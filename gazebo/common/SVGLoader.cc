@@ -61,8 +61,12 @@ std::vector<std::string> &split(const std::string &_s,
 /////////////////////////////////////////////////
 ignition::math::Matrix3d ParseTransformMatrixStr(const std::string &_transformStr)
 {
+  gzwarn << "ParseTransformMatrixStr " << _transformStr << std::endl;
   if(_transformStr.empty())
+  {
+    gzerr << "NO TRANSFORM" << std::endl;
     return ignition::math::Matrix3d::Identity;
+  }
 
   // _transfromStr should not have a closing paren and look like this
   // matrix(0,0.55669897,-0.55669897,0,194.55441,-149.50402
@@ -86,47 +90,48 @@ ignition::math::Matrix3d ParseTransformMatrixStr(const std::string &_transformSt
     double v02 = stod(numbers[4]);
     double v12 = stod(numbers[5]);
     ignition::math::Matrix3d m(v00, v01, v02, v10, v11, v12, 0, 0, 1);
+    gzmsg << "  M: " << m << std::endl;
     return m;
   }
 
   if(transform.find("skewX") != std::string::npos)
   {
     gzmsg << "skewX" << std::endl;
-
-    ignition::math::Matrix3d m;
+    ignition::math::Matrix3d m = ignition::math::Matrix3d::Identity;
     return m;
   }
 
   if(transform.find("skewY") != std::string::npos)
   {
     gzmsg << "skewY" << std::endl;
-    ignition::math::Matrix3d m;
+    ignition::math::Matrix3d m = ignition::math::Matrix3d::Identity;
     return m;
   }
 
   if(transform.find("scale") != std::string::npos)
   {
     gzmsg << "scale" << std::endl;
-    ignition::math::Matrix3d m;
+    ignition::math::Matrix3d m = ignition::math::Matrix3d::Identity;
     return m;
   }
 
   if(transform.find("translate") != std::string::npos)
   {
     gzmsg << "translate" << std::endl;
-    ignition::math::Matrix3d m;
+    ignition::math::Matrix3d m = ignition::math::Matrix3d::Identity;
     return m;
   }
 
   if(transform.find("rotate") != std::string::npos)
   {
     gzmsg << "rotate" << std::endl;
-    ignition::math::Matrix3d m;
+    ignition::math::Matrix3d m = ignition::math::Matrix3d::Identity;
+    gzmsg << "  M: " << m << std::endl;
     return m;
   }
 
   gzwarn << "Unsupported transformation: " << transform << std::endl;
-  ignition::math::Matrix3d m;
+  ignition::math::Matrix3d m = ignition::math::Matrix3d::Identity;
   return m;
 }
 
@@ -652,21 +657,29 @@ void SVGLoader::GetPathCommands(const std::vector<std::string> &_tokens,
   // if necessary, apply transform to p and polyline
   if (_path.transform != ignition::math::Matrix3d::Identity)
   {
+    gzmsg << _path.id << " [" << _path.transform << "]\n";
     // we need to transform all the points in the path
     for(auto &polyline: _path.polylines)
     {
       for (auto  &polyPoint: polyline)
       {
-        gzerr << "trans: " << polyPoint  << std::endl;
+        gzerr << "trans before: " << polyPoint  << std::endl;
+        ignition::math::Vector3d point3(polyPoint.X(), polyPoint.Y(), 0);
+        auto transformed = _path.transform * point3;
+        polyPoint.X(transformed.X());
+        polyPoint.Y(transformed.Y());
+        gzerr << "trans after: " << polyPoint  << std::endl;
       }
     }
   }
+
 }
 
 /////////////////////////////////////////////////
 void SVGLoader::GetPathAttribs(TiXmlElement *_pElement, SVGPath &_path)
 {
   GZ_ASSERT(_pElement, "empty XML element where a path was expected");
+  _path.transform = ignition::math::Matrix3d::Identity;
   TiXmlAttribute *pAttrib = _pElement->FirstAttribute();
   while (pAttrib)
   {

@@ -211,6 +211,43 @@ TEST_F(SVGLoader, ClosedLoops)
 }
 
 /////////////////////////////////////////////////
+TEST_F(SVGLoader, Transforms)
+{
+  // this tests the PathsToClosedPolylines function
+  common::SVGLoader loader(3);
+  std::vector<common::SVGPath> paths;
+  std::string filePath = std::string(PROJECT_SOURCE_PATH);
+  filePath += "/test/data/svg/transform.svg";
+  bool success = loader.Parse(filePath, paths);
+  EXPECT_EQ(true, success);
+
+  // save for inspection
+  std::ofstream out("transform.html");
+  loader.DumpPaths(paths, out);
+  out.close();
+
+
+  std::vector< std::vector<ignition::math::Vector2d> > closedPolys;
+  std::vector< std::vector<ignition::math::Vector2d> > openPolys;
+
+  loader.PathsToClosedPolylines(paths, tol, closedPolys, openPolys);
+
+  EXPECT_EQ(0u, openPolys.size());
+  EXPECT_EQ(2u, closedPolys.size());
+
+  // without transform, the first segment of the firts polyline is vertical
+  // (x is constant)
+  auto p0 = closedPolys[0][0];
+  auto p1 = closedPolys[0][1];
+  double dx = fabs(p0.X() - p1.X());
+  EXPECT_GT(dx, 10.0);
+  // without transform, the first segment of the second poly is horizontal
+  // (y is constant)
+  double dy = fabs(closedPolys[1][0].Y() - closedPolys[1][1].Y() );
+  EXPECT_GT(dy, 10.0);
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
