@@ -90,7 +90,6 @@ ignition::math::Matrix3d ParseTransformMatrixStr(const std::string &_transformSt
     double v02 = stod(numbers[4]);
     double v12 = stod(numbers[5]);
     ignition::math::Matrix3d m(v00, v01, v02, v10, v11, v12, 0, 0, 1);
-    gzmsg << "  M: " << m << std::endl;
     return m;
   }
 
@@ -657,18 +656,17 @@ void SVGLoader::GetPathCommands(const std::vector<std::string> &_tokens,
   // if necessary, apply transform to p and polyline
   if (_path.transform != ignition::math::Matrix3d::Identity)
   {
-    gzmsg << _path.id << " [" << _path.transform << "]\n";
     // we need to transform all the points in the path
     for(auto &polyline: _path.polylines)
     {
       for (auto  &polyPoint: polyline)
       {
-        gzerr << "trans before: " << polyPoint  << std::endl;
+	// make a 3d vector form the 2d point
         ignition::math::Vector3d point3(polyPoint.X(), polyPoint.Y(), 0);
+	// matrix multiply
         auto transformed = _path.transform * point3;
         polyPoint.X(transformed.X());
         polyPoint.Y(transformed.Y());
-        gzerr << "trans after: " << polyPoint  << std::endl;
       }
     }
   }
