@@ -15,6 +15,7 @@
           <contact_surface_layer>0</contact_surface_layer>
         </constraints>
       </ode>
+      <real_time_update_rate>0.000000</real_time_update_rate>
       <max_step_size>0.001</max_step_size>
     </physics>
     <model name='box'>
