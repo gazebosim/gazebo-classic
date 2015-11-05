@@ -40,7 +40,7 @@ class PhysicsTest : public ServerFixture,
 
   /// \brief Callback for contact subscribers in depth test.
   /// \param[in] _msg Contact message
-  private: void Callback(const ConstContactsPtr &_msg);
+  private: void ContactCallback(const ConstContactsPtr &_msg);
 
   /// \brief Message to be filled with the latest contacts message.
   private: msgs::Contacts contactsMsg;
@@ -50,7 +50,7 @@ class PhysicsTest : public ServerFixture,
 };
 
 /////////////////////////////////////////////////
-void PhysicsTest::Callback(const ConstContactsPtr &_msg)
+void PhysicsTest::ContactCallback(const ConstContactsPtr &_msg)
 {
   boost::mutex::scoped_lock lock(this->mutex);
   this->contactsMsg = *_msg;
@@ -99,13 +99,14 @@ void PhysicsTest::ElasticModulusContact(const std::string &_physicsEngine)
 
   gzdbg << "Listening to " << topic << std::endl;
   transport::SubscriberPtr sub = this->node->Subscribe(topic,
-      &PhysicsTest::Callback, this);
+      &PhysicsTest::ContactCallback, this);
 
+  getchar();
   // step to let contact happen and settle
   world->Step(3000);
 
   // Wait for contact messages to be received
-  int maxSleep = 30;
+  int maxSleep = 100;
   int sleep = 0;
   while (this->contactsMsg.contact().size() < 1 && sleep < maxSleep)
   {
@@ -113,14 +114,11 @@ void PhysicsTest::ElasticModulusContact(const std::string &_physicsEngine)
     sleep++;
   }
   ASSERT_EQ(this->contactsMsg.contact().size(), 1);
-  // Copy message to local variable
-  msgs::Contacts contacts;
-  {
-    boost::mutex::scoped_lock lock(this->mutex);
-    contacts = this->contactsMsg;
-  }
 
-  // recompute stiffness by hand to double check physics
+  // recorded from opende/src/joints/contact.cpp:208
+  const double k_converged = 71448.294771;
+  const double k_lin_converged =  11488.234018;
+
   // sphere
   const double nu1 = 0.4;
   const double E1 = 600000;
@@ -135,64 +133,93 @@ void PhysicsTest::ElasticModulusContact(const std::string &_physicsEngine)
   // contact force
   double f1 = -physics->GetGravity().x * m1;
 
-  // get min contact depth from model
-  const double minDepth = std::min(0.0015, 0.001);
-
-  // GET CONTACT DEPTH FROM CONTACT MANAGER
-  ASSERT_EQ(contacts.contact().size(), 1);
-  double d1 = 0;
-  for (auto const &contact : contacts.contact())
+  for (int n = 0; n < 30; ++n)
   {
-    gzdbg << "col1 [" << contact.collision1()
-          << "] col2 [" << contact.collision2()
-          << "]\n";
-    EXPECT_EQ(contact.depth().size(), 1);
-    for (auto const &d : contact.depth())
+  getchar();
+    world->Step(200);
+    // Copy message to local variable
+    msgs::Contacts contacts;
     {
-      d1 = d - minDepth;
-      // gzerr << d1 << "\n";
+      boost::mutex::scoped_lock lock(this->mutex);
+      contacts = this->contactsMsg;
     }
+
+    // recompute stiffness by hand to double check physics
+
+    // get min contact depth from model
+    const double minDepth = std::min(0.0015, 0.001);
+
+    // GET CONTACT DEPTH FROM CONTACT MANAGER
+    ASSERT_EQ(contacts.contact().size(), 1);
+    double d1 = 0;
+    for (auto const &contact : contacts.contact())
+    {
+      gzdbg << "col1 [" << contact.collision1()
+            << "] col2 [" << contact.collision2()
+            << "]\n";
+      EXPECT_EQ(contact.depth().size(), 1);
+      for (auto const &d : contact.depth())
+      {
+        d1 = d - minDepth;
+        // gzerr << d1 << "\n";
+      }
+    }
+    EXPECT_FLOAT_EQ(d1, 0.025853707);
+
+    // GET CONTACT DEPTH FROM LINK POSES AND KNOWN GEOMETRY INFORMATION
+    double d2 = 1.0 - (sphere_link->GetWorldPose().pos.x -
+                 box_link->GetWorldPose().pos.x) - minDepth;
+
+    EXPECT_FLOAT_EQ(d1, d2);
+
+    // GET CONTACT DEPTH BASED ON CONTACT MODEL
+    // k = f / d^1.5 or f = k * d^1.5.
+    // And we know that:
+    //   k = 4.0 / 3.0 * e_star * sqrt(patch_radius);
+    // or
+    //   k = 4.0 / 3.0 * e_star * sqrt(sqrt(R_star * depth));
+    // and
+    //   f = k * depth^1.5
+    // therefore
+    //   f = 4.0 / 3.0 * e_star * sqrt(sqrt(R_star)) * depth^1.75
+    // knowing f,
+    // solving for d yeilds analytical depth:
+    double d3 = pow(f1 / (4.0 / 3.0 * E_star * sqrt(sqrt(R_star))), 1.0/1.75);
+
+    // check that d1 and d3 should be near
+    EXPECT_LT(fabs(d1-d3)/d3, PHYSICS_TOL);
+
+    // linearized contact patch radius
+    double patchRadius = sqrt(R_star * d1);
+
+    // check stiffness
+    double k = 4.0 / 3.0 * E_star * sqrt(patchRadius);
+    // check linearized stiffness (should match ode internal k_hertz_sqrtx)
+    double k_lin = 4.0 / 3.0 * E_star * sqrt(patchRadius*d1);
+
+    // recorded from opende/src/joints/contact.cpp:208
+    EXPECT_FLOAT_EQ(k,     k_converged);
+    // recorded from opende/src/joints/contact.cpp:208
+    EXPECT_FLOAT_EQ(k_lin, k_lin_converged);
+
+    gzdbg << "Contact State:\n"
+          << "  t [" << world->GetSimTime().Double()
+          << "]\n f1 [" << f1
+          << "]\n  E* [" << E_star
+          << "]\n  R* [" << R_star
+          << "]\n  patch radius [" << patchRadius
+          << "]\n  d contact manager [" << d1
+          << "]\n  d geom [" << d2
+          << "]\n  d solution [" << d3
+          << "]\n  d relative error [" << (d1-d3)/d3
+          << "]\n  patch radius [" << patchRadius
+          << "]\n  k(Hertzian) [" << k
+          << "]\n  k relative error [" << (k - k_converged)/k_converged
+          << "]\n  k(liearized about depth) [" << k_lin
+          << "]\n  k lin relative error ["
+          << (k_lin - k_lin_converged)/k_lin_converged
+          << "] \n";
   }
-  EXPECT_FLOAT_EQ(d1, 0.0059920521);
-
-  // GET CONTACT DEPTH FROM LINK POSES AND KNOWN GEOMETRY INFORMATION
-  double d2 = 1.0 - (sphere_link->GetWorldPose().pos.x -
-               box_link->GetWorldPose().pos.x) - minDepth;
-
-  EXPECT_FLOAT_EQ(d1, d2);
-
-  // GET CONTACT DEPTH BASED ON CONTACT MODEL
-  // k = f / d or f = k * d.
-  // And we know that:
-  //   k = 4.0 / 3.0 * e_star * sqrt(patch_radius);
-  // or
-  //   k = 4.0 / 3.0 * e_star * sqrt(R_star * depth);
-  // So f = 4.0 / 3.0 * e_star * sqrt(R_star) * depth^1.5
-  // knowing f,
-  // solving for d yeilds:
-  double d3 = pow(f1 / (4.0 / 3.0 * E_star * sqrt(sqrt(R_star))), 1.0/1.25);
-
-  // check that d1 and d3 should be near
-  EXPECT_LT(fabs(d1-d3)/d3, PHYSICS_TOL);
-  gzdbg << "relative error: " << (d1-d3)/d3 << "\n";
-
-  // contact patch radius
-  double patchRadius = sqrt(R_star * d1);
-
-  // double check recorded stiffness
-  double stiffness = 4.0 / 3.0 * E_star * sqrt(patchRadius);
-  EXPECT_FLOAT_EQ(stiffness, 49574.125);
-
-  gzdbg << "Contact State:\n  f1 [" << f1
-        << "]\n  E* [" << E_star
-        << "]\n  R* [" << R_star
-        << "]\n  patch radius [" << patchRadius
-        << "]\n  d contact manager [" << d1
-        << "]\n  d geom [" << d2
-        << "]\n  d solution [" << d3
-        << "]\n  patch radius [" << patchRadius
-        << "]\n  stiffness [" << stiffness
-        << "] \n";
 }
 
 TEST_P(PhysicsTest, ElasticModulusContact)

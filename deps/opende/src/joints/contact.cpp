@@ -175,13 +175,21 @@ dxJointContact::getInfo2( dxJoint::Info2 *info )
 
         // use elastic modulus
         dReal e_star = contact.surface.elastic_modulus;
-        /// \TODO Using Hertzian contact, but ignoring the ^1.5 power!!!
-        /// We should fix this by either linearizing about x, or try
-        /// to rederive the cfm/erp -> kp/kd equivalence (per Catto)
-        /// for stiffness term = K*x^1.5.
-        /// For now, pretend it's just x.
-        ///   equation 5.23 form Contact Mechanics and Friction by Popov
-        dReal stiffness = 4.0 / 3.0 * e_star * sqrt(patch_radius);
+
+        /// Using Hertzian contact, where stiffness term f = K*x^1.5.
+        /// Equation 5.23 form Contact Mechanics and Friction by Popov.
+        /// Split the penetration depth term to the 1.5 power
+        /// (x^1.5) as x(last iteration)^0.5 * x(current iteration)^1.3:
+        ///   f = K*x^0.5 * x
+        /// Let linearized stiffness
+        ///   K* = K*x^0.5
+        /// then,
+        ///   f = K* * x
+        dReal khertz_sqrtx = 4.0 / 3.0 * e_star * sqrt(patch_radius * depth);
+        /// but note that this is not the linear spring stiffness
+        /// we are used to dealing with.
+        /// This is the Hertzian stiffness governed by
+        /// a non-linear equation (k*x^1.5).
 
         // to convert stiffness to erp:
         // first recover kd from previous cfm and erp
@@ -190,14 +198,16 @@ dxJointContact::getInfo2( dxJoint::Info2 *info )
         //   cfm = 1 / ( dt * kp + kd )
         dReal kd = 1.0/info->cfm[0] - local_erp/info->fps;
         // compute erp using stiffness and kd
-        dReal kph = stiffness/info->fps;
+        dReal kph = khertz_sqrtx/info->fps;
         local_erp = (kph) / (kph + kd);
         // compute new cfm for the new stiffness
-        info->cfm[0] = 1.0 / (stiffness/info->fps + kd);
+        info->cfm[0] = 1.0 / (khertz_sqrtx/info->fps + kd);
 
         // debug, comparing stiffnesss, force and depth
-        // printf("depth: %f, d: %f, k: %f, f: %f\n",
-        //   depth, kd, stiffness, stiffness*depth);
+        // used to generate values for test/integration/elastic_modulus.cc:118
+        // printf("depth: %f, d: %f, k: %f k_linearized: %f, f: %f\n",
+        //   depth, kd, 4.0 / 3.0 * e_star * sqrt(patch_radius),
+        //   khertz_sqrtx, khertz_sqrtx*depth);
     }
     dReal k = info->fps * local_erp;
 
