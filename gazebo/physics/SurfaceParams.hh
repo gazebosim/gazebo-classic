@@ -104,7 +104,7 @@ namespace gazebo
       public: double PoissonsRatio() const;
 
       /// \brief Set the Poisson's ratio
-      /// \param[in] _modulus Poisson's ratio
+      /// \param[in] _ratio Poisson's ratio
       public: void SetPoissonsRatio(double _ratio);
 
       /// \brief Get the elastic modulus
