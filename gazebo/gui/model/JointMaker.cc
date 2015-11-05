@@ -413,11 +413,11 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
             return false;
         }
 
-	if (this->hoverVis)
-	{
-	  this->hoverVis->SetEmissive(common::Color(0, 0, 0));
-	  this->hoverVis.reset();
-	}
+        if (this->hoverVis)
+        {
+          this->hoverVis->SetEmissive(common::Color(0, 0, 0));
+          this->hoverVis.reset();
+        }
       }
     }
 
@@ -666,7 +666,7 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
   // Case when a parent link is already selected and currently
   // extending the joint line to a child link
   if (this->newJoint && this->newJoint->parent && this->hoverVis &&
-      this->newJoint->line && this->newJoint->parent)
+      this->newJoint->line)
   {
     math::Vector3 parentPos;
 
