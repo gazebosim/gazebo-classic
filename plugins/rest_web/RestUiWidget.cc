@@ -15,11 +15,12 @@
  *
 */
 
+#include <gazebo/gui/qt.h>
+#include <gazebo/gui/GuiEvents.hh>
 #include <gazebo/gui/MainWindow.hh>
 #include <gazebo/gui/RenderWidget.hh>
 #include <gazebo/gui/TopToolbar.hh>
 
-#include <QMessageBox>
 #include "RestUiWidget.hh"
 
 using namespace gazebo;
@@ -51,6 +52,8 @@ RestUiWidget::RestUiWidget(QWidget *_parent,
   this->restID = static_cast<unsigned int>(common::Time::GetWallTime().nsec);
 
   this->toolbar = NULL;
+  this->loginLabelAct = NULL;
+  this->loginLabel = new QLabel();
   gui::MainWindow *mainWindow = qobject_cast<gui::MainWindow *>(_parent);
   if (mainWindow)
   {
@@ -59,8 +62,29 @@ RestUiWidget::RestUiWidget(QWidget *_parent,
     {
       this->toolbar = renderWidget->GetToolbar();
 
-      this->loginLabel = new QLabel();
-      this->toolbar->AddWidget(this->loginLabel);
+      // push icons to the left for the login label
+      QAction *spaceAction =
+          this->toolbar->findChild<QAction *>("toolbarSpacerAction");
+      QToolBar *tb =
+          this->toolbar->findChild<QToolBar *>("topToolbarToolbar");
+      if (spaceAction && tb)
+      {
+        QWidget *w = tb->widgetForAction(spaceAction);
+        w->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+      }
+
+      // Empty space to push the label to the right
+      QWidget *spacer = new QWidget();
+      spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+      QAction *spacerAction = this->toolbar->AddWidget(spacer);
+      spacerAction->setObjectName("toolbarLoginSpacerAction");
+
+      this->loginLabelAct = this->toolbar->AddWidget(this->loginLabel);
+
+      // Connections
+      this->connections.push_back(
+          gui::Events::ConnectWindowMode(
+          boost::bind(&RestUiWidget::OnWindowMode, this, _1)));
     }
   }
   if (!this->toolbar)
@@ -159,4 +183,11 @@ void RestUiWidget::Update()
       this->loginLabel->setText(tr(""));
     }
   }
+}
+
+/////////////////////////////////////////////////
+void RestUiWidget::OnWindowMode(const std::string &/*_mode*/)
+{
+  if (this->loginLabelAct)
+    this->loginLabelAct->setVisible(true);
 }

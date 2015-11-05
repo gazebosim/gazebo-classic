@@ -147,25 +147,23 @@ TopToolbar::TopToolbar(QWidget *_parent)
     g_viewAngleButtonAct = this->dataPtr->toolbar->addWidget(viewAngleButton);
   }
 
-  this->dataPtr->toolbar->addSeparator();
+  // Empty space to push whatever comes next to the right
+  QWidget *spacer = new QWidget();
+  spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+  QAction *spacerAction = this->dataPtr->toolbar->addWidget(spacer);
+  spacerAction->setObjectName("toolbarSpacerAction");
 
-  // Empty space to for editor actions
+/*  // Empty space to for editor actions
   QWidget *editorSpacer = new QWidget();
   editorSpacer->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
   QAction *editorSpacerAction = this->dataPtr->toolbar->addWidget(editorSpacer);
-  editorSpacerAction->setObjectName("toolbarEditorSpacerAction");
+  editorSpacerAction->setObjectName("toolbarEditorSpacerAction");*/
 
   // Screenshot / logging
   if (g_screenshotAct)
     this->dataPtr->toolbar->addAction(g_screenshotAct);
   if (g_dataLoggerAct)
     this->dataPtr->toolbar->addAction(g_dataLoggerAct);
-
-  // Empty space to push whatever comes next to the right
-  QWidget *spacer = new QWidget();
-  spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-  QAction *spacerAction = this->dataPtr->toolbar->addWidget(spacer);
-  spacerAction->setObjectName("toolbarSpacerAction");
 
   // Layout
   QHBoxLayout *toolLayout = new QHBoxLayout;

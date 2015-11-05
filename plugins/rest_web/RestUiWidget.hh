@@ -72,6 +72,10 @@ namespace gazebo
     /// \param[in] _msg Rest response message.
     private: void OnResponse(ConstRestResponsePtr &_msg);
 
+    /// \brief Callback when window mode is changed.
+    /// \param[in] _mode New window mode.
+    private: void OnWindowMode(const std::string &_mode);
+
     /// \brief Login menu item
     private: QAction &loginMenuAction;
 
@@ -109,6 +113,12 @@ namespace gazebo
 
     /// \brief ID of this rest service client
     private: unsigned int restID;
+
+    /// \brief Pointer to the Qt action associated with the login label.
+    private: QAction *loginLabelAct;
+
+    /// \brief Event based connections.
+    public: std::vector<event::ConnectionPtr> connections;
   };
 }
 

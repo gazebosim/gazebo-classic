@@ -192,26 +192,20 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
 
   // Separator
   QAction *jointSeparatorAct =
-      topToolbar->InsertSeparator("toolbarEditorSpacerAction");
+      topToolbar->InsertSeparator("toolbarSpacerAction");
   jointSeparatorAct->setObjectName(
       "modelEditorJointSeparatorAct");
 
   // Joint create action
-  topToolbar->InsertAction("toolbarEditorSpacerAction", this->dataPtr->jointAct);
+  topToolbar->InsertAction("toolbarSpacerAction", this->dataPtr->jointAct);
 
   // Joint type dropdown
-  QAction *jointTypeAct = topToolbar->InsertWidget("toolbarEditorSpacerAction",
+  QAction *jointTypeAct = topToolbar->InsertWidget("toolbarSpacerAction",
       jointButton);
   jointTypeAct->setObjectName("modelEditorJointTypeAct");
 
-  QAction *jointEndSeparatorAct =
-      topToolbar->InsertSeparator("toolbarEditorSpacerAction");
-  jointEndSeparatorAct->setObjectName(
-      "modelEditorJointEndSeparatorAct");
-
   this->dataPtr->jointAct->setVisible(false);
   jointSeparatorAct->setVisible(false);
-  jointEndSeparatorAct->setVisible(false);
   jointTypeAct->setVisible(false);
 
   this->dataPtr->signalMapper = new QSignalMapper(this);
