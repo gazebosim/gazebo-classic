@@ -48,7 +48,7 @@
               <elastic_modulus>500000.0</elastic_modulus>
               <ode>
                 <kp>1</kp>
-                <kd>1.0</kd>
+                <kd>100.0</kd>
                 <max_vel>100.0</max_vel>
                 <min_depth>0.0015</min_depth>
               </ode>
@@ -113,7 +113,7 @@
               <elastic_modulus>600000.0</elastic_modulus>
               <ode>
                 <kp>1</kp>
-                <kd>1.0</kd>
+                <kd>100.0</kd>
                 <max_vel>100.0</max_vel>
                 <min_depth>0.001</min_depth>
               </ode>

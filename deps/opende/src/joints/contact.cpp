@@ -185,10 +185,9 @@ dxJointContact::getInfo2( dxJoint::Info2 *info )
 
         // to convert stiffness to erp:
         // first recover kd from previous cfm and erp
-        // then compute new cfm and erp.
-        // get kd using:
-        //   cfm = 1 / ( dt * kp + kd )
-        dReal kd = 1.0/info->cfm[0] - local_erp/info->fps;
+        dReal kd = 0;
+        if (info->cfm[0] > 0.0)
+          kd = (1.0 - local_erp)/info->cfm[0];
         // compute erp using stiffness and kd
         dReal kph = stiffness/info->fps;
         local_erp = (kph) / (kph + kd);

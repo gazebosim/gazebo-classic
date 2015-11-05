@@ -153,7 +153,7 @@ void PhysicsTest::ElasticModulusContact(const std::string &_physicsEngine)
       // gzerr << d1 << "\n";
     }
   }
-  EXPECT_FLOAT_EQ(d1, 0.0059920521);
+  EXPECT_FLOAT_EQ(d1, 0.0059949514);
 
   // GET CONTACT DEPTH FROM LINK POSES AND KNOWN GEOMETRY INFORMATION
   double d2 = 1.0 - (sphere_link->GetWorldPose().pos.x -
@@ -181,7 +181,7 @@ void PhysicsTest::ElasticModulusContact(const std::string &_physicsEngine)
 
   // double check recorded stiffness
   double stiffness = 4.0 / 3.0 * E_star * sqrt(patchRadius);
-  EXPECT_FLOAT_EQ(stiffness, 49574.125);
+  EXPECT_FLOAT_EQ(stiffness, 49580.121);
 
   gzdbg << "Contact State:\n  f1 [" << f1
         << "]\n  E* [" << E_star
