@@ -53,6 +53,7 @@ RestUiWidget::RestUiWidget(QWidget *_parent,
 
   this->toolbar = NULL;
   this->loginLabelAct = NULL;
+  this->spacerAct = NULL;
   this->loginLabel = new QLabel();
   gui::MainWindow *mainWindow = qobject_cast<gui::MainWindow *>(_parent);
   if (mainWindow)
@@ -63,21 +64,21 @@ RestUiWidget::RestUiWidget(QWidget *_parent,
       this->toolbar = renderWidget->GetToolbar();
 
       // push icons to the left for the login label
-      QAction *spaceAction =
+      QAction *tbSpacerAction =
           this->toolbar->findChild<QAction *>("toolbarSpacerAction");
       QToolBar *tb =
           this->toolbar->findChild<QToolBar *>("topToolbarToolbar");
-      if (spaceAction && tb)
+      if (tbSpacerAction && tb)
       {
-        QWidget *w = tb->widgetForAction(spaceAction);
+        QWidget *w = tb->widgetForAction(tbSpacerAction);
         w->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
       }
 
       // Empty space to push the label to the right
       QWidget *spacer = new QWidget();
       spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-      QAction *spacerAction = this->toolbar->AddWidget(spacer);
-      spacerAction->setObjectName("toolbarLoginSpacerAction");
+      this->spacerAct = this->toolbar->AddWidget(spacer);
+      this->spacerAct->setObjectName("toolbarLoginSpacerAction");
 
       this->loginLabelAct = this->toolbar->AddWidget(this->loginLabel);
 
@@ -190,4 +191,6 @@ void RestUiWidget::OnWindowMode(const std::string &/*_mode*/)
 {
   if (this->loginLabelAct)
     this->loginLabelAct->setVisible(true);
+  if (this->spacerAct)
+    this->spacerAct->setVisible(true);
 }

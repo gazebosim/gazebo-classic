@@ -118,6 +118,10 @@ namespace gazebo
     /// \brief Pointer to the Qt action associated with the login label.
     private: QAction *loginLabelAct;
 
+    /// \brief Pointer to the Qt action associated with the spacer widget
+    /// before the login label.
+    private: QAction *spacerAct;
+
     /// \brief Event based connections.
     public: std::vector<event::ConnectionPtr> connections;
   };
