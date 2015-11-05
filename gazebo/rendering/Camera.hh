@@ -535,6 +535,49 @@ namespace gazebo
       /// \sa SetProjectionType(const std::string &_type)
       public: std::string GetProjectionType() const;
 
+      /// \brief Get whether this camera is static when tracking a model.
+      /// \return True if camera is static when tracking a model.
+      /// \sa SetTrackIsStatic(bool _isStatic)
+      public: virtual bool GetTrackIsStatic() const;
+
+      /// \brief Set whether this camera is static when tracking a model.
+      /// \param[in] _isStatic True means camera is static when tracking a
+      /// model.
+      /// \sa GetTrackIsStatic()
+      public: virtual void SetTrackIsStatic(bool _isStatic);
+
+      /// \brief Get whether this camera's position is relative to tracked
+      /// models.
+      /// \return True if camera's position is relative to tracked models.
+      /// \sa SetTrackIsRelative(bool _isRelative)
+      public: virtual bool GetTrackIsRelative() const;
+
+      /// \brief Set whether this camera's position is relative to tracked
+      /// models.
+      /// \param[in] _isStatic True means camera's position is relative to
+      /// tracked models.
+      /// \sa GetTrackIsRelative()
+      public: virtual void SetTrackIsRelative(bool _isRelative);
+
+      /// \brief Return the position of the camera when tracking a model.
+      /// \return Position of the camera.
+      /// \sa SetTrackPosition(const ignition::math::Vector3d &_pos)
+      public: virtual ignition::math::Vector3d GetTrackPosition() const;
+
+      /// \brief Set the position of the camera when tracking a model.
+      /// \param[in] _pos Position of the camera.
+      /// \sa GetTrackPosition()
+      public: virtual void SetTrackPosition(
+                  const ignition::math::Vector3d &_pos);
+
+      /// \brief Return the distance to the tracked model.
+      /// \return Distance to the model.
+      public: virtual double GetTrackDistance() const;
+
+      /// \brief Set the between the camera and tracked model.
+      /// \param[in] _dist Distance between camera and model.
+      public: virtual void SetTrackDistance(double _dist);
+
       /// \brief Implementation of the render call
       protected: virtual void RenderImpl();
 

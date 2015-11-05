@@ -596,6 +596,12 @@ namespace gazebo
               camSDF->Get<std::string>("projection_type"));
         }
 
+        if (camSDF->HasElement("follow_model"))
+        {
+          guiCam->mutable_follow()->CopyFrom(
+              FollowModelFromSDF(camSDF->GetElement("follow_model")));
+        }
+
         if (camSDF->HasElement("track_visual"))
         {
           guiCam->mutable_track()->CopyFrom(
@@ -621,6 +627,29 @@ namespace gazebo
         ss << innerElem->ToString("");
       }
       result.set_innerxml(ss.str());
+
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    msgs::FollowModel FollowModelFromSDF(sdf::ElementPtr _sdf)
+    {
+      msgs::FollowModel result;
+
+      if (_sdf->HasElement("static"))
+        result.set_is_static(_sdf->Get<bool>("static"));
+
+      if (_sdf->HasElement("relative"))
+        result.set_is_relative(_sdf->Get<bool>("relative"));
+
+      if (_sdf->HasElement("xyz"))
+      {
+        msgs::Set(result.mutable_xyz(),
+            _sdf->Get<ignition::math::Vector3d>("xyz"));
+      }
+
+      if (_sdf->HasElement("distance"))
+        result.set_distance(_sdf->GetElement("distance")->Get<double>());
 
       return result;
     }

@@ -1859,6 +1859,32 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
       g_orbitAct->setEnabled(false);
     }
 
+    if (_msg->camera().has_follow())
+    {
+      if (_msg->camera().follow().has_is_static())
+      {
+        cam->SetTrackIsStatic(_msg->camera().follow().is_static());
+      }
+
+      if (_msg->camera().follow().has_is_relative())
+      {
+        cam->SetTrackIsRelative(_msg->camera().follow().is_relative());
+      }
+
+      if (_msg->camera().follow().has_xyz())
+      {
+        const msgs::Vector3d &msg_pos = _msg->camera().follow().xyz();
+        ignition::math::Vector3d cam_pos = ignition::math::Vector3d(
+          msg_pos.x(),
+          msg_pos.y(),
+          msg_pos.z());
+        cam->SetTrackPosition(cam_pos);
+      }
+
+      if (_msg->camera().follow().has_distance())
+        cam->SetTrackDistance(_msg->camera().follow().distance());
+    }
+
     if (_msg->camera().has_track())
     {
       std::string name = _msg->camera().track().name();
