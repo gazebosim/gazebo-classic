@@ -85,15 +85,15 @@ void JointController::Reset()
   std::map<std::string, common::PID>::iterator iter;
 
   for (iter = this->dataPtr->posPids.begin();
-  iter != this->dataPtr->posPids.end(); ++iter)
+    iter != this->dataPtr->posPids.end(); ++iter)
   {
-    this->dataPtr->posPids[iter->first].Reset();
+    iter->second.Reset();
   }
 
-  for (iter = this->dataPtr->velPids.begin();
-    iter != this->dataPtr->velPids.end(); ++iter)
+  for (iter = this->dataPtr->posPids.begin();
+    iter != this->dataPtr->posPids.end(); ++iter)
   {
-    this->dataPtr->velPids[iter->first].Reset();
+    iter->second.Reset();
   }
 }
 
