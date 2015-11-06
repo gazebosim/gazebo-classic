@@ -4,6 +4,9 @@
    Use tinyxml2 for playback.
     * [Pull request #1931](https://bitbucket.org/osrf/gazebo/pull-request/1931)
 
+1. Improve SVG import. Added support for transforms in paths.
+    * [Pull request #1981](https://bitbucket.org/osrf/gazebo/pull-request/1981)
+
 1 Added Ignition Transport dependency.
   * [Pull request #1930](https://bitbucket.org/osrf/gazebo/pull-request/1930)
 
@@ -164,7 +167,7 @@ using the same arguments used in the command line.
 1. Update inertia properties during simulation
     * [Pull request #1909](https://bitbucket.org/osrf/gazebo/pull-requests/1909)
     * [Design document](https://bitbucket.org/osrf/gazebo_design/src/default/inertia_resize/inertia_resize.md)
-    
+
 1. Fix transparency correction for opaque materials
     * [Pull request #1946](https://bitbucket.org/osrf/gazebo/pull-requests/1946/fix-transparency-correction-for-opaque/diff)
 

@@ -213,7 +213,7 @@ TEST_F(SVGLoader, ClosedLoops)
 /////////////////////////////////////////////////
 TEST_F(SVGLoader, Transforms)
 {
-  // this tests the PathsToClosedPolylines function
+  // this tests the scale, matrix and rotation transforms
   common::SVGLoader loader(3);
   std::vector<common::SVGPath> paths;
   std::string filePath = std::string(PROJECT_SOURCE_PATH);
@@ -240,13 +240,69 @@ TEST_F(SVGLoader, Transforms)
   auto p0 = closedPolys[0][0];
   auto p1 = closedPolys[0][1];
   double dy = fabs(p0.Y() - p1.Y());
-  gzmsg << dy << " rewrdewr\n";
   EXPECT_LE(dy, 40.0);
   // without transform, the first segment of the second poly is horizontal
   // (y is constant, dy is 0)
   dy = fabs(closedPolys[1][0].Y() - closedPolys[1][1].Y() );
-  gzmsg << dy << " rewrdewr Y\n";
   EXPECT_GT(dy, 150.0);
+}
+
+/////////////////////////////////////////////////
+TEST_F(SVGLoader, Transforms2)
+{
+  // this tests the skewY and skewX transforms
+  common::SVGLoader loader(3);
+  std::vector<common::SVGPath> paths;
+  std::string filePath = std::string(PROJECT_SOURCE_PATH);
+  filePath += "/test/data/svg/transform2.svg";
+  bool success = loader.Parse(filePath, paths);
+  EXPECT_EQ(true, success);
+
+  // save for inspection
+  std::ofstream out("transform.html");
+  loader.DumpPaths(paths, out);
+  out.close();
+
+
+  std::vector< std::vector<ignition::math::Vector2d> > closedPolys;
+  std::vector< std::vector<ignition::math::Vector2d> > openPolys;
+
+  loader.PathsToClosedPolylines(paths, tol, closedPolys, openPolys);
+
+  EXPECT_EQ(0u, openPolys.size());
+  EXPECT_EQ(3u, closedPolys.size());
+
+  EXPECT_EQ("original", paths[0].id);
+  double dxOriginal = fabs(closedPolys[0][0].X() - closedPolys[0][1].X() );
+  double dyOriginal = fabs(closedPolys[0][0].Y() - closedPolys[0][1].Y() );
+  gzmsg << dxOriginal << " X original 0-1\n";
+  gzmsg << dyOriginal << " Y original 0-1\n";
+  // the sgment is vertical (dx = 0)
+  EXPECT_DOUBLE_EQ(dxOriginal, 0);
+
+  EXPECT_EQ("skewx", paths[1].id);
+  double dxSkewX = fabs(closedPolys[1][0].X() - closedPolys[1][1].X() );
+  double dySkewX = fabs(closedPolys[1][0].Y() - closedPolys[1][1].Y() );
+  gzmsg << dxSkewX << " X skewX 0-1\n";
+  gzmsg << dySkewX << " Y skewX 0-1\n";
+  // the segment is 45 degree, hence dx = dy
+  EXPECT_DOUBLE_EQ(dxSkewX, dySkewX);
+
+  EXPECT_EQ("skewy", paths[2].id);
+  double dxSkewY = fabs(closedPolys[2][0].X() - closedPolys[2][1].X() );
+  double dySkewY = fabs(closedPolys[2][0].Y() - closedPolys[2][1].Y() );
+  gzmsg << dxSkewY << " X skewY 0-1\n";
+  gzmsg << dySkewY << " Y skewY 0-1\n";
+  // the segment is vertical (dx = 0)
+  EXPECT_DOUBLE_EQ(dxOriginal, dxSkewY);
+
+  // segment is skewed 30 degrees
+  double dxSkewYb = fabs(closedPolys[2][5].X() - closedPolys[2][4].X() );
+  double dySkewYb = fabs(closedPolys[2][5].Y() - closedPolys[2][4].Y() );
+  gzmsg << dxSkewYb << " X skewY b\n";
+  gzmsg << dySkewYb << " Y skewY b\n";
+  EXPECT_GT(dxSkewYb, 131.0);
+  EXPECT_GT(dySkewYb, 35.0);
 }
 
 /////////////////////////////////////////////////
