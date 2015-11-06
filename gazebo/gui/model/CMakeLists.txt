@@ -40,18 +40,25 @@ set (headers_install
   ModelEditor.hh
 )
 
+set (qt_tests_local
+  CollisionConfig_TEST.cc
+  JointInspector_TEST.cc
+  LinkConfig_TEST.cc
+  LinkInspector_TEST.cc
+  ModelPluginInspector_TEST.cc
+  VisualConfig_TEST.cc
+)
+
 if (ENABLE_SCREEN_TESTS)
   set (qt_tests_local
+    ${qt_tests_local}
     ExtrudeDialog_TEST.cc
-    JointInspector_TEST.cc
     JointMaker_TEST.cc
-    LinkInspector_TEST.cc
     ModelCreator_TEST.cc
     ModelData_TEST.cc
     ModelEditor_TEST.cc
     ModelEditorPalette_TEST.cc
     ModelTreeWidget_TEST.cc
-    ModelPluginInspector_TEST.cc
   )
 endif()
 
@@ -66,6 +73,10 @@ if (HAVE_GRAPHVIZ)
     model/GraphScene.cc
     model/GraphView.cc
     model/SchematicViewWidget.cc
+  )
+
+  set (qt_tests_local ${qt_tests_local}
+    GraphScene_TEST.cc
   )
 
   if (ENABLE_SCREEN_TESTS)

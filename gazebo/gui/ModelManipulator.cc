@@ -64,6 +64,7 @@ void ModelManipulator::Clear()
 {
   this->dataPtr->modelPub.reset();
   this->dataPtr->lightPub.reset();
+  this->dataPtr->userCmdPub.reset();
   this->dataPtr->selectionObj.reset();
   this->dataPtr->userCamera.reset();
   this->dataPtr->scene.reset();
@@ -97,6 +98,8 @@ void ModelManipulator::Init()
       this->dataPtr->node->Advertise<msgs::Model>("~/model/modify");
   this->dataPtr->lightPub =
       this->dataPtr->node->Advertise<msgs::Light>("~/light/modify");
+  this->dataPtr->userCmdPub =
+      this->dataPtr->node->Advertise<msgs::UserCmd>("~/user_cmd");
 
   this->dataPtr->selectionObj.reset(new rendering::SelectionObj("__GL_MANIP__",
       this->dataPtr->scene->GetWorldVisual()));
@@ -537,6 +540,34 @@ void ModelManipulator::PublishVisualPose(rendering::VisualPtr _vis)
       msgs::Set(msg.mutable_pose(), _vis->GetWorldPose().Ign());
       this->dataPtr->lightPub->Publish(msg);
     }
+    else
+    {
+      gzerr << "Visual [" << _vis->GetName() << "] isn't a model or a light"
+          << std::endl;
+      return;
+    }
+
+    // Register user command on server
+    std::string description;
+    if (this->dataPtr->manipMode == "translate")
+    {
+      description = "Translate [";
+    }
+    else if (this->dataPtr->manipMode == "rotate")
+    {
+      description = "Rotate [";
+    }
+    else
+    {
+      gzerr << "Unknown mode [" << this->dataPtr->manipMode << "]. " <<
+          "Not sending user command." << std::endl;
+      return;
+    }
+
+    msgs::UserCmd userCmdMsg;
+    userCmdMsg.set_description(description + _vis->GetName() + "]");
+    userCmdMsg.set_type(msgs::UserCmd::MOVING);
+    this->dataPtr->userCmdPub->Publish(userCmdMsg);
   }
 }
 
