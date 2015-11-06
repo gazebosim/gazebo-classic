@@ -510,6 +510,7 @@ void JointInspector::Open()
   std::string currentChild =
       this->configWidget->GetStringWidgetValue("child");
 
+
   this->configWidget->blockSignals(true);
   if (!currentParent.empty())
     this->configWidget->SetEnumWidgetValue("parentCombo", currentParent);

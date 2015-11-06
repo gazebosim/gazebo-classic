@@ -15,36 +15,33 @@
  *
 */
 
-#ifndef _GAZEBO_VISUAL_CONFIG_TEST_HH_
-#define _GAZEBO_VISUAL_CONFIG_TEST_HH_
+#ifndef _GAZEBO_LINKCONFIG_TEST_HH_
+#define _GAZEBO_LINKCONFIG_TEST_HH_
 
 #include "gazebo/gui/QTestFixture.hh"
 
-/// \brief A test class for the visual config.
-class VisualConfig_TEST : public QTestFixture
+/// \brief A test class for the LinkConfig class.
+class LinkConfig_TEST : public QTestFixture
 {
   Q_OBJECT
-
-  /// \brief Constructor
-  public: VisualConfig_TEST() = default;
 
   /// \brief Test initialization.
   private slots: void Initialization();
 
-  /// \brief Test visual data management
-  private slots: void VisualUpdates();
+  /// \brief Test link message update
+  private slots: void LinkMsgUpdate();
 
-  /// \brief Test geometry data management
-  private slots: void GeometryUpdates();
+  /// \brief Test pose update
+  private slots: void PoseUpdate();
 
-  /// \brief Test that the Applied signal is emitted when widgets are edited.
-  private slots: void AppliedSignal();
+  /// \brief Test mass update
+  private slots: void MassUpdate();
 
-  /// \brief Slot that receives Applied signals.
-  private slots: void OnApply();
+  /// \brief Test inertia matrix update
+  private slots: void InertiaMatrixUpdate();
 
-  /// \brief Count how many Applied signals have been emitted.
-  private: unsigned int g_appliedSignalCount = 0;
+  /// \brief Test inertia pose update
+  private slots: void InertialPoseUpdate();
 };
 
 #endif

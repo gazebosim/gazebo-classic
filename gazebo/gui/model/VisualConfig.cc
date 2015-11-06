@@ -374,6 +374,12 @@ void VisualConfig::SetMaterial(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
+const std::map<int, VisualConfigData *> &VisualConfig::ConfigData() const
+{
+  return this->configs;
+}
+
+/////////////////////////////////////////////////
 void VisualConfig::OnPoseChanged(const QString &/*_name*/,
     const ignition::math::Pose3d &/*_value*/)
 {
