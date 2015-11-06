@@ -30,6 +30,9 @@ flags from c functions. Windows did not like `CPPTYPE_*` in
 1. Light and light state for the server side
     * [Pull request #1920](https://bitbucket.org/osrf/gazebo/pull-request/1920)
 
+1. Added tests for WorldState
+    * [Pull request #1968](https://bitbucket.org/osrf/gazebo/pull-request/1968)
+
 1. Rename Reset to Reset Time in time widget
     * [Pull request #1892](https://bitbucket.org/osrf/gazebo/pull-request/1892)
     * [Issue #1730](https://bitbucket.org/osrf/gazebo/issue/1730)
@@ -174,7 +177,7 @@ using the same arguments used in the command line.
 1. Update inertia properties during simulation
     * [Pull request #1909](https://bitbucket.org/osrf/gazebo/pull-requests/1909)
     * [Design document](https://bitbucket.org/osrf/gazebo_design/src/default/inertia_resize/inertia_resize.md)
-    
+
 1. Fix transparency correction for opaque materials
     * [Pull request #1946](https://bitbucket.org/osrf/gazebo/pull-requests/1946/fix-transparency-correction-for-opaque/diff)
 

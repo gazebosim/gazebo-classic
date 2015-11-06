@@ -121,8 +121,9 @@ namespace gazebo
       /// \brief Update callback on PreRender.
       public: void Update();
 
-      /// \brief Remove joint by name
-      /// \param[in] _jointName Name of joint to be removed.
+      /// \brief Remove joint by name.
+      /// \param[in] _jointName Name of joint to be removed, or an empty string
+      /// to remove the new joint under creation.
       public: void RemoveJoint(const std::string &_jointName);
 
       /// \brief Remove all joints connected to link.
@@ -215,15 +216,15 @@ namespace gazebo
 
       /// \brief A new parent link for the joint being created has been chosen.
       /// To be used by other classes.
-      /// \sa NewParentLink(rendering::VisualPtr _parentLink)
+      /// \sa SetParentLink(rendering::VisualPtr _parentLink)
       /// \param[in] _name Link name, either the leaf or scoped.
-      public: void NewParentLink(const std::string &_name);
+      public: void SetParentLink(const std::string &_name);
 
       /// \brief A new child link for the joint being created has been chosen.
       /// To be used by other classes.
-      /// \sa NewChildLink(rendering::VisualPtr _childLink)
+      /// \sa SetChildLink(rendering::VisualPtr _childLink)
       /// \param[in] _name Link name, either the leaf or scoped.
-      public: void NewChildLink(const std::string &_name);
+      public: void SetChildLink(const std::string &_name);
 
       /// \brief Mouse event filter callback when mouse button is pressed.
       /// \param[in] _event The mouse event.
@@ -303,17 +304,15 @@ namespace gazebo
       private: rendering::VisualPtr LinkVisualFromName(
           const std::string &_name);
 
-      /// \brief A new parent link for the joint being created has been chosen.
-      /// This function is used internally.
-      /// \sa NewParentLink(const std::string &_name)
+      /// \brief Set a new parent link for the joint being created.
       /// \param[in] _parentLink Pointer to the link visual.
-      private: void NewParentLink(rendering::VisualPtr _parentLink);
+      /// \return True if successfully set new parent.
+      private: bool SetParentLink(rendering::VisualPtr _parentLink);
 
-      /// \brief A new parent link for the joint being created has been chosen.
-      /// This function is used internally.
-      /// \sa NewChildLink(const std::string &_name)
-      /// \param[in] _parentLink Pointer to the link visual.
-      private: void NewChildLink(rendering::VisualPtr _childLink);
+      /// \brief Set a new child link for the joint being created.
+      /// \param[in] _childLink Pointer to the link visual.
+      /// \return True if successfully set new child.
+      private: bool SetChildLink(rendering::VisualPtr _childLink);
 
       /// \brief Qt signal when the joint creation process has ended.
       Q_SIGNALS: void JointAdded();
@@ -341,12 +340,6 @@ namespace gazebo
 
       /// \brief Visual that is currently hovered over by the mouse
       private: rendering::VisualPtr hoverVis;
-
-      /// \brief Visual of the parent link for the new joint.
-      private: rendering::VisualPtr parentVis;
-
-      /// \brief Visual of the child link for the new joint.
-      private: rendering::VisualPtr childVis;
 
       /// \brief Name of joint that is currently being inspected.
       private: std::string inspectName;

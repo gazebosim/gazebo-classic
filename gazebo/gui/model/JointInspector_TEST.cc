@@ -193,7 +193,7 @@ void JointInspector_TEST::AppliedSignal()
   // Get combo boxes
   QList<QComboBox *> combos =
       jointInspector->findChildren<QComboBox *>();
-  QVERIFY(combos.size() == 3);
+  QVERIFY(combos.size() == 5);
 
   // Get line edits
   QList<QLineEdit *> lineEdits =
@@ -236,12 +236,12 @@ void JointInspector_TEST::AppliedSignal()
 
   // Reset
   pushButtons[0]->click();
-  QCOMPARE(g_appliedSignalCount, 6u);
+  QCOMPARE(g_appliedSignalCount, 7u);
   QVERIFY(jointInspector->isVisible());
 
   // Ok
   pushButtons[2]->click();
-  QCOMPARE(g_appliedSignalCount, 7u);
+  QCOMPARE(g_appliedSignalCount, 8u);
   QVERIFY(!jointInspector->isVisible());
 
   delete jointInspector;

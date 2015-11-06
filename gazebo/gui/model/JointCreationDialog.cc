@@ -523,9 +523,9 @@ void JointCreationDialog::OnLinkFromDialog()
   if (currentParent != currentChild)
   {
     if (currentParent != "")
-      this->dataPtr->jointMaker->NewParentLink(currentParent);
+      this->dataPtr->jointMaker->SetParentLink(currentParent);
     if (currentChild != "")
-      this->dataPtr->jointMaker->NewChildLink(currentChild);
+      this->dataPtr->jointMaker->SetChildLink(currentChild);
   }
 
   if (currentParent != "")
