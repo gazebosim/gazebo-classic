@@ -44,8 +44,19 @@ ODEGearboxJoint::~ODEGearboxJoint()
 void ODEGearboxJoint::Init()
 {
   Joint::Init();
-  LinkPtr link = this->model->GetLink(this->referenceBody);
-  this->SetReferenceBody(link);
+  if (!this->referenceBodyParent.empty() &&
+      !this->referenceBodyChild.empty())
+  {
+    LinkPtr parentLink = this->model->GetLink(this->referenceBodyParent);
+    this->SetReferenceBodyParent(parentLink);
+    LinkPtr childLink = this->model->GetLink(this->referenceBodyChild);
+    this->SetReferenceBodyChild(childLink);
+  }
+  else
+  {
+    LinkPtr link = this->model->GetLink(this->referenceBody);
+    this->SetReferenceBody(link);
+  }
 }
 
 //////////////////////////////////////////////////
@@ -72,6 +83,42 @@ void ODEGearboxJoint::SetReferenceBody(LinkPtr _body)
   }
 
   dJointSetGearboxReferenceBody(this->jointId, refId);
+}
+
+//////////////////////////////////////////////////
+void ODEGearboxJoint::SetReferenceBodyParent(LinkPtr _body)
+{
+  ODELinkPtr odelink = boost::dynamic_pointer_cast<ODELink>(_body);
+  dBodyID refId;
+  if (odelink == NULL)
+  {
+    gzwarn << "Reference body not valid, using inertial frame.\n";
+    refId = 0;
+  }
+  else
+  {
+    refId = odelink->GetODEId();
+  }
+
+  dJointSetGearboxReferenceBody1(this->jointId, refId);
+}
+
+//////////////////////////////////////////////////
+void ODEGearboxJoint::SetReferenceBodyChild(LinkPtr _body)
+{
+  ODELinkPtr odelink = boost::dynamic_pointer_cast<ODELink>(_body);
+  dBodyID refId;
+  if (odelink == NULL)
+  {
+    gzwarn << "Reference body not valid, using inertial frame.\n";
+    refId = 0;
+  }
+  else
+  {
+    refId = odelink->GetODEId();
+  }
+
+  dJointSetGearboxReferenceBody2(this->jointId, refId);
 }
 
 //////////////////////////////////////////////////

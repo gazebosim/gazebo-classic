@@ -17,6 +17,12 @@ message Joint
     /// \brief Gearbox joint reference body link
     required string gearbox_reference_body = 1;
 
+    /// \brief Gearbox joint reference body link
+    required string gearbox_reference_body_parent = 3;
+
+    /// \brief Gearbox joint reference body link
+    required string gearbox_reference_body_child = 4;
+
     /// \brief Gearbox ratio.
     required double gearbox_ratio = 2;
   }
