@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _COLLISION_CONFIG_HH_
-#define _COLLISION_CONFIG_HH_
+#ifndef _GAZEBO_COLLISION_CONFIG_HH_
+#define _GAZEBO_COLLISION_CONFIG_HH_
 
 #include <map>
 #include <string>

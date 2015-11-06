@@ -826,7 +826,7 @@ namespace gazebo
       Q_SIGNALS: void EnumValueChanged(const QString &_name,
           const QString &_value);
 
-          /// \brief Signal emitted when density value changes.
+      /// \brief Signal emitted when density value changes.
       /// \param[in] _value Density value.
       Q_SIGNALS: void DensityValueChanged(const double &_value);
 

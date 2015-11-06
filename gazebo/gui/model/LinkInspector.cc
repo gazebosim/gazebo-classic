@@ -26,6 +26,8 @@
 #include "gazebo/gui/model/CollisionConfig.hh"
 #include "gazebo/gui/model/LinkInspector.hh"
 
+#include "gazebo/math/Helpers.hh"
+
 using namespace gazebo;
 using namespace gui;
 
@@ -101,7 +103,7 @@ LinkInspector::LinkInspector(QWidget *_parent) : QDialog(_parent)
   mainLayout->addLayout(buttonsLayout);
   this->setLayout(mainLayout);
 
-// Conections
+  // Conections
   connect(this, SIGNAL(rejected()), this, SLOT(RestoreOriginalData()));
 
   connect(this->linkConfig, SIGNAL(DensityValueChanged(const double &)),
@@ -270,7 +272,7 @@ void LinkInspector::OnDensityValueChanged(const double &_value)
   double volume = ComputeVolume();
   double mass = volume * _value;
 
-  if (fabs(this->linkConfig->Mass() - mass) > DBL_EPSILON)
+  if (!math::equal(this->linkConfig->Mass(), mass))
   {
     ignition::math::Vector3d I = ComputeInertia(mass);
     this->linkConfig->SetMass(mass);
@@ -283,10 +285,10 @@ void LinkInspector::OnMassValueChanged(const double &_value)
 {
   double volume = ComputeVolume();
 
-  if (fabs(volume - 0.0) > DBL_EPSILON)
+  if (!math::equal(volume, 0.0))
   {
     double density = _value / volume;
-    if (fabs(this->linkConfig->Density() - density) > DBL_EPSILON)
+    if (!math::equal(this->linkConfig->Density(), density))
     {
       ignition::math::Vector3d I = ComputeInertia(_value);
       this->linkConfig->SetDensity(density);
@@ -303,7 +305,7 @@ void LinkInspector::OnCollisionChanged(const std::string &/*_name*/,
   {
     double volume = ComputeVolume();
 
-    if (fabs(volume - 0.0) > DBL_EPSILON)
+    if (!math::equal(volume, 0.0))
     {
       double mass = this->linkConfig->Mass();
       double density = mass / volume;

@@ -109,7 +109,7 @@ namespace gazebo
       /// \param[in] _value The new mass value.
       private slots: void OnMassValueChanged(const double &_value);
 
-/// \brief Initialize widget.
+      /// \brief Initialize widget.
       public: void Init();
 
       /// \brief Restore the widget's data to how it was when first opened.

@@ -22,9 +22,8 @@
 #endif
 
 #include <sstream>
-#include <math.h>
-#include <float.h>
 
+#include "gazebo/math/Helpers.hh"
 #include "gazebo/gui/model/DensityModel.hh"
 
 using namespace gazebo;
@@ -93,7 +92,7 @@ std::vector<const DensityEntry *> DensityModel::Entries() const
 }
 
 /////////////////////////////////////////////////
-const DensityEntry *DensityModel::EntryByDesc(std::string &_desc) const
+const DensityEntry *DensityModel::EntryByDesc(const std::string &_desc) const
 {
   for (auto it : this->entries)
   {
@@ -104,20 +103,12 @@ const DensityEntry *DensityModel::EntryByDesc(std::string &_desc) const
 }
 
 /////////////////////////////////////////////////
-const DensityEntry *DensityModel::EntryByDesc(const char *_desc) const
-{
-  std::string desc(_desc);
-  return this->EntryByDesc(desc);
-}
-
-/////////////////////////////////////////////////
 const DensityEntry *DensityModel::EntryByValue(double _value) const
 {
   for (auto it : this->entries)
   {
-    //  Appease compiler for "if (it->value == _value)..."
-    if (fabs(it->value - _value) < DBL_EPSILON)
-      return it;
+	if (math::equal(it->value, _value))
+		return it;
   }
   return NULL;
 }

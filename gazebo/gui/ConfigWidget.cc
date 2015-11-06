@@ -531,9 +531,7 @@ std::string ConfigWidget::GetGeometryWidgetValue(const std::string &_name,
 double ConfigWidget::DensityWidgetValue(const std::string &_name) const
 {
   double value = 0.0;
-
-  std::map <std::string, ConfigChildWidget *>::const_iterator iter =
-      this->configWidgets.find(_name);
+  auto iter = this->configWidgets.find(_name);
 
   if (iter != this->configWidgets.end())
   {
@@ -1960,7 +1958,7 @@ ConfigChildWidget *ConfigWidget::CreateDensityWidget(
   QComboBox *comboBox = new QComboBox;
   size_t minLen = 0;
 
-  for (auto it : DensityModel::Instance()->Entries())
+  for (const auto &it : DensityModel::Instance()->Entries())
   {
     minLen = std::max(minLen, it->desc.length());
     comboBox->addItem(tr(it->desc.c_str()), QVariant::fromValue(it->value));
@@ -3232,7 +3230,7 @@ void ConfigWidget::OnMassValueChanged(double _value)
   emit MassValueChanged(_value);
 }
 
-
+/////////////////////////////////////////////////
 void ConfigWidget::OnGeometryChanged()
 {
   emit GeometryChanged();

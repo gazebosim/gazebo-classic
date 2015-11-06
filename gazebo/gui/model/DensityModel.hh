@@ -66,12 +66,7 @@ namespace gazebo
       /// \brief Return first entry with matching desc or null if not found.
       /// \param[in] _desc Description of entry to match.
       /// \return Matching DensityEntry if found else null.
-      public: const DensityEntry *EntryByDesc(std::string &_desc) const;
-
-      /// \brief Return first entry with matching desc or null if not found.
-      /// \param[in] _desc Description of entry to match.
-      /// \return Matching DensityEntry if found else null.
-      public: const DensityEntry *EntryByDesc(const char *_desc) const;
+      public: const DensityEntry *EntryByDesc(const std::string &_desc) const;
 
       /// \brief Return first entry with matching value or null if not found.
       /// \param[in] Density value of entry to match.
