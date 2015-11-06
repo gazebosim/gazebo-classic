@@ -18,6 +18,7 @@
 #include <algorithm>
 #include <tinyxml.h>
 #include <utility>
+#include <cmath>
 
 #include <gazebo/common/Console.hh>
 #include <gazebo/common/Assert.hh>
@@ -59,12 +60,12 @@ std::vector<std::string> &split(const std::string &_s,
 }
 
 /////////////////////////////////////////////////
-ignition::math::Matrix3d ParseTransformMatrixStr(const std::string &_transformStr)
+ignition::math::Matrix3d ParseTransformMatrixStr(
+                                              const std::string &_transformStr)
 {
-  gzwarn << "ParseTransformMatrixStr " << _transformStr << std::endl;
-  if(_transformStr.empty())
+  // check for transformation
+  if (_transformStr.empty())
   {
-    gzerr << "NO TRANSFORM" << std::endl;
     return ignition::math::Matrix3d::Identity;
   }
 
@@ -80,9 +81,8 @@ ignition::math::Matrix3d ParseTransformMatrixStr(const std::string &_transformSt
 
   // how to unpack the values into 3x3 matrices
   // http://www.w3.org/TR/SVG/coords.html#TransformAttribute
-  if(transform.find("matrix") != std::string::npos)
+  if (transform.find("matrix") != std::string::npos)
   {
-    gzmsg << "matrix" << std::endl;
     double v00 = stod(numbers[0]);
     double v10 = stod(numbers[1]);
     double v01 = stod(numbers[2]);
@@ -93,43 +93,110 @@ ignition::math::Matrix3d ParseTransformMatrixStr(const std::string &_transformSt
     return m;
   }
 
-  if(transform.find("skewX") != std::string::npos)
+  if (transform.find("skewX") != std::string::npos)
   {
-    gzmsg << "skewX" << std::endl;
-    ignition::math::Matrix3d m = ignition::math::Matrix3d::Identity;
+    if (numbers.size() != 1)
+    {
+      gzerr << "Unsupported skewX transform. Needs 1 parameter only"
+            << std::endl;
+      return ignition::math::Matrix3d::Identity;
+    }
+    double deg = stod(numbers[0]);
+    ignition::math::Angle angle;
+    angle.Degree(deg);
+    // get the tangeant of the angle
+    double t = tan(angle.Radian());
+    ignition::math::Matrix3d m(1, t, 0, 0, 1, 0, 0, 0, 1);
     return m;
   }
 
-  if(transform.find("skewY") != std::string::npos)
+  if (transform.find("skewY") != std::string::npos)
   {
-    gzmsg << "skewY" << std::endl;
-    ignition::math::Matrix3d m = ignition::math::Matrix3d::Identity;
+    if (numbers.size() != 1)
+    {
+      gzerr << "Unsupported skewY transform. Needs 1 parameter only"
+            << std::endl;
+      return ignition::math::Matrix3d::Identity;
+    }
+    double deg = stod(numbers[0]);
+    ignition::math::Angle angle;
+    angle.Degree(deg);
+    // get the tangeant of the angle
+    double t = tan(angle.Radian());
+    ignition::math::Matrix3d m(1, 0, 0, t, 1, 0, 0, 0, 1);
     return m;
   }
 
-  if(transform.find("scale") != std::string::npos)
+  // scale(<x> [<y>])
+  // if y is not provided, it is assumed to be equal to x.
+  if (transform.find("scale") != std::string::npos)
   {
-    gzmsg << "scale" << std::endl;
-    ignition::math::Matrix3d m = ignition::math::Matrix3d::Identity;
+    if (numbers.size() ==0 || numbers.size() > 2)
+    {
+      gzerr << "Unsupported scale transform with more than 2 parameters"
+            << std::endl;
+      return ignition::math::Matrix3d::Identity;
+    }
+    double x = stod(numbers[0]);
+    double y = x;
+    if (numbers.size() == 2)
+    {
+      y = stod(numbers[1]);
+    }
+    ignition::math::Matrix3d m(x, 0, 0, 0, y, 0, 0, 0, 1);
     return m;
   }
-
-  if(transform.find("translate") != std::string::npos)
+  // translate(<x> [<y>])
+  // If y is not provided, it is assumed to be zero.
+  if (transform.find("translate") != std::string::npos)
   {
-    gzmsg << "translate" << std::endl;
-    ignition::math::Matrix3d m = ignition::math::Matrix3d::Identity;
+    if (numbers.size() == 0 || numbers.size() > 2)
+    {
+      gzerr << "Unsupported translate transform with more than 2 parameters"
+            << std::endl;
+      return ignition::math::Matrix3d::Identity;
+    }
+    double x = stod(numbers[0]);
+    double y = 0;
+    if (numbers.size() == 2)
+    {
+      y = stod(numbers[1]);
+    }
+    ignition::math::Matrix3d m(1, 0, 0, 1, x, y, 0, 0, 1);
     return m;
   }
-
-  if(transform.find("rotate") != std::string::npos)
+  // rotate(<a> [<x> <y>]) angle in degrees, center x and y
+  // if x, y are not supplied, rotation is about 0, 0
+  if (transform.find("rotate") != std::string::npos)
   {
-    gzmsg << "rotate" << std::endl;
-    ignition::math::Matrix3d m = ignition::math::Matrix3d::Identity;
-    gzmsg << "  M: " << m << std::endl;
+    if (numbers.size() ==0 || numbers.size() == 2 || numbers.size() > 3 )
+    {
+      gzerr << "Unsupported rotate transform. Only angle and optional x y"
+            << " are supported" << std::endl;
+      return ignition::math::Matrix3d::Identity;
+    }
+    double deg = stod(numbers[0]);
+    ignition::math::Angle angle;
+    angle.Degree(deg);
+    double a = angle.Radian();
+    double sina = sin(a);
+    double cosa = cos(a);
+    double x = 0;
+    double y = 0;
+    if (numbers.size() == 3)
+    {
+      x = stod(numbers[1]);
+      y = stod(numbers[2]);
+    }
+    // we apply a translation to x, y, the rotation and the translation -x,-y
+    ignition::math::Matrix3d transToXy(1, 0, 0, 1, x, y, 0, 0, 1);
+    ignition::math::Matrix3d transFromXy(1, 0, 0, 1, -x, -y, 0, 0, 1);
+    ignition::math::Matrix3d rotate(cosa, -sina, 0, sina, cosa, 0, 0, 0, 1);
+    ignition::math::Matrix3d m = transToXy * rotate * transFromXy;
     return m;
   }
-
-  gzwarn << "Unsupported transformation: " << transform << std::endl;
+  // we have no business being here
+  gzerr << "Unknown transformation: " << transform << std::endl;
   ignition::math::Matrix3d m = ignition::math::Matrix3d::Identity;
   return m;
 }
@@ -657,20 +724,19 @@ void SVGLoader::GetPathCommands(const std::vector<std::string> &_tokens,
   if (_path.transform != ignition::math::Matrix3d::Identity)
   {
     // we need to transform all the points in the path
-    for(auto &polyline: _path.polylines)
+    for (auto &polyline: _path.polylines)
     {
       for (auto  &polyPoint: polyline)
       {
-	// make a 3d vector form the 2d point
+        // make a 3d vector form the 2d point
         ignition::math::Vector3d point3(polyPoint.X(), polyPoint.Y(), 0);
-	// matrix multiply
+        // matrix multiply to get the new point, then save new coords in place
         auto transformed = _path.transform * point3;
         polyPoint.X(transformed.X());
         polyPoint.Y(transformed.Y());
       }
     }
   }
-
 }
 
 /////////////////////////////////////////////////

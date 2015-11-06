@@ -235,16 +235,18 @@ TEST_F(SVGLoader, Transforms)
   EXPECT_EQ(0u, openPolys.size());
   EXPECT_EQ(2u, closedPolys.size());
 
-  // without transform, the first segment of the firts polyline is vertical
-  // (x is constant)
+  // without transform, the first segment of the firts polyline is
+  // about 132 units along y
   auto p0 = closedPolys[0][0];
   auto p1 = closedPolys[0][1];
-  double dx = fabs(p0.X() - p1.X());
-  EXPECT_GT(dx, 10.0);
+  double dy = fabs(p0.Y() - p1.Y());
+  gzmsg << dy << " rewrdewr\n";
+  EXPECT_LE(dy, 40.0);
   // without transform, the first segment of the second poly is horizontal
-  // (y is constant)
-  double dy = fabs(closedPolys[1][0].Y() - closedPolys[1][1].Y() );
-  EXPECT_GT(dy, 10.0);
+  // (y is constant, dy is 0)
+  dy = fabs(closedPolys[1][0].Y() - closedPolys[1][1].Y() );
+  gzmsg << dy << " rewrdewr Y\n";
+  EXPECT_GT(dy, 150.0);
 }
 
 /////////////////////////////////////////////////
