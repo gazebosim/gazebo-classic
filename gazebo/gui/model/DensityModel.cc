@@ -107,8 +107,8 @@ const DensityEntry *DensityModel::EntryByValue(double _value) const
 {
   for (auto it : this->entries)
   {
-	if (math::equal(it->value, _value))
-		return it;
+    if (math::equal(it->value, _value))
+      return it;
   }
   return NULL;
 }
