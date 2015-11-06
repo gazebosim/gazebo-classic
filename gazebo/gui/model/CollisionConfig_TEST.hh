@@ -28,6 +28,15 @@ class CollisionConfig_TEST : public QTestFixture
   /// \brief Constructor
   public: CollisionConfig_TEST() = default;
 
+  /// \brief Test initialization.
+  private slots: void Initialization();
+
+  /// \brief Test collision data management
+  private slots: void CollisionUpdates();
+
+  /// \brief Test geometry data management
+  private slots: void GeometryUpdates();
+
   /// \brief Test that the Applied signal is emitted when widgets are edited.
   private slots: void AppliedSignal();
 
