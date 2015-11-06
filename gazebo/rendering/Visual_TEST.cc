@@ -1381,6 +1381,55 @@ TEST_F(Visual_TEST, Scale)
 }
 
 /////////////////////////////////////////////////
+TEST_F(Visual_TEST, Clone)
+{
+  Load("worlds/blank.world");
+
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
+  ASSERT_TRUE(scene != NULL);
+
+  // Get world visual
+  gazebo::rendering::VisualPtr world = scene->GetWorldVisual();
+  ASSERT_TRUE(world != NULL);
+
+  // Create a visual as child of the world visual
+  gazebo::rendering::VisualPtr vis1;
+  vis1.reset(new gazebo::rendering::Visual("vis1", scene->GetWorldVisual()));
+  vis1->Load();
+
+  // Create a visual as child of vis1
+  gazebo::rendering::VisualPtr vis2;
+  vis2.reset(new gazebo::rendering::Visual("vis1::vis2", vis1));
+  vis2->Load();
+
+  // Create a visual as child of vis2
+  gazebo::rendering::VisualPtr vis3;
+  vis3.reset(new gazebo::rendering::Visual("vis1::vis2::vis3", vis2));
+  vis3->Load();
+
+  gazebo::rendering::VisualPtr vis1Clone = vis1->Clone("vis1_clone",
+      vis1->GetParent());
+  EXPECT_EQ(vis1Clone->GetName(), "vis1_clone");
+
+  EXPECT_EQ(vis1Clone->GetChildCount(), vis1->GetChildCount());
+  EXPECT_EQ(vis1Clone->GetChildCount(), 1u);
+
+  gazebo::rendering::VisualPtr vis2Clone = vis1Clone->GetChild(0);
+  EXPECT_TRUE(vis2Clone != NULL);
+  EXPECT_EQ(vis2Clone->GetName(), "vis1_clone::vis2");
+
+  EXPECT_EQ(vis2Clone->GetChildCount(), vis2->GetChildCount());
+  EXPECT_EQ(vis2Clone->GetChildCount(), 1u);
+
+  gazebo::rendering::VisualPtr vis3Clone = vis2Clone->GetChild(0);
+  EXPECT_TRUE(vis3Clone != NULL);
+  EXPECT_EQ(vis3Clone->GetName(), "vis1_clone::vis2::vis3");
+
+  EXPECT_EQ(vis3Clone->GetChildCount(), vis3->GetChildCount());
+  EXPECT_EQ(vis3Clone->GetChildCount(), 0u);
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
