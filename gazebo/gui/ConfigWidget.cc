@@ -3292,6 +3292,7 @@ void GeometryConfigWidget::OnGeometryTypeChanged(const QString _text)
   emit GeometryChanged();
 }
 
+/////////////////////////////////////////////////
 void GeometryConfigWidget::OnGeometrySizeChanged(double /*_value*/)
 {
   emit GeometryChanged();
