@@ -15,9 +15,6 @@
  *
 */
 
-#include <math.h>
-#include <float.h>
-
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/message.h>
 
