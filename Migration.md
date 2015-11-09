@@ -82,6 +82,8 @@ release will remove the deprecated code.
 
 ### Deletions
 
+1. **plugins/rest_web/RestUiLogoutDialog.hh.hh**
+
 1. **gazebo rendering libraries**
     * The following libraries have been removed: `libgazebo_skyx`, `libgazebo_selection_buffer`, `libgazebo_rendering_deferred`. Gazebo now combines all the different rendering libraries into `libgazebo_rendering.so`.
     * [Pull request #1817](https://bitbucket.org/osrf/gazebo/pull-request/1817)
