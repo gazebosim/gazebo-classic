@@ -58,6 +58,7 @@ set (sources
   TopicPlot.cc
   TopicSelector.cc
   TopToolbar.cc
+  UserCmdHistory.cc
   ViewAngleWidget.cc
 )
 
@@ -97,6 +98,7 @@ set (qt_headers
   TopicPlot.hh
   TopicSelector.hh
   TopToolbar.hh
+  UserCmdHistory.hh
   ViewAngleWidget.hh
 )
 

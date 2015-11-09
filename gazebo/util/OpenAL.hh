@@ -103,22 +103,7 @@ namespace gazebo
       /// \brief Set the position of the sink.
       /// \param[in] _pose New pose of the sink.
       /// \return True on success.
-      /// \deprecated See SetPose function that accepts an
-      /// ignition::math::Pose3d object.
-      public: bool SetPose(const math::Pose &_pose) GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Set the position of the sink.
-      /// \param[in] _pose New pose of the sink.
-      /// \return True on success.
       public: bool SetPose(const ignition::math::Pose3d &_pose);
-
-      /// \brief Set the velocity of the sink
-      /// \param[in] _vel Velocity of the sink.
-      /// \return True on success.
-      /// \deprecated See SetVelocity function that accepts an
-      /// ignition::math::Vector3d object.
-      public: bool SetVelocity(const math::Vector3 &_vel)
-              GAZEBO_DEPRECATED(6.0);
 
       /// \brief Set the velocity of the sink
       /// \param[in] _vel Velocity of the sink.
@@ -144,22 +129,7 @@ namespace gazebo
       /// \brief Set the position of the source.
       /// \param[in] _pose New pose of the source.
       /// \return True on success.
-      /// \deprecated See SetPose function that accepts an
-      /// ignition::math::Pose3d object.
-      public: bool SetPose(const math::Pose &_pose) GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Set the position of the source.
-      /// \param[in] _pose New pose of the source.
-      /// \return True on success.
       public: bool SetPose(const ignition::math::Pose3d &_pose);
-
-      /// \brief Set the velocity of the source.
-      /// \param[in] _vel New velocity of the source.
-      /// \return True on success.
-      /// \deprecated See SetVelocity function that accepts an
-      /// ignition::math::Vector3d object.
-      public: bool SetVelocity(const math::Vector3 &_vel)
-              GAZEBO_DEPRECATED(6.0);
 
       /// \brief Set the velocity of the source.
       /// \param[in] _vel New velocity of the source.
