@@ -1,5 +1,8 @@
 ## Gazebo 7.0
 
+1. Update rest web plugin to publish response messages and display login user name in toolbar.
+    * [Pull request #1956](https://bitbucket.org/osrf/gazebo/pull-request/1956)
+
 1. Improve overall speed of log playback. Added new functions to LogPlay.
    Use tinyxml2 for playback.
     * [Pull request #1931](https://bitbucket.org/osrf/gazebo/pull-request/1931)

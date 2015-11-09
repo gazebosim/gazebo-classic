@@ -43,6 +43,7 @@ set (headers_install
 set (qt_tests_local
   CollisionConfig_TEST.cc
   JointInspector_TEST.cc
+  LinkConfig_TEST.cc
   LinkInspector_TEST.cc
   ModelPluginInspector_TEST.cc
   VisualConfig_TEST.cc
@@ -72,6 +73,10 @@ if (HAVE_GRAPHVIZ)
     model/GraphScene.cc
     model/GraphView.cc
     model/SchematicViewWidget.cc
+  )
+
+  set (qt_tests_local ${qt_tests_local}
+    GraphScene_TEST.cc
   )
 
   if (ENABLE_SCREEN_TESTS)

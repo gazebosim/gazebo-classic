@@ -37,7 +37,7 @@ void JointInspector_TEST::AddRemoveLink()
   // Get combo boxes
   QList<QComboBox *> comboBoxes = jointInspector->findChildren<QComboBox *>();
   unsigned int boxCount = comboBoxes.size();
-  QVERIFY(boxCount >= 2);
+  QVERIFY(boxCount >= 5);
 
   // Check parent and child combo boxes
   QComboBox *parentBox = comboBoxes[boxCount-2];
@@ -98,7 +98,7 @@ void JointInspector_TEST::Swap()
   // Get combo boxes
   QList<QComboBox *> comboBoxes = jointInspector->findChildren<QComboBox *>();
   unsigned int boxCount = comboBoxes.size();
-  QVERIFY(boxCount >= 2);
+  QVERIFY(boxCount >= 5);
 
   // Check parent and child combo boxes
   QComboBox *parentBox = comboBoxes[boxCount-2];
@@ -193,7 +193,7 @@ void JointInspector_TEST::AppliedSignal()
   // Get combo boxes
   QList<QComboBox *> combos =
       jointInspector->findChildren<QComboBox *>();
-  QVERIFY(combos.size() == 3);
+  QVERIFY(combos.size() == 5);
 
   // Get line edits
   QList<QLineEdit *> lineEdits =
@@ -206,7 +206,7 @@ void JointInspector_TEST::AppliedSignal()
   QVERIFY(pushButtons.size() == 3);
 
   // Edit link (1~2)
-  combos[1]->setCurrentIndex(1);
+  combos[combos.size()-1]->setCurrentIndex(1);
   QCOMPARE(g_appliedSignalCount, 1u);
   QVERIFY(jointInspector->isVisible());
 
@@ -217,7 +217,7 @@ void JointInspector_TEST::AppliedSignal()
   QVERIFY(jointInspector->isVisible());
 
   // Edit type (0)
-  combos[2]->setCurrentIndex(0);
+  combos[0]->setCurrentIndex(0);
   QTest::keyClick(lineEdits[0], Qt::Key_Enter);
   QCOMPARE(g_appliedSignalCount, 3u);
   QVERIFY(jointInspector->isVisible());

@@ -132,6 +132,10 @@ namespace gazebo
           const common::Color &_ambient, const common::Color &_diffuse,
           const common::Color &_specular, const common::Color &_emissive);
 
+      /// \brief Get visual config data
+      /// \return Config data for the visuals
+      public: const std::map<int, VisualConfigData *> &ConfigData() const;
+
       /// \brief Qt signal emitted when a visual is removed.
       /// \param[in] _name Name of visual removed.
       Q_SIGNALS: void VisualRemoved(const std::string &_name);

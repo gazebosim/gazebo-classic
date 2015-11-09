@@ -15,24 +15,27 @@
  *
 */
 
-#ifndef _GAZEBO_TOP_TOOLBAR_TEST_HH_
-#define _GAZEBO_TOP_TOOLBAR_TEST_HH_
+#ifndef _GAZEBO_GRAPHSCENE_TEST_HH_
+#define _GAZEBO_GRAPHSCENE_TEST_HH_
 
 #include "gazebo/gui/QTestFixture.hh"
 
-/// \brief A test class for the TopToolbar widget.
-class TopToolbar_TEST : public QTestFixture
+/// \brief A test class for GraphScene class.
+class GraphScene_TEST : public QTestFixture
 {
   Q_OBJECT
 
-  /// \brief Test different window modes.
-  private slots: void WindowModes();
+  /// \brief Test initialization.
+  private slots: void Initialization();
 
-  /// \brief Test inserting actions, separators and widgets.
-  private slots: void Insert();
+  /// \brief Test addition and removal of nodes.
+  private slots: void NodeUpdates();
 
-  /// \brief Test adding actions, separators and widgets.
-  private slots: void Add();
+  /// \brief Test addition and removal of edges.
+  private slots: void EdgeUpdates();
+
+  /// \brief Test setting of edge color.
+  private slots: void EdgeColor();
 };
 
 #endif
