@@ -97,18 +97,11 @@ namespace gazebo
       /// "Rotate box", "Delete sphere", etc.
       /// \param[in] _type Type of command, such as MOVING, DELETING, etc.
       public: UserWrenchCmd(const unsigned int _id,
-			    physics::WorldPtr _world,
-			    const std::string &_description,
-			    const msgs::UserCmd::Type &_type,
-			    const std::string &_linkName,
-			    const msgs::Wrench &_wrenchMsg);
-/*
-      /// \brief Undo this command.
-      public: virtual void Undo();
-
-      /// \brief Redo this command.
-      public: virtual void Redo();
-*/
+                            physics::WorldPtr _world,
+                            const std::string &_description,
+                            const msgs::UserCmd::Type &_type,
+                            const std::string &_linkName,
+                            const msgs::Wrench &_wrenchMsg);
     };
 
     class UserCmdManagerPrivate;
