@@ -217,20 +217,20 @@ namespace gazebo
             event::ConnectionPtr _subscriber)
           { jointChanged.Disconnect(_subscriber); }
 
-        /// \brief Connect a Gazebo event to the nestedModel removed signal.
+        /// \brief Connect a Gazebo event to the nested model removed signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
         public: template<typename T>
             static event::ConnectionPtr ConnectNestedModelRemoved(T _subscriber)
           { return nestedModelRemoved.Connect(_subscriber); }
 
-        /// \brief Disconnect a Gazebo event from the nestedModel removed
+        /// \brief Disconnect a Gazebo event from the nested model removed
         /// signal.
         /// \param[in] _subscriber the subscriber to this event
         public: static void DisconnectNestedModelRemoved(
             event::ConnectionPtr _subscriber)
           { nestedModelRemoved.Disconnect(_subscriber); }
-                    
+
         /// \brief Connect a Gazebo event to the request link removal signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
@@ -524,9 +524,8 @@ namespace gazebo
         public: static event::EventT<void (std::string)> modelNameChanged;
 
         /// \brief Notify that model properties have been changed.
-        // The properties are: is_static, auto_disable, pose, name.
-        public: static event::EventT<void (bool, bool, const math::Pose &,
-            const std::string &)> modelPropertiesChanged;
+        // The properties are: is_static, auto_disable.
+        public: static event::EventT<void (bool, bool)> modelPropertiesChanged;
 
         /// \brief Notify that model has been saved.
         public: static event::EventT<void (std::string)> saveModel;
@@ -542,6 +541,7 @@ namespace gazebo
 
         /// \brief Notify that a nested model has been removed.
         public: static event::EventT<void (std::string)> nestedModelRemoved;
+
         /// \brief Notify that a link has been removed.
         public: static event::EventT<void (std::string)> linkRemoved;
 
@@ -618,7 +618,7 @@ namespace gazebo
             requestModelPluginRemoval;
 
         /// \brief Event triggered when an existing model is to be edited in the
-        /// model editor.     
+        /// model editor.
         public: static event::EventT<void (std::string, std::string,
           std::string)> editModel;
       };

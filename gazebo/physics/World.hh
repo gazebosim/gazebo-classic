@@ -349,6 +349,10 @@ namespace gazebo
       /// \param[in] _name Name of the model to remove.
       public: void RemoveModel(const std::string &_name);
 
+      /// \brief Reset the velocity, acceleration, force and torque of
+      /// all child models.
+      public: void ResetPhysicsStates();
+
       /// \internal
       /// \brief Inform the World that an Entity has moved. The Entity
       /// is added to a list that will be processed by the World.
@@ -507,7 +511,7 @@ namespace gazebo
       /// \deprecated Topic ~/light deprecated.
       /// See OnLightFactoryMsg which subscribes to ~/factory/light and
       /// OnLightModifyMsg which subscribes to ~/light/modify
-      private: void OnLightMsg(ConstLightPtr &_msg) GAZEBO_DEPRECATED(7.0);
+      private: void OnLightMsg(ConstLightPtr &_msg);
 
       /// \brief Callback when a light message is received in the
       /// ~/factory/light topic.

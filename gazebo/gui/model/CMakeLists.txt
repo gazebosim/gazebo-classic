@@ -14,6 +14,7 @@ set (sources_local
   model/ModelEditorEvents.cc
   model/ModelEditorPalette.cc
   model/ModelPluginInspector.cc
+  model/ModelTreeWidget.cc
   model/VisualConfig.cc
 )
 
@@ -30,6 +31,7 @@ set (qt_headers_local
   model/ModelEditor.hh
   model/ModelEditorPalette.hh
   model/ModelPluginInspector.hh
+  model/ModelTreeWidget.hh
   model/VisualConfig.hh
 )
 
@@ -39,21 +41,25 @@ set (headers_install
   ModelEditorEvents.hh
 )
 
+set (qt_tests_local
+  CollisionConfig_TEST.cc
+  JointInspector_TEST.cc
+  LinkConfig_TEST.cc
+  LinkInspector_TEST.cc
+  ModelPluginInspector_TEST.cc
+  VisualConfig_TEST.cc
+)
+
 if (ENABLE_SCREEN_TESTS)
   set (qt_tests_local
-    CollisionConfig_TEST.cc
-    VisualConfig_TEST.cc
-    LinkConfig_TEST.cc
+    ${qt_tests_local}
     ExtrudeDialog_TEST.cc
-    GraphScene_TEST.cc
-    JointInspector_TEST.cc
     JointMaker_TEST.cc
-    LinkInspector_TEST.cc
     ModelCreator_TEST.cc
     ModelData_TEST.cc
     ModelEditor_TEST.cc
     ModelEditorPalette_TEST.cc
-    ModelPluginInspector_TEST.cc
+    ModelTreeWidget_TEST.cc
   )
 endif()
 
@@ -68,6 +74,10 @@ if (HAVE_GRAPHVIZ)
     model/GraphScene.cc
     model/GraphView.cc
     model/SchematicViewWidget.cc
+  )
+
+  set (qt_tests_local ${qt_tests_local}
+    GraphScene_TEST.cc
   )
 
   if (ENABLE_SCREEN_TESTS)
