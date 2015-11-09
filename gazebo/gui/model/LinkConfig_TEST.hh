@@ -15,24 +15,33 @@
  *
 */
 
-#ifndef _GAZEBO_TOP_TOOLBAR_TEST_HH_
-#define _GAZEBO_TOP_TOOLBAR_TEST_HH_
+#ifndef _GAZEBO_LINKCONFIG_TEST_HH_
+#define _GAZEBO_LINKCONFIG_TEST_HH_
 
 #include "gazebo/gui/QTestFixture.hh"
 
-/// \brief A test class for the TopToolbar widget.
-class TopToolbar_TEST : public QTestFixture
+/// \brief A test class for the LinkConfig class.
+class LinkConfig_TEST : public QTestFixture
 {
   Q_OBJECT
 
-  /// \brief Test different window modes.
-  private slots: void WindowModes();
+  /// \brief Test initialization.
+  private slots: void Initialization();
 
-  /// \brief Test inserting actions, separators and widgets.
-  private slots: void Insert();
+  /// \brief Test link message update
+  private slots: void LinkMsgUpdate();
 
-  /// \brief Test adding actions, separators and widgets.
-  private slots: void Add();
+  /// \brief Test pose update
+  private slots: void PoseUpdate();
+
+  /// \brief Test mass update
+  private slots: void MassUpdate();
+
+  /// \brief Test inertia matrix update
+  private slots: void InertiaMatrixUpdate();
+
+  /// \brief Test inertia pose update
+  private slots: void InertialPoseUpdate();
 };
 
 #endif

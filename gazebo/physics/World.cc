@@ -39,6 +39,8 @@
 #include <string>
 #include <vector>
 
+#include <ignition/math/Rand.hh>
+
 #include "gazebo/sensors/SensorManager.hh"
 #include "gazebo/math/Rand.hh"
 
@@ -1107,6 +1109,7 @@ void World::Reset()
     boost::recursive_mutex::scoped_lock lk(*this->dataPtr->worldUpdateMutex);
 
     math::Rand::SetSeed(math::Rand::GetSeed());
+    ignition::math::Rand::Seed(ignition::math::Rand::Seed());
     this->dataPtr->physicsEngine->SetSeed(math::Rand::GetSeed());
 
     this->ResetTime();
@@ -1243,6 +1246,7 @@ void World::OnControl(ConstWorldControlPtr &_data)
   if (_data->has_seed())
   {
     math::Rand::SetSeed(_data->seed());
+    ignition::math::Rand::Seed(_data->seed());
     this->dataPtr->physicsEngine->SetSeed(_data->seed());
   }
 
