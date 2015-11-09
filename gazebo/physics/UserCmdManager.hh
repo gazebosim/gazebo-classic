@@ -29,6 +29,7 @@ namespace gazebo
   namespace physics
   {
     class UserCmdPrivate;
+    class UserWrenchCmdPrivate;
 
     /// \brief Class which represents a user command, which can be "undone"
     /// and "redone".
@@ -44,6 +45,20 @@ namespace gazebo
                       physics::WorldPtr _world,
                       const std::string &_description,
                       const msgs::UserCmd::Type &_type);
+
+      /// \internal
+      /// \brief Constructor used by inherited classes
+      /// \param[in] _dataPtr Pointer to private data.
+      /// \param[in] _id Unique ID for this command
+      /// \param[in] _world Pointer to the world
+      /// \param[in] _description Description for the command, such as
+      /// "Rotate box", "Delete sphere", etc.
+      /// \param[in] _type Type of command, such as MOVING, DELETING, etc.
+      protected: UserCmd(UserCmdPrivate &_dataPtr,
+                        const unsigned int _id,
+                        physics::WorldPtr _world,
+                        const std::string &_description,
+                        const msgs::UserCmd::Type &_type);
 
       /// \brief Destructor
       public: virtual ~UserCmd();
@@ -69,6 +84,31 @@ namespace gazebo
       /// \internal
       /// \brief Pointer to private data.
       protected: UserCmdPrivate *dataPtr;
+    };
+
+    /// \brief Class which represents a user command, which can be "undone"
+    /// and "redone".
+    class GAZEBO_VISIBLE UserWrenchCmd : public UserCmd
+    {
+      /// \brief Constructor
+      /// \param[in] _id Unique ID for this command
+      /// \param[in] _world Pointer to the world
+      /// \param[in] _description Description for the command, such as
+      /// "Rotate box", "Delete sphere", etc.
+      /// \param[in] _type Type of command, such as MOVING, DELETING, etc.
+      public: UserWrenchCmd(const unsigned int _id,
+			    physics::WorldPtr _world,
+			    const std::string &_description,
+			    const msgs::UserCmd::Type &_type,
+			    const std::string &_linkName,
+			    const msgs::Wrench &_wrenchMsg);
+/*
+      /// \brief Undo this command.
+      public: virtual void Undo();
+
+      /// \brief Redo this command.
+      public: virtual void Redo();
+*/
     };
 
     class UserCmdManagerPrivate;

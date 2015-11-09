@@ -440,7 +440,6 @@ void ApplyWrenchDialog::Fini()
   if (this->dataPtr->mainWindow)
     this->dataPtr->mainWindow->removeEventFilter(this);
 
-  this->dataPtr->wrenchPub.reset();
   this->dataPtr->userCmdPub.reset();
   this->dataPtr->node->Fini();
   this->dataPtr->connections.clear();
@@ -578,15 +577,6 @@ bool ApplyWrenchDialog::SetLink(const std::string &_linkName)
   this->dataPtr->linkVisual = vis;
   this->AttachVisuals();
 
-  // Set publisher
-  std::string topicName = "~/";
-  topicName += this->dataPtr->linkName + "/wrench";
-  boost::replace_all(topicName, "::", "/");
-
-  this->dataPtr->wrenchPub.reset();
-  this->dataPtr->wrenchPub =
-      this->dataPtr->node->Advertise<msgs::Wrench>(topicName);
-
   // Filter main window activate events
   if (this->dataPtr->mainWindow)
     this->dataPtr->mainWindow->installEventFilter(this);
@@ -625,13 +615,14 @@ void ApplyWrenchDialog::OnApplyAll()
   msgs::Set(msg.mutable_torque(), this->dataPtr->torqueVector.Ign());
   msgs::Set(msg.mutable_force_offset(), this->dataPtr->forcePosVector.Ign());
 
-  this->dataPtr->wrenchPub->Publish(msg);
-
   // Register user command on server
+  // The wrench will be applied from the server
   msgs::UserCmd userCmdMsg;
   userCmdMsg.set_description("Apply wrench to [" + this->dataPtr->linkName +
       "]");
-  userCmdMsg.set_type(msgs::UserCmd::MOVING);
+  userCmdMsg.set_entity_name(this->dataPtr->linkName);
+  userCmdMsg.set_type(msgs::UserCmd::WRENCH);
+  userCmdMsg.mutable_wrench()->CopyFrom(msg);
   this->dataPtr->userCmdPub->Publish(userCmdMsg);
 }
 
@@ -644,13 +635,14 @@ void ApplyWrenchDialog::OnApplyForce()
   msgs::Set(msg.mutable_torque(), ignition::math::Vector3d::Zero);
   msgs::Set(msg.mutable_force_offset(), this->dataPtr->forcePosVector.Ign());
 
-  this->dataPtr->wrenchPub->Publish(msg);
-
   // Register user command on server
+  // The wrench will be applied from the server
   msgs::UserCmd userCmdMsg;
   userCmdMsg.set_description("Apply force to [" + this->dataPtr->linkName +
       "]");
-  userCmdMsg.set_type(msgs::UserCmd::MOVING);
+  userCmdMsg.set_entity_name(this->dataPtr->linkName);
+  userCmdMsg.set_type(msgs::UserCmd::WRENCH);
+  userCmdMsg.mutable_wrench()->CopyFrom(msg);
   this->dataPtr->userCmdPub->Publish(userCmdMsg);
 }
 
@@ -662,13 +654,14 @@ void ApplyWrenchDialog::OnApplyTorque()
   msgs::Set(msg.mutable_force(), ignition::math::Vector3d::Zero);
   msgs::Set(msg.mutable_torque(), this->dataPtr->torqueVector.Ign());
 
-  this->dataPtr->wrenchPub->Publish(msg);
-
   // Register user command on server
+  // The wrench will be applied from the server
   msgs::UserCmd userCmdMsg;
   userCmdMsg.set_description("Apply torque to [" + this->dataPtr->linkName +
       "]");
-  userCmdMsg.set_type(msgs::UserCmd::MOVING);
+  userCmdMsg.set_entity_name(this->dataPtr->linkName);
+  userCmdMsg.set_type(msgs::UserCmd::WRENCH);
+  userCmdMsg.mutable_wrench()->CopyFrom(msg);
   this->dataPtr->userCmdPub->Publish(userCmdMsg);
 }
 

@@ -55,6 +55,12 @@ namespace gazebo
       public: msgs::UserCmd::Type type;
     };
 
+    /// \internal
+    /// \brief Private data for the UserCmdManager class
+    class UserWrenchCmdPrivate : public UserCmdPrivate
+    {
+    };
+
     class UserCmd;
 
     /// \internal

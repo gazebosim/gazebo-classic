@@ -50,6 +50,23 @@ UserCmd::UserCmd(const unsigned int _id,
   this->dataPtr->startState = WorldState(this->dataPtr->world);
 }
 
+//////////////////////////////////////////////////
+UserCmd::UserCmd(UserCmdPrivate &_dataPtr,
+                 const unsigned int _id,
+                 physics::WorldPtr _world,
+                 const std::string &_description,
+                 const msgs::UserCmd::Type &_type)
+    : dataPtr(&_dataPtr)
+{
+  this->dataPtr->id = _id;
+  this->dataPtr->world = _world;
+  this->dataPtr->description = _description;
+  this->dataPtr->type = _type;
+
+  // Record current world state
+  this->dataPtr->startState = WorldState(this->dataPtr->world);
+}
+
 /////////////////////////////////////////////////
 UserCmd::~UserCmd()
 {
@@ -99,6 +116,30 @@ msgs::UserCmd::Type UserCmd::Type() const
 }
 
 /////////////////////////////////////////////////
+UserWrenchCmd::UserWrenchCmd(const unsigned int _id,
+                       physics::WorldPtr _world,
+                       const std::string &_description,
+                       const msgs::UserCmd::Type &_type,
+                       const std::string &_linkName,
+                       const msgs::Wrench &_wrenchMsg)
+  : UserCmd(*new UserWrenchCmdPrivate, _id, _world, _description, _type)
+{
+  // Transport
+  auto node = transport::NodePtr(new transport::Node());
+  node->Init();
+
+  // Set publisher
+  std::string topicName = "~/";
+  topicName += _linkName + "/wrench";
+  boost::replace_all(topicName, "::", "/");
+
+  auto wrenchPub = node->Advertise<msgs::Wrench>(topicName);
+
+  // Pulish message to  apply wrench after we've save the current state
+  wrenchPub->Publish(_wrenchMsg);
+}
+
+/////////////////////////////////////////////////
 UserCmdManager::UserCmdManager(const WorldPtr _world)
   : dataPtr(new UserCmdManagerPrivate())
 {
@@ -132,12 +173,25 @@ void UserCmdManager::OnUserCmdMsg(ConstUserCmdPtr &_msg)
   // Generate unique id
   unsigned int id = this->dataPtr->idCounter++;
 
+  UserCmdPtr cmdPtr;
+
   // Create command
-  UserCmdPtr cmd(new UserCmd(id, this->dataPtr->world, _msg->description(),
-      _msg->type()));
+  if (_msg->type() == msgs::UserCmd::WRENCH)
+  {
+    UserWrenchCmdPtr cmd(new UserWrenchCmd(id, this->dataPtr->world,
+        _msg->description(), _msg->type(), _msg->entity_name(),
+        _msg->wrench()));
+    cmdPtr = cmd;
+  }
+  else
+  {
+    UserCmdPtr cmd(new UserCmd(id, this->dataPtr->world, _msg->description(),
+        _msg->type()));
+    cmdPtr = cmd;
+  }
 
   // Add it to undo list
-  this->dataPtr->undoCmds.push_back(cmd);
+  this->dataPtr->undoCmds.push_back(cmdPtr);
 
   // Clear redo list
   this->dataPtr->redoCmds.clear();

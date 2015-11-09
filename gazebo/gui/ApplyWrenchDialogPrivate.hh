@@ -99,9 +99,6 @@ namespace gazebo
       /// \brief Torque vector.
       public: math::Vector3 torqueVector;
 
-      /// \brief Publishes the wrench message.
-      public: transport::PublisherPtr wrenchPub;
-
       /// \brief Publish user command messages for the server to place in the
       /// undo queue.
       public: transport::PublisherPtr userCmdPub;
