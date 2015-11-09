@@ -198,10 +198,12 @@ void JointMaker::RemoveJoint(const std::string &_jointId)
   std::string jointId = _jointId;
   JointData *joint = NULL;
 
+  auto jointIt = this->joints.find(_jointId);
+
   // Existing joint
-  if (this->joints.find(jointId) != this->joints.end())
+  if (jointIt != this->joints.end())
   {
-    joint = this->joints[jointId];
+    joint = jointIt->second;
   }
   // Joint being created
   else if (this->newJoint)
@@ -1436,11 +1438,6 @@ bool JointMaker::SetChildLink(rendering::VisualPtr _childLink)
     this->newJoint = joint;
     this->newJointCreated = true;
     gui::model::Events::modelChanged();
-
-/*
-    // Create hotspot visual
-    this->CreateHotSpot(this->newJoint);
-*/
   }
   // Update child
   else
