@@ -220,7 +220,7 @@ void Camera::Init()
 
   this->dataPtr->trackIsStatic = false;
   this->dataPtr->trackIsRelative = true;
-  this->dataPtr->trackDistance = 0;
+  this->dataPtr->trackDistance = 8.0;
   this->dataPtr->trackPos = ignition::math::Vector3d(-5.0, 0.0, 3.0);
 }
 
