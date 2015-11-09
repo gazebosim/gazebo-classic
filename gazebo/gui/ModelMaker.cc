@@ -357,7 +357,7 @@ void ModelMaker::Stop()
   if (scene)
     scene->RemoveVisual(dPtr->modelVisual);
   for (auto vis : dPtr->visuals)
-  {  
+  {
     scene->RemoveVisual(vis);
   }
   dPtr->modelVisual.reset();
