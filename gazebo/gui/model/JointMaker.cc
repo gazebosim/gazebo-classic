@@ -200,23 +200,26 @@ void JointMaker::RemoveJoint(const std::string &_jointId)
 
     JointData *joint = jointIt->second;
     rendering::ScenePtr scene = joint->hotspot->GetScene();
-    scene->GetManager()->destroyBillboardSet(joint->handles);
-    scene->RemoveVisual(joint->hotspot);
-    scene->RemoveVisual(joint->visual);
-    joint->visual->Fini();
-    if (joint->jointVisual)
+    if (scene)
     {
-      rendering::JointVisualPtr parentAxisVis = joint->jointVisual
-          ->GetParentAxisVisual();
-      if (parentAxisVis)
+      scene->GetManager()->destroyBillboardSet(joint->handles);
+      scene->RemoveVisual(joint->hotspot);
+      scene->RemoveVisual(joint->visual);
+      joint->visual->Fini();
+      if (joint->jointVisual)
       {
-        parentAxisVis->GetParent()->DetachVisual(
-            parentAxisVis->GetName());
-        scene->RemoveVisual(parentAxisVis);
+        rendering::JointVisualPtr parentAxisVis = joint->jointVisual
+            ->GetParentAxisVisual();
+        if (parentAxisVis)
+        {
+          parentAxisVis->GetParent()->DetachVisual(
+              parentAxisVis->GetName());
+          scene->RemoveVisual(parentAxisVis);
+        }
+        joint->jointVisual->GetParent()->DetachVisual(
+            joint->jointVisual->GetName());
+        scene->RemoveVisual(joint->jointVisual);
       }
-      joint->jointVisual->GetParent()->DetachVisual(
-          joint->jointVisual->GetName());
-      scene->RemoveVisual(joint->jointVisual);
     }
     joint->hotspot.reset();
     joint->visual.reset();
@@ -972,7 +975,7 @@ JointMaker::JointType JointMaker::GetState() const
 
 /////////////////////////////////////////////////
 math::Vector3 JointMaker::GetLinkWorldCentroid(
-    const rendering::VisualPtr _visual)
+    const rendering::VisualPtr &_visual)
 {
   math::Vector3 centroid;
   int count = 0;
@@ -1016,7 +1019,8 @@ void JointData::OnApply()
       msgs::ConvertJointType(this->jointMsg->type()));
 
   // Parent
-  if (this->jointMsg->parent() != this->parent->GetName())
+  if (this->parent->GetName().find(this->jointMsg->parent()) ==
+      std::string::npos)
   {
     // Get scoped name
     std::string oldName = this->parent->GetName();
@@ -1034,7 +1038,8 @@ void JointData::OnApply()
   }
 
   // Child
-  if (this->jointMsg->child() != this->child->GetName())
+  if (this->child->GetName().find(this->jointMsg->child()) ==
+      std::string::npos)
   {
     // Get scoped name
     std::string oldName = this->child->GetName();
