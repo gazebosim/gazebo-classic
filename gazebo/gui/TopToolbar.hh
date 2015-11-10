@@ -59,6 +59,18 @@ namespace gazebo
       public: QAction *InsertWidget(const QString &_before,
           QWidget *_widget);
 
+      /// \brief Add an action to the end of the toolbar.
+      /// \param[in] _action The action to be added.
+      public: void AddAction(QAction *_action);
+
+      /// \brief Add a separator to the end of the toolbar.
+      /// \return The action for the created separator, if successful.
+      public: QAction *AddSeparator();
+
+      /// \brief Add a widget to the end of the toolbar.
+      /// \return The new toolbar action for the widget, if successful.
+      public: QAction *AddWidget(QWidget *_widget);
+
       /// \brief Callback when window mode is changed.
       /// \param[in] _mode New window mode.
       private: void OnWindowMode(const std::string &_mode);

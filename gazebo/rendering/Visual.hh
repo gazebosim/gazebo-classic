@@ -57,7 +57,7 @@ namespace gazebo
     /// \class Visual Visual.hh rendering/rendering.hh
     /// \brief A renderable object
     class GZ_RENDERING_VISIBLE Visual :
-      public boost::enable_shared_from_this<Visual>
+      public std::enable_shared_from_this<Visual>
     {
       /// \brief Type of visual
       public: enum VisualType

@@ -153,6 +153,14 @@ namespace gazebo
       public: CameraPtr CreateCamera(const std::string &_name,
                                      bool _autoRender = true);
 
+      /// \brief Create a wide-angle camera
+      /// \param[in] _name Name of the new camera.
+      /// \param[in] _autoRender True to allow Gazebo to automatically
+      /// render the camera. This should almost always be true.
+      /// \return Pointer to the new camera.
+      public: WideAngleCameraPtr CreateWideAngleCamera(const std::string &_name,
+          const bool _autoRender = true);
+
 #ifdef HAVE_OCULUS
       /// \brief Create an oculus rift camera
       /// \param[in] _name Name of the new camera.
@@ -577,13 +585,21 @@ namespace gazebo
       private: bool ProcessVisualMsg(ConstVisualPtr &_msg,
           Visual::VisualType _type = Visual::VT_ENTITY);
 
-      /// \brief Light message callback.
+      /// \brief Light factory message callback.
       /// \param[in] _msg The message data.
-      private: void OnLightMsg(ConstLightPtr &_msg);
+      private: void OnLightFactoryMsg(ConstLightPtr &_msg);
 
-      /// \brief Process a light message.
+      /// \brief Light modify message callback.
       /// \param[in] _msg The message data.
-      private: bool ProcessLightMsg(ConstLightPtr &_msg);
+      private: void OnLightModifyMsg(ConstLightPtr &_msg);
+
+      /// \brief Process a light factory message.
+      /// \param[in] _msg The message data.
+      private: bool ProcessLightFactoryMsg(ConstLightPtr &_msg);
+
+      /// \brief Process a light modify message.
+      /// \param[in] _msg The message data.
+      private: bool ProcessLightModifyMsg(ConstLightPtr &_msg);
 
       /// \brief Process a request message.
       /// \param[in] _msg The message data.
