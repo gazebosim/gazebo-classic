@@ -62,7 +62,7 @@ namespace gazebo
       /// \brief Set the CoM vector and update the position of the torque
       /// visual.
       /// \param[in] _comVector New vector.
-      /// \deprecated See function that accepts ignition math parameters
+      /// \deprecated See function that accepts ignition::math parameters
       public: void SetCoM(const math::Vector3 &_comVector)
               GAZEBO_DEPRECATED(7.0);
 
@@ -74,7 +74,7 @@ namespace gazebo
       /// \brief Set the force position vector and update the position of the
       /// force visual.
       /// \param[in] _forcePosVector New vector.
-      /// \deprecated See function that accepts ignition math parameters
+      /// \deprecated See function that accepts ignition::math parameters
       public: void SetForcePos(const math::Vector3 &_forcePosVector)
               GAZEBO_DEPRECATED(7.0);
 
@@ -87,7 +87,7 @@ namespace gazebo
       /// \param[in] _forceVector New vector.
       /// \param[in] _rotatedByMouse Whether the rotation comes from the mouse
       /// or not.
-      /// \deprecated See function that accepts ignition math parameters
+      /// \deprecated See function that accepts ignition::math parameters
       public: void SetForce(const math::Vector3 &_forceVector,
           const bool _rotatedByMouse) GAZEBO_DEPRECATED(7.0);
 
@@ -102,7 +102,7 @@ namespace gazebo
       /// \param[in] _torqueVector New vector.
       /// \param[in] _rotatedByMouse Whether the rotation comes from the mouse
       /// or not.
-      /// \deprecated See function that accepts ignition math parameters
+      /// \deprecated See function that accepts ignition::math parameters
       public: void SetTorque(const math::Vector3 &_torqueVector,
           const bool _rotatedByMouse) GAZEBO_DEPRECATED(7.0);
 
