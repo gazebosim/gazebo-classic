@@ -21,8 +21,10 @@
 
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/gui/GuiPlugin.hh>
-#include <gazebo/transport/transport.hh>
-#include <gazebo/gui/gui.hh>
+#ifndef Q_MOC_RUN  // See: https://bugreports.qt-project.org/browse/QTBUG-22829
+# include <gazebo/transport/transport.hh>
+# include <gazebo/gui/gui.hh>
+#endif
 
 namespace gazebo
 {
@@ -37,9 +39,17 @@ namespace gazebo
     /// \brief Destructor
     public: virtual ~CameraLensControlExample();
 
+    /// \brief Filter mouse events, so that parent widget won't handle them
+    /// \param[in] _watched Receiver of the event
+    /// \param[in] _event Event to filter
+    private: bool eventFilter(QObject *_watched, QEvent *_event) override;
+
     /// \brief Load GUI components
     /// \param[in] _parent Pointer to the parent widget
     private: virtual void LoadGUIComponents(QWidget *_parent);
+
+    /// \brief Update the GUI components based on the lens type.
+    private: void UpdateWidgets();
 
     /// \brief Callback to spawn a button
     private slots: void OnButtonSpawn();
@@ -60,9 +70,6 @@ namespace gazebo
 
     /// \brief Counter used to create unique model names.
     private: unsigned int counter = 0;
-
-    // \brief Name of current element selected in gazebo.
-    private: std::string selectedElementName;
 
     /// \brief Node used to establish communication with gzserver.
     private: transport::NodePtr node;

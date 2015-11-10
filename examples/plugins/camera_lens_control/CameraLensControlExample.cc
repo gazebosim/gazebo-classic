@@ -44,13 +44,16 @@ CameraLensControlExample::CameraLensControlExample()
   QVBoxLayout *frameLayout = new QVBoxLayout();
 
   // Open file with GUI description
-  QFile file("./mainwindow.ui");
+  QFile file(":/mainwindow.ui");
   file.open(QFile::ReadOnly);
 
   // Load GUI from file
   QUiLoader loader;
   QWidget *contentWidget = loader.load(&file, this);
   file.close();
+
+  // Prevent mouse events propagation to parent widget
+  contentWidget->installEventFilter(this);
 
   // Add loaded widget to layout
   frameLayout->addWidget(contentWidget);
@@ -147,6 +150,8 @@ void CameraLensControlExample::LoadGUIComponents(QWidget *_parent)
 
   // Add listener for spawn button
   connect(this->pbSpawn, SIGNAL(clicked()), this, SLOT(OnButtonSpawn()));
+
+  this->UpdateWidgets();
 }
 
 /////////////////////////////////////////////////
@@ -159,6 +164,11 @@ void CameraLensControlExample::OnButtonSpawn()
     << "    <link name='link'>"
     << "      <inertial>"
     << "        <mass>0.1</mass>"
+    << "        <inertia>"
+    << "          <ixx>0.000166667</ixx>"
+    << "          <iyy>0.000166667</iyy>"
+    << "          <izz>0.000166667</izz>"
+    << "        </inertia>"
     << "      </inertial>"
     << "      <collision name='collision'>"
     << "        <geometry>"
@@ -216,15 +226,17 @@ void CameraLensControlExample::OnButtonSpawn()
 /////////////////////////////////////////////////
 void CameraLensControlExample::OnSelect(ConstSelectionPtr &_msg)
 {
-  this->lbName->setText(QString::fromStdString(_msg->name()));
-
   std::string t("wideanglecamera");
-  if (_msg->name().compare(0, t.length(), t) == 0)
+
+  if (_msg->selected() && (_msg->name().compare(0, t.length(), t) == 0))
   {
-    this->selectedElementName = _msg->name();
+    this->lbName->setText(QString::fromStdString(_msg->name()));
 
     if (this->infoSub)
+    {
       this->infoSub->Unsubscribe();
+      this->infoSub.reset();
+    }
 
     // subscribe for the info messages
     this->infoSub = this->node->Subscribe(
@@ -237,7 +249,17 @@ void CameraLensControlExample::OnSelect(ConstSelectionPtr &_msg)
     this->acceptInfoMessages = true;
   }
   else
-    this->lbName->setText("Spawn and select a camera.");
+  {
+    if (this->infoSub)
+    {
+      this->infoSub->Unsubscribe();
+      this->infoSub.reset();
+    }
+
+    this->cameraControlPub.reset();
+
+    this->lbName->setText("Spawn and/or select a camera.");
+  }
 }
 
 /////////////////////////////////////////////////
@@ -271,15 +293,9 @@ void CameraLensControlExample::OnCameraLens(ConstCameraLensPtr &_msg)
   if (_msg->has_scale_to_hfov())
     this->cbScaleToHFOV->setChecked(_msg->scale_to_hfov());
 
-  bool isCustom = (this->cbType->currentText() == "custom");
+  this->UpdateWidgets();
 
-  this->cbFun->setEnabled(isCustom);
-  this->sbC1->setEnabled(isCustom);
-  this->sbC2->setEnabled(isCustom);
-  this->sbC3->setEnabled(isCustom);
-  this->sbF->setEnabled(isCustom);
-
-  // Information got, runtime update is not needed
+  // Information received, runtime update is not needed
   this->acceptInfoMessages = false;
 }
 
@@ -289,7 +305,7 @@ void CameraLensControlExample::OnValueChanged()
   if (acceptInfoMessages)
     return;
 
-  if (this->selectedElementName != "")
+  if (this->cameraControlPub)
   {
     msgs::CameraLens msg;
 
@@ -320,6 +336,12 @@ void CameraLensControlExample::OnTypeChanged()
 
   this->acceptInfoMessages = true;
 
+  this->UpdateWidgets();
+}
+
+/////////////////////////////////////////////////
+void CameraLensControlExample::UpdateWidgets()
+{
   bool isCustom = (this->cbType->currentText() == "custom");
 
   this->cbFun->setEnabled(isCustom);
@@ -328,3 +350,23 @@ void CameraLensControlExample::OnTypeChanged()
   this->sbC3->setEnabled(isCustom);
   this->sbF->setEnabled(isCustom);
 }
+
+/////////////////////////////////////////////////
+bool CameraLensControlExample::eventFilter(QObject *_watched, QEvent *_event)
+{
+  std::set<QEvent::Type> filtered = { QEvent::MouseButtonDblClick,
+                                      QEvent::MouseButtonPress,
+                                      QEvent::MouseButtonRelease,
+                                      QEvent::MouseMove,
+                                      QEvent::MouseTrackingChange };
+
+  if (filtered.find(_event->type()) != filtered.end())
+  {
+    return true;
+  }
+  else
+  {
+    return _watched->eventFilter(_watched, _event);
+  }
+}
+

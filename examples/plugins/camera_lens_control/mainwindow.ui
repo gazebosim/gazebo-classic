@@ -119,7 +119,7 @@
     <number>4</number>
    </property>
    <property name="maximum">
-    <double>3.141600000000000</double>
+    <double>6.283100000000000</double>
    </property>
    <property name="singleStep">
     <double>0.050000000000000</double>
