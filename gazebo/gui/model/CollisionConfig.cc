@@ -73,6 +73,17 @@ CollisionConfig::~CollisionConfig()
 }
 
 /////////////////////////////////////////////////
+void CollisionConfig::Init()
+{
+  // Keep original data in case user cancels
+  for (auto &it : this->configs)
+  {
+    CollisionConfigData *configData = it.second;
+    configData->originalDataMsg.CopyFrom(*this->GetData(configData->name));
+  }
+}
+
+/////////////////////////////////////////////////
 void CollisionConfig::OnAddCollision()
 {
   std::stringstream collisionIndex;
@@ -208,6 +219,16 @@ void CollisionConfig::AddCollision(const std::string &_name,
   configWidget->SetWidgetReadOnly("id", true);
   configWidget->SetWidgetReadOnly("name", true);
 
+  connect(configWidget, SIGNAL(PoseValueChanged(const QString &,
+      const ignition::math::Pose3d &)), this,
+      SLOT(OnPoseChanged(const QString &, const ignition::math::Pose3d &)));
+
+  connect(configWidget, SIGNAL(GeometryValueChanged(const std::string &,
+      const std::string &, const ignition::math::Vector3d &,
+      const std::string &)), this, SLOT(OnGeometryChanged(const std::string &,
+      const std::string &, const ignition::math::Vector3d &,
+      const std::string &)));
+
   // Item layout
   QVBoxLayout *itemLayout = new QVBoxLayout();
   itemLayout->addWidget(headerWidget);
@@ -332,10 +353,54 @@ void CollisionConfig::Geometry(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
+const std::map<int, CollisionConfigData *> &CollisionConfig::ConfigData() const
+{
+  return this->configs;
+}
+
+/////////////////////////////////////////////////
+void CollisionConfig::OnPoseChanged(const QString &/*_name*/,
+    const ignition::math::Pose3d &/*_value*/)
+{
+  emit Applied();
+}
+
+/////////////////////////////////////////////////
+void CollisionConfig::OnGeometryChanged(const std::string &/*_name*/,
+    const std::string &/*_value*/,
+    const ignition::math::Vector3d &/*dimensions*/,
+    const std::string &/*_uri*/)
+{
+  emit Applied();
+}
+
+/////////////////////////////////////////////////
+void CollisionConfig::RestoreOriginalData()
+{
+  for (auto &it : this->configs)
+  {
+    it.second->RestoreOriginalData();
+  }
+}
+
+/////////////////////////////////////////////////
 void CollisionConfigData::OnToggleItem(bool _checked)
 {
   if (_checked)
     this->configWidget->show();
   else
     this->configWidget->hide();
+}
+
+/////////////////////////////////////////////////
+void CollisionConfigData::RestoreOriginalData()
+{
+  msgs::CollisionPtr collisionPtr;
+  collisionPtr.reset(new msgs::Collision);
+  collisionPtr->CopyFrom(this->originalDataMsg);
+
+  // Update default widgets
+  this->configWidget->blockSignals(true);
+  this->configWidget->UpdateFromMsg(collisionPtr.get());
+  this->configWidget->blockSignals(false);
 }

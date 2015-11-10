@@ -15,7 +15,7 @@ set (sources
   SubscriptionTransport.cc
   TopicManager.cc
   TransportIface.cc
-) 
+)
 
 set (headers
   CallbackHelper.hh
@@ -57,11 +57,11 @@ endif ()
 
 gz_add_library(gazebo_transport ${sources})
 target_link_libraries(gazebo_transport
-  gazebo_common 
-  gazebo_msgs 
+  gazebo_common
+  gazebo_msgs
   ${IGNITION-MATH_LIBRARIES}
   ${Boost_LIBRARIES}
-  ${TBB_LIBRARIES} 
+  ${TBB_LIBRARIES}
 )
 if (WIN32)
   target_link_libraries(gazebo_transport ws2_32 Iphlpapi)
