@@ -749,6 +749,11 @@ QAbstractSpinBox::down-arrow:hover
   height: 10px;
 }
 
+QAbstractSpinBox:disabled
+{
+  color: #909090;
+}
+
 QLineEdit#logPlayCurrentTime
 {
   background-color: #808080;
