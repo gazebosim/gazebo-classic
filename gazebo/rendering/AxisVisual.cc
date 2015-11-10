@@ -100,7 +100,6 @@ void AxisVisual::ScaleXAxis(const math::Vector3 &_scale)
 /////////////////////////////////////////////////
 void AxisVisual::ScaleXAxis(const ignition::math::Vector3d &_scale)
 {
-
   AxisVisualPrivate *dPtr =
       reinterpret_cast<AxisVisualPrivate *>(this->dataPtr);
 
