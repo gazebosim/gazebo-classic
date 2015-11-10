@@ -143,3 +143,9 @@ void LinkConfig::RestoreOriginalData()
   this->Update(linkPtr);
   this->configWidget->blockSignals(false);
 }
+
+/////////////////////////////////////////////////
+const ConfigWidget *LinkConfig::LinkConfigWidget() const
+{
+  return this->configWidget;
+}

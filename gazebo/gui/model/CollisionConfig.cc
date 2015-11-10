@@ -353,6 +353,12 @@ void CollisionConfig::Geometry(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
+const std::map<int, CollisionConfigData *> &CollisionConfig::ConfigData() const
+{
+  return this->configs;
+}
+
+/////////////////////////////////////////////////
 void CollisionConfig::OnPoseChanged(const QString &/*_name*/,
     const ignition::math::Pose3d &/*_value*/)
 {

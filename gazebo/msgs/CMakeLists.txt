@@ -86,7 +86,7 @@ set (msgs
   raysensor.proto
   request.proto
   response.proto
-  rest_error.proto
+  rest_response.proto
   rest_login.proto
   rest_logout.proto
   rest_post.proto
