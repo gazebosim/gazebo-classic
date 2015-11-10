@@ -46,16 +46,16 @@ namespace gazebo
       public: rendering::DynamicLines *torqueLine;
 
       /// \brief CoM position in link coordinates.
-      public: math::Vector3 comVector;
+      public: ignition::math::Vector3d comVector;
 
       /// \brief Force application point in link coordinates.
-      public: math::Vector3 forcePosVector;
+      public: ignition::math::Vector3d forcePosVector;
 
       /// \brief Force vector expressed in the link frame.
-      public: math::Vector3 forceVector;
+      public: ignition::math::Vector3d forceVector;
 
       /// \brief Torque vector expressed in the link frame.
-      public: math::Vector3 torqueVector;
+      public: ignition::math::Vector3d torqueVector;
 
       /// \brief Mutex to protect variables
       public: std::mutex mutex;
