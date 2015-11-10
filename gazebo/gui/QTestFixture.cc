@@ -43,6 +43,9 @@ QTestFixture::QTestFixture()
 /////////////////////////////////////////////////
 void QTestFixture::initTestCase()
 {
+  // Verbose mode
+  gazebo::common::Console::SetQuiet(false);
+
   // Initialize the informational logger. This will log warnings, and
   // errors.
   gzLogInit("qtest-", "test.log");

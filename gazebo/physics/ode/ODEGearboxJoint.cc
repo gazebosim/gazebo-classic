@@ -146,20 +146,6 @@ void ODEGearboxJoint::SetVelocity(unsigned int /*index*/, double /*_angle*/)
 }
 
 //////////////////////////////////////////////////
-void ODEGearboxJoint::SetMaxForce(unsigned int /*index*/, double /*_t*/)
-{
-  gzlog << "SetMaxForce not implemented for gearbox\n";
-  return;
-}
-
-//////////////////////////////////////////////////
-double ODEGearboxJoint::GetMaxForce(unsigned int /*index*/)
-{
-  gzlog << "GetMaxForce not implemented for gearbox\n";
-  return 0;
-}
-
-//////////////////////////////////////////////////
 void ODEGearboxJoint::SetForceImpl(unsigned int /*_index*/, double /*_effort*/)
 {
   if (this->jointId)

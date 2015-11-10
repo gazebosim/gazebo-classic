@@ -293,6 +293,26 @@ ignition::math::Pose3d Sensor::Pose() const
 }
 
 //////////////////////////////////////////////////
+void Sensor::SetPose(const ignition::math::Pose3d &_pose)
+{
+  this->pose = _pose;
+
+  // Update the visualization with the pose information.
+  if (this->sensorPub && this->GetVisualize())
+  {
+    msgs::Sensor msg;
+    msg.set_name(this->GetName());
+    msg.set_id(this->GetId());
+    msg.set_parent(this->GetParentName());
+    msg.set_parent_id(this->GetParentId());
+    msg.set_type(this->GetType());
+    msg.set_visualize(true);
+    msgs::Set(msg.mutable_pose(), this->pose);
+    this->sensorPub->Publish(msg);
+  }
+}
+
+//////////////////////////////////////////////////
 double Sensor::GetUpdateRate()
 {
   if (this->updatePeriod.Double() > 0.0)
@@ -363,12 +383,12 @@ void Sensor::FillMsg(msgs::Sensor &_msg)
   {
     LogicalCameraSensor *camSensor = static_cast<LogicalCameraSensor*>(this);
     msgs::LogicalCameraSensor *camMsg = _msg.mutable_logical_camera();
-    camMsg->set_near(camSensor->Near());
-    camMsg->set_far(camSensor->Far());
+    camMsg->set_near_clip(camSensor->Near());
+    camMsg->set_far_clip(camSensor->Far());
     camMsg->set_horizontal_fov(camSensor->HorizontalFOV().Radian());
     camMsg->set_aspect_ratio(camSensor->AspectRatio());
   }
-  else if (this->GetType() == "camera")
+  else if (this->GetType() == "camera" || this->GetType() == "wideanglecamera")
   {
     CameraSensor *camSensor = static_cast<CameraSensor*>(this);
     msgs::CameraSensor *camMsg = _msg.mutable_camera();

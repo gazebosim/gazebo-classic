@@ -104,21 +104,6 @@ double DARTFixedJoint::GetVelocity(unsigned int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-void DARTFixedJoint::SetMaxForce(unsigned int /*_index*/, double /*_force*/)
-{
-  gzwarn << "DARTFixedJoint: called method "
-         << "SetMaxForce that is not valid for joints of type fixed.\n";
-}
-
-//////////////////////////////////////////////////
-double DARTFixedJoint::GetMaxForce(unsigned int /*_index*/)
-{
-  gzwarn << "DARTFixedJoint: called method "
-         << "GetMaxForce that is not valid for joints of type fixed.\n";
-  return 0.0;
-}
-
-//////////////////////////////////////////////////
 void DARTFixedJoint::SetForceImpl(unsigned int /*_index*/, double /*_effort*/)
 {
   gzwarn << "DARTFixedJoint: called method "

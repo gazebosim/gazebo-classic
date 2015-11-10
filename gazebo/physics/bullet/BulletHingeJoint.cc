@@ -268,18 +268,6 @@ double BulletHingeJoint::GetVelocity(unsigned int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-void BulletHingeJoint::SetMaxForce(unsigned int /*_index*/, double _t)
-{
-  this->bulletHinge->setMaxMotorImpulse(_t);
-}
-
-//////////////////////////////////////////////////
-double BulletHingeJoint::GetMaxForce(unsigned int /*_index*/)
-{
-  return this->bulletHinge->getMaxMotorImpulse();
-}
-
-//////////////////////////////////////////////////
 void BulletHingeJoint::SetForceImpl(unsigned int /*_index*/, double _effort)
 {
   if (this->bulletHinge)

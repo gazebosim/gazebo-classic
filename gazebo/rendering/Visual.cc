@@ -1543,7 +1543,6 @@ void Visual::SetHighlighted(bool _highlighted)
   // If this is a link, highlight frame visual
   if (this->GetType() == VT_LINK)
   {
-    VisualPtr linkFrameVis;
     for (auto child : this->dataPtr->children)
     {
       if (child->GetName().find("LINK_FRAME_VISUAL__") != std::string::npos)
@@ -2535,7 +2534,7 @@ bool Visual::IsDescendantOf(const rendering::VisualPtr _visual) const
 //////////////////////////////////////////////////
 unsigned int Visual::GetDepth() const
 {
-  boost::shared_ptr<Visual const> p = shared_from_this();
+  std::shared_ptr<const Visual> p = shared_from_this();
   unsigned int depth = 0;
   while (p->GetParent())
   {
