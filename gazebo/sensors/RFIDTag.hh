@@ -24,7 +24,6 @@
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/sensors/Sensor.hh"
-#include "gazebo/math/Pose.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/util/system.hh"
 

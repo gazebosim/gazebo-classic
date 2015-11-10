@@ -35,8 +35,6 @@
 
 #include "gazebo/msgs/msgs.hh"
 
-#include "gazebo/math/Vector3.hh"
-
 #include "gazebo/sensors/RFIDTag.hh"
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/RFIDSensor.hh"

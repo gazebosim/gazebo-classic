@@ -23,8 +23,6 @@
 #include <ignition/math/Angle.hh>
 #include <ignition/math/Pose3.hh>
 
-#include "gazebo/math/Angle.hh"
-#include "gazebo/math/Pose.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/util/system.hh"

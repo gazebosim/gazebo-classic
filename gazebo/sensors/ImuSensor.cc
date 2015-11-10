@@ -26,10 +26,6 @@
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
 
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Pose.hh"
-#include "gazebo/math/Rand.hh"
-
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
@@ -63,11 +59,24 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 {
   Sensor::Load(_worldName, _sdf);
 
-  std::string topicName = "~/";
-  topicName += this->parentName + "/" + this->GetName() + "/imu";
-  boost::replace_all(topicName, "::", "/");
+  // CASE 1 : Topic is specified in the sensor itself (should be deprecated!)
+  if (this->sdf->HasElement("imu") &&
+      this->sdf->GetElement("imu")->HasElement("topic") &&
+      this->sdf->GetElement("imu")->Get<std::string>("topic")
+      != "__default_topic__")
+  {
+    this->pub = this->node->Advertise<msgs::IMU>(
+        this->sdf->GetElement("imu")->Get<std::string>("topic"), 500);
+  }
+  // CASE 2 : Topic is specified in parent sensor definition
+  else
+  {
+    std::string topicName = "~/";
+    topicName += this->parentName + "/" + this->GetName() + "/imu";
+    boost::replace_all(topicName, "::", "/");
 
-  this->pub = this->node->Advertise<msgs::IMU>(topicName, 500);
+    this->pub = this->node->Advertise<msgs::IMU>(topicName, 500);
+  }
 
   // Get the imu element pointer
   sdf::ElementPtr imuElem = this->sdf->GetElement("imu");
