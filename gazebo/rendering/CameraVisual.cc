@@ -54,11 +54,11 @@ void CameraVisual::Load(const msgs::CameraSensor &_msg)
   CameraVisualPrivate *dPtr =
       reinterpret_cast<CameraVisualPrivate *>(this->dataPtr);
 
-  math::Vector2d imageSize = msgs::ConvertIgn(_msg.image_size());
+  ignition::math::Vector2d imageSize = msgs::ConvertIgn(_msg.image_size());
 
   double dist = 2.0;
   double width = 1.0;
-  double height = imageSize.y / static_cast<double>(imageSize.x);
+  double height = imageSize.Y() / imageSize.X();
 
   dPtr->camera = dPtr->scene->CreateCamera(this->GetName(), false);
 
@@ -101,17 +101,17 @@ void CameraVisual::Load(const msgs::CameraSensor &_msg)
 
   DynamicLines *line = this->CreateDynamicLine(RENDERING_LINE_LIST);
 
-  line->AddPoint(math::Vector3(0, 0, 0));
-  line->AddPoint(math::Vector3(dist, width*0.5, height*0.5));
+  line->AddPoint(ignition::math::Vector3d(0, 0, 0));
+  line->AddPoint(ignition::math::Vector3d(dist, width*0.5, height*0.5));
 
-  line->AddPoint(math::Vector3(0, 0, 0));
-  line->AddPoint(math::Vector3(dist, -width*0.5, height*0.5));
+  line->AddPoint(ignition::math::Vector3d(0, 0, 0));
+  line->AddPoint(ignition::math::Vector3d(dist, -width*0.5, height*0.5));
 
-  line->AddPoint(math::Vector3(0, 0, 0));
-  line->AddPoint(math::Vector3(dist, -width*0.5, -height*0.5));
+  line->AddPoint(ignition::math::Vector3d(0, 0, 0));
+  line->AddPoint(ignition::math::Vector3d(dist, -width*0.5, -height*0.5));
 
-  line->AddPoint(math::Vector3(0, 0, 0));
-  line->AddPoint(math::Vector3(dist, width*0.5, -height*0.5));
+  line->AddPoint(ignition::math::Vector3d(0, 0, 0));
+  line->AddPoint(ignition::math::Vector3d(dist, width*0.5, -height*0.5));
 
   line->setMaterial("Gazebo/WhiteGlow");
   line->setVisibilityFlags(GZ_VISIBILITY_GUI);

@@ -401,10 +401,10 @@ void ModelSnap::Update()
             this->dataPtr->highlightVisual->CreateDynamicLine(
             rendering::RENDERING_TRIANGLE_FAN);
         this->dataPtr->snapHighlight->setMaterial("Gazebo/RedTransparent");
-        this->dataPtr->snapHighlight->AddPoint(hoverTriangle[0]);
-        this->dataPtr->snapHighlight->AddPoint(hoverTriangle[1]);
-        this->dataPtr->snapHighlight->AddPoint(hoverTriangle[2]);
-        this->dataPtr->snapHighlight->AddPoint(hoverTriangle[0]);
+        this->dataPtr->snapHighlight->AddPoint(hoverTriangle[0].Ign());
+        this->dataPtr->snapHighlight->AddPoint(hoverTriangle[1].Ign());
+        this->dataPtr->snapHighlight->AddPoint(hoverTriangle[2].Ign());
+        this->dataPtr->snapHighlight->AddPoint(hoverTriangle[0].Ign());
         this->dataPtr->highlightVisual->SetVisible(true);
         this->dataPtr->highlightVisual->GetSceneNode()->setInheritScale(false);
         this->dataPtr->highlightVisual->SetVisibilityFlags(
@@ -425,10 +425,10 @@ void ModelSnap::Update()
           }
           this->dataPtr->hoverVis->AttachVisual(this->dataPtr->highlightVisual);
         }
-        this->dataPtr->snapHighlight->SetPoint(0, hoverTriangle[0]);
-        this->dataPtr->snapHighlight->SetPoint(1, hoverTriangle[1]);
-        this->dataPtr->snapHighlight->SetPoint(2, hoverTriangle[2]);
-        this->dataPtr->snapHighlight->SetPoint(3, hoverTriangle[0]);
+        this->dataPtr->snapHighlight->SetPoint(0, hoverTriangle[0].Ign());
+        this->dataPtr->snapHighlight->SetPoint(1, hoverTriangle[1].Ign());
+        this->dataPtr->snapHighlight->SetPoint(2, hoverTriangle[2].Ign());
+        this->dataPtr->snapHighlight->SetPoint(3, hoverTriangle[0].Ign());
       }
     }
     else
@@ -465,10 +465,10 @@ void ModelSnap::Update()
           this->dataPtr->snapVisual->CreateDynamicLine(
           rendering::RENDERING_LINE_STRIP);
       this->dataPtr->snapLines->setMaterial("Gazebo/RedGlow");
-      this->dataPtr->snapLines->AddPoint(triangle[0]);
-      this->dataPtr->snapLines->AddPoint(triangle[1]);
-      this->dataPtr->snapLines->AddPoint(triangle[2]);
-      this->dataPtr->snapLines->AddPoint(triangle[0]);
+      this->dataPtr->snapLines->AddPoint(triangle[0].Ign());
+      this->dataPtr->snapLines->AddPoint(triangle[1].Ign());
+      this->dataPtr->snapLines->AddPoint(triangle[2].Ign());
+      this->dataPtr->snapLines->AddPoint(triangle[0].Ign());
       this->dataPtr->snapVisual->SetVisible(true);
       this->dataPtr->snapVisual->GetSceneNode()->setInheritScale(false);
       this->dataPtr->snapVisual->SetVisibilityFlags(
@@ -488,10 +488,10 @@ void ModelSnap::Update()
         }
         this->dataPtr->selectedVis->AttachVisual(this->dataPtr->snapVisual);
       }
-      this->dataPtr->snapLines->SetPoint(0, triangle[0]);
-      this->dataPtr->snapLines->SetPoint(1, triangle[1]);
-      this->dataPtr->snapLines->SetPoint(2, triangle[2]);
-      this->dataPtr->snapLines->SetPoint(3, triangle[0]);
+      this->dataPtr->snapLines->SetPoint(0, triangle[0].Ign());
+      this->dataPtr->snapLines->SetPoint(1, triangle[1].Ign());
+      this->dataPtr->snapLines->SetPoint(2, triangle[2].Ign());
+      this->dataPtr->snapLines->SetPoint(3, triangle[0].Ign());
     }
     this->dataPtr->selectedTriangleDirty = false;
   }
