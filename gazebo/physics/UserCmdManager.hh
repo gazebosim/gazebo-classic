@@ -29,7 +29,6 @@ namespace gazebo
   namespace physics
   {
     class UserCmdPrivate;
-    class UserWrenchCmdPrivate;
 
     /// \brief Class which represents a user command, which can be "undone"
     /// and "redone".
@@ -84,24 +83,6 @@ namespace gazebo
       /// \internal
       /// \brief Pointer to private data.
       protected: UserCmdPrivate *dataPtr;
-    };
-
-    /// \brief Class which represents a user command, which can be "undone"
-    /// and "redone".
-    class GAZEBO_VISIBLE UserWrenchCmd : public UserCmd
-    {
-      /// \brief Constructor
-      /// \param[in] _id Unique ID for this command
-      /// \param[in] _world Pointer to the world
-      /// \param[in] _description Description for the command, such as
-      /// "Rotate box", "Delete sphere", etc.
-      /// \param[in] _type Type of command, such as MOVING, DELETING, etc.
-      public: UserWrenchCmd(const unsigned int _id,
-                            physics::WorldPtr _world,
-                            const std::string &_description,
-                            const msgs::UserCmd::Type &_type,
-                            const std::string &_linkName,
-                            const msgs::Wrench &_wrenchMsg);
     };
 
     class UserCmdManagerPrivate;

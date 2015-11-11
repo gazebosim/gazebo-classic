@@ -657,33 +657,33 @@ void MainWindow::OnFollow(const std::string &_modelName)
 /////////////////////////////////////////////////
 void MainWindow::OnResetModelOnly()
 {
-  // Publish reset world message
   msgs::WorldControl msg;
   msg.mutable_reset()->set_all(false);
   msg.mutable_reset()->set_time_only(false);
   msg.mutable_reset()->set_model_only(true);
-  this->worldControlPub->Publish(msg);
 
   // Register user command on server
   msgs::UserCmd userCmdMsg;
   userCmdMsg.set_description("Reset models");
-  userCmdMsg.set_type(msgs::UserCmd::MOVING);
+  userCmdMsg.set_type(msgs::UserCmd::WORLD_CONTROL);
+  userCmdMsg.mutable_world_control()->CopyFrom(msg);
   this->userCmdPub->Publish(userCmdMsg);
 }
 
 /////////////////////////////////////////////////
 void MainWindow::OnResetWorld()
 {
-  // Publish reset world message
+std::cout << "MainWindow::OnResetWorld" << std::endl;
   msgs::WorldControl msg;
   msg.mutable_reset()->set_all(true);
-  this->worldControlPub->Publish(msg);
 
   // Register user command on server
   msgs::UserCmd userCmdMsg;
   userCmdMsg.set_description("Reset world");
-  userCmdMsg.set_type(msgs::UserCmd::MOVING);
+  userCmdMsg.set_type(msgs::UserCmd::WORLD_CONTROL);
+  userCmdMsg.mutable_world_control()->CopyFrom(msg);
   this->userCmdPub->Publish(userCmdMsg);
+std::cout << "/MainWindow::OnResetWorld" << std::endl;
 }
 
 /////////////////////////////////////////////////

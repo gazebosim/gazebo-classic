@@ -46,7 +46,6 @@ namespace gazebo
     class Contact;
     class PresetManager;
     class UserCmd;
-    class UserWrenchCmd;
     class UserCmdManager;
     class PhysicsEngine;
     class Mass;
@@ -123,10 +122,6 @@ namespace gazebo
     /// \def  UserCmdPtr
     /// \brief Shared pointer to a UserCmd object
     typedef std::shared_ptr<UserCmd> UserCmdPtr;
-
-    /// \def  UserWrenchCmdPtr
-    /// \brief Shared pointer to a UserWrenchCmd object
-    typedef std::shared_ptr<UserWrenchCmd> UserWrenchCmdPtr;
 
     /// \def  UserCmdManagerPtr
     /// \brief Shared pointer to a UserCmdManager object

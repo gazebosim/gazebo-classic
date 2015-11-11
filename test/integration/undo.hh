@@ -36,6 +36,10 @@ class UndoTest : public QTestFixture
   /// physics::UserCmdManager.
   private slots: void MsgPassing();
 
+  /// \brief Test message passing between gui::UserCmdHistory and
+  /// physics::UserCmdManager.
+  private slots: void Wrench();
+
   /// \brief UndoRedo message received
   /// \param[in] _msg Message containing an undo/redo request.
   private: void OnUndoRedo(ConstUndoRedoPtr &_msg);

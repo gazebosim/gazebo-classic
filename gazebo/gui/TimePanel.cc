@@ -324,16 +324,15 @@ void TimePanel::Update()
 /////////////////////////////////////////////////
 void TimePanel::OnTimeReset()
 {
-  // Publish time reset message
   msgs::WorldControl msg;
   msg.mutable_reset()->set_all(false);
   msg.mutable_reset()->set_time_only(true);
-  this->dataPtr->worldControlPub->Publish(msg);
 
   // Register user command on server
   msgs::UserCmd userCmdMsg;
   userCmdMsg.set_description("Reset time");
-  userCmdMsg.set_type(msgs::UserCmd::MOVING);
+  userCmdMsg.set_type(msgs::UserCmd::WORLD_CONTROL);
+  userCmdMsg.mutable_world_control()->CopyFrom(msg);
   this->dataPtr->userCmdPub->Publish(userCmdMsg);
 }
 
