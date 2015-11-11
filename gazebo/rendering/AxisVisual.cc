@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Axis Visualization Class
- * Author: Nate Koenig
- */
-
 #include "gazebo/common/MeshManager.hh"
 
 #include "gazebo/rendering/ogre_gazebo.h"
@@ -98,6 +94,12 @@ void AxisVisual::Load()
 /////////////////////////////////////////////////
 void AxisVisual::ScaleXAxis(const math::Vector3 &_scale)
 {
+  this->ScaleXAxis(_scale.Ign());
+}
+
+/////////////////////////////////////////////////
+void AxisVisual::ScaleXAxis(const ignition::math::Vector3d &_scale)
+{
   AxisVisualPrivate *dPtr =
       reinterpret_cast<AxisVisualPrivate *>(this->dataPtr);
 
@@ -107,6 +109,12 @@ void AxisVisual::ScaleXAxis(const math::Vector3 &_scale)
 /////////////////////////////////////////////////
 void AxisVisual::ScaleYAxis(const math::Vector3 &_scale)
 {
+  this->ScaleYAxis(_scale.Ign());
+}
+
+/////////////////////////////////////////////////
+void AxisVisual::ScaleYAxis(const ignition::math::Vector3d &_scale)
+{
   AxisVisualPrivate *dPtr =
       reinterpret_cast<AxisVisualPrivate *>(this->dataPtr);
 
@@ -115,6 +123,12 @@ void AxisVisual::ScaleYAxis(const math::Vector3 &_scale)
 
 /////////////////////////////////////////////////
 void AxisVisual::ScaleZAxis(const math::Vector3 &_scale)
+{
+  this->ScaleZAxis(_scale.Ign());
+}
+
+/////////////////////////////////////////////////
+void AxisVisual::ScaleZAxis(const ignition::math::Vector3d &_scale)
 {
   AxisVisualPrivate *dPtr =
       reinterpret_cast<AxisVisualPrivate *>(this->dataPtr);
