@@ -120,40 +120,42 @@ void ModelManipulator::Detach()
 void ModelManipulator::RotateEntity(rendering::VisualPtr &_vis,
     const math::Vector3 &_axis, bool _local)
 {
-  math::Vector3 normal;
+  ignition::math::Vector3d normal;
 
   if (_local)
   {
     if (_axis.x > 0)
-      normal = this->dataPtr->mouseMoveVisStartPose.rot.GetXAxis();
+      normal = this->dataPtr->mouseMoveVisStartPose.rot.GetXAxis().Ign();
     else if (_axis.y > 0)
-      normal = this->dataPtr->mouseMoveVisStartPose.rot.GetYAxis();
+      normal = this->dataPtr->mouseMoveVisStartPose.rot.GetYAxis().Ign();
     else if (_axis.z > 0)
-      normal = this->dataPtr->mouseMoveVisStartPose.rot.GetZAxis();
+      normal = this->dataPtr->mouseMoveVisStartPose.rot.GetZAxis().Ign();
   }
   else
-    normal = _axis;
+    normal = _axis.Ign();
 
   double offset = this->dataPtr->mouseMoveVisStartPose.pos.Dot(normal);
 
-  math::Vector3 pressPoint;
-  this->dataPtr->userCamera->GetWorldPointOnPlane(
+  ignition::math::Vector3d pressPoint;
+  this->dataPtr->userCamera->WorldPointOnPlane(
       this->dataPtr->mouseEvent.PressPos().X(),
       this->dataPtr->mouseEvent.PressPos().Y(),
-      math::Plane(normal, offset), pressPoint);
+      ignition::math::Planed(normal, offset), pressPoint);
 
-  math::Vector3 newPoint;
-  this->dataPtr->userCamera->GetWorldPointOnPlane(
+  ignition::math::Vector3d newPoint;
+  this->dataPtr->userCamera->WorldPointOnPlane(
       this->dataPtr->mouseEvent.Pos().X(),
       this->dataPtr->mouseEvent.Pos().Y(),
-      math::Plane(normal, offset), newPoint);
+      ignition::math::Planed(normal, offset), newPoint);
 
-  math::Vector3 v1 = pressPoint - this->dataPtr->mouseMoveVisStartPose.pos;
-  math::Vector3 v2 = newPoint - this->dataPtr->mouseMoveVisStartPose.pos;
+  ignition::math::Vector3d v1 = pressPoint -
+    this->dataPtr->mouseMoveVisStartPose.pos.Ign();
+  ignition::math::Vector3d v2 = newPoint -
+    this->dataPtr->mouseMoveVisStartPose.pos.Ign();
   v1 = v1.Normalize();
   v2 = v2.Normalize();
   double signTest = v1.Cross(v2).Dot(normal);
-  double angle = atan2((v1.Cross(v2)).GetLength(), v1.Dot(v2));
+  double angle = atan2((v1.Cross(v2)).Length(), v1.Dot(v2));
 
   if (signTest < 0 )
     angle *= -1;
@@ -178,20 +180,21 @@ math::Vector3 ModelManipulator::GetMousePositionOnPlane(
     rendering::CameraPtr _camera,
     const common::MouseEvent &_event)
 {
-  math::Vector3 origin1, dir1, p1;
+  ignition::math::Vector3d origin1, dir1, p1;
 
   // Cast ray from the camera into the world
-  _camera->GetCameraToViewportRay(_event.Pos().X(), _event.Pos().Y(),
+  _camera->CameraToViewportRay(_event.Pos().X(), _event.Pos().Y(),
       origin1, dir1);
 
   // Compute the distance from the camera to plane of translation
-  math::Plane plane(math::Vector3(0, 0, 1), 0);
+  ignition::math::Planed plane(ignition::math::Vector3d(0, 0, 1), 0);
   double dist1 = plane.Distance(origin1, dir1);
 
   p1 = origin1 + dir1 * dist1;
 
   return p1;
 }
+
 /////////////////////////////////////////////////
 math::Vector3 ModelManipulator::SnapPoint(const math::Vector3 &_point,
     double _interval, double _sensitivity)
@@ -242,57 +245,55 @@ math::Vector3 ModelManipulator::GetMouseMoveDistance(
     const math::Vector2i &_start, const math::Vector2i &_end,
     const math::Pose &_pose, const math::Vector3 &_axis, bool _local)
 {
-  math::Pose pose = _pose;
+  ignition::math::Pose3d pose = _pose.Ign();
 
-  math::Vector3 origin1, dir1, p1;
-  math::Vector3 origin2, dir2, p2;
+  ignition::math::Vector3d origin1, dir1, p1;
+  ignition::math::Vector3d origin2, dir2, p2;
 
   // Cast two rays from the camera into the world
-  _camera->GetCameraToViewportRay(_end.x,
-      _end.y, origin1, dir1);
-  _camera->GetCameraToViewportRay(_start.x,
-      _start.y, origin2, dir2);
+  _camera->CameraToViewportRay(_end.x, _end.y, origin1, dir1);
+  _camera->CameraToViewportRay(_start.x, _start.y, origin2, dir2);
 
-  math::Vector3 planeNorm(0, 0, 0);
-  math::Vector3 projNorm(0, 0, 0);
+  ignition::math::Vector3d planeNorm(0, 0, 0);
+  ignition::math::Vector3d projNorm(0, 0, 0);
 
-  math::Vector3 planeNormOther(0, 0, 0);
+  ignition::math::Vector3d planeNormOther(0, 0, 0);
 
   if (_axis.x > 0 && _axis.y > 0)
   {
-    planeNorm.z = 1;
-    projNorm.z = 1;
+    planeNorm.Z(1);
+    projNorm.Z(1);
   }
   else if (_axis.z > 0)
   {
-    planeNorm.y = 1;
-    projNorm.x = 1;
-    planeNormOther.x = 1;
+    planeNorm.Y(1);
+    projNorm.X(1);
+    planeNormOther.X(1);
   }
   else if (_axis.x > 0)
   {
-    planeNorm.z = 1;
-    projNorm.y = 1;
-    planeNormOther.y = 1;
+    planeNorm.Z(1);
+    projNorm.Y(1);
+    planeNormOther.Y(1);
   }
   else if (_axis.y > 0)
   {
-    planeNorm.z = 1;
-    projNorm.x = 1;
-    planeNormOther.x = 1;
+    planeNorm.Z(1);
+    projNorm.X(1);
+    planeNormOther.X(1);
   }
 
   if (_local)
   {
-    planeNorm = pose.rot.RotateVector(planeNorm);
-    projNorm = pose.rot.RotateVector(projNorm);
+    planeNorm = pose.Rot().RotateVector(planeNorm);
+    projNorm = pose.Rot().RotateVector(projNorm);
   }
 
   // Fine tune ray casting: cast a second ray and compare the two rays' angle
   // to plane. Use the one that is less parallel to plane for better results.
   double angle = dir1.Dot(planeNorm);
   if (_local)
-    planeNormOther = pose.rot.RotateVector(planeNormOther);
+    planeNormOther = pose.Rot().RotateVector(planeNormOther);
   double angleOther = dir1.Dot(planeNormOther);
   if (fabs(angleOther) > fabs(angle))
   {
@@ -301,8 +302,8 @@ math::Vector3 ModelManipulator::GetMouseMoveDistance(
   }
 
   // Compute the distance from the camera to plane
-  double d = pose.pos.Dot(planeNorm);
-  math::Plane plane(planeNorm, d);
+  double d = pose.Pos().Dot(planeNorm);
+  ignition::math::Planed plane(planeNorm, d);
   double dist1 = plane.Distance(origin1, dir1);
   double dist2 = plane.Distance(origin2, dir2);
 
@@ -314,10 +315,10 @@ math::Vector3 ModelManipulator::GetMouseMoveDistance(
   if (_local)
     p1 = p1 - (p1-p2).Dot(projNorm) * projNorm;
 
-  math::Vector3 distance = p1 - p2;
+  ignition::math::Vector3d distance = p1 - p2;
 
   if (!_local)
-    distance *= _axis;
+    distance *= _axis.Ign();
 
   return distance;
 }

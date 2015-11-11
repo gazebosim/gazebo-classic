@@ -148,10 +148,10 @@ void MainWindow_TEST::Selection()
   QVERIFY(vis->GetRootVisual()->GetName() == "box");
 
   // move camera to look at the box
-  gazebo::math::Pose cameraPose(gazebo::math::Vector3(-1, 0, 0.5),
-      gazebo::math::Vector3(0, 0, 0));
+  ignition::math::Pose3d cameraPose(ignition::math::Vector3d(-1, 0, 0.5),
+      ignition::math::Vector3d(0, 0, 0));
   cam->SetWorldPose(cameraPose);
-  QVERIFY(cam->GetWorldPose() == cameraPose);
+  QVERIFY(cam->WorldPose() == cameraPose);
 
   // verify we get a box
   gazebo::rendering::VisualPtr vis2 =
@@ -160,18 +160,18 @@ void MainWindow_TEST::Selection()
   QVERIFY(vis2->GetRootVisual()->GetName() == "box");
 
   // look upwards
-  gazebo::math::Quaternion pitch90(gazebo::math::Vector3(0, -1.57, 0));
+  ignition::math::Quaterniond pitch90(ignition::math::Vector3d(0, -1.57, 0));
   cam->SetWorldRotation(pitch90);
-  QVERIFY(cam->GetWorldRotation() == pitch90);
+  QVERIFY(cam->WorldRotation() == pitch90);
 
   // verify there is nothing in the middle of the window
   gazebo::rendering::VisualPtr vis3 = cam->GetVisual(glWidgetCenter);
   QVERIFY(vis3 == NULL);
 
   // reset orientation
-  gazebo::math::Quaternion identityRot(gazebo::math::Vector3(0, 0, 0));
+  ignition::math::Quaterniond identityRot(ignition::math::Vector3d(0, 0, 0));
   cam->SetWorldRotation(identityRot);
-  QVERIFY(cam->GetWorldRotation() == identityRot);
+  QVERIFY(cam->WorldRotation() == identityRot);
 
   // verify we can still get the box
   gazebo::rendering::VisualPtr vis4 =
@@ -619,8 +619,8 @@ void MainWindow_TEST::UserCameraJoystick()
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
   QVERIFY(cam != NULL);
 
-  gazebo::math::Pose startPose = cam->GetWorldPose();
-  QVERIFY(startPose == gazebo::math::Pose(5, -5, 2, 0, 0.275643, 2.35619));
+  ignition::math::Pose3d startPose = cam->WorldPose();
+  QVERIFY(startPose == ignition::math::Pose3d(5, -5, 2, 0, 0.275643, 2.35619));
 
   gazebo::transport::NodePtr node = gazebo::transport::NodePtr(
       new gazebo::transport::Node());
@@ -647,9 +647,9 @@ void MainWindow_TEST::UserCameraJoystick()
       mainWindow->repaint();
     }
 
-    gazebo::math::Pose endPose = cam->GetWorldPose();
-    QVERIFY(endPose == gazebo::math::Pose(4.98664, -5.00091, 2.01306,
-                                          0, 0.275643, 2.35619));
+    ignition::math::Pose3d endPose = cam->WorldPose();
+    QVERIFY(endPose == ignition::math::Pose3d(4.98664, -5.00091, 2.01306,
+                                              0, 0.275643, 2.35619));
   }
 
   // Test with just rotation
@@ -670,9 +670,9 @@ void MainWindow_TEST::UserCameraJoystick()
       mainWindow->repaint();
     }
 
-    gazebo::math::Pose endPose = cam->GetWorldPose();
-    QVERIFY(endPose == gazebo::math::Pose(4.98664, -5.00091, 2.01306,
-                                          0, 0.276643, 2.36619));
+    ignition::math::Pose3d endPose = cam->WorldPose();
+    QVERIFY(endPose == ignition::math::Pose3d(4.98664, -5.00091, 2.01306,
+                                              0, 0.276643, 2.36619));
   }
 
   // Test with both translation and  rotation
@@ -697,9 +697,9 @@ void MainWindow_TEST::UserCameraJoystick()
       mainWindow->repaint();
     }
 
-    gazebo::math::Pose endPose = cam->GetWorldPose();
-    QVERIFY(endPose == gazebo::math::Pose(4.84758, -5.01151, 2.15333,
-                                          0, 0.297643, 2.52619));
+    ignition::math::Pose3d endPose = cam->WorldPose();
+    QVERIFY(endPose == ignition::math::Pose3d(4.84758, -5.01151, 2.15333,
+                                              0, 0.297643, 2.52619));
   }
 
   cam->Fini();

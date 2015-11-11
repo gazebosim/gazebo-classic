@@ -156,7 +156,7 @@ void ModelPropShop::Update()
     this->camera->SetCaptureData(true);
     this->camera->Load(cameraSDF);
     this->camera->Init();
-    this->camera->SetHFOV(GZ_DTOR(60));
+    this->camera->SetHFOV(static_cast<ignition::math::Angle>(IGN_DTOR(60)));
     this->camera->SetImageWidth(960);
     this->camera->SetImageHeight(540);
     this->camera->CreateRenderTexture("ModelPropShop_RttTex");
@@ -208,11 +208,11 @@ void ModelPropShop::Update()
       // Place the visual at the origin
       bbox = vis->GetBoundingBox();
 
-      math::Pose pose;
+      ignition::math::Pose3d pose;
 
       // Perspective view
-      pose.pos.Set(1.6, -1.6, 1.2);
-      pose.rot.SetFromEuler(0, GZ_DTOR(30), GZ_DTOR(-225));
+      pose.Pos().Set(1.6, -1.6, 1.2);
+      pose.Rot().Euler(0, IGN_DTOR(30), IGN_DTOR(-225));
       this->light->SetDirection(math::Vector3(-0.4, 0.4, -0.4));
       this->camera->SetWorldPose(pose);
       this->camera->Update();
@@ -221,8 +221,8 @@ void ModelPropShop::Update()
       this->camera->SaveFrame((this->savePath / "1.png").string());
 
       // Top view
-      pose.pos.Set(0, 0, 2.2);
-      pose.rot.SetFromEuler(0, GZ_DTOR(90), 0);
+      pose.Pos().Set(0, 0, 2.2);
+      pose.Rot().Euler(0, IGN_DTOR(90), 0);
       this->light->SetDirection(math::Vector3(0, 0, -1.0));
       this->camera->SetWorldPose(pose);
       this->camera->Update();
@@ -231,8 +231,8 @@ void ModelPropShop::Update()
       this->camera->SaveFrame((this->savePath / "2.png").string());
 
       // Front view
-      pose.pos.Set(2.2, 0, 0);
-      pose.rot.SetFromEuler(0, 0, GZ_DTOR(-180));
+      pose.Pos().Set(2.2, 0, 0);
+      pose.Rot().Euler(0, 0, IGN_DTOR(-180));
       this->light->SetDirection(math::Vector3(-0.6, 0.0, -0.4));
       this->camera->SetWorldPose(pose);
       this->camera->Update();
@@ -241,8 +241,8 @@ void ModelPropShop::Update()
       this->camera->SaveFrame((this->savePath / "3.png").string());
 
       // Side view
-      pose.pos.Set(0, 2.2, 0);
-      pose.rot.SetFromEuler(0, 0, GZ_DTOR(-90));
+      pose.Pos().Set(0, 2.2, 0);
+      pose.Rot().Euler(0, 0, IGN_DTOR(-90));
       this->light->SetDirection(math::Vector3(0, -0.6, -0.4));
       this->camera->SetWorldPose(pose);
       this->camera->Update();
@@ -251,8 +251,8 @@ void ModelPropShop::Update()
       this->camera->SaveFrame((this->savePath / "4.png").string());
 
       // Back view
-      pose.pos.Set(-2.2, 0, 0);
-      pose.rot.SetFromEuler(0, 0, 0);
+      pose.Pos().Set(-2.2, 0, 0);
+      pose.Rot().Euler(0, 0, 0);
       this->light->SetDirection(math::Vector3(0.6, 0, -0.4));
       this->camera->SetWorldPose(pose);
       this->camera->Update();
