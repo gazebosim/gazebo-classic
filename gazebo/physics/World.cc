@@ -39,6 +39,8 @@
 #include <string>
 #include <vector>
 
+#include <ignition/math/Rand.hh>
+
 #include "gazebo/sensors/SensorManager.hh"
 #include "gazebo/math/Rand.hh"
 
@@ -71,6 +73,7 @@
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/PhysicsFactory.hh"
 #include "gazebo/physics/PresetManager.hh"
+#include "gazebo/physics/UserCmdManager.hh"
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/Light.hh"
 #include "gazebo/physics/Actor.hh"
@@ -159,6 +162,7 @@ World::World(const std::string &_name)
 World::~World()
 {
   this->dataPtr->presetManager.reset();
+  this->dataPtr->userCmdManager.reset();
   delete this->dataPtr->receiveMutex;
   this->dataPtr->receiveMutex = NULL;
   delete this->dataPtr->loadModelMutex;
@@ -315,6 +319,9 @@ void World::Load(sdf::ElementPtr _sdf)
   // this->dataPtr->modelUpdateFunc = &World::ModelUpdateTBB;
 
   event::Events::worldCreated(this->GetName());
+
+  this->dataPtr->userCmdManager = UserCmdManagerPtr(
+      new UserCmdManager(shared_from_this()));
 
   this->dataPtr->loaded = true;
 }
@@ -1102,6 +1109,7 @@ void World::Reset()
     boost::recursive_mutex::scoped_lock lk(*this->dataPtr->worldUpdateMutex);
 
     math::Rand::SetSeed(math::Rand::GetSeed());
+    ignition::math::Rand::Seed(ignition::math::Rand::Seed());
     this->dataPtr->physicsEngine->SetSeed(math::Rand::GetSeed());
 
     this->ResetTime();
@@ -1238,6 +1246,7 @@ void World::OnControl(ConstWorldControlPtr &_data)
   if (_data->has_seed())
   {
     math::Rand::SetSeed(_data->seed());
+    ignition::math::Rand::Seed(_data->seed());
     this->dataPtr->physicsEngine->SetSeed(_data->seed());
   }
 
@@ -2466,4 +2475,11 @@ void World::_AddDirty(Entity *_entity)
 {
   GZ_ASSERT(_entity != NULL, "_entity is NULL");
   this->dataPtr->dirtyPoses.push_back(_entity);
+}
+
+/////////////////////////////////////////////////
+void World::ResetPhysicsStates()
+{
+  for (auto &model : this->dataPtr->models)
+    model->ResetPhysicsStates();
 }

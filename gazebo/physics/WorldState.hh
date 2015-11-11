@@ -100,6 +100,12 @@ namespace gazebo
       /// \return Number of models.
       public: unsigned int GetModelStateCount() const;
 
+      /// \brief Get the number of light states.
+      ///
+      /// Returns the number of lights in this instance.
+      /// \return Number of lights.
+      public: unsigned int LightStateCount() const;
+
       /// \brief Get a model state by model name.
       /// \param[in] _modelName Name of the model state to get.
       /// \return The model state.
