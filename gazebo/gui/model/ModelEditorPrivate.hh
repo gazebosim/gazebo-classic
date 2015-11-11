@@ -97,7 +97,7 @@ namespace gazebo
 
       /// \brief A list of event connections.
       public: std::vector<event::ConnectionPtr> connections;
-      
+
       /// \brief Model editor material switcher used to switch the non-editable
       /// models in the background to use a different material
       public: EditorMaterialSwitcherPtr materialSwitcher;
