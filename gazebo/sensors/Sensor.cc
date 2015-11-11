@@ -399,7 +399,7 @@ void Sensor::FillMsg(msgs::Sensor &_msg)
     CameraSensor *camSensor = static_cast<CameraSensor*>(this);
     msgs::CameraSensor *camMsg = _msg.mutable_camera();
     auto cam = camSensor->GetCamera();
-    camMsg->set_horizontal_fov(cam->GetHFOV().Radian());
+    camMsg->set_horizontal_fov(cam->HFOV().Radian());
     camMsg->mutable_image_size()->set_x(camSensor->GetImageWidth());
     camMsg->mutable_image_size()->set_y(camSensor->GetImageHeight());
     camMsg->set_image_format(cam->GetImageFormat());

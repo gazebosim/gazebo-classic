@@ -26,6 +26,10 @@
 #include <vector>
 #include <deque>
 #include <sdf/sdf.hh>
+#include <ignition/math/Angle.hh>
+#include <ignition/math/Vector3.hh>
+#include <ignition/math/Quaternion.hh>
+#include <ignition/math/Pose3.hh>
 
 #include "gazebo/msgs/msgs.hh"
 
@@ -150,38 +154,90 @@ namespace gazebo
 
       /// \brief Get the camera position in the world
       /// \return The world position of the camera
-      public: math::Vector3 GetWorldPosition() const;
+      /// \deprecated See function that returns an ignition::math object
+      /// \sa WorldPosition
+      public: math::Vector3 GetWorldPosition() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the camera position in the world
+      /// \return The world position of the camera
+      public: ignition::math::Vector3d WorldPosition() const;
 
       /// \brief Get the camera's orientation in the world
       /// \return The camera's orientation as a math::Quaternion
-      public: math::Quaternion GetWorldRotation() const;
+      /// \deprecated See function that returns an ignition::math object
+      /// \sa WorldRotation
+      public: math::Quaternion GetWorldRotation() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the camera's orientation in the world
+      /// \return The camera's orientation as an ignition::math::Quaterniond
+      public: ignition::math::Quaterniond WorldRotation() const;
 
       /// \brief Set the global pose of the camera
       /// \param[in] _pose The new math::Pose of the camera
-      public: virtual void SetWorldPose(const math::Pose &_pose);
+      /// \deprecated See function that accepts an ignition::math parameter.
+      public: virtual void SetWorldPose(const math::Pose &_pose)
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Set the global pose of the camera
+      /// \param[in] _pose The new ignition::math::Pose3d of the camera
+      public: virtual void SetWorldPose(const ignition::math::Pose3d &_pose);
 
       /// \brief Get the world pose.
       /// \return The pose of the camera in the world coordinate frame.
-      public: math::Pose GetWorldPose() const;
+      /// \deprecated See function that returns an ignition::math object
+      /// \sa WorldPose
+      public: math::Pose GetWorldPose() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the world pose.
+      /// \return The pose of the camera in the world coordinate frame.
+      public: ignition::math::Pose3d WorldPose() const;
 
       /// \brief Set the world position
       /// \param[in] _pos The new position of the camera
-      public: void SetWorldPosition(const math::Vector3 &_pos);
+      /// \deprecated See function that accepts an ignition::math parameter
+      public: void SetWorldPosition(const math::Vector3 &_pos)
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Set the world position
+      /// \param[in] _pos The new position of the camera
+      public: void SetWorldPosition(const ignition::math::Vector3d &_pos);
 
       /// \brief Set the world orientation
       /// \param[in] _quat The new orientation of the camera
-      public: void SetWorldRotation(const math::Quaternion &_quat);
+      /// \deprecated See function that accepts an ignition::math parameter
+      public: void SetWorldRotation(const math::Quaternion &_quat)
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Set the world orientation
+      /// \param[in] _quat The new orientation of the camera
+      public: void SetWorldRotation(const ignition::math::Quaterniond &_quat);
 
       /// \brief Translate the camera
       /// \param[in] _direction The translation vector
-      public: void Translate(const math::Vector3 &_direction);
+      /// \deprecated See function that accepts an ignition::math parameter
+      public: void Translate(const math::Vector3 &_direction)
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Translate the camera
+      /// \param[in] _direction The translation vector
+      public: void Translate(const ignition::math::Vector3d &_direction);
 
       /// \brief Rotate the camera around the x-axis
       /// \param[in] _angle Rotation amount
       /// \param[in] _relativeTo Coordinate frame to rotate in. Valid values
       /// are Ogre::TS_LOCAL, Ogre::TS_PARENT, and Ogre::TS_WORLD. Default
       /// is Ogre::TS_LOCAL
+      /// \deprecated See function the accepts an ignition::math parameter
       public: void Roll(const math::Angle &_angle,
+                  Ogre::Node::TransformSpace _relativeTo =
+                  Ogre::Node::TS_LOCAL) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Rotate the camera around the x-axis
+      /// \param[in] _angle Rotation amount
+      /// \param[in] _relativeTo Coordinate frame to rotate in. Valid values
+      /// are Ogre::TS_LOCAL, Ogre::TS_PARENT, and Ogre::TS_WORLD. Default
+      /// is Ogre::TS_LOCAL
+      public: void Roll(const ignition::math::Angle &_angle,
                   Ogre::Node::TransformSpace _relativeTo =
                   Ogre::Node::TS_LOCAL);
 
@@ -190,7 +246,17 @@ namespace gazebo
       /// \param[in] _relativeTo Coordinate frame to rotate in. Valid values
       /// are Ogre::TS_LOCAL, Ogre::TS_PARENT, and Ogre::TS_WORLD. Default
       /// is Ogre::TS_LOCAL
+      /// \deprecated See function the accepts an ignition::math parameter
       public: void Pitch(const math::Angle &_angle,
+                  Ogre::Node::TransformSpace _relativeTo =
+                  Ogre::Node::TS_LOCAL) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Rotate the camera around the y-axis
+      /// \param[in] _angle Pitch amount
+      /// \param[in] _relativeTo Coordinate frame to rotate in. Valid values
+      /// are Ogre::TS_LOCAL, Ogre::TS_PARENT, and Ogre::TS_WORLD. Default
+      /// is Ogre::TS_LOCAL
+      public: void Pitch(const ignition::math::Angle &_angle,
                   Ogre::Node::TransformSpace _relativeTo =
                   Ogre::Node::TS_LOCAL);
 
@@ -199,7 +265,17 @@ namespace gazebo
       /// \param[in] _relativeTo Coordinate frame to rotate in. Valid values
       /// are Ogre::TS_LOCAL, Ogre::TS_PARENT, and Ogre::TS_WORLD. Default
       /// Ogre::TS_WORLD
+      /// \deprecated See function the accepts an ignition::math parameter
       public: void Yaw(const math::Angle &_angle,
+                  Ogre::Node::TransformSpace _relativeTo =
+                  Ogre::Node::TS_WORLD) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Rotate the camera around the z-axis
+      /// \param[in] _angle Rotation amount
+      /// \param[in] _relativeTo Coordinate frame to rotate in. Valid values
+      /// are Ogre::TS_LOCAL, Ogre::TS_PARENT, and Ogre::TS_WORLD. Default
+      /// Ogre::TS_WORLD
+      public: void Yaw(const ignition::math::Angle &_angle,
                   Ogre::Node::TransformSpace _relativeTo =
                   Ogre::Node::TS_WORLD);
 
@@ -209,16 +285,35 @@ namespace gazebo
       public: virtual void SetClipDist(float _near, float _far);
 
       /// \brief Set the camera FOV (horizontal)
-      /// \param[in] _radians Horizontal field of view
-      public: void SetHFOV(math::Angle _angle);
+      /// \param[in] _angle Horizontal field of view
+      /// \deprecated See function the accepts an ignition::math parameter
+      public: void SetHFOV(math::Angle _angle) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Set the camera FOV (horizontal)
+      /// \param[in] _angle Horizontal field of view
+      public: void SetHFOV(const ignition::math::Angle &_angle);
 
       /// \brief Get the camera FOV (horizontal)
       /// \return The horizontal field of view
-      public: math::Angle GetHFOV() const;
+      /// \deprecated See function that returns an ignition::math object.
+      /// \sa HFOV
+      public: math::Angle GetHFOV() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the camera FOV (horizontal)
+      /// \return The horizontal field of view
+      public: ignition::math::Angle HFOV() const;
 
       /// \brief Get the camera FOV (vertical)
       /// \return The vertical field of view
-      public: math::Angle GetVFOV() const;
+      /// \deprecated See function that returns an ignition::math object.
+      /// \sa VFOV
+      public: math::Angle GetVFOV() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the camera FOV (vertical)
+      /// \return The vertical field of view
+      /// \deprecated See function that returns an ignition::math object.
+      /// \sa VFOV
+      public: ignition::math::Angle VFOV() const;
 
       /// \brief Set the image size
       /// \param[in] _w Image width
@@ -320,11 +415,23 @@ namespace gazebo
 
       /// \brief Get the viewport up vector
       /// \return The viewport up vector
-      public: math::Vector3 GetUp();
+      /// \deprecated See function that returns an ignition::math object.
+      /// \sa Up
+      public: math::Vector3 GetUp() GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the viewport up vector
+      /// \return The viewport up vector
+      public: ignition::math::Vector3d Up() const;
 
       /// \brief Get the viewport right vector
       /// \return The viewport right vector
-      public: math::Vector3 GetRight();
+      /// \deprecated See function that returns an ignition::math object.
+      /// \sa Right
+      public: math::Vector3 GetRight() GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the viewport right vector
+      /// \return The viewport right vector
+      public: ignition::math::Vector3d Right() const;
 
       /// \brief Get the average FPS
       /// \return The average frames per second
@@ -383,9 +490,23 @@ namespace gazebo
       /// \param[out] _origin Origin in the world coordinate frame of the
       /// resulting ray
       /// \param[out] _dir Direction of the resulting ray
+      /// \deprecated See function that accepts ignition::math parameters.
+      /// \sa CameraToViwportRay
       public: void GetCameraToViewportRay(int _screenx, int _screeny,
-                                          math::Vector3 &_origin,
-                                          math::Vector3 &_dir);
+                  math::Vector3 &_origin, math::Vector3 &_dir)
+                  GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get a world space ray as cast from the camera
+      /// through the viewport
+      /// \param[in] _screenx X coordinate in the camera's viewport, in pixels.
+      /// \param[in] _screeny Y coordinate in the camera's viewport, in pixels.
+      /// \param[out] _origin Origin in the world coordinate frame of the
+      /// resulting ray
+      /// \param[out] _dir Direction of the resulting ray
+      /// \deprecated See function that accepts ignition::math parameters.
+      public: void CameraToViewportRay(int _screenx, int _screeny,
+                  ignition::math::Vector3d &_origin,
+                  ignition::math::Vector3d &_dir) const;
 
       /// \brief Set whether to capture data
       /// \param[in] _value Set to true to capture data into a memory buffer.
@@ -408,8 +529,21 @@ namespace gazebo
       /// \param[in] _plane Plane on which to find the intersecting point
       /// \param[out] _result Point on the plane
       /// \return True if a valid point was found
+      /// \deprecated See function that accepts ignition::math parameters.
+      /// \sa WorldPointOnPlane
       public: bool GetWorldPointOnPlane(int _x, int _y,
-                  const math::Plane &_plane, math::Vector3 &_result);
+                  const math::Plane &_plane, math::Vector3 &_result)
+                  GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get point on a plane
+      /// \param[in] _x X cooridnate in camera's viewport, in pixels
+      /// \param[in] _y Y cooridnate in camera's viewport, in pixels
+      /// \param[in] _plane Plane on which to find the intersecting point
+      /// \param[out] _result Point on the plane
+      /// \return True if a valid point was found
+      public: bool WorldPointOnPlane(int _x, int _y,
+                  const ignition::math::Planed &_plane,
+                  ignition::math::Vector3d &_result);
 
       /// \brief Set the camera's render target
       /// \param[in] _target Pointer to the render target
@@ -449,7 +583,13 @@ namespace gazebo
 
       /// \brief Get the camera's direction vector
       /// \return Direction the camera is facing
-      public: math::Vector3 GetDirection() const;
+      /// \deprecated See function that returns an ignition::math object.
+      /// \sa Direction
+      public: math::Vector3 GetDirection() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the camera's direction vector
+      /// \return Direction the camera is facing
+      public: ignition::math::Vector3d Direction() const;
 
       /// \brief Connect to the new image signal
       /// \param[in] _subscriber Callback that is called when a new image is
@@ -501,7 +641,15 @@ namespace gazebo
       /// \sa Camera::MoveToPositions
       /// \param[in] _pose End position of the camera
       /// \param[in] _time Duration of the camera's movement
+      /// \deprecated See function that accepts ignition::math parameters.
       public: virtual bool MoveToPosition(const math::Pose &_pose,
+                                          double _time) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Move the camera to a position (this is an animated motion).
+      /// \sa Camera::MoveToPositions
+      /// \param[in] _pose End position of the camera
+      /// \param[in] _time Duration of the camera's movement
+      public: virtual bool MoveToPosition(const ignition::math::Pose3d &_pose,
                                           double _time);
 
       /// \brief Move the camera to a series of poses (this is an
@@ -511,9 +659,23 @@ namespace gazebo
       /// \param[in] _time Duration of the entire move
       /// \param[in] _onComplete Callback that is called when the move is
       /// complete
+      /// \deprecated See function that accepts ignition::math parameters.
       public: bool MoveToPositions(const std::vector<math::Pose> &_pts,
                                    double _time,
-                                   boost::function<void()> _onComplete = NULL);
+                                   boost::function<void()> _onComplete = NULL)
+                                   GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Move the camera to a series of poses (this is an
+      /// animated motion).
+      /// \sa Camera::MoveToPosition
+      /// \param[in] _pts Vector of poses to move to
+      /// \param[in] _time Duration of the entire move
+      /// \param[in] _onComplete Callback that is called when the move is
+      /// complete
+      public: bool MoveToPositions(
+                  const std::vector<ignition::math::Pose3d> &_pts,
+                  double _time,
+                  boost::function<void()> _onComplete = NULL);
 
       /// \brief Get the path to saved screenshots.
       /// \return Path to saved screenshots.

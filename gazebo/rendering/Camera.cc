@@ -177,7 +177,7 @@ void Camera::Load()
   if (this->sdf->HasElement("horizontal_fov"))
   {
     sdf::ElementPtr elem = this->sdf->GetElement("horizontal_fov");
-    double angle = elem->Get<double>();
+    ignition::math::Angle angle = elem->Get<double>();
     if (angle < 0.01 || angle > M_PI*2)
     {
       gzthrow("Camera horizontal field of view invalid.");
@@ -348,18 +348,19 @@ void Camera::Update()
   }
   else if (this->dataPtr->trackedVisual)
   {
-    math::Vector3 direction = this->dataPtr->trackedVisual->GetWorldPose().pos -
-                              this->GetWorldPose().pos;
+    ignition::math::Vector3d direction =
+      this->dataPtr->trackedVisual->GetWorldPose().pos.Ign() -
+                              this->WorldPose().Pos();
 
-    double yaw = atan2(direction.y, direction.x);
-    double pitch = atan2(-direction.z,
-                         sqrt(pow(direction.x, 2) + pow(direction.y, 2)));
+    double yaw = atan2(direction.Y(), direction.X());
+    double pitch = atan2(-direction.Z(),
+                         sqrt(pow(direction.X(), 2) + pow(direction.Y(), 2)));
 
     Ogre::Quaternion localRotOgre = this->sceneNode->getOrientation();
-    math::Quaternion localRot = math::Quaternion(
+    ignition::math::Quaterniond localRot = ignition::math::Quaterniond(
       localRotOgre.w, localRotOgre.x, localRotOgre.y, localRotOgre.z);
-    double currPitch = localRot.GetAsEuler().y;
-    double currYaw = localRot.GetAsEuler().z;
+    double currPitch = localRot.Euler().Y();
+    double currYaw = localRot.Euler().Z();
 
     double pitchError = currPitch - pitch;
 
@@ -374,22 +375,22 @@ void Camera::Update()
     double yawAdj = this->dataPtr->trackVisualYawPID.Update(
         yawError, 0.01);
 
-    this->SetWorldRotation(math::Quaternion(0, currPitch + pitchAdj,
+    this->SetWorldRotation(ignition::math::Quaterniond(0, currPitch + pitchAdj,
           currYaw + yawAdj));
 
     double origDistance = 8.0;
-    double distance = direction.GetLength();
+    double distance = direction.Length();
     double error = origDistance - distance;
 
     double scaling = this->dataPtr->trackVisualPID.Update(error, 0.3);
 
-    math::Vector3 displacement = direction;
+    ignition::math::Vector3d displacement = direction;
     displacement.Normalize();
     displacement *= scaling;
 
-    math::Vector3 localPos =
-      Conversions::Convert(this->sceneNode->_getDerivedPosition());
-    math::Vector3 pos = localPos + displacement;
+    ignition::math::Vector3d localPos =
+      Conversions::ConvertIgn(this->sceneNode->_getDerivedPosition());
+    ignition::math::Vector3d pos = localPos + displacement;
 
     this->SetWorldPosition(pos);
   }
@@ -549,6 +550,12 @@ math::Vector3 Camera::GetWorldPosition() const
 }
 
 //////////////////////////////////////////////////
+ignition::math::Vector3d Camera::WorldPosition() const
+{
+  return Conversions::ConvertIgn(this->sceneNode->_getDerivedPosition());
+}
+
+//////////////////////////////////////////////////
 math::Quaternion Camera::GetWorldRotation() const
 {
   Ogre::Quaternion rot = this->sceneNode->_getDerivedOrientation();
@@ -556,46 +563,91 @@ math::Quaternion Camera::GetWorldRotation() const
 }
 
 //////////////////////////////////////////////////
+ignition::math::Quaterniond Camera::WorldRotation() const
+{
+  Ogre::Quaternion rot = this->sceneNode->_getDerivedOrientation();
+  return ignition::math::Quaterniond(rot.w, rot.x, rot.y, rot.z);
+}
+
+//////////////////////////////////////////////////
 void Camera::SetWorldPose(const math::Pose &_pose)
 {
-  this->SetWorldPosition(_pose.pos);
-  this->SetWorldRotation(_pose.rot);
+  this->SetWorldPosition(_pose.pos.Ign());
+  this->SetWorldRotation(_pose.rot.Ign());
+}
+
+//////////////////////////////////////////////////
+void Camera::SetWorldPose(const ignition::math::Pose3d &_pose)
+{
+  this->SetWorldPosition(_pose.Pos());
+  this->SetWorldRotation(_pose.Rot());
 }
 
 //////////////////////////////////////////////////
 math::Pose Camera::GetWorldPose() const
 {
+#ifndef _WIN32
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return math::Pose(this->GetWorldPosition(), this->GetWorldRotation());
+#ifndef _WIN32
+#pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+ignition::math::Pose3d Camera::WorldPose() const
+{
+  return ignition::math::Pose3d(this->WorldPosition(), this->WorldRotation());
 }
 
 //////////////////////////////////////////////////
 void Camera::SetWorldPosition(const math::Vector3 &_pos)
 {
-  if (this->animState)
-    return;
-
-  this->sceneNode->_setDerivedPosition(Ogre::Vector3(_pos.x, _pos.y, _pos.z));
-  this->sceneNode->needUpdate();
+  this->SetWorldPosition(_pos.Ign());
 }
 
 //////////////////////////////////////////////////
-void Camera::SetWorldRotation(const math::Quaternion &_quant)
+void Camera::SetWorldPosition(const ignition::math::Vector3d &_pos)
 {
   if (this->animState)
     return;
 
-  math::Vector3 rpy = _quant.GetAsEuler();
+  this->sceneNode->_setDerivedPosition(Conversions::Convert(_pos));
+  this->sceneNode->needUpdate();
+}
+
+//////////////////////////////////////////////////
+void Camera::SetWorldRotation(const math::Quaternion &_quat)
+{
+  this->SetWorldRotation(_quat.Ign());
+}
+
+//////////////////////////////////////////////////
+void Camera::SetWorldRotation(const ignition::math::Quaterniond &_quat)
+{
+  if (this->animState)
+    return;
+
+  ignition::math::Vector3d rpy = _quat.Euler();
 
   // Set the roll and yaw for sceneNode
-  math::Quaternion s(rpy.x, rpy.y, rpy.z);
+  ignition::math::Quaterniond s(rpy.X(), rpy.Y(), rpy.Z());
 
-  this->sceneNode->_setDerivedOrientation(Ogre::Quaternion(s.w, s.x, s.y, s.z));
+  this->sceneNode->_setDerivedOrientation(Conversions::Convert(s));
 
   this->sceneNode->needUpdate();
 }
 
 //////////////////////////////////////////////////
 void Camera::Translate(const math::Vector3 &_direction)
+{
+  this->Translate(_direction.Ign());
+}
+
+//////////////////////////////////////////////////
+void Camera::Translate(const ignition::math::Vector3d &_direction)
 {
   this->sceneNode->translate(this->sceneNode->getOrientation() *
       Conversions::Convert(_direction));
@@ -605,6 +657,13 @@ void Camera::Translate(const math::Vector3 &_direction)
 void Camera::Roll(const math::Angle &_angle,
     Ogre::Node::TransformSpace _relativeTo)
 {
+  this->Roll(_angle.Ign(), _relativeTo);
+}
+
+//////////////////////////////////////////////////
+void Camera::Roll(const ignition::math::Angle &_angle,
+    Ogre::Node::TransformSpace _relativeTo)
+{
   this->sceneNode->pitch(Ogre::Radian(_angle.Radian()), _relativeTo);
 }
 
@@ -612,11 +671,25 @@ void Camera::Roll(const math::Angle &_angle,
 void Camera::Yaw(const math::Angle &_angle,
     Ogre::Node::TransformSpace _relativeTo)
 {
+  this->Yaw(_angle.Ign(), _relativeTo);
+}
+
+//////////////////////////////////////////////////
+void Camera::Yaw(const ignition::math::Angle &_angle,
+    Ogre::Node::TransformSpace _relativeTo)
+{
   this->sceneNode->roll(Ogre::Radian(_angle.Radian()), _relativeTo);
 }
 
 //////////////////////////////////////////////////
 void Camera::Pitch(const math::Angle &_angle,
+    Ogre::Node::TransformSpace _relativeTo)
+{
+  this->Pitch(_angle.Ign(), _relativeTo);
+}
+
+//////////////////////////////////////////////////
+void Camera::Pitch(const ignition::math::Angle &_angle,
     Ogre::Node::TransformSpace _relativeTo)
 {
   this->sceneNode->yaw(Ogre::Radian(_angle.Radian()), _relativeTo);
@@ -653,6 +726,12 @@ void Camera::SetClipDist(float _near, float _far)
 //////////////////////////////////////////////////
 void Camera::SetHFOV(math::Angle _angle)
 {
+  this->SetHFOV(_angle.Ign());
+}
+
+//////////////////////////////////////////////////
+void Camera::SetHFOV(const ignition::math::Angle &_angle)
+{
   this->sdf->GetElement("horizontal_fov")->Set(_angle.Radian());
   this->UpdateFOV();
 }
@@ -664,9 +743,21 @@ math::Angle Camera::GetHFOV() const
 }
 
 //////////////////////////////////////////////////
+ignition::math::Angle Camera::HFOV() const
+{
+  return ignition::math::Angle(this->sdf->Get<double>("horizontal_fov"));
+}
+
+//////////////////////////////////////////////////
 math::Angle Camera::GetVFOV() const
 {
   return math::Angle(this->camera->getFOVy().valueRadians());
+}
+
+//////////////////////////////////////////////////
+ignition::math::Angle Camera::VFOV() const
+{
+  return ignition::math::Angle(this->camera->getFOVy().valueRadians());
 }
 
 //////////////////////////////////////////////////
@@ -919,10 +1010,24 @@ math::Vector3 Camera::GetUp()
 }
 
 //////////////////////////////////////////////////
+ignition::math::Vector3d Camera::Up() const
+{
+  Ogre::Vector3 up = this->camera->getRealUp();
+  return ignition::math::Vector3d(up.x, up.y, up.z);
+}
+
+//////////////////////////////////////////////////
 math::Vector3 Camera::GetRight()
 {
   Ogre::Vector3 right = this->camera->getRealRight();
   return math::Vector3(right.x, right.y, right.z);
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d Camera::Right() const
+{
+  Ogre::Vector3 right = this->camera->getRealRight();
+  return ignition::math::Vector3d(right.x, right.y, right.z);
 }
 
 //////////////////////////////////////////////////
@@ -1109,6 +1214,18 @@ void Camera::GetCameraToViewportRay(int _screenx, int _screeny,
   _dir.Set(ray.getDirection().x, ray.getDirection().y, ray.getDirection().z);
 }
 
+//////////////////////////////////////////////////
+void Camera::CameraToViewportRay(int _screenx, int _screeny,
+    ignition::math::Vector3d &_origin,
+    ignition::math::Vector3d &_dir) const
+{
+  Ogre::Ray ray = this->camera->getCameraToViewportRay(
+      static_cast<float>(_screenx) / this->GetViewportWidth(),
+      static_cast<float>(_screeny) / this->GetViewportHeight());
+
+  _origin.Set(ray.getOrigin().x, ray.getOrigin().y, ray.getOrigin().z);
+  _dir.Set(ray.getDirection().x, ray.getDirection().y, ray.getDirection().z);
+}
 
 //////////////////////////////////////////////////
 void Camera::ConvertRGBToBAYER(unsigned char* dst, unsigned char* src,
@@ -1282,6 +1399,10 @@ bool Camera::GetWorldPointOnPlane(int _x, int _y,
                                   const math::Plane &_plane,
                                   math::Vector3 &_result)
 {
+#ifndef _WIN32
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   math::Vector3 origin, dir;
   double dist;
 
@@ -1293,6 +1414,30 @@ bool Camera::GetWorldPointOnPlane(int _x, int _y,
   _result = origin + dir * dist;
 
   if (!math::equal(dist, -1.0))
+    return true;
+  else
+    return false;
+#ifndef _WIN32
+#pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+bool Camera::WorldPointOnPlane(int _x, int _y,
+    const ignition::math::Planed &_plane,
+    ignition::math::Vector3d &_result)
+{
+  ignition::math::Vector3d origin, dir;
+  double dist;
+
+  // Cast two rays from the camera into the world
+  this->CameraToViewportRay(_x, _y, origin, dir);
+
+  dist = _plane.Distance(origin, dir);
+
+  _result = origin + dir * dist;
+
+  if (!ignition::math::equal(dist, -1.0))
     return true;
   else
     return false;
@@ -1324,7 +1469,7 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
     double ratio = static_cast<double>(this->viewport->getActualWidth()) /
                    static_cast<double>(this->viewport->getActualHeight());
 
-    double hfov = this->GetHFOV().Radian();
+    double hfov = this->HFOV().Radian();
     double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
 
     this->camera->setAspectRatio(ratio);
@@ -1525,14 +1670,20 @@ math::Vector3 Camera::GetDirection() const
 }
 
 /////////////////////////////////////////////////
+ignition::math::Vector3d Camera::Direction() const
+{
+  return Conversions::ConvertIgn(this->camera->getDerivedDirection());
+}
+
+/////////////////////////////////////////////////
 bool Camera::IsVisible(VisualPtr _visual)
 {
   if (this->camera && _visual)
   {
-    math::Box bbox = _visual->GetBoundingBox();
+    ignition::math::Box bbox = _visual->GetBoundingBox().Ign();
     Ogre::AxisAlignedBox box;
-    box.setMinimum(bbox.min.x, bbox.min.y, bbox.min.z);
-    box.setMaximum(bbox.max.x, bbox.max.y, bbox.max.z);
+    box.setMinimum(bbox.Min().X(), bbox.Min().Y(), bbox.Min().Z());
+    box.setMaximum(bbox.Max().X(), bbox.Max().Y(), bbox.Max().Z());
 
     box.transformAffine(_visual->GetSceneNode()->_getFullTransform());
     return this->camera->isVisible(box);
@@ -1556,6 +1707,12 @@ bool Camera::IsAnimating() const
 /////////////////////////////////////////////////
 bool Camera::MoveToPosition(const math::Pose &_pose, double _time)
 {
+  return this->MoveToPosition(_pose.Ign(), _time);
+}
+
+/////////////////////////////////////////////////
+bool Camera::MoveToPosition(const ignition::math::Pose3d &_pose, double _time)
+{
   if (this->animState)
   {
     this->dataPtr->moveToPositionQueue.push_back(std::make_pair(_pose, _time));
@@ -1563,22 +1720,22 @@ bool Camera::MoveToPosition(const math::Pose &_pose, double _time)
   }
 
   Ogre::TransformKeyFrame *key;
-  math::Vector3 rpy = _pose.rot.GetAsEuler();
-  math::Vector3 start = this->GetWorldPose().pos;
+  ignition::math::Vector3d rpy = _pose.Rot().Euler();
+  ignition::math::Vector3d start = this->WorldPose().Pos();
 
   Ogre::Quaternion localRotOgre = this->sceneNode->getOrientation();
-  math::Quaternion localRot = math::Quaternion(
+  ignition::math::Quaterniond localRot = ignition::math::Quaterniond(
     localRotOgre.w, localRotOgre.x, localRotOgre.y, localRotOgre.z);
-  double dyaw =  localRot.GetAsEuler().z - rpy.z;
+  double dyaw =  localRot.Euler().Z() - rpy.Z();
 
   if (dyaw > M_PI)
-    rpy.z += 2*M_PI;
+    rpy.Z() += 2*M_PI;
   else if (dyaw < -M_PI)
-    rpy.z -= 2*M_PI;
+    rpy.Z() -= 2*M_PI;
 
-  math::Quaternion pitchYawOnly(0, rpy.y, rpy.z);
-  Ogre::Quaternion pitchYawFinal(pitchYawOnly.w, pitchYawOnly.x,
-    pitchYawOnly.y, pitchYawOnly.z);
+  ignition::math::Quaterniond pitchYawOnly(0, rpy.Y(), rpy.Z());
+  Ogre::Quaternion pitchYawFinal(pitchYawOnly.W(), pitchYawOnly.X(),
+    pitchYawOnly.Y(), pitchYawOnly.Z());
 
   std::string trackName = "cameratrack";
   int i = 0;
@@ -1596,13 +1753,13 @@ bool Camera::MoveToPosition(const math::Pose &_pose, double _time)
   Ogre::NodeAnimationTrack *strack = anim->createNodeTrack(0, this->sceneNode);
 
   key = strack->createNodeKeyFrame(0);
-  key->setTranslate(Ogre::Vector3(start.x, start.y, start.z));
+  key->setTranslate(Ogre::Vector3(start.X(), start.Y(), start.Z()));
   key->setRotation(this->sceneNode->getOrientation());
 
   key = strack->createNodeKeyFrame(_time);
-  key->setTranslate(Ogre::Vector3(_pose.pos.x, _pose.pos.y, _pose.pos.z));
+  key->setTranslate(Ogre::Vector3(_pose.Pos().X(), _pose.Pos().Y(),
+        _pose.Pos().Z()));
   key->setRotation(pitchYawFinal);
-
 
   this->animState =
     this->scene->GetManager()->createAnimationState(trackName);
@@ -1619,13 +1776,24 @@ bool Camera::MoveToPosition(const math::Pose &_pose, double _time)
 bool Camera::MoveToPositions(const std::vector<math::Pose> &_pts,
                              double _time, boost::function<void()> _onComplete)
 {
+  std::vector<ignition::math::Pose3d> pts;
+  for (auto const p : _pts)
+    pts.push_back(p.Ign());
+
+  return this->MoveToPositions(pts, _time, _onComplete);
+}
+
+/////////////////////////////////////////////////
+bool Camera::MoveToPositions(const std::vector<ignition::math::Pose3d> &_pts,
+                             double _time, boost::function<void()> _onComplete)
+{
   if (this->animState)
     return false;
 
   this->onAnimationComplete = _onComplete;
 
   Ogre::TransformKeyFrame *key;
-  math::Vector3 start = this->GetWorldPose().pos;
+  ignition::math::Vector3d start = this->WorldPose().Pos();
 
   std::string trackName = "cameratrack";
   int i = 0;
@@ -1643,35 +1811,35 @@ bool Camera::MoveToPositions(const std::vector<math::Pose> &_pts,
   Ogre::NodeAnimationTrack *strack = anim->createNodeTrack(0, this->sceneNode);
 
   key = strack->createNodeKeyFrame(0);
-  key->setTranslate(Ogre::Vector3(start.x, start.y, start.z));
+  key->setTranslate(Ogre::Vector3(start.X(), start.Y(), start.Z()));
   key->setRotation(this->sceneNode->getOrientation());
 
   double dt = _time / (_pts.size()-1);
   double tt = 0;
 
   Ogre::Quaternion localRotOgre = this->sceneNode->getOrientation();
-  math::Quaternion localRot = math::Quaternion(
+  ignition::math::Quaterniond localRot = ignition::math::Quaterniond(
     localRotOgre.w, localRotOgre.x, localRotOgre.y, localRotOgre.z);
-  double prevYaw = localRot.GetAsEuler().z;
+  double prevYaw = localRot.Euler().Z();
   for (unsigned int j = 0; j < _pts.size(); j++)
   {
-    math::Vector3 pos = _pts[j].pos;
-    math::Vector3 rpy = _pts[j].rot.GetAsEuler();
-    double dyaw = prevYaw - rpy.z;
+    ignition::math::Vector3d pos = _pts[j].Pos();
+    ignition::math::Vector3d rpy = _pts[j].Rot().Euler();
+    double dyaw = prevYaw - rpy.Z();
 
     if (dyaw > M_PI)
-      rpy.z += 2*M_PI;
+      rpy.Z() += 2*M_PI;
     else if (dyaw < -M_PI)
-      rpy.z -= 2*M_PI;
+      rpy.Z() -= 2*M_PI;
 
-    prevYaw = rpy.z;
+    prevYaw = rpy.Z();
 
-    math::Quaternion pitchYawOnly(0, rpy.y, rpy.z);
-    Ogre::Quaternion pitchYawFinal(pitchYawOnly.w, pitchYawOnly.x,
-      pitchYawOnly.y, pitchYawOnly.z);
+    ignition::math::Quaterniond pitchYawOnly(0, rpy.Y(), rpy.Z());
+    Ogre::Quaternion pitchYawFinal(pitchYawOnly.W(), pitchYawOnly.X(),
+      pitchYawOnly.Y(), pitchYawOnly.Z());
 
     key = strack->createNodeKeyFrame(tt);
-    key->setTranslate(Ogre::Vector3(pos.x, pos.y, pos.z));
+    key->setTranslate(Ogre::Vector3(pos.X(), pos.Y(), pos.Z()));
     key->setRotation(pitchYawFinal);
 
     tt += dt;

@@ -1020,17 +1020,17 @@ bool ApplyWrenchDialog::OnMouseMove(const common::MouseEvent &_event)
   // Dragging tool, adapted from ModelManipulator::RotateEntity
   if (isDragging && isLeftButton && this->dataPtr->draggingTool)
   {
-    math::Vector3 normal;
-    math::Vector3 axis;
+    ignition::math::Vector3d normal;
+    ignition::math::Vector3d axis;
     if (this->dataPtr->manipState == "rot_z")
     {
-      normal = this->dataPtr->dragStartPose.rot.GetZAxis();
-      axis = math::Vector3::UnitZ;
+      normal = this->dataPtr->dragStartPose.rot.GetZAxis().Ign();
+      axis = ignition::math::Vector3d::UnitZ;
     }
     else if (this->dataPtr->manipState == "rot_y")
     {
-      normal = this->dataPtr->dragStartPose.rot.GetYAxis();
-      axis = math::Vector3::UnitY;
+      normal = this->dataPtr->dragStartPose.rot.GetYAxis().Ign();
+      axis = ignition::math::Vector3d::UnitY;
     }
     else
     {
@@ -1039,23 +1039,25 @@ bool ApplyWrenchDialog::OnMouseMove(const common::MouseEvent &_event)
       return false;
     }
 
-    double offset = this->dataPtr->dragStartPose.pos.Dot(normal);
+    double offset = this->dataPtr->dragStartPose.pos.Ign().Dot(normal);
 
-    math::Vector3 pressPoint;
-    userCamera->GetWorldPointOnPlane(_event.PressPos().X(),
+    ignition::math::Vector3d pressPoint;
+    userCamera->WorldPointOnPlane(_event.PressPos().X(),
         _event.PressPos().Y(),
-        math::Plane(normal, offset), pressPoint);
+        ignition::math::Planed(normal, offset), pressPoint);
 
-    math::Vector3 newPoint;
-    userCamera->GetWorldPointOnPlane(_event.Pos().X(), _event.Pos().Y(),
-        math::Plane(normal, offset), newPoint);
+    ignition::math::Vector3d newPoint;
+    userCamera->WorldPointOnPlane(_event.Pos().X(), _event.Pos().Y(),
+        ignition::math::Planed(normal, offset), newPoint);
 
-    math::Vector3 v1 = pressPoint - this->dataPtr->dragStartPose.pos;
-    math::Vector3 v2 = newPoint - this->dataPtr->dragStartPose.pos;
+    ignition::math::Vector3d v1 = pressPoint -
+      this->dataPtr->dragStartPose.pos.Ign();
+    ignition::math::Vector3d v2 = newPoint -
+      this->dataPtr->dragStartPose.pos.Ign();
     v1 = v1.Normalize();
     v2 = v2.Normalize();
     double signTest = v1.Cross(v2).Dot(normal);
-    double angle = atan2((v1.Cross(v2)).GetLength(), v1.Dot(v2));
+    double angle = atan2((v1.Cross(v2)).Length(), v1.Dot(v2));
 
     if (signTest < 0)
       angle *= -1;
@@ -1063,24 +1065,24 @@ bool ApplyWrenchDialog::OnMouseMove(const common::MouseEvent &_event)
     if (QApplication::keyboardModifiers() & Qt::ControlModifier)
       angle = rint(angle / (M_PI * 0.25)) * (M_PI * 0.25);
 
-    math::Quaternion rot(axis, angle);
-    rot = this->dataPtr->dragStartPose.rot * rot;
+    ignition::math::Quaterniond rot(axis, angle);
+    rot = this->dataPtr->dragStartPose.rot.Ign() * rot;
 
     // Must rotate the tool here to make sure we have proper roll,
     // once the rotation gets transformed into a vector we lose a DOF
     this->dataPtr->applyWrenchVisual->GetRotTool()->SetWorldRotation(rot);
 
     // Get direction from tool orientation
-    math::Vector3 vec;
-    math::Vector3 rotEuler;
-    rotEuler = rot.GetAsEuler();
-    vec.x = cos(rotEuler.z)*cos(rotEuler.y);
-    vec.y = sin(rotEuler.z)*cos(rotEuler.y);
-    vec.z = -sin(rotEuler.y);
+    ignition::math::Vector3d vec;
+    ignition::math::Vector3d rotEuler;
+    rotEuler = rot.Euler();
+    vec.X(cos(rotEuler.Z())*cos(rotEuler.Y()));
+    vec.Y(sin(rotEuler.Z())*cos(rotEuler.Y()));
+    vec.Z(-sin(rotEuler.Y()));
 
     // To local frame
     vec = this->dataPtr->linkVisual->GetWorldPose().rot.RotateVectorReverse(
-        vec);
+        vec).Ign();
 
     if (this->GetMode() == Mode::FORCE)
     {

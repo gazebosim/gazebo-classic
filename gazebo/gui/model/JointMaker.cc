@@ -661,15 +661,16 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
     else
     {
       // Set end point to mouse plane intersection
-      math::Vector3 pt;
-      camera->GetWorldPointOnPlane(_event.Pos().X(), _event.Pos().Y(),
-          math::Plane(math::Vector3(0, 0, 1)), pt);
+      ignition::math::Vector3d pt;
+      camera->WorldPointOnPlane(_event.Pos().X(), _event.Pos().Y(),
+          ignition::math::Planed(ignition::math::Vector3d(0, 0, 1)), pt);
       if (this->mouseJoint->parent)
       {
         parentPos = this->GetLinkWorldCentroid(this->mouseJoint->parent)
             - this->mouseJoint->line->GetPoint(0);
         this->mouseJoint->line->SetPoint(1,
-            this->GetLinkWorldCentroid(this->hoverVis) - parentPos + pt);
+            this->GetLinkWorldCentroid(this->hoverVis) -
+            parentPos.Ign() + pt);
       }
     }
   }
