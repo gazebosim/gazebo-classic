@@ -192,11 +192,21 @@ namespace gazebo
 
       /// \brief Set the scale.
       /// \param[in] _scale The scaling factor for the visual.
-      public: void SetScale(const math::Vector3 &_scale);
+      /// \deprecated See function that accepts ignition::math parameters
+      public: void SetScale(const math::Vector3 &_scale) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Set the scale.
+      /// \param[in] _scale The scaling factor for the visual.
+      public: void SetScale(const ignition::math::Vector3d &_scale);
 
       /// \brief Get the scale.
       /// \return The scaling factor.
-      public: math::Vector3 GetScale();
+      /// \deprecated See function that returns an ignition::math object.
+      public: math::Vector3 GetScale() GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the scale.
+      /// \return The scaling factor.
+      public: ignition::math::Vector3d Scale() const;
 
       /// \brief Get the scale of the visual as inherited from all parents.
       /// \return The derived scaling factor.
@@ -310,43 +320,97 @@ namespace gazebo
 
       /// \brief Set the position of the visual.
       /// \param[in] _pos The position to set the visual to.
-      public: void SetPosition(const math::Vector3 &_pos);
+      /// \deprecated See function that accepts ignition::math parameters
+      public: void SetPosition(const math::Vector3 &_pos)
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Set the position of the visual.
+      /// \param[in] _pos The position to set the visual to.
+      public: void SetPosition(const ignition::math::Vector3d &_pos);
 
       /// \brief Set the rotation of the visual.
       /// \param[in] _rot The rotation of the visual.
-      public: void SetRotation(const math::Quaternion &_rot);
+      /// \deprecated See function that accepts ignition::math parameters
+      public: void SetRotation(const math::Quaternion &_rot)
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Set the rotation of the visual.
+      /// \param[in] _rot The rotation of the visual.
+      public: void SetRotation(const ignition::math::Quaterniond &_rot);
 
       /// \brief Set the pose of the visual.
       /// \param[in] _pose The new pose of the visual.
-      public: void SetPose(const math::Pose &_pose);
+      /// \deprecated See function that accepts ignition::math parameters
+      public: void SetPose(const math::Pose &_pose) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Set the pose of the visual.
+      /// \param[in] _pose The new pose of the visual.
+      public: void SetPose(const ignition::math::Pose3d &_pose);
 
       /// \brief Get the position of the visual.
       /// \return The visual's position.
-      public: math::Vector3 GetPosition() const;
+      /// \deprecated See function that returns an ignition::math object
+      public: math::Vector3 GetPosition() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the position of the visual.
+      /// \return The visual's position.
+      public: ignition::math::Vector3d Position() const;
 
       /// \brief Get the rotation of the visual.
       /// \return The visual's rotation.
-      public: math::Quaternion GetRotation() const;
+      /// \deprecated See function that returns an ignition::math object
+      public: math::Quaternion GetRotation() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the rotation of the visual.
+      /// \return The visual's rotation.
+      public: ignition::math::Quaterniond Rotation() const;
 
       /// \brief Get the pose of the visual.
       /// \return The Visual's pose.
-      public: math::Pose GetPose() const;
+      /// \deprecated See function that returns an ignition::math object
+      public: math::Pose GetPose() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the pose of the visual.
+      /// \return The Visual's pose.
+      public: ignition::math::Pose3d Pose() const;
 
       /// \brief Get the global pose of the node.
       /// \return The pose in the world coordinate frame.
-      public: math::Pose GetWorldPose() const;
+      /// \deprecated See function that returns an ignition::math object
+      public: math::Pose GetWorldPose() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the global pose of the node.
+      /// \return The pose in the world coordinate frame.
+      public: ignition::math::Pose3d WorldPose() const;
 
       /// \brief Set the world pose of the visual.
       /// \param[in] _pose Pose of the visual in the world coordinate frame.
-      public: void SetWorldPose(const math::Pose &_pose);
+      /// \deprecated See function that accepts ignition::math parameters.
+      public: void SetWorldPose(const math::Pose &_pose) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Set the world pose of the visual.
+      /// \param[in] _pose Pose of the visual in the world coordinate frame.
+      public: void SetWorldPose(const ignition::math::Pose3d &_pose);
 
       /// \brief Set the world linear position of the visual.
       /// \param[in] _pose Position in the world coordinate frame.
-      public: void SetWorldPosition(const math::Vector3 &_pos);
+      /// \deprecated See function that accepts ignition::math parameters.
+      public: void SetWorldPosition(const math::Vector3 &_pos)
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Set the world linear position of the visual.
+      /// \param[in] _pose Position in the world coordinate frame.
+      public: void SetWorldPosition(const ignition::math::Vector3d &_pos);
 
       /// \brief Set the world orientation of the visual
       /// \param[in] _rot Rotation in the world coordinate frame.
-      public: void SetWorldRotation(const math::Quaternion &_rot);
+      /// \deprecated See function that accepts ignition::math parameters.
+      public: void SetWorldRotation(const math::Quaternion &_rot)
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Set the world orientation of the visual
+      /// \param[in] _rot Rotation in the world coordinate frame.
+      public: void SetWorldRotation(const ignition::math::Quaterniond &_rot);
 
       /// \brief Return the scene Node of this visual entity.
       /// \return The Ogre scene node.
@@ -384,7 +448,12 @@ namespace gazebo
 
       /// \brief Get the bounding box for the visual.
       /// \return The bounding box in world coordinates.
-      public: math::Box GetBoundingBox() const;
+      /// \deprecated See function that returns an ignition::math object.
+      public: math::Box GetBoundingBox() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the bounding box for the visual.
+      /// \return The bounding box in world coordinates.
+      public: ignition::math::Box BoundingBox() const;
 
       /// \brief Add a line to the visual.
       /// \param[in] _type The type of line to make.
@@ -475,15 +544,33 @@ namespace gazebo
       /// \brief Move to a pose and over a given time.
       /// \param[in] _pose Pose the visual will end at.
       /// \param[in] _time Time it takes the visual to move to the pose.
-      public: void MoveToPosition(const math::Pose &_pose, double _time);
+      /// \deprecated See function that accepts ignition::math parameters
+      public: void MoveToPosition(const math::Pose &_pose, double _time)
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Move to a pose and over a given time.
+      /// \param[in] _pose Pose the visual will end at.
+      /// \param[in] _time Time it takes the visual to move to the pose.
+      public: void MoveToPosition(const ignition::math::Pose3d &_pose,
+                  const double _time);
 
       /// \brief Move to a series of pose and over a given time.
       /// \param[in] _poses Series of poses the visual will move to.
       /// \param[in] _time Time it takes the visual to move to the pose.
       /// \param[in] _onComplete Callback used when the move is complete.
+      /// \deprecated See function that accepts ignition::math parameters
       public: void MoveToPositions(const std::vector<math::Pose> &_pts,
-                                   double _time,
-                                   boost::function<void()> _onComplete = NULL);
+                  double _time, boost::function<void()> _onComplete = NULL)
+                  GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Move to a series of pose and over a given time.
+      /// \param[in] _poses Series of poses the visual will move to.
+      /// \param[in] _time Time it takes the visual to move to the pose.
+      /// \param[in] _onComplete Callback used when the move is complete.
+      public: void MoveToPositions(
+                  const std::vector<ignition::math::Pose3d> &_pts,
+                  const double _time,
+                  boost::function<void()> _onComplete = NULL);
 
       /// \brief Set visibility flags for this visual and all children.
       /// \param[in] _flags The visiblity flags.
@@ -652,7 +739,7 @@ namespace gazebo
       /// \param[in] _node Pointer to the Ogre Node to process.
       /// \param[in] _box Current bounding box information.
       private: void GetBoundsHelper(Ogre::SceneNode *_node,
-                                    math::Box &_box) const;
+                   ignition::math::Box &_box) const;
 
       /// \brief Return true if the submesh should be centered.
       /// \return True if the submesh should be centered when it's inserted

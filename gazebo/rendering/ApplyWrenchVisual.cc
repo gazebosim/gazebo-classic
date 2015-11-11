@@ -372,24 +372,25 @@ void ApplyWrenchVisual::UpdateForceVisual()
     return;
   }
 
-  math::Vector3 normVec = dPtr->forceVector;
+  ignition::math::Vector3d normVec = dPtr->forceVector.Ign();
   normVec.Normalize();
 
   // Place it on X axis in case it is zero
-  if (normVec == math::Vector3::Zero)
-    normVec = math::Vector3::UnitX;
+  if (normVec == ignition::math::Vector3d::Zero)
+    normVec = ignition::math::Vector3d::UnitX;
 
   // Set rotation in the vector direction
-  math::Quaternion quat = this->GetQuaternionFromVector(normVec);
-  dPtr->forceVisual->SetRotation(quat * math::Quaternion(
-      math::Vector3(0, M_PI/2.0, 0)));
+  ignition::math::Quaterniond quat = this->GetQuaternionFromVector(
+      normVec).Ign();
+  dPtr->forceVisual->SetRotation(quat * ignition::math::Quaterniond(
+      ignition::math::Vector3d(0, M_PI/2.0, 0)));
 
   // Set arrow tip to forcePosVector
   dPtr->forceVisual->SetPosition(-normVec * 0.28 *
-      dPtr->forceVisual->GetScale().z + dPtr->forcePosVector);
+      dPtr->forceVisual->Scale().Z() + dPtr->forcePosVector.Ign());
 
   // Rotation tool
-  dPtr->rotTool->SetPosition(dPtr->forcePosVector);
+  dPtr->rotTool->SetPosition(dPtr->forcePosVector.Ign());
   if (!dPtr->rotatedByMouse)
     dPtr->rotTool->SetRotation(quat);
 }
@@ -406,26 +407,28 @@ void ApplyWrenchVisual::UpdateTorqueVisual()
     return;
   }
 
-  math::Vector3 normVec = dPtr->torqueVector;
+  ignition::math::Vector3d normVec = dPtr->torqueVector.Ign();
   normVec.Normalize();
 
   // Place it on X axis in case it is zero
-  if (normVec == math::Vector3::Zero)
-    normVec = math::Vector3::UnitX;
+  if (normVec == ignition::math::Vector3d::Zero)
+    normVec = ignition::math::Vector3d::UnitX;
 
   // Set rotation in the vector direction
-  math::Quaternion quat = this->GetQuaternionFromVector(normVec);
-  dPtr->torqueVisual->SetRotation(quat * math::Quaternion(
-      math::Vector3(0, M_PI/2.0, 0)));
+  ignition::math::Quaterniond quat = this->GetQuaternionFromVector(
+      normVec).Ign();
+  dPtr->torqueVisual->SetRotation(quat * ignition::math::Quaterniond(
+      ignition::math::Vector3d(0, M_PI/2.0, 0)));
 
   // Position towards comVector
-  double linkDiagonal = dPtr->parent->GetBoundingBox().GetSize().GetLength();
-  dPtr->torqueVisual->SetPosition(normVec*linkDiagonal*0.75 + dPtr->comVector);
-  dPtr->torqueLine->SetPoint(1,
-      math::Vector3(0, 0, -linkDiagonal*0.75)/dPtr->torqueVisual->GetScale());
+  double linkDiagonal = dPtr->parent->BoundingBox().Size().Length();
+  dPtr->torqueVisual->SetPosition(normVec*linkDiagonal*0.75 +
+      dPtr->comVector.Ign());
+  dPtr->torqueLine->SetPoint(1, ignition::math::Vector3d(0, 0,
+        -linkDiagonal*0.75) / dPtr->torqueVisual->Scale());
 
   // Rotation tool
-  dPtr->rotTool->SetPosition(dPtr->comVector);
+  dPtr->rotTool->SetPosition(dPtr->comVector.Ign());
   if (!dPtr->rotatedByMouse)
     dPtr->rotTool->SetRotation(quat);
 }
@@ -446,23 +449,22 @@ void ApplyWrenchVisual::Resize()
   // Protect force/torque visuals
   std::lock_guard<std::mutex> lock(dPtr->mutex);
 
-  double linkSize = std::max(0.1,
-      dPtr->parent->GetBoundingBox().GetSize().GetLength());
+  double linkSize = std::max(0.1, dPtr->parent->BoundingBox().Size().Length());
 
   // Force visual
-  dPtr->forceVisual->SetScale(math::Vector3(2*linkSize,
-                                            2*linkSize,
-                                            2*linkSize));
+  dPtr->forceVisual->SetScale(ignition::math::Vector3d(2*linkSize,
+                                                       2*linkSize,
+                                                       2*linkSize));
 
   // Torque visual
-  dPtr->torqueVisual->SetScale(math::Vector3(linkSize,
-                                             linkSize,
-                                             linkSize));
+  dPtr->torqueVisual->SetScale(ignition::math::Vector3d(linkSize,
+                                                        linkSize,
+                                                        linkSize));
 
   // Rot tool
-  dPtr->rotTool->SetScale(math::Vector3(0.75*linkSize,
-                                        0.75*linkSize,
-                                        0.75*linkSize));
+  dPtr->rotTool->SetScale(ignition::math::Vector3d(0.75*linkSize,
+                                                   0.75*linkSize,
+                                                   0.75*linkSize));
 
   // Texts
   double fontSize = 0.1*linkSize;
