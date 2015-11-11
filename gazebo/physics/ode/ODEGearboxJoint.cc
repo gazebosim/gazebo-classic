@@ -47,10 +47,10 @@ void ODEGearboxJoint::Init()
   if (!this->referenceBodyParent.empty() &&
       !this->referenceBodyChild.empty())
   {
-    LinkPtr parentLink = this->model->GetLink(this->referenceBodyParent);
-    this->SetReferenceBodyParent(parentLink);
-    LinkPtr childLink = this->model->GetLink(this->referenceBodyChild);
-    this->SetReferenceBodyChild(childLink);
+    LinkPtr pRefLink = this->model->GetLink(this->referenceBodyParent);
+    this->SetReferenceBodyParent(pRefLink);
+    LinkPtr cRefLink = this->model->GetLink(this->referenceBodyChild);
+    this->SetReferenceBodyChild(cRefLink);
   }
   else
   {
@@ -146,7 +146,7 @@ math::Vector3 ODEGearboxJoint::GetGlobalAxis(unsigned int _index) const
 //////////////////////////////////////////////////
 void ODEGearboxJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
 {
-  ODEJoint::SetAxis(_index, _axis);
+  // ODEJoint::SetAxis(_index, _axis);
 
   if (this->childLink)
     this->childLink->SetEnabled(true);
@@ -159,16 +159,231 @@ void ODEGearboxJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
 
   if (_index == 0)
   {
+    // check if a joint exists between parent link and referenceBody
+    // if so, use it to override globalAxis.
+    /// \TODO:  To release, we need to do something to keep
+    /// backwards compatible.
+    bool found = false;
+    LinkPtr link = this->model->GetLink(this->referenceBody);
+    // check parent link against reference body's parent joints
+    if (link)
+    {
+      for (const auto &j : link->GetParentJoints())
+      {
+        // GetParentJoints returns joints that connects to
+        // this joint's parent link for a normal joint,
+        // but gearbox is not really a normal joint, so check
+        // both parent and child link of the parent joint
+        if (j->GetParent() && j->GetChild())
+          gzerr << j->GetParent()->GetName()
+                << " : " << j->GetChild()->GetName()
+                << " : " << this->parentLink->GetName() << "\n";
+        if (j->GetParent() &&
+            j->GetParent().get() == this->parentLink.get())
+        {
+          globalAxis = -j->GetGlobalAxis(_index);
+          found = true;
+          gzerr << globalAxis << "\n";
+          break;
+        }
+        else if (j->GetChild() &&
+                 j->GetChild().get() == this->parentLink.get())
+        {
+          globalAxis = j->GetGlobalAxis(_index);
+          found = true;
+          gzerr << globalAxis << "\n";
+          break;
+        }
+      }
+    }
+    // check parent link against reference body's parent joints
+    if (!found && link)
+    {
+      for (const auto &j : link->GetChildJoints())
+      {
+        if (j->GetChild())
+          gzerr << j->GetChild()->GetName()
+                << " : " << this->parentLink->GetName() << "\n";
+        if (j->GetParent() &&
+            j->GetParent().get() == this->parentLink.get())
+        {
+          globalAxis = j->GetGlobalAxis(_index);
+          found = true;
+          gzerr << globalAxis << "\n";
+          break;
+        }
+        else if (j->GetChild() &&
+                 j->GetChild().get() == this->parentLink.get())
+        {
+          globalAxis = j->GetGlobalAxis(_index);
+          found = true;
+          gzerr << globalAxis << "\n";
+          break;
+        }
+      }
+    }
+    // check if a joint exists between parent link and referenceBodyParent
+    link = this->model->GetLink(this->referenceBodyParent);
+    if (!found && link)
+    {
+      for (const auto &j : link->GetParentJoints())
+      {
+        if (j->GetParent() &&
+            j->GetParent().get() == this->parentLink.get())
+        {
+          globalAxis = j->GetGlobalAxis(_index);
+          found = true;
+          gzerr << globalAxis << "\n";
+          break;
+        }
+        else if (j->GetChild() &&
+                 j->GetChild().get() == this->parentLink.get())
+        {
+          globalAxis = j->GetGlobalAxis(_index);
+          found = true;
+          gzerr << globalAxis << "\n";
+          break;
+        }
+      }
+    }
+    // check if a joint exists between parent link and referenceBodyParent
+    if (!found && link)
+    {
+      for (const auto &j : link->GetChildJoints())
+      {
+        if (j->GetParent() &&
+            j->GetParent().get() == this->parentLink.get())
+        {
+          globalAxis = j->GetGlobalAxis(_index);
+          found = true;
+          gzerr << globalAxis << "\n";
+          break;
+        }
+        else if (j->GetChild() &&
+                 j->GetChild().get() == this->parentLink.get())
+        {
+          globalAxis = j->GetGlobalAxis(_index);
+          found = true;
+          gzerr << globalAxis << "\n";
+          break;
+        }
+      }
+    }
+    if (!found)
+      gzerr << "not found\n";
+
+    // if not found, default to use user specified axis
     dJointSetGearboxAxis1(this->jointId, globalAxis.x, globalAxis.y,
       globalAxis.z);
   }
   else if (_index == 1)
   {
+    // check if a joint exists between child link and referenceBody
+    // if so, use it to override globalAxis.
+    /// \TODO:  To release, we need to do something to keep
+    /// backwards compatible.
+    bool found = false;
+    LinkPtr link = this->model->GetLink(this->referenceBody);
+    // check child link against reference body's parent joints
+    if (link)
+    {
+      for (const auto &j : link->GetParentJoints())
+      {
+        if (j->GetParent() && j->GetParent().get() == this->childLink.get())
+        {
+          globalAxis = j->GetGlobalAxis(_index);
+          found = true;
+          gzerr << globalAxis << "\n";
+          break;
+        }
+        else if (j->GetChild() && j->GetChild().get() == this->childLink.get())
+        {
+          globalAxis = j->GetGlobalAxis(_index);
+          found = true;
+          gzerr << globalAxis << "\n";
+          break;
+        }
+      }
+    }
+    // check child link against reference body's child joints
+    if (!found && link)
+    {
+      for (const auto &j : link->GetChildJoints())
+      {
+        if (j->GetParent() && j->GetParent().get() == this->childLink.get())
+        {
+          globalAxis = j->GetGlobalAxis(_index);
+          found = true;
+          gzerr << globalAxis << "\n";
+          break;
+        }
+        else if (j->GetChild() && j->GetChild().get() == this->childLink.get())
+        {
+          globalAxis = j->GetGlobalAxis(_index);
+          found = true;
+          gzerr << globalAxis << "\n";
+          break;
+        }
+      }
+    }
+    // check if a joint exists between parent link and referenceBodyChild
+    link = this->model->GetLink(this->referenceBodyChild);
+    if (!found && link)
+    {
+      for (const auto &j : link->GetParentJoints())
+      {
+        if (j->GetParent() &&
+            j->GetParent().get() == this->childLink.get())
+        {
+          globalAxis = j->GetGlobalAxis(_index);
+          found = true;
+          gzerr << globalAxis << "\n";
+          break;
+        }
+        else if (j->GetChild() &&
+                 j->GetChild().get() == this->childLink.get())
+        {
+          globalAxis = j->GetGlobalAxis(_index);
+          found = true;
+          gzerr << globalAxis << "\n";
+          break;
+        }
+      }
+    }
+    // check if a joint exists between parent link and referenceBodyParent
+    if (!found && link)
+    {
+      for (const auto &j : link->GetChildJoints())
+      {
+        if (j->GetParent() &&
+            j->GetParent().get() == this->childLink.get())
+        {
+          globalAxis = j->GetGlobalAxis(_index);
+          found = true;
+          gzerr << globalAxis << "\n";
+          break;
+        }
+        else if (j->GetChild() &&
+             j->GetChild().get() == this->childLink.get())
+        {
+          globalAxis = j->GetGlobalAxis(_index);
+          found = true;
+          gzerr << globalAxis << "\n";
+          break;
+        }
+      }
+    }
+    if (!found)
+      gzerr << "not found\n";
+
+    // if not found, default to use user specified axis
     dJointSetGearboxAxis2(this->jointId, globalAxis.x, globalAxis.y,
       globalAxis.z);
   }
   else
     gzerr << "index [" << _index << "] out of range\n";
+
+  ODEJoint::SetAxis(_index, axisFrame.RotateVectorReverse(globalAxis));
 }
 
 //////////////////////////////////////////////////

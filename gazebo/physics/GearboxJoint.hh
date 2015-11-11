@@ -132,7 +132,8 @@ namespace gazebo
                 gearboxMsg->set_gearbox_reference_body(this->referenceBody);
                 gearboxMsg->set_gearbox_reference_body_parent(
                   this->referenceBodyParent);
-                gearboxMsg->set_gearbox_reference_body_child(this->referenceBodyChild);
+                gearboxMsg->set_gearbox_reference_body_child(
+                  this->referenceBodyChild);
                 gearboxMsg->set_gearbox_ratio(this->gearRatio);
               }
 
