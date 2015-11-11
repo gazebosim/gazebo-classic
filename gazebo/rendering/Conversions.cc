@@ -45,6 +45,12 @@ math::Vector3 Conversions::Convert(const Ogre::Vector3 &v)
 }
 
 //////////////////////////////////////////////////
+ignition::math::Vector3d Conversions::ConvertIgn(const Ogre::Vector3 &_v)
+{
+    return ignition::math::Vector3d(_v.x, _v.y, _v.z);
+}
+
+//////////////////////////////////////////////////
 Ogre::Quaternion Conversions::Convert(const math::Quaternion &_v)
 {
   return Ogre::Quaternion(_v.w, _v.x, _v.y, _v.z);

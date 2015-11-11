@@ -411,8 +411,8 @@ JointData *JointMaker::CreateJointLine(const std::string &_name,
       jointVis->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
   math::Vector3 origin = _parent->GetWorldPose().pos
       - _parent->GetParent()->GetWorldPose().pos;
-  jointLine->AddPoint(origin);
-  jointLine->AddPoint(origin + math::Vector3(0, 0, 0.1));
+  jointLine->AddPoint(origin.Ign());
+  jointLine->AddPoint(origin.Ign() + ignition::math::Vector3d(0, 0, 0.1));
   jointVis->GetSceneNode()->setInheritScale(false);
   jointVis->GetSceneNode()->setInheritOrientation(false);
 
@@ -652,10 +652,10 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
     {
       if (this->mouseJoint->parent)
       {
-        parentPos =  this->GetLinkWorldCentroid(this->mouseJoint->parent)
-            - this->mouseJoint->line->GetPoint(0);
+        parentPos =  this->GetLinkWorldCentroid(this->mouseJoint->parent).Ign()
+            - this->mouseJoint->line->Point(0);
         this->mouseJoint->line->SetPoint(1,
-            this->GetLinkWorldCentroid(this->hoverVis) - parentPos);
+            (this->GetLinkWorldCentroid(this->hoverVis) - parentPos).Ign());
       }
     }
     else
@@ -666,10 +666,11 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
           math::Plane(math::Vector3(0, 0, 1)), pt);
       if (this->mouseJoint->parent)
       {
-        parentPos = this->GetLinkWorldCentroid(this->mouseJoint->parent)
-            - this->mouseJoint->line->GetPoint(0);
+        parentPos = this->GetLinkWorldCentroid(this->mouseJoint->parent).Ign()
+            - this->mouseJoint->line->Point(0);
         this->mouseJoint->line->SetPoint(1,
-            this->GetLinkWorldCentroid(this->hoverVis) - parentPos + pt);
+            (this->GetLinkWorldCentroid(this->hoverVis)
+             - parentPos + pt).Ign());
       }
     }
   }
@@ -1168,11 +1169,11 @@ void JointData::Update()
   }
 
   // Line now connects the child link to the joint frame
-  this->line->SetPoint(0, this->child->GetWorldPose().pos
-      - this->child->GetParent()->GetWorldPose().pos);
+  this->line->SetPoint(0, (this->child->GetWorldPose().pos
+      - this->child->GetParent()->GetWorldPose().pos).Ign());
   this->line->SetPoint(1,
-      this->jointVisual->GetWorldPose().pos
-      - this->child->GetParent()->GetWorldPose().pos);
+      (this->jointVisual->GetWorldPose().pos
+      - this->child->GetParent()->GetWorldPose().pos).Ign());
   this->line->setMaterial(JointMaker::jointMaterials[this->type]);
   this->dirty = false;
 }
@@ -1311,8 +1312,8 @@ void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
 
   math::Vector3 origin = parentVis->GetWorldPose().pos
       - parentVis->GetParent()->GetWorldPose().pos;
-  jointLine->AddPoint(origin);
-  jointLine->AddPoint(origin + math::Vector3(0, 0, 0.1));
+  jointLine->AddPoint(origin.Ign());
+  jointLine->AddPoint(origin.Ign() + ignition::math::Vector3d(0, 0, 0.1));
 
   jointVis->GetSceneNode()->setInheritScale(false);
   jointVis->GetSceneNode()->setInheritOrientation(false);

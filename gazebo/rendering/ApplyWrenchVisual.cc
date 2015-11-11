@@ -422,7 +422,8 @@ void ApplyWrenchVisual::UpdateTorqueVisual()
   double linkDiagonal = dPtr->parent->GetBoundingBox().GetSize().GetLength();
   dPtr->torqueVisual->SetPosition(normVec*linkDiagonal*0.75 + dPtr->comVector);
   dPtr->torqueLine->SetPoint(1,
-      math::Vector3(0, 0, -linkDiagonal*0.75)/dPtr->torqueVisual->GetScale());
+      ignition::math::Vector3d(0, 0,
+        -linkDiagonal*0.75)/dPtr->torqueVisual->GetScale().Ign());
 
   // Rotation tool
   dPtr->rotTool->SetPosition(dPtr->comVector);
