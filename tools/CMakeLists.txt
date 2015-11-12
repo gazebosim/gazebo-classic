@@ -37,7 +37,7 @@ set (test_sources
 
 gz_build_tests(${test_sources})
 
-add_executable(gz gz.cc gz_topic.cc gz_log.cc)
+add_executable(gz gz.cc gz_topic.cc gz_log.cc gz_marker.cc)
 target_link_libraries(gz
  libgazebo_client
  gazebo_msgs gazebo_common gazebo_transport gazebo_gui gazebo_physics

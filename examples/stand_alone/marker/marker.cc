@@ -43,7 +43,7 @@ int main(int _argc, char **_argv)
   markerMsg.set_id(0);
   markerMsg.set_action(gazebo::msgs::Marker::ADD_MODIFY);
   markerMsg.set_type(gazebo::msgs::Marker::SPHERE);
-
+/*
   gazebo::msgs::Material *matMsg = markerMsg.mutable_material();
   matMsg->mutable_script()->set_name("Gazebo/BlueLaser");
 
@@ -90,6 +90,8 @@ int main(int _argc, char **_argv)
 
   std::cout << "Adding a line between the sphere and cylinder\n";
   markerMsg.set_id(2);
+  gazebo::msgs::Set(markerMsg.mutable_pose(),
+                    ignition::math::Pose3d(0, 0, 0, 0, 0, 0));
   markerMsg.set_action(gazebo::msgs::Marker::ADD_MODIFY);
   markerMsg.set_type(gazebo::msgs::Marker::LINE_LIST);
   gazebo::msgs::Set(markerMsg.add_point(), ignition::math::Vector3d(0, 0, 1.1));
@@ -98,13 +100,13 @@ int main(int _argc, char **_argv)
 
   gazebo::common::Time::Sleep(2);
 
-  std::cout << "Adding a square between the sphere and cylinder\n";
+  std::cout << "Adding a square around the origin\n";
   markerMsg.set_id(3);
   markerMsg.set_action(gazebo::msgs::Marker::ADD_MODIFY);
   markerMsg.set_type(gazebo::msgs::Marker::LINE_STRIP);
-  gazebo::msgs::Set(markerMsg.add_point(),
+  gazebo::msgs::Set(markerMsg.mutable_point(0),
       ignition::math::Vector3d(0.5, 0.5, 0.05));
-  gazebo::msgs::Set(markerMsg.add_point(),
+  gazebo::msgs::Set(markerMsg.mutable_point(1),
       ignition::math::Vector3d(0.5, -0.5, 0.05));
   gazebo::msgs::Set(markerMsg.add_point(),
       ignition::math::Vector3d(-0.5, -0.5, 0.05));
@@ -120,13 +122,14 @@ int main(int _argc, char **_argv)
   markerMsg.set_id(4);
   markerMsg.set_action(gazebo::msgs::Marker::ADD_MODIFY);
   markerMsg.set_type(gazebo::msgs::Marker::POINTS);
+  markerMsg.clear_point();
   for (int i = 0; i < 100; ++i)
   {
     gazebo::msgs::Set(markerMsg.add_point(),
         ignition::math::Vector3d(
           ignition::math::Rand::DblUniform(-0.49, 0.49),
           ignition::math::Rand::DblUniform(-0.49, 0.49),
-          0.05);
+          0.05));
   }
   pub->Publish(markerMsg);
 
@@ -137,8 +140,80 @@ int main(int _argc, char **_argv)
   markerMsg.set_action(gazebo::msgs::Marker::ADD_MODIFY);
   markerMsg.set_type(gazebo::msgs::Marker::TEXT);
   markerMsg.set_text("HELLO");
+  gazebo::msgs::Set(markerMsg.mutable_scale(),
+                    ignition::math::Vector3d(0.2, 0.2, 0.2));
   gazebo::msgs::Set(markerMsg.mutable_pose(),
                     ignition::math::Pose3d(0, 0, 2, 0, 0, 0));
+  pub->Publish(markerMsg);
+
+  gazebo::common::Time::Sleep(2);
+  */
+
+  std::cout << "Adding a semi-circular triangle fan\n";
+  markerMsg.set_id(6);
+  markerMsg.set_action(gazebo::msgs::Marker::ADD_MODIFY);
+  markerMsg.set_type(gazebo::msgs::Marker::TRIANGLE_FAN);
+  markerMsg.clear_point();
+  gazebo::msgs::Set(markerMsg.mutable_pose(),
+                    ignition::math::Pose3d(0, 1.5, 0, 0, 0, 0));
+  gazebo::msgs::Set(markerMsg.add_point(),
+        ignition::math::Vector3d(0, 0, 0.05));
+  double radius = 2;
+  for (double t = 0; t <= M_PI; t+= 0.01)
+  {
+    gazebo::msgs::Set(markerMsg.add_point(),
+        ignition::math::Vector3d(radius * cos(t), radius * sin(t), 0.05));
+  }
+  pub->Publish(markerMsg);
+
+  gazebo::common::Time::Sleep(2);
+
+  std::cout << "Adding two triangles using a triangle list\n";
+  markerMsg.set_id(7);
+  markerMsg.set_action(gazebo::msgs::Marker::ADD_MODIFY);
+  markerMsg.set_type(gazebo::msgs::Marker::TRIANGLE_LIST);
+  markerMsg.clear_point();
+  gazebo::msgs::Set(markerMsg.mutable_pose(),
+                    ignition::math::Pose3d(0, -1.5, 0, 0, 0, 0));
+  gazebo::msgs::Set(markerMsg.add_point(),
+        ignition::math::Vector3d(0, 0, 0.05));
+  gazebo::msgs::Set(markerMsg.add_point(),
+      ignition::math::Vector3d(1, 0, 0.05));
+  gazebo::msgs::Set(markerMsg.add_point(),
+      ignition::math::Vector3d(1, 1, 0.05));
+
+  gazebo::msgs::Set(markerMsg.add_point(),
+      ignition::math::Vector3d(1, 1, 0.05));
+  gazebo::msgs::Set(markerMsg.add_point(),
+      ignition::math::Vector3d(2, 1, 0.05));
+  gazebo::msgs::Set(markerMsg.add_point(),
+      ignition::math::Vector3d(2, 2, 0.05));
+
+  pub->Publish(markerMsg);
+
+  gazebo::common::Time::Sleep(2);
+
+  std::cout << "Adding a rectangular triangle strip\n";
+  markerMsg.set_id(8);
+  markerMsg.set_action(gazebo::msgs::Marker::ADD_MODIFY);
+  markerMsg.set_type(gazebo::msgs::Marker::TRIANGLE_STRIP);
+  markerMsg.clear_point();
+  gazebo::msgs::Set(markerMsg.mutable_pose(),
+                    ignition::math::Pose3d(-2, -2, 0, 0, 0, 0));
+  gazebo::msgs::Set(markerMsg.add_point(),
+        ignition::math::Vector3d(0, 0, 0.05));
+  gazebo::msgs::Set(markerMsg.add_point(),
+      ignition::math::Vector3d(1, 0, 0.05));
+  gazebo::msgs::Set(markerMsg.add_point(),
+      ignition::math::Vector3d(0, 1, 0.05));
+
+  gazebo::msgs::Set(markerMsg.add_point(),
+      ignition::math::Vector3d(1, 1, 0.05));
+  gazebo::msgs::Set(markerMsg.add_point(),
+      ignition::math::Vector3d(0, 2, 0.05));
+  gazebo::msgs::Set(markerMsg.add_point(),
+      ignition::math::Vector3d(1, 2, 0.05));
+
   pub->Publish(markerMsg);
 
   gazebo::common::Time::Sleep(2);

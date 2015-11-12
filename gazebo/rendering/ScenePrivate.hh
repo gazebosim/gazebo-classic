@@ -252,6 +252,9 @@ namespace gazebo
       /// \brief Subscribe to model info updates
       public: transport::SubscriberPtr modelInfoSub;
 
+      /// \brief Subscribe to world stats message
+      public: transport::SubscriberPtr statsSub;
+
       /// \brief Respond to requests.
       public: transport::PublisherPtr responsePub;
 
@@ -319,9 +322,8 @@ namespace gazebo
       /// \brief Initialized.
       public: bool initialized;
 
-      /// \brief SimTime of this Scene, as we receive PosesStamped from
-      /// the world, we update this time accordingly.
-      public: common::Time sceneSimTimePosesReceived;
+      /// \brief SimTime of this Scene.
+      public: common::Time simTime;
 
       /// \brief SimTime of this Scene, after applying PosesStamped to
       /// scene, we update this time accordingly.

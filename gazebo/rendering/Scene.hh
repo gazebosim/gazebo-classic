@@ -655,6 +655,10 @@ namespace gazebo
       /// \param[in] _vis Visual that the visualizations are attached to.
       private: void RemoveVisualizations(VisualPtr _vis);
 
+      /// \biref Callback from the world_stats topic
+      /// \param[in] _msg World statistics message.
+      private: void OnStats(ConstWorldStatisticsPtr &_msg);
+
       /// \internal
       /// \brief Pointer to private data.
       private: ScenePrivate *dataPtr;

@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Subscriber.hh"
 #include "gazebo/common/Events.hh"
@@ -78,48 +77,49 @@ void MarkerManager::OnPreRender()
     else
       ++markerIter;
   }
+
+  // Update the markers
+  for (auto marker : this->dataPtr->markers)
+  {
+    for (auto m : marker.second)
+    {
+      if (m.second->Lifetime() != common::Time::Zero &&
+          m.second->Lifetime() <= this->dataPtr->scene->GetSimTime())
+      {
+        marker.second.erase(m.first);
+      }
+    }
+  }
 }
 
 //////////////////////////////////////////////////
 bool MarkerManager::ProcessMarkerMsg(const msgs::Marker &_msg)
 {
-  std::cout << "PRocess marker message:" << _msg.DebugString() << "]\n";
-
+  // Get the namespace that the marker belongs to
   Marker_M::iterator nsIter = this->dataPtr->markers.find(_msg.ns());
 
-  if (nsIter != this->dataPtr->markers.end())
+  std::map<uint64_t, MarkerVisualPtr>::iterator markerIter;
+
+  // Add the marker to an existing namespace, if the namespace exists.
+  if (nsIter != this->dataPtr->markers.end() &&
+      (markerIter = nsIter->second.find(_msg.id())) != nsIter->second.end())
   {
-    std::cout << " Namespace exists\n";
-    std::map<uint64_t, MarkerVisualPtr>::iterator markerIter =
-      nsIter->second.find(_msg.id());
-
-    if (markerIter != nsIter->second.end())
-    {
-      std::cout << "Marker exists\n";
-      markerIter->second->Load(_msg);
-    }
-    else
-    {
-      std::string name = "__GZ_MARKER_VISUAL_NS_" + _msg.ns() + "_" +
-        std::to_string(_msg.id());
-      std::cout << "New marker created1. Name[" << name << "]\n";
-
-      MarkerVisualPtr marker(new MarkerVisual(name,
-            this->dataPtr->scene->GetWorldVisual()));
-      marker->Load(_msg);
-      this->dataPtr->markers[_msg.layer()][_msg.id()] = marker;
-    }
+    markerIter->second->Load(_msg);
   }
   else
   {
+    // Create the name for the marker
     std::string name = "__GZ_MARKER_VISUAL_NS_" + _msg.ns() + "_" +
       std::to_string(_msg.id());
 
-    std::cout << "New marker created0 Name[" << name << "}\n";
+    // Create the new marker
     MarkerVisualPtr marker(new MarkerVisual(name,
           this->dataPtr->scene->GetWorldVisual()));
 
+    // Load the marker
     marker->Load(_msg);
+
+    // Store the marker
     this->dataPtr->markers[_msg.layer()][_msg.id()] = marker;
   }
 

@@ -172,16 +172,14 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations,
       &Scene::OnResponse, this, true);
   this->dataPtr->sceneSub =
       this->dataPtr->node->Subscribe("~/scene", &Scene::OnScene, this);
+  this->dataPtr->statsSub = this->dataPtr->node->Subscribe(
+      "~/world_stats", &Scene::OnStats, this);
 
   this->dataPtr->sdf.reset(new sdf::Element);
   sdf::initFile("scene.sdf", this->dataPtr->sdf);
 
   this->dataPtr->terrain = NULL;
   this->dataPtr->selectedVis.reset();
-
-  this->dataPtr->sceneSimTimePosesApplied = common::Time();
-  this->dataPtr->sceneSimTimePosesReceived = common::Time();
-
 }
 
 //////////////////////////////////////////////////
@@ -2030,10 +2028,6 @@ void Scene::PreRender()
       else
         ++spIter;
     }
-
-    // official time stamp of approval
-    this->dataPtr->sceneSimTimePosesApplied =
-        this->dataPtr->sceneSimTimePosesReceived;
   }
 }
 
@@ -2676,15 +2670,13 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
 common::Time Scene::GetSimTime() const
 {
   boost::mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
-  return this->dataPtr->sceneSimTimePosesApplied;
+  return this->dataPtr->simTime;
 }
 
 /////////////////////////////////////////////////
 void Scene::OnPoseMsg(ConstPosesStampedPtr &_msg)
 {
   boost::recursive_mutex::scoped_lock lock(this->dataPtr->poseMsgMutex);
-  this->dataPtr->sceneSimTimePosesReceived =
-    common::Time(_msg->time().sec(), _msg->time().nsec());
 
   for (int i = 0; i < _msg->pose_size(); ++i)
   {
@@ -3383,4 +3375,10 @@ void Scene::ToggleLayer(const int32_t _layer)
   {
     visual.second->ToggleLayer(_layer);
   }
+}
+
+/////////////////////////////////////////////////
+void Scene::OnStats(ConstWorldStatisticsPtr &_msg)
+{
+  this->dataPtr->simTime = msgs::Convert(_msg->sim_time());
 }

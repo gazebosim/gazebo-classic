@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-
 #ifndef _GAZEBO_MARKER_MANAGER_PRIVATE_HH_
 #define _GAZEBO_MARKER_MANAGER_PRIVATE_HH_
 

@@ -14,12 +14,13 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_MARKER_PRIVATE_HH_
-#define _GAZEBO_MARKER_PRIVATE_HH_
+#ifndef _GAZEBO_MARKER_VISUAL_PRIVATE_HH_
+#define _GAZEBO_MARKER_VISUAL_PRIVATE_HH_
 
 #include <vector>
+#include <memory>
 
+#include "gazebo/rendering/MovableText.hh"
 #include "gazebo/rendering/VisualPrivate.hh"
 
 namespace gazebo
@@ -31,16 +32,20 @@ namespace gazebo
     /// \brief Private data for the marker Visual class.
     class MarkerVisualPrivate : public VisualPrivate
     {
-      public: MarkerVisualPrivate() : dynamicRenderable(NULL) {}
+      /// \brief Renders line segments
+      public: std::unique_ptr<DynamicLines> dynamicRenderable;
 
-      /// \brief Renders the laser data as a triangle fan.
-      public: DynamicLines *dynamicRenderable;
+      /// \brief Renders text.
+      public: std::unique_ptr<MovableText> text;
 
       /// \brief Mutex to protect the contact message.
       public: std::mutex mutex;
 
       /// \brief The last marker message received.
       public: msgs::Marker msg;
+
+      /// \brief Lifetime of the marker
+      public: common::Time lifetime;
     };
   }
 }

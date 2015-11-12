@@ -14,16 +14,17 @@ message Marker
   /// \brief The marker type (shape/geometry)
   enum Type
   {
-    NONE          = 0;
-    CUBE          = 1;
-    CYLINDER      = 2;
-    LINE_LIST     = 4;
-    LINE_STRIP    = 3;
-    POINTS        = 5;
-    SPHERE        = 6;
-    TEXT          = 7;
-    TRIANGLE_FAN  = 8;
-    TRIANGLE_LIST = 9;
+    NONE           = 0;
+    CUBE           = 1;
+    CYLINDER       = 2;
+    LINE_LIST      = 4;
+    LINE_STRIP     = 3;
+    POINTS         = 5;
+    SPHERE         = 6;
+    TEXT           = 7;
+    TRIANGLE_FAN   = 8;
+    TRIANGLE_LIST  = 9;
+    TRIANGLE_STRIP = 10;
   }
 
   /// \brief How to interpret the data. 
@@ -76,7 +77,8 @@ message Marker
   optional Type type         = 5;
 
   /// \brief How long to keep the visual alive before deletion. A value of 
-  /// zero indicates forever.
+  /// zero indicates forever. The lifetime is based on simulation-time, not
+  /// real-time.
   ///
   /// Relevant Action: ADD_MODIFY
   ///
@@ -90,7 +92,7 @@ message Marker
   /// Relevant Type: all
   optional Pose pose         = 7;
 
-  /// \brief Scale of the marker
+  /// \brief Scale of the marker.
   ///
   /// Relevant Action: ADD_MODIFY
   ///
@@ -105,11 +107,12 @@ message Marker
   optional Material material = 9;
 
   /// \brief Used to specify geometry for a LINE_STRIP, LINE_LIST, POINTS,
-  /// TRIANGLE_LIST, and TRIANGLE_FAN
+  /// TRIANGLE_LIST, TRIANGLE_FAN, TRIANGLE_STRIP
   ///
   /// Relevant Action: ADD_MODIFY
   ///
-  /// Relevant Type: LINE_STRIP, LINE_LIST, POINTS, TRIANGLE_FAN, TRIANGLE_LIST
+  /// Relevant Type: LINE_STRIP, LINE_LIST, POINTS, TRIANGLE_FAN, TRIANGLE_LIST,
+  /// TRIANGLE_STRIP
   repeated Vector3d point    = 10;
 
   /// \brief String to display. Only used for TEXT marker.

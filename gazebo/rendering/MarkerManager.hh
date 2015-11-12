@@ -29,7 +29,7 @@ namespace gazebo
 
     /// \internal
     /// \brief Creates, deletes, and maintains marker visuals. Only the
-    /// Scene class should intantiate and use this class.
+    /// Scene class should instantiate and use this class.
     class MarkerManager
     {
       /// \brief Constructor

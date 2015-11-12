@@ -19,8 +19,8 @@
  * Date: 13 Feb 2006
  */
 
-#ifndef _MOVABLETEXT_HH_
-#define _MOVABLETEXT_HH_
+#ifndef _GAZEBO_MOVABLETEXT_HH_
+#define _GAZEBO_MOVABLETEXT_HH_
 
 #include <string>
 
