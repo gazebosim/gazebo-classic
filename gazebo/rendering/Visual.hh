@@ -263,6 +263,10 @@ namespace gazebo
       /// \param[in] _show True to enable wireframe for this visual.
       public: void SetWireframe(bool _show);
 
+      /// \brief Get whether wireframe is enabled for this visual.
+      /// \return True if wireframe is enabled for this visual.
+      public: bool Wireframe() const;
+
       /// \brief Set the transparency of a single visual without calling
       /// UpdateShaders.
       /// \param[in] _sceneNode The target scene node.
@@ -277,6 +281,19 @@ namespace gazebo
       /// \brief Get the transparency.
       /// \return The transparency.
       public: float GetTransparency();
+
+      /// \brief Get the transparency of the visual as inherited from all
+      /// parents.
+      /// \return The derived transparency.
+      public: float DerivedTransparency() const;
+
+      /// \brief Set whether to inherit transparency from parent
+      /// \param[in] _inherit True to inherit transparency.
+      public: void SetInheritTransparency(const bool _inherit);
+
+      /// \brief Get whether this visual inherits transparency from parent
+      /// \return True if the visual inherits transparency.
+      public: bool InheritTransparency() const;
 
       /// \brief Set the visual to be visually highlighted. This is most
       /// often used when an object is selected by a user via the GUI.
@@ -668,6 +685,10 @@ namespace gazebo
       /// the scale of the visual.
       /// \param[in] _scale Scale of visual
       private: void UpdateGeomSize(const ignition::math::Vector3d &_scale);
+
+      /// \brief Helper function to update the transparency of the visual
+      /// \param[in] _cascade True to update the children's transparency too.
+      private: void UpdateTransparency(const bool _cascade = true);
 
       /// \internal
       /// \brief Pointer to private data.
