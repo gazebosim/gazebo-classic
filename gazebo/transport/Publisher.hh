@@ -41,6 +41,7 @@ namespace gazebo
     /// \class Publisher Publisher.hh transport/transport.hh
     /// \brief A publisher of messages on a topic
     class GZ_TRANSPORT_VISIBLE Publisher
+      : public boost::enable_shared_from_this<Publisher>
     {
       /// \brief Constructor
       /// \param[in] _topic Name of topic to be published
