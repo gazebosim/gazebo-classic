@@ -96,6 +96,10 @@ namespace gazebo
       /// \brief Callback when the model has been completed.
       private: void OnFinish();
 
+      /// \brief Toggle the model material scheme. This greys out all
+      /// non-editable models when the user enters the model editor mode.
+      private: void ToggleMaterialScheme();
+
       /// \brief Toggle main window's toolbar to display model editor icons.
       private: void ToggleToolbar();
 
