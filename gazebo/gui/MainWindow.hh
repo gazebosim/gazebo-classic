@@ -306,6 +306,11 @@ namespace gazebo
       private: transport::PublisherPtr serverControlPub;
       private: transport::PublisherPtr requestPub;
       private: transport::PublisherPtr scenePub;
+
+      /// \brief Publish user command messages for the server to place in the
+      /// undo queue.
+      private: transport::PublisherPtr userCmdPub;
+
       private: transport::SubscriberPtr responseSub;
       private: transport::SubscriberPtr guiSub;
       private: transport::SubscriberPtr newEntitySub, statsSub;
