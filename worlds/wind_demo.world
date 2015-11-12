@@ -1,0 +1,46 @@
+<?xml version="1.0" ?>
+<sdf version="1.4">
+  <world name="default">
+
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <wind>
+      <direction>45.0</direction>
+      <magnitude>15.0</magnitude>
+    </wind>
+
+    <!-- Load the plugin for the wind -->
+    <plugin name="wind" filename="libWindPlugin.so"></plugin>
+
+    <!-- A sphere controlled by the wind -->
+    <model name="sphere">
+      <pose>0 0 0 0 0 0</pose>
+      <link name="link">
+        <wind>true</wind>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+
+</world>
+</sdf>

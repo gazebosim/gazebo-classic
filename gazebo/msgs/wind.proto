@@ -1,0 +1,13 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Wind
+/// \brief A message containing a description of the global wind properties
+
+
+message Wind
+{
+  optional double direction = 1;
+  optional double magnitude = 2;
+  optional bool enable_wind = 3;
+}

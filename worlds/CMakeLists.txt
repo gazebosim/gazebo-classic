@@ -69,6 +69,7 @@ set (files
   underwater.world
   willowgarage.world
   wireless_sensors.world
+  wind_demo.world
 )
 
 install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_MAJOR_VERSION}/worlds/)

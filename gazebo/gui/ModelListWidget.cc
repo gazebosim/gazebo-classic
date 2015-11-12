@@ -190,6 +190,12 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
                                              this->selectedEntityName);
       this->requestPub->Publish(*this->requestMsg);
     }
+    else if (name == "Wind")
+    {
+      this->requestMsg = msgs::CreateRequest("wind_info",
+                                             this->selectedEntityName);
+      this->requestPub->Publish(*this->requestMsg);
+    }
     else if (name == "Spherical Coordinates")
     {
       this->requestMsg = msgs::CreateRequest("spherical_coordinates_info",
@@ -302,6 +308,8 @@ void ModelListWidget::Update()
       this->FillPropertyTree(this->sceneMsg, NULL);
     else if (this->fillTypes[0] == "Physics")
       this->FillPropertyTree(this->physicsMsg, NULL);
+    else if (this->fillTypes[0] == "Wind")
+      this->FillPropertyTree(this->windMsg, NULL);
     else if (this->fillTypes[0] == "Light")
       this->FillPropertyTree(this->lightMsg, NULL);
     else if (this->fillTypes[0] == "Spherical Coordinates")
@@ -459,6 +467,13 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
     this->fillTypes.push_back("Physics");
     this->propMutex->unlock();
   }
+  else if (_msg->has_type() && _msg->type() == this->windMsg.GetTypeName())
+  {
+    this->propMutex->lock();
+    this->windMsg.ParseFromString(_msg->serialized_data());
+    this->fillTypes.push_back("Wind");
+    this->propMutex->unlock();
+  }
   else if (_msg->has_type() && _msg->type() == this->lightMsg.GetTypeName())
   {
     this->propMutex->lock();
@@ -607,6 +622,8 @@ void ModelListWidget::OnPropertyChanged(QtProperty *_item)
     this->ScenePropertyChanged(_item);
   else if (currentItem == this->physicsItem)
     this->PhysicsPropertyChanged(_item);
+  else if (currentItem == this->windItem)
+    this->WindPropertyChanged(_item);
   else if (currentItem == this->guiItem)
     this->GUIPropertyChanged(_item);
 }
@@ -749,6 +766,32 @@ void ModelListWidget::PhysicsPropertyChanged(QtProperty * /*_item*/)
 
   msg.set_type(this->physicsType);
   this->physicsPub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
+void ModelListWidget::WindPropertyChanged(QtProperty * /*_item*/)
+{
+  msgs::Wind msg;
+
+  QList<QtProperty*> properties = this->propTreeBrowser->properties();
+  for (QList<QtProperty*>::iterator iter = properties.begin();
+       iter != properties.end(); ++iter)
+  {
+    if ((*iter)->propertyName().toStdString() == "enable wind")
+    {
+      msg.set_enable_wind(this->variantManager->value((*iter)).toBool());
+    }
+    else if ((*iter)->propertyName().toStdString() == "direction")
+    {
+      msg.set_direction(this->variantManager->value((*iter)).toDouble());
+    }
+    else if ((*iter)->propertyName().toStdString() == "magnitude")
+    {
+      msg.set_magnitude(this->variantManager->value((*iter)).toDouble());
+    }
+  }
+
+  this->windPub->Publish(msg);
 }
 
 /////////////////////////////////////////////////
@@ -1619,6 +1662,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
 {
   QtProperty *topItem = NULL;
   QtProperty *inertialItem = NULL;
+  QtProperty *windItem = NULL;
   QtVariantProperty *item = NULL;
 
   // id, store it but but make it hidden
@@ -1766,6 +1810,22 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
       QtVariantPropertyManager::groupTypeId(), tr("pose"));
   inertialItem->addSubProperty(topItem);
   this->FillPoseProperty(_msg.inertial().pose(), topItem);
+
+  // Wind
+  windItem = this->variantManager->addProperty(
+      QtVariantPropertyManager::groupTypeId(), tr("wind"));
+  this->AddProperty(windItem, _parent);
+  windItem->setEnabled(false);
+  if (_msg.has_wind())
+    this->FillVector3dProperty(_msg.wind(), windItem);
+  else
+  {
+    msgs::Vector3d xyz;
+    xyz.set_x(0);
+    xyz.set_y(0);
+    xyz.set_z(0);
+    this->FillVector3dProperty(xyz, windItem);
+  }
 
   for (int i = 0; i < _msg.collision_size(); i++)
   {
@@ -2424,6 +2484,7 @@ void ModelListWidget::OnRemoveScene(const std::string &/*_name*/)
   this->modelPub.reset();
   this->scenePub.reset();
   this->physicsPub.reset();
+  this->windPub.reset();
   this->lightPub.reset();
   this->responseSub.reset();
   this->requestSub.reset();
@@ -2452,6 +2513,7 @@ void ModelListWidget::InitTransport(const std::string &_name)
     this->modelPub.reset();
     this->scenePub.reset();
     this->physicsPub.reset();
+    this->windPub.reset();
     this->lightPub.reset();
     this->responseSub.reset();
     this->requestSub.reset();
@@ -2463,6 +2525,7 @@ void ModelListWidget::InitTransport(const std::string &_name)
   this->modelPub = this->node->Advertise<msgs::Model>("~/model/modify");
   this->scenePub = this->node->Advertise<msgs::Scene>("~/scene");
   this->physicsPub = this->node->Advertise<msgs::Physics>("~/physics");
+  this->windPub = this->node->Advertise<msgs::Wind>("~/wind");
 
   this->lightPub = this->node->Advertise<msgs::Light>("~/light/modify");
 
@@ -2505,6 +2568,13 @@ void ModelListWidget::ResetTree()
         QStringList(QString("%1").arg(tr("Physics"))));
     this->physicsItem->setData(0, Qt::UserRole, QVariant(tr("Physics")));
     this->modelTreeWidget->addTopLevelItem(this->physicsItem);
+
+    // Wind item
+    this->windItem = new QTreeWidgetItem(
+        static_cast<QTreeWidgetItem*>(0),
+        QStringList(QString("%1").arg(tr("Wind"))));
+    this->windItem->setData(0, Qt::UserRole, QVariant(tr("Wind")));
+    this->modelTreeWidget->addTopLevelItem(this->windItem);
 
     // Models item
     this->modelsItem = new QTreeWidgetItem(
@@ -2759,6 +2829,35 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
   if (_msg.has_contact_surface_layer())
     item->setValue(_msg.contact_surface_layer());
   constraintsItem->addSubProperty(item);
+}
+
+/////////////////////////////////////////////////
+void ModelListWidget::FillPropertyTree(const msgs::Wind &_msg,
+                                       QtProperty * /*_parent*/)
+{
+  QtVariantProperty *item = NULL;
+
+  item = this->variantManager->addProperty(QVariant::Bool,
+    tr("enable wind"));
+  if (_msg.has_enable_wind())
+    item->setValue(_msg.enable_wind());
+  this->propTreeBrowser->addProperty(item);
+
+  item = this->variantManager->addProperty(QVariant::Double, tr("direction"));
+  static_cast<QtVariantPropertyManager*>
+    (this->variantFactory->propertyManager(item))->setAttribute(
+        item, "decimals", 6);
+  if (_msg.has_direction())
+    item->setValue(_msg.direction());
+  this->propTreeBrowser->addProperty(item);
+
+  item = this->variantManager->addProperty(QVariant::Double, tr("magnitude"));
+  static_cast<QtVariantPropertyManager*>
+    (this->variantFactory->propertyManager(item))->setAttribute(
+        item, "decimals", 6);
+  if (_msg.has_magnitude())
+    item->setValue(_msg.magnitude());
+  this->propTreeBrowser->addProperty(item);
 }
 
 /////////////////////////////////////////////////

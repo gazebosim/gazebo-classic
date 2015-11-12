@@ -48,6 +48,7 @@ namespace gazebo
     class UserCmd;
     class UserCmdManager;
     class PhysicsEngine;
+    class Wind;
     class Mass;
     class Road;
     class Shape;
@@ -114,6 +115,10 @@ namespace gazebo
     /// \def  PhysicsEnginePtr
     /// \brief Boost shared pointer to a PhysicsEngine object
     typedef boost::shared_ptr<PhysicsEngine> PhysicsEnginePtr;
+
+    /// \def  WindPtr
+    /// \brief Standard shared pointer to a Wind object
+    typedef std::shared_ptr<Wind> WindPtr;
 
     /// \def  PresetManagerPtr
     /// \brief Shared pointer to a PresetManager object

@@ -50,6 +50,7 @@
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/Link.hh"
+#include "gazebo/physics/Wind.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -274,6 +275,9 @@ void Link::Init()
     battery->Init();
   }
 
+  if (this->GetWindMode() && this->world->GetEnableWind())
+    this->EnableWind(true);
+
   this->initialized = true;
 }
 
@@ -351,11 +355,16 @@ void Link::UpdateParameters(sdf::ElementPtr _sdf)
 
   this->sdf->GetElement("gravity")->GetValue()->SetUpdateFunc(
       boost::bind(&Link::GetGravityMode, this));
+  this->sdf->GetElement("wind")->GetValue()->SetUpdateFunc(
+      boost::bind(&Link::GetWindMode, this));
   this->sdf->GetElement("kinematic")->GetValue()->SetUpdateFunc(
       boost::bind(&Link::GetKinematic, this));
 
   if (this->sdf->Get<bool>("gravity") != this->GetGravityMode())
     this->SetGravityMode(this->sdf->Get<bool>("gravity"));
+
+  if (this->sdf->Get<bool>("wind") != this->GetWindMode())
+    this->SetWindMode(this->sdf->Get<bool>("wind"));
 
   // before loading child collision, we have to figure out if
   // selfCollide is true and modify parent class Entity so this
@@ -526,6 +535,12 @@ void Link::Update(const common::UpdateInfo & /*_info*/)
   {
     battery->Update();
   }
+}
+
+//////////////////////////////////////////////////
+void Link::UpdateWind(const common::UpdateInfo & /*_info*/)
+{
+  this->windLinearVel = this->world->GetWind()->WorldLinearVel(this);
 }
 
 /////////////////////////////////////////////////
@@ -737,6 +752,40 @@ math::Box Link::GetBoundingBox() const
 }
 
 //////////////////////////////////////////////////
+void Link::SetWindMode(bool _mode)
+{
+  this->sdf->GetElement("wind")->Set(_mode);
+
+  if (!this->GetWindMode() && this->updateConnection)
+    this->EnableWind(false);
+  else if (this->GetWindMode() && !this->updateConnection)
+    this->EnableWind(true);
+}
+
+/////////////////////////////////////////////////
+void Link::EnableWind(bool _enable)
+{
+  if (_enable)
+  {
+    this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+        boost::bind(&Link::UpdateWind, this, _1));
+  }
+  else
+  {
+    event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
+    this->updateConnection.reset();
+    // Make sure wind velocity is null
+    this->windLinearVel.Set(0, 0, 0);
+  }
+}
+
+//////////////////////////////////////////////////
+bool Link::GetWindMode() const
+{
+  return this->sdf->Get<bool>("wind");
+}
+
+//////////////////////////////////////////////////
 bool Link::SetSelected(bool _s)
 {
   Entity::SetSelected(_s);
@@ -828,6 +877,7 @@ void Link::FillMsg(msgs::Link &_msg)
   _msg.set_name(this->GetScopedName());
   _msg.set_self_collide(this->GetSelfCollide());
   _msg.set_gravity(this->GetGravityMode());
+  _msg.set_enable_wind(this->GetWindMode());
   _msg.set_kinematic(this->GetKinematic());
   _msg.set_enabled(this->GetEnabled());
   msgs::Set(_msg.mutable_pose(), relPose.Ign());
@@ -916,6 +966,10 @@ void Link::ProcessMsg(const msgs::Link &_msg)
   {
     this->SetGravityMode(_msg.gravity());
     this->SetEnabled(true);
+  }
+  if (_msg.has_enable_wind())
+  {
+    this->SetWindMode(_msg.enable_wind());
   }
   if (_msg.has_kinematic())
   {
@@ -1533,4 +1587,11 @@ void Link::LoadBattery(sdf::ElementPtr _sdf)
   common::BatteryPtr battery(new common::Battery());
   battery->Load(_sdf);
   this->batteries.push_back(battery);
+}
+
+/////////////////////////////////////////////////
+const ignition::math::Vector3d Link::RelativeWindLinearVel() const
+{
+  return this->GetWorldPose().Ign().Rot().Inverse().RotateVector(
+      this->windLinearVel);
 }

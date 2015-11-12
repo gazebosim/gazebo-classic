@@ -77,6 +77,7 @@
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/Light.hh"
 #include "gazebo/physics/Actor.hh"
+#include "gazebo/physics/Wind.hh"
 #include "gazebo/physics/WorldPrivate.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/common/SphericalCoordinates.hh"
@@ -143,6 +144,7 @@ World::World(const std::string &_name)
   this->dataPtr->resetTimeOnly = false;
   this->dataPtr->resetModelOnly = false;
   this->dataPtr->enablePhysicsEngine = true;
+  this->dataPtr->enableWind = true;
   this->dataPtr->setWorldPoseMutex = new boost::mutex();
   this->dataPtr->worldUpdateMutex = new boost::recursive_mutex();
 
@@ -274,6 +276,16 @@ void World::Load(sdf::ElementPtr _sdf)
     gzthrow("Unable to create physics engine\n");
 
   this->dataPtr->physicsEngine->Load(physicsElem);
+
+  // This should come before loading of entities
+  sdf::ElementPtr windElem = this->dataPtr->sdf->GetElement("wind");
+
+  this->dataPtr->wind.reset(new Wind(shared_from_this()));
+
+  if (this->dataPtr->wind == NULL)
+    gzthrow("Unable to create wind\n");
+
+  this->dataPtr->wind->Load(windElem);
 
   // This should also come before loading of entities
   {
@@ -872,6 +884,12 @@ PhysicsEnginePtr World::GetPhysicsEngine() const
 PresetManagerPtr World::GetPresetManager() const
 {
   return this->dataPtr->presetManager;
+}
+
+//////////////////////////////////////////////////
+WindPtr World::GetWind() const
+{
+  return this->dataPtr->wind;
 }
 
 //////////////////////////////////////////////////
@@ -2468,6 +2486,31 @@ bool World::GetEnablePhysicsEngine()
 void World::EnablePhysicsEngine(bool _enable)
 {
   this->dataPtr->enablePhysicsEngine = _enable;
+}
+
+/////////////////////////////////////////////////
+bool World::GetEnableWind()
+{
+  return this->dataPtr->enableWind;
+}
+
+/////////////////////////////////////////////////
+void World::EnableWind(bool _enable)
+{
+  if (this->dataPtr->enableWind == _enable)
+    return;
+
+  this->dataPtr->enableWind = _enable;
+
+  for (auto const &model : this->dataPtr->models)
+  {
+    Link_V links = model->GetLinks();
+    for (auto const &link : links)
+    {
+      if (link->GetWindMode())
+        link->EnableWind(this->dataPtr->enableWind);
+    }
+  }
 }
 
 /////////////////////////////////////////////////

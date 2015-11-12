@@ -126,6 +126,11 @@ namespace gazebo
       /// \return Pointer to the preset manager.
       public: PresetManagerPtr GetPresetManager() const;
 
+      /// \brief Return the wind.
+      /// Get a pointer to the wind used by the world.
+      /// \return Pointer to the wind.
+      public: WindPtr GetWind() const;
+
       /// \brief Return the spherical coordinates converter.
       /// \return Pointer to the spherical coordinates converter.
       public: common::SphericalCoordinatesPtr GetSphericalCoordinates() const;
@@ -299,6 +304,14 @@ namespace gazebo
       /// \brief enable/disable physics engine during World::Update.
       /// \param[in] _enable True to enable the physics engine.
       public: void EnablePhysicsEngine(bool _enable);
+
+      /// \brief check if wind is enabled/disabled.
+      /// \param True if the wind is enabled.
+      public: bool GetEnableWind();
+
+      /// \brief enable/disable wind.
+      /// \param[in] _enable True to enable the wind.
+      public: void EnableWind(bool _enable);
 
       /// \brief Update the state SDF value from the current state.
       public: void UpdateStateSDF();

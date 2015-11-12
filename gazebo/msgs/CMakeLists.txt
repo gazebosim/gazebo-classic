@@ -112,6 +112,7 @@ set (msgs
   vector2d.proto
   vector3d.proto
   visual.proto
+  wind.proto
   wireless_node.proto
   wireless_nodes.proto
   world_control.proto

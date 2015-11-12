@@ -155,6 +155,9 @@ namespace gazebo
       private: void FillPropertyTree(const msgs::Physics &_msg,
                                      QtProperty *_parent);
 
+      private: void FillPropertyTree(const msgs::Wind &_msg,
+                                     QtProperty *_parent);
+
       private: void FillPropertyTree(const msgs::Light &_msg,
                                      QtProperty *_parent);
 
@@ -198,6 +201,10 @@ namespace gazebo
       /// \param[in] _item The item that was changed.
       private: void PhysicsPropertyChanged(QtProperty *_item);
 
+      /// \brief Called when a wind property is changed by the user.
+      /// \param[in] _item The item that was changed.
+      private: void WindPropertyChanged(QtProperty *_item);
+
       /// \brief Called when a GUI property is changed by the user.
       /// \param[in] _item The item that was changed.
       private: void GUIPropertyChanged(QtProperty *_item);
@@ -210,6 +217,7 @@ namespace gazebo
       private: transport::PublisherPtr modelPub;
       private: transport::PublisherPtr scenePub;
       private: transport::PublisherPtr physicsPub;
+      private: transport::PublisherPtr windPub;
       private: transport::PublisherPtr lightPub;
 
       private: transport::SubscriberPtr responseSub;
@@ -223,6 +231,9 @@ namespace gazebo
 
       /// \brief Physics tree item.
       private: QTreeWidgetItem *physicsItem;
+
+      /// \brief Wind tree item.
+      private: QTreeWidgetItem *windItem;
 
       /// \brief Models tree item.
       private: QTreeWidgetItem *modelsItem;
@@ -259,6 +270,7 @@ namespace gazebo
       private: msgs::Scene sceneMsg;
       private: msgs::Joint jointMsg;
       private: msgs::Physics physicsMsg;
+      private: msgs::Wind windMsg;
       private: msgs::Light lightMsg;
       private: msgs::SphericalCoordinates sphericalCoordMsg;
 

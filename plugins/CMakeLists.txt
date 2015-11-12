@@ -67,7 +67,8 @@ set (plugins
   SonarPlugin
   SphereAtlasDemoPlugin
   TransporterPlugin
-  VehiclePlugin)
+  VehiclePlugin
+  WindPlugin)
 
 if (HAVE_USB AND UNIX AND NOT APPLE)
   set (plugins ${plugins}
