@@ -75,7 +75,9 @@ namespace gazebo
                 lighting(true),
                 visibilityFlags(GZ_VISIBILITY_ALL),
                 type(Visual::VT_ENTITY),
-                layer(0)
+                layer(0),
+                inheritTransparency(true),
+                wireframe(false)
       {
       }
 
@@ -197,6 +199,12 @@ namespace gazebo
       /// \brief Index of the layer to which this visual belongs. Layers
       /// act similar to layers in photoshop.
       public: int32_t layer;
+
+      /// \brief True to inherit transparency from parent.
+      public: bool inheritTransparency;
+
+      /// \brief True if wireframe mode is enabled
+      public: bool wireframe;
     };
     /// \}
   }
