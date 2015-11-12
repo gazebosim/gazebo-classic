@@ -433,7 +433,8 @@ void UndoTest::UndoResetWorld()
   sleep = 0;
   newTime = world->GetSimTime();
   boxNewPose = box->GetWorldPose();
-  while (newTime != initialTime && boxNewPose == boxInitialPose && sleep < maxSleep)
+  while (newTime != initialTime && boxNewPose == boxInitialPose &&
+      sleep < maxSleep)
   {
     newTime = world->GetSimTime();
     boxNewPose = box->GetWorldPose();
