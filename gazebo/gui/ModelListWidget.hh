@@ -155,6 +155,9 @@ namespace gazebo
       private: void FillPropertyTree(const msgs::Physics &_msg,
                                      QtProperty *_parent);
 
+      private: void FillPropertyTree(const msgs::Atmosphere &_msg,
+                                     QtProperty *_parent);
+
       private: void FillPropertyTree(const msgs::Light &_msg,
                                      QtProperty *_parent);
 
@@ -198,6 +201,10 @@ namespace gazebo
       /// \param[in] _item The item that was changed.
       private: void PhysicsPropertyChanged(QtProperty *_item);
 
+      /// \brief Called when an atmosphere property is changed by the user.
+      /// \param[in] _item The item that was changed.
+      private: void AtmospherePropertyChanged(QtProperty *_item);
+
       /// \brief Called when a GUI property is changed by the user.
       /// \param[in] _item The item that was changed.
       private: void GUIPropertyChanged(QtProperty *_item);
@@ -210,6 +217,7 @@ namespace gazebo
       private: transport::PublisherPtr modelPub;
       private: transport::PublisherPtr scenePub;
       private: transport::PublisherPtr physicsPub;
+      private: transport::PublisherPtr atmospherePub;
       private: transport::PublisherPtr lightPub;
 
       private: transport::SubscriberPtr responseSub;
@@ -223,6 +231,9 @@ namespace gazebo
 
       /// \brief Physics tree item.
       private: QTreeWidgetItem *physicsItem;
+
+      /// \brief Atmosphere tree item.
+      private: QTreeWidgetItem *atmosphereItem;
 
       /// \brief Models tree item.
       private: QTreeWidgetItem *modelsItem;
@@ -259,6 +270,7 @@ namespace gazebo
       private: msgs::Scene sceneMsg;
       private: msgs::Joint jointMsg;
       private: msgs::Physics physicsMsg;
+      private: msgs::Atmosphere atmosphereMsg;
       private: msgs::Light lightMsg;
       private: msgs::SphericalCoordinates sphericalCoordMsg;
 
@@ -269,6 +281,9 @@ namespace gazebo
 
       /// \brief Type of physics engine.
       private: msgs::Physics_Type physicsType;
+
+      /// \brief Type of atmosphere model.
+      private: msgs::Atmosphere_Type atmosphereType;
     };
 
     class GZ_GUI_VISIBLE ModelListSheetDelegate: public QItemDelegate

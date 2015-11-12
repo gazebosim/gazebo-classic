@@ -1,0 +1,20 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Atmosphere
+/// \brief A message containing a description of the global atmosphere properties
+
+
+message Atmosphere
+{
+  enum Type
+  {
+    ADIABATIC = 1;
+  }
+  optional Type type                         = 1[default=ADIABATIC];
+
+  optional double temperature                = 2;
+  optional double pressure                   = 3;
+  optional double mass_density               = 4;
+  optional bool enable_atmosphere            = 5;
+}
