@@ -59,7 +59,7 @@ void ArrowVisual::Load()
   this->InsertMesh("axis_head");
 
   VisualPtr shaftVis(
-      new Visual(this->GetName()+"__SHAFT__", shared_from_this()));
+      new Visual(this->GetName()+"__SHAFT__", shared_from_this(), false));
   shaftVis->Load();
   shaftVis->AttachMesh("axis_shaft");
   shaftVis->SetPosition(math::Vector3(0, 0, 0.1));
@@ -67,7 +67,7 @@ void ArrowVisual::Load()
   dPtr->shaftNode = shaftVis->GetSceneNode();
 
   VisualPtr headVis(
-      new Visual(this->GetName()+"__HEAD__", shared_from_this()));
+      new Visual(this->GetName()+"__HEAD__", shared_from_this(), false));
   headVis->Load();
   headVis->AttachMesh("axis_head");
   headVis->SetPosition(math::Vector3(0, 0, 0.24));
@@ -79,7 +79,7 @@ void ArrowVisual::Load()
   this->InsertMesh("rotation_tube");
 
   VisualPtr rotationVis(
-      new Visual(this->GetName()+"__ROTATION__", shared_from_this()));
+      new Visual(this->GetName()+"__ROTATION__", shared_from_this(), false));
   rotationVis->Load();
   rotationVis->AttachMesh("rotation_tube");
   rotationVis->SetPosition(math::Vector3(0, 0, 0.24));
