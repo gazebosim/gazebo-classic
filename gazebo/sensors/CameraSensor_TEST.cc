@@ -25,9 +25,10 @@ class CameraSensor_TEST : public ServerFixture
 {
 };
 
+/////////////////////////////////////////////////
 TEST_F(CameraSensor_TEST, CreateCamera)
 {
-  Load("worlds/camera.world");
+  this->Load("worlds/camera.world");
   sensors::SensorManager *mgr = sensors::SensorManager::Instance();
 
   // Create the camera sensor
