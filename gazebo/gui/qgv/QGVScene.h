@@ -25,6 +25,7 @@ License along with this library.
 #include <QGraphicsScene>
 
 #include "qgv.h"
+#include "gazebo/util/system.hh"
 
 class QGVNode;
 class QGVEdge;
@@ -37,7 +38,7 @@ class QGVGvcPrivate;
  * @brief GraphViz interactive scene
  *
  */
-class QGVCORE_EXPORT QGVScene : public QGraphicsScene
+class GZ_GUI_VISIBLE QGVScene : public QGraphicsScene
 {
     Q_OBJECT
   public:
