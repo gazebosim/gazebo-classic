@@ -64,10 +64,7 @@ ignition::math::Matrix3d ParseTransformMatrixStr(
                                               const std::string &_transformStr)
 {
   // check for transformation
-  if (_transformStr.empty())
-  {
-    return ignition::math::Matrix3d::Identity;
-  }
+  GZ_ASSERT(!_transformStr.empty(), "no data for ParseTransformMatrixStr");
 
   // _transfromStr should not have a closing paren and look like this
   // matrix(0,0.55669897,-0.55669897,0,194.55441,-149.50402
@@ -83,6 +80,13 @@ ignition::math::Matrix3d ParseTransformMatrixStr(
   // http://www.w3.org/TR/SVG/coords.html#TransformAttribute
   if (transform.find("matrix") != std::string::npos)
   {
+    if (numbers.size() != 6)
+    {
+      gzerr << "Unsupported matrix transform with "
+            << numbers.size() << " parameters. Should be 6."
+            << std::endl;
+      return ignition::math::Matrix3d::Identity;
+    }
     double v00 = stod(numbers[0]);
     double v10 = stod(numbers[1]);
     double v01 = stod(numbers[2]);
