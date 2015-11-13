@@ -138,7 +138,7 @@ void UserCmdManager::OnUserCmdMsg(ConstUserCmdPtr &_msg)
 
   if (_msg->type() == msgs::UserCmd::WORLD_CONTROL)
   {
-    // Pulish world control message after we've save the current state
+    // Publish world control message after we've save the current state
     if (_msg->has_world_control())
     {
       auto worldControlPub = this->dataPtr->node->Advertise<msgs::WorldControl>(
