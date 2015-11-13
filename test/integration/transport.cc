@@ -32,6 +32,7 @@ bool g_stringMsg = false;
 bool g_stringMsg2 = false;
 bool g_stringMsg3 = false;
 bool g_stringMsg4 = false;
+unsigned int g_unadvertiseReceivedCount = 0;
 
 void ReceiveStringMsg(ConstGzStringPtr &/*_msg*/)
 {
@@ -71,6 +72,12 @@ void ReceiveWorldStatsMsg2(ConstWorldStatisticsPtr &/*_msg*/)
 void ReceiveWorldStatsDebugMsg(ConstGzStringPtr &/*_data*/)
 {
   g_worldStatsDebugMsg = true;
+}
+
+/////////////////////////////////////////////////
+void ReceiveUnadvertise(ConstVector3dPtr &/*_msg*/)
+{
+  g_unadvertiseReceivedCount++;
 }
 
 /////////////////////////////////////////////////
@@ -479,6 +486,92 @@ TEST_F(TransportTest, Errors)
   scenePub.reset();
   statsSub.reset();
   testNode.reset();
+}
+
+/////////////////////////////////////////////////
+TEST_F(TransportTest, Unadvertise)
+{
+  this->Load("worlds/empty.world");
+
+  transport::NodePtr node = transport::NodePtr(new transport::Node());
+  node->Init();
+  ASSERT_TRUE(node != NULL);
+
+  // Advertise two publishers to the same topic
+  auto pubA = node->Advertise<msgs::Vector3d>("~/test_topic");
+  auto pubB = node->Advertise<msgs::Vector3d>("~/test_topic");
+
+  // Create a subscriber
+  auto sub = node->Subscribe("~/test_topic", &ReceiveUnadvertise);
+
+  // Check counter of received messages
+  EXPECT_EQ(g_unadvertiseReceivedCount, 0u);
+
+  // Publish with pubA
+  {
+    msgs::Vector3d msg;
+    msg.set_x(1);
+    msg.set_y(2);
+    msg.set_z(3);
+    pubA->Publish(msg);
+
+    // Wait for message to be received
+    int maxSleep = 10;
+    int sleep = 0;
+    while (g_unadvertiseReceivedCount != 1u && sleep < maxSleep)
+    {
+      common::Time::MSleep(100);
+      sleep++;
+    }
+    // Check counter of received messages
+    EXPECT_EQ(g_unadvertiseReceivedCount, 1u);
+  }
+
+  // Publish with pubB
+  {
+    msgs::Vector3d msg;
+    msg.set_x(1);
+    msg.set_y(2);
+    msg.set_z(3);
+    pubB->Publish(msg);
+
+    // Wait for message to be received
+    int maxSleep = 10;
+    int sleep = 0;
+    while (g_unadvertiseReceivedCount != 2u && sleep < maxSleep)
+    {
+      common::Time::MSleep(100);
+      sleep++;
+    }
+    // Check counter of received messages
+    EXPECT_EQ(g_unadvertiseReceivedCount, 2u);
+  }
+
+  // Finish pubB
+  transport::TopicManager::Instance()->Unadvertise("~/test_topic");
+  pubB->Fini();
+  pubB.reset();
+
+  // Publish with pubA
+  {
+    msgs::Vector3d msg;
+    msg.set_x(1);
+    msg.set_y(2);
+    msg.set_z(3);
+    pubA->Publish(msg);
+
+    // Wait for message to be received
+    int maxSleep = 10;
+    int sleep = 0;
+    while (g_unadvertiseReceivedCount != 3u && sleep < maxSleep)
+    {
+      common::Time::MSleep(100);
+      sleep++;
+    }
+    // Check counter of received messages
+    EXPECT_EQ(g_unadvertiseReceivedCount, 3u);
+gzmsg << "FINISH" << std::endl;
+  }
 }
 
 /////////////////////////////////////////////////
