@@ -1,5 +1,9 @@
 ## Gazebo 7.0
 
+1. Fix visual transparency issues
++    * [Pull request #1987](https://bitbucket.org/osrf/gazebo/pull-request/1987)
++    * [Issue #1726](https://bitbucket.org/osrf/gazebo/issue/1726)
+
 1. Update rest web plugin to publish response messages and display login user name in toolbar.
     * [Pull request #1956](https://bitbucket.org/osrf/gazebo/pull-request/1956)
 
