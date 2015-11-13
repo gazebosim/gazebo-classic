@@ -23,6 +23,7 @@ License along with this library.
 #include <QPen>
 
 #include "qgv.h"
+#include "gazebo/util/system.hh"
 
 class QGVNode;
 class QGVScene;
@@ -32,7 +33,7 @@ class QGVEdgePrivate;
  * @brief Edge item
  *
  */
-class QGVCORE_EXPORT QGVEdge : public QGraphicsItem
+class GZ_GUI_VISIBLE QGVEdge : public QGraphicsItem
 {
   public:
     ~QGVEdge();
