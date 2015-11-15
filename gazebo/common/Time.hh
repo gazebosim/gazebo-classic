@@ -131,6 +131,15 @@ namespace gazebo
       public: std::string FormattedString(FormatOption _start = DAYS,
           FormatOption _end = MILLISECONDS) const;
 
+      /// \brief Set the time from a string formatted as "DD hh:mm:ss.mmm", with
+      /// the option to choose the start/end.
+      /// \param[in] _timeStr String representing time.
+      /// \param[in] _start Start point.
+      /// \param[in] _end End point.
+      /// \return True if successful.
+      public: bool SetFromFormattedString(std::string _timeStr,
+          FormatOption _start = DAYS, FormatOption _end = MILLISECONDS);
+
       /// \brief Sleep for the specified time
       /// \param[in] _time Sleep time
       /// \return Time actually slept

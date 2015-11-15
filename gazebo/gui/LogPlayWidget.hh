@@ -86,6 +86,9 @@ namespace gazebo
       /// \param[in] _time Desired time
       public slots: void OnSeek(const common::Time &_time);
 
+      /// \brief Callback when the current time has been edited.
+      public slots: void OnCurrentTime();
+
       /// \brief Qt signal to show the play button.
       signals: void ShowPlay();
 

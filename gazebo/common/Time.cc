@@ -362,6 +362,171 @@ std::string Time::FormattedString(FormatOption _start, FormatOption _end) const
 }
 
 /////////////////////////////////////////////////
+bool Time::SetFromFormattedString(std::string _timeStr, FormatOption _start,
+    FormatOption _end)
+{
+  // "DD hh:mm:ss.mmm"
+  if (_start > MILLISECONDS)
+  {
+    gzerr << "Invalid start [" << _start << "]." << std::endl;
+    return false;
+  }
+
+  if (_end < _start)
+  {
+    gzerr << "End [" << _end << "], can't be before start [" << _start << "]."
+        << std::endl;
+    return false;
+  }
+
+  if (_end > MILLISECONDS)
+  {
+    gzerr << "Invalid end [" << _end << "]." << std::endl;
+    return false;
+  }
+
+  unsigned int d = 0;
+  unsigned int h = 0;
+  unsigned int m = 0;
+  unsigned int s = 0;
+  unsigned int ms = 0;
+
+  // Days
+  auto index = _timeStr.find(" ");
+  if (_start <= DAYS)
+  {
+    try
+    {
+      d = stoi(_timeStr);
+    }
+    catch (std::invalid_argument)
+    {
+      gzerr << "Can't convert [" << _timeStr << "] to int" << std::endl;
+      return false;
+    }
+
+    // Strip days
+    if (index != std::string::npos)
+    {
+      _timeStr = _timeStr.substr(index+1);
+    }
+    else if (_end > DAYS)
+    {
+      gzerr << "Can't find [ ] between DAYS and HOURS in [" << _timeStr <<
+          "]." << std::endl;
+      return false;
+    }
+  }
+  else if (index != std::string::npos)
+  {
+    gzerr << "Character [ ] is not part of the chosen range: [" << _start <<
+        "] -> [" << _end << std::endl;
+    return false;
+  }
+
+  // Hours
+  index = _timeStr.find(":");
+  if (_start <= HOURS && _end >= HOURS)
+  {
+    try
+    {
+      h = stoi(_timeStr);
+    }
+    catch (std::invalid_argument)
+    {
+      gzerr << "Can't convert [" << _timeStr << "] to int" << std::endl;
+      return false;
+    }
+
+    // Strip hours
+    if (index != std::string::npos)
+    {
+      _timeStr = _timeStr.substr(index+1);
+    }
+    else if (_end > HOURS)
+    {
+      gzerr << "Can't find [:] between HOURS and MINUTES in [" << _timeStr <<
+          "]." << std::endl;
+      return false;
+    }
+  }
+
+  // Minutes
+  index = _timeStr.find(":");
+  if (_start <= MINUTES && _end >= MINUTES)
+  {
+    try
+    {
+      m = stoi(_timeStr);
+    }
+    catch (std::invalid_argument)
+    {
+      gzerr << "Can't convert [" << _timeStr << "] to int" << std::endl;
+      return false;
+    }
+
+    // Strip minutes
+    if (index != std::string::npos)
+    {
+      _timeStr = _timeStr.substr(index+1);
+    }
+    else if (_end > MINUTES)
+    {
+      gzerr << "Can't find [:] between MINUTES and SECONDS in [" << _timeStr <<
+          "]." << std::endl;
+      return false;
+    }
+  }
+
+  // Seconds
+  index = _timeStr.find(".");
+  if (_start <= SECONDS && _end >= SECONDS)
+  {
+    try
+    {
+      s = stoi(_timeStr);
+    }
+    catch (std::invalid_argument)
+    {
+      gzerr << "Can't convert [" << _timeStr << "] to int" << std::endl;
+      return false;
+    }
+
+    // Strip seconds
+    if (index != std::string::npos)
+    {
+      _timeStr = _timeStr.substr(index+1);
+    }
+    else if (_end > SECONDS)
+    {
+      gzerr << "Can't find [.] between SECONDS and MILLISECONDS in [" <<
+          _timeStr << "]." << std::endl;
+      return false;
+    }
+  }
+
+  // Milliseconds
+  if (_start <= MILLISECONDS && _end >= MILLISECONDS)
+  {
+    try
+    {
+      ms = stoi(_timeStr);
+    }
+    catch (std::invalid_argument)
+    {
+      gzerr << "Can't convert [" << _timeStr << "] to int" << std::endl;
+      return false;
+    }
+  }
+
+  // Set this
+  double seconds = d*86400 + h*3600 + m*60 + s + ms/1000.0;
+  this->Set(seconds);
+
+  return true;
+}
+
+/////////////////////////////////////////////////
 Time Time::Sleep(const common::Time &_time)
 {
   Time result;

@@ -125,19 +125,21 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
       SLOT(SetEndTime(common::Time)));
 
   // Time
-  QLineEdit *currentTime = new QLineEdit();
-  currentTime->setObjectName("logPlayCurrentTime");
-  currentTime->setMaximumWidth(110);
-  currentTime->setAlignment(Qt::AlignRight);
-  connect(this, SIGNAL(SetCurrentTime(const QString &)), currentTime,
-      SLOT(setText(const QString &)));
+  this->dataPtr->currentTimeEdit = new QLineEdit();
+  this->dataPtr->currentTimeEdit->setObjectName("logPlayCurrentTime");
+  this->dataPtr->currentTimeEdit->setMaximumWidth(110);
+  this->dataPtr->currentTimeEdit->setAlignment(Qt::AlignRight);
+  connect(this, SIGNAL(SetCurrentTime(const QString &)),
+      this->dataPtr->currentTimeEdit, SLOT(setText(const QString &)));
+  connect(this->dataPtr->currentTimeEdit, SIGNAL(editingFinished()), this,
+      SLOT(OnCurrentTime()));
 
   QLabel *endTime = new QLabel();
   connect(this, SIGNAL(SetEndTime(const QString &)), endTime,
       SLOT(setText(const QString &)));
 
   QHBoxLayout *timeLayout = new QHBoxLayout();
-  timeLayout->addWidget(currentTime);
+  timeLayout->addWidget(this->dataPtr->currentTimeEdit);
   timeLayout->addWidget(endTime);
 
   // Empty space on the right
@@ -312,6 +314,30 @@ void LogPlayWidget::OnSeek(const common::Time &_time)
 }
 
 /////////////////////////////////////////////////
+void LogPlayWidget::OnCurrentTime()
+{
+  auto timeStr = this->dataPtr->currentTimeEdit->text();
+  common::Time time;
+
+  if (this->dataPtr->lessThan1h &&
+      time.SetFromFormattedString(timeStr.toStdString(),
+      common::Time::FormatOption::MINUTES))
+  {
+    this->OnSeek(time);
+  }
+  else if (time.SetFromFormattedString(timeStr.toStdString()))
+  {
+    this->OnSeek(time);
+  }
+  // If input time is invalid, stay in current time
+  else
+  {
+    this->OnSeek(this->dataPtr->currentTime);
+  }
+  this->dataPtr->currentTimeEdit->clearFocus();
+}
+
+/////////////////////////////////////////////////
 void LogPlayWidget::EmitSetCurrentTime(const common::Time &_time)
 {
   // Make sure it's within limits
@@ -330,14 +356,17 @@ void LogPlayWidget::EmitSetCurrentTime(const common::Time &_time)
   this->dataPtr->playButton->setEnabled(time != this->dataPtr->endTime);
 
   // Update current time line edit
-  if (this->dataPtr->lessThan1h)
+  if (!this->dataPtr->currentTimeEdit->hasFocus())
   {
-    this->SetCurrentTime(QString::fromStdString(time.FormattedString(
-        common::Time::FormatOption::MINUTES)));
-  }
-  else
-  {
-    this->SetCurrentTime(QString::fromStdString(time.FormattedString()));
+    if (this->dataPtr->lessThan1h)
+    {
+      this->SetCurrentTime(QString::fromStdString(time.FormattedString(
+	  common::Time::FormatOption::MINUTES)));
+    }
+    else
+    {
+      this->SetCurrentTime(QString::fromStdString(time.FormattedString()));
+    }
   }
 
   // Update current time item in view

@@ -132,7 +132,7 @@ TEST_F(TimeTest, Time)
 }
 
 /////////////////////////////////////////////////
-TEST_F(TimeTest, String)
+TEST_F(TimeTest, ToString)
 {
   common::Time time(0);
 
@@ -225,6 +225,118 @@ TEST_F(TimeTest, String)
   // Large time
   time = common::Time(1234567890, 123456789);
   EXPECT_EQ(time.FormattedString(), "14288 23:31:30.123");
+}
+
+/////////////////////////////////////////////////
+TEST_F(TimeTest, FromString)
+{
+  common::Time time;
+
+  // Default start and end
+  EXPECT_TRUE(time.SetFromFormattedString("00 00:00:01.000"));
+  EXPECT_EQ(common::Time(1), time);
+
+  // DAYS -> MILLISECONDS
+  EXPECT_TRUE(time.SetFromFormattedString("00 00:00:02.000",
+      common::Time::FormatOption::DAYS,
+      common::Time::FormatOption::MILLISECONDS));
+  EXPECT_EQ(common::Time(2), time);
+
+  // DAYS -> SECONDS
+  EXPECT_TRUE(time.SetFromFormattedString("00 00:00:03",
+      common::Time::FormatOption::DAYS,
+      common::Time::FormatOption::SECONDS));
+  EXPECT_EQ(common::Time(3), time);
+
+  // DAYS -> MINUTES
+  EXPECT_TRUE(time.SetFromFormattedString("00 00:01",
+      common::Time::FormatOption::DAYS,
+      common::Time::FormatOption::MINUTES));
+  EXPECT_EQ(common::Time(60), time);
+
+  // DAYS -> HOURS
+  EXPECT_TRUE(time.SetFromFormattedString("00 01",
+      common::Time::FormatOption::DAYS,
+      common::Time::FormatOption::HOURS));
+  EXPECT_EQ(common::Time(3600), time);
+
+  // DAYS -> DAYS
+  EXPECT_TRUE(time.SetFromFormattedString("03",
+      common::Time::FormatOption::DAYS,
+      common::Time::FormatOption::DAYS));
+  EXPECT_EQ(common::Time(259200), time);
+
+  // HOURS -> MILLISECONDS
+  EXPECT_TRUE(time.SetFromFormattedString("00:00:02.000",
+      common::Time::FormatOption::HOURS,
+      common::Time::FormatOption::MILLISECONDS));
+  EXPECT_EQ(common::Time(2), time);
+
+  // HOURS -> SECONDS
+  EXPECT_TRUE(time.SetFromFormattedString("00:00:03",
+      common::Time::FormatOption::HOURS,
+      common::Time::FormatOption::SECONDS));
+  EXPECT_EQ(common::Time(3), time);
+
+  // HOURS -> MINUTES
+  EXPECT_TRUE(time.SetFromFormattedString("00:01",
+      common::Time::FormatOption::HOURS,
+      common::Time::FormatOption::MINUTES));
+  EXPECT_EQ(common::Time(60), time);
+
+  // HOURS -> HOURS
+  EXPECT_TRUE(time.SetFromFormattedString("01",
+      common::Time::FormatOption::HOURS,
+      common::Time::FormatOption::HOURS));
+  EXPECT_EQ(common::Time(3600), time);
+
+  // MINUTES -> MILLISECONDS
+  EXPECT_TRUE(time.SetFromFormattedString("00:02.000",
+      common::Time::FormatOption::MINUTES,
+      common::Time::FormatOption::MILLISECONDS));
+  EXPECT_EQ(common::Time(2), time);
+
+  // MINUTES -> SECONDS
+  EXPECT_TRUE(time.SetFromFormattedString("00:03",
+      common::Time::FormatOption::MINUTES,
+      common::Time::FormatOption::SECONDS));
+  EXPECT_EQ(common::Time(3), time);
+
+  // MINUTES -> MINUTES
+  EXPECT_TRUE(time.SetFromFormattedString("01",
+      common::Time::FormatOption::MINUTES,
+      common::Time::FormatOption::MINUTES));
+  EXPECT_EQ(common::Time(60), time);
+
+  // SECONDS -> MILLISECONDS
+  EXPECT_TRUE(time.SetFromFormattedString("02.000",
+      common::Time::FormatOption::SECONDS,
+      common::Time::FormatOption::MILLISECONDS));
+  EXPECT_EQ(common::Time(2), time);
+
+  // SECONDS -> SECONDS
+  EXPECT_TRUE(time.SetFromFormattedString("03",
+      common::Time::FormatOption::SECONDS,
+      common::Time::FormatOption::SECONDS));
+  EXPECT_EQ(common::Time(3), time);
+
+  // MILLISECONDS -> MILLISECONDS
+  EXPECT_TRUE(time.SetFromFormattedString("000",
+      common::Time::FormatOption::MILLISECONDS,
+      common::Time::FormatOption::MILLISECONDS));
+  EXPECT_EQ(common::Time(0), time);
+
+  // Give wrong start / end and check it wasn't set
+  EXPECT_FALSE(time.SetFromFormattedString("00 00:00:03.000",
+      common::Time::FormatOption::HOURS,
+      common::Time::FormatOption::SECONDS));
+  EXPECT_EQ(common::Time(0), time);
+
+  // Give bad string and check it wasn't set
+  EXPECT_FALSE(time.SetFromFormattedString("xyz",
+      common::Time::FormatOption::HOURS,
+      common::Time::FormatOption::SECONDS));
+  EXPECT_EQ(common::Time(0), time);
 }
 
 /////////////////////////////////////////////////

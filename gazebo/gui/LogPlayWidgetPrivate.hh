@@ -75,6 +75,9 @@ namespace gazebo
       /// \brief Button to jump forward.
       public: QToolButton *forwardButton;
 
+      /// \brief Widget to edit the current time.
+      public: QLineEdit *currentTimeEdit;
+
       /// \brief Number of steps pending to be published once the simulation
       /// is paused.
       public: int pendingStep = 0;
