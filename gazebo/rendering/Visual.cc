@@ -240,7 +240,7 @@ VisualPtr Visual::Clone(const std::string &_name, VisualPtr _newParent)
   }
 
   if (_newParent == this->dataPtr->scene->GetWorldVisual())
-    result->SetWorldPose(this->GetWorldPose());
+    result->SetWorldPose(this->WorldPose());
   result->ShowCollision(false);
 
   result->SetName(_name);
@@ -387,7 +387,7 @@ void Visual::Load()
     else if (geomElem->HasElement("plane"))
     {
       ignition::math::Vector2d size =
-        geomElem->GetElement("plane")->Get<igntion::math::Vector2d>("size");
+        geomElem->GetElement("plane")->Get<ignition::math::Vector2d>("size");
       geometrySize.Set(size.X(), size.Y(), 1);
     }
     else if (geomElem->HasElement("mesh"))
@@ -755,7 +755,7 @@ void Visual::UpdateGeomSize(const ignition::math::Vector3d &_scale)
   for (std::vector<VisualPtr>::iterator iter = this->dataPtr->children.begin();
        iter != this->dataPtr->children.end(); ++iter)
   {
-    (*iter)->UpdateGeomSize(_scale * (*iter)->GetScale().Ign());
+    (*iter)->UpdateGeomSize(_scale * (*iter)->Scale());
   }
 
   // update the same way as server - see Link::UpdateVisualGeomSDF()
@@ -837,7 +837,7 @@ ignition::math::Vector3d Visual::DerivedScale() const
 
   while (vis && vis != worldVis)
   {
-    derivedScale = derivedScale * vis->GetScale().Ign();
+    derivedScale = derivedScale * vis->Scale();
     vis = vis->GetParent();
   }
 
@@ -1535,7 +1535,7 @@ void Visual::SetHighlighted(bool _highlighted)
 {
   if (_highlighted)
   {
-    ignition::math::Box bbox = this->GetBoundingBox();
+    ignition::math::Box bbox = this->BoundingBox();
 
     // Create the bounding box if it's not already created.
     if (!this->dataPtr->boundingBox)
@@ -1669,7 +1669,7 @@ void Visual::SetRotation(const ignition::math::Quaterniond &_rot)
   GZ_ASSERT(this->dataPtr->sceneNode, "Visual SceneNode is NULL");
   this->dataPtr->sceneNode->setOrientation(Conversions::Convert(_rot));
 
-  this->dataPtr->sdf->GetElement("pose")->Set(this->GetPose());
+  this->dataPtr->sdf->GetElement("pose")->Set(this->Pose());
 }
 
 //////////////////////////////////////////////////
@@ -1679,7 +1679,7 @@ void Visual::SetPose(const math::Pose &_pose)
 }
 
 //////////////////////////////////////////////////
-void Visual::SetPose(const math::Pose &_pose)
+void Visual::SetPose(const ignition::math::Pose3d &_pose)
 {
   this->SetPosition(_pose.Pos());
   this->SetRotation(_pose.Rot());
@@ -1713,8 +1713,8 @@ ignition::math::Quaterniond Visual::Rotation() const
 math::Pose Visual::GetPose() const
 {
   math::Pose pos;
-  pos.pos = this->GetPosition();
-  pos.rot = this->GetRotation();
+  pos.pos = this->Position();
+  pos.rot = this->Rotation();
   return pos;
 }
 
@@ -1727,8 +1727,8 @@ ignition::math::Pose3d Visual::Pose() const
 //////////////////////////////////////////////////
 void Visual::SetWorldPose(const math::Pose &_pose)
 {
-  this->SetWorldPosition(_pose.pos);
-  this->SetWorldRotation(_pose.rot);
+  this->SetWorldPosition(_pose.pos.Ign());
+  this->SetWorldRotation(_pose.rot.Ign());
 }
 
 //////////////////////////////////////////////////
@@ -1922,7 +1922,7 @@ void Visual::DeleteDynamicLine(DynamicLines *_line)
 void Visual::AttachLineVertex(DynamicLines *_line, unsigned int _index)
 {
   this->dataPtr->lineVertices.push_back(std::make_pair(_line, _index));
-  _line->SetPoint(_index, this->GetWorldPose().pos.Ign());
+  _line->SetPoint(_index, this->WorldPose().Pos());
 }
 
 //////////////////////////////////////////////////
@@ -1996,8 +1996,8 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *_node,
         // get oriented bounding box in object's local space
         bb.transformAffine(transform);
 
-        min = Conversions::Convert(bb.getMinimum());
-        max = Conversions::Convert(bb.getMaximum());
+        min = Conversions::ConvertIgn(bb.getMinimum());
+        max = Conversions::ConvertIgn(bb.getMaximum());
       }
 
       _box.Merge(ignition::math::Box(min, max));
@@ -2782,7 +2782,7 @@ void Visual::MoveToPositions(const std::vector<math::Pose> &_pts,
 {
   std::vector<ignition::math::Pose3d> pts;
   for (auto const p : _pts)
-   pts.push_back(p);
+   pts.push_back(p.Ign());
   this->MoveToPositions(pts, _time, _onComplete);
 }
 
@@ -2792,7 +2792,7 @@ void Visual::MoveToPositions(const std::vector<ignition::math::Pose3d> &_pts,
                              boost::function<void()> _onComplete)
 {
   Ogre::TransformKeyFrame *key;
-  ignition::math::Vector3d start = this->GetWorldPose().pos;
+  ignition::math::Vector3d start = this->WorldPose().Pos();
 
   this->dataPtr->onAnimationComplete = _onComplete;
 
@@ -2837,7 +2837,7 @@ void Visual::MoveToPositions(const std::vector<ignition::math::Pose3d> &_pts,
 //////////////////////////////////////////////////
 void Visual::MoveToPosition(const math::Pose &_pose, double _time)
 {
-  this->MoveToPosition(_pose, _time);
+  this->MoveToPosition(_pose.Ign(), _time);
 }
 
 //////////////////////////////////////////////////
@@ -2845,8 +2845,8 @@ void Visual::MoveToPosition(const ignition::math::Pose3d &_pose,
                             const double _time)
 {
   Ogre::TransformKeyFrame *key;
-  ignition::math::Vector3d start = this->GetWorldPose().pos;
-  ignition::math::Vector3d rpy = _pose.rot.GetAsEuler();
+  ignition::math::Vector3d start = this->WorldPose().Pos();
+  ignition::math::Vector3d rpy = _pose.Rot().Euler();
 
   ignition::math::Quaterniond rotFinal(0, rpy.Y(), rpy.Z());
 

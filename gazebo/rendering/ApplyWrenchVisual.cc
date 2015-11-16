@@ -213,9 +213,9 @@ void ApplyWrenchVisual::Load()
   torqueHeadNode->attachObject(torqueHeadObj);
   torqueHeadNode->setScale(3, 3, 1);
   torqueHeadNode->setPosition(-0.04, 0.125, 0);
-  math::Quaternion quat(0, -M_PI/2.0, 0);
+  ignition::math::Quaterniond quat(0, -M_PI/2.0, 0);
   torqueHeadNode->setOrientation(
-      Ogre::Quaternion(quat.w, quat.x, quat.y, quat.z));
+      Ogre::Quaternion(quat.W(), quat.X(), quat.Y(), quat.Z()));
 
   dPtr->torqueVisual->SetMaterial(dPtr->unselectedMaterial);
   dPtr->torqueVisual->GetSceneNode()->setInheritScale(false);
@@ -253,8 +253,8 @@ void ApplyWrenchVisual::Load()
       "Gazebo/DarkMagentaTransparent");
 
   // Initialize
-  dPtr->forceVector = math::Vector3::Zero;
-  dPtr->torqueVector = math::Vector3::Zero;
+  dPtr->forceVector = ignition::math::Vector3d::Zero;
+  dPtr->torqueVector = ignition::math::Vector3d::Zero;
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
   this->Resize();
@@ -264,18 +264,24 @@ void ApplyWrenchVisual::Load()
 }
 
 ///////////////////////////////////////////////////
-math::Quaternion ApplyWrenchVisual::GetQuaternionFromVector(
-    const math::Vector3 &_vec)
+ignition::math::Quaterniond ApplyWrenchVisual::QuaternionFromVector(
+    const ignition::math::Vector3d &_vec)
 {
   double roll = 0;
-  double pitch = -atan2(_vec.z, sqrt(pow(_vec.x, 2) + pow(_vec.y, 2)));
-  double yaw = atan2(_vec.y, _vec.x);
+  double pitch = -atan2(_vec.Z(), sqrt(pow(_vec.Z(), 2) + pow(_vec.Y(), 2)));
+  double yaw = atan2(_vec.Y(), _vec.X());
 
-  return math::Quaternion(roll, pitch, yaw);
+  return ignition::math::Quaterniond(roll, pitch, yaw);
 }
 
 ///////////////////////////////////////////////////
 void ApplyWrenchVisual::SetCoM(const math::Vector3 &_comVector)
+{
+  this->SetCoM(_comVector.Ign());
+}
+
+///////////////////////////////////////////////////
+void ApplyWrenchVisual::SetCoM(const ignition::math::Vector3d &_comVector)
 {
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
@@ -292,6 +298,13 @@ void ApplyWrenchVisual::SetCoM(const math::Vector3 &_comVector)
 
 ///////////////////////////////////////////////////
 void ApplyWrenchVisual::SetForcePos(const math::Vector3 &_forcePosVector)
+{
+  this->SetForcePos(_forcePosVector.Ign());
+}
+
+///////////////////////////////////////////////////
+void ApplyWrenchVisual::SetForcePos(
+    const ignition::math::Vector3d &_forcePosVector)
 {
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
@@ -310,19 +323,26 @@ void ApplyWrenchVisual::SetForcePos(const math::Vector3 &_forcePosVector)
 void ApplyWrenchVisual::SetForce(const math::Vector3 &_forceVector,
     const bool _rotatedByMouse)
 {
+  this->SetForce(_forceVector.Ign(), _rotatedByMouse);
+}
+
+///////////////////////////////////////////////////
+void ApplyWrenchVisual::SetForce(const ignition::math::Vector3d &_forceVector,
+    const bool _rotatedByMouse)
+{
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
   std::ostringstream mag;
-  mag << std::fixed << std::setprecision(3) << _forceVector.GetLength();
+  mag << std::fixed << std::setprecision(3) << _forceVector.Length();
   dPtr->forceText.SetText(mag.str() + "N");
 
   dPtr->forceVector = _forceVector;
   dPtr->rotatedByMouse = _rotatedByMouse;
 
-  if (_forceVector == math::Vector3::Zero)
+  if (_forceVector == ignition::math::Vector3d::Zero)
   {
-    if (dPtr->torqueVector == math::Vector3::Zero)
+    if (dPtr->torqueVector == ignition::math::Vector3d::Zero)
       this->SetMode(Mode::NONE);
     else
       this->SetMode(Mode::TORQUE);
@@ -337,19 +357,26 @@ void ApplyWrenchVisual::SetForce(const math::Vector3 &_forceVector,
 void ApplyWrenchVisual::SetTorque(const math::Vector3 &_torqueVector,
     const bool _rotatedByMouse)
 {
+  this->SetTorque(_torqueVector.Ign(), _rotatedByMouse);
+}
+
+///////////////////////////////////////////////////
+void ApplyWrenchVisual::SetTorque(const ignition::math::Vector3d &_torqueVector,
+    const bool _rotatedByMouse)
+{
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
   std::ostringstream mag;
-  mag << std::fixed << std::setprecision(3) << _torqueVector.GetLength();
+  mag << std::fixed << std::setprecision(3) << _torqueVector.Length();
   dPtr->torqueText.SetText(mag.str() + "Nm");
 
   dPtr->torqueVector = _torqueVector;
   dPtr->rotatedByMouse = _rotatedByMouse;
 
-  if (_torqueVector == math::Vector3::Zero)
+  if (_torqueVector == ignition::math::Vector3d::Zero)
   {
-    if (dPtr->forceVector == math::Vector3::Zero)
+    if (dPtr->forceVector == ignition::math::Vector3d::Zero)
       this->SetMode(Mode::NONE);
     else
       this->SetMode(Mode::FORCE);
@@ -372,7 +399,7 @@ void ApplyWrenchVisual::UpdateForceVisual()
     return;
   }
 
-  ignition::math::Vector3d normVec = dPtr->forceVector.Ign();
+  ignition::math::Vector3d normVec = dPtr->forceVector;
   normVec.Normalize();
 
   // Place it on X axis in case it is zero
@@ -380,17 +407,16 @@ void ApplyWrenchVisual::UpdateForceVisual()
     normVec = ignition::math::Vector3d::UnitX;
 
   // Set rotation in the vector direction
-  ignition::math::Quaterniond quat = this->GetQuaternionFromVector(
-      normVec).Ign();
+  ignition::math::Quaterniond quat = this->QuaternionFromVector(normVec);
   dPtr->forceVisual->SetRotation(quat * ignition::math::Quaterniond(
       ignition::math::Vector3d(0, M_PI/2.0, 0)));
 
   // Set arrow tip to forcePosVector
   dPtr->forceVisual->SetPosition(-normVec * 0.28 *
-      dPtr->forceVisual->Scale().Z() + dPtr->forcePosVector.Ign());
+      dPtr->forceVisual->Scale().Z() + dPtr->forcePosVector);
 
   // Rotation tool
-  dPtr->rotTool->SetPosition(dPtr->forcePosVector.Ign());
+  dPtr->rotTool->SetPosition(dPtr->forcePosVector);
   if (!dPtr->rotatedByMouse)
     dPtr->rotTool->SetRotation(quat);
 }
@@ -407,7 +433,7 @@ void ApplyWrenchVisual::UpdateTorqueVisual()
     return;
   }
 
-  ignition::math::Vector3d normVec = dPtr->torqueVector.Ign();
+  ignition::math::Vector3d normVec = dPtr->torqueVector;
   normVec.Normalize();
 
   // Place it on X axis in case it is zero
@@ -415,8 +441,7 @@ void ApplyWrenchVisual::UpdateTorqueVisual()
     normVec = ignition::math::Vector3d::UnitX;
 
   // Set rotation in the vector direction
-  ignition::math::Quaterniond quat = this->GetQuaternionFromVector(
-      normVec).Ign();
+  ignition::math::Quaterniond quat = this->QuaternionFromVector(normVec);
   dPtr->torqueVisual->SetRotation(quat * ignition::math::Quaterniond(
       ignition::math::Vector3d(0, M_PI/2.0, 0)));
 

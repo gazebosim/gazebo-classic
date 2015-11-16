@@ -363,25 +363,25 @@ void Light::CreateVisual()
 //////////////////////////////////////////////////
 void Light::SetPosition(const math::Vector3 &_p)
 {
-  this->visual->SetPosition(_p);
+  this->visual->SetPosition(_p.Ign());
 }
 
 //////////////////////////////////////////////////
 math::Vector3 Light::GetPosition() const
 {
-  return this->visual->GetPosition();
+  return this->visual->Position();
 }
 
 //////////////////////////////////////////////////
 void Light::SetRotation(const math::Quaternion &_q)
 {
-  this->visual->SetRotation(_q);
+  this->visual->SetRotation(_q.Ign());
 }
 
 //////////////////////////////////////////////////
 math::Quaternion Light::GetRotation() const
 {
-  return this->visual->GetRotation();
+  return this->visual->Rotation();
 }
 
 //////////////////////////////////////////////////

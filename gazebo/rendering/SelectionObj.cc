@@ -147,7 +147,7 @@ void SelectionObj::Attach(rendering::VisualPtr _vis)
 
   dPtr->parent = _vis;
   dPtr->parent->AttachVisual(shared_from_this());
-  this->SetPosition(math::Vector3(0, 0, 0));
+  this->SetPosition(ignition::math::Vector3d(0, 0, 0));
 
   this->UpdateSize();
 }
@@ -162,8 +162,7 @@ void SelectionObj::UpdateSize()
 
   // don't include the selection obj itself when calculating the size.
   this->Detach();
-  math::Vector3 bboxSize = vis->GetBoundingBox().GetSize()
-      * vis->GetScale();
+  ignition::math::Vector3d bboxSize = vis->BoundingBox().Size() * vis->Scale();
   dPtr->parent = vis;
   dPtr->parent->AttachVisual(shared_from_this());
 
@@ -185,7 +184,7 @@ void SelectionObj::UpdateSize()
     this->SetHandleMaterial(ROT_Y, dPtr->yAxisMat, false);
     this->SetHandleMaterial(ROT_Z, dPtr->zAxisMat, false);
   }
-  this->SetScale(math::Vector3(max, max, max));
+  this->SetScale(ignition::math::Vector3d(max, max, max));
 }
 
 /////////////////////////////////////////////////
@@ -458,16 +457,16 @@ void SelectionObj::CreateTranslateVisual()
   shaftZObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
   headZObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
-  dPtr->transXVisual->SetRotation(
-      math::Quaternion(math::Vector3(0, 1, 0), GZ_DTOR(90)));
-  dPtr->transYVisual->SetRotation(
-      math::Quaternion(math::Vector3(1, 0, 0), GZ_DTOR(-90)));
+  dPtr->transXVisual->SetRotation(ignition::math::Quaterniond(
+        ignition::math::Vector3d(0, 1, 0), IGN_DTOR(90)));
+  dPtr->transYVisual->SetRotation(ignition::math::Quaterniond(
+        ignition::math::Vector3d(1, 0, 0), IGN_DTOR(-90)));
 
   this->SetHandleMaterial(TRANS_X, dPtr->xAxisMatOverlay);
   this->SetHandleMaterial(TRANS_Y, dPtr->yAxisMatOverlay);
   this->SetHandleMaterial(TRANS_Z, dPtr->zAxisMatOverlay);
 
-  dPtr->transVisual->SetScale(math::Vector3(5.0, 5.0, 5.0));
+  dPtr->transVisual->SetScale(ignition::math::Vector3d(5.0, 5.0, 5.0));
 
   dPtr->transXVisual->SetVisibilityFlags(
       GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
@@ -538,10 +537,10 @@ void SelectionObj::CreateRotateVisual()
   dPtr->rotYVisual->Load();
   dPtr->rotZVisual->Load();
 
-  dPtr->rotXVisual->SetRotation(
-      math::Quaternion(math::Vector3(0, 1, 0), GZ_DTOR(90)));
-  dPtr->rotYVisual->SetRotation(
-      math::Quaternion(math::Vector3(1, 0, 0), GZ_DTOR(-90)));
+  dPtr->rotXVisual->SetRotation(ignition::math::Quaterniond(
+        ignition::math::Vector3d(0, 1, 0), IGN_DTOR(90)));
+  dPtr->rotYVisual->SetRotation(ignition::math::Quaterniond(
+        ignition::math::Vector3d(1, 0, 0), IGN_DTOR(-90)));
 
   // By default the visuals are not overlays like translation or scale visuals.
   // This is so that the rings does not block the object it's attached too,
@@ -550,7 +549,7 @@ void SelectionObj::CreateRotateVisual()
   this->SetHandleMaterial(ROT_Y, dPtr->yAxisMat);
   this->SetHandleMaterial(ROT_Z, dPtr->zAxisMat);
 
-  dPtr->rotVisual->SetScale(math::Vector3(1.0, 1.0, 1.0));
+  dPtr->rotVisual->SetScale(ignition::math::Vector3d(1.0, 1.0, 1.0));
 
   dPtr->rotXVisual->SetVisibilityFlags(
       GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
@@ -663,16 +662,16 @@ void SelectionObj::CreateScaleVisual()
   scaleShaftZObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
   scaleHeadZObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
-  dPtr->scaleXVisual->SetRotation(
-      math::Quaternion(math::Vector3(0, 1, 0), GZ_DTOR(90)));
-  dPtr->scaleYVisual->SetRotation(
-      math::Quaternion(math::Vector3(1, 0, 0), GZ_DTOR(-90)));
+  dPtr->scaleXVisual->SetRotation(ignition::math::Quaterniond(
+        ignition::math::Vector3d(0, 1, 0), IGN_DTOR(90)));
+  dPtr->scaleYVisual->SetRotation(ignition::math::Quaterniond(
+        ignition::math::Vector3d(1, 0, 0), IGN_DTOR(-90)));
 
   this->SetHandleMaterial(SCALE_X, dPtr->xAxisMatOverlay);
   this->SetHandleMaterial(SCALE_Y, dPtr->yAxisMatOverlay);
   this->SetHandleMaterial(SCALE_Z, dPtr->zAxisMatOverlay);
 
-  dPtr->scaleVisual->SetScale(math::Vector3(5.0, 5.0, 5.0));
+  dPtr->scaleVisual->SetScale(ignition::math::Vector3d(5.0, 5.0, 5.0));
 
   dPtr->scaleXVisual->SetVisibilityFlags(
       GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);

@@ -690,9 +690,9 @@ void GpuLaser::CreateCanvas()
   this->object->setVisibilityFlags(GZ_VISIBILITY_ALL
       & ~GZ_VISIBILITY_SELECTABLE);
 
-  math::Pose pose;
-  pose.pos = math::Vector3(0.01, 0, 0);
-  pose.rot.SetFromEuler(math::Vector3(0, 0, 0));
+  ignition::math::Pose3d pose;
+  pose.Pos().Set(0.01, 0, 0);
+  pose.Rot().Euler(ignition::math::Vector3d(0, 0, 0));
 
   this->visual->SetPose(pose);
 

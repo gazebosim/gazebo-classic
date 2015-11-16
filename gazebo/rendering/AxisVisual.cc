@@ -103,7 +103,7 @@ void AxisVisual::ScaleXAxis(const ignition::math::Vector3d &_scale)
   AxisVisualPrivate *dPtr =
       reinterpret_cast<AxisVisualPrivate *>(this->dataPtr);
 
-  dPtr->xAxis->SetScale(_scale.Ign());
+  dPtr->xAxis->SetScale(_scale);
 }
 
 /////////////////////////////////////////////////
@@ -118,7 +118,7 @@ void AxisVisual::ScaleYAxis(const ignition::math::Vector3d &_scale)
   AxisVisualPrivate *dPtr =
       reinterpret_cast<AxisVisualPrivate *>(this->dataPtr);
 
-  dPtr->yAxis->SetScale(_scale.Ign());
+  dPtr->yAxis->SetScale(_scale);
 }
 
 /////////////////////////////////////////////////
@@ -133,7 +133,7 @@ void AxisVisual::ScaleZAxis(const ignition::math::Vector3d &_scale)
   AxisVisualPrivate *dPtr =
       reinterpret_cast<AxisVisualPrivate *>(this->dataPtr);
 
-  dPtr->zAxis->SetScale(_scale.Ign());
+  dPtr->zAxis->SetScale(_scale);
 }
 
 /////////////////////////////////////////////////

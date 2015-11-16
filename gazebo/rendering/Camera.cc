@@ -349,8 +349,7 @@ void Camera::Update()
   else if (this->dataPtr->trackedVisual)
   {
     ignition::math::Vector3d direction =
-      this->dataPtr->trackedVisual->GetWorldPose().pos.Ign() -
-                              this->WorldPose().Pos();
+      this->dataPtr->trackedVisual->WorldPose().Pos() - this->WorldPose().Pos();
 
     double yaw = atan2(direction.Y(), direction.X());
     double pitch = atan2(-direction.Z(),
@@ -1680,7 +1679,7 @@ bool Camera::IsVisible(VisualPtr _visual)
 {
   if (this->camera && _visual)
   {
-    ignition::math::Box bbox = _visual->GetBoundingBox().Ign();
+    ignition::math::Box bbox = _visual->BoundingBox();
     Ogre::AxisAlignedBox box;
     box.setMinimum(bbox.Min().X(), bbox.Min().Y(), bbox.Min().Z());
     box.setMaximum(bbox.Max().X(), bbox.Max().Y(), bbox.Max().Z());

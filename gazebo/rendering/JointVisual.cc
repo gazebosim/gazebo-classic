@@ -77,7 +77,7 @@ void JointVisual::Load(ConstJointPtr &_msg)
 
     JointVisualPtr jointVis;
     jointVis.reset(new JointVisual(this->GetName() + "_parent_", parentVis));
-    jointVis->Load(_msg, pose + this->GetParent()->GetWorldPose().Ign());
+    jointVis->Load(_msg, pose + this->GetParent()->WorldPose());
 
     // attach axis2 to this visual
     msgs::Axis axis2Msg = _msg->axis2();
@@ -96,14 +96,13 @@ void JointVisual::Load(ConstJointPtr &_msg)
   }
 
   // Scale according to the link it is attached to
-  double linkSize = std::max(0.1,
-      dPtr->parent->GetBoundingBox().GetSize().GetLength());
+  double linkSize = std::max(0.1, dPtr->parent->BoundingBox().Size().Length());
   dPtr->scaleToLink = math::Vector3(linkSize * 0.7,
                                     linkSize * 0.7,
                                     linkSize * 0.7);
   this->SetScale(dPtr->scaleToLink);
   if (dPtr->parentAxisVis)
-    dPtr->parentAxisVis->SetScale(dPtr->scaleToLink);
+    dPtr->parentAxisVis->SetScale(dPtr->scaleToLink.Ign());
 
   this->GetSceneNode()->setInheritScale(false);
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
@@ -154,15 +153,15 @@ void JointVisual::UpdateAxis(ArrowVisualPtr _arrowVisual,
       reinterpret_cast<JointVisualPrivate *>(this->dataPtr);
 
   // Get rotation to axis vector
-  math::Vector3 axisDir = _axis;
-  math::Vector3 u = axisDir.Normalize();
-  math::Vector3 v = math::Vector3::UnitZ;
+  ignition::math::Vector3d axisDir = _axis.Ign();
+  ignition::math::Vector3d u = axisDir.Normalize();
+  ignition::math::Vector3d v = igntion::math::Vector3d::UnitZ;
   double cosTheta = v.Dot(u);
   double angle = acos(cosTheta);
-  math::Quaternion quat;
+  ignition::math::Quaterniond quat;
   // check the parallel case
   if (math::equal(angle, M_PI))
-    quat.SetFromAxis(u.GetPerpendicular(), angle);
+    quat.SetFromAxis(u.Perpendicular(), angle);
   else
     quat.SetFromAxis((v.Cross(u)).Normalize(), angle);
   _arrowVisual->SetRotation(quat);
@@ -173,9 +172,9 @@ void JointVisual::UpdateAxis(ArrowVisualPtr _arrowVisual,
     // rotate the arrow visual relative to the model
     VisualPtr model = this->GetRootVisual();
     math::Quaternion quatFromModel =
-        model->GetWorldPose().rot.GetInverse()*this->GetWorldPose().rot;
-    _arrowVisual->SetRotation(quatFromModel.GetInverse() *
-        _arrowVisual->GetRotation());
+        model->WorldPose().Rot().Inverse() * this->WorldPose().Rot();
+    _arrowVisual->SetRotation(quatFromModel.Inverse() *
+        _arrowVisual->Rotation());
   }
   _arrowVisual->ShowRotation(_type == msgs::Joint::REVOLUTE ||
                              _type == msgs::Joint::REVOLUTE2 ||
@@ -279,7 +278,7 @@ void JointVisual::UpdateFromMsg(ConstJointPtr &_msg)
           this->GetParent()->GetWorldPose().Ign());
 
       dPtr->parentAxisVis = jointVis;
-      dPtr->parentAxisVis->SetScale(dPtr->scaleToLink);
+      dPtr->parentAxisVis->SetScale(dPtr->scaleToLink.Ign());
 
       // Previously had 1 axis, which becomes axis 2 now
       if (dPtr->arrowVisual)

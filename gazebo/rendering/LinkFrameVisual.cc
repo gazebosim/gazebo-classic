@@ -43,8 +43,7 @@ void LinkFrameVisual::Load()
 
   AxisVisual::Load();
 
-  double linkSize = std::max(0.1,
-      dPtr->parent->GetBoundingBox().GetSize().GetLength());
+  double linkSize = std::max(0.1, dPtr->parent->BoundingBox().Size().Length());
   linkSize = std::min(linkSize, 1.0);
   dPtr->scaleToLink = math::Vector3(linkSize * 0.7,
                                     linkSize * 0.7,
@@ -52,7 +51,7 @@ void LinkFrameVisual::Load()
 
   // Scale according to the link it is attached to
   if (dPtr->scaleToLink != math::Vector3::Zero)
-    this->SetScale(dPtr->scaleToLink);
+    this->SetScale(dPtr->scaleToLink.Ign());
 
   // Don't scale when link is scaled
   this->GetSceneNode()->setInheritScale(false);

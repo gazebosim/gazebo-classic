@@ -137,10 +137,10 @@ void COMVisual::Load()
 
   // Get the link's bounding box
   VisualPtr vis = this->GetScene()->GetVisual(dPtr->linkName);
-  math::Box box;
+  ignition::math::Box box;
 
   if (vis)
-    box = vis->GetBoundingBox();
+    box = vis->BoundingBox();
 
   // Mass indicator: equivalent sphere with density of lead
   this->InsertMesh("unit_sphere");
@@ -166,12 +166,12 @@ void COMVisual::Load()
   this->SetMaterial("Gazebo/CoM");
 
   // CoM position indicator
-  ignition::math::Vector3d p1(0, 0, box.min.z - dPtr->inertiaPose.pos.z);
-  ignition::math::Vector3d p2(0, 0, box.max.z - dPtr->inertiaPose.pos.z);
-  ignition::math::Vector3d p3(0, box.min.y - dPtr->inertiaPose.pos.y, 0);
-  ignition::math::Vector3d p4(0, box.max.y - dPtr->inertiaPose.pos.y, 0);
-  ignition::math::Vector3d p5(box.min.x - dPtr->inertiaPose.pos.x, 0, 0);
-  ignition::math::Vector3d p6(box.max.x - dPtr->inertiaPose.pos.x, 0, 0);
+  ignition::math::Vector3d p1(0, 0, box.Min().Z() - dPtr->inertiaPose.pos.z);
+  ignition::math::Vector3d p2(0, 0, box.Max().Z() - dPtr->inertiaPose.pos.z);
+  ignition::math::Vector3d p3(0, box.Min().Y() - dPtr->inertiaPose.pos.y, 0);
+  ignition::math::Vector3d p4(0, box.Max().Y() - dPtr->inertiaPose.pos.y, 0);
+  ignition::math::Vector3d p5(box.Min().X() - dPtr->inertiaPose.pos.x, 0, 0);
+  ignition::math::Vector3d p6(box.Max().X() - dPtr->inertiaPose.pos.x, 0, 0);
   p1 += dPtr->inertiaPose.pos.Ign();
   p2 += dPtr->inertiaPose.pos.Ign();
   p3 += dPtr->inertiaPose.pos.Ign();

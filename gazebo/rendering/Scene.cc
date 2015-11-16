@@ -837,9 +837,10 @@ void Scene::SnapVisualToNearestBelow(const std::string &_visualName)
 
   if (vis && visBelow)
   {
-    math::Vector3 pos = vis->GetWorldPose().pos;
-    double dz = vis->GetBoundingBox().min.z - visBelow->GetBoundingBox().max.z;
-    pos.z -= dz;
+    ignition::math::Vector3d pos = vis->WorldPose().Pos();
+    double dz = vis->BoundingBox().Min().Z() -
+      visBelow->BoundingBox().Max().Z();
+    pos.Z() -= dz;
     vis->SetWorldPosition(pos);
   }
 }
@@ -853,16 +854,16 @@ VisualPtr Scene::GetVisualBelow(const std::string &_visualName)
   if (vis)
   {
     std::vector<VisualPtr> below;
-    this->GetVisualsBelowPoint(vis->GetWorldPose().pos, below);
+    this->GetVisualsBelowPoint(vis->WorldPose().Pos(), below);
 
     double maxZ = -10000;
 
     for (uint32_t i = 0; i < below.size(); ++i)
     {
       if (below[i]->GetName().find(vis->GetName()) != 0
-          && below[i]->GetBoundingBox().max.z > maxZ)
+          && below[i]->BoundingBox().Max().Z() > maxZ)
       {
-        maxZ = below[i]->GetBoundingBox().max.z;
+        maxZ = below[i]->BoundingBox().Max().Z();
         result = below[i];
       }
     }
