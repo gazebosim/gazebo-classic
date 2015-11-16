@@ -201,10 +201,12 @@ void JointMaker::RemoveJoint(const std::string &_jointId)
   std::string jointId = _jointId;
   JointData *joint = NULL;
 
+  auto jointIt = this->joints.find(_jointId);
+
   // Existing joint
-  if (this->joints.find(jointId) != this->joints.end())
+  if (jointIt != this->joints.end())
   {
-    joint = this->joints[jointId];
+    joint = jointIt->second;
   }
   // Joint being created
   else if (this->newJoint)
@@ -423,6 +425,12 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
             return false;
 
           this->jointCreationDialog->NewChild(this->newJoint->child->GetName());
+        }
+
+        if (this->hoverVis)
+        {
+          this->hoverVis->SetEmissive(common::Color(0, 0, 0));
+          this->hoverVis.reset();
         }
       }
     }
@@ -1408,8 +1416,8 @@ bool JointMaker::SetParentLink(rendering::VisualPtr _parentLink)
   // Choosing parent for the first time
   if (!this->newJoint)
   {
-    this->newJoint = this->CreateJointLine("JOINT_LINE",
-        _parentLink);
+    // Create new line connecting parent to mouse
+    this->newJoint = this->CreateJointLine("JOINT_LINE", _parentLink);
   }
   // Update parent of joint being created
   else if (this->newJoint->parent)
@@ -1464,7 +1472,10 @@ bool JointMaker::SetChildLink(rendering::VisualPtr _childLink)
     this->RemoveJoint("");
 
     // Create new joint with parent and child
-    this->newJoint = this->CreateJoint(parentVis, _childLink);
+    auto joint = this->CreateJoint(parentVis, _childLink);
+    this->newJoint = joint;
+    this->newJointCreated = true;
+    gui::model::Events::modelChanged();
 
     // Create hotspot visual
     this->CreateHotSpot(this->newJoint);

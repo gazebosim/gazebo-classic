@@ -510,9 +510,12 @@ void JointInspector::Open()
   std::string currentChild =
       this->configWidget->GetStringWidgetValue("child");
 
+
   this->configWidget->blockSignals(true);
-  this->configWidget->SetEnumWidgetValue("parentCombo", currentParent);
-  this->configWidget->SetEnumWidgetValue("childCombo", currentChild);
+  if (!currentParent.empty())
+    this->configWidget->SetEnumWidgetValue("parentCombo", currentParent);
+  if (!currentChild.empty())
+    this->configWidget->SetEnumWidgetValue("childCombo", currentChild);
   this->configWidget->blockSignals(false);
 
   // Reset states
@@ -556,13 +559,20 @@ void JointInspector::RestoreOriginalData()
   this->Update(jointPtr);
 
   // Update joint type and parent icon
+  this->blockSignals(true);
   this->OnJointTypeChanged(tr(msgs::Joint_Type_Name(jointPtr->type()).c_str()));
+  this->blockSignals(false);
 
   // Update custom widgets
-  this->configWidget->SetEnumWidgetValue("parentCombo",
-      this->configWidget->GetStringWidgetValue("parent"));
-  this->configWidget->SetEnumWidgetValue("childCombo",
-      this->configWidget->GetStringWidgetValue("child"));
+  std::string originalParent =
+      this->configWidget->GetStringWidgetValue("parent");
+  std::string originalChild =
+      this->configWidget->GetStringWidgetValue("child");
+
+  if (!originalParent.empty())
+    this->configWidget->SetEnumWidgetValue("parentCombo", originalParent);
+  if (!originalChild.empty())
+    this->configWidget->SetEnumWidgetValue("childCombo", originalChild);
   this->configWidget->blockSignals(false);
 
   // Reset variables, we assume the original data was valid

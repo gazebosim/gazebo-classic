@@ -203,7 +203,7 @@ void RestApi::PostJsonData(const char *_route, const char *_json)
     boost::mutex::scoped_lock lock(this->postsMutex);
     this->posts.push_back(post);
   }
-  SendUnpostedPosts();
+  this->SendUnpostedPosts();
 }
 
 /////////////////////////////////////////////////
