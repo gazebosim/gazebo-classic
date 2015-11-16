@@ -337,6 +337,33 @@ TEST_F(TimeTest, FromString)
       common::Time::FormatOption::HOURS,
       common::Time::FormatOption::SECONDS));
   EXPECT_EQ(common::Time(0), time);
+
+  // Back and forth from string
+  double timeDb = 1234567.890;
+  time.Set(timeDb);
+  EXPECT_TRUE(time.SetFromFormattedString(time.FormattedString()));
+  EXPECT_EQ(time, common::Time(timeDb));
+
+  std::string timeStr = "123 04:05:06.789";
+  EXPECT_TRUE(time.SetFromFormattedString(timeStr));
+  EXPECT_EQ(time.FormattedString(), timeStr);
+
+  // Check that overshooting is parsed well, although not possible to go back
+  timeStr = "00 00:00:2000.000";
+  EXPECT_TRUE(time.SetFromFormattedString(timeStr));
+  EXPECT_EQ(time, common::Time(2000));
+
+  timeStr = "00 00:2000:00.000";
+  EXPECT_TRUE(time.SetFromFormattedString(timeStr));
+  EXPECT_EQ(time, common::Time(2000*60));
+
+  timeStr = "00 2000:00:00.000";
+  EXPECT_TRUE(time.SetFromFormattedString(timeStr));
+  EXPECT_EQ(time, common::Time(2000*60*60));
+
+  timeStr = "2000 00:00:00.000";
+  EXPECT_TRUE(time.SetFromFormattedString(timeStr));
+  EXPECT_EQ(time, common::Time(2000*60*60*24));
 }
 
 /////////////////////////////////////////////////

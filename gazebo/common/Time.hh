@@ -132,7 +132,8 @@ namespace gazebo
           FormatOption _end = MILLISECONDS) const;
 
       /// \brief Set the time from a string formatted as "DD hh:mm:ss.mmm", with
-      /// the option to choose the start/end.
+      /// the option to choose the start/end. The separators are enforced, but
+      /// the number of digits isn't.
       /// \param[in] _timeStr String representing time.
       /// \param[in] _start Start point.
       /// \param[in] _end End point.
