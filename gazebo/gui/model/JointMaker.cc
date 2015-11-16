@@ -54,7 +54,6 @@ JointMaker::JointMaker()
   this->unitVectors.push_back(ignition::math::Vector3d::UnitY);
   this->unitVectors.push_back(ignition::math::Vector3d::UnitZ);
 
-  this->newJointCreated = false;
   this->newJoint = NULL;
   this->modelSDF.reset();
   this->jointType = JointMaker::JOINT_NONE;
@@ -142,7 +141,6 @@ JointMaker::~JointMaker()
 void JointMaker::Reset()
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
-  this->newJointCreated = false;
   if (this->newJoint)
   {
     delete this->newJoint;
@@ -416,7 +414,8 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
           if (!this->SetParentLink(this->hoverVis))
             return false;
 
-          this->jointCreationDialog->NewParent(this->newJoint->parent->GetName());
+          this->jointCreationDialog->NewParent(
+              this->newJoint->parent->GetName());
         }
         // Pressed child link
         else if (this->newJoint && this->newJoint->parent != this->hoverVis)
@@ -621,23 +620,14 @@ void JointMaker::AddJoint(JointMaker::JointType _type)
 /////////////////////////////////////////////////
 void JointMaker::Stop()
 {
-  if (this->jointType != JointMaker::JOINT_NONE)
-  {
-    this->newJointCreated = false;
-    if (this->newJoint)
-    {
-      this->newJoint->visual->DeleteDynamicLine(this->newJoint->line);
-      rendering::ScenePtr scene = this->newJoint->visual->GetScene();
-      scene->RemoveVisual(this->newJoint->visual);
-      this->newJoint->visual.reset();
-      delete this->newJoint;
-      this->newJoint = NULL;
-    }
-    this->AddJoint(JointMaker::JOINT_NONE);
-    if (this->hoverVis)
-      this->hoverVis->SetEmissive(common::Color(0, 0, 0));
-    this->hoverVis.reset();
-  }
+  this->RemoveJoint("");
+  this->AddJoint(JointMaker::JOINT_NONE);
+  if (this->hoverVis)
+    this->hoverVis->SetEmissive(common::Color(0, 0, 0));
+  this->hoverVis.reset();
+
+  if (this->jointCreationDialog && this->jointCreationDialog->isVisible())
+    this->jointCreationDialog->reject();
 }
 
 /////////////////////////////////////////////////
@@ -851,12 +841,6 @@ void JointMaker::CreateHotSpot(JointData *_joint)
 void JointMaker::Update()
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
-  if (this->newJointCreated)
-  {
-    this->CreateHotSpot(this->newJoint);
-    this->newJoint = NULL;
-    this->newJointCreated = false;
-  }
 
   // Update each joint
   for (auto it : this->joints)
@@ -1116,6 +1100,15 @@ void JointData::OpenInspector()
 /////////////////////////////////////////////////
 void JointData::Update()
 {
+  // Doesn't have a child yet, just the line connecting the parent to the mouse
+  if (this->parent && this->line && !this->hotspot && !this->child)
+  {
+    math::Vector3 origin = this->parent->GetWorldPose().pos
+        - this->parent->GetParent()->GetWorldPose().pos;
+    this->line->SetPoint(0, origin);
+    return;
+  }
+
   // get origin of parent link visuals
   math::Vector3 parentOrigin = this->parent->GetWorldPose().pos;
 
@@ -1427,13 +1420,7 @@ bool JointMaker::SetParentLink(rendering::VisualPtr _parentLink)
 //    this->SetHighlighted(this->newJoint->parent, false);
 
     this->newJoint->parent = _parentLink;
-
-    // If joint already has parent and child
-    if (this->newJoint->hotspot)
-      this->newJoint->Update();
-    // If joint has only parent
-    else
-      this->newJoint->UpdateJointLine();
+    this->newJoint->Update();
   }
   else
   {
@@ -1474,7 +1461,6 @@ bool JointMaker::SetChildLink(rendering::VisualPtr _childLink)
     // Create new joint with parent and child
     auto joint = this->CreateJoint(parentVis, _childLink);
     this->newJoint = joint;
-    this->newJointCreated = true;
     gui::model::Events::modelChanged();
 
     // Create hotspot visual
@@ -1510,10 +1496,7 @@ void JointMaker::NewType(const int _typeInt)
   if (this->newJoint && type != JOINT_NONE)
   {
     this->newJoint->type = type;
-    if (this->newJoint->hotspot)
-      this->newJoint->Update();
-    else
-      this->newJoint->UpdateJointLine();
+    this->newJoint->Update();
   }
 }
 
@@ -1559,16 +1542,5 @@ rendering::VisualPtr JointMaker::LinkVisualFromName(const std::string &_name)
     return NULL;
 
   return scene->GetVisual(scopedName);
-}
-
-/////////////////////////////////////////////////
-void JointData::UpdateJointLine()
-{
-  if (!this->parent)
-    return;
-
-  math::Vector3 origin = this->parent->GetWorldPose().pos
-      - this->parent->GetParent()->GetWorldPose().pos;
-  this->line->SetPoint(0, origin);
 }
 

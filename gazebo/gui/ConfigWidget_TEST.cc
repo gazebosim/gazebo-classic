@@ -962,8 +962,10 @@ void ConfigWidget_TEST::ConfigWidgetReadOnly()
     QCOMPARE(visualConfigWidget->GetWidgetReadOnly("id"), true);
     QCOMPARE(visualConfigWidget->GetWidgetReadOnly("pose"), true);
     {
- //     auto spins = visualConfigWidget->ConfigWidgetByName("pose")->
- //         findChildren<QDoubleSpinBoxes *>();
+//      auto childWidgets = visualConfigWidget->ConfigWidgetByName("pose")->
+//          findChildren<QWidget *>();
+//      for (auto it : childWidgets)
+//        QCOMPARE(it->isEnabled(), false);
     }
     QCOMPARE(visualConfigWidget->GetWidgetReadOnly("geometry"), true);
     QCOMPARE(visualConfigWidget->GetWidgetReadOnly("material::diffuse"), true);

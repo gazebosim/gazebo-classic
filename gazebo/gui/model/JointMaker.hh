@@ -301,15 +301,20 @@ namespace gazebo
       private: JointData *CreateJointLine(const std::string &_name,
           rendering::VisualPtr _parent);
 
+      /// \brief Get a link's visual from the link's name.
+      /// \param[in] _name Link name, scoped or not.
+      /// \return Pointer to link visual.
       private: rendering::VisualPtr LinkVisualFromName(
           const std::string &_name);
 
       /// \brief Set a new parent link for the joint being created.
+      /// \sa SetParentLink(const std::string &_name);
       /// \param[in] _parentLink Pointer to the link visual.
       /// \return True if successfully set new parent.
       private: bool SetParentLink(rendering::VisualPtr _parentLink);
 
       /// \brief Set a new child link for the joint being created.
+      /// \sa SetChildLink(const std::string &_name);
       /// \param[in] _childLink Pointer to the link visual.
       /// \return True if successfully set new child.
       private: bool SetChildLink(rendering::VisualPtr _childLink);
@@ -385,6 +390,7 @@ namespace gazebo
       /// the link's fully scoped name and the second is the leaf name.
       private: std::map<std::string, std::string> linkList;
 
+      /// \brief Dialog for creating a new joint.
       private: JointCreationDialog *jointCreationDialog;
     };
     /// \}
@@ -401,9 +407,6 @@ namespace gazebo
 
       /// \brief Update this joint data.
       public: void Update();
-
-      /// \brief Update only the line of this joint, before there is a hotspot.
-      public: void UpdateJointLine();
 
       /// \brief Name of the joint.
       public: std::string name;
