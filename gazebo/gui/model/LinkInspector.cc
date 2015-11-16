@@ -272,7 +272,7 @@ void LinkInspector::OnDensityValueChanged(const double &_value)
   double volume = ComputeVolume();
   double mass = volume * _value;
 
-  if (!math::equal(this->linkConfig->Mass(), mass))
+  if (!ignition::math::equal(this->linkConfig->Mass(), mass))
   {
     ignition::math::Vector3d I = ComputeInertia(mass);
     this->linkConfig->SetMass(mass);
