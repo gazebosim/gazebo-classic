@@ -16,7 +16,7 @@ message FollowModel
   /// model reference frame.
   optional bool is_relative = 2;
 
-  /// \brief Posititon of the camera.
+  /// \brief Position of the camera.
   optional Vector3d xyz = 3;
 
   /// \brief Distance between the camera and the model.
