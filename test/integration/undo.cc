@@ -275,7 +275,7 @@ void UndoTest::UndoResetTime()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/shapes.world");
+  this->Load("worlds/shapes.world", false, false, true);
 
   // Get world
   gazebo::physics::WorldPtr world = gazebo::physics::get_world("default");
@@ -363,7 +363,7 @@ void UndoTest::UndoResetWorld()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/shapes.world");
+  this->Load("worlds/shapes.world", false, false, true);
 
   // Get world
   gazebo::physics::WorldPtr world = gazebo::physics::get_world("default");
@@ -456,7 +456,7 @@ void UndoTest::UndoResetModelPoses()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/shapes.world");
+  this->Load("worlds/shapes.world", false, false, true);
 
   // Get world
   gazebo::physics::WorldPtr world = gazebo::physics::get_world("default");
