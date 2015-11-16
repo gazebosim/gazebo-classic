@@ -355,10 +355,14 @@ void ModelMaker::Stop()
   // Remove the temporary visual from the scene
   rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
   if (scene)
-    scene->RemoveVisual(dPtr->modelVisual);
-  for (auto vis : dPtr->visuals)
   {
-    scene->RemoveVisual(vis);
+    for (auto vis : dPtr->visuals)
+    {
+      auto v = vis.lock();
+      if (v)
+        scene->RemoveVisual(v);
+    }
+    scene->RemoveVisual(dPtr->modelVisual);
   }
   dPtr->modelVisual.reset();
   dPtr->modelSDF.reset();

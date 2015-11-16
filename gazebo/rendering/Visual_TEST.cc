@@ -1409,6 +1409,7 @@ TEST_F(Visual_TEST, Clone)
 
   gazebo::rendering::VisualPtr vis1Clone = vis1->Clone("vis1_clone",
       vis1->GetParent());
+  EXPECT_TRUE(vis1Clone != NULL);
   EXPECT_EQ(vis1Clone->GetName(), "vis1_clone");
 
   EXPECT_EQ(vis1Clone->GetChildCount(), vis1->GetChildCount());
