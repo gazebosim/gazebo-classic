@@ -361,7 +361,7 @@ void LogPlayWidget::EmitSetCurrentTime(const common::Time &_time)
     if (this->dataPtr->lessThan1h)
     {
       this->SetCurrentTime(QString::fromStdString(time.FormattedString(
-	  common::Time::FormatOption::MINUTES)));
+      common::Time::FormatOption::MINUTES)));
     }
     else
     {

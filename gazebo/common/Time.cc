@@ -399,7 +399,7 @@ bool Time::SetFromFormattedString(std::string _timeStr, FormatOption _start,
     {
       d = stoi(_timeStr);
     }
-    catch (std::invalid_argument)
+    catch(std::invalid_argument)
     {
       gzerr << "Can't convert [" << _timeStr << "] to int" << std::endl;
       return false;
@@ -432,7 +432,7 @@ bool Time::SetFromFormattedString(std::string _timeStr, FormatOption _start,
     {
       h = stoi(_timeStr);
     }
-    catch (std::invalid_argument)
+    catch(std::invalid_argument)
     {
       gzerr << "Can't convert [" << _timeStr << "] to int" << std::endl;
       return false;
@@ -459,7 +459,7 @@ bool Time::SetFromFormattedString(std::string _timeStr, FormatOption _start,
     {
       m = stoi(_timeStr);
     }
-    catch (std::invalid_argument)
+    catch(std::invalid_argument)
     {
       gzerr << "Can't convert [" << _timeStr << "] to int" << std::endl;
       return false;
@@ -486,7 +486,7 @@ bool Time::SetFromFormattedString(std::string _timeStr, FormatOption _start,
     {
       s = stoi(_timeStr);
     }
-    catch (std::invalid_argument)
+    catch(std::invalid_argument)
     {
       gzerr << "Can't convert [" << _timeStr << "] to int" << std::endl;
       return false;
@@ -512,7 +512,7 @@ bool Time::SetFromFormattedString(std::string _timeStr, FormatOption _start,
     {
       ms = stoi(_timeStr);
     }
-    catch (std::invalid_argument)
+    catch(std::invalid_argument)
     {
       gzerr << "Can't convert [" << _timeStr << "] to int" << std::endl;
       return false;
