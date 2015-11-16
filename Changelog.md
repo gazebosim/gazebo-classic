@@ -1,5 +1,8 @@
 ## Gazebo 7.0
 
+1. Switching to ignition math for the rendering library.
+    * [Pull request #1993](https://bitbucket.org/osrf/gazebo/pull-request/1993)
+
 1. Update rest web plugin to publish response messages and display login user name in toolbar.
     * [Pull request #1956](https://bitbucket.org/osrf/gazebo/pull-request/1956)
 
