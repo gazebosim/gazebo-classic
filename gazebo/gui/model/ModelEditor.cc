@@ -23,12 +23,16 @@
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Assert.hh"
 
+#include "gazebo/rendering/UserCamera.hh"
+
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/RenderWidget.hh"
 #include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/TopToolbar.hh"
+#include "gazebo/gui/model/EditorMaterialSwitcher.hh"
 #include "gazebo/gui/model/ModelTreeWidget.hh"
 #include "gazebo/gui/model/ModelEditorPalette.hh"
 #include "gazebo/gui/model/ModelEditorEvents.hh"
@@ -36,6 +40,7 @@
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/ModelEditorPrivate.hh"
 #include "gazebo/gui/model/ModelEditor.hh"
+#include "gazebo/gui/model/ModelEditorTypes.hh"
 
 #ifdef HAVE_GRAPHVIZ
 #include "gazebo/gui/model/SchematicViewWidget.hh"
@@ -58,6 +63,20 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   this->tabWidget->addTab(this->dataPtr->modelTree, tr("Settings"));
 
   GZ_ASSERT(this->tabWidget != NULL, "Editor tab widget is NULL");
+
+  rendering::CameraPtr camera = boost::dynamic_pointer_cast<rendering::Camera>(
+      gui::get_active_camera());
+  if (camera)
+  {
+    this->dataPtr->materialSwitcher.reset(new EditorMaterialSwitcher(camera));
+  }
+  else
+  {
+    gzerr << "User camera is NULL. "
+        << "Non-editable models will keep their original material"
+        << std::endl;
+  }
+
 
   this->dataPtr->schematicViewAct = NULL;
   this->dataPtr->svWidget = NULL;
@@ -414,6 +433,7 @@ void ModelEditor::OnEdit(bool /*_checked*/)
 #endif
 
   this->dataPtr->active = !this->dataPtr->active;
+  this->ToggleMaterialScheme();
   this->ToggleToolbar();
   this->ToggleInsertWidget();
   // g_editModelAct->setChecked(this->dataPtr->active);
@@ -476,6 +496,15 @@ void ModelEditor::OnAction(QAction *_action)
 {
   if (_action != this->dataPtr->jointAct)
     this->dataPtr->modelPalette->CreateJoint("none");
+}
+
+/////////////////////////////////////////////////
+void ModelEditor::ToggleMaterialScheme()
+{
+  if (this->dataPtr->active)
+    this->dataPtr->materialSwitcher->SetMaterialScheme("ModelEditor");
+  else
+    this->dataPtr->materialSwitcher->SetMaterialScheme("");
 }
 
 /////////////////////////////////////////////////

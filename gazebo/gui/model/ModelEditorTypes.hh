@@ -15,24 +15,22 @@
  *
 */
 
-#ifndef _GAZEBO_TOP_TOOLBAR_TEST_HH_
-#define _GAZEBO_TOP_TOOLBAR_TEST_HH_
+#ifndef _GAZEBO_MODEL_EDITOR_TYPES_HH_
+#define _GAZEBO_MODEL_EDITOR_TYPES_HH_
 
-#include "gazebo/gui/QTestFixture.hh"
+#include <memory>
 
-/// \brief A test class for the TopToolbar widget.
-class TopToolbar_TEST : public QTestFixture
+namespace gazebo
 {
-  Q_OBJECT
+  /// \brief GUI model editor forward declarations and type defines
+  namespace gui
+  {
+    class EditorMaterialSwitcher;
 
-  /// \brief Test different window modes.
-  private slots: void WindowModes();
-
-  /// \brief Test inserting actions, separators and widgets.
-  private slots: void Insert();
-
-  /// \brief Test adding actions, separators and widgets.
-  private slots: void Add();
-};
+    /// \def EditorMaterialSwitcherPtr
+    /// \brief Shared pointer to a EditorMaterialSwitcherPtr object
+    using EditorMaterialSwitcherPtr = std::shared_ptr<EditorMaterialSwitcher>;
+  }
+}
 
 #endif

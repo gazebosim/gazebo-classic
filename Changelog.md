@@ -1,5 +1,8 @@
 ## Gazebo 7.0
 
+1. Update rest web plugin to publish response messages and display login user name in toolbar.
+    * [Pull request #1956](https://bitbucket.org/osrf/gazebo/pull-request/1956)
+
 1. Improve overall speed of log playback. Added new functions to LogPlay.
    Use tinyxml2 for playback.
     * [Pull request #1931](https://bitbucket.org/osrf/gazebo/pull-request/1931)
@@ -116,6 +119,10 @@ using the same arguments used in the command line.
     * [Pull request #1828](https://bitbucket.org/osrf/gazebo/pull-request/1828)
 
 1. Model editor updates
+
+    1. Make non-editable background models white in model editor
+        * [Pull request #1950](https://bitbucket.org/osrf/gazebo/pull-request/1950)
+
     1. Choose / swap parent and child links in joint inspector
         * [Pull request #1887](https://bitbucket.org/osrf/gazebo/pull-request/1887)
         * [Issue #1500](https://bitbucket.org/osrf/gazebo/issue/1500)

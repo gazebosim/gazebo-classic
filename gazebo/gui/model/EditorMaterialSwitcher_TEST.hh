@@ -15,24 +15,18 @@
  *
 */
 
-#ifndef _GAZEBO_TOP_TOOLBAR_TEST_HH_
-#define _GAZEBO_TOP_TOOLBAR_TEST_HH_
+#ifndef _GAZEBO_EDITOR_MATERIAL_SWITCHER_TEST_HH_
+#define _GAZEBO_EDITOR_MATERIAL_SWITCHER_TEST_HH_
 
 #include "gazebo/gui/QTestFixture.hh"
 
-/// \brief A test class for the TopToolbar widget.
-class TopToolbar_TEST : public QTestFixture
+/// \brief A test class for the EditorMaterialSwitcher class.
+class EditorMaterialSwitcher_TEST : public QTestFixture
 {
   Q_OBJECT
 
-  /// \brief Test different window modes.
-  private slots: void WindowModes();
-
-  /// \brief Test inserting actions, separators and widgets.
-  private slots: void Insert();
-
-  /// \brief Test adding actions, separators and widgets.
-  private slots: void Add();
+  /// \brief Tests creating a material switcher.
+  private slots: void CreateMaterialSwitcher();
 };
 
 #endif
