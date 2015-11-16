@@ -31,6 +31,10 @@
 #include "gazebo/physics/bullet/bullet_math_inc.h"
 #endif
 
+#ifdef HAVE_BULLET
+#include "gazebo/physics/bullet/bullet_math_inc.h"
+#endif
+
 #define PHYSICS_TOL 1e-2
 using namespace gazebo;
 
