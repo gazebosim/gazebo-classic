@@ -268,7 +268,7 @@ ignition::math::Quaterniond ApplyWrenchVisual::QuaternionFromVector(
     const ignition::math::Vector3d &_vec)
 {
   double roll = 0;
-  double pitch = -atan2(_vec.Z(), sqrt(pow(_vec.Z(), 2) + pow(_vec.Y(), 2)));
+  double pitch = -atan2(_vec.Z(), sqrt(pow(_vec.X(), 2) + pow(_vec.Y(), 2)));
   double yaw = atan2(_vec.Y(), _vec.X());
 
   return ignition::math::Quaterniond(roll, pitch, yaw);
