@@ -94,7 +94,7 @@ namespace gazebo
       /// \param[in] Name of the scene to remove.
       public: void RemoveScene(const std::string &_scene);
 
-      /// \brief Update the shaders. This should not be called frequently.
+      /// \brief Update the shaders.
       public: void UpdateShaders();
 
       /// \brief Set an Ogre::Entity to use RT shaders.
