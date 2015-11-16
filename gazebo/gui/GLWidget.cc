@@ -328,6 +328,7 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
   if (_event->key() == Qt::Key_Delete &&
       this->selectionLevel == SelectionLevels::MODEL)
   {
+    ModelManipulator::Instance()->Detach();
     boost::mutex::scoped_lock lock(this->selectedVisMutex);
     while (!this->selectedVisuals.empty())
     {
@@ -1100,8 +1101,8 @@ void GLWidget::OnManipMode(const std::string &_mode)
       for (std::vector<rendering::VisualPtr>::iterator it
           = this->selectedVisuals.begin(); it != --this->selectedVisuals.end();)
       {
-         (*it)->SetHighlighted(false);
-         it = this->selectedVisuals.erase(it);
+        (*it)->SetHighlighted(false);
+        it = this->selectedVisuals.erase(it);
       }
     }
   }

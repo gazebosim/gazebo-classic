@@ -153,6 +153,7 @@ set (gtest_sources_dri
   GpuLaser_TEST.cc
   Heightmap_TEST.cc
   JointVisual_TEST.cc
+  Light_Rendering_TEST.cc
   LinkFrameVisual_TEST.cc
   OriginVisual_TEST.cc
   Scene_TEST.cc

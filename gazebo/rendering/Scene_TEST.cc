@@ -125,7 +125,9 @@ TEST_F(Scene_TEST, RemoveModelVisual)
   // Send request to delete the box model
   transport::NodePtr node = transport::NodePtr(new transport::Node());
   node->Init();
+  std::cerr << " request no reply " << std::endl;
   transport::requestNoReply(node, "entity_delete", "box");
+  std::cerr << " request no reply done " << std::endl;
 
   sleep = 0;
   while (box && sleep < maxSleep)
@@ -153,6 +155,8 @@ TEST_F(Scene_TEST, RemoveModelVisual)
 
   // Check that the link frame visuals were properly removed
   EXPECT_TRUE(scene->GetVisual("box::link_LINK_FRAME_VISUAL__") == NULL);
+
+  std::cerr << " done!!!" << std::endl;
 }
 
 /////////////////////////////////////////////////

@@ -170,8 +170,7 @@ void Visual::Init(const std::string &_name, VisualPtr _parent,
 //////////////////////////////////////////////////
 Visual::~Visual()
 {
-  if (this->dataPtr->preRenderConnection)
-    event::Events::DisconnectPreRender(this->dataPtr->preRenderConnection);
+  this->Fini();
 
   delete this->dataPtr->boundingBox;
 
@@ -181,22 +180,12 @@ Visual::~Visual()
     delete *iter;
     */
   this->dataPtr->lines.clear();
-
-  if (this->dataPtr->sceneNode != NULL)
-  {
-    // seems we never get into this block because Fini() runs first
-    this->DestroyAllAttachedMovableObjects(this->dataPtr->sceneNode);
-    this->dataPtr->sceneNode->removeAndDestroyAllChildren();
-    this->dataPtr->scene->GetManager()->destroySceneNode(
-        this->dataPtr->sceneNode->getName());
-    this->dataPtr->sceneNode = NULL;
-  }
-
   this->dataPtr->scene.reset();
   this->dataPtr->sdf->Reset();
   this->dataPtr->sdf.reset();
   this->dataPtr->parent.reset();
   this->dataPtr->children.clear();
+  this->dataPtr->plugins.clear();
 
   delete this->dataPtr;
   this->dataPtr = 0;
@@ -205,7 +194,15 @@ Visual::~Visual()
 /////////////////////////////////////////////////
 void Visual::Fini()
 {
-  this->dataPtr->plugins.clear();
+  if (!this->dataPtr->scene)
+    return;
+
+  while (!this->dataPtr->children.empty())
+  {
+    VisualPtr childVis = this->dataPtr->children.front();
+    this->DetachVisual(childVis);
+    childVis->Fini();
+  }
 
   // Detach from the parent
   if (this->dataPtr->parent)
@@ -213,7 +210,7 @@ void Visual::Fini()
 
   if (this->dataPtr->sceneNode)
   {
-    this->dataPtr->sceneNode->detachAllObjects();
+    this->DestroyAllAttachedMovableObjects(this->dataPtr->sceneNode);
     this->dataPtr->scene->GetManager()->destroySceneNode(
         this->dataPtr->sceneNode);
     this->dataPtr->sceneNode = NULL;
@@ -225,6 +222,9 @@ void Visual::Fini()
     this->dataPtr->preRenderConnection.reset();
   }
 
+  if (this->dataPtr->scene->GetVisual(this->dataPtr->id))
+    this->dataPtr->scene->RemoveVisual(this->dataPtr->id);
+
   this->dataPtr->scene.reset();
 }
 
@@ -234,9 +234,16 @@ VisualPtr Visual::Clone(const std::string &_name, VisualPtr _newParent)
   VisualPtr result(new Visual(_name, _newParent));
   result->Load(this->dataPtr->sdf);
   result->SetScale(this->dataPtr->scale);
+  std::string visName = this->GetName();
   for (auto iter: this->dataPtr->children)
   {
-    iter->Clone(iter->GetName(), result);
+    // give a unique name by prefixing child visuals with the new clone name
+    std::string childName = iter->GetName();
+    std::string newName = childName;
+    size_t pos = childName.find(visName);
+    if (pos == 0)
+      newName = _name + childName.substr(pos+visName.size());
+    iter->Clone(newName, result);
   }
 
   if (_newParent == this->dataPtr->scene->GetWorldVisual())
@@ -265,15 +272,20 @@ void Visual::DestroyAllAttachedMovableObjects(Ogre::SceneNode *_sceneNode)
     else
       delete ent;
   }
+  this->dataPtr->lines.clear();
 
-  // Recurse to child SceneNodes
-  Ogre::SceneNode::ChildNodeIterator itChild = _sceneNode->getChildIterator();
-
-  while (itChild.hasMoreElements())
+  // only recurse if there are no child visuals otherwise let them clean up
+  // after themselves in Fini()
+  if (this->dataPtr->children.empty())
   {
-    Ogre::SceneNode* pChildNode =
-        static_cast<Ogre::SceneNode*>(itChild.getNext());
-    this->DestroyAllAttachedMovableObjects(pChildNode);
+    // Recurse to child SceneNodes
+    Ogre::SceneNode::ChildNodeIterator itChild = _sceneNode->getChildIterator();
+    while (itChild.hasMoreElements())
+    {
+      Ogre::SceneNode* pChildNode =
+          static_cast<Ogre::SceneNode*>(itChild.getNext());
+      this->DestroyAllAttachedMovableObjects(pChildNode);
+    }
   }
 }
 
@@ -1444,12 +1456,10 @@ void Visual::SetTransparencyInnerLoop(Ogre::SceneNode *_sceneNode)
           if (this->dataPtr->transparency > 0.0)
           {
             pass->setDepthWriteEnabled(false);
-            pass->setDepthCheckEnabled(true);
           }
           else
           {
             pass->setDepthWriteEnabled(true);
-            pass->setDepthCheckEnabled(true);
           }
 
           dc = pass->getDiffuse();

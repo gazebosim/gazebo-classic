@@ -77,6 +77,7 @@ bool ModelMaker::InitFromModel(const std::string &_modelName)
   {
     scene->RemoveVisual(dPtr->modelVisual);
     dPtr->modelVisual.reset();
+    dPtr->visuals.clear();
   }
 
   rendering::VisualPtr vis = scene->GetVisual(_modelName);
@@ -214,11 +215,11 @@ bool ModelMaker::Init()
   if (modelElem->HasElement("pose"))
     modelPose = modelElem->Get<ignition::math::Pose3d>("pose");
 
-  modelName = dPtr->node->GetTopicNamespace() + "::" +
-    modelElem->Get<std::string>("name");
+  modelName = modelElem->Get<std::string>("name");
 
-  dPtr->modelVisual.reset(new rendering::Visual(modelName,
-                          scene->GetWorldVisual()));
+  dPtr->modelVisual.reset(new rendering::Visual(
+      dPtr->node->GetTopicNamespace() + "::" + modelName,
+      scene->GetWorldVisual()));
   dPtr->modelVisual->Load();
   dPtr->modelVisual->SetPose(modelPose);
 
@@ -227,55 +228,7 @@ bool ModelMaker::Init()
 
   if (modelElem->GetName() == "model")
   {
-    sdf::ElementPtr linkElem = modelElem->GetElement("link");
-
-    try
-    {
-      while (linkElem)
-      {
-        std::string linkName = linkElem->Get<std::string>("name");
-        if (linkElem->HasElement("pose"))
-          linkPose = linkElem->Get<ignition::math::Pose3d>("pose");
-        else
-          linkPose.Set(0, 0, 0, 0, 0, 0);
-
-        rendering::VisualPtr linkVisual(new rendering::Visual(modelName + "::" +
-              linkName, dPtr->modelVisual));
-        linkVisual->Load();
-        linkVisual->SetPose(linkPose);
-
-        int visualIndex = 0;
-        sdf::ElementPtr visualElem;
-
-        if (linkElem->HasElement("visual"))
-          visualElem = linkElem->GetElement("visual");
-
-        while (visualElem)
-        {
-          if (visualElem->HasElement("pose"))
-            visualPose = visualElem->Get<ignition::math::Pose3d>("pose");
-          else
-            visualPose.Set(0, 0, 0, 0, 0, 0);
-
-          std::ostringstream visualName;
-          visualName << modelName << "::" << linkName << "::Visual_"
-            << visualIndex++;
-          rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
-                linkVisual));
-
-          visVisual->Load(visualElem);
-          visVisual->SetPose(visualPose);
-
-          visualElem = visualElem->GetNextElement("visual");
-        }
-
-        linkElem = linkElem->GetNextElement("link");
-      }
-    }
-    catch(common::Exception &_e)
-    {
-      return false;
-    }
+    this->CreateModelFromSDF(modelElem);
   }
   else if (modelElem->GetName() == "light")
   {
@@ -290,6 +243,110 @@ bool ModelMaker::Init()
 }
 
 /////////////////////////////////////////////////
+void ModelMaker::CreateModelFromSDF(sdf::ElementPtr _modelElem)
+{
+  ModelMakerPrivate *dPtr =
+      reinterpret_cast<ModelMakerPrivate *>(this->dataPtr);
+
+  math::Pose linkPose, visualPose;
+  std::list<std::pair<sdf::ElementPtr, rendering::VisualPtr> > modelElemList;
+
+  std::pair<sdf::ElementPtr, rendering::VisualPtr> pair(
+      _modelElem, dPtr->modelVisual);
+  modelElemList.push_back(pair);
+
+  while (!modelElemList.empty())
+  {
+    sdf::ElementPtr modelElem = modelElemList.front().first;
+    rendering::VisualPtr modelVis = modelElemList.front().second;
+    modelElemList.pop_front();
+
+    std::string modelName = modelVis->GetName();
+
+    // create model
+    sdf::ElementPtr linkElem;
+    if (modelElem->HasElement("link"))
+      linkElem = modelElem->GetElement("link");
+
+    try
+    {
+      while (linkElem)
+      {
+        std::string linkName = linkElem->Get<std::string>("name");
+        if (linkElem->HasElement("pose"))
+          linkPose = linkElem->Get<math::Pose>("pose");
+        else
+          linkPose.Set(0, 0, 0, 0, 0, 0);
+
+        rendering::VisualPtr linkVisual(new rendering::Visual(modelName + "::" +
+              linkName, modelVis));
+        linkVisual->Load();
+        linkVisual->SetPose(linkPose);
+        dPtr->visuals.push_back(linkVisual);
+
+        int visualIndex = 0;
+        sdf::ElementPtr visualElem;
+
+        if (linkElem->HasElement("visual"))
+          visualElem = linkElem->GetElement("visual");
+
+        while (visualElem)
+        {
+          if (visualElem->HasElement("pose"))
+            visualPose = visualElem->Get<math::Pose>("pose");
+          else
+            visualPose.Set(0, 0, 0, 0, 0, 0);
+
+          std::ostringstream visualName;
+          visualName << modelName << "::" << linkName << "::Visual_"
+            << visualIndex++;
+          rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
+                linkVisual));
+
+          visVisual->Load(visualElem);
+          visVisual->SetPose(visualPose);
+          dPtr->visuals.push_back(visVisual);
+
+          visualElem = visualElem->GetNextElement("visual");
+        }
+
+        linkElem = linkElem->GetNextElement("link");
+      }
+    }
+    catch(common::Exception &_e)
+    {
+      this->Stop();
+    }
+
+    // append other model elems to the list
+    if (modelElem->HasElement("model"))
+    {
+      sdf::ElementPtr childElem = modelElem->GetElement("model");
+      while (childElem)
+      {
+        rendering::VisualPtr childVis;
+        std::string childName = childElem->Get<std::string>("name");
+        childVis.reset(new rendering::Visual(modelName + "::" + childName,
+            modelVis));
+        childVis->Load();
+        dPtr->visuals.push_back(childVis);
+
+        math::Pose childPose;
+        if (childElem->HasElement("pose"))
+          childPose = childElem->Get<math::Pose>("pose");
+        childVis->SetPose(childPose);
+
+        std::pair<sdf::ElementPtr, rendering::VisualPtr> childPair(
+            childElem, childVis);
+        modelElemList.push_back(childPair);
+
+        childElem = childElem->GetNextElement("model");
+      }
+    }
+  }
+}
+
+/////////////////////////////////////////////////
 void ModelMaker::Stop()
 {
   ModelMakerPrivate *dPtr =
@@ -299,6 +356,10 @@ void ModelMaker::Stop()
   rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
   if (scene)
     scene->RemoveVisual(dPtr->modelVisual);
+  for (auto vis : dPtr->visuals)
+  {  
+    scene->RemoveVisual(vis);
+  }
   dPtr->modelVisual.reset();
   dPtr->modelSDF.reset();
 
@@ -383,4 +444,3 @@ void ModelMaker::SetEntityPosition(const ignition::math::Vector3d &_pos)
 
   dPtr->modelVisual->SetWorldPosition(_pos);
 }
-

@@ -85,54 +85,6 @@ void SelectionObj::Load()
 }
 
 /////////////////////////////////////////////////
-void SelectionObj::Fini()
-{
-  SelectionObjPrivate *dPtr =
-      reinterpret_cast<SelectionObjPrivate *>(this->dataPtr);
-
-  // Destroy objects and nodes created by this visual
-  if (!dPtr->scene)
-    return;
-  Ogre::SceneManager *manager = dPtr->scene->GetManager();
-  if (!manager)
-    return;
-
-  // transVisual / rotVisual / scaleVisual
-  for (unsigned int i = 0; i < this->GetChildCount(); ++i)
-  {
-    if (!this->GetChild(i))
-      continue;
-
-    // transXVisual / transYVisual / transZVisual
-    for (unsigned int j = 0; j < this->GetChild(i)->GetChildCount(); ++j)
-    {
-      if (!this->GetChild(i)->GetChild(j) ||
-          !this->GetChild(i)->GetChild(j)->GetSceneNode())
-      {
-        continue;
-      }
-
-      // transShaftXNode / transHeadXNode
-      for (auto k = this->GetChild(i)->GetChild(j)->GetSceneNode()->
-          numChildren()-1; k >= 0; --k)
-      {
-        Ogre::SceneNode *toDestroy =
-            reinterpret_cast<Ogre::SceneNode *>(
-            this->GetChild(i)->
-            GetChild(j)->
-            GetSceneNode()->
-            getChild(k));
-
-        manager->destroyMovableObject(toDestroy->getAttachedObject(0));
-        manager->destroySceneNode(toDestroy);
-      }
-    }
-  }
-
-  Visual::Fini();
-}
-
-/////////////////////////////////////////////////
 void SelectionObj::Attach(rendering::VisualPtr _vis)
 {
   SelectionObjPrivate *dPtr =
@@ -185,6 +137,12 @@ void SelectionObj::UpdateSize()
     this->SetHandleMaterial(ROT_Y, dPtr->yAxisMat, false);
     this->SetHandleMaterial(ROT_Z, dPtr->zAxisMat, false);
   }
+  // FIXME cascade transparency does not seem to work work properly
+  //  so need to set child transparency directly
+  // dPtr->rotVisual->SetTransparency(0.5);
+  dPtr->rotXVisual->GetChild(0)->SetTransparency(0.5);
+  dPtr->rotYVisual->GetChild(0)->SetTransparency(0.5);
+  dPtr->rotZVisual->GetChild(0)->SetTransparency(0.5);
   this->SetScale(math::Vector3(max, max, max));
 }
 
@@ -298,11 +256,7 @@ void SelectionObj::SetState(SelectionMode _state)
 
   if (dPtr->selectedVis)
   {
-    Ogre::MaterialPtr mat =
-      Ogre::MaterialManager::getSingleton().getByName(
-      dPtr->selectedVis->GetMaterialName());
-    mat->getTechnique(0)->getPass(0)->getTextureUnitState(0)->setAlphaOperation(
-      Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL, Ogre::LBS_CURRENT, 0.5);
+    dPtr->selectedVis->SetTransparency(0.5);
     dPtr->selectedVis.reset();
   }
 
@@ -327,11 +281,7 @@ void SelectionObj::SetState(SelectionMode _state)
 
   if (dPtr->selectedVis)
   {
-    Ogre::MaterialPtr mat =
-      Ogre::MaterialManager::getSingleton().getByName(
-      dPtr->selectedVis->GetMaterialName());
-    mat->getTechnique(0)->getPass(0)->getTextureUnitState(0)->setAlphaOperation(
-      Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL, Ogre::LBS_CURRENT, 0.7);
+    dPtr->selectedVis->SetTransparency(0.3);
   }
 }
 
@@ -363,7 +313,7 @@ void SelectionObj::CreateTranslateVisual()
   // Translation mainipulation tool
   dPtr->transVisual.reset(new rendering::Visual(
       this->GetName() + "__SELECTION_OBJ_TRANS__",
-      shared_from_this()));
+      shared_from_this(), false));
   dPtr->transVisual->Load();
 
   dPtr->transXVisual.reset(
@@ -383,79 +333,82 @@ void SelectionObj::CreateTranslateVisual()
   this->InsertMesh("axis_shaft");
   this->InsertMesh("axis_head");
 
+  VisualPtr transShaftXVis(
+      new Visual("__SELECTION_OBJ__TRANS_SHAFT_NODE_X__"  + this->GetName(),
+      dPtr->transXVisual, false));
+  transShaftXVis->Load();
+  transShaftXVis->AttachMesh("axis_shaft");
+  transShaftXVis->SetScale(ignition::math::Vector3d(0.5, 0.5, 1.0));
+  transShaftXVis->SetPosition(ignition::math::Vector3d(0, 0, 0.1));
   Ogre::MovableObject *shaftXObj =
-      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
-      "__SELECTION_OBJ_TRANS_SHAFT_X__" + this->GetName(), "axis_shaft"));
-  Ogre::MovableObject *headXObj =
-      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
-      "__SELECTION_OBJ_TRANS_HEAD_X__" + this->GetName(), "axis_head"));
-  Ogre::SceneNode *transShaftXNode =
-      dPtr->transXVisual->GetSceneNode()->createChildSceneNode(
-      "__SELECTION_OBJ__TRANS_SHAFT_NODE_X__"  + this->GetName());
-  Ogre::SceneNode *transHeadXNode =
-      dPtr->transXVisual->GetSceneNode()->createChildSceneNode(
-      "__SELECTION_OBJ__TRANS_HEAD_NODE_X__"  + this->GetName());
-  transShaftXNode->attachObject(shaftXObj);
-  transShaftXNode->setScale(0.5, 0.5, 1.0);
-  transShaftXNode->setPosition(0, 0, 0.1);
-  transHeadXNode->attachObject(headXObj);
-  transHeadXNode->setScale(0.5, 0.5, 0.5);
-  transHeadXNode->setPosition(0, 0, 0.22);
+      transShaftXVis->GetSceneNode()->getAttachedObject(0);
   shaftXObj->getUserObjectBindings().setUserAny(
-      Ogre::Any(std::string("trans_x")));
-  headXObj->getUserObjectBindings().setUserAny(
-      Ogre::Any(std::string("trans_x")));
+        Ogre::Any(std::string("trans_x")));
   shaftXObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
+
+  VisualPtr transHeadXVis(
+      new Visual("__SELECTION_OBJ__TRANS_HEAD_NODE_X__"  + this->GetName(),
+      dPtr->transXVisual, false));
+  transHeadXVis->Load();
+  transHeadXVis->AttachMesh("axis_head");
+  transHeadXVis->SetScale(ignition::math::Vector3d(0.5, 0.5, 0.5));
+  transHeadXVis->SetPosition(ignition::math::Vector3d(0, 0, 0.22));
+  Ogre::MovableObject *headXObj =
+      transHeadXVis->GetSceneNode()->getAttachedObject(0);
+  headXObj->getUserObjectBindings().setUserAny(
+        Ogre::Any(std::string("trans_x")));
   headXObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
+  VisualPtr transShaftYVis(
+      new Visual("__SELECTION_OBJ__TRANS_SHAFT_NODE_Y__"  + this->GetName(),
+      dPtr->transYVisual, false));
+  transShaftYVis->Load();
+  transShaftYVis->AttachMesh("axis_shaft");
+  transShaftYVis->SetScale(ignition::math::Vector3d(0.5, 0.5, 1.0));
+  transShaftYVis->SetPosition(ignition::math::Vector3d(0, 0, 0.1));
   Ogre::MovableObject *shaftYObj =
-      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
-      "__SELECTION_OBJ_TRANS_SHAFT_Y__" + this->GetName(), "axis_shaft"));
-  Ogre::MovableObject *headYObj =
-      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
-      "__SELECTION_OBJ_TRANS_HEAD_Y__" + this->GetName(), "axis_head"));
-  Ogre::SceneNode *transShaftYNode =
-      dPtr->transYVisual->GetSceneNode()->createChildSceneNode(
-      "__SELECTION_OBJ_TRANS_SHAFT_NODE_Y__"  + this->GetName());
-  Ogre::SceneNode *transHeadYNode =
-      dPtr->transYVisual->GetSceneNode()->createChildSceneNode(
-      "__SELECTION_OBJ_TRANS_HEAD_NODE_Y__"  + this->GetName());
-  transShaftYNode->attachObject(shaftYObj);
-  transShaftYNode->setScale(0.5, 0.5, 1.0);
-  transShaftYNode->setPosition(0, 0, 0.1);
-  transHeadYNode->attachObject(headYObj);
-  transHeadYNode->setScale(0.5, 0.5, 0.5);
-  transHeadYNode->setPosition(0, 0, 0.22);
+      transShaftYVis->GetSceneNode()->getAttachedObject(0);
   shaftYObj->getUserObjectBindings().setUserAny(
       Ogre::Any(std::string("trans_y")));
+  shaftYObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
+
+  VisualPtr transHeadYVis(
+      new Visual("__SELECTION_OBJ__TRANS_HEAD_NODE_Y__"  + this->GetName(),
+      dPtr->transYVisual, false));
+  transHeadYVis->Load();
+  transHeadYVis->AttachMesh("axis_head");
+  transHeadYVis->SetScale(ignition::math::Vector3d(0.5, 0.5, 0.5));
+  transHeadYVis->SetPosition(ignition::math::Vector3d(0, 0, 0.22));
+  Ogre::MovableObject *headYObj =
+      transHeadYVis->GetSceneNode()->getAttachedObject(0);
   headYObj->getUserObjectBindings().setUserAny(
       Ogre::Any(std::string("trans_y")));
-  shaftYObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
   headYObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
+  VisualPtr transShaftZVis(
+      new Visual("__SELECTION_OBJ__TRANS_SHAFT_NODE_Z__"  + this->GetName(),
+      dPtr->transZVisual, false));
+  transShaftZVis->Load();
+  transShaftZVis->AttachMesh("axis_shaft");
+  transShaftZVis->SetScale(ignition::math::Vector3d(0.5, 0.5, 1.0));
+  transShaftZVis->SetPosition(ignition::math::Vector3d(0, 0, 0.1));
   Ogre::MovableObject *shaftZObj =
-      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
-      "__SELECTION_OBJ_TRANS_SHAFT_Z__" + this->GetName(), "axis_shaft"));
-  Ogre::MovableObject *headZObj =
-      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
-      "__SELECTION_OBJ_TRANS_HEAD_Z__" + this->GetName(), "axis_head"));
-  Ogre::SceneNode *transShaftZNode =
-      dPtr->transZVisual->GetSceneNode()->createChildSceneNode(
-      "__SELECTION_OBJ_TRANS_SHAFT_NODE_Z__"  + this->GetName());
-  Ogre::SceneNode *transHeadZNode =
-      dPtr->transZVisual->GetSceneNode()->createChildSceneNode(
-      "__SELECTION_OBJ_TRANS_HEAD_NODE_Z__"  + this->GetName());
-  transShaftZNode->attachObject(shaftZObj);
-  transShaftZNode->setScale(0.5, 0.5, 1.0);
-  transShaftZNode->setPosition(0, 0, 0.1);
-  transHeadZNode->attachObject(headZObj);
-  transHeadZNode->setScale(0.5, 0.5, 0.5);
-  transHeadZNode->setPosition(0, 0, 0.22);
+      transShaftZVis->GetSceneNode()->getAttachedObject(0);
   shaftZObj->getUserObjectBindings().setUserAny(
       Ogre::Any(std::string("trans_z")));
+  shaftZObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
+
+  VisualPtr transHeadZVis(
+      new Visual("__SELECTION_OBJ__TRANS_HEAD_NODE_Z__"  + this->GetName(),
+      dPtr->transZVisual, false));
+  transHeadZVis->Load();
+  transHeadZVis->AttachMesh("axis_head");
+  transHeadZVis->SetScale(ignition::math::Vector3d(0.5, 0.5, 0.5));
+  transHeadZVis->SetPosition(ignition::math::Vector3d(0, 0, 0.22));
+  Ogre::MovableObject *headZObj =
+      transHeadZVis->GetSceneNode()->getAttachedObject(0);
   headZObj->getUserObjectBindings().setUserAny(
       Ogre::Any(std::string("trans_z")));
-  shaftZObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
   headZObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
   dPtr->transXVisual->SetRotation(
@@ -468,6 +421,7 @@ void SelectionObj::CreateTranslateVisual()
   this->SetHandleMaterial(TRANS_Z, dPtr->zAxisMatOverlay);
 
   dPtr->transVisual->SetScale(math::Vector3(5.0, 5.0, 5.0));
+  dPtr->transVisual->SetTransparency(0.5);
 
   dPtr->transXVisual->SetVisibilityFlags(
       GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
@@ -486,7 +440,7 @@ void SelectionObj::CreateRotateVisual()
   // Rotation mainipulation tool
   dPtr->rotVisual.reset(new rendering::Visual(
       this->GetName() + "__SELECTION_OBJ_ROT__",
-      shared_from_this()));
+      shared_from_this(), false));
   dPtr->rotVisual->Load();
 
   dPtr->rotXVisual.reset(
@@ -501,42 +455,42 @@ void SelectionObj::CreateRotateVisual()
 
   dPtr->rotVisual->InsertMesh("selection_tube");
 
+  dPtr->rotXVisual->Load();
+  dPtr->rotYVisual->Load();
+  dPtr->rotZVisual->Load();
+
+  VisualPtr rotRingXVis(
+      new Visual("__SELECTION_OBJ__ROT_NODE_X__"  + this->GetName(),
+      dPtr->rotXVisual, false));
+  rotRingXVis->Load();
+  rotRingXVis->AttachMesh("selection_tube");
   Ogre::MovableObject *rotXObj =
-      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
-      "__SELECTION_OBJ_ROT_X__" + this->GetName(), "selection_tube"));
-  Ogre::SceneNode *xNode =
-      dPtr->rotXVisual->GetSceneNode()->createChildSceneNode(
-      "__SELECTION_OBJ__ROT_NODE_X__"  + this->GetName());
-  xNode->attachObject(rotXObj);
+      rotRingXVis->GetSceneNode()->getAttachedObject(0);
   rotXObj->getUserObjectBindings().setUserAny(
       Ogre::Any(std::string("rot_x")));
   rotXObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
+  VisualPtr rotRingYVis(
+      new Visual("__SELECTION_OBJ__ROT_NODE_Y__"  + this->GetName(),
+      dPtr->rotYVisual, false));
+  rotRingYVis->Load();
+  rotRingYVis->AttachMesh("selection_tube");
   Ogre::MovableObject *rotYObj =
-      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
-      "__SELECTION_OBJ_ROT_Y__" + this->GetName(), "selection_tube"));
-  Ogre::SceneNode *yNode =
-      dPtr->rotYVisual->GetSceneNode()->createChildSceneNode(
-      "__SELECTION_OBJ__ROT_NODE_Y__"  + this->GetName());
-  yNode->attachObject(rotYObj);
+      rotRingYVis->GetSceneNode()->getAttachedObject(0);
   rotYObj->getUserObjectBindings().setUserAny(
       Ogre::Any(std::string("rot_y")));
   rotYObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
+  VisualPtr rotRingZVis(
+      new Visual("__SELECTION_OBJ__ROT_NODE_Z__"  + this->GetName(),
+      dPtr->rotZVisual, false));
+  rotRingZVis->Load();
+  rotRingZVis->AttachMesh("selection_tube");
   Ogre::MovableObject *rotZObj =
-      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
-      "__SELECTION_OBJ_ROT_Z__" + this->GetName(), "selection_tube"));
-  Ogre::SceneNode *zNode =
-      dPtr->rotZVisual->GetSceneNode()->createChildSceneNode(
-      "__SELECTION_OBJ__ROT_NODE_Z__"  + this->GetName());
-  zNode->attachObject(rotZObj);
+      rotRingZVis->GetSceneNode()->getAttachedObject(0);
   rotZObj->getUserObjectBindings().setUserAny(
       Ogre::Any(std::string("rot_z")));
   rotZObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
-
-  dPtr->rotXVisual->Load();
-  dPtr->rotYVisual->Load();
-  dPtr->rotZVisual->Load();
 
   dPtr->rotXVisual->SetRotation(
       math::Quaternion(math::Vector3(0, 1, 0), GZ_DTOR(90)));
@@ -551,6 +505,7 @@ void SelectionObj::CreateRotateVisual()
   this->SetHandleMaterial(ROT_Z, dPtr->zAxisMat);
 
   dPtr->rotVisual->SetScale(math::Vector3(1.0, 1.0, 1.0));
+  dPtr->rotVisual->SetTransparency(0.5);
 
   dPtr->rotXVisual->SetVisibilityFlags(
       GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
@@ -569,7 +524,7 @@ void SelectionObj::CreateScaleVisual()
   // Scale mainipulation tool
   dPtr->scaleVisual.reset(new rendering::Visual(
       this->GetName() + "__SELECTION_OBJ_SCALE__",
-      shared_from_this()));
+      shared_from_this(), false));
   dPtr->scaleVisual->Load();
 
   dPtr->scaleXVisual.reset(
@@ -588,80 +543,83 @@ void SelectionObj::CreateScaleVisual()
 
   this->InsertMesh("unit_box");
 
-  Ogre::MovableObject *scaleShaftXObj =
-      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
-      "__SELECTION_OBJ_SCALE_SHAFT_X__" + this->GetName(), "axis_shaft"));
-  Ogre::MovableObject *scaleHeadXObj =
-      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
-      "__SELECTION_OBJ_SCALE_HEAD_X__" + this->GetName(), "unit_box"));
-  Ogre::SceneNode *scaleShaftXNode =
-      dPtr->scaleXVisual->GetSceneNode()->createChildSceneNode(
-      "__SELECTION_OBJ__SCALE_SHAFT_NODE_X__"  + this->GetName());
-  Ogre::SceneNode *scaleHeadXNode =
-      dPtr->scaleXVisual->GetSceneNode()->createChildSceneNode(
-      "__SELECTION_OBJ__SCALE_HEAD_NODE_X__"  + this->GetName());
-  scaleShaftXNode->attachObject(scaleShaftXObj);
-  scaleShaftXNode->setScale(0.5, 0.5, 1.0);
-  scaleShaftXNode->setPosition(0, 0, 0.1);
-  scaleHeadXNode->attachObject(scaleHeadXObj);
-  scaleHeadXNode->setScale(0.02, 0.02, 0.02);
-  scaleHeadXNode->setPosition(0, 0, 0.21);
-  scaleShaftXObj->getUserObjectBindings().setUserAny(
+  VisualPtr scaleShaftXVis(
+      new Visual("__SELECTION_OBJ__SCALE_SHAFT_NODE_X__"  + this->GetName(),
+      dPtr->scaleXVisual, false));
+  scaleShaftXVis->Load();
+  scaleShaftXVis->AttachMesh("axis_shaft");
+  scaleShaftXVis->SetScale(ignition::math::Vector3d(0.5, 0.5, 1.0));
+  scaleShaftXVis->SetPosition(ignition::math::Vector3d(0, 0, 0.1));
+  Ogre::MovableObject *scaleXObj =
+      scaleShaftXVis->GetSceneNode()->getAttachedObject(0);
+  scaleXObj->getUserObjectBindings().setUserAny(
       Ogre::Any(std::string("scale_x")));
-  scaleHeadXObj->getUserObjectBindings().setUserAny(
+  scaleXObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
+
+  VisualPtr scaleHeadXVis(
+      new Visual("__SELECTION_OBJ__SCALE_HEAD_NODE_X__"  + this->GetName(),
+      dPtr->scaleXVisual, false));
+  scaleHeadXVis->Load();
+  scaleHeadXVis->AttachMesh("unit_box");
+  scaleHeadXVis->SetScale(ignition::math::Vector3d(0.02, 0.02, 0.02));
+  scaleHeadXVis->SetPosition(ignition::math::Vector3d(0, 0, 0.21));
+  Ogre::MovableObject *headXObj =
+      scaleHeadXVis->GetSceneNode()->getAttachedObject(0);
+  headXObj->getUserObjectBindings().setUserAny(
       Ogre::Any(std::string("scale_x")));
-  scaleShaftXObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
-  scaleHeadXObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
+  headXObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
-  Ogre::MovableObject *scaleShaftYObj =
-      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
-      "__SELECTION_OBJ_SCALE_SHAFT_Y__" + this->GetName(), "axis_shaft"));
-  Ogre::MovableObject *scaleHeadYObj =
-      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
-      "__SELECTION_OBJ_SCALE_HEAD_Y__" + this->GetName(), "unit_box"));
-  Ogre::SceneNode *scaleShaftYNode =
-      dPtr->scaleYVisual->GetSceneNode()->createChildSceneNode(
-      "__SELECTION_OBJ_SCALE_SHAFT_NODE_Y__"  + this->GetName());
-  Ogre::SceneNode *scaleHeadYNode =
-      dPtr->scaleYVisual->GetSceneNode()->createChildSceneNode(
-      "__SELECTION_OBJ_SCALE_HEAD_NODE_Y__"  + this->GetName());
-  scaleShaftYNode->attachObject(scaleShaftYObj);
-  scaleShaftYNode->setScale(0.5, 0.5, 1.0);
-  scaleShaftYNode->setPosition(0, 0, 0.1);
-  scaleHeadYNode->attachObject(scaleHeadYObj);
-  scaleHeadYNode->setScale(0.02, 0.02, 0.02);
-  scaleHeadYNode->setPosition(0, 0, 0.21);
-  scaleShaftYObj->getUserObjectBindings().setUserAny(
+  VisualPtr scaleShaftYVis(
+      new Visual("__SELECTION_OBJ__SCALE_SHAFT_NODE_Y__"  + this->GetName(),
+      dPtr->scaleYVisual, false));
+  scaleShaftYVis->Load();
+  scaleShaftYVis->AttachMesh("axis_shaft");
+  scaleShaftYVis->SetScale(ignition::math::Vector3d(0.5, 0.5, 1.0));
+  scaleShaftYVis->SetPosition(ignition::math::Vector3d(0, 0, 0.1));
+  Ogre::MovableObject *scaleYObj =
+      scaleShaftYVis->GetSceneNode()->getAttachedObject(0);
+  scaleYObj->getUserObjectBindings().setUserAny(
       Ogre::Any(std::string("scale_y")));
-  scaleHeadYObj->getUserObjectBindings().setUserAny(
-      Ogre::Any(std::string("scale_y")));
-  scaleShaftYObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
-  scaleHeadYObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
+  scaleYObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
-  Ogre::MovableObject *scaleShaftZObj =
-      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
-      "__SELECTION_OBJ_SCALE_SHAFT_Z__" + this->GetName(), "axis_shaft"));
-  Ogre::MovableObject *scaleHeadZObj =
-      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
-      "__SELECTION_OBJ_SCALE_HEAD_Z__" + this->GetName(), "unit_box"));
-  Ogre::SceneNode *scaleShaftZNode =
-      dPtr->scaleZVisual->GetSceneNode()->createChildSceneNode(
-      "__SELECTION_OBJ_SCALE_SHAFT_NODE_Z__"  + this->GetName());
-  Ogre::SceneNode *scaleHeadZNode =
-      dPtr->scaleZVisual->GetSceneNode()->createChildSceneNode(
-      "__SELECTION_OBJ_SCALE_HEAD_NODE_Z__"  + this->GetName());
-  scaleShaftZNode->attachObject(scaleShaftZObj);
-  scaleShaftZNode->setScale(0.5, 0.5, 1.0);
-  scaleShaftZNode->setPosition(0, 0, 0.1);
-  scaleHeadZNode->attachObject(scaleHeadZObj);
-  scaleHeadZNode->setScale(0.02, 0.02, 0.02);
-  scaleHeadZNode->setPosition(0, 0, 0.21);
-  scaleShaftZObj->getUserObjectBindings().setUserAny(
+  VisualPtr scaleHeadYVis(
+      new Visual("__SELECTION_OBJ__SCALE_HEAD_NODE_Y__"  + this->GetName(),
+      dPtr->scaleYVisual, false));
+  scaleHeadYVis->Load();
+  scaleHeadYVis->AttachMesh("unit_box");
+  scaleHeadYVis->SetScale(ignition::math::Vector3d(0.02, 0.02, 0.02));
+  scaleHeadYVis->SetPosition(ignition::math::Vector3d(0, 0, 0.21));
+  Ogre::MovableObject *headYObj =
+      scaleHeadYVis->GetSceneNode()->getAttachedObject(0);
+  headYObj->getUserObjectBindings().setUserAny(
+      Ogre::Any(std::string("scale_y")));
+  headYObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
+
+  VisualPtr scaleShaftZVis(
+      new Visual("__SELECTION_OBJ__SCALE_SHAFT_NODE_Z__"  + this->GetName(),
+      dPtr->scaleZVisual, false));
+  scaleShaftZVis->Load();
+  scaleShaftZVis->AttachMesh("axis_shaft");
+  scaleShaftZVis->SetScale(ignition::math::Vector3d(0.5, 0.5, 1.0));
+  scaleShaftZVis->SetPosition(ignition::math::Vector3d(0, 0, 0.1));
+  Ogre::MovableObject *scaleZObj =
+      scaleShaftZVis->GetSceneNode()->getAttachedObject(0);
+  scaleZObj->getUserObjectBindings().setUserAny(
       Ogre::Any(std::string("scale_z")));
-  scaleHeadZObj->getUserObjectBindings().setUserAny(
+  scaleZObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
+
+  VisualPtr scaleHeadZVis(
+      new Visual("__SELECTION_OBJ__SCALE_HEAD_NODE_Z__"  + this->GetName(),
+      dPtr->scaleZVisual, false));
+  scaleHeadZVis->Load();
+  scaleHeadZVis->AttachMesh("unit_box");
+  scaleHeadZVis->SetScale(ignition::math::Vector3d(0.02, 0.02, 0.02));
+  scaleHeadZVis->SetPosition(ignition::math::Vector3d(0, 0, 0.21));
+  Ogre::MovableObject *headZObj =
+      scaleHeadZVis->GetSceneNode()->getAttachedObject(0);
+  headZObj->getUserObjectBindings().setUserAny(
       Ogre::Any(std::string("scale_z")));
-  scaleShaftZObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
-  scaleHeadZObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
+  headZObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
   dPtr->scaleXVisual->SetRotation(
       math::Quaternion(math::Vector3(0, 1, 0), GZ_DTOR(90)));
@@ -673,6 +631,7 @@ void SelectionObj::CreateScaleVisual()
   this->SetHandleMaterial(SCALE_Z, dPtr->zAxisMatOverlay);
 
   dPtr->scaleVisual->SetScale(math::Vector3(5.0, 5.0, 5.0));
+  dPtr->scaleVisual->SetTransparency(0.5);
 
   dPtr->scaleXVisual->SetVisibilityFlags(
       GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);

@@ -229,6 +229,130 @@ void ModelMaker_TEST::FromFile()
 }
 
 /////////////////////////////////////////////////
+void ModelMaker_TEST::FromNestedModelFile()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/empty.world");
+
+  // Create the main window.
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Process some events and draw the screen
+  for (size_t i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Check there's no model in the left panel yet
+  bool hasModel = mainWindow->HasEntityName("model_00");
+  QVERIFY(!hasModel);
+
+  // Get scene
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
+  QVERIFY(scene != NULL);
+
+  // Check there's no model in the scene yet
+  gazebo::rendering::VisualPtr vis = scene->GetVisual("model_00");
+  QVERIFY(vis == NULL);
+
+  // Create a model maker
+  gazebo::gui::ModelMaker *modelMaker = new gazebo::gui::ModelMaker();
+  QVERIFY(modelMaker != NULL);
+
+  // Model data
+  boost::filesystem::path path;
+  path = path / TEST_PATH / "models" / "deeply_nested_model.sdf";
+
+  // Start the maker to make a model
+  modelMaker->InitFromFile(path.string());
+  modelMaker->Start();
+
+  // Check there's still no model in the left panel
+  hasModel = mainWindow->HasEntityName("model_00");
+  QVERIFY(!hasModel);
+
+  // Check there's a model in the scene -- this is the preview
+  vis = scene->GetVisual("model_00");
+  QVERIFY(vis != NULL);
+
+  // check all preview visuals are loaded
+  vis = scene->GetVisual("model_00::model_01");
+  QVERIFY(vis != NULL);
+  vis = scene->GetVisual("model_00::model_01::model_02");
+  QVERIFY(vis != NULL);
+  vis = scene->GetVisual("model_00::model_01::model_02::model_03");
+  QVERIFY(vis != NULL);
+
+  // Check that the model appeared in the center of the screen
+  ignition::math::Vector3d startPos = modelMaker->EntityPosition();
+  QVERIFY(startPos == ignition::math::Vector3d(0, 0, 0.5));
+  vis = scene->GetVisual("model_00");
+  QVERIFY(vis->GetWorldPose().pos == startPos);
+
+  // Mouse move
+  gazebo::common::MouseEvent mouseEvent;
+  mouseEvent.SetType(gazebo::common::MouseEvent::MOVE);
+  modelMaker->OnMouseMove(mouseEvent);
+
+  // Check that entity moved
+  ignition::math::Vector3d pos = modelMaker->EntityPosition();
+  QVERIFY(pos != startPos);
+  QVERIFY(vis->GetWorldPose().pos == pos);
+
+  // Mouse release
+  mouseEvent.SetType(gazebo::common::MouseEvent::RELEASE);
+  mouseEvent.SetButton(gazebo::common::MouseEvent::LEFT);
+  mouseEvent.SetDragging(false);
+  mouseEvent.SetPressPos(0, 0);
+  mouseEvent.SetPos(0, 0);
+  modelMaker->OnMouseRelease(mouseEvent);
+
+  // Check there's no model in the scene -- the preview is gone
+  vis = scene->GetVisual("model_00");
+  QVERIFY(vis == NULL);
+  vis = scene->GetVisual("model_00::model_01");
+  QVERIFY(vis == NULL);
+  vis = scene->GetVisual("model_00::model_01::model_02");
+  QVERIFY(vis == NULL);
+  vis = scene->GetVisual("model_00::model_01::model_02::model_03");
+  QVERIFY(vis == NULL);
+
+  // Process some events and draw the screen
+  for (size_t i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Check there's a model in the scene -- this is the final model
+  vis = scene->GetVisual("model_00");
+  QVERIFY(vis != NULL);
+  vis = scene->GetVisual("model_00::model_01");
+  QVERIFY(vis != NULL);
+  vis = scene->GetVisual("model_00::model_01::model_02");
+  QVERIFY(vis != NULL);
+  vis = scene->GetVisual("model_00::model_01::model_02::model_03");
+  QVERIFY(vis != NULL);
+
+  // Check the model is in the left panel
+  hasModel = mainWindow->HasEntityName("model_00");
+  QVERIFY(hasModel);
+
+  // Terminate
+  mainWindow->close();
+  delete mainWindow;
+}
+
+/////////////////////////////////////////////////
 void ModelMaker_TEST::FromModel()
 {
   this->resMaxPercentChange = 5.0;
@@ -330,6 +454,143 @@ void ModelMaker_TEST::FromModel()
 
   // Check the clone is in the left panel
   hasModel = mainWindow->HasEntityName("box_clone");
+  QVERIFY(hasModel);
+
+  // Terminate
+  mainWindow->close();
+  delete mainWindow;
+}
+
+/////////////////////////////////////////////////
+void ModelMaker_TEST::FromNestedModel()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("test/worlds/deeply_nested_models.world");
+
+  // Create the main window.
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Process some events and draw the screen
+  for (size_t i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Check there's a model but not its copy
+  bool hasModel = mainWindow->HasEntityName("model_00");
+  QVERIFY(hasModel);
+  hasModel = mainWindow->HasEntityName("model_00_clone");
+  QVERIFY(!hasModel);
+
+  // Get scene
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
+  QVERIFY(scene != NULL);
+
+  // Check there's a model but no clone in the scene yet
+  gazebo::rendering::VisualPtr vis = scene->GetVisual("model_00");
+  QVERIFY(vis != NULL);
+  vis = scene->GetVisual("model_00_clone_tmp");
+  QVERIFY(vis == NULL);
+  vis = scene->GetVisual("model_00_clone");
+  QVERIFY(vis == NULL);
+
+  // check all nested model visuals are there
+  vis = scene->GetVisual("model_00::model_01");
+  QVERIFY(vis != NULL);
+  vis = scene->GetVisual("model_00::model_01::model_02");
+  QVERIFY(vis != NULL);
+  vis = scene->GetVisual("model_00::model_01::model_02::model_03");
+  QVERIFY(vis != NULL);
+
+  // Create a model maker
+  gazebo::gui::ModelMaker *modelMaker = new gazebo::gui::ModelMaker();
+  QVERIFY(modelMaker != NULL);
+
+  // Start the maker to copy the model
+  modelMaker->InitFromModel("model_00");
+  modelMaker->Start();
+
+  // Check there's still no clone in the left panel
+  hasModel = mainWindow->HasEntityName("model_00_clone_tmp");
+  QVERIFY(!hasModel);
+  hasModel = mainWindow->HasEntityName("model_00_clone");
+  QVERIFY(!hasModel);
+
+  // Check there's a clone in the scene -- this is the preview
+  vis = scene->GetVisual("model_00_clone");
+  QVERIFY(vis == NULL);
+  vis = scene->GetVisual("model_00_clone_tmp");
+  QVERIFY(vis != NULL);
+
+  vis = scene->GetVisual("model_00_clone_tmp::model_01");
+  QVERIFY(vis != NULL);
+  vis = scene->GetVisual("model_00_clone_tmp::model_01::model_02");
+  QVERIFY(vis != NULL);
+  vis = scene->GetVisual("model_00_clone_tmp::model_01::model_02::model_03");
+  QVERIFY(vis != NULL);
+
+  // Check that the clone appeared in the center of the screen
+  ignition::math::Vector3d startPos = modelMaker->EntityPosition();
+  QVERIFY(startPos == ignition::math::Vector3d(0, 0, 0.5));
+  vis = scene->GetVisual("model_00_clone_tmp");
+  QVERIFY(vis->GetWorldPose().pos == startPos);
+
+  // Mouse move
+  gazebo::common::MouseEvent mouseEvent;
+  mouseEvent.SetType(gazebo::common::MouseEvent::MOVE);
+  modelMaker->OnMouseMove(mouseEvent);
+
+  // Check that entity moved
+  ignition::math::Vector3d pos = modelMaker->EntityPosition();
+  QVERIFY(pos != startPos);
+  QVERIFY(vis->GetWorldPose().pos == pos);
+
+  // Mouse release
+  mouseEvent.SetType(gazebo::common::MouseEvent::RELEASE);
+  mouseEvent.SetButton(gazebo::common::MouseEvent::LEFT);
+  mouseEvent.SetDragging(false);
+  mouseEvent.SetPressPos(0, 0);
+  mouseEvent.SetPos(0, 0);
+  modelMaker->OnMouseRelease(mouseEvent);
+
+  // Check there's no clone in the scene -- the preview is gone
+  vis = scene->GetVisual("model_00_clone_tmp");
+  QVERIFY(vis == NULL);
+  vis = scene->GetVisual("model_00_clone_tmp::model_01");
+  QVERIFY(vis == NULL);
+  vis = scene->GetVisual("model_00_clone_tmp::model_01::model_02");
+  QVERIFY(vis == NULL);
+  vis = scene->GetVisual("model_00_clone_tmp::model_01::model_02::model_03");
+  QVERIFY(vis == NULL);
+
+  // Process some events and draw the screen
+  for (size_t i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Check there's a clone in the scene -- this is the final model
+  vis = scene->GetVisual("model_00_clone");
+  QVERIFY(vis != NULL);
+  vis = scene->GetVisual("model_00_clone::model_01");
+  QVERIFY(vis != NULL);
+  vis = scene->GetVisual("model_00_clone::model_01::model_02");
+  QVERIFY(vis != NULL);
+  vis = scene->GetVisual("model_00_clone::model_01::model_02::model_03");
+  QVERIFY(vis != NULL);
+
+  // Check the clone is in the left panel
+  hasModel = mainWindow->HasEntityName("model_00_clone");
   QVERIFY(hasModel);
 
   // Terminate

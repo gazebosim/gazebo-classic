@@ -39,9 +39,6 @@ namespace gazebo
       /// \brief Lines that make the cross marking the center of mass.
       public: DynamicLines *crossLines;
 
-      /// \brief Sphere with density of lead and equivalent mass.
-      public: Ogre::SceneNode *sphereNode;
-
       /// \brief Inertia pose in link frame.
       public: math::Pose inertiaPose;
 
