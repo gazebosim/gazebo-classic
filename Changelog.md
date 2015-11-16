@@ -1,7 +1,7 @@
 ## Gazebo 7.0
 
 1. Removed deprecations
-    * [Pull request #XXXX]((https://bitbucket.org/osrf/gazebo/pull-request/XXXX)
+    * [Pull request #1992]((https://bitbucket.org/osrf/gazebo/pull-request/1992)
 
 1. Update rest web plugin to publish response messages and display login user name in toolbar.
     * [Pull request #1956](https://bitbucket.org/osrf/gazebo/pull-request/1956)
