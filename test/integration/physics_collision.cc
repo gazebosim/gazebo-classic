@@ -22,7 +22,7 @@
 
 using namespace gazebo;
 
-const double g_big = 1e29;
+const double g_big = 1e17;
 
 class PhysicsCollisionTest : public ServerFixture,
                              public testing::WithParamInterface<const char*>
