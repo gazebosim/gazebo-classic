@@ -166,6 +166,8 @@ dxJointContact::getInfo2( dxJoint::Info2 *info )
         dReal patch_radius;
         if (!contact.surface.use_patch_radius)
         {
+          if (contact.surface.surface_radius < 0)
+            contact.surface.surface_radius = 0;
           patch_radius = sqrt(contact.surface.surface_radius * depth);
         }
         else
@@ -406,6 +408,8 @@ dxJointContact::getInfo2( dxJoint::Info2 *info )
             dReal patch_radius;
             if (!contact.surface.use_patch_radius)
             {
+              if (contact.surface.surface_radius < 0)
+                contact.surface.surface_radius = 0;
               patch_radius = sqrt(contact.surface.surface_radius * depth);
             }
             else
