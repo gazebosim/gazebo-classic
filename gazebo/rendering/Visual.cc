@@ -1759,7 +1759,6 @@ void Visual::SetWorldRotation(const math::Quaternion &_q)
 //////////////////////////////////////////////////
 void Visual::SetWorldRotation(const ignition::math::Quaterniond &_q)
 {
-
   this->dataPtr->sceneNode->_setDerivedOrientation(Conversions::Convert(_q));
 }
 
@@ -2789,7 +2788,7 @@ void Visual::MoveToPositions(const std::vector<math::Pose> &_pts,
 {
   std::vector<ignition::math::Pose3d> pts;
   for (auto const p : _pts)
-   pts.push_back(p.Ign());
+    pts.push_back(p.Ign());
   this->MoveToPositions(pts, _time, _onComplete);
 }
 
