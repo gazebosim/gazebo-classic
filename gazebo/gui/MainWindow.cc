@@ -261,6 +261,20 @@ void MainWindow::Init()
 
   this->setGeometry(winXPos, winYPos, winWidth, winHeight);
 
+  if ( this->width() > winWidth )
+  {
+    gzwarn << "Requested geometry.width of " << winWidth
+           << " but the minimum width of the window is "
+           << this->width() << "." << std::endl;
+  }
+
+  if ( this->height() > winHeight )
+  {
+    gzwarn << "Requested geometry.height of " << winHeight
+           << " but the minimum height of the window is "
+           << this->height() << "." << std::endl;
+  }
+
   this->worldControlPub =
     this->node->Advertise<msgs::WorldControl>("~/world_control");
   this->serverControlPub =

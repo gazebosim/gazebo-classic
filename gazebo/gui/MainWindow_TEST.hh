@@ -43,6 +43,9 @@ class MainWindow_TEST : public QTestFixture
 
   /// \brief Test moving the user camera via a joystick message.
   private slots: void UserCameraJoystick();
+
+  /// \brief Test that the minimum size of the window is reasonable.
+  private slots: void MinimumSize();
 };
 
 #endif

@@ -2,6 +2,11 @@
 
 ### Gazebo 5.x.x
 
+1. Fix minimum window height
+    * Backport of [pull request #1977](https://bitbucket.org/osrf/gazebo/pull-request/1977)
+    * [Pull request #](https://bitbucket.org/osrf/gazebo/pull-request/)
+    * [Issue #1706](https://bitbucket.org/osrf/gazebo/issue/1706)
+
 ### Gazebo 5.2.0 (2015-10-02)
 
 1. Initialize sigact struct fields that valgrind said were being used uninitialized
@@ -13,7 +18,7 @@
 1. Use ToSDF functions to simplify physics_friction test
     * [Pull request #1808](https://bitbucket.org/osrf/gazebo/pull-request/1808)
 
-1. Added lines to laser sensor visualization 
+1. Added lines to laser sensor visualization
     * [Pull request #1742](https://bitbucket.org/osrf/gazebo/pull-request/1742)
     * [Issue #935](https://bitbucket.org/osrf/gazebo/issue/935)
 
