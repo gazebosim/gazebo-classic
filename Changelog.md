@@ -7,6 +7,9 @@
    Use tinyxml2 for playback.
     * [Pull request #1931](https://bitbucket.org/osrf/gazebo/pull-request/1931)
 
+1. Enter time during log playback
+    * [Pull request #2000](https://bitbucket.org/osrf/gazebo/pull-request/2000)
+
 1 Added Ignition Transport dependency.
   * [Pull request #1930](https://bitbucket.org/osrf/gazebo/pull-request/1930)
 
