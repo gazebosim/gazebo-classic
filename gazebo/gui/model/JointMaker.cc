@@ -1259,8 +1259,19 @@ void JointData::UpdateMsg()
   }
 
   // Others
-  this->jointMsg->set_limit_erp(0.2);
-  this->jointMsg->set_suspension_erp(0.2);
+  if (oldMsg && oldMsg->has_limit_erp())
+  {
+    this->jointMsg->set_limit_erp(oldMsg->limit_erp());
+  }
+  else
+    this->jointMsg->set_limit_erp(0.2);
+
+  if (oldMsg && oldMsg->has_suspension_erp())
+  {
+    this->jointMsg->set_suspension_erp(oldMsg->suspension_erp());
+  }
+  else
+    this->jointMsg->set_suspension_erp(0.2);
 }
 
 /////////////////////////////////////////////////
