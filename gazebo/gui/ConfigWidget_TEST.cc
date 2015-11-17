@@ -907,6 +907,122 @@ void ConfigWidget_TEST::ConfigWidgetVisible()
 }
 
 /////////////////////////////////////////////////
+void ConfigWidget_TEST::CustomConfigWidgetReadOnly()
+{
+  auto configWidget = new gazebo::gui::ConfigWidget;
+  auto configLayout = new QVBoxLayout();
+
+  // Create a child widget
+  {
+    auto vecWidget = configWidget->CreateVector3dWidget("vector3d", 0);
+    auto stringWidget = configWidget->CreateStringWidget("string", 0);
+
+    QVERIFY(configWidget->AddConfigChildWidget("vector3d", vecWidget));
+    QVERIFY(configWidget->AddConfigChildWidget("string", stringWidget));
+
+    auto *childLayout = new QVBoxLayout();
+    childLayout->addWidget(vecWidget);
+    childLayout->addWidget(stringWidget);
+
+    auto childWidget = new gazebo::gui::ConfigChildWidget();
+    childWidget->setLayout(childLayout);
+
+    auto groupWidget = configWidget->CreateGroupWidget("group",
+        childWidget, 0);
+
+    configLayout->addWidget(groupWidget);
+  }
+
+  // Create a custom child widget
+  {
+    auto customLabel = new QLabel("custom label");
+    customLabel->setObjectName("label");
+    auto custom1 = new QToolButton();
+    auto custom2 = new QDoubleSpinBox();
+    auto custom3 = new QLineEdit();
+
+    auto customLayout = new QGridLayout();
+    customLayout->addWidget(customLabel, 0, 0);
+    customLayout->addWidget(custom1, 0, 1);
+    customLayout->addWidget(custom2, 0, 2);
+    customLayout->addWidget(custom3, 0, 3);
+
+    auto customLayout2 = new QVBoxLayout();
+    customLayout2->addLayout(customLayout);
+
+    auto customWidget = new gazebo::gui::ConfigChildWidget();
+    customWidget->setLayout(customLayout2);
+
+    QVERIFY(configWidget->AddConfigChildWidget("custom", customWidget));
+
+    auto customGroupWidget = configWidget->CreateGroupWidget("custom group",
+        customWidget, 0);
+
+    configLayout->addWidget(customGroupWidget);
+  }
+  configWidget->setLayout(configLayout);
+
+  // set to be read-only
+  {
+    configWidget->SetWidgetReadOnly("vector3d", true);
+    configWidget->SetWidgetReadOnly("string", true);
+    configWidget->SetWidgetReadOnly("custom", true);
+
+    QCOMPARE(configWidget->GetWidgetReadOnly("vector3d"), true);
+    QCOMPARE(configWidget->GetWidgetReadOnly("string"), true);
+    QCOMPARE(configWidget->GetWidgetReadOnly("custom"), true);
+    {
+      auto childWidgets =
+          configWidget->ConfigChildWidgetByName("custom")->
+          findChildren<QWidget *>();
+      QCOMPARE(childWidgets.size(), 5);
+      for (auto it : childWidgets)
+        QCOMPARE(it->isEnabled(), false);
+    }
+  }
+
+  // set read-only back to false
+  {
+    configWidget->SetWidgetReadOnly("vector3d", false);
+    configWidget->SetWidgetReadOnly("string", false);
+    configWidget->SetWidgetReadOnly("custom", false);
+
+    QCOMPARE(configWidget->GetWidgetReadOnly("vector3d"), false);
+    QCOMPARE(configWidget->GetWidgetReadOnly("string"), false);
+    QCOMPARE(configWidget->GetWidgetReadOnly("custom"), false);
+    {
+      auto childWidgets =
+          configWidget->ConfigChildWidgetByName("custom")->
+          findChildren<QWidget *>();
+      QCOMPARE(childWidgets.size(), 5);
+      for (auto it : childWidgets)
+        QCOMPARE(it->isEnabled(), true);
+    }
+  }
+
+  // set read-only back to true
+  {
+    configWidget->SetWidgetReadOnly("vector3d", true);
+    configWidget->SetWidgetReadOnly("string", true);
+    configWidget->SetWidgetReadOnly("custom", true);
+
+    QCOMPARE(configWidget->GetWidgetReadOnly("vector3d"), true);
+    QCOMPARE(configWidget->GetWidgetReadOnly("string"), true);
+    QCOMPARE(configWidget->GetWidgetReadOnly("custom"), true);
+    {
+      auto childWidgets =
+          configWidget->ConfigChildWidgetByName("custom")->
+          findChildren<QWidget *>();
+      QCOMPARE(childWidgets.size(), 5);
+      for (auto it : childWidgets)
+        QCOMPARE(it->isEnabled(), false);
+    }
+  }
+
+  delete configWidget;
+}
+
+/////////////////////////////////////////////////
 void ConfigWidget_TEST::ConfigWidgetReadOnly()
 {
   gazebo::gui::ConfigWidget *visualConfigWidget =
@@ -961,12 +1077,6 @@ void ConfigWidget_TEST::ConfigWidgetReadOnly()
 
     QCOMPARE(visualConfigWidget->GetWidgetReadOnly("id"), true);
     QCOMPARE(visualConfigWidget->GetWidgetReadOnly("pose"), true);
-    {
-//      auto childWidgets = visualConfigWidget->ConfigWidgetByName("pose")->
-//          findChildren<QWidget *>();
-//      for (auto it : childWidgets)
-//        QCOMPARE(it->isEnabled(), false);
-    }
     QCOMPARE(visualConfigWidget->GetWidgetReadOnly("geometry"), true);
     QCOMPARE(visualConfigWidget->GetWidgetReadOnly("material::diffuse"), true);
     QCOMPARE(visualConfigWidget->GetWidgetReadOnly("material::script::name"),
