@@ -304,7 +304,7 @@ void MainWindow::Init()
 
   if ( this->height() > winHeight )
   {
-    gzwarn << "Requested geometry.height of " << winWidth
+    gzwarn << "Requested geometry.height of " << winHeight
            << " but the minimum height of the window is "
            << this->height() << "." << std::endl;
   }
