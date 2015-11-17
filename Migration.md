@@ -82,6 +82,14 @@ release will remove the deprecated code.
     + ***Deprecation:*** public: void SetTorque(const math::Vector3 &_torqueVector,const bool _rotatedByMouse);
     + ***Replacement:*** public: void SetTorque(const ignition::math::Vector3d &_torqueVector, const bool _rotatedByMouse);
 
+1. **gazebo/rendering/AxisVisual.hh**
+    + ***Deprecation:*** public: void ScaleXAxis(const math::Vector3 &_scale)
+    + ***Replacement:*** public: void ScaleXAxis(const ignition::math::Vector3d &_scale);
+    + ***Deprecation:*** public: void ScaleYAxis(const math::Vector3 &_scale)
+    + ***Replacement:*** public: void ScaleYAxis(const ignition::math::Vector3d &_scale);
+    + ***Deprecation:*** public: void ScaleZAxis(const math::Vector3 &_scale)
+    + ***Replacement:*** public: void ScaleZAxis(const ignition::math::Vector3d &_scale);
+
 1. **gazebo/gui/RTShaderSystem.hh**
     + ***Deprecation:*** void AttachEntity(Visual *vis)
     + ***No replacement for AttachEntity ***
