@@ -4,7 +4,7 @@
 
 1. Fix minimum window height
     * Backport of [pull request #1977](https://bitbucket.org/osrf/gazebo/pull-request/1977)
-    * [Pull request #19](https://bitbucket.org/osrf/gazebo/pull-request/19)
+    * [Pull request #1998](https://bitbucket.org/osrf/gazebo/pull-request/1998)
     * [Issue #1706](https://bitbucket.org/osrf/gazebo/issue/1706)
 
 1. Fix visual transparency issues
