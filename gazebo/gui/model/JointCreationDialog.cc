@@ -533,6 +533,8 @@ void JointCreationDialog::OnLinkFromDialog()
 
   if (currentChild != "")
     this->OnChildImpl(QString::fromStdString(currentChild));
+
+  this->UncheckAllAlign();
 }
 
 /////////////////////////////////////////////////
@@ -750,7 +752,8 @@ void JointCreationDialog::UpdateRelativePose(
 /////////////////////////////////////////////////
 void JointCreationDialog::OnResetPoses()
 {
-//  this->dataPtr->jointMaker->SetRelativePose(ignition::math::Pose3d(), true);
+  this->dataPtr->jointMaker->SetLinksRelativePose(ignition::math::Pose3d(),
+      true);
 }
 
 /////////////////////////////////////////////////
@@ -809,38 +812,48 @@ bool JointCreationDialog::CheckValid()
 void JointCreationDialog::OnAlign(const int _int)
 {
   // Reset pose
-//  this->dataPtr->jointMaker->SetRelativePose(ignition::math::Pose3d(), true);
+  this->dataPtr->jointMaker->SetLinksRelativePose(ignition::math::Pose3d(), true);
 
   // Reference link
-//  bool childToParent = this->dataPtr->alignCombo->currentIndex() == 0;
+  bool childToParent = this->dataPtr->alignCombo->currentIndex() == 0;
 
   // Button groups
-//  std::vector<std::string> axes = {"x", "y", "z"};
-//  std::vector<std::string> configs = {"min", "center", "max"};
-//  for (unsigned int g = 0; g < this->dataPtr->alignGroups.size(); ++g)
-//  {
-//    auto group = this->dataPtr->alignGroups[g];
-//
-//    // Uncheck other buttons in the same group
-//    if (this->sender() == group)
-//    {
-//      for (int i = 0; i < group->buttons().size(); ++i)
-//      {
-//        if (i != _int)
-//        {
-//          group->buttons()[i]->setChecked(false);
-//        }
-//      }
-//    }
-//
-//    // Align for the checked button of each group
-//    int checked = group->checkedId();
-//    if (checked >= 0 && checked <=2)
-//    {
-//      this->dataPtr->jointMaker->AlignLinks(childToParent, axes[g],
-//          configs[checked]);
-//    }
-//  }
+  std::vector<std::string> axes = {"x", "y", "z"};
+  std::vector<std::string> configs = {"min", "center", "max"};
+  for (unsigned int g = 0; g < this->dataPtr->alignGroups.size(); ++g)
+  {
+    auto group = this->dataPtr->alignGroups[g];
+
+    // Uncheck other buttons in the same group
+    if (this->sender() == group)
+    {
+      for (int i = 0; i < group->buttons().size(); ++i)
+      {
+        if (i != _int)
+        {
+          group->buttons()[i]->setChecked(false);
+        }
+      }
+    }
+
+    // Align for the checked button of each group
+    int checked = group->checkedId();
+    if (checked >= 0 && checked <=2)
+    {
+      this->dataPtr->jointMaker->AlignLinks(childToParent, axes[g],
+          configs[checked]);
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void JointCreationDialog::UncheckAllAlign()
+{
+  for (auto group : this->dataPtr->alignGroups)
+  {
+    for (auto button : group->buttons())
+      button->setChecked(false);
+  }
 }
 
 /////////////////////////////////////////////////

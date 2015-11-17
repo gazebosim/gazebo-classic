@@ -235,6 +235,14 @@ namespace gazebo
       /// \param[in] _name Link name, either the leaf or scoped.
       public: void SetChildLink(const std::string &_name);
 
+      /// \brief Set the relative pose
+      public: void SetLinksRelativePose(
+          const ignition::math::Pose3d &_pose, bool _reset);
+
+      public: void AlignLinks(
+          const bool _childToParent, const std::string &_axis,
+          const std::string &_mode);
+
       /// \brief Mouse event filter callback when mouse button is pressed.
       /// \param[in] _event The mouse event.
       /// \return True if the event was handled
@@ -401,6 +409,12 @@ namespace gazebo
 
       /// \brief Dialog for creating a new joint.
       private: JointCreationDialog *jointCreationDialog;
+
+      /// \brief Visual currently selected to be the child link.
+      private: ignition::math::Pose3d parentLinkOriginalPose;
+
+      /// \brief Visual currently selected to be the child link.
+      private: ignition::math::Pose3d childLinkOriginalPose;
     };
     /// \}
 
@@ -414,7 +428,8 @@ namespace gazebo
       /// \brief Open the joint inspector.
       public: void OpenInspector();
 
-      /// \brief Update this joint data.
+      /// \brief Update this joint data. Avoid calling this directly, instead,
+      /// set dirty to true and this will be called on PreRender.
       public: void Update();
 
       /// \brief Update the joint message based on the other fields.
@@ -459,7 +474,7 @@ namespace gazebo
       /// \brief Type of joint.
       public: JointMaker::JointType type;
 
-      /// \brief True if the joint visual needs update.
+      /// \brief True if the joint needs update.
       public: bool dirty;
 
       /// \brief Msg containing joint data.

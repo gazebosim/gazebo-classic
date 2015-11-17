@@ -35,6 +35,7 @@
 #include "gazebo/gui/MouseEventHandler.hh"
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/MainWindow.hh"
+#include "gazebo/gui/ModelAlign.hh"
 
 #include "gazebo/gui/model/JointCreationDialog.hh"
 #include "gazebo/gui/model/JointInspector.hh"
@@ -1484,11 +1485,11 @@ bool JointMaker::SetParentLink(rendering::VisualPtr _parentLink)
   else if (this->newJoint->parent)
   {
     // Reset previous parent
-//    this->newJoint->parent->SetWorldPose(this->parentOriginalPose);
+    this->newJoint->parent->SetWorldPose(this->parentLinkOriginalPose);
 //    this->SetHighlighted(this->newJoint->parent, false);
 
     this->newJoint->parent = _parentLink;
-    this->newJoint->Update();
+    this->newJoint->dirty = true;
   }
   else
   {
@@ -1497,7 +1498,7 @@ bool JointMaker::SetParentLink(rendering::VisualPtr _parentLink)
     return false;
   }
 
-//  this->parentOriginalPose = _parentLink->GetWorldPose().Ign();
+  this->parentLinkOriginalPose = _parentLink->GetWorldPose().Ign();
   return true;
 }
 
@@ -1537,17 +1538,16 @@ bool JointMaker::SetChildLink(rendering::VisualPtr _childLink)
   // Update child
   else
   {
+    // Reset previous child
+    this->newJoint->child->SetWorldPose(this->childLinkOriginalPose);
+//    this->SetHighlighted(this->childLinkVis, false);
+
     this->newJoint->child = _childLink;
     this->newJoint->dirty = true;
-    this->newJoint->Update();
     _childLink->AttachVisual(this->newJoint->jointVisual);
-
-    // Reset previous child
-//    this->childLinkVis->SetWorldPose(this->childOriginalPose);
-//    this->SetHighlighted(this->childLinkVis, false);
   }
 
-//  this->childOriginalPose = _childLink->GetWorldPose().Ign();
+  this->childLinkOriginalPose = _childLink->GetWorldPose().Ign();
 
   // Change state to not creating joint
   gui::Events::manipMode("select");
@@ -1563,7 +1563,7 @@ void JointMaker::SetType(const int _typeInt)
   if (this->newJoint && this->jointType != JOINT_NONE)
   {
     this->newJoint->type = this->jointType;
-    this->newJoint->Update();
+    this->newJoint->dirty = true;
   }
 }
 
@@ -1583,7 +1583,7 @@ void JointMaker::SetAxis(const QString &_axis,
       msgs::Set(this->newJoint->jointMsg->mutable_axis2()->mutable_xyz(),
       _value);
     }
-    this->newJoint->Update();
+    this->newJoint->dirty = true;
   }
 }
 
@@ -1593,7 +1593,7 @@ void JointMaker::SetJointPose(const ignition::math::Pose3d &_pose)
   if (this->newJoint && this->newJoint->jointMsg)
   {
     msgs::Set(this->newJoint->jointMsg->mutable_pose(), _pose);
-    this->newJoint->Update();
+    this->newJoint->dirty = true;
   }
 }
 
@@ -1639,5 +1639,61 @@ rendering::VisualPtr JointMaker::LinkVisualFromName(const std::string &_name)
     return NULL;
 
   return scene->GetVisual(scopedName);
+}
+
+/////////////////////////////////////////////////
+void JointMaker::SetLinksRelativePose(const ignition::math::Pose3d &_pose,
+    bool _reset)
+{
+  if (!this->newJoint || !this->newJoint->parent || !this->newJoint->child)
+  {
+    gzerr << "Can't set relative pose without new joint's parent and child "
+        << "links." << std::endl;
+    return;
+  }
+
+  ignition::math::Pose3d newChildPose;
+
+  if (_reset)
+  {
+    newChildPose = this->childLinkOriginalPose;
+    this->newJoint->parent->SetWorldPose(this->parentLinkOriginalPose);
+  }
+  else
+  {
+    // Get poses as homogeneous transforms
+    ignition::math::Matrix4d parent_world(
+        this->newJoint->parent->GetWorldPose().Ign());
+    ignition::math::Matrix4d child_parent(_pose);
+
+    // w_T_c = w_T_p * p_T_c
+    ignition::math::Matrix4d child_world =
+        parent_world * child_parent;
+
+    newChildPose = child_world.Pose();
+  }
+
+  this->newJoint->child->SetWorldPose(newChildPose);
+}
+
+/////////////////////////////////////////////////
+void JointMaker::AlignLinks(const bool _childToParent,
+    const std::string &_axis, const std::string &_config)
+{
+  if (!this->newJoint || !this->newJoint->parent || !this->newJoint->child)
+  {
+    gzerr << "Couldn't find new joint's parent and child links to be aligned."
+        << std::endl;
+    return;
+  }
+
+  std::vector<rendering::VisualPtr> links;
+  links.push_back(this->newJoint->parent);
+  links.push_back(this->newJoint->child);
+
+  std::string target = _childToParent ? "first" : "last";
+
+  ModelAlign::Instance()->AlignVisuals(links, _axis, _config,
+      target, true);
 }
 

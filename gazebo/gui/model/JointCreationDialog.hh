@@ -91,6 +91,9 @@ namespace gazebo
 
       /// \brief Qt callback when the axis combo box is changed.
       private slots: void OnAlign(const int _int);
+
+      private slots: void UncheckAllAlign();
+
       private slots: void SetType(const int _typeInt);
 
       /// \brief Qt callback when the Swap links button is pressed.
