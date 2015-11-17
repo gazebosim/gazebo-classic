@@ -94,7 +94,7 @@ namespace gazebo
       /// \param[in] Name of the scene to remove.
       public: void RemoveScene(const std::string &_scene);
 
-      /// \brief Update the shaders. This should not be called frequently.
+      /// \brief Update the shaders.
       public: void UpdateShaders();
 
       /// \brief Set an Ogre::Entity to use RT shaders.
@@ -136,6 +136,9 @@ namespace gazebo
       /// \brief Get the Ogre PSSM Shadows camera setup.
       /// \return The Ogre PSSM Shadows camera setup.
       public: Ogre::PSSMShadowCameraSetup *GetPSSMShadowCameraSetup() const;
+
+      /// \brief Update the RT shaders. This should not be called frequently.
+      public: void Update();
 
       /// \brief Get paths for the shader system
       /// \param[out] _coreLibsPath Path to the core libraries.
