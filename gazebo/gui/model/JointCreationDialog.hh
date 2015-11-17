@@ -91,7 +91,7 @@ namespace gazebo
 
       /// \brief Qt callback when the axis combo box is changed.
       private slots: void OnAlign(const int _int);
-      private slots: void NewType(const int _typeInt);
+      private slots: void SetType(const int _typeInt);
 
       /// \brief Qt callback when the Swap links button is pressed.
       private slots: void OnSwap();
@@ -104,11 +104,11 @@ namespace gazebo
 
       /// \brief Event callback when the parent link is chosen in the 3D scene.
       /// \param[in] _linkName Name of new parent link.
-      public: void NewParent(const std::string &_linkName);
+      public: void SetParent(const std::string &_linkName);
 
       /// \brief Event callback when the child link is chosen in the 3D scene.
       /// \param[in] _linkName Name of new child link.
-      public: void NewChild(const std::string &_linkName);
+      public: void SetChild(const std::string &_linkName);
 
       /// \brief Check if the current parent and child link selection is valid.
       private: void CheckLinksValid();

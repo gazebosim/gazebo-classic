@@ -212,7 +212,14 @@ namespace gazebo
       /// \brief A new type for the joint being created has been chosen.
       /// To be used by other classes.
       /// \param[in] _typeInt Integer corresponding to joint type enum.
-      public slots: void NewType(const int _typeInt);
+      public slots: void SetType(const int _typeInt);
+
+      /// \brief A new axis for the joint being created has been chosen.
+      /// To be used by other classes.
+      /// \param[in] _axis Axis which was changed, either "axis1" or "axis2".
+      /// \param[in] _value New value for the axis
+      public slots: void SetAxis(const QString &_axis,
+          const ignition::math::Vector3d &_value);
 
       /// \brief A new parent link for the joint being created has been chosen.
       /// To be used by other classes.

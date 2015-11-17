@@ -415,7 +415,7 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
           if (!this->SetParentLink(this->hoverVis))
             return false;
 
-          this->jointCreationDialog->NewParent(
+          this->jointCreationDialog->SetParent(
               this->newJoint->parent->GetName());
         }
         // Pressed child link
@@ -424,7 +424,7 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
           if (!this->SetChildLink(this->hoverVis))
             return false;
 
-          this->jointCreationDialog->NewChild(this->newJoint->child->GetName());
+          this->jointCreationDialog->SetChild(this->newJoint->child->GetName());
         }
 
         if (this->hoverVis)
@@ -1545,14 +1545,33 @@ bool JointMaker::SetChildLink(rendering::VisualPtr _childLink)
 }
 
 /////////////////////////////////////////////////
-void JointMaker::NewType(const int _typeInt)
+void JointMaker::SetType(const int _typeInt)
 {
   this->jointType = static_cast<JointMaker::JointType>(_typeInt);
-  auto type = static_cast<JointMaker::JointType>(_typeInt);
 
-  if (this->newJoint && type != JOINT_NONE)
+  if (this->newJoint && this->jointType != JOINT_NONE)
   {
-    this->newJoint->type = type;
+    this->newJoint->type = this->jointType;
+    this->newJoint->Update();
+  }
+}
+
+/////////////////////////////////////////////////
+void JointMaker::SetAxis(const QString &_axis,
+      const ignition::math::Vector3d &_value)
+{
+  if (this->newJoint && this->newJoint->jointMsg)
+  {
+    if (_axis == "axis1" && this->newJoint->jointMsg->has_axis1())
+    {
+      msgs::Set(this->newJoint->jointMsg->mutable_axis1()->mutable_xyz(),
+      _value);
+    }
+    else if (_axis == "axis2" && this->newJoint->jointMsg->has_axis2())
+    {
+      msgs::Set(this->newJoint->jointMsg->mutable_axis2()->mutable_xyz(),
+      _value);
+    }
     this->newJoint->Update();
   }
 }

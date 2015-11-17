@@ -65,9 +65,9 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   this->dataPtr->typeButtons->addButton(ballJointRadio, 7);
   this->dataPtr->typeButtons->addButton(gearboxJointRadio, 8);
   connect(this->dataPtr->typeButtons, SIGNAL(buttonClicked(int)),
-      this->dataPtr->jointMaker, SLOT(NewType(int)));
+      this->dataPtr->jointMaker, SLOT(SetType(int)));
   connect(this->dataPtr->typeButtons, SIGNAL(buttonClicked(int)),
-      this, SLOT(NewType(int)));
+      this, SLOT(SetType(int)));
 
   for (auto button : this->dataPtr->typeButtons->buttons())
   {
@@ -465,7 +465,7 @@ void JointCreationDialog::Open(JointMaker::JointType _type)
   // Check joint type
   this->dataPtr->typeButtons->button(static_cast<int>(_type))
       ->setChecked(true);
-  this->NewType(_type);
+  this->SetType(_type);
 
   // Clear links
   this->dataPtr->configWidget->ClearEnumWidget("parentCombo");
@@ -540,9 +540,9 @@ void JointCreationDialog::OnPoseFromDialog(const QString &_name,
     const ignition::math::Pose3d &_pose)
 {
  // if (_name == "relative_pose")
- //   this->dataPtr->jointMaker->NewRelativePose(_pose, false);
+ //   this->dataPtr->jointMaker->SetRelativePose(_pose, false);
  // else if (_name == "joint_pose")
- //   this->dataPtr->jointMaker->NewJointPose(_pose);
+ //   this->dataPtr->jointMaker->SetJointPose(_pose);
 }
 
 /////////////////////////////////////////////////
@@ -580,13 +580,12 @@ void JointCreationDialog::OnVector3dFromDialog(const QString &_name,
     }
   }
 
-  this->CheckValid();
-
-//  this->dataPtr->jointMaker->NewAxis(_name, _value);
+  if (this->CheckValid())
+    this->dataPtr->jointMaker->SetAxis(_name, _value);
 }
 
 /////////////////////////////////////////////////
-void JointCreationDialog::NewParent(const std::string &_linkName)
+void JointCreationDialog::SetParent(const std::string &_linkName)
 {
   if (_linkName.empty())
   {
@@ -612,7 +611,7 @@ void JointCreationDialog::NewParent(const std::string &_linkName)
 }
 
 /////////////////////////////////////////////////
-void JointCreationDialog::NewChild(const std::string &_linkName)
+void JointCreationDialog::SetChild(const std::string &_linkName)
 {
   if (_linkName.empty())
   {
@@ -751,7 +750,7 @@ void JointCreationDialog::UpdateRelativePose(
 /////////////////////////////////////////////////
 void JointCreationDialog::OnResetPoses()
 {
-//  this->dataPtr->jointMaker->NewRelativePose(ignition::math::Pose3d(), true);
+//  this->dataPtr->jointMaker->SetRelativePose(ignition::math::Pose3d(), true);
 }
 
 /////////////////////////////////////////////////
@@ -810,7 +809,7 @@ bool JointCreationDialog::CheckValid()
 void JointCreationDialog::OnAlign(const int _int)
 {
   // Reset pose
-//  this->dataPtr->jointMaker->NewRelativePose(ignition::math::Pose3d(), true);
+//  this->dataPtr->jointMaker->SetRelativePose(ignition::math::Pose3d(), true);
 
   // Reference link
 //  bool childToParent = this->dataPtr->alignCombo->currentIndex() == 0;
@@ -845,7 +844,7 @@ void JointCreationDialog::OnAlign(const int _int)
 }
 
 /////////////////////////////////////////////////
-void JointCreationDialog::NewType(const int _typeInt)
+void JointCreationDialog::SetType(const int _typeInt)
 {
   auto type = static_cast<JointMaker::JointType>(_typeInt);
   unsigned int axisCount = JointMaker::GetJointAxisCount(type);
