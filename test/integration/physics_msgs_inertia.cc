@@ -51,7 +51,7 @@ class InertiaMsgsTest : public ServerFixture,
 /////////////////////////////////////////////////
 void InertiaMsgsTest::InertialAccessors(const std::string &_physicsEngine)
 {
-  Load("worlds/seesaw.world", true, _physicsEngine);
+  this->Load("worlds/seesaw.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
@@ -125,7 +125,7 @@ TEST_P(InertiaMsgsTest, InertialAccessors)
 /////////////////////////////////////////////////
 void InertiaMsgsTest::SetCoG(const std::string &_physicsEngine)
 {
-  Load("worlds/seesaw.world", true, _physicsEngine);
+  this->Load("worlds/seesaw.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
@@ -199,7 +199,7 @@ TEST_P(InertiaMsgsTest, SetCoG)
 /////////////////////////////////////////////////
 void InertiaMsgsTest::SetMass(const std::string &_physicsEngine)
 {
-  Load("worlds/seesaw.world", true, _physicsEngine);
+  this->Load("worlds/seesaw.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
@@ -272,7 +272,7 @@ TEST_P(InertiaMsgsTest, SetMass)
 /////////////////////////////////////////////////
 void InertiaMsgsTest::SetPendulumInertia(const std::string &_physicsEngine)
 {
-  Load("worlds/pendulum_axes.world", true, _physicsEngine);
+  this->Load("worlds/pendulum_axes.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
