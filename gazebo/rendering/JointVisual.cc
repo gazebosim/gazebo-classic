@@ -100,7 +100,7 @@ void JointVisual::Load(ConstJointPtr &_msg)
   dPtr->scaleToLink = math::Vector3(linkSize * 0.7,
                                     linkSize * 0.7,
                                     linkSize * 0.7);
-  this->SetScale(dPtr->scaleToLink);
+  this->SetScale(dPtr->scaleToLink.Ign());
   if (dPtr->parentAxisVis)
     dPtr->parentAxisVis->SetScale(dPtr->scaleToLink.Ign());
 
@@ -121,7 +121,7 @@ void JointVisual::Load(ConstJointPtr &_msg, const math::Pose &_worldPose)
       axis1Msg.use_parent_model_frame(), _msg->type());
 
   // joint pose is always relative to the child link so update axis pose
-  this->SetWorldPose(_worldPose);
+  this->SetWorldPose(_worldPose.Ign());
 
   this->GetSceneNode()->setInheritScale(false);
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
@@ -155,15 +155,15 @@ void JointVisual::UpdateAxis(ArrowVisualPtr _arrowVisual,
   // Get rotation to axis vector
   ignition::math::Vector3d axisDir = _axis.Ign();
   ignition::math::Vector3d u = axisDir.Normalize();
-  ignition::math::Vector3d v = igntion::math::Vector3d::UnitZ;
+  ignition::math::Vector3d v = ignition::math::Vector3d::UnitZ;
   double cosTheta = v.Dot(u);
   double angle = acos(cosTheta);
   ignition::math::Quaterniond quat;
   // check the parallel case
   if (math::equal(angle, M_PI))
-    quat.SetFromAxis(u.Perpendicular(), angle);
+    quat.Axis(u.Perpendicular(), angle);
   else
-    quat.SetFromAxis((v.Cross(u)).Normalize(), angle);
+    quat.Axis((v.Cross(u)).Normalize(), angle);
   _arrowVisual->SetRotation(quat);
 
   if (_useParentFrame)
@@ -171,7 +171,7 @@ void JointVisual::UpdateAxis(ArrowVisualPtr _arrowVisual,
     // if set to use parent model frame
     // rotate the arrow visual relative to the model
     VisualPtr model = this->GetRootVisual();
-    math::Quaternion quatFromModel =
+    ignition::math::Quaterniond quatFromModel =
         model->WorldPose().Rot().Inverse() * this->WorldPose().Rot();
     _arrowVisual->SetRotation(quatFromModel.Inverse() *
         _arrowVisual->Rotation());
@@ -191,26 +191,29 @@ void JointVisual::UpdateAxis(ArrowVisualPtr _arrowVisual,
   }
 
   // Hide existing arrow head if it overlaps with the axis
-  math::Quaternion axisWorldRotation = _arrowVisual->GetWorldPose().rot;
-  math::Quaternion jointWorldRotation = this->GetWorldPose().rot;
+  ignition::math::Quaterniond axisWorldRotation =
+    _arrowVisual->WorldPose().Rot();
+  ignition::math::Quaterniond jointWorldRotation =
+    this->WorldPose().Rot();
 
   dPtr->axisVisual->ShowAxisHead(0, true);
   dPtr->axisVisual->ShowAxisHead(1, true);
   dPtr->axisVisual->ShowAxisHead(2, true);
   _arrowVisual->ShowShaft(true);
 
-  math::Vector3 axisWorld = axisWorldRotation*math::Vector3::UnitZ;
-  if (axisWorld == jointWorldRotation*math::Vector3::UnitX)
+  ignition::math::Vector3d axisWorld =
+    axisWorldRotation * ignition::math::Vector3d::UnitZ;
+  if (axisWorld == jointWorldRotation * ignition::math::Vector3d::UnitX)
   {
     dPtr->axisVisual->ShowAxisHead(0, false);
     _arrowVisual->ShowShaft(false);
   }
-  else if (axisWorld == jointWorldRotation*math::Vector3::UnitY)
+  else if (axisWorld == jointWorldRotation * ignition::math::Vector3d::UnitY)
   {
     dPtr->axisVisual->ShowAxisHead(1, false);
     _arrowVisual->ShowShaft(false);
   }
-  else if (axisWorld == jointWorldRotation*math::Vector3::UnitZ)
+  else if (axisWorld == jointWorldRotation * ignition::math::Vector3d::UnitZ)
   {
     dPtr->axisVisual->ShowAxisHead(2, false);
     _arrowVisual->ShowShaft(false);
@@ -227,7 +230,7 @@ void JointVisual::UpdateFromMsg(ConstJointPtr &_msg)
   {
     // Avoid position changing when parent is scaled
     this->SetPosition(msgs::ConvertIgn(_msg->pose().position()) /
-        this->GetParent()->GetScale().Ign());
+        this->GetParent()->Scale());
     this->SetRotation(msgs::ConvertIgn(_msg->pose().orientation()));
   }
 
@@ -261,7 +264,7 @@ void JointVisual::UpdateFromMsg(ConstJointPtr &_msg)
           axis2Msg.use_parent_model_frame(), _msg->type());
       // joint pose is always relative to the child link
       dPtr->parentAxisVis->SetWorldPose(msgs::ConvertIgn(_msg->pose()) +
-          this->GetParent()->GetWorldPose().Ign());
+          this->GetParent()->WorldPose());
     }
     else
     {
@@ -273,9 +276,8 @@ void JointVisual::UpdateFromMsg(ConstJointPtr &_msg)
 
       JointVisualPtr jointVis;
       jointVis.reset(new JointVisual(this->GetName() + "_parent_", parentVis));
-      jointVis->Load(_msg,
-          msgs::ConvertIgn(_msg->pose()) +
-          this->GetParent()->GetWorldPose().Ign());
+      jointVis->Load(_msg, msgs::ConvertIgn(_msg->pose()) +
+          this->GetParent()->WorldPose());
 
       dPtr->parentAxisVis = jointVis;
       dPtr->parentAxisVis->SetScale(dPtr->scaleToLink.Ign());

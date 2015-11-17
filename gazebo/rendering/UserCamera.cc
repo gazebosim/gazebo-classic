@@ -510,14 +510,13 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
     this->scene->GetManager()->destroyAnimation("cameratrack");
   }
 
-  ignition::math::Box box = _visual->GetBoundingBox().Ign();
+  ignition::math::Box box = _visual->BoundingBox();
   ignition::math::Vector3d size = box.Size();
   double maxSize = size.Max();
 
   ignition::math::Vector3d start = this->WorldPose().Pos();
   start.Correct();
-  ignition::math::Vector3d end = box.Center() +
-    _visual->GetWorldPose().pos.Ign();
+  ignition::math::Vector3d end = box.Center() + _visual->WorldPose().Pos();
   end.Correct();
   ignition::math::Vector3d dir = end - start;
   dir.Correct();

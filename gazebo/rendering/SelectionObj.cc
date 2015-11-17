@@ -166,7 +166,7 @@ void SelectionObj::UpdateSize()
   dPtr->parent = vis;
   dPtr->parent->AttachVisual(shared_from_this());
 
-  double max = std::max(std::max(bboxSize.x, bboxSize.y), bboxSize.z);
+  double max = bboxSize.Max();
 
   max = std::min(std::max(dPtr->minScale, max), dPtr->maxScale);
 

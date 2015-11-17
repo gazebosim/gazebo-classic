@@ -1654,7 +1654,7 @@ void Visual::SetPosition(const ignition::math::Vector3d &_pos)
   GZ_ASSERT(this->dataPtr->sceneNode, "Visual SceneNode is NULL");
   this->dataPtr->sceneNode->setPosition(_pos.X(), _pos.Y(), _pos.Z());
 
-  this->dataPtr->sdf->GetElement("pose")->Set(this->GetPose());
+  this->dataPtr->sdf->GetElement("pose")->Set(this->Pose());
 }
 
 //////////////////////////////////////////////////
@@ -1776,7 +1776,7 @@ ignition::math::Pose3d Visual::WorldPose() const
     pose.Pos() = Conversions::ConvertIgn(vpos);
 
     vquatern = this->dataPtr->sceneNode->_getDerivedOrientation();
-    pose.Row() = Conversions::ConvertIgn(vquatern);
+    pose.Rot() = Conversions::ConvertIgn(vquatern);
   }
 
   return pose;
