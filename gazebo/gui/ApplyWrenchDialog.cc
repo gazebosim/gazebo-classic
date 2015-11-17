@@ -764,7 +764,8 @@ void ApplyWrenchDialog::SetForcePos(const math::Vector3 &_forcePos)
     return;
   }
 
-  this->dataPtr->applyWrenchVisual->SetForcePos(this->dataPtr->forcePosVector);
+  this->dataPtr->applyWrenchVisual->SetForcePos(
+      this->dataPtr->forcePosVector.Ign());
 }
 
 /////////////////////////////////////////////////
@@ -802,7 +803,7 @@ void ApplyWrenchDialog::SetForce(const math::Vector3 &_force,
     return;
   }
 
-  this->dataPtr->applyWrenchVisual->SetForce(_force, _rotatedByMouse);
+  this->dataPtr->applyWrenchVisual->SetForce(_force.Ign(), _rotatedByMouse);
 }
 
 /////////////////////////////////////////////////
@@ -840,7 +841,7 @@ void ApplyWrenchDialog::SetTorque(const math::Vector3 &_torque,
     return;
   }
 
-  this->dataPtr->applyWrenchVisual->SetTorque(_torque, _rotatedByMouse);
+  this->dataPtr->applyWrenchVisual->SetTorque(_torque.Ign(), _rotatedByMouse);
 }
 
 /////////////////////////////////////////////////
@@ -855,7 +856,7 @@ void ApplyWrenchDialog::SetCoM(const math::Vector3 &_com)
     return;
   }
 
-  this->dataPtr->applyWrenchVisual->SetCoM(this->dataPtr->comVector);
+  this->dataPtr->applyWrenchVisual->SetCoM(this->dataPtr->comVector.Ign());
 }
 
 /////////////////////////////////////////////////
