@@ -60,21 +60,23 @@ JointMaker::JointMaker()
 
   this->jointMaterials[JOINT_FIXED]     = "Gazebo/Red";
   this->jointMaterials[JOINT_HINGE]     = "Gazebo/Orange";
-  this->jointMaterials[JOINT_HINGE2]    = "Gazebo/Yellow";
+  this->jointMaterials[JOINT_HINGE2]    = "Gazebo/DarkYellow";
   this->jointMaterials[JOINT_SLIDER]    = "Gazebo/Green";
-  this->jointMaterials[JOINT_SCREW]     = "Gazebo/Black";
+  this->jointMaterials[JOINT_SCREW]     = "Gazebo/DarkGrey";
   this->jointMaterials[JOINT_UNIVERSAL] = "Gazebo/Blue";
   this->jointMaterials[JOINT_BALL]      = "Gazebo/Purple";
+  this->jointMaterials[JOINT_GEARBOX]   = "Gazebo/Indigo";
 
 
-  jointTypes[JOINT_FIXED]     = "fixed";
-  jointTypes[JOINT_HINGE]     = "revolute";
-  jointTypes[JOINT_HINGE2]    = "revolute2";
-  jointTypes[JOINT_SLIDER]    = "prismatic";
-  jointTypes[JOINT_SCREW]     = "screw";
-  jointTypes[JOINT_UNIVERSAL] = "universal";
-  jointTypes[JOINT_BALL]      = "ball";
-  jointTypes[JOINT_NONE]      = "none";
+  this->jointTypes[JOINT_FIXED]     = "fixed";
+  this->jointTypes[JOINT_HINGE]     = "revolute";
+  this->jointTypes[JOINT_HINGE2]    = "revolute2";
+  this->jointTypes[JOINT_SLIDER]    = "prismatic";
+  this->jointTypes[JOINT_SCREW]     = "screw";
+  this->jointTypes[JOINT_UNIVERSAL] = "universal";
+  this->jointTypes[JOINT_BALL]      = "ball";
+  this->jointTypes[JOINT_GEARBOX]   = "gearbox";
+  this->jointTypes[JOINT_NONE]      = "none";
 
   this->connections.push_back(
       event::Events::ConnectPreRender(
