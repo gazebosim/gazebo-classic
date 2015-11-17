@@ -1913,6 +1913,8 @@ void Scene::PreRender()
         std::front_inserter(this->dataPtr->linkMsgs));
   }
 
+  RTShaderSystem::Instance()->Update();
+
   {
     boost::recursive_mutex::scoped_lock lock(this->dataPtr->poseMsgMutex);
 
@@ -2610,7 +2612,8 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
       visual->ShowLinkFrame(this->dataPtr->showLinkFrames);
       visual->ShowCollision(this->dataPtr->showCollisions);
       visual->ShowJoints(this->dataPtr->showJoints);
-      visual->SetTransparency(this->dataPtr->transparent ? 0.5 : 0.0);
+      if (visual->GetType() == Visual::VT_MODEL)
+        visual->SetTransparency(this->dataPtr->transparent ? 0.5 : 0.0);
       visual->SetWireframe(this->dataPtr->wireframe);
     }
   }
@@ -3139,12 +3142,8 @@ void Scene::SetTransparent(bool _show)
   this->dataPtr->transparent = _show;
   for (auto visual : this->dataPtr->visuals)
   {
-    if (visual.second->GetType() != Visual::VT_GUI &&
-        visual.second->GetType() != Visual::VT_PHYSICS &&
-        visual.second->GetType() != Visual::VT_SENSOR)
-    {
+    if (visual.second->GetType() == Visual::VT_MODEL)
       visual.second->SetTransparency(_show ? 0.5 : 0.0);
-    }
   }
 }
 

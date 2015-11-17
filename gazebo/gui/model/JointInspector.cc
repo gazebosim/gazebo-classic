@@ -157,6 +157,13 @@ void JointInspector::OnJointTypeChanged(const QString &/*_name*/,
     const QString &_value)
 {
   std::string valueStr = _value.toLower().toStdString();
+
+  if (valueStr == "gearbox" || valueStr == "screw")
+  {
+    gzerr << "Not all " << valueStr << " joint params are editable in "
+        << " the model editor in gazebo versions <= 6" << std::endl;
+  }
+
   unsigned int axisCount = JointMaker::GetJointAxisCount(
       JointMaker::ConvertJointType(valueStr));
 
