@@ -337,9 +337,6 @@ namespace gazebo
       /// currently triggered by the context menu via right click.
       private slots: void OnDelete();
 
-      /// \brief Constant vector containing [UnitX, UnitY, UnitZ].
-      private: std::vector<ignition::math::Vector3d> unitVectors;
-
       /// \brief Type of joint to create
       private: JointMaker::JointType jointType;
 
@@ -382,6 +379,9 @@ namespace gazebo
       /// \brief A map of joint type to its string value.
       public: static std::map<JointMaker::JointType, std::string> jointTypes;
 
+      /// \brief Constant vector containing [UnitX, UnitY, UnitZ].
+      public: static std::vector<ignition::math::Vector3d> unitVectors;
+
       /// \brief A map of joint type to its corresponding material.
       public: static std::map<JointMaker::JointType, std::string>
           jointMaterials;
@@ -407,6 +407,9 @@ namespace gazebo
 
       /// \brief Update this joint data.
       public: void Update();
+
+      /// \brief Update the joint message based on the other fields.
+      public: void UpdateMsg();
 
       /// \brief Name of the joint.
       public: std::string name;
