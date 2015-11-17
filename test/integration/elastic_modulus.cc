@@ -20,16 +20,16 @@
 #include <vector>
 #include <math.h>
 
+#include <gazebo/msgs/msgs.hh>
+#include <gazebo/physics/physics.hh>
+#include <gazebo/test/helper_physics_generator.hh>
+#include <gazebo/test/ServerFixture.hh>
+#include <gazebo/transport/transport.hh>
+
 #include <ignition/math/Rand.hh>
 
-#include <gazebo/msgs/msgs.hh>
-#include <gazebo/transport/transport.hh>
-#include <gazebo/test/ServerFixture.hh>
-#include <gazebo/physics/physics.hh>
-#include <gazebo/msgs/msgs.hh>
-#include <gazebo/test/helper_physics_generator.hh>
-
 #define PHYSICS_TOL 0.008
+
 using namespace gazebo;
 
 class PhysicsTest : public ServerFixture,
