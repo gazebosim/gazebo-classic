@@ -1577,6 +1577,16 @@ void JointMaker::SetAxis(const QString &_axis,
 }
 
 /////////////////////////////////////////////////
+void JointMaker::SetJointPose(const ignition::math::Pose3d &_pose)
+{
+  if (this->newJoint && this->newJoint->jointMsg)
+  {
+    msgs::Set(this->newJoint->jointMsg->mutable_pose(), _pose);
+    this->newJoint->Update();
+  }
+}
+
+/////////////////////////////////////////////////
 void JointMaker::SetParentLink(const std::string &_name)
 {
   auto vis = this->LinkVisualFromName(_name);

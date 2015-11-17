@@ -221,6 +221,8 @@ namespace gazebo
       public slots: void SetAxis(const QString &_axis,
           const ignition::math::Vector3d &_value);
 
+      public: void SetJointPose(const ignition::math::Pose3d &_pose);
+
       /// \brief A new parent link for the joint being created has been chosen.
       /// To be used by other classes.
       /// \sa SetParentLink(rendering::VisualPtr _parentLink)

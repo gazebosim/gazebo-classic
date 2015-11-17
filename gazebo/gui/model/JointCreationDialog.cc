@@ -541,8 +541,8 @@ void JointCreationDialog::OnPoseFromDialog(const QString &_name,
 {
  // if (_name == "relative_pose")
  //   this->dataPtr->jointMaker->SetRelativePose(_pose, false);
- // else if (_name == "joint_pose")
- //   this->dataPtr->jointMaker->SetJointPose(_pose);
+  if (_name == "joint_pose")
+    this->dataPtr->jointMaker->SetJointPose(_pose);
 }
 
 /////////////////////////////////////////////////
