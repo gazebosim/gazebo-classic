@@ -134,12 +134,12 @@ TEST_F(CameraTest, Visible)
   world->Step(1);
   sleep = 0;
   maxSleep = 10;
-  while (visual->GetWorldPose() != pose && sleep < maxSleep)
+  while (visual->WorldPose() != pose.Ign() && sleep < maxSleep)
   {
     common::Time::MSleep(100);
     sleep++;
   }
-  EXPECT_TRUE(visual->GetWorldPose() == pose);
+  EXPECT_TRUE(visual->WorldPose() == pose.Ign());
   world->Step(1);
   EXPECT_TRUE(!camera->IsVisible(visual));
   EXPECT_TRUE(!camera->IsVisible(visual->GetName()));
@@ -150,12 +150,12 @@ TEST_F(CameraTest, Visible)
   world->Step(1);
   sleep = 0;
   maxSleep = 10;
-  while (visual->GetWorldPose() != pose && sleep < maxSleep)
+  while (visual->WorldPose() != pose.Ign() && sleep < maxSleep)
   {
     common::Time::MSleep(100);
     sleep++;
   }
-  EXPECT_TRUE(visual->GetWorldPose() == pose);
+  EXPECT_TRUE(visual->WorldPose() == pose.Ign());
   world->Step(1);
   EXPECT_TRUE(!camera->IsVisible(visual));
   EXPECT_TRUE(!camera->IsVisible(visual->GetName()));
@@ -167,12 +167,12 @@ TEST_F(CameraTest, Visible)
   world->Step(1);
   sleep = 0;
   maxSleep = 10;
-  while (visual->GetWorldPose() != pose && sleep < maxSleep)
+  while (visual->WorldPose() != pose.Ign() && sleep < maxSleep)
   {
     common::Time::MSleep(100);
     sleep++;
   }
-  EXPECT_TRUE(visual->GetWorldPose() == pose);
+  EXPECT_TRUE(visual->WorldPose() == pose.Ign());
   world->Step(1);
   EXPECT_TRUE(!camera->IsVisible(visual));
   EXPECT_TRUE(!camera->IsVisible(visual->GetName()));
@@ -190,12 +190,12 @@ TEST_F(CameraTest, Visible)
   world->Step(1);
   sleep = 0;
   maxSleep = 10;
-  while (visual->GetWorldPose() != pose && sleep < maxSleep)
+  while (visual->WorldPose() != pose.Ign() && sleep < maxSleep)
   {
     common::Time::MSleep(100);
     sleep++;
   }
-  EXPECT_TRUE(visual->GetWorldPose() == pose);
+  EXPECT_TRUE(visual->WorldPose() == pose.Ign());
   world->Step(1);
   EXPECT_TRUE(!camera->IsVisible(visual));
   EXPECT_TRUE(!camera->IsVisible(visual->GetName()));

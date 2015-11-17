@@ -959,7 +959,7 @@ bool ApplyWrenchDialog::OnMousePress(const common::MouseEvent &_event)
 
     // Register rotTool pose at drag start
     this->dataPtr->dragStartPose =
-        this->dataPtr->applyWrenchVisual->GetRotTool()->GetWorldPose();
+        this->dataPtr->applyWrenchVisual->GetRotTool()->WorldPose();
   }
   return false;
 }
@@ -1082,8 +1082,8 @@ bool ApplyWrenchDialog::OnMouseMove(const common::MouseEvent &_event)
     vec.Z(-sin(rotEuler.Y()));
 
     // To local frame
-    vec = this->dataPtr->linkVisual->GetWorldPose().rot.RotateVectorReverse(
-        vec).Ign();
+    vec = this->dataPtr->linkVisual->WorldPose().Rot().RotateVectorReverse(
+        vec);
 
     if (this->GetMode() == Mode::FORCE)
     {

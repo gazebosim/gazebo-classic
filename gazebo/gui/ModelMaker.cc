@@ -350,15 +350,14 @@ void ModelMaker::CreateTheEntity()
 
     // The the SDF model's name
     modelElem->GetAttribute("name")->Set(modelName);
-    modelElem->GetElement("pose")->Set(
-        dPtr->modelVisual->GetWorldPose().Ign());
+    modelElem->GetElement("pose")->Set(dPtr->modelVisual->WorldPose());
 
     // Spawn the model in the physics server
     msg.set_sdf(dPtr->modelSDF->ToString());
   }
   else
   {
-    msgs::Set(msg.mutable_pose(), dPtr->modelVisual->GetWorldPose().Ign());
+    msgs::Set(msg.mutable_pose(), dPtr->modelVisual->WorldPose());
     msg.set_clone_model_name(dPtr->modelVisual->GetName().substr(0,
           dPtr->modelVisual->GetName().find("_clone_tmp")));
   }
@@ -372,7 +371,7 @@ ignition::math::Vector3d ModelMaker::EntityPosition() const
   ModelMakerPrivate *dPtr =
       reinterpret_cast<ModelMakerPrivate *>(this->dataPtr);
 
-  return dPtr->modelVisual->GetWorldPose().pos.Ign();
+  return dPtr->modelVisual->WorldPose().Pos();
 }
 
 /////////////////////////////////////////////////

@@ -305,11 +305,11 @@ void ModelSnap::Snap(const std::vector<math::Vector3> &_triangleSrc,
   math::Quaternion rotation;
 
   this->GetSnapTransform(_triangleSrc, _triangleDest,
-      _visualSrc->GetWorldPose(), translation, rotation);
+      _visualSrc->WorldPose(), translation, rotation);
 
   _visualSrc->SetWorldPose(
-      math::Pose(_visualSrc->GetWorldPose().pos + translation,
-      rotation * _visualSrc->GetWorldPose().rot));
+      ignition::math::Pose3d(_visualSrc->WorldPose().Pos() + translation.Ign(),
+      rotation.Ign() * _visualSrc->WorldPose().Rot()));
 
   this->PublishVisualPose(_visualSrc);
 }
@@ -362,7 +362,7 @@ void ModelSnap::PublishVisualPose(rendering::VisualPtr _vis)
     msg.set_id(gui::get_entity_id(_vis->GetName()));
     msg.set_name(_vis->GetName());
 
-    msgs::Set(msg.mutable_pose(), _vis->GetWorldPose().Ign());
+    msgs::Set(msg.mutable_pose(), _vis->WorldPose());
     this->dataPtr->modelPub->Publish(msg);
 
     // Register user command on server
@@ -386,9 +386,9 @@ void ModelSnap::Update()
       for (unsigned int i = 0; i < this->dataPtr->hoverTriangle.size(); ++i)
       {
         hoverTriangle.push_back(
-            this->dataPtr->hoverVis->GetWorldPose().rot.GetInverse() *
-            (this->dataPtr->hoverTriangle[i] -
-            this->dataPtr->hoverVis->GetWorldPose().pos));
+            this->dataPtr->hoverVis->WorldPose().Rot().Inverse() *
+            (this->dataPtr->hoverTriangle[i].Ign() -
+            this->dataPtr->hoverVis->WorldPose().Pos()));
       }
 
       if (!this->dataPtr->highlightVisual)
@@ -447,9 +447,9 @@ void ModelSnap::Update()
     for (unsigned int i = 0; i < this->dataPtr->selectedTriangle.size(); ++i)
     {
       triangle.push_back(
-          this->dataPtr->selectedVis->GetWorldPose().rot.GetInverse() *
-          (this->dataPtr->selectedTriangle[i] -
-          this->dataPtr->selectedVis->GetWorldPose().pos));
+          this->dataPtr->selectedVis->WorldPose().Rot().Inverse() *
+          (this->dataPtr->selectedTriangle[i].Ign() -
+          this->dataPtr->selectedVis->WorldPose().Pos()));
     }
 
     if (!this->dataPtr->snapVisual)

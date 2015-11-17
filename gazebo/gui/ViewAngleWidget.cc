@@ -159,7 +159,7 @@ void ViewAngleWidget::LookDirection(const ignition::math::Vector3d &_dir)
   {
     for (auto const &vis : selectedVisuals)
     {
-      ignition::math::Vector3d visPos = vis->GetWorldPose().pos.Ign();
+      ignition::math::Vector3d visPos = vis->WorldPose().Pos();
       lookAt += visPos;
     }
     lookAt /= selectedVisuals.size();

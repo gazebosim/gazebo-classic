@@ -409,8 +409,8 @@ JointData *JointMaker::CreateJointLine(const std::string &_name,
   jointVis->Load();
   rendering::DynamicLines *jointLine =
       jointVis->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
-  math::Vector3 origin = _parent->GetWorldPose().pos
-      - _parent->GetParent()->GetWorldPose().pos;
+  math::Vector3 origin = _parent->WorldPose().Pos()
+      - _parent->GetParent()->WorldPose().Pos();
   jointLine->AddPoint(origin.Ign());
   jointLine->AddPoint(origin.Ign() + ignition::math::Vector3d(0, 0, 0.1));
   jointVis->GetSceneNode()->setInheritScale(false);
@@ -669,7 +669,7 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
         parentPos = this->GetLinkWorldCentroid(this->mouseJoint->parent).Ign()
             - this->mouseJoint->line->Point(0);
         this->mouseJoint->line->SetPoint(1,
-            this->GetLinkWorldCentroid(this->hoverVis) -
+            this->GetLinkWorldCentroid(this->hoverVis).Ign() -
             parentPos.Ign() + pt);
       }
     }
@@ -781,7 +781,7 @@ void JointMaker::CreateHotSpot(JointData *_joint)
   color.a = 0.5;
 
   double linkSize = std::min(0.1,
-      _joint->parent->GetBoundingBox().GetSize().GetLength()*0.05);
+      _joint->parent->BoundingBox().Size().Length()*0.05);
   linkSize = std::max(linkSize, 0.01);
 
   double dimension = linkSize;
@@ -832,13 +832,13 @@ void JointMaker::Update()
       if (joint->child && joint->parent)
       {
         bool poseUpdate = false;
-        if (joint->parentPose != joint->parent->GetWorldPose() ||
-            joint->childPose != joint->child->GetWorldPose() ||
-            joint->childScale != joint->child->GetScale())
+        if (joint->parentPose != joint->parent->WorldPose() ||
+            joint->childPose != joint->child->WorldPose() ||
+            joint->childScale != joint->child->Scale())
          {
-           joint->parentPose = joint->parent->GetWorldPose();
-           joint->childPose = joint->child->GetWorldPose();
-           joint->childScale = joint->child->GetScale();
+           joint->parentPose = joint->parent->WorldPose();
+           joint->childPose = joint->child->WorldPose();
+           joint->childScale = joint->child->Scale();
            poseUpdate = true;
          }
 
@@ -985,7 +985,7 @@ math::Vector3 JointMaker::GetLinkWorldCentroid(
     if (_visual->GetChild(i)->GetName().find("_JOINT_VISUAL_") ==
         std::string::npos)
     {
-      centroid += _visual->GetChild(i)->GetWorldPose().pos;
+      centroid += _visual->GetChild(i)->WorldPose().Pos();
       count++;
     }
   }
@@ -1082,18 +1082,18 @@ void JointData::OpenInspector()
 void JointData::Update()
 {
   // get origin of parent link visuals
-  math::Vector3 parentOrigin = this->parent->GetWorldPose().pos;
+  math::Vector3 parentOrigin = this->parent->WorldPose().Pos();
 
   // get origin of child link visuals
-  math::Vector3 childOrigin = this->child->GetWorldPose().pos;
+  math::Vector3 childOrigin = this->child->WorldPose().Pos();
 
   // set position of joint hotspot
   math::Vector3 dPos = (childOrigin - parentOrigin);
   math::Vector3 center = dPos * 0.5;
   double length = std::max(dPos.GetLength(), 0.001);
   this->hotspot->SetScale(
-      math::Vector3(0.008, 0.008, length));
-  this->hotspot->SetWorldPosition(parentOrigin + center);
+      ignition::math::Vector3d(0.008, 0.008, length));
+  this->hotspot->SetWorldPosition(parentOrigin.Ign() + center.Ign());
 
   // set orientation of joint hotspot
   math::Vector3 u = dPos.Normalize();
@@ -1103,7 +1103,7 @@ void JointData::Update()
   math::Vector3 w = (v.Cross(u)).Normalize();
   math::Quaternion q;
   q.SetFromAxis(w, angle);
-  this->hotspot->SetWorldRotation(q);
+  this->hotspot->SetWorldRotation(q.Ign());
 
   // set new material if joint type has changed
   std::string material = JointMaker::jointMaterials[this->type];
@@ -1133,7 +1133,7 @@ void JointData::Update()
   // set pos of joint handle
   this->handles->getBillboard(0)->setPosition(
       rendering::Conversions::Convert(parentOrigin -
-      this->hotspot->GetWorldPose().pos));
+      this->hotspot->WorldPose().Pos()));
   this->handles->_updateBounds();
 
   // Update msg
@@ -1169,11 +1169,10 @@ void JointData::Update()
   }
 
   // Line now connects the child link to the joint frame
-  this->line->SetPoint(0, (this->child->GetWorldPose().pos
-      - this->child->GetParent()->GetWorldPose().pos).Ign());
-  this->line->SetPoint(1,
-      (this->jointVisual->GetWorldPose().pos
-      - this->child->GetParent()->GetWorldPose().pos).Ign());
+  this->line->SetPoint(0, this->child->WorldPose().Pos()
+      - this->child->GetParent()->WorldPose().Pos());
+  this->line->SetPoint(1, this->jointVisual->WorldPose().Pos()
+      - this->child->GetParent()->WorldPose().Pos());
   this->line->setMaterial(JointMaker::jointMaterials[this->type]);
   this->dirty = false;
 }
@@ -1310,10 +1309,10 @@ void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
   rendering::DynamicLines *jointLine =
       jointVis->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
 
-  math::Vector3 origin = parentVis->GetWorldPose().pos
-      - parentVis->GetParent()->GetWorldPose().pos;
-  jointLine->AddPoint(origin.Ign());
-  jointLine->AddPoint(origin.Ign() + ignition::math::Vector3d(0, 0, 0.1));
+  ignition::math::Vector3d origin = parentVis->WorldPose().Pos()
+      - parentVis->GetParent()->WorldPose().Pos();
+  jointLine->AddPoint(origin);
+  jointLine->AddPoint(origin + ignition::math::Vector3d(0, 0, 0.1));
 
   jointVis->GetSceneNode()->setInheritScale(false);
   jointVis->GetSceneNode()->setInheritOrientation(false);

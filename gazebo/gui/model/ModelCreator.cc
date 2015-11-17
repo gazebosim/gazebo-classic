@@ -318,7 +318,7 @@ void ModelCreator::OnEditModel(const std::string &_modelName)
           ignition::math::Pose3d pose;
           if (visual)
           {
-            pose = visual->GetWorldPose().Ign();
+            pose = visual->WorldPose();
             this->previewVisual->SetWorldPose(pose);
           }
 
@@ -862,17 +862,18 @@ std::string ModelCreator::AddShape(EntityType _type,
   this->CreateLink(visVisual);
   linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
 
-  linkVisual->SetPose(_pose);
+  linkVisual->SetPose(_pose.Ign());
 
   // insert over ground plane for now
-  math::Vector3 linkPos = linkVisual->GetWorldPose().pos;
+  ignition::math::Vector3d linkPos = linkVisual->WorldPose().Pos();
   if (_type == ENTITY_BOX || _type == ENTITY_CYLINDER || _type == ENTITY_SPHERE)
   {
-    linkPos.z = _size.z * 0.5;
+    linkPos.Z() = _size.z * 0.5;
   }
   // override orientation as it's more natural to insert objects upright rather
   // than inserting it in the model frame.
-  linkVisual->SetWorldPose(math::Pose(linkPos, math::Quaternion()));
+  linkVisual->SetWorldPose(ignition::math::Pose3d(linkPos,
+        ignition::math::Quaterniond()));
 
   this->mouseVisual = linkVisual;
 
@@ -1060,9 +1061,9 @@ LinkData *ModelCreator::CreateLinkFromSDF(const sdf::ElementPtr &_linkElem,
     visVisual->Load(visualElem);
 
     // Visual pose
-    math::Pose visualPose;
+    ignition::math::Pose3d visualPose;
     if (visualElem->HasElement("pose"))
-      visualPose = visualElem->Get<math::Pose>("pose");
+      visualPose = visualElem->Get<ignition::math::Pose3d>("pose");
     else
       visualPose.Set(0, 0, 0, 0, 0, 0);
     visVisual->SetPose(visualPose);
@@ -1106,9 +1107,9 @@ LinkData *ModelCreator::CreateLinkFromSDF(const sdf::ElementPtr &_linkElem,
         linkVisual));
 
     // Collision pose
-    math::Pose collisionPose;
+    ignition::math::Pose3d collisionPose;
     if (collisionElem->HasElement("pose"))
-      collisionPose = collisionElem->Get<math::Pose>("pose");
+      collisionPose = collisionElem->Get<ignition::math::Pose3d>("pose");
     else
       collisionPose.Set(0, 0, 0, 0, 0, 0);
 
@@ -1650,7 +1651,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
     if (linkIt != this->allLinks.end())
     {
       LinkData *link = linkIt->second;
-      link->SetPose((this->mouseVisual->GetWorldPose()-this->modelPose).Ign());
+      link->SetPose(this->mouseVisual->WorldPose() - this->modelPose);
       gui::model::Events::linkInserted(this->mouseVisual->GetName());
     }
     else
@@ -1659,8 +1660,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
       if (modelIt != this->allNestedModels.end())
       {
         NestedModelData *modelData = modelIt->second;
-        modelData->SetPose((
-            this->mouseVisual->GetWorldPose()-this->modelPose).Ign());
+        modelData->SetPose(this->mouseVisual->WorldPose() - this->modelPose);
 
         this->EmitNestedModelInsertedEvent(this->mouseVisual);
       }
@@ -1886,15 +1886,15 @@ bool ModelCreator::OnMouseMove(const common::MouseEvent &_event)
     return false;
   }
 
-  math::Pose pose = this->mouseVisual->GetWorldPose();
-  pose.pos = ModelManipulator::GetMousePositionOnPlane(
-      userCamera, _event);
+  ignition::math::Pose3d pose = this->mouseVisual->WorldPose();
+  pose.Pos() = ModelManipulator::GetMousePositionOnPlane(
+      userCamera, _event).Ign();
 
   if (!_event.Shift())
   {
-    pose.pos = ModelManipulator::SnapPoint(pose.pos);
+    pose.Pos() = ModelManipulator::SnapPoint(pose.Pos()).Ign();
   }
-  pose.pos.z = this->mouseVisual->GetWorldPose().pos.z;
+  pose.Pos().Z(this->mouseVisual->WorldPose().Pos().Z());
 
   this->mouseVisual->SetWorldPose(pose);
 
@@ -1947,7 +1947,7 @@ void ModelCreator::OpenInspector(const std::string &_name)
   if (link->nested)
     return;
 
-  link->SetPose((link->linkVisual->GetWorldPose()-this->modelPose).Ign());
+  link->SetPose(link->linkVisual->WorldPose() - this->modelPose);
   link->UpdateConfig();
   link->inspector->Open();
 }
@@ -1997,7 +1997,7 @@ void ModelCreator::OnPaste()
 
     LinkData* clonedLink = this->CloneLink(it->first);
 
-    math::Pose clonePose = copiedLink->linkVisual->GetWorldPose();
+    math::Pose clonePose = copiedLink->linkVisual->WorldPose();
     rendering::UserCameraPtr userCamera = gui::get_active_camera();
     if (userCamera)
     {
@@ -2008,7 +2008,7 @@ void ModelCreator::OnPaste()
       clonePose.pos.y = mousePosition.y;
     }
 
-    clonedLink->linkVisual->SetWorldPose(clonePose);
+    clonedLink->linkVisual->SetWorldPose(clonePose.Ign());
     this->addEntityType = ENTITY_MESH;
     this->mouseVisual = clonedLink->linkVisual;
   }
@@ -2076,7 +2076,7 @@ void ModelCreator::GenerateSDF()
     LinkData *link = linksIt.second;
     if (link->nested)
       continue;
-    link->SetPose((link->linkVisual->GetWorldPose() - this->modelPose).Ign());
+    link->SetPose(link->linkVisual->WorldPose() - this->modelPose);
     link->linkVisual->SetPose(link->Pose());
   }
   for (auto &nestedModelsIt : this->allNestedModels)
@@ -2090,8 +2090,7 @@ void ModelCreator::GenerateSDF()
     if (modelData->Depth() != 2)
       continue;
 
-    modelData->SetPose(modelData->modelVisual->GetWorldPose().Ign() -
-        this->modelPose);
+    modelData->SetPose(modelData->modelVisual->WorldPose() - this->modelPose);
     modelData->modelVisual->SetPose(modelData->Pose());
   }
 
@@ -2179,7 +2178,7 @@ sdf::ElementPtr ModelCreator::GenerateLinkSDF(LinkData *_link)
   collisionNameStream.str("");
 
   sdf::ElementPtr newLinkElem = _link->linkSDF->Clone();
-  newLinkElem->GetElement("pose")->Set(_link->linkVisual->GetWorldPose()
+  newLinkElem->GetElement("pose")->Set(_link->linkVisual->WorldPose()
       - this->modelPose);
 
   // visuals
@@ -2359,9 +2358,9 @@ void ModelCreator::Update()
   for (auto &linksIt : this->allLinks)
   {
     LinkData *link = linksIt.second;
-    if (link->Pose() != link->linkVisual->GetPose().Ign())
+    if (link->Pose() != link->linkVisual->Pose())
     {
-      link->SetPose((link->linkVisual->GetWorldPose() - this->modelPose).Ign());
+      link->SetPose(link->linkVisual->WorldPose() - this->modelPose);
       this->ModelChanged();
     }
     for (auto &scaleIt : this->linkScaleUpdate)

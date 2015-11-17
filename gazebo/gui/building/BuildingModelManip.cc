@@ -102,12 +102,12 @@ void BuildingModelManip::OnSizeChanged(double _width, double _depth,
     double _height)
 {
   this->size = BuildingMaker::ConvertSize(_width, _depth, _height);
-  double dScaleZ = this->visual->GetScale().z - this->size.z;
-  this->visual->SetScale(this->size);
-  math::Vector3 originalPos = this->visual->GetPosition();
+  double dScaleZ = this->visual->Scale().Z() - this->size.z;
+  this->visual->SetScale(this->size.Ign());
+  math::Vector3 originalPos = this->visual->Position();
   math::Vector3 newPos = originalPos
       - math::Vector3(0, 0, dScaleZ/2.0);
-  this->visual->SetPosition(newPos);
+  this->visual->SetPosition(newPos.Ign());
   this->maker->BuildingChanged();
 }
 
@@ -196,9 +196,9 @@ void BuildingModelManip::OnPoseOriginTransformed(double _x, double _y,
   math::Pose trans = BuildingMaker::ConvertPose(_x, -_y, _z, _roll, _pitch,
       _yaw);
 
-  math::Pose oldPose = this->visual->GetParent()->GetWorldPose();
+  math::Pose oldPose = this->visual->GetParent()->WorldPose();
 
-  this->visual->GetParent()->SetWorldPose(oldPose + trans);
+  this->visual->GetParent()->SetWorldPose(oldPose.Ign() + trans.Ign());
   this->maker->BuildingChanged();
 }
 
@@ -209,7 +209,7 @@ void BuildingModelManip::OnPositionChanged(double _x, double _y, double _z)
   double scaledY = BuildingMaker::Convert(-_y);
   double scaledZ = BuildingMaker::Convert(_z);
 
-  this->visual->GetParent()->SetWorldPosition(math::Vector3(
+  this->visual->GetParent()->SetWorldPosition(ignition::math::Vector3d(
       scaledX, scaledY, scaledZ));
   this->maker->BuildingChanged();
 }
@@ -218,9 +218,9 @@ void BuildingModelManip::OnPositionChanged(double _x, double _y, double _z)
 void BuildingModelManip::OnWidthChanged(double _width)
 {
   double scaledWidth = BuildingMaker::Convert(_width);
-  this->size = this->visual->GetScale();
+  this->size = this->visual->Scale();
   this->size.x = scaledWidth;
-  this->visual->SetScale(this->size);
+  this->visual->SetScale(this->size.Ign());
   this->maker->BuildingChanged();
 }
 
@@ -228,9 +228,9 @@ void BuildingModelManip::OnWidthChanged(double _width)
 void BuildingModelManip::OnDepthChanged(double _depth)
 {
   double scaledDepth = BuildingMaker::Convert(_depth);
-  this->size = this->visual->GetScale();
+  this->size = this->visual->Scale();
   this->size.y = scaledDepth;
-  this->visual->SetScale(this->size);
+  this->visual->SetScale(this->size.Ign());
   this->maker->BuildingChanged();
 }
 
@@ -238,46 +238,46 @@ void BuildingModelManip::OnDepthChanged(double _depth)
 void BuildingModelManip::OnHeightChanged(double _height)
 {
   double scaledHeight = BuildingMaker::Convert(_height);
-  this->size = this->visual->GetScale();
+  this->size = this->visual->Scale();
   this->size.z = scaledHeight;
-  math::Vector3 dScale = this->visual->GetScale() - this->size;
-  math::Vector3 originalPos = this->visual->GetPosition();
-  this->visual->SetScale(this->size);
+  math::Vector3 dScale = this->visual->Scale() - this->size.Ign();
+  math::Vector3 originalPos = this->visual->Position();
+  this->visual->SetScale(this->size.Ign());
 
   math::Vector3 newPos = originalPos
       - math::Vector3(0, 0, dScale.z/2.0);
 
-  this->visual->SetPosition(newPos);
+  this->visual->SetPosition(newPos.Ign());
   this->maker->BuildingChanged();
 }
 
 /////////////////////////////////////////////////
 void BuildingModelManip::OnPosXChanged(double _posX)
 {
-  math::Pose visualPose = this->visual->GetParent()->GetWorldPose();
+  math::Pose visualPose = this->visual->GetParent()->WorldPose();
   double scaledX = BuildingMaker::Convert(_posX);
   visualPose.pos.x = scaledX;
-  this->visual->GetParent()->SetWorldPosition(visualPose.pos);
+  this->visual->GetParent()->SetWorldPosition(visualPose.pos.Ign());
   this->maker->BuildingChanged();
 }
 
 /////////////////////////////////////////////////
 void BuildingModelManip::OnPosYChanged(double _posY)
 {
-  math::Pose visualPose = this->visual->GetParent()->GetWorldPose();
+  math::Pose visualPose = this->visual->GetParent()->WorldPose();
   double scaledY = BuildingMaker::Convert(_posY);
   visualPose.pos.y = -scaledY;
-  this->visual->GetParent()->SetWorldPosition(visualPose.pos);
+  this->visual->GetParent()->SetWorldPosition(visualPose.pos.Ign());
   this->maker->BuildingChanged();
 }
 
 /////////////////////////////////////////////////
 void BuildingModelManip::OnPosZChanged(double _posZ)
 {
-  math::Pose visualPose = this->visual->GetParent()->GetWorldPose();
+  math::Pose visualPose = this->visual->GetParent()->WorldPose();
   double scaledZ = BuildingMaker::Convert(_posZ);
   visualPose.pos.z = scaledZ;
-  this->visual->GetParent()->SetWorldPosition(visualPose.pos);
+  this->visual->GetParent()->SetWorldPosition(visualPose.pos.Ign());
   this->maker->BuildingChanged();
 }
 
@@ -285,9 +285,9 @@ void BuildingModelManip::OnPosZChanged(double _posZ)
 void BuildingModelManip::OnYawChanged(double _yaw)
 {
   double newYaw = BuildingMaker::ConvertAngle(_yaw);
-  math::Vector3 angles = this->visual->GetRotation().GetAsEuler();
+  math::Vector3 angles = this->visual->Rotation().Euler();
   angles.z = -newYaw;
-  this->visual->GetParent()->SetRotation(angles);
+  this->visual->GetParent()->SetRotation(angles.Ign());
   this->maker->BuildingChanged();
 }
 
@@ -348,8 +348,8 @@ void BuildingModelManip::SetPosition(double _x, double _y, double _z)
   double scaledX = BuildingMaker::Convert(_x);
   double scaledY = BuildingMaker::Convert(-_y);
   double scaledZ = BuildingMaker::Convert(_z);
-  this->visual->GetParent()->SetWorldPosition(math::Vector3(scaledX, scaledY,
-      scaledZ));
+  this->visual->GetParent()->SetWorldPosition(
+      ignition::math::Vector3d(scaledX, scaledY, scaledZ));
 }
 
 /////////////////////////////////////////////////
@@ -360,7 +360,7 @@ void BuildingModelManip::SetRotation(double _roll, double _pitch, double _yaw)
   double yawRad = BuildingMaker::ConvertAngle(_yaw);
 
   this->visual->GetParent()->SetRotation(
-      math::Quaternion(rollRad, pitchRad, -yawRad));
+      ignition::math::Quaterniond(rollRad, pitchRad, -yawRad));
 }
 
 /////////////////////////////////////////////////
@@ -368,17 +368,17 @@ void BuildingModelManip::SetSize(double _width, double _depth, double _height)
 {
   this->size = BuildingMaker::ConvertSize(_width, _depth, _height);
 
-  math::Vector3 dScale = this->visual->GetScale() - this->size;
+  math::Vector3 dScale = this->visual->Scale() - this->size.Ign();
 
-  math::Vector3 originalPos = this->visual->GetPosition();
-  this->visual->SetPosition(math::Vector3(0, 0, 0));
-  this->visual->SetScale(this->size);
+  math::Vector3 originalPos = this->visual->Position();
+  this->visual->SetPosition(ignition::math::Vector3d::Zero);
+  this->visual->SetScale(this->size.Ign());
 
   // adjust position due to difference in pivot points
   math::Vector3 newPos = originalPos
       - math::Vector3(dScale.x/2.0, dScale.y/2.0, dScale.z/2.0);
 
-  this->visual->SetPosition(newPos);
+  this->visual->SetPosition(newPos.Ign());
 }
 
 /////////////////////////////////////////////////

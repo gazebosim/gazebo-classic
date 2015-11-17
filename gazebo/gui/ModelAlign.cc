@@ -194,7 +194,7 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
     {
       if (it->first)
       {
-        it->first->SetWorldPose(it->second);
+        it->first->SetWorldPose(it->second.Ign());
         this->SetHighlighted(it->first, false);
       }
     }
@@ -225,10 +225,10 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
     this->dataPtr->targetVis = this->dataPtr->selectedVisuals.back();
   }
 
-  math::Pose targetWorldPose = this->dataPtr->targetVis->GetWorldPose();
-  math::Box targetBbox = this->dataPtr->targetVis->GetBoundingBox();
-  targetBbox.min *= this->dataPtr->targetVis->GetScale();
-  targetBbox.max *= this->dataPtr->targetVis->GetScale();
+  math::Pose targetWorldPose = this->dataPtr->targetVis->WorldPose();
+  math::Box targetBbox = this->dataPtr->targetVis->BoundingBox();
+  targetBbox.min *= this->dataPtr->targetVis->Scale();
+  targetBbox.max *= this->dataPtr->targetVis->Scale();
 
   std::vector<math::Vector3> targetVertices;
   this->Transform(targetBbox, targetWorldPose, targetVertices);
@@ -241,10 +241,10 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
   {
     rendering::VisualPtr vis = this->dataPtr->selectedVisuals[i];
 
-    math::Pose worldPose = vis->GetWorldPose();
-    math::Box bbox = vis->GetBoundingBox();
-    bbox.min *= vis->GetScale();
-    bbox.max *= vis->GetScale();
+    math::Pose worldPose = vis->WorldPose();
+    math::Box bbox = vis->BoundingBox();
+    bbox.min *= vis->Scale();
+    bbox.max *= vis->Scale();
 
     std::vector<math::Vector3> vertices;
     this->Transform(bbox, worldPose, vertices);
@@ -266,7 +266,7 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
       if (this->dataPtr->originalVisualPose.find(vis) ==
           this->dataPtr->originalVisualPose.end())
       {
-        this->dataPtr->originalVisualPose[vis] = vis->GetWorldPose();
+        this->dataPtr->originalVisualPose[vis] = vis->WorldPose();
         this->SetHighlighted(vis, true);
       }
       // prevent the visual pose from being updated by the server
@@ -277,17 +277,17 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
     if (_axis == "x")
     {
       trans.y = trans.z = 0;
-      vis->SetWorldPosition(vis->GetWorldPose().pos + trans);
+      vis->SetWorldPosition(vis->WorldPose().Pos() + trans.Ign());
     }
     else if (_axis == "y")
     {
       trans.x = trans.z = 0;
-      vis->SetWorldPosition(vis->GetWorldPose().pos + trans);
+      vis->SetWorldPosition(vis->WorldPose().Pos() + trans.Ign());
     }
     else if (_axis == "z")
     {
       trans.x = trans.y = 0;
-      vis->SetWorldPosition(vis->GetWorldPose().pos + trans);
+      vis->SetWorldPosition(vis->WorldPose().Pos() + trans.Ign());
     }
 
     if (_publish)
@@ -317,7 +317,7 @@ void ModelAlign::PublishVisualPose(rendering::VisualPtr _vis)
     msg.set_id(gui::get_entity_id(_vis->GetName()));
     msg.set_name(_vis->GetName());
 
-    msgs::Set(msg.mutable_pose(), _vis->GetWorldPose().Ign());
+    msgs::Set(msg.mutable_pose(), _vis->WorldPose());
     this->dataPtr->modelPub->Publish(msg);
   }
 }

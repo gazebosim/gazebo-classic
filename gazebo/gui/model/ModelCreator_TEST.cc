@@ -236,7 +236,7 @@ void ModelCreator_TEST::SaveState()
       gui::ModelCreator::ALL_SAVED);
 
   // Move a link to have unsaved changes
-  cylinder->SetWorldPose(math::Pose(1, 2, 3, 4, 5, 6));
+  cylinder->SetWorldPose(ignition::math::Pose3d(1, 2, 3, 4, 5, 6));
   // Process some events, and draw the screen
   for (unsigned int i = 0; i < 10; ++i)
   {

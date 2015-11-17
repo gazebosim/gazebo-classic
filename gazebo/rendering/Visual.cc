@@ -1732,6 +1732,13 @@ void Visual::SetWorldPose(const math::Pose &_pose)
 }
 
 //////////////////////////////////////////////////
+void Visual::SetWorldPose(const ignition::math::Pose3d &_pose)
+{
+  this->SetWorldPosition(_pose.Pos());
+  this->SetWorldRotation(_pose.Rot());
+}
+
+//////////////////////////////////////////////////
 void Visual::SetWorldPosition(const math::Vector3 &_pos)
 {
   this->SetWorldPosition(_pos.Ign());

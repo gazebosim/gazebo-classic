@@ -80,7 +80,7 @@ void ModelMaker_TEST::SimpleShape()
   // Check that the box appeared in the center of the screen
   ignition::math::Vector3d startPos = modelMaker->EntityPosition();
   QVERIFY(startPos == ignition::math::Vector3d(0, 0, 0.5));
-  QVERIFY(vis->GetWorldPose().pos == startPos);
+  QVERIFY(vis->WorldPose().Pos() == startPos);
 
   // Mouse move
   gazebo::common::MouseEvent mouseEvent;
@@ -90,7 +90,7 @@ void ModelMaker_TEST::SimpleShape()
   // Check that entity moved
   ignition::math::Vector3d pos = modelMaker->EntityPosition();
   QVERIFY(pos != startPos);
-  QVERIFY(vis->GetWorldPose().pos == pos);
+  QVERIFY(vis->WorldPose().Pos() == pos);
 
   // Mouse release
   mouseEvent.SetType(gazebo::common::MouseEvent::RELEASE);
@@ -183,7 +183,7 @@ void ModelMaker_TEST::FromFile()
   // Check that the box appeared in the center of the screen
   ignition::math::Vector3d startPos = modelMaker->EntityPosition();
   QVERIFY(startPos == ignition::math::Vector3d(0, 0, 0.5));
-  QVERIFY(vis->GetWorldPose().pos == startPos);
+  QVERIFY(vis->WorldPose().Pos() == startPos);
 
   // Mouse move
   gazebo::common::MouseEvent mouseEvent;
@@ -193,7 +193,7 @@ void ModelMaker_TEST::FromFile()
   // Check that entity moved
   ignition::math::Vector3d pos = modelMaker->EntityPosition();
   QVERIFY(pos != startPos);
-  QVERIFY(vis->GetWorldPose().pos == pos);
+  QVERIFY(vis->WorldPose().Pos() == pos);
 
   // Mouse release
   mouseEvent.SetType(gazebo::common::MouseEvent::RELEASE);
@@ -292,7 +292,7 @@ void ModelMaker_TEST::FromModel()
   // Check that the clone appeared in the center of the screen
   ignition::math::Vector3d startPos = modelMaker->EntityPosition();
   QVERIFY(startPos == ignition::math::Vector3d(0, 0, 0.5));
-  QVERIFY(vis->GetWorldPose().pos == startPos);
+  QVERIFY(vis->WorldPose().Pos() == startPos);
 
   // Mouse move
   gazebo::common::MouseEvent mouseEvent;
@@ -302,7 +302,7 @@ void ModelMaker_TEST::FromModel()
   // Check that entity moved
   ignition::math::Vector3d pos = modelMaker->EntityPosition();
   QVERIFY(pos != startPos);
-  QVERIFY(vis->GetWorldPose().pos == pos);
+  QVERIFY(vis->WorldPose().Pos() == pos);
 
   // Mouse release
   mouseEvent.SetType(gazebo::common::MouseEvent::RELEASE);

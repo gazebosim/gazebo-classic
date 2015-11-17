@@ -89,7 +89,7 @@ TEST_F(JointVisual_TEST, JointVisualTest)
   jointVis->Load(jointMsg);
 
   // pose matches the message's pose
-  EXPECT_EQ(jointVis->GetPose(), math::Pose(1, 2, 3, 1.57, 1.57, 0));
+  EXPECT_EQ(jointVis->Pose(), ignition::math::Pose3d(1, 2, 3, 1.57, 1.57, 0));
 
   // has axis 1 and it is visible
   EXPECT_TRUE(jointVis->GetArrowVisual() != NULL);
@@ -108,7 +108,7 @@ TEST_F(JointVisual_TEST, JointVisualTest)
   jointVis->UpdateFromMsg(jointMsg);
 
   // pose properly updated
-  EXPECT_EQ(jointVis->GetPose(), math::Pose(3, 2, 1, 0, 1.57, 0));
+  EXPECT_EQ(jointVis->Pose(), ignition::math::Pose3d(3, 2, 1, 0, 1.57, 0));
 
   // axis 1 still visible
   EXPECT_TRUE(jointVis->GetArrowVisual() != NULL);
@@ -138,7 +138,7 @@ TEST_F(JointVisual_TEST, JointVisualTest)
   jointVis->UpdateFromMsg(jointMsg);
 
   // pose hasn't changed
-  EXPECT_EQ(jointVis->GetPose(), math::Pose(3, 2, 1, 0, 1.57, 0));
+  EXPECT_EQ(jointVis->Pose(), ignition::math::Pose3d(3, 2, 1, 0, 1.57, 0));
 
   // axis 1 still visible
   EXPECT_TRUE(jointVis->GetArrowVisual() != NULL);
@@ -158,7 +158,7 @@ TEST_F(JointVisual_TEST, JointVisualTest)
   jointVis->UpdateFromMsg(jointMsg);
 
   // new pose
-  EXPECT_EQ(jointVis->GetPose(), math::Pose(0, -2, 1, -1.57, 1.57, 0));
+  EXPECT_EQ(jointVis->Pose(), ignition::math::Pose3d(0, -2, 1, -1.57, 1.57, 0));
 
   // axis 1 still there but not visible
   EXPECT_TRUE(jointVis->GetArrowVisual() != NULL);

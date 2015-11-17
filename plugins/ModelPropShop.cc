@@ -192,7 +192,7 @@ void ModelPropShop::Update()
     rendering::VisualPtr vis = this->scene->GetVisual(this->modelName);
     if (vis)
     {
-      math::Box bbox = vis->GetBoundingBox();
+      math::Box bbox = vis->BoundingBox();
 
       // Compute model scaling.
       double scaling = 1.0 / bbox.GetSize().GetMax();
@@ -202,11 +202,12 @@ void ModelPropShop::Update()
       trans *= -scaling;
 
       // Normalize the size of the visual
-      vis->SetScale(math::Vector3(scaling, scaling, scaling));
-      vis->SetWorldPose(math::Pose(trans.x, trans.y, trans.z, 0, 0, 0));
+      vis->SetScale(ignition::math::Vector3d(scaling, scaling, scaling));
+      vis->SetWorldPose(
+          ignition::math::Pose3d(trans.x, trans.y, trans.z, 0, 0, 0));
 
       // Place the visual at the origin
-      bbox = vis->GetBoundingBox();
+      bbox = vis->BoundingBox();
 
       ignition::math::Pose3d pose;
 

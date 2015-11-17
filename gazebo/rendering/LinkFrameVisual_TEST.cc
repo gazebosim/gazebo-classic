@@ -59,7 +59,7 @@ TEST_F(LinkFrameVisual_TEST, LinkFrameTest)
   EXPECT_EQ(linkFrameVis->GetParent(), linkVis);
 
   // Check that the pose within the link visual (local pose) is zero
-  EXPECT_EQ(linkFrameVis->GetPose(), gazebo::math::Pose::Zero);
+  EXPECT_EQ(linkFrameVis->Pose(), ignition::math::Pose3d::Zero);
 
   // Check that frame is not highlighted
   EXPECT_FALSE(linkFrameVis->GetHighlighted());
