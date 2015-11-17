@@ -132,6 +132,14 @@ release will remove the deprecated code.
     + ***Deprecation:*** public: bool MoveToPositions(const std::vector<math::Pose> &_pts,double _time,boost::function<void()> _onComplete = NULL);
     + ***Replacement:*** public: bool MoveToPositions(const std::vector<ignition::math::Pose3d> &_pts,double _time,boost::function<void()> _onComplete = NULL);
 
+1. **gazebo/rendering/DynamicLines.hh**
+    + ***Deprecation:*** public: void AddPoint(const math::Vector3 &_pt,const common::Color &_color = common::Color::White)
+    + ***Replacement:*** public: void AddPoint(const ignition::math::Vector3d &_pt,const common::Color &_color = common::Color::White);
+    + ***Deprecation:*** public: void SetPoint(unsigned int _index, const math::Vector3 &_value)
+    + ***Replacement:*** public: void SetPoint(unsigned int _index,const ignition::math::Vector3d &_value);
+    + ***Deprecation:***  public: math::Vector3 GetPoint(unsigned int _index) const
+    + ***Replacement:*** public: const ignition::math::Vector3d &Point(const unsigned int _index) const;
+
 1. **gazebo/gui/RTShaderSystem.hh**
     + ***Deprecation:*** void AttachEntity(Visual *vis)
     + ***No replacement for AttachEntity ***
