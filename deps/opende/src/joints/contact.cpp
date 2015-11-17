@@ -194,16 +194,19 @@ dxJointContact::getInfo2( dxJoint::Info2 *info )
         /// a non-linear equation (k*x^1.5).
 
         // to convert stiffness to erp:
-        // first recover kd from previous cfm and erp
-        // then compute new cfm and erp.
-        // get kd using:
-        //   cfm = 1 / ( dt * kp + kd )
+        // 1) first recover kd from previous cfm and erp, then
+        // 2) compute new cfm and erp using new kp from
+        // elastic modulus calculatoin and kd from 1.
+
+        // get kd using: cfm = 1 / ( dt * kp + kd )
         dReal kd = 1.0/info->cfm[0] - local_erp/info->fps;
-        // compute erp using stiffness and kd
+
+        // compute new erp using stiffness and kd
         dReal kph = khertz_sqrtx/info->fps;
         local_erp = (kph) / (kph + kd);
-        // compute new cfm for the new stiffness
-        info->cfm[0] = 1.0 / (khertz_sqrtx/info->fps + kd);
+
+        // compute new cfm given the new stiffness
+        info->cfm[0] = 1.0 / (kph + kd);
 
         // debug, comparing stiffnesss, force and depth
         // used to generate values for test/integration/elastic_modulus.cc:118
