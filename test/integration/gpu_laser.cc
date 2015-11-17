@@ -18,7 +18,7 @@
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/sensors/sensors.hh"
 
-#define LASER_TOL 1e-5
+#define LASER_TOL 1e-4
 #define DOUBLE_TOL 1e-6
 
 using namespace gazebo;
