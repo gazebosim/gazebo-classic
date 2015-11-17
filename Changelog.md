@@ -2,6 +2,11 @@
 
 ### Gazebo 6.X.X (201X-XX-XX)
 
+1. Fix minimum window height
+    * Backport of [pull request #1977](https://bitbucket.org/osrf/gazebo/pull-request/1977)
+    * [Pull request #19](https://bitbucket.org/osrf/gazebo/pull-request/19)
+    * [Issue #1706](https://bitbucket.org/osrf/gazebo/issue/1706)
+
 1. Fix visual transparency issues
     * [Pull request #1967](https://bitbucket.org/osrf/gazebo/pull-request/1967)
     * [Issue #1726](https://bitbucket.org/osrf/gazebo/issue/1726)
