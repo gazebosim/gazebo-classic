@@ -79,6 +79,10 @@ using the same arguments used in the command line.
 1. Set window flags for dialogs and file dialogs
     * [Pull request #1816](https://bitbucket.org/osrf/gazebo/pull-request/1816)
 
+1. Fix minimum window height
+   * [Pull request #1977](https://bitbucket.org/osrf/gazebo/pull-request/1977)
+   * [Issue #1706](https://bitbucket.org/osrf/gazebo/issue/1706)
+
 1. Log playback GUI for multistep, rewind, forward and seek
     * [Pull request #1791](https://bitbucket.org/osrf/gazebo/pull-request/1791)
 
@@ -119,6 +123,10 @@ using the same arguments used in the command line.
     * [Pull request #1828](https://bitbucket.org/osrf/gazebo/pull-request/1828)
 
 1. Model editor updates
+
+    1. Make non-editable background models white in model editor
+        * [Pull request #1950](https://bitbucket.org/osrf/gazebo/pull-request/1950)
+
     1. Choose / swap parent and child links in joint inspector
         * [Pull request #1887](https://bitbucket.org/osrf/gazebo/pull-request/1887)
         * [Issue #1500](https://bitbucket.org/osrf/gazebo/issue/1500)
