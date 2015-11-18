@@ -578,7 +578,7 @@ void RTShaderSystem::Update()
   if (!this->dataPtr->initialized || !this->dataPtr->updateShaders)
     return;
 
-  for (auto &scene : this->dataPtr->scenes)
+  for (const auto &scene : this->dataPtr->scenes)
   {
     VisualPtr vis = scene->GetWorldVisual();
     if (vis)

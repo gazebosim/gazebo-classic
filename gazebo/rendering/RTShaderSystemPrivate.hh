@@ -21,7 +21,6 @@
 #include <string>
 #include <vector>
 
-#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/gazebo_config.h"
 

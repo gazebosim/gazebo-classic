@@ -1,6 +1,6 @@
 ## Gazebo 7.0
 
-1. Implemented private data pointer for the RTShaderSystem class.
+1. Implemented private data pointer for the RTShaderSystem class. Minimized shader updates to once per render update.
     * [Pull request #](https://bitbucket.org/osrf/gazebo/pull-request/)
 
 1. Update rest web plugin to publish response messages and display login user name in toolbar.
