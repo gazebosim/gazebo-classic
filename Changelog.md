@@ -4,7 +4,7 @@
 
 1. Fix minimum window height
     * Backport of [pull request #1977](https://bitbucket.org/osrf/gazebo/pull-request/1977)
-    * [Pull request #](https://bitbucket.org/osrf/gazebo/pull-request/)
+    * [Pull request #2002](https://bitbucket.org/osrf/gazebo/pull-request/2002)
     * [Issue #1706](https://bitbucket.org/osrf/gazebo/issue/1706)
 
 ### Gazebo 5.2.0 (2015-10-02)
