@@ -552,7 +552,23 @@ void JointMaker::AddJoint(JointMaker::JointType _type)
 /////////////////////////////////////////////////
 void JointMaker::Stop()
 {
+  // Reset links
+  if (this->newJoint)
+  {
+    if (this->newJoint->parent)
+    {
+      this->newJoint->parent->SetWorldPose(this->parentLinkOriginalPose);
+     // this->SetHighlighted(this->parentLinkVis, false);
+    }
+    if (this->newJoint->child)
+    {
+      this->newJoint->child->SetWorldPose(this->childLinkOriginalPose);
+    //  this->SetHighlighted(this->childLinkVis, false);
+    }
+  }
+
   this->RemoveJoint("");
+
   this->AddJoint(JointMaker::JOINT_NONE);
   if (this->hoverVis)
     this->hoverVis->SetEmissive(common::Color(0, 0, 0));

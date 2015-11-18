@@ -487,6 +487,11 @@ void JointCreationDialog::Open(JointMaker::JointType _type)
       ignition::math::Vector3d::UnitX);
   this->dataPtr->configWidget->SetVector3WidgetValue("axis2",
       ignition::math::Vector3d::UnitY);
+  this->dataPtr->configWidget->SetPoseWidgetValue("joint_pose",
+      ignition::math::Pose3d());
+  this->dataPtr->configWidget->SetPoseWidgetValue("relative_pose",
+      ignition::math::Pose3d());
+  this->UncheckAllAlign();
 
   // Reset enabled states
   this->dataPtr->createButton->setEnabled(false);
@@ -807,7 +812,8 @@ bool JointCreationDialog::CheckValid()
 void JointCreationDialog::OnAlign(const int _int)
 {
   // Reset pose
-  this->dataPtr->jointMaker->SetLinksRelativePose(ignition::math::Pose3d(), true);
+  this->dataPtr->jointMaker->SetLinksRelativePose(ignition::math::Pose3d(),
+      true);
 
   // Reference link
   bool childToParent = this->dataPtr->alignCombo->currentIndex() == 0;
