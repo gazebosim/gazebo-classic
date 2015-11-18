@@ -72,6 +72,12 @@ ignition::math::Matrix3d ParseTransformMatrixStr(
   std::vector<std::string> tx;
   split(_transformStr, '(', tx);
 
+  if(tx.size() < 2)
+  {
+    gzerr << "Can't parse matrix transform '" << &_transformStr << "'"
+          << std::endl;
+    return ignition::math::Matrix3d::Identity;
+  }
   std::string transform = tx[0];
   std::vector<std::string> numbers;
   split(tx[1], ',', numbers);
