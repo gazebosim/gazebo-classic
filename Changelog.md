@@ -119,6 +119,10 @@ using the same arguments used in the command line.
     * [Pull request #1828](https://bitbucket.org/osrf/gazebo/pull-request/1828)
 
 1. Model editor updates
+
+    1. Added support for copying and pasting top level nested models
+        * [Pull request #](https://bitbucket.org/osrf/gazebo/pull-request/)
+
     1. Choose / swap parent and child links in joint inspector
         * [Pull request #1887](https://bitbucket.org/osrf/gazebo/pull-request/1887)
         * [Issue #1500](https://bitbucket.org/osrf/gazebo/issue/1500)
