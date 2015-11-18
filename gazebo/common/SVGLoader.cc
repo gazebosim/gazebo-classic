@@ -72,9 +72,9 @@ ignition::math::Matrix3d ParseTransformMatrixStr(
   std::vector<std::string> tx;
   split(_transformStr, '(', tx);
 
-  if(tx.size() < 2)
+  if (tx.size() < 2)
   {
-    gzerr << "Can't parse matrix transform '" << &_transformStr << "'"
+    gzerr << "Invalid path transform: '" << &_transformStr << "'"
           << std::endl;
     return ignition::math::Matrix3d::Identity;
   }
@@ -755,6 +755,9 @@ void SVGLoader::GetPathAttribs(TiXmlElement *_pElement, SVGPath &_path)
   GZ_ASSERT(_pElement, "empty XML element where a path was expected");
   _path.transform = ignition::math::Matrix3d::Identity;
   TiXmlAttribute *pAttrib = _pElement->FirstAttribute();
+
+  // this attribute contains a list of coordinates
+  std::vector<std::string> tokens;
   while (pAttrib)
   {
     std::string name = lowercase(pAttrib->Name());
@@ -773,10 +776,8 @@ void SVGLoader::GetPathAttribs(TiXmlElement *_pElement, SVGPath &_path)
     }
     else if (name == "d")
     {
-      // this attribute contains a list of coordinates
-      std::vector<std::string> tokens;
+      // load in the path parameters
       split(value, ' ', tokens);
-      this->GetPathCommands(tokens, _path);
     }
     else
     {
@@ -784,6 +785,8 @@ void SVGLoader::GetPathAttribs(TiXmlElement *_pElement, SVGPath &_path)
     }
     pAttrib = pAttrib->Next();
   }
+  // Now that all attributes are loaded, we can compute the values
+  this->GetPathCommands(tokens, _path);
 }
 
 /////////////////////////////////////////////////

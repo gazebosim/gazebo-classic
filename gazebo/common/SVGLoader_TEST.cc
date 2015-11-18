@@ -259,7 +259,7 @@ TEST_F(SVGLoader, Transforms2)
   EXPECT_EQ(true, success);
 
   // save for inspection
-  std::ofstream out("transform.html");
+  std::ofstream out("transform2.html");
   loader.DumpPaths(paths, out);
   out.close();
 
@@ -303,6 +303,39 @@ TEST_F(SVGLoader, Transforms2)
   gzmsg << dySkewYb << " Y skewY b\n";
   EXPECT_GT(dxSkewYb, 131.0);
   EXPECT_GT(dySkewYb, 35.0);
+}
+
+/////////////////////////////////////////////////
+TEST_F(SVGLoader, Transforms3)
+{
+  // this tests the skewY and skewX transforms
+  common::SVGLoader loader(3);
+  std::vector<common::SVGPath> paths;
+  std::string filePath = std::string(PROJECT_SOURCE_PATH);
+  filePath += "/test/data/svg/transform3.svg";
+  bool success = loader.Parse(filePath, paths);
+  EXPECT_EQ(true, success);
+
+  EXPECT_EQ(3u, paths.size());
+  EXPECT_EQ("path2985", paths[0].id);
+  EXPECT_EQ("path2987", paths[1].id);
+  EXPECT_EQ("path_no_tx", paths[2].id);
+
+  gzerr << paths[0].id << " tx: " << paths[0].transform << std::endl;
+  gzerr << paths[1].id << " tx: " << paths[1].transform << std::endl;
+  gzerr << paths[2].id << " tx: " << paths[2].transform << std::endl;
+
+  // save for inspection
+  std::ofstream out("transform3.html");
+  loader.DumpPaths(paths, out);
+  out.close();
+
+  std::vector< std::vector<ignition::math::Vector2d> > closedPolys;
+  std::vector< std::vector<ignition::math::Vector2d> > openPolys;
+  loader.PathsToClosedPolylines(paths, tol, closedPolys, openPolys);
+
+  EXPECT_EQ(0u, openPolys.size());
+  EXPECT_EQ(3u, closedPolys.size());
 }
 
 /////////////////////////////////////////////////
