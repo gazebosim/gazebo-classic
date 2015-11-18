@@ -47,7 +47,7 @@ math::Vector3 Conversions::Convert(const Ogre::Vector3 &v)
 //////////////////////////////////////////////////
 ignition::math::Vector3d Conversions::ConvertIgn(const Ogre::Vector3 &_v)
 {
-    return ignition::math::Vector3d(_v.x, _v.y, _v.z);
+  return ignition::math::Vector3d(_v.x, _v.y, _v.z);
 }
 
 //////////////////////////////////////////////////
