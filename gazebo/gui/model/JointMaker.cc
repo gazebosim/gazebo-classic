@@ -800,6 +800,24 @@ void JointMaker::Update()
         if (joint->dirty || poseUpdate)
         {
           joint->Update();
+
+          if (joint == this->newJoint && this->newJoint->parent &&
+              this->newJoint->child && this->jointCreationDialog &&
+              this->jointCreationDialog->isVisible())
+          {
+            // Get poses as homogeneous transforms
+            ignition::math::Matrix4d parent_world(
+                this->newJoint->parent->GetWorldPose().Ign());
+            ignition::math::Matrix4d child_world(
+                this->newJoint->child->GetWorldPose().Ign());
+
+            // w_T_c = w_T_p * p_T_c
+            // w_T_p^-1 * w_T_c = p_T_c
+            ignition::math::Matrix4d child_parent = parent_world.Inverse() *
+                child_world;
+
+            this->jointCreationDialog->UpdateRelativePose(child_parent.Pose());
+          }
         }
       }
     }

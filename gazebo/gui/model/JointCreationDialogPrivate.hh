@@ -68,6 +68,7 @@ namespace gazebo
       public: bool validLinks;
       public: bool validAxis1;
       public: bool validAxis2;
+      public: bool alignPending;
     };
   }
 }

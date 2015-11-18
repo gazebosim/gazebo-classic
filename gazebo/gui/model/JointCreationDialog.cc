@@ -541,8 +541,8 @@ void JointCreationDialog::OnLinkFromDialog()
 void JointCreationDialog::OnPoseFromDialog(const QString &_name,
     const ignition::math::Pose3d &_pose)
 {
- // if (_name == "relative_pose")
- //   this->dataPtr->jointMaker->SetRelativePose(_pose, false);
+  if (_name == "relative_pose")
+    this->dataPtr->jointMaker->SetLinksRelativePose(_pose, false);
   if (_name == "joint_pose")
     this->dataPtr->jointMaker->SetJointPose(_pose);
 }
@@ -735,18 +735,13 @@ void JointCreationDialog::OnSwap()
 void JointCreationDialog::UpdateRelativePose(
     const ignition::math::Pose3d &_pose)
 {
-//  this->dataPtr->configWidget->SetPoseWidgetValue("pose", math::Pose(_pose));
+  this->dataPtr->configWidget->SetPoseWidgetValue("relative_pose",
+      math::Pose(_pose));
 
-  // TODO: Uncheck all align buttons if the pose is not satisfying alignment
-  // How to know if the pose update is due to an align request coming from
-  // here?
-/*
-  for (auto group : this->dataPtr->alignGroups)
-  {
-    if (group->checkedButton())
-      group->checkedButton()->setChecked(false);
-  }
-*/
+  if (this->dataPtr->alignPending)
+    this->dataPtr->alignPending = false;
+  else
+    this->UncheckAllAlign();
 }
 
 /////////////////////////////////////////////////
@@ -844,6 +839,8 @@ void JointCreationDialog::OnAlign(const int _int)
           configs[checked]);
     }
   }
+
+  this->dataPtr->alignPending = true;
 }
 
 /////////////////////////////////////////////////
