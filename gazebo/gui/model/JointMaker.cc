@@ -1034,8 +1034,7 @@ void JointData::Update()
     math::Vector3 dPos = (childOrigin - parentOrigin);
     math::Vector3 center = dPos * 0.5;
     double length = std::max(dPos.GetLength(), 0.001);
-    this->hotspot->SetScale(
-	math::Vector3(0.008, 0.008, length));
+    this->hotspot->SetScale(math::Vector3(0.008, 0.008, length));
     this->hotspot->SetWorldPosition(parentOrigin + center);
 
     // Hotspot orientation
@@ -1065,9 +1064,8 @@ void JointData::Update()
       this->hotspot->SetTransparency(0.7);
       handleNode->attachObject(this->handles);
       Ogre::MaterialPtr mat =
-	  Ogre::MaterialManager::getSingleton().getByName(material);
-      Ogre::ColourValue color =
-	  mat->getTechnique(0)->getPass(0)->getDiffuse();
+          Ogre::MaterialManager::getSingleton().getByName(material);
+      Ogre::ColourValue color = mat->getTechnique(0)->getPass(0)->getDiffuse();
       color.a = 0.5;
       this->handles->getBillboard(0)->setColour(color);
     }
@@ -1090,11 +1088,11 @@ void JointData::Update()
       std::string jointVisName = childName;
       size_t idx = childName.find("::");
       if (idx != std::string::npos)
-	jointVisName = childName.substr(0, idx+2);
+        jointVisName = childName.substr(0, idx+2);
       jointVisName += "_JOINT_VISUAL_";
 
       gazebo::rendering::JointVisualPtr jointVis(
-	  new gazebo::rendering::JointVisual(jointVisName, this->child));
+          new gazebo::rendering::JointVisual(jointVisName, this->child));
       jointVis->Load(this->jointMsg);
       this->jointVisual = jointVis;
     }
