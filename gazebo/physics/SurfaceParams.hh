@@ -105,7 +105,7 @@ namespace gazebo
 
       /// \brief Set the Poisson's ratio
       /// \param[in] _ratio Poisson's ratio
-      public: void SetPoissonsRatio(double _ratio);
+      public: void SetPoissonsRatio(const double _ratio);
 
       /// \brief Get the elastic modulus
       /// \return elastic modulus
@@ -113,7 +113,7 @@ namespace gazebo
 
       /// \brief Set the elastic modulus
       /// \param[in] _modulus elastic modulus to set to
-      public: void SetElasticModulus(double _modulus);
+      public: void SetElasticModulus(const double _modulus);
 
       /// \brief Get the friction coefficient in a single direction.
       /// \param[in] _index Index of friction direction, 0 for primary,

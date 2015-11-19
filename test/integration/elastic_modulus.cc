@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -121,15 +121,15 @@ void PhysicsTest::ElasticModulusContact(const std::string &_physicsEngine)
 
   // sphere
   const double nu1 = 0.4;
-  const double E1 = 600000;
+  const double e1 = 600000;
   const double m1 = 3;
-  const double R1 = 0.06;
+  const double r1 = 0.06;
   // static box
   const double nu2 = 0.3;
-  const double E2 = 500000;
-  const double R2 = 0.08;
-  double E_star = 1.0 / ((1.0 - nu1*nu1)/E1 + (1.0 - nu2*nu2)/E2);
-  double R_star = 1.0 / (1.0/R1 + 1.0/R2);
+  const double e2 = 500000;
+  const double r2 = 0.08;
+  double eStar = 1.0 / ((1.0 - nu1*nu1)/e1 + (1.0 - nu2*nu2)/e2);
+  double rStar = 1.0 / (1.0/r1 + 1.0/r2);
   // contact force
   double f1 = -physics->GetGravity().x * m1;
 
@@ -178,25 +178,25 @@ void PhysicsTest::ElasticModulusContact(const std::string &_physicsEngine)
     // And we know that:
     //   k = 4.0 / 3.0 * e_star * sqrt(patch_radius);
     // or
-    //   k = 4.0 / 3.0 * e_star * sqrt(sqrt(R_star * depth));
+    //   k = 4.0 / 3.0 * e_star * sqrt(sqrt(rStar * depth));
     // and
     //   f = k * depth^1.5
     // therefore
-    //   f = 4.0 / 3.0 * e_star * sqrt(sqrt(R_star)) * depth^1.75
+    //   f = 4.0 / 3.0 * e_star * sqrt(sqrt(rStar)) * depth^1.75
     // knowing f,
     // solving for d yeilds analytical depth:
-    double d3 = pow(f1 / (4.0 / 3.0 * E_star * sqrt(sqrt(R_star))), 1.0/1.75);
+    double d3 = pow(f1 / (4.0 / 3.0 * eStar * sqrt(sqrt(rStar))), 1.0/1.75);
 
     // check that d1 and d3 should be near
     EXPECT_LT(fabs(d1-d3)/d3, PHYSICS_TOL);
 
     // linearized contact patch radius
-    double patchRadius = sqrt(R_star * d1);
+    double patchRadius = sqrt(rStar * d1);
 
     // check stiffness
-    double k = 4.0 / 3.0 * E_star * sqrt(patchRadius);
+    double k = 4.0 / 3.0 * eStar * sqrt(patchRadius);
     // check linearized stiffness (should match ode internal k_hertz_sqrtx)
-    double k_lin = 4.0 / 3.0 * E_star * sqrt(patchRadius*d1);
+    double k_lin = 4.0 / 3.0 * eStar * sqrt(patchRadius*d1);
 
     // recorded from opende/src/joints/contact.cpp:208
     EXPECT_FLOAT_EQ(k,     k_converged);
@@ -206,8 +206,8 @@ void PhysicsTest::ElasticModulusContact(const std::string &_physicsEngine)
     gzdbg << "Contact State:\n"
           << "  t [" << world->GetSimTime().Double()
           << "]\n f1 [" << f1
-          << "]\n  E* [" << E_star
-          << "]\n  R* [" << R_star
+          << "]\n  E* [" << eStar
+          << "]\n  R* [" << rStar
           << "]\n  patch radius [" << patchRadius
           << "]\n  d contact manager [" << d1
           << "]\n  d convergence error [" << d_convergence_error
@@ -224,13 +224,16 @@ void PhysicsTest::ElasticModulusContact(const std::string &_physicsEngine)
   }
 }
 
+/////////////////////////////////////////////////
 TEST_P(PhysicsTest, ElasticModulusContact)
 {
   ElasticModulusContact(GetParam());
 }
 
+/////////////////////////////////////////////////
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, PhysicsTest, PHYSICS_ENGINE_VALUES);
 
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

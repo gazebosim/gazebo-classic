@@ -49,7 +49,7 @@ enum {
   dContactApprox1_2	= 0x2000,
   dContactApprox1	= 0x3000,
   dContactApprox3	= 0x4000,
-  dContactEM 		  = 0x8000
+  dContactEM            = 0x8000
 };
 
 
