@@ -2698,7 +2698,7 @@ namespace gazebo
       if (_msg.has_pose())
       {
         stream << "<pose>"
-               << msgs::Convert(_msg.pose())
+               << msgs::ConvertIgn(_msg.pose())
                << "</pose>";
       }
       for (int i = 0; i < _msg.joint_size(); ++i)
@@ -2749,7 +2749,7 @@ namespace gazebo
       if (_msg.has_pose())
       {
         stream << "<pose>"
-               << msgs::Convert(_msg.pose())
+               << msgs::ConvertIgn(_msg.pose())
                << "</pose>";
       }
       if (_msg.visual_size() > 0)
@@ -2794,7 +2794,7 @@ namespace gazebo
       if (_msg.has_pose())
       {
         stream << "<pose>"
-               << msgs::Convert(_msg.pose())
+               << msgs::ConvertIgn(_msg.pose())
                << "</pose>";
       }
       if (_msg.has_geometry())
@@ -2876,7 +2876,7 @@ namespace gazebo
       std::ostringstream stream;
       stream << "<box>"
              << "<size>"
-             << msgs::Convert(_msg.size())
+             << msgs::ConvertIgn(_msg.size())
              << "</size>"
              << "</box>";
       return stream.str();
@@ -2925,10 +2925,10 @@ namespace gazebo
       std::ostringstream stream;
       stream << "<plane>"
              << "<normal>"
-             << msgs::Convert(_msg.normal())
+             << msgs::ConvertIgn(_msg.normal())
              << "</normal>"
              << "<size>"
-             << msgs::Convert(_msg.size())
+             << msgs::ConvertIgn(_msg.size())
              << "</size>";
       if (_msg.has_d())
       {
@@ -3044,7 +3044,7 @@ namespace gazebo
       }
       if (_msg.has_pose())
       {
-        stream << "<pose>" << msgs::Convert(_msg.pose()) << "</pose>";
+        stream << "<pose>" << msgs::ConvertIgn(_msg.pose()) << "</pose>";
       }
 
       stream << "<inertia>";
@@ -3134,7 +3134,7 @@ namespace gazebo
       if (_msg.has_pose())
       {
         stream << "<pose>"
-               << msgs::Convert(_msg.pose())
+               << msgs::ConvertIgn(_msg.pose())
                << "</pose>";
       }
       if (_msg.has_axis1())
@@ -3204,7 +3204,7 @@ namespace gazebo
       if (_msg.has_xyz())
       {
         stream << "<xyz>"
-               << msgs::Convert(_msg.xyz())
+               << msgs::ConvertIgn(_msg.xyz())
                << "</xyz>";
       }
       if (_useParentModelFrame >= 0)
@@ -3285,7 +3285,7 @@ namespace gazebo
       }
       if (_msg.has_fdir1())
       {
-        stream << "<fdir1>" << msgs::Convert(_msg.fdir1()) << "</fdir1>";
+        stream << "<fdir1>" << msgs::ConvertIgn(_msg.fdir1()) << "</fdir1>";
       }
       stream
         << "</ode>"
