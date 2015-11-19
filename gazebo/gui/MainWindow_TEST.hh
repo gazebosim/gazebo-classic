@@ -61,6 +61,9 @@ class MainWindow_TEST : public QTestFixture
 
   /// \brief Test different window modes.
   private slots: void WindowModes();
+
+  /// \brief Test that the minimum size of the window is reasonable.
+  private slots: void MinimumSize();
 };
 
 #endif
