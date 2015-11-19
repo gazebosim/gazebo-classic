@@ -18,10 +18,19 @@ release will remove the deprecated code.
 
 ### Modifications
 
+1. **gazebo/rendering/RenderTypes.hh**
+    + typedefs for Visual and its derived classes have been changed from boost to std pointers.
+    + [pull request #1924](https://bitbucket.org/osrf/gazebo/pull-request/1924)
+
+1. **gazebo/gui/model/ModelEditorEvents.hh**
+    + ***Removed:*** public: static event::EventT<void (bool, bool, const math::Pose &, const std::string &)> modelPropertiesChanged
+    + ***Replacement:*** public: static event::EventT<void (bool, bool)> modelPropertiesChanged
+    + ***Note:*** Removed last two arguments, model pose and name, from the function
+
 1. **gazebo/rendering/Camera.hh**
     + ***Removed:*** public: void SetClipDist();
     + ***Replacement:*** public: virtual void SetClipDist();
-    
+
 1. **gazebo/msgs/logical_camera_sensors.proto**
     + The `near` and `far` members have been replaced with `near_clip` and `far_clip`
     + [Pull request #1942](https://bitbucket.org/osrf/gazebo/pull-request/1942)
@@ -72,6 +81,8 @@ release will remove the deprecated code.
     + ***No replacement for DetachEntity ***
 
 ### Deletions
+
+1. **plugins/rest_web/RestUiLogoutDialog.hh.hh**
 
 1. **gazebo rendering libraries**
     * The following libraries have been removed: `libgazebo_skyx`, `libgazebo_selection_buffer`, `libgazebo_rendering_deferred`. Gazebo now combines all the different rendering libraries into `libgazebo_rendering.so`.
