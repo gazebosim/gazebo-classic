@@ -36,6 +36,15 @@ class UndoTest : public QTestFixture
   /// physics::UserCmdManager.
   private slots: void MsgPassing();
 
+  /// \brief Test undoing reset time commands.
+  private slots: void UndoResetTime();
+
+  /// \brief Test undoing reset world commands.
+  private slots: void UndoResetWorld();
+
+  /// \brief Test undoing reset model poses commands.
+  private slots: void UndoResetModelPoses();
+
   /// \brief Test message passing between gui::UserCmdHistory and
   /// physics::UserCmdManager.
   private slots: void Wrench();

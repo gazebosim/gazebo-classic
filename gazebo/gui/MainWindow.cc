@@ -687,7 +687,6 @@ void MainWindow::OnResetModelOnly()
 /////////////////////////////////////////////////
 void MainWindow::OnResetWorld()
 {
-std::cout << "MainWindow::OnResetWorld" << std::endl;
   msgs::WorldControl msg;
   msg.mutable_reset()->set_all(true);
 
@@ -697,7 +696,6 @@ std::cout << "MainWindow::OnResetWorld" << std::endl;
   userCmdMsg.set_type(msgs::UserCmd::WORLD_CONTROL);
   userCmdMsg.mutable_world_control()->CopyFrom(msg);
   this->userCmdPub->Publish(userCmdMsg);
-std::cout << "/MainWindow::OnResetWorld" << std::endl;
 }
 
 /////////////////////////////////////////////////

@@ -188,6 +188,23 @@ std::cout << "UserCmdManager::OnUserCmdMsg   WORLD" << std::endl;
     cmdPtr = cmd;
   }
 
+  if (_msg->type() == msgs::UserCmd::WORLD_CONTROL)
+  {
+    // Publish world control message after we've save the current state
+    if (_msg->has_world_control())
+    {
+      auto worldControlPub = this->dataPtr->node->Advertise<msgs::WorldControl>(
+          "~/world_control");
+      worldControlPub->Publish(_msg->world_control());
+    }
+    else
+    {
+      gzwarn << "World control command [" << _msg->description() <<
+          "] without a world control message. Command won't be executed."
+          << std::endl;
+    }
+  }
+
   // Add it to undo list
   this->dataPtr->undoCmds.push_back(cmdPtr);
 

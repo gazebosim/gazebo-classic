@@ -15,11 +15,11 @@ message UserCmd
     /// \brief Moving a model.
     MOVING = 1;
 
-    /// \brief Applying wrench.
-    WRENCH = 2;
-
     /// \brief Controlling the world.
-    WORLD_CONTROL = 3;
+    WORLD_CONTROL = 2;
+
+    /// \brief Applying wrench.
+    WRENCH = 3;
   }
 
   /// \brief Unique id for user command.
@@ -34,9 +34,9 @@ message UserCmd
   /// \brief Wrench for apply wrench commands.
   optional string entity_name = 4;
 
-  /// \brief Wrench for apply wrench commands.
-  optional Wrench wrench = 5;
-
   /// \brief For World Control commands.
-  optional WorldControl world_control = 6;
+  optional WorldControl world_control = 5;
+
+  /// \brief Wrench for apply wrench commands.
+  optional Wrench wrench = 6;
 }

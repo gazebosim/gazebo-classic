@@ -73,8 +73,6 @@ TimePanel::TimePanel(QWidget *_parent)
   this->dataPtr->statsSub = this->dataPtr->node->Subscribe(
       "~/world_stats", &TimePanel::OnStats, this);
 
-  this->dataPtr->worldControlPub = this->dataPtr->node->
-      Advertise<msgs::WorldControl>("~/world_control");
   this->dataPtr->userCmdPub =
       this->dataPtr->node->Advertise<msgs::UserCmd>("~/user_cmd");
 
@@ -105,8 +103,6 @@ void TimePanel::OnFullScreen(bool /*_value*/)
 TimePanel::~TimePanel()
 {
   this->dataPtr->node.reset();
-  this->dataPtr->worldControlPub.reset();
-  this->dataPtr->userCmdPub.reset();
 
   delete this->dataPtr;
   this->dataPtr = NULL;
