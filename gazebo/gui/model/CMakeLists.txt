@@ -2,6 +2,7 @@ include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
 set (sources_local
   model/CollisionConfig.cc
+  model/EditorMaterialSwitcher.cc
   model/ExtrudeDialog.cc
   model/ImportDialog.cc
   model/JointInspector.cc
@@ -52,6 +53,7 @@ set (qt_tests_local
 if (ENABLE_SCREEN_TESTS)
   set (qt_tests_local
     ${qt_tests_local}
+    EditorMaterialSwitcher_TEST.cc
     ExtrudeDialog_TEST.cc
     JointMaker_TEST.cc
     ModelCreator_TEST.cc
