@@ -1921,12 +1921,7 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
 
       if (_msg->camera().follow().has_xyz())
       {
-        const msgs::Vector3d &msg_pos = _msg->camera().follow().xyz();
-        ignition::math::Vector3d cam_pos = ignition::math::Vector3d(
-          msg_pos.x(),
-          msg_pos.y(),
-          msg_pos.z());
-        cam->SetTrackPosition(cam_pos);
+        cam->SetTrackPosition(msgs::Convert(_msg->camera().follow().xyz()));
       }
 
       if (_msg->camera().follow().has_distance())
