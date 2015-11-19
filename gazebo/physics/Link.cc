@@ -1126,19 +1126,21 @@ size_t Link::BatteryCount() const
 bool Link::VisualId(const std::string &_visName, uint32_t &_visualId) const
 {
   for (auto &iter : this->visuals)
+  {
     if (iter.second.name() == _visName ||
         iter.second.name() == this->GetScopedName() + "::" + _visName)
     {
       _visualId = iter.first;
       return true;
     }
+  }
   gzerr << "Trying to get unique ID of visual from invalid visual name["
         << _visName << "] for link [" << this->GetScopedName() << "]\n";
   return false;
 }
 
 //////////////////////////////////////////////////
-bool Link::VisualPose(uint32_t _id, ignition::math::Pose3d &_pose) const
+bool Link::VisualPose(const uint32_t _id, ignition::math::Pose3d &_pose) const
 {
   auto iter = this->visuals.find(_id);
   if (iter == this->visuals.end())
@@ -1153,7 +1155,8 @@ bool Link::VisualPose(uint32_t _id, ignition::math::Pose3d &_pose) const
 }
 
 //////////////////////////////////////////////////
-bool Link::SetVisualPose(uint32_t _id, const ignition::math::Pose3d &_pose)
+bool Link::SetVisualPose(const uint32_t _id,
+                         const ignition::math::Pose3d &_pose)
 {
   auto iter = this->visuals.find(_id);
   if (iter == this->visuals.end())

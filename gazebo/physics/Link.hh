@@ -580,14 +580,14 @@ namespace gazebo
       /// \param[in] _id Unique ID of visual.
       /// \param[out] _pose Pose of the visual relative to this link.
       /// \return True if getting the pose of the visual was successful.
-      public: bool VisualPose(uint32_t _id, ignition::math::Pose3d &_pose)
-        const;
+      public: bool VisualPose(const uint32_t _id,
+                  ignition::math::Pose3d &_pose) const;
 
       /// \brief Set the pose of a visual.
       /// \param[in] _id Unique ID of visual message.
       /// \param[in] _pose Pose relative to this link to place the visual.
       /// \return True if setting the pose of the visual was successful.
-      public: bool SetVisualPose(uint32_t _id,
+      public: bool SetVisualPose(const uint32_t _id,
                                  const ignition::math::Pose3d &_pose);
 
       /// \brief Publish timestamped link data such as velocity.

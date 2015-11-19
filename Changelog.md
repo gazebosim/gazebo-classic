@@ -1,5 +1,8 @@
 ## Gazebo 7.0
 
+1. Add ability to set the pose of a visual from a link.
+    * [Pull request #1963](https://bitbucket.org/osrf/gazebo/pull-request/1963)
+
 1. Improve overall speed of log playback. Added new functions to LogPlay.
    Use tinyxml2 for playback.
     * [Pull request #1931](https://bitbucket.org/osrf/gazebo/pull-request/1931)
