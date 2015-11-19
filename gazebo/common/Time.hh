@@ -138,8 +138,9 @@ namespace gazebo
       /// \param[in] _start Start point.
       /// \param[in] _end End point.
       /// \return True if successful.
-      public: bool SetFromFormattedString(std::string _timeStr,
-          FormatOption _start = DAYS, FormatOption _end = MILLISECONDS);
+      public: bool SetFromFormattedString(const std::string &_timeStr,
+          const FormatOption &_start = DAYS,
+          const FormatOption &_end = MILLISECONDS);
 
       /// \brief Sleep for the specified time
       /// \param[in] _time Sleep time
