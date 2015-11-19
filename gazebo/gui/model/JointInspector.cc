@@ -266,9 +266,6 @@ JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
   // Initialize variables
   this->validJointName = true;
   this->validLinks = true;
-
-  // Set initial joint type
-  this->OnJointTypeChanged(tr(msgs::Joint_Type_Name(jointMsg.type()).c_str()));
 }
 
 /////////////////////////////////////////////////
@@ -299,8 +296,6 @@ msgs::Joint *JointInspector::GetData() const
 
   if (currentParent == currentChild)
   {
-    gzerr << "Parent link equal to child link - not updating joint."
-        << std::endl;
     return NULL;
   }
 
@@ -579,6 +574,13 @@ void JointInspector::RestoreOriginalData()
   if (!originalChild.empty())
     this->configWidget->SetEnumWidgetValue("childCombo", originalChild);
   this->configWidget->blockSignals(false);
+
+  // Reset variables, we assume the original data was valid
+  this->validJointName = true;
+  this->validLinks = true;
+  this->nameWidget->setStyleSheet(ConfigWidget::StyleSheet("normal"));
+  this->parentLinkWidget->setStyleSheet(ConfigWidget::StyleSheet("normal"));
+  this->childLinkWidget->setStyleSheet(ConfigWidget::StyleSheet("normal"));
 
   if (this->CheckValid())
     emit Applied();
