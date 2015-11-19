@@ -558,12 +558,12 @@ void JointMaker::Stop()
     if (this->newJoint->parent)
     {
       this->newJoint->parent->SetWorldPose(this->parentLinkOriginalPose);
-     // this->SetHighlighted(this->parentLinkVis, false);
+      this->SetVisualMoved(this->newJoint->parent, false);
     }
     if (this->newJoint->child)
     {
       this->newJoint->child->SetWorldPose(this->childLinkOriginalPose);
-    //  this->SetHighlighted(this->childLinkVis, false);
+      this->SetVisualMoved(this->newJoint->child, false);
     }
   }
 
@@ -811,6 +811,21 @@ void JointMaker::Update()
            joint->childPose = joint->child->GetWorldPose();
            joint->childScale = joint->child->GetScale();
            poseUpdate = true;
+
+           // Highlight links connected to joint being created if they have
+           // been moved to another position
+           if (joint == this->newJoint)
+           {
+             // Parent
+             this->SetVisualMoved(joint->parent,
+                 joint->parent->GetWorldPose().Ign() !=
+                 this->parentLinkOriginalPose);
+
+             // Child
+             this->SetVisualMoved(joint->child,
+                 joint->child->GetWorldPose().Ign() !=
+                 this->childLinkOriginalPose);
+           }
          }
 
         // Create / update joint visual
@@ -1519,7 +1534,7 @@ bool JointMaker::SetParentLink(rendering::VisualPtr _parentLink)
   {
     // Reset previous parent
     this->newJoint->parent->SetWorldPose(this->parentLinkOriginalPose);
-//    this->SetHighlighted(this->newJoint->parent, false);
+    this->SetVisualMoved(this->newJoint->parent, false);
 
     this->newJoint->parent = _parentLink;
     this->newJoint->dirty = true;
@@ -1573,7 +1588,7 @@ bool JointMaker::SetChildLink(rendering::VisualPtr _childLink)
   {
     // Reset previous child
     this->newJoint->child->SetWorldPose(this->childLinkOriginalPose);
-//    this->SetHighlighted(this->childLinkVis, false);
+    this->SetVisualMoved(this->newJoint->child, false);
 
     this->newJoint->child = _childLink;
     this->newJoint->dirty = true;
@@ -1730,3 +1745,25 @@ void JointMaker::AlignLinks(const bool _childToParent,
       target, true);
 }
 
+/////////////////////////////////////////////////
+void JointMaker::SetVisualMoved(rendering::VisualPtr _vis, bool _moved)
+{
+  if (_vis->GetChildCount() != 0)
+  {
+    for (unsigned int j = 0; j < _vis->GetChildCount(); ++j)
+    {
+      this->SetVisualMoved(_vis->GetChild(j), _moved);
+    }
+  }
+  else
+  {
+    if (_moved)
+    {
+      _vis->SetEmissive(common::Color(0, 0, 1, 1));
+    }
+    else
+    {
+      _vis->SetEmissive(common::Color(0, 0, 0, 1));
+    }
+  }
+}

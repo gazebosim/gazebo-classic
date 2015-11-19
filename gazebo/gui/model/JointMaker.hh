@@ -336,6 +336,12 @@ namespace gazebo
       /// \return True if successfully set new child.
       private: bool SetChildLink(rendering::VisualPtr _childLink);
 
+      /// \brief Highlight link visuals which have been moved while creating
+      /// a new joint.
+      /// \param[in] _vis Visual to be highlighted.
+      /// \param[in] _moved Whether it moved or not.
+      private: void SetVisualMoved(rendering::VisualPtr _vis, bool _moved);
+
       /// \brief Qt signal when the joint creation process has ended.
       Q_SIGNALS: void JointAdded();
 
