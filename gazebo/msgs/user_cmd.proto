@@ -1,5 +1,8 @@
 package gazebo.msgs;
 
+import "light.proto";
+import "model.proto";
+
 /// \ingroup gazebo_msgs
 /// \interface UserCmd
 /// \brief Notifies that a new command has been executed by a user
@@ -21,4 +24,10 @@ message UserCmd
 
   /// \brief Type of command.
   required Type type = 3;
+
+  /// \brief For model modify commands.
+  optional Model model = 4;
+
+  /// \brief For light modify commands.
+  optional Light light = 5;
 }

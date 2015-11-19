@@ -136,6 +136,28 @@ void UserCmdManager::OnUserCmdMsg(ConstUserCmdPtr &_msg)
   UserCmdPtr cmd(new UserCmd(id, this->dataPtr->world, _msg->description(),
       _msg->type()));
 
+  if (_msg->type() == msgs::UserCmd::MOVING)
+  {
+    if (_msg->has_model())
+    {
+      auto modelPub = this->dataPtr->node->Advertise<msgs::Model>(
+          "~/model/modify");
+      modelPub->Publish(_msg->model());
+    }
+    else if (_msg->has_light())
+    {
+      auto lightPub = this->dataPtr->node->Advertise<msgs::Light>(
+          "~/light/modify");
+      lightPub->Publish(_msg->light());
+    }
+    else
+    {
+      gzwarn << "Moving command [" << _msg->description() <<
+          "] without a model or light message. Command won't be executed."
+          << std::endl;
+    }
+  }
+
   // Add it to undo list
   this->dataPtr->undoCmds.push_back(cmd);
 
