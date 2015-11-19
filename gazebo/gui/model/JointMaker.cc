@@ -223,6 +223,12 @@ void JointMaker::RemoveJoint(const std::string &_jointId)
   if (!joint)
     return;
 
+  if (jointId != "")
+  {
+    this->joints.erase(jointId);
+    gui::model::Events::jointRemoved(jointId);
+  }
+
   auto scene = rendering::get_scene();
   if (!scene)
     return;
@@ -274,11 +280,6 @@ void JointMaker::RemoveJoint(const std::string &_jointId)
   delete joint->inspector;
   delete joint;
   gui::model::Events::modelChanged();
-  if (jointId != "")
-  {
-    this->joints.erase(jointId);
-    gui::model::Events::jointRemoved(jointId);
-  }
 }
 
 /////////////////////////////////////////////////
