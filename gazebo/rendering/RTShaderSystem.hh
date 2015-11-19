@@ -32,8 +32,6 @@ namespace gazebo
 {
   namespace rendering
   {
-    class Visual;
-    class Scene;
     class RTShaderSystemPrivate;
 
     /// \addtogroup gazebo_rendering

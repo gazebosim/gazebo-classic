@@ -28,9 +28,6 @@ namespace gazebo
 {
   namespace rendering
   {
-    class Visual;
-    class Scene;
-
     /// \brief Private data for the RTShaderSystem class
     class RTShaderSystemPrivate
     {
