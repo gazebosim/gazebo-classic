@@ -781,6 +781,8 @@ void JointMaker::CreateHotSpot(JointData *_joint)
   _joint->hotspot = hotspotVisual;
   _joint->inspector->SetJointId(_joint->hotspot->GetName());
 
+  _joint->dirty = true;
+
   std::string parentName = _joint->parent->GetName();
   std::string childName = _joint->child->GetName();
 
@@ -792,7 +794,6 @@ void JointMaker::CreateHotSpot(JointData *_joint)
 void JointMaker::Update()
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
-
   // Update each joint
   for (auto it : this->joints)
   {
@@ -1082,8 +1083,7 @@ void JointData::Update()
     math::Vector3 dPos = (childOrigin - parentOrigin);
     math::Vector3 center = dPos * 0.5;
     double length = std::max(dPos.GetLength(), 0.001);
-    this->hotspot->SetScale(
-        math::Vector3(0.008, 0.008, length));
+    this->hotspot->SetScale(math::Vector3(0.008, 0.008, length));
     this->hotspot->SetWorldPosition(parentOrigin + center);
 
     // Hotspot orientation
@@ -1114,8 +1114,7 @@ void JointData::Update()
       handleNode->attachObject(this->handles);
       Ogre::MaterialPtr mat =
           Ogre::MaterialManager::getSingleton().getByName(material);
-      Ogre::ColourValue color =
-          mat->getTechnique(0)->getPass(0)->getDiffuse();
+      Ogre::ColourValue color = mat->getTechnique(0)->getPass(0)->getDiffuse();
       color.a = 0.5;
       this->handles->getBillboard(0)->setColour(color);
     }

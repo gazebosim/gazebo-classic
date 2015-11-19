@@ -372,9 +372,6 @@ namespace gazebo
       /// \brief All the event connections.
       private: std::vector<event::ConnectionPtr> connections;
 
-      /// \brief Flag set to true when a joint has been connected.
-      private: bool newJointCreated;
-
       /// \brief The SDF element pointer to the model that contains the joints.
       private: sdf::ElementPtr modelSDF;
 
