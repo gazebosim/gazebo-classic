@@ -116,7 +116,8 @@ namespace gazebo
 
       /// \brief Helper method to create hotspot visual for mouse interaction.
       /// \param[in] _joint Joint data used for creating the hotspot
-      public: void CreateHotSpot(JointData *_joint);
+      /// \return Joint id, empty if hotspot creation failed.
+      public: std::string CreateHotSpot(JointData *_joint);
 
       /// \brief Update callback on PreRender.
       public: void Update();
@@ -242,6 +243,9 @@ namespace gazebo
       public: void AlignLinks(
           const bool _childToParent, const std::string &_axis,
           const std::string &_mode);
+
+      /// \brief Finalize joint creation.
+      public: void FinalizeCreation();
 
       /// \brief Mouse event filter callback when mouse button is pressed.
       /// \param[in] _event The mouse event.

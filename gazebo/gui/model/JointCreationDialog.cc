@@ -713,7 +713,7 @@ void JointCreationDialog::OnCancel()
 void JointCreationDialog::OnCreate()
 {
   this->accept();
-//  this->dataPtr->jointMaker->CreationComplete();
+  this->dataPtr->jointMaker->FinalizeCreation();
 }
 
 /////////////////////////////////////////////////

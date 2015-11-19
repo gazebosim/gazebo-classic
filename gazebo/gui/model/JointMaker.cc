@@ -723,10 +723,10 @@ void JointMaker::OnDelete()
 }
 
 /////////////////////////////////////////////////
-void JointMaker::CreateHotSpot(JointData *_joint)
+std::string JointMaker::CreateHotSpot(JointData *_joint)
 {
   if (!_joint)
-    return;
+    return "";
 
   rendering::UserCameraPtr camera = gui::get_active_camera();
 
@@ -783,11 +783,7 @@ void JointMaker::CreateHotSpot(JointData *_joint)
 
   _joint->dirty = true;
 
-  std::string parentName = _joint->parent->GetName();
-  std::string childName = _joint->child->GetName();
-
-  gui::model::Events::jointInserted(jointId, _joint->name,
-      jointTypes[_joint->type], parentName, childName);
+  return jointId;
 }
 
 /////////////////////////////////////////////////
@@ -1466,7 +1462,15 @@ void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
   joint->line = jointLine;
   joint->dirty = true;
 
-  this->CreateHotSpot(joint);
+  auto jointId = this->CreateHotSpot(joint);
+
+  // Notify other widgets
+  if (!jointId.empty())
+  {
+    gui::model::Events::jointInserted(jointId, joint->name,
+        jointTypes[joint->type], joint->parent->GetName(),
+        joint->child->GetName());
+  }
 }
 
 /////////////////////////////////////////////////
@@ -1578,7 +1582,6 @@ bool JointMaker::SetChildLink(rendering::VisualPtr _childLink)
     // Create new joint with parent and child
     auto joint = this->CreateJoint(parentVis, _childLink);
     this->newJoint = joint;
-    gui::model::Events::modelChanged();
 
     // Create hotspot visual
     this->CreateHotSpot(this->newJoint);
@@ -1766,4 +1769,34 @@ void JointMaker::SetVisualMoved(rendering::VisualPtr _vis, bool _moved)
       _vis->SetEmissive(common::Color(0, 0, 0, 1));
     }
   }
+}
+
+/////////////////////////////////////////////////
+void JointMaker::FinalizeCreation()
+{
+  gui::model::Events::modelChanged();
+  this->jointType = JointMaker::JOINT_NONE;
+
+  // Notify schematic view and palette list
+  if (this->newJoint && this->newJoint->hotspot &&
+      this->newJoint->child && this->newJoint->parent)
+  {
+    gui::model::Events::jointInserted(
+        this->newJoint->hotspot->GetName(),
+        this->newJoint->name,
+        this->jointTypes[this->newJoint->type],
+        this->newJoint->parent->GetName(),
+        this->newJoint->child->GetName());
+
+
+    // Reset visuals
+    this->SetVisualMoved(this->newJoint->parent, false);
+    this->SetVisualMoved(this->newJoint->child, false);
+  }
+  this->newJoint = NULL;
+
+  // Notify ModelEditor to uncheck tool button
+  this->JointAdded();
+
+  this->Stop();
 }
