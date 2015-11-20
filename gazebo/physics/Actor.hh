@@ -111,32 +111,11 @@ namespace gazebo
       /// \param[in] _linkSdf The link to add the inertia to.
       /// \param[in] _pose Pose of the inertia.
       /// \param[in] _mass Mass of the inertia.
-      /// \param[in] _radiau Radius of the sphere.
-      /// \deprecated See function that accepts ignition::math parameters
-      private: void AddSphereInertia(sdf::ElementPtr _linkSdf,
-                   const math::Pose &_pose,
-                   double _mass, double _radius) GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Add inertia for a sphere.
-      /// \param[in] _linkSdf The link to add the inertia to.
-      /// \param[in] _pose Pose of the inertia.
-      /// \param[in] _mass Mass of the inertia.
       /// \param[in] _radius Radius of the sphere.
       /// \deprecated See function that accepts ignition::math parameters
       private: void AddSphereInertia(const sdf::ElementPtr &_linkSdf,
                    const ignition::math::Pose3d &_pose,
                    const double _mass, const double _radius);
-
-
-      /// \brief Add a spherical collision object.
-      /// \param[in] _linkSdf Link to add the collision to.
-      /// \param[in] _name Name of the collision object.
-      /// \param[in] _pose Pose of the collision object.
-      /// \param[in] _radius Radius of the collision object.
-      /// \deprecated See function that accepts ignition::math parameters
-      private: void AddSphereCollision(sdf::ElementPtr _linkSdf,
-                   const std::string &_name, const math::Pose &_pose,
-                   double _radius) GAZEBO_DEPRECATED(7.0);
 
       /// \brief Add a spherical collision object.
       /// \param[in] _linkSdf Link to add the collision to.
@@ -147,19 +126,6 @@ namespace gazebo
                    const std::string &_name,
                    const ignition::math::Pose3d &_pose,
                    const double _radius);
-
-      /// \brief Add a spherical visual object.
-      /// \param[in] _linkSdf Link to add the visual to.
-      /// \param[in] _name Name of the visual object.
-      /// \param[in] _pose Pose of the visual object.
-      /// \param[in] _radius Radius of the visual object.
-      /// \param[in] _material Name of the visual material.
-      /// \param[in] _ambient Ambient color.
-      /// \deprecated See function that accepts ignition::math parameters
-      private: void AddSphereVisual(sdf::ElementPtr _linkSdf,
-                   const std::string &_name, const math::Pose &_pose,
-                   double _radius, const std::string &_material,
-                   const common::Color &_ambient) GAZEBO_DEPRECATED(7.0);
 
       /// \brief Add a spherical visual object.
       /// \param[in] _linkSdf Link to add the visual to.
@@ -180,34 +146,12 @@ namespace gazebo
       /// \param[in] _size Dimensions of the visual object.
       /// \param[in] _material Name of the visual material.
       /// \param[in] _ambient Ambient color.
-      /// \deprecated See function that accepts ignition::math parameters
-      private: void AddBoxVisual(sdf::ElementPtr _linkSdf,
-                   const std::string &_name, const math::Pose &_pose,
-                   const math::Vector3 &_size, const std::string &_material,
-                   const common::Color &_ambient) GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Add a box visual object.
-      /// \param[in] _linkSdf Link to add the visual to.
-      /// \param[in] _name Name of the visual object.
-      /// \param[in] _pose Pose of the visual object.
-      /// \param[in] _size Dimensions of the visual object.
-      /// \param[in] _material Name of the visual material.
-      /// \param[in] _ambient Ambient color.
       private: void AddBoxVisual(const sdf::ElementPtr &_linkSdf,
                    const std::string &_name,
                    const ignition::math::Pose3d &_pose,
                    const ignition::math::Vector3d &_size,
                    const std::string &_material,
                    const common::Color &_ambient);
-
-      /// \brief Add an actor visual to a link.
-      /// \param[in] _linkSdf Link to add the visual to.
-      /// \param[in] _name Name of the visual.
-      /// \param[in] _pose Pose of the visual.
-      /// \deprecated See function that accepts ignition::math parameters
-      private: void AddActorVisual(sdf::ElementPtr _linkSdf,
-                   const std::string &_name, const math::Pose &_pose)
-               GAZEBO_DEPRECATED(7.0);
 
       /// \brief Add an actor visual to a link.
       /// \param[in] _linkSdf Link to add the visual to.

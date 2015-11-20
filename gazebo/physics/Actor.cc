@@ -656,14 +656,6 @@ const sdf::ElementPtr Actor::GetSDF()
 }
 
 //////////////////////////////////////////////////
-void Actor::AddSphereInertia(sdf::ElementPtr _linkSdf,
-                             const math::Pose &_pose,
-                             double _mass, double _radius)
-{
-  this->AddSphereInertia(_linkSdf, _pose.Ign(), _mass, _radius);
-}
-
-//////////////////////////////////////////////////
 void Actor::AddSphereInertia(const sdf::ElementPtr &_linkSdf,
                              const ignition::math::Pose3d &_pose,
                              const double _mass, const double _radius)
@@ -683,15 +675,6 @@ void Actor::AddSphereInertia(const sdf::ElementPtr &_linkSdf,
 }
 
 //////////////////////////////////////////////////
-void Actor::AddSphereCollision(sdf::ElementPtr _linkSdf,
-                               const std::string &_name,
-                               const math::Pose &_pose,
-                               double _radius)
-{
-  this->AddSphereCollision(_linkSdf, _name, _pose.Ign(), _radius);
-}
-
-//////////////////////////////////////////////////
 void Actor::AddSphereCollision(const sdf::ElementPtr &_linkSdf,
                                const std::string &_name,
                                const ignition::math::Pose3d &_pose,
@@ -704,15 +687,6 @@ void Actor::AddSphereCollision(const sdf::ElementPtr &_linkSdf,
   sdf::ElementPtr geomColSdf = collisionSdf->GetElement("geometry");
   sdf::ElementPtr sphereColSdf = geomColSdf->GetElement("sphere");
   sphereColSdf->GetElement("radius")->Set(_radius);
-}
-
-//////////////////////////////////////////////////
-void Actor::AddSphereVisual(sdf::ElementPtr _linkSdf, const std::string &_name,
-            const math::Pose &_pose, double _radius,
-            const std::string &_material, const common::Color &_ambient)
-{
-  this->AddSphereVisual(_linkSdf, _name, _pose.Ign(),
-                        _radius, _material, _ambient);
 }
 
 //////////////////////////////////////////////////
@@ -735,15 +709,6 @@ void Actor::AddSphereVisual(const sdf::ElementPtr &_linkSdf,
 }
 
 //////////////////////////////////////////////////
-void Actor::AddBoxVisual(sdf::ElementPtr _linkSdf, const std::string &_name,
-    const math::Pose &_pose, const math::Vector3 &_size,
-    const std::string &_material, const common::Color &_ambient)
-{
-  this->AddBoxVisual(_linkSdf, _name, _pose.Ign(), _size.Ign(),
-                     _material, _ambient);
-}
-
-//////////////////////////////////////////////////
 void Actor::AddBoxVisual(const sdf::ElementPtr &_linkSdf,
     const std::string &_name, const ignition::math::Pose3d &_pose,
     const ignition::math::Vector3d &_size, const std::string &_material,
@@ -760,13 +725,6 @@ void Actor::AddBoxVisual(const sdf::ElementPtr &_linkSdf,
   matSdf->GetElement("script")->Set(_material);
   sdf::ElementPtr colorSdf = matSdf->GetElement("ambient");
   colorSdf->Set(_ambient);
-}
-
-//////////////////////////////////////////////////
-void Actor::AddActorVisual(sdf::ElementPtr _linkSdf, const std::string &_name,
-                           const math::Pose &_pose)
-{
-  this->AddActorVisual(_linkSdf, _name, _pose.Ign());
 }
 
 //////////////////////////////////////////////////
