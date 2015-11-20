@@ -352,7 +352,7 @@ void ModelSnap::PublishVisualPose(rendering::VisualPtr _vis)
     return;
 
   // Check to see if the visual is a model.
-  if (gui::get_entity_id(_vis->GetName()))
+  if (_vis->GetType() == rendering::Visual::VT_MODEL)
   {
     // Register user command on server
     msgs::UserCmd userCmdMsg;
@@ -360,7 +360,6 @@ void ModelSnap::PublishVisualPose(rendering::VisualPtr _vis)
     userCmdMsg.set_type(msgs::UserCmd::MOVING);
 
     msgs::Model msg;
-    msg.set_id(gui::get_entity_id(_vis->GetName()));
     msg.set_name(_vis->GetName());
     msgs::Set(msg.mutable_pose(), _vis->GetWorldPose().Ign());
 

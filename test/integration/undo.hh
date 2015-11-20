@@ -39,6 +39,9 @@ class UndoTest : public QTestFixture
   /// \brief Test undoing translate commands.
   private slots: void UndoTranslate();
 
+  /// \brief Test undoing snap commands.
+  private slots: void UndoSnap();
+
   /// \brief UndoRedo message received
   /// \param[in] _msg Message containing an undo/redo request.
   private: void OnUndoRedo(ConstUndoRedoPtr &_msg);
