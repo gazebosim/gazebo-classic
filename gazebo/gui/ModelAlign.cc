@@ -301,11 +301,15 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
 
     for (auto vis : visToPub)
     {
-      // Check to see if the visual is a model.
-      if (gui::get_entity_id(vis->GetName()))
+      // Only publish for models
+      if (vis->GetType() == gazebo::rendering::Visual::VT_MODEL)
       {
         msgs::Model msg;
-        msg.set_id(gui::get_entity_id(vis->GetName()));
+
+        auto id = gui::get_entity_id(vis->GetName());
+        if (id)
+          msg.set_id(id);
+
         msg.set_name(vis->GetName());
         msgs::Set(msg.mutable_pose(), vis->GetWorldPose().Ign());
 

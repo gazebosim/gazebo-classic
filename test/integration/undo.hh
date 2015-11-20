@@ -42,6 +42,9 @@ class UndoTest : public QTestFixture
   /// \brief Test undoing snap commands.
   private slots: void UndoSnap();
 
+  /// \brief Test undoing align commands.
+  private slots: void UndoAlign();
+
   /// \brief UndoRedo message received
   /// \param[in] _msg Message containing an undo/redo request.
   private: void OnUndoRedo(ConstUndoRedoPtr &_msg);

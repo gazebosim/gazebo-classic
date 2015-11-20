@@ -541,10 +541,15 @@ void ModelManipulator::PublishVisualPose(rendering::VisualPtr _vis)
   userCmdMsg.set_description(description + _vis->GetName() + "]");
   userCmdMsg.set_type(msgs::UserCmd::MOVING);
 
-  // Check to see if the visual is a model.
+  // Only publish for models
   if (_vis->GetType() == gazebo::rendering::Visual::VT_MODEL)
   {
     msgs::Model msg;
+
+    auto id = gui::get_entity_id(_vis->GetName());
+    if (id)
+      msg.set_id(id);
+
     msg.set_name(_vis->GetName());
     msgs::Set(msg.mutable_pose(), _vis->GetWorldPose().Ign());
 

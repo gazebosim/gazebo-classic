@@ -21,6 +21,7 @@
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/MainWindow.hh"
+#include "gazebo/gui/ModelAlign.hh"
 #include "gazebo/gui/ModelManipulator.hh"
 #include "gazebo/gui/ModelSnap.hh"
 #include "gazebo/gui/UserCmdHistory.hh"
@@ -269,6 +270,7 @@ void UndoTest::MsgPassing()
   node.reset();
   delete mainWindow;
   mainWindow = NULL;
+  world->Fini();
 }
 
 /////////////////////////////////////////////////
@@ -362,6 +364,10 @@ void UndoTest::UndoTranslate()
   gzmsg << "Box pose [" << boxModel->GetWorldPose() << "] initial pose [" <<
       boxInitialPose << "]    sleep [" << sleep << "]" << std::endl;
   QVERIFY(boxModel->GetWorldPose() == boxInitialPose);
+
+  // Clean up
+  delete mainWindow;
+  mainWindow = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -425,7 +431,7 @@ void UndoTest::UndoSnap()
 
   // Check that box model moved
   int sleep = 0;
-  int maxSleep = 100;
+  int maxSleep = 10;
   while (boxModel->GetWorldPose() == boxInitialPose && sleep < maxSleep)
   {
     gazebo::common::Time::MSleep(100);
@@ -456,6 +462,131 @@ void UndoTest::UndoSnap()
   gzmsg << "Box pose [" << boxModel->GetWorldPose() << "] initial pose [" <<
       boxInitialPose << "]    sleep [" << sleep << "]" << std::endl;
   QVERIFY(boxModel->GetWorldPose() == boxInitialPose);
+
+  // Clean up
+  delete mainWindow;
+  mainWindow = NULL;
+}
+
+/////////////////////////////////////////////////
+void UndoTest::UndoAlign()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/shapes.world", false, false, true);
+
+  // Get world
+  auto world = gazebo::physics::get_world("default");
+  QVERIFY(world != NULL);
+
+  // Create the main window.
+  auto mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Process some events and draw the screen
+  for (size_t i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Get scene
+  auto scene = gazebo::gui::get_active_camera()->GetScene();
+  QVERIFY(scene != NULL);
+
+  // Get models
+  auto boxModel = world->GetModel("box");
+  QVERIFY(boxModel != NULL);
+  auto boxInitialPose = boxModel->GetWorldPose();
+
+  auto cylinderModel = world->GetModel("cylinder");
+  QVERIFY(cylinderModel != NULL);
+  auto cylinderInitialPose = cylinderModel->GetWorldPose();
+
+  auto sphereModel = world->GetModel("sphere");
+  QVERIFY(sphereModel != NULL);
+  auto sphereInitialPose = sphereModel->GetWorldPose();
+
+  // Get visuals
+  auto boxVis = scene->GetVisual("box");
+  QVERIFY(boxVis != NULL);
+  QVERIFY(boxVis->GetWorldPose() == boxInitialPose);
+
+  auto cylinderVis = scene->GetVisual("cylinder");
+  QVERIFY(cylinderVis != NULL);
+  QVERIFY(cylinderVis->GetWorldPose() == cylinderInitialPose);
+
+  auto sphereVis = scene->GetVisual("sphere");
+  QVERIFY(sphereVis != NULL);
+  QVERIFY(sphereVis->GetWorldPose() == sphereInitialPose);
+
+  // Trigger user command
+  std::vector<gazebo::rendering::VisualPtr> visuals;
+  visuals.push_back(sphereVis);
+  visuals.push_back(cylinderVis);
+  visuals.push_back(boxVis);
+
+  gazebo::gui::ModelAlign::Instance()->AlignVisuals(visuals, "y", "min",
+      "first", true);
+
+  // Check that models haven't moved yet
+  QVERIFY(sphereModel->GetWorldPose() == sphereInitialPose);
+  QVERIFY(boxModel->GetWorldPose() == boxInitialPose);
+  QVERIFY(cylinderModel->GetWorldPose() == cylinderInitialPose);
+
+  // Check that box and cylinder models moved
+  int sleep = 0;
+  int maxSleep = 10;
+  while (boxModel->GetWorldPose() == boxInitialPose &&
+      cylinderModel->GetWorldPose() == cylinderInitialPose && sleep < maxSleep)
+  {
+    gazebo::common::Time::MSleep(100);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+    sleep++;
+  }
+  gzmsg << "Box pose [" << boxModel->GetWorldPose()
+        << "] box initial pose [" << boxInitialPose
+        << "] cylinder pose [" << cylinderModel->GetWorldPose()
+        << "] cylinder initial pose [" << cylinderInitialPose
+        << "]    sleep [" << sleep << "]" << std::endl;
+  QVERIFY(boxModel->GetWorldPose() != boxInitialPose);
+  QVERIFY(cylinderModel->GetWorldPose() != cylinderInitialPose);
+
+  // Undo
+  QVERIFY(gazebo::gui::g_undoAct != NULL);
+  QVERIFY(gazebo::gui::g_undoAct->isEnabled() == true);
+
+  gazebo::gui::g_undoAct->trigger();
+
+  // Check that box and cylinder are back to initial pose
+  sleep = 0;
+  maxSleep = 10;
+  while (boxModel->GetWorldPose() != boxInitialPose &&
+      cylinderModel->GetWorldPose() != cylinderInitialPose && sleep < maxSleep)
+  {
+    gazebo::common::Time::MSleep(100);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+    sleep++;
+  }
+  gzmsg << "Box pose [" << boxModel->GetWorldPose()
+        << "] box initial pose [" << boxInitialPose
+        << "] cylinder pose [" << cylinderModel->GetWorldPose()
+        << "] cylinder initial pose [" << cylinderInitialPose
+        << "]    sleep [" << sleep << "]" << std::endl;
+  QVERIFY(boxModel->GetWorldPose() == boxInitialPose);
+  QVERIFY(cylinderModel->GetWorldPose() == cylinderInitialPose);
+  QVERIFY(sphereModel->GetWorldPose() == sphereInitialPose);
+
+  // Clean up
+  delete mainWindow;
+  mainWindow = NULL;
 }
 
 // Generate a main function for the test
