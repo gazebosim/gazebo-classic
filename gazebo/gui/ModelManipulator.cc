@@ -533,7 +533,7 @@ void ModelManipulator::PublishVisualPose(rendering::VisualPtr _vis)
   else
   {
     gzerr << "Unknown mode [" << this->dataPtr->manipMode << "]. " <<
-	"Not sending user command." << std::endl;
+        "Not sending user command." << std::endl;
     return;
   }
 
@@ -542,10 +542,9 @@ void ModelManipulator::PublishVisualPose(rendering::VisualPtr _vis)
   userCmdMsg.set_type(msgs::UserCmd::MOVING);
 
   // Check to see if the visual is a model.
-  if (gui::get_entity_id(_vis->GetName()))
+  if (_vis->GetType() == gazebo::rendering::Visual::VT_MODEL)
   {
     msgs::Model msg;
-    msg.set_id(gui::get_entity_id(_vis->GetName()));
     msg.set_name(_vis->GetName());
     msgs::Set(msg.mutable_pose(), _vis->GetWorldPose().Ign());
 
@@ -565,7 +564,7 @@ void ModelManipulator::PublishVisualPose(rendering::VisualPtr _vis)
   else
   {
     gzerr << "Visual [" << _vis->GetName() << "] isn't a model or a light"
-	<< std::endl;
+        << std::endl;
     return;
   }
   this->dataPtr->userCmdPub->Publish(userCmdMsg);

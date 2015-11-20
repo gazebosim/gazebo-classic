@@ -36,6 +36,9 @@ class UndoTest : public QTestFixture
   /// physics::UserCmdManager.
   private slots: void MsgPassing();
 
+  /// \brief Test undoing translate commands.
+  private slots: void UndoTranslate();
+
   /// \brief UndoRedo message received
   /// \param[in] _msg Message containing an undo/redo request.
   private: void OnUndoRedo(ConstUndoRedoPtr &_msg);
