@@ -122,12 +122,6 @@ dxJointContact::getInfo2( dxJoint::Info2 *info )
         dNegateVector3( info->J2a );
     }
 
-    // set right hand side and cfm value for normal
-    dReal local_erp = info->erp;
-    if ( contact.surface.mode & dContactSoftERP )
-        local_erp = contact.surface.soft_erp;
-    dReal k = info->fps * local_erp;
-
     // experimental - check relative acceleration at the contact
 
     dReal depth;
@@ -160,6 +154,67 @@ dxJointContact::getInfo2( dxJoint::Info2 *info )
     dReal motionN = 0;
     if ( contact.surface.mode & dContactMotionN )
         motionN = contact.surface.motionN;
+
+    // set right hand side and cfm value for normal
+    dReal local_erp = info->erp;
+    if ( contact.surface.mode & dContactSoftERP )
+        local_erp = contact.surface.soft_erp;
+
+    if ( contact.surface.mode & dContactEM )
+    {
+        // get patch radius for surface area calculation
+        dReal patch_radius;
+        if (!contact.surface.use_patch_radius)
+        {
+          if (contact.surface.surface_radius < 0)
+            contact.surface.surface_radius = 0;
+          patch_radius = sqrt(contact.surface.surface_radius * depth);
+        }
+        else
+        {
+          patch_radius = contact.surface.patch_radius;
+        }
+
+        // use elastic modulus
+        dReal e_star = contact.surface.elastic_modulus;
+
+        /// Using Hertzian contact, where stiffness term f = K*x^1.5.
+        /// Equation 5.23 form Contact Mechanics and Friction by Popov.
+        /// Split the penetration depth term to the 1.5 power
+        /// (x^1.5) as x(last iteration)^0.5 * x(current iteration)^1.3:
+        ///   f = K*x^0.5 * x
+        /// Let linearized stiffness
+        ///   K* = K*x^0.5
+        /// then,
+        ///   f = K* * x
+        dReal khertz_sqrtx = 4.0 / 3.0 * e_star * sqrt(patch_radius * depth);
+        /// but note that this is not the linear spring stiffness
+        /// we are used to dealing with.
+        /// This is the Hertzian stiffness governed by
+        /// a non-linear equation (k*x^1.5).
+
+        // to convert stiffness to erp:
+        // 1) first recover kd from previous cfm and erp, then
+        // 2) compute new cfm and erp using new kp from
+        // elastic modulus calculation and kd from 1.
+
+        // get kd using: cfm = 1 / ( dt * kp + kd )
+        dReal kd = 1.0/info->cfm[0] - local_erp/info->fps;
+
+        // compute new erp using stiffness and kd
+        dReal kph = khertz_sqrtx/info->fps;
+        local_erp = (kph) / (kph + kd);
+
+        // compute new cfm given the new stiffness
+        info->cfm[0] = 1.0 / (kph + kd);
+
+        // debug, comparing stiffnesss, force and depth
+        // used to generate values for test/integration/elastic_modulus.cc:118
+        // printf("depth: %f, d: %f, k: %f k_linearized: %f, f: %f\n",
+        //   depth, kd, 4.0 / 3.0 * e_star * sqrt(patch_radius),
+        //   khertz_sqrtx, khertz_sqrtx*depth);
+    }
+    dReal k = info->fps * local_erp;
 
     const dReal pushout = k * depth + motionN;
     info->c[0] = pushout;
@@ -356,6 +411,8 @@ dxJointContact::getInfo2( dxJoint::Info2 *info )
             dReal patch_radius;
             if (!contact.surface.use_patch_radius)
             {
+              if (contact.surface.surface_radius < 0)
+                contact.surface.surface_radius = 0;
               patch_radius = sqrt(contact.surface.surface_radius * depth);
             }
             else

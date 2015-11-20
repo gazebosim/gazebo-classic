@@ -860,6 +860,7 @@ std::string ModelCreator::AddShape(EntityType _type,
 
   visVisual->Load(visualElem);
   this->CreateLink(visVisual);
+  linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
 
   linkVisual->SetPose(_pose);
 
@@ -1135,6 +1136,8 @@ LinkData *ModelCreator::CreateLinkFromSDF(const sdf::ElementPtr &_linkElem,
 
     collisionElem = collisionElem->GetNextElement("collision");
   }
+
+  linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
 
   // Top-level links only
   if (_parentVis == this->previewVisual)
