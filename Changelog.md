@@ -1,5 +1,8 @@
 ## Gazebo 7.0
 
+1. Publish camera sensor image size when rendering is not enabled
+    * [Pull request #1969](https://bitbucket.org/osrf/gazebo/pull-request/1969)
+
 1. Added Poissons Ratio and Elastic Modulus for ODE.
     * [Pull request #1974](https://bitbucket.org/osrf/gazebo/pull-request/1974)
 
