@@ -1,5 +1,8 @@
 ## Gazebo 7.0
 
+1. Updating physics library to use ignition math.
+    * [Pull request #2007](https://bitbucket.org/osrf/gazebo/pull-request/2007)
+
 1. Added Poissons Ratio and Elastic Modulus for ODE.
     * [Pull request #1974](https://bitbucket.org/osrf/gazebo/pull-request/1974)
 
