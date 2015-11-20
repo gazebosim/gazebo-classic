@@ -277,6 +277,22 @@ void DARTLink::Fini()
   Link::Fini();
 }
 
+/////////////////////////////////////////////////////////////////////
+void DARTLink::UpdateMass()
+{
+  if (this->dataPtr->dtBodyNode && this->inertial)
+  {
+    this->dataPtr->dtBodyNode->setMass(this->inertial->GetMass());
+    auto Ixxyyzz = this->inertial->GetPrincipalMoments();
+    auto Ixyxzyz = this->inertial->GetProductsofInertia();
+    this->dataPtr->dtBodyNode->setMomentOfInertia(
+        Ixxyyzz[0], Ixxyyzz[1], Ixxyyzz[2],
+        Ixyxzyz[0], Ixyxzyz[1], Ixyxzyz[2]);
+    auto cog = DARTTypes::ConvVec3(this->inertial->GetCoG());
+    this->dataPtr->dtBodyNode->setLocalCOM(cog);
+  }
+}
+
 //////////////////////////////////////////////////
 void DARTLink::OnPoseChange()
 {

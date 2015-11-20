@@ -3,17 +3,79 @@ if (@PKG_NAME@_CONFIG_INCLUDED)
 endif()
 set(@PKG_NAME@_CONFIG_INCLUDED TRUE)
 set(@PKG_NAME@_VERSION @GAZEBO_VERSION@)
+set(@PKG_NAME@_MAJOR_VERSION @GAZEBO_MAJOR_VERSION@)
 
-set(@PKG_NAME@_PLUGIN_PATH @CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@/gazebo-@GAZEBO_VERSION@/plugins)
+set(@PKG_NAME@_PLUGIN_PATH "@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@/gazebo-@GAZEBO_MAJOR_VERSION@/plugins")
+
+# The media path contains the location on disk where images,
+# materials scripts, shaders, and other related resources are stored.
+set(@PKG_NAME@_MEDIA_PATH "@CMAKE_INSTALL_PREFIX@/share/gazebo-@GAZEBO_MAJOR_VERSION@/media")
+
+set(@PKG_NAME@_PLUGIN_PATH "@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@/gazebo-@GAZEBO_VERSION@/plugins")
+
+# The media path contains the location on disk where images,
+# materials scripts, shaders, and other related resources are stored.
+set(@PKG_NAME@_MEDIA_PATH "@CMAKE_INSTALL_PREFIX@/share/gazebo-@GAZEBO_VERSION@/media")
+
+#################################################
+# @PKG_NAME@_PROTO_PATH, @PKG_NAME@_PROTO_INCLUDE_DIRS, and
+# @PKG_NAME@_PROTO_LIBRARIES
+#
+# These three variables allow Gazebo messages to be used in other projects.
+#
+# The following examples are for demonstration purposes and are
+# incomplete. The first example shows how to use a Gazebo message in a
+# custom  proto file. The second example shows how to run 'protoc' against
+# custom proto files that make use Gazebo message definitions. The third
+# example shows how to include the correct directory when compiling a library
+# or executable that uses your custom messages.
+#
+# 1. Use a Gazebo message in a custom proto file:
+#
+# package my.msgs;
+# import "vector3d.proto";
+#
+# message MyMessage
+# {
+#   required gazebo.msgs.Vector3d p = 1;
+# }
+#
+# 2. Run protoc from a CMakeLists.txt to generate your message's
+#    header and source files:
+#
+#  add_custom_command(
+#    OUTPUT
+#      "${proto_filename}.pb.cc"
+#      "${proto_filename}.pb.h"
+#    COMMAND protoc
+#    ARGS --proto_path ${GAZEBO_PROTO_PATH} ${proto_file_out}
+#    COMMENT "Running C++ protocol buffer compiler on ${proto_filename}"
+#    VERBATIM)
+#
+# 3. When compiling your library or executable, make sure to use the following
+#    in the CMakeLists.txt file:
+#
+# include_directories(@PKG_NAME@_PROTO_INCLUDE_DIRS)
+# target_link_libraries(your_package @PKG_NAME@_PROTO_LIBRARIES)
+#
+set(@PKG_NAME@_PROTO_PATH
+  "@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_INCLUDEDIR@/gazebo-@GAZEBO_MAJOR_VERSION@/gazebo/msgs/proto")
+find_library(gazebo_proto_msgs_lib gazebo_msgs
+  PATHS "@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@" NO_DEFAULT_PATH)
+list(APPEND @PKG_NAME@_PROTO_LIBRARIES ${gazebo_proto_msgs_lib})
+list(APPEND @PKG_NAME@_PROTO_INCLUDE_DIRS
+  "@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_INCLUDEDIR@/gazebo-@GAZEBO_MAJOR_VERSION@/gazebo/msgs")
+# End @PKG_NAME@_PROTO_PATH, @PKG_NAME@_PROTO_INCLUDE_DIRS, and
+# @PKG_NAME@_PROTO_LIBRARIES
 
 list(APPEND @PKG_NAME@_INCLUDE_DIRS @CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_INCLUDEDIR@)
-list(APPEND @PKG_NAME@_INCLUDE_DIRS @CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_INCLUDEDIR@/gazebo-@GAZEBO_VERSION@)
+list(APPEND @PKG_NAME@_INCLUDE_DIRS @CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_INCLUDEDIR@/gazebo-@GAZEBO_MAJOR_VERSION@)
 
 list(APPEND @PKG_NAME@_LIBRARY_DIRS @CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@)
-list(APPEND @PKG_NAME@_LIBRARY_DIRS @CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@/gazebo-@GAZEBO_VERSION@/plugins)
+list(APPEND @PKG_NAME@_LIBRARY_DIRS @CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@/gazebo-@GAZEBO_MAJOR_VERSION@/plugins)
 
 list(APPEND @PKG_NAME@_CFLAGS -I@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_INCLUDEDIR@)
-list(APPEND @PKG_NAME@_CFLAGS -I@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_INCLUDEDIR@/gazebo-@GAZEBO_VERSION@)
+list(APPEND @PKG_NAME@_CFLAGS -I@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_INCLUDEDIR@/gazebo-@GAZEBO_MAJOR_VERSION@)
 
 # Visual Studio enables c++11 support by default
 if (NOT MSVC)
@@ -27,7 +89,7 @@ endif ()
 foreach(lib @PKG_LIBRARIES@)
   set(onelib "${lib}-NOTFOUND")
   find_library(onelib ${lib}
-    PATHS @CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@
+    PATHS "@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@"
     NO_DEFAULT_PATH
     )
   if(NOT onelib)
@@ -77,6 +139,6 @@ list(APPEND @PKG_NAME@_INCLUDE_DIRS ${IGNITION-MATH_INCLUDE_DIRS})
 list(APPEND @PKG_NAME@_LIBRARY_DIRS ${IGNITION-MATH_LIBRARY_DIRS})
 list(APPEND @PKG_NAME@_LIBRARIES ${IGNITION-MATH_LIBRARIES})
 
-list(APPEND @PKG_NAME@_LDFLAGS -Wl,-rpath,@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@/gazebo-@GAZEBO_VERSION@/plugins)
+list(APPEND @PKG_NAME@_LDFLAGS -Wl,-rpath,@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@/gazebo-@GAZEBO_MAJOR_VERSION@/plugins)
 list(APPEND @PKG_NAME@_LDFLAGS -L@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@)
-list(APPEND @PKG_NAME@_LDFLAGS -L@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@/gazebo-@GAZEBO_VERSION@/plugins)
+list(APPEND @PKG_NAME@_LDFLAGS -L@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@/gazebo-@GAZEBO_MAJOR_VERSION@/plugins)

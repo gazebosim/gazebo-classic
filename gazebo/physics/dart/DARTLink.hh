@@ -150,6 +150,9 @@ namespace gazebo
       // Documentation inherited
       public: virtual void SetLinkStatic(bool _static);
 
+      // Documentation inherited.
+      public: virtual void UpdateMass();
+
       /// \brief Store DART Transformation to Entity::dirtyPose and add this
       ///        link to World::dirtyPoses so that World::Update() trigger
       ///        Entity::SetWorldPose() for this link.

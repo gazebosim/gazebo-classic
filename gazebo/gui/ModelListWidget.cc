@@ -24,6 +24,8 @@
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/message.h>
 
+#include <boost/algorithm/string.hpp>
+#include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/thread/recursive_mutex.hpp>
@@ -2462,7 +2464,7 @@ void ModelListWidget::InitTransport(const std::string &_name)
   this->scenePub = this->node->Advertise<msgs::Scene>("~/scene");
   this->physicsPub = this->node->Advertise<msgs::Physics>("~/physics");
 
-  this->lightPub = this->node->Advertise<msgs::Light>("~/light");
+  this->lightPub = this->node->Advertise<msgs::Light>("~/light/modify");
 
   this->requestPub = this->node->Advertise<msgs::Request>("~/request");
   this->responseSub = this->node->Subscribe("~/response",

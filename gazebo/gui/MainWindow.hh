@@ -47,6 +47,7 @@ namespace gazebo
     class ModelListWidget;
     class Editor;
     class SpaceNav;
+    class UserCmdHistory;
 
     class GZ_GUI_VISIBLE MainWindow : public QMainWindow
     {
@@ -310,8 +311,11 @@ namespace gazebo
       private: transport::SubscriberPtr newEntitySub, statsSub;
       private: transport::SubscriberPtr worldModSub;
 
-      /// \brief Subscriber to the light topic.
-      private: transport::SubscriberPtr lightSub;
+      /// \brief Subscriber to the light modify topic.
+      private: transport::SubscriberPtr lightModifySub;
+
+      /// \brief Subscriber to the light factory topic.
+      private: transport::SubscriberPtr lightFactorySub;
 
       private: QDockWidget *toolsDock;
 
@@ -378,6 +382,9 @@ namespace gazebo
 
       /// \brief Tab to insert models.
       private: InsertModelWidget *insertModel;
+
+      /// \brief Class which manages user commands and undoing / redoing them.
+      private: UserCmdHistory *userCmdHistory;
     };
   }
 }

@@ -217,6 +217,35 @@ namespace gazebo
             event::ConnectionPtr _subscriber)
           { jointChanged.Disconnect(_subscriber); }
 
+        /// \brief Connect a Gazebo event to the nested model removed signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectNestedModelRemoved(T _subscriber)
+          { return nestedModelRemoved.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the nested model removed
+        /// signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectNestedModelRemoved(
+            event::ConnectionPtr _subscriber)
+          { nestedModelRemoved.Disconnect(_subscriber); }
+
+        /// \brief Connect a Gazebo event to the request link removal signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectRequestLinkRemoval(
+            T _subscriber)
+          { return requestLinkRemoval.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the request link removal
+        /// signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectRequestLinkRemoval(
+            event::ConnectionPtr _subscriber)
+          { requestLinkRemoval.Disconnect(_subscriber); }
+
         /// \brief Connect a Gazebo event to the link removed signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
@@ -415,6 +444,22 @@ namespace gazebo
             event::ConnectionPtr _subscriber)
           { modelPluginRemoved.Disconnect(_subscriber); }
 
+        /// \brief Connect a Gazebo event to the request model plugin removal
+        /// signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectRequestModelPluginRemoval(
+            T _subscriber)
+          { return requestModelPluginRemoval.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the request model plugin
+        /// removal signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectRequestModelPluginRemoval(
+            event::ConnectionPtr _subscriber)
+          { requestModelPluginRemoval.Disconnect(_subscriber); }
+
         /// \brief A model has been completed and uploaded onto the server.
         public: static event::EventT<void ()> finishModel;
 
@@ -437,9 +482,8 @@ namespace gazebo
         public: static event::EventT<void (std::string)> modelNameChanged;
 
         /// \brief Notify that model properties have been changed.
-        // The properties are: is_static, auto_disable, pose, name.
-        public: static event::EventT<void (bool, bool, const math::Pose &,
-            const std::string &)> modelPropertiesChanged;
+        // The properties are: is_static, auto_disable.
+        public: static event::EventT<void (bool, bool)> modelPropertiesChanged;
 
         /// \brief Notify that model has been saved.
         public: static event::EventT<void (std::string)> saveModel;
@@ -453,8 +497,14 @@ namespace gazebo
         /// \brief Notify that a link has been inserted.
         public: static event::EventT<void (std::string)> linkInserted;
 
+        /// \brief Notify that a nested model has been removed.
+        public: static event::EventT<void (std::string)> nestedModelRemoved;
+
         /// \brief Notify that a link has been removed.
         public: static event::EventT<void (std::string)> linkRemoved;
+
+        /// \brief Request to remove a link.
+        public: static event::EventT<void (std::string)> requestLinkRemoval;
 
         /// \brief Notify that a joint has been inserted. The parameters are:
         /// joint's unique id, joint name, joint type, parent link's name, and
@@ -512,6 +562,10 @@ namespace gazebo
 
         /// \brief Notify that a model plugin has been removed.
         public: static event::EventT<void (std::string)> modelPluginRemoved;
+
+        /// \brief Request to remove a model plugin.
+        public: static event::EventT<void (std::string)>
+            requestModelPluginRemoval;
       };
     }
   }

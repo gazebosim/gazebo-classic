@@ -16,6 +16,7 @@
 */
 
 #include "gazebo/gui/model/ModelEditorEvents.hh"
+#include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/JointInspector.hh"
 #include "gazebo/gui/model/JointInspector_TEST.hh"
 
@@ -36,7 +37,7 @@ void JointInspector_TEST::AddRemoveLink()
   // Get combo boxes
   QList<QComboBox *> comboBoxes = jointInspector->findChildren<QComboBox *>();
   unsigned int boxCount = comboBoxes.size();
-  QVERIFY(boxCount >= 2);
+  QVERIFY(boxCount >= 5);
 
   // Check parent and child combo boxes
   QComboBox *parentBox = comboBoxes[boxCount-2];
@@ -97,7 +98,7 @@ void JointInspector_TEST::Swap()
   // Get combo boxes
   QList<QComboBox *> comboBoxes = jointInspector->findChildren<QComboBox *>();
   unsigned int boxCount = comboBoxes.size();
-  QVERIFY(boxCount >= 2);
+  QVERIFY(boxCount >= 5);
 
   // Check parent and child combo boxes
   QComboBox *parentBox = comboBoxes[boxCount-2];
@@ -114,10 +115,10 @@ void JointInspector_TEST::Swap()
   // Get swap button
   QList<QToolButton *> toolButtons =
       jointInspector->findChildren<QToolButton *>();
-  QVERIFY(toolButtons.size() == 1);
+  QVERIFY(toolButtons.size() == 2);
 
   // Trigger swap
-  toolButtons[0]->click();
+  toolButtons[1]->click();
 
   // Check parent and child links
   QVERIFY(parentBox->currentText() == "link2");
@@ -125,6 +126,132 @@ void JointInspector_TEST::Swap()
 
   delete jointInspector;
   delete jointMaker;
+}
+
+/////////////////////////////////////////////////
+void JointInspector_TEST::RemoveButton()
+{
+  // Create a joint maker
+  gazebo::gui::JointMaker *jointMaker = new gazebo::gui::JointMaker();
+  QVERIFY(jointMaker != NULL);
+
+  // Create a joint inspector
+  gazebo::gui::JointInspector *jointInspector =
+      new gazebo::gui::JointInspector(jointMaker);
+  QVERIFY(jointInspector != NULL);
+
+  // Open it
+  jointInspector->Open();
+  QVERIFY(jointInspector->isVisible());
+
+  // Get buttons
+  QList<QToolButton *> toolButtons =
+      jointInspector->findChildren<QToolButton *>();
+  QVERIFY(toolButtons.size() == 2);
+  QVERIFY(toolButtons[0]->text() == "");
+
+  // Trigger remove
+  toolButtons[0]->click();
+
+  // Check joint inspector disappeared
+  QVERIFY(!jointInspector->isVisible());
+
+  delete jointInspector;
+  delete jointMaker;
+}
+
+/////////////////////////////////////////////////
+void JointInspector_TEST::AppliedSignal()
+{
+  // Create a joint maker
+  gazebo::gui::JointMaker *jointMaker = new gazebo::gui::JointMaker();
+  QVERIFY(jointMaker != NULL);
+
+  // Add links to list
+  gazebo::gui::model::Events::linkInserted("model::link1");
+  gazebo::gui::model::Events::linkInserted("model::link2");
+  gazebo::gui::model::Events::linkInserted("model::link3");
+
+  // Create a joint inspector
+  gazebo::gui::JointInspector *jointInspector =
+      new gazebo::gui::JointInspector(jointMaker);
+  QVERIFY(jointInspector != NULL);
+
+  // Connect signals
+  connect(jointInspector, SIGNAL(Applied()), this, SLOT(OnApply()));
+
+  // Open it
+  jointInspector->Open();
+  QVERIFY(jointInspector->isVisible());
+  QCOMPARE(g_appliedSignalCount, 0u);
+
+  // Get spins
+  QList<QDoubleSpinBox *> spins =
+      jointInspector->findChildren<QDoubleSpinBox *>();
+  QVERIFY(spins.size() == 34);
+
+  // Get combo boxes
+  QList<QComboBox *> combos =
+      jointInspector->findChildren<QComboBox *>();
+  QVERIFY(combos.size() == 5);
+
+  // Get line edits
+  QList<QLineEdit *> lineEdits =
+      jointInspector->findChildren<QLineEdit *>();
+  QVERIFY(lineEdits.size() == 41);
+
+  // Get push buttons
+  QList<QPushButton *> pushButtons =
+      jointInspector->findChildren<QPushButton *>();
+  QVERIFY(pushButtons.size() == 3);
+
+  // Edit link (1~2)
+  combos[combos.size()-1]->setCurrentIndex(1);
+  QCOMPARE(g_appliedSignalCount, 1u);
+  QVERIFY(jointInspector->isVisible());
+
+  // Edit name (0)
+  lineEdits[0]->setText("new_name");
+  QTest::keyClick(lineEdits[0], Qt::Key_Enter);
+  QCOMPARE(g_appliedSignalCount, 2u);
+  QVERIFY(jointInspector->isVisible());
+
+  // Edit type (0)
+  combos[0]->setCurrentIndex(0);
+  QTest::keyClick(lineEdits[0], Qt::Key_Enter);
+  QCOMPARE(g_appliedSignalCount, 3u);
+  QVERIFY(jointInspector->isVisible());
+
+  // Edit pose (0~5)
+  spins[0]->setValue(2.0);
+  QTest::keyClick(spins[0], Qt::Key_Enter);
+  QCOMPARE(g_appliedSignalCount, 4u);
+  QVERIFY(jointInspector->isVisible());
+
+  // Edit axis (6~8)
+  spins[7]->setValue(0.5);
+  QTest::keyClick(spins[7], Qt::Key_Enter);
+  QCOMPARE(g_appliedSignalCount, 5u);
+  QVERIFY(jointInspector->isVisible());
+
+  // Reset
+  pushButtons[0]->click();
+  QCOMPARE(g_appliedSignalCount, 6u);
+  QVERIFY(jointInspector->isVisible());
+
+  // Ok
+  pushButtons[2]->click();
+  QCOMPARE(g_appliedSignalCount, 7u);
+  QVERIFY(!jointInspector->isVisible());
+
+  delete jointInspector;
+  delete jointMaker;
+}
+
+/////////////////////////////////////////////////
+void JointInspector_TEST::OnApply()
+{
+  g_appliedSignalCount++;
 }
 
 // Generate a main function for the test

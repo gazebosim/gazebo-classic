@@ -86,17 +86,6 @@ double DARTBallJoint::GetVelocity(unsigned int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-double DARTBallJoint::GetMaxForce(unsigned int /*_index*/)
-{
-  return 0;
-}
-
-//////////////////////////////////////////////////
-void DARTBallJoint::SetMaxForce(unsigned int /*_index*/, double /*_t*/)
-{
-}
-
-//////////////////////////////////////////////////
 math::Angle DARTBallJoint::GetAngleImpl(unsigned int /*_index*/) const
 {
   gzerr << "DARTBallJoint::GetAngleImpl not implemented" << std::endl;
