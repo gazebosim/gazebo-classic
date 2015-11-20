@@ -60,7 +60,20 @@ TEST_F(CameraSensor_TEST, CreateCamera)
 
   // simulate the case where sensor cannot start and
   // check that we can still read the correct camera sensor descriptions
-  sensors::SensorManager::Instance()->Fini();
+  std::string sensorScopedName = sensor->GetScopedName();
+  sensors::SensorManager::Instance()->RemoveSensor(sensorScopedName);
+
+  // wait for the sensor to be removed
+  sleep = 0;
+  while (sensors::SensorManager::Instance()->GetSensor(sensorScopedName)
+      && sleep < maxSleep)
+  {
+    sleep++;
+    common::Time::MSleep(100);
+  }
+  EXPECT_TRUE(sensors::SensorManager::Instance()->GetSensor(sensorScopedName)
+      == NULL);
+
   EXPECT_EQ(sensor->GetImageWidth(), 320);
   EXPECT_EQ(sensor->GetImageHeight(), 240);
 }
