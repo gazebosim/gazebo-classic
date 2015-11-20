@@ -21,7 +21,6 @@ set (msgs
   factory.proto
   fluid.proto
   fog.proto
-  follow_model.proto
   friction.proto
   geometry.proto
   gps.proto
@@ -86,7 +85,7 @@ set (msgs
   raysensor.proto
   request.proto
   response.proto
-  rest_error.proto
+  rest_response.proto
   rest_login.proto
   rest_logout.proto
   rest_post.proto
@@ -107,6 +106,9 @@ set (msgs
   time.proto
   topic_info.proto
   track_visual.proto
+  undo_redo.proto
+  user_cmd.proto
+  user_cmd_stats.proto
   vector2d.proto
   vector3d.proto
   visual.proto
