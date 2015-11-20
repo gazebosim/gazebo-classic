@@ -112,7 +112,6 @@ namespace gazebo
       /// \param[in] _pose Pose of the inertia.
       /// \param[in] _mass Mass of the inertia.
       /// \param[in] _radius Radius of the sphere.
-      /// \deprecated See function that accepts ignition::math parameters
       private: void AddSphereInertia(const sdf::ElementPtr &_linkSdf,
                    const ignition::math::Pose3d &_pose,
                    const double _mass, const double _radius);
