@@ -216,7 +216,7 @@ void PhysicsEngine::OnPhysicsMsg(ConstPhysicsPtr &_msg)
   // Only handle parameters that don't require GetParam or SetParam
   if (_msg->has_gravity())
   {
-    this->SetGravity(msgs::Convert(_msg->gravity()));
+    this->SetGravity(msgs::ConvertIgn(_msg->gravity()));
   }
 
   if (_msg->has_enable_physics())
