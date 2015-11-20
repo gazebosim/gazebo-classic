@@ -192,53 +192,6 @@ double DARTSliderJoint::GetVelocity(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-void DARTSliderJoint::SetMaxForce(unsigned int _index, double _force)
-{
-  if (!this->dataPtr->IsInitialized())
-  {
-    this->dataPtr->Cache(
-        "MaxForce" + std::to_string(_index),
-        boost::bind(&DARTSliderJoint::SetMaxForce, this, _index, _force));
-    return;
-  }
-
-  if (_index == 0)
-  {
-    this->dataPtr->dtJoint->setForceLowerLimit(0, -_force);
-    this->dataPtr->dtJoint->setForceUpperLimit(0, _force);
-  }
-  else
-  {
-    gzerr << "Invalid index[" << _index << "]\n";
-  }
-}
-
-//////////////////////////////////////////////////
-double DARTSliderJoint::GetMaxForce(unsigned int _index)
-{
-  if (!this->dataPtr->IsInitialized())
-  {
-    return this->dataPtr->GetCached<double>(
-          "MaxForce" + std::to_string(_index));
-  }
-
-  double result = 0.0;
-
-  if (_index == 0)
-  {
-    // Assume that the lower limit and upper limit has equal magnitute
-    // result = this->dataPtr->dtJoint->getForceLowerLimit(0);
-    result = this->dataPtr->dtJoint->getForceUpperLimit(0);
-  }
-  else
-  {
-    gzerr << "Invalid index[" << _index << "]\n";
-  }
-
-  return result;
-}
-
-//////////////////////////////////////////////////
 void DARTSliderJoint::SetForceImpl(unsigned int _index, double _effort)
 {
   if (!this->dataPtr->IsInitialized())
