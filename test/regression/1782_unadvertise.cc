@@ -49,33 +49,55 @@ TEST_F(Issue1782Test, Unadvertise)
   // Advertise two publishers to the same topic
   auto pubA = node->Advertise<msgs::Vector3d>(fullTopic);
   ASSERT_TRUE(pubA != NULL);
-  common::Time::MSleep(100);
-
-  topics = transport::getAdvertisedTopics("gazebo.msgs.Vector3d");
-  EXPECT_FALSE(topics.empty());
-  EXPECT_TRUE(std::find(topics.begin(), topics.end(),
-      fullTopic) != topics.end());
 
   auto pubB = node->Advertise<msgs::Vector3d>(fullTopic);
   ASSERT_TRUE(pubA != NULL);
-  common::Time::MSleep(100);
 
+  // Check that topic has been advertised
   topics = transport::getAdvertisedTopics("gazebo.msgs.Vector3d");
+  int sleep = 0;
+  int maxSleep = 10;
+  while (topics.empty() && sleep < maxSleep)
+  {
+    topics = transport::getAdvertisedTopics("gazebo.msgs.Vector3d");
+    common::Time::MSleep(100);
+    sleep++;
+  }
   EXPECT_FALSE(topics.empty());
   EXPECT_TRUE(std::find(topics.begin(), topics.end(),
       fullTopic) != topics.end());
 
   // Finish pubB
-  transport::TopicManager::Instance()->Unadvertise("~/test_topic");
   pubB->Fini();
   pubB.reset();
-  common::Time::MSleep(100);
 
   // Check that topic is still advertised
   topics = transport::getAdvertisedTopics("gazebo.msgs.Vector3d");
+  sleep = 0;
+  while (!topics.empty() && sleep < maxSleep)
+  {
+    topics = transport::getAdvertisedTopics("gazebo.msgs.Vector3d");
+    common::Time::MSleep(100);
+    sleep++;
+  }
   EXPECT_FALSE(topics.empty());
   EXPECT_TRUE(std::find(topics.begin(), topics.end(),
       fullTopic) != topics.end());
+
+  // Finish pubA
+  pubA->Fini();
+  pubA.reset();
+
+  // Check that topic was unadvertised now that there are no publishers left
+  topics = transport::getAdvertisedTopics("gazebo.msgs.Vector3d");
+  sleep = 0;
+  while (!topics.empty() && sleep < maxSleep)
+  {
+    topics = transport::getAdvertisedTopics("gazebo.msgs.Vector3d");
+    common::Time::MSleep(100);
+    sleep++;
+  }
+  EXPECT_TRUE(topics.empty());
 }
 
 /////////////////////////////////////////////////
