@@ -4,16 +4,21 @@ package gazebo.msgs;
 /// \interface GUICamera 
 /// \brief Message for a GUI Camera
 
-
-
 import "pose.proto";
 import "track_visual.proto";
 
 message GUICamera
 {
-  required string name                  = 1;
+  /// \brief Name of the camera
+  optional string name                  = 1;
+
+  /// \brief Type of view controller: "orbit", "fps"
   optional string view_controller       = 2;
+
+  /// \brief Pose of the camera
   optional Pose pose                    = 3;
+
+  /// \brief Parameters for moving the camera to follow a visual.
   optional TrackVisual track            = 4;
 
   /// \brief Type of projection: "perspective" or "orthographic".

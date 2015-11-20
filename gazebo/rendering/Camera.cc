@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
@@ -217,6 +216,12 @@ void Camera::Init()
   this->saveCount = 0;
 
   this->SetClipDist();
+
+  this->dataPtr->trackIsStatic = false;
+  this->dataPtr->trackIsRelative = true;
+  this->dataPtr->trackMinDistance = 8.0;
+  this->dataPtr->trackMaxDistance = 8.0;
+  this->dataPtr->trackPos = ignition::math::Vector3d(-5.0, 0.0, 3.0);
 }
 
 //////////////////////////////////////////////////
@@ -377,19 +382,41 @@ void Camera::Update()
     this->SetWorldRotation(math::Quaternion(0, currPitch + pitchAdj,
           currYaw + yawAdj));
 
-    double origDistance = 8.0;
-    double distance = direction.GetLength();
-    double error = origDistance - distance;
+    double error = 0.0;
+    if (!this->dataPtr->trackIsStatic)
+    {
+      if (direction.GetLength() < this->dataPtr->trackMinDistance)
+        error = this->dataPtr->trackMinDistance - direction.GetLength();
+      else if (direction.GetLength() > this->dataPtr->trackMaxDistance)
+        error =  direction.GetLength() - this->dataPtr->trackMaxDistance;
+    }
+    else
+    {
+      if (this->dataPtr->trackIsRelative)
+      {
+        yaw =
+            this->dataPtr->trackedVisual->GetWorldPose().Ign().Rot().Yaw();
+        ignition::math::Quaterniond rot =
+            ignition::math::Quaterniond(0.0, 0.0, yaw);
+        direction += rot.RotateVector(this->dataPtr->trackPos);
+        error = -direction.GetLength();
+      }
+      else
+      {
+        direction = this->dataPtr->trackPos - this->GetWorldPose().Ign().Pos();
+        error = -direction.GetLength();
+      }
+    }
 
     double scaling = this->dataPtr->trackVisualPID.Update(error, 0.3);
 
-    math::Vector3 displacement = direction;
+    ignition::math::Vector3d displacement = direction.Ign();
     displacement.Normalize();
     displacement *= scaling;
 
-    math::Vector3 localPos =
-      Conversions::Convert(this->sceneNode->_getDerivedPosition());
-    math::Vector3 pos = localPos + displacement;
+    ignition::math::Vector3d localPos =
+      Conversions::Convert(this->sceneNode->_getDerivedPosition()).Ign();
+    ignition::math::Vector3d pos = localPos + displacement;
 
     this->SetWorldPosition(pos);
   }
@@ -1380,13 +1407,22 @@ void Camera::AttachToVisual(uint32_t _visualId,
                             bool _inheritOrientation,
                             double _minDist, double _maxDist)
 {
+  this->SetTrackMinDistance(_minDist);
+  this->SetTrackMaxDistance(_maxDist);
+  this->AttachToVisual(_visualId, _inheritOrientation);
+}
+
+//////////////////////////////////////////////////
+void Camera::AttachToVisual(uint32_t _visualId,
+                            bool _inheritOrientation)
+{
   msgs::Request request;
   msgs::TrackVisual track;
 
   track.set_name(this->GetName() + "_attach_to_visual_track");
   track.set_id(_visualId);
-  track.set_min_dist(_minDist);
-  track.set_max_dist(_maxDist);
+  track.set_min_dist(this->TrackMinDistance());
+  track.set_max_dist(this->TrackMaxDistance());
   track.set_inherit_orientation(_inheritOrientation);
 
   std::string *serializedData = request.mutable_data();
@@ -1402,6 +1438,15 @@ void Camera::AttachToVisual(const std::string &_visualName,
                             bool _inheritOrientation,
                             double _minDist, double _maxDist)
 {
+  this->SetTrackMinDistance(_minDist);
+  this->SetTrackMaxDistance(_maxDist);
+  this->AttachToVisual(_visualName, _inheritOrientation);
+}
+
+//////////////////////////////////////////////////
+void Camera::AttachToVisual(const std::string &_visualName,
+                            bool _inheritOrientation)
+{
   msgs::Request request;
   msgs::TrackVisual track;
 
@@ -1416,8 +1461,8 @@ void Camera::AttachToVisual(const std::string &_visualName,
   }
 
   track.set_name(_visualName);
-  track.set_min_dist(_minDist);
-  track.set_max_dist(_maxDist);
+  track.set_min_dist(this->TrackMinDistance());
+  track.set_max_dist(this->TrackMaxDistance());
   track.set_inherit_orientation(_inheritOrientation);
 
   std::string *serializedData = request.mutable_data();
@@ -1800,4 +1845,64 @@ std::string Camera::GetProjectionType() const
   {
     return "perspective";
   }
+}
+
+/////////////////////////////////////////////////
+bool Camera::TrackIsStatic() const
+{
+  return this->dataPtr->trackIsStatic;
+}
+
+/////////////////////////////////////////////////
+void Camera::SetTrackIsStatic(const bool _isStatic)
+{
+  this->dataPtr->trackIsStatic = _isStatic;
+}
+
+/////////////////////////////////////////////////
+bool Camera::TrackIsRelative() const
+{
+  return this->dataPtr->trackIsRelative;
+}
+
+/////////////////////////////////////////////////
+void Camera::SetTrackIsRelative(const bool _isRelative)
+{
+  this->dataPtr->trackIsRelative = _isRelative;
+}
+
+/////////////////////////////////////////////////
+ignition::math::Vector3d Camera::TrackPosition() const
+{
+  return this->dataPtr->trackPos;
+}
+
+/////////////////////////////////////////////////
+void Camera::SetTrackPosition(const ignition::math::Vector3d &_pos)
+{
+  this->dataPtr->trackPos = _pos;
+}
+
+/////////////////////////////////////////////////
+double Camera::TrackMinDistance() const
+{
+  return this->dataPtr->trackMinDistance;
+}
+
+/////////////////////////////////////////////////
+double Camera::TrackMaxDistance() const
+{
+  return this->dataPtr->trackMaxDistance;
+}
+
+/////////////////////////////////////////////////
+void Camera::SetTrackMinDistance(const double _dist)
+{
+  this->dataPtr->trackMinDistance = _dist;
+}
+
+/////////////////////////////////////////////////
+void Camera::SetTrackMaxDistance(const double _dist)
+{
+  this->dataPtr->trackMaxDistance = _dist;
 }
