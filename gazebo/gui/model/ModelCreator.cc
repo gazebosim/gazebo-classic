@@ -1747,7 +1747,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
 
       // if right clicked on entity that's not previously selected then
       // select it
-      if (!isSelectedLink && !isNestedModel)
+      if (!isSelectedLink && !isSelectedNestedModel)
       {
         this->DeselectAll();
         this->SetSelected(topLevelVis, true);
