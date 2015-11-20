@@ -1,5 +1,8 @@
 ## Gazebo 7.0
 
+1. Added Poissons Ratio and Elastic Modulus for ODE.
+    * [Pull request #1974](https://bitbucket.org/osrf/gazebo/pull-request/1974)
+
 1. Update rest web plugin to publish response messages and display login user name in toolbar.
     * [Pull request #1956](https://bitbucket.org/osrf/gazebo/pull-request/1956)
 
