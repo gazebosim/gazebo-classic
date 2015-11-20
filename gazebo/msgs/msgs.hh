@@ -251,12 +251,6 @@ namespace gazebo
     GAZEBO_VISIBLE
     void Set(msgs::PlaneGeom *_p, const ignition::math::Planed &_v);
 
-    /// \brief Create a msgs::FollowModel from a follow model SDF element
-    /// \param[in] _sdf The sdf element
-    /// \return The new msgs::FollowModel object
-    GAZEBO_VISIBLE
-    msgs::FollowModel FollowModelFromSDF(sdf::ElementPtr _sdf);
-
     /// \brief Create a msgs::TrackVisual from a track visual SDF element
     /// \param[in] _sdf The sdf element
     /// \return The new msgs::TrackVisual object

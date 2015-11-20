@@ -102,8 +102,11 @@ namespace gazebo
       /// \brief Position of the camera when tracking a model.
       public: ignition::math::Vector3d trackPos;
 
-      /// \brief Distance between the camera and tracked model;
-      public: double trackDistance;
+      /// \brief Minimum distance between the camera and tracked model.
+      public: double trackMinDistance;
+
+      /// \brief Maximum distance between the camera and tracked model.
+      public: double trackMaxDistance;
     };
   }
 }

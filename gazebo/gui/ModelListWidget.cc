@@ -232,28 +232,37 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
       {
         topItem->addSubProperty(item);
 
-        bool isStatic = cam->GetTrackIsStatic();
+        bool isStatic = cam->TrackIsStatic();
         QtVariantProperty *item2 = this->variantManager->addProperty(
             QVariant::Bool, tr("is_static"));
         item2->setValue(isStatic);
         item->addSubProperty(item2);
 
-        bool isRelative = cam->GetTrackIsRelative();
+        bool isRelative = cam->TrackIsRelative();
         item2 = this->variantManager->addProperty(
             QVariant::Bool, tr("is_relative"));
         item2->setValue(isRelative);
         item->addSubProperty(item2);
 
-        ignition::math::Vector3d trackPos = cam->GetTrackPosition();
+        ignition::math::Vector3d trackPos = cam->TrackPosition();
         this->FillVector3dProperty(msgs::Convert(trackPos), item);
 
-        double dist = cam->GetTrackDistance();
+        double minDist = cam->TrackMinDistance();
         item2 = this->variantManager->addProperty(
-            QVariant::Double, tr("distance"));
+            QVariant::Double, tr("min_distance"));
         static_cast<QtVariantPropertyManager*>
           (this->variantFactory->propertyManager(item2))->setAttribute(
               item2, "decimals", 6);
-        item2->setValue(dist);
+        item2->setValue(minDist);
+        item->addSubProperty(item2);
+
+        double maxDist = cam->TrackMaxDistance();
+        item2 = this->variantManager->addProperty(
+            QVariant::Double, tr("max_distance"));
+        static_cast<QtVariantPropertyManager*>
+          (this->variantFactory->propertyManager(item2))->setAttribute(
+              item2, "decimals", 6);
+        item2->setValue(maxDist);
         item->addSubProperty(item2);
       }
 
@@ -750,17 +759,24 @@ void ModelListWidget::GUIPropertyChanged(QtProperty *_item)
              this->GetChildItem(cameraFollowProperty, "is_relative")).toBool());
     }
     else if (changedProperty == "x"
-      || changedProperty == "y"
-      || changedProperty == "z")
+        || changedProperty == "y"
+        || changedProperty == "z")
     {
       msgs::Vector3d msg;
       this->FillVector3Msg(cameraFollowProperty, &msg);
       cam->SetTrackPosition(msgs::ConvertIgn(msg));
     }
-    else if (changedProperty == "distance")
+    else if (changedProperty == "min_distance")
     {
-      cam->SetTrackDistance(this->variantManager->value(
-             this->GetChildItem(cameraFollowProperty, "distance")).toDouble());
+      cam->SetTrackMinDistance(this->variantManager->value(
+             this->GetChildItem(cameraFollowProperty,
+               "min_distance")).toDouble());
+    }
+    else if (changedProperty == "max_distance")
+    {
+      cam->SetTrackMinDistance(this->variantManager->value(
+             this->GetChildItem(cameraFollowProperty,
+               "max_distance")).toDouble());
     }
   }
 }

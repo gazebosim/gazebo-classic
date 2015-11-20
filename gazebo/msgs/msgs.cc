@@ -596,12 +596,6 @@ namespace gazebo
               camSDF->Get<std::string>("projection_type"));
         }
 
-        if (camSDF->HasElement("follow_model"))
-        {
-          guiCam->mutable_follow()->CopyFrom(
-              FollowModelFromSDF(camSDF->GetElement("follow_model")));
-        }
-
         if (camSDF->HasElement("track_visual"))
         {
           guiCam->mutable_track()->CopyFrom(
@@ -632,9 +626,17 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////////
-    msgs::FollowModel FollowModelFromSDF(sdf::ElementPtr _sdf)
+    msgs::TrackVisual TrackVisualFromSDF(sdf::ElementPtr _sdf)
     {
-      msgs::FollowModel result;
+      msgs::TrackVisual result;
+
+      result.set_name(_sdf->Get<std::string>("name"));
+
+      if (_sdf->HasElement("min_dist"))
+        result.set_min_dist(_sdf->GetElement("min_dist")->Get<double>());
+
+      if (_sdf->HasElement("max_dist"))
+        result.set_max_dist(_sdf->GetElement("max_dist")->Get<double>());
 
       if (_sdf->HasElement("static"))
         result.set_is_static(_sdf->Get<bool>("static"));
@@ -647,25 +649,6 @@ namespace gazebo
         msgs::Set(result.mutable_xyz(),
             _sdf->Get<ignition::math::Vector3d>("xyz"));
       }
-
-      if (_sdf->HasElement("distance"))
-        result.set_distance(_sdf->GetElement("distance")->Get<double>());
-
-      return result;
-    }
-
-    /////////////////////////////////////////////////
-    msgs::TrackVisual TrackVisualFromSDF(sdf::ElementPtr _sdf)
-    {
-      msgs::TrackVisual result;
-
-      result.set_name(_sdf->Get<std::string>("name"));
-
-      if (_sdf->HasElement("min_dist"))
-        result.set_min_dist(_sdf->GetElement("min_dist")->Get<double>());
-
-      if (_sdf->HasElement("max_dist"))
-        result.set_max_dist(_sdf->GetElement("max_dist")->Get<double>());
 
       return result;
     }
