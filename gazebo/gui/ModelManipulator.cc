@@ -547,9 +547,10 @@ void ModelManipulator::PublishVisualPose(rendering::VisualPtr _vis)
     msgs::Model msg;
     msg.set_id(gui::get_entity_id(_vis->GetName()));
     msg.set_name(_vis->GetName());
-
     msgs::Set(msg.mutable_pose(), _vis->GetWorldPose().Ign());
-    userCmdMsg.mutable_model()->CopyFrom(msg);
+
+    auto modelMsg = userCmdMsg.add_model();
+    modelMsg->CopyFrom(msg);
   }
   // Otherwise, check to see if the visual is a light
   else if (this->dataPtr->scene->GetLight(_vis->GetName()))
@@ -557,7 +558,9 @@ void ModelManipulator::PublishVisualPose(rendering::VisualPtr _vis)
     msgs::Light msg;
     msg.set_name(_vis->GetName());
     msgs::Set(msg.mutable_pose(), _vis->GetWorldPose().Ign());
-    userCmdMsg.mutable_light()->CopyFrom(msg);
+
+    auto lightMsg = userCmdMsg.add_light();
+    lightMsg->CopyFrom(msg);
   }
   else
   {

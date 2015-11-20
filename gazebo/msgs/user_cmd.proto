@@ -26,8 +26,8 @@ message UserCmd
   required Type type = 3;
 
   /// \brief For model modify commands.
-  optional Model model = 4;
+  repeated Model model = 4;
 
   /// \brief For light modify commands.
-  optional Light light = 5;
+  repeated Light light = 5;
 }

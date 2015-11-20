@@ -64,7 +64,6 @@ void ModelAlign::Clear()
   this->dataPtr->userCamera.reset();
   this->dataPtr->scene.reset();
   this->dataPtr->node.reset();
-  this->dataPtr->modelPub.reset();
   this->dataPtr->userCmdPub.reset();
   this->dataPtr->selectedVisuals.clear();
   this->dataPtr->connections.clear();
@@ -90,8 +89,6 @@ void ModelAlign::Init()
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init();
-  this->dataPtr->modelPub =
-      this->dataPtr->node->Advertise<msgs::Model>("~/model/modify");
   this->dataPtr->userCmdPub =
       this->dataPtr->node->Advertise<msgs::UserCmd>("~/user_cmd");
 
@@ -237,6 +234,7 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
   math::Vector3 targetMax;
   this->GetMinMax(targetVertices, targetMin, targetMax);
 
+  std::vector<rendering::VisualPtr> visToPub;
   for (unsigned i = start; i < end; ++i)
   {
     rendering::VisualPtr vis = this->dataPtr->selectedVisuals[i];
@@ -291,7 +289,7 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
     }
 
     if (_publish)
-      this->PublishVisualPose(vis);
+      visToPub.push_back(vis);
   }
   // Register user command on server
   if (_publish)
@@ -300,25 +298,23 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
     userCmdMsg.set_description(
         "Align to [" + this->dataPtr->targetVis->GetName() + "]");
     userCmdMsg.set_type(msgs::UserCmd::MOVING);
+
+    for (auto vis : visToPub)
+    {
+      // Check to see if the visual is a model.
+      if (gui::get_entity_id(vis->GetName()))
+      {
+        msgs::Model msg;
+        msg.set_id(gui::get_entity_id(vis->GetName()));
+        msg.set_name(vis->GetName());
+        msgs::Set(msg.mutable_pose(), vis->GetWorldPose().Ign());
+
+        auto modelMsg = userCmdMsg.add_model();
+        modelMsg->CopyFrom(msg);
+      }
+    }
+
     this->dataPtr->userCmdPub->Publish(userCmdMsg);
-  }
-}
-
-/////////////////////////////////////////////////
-void ModelAlign::PublishVisualPose(rendering::VisualPtr _vis)
-{
-  if (!_vis)
-    return;
-
-  // Check to see if the visual is a model.
-  if (gui::get_entity_id(_vis->GetName()))
-  {
-    msgs::Model msg;
-    msg.set_id(gui::get_entity_id(_vis->GetName()));
-    msg.set_name(_vis->GetName());
-
-    msgs::Set(msg.mutable_pose(), _vis->GetWorldPose().Ign());
-    this->dataPtr->modelPub->Publish(msg);
   }
 }
 

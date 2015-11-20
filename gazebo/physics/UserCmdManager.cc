@@ -116,6 +116,12 @@ UserCmdManager::UserCmdManager(const WorldPtr _world)
   this->dataPtr->userCmdStatsPub =
     this->dataPtr->node->Advertise<msgs::UserCmdStats>("~/user_cmd_stats");
 
+  this->dataPtr->modelModifyPub =
+      this->dataPtr->node->Advertise<msgs::Model>("~/model/modify");
+
+  this->dataPtr->lightModifyPub =
+      this->dataPtr->node->Advertise<msgs::Light>("~/light/modify");
+
   this->dataPtr->idCounter = 0;
 }
 
@@ -138,24 +144,11 @@ void UserCmdManager::OnUserCmdMsg(ConstUserCmdPtr &_msg)
 
   if (_msg->type() == msgs::UserCmd::MOVING)
   {
-    if (_msg->has_model())
-    {
-      auto modelPub = this->dataPtr->node->Advertise<msgs::Model>(
-          "~/model/modify");
-      modelPub->Publish(_msg->model());
-    }
-    else if (_msg->has_light())
-    {
-      auto lightPub = this->dataPtr->node->Advertise<msgs::Light>(
-          "~/light/modify");
-      lightPub->Publish(_msg->light());
-    }
-    else
-    {
-      gzwarn << "Moving command [" << _msg->description() <<
-          "] without a model or light message. Command won't be executed."
-          << std::endl;
-    }
+    for (int i = 0; i < _msg->model_size(); ++i)
+      this->dataPtr->modelModifyPub->Publish(_msg->model(i));
+
+    for (int i = 0; i < _msg->light_size(); ++i)
+      this->dataPtr->lightModifyPub->Publish(_msg->light(i));
   }
 
   // Add it to undo list
