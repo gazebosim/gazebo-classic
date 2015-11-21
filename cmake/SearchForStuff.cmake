@@ -661,6 +661,18 @@ else ()
 endif ()
 
 ########################################
+# Find qscintilla
+include (${gazebo_cmake_dir}/FindQScintilla.cmake)
+if (NOT QSCINTILLA_FOUND)
+  message (STATUS "Looking for libqscintilla2-dev - not found")
+  BUILD_WARNING ("QScintilla not found, Model editor's plugin editor will be disabled.")
+  set (HAVE_QSCINTILLA OFF CACHE BOOL "HAVE QSCINTILLA" FORCE)
+else ()
+  message (STATUS "Looking for libqscintilla2-dev - found")
+  set (HAVE_QSCINTILLA ON CACHE BOOL "HAVE QSCINTILLA" FORCE)
+endif ()
+
+########################################
 # Find ignition math in unix platforms
 # In Windows we expect a call from configure.bat script with the paths
 if (NOT WIN32)

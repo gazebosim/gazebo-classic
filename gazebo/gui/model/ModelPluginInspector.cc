@@ -15,6 +15,8 @@
  *
 */
 
+#include <Qsci/qsciscintilla.h>
+
 #include "gazebo/gui/model/ModelEditorEvents.hh"
 
 #include "gazebo/gui/model/ModelPluginInspectorPrivate.hh"
@@ -84,6 +86,8 @@ ModelPluginInspector::ModelPluginInspector(QWidget *_parent)
   mainLayout->addLayout(generalLayout);
   mainLayout->addLayout(buttonsLayout);
   this->setLayout(mainLayout);
+
+  QsciScintilla *sci;
 }
 
 /////////////////////////////////////////////////
