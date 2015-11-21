@@ -1381,6 +1381,96 @@ TEST_F(Visual_TEST, Scale)
 }
 
 /////////////////////////////////////////////////
+TEST_F(Visual_TEST, VisibilityFlags)
+{
+  // Load a world containing 3 simple shapes
+  Load("worlds/shapes.world");
+
+  // FIXME need a camera otherwise test produces a gl vertex buffer error
+  math::Pose cameraStartPose(0, 0, 0, 0, 0, 0);
+  std::string cameraName = "test_camera";
+  SpawnCamera("test_camera_model", cameraName,
+      cameraStartPose.pos, cameraStartPose.rot.GetAsEuler());
+
+  // Get the scene
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
+  ASSERT_TRUE(scene != NULL);
+
+  // Wait until all models are inserted
+  int sleep = 0;
+  int maxSleep = 10;
+  rendering::VisualPtr cylinder;
+  while ((!cylinder) && sleep < maxSleep)
+  {
+    cylinder = scene->GetVisual("cylinder");
+    common::Time::MSleep(1000);
+    sleep++;
+  }
+
+  // Check that the cylinder model, link, and visual were properly added
+
+  // cylinder
+  ASSERT_TRUE(cylinder != NULL);
+  rendering::VisualPtr cylinderLink;
+  for (unsigned int i = 0; i < cylinder->GetChildCount(); ++i)
+  {
+    rendering::VisualPtr vis = cylinder->GetChild(i);
+    if (vis->GetType() == rendering::Visual::VT_LINK)
+      cylinderLink = vis;
+  }
+  ASSERT_TRUE(cylinderLink != NULL);
+
+  rendering::VisualPtr cylinderVisual;
+  for (unsigned int i = 0; i < cylinderLink->GetChildCount(); ++i)
+  {
+    rendering::VisualPtr vis = cylinderLink->GetChild(i);
+    if (vis->GetType() == rendering::Visual::VT_VISUAL)
+      cylinderVisual = vis;
+  }
+  ASSERT_TRUE(cylinderVisual != NULL);
+
+  // set visibility flags - by default they cascade
+
+  // cylinder
+  uint32_t newCylinderVisibilityFlags = GZ_VISIBILITY_ALL;
+  cylinderLink->SetVisibilityFlags(newCylinderVisibilityFlags);
+  EXPECT_EQ(cylinder->GetVisibilityFlags(), newCylinderVisibilityFlags);
+
+  // cylinder link
+  uint32_t newCylinderLinkVisibilityFlags = GZ_VISIBILITY_GUI;
+  cylinderLink->SetVisibilityFlags(newCylinderLinkVisibilityFlags);
+  EXPECT_EQ(cylinderLink->GetVisibilityFlags(), newCylinderLinkVisibilityFlags);
+
+  // cylinder visual
+  uint32_t newCylinderVisualVisibilityFlags = GZ_VISIBILITY_SELECTABLE;
+  cylinderLink->SetVisibilityFlags(newCylinderVisualVisibilityFlags);
+  EXPECT_EQ(cylinderVisual->GetVisibilityFlags(),
+      newCylinderVisualVisibilityFlags);
+
+  // clone visuals and verify visibility flags
+  rendering::VisualPtr cylinderClone = cylinder->Clone("cylinderClone",
+      cylinder->GetParent());
+
+  std::queue<std::pair<rendering::VisualPtr, rendering::VisualPtr> >
+      cloneVisuals;
+  cloneVisuals.push(std::make_pair(cylinder, cylinderClone));
+  while (!cloneVisuals.empty())
+  {
+    auto visualPair = cloneVisuals.front();
+    cloneVisuals.pop();
+    EXPECT_EQ(visualPair.first->GetVisibilityFlags(),
+        visualPair.second->GetVisibilityFlags());
+    EXPECT_EQ(visualPair.first->GetChildCount(),
+        visualPair.second->GetChildCount());
+    for (unsigned int i  = 0; i < visualPair.first->GetChildCount(); ++i)
+    {
+      cloneVisuals.push(std::make_pair(
+          visualPair.first->GetChild(i), visualPair.second->GetChild(i)));
+    }
+  }
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
