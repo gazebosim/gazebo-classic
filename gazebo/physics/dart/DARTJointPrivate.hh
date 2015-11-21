@@ -61,7 +61,7 @@ namespace gazebo
         for (auto func : mFuncs)
           func();
 
-        dtJoint->setPositionLimited(true);
+        dtJoint->setPositionLimitEnforced(true);
       }
 
       /// \brief Return true if DART Joint is initialized

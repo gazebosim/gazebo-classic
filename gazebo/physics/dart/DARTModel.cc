@@ -105,7 +105,7 @@ void DARTModel::Init()
   DARTModelPrivate::BodyNodeMap::const_iterator bodyNodeItr =
       bodyNodeMap.begin();
   DARTModelPrivate::JointMap::const_iterator parentJointItr;
-  dart::dynamics::BodyNode* dtParentBodyNode;
+  dart::dynamics::BodyNode* dtParentBodyNode = NULL;
 
   while (bodyNodeItr != bodyNodeMap.end())
   {
