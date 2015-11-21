@@ -421,7 +421,7 @@ bool Time::SetFromFormattedString(const std::string &_timeStr,
   else if (index != std::string::npos)
   {
     gzerr << "Character [ ] is not part of the chosen range: [" << _start <<
-        "] -> [" << _end << std::endl;
+        "] -> [" << _end << "]" << std::endl;
     return false;
   }
 
