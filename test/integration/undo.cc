@@ -274,7 +274,7 @@ void UndoTest::MsgPassing()
 }
 
 /////////////////////////////////////////////////
-void UndoTest::UndoTranslate()
+void UndoTest::UndoTranslateModel()
 {
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
@@ -364,6 +364,103 @@ void UndoTest::UndoTranslate()
   gzmsg << "Box pose [" << boxModel->GetWorldPose() << "] initial pose [" <<
       boxInitialPose << "]    sleep [" << sleep << "]" << std::endl;
   QVERIFY(boxModel->GetWorldPose() == boxInitialPose);
+
+  // Clean up
+  delete mainWindow;
+  mainWindow = NULL;
+}
+
+/////////////////////////////////////////////////
+void UndoTest::UndoRotateLight()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/shapes.world", false, false, true);
+
+  // Get world
+  auto world = gazebo::physics::get_world("default");
+  QVERIFY(world != NULL);
+
+  // Create the main window.
+  auto mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Process some events and draw the screen
+  for (size_t i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Get scene
+  auto scene = gazebo::gui::get_active_camera()->GetScene();
+  QVERIFY(scene != NULL);
+
+  // Get sun light
+  auto sunLight = world->Light("sun");
+  QVERIFY(sunLight != NULL);
+  auto sunInitialRot = sunLight->GetWorldPose().rot.Ign();
+
+  // Get sun visual
+  auto sunVis = scene->GetVisual("sun");
+  QVERIFY(sunVis != NULL);
+  QVERIFY(sunVis->GetRotation() == sunInitialRot);
+
+  // Move visual
+  auto sunFinalRot = ignition::math::Quaterniond(1, 0, 0);
+  sunVis->SetRotation(sunFinalRot);
+  QVERIFY(sunVis->GetRotation() != sunInitialRot);
+  QVERIFY(sunVis->GetRotation() == sunFinalRot);
+
+  // Check that light has not moved yet
+  QVERIFY(sunLight->GetWorldPose().rot == sunInitialRot);
+
+  // Trigger user command
+  gazebo::gui::ModelManipulator::Instance()->SetManipulationMode("rotate");
+  gazebo::gui::ModelManipulator::Instance()->SetAttachedVisual(sunVis);
+
+  gazebo::common::MouseEvent mouseEvent;
+  mouseEvent.SetDragging(true);
+  gazebo::gui::ModelManipulator::Instance()->OnMouseReleaseEvent(mouseEvent);
+
+  // Check that sun light moved
+  int sleep = 0;
+  int maxSleep = 10;
+  while (sunLight->GetWorldPose().rot != sunFinalRot && sleep < maxSleep)
+  {
+    gazebo::common::Time::MSleep(100);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+    sleep++;
+  }
+  gzmsg << "Sun rot [" << sunLight->GetWorldPose().rot << "] final pose [" <<
+      sunFinalRot << "]    sleep [" << sleep << "]" << std::endl;
+  QVERIFY(sunLight->GetWorldPose().rot == sunFinalRot);
+
+  // Undo
+  QVERIFY(gazebo::gui::g_undoAct != NULL);
+  QVERIFY(gazebo::gui::g_undoAct->isEnabled() == true);
+
+  gazebo::gui::g_undoAct->trigger();
+
+  // Check sun is back to initial pose
+  sleep = 0;
+  maxSleep = 10;
+  while (sunLight->GetWorldPose().rot != sunInitialRot && sleep < maxSleep)
+  {
+    gazebo::common::Time::MSleep(100);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+    sleep++;
+  }
+  gzmsg << "Sun pose [" << sunLight->GetWorldPose().rot << "] initial pose [" <<
+      sunInitialRot << "]    sleep [" << sleep << "]" << std::endl;
+  QVERIFY(sunLight->GetWorldPose().rot == sunInitialRot);
 
   // Clean up
   delete mainWindow;
