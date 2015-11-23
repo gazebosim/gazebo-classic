@@ -53,6 +53,18 @@ void ModelTreeWidget_TEST::AddRemoveNestedModels()
   QVERIFY(nestedModelsItem->child(0)->data(0, Qt::UserRole) == "nestedModel1");
   QVERIFY(nestedModelsItem->child(1)->data(0, Qt::UserRole) == "nestedModel2");
 
+  // Insert more nested models and verify they are added to the correct parent.
+  gazebo::gui::model::Events::nestedModelInserted("nestedModel1::model");
+  QCOMPARE(nestedModelsItem->childCount(), 2);
+  QCOMPARE(nestedModelsItem->child(0)->childCount(), 1);
+  QVERIFY(nestedModelsItem->child(0)->child(0)->data(0, Qt::UserRole) ==
+      "nestedModel1::model");
+  gazebo::gui::model::Events::nestedModelInserted("nestedModel2::model");
+  QCOMPARE(nestedModelsItem->childCount(), 2);
+  QCOMPARE(nestedModelsItem->child(1)->childCount(), 1);
+  QVERIFY(nestedModelsItem->child(1)->child(0)->data(0, Qt::UserRole) ==
+      "nestedModel2::model");
+
   // Remove a nested model and check number again
   gazebo::gui::model::Events::nestedModelRemoved("nestedModel1");
   QCOMPARE(nestedModelsItem->childCount(), 1);

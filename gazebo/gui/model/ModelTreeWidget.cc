@@ -622,8 +622,11 @@ void ModelTreeWidget::OnNestedModelInserted(const std::string &_nestedModelId)
   // check if nested model already exists
   auto treeItems = this->modelTreeWidget->findItems(tr(leafName.c_str()),
       Qt::MatchExactly | Qt::MatchRecursive);
-  if (!treeItems.empty())
-    return;
+  for (auto const &it : treeItems)
+  {
+    if (it->data(0, Qt::UserRole).toString().toStdString() == _nestedModelId)
+      return;
+  }
 
   QTreeWidgetItem *newNestedModelItem =
       new QTreeWidgetItem(parentItem,
