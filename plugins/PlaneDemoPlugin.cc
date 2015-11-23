@@ -15,7 +15,7 @@
  *
 */
 
-#include "kbhit.h"
+#include "keyboard/kbhit.h"
 
 #include <boost/unordered_map.hpp>
 #include <boost/unordered_set.hpp>

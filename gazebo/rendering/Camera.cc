@@ -379,7 +379,7 @@ void Camera::Update()
 
     /// \TODO: make this a parameter, for larger objects, we want
     /// to follow it from larger distance.
-    double origDistance = 7.0;
+    double origDistance = 8.0;
     double distance = direction.GetLength();
     double error = origDistance - distance;
 
