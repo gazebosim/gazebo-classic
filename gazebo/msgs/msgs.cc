@@ -958,8 +958,11 @@ namespace gazebo
       }
 
       // Set the origin of the visual
-      msgs::Set(result.mutable_pose(),
+      if (_sdf->HasElement("pose"))
+      {
+        msgs::Set(result.mutable_pose(),
           _sdf->Get<ignition::math::Pose3d>("pose"));
+      }
 
       // Set plugins of the visual
       if (_sdf->HasElement("plugin"))
