@@ -1909,9 +1909,6 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
 
     if (_msg->camera().has_track())
     {
-      double minDist = 0.0;
-      double maxDist = 0.0;
-
       if (_msg->camera().track().has_is_static())
         cam->SetTrackIsStatic(_msg->camera().track().is_static());
 
@@ -1926,13 +1923,13 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
 
       if (_msg->camera().track().has_min_dist())
       {
-        minDist = _msg->camera().track().min_dist();
+        double minDist = _msg->camera().track().min_dist();
         cam->SetTrackMinDistance(minDist);
       }
 
       if (_msg->camera().track().has_max_dist())
       {
-        maxDist = _msg->camera().track().max_dist();
+        double maxDist = _msg->camera().track().max_dist();
         cam->SetTrackMaxDistance(maxDist);
       }
 
