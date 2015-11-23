@@ -1,4 +1,35 @@
 <?xml version="1.0" ?>
+
+<!--
+
+To run this demo, you must have following arducopter repo checked out:
+
+https://github.com/hsu/ardupilot/tree/gazebo_sitl
+
+To start simulation, first run gazebo:
+
+gazebo worlds/iris_standoff_demo.world
+
+Gazebo starts up paused in a black screen. To start simulation,
+setup ArduCopter and run below in a separate terminal:
+
+sim_vehicle.sh -j 4 -f Gazebo
+
+This will start mavproxy, you can then do the usual mavprox commands with
+Gazebo, e.g.
+
+MAV> arm uncheck all
+MAV> mode STABILIZE
+STABILIZE> arm throttle
+
+or
+
+STABILIZE> module load joystick
+
+to fly iris with a ps2 joystick.
+
+-->
+
 <sdf version="1.4">
   <world name="default">
     <gui>
