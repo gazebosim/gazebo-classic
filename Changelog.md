@@ -3,6 +3,9 @@
 1. Implemented private data pointer for the RTShaderSystem class. Minimized shader updates to once per render update.
     * [Pull request #2003](https://bitbucket.org/osrf/gazebo/pull-request/2003)
     
+1. Publish camera sensor image size when rendering is not enabled
+    * [Pull request #1969](https://bitbucket.org/osrf/gazebo/pull-request/1969)
+
 1. Added Poissons Ratio and Elastic Modulus for ODE.
     * [Pull request #1974](https://bitbucket.org/osrf/gazebo/pull-request/1974)
 
