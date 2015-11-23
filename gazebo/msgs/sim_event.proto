@@ -5,10 +5,20 @@ import "world_stats.proto";
 /// \ingroup gazebo_msgs
 /// \interface SimEvent
 
-message SimEvent 
+message SimEvent
 {
-  required string type                      = 1;
-  required string name                      = 2;
-  required WorldStatistics world_statistics = 3;
-  optional string data                      = 4;
+  /// \brief ID of this event message
+  optional uint32 id                        = 1;
+
+  /// \brief Type of sim event
+  required string type                      = 2;
+
+  /// \brief Name of sim event
+  required string name                      = 3;
+
+  /// \brief Statistics of the world
+  required WorldStatistics world_statistics = 4;
+
+  /// \brief Data describing the sim event
+  optional string data                      = 5;
 }

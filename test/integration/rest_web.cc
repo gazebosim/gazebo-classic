@@ -38,22 +38,33 @@ class RestWebTest : public ServerFixture,
 // globals to exchange data between threads
 boost::mutex g_mutex;
 unsigned int g_count;
+int g_restID;
 
 // RestLogin: string url, username, password
-// RestError: string type, msg
+// RestResponse: string type, msg
 // RestPost:  string route, json
 
 
+//////////////////////////////////////////////////
 // callback for SimEvent messages
 // increment a counter and keep the data around
-void ReceiveRestError(ConstRestErrorPtr &_msg)
+void ReceiveRestError(ConstRestResponsePtr &_msg)
 {
-  gzmsg << "ReceiveRestError:" << std::endl;
+  gzmsg << "ReceiveRestResponse:" << std::endl;
   gzmsg << "    \""  << _msg->msg() << "\"" << std::endl;
   boost::mutex::scoped_lock lock(g_mutex);
+
+  if (!_msg->has_id())
+    return;
+
+  EXPECT_EQ(_msg->id(), g_restID);
+  EXPECT_EQ(_msg->type(), msgs::RestResponse::ERROR);
+  EXPECT_FALSE(_msg->msg().empty());
+
   g_count += 1;
 }
 
+//////////////////////////////////////////////////
 // get the count in a thread safe way
 unsigned int GetErrorCount()
 {
@@ -61,21 +72,15 @@ unsigned int GetErrorCount()
   return g_count;
 }
 
-// get the last event type in thread safe way
-std::string LastRestError()
-{
-  boost::mutex::scoped_lock lock(g_mutex);
-  return "";
-}
-
+//////////////////////////////////////////////////
 // waits for one or multiple events. if the expected number is
 // specified, then the function can return early
 unsigned int WaitForNewError(unsigned int current,
-                             unsigned int max_tries = 10,
+                             unsigned int maxTries = 20,
                              unsigned int ms = 100)
 {
   gzmsg << "WaitForNewError " << current << std::endl;
-  for (unsigned int i = 0; i < max_tries; i++)
+  for (unsigned int i = 0; i < maxTries; ++i)
   {
     unsigned int count = GetErrorCount();
     if (count > current)
@@ -88,16 +93,17 @@ unsigned int WaitForNewError(unsigned int current,
   return GetErrorCount();
 }
 
+//////////////////////////////////////////////////
 // test macro
 TEST_P(RestWebTest, FirstTest)
 {
   FirstTest(GetParam());
 }
 
-////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 // SimPauseRun:
 // Load test world, publish login and post messages
-////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 void RestWebTest::FirstTest(const std::string &_physicsEngine)
 {
   Load("test/worlds/rest_web.world",
@@ -111,7 +117,7 @@ void RestWebTest::FirstTest(const std::string &_physicsEngine)
   transport::NodePtr node = transport::NodePtr(new transport::Node());
   node->Init();
 
-  transport::SubscriberPtr sub = node->Subscribe("/gazebo/rest/rest_error",
+  transport::SubscriberPtr sub = node->Subscribe("/gazebo/rest/rest_response",
       &ReceiveRestError);
 
   // check that after pause, we have received a new event
@@ -123,13 +129,15 @@ void RestWebTest::FirstTest(const std::string &_physicsEngine)
   pub->WaitForConnection();
 
   gazebo::msgs::RestLogin msg;
+  g_restID = 12345;
+  msg.set_id(g_restID);
   msg.set_url("https://localhost:3000");
   msg.set_username("myuser");
   msg.set_password("mypass");
   pub->Publish(msg);
 
   // since this test does not expect a server to be running (yet), we should
-  // receive a Rest_error via our sub
+  // receive a rest_response via our sub
 
   // wait for it ...
   unsigned int count_after = WaitForNewError(count_before);
