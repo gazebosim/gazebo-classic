@@ -1432,18 +1432,18 @@ TEST_F(Visual_TEST, VisibilityFlags)
   // set visibility flags - by default they cascade
 
   // cylinder
-  uint32_t newCylinderVisibilityFlags = GZ_VISIBILITY_ALL;
-  cylinderLink->SetVisibilityFlags(newCylinderVisibilityFlags);
+  uint32_t newCylinderVisibilityFlags = GZ_VISIBILITY_GUI;
+  cylinder->SetVisibilityFlags(newCylinderVisibilityFlags);
   EXPECT_EQ(cylinder->GetVisibilityFlags(), newCylinderVisibilityFlags);
 
   // cylinder link
-  uint32_t newCylinderLinkVisibilityFlags = GZ_VISIBILITY_GUI;
+  uint32_t newCylinderLinkVisibilityFlags = GZ_VISIBILITY_ALL;
   cylinderLink->SetVisibilityFlags(newCylinderLinkVisibilityFlags);
   EXPECT_EQ(cylinderLink->GetVisibilityFlags(), newCylinderLinkVisibilityFlags);
 
   // cylinder visual
   uint32_t newCylinderVisualVisibilityFlags = GZ_VISIBILITY_SELECTABLE;
-  cylinderLink->SetVisibilityFlags(newCylinderVisualVisibilityFlags);
+  cylinderVisual->SetVisibilityFlags(newCylinderVisualVisibilityFlags);
   EXPECT_EQ(cylinderVisual->GetVisibilityFlags(),
       newCylinderVisualVisibilityFlags);
 
