@@ -45,6 +45,7 @@ set (headers_install
 
 set (qt_tests_local
   CollisionConfig_TEST.cc
+  JointCreationDialog_TEST.cc
   JointInspector_TEST.cc
   LinkConfig_TEST.cc
   LinkInspector_TEST.cc
