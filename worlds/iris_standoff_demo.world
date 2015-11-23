@@ -615,15 +615,7 @@
           <jointName>iris::rotor_0_joint</jointName>
           <linkName>iris::rotor_0</linkName>
           <turningDirection>ccw</turningDirection>
-          <timeConstantUp>0.0125</timeConstantUp>
-          <timeConstantDown>0.025</timeConstantDown>
-          <maxRotVelocity>838</maxRotVelocity>
-          <motorConstant>8.54858e-06</motorConstant>
-          <momentConstant>0.016</momentConstant>
           <motorNumber>0</motorNumber>
-          <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
-          <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
-          <motorSpeedPubTopic>motor_speed/0</motorSpeedPubTopic>
           <rotorVelocitySlowdownSim>1</rotorVelocitySlowdownSim>
         </rotor>
         <rotor id="1">
@@ -637,16 +629,7 @@
           <jointName>iris::rotor_1_joint</jointName>
           <linkName>iris::rotor_1</linkName>
           <turningDirection>ccw</turningDirection>
-          <timeConstantUp>0.0125</timeConstantUp>
-          <timeConstantDown>0.025</timeConstantDown>
-          <maxRotVelocity>838</maxRotVelocity>
-          <motorConstant>8.54858e-06</motorConstant>
-          <momentConstant>0.016</momentConstant>
-          <commandSubTopic>command/motor_speed</commandSubTopic>
           <motorNumber>1</motorNumber>
-          <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
-          <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
-          <motorSpeedPubTopic>motor_speed/1</motorSpeedPubTopic>
           <rotorVelocitySlowdownSim>1</rotorVelocitySlowdownSim>
         </rotor>
         <rotor id="2">
@@ -660,16 +643,7 @@
           <jointName>iris::rotor_2_joint</jointName>
           <linkName>iris::rotor_2</linkName>
           <turningDirection>cw</turningDirection>
-          <timeConstantUp>0.0125</timeConstantUp>
-          <timeConstantDown>0.025</timeConstantDown>
-          <maxRotVelocity>838</maxRotVelocity>
-          <motorConstant>8.54858e-06</motorConstant>
-          <momentConstant>0.016</momentConstant>
-          <commandSubTopic>command/motor_speed</commandSubTopic>
           <motorNumber>2</motorNumber>
-          <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
-          <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
-          <motorSpeedPubTopic>motor_speed/2</motorSpeedPubTopic>
           <rotorVelocitySlowdownSim>1</rotorVelocitySlowdownSim>
         </rotor>
         <rotor id="3">
@@ -683,16 +657,7 @@
           <jointName>iris::rotor_3_joint</jointName>
           <linkName>iris::rotor_3</linkName>
           <turningDirection>cw</turningDirection>
-          <timeConstantUp>0.0125</timeConstantUp>
-          <timeConstantDown>0.025</timeConstantDown>
-          <maxRotVelocity>838</maxRotVelocity>
-          <motorConstant>8.54858e-06</motorConstant>
-          <momentConstant>0.016</momentConstant>
-          <commandSubTopic>command/motor_speed</commandSubTopic>
           <motorNumber>3</motorNumber>
-          <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
-          <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
-          <motorSpeedPubTopic>motor_speed/3</motorSpeedPubTopic>
           <rotorVelocitySlowdownSim>1</rotorVelocitySlowdownSim>
         </rotor>
       </plugin>
