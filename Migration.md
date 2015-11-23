@@ -16,6 +16,12 @@ release will remove the deprecated code.
     + public: bool RemoveJoint(const std::string &_name);
     + public: boost::shared_ptr<Model> shared_from_this();
 
+1. **gazebo/physics/SurfaceParams.hh**
+    + public: double PoissonsRatio() const;
+    + public: void SetPoissonsRatio(double _ratio);
+    + public: double ElasticModulus() const;
+    + public: void SetElasticModulus(double _modulus);
+
 ### Modifications
 
 1. **gazebo/rendering/RenderTypes.hh**
