@@ -154,7 +154,7 @@ void RigidBodyTest::SphereImpact(const std::string &_physicsEngine
     // msgGeometry->mutable_sphere()->set_radius(_radius);
 
     // 1m above ground, -5 meters away from origin
-    math::Vector3 pos(-5.0 - _radius, 0.0, 1.0 + _radius);
+    ignition::math::Vector3d pos(-5.0 - _radius, 0.0, 1.0 + _radius);
     msgs::Set(msgModel.mutable_pose()->mutable_position(), pos);
 
     models.push_back(this->SpawnModel(msgModel));
@@ -197,7 +197,7 @@ void RigidBodyTest::SphereImpact(const std::string &_physicsEngine
     // msgGeometry->mutable_sphere()->set_radius(radius2);
 
     // 1m above ground, 0m way from origin
-    math::Vector3 pos(0.0 + radius2, 0.0, 1.0 + _radius);
+    ignition::math::Vector3d pos(0.0 + radius2, 0.0, 1.0 + _radius);
     msgs::Set(msgModel.mutable_pose()->mutable_position(), pos);
 
     models.push_back(this->SpawnModel(msgModel));
