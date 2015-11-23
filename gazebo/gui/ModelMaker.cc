@@ -248,7 +248,7 @@ void ModelMaker::CreateModelFromSDF(sdf::ElementPtr _modelElem)
   ModelMakerPrivate *dPtr =
       reinterpret_cast<ModelMakerPrivate *>(this->dataPtr);
 
-  math::Pose linkPose, visualPose;
+  ignition::math::Pose3d linkPose, visualPose;
   std::list<std::pair<sdf::ElementPtr, rendering::VisualPtr> > modelElemList;
 
   std::pair<sdf::ElementPtr, rendering::VisualPtr> pair(
@@ -274,7 +274,7 @@ void ModelMaker::CreateModelFromSDF(sdf::ElementPtr _modelElem)
       {
         std::string linkName = linkElem->Get<std::string>("name");
         if (linkElem->HasElement("pose"))
-          linkPose = linkElem->Get<math::Pose>("pose");
+          linkPose = linkElem->Get<ignition::math::Pose3d>("pose");
         else
           linkPose.Set(0, 0, 0, 0, 0, 0);
 
@@ -293,7 +293,7 @@ void ModelMaker::CreateModelFromSDF(sdf::ElementPtr _modelElem)
         while (visualElem)
         {
           if (visualElem->HasElement("pose"))
-            visualPose = visualElem->Get<math::Pose>("pose");
+            visualPose = visualElem->Get<ignition::math::Pose3d>("pose");
           else
             visualPose.Set(0, 0, 0, 0, 0, 0);
 
