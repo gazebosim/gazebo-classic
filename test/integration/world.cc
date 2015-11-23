@@ -77,7 +77,7 @@ TEST_F(WorldTest, ModifyLight)
   {
     // Check light objects
     physics::Light_V lights = world->Lights();
-    EXPECT_EQ(lights.size(), 1);
+    EXPECT_EQ(lights.size(), 1u);
     EXPECT_STREQ(lights[0]->GetName().c_str(), "sun");
 
     // Check scene message
@@ -106,7 +106,7 @@ TEST_F(WorldTest, ModifyLight)
   {
     // Check light objects
     physics::Light_V lights = world->Lights();
-    EXPECT_EQ(lights.size(), 1);
+    EXPECT_EQ(lights.size(), 1u);
     EXPECT_STREQ(lights[0]->GetName().c_str(), "sun");
     msgs::Light lightMsg;
     lights[0]->FillMsg(lightMsg);
@@ -141,7 +141,7 @@ TEST_F(WorldTest, ModifyLight)
   {
     // Check light objects
     physics::Light_V lights = world->Lights();
-    EXPECT_EQ(lights.size(), 2);
+    EXPECT_EQ(lights.size(), 2u);
     EXPECT_STREQ(lights[1]->GetName().c_str(), "test_light");
     msgs::Light lightMsg;
     lights[1]->FillMsg(lightMsg);
@@ -170,7 +170,7 @@ TEST_F(WorldTest, ModifyLight)
   {
     // Check light objects
     physics::Light_V lights = world->Lights();
-    EXPECT_EQ(lights.size(), 1);
+    EXPECT_EQ(lights.size(), 1u);
     EXPECT_STREQ(lights[0]->GetName().c_str(), "sun");
 
     // Check scene message
@@ -194,7 +194,7 @@ TEST_F(WorldTest, ModifyLight)
   {
     // Check light objects
     physics::Light_V lights = world->Lights();
-    EXPECT_EQ(lights.size(), 2);
+    EXPECT_EQ(lights.size(), 2u);
     EXPECT_STREQ(lights[1]->GetName().c_str(), "test_spot_light");
     msgs::Light lightMsg;
     lights[1]->FillMsg(lightMsg);
@@ -231,7 +231,7 @@ TEST_F(WorldTest, ModifyLight)
   {
     // Check light objects
     physics::Light_V lights = world->Lights();
-    EXPECT_EQ(lights.size(), 2);
+    EXPECT_EQ(lights.size(), 2u);
     EXPECT_STREQ(lights[1]->GetName().c_str(), "test_spot_light");
     msgs::Light lightMsg;
     lights[1]->FillMsg(lightMsg);
@@ -283,7 +283,7 @@ TEST_F(WorldTest, ModifyLight)
   {
     // Check light objects
     physics::Light_V lights = world->Lights();
-    EXPECT_EQ(lights.size(), 3);
+    EXPECT_EQ(lights.size(), 3u);
     EXPECT_STREQ(lights[2]->GetName().c_str(), "test_light");
     msgs::Light lightMsg;
     lights[2]->FillMsg(lightMsg);

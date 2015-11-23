@@ -1368,6 +1368,19 @@ ConfigChildWidget *ConfigWidget::CreateVector3dWidget(
   // ChildWidget
   ConfigChildWidget *widget = new ConfigChildWidget();
 
+  // Presets
+  auto presetsCombo = new QComboBox(widget);
+  presetsCombo->addItem("Custom", 0);
+  presetsCombo->addItem(" X", 1);
+  presetsCombo->addItem("-X", 2);
+  presetsCombo->addItem(" Y", 3);
+  presetsCombo->addItem("-Y", 4);
+  presetsCombo->addItem(" Z", 5);
+  presetsCombo->addItem("-Z", 6);
+  presetsCombo->setMinimumWidth(80);
+  connect(presetsCombo, SIGNAL(currentIndexChanged(const int)), this,
+      SLOT(OnVector3dPresetChanged(const int)));
+
   // Labels
   QLabel *vecXLabel = new QLabel(tr("X"));
   QLabel *vecYLabel = new QLabel(tr("Y"));
@@ -1415,6 +1428,7 @@ ConfigChildWidget *ConfigWidget::CreateVector3dWidget(
   QHBoxLayout *widgetLayout = new QHBoxLayout;
   widgetLayout->addItem(new QSpacerItem(20*level, 1,
       QSizePolicy::Fixed, QSizePolicy::Fixed));
+  widgetLayout->addWidget(presetsCombo);
   widgetLayout->addWidget(vecXLabel);
   widgetLayout->addWidget(vecXSpinBox);
   widgetLayout->addWidget(vecYLabel);
@@ -1433,6 +1447,7 @@ ConfigChildWidget *ConfigWidget::CreateVector3dWidget(
   widget->widgets.push_back(vecXSpinBox);
   widget->widgets.push_back(vecYSpinBox);
   widget->widgets.push_back(vecZSpinBox);
+  widget->widgets.push_back(presetsCombo);
 
   return widget;
 }
@@ -1604,44 +1619,55 @@ ConfigChildWidget *ConfigWidget::CreatePoseWidget(const std::string &/*_key*/,
 ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
     const std::string &/*_key*/, const int _level)
 {
+  // ChildWidget
+  GeometryConfigWidget *widget = new GeometryConfigWidget;
+
   // Geometry ComboBox
   QLabel *geometryLabel = new QLabel(tr("Geometry"));
   geometryLabel->setToolTip(tr("geometry"));
-  QComboBox *geometryComboBox = new QComboBox;
+  QComboBox *geometryComboBox = new QComboBox(widget);
   geometryComboBox->addItem(tr("box"));
   geometryComboBox->addItem(tr("cylinder"));
   geometryComboBox->addItem(tr("sphere"));
   geometryComboBox->addItem(tr("mesh"));
   geometryComboBox->addItem(tr("polyline"));
+  connect(geometryComboBox, SIGNAL(currentIndexChanged(const int)), this,
+      SLOT(OnGeometryValueChanged(const int)));
 
   // Size XYZ
   double min = 0;
   double max = 0;
   this->GetRangeFromKey("length", min, max);
 
-  QDoubleSpinBox *geomSizeXSpinBox = new QDoubleSpinBox;
+  QDoubleSpinBox *geomSizeXSpinBox = new QDoubleSpinBox(widget);
   geomSizeXSpinBox->setRange(min, max);
   geomSizeXSpinBox->setSingleStep(0.01);
   geomSizeXSpinBox->setDecimals(6);
   geomSizeXSpinBox->setValue(1.000);
   geomSizeXSpinBox->setAlignment(Qt::AlignRight);
   geomSizeXSpinBox->setMaximumWidth(100);
+  connect(geomSizeXSpinBox, SIGNAL(editingFinished()), this,
+      SLOT(OnGeometryValueChanged()));
 
-  QDoubleSpinBox *geomSizeYSpinBox = new QDoubleSpinBox;
+  QDoubleSpinBox *geomSizeYSpinBox = new QDoubleSpinBox(widget);
   geomSizeYSpinBox->setRange(min, max);
   geomSizeYSpinBox->setSingleStep(0.01);
   geomSizeYSpinBox->setDecimals(6);
   geomSizeYSpinBox->setValue(1.000);
   geomSizeYSpinBox->setAlignment(Qt::AlignRight);
   geomSizeYSpinBox->setMaximumWidth(100);
+  connect(geomSizeYSpinBox, SIGNAL(editingFinished()), this,
+      SLOT(OnGeometryValueChanged()));
 
-  QDoubleSpinBox *geomSizeZSpinBox = new QDoubleSpinBox;
+  QDoubleSpinBox *geomSizeZSpinBox = new QDoubleSpinBox(widget);
   geomSizeZSpinBox->setRange(min, max);
   geomSizeZSpinBox->setSingleStep(0.01);
   geomSizeZSpinBox->setDecimals(6);
   geomSizeZSpinBox->setValue(1.000);
   geomSizeZSpinBox->setAlignment(Qt::AlignRight);
   geomSizeZSpinBox->setMaximumWidth(100);
+  connect(geomSizeZSpinBox, SIGNAL(editingFinished()), this,
+      SLOT(OnGeometryValueChanged()));
 
   QLabel *geomSizeXLabel = new QLabel(tr("X"));
   QLabel *geomSizeYLabel = new QLabel(tr("Y"));
@@ -1676,7 +1702,9 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   // Uri
   QLabel *geomFilenameLabel = new QLabel(tr("Uri"));
   geomFilenameLabel->setToolTip(tr("uri"));
-  QLineEdit *geomFilenameLineEdit = new QLineEdit;
+  QLineEdit *geomFilenameLineEdit = new QLineEdit(widget);
+  connect(geomFilenameLineEdit, SIGNAL(editingFinished()), this,
+      SLOT(OnGeometryValueChanged()));
   QPushButton *geomFilenameButton = new QPushButton(tr("..."));
   geomFilenameButton->setMaximumWidth(30);
 
@@ -1689,7 +1717,7 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   geomSizeFilenameLayout->addLayout(geomSizeLayout);
   geomSizeFilenameLayout->addLayout(geomFilenameLayout);
 
-  QWidget *geomSizeWidget = new QWidget;
+  QWidget *geomSizeWidget = new QWidget(widget);
   geomSizeWidget->setLayout(geomSizeFilenameLayout);
 
   // Radius / Length
@@ -1700,21 +1728,25 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   geomRadiusLabel->setToolTip(tr("radius"));
   geomLengthLabel->setToolTip(tr("length"));
 
-  QDoubleSpinBox *geomRadiusSpinBox = new QDoubleSpinBox;
+  QDoubleSpinBox *geomRadiusSpinBox = new QDoubleSpinBox(widget);
   geomRadiusSpinBox->setRange(min, max);
   geomRadiusSpinBox->setSingleStep(0.01);
   geomRadiusSpinBox->setDecimals(6);
   geomRadiusSpinBox->setValue(0.500);
   geomRadiusSpinBox->setAlignment(Qt::AlignRight);
   geomRadiusSpinBox->setMaximumWidth(100);
+  connect(geomRadiusSpinBox, SIGNAL(editingFinished()), this,
+      SLOT(OnGeometryValueChanged()));
 
-  QDoubleSpinBox *geomLengthSpinBox = new QDoubleSpinBox;
+  QDoubleSpinBox *geomLengthSpinBox = new QDoubleSpinBox(widget);
   geomLengthSpinBox->setRange(min, max);
   geomLengthSpinBox->setSingleStep(0.01);
   geomLengthSpinBox->setDecimals(6);
   geomLengthSpinBox->setValue(1.000);
   geomLengthSpinBox->setAlignment(Qt::AlignRight);
   geomLengthSpinBox->setMaximumWidth(100);
+  connect(geomLengthSpinBox, SIGNAL(editingFinished()), this,
+      SLOT(OnGeometryValueChanged()));
 
   QHBoxLayout *geomRLLayout = new QHBoxLayout;
   geomRLLayout->addWidget(geomRadiusLabel);
@@ -1731,7 +1763,7 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   geomRLWidget->setLayout(geomRLLayout);
 
   // Dimensions
-  QStackedWidget *geomDimensionWidget = new QStackedWidget;
+  QStackedWidget *geomDimensionWidget = new QStackedWidget(widget);
   geomDimensionWidget->insertWidget(0, geomSizeWidget);
 
   geomDimensionWidget->insertWidget(1, geomRLWidget);
@@ -1751,7 +1783,6 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   widgetLayout->addWidget(geomDimensionWidget, 2, 1, 1, 3);
 
   // ChildWidget
-  GeometryConfigWidget *widget = new GeometryConfigWidget;
   widget->setFrameStyle(QFrame::Box);
   widget->geomDimensionWidget = geomDimensionWidget;
   widget->geomLengthSpinBox = geomLengthSpinBox;
@@ -2117,7 +2148,7 @@ void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
           else if (field->message_type()->name() == "Vector3d")
           {
             std::vector<double> values;
-            for (unsigned int j = 0; j < childWidget->widgets.size(); ++j)
+            for (unsigned int j = 0; j < 3; ++j)
             {
               QDoubleSpinBox *valueSpinBox =
                   qobject_cast<QDoubleSpinBox *>(childWidget->widgets[j]);
@@ -2298,11 +2329,29 @@ bool ConfigWidget::UpdateBoolWidget(ConfigChildWidget *_widget, bool _value)
 bool ConfigWidget::UpdateVector3Widget(ConfigChildWidget *_widget,
     const math::Vector3 &_vec)
 {
-  if (_widget->widgets.size() == 3u)
+  if (_widget->widgets.size() == 4u)
   {
     qobject_cast<QDoubleSpinBox *>(_widget->widgets[0])->setValue(_vec.x);
     qobject_cast<QDoubleSpinBox *>(_widget->widgets[1])->setValue(_vec.y);
     qobject_cast<QDoubleSpinBox *>(_widget->widgets[2])->setValue(_vec.z);
+
+    // Update preset
+    int preset = 0;
+    if (_vec == math::Vector3::UnitX)
+      preset = 1;
+    else if (_vec == -math::Vector3::UnitX)
+      preset = 2;
+    else if (_vec == math::Vector3::UnitY)
+      preset = 3;
+    else if (_vec == -math::Vector3::UnitY)
+      preset = 4;
+    else if (_vec == math::Vector3::UnitZ)
+      preset = 5;
+    else if (_vec == -math::Vector3::UnitZ)
+      preset = 6;
+
+    qobject_cast<QComboBox *>(_widget->widgets[3])->setCurrentIndex(preset);
+
     return true;
   }
   else
@@ -2530,7 +2579,7 @@ math::Vector3 ConfigWidget::GetVector3WidgetValue(ConfigChildWidget *_widget)
     const
 {
   math::Vector3 value;
-  if (_widget->widgets.size() == 3u)
+  if (_widget->widgets.size() == 4u)
   {
     value.x = qobject_cast<QDoubleSpinBox *>(_widget->widgets[0])->value();
     value.y = qobject_cast<QDoubleSpinBox *>(_widget->widgets[1])->value();
@@ -2776,8 +2825,49 @@ void ConfigWidget::OnVector3dValueChanged()
   if (!widget)
     return;
 
-  emit Vector3dValueChanged(widget->scopedName.c_str(),
-      this->GetVector3WidgetValue(widget).Ign());
+  auto value = this->GetVector3WidgetValue(widget).Ign();
+
+  // Update preset
+  this->UpdateVector3Widget(widget, value);
+
+  // Signal
+  emit Vector3dValueChanged(widget->scopedName.c_str(), value);
+}
+
+/////////////////////////////////////////////////
+void ConfigWidget::OnVector3dPresetChanged(const int _index)
+{
+  auto combo = qobject_cast<QComboBox *>(QObject::sender());
+
+  if (!combo)
+    return;
+
+  auto widget = qobject_cast<ConfigChildWidget *>(combo->parent());
+
+  if (!widget)
+    return;
+
+  // Update spins
+  ignition::math::Vector3d vec;
+  if (_index == 1)
+    vec = ignition::math::Vector3d::UnitX;
+  else if (_index == 2)
+    vec = -ignition::math::Vector3d::UnitX;
+  else if (_index == 3)
+    vec = ignition::math::Vector3d::UnitY;
+  else if (_index == 4)
+    vec = -ignition::math::Vector3d::UnitY;
+  else if (_index == 5)
+    vec = ignition::math::Vector3d::UnitZ;
+  else if (_index == 6)
+    vec = -ignition::math::Vector3d::UnitZ;
+  else
+    return;
+
+  this->UpdateVector3Widget(widget, vec);
+
+  // Signal
+  emit Vector3dValueChanged(widget->scopedName.c_str(), vec);
 }
 
 /////////////////////////////////////////////////
@@ -2816,6 +2906,56 @@ void ConfigWidget::OnPoseValueChanged()
 
   emit PoseValueChanged(widget->scopedName.c_str(),
       this->GetPoseWidgetValue(widget).Ign());
+}
+
+/////////////////////////////////////////////////
+void ConfigWidget::OnGeometryValueChanged()
+{
+  QWidget *senderWidget = qobject_cast<QWidget *>(QObject::sender());
+
+  if (!senderWidget)
+    return;
+
+  ConfigChildWidget *widget;
+  while (senderWidget->parent() != NULL)
+  {
+    senderWidget = qobject_cast<QWidget *>(senderWidget->parent());
+    widget = qobject_cast<ConfigChildWidget *>(senderWidget);
+    if (widget)
+      break;
+  }
+
+  if (!widget)
+    return;
+
+  ignition::math::Vector3d dimensions;
+  std::string uri;
+  std::string value = this->GetGeometryWidgetValue(widget, dimensions, uri);
+
+  emit GeometryValueChanged(widget->scopedName.c_str(), value, dimensions,
+      uri);
+}
+
+/////////////////////////////////////////////////
+void ConfigWidget::OnGeometryValueChanged(const int /*_value*/)
+{
+  QComboBox *combo =
+      qobject_cast<QComboBox *>(QObject::sender());
+
+  if (!combo)
+    return;
+
+  GeometryConfigWidget *widget =
+      qobject_cast<GeometryConfigWidget *>(combo->parent());
+
+  if (!widget)
+    return;
+
+  ignition::math::Vector3d dimensions;
+  std::string uri;
+  std::string value = this->GetGeometryWidgetValue(widget, dimensions, uri);
+
+  emit GeometryValueChanged(widget->scopedName.c_str(), value, dimensions, uri);
 }
 
 /////////////////////////////////////////////////
@@ -3089,4 +3229,63 @@ void ConfigWidget::InsertLayout(QLayout *_layout, int _pos)
     return;
 
   boxLayout->insertLayout(_pos, _layout);
+}
+
+/////////////////////////////////////////////////
+ConfigChildWidget *ConfigWidget::ConfigChildWidgetByName(
+    const std::string &_name) const
+{
+  auto iter = this->configWidgets.find(_name);
+
+  if (iter != this->configWidgets.end())
+    return iter->second;
+  else
+    return NULL;
+}
+
+/////////////////////////////////////////////////
+QString ConfigWidget::StyleSheet(const std::string &_type, const int _level)
+{
+  if (_type == "normal")
+  {
+    return "QWidget\
+        {\
+          background-color: " + ConfigWidget::bgColors[_level] + ";\
+          color: #4c4c4c;\
+        }\
+        QLabel\
+        {\
+          color: #d0d0d0;\
+        }\
+        QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
+        {\
+          background-color: " + ConfigWidget::widgetColors[_level] +
+        "}";
+  }
+  else if (_type == "warning")
+  {
+    return "QWidget\
+      {\
+        background-color: " + ConfigWidget::bgColors[_level] + ";\
+        color: " + ConfigWidget::redColor + ";\
+      }\
+      QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
+      {\
+        background-color: " + ConfigWidget::widgetColors[_level] +
+      "}";
+  }
+  else if (_type == "active")
+  {
+    return "QWidget\
+      {\
+        background-color: " + ConfigWidget::bgColors[_level] + ";\
+        color: " + ConfigWidget::greenColor + ";\
+      }\
+      QDoubleSpinBox, QSpinBox, QLineEdit, QComboBox\
+      {\
+        background-color: " + ConfigWidget::widgetColors[_level] +
+      "}";
+  }
+  gzwarn << "Requested unknown style sheet type [" << _type << "]" << std::endl;
+  return "";
 }
