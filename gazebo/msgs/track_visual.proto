@@ -33,4 +33,7 @@ message TrackVisual
 
   /// \brief Position of the camera.
   optional Vector3d xyz             = 8;
+
+  /// \brief If set to true, the camera inherits the yaw rotation of the model.
+  optional bool inherit_yaw         = 9;
 }

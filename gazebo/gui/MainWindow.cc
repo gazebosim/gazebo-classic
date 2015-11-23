@@ -1921,6 +1921,9 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
       if (_msg->camera().track().has_xyz())
         cam->SetTrackPosition(msgs::ConvertIgn(_msg->camera().track().xyz()));
 
+      if (_msg->camera().track().has_inherit_yaw())
+        cam->SetTrackInheritYaw(_msg->camera().track().inherit_yaw());
+
       if (_msg->camera().track().has_min_dist())
       {
         minDist = _msg->camera().track().min_dist();

@@ -601,6 +601,20 @@ namespace gazebo
       /// \param[in] _dist Maximum distance between camera and visual.
       public: virtual void SetTrackMaxDistance(const double _dist);
 
+      /// \brief Get whether this camera inherits the yaw rotation of the
+      /// tracked model.
+      /// \return True if the camera inherits the yaw rotation of the tracked
+      /// model.
+      /// \sa SetTrackInheritYaw(bool _inheritYaw)
+      public: virtual bool GetTrackInheritYaw() const;
+
+      /// \brief Set whether this camera inherits the yaw rotation of the
+      /// tracked model.
+      /// \param[in] _inheritYaw True means camera inherits the yaw rotation of
+      /// the tracked model.
+      /// \sa GetTrackInheritRotation()
+      public: virtual void SetTrackInheritYaw(bool _inheritYaw);
+
       /// \brief Implementation of the render call
       protected: virtual void RenderImpl();
 

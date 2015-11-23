@@ -95,6 +95,10 @@ namespace gazebo
       /// \brief If set to true, the position of the camera is static.
       public: bool trackIsStatic;
 
+      /// \brief If set to true, the camera inherits the yaw rotation of the
+      /// tracked model.
+      public: bool trackInheritYaw;
+
       /// \brief If set to true, the position of the camera is relative to
       /// the tracked model, otherwise it represents world coordinates.
       public: bool trackIsRelative;

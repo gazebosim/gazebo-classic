@@ -244,6 +244,12 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
         item2->setValue(isRelative);
         item->addSubProperty(item2);
 
+        bool inheritYaw = cam->GetTrackInheritYaw();
+        item2 = this->variantManager->addProperty(
+            QVariant::Bool, tr("inherit_yaw"));
+        item2->setValue(inheritYaw);
+        item->addSubProperty(item2);
+
         ignition::math::Vector3d trackPos = cam->TrackPosition();
         this->FillVector3dProperty(msgs::Convert(trackPos), item);
 
@@ -757,6 +763,11 @@ void ModelListWidget::GUIPropertyChanged(QtProperty *_item)
     {
       cam->SetTrackIsRelative(this->variantManager->value(
              this->GetChildItem(cameraFollowProperty, "is_relative")).toBool());
+    }
+    else if (changedProperty == "inherit_yaw")
+    {
+      cam->SetTrackInheritYaw(this->variantManager->value(
+             this->GetChildItem(cameraFollowProperty, "inherit_yaw")).toBool());
     }
     else if (changedProperty == "x"
         || changedProperty == "y"

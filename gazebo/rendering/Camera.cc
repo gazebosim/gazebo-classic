@@ -222,6 +222,7 @@ void Camera::Init()
   this->dataPtr->trackMinDistance = 8.0;
   this->dataPtr->trackMaxDistance = 8.0;
   this->dataPtr->trackPos = ignition::math::Vector3d(-5.0, 0.0, 3.0);
+  this->dataPtr->trackInheritYaw = true;
 }
 
 //////////////////////////////////////////////////
@@ -394,11 +395,18 @@ void Camera::Update()
     {
       if (this->dataPtr->trackIsRelative)
       {
-        yaw =
-            this->dataPtr->trackedVisual->GetWorldPose().Ign().Rot().Yaw();
-        ignition::math::Quaterniond rot =
-            ignition::math::Quaterniond(0.0, 0.0, yaw);
-        direction += rot.RotateVector(this->dataPtr->trackPos);
+        if (this->dataPtr->trackInheritYaw)
+        {
+          yaw =
+              this->dataPtr->trackedVisual->GetWorldPose().Ign().Rot().Yaw();
+          ignition::math::Quaterniond rot =
+              ignition::math::Quaterniond(0.0, 0.0, yaw);
+          direction += rot.RotateVector(this->dataPtr->trackPos);
+        }
+        else
+        {
+          direction += this->dataPtr->trackPos;
+        }
         error = -direction.GetLength();
       }
       else
@@ -1905,4 +1913,16 @@ void Camera::SetTrackMinDistance(const double _dist)
 void Camera::SetTrackMaxDistance(const double _dist)
 {
   this->dataPtr->trackMaxDistance = _dist;
+}
+
+/////////////////////////////////////////////////
+bool Camera::GetTrackInheritYaw() const
+{
+  return this->dataPtr->trackInheritYaw;
+}
+
+/////////////////////////////////////////////////
+void Camera::SetTrackInheritYaw(bool _inheritYaw)
+{
+  this->dataPtr->trackInheritYaw = _inheritYaw;
 }

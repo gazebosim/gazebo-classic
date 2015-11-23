@@ -644,6 +644,9 @@ namespace gazebo
       if (_sdf->HasElement("relative"))
         result.set_is_relative(_sdf->Get<bool>("relative"));
 
+      if (_sdf->HasElement("inherit_yaw"))
+        result.set_inherit_yaw(_sdf->Get<bool>("inherit_yaw"));
+
       if (_sdf->HasElement("xyz"))
       {
         msgs::Set(result.mutable_xyz(),
