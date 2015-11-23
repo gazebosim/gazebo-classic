@@ -234,6 +234,7 @@ VisualPtr Visual::Clone(const std::string &_name, VisualPtr _newParent)
   VisualPtr result(new Visual(_name, _newParent));
   result->Load(this->dataPtr->sdf);
   result->SetScale(this->dataPtr->scale);
+  result->SetVisibilityFlags(this->dataPtr->visibilityFlags);
   std::string visName = this->GetName();
   for (auto iter: this->dataPtr->children)
   {
