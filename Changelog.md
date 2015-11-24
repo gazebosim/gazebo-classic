@@ -3,6 +3,9 @@
 1. Removed deprecations
     * [Pull request #1992]((https://bitbucket.org/osrf/gazebo/pull-request/1992)
 
+1. Copy visual visibility flags on clone
+    * [Pull request #2008](https://bitbucket.org/osrf/gazebo/pull-request/2008)
+    
 1. Publish camera sensor image size when rendering is not enabled
     * [Pull request #1969](https://bitbucket.org/osrf/gazebo/pull-request/1969)
 
