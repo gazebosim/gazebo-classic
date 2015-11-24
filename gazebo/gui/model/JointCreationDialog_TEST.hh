@@ -30,6 +30,7 @@ class JointCreationDialog_TEST : public QTestFixture
 
   /// \brief Test type.
   private slots: void Type();
+  private slots: void Links();
 };
 
 #endif
