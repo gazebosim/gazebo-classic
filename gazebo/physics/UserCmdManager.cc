@@ -227,6 +227,12 @@ UserCmdManager::UserCmdManager(const WorldPtr _world)
   this->dataPtr->userCmdStatsPub =
     this->dataPtr->node->Advertise<msgs::UserCmdStats>("~/user_cmd_stats");
 
+  this->dataPtr->modelModifyPub =
+      this->dataPtr->node->Advertise<msgs::Model>("~/model/modify");
+
+  this->dataPtr->lightModifyPub =
+      this->dataPtr->node->Advertise<msgs::Light>("~/light/modify");
+
   this->dataPtr->idCounter = 0;
 }
 
@@ -250,6 +256,15 @@ void UserCmdManager::OnUserCmdMsg(ConstUserCmdPtr &_msg)
   // Create command
   UserCmdPtr cmd(new UserCmd(id, this->dataPtr->world, _msg->description(),
       _msg->type(), name));
+
+  if (_msg->type() == msgs::UserCmd::MOVING)
+  {
+    for (int i = 0; i < _msg->model_size(); ++i)
+      this->dataPtr->modelModifyPub->Publish(_msg->model(i));
+
+    for (int i = 0; i < _msg->light_size(); ++i)
+      this->dataPtr->lightModifyPub->Publish(_msg->light(i));
+  }
 
   // Add it to undo list
   this->dataPtr->undoCmds.push_back(cmd);
