@@ -1,8 +1,11 @@
 ## Gazebo 7.0
 
+1. Update depth camera sensor to publish depth values over a topic.
+    * [Pull request #](https://bitbucket.org/osrf/gazebo/pull-request/)
+
 1. Copy visual visibility flags on clone
     * [Pull request #2008](https://bitbucket.org/osrf/gazebo/pull-request/2008)
-    
+
 1. Publish camera sensor image size when rendering is not enabled
     * [Pull request #1969](https://bitbucket.org/osrf/gazebo/pull-request/1969)
 

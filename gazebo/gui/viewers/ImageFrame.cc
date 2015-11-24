@@ -105,8 +105,8 @@ void ImageFrame::OnImage(const msgs::Image &_msg)
   if (isDepthImage)
   {
     unsigned int depthSamples = _msg.width() * _msg.height();
-    // cppchecker recommends sizeof(varname)
     float f;
+    // cppchecker recommends using sizeof(varname)
     unsigned int depthBufferSize = depthSamples * sizeof(f);
     float *depthBuffer = new float[depthSamples];
     memcpy(depthBuffer, _msg.data().c_str(), depthBufferSize);
@@ -119,9 +119,9 @@ void ImageFrame::OnImage(const msgs::Image &_msg)
     }
 
     unsigned int idx = 0;
-    for ( unsigned int j = 0; j < _msg.height(); j++)
+    for (unsigned int j = 0; j < _msg.height(); j++)
     {
-      for ( unsigned int i = 0; i < _msg.width(); i++)
+      for (unsigned int i = 0; i < _msg.width(); i++)
       {
         float d = depthBuffer[idx++];
         d = 255 - (d / maxDepth * 255);

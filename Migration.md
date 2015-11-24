@@ -9,6 +9,11 @@ release will remove the deprecated code.
 
 ### Additions
 
+1. **gazebo/sensors/DepthCameraSensor.hh**
+    + public: virtual rendering::DepthCameraPtr GetDepthCamera() const
+    + public: virtual const float *GetDepthData() const
+    + public: virtual std::string GetPointCloudTopic() const
+
 1. **gazebo/physics/Model.hh**
     + public: gazebo::physics::JointPtr CreateJoint(
         const std::string &_name, const std::string &_type,
@@ -23,6 +28,9 @@ release will remove the deprecated code.
     + public: void SetElasticModulus(double _modulus);
 
 ### Modifications
+
+1. **gazebo/sensors/DepthCameraSensor.hh**
+    + Modified to inherit from CameraSensor class.
 
 1. **gazebo/rendering/RenderTypes.hh**
     + typedefs for Visual and its derived classes have been changed from boost to std pointers.

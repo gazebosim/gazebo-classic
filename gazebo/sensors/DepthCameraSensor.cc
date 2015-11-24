@@ -72,8 +72,6 @@ std::string DepthCameraSensor::GetPointCloudTopic() const
 void DepthCameraSensor::Load(const std::string &_worldName)
 {
   CameraSensor::Load(_worldName);
-  this->pcdPub = this->node->Advertise<msgs::PointCloud>(
-      this->GetPointCloudTopic(), 50);
 }
 
 //////////////////////////////////////////////////
@@ -177,8 +175,8 @@ bool DepthCameraSensor::UpdateImpl(bool /*_force*/)
         boost::dynamic_pointer_cast<rendering::DepthCamera>(this->camera);
 
     unsigned int depthSamples = msg.image().width() * msg.image().height();
-    // cppchecker recommends sizeof(varname)
     float f;
+    // cppchecker recommends using sizeof(varname)
     unsigned int depthBufferSize = depthSamples * sizeof(f);
 
     if (!this->depthBuffer)

@@ -67,9 +67,6 @@ namespace gazebo
       // Documentation inherited
       protected: virtual bool UpdateImpl(bool _force);
 
-      /// \brief Publisher of point cloud messages.
-      protected: transport::PublisherPtr pcdPub;
-
       /// \brief Depth data buffer.
       protected: float *depthBuffer;
     };
