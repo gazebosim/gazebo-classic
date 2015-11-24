@@ -46,7 +46,7 @@ namespace gazebo
       /// \param[in] _description Description for the command, such as
       /// "Rotate box", "Delete sphere", etc.
       /// \param[in] _type Type of command, such as MOVING, DELETING, etc.
-      public: MEUserCmd(std::string _id,
+      public: MEUserCmd(unsigned int _id,
                       const std::string &_description,
                       msgs::UserCmd::Type _type);
 
@@ -61,7 +61,7 @@ namespace gazebo
 
       /// \brief Return this command's unique ID.
       /// \return Unique ID
-      public: std::string Id() const;
+      public: unsigned int Id() const;
 
       /// \brief Return this command's description.
       /// \return Description
@@ -95,13 +95,8 @@ namespace gazebo
       /// internal state of the singleton and prepares it for exit.
       public: void Clear();
 
-      public: void NewCmd(const std::string &_id,
-                 const std::string &_description,
+      public: void NewCmd(const std::string &_description,
                  const msgs::UserCmd::Type _type);
-
-      /// \internal
-      /// \brief Triggers OnStatsSlot
-      signals: void StatsSignal();
 
       /// \brief Qt call back when an undo history action is triggered.
       /// It publishes an undo request message.
@@ -121,7 +116,7 @@ namespace gazebo
 
       /// \brief Updates the widgets according to the user command stats
       /// message.
-      private slots: void OnStatsSlot();
+      private slots: void UpdateStats();
 
       /// \brief User command statistics message callback.
       /// \param[in] _msg Message containing statistics about user commands

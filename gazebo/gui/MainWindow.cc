@@ -2317,4 +2317,7 @@ void MainWindow::OnWindowMode(const std::string &_mode)
     this->tabWidget->removeTab(this->tabWidget->indexOf(this->insertModel));
   else if (simulation && this->tabWidget->indexOf(this->insertModel) == -1)
     this->tabWidget->insertTab(1, this->insertModel, "Insert");
+
+  // User commands
+  this->userCmdHistory->SetActive(simulation);
 }

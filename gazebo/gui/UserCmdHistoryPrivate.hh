@@ -47,6 +47,9 @@ namespace gazebo
 
       /// \brief Group of actions in redo history menu.
       public: QActionGroup *redoActions;
+
+      /// \brief Group of actions in redo history menu.
+      public: bool active;
     };
   }
 }

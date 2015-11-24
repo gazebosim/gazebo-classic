@@ -36,6 +36,8 @@ UserCmdHistory::UserCmdHistory()
     return;
   }
 
+  this->dataPtr->active = true;
+
   // Action groups
   this->dataPtr->undoActions = new QActionGroup(this);
   this->dataPtr->undoActions->setExclusive(false);
@@ -84,12 +86,18 @@ UserCmdHistory::~UserCmdHistory()
 /////////////////////////////////////////////////
 void UserCmdHistory::OnUndo()
 {
+  if (!this->dataPtr->active)
+    return;
+
   this->OnUndoCommand(NULL);
 }
 
 /////////////////////////////////////////////////
 void UserCmdHistory::OnUndoCommand(QAction *_action)
 {
+  if (!this->dataPtr->active)
+    return;
+
   msgs::UndoRedo msg;
   msg.set_undo(true);
 
@@ -104,9 +112,11 @@ void UserCmdHistory::OnUndoCommand(QAction *_action)
 /////////////////////////////////////////////////
 void UserCmdHistory::OnUndoHovered(QAction *_action)
 {
+gzdbg << "OnUndoHovered" << std::endl;
   bool beforeThis = true;
   for (auto action : this->dataPtr->undoActions->actions())
   {
+gzdbg << "OnUndoHovered A" << std::endl;
     action->blockSignals(true);
     action->setChecked(beforeThis);
     action->blockSignals(false);
@@ -119,12 +129,18 @@ void UserCmdHistory::OnUndoHovered(QAction *_action)
 /////////////////////////////////////////////////
 void UserCmdHistory::OnRedo()
 {
+  if (!this->dataPtr->active)
+    return;
+
   this->OnRedoCommand(NULL);
 }
 
 /////////////////////////////////////////////////
 void UserCmdHistory::OnRedoCommand(QAction *_action)
 {
+  if (!this->dataPtr->active)
+    return;
+
   msgs::UndoRedo msg;
   msg.set_undo(false);
 
@@ -171,6 +187,11 @@ void UserCmdHistory::OnStatsSlot()
 /////////////////////////////////////////////////
 void UserCmdHistory::OnUndoCmdHistory()
 {
+gzdbg << "UserCmdHistory::OnUndoCmdHistory" << std::endl;
+  if (!this->dataPtr->active)
+    return;
+gzdbg << "UserCmdHistory::OnUndoCmdHistory    BAD" << std::endl;
+
   // Clear undo action group
   for (auto action : this->dataPtr->undoActions->actions())
   {
@@ -195,6 +216,9 @@ void UserCmdHistory::OnUndoCmdHistory()
 /////////////////////////////////////////////////
 void UserCmdHistory::OnRedoCmdHistory()
 {
+  if (!this->dataPtr->active)
+    return;
+
   // Clear redo action group
   for (auto action : this->dataPtr->redoActions->actions())
   {
@@ -214,5 +238,17 @@ void UserCmdHistory::OnRedoCmdHistory()
   }
 
   menu.exec(QCursor::pos());
+}
+
+/////////////////////////////////////////////////
+void UserCmdHistory::SetActive(bool _active)
+{
+  this->dataPtr->active = _active;
+}
+
+/////////////////////////////////////////////////
+bool UserCmdHistory::Active() const
+{
+  return this->dataPtr->active;
 }
 

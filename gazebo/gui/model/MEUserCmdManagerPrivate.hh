@@ -32,7 +32,7 @@ namespace gazebo
     class MEUserCmdPrivate
     {
       /// \brief Unique ID identifying this command in the server.
-      public: std::string id;
+      public: unsigned int id;
 
       /// \brief Description for the command.
       public: std::string description;
@@ -47,6 +47,9 @@ namespace gazebo
     /// \brief Private data for the MEUserCmdManager class
     class MEUserCmdManagerPrivate : public UserCmdHistoryPrivate
     {
+      /// \brief Counter to give commands unique ids.
+      public: unsigned int idCounter;
+
       /// \brief Group of actions in undo history menu.
       public: QActionGroup *undoActions;
 

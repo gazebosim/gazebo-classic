@@ -42,6 +42,9 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~UserCmdHistory();
 
+      public: void SetActive(bool _active);
+      public: bool Active() const;
+
       /// \internal
       /// \brief Triggers OnStatsSlot
       signals: void StatsSignal();

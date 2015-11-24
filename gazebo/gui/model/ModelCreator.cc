@@ -949,8 +949,6 @@ void ModelCreator::CreateLink(const rendering::VisualPtr &_visual)
       this->canonicalLink = linkName;
   }
 
-  rendering::ScenePtr scene = link->linkVisual->GetScene();
-
   this->ModelChanged();
 }
 
@@ -1656,6 +1654,9 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
       LinkData *link = linkIt->second;
       link->SetPose((this->mouseVisual->GetWorldPose()-this->modelPose).Ign());
       gui::model::Events::linkInserted(this->mouseVisual->GetName());
+
+      MEUserCmdManager::Instance()->NewCmd(
+          "Inserted " + this->mouseVisual->GetName(), msgs::UserCmd::INSERTING);
     }
     else
     {
@@ -1667,6 +1668,9 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
             this->mouseVisual->GetWorldPose()-this->modelPose).Ign());
 
         this->EmitNestedModelInsertedEvent(this->mouseVisual);
+
+      MEUserCmdManager::Instance()->NewCmd(
+          "Inserted " + this->mouseVisual->GetName(), msgs::UserCmd::INSERTING);
       }
     }
 

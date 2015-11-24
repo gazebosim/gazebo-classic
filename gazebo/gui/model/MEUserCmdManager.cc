@@ -27,7 +27,7 @@ using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-MEUserCmd::MEUserCmd(std::string _id,
+MEUserCmd::MEUserCmd(unsigned int _id,
                  const std::string &_description,
                  msgs::UserCmd::Type _type)
   : dataPtr(new MEUserCmdPrivate())
@@ -47,15 +47,23 @@ MEUserCmd::~MEUserCmd()
 /////////////////////////////////////////////////
 void MEUserCmd::Undo()
 {
+  if (this->dataPtr->type == msgs::UserCmd::INSERTING)
+  {
+    gzdbg << "Undo insert command: " << this->Description() << std::endl;
+  }
 }
 
 /////////////////////////////////////////////////
 void MEUserCmd::Redo()
 {
+  if (this->dataPtr->type == msgs::UserCmd::INSERTING)
+  {
+    gzdbg << "Redo insert command: " << this->Description() << std::endl;
+  }
 }
 
 /////////////////////////////////////////////////
-std::string MEUserCmd::Id() const
+unsigned int MEUserCmd::Id() const
 {
   return this->dataPtr->id;
 }
@@ -81,32 +89,26 @@ MEUserCmdManager::MEUserCmdManager()
     gzerr << "Action missing, not initializing MEUserCmdManager" << std::endl;
     return;
   }
+  auto *dPtr = reinterpret_cast<MEUserCmdManagerPrivate *>(this->dataPtr);
+
+
+  dPtr->idCounter = 0;
 
   // Action groups
-  this->dataPtr->undoActions = new QActionGroup(this);
-  this->dataPtr->undoActions->setExclusive(false);
+  dPtr->undoActions = new QActionGroup(this);
+  dPtr->undoActions->setExclusive(false);
 
-  this->dataPtr->redoActions = new QActionGroup(this);
-  this->dataPtr->redoActions->setExclusive(false);
+  dPtr->redoActions = new QActionGroup(this);
+  dPtr->redoActions->setExclusive(false);
 
-  // Qt connections
-  connect(this, SIGNAL(StatsSignal()), this, SLOT(OnStatsSlot()));
-
-  connect(g_undoAct, SIGNAL(triggered()), this, SLOT(OnUndo()));
-  connect(g_redoAct, SIGNAL(triggered()), this, SLOT(OnRedo()));
-  connect(g_undoHistoryAct, SIGNAL(triggered()), this,
-      SLOT(OnUndoCmdHistory()));
-  connect(g_redoHistoryAct, SIGNAL(triggered()), this,
-      SLOT(OnRedoCmdHistory()));
-
-  connect(this->dataPtr->undoActions, SIGNAL(triggered(QAction *)), this,
+  connect(dPtr->undoActions, SIGNAL(triggered(QAction *)), this,
       SLOT(OnUndoCommand(QAction *)));
-  connect(this->dataPtr->undoActions, SIGNAL(hovered(QAction *)), this,
+  connect(dPtr->undoActions, SIGNAL(hovered(QAction *)), this,
       SLOT(OnUndoHovered(QAction *)));
 
-  connect(this->dataPtr->redoActions, SIGNAL(triggered(QAction *)), this,
+  connect(dPtr->redoActions, SIGNAL(triggered(QAction *)), this,
       SLOT(OnRedoCommand(QAction *)));
-  connect(this->dataPtr->redoActions, SIGNAL(hovered(QAction *)), this,
+  connect(dPtr->redoActions, SIGNAL(hovered(QAction *)), this,
       SLOT(OnRedoHovered(QAction *)));
 }
 
@@ -132,67 +134,169 @@ gzdbg << "Clear" << std::endl;
 /////////////////////////////////////////////////
 void MEUserCmdManager::OnUndoCommand(QAction *_action)
 {
-  // Directly call undo on command
-gzdbg << "OnUndoCmd" << std::endl;
+  auto *dPtr = reinterpret_cast<MEUserCmdManagerPrivate *>(this->dataPtr);
+
+  if (dPtr->undoCmds.empty())
+  {
+    gzwarn << "No commands to be undone" << std::endl;
+    return;
+  }
+
+  // Get the last done command
+  auto cmd = dPtr->undoCmds.back();
+
+  // If there's an action, get that command instead
+  if (_action)
+  {
+    bool found = false;
+    auto id = _action->data().toUInt();
+    for (auto cmdIt : dPtr->undoCmds)
+    {
+      if (cmdIt->Id() == id)
+      {
+        cmd = cmdIt;
+        found = true;
+        break;
+      }
+    }
+    if (!found)
+    {
+      gzerr << "Requested command [" << id <<
+          "] is not in the undo queue and won't be undone." << std::endl;
+      return;
+    }
+  }
+
+  // Undo all commands up to the desired one
+  for (auto cmdIt : boost::adaptors::reverse(dPtr->undoCmds))
+  {
+    // Undo it
+    cmdIt->Undo();
+
+    // Transfer to the redo list
+    dPtr->undoCmds.pop_back();
+    dPtr->redoCmds.push_back(cmdIt);
+
+    if (cmdIt == cmd)
+      break;
+  }
+
+  // Update buttons
+  this->UpdateStats();
 }
 
 /////////////////////////////////////////////////
 void MEUserCmdManager::OnRedoCommand(QAction *_action)
 {
-  // Directly call redo on command
-gzdbg << "OnRedoCmd" << std::endl;
+  auto *dPtr = reinterpret_cast<MEUserCmdManagerPrivate *>(this->dataPtr);
+
+  if (dPtr->redoCmds.empty())
+  {
+    gzwarn << "No commands to be redone" << std::endl;
+    return;
+  }
+
+  // Get the last done command
+  auto cmd = dPtr->redoCmds.back();
+
+  // If there's an action, get that command instead
+  if (_action)
+  {
+    bool found = false;
+    auto id = _action->data().toUInt();
+    for (auto cmdIt : dPtr->redoCmds)
+    {
+      if (cmdIt->Id() == id)
+      {
+        cmd = cmdIt;
+        found = true;
+        break;
+      }
+    }
+    if (!found)
+    {
+      gzerr << "Requested command [" << id <<
+          "] is not in the redo queue and won't be redone." << std::endl;
+      return;
+    }
+  }
+
+  // Redo all commands up to the desired one
+  for (auto cmdIt : boost::adaptors::reverse(dPtr->redoCmds))
+  {
+    // Redo it
+    cmdIt->Redo();
+
+    // Transfer to the undo list
+    dPtr->redoCmds.pop_back();
+    dPtr->undoCmds.push_back(cmdIt);
+
+    if (cmdIt == cmd)
+      break;
+  }
+
+  // Update buttons
+  this->UpdateStats();
 }
 
 /////////////////////////////////////////////////
-void MEUserCmdManager::NewCmd(const std::string &_id,
-                 const std::string &_description,
-                 const msgs::UserCmd::Type _type)
+void MEUserCmdManager::NewCmd(const std::string &_description,
+    const msgs::UserCmd::Type _type)
 {
+  auto *dPtr = reinterpret_cast<MEUserCmdManagerPrivate *>(this->dataPtr);
+
   // Create command
   MEUserCmd *cmd = new MEUserCmd(
-      _id,
+      dPtr->idCounter++,
       _description,
       _type);
-
-
-  auto *dPtr = reinterpret_cast<MEUserCmdManagerPrivate *>(this->dataPtr);
 
   // Add it to undo list
   dPtr->undoCmds.push_back(cmd);
 
   // Clear redo list
   dPtr->redoCmds.clear();
+
+  // Update buttons
+  this->UpdateStats();
 }
 
 /////////////////////////////////////////////////
-void MEUserCmdManager::OnStatsSlot()
+void MEUserCmdManager::UpdateStats()
 {
-  g_undoAct->setEnabled(this->dataPtr->msg.undo_cmd_count() > 0);
-  g_redoAct->setEnabled(this->dataPtr->msg.redo_cmd_count() > 0);
-  g_undoHistoryAct->setEnabled(this->dataPtr->msg.undo_cmd_count() > 0);
-  g_redoHistoryAct->setEnabled(this->dataPtr->msg.redo_cmd_count() > 0);
+  auto *dPtr = reinterpret_cast<MEUserCmdManagerPrivate *>(this->dataPtr);
+  g_undoAct->setEnabled(dPtr->undoCmds.size() > 0);
+  g_redoAct->setEnabled(dPtr->redoCmds.size() > 0);
+  g_undoHistoryAct->setEnabled(dPtr->undoCmds.size() > 0);
+  g_redoHistoryAct->setEnabled(dPtr->redoCmds.size() > 0);
 }
 
 /////////////////////////////////////////////////
 void MEUserCmdManager::OnUndoCmdHistory()
 {
-gzdbg << "OnUndoCmdHistory" << std::endl;
-  // Clear undo action group
-  for (auto action : this->dataPtr->undoActions->actions())
+  auto *dPtr = reinterpret_cast<MEUserCmdManagerPrivate *>(this->dataPtr);
+  if (!dPtr->undoActions)
   {
-    this->dataPtr->undoActions->removeAction(action);
+    gzerr << "No undo actions" << std::endl;
+    return;
   }
+  // Clear undo action group
+  for (auto action : dPtr->undoActions->actions())
+  {
+    dPtr->undoActions->removeAction(action);
+  }
+
 
   // Create new menu
   QMenu menu;
-  for (auto cmd : boost::adaptors::reverse(this->dataPtr->msg.undo_cmd()))
+  for (auto cmd : boost::adaptors::reverse(dPtr->undoCmds))
   {
-    QAction *action = new QAction(QString::fromStdString(cmd.description()),
+    QAction *action = new QAction(QString::fromStdString(cmd->Description()),
         this);
-    action->setData(QVariant(cmd.id()));
+    action->setData(QVariant(cmd->Id()));
     action->setCheckable(true);
     menu.addAction(action);
-    this->dataPtr->undoActions->addAction(action);
+    dPtr->undoActions->addAction(action);
   }
 
   menu.exec(QCursor::pos());
@@ -201,20 +305,21 @@ gzdbg << "OnUndoCmdHistory" << std::endl;
 /////////////////////////////////////////////////
 void MEUserCmdManager::OnRedoCmdHistory()
 {
-gzdbg << "OnRedoCmdHistory" << std::endl;
   // Clear redo action group
   for (auto action : this->dataPtr->redoActions->actions())
   {
     this->dataPtr->redoActions->removeAction(action);
   }
 
+  auto *dPtr = reinterpret_cast<MEUserCmdManagerPrivate *>(this->dataPtr);
+
   // Create new menu
   QMenu menu;
-  for (auto cmd : boost::adaptors::reverse(this->dataPtr->msg.redo_cmd()))
+  for (auto cmd : boost::adaptors::reverse(dPtr->redoCmds))
   {
-    QAction *action = new QAction(QString::fromStdString(cmd.description()),
+    QAction *action = new QAction(QString::fromStdString(cmd->Description()),
         this);
-    action->setData(QVariant(cmd.id()));
+    action->setData(QVariant(cmd->Id()));
     action->setCheckable(true);
     menu.addAction(action);
     this->dataPtr->redoActions->addAction(action);
