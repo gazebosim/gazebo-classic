@@ -31,7 +31,7 @@ void VisualPoseTest::VisualPose()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/shapes.world", true, false, true);
+  this->Load("test/worlds/visual_pose.world", true, false, true);
 
   // Get world
   gazebo::physics::WorldPtr world = gazebo::physics::get_world("default");
@@ -89,7 +89,8 @@ void VisualPoseTest::VisualPose()
   // Check that it's not possible to return the visual pose yet
   // FIXME: Is this the desired behaviour?
   ignition::math::Pose3d boxVisualPose;
-  QVERIFY(!boxLink->VisualPose(boxVisualId, boxVisualPose));
+  QVERIFY(boxLink->VisualPose(boxVisualId, boxVisualPose));
+  QVERIFY(boxVisualPose == ignition::math::Pose3d(0, 2, 0, 0, 0, 0));
 
   // Set box visual pose (physics)
   ignition::math::Pose3d newVisualPose(1, -2, 3, -0.1, 0.2, -0.3);

@@ -1162,9 +1162,8 @@ bool Link::VisualPose(const uint32_t _id, ignition::math::Pose3d &_pose) const
   }
   else
   {
-    gzerr << "Pose not found for visual [" << _id << "] in link [" <<
-        this->GetScopedName() << "]" << std::endl;
-    return false;
+    // Pose wasn't specified on SDF, use default value
+    _pose = ignition::math::Pose3d::Zero;
   }
   return true;
 }
