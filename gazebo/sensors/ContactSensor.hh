@@ -17,9 +17,7 @@
 #ifndef _GAZEBO_CONTACTSENSOR_HH_
 #define _GAZEBO_CONTACTSENSOR_HH_
 
-#include <vector>
 #include <map>
-#include <list>
 #include <string>
 
 #include "gazebo/msgs/msgs.hh"
@@ -34,6 +32,9 @@ namespace gazebo
   /// \brief Sensors namespace
   namespace sensors
   {
+    // Forward declare private data class
+    class ContactSensorPrivate;
+
     /// \addtogroup gazebo_sensors
     /// \{
 
@@ -134,23 +135,9 @@ namespace gazebo
       /// \brief Callback for contact messages from the physics engine.
       private: void OnContacts(ConstContactsPtr &_msg);
 
-      /// \brief Collisions this sensor monitors for contacts
-      private: std::vector<std::string> collisions;
-
-      /// \brief Output contact information.
-      private: transport::PublisherPtr contactsPub;
-
-      /// \brief Subscription to contact messages from the physics engine
-      private: transport::SubscriberPtr contactSub;
-
-      /// \brief Mutex to protect reads and writes.
-      private: mutable boost::mutex mutex;
-
-      /// \brief Contacts message used to output sensor data.
-      private: msgs::Contacts contactsMsg;
-
-      typedef std::list<boost::shared_ptr<msgs::Contacts const> > ContactMsgs_L;
-      private: ContactMsgs_L incomingContacts;
+      /// \internal
+      /// \brief Private data pointer
+      private: std::uniqu_ptr<ContactSensorPrivate> dataPtr;
     };
     /// \}
   }

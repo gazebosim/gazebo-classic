@@ -41,25 +41,11 @@ namespace gazebo
 {
   namespace sensors
   {
-    /// \brief SensorClass is used to categorize sensors. This is used to
-    /// put sensors into different threads.
-    enum SensorCategory
-    {
-      // IMAGE must be the first element, and it must start with 0. Do not
-      // change this! See SensorManager::sensorContainers for reference.
-      /// \brief Image based sensor class. This type requires the rendering
-      /// engine.
-      IMAGE = 0,
+    // Forward declare protected data
+    class SensorProtected;
 
-      /// \brief Ray based sensor class.
-      RAY = 1,
-
-      /// \brief A type of sensor is not a RAY or IMAGE sensor.
-      OTHER = 2,
-
-      /// \brief Number of Sensor Categories
-      CATEGORY_COUNT = 3
-    };
+    // Forward declare private data
+    class SensorPrivate;
 
     /// \addtogroup gazebo_sensors
     /// \{
@@ -236,82 +222,13 @@ namespace gazebo
       /// \param[in] _sdf SDF parameters.
       private: void LoadPlugin(sdf::ElementPtr _sdf);
 
-      /// \brief True if sensor generation is active.
-      protected: bool active;
+      /// \internal
+      /// \brief Data pointer for protected data
+      protected: std::unique_ptr<SensorPrivate> dataPtr;
 
-      /// \brief Pointer the the SDF element for the sensor.
-      protected: sdf::ElementPtr sdf;
-
-      /// \brief Pose of the sensor.
-      protected: ignition::math::Pose3d pose;
-
-      /// \brief All event connections.
-      protected: std::vector<event::ConnectionPtr> connections;
-
-      /// \brief Node for communication.
-      protected: transport::NodePtr node;
-
-      /// \brief Subscribe to pose updates.
-      protected: transport::SubscriberPtr poseSub;
-
-      /// \brief Name of the parent.
-      protected: std::string parentName;
-
-      /// \brief The sensor's parent ID.
-      protected: uint32_t parentId;
-
-      /// \brief All the plugins for the sensor.
-      protected: std::vector<SensorPluginPtr> plugins;
-
-      /// \brief Pointer to the world.
-      protected: gazebo::physics::WorldPtr world;
-
-      /// \brief Pointer to the Scene
-      protected: gazebo::rendering::ScenePtr scene;
-
-      /// \brief Desired time between updates, set indirectly by
-      ///        Sensor::SetUpdateRate.
-      protected: common::Time updatePeriod;
-
-      /// \brief Time of the last update.
-      protected: common::Time lastUpdateTime;
-
-      /// \brief Stores last time that a sensor measurement was generated;
-      ///        this value must be updated within each sensor's UpdateImpl
-      protected: common::Time lastMeasurementTime;
-
-      /// \brief Noise added to sensor data
-      /// The key maps to a SensorNoiseType, and is kept as an int value
-      /// for backward compatibilty with Gazebo 5&6.
-      /// \todo: Change to std::map<SensorNoiseType, NoisePtr> in Gazebo7.
-      /// Adding the word GAZEBO_DEPRECATED here so that a grep will find
-      /// the above note.
-      protected: std::map<int, NoisePtr> noises;
-
-      /// \brief Mutex to protect resetting lastUpdateTime.
-      private: boost::mutex mutexLastUpdateTime;
-
-      /// \brief Event triggered when a sensor is updated.
-      private: event::EventT<void()> updated;
-
-      /// \brief Subscribe to control message.
-      private: transport::SubscriberPtr controlSub;
-
-      /// \brief Publish sensor data.
-      private: transport::PublisherPtr sensorPub;
-
-      /// \brief The category of the sensor.
-      private: SensorCategory category;
-
-      /// \brief Keep track how much the update has been delayed.
-      private: common::Time updateDelay;
-
-      /// \brief The sensors unique ID.
-      private: uint32_t id;
-
-      /// \brief An SDF pointer that allows us to only read the sensor.sdf
-      /// file once, which in turns limits disk reads.
-      private: static sdf::ElementPtr sdfSensor;
+      /// \internal
+      /// \brief Data pointer for private data
+      private: std::unique_ptr<SensorPrivate> pDataPtr;
     };
     /// \}
   }
