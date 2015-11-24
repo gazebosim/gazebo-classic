@@ -1156,7 +1156,16 @@ bool Link::VisualPose(const uint32_t _id, ignition::math::Pose3d &_pose) const
     return false;
   }
   const msgs::Visual &msg = iter->second;
-  _pose = msgs::ConvertIgn(msg.pose());
+  if (msg.has_pose())
+  {
+    _pose = msgs::ConvertIgn(msg.pose());
+  }
+  else
+  {
+    gzerr << "Pose not found for visual [" << _id << "] in link [" <<
+        this->GetScopedName() << "]" << std::endl;
+    return false;
+  }
   return true;
 }
 
