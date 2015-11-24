@@ -77,7 +77,6 @@ void CylinderShape::SetScale(const math::Vector3 &_scale)
 //////////////////////////////////////////////////
 void CylinderShape::SetScale(const ignition::math::Vector3d &_scale)
 {
-
   if (_scale.Min() < 0)
     return;
 

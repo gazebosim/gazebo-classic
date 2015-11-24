@@ -296,7 +296,6 @@ math::Angle MultiRayShape::GetVerticalMinAngle() const
 //////////////////////////////////////////////////
 ignition::math::Angle MultiRayShape::VerticalMinAngle() const
 {
-
   if (this->vertElem)
     return this->vertElem->Get<double>("min_angle");
   else
