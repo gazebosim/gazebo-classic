@@ -43,7 +43,7 @@ namespace gazebo
       public: UserCmd(const unsigned int _id,
                       physics::WorldPtr _world,
                       const std::string &_description,
-                      const msgs::UserCmd::Type _type,
+                      const msgs::UserCmd::Type &_type,
                       const std::string &_name = "");
 
       /// \brief Destructor

@@ -567,7 +567,6 @@ void ModelManipulator::PublishVisualPose(rendering::VisualPtr _vis)
     msgs::UserCmd userCmdMsg;
     userCmdMsg.set_description(description + _vis->GetName() + "]");
     userCmdMsg.set_type(msgs::UserCmd::MOVING);
-    userCmdMsg.set_entity_name(_vis->GetName());
     this->dataPtr->userCmdPub->Publish(userCmdMsg);
   }
 }
