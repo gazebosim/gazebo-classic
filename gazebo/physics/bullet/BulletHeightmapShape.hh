@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: Heightmap collision
- * Author: Nate Koenig
- * Date: 8 May 2003
- */
-
-#ifndef _BULLETHEIGHTMAPGEOM_HH_
-#define _BULLETHEIGHTMAPGEOM_HH_
+#ifndef _GAZEBO_PHYSICS_BULLETHEIGHTMAPGEOM_HH_
+#define _GAZEBO_PHYSICS_BULLETHEIGHTMAPGEOM_HH_
 #include <string>
 
 #include "gazebo/physics/HeightmapShape.hh"

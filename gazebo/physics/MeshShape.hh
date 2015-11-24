@@ -14,15 +14,11 @@
  * limitations under the License.
  *
 */
-/* Desc: Trimesh geometry
- * Author: Nate Koenig, Andrew Howard
- * Date: 8 May 2003
- */
-
-#ifndef _MESHSHAPE_HH_
-#define _MESHSHAPE_HH_
+#ifndef _GAZEBO_PHYSICS_MESHSHAPE_HH_
+#define _GAZEBO_PHYSICS_MESHSHAPE_HH_
 
 #include <string>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
@@ -55,7 +51,12 @@ namespace gazebo
 
       /// \brief Get the size of the triangle mesh.
       /// \return The size of the triangle mesh.
-      public: virtual math::Vector3 GetSize() const;
+      /// \deprecated See function that returns an ignition::math object.
+      public: virtual math::Vector3 GetSize() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the size of the triangle mesh.
+      /// \return The size of the triangle mesh.
+      public: virtual ignition::math::Vector3d Size() const;
 
       /// \brief Get the URI of the mesh data.
       /// \return The URI of the mesh data.
@@ -73,7 +74,12 @@ namespace gazebo
 
       /// \brief Set the scaling factor.
       /// \param[in] _scale Scaling factor.
+      /// \deprecated See function that accepts ignition::math params
       public: void SetScale(const math::Vector3 &_scale);
+
+      /// \brief Set the scaling factor.
+      /// \param[in] _scale Scaling factor.
+      public: void SetScale(const ignition::math::Vector3d &_scale);
 
       /// \brief Populate a msgs::Geometry message with data from this
       /// shape.

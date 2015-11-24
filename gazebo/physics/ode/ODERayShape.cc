@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A ray
- * Author: Nate Koenig
- * Date: 14 Oct 2009
- */
-
 #include "gazebo/common/Assert.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Link.hh"
@@ -76,7 +71,7 @@ ODERayShape::~ODERayShape()
 //////////////////////////////////////////////////
 void ODERayShape::Update()
 {
-  math::Vector3 dir;
+  ignition::math::Vector3d dir;
 
   if (this->collisionParent)
   {
@@ -85,21 +80,23 @@ void ODERayShape::Update()
 
     this->globalStartPos =
       this->collisionParent->GetLink()->GetWorldPose().CoordPositionAdd(
-          this->relativeStartPos);
+          this->relativeStartPos).Ign();
 
     this->globalEndPos =
       this->collisionParent->GetLink()->GetWorldPose().CoordPositionAdd(
-          this->relativeEndPos);
+          this->relativeEndPos).Ign();
   }
 
   dir = this->globalEndPos - this->globalStartPos;
   dir.Normalize();
 
-  if (!math::equal(this->contactLen, 0.0))
+  if (!ignition::math::equal(this->contactLen, 0.0))
   {
     dGeomRaySet(this->geomId,
-        this->globalStartPos.x, this->globalStartPos.y, this->globalStartPos.z,
-        dir.x, dir.y, dir.z);
+        this->globalStartPos.X(),
+        this->globalStartPos.Y(),
+        this->globalStartPos.Z(),
+        dir.X(), dir.Y(), dir.Z());
 
     dGeomRaySetLength(this->geomId,
         this->globalStartPos.Distance(this->globalEndPos));
@@ -133,18 +130,25 @@ void ODERayShape::GetIntersection(double &_dist, std::string &_entity)
 void ODERayShape::SetPoints(const math::Vector3 &_posStart,
                             const math::Vector3 &_posEnd)
 {
-  math::Vector3 dir;
+  this->SetPoints(_posStart.Ign(), _posEnd.Ign());
+}
+
+//////////////////////////////////////////////////
+void ODERayShape::SetPoints(const ignition::math::Vector3d &_posStart,
+                            const ignition::math::Vector3d &_posEnd)
+{
+  ignition::math::Vector3d dir;
   RayShape::SetPoints(_posStart, _posEnd);
 
   dir = this->globalEndPos - this->globalStartPos;
   dir.Normalize();
 
-  dGeomRaySet(this->geomId, this->globalStartPos.x,
-              this->globalStartPos.y, this->globalStartPos.z,
-              dir.x, dir.y, dir.z);
+  dGeomRaySet(this->geomId, this->globalStartPos.X(),
+              this->globalStartPos.Y(), this->globalStartPos.Z(),
+              dir.X(), dir.Y(), dir.Z());
 
   dGeomRaySetLength(this->geomId,
-                     this->globalStartPos.Distance(this->globalEndPos));
+                    this->globalStartPos.Distance(this->globalEndPos));
 }
 
 //////////////////////////////////////////////////

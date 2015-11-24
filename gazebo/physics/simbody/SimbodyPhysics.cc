@@ -1425,7 +1425,7 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
         // rotate it based on normal vector specified by user
         // Create a rotation whos x-axis is in the
         // negative normal vector direction
-        Vec3 normal = SimbodyPhysics::Vector3ToVec3(p->GetNormal());
+        Vec3 normal = SimbodyPhysics::Vector3ToVec3(p->Normal());
         Rotation R_XN(-UnitVec3(normal), XAxis);
 
         ContactSurface surface(ContactGeometry::HalfSpace(), material);
@@ -1493,7 +1493,7 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
       {
         Vec3 hsz = SimbodyPhysics::Vector3ToVec3(
           (boost::dynamic_pointer_cast<physics::BoxShape>(
-          (*ci)->GetShape()))->GetSize())/2;
+          (*ci)->GetShape()))->Size())/2;
 
         /// \TODO: harcoded resolution, make collision resolution
         /// an adjustable parameter (#980)
@@ -1545,6 +1545,13 @@ SimTK::Quaternion SimbodyPhysics::QuadToQuad(const math::Quaternion &_q)
 }
 
 /////////////////////////////////////////////////
+SimTK::Quaternion SimbodyPhysics::QuadToQuad(
+    const ignition::math::Quaterniond &_q)
+{
+  return SimTK::Quaternion(_q.W(), _q.X(), _q.Y(), _q.Z());
+}
+
+/////////////////////////////////////////////////
 math::Quaternion SimbodyPhysics::QuadToQuad(const SimTK::Quaternion &_q)
 {
   return math::Quaternion(_q[0], _q[1], _q[2], _q[3]);
@@ -1554,6 +1561,12 @@ math::Quaternion SimbodyPhysics::QuadToQuad(const SimTK::Quaternion &_q)
 SimTK::Vec3 SimbodyPhysics::Vector3ToVec3(const math::Vector3 &_v)
 {
   return SimTK::Vec3(_v.x, _v.y, _v.z);
+}
+
+/////////////////////////////////////////////////
+SimTK::Vec3 SimbodyPhysics::Vector3ToVec3(const ignition::math::Vector3d &_v)
+{
+  return SimTK::Vec3(_v.X(), _v.Y(), _v.Z());
 }
 
 /////////////////////////////////////////////////

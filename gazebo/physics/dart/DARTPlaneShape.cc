@@ -47,8 +47,6 @@ void DARTPlaneShape::CreatePlane()
   DARTCollisionPtr dartCollisionParent =
       boost::dynamic_pointer_cast<DARTCollision>(this->collisionParent);
 
-  // math::Vector3 n = this->GetNormal();
-
   dart::dynamics::BodyNode *dtBodyNode =
       dartCollisionParent->GetDARTBodyNode();
   dart::dynamics::BoxShape *dtBoxShape =
@@ -57,10 +55,3 @@ void DARTPlaneShape::CreatePlane()
   dtBoxShape->setOffset(Eigen::Vector3d(0.0, 0.0, -0.005));
   dartCollisionParent->SetDARTCollisionShape(dtBoxShape, false);
 }
-
-//////////////////////////////////////////////////
-void DARTPlaneShape::SetAltitude(const math::Vector3 &_pos)
-{
-  PlaneShape::SetAltitude(_pos);
-}
-

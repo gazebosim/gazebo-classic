@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_DARTMESHSHAPE_PRIVATE_HH_
-#define _GAZEBO_DARTMESHSHAPE_PRIVATE_HH_
+#ifndef _GAZEBO_PHYSICS_DARTMESHSHAPE_PRIVATE_HH_
+#define _GAZEBO_PHYSICS_DARTMESHSHAPE_PRIVATE_HH_
 
 #include "gazebo/physics/dart/dart_inc.h"
 #include "gazebo/physics/dart/DARTMesh.hh"

@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: ODE Heightmap shape
- * Author: Nate Koenig
- * Date: 12 Nov 2009
- */
-
-#ifndef _ODEHEIGHTMAPSHAPE_HH_
-#define _ODEHEIGHTMAPSHAPE_HH_
+#ifndef _GAZEBO_PHYSICS_ODEHEIGHTMAPSHAPE_HH_
+#define _GAZEBO_PHYSICS_ODEHEIGHTMAPSHAPE_HH_
 
 #include <vector>
 

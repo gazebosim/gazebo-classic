@@ -14,16 +14,12 @@
  * limitations under the License.
  *
 */
-/* Desc: Heightmap shape
- * Author: Nate Koenig, Andrew Howard
- * Date: 8 May 2003
- */
-
-#ifndef _HEIGHTMAPSHAPE_HH_
-#define _HEIGHTMAPSHAPE_HH_
+#ifndef _GAZEBO_PHYSICS_HEIGHTMAPSHAPE_HH_
+#define _GAZEBO_PHYSICS_HEIGHTMAPSHAPE_HH_
 
 #include <string>
 #include <vector>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/common/ImageHeightmap.hh"
 #include "gazebo/common/HeightmapData.hh"
@@ -61,9 +57,12 @@ namespace gazebo
       /// \brief Initialize the heightmap.
       public: virtual void Init();
 
-      /// \brief Set the scale of the heightmap shape.
-      /// \param[in] _scale Scale to set the heightmap shape to.
-      public: virtual void SetScale(const math::Vector3 &_scale);
+      // Documentation inherited
+      public: virtual void SetScale(const math::Vector3 &_scale)
+              GAZEBO_DEPRECATED(7.0);
+
+      // Documentation inherited
+      public: virtual void SetScale(const ignition::math::Vector3d &_scale);
 
       /// \brief Get the URI of the heightmap image.
       /// \return The heightmap image URI.
@@ -71,17 +70,34 @@ namespace gazebo
 
       /// \brief Get the size in meters.
       /// \return The size in meters.
-      public: math::Vector3 GetSize() const;
+      /// \deprecated See function that returns an ignition::math object.
+      public: math::Vector3 GetSize() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the size in meters.
+      /// \return The size in meters.
+      public: ignition::math::Vector3d Size() const;
 
       /// \brief Get the origin in world coordinate frame.
       /// \return The origin in world coordinate frame.
-      public: math::Vector3 GetPos() const;
+      /// \deprecated See function that returns an ignition::math object.
+      public: math::Vector3 GetPos() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the origin in world coordinate frame.
+      /// \return The origin in world coordinate frame.
+      public: ignition::math::Vector3d Pos() const;
 
       /// \brief Return the number of vertices, which equals the size of the
       /// image used to load the heightmap.
       /// \return math::Vector2i, result.x = width,
       /// result.y = length/height.
-      public: math::Vector2i GetVertexCount() const;
+      /// \deprecated See function that returns an ignition::math object.
+      public: math::Vector2i GetVertexCount() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Return the number of vertices, which equals the size of the
+      /// image used to load the heightmap.
+      /// \return ignition::math::Vector2i, result.x = width,
+      /// result.y = length/height.
+      public: ignition::math::Vector2i VertexCount() const;
 
       /// \brief Get a height at a position.
       /// \param[in] _x X position.
@@ -172,7 +188,7 @@ namespace gazebo
       private: std::string fileFormat;
 
       /// \brief Terrain size
-      private: math::Vector3 heightmapSize;
+      private: ignition::math::Vector3d heightmapSize;
 
       #ifdef HAVE_GDAL
       /// \brief DEM used to generate the heights.

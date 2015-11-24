@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A ray shape
- * Author: Nate Koenig
- * Date: 14 Oct 2009
- */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
@@ -83,7 +78,14 @@ RayShape::~RayShape()
 void RayShape::SetPoints(const math::Vector3 &_posStart,
                          const math::Vector3 &_posEnd)
 {
-  math::Vector3 dir;
+  this->SetPoints(_posStart.Ign(), _posEnd.Ign());
+}
+
+//////////////////////////////////////////////////
+void RayShape::SetPoints(const ignition::math::Vector3d &_posStart,
+                         const ignition::math::Vector3d &_posEnd)
+{
+  ignition::math::Vector3d dir;
 
   this->relativeStartPos = _posStart;
   this->relativeEndPos = _posEnd;
@@ -92,10 +94,10 @@ void RayShape::SetPoints(const math::Vector3 &_posStart,
   {
     this->globalStartPos =
       this->collisionParent->GetWorldPose().CoordPositionAdd(
-        this->relativeStartPos);
+        this->relativeStartPos).Ign();
     this->globalEndPos =
       this->collisionParent->GetWorldPose().CoordPositionAdd(
-        this->relativeEndPos);
+        this->relativeEndPos).Ign();
   }
   else
   {
@@ -111,12 +113,32 @@ void RayShape::SetPoints(const math::Vector3 &_posStart,
 //////////////////////////////////////////////////
 void RayShape::GetRelativePoints(math::Vector3 &_posA, math::Vector3 &_posB)
 {
+  ignition::math::Vector3d a, b;
+  this->RelativePoints(a, b);
+  _posA = a;
+  _posB = b;
+}
+
+//////////////////////////////////////////////////
+void RayShape::RelativePoints(ignition::math::Vector3d &_posA,
+    ignition::math::Vector3d &_posB)
+{
   _posA = this->relativeStartPos;
   _posB = this->relativeEndPos;
 }
 
 //////////////////////////////////////////////////
 void RayShape::GetGlobalPoints(math::Vector3 &_posA, math::Vector3 &_posB)
+{
+  ignition::math::Vector3d a, b;
+  this->GlobalPoints(a, b);
+  _posA = a;
+  _posB = b;
+}
+
+//////////////////////////////////////////////////
+void RayShape::GlobalPoints(ignition::math::Vector3d &_posA,
+                            ignition::math::Vector3d &_posB)
 {
   _posA = this->globalStartPos;
   _posB = this->globalEndPos;
@@ -127,7 +149,7 @@ void RayShape::SetLength(double _len)
 {
   this->contactLen = _len;
 
-  math::Vector3 dir = this->relativeEndPos - this->relativeStartPos;
+  ignition::math::Vector3d dir = this->relativeEndPos - this->relativeStartPos;
   dir.Normalize();
 
   this->relativeEndPos = dir * _len + this->relativeStartPos;
@@ -135,6 +157,12 @@ void RayShape::SetLength(double _len)
 
 //////////////////////////////////////////////////
 void RayShape::SetScale(const math::Vector3 &_scale)
+{
+  this->SetScale(_scale.Ign());
+}
+
+//////////////////////////////////////////////////
+void RayShape::SetScale(const ignition::math::Vector3d &_scale)
 {
   if (this->scale == _scale)
     return;

@@ -51,18 +51,26 @@ void BulletHeightmapShape::Init()
 
   // This will force the Z-axis to be up
   int upIndex = 2;
-  btVector3 localScaling(this->scale.x, this->scale.y, 1.0);
+  btVector3 localScaling(this->scale.X(), this->scale.Y(), 1.0);
 
   this->heightFieldShape  = new btHeightfieldTerrainShape(
-      this->vertSize,     // # of heights along width
-      this->vertSize,     // # of height along height
-      &this->heights[0],  // The heights
-      1,                  // Height scaling
-      minHeight,          // Min height
-      maxHeight,          // Max height
-      upIndex,            // Up axis
+      // # of heights along width
+      this->vertSize,
+      // # of height along height
+      this->vertSize,
+      // The heights
+      &this->heights[0],
+      // Height scaling
+      1,
+      // Min height
+      minHeight,
+      // Max height
+      maxHeight,
+      // Up axis
+      upIndex,
       PHY_FLOAT,
-      false);             // Flip quad edges
+      // Flip quad edges
+      false);
 
   this->heightFieldShape->setLocalScaling(localScaling);
 

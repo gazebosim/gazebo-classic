@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _SIMBODY_MESHSHAPE_HH_
-#define _SIMBODY_MESHSHAPE_HH_
+#ifndef _GAZEBO_PHYSICS_SIMBODY_MESHSHAPE_HH_
+#define _GAZEBO_PHYSICS_SIMBODY_MESHSHAPE_HH_
 
 #include "gazebo/physics/MeshShape.hh"
 #include "gazebo/util/system.hh"

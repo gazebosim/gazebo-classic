@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_DARTCYLINDERSHAPE_HH_
-#define _GAZEBO_DARTCYLINDERSHAPE_HH_
+#ifndef _GAZEBO_PHYSICS_DARTCYLINDERSHAPE_HH_
+#define _GAZEBO_PHYSICS_DARTCYLINDERSHAPE_HH_
 
 #include "gazebo/physics/CylinderShape.hh"
 #include "gazebo/physics/dart/DARTPhysics.hh"

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_DARTSPHERESHAPE_HH_
-#define _GAZEBO_DARTSPHERESHAPE_HH_
+#ifndef _GAZEBO_PHYSICS_DARTSPHERESHAPE_HH_
+#define _GAZEBO_PHYSICS_DARTSPHERESHAPE_HH_
 
 #include "gazebo/physics/dart/DARTPhysics.hh"
 #include "gazebo/physics/dart/DARTCollision.hh"

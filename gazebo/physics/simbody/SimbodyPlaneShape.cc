@@ -34,20 +34,12 @@ SimbodyPlaneShape::~SimbodyPlaneShape()
 }
 
 /////////////////////////////////////////////////
-void SimbodyPlaneShape::SetAltitude(const math::Vector3 &_pos)
-{
-  PlaneShape::SetAltitude(_pos);
-}
-
-/////////////////////////////////////////////////
 void SimbodyPlaneShape::CreatePlane()
 {
   PlaneShape::CreatePlane();
   SimbodyCollisionPtr bParent;
   bParent = boost::dynamic_pointer_cast<SimbodyCollision>(
       this->collisionParent);
-
-  math::Vector3 n = this->GetNormal();
 
   // set collision shape
 }

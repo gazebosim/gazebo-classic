@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: Sphere shape
- * Author: Nate Koenig
- * Date: 14 Oct 2009
- */
-
-#ifndef _SPHERESHAPE_HH_
-#define _SPHERESHAPE_HH_
+#ifndef _GAZEBO_PHYSICS_SPHERESHAPE_HH_
+#define _GAZEBO_PHYSICS_SPHERESHAPE_HH_
 
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
@@ -63,7 +58,13 @@ namespace gazebo
 
       /// \brief Set the scale of the sphere.
       /// \param[in] _scale Scale to set the sphere to.
-      public: virtual void SetScale(const math::Vector3 &_scale);
+      /// \deprecated See function that accepts ignition::math parameters.
+      public: virtual void SetScale(const math::Vector3 &_scale)
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Set the scale of the sphere.
+      /// \param[in] _scale Scale to set the sphere to.
+      public: virtual void SetScale(const ignition::math::Vector3d &_scale);
 
       /// \brief Fill in the values for a geomertry message.
       /// \param[out] _msg The geometry message to fill.

@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _SIMBODY_PLANESHAPE_HH_
-#define _SIMBODY_PLANESHAPE_HH_
+#ifndef _GAZEBO_PHYSICS_SIMBODY_PLANESHAPE_HH_
+#define _GAZEBO_PHYSICS_SIMBODY_PLANESHAPE_HH_
 
 #include "gazebo/physics/PlaneShape.hh"
 #include "gazebo/util/system.hh"
@@ -37,9 +36,6 @@ namespace gazebo
 
       /// \brief Destructor
       public: virtual ~SimbodyPlaneShape();
-
-      // Documentation inherited
-      public: virtual void SetAltitude(const math::Vector3 &_pos);
 
       // Documentation inherited
       public: virtual void CreatePlane();

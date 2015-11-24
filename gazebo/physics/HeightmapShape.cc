@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Heightmap shape
- * Author: Nate Koenig, Andrew Howard
- * Date: 8 May 2003
- */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
@@ -97,7 +92,7 @@ int HeightmapShape::LoadImageAsTerrain(const std::string &_filename)
   }
 
   this->heightmapData = static_cast<common::HeightmapData*>(&this->img);
-  this->heightmapSize = this->sdf->Get<math::Vector3>("size");
+  this->heightmapSize = this->sdf->Get<ignition::math::Vector3d>("size");
 
   return 0;
 }
@@ -114,14 +109,14 @@ int HeightmapShape::LoadDEMAsTerrain(const std::string &_filename)
 
   if (this->sdf->HasElement("size"))
   {
-    this->heightmapSize = this->sdf->Get<math::Vector3>("size");
+    this->heightmapSize = this->sdf->Get<ignition::math::Vector3d>("size");
   }
   else
   {
-    this->heightmapSize.x = this->dem.GetWorldWidth();
-    this->heightmapSize.y = this->dem.GetWorldHeight();
-    this->heightmapSize.z = this->dem.GetMaxElevation() -
-        std::max(0.0f, this->dem.GetMinElevation());
+    this->heightmapSize.X(this->dem.GetWorldWidth());
+    this->heightmapSize.Y(this->dem.GetWorldHeight());
+    this->heightmapSize.Z(this->dem.GetMaxElevation() -
+        std::max(0.0f, this->dem.GetMinElevation()));
   }
 
   this->heightmapData = static_cast<common::HeightmapData*>(&this->dem);
@@ -209,7 +204,7 @@ void HeightmapShape::Load(sdf::ElementPtr _sdf)
 
   // Check if the geometry of the terrain data matches Ogre constrains
   if (this->heightmapData->GetWidth() != this->heightmapData->GetHeight() ||
-      !math::isPowerOfTwo(this->heightmapData->GetWidth() - 1))
+      !ignition::math::isPowerOfTwo(this->heightmapData->GetWidth() - 1))
   {
     gzerr << "Heightmap data size must be square, with a size of 2^n+1\n";
     return;
@@ -234,26 +229,32 @@ void HeightmapShape::Init()
 
   this->subSampling = 2;
 
-  math::Vector3 terrainSize = this->GetSize();
+  ignition::math::Vector3d terrainSize = this->Size();
 
   // sampling size along image width and height
   this->vertSize = (this->heightmapData->GetWidth() * this->subSampling)-1;
-  this->scale.x = terrainSize.x / this->vertSize;
-  this->scale.y = terrainSize.y / this->vertSize;
+  this->scale.X(terrainSize.X() / this->vertSize);
+  this->scale.Y(terrainSize.Y() / this->vertSize);
 
-  if (math::equal(this->heightmapData->GetMaxElevation(), 0.0f))
-    this->scale.z = fabs(terrainSize.z);
+  if (ignition::math::equal(this->heightmapData->GetMaxElevation(), 0.0f))
+    this->scale.Z(fabs(terrainSize.Z()));
   else
-    this->scale.z = fabs(terrainSize.z) /
-                    this->heightmapData->GetMaxElevation();
+    this->scale.Z(fabs(terrainSize.Z()) /
+                  this->heightmapData->GetMaxElevation());
 
   // Step 1: Construct the heightmap lookup table
   this->heightmapData->FillHeightMap(this->subSampling, this->vertSize,
-      this->GetSize().Ign(), this->scale.Ign(), this->flipY, this->heights);
+      this->Size(), this->scale, this->flipY, this->heights);
 }
 
 //////////////////////////////////////////////////
 void HeightmapShape::SetScale(const math::Vector3 &_scale)
+{
+  this->SetScale(_scale.Ign());
+}
+
+//////////////////////////////////////////////////
+void HeightmapShape::SetScale(const ignition::math::Vector3d &_scale)
 {
   if (this->scale == _scale)
     return;
@@ -270,13 +271,25 @@ std::string HeightmapShape::GetURI() const
 //////////////////////////////////////////////////
 math::Vector3 HeightmapShape::GetSize() const
 {
+  return this->Size();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d HeightmapShape::Size() const
+{
   return this->heightmapSize;
 }
 
 //////////////////////////////////////////////////
 math::Vector3 HeightmapShape::GetPos() const
 {
-  return this->sdf->Get<math::Vector3>("pos");
+  return this->Pos();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d HeightmapShape::Pos() const
+{
+  return this->sdf->Get<ignition::math::Vector3d>("pos");
 }
 
 //////////////////////////////////////////////////
@@ -296,8 +309,8 @@ void HeightmapShape::FillMsg(msgs::Geometry &_msg)
     }
   }
 
-  msgs::Set(_msg.mutable_heightmap()->mutable_size(), this->GetSize().Ign());
-  msgs::Set(_msg.mutable_heightmap()->mutable_origin(), this->GetPos().Ign());
+  msgs::Set(_msg.mutable_heightmap()->mutable_size(), this->Size());
+  msgs::Set(_msg.mutable_heightmap()->mutable_origin(), this->Pos());
   _msg.mutable_heightmap()->set_filename(this->img.GetFilename());
 }
 
@@ -310,7 +323,13 @@ void HeightmapShape::ProcessMsg(const msgs::Geometry & /*_msg*/)
 //////////////////////////////////////////////////
 math::Vector2i HeightmapShape::GetVertexCount() const
 {
-  return math::Vector2i(this->vertSize, this->vertSize);
+  return this->VertexCount();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector2i HeightmapShape::VertexCount() const
+{
+  return ignition::math::Vector2i(this->vertSize, this->vertSize);
 }
 
 /////////////////////////////////////////////////

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _ODESPHERESHAPE_HH_
-#define _ODESPHERESHAPE_HH_
+#ifndef _GAZEBO_PHYSICS_ODESPHERESHAPE_HH_
+#define _GAZEBO_PHYSICS_ODESPHERESHAPE_HH_
 
 #include "gazebo/physics/ode/ODEPhysics.hh"
 #include "gazebo/physics/ode/ODECollision.hh"

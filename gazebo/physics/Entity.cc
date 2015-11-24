@@ -703,7 +703,7 @@ void Entity::GetNearestEntityBelow(double &_distBelow,
   math::Vector3 end = start;
   start.z = box.min.z - 0.00001;
   end.z -= 1000;
-  rayShape->SetPoints(start, end);
+  rayShape->SetPoints(start.Ign(), end.Ign());
   rayShape->GetIntersection(_distBelow, _entityName);
   _distBelow += 0.00001;
 }

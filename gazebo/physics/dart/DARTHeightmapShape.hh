@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_DARTHEIGHTMAPSHAPE_HH_
-#define _GAZEBO_DARTHEIGHTMAPSHAPE_HH_
+#ifndef _GAZEBO_PHYSICS_DARTHEIGHTMAPSHAPE_HH_
+#define _GAZEBO_PHYSICS_DARTHEIGHTMAPSHAPE_HH_
 
 #include <vector>
 

@@ -14,9 +14,10 @@
  * limitations under the License.
  *
 */
+#ifndef _GAZEBO_PHYSICS_DARTMESH_HH_
+#define _GAZEBO_PHYSICS_DARTMESH_HH_
 
-#ifndef _GAZEBO_DARTMESH_HH_
-#define _GAZEBO_DARTMESH_HH_
+#include <math/ignition/Vector3.hh>
 
 #include "gazebo/physics/dart/DARTTypes.hh"
 #include "gazebo/util/system.hh"
@@ -45,9 +46,27 @@ namespace gazebo
       /// \param[in] _subMesh Pointer to the submesh.
       /// \param[in] _collision Pointer to the collsion object.
       /// \param[in] _scale Scaling factor.
+      /// \deprecated See function that accepts ignition::math parameters.
       public: void Init(const common::SubMesh *_subMesh,
                       DARTCollisionPtr _collision,
-                      const math::Vector3 &_scale);
+                      const math::Vector3 &_scale) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Create a mesh collision shape using a submesh.
+      /// \param[in] _subMesh Pointer to the submesh.
+      /// \param[in] _collision Pointer to the collsion object.
+      /// \param[in] _scale Scaling factor.
+      public: void Init(const common::SubMesh *_subMesh,
+                      DARTCollisionPtr _collision,
+                      const ignition::math::Vector3d &_scale);
+
+      /// \brief Create a mesh collision shape using a mesh.
+      /// \param[in] _mesh Pointer to the mesh.
+      /// \param[in] _collision Pointer to the collsion object.
+      /// \param[in] _scale Scaling factor.
+      /// \deprecated See function that accepts ignition::math parameters.
+      public: void Init(const common::Mesh *_mesh,
+                      DARTCollisionPtr _collision,
+                      const math::Vector3 &_scale) GAZEBO_DEPRECATED(7.0);
 
       /// \brief Create a mesh collision shape using a mesh.
       /// \param[in] _mesh Pointer to the mesh.
@@ -55,7 +74,7 @@ namespace gazebo
       /// \param[in] _scale Scaling factor.
       public: void Init(const common::Mesh *_mesh,
                       DARTCollisionPtr _collision,
-                      const math::Vector3 &_scale);
+                      const ignition::math::Vector3d &_scale);
 
       /// \brief Helper function to create the collision shape.
       /// \param[in] _vertices Array of vertices.
@@ -66,7 +85,7 @@ namespace gazebo
       private: void CreateMesh(float *_vertices, int *_indices,
                    unsigned int _numVertices, unsigned int _numIndices,
                    DARTCollisionPtr _collision,
-                   const math::Vector3 &_scale);
+                   const ignition::math::Vector3d &_scale);
 
       /// \internal
       /// \brief Pointer to private data

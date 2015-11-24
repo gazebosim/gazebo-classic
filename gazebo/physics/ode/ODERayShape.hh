@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: A ray
- * Author: Nate Koenig, Andrew Howard
- * Date: 14 Oct 2009
- */
-
-#ifndef _ODERAYSHAPE_HH_
-#define _ODERAYSHAPE_HH_
+#ifndef _GAZEBO_PHYSICS_ODERAYSHAPE_HH_
+#define _GAZEBO_PHYSICS_ODERAYSHAPE_HH_
 
 #include <string>
 
@@ -58,8 +53,16 @@ namespace gazebo
       ///        the body
       /// \param[in] _posStart Start position, relative the body
       /// \param[in] _posEnd End position, relative to the body
+      /// \deprecation See function that accepts ignition::math parameters.
       public: virtual void SetPoints(const math::Vector3 &_posStart,
-                                     const math::Vector3 &_posEnd);
+                  const math::Vector3 &_posEnd) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Set the ray based on starting and ending points relative to
+      /// the body
+      /// \param[in] _posStart Start position, relative the body
+      /// \param[in] _posEnd End position, relative to the body
+      public: virtual void SetPoints(const ignition::math::Vector3d &_posStart,
+                                     const ignition::math::Vector3d &_posEnd);
 
       /// \brief Ray-intersection callback.
       /// \param[in] _data Pointer to user data.

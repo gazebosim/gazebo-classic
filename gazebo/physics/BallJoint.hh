@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: A ball joint
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
-
-#ifndef _BALLJOINT_HH_
-#define _BALLJOINT_HH_
+#ifndef _GAZEBO_PHYSICS_BALLJOINT_HH_
+#define _GAZEBO_PHYSICS_BALLJOINT_HH_
 
 #include "gazebo/physics/Joint.hh"
 #include "gazebo/util/system.hh"

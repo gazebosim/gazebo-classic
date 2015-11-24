@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A ray
- * Author: Nate Koenig
- * Date: 24 May 2009
- */
-
 #include "gazebo/common/Assert.hh"
 
 #include "gazebo/physics/World.hh"
@@ -67,16 +62,16 @@ void BulletRayShape::Update()
     GZ_ASSERT(link != NULL, "Bullet link is NULL");
 
     this->globalStartPos = link->GetWorldPose().CoordPositionAdd(
-          this->relativeStartPos);
+          this->relativeStartPos).Ign();
 
     this->globalEndPos = link->GetWorldPose().CoordPositionAdd(
-          this->relativeEndPos);
+          this->relativeEndPos).Ign();
   }
 
-  btVector3 start(this->globalStartPos.x, this->globalStartPos.y,
-      this->globalStartPos.z);
-  btVector3 end(this->globalEndPos.x, this->globalEndPos.y,
-      this->globalEndPos.z);
+  btVector3 start(this->globalStartPos.X(), this->globalStartPos.Y(),
+      this->globalStartPos.Z());
+  btVector3 end(this->globalEndPos.X(), this->globalEndPos.Y(),
+      this->globalEndPos.Z());
 
   btCollisionWorld::ClosestRayResultCallback rayCallback(start, end);
   rayCallback.m_collisionFilterGroup = GZ_SENSOR_COLLIDE;
@@ -90,7 +85,7 @@ void BulletRayShape::Update()
 
   if (rayCallback.hasHit())
   {
-    math::Vector3 result(rayCallback.m_hitPointWorld.getX(),
+    ignition::math::Vector3d result(rayCallback.m_hitPointWorld.getX(),
                          rayCallback.m_hitPointWorld.getY(),
                          rayCallback.m_hitPointWorld.getZ());
     this->SetLength(this->globalStartPos.Distance(result));
@@ -112,18 +107,18 @@ void BulletRayShape::GetIntersection(double &_dist, std::string &_entity)
     GZ_ASSERT(link != NULL, "Bullet link is NULL");
 
     this->globalStartPos = link->GetWorldPose().CoordPositionAdd(
-          this->relativeStartPos);
+          this->relativeStartPos).Ign();
 
     this->globalEndPos = link->GetWorldPose().CoordPositionAdd(
-          this->relativeEndPos);
+          this->relativeEndPos).Ign();
   }
 
   if (this->physicsEngine)
   {
-    btVector3 start(this->globalStartPos.x, this->globalStartPos.y,
-        this->globalStartPos.z);
-    btVector3 end(this->globalEndPos.x, this->globalEndPos.y,
-        this->globalEndPos.z);
+    btVector3 start(this->globalStartPos.X(), this->globalStartPos.Y(),
+        this->globalStartPos.Z());
+    btVector3 end(this->globalEndPos.X(), this->globalEndPos.Y(),
+        this->globalEndPos.Z());
 
     btCollisionWorld::ClosestRayResultCallback rayCallback(start, end);
     rayCallback.m_collisionFilterGroup = GZ_SENSOR_COLLIDE;
@@ -132,7 +127,7 @@ void BulletRayShape::GetIntersection(double &_dist, std::string &_entity)
         start, end, rayCallback);
     if (rayCallback.hasHit())
     {
-      math::Vector3 result(rayCallback.m_hitPointWorld.getX(),
+      ignition::math::Vector3d result(rayCallback.m_hitPointWorld.getX(),
                            rayCallback.m_hitPointWorld.getY(),
                            rayCallback.m_hitPointWorld.getZ());
       _dist = this->globalStartPos.Distance(result);
@@ -147,7 +142,14 @@ void BulletRayShape::GetIntersection(double &_dist, std::string &_entity)
 
 //////////////////////////////////////////////////
 void BulletRayShape::SetPoints(const math::Vector3 &_posStart,
-                                   const math::Vector3 &_posEnd)
+                               const math::Vector3 &_posEnd)
+{
+  this->SetPoints(_posStart.Ign(), _posEnd.Ign());
+}
+
+//////////////////////////////////////////////////
+void BulletRayShape::SetPoints(const ignition::math::Vector3d &_posStart,
+                               const ignition::math::Vector3d &_posEnd)
 {
   RayShape::SetPoints(_posStart, _posEnd);
 }

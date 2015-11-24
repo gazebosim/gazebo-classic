@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: A ray
- * Author: Nate Koenig
- * Date: 24 May 2009
- */
-
-#ifndef _BULLETRAYGEOM_HH_
-#define _BULLETRAYGEOM_HH_
+#ifndef _GAZEBO_PHYSICS_BULLETRAYGEOM_HH_
+#define _GAZEBO_PHYSICS_BULLETRAYGEOM_HH_
 
 #include <string>
 #include "gazebo/physics/RayShape.hh"
@@ -56,8 +51,17 @@ namespace gazebo
       ///        the body
       /// \param posStart Start position, relative the body
       /// \param posEnd End position, relative to the body
+      /// \brief An intersection class keeping track of name and depth of
       public: void SetPoints(const math::Vector3 &_posStart,
-                             const math::Vector3 &_posEnd);
+                  const math::Vector3 &_posEnd) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Set the ray based on starting and ending points relative to
+      ///        the body
+      /// \param posStart Start position, relative the body
+      /// \param posEnd End position, relative to the body
+      /// \brief An intersection class keeping track of name and depth of
+      public: void SetPoints(const ignition::math::Vector3d &_posStart,
+                  const ignition::math::Vector3d &_posEnd);
 
       /// \brief Pointer to the Bullet physics engine
       private: BulletPhysicsPtr physicsEngine;

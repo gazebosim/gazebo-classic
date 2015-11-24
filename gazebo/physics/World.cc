@@ -1932,7 +1932,7 @@ EntityPtr World::GetEntityBelowPoint(const math::Vector3 &_pt)
   end.z -= 1000;
 
   this->dataPtr->physicsEngine->InitForThread();
-  this->dataPtr->testRay->SetPoints(_pt, end);
+  this->dataPtr->testRay->SetPoints(_pt.Ign(), end.Ign());
   this->dataPtr->testRay->GetIntersection(dist, entityName);
   return this->GetEntity(entityName);
 }
