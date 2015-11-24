@@ -36,6 +36,7 @@
 #include "gazebo/rendering/RenderEngine.hh"
 
 #include "gazebo/sensors/SensorFactory.hh"
+#include "gazebo/sensors/CameraSensor.hh"
 #include "gazebo/sensors/DepthCameraSensor.hh"
 
 using namespace gazebo;
@@ -45,30 +46,34 @@ GZ_REGISTER_STATIC_SENSOR("depth", DepthCameraSensor)
 
 //////////////////////////////////////////////////
 DepthCameraSensor::DepthCameraSensor()
-    : Sensor(sensors::IMAGE)
+    : CameraSensor()
 {
-  this->rendered = false;
-  this->connections.push_back(
-      event::Events::ConnectRender(
-        boost::bind(&DepthCameraSensor::Render, this)));
+  this->depthBuffer = NULL;
 }
 
 //////////////////////////////////////////////////
 DepthCameraSensor::~DepthCameraSensor()
 {
+  if (this->depthBuffer)
+    delete [] this->depthBuffer;
 }
 
 //////////////////////////////////////////////////
-void DepthCameraSensor::Load(const std::string &_worldName,
-                                   sdf::ElementPtr _sdf)
+std::string DepthCameraSensor::GetPointCloudTopic() const
 {
-  Sensor::Load(_worldName, _sdf);
+  std::string topicName = "~/";
+  topicName += this->parentName + "/" + this->GetName() + "/points";
+  boost::replace_all(topicName, "::", "/");
+
+  return topicName;
 }
 
 //////////////////////////////////////////////////
 void DepthCameraSensor::Load(const std::string &_worldName)
 {
-  Sensor::Load(_worldName);
+  CameraSensor::Load(_worldName);
+  this->pcdPub = this->node->Advertise<msgs::PointCloud>(
+      this->GetPointCloudTopic(), 50);
 }
 
 //////////////////////////////////////////////////
@@ -90,31 +95,39 @@ void DepthCameraSensor::Init()
     if (!this->scene)
       this->scene = rendering::create_scene(worldName, false, true);
 
-    this->camera = this->scene->CreateDepthCamera(
+    rendering::DepthCameraPtr depthCamera = this->scene->CreateDepthCamera(
         this->sdf->Get<std::string>("name"), false);
 
-    if (!this->camera)
+    if (!depthCamera)
     {
       gzerr << "Unable to create depth camera sensor\n";
       return;
     }
-    this->camera->SetCaptureData(true);
+    depthCamera->SetCaptureData(true);
 
     sdf::ElementPtr cameraSdf = this->sdf->GetElement("camera");
-    this->camera->Load(cameraSdf);
+    depthCamera->Load(cameraSdf);
 
     // Do some sanity checks
-    if (this->camera->GetImageWidth() == 0 ||
-        this->camera->GetImageHeight() == 0)
+    if (depthCamera->GetImageWidth() == 0 ||
+        depthCamera->GetImageHeight() == 0)
     {
       gzthrow("image has zero size");
     }
 
-    this->camera->Init();
-    this->camera->CreateRenderTexture(this->GetName() + "_RttTex_Image");
-    this->camera->CreateDepthTexture(this->GetName() + "_RttTex_Depth");
-    this->camera->SetWorldPose(this->pose);
-    this->camera->AttachToVisual(this->parentId, true);
+    depthCamera->Init();
+    depthCamera->CreateRenderTexture(this->GetName() + "_RttTex_Image");
+    depthCamera->CreateDepthTexture(this->GetName() + "_RttTex_Depth");
+    ignition::math::Pose3d cameraPose = this->pose;
+    if (cameraSdf->HasElement("pose"))
+      cameraPose = cameraSdf->Get<ignition::math::Pose3d>("pose") + cameraPose;
+
+    depthCamera->SetWorldPose(cameraPose);
+    depthCamera->AttachToVisual(this->parentId, true);
+
+    this->camera = boost::dynamic_pointer_cast<rendering::Camera>(depthCamera);
+
+    GZ_ASSERT(this->camera, "Unable to cast depth camera to camera");
   }
   else
     gzerr << "No world name\n";
@@ -129,48 +142,66 @@ void DepthCameraSensor::Init()
 }
 
 //////////////////////////////////////////////////
-void DepthCameraSensor::Fini()
+rendering::DepthCameraPtr DepthCameraSensor::GetDepthCamera() const
 {
-  Sensor::Fini();
-  this->scene->RemoveCamera(this->camera->GetName());
-  this->camera.reset();
-  this->scene.reset();
+  return boost::dynamic_pointer_cast<rendering::DepthCamera>(this->camera);
 }
 
 //////////////////////////////////////////////////
-void DepthCameraSensor::SetActive(bool value)
+const float *DepthCameraSensor::GetDepthData() const
 {
-  Sensor::SetActive(value);
-}
-
-//////////////////////////////////////////////////
-void DepthCameraSensor::Render()
-{
-  if (!this->camera || !this->IsActive() || !this->NeedsUpdate())
-    return;
-
-  this->camera->Render();
-
-  this->rendered = true;
-  this->lastMeasurementTime = this->scene->GetSimTime();
+  return this->depthBuffer;
 }
 
 //////////////////////////////////////////////////
 bool DepthCameraSensor::UpdateImpl(bool /*_force*/)
 {
-  // Sensor::Update(force);
   if (!this->rendered)
     return false;
 
   this->camera->PostRender();
 
+  if (this->imagePub && this->imagePub->HasConnections())
+  {
+    msgs::ImageStamped msg;
+    msgs::Set(msg.mutable_time(), this->scene->GetSimTime());
+    msg.mutable_image()->set_width(this->camera->GetImageWidth());
+    msg.mutable_image()->set_height(this->camera->GetImageHeight());
+    msg.mutable_image()->set_pixel_format(common::Image::R_FLOAT32);
+
+
+    msg.mutable_image()->set_step(this->camera->GetImageWidth() *
+        this->camera->GetImageDepth());
+
+    rendering::DepthCameraPtr depthCamera =
+        boost::dynamic_pointer_cast<rendering::DepthCamera>(this->camera);
+
+    unsigned int depthSamples = msg.image().width() * msg.image().height();
+    // cppchecker recommends sizeof(varname)
+    float f;
+    unsigned int depthBufferSize = depthSamples * sizeof(f);
+
+    if (!this->depthBuffer)
+      this->depthBuffer = new float[depthSamples];
+
+    memcpy(this->depthBuffer, depthCamera->GetDepthData(), depthBufferSize);
+
+    for (unsigned int i = 0; i < depthSamples; ++i)
+    {
+      // Mask ranges outside of min/max to +/- inf, as per REP 117
+      if (this->depthBuffer[i] >= this->camera->GetFarClip())
+      {
+        this->depthBuffer[i] = IGN_DBL_INF;
+      }
+      else if (this->depthBuffer[i] <= this->camera->GetNearClip())
+      {
+        this->depthBuffer[i] = -IGN_DBL_INF;
+      }
+    }
+    msg.mutable_image()->set_data(this->depthBuffer, depthBufferSize);
+    this->imagePub->Publish(msg);
+  }
+
   this->rendered = false;
   return true;
-}
-
-//////////////////////////////////////////////////
-bool DepthCameraSensor::SaveFrame(const std::string &_filename)
-{
-  this->SetActive(true);
-  return this->camera->SaveFrame(_filename);
 }

@@ -61,29 +61,82 @@ void ImageFrame::paintEvent(QPaintEvent * /*_event*/)
 /////////////////////////////////////////////////
 void ImageFrame::OnImage(const msgs::Image &_msg)
 {
-  unsigned char *rgbData = NULL;
-  unsigned int rgbDataSize = 0;
+  if (_msg.width() == 0 || _msg.height() == 0)
+    return;
 
-  // Convert the image data to RGB
+
   common::Image img;
-  img.SetFromData(
-      (unsigned char *)(_msg.data().c_str()),
-      _msg.width(), _msg.height(),
-      (common::Image::PixelFormat)(_msg.pixel_format()));
-
-  img.GetRGBData(&rgbData, rgbDataSize);
+  QImage::Format qFormat;
+  unsigned int imgSize = 0;
+  bool isDepthImage = false;
+  switch (_msg.pixel_format())
+  {
+    case common::Image::PixelFormat::L_INT8:
+    case common::Image::PixelFormat::L_INT16:
+    {
+      qFormat = QImage::Format_Mono;
+      imgSize = _msg.width() * _msg.height();
+      break;
+    }
+    case common::Image::PixelFormat::R_FLOAT16:
+    case common::Image::PixelFormat::R_FLOAT32:
+    {
+      qFormat = QImage::Format_RGB888;
+      imgSize = _msg.width() * _msg.height() * 3;
+      isDepthImage = true;
+      break;
+    }
+    default:
+    {
+      qFormat = QImage::Format_RGB888;
+      imgSize = _msg.width() * _msg.height() * 3;
+      break;
+    }
+  }
 
   if (_msg.width() != static_cast<unsigned int>(this->dataPtr->image.width()) ||
       _msg.height() != static_cast<unsigned int>(this->dataPtr->image.height()))
   {
-    QImage qimage(_msg.width(), _msg.height(), QImage::Format_RGB888);
+    QImage qimage(_msg.width(), _msg.height(), qFormat);
     this->dataPtr->image = qimage.copy();
   }
 
-  // Store the image data
-  memcpy(this->dataPtr->image.bits(), rgbData, rgbDataSize);
+  // Convert the image data to RGB
+  if (isDepthImage)
+  {
+    unsigned int depthSamples = _msg.width() * _msg.height();
+    // cppchecker recommends sizeof(varname)
+    float f;
+    unsigned int depthBufferSize = depthSamples * sizeof(f);
+    float *depthBuffer = new float[depthSamples];
+    memcpy(depthBuffer, _msg.data().c_str(), depthBufferSize);
+
+    float maxDepth = depthBuffer[0];
+    for (unsigned int i = 1; i < _msg.height() * _msg.width(); ++i)
+    {
+      if (depthBuffer[i] > maxDepth)
+        maxDepth = depthBuffer[i];
+    }
+
+    unsigned int idx = 0;
+    for ( unsigned int j = 0; j < _msg.height(); j++)
+    {
+      for ( unsigned int i = 0; i < _msg.width(); i++)
+      {
+        float d = depthBuffer[idx++];
+        d = 255 - (d / maxDepth * 255);
+        QRgb value = qRgb(d, d, d);
+        this->dataPtr->image.setPixel(i, j, value);
+      }
+    }
+
+    delete [] depthBuffer;
+  }
+  else
+  {
+    memcpy(this->dataPtr->image.bits(), _msg.data().c_str(), imgSize);
+  }
   boost::mutex::scoped_lock lock(this->dataPtr->mutex);
 
   this->update();
-  delete [] rgbData;
 }

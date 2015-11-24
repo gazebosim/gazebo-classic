@@ -20,6 +20,7 @@
 #include <string>
 
 #include "gazebo/sensors/Sensor.hh"
+#include "gazebo/sensors/CameraSensor.hh"
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/util/system.hh"
@@ -36,7 +37,7 @@ namespace gazebo
     /// \{
     /// \brief Depth camera sensor
     /// This sensor is used for simulating standard monocular cameras
-    class GAZEBO_VISIBLE DepthCameraSensor : public Sensor
+    class GAZEBO_VISIBLE DepthCameraSensor : public CameraSensor
     {
       /// \brief Constructor
       public: DepthCameraSensor();
@@ -44,47 +45,33 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~DepthCameraSensor();
 
-      /// \brief Load the sensor with SDF parameters
-      /// \param[in] _sdf SDF Sensor parameters
-      /// \param[in] _worldName Name of world to load from
-      protected: virtual void Load(const std::string &_worldName,
-                                   sdf::ElementPtr _sdf);
+      /// \brief Returns a pointer to the rendering::DepthCamera
+      /// \return Depth Camera pointer
+      public: virtual rendering::DepthCameraPtr GetDepthCamera() const;
+
+      /// \brief Gets the raw depth data from the sensor.
+      /// \return The pointer to the depth data array.
+      public: virtual const float *GetDepthData() const;
+
+      /// \brief Gets the point cloud data topic name of the sensor
+      /// \return Topic name
+      public: virtual std::string GetPointCloudTopic() const;
+
+      /// \brief Initialize the camera
+      public: virtual void Init();
 
       /// \brief Load the sensor with default parameters
       /// \param[in] _worldName Name of world to load from
       protected: virtual void Load(const std::string &_worldName);
 
-      /// \brief Initialize the camera
-      protected: virtual void Init();
-
       // Documentation inherited
       protected: virtual bool UpdateImpl(bool _force);
 
-      /// Finalize the camera
-      protected: virtual void Fini();
+      /// \brief Publisher of point cloud messages.
+      protected: transport::PublisherPtr pcdPub;
 
-      /// \brief Set whether the sensor is active or not
-      /// \param[in] _value True if active, false if not
-      public: virtual void SetActive(bool _value);
-
-      /// \brief Returns a pointer to the rendering::DepthCamera
-      /// \return Depth Camera pointer
-      public: rendering::DepthCameraPtr GetDepthCamera() const
-              {return this->camera;}
-
-      /// \brief Saves an image frame of depth camera sensor to file
-      /// \param[in] Name of file to save as
-      /// \return True if saved, false if not
-      public: bool SaveFrame(const std::string &_filename);
-
-      /// \brief Handle the render event.
-      private: void Render();
-
-      /// \brief Pointer to the camera.
-      private: rendering::DepthCameraPtr camera;
-
-      /// \brief True if the sensor was rendered.
-      private: bool rendered;
+      /// \brief Depth data buffer.
+      protected: float *depthBuffer;
     };
     /// \}
   }

@@ -118,7 +118,6 @@ namespace gazebo
       public: void DisconnectNewRGBPointCloud(event::ConnectionPtr &c)
               { newRGBPointCloud.Disconnect(c); }
 
-
       /// \brief Implementation of the render call
       private: virtual void RenderImpl();
 

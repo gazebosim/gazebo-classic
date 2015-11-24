@@ -62,12 +62,6 @@ namespace gazebo
       /// @todo to be implemented
       public: virtual std::string GetTopic() const;
 
-      // Documentation inherited
-      protected: virtual bool UpdateImpl(bool _force);
-
-      /// \brief Finalize the camera
-      protected: virtual void Fini();
-
       /// \brief Returns a pointer to the rendering::Camera.
       /// \return The Pointer to the camera sensor.
       public: rendering::CameraPtr GetCamera() const
@@ -93,8 +87,14 @@ namespace gazebo
       // Documentation inherited
       public: virtual bool IsActive();
 
+      // Documentation inherited
+      protected: virtual bool UpdateImpl(bool _force);
+
+      /// \brief Finalize the camera
+      protected: virtual void Fini();
+
       /// \brief Handle the render event.
-      private: void Render();
+      protected: virtual void Render();
 
       /// \brief Pointer to the camera.
       protected: rendering::CameraPtr camera;
@@ -103,7 +103,7 @@ namespace gazebo
       protected: transport::PublisherPtr imagePub;
 
       /// \brief True if the sensor was rendered.
-      private: bool rendered;
+      protected: bool rendered;
     };
     /// \}
   }

@@ -329,6 +329,21 @@ namespace gazebo
                    const std::string &_noiseType = "", double _noiseMean = 0.0,
                    double _noiseStdDev = 0.0);
 
+    /// \brief Spawn a depth camera.
+    /// \param[in] _modelName Name of the model.
+    /// \param[in] _cameraName Name of the camera.
+    /// \param[in] _pos Camera position.
+    /// \param[in] _rpy Camera roll, pitch, yaw.
+    /// \param[in] _width Output image width.
+    /// \param[in] _height Output image height.
+    /// \param[in] _rate Output Hz.
+    protected: void SpawnDepthCameraSensor(const std::string &_modelName,
+                   const std::string &_cameraName,
+                   const ignition::math::Vector3d &_pos,
+                   const ignition::math::Vector3d &_rpy,
+                   unsigned int _width = 320, unsigned int _height = 240,
+                   double _rate = 25, double _near = 0.1, double _far = 10);
+
     /// \brief Spawn an imu sensor laser.
     /// \param[in] _modelName Name of the model.
     /// \param[in] _imuSensorName Name of the imu sensor.
