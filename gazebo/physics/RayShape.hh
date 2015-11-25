@@ -96,10 +96,11 @@ namespace gazebo
       public: double GetLength() const;
 
       /// \brief Set the scale of the ray
+      /// \deprecated See function that accepts ignition::math parameters.
       public: virtual void SetScale(const math::Vector3 &_scale)
               GAZEBO_DEPRECATED(7.0);
 
-      /// \brief Set the scale of the ray
+      // Documentation inherited
       public: virtual void SetScale(const ignition::math::Vector3d &_scale);
 
       /// \brief Update the ray collision.
