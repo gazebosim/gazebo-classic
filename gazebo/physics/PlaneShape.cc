@@ -126,7 +126,7 @@ void PlaneShape::SetScale(const ignition::math::Vector3d &_scale)
   this->scale = _scale;
 
   ignition::math::Vector2d size = this->Size() *
-    ignition::math::Vector2d(_scale.X(), scale.Y());
+    ignition::math::Vector2d(_scale.X(), _scale.Y());
   this->SetSize(size);
 }
 
