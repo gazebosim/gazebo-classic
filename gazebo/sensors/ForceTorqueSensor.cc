@@ -288,11 +288,11 @@ bool ForceTorqueSensor::IsActive() const
 }
 
 //////////////////////////////////////////////////
-event::ConnectionPtr ForceTorqueSensor::ConnectUpdate(
+/*event::ConnectionPtr ForceTorqueSensor::ConnectUpdate(
     boost::function<void (msgs::WrenchStamped)> _subscriber)
 {
   return this->dataPtr->update.Connect(_subscriber);
-}
+}*/
 
 //////////////////////////////////////////////////
 event::ConnectionPtr ForceTorqueSensor::ConnectUpdate(

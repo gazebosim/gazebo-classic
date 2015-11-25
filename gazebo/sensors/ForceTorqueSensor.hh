@@ -83,9 +83,10 @@ namespace gazebo
       /// \return The connection, which must be kept in scope.
       /// \deprecated See ConnectUpdate that accepts a std::function
       /// parameter.
-      public: event::ConnectionPtr ConnectUpdate(
+      /*public: event::ConnectionPtr ConnectUpdate(
                   boost::function<void (msgs::WrenchStamped)> _subscriber)
               GAZEBO_DEPRECATED(7.0);
+              */
 
       /// \brief Connect a to the  update signal.
       /// \param[in] _subscriber Callback function.
