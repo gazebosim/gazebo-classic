@@ -19,6 +19,7 @@
 
 #include <map>
 #include <string>
+#include <memory>
 
 #include "gazebo/msgs/msgs.hh"
 
@@ -121,23 +122,72 @@ namespace gazebo
       ///                           CG of perspective links for each collision
       ///                           body, specified in the inertial frame.
       ///    \li Time time          time at which this contact happened.
-      public: msgs::Contacts GetContacts() const;
+      /// \deprecated See Contact()
+      public: msgs::Contacts GetContacts() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get all the contacts for the ContactSensor
+      /// \return Message that contains contact information between collision
+      /// pairs.
+      ///
+      /// During ODEPhysics::UpdateCollisions, all collision pairs in the
+      /// world are pushed into a buffer within ContactManager.
+      /// Subsequently, World::Update invokes ContactManager::PublishContacts
+      /// to publish all contacts generated within a timestep onto
+      /// Gazebo topic ~/physics/contacts.
+      ///
+      /// Each ContactSensor subscribes to the Gazebo ~/physics/contacts topic,
+      /// retrieves all contact pairs in a time step and filters them wthin
+      /// ContactSensor::OnContacts against <collision> body name
+      /// specified by the ContactSensor SDF.
+      /// All collision pairs between ContactSensor <collision> body and
+      /// other bodies in the world are stored in an array inside
+      /// contacts.proto.
+      ///
+      /// Within each element of the contact.proto array inside contacts.proto,
+      /// list of collisions between collision bodies
+      /// (collision1 and collision 2) are stored in an array of
+      /// elements, (position, normal, depth, wrench).  A timestamp has also
+      /// been added (time).  Details are described below:
+      ///
+      ///    \li string collision1  name of the first collision object.
+      ///    \li string collision2  name of the second collision object.
+      ///    \li Vector3d position  position of the contact joint in
+      ///                           inertial frame.
+      ///    \li Vector3d normal    normal of the contact joint in
+      ///                           inertial frame.
+      ///    \li double depth       intersection (penetration)
+      ///                           depth of two collision bodies.
+      ///    \li JointWrench wrench Forces and torques acting on both collision
+      ///                           bodies.  See joint_wrench.proto for details.
+      ///                           The forces and torques are applied at the
+      ///                           CG of perspective links for each collision
+      ///                           body, specified in the inertial frame.
+      ///    \li Time time          time at which this contact happened.
+      /// \deprecated See Contact()
+      public: msgs::Contacts Contacts() const;
 
       /// \brief Gets contacts of a collision
       /// \param[in] _collisionName Name of collision
       /// \return Container of contacts
+      /// \deprecated See Contacts(const std::string &_collisionName)
       public: std::map<std::string, physics::Contact> GetContacts(
-                  const std::string &_collisionName);
+                  const std::string &_collisionName) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Gets contacts of a collision
+      /// \param[in] _collisionName Name of collision
+      /// \return Container of contacts
+      public: std::map<std::string, physics::Contact> Contacts(
+                  const std::string &_collisionName) const;
 
       // Documentation inherited.
-      public: virtual bool IsActive();
+      public: virtual bool IsActive() const;
 
       /// \brief Callback for contact messages from the physics engine.
       private: void OnContacts(ConstContactsPtr &_msg);
 
       /// \internal
       /// \brief Private data pointer
-      private: std::uniqu_ptr<ContactSensorPrivate> dataPtr;
+      private: std::shared_ptr<ContactSensorPrivate> dataPtr;
     };
     /// \}
   }

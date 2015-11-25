@@ -24,14 +24,15 @@
 
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/msgs/msgs.hh"
+#include "gazebo/sensors/SensorPrivate.hh"
 
 namespace gazebo
 {
   namespace sensors
   {
     /// \internal
-    /// \brief Contact sensor public data.
-    class ContactSensorPrivate
+    /// \brief Contact sensor private data.
+    class ContactSensorPrivate : public SensorProtected
     {
       /// \brief Collisions this sensor monitors for contacts
       public: std::vector<std::string> collisions;

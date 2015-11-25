@@ -33,14 +33,15 @@
 #include "gazebo/physics/World.hh"
 
 #include "gazebo/rendering/RenderEngine.hh"
-#include "gazebo/rendering/Camera.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/RenderingIface.hh"
+#include "gazebo/rendering/Camera.hh"
 
 #include "gazebo/sensors/SensorFactory.hh"
-#include "gazebo/sensors/CameraSensor.hh"
 #include "gazebo/sensors/Noise.hh"
 
+#include "gazebo/sensors/CameraSensorPrivate.hh"
+#include "gazebo/sensors/CameraSensor.hh"
 
 using namespace gazebo;
 using namespace sensors;
@@ -49,10 +50,24 @@ GZ_REGISTER_STATIC_SENSOR("camera", CameraSensor)
 
 //////////////////////////////////////////////////
 CameraSensor::CameraSensor()
-    : Sensor(sensors::IMAGE)
+    : Sensor(*new CameraSensorPrivate, sensors::IMAGE)
 {
-  this->rendered = false;
-  this->connections.push_back(
+  this->dataPtr = std::static_pointer_cast<CameraSensorPrivate>(this->dPtr);
+
+  this->dataPtr->rendered = false;
+  this->dataPtr->connections.push_back(
+      event::Events::ConnectRender(
+        boost::bind(&CameraSensor::Render, this)));
+}
+
+//////////////////////////////////////////////////
+CameraSensor::CameraSensor(CameraSensorPrivate &_dataPtr)
+: Sensor(_dataPtr, sensors::IMAGE)
+{
+  this->dataPtr = std::static_pointer_cast<CameraSensorPrivate>(this->dPtr);
+
+  this->dataPtr->rendered = false;
+  this->dataPtr->connections.push_back(
       event::Events::ConnectRender(
         boost::bind(&CameraSensor::Render, this)));
 }
@@ -69,10 +84,10 @@ void CameraSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-std::string CameraSensor::GetTopic() const
+std::string CameraSensor::Topic() const
 {
   std::string topicName = "~/";
-  topicName += this->parentName + "/" + this->GetName() + "/image";
+  topicName += this->ParentName() + "/" + this->Name() + "/image";
   boost::replace_all(topicName, "::", "/");
 
   return topicName;
@@ -82,8 +97,8 @@ std::string CameraSensor::GetTopic() const
 void CameraSensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
-  this->imagePub = this->node->Advertise<msgs::ImageStamped>(
-      this->GetTopic(), 50);
+  this->dataPtr->imagePub = this->dataPtr->node->Advertise<msgs::ImageStamped>(
+      this->Topic(), 50);
 }
 
 //////////////////////////////////////////////////
@@ -96,58 +111,58 @@ void CameraSensor::Init()
     return;
   }
 
-  std::string worldName = this->world->GetName();
+  std::string worldName = this->dataPtr->world->GetName();
 
   if (!worldName.empty())
   {
-    this->scene = rendering::get_scene(worldName);
-    if (!this->scene)
+    this->dataPtr->scene = rendering::get_scene(worldName);
+    if (!this->dataPtr->scene)
     {
-      this->scene = rendering::create_scene(worldName, false, true);
+      this->dataPtr->scene = rendering::create_scene(worldName, false, true);
 
       // This usually means rendering is not available
-      if (!this->scene)
+      if (!this->dataPtr->scene)
       {
         gzerr << "Unable to create CameraSensor.\n";
         return;
       }
     }
 
-    this->camera = this->scene->CreateCamera(
-        this->sdf->Get<std::string>("name"), false);
+    this->dataPtr->camera = this->dataPtr->scene->CreateCamera(
+        this->dataPtr->sdf->Get<std::string>("name"), false);
 
-    if (!this->camera)
+    if (!this->dataPtr->camera)
     {
       gzerr << "Unable to create camera sensor[mono_camera]\n";
       return;
     }
-    this->camera->SetCaptureData(true);
+    this->dataPtr->camera->SetCaptureData(true);
 
-    sdf::ElementPtr cameraSdf = this->sdf->GetElement("camera");
-    this->camera->Load(cameraSdf);
+    sdf::ElementPtr cameraSdf = this->dataPtr->sdf->GetElement("camera");
+    this->dataPtr->camera->Load(cameraSdf);
 
     // Do some sanity checks
-    if (this->camera->GetImageWidth() == 0 ||
-        this->camera->GetImageHeight() == 0)
+    if (this->dataPtr->camera->GetImageWidth() == 0 ||
+        this->dataPtr->camera->GetImageHeight() == 0)
     {
       gzthrow("image has zero size");
     }
 
-    this->camera->Init();
-    this->camera->CreateRenderTexture(this->GetName() + "_RttTex");
-    ignition::math::Pose3d cameraPose = this->pose;
+    this->dataPtr->camera->Init();
+    this->dataPtr->camera->CreateRenderTexture(this->Name() + "_RttTex");
+    ignition::math::Pose3d cameraPose = this->dataPtr->pose;
     if (cameraSdf->HasElement("pose"))
       cameraPose = cameraSdf->Get<ignition::math::Pose3d>("pose") + cameraPose;
 
-    this->camera->SetWorldPose(cameraPose);
-    this->camera->AttachToVisual(this->parentId, true);
+    this->dataPtr->camera->SetWorldPose(cameraPose);
+    this->dataPtr->camera->AttachToVisual(this->ParentId(), true);
 
     if (cameraSdf->HasElement("noise"))
     {
-      this->noises[CAMERA_NOISE] =
+      this->dataPtr->noises[CAMERA_NOISE] =
         NoiseFactory::NewNoiseModel(cameraSdf->GetElement("noise"),
-        this->GetType());
-      this->noises[CAMERA_NOISE]->SetCamera(this->camera);
+        this->Type());
+      this->dataPtr->noises[CAMERA_NOISE]->SetCamera(this->dataPtr->camera);
     }
   }
   else
@@ -155,7 +170,7 @@ void CameraSensor::Init()
 
   // Disable clouds and moon on server side until fixed and also to improve
   // performance
-  this->scene->SetSkyXMode(rendering::Scene::GZ_SKYX_ALL &
+  this->dataPtr->scene->SetSkyXMode(rendering::Scene::GZ_SKYX_ALL &
       ~rendering::Scene::GZ_SKYX_CLOUDS &
       ~rendering::Scene::GZ_SKYX_MOON);
 
@@ -165,68 +180,74 @@ void CameraSensor::Init()
 //////////////////////////////////////////////////
 void CameraSensor::Fini()
 {
-  this->imagePub.reset();
+  this->dataPtr->imagePub.reset();
   Sensor::Fini();
 
-  if (this->camera)
+  if (this->dataPtr->camera)
   {
-    this->scene->RemoveCamera(this->camera->GetName());
+    this->dataPtr->scene->RemoveCamera(this->dataPtr->camera->GetName());
   }
 
-  this->camera.reset();
-  this->scene.reset();
+  this->dataPtr->camera.reset();
+  this->dataPtr->scene.reset();
 }
 
 //////////////////////////////////////////////////
 void CameraSensor::Render()
 {
-  if (!this->camera || !this->IsActive() || !this->NeedsUpdate())
+  if (!this->dataPtr->camera || !this->IsActive() || !this->NeedsUpdate())
     return;
 
   // Update all the cameras
-  this->camera->Render();
+  this->dataPtr->camera->Render();
 
-  this->rendered = true;
-  this->lastMeasurementTime = this->scene->GetSimTime();
+  this->dataPtr->rendered = true;
+  this->dataPtr->lastMeasurementTime = this->dataPtr->scene->GetSimTime();
 }
 
 //////////////////////////////////////////////////
-bool CameraSensor::UpdateImpl(bool /*_force*/)
+bool CameraSensor::UpdateImpl(const bool /*_force*/)
 {
-  if (!this->rendered)
+  if (!this->dataPtr->rendered)
     return false;
 
-  this->camera->PostRender();
+  this->dataPtr->camera->PostRender();
 
-  if (this->imagePub && this->imagePub->HasConnections())
+  if (this->dataPtr->imagePub && this->dataPtr->imagePub->HasConnections())
   {
     msgs::ImageStamped msg;
-    msgs::Set(msg.mutable_time(), this->scene->GetSimTime());
-    msg.mutable_image()->set_width(this->camera->GetImageWidth());
-    msg.mutable_image()->set_height(this->camera->GetImageHeight());
+    msgs::Set(msg.mutable_time(), this->dataPtr->scene->GetSimTime());
+    msg.mutable_image()->set_width(this->dataPtr->camera->GetImageWidth());
+    msg.mutable_image()->set_height(this->dataPtr->camera->GetImageHeight());
     msg.mutable_image()->set_pixel_format(common::Image::ConvertPixelFormat(
-          this->camera->GetImageFormat()));
+          this->dataPtr->camera->GetImageFormat()));
 
-    msg.mutable_image()->set_step(this->camera->GetImageWidth() *
-        this->camera->GetImageDepth());
-    msg.mutable_image()->set_data(this->camera->GetImageData(),
-        msg.image().width() * this->camera->GetImageDepth() *
+    msg.mutable_image()->set_step(this->dataPtr->camera->GetImageWidth() *
+        this->dataPtr->camera->GetImageDepth());
+    msg.mutable_image()->set_data(this->dataPtr->camera->GetImageData(),
+        msg.image().width() * this->dataPtr->camera->GetImageDepth() *
         msg.image().height());
 
-    this->imagePub->Publish(msg);
+    this->dataPtr->imagePub->Publish(msg);
   }
 
-  this->rendered = false;
+  this->dataPtr->rendered = false;
   return true;
 }
 
 //////////////////////////////////////////////////
 unsigned int CameraSensor::GetImageWidth() const
 {
-  if (this->camera)
-    return this->camera->GetImageWidth();
+  return this->ImageWidth();
+}
 
-  sdf::ElementPtr cameraSdf = this->sdf->GetElement("camera");
+//////////////////////////////////////////////////
+unsigned int CameraSensor::ImageWidth() const
+{
+  if (this->dataPtr->camera)
+    return this->dataPtr->camera->GetImageWidth();
+
+  sdf::ElementPtr cameraSdf = this->dataPtr->sdf->GetElement("camera");
   sdf::ElementPtr elem = cameraSdf->GetElement("image");
   return elem->Get<unsigned int>("width");
 }
@@ -234,10 +255,16 @@ unsigned int CameraSensor::GetImageWidth() const
 //////////////////////////////////////////////////
 unsigned int CameraSensor::GetImageHeight() const
 {
-  if (this->camera)
-    return this->camera->GetImageHeight();
+  return this->ImageHeight();
+}
 
-  sdf::ElementPtr cameraSdf = this->sdf->GetElement("camera");
+//////////////////////////////////////////////////
+unsigned int CameraSensor::ImageHeight() const
+{
+  if (this->dataPtr->camera)
+    return this->dataPtr->camera->GetImageHeight();
+
+  sdf::ElementPtr cameraSdf = this->dataPtr->sdf->GetElement("camera");
   sdf::ElementPtr elem = cameraSdf->GetElement("image");
   return elem->Get<unsigned int>("height");
 }
@@ -245,8 +272,14 @@ unsigned int CameraSensor::GetImageHeight() const
 //////////////////////////////////////////////////
 const unsigned char *CameraSensor::GetImageData()
 {
-  if (this->camera)
-    return this->camera->GetImageData(0);
+  return this->ImageData();
+}
+
+//////////////////////////////////////////////////
+const unsigned char *CameraSensor::ImageData() const
+{
+  if (this->dataPtr->camera)
+    return this->dataPtr->camera->GetImageData(0);
   else
     return NULL;
 }
@@ -256,15 +289,27 @@ bool CameraSensor::SaveFrame(const std::string &_filename)
 {
   this->SetActive(true);
 
-  if (this->camera)
-    return this->camera->SaveFrame(_filename);
+  if (this->dataPtr->camera)
+    return this->dataPtr->camera->SaveFrame(_filename);
   else
     return false;
 }
 
 //////////////////////////////////////////////////
-bool CameraSensor::IsActive()
+bool CameraSensor::IsActive() const
 {
   return Sensor::IsActive() ||
-    (this->imagePub && this->imagePub->HasConnections());
+    (this->dataPtr->imagePub && this->dataPtr->imagePub->HasConnections());
+}
+
+//////////////////////////////////////////////////
+rendering::CameraPtr CameraSensor::GetCamera() const
+{
+  return this->Camera();
+}
+
+//////////////////////////////////////////////////
+rendering::CameraPtr CameraSensor::Camera() const
+{
+  return this->dataPtr->camera;
 }

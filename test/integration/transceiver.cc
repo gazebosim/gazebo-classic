@@ -158,10 +158,10 @@ void TransceiverTest::TxRxEmptySpace(const std::string &_physicsEngine)
       {
         gazebo::msgs::WirelessNode txNode = nodesMsg->node(i);
         std::string essid = txNode.essid();
-        EXPECT_EQ(transmitters[essid]->GetESSID(), essid);
-        EXPECT_EQ(transmitters[essid]->GetFreq(), txNode.frequency());
+        EXPECT_EQ(transmitters[essid]->ESSID(), essid);
+        EXPECT_EQ(transmitters[essid]->Freq(), txNode.frequency());
         EXPECT_LE(txNode.signal_level(), 0);
-        EXPECT_GE(txNode.signal_level(), rx->GetSensitivity());
+        EXPECT_GE(txNode.signal_level(), rx->Sensitivity());
       }
       return;
     }

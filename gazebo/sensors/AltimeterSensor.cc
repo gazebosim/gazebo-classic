@@ -37,15 +37,14 @@ GZ_REGISTER_STATIC_SENSOR("altimeter", AltimeterSensor)
 
 /////////////////////////////////////////////////
 AltimeterSensor::AltimeterSensor()
-: Sensor(sensors::OTHER), dataPtr(new AltimeterSensorPrivate)
+: Sensor(*new AltimeterSensorPrivate, sensors::OTHER)
 {
+  this->dataPtr = std::static_pointer_cast<AltimeterSensorPrivate>(this->dPtr);
 }
 
 /////////////////////////////////////////////////
 AltimeterSensor::~AltimeterSensor()
 {
-  delete this->dataPtr;
-  this->dataPtr = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -57,9 +56,9 @@ void AltimeterSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 std::string AltimeterSensor::GetTopic() const
 {
-  std::string topicName = "~/" + this->parentName + '/' + this->GetName();
-  if (this->sdf->HasElement("topic"))
-    topicName += '/' + this->sdf->Get<std::string>("topic");
+  std::string topicName = "~/" + this->ParentName() + '/' + this->Name();
+  if (this->dataPtr->sdf->HasElement("topic"))
+    topicName += '/' + this->dataPtr->sdf->Get<std::string>("topic");
   boost::replace_all(topicName, "::", "/");
 
   return topicName;
@@ -70,20 +69,21 @@ void AltimeterSensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
 
-  physics::EntityPtr parentEntity = this->world->GetEntity(this->parentName);
+  physics::EntityPtr parentEntity = this->dataPtr->world->GetEntity(
+      this->ParentName());
   this->dataPtr->parentLink =
     boost::dynamic_pointer_cast<physics::Link>(parentEntity);
 
   this->dataPtr->altPub =
-    this->node->Advertise<msgs::Altimeter>(this->GetTopic(), 50);
+    this->dataPtr->node->Advertise<msgs::Altimeter>(this->Topic(), 50);
 
   // Parse sdf noise parameters
-  sdf::ElementPtr altElem = this->sdf->GetElement("altimeter");
+  sdf::ElementPtr altElem = this->dataPtr->sdf->GetElement("altimeter");
 
   if (!altElem)
   {
     gzerr << "Missing <altimeter> element in sensor["
-      << this->GetName() << "]\n";
+      << this->Name() << "]\n";
   }
   else
   {
@@ -92,7 +92,7 @@ void AltimeterSensor::Load(const std::string &_worldName)
         altElem->GetElement("vertical_position")->HasElement("noise"))
     {
       sdf::ElementPtr vertPosElem = altElem->GetElement("vertical_position");
-      this->noises[ALTIMETER_POSITION_NOISE_METERS] =
+      this->dPtr->noises[ALTIMETER_POSITION_NOISE_METERS] =
       NoiseFactory::NewNoiseModel(vertPosElem->GetElement("noise"));
     }
 
@@ -101,13 +101,13 @@ void AltimeterSensor::Load(const std::string &_worldName)
         altElem->GetElement("vertical_velocity")->HasElement("noise"))
     {
       sdf::ElementPtr vertVelElem = altElem->GetElement("vertical_velocity");
-      this->noises[ALTIMETER_VELOCITY_NOISE_METERS_PER_S] =
+      this->dataPtr->noises[ALTIMETER_VELOCITY_NOISE_METERS_PER_S] =
         NoiseFactory::NewNoiseModel(vertVelElem->GetElement("noise"));
     }
 
     // Initialise reference altitude
     std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-    this->dataPtr->altMsg.set_vertical_reference((this->pose +
+    this->dataPtr->altMsg.set_vertical_reference((this->dataPtr->pose +
          this->dataPtr->parentLink->GetWorldPose().Ign()).Pos().Z());
   }
 }
@@ -137,17 +137,18 @@ bool AltimeterSensor::UpdateImpl(bool /*_force*/)
       this->dataPtr->parentLink->GetWorldPose().Ign();
 
     // Get pose in gazebo reference frame
-    ignition::math::Pose3d altPose = this->pose + parentPose;
+    ignition::math::Pose3d altPose = this->dataPtr->pose + parentPose;
 
     ignition::math::Vector3d altVel =
-      this->dataPtr->parentLink->GetWorldLinearVel(this->pose.Pos()).Ign();
+      this->dataPtr->parentLink->GetWorldLinearVel(
+          this->dataPtr->pose.Pos()).Ign();
 
     // Apply noise to the position and velocity
-    if (this->noises.find(ALTIMETER_POSITION_NOISE_METERS) !=
-        this->noises.end())
+    if (this->dataPtr->noises.find(ALTIMETER_POSITION_NOISE_METERS) !=
+        this->dataPtr->noises.end())
     {
       this->dataPtr->altMsg.set_vertical_position(
-          this->noises[ALTIMETER_POSITION_NOISE_METERS]->Apply(
+          this->dataPtr->noises[ALTIMETER_POSITION_NOISE_METERS]->Apply(
             altPose.Pos().Z() - this->dataPtr->altMsg.vertical_reference()));
     }
     else
@@ -156,11 +157,11 @@ bool AltimeterSensor::UpdateImpl(bool /*_force*/)
           altPose.Pos().Z() - this->dataPtr->altMsg.vertical_reference());
     }
 
-    if (this->noises.find(ALTIMETER_VELOCITY_NOISE_METERS_PER_S) !=
-        this->noises.end())
+    if (this->dataPtr->noises.find(ALTIMETER_VELOCITY_NOISE_METERS_PER_S) !=
+        this->dataPtr->noises.end())
     {
       this->dataPtr->altMsg.set_vertical_velocity(
-          this->noises[ALTIMETER_VELOCITY_NOISE_METERS_PER_S]->Apply(
+          this->dataPtr->noises[ALTIMETER_VELOCITY_NOISE_METERS_PER_S]->Apply(
             altVel.Z()));
     }
     else
@@ -170,7 +171,8 @@ bool AltimeterSensor::UpdateImpl(bool /*_force*/)
   }
 
   // Save the time of the measurement
-  msgs::Set(this->dataPtr->altMsg.mutable_time(), this->world->GetSimTime());
+  msgs::Set(this->dataPtr->altMsg.mutable_time(),
+      this->dataPtr->world->GetSimTime());
 
   // Publish the message if needed
   if (this->dataPtr->altPub)

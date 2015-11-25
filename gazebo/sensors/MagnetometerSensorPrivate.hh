@@ -23,6 +23,7 @@
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/msgs/msgs.hh"
+#include "gazebo/sensors/SensorPrivate.hh"
 
 namespace gazebo
 {
@@ -30,7 +31,7 @@ namespace gazebo
   {
     /// \internal
     /// \brief MagnetometerSensor private data.
-    class MagnetometerSensorPrivate
+    class MagnetometerSensorPrivate : public SensorProtected
     {
       /// \brief Mutex to protect reads and writes.
       public: mutable std::mutex mutex;

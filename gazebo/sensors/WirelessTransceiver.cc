@@ -26,20 +26,30 @@
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/SensorManager.hh"
 #include "gazebo/physics/physics.hh"
-#include "gazebo/sensors/WirelessTransceiver.hh"
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
+
+#include "gazebo/sensors/WirelessTransceiverPrivate.hh"
+#include "gazebo/sensors/WirelessTransceiver.hh"
 
 using namespace gazebo;
 using namespace sensors;
 
 /////////////////////////////////////////////////
 WirelessTransceiver::WirelessTransceiver()
-  : Sensor(sensors::OTHER)
+  : Sensor(*new WirelessTransceiverPrivate, sensors::OTHER)
 {
-  this->active = false;
-  this->gain = 2.5;
-  this->power = 14.5;
+  this->dataPtr = std::static_pointer_cast<WirelessTransceiverPrivate>(
+      this->dPtr);
+
+  this->dataPtr->active = false;
+}
+
+/////////////////////////////////////////////////
+WirelessTransceiver::WirelessTransceiver(WirelessTransceiverPrivate &_dataPtr)
+  : Sensor(_dataPtr, sensors::OTHER)
+{
+  this->dataPtr->active = false;
 }
 
 /////////////////////////////////////////////////
@@ -48,10 +58,10 @@ WirelessTransceiver::~WirelessTransceiver()
 }
 
 //////////////////////////////////////////////////
-std::string WirelessTransceiver::GetTopic() const
+std::string WirelessTransceiver::Topic() const
 {
   std::string topicName = "~/";
-  topicName += this->parentName + "/" + this->GetName() + "/transceiver";
+  topicName += this->ParentName() + "/" + this->Name() + "/transceiver";
   boost::replace_all(topicName, "::", "/");
 
   return topicName;
@@ -62,33 +72,36 @@ void WirelessTransceiver::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
 
-  this->parentEntity = boost::dynamic_pointer_cast<physics::Link>(
-    this->world->GetEntity(this->parentName));
+  this->dataPtr->parentEntity = boost::dynamic_pointer_cast<physics::Link>(
+    this->dataPtr->world->GetEntity(this->ParentName()));
 
-  GZ_ASSERT(this->parentEntity.lock() != NULL, "parentEntity is NULL");
+  GZ_ASSERT(this->dataPtr->parentEntity.lock() != NULL, "parentEntity is NULL");
 
-  this->referencePose = this->pose +
-    this->parentEntity.lock()->GetWorldPose().Ign();
+  this->dataPtr->referencePose = this->dataPtr->pose +
+    this->dataPtr->parentEntity.lock()->GetWorldPose().Ign();
 
-  if (!this->sdf->HasElement("transceiver"))
+  if (!this->dataPtr->sdf->HasElement("transceiver"))
   {
     gzthrow("Transceiver sensor is missing <transceiver> SDF element");
   }
 
-  sdf::ElementPtr transceiverElem = this->sdf->GetElement("transceiver");
-  this->gain = transceiverElem->Get<double>("gain");
-  this->power = transceiverElem->Get<double>("power");
+  sdf::ElementPtr transceiverElem =
+    this->dataPtr->sdf->GetElement("transceiver");
+  this->dataPtr->gain = transceiverElem->Get<double>("gain");
+  this->dataPtr->power = transceiverElem->Get<double>("power");
 
-  if (this->gain < 0)
+  if (this->dataPtr->gain < 0)
   {
-    gzthrow("Wireless transceiver gain must be > 0. Current value is [" <<
-        this->gain << "]");
+    gzerr << "Attempting to set a negative gain of [" <<
+        this->dataPtr->gain << "]. Using a value of 1.\n";
+    this->dataPtr->gain = 1;
   }
 
-  if (this->power < 0)
+  if (this->dataPtr->power < 0)
   {
-    gzthrow("Wireless transceiver power must be > 0. Current value is [" <<
-        this->power << "]");
+    gzerr << "Attempting to set a negative transceiver power of[" <<
+        this->dataPtr->power << "]. Using a value of 1.\n";
+    this->dataPtr->power = 1;
   }
 }
 
@@ -101,19 +114,31 @@ void WirelessTransceiver::Init()
 /////////////////////////////////////////////////
 void WirelessTransceiver::Fini()
 {
-  this->pub.reset();
-  this->parentEntity.lock().reset();
+  this->dataPtr->pub.reset();
+  this->dataPtr->parentEntity.lock().reset();
   Sensor::Fini();
 }
 
 /////////////////////////////////////////////////
 double WirelessTransceiver::GetPower() const
 {
-  return this->power;
+  return this->Power();
+}
+
+/////////////////////////////////////////////////
+double WirelessTransceiver::Power() const
+{
+  return this->dataPtr->power;
 }
 
 /////////////////////////////////////////////////
 double WirelessTransceiver::GetGain() const
 {
-  return this->gain;
+  return this->Gain();
+}
+
+/////////////////////////////////////////////////
+double WirelessTransceiver::Gain() const
+{
+  return this->dataPtr->gain;
 }

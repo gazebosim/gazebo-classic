@@ -29,6 +29,9 @@ namespace gazebo
 {
   namespace sensors
   {
+    // Forward declare private data class
+    class WirelessTransceiverPrivate;
+
     /// \addtogroup gazebo_sensors
     /// \{
 
@@ -43,7 +46,7 @@ namespace gazebo
       public: ~WirelessTransceiver();
 
       // Documentation inherited
-      public: virtual std::string GetTopic() const;
+      public: virtual std::string Topic() const;
 
       // Documentation inherited
       public: virtual void Load(const std::string &_worldName);
@@ -56,26 +59,30 @@ namespace gazebo
 
       /// \brief Returns the antenna's gain of the receiver (dBi).
       /// \return Antenna's gain of the receiver (dBi).
-      public: double GetGain() const;
+      /// \deprecated See Gain()
+      public: double GetGain() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Returns the antenna's gain of the receiver (dBi).
+      /// \return Antenna's gain of the receiver (dBi).
+      public: double Gain() const;
 
       /// \brief Returns the receiver power (dBm).
       /// \return Receiver power (dBm).
-      public: double GetPower() const;
+      /// \deprecated See Power()
+      public: double GetPower() const GAZEBO_DEPRECATED(7.0);
 
-      /// \brief Publisher to publish propagation model data
-      protected: transport::PublisherPtr pub;
+      /// \brief Returns the receiver power (dBm).
+      /// \return Receiver power (dBm).
+      public: double Power() const;
 
-      /// \brief Receiver's power (dBm).
-      protected: double power;
+      /// \internal
+      /// \brief Constructor used by inherited classes
+      /// \param[in] _dataPtr Pointer to private data.
+      protected: WirelessTransceiver(WirelessTransceiverPrivate &_dataPtr);
 
-      /// \brief Antenna's gain of the receiver (dBi).
-      protected: double gain;
-
-      /// \brief Parent entity which the sensor is attached to
-      protected: boost::weak_ptr<physics::Link> parentEntity;
-
-      /// \brief Sensor reference pose
-      protected: ignition::math::Pose3d referencePose;
+      /// \internal
+      /// \brief Private data pointer
+      private: std::shared_ptr<WirelessTransceiverPrivate> dataPtr;
     };
     /// \}
   }

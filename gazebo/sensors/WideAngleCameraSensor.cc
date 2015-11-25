@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-
 #include <mutex>
 
 #include <boost/algorithm/string.hpp>
@@ -40,7 +39,6 @@
 #include "gazebo/sensors/WideAngleCameraSensorPrivate.hh"
 #include "gazebo/sensors/WideAngleCameraSensor.hh"
 
-
 using namespace gazebo;
 using namespace sensors;
 
@@ -48,8 +46,10 @@ GZ_REGISTER_STATIC_SENSOR("wideanglecamera", WideAngleCameraSensor)
 
 //////////////////////////////////////////////////
 WideAngleCameraSensor::WideAngleCameraSensor()
-  : dataPtr(new WideAngleCameraSensorPrivate)
+  : CameraSensor(*new WideAngleCameraSensorPrivate)
 {
+  this->dataPtr = std::static_pointer_cast<
+    WideAngleCameraSensorPrivate>(this->dPtr);
 }
 
 //////////////////////////////////////////////////
@@ -63,61 +63,61 @@ void WideAngleCameraSensor::Init()
     return;
   }
 
-  std::string worldName = this->world->GetName();
+  std::string worldName = this->dataPtr->world->GetName();
 
   if (!worldName.empty())
   {
-    this->scene = rendering::get_scene(worldName);
-    if (!this->scene)
+    this->dataPtr->scene = rendering::get_scene(worldName);
+    if (!this->dataPtr->scene)
     {
-      this->scene = rendering::create_scene(worldName, false, true);
+      this->dataPtr->scene = rendering::create_scene(worldName, false, true);
 
       // This usually means rendering is not available
-      if (!this->scene)
+      if (!this->dataPtr->scene)
       {
         gzerr << "Unable to create WideAngleCameraSensor." << std::endl;
         return;
       }
     }
 
-    this->camera = this->scene->CreateWideAngleCamera(
-        this->sdf->Get<std::string>("name"), false);
+    this->dataPtr->camera = this->dataPtr->scene->CreateWideAngleCamera(
+        this->dataPtr->sdf->Get<std::string>("name"), false);
 
-    if (!this->camera)
+    if (!this->dataPtr->camera)
     {
       gzerr << "Unable to create wide angle camera sensor[mono_camera]"
           << std::endl;
       return;
     }
-    this->camera->SetCaptureData(true);
+    this->dataPtr->camera->SetCaptureData(true);
 
-    sdf::ElementPtr cameraSdf = this->sdf->GetElement("camera");
-    this->camera->Load(cameraSdf);
+    sdf::ElementPtr cameraSdf = this->dataPtr->sdf->GetElement("camera");
+    this->dataPtr->camera->Load(cameraSdf);
 
     // Do some sanity checks
-    if (this->camera->GetImageWidth() == 0 ||
-        this->camera->GetImageHeight() == 0)
+    if (this->dataPtr->camera->GetImageWidth() == 0 ||
+        this->dataPtr->camera->GetImageHeight() == 0)
     {
       gzerr << "image has zero size" << std::endl;
       return;
     }
 
-    this->camera->Init();
-    this->camera->CreateRenderTexture(this->GetName() + "_RttTex");
+    this->dataPtr->camera->Init();
+    this->dataPtr->camera->CreateRenderTexture(this->Name() + "_RttTex");
 
-    math::Pose cameraPose = this->pose;
+    math::Pose cameraPose = this->dataPtr->pose;
     if (cameraSdf->HasElement("pose"))
       cameraPose = cameraSdf->Get<math::Pose>("pose") + cameraPose;
 
-    this->camera->SetWorldPose(cameraPose);
-    this->camera->AttachToVisual(this->parentId, true);
+    this->dataPtr->camera->SetWorldPose(cameraPose);
+    this->dataPtr->camera->AttachToVisual(this->ParentId(), true);
 
     if (cameraSdf->HasElement("noise"))
     {
-      this->noises[CAMERA_NOISE] =
+      this->dataPtr->noises[CAMERA_NOISE] =
         NoiseFactory::NewNoiseModel(cameraSdf->GetElement("noise"),
-        this->GetType());
-      this->noises[CAMERA_NOISE]->SetCamera(this->camera);
+        this->Type());
+      this->dataPtr->noises[CAMERA_NOISE]->SetCamera(this->dataPtr->camera);
     }
   }
   else
@@ -125,7 +125,7 @@ void WideAngleCameraSensor::Init()
 
   // Disable clouds and moon on server side until fixed and also to improve
   // performance
-  this->scene->SetSkyXMode(rendering::Scene::GZ_SKYX_ALL &
+  this->dataPtr->scene->SetSkyXMode(rendering::Scene::GZ_SKYX_ALL &
       ~rendering::Scene::GZ_SKYX_CLOUDS &
       ~rendering::Scene::GZ_SKYX_MOON);
 
@@ -136,20 +136,21 @@ void WideAngleCameraSensor::Init()
 void WideAngleCameraSensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
-  this->imagePub = this->node->Advertise<msgs::ImageStamped>(
-      this->GetTopic(), 50);
+  this->dataPtr->imagePub = this->dataPtr->node->Advertise<msgs::ImageStamped>(
+      this->Topic(), 50);
 
   std::string lensTopicName = "~/";
-  lensTopicName += this->parentName + "/" + this->GetName() + "/lens/";
+  lensTopicName += this->ParentName() + "/" + this->Name() + "/lens/";
   boost::replace_all(lensTopicName, "::", "/");
 
-  sdf::ElementPtr lensSdf = this->sdf->GetElement("camera")->GetElement("lens");
+  sdf::ElementPtr lensSdf =
+    this->dataPtr->sdf->GetElement("camera")->GetElement("lens");
 
   // create a topic that publishes lens states
-  this->dataPtr->lensPub = this->node->Advertise<msgs::CameraLens>(
+  this->dataPtr->lensPub = this->dataPtr->node->Advertise<msgs::CameraLens>(
     lensTopicName+"info", 1);
 
-  this->dataPtr->lensSub = this->node->Subscribe(lensTopicName + "control",
+  this->dataPtr->lensSub = this->dataPtr->node->Subscribe(lensTopicName + "control",
       &WideAngleCameraSensor::OnCtrlMessage, this);
 }
 
@@ -174,12 +175,16 @@ bool WideAngleCameraSensor::UpdateImpl(bool _force)
 
     for (; !this->dataPtr->hfovCmdQueue.empty();
         this->dataPtr->hfovCmdQueue.pop())
-      this->camera->SetHFOV(math::Angle(this->dataPtr->hfovCmdQueue.front()));
+    {
+      this->dataPtr->camera->SetHFOV(
+          math::Angle(this->dataPtr->hfovCmdQueue.front()));
+    }
 
     msgs::CameraLens msg;
 
     rendering::WideAngleCameraPtr wcamera =
-      boost::dynamic_pointer_cast<rendering::WideAngleCamera>(this->camera);
+      boost::dynamic_pointer_cast<rendering::WideAngleCamera>(
+          this->dataPtr->camera);
 
     const rendering::CameraLens *lens = wcamera->Lens();
 
@@ -209,7 +214,8 @@ void WideAngleCameraSensor::OnCtrlMessage(ConstCameraLensPtr &_msg)
   std::lock_guard<std::mutex> lock(this->dataPtr->lensCmdMutex);
 
   rendering::WideAngleCameraPtr wcamera =
-      boost::dynamic_pointer_cast<rendering::WideAngleCamera>(this->camera);
+      boost::dynamic_pointer_cast<rendering::WideAngleCamera>(
+          this->dataPtr->camera);
 
   rendering::CameraLens *lens = (wcamera->Lens());
 

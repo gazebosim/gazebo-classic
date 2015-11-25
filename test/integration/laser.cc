@@ -73,17 +73,17 @@ void LaserTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
   laser->Init();
   laser->Update(true);
 
-  EXPECT_EQ(640, laser->GetRayCount());
-  EXPECT_EQ(640, laser->GetRangeCount());
+  EXPECT_EQ(640, laser->RayCount());
+  EXPECT_EQ(640, laser->RangeCount());
   EXPECT_NEAR(laser->AngleMin().Radian(), -2.27, DOUBLE_TOL);
   EXPECT_NEAR(laser->AngleMax().Radian(), 2.27, DOUBLE_TOL);
-  EXPECT_NEAR(laser->GetRangeMin(), 0, DOUBLE_TOL);
-  EXPECT_NEAR(laser->GetRangeMax(), 10, DOUBLE_TOL);
-  EXPECT_NEAR(laser->GetRangeResolution(), 0.01, DOUBLE_TOL);
+  EXPECT_NEAR(laser->RangeMin(), 0, DOUBLE_TOL);
+  EXPECT_NEAR(laser->RangeMax(), 10, DOUBLE_TOL);
+  EXPECT_NEAR(laser->RangeResolution(), 0.01, DOUBLE_TOL);
 
-  for (int i = 0; i < laser->GetRangeCount(); ++i)
+  for (int i = 0; i < laser->RangeCount(); ++i)
   {
-    EXPECT_DOUBLE_EQ(GZ_DBL_INF, laser->GetRange(i));
+    EXPECT_DOUBLE_EQ(GZ_DBL_INF, laser->Range(i));
   }
 
   // Spawn a box and test for proper laser scan
@@ -95,7 +95,7 @@ void LaserTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
     laser->Update(true);
 
     std::vector<double> scan;
-    laser->GetRanges(scan);
+    laser->Ranges(scan);
 
     // run test against pre-recorded range data only in ode
     if (_physicsEngine == "ode")
@@ -120,7 +120,7 @@ void LaserTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
 
     physics::ModelPtr model = world->GetModel(modelName);
 
-    prevTime = laser->GetLastUpdateTime();
+    prevTime = laser->LastUpdateTime();
     model->SetWorldPose(math::Pose(0, 0, 1.0, 0, M_PI*0.5, 0));
 
     double diffMax, diffSum, diffAvg;
@@ -131,9 +131,9 @@ void LaserTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
     for (unsigned int j = 0; j < 5; ++j)
     {
       laser->Update(true);
-      laser->GetRanges(scan);
+      laser->Ranges(scan);
       laser->Update(true);
-      laser->GetRanges(scan2);
+      laser->Ranges(scan2);
 
       DoubleCompare(&scan[0], &scan2[0], 640, diffMax, diffSum, diffAvg);
       EXPECT_LT(diffMax, 1e-6);
@@ -244,10 +244,10 @@ void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
   double unitBoxSize = 1.0;
   double expectedRangeAtMidPoint = box01Pose.pos.x - unitBoxSize/2;
 
-  EXPECT_NEAR(raySensor->GetRange(mid), expectedRangeAtMidPoint, LASER_TOL);
-  EXPECT_NEAR(raySensor->GetRange(0), expectedRangeAtMidPoint, LASER_TOL);
+  EXPECT_NEAR(raySensor->Range(mid), expectedRangeAtMidPoint, LASER_TOL);
+  EXPECT_NEAR(raySensor->Range(0), expectedRangeAtMidPoint, LASER_TOL);
 
-  EXPECT_DOUBLE_EQ(raySensor->GetRange(samples-1), GZ_DBL_INF);
+  EXPECT_DOUBLE_EQ(raySensor->Range(samples-1), GZ_DBL_INF);
 
   // Move all boxes out of range
   world->GetModel(box01)->SetWorldPose(
@@ -258,9 +258,9 @@ void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
   world->Step(1);
   raySensor->Update(true);
 
-  for (int i = 0; i < raySensor->GetRayCount(); ++i)
+  for (int i = 0; i < raySensor->RayCount(); ++i)
   {
-    EXPECT_DOUBLE_EQ(raySensor->GetRange(i), GZ_DBL_INF);
+    EXPECT_DOUBLE_EQ(raySensor->Range(i), GZ_DBL_INF);
   }
 }
 
@@ -340,13 +340,13 @@ void LaserTest::LaserVertical(const std::string &_physicsEngine)
         - testPose.pos.x;
     expectedRangeAtMidPoint = expectedRangeAtMidPoint / cos(angleStep);
 
-    EXPECT_NEAR(raySensor->GetRange(i*samples + mid),
+    EXPECT_NEAR(raySensor->Range(i*samples + mid),
         expectedRangeAtMidPoint, LASER_TOL);
 
     angleStep += vAngleStep;
 
-    EXPECT_DOUBLE_EQ(raySensor->GetRange(i*samples), GZ_DBL_INF);
-    EXPECT_DOUBLE_EQ(raySensor->GetRange(i*samples + samples-1), GZ_DBL_INF);
+    EXPECT_DOUBLE_EQ(raySensor->Range(i*samples), GZ_DBL_INF);
+    EXPECT_DOUBLE_EQ(raySensor->Range(i*samples + samples-1), GZ_DBL_INF);
   }
 
   // Move box out of range
@@ -355,11 +355,11 @@ void LaserTest::LaserVertical(const std::string &_physicsEngine)
   world->Step(1);
   raySensor->Update(true);
 
-  for (int j = 0; j < raySensor->GetVerticalRayCount(); ++j)
+  for (int j = 0; j < raySensor->VerticalRayCount(); ++j)
   {
-    for (int i = 0; i < raySensor->GetRayCount(); ++i)
+    for (int i = 0; i < raySensor->RayCount(); ++i)
     {
-      EXPECT_DOUBLE_EQ(raySensor->GetRange(j*raySensor->GetRayCount() + i),
+      EXPECT_DOUBLE_EQ(raySensor->Range(j*raySensor->RayCount() + i),
           GZ_DBL_INF);
     }
   }
@@ -439,7 +439,7 @@ void LaserTest::LaserScanResolution(const std::string &_physicsEngine)
       double p = vMinAngle + v*vAngleStep;
       // yaw angle
       double y = hMinAngle + h*hAngleStep;
-      double R = raySensor->GetRange(v*hSamples*hResolution + h);
+      double R = raySensor->Range(v*hSamples*hResolution + h);
 
       math::Quaternion rot(0.0, -p, y);
       math::Vector3 axis = testPose.rot * rot * math::Vector3::UnitX;
@@ -519,7 +519,7 @@ void LaserTest::GroundPlane(const std::string &_physicsEngine)
       double p = vMinAngle + v*vAngleStep;
       // yaw angle
       double y = hMinAngle + h*hAngleStep;
-      double R = raySensor->GetRange(v*hSamples + h);
+      double R = raySensor->Range(v*hSamples + h);
 
       math::Quaternion rot(0.0, -p, y);
       math::Vector3 axis = testPose.rot * rot * math::Vector3::UnitX;
@@ -582,9 +582,9 @@ void LaserTest::LaserUnitNoise(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   bool foundNoise = false;
-  for (int i = 0; i < raySensor->GetRayCount(); ++i)
+  for (int i = 0; i < raySensor->RayCount(); ++i)
   {
-    if (fabs(raySensor->GetRange(i) - maxRange) > LASER_TOL)
+    if (fabs(raySensor->Range(i) - maxRange) > LASER_TOL)
       foundNoise = true;
   }
   EXPECT_TRUE(foundNoise);

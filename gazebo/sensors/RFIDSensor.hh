@@ -37,6 +37,9 @@ namespace gazebo
   {
     class RFIDTag;
 
+    // Forward declare private data class.
+    class RFIDSensorPrivate;
+
     /// \addtogroup gazebo_sensors
     /// \{
 
@@ -64,7 +67,7 @@ namespace gazebo
       public: void AddTag(RFIDTag *_tag);
 
       // Documentation inherited.
-      protected: virtual bool UpdateImpl(bool _force);
+      protected: virtual bool UpdateImpl(const bool _force);
 
       // Documentation inherited
       public: virtual void Fini();
@@ -76,24 +79,11 @@ namespace gazebo
       /// \brief Check the range for one RFID tag.
       /// \param[in] _pose Pose of a tag.
       /// \return Checks if tag is in range
-      /// \deprecated See CheckTagRange() that accepts an
-      /// ignition::math::Pose3d object.
-      private: bool CheckTagRange(const math::Pose &_pose)
-               GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Check the range for one RFID tag.
-      /// \param[in] _pose Pose of a tag.
-      /// \return Checks if tag is in range
       private: bool CheckTagRange(const ignition::math::Pose3d &_pose);
 
-      /// \brief Parent entity
-      private: physics::EntityPtr entity;
-
-      /// \brief Publisher for RFID pose messages.
-      private: transport::PublisherPtr scanPub;
-
-      /// \brief All the RFID tags.
-      private: std::vector<RFIDTag*> tags;
+      /// \internal
+      /// \brief Private data pointer
+      private: std::shared_ptr<RFIDSensorPrivate> dataPtr;
     };
     /// \}
   }

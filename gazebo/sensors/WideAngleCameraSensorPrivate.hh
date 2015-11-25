@@ -20,8 +20,8 @@
 #include <mutex>
 #include <queue>
 
+#include "gazebo/sensors/CameraSensorPrivate.hh"
 #include "gazebo/msgs/MessageTypes.hh"
-
 
 namespace gazebo
 {
@@ -29,7 +29,7 @@ namespace gazebo
   {
     /// \internal
     /// \brief Wide angle camera sensor private data.
-    class WideAngleCameraSensorPrivate
+    class WideAngleCameraSensorPrivate : public CameraSensorPrivate
     {
       /// \brief Publisher of lens info messages
       public: transport::PublisherPtr lensPub;

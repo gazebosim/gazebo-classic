@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: RFID Sensor
- * Author: Jonas Mellin & Zakiruz Zaman
- * Date: 6th December 2011
- */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
@@ -39,6 +34,7 @@
 
 #include "gazebo/sensors/RFIDTag.hh"
 #include "gazebo/sensors/SensorFactory.hh"
+#include "gazebo/sensors/RFIDSensorPrivate.hh"
 #include "gazebo/sensors/RFIDSensor.hh"
 
 using namespace gazebo;
@@ -48,9 +44,10 @@ GZ_REGISTER_STATIC_SENSOR("rfid", RFIDSensor)
 
 /////////////////////////////////////////////////
 RFIDSensor::RFIDSensor()
-  : Sensor(sensors::OTHER)
+  : Sensor(*new RFIDSensorPrivate, sensors::OTHER)
 {
-  this->active = false;
+  this->dataPtr = std::static_pointer_cast<RFIDSensorPrivate>(this->dPtr);
+  this->dataPtr->active = false;
 }
 
 /////////////////////////////////////////////////
@@ -72,15 +69,15 @@ void RFIDSensor::Load(const std::string &_worldName)
 
   // std::cout << "load rfid sensor" << std::endl;
 
-  if (this->sdf->GetElement("topic"))
+  if (this->dataPtr->sdf->GetElement("topic"))
   {
-    this->scanPub = this->node->Advertise<msgs::Pose>(
-        this->sdf->GetElement("topic")->Get<std::string>());
+    this->dataPtr->scanPub = this->dataPtr->node->Advertise<msgs::Pose>(
+        this->dataPtr->sdf->GetElement("topic")->Get<std::string>());
   }
 
-  this->entity = this->world->GetEntity(this->parentName);
+  this->dataPtr->entity = this->dataPtr->world->GetEntity(this->ParentName());
 
-  // this->sdf->PrintDescription("something");
+  // this->dataPtr->sdf->PrintDescription("something");
   /*std::cout << " setup ray" << std::endl;
   physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
 
@@ -94,7 +91,7 @@ void RFIDSensor::Load(const std::string &_worldName)
   this->laserShape = boost::dynamic_pointer_cast<physics::RayShape>(
       this->laserCollision->GetShape());
 
-  this->laserShape->Load(this->sdf);
+  this->laserShape->Load(this->dataPtr->sdf);
 
   this->laserShape->Init();
   */
@@ -129,16 +126,16 @@ void RFIDSensor::Init()
 }
 
 //////////////////////////////////////////////////
-bool RFIDSensor::UpdateImpl(bool /*_force*/)
+bool RFIDSensor::UpdateImpl(const bool /*_force*/)
 {
   this->EvaluateTags();
-  this->lastMeasurementTime = this->world->GetSimTime();
+  this->dataPtr->lastMeasurementTime = this->dataPtr->world->GetSimTime();
 
-  if (this->scanPub)
+  if (this->dataPtr->scanPub)
   {
     msgs::Pose msg;
-    msgs::Set(&msg, this->entity->GetWorldPose().Ign());
-    this->scanPub->Publish(msg);
+    msgs::Set(&msg, this->dataPtr->entity->GetWorldPose().Ign());
+    this->dataPtr->scanPub->Publish(msg);
   }
 
   return true;
@@ -150,7 +147,7 @@ void RFIDSensor::EvaluateTags()
   std::vector<RFIDTag*>::const_iterator ci;
 
   // iterate through the tags contained given rfid tag manager
-  for (ci = this->tags.begin(); ci != this->tags.end(); ++ci)
+  for (ci = this->dataPtr->tags.begin(); ci != this->dataPtr->tags.end(); ++ci)
   {
     ignition::math::Pose3d pos = (*ci)->TagPose();
     // std::cout << "link: " << tagModelPtr->GetName() << std::endl;
@@ -162,17 +159,11 @@ void RFIDSensor::EvaluateTags()
 }
 
 //////////////////////////////////////////////////
-bool RFIDSensor::CheckTagRange(const math::Pose &_pose)
-{
-  return this->CheckTagRange(_pose.Ign());
-}
-
-//////////////////////////////////////////////////
 bool RFIDSensor::CheckTagRange(const ignition::math::Pose3d &_pose)
 {
   // copy sensor vector pos into a temp var
   ignition::math::Vector3d v;
-  v = _pose.Pos() - this->entity->GetWorldPose().Ign().Pos();
+  v = _pose.Pos() - this->dataPtr->entity->GetWorldPose().Ign().Pos();
 
   // std::cout << v.GetLength() << std::endl;
 
@@ -189,5 +180,5 @@ bool RFIDSensor::CheckTagRange(const ignition::math::Pose3d &_pose)
 //////////////////////////////////////////////////
 void RFIDSensor::AddTag(RFIDTag *_tag)
 {
-  this->tags.push_back(_tag);
+  this->dataPtr->tags.push_back(_tag);
 }

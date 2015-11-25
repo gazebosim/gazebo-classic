@@ -85,7 +85,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Private data pointer
-      private: AltimeterSensorPrivate *dataPtr;
+      private: std::shared_ptr<AltimeterSensorPrivate> dataPtr;
     };
     /// \}
   }

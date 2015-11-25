@@ -20,6 +20,8 @@
   #include <Winsock2.h>
 #endif
 
+#include <functional>
+
 #include "ForceTorquePlugin.hh"
 
 using namespace gazebo;
@@ -50,7 +52,7 @@ void ForceTorquePlugin::Load(sensors::SensorPtr _parent,
     gzthrow("ForceTorquePlugin requires a force_torque sensor as its parent.");
 
   this->connection = this->parentSensor->ConnectUpdate(
-        boost::bind(&ForceTorquePlugin::OnUpdate, this, _1));
+        std::bind(&ForceTorquePlugin::OnUpdate, this, std::placeholders::_1));
 }
 
 /////////////////////////////////////////////////

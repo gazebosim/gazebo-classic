@@ -29,6 +29,7 @@
 #include "gazebo/sensors/Noise.hh"
 #include "gazebo/transport/transport.hh"
 
+#include "gazebo/sensors/GpsSensorPrivate.hh"
 #include "gazebo/sensors/GpsSensor.hh"
 
 using namespace gazebo;
@@ -38,8 +39,9 @@ GZ_REGISTER_STATIC_SENSOR("gps", GpsSensor)
 
 /////////////////////////////////////////////////
 GpsSensor::GpsSensor()
-: Sensor(sensors::OTHER)
+: Sensor(*new GpsSensorPrivate, sensors::OTHER)
 {
+  this->dataPtr = std::static_pointer_cast<GpsSensorPrivate>(this->dPtr);
 }
 
 /////////////////////////////////////////////////
@@ -58,31 +60,37 @@ void GpsSensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
 
-  physics::EntityPtr parentEntity = this->world->GetEntity(this->parentName);
-  this->parentLink = boost::dynamic_pointer_cast<physics::Link>(parentEntity);
+  physics::EntityPtr parentEntity =
+    this->dataPtr->world->GetEntity(this->ParentName());
+  this->dataPtr->parentLink =
+    boost::dynamic_pointer_cast<physics::Link>(parentEntity);
 
-  this->lastGpsMsg.set_link_name(this->parentName);
+  this->dataPtr->lastGpsMsg.set_link_name(this->ParentName());
 
-  this->topicName = "~/" + this->parentName + '/' + this->GetName();
-  if (this->sdf->HasElement("topic"))
-    this->topicName += '/' + this->sdf->Get<std::string>("topic");
-  boost::replace_all(this->topicName, "::", "/");
+  this->dataPtr->topicName = "~/" + this->ParentName() + '/' + this->Name();
+  if (this->dataPtr->sdf->HasElement("topic"))
+  {
+    this->dataPtr->topicName += '/' +
+      this->dataPtr->sdf->Get<std::string>("topic");
+  }
+  boost::replace_all(this->dataPtr->topicName, "::", "/");
 
-  this->gpsPub = this->node->Advertise<msgs::GPS>(this->topicName, 50);
+  this->dataPtr->gpsPub =
+    this->dataPtr->node->Advertise<msgs::GPS>(this->dataPtr->topicName, 50);
 
   // Parse sdf noise parameters
-  sdf::ElementPtr gpsElem = this->sdf->GetElement("gps");
+  sdf::ElementPtr gpsElem = this->dataPtr->sdf->GetElement("gps");
 
   // Load position noise parameters
   {
     sdf::ElementPtr posElem = gpsElem->GetElement("position_sensing");
-    this->noises[GPS_POSITION_LATITUDE_NOISE_METERS] =
+    this->dataPtr->noises[GPS_POSITION_LATITUDE_NOISE_METERS] =
       NoiseFactory::NewNoiseModel(
           posElem->GetElement("horizontal")->GetElement("noise"));
-    this->noises[GPS_POSITION_LONGITUDE_NOISE_METERS] =
+    this->dataPtr->noises[GPS_POSITION_LONGITUDE_NOISE_METERS] =
       NoiseFactory::NewNoiseModel(
           posElem->GetElement("horizontal")->GetElement("noise"));
-    this->noises[GPS_POSITION_ALTITUDE_NOISE_METERS] =
+    this->dataPtr->noises[GPS_POSITION_ALTITUDE_NOISE_METERS] =
       NoiseFactory::NewNoiseModel(
           posElem->GetElement("vertical")->GetElement("noise"));
   }
@@ -90,13 +98,13 @@ void GpsSensor::Load(const std::string &_worldName)
   // Load velocity noise parameters
   {
     sdf::ElementPtr velElem = gpsElem->GetElement("velocity_sensing");
-    this->noises[GPS_VELOCITY_LATITUDE_NOISE_METERS] =
+    this->dataPtr->noises[GPS_VELOCITY_LATITUDE_NOISE_METERS] =
       NoiseFactory::NewNoiseModel(
           velElem->GetElement("horizontal")->GetElement("noise"));
-    this->noises[GPS_VELOCITY_LONGITUDE_NOISE_METERS] =
+    this->dataPtr->noises[GPS_VELOCITY_LONGITUDE_NOISE_METERS] =
       NoiseFactory::NewNoiseModel(
           velElem->GetElement("horizontal")->GetElement("noise"));
-    this->noises[GPS_VELOCITY_ALTITUDE_NOISE_METERS] =
+    this->dataPtr->noises[GPS_VELOCITY_ALTITUDE_NOISE_METERS] =
       NoiseFactory::NewNoiseModel(
           velElem->GetElement("vertical")->GetElement("noise"));
   }
@@ -106,8 +114,8 @@ void GpsSensor::Load(const std::string &_worldName)
 void GpsSensor::Fini()
 {
   Sensor::Fini();
-  this->parentLink.reset();
-  this->sphericalCoordinates.reset();
+  this->dataPtr->parentLink.reset();
+  this->dataPtr->sphericalCoordinates.reset();
 }
 
 //////////////////////////////////////////////////
@@ -115,104 +123,100 @@ void GpsSensor::Init()
 {
   Sensor::Init();
 
-  this->sphericalCoordinates = this->world->GetSphericalCoordinates();
+  this->dataPtr->sphericalCoordinates = this->dataPtr->world->GetSphericalCoordinates();
 }
 
 //////////////////////////////////////////////////
-bool GpsSensor::UpdateImpl(bool /*_force*/)
+bool GpsSensor::UpdateImpl(const bool /*_force*/)
 {
   // Get latest pose information
-  if (this->parentLink)
+  if (this->dataPtr->parentLink)
   {
     // Measure position and apply noise
     {
       // Get postion in Cartesian gazebo frame
-      ignition::math::Pose3d gpsPose = this->pose +
-        this->parentLink->GetWorldPose().Ign();
+      ignition::math::Pose3d gpsPose = this->dataPtr->pose +
+        this->dataPtr->parentLink->GetWorldPose().Ign();
 
       // Apply position noise before converting to global frame
       gpsPose.Pos().X(
-        this->noises[GPS_POSITION_LATITUDE_NOISE_METERS]->Apply(
+        this->dataPtr->noises[GPS_POSITION_LATITUDE_NOISE_METERS]->Apply(
           gpsPose.Pos().X()));
       gpsPose.Pos().Y(
-        this->noises[GPS_POSITION_LONGITUDE_NOISE_METERS]->Apply(
+        this->dataPtr->noises[GPS_POSITION_LONGITUDE_NOISE_METERS]->Apply(
           gpsPose.Pos().Y()));
       gpsPose.Pos().Z(
-        this->noises[GPS_POSITION_ALTITUDE_NOISE_METERS]->Apply(
+        this->dataPtr->noises[GPS_POSITION_ALTITUDE_NOISE_METERS]->Apply(
           gpsPose.Pos().Z()));
 
       // Convert to global frames
-      ignition::math::Vector3d spherical = this->sphericalCoordinates->
+      ignition::math::Vector3d spherical = this->dataPtr->sphericalCoordinates->
         SphericalFromLocal(gpsPose.Pos());
-      this->lastGpsMsg.set_latitude_deg(spherical.X());
-      this->lastGpsMsg.set_longitude_deg(spherical.Y());
-      this->lastGpsMsg.set_altitude(spherical.Z());
+      this->dataPtr->lastGpsMsg.set_latitude_deg(spherical.X());
+      this->dataPtr->lastGpsMsg.set_longitude_deg(spherical.Y());
+      this->dataPtr->lastGpsMsg.set_altitude(spherical.Z());
     }
 
     // Measure velocity and apply noise
     {
       ignition::math::Vector3d gpsVelocity =
-        this->parentLink->GetWorldLinearVel(this->pose.Pos()).Ign();
+        this->dataPtr->parentLink->GetWorldLinearVel(
+            this->dataPtr->pose.Pos()).Ign();
 
       // Convert to global frame
       gpsVelocity =
-        this->sphericalCoordinates->GlobalFromLocal(gpsVelocity);
+        this->dataPtr->sphericalCoordinates->GlobalFromLocal(gpsVelocity);
 
       // Apply noise after converting to global frame
       gpsVelocity.X(
-        this->noises[GPS_VELOCITY_LATITUDE_NOISE_METERS]->Apply(
+        this->dataPtr->noises[GPS_VELOCITY_LATITUDE_NOISE_METERS]->Apply(
           gpsVelocity.X()));
       gpsVelocity.Y(
-        this->noises[GPS_VELOCITY_LONGITUDE_NOISE_METERS]->Apply(
+        this->dataPtr->noises[GPS_VELOCITY_LONGITUDE_NOISE_METERS]->Apply(
           gpsVelocity.Y()));
       gpsVelocity.Z(
-        this->noises[GPS_VELOCITY_ALTITUDE_NOISE_METERS]->Apply(
+        this->dataPtr->noises[GPS_VELOCITY_ALTITUDE_NOISE_METERS]->Apply(
           gpsVelocity.Z()));
 
-      this->lastGpsMsg.set_velocity_east(gpsVelocity.X());
-      this->lastGpsMsg.set_velocity_north(gpsVelocity.Y());
-      this->lastGpsMsg.set_velocity_up(gpsVelocity.Z());
+      this->dataPtr->lastGpsMsg.set_velocity_east(gpsVelocity.X());
+      this->dataPtr->lastGpsMsg.set_velocity_north(gpsVelocity.Y());
+      this->dataPtr->lastGpsMsg.set_velocity_up(gpsVelocity.Z());
     }
   }
-  this->lastMeasurementTime = this->world->GetSimTime();
-  msgs::Set(this->lastGpsMsg.mutable_time(), this->lastMeasurementTime);
+  this->dataPtr->lastMeasurementTime = this->dataPtr->world->GetSimTime();
+  msgs::Set(this->dataPtr->lastGpsMsg.mutable_time(),
+      this->dataPtr->lastMeasurementTime);
 
-  if (this->gpsPub)
-    this->gpsPub->Publish(this->lastGpsMsg);
+  if (this->dataPtr->gpsPub)
+    this->dataPtr->gpsPub->Publish(this->dataPtr->lastGpsMsg);
 
   return true;
-}
-
-//////////////////////////////////////////////////
-math::Angle GpsSensor::GetLongitude() const
-{
-  return this->Longitude();
 }
 
 //////////////////////////////////////////////////
 ignition::math::Angle GpsSensor::Longitude() const
 {
   ignition::math::Angle angle;
-  angle.Degree(this->lastGpsMsg.longitude_deg());
+  angle.Degree(this->dataPtr->lastGpsMsg.longitude_deg());
   return angle;
-}
-
-//////////////////////////////////////////////////
-math::Angle GpsSensor::GetLatitude() const
-{
-  return this->Latitude();
 }
 
 //////////////////////////////////////////////////
 ignition::math::Angle GpsSensor::Latitude() const
 {
   ignition::math::Angle angle;
-  angle.Degree(this->lastGpsMsg.latitude_deg());
+  angle.Degree(this->dataPtr->lastGpsMsg.latitude_deg());
   return angle;
 }
 
 //////////////////////////////////////////////////
 double GpsSensor::GetAltitude() const
 {
-  return this->lastGpsMsg.altitude();
+  return this->Altitude();
+}
+
+//////////////////////////////////////////////////
+double GpsSensor::Altitude() const
+{
+  return this->dataPtr->lastGpsMsg.altitude();
 }

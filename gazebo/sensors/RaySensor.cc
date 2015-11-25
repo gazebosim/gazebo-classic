@@ -40,6 +40,7 @@
 #include "gazebo/math/Rand.hh"
 
 #include "gazebo/sensors/SensorFactory.hh"
+#include "gazebo/sensors/RaySensorPrivate.hh"
 #include "gazebo/sensors/RaySensor.hh"
 #include "gazebo/sensors/Noise.hh"
 
@@ -50,7 +51,7 @@ GZ_REGISTER_STATIC_SENSOR("ray", RaySensor)
 
 //////////////////////////////////////////////////
 RaySensor::RaySensor()
-    : Sensor(sensors::RAY)
+    : Sensor(*new RaySensorPrivate, sensors::RAY)
 {
 }
 
@@ -60,10 +61,10 @@ RaySensor::~RaySensor()
 }
 
 //////////////////////////////////////////////////
-std::string RaySensor::GetTopic() const
+std::string RaySensor::Topic() const
 {
   std::string topicName = "~/";
-  topicName += this->parentName + "/" + this->GetName() + "/scan";
+  topicName += this->ParentName() + "/" + this->Name() + "/scan";
   boost::replace_all(topicName, "::", "/");
 
   return topicName;
@@ -73,48 +74,50 @@ std::string RaySensor::GetTopic() const
 void RaySensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
-  this->scanPub = this->node->Advertise<msgs::LaserScanStamped>(
-      this->GetTopic(), 50);
+  this->dataPtr->scanPub =
+    this->dataPtr->node->Advertise<msgs::LaserScanStamped>(this->Topic(), 50);
 
-  GZ_ASSERT(this->world != NULL,
+  GZ_ASSERT(this->dataPtr->world != NULL,
       "RaySensor did not get a valid World pointer");
 
-  physics::PhysicsEnginePtr physicsEngine = this->world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physicsEngine =
+    this->dataPtr->world->GetPhysicsEngine();
 
   GZ_ASSERT(physicsEngine != NULL,
       "Unable to get a pointer to the physics engine");
 
-  this->laserCollision = physicsEngine->CreateCollision("multiray",
-      this->parentName);
+  this->dataPtr->laserCollision = physicsEngine->CreateCollision("multiray",
+      this->ParentName());
 
-  GZ_ASSERT(this->laserCollision != NULL,
+  GZ_ASSERT(this->dataPtr->laserCollision != NULL,
       "Unable to create a multiray collision using the physics engine.");
 
-  this->laserCollision->SetName("ray_sensor_collision");
-  this->laserCollision->SetRelativePose(this->pose);
-  this->laserCollision->SetInitialRelativePose(this->pose);
+  this->dataPtr->laserCollision->SetName("ray_sensor_collision");
+  this->dataPtr->laserCollision->SetRelativePose(this->dataPtr->pose);
+  this->dataPtr->laserCollision->SetInitialRelativePose(this->dataPtr->pose);
 
-  this->laserShape = boost::dynamic_pointer_cast<physics::MultiRayShape>(
-                     this->laserCollision->GetShape());
+  this->dataPtr->laserShape = boost::dynamic_pointer_cast<physics::MultiRayShape>(
+                     this->dataPtr->laserCollision->GetShape());
 
-  GZ_ASSERT(this->laserShape != NULL,
+  GZ_ASSERT(this->dataPtr->laserShape != NULL,
       "Unable to get the laser shape from the multi-ray collision.");
 
-  this->laserShape->Load(this->sdf);
-  this->laserShape->Init();
+  this->dataPtr->laserShape->Load(this->dataPtr->sdf);
+  this->dataPtr->laserShape->Init();
 
   // Handle noise model settings.
-  sdf::ElementPtr rayElem = this->sdf->GetElement("ray");
+  sdf::ElementPtr rayElem = this->dataPtr->sdf->GetElement("ray");
   if (rayElem->HasElement("noise"))
   {
-    this->noises[RAY_NOISE] =
+    this->dataPtr->noises[RAY_NOISE] =
         NoiseFactory::NewNoiseModel(rayElem->GetElement("noise"),
-        this->GetType());
+        this->Type());
   }
 
-  this->parentEntity = this->world->GetEntity(this->parentName);
+  this->dataPtr->parentEntity =
+    this->dataPtr->world->GetEntity(this->ParentName());
 
-  GZ_ASSERT(this->parentEntity != NULL,
+  GZ_ASSERT(this->dataPtr->parentEntity != NULL,
       "Unable to get the parent entity.");
 }
 
@@ -122,7 +125,7 @@ void RaySensor::Load(const std::string &_worldName)
 void RaySensor::Init()
 {
   Sensor::Init();
-  this->laserMsg.mutable_scan()->set_frame(this->parentName);
+  this->dataPtr->laserMsg.mutable_scan()->set_frame(this->ParentName());
 }
 
 //////////////////////////////////////////////////
@@ -130,47 +133,35 @@ void RaySensor::Fini()
 {
   Sensor::Fini();
 
-  this->scanPub.reset();
+  this->dataPtr->scanPub.reset();
 
-  if (this->laserCollision)
+  if (this->dataPtr->laserCollision)
   {
-    this->laserCollision->Fini();
-    this->laserCollision.reset();
+    this->dataPtr->laserCollision->Fini();
+    this->dataPtr->laserCollision.reset();
   }
 
-  if (this->laserShape)
+  if (this->dataPtr->laserShape)
   {
-    this->laserShape->Fini();
-    this->laserShape.reset();
+    this->dataPtr->laserShape->Fini();
+    this->dataPtr->laserShape.reset();
   }
-}
-
-//////////////////////////////////////////////////
-math::Angle RaySensor::GetAngleMin() const
-{
-  return this->AngleMin();
 }
 
 //////////////////////////////////////////////////
 ignition::math::Angle RaySensor::AngleMin() const
 {
-  if (this->laserShape)
-    return this->laserShape->GetMinAngle().Ign();
+  if (this->dataPtr->laserShape)
+    return this->dataPtr->laserShape->GetMinAngle().Ign();
   else
     return -1;
 }
 
 //////////////////////////////////////////////////
-math::Angle RaySensor::GetAngleMax() const
-{
-  return this->AngleMax();
-}
-
-//////////////////////////////////////////////////
 ignition::math::Angle RaySensor::AngleMax() const
 {
-  if (this->laserShape)
-    return ignition::math::Angle(this->laserShape->GetMaxAngle().Radian());
+  if (this->dataPtr->laserShape)
+    return ignition::math::Angle(this->dataPtr->laserShape->GetMaxAngle().Radian());
   else
     return -1;
 }
@@ -178,8 +169,14 @@ ignition::math::Angle RaySensor::AngleMax() const
 //////////////////////////////////////////////////
 double RaySensor::GetRangeMin() const
 {
-  if (this->laserShape)
-    return this->laserShape->GetMinRange();
+  return this->RangeMin();
+}
+
+//////////////////////////////////////////////////
+double RaySensor::RangeMin() const
+{
+  if (this->dataPtr->laserShape)
+    return this->dataPtr->laserShape->GetMinRange();
   else
     return -1;
 }
@@ -187,8 +184,14 @@ double RaySensor::GetRangeMin() const
 //////////////////////////////////////////////////
 double RaySensor::GetRangeMax() const
 {
-  if (this->laserShape)
-    return this->laserShape->GetMaxRange();
+  return this->RangeMax();
+}
+
+//////////////////////////////////////////////////
+double RaySensor::RangeMax() const
+{
+  if (this->dataPtr->laserShape)
+    return this->dataPtr->laserShape->GetMaxRange();
   else
     return -1;
 }
@@ -196,15 +199,27 @@ double RaySensor::GetRangeMax() const
 //////////////////////////////////////////////////
 double RaySensor::GetAngleResolution() const
 {
+  return this->AngleResolution();
+}
+
+//////////////////////////////////////////////////
+double RaySensor::AngleResolution() const
+{
   return (this->AngleMax() - this->AngleMin()).Radian() /
-    (this->GetRangeCount()-1);
+    (this->RangeCount()-1);
 }
 
 //////////////////////////////////////////////////
 double RaySensor::GetRangeResolution() const
 {
-  if (this->laserShape)
-    return this->laserShape->GetResRange();
+  return this->RangeResolution();
+}
+
+//////////////////////////////////////////////////
+double RaySensor::RangeResolution() const
+{
+  if (this->dataPtr->laserShape)
+    return this->dataPtr->laserShape->GetResRange();
   else
     return -1;
 }
@@ -212,8 +227,14 @@ double RaySensor::GetRangeResolution() const
 //////////////////////////////////////////////////
 int RaySensor::GetRayCount() const
 {
-  if (this->laserShape)
-    return this->laserShape->GetSampleCount();
+  return this->RayCount();
+}
+
+//////////////////////////////////////////////////
+int RaySensor::RayCount() const
+{
+  if (this->dataPtr->laserShape)
+    return this->dataPtr->laserShape->GetSampleCount();
   else
     return -1;
 }
@@ -221,11 +242,17 @@ int RaySensor::GetRayCount() const
 //////////////////////////////////////////////////
 int RaySensor::GetRangeCount() const
 {
-  // TODO: maybe should check against this->laserMsg.ranges_size()
+  return this->RangeCount();
+}
+
+//////////////////////////////////////////////////
+int RaySensor::RangeCount() const
+{
+  // TODO: maybe should check against this->dataPtr->laserMsg.ranges_size()
   //       as users use this to loop through GetRange() calls
-  if (this->laserShape)
-    return this->laserShape->GetSampleCount() *
-      this->laserShape->GetScanResolution();
+  if (this->dataPtr->laserShape)
+    return this->dataPtr->laserShape->GetSampleCount() *
+      this->dataPtr->laserShape->GetScanResolution();
   else
     return -1;
 }
@@ -233,8 +260,14 @@ int RaySensor::GetRangeCount() const
 //////////////////////////////////////////////////
 int RaySensor::GetVerticalRayCount() const
 {
-  if (this->laserShape)
-    return this->laserShape->GetVerticalSampleCount();
+  return this->VerticalRayCount();
+}
+
+//////////////////////////////////////////////////
+int RaySensor::VerticalRayCount() const
+{
+  if (this->dataPtr->laserShape)
+    return this->dataPtr->laserShape->GetVerticalSampleCount();
   else
     return -1;
 }
@@ -242,44 +275,38 @@ int RaySensor::GetVerticalRayCount() const
 //////////////////////////////////////////////////
 int RaySensor::GetVerticalRangeCount() const
 {
-  if (this->laserShape)
-    return this->laserShape->GetVerticalSampleCount() *
-      this->laserShape->GetVerticalScanResolution();
+  return this->VerticalRangeCount();
+}
+
+//////////////////////////////////////////////////
+int RaySensor::VerticalRangeCount() const
+{
+  if (this->dataPtr->laserShape)
+    return this->dataPtr->laserShape->GetVerticalSampleCount() *
+      this->dataPtr->laserShape->GetVerticalScanResolution();
   else
     return -1;
 }
 
 //////////////////////////////////////////////////
-math::Angle RaySensor::GetVerticalAngleMin() const
-{
-  return this->VerticalAngleMin();
-}
-
-//////////////////////////////////////////////////
 ignition::math::Angle RaySensor::VerticalAngleMin() const
 {
-  if (this->laserShape)
+  if (this->dataPtr->laserShape)
   {
     return ignition::math::Angle(
-        this->laserShape->GetVerticalMinAngle().Radian());
+        this->dataPtr->laserShape->GetVerticalMinAngle().Radian());
   }
   else
     return -1;
 }
 
 //////////////////////////////////////////////////
-math::Angle RaySensor::GetVerticalAngleMax() const
-{
-  return math::Angle(this->VerticalAngleMax().Radian());
-}
-
-//////////////////////////////////////////////////
 ignition::math::Angle RaySensor::VerticalAngleMax() const
 {
-  if (this->laserShape)
+  if (this->dataPtr->laserShape)
   {
     return ignition::math::Angle(
-        this->laserShape->GetVerticalMaxAngle().Radian());
+        this->dataPtr->laserShape->GetVerticalMaxAngle().Radian());
   }
   else
     return -1;
@@ -288,121 +315,153 @@ ignition::math::Angle RaySensor::VerticalAngleMax() const
 //////////////////////////////////////////////////
 double RaySensor::GetVerticalAngleResolution() const
 {
+  return this->VerticalAngleResolution();
+}
+
+//////////////////////////////////////////////////
+double RaySensor::VerticalAngleResolution() const
+{
   return (this->VerticalAngleMax() - this->VerticalAngleMin()).Radian() /
-    (this->GetVerticalRangeCount()-1);
+    (this->VerticalRangeCount()-1);
 }
 
 //////////////////////////////////////////////////
 void RaySensor::GetRanges(std::vector<double> &_ranges)
 {
-  boost::mutex::scoped_lock lock(this->mutex);
+  this->Ranges(_ranges);
+}
 
-  _ranges.resize(this->laserMsg.scan().ranges_size());
-  memcpy(&_ranges[0], this->laserMsg.scan().ranges().data(),
-         sizeof(_ranges[0]) * this->laserMsg.scan().ranges_size());
+//////////////////////////////////////////////////
+void RaySensor::Ranges(std::vector<double> &_ranges) const
+{
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+
+  _ranges.resize(this->dataPtr->laserMsg.scan().ranges_size());
+  memcpy(&_ranges[0], this->dataPtr->laserMsg.scan().ranges().data(),
+         sizeof(_ranges[0]) * this->dataPtr->laserMsg.scan().ranges_size());
 }
 
 //////////////////////////////////////////////////
 double RaySensor::GetRange(unsigned int _index)
 {
-  boost::mutex::scoped_lock lock(this->mutex);
+  return this->Range(_index);
+}
 
-  if (this->laserMsg.scan().ranges_size() == 0)
+//////////////////////////////////////////////////
+double RaySensor::Range(const unsigned int _index) const
+{
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+
+  if (this->dataPtr->laserMsg.scan().ranges_size() == 0)
   {
     gzwarn << "ranges not constructed yet (zero sized)\n";
     return 0.0;
   }
-  if (static_cast<int>(_index) >= this->laserMsg.scan().ranges_size())
+  if (static_cast<int>(_index) >= this->dataPtr->laserMsg.scan().ranges_size())
   {
     gzerr << "Invalid range index[" << _index << "]\n";
     return 0.0;
   }
 
-  return this->laserMsg.scan().ranges(_index);
+  return this->dataPtr->laserMsg.scan().ranges(_index);
 }
 
 //////////////////////////////////////////////////
 double RaySensor::GetRetro(unsigned int _index)
 {
-  boost::mutex::scoped_lock lock(this->mutex);
+  return this->Retro(_index);
+}
 
-  if (this->laserMsg.scan().intensities_size() == 0)
+//////////////////////////////////////////////////
+double RaySensor::Retro(const unsigned int _index) const
+{
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+
+  if (this->dataPtr->laserMsg.scan().intensities_size() == 0)
   {
     gzwarn << "Intensities not constructed yet (zero size)\n";
     return 0.0;
   }
-  if (static_cast<int>(_index) >= this->laserMsg.scan().intensities_size())
+  if (static_cast<int>(_index) >=
+      this->dataPtr->laserMsg.scan().intensities_size())
   {
     gzerr << "Invalid intensity index[" << _index << "]\n";
     return 0.0;
   }
 
-  return this->laserMsg.scan().intensities(_index);
+  return this->dataPtr->laserMsg.scan().intensities(_index);
 }
 
 //////////////////////////////////////////////////
 int RaySensor::GetFiducial(unsigned int _index)
 {
-  boost::mutex::scoped_lock lock(this->mutex);
+  return this->Fiducial(_index);
+}
+
+//////////////////////////////////////////////////
+int RaySensor::Fiducial(const unsigned int _index) const
+{
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
   // Convert range index to ray index.
   // Find vertical/horizontal range indices (vIdx, hIdx) and mulitply
   // by the ratio of ray count to range count to get the vertical/horizontal
   // ray indices, which are then used to compute the final index into ray array.
-  int vIdx = _index / this->GetRangeCount();
-  vIdx = vIdx * this->GetVerticalRayCount() / this->GetVerticalRangeCount();
-  int hIdx = _index % this->GetRangeCount();
-  hIdx = hIdx * this->GetRayCount() / this->GetRangeCount();
-  int idx = vIdx * this->GetRayCount()  + hIdx;
+  int vIdx = _index / this->RangeCount();
+  vIdx = vIdx * this->VerticalRayCount() / this->VerticalRangeCount();
+  int hIdx = _index % this->RangeCount();
+  hIdx = hIdx * this->RayCount() / this->RangeCount();
+  int idx = vIdx * this->RayCount()  + hIdx;
 
-  if (idx >=  this->GetRayCount() * this->GetVerticalRayCount())
+  if (idx >= this->RayCount() * this->VerticalRayCount())
   {
     gzerr << "Invalid fiducial index[" << _index << "]\n";
     return 0.0;
   }
-  return this->laserShape->GetFiducial(idx);
+  return this->dataPtr->laserShape->GetFiducial(idx);
 }
 
 //////////////////////////////////////////////////
-bool RaySensor::UpdateImpl(bool /*_force*/)
+bool RaySensor::UpdateImpl(const bool /*_force*/)
 {
   // do the collision checks
   // this eventually call OnNewScans, so move mutex lock behind it in case
   // need to move mutex lock after this? or make the OnNewLaserScan connection
   // call somewhere else?
-  this->laserShape->Update();
-  this->lastMeasurementTime = this->world->GetSimTime();
+  this->dataPtr->laserShape->Update();
+  this->dataPtr->lastMeasurementTime = this->dataPtr->world->GetSimTime();
 
   // moving this behind laserShape update
-  boost::mutex::scoped_lock lock(this->mutex);
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
-  msgs::Set(this->laserMsg.mutable_time(), this->lastMeasurementTime);
+  msgs::Set(this->dataPtr->laserMsg.mutable_time(),
+            this->dataPtr->lastMeasurementTime);
 
-  msgs::LaserScan *scan = this->laserMsg.mutable_scan();
+  msgs::LaserScan *scan = this->dataPtr->laserMsg.mutable_scan();
 
   // Store the latest laser scans into laserMsg
   msgs::Set(scan->mutable_world_pose(),
-            this->pose + this->parentEntity->GetWorldPose().Ign());
+      this->dataPtr->pose + this->dataPtr->parentEntity->GetWorldPose().Ign());
   scan->set_angle_min(this->AngleMin().Radian());
   scan->set_angle_max(this->AngleMax().Radian());
-  scan->set_angle_step(this->GetAngleResolution());
-  scan->set_count(this->GetRangeCount());
+  scan->set_angle_step(this->AngleResolution());
+  scan->set_count(this->RangeCount());
 
   scan->set_vertical_angle_min(this->VerticalAngleMin().Radian());
   scan->set_vertical_angle_max(this->VerticalAngleMax().Radian());
-  scan->set_vertical_angle_step(this->GetVerticalAngleResolution());
-  scan->set_vertical_count(this->GetVerticalRangeCount());
+  scan->set_vertical_angle_step(this->VerticalAngleResolution());
+  scan->set_vertical_count(this->VerticalRangeCount());
 
-  scan->set_range_min(this->GetRangeMin());
-  scan->set_range_max(this->GetRangeMax());
+  scan->set_range_min(this->RangeMin());
+  scan->set_range_max(this->RangeMax());
 
   scan->clear_ranges();
   scan->clear_intensities();
 
-  unsigned int rayCount = this->GetRayCount();
-  unsigned int rangeCount = this->GetRangeCount();
-  unsigned int verticalRayCount = this->GetVerticalRayCount();
-  unsigned int verticalRangeCount = this->GetVerticalRangeCount();
+  unsigned int rayCount = this->RayCount();
+  unsigned int rangeCount = this->RangeCount();
+  unsigned int verticalRayCount = this->VerticalRayCount();
+  unsigned int verticalRangeCount = this->VerticalRangeCount();
 
   // Interpolation: for every point in range count, compute interpolated value
   // using four bounding ray samples.
@@ -477,40 +536,42 @@ bool RaySensor::UpdateImpl(bool /*_force*/)
         j4 = hjb + vjb * rayCount;
 
         // range readings of 4 corners
-        r1 = this->GetLaserShape()->GetRange(j1);
-        r2 = this->GetLaserShape()->GetRange(j2);
-        r3 = this->GetLaserShape()->GetRange(j3);
-        r4 = this->GetLaserShape()->GetRange(j4);
+        r1 = this->LaserShape()->GetRange(j1);
+        r2 = this->LaserShape()->GetRange(j2);
+        r3 = this->LaserShape()->GetRange(j3);
+        r4 = this->LaserShape()->GetRange(j4);
         range = (1-vb)*((1 - hb) * r1 + hb * r2)
             + vb *((1 - hb) * r3 + hb * r4);
 
         // intensity is averaged
-        intensity = 0.25 * (this->GetLaserShape()->GetRetro(j1)
-            + this->GetLaserShape()->GetRetro(j2)
-            + this->GetLaserShape()->GetRetro(j3)
-            + this->GetLaserShape()->GetRetro(j4));
+        intensity = 0.25 * (this->LaserShape()->GetRetro(j1)
+            + this->LaserShape()->GetRetro(j2)
+            + this->LaserShape()->GetRetro(j3)
+            + this->LaserShape()->GetRetro(j4));
       }
       else
       {
-        range = this->laserShape->GetRange(j * this->GetRayCount() + i);
-        intensity = this->laserShape->GetRetro(j * this->GetRayCount() + i);
+        range = this->dataPtr->laserShape->GetRange(j * this->RayCount() + i);
+        intensity = this->dataPtr->laserShape->GetRetro(j *
+            this->RayCount() + i);
       }
 
       // Mask ranges outside of min/max to +/- inf, as per REP 117
-      if (range >= this->GetRangeMax())
+      if (range >= this->RangeMax())
       {
-        range = GZ_DBL_INF;
+        range = IGN_DBL_INF;
       }
-      else if (range <= this->GetRangeMin())
+      else if (range <= this->RangeMin())
       {
-        range = -GZ_DBL_INF;
+        range = -IGN_DBL_INF;
       }
-      else if (this->noises.find(RAY_NOISE) != this->noises.end())
+      else if (this->dataPtr->noises.find(RAY_NOISE) !=
+               this->dataPtr->noises.end())
       {
         // currently supports only one noise model per laser sensor
-        range = this->noises[RAY_NOISE]->Apply(range);
+        range = this->dataPtr->noises[RAY_NOISE]->Apply(range);
         range = ignition::math::clamp(range,
-            this->GetRangeMin(), this->GetRangeMax());
+            this->RangeMin(), this->RangeMax());
       }
 
       scan->add_ranges(range);
@@ -518,15 +579,27 @@ bool RaySensor::UpdateImpl(bool /*_force*/)
     }
   }
 
-  if (this->scanPub && this->scanPub->HasConnections())
-    this->scanPub->Publish(this->laserMsg);
+  if (this->dataPtr->scanPub && this->dataPtr->scanPub->HasConnections())
+    this->dataPtr->scanPub->Publish(this->dataPtr->laserMsg);
 
   return true;
 }
 
 //////////////////////////////////////////////////
-bool RaySensor::IsActive()
+bool RaySensor::IsActive() const
 {
   return Sensor::IsActive() ||
-    (this->scanPub && this->scanPub->HasConnections());
+    (this->dataPtr->scanPub && this->dataPtr->scanPub->HasConnections());
+}
+
+//////////////////////////////////////////////////
+physics::MultiRayShapePtr RaySensor::GetLaserShape() const
+{
+  return this->LaserShape();
+}
+
+//////////////////////////////////////////////////
+physics::MultiRayShapePtr RaySensor::LaserShape() const
+{
+  return this->dataPtr->laserShape;
 }

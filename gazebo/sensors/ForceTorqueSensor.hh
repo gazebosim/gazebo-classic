@@ -29,6 +29,9 @@ namespace gazebo
   /// \brief Sensors namespace
   namespace sensors
   {
+    // Forward declare private data class.
+    class ForceTorqueSensorPrivate;
+
     /// \addtogroup gazebo_sensors
     /// \{
 
@@ -52,13 +55,7 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited.
-      public: virtual std::string GetTopic() const;
-
-      /// \brief Get the current joint torque.
-      /// \return The latest measured torque.
-      /// \deprecated See Torque() function that returns an
-      /// ignition::math::Vector3d object.
-      public: math::Vector3 GetTorque() const GAZEBO_DEPRECATED(6.0);
+      public: virtual std::string Topic() const;
 
       /// \brief Get the current joint torque.
       /// \return The latest measured torque.
@@ -66,32 +63,41 @@ namespace gazebo
 
       /// \brief Get the current joint force.
       /// \return The latested measured force.
-      /// \deprecated See Force() function that returns an
-      /// ignition::math::Vector3d object.
-      public: math::Vector3 GetForce() const GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Get the current joint force.
-      /// \return The latested measured force.
       public: ignition::math::Vector3d Force() const;
 
       /// \brief Get Parent Joint
       /// \return Pointer to the joint containing this sensor
-      public: physics::JointPtr GetJoint() const;
+      /// \deprecated See Joint()
+      public: physics::JointPtr GetJoint() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get Parent Joint
+      /// \return Pointer to the joint containing this sensor
+      /// \deprecated See Joint()
+      public: physics::JointPtr Joint() const;
 
       // Documentation inherited.
-      public: virtual bool IsActive();
+      public: virtual bool IsActive() const;
 
       /// \brief Connect a to the  update signal.
       /// \param[in] _subscriber Callback function.
       /// \return The connection, which must be kept in scope.
-      public: template<typename T>
-              event::ConnectionPtr ConnectUpdate(T _subscriber)
-              {return update.Connect(_subscriber);}
+      /// \deprecated See ConnectUpdate that accepts a std::function
+      /// parameter.
+      public: event::ConnectionPtr ConnectUpdate(
+                  boost::function<void (msgs::WrenchStamped)> _subscriber)
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Connect a to the  update signal.
+      /// \param[in] _subscriber Callback function.
+      /// \return The connection, which must be kept in scope.
+      /// \deprecated See ConnectUpdate that accepts a std::function
+      /// parameter.
+      public: event::ConnectionPtr ConnectUpdate(
+                  std::function<void (msgs::WrenchStamped)> _subscriber);
 
       /// \brief Disconnect from the update signal.
       /// \param[in] _conn Connection to remove.
-      public: void DisconnectUpdate(event::ConnectionPtr &_conn)
-              {update.Disconnect(_conn);}
+      public: void DisconnectUpdate(event::ConnectionPtr &_conn);
 
       // Documentation inherited.
       protected: virtual bool UpdateImpl(bool _force);
@@ -99,41 +105,9 @@ namespace gazebo
       // Documentation inherited.
       protected: virtual void Fini();
 
-      /// \brief Update event.
-      protected: event::EventT<void(msgs::WrenchStamped)> update;
-
-      /// \brief Parent joint, from which we get force torque info.
-      private: physics::JointPtr parentJoint;
-
-      /// \brief Publishes the wrenchMsg.
-      private: transport::PublisherPtr wrenchPub;
-
-      /// \brief Message the store the current force torque info.
-      private: msgs::WrenchStamped wrenchMsg;
-
-      /// \brief Mutex to protect the wrench message
-      private: boost::mutex mutex;
-
-      /// \brief Which orientation we support for returning sensor measure
-      private: enum MeasureFrame
-      {
-        PARENT_LINK,
-        CHILD_LINK,
-        SENSOR
-      };
-
-      /// \brief Frame in which we return the measured force torque info.
-      private: MeasureFrame measureFrame;
-
-      /// \brief Direction of the measure
-      ///        True if the measured force torque is the one applied
-      ///        by the parent on the child, false otherwise
-      private: bool parentToChild;
-
-      /// \brief Rotation matrix than transforms a vector expressed in child
-      ///        orientation in a vector expressed in joint orientation.
-      ///        Necessary is the measure is specified in joint frame.
-      private: ignition::math::Matrix3d rotationSensorChild;
+      /// \internal
+      /// \brief Private data pointer
+      private: std::shared_ptr<ForceTorqueSensorPrivate> dataPtr;
     };
     /// \}
   }

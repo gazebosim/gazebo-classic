@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: RaySensor proximity sensor
- * Author: Mihai Emanuel Dolha
- * Date: 29 March 2012
-*/
-
-#ifndef _GPURAYSENSOR_HH_
-#define _GPURAYSENSOR_HH_
+#ifndef _GAZEBO_GPURAYSENSOR_HH_
+#define _GAZEBO_GPURAYSENSOR_HH_
 
 #include <vector>
 #include <string>
@@ -43,6 +38,9 @@ namespace gazebo
   /// \brief Sensors namespace
   namespace sensors
   {
+    // Forward declare private data pointer.
+    class GpuRaySensorPrivate;
+
     /// \class GpuRaySensor GpuRaySensor.hh sensors/sensors.hh
     /// \addtogroup gazebo_sensors
     /// \{
@@ -74,24 +72,23 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited
-      protected: virtual bool UpdateImpl(bool _force);
+      protected: virtual bool UpdateImpl(const bool _force);
 
       /// \brief Finalize the ray
       protected: virtual void Fini();
 
       // Documentation inherited
-      public: virtual std::string GetTopic() const;
+      public: virtual std::string Topic() const;
 
       /// \brief Returns a pointer to the internally kept rendering::GpuLaser
       /// \return Pointer to GpuLaser
+      /// \deprecate See LaserCamera
       public: rendering::GpuLaserPtr GetLaserCamera() const
-              {return this->laserCam;}
+              GAZEBO_DEPRECATED(7.0);
 
-      /// \brief Get the minimum angle
-      /// \return The minimum angle
-      /// \deprecated See AngleMin() function that returns an
-      /// ignition::math::Angle object.
-      public: math::Angle GetAngleMin() const GAZEBO_DEPRECATED(6.0);
+      /// \brief Returns a pointer to the internally kept rendering::GpuLaser
+      /// \return Pointer to GpuLaser
+      public: rendering::GpuLaserPtr LaserCamera() const;
 
       /// \brief Get the minimum angle
       /// \return The minimum angle
@@ -99,13 +96,7 @@ namespace gazebo
 
       /// \brief Set the scan minimum angle
       /// \param[in] _angle The minimum angle
-      public: void SetAngleMin(double _angle);
-
-      /// \brief Get the maximum angle
-      /// \return the maximum angle
-      /// \deprecated See AngleMax() function that returns an
-      /// ignition::math::Angle object.
-      public: math::Angle GetAngleMax() const GAZEBO_DEPRECATED(6.0);
+      public: void SetAngleMin(const double _angle);
 
       /// \brief Get the maximum angle
       /// \return the maximum angle
@@ -113,18 +104,34 @@ namespace gazebo
 
       /// \brief Set the scan maximum angle
       /// \param[in] _angle The maximum angle
-      public: void SetAngleMax(double _angle);
+      public: void SetAngleMax(const double _angle);
 
       /// \brief Get radians between each range
-      public: double GetAngleResolution() const;
+      /// \return Return angle resolution
+      /// \deprecated See AngleResolution()
+      public: double GetAngleResolution() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get radians between each range
+      /// \return Return angle resolution
+      public: double AngleResolution() const;
 
       /// \brief Get the minimum range
       /// \return The minimum range
-      public: double GetRangeMin() const;
+      /// \deprecated See RangeMin
+      public: double GetRangeMin() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the minimum range
+      /// \return The minimum range
+      public: double RangeMin() const;
 
       /// \brief Get the maximum range
       /// \return The maximum range
-      public: double GetRangeMax() const;
+      /// \deprecated See RangeMax
+      public: double GetRangeMax() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the maximum range
+      /// \return The maximum range
+      public: double RangeMax() const;
 
       /// \brief Get the range resolution
       ///      If RangeResolution is 1, the number of simulated rays is equal
@@ -133,29 +140,53 @@ namespace gazebo
       ///      used, the results are interpolated from two nearest neighbors,
       ///      and vice versa.
       /// \return The Range Resolution
-      public: double GetRangeResolution() const;
+      /// \deprecated See RangeResolution()
+      public: double GetRangeResolution() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the range resolution
+      ///      If RangeResolution is 1, the number of simulated rays is equal
+      ///      to the number of returned range readings. If it's less than 1,
+      ///      fewer simulated rays than actual returned range readings are
+      ///      used, the results are interpolated from two nearest neighbors,
+      ///      and vice versa.
+      /// \return The Range Resolution
+      public: double RangeResolution() const;
 
       /// \brief Get the ray count
       /// \return The number of rays
-      public: int GetRayCount() const;
+      /// \deprecated See RayCount
+      public: int GetRayCount() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the ray count
+      /// \return The number of rays
+      public: int RayCount() const;
 
       /// \brief Get the range count
       /// \return The number of ranges
-      public: int GetRangeCount() const;
+      /// \deprecated See RangeCount
+      public: int GetRangeCount() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the range count
+      /// \return The number of ranges
+      public: int RangeCount() const;
 
       /// \brief Get the vertical scan line count
       /// \return The number of scan lines vertically
-      public: int GetVerticalRayCount() const;
+      /// \deprecated See VerticalRayCount()
+      public: int GetVerticalRayCount() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the vertical scan line count
       /// \return The number of scan lines vertically
-      public: int GetVerticalRangeCount() const;
+      public: int VerticalRayCount() const;
 
-      /// \brief Get the vertical scan bottom angle
-      /// \return The minimum angle of the scan block
-      /// \deprecated See VerticalAngleMin() function that returns an
-      /// ignition::math::Angle object.
-      public: math::Angle GetVerticalAngleMin() const GAZEBO_DEPRECATED(6.0);
+      /// \brief Get the vertical scan line count
+      /// \return The number of scan lines vertically
+      /// \deprecated See VerticalRangeCount()
+      public: int GetVerticalRangeCount() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the vertical scan line count
+      /// \return The number of scan lines vertically
+      public: int VerticalRangeCount() const;
 
       /// \brief Get the vertical scan bottom angle
       /// \return The minimum angle of the scan block
@@ -163,13 +194,7 @@ namespace gazebo
 
       /// \brief Set the vertical scan bottom angle
       /// \param[in] _angle The minimum angle of the scan block
-      public: void SetVerticalAngleMin(double _angle);
-
-      /// \brief Get the vertical scan line top angle
-      /// \return The Maximum angle of the scan block
-      /// \deprecated See VerticalAngleMax() function that returns an
-      /// ignition::math::Angle object.
-      public: math::Angle GetVerticalAngleMax() const GAZEBO_DEPRECATED(6.0);
+      public: void SetVerticalAngleMin(const double _angle);
 
       /// \brief Get the vertical scan line top angle
       /// \return The Maximum angle of the scan block
@@ -177,11 +202,17 @@ namespace gazebo
 
       /// \brief Set the vertical scan line top angle
       /// \param[in] _angle The Maximum angle of the scan block
-      public: void SetVerticalAngleMax(double _angle);
+      /// \deprecated See VerticalAngleMax(double _angle)
+      public: void SetVerticalAngleMax(const double _angle);
 
       /// \brief Get the vertical angle in radians between each range
       /// \return Resolution of the angle
-      public: double GetVerticalAngleResolution() const;
+      /// \deprecated See VerticalAngleResolution
+      public: double GetVerticalAngleResolution() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the vertical angle in radians between each range
+      /// \return Resolution of the angle
+      public: double VerticalAngleResolution() const;
 
       /// \brief Get detected range for a ray.
       ///         Warning: If you are accessing all the ray data in a loop
@@ -192,11 +223,30 @@ namespace gazebo
       ///         SetActive(true).
       /// \param[in] _index Index of specific ray
       /// \return Returns RangeMax for no detection.
-      public: double GetRange(int _index);
+      /// \deprecated See Range(int _index)
+      public: double GetRange(int _index) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get detected range for a ray.
+      ///         Warning: If you are accessing all the ray data in a loop
+      ///         it's possible that the Ray will update in the middle of
+      ///         your access loop. This means some data will come from one
+      ///         scan, and some from another scan. You can solve this
+      ///         problem by using SetActive(false) <your accessor loop>
+      ///         SetActive(true).
+      /// \param[in] _index Index of specific ray
+      /// \return Returns RangeMax for no detection.
+      /// \deprecated See Range(int _index)
+      public: double Range(const int _index) const;
 
       /// \brief Get all the ranges
       /// \param[out] _range A vector that will contain all the range data
-      public: void GetRanges(std::vector<double> &_ranges);
+      /// \deprecated See Ranges(std::vector<double> &_ranges)
+      public: void GetRanges(std::vector<double> &_ranges)
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get all the ranges
+      /// \param[out] _range A vector that will contain all the range data
+      public: void GetRanges(std::vector<double> &_ranges) const;
 
       /// \brief Get detected retro (intensity) value for a ray.
       ///         Warning: If you are accessing all the ray data in a loop
@@ -207,7 +257,19 @@ namespace gazebo
       ///         SetActive(true).
       /// \param[in] _index Index of specific ray
       /// \return Intensity value of ray
-      public: double GetRetro(int _index) const;
+      /// \deprecated See Retro(int _index)
+      public: double GetRetro(int _index) const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get detected retro (intensity) value for a ray.
+      ///         Warning: If you are accessing all the ray data in a loop
+      ///         it's possible that the Ray will update in the middle of
+      ///         your access loop. This means some data will come from one
+      ///         scan, and some from another scan. You can solve this
+      ///         problem by using SetActive(false) <your accessor loop>
+      ///         SetActive(true).
+      /// \param[in] _index Index of specific ray
+      /// \return Intensity value of ray
+      public: double Retro(const int _index) const;
 
       /// \brief Get detected fiducial value for a ray.
       ///         Warning: If you are accessing all the ray data in a loop
@@ -218,11 +280,28 @@ namespace gazebo
       ///         SetActive(true).
       /// \param[in] _index Index of specific ray
       /// \return Fiducial value of ray
-      public: int GetFiducial(int _index) const;
+      /// \deprecated See Fiducial(int _index)
+      public: int GetFiducial(int _index) const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get detected fiducial value for a ray.
+      ///         Warning: If you are accessing all the ray data in a loop
+      ///         it's possible that the Ray will update in the middle of
+      ///         your access loop. This means some data will come from one
+      ///         scan, and some from another scan. You can solve this
+      ///         problem by using SetActive(false) <your accessor loop>
+      ///         SetActive(true).
+      /// \param[in] _index Index of specific ray
+      /// \return Fiducial value of ray
+      public: int Fiducial(const int _index) const;
 
       /// \brief Gets the camera count
       /// \return Number of cameras
-      public: unsigned int GetCameraCount() const;
+      /// \deprecated See CameraCount()
+      public: unsigned int GetCameraCount() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Gets the camera count
+      /// \return Number of cameras
+      public: unsigned int CameraCount() const;
 
       /// \brief Gets if sensor is horizontal
       /// \return True if horizontal, false if not
@@ -234,7 +313,16 @@ namespace gazebo
       /// A ray count is the number of simulated rays. Whereas a range count
       /// is the total number of data points returned. When range count
       /// != ray count, then values are interpolated between rays.
-      public: double GetRayCountRatio() const;
+      /// \deprecated See RayCountRatio
+      public: double GetRayCountRatio() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Return the ratio of horizontal ray count to vertical ray
+      /// count.
+      ///
+      /// A ray count is the number of simulated rays. Whereas a range count
+      /// is the total number of data points returned. When range count
+      /// != ray count, then values are interpolated between rays.
+      public: double RayCountRatio() const;
 
       /// \brief Return the ratio of horizontal range count to vertical
       /// range count.
@@ -242,35 +330,82 @@ namespace gazebo
       /// A ray count is the number of simulated rays. Whereas a range count
       /// is the total number of data points returned. When range count
       /// != ray count, then values are interpolated between rays.
-      public: double GetRangeCountRatio() const;
+      /// \deprecated See RangeCountRatio
+      public: double GetRangeCountRatio() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Return the ratio of horizontal range count to vertical
+      /// range count.
+      ///
+      /// A ray count is the number of simulated rays. Whereas a range count
+      /// is the total number of data points returned. When range count
+      /// != ray count, then values are interpolated between rays.
+      public: double RangeCountRatio() const;
 
       /// \brief Get the horizontal field of view of the laser sensor.
       /// \return The horizontal field of view of the laser sensor.
-      public: double GetHorzFOV() const;
+      /// \deprecated See HorzFOV
+      public: double GetHorzFOV() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the horizontal field of view of the laser sensor.
+      /// \return The horizontal field of view of the laser sensor.
+      public: double HorzFOV() const;
 
       /// \brief Get Cos Horz field-of-view
       /// \return 2 * atan(tan(this->hfov/2) / cos(this->vfov/2))
-      public: double GetCosHorzFOV() const;
+      /// \deprecated See CosHorzFOV
+      public: double GetCosHorzFOV() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get Cos Horz field-of-view
+      /// \return 2 * atan(tan(this->hfov/2) / cos(this->vfov/2))
+      public: double CosHorzFOV() const;
 
       /// \brief Get the vertical field-of-view.
-      public: double GetVertFOV() const;
+      /// \deprecated See VertFOV
+      public: double GetVertFOV() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the vertical field-of-view.
+      public: double VertFOV() const;
 
       /// \brief Get Cos Vert field-of-view
       /// \return 2 * atan(tan(this->vfov/2) / cos(this->hfov/2))
-      public: double GetCosVertFOV() const;
+      /// \deprecated See CosVertFOV.
+      public: double GetCosVertFOV() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get Cos Vert field-of-view
+      /// \return 2 * atan(tan(this->vfov/2) / cos(this->hfov/2))
+      public: double CosVertFOV() const;
 
       /// \brief Get (horizontal_max_angle + horizontal_min_angle) * 0.5
       /// \return (horizontal_max_angle + horizontal_min_angle) * 0.5
-      public: double GetHorzHalfAngle() const;
+      /// \deprecated See HorzHalfAngle()
+      public: double GetHorzHalfAngle() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get (horizontal_max_angle + horizontal_min_angle) * 0.5
+      /// \return (horizontal_max_angle + horizontal_min_angle) * 0.5
+      public: double HorzHalfAngle() const;
 
       /// \brief Get (vertical_max_angle + vertical_min_angle) * 0.5
       /// \return (vertical_max_angle + vertical_min_angle) * 0.5
-      public: double GetVertHalfAngle() const;
+      /// \deprecated See VertHalfAngle
+      public: double GetVertHalfAngle() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get (vertical_max_angle + vertical_min_angle) * 0.5
+      /// \return (vertical_max_angle + vertical_min_angle) * 0.5
+      /// \deprecated See VertHalfAngle
+      public: double VertHalfAngle() const;
 
       /// \brief Connect to the new laser frame event.
       /// \param[in] _subscriber Event callback.
+      /// \deprecated See ConnectNewLaserFrame that accepts a std::function.
       public: event::ConnectionPtr ConnectNewLaserFrame(
         boost::function<void(const float *, unsigned int, unsigned int,
+        unsigned int, const std::string &)> _subscriber) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Connect to the new laser frame event.
+      /// \param[in] _subscriber Event callback.
+      /// \deprecated See ConnectNewLaserFrame that accepts a std::function.
+      public: event::ConnectionPtr ConnectNewLaserFrame(
+        std::function<void(const float *, unsigned int, unsigned int,
         unsigned int, const std::string &)> _subscriber);
 
       /// \brief Disconnect Laser Frame.
@@ -278,58 +413,14 @@ namespace gazebo
       public: void DisconnectNewLaserFrame(event::ConnectionPtr &_conn);
 
       // Documentation inherited
-      public: virtual bool IsActive();
+      public: virtual bool IsActive() const;
 
       /// brief Render the camera.
       private: void Render();
 
-      /// \brief Scan SDF elementz.
-      protected: sdf::ElementPtr scanElem;
-
-      /// \brief Horizontal SDF element.
-      protected: sdf::ElementPtr horzElem;
-
-      /// \brief Vertical SDF element.
-      protected: sdf::ElementPtr vertElem;
-
-      /// \brief Range SDF element.
-      protected: sdf::ElementPtr rangeElem;
-
-      /// \brief Camera SDF element.
-      protected: sdf::ElementPtr cameraElem;
-
-      /// \brief Horizontal ray count.
-      protected: unsigned int horzRayCount;
-
-      /// \brief Vertical ray count.
-      protected: unsigned int vertRayCount;
-
-      /// \brief Horizontal range count.
-      protected: unsigned int horzRangeCount;
-
-      /// \brief Vertical range count.
-      protected: unsigned int vertRangeCount;
-
-      /// \brief Range count ratio.
-      protected: double rangeCountRatio;
-
-      /// \brief GPU laser rendering.
-      private: rendering::GpuLaserPtr laserCam;
-
-      /// \brief Mutex to protect getting ranges.
-      private: boost::mutex mutex;
-
-      /// \brief Laser message to publish data.
-      private: msgs::LaserScanStamped laserMsg;
-
-      /// \brief Parent entity of gpu ray sensor
-      private: physics::EntityPtr parentEntity;
-
-      /// \brief Publisher to publish ray sensor data
-      private: transport::PublisherPtr scanPub;
-
-      /// \brief True if the sensor was rendered.
-      private: bool rendered;
+      /// \internal
+      /// \brief Private data pointer.
+      private: std::shared_ptr<GpuRaySensorPrivate> dataPtr;
     };
     /// \}
   }

@@ -28,7 +28,6 @@
 #include "gazebo/sensors/CameraSensor.hh"
 #include "gazebo/util/system.hh"
 
-
 namespace gazebo
 {
   namespace sensors
@@ -69,7 +68,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Private data pointer.
-      private: std::unique_ptr<WideAngleCameraSensorPrivate> dataPtr;
+      private: std::shared_ptr<WideAngleCameraSensorPrivate> dataPtr;
     };
     /// \}
   }

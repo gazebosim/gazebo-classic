@@ -102,9 +102,9 @@ void NoiseTest::NoisePlugin(const std::string &_physicsEngine)
   // Noise rate value also taken directly from plugin.
   double fixedNoiseRate = 0.005;
   double noise = maxRange*fixedNoiseRate;
-  for (int i = 0; i < raySensor->GetRayCount(); ++i)
+  for (int i = 0; i < raySensor->RayCount(); ++i)
   {
-    double range = raySensor->GetRange(i);
+    double range = raySensor->Range(i);
     if (std::isinf(range))
     {
       continue;

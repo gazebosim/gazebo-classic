@@ -272,8 +272,8 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
       && --steps > 0)
   {
     world->Step(1);
-    contacts01 = contactSensor01->GetContacts();
-    contacts02 = contactSensor02->GetContacts();
+    contacts01 = contactSensor01->Contacts();
+    contacts02 = contactSensor02->Contacts();
     // gzdbg << "steps[" << steps
     //       << "] contacts01[" << contacts01.contact_size()
     //       << "] contacts02[" << contacts02.contact_size()
@@ -484,12 +484,12 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
   while (contacts.contact_size() == 0 && --steps > 0)
   {
     world->Step(1);
-    contacts = contactSensor->GetContacts();
+    contacts = contactSensor->Contacts();
   }
 
   EXPECT_GT(steps, 0);
 
-  contacts = contactSensor->GetContacts();
+  contacts = contactSensor->Contacts();
 
   unsigned int ColInd = 0;
   physics::CollisionPtr col = contactModel->GetLink()->GetCollision(ColInd);

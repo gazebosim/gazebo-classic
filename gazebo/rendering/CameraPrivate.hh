@@ -21,6 +21,7 @@
 #include <utility>
 #include <list>
 
+#include "gazebo/common/PID.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/util/system.hh"
 

@@ -71,7 +71,7 @@ namespace gazebo
       public: ignition::math::Vector3d MagneticField() const;
 
       /// \brief Private data pointer.
-      private: MagnetometerSensorPrivate *dataPtr;
+      private: std::shared_ptr<MagnetometerSensorPrivate> dataPtr;
     };
     /// \}
   }

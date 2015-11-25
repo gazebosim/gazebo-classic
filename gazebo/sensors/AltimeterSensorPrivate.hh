@@ -20,6 +20,7 @@
 #include <mutex>
 #include <string>
 
+#include "gazebo/sensors/SensorPrivate.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/msgs/msgs.hh"
@@ -30,7 +31,7 @@ namespace gazebo
   {
     /// \internal
     /// \brief AltimeterSensor private data
-    class AltimeterSensorPrivate
+    class AltimeterSensorPrivate : public SensorProtected
     {
       /// \brief Mutex to protect reads and writes.
       public: mutable std::mutex mutex;

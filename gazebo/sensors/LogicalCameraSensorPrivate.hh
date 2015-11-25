@@ -22,6 +22,7 @@
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/Link.hh"
+#include "gazebo/sensors/SensorPrivate.hh"
 
 namespace gazebo
 {
@@ -29,7 +30,7 @@ namespace gazebo
   {
     /// \internal
     /// \brief Logical camera sensor private data.
-    class LogicalCameraSensorPrivate
+    class LogicalCameraSensorPrivate : public SensorProtected
     {
       /// \brief Publisher of msgs::LogicalCameraImage messages.
       public: transport::PublisherPtr pub;

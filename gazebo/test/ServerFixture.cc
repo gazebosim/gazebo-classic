@@ -502,8 +502,8 @@ void ServerFixture::GetFrame(const std::string &_cameraName,
   sensors::CameraSensorPtr camSensor =
     boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
 
-  _width = camSensor->GetImageWidth();
-  _height = camSensor->GetImageHeight();
+  _width = camSensor->ImageWidth();
+  _height = camSensor->ImageHeight();
 
   if (*_imgData)
   {
@@ -515,14 +515,14 @@ void ServerFixture::GetFrame(const std::string &_cameraName,
 
   this->gotImage = 0;
   event::ConnectionPtr c =
-    camSensor->GetCamera()->ConnectNewImageFrame(
+    camSensor->Camera()->ConnectNewImageFrame(
         boost::bind(&ServerFixture::OnNewFrame,
                     this, _1, _2, _3, _4, _5));
 
   while (this->gotImage < 20)
     common::Time::MSleep(100);
 
-  camSensor->GetCamera()->DisconnectNewImageFrame(c);
+  camSensor->Camera()->DisconnectNewImageFrame(c);
 }
 
 /////////////////////////////////////////////////

@@ -28,6 +28,9 @@ namespace gazebo
 {
   namespace sensors
   {
+    // Forward declare private data
+    class WirelessReceiverPrivate;
+
     /// \addtogroup gazebo_sensors
     /// \{
 
@@ -51,28 +54,38 @@ namespace gazebo
       public: virtual void Fini();
 
       // Documentation inherited
-      private: virtual bool UpdateImpl(bool _force);
+      private: virtual bool UpdateImpl(const bool _force);
 
       /// \brief Returns the minimum frequency filtered (MHz).
       /// \return Reception frequency (MHz).
-      public: double GetMinFreqFiltered() const;
+      /// \deprecated See MinFreqFiltered()
+      public: double GetMinFreqFiltered() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Returns the minimum frequency filtered (MHz).
+      /// \return Reception frequency (MHz).
+      public: double MinFreqFiltered() const;
 
       /// \brief Returns the maximum frequency filtered (MHz).
       /// \return Reception frequency (MHz).
-      public: double GetMaxFreqFiltered() const;
+      /// \deprecated See MaxFreqFiltered()
+      public: double GetMaxFreqFiltered() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Returns the maximum frequency filtered (MHz).
+      /// \return Reception frequency (MHz).
+      public: double MaxFreqFiltered() const;
 
       /// \brief Returns the receiver sensitivity (dBm).
       /// \return Receiver sensitivity (dBm).
-      public: double GetSensitivity() const;
+      /// \deprecated See Sensitivity()
+      public: double GetSensitivity() const GAZEBO_DEPRECATED(7.0);
 
-      /// \brief Reception low filter frequency (MHz).
-      private: double minFreq;
+      /// \brief Returns the receiver sensitivity (dBm).
+      /// \return Receiver sensitivity (dBm).
+      public: double Sensitivity() const;
 
-      /// \brief Reception high filter frequency (MHz).
-      private: double maxFreq;
-
-      /// \brief Antenna's sensitivity of the receiver (dBm).
-      private: double sensitivity;
+      /// \internal
+      /// \brief Private data pointer
+      private: std::shared_ptr<WirelessReceiverPrivate> dataPtr;
     };
     /// \}
   }
