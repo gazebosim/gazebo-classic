@@ -42,8 +42,6 @@ LightMaker::LightMaker() : EntityMaker(*new LightMakerPrivate)
   LightMakerPrivate *dPtr =
       reinterpret_cast<LightMakerPrivate *>(this->dataPtr);
 
-  dPtr->lightPub = dPtr->node->Advertise<msgs::Light>("~/factory/light");
-
   msgs::Set(dPtr->msg.mutable_diffuse(), common::Color(0.5, 0.5, 0.5, 1));
   msgs::Set(dPtr->msg.mutable_specular(), common::Color(0.1, 0.1, 0.1, 1));
 
@@ -171,14 +169,16 @@ void LightMaker::CreateTheEntity()
             dPtr->light->GetPosition().Ign());
   msgs::Set(dPtr->msg.mutable_pose()->mutable_orientation(),
             ignition::math::Quaterniond());
-  dPtr->lightPub->Publish(dPtr->msg);
 
   // Register user command on server
-gzdbg << "LightMaker::CreateTheEntity" << std::endl;
   msgs::UserCmd userCmdMsg;
   userCmdMsg.set_description("Insert [" + dPtr->msg.name() + "]");
   userCmdMsg.set_type(msgs::UserCmd::INSERTING);
   userCmdMsg.set_entity_name(dPtr->msg.name());
+
+  auto lightMsg = userCmdMsg.add_light();
+  lightMsg->CopyFrom(dPtr->msg);
+
   dPtr->userCmdPub->Publish(userCmdMsg);
 }
 

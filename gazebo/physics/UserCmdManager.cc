@@ -72,7 +72,8 @@ UserCmd::UserCmd(const unsigned int _id,
     this->dataPtr->node->Init();
     this->dataPtr->factoryPub =
         this->dataPtr->node->Advertise<msgs::Factory>("~/factory");
-    this->dataPtr->lightPub = this->dataPtr->node->Advertise<msgs::Light>("~/light");
+    this->dataPtr->lightPub =
+        this->dataPtr->node->Advertise<msgs::Light>("~/light");
 
     physics::ModelPtr model =
         this->dataPtr->world->GetModel(this->dataPtr->name);
@@ -90,10 +91,6 @@ UserCmd::UserCmd(const unsigned int _id,
       this->dataPtr->sdf->Root()->Copy(model->GetSDF());
     else if (light)
       this->dataPtr->sdf->Root()->Copy(light->GetSDF());
-
-    // Delete from here because we need to make ssure to copy the model first
-    transport::requestNoReply(
-        this->dataPtr->node, "entity_delete", this->dataPtr->name);
   }
 }
 
@@ -233,6 +230,15 @@ UserCmdManager::UserCmdManager(const WorldPtr _world)
   this->dataPtr->lightModifyPub =
       this->dataPtr->node->Advertise<msgs::Light>("~/light/modify");
 
+  this->dataPtr->modelFactoryPub =
+      this->dataPtr->node->Advertise<msgs::Factory>("~/factory");
+
+  this->dataPtr->lightFactoryPub =
+      this->dataPtr->node->Advertise<msgs::Light>("~/factory/light");
+
+  this->dataPtr->worldControlPub =
+      this->dataPtr->node->Advertise<msgs::WorldControl>("~/world_control");
+
   this->dataPtr->idCounter = 0;
 }
 
@@ -257,6 +263,7 @@ void UserCmdManager::OnUserCmdMsg(ConstUserCmdPtr &_msg)
   UserCmdPtr cmd(new UserCmd(id, this->dataPtr->world, _msg->description(),
       _msg->type(), name));
 
+  // Publish command message after we've save the current state
   if (_msg->type() == msgs::UserCmd::MOVING)
   {
     for (int i = 0; i < _msg->model_size(); ++i)
@@ -264,6 +271,45 @@ void UserCmdManager::OnUserCmdMsg(ConstUserCmdPtr &_msg)
 
     for (int i = 0; i < _msg->light_size(); ++i)
       this->dataPtr->lightModifyPub->Publish(_msg->light(i));
+  }
+  else if (_msg->type() == msgs::UserCmd::SCALING)
+  {
+    for (int i = 0; i < _msg->model_size(); ++i)
+      this->dataPtr->modelModifyPub->Publish(_msg->model(i));
+  }
+  else if (_msg->type() == msgs::UserCmd::WORLD_CONTROL)
+  {
+    if (_msg->has_world_control())
+    {
+      this->dataPtr->worldControlPub->Publish(_msg->world_control());
+    }
+    else
+    {
+      gzwarn << "World control command [" << _msg->description() <<
+          "] without a world control message. Command won't be executed."
+          << std::endl;
+    }
+  }
+  else if (_msg->type() == msgs::UserCmd::INSERTING)
+  {
+    if (_msg->has_factory())
+    {
+      this->dataPtr->modelFactoryPub->Publish(_msg->factory());
+    }
+    else if (_msg->light_size() == 1)
+    {
+      this->dataPtr->lightFactoryPub->Publish(_msg->light(0));
+    }
+    else
+    {
+      gzwarn << "Insert command [" << _msg->description() <<
+          "] does not contain factory or light messages." <<
+          " Command won't be executed." << std::endl;
+    }
+  }
+  else if (_msg->type() == msgs::UserCmd::DELETING)
+  {
+    transport::requestNoReply(this->dataPtr->node, "entity_delete", name);
   }
 
   // Add it to undo list

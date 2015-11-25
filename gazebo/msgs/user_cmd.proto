@@ -1,7 +1,9 @@
 package gazebo.msgs;
 
+import "factory.proto";
 import "light.proto";
 import "model.proto";
+import "world_control.proto";
 
 /// \ingroup gazebo_msgs
 /// \interface UserCmd
@@ -12,14 +14,16 @@ message UserCmd
   /// \brief Types of user commands
   enum Type
   {
+    /// \brief Moving a model.
+    MOVING = 1;
+    /// \brief Controlling the world.
+    WORLD_CONTROL = 2;
     /// \brief New model insertion
-    INSERTING = 0;
+    INSERTING = 3;
     /// \brief Model deletion
-    DELETING = 1;
-    /// \brief Model moving
-    MOVING = 2;
+    DELETING = 4;
     /// \brief Model scaling
-    SCALING = 3;
+    SCALING = 5;
   }
 
   /// \brief Unique id for user command.
@@ -34,9 +38,15 @@ message UserCmd
   /// \brief For model modify commands.
   repeated Model model = 4;
 
-  /// \brief For light modify commands.
+  /// \brief For light modify or factory commands.
   repeated Light light = 5;
 
+  /// \brief For World Control commands.
+  optional WorldControl world_control = 6;
+
+  /// \brief For model factory commands.
+  optional Factory factory = 7;
+
   /// \brief Name of entity related to the command.
-  optional string entity_name = 6;
+  optional string entity_name = 8;
 }

@@ -97,6 +97,15 @@ namespace gazebo
       /// \brief Publisher of light modify messages.
       public: transport::PublisherPtr lightModifyPub;
 
+      /// \brief Publisher of model factory messages.
+      public: transport::PublisherPtr modelFactoryPub;
+
+      /// \brief Publisher of light factory messages.
+      public: transport::PublisherPtr lightFactoryPub;
+
+      /// \brief Publisher of world control messages.
+      public: transport::PublisherPtr worldControlPub;
+
       /// \brief List of commands which can be undone.
       public: std::vector<UserCmdPtr> undoCmds;
 

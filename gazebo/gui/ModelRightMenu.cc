@@ -332,10 +332,7 @@ void ModelRightMenu::OnDelete(const std::string &_name)
   // Delete the entity
   if (!name.empty())
   {
-  //  transport::requestNoReply(this->node, "entity_delete", name);
-
     // Send user command and UserCmdManager will publish delete request
-  gzdbg << "ModelRightMenu::OnDelete" << std::endl;
     msgs::UserCmd userCmdMsg;
     userCmdMsg.set_description("Delete " + name + "]");
     userCmdMsg.set_type(msgs::UserCmd::DELETING);

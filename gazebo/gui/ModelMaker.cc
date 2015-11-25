@@ -51,16 +51,11 @@ ModelMaker::ModelMaker() : EntityMaker(*new ModelMakerPrivate)
       reinterpret_cast<ModelMakerPrivate *>(this->dataPtr);
 
   dPtr->clone = false;
-  dPtr->makerPub = dPtr->node->Advertise<msgs::Factory>("~/factory");
 }
 
 /////////////////////////////////////////////////
 ModelMaker::~ModelMaker()
 {
-  ModelMakerPrivate *dPtr =
-      reinterpret_cast<ModelMakerPrivate *>(this->dataPtr);
-
-  dPtr->makerPub.reset();
 }
 
 /////////////////////////////////////////////////
@@ -364,15 +359,13 @@ void ModelMaker::CreateTheEntity()
           dPtr->modelVisual->GetName().find("_clone_tmp")));
   }
 
-
-  dPtr->makerPub->Publish(msg);
-
   // Register user command on server
-gzdbg << "ModelMaker::CreateTheEntity" << std::endl;
   msgs::UserCmd userCmdMsg;
   userCmdMsg.set_description("Insert [" + modelName + "]");
   userCmdMsg.set_type(msgs::UserCmd::INSERTING);
   userCmdMsg.set_entity_name(modelName);
+  userCmdMsg.mutable_factory()->CopyFrom(msg);
+
   dPtr->userCmdPub->Publish(userCmdMsg);
 }
 
