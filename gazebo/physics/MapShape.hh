@@ -83,7 +83,7 @@ namespace gazebo
 
       /// \brief Returns scaling factor for this geometry.
       /// \return Scaling factor.
-      /// \deprecated See function that return an ignition::math object
+      /// \deprecated See function that returns an ignition::math object
       public: virtual math::Vector3 GetScale() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Returns scaling factor for this geometry.
