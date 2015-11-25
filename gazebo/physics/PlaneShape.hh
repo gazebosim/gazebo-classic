@@ -59,7 +59,6 @@ namespace gazebo
 
       /// \brief Set the altitude of the plane.
       /// \param[in] _pos Position of the plane.
-      /// \deprecated See function that accepts ignition::math parameters
       public: virtual void SetAltitude(const ignition::math::Vector3d &_pos);
 
       /// \brief Set the normal.
