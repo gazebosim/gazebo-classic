@@ -50,11 +50,11 @@ namespace gazebo
       /// \brief Init the shape.
       public: virtual void Init();
 
-      // Documentation inherticed
+      // Documentation inherited
       public: virtual void SetScale(const math::Vector3 &_scale)
               GAZEBO_DEPRECATED(7.0);
 
-      // Documentation inherticed
+      // Documentation inherited
       public: virtual void SetScale(const ignition::math::Vector3d &_scale);
 
       /// \brief Get detected range for a ray.
@@ -108,7 +108,6 @@ namespace gazebo
 
       /// \brief Get the maximum angle.
       /// \return Maximum angle of ray scan.
-      /// \deprecated See function that returns an ignition::math object
       public: ignition::math::Angle MaxAngle() const;
 
       /// \brief Get the vertical sample count.
