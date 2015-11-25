@@ -86,8 +86,8 @@ namespace gazebo
       private slots: void OnEnumChanged(const QString &_name,
           const QString &_value);
 
-      /// \brief Qt callback when the Reset poses button is pressed.
-      private slots: void OnResetPoses();
+      /// \brief Qt callback when the Reset all button is pressed.
+      private slots: void OnResetAll();
 
       /// \brief Qt callback when the axis combo box is changed.
       private slots: void OnAlign(const int _int);

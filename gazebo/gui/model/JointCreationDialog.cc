@@ -361,18 +361,18 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   this->dataPtr->configWidget->AddConfigChildWidget("relative_pose",
       relativePoseWidget);
 
-  // Reset pose button
-  QPushButton *resetPoseButton = new QPushButton(tr(
-      "Reset parent and child poses"));
-  resetPoseButton->setToolTip("Reset parent and child poses");
-  connect(resetPoseButton, SIGNAL(clicked()), this,
-      SLOT(OnResetPoses()));
+  // Reset all button
+  QPushButton *resetAllButton = new QPushButton(tr(
+      "Reset all fields"));
+  resetAllButton->setToolTip("Reset all fields");
+  connect(resetAllButton, SIGNAL(clicked()), this,
+      SLOT(OnResetAll()));
 
   // Relative pose general layout
   QVBoxLayout *relativePoseGeneralLayout = new QVBoxLayout();
   relativePoseGeneralLayout->setContentsMargins(0, 0, 0, 0);
   relativePoseGeneralLayout->addWidget(relativePoseWidget);
-  relativePoseGeneralLayout->addWidget(resetPoseButton);
+  relativePoseGeneralLayout->addWidget(resetAllButton);
 
   ConfigChildWidget *relativePoseGeneralWidget = new ConfigChildWidget();
   relativePoseGeneralWidget->setLayout(relativePoseGeneralLayout);
@@ -750,10 +750,18 @@ void JointCreationDialog::UpdateRelativePose(
 }
 
 /////////////////////////////////////////////////
-void JointCreationDialog::OnResetPoses()
+void JointCreationDialog::OnResetAll()
 {
-  this->dataPtr->jointMaker->SetLinksRelativePose(ignition::math::Pose3d(),
+  this->dataPtr->jointMaker->SetLinksRelativePose(ignition::math::Pose3d::Zero,
       true);
+  this->dataPtr->configWidget->SetVector3WidgetValue("axis1",
+      ignition::math::Vector3d::UnitX);
+  this->dataPtr->configWidget->SetVector3WidgetValue("axis2",
+      ignition::math::Vector3d::UnitY);
+
+  this->dataPtr->configWidget->SetPoseWidgetValue("joint_pose",
+      ignition::math::Pose3d::Zero);
+ this->OnPoseFromDialog("joint_pose", ignition::math::Pose3d::Zero);
 }
 
 /////////////////////////////////////////////////
