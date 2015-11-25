@@ -224,12 +224,53 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
         ignition::math::Pose3d cameraPose = cam->GetWorldPose().Ign();
 
         this->FillPoseProperty(msgs::Convert(cameraPose), item);
-        // set expanded to true by default for easier viewing
-        this->propTreeBrowser->setExpanded(cameraBrowser, true);
-        for (auto browser : cameraBrowser->children())
-        {
-          this->propTreeBrowser->setExpanded(browser, true);
-        }
+      }
+
+      // Create and set the gui camera position relative to a tracked model
+      item = this->variantManager->addProperty(
+          QtVariantPropertyManager::groupTypeId(), tr("follow"));
+      {
+        topItem->addSubProperty(item);
+
+        bool isStatic = cam->TrackIsStatic();
+        QtVariantProperty *item2 = this->variantManager->addProperty(
+            QVariant::Bool, tr("is_static"));
+        item2->setValue(isStatic);
+        item->addSubProperty(item2);
+
+        bool isRelative = cam->TrackIsRelative();
+        item2 = this->variantManager->addProperty(
+            QVariant::Bool, tr("is_relative"));
+        item2->setValue(isRelative);
+        item->addSubProperty(item2);
+
+        ignition::math::Vector3d trackPos = cam->TrackPosition();
+        this->FillVector3dProperty(msgs::Convert(trackPos), item);
+
+        double minDist = cam->TrackMinDistance();
+        item2 = this->variantManager->addProperty(
+            QVariant::Double, tr("min_distance"));
+        static_cast<QtVariantPropertyManager*>
+          (this->variantFactory->propertyManager(item2))->setAttribute(
+              item2, "decimals", 6);
+        item2->setValue(minDist);
+        item->addSubProperty(item2);
+
+        double maxDist = cam->TrackMaxDistance();
+        item2 = this->variantManager->addProperty(
+            QVariant::Double, tr("max_distance"));
+        static_cast<QtVariantPropertyManager*>
+          (this->variantFactory->propertyManager(item2))->setAttribute(
+              item2, "decimals", 6);
+        item2->setValue(maxDist);
+        item->addSubProperty(item2);
+      }
+
+      // set expanded to true by default for easier viewing
+      this->propTreeBrowser->setExpanded(cameraBrowser, true);
+      for (auto browser : cameraBrowser->children())
+      {
+        this->propTreeBrowser->setExpanded(browser, true);
       }
     }
     else
@@ -675,15 +716,12 @@ void ModelListWidget::LightPropertyChanged(QtProperty * /*_item*/)
 /////////////////////////////////////////////////
 void ModelListWidget::GUIPropertyChanged(QtProperty *_item)
 {
-  // Only camera pose editable for now
+  // Only camera pose and follow parameters editable for now
   QtProperty *cameraProperty = this->GetChildItem("camera");
   if (!cameraProperty)
     return;
 
   QtProperty *cameraPoseProperty = this->GetChildItem(cameraProperty, "pose");
-  if (!cameraPoseProperty)
-    return;
-
   if (cameraPoseProperty)
   {
     std::string changedProperty = _item->propertyName().toStdString();
@@ -699,6 +737,46 @@ void ModelListWidget::GUIPropertyChanged(QtProperty *_item)
       rendering::UserCameraPtr cam = gui::get_active_camera();
       if (cam)
         cam->SetWorldPose(msgs::ConvertIgn(poseMsg));
+    }
+  }
+
+  QtProperty *cameraFollowProperty = this->GetChildItem(cameraProperty,
+                                                        "follow");
+  if (cameraFollowProperty)
+  {
+    rendering::UserCameraPtr cam = gui::get_active_camera();
+    if (!cam)
+      return;
+    std::string changedProperty = _item->propertyName().toStdString();
+    if (changedProperty == "is_static")
+    {
+      cam->SetTrackIsStatic(this->variantManager->value(
+             this->GetChildItem(cameraFollowProperty, "is_static")).toBool());
+    }
+    else if (changedProperty == "is_relative")
+    {
+      cam->SetTrackIsRelative(this->variantManager->value(
+             this->GetChildItem(cameraFollowProperty, "is_relative")).toBool());
+    }
+    else if (changedProperty == "x"
+        || changedProperty == "y"
+        || changedProperty == "z")
+    {
+      msgs::Vector3d msg;
+      this->FillVector3Msg(cameraFollowProperty, &msg);
+      cam->SetTrackPosition(msgs::ConvertIgn(msg));
+    }
+    else if (changedProperty == "min_distance")
+    {
+      cam->SetTrackMinDistance(this->variantManager->value(
+             this->GetChildItem(cameraFollowProperty,
+               "min_distance")).toDouble());
+    }
+    else if (changedProperty == "max_distance")
+    {
+      cam->SetTrackMinDistance(this->variantManager->value(
+             this->GetChildItem(cameraFollowProperty,
+               "max_distance")).toDouble());
     }
   }
 }
