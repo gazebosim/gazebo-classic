@@ -190,6 +190,9 @@ UserCmdManager::UserCmdManager(const WorldPtr _world)
   this->dataPtr->lightFactoryPub =
       this->dataPtr->node->Advertise<msgs::Light>("~/factory/light");
 
+  this->dataPtr->worldControlPub =
+      this->dataPtr->node->Advertise<msgs::WorldControl>("~/world_control");
+
   this->dataPtr->idCounter = 0;
   this->dataPtr->insertionPending = "";
 }
@@ -224,6 +227,19 @@ void UserCmdManager::OnUserCmdMsg(ConstUserCmdPtr &_msg)
 
     for (int i = 0; i < _msg->light_size(); ++i)
       this->dataPtr->lightModifyPub->Publish(_msg->light(i));
+  }
+  else if (_msg->type() == msgs::UserCmd::WORLD_CONTROL)
+  {
+    if (_msg->has_world_control())
+    {
+      this->dataPtr->worldControlPub->Publish(_msg->world_control());
+    }
+    else
+    {
+      gzwarn << "World control command [" << _msg->description() <<
+          "] without a world control message. Command won't be executed."
+          << std::endl;
+    }
   }
   else if (_msg->type() == msgs::UserCmd::INSERTING)
   {

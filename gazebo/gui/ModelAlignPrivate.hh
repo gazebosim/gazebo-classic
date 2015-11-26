@@ -43,9 +43,6 @@ namespace gazebo
       /// undo queue.
       public: transport::PublisherPtr userCmdPub;
 
-      /// \brief Pointer to the user camera.
-      public: rendering::UserCameraPtr userCamera;
-
       /// \brief Pointer to the scene where models are in.
       public: rendering::ScenePtr scene;
 

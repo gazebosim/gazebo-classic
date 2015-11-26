@@ -1,5 +1,8 @@
 ## Gazebo 7.0
 
+1. Copy visual visibility flags on clone
+    * [Pull request #2008](https://bitbucket.org/osrf/gazebo/pull-request/2008)
+    
 1. Publish camera sensor image size when rendering is not enabled
     * [Pull request #1969](https://bitbucket.org/osrf/gazebo/pull-request/1969)
 
@@ -62,6 +65,9 @@ flags from c functions. Windows did not like `CPPTYPE_*` in
     
 1. Forward user command messages for undo.
     * [Pull request #2009](https://bitbucket.org/osrf/gazebo/pull-request/2009)
+
+1. Undo reset commands during simulation, forwarding commands
+    * [Pull request #1986](https://bitbucket.org/osrf/gazebo/pull-request/1986)
 
 1. Add function to get the derived scale of a Visual
     * [Pull request #1881](https://bitbucket.org/osrf/gazebo/pull-request/1881)

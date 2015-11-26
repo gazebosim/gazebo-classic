@@ -3,6 +3,7 @@ package gazebo.msgs;
 import "factory.proto";
 import "light.proto";
 import "model.proto";
+import "world_control.proto";
 
 /// \ingroup gazebo_msgs
 /// \interface UserCmd
@@ -15,6 +16,10 @@ message UserCmd
   {
     /// \brief Moving a model.
     MOVING = 1;
+
+    /// \brief Controlling the world.
+    WORLD_CONTROL = 2;
+
     /// \brief New model insertion
     INSERTING = 3;
   }
@@ -33,6 +38,9 @@ message UserCmd
 
   /// \brief For light modify or factory commands.
   repeated Light light = 5;
+
+  /// \brief For World Control commands.
+  optional WorldControl world_control = 6;
 
   /// \brief For model factory commands.
   optional Factory factory = 7;
