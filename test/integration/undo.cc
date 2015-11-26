@@ -161,6 +161,9 @@ void UndoTest::MsgPassing()
   // Check undo msg was published
   QVERIFY(this->g_undoMsgReceived == true);
 
+  // Trigger UserCmdManager::ProcessPendingStates
+  gazebo::event::Events::worldUpdateBegin(gazebo::common::UpdateInfo());
+
   // Check we went back to the last cmd time
   currentTime = world->GetSimTime();
   QVERIFY(currentTime == cmdTimes[2]);
@@ -189,6 +192,9 @@ void UndoTest::MsgPassing()
 
   // Check undo msg was published
   QVERIFY(this->g_redoMsgReceived == true);
+
+  // Trigger UserCmdManager::ProcessPendingStates
+  gazebo::event::Events::worldUpdateBegin(gazebo::common::UpdateInfo());
 
   // Check we moved forward to the moment undo was triggered
   currentTime = world->GetSimTime();
@@ -221,6 +227,10 @@ void UndoTest::MsgPassing()
     mainWindow->repaint();
   }
 
+  // Trigger UserCmdManager::ProcessPendingStates for all commands
+  for (int i = 0; i < 5; ++i)
+    gazebo::event::Events::worldUpdateBegin(gazebo::common::UpdateInfo());
+
   // Check we went back to the first cmd time
   currentTime = world->GetSimTime();
   QVERIFY(currentTime == cmdTimes[0]);
@@ -251,6 +261,9 @@ void UndoTest::MsgPassing()
     QCoreApplication::processEvents();
     mainWindow->repaint();
   }
+
+  // Trigger UserCmdManager::ProcessPendingStates
+  gazebo::event::Events::worldUpdateBegin(gazebo::common::UpdateInfo());
 
   // Check we moved forward to the moment undo was triggered
   currentTime = world->GetSimTime();
