@@ -55,10 +55,6 @@ Base::Base(BasePtr _parent)
 //////////////////////////////////////////////////
 Base::~Base()
 {
-  // remove self as a child of the parent
-  if (this->parent)
-    this->parent->RemoveChild(this->id);
-
   this->SetParent(BasePtr());
 
   for (Base_V::iterator iter = this->children.begin();
