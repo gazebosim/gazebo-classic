@@ -66,6 +66,7 @@ bool Server::stop = true;
 Server::Server()
 {
   this->initialized = false;
+  this->waiting = false;
   this->systemPluginsArgc = 0;
   this->systemPluginsArgv = NULL;
 }
@@ -237,7 +238,7 @@ bool Server::ParseArgs(int _argc, char **_argv)
   // this->ProcessPrarams.
   //
   // Set the parameter to playback a log file. The log file contains the
-  // world description, so don't try to reead the world file from the
+  // world description, so don't try to read the world file from the
   // command line.
   if (this->vm.count("play"))
   {
@@ -314,6 +315,8 @@ bool Server::GetInitialized() const
 bool Server::LoadFile(const std::string &_filename,
                       const std::string &_physics)
 {
+gzdbg << "Server::LoadFile   " << _filename << std::endl;
+
   // Quick test for a valid file
   FILE *test = fopen(common::find_file(_filename).c_str(), "r");
   if (!test)
@@ -459,6 +462,7 @@ void Server::Stop()
 /////////////////////////////////////////////////
 void Server::Fini()
 {
+gzdbg << "Server::Fini DON'T" << std::endl;
   this->Stop();
   gazebo::shutdown();
 }
@@ -510,7 +514,7 @@ void Server::Run()
   this->initialized = true;
 
   // Update the sensors.
-  while (!this->stop && physics::worlds_running())
+  while ((!this->stop && physics::worlds_running()) || this->waiting)
   {
     this->ProcessControlMsgs();
     sensors::run_once();
@@ -518,7 +522,8 @@ void Server::Run()
   }
 
   // Shutdown gazebo
-  gazebo::shutdown();
+gzdbg << "Server::Run shutdown DON'T" << std::endl;
+//  gazebo::shutdown();
 }
 
 /////////////////////////////////////////////////
@@ -683,11 +688,57 @@ void Server::ProcessControlMsgs()
 }
 
 /////////////////////////////////////////////////
-bool Server::OpenWorld(const std::string & /*_filename*/)
+bool Server::OpenWorld(const std::string & _filename)
 {
   gzerr << "Open World is not implemented\n";
-  return false;
-/*
+//  return false;
+
+
+  // Put server in a waiting state
+  this->waiting = true;
+
+//gzdbg << "A0" << std::endl;
+//  msgs::WorldModify worldMsg;
+//  worldMsg.set_world_name("default");
+//  worldMsg.set_remove(true);
+//  this->worldModPub->Publish(worldMsg);
+
+  // Stop current world
+gzdbg << "A" << std::endl;
+//  physics::stop_worlds(); -- remove stops them
+
+gzdbg << "B" << std::endl;
+  physics::remove_worlds();
+
+gzdbg << "C" << std::endl;
+  sensors::remove_sensors();
+
+gzdbg << "D" << std::endl;
+  gazebo::transport::clear_buffers();
+
+  // topics still advertised, transport is not stopped by this point
+
+gzdbg << "E" << std::endl;
+
+
+
+gazebo::common::Time::Sleep(1);
+
+
+
+  // Load new world
+
+
+
+  FILE *test = fopen(common::find_file(_filename).c_str(), "r");
+  if (!test)
+  {
+    gzerr << "Could not open file[" << _filename << "]\n";
+    return false;
+  }
+  fclose(test);
+
+  // Load the world file
   sdf::SDFPtr sdf(new sdf::SDF);
   if (!sdf::init(sdf))
   {
@@ -695,39 +746,59 @@ bool Server::OpenWorld(const std::string & /*_filename*/)
     return false;
   }
 
-  if (!sdf::readFile(_filename, sdf))
+  if (!sdf::readFile(common::find_file(_filename), sdf))
   {
     gzerr << "Unable to read sdf file[" << _filename << "]\n";
     return false;
   }
 
-  msgs::WorldModify worldMsg;
-  worldMsg.set_world_name("default");
-  worldMsg.set_remove(true);
-  this->worldModPub->Publish(worldMsg);
+  auto worldElem = sdf->Root()->GetElement("world");
+  if (!worldElem)
+    return false;
+gzdbg << "F" << std::endl;
 
-  physics::stop_worlds();
-
-  physics::remove_worlds();
-
-  sensors::remove_sensors();
-
-  gazebo::transport::clear_buffers();
-
-  sdf::ElementPtr worldElem = sdf->Root()->GetElement("world");
-
-  physics::WorldPtr world = physics::create_world();
+  auto world = physics::create_world();
+  if (!world)
+    return false;
+gzdbg << "G" << std::endl;
 
   physics::load_world(world, worldElem);
+  // light is not properly created
+
+
+  // trigger factories
+  // The first time the client is opened it sends a request, but now
+  // there is no request
+
+
+
+
+gzdbg << "H" << std::endl;
 
   physics::init_world(world);
+gzdbg << "I" << std::endl;
 
   physics::run_world(world);
+gzdbg << "J" << std::endl;
+/*
+  auto scenePub = this->node->Advertise<msgs::Scene>("~/scene");
+  auto sceneMsg = world->GetSceneMsg();
+  scenePub->Publish(sceneMsg);
+gzdbg << "K" << std::endl;
 
-  worldMsg.set_world_name("default");
-  worldMsg.set_remove(false);
-  worldMsg.set_create(true);
-  this->worldModPub->Publish(worldMsg);
+
+
+//  worldMsg.set_world_name("default");
+//  worldMsg.set_remove(false);
+//  worldMsg.set_create(true);
+//  this->worldModPub->Publish(worldMsg);
+
+// gzdbg << "K" << std::endl;
+
+
+  // Resume server
+  this->waiting = false;
+gzdbg << "L" << std::endl;
+*/
   return true;
-  */
 }

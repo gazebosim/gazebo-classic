@@ -315,6 +315,7 @@ VisualPtr Scene::GetWorldVisual() const
 //////////////////////////////////////////////////
 void Scene::Init()
 {
+gzdbg << "Scene::Init" << std::endl;
   this->dataPtr->worldVisual.reset(new Visual("__world_node__",
       shared_from_this()));
   this->dataPtr->worldVisual->SetId(0);
@@ -2281,6 +2282,7 @@ bool Scene::ProcessJointMsg(ConstJointPtr &_msg)
 /////////////////////////////////////////////////
 void Scene::OnScene(ConstScenePtr &_msg)
 {
+gzdbg << "Scene::OnScene" << std::endl;
   boost::mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
   this->dataPtr->sceneMsgs.push_back(_msg);
 }
@@ -2298,6 +2300,7 @@ void Scene::OnResponse(ConstResponsePtr &_msg)
 
   boost::mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
   this->dataPtr->sceneMsgs.push_back(sm);
+gzwarn << "Scene::OnResponse    "  << sm->DebugString() << std::endl;
   this->dataPtr->requestMsg = NULL;
 }
 
@@ -2724,6 +2727,7 @@ void Scene::OnLightModifyMsg(ConstLightPtr &_msg)
 /////////////////////////////////////////////////
 bool Scene::ProcessLightFactoryMsg(ConstLightPtr &_msg)
 {
+gzdbg << "Scene::ProcessLightFactoryMsg" << std::endl;
   Light_M::iterator iter;
   iter = this->dataPtr->lights.find(_msg->name());
 
@@ -3061,6 +3065,7 @@ void Scene::SetVisualId(VisualPtr _vis, uint32_t _id)
 /////////////////////////////////////////////////
 void Scene::AddLight(LightPtr _light)
 {
+gzdbg << "Scene::Light" << std::endl;
   std::string n = this->StripSceneName(_light->GetName());
   Light_M::iterator iter = this->dataPtr->lights.find(n);
   if (iter != this->dataPtr->lights.end())

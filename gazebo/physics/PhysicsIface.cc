@@ -113,6 +113,7 @@ void physics::pause_worlds(bool _pause)
 /////////////////////////////////////////////////
 void physics::stop_worlds()
 {
+gzdbg << "stop_worlds" << std::endl;
   for (auto &world : g_worlds)
     world->Stop();
 }
@@ -144,12 +145,14 @@ void physics::pause_world(WorldPtr _world, bool _pause)
 /////////////////////////////////////////////////
 void physics::stop_world(WorldPtr _world)
 {
+gzdbg << "stop_world" << std::endl;
   _world->Stop();
 }
 
 /////////////////////////////////////////////////
 void physics::remove_worlds()
 {
+gzdbg << "remove_worlds" << std::endl;
   for (auto &world : g_worlds)
   {
     world->Fini();

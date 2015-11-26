@@ -237,7 +237,7 @@ void World::Load(sdf::ElementPtr _sdf)
       "~/playback_control", &World::OnPlaybackControl, this);
 
   this->dataPtr->requestSub = this->dataPtr->node->Subscribe("~/request",
-                                           &World::OnRequest, this, true);
+                                           &World::OnRequest, this, false);
   this->dataPtr->jointSub = this->dataPtr->node->Subscribe("~/joint",
       &World::JointLog, this);
 
@@ -350,7 +350,7 @@ void World::Save(const std::string &_filename)
 void World::Init()
 {
   // Initialize all the entities (i.e. Model)
-  for (unsigned int i = 0; i < this->dataPtr->rootElement->GetChildCount(); i++)
+  for (unsigned int i = 0; i < this->dataPtr->rootElement->GetChildCount(); ++i)
     this->dataPtr->rootElement->GetChild(i)->Init();
 
   // Initialize the physics engine
@@ -443,6 +443,7 @@ bool World::GetRunning() const
 //////////////////////////////////////////////////
 void World::Stop()
 {
+gzdbg << "World::Stop" << std::endl;
   this->dataPtr->stop = true;
 
   if (this->dataPtr->thread)
@@ -451,6 +452,7 @@ void World::Stop()
     delete this->dataPtr->thread;
     this->dataPtr->thread = NULL;
   }
+gzdbg << "/World::Stop" << std::endl;
 }
 
 //////////////////////////////////////////////////
@@ -577,6 +579,7 @@ void World::LogStep()
 
           while (nameElem)
           {
+gzdbg << "DELETE 1" << std::endl;
             transport::requestNoReply(this->GetName(), "entity_delete",
                                       nameElem->Get<std::string>());
             nameElem = nameElem->GetNextElement("name");
@@ -810,6 +813,13 @@ void World::Fini()
 
   this->dataPtr->node->Fini();
 
+  this->dataPtr->deleteEntity.clear();
+  this->dataPtr->requestMsgs.clear();
+  this->dataPtr->factoryMsgs.clear();
+  this->dataPtr->modelMsgs.clear();
+  this->dataPtr->lightFactoryMsgs.clear();
+  this->dataPtr->lightModifyMsgs.clear();
+
   if (this->dataPtr->rootElement)
   {
     this->dataPtr->rootElement->Fini();
@@ -823,6 +833,7 @@ void World::Fini()
   }
 
   this->dataPtr->models.clear();
+  this->dataPtr->lights.clear();
   this->dataPtr->prevStates[0].SetWorld(WorldPtr());
   this->dataPtr->prevStates[1].SetWorld(WorldPtr());
 
@@ -960,13 +971,14 @@ LightPtr World::LoadLight(const sdf::ElementPtr &_sdf, const BasePtr &_parent)
   // Add to scene message
   msgs::Light *msg = this->dataPtr->sceneMsg.add_light();
   msg->CopyFrom(msgs::LightFromSDF(_sdf));
-
+gzdbg << "World::LoadLight  " << msg->name() << std::endl;
   // Create new light object
   LightPtr light(new physics::Light(_parent));
   light->ProcessMsg(*msg);
   light->SetWorld(shared_from_this());
   light->Load(_sdf);
   this->dataPtr->lights.push_back(light);
+gzdbg << "/World::LoadLight  " << std::endl;
 
   return light;
 }
@@ -1137,7 +1149,7 @@ void World::OnStep()
 void World::PrintEntityTree()
 {
   // Initialize all the entities
-  for (unsigned int i = 0; i < this->dataPtr->rootElement->GetChildCount(); i++)
+  for (unsigned int i = 0; i < this->dataPtr->rootElement->GetChildCount(); ++i)
     this->dataPtr->rootElement->GetChild(i)->Print("");
 }
 
@@ -1314,6 +1326,7 @@ void World::OnPlaybackControl(ConstLogPlaybackControlPtr &_data)
 //////////////////////////////////////////////////
 void World::OnRequest(ConstRequestPtr &_msg)
 {
+gzdbg << "World::OnRequest  " << std::endl;
   boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
   this->dataPtr->requestMsgs.push_back(*_msg);
 }
@@ -1355,6 +1368,11 @@ void World::BuildSceneMsg(msgs::Scene &_scene, BasePtr _entity)
     {
       msgs::Model *modelMsg = _scene.add_model();
       boost::static_pointer_cast<Model>(_entity)->FillMsg(*modelMsg);
+    }
+    if (_entity->HasType(Entity::LIGHT))
+    {
+      msgs::Light *lightMsg = _scene.add_light();
+      boost::static_pointer_cast<physics::Light>(_entity)->FillMsg(*lightMsg);
     }
 
     for (unsigned int i = 0; i < _entity->GetChildCount(); ++i)
@@ -1462,6 +1480,7 @@ void World::ProcessEntityMsgs()
 
   for (auto &entityName : this->dataPtr->deleteEntity)
   {
+gzdbg << "World::ProcessEntityMessages DELETE "<< entityName << std::endl;;
     this->RemoveModel(entityName);
   }
 
@@ -1507,6 +1526,7 @@ void World::ProcessRequestMsgs()
     }
     else if (requestMsg.request() == "entity_delete")
     {
+gzdbg << "World::ProcessRequestMsgs DELETE " << std::endl;;
       boost::mutex::scoped_lock lock2(this->dataPtr->entityDeleteMutex);
       this->dataPtr->deleteEntity.push_back(requestMsg.data());
     }
@@ -1582,6 +1602,7 @@ void World::ProcessRequestMsgs()
     else if (requestMsg.request() == "scene_info")
     {
       this->dataPtr->sceneMsg.clear_model();
+      this->dataPtr->sceneMsg.clear_light();
       this->BuildSceneMsg(this->dataPtr->sceneMsg, this->dataPtr->rootElement);
 
       std::string *serializedData = response.mutable_serialized_data();

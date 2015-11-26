@@ -121,6 +121,7 @@ bool gazebo::setupServer(const std::vector<std::string> &_args)
 /////////////////////////////////////////////////
 bool gazebo::shutdown()
 {
+gzdbg << "gazebo::shutdown DON'T" << std::endl;
   gazebo::physics::stop_worlds();
 
   gazebo::sensors::stop();
