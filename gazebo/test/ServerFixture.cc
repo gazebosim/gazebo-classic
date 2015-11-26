@@ -180,6 +180,9 @@ void ServerFixture::LoadArgs(const std::string &_args)
   if (std::find(params.begin(), params.end(), "-u") != params.end())
     paused = true;
 
+  // start the rendering in the server fixture thread
+  rendering::load();
+
   // Create, load, and run the server in its own thread
   this->serverThread = new boost::thread(
     boost::bind(&ServerFixture::RunServer, this, params));
