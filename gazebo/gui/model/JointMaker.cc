@@ -38,6 +38,7 @@
 
 #include "gazebo/gui/model/JointInspector.hh"
 #include "gazebo/gui/model/ModelEditorEvents.hh"
+#include "gazebo/gui/model/MEUserCmdManager.hh"
 #include "gazebo/gui/model/JointMaker.hh"
 
 using namespace gazebo;
@@ -759,6 +760,9 @@ void JointMaker::OnDelete()
   if (this->inspectName.empty())
     return;
 
+  MEUserCmdManager::Instance()->NewCmd(
+      "Deleted " + this->inspectName, msgs::UserCmd::DELETING);
+
   this->RemoveJoint(this->inspectName);
   this->inspectName = "";
 }
@@ -1438,6 +1442,9 @@ bool JointMaker::SetChildLink(rendering::VisualPtr _childLink)
     this->newJoint = joint;
     this->newJointCreated = true;
     gui::model::Events::modelChanged();
+
+    MEUserCmdManager::Instance()->NewCmd(
+        "Inserted " + joint->name, msgs::UserCmd::INSERTING);
   }
   // Update child
   else

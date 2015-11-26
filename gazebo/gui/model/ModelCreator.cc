@@ -1487,6 +1487,9 @@ void ModelCreator::OnDelete()
 /////////////////////////////////////////////////
 void ModelCreator::OnDelete(const std::string &_entity)
 {
+  MEUserCmdManager::Instance()->NewCmd(
+      "Deleted " + _entity, msgs::UserCmd::DELETING);
+
   this->RemoveEntity(_entity);
 }
 

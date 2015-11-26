@@ -12,6 +12,7 @@ message UserCmd
     /// \brief Moving a model.
     MOVING = 1;
     INSERTING = 2;
+    DELETING = 3;
   }
 
   /// \brief Unique id for user command.
