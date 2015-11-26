@@ -22,8 +22,12 @@
 
 #include <boost/range/adaptor/reversed.hpp>
 
+#include "gazebo/common/Events.hh"
+
 #include "gazebo/transport/transport.hh"
 
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/Light.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/WorldState.hh"
 
@@ -35,16 +39,19 @@ using namespace physics;
 
 
 /////////////////////////////////////////////////
-UserCmd::UserCmd(const unsigned int _id,
+UserCmd::UserCmd(UserCmdManagerPtr _manager,
+                 const unsigned int _id,
                  physics::WorldPtr _world,
                  const std::string &_description,
                  const msgs::UserCmd::Type &_type)
   : dataPtr(new UserCmdPrivate())
 {
+  this->dataPtr->manager = _manager;
   this->dataPtr->id = _id;
   this->dataPtr->world = _world;
   this->dataPtr->description = _description;
   this->dataPtr->type = _type;
+  this->dataPtr->sdf = NULL;
 
   // Record current world state
   this->dataPtr->startState = WorldState(this->dataPtr->world);
@@ -63,21 +70,59 @@ void UserCmd::Undo()
   // Record / override the state for redo
   this->dataPtr->endState = WorldState(this->dataPtr->world);
 
-  // Reset physics states for the whole world
-  this->dataPtr->world->ResetPhysicsStates();
+  // Undo insertion
+  if (this->dataPtr->type == msgs::UserCmd::INSERTING &&
+      this->dataPtr->manager && !this->dataPtr->entityName.empty())
+  {
+    // Keep sdf for redo
+    if (!this->dataPtr->sdf)
+    {
+      physics::ModelPtr model =
+          this->dataPtr->world->GetModel(this->dataPtr->entityName);
+      physics::LightPtr light =
+          this->dataPtr->world->Light(this->dataPtr->entityName);
+      if (!model && !light)
+      {
+        gzerr << "Entity [" << this->dataPtr->entityName << "] not found."
+            << std::endl;
+        return;
+      }
+
+      this->dataPtr->sdf.reset(new sdf::SDF);
+      if (model)
+        this->dataPtr->sdf->Root()->Copy(model->GetSDF());
+      else if (light)
+        this->dataPtr->sdf->Root()->Copy(light->GetSDF());
+    }
+
+    // Delete
+    transport::requestNoReply(this->dataPtr->manager->dataPtr->node,
+        "entity_delete", this->dataPtr->entityName);
+  }
 
   // Set state to the moment the command was executed
-  this->dataPtr->world->SetState(this->dataPtr->startState);
+  this->dataPtr->manager->dataPtr->pendingStates.push_back(
+      this->dataPtr->startState);
 }
 
 /////////////////////////////////////////////////
 void UserCmd::Redo()
 {
-  // Reset physics states for the whole world
-  this->dataPtr->world->ResetPhysicsStates();
+  // Redo insertion
+  if (this->dataPtr->type == msgs::UserCmd::INSERTING &&
+      this->dataPtr->manager && this->dataPtr->sdf)
+  {
+    msgs::Factory msg;
+    msg.set_sdf(this->dataPtr->sdf->ToString());
+    this->dataPtr->manager->dataPtr->modelFactoryPub->Publish(msg);
+
+    this->dataPtr->manager->dataPtr->insertionPending =
+        this->dataPtr->entityName;
+  }
 
   // Set state to the moment undo was triggered
-  this->dataPtr->world->SetState(this->dataPtr->endState);
+  this->dataPtr->manager->dataPtr->pendingStates.push_back(
+      this->dataPtr->endState);
 }
 
 /////////////////////////////////////////////////
@@ -99,11 +144,28 @@ msgs::UserCmd::Type UserCmd::Type() const
 }
 
 /////////////////////////////////////////////////
+void UserCmd::SetEntityName(const std::string &_name)
+{
+  this->dataPtr->entityName = _name;
+}
+
+/////////////////////////////////////////////////
+std::string UserCmd::EntityName() const
+{
+  return this->dataPtr->entityName;
+}
+
+/////////////////////////////////////////////////
 UserCmdManager::UserCmdManager(const WorldPtr _world)
   : dataPtr(new UserCmdManagerPrivate())
 {
   this->dataPtr->world = _world;
 
+  // Events
+  this->dataPtr->connections.push_back(event::Events::ConnectWorldUpdateBegin(
+      boost::bind(&UserCmdManager::ProcessPendingStates, this)));
+
+  // Transport
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init();
 
@@ -122,12 +184,21 @@ UserCmdManager::UserCmdManager(const WorldPtr _world)
   this->dataPtr->lightModifyPub =
       this->dataPtr->node->Advertise<msgs::Light>("~/light/modify");
 
+  this->dataPtr->modelFactoryPub =
+      this->dataPtr->node->Advertise<msgs::Factory>("~/factory");
+
+  this->dataPtr->lightFactoryPub =
+      this->dataPtr->node->Advertise<msgs::Light>("~/factory/light");
+
   this->dataPtr->idCounter = 0;
+  this->dataPtr->insertionPending = "";
 }
 
 /////////////////////////////////////////////////
 UserCmdManager::~UserCmdManager()
 {
+  this->dataPtr->connections.clear();
+
   delete this->dataPtr;
   this->dataPtr = NULL;
 }
@@ -139,9 +210,13 @@ void UserCmdManager::OnUserCmdMsg(ConstUserCmdPtr &_msg)
   unsigned int id = this->dataPtr->idCounter++;
 
   // Create command
-  UserCmdPtr cmd(new UserCmd(id, this->dataPtr->world, _msg->description(),
-      _msg->type()));
+  UserCmdPtr cmd(new UserCmd(shared_from_this(), id, this->dataPtr->world,
+      _msg->description(), _msg->type()));
 
+  if (_msg->has_entity_name())
+    cmd->SetEntityName(_msg->entity_name());
+
+  // Forward command now that we saved the previous world state
   if (_msg->type() == msgs::UserCmd::MOVING)
   {
     for (int i = 0; i < _msg->model_size(); ++i)
@@ -149,6 +224,23 @@ void UserCmdManager::OnUserCmdMsg(ConstUserCmdPtr &_msg)
 
     for (int i = 0; i < _msg->light_size(); ++i)
       this->dataPtr->lightModifyPub->Publish(_msg->light(i));
+  }
+  else if (_msg->type() == msgs::UserCmd::INSERTING)
+  {
+    if (_msg->has_factory())
+    {
+      this->dataPtr->modelFactoryPub->Publish(_msg->factory());
+    }
+    else if (_msg->light_size() == 1)
+    {
+      this->dataPtr->lightFactoryPub->Publish(_msg->light(0));
+    }
+    else
+    {
+      gzwarn << "Insert command [" << _msg->description() <<
+          "] does not contain factory or light messages." <<
+          " Command won't be executed." << std::endl;
+    }
   }
 
   // Add it to undo list
@@ -289,4 +381,27 @@ void UserCmdManager::PublishCurrentStats()
   this->dataPtr->userCmdStatsPub->Publish(statsMsg);
 }
 
+/////////////////////////////////////////////////
+void UserCmdManager::ProcessPendingStates()
+{
+  if (this->dataPtr->pendingStates.empty())
+    return;
+
+  // Insertion pending
+  if (!this->dataPtr->insertionPending.empty())
+  {
+    // Model hasn't been inserted yet
+    if (!this->dataPtr->world->GetModel(this->dataPtr->insertionPending))
+      return;
+    else
+      this->dataPtr->insertionPending = "";
+  }
+
+  // Reset physics states for the whole world
+  this->dataPtr->world->ResetPhysicsStates();
+
+  // Set world state to pending state
+  this->dataPtr->world->SetState(this->dataPtr->pendingStates.front());
+  this->dataPtr->pendingStates.pop_front();
+}
 

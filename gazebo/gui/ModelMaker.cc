@@ -51,16 +51,11 @@ ModelMaker::ModelMaker() : EntityMaker(*new ModelMakerPrivate)
       reinterpret_cast<ModelMakerPrivate *>(this->dataPtr);
 
   dPtr->clone = false;
-  dPtr->makerPub = dPtr->node->Advertise<msgs::Factory>("~/factory");
 }
 
 /////////////////////////////////////////////////
 ModelMaker::~ModelMaker()
 {
-  ModelMakerPrivate *dPtr =
-      reinterpret_cast<ModelMakerPrivate *>(this->dataPtr);
-
-  dPtr->makerPub.reset();
 }
 
 /////////////////////////////////////////////////
@@ -311,6 +306,7 @@ void ModelMaker::CreateTheEntity()
   ModelMakerPrivate *dPtr =
       reinterpret_cast<ModelMakerPrivate *>(this->dataPtr);
 
+  std::string modelName;
   msgs::Factory msg;
   if (!dPtr->clone)
   {
@@ -328,7 +324,7 @@ void ModelMaker::CreateTheEntity()
       isLight = true;
     }
 
-    std::string modelName = modelElem->Get<std::string>("name");
+    modelName = modelElem->Get<std::string>("name");
 
     // Automatically create a new name if the model exists
     rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
@@ -363,7 +359,14 @@ void ModelMaker::CreateTheEntity()
           dPtr->modelVisual->GetName().find("_clone_tmp")));
   }
 
-  dPtr->makerPub->Publish(msg);
+  // Register user command on server
+  msgs::UserCmd userCmdMsg;
+  userCmdMsg.set_description("Insert [" + modelName + "]");
+  userCmdMsg.set_type(msgs::UserCmd::INSERTING);
+  userCmdMsg.set_entity_name(modelName);
+  userCmdMsg.mutable_factory()->CopyFrom(msg);
+
+  dPtr->userCmdPub->Publish(userCmdMsg);
 }
 
 /////////////////////////////////////////////////

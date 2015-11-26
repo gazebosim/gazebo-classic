@@ -1,5 +1,6 @@
 package gazebo.msgs;
 
+import "factory.proto";
 import "light.proto";
 import "model.proto";
 
@@ -14,6 +15,8 @@ message UserCmd
   {
     /// \brief Moving a model.
     MOVING = 1;
+    /// \brief New model insertion
+    INSERTING = 3;
   }
 
   /// \brief Unique id for user command.
@@ -28,6 +31,12 @@ message UserCmd
   /// \brief For model modify commands.
   repeated Model model = 4;
 
-  /// \brief For light modify commands.
+  /// \brief For light modify or factory commands.
   repeated Light light = 5;
+
+  /// \brief For model factory commands.
+  optional Factory factory = 7;
+
+  /// \brief Name of entity related to the command.
+  optional string entity_name = 8;
 }

@@ -40,7 +40,8 @@ namespace gazebo
       /// \param[in] _description Description for the command, such as
       /// "Rotate box", "Delete sphere", etc.
       /// \param[in] _type Type of command, such as MOVING, DELETING, etc.
-      public: UserCmd(const unsigned int _id,
+      public: UserCmd(UserCmdManagerPtr _manager,
+                      const unsigned int _id,
                       physics::WorldPtr _world,
                       const std::string &_description,
                       const msgs::UserCmd::Type &_type);
@@ -66,6 +67,14 @@ namespace gazebo
       /// \return Command type
       public: msgs::UserCmd::Type Type() const;
 
+      /// \brief Set the name of the entity related tot he command.
+      /// \param[in] _name Entity name.
+      public: void SetEntityName(const std::string &_name);
+
+      /// \brief Get the name of the entity related tot he command.
+      /// \return Entity name.
+      public: std::string EntityName() const;
+
       /// \internal
       /// \brief Pointer to private data.
       protected: UserCmdPrivate *dataPtr;
@@ -75,6 +84,7 @@ namespace gazebo
 
     /// \brief Manages user commands from the server side.
     class GAZEBO_VISIBLE UserCmdManager
+        : public std::enable_shared_from_this<UserCmdManager>
     {
       /// \brief Constructor.
       /// \param[in] _world Pointer to the world.
@@ -95,6 +105,12 @@ namespace gazebo
 
       /// \brief Publish a message about current user command statistics.
       private: void PublishCurrentStats();
+
+      /// \brief Called every world update iteration.
+      private: void ProcessPendingStates();
+
+      // The UserCmd class is a friend so it can use the transport node.
+      private: friend class UserCmd;
 
       /// \internal
       /// \brief Pointer to private data.

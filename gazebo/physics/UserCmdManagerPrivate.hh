@@ -53,6 +53,12 @@ namespace gazebo
 
       /// \brief Type of command, such as MOVING or DELETING.
       public: msgs::UserCmd::Type type;
+
+      /// \brief Type of command, such as MOVING or DELETING.
+      public: std::string entityName;
+
+      public: sdf::SDFPtr sdf;
+      public: UserCmdManagerPtr manager;
     };
 
     class UserCmd;
@@ -85,11 +91,23 @@ namespace gazebo
       /// \brief Publisher of light modify messages.
       public: transport::PublisherPtr lightModifyPub;
 
+      /// \brief Publisher of model factory messages.
+      public: transport::PublisherPtr modelFactoryPub;
+
+      /// \brief Publisher of light factory messages.
+      public: transport::PublisherPtr lightFactoryPub;
+
       /// \brief List of commands which can be undone.
       public: std::vector<UserCmdPtr> undoCmds;
 
       /// \brief List of commands which can be redone.
       public: std::vector<UserCmdPtr> redoCmds;
+
+      /// \brief All the event connections.
+      public: event::Connection_V connections;
+
+      public: std::string insertionPending;
+      public: std::list<WorldState> pendingStates;
     };
   }
 }

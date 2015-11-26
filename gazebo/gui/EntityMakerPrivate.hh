@@ -32,6 +32,10 @@ namespace gazebo
       /// \brief Node to publish messages and spawn the entity. Each derived
       /// class must create its own publisher to the appropriate topic.
       public: transport::NodePtr node;
+
+      /// \brief Publish user command messages for the server to place in the
+      /// undo queue.
+      public: transport::PublisherPtr userCmdPub;
     };
   }
 }

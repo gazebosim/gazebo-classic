@@ -39,14 +39,15 @@ TEST_F(UserCmdManagerTest, CreateCmd)
   EXPECT_TRUE(world != NULL);
 
   // Create a manager
-  physics::UserCmdManager *manager = new physics::UserCmdManager(world);
+  physics::UserCmdManagerPtr manager(new physics::UserCmdManager(world));
   EXPECT_TRUE(manager != NULL);
 
   // Create the command
   unsigned int id = 21;
   std::string description = "Command description";
   msgs::UserCmd::Type type = msgs::UserCmd::MOVING;
-  physics::UserCmd *cmd = new physics::UserCmd(id, world, description, type);
+  physics::UserCmd *cmd =
+      new physics::UserCmd(manager, id, world, description, type);
   EXPECT_TRUE(cmd != NULL);
 
   // Check data
@@ -57,8 +58,7 @@ TEST_F(UserCmdManagerTest, CreateCmd)
   // Clean up
   delete cmd;
   cmd = NULL;
-  delete manager;
-  manager = NULL;
+  manager.reset();
 }
 
 int main(int argc, char **argv)

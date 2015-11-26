@@ -35,9 +35,6 @@ namespace gazebo
       /// \brief True if the model is being created as a clone of an existing
       /// model.
       public: bool clone;
-
-      /// \brief Publisher for factory messages.
-      public: transport::PublisherPtr makerPub;
     };
   }
 }

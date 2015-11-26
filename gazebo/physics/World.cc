@@ -237,7 +237,7 @@ void World::Load(sdf::ElementPtr _sdf)
       "~/playback_control", &World::OnPlaybackControl, this);
 
   this->dataPtr->requestSub = this->dataPtr->node->Subscribe("~/request",
-                                           &World::OnRequest, this, true);
+                                           &World::OnRequest, this, false);
   this->dataPtr->jointSub = this->dataPtr->node->Subscribe("~/joint",
       &World::JointLog, this);
 
