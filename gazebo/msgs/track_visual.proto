@@ -2,7 +2,7 @@ package gazebo.msgs;
 
 /// \ingroup gazebo_msgs
 /// \interface TrackVisual
-/// \brief Message for a trakking a rendering::Visual with a rendering::Camera
+/// \brief Message for a trackking a rendering::Visual with a rendering::Camera
 
 
 message TrackVisual
