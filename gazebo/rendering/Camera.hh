@@ -424,14 +424,8 @@ namespace gazebo
       /// \param[in] _maxDist Maximum distance the camera is allowd to get from
       /// the visual
       public: void AttachToVisual(const std::string &_visualName,
-                  bool _inheritOrientation, double _minDist, double _maxDist);
-
-      /// \brief Attach the camera to a scene node
-      /// \param[in] _visualName Name of the visual to attach the camera to
-      /// \param[in] _inheritOrientation True means camera acquires the visual's
-      /// orientation
-      public: void AttachToVisual(const std::string &_visualName,
-                  bool _inheritOrientation);
+                  bool _inheritOrientation,
+                  double _minDist = 0.0, double _maxDist = 0.0);
 
       /// \brief Attach the camera to a scene node
       /// \param[in] _id ID of the visual to attach the camera to
@@ -443,14 +437,7 @@ namespace gazebo
       /// the visual
       public: void AttachToVisual(uint32_t _id,
                   bool _inheritOrientation,
-                  double _minDist, double _maxDist);
-
-      /// \brief Attach the camera to a scene node
-      /// \param[in] _id ID of the visual to attach the camera to
-      /// \param[in] _inheritOrientation True means camera acquires the visual's
-      /// orientation
-      public: void AttachToVisual(uint32_t _id,
-                                  bool _inheritOrientation);
+                  double _minDist = 0.0, double _maxDist = 0.0);
 
       /// \brief Set the camera to track a scene node
       /// \param[in] _visualName Name of the visual to track
@@ -548,59 +535,6 @@ namespace gazebo
       /// \sa SetProjectionType(const std::string &_type)
       public: std::string GetProjectionType() const;
 
-      /// \brief Get whether this camera is static when tracking a model.
-      /// \return True if camera is static when tracking a model.
-      /// \sa SetTrackIsStatic(bool _isStatic)
-      public: virtual bool TrackIsStatic() const;
-
-      /// \brief Set whether this camera is static when tracking a model.
-      /// \param[in] _isStatic True means camera is static when tracking a
-      /// model.
-      /// \sa TrackIsStatic()
-      public: virtual void SetTrackIsStatic(const bool _isStatic);
-
-      /// \brief Get whether this camera's position is relative to tracked
-      /// models.
-      /// \return True if camera's position is relative to tracked models.
-      /// \sa SetTrackIsRelative(bool _isRelative)
-      public: virtual bool TrackIsRelative() const;
-
-      /// \brief Set whether this camera's position is relative to tracked
-      /// models.
-      /// \param[in] _isStatic True means camera's position is relative to
-      /// tracked models.
-      /// \sa TrackIsRelative()
-      public: virtual void SetTrackIsRelative(const bool _isRelative);
-
-      /// \brief Return the position of the camera when tracking a model.
-      /// \return Position of the camera.
-      /// \sa SetTrackPosition(const ignition::math::Vector3d &_pos)
-      public: virtual ignition::math::Vector3d TrackPosition() const;
-
-      /// \brief Set the position of the camera when tracking a visual.
-      /// \param[in] _pos Position of the camera.
-      /// \sa TrackPosition()
-      public: virtual void SetTrackPosition(
-                  const ignition::math::Vector3d &_pos);
-
-      /// \brief Return the minimum distance to the tracked visual.
-      /// \return Minimum distance to the model.
-      public: virtual double TrackMinDistance() const;
-
-      /// \brief Return the maximum distance to the tracked visual.
-      /// \return Maximum distance to the model.
-      public: virtual double TrackMaxDistance() const;
-
-      /// \brief Set the minimum distance between the camera and tracked
-      /// visual.
-      /// \param[in] _dist Minimum distance between camera and visual.
-      public: virtual void SetTrackMinDistance(const double _dist);
-
-      /// \brief Set the maximum distance between the camera and tracked
-      /// visual.
-      /// \param[in] _dist Maximum distance between camera and visual.
-      public: virtual void SetTrackMaxDistance(const double _dist);
-
       /// \brief Implementation of the render call
       protected: virtual void RenderImpl();
 
@@ -628,7 +562,7 @@ namespace gazebo
       /// \return True on success
       protected: virtual bool AttachToVisualImpl(const std::string &_name,
                      bool _inheritOrientation,
-                     double _minDist= 0, double _maxDist = 0);
+                     double _minDist = 0, double _maxDist = 0);
 
       /// \brief Attach the camera to a scene node
       /// \param[in] _id ID of the visual to attach the camera to

@@ -118,7 +118,7 @@ void CameraVisual::Load(const msgs::CameraSensor &_msg)
   line->setVisibilityFlags(GZ_VISIBILITY_GUI);
 
   this->AttachObject(planeEnt);
-  dPtr->camera->AttachToVisual(this->GetId(), true, 0, 0);
+  dPtr->camera->AttachToVisual(this->GetId(), true);
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
 
