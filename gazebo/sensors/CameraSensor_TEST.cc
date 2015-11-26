@@ -44,8 +44,8 @@ TEST_F(CameraSensor_TEST, CreateCamera)
 
   EXPECT_TRUE(sensor->IsActive());
 
-  EXPECT_EQ(sensor->GetImageWidth(), 320);
-  EXPECT_EQ(sensor->GetImageHeight(), 240);
+  EXPECT_EQ(sensor->GetImageWidth(), 320u);
+  EXPECT_EQ(sensor->GetImageHeight(), 240u);
   EXPECT_FALSE(sensor->GetTopic().empty());
 
   // wait for camera images
