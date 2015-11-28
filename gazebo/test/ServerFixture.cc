@@ -121,6 +121,8 @@ void ServerFixture::Unload()
   if (this->node)
     this->node->Fini();
 
+  rendering::fini();
+
   if (this->server)
   {
     this->server->Stop();
