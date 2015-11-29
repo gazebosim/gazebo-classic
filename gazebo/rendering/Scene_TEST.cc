@@ -28,6 +28,9 @@ class Scene_TEST : public ServerFixture
 /////////////////////////////////////////////////
 TEST_F(Scene_TEST, AddRemoveVisuals)
 {
+  // start rendering in test thread
+  rendering::load();
+
   Load("worlds/empty.world");
 
   // Get the scene
@@ -61,6 +64,9 @@ TEST_F(Scene_TEST, AddRemoveVisuals)
 /////////////////////////////////////////////////
 TEST_F(Scene_TEST, RemoveModelVisual)
 {
+  // start rendering in test thread
+  rendering::load();
+
   // Load a world containing 3 simple shapes
   Load("worlds/shapes.world");
 
@@ -158,6 +164,9 @@ TEST_F(Scene_TEST, RemoveModelVisual)
 /////////////////////////////////////////////////
 TEST_F(Scene_TEST, VisualType)
 {
+  // start rendering in test thread
+  rendering::load();
+
   // Load a world containing 3 simple shapes
   Load("worlds/shapes.world");
 

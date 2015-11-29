@@ -120,6 +120,9 @@ void CreateColorMaterial(const std::string &_materialName,
 /////////////////////////////////////////////////
 TEST_F(Visual_TEST, BoundingBox)
 {
+  // start rendering in test thread
+  rendering::load();
+
   Load("worlds/empty.world");
 
   // Spawn a box and check its bounding box dimensions.
@@ -181,6 +184,9 @@ TEST_F(Visual_TEST, BoundingBox)
 /////////////////////////////////////////////////
 TEST_F(Visual_TEST, Geometry)
 {
+  // start rendering in test thread
+  rendering::load();
+
   Load("worlds/empty.world");
 
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
@@ -307,6 +313,9 @@ TEST_F(Visual_TEST, Geometry)
 /////////////////////////////////////////////////
 TEST_F(Visual_TEST, CastShadows)
 {
+  // start rendering in test thread
+  rendering::load();
+
   Load("worlds/empty.world");
 
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
@@ -344,6 +353,9 @@ TEST_F(Visual_TEST, CastShadows)
 /////////////////////////////////////////////////
 TEST_F(Visual_TEST, Transparency)
 {
+  // start rendering in test thread
+  rendering::load();
+
   Load("worlds/empty.world");
 
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
@@ -378,6 +390,9 @@ TEST_F(Visual_TEST, Transparency)
 /////////////////////////////////////////////////
 TEST_F(Visual_TEST, ChildTransparency)
 {
+  // start rendering in test thread
+  rendering::load();
+
   Load("worlds/empty.world");
 
   // Get scene
@@ -426,6 +441,9 @@ TEST_F(Visual_TEST, ChildTransparency)
 /////////////////////////////////////////////////
 TEST_F(Visual_TEST, Material)
 {
+  // start rendering in test thread
+  rendering::load();
+
   Load("worlds/empty.world");
 
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
@@ -465,6 +483,9 @@ TEST_F(Visual_TEST, Material)
 /////////////////////////////////////////////////
 TEST_F(Visual_TEST, ChildMaterial)
 {
+  // start rendering in test thread
+  rendering::load();
+
   Load("worlds/empty.world");
 
   // Get scene
@@ -521,6 +542,9 @@ TEST_F(Visual_TEST, ChildMaterial)
 /////////////////////////////////////////////////
 TEST_F(Visual_TEST, Lighting)
 {
+  // start rendering in test thread
+  rendering::load();
+
   Load("worlds/empty.world");
 
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
@@ -556,6 +580,9 @@ TEST_F(Visual_TEST, Lighting)
 /////////////////////////////////////////////////
 TEST_F(Visual_TEST, Color)
 {
+  // start rendering in test thread
+  rendering::load();
+
   Load("worlds/empty.world");
 
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
@@ -638,6 +665,9 @@ TEST_F(Visual_TEST, Color)
 /////////////////////////////////////////////////
 TEST_F(Visual_TEST, ChildColor)
 {
+  // start rendering in test thread
+  rendering::load();
+
   Load("worlds/empty.world");
 
   // Get scene
@@ -740,6 +770,9 @@ TEST_F(Visual_TEST, ChildColor)
 /////////////////////////////////////////////////
 TEST_F(Visual_TEST, ColorMaterial)
 {
+  // start rendering in test thread
+  rendering::load();
+
   Load("worlds/empty.world");
 
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
@@ -853,6 +886,9 @@ TEST_F(Visual_TEST, ColorMaterial)
 /////////////////////////////////////////////////
 TEST_F(Visual_TEST, UpdateMeshFromMsg)
 {
+  // start rendering in test thread
+  rendering::load();
+
   Load("worlds/empty.world");
 
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
@@ -893,6 +929,9 @@ TEST_F(Visual_TEST, UpdateMeshFromMsg)
 /////////////////////////////////////////////////
 TEST_F(Visual_TEST, GetAncestors)
 {
+  // start rendering in test thread
+  rendering::load();
+
   Load("worlds/blank.world");
 
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
@@ -1094,6 +1133,9 @@ TEST_F(Visual_TEST, GetAncestors)
 /////////////////////////////////////////////////
 TEST_F(Visual_TEST, ConvertVisualType)
 {
+  // start rendering in test thread
+  rendering::load();
+
   // convert from msgs::Visual::Type to Visual::VisualType
   EXPECT_EQ(msgs::Visual::ENTITY,
       rendering::Visual::ConvertVisualType(rendering::Visual::VT_ENTITY));
@@ -1134,6 +1176,9 @@ TEST_F(Visual_TEST, ConvertVisualType)
 /////////////////////////////////////////////////
 TEST_F(Visual_TEST, Scale)
 {
+  // start rendering in test thread
+  rendering::load();
+
   // Load a world containing 3 simple shapes
   Load("worlds/shapes.world");
 
@@ -1383,6 +1428,9 @@ TEST_F(Visual_TEST, Scale)
 /////////////////////////////////////////////////
 TEST_F(Visual_TEST, VisibilityFlags)
 {
+  // start rendering in test thread
+  rendering::load();
+
   // Load a world containing 3 simple shapes
   Load("worlds/shapes.world");
 

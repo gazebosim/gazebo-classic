@@ -29,6 +29,9 @@ class LinkFrameVisual_TEST : public ServerFixture
 /////////////////////////////////////////////////
 TEST_F(LinkFrameVisual_TEST, LinkFrameTest)
 {
+  // start rendering in test thread
+  rendering::load();
+
   Load("worlds/empty.world");
 
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene("default");

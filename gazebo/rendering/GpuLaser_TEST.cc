@@ -34,6 +34,9 @@ class GpuLaser_TEST : public ServerFixture
 /////////////////////////////////////////////////
 TEST_F(GpuLaser_TEST, BasicGpuLaserAPITest)
 {
+  // start rendering in test thread
+  rendering::load();
+
   Load("worlds/empty.world");
 
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene("default");

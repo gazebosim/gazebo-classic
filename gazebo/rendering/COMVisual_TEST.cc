@@ -29,6 +29,9 @@ class COMVisual_TEST : public ServerFixture
 /////////////////////////////////////////////////
 TEST_F(COMVisual_TEST, COMVisualTest)
 {
+  // start rendering in test thread
+  rendering::load();
+
   Load("worlds/empty.world");
 
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene("default");

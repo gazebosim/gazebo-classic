@@ -30,6 +30,9 @@ class SonarVisual_TEST : public ServerFixture
 /////////////////////////////////////////////////
 TEST_F(SonarVisual_TEST, SonarVisualTest)
 {
+  // start rendering in test thread
+  rendering::load();
+
   Load("worlds/empty.world");
 
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene("default");

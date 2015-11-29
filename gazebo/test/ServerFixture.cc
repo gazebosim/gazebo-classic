@@ -121,8 +121,6 @@ void ServerFixture::Unload()
   if (this->node)
     this->node->Fini();
 
-  rendering::fini();
-
   if (this->server)
   {
     this->server->Stop();
@@ -181,9 +179,6 @@ void ServerFixture::LoadArgs(const std::string &_args)
   bool paused = false;
   if (std::find(params.begin(), params.end(), "-u") != params.end())
     paused = true;
-
-  // start the rendering in the server fixture thread
-  rendering::load();
 
   // Create, load, and run the server in its own thread
   this->serverThread = new boost::thread(
