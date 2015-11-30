@@ -20,6 +20,7 @@
 #include <sstream>
 #include "gazebo/rendering/ogre_gazebo.h"
 
+#include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/rendering/DynamicLines.hh"
 
@@ -107,12 +108,10 @@ void DynamicLines::SetColor(unsigned int _index, const common::Color &_color)
 }
 
 /////////////////////////////////////////////////
-const math::Vector3 &DynamicLines::GetPoint(unsigned int _index) const
+math::Vector3 DynamicLines::GetPoint(unsigned int _index) const
 {
   if (_index >= this->points.size())
-  {
     gzthrow("Point index is out of bounds");
-  }
 
   return this->points[_index];
 }

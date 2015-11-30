@@ -103,7 +103,7 @@ namespace gazebo
       /// \deprecated See function that returns an ignition::math object
       /// \throw Throws an gazebo::common::Exception if the _index is out
       /// of bounds
-      public: const math::Vector3 &GetPoint(unsigned int _index) const
+      public: math::Vector3 GetPoint(unsigned int _index) const
               GAZEBO_DEPRECATED(7.0);
 
       /// \brief Return the location of an existing point in the point list
