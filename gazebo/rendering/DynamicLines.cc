@@ -84,7 +84,7 @@ void DynamicLines::SetPoint(unsigned int _index, const math::Vector3 &_value)
 }
 
 /////////////////////////////////////////////////
-void DynamicLines::SetPoint(unsigned int _index,
+void DynamicLines::SetPoint(const unsigned int _index,
                             const ignition::math::Vector3d &_value)
 {
   if (_index >= this->points.size())
