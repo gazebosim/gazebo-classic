@@ -103,16 +103,16 @@ namespace gazebo
       /// \deprecated See function that returns an ignition::math object
       /// \throw Throws an gazebo::common::Exception if the _index is out
       /// of bounds
-      public: math::Vector3 GetPoint(unsigned int _index) const
+      public: const math::Vector3 &GetPoint(unsigned int _index) const
               GAZEBO_DEPRECATED(7.0);
 
       /// \brief Return the location of an existing point in the point list
       /// \param[in] _index Number of the point to return
-      /// \return ignition::math::Vector3d value of the point
-      /// \throw Throws an gazebo::common::Exception if the _index is out
-      /// of bounds
-      public: const ignition::math::Vector3d &Point(
-                  const unsigned int _index) const;
+      /// \return ignition::math::Vector3d value of the point. A vector of
+      /// [IGN_DBL_INF, IGN_DBL_INF, IGN_DBL_INF] is returned when then the
+      /// _index is out of bounds.
+      /// IGN_DBL_INF==std::numeric_limits<double>::infinity()
+      public: ignition::math::Vector3d Point(const unsigned int _index) const;
 
       /// \brief Return the total number of points in the point list
       /// \return Number of points

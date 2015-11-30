@@ -107,7 +107,7 @@ void DynamicLines::SetColor(unsigned int _index, const common::Color &_color)
 }
 
 /////////////////////////////////////////////////
-math::Vector3 DynamicLines::GetPoint(unsigned int _index) const
+const math::Vector3 &DynamicLines::GetPoint(unsigned int _index) const
 {
   if (_index >= this->points.size())
   {
@@ -118,12 +118,15 @@ math::Vector3 DynamicLines::GetPoint(unsigned int _index) const
 }
 
 /////////////////////////////////////////////////
-const ignition::math::Vector3d &DynamicLines::Point(
+ignition::math::Vector3d DynamicLines::Point(
     const unsigned int _index) const
 {
   if (_index >= this->points.size())
   {
-    gzthrow("Point index is out of bounds");
+    gzerr << "Point index[" << _index << "] is out of bounds[0-"
+           << this->points.size()-1 << "]\n";
+
+    return ignition::math::Vector3d(IGN_DBL_INF, IGN_DBL_INF, IGN_DBL_INF);
   }
 
   return this->points[_index];
