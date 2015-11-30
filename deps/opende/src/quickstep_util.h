@@ -157,7 +157,11 @@ struct dxPGSLCPParameters {
     dRealPtr rhs;
     dRealMutablePtr caccel;
     dRealMutablePtr lambda;
-    dRealMutablePtr mg_mu;
+
+    /// MG
+    dRealMutablePtr mg_B;
+    dRealMutablePtr mg_r;
+    dRealMutablePtr mg_e;
 
     /// Only used if THREAD_POSITION_CORRECTION is not active,
     /// in that case, compute both updates in the same
@@ -169,7 +173,7 @@ struct dxPGSLCPParameters {
 #ifdef REORDER_CONSTRAINTS
     dRealMutablePtr last_lambda;
     dRealMutablePtr last_lambda_erp;
-    dRealMutablePtr last_mu_mg;
+    dRealMutablePtr last_mg_e;
 #endif
 };
 // ****************************************************************

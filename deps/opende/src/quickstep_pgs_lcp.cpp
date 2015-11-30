@@ -102,8 +102,14 @@ static void* ComputeRows(void *p)
   dRealMutablePtr caccel       = params->caccel;
   dRealMutablePtr lambda       = params->lambda;
 
-  /// MG
-  dRealMutablePtr mg_mu       = params->mg_mu;
+  /// MG solve Be = r for e, then
+  /// update solution u = lambda-e
+  /// MG RHS
+  dRealMutablePtr mg_B          = params->mg_B;
+  /// MG residual r=A*lambda -f
+  dRealMutablePtr mg_r          = params->mg_r;
+  /// MG error term obtained by solving Be=r
+  dRealMutablePtr mg_e          = params->mg_e;
 
   /// THREAD_POSITION_CORRECTION
   dRealPtr rhs_erp             = params->rhs_erp;
@@ -113,7 +119,7 @@ static void* ComputeRows(void *p)
 #ifdef REORDER_CONSTRAINTS
   dRealMutablePtr last_lambda  = params->last_lambda;
   /// MG
-  dRealMutablePtr last_mg_mu   = params->last_mg_mu;
+  dRealMutablePtr last_mg_e   = params->last_mg_e;
 #endif
 
   //printf("iiiiiiiii %d %d %d\n",thread_id,jb[0],jb[1]);
@@ -1244,6 +1250,8 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
   //   - solve lambda_erp and caccel_erp using rhs_erp
   // these two solves can be performed simultaneously.
 
+  std::thread params_erp_thread;
+
   IFTIMING (dTimerNow ("start pgs rows"));
   for (int i=0; i<m; i+= chunk,thread_id++)
   {
@@ -1253,8 +1261,6 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
     int nStart = i - qs->num_overlap < 0 ? 0 : i - qs->num_overlap;
     int nEnd   = i + chunk + qs->num_overlap;
     if (nEnd > m) nEnd = m;
-
-    std::thread params_erp_thread;
 
     if (qs->thread_position_correction && params_erp != NULL)
     {
@@ -1407,7 +1413,7 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
       params_erp_thread.join();
       IFTIMING (dTimerNow ("params_erp threads done"));
     }
-  }
+  }  // end of for loop on m
 
 
   // check time for scheduling, this is usually very quick
