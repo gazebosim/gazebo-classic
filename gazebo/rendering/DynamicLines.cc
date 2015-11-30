@@ -89,10 +89,9 @@ void DynamicLines::SetPoint(unsigned int _index,
 {
   if (_index >= this->points.size())
   {
-    std::ostringstream stream;
-    stream << "Point index[" << _index << "] is out of bounds[0-"
-           << this->points.size()-1 << "]";
-    gzthrow(stream.str());
+    gzerr << "Point index[" << _index << "] is out of bounds[0-"
+           << this->points.size()-1 << "]\n";
+    return;
   }
 
   this->points[_index] = _value;
