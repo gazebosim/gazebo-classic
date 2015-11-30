@@ -86,8 +86,7 @@ void VisualPoseTest::VisualPose()
   QVERIFY(boxLink->VisualId("visual", boxVisualId));
   QVERIFY(boxVisualId != 0u);
 
-  // Check that it's not possible to return the visual pose yet
-  // FIXME: Is this the desired behaviour?
+  // Get box visual pose (physics)
   ignition::math::Pose3d boxVisualPose;
   QVERIFY(boxLink->VisualPose(boxVisualId, boxVisualPose));
   QVERIFY(boxVisualPose == ignition::math::Pose3d(0, 2, 0, 0, 0, 0));
