@@ -131,6 +131,13 @@ void ODESurfaceParams::Load(sdf::ElementPtr _sdf)
           this->maxVel = contactOdeElem->Get<double>("max_vel");
           this->minDepth = contactOdeElem->Get<double>("min_depth");
         }
+        this->frictionPyramid->SetPoissonsRatio(
+          contactElem->Get<double>("poissons_ratio"));
+        this->frictionPyramid->SetElasticModulus(
+          contactElem->Get<double>("elastic_modulus"));
+        // gzerr << "poisson: [" << this->frictionPyramid->PoissonsRatio()
+        //       << "] em: [" << this->frictionPyramid->ElasticModulus()
+        //       << "] \n";
       }
     }
   }
@@ -165,6 +172,7 @@ void ODESurfaceParams::FillMsg(msgs::Surface &_msg)
 
   _msg.set_soft_cfm(this->cfm);
   _msg.set_soft_erp(this->erp);
+  _msg.set_elastic_modulus(this->frictionPyramid->ElasticModulus());
   _msg.set_kp(this->kp);
   _msg.set_kd(this->kd);
   _msg.set_max_vel(this->maxVel);
@@ -230,6 +238,8 @@ void ODESurfaceParams::ProcessMsg(const msgs::Surface &_msg)
     this->cfm = _msg.soft_cfm();
   if (_msg.has_soft_erp())
     this->erp = _msg.soft_erp();
+  if (_msg.has_elastic_modulus())
+    this->frictionPyramid->SetElasticModulus(_msg.elastic_modulus());
   if (_msg.has_kp())
     this->kp = _msg.kp();
   if (_msg.has_kd())

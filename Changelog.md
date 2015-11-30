@@ -3,6 +3,15 @@
 1. Switching to ignition math for the rendering library.
     * [Pull request #1995](https://bitbucket.org/osrf/gazebo/pull-request/1995)
 
+1. Copy visual visibility flags on clone
+    * [Pull request #2008](https://bitbucket.org/osrf/gazebo/pull-request/2008)
+    
+1. Publish camera sensor image size when rendering is not enabled
+    * [Pull request #1969](https://bitbucket.org/osrf/gazebo/pull-request/1969)
+
+1. Added Poissons Ratio and Elastic Modulus for ODE.
+    * [Pull request #1974](https://bitbucket.org/osrf/gazebo/pull-request/1974)
+
 1. Update rest web plugin to publish response messages and display login user name in toolbar.
     * [Pull request #1956](https://bitbucket.org/osrf/gazebo/pull-request/1956)
 
