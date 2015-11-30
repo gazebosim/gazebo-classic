@@ -393,6 +393,75 @@ void JointTest::SpringDamperTest(const std::string &_physicsEngine)
 }
 
 //////////////////////////////////////////////////
+void JointTest::DynamicJointVisualization(const std::string &_physicsEngine)
+{
+  /// \TODO: simbody not complete for this test
+  if (_physicsEngine == "simbody")
+  {
+    gzerr << "Aborting test for Simbody, see issue #862.\n";
+    return;
+  }
+  // Load empty world
+  Load("worlds/empty.world", true, _physicsEngine);
+
+  // Get a pointer to the world, make sure world loads
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // Verify physics engine type
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  // Spawn two boxes
+  SpawnBox("box1", math::Vector3(1, 1, 1), math::Vector3(1, 0, 0.5),
+      math::Vector3::Zero, false);
+  SpawnBox("box2", math::Vector3(1, 1, 1), math::Vector3(-1, 0, 0.5),
+      math::Vector3::Zero, false);
+  physics::ModelPtr model  = world->GetModel("box1");
+  physics::ModelPtr model2 = world->GetModel("box2");
+  ASSERT_TRUE(model  != NULL);
+  ASSERT_TRUE(model2 != NULL);
+
+  // Get link pointers
+  physics::LinkPtr parent = model->GetLink();
+  physics::LinkPtr child  = model2->GetLink();
+
+  // Create dynamic joint
+  std::string name = "dynamic_joint_unique";
+  physics::JointPtr joint;
+  joint = model->CreateJoint(name, "revolute", parent, child);
+  joint->Init();
+
+  // Get model joints (used for visualization)
+  physics::Joint_V joints = model->GetJoints();
+  bool jointFound = false;
+  for (auto const &joint : joints)
+  {
+    if (joint->GetName() == name)
+    {
+      jointFound = true;
+      break;
+    }
+  }
+  EXPECT_TRUE(jointFound);
+
+  // Try to create the joint with the same name
+  EXPECT_TRUE(model->CreateJoint(name, "revolute", parent, child) == NULL);
+
+  // step to let joint creation finish before removing it
+  world->Step(1000);
+
+  // test remove joint
+  EXPECT_TRUE(model->RemoveJoint(name));
+  joint = model->GetJoint(name);
+  EXPECT_TRUE(joint == NULL);
+
+  // test that removing a non-existent joint will not break gazebo
+  EXPECT_FALSE(model->RemoveJoint("this_joint_doees_not_exist"));
+}
+
+//////////////////////////////////////////////////
 TEST_F(JointTest, joint_SDF14)
 {
   Load("worlds/SDF_1_4.world");
@@ -447,6 +516,11 @@ TEST_P(JointTest, GetInertiaRatio)
 TEST_P(JointTest, SpringDamperTest)
 {
   SpringDamperTest(this->physicsEngine);
+}
+
+TEST_P(JointTest, DynamicJointVisualization)
+{
+  DynamicJointVisualization(this->physicsEngine);
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, JointTest,

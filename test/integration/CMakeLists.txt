@@ -36,6 +36,7 @@ set(tests
   concave_mesh.cc
   contact_sensor.cc
   dem.cc
+  elastic_modulus.cc
   file_handling.cc
   gripper.cc
   gz_joint.cc
@@ -68,7 +69,9 @@ set(tests
   physics_inertia_ratio.cc
   physics_link.cc
   physics_msgs.cc
+  physics_msgs_inertia.cc
   physics_presets.cc
+  physics_solver.cc
   physics_thread_safe.cc
   physics_torsional_friction.cc
   pioneer2dx.cc
@@ -146,6 +149,7 @@ gz_build_dri_tests(${dri_tests})
 
 set(qt_tests
   insert_model.cc
+  undo.cc
 )
 
 gz_build_qt_tests(${qt_tests})

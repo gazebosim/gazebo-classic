@@ -81,8 +81,8 @@ std::string GetEventData()
 // waits for one or multiple events. if the expected number is
 // specified, then the function can return early
 unsigned int WaitForNewEvent(unsigned int current,
-                             unsigned int max_tries = 50,
-                             unsigned int ms = 10)
+                             unsigned int max_tries = 20,
+                             unsigned int ms = 100)
 {
   for (unsigned int i = 0; i < max_tries; i++)
   {
@@ -254,9 +254,10 @@ void SimEventsTest::JointEventSource(const std::string &_physicsEngine)
 
   // check that after position, we have received a new event
   unsigned int count_before = GetEventCount();
-  // rotate joint
 
-  joint->SetPosition(0, IGN_PI);
+  // rotate joint
+  joint->SetPosition(0, 3.1);
+
   // check for event
   unsigned int count_after = WaitForNewEvent(count_before);
   EXPECT_GT(count_after, count_before);

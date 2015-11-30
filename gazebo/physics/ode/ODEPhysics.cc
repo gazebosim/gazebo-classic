@@ -626,6 +626,8 @@ ODEPhysics::ConvertWorldStepSolverType(const std::string &_solverType)
     result = ODE_DEFAULT;
   else if (_solverType.compare("DART_PGS") == 0)
     result = DART_PGS;
+  else if (_solverType.compare("BULLET_LEMKE") == 0)
+    result = BULLET_LEMKE;
   else if (_solverType.compare("BULLET_PGS") == 0)
     result = BULLET_PGS;
   else
@@ -653,6 +655,11 @@ ODEPhysics::ConvertWorldStepSolverType(const World_Solver_Type _solverType)
     case DART_PGS:
     {
       result = "DART_PGS";
+      break;
+    }
+    case BULLET_LEMKE:
+    {
+      result = "BULLET_LEMKE";
       break;
     }
     case BULLET_PGS:
@@ -1186,6 +1193,25 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
       {
         contact.surface.mode |= dContactSlip3;
       }
+    }
+  }
+
+  // Set the elastic modulus
+  // Using Hertzian contact
+  // equation 5.26 from Contact Mechanics and Friction by Popov
+  double nu1 = surf1->FrictionPyramid()->PoissonsRatio();
+  double nu2 = surf2->FrictionPyramid()->PoissonsRatio();
+  double e1 = surf1->FrictionPyramid()->ElasticModulus();
+  double e2 = surf2->FrictionPyramid()->ElasticModulus();
+  if (e1 > 0 && e2 > 0)
+  {
+    contact.surface.elastic_modulus = 1.0 /
+      ((1.0 - nu1*nu1)/e1 + (1.0 - nu2*nu2)/e2);
+
+    // Turn on Contact Elastic Modulus model if elastic modulus > 0
+    if (contact.surface.elastic_modulus > 0.0)
+    {
+      contact.surface.mode |= dContactEM;
     }
   }
 

@@ -27,6 +27,7 @@ set (sources
   SensorManager.cc
   SensorTypes.cc
   SonarSensor.cc
+  WideAngleCameraSensor.cc
   WirelessReceiver.cc
   WirelessTransceiver.cc
   WirelessTransmitter.cc
@@ -55,6 +56,7 @@ set (headers
   SensorFactory.hh
   SensorManager.hh
   SonarSensor.hh
+  WideAngleCameraSensor.hh
   WirelessReceiver.hh
   WirelessTransceiver.hh
   WirelessTransmitter.hh
@@ -77,6 +79,7 @@ set (gtest_sources
 gz_build_tests(${gtest_sources})
 
 set (gtest_sources_dri
+  CameraSensor_TEST.cc
   GpuRaySensor_TEST.cc
   SensorManager_TEST.cc
 )
