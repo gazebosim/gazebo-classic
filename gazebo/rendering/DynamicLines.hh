@@ -101,7 +101,7 @@ namespace gazebo
       /// \param[in] _index Number of the point to return
       /// \return math::Vector3 value of the point
       /// \deprecated See function that returns an ignition::math object
-      /// \throws Throws an gazebo::common::Exception if the _index is out
+      /// \throw Throws an gazebo::common::Exception if the _index is out
       /// of bounds
       public: math::Vector3 GetPoint(unsigned int _index) const
               GAZEBO_DEPRECATED(7.0);
@@ -109,7 +109,7 @@ namespace gazebo
       /// \brief Return the location of an existing point in the point list
       /// \param[in] _index Number of the point to return
       /// \return ignition::math::Vector3d value of the point
-      /// \throws Throws an gazebo::common::Exception if the _index is out
+      /// \throw Throws an gazebo::common::Exception if the _index is out
       /// of bounds
       public: const ignition::math::Vector3d &Point(
                   const unsigned int _index) const;
