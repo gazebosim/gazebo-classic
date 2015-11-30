@@ -46,11 +46,13 @@ MarkerVisual::~MarkerVisual()
 void MarkerVisual::Load(const msgs::Marker &_msg)
 {
  std::lock_guard<std::mutex> lock(this->dPtr->mutex);
+ Visual::Load();
 
  if (_msg.action() == msgs::Marker::ADD_MODIFY)
  {
    this->AddModify(_msg);
  }
+
 }
 
 /////////////////////////////////////////////////
@@ -111,8 +113,23 @@ void MarkerVisual::AddModify(const msgs::Marker &_msg)
   {
     this->dPtr->lifetime = this->GetScene()->GetSimTime() +
       msgs::Convert(_msg.lifetime());
-    std::cout << "SimTime[" << this->GetScene()->GetSimTime() << "]\n";
-    std::cout << "Setting lifetime to[" << this->dPtr->lifetime << "]\n";
+  }
+
+  // Attach marker to a parent visual, if specified in the message.
+  if (_msg.has_parent())
+  {
+    // Detach from existing parent
+    if (this->GetParent())
+      this->GetParent()->DetachVisual(shared_from_this());
+
+    // Get the new parent
+    VisualPtr parent = this->GetScene()->GetVisual(_msg.parent());
+
+    // Attach to the new parent, if the parent is valid
+    if (parent)
+      parent->AttachVisual(shared_from_this());
+    else
+      gzerr << "No visual with the name[" << _msg.parent() << "]\n";
   }
 }
 

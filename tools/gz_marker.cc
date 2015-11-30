@@ -39,6 +39,8 @@ MarkerCommand::MarkerCommand()
     ("type,t", po::value<std::string>(),
      "Type of geometry: cube, cylinder, sphere, line_list, line_strip, "
      "points, text, triangle_fan, triangle_list, triangle_strip")
+    ("parent,p", po::value<std::string>(),
+     "Name of a visual to which this marker should be attached.")
     ("lifetime,f", po::value<double>(),
      "Time the marker should last before deletion")
     ("delete,d", "Delete an existing visual marker")
@@ -72,6 +74,7 @@ bool MarkerCommand::RunImpl()
   std::string ns = "default";
   unsigned int id = 0;
   std::string type = "none";
+  std::string parent;
   common::Time lifetime;
 
   if (this->vm.count("namespace"))
@@ -80,13 +83,15 @@ bool MarkerCommand::RunImpl()
     id = this->vm["id"].as<unsigned int>();
   if (this->vm.count("type"))
     type = this->vm["type"].as<std::string>();
+  if (this->vm.count("parent"))
+    parent = this->vm["parent"].as<std::string>();
   if (this->vm.count("lifetime"))
     lifetime.Set(this->vm["lifetime"].as<double>());
 
   if (this->vm.count("list"))
     this->List();
   else if (this->vm.count("add"))
-    this->Add(ns, id, type, lifetime);
+    this->Add(ns, id, type, lifetime, parent);
   else
     this->Help();
 
@@ -100,11 +105,13 @@ void MarkerCommand::List() const
 
 /////////////////////////////////////////////////
 void MarkerCommand::Add(const std::string &_ns, const unsigned int _id,
-    const std::string &_type, const common::Time _lifetime) const
+    const std::string &_type, const common::Time _lifetime,
+    const std::string &_parent) const
 {
   gazebo::msgs::Marker msg;
   msg.set_ns(_ns);
   msg.set_id(_id);
+  msg.set_parent(_parent);
 
   msgs::Set(msg.mutable_lifetime(), _lifetime);
 

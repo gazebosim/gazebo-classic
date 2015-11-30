@@ -78,49 +78,81 @@ void MarkerManager::OnPreRender()
       ++markerIter;
   }
 
-  // Update the markers
-  for (auto marker : this->dataPtr->markers)
+  // Erase any markers that have a lifetime.
+  for (auto mit = this->dataPtr->markers.begin();
+       mit != this->dataPtr->markers.end(); ++mit)
   {
-    for (auto m : marker.second)
+    for (auto it = mit->second.cbegin(); it != mit->second.cend();)
     {
-      if (m.second->Lifetime() != common::Time::Zero &&
-          m.second->Lifetime() <= this->dataPtr->scene->GetSimTime())
+      // Erase a marker if it has a lifetime and it's expired.
+      if (it->second->Lifetime() != common::Time::Zero &&
+          it->second->Lifetime() <= this->dataPtr->scene->GetSimTime())
       {
-        marker.second.erase(m.first);
+        it = mit->second.erase(it);
       }
+      else
+        ++it;
     }
+
+    // Erase a namespace if it's empty
+    /*if (mit->second.empty())
+      mit = this->dataPtr->markers.erase(mit);
+    else
+      ++mit;
+      */
   }
 }
 
 //////////////////////////////////////////////////
 bool MarkerManager::ProcessMarkerMsg(const msgs::Marker &_msg)
 {
+  // Get the namespace, if it exists
+  std::string ns = "";
+  if (_msg.has_ns())
+    ns = _msg.ns();
+
   // Get the namespace that the marker belongs to
-  Marker_M::iterator nsIter = this->dataPtr->markers.find(_msg.ns());
+  Marker_M::iterator nsIter = this->dataPtr->markers.find(ns);
 
-  std::map<uint64_t, MarkerVisualPtr>::iterator markerIter;
-
-  // Add the marker to an existing namespace, if the namespace exists.
-  if (nsIter != this->dataPtr->markers.end() &&
-      (markerIter = nsIter->second.find(_msg.id())) != nsIter->second.end())
+  // Add/modify a marker
+  if (_msg.action() == msgs::Marker::ADD_MODIFY)
   {
-    markerIter->second->Load(_msg);
+    std::map<uint64_t, MarkerVisualPtr>::iterator markerIter;
+
+    // Add the marker to an existing namespace, if the namespace exists.
+    if (nsIter != this->dataPtr->markers.end() &&
+        (markerIter = nsIter->second.find(_msg.id())) != nsIter->second.end())
+    {
+      markerIter->second->Load(_msg);
+    }
+    else
+    {
+      // Create the name for the marker
+      std::string name = "__GZ_MARKER_VISUAL_" + ns + "_" +
+        std::to_string(_msg.id());
+
+      // Create the new marker
+      MarkerVisualPtr marker(new MarkerVisual(name,
+            this->dataPtr->scene->GetWorldVisual()));
+
+      // Load the marker
+      marker->Load(_msg);
+
+      // Store the marker
+      this->dataPtr->markers[ns][_msg.id()] = marker;
+    }
   }
-  else
+  else if (_msg.action() == msgs::Marker::DELETE_ALL)
   {
-    // Create the name for the marker
-    std::string name = "__GZ_MARKER_VISUAL_NS_" + _msg.ns() + "_" +
-      std::to_string(_msg.id());
-
-    // Create the new marker
-    MarkerVisualPtr marker(new MarkerVisual(name,
-          this->dataPtr->scene->GetWorldVisual()));
-
-    // Load the marker
-    marker->Load(_msg);
-
-    // Store the marker
-    this->dataPtr->markers[_msg.layer()][_msg.id()] = marker;
+    if (nsIter != this->dataPtr->markers.end())
+    {
+      for (auto it = nsIter->second.begin(); it != nsIter->second.end(); ++it)
+      {
+        it->second->Fini();
+        this->dataPtr->scene->RemoveVisual(it->second);
+      }
+      nsIter->second.clear();
+    }
   }
 
   return true;

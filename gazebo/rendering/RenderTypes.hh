@@ -14,8 +14,10 @@
  * limitations under the License.
  *
 */
-#ifndef _RENDERTYPES_HH_
-#define _RENDERTYPES_HH_
+#ifndef _GAZEBO_RENDERTYPES_HH_
+#define _GAZEBO_RENDERTYPES_HH_
+
+#include <memory>
 
 #include <boost/shared_ptr.hpp>
 #include "gazebo/gazebo_config.h"
@@ -122,7 +124,7 @@ namespace gazebo
 
     /// \def MarkerVisualPtr
     /// \brief Shared pointer to MarkerVisual
-    typedef boost::shared_ptr<MarkerVisual> MarkerVisualPtr;
+    typedef std::shared_ptr<MarkerVisual> MarkerVisualPtr;
 
     /// \def SonarVisualPtr
     /// \brief Shared pointer to SonarVisual

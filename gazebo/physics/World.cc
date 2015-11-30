@@ -1934,6 +1934,7 @@ EntityPtr World::GetEntityBelowPoint(const math::Vector3 &_pt)
   this->dataPtr->physicsEngine->InitForThread();
   this->dataPtr->testRay->SetPoints(_pt, end);
   this->dataPtr->testRay->GetIntersection(dist, entityName);
+  std::cout << "Pt[" << _pt << "] End[" << end << "] e[" << entityName << "]\n";
   return this->GetEntity(entityName);
 }
 

@@ -205,6 +205,7 @@ Visual::~Visual()
 /////////////////////////////////////////////////
 void Visual::Fini()
 {
+  std::cout << "Visual::Fini[" << this->GetName() << "]\n";
   this->dataPtr->plugins.clear();
 
   // Detach from the parent
@@ -571,7 +572,7 @@ void Visual::DetachVisual(const std::string &_name)
     {
       VisualPtr childVis = (*iter);
       this->dataPtr->children.erase(iter);
-      if (this->dataPtr->sceneNode)
+      if (this->dataPtr->sceneNode && childVis->GetSceneNode())
         this->dataPtr->sceneNode->removeChild(childVis->GetSceneNode());
       childVis->GetParent().reset();
       break;

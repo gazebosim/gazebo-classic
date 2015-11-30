@@ -121,4 +121,6 @@ message Marker
   ///
   /// Relevant Type: TEXT
   optional string text       = 11;
+
+  optional string parent     = 12;
 }

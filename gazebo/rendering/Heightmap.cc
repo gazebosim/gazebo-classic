@@ -58,7 +58,6 @@ static std::string textureStr = "texture";
 //////////////////////////////////////////////////
 Heightmap::Heightmap(ScenePtr _scene)
 {
-  std::cout << "NEW HEIGHTMAP\n\n";
   this->scene = _scene;
   this->terrainGlobals = NULL;
   this->terrainPaging = NULL;
@@ -234,8 +233,6 @@ void Heightmap::SplitHeights(const std::vector<float> &_heightmap, int _n,
     }
   }
   double height = this->GetHeight(39.0625, 39.0625);
-  std::cout << "\n\n\n HEIGHTMAP[" << height << "]\n\n\n";
-
 }
 
 //////////////////////////////////////////////////
@@ -243,7 +240,6 @@ void Heightmap::UpdateTerrainHash(const std::string &_hash,
     const boost::filesystem::path &_terrainDir)
 {
   double height = this->GetHeight(39.0625, 39.0625);
-  std::cout << "\n\n\n HEIGHTMAP[" << height << "]\n\n\n";
 
   std::ofstream terrainHashFile;
   boost::filesystem::path terrainHashFullPath;
@@ -598,7 +594,6 @@ void Heightmap::ConfigureTerrainDefaults()
 void Heightmap::SetWireframe(bool _show)
 {
   double height = this->GetHeight(39.0625, 39.0625);
-  std::cout << "\n\n\n HEIGHTMAP[" << height << "]\n\n\n";
 
   Ogre::Terrain *terrain = this->terrainGroup->getTerrain(0, 0);
   GZ_ASSERT(terrain != NULL, "Unable to get a valid terrain pointer");
