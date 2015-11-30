@@ -139,17 +139,8 @@ static void* ComputeRows(void *p)
   }
   printf("\n");
 
-  // print J, J_precon (already premultiplied by inverse of diagonal of LHS)
-  // and rhs_precon and rhs
-  printf("J_precon\n");
-  for (int i=startRow; i<startRow+nRows; i++) {
-    for (int j=0; j < 12 ; j++) {
-      printf("  %12.6f",J_precon[i*12+j]);
-    }
-    printf("\n");
-  }
-  printf("\n");
-
+  // print J (already premultiplied by inverse of diagonal of LHS)
+  // and rhs
   printf("J\n");
   for (int i=startRow; i<startRow+nRows; i++) {
     for (int j=0; j < 12 ; j++) {
@@ -157,11 +148,6 @@ static void* ComputeRows(void *p)
     }
     printf("\n");
   }
-  printf("\n");
-
-  printf("rhs_precon\n");
-  for (int i=startRow; i<startRow+nRows; i++)
-    printf("  %12.6f",rhs_precon[i]);
   printf("\n");
 
   printf("rhs\n");
@@ -188,7 +174,6 @@ static void* ComputeRows(void *p)
   dSetZero(rms_error, 4);
 
   int num_iterations = qs->num_iterations;
-  int precon_iterations = qs->precon_iterations;
   dReal pgs_lcp_tolerance = qs->pgs_lcp_tolerance;
   int friction_iterations = qs->friction_iterations;
   Friction_Model friction_model = qs->friction_model;
@@ -206,7 +191,7 @@ static void* ComputeRows(void *p)
   dReal Jvnew_final = 0;
 #endif
 #ifdef HDF5_INSTRUMENT
-  errors.resize(num_iterations + precon_iterations + friction_iterations);
+  errors.resize(num_iterations + friction_iterations);
 #endif
   dRealMutablePtr caccel_ptr1;
   dRealMutablePtr caccel_ptr2;
@@ -217,8 +202,7 @@ static void* ComputeRows(void *p)
 
   dRealMutablePtr cforce_ptr1;
   dRealMutablePtr cforce_ptr2;
-  int total_iterations = precon_iterations + num_iterations +
-    friction_iterations;
+  int total_iterations = num_iterations + friction_iterations;
   for (int iteration = 0; iteration < total_iterations; ++iteration)
   {
     // reset rms_dlambda at beginning of iteration
@@ -226,7 +210,7 @@ static void* ComputeRows(void *p)
     // reset rms_error at beginning of iteration
     rms_error[2] = 0;
     m_rms_dlambda[2] = 0;
-    if (iteration < num_iterations + precon_iterations)
+    if (iteration < num_iterations)
     {
       // skip resetting rms_dlambda and rms_error for bilateral constraints
       // and contact normals during extra friction iterations.
@@ -329,37 +313,20 @@ static void* ComputeRows(void *p)
       // check if we are doing extra friction_iterations, if so, only solve
       // friction force constraints and nothing else.
       // i.e. skip bilateral and contact normal constraints.
-      if (iteration >= (num_iterations + precon_iterations) &&
-          constraint_index < 0)
+      if ((iteration >= num_iterations) && constraint_index < 0)
         continue;
 
 
       dReal delta = 0;
-      dReal delta_precon = 0;
 
       // THREAD_POSITION_CORRECTION
       dReal delta_erp = 0;
-      // precon does not support split position correction right now.
-      // dReal delta_precon_erp = 0;
 
       // setup pointers
       int b1 = jb[index*2];
       int b2 = jb[index*2+1];
 
-      // for precon
-      {
-        cforce_ptr1 = cforce + 6*b1;
-        if (b2 >= 0)
-        {
-          cforce_ptr2     = cforce + 6*b2;
-        }
-        else
-        {
-          cforce_ptr2     = NULL;
-        }
-      }
-
-      // for non-precon
+      // constraint accelerations
       {
         caccel_ptr1 = caccel + 6*b1;
         if (b2 >= 0)
@@ -399,15 +366,22 @@ static void* ComputeRows(void *p)
 
 
       //
-      // caccel is the constraint accel in the non-precon case
-      // cforce is the constraint force in the     precon case
+      // caccel is the constraint acceleration
+      //
+      // cforce is the constraint force used only for the precon case
       // J_precon and J differs essentially in Ad and Ad_precon,
       //  Ad is derived from diagonal of J inv(M) J'
       //  Ad_precon is derived from diagonal of J J'
       //
-      if (iteration < precon_iterations)
+      // The reason cforce is used insteady of caccel for the precon
+      // case is because M is identify for the precon case, therefor
+      // accel computed by M of identity is actually force.
+      //
+      // if (iteration < precon_iterations)
       {
         // preconditioning
+        // This is solving for the case where M is identity,
+        // exactly what we need for _mg.
 
         // update delta_precon
         delta_precon = rhs_precon[index] - old_lambda*Adcfm_precon[index];
