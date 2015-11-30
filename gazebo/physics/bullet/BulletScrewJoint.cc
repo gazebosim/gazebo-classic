@@ -392,26 +392,6 @@ void BulletScrewJoint::SetForceImpl(unsigned int _index, double _force)
 }
 
 //////////////////////////////////////////////////
-void BulletScrewJoint::SetMaxForce(unsigned int /*_index*/, double _force)
-{
-  if (this->bulletScrew)
-    this->bulletScrew->setMaxLinMotorForce(_force);
-  else
-    gzerr << "bulletScrew not created yet\n";
-}
-
-//////////////////////////////////////////////////
-double BulletScrewJoint::GetMaxForce(unsigned int /*index*/)
-{
-  double result = 0;
-  if (this->bulletScrew)
-    result = this->bulletScrew->getMaxLinMotorForce();
-  else
-    gzerr << "bulletScrew not created yet\n";
-  return result;
-}
-
-//////////////////////////////////////////////////
 bool BulletScrewJoint::SetHighStop(unsigned int _index,
                       const math::Angle &_angle)
 {

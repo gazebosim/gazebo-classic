@@ -55,28 +55,6 @@ void PolylineShape::Init()
 }
 
 //////////////////////////////////////////////////
-std::vector<std::vector<math::Vector2d> > PolylineShape::GetVertices() const
-{
-  std::vector<std::vector<math::Vector2d> > paths;
-
-  sdf::ElementPtr polylineElem = this->sdf;
-  while (polylineElem)
-  {
-    sdf::ElementPtr pointElem = polylineElem->GetElement("point");
-    std::vector<math::Vector2d> vertices;
-    while (pointElem)
-    {
-      math::Vector2d point = pointElem->Get<math::Vector2d>();
-      pointElem = pointElem->GetNextElement("point");
-      vertices.push_back(point);
-    }
-    polylineElem = polylineElem->GetNextElement("polyline");
-    paths.push_back(vertices);
-  }
-  return paths;
-}
-
-//////////////////////////////////////////////////
 std::vector<std::vector<ignition::math::Vector2d> >
 PolylineShape::Vertices() const
 {
@@ -130,13 +108,6 @@ void PolylineShape::SetScale(const math::Vector3 &_scale)
 }
 
 ////////////////////////////////////////////////////
-void PolylineShape::SetVertices(const msgs::Geometry &_msg)
-{
-  sdf::ElementPtr geomSDF = msgs::GeometryToSDF(_msg);
-  this->sdf = geomSDF->GetElement("polyline");
-}
-
-////////////////////////////////////////////////////
 void PolylineShape::SetVertices(
     const std::vector<std::vector<ignition::math::Vector2d> > &_vertices)
 {
@@ -156,22 +127,10 @@ void PolylineShape::SetVertices(
 }
 
 ////////////////////////////////////////////////////
-void PolylineShape::SetVertices(
-    const std::vector<std::vector<math::Vector2d> > &_vertices)
+void PolylineShape::SetVertices(const msgs::Geometry &_msg)
 {
-  sdf::ElementPtr polylineElem = this->sdf;
-  for (unsigned int i = 0; i < _vertices.size(); ++i)
-  {
-    std::vector<math::Vector2d> v = _vertices[i];
-
-    sdf::ElementPtr pointElem = polylineElem->GetElement("point");
-    for (unsigned int j = 0; j < v.size(); ++j)
-    {
-      pointElem->Set(v[j]);
-      pointElem = pointElem->GetNextElement("point");
-    }
-    polylineElem = polylineElem->GetNextElement("polyline");
-  }
+  sdf::ElementPtr geomSDF = msgs::GeometryToSDF(_msg);
+  this->sdf = geomSDF->GetElement("polyline");
 }
 
 //////////////////////////////////////////////////
@@ -180,26 +139,6 @@ void PolylineShape::SetPolylineShape(const double &_height,
 {
   this->SetHeight(_height);
   this->SetVertices(_vertices);
-}
-
-//////////////////////////////////////////////////
-void PolylineShape::SetPolylineShape(const double &_height,
-    const std::vector<std::vector<math::Vector2d> > &_vertices)
-{
-  this->SetHeight(_height);
-
-  std::vector<std::vector<ignition::math::Vector2d> > vertices;
-  for (auto const &v : _vertices)
-  {
-    std::vector<ignition::math::Vector2d> vIgn;
-    for (auto const &v1 : v)
-    {
-      vIgn.push_back(v1.Ign());
-    }
-    vertices.push_back(vIgn);
-  }
-
-  this->SetVertices(vertices);
 }
 
 //////////////////////////////////////////////////

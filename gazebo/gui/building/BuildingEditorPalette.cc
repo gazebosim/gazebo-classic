@@ -245,7 +245,20 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   mainLayout->addLayout(buttonsLayout);
   mainLayout->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
 
-  this->setLayout(mainLayout);
+  // Scroll area
+  auto scrollWidget = new QWidget();
+  scrollWidget->setObjectName("buildingEditorPaletteScroll");
+  scrollWidget->setLayout(mainLayout);
+  scrollWidget->setMinimumWidth(200);
+
+  auto scrollArea = new QScrollArea;
+  scrollArea->setWidget(scrollWidget);
+  scrollArea->setWidgetResizable(true);
+
+  auto scrollLayout = new QVBoxLayout();
+  scrollLayout->addWidget(scrollArea);
+
+  this->setLayout(scrollLayout);
 
   // Connections
   this->dataPtr->connections.push_back(

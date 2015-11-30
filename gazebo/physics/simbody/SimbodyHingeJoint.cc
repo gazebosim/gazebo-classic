@@ -97,19 +97,6 @@ double SimbodyHingeJoint::GetVelocity(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-void SimbodyHingeJoint::SetMaxForce(unsigned int /*_index*/, double /*_t*/)
-{
-  gzdbg << "SetMaxForce: doesn't make sense in simbody...\n";
-}
-
-//////////////////////////////////////////////////
-double SimbodyHingeJoint::GetMaxForce(unsigned int /*_index*/)
-{
-  gzdbg << "GetMaxForce: doesn't make sense in simbody...\n";
-  return 0;
-}
-
-//////////////////////////////////////////////////
 void SimbodyHingeJoint::SetForceImpl(unsigned int _index, double _torque)
 {
   if (_index < this->GetAngleCount() && this->physicsInitialized)

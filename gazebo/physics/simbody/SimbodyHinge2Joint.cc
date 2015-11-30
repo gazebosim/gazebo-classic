@@ -89,19 +89,6 @@ void SimbodyHinge2Joint::SetForceImpl(
 }
 
 //////////////////////////////////////////////////
-void SimbodyHinge2Joint::SetMaxForce(unsigned int /*_index*/, double /*_t*/)
-{
-  gzerr << "Not implemented";
-}
-
-//////////////////////////////////////////////////
-double SimbodyHinge2Joint::GetMaxForce(unsigned int /*_index*/)
-{
-  gzerr << "Not implemented";
-  return 0;
-}
-
-//////////////////////////////////////////////////
 math::Vector3 SimbodyHinge2Joint::GetGlobalAxis(unsigned int /*_index*/) const
 {
   gzerr << "SimbodyHinge2Joint::GetGlobalAxis not implemented\n";

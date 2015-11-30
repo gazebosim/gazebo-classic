@@ -120,8 +120,9 @@ namespace gazebo
       /// \brief Update callback on PreRender.
       public: void Update();
 
-      /// \brief Remove joint by name
-      /// \param[in] _jointName Name of joint to be removed.
+      /// \brief Remove joint by name.
+      /// \param[in] _jointName Name of joint to be removed, or an empty string
+      /// to remove the new joint under creation.
       public: void RemoveJoint(const std::string &_jointName);
 
       /// \brief Remove all joints connected to link.
@@ -235,7 +236,7 @@ namespace gazebo
       /// \param[in] _visual Visual of the link.
       /// \return Centroid in world coordinates;
       private: math::Vector3 GetLinkWorldCentroid(
-          const rendering::VisualPtr _visual);
+          const rendering::VisualPtr &_visual);
 
       /// \brief Open joint inspector.
       /// \param[in] _name Name of joint.
@@ -281,6 +282,16 @@ namespace gazebo
       private: JointData *CreateJointLine(const std::string &_name,
           rendering::VisualPtr _parent);
 
+      /// \brief Set a new parent link for the joint being created.
+      /// \param[in] _parentLink Pointer to the link visual.
+      /// \return True if successfully set new parent.
+      private: bool SetParentLink(rendering::VisualPtr _parentLink);
+
+      /// \brief Set a new child link for the joint being created.
+      /// \param[in] _childLink Pointer to the link visual.
+      /// \return True if successfully set new child.
+      private: bool SetChildLink(rendering::VisualPtr _childLink);
+
       /// \brief Qt signal when the joint creation process has ended.
       Q_SIGNALS: void JointAdded();
 
@@ -308,9 +319,6 @@ namespace gazebo
       /// \brief Visual that is currently hovered over by the mouse
       private: rendering::VisualPtr hoverVis;
 
-      /// \brief Currently selected visual
-      private: rendering::VisualPtr selectedVis;
-
       /// \brief Name of joint that is currently being inspected.
       private: std::string inspectName;
 
@@ -318,7 +326,7 @@ namespace gazebo
       private: std::map<std::string, JointData *> joints;
 
       /// \brief Joint currently being created.
-      private: JointData *mouseJoint;
+      private: JointData *newJoint;
 
       /// \brief All the event connections.
       private: std::vector<event::ConnectionPtr> connections;
@@ -363,6 +371,9 @@ namespace gazebo
     class GZ_GUI_VISIBLE JointData : public QObject
     {
       Q_OBJECT
+
+      /// \brief Open the joint inspector.
+      public: void OpenInspector();
 
       /// \brief Update this joint data.
       public: void Update();
@@ -414,9 +425,6 @@ namespace gazebo
 
       /// \brief Inspector for configuring joint properties.
       public: JointInspector *inspector;
-
-      /// \brief Open the joint inspector.
-      public: void OpenInspector();
 
       /// \brief Qt Callback when joint inspector is to be opened.
       private slots: void OnOpenInspector();
