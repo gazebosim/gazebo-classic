@@ -106,7 +106,7 @@ static void* ComputeRows(void *p)
   /// update solution u = lambda-e
   /// MG RHS
   dRealMutablePtr mg_B          = params->mg_B;
-  /// MG residual r=A*lambda -f
+  /// MG residual (residue) r=A*lambda -f
   dRealMutablePtr mg_r          = params->mg_r;
   /// MG error term obtained by solving Be=r
   dRealMutablePtr mg_e          = params->mg_e;
@@ -555,37 +555,23 @@ static void* ComputeRows(void *p)
               delta_erp -= quickstep::dot6(caccel_erp_ptr2, J_ptr + 6);
           }
 
-        // set the limits for this constraint.
-        // this is the place where the QuickStep method differs from the
-        // direct LCP solving method, since that method only performs this
-        // limit adjustment once per time step, whereas this method performs
-        // once per iteration per constraint row.
-        // the constraints are ordered so that all lambda[] values needed have
-        // already been computed.
-        dReal hi_act, lo_act;
-        /// THREAD_POSITION_CORRECTION
-        dReal hi_act_erp, lo_act_erp;
-        if (constraint_index >= 0)
-        {
-          if (index - constraint_index >= 3)
+          // set the limits for this constraint.
+          // this is the place where the QuickStep method differs from the
+          // direct LCP solving method, since that method only performs this
+          // limit adjustment once per time step, whereas this method performs
+          // once per iteration per constraint row.
+          // the constraints are ordered so that all lambda[] values needed have
+          // already been computed.
+          dReal hi_act, lo_act;
+          /// THREAD_POSITION_CORRECTION
+          dReal hi_act_erp, lo_act_erp;
+          if (constraint_index >= 0)
           {
-            // torsional friction should have been added as the third row from
-            // contact normal constraint
-            // this_is_torsional_friction
-            hi_act = dFabs (hi[index] * lambda[constraint_index]);
-            lo_act = -hi_act;
-            if (inline_position_correction)
+            if (index - constraint_index >= 3)
             {
-              hi_act_erp = dFabs (hi[index] * lambda_erp[constraint_index]);
-              lo_act_erp = -hi_act_erp;
-            }
-          }
-          else
-          {
-            // deal with non-torsional frictions
-            if (friction_model == pyramid_friction)
-            {
-              // FOR erp throttled by info.c_v_max or info.c
+              // torsional friction should have been added as the third row from
+              // contact normal constraint
+              // this_is_torsional_friction
               hi_act = dFabs (hi[index] * lambda[constraint_index]);
               lo_act = -hi_act;
               if (inline_position_correction)
@@ -594,42 +580,60 @@ static void* ComputeRows(void *p)
                 lo_act_erp = -hi_act_erp;
               }
             }
-            else if (friction_model == cone_friction)
-            {
-              quickstep::dxConeFrictionModel(lo_act, hi_act, lo_act_erp, hi_act_erp, jb, J_orig, index,
-                  constraint_index, startRow, nRows, nb, body, i, order, findex, NULL, hi, lambda, lambda_erp);
-            }
-            else if(friction_model == box_friction)
-            {
-              hi_act = hi[index];
-              lo_act = -hi_act;
-              hi_act_erp = hi[index];
-              lo_act_erp = -hi_act_erp;
-            }
             else
             {
-                // initialize the hi and lo to get rid of warnings
-                hi_act = dInfinity;
-                lo_act = -dInfinity;
-                hi_act_erp = dInfinity;
-                lo_act_erp = -dInfinity;
-                dMessage (d_ERR_UASSERT, "internal error, undefined friction model");
+              // deal with non-torsional frictions
+              if (friction_model == pyramid_friction)
+              {
+                // FOR erp throttled by info.c_v_max or info.c
+                hi_act = dFabs (hi[index] * lambda[constraint_index]);
+                lo_act = -hi_act;
+                if (inline_position_correction)
+                {
+                  hi_act_erp = dFabs (hi[index] * lambda_erp[constraint_index]);
+                  lo_act_erp = -hi_act_erp;
+                }
+              }
+              else if (friction_model == cone_friction)
+              {
+                quickstep::dxConeFrictionModel(
+                  lo_act, hi_act, lo_act_erp, hi_act_erp, jb, J_orig, index,
+                  constraint_index, startRow, nRows, nb, body, i, order,
+                  findex, NULL, hi, lambda, lambda_erp);
+              }
+              else if(friction_model == box_friction)
+              {
+                hi_act = hi[index];
+                lo_act = -hi_act;
+                hi_act_erp = hi[index];
+                lo_act_erp = -hi_act_erp;
+              }
+              else
+              {
+                  // initialize the hi and lo to get rid of warnings
+                  hi_act = dInfinity;
+                  lo_act = -dInfinity;
+                  hi_act_erp = dInfinity;
+                  lo_act_erp = -dInfinity;
+                  dMessage (d_ERR_UASSERT,
+                    "internal error, undefined friction model");
+              }
             }
           }
-        }
-        else
-        {
-          // FOR erp throttled by info.c_v_max or info.c
-          hi_act = hi[index];
-          lo_act = lo[index];
-          if (inline_position_correction)
+          else
           {
-            hi_act_erp = hi[index];
-            lo_act_erp = lo[index];
+            // FOR erp throttled by info.c_v_max or info.c
+            hi_act = hi[index];
+            lo_act = lo[index];
+            if (inline_position_correction)
+            {
+              hi_act_erp = hi[index];
+              lo_act_erp = lo[index];
+            }
           }
-        }
-        // compute lambda and clamp it to [lo,hi].
-        // @@@ SSE not a win here
+
+          // compute lambda and clamp it to [lo,hi].
+          // @@@ SSE not a win here
 #undef SSE_CLAMP
 #ifndef SSE_CLAMP
           // FOR erp throttled by info.c_v_max or info.c
