@@ -79,6 +79,9 @@ namespace gazebo
       /// \brief Publisher of undo redo statistics messages.
       public: transport::PublisherPtr userCmdStatsPub;
 
+      /// \brief Publisher of world control messages.
+      public: transport::PublisherPtr worldControlPub;
+
       /// \brief List of commands which can be undone.
       public: std::vector<UserCmdPtr> undoCmds;
 
