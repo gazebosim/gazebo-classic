@@ -22,6 +22,10 @@
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/test/helper_physics_generator.hh"
 
+#ifdef HAVE_BULLET
+#include "gazebo/physics/bullet/bullet_math_inc.h"
+#endif
+
 #define PHYSICS_TOL 1e-2
 using namespace gazebo;
 
@@ -534,8 +538,20 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
       pose1 = model->GetWorldPose();
       x0 = modelPos[name].x;
       y0 = modelPos[name].y;
-      EXPECT_NEAR(pose1.pos.x, x0, PHYSICS_TOL);
-      EXPECT_NEAR(pose1.pos.y, y0, PHYSICS_TOL);
+      double xTolerance = PHYSICS_TOL;
+      double yTolerance = PHYSICS_TOL;
+#ifdef HAVE_BULLET
+      if (_physicsEngine == "bullet" && sizeof(btScalar) == 4)
+      {
+        if (name.find("test_box") != std::string::npos)
+        {
+          xTolerance *= 1.6;
+          yTolerance *= 2.3;
+        }
+      }
+#endif
+      EXPECT_NEAR(pose1.pos.x, x0, xTolerance);
+      EXPECT_NEAR(pose1.pos.y, y0, yTolerance);
       EXPECT_NEAR(pose1.pos.z, 0.5*scaleFactor, PHYSICS_TOL);
     }
     else

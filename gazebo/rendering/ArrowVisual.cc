@@ -57,39 +57,34 @@ void ArrowVisual::Load()
   this->InsertMesh("axis_shaft");
   this->InsertMesh("axis_head");
 
-  Ogre::MovableObject *shaftObj =
-    (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
-          this->GetName()+"__SHAFT__", "axis_shaft"));
+  VisualPtr shaftVis(
+      new Visual(this->GetName()+"__SHAFT__", shared_from_this(), false));
+  shaftVis->Load();
+  shaftVis->AttachMesh("axis_shaft");
+  shaftVis->SetPosition(math::Vector3(0, 0, 0.1));
+  shaftVis->SetCastShadows(false);
+  dPtr->shaftNode = shaftVis->GetSceneNode();
 
-  Ogre::MovableObject *headObj =
-    (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
-          this->GetName()+"__HEAD__", "axis_head"));
-
-  dPtr->shaftNode =
-      dPtr->sceneNode->createChildSceneNode(
-      this->GetName() + "_SHAFT");
-  dPtr->shaftNode->attachObject(shaftObj);
-  dPtr->shaftNode->setPosition(0, 0, 0.1);
-
-  dPtr->headNode =
-      dPtr->sceneNode->createChildSceneNode(
-      this->GetName() + "_HEAD");
-  dPtr->headNode->attachObject(headObj);
-  dPtr->headNode->setPosition(0, 0, 0.24);
+  VisualPtr headVis(
+      new Visual(this->GetName()+"__HEAD__", shared_from_this(), false));
+  headVis->Load();
+  headVis->AttachMesh("axis_head");
+  headVis->SetPosition(math::Vector3(0, 0, 0.24));
+  headVis->SetCastShadows(false);
+  dPtr->headNode = headVis->GetSceneNode();
 
   common::MeshManager::Instance()->CreateTube("rotation_tube",
       0.035, 0.04, 0.01, 1, 32);
   this->InsertMesh("rotation_tube");
 
-  Ogre::MovableObject *rotationObj =
-    (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
-          this->GetName()+"__ROTATION__", "rotation_tube"));
+  VisualPtr rotationVis(
+      new Visual(this->GetName()+"__ROTATION__", shared_from_this(), false));
+  rotationVis->Load();
+  rotationVis->AttachMesh("rotation_tube");
+  rotationVis->SetPosition(math::Vector3(0, 0, 0.24));
+  rotationVis->SetCastShadows(false);
+  dPtr->rotationNode = rotationVis->GetSceneNode();
 
-  dPtr->rotationNode =
-      dPtr->sceneNode->createChildSceneNode(
-      this->GetName() + "_ROTATION");
-  dPtr->rotationNode->attachObject(rotationObj);
-  dPtr->rotationNode->setPosition(0, 0, 0.24);
   this->ShowRotation(false);
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);

@@ -100,7 +100,7 @@ void JointForceTorqueTest::ForceTorque1(const std::string &_physicsEngine)
     physics::JointWrench wrench_01 = joint_01->GetForceTorque(0u);
     EXPECT_DOUBLE_EQ(wrench_01.body1Force.x,    0.0);
     EXPECT_DOUBLE_EQ(wrench_01.body1Force.y,    0.0);
-    EXPECT_DOUBLE_EQ(wrench_01.body1Force.z, 1000.0);
+    EXPECT_FLOAT_EQ(wrench_01.body1Force.z, 1000.0);
     EXPECT_DOUBLE_EQ(wrench_01.body1Torque.x,   0.0);
     EXPECT_DOUBLE_EQ(wrench_01.body1Torque.y,   0.0);
     EXPECT_DOUBLE_EQ(wrench_01.body1Torque.z,   0.0);
@@ -133,7 +133,7 @@ void JointForceTorqueTest::ForceTorque1(const std::string &_physicsEngine)
     physics::JointWrench wrench_12 = joint_12->GetForceTorque(0u);
     EXPECT_DOUBLE_EQ(wrench_12.body1Force.x,    0.0);
     EXPECT_DOUBLE_EQ(wrench_12.body1Force.y,    0.0);
-    EXPECT_DOUBLE_EQ(wrench_12.body1Force.z,  500.0);
+    EXPECT_FLOAT_EQ(wrench_12.body1Force.z,  500.0);
     EXPECT_DOUBLE_EQ(wrench_12.body1Torque.x,   0.0);
     EXPECT_DOUBLE_EQ(wrench_12.body1Torque.y,   0.0);
     EXPECT_DOUBLE_EQ(wrench_12.body1Torque.z,   0.0);

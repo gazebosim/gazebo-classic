@@ -424,6 +424,349 @@ TEST_F(Visual_TEST, ChildTransparency)
 }
 
 /////////////////////////////////////////////////
+TEST_F(Visual_TEST, DerivedTransparency)
+{
+  // Load a world containing 3 simple shapes
+  Load("worlds/shapes.world");
+
+  // FIXME need a camera otherwise test produces a gl vertex buffer error
+  math::Pose cameraStartPose(0, 0, 0, 0, 0, 0);
+  std::string cameraName = "test_camera";
+  SpawnCamera("test_camera_model", cameraName,
+      cameraStartPose.pos, cameraStartPose.rot.GetAsEuler());
+
+  // Get the scene
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
+  ASSERT_TRUE(scene != NULL);
+
+  // Wait until all models are inserted
+  int sleep = 0;
+  int maxSleep = 10;
+  rendering::VisualPtr box, sphere, cylinder;
+  while ((!box || !sphere || !cylinder) && sleep < maxSleep)
+  {
+    box = scene->GetVisual("box");
+    cylinder = scene->GetVisual("cylinder");
+    sphere = scene->GetVisual("sphere");
+    common::Time::MSleep(1000);
+    sleep++;
+  }
+
+  // Check that the model, link, and visuals were properly added
+  // and verify initial transparency
+
+  // box
+  ASSERT_TRUE(box != NULL);
+  rendering::VisualPtr boxLink;
+  for (unsigned int i = 0; i < box->GetChildCount(); ++i)
+  {
+    rendering::VisualPtr vis = box->GetChild(i);
+    if (vis->GetType() == rendering::Visual::VT_LINK)
+      boxLink = vis;
+  }
+  ASSERT_TRUE(boxLink != NULL);
+
+  rendering::VisualPtr boxVisual;
+  for (unsigned int i = 0; i < boxLink->GetChildCount(); ++i)
+  {
+    rendering::VisualPtr vis = boxLink->GetChild(i);
+    if (vis->GetType() == rendering::Visual::VT_VISUAL)
+      boxVisual = vis;
+  }
+  ASSERT_TRUE(boxVisual != NULL);
+
+  EXPECT_FLOAT_EQ(box->GetTransparency(), 0.0f);
+  EXPECT_FLOAT_EQ(boxLink->GetTransparency(), 0.0f);
+  EXPECT_FLOAT_EQ(boxVisual->GetTransparency(), 0.0f);
+
+  EXPECT_FLOAT_EQ(box->DerivedTransparency(), 0.0f);
+  EXPECT_FLOAT_EQ(boxLink->DerivedTransparency(), 0.0f);
+  EXPECT_FLOAT_EQ(boxVisual->DerivedTransparency(), 0.0f);
+
+  // sphere
+  ASSERT_TRUE(sphere != NULL);
+  rendering::VisualPtr sphereLink;
+  for (unsigned int i = 0; i < sphere->GetChildCount(); ++i)
+  {
+    rendering::VisualPtr vis = sphere->GetChild(i);
+    if (vis->GetType() == rendering::Visual::VT_LINK)
+      sphereLink = vis;
+  }
+  ASSERT_TRUE(sphereLink != NULL);
+
+  rendering::VisualPtr sphereVisual;
+  for (unsigned int i = 0; i < sphereLink->GetChildCount(); ++i)
+  {
+    rendering::VisualPtr vis = sphereLink->GetChild(i);
+    if (vis->GetType() == rendering::Visual::VT_VISUAL)
+      sphereVisual = vis;
+  }
+  ASSERT_TRUE(sphereVisual != NULL);
+
+  EXPECT_FLOAT_EQ(sphere->GetTransparency(), 0.0f);
+  EXPECT_FLOAT_EQ(sphereLink->GetTransparency(), 0.0f);
+  EXPECT_FLOAT_EQ(sphereVisual->GetTransparency(), 0.0f);
+
+  EXPECT_FLOAT_EQ(sphere->DerivedTransparency(), 0.0f);
+  EXPECT_FLOAT_EQ(sphereLink->DerivedTransparency(), 0.0f);
+  EXPECT_FLOAT_EQ(sphereVisual->DerivedTransparency(), 0.0f);
+
+  // cylinder
+  ASSERT_TRUE(cylinder != NULL);
+  rendering::VisualPtr cylinderLink;
+  for (unsigned int i = 0; i < cylinder->GetChildCount(); ++i)
+  {
+    rendering::VisualPtr vis = cylinder->GetChild(i);
+    if (vis->GetType() == rendering::Visual::VT_LINK)
+      cylinderLink = vis;
+  }
+  ASSERT_TRUE(cylinderLink != NULL);
+
+  rendering::VisualPtr cylinderVisual;
+  for (unsigned int i = 0; i < cylinderLink->GetChildCount(); ++i)
+  {
+    rendering::VisualPtr vis = cylinderLink->GetChild(i);
+    if (vis->GetType() == rendering::Visual::VT_VISUAL)
+      cylinderVisual = vis;
+  }
+  ASSERT_TRUE(cylinderVisual != NULL);
+
+  EXPECT_FLOAT_EQ(cylinder->GetTransparency(), 0.0f);
+  EXPECT_FLOAT_EQ(cylinderLink->GetTransparency(), 0.0f);
+  EXPECT_FLOAT_EQ(cylinderVisual->GetTransparency(), 0.0f);
+
+  EXPECT_FLOAT_EQ(cylinder->DerivedTransparency(), 0.0f);
+  EXPECT_FLOAT_EQ(cylinderLink->DerivedTransparency(), 0.0f);
+  EXPECT_FLOAT_EQ(cylinderVisual->DerivedTransparency(), 0.0f);
+
+  // update model transparency and verify derived transparency
+  float newBoxTransparency = 0.4f;
+  box->SetTransparency(newBoxTransparency);
+  EXPECT_FLOAT_EQ(box->GetTransparency(), newBoxTransparency);
+  EXPECT_FLOAT_EQ(boxLink->GetTransparency(), 0.0f);
+  EXPECT_FLOAT_EQ(boxVisual->GetTransparency(), 0.0f);
+
+  EXPECT_FLOAT_EQ(box->DerivedTransparency(), newBoxTransparency);
+  EXPECT_FLOAT_EQ(boxLink->DerivedTransparency(), newBoxTransparency);
+  EXPECT_FLOAT_EQ(boxVisual->DerivedTransparency(), newBoxTransparency);
+
+  float newSphereTransparency = 0.3f;
+  sphere->SetTransparency(newSphereTransparency);
+  EXPECT_FLOAT_EQ(sphere->GetTransparency(), newSphereTransparency);
+  EXPECT_FLOAT_EQ(sphereLink->GetTransparency(), 0.0f);
+  EXPECT_FLOAT_EQ(sphereVisual->GetTransparency(), 0.0f);
+
+  EXPECT_FLOAT_EQ(sphere->DerivedTransparency(), newSphereTransparency);
+  EXPECT_FLOAT_EQ(sphereLink->DerivedTransparency(), newSphereTransparency);
+  EXPECT_FLOAT_EQ(sphereVisual->DerivedTransparency(), newSphereTransparency);
+
+  float newCylinderTransparency = 0.25f;
+  cylinder->SetTransparency(newCylinderTransparency);
+  EXPECT_FLOAT_EQ(cylinder->GetTransparency(), newCylinderTransparency);
+  EXPECT_FLOAT_EQ(cylinderLink->GetTransparency(), 0.0f);
+  EXPECT_FLOAT_EQ(cylinderVisual->GetTransparency(), 0.0f);
+
+  EXPECT_FLOAT_EQ(cylinder->DerivedTransparency(), newCylinderTransparency);
+  EXPECT_FLOAT_EQ(cylinderLink->DerivedTransparency(), newCylinderTransparency);
+  EXPECT_FLOAT_EQ(cylinderVisual->DerivedTransparency(),
+      newCylinderTransparency);
+
+  // update link transparency and verify derived transparency
+  float newBoxLinkTransparency = 0.2f;
+  boxLink->SetTransparency(newBoxLinkTransparency);
+  EXPECT_FLOAT_EQ(box->GetTransparency(), newBoxTransparency);
+  EXPECT_FLOAT_EQ(boxLink->GetTransparency(), newBoxLinkTransparency);
+  EXPECT_FLOAT_EQ(boxVisual->GetTransparency(), 0.0f);
+
+  EXPECT_FLOAT_EQ(box->DerivedTransparency(), newBoxTransparency);
+  EXPECT_FLOAT_EQ(boxLink->DerivedTransparency(),
+      1.0 - ((1.0 - newBoxTransparency) * (1.0 - newBoxLinkTransparency)));
+  EXPECT_FLOAT_EQ(boxVisual->DerivedTransparency(),
+      1.0 -((1.0 - newBoxTransparency) * (1.0 - newBoxLinkTransparency)));
+
+  float newSphereLinkTransparency = 0.9f;
+  sphereLink->SetTransparency(newSphereLinkTransparency);
+  EXPECT_FLOAT_EQ(sphere->GetTransparency(), newSphereTransparency);
+  EXPECT_FLOAT_EQ(sphereLink->GetTransparency(), newSphereLinkTransparency);
+  EXPECT_FLOAT_EQ(sphereVisual->GetTransparency(), 0.0f);
+
+  EXPECT_FLOAT_EQ(sphere->DerivedTransparency(), newSphereTransparency);
+  EXPECT_FLOAT_EQ(sphereLink->DerivedTransparency(),
+      1.0 - ((1.0 - newSphereTransparency) *
+      (1.0 - newSphereLinkTransparency)));
+  EXPECT_FLOAT_EQ(sphereVisual->DerivedTransparency(),
+      1.0 - ((1.0 - newSphereTransparency) *
+      (1.0 - newSphereLinkTransparency)));
+
+  float newCylinderLinkTransparency = 0.02f;
+  cylinderLink->SetTransparency(newCylinderLinkTransparency);
+  EXPECT_FLOAT_EQ(cylinder->GetTransparency(), newCylinderTransparency);
+  EXPECT_FLOAT_EQ(cylinderLink->GetTransparency(), newCylinderLinkTransparency);
+  EXPECT_FLOAT_EQ(cylinderVisual->GetTransparency(), 0.0f);
+
+  EXPECT_FLOAT_EQ(cylinder->DerivedTransparency(), newCylinderTransparency);
+  EXPECT_FLOAT_EQ(cylinderLink->DerivedTransparency(),
+      1.0 - ((1.0 - newCylinderTransparency) *
+      (1.0 - newCylinderLinkTransparency)));
+  EXPECT_FLOAT_EQ(cylinderVisual->DerivedTransparency(),
+      1.0 - ((1.0 - newCylinderTransparency) *
+      (1.0 - newCylinderLinkTransparency)));
+
+  // update visual transparency and verify derived transparency
+  float newBoxVisualTransparency = 0.6f;
+  boxVisual->SetTransparency(newBoxVisualTransparency);
+  EXPECT_FLOAT_EQ(box->GetTransparency(), newBoxTransparency);
+  EXPECT_FLOAT_EQ(boxLink->GetTransparency(), newBoxLinkTransparency);
+  EXPECT_FLOAT_EQ(boxVisual->GetTransparency(), newBoxVisualTransparency);
+
+  EXPECT_FLOAT_EQ(box->DerivedTransparency(), newBoxTransparency);
+  EXPECT_FLOAT_EQ(boxLink->DerivedTransparency(),
+      1.0 - ((1.0 - newBoxTransparency) * (1.0 - newBoxLinkTransparency)));
+  EXPECT_FLOAT_EQ(boxVisual->DerivedTransparency(),
+      1.0 - ((1.0 - newBoxTransparency) * (1.0 - newBoxLinkTransparency) *
+      (1.0 - newBoxVisualTransparency)));
+
+
+  float newSphereVisualTransparency = 0.08f;
+  sphereVisual->SetTransparency(newSphereVisualTransparency);
+  EXPECT_FLOAT_EQ(sphere->GetTransparency(), newSphereTransparency);
+  EXPECT_FLOAT_EQ(sphereLink->GetTransparency(), newSphereLinkTransparency);
+  EXPECT_FLOAT_EQ(sphereVisual->GetTransparency(), newSphereVisualTransparency);
+
+  EXPECT_FLOAT_EQ(sphere->DerivedTransparency(), newSphereTransparency);
+  EXPECT_FLOAT_EQ(sphereLink->DerivedTransparency(),
+      1.0 - ((1.0 - newSphereTransparency) *
+      (1.0 - newSphereLinkTransparency)));
+  EXPECT_FLOAT_EQ(sphereVisual->DerivedTransparency(),
+      1.0 - ((1.0 - newSphereTransparency) *
+      (1.0 - newSphereLinkTransparency) *
+      (1.0 - newSphereVisualTransparency)));
+
+  float newCylinderVisualTransparency = 1.0f;
+  cylinderVisual->SetTransparency(newCylinderVisualTransparency);
+  EXPECT_FLOAT_EQ(cylinder->GetTransparency(), newCylinderTransparency);
+  EXPECT_FLOAT_EQ(cylinderLink->GetTransparency(), newCylinderLinkTransparency);
+  EXPECT_FLOAT_EQ(cylinderVisual->GetTransparency(),
+      newCylinderVisualTransparency);
+
+  EXPECT_FLOAT_EQ(cylinder->DerivedTransparency(), newCylinderTransparency);
+  EXPECT_FLOAT_EQ(cylinderLink->DerivedTransparency(),
+      1.0 - ((1.0 - newCylinderTransparency) *
+      (1.0 - newCylinderLinkTransparency)));
+  EXPECT_FLOAT_EQ(cylinderVisual->DerivedTransparency(),
+      1.0 - ((1.0 - newCylinderTransparency) *
+      (1.0 - newCylinderLinkTransparency) *
+      (1.0 - newCylinderVisualTransparency)));
+
+  // clone visual and verify transparency
+  rendering::VisualPtr boxClone = box->Clone("boxClone",
+      box->GetParent());
+  rendering::VisualPtr sphereClone = sphere->Clone("sphereClone",
+      sphere->GetParent());
+  rendering::VisualPtr cylinderClone = cylinder->Clone("cylinderClone",
+      cylinder->GetParent());
+
+  std::queue<std::pair<rendering::VisualPtr, rendering::VisualPtr> >
+      cloneVisuals;
+  cloneVisuals.push(std::make_pair(box, boxClone));
+  cloneVisuals.push(std::make_pair(sphere, sphereClone));
+  cloneVisuals.push(std::make_pair(cylinder, cylinderClone));
+  while (!cloneVisuals.empty())
+  {
+    auto visualPair = cloneVisuals.front();
+    cloneVisuals.pop();
+    EXPECT_FLOAT_EQ(visualPair.first->GetTransparency(),
+        visualPair.second->GetTransparency());
+    EXPECT_FLOAT_EQ(visualPair.first->DerivedTransparency(),
+        visualPair.second->DerivedTransparency());
+
+    EXPECT_FLOAT_EQ(visualPair.first->GetChildCount(),
+        visualPair.second->GetChildCount());
+    for (unsigned int i  = 0; i < visualPair.first->GetChildCount(); ++i)
+    {
+      cloneVisuals.push(std::make_pair(
+          visualPair.first->GetChild(i), visualPair.second->GetChild(i)));
+    }
+  }
+
+  // verify inherit transparency
+  EXPECT_TRUE(cylinder->InheritTransparency());
+  EXPECT_TRUE(cylinderLink->InheritTransparency());
+  EXPECT_TRUE(cylinderVisual->InheritTransparency());
+
+  cylinderLink->SetInheritTransparency(false);
+  EXPECT_TRUE(cylinder->InheritTransparency());
+  EXPECT_FALSE(cylinderLink->InheritTransparency());
+  EXPECT_TRUE(cylinderVisual->InheritTransparency());
+
+  EXPECT_FLOAT_EQ(cylinder->DerivedTransparency(), newCylinderTransparency);
+  EXPECT_FLOAT_EQ(cylinderLink->DerivedTransparency(),
+      newCylinderLinkTransparency);
+  EXPECT_FLOAT_EQ(cylinderVisual->DerivedTransparency(),
+      1.0 - ((1.0 - newCylinderLinkTransparency) *
+      (1.0 - newCylinderVisualTransparency)));
+}
+
+/////////////////////////////////////////////////
+TEST_F(Visual_TEST, Wireframe)
+{
+  Load("worlds/empty.world");
+
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
+  ASSERT_TRUE(scene != NULL);
+
+  sdf::ElementPtr sphereSDF(new sdf::Element);
+  sdf::initFile("visual.sdf", sphereSDF);
+  sdf::readString(GetVisualSDFString("sphere_visual", "sphere",
+      gazebo::math::Pose::Zero, 0), sphereSDF);
+  gazebo::rendering::VisualPtr sphereVis(
+      new gazebo::rendering::Visual("sphere_visual", scene));
+  sphereVis->Load(sphereSDF);
+
+  sdf::ElementPtr boxSDF(new sdf::Element);
+  sdf::initFile("visual.sdf", boxSDF);
+  sdf::readString(GetVisualSDFString("box_visual", "box",
+      gazebo::math::Pose::Zero, 0), boxSDF);
+  gazebo::rendering::VisualPtr boxVis(
+      new gazebo::rendering::Visual("box_visual", sphereVis));
+  boxVis->Load(boxSDF);
+
+  // wireframe should be disabled by default
+  EXPECT_FALSE(sphereVis->Wireframe());
+  EXPECT_FALSE(boxVis->Wireframe());
+
+  // enable wireframe for box visual
+  boxVis->SetWireframe(true);
+  EXPECT_FALSE(sphereVis->Wireframe());
+  EXPECT_TRUE(boxVis->Wireframe());
+
+  // disable wireframe for box visual
+  boxVis->SetWireframe(false);
+  EXPECT_FALSE(sphereVis->Wireframe());
+  EXPECT_FALSE(boxVis->Wireframe());
+
+  // enable wireframe for sphere visual, it should cascade down to box visual
+  sphereVis->SetWireframe(true);
+  EXPECT_TRUE(sphereVis->Wireframe());
+  EXPECT_TRUE(boxVis->Wireframe());
+
+  // reset everything
+  sphereVis->SetWireframe(false);
+  EXPECT_FALSE(sphereVis->Wireframe());
+  EXPECT_FALSE(boxVis->Wireframe());
+
+  // check that certain visual types won't be affected by wireframe mode
+  boxVis->SetType(rendering::Visual::VT_GUI);
+  boxVis->SetWireframe(true);
+  EXPECT_FALSE(sphereVis->Wireframe());
+  EXPECT_FALSE(boxVis->Wireframe());
+
+  sphereVis->SetWireframe(true);
+  EXPECT_TRUE(sphereVis->Wireframe());
+  EXPECT_FALSE(boxVis->Wireframe());
+}
+
+/////////////////////////////////////////////////
 TEST_F(Visual_TEST, Material)
 {
   Load("worlds/empty.world");
