@@ -1,5 +1,8 @@
 ## Gazebo 7.0
 
+1. Switching to ignition math for the rendering library.
+    * [Pull request #1993](https://bitbucket.org/osrf/gazebo/pull-request/1993)
+
 1. Add ability to set the pose of a visual from a link.
     * [Pull request #1963](https://bitbucket.org/osrf/gazebo/pull-request/1963)
 
