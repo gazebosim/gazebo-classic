@@ -61,7 +61,6 @@ ModelAlign::~ModelAlign()
 void ModelAlign::Clear()
 {
   this->dataPtr->targetVis.reset();
-  this->dataPtr->userCamera.reset();
   this->dataPtr->scene.reset();
   this->dataPtr->node.reset();
   this->dataPtr->userCmdPub.reset();
@@ -79,13 +78,19 @@ void ModelAlign::Init()
 
   rendering::UserCameraPtr cam = gui::get_active_camera();
   if (!cam)
-    return;
+  {
+    this->dataPtr->scene = rendering::get_scene();
+  }
+  else
+  {
+    this->dataPtr->scene = cam->GetScene();
+  }
 
-  if (!cam->GetScene())
-    return;
-
-  this->dataPtr->userCamera = cam;
-  this->dataPtr->scene = cam->GetScene();
+  if (!this->dataPtr->scene)
+  {
+    gzerr << "Unable to initialize Model Align tool, scene is NULL"
+        << std::endl;
+  }
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init();
