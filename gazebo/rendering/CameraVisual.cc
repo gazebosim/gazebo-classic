@@ -24,6 +24,7 @@
 #include <boost/bind.hpp>
 
 #include "gazebo/rendering/ogre_gazebo.h"
+#include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/DynamicLines.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/Camera.hh"
@@ -117,7 +118,7 @@ void CameraVisual::Load(const msgs::CameraSensor &_msg)
   line->setVisibilityFlags(GZ_VISIBILITY_GUI);
 
   this->AttachObject(planeEnt);
-  dPtr->camera->AttachToVisual(this->GetId(), true, 0, 0);
+  dPtr->camera->AttachToVisual(this->GetId(), true);
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
 

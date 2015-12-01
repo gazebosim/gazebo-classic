@@ -785,7 +785,7 @@ void ModelListWidget::GUIPropertyChanged(QtProperty *_item)
     }
     else if (changedProperty == "max_distance")
     {
-      cam->SetTrackMinDistance(this->variantManager->value(
+      cam->SetTrackMaxDistance(this->variantManager->value(
              this->GetChildItem(cameraFollowProperty,
                "max_distance")).toDouble());
     }
