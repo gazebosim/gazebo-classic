@@ -76,7 +76,7 @@ namespace gazebo
                 visibilityFlags(GZ_VISIBILITY_ALL),
                 type(Visual::VT_ENTITY),
                 layer(0),
-                geomSize(ignition::math::Vector3d::One)
+                geomSize(ignition::math::Vector3d::One),
                 inheritTransparency(true),
                 wireframe(false)
       {
