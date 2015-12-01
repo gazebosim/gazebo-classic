@@ -360,6 +360,13 @@ unsigned int Publication::GetCallbackCount() const
 }
 
 //////////////////////////////////////////////////
+unsigned int Publication::PublisherCount() const
+{
+  boost::mutex::scoped_lock lock(this->callbackMutex);
+  return this->publishers.size();
+}
+
+//////////////////////////////////////////////////
 unsigned int Publication::GetNodeCount() const
 {
   boost::mutex::scoped_lock lock(this->nodeMutex);

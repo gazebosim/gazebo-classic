@@ -78,11 +78,6 @@ namespace gazebo
       /// sent. False means nodes process both outbound and inbound messages
       public: void ProcessNodes(bool _onlyOut = false);
 
-      /// \brief Has the topic been advertised?
-      /// \param[in] _topic The name of the topic to check
-      /// \return true if the topic has been advertised, false otherwise
-      public: bool IsAdvertised(const std::string &_topic);
-
       /// \brief Subscribe to a topic
       /// \param[in] _options The options to use for the subscription
       /// \return Pointer to the newly created subscriber

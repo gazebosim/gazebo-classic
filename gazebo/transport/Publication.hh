@@ -89,6 +89,10 @@ namespace gazebo
       /// \return The number of callbacks
       public: unsigned int GetCallbackCount() const;
 
+      /// \brief Get the number of publishers.
+      /// \return The number of publishers.
+      public: unsigned int PublisherCount() const;
+
       /// \brief Get the number of nodes
       /// \return The number of nodes
       public: unsigned int GetNodeCount() const;

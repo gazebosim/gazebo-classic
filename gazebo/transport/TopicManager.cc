@@ -408,12 +408,17 @@ void TopicManager::Unadvertise(PublisherPtr _pub)
 
   if (_pub)
   {
+    unsigned int pubsSameTopic = 0;
     PublicationPtr publication = this->FindPublication(_pub->GetTopic());
     if (publication)
+    {
       publication->RemovePublisher(_pub);
+      pubsSameTopic = publication->PublisherCount();
+    }
 
-    // TODO: Unadvertise topic if this is its last publisher
-    // this->Unadvertise(_pub->GetTopic());
+    // Unadvertise topic if this was its last publisher
+    if (pubsSameTopic == 0)
+      this->Unadvertise(_pub->GetTopic());
   }
 }
 
