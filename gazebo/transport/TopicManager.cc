@@ -432,9 +432,7 @@ void TopicManager::GetTopicNamespaces(std::list<std::string> &_namespaces)
 void TopicManager::ClearBuffers()
 {
   for (auto iter : this->advertisedTopics)
-  {
     iter.second->ClearPrevMsgs();
-  }
 }
 
 //////////////////////////////////////////////////

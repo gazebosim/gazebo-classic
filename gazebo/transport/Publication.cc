@@ -501,3 +501,4 @@ MessagePtr Publication::GetPrevMsg(uint32_t _pubId)
   else
     return MessagePtr();
 }
+

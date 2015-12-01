@@ -515,7 +515,6 @@ TEST_F(TransportTest, ClearBuffers)
   transport::NodePtr node = transport::NodePtr(new transport::Node());
   node->Init();
   ASSERT_TRUE(node != NULL);
-  ASSERT_FALSE(node->HasLatchedSubscriber(fullTopic));
 
   // Advertise publisher
   auto pub1 = node->Advertise<msgs::Vector3d>(fullTopic);
@@ -535,8 +534,8 @@ TEST_F(TransportTest, ClearBuffers)
   EXPECT_TRUE(std::find(topics.begin(), topics.end(),
       fullTopic) != topics.end());
 
-  // Keep topic count to compare later
-  auto topicCount = topics.size();
+  // Keep total topic count to compare later
+  auto topicCount = transport::getAdvertisedTopics().size();
 
   // Publish a message
   msgs::Vector3d msg;
@@ -550,7 +549,7 @@ TEST_F(TransportTest, ClearBuffers)
       &ReceiveBeforeClear, true);
   ASSERT_TRUE(subBeforeClear != NULL);
 
-  // Wait for message to be received by latched subscriber
+  // Check that message is in buffer, since it's received by latched subscriber
   sleep = 0;
   while (g_subBeforeClear != 1 && sleep < maxSleep)
   {
@@ -562,25 +561,25 @@ TEST_F(TransportTest, ClearBuffers)
   // Clear buffers
   transport::clear_buffers();
 
+  // Check that transport is still running and advertised topic is there
+  EXPECT_FALSE(transport::is_stopped());
+  EXPECT_TRUE(transport::ConnectionManager::Instance()->IsRunning());
+  EXPECT_FALSE(transport::getAdvertisedTopics().empty());
+  EXPECT_EQ(transport::getAdvertisedTopics().size(), topicCount);
+
   // Create another latched subscriber after publishing
-  auto subAfterClear = node->Subscribe(fullTopic,
-      &ReceiveAfterClear, true);
+  auto subAfterClear = node->Subscribe(fullTopic, &ReceiveAfterClear, true);
   ASSERT_TRUE(subAfterClear != NULL);
 
-  // Check that the topic is still advertised, but previous message is not
-  // received by new latched subscriber
+  // Check that previous message is not received by new latched subscriber
   sleep = 0;
-  topics = transport::getAdvertisedTopics("gazebo.msgs.Vector3d");
-  while (topics.size() != topicCount && g_subAfterClear != 1 &&
-      sleep < maxSleep)
+  while (g_subAfterClear != 1 && sleep < maxSleep)
   {
-    topics = transport::getAdvertisedTopics("gazebo.msgs.Vector3d");
     common::Time::MSleep(100);
     sleep++;
   }
   EXPECT_EQ(g_subBeforeClear, 1);
   EXPECT_EQ(g_subAfterClear, 0);
-  EXPECT_EQ(topics.size(), topicCount);
 }
 
 /////////////////////////////////////////////////
