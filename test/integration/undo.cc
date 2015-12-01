@@ -24,6 +24,8 @@
 #include "gazebo/gui/ModelAlign.hh"
 #include "gazebo/gui/ModelManipulator.hh"
 #include "gazebo/gui/ModelSnap.hh"
+#include "gazebo/gui/RenderWidget.hh"
+#include "gazebo/gui/TimePanel.hh"
 #include "gazebo/gui/UserCmdHistory.hh"
 #include "undo.hh"
 
@@ -684,6 +686,274 @@ void UndoTest::UndoAlign()
   // Clean up
   delete mainWindow;
   mainWindow = NULL;
+}
+
+/////////////////////////////////////////////////
+void UndoTest::UndoResetTime()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/shapes.world", false, false, true);
+
+  // Get world
+  gazebo::physics::WorldPtr world = gazebo::physics::get_world("default");
+  QVERIFY(world != NULL);
+
+  // Create the main window.
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Process some events and draw the screen
+  for (size_t i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Get box and move it
+  auto box = world->GetModel("box");
+  QVERIFY(box != NULL);
+  auto boxInitialPose = box->GetWorldPose();
+
+  auto boxFinalPose = gazebo::math::Pose(10, 20, 0.5, 0, 0, 0);
+  box->SetWorldPose(boxFinalPose);
+  QVERIFY(box->GetWorldPose() != boxInitialPose);
+  QVERIFY(box->GetWorldPose() == boxFinalPose);
+
+  // Get sim time
+  world->SetPaused(true);
+  auto initialTime = world->GetSimTime();
+  QVERIFY(initialTime != gazebo::common::Time::Zero);
+
+  // Reset time
+  mainWindow->GetRenderWidget()->GetTimePanel()->OnTimeReset();
+
+  // Check time
+  int sleep = 0;
+  int maxSleep = 100;
+  auto newTime = world->GetSimTime();
+  while (newTime != gazebo::common::Time::Zero && sleep < maxSleep)
+  {
+    newTime = world->GetSimTime();
+    gazebo::common::Time::MSleep(100);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+    sleep++;
+  }
+  gzmsg << "Initial time [" << initialTime << "] new time [" << newTime
+      << "]    sleep [" << sleep << "]" << std::endl;
+  QVERIFY(newTime == gazebo::common::Time::Zero);
+
+  // Check that box pose wasn't reset
+  QVERIFY(box->GetWorldPose() == boxFinalPose);
+  QVERIFY(box->GetWorldPose() != boxInitialPose);
+
+  // Undo
+  QVERIFY(gazebo::gui::g_undoAct != NULL);
+  QVERIFY(gazebo::gui::g_undoAct->isEnabled() == true);
+
+  gazebo::gui::g_undoAct->trigger();
+
+  // Check time is back to initial time
+  sleep = 0;
+  maxSleep = 10;
+  newTime = world->GetSimTime();
+  while (newTime != initialTime && sleep < maxSleep)
+  {
+    newTime = world->GetSimTime();
+    gazebo::common::Time::MSleep(100);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+    sleep++;
+  }
+  gzmsg << "Initial time [" << initialTime << "] new time [" << newTime
+      << "]    sleep [" << sleep << "]" << std::endl;
+  QVERIFY(newTime == initialTime);
+}
+
+/////////////////////////////////////////////////
+void UndoTest::UndoResetWorld()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/shapes.world", false, false, true);
+
+  // Get world
+  gazebo::physics::WorldPtr world = gazebo::physics::get_world("default");
+  QVERIFY(world != NULL);
+
+  // Create the main window.
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Process some events and draw the screen
+  for (size_t i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Get box and move it
+  auto box = world->GetModel("box");
+  QVERIFY(box != NULL);
+  auto boxInitialPose = box->GetWorldPose();
+
+  gazebo::math::Pose boxFinalPose = gazebo::math::Pose(10, 20, 0.5, 0, 0, 0);
+  box->SetWorldPose(boxFinalPose);
+  QVERIFY(box->GetWorldPose() != boxInitialPose);
+  QVERIFY(box->GetWorldPose() == boxFinalPose);
+
+  // Get sim time
+  world->SetPaused(true);
+  auto initialTime = world->GetSimTime();
+  QVERIFY(initialTime != gazebo::common::Time::Zero);
+
+  // Reset world
+  gazebo::gui::g_resetWorldAct->trigger();
+
+  // Check time and box pose
+  int sleep = 0;
+  int maxSleep = 100;
+  auto newTime = world->GetSimTime();
+  auto boxNewPose = box->GetWorldPose();
+  while (newTime != gazebo::common::Time::Zero && boxNewPose != boxInitialPose
+      && sleep < maxSleep)
+  {
+    newTime = world->GetSimTime();
+    boxNewPose = box->GetWorldPose();
+    gazebo::common::Time::MSleep(100);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+    sleep++;
+  }
+  gzmsg << "Initial time [" << initialTime << "] new time [" << newTime
+        << "] Initial pose [" << boxInitialPose << "] new pose [" << boxNewPose
+        << "]    sleep [" << sleep << "]" << std::endl;
+  QVERIFY(newTime == gazebo::common::Time::Zero);
+  QVERIFY(boxNewPose == boxInitialPose);
+
+  // Undo
+  QVERIFY(gazebo::gui::g_undoAct != NULL);
+  QVERIFY(gazebo::gui::g_undoAct->isEnabled() == true);
+
+  gazebo::gui::g_undoAct->trigger();
+
+  // Check time and box were reset
+  sleep = 0;
+  newTime = world->GetSimTime();
+  boxNewPose = box->GetWorldPose();
+  while (newTime != initialTime && boxNewPose == boxInitialPose &&
+      sleep < maxSleep)
+  {
+    newTime = world->GetSimTime();
+    boxNewPose = box->GetWorldPose();
+    gazebo::common::Time::MSleep(100);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+    sleep++;
+  }
+  gzmsg << "Initial time [" << initialTime << "] new time [" << newTime
+        << "] Initial pose [" << boxInitialPose << "] new pose [" << boxNewPose
+        << "]    sleep [" << sleep << "]" << std::endl;
+  QVERIFY(newTime == initialTime);
+  QVERIFY(boxNewPose == boxFinalPose);
+}
+
+/////////////////////////////////////////////////
+void UndoTest::UndoResetModelPoses()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/shapes.world", false, false, true);
+
+  // Get world
+  gazebo::physics::WorldPtr world = gazebo::physics::get_world("default");
+  QVERIFY(world != NULL);
+
+  // Create the main window.
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Process some events and draw the screen
+  for (size_t i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Get box and move it
+  auto box = world->GetModel("box");
+  QVERIFY(box != NULL);
+  auto boxInitialPose = box->GetWorldPose();
+
+  gazebo::math::Pose boxFinalPose = gazebo::math::Pose(10, 20, 0.5, 0, 0, 0);
+  box->SetWorldPose(boxFinalPose);
+  QVERIFY(box->GetWorldPose() != boxInitialPose);
+  QVERIFY(box->GetWorldPose() == boxFinalPose);
+
+  // Get sim time
+  world->SetPaused(true);
+  auto initialTime = world->GetSimTime();
+  QVERIFY(initialTime != gazebo::common::Time::Zero);
+
+  // Reset model poses
+  gazebo::gui::g_resetModelsAct->trigger();
+
+  // Check time and box pose
+  int sleep = 0;
+  int maxSleep = 100;
+  auto boxNewPose = box->GetWorldPose();
+  while (boxNewPose != boxInitialPose && sleep < maxSleep)
+  {
+    boxNewPose = box->GetWorldPose();
+    gazebo::common::Time::MSleep(100);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+    sleep++;
+  }
+  gzmsg << "Initial pose [" << boxInitialPose << "] new pose [" << boxNewPose
+        << "]    sleep [" << sleep << "]" << std::endl;
+  QVERIFY(boxNewPose == boxInitialPose);
+
+  // Check that time wasn't reset
+  QVERIFY(world->GetSimTime() != gazebo::common::Time::Zero);
+  QVERIFY(world->GetSimTime() == initialTime + gazebo::common::Time(0.001));
+
+  // Undo
+  QVERIFY(gazebo::gui::g_undoAct != NULL);
+  QVERIFY(gazebo::gui::g_undoAct->isEnabled() == true);
+
+  gazebo::gui::g_undoAct->trigger();
+
+  // Check time and box were reset
+  sleep = 0;
+  boxNewPose = box->GetWorldPose();
+  while (boxNewPose == boxInitialPose && sleep < maxSleep)
+  {
+    boxNewPose = box->GetWorldPose();
+    gazebo::common::Time::MSleep(100);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+    sleep++;
+  }
+  gzmsg << "Initial pose [" << boxInitialPose << "] new pose [" << boxNewPose
+        << "]    sleep [" << sleep << "]" << std::endl;
+  QVERIFY(boxNewPose == boxFinalPose);
 }
 
 // Generate a main function for the test

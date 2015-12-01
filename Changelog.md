@@ -1,5 +1,9 @@
 ## Gazebo 7.0
 
+1. Switching to ignition math for the rendering library.
+    * [Pull request #1993](https://bitbucket.org/osrf/gazebo/pull-request/1993)
+    * [Pull request #1994](https://bitbucket.org/osrf/gazebo/pull-request/1994)
+
 1. Add ability to set the pose of a visual from a link.
     * [Pull request #1963](https://bitbucket.org/osrf/gazebo/pull-request/1963)
 
@@ -68,6 +72,9 @@ flags from c functions. Windows did not like `CPPTYPE_*` in
     
 1. Forward user command messages for undo.
     * [Pull request #2009](https://bitbucket.org/osrf/gazebo/pull-request/2009)
+
+1. Undo reset commands during simulation, forwarding commands
+    * [Pull request #1986](https://bitbucket.org/osrf/gazebo/pull-request/1986)
 
 1. Add function to get the derived scale of a Visual
     * [Pull request #1881](https://bitbucket.org/osrf/gazebo/pull-request/1881)
