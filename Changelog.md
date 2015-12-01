@@ -5,6 +5,11 @@
 1. Backport model editor toolbar fixed joint option from [pull request #1794](https://bitbucket.org/osrf/gazebo/pull-request/1794)
     * [Pull request #1957](https://bitbucket.org/osrf/gazebo/pull-request/1957)
 
+1. Fix minimum window height
+    * Backport of [pull request #1977](https://bitbucket.org/osrf/gazebo/pull-request/1977)
+    * [Pull request #1998](https://bitbucket.org/osrf/gazebo/pull-request/1998)
+    * [Issue #1706](https://bitbucket.org/osrf/gazebo/issue/1706)
+
 1. Fix visual transparency issues
     * [Pull request #1967](https://bitbucket.org/osrf/gazebo/pull-request/1967)
     * [Issue #1726](https://bitbucket.org/osrf/gazebo/issue/1726)
