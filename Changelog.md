@@ -1,5 +1,9 @@
 ## Gazebo 7.0
 
+1. Switching to ignition math for the rendering library.
+    * [Pull request #1993](https://bitbucket.org/osrf/gazebo/pull-request/1993)
+    * [Pull request #1994](https://bitbucket.org/osrf/gazebo/pull-request/1994)
+
 1. Removed deprecations
     * [Pull request #1992]((https://bitbucket.org/osrf/gazebo/pull-request/1992)
 
