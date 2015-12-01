@@ -340,11 +340,16 @@ void UndoTest::UndoResetTime()
   while (newTime != gazebo::common::Time::Zero && sleep < maxSleep)
   {
     newTime = world->GetSimTime();
+
+    // Trigger UserCmdManager::ProcessPendingStates
+    gazebo::event::Events::worldUpdateBegin(gazebo::common::UpdateInfo());
+
     gazebo::common::Time::MSleep(100);
     QCoreApplication::processEvents();
     mainWindow->repaint();
     sleep++;
   }
+
   gzmsg << "Initial time [" << initialTime << "] new time [" << newTime
       << "]    sleep [" << sleep << "]" << std::endl;
   QVERIFY(newTime == gazebo::common::Time::Zero);
@@ -366,11 +371,16 @@ void UndoTest::UndoResetTime()
   while (newTime != initialTime && sleep < maxSleep)
   {
     newTime = world->GetSimTime();
+
+    // Trigger UserCmdManager::ProcessPendingStates
+    gazebo::event::Events::worldUpdateBegin(gazebo::common::UpdateInfo());
+
     gazebo::common::Time::MSleep(100);
     QCoreApplication::processEvents();
     mainWindow->repaint();
     sleep++;
   }
+
   gzmsg << "Initial time [" << initialTime << "] new time [" << newTime
       << "]    sleep [" << sleep << "]" << std::endl;
   QVERIFY(newTime == initialTime);
@@ -430,6 +440,10 @@ void UndoTest::UndoResetWorld()
       && sleep < maxSleep)
   {
     newTime = world->GetSimTime();
+
+    // Trigger UserCmdManager::ProcessPendingStates
+    gazebo::event::Events::worldUpdateBegin(gazebo::common::UpdateInfo());
+
     boxNewPose = box->GetWorldPose();
     gazebo::common::Time::MSleep(100);
     QCoreApplication::processEvents();
@@ -456,6 +470,10 @@ void UndoTest::UndoResetWorld()
       sleep < maxSleep)
   {
     newTime = world->GetSimTime();
+
+    // Trigger UserCmdManager::ProcessPendingStates
+    gazebo::event::Events::worldUpdateBegin(gazebo::common::UpdateInfo());
+
     boxNewPose = box->GetWorldPose();
     gazebo::common::Time::MSleep(100);
     QCoreApplication::processEvents();
@@ -521,6 +539,10 @@ void UndoTest::UndoResetModelPoses()
   while (boxNewPose != boxInitialPose && sleep < maxSleep)
   {
     boxNewPose = box->GetWorldPose();
+
+    // Trigger UserCmdManager::ProcessPendingStates
+    gazebo::event::Events::worldUpdateBegin(gazebo::common::UpdateInfo());
+
     gazebo::common::Time::MSleep(100);
     QCoreApplication::processEvents();
     mainWindow->repaint();
@@ -546,6 +568,10 @@ void UndoTest::UndoResetModelPoses()
   while (boxNewPose == boxInitialPose && sleep < maxSleep)
   {
     boxNewPose = box->GetWorldPose();
+
+    // Trigger UserCmdManager::ProcessPendingStates
+    gazebo::event::Events::worldUpdateBegin(gazebo::common::UpdateInfo());
+
     gazebo::common::Time::MSleep(100);
     QCoreApplication::processEvents();
     mainWindow->repaint();
@@ -619,6 +645,9 @@ void UndoTest::UndoTranslateModel()
   int maxSleep = 10;
   while (boxModel->GetWorldPose() != boxFinalPose && sleep < maxSleep)
   {
+    // Trigger UserCmdManager::ProcessPendingStates
+    gazebo::event::Events::worldUpdateBegin(gazebo::common::UpdateInfo());
+
     gazebo::common::Time::MSleep(100);
     QCoreApplication::processEvents();
     mainWindow->repaint();
@@ -639,6 +668,9 @@ void UndoTest::UndoTranslateModel()
   maxSleep = 10;
   while (boxModel->GetWorldPose() != boxInitialPose && sleep < maxSleep)
   {
+    // Trigger UserCmdManager::ProcessPendingStates
+    gazebo::event::Events::worldUpdateBegin(gazebo::common::UpdateInfo());
+
     gazebo::common::Time::MSleep(100);
     QCoreApplication::processEvents();
     mainWindow->repaint();
@@ -716,6 +748,9 @@ void UndoTest::UndoRotateLight()
   int maxSleep = 10;
   while (sunLight->GetWorldPose().rot != sunFinalRot && sleep < maxSleep)
   {
+    // Trigger UserCmdManager::ProcessPendingStates
+    gazebo::event::Events::worldUpdateBegin(gazebo::common::UpdateInfo());
+
     gazebo::common::Time::MSleep(100);
     QCoreApplication::processEvents();
     mainWindow->repaint();
@@ -736,6 +771,9 @@ void UndoTest::UndoRotateLight()
   maxSleep = 10;
   while (sunLight->GetWorldPose().rot != sunInitialRot && sleep < maxSleep)
   {
+    // Trigger UserCmdManager::ProcessPendingStates
+    gazebo::event::Events::worldUpdateBegin(gazebo::common::UpdateInfo());
+
     gazebo::common::Time::MSleep(100);
     QCoreApplication::processEvents();
     mainWindow->repaint();
@@ -814,6 +852,9 @@ void UndoTest::UndoSnap()
   int maxSleep = 10;
   while (boxModel->GetWorldPose() == boxInitialPose && sleep < maxSleep)
   {
+    // Trigger UserCmdManager::ProcessPendingStates
+    gazebo::event::Events::worldUpdateBegin(gazebo::common::UpdateInfo());
+
     gazebo::common::Time::MSleep(100);
     QCoreApplication::processEvents();
     mainWindow->repaint();
@@ -834,6 +875,9 @@ void UndoTest::UndoSnap()
   maxSleep = 10;
   while (boxModel->GetWorldPose() != boxInitialPose && sleep < maxSleep)
   {
+    // Trigger UserCmdManager::ProcessPendingStates
+    gazebo::event::Events::worldUpdateBegin(gazebo::common::UpdateInfo());
+
     gazebo::common::Time::MSleep(100);
     QCoreApplication::processEvents();
     mainWindow->repaint();
@@ -925,6 +969,9 @@ void UndoTest::UndoAlign()
   while (boxModel->GetWorldPose() == boxInitialPose &&
       cylinderModel->GetWorldPose() == cylinderInitialPose && sleep < maxSleep)
   {
+    // Trigger UserCmdManager::ProcessPendingStates
+    gazebo::event::Events::worldUpdateBegin(gazebo::common::UpdateInfo());
+
     gazebo::common::Time::MSleep(100);
     QCoreApplication::processEvents();
     mainWindow->repaint();
@@ -950,6 +997,9 @@ void UndoTest::UndoAlign()
   while (boxModel->GetWorldPose() != boxInitialPose &&
       cylinderModel->GetWorldPose() != cylinderInitialPose && sleep < maxSleep)
   {
+    // Trigger UserCmdManager::ProcessPendingStates
+    gazebo::event::Events::worldUpdateBegin(gazebo::common::UpdateInfo());
+
     gazebo::common::Time::MSleep(100);
     QCoreApplication::processEvents();
     mainWindow->repaint();
