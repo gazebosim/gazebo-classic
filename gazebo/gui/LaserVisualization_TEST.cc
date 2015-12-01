@@ -76,7 +76,7 @@ void LaserVisualization_TEST::Lines()
     // check if current pixel is blue, prev pixel is also blue
     // and the two shades of blue are different
     if (r == g && r < b && rPrev == gPrev && rPrev < bPrev &&
-        r < rPrev && b != bPrev)
+        r < rPrev)
       ++darkBlueTransition;
 
     // check if current and prev pixels are the same blue color
