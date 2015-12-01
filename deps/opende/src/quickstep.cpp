@@ -265,11 +265,13 @@ void dxQuickStepper (dxWorldProcessContext *context,
  // load lambda from the value saved on the previous iteration,
  // need access to lambda in dxUpdateBodies()
   dReal *lambda = context->AllocateArray<dReal> (m);
+  dReal *mg_e = context->AllocateArray<dReal> (m);
   dReal *lambda_erp = context->AllocateArray<dReal> (m);
 
   dSetZero(caccel, nb*6);
   dSetZero(caccel_erp, nb*6);
   dSetZero(lambda, m);
+  dSetZero(mg_e, m);
   dSetZero(lambda_erp, m);
 
   // Get Joint Information, setup Jacobians by calling getInfo2.
@@ -509,6 +511,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
     else
     {
       dSetZero (lambda,m);
+      dSetZero (mg_e,m);
       dSetZero (lambda_erp,m);
     }
 
@@ -521,7 +524,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
                stepsize,
 #endif
                jb,body,
-               invMOI,MOI,lambda,lambda_erp,
+               invMOI,MOI,lambda,mg_e,lambda_erp,
                caccel,caccel_erp,cforce,
                rhs,rhs_erp,rhs_precon,
                lo,hi,cfm,findex,
@@ -628,6 +631,7 @@ size_t dxEstimateQuickStepMemoryRequirements (
         }
 
         size_t sub2_res2 = dEFFICIENT_SIZE(sizeof(dReal) * m); // for lambda
+        sub2_res2 += dEFFICIENT_SIZE(sizeof(dReal) * m); // for mg_e
         sub2_res2 += dEFFICIENT_SIZE(sizeof(dReal) * m); // for lambda_erp
         sub2_res2 += dEFFICIENT_SIZE(sizeof(dReal) * 6 * nb); // for cforce
         sub2_res2 += dEFFICIENT_SIZE(sizeof(dReal) * 6 * nb); // for caccel

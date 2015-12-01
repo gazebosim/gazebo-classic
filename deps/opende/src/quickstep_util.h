@@ -149,9 +149,9 @@ struct dxPGSLCPParameters {
     dRealPtr Adcfm_precon;
     dRealPtr J;
     dRealPtr iMJ;
-    dRealPtr rhs_precon ;
     dRealPtr J_precon ;
     dRealPtr J_orig ;
+    dRealMutablePtr rhs_precon ;
     dRealMutablePtr cforce ;
 
     dRealPtr rhs;

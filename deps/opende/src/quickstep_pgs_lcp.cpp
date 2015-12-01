@@ -93,7 +93,7 @@ static void* ComputeRows(void *p)
   dRealPtr        Adcfm_precon = params->Adcfm_precon;
   dRealPtr        J            = params->J;
   dRealPtr        iMJ          = params->iMJ;
-  dRealPtr        rhs_precon   = params->rhs_precon;
+  dRealMutablePtr rhs_precon   = params->rhs_precon;
   dRealPtr        J_precon     = params->J_precon;
   dRealPtr        J_orig       = params->J_orig;
   dRealMutablePtr cforce       = params->cforce;
@@ -318,6 +318,7 @@ static void* ComputeRows(void *p)
 
 
       dReal delta = 0;
+      dReal delta_precon = 0;
 
       // THREAD_POSITION_CORRECTION
       dReal delta_erp = 0;
@@ -325,6 +326,19 @@ static void* ComputeRows(void *p)
       // setup pointers
       int b1 = jb[index*2];
       int b2 = jb[index*2+1];
+
+      // for precon
+      {
+        cforce_ptr1 = cforce + 6*b1;
+        if (b2 >= 0)
+        {
+          cforce_ptr2     = cforce + 6*b2;
+        }
+        else
+        {
+          cforce_ptr2     = NULL;
+        }
+      }
 
       // constraint accelerations
       {
@@ -377,129 +391,6 @@ static void* ComputeRows(void *p)
       // case is because M is identify for the precon case, therefor
       // accel computed by M of identity is actually force.
       //
-      // if (iteration < precon_iterations)
-      {
-        // preconditioning
-        // This is solving for the case where M is identity,
-        // exactly what we need for _mg.
-
-        // update delta_precon
-        delta_precon = rhs_precon[index] - old_lambda*Adcfm_precon[index];
-
-        dRealPtr J_ptr = J_precon + index*12;
-
-        // for preconditioned case, update delta using cforce, not caccel
-
-        delta_precon -= quickstep::dot6(cforce_ptr1, J_ptr);
-        if (cforce_ptr2)
-          delta_precon -= quickstep::dot6(cforce_ptr2, J_ptr + 6);
-
-        // set the limits for this constraint.
-        // this is the place where the QuickStep method differs from the
-        // direct LCP solving method, since that method only performs this
-        // limit adjustment once per time step, whereas this method performs
-        // once per iteration per constraint row.
-        // the constraints are ordered so that all lambda[] values needed have
-        // already been computed.
-        dReal hi_act, lo_act;
-        if (constraint_index >= 0) {
-          hi_act = dFabs (hi[index] * lambda[constraint_index]);
-          lo_act = -hi_act;
-        } else {
-          hi_act = hi[index];
-          lo_act = lo[index];
-        }
-
-        // compute lambda and clamp it to [lo,hi].
-        // @@@ SSE is used to speed up vector math
-        // operations with gcc compiler when defined
-        // but SSE is not a win here, #undef for now
-#undef SSE_CLAMP
-#ifndef SSE_CLAMP
-        lambda[index] = old_lambda+ delta_precon;
-        if (lambda[index] < lo_act) {
-          delta_precon = lo_act-old_lambda;
-          lambda[index] = lo_act;
-        }
-        else if (lambda[index] > hi_act) {
-          delta_precon = hi_act-old_lambda;
-          lambda[index] = hi_act;
-        }
-#else
-        dReal nl = old_lambda+ delta_precon;
-        _mm_store_sd(&nl, _mm_max_sd(_mm_min_sd(_mm_load_sd(&nl),
-          _mm_load_sd(&hi_act)), _mm_load_sd(&lo_act)));
-        lambda[index] = nl;
-        delta_precon = nl - old_lambda;
-#endif
-
-        // update cforce (this is strictly for the precon case)
-        {
-          // for preconditioning case, compute cforce
-          // FIXME: need un-altered unscaled J, not J_precon!!
-          J_ptr = J_orig + index*12;
-
-          // update cforce.
-          quickstep::sum6(cforce_ptr1, delta_precon, J_ptr);
-          if (cforce_ptr2)
-            quickstep::sum6(cforce_ptr2, delta_precon, J_ptr + 6);
-        }
-
-        // record residual (error) (for the non-erp version)
-        // given
-        //   dlambda = sor * (b_i - A_ij * lambda_j)/(A_ii + cfm)
-        // define scalar Ad:
-        //   Ad = sor / (A_ii + cfm)
-        // then
-        //   dlambda = Ad  * (b_i - A_ij * lambda_j)
-        // thus, to get residual from dlambda,
-        //   residual = dlambda / Ad
-        // or
-        //   residual = sqrt(sum( Ad2 * dlambda_i * dlambda_i))
-        //   where Ad2 = 1/(Ad * Ad)
-        dReal Ad2 = 0.0;
-        if (!_dequal(Ad[index], 0.0))
-        {
-          // Ad[i] = sor_w / (sum + cfm[i]);
-          Ad2 = 1.0 / (Ad[index] * Ad[index]);
-        }
-        else
-        {
-          // TODO: Usually, this means qs->w (SOR param) is zero.
-          // Residual calculation is wrong when SOR (w) is zero
-          // Given SOR is rarely 0, we'll set residual as 0 for now.
-          // To do this properly, we should compute dlambda without sor
-          // then use the Ad without SOR to back out residual.
-        }
-
-        dReal delta_precon2 = delta_precon*delta_precon;
-        if (constraint_index == -1)  // bilateral
-        {
-          rms_dlambda[0] += delta_precon2;
-          rms_error[0] += delta_precon2*Ad2;
-          m_rms_dlambda[0]++;
-        }
-        else if (constraint_index == -2)  // contact normal
-        {
-          rms_dlambda[1] += delta_precon2;
-          rms_error[1] += delta_precon2*Ad2;
-          m_rms_dlambda[1]++;
-        }
-        else  // friction forces
-        {
-          rms_dlambda[2] += delta_precon2;
-          rms_error[2] += delta_precon2*Ad2;
-          m_rms_dlambda[2]++;
-        }
-
-        // initialize position correction terms (_erp) with precon results
-        if (inline_position_correction)
-        {
-          old_lambda_erp = old_lambda;
-          lambda_erp[index] = lambda[index];
-        }
-      }
-      else
       {
         if (!skip_friction || constraint_index < 0)
         {
@@ -792,6 +683,158 @@ static void* ComputeRows(void *p)
         }
       } // end of non-precon
 
+
+
+
+      //////////////////////////////////////////////////////
+      //                                                  //
+      // use the precon case repeated below for _mg       //
+      // except here:                                     //
+      //    rhs_precon --> mg_r (residual)                //
+      //    lambda     --> mg_e (correction)              //
+      //                                                  //
+      // Then, we correct lambda with the correction      //
+      //    lambda = lambda - mg_e                        //
+      //                                                  //
+      //////////////////////////////////////////////////////
+      {
+        /// save last correction
+        dReal old_mg_e = mg_e[index];
+
+        // preconditioning --> mg
+        // Precon was solving for the case where M is identity,
+        // pretty much what we need for _mg.
+
+
+        // fill rhs_precon with residue:
+        //   rhs_precon = J inv(M) J^T lambda - rhs
+        rhs_precon[index] = 0;
+
+
+        // update delta_precon
+        delta_precon = rhs_precon[index] - old_mg_e*Adcfm_precon[index];
+
+        dRealPtr J_ptr = J_precon + index*12;
+
+        // for preconditioned case, update delta using cforce, not caccel
+
+        delta_precon -= quickstep::dot6(cforce_ptr1, J_ptr);
+        if (cforce_ptr2)
+          delta_precon -= quickstep::dot6(cforce_ptr2, J_ptr + 6);
+
+        // set the limits for this constraint.
+        // this is the place where the QuickStep method differs from the
+        // direct LCP solving method, since that method only performs this
+        // limit adjustment once per time step, whereas this method performs
+        // once per iteration per constraint row.
+        // the constraints are ordered so that all mg_e[] values needed have
+        // already been computed.
+        dReal hi_act, lo_act;
+        if (constraint_index >= 0) {
+          hi_act = dFabs (hi[index] * mg_e[constraint_index]);
+          lo_act = -hi_act;
+        } else {
+          hi_act = hi[index];
+          lo_act = lo[index];
+        }
+
+        // compute mg_e and clamp it to [lo,hi].
+        // @@@ SSE is used to speed up vector math
+        // operations with gcc compiler when defined
+        // but SSE is not a win here, #undef for now
+#undef SSE_CLAMP
+#ifndef SSE_CLAMP
+        mg_e[index] = old_mg_e+ delta_precon;
+        if (mg_e[index] < lo_act) {
+          delta_precon = lo_act-old_mg_e;
+          mg_e[index] = lo_act;
+        }
+        else if (mg_e[index] > hi_act) {
+          delta_precon = hi_act-old_mg_e;
+          mg_e[index] = hi_act;
+        }
+        // printf("m %d index %d oldmge %f mg_e %20.16f delta %f\n",
+        //   params->m, index, old_mg_e, mg_e[index], delta_precon);
+#else
+        dReal nl = old_mg_e+ delta_precon;
+        _mm_store_sd(&nl, _mm_max_sd(_mm_min_sd(_mm_load_sd(&nl),
+          _mm_load_sd(&hi_act)), _mm_load_sd(&lo_act)));
+        mg_e[index] = nl;
+        delta_precon = nl - old_mg_e;
+#endif
+
+        // update cforce (this is strictly for the precon case)
+        {
+          // for preconditioning case, compute cforce
+          // FIXME: need un-altered unscaled J, not J_precon!!
+          J_ptr = J_orig + index*12;
+
+          // update cforce.
+          quickstep::sum6(cforce_ptr1, delta_precon, J_ptr);
+          if (cforce_ptr2)
+            quickstep::sum6(cforce_ptr2, delta_precon, J_ptr + 6);
+        }
+
+        // record residual (error) (for the non-erp version)
+        // given
+        //   dlambda = sor * (b_i - A_ij * lambda_j)/(A_ii + cfm)
+        // define scalar Ad:
+        //   Ad = sor / (A_ii + cfm)
+        // then
+        //   dlambda = Ad  * (b_i - A_ij * lambda_j)
+        // thus, to get residual from dlambda,
+        //   residual = dlambda / Ad
+        // or
+        //   residual = sqrt(sum( Ad2 * dlambda_i * dlambda_i))
+        //   where Ad2 = 1/(Ad * Ad)
+        dReal Ad2 = 0.0;
+        if (!_dequal(Ad[index], 0.0))
+        {
+          // Ad[i] = sor_w / (sum + cfm[i]);
+          Ad2 = 1.0 / (Ad[index] * Ad[index]);
+        }
+        else
+        {
+          // TODO: Usually, this means qs->w (SOR param) is zero.
+          // Residual calculation is wrong when SOR (w) is zero
+          // Given SOR is rarely 0, we'll set residual as 0 for now.
+          // To do this properly, we should compute dlambda without sor
+          // then use the Ad without SOR to back out residual.
+        }
+
+        dReal delta_precon2 = delta_precon*delta_precon;
+        if (constraint_index == -1)  // bilateral
+        {
+          rms_dlambda[0] += delta_precon2;
+          rms_error[0] += delta_precon2*Ad2;
+          m_rms_dlambda[0]++;
+        }
+        else if (constraint_index == -2)  // contact normal
+        {
+          rms_dlambda[1] += delta_precon2;
+          rms_error[1] += delta_precon2*Ad2;
+          m_rms_dlambda[1]++;
+        }
+        else  // friction forces
+        {
+          rms_dlambda[2] += delta_precon2;
+          rms_error[2] += delta_precon2*Ad2;
+          m_rms_dlambda[2]++;
+        }
+
+        // // initialize position correction terms (_erp) with precon results
+        // if (inline_position_correction)
+        // {
+        //   old_lambda_erp = old_lambda;
+        //   lambda_erp[index] = lambda[index];
+        // }
+
+        // add correction to lambda
+        lambda[index] = lambda[index] - mg_e[index];
+        // printf("\tindex %d lambda %f mg_e %20.16f\n",
+        //   index, lambda[index], mg_e[index]);
+      }
+
       //@@@ a trick that may or may not help
       //dReal ramp = (1-((dReal)(iteration+1)/(dReal)iterations));
       //delta *= ramp;
@@ -877,8 +920,7 @@ static void* ComputeRows(void *p)
 #endif
 
     // option to stop when tolerance has been met
-    if (iteration >= precon_iterations &&
-        qs->rms_constraint_residual[3] < pgs_lcp_tolerance)
+    if (qs->rms_constraint_residual[3] < pgs_lcp_tolerance)
     {
       #ifdef DEBUG_CONVERGENCE_TOLERANCE
         printf("CONVERGED: id: %d steps: %d,"
@@ -963,6 +1005,7 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
 #endif
   int *jb, dxBody * const *body,
   dRealPtr invMOI, dRealPtr MOI, dRealMutablePtr lambda,
+  dRealMutablePtr mg_e,
   dRealMutablePtr lambda_erp,
   dRealMutablePtr caccel, dRealMutablePtr caccel_erp, dRealMutablePtr cforce,
   dRealMutablePtr rhs, dRealMutablePtr rhs_erp, dRealMutablePtr rhs_precon,
@@ -983,7 +1026,7 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
     // warm starting
     // compute cforce=(inv(M)*J')*lambda
     if (qs->precon_iterations > 0)
-      multiply_invM_JT (m,nb,J,jb,lambda,cforce);
+      multiply_invM_JT (m,nb,J,jb,mg_e,cforce);
 
     // re-compute caccel=(inv(M)*J')*lambda with new iMJ
     // seems much better than using stored caccel's
@@ -993,7 +1036,7 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
   else
   {
     // no warm starting
-    if (qs->precon_iterations > 0)
+    // if (qs->precon_iterations > 0)
       dSetZero (cforce,nb*6);
     dSetZero (caccel,nb*6);
     dSetZero (caccel_erp,nb*6);
@@ -1023,7 +1066,7 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
   //   whereas Ad is 1 over diagonals of J inv(M) J'
   //    Ad_precon is 1 over diagonals of J J'
   dReal *Adcfm_precon = NULL;
-  if (qs->precon_iterations > 0)
+  // if (qs->precon_iterations > 0)
   {
     dReal *Ad_precon = context->AllocateArray<dReal> (m);
 
@@ -1283,6 +1326,7 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
       params_erp[thread_id].J_orig  = J_orig;
       params_erp[thread_id].cforce  = cforce;
 
+      params_erp[thread_id].mg_e  = mg_e;
       params_erp[thread_id].rhs = rhs_erp;
       params_erp[thread_id].caccel = caccel_erp;
       params_erp[thread_id].lambda = lambda_erp;
@@ -1351,6 +1395,7 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
     params[thread_id].J_orig  = J_orig;
     params[thread_id].cforce  = cforce;
 
+    params[thread_id].mg_e  = mg_e;
     params[thread_id].rhs = rhs;
     params[thread_id].caccel = caccel;
     params[thread_id].lambda = lambda;

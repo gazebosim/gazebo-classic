@@ -39,6 +39,7 @@ void PGS_LCP (dxWorldProcessContext *context,
 #endif
   int *jb, dxBody * const *body,
   dRealPtr invMOI, dRealPtr MOI, dRealMutablePtr lambda,
+  dRealMutablePtr mg_e,
   dRealMutablePtr lambda_erp,
   dRealMutablePtr caccel, dRealMutablePtr caccel_erp, dRealMutablePtr cforce,
   dRealMutablePtr rhs, dRealMutablePtr rhs_erp, dRealMutablePtr rhs_precon,
