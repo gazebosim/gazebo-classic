@@ -107,6 +107,13 @@ void Publication::SetPrevMsg(uint32_t _pubId, MessagePtr _msg)
 }
 
 //////////////////////////////////////////////////
+void Publication::ClearPrevMsgs()
+{
+  boost::mutex::scoped_lock lock(this->callbackMutex);
+  this->prevMsgs.clear();
+}
+
+//////////////////////////////////////////////////
 void Publication::AddTransport(const PublicationTransportPtr &_publink)
 {
   bool add = true;
@@ -494,3 +501,4 @@ MessagePtr Publication::GetPrevMsg(uint32_t _pubId)
   else
     return MessagePtr();
 }
+
