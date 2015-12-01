@@ -443,7 +443,6 @@ bool World::GetRunning() const
 //////////////////////////////////////////////////
 void World::Stop()
 {
-gzdbg << "World::Stop" << std::endl;
   this->dataPtr->stop = true;
 
   if (this->dataPtr->thread)
@@ -452,7 +451,6 @@ gzdbg << "World::Stop" << std::endl;
     delete this->dataPtr->thread;
     this->dataPtr->thread = NULL;
   }
-gzdbg << "/World::Stop" << std::endl;
 }
 
 //////////////////////////////////////////////////
@@ -579,7 +577,6 @@ void World::LogStep()
 
           while (nameElem)
           {
-gzdbg << "DELETE 1" << std::endl;
             transport::requestNoReply(this->GetName(), "entity_delete",
                                       nameElem->Get<std::string>());
             nameElem = nameElem->GetNextElement("name");
@@ -971,14 +968,12 @@ LightPtr World::LoadLight(const sdf::ElementPtr &_sdf, const BasePtr &_parent)
   // Add to scene message
   msgs::Light *msg = this->dataPtr->sceneMsg.add_light();
   msg->CopyFrom(msgs::LightFromSDF(_sdf));
-gzdbg << "World::LoadLight  " << msg->name() << std::endl;
   // Create new light object
   LightPtr light(new physics::Light(_parent));
   light->ProcessMsg(*msg);
   light->SetWorld(shared_from_this());
   light->Load(_sdf);
   this->dataPtr->lights.push_back(light);
-gzdbg << "/World::LoadLight  " << std::endl;
 
   return light;
 }
@@ -1326,7 +1321,6 @@ void World::OnPlaybackControl(ConstLogPlaybackControlPtr &_data)
 //////////////////////////////////////////////////
 void World::OnRequest(ConstRequestPtr &_msg)
 {
-gzdbg << "World::OnRequest  " << std::endl;
   boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
   this->dataPtr->requestMsgs.push_back(*_msg);
 }
@@ -1480,7 +1474,6 @@ void World::ProcessEntityMsgs()
 
   for (auto &entityName : this->dataPtr->deleteEntity)
   {
-gzdbg << "World::ProcessEntityMessages DELETE "<< entityName << std::endl;;
     this->RemoveModel(entityName);
   }
 
@@ -1526,7 +1519,6 @@ void World::ProcessRequestMsgs()
     }
     else if (requestMsg.request() == "entity_delete")
     {
-gzdbg << "World::ProcessRequestMsgs DELETE " << std::endl;;
       boost::mutex::scoped_lock lock2(this->dataPtr->entityDeleteMutex);
       this->dataPtr->deleteEntity.push_back(requestMsg.data());
     }

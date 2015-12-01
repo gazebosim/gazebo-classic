@@ -38,9 +38,6 @@ int main(int argc, char **argv)
       return -1;
 
     server->Run();
-
-gzdbg << "main Fini DON'T" << std::endl;
-
     server->Fini();
 
     delete server;

@@ -1024,10 +1024,11 @@ void MainWindow::OnDataLoggerClosed()
 /////////////////////////////////////////////////
 void MainWindow::CreateActions()
 {
-  g_newAct = new QAction(tr("&New World"), this);
+  /*g_newAct = new QAction(tr("&New World"), this);
   g_newAct->setShortcut(tr("Ctrl+N"));
   g_newAct->setStatusTip(tr("Create a new world"));
   connect(g_newAct, SIGNAL(triggered()), this, SLOT(New()));
+  */
 
   g_topicVisAct = new QAction(tr("Topic Visualization"), this);
   g_topicVisAct->setShortcut(tr("Ctrl+T"));
@@ -1582,9 +1583,6 @@ void MainWindow::DeleteActions()
   delete g_topicVisAct;
   g_topicVisAct = 0;
 
-  delete g_newAct;
-  g_newAct = 0;
-
   delete g_openAct;
   g_openAct = 0;
 
@@ -1763,7 +1761,7 @@ void MainWindow::CreateMenuBar()
 
   QMenu *fileMenu = bar->addMenu(tr("&File"));
   // fileMenu->addAction(g_openAct);
-  fileMenu->addAction(g_newAct);
+  // fileMenu->addAction(g_newAct);
   fileMenu->addAction(g_saveAct);
   fileMenu->addAction(g_saveAsAct);
   fileMenu->addSeparator();

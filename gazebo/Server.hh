@@ -149,8 +149,6 @@ namespace gazebo
 
     /// \brief Save argv for access by system plugins.
     private: char **systemPluginsArgv;
-
-    private: bool waiting;
   };
 }
 
