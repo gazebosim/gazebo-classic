@@ -431,7 +431,10 @@ void TopicManager::GetTopicNamespaces(std::list<std::string> &_namespaces)
 //////////////////////////////////////////////////
 void TopicManager::ClearBuffers()
 {
-  gzwarn << "TopicManager::ClearBuffers is not implemented yet." << std::endl;
+  for (auto iter : this->advertisedTopics)
+  {
+    iter.second->ClearPrevMsgs();
+  }
 }
 
 //////////////////////////////////////////////////

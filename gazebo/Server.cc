@@ -691,9 +691,8 @@ bool Server::OpenWorld(const std::string &_filename)
   physics::remove_worlds();
   sensors::remove_sensors();
 
-  // Topics still advertised, transport is not stopped
-  // Clear buffers not implemented yet
-  // gazebo::transport::clear_buffers();
+  // Keep transport system but clear all previous messages
+  gazebo::transport::clear_buffers();
 
   // Load new world
   FILE *test = fopen(common::find_file(_filename).c_str(), "r");
