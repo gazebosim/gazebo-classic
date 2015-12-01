@@ -134,6 +134,9 @@ std::cout << "UserCmdManager::UserCmdManager   userCmdSub" << std::endl;
   this->dataPtr->userCmdStatsPub =
     this->dataPtr->node->Advertise<msgs::UserCmdStats>("~/user_cmd_stats");
 
+  this->dataPtr->worldControlPub =
+      this->dataPtr->node->Advertise<msgs::WorldControl>("~/world_control");
+
   this->dataPtr->idCounter = 0;
 }
 
@@ -193,9 +196,7 @@ std::cout << "UserCmdManager::OnUserCmdMsg   WORLD" << std::endl;
     // Publish world control message after we've save the current state
     if (_msg->has_world_control())
     {
-      auto worldControlPub = this->dataPtr->node->Advertise<msgs::WorldControl>(
-          "~/world_control");
-      worldControlPub->Publish(_msg->world_control());
+      this->dataPtr->worldControlPub->Publish(_msg->world_control());
     }
     else
     {
