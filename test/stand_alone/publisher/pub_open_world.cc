@@ -25,7 +25,6 @@
 int main(int _argc, char **_argv)
 {
   // Get world
-std::cout << _argc << std::endl;
   std::string worldFile;
   if (_argc == 2)
   {
