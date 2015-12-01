@@ -77,11 +77,11 @@ TEST_F(Sensor_TEST, UpdateAfterReset)
   updateRateImu = 1000.0;
   sensor->SetUpdateRate(updateRateHokuyo);
   imuSensor->SetUpdateRate(updateRateImu);
-  gzdbg << sensor->GetScopedName() << " loaded with update rate of "
-        << sensor->GetUpdateRate() << " Hz"
+  gzdbg << sensor->ScopedName() << " loaded with update rate of "
+        << sensor->UpdateRate() << " Hz"
         << std::endl;
-  gzdbg << imuSensor->GetScopedName() << " loaded with update rate of "
-        << imuSensor->GetUpdateRate() << " Hz"
+  gzdbg << imuSensor->ScopedName() << " loaded with update rate of "
+        << imuSensor->UpdateRate() << " Hz"
         << std::endl;
 
   g_hokuyoMsgCount = 0;

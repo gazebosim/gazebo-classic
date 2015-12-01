@@ -543,12 +543,6 @@ void Sensor::ResetLastUpdateTime()
 }
 
 //////////////////////////////////////////////////
-event::ConnectionPtr Sensor::ConnectUpdated(boost::function<void()> _subscriber)
-{
-  return this->pdPtr->updated.Connect(_subscriber);
-}
-
-//////////////////////////////////////////////////
 event::ConnectionPtr Sensor::ConnectUpdated(std::function<void()> _subscriber)
 {
   return this->pdPtr->updated.Connect(_subscriber);

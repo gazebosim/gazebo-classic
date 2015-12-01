@@ -39,7 +39,7 @@ GZ_REGISTER_STATIC_SENSOR("wireless_transmitter", WirelessTransmitter)
 
 const double WirelessTransmitterPrivate::NEmpty = 6;
 const double WirelessTransmitterPrivate::NObstacle = 12.0;
-const double WirelessTransmitterPrivate::ModelStdDesv = 6.0;
+const double WirelessTransmitterPrivate::ModelStdDev = 6.0;
 const double WirelessTransmitterPrivate::Step = 1.0;
 const double WirelessTransmitterPrivate::MaxRadius = 10.0;
 
@@ -201,7 +201,7 @@ double WirelessTransmitter::SignalStrength(
   double distance = std::max(1.0,
       this->dataPtr->referencePose.Pos().Distance(_receiver.Pos()));
   double x = std::abs(ignition::math::Rand::DblNormal(0.0,
-        WirelessTransmitterPrivate::ModelStdDesv));
+        WirelessTransmitterPrivate::ModelStdDev));
   double wavelength = common::SpeedOfLight / (this->Freq() * 1000000);
 
   // Hata-Okumara propagation model
@@ -209,4 +209,10 @@ double WirelessTransmitter::SignalStrength(
       20 * log10(wavelength) - 20 * log10(4 * M_PI) - 10 * n * log10(distance);
 
   return rxPower;
+}
+
+/////////////////////////////////////////////////
+double WirelessTransmitter::ModelStdDev() const
+{
+  return WirelessTransmitterPrivate::ModelStdDev;
 }

@@ -14,10 +14,7 @@
  * limitations under the License.
  *
 */
-/*
- * Desc: Contact plugin
- * Author: Nate Koenig mod by John Hsu
- */
+#include <functional>
 
 #include "gazebo/physics/physics.hh"
 #include "RayPlugin.hh"
@@ -35,7 +32,7 @@ RayPlugin::RayPlugin()
 /////////////////////////////////////////////////
 RayPlugin::~RayPlugin()
 {
-  this->parentSensor->GetLaserShape()->DisconnectNewLaserScans(
+  this->parentSensor->LaserShape()->DisconnectNewLaserScans(
       this->newLaserScansConnection);
   this->newLaserScansConnection.reset();
 
@@ -53,11 +50,11 @@ void RayPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr /*_sdf*/)
   if (!this->parentSensor)
     gzthrow("RayPlugin requires a Ray Sensor as its parent");
 
-  this->world = physics::get_world(this->parentSensor->GetWorldName());
+  this->world = physics::get_world(this->parentSensor->WorldName());
 
   this->newLaserScansConnection =
-    this->parentSensor->GetLaserShape()->ConnectNewLaserScans(
-      boost::bind(&RayPlugin::OnNewLaserScans, this));
+    this->parentSensor->LaserShape()->ConnectNewLaserScans(
+      std::bind(&RayPlugin::OnNewLaserScans, this));
 }
 
 /////////////////////////////////////////////////

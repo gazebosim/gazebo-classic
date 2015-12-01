@@ -43,9 +43,9 @@ namespace gazebo
       /// obstacles between transmitter and receiver
       public: static const double NObstacle;
 
-      /// \brief Std desv of the Gaussian random variable used in the
+      /// \brief Std dev of the Gaussian random variable used in the
       /// propagation model
-      public: static const double ModelStdDesv;
+      public: static const double ModelStdDev;
 
       /// \brief Size of the grid used for visualization.
       public: static const double Step;

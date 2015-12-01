@@ -325,14 +325,6 @@ void GpuRaySensor::Fini()
 
 //////////////////////////////////////////////////
 event::ConnectionPtr GpuRaySensor::ConnectNewLaserFrame(
-  boost::function<void(const float *, unsigned int, unsigned int, unsigned int,
-  const std::string &)> _subscriber)
-{
-  return this->dataPtr->laserCam->ConnectNewLaserFrame(_subscriber);
-}
-
-//////////////////////////////////////////////////
-event::ConnectionPtr GpuRaySensor::ConnectNewLaserFrame(
   std::function<void(const float *, unsigned int, unsigned int, unsigned int,
   const std::string &)> _subscriber)
 {
@@ -629,6 +621,12 @@ void GpuRaySensor::SetVerticalAngleMax(const double _angle)
 //////////////////////////////////////////////////
 void GpuRaySensor::GetRanges(std::vector<double> &_ranges)
 {
+  this->Ranges(_ranges);
+}
+
+//////////////////////////////////////////////////
+void GpuRaySensor::Ranges(std::vector<double> &_ranges) const
+{
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
   _ranges.resize(this->dataPtr->laserMsg.scan().ranges_size());
@@ -674,6 +672,12 @@ double GpuRaySensor::Retro(const int /*_index*/) const
 
 //////////////////////////////////////////////////
 int GpuRaySensor::GetFiducial(int /*_index*/) const
+{
+  return -1;
+}
+
+//////////////////////////////////////////////////
+int GpuRaySensor::Fiducial(const unsigned int /*_index*/) const
 {
   return -1;
 }

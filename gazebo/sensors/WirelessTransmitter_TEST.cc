@@ -106,10 +106,10 @@ void WirelessTransmitter_TEST::TestCreateWirelessTransmitter()
   // Make sure the above dynamic cast worked.
   ASSERT_TRUE(sensor != NULL);
 
-  EXPECT_EQ("GzTest", sensor->GetESSID());
-  EXPECT_DOUBLE_EQ(sensor->GetFreq(), 2442.0);
-  EXPECT_DOUBLE_EQ(sensor->GetPower(), 14.5);
-  EXPECT_DOUBLE_EQ(sensor->GetGain(), 2.6);
+  EXPECT_EQ("GzTest", sensor->ESSID());
+  EXPECT_DOUBLE_EQ(sensor->Freq(), 2442.0);
+  EXPECT_DOUBLE_EQ(sensor->Power(), 14.5);
+  EXPECT_DOUBLE_EQ(sensor->Gain(), 2.6);
 
   EXPECT_TRUE(sensor->IsActive());
 }
@@ -152,11 +152,11 @@ void WirelessTransmitter_TEST::TestSignalStrength()
   for (int i = 0; i < samples; ++i)
   {
     this->tx->Update(true);
-    signStrengthAvg += this->tx->SignalStrength(txPose, tx->GetGain());
+    signStrengthAvg += this->tx->SignalStrength(txPose, tx->Gain());
   }
   signStrengthAvg /= samples;
 
-  EXPECT_NEAR(signStrengthAvg, -62.0, this->tx->ModelStdDesv);
+  EXPECT_NEAR(signStrengthAvg, -62.0, this->tx->ModelStdDev());
 }
 
 /////////////////////////////////////////////////

@@ -77,6 +77,11 @@ namespace gazebo
       public: double SignalStrength(const ignition::math::Pose3d &_receiver,
           const double _rxGain);
 
+      /// \brief Get the std dev of the Gaussian random variable used in the
+      /// propagation model.
+      /// \return The standard deviation of the propagation model.
+      public: double ModelStdDev() const;
+
       /// \internal
       /// \brief Private data pointer
       private: std::shared_ptr<WirelessTransmitterPrivate> dataPtr;

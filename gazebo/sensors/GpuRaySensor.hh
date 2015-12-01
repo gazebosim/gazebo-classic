@@ -246,7 +246,7 @@ namespace gazebo
 
       /// \brief Get all the ranges
       /// \param[out] _range A vector that will contain all the range data
-      public: void GetRanges(std::vector<double> &_ranges) const;
+      public: void Ranges(std::vector<double> &_ranges) const;
 
       /// \brief Get detected retro (intensity) value for a ray.
       ///         Warning: If you are accessing all the ray data in a loop
@@ -280,7 +280,7 @@ namespace gazebo
       ///         SetActive(true).
       /// \param[in] _index Index of specific ray
       /// \return Fiducial value of ray
-      /// \deprecated See Fiducial(int _index)
+      /// \deprecated See Fiducial(unsigned int _index)
       public: int GetFiducial(int _index) const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get detected fiducial value for a ray.
@@ -292,7 +292,7 @@ namespace gazebo
       ///         SetActive(true).
       /// \param[in] _index Index of specific ray
       /// \return Fiducial value of ray
-      public: int Fiducial(const int _index) const;
+      public: int Fiducial(const unsigned int _index) const;
 
       /// \brief Gets the camera count
       /// \return Number of cameras
@@ -393,13 +393,6 @@ namespace gazebo
       /// \return (vertical_max_angle + vertical_min_angle) * 0.5
       /// \deprecated See VertHalfAngle
       public: double VertHalfAngle() const;
-
-      /// \brief Connect to the new laser frame event.
-      /// \param[in] _subscriber Event callback.
-      /// \deprecated See ConnectNewLaserFrame that accepts a std::function.
-      public: event::ConnectionPtr ConnectNewLaserFrame(
-        boost::function<void(const float *, unsigned int, unsigned int,
-        unsigned int, const std::string &)> _subscriber) GAZEBO_DEPRECATED(7.0);
 
       /// \brief Connect to the new laser frame event.
       /// \param[in] _subscriber Event callback.

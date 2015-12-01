@@ -214,16 +214,6 @@ namespace gazebo
       /// \param[in] _subscriber Callback that receives the signal.
       /// \return A pointer to the connection. This must be kept in scope.
       /// \sa Sensor::DisconnectUpdated
-      /// \deprecated See ConnectUpdated that accepts a std::function
-      /// parameter.
-      public: event::ConnectionPtr ConnectUpdated(
-                  boost::function<void()> _subscriber) GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Connect a signal that is triggered when the sensor is
-      /// updated.
-      /// \param[in] _subscriber Callback that receives the signal.
-      /// \return A pointer to the connection. This must be kept in scope.
-      /// \sa Sensor::DisconnectUpdated
       public: event::ConnectionPtr ConnectUpdated(
                   std::function<void()> _subscriber);
 

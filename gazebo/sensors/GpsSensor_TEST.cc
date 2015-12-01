@@ -104,7 +104,7 @@ TEST_F(GpsSensor_TEST, CreateGps)
 
   EXPECT_DOUBLE_EQ(sensor->Latitude().Radian(), 0.0);
   EXPECT_DOUBLE_EQ(sensor->Longitude().Radian(), 0.0);
-  EXPECT_DOUBLE_EQ(sensor->GetAltitude(), 0.0);
+  EXPECT_DOUBLE_EQ(sensor->Altitude(), 0.0);
 
   EXPECT_TRUE(sensor->IsActive());
 

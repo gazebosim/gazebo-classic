@@ -54,18 +54,18 @@ TEST_F(GPURaySensor_TEST, CreateLaser)
   EXPECT_TRUE(sensor != NULL);
 
   double angleRes = (sensor->AngleMax() - sensor->AngleMin()).Radian() /
-                    sensor->GetRayCount();
+                    sensor->RayCount();
   EXPECT_EQ(sensor->AngleMin(), ignition::math::Angle(-1.396263));
   EXPECT_EQ(sensor->AngleMax(), ignition::math::Angle(1.396263));
-  EXPECT_NEAR(sensor->GetRangeMin(), 0.08, 1e-6);
-  EXPECT_NEAR(sensor->GetRangeMax(), 10.0, 1e-6);
-  EXPECT_NEAR(sensor->GetAngleResolution(), angleRes, 1e-3);
-  EXPECT_NEAR(sensor->GetRangeResolution(), 0.01, 1e-3);
-  EXPECT_EQ(sensor->GetRayCount(), 640);
-  EXPECT_EQ(sensor->GetRangeCount(), 640);
+  EXPECT_NEAR(sensor->RangeMin(), 0.08, 1e-6);
+  EXPECT_NEAR(sensor->RangeMax(), 10.0, 1e-6);
+  EXPECT_NEAR(sensor->AngleResolution(), angleRes, 1e-3);
+  EXPECT_NEAR(sensor->RangeResolution(), 0.01, 1e-3);
+  EXPECT_EQ(sensor->RayCount(), 640);
+  EXPECT_EQ(sensor->RangeCount(), 640);
 
-  EXPECT_EQ(sensor->GetVerticalRayCount(), 1);
-  EXPECT_EQ(sensor->GetVerticalRangeCount(), 1);
+  EXPECT_EQ(sensor->VerticalRayCount(), 1);
+  EXPECT_EQ(sensor->VerticalRangeCount(), 1);
   EXPECT_EQ(sensor->VerticalAngleMin(), 0.0);
   EXPECT_EQ(sensor->VerticalAngleMax(), 0.0);
 
@@ -73,13 +73,15 @@ TEST_F(GPURaySensor_TEST, CreateLaser)
   EXPECT_TRUE(sensor->IsHorizontal());
 
   // listen to new laser frames
-  float *scan = new float[sensor->GetRayCount()
-      * sensor->GetVerticalRayCount() * 3];
+  float *scan = new float[sensor->RayCount()
+      * sensor->VerticalRayCount() * 3];
   int scanCount = 0;
   event::ConnectionPtr c =
     sensor->ConnectNewLaserFrame(
-        boost::bind(&::OnNewLaserFrame, &scanCount, scan,
-          _1, _2, _3, _4, _5));
+        std::bind(&::OnNewLaserFrame, &scanCount, scan,
+          std::placeholders::_1, std::placeholders::_2,
+          std::placeholders::_3, std::placeholders::_4,
+          std::placeholders::_5));
 
   // wait for a few laser scans
   int i = 0;
@@ -92,16 +94,16 @@ TEST_F(GPURaySensor_TEST, CreateLaser)
 
   // Get all the range values
   std::vector<double> ranges;
-  sensor->GetRanges(ranges);
+  sensor->Ranges(ranges);
   EXPECT_EQ(ranges.size(), static_cast<size_t>(640));
 
   // Check that all the range values
   for (unsigned int i = 0; i < ranges.size(); ++i)
   {
     EXPECT_DOUBLE_EQ(ranges[i], GZ_DBL_INF);
-    EXPECT_DOUBLE_EQ(sensor->GetRange(i), ranges[i]);
-    EXPECT_NEAR(sensor->GetRetro(i), 0, 1e-6);
-    EXPECT_EQ(sensor->GetFiducial(i), -1);
+    EXPECT_DOUBLE_EQ(sensor->Range(i), ranges[i]);
+    EXPECT_NEAR(sensor->Retro(i), 0, 1e-6);
+    EXPECT_EQ(sensor->Fiducial(i), -1);
   }
 
   delete [] scan;

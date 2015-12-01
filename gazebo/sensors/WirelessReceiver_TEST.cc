@@ -92,11 +92,11 @@ void WirelessReceiver_TEST::TestCreateWirelessReceiver()
   // Make sure the above dynamic cast worked.
   ASSERT_TRUE(sensor != NULL);
 
-  EXPECT_DOUBLE_EQ(sensor->GetMinFreqFiltered(), 2412.0);
-  EXPECT_DOUBLE_EQ(sensor->GetMaxFreqFiltered(), 2484.0);
-  EXPECT_DOUBLE_EQ(sensor->GetPower(), 14.5);
-  EXPECT_DOUBLE_EQ(sensor->GetGain(), 2.5);
-  EXPECT_DOUBLE_EQ(sensor->GetSensitivity(), -90);
+  EXPECT_DOUBLE_EQ(sensor->MinFreqFiltered(), 2412.0);
+  EXPECT_DOUBLE_EQ(sensor->MaxFreqFiltered(), 2484.0);
+  EXPECT_DOUBLE_EQ(sensor->Power(), 14.5);
+  EXPECT_DOUBLE_EQ(sensor->Gain(), 2.5);
+  EXPECT_DOUBLE_EQ(sensor->Sensitivity(), -90);
 
   EXPECT_TRUE(sensor->IsActive());
 }

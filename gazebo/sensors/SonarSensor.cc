@@ -380,13 +380,6 @@ void SonarSensor::OnContacts(ConstContactsPtr &_msg)
 
 //////////////////////////////////////////////////
 event::ConnectionPtr SonarSensor::ConnectUpdate(
-    boost::function<void (msgs::SonarStamped)> _subscriber)
-{
-  return this->dataPtr->update.Connect(_subscriber);
-}
-
-//////////////////////////////////////////////////
-event::ConnectionPtr SonarSensor::ConnectUpdate(
     std::function<void (msgs::SonarStamped)> _subscriber)
 {
   return this->dataPtr->update.Connect(_subscriber);

@@ -108,18 +108,18 @@ TEST_F(RaySensor_TEST, CreateLaser)
   EXPECT_TRUE(sensor != NULL);
 
   double angleRes = (sensor->AngleMax() - sensor->AngleMin()).Radian() /
-                    sensor->GetRayCount();
+                     sensor->RayCount();
   EXPECT_EQ(sensor->AngleMin(), ignition::math::Angle(-2.2689));
   EXPECT_EQ(sensor->AngleMax(), ignition::math::Angle(2.2689));
-  EXPECT_NEAR(sensor->GetRangeMin(), 0.08, 1e-6);
-  EXPECT_NEAR(sensor->GetRangeMax(), 10.0, 1e-6);
-  EXPECT_NEAR(sensor->GetAngleResolution(), angleRes, 1e-3);
-  EXPECT_NEAR(sensor->GetRangeResolution(), 0.01, 1e-3);
-  EXPECT_EQ(sensor->GetRayCount(), 640);
-  EXPECT_EQ(sensor->GetRangeCount(), 640);
+  EXPECT_NEAR(sensor->RangeMin(), 0.08, 1e-6);
+  EXPECT_NEAR(sensor->RangeMax(), 10.0, 1e-6);
+  EXPECT_NEAR(sensor->AngleResolution(), angleRes, 1e-3);
+  EXPECT_NEAR(sensor->RangeResolution(), 0.01, 1e-3);
+  EXPECT_EQ(sensor->RayCount(), 640);
+  EXPECT_EQ(sensor->RangeCount(), 640);
 
-  EXPECT_EQ(sensor->GetVerticalRayCount(), 1);
-  EXPECT_EQ(sensor->GetVerticalRangeCount(), 1);
+  EXPECT_EQ(sensor->VerticalRayCount(), 1);
+  EXPECT_EQ(sensor->VerticalRangeCount(), 1);
   EXPECT_EQ(sensor->VerticalAngleMin(), 0);
   EXPECT_EQ(sensor->VerticalAngleMax(), 0);
 
@@ -130,16 +130,16 @@ TEST_F(RaySensor_TEST, CreateLaser)
 
   // Get all the range values
   std::vector<double> ranges;
-  sensor->GetRanges(ranges);
+  sensor->Ranges(ranges);
   EXPECT_EQ(ranges.size(), static_cast<size_t>(640));
 
   // Check that all the range values
   for (unsigned int i = 0; i < ranges.size(); ++i)
   {
     EXPECT_DOUBLE_EQ(ranges[i], GZ_DBL_INF);
-    EXPECT_DOUBLE_EQ(sensor->GetRange(i), ranges[i]);
-    EXPECT_NEAR(sensor->GetRetro(i), 0, 1e-6);
-    EXPECT_EQ(sensor->GetFiducial(i), -1);
+    EXPECT_DOUBLE_EQ(sensor->Range(i), ranges[i]);
+    EXPECT_NEAR(sensor->Retro(i), 0, 1e-6);
+    EXPECT_EQ(sensor->Fiducial(i), -1);
   }
 }
 
@@ -172,11 +172,11 @@ TEST_F(RaySensor_TEST, LaserScanResolution)
   EXPECT_TRUE(sensor != NULL);
 
   // range count = ray count * resolution
-  EXPECT_EQ(sensor->GetRayCount(), 120);
-  EXPECT_EQ(sensor->GetRangeCount(), 240);
+  EXPECT_EQ(sensor->RayCount(), 120);
+  EXPECT_EQ(sensor->RangeCount(), 240);
 
-  EXPECT_EQ(sensor->GetVerticalRayCount(), 2);
-  EXPECT_EQ(sensor->GetVerticalRangeCount(), 6);
+  EXPECT_EQ(sensor->VerticalRayCount(), 2);
+  EXPECT_EQ(sensor->VerticalRangeCount(), 6);
 
   EXPECT_TRUE(sensor->IsActive());
 
@@ -185,16 +185,16 @@ TEST_F(RaySensor_TEST, LaserScanResolution)
 
   // Get all the range values
   std::vector<double> ranges;
-  sensor->GetRanges(ranges);
+  sensor->Ranges(ranges);
   EXPECT_EQ(ranges.size(), static_cast<size_t>(240 * 6));
 
   // Check that all the range values
   for (unsigned int i = 0; i < ranges.size(); ++i)
   {
     EXPECT_DOUBLE_EQ(ranges[i], GZ_DBL_INF);
-    EXPECT_DOUBLE_EQ(sensor->GetRange(i), ranges[i]);
-    EXPECT_NEAR(sensor->GetRetro(i), 0, 1e-6);
-    EXPECT_EQ(sensor->GetFiducial(i), -1);
+    EXPECT_DOUBLE_EQ(sensor->Range(i), ranges[i]);
+    EXPECT_NEAR(sensor->Retro(i), 0, 1e-6);
+    EXPECT_EQ(sensor->Fiducial(i), -1);
   }
 }
 

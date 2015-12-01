@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-
+#include <functional>
 #include "ImuSensorPlugin.hh"
 
 using namespace gazebo;
@@ -41,8 +41,8 @@ void ImuSensorPlugin::Load(sensors::SensorPtr _parent,
   this->parentSensor =
     boost::dynamic_pointer_cast<sensors::ImuSensor>(_parent);
 
-  this->world = physics::get_world(_parent->GetWorldName());
-  physics::EntityPtr entity = this->world->GetEntity(_parent->GetParentName());
+  this->world = physics::get_world(_parent->WorldName());
+  physics::EntityPtr entity = this->world->GetEntity(_parent->ParentName());
   this->link = boost::dynamic_pointer_cast<physics::Link>(entity);
 
   if (!this->link)
@@ -52,7 +52,7 @@ void ImuSensorPlugin::Load(sensors::SensorPtr _parent,
     gzthrow("ImuSensorPlugin requires a imu sensor as its parent.");
 
   this->connection = this->parentSensor->ConnectUpdated(
-        boost::bind(&ImuSensorPlugin::OnUpdate, this, this->parentSensor));
+        std::bind(&ImuSensorPlugin::OnUpdate, this, this->parentSensor));
 }
 
 /////////////////////////////////////////////////

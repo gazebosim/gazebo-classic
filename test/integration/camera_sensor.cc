@@ -81,8 +81,7 @@ TEST_F(CameraSensor, CheckThrottle)
     boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
   imageCount = 0;
   img = new unsigned char[width * height*3];
-  event::ConnectionPtr c =
-    camSensor->GetCamera()->ConnectNewImageFrame(
+  event::ConnectionPtr c = camSensor->Camera()->ConnectNewImageFrame(
         boost::bind(&::OnNewCameraFrame, &imageCount, img,
           _1, _2, _3, _4, _5));
   common::Timer timer;
@@ -98,7 +97,7 @@ TEST_F(CameraSensor, CheckThrottle)
   gzdbg << "timer [" << dt.Double() << "] seconds rate [" << rate << "] fps\n";
   EXPECT_GT(rate, 7.0);
   EXPECT_LT(rate, 11.0);
-  camSensor->GetCamera()->DisconnectNewImageFrame(c);
+  camSensor->Camera()->DisconnectNewImageFrame(c);
   delete img;
 }
 
@@ -136,7 +135,7 @@ TEST_F(CameraSensor, FillMsg)
 
   // Required fields
   EXPECT_EQ(msg.name(), cameraName);
-  EXPECT_EQ(msg.parent(), sensor->GetParentName());
+  EXPECT_EQ(msg.parent(), sensor->ParentName());
   EXPECT_EQ(msg.type(), "camera");
 
   // Optional fields
@@ -147,22 +146,22 @@ TEST_F(CameraSensor, FillMsg)
   EXPECT_EQ(msgs::ConvertIgn(msg.pose()), sensor->Pose());
 
   ASSERT_TRUE(msg.has_topic());
-  EXPECT_EQ(msg.topic(), sensor->GetTopic());
+  EXPECT_EQ(msg.topic(), sensor->Topic());
 
   ASSERT_TRUE(msg.has_update_rate());
-  EXPECT_EQ(msg.update_rate(), sensor->GetUpdateRate());
+  EXPECT_EQ(msg.update_rate(), sensor->UpdateRate());
 
   ASSERT_TRUE(msg.has_visualize());
-  EXPECT_EQ(msg.visualize(), sensor->GetVisualize());
+  EXPECT_EQ(msg.visualize(), sensor->Visualize());
 
   ASSERT_FALSE(msg.has_contact());
   ASSERT_FALSE(msg.has_ray());
   ASSERT_TRUE(msg.has_camera());
   auto cameraMsg = msg.camera();
-  auto cam = camSensor->GetCamera();
+  auto cam = camSensor->Camera();
   EXPECT_EQ(cameraMsg.horizontal_fov(), cam->GetHFOV().Radian());
-  EXPECT_EQ(cameraMsg.image_size().x(), camSensor->GetImageWidth());
-  EXPECT_EQ(cameraMsg.image_size().y(), camSensor->GetImageHeight());
+  EXPECT_EQ(cameraMsg.image_size().x(), camSensor->ImageWidth());
+  EXPECT_EQ(cameraMsg.image_size().y(), camSensor->ImageHeight());
   EXPECT_EQ(cameraMsg.image_format(), cam->GetImageFormat());
   EXPECT_EQ(cameraMsg.near_clip(), cam->GetNearClip());
   EXPECT_EQ(cameraMsg.far_clip(), cam->GetFarClip());
@@ -199,7 +198,7 @@ TEST_F(CameraSensor, UnlimitedTest)
   imageCount = 0;
   img = new unsigned char[width * height*3];
   event::ConnectionPtr c =
-    camSensor->GetCamera()->ConnectNewImageFrame(
+    camSensor->Camera()->ConnectNewImageFrame(
         boost::bind(&::OnNewCameraFrame, &imageCount, img,
           _1, _2, _3, _4, _5));
   common::Timer timer;
@@ -211,7 +210,7 @@ TEST_F(CameraSensor, UnlimitedTest)
   common::Time dt = timer.GetElapsed();
   double rate = static_cast<double>(total_images)/dt.Double();
   gzdbg << "timer [" << dt.Double() << "] seconds rate [" << rate << "] fps\n";
-  camSensor->GetCamera()->DisconnectNewImageFrame(c);
+  camSensor->Camera()->DisconnectNewImageFrame(c);
   EXPECT_GT(rate, 30.0);
 
   delete img;
@@ -252,7 +251,7 @@ TEST_F(CameraSensor, MultiSenseHigh)
   imageCount = 0;
   img = new unsigned char[width * height*3];
   event::ConnectionPtr c =
-    camSensor->GetCamera()->ConnectNewImageFrame(
+    camSensor->Camera()->ConnectNewImageFrame(
         boost::bind(&::OnNewCameraFrame, &imageCount, img,
           _1, _2, _3, _4, _5));
   common::Timer timer;
@@ -264,7 +263,7 @@ TEST_F(CameraSensor, MultiSenseHigh)
   common::Time dt = timer.GetElapsed();
   double rate = static_cast<double>(total_images)/dt.Double();
   gzdbg << "timer [" << dt.Double() << "] seconds rate [" << rate << "] fps\n";
-  camSensor->GetCamera()->DisconnectNewImageFrame(c);
+  camSensor->Camera()->DisconnectNewImageFrame(c);
   EXPECT_GT(rate, 24.0);
   EXPECT_LT(rate, 25.0);
 
@@ -307,7 +306,7 @@ TEST_F(CameraSensor, MultiSenseLow)
   imageCount = 0;
   img = new unsigned char[width * height*3];
   event::ConnectionPtr c =
-    camSensor->GetCamera()->ConnectNewImageFrame(
+    camSensor->Camera()->ConnectNewImageFrame(
         boost::bind(&::OnNewCameraFrame, &imageCount, img,
           _1, _2, _3, _4, _5));
   common::Timer timer;
@@ -319,7 +318,7 @@ TEST_F(CameraSensor, MultiSenseLow)
   common::Time dt = timer.GetElapsed();
   double rate = static_cast<double>(total_images)/dt.Double();
   gzdbg << "timer [" << dt.Double() << "] seconds rate [" << rate << "] fps\n";
-  camSensor->GetCamera()->DisconnectNewImageFrame(c);
+  camSensor->Camera()->DisconnectNewImageFrame(c);
   EXPECT_GT(rate, 24.0);
   EXPECT_LT(rate, 25.0);
 
@@ -370,11 +369,11 @@ TEST_F(CameraSensor, CheckNoise)
   img = new unsigned char[width * height*3];
   img2 = new unsigned char[width * height*3];
   event::ConnectionPtr c =
-    camSensor->GetCamera()->ConnectNewImageFrame(
+    camSensor->Camera()->ConnectNewImageFrame(
         boost::bind(&::OnNewCameraFrame, &imageCount, img,
           _1, _2, _3, _4, _5));
   event::ConnectionPtr c2 =
-    camSensorNoisy->GetCamera()->ConnectNewImageFrame(
+    camSensorNoisy->Camera()->ConnectNewImageFrame(
         boost::bind(&::OnNewCameraFrame, &imageCount2, img2,
           _1, _2, _3, _4, _5));
 
@@ -438,11 +437,11 @@ TEST_F(CameraSensor, CheckDistortion)
   img = new unsigned char[width * height*3];
   img2 = new unsigned char[width * height*3];
   event::ConnectionPtr c =
-    camSensor->GetCamera()->ConnectNewImageFrame(
+    camSensor->Camera()->ConnectNewImageFrame(
         boost::bind(&::OnNewCameraFrame, &imageCount, img,
           _1, _2, _3, _4, _5));
   event::ConnectionPtr c2 =
-    camSensorDistorted->GetCamera()->ConnectNewImageFrame(
+    camSensorDistorted->Camera()->ConnectNewImageFrame(
         boost::bind(&::OnNewCameraFrame, &imageCount2, img2,
           _1, _2, _3, _4, _5));
 
@@ -546,11 +545,11 @@ TEST_F(CameraSensor, CompareSideBySideCamera)
   img2 = new unsigned char[width * height*3];
   unsigned char *prevImg2 = new unsigned char[width * height*3];
   event::ConnectionPtr c =
-    camSensor->GetCamera()->ConnectNewImageFrame(
+    camSensor->Camera()->ConnectNewImageFrame(
         boost::bind(&::OnNewCameraFrame, &imageCount, img,
           _1, _2, _3, _4, _5));
   event::ConnectionPtr c2 =
-    camSensor2->GetCamera()->ConnectNewImageFrame(
+    camSensor2->Camera()->ConnectNewImageFrame(
         boost::bind(&::OnNewCameraFrame, &imageCount2, img2,
           _1, _2, _3, _4, _5));
 

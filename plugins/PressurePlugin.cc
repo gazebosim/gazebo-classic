@@ -57,10 +57,10 @@ void PressurePlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr /*_sdf*/)
   this->parentSensor->SetActive(true);
 
   // Get world name.
-  this->worldName = this->parentSensor->GetWorldName();
+  this->worldName = this->parentSensor->WorldName();
 
   // Get name of parent sensor.
-  this->parentSensorName = this->parentSensor->GetName();
+  this->parentSensorName = this->parentSensor->Name();
 
   // Get collision names of parent sensor and physics pointers.
   physics::WorldPtr world = physics::get_world(this->worldName);
@@ -138,7 +138,7 @@ void PressurePlugin::OnUpdate()
     // Get the contacts sorted by collision element.
     std::map<std::string, gazebo::physics::Contact> contacts;
     std::map<std::string, gazebo::physics::Contact>::iterator iter2;
-    contacts = this->parentSensor->GetContacts(iter->first);
+    contacts = this->parentSensor->Contacts(iter->first);
     for (iter2 = contacts.begin(); iter2 != contacts.end(); ++iter2)
     {
       for (int i = 0; i < iter2->second.count; ++i)
@@ -161,7 +161,7 @@ void PressurePlugin::OnUpdate()
     }
   }
 
-  msgs::Contacts contacts = this->parentSensor->GetContacts();
+  msgs::Contacts contacts = this->parentSensor->Contacts();
   int nc = contacts.contact_size();
   if (nc > 0)
   {
