@@ -44,15 +44,7 @@ ODEGearboxJoint::~ODEGearboxJoint()
 void ODEGearboxJoint::Init()
 {
   Joint::Init();
-  if (!this->referenceBodyParent.empty() &&
-      !this->referenceBodyChild.empty())
-  {
-    LinkPtr pRefLink = this->model->GetLink(this->referenceBodyParent);
-    this->SetReferenceBodyParent(pRefLink);
-    LinkPtr cRefLink = this->model->GetLink(this->referenceBodyChild);
-    this->SetReferenceBodyChild(cRefLink);
-  }
-  else
+  if (!this->referenceBody.empty())
   {
     LinkPtr link = this->model->GetLink(this->referenceBody);
     this->SetReferenceBody(link);
@@ -222,6 +214,8 @@ void ODEGearboxJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
         }
       }
     }
+
+/*
     // check if a joint exists between parent link and referenceBodyParent
     link = this->model->GetLink(this->referenceBodyParent);
     if (!found && link)
@@ -269,6 +263,7 @@ void ODEGearboxJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
         }
       }
     }
+*/
     if (!found)
       gzerr << "not found\n";
 
@@ -326,6 +321,8 @@ void ODEGearboxJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
         }
       }
     }
+
+/*
     // check if a joint exists between parent link and referenceBodyChild
     link = this->model->GetLink(this->referenceBodyChild);
     if (!found && link)
@@ -373,6 +370,8 @@ void ODEGearboxJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
         }
       }
     }
+*/
+
     if (!found)
       gzerr << "not found\n";
 
