@@ -44,8 +44,8 @@ TEST_F(CameraSensor_TEST, CreateCamera)
 
   EXPECT_TRUE(sensor->IsActive());
 
-  EXPECT_EQ(sensor->ImageWidth(), 320);
-  EXPECT_EQ(sensor->ImageHeight(), 240);
+  EXPECT_EQ(sensor->ImageWidth(), 320u);
+  EXPECT_EQ(sensor->ImageHeight(), 240u);
   EXPECT_FALSE(sensor->Topic().empty());
 
   // wait for camera images
@@ -74,8 +74,8 @@ TEST_F(CameraSensor_TEST, CreateCamera)
   EXPECT_TRUE(sensors::SensorManager::Instance()->GetSensor(sensorScopedName)
       == NULL);
 
-  EXPECT_EQ(sensor->ImageWidth(), 320);
-  EXPECT_EQ(sensor->ImageHeight(), 240);
+  EXPECT_EQ(sensor->ImageWidth(), 320u);
+  EXPECT_EQ(sensor->ImageHeight(), 240u);
 }
 
 /////////////////////////////////////////////////
