@@ -20,6 +20,8 @@
 
 #include <string>
 
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
 
@@ -73,6 +75,15 @@ namespace gazebo
       /// \param[in] _event Qt event.
       protected: virtual void enterEvent(QEvent *_event);
 
+      /// \brief Computes volume of associated link.
+      /// \return The volume.
+      private: double ComputeVolume() const;
+
+      /// \brief Computes mass moment of inertia of associated link.
+      /// \param[in] _mass Mass of the link.
+      /// \return The inertia matrix.
+      private: ignition::math::Vector3d ComputeInertia(double _mass) const;
+
       /// \brief Set the item name.
       /// \param[in] _name Name to set to.
       // public: void SetName(const std::string &_name);
@@ -90,11 +101,28 @@ namespace gazebo
       /// \brief Qt callback when the Cancel button is pressed.
       private slots: void OnCancel();
 
+      /// \brief Qt callback when the Apply button is pressed.
+      private slots: void OnApply();
+
       /// \brief Qt callback when the Ok button is pressed.
       private slots: void OnOK();
 
       /// \brief Qt callback when one of the child configs has been applied.
       private slots: void OnConfigApplied();
+
+      /// \brief Callback for density changes in link config.
+      /// \param[in] _value The new density value.
+      private slots: void OnDensityValueChanged(const double &_value);
+
+      /// \brief Callback for mass changes in link config.
+      /// \param[in] _value The new mass value.
+      private slots: void OnMassValueChanged(const double &_value);
+
+      /// \brief Callback for changes to collisions.
+      /// \param[in] _name Name of the collision.
+      /// \param[in] _type Type of change (eg, "geometry", etc).
+      private slots: void OnCollisionChanged(const std::string &_name,
+          const std::string &_type);
 
       /// \brief Restore the widget's data to how it was when first opened.
       private slots: void RestoreOriginalData();

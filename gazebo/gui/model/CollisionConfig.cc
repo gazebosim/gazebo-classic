@@ -247,10 +247,22 @@ void CollisionConfig::AddCollision(const std::string &_name,
   configData->id =  this->counter;
   configData->widget = item;
   configData->name = _name;
+
   connect(headerButton, SIGNAL(toggled(bool)), configData,
            SLOT(OnToggleItem(bool)));
-  this->configs[this->counter] = configData;
 
+  connect(headerButton, SIGNAL(toggled(bool)),
+      configData, SLOT(OnToggleItem(bool)));
+
+  connect(configWidget, SIGNAL(GeometryChanged()),
+      configData, SLOT(OnGeometryChanged()));
+
+  connect(configData, SIGNAL(CollisionChanged(
+          const std::string &, const std::string &)),
+      this, SLOT(OnCollisionChanged(
+          const std::string &, const std::string &)));
+
+  this->configs[this->counter] = configData;
   this->counter++;
 }
 
@@ -384,12 +396,26 @@ void CollisionConfig::RestoreOriginalData()
 }
 
 /////////////////////////////////////////////////
+void CollisionConfig::OnCollisionChanged(const std::string &_name,
+    const std::string &_type)
+{
+  emit Applied();
+  emit CollisionChanged(_name, _type);
+}
+
+/////////////////////////////////////////////////
 void CollisionConfigData::OnToggleItem(bool _checked)
 {
   if (_checked)
     this->configWidget->show();
   else
     this->configWidget->hide();
+}
+
+/////////////////////////////////////////////////
+void CollisionConfigData::OnGeometryChanged()
+{
+  emit CollisionChanged(this->name, "geometry");
 }
 
 /////////////////////////////////////////////////
@@ -404,3 +430,4 @@ void CollisionConfigData::RestoreOriginalData()
   this->configWidget->UpdateFromMsg(collisionPtr.get());
   this->configWidget->blockSignals(false);
 }
+

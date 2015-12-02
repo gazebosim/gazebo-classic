@@ -137,6 +137,30 @@ namespace gazebo
       /// \return A clone of this link data.
       public: LinkData *Clone(const std::string &_newName);
 
+      /// \brief Computes the volume of a link.
+      /// \param[in] _collision A collision message.
+      /// \return The computed volume.
+      public: static double ComputeVolume(const msgs::Collision &_collision);
+
+      /// \brief Computes mass moment of inertia for a link.
+      /// \param[in] _collision A collision message.
+      /// \param[in] _mass The mass of the link.
+      /// \return The computed moment of inertia.
+      public: static ignition::math::Vector3d ComputeMomentOfInertia(
+          const msgs::Collision &_collision, double _mass);
+
+      /// \brief Computes the volume of the link.
+      /// \return The volume.
+      public: double ComputeVolume() const;
+
+      /// \brief Set the visual for the link.
+      /// \param[in] _visual Visual for the link.
+      public: void SetLinkVisual(const rendering::VisualPtr _visual);
+
+      /// \brief Get the visual for the link.
+      /// \return Visual for the link.
+      public: rendering::VisualPtr LinkVisual() const;
+
       /// \brief Update callback on PreRender.
       private: void Update();
 
