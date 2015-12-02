@@ -129,6 +129,10 @@ namespace gazebo
       /// \param[in] _pub Pointer to publisher object to remove.
       public: void RemovePublisher(PublisherPtr _pub);
 
+      /// \brief Remove a publisher, based on a publisher ID.
+      /// \param[in] _id ID of the publisher to remove.
+      public: void RemovePublisher(const uint32_t id);
+
       /// \brief Set the previous message for a publisher.
       /// \param[in] _pubId ID of the publisher.
       /// \param[in] _msg The previous message.
