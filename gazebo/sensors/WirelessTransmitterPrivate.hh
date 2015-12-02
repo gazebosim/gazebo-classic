@@ -18,7 +18,7 @@
 #define _GAZEBO_WIRELESS_TRANSMITTER_PRIVATE_HH_
 
 #include <string>
-#include "gazebo/physisc/PhysicsTypes.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/sensors/WirelessTransceiverPrivate.hh"
 
 namespace gazebo
