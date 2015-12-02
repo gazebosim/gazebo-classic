@@ -84,6 +84,26 @@ namespace gazebo
                 {
                   gzerr << "Gearbox joint missing reference body.\n";
                 }
+
+                if (_sdf->HasElement("gearbox_reference_body_parent"))
+                {
+                  this->referenceBodyParent =
+                    _sdf->Get<std::string>("gearbox_reference_body_parent");
+                }
+                else
+                {
+                  gzerr << "Gearbox joint missing reference body parent.\n";
+                }
+
+                if (_sdf->HasElement("gearbox_reference_body_child"))
+                {
+                  this->referenceBodyChild =
+                    _sdf->Get<std::string>("gearbox_reference_body_child");
+                }
+                else
+                {
+                  gzerr << "Gearbox joint missing reference body child.\n";
+                }
               }
 
       /// \brief Initialize joint
@@ -110,6 +130,10 @@ namespace gazebo
                 Joint::FillMsg(_msg);
                 msgs::Joint::Gearbox *gearboxMsg = _msg.mutable_gearbox();
                 gearboxMsg->set_gearbox_reference_body(this->referenceBody);
+                gearboxMsg->set_gearbox_reference_body_parent(
+                  this->referenceBodyParent);
+                gearboxMsg->set_gearbox_reference_body_child(
+                  this->referenceBodyChild);
                 gearboxMsg->set_gearbox_ratio(this->gearRatio);
               }
 
@@ -118,6 +142,12 @@ namespace gazebo
 
       /// \brief reference link/body for computing joint angles
       protected: std::string referenceBody;
+
+      /// \brief reference link/body for computing joint angles
+      protected: std::string referenceBodyParent;
+
+      /// \brief reference link/body for computing joint angles
+      protected: std::string referenceBodyChild;
     };
     /// \}
   }

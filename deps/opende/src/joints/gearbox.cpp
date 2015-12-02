@@ -71,14 +71,15 @@ dxJointGearbox::getInfo2( dxJoint::Info2* info )
 
     double ang1 = getHingeAngle(refBody1,node[0].body,globalAxis1,qrel1);
     double ang2 = getHingeAngle(refBody2,node[1].body,globalAxis2,qrel2);
-    // printf("a1(%f) a10(%f) a2(%f) a20(%f)\n",
-    //   ang1, cumulative_angle1, ang2, cumulative_angle2);
 
     cumulative_angle1 = dShortestAngularDistanceUpdate(cumulative_angle1,ang1);
     cumulative_angle2 = dShortestAngularDistanceUpdate(cumulative_angle2,ang2);
 
     double err = dShortestAngularDistance(
      cumulative_angle1, -ratio * cumulative_angle2);
+
+    // printf("a1(%f) a10(%f) a2(%f) a20(%f) err(%f)\n",
+    //   ang1, cumulative_angle1, ang2, cumulative_angle2, err);
 
     // FIXME: error calculation is not amenable to reset of poses,
     // cumulative angles might snap to wrong angular value.
@@ -92,7 +93,7 @@ dxJointGearbox::getInfo2( dxJoint::Info2* info )
     info->J2a[0] = ratio * globalAxis2[0];
     info->J2a[1] = ratio * globalAxis2[1];
     info->J2a[2] = ratio * globalAxis2[2];
-    
+
     dReal k = info->fps * info->erp;
     info->c[0] = -k * err;
 
@@ -199,7 +200,7 @@ void dJointSetGearboxReferenceBody2( dJointID j, dBodyID b )
         dQMultiply1( joint->qrel2, joint->refBody2->q, joint->node[1].body->q );
       else
       {
-        // set qrel1 to the transpose of the first body q
+        // set qrel2 to the transpose of the first body q
         joint->qrel2[0] = joint->node[1].body->q[0];
         joint->qrel2[1] = joint->node[1].body->q[1];
         joint->qrel2[2] = joint->node[1].body->q[2];

@@ -85,6 +85,14 @@ namespace gazebo
       /// \brief Set gearbox joint gear reference body
       /// \param[in] _body an ode body as the reference link for the gears.
       private: void SetReferenceBody(LinkPtr _body);
+
+      /// \brief Set gearbox joint gear reference body for parent joint
+      /// \param[in] _body an ode body as the reference link for the gears.
+      public: void SetReferenceBodyParent(LinkPtr _body);
+
+      /// \brief Set gearbox joint gear reference body for child joint
+      /// \param[in] _body an ode body as the reference link for the gears.
+      public: void SetReferenceBodyChild(LinkPtr _body);
     };
   }
 }
