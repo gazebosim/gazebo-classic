@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _AXISVISUAL_HH_
-#define _AXISVISUAL_HH_
+#ifndef _GAZEBO_AXISVISUAL_HH_
+#define _GAZEBO_AXISVISUAL_HH_
 
 #include <string>
 
@@ -63,15 +63,33 @@ namespace gazebo
 
       /// \brief Scale the X axis
       /// \param[in] _scale Scaling factor
-      public: void ScaleXAxis(const math::Vector3 &_scale);
+      /// \deprecated See function that accepts ignition::math parameters
+      public: void ScaleXAxis(const math::Vector3 &_scale)
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Scale the X axis
+      /// \param[in] _scale Scaling factor
+      public: void ScaleXAxis(const ignition::math::Vector3d &_scale);
 
       /// \brief Scale the Y axis
       /// \param[in] _scale Scaling factor
-      public: void ScaleYAxis(const math::Vector3 &_scale);
+      /// \deprecated See function that accepts ignition::math parameters
+      public: void ScaleYAxis(const math::Vector3 &_scale)
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Scale the Y axis
+      /// \param[in] _scale Scaling factor
+      public: void ScaleYAxis(const ignition::math::Vector3d &_scale);
 
       /// \brief Scale the Z axis
       /// \param[in] _scale Scaling factor
-      public: void ScaleZAxis(const math::Vector3 &_scale);
+      /// \deprecated See function that accepts ignition::math parameters
+      public: void ScaleZAxis(const math::Vector3 &_scale)
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Scale the Z axis
+      /// \param[in] _scale Scaling factor
+      public: void ScaleZAxis(const ignition::math::Vector3d &_scale);
 
       /// \brief Set the material used to render and axis
       /// \param[in] _axis The number of the axis (0, 1, 2 = x,y,z)
