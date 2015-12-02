@@ -93,13 +93,13 @@ ignition::math::Matrix3d ParseTransformMatrixStr(
             << std::endl;
       return ignition::math::Matrix3d::Identity;
     }
-    double v00 = stod(numbers[0]);
-    double v10 = stod(numbers[1]);
-    double v01 = stod(numbers[2]);
-    double v11 = stod(numbers[3]);
-    double v02 = stod(numbers[4]);
-    double v12 = stod(numbers[5]);
-    ignition::math::Matrix3d m(v00, v01, v02, v10, v11, v12, 0, 0, 1);
+    double a = stod(numbers[0]);  // 00
+    double b = stod(numbers[1]);  // 10
+    double c = stod(numbers[2]);  // 01
+    double d = stod(numbers[3]);  // 11
+    double e = stod(numbers[4]);  // 02
+    double f = stod(numbers[5]);  // 12
+    ignition::math::Matrix3d m(a, c, e, b, d, f, 0, 0, 1);
     return m;
   }
 
@@ -730,6 +730,7 @@ void SVGLoader::GetPathCommands(const std::vector<std::string> &_tokens,
     std::vector<ignition::math::Vector2d> &polyline = _path.polylines.back();
     p = this->SubpathToPolyline(subpath, p, polyline);
   }
+std::cerr <<  _path.id << " = [" << std::endl;
   // if necessary, apply transform to p and polyline
   if (_path.transform != ignition::math::Matrix3d::Identity)
   {
@@ -744,9 +745,11 @@ void SVGLoader::GetPathCommands(const std::vector<std::string> &_tokens,
         auto transformed = _path.transform * point3;
         polyPoint.X(transformed.X());
         polyPoint.Y(transformed.Y());
+std::cerr  << "{point:'" << point3 << "', transform:'" << transformed << "'}," << std::endl;
       }
     }
   }
+std::cerr << "]" << std::endl;
 }
 
 /////////////////////////////////////////////////

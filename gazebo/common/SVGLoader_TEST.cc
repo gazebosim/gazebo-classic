@@ -317,9 +317,9 @@ TEST_F(SVGLoader, Transforms3)
   EXPECT_EQ(true, success);
 
   EXPECT_EQ(3u, paths.size());
-  EXPECT_EQ("path2985", paths[0].id);
-  EXPECT_EQ("path2987", paths[1].id);
-  EXPECT_EQ("path_no_tx", paths[2].id);
+  EXPECT_EQ("outer_path", paths[0].id);
+  EXPECT_EQ("path_no_tx", paths[1].id);
+  EXPECT_EQ("path_tx", paths[2].id);
 
   gzerr << paths[0].id << " tx: " << paths[0].transform << std::endl;
   gzerr << paths[1].id << " tx: " << paths[1].transform << std::endl;
