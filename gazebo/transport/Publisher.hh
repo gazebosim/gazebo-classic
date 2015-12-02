@@ -41,7 +41,6 @@ namespace gazebo
     /// \class Publisher Publisher.hh transport/transport.hh
     /// \brief A publisher of messages on a topic
     class GZ_TRANSPORT_VISIBLE Publisher
-      : public boost::enable_shared_from_this<Publisher>
     {
       /// \brief Constructor
       /// \param[in] _topic Name of topic to be published
@@ -120,6 +119,10 @@ namespace gazebo
 
       /// \brief Finalize the publisher.
       public: void Fini();
+
+      /// \brief Get the id of this publisher.
+      /// \return Unique id of this publisher.
+      public: uint32_t Id() const;
 
       /// \brief Implementation of Publish.
       /// \param[in] _message Message to be published.
