@@ -116,6 +116,9 @@ UserCmdManager::UserCmdManager(const WorldPtr _world)
   this->dataPtr->userCmdStatsPub =
     this->dataPtr->node->Advertise<msgs::UserCmdStats>("~/user_cmd_stats");
 
+  this->dataPtr->worldControlPub =
+      this->dataPtr->node->Advertise<msgs::WorldControl>("~/world_control");
+
   this->dataPtr->modelModifyPub =
       this->dataPtr->node->Advertise<msgs::Model>("~/model/modify");
 
@@ -142,6 +145,7 @@ void UserCmdManager::OnUserCmdMsg(ConstUserCmdPtr &_msg)
   UserCmdPtr cmd(new UserCmd(id, this->dataPtr->world, _msg->description(),
       _msg->type()));
 
+  // Forward message
   if (_msg->type() == msgs::UserCmd::MOVING)
   {
     for (int i = 0; i < _msg->model_size(); ++i)
@@ -149,6 +153,19 @@ void UserCmdManager::OnUserCmdMsg(ConstUserCmdPtr &_msg)
 
     for (int i = 0; i < _msg->light_size(); ++i)
       this->dataPtr->lightModifyPub->Publish(_msg->light(i));
+  }
+  else if (_msg->type() == msgs::UserCmd::WORLD_CONTROL)
+  {
+    if (_msg->has_world_control())
+    {
+      this->dataPtr->worldControlPub->Publish(_msg->world_control());
+    }
+    else
+    {
+      gzwarn << "World control command [" << _msg->description() <<
+          "] without a world control message. Command won't be executed."
+          << std::endl;
+    }
   }
 
   // Add it to undo list
