@@ -232,15 +232,12 @@ void Heightmap::SplitHeights(const std::vector<float> &_heightmap, int _n,
           lastRow.begin(), lastRow.end());
     }
   }
-  double height = this->GetHeight(39.0625, 39.0625);
 }
 
 //////////////////////////////////////////////////
 void Heightmap::UpdateTerrainHash(const std::string &_hash,
     const boost::filesystem::path &_terrainDir)
 {
-  double height = this->GetHeight(39.0625, 39.0625);
-
   std::ofstream terrainHashFile;
   boost::filesystem::path terrainHashFullPath;
 
@@ -593,8 +590,6 @@ void Heightmap::ConfigureTerrainDefaults()
 /////////////////////////////////////////////////
 void Heightmap::SetWireframe(bool _show)
 {
-  double height = this->GetHeight(39.0625, 39.0625);
-
   Ogre::Terrain *terrain = this->terrainGroup->getTerrain(0, 0);
   GZ_ASSERT(terrain != NULL, "Unable to get a valid terrain pointer");
 
