@@ -14,12 +14,6 @@
  * limitations under the License.
  *
 */
-
-/* Desc: Base class shared by all classes in Gazebo.
- * Author: Nate Koenig
- * Date: 09 Sept. 2008
- */
-
 #ifndef _GAZEBO_PHYSICS_BASE_HH_
 #define _GAZEBO_PHYSICS_BASE_HH_
 
@@ -31,18 +25,19 @@
 
 #include <boost/enable_shared_from_this.hpp>
 #include <string>
-
+#include <memory>
 #include <sdf/sdf.hh>
 
-#include "gazebo/common/CommonTypes.hh"
-#include "gazebo/physics/PhysicsTypes.hh"
-#include "gazebo/util/system.hh"
+#include <gazebo/physics/PhysicsTypes.hh>
 
 namespace gazebo
 {
   /// \brief namespace for physics
   namespace physics
   {
+    // Forward declare private data class.
+    class BasePrivate;
+
     /// \addtogroup gazebo_physics Classes for physics and dynamics
     /// \{
 
@@ -183,25 +178,46 @@ namespace gazebo
 
       /// \brief Return the name of the entity.
       /// \return Name of the entity.
-      public: std::string GetName() const;
+      /// \deprecated See Name()
+      public: std::string GetName() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Return the name of the entity.
+      /// \return Name of the entity.
+      public: std::string Name() const;
 
       /// \brief Return the ID of this entity. This id is unique.
       /// \return Integer ID.
-      public: uint32_t GetId() const;
+      /// \deprecated See Id()
+      public: uint32_t GetId() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Return the ID of this entity. This id is unique.
+      /// \return Integer ID.
+      public: uint32_t Id() const;
 
       /// \brief Set whether the object should be "saved", when the user
       /// selects to save the world to xml
       /// \param[in] _v Set to True if the object should be saved.
-      public: void SetSaveable(bool _v);
+      public: void SetSaveable(const bool _v);
 
       /// \brief Get whether the object should be "saved", when the user
       /// selects to save the world to xml.
       /// \return True if the object is saveable.
-      public: bool GetSaveable() const;
+      /// \deprecated See Saveable()
+      public: bool GetSaveable() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get whether the object should be "saved", when the user
+      /// selects to save the world to xml.
+      /// \return True if the object is saveable.
+      public: bool Saveable() const;
 
       /// \brief Return the ID of the parent.
       /// \return Integer ID.
-      public: int GetParentId() const;
+      /// \deprecated See ParentId()
+      public: int GetParentId() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Return the ID of the parent.
+      /// \return Integer ID.
+      public: int ParentId() const;
 
       /// \brief Set the parent.
       /// \param[in] _parent Parent object.
@@ -209,7 +225,12 @@ namespace gazebo
 
       /// \brief Get the parent.
       /// \return Pointer to the parent entity.
-      public: BasePtr GetParent() const;
+      /// \deprecated See Parent()
+      public: BasePtr GetParent() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the parent.
+      /// \return Pointer to the parent entity.
+      public: BasePtr Parent() const;
 
       /// \brief Add a child to this entity.
       /// \param[in] _child Child entity.
@@ -224,30 +245,63 @@ namespace gazebo
 
       /// \brief Get the number of children.
       /// \return The number of children.
-      public: unsigned int GetChildCount() const;
+      /// \deprecated See ChildCount()
+      public: unsigned int GetChildCount() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the number of children.
+      /// \return The number of children.
+      public: unsigned int ChildCount() const;
 
       /// \cond
       /// This is an internal function.
       /// \brief Get a child or self by id.
       /// \param[in] _id ID of the object to retreive.
       /// \return A pointer to the object, NULL if not found
-      public: BasePtr GetById(unsigned int _id) const;
+      /// \deprecated See BaseById(const unsigned int)
+      public: BasePtr GetById(unsigned int _id) const GAZEBO_DEPRECATED(7.0);
+      /// \endcond
+
+      /// \cond
+      /// This is an internal function.
+      /// \brief Get a child or self by id.
+      /// \param[in] _id ID of the object to retreive.
+      /// \return A pointer to the object, NULL if not found
+      public: BasePtr BaseById(const unsigned int _id) const;
       /// \endcond
 
       /// \brief Get by name.
       /// \param[in] _name Get a child (or self) object by name
       /// \return A pointer to the object, NULL if not found
-      public: BasePtr GetByName(const std::string &_name);
+      /// \deprecated See BaseByName(const std::string)
+      public: BasePtr GetByName(const std::string &_name)
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get by name.
+      /// \param[in] _name Get a child (or self) object by name
+      /// \return A pointer to the object, NULL if not found
+      public: BasePtr BaseByName(const std::string &_name) const;
 
       /// \brief Get a child by index.
       /// \param[in] _i Index of the child to retreive.
       /// \return A pointer to the object, NULL if the index is invalid.
-      public: BasePtr GetChild(unsigned int _i) const;
+      /// \deprecated See Child(const unsigned int)
+      public: BasePtr GetChild(unsigned int _i) const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get a child by index.
+      /// \param[in] _i Index of the child to retreive.
+      /// \return A pointer to the object, NULL if the index is invalid.
+      public: BasePtr Child(const unsigned int _i) const;
 
       /// \brief Get a child by name.
       /// \param[in] _name Name of the child.
       /// \return A pointer to the object, NULL if not found
-      public: BasePtr GetChild(const std::string &_name);
+      /// \deprecated See Child(const std::string)
+      public: BasePtr GetChild(const std::string &_name) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get a child by name.
+      /// \param[in] _name Name of the child.
+      /// \return A pointer to the object, NULL if not found
+      public: BasePtr Child(const std::string &_name) const;
 
       /// \brief Remove a child by name.
       /// \param[in] _name Name of the child.
@@ -266,7 +320,12 @@ namespace gazebo
 
       /// \brief Get the full type definition.
       /// \return The full type definition.
-      public: unsigned int GetType() const;
+      /// \deprecated See Type()
+      public: unsigned int GetType() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the full type definition.
+      /// \return The full type definition.
+      public: unsigned int Type() const;
 
       /// \brief Return the name of this entity with the model scope
       /// model1::...::modelN::entityName
@@ -274,7 +333,18 @@ namespace gazebo
       /// with the world name. The result will be
       /// world::model1::...::modelN::entityName.
       /// \return The scoped name.
-      public: std::string GetScopedName(bool _prependWorldName = false) const;
+      /// \deprecated See ScopedName(bool)
+      public: std::string GetScopedName(bool _prependWorldName = false) const
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Return the name of this entity with the model scope
+      /// model1::...::modelN::entityName
+      /// \param[in] _prependWorldName True to prended the returned string
+      /// with the world name. The result will be
+      /// world::model1::...::modelN::entityName.
+      /// \return The scoped name.
+      public: std::string ScopedName(
+                  const bool _prependWorldName = false) const;
 
       /// \brief Print this object to screen via gzmsg.
       /// \param[in] _prefix Usually a set of spaces.
@@ -283,7 +353,7 @@ namespace gazebo
       /// \brief Set whether this entity has been selected by the user through
       /// the gui.
       /// \param[in] _show True to set this entity as selected.
-      public: virtual bool SetSelected(bool _show);
+      public: virtual bool SetSelected(const bool _show);
 
       /// \brief True if the entity is selected by the user.
       /// \return True if the entity is selected.
@@ -293,7 +363,7 @@ namespace gazebo
       /// Checks only the name.
       /// \param[in] _ent Base object to compare with.
       /// \return True if the entities are the same.
-      public: bool operator ==(const Base &_ent) const;
+      public: bool operator==(const Base &_ent) const;
 
       /// \brief Set the world this object belongs to. This will also
       /// set the world for all children.
@@ -302,48 +372,25 @@ namespace gazebo
 
       /// \brief Get the World this object is in.
       /// \return The World this object is part of.
-      public: const WorldPtr &GetWorld() const;
+      /// \deprecated See World()
+      public: const WorldPtr &GetWorld() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the World this object is in.
+      /// \return The World this object is part of.
+      public: const WorldPtr &World() const;
 
       /// \brief Get the SDF values for the object.
       /// \return The SDF values for the object.
-      public: virtual const sdf::ElementPtr GetSDF();
+      /// \deprecated See SDF()
+      public: virtual const sdf::ElementPtr GetSDF() GAZEBO_DEPRECATED(7.0);
 
-      /// \brief Compute the scoped name of this object based on its
-      /// parents.
-      /// \sa Base::GetScopedName
-      protected: void ComputeScopedName();
+      /// \brief Get the SDF values for the object.
+      /// \return The SDF values for the object.
+      public: virtual const sdf::ElementPtr SDF() const;
 
-      /// \brief The SDF values for this object.
-      protected: sdf::ElementPtr sdf;
-
-      /// \brief Parent of this entity.
-      protected: BasePtr parent;
-
-      /// \brief Children of this entity.
-      protected: Base_V children;
-
-      /// \brief Pointer to the world.
-      protected: WorldPtr world;
-
-      /// \brief Set to true if the object should be saved.
-      private: bool saveable;
-
-      /// \brief This entities ID.
-      private: uint32_t id;
-
-      /// \brief The type of this object.
-      private: unsigned int type;
-
-      /// \brief True if selected.
-      private: bool selected;
-
-      /// \brief Local copy of the sdf name.
-      private: std::string name;
-
-      /// \brief Local copy of the scoped name.
-      private: std::string scopedName;
-
-      protected: friend class Entity;
+      /// \internal
+      /// \brief Data pointer for private data
+      private: std::unique_ptr<BasePrivate> dataPtr;
     };
     /// \}
   }

@@ -14,8 +14,6 @@
  * limitations under the License.
  *
 */
-
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
@@ -58,7 +56,7 @@ using namespace common;
 
 //////////////////////////////////////////////////
 Actor::Actor(BasePtr _parent)
-  : Model(_parent)
+  : Model(*new ActorPrivate, _parent)
 {
   this->AddType(ACTOR);
   this->mesh = NULL;
@@ -441,7 +439,7 @@ void Actor::Stop()
 }
 
 //////////////////////////////////////////////////
-bool Actor::IsActive()
+bool Actor::IsActive() const
 {
   return this->active;
 }
@@ -555,8 +553,9 @@ void Actor::Update()
 }
 
 //////////////////////////////////////////////////
-void Actor::SetPose(std::map<std::string, ignition::math::Matrix4d> _frame,
-      std::map<std::string, std::string> _skelMap, double _time)
+void Actor::SetPose(
+    const std::map<std::string, ignition::math::Matrix4d> &_frame,
+    const std::map<std::string, std::string> &_skelMap, const double _time)
 {
   msgs::PoseAnimation msg;
   msg.set_model_name(this->visualName);
@@ -641,12 +640,6 @@ void Actor::Fini()
 void Actor::UpdateParameters(sdf::ElementPtr /*_sdf*/)
 {
 //  Model::UpdateParameters(_sdf);
-}
-
-//////////////////////////////////////////////////
-const sdf::ElementPtr Actor::GetSDF()
-{
-  return Model::GetSDF();
 }
 
 //////////////////////////////////////////////////

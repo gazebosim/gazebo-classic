@@ -14,19 +14,13 @@
  * limitations under the License.
  *
 */
-/* Desc: Base class for all models
- * Author: Nathan Koenig and Andrew Howard
- * Date: 8 May 2003
- */
-
-#ifndef _MODEL_HH_
-#define _MODEL_HH_
+#ifndef _GAZEBO_PHYSICS_MODEL_HH_
+#define _GAZEBO_PHYSICS_MODEL_HH_
 
 #include <string>
 #include <map>
 #include <vector>
-#include <boost/function.hpp>
-#include <boost/thread/recursive_mutex.hpp>
+#include <functional>
 
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
@@ -34,16 +28,12 @@
 #include "gazebo/physics/Entity.hh"
 #include "gazebo/util/system.hh"
 
-namespace boost
-{
-  class recursive_mutex;
-}
-
 namespace gazebo
 {
   namespace physics
   {
-    class Gripper;
+    // Forware declare private data class
+    class ModelPrivate;
 
     /// \addtogroup gazebo_physics
     /// \{
@@ -79,10 +69,6 @@ namespace gazebo
       /// \param[in] _sdf SDF values to update from.
       public: virtual void UpdateParameters(sdf::ElementPtr _sdf);
 
-      /// \brief Get the SDF values for the model.
-      /// \return The SDF value for this model.
-      public: virtual const sdf::ElementPtr GetSDF();
-
       /// \brief Remove a child.
       /// \param[in] _child Remove a child entity.
       public: virtual void RemoveChild(EntityPtr _child);
@@ -97,61 +83,147 @@ namespace gazebo
 
       /// \brief Set the linear velocity of the model, and all its links.
       /// \param[in] _vel The new linear velocity.
-      public: void SetLinearVel(const math::Vector3 &_vel);
+      /// \deprecated See version that accepts ignition::math parameters.
+      public: void SetLinearVel(const math::Vector3 &_vel)
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Set the linear velocity of the model, and all its links.
+      /// \param[in] _vel The new linear velocity.
+      public: void SetLinearVel(const ignition::math::Vector3d &_vel);
 
       /// \brief Set the angular velocity of the model, and all its links.
       /// \param[in] _vel The new angular velocity.
-      public: void SetAngularVel(const math::Vector3 &_vel);
+      /// \deprecated See version that accepts ignition::math parameters
+      public: void SetAngularVel(const math::Vector3 &_vel)
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Set the angular velocity of the model, and all its links.
+      /// \param[in] _vel The new angular velocity.
+      public: void SetAngularVel(const ignition::math::Vector3d &_vel);
 
       /// \brief Set the linear acceleration of the model, and all its
       /// links.
       /// \param[in] _vel The new linear acceleration.
-      public: void SetLinearAccel(const math::Vector3 &_vel);
+      /// \deprecated See version that accepts ignition::math parameters.
+      public: void SetLinearAccel(const math::Vector3 &_vel)
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Set the linear acceleration of the model, and all its
+      /// links.
+      /// \param[in] _vel The new linear acceleration.
+      public: void SetLinearAccel(const ignition::math::Vector3d &_vel);
 
       /// \brief Set the angular acceleration of the model, and all its
       /// links.
       /// \param[in] _vel The new angular acceleration
-      public: void SetAngularAccel(const math::Vector3 &_vel);
+      /// \deprecated See version that accepts ignition::math parameters.
+      public: void SetAngularAccel(const math::Vector3 &_vel)
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Set the angular acceleration of the model, and all its
+      /// links.
+      /// \param[in] _vel The new angular acceleration
+      public: void SetAngularAccel(const ignition::math::Vector3d &_vel);
 
       /// \brief Get the linear velocity of the entity.
       /// \return math::Vector3, set to 0, 0, 0 if the model has no body.
-      public: virtual math::Vector3 GetRelativeLinearVel() const;
+      /// \deprecated See RelativeLinearVel()
+      public: virtual math::Vector3 GetRelativeLinearVel() const
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the linear velocity of the entity.
+      /// \return math::Vector3, set to 0, 0, 0 if the model has no body.
+      public: virtual ignition::math::Vector3d RelativeLinearVel() const;
 
       /// \brief Get the linear velocity of the entity in the world frame.
       /// \return math::Vector3, set to 0, 0, 0 if the model has no body.
-      public: virtual math::Vector3 GetWorldLinearVel() const;
+      /// \deprecated See WorldLinearVel()
+      public: virtual math::Vector3 GetWorldLinearVel() const
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the linear velocity of the entity in the world frame.
+      /// \return math::Vector3, set to 0, 0, 0 if the model has no body.
+      public: virtual ignition::math::Vector3d WorldLinearVel() const;
 
       /// \brief Get the angular velocity of the entity.
       /// \return math::Vector3, set to 0, 0, 0 if the model has no body.
-      public: virtual math::Vector3 GetRelativeAngularVel() const;
+      /// \deprecated See RelativeAngularVel()
+      public: virtual math::Vector3 GetRelativeAngularVel() const
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the angular velocity of the entity.
+      /// \return ignition::math::Vector3d, set to 0, 0, 0 if the model has
+      /// no body.
+      public: virtual ignition::math::Vector3d RelativeAngularVel() const;
 
       /// \brief Get the angular velocity of the entity in the world frame.
       /// \return math::Vector3, set to 0, 0, 0 if the model has no body.
-      public: virtual math::Vector3 GetWorldAngularVel() const;
+      /// \deprecated See WorldAngularVel()
+      public: virtual math::Vector3 GetWorldAngularVel() const
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the angular velocity of the entity in the world frame.
+      /// \return ignition::math::Vector3d, set to 0, 0, 0 if the model
+      /// has no body.
+      public: virtual ignition::math::Vector3d WorldAngularVel() const;
 
       /// \brief Get the linear acceleration of the entity.
       /// \return math::Vector3, set to 0, 0, 0 if the model has no body.
-      public: virtual math::Vector3 GetRelativeLinearAccel() const;
+      /// \deprecated See RelativeLinearAccel()
+      public: virtual math::Vector3 GetRelativeLinearAccel() const
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the linear acceleration of the entity.
+      /// \return ignition::math::Vector3d, set to 0, 0, 0 if the model has
+      /// no body.
+      public: virtual ignition::math::Vector3d RelativeLinearAccel() const;
 
       /// \brief Get the linear acceleration of the entity in the world frame.
       /// \return math::Vector3, set to 0, 0, 0 if the model has no body.
-      public: virtual math::Vector3 GetWorldLinearAccel() const;
+      /// \deprecated See WorldLinearAccel()
+      public: virtual math::Vector3 GetWorldLinearAccel() const
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the linear acceleration of the entity in the world frame.
+      /// \return ignition::math::Vector3d, set to 0, 0, 0 if the model has
+      /// no body.
+      public: virtual ignition::math::Vector3d WorldLinearAccel() const;
 
       /// \brief Get the angular acceleration of the entity.
       /// \return math::Vector3, set to 0, 0, 0 if the model has no body.
-      public: virtual math::Vector3 GetRelativeAngularAccel() const;
+      /// \deprecated See RelativeAngularAccel()
+      public: virtual math::Vector3 GetRelativeAngularAccel() const
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the angular acceleration of the entity.
+      /// \return ignition::math::Vector3d, set to 0, 0, 0 if the model has no
+      /// body.
+      public: virtual ignition::math::Vector3d RelativeAngularAccel() const;
 
       /// \brief Get the angular acceleration of the entity in the world frame.
       /// \return math::Vector3, set to 0, 0, 0 if the model has no body.
-      public: virtual math::Vector3 GetWorldAngularAccel() const;
+      /// \deprecated See WorldAngularAccel()
+      public: virtual math::Vector3 GetWorldAngularAccel() const
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the angular acceleration of the entity in the world frame.
+      /// \return ignition::math::Vector3d, set to 0, 0, 0 if the model has
+      /// no body.
+      public: virtual ignition::math::Vector3d WorldAngularAccel() const;
 
       /// \brief Get the size of the bounding box.
       /// \return The bounding box.
-      public: virtual math::Box GetBoundingBox() const;
+      public: virtual ignition::math::Box BoundingBox() const;
 
       /// \brief Get the number of joints.
       /// \return Get the number of joints.
-      public: unsigned int GetJointCount() const;
+      /// \deprecated See JointCount()
+      public: unsigned int GetJointCount() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the number of joints.
+      /// \return Get the number of joints.
+      /// \deprecated See JointCount()
+      public: unsigned int JointCount() const;
 
       /// \brief Get a nested model that is a direct child of this model.
       /// \param[in] _name Name of the child model to get.
@@ -165,28 +237,61 @@ namespace gazebo
       /// \brief Construct and return a vector of Link's in this model
       /// Note this constructs the vector of Link's on the fly, could be costly
       /// \return a vector of Link's in this model
-      public: const Link_V &GetLinks() const;
+      /// \deprecated See Links()
+      public: const Link_V &GetLinks() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Construct and return a vector of Link's in this model
+      /// Note this constructs the vector of Link's on the fly, could be costly
+      /// \return a vector of Link's in this model
+      public: const Link_V &Links() const;
 
       /// \brief Get the joints.
       /// \return Vector of joints.
-      public: const Joint_V &GetJoints() const;
+      /// \deprecated See Joints()
+      public: const Joint_V &GetJoints() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the joints.
+      /// \return Vector of joints.
+      public: const Joint_V &Joints() const;
 
       /// \brief Get a joint
       /// \param name The name of the joint, specified in the world file
       /// \return Pointer to the joint
-      public: JointPtr GetJoint(const std::string &name);
+      /// \deprecated See Joint(const std::string)
+      public: JointPtr GetJoint(const std::string &name) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get a joint
+      /// \param name The name of the joint, specified in the world file
+      /// \return Pointer to the joint
+      public: JointPtr Joint(const std::string &_name) const;
 
       /// \cond
       /// This is an internal function
       /// \brief Get a link by id.
       /// \return Pointer to the link, NULL if the id is invalid.
-      public: LinkPtr GetLinkById(unsigned int _id) const;
+      /// \deprecated See LinkById(const unsigned int) const
+      public: LinkPtr GetLinkById(unsigned int _id) const
+              GAZEBO_DEPRECATED(7.0);
+      /// \endcond
+
+      /// \cond
+      /// This is an internal function
+      /// \brief Get a link by id.
+      /// \return Pointer to the link, NULL if the id is invalid.
+      public: LinkPtr LinkById(const unsigned int _id) const;
       /// \endcond
 
       /// \brief Get a link by name.
       /// \param[in] _name Name of the link to get.
       /// \return Pointer to the link, NULL if the name is invalid.
-      public: LinkPtr GetLink(const std::string &_name ="canonical") const;
+      /// \deprecated See Link(const std:;string &) const
+      public: LinkPtr GetLink(const std::string &_name ="canonical") const
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get a link by name.
+      /// \param[in] _name Name of the link to get.
+      /// \return Pointer to the link, NULL if the name is invalid.
+      public: LinkPtr Link(const std::string &_name = "canonical") const;
 
       /// \brief If true, all links within the model will collide by default.
       /// Two links within the same model will not collide if both have
@@ -195,16 +300,26 @@ namespace gazebo
       /// Bodies connected by a joint are exempt from this, and will
       /// never collide.
       /// \return True if self-collide enabled for this model, false otherwise.
-      public: bool GetSelfCollide() const;
+      /// \deprecated See SelfCollide() const
+      public: bool GetSelfCollide() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief If true, all links within the model will collide by default.
+      /// Two links within the same model will not collide if both have
+      /// link.self_collide == false.
+      /// link 1 and link2 collide = link1.self_collide || link2.self_collide
+      /// Bodies connected by a joint are exempt from this, and will
+      /// never collide.
+      /// \return True if self-collide enabled for this model, false otherwise.
+      public: bool SelfCollide() const;
 
       /// \brief Set this model's self_collide property
       /// \sa GetSelfCollide
       /// \param[in] _self_collide True if self-collisions enabled by default.
-      public: void SetSelfCollide(bool _self_collide);
+      public: void SetSelfCollide(const bool _selfCollide);
 
       /// \brief Set the gravity mode of the model.
       /// \param[in] _value False to turn gravity on for the model.
-      public: void SetGravityMode(const bool &_value);
+      public: void SetGravityMode(const bool _value);
 
       /// \TODO This is not implemented in Link, which means this function
       /// doesn't do anything.
@@ -229,7 +344,7 @@ namespace gazebo
       /// \param[in] _jointName Name of the joint to set.
       /// \param[in] _position Position to set the joint to.
       public: void SetJointPosition(const std::string &_jointName,
-                                    double _position, int _index = 0);
+                  const double _position, const int _index = 0);
 
       /// \brief Set the positions of a set of joints.
       /// \sa JointController::SetJointPositions.
@@ -243,7 +358,7 @@ namespace gazebo
       /// completes.
       public: void SetJointAnimation(
                const std::map<std::string, common::NumericAnimationPtr> &_anims,
-               boost::function<void()> _onComplete = NULL);
+               std::function<void()> _onComplete = NULL);
 
       /// \brief Stop the current animations.
       public: virtual void StopAnimation();
@@ -262,7 +377,26 @@ namespace gazebo
       ///
       /// \param[in] _model Pointer to the static model.
       /// \param[in] _offset Offset, relative to this Model, to place _model.
-      public: void AttachStaticModel(ModelPtr &_model, math::Pose _offset);
+      /// \deprecated See version that accepts ignition::math parameters
+      public: void AttachStaticModel(ModelPtr &_model, math::Pose _offset)
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Attach a static model to this model
+      ///
+      /// This function takes as input a static Model, which is a Model that
+      /// has been marked as static (no physics simulation), and attaches it
+      /// to this Model with a given offset.
+      ///
+      /// This function is useful when you want to simulate a grasp of a
+      /// static object, or move a static object around using a dynamic
+      /// model.
+      ///
+      /// If you are in doubt, do not use this function.
+      ///
+      /// \param[in] _model Pointer to the static model.
+      /// \param[in] _offset Offset, relative to this Model, to place _model.
+      public: void AttachStaticModel(ModelPtr &_model,
+                  const ignition::math::Pose3d &_offset);
 
       /// \brief Detach a static model from this model.
       /// \param[in] _model Name of an attached static model to remove.
@@ -275,11 +409,16 @@ namespace gazebo
 
       /// \brief Set the scale of model.
       /// \param[in] _scale Scale to set the model to.
-      public: void SetScale(const math::Vector3 &_scale);
+      /// \deprecated See version that accepts ignition::math parameters.
+      public: void SetScale(const math::Vector3 &_scale) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Set the scale of model.
+      /// \param[in] _scale Scale to set the model to.
+      public: void SetScale(const ignition::math::Vector3d &_scale);
 
       /// \brief Enable all the links in all the models.
       /// \param[in] _enabled True to enable all the links.
-      public: void SetEnabled(bool _enabled);
+      public: void SetEnabled(const bool _enabled);
 
       /// \brief Set the Pose of the entire Model by specifying
       /// desired Pose of a Link within the Model.  Doing so, keeps
@@ -287,8 +426,18 @@ namespace gazebo
       /// are unchanged.
       /// \param[in] _pose Pose to set the link to.
       /// \param[in] _linkName Name of the link to set.
+      /// \deprecated See version that accepts ignition::math parameters
       public: void SetLinkWorldPose(const math::Pose &_pose,
-                                    std::string _linkName);
+                  std::string _linkName) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Set the Pose of the entire Model by specifying
+      /// desired Pose of a Link within the Model.  Doing so, keeps
+      /// the configuration of the Model unchanged, i.e. all Joint angles
+      /// are unchanged.
+      /// \param[in] _pose Pose to set the link to.
+      /// \param[in] _linkName Name of the link to set.
+      public: void SetLinkWorldPose(const ignition::math::Pose3d &_pose,
+                                    const std::string &_linkName);
 
       /// \brief Set the Pose of the entire Model by specifying
       /// desired Pose of a Link within the Model.  Doing so, keeps
@@ -296,17 +445,32 @@ namespace gazebo
       /// are unchanged.
       /// \param[in] _pose Pose to set the link to.
       /// \param[in] _link Pointer to the link to set.
+      /// \deprecated See version that accepts ignition::math parameters
       public: void SetLinkWorldPose(const math::Pose &_pose,
-                                    const LinkPtr &_link);
+                  const LinkPtr &_link) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Set the Pose of the entire Model by specifying
+      /// desired Pose of a Link within the Model.  Doing so, keeps
+      /// the configuration of the Model unchanged, i.e. all Joint angles
+      /// are unchanged.
+      /// \param[in] _pose Pose to set the link to.
+      /// \param[in] _link Pointer to the link to set.
+      public: void SetLinkWorldPose(const ignition::math::Pose3d &_pose,
+                  const LinkPtr &_link);
 
       /// \brief Allow the model the auto disable. This is ignored if the
       /// model has joints.
       /// \param[in] _disable If true, the model is allowed to auto disable.
-      public: void SetAutoDisable(bool _disable);
+      public: void SetAutoDisable(const bool _disable);
 
       /// \brief Return the value of the SDF <allow_auto_disable> element.
       /// \return True if auto disable is allowed for this model.
-      public: bool GetAutoDisable() const;
+      /// \deprecated See AutoDisable() const
+      public: bool GetAutoDisable() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Return the value of the SDF <allow_auto_disable> element.
+      /// \return True if auto disable is allowed for this model.
+      public: bool AutoDisable() const;
 
       /// \brief Load all plugins
       ///
@@ -315,42 +479,89 @@ namespace gazebo
 
       /// \brief Get the number of plugins this model has.
       /// \return Number of plugins associated with this model.
-      public: unsigned int GetPluginCount() const;
+      /// \deprecated See PluginCount()
+      public: unsigned int GetPluginCount() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the number of plugins this model has.
+      /// \return Number of plugins associated with this model.
+      public: unsigned int PluginCount() const;
 
       /// \brief Get the number of sensors attached to this model.
       /// This will count all the sensors attached to all the links.
       /// \return Number of sensors.
-      public: unsigned int GetSensorCount() const;
+      /// \deprecated See SensorCount()
+      public: unsigned int GetSensorCount() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the number of sensors attached to this model.
+      /// This will count all the sensors attached to all the links.
+      /// \return Number of sensors.
+      public: unsigned int SensorCount() const;
 
       /// \brief Get a handle to the Controller for the joints in this model.
       /// \return A handle to the Controller for the joints in this model.
-      public: JointControllerPtr GetJointController();
+      /// \deprecated See JointController()
+      public: JointControllerPtr GetJointController() GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get a handle to the Controller for the joints in this model.
+      /// \return A handle to the Controller for the joints in this model.
+      public: JointControllerPtr JointController() const;
 
       /// \brief Get a gripper based on an index.
       /// \return A pointer to a Gripper. Null if the _index is invalid.
-      public: GripperPtr GetGripper(size_t _index) const;
+      /// \deprecated See Gripper(const size_t _index) const
+      public: GripperPtr GetGripper(size_t _index) const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get a gripper based on an index.
+      /// \return A pointer to a Gripper. Null if the _index is invalid.
+      public: GripperPtr Gripper(const size_t _index) const;
 
       /// \brief Get the number of grippers in this model.
       /// \return Size of this->grippers array.
       /// \sa Model::GetGripper()
-      public: size_t GetGripperCount() const;
+      /// \deprecated See GripperCount() const
+      public: size_t GetGripperCount() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the number of grippers in this model.
+      /// \return Size of this->grippers array.
+      /// \sa Model::GetGripper()
+      public: size_t GripperCount() const;
 
       /// \brief Returns the potential energy of all links
       /// and joint springs in the model.
       /// \return this link's potential energy,
-      public: double GetWorldEnergyPotential() const;
+      /// \deprecated See WorldEnergyPotential()
+      public: double GetWorldEnergyPotential() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Returns the potential energy of all links
+      /// and joint springs in the model.
+      /// \return this link's potential energy,
+      public: double WorldEnergyPotential() const;
 
       /// \brief Returns sum of the kinetic energies of all links
       /// in this model.  Computed using link's CoG velocity in
       /// the inertial (world) frame.
       /// \return this link's kinetic energy
-      public: double GetWorldEnergyKinetic() const;
+      /// \deprecated See WorldEnergyKinetic()
+      public: double GetWorldEnergyKinetic() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Returns sum of the kinetic energies of all links
+      /// in this model.  Computed using link's CoG velocity in
+      /// the inertial (world) frame.
+      /// \return this link's kinetic energy
+      public: double WorldEnergyKinetic() const;
 
       /// \brief Returns this model's total energy, or
       /// sum of Model::GetWorldEnergyPotential() and
       /// Model::GetWorldEnergyKinetic().
       /// \return this link's total energy
-      public: double GetWorldEnergy() const;
+      /// \deprecated See WorldEnergy()
+      public: double GetWorldEnergy() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Returns this model's total energy, or
+      /// sum of Model::GetWorldEnergyPotential() and
+      /// Model::GetWorldEnergyKinetic().
+      /// \return this link's total energy
+      public: double WorldEnergy() const;
 
       /// \brief Create a joint for this model
       /// \param[in] _name name of joint
@@ -400,45 +611,9 @@ namespace gazebo
       /// \param[in] _name Name of the link to remove.
       private: void RemoveLink(const std::string &_name);
 
-      /// used by Model::AttachStaticModel
-      protected: std::vector<ModelPtr> attachedModels;
-
-      /// used by Model::AttachStaticModel
-      protected: std::vector<math::Pose> attachedModelsOffset;
-
-      /// \brief Publisher for joint info.
-      protected: transport::PublisherPtr jointPub;
-
-      /// \brief The canonical link of the model.
-      private: LinkPtr canonicalLink;
-
-      /// \brief All the joints in the model.
-      private: Joint_V joints;
-
-      /// \brief Cached list of links. This is here for performance.
-      private: Link_V links;
-
-      /// \brief Cached list of nested models.
-      private: Model_V models;
-
-      /// \brief All the grippers in the model.
-      private: std::vector<GripperPtr> grippers;
-
-      /// \brief All the model plugins.
-      private: std::vector<ModelPluginPtr> plugins;
-
-      /// \brief The joint animations.
-      private: std::map<std::string, common::NumericAnimationPtr>
-               jointAnimations;
-
-      /// \brief Callback used when a joint animation completes.
-      private: boost::function<void()> onJointAnimationComplete;
-
-      /// \brief Mutex used during the update cycle.
-      private: mutable boost::recursive_mutex updateMutex;
-
-      /// \brief Controller for the joints.
-      private: JointControllerPtr jointController;
+      /// \internal
+      /// \brief Private data pointer
+      private: std::unique_ptr<ModelPrivate> dataPtr;
     };
     /// \}
   }
