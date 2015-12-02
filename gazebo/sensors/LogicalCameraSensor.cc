@@ -37,7 +37,8 @@ GZ_REGISTER_STATIC_SENSOR("logical_camera", LogicalCameraSensor)
 
 //////////////////////////////////////////////////
 LogicalCameraSensor::LogicalCameraSensor()
-  : Sensor(*new LogicalCameraSensorPrivate, sensors::OTHER)
+: Sensor(*new LogicalCameraSensorPrivate, sensors::OTHER),
+  dataPtr(std::static_pointer_cast<LogicalCameraSensorPrivate>(this->dPtr))
 {
 }
 

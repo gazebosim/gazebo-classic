@@ -51,10 +51,9 @@ GZ_REGISTER_STATIC_SENSOR("multicamera", MultiCameraSensor)
 
 //////////////////////////////////////////////////
 MultiCameraSensor::MultiCameraSensor()
-: Sensor(*new MultiCameraSensorPrivate, sensors::IMAGE)
+: Sensor(*new MultiCameraSensorPrivate, sensors::IMAGE),
+  dataPtr(std::static_pointer_cast<MultiCameraSensorPrivate>(this->dPtr))
 {
-  this->dataPtr = std::static_pointer_cast<MultiCameraSensorPrivate>(
-      this->dPtr);
   this->dataPtr->rendered = false;
   this->dataPtr->connections.push_back(
       event::Events::ConnectRender(

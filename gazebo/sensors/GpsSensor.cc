@@ -39,9 +39,9 @@ GZ_REGISTER_STATIC_SENSOR("gps", GpsSensor)
 
 /////////////////////////////////////////////////
 GpsSensor::GpsSensor()
-: Sensor(*new GpsSensorPrivate, sensors::OTHER)
+: Sensor(*new GpsSensorPrivate, sensors::OTHER),
+  dataPtr(std::static_pointer_cast<GpsSensorPrivate>(this->dPtr))
 {
-  this->dataPtr = std::static_pointer_cast<GpsSensorPrivate>(this->dPtr);
 }
 
 /////////////////////////////////////////////////

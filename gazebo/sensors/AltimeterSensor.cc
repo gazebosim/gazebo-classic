@@ -37,9 +37,9 @@ GZ_REGISTER_STATIC_SENSOR("altimeter", AltimeterSensor)
 
 /////////////////////////////////////////////////
 AltimeterSensor::AltimeterSensor()
-: Sensor(*new AltimeterSensorPrivate, sensors::OTHER)
+: Sensor(*new AltimeterSensorPrivate, sensors::OTHER),
+  dataPtr(std::static_pointer_cast<AltimeterSensorPrivate>(this->dPtr))
 {
-  this->dataPtr = std::static_pointer_cast<AltimeterSensorPrivate>(this->dPtr);
 }
 
 /////////////////////////////////////////////////

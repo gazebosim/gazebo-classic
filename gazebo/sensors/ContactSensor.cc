@@ -45,9 +45,9 @@ GZ_REGISTER_STATIC_SENSOR("contact", ContactSensor)
 
 //////////////////////////////////////////////////
 ContactSensor::ContactSensor()
-: Sensor(*new ContactSensorPrivate, sensors::OTHER)
+: Sensor(*new ContactSensorPrivate, sensors::OTHER),
+  dataPtr(std::static_pointer_cast<ContactSensorPrivate>(this->dPtr))
 {
-  this->dataPtr = std::static_pointer_cast<ContactSensorPrivate>(this->dPtr);
 }
 
 //////////////////////////////////////////////////

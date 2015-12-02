@@ -50,10 +50,9 @@ GZ_REGISTER_STATIC_SENSOR("camera", CameraSensor)
 
 //////////////////////////////////////////////////
 CameraSensor::CameraSensor()
-    : Sensor(*new CameraSensorPrivate, sensors::IMAGE)
+: Sensor(*new CameraSensorPrivate, sensors::IMAGE),
+  dataPtr(std::static_pointer_cast<CameraSensorPrivate>(this->dPtr))
 {
-  this->dataPtr = std::static_pointer_cast<CameraSensorPrivate>(this->dPtr);
-
   this->dataPtr->rendered = false;
   this->dataPtr->connections.push_back(
       event::Events::ConnectRender(

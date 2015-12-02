@@ -46,7 +46,8 @@ GZ_REGISTER_STATIC_SENSOR("depth", DepthCameraSensor)
 
 //////////////////////////////////////////////////
 DepthCameraSensor::DepthCameraSensor()
-    : Sensor(*new DepthCameraSensorPrivate, sensors::IMAGE)
+: Sensor(*new DepthCameraSensorPrivate, sensors::IMAGE),
+  dataPtr(std::static_pointer_cast<DepthCameraSensorPrivate>(this->dPtr))
 {
   this->dataPtr->rendered = false;
   this->dataPtr->connections.push_back(

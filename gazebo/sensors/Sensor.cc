@@ -51,13 +51,14 @@ sdf::ElementPtr SensorPrivate::sdfSensor;
 
 //////////////////////////////////////////////////
 Sensor::Sensor(SensorCategory _cat)
+: dPtr(new SensorProtected), pdPtr(new SensorPrivate)
 {
   this->ConstructorHelper(_cat);
 }
 
 //////////////////////////////////////////////////
 Sensor::Sensor(SensorProtected &_dataPtr, SensorCategory _cat)
-: dPtr(&_dataPtr)
+: dPtr(&_dataPtr), pdPtr(new SensorPrivate)
 {
   this->ConstructorHelper(_cat);
 }

@@ -46,10 +46,9 @@ GZ_REGISTER_STATIC_SENSOR("wideanglecamera", WideAngleCameraSensor)
 
 //////////////////////////////////////////////////
 WideAngleCameraSensor::WideAngleCameraSensor()
-  : CameraSensor(*new WideAngleCameraSensorPrivate)
+: CameraSensor(*new WideAngleCameraSensorPrivate),
+  dataPtr(std::static_pointer_cast<WideAngleCameraSensorPrivate>(this->dPtr))
 {
-  this->dataPtr = std::static_pointer_cast<
-    WideAngleCameraSensorPrivate>(this->dPtr);
 }
 
 //////////////////////////////////////////////////

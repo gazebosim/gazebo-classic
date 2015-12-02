@@ -39,7 +39,8 @@ GZ_REGISTER_STATIC_SENSOR("rfidtag", RFIDTag)
 
 /////////////////////////////////////////////////
 RFIDTag::RFIDTag()
-: Sensor(sensors::OTHER)
+: Sensor(*new RFIDTagPrivate, sensors::OTHER),
+  dataPtr(std::static_pointer_cast<RFIDTagPrivate>(this->dPtr))
 {
   this->dataPtr->active = false;
 }

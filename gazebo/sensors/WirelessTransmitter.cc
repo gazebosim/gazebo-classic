@@ -45,10 +45,9 @@ const double WirelessTransmitterPrivate::MaxRadius = 10.0;
 
 /////////////////////////////////////////////////
 WirelessTransmitter::WirelessTransmitter()
-: WirelessTransceiver(*new WirelessTransmitterPrivate)
+: WirelessTransceiver(*new WirelessTransmitterPrivate),
+  dataPtr(std::static_pointer_cast<WirelessTransmitterPrivate>(this->dPtr))
 {
-  this->dataPtr = std::static_pointer_cast<WirelessTransmitterPrivate>(
-      this->dPtr);
 }
 
 /////////////////////////////////////////////////

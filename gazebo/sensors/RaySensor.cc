@@ -51,7 +51,8 @@ GZ_REGISTER_STATIC_SENSOR("ray", RaySensor)
 
 //////////////////////////////////////////////////
 RaySensor::RaySensor()
-    : Sensor(*new RaySensorPrivate, sensors::RAY)
+: Sensor(*new RaySensorPrivate, sensors::RAY),
+  dataPtr(std::static_pointer_cast<RaySensorPrivate>(this->dPtr))
 {
 }
 

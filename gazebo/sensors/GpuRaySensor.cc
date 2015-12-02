@@ -49,9 +49,9 @@ GZ_REGISTER_STATIC_SENSOR("gpu_ray", GpuRaySensor)
 
 //////////////////////////////////////////////////
 GpuRaySensor::GpuRaySensor()
-    : Sensor(*new GpuRaySensorPrivate, sensors::IMAGE)
+: Sensor(*new GpuRaySensorPrivate, sensors::IMAGE),
+  dataPtr(std::static_pointer_cast<GpuRaySensorPrivate>(this->dPtr))
 {
-  this->dataPtr = std::static_pointer_cast<GpuRaySensorPrivate>(this->dPtr);
 
   this->dataPtr->rendered = false;
   this->dataPtr->active = false;

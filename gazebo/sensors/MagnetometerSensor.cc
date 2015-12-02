@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
@@ -40,7 +39,8 @@ GZ_REGISTER_STATIC_SENSOR("magnetometer", MagnetometerSensor)
 
 /////////////////////////////////////////////////
 MagnetometerSensor::MagnetometerSensor()
-  : Sensor(*new MagnetometerSensorPrivate, sensors::OTHER)
+: Sensor(*new MagnetometerSensorPrivate, sensors::OTHER),
+  dataPtr(std::static_pointer_cast<MagnetometerSensorPrivate>(this->dPtr))
 {
 }
 
