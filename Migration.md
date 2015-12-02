@@ -16,6 +16,12 @@ release will remove the deprecated code.
     + public: bool RemoveJoint(const std::string &_name);
     + public: boost::shared_ptr<Model> shared_from_this();
 
+1. **gazebo/physics/SurfaceParams.hh**
+    + public: double PoissonsRatio() const;
+    + public: void SetPoissonsRatio(double _ratio);
+    + public: double ElasticModulus() const;
+    + public: void SetElasticModulus(double _modulus);
+
 ### Modifications
 
 1. **gazebo/rendering/RenderTypes.hh**
@@ -71,6 +77,24 @@ release will remove the deprecated code.
     + ***Replacement:*** public: virtual void Stop();
 
 ### Deprecations
+
+1. **gazebo/rendering/ApplyWrenchVisual.hh**
+    + ***Deprecation:*** public: void SetCoM(const math::Vector3 &_comVector)
+    + ***Replacement:*** public: void SetCoM(const ignition::math::Vector3d &_comVector);
+    + ***Deprecation:*** public: void SetForcePos(const math::Vector3 &_forcePosVector)
+    + ***Replacement:*** public: void SetForcePos(const ignition::math::Vector3d &_forcePosVector);
+    + ***Deprecation:*** public: void SetForce(const math::Vector3 &_forceVector,const bool _rotatedByMouse);
+    + ***Replacement:*** public: void SetForce(const ignition::math::Vector3d &_forceVector, const bool _rotatedByMouse);
+    + ***Deprecation:*** public: void SetTorque(const math::Vector3 &_torqueVector,const bool _rotatedByMouse);
+    + ***Replacement:*** public: void SetTorque(const ignition::math::Vector3d &_torqueVector, const bool _rotatedByMouse);
+
+1. **gazebo/rendering/AxisVisual.hh**
+    + ***Deprecation:*** public: void ScaleXAxis(const math::Vector3 &_scale)
+    + ***Replacement:*** public: void ScaleXAxis(const ignition::math::Vector3d &_scale);
+    + ***Deprecation:*** public: void ScaleYAxis(const math::Vector3 &_scale)
+    + ***Replacement:*** public: void ScaleYAxis(const ignition::math::Vector3d &_scale);
+    + ***Deprecation:*** public: void ScaleZAxis(const math::Vector3 &_scale)
+    + ***Replacement:*** public: void ScaleZAxis(const ignition::math::Vector3d &_scale);
 
 1. **gazebo/gui/RTShaderSystem.hh**
     + ***Deprecation:*** void AttachEntity(Visual *vis)

@@ -2105,7 +2105,7 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
     if (!parentVis)
       return false;
 
-    // image size is 0 if renering is unavailable
+    // image size is 0 if rendering is unavailable
     if (_msg->camera().image_size().x() > 0 &&
         _msg->camera().image_size().y() > 0)
     {
