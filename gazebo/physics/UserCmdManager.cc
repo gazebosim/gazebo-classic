@@ -50,23 +50,6 @@ UserCmd::UserCmd(const unsigned int _id,
   this->dataPtr->startState = WorldState(this->dataPtr->world);
 }
 
-//////////////////////////////////////////////////
-UserCmd::UserCmd(UserCmdPrivate &_dataPtr,
-                 const unsigned int _id,
-                 physics::WorldPtr _world,
-                 const std::string &_description,
-                 const msgs::UserCmd::Type &_type)
-    : dataPtr(&_dataPtr)
-{
-  this->dataPtr->id = _id;
-  this->dataPtr->world = _world;
-  this->dataPtr->description = _description;
-  this->dataPtr->type = _type;
-
-  // Record current world state
-  this->dataPtr->startState = WorldState(this->dataPtr->world);
-}
-
 /////////////////////////////////////////////////
 UserCmd::~UserCmd()
 {
@@ -124,7 +107,6 @@ UserCmdManager::UserCmdManager(const WorldPtr _world)
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init();
 
-std::cout << "UserCmdManager::UserCmdManager   userCmdSub" << std::endl;
   this->dataPtr->userCmdSub = this->dataPtr->node->Subscribe("~/user_cmd",
       &UserCmdManager::OnUserCmdMsg, this, true);
 
@@ -150,50 +132,16 @@ UserCmdManager::~UserCmdManager()
 /////////////////////////////////////////////////
 void UserCmdManager::OnUserCmdMsg(ConstUserCmdPtr &_msg)
 {
-std::cout << "UserCmdManager::OnUserCmdMsg  " << _msg->type() << std::endl;
   // Generate unique id
   unsigned int id = this->dataPtr->idCounter++;
 
-  UserCmdPtr cmdPtr;
-
   // Create command
-  if (_msg->type() == msgs::UserCmd::WRENCH)
-  {
-    UserCmdPtr cmd(new UserCmd(id, this->dataPtr->world, _msg->description(),
-        _msg->type()));
+  UserCmdPtr cmd(new UserCmd(id, this->dataPtr->world, _msg->description(),
+      _msg->type()));
 
-    // Set publisher
-    std::string topicName = "~/";
-    topicName += _msg->entity_name() + "/wrench";
-    boost::replace_all(topicName, "::", "/");
-    auto wrenchPub = this->dataPtr->node->Advertise<msgs::Wrench>(topicName);
-    wrenchPub->Publish(_msg->wrench());
-
-    cmdPtr = cmd;
-  }
-  else if (_msg->type() == msgs::UserCmd::WORLD_CONTROL)
-  {
-std::cout << "UserCmdManager::OnUserCmdMsg   WORLD" << std::endl;
-    UserCmdPtr cmd(new UserCmd(id, this->dataPtr->world,
-        _msg->description(), _msg->type()));
-
-    // Pulish world control message after we've save the current state
-    auto worldControlPub = this->dataPtr->node->Advertise<msgs::WorldControl>(
-        "~/world_control");
-    worldControlPub->Publish(_msg->world_control());
-
-    cmdPtr = cmd;
-  }
-  else
-  {
-    UserCmdPtr cmd(new UserCmd(id, this->dataPtr->world, _msg->description(),
-        _msg->type()));
-    cmdPtr = cmd;
-  }
-
+  // Forward message after we've save the current state
   if (_msg->type() == msgs::UserCmd::WORLD_CONTROL)
   {
-    // Publish world control message after we've save the current state
     if (_msg->has_world_control())
     {
       this->dataPtr->worldControlPub->Publish(_msg->world_control());
@@ -205,9 +153,19 @@ std::cout << "UserCmdManager::OnUserCmdMsg   WORLD" << std::endl;
           << std::endl;
     }
   }
+  else if (_msg->type() == msgs::UserCmd::WRENCH)
+  {
+    // Set publisher
+    std::string topicName = "~/";
+    topicName += _msg->entity_name() + "/wrench";
+    boost::replace_all(topicName, "::", "/");
+
+    auto wrenchPub = this->dataPtr->node->Advertise<msgs::Wrench>(topicName);
+    wrenchPub->Publish(_msg->wrench());
+  }
 
   // Add it to undo list
-  this->dataPtr->undoCmds.push_back(cmdPtr);
+  this->dataPtr->undoCmds.push_back(cmd);
 
   // Clear redo list
   this->dataPtr->redoCmds.clear();

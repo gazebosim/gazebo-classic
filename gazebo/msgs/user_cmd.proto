@@ -31,7 +31,7 @@ message UserCmd
   /// \brief Type of command.
   required Type type = 3;
 
-  /// \brief Wrench for apply wrench commands.
+  /// \brief Name of entity targeted by command
   optional string entity_name = 4;
 
   /// \brief For World Control commands.

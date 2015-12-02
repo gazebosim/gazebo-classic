@@ -45,20 +45,6 @@ namespace gazebo
                       const std::string &_description,
                       const msgs::UserCmd::Type &_type);
 
-      /// \internal
-      /// \brief Constructor used by inherited classes
-      /// \param[in] _dataPtr Pointer to private data.
-      /// \param[in] _id Unique ID for this command
-      /// \param[in] _world Pointer to the world
-      /// \param[in] _description Description for the command, such as
-      /// "Rotate box", "Delete sphere", etc.
-      /// \param[in] _type Type of command, such as MOVING, DELETING, etc.
-      protected: UserCmd(UserCmdPrivate &_dataPtr,
-                        const unsigned int _id,
-                        physics::WorldPtr _world,
-                        const std::string &_description,
-                        const msgs::UserCmd::Type &_type);
-
       /// \brief Destructor
       public: virtual ~UserCmd();
 
