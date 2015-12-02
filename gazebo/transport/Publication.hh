@@ -136,6 +136,9 @@ namespace gazebo
       /// previous message.
       public: MessagePtr GetPrevMsg(uint32_t _pubId);
 
+      /// \brief Clear all previous messages for a publisher.
+      public: void ClearPrevMsgs();
+
       /// \brief Add a transport
       /// \param[in] _publink Pointer to publication transport object to
       /// be added

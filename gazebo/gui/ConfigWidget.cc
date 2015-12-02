@@ -273,6 +273,14 @@ void ConfigWidget::SetWidgetReadOnly(const std::string &_name, bool _readOnly)
       if (groupWidget)
       {
         groupWidget->setEnabled(!_readOnly);
+
+        // Qt docs: "Disabling a widget implicitly disables all its children.
+        // Enabling respectively enables all child widgets unless they have
+        // been explicitly disabled."
+        auto childWidgets = groupWidget->findChildren<QWidget *>();
+        for (auto widget : childWidgets)
+          widget->setEnabled(!_readOnly);
+
         return;
       }
     }
