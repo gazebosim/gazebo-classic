@@ -72,7 +72,8 @@ void MagnetometerSensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
 
-  physics::EntityPtr parentEntity = this->dataPtr->world->GetEntity(this->ParentName());
+  physics::EntityPtr parentEntity =
+    this->dataPtr->world->GetEntity(this->ParentName());
   this->dataPtr->parentLink =
     boost::dynamic_pointer_cast<physics::Link>(parentEntity);
 
@@ -93,22 +94,25 @@ void MagnetometerSensor::Load(const std::string &_worldName)
     if (magElem->HasElement("x") &&
         magElem->GetElement("x")->HasElement("noise"))
     {
-      this->dataPtr->noises[MAGNETOMETER_X_NOISE_TESLA] = NoiseFactory::NewNoiseModel(
-          magElem->GetElement("x")->GetElement("noise"));
+      this->dataPtr->noises[MAGNETOMETER_X_NOISE_TESLA] =
+        NoiseFactory::NewNoiseModel(
+            magElem->GetElement("x")->GetElement("noise"));
     }
 
     if (magElem->HasElement("y") &&
         magElem->GetElement("y")->HasElement("noise"))
     {
-      this->dataPtr->noises[MAGNETOMETER_Y_NOISE_TESLA] = NoiseFactory::NewNoiseModel(
-          magElem->GetElement("y")->GetElement("noise"));
+      this->dataPtr->noises[MAGNETOMETER_Y_NOISE_TESLA] =
+        NoiseFactory::NewNoiseModel(
+            magElem->GetElement("y")->GetElement("noise"));
     }
 
     if (magElem->HasElement("z") &&
         magElem->GetElement("z")->HasElement("noise"))
     {
-      this->dataPtr->noises[MAGNETOMETER_Z_NOISE_TESLA] = NoiseFactory::NewNoiseModel(
-          magElem->GetElement("z")->GetElement("noise"));
+      this->dataPtr->noises[MAGNETOMETER_Z_NOISE_TESLA] =
+        NoiseFactory::NewNoiseModel(
+            magElem->GetElement("z")->GetElement("noise"));
     }
   }
 }

@@ -235,11 +235,14 @@ rendering::CameraPtr MultiCameraSensor::Camera(const unsigned int _index) const
 //////////////////////////////////////////////////
 void MultiCameraSensor::Render()
 {
-  if (this->dataPtr->cameras.empty() || !this->IsActive() || !this->NeedsUpdate())
+  if (this->dataPtr->cameras.empty() || !this->IsActive() ||
+      !this->NeedsUpdate())
+  {
     return;
+  }
 
   // Update all the cameras
-  for (std::vector<rendering::CameraPtr>::iterator iter = this->dataPtr->cameras.begin();
+  for (auto iter = this->dataPtr->cameras.begin();
       iter != this->dataPtr->cameras.end(); ++iter)
   {
     (*iter)->Render();
@@ -263,7 +266,7 @@ bool MultiCameraSensor::UpdateImpl(const bool /*_force*/)
             this->dataPtr->lastMeasurementTime);
 
   int index = 0;
-  for (std::vector<rendering::CameraPtr>::iterator iter = this->dataPtr->cameras.begin();
+  for (auto iter = this->dataPtr->cameras.begin();
        iter != this->dataPtr->cameras.end(); ++iter, ++index)
   {
     (*iter)->PostRender();
@@ -347,7 +350,7 @@ bool MultiCameraSensor::SaveFrame(const std::vector<std::string> &_filenames)
 
   bool result = true;
 
-  std::vector<rendering::CameraPtr>::iterator citer = this->dataPtr->cameras.begin();
+  auto citer = this->dataPtr->cameras.begin();
   for (std::vector<std::string>::const_iterator fiter = _filenames.begin();
        fiter != _filenames.end(); ++fiter, ++citer)
   {

@@ -81,7 +81,8 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
     topicName += this->ParentName() + "/" + this->Name() + "/imu";
     boost::replace_all(topicName, "::", "/");
 
-    this->dataPtr->pub = this->dataPtr->node->Advertise<msgs::IMU>(topicName, 500);
+    this->dataPtr->pub =
+      this->dataPtr->node->Advertise<msgs::IMU>(topicName, 500);
   }
 
   // Get the imu element pointer
@@ -439,8 +440,10 @@ bool ImuSensor::UpdateImpl(bool /*_force*/)
       (imuWorldLinearVel - this->dataPtr->lastLinearVel) / dt);
 
     // Add contribution from gravity
-    this->dataPtr->linearAcc -= imuPose.Rot().Inverse().RotateVector(this->dataPtr->gravity);
-    msgs::Set(this->dataPtr->imuMsg.mutable_linear_acceleration(), this->dataPtr->linearAcc);
+    this->dataPtr->linearAcc -= imuPose.Rot().Inverse().RotateVector(
+        this->dataPtr->gravity);
+    msgs::Set(this->dataPtr->imuMsg.mutable_linear_acceleration(),
+        this->dataPtr->linearAcc);
 
     // Set the IMU orientation
     msgs::Set(this->dataPtr->imuMsg.mutable_orientation(),
@@ -455,23 +458,28 @@ bool ImuSensor::UpdateImpl(bool /*_force*/)
       {
         case IMU_ANGVEL_X_NOISE_RADIANS_PER_S:
           this->dataPtr->imuMsg.mutable_angular_velocity()->set_x(
-            keyNoise.second->Apply(this->dataPtr->imuMsg.angular_velocity().x()));
+            keyNoise.second->Apply(
+              this->dataPtr->imuMsg.angular_velocity().x()));
           break;
         case IMU_ANGVEL_Y_NOISE_RADIANS_PER_S:
           this->dataPtr->imuMsg.mutable_angular_velocity()->set_y(
-            keyNoise.second->Apply(this->dataPtr->imuMsg.angular_velocity().y()));
+            keyNoise.second->Apply(
+              this->dataPtr->imuMsg.angular_velocity().y()));
           break;
         case IMU_ANGVEL_Z_NOISE_RADIANS_PER_S:
           this->dataPtr->imuMsg.mutable_angular_velocity()->set_z(
-            keyNoise.second->Apply(this->dataPtr->imuMsg.angular_velocity().z()));
+            keyNoise.second->Apply(
+              this->dataPtr->imuMsg.angular_velocity().z()));
           break;
         case IMU_LINACC_X_NOISE_METERS_PER_S_SQR:
           this->dataPtr->imuMsg.mutable_linear_acceleration()->set_x(
-            keyNoise.second->Apply(this->dataPtr->imuMsg.linear_acceleration().x()));
+            keyNoise.second->Apply(
+              this->dataPtr->imuMsg.linear_acceleration().x()));
           break;
         case IMU_LINACC_Y_NOISE_METERS_PER_S_SQR:
           this->dataPtr->imuMsg.mutable_linear_acceleration()->set_y(
-            keyNoise.second->Apply(this->dataPtr->imuMsg.linear_acceleration().y()));
+            keyNoise.second->Apply(
+              this->dataPtr->imuMsg.linear_acceleration().y()));
           break;
         case IMU_LINACC_Z_NOISE_METERS_PER_S_SQR:
           this->dataPtr->imuMsg.mutable_linear_acceleration()->set_z(

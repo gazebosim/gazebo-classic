@@ -119,7 +119,8 @@ void ContactSensor::Load(const std::string &_worldName)
     // this sensor
     physics::ContactManager *mgr =
         this->dataPtr->world->GetPhysicsEngine()->GetContactManager();
-    std::string topic = mgr->CreateFilter(filterName, this->dataPtr->collisions);
+    std::string topic = mgr->CreateFilter(filterName,
+        this->dataPtr->collisions);
     if (!this->dataPtr->contactSub)
     {
       this->dataPtr->contactSub = this->dataPtr->node->Subscribe(topic,
@@ -198,7 +199,8 @@ bool ContactSensor::UpdateImpl(bool /*_force*/)
   this->dataPtr->lastMeasurementTime = this->dataPtr->world->GetSimTime();
 
   // Generate a outgoing message only if someone is listening.
-  if (this->dataPtr->contactsPub && this->dataPtr->contactsPub->HasConnections())
+  if (this->dataPtr->contactsPub &&
+      this->dataPtr->contactsPub->HasConnections())
   {
     msgs::Set(this->dataPtr->contactsMsg.mutable_time(),
               this->dataPtr->lastMeasurementTime);

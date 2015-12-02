@@ -52,7 +52,6 @@ GpuRaySensor::GpuRaySensor()
 : Sensor(*new GpuRaySensorPrivate, sensors::IMAGE),
   dataPtr(std::static_pointer_cast<GpuRaySensorPrivate>(this->dPtr))
 {
-
   this->dataPtr->rendered = false;
   this->dataPtr->active = false;
   this->dataPtr->connections.push_back(
@@ -207,8 +206,10 @@ void GpuRaySensor::Init()
     if ((this->dataPtr->horzRayCount * this->dataPtr->vertRayCount) <
         (this->dataPtr->horzRangeCount * this->dataPtr->vertRangeCount))
     {
-      this->dataPtr->horzRayCount = std::max(this->dataPtr->horzRayCount, this->dataPtr->horzRangeCount);
-      this->dataPtr->vertRayCount = std::max(this->dataPtr->vertRayCount, this->dataPtr->vertRangeCount);
+      this->dataPtr->horzRayCount =
+        std::max(this->dataPtr->horzRayCount, this->dataPtr->horzRangeCount);
+      this->dataPtr->vertRayCount =
+        std::max(this->dataPtr->vertRayCount, this->dataPtr->vertRangeCount);
     }
 
     if (this->dataPtr->laserCam->IsHorizontal())

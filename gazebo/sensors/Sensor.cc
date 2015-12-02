@@ -127,7 +127,8 @@ void Sensor::Load(const std::string &_worldName)
   this->dPtr->lastUpdateTime = common::Time(0.0);
 
   this->dPtr->node->Init(this->dPtr->world->GetName());
-  this->pdPtr->sensorPub = this->dPtr->node->Advertise<msgs::Sensor>("~/sensor");
+  this->pdPtr->sensorPub =
+    this->dPtr->node->Advertise<msgs::Sensor>("~/sensor");
 }
 
 //////////////////////////////////////////////////

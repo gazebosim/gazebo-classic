@@ -149,8 +149,9 @@ void WideAngleCameraSensor::Load(const std::string &_worldName)
   this->dataPtr->lensPub = this->dataPtr->node->Advertise<msgs::CameraLens>(
     lensTopicName+"info", 1);
 
-  this->dataPtr->lensSub = this->dataPtr->node->Subscribe(lensTopicName + "control",
-      &WideAngleCameraSensor::OnCtrlMessage, this);
+  this->dataPtr->lensSub =
+    this->dataPtr->node->Subscribe(lensTopicName + "control",
+        &WideAngleCameraSensor::OnCtrlMessage, this);
 }
 
 //////////////////////////////////////////////////

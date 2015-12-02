@@ -97,8 +97,9 @@ void RaySensor::Load(const std::string &_worldName)
   this->dataPtr->laserCollision->SetRelativePose(this->dataPtr->pose);
   this->dataPtr->laserCollision->SetInitialRelativePose(this->dataPtr->pose);
 
-  this->dataPtr->laserShape = boost::dynamic_pointer_cast<physics::MultiRayShape>(
-                     this->dataPtr->laserCollision->GetShape());
+  this->dataPtr->laserShape =
+    boost::dynamic_pointer_cast<physics::MultiRayShape>(
+        this->dataPtr->laserCollision->GetShape());
 
   GZ_ASSERT(this->dataPtr->laserShape != NULL,
       "Unable to get the laser shape from the multi-ray collision.");
@@ -162,7 +163,10 @@ ignition::math::Angle RaySensor::AngleMin() const
 ignition::math::Angle RaySensor::AngleMax() const
 {
   if (this->dataPtr->laserShape)
-    return ignition::math::Angle(this->dataPtr->laserShape->GetMaxAngle().Radian());
+  {
+    return ignition::math::Angle(
+        this->dataPtr->laserShape->GetMaxAngle().Radian());
+  }
   else
     return -1;
 }

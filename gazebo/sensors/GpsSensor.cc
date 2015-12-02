@@ -123,7 +123,8 @@ void GpsSensor::Init()
 {
   Sensor::Init();
 
-  this->dataPtr->sphericalCoordinates = this->dataPtr->world->GetSphericalCoordinates();
+  this->dataPtr->sphericalCoordinates =
+    this->dataPtr->world->GetSphericalCoordinates();
 }
 
 //////////////////////////////////////////////////
