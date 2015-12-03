@@ -435,77 +435,6 @@ TEST_F(TransportTest, IfaceGetAdvertisedTopics)
 }
 
 /////////////////////////////////////////////////
-// Test error cases
-TEST_F(TransportTest, Errors)
-{
-  Load("worlds/empty.world");
-  transport::NodePtr testNode = transport::NodePtr(new transport::Node());
-  testNode->Init("default");
-  transport::PublisherPtr scenePub;
-
-  transport::SubscriberPtr statsSub =
-    testNode->Subscribe("~/world_stats", &ReceiveWorldStatsMsg);
-  EXPECT_STREQ("/gazebo/default/world_stats", statsSub->GetTopic().c_str());
-
-  // This generates a warning message
-  // EXPECT_THROW(testNode->Advertise<math::Vector3>("~/scene"),
-  //             common::Exception);
-
-  scenePub = testNode->Advertise<msgs::Scene>("~/scene");
-  EXPECT_THROW(testNode->Advertise<msgs::Factory>("~/scene"),
-               common::Exception);
-
-  transport::PublisherPtr factoryPub =
-    testNode->Advertise<msgs::Factory>("~/factory");
-  factoryPub->WaitForConnection();
-  EXPECT_EQ(static_cast<unsigned int>(0), factoryPub->GetOutgoingCount());
-  EXPECT_STREQ("/gazebo/default/factory", factoryPub->GetTopic().c_str());
-  EXPECT_STREQ("gazebo.msgs.Factory", factoryPub->GetMsgType().c_str());
-
-  EXPECT_STREQ("default", testNode->GetTopicNamespace().c_str());
-  EXPECT_STREQ("/gazebo/default/factory",
-               testNode->DecodeTopicName("~/factory").c_str());
-  EXPECT_STREQ("~/factory",
-               testNode->EncodeTopicName("/gazebo/default/factory").c_str());
-
-  // Get the original URI
-  char *uri = getenv("GAZEBO_MASTER_URI");
-  std::string origURI = "GAZEBO_MASTER_URI=";
-  if (uri)
-    origURI += uri;
-
-  int i = 0;
-  while (!g_worldStatsMsg && !g_sceneMsg && !g_worldStatsDebugMsg && i < 20)
-  {
-    common::Time::MSleep(100);
-    ++i;
-  }
-  EXPECT_LT(i, 20);
-
-  putenv(const_cast<char*>("GAZEBO_MASTER_URI="));
-  std::string masterHost;
-  unsigned int masterPort;
-  EXPECT_FALSE(transport::get_master_uri(masterHost, masterPort));
-  EXPECT_STREQ("localhost", masterHost.c_str());
-  EXPECT_EQ(static_cast<unsigned int>(11345), masterPort);
-
-  // restore original URI
-  putenv(const_cast<char*>(origURI.c_str()));
-
-  transport::clear_buffers();
-  transport::pause_incoming(true);
-  transport::TopicManager::Instance()->ProcessNodes();
-  transport::pause_incoming(false);
-
-  transport::stop();
-  EXPECT_TRUE(transport::init(masterHost, masterPort));
-
-  scenePub.reset();
-  statsSub.reset();
-  testNode.reset();
-}
-
-/////////////////////////////////////////////////
 // Test latching
 TEST_F(TransportTest, Latching)
 {
@@ -666,6 +595,77 @@ TEST_F(TransportTest, Latching)
   EXPECT_EQ(g_latchCreatedAfterPub, 3);
   EXPECT_EQ(g_noLatchCreatedAfterPub, 2);
   EXPECT_EQ(g_latchCreatedAfterPub2, 3);
+}
+
+/////////////////////////////////////////////////
+// Test error cases
+TEST_F(TransportTest, Errors)
+{
+  Load("worlds/empty.world");
+  transport::NodePtr testNode = transport::NodePtr(new transport::Node());
+  testNode->Init("default");
+  transport::PublisherPtr scenePub;
+
+  transport::SubscriberPtr statsSub =
+    testNode->Subscribe("~/world_stats", &ReceiveWorldStatsMsg);
+  EXPECT_STREQ("/gazebo/default/world_stats", statsSub->GetTopic().c_str());
+
+  // This generates a warning message
+  // EXPECT_THROW(testNode->Advertise<math::Vector3>("~/scene"),
+  //             common::Exception);
+
+  scenePub = testNode->Advertise<msgs::Scene>("~/scene");
+  EXPECT_THROW(testNode->Advertise<msgs::Factory>("~/scene"),
+               common::Exception);
+
+  transport::PublisherPtr factoryPub =
+    testNode->Advertise<msgs::Factory>("~/factory");
+  factoryPub->WaitForConnection();
+  EXPECT_EQ(static_cast<unsigned int>(0), factoryPub->GetOutgoingCount());
+  EXPECT_STREQ("/gazebo/default/factory", factoryPub->GetTopic().c_str());
+  EXPECT_STREQ("gazebo.msgs.Factory", factoryPub->GetMsgType().c_str());
+
+  EXPECT_STREQ("default", testNode->GetTopicNamespace().c_str());
+  EXPECT_STREQ("/gazebo/default/factory",
+               testNode->DecodeTopicName("~/factory").c_str());
+  EXPECT_STREQ("~/factory",
+               testNode->EncodeTopicName("/gazebo/default/factory").c_str());
+
+  // Get the original URI
+  char *uri = getenv("GAZEBO_MASTER_URI");
+  std::string origURI = "GAZEBO_MASTER_URI=";
+  if (uri)
+    origURI += uri;
+
+  int i = 0;
+  while (!g_worldStatsMsg && !g_sceneMsg && !g_worldStatsDebugMsg && i < 20)
+  {
+    common::Time::MSleep(100);
+    ++i;
+  }
+  EXPECT_LT(i, 20);
+
+  putenv(const_cast<char*>("GAZEBO_MASTER_URI="));
+  std::string masterHost;
+  unsigned int masterPort;
+  EXPECT_FALSE(transport::get_master_uri(masterHost, masterPort));
+  EXPECT_STREQ("localhost", masterHost.c_str());
+  EXPECT_EQ(static_cast<unsigned int>(11345), masterPort);
+
+  // restore original URI
+  putenv(const_cast<char*>(origURI.c_str()));
+
+  transport::clear_buffers();
+  transport::pause_incoming(true);
+  transport::TopicManager::Instance()->ProcessNodes();
+  transport::pause_incoming(false);
+
+  transport::stop();
+  EXPECT_TRUE(transport::init(masterHost, masterPort));
+
+  scenePub.reset();
+  statsSub.reset();
+  testNode.reset();
 }
 
 /////////////////////////////////////////////////
