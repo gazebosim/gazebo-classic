@@ -529,6 +529,11 @@ void JointInspector::Open()
   if (msg)
     this->originalDataMsg.CopyFrom(*msg);
 
+  // Make sure the dialog opens with the proper fields showing
+  this->blockSignals(true);
+  this->RestoreOriginalData();
+  this->blockSignals(false);
+
   this->move(QCursor::pos());
   this->show();
 }
@@ -559,9 +564,12 @@ void JointInspector::RestoreOriginalData()
   this->Update(jointPtr);
 
   // Update joint type and parent icon
+  // Only unblock signals if they are not blocked from outside
+  bool unblock = !this->signalsBlocked();
   this->blockSignals(true);
   this->OnJointTypeChanged(tr(msgs::Joint_Type_Name(jointPtr->type()).c_str()));
-  this->blockSignals(false);
+  if (unblock)
+    this->blockSignals(false);
 
   // Update custom widgets
   std::string originalParent =
