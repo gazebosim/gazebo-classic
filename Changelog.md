@@ -29,6 +29,9 @@
 1 Added Ignition Transport dependency.
   * [Pull request #1930](https://bitbucket.org/osrf/gazebo/pull-request/1930)
 
+1 Implemented transport clear buffers
+  * [Pull request #2017](https://bitbucket.org/osrf/gazebo/pull-request/2017)
+
 1. KeyEvent constructor should be in a source file. Removed a few visibility
 flags from c functions. Windows did not like `CPPTYPE_*` in
 `gazebo/gui/ConfigWidget.cc`, so I replaced it with `TYPE_*`.
