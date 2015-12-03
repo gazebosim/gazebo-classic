@@ -35,8 +35,6 @@
 
 #include "gazebo/msgs/msgs.hh"
 
-#include "gazebo/math/Vector3.hh"
-
 #include "gazebo/sensors/RFIDTag.hh"
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/RFIDSensor.hh"
@@ -159,12 +157,6 @@ void RFIDSensor::EvaluateTags()
     //     << " z:" << pos.pos.z << std::endl;
     this->CheckTagRange(pos);
   }
-}
-
-//////////////////////////////////////////////////
-bool RFIDSensor::CheckTagRange(const math::Pose &_pose)
-{
-  return this->CheckTagRange(_pose.Ign());
 }
 
 //////////////////////////////////////////////////
