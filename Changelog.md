@@ -27,7 +27,11 @@
     * [Pull request #1931](https://bitbucket.org/osrf/gazebo/pull-request/1931)
 
 1 Added Ignition Transport dependency.
-  * [Pull request #1930](https://bitbucket.org/osrf/gazebo/pull-request/1930)
+    * [Pull request #1930](https://bitbucket.org/osrf/gazebo/pull-request/1930)
+
+1 Make latched subscribers receive the message only once
+    * [Issue #1789](https://bitbucket.org/osrf/gazebo/issue/1789)
+    * [Pull request #2016](https://bitbucket.org/osrf/gazebo/pull-request/2016)
 
 1. KeyEvent constructor should be in a source file. Removed a few visibility
 flags from c functions. Windows did not like `CPPTYPE_*` in
@@ -43,7 +47,6 @@ flags from c functions. Windows did not like `CPPTYPE_*` in
 1. Resolve issue #1702
     * [Issue #1702](https://bitbucket.org/osrf/gazebo/issue/1702)
     * [Pull request #1905](https://bitbucket.org/osrf/gazebo/pull-request/1905)
-    * [Pull request #1912](https://bitbucket.org/osrf/gazebo/pull-request/1912)
     * [Pull request #1913](https://bitbucket.org/osrf/gazebo/pull-request/1913)
     * [Pull request #1914](https://bitbucket.org/osrf/gazebo/pull-request/1914)
 

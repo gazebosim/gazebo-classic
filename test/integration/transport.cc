@@ -599,6 +599,8 @@ TEST_F(TransportTest, Latching)
 
 /////////////////////////////////////////////////
 // Test error cases
+// This test must be run after all the others, because it messes up
+// GAZEO_MASTER_URI
 TEST_F(TransportTest, Errors)
 {
   Load("worlds/empty.world");
