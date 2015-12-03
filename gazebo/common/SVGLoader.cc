@@ -93,13 +93,13 @@ ignition::math::Matrix3d ParseTransformMatrixStr(
             << std::endl;
       return ignition::math::Matrix3d::Identity;
     }
-    double v00 = stod(numbers[0]);
-    double v10 = stod(numbers[1]);
-    double v01 = stod(numbers[2]);
-    double v11 = stod(numbers[3]);
-    double v02 = stod(numbers[4]);
-    double v12 = stod(numbers[5]);
-    ignition::math::Matrix3d m(v00, v01, v02, v10, v11, v12, 0, 0, 1);
+    double a = stod(numbers[0]);  // 00
+    double b = stod(numbers[1]);  // 10
+    double c = stod(numbers[2]);  // 01
+    double d = stod(numbers[3]);  // 11
+    double e = stod(numbers[4]);  // 02
+    double f = stod(numbers[5]);  // 12
+    ignition::math::Matrix3d m(a, c, e, b, d, f, 0, 0, 1);
     return m;
   }
 
@@ -172,7 +172,7 @@ ignition::math::Matrix3d ParseTransformMatrixStr(
     {
       y = stod(numbers[1]);
     }
-    ignition::math::Matrix3d m(1, 0, 0, 1, x, y, 0, 0, 1);
+    ignition::math::Matrix3d m(1, 0, x, 0, 1, y, 0, 0, 1);
     return m;
   }
   // rotate(<a> [<x> <y>]) angle in degrees, center x and y
@@ -199,8 +199,8 @@ ignition::math::Matrix3d ParseTransformMatrixStr(
       y = stod(numbers[2]);
     }
     // we apply a translation to x, y, the rotation and the translation -x,-y
-    ignition::math::Matrix3d transToXy(1, 0, 0, 1, x, y, 0, 0, 1);
-    ignition::math::Matrix3d transFromXy(1, 0, 0, 1, -x, -y, 0, 0, 1);
+    ignition::math::Matrix3d transToXy(1, 0, x, 0, 1, y, 0, 0, 1);
+    ignition::math::Matrix3d transFromXy(1, 0, -x, 0, 1, -y, 0, 0, 1);
     ignition::math::Matrix3d rotate(cosa, -sina, 0, sina, cosa, 0, 0, 0, 1);
     ignition::math::Matrix3d m = transToXy * rotate * transFromXy;
     return m;
@@ -739,7 +739,7 @@ void SVGLoader::GetPathCommands(const std::vector<std::string> &_tokens,
       for (auto  &polyPoint: polyline)
       {
         // make a 3d vector form the 2d point
-        ignition::math::Vector3d point3(polyPoint.X(), polyPoint.Y(), 0);
+        ignition::math::Vector3d point3(polyPoint.X(), polyPoint.Y(), 1);
         // matrix multiply to get the new point, then save new coords in place
         auto transformed = _path.transform * point3;
         polyPoint.X(transformed.X());
