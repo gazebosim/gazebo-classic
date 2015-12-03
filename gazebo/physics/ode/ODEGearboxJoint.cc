@@ -49,6 +49,8 @@ void ODEGearboxJoint::Init()
     LinkPtr link = this->model->GetLink(this->referenceBody);
     this->SetReferenceBody(link);
   }
+  this->SetAxis(0, math::Vector3());
+  this->SetAxis(1, math::Vector3());
 }
 
 //////////////////////////////////////////////////
@@ -149,6 +151,8 @@ void ODEGearboxJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
   math::Quaternion axisFrame = this->GetAxisFrame(_index);
   math::Vector3 globalAxis = axisFrame.RotateVector(_axis);
 
+  LinkPtr refBody = this->model->GetLink(this->referenceBody);
+
   if (_index == 0)
   {
     // check if a joint exists between parent link and referenceBody
@@ -156,114 +160,44 @@ void ODEGearboxJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
     /// \TODO:  To release, we need to do something to keep
     /// backwards compatible.
     bool found = false;
-    LinkPtr link = this->model->GetLink(this->referenceBody);
-    // check parent link against reference body's parent joints
-    if (link)
+    gzdbg << "ref body: " << refBody->GetName() << "\n";
+    // check parent refBody against reference body's parent joints
+    if (refBody)
     {
-      for (const auto &j : link->GetParentJoints())
+      for (const auto &refBodyParentJoint : refBody->GetParentJoints())
       {
-        // GetParentJoints returns joints that connects to
-        // this joint's parent link for a normal joint,
-        // but gearbox is not really a normal joint, so check
-        // both parent and child link of the parent joint
-        if (j->GetParent() && j->GetChild())
-          gzerr << j->GetParent()->GetName()
-                << " : " << j->GetChild()->GetName()
-                << " : " << this->parentLink->GetName() << "\n";
-        if (j->GetParent() &&
-            j->GetParent().get() == this->parentLink.get())
+        if (refBodyParentJoint->GetParent() &&
+            refBodyParentJoint->GetParent().get() == this->parentLink.get())
         {
-          globalAxis = -j->GetGlobalAxis(_index);
+          globalAxis = refBodyParentJoint->GetGlobalAxis(_index);
           found = true;
-          gzerr << globalAxis << "\n";
-          break;
-        }
-        else if (j->GetChild() &&
-                 j->GetChild().get() == this->parentLink.get())
-        {
-          globalAxis = j->GetGlobalAxis(_index);
-          found = true;
-          gzerr << globalAxis << "\n";
+          gzdbg << "ref parent: [" << refBodyParentJoint->GetParent()->GetName()
+                << "] parent: [" << this->parentLink->GetName()
+                << "] axis: [" << globalAxis
+                << "]\n";
           break;
         }
       }
     }
-    // check parent link against reference body's parent joints
-    if (!found && link)
+    // check parent link against reference body's child joints
+    if (!found)
     {
-      for (const auto &j : link->GetChildJoints())
+      for (const auto &refBodyChildJoint : refBody->GetChildJoints())
       {
-        if (j->GetChild())
-          gzerr << j->GetChild()->GetName()
-                << " : " << this->parentLink->GetName() << "\n";
-        if (j->GetParent() &&
-            j->GetParent().get() == this->parentLink.get())
+        if (refBodyChildJoint->GetChild() &&
+            refBodyChildJoint->GetChild().get() == this->parentLink.get())
         {
-          globalAxis = j->GetGlobalAxis(_index);
+          globalAxis = refBodyChildJoint->GetGlobalAxis(_index);
           found = true;
-          gzerr << globalAxis << "\n";
-          break;
-        }
-        else if (j->GetChild() &&
-                 j->GetChild().get() == this->parentLink.get())
-        {
-          globalAxis = j->GetGlobalAxis(_index);
-          found = true;
-          gzerr << globalAxis << "\n";
+          gzdbg << "ref child: [" << refBodyChildJoint->GetChild()->GetName()
+                << "] parent: [" << this->parentLink->GetName()
+                << "] axis: [" << globalAxis
+                << "]\n";
           break;
         }
       }
     }
 
-/*
-    // check if a joint exists between parent link and referenceBodyParent
-    link = this->model->GetLink(this->referenceBodyParent);
-    if (!found && link)
-    {
-      for (const auto &j : link->GetParentJoints())
-      {
-        if (j->GetParent() &&
-            j->GetParent().get() == this->parentLink.get())
-        {
-          globalAxis = j->GetGlobalAxis(_index);
-          found = true;
-          gzerr << globalAxis << "\n";
-          break;
-        }
-        else if (j->GetChild() &&
-                 j->GetChild().get() == this->parentLink.get())
-        {
-          globalAxis = j->GetGlobalAxis(_index);
-          found = true;
-          gzerr << globalAxis << "\n";
-          break;
-        }
-      }
-    }
-    // check if a joint exists between parent link and referenceBodyParent
-    if (!found && link)
-    {
-      for (const auto &j : link->GetChildJoints())
-      {
-        if (j->GetParent() &&
-            j->GetParent().get() == this->parentLink.get())
-        {
-          globalAxis = j->GetGlobalAxis(_index);
-          found = true;
-          gzerr << globalAxis << "\n";
-          break;
-        }
-        else if (j->GetChild() &&
-                 j->GetChild().get() == this->parentLink.get())
-        {
-          globalAxis = j->GetGlobalAxis(_index);
-          found = true;
-          gzerr << globalAxis << "\n";
-          break;
-        }
-      }
-    }
-*/
     if (!found)
       gzerr << "not found\n";
 
@@ -278,99 +212,39 @@ void ODEGearboxJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
     /// \TODO:  To release, we need to do something to keep
     /// backwards compatible.
     bool found = false;
-    LinkPtr link = this->model->GetLink(this->referenceBody);
     // check child link against reference body's parent joints
-    if (link)
+    for (const auto &refBodyParentJoint : refBody->GetParentJoints())
     {
-      for (const auto &j : link->GetParentJoints())
+      if (refBodyParentJoint->GetParent() &&
+          refBodyParentJoint->GetParent().get() == this->childLink.get())
       {
-        if (j->GetParent() && j->GetParent().get() == this->childLink.get())
-        {
-          globalAxis = j->GetGlobalAxis(_index);
-          found = true;
-          gzerr << globalAxis << "\n";
-          break;
-        }
-        else if (j->GetChild() && j->GetChild().get() == this->childLink.get())
-        {
-          globalAxis = j->GetGlobalAxis(_index);
-          found = true;
-          gzerr << globalAxis << "\n";
-          break;
-        }
+        globalAxis = refBodyParentJoint->GetGlobalAxis(_index);
+        found = true;
+        gzdbg << "ref parent: [" << refBodyParentJoint->GetParent()->GetName()
+              << "] child: [" << this->childLink->GetName()
+              << "] axis: [" << globalAxis
+              << "]\n";
+        break;
       }
     }
     // check child link against reference body's child joints
-    if (!found && link)
+    if (!found)
     {
-      for (const auto &j : link->GetChildJoints())
+      for (const auto &refBodyChildJoint : refBody->GetChildJoints())
       {
-        if (j->GetParent() && j->GetParent().get() == this->childLink.get())
+        if (refBodyChildJoint->GetChild() &&
+            refBodyChildJoint->GetChild().get() == this->childLink.get())
         {
-          globalAxis = j->GetGlobalAxis(_index);
+          globalAxis = refBodyChildJoint->GetGlobalAxis(_index);
           found = true;
-          gzerr << globalAxis << "\n";
-          break;
-        }
-        else if (j->GetChild() && j->GetChild().get() == this->childLink.get())
-        {
-          globalAxis = j->GetGlobalAxis(_index);
-          found = true;
-          gzerr << globalAxis << "\n";
+          gzdbg << "ref child: [" << refBodyChildJoint->GetChild()->GetName()
+                << "] child: [" << this->childLink->GetName()
+                << "] axis: [" << globalAxis
+                << "]\n";
           break;
         }
       }
     }
-
-/*
-    // check if a joint exists between parent link and referenceBodyChild
-    link = this->model->GetLink(this->referenceBodyChild);
-    if (!found && link)
-    {
-      for (const auto &j : link->GetParentJoints())
-      {
-        if (j->GetParent() &&
-            j->GetParent().get() == this->childLink.get())
-        {
-          globalAxis = j->GetGlobalAxis(_index);
-          found = true;
-          gzerr << globalAxis << "\n";
-          break;
-        }
-        else if (j->GetChild() &&
-                 j->GetChild().get() == this->childLink.get())
-        {
-          globalAxis = j->GetGlobalAxis(_index);
-          found = true;
-          gzerr << globalAxis << "\n";
-          break;
-        }
-      }
-    }
-    // check if a joint exists between parent link and referenceBodyParent
-    if (!found && link)
-    {
-      for (const auto &j : link->GetChildJoints())
-      {
-        if (j->GetParent() &&
-            j->GetParent().get() == this->childLink.get())
-        {
-          globalAxis = j->GetGlobalAxis(_index);
-          found = true;
-          gzerr << globalAxis << "\n";
-          break;
-        }
-        else if (j->GetChild() &&
-             j->GetChild().get() == this->childLink.get())
-        {
-          globalAxis = j->GetGlobalAxis(_index);
-          found = true;
-          gzerr << globalAxis << "\n";
-          break;
-        }
-      }
-    }
-*/
 
     if (!found)
       gzerr << "not found\n";
