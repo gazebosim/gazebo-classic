@@ -45,6 +45,9 @@ class ConfigWidget_TEST : public QTestFixture
   /// \brief Test setting visibility of a field in config widget.
   private slots: void ConfigWidgetVisible();
 
+  /// \brief Test setting a field to be read-only in custom config widget.
+  private slots: void CustomConfigWidgetReadOnly();
+
   /// \brief Test setting a field to be read-only in config widget.
   private slots: void ConfigWidgetReadOnly();
 
