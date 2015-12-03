@@ -863,7 +863,8 @@ void ODEJoint::ApplyImplicitStiffnessDamping()
     double dAngle = 2.0 * this->GetVelocity(i) * dt;
     angle += dAngle;
 
-    if ((math::equal(this->dissipationCoefficient[i], 0.0) &&
+    if (this->implicitDampingState[i] != ODEJoint::NONE &&
+        (math::equal(this->dissipationCoefficient[i], 0.0) &&
          math::equal(this->stiffnessCoefficient[i], 0.0)) ||
         angle >= this->upperLimit[i].Radian() ||
         angle <= this->lowerLimit[i].Radian())
