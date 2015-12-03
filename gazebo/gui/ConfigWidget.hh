@@ -127,14 +127,15 @@ namespace gazebo
       public: void SetDensity(double _density);
 
       /// \brief Accessor for the widget's density value.
+      /// \return The density.
       public: double Density() const;
 
-      /// brief Callback when the density combo box is changed.
+      /// \brief Callback when the density combo box is changed.
       /// \param[in] _text New density type in string.
       private slots: void OnComboBoxChanged(const QString _text);
 
-      /// brief Callback when the density spin box is changed.
-      /// \param[in] _text New density type in string.
+      /// \brief Callback when the density spin box is changed.
+      /// \param[in] _text New density value in string.
       private slots: void OnSpinBoxChanged(const QString _text);
 
       /// \brief Signal emitted when density has changed.

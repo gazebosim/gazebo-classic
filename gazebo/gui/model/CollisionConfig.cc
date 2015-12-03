@@ -258,9 +258,9 @@ void CollisionConfig::AddCollision(const std::string &_name,
       configData, SLOT(OnGeometryChanged()));
 
   connect(configData, SIGNAL(CollisionChanged(
-          const std::string &, const std::string &)),
+      const std::string &, const std::string &)),
       this, SLOT(OnCollisionChanged(
-          const std::string &, const std::string &)));
+      const std::string &, const std::string &)));
 
   this->configs[this->counter] = configData;
   this->counter++;
