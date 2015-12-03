@@ -600,5 +600,40 @@ void MainWindow_TEST::UserCameraJoystick()
   delete mainWindow;
 }
 
+/////////////////////////////////////////////////
+void MainWindow_TEST::MinimumSize()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/empty.world", false, false, true);
+
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+
+  // Create the main window.
+  mainWindow->Load();
+  mainWindow->Init();
+
+  // Check that minimum size is smaller then a predefined size
+  // This desired values are arbitrary, but increasing the minimum
+  // size could create problems on small screens (such as laptop's).
+  // See https://bitbucket.org/osrf/gazebo/issues/1706 for more info.
+  int desiredMinimumWidth  = 700;
+  int desiredMinimumHeight = 710;
+  QVERIFY(mainWindow->minimumSize().width() <= desiredMinimumWidth);
+  QVERIFY(mainWindow->minimumSize().height() <= desiredMinimumHeight);
+
+  // Check that resizing to a small window (10x10) actually result
+  // in a size that is smaller then desiredMinimum*
+  mainWindow->resize(10, 10);
+
+  QVERIFY(mainWindow->width() <= desiredMinimumWidth);
+  QVERIFY(mainWindow->height() <= desiredMinimumHeight);
+
+  mainWindow->close();
+  delete mainWindow;
+}
+
 // Generate a main function for the test
 QTEST_MAIN(MainWindow_TEST)
