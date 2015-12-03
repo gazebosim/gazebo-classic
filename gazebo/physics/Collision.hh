@@ -14,22 +14,9 @@
  * limitations under the License.
  *
 */
-/* Desc: Collision class
- * Author: Nate Koenig
- * Date: 13 Feb 2006
- */
+#ifndef _GAZEBO_PHYSICS_COLLISION_HH_
+#define _GAZEBO_PHYSICS_COLLISION_HH_
 
-#ifndef _COLLISION_HH_
-#define _COLLISION_HH_
-
-#include <string>
-#include <vector>
-
-#include "gazebo/common/Event.hh"
-#include "gazebo/common/CommonTypes.hh"
-
-#include "gazebo/physics/PhysicsTypes.hh"
-#include "gazebo/physics/CollisionState.hh"
 #include "gazebo/physics/Entity.hh"
 #include "gazebo/util/system.hh"
 
@@ -37,6 +24,9 @@ namespace gazebo
 {
   namespace physics
   {
+    // Forward declare private data class.
+    class CollisionPrivate;
+
     /// \addtogroup gazebo_physics
     /// \{
 
@@ -66,7 +56,7 @@ namespace gazebo
 
       /// \brief Set the encapsulated collsion object.
       /// \param[in] _placeable True to make the object movable.
-      public: void SetCollision(bool _placeable);
+      public: void SetCollision(const bool _placeable);
 
       /// \brief Return whether this collision is movable.
       /// Example on an immovable object is a ray.
@@ -75,36 +65,58 @@ namespace gazebo
 
       /// \brief Set the category bits, used during collision detection.
       /// \param[in] _bits The bits to set.
-      public: virtual void SetCategoryBits(unsigned int _bits) = 0;
+      public: virtual void SetCategoryBits(const unsigned int _bits) = 0;
 
       /// \brief Set the collide bits, used during collision detection.
       /// \param[in] _bits The bits to set.
-      public: virtual void SetCollideBits(unsigned int _bits) = 0;
+      public: virtual void SetCollideBits(const unsigned int _bits) = 0;
 
       /// \brief Set the laser retro reflectiveness.
       /// \param[in] _retro The laser retro value.
-      public: void SetLaserRetro(float _retro);
+      public: void SetLaserRetro(const float _retro);
 
       /// \brief Get the laser retro reflectiveness
       /// \return The laser retro value.
-      public: float GetLaserRetro() const;
+      /// \deprecated See LaserRetro()
+      public: float GetLaserRetro() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the laser retro reflectiveness
+      /// \return The laser retro value.
+      public: float LaserRetro() const;
 
       /// \brief Get the link this collision belongs to.
       /// \return The parent Link.
-      public: LinkPtr GetLink() const;
+      /// \deprecated See Link();
+      public: LinkPtr GetLink() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the link this collision belongs to.
+      /// \return The parent Link.
+      /// \deprecated See Link();
+      public: LinkPtr Link() const;
 
       /// \brief Get the model this collision belongs to.
       /// \return The parent model.
-      public: ModelPtr GetModel() const;
+      /// \deprecated See Model() const
+      public: ModelPtr GetModel() const GAZEBO_DEPRECATED(7.0);
 
-      /// \brief Get the bounding box for this collision.
-      /// \return The bounding box.
-      public: virtual math::Box GetBoundingBox() const = 0;
+      /// \brief Get the model this collision belongs to.
+      /// \return The parent model.
+      /// \deprecated See Model() const
+      public: ModelPtr Model() const;
+
+      // Documentation inherited
+      public: virtual ignition::math::Box BoundingBox() const = 0;
 
       /// \brief Get the shape type.
       /// \return The shape type.
       /// \sa EntityType
-      public: unsigned int GetShapeType() const;
+      /// \deprecated See ShapeType() const
+      public: unsigned int GetShapeType() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the shape type.
+      /// \return The shape type.
+      /// \sa EntityType
+      public: unsigned int ShapeType() const;
 
       /// \brief Set the shape for this collision.
       /// \param[in] _shape The shape for this collision object.
@@ -112,7 +124,12 @@ namespace gazebo
 
       /// \brief Get the collision shape.
       /// \return The collision shape.
-      public: ShapePtr GetShape() const;
+      /// \deprecated See Shape() const
+      public: ShapePtr GetShape() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the collision shape.
+      /// \return The collision shape.
+      public: ShapePtr Shape() const;
 
       /// \brief Set the scale of the collision.
       /// \param[in] _scale Scale to set the collision to.
@@ -120,42 +137,98 @@ namespace gazebo
 
       /// \brief Get the linear velocity of the collision.
       /// \return The linear velocity relative to the parent model.
-      public: virtual math::Vector3 GetRelativeLinearVel() const;
+      /// \deprecated See GetRelativeLinearVel() const
+      public: virtual math::Vector3 GetRelativeLinearVel() const
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the linear velocity of the collision.
+      /// \return The linear velocity relative to the parent model.
+      public: virtual ignition::math::Vector3d RelativeLinearVel() const;
 
       /// \brief Get the linear velocity of the collision in the world
       /// frame.
       /// \return The linear velocity of the collision in the world frame.
-      public: virtual math::Vector3 GetWorldLinearVel() const;
+      /// \deprecated See WorldLinearVel() const
+      public: virtual math::Vector3 GetWorldLinearVel() const
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the linear velocity of the collision in the world
+      /// frame.
+      /// \return The linear velocity of the collision in the world frame.
+      public: virtual ignition::math::Vector3d WorldLinearVel() const;
 
       /// \brief Get the angular velocity of the collision.
       /// \return The angular velocity of the collision.
-      public: virtual math::Vector3 GetRelativeAngularVel() const;
+      /// \deprecated See RelativeAngularVel() const
+      public: virtual math::Vector3 GetRelativeAngularVel() const
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the angular velocity of the collision.
+      /// \return The angular velocity of the collision.
+      public: virtual ignition::math::Vector3d RelativeAngularVel() const;
 
       /// \brief Get the angular velocity of the collision in the world frame.
       /// \return The angular velocity of the collision in the world frame.
-      public: virtual math::Vector3 GetWorldAngularVel() const;
+      /// \deprecated See GetWorldAngularVel() const
+      public: virtual math::Vector3 GetWorldAngularVel() const
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the angular velocity of the collision in the world frame.
+      /// \return The angular velocity of the collision in the world frame.
+      public: virtual ignition::math::Vector3d WorldAngularVel() const;
 
       /// \brief Get the linear acceleration of the collision.
       /// \return The linear acceleration of the collision.
-      public: virtual math::Vector3 GetRelativeLinearAccel() const;
+      /// \deprecated See RelativeLinearAccel();
+      public: virtual math::Vector3 GetRelativeLinearAccel() const
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the linear acceleration of the collision.
+      /// \return The linear acceleration of the collision.
+      public: virtual ignition::math::Vector3d RelativeLinearAccel() const;
 
       /// \brief Get the linear acceleration of the collision in the world
       /// frame.
       /// \return The linear acceleration of the collision in the world frame.
-      public: virtual math::Vector3 GetWorldLinearAccel() const;
+      /// \deprecated See tWorldLinearAccel() const
+      public: virtual math::Vector3 GetWorldLinearAccel() const
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the linear acceleration of the collision in the world
+      /// frame.
+      /// \return The linear acceleration of the collision in the world frame.
+      public: virtual ignition::math::Vector3d WorldLinearAccel() const;
 
       /// \brief Get the angular acceleration of the collision.
       /// \return The angular acceleration of the collision.
-      public: virtual math::Vector3 GetRelativeAngularAccel() const;
+      /// \deprecated See RelativeAngularAccel() const
+      public: virtual math::Vector3 GetRelativeAngularAccel() const
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the angular acceleration of the collision.
+      /// \return The angular acceleration of the collision.
+      public: virtual ignition::math::Vector3d RelativeAngularAccel() const;
 
       /// \brief Get the angular acceleration of the collision in the
       /// world frame.
       /// \return The angular acceleration of the collision in the world frame.
-      public: virtual math::Vector3 GetWorldAngularAccel() const;
+      /// \deprecated See GetWorldAngularAccel() const
+      public: virtual math::Vector3 GetWorldAngularAccel() const
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the angular acceleration of the collision in the
+      /// world frame.
+      /// \return The angular acceleration of the collision in the world frame.
+      public: virtual ignition::math::Vector3d WorldAngularAccel() const;
 
       /// \brief Get the collision state.
       /// \return The collision state.
-      public: CollisionState GetState();
+      /// \deprecated See State() const
+      public: CollisionState GetState() GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the collision state.
+      /// \return The collision state.
+      public: CollisionState State() const;
 
       /// \brief Set the current collision state.
       /// \param[in] The collision state.
@@ -171,18 +244,28 @@ namespace gazebo
 
       /// \brief Get the surface parameters.
       /// \return The surface parameters.
-      public: inline SurfaceParamsPtr GetSurface() const
-              {return this->surface;}
+      /// \deprecated See Surface() const
+      public: SurfaceParamsPtr GetSurface() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the surface parameters.
+      /// \return The surface parameters.
+      public: SurfaceParamsPtr Surface() const;
 
       /// \brief Number of contacts allowed for this collision.
       /// This overrides global value (in PhysicsEngine) if specified.
       /// \param[in] _maxContacts max num contacts allowed for this collision.
-      public: virtual void SetMaxContacts(unsigned int _maxContacts);
+      public: virtual void SetMaxContacts(const unsigned int _maxContacts);
 
       /// \brief returns number of contacts allowed for this collision.
       /// This overrides global value (in PhysicsEngine) if specified.
       /// \return max num contacts allowed for this collision.
-      public: virtual unsigned int GetMaxContacts();
+      /// \deprecated See MaxContacts() const
+      public: virtual unsigned int GetMaxContacts() GAZEBO_DEPRECATED(7.0);
+
+      /// \brief returns number of contacts allowed for this collision.
+      /// This overrides global value (in PhysicsEngine) if specified.
+      /// \return max num contacts allowed for this collision.
+      public: virtual unsigned int MaxContacts() const;
 
       /// \brief Indicate that the world pose should be recalculated.
       /// The recalculation will be done when Collision::GetWorldPose is
@@ -190,38 +273,15 @@ namespace gazebo
       public: void SetWorldPoseDirty();
 
       // Documentation inherited.
-      public: virtual const math::Pose &GetWorldPose() const;
+      public: virtual const ignition::math::Pose3d &WorldPose() const;
 
       /// \brief Helper function used to create a collision visual message.
       /// \return Visual message for a collision.
       private: msgs::Visual CreateCollisionVisual();
 
-      /// \brief The link this collision belongs to
-      protected: LinkPtr link;
-
-      /// \brief Flag for placeable.
-      protected: bool placeable;
-
-      /// \brief Pointer to physics::Shape.
-      protected: ShapePtr shape;
-
-      /// \brief The surface parameters.
-      protected: SurfaceParamsPtr surface;
-
-      /// \brief The laser retro value.
-      private: float laserRetro;
-
-      /// \brief Stores collision state information.
-      private: CollisionState state;
-
-      /// \brief Number of contact points allowed for this collision.
-      private: unsigned int maxContacts;
-
-      /// \brief Unique id for collision visual.
-      private: uint32_t collisionVisualId;
-
-      /// \brief True if the world pose should be recalculated.
-      private: mutable bool worldPoseDirty;
+      /// \internal
+      /// \brief Private data pointer
+      private: std::unique_ptr<CollisionPrivate> *dPtr;
     };
     /// \}
   }
