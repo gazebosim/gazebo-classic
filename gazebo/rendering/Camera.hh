@@ -567,7 +567,7 @@ namespace gazebo
 
       /// \brief Set whether this camera's position is relative to tracked
       /// models.
-      /// \param[in] _isStatic True means camera's position is relative to
+      /// \param[in] _isRelative True means camera's position is relative to
       /// tracked models.
       /// \sa TrackIsRelative()
       public: virtual void SetTrackIsRelative(const bool _isRelative);
@@ -585,20 +585,24 @@ namespace gazebo
 
       /// \brief Return the minimum distance to the tracked visual.
       /// \return Minimum distance to the model.
+      /// \sa SetTrackMinDistance(const double _dist)
       public: virtual double TrackMinDistance() const;
 
       /// \brief Return the maximum distance to the tracked visual.
       /// \return Maximum distance to the model.
+      /// \sa SetTrackMaxDistance(const double _dist)
       public: virtual double TrackMaxDistance() const;
 
       /// \brief Set the minimum distance between the camera and tracked
       /// visual.
       /// \param[in] _dist Minimum distance between camera and visual.
+      /// \sa TrackMaxDistance()
       public: virtual void SetTrackMinDistance(const double _dist);
 
       /// \brief Set the maximum distance between the camera and tracked
       /// visual.
       /// \param[in] _dist Maximum distance between camera and visual.
+      /// \sa TrackMinDistance()
       public: virtual void SetTrackMaxDistance(const double _dist);
 
       /// \brief Get whether this camera inherits the yaw rotation of the
@@ -606,13 +610,13 @@ namespace gazebo
       /// \return True if the camera inherits the yaw rotation of the tracked
       /// model.
       /// \sa SetTrackInheritYaw(bool _inheritYaw)
-      public: virtual bool GetTrackInheritYaw() const;
+      public: virtual bool TrackInheritYaw() const;
 
       /// \brief Set whether this camera inherits the yaw rotation of the
       /// tracked model.
       /// \param[in] _inheritYaw True means camera inherits the yaw rotation of
       /// the tracked model.
-      /// \sa GetTrackInheritRotation()
+      /// \sa TrackInheritYaw()
       public: virtual void SetTrackInheritYaw(bool _inheritYaw);
 
       /// \brief Implementation of the render call
@@ -642,7 +646,7 @@ namespace gazebo
       /// \return True on success
       protected: virtual bool AttachToVisualImpl(const std::string &_name,
                      bool _inheritOrientation,
-                     double _minDist= 0, double _maxDist = 0);
+                     double _minDist = 0, double _maxDist = 0);
 
       /// \brief Attach the camera to a scene node
       /// \param[in] _id ID of the visual to attach the camera to

@@ -36,6 +36,8 @@ release will remove the deprecated code.
 1. **gazebo/rendering/Camera.hh**
     + ***Removed:*** public: void SetClipDist();
     + ***Replacement:*** public: virtual void SetClipDist();
+    + ***Removed:*** public: void AttachToVisual(const std::string &_visualName, bool _inheritOrientation, double _minDist = 0.0, double _maxDist = 0.0);
+    + ***Replacement:*** public: void AttachToVisual(const std::string &_visualName, bool _inheritOrientation, double _minDist, double _maxDist);
 
 1. **gazebo/msgs/logical_camera_sensors.proto**
     + The `near` and `far` members have been replaced with `near_clip` and `far_clip`

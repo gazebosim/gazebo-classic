@@ -244,7 +244,7 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
         item2->setValue(isRelative);
         item->addSubProperty(item2);
 
-        bool inheritYaw = cam->GetTrackInheritYaw();
+        bool inheritYaw = cam->TrackInheritYaw();
         item2 = this->variantManager->addProperty(
             QVariant::Bool, tr("inherit_yaw"));
         item2->setValue(inheritYaw);

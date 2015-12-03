@@ -1916,7 +1916,7 @@ void Camera::SetTrackMaxDistance(const double _dist)
 }
 
 /////////////////////////////////////////////////
-bool Camera::GetTrackInheritYaw() const
+bool Camera::TrackInheritYaw() const
 {
   return this->dataPtr->trackInheritYaw;
 }
