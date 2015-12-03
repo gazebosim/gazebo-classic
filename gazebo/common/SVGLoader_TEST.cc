@@ -339,6 +339,31 @@ TEST_F(SVGLoader, Transforms3)
 }
 
 /////////////////////////////////////////////////
+TEST_F(SVGLoader, MultipleFiles)
+{
+  // this test can load multiple svg files and
+  // save the html for inspection
+  std::vector<std::string> files;
+  files.push_back("issue_1489_5.svg");
+  for (auto file : files)
+  {
+    // this tests the skewY and skewX transforms
+    common::SVGLoader loader(3);
+    std::vector<common::SVGPath> paths;
+    std::string filePath = std::string(PROJECT_SOURCE_PATH);
+    filePath += "/test/data/svg/";
+    filePath += file;
+    bool success = loader.Parse(filePath, paths);
+    EXPECT_EQ(true, success);
+
+    // save for inspection
+    std::ofstream out(file + ".html");
+    loader.DumpPaths(paths, out);
+    out.close();
+  }
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

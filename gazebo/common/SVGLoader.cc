@@ -172,7 +172,7 @@ ignition::math::Matrix3d ParseTransformMatrixStr(
     {
       y = stod(numbers[1]);
     }
-    ignition::math::Matrix3d m(1, 0, 0, 1, x, y, 0, 0, 1);
+    ignition::math::Matrix3d m(1, 0, x, 0, 1, y, 0, 0, 1);
     return m;
   }
   // rotate(<a> [<x> <y>]) angle in degrees, center x and y
@@ -199,8 +199,8 @@ ignition::math::Matrix3d ParseTransformMatrixStr(
       y = stod(numbers[2]);
     }
     // we apply a translation to x, y, the rotation and the translation -x,-y
-    ignition::math::Matrix3d transToXy(1, 0, 0, 1, x, y, 0, 0, 1);
-    ignition::math::Matrix3d transFromXy(1, 0, 0, 1, -x, -y, 0, 0, 1);
+    ignition::math::Matrix3d transToXy(1, 0, x, 0, 1, y, 0, 0, 1);
+    ignition::math::Matrix3d transFromXy(1, 0, -x, 0, 1, -y, 0, 0, 1);
     ignition::math::Matrix3d rotate(cosa, -sina, 0, sina, cosa, 0, 0, 0, 1);
     ignition::math::Matrix3d m = transToXy * rotate * transFromXy;
     return m;
@@ -730,7 +730,6 @@ void SVGLoader::GetPathCommands(const std::vector<std::string> &_tokens,
     std::vector<ignition::math::Vector2d> &polyline = _path.polylines.back();
     p = this->SubpathToPolyline(subpath, p, polyline);
   }
-std::cerr <<  _path.id << " = [" << std::endl;
   // if necessary, apply transform to p and polyline
   if (_path.transform != ignition::math::Matrix3d::Identity)
   {
@@ -740,16 +739,14 @@ std::cerr <<  _path.id << " = [" << std::endl;
       for (auto  &polyPoint: polyline)
       {
         // make a 3d vector form the 2d point
-        ignition::math::Vector3d point3(polyPoint.X(), polyPoint.Y(), 0);
+        ignition::math::Vector3d point3(polyPoint.X(), polyPoint.Y(), 1);
         // matrix multiply to get the new point, then save new coords in place
         auto transformed = _path.transform * point3;
         polyPoint.X(transformed.X());
         polyPoint.Y(transformed.Y());
-std::cerr  << "{point:'" << point3 << "', transform:'" << transformed << "'}," << std::endl;
       }
     }
   }
-std::cerr << "]" << std::endl;
 }
 
 /////////////////////////////////////////////////
