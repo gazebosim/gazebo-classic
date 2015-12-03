@@ -170,9 +170,9 @@ void ModelState::Load(const sdf::ElementPtr _elem)
     this->pose.Set(0, 0, 0, 0, 0, 0);
 
   // Set the model scale
-//  if (_elem->HasElement("scale"))
-//    this->scale = _elem->Get<ignition::math::Vector3d>("scale");
-//  else
+  if (_elem->HasElement("scale"))
+    this->scale = _elem->Get<ignition::math::Vector3d>("scale");
+  else
     this->scale.Set(1, 1, 1);
 
   // Set all the links
@@ -587,7 +587,7 @@ void ModelState::FillSDF(sdf::ElementPtr _sdf)
 
   _sdf->GetAttribute("name")->Set(this->name);
   _sdf->GetElement("pose")->Set(this->pose);
-  //_sdf->GetElement("scale")->Set(this->scale);
+  _sdf->GetElement("scale")->Set(this->scale);
 
   for (LinkState_M::iterator iter = this->linkStates.begin();
        iter != this->linkStates.end(); ++iter)

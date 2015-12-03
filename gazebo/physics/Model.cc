@@ -1132,7 +1132,14 @@ void Model::SetState(const ModelState &_state)
 }
 
 /////////////////////////////////////////////////
-void Model::SetScale(const math::Vector3 &_scale, const bool _publish)
+void Model::SetScale(const math::Vector3 &_scale)
+{
+  this->SetScale(_scale.Ign());
+}
+
+/////////////////////////////////////////////////
+void Model::SetScale(const ignition::math::Vector3d &_scale,
+      const bool _publish)
 {
   if (this->scale == _scale)
     return;

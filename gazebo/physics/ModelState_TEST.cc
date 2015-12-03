@@ -34,6 +34,7 @@ TEST_F(ModelStateTest, Nested)
     << "<state world_name='default'>"
     << "<model name='model_00'>"
     << "  <pose>0 0 0.5 0 0 0</pose>"
+    << "  <scale>1 1 1</scale>"
     << "  <link name='link_00'>"
     << "    <pose>0 0 0.5 0 0 0</pose>"
     << "    <velocity>0.001 0 0 0 0 0</velocity>"
@@ -92,6 +93,7 @@ TEST_F(ModelStateTest, Nested)
   {
     // model state properties
     EXPECT_EQ(m.GetPose(), ignition::math::Pose3d(0, 0, 0.5, 0, 0, 0));
+    EXPECT_EQ(m.Scale(), ignition::math::Vector3d(1, 1, 1));
     EXPECT_EQ(m.GetJointStateCount(), 0u);
     EXPECT_EQ(m.GetJointStates().size(), 0u);
 
