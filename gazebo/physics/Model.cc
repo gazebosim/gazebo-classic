@@ -1099,6 +1099,7 @@ void Model::OnPoseChange()
 void Model::SetState(const ModelState &_state)
 {
   this->SetWorldPose(_state.GetPose(), true);
+  this->SetScale(_state.Scale(), true);
 
   LinkState_M linkStates = _state.GetLinkStates();
   for (LinkState_M::iterator iter = linkStates.begin();
@@ -1131,7 +1132,7 @@ void Model::SetState(const ModelState &_state)
 }
 
 /////////////////////////////////////////////////
-void Model::SetScale(const math::Vector3 &_scale)
+void Model::SetScale(const math::Vector3 &_scale, const bool _publish)
 {
   if (this->scale == _scale)
     return;
@@ -1146,6 +1147,15 @@ void Model::SetScale(const math::Vector3 &_scale)
       boost::static_pointer_cast<Link>(*iter)->SetScale(_scale);
     }
   }
+
+  if (_publish)
+    this->PublishScale();
+}
+
+/////////////////////////////////////////////////
+ignition::math::Vector3d Model::Scale() const
+{
+  return this->scale.Ign();
 }
 
 /////////////////////////////////////////////////
@@ -1333,4 +1343,13 @@ bool Model::RemoveJoint(const std::string &_name)
            << "], not removed.\n";
     return false;
   }
+}
+
+//////////////////////////////////////////////////
+void Model::PublishScale()
+{
+  GZ_ASSERT(this->GetParentModel() != NULL,
+      "A model without a parent model should not happen");
+
+  this->world->PublishModelScale(this->GetParentModel());
 }

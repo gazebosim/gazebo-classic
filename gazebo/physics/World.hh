@@ -317,6 +317,12 @@ namespace gazebo
       /// \param[in] _model Pointer to the model to publish.
       public: void PublishModelPose(physics::ModelPtr _model);
 
+      /// \brief Publish scale updates for a model.
+      /// This list of models to publish is processed and cleared once every
+      /// iteration.
+      /// \param[in] _model Pointer to the model to publish.
+      public: void PublishModelScale(physics::ModelPtr _model);
+
       /// \brief Publish pose updates for a light.
       /// Adds light to a list of lights to publish, which is processed and
       /// cleared once every iteration.
