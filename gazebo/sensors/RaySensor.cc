@@ -36,9 +36,6 @@
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/msgs/msgs.hh"
 
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Rand.hh"
-
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/RaySensor.hh"
 #include "gazebo/sensors/Noise.hh"
@@ -146,24 +143,12 @@ void RaySensor::Fini()
 }
 
 //////////////////////////////////////////////////
-math::Angle RaySensor::GetAngleMin() const
-{
-  return this->AngleMin();
-}
-
-//////////////////////////////////////////////////
 ignition::math::Angle RaySensor::AngleMin() const
 {
   if (this->laserShape)
     return this->laserShape->GetMinAngle().Ign();
   else
     return -1;
-}
-
-//////////////////////////////////////////////////
-math::Angle RaySensor::GetAngleMax() const
-{
-  return this->AngleMax();
 }
 
 //////////////////////////////////////////////////
@@ -250,12 +235,6 @@ int RaySensor::GetVerticalRangeCount() const
 }
 
 //////////////////////////////////////////////////
-math::Angle RaySensor::GetVerticalAngleMin() const
-{
-  return this->VerticalAngleMin();
-}
-
-//////////////////////////////////////////////////
 ignition::math::Angle RaySensor::VerticalAngleMin() const
 {
   if (this->laserShape)
@@ -265,12 +244,6 @@ ignition::math::Angle RaySensor::VerticalAngleMin() const
   }
   else
     return -1;
-}
-
-//////////////////////////////////////////////////
-math::Angle RaySensor::GetVerticalAngleMax() const
-{
-  return math::Angle(this->VerticalAngleMax().Radian());
 }
 
 //////////////////////////////////////////////////

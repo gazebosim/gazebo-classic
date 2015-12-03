@@ -64,26 +64,6 @@ namespace gazebo
       public: msgs::IMU GetImuMessage() const;
 
       /// \brief Returns the angular velocity.
-      /// \return Angular velocity.
-      /// \deprecated See AngularVelocity() function that returns an
-      /// ignition::math::Vector3d object.
-      public: math::Vector3 GetAngularVelocity() const GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Returns the imu linear acceleration
-      /// \return Linear acceleration.
-      /// \deprecated See LinearVelocity() function that returns an
-      /// ignition::math::Vector3d object.
-      public: math::Vector3 GetLinearAcceleration() const
-              GAZEBO_DEPRECATED(6.0);
-
-      /// \brief get orientation of the IMU relative to the reference pose
-      /// \return returns the orientation quaternion of the IMU relative to
-      /// the imu reference pose.
-      /// \deprecated See Orientation() function that returns an
-      /// ignition::math::Quaterniond object.
-      public: math::Quaternion GetOrientation() const GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Returns the angular velocity.
       /// \param[in] _noiseFree True if the returned measurement should
       /// not use noise.
       /// \return Angular velocity.
