@@ -23,6 +23,7 @@
 
 #include <vector>
 #include <string>
+#include <mutex>
 
 #include "gazebo/common/Console.hh"
 #include "gazebo/msgs/msgs.hh"
@@ -90,6 +91,9 @@ namespace gazebo
       /// published message on the topic.
       protected: bool latching;
 
+      /// \brief Mutex to protect the latching variable.
+      protected: mutable std::mutex latchingMutex;
+
       /// \brief A counter to generate the unique id of this callback.
       private: static unsigned int idCounter;
 
@@ -139,7 +143,7 @@ namespace gazebo
       public: virtual bool HandleData(const std::string &_newdata,
                   boost::function<void(uint32_t)> _cb, uint32_t _id)
               {
-                this->latching = false;
+                this->SetLatching(false);
                 boost::shared_ptr<M> m(new M);
                 m->ParseFromString(_newdata);
                 this->callback(m);
@@ -151,7 +155,7 @@ namespace gazebo
       // documentation inherited
       public: virtual bool HandleMessage(MessagePtr _newMsg)
               {
-                this->latching = false;
+                this->SetLatching(false);
                 this->callback(boost::dynamic_pointer_cast<M>(_newMsg));
                 return true;
               }
@@ -193,7 +197,7 @@ namespace gazebo
       public: virtual bool HandleData(const std::string &_newdata,
                   boost::function<void(uint32_t)> _cb, uint32_t _id)
               {
-                this->latching = false;
+                this->SetLatching(false);
                 this->callback(_newdata);
                 if (!_cb.empty())
                   _cb(_id);
@@ -203,7 +207,7 @@ namespace gazebo
       // documentation inherited
       public: virtual bool HandleMessage(MessagePtr _newMsg)
               {
-                this->latching = false;
+                this->SetLatching(false);
                 std::string data;
                 _newMsg->SerializeToString(&data);
                 this->callback(data);

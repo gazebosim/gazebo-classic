@@ -32,6 +32,30 @@ bool g_stringMsg = false;
 bool g_stringMsg2 = false;
 bool g_stringMsg3 = false;
 bool g_stringMsg4 = false;
+int g_createdBeforePub = 0;
+int g_noLatchCreatedAfterPub = 0;
+int g_latchCreatedAfterPub = 0;
+int g_latchCreatedAfterPub2 = 0;
+
+void ReceiveNoLatchCreatedAfterPub(ConstVector3dPtr &/*_msg*/)
+{
+  g_noLatchCreatedAfterPub++;
+}
+
+void ReceiveLatchCreatedAfterPub2(ConstVector3dPtr &/*_msg*/)
+{
+  g_latchCreatedAfterPub2++;
+}
+
+void ReceiveLatchCreatedAfterPub(ConstVector3dPtr &/*_msg*/)
+{
+  g_latchCreatedAfterPub++;
+}
+
+void ReceiveCreatedBeforePub(ConstVector3dPtr &/*_msg*/)
+{
+  g_createdBeforePub++;
+}
 
 void ReceiveStringMsg(ConstGzStringPtr &/*_msg*/)
 {
@@ -479,6 +503,169 @@ TEST_F(TransportTest, Errors)
   scenePub.reset();
   statsSub.reset();
   testNode.reset();
+}
+
+/////////////////////////////////////////////////
+// Test latching
+TEST_F(TransportTest, Latching)
+{
+  this->Load("worlds/empty.world");
+
+  // Check that transport is running and there are advertised topics
+  EXPECT_FALSE(transport::is_stopped());
+  EXPECT_TRUE(transport::ConnectionManager::Instance()->IsRunning());
+  EXPECT_FALSE(transport::getAdvertisedTopics().empty());
+
+  // Check that our topic is not advertised yet
+  auto topics = transport::getAdvertisedTopics("gazebo.msgs.Vector3d");
+  EXPECT_TRUE(topics.empty());
+
+  // Initialize transport node
+  transport::NodePtr node1 = transport::NodePtr(new transport::Node());
+  node1->Init();
+  ASSERT_TRUE(node1 != NULL);
+
+  std::string fullTopic = "/gazebo/" +  node1->GetTopicNamespace() +
+      "/test_topic";
+
+  // Create a non latched subscriber before publishing
+  auto subCreatedBeforePub = node1->Subscribe(fullTopic,
+      &ReceiveCreatedBeforePub);
+  ASSERT_TRUE(subCreatedBeforePub != NULL);
+
+  // Advertise publisher
+  auto pub1 = node1->Advertise<msgs::Vector3d>(fullTopic);
+  ASSERT_TRUE(pub1 != NULL);
+
+  // Check that topic has been advertised
+  topics = transport::getAdvertisedTopics("gazebo.msgs.Vector3d");
+  int sleep = 0;
+  int maxSleep = 30;
+  while (topics.empty() && sleep < maxSleep)
+  {
+    topics = transport::getAdvertisedTopics("gazebo.msgs.Vector3d");
+    common::Time::MSleep(100);
+    sleep++;
+  }
+  EXPECT_FALSE(topics.empty());
+  EXPECT_TRUE(std::find(topics.begin(), topics.end(),
+      fullTopic) != topics.end());
+
+  // Check no message has been received by subCreatedBeforePub
+  EXPECT_EQ(g_createdBeforePub, 0);
+
+  // Publish a message
+  msgs::Vector3d msg;
+  msg.set_x(1);
+  msg.set_y(2);
+  msg.set_z(3);
+  pub1->Publish(msg);
+
+  // Wait for message to be received
+  sleep = 0;
+  while (g_createdBeforePub != 1 && sleep < maxSleep)
+  {
+    common::Time::MSleep(100);
+    sleep++;
+  }
+  EXPECT_EQ(g_createdBeforePub, 1);
+
+  // Create a non latched subscriber after publishing
+  auto subNoLatchCreatedAfterPub = node1->Subscribe(fullTopic,
+      &ReceiveNoLatchCreatedAfterPub, false);
+  ASSERT_TRUE(subNoLatchCreatedAfterPub != NULL);
+
+  // Create a latched subscriber after publishing
+  auto subLatchCreatedAfterPub = node1->Subscribe(fullTopic,
+      &ReceiveLatchCreatedAfterPub, true);
+  ASSERT_TRUE(subLatchCreatedAfterPub != NULL);
+
+  // Wait for message to be received by latched subscriber
+  sleep = 0;
+  while (g_latchCreatedAfterPub != 1 && sleep < maxSleep)
+  {
+    common::Time::MSleep(100);
+    sleep++;
+  }
+  EXPECT_EQ(g_createdBeforePub, 1);
+  EXPECT_EQ(g_latchCreatedAfterPub, 1);
+  EXPECT_EQ(g_noLatchCreatedAfterPub, 0);
+
+  // Create another latched subscriber after publishing
+  auto subLatchCreatedAfterPub2 = node1->Subscribe(fullTopic,
+      &ReceiveLatchCreatedAfterPub2, true);
+  ASSERT_TRUE(subLatchCreatedAfterPub2 != NULL);
+
+  // Wait for message to be received only by new latched subscriber
+  sleep = 0;
+  while (g_latchCreatedAfterPub2 != 1 && sleep < maxSleep)
+  {
+    common::Time::MSleep(100);
+    sleep++;
+  }
+  EXPECT_EQ(g_createdBeforePub, 1);
+  EXPECT_EQ(g_latchCreatedAfterPub, 1);
+  EXPECT_EQ(g_noLatchCreatedAfterPub, 0);
+  EXPECT_EQ(g_latchCreatedAfterPub2, 1);
+
+  // Publish another message
+  msgs::Vector3d msg2;
+  msg2.set_x(4);
+  msg2.set_y(5);
+  msg2.set_z(6);
+  pub1->Publish(msg2);
+
+  // Wait for message to be received by all subscribers
+  sleep = 0;
+  while (g_latchCreatedAfterPub2 != 2 && sleep < maxSleep)
+  {
+    common::Time::MSleep(100);
+    sleep++;
+  }
+  EXPECT_EQ(g_createdBeforePub, 2);
+  EXPECT_EQ(g_latchCreatedAfterPub, 2);
+  EXPECT_EQ(g_noLatchCreatedAfterPub, 1);
+  EXPECT_EQ(g_latchCreatedAfterPub2, 2);
+
+  // Initialize another transport node
+  transport::NodePtr node2 = transport::NodePtr(new transport::Node());
+  node2->Init();
+  ASSERT_TRUE(node2 != NULL);
+
+  // Advertise another publisher
+  auto pub2 = node2->Advertise<msgs::Vector3d>(fullTopic);
+  ASSERT_TRUE(pub2 != NULL);
+
+  // Check that the subscribers didn't get latched messages again
+  sleep = 0;
+  while (sleep < maxSleep)
+  {
+    common::Time::MSleep(100);
+    sleep++;
+  }
+  EXPECT_EQ(g_createdBeforePub, 2);
+  EXPECT_EQ(g_latchCreatedAfterPub, 2);
+  EXPECT_EQ(g_noLatchCreatedAfterPub, 1);
+  EXPECT_EQ(g_latchCreatedAfterPub2, 2);
+
+  // Publish with new publisher
+  msgs::Vector3d msg3;
+  msg3.set_x(4);
+  msg3.set_y(5);
+  msg3.set_z(6);
+  pub2->Publish(msg3);
+
+  // Wait for message to be received
+  sleep = 0;
+  while (g_createdBeforePub != 3 && sleep < maxSleep)
+  {
+    common::Time::MSleep(100);
+    sleep++;
+  }
+  EXPECT_EQ(g_createdBeforePub, 3);
+  EXPECT_EQ(g_latchCreatedAfterPub, 3);
+  EXPECT_EQ(g_noLatchCreatedAfterPub, 2);
+  EXPECT_EQ(g_latchCreatedAfterPub2, 3);
 }
 
 /////////////////////////////////////////////////
