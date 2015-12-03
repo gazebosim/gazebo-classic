@@ -18,6 +18,9 @@ message UserCmd
 
     /// \brief Controlling the world.
     WORLD_CONTROL = 2;
+
+    /// \brief Scaling a model.
+    SCALING = 7;
   }
 
   /// \brief Unique id for user command.

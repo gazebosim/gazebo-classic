@@ -154,6 +154,11 @@ void UserCmdManager::OnUserCmdMsg(ConstUserCmdPtr &_msg)
     for (int i = 0; i < _msg->light_size(); ++i)
       this->dataPtr->lightModifyPub->Publish(_msg->light(i));
   }
+  else if (_msg->type() == msgs::UserCmd::SCALING)
+  {
+    for (int i = 0; i < _msg->model_size(); ++i)
+      this->dataPtr->modelModifyPub->Publish(_msg->model(i));
+  }
   else if (_msg->type() == msgs::UserCmd::WORLD_CONTROL)
   {
     if (_msg->has_world_control())
