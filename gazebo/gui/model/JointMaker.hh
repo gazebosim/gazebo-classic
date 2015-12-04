@@ -310,9 +310,6 @@ namespace gazebo
       /// currently triggered by the context menu via right click.
       private slots: void OnDelete();
 
-      /// \brief Constant vector containing [UnitX, UnitY, UnitZ].
-      private: std::vector<ignition::math::Vector3d> unitVectors;
-
       /// \brief Type of joint to create
       private: JointMaker::JointType jointType;
 
@@ -330,9 +327,6 @@ namespace gazebo
 
       /// \brief All the event connections.
       private: std::vector<event::ConnectionPtr> connections;
-
-      /// \brief Flag set to true when a joint has been connected.
-      private: bool newJointCreated;
 
       /// \brief The SDF element pointer to the model that contains the joints.
       private: sdf::ElementPtr modelSDF;
@@ -355,6 +349,9 @@ namespace gazebo
       /// \brief A map of joint type to its string value.
       public: static std::map<JointMaker::JointType, std::string> jointTypes;
 
+      /// \brief Constant vector containing [UnitX, UnitY, UnitZ].
+      public: static std::vector<ignition::math::Vector3d> unitVectors;
+
       /// \brief A map of joint type to its corresponding material.
       public: static std::map<JointMaker::JointType, std::string>
           jointMaterials;
@@ -375,8 +372,12 @@ namespace gazebo
       /// \brief Open the joint inspector.
       public: void OpenInspector();
 
-      /// \brief Update this joint data.
+      /// \brief Update this joint data. Avoid calling this directly, instead,
+      /// set dirty to true and this will be called on PreRender.
       public: void Update();
+
+      /// \brief Update the joint message based on the other fields.
+      public: void UpdateMsg();
 
       /// \brief Name of the joint.
       public: std::string name;
@@ -417,7 +418,7 @@ namespace gazebo
       /// \brief Type of joint.
       public: JointMaker::JointType type;
 
-      /// \brief True if the joint visual needs update.
+      /// \brief True if the joint needs update.
       public: bool dirty;
 
       /// \brief Msg containing joint data.

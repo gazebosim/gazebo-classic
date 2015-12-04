@@ -4,6 +4,9 @@
     * [Pull request #1993](https://bitbucket.org/osrf/gazebo/pull-request/1993)
     * [Pull request #1994](https://bitbucket.org/osrf/gazebo/pull-request/1994)
 
+1. Removed deprecations
+    * [Pull request #1992]((https://bitbucket.org/osrf/gazebo/pull-request/1992)
+
 1. Add ability to set the pose of a visual from a link.
     * [Pull request #1963](https://bitbucket.org/osrf/gazebo/pull-request/1963)
 
@@ -24,7 +27,11 @@
     * [Pull request #1931](https://bitbucket.org/osrf/gazebo/pull-request/1931)
 
 1 Added Ignition Transport dependency.
-  * [Pull request #1930](https://bitbucket.org/osrf/gazebo/pull-request/1930)
+    * [Pull request #1930](https://bitbucket.org/osrf/gazebo/pull-request/1930)
+
+1 Make latched subscribers receive the message only once
+    * [Issue #1789](https://bitbucket.org/osrf/gazebo/issue/1789)
+    * [Pull request #2016](https://bitbucket.org/osrf/gazebo/pull-request/2016)
 
 1. KeyEvent constructor should be in a source file. Removed a few visibility
 flags from c functions. Windows did not like `CPPTYPE_*` in
@@ -197,6 +204,9 @@ using the same arguments used in the command line.
 
     1. Add Insert tab to model editor
         * [Pull request #1924](https://bitbucket.org/osrf/gazebo/pull-request/1924)
+
+    1. Support inserting nested models from model maker
+        * [Pull request #1982](https://bitbucket.org/osrf/gazebo/pull-request/1982)
 
 ## Gazebo 6.0
 

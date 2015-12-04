@@ -24,7 +24,6 @@
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/sensors/Sensor.hh"
-#include "gazebo/math/Pose.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/util/system.hh"
 
@@ -60,12 +59,6 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual void Fini();
-
-      /// \brief Returns pose of tag in world coordinate.
-      /// \return Pose of object.
-      /// \deprecated See TagPose() function that returns an
-      /// ignition::math::Pose3d object.
-      public: math::Pose GetTagPose() const GAZEBO_DEPRECATED(6.0);
 
       /// \brief Returns pose of tag in world coordinate.
       /// \return Pose of object.

@@ -100,12 +100,12 @@ void ImuSensor_TEST::LinearAccelerationTest(const std::string &_physicsEngine)
 
   std::string modelName = "imuModel";
   std::string imuSensorName = "imuSensor";
-  math::Pose modelPose(0, 0, z, 0, 0, 0);
+  ignition::math::Pose3d modelPose(0, 0, z, 0, 0, 0);
 
   std::string topic = "~/" + imuSensorName + "_" + _physicsEngine;
   // spawn imu sensor
   SpawnUnitImuSensor(modelName, imuSensorName,
-      "box", topic, modelPose.pos, modelPose.rot.GetAsEuler());
+      "box", topic, modelPose.Pos(), modelPose.Rot().Euler());
 
   sensors::SensorPtr sensor = sensors::get_sensor(imuSensorName);
   sensors::ImuSensorPtr imuSensor =
