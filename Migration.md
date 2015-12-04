@@ -104,6 +104,10 @@ release will remove the deprecated code.
     + ***Deprecation:*** void DetachEntity(Visual *_vis)
     + ***No replacement for DetachEntity ***
 
+1. **gazebo/physics/Model.hh**
+    + ***Deprecation:*** public: void SetScale(const math::Vector3 &_scale);
+    + ***Replacement:*** public: void SetScale(const ignition::math::Vector3d &_scale, const bool _publish = false);
+
 ### Deletions
 
 1. **plugins/rest_web/RestUiLogoutDialog.hh.hh**

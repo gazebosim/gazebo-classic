@@ -258,6 +258,9 @@ namespace gazebo
       /// \brief The list of models that need to publish their pose.
       public: std::set<ModelPtr> publishModelPoses;
 
+      /// \brief The list of models that need to publish their scale.
+      public: std::set<ModelPtr> publishModelScales;
+
       /// \brief The list of lights that need to publish their pose.
       public: std::set<LightPtr> publishLightPoses;
 
