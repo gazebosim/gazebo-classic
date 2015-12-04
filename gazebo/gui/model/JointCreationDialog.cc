@@ -365,6 +365,7 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   // Reset all button
   QPushButton *resetAllButton = new QPushButton(tr(
       "Reset all fields"));
+  resetAllButton->setObjectName("JointCreationResetButton");
   resetAllButton->setToolTip("Reset all fields");
   connect(resetAllButton, SIGNAL(clicked()), this,
       SLOT(OnResetAll()));

@@ -39,6 +39,9 @@ class JointCreationDialog_TEST : public QTestFixture
 
   /// \brief Test child and parent align widget.
   private slots: void Align();
+
+  /// \brief Test the relative pose widget.
+  private slots: void RelativePose();
 };
 
 #endif

@@ -454,5 +454,76 @@ void JointCreationDialog_TEST::Align()
     QVERIFY(!button->isChecked());
 }
 
+/////////////////////////////////////////////////
+void JointCreationDialog_TEST::RelativePose()
+{
+  // Create a joint maker
+  auto jointMaker = new gazebo::gui::JointMaker();
+  QVERIFY(jointMaker != NULL);
+
+  // Add links to list
+  std::vector<std::string> scopedLinkNames =
+      {"model::link1", "model::link2", "model::link3"};
+  std::vector<std::string> linkNames;
+  for (auto scopedName : scopedLinkNames)
+  {
+    gazebo::gui::model::Events::linkInserted(scopedName);
+
+    linkNames.push_back(scopedName.substr(scopedName.find("::")+2));
+  }
+
+  // Create a dialog
+  auto jointCreationDialog = new gazebo::gui::JointCreationDialog(jointMaker);
+  QVERIFY(jointCreationDialog != NULL);
+
+  // Open it
+  jointCreationDialog->Open(gazebo::gui::JointMaker::JOINT_HINGE2);
+  QVERIFY(jointCreationDialog->isVisible());
+
+  // Get push buttons (reset, cancel, create)
+  auto pushButtons = jointCreationDialog->findChildren<QPushButton *>();
+  QCOMPARE(pushButtons.size(), 3);
+
+  // Get the config widget
+  auto configWidget =
+      jointCreationDialog->findChild<gazebo::gui::ConfigWidget *>();
+  QVERIFY(configWidget != NULL);
+
+  // Check the default value
+  QVERIFY(configWidget->GetPoseWidgetValue("relative_pose") ==
+      ignition::math::Pose3d::Zero);
+
+  // Set child and parent from 3D scene
+  jointCreationDialog->SetParent(scopedLinkNames[0]);
+  jointCreationDialog->SetChild(scopedLinkNames[1]);
+
+  // Check that all widgets are enabled
+  QVERIFY(!configWidget->GetWidgetReadOnly("parentCombo"));
+  QVERIFY(!configWidget->GetWidgetReadOnly("childCombo"));
+  QVERIFY(!configWidget->GetWidgetReadOnly("axis1"));
+  QVERIFY(!configWidget->GetWidgetReadOnly("axis2"));
+  QVERIFY(!configWidget->GetWidgetReadOnly("align"));
+  QVERIFY(!configWidget->GetWidgetReadOnly("joint_pose"));
+  QVERIFY(!configWidget->GetWidgetReadOnly("relative_pose_general"));
+
+  for (auto button : pushButtons)
+    QVERIFY(button->isEnabled());
+
+  // Update the relative pose from 3D
+  ignition::math::Pose3d pose(1, -0.2, 3.3, 0.1, -0.2, 0);
+  jointCreationDialog->UpdateRelativePose(pose);
+
+  // Check the widget was updated
+  QVERIFY(configWidget->GetPoseWidgetValue("relative_pose") == pose);
+
+  // Get reset button
+  auto resetButton =
+      jointCreationDialog->findChild<QPushButton *>("JointCreationResetButton");
+  QVERIFY(resetButton != NULL);
+
+  // Trigger reset
+  resetButton->click();
+}
+
 // Generate a main function for the test
 QTEST_MAIN(JointCreationDialog_TEST)
