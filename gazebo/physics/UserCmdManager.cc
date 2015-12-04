@@ -112,9 +112,18 @@ void UserCmd::Redo()
   if (this->dataPtr->type == msgs::UserCmd::INSERTING &&
       this->dataPtr->manager && this->dataPtr->sdf)
   {
-    msgs::Factory msg;
-    msg.set_sdf(this->dataPtr->sdf->ToString());
-    this->dataPtr->manager->dataPtr->modelFactoryPub->Publish(msg);
+    if (this->dataPtr->sdf->Root()->GetName() == "model")
+    {
+      msgs::Factory msg;
+      msg.set_sdf(this->dataPtr->sdf->ToString());
+      this->dataPtr->manager->dataPtr->modelFactoryPub->Publish(msg);
+    }
+    else if (this->dataPtr->sdf->Root()->GetName() == "light")
+    {
+      auto lightElem = this->dataPtr->sdf->Root();
+      msgs::Light msg = msgs::LightFromSDF(lightElem);
+      this->dataPtr->manager->dataPtr->lightFactoryPub->Publish(msg);
+    }
 
     this->dataPtr->manager->dataPtr->insertionPending =
         this->dataPtr->entityName;
