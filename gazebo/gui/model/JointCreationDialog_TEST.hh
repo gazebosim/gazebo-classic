@@ -36,6 +36,9 @@ class JointCreationDialog_TEST : public QTestFixture
 
   /// \brief Test joint axis widget.
   private slots: void Axis();
+
+  /// \brief Test child and parent align widget.
+  private slots: void Align();
 };
 
 #endif

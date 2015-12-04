@@ -360,5 +360,99 @@ void JointCreationDialog_TEST::Axis()
   delete jointMaker;
 }
 
+/////////////////////////////////////////////////
+void JointCreationDialog_TEST::Align()
+{
+  // Create a joint maker
+  auto jointMaker = new gazebo::gui::JointMaker();
+  QVERIFY(jointMaker != NULL);
+
+  // Add links to list
+  std::vector<std::string> scopedLinkNames =
+      {"model::link1", "model::link2", "model::link3"};
+  std::vector<std::string> linkNames;
+  for (auto scopedName : scopedLinkNames)
+  {
+    gazebo::gui::model::Events::linkInserted(scopedName);
+
+    linkNames.push_back(scopedName.substr(scopedName.find("::")+2));
+  }
+
+  // Create a dialog
+  auto jointCreationDialog = new gazebo::gui::JointCreationDialog(jointMaker);
+  QVERIFY(jointCreationDialog != NULL);
+
+  // Open it
+  jointCreationDialog->Open(gazebo::gui::JointMaker::JOINT_HINGE2);
+  QVERIFY(jointCreationDialog->isVisible());
+
+  // Get push buttons (reset, cancel, create)
+  auto pushButtons = jointCreationDialog->findChildren<QPushButton *>();
+  QCOMPARE(pushButtons.size(), 3);
+
+  // Get the config widget
+  auto configWidget =
+      jointCreationDialog->findChild<gazebo::gui::ConfigWidget *>();
+  QVERIFY(configWidget != NULL);
+
+  // Set child and parent from 3D scene
+  jointCreationDialog->SetParent(scopedLinkNames[0]);
+  jointCreationDialog->SetChild(scopedLinkNames[1]);
+
+  // Check that all widgets are enabled
+  QVERIFY(!configWidget->GetWidgetReadOnly("parentCombo"));
+  QVERIFY(!configWidget->GetWidgetReadOnly("childCombo"));
+  QVERIFY(!configWidget->GetWidgetReadOnly("axis1"));
+  QVERIFY(!configWidget->GetWidgetReadOnly("axis2"));
+  QVERIFY(!configWidget->GetWidgetReadOnly("align"));
+  QVERIFY(!configWidget->GetWidgetReadOnly("joint_pose"));
+  QVERIFY(!configWidget->GetWidgetReadOnly("relative_pose_general"));
+
+  for (auto button : pushButtons)
+    QVERIFY(button->isEnabled());
+
+  // Get align widget and check it has all the buttons
+  auto alignWidget = configWidget->ConfigChildWidgetByName("align");
+  QVERIFY(alignWidget != NULL);
+
+  auto alignButtons = alignWidget->findChildren<QToolButton *>();
+  QVERIFY(alignButtons.size() == 9u);
+
+  // Check that only one button per axis can be checked at a time
+  alignButtons[0]->click();
+  QVERIFY(alignButtons[0]->isChecked());
+  QVERIFY(!alignButtons[1]->isChecked());
+  QVERIFY(!alignButtons[2]->isChecked());
+
+  alignButtons[1]->click();
+  QVERIFY(!alignButtons[0]->isChecked());
+  QVERIFY(alignButtons[1]->isChecked());
+  QVERIFY(!alignButtons[2]->isChecked());
+
+  // Check that checked button is toggled on click
+  alignButtons[1]->click();
+  QVERIFY(!alignButtons[0]->isChecked());
+  QVERIFY(!alignButtons[1]->isChecked());
+  QVERIFY(!alignButtons[2]->isChecked());
+
+  // Check a button per axis and check they are checked at the same time
+  alignButtons[0]->click();
+  alignButtons[3]->click();
+  alignButtons[6]->click();
+  QVERIFY(alignButtons[0]->isChecked());
+  QVERIFY(alignButtons[3]->isChecked());
+  QVERIFY(alignButtons[6]->isChecked());
+
+  // Check that all buttons are disabled when the link is changed
+  auto parentWidget = configWidget->ConfigChildWidgetByName("parentCombo");
+  QVERIFY(parentWidget != NULL);
+  auto parentCombo = parentWidget->findChild<QComboBox *>();
+  QVERIFY(parentCombo != NULL);
+  parentCombo->setCurrentIndex(2);
+
+  for (auto button : alignButtons)
+    QVERIFY(!button->isChecked());
+}
+
 // Generate a main function for the test
 QTEST_MAIN(JointCreationDialog_TEST)
