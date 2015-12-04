@@ -178,6 +178,9 @@ UserCmdManager::UserCmdManager(const WorldPtr _world)
   this->dataPtr->userCmdStatsPub =
     this->dataPtr->node->Advertise<msgs::UserCmdStats>("~/user_cmd_stats");
 
+  this->dataPtr->worldControlPub =
+      this->dataPtr->node->Advertise<msgs::WorldControl>("~/world_control");
+
   this->dataPtr->modelModifyPub =
       this->dataPtr->node->Advertise<msgs::Model>("~/model/modify");
 
@@ -189,9 +192,6 @@ UserCmdManager::UserCmdManager(const WorldPtr _world)
 
   this->dataPtr->lightFactoryPub =
       this->dataPtr->node->Advertise<msgs::Light>("~/factory/light");
-
-  this->dataPtr->worldControlPub =
-      this->dataPtr->node->Advertise<msgs::WorldControl>("~/world_control");
 
   this->dataPtr->idCounter = 0;
   this->dataPtr->insertionPending = "";
