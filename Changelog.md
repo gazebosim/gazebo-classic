@@ -4,6 +4,9 @@
     * [Pull request #1993](https://bitbucket.org/osrf/gazebo/pull-request/1993)
     * [Pull request #1994](https://bitbucket.org/osrf/gazebo/pull-request/1994)
 
+1. Removed deprecations
+    * [Pull request #1992]((https://bitbucket.org/osrf/gazebo/pull-request/1992)
+
 1. Add ability to set the pose of a visual from a link.
     * [Pull request #1963](https://bitbucket.org/osrf/gazebo/pull-request/1963)
 
@@ -191,6 +194,9 @@ using the same arguments used in the command line.
 
     1. Add Insert tab to model editor
         * [Pull request #1924](https://bitbucket.org/osrf/gazebo/pull-request/1924)
+
+    1. Support inserting nested models from model maker
+        * [Pull request #1982](https://bitbucket.org/osrf/gazebo/pull-request/1982)
 
 ## Gazebo 6.0
 

@@ -429,12 +429,6 @@ double GpuRaySensor::RayCountRatio() const
 }
 
 //////////////////////////////////////////////////
-double GpuRaySensor::GetRangeCountRatio() const
-{
-  return this->RangeCountRatio();
-}
-
-//////////////////////////////////////////////////
 double GpuRaySensor::RangeCountRatio() const
 {
   return this->dataPtr->rangeCountRatio;

@@ -33,7 +33,6 @@
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Time.hh"
-#include "gazebo/math/Pose.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/util/system.hh"
 

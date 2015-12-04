@@ -36,9 +36,6 @@
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/msgs/msgs.hh"
 
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Rand.hh"
-
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/RaySensorPrivate.hh"
 #include "gazebo/sensors/RaySensor.hh"

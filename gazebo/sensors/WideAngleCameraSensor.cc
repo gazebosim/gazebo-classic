@@ -104,9 +104,9 @@ void WideAngleCameraSensor::Init()
     this->dataPtr->camera->Init();
     this->dataPtr->camera->CreateRenderTexture(this->Name() + "_RttTex");
 
-    math::Pose cameraPose = this->dataPtr->pose;
+    ignition::math::Pose3d cameraPose = this->dataPtr->pose;
     if (cameraSdf->HasElement("pose"))
-      cameraPose = cameraSdf->Get<math::Pose>("pose") + cameraPose;
+      cameraPose = cameraSdf->Get<ignition::math::Pose3d>("pose") + cameraPose;
 
     this->dataPtr->camera->SetWorldPose(cameraPose);
     this->dataPtr->camera->AttachToVisual(this->ParentId(), true);
@@ -176,8 +176,8 @@ bool WideAngleCameraSensor::UpdateImpl(bool _force)
     for (; !this->dataPtr->hfovCmdQueue.empty();
         this->dataPtr->hfovCmdQueue.pop())
     {
-      this->dataPtr->camera->SetHFOV(
-          math::Angle(this->dataPtr->hfovCmdQueue.front()));
+      this->dataPtr->camera->SetHFOV(ignition::math::Angle(
+            this->dataPtr->hfovCmdQueue.front()));
     }
 
     msgs::CameraLens msg;
