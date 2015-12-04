@@ -253,7 +253,12 @@ namespace gazebo
           << q.x << " "
           << q.y << " "
           << q.z << " "
-          << "</pose>";
+          << "</pose>"
+          << "<scale>"
+          << _state.scale.X() << " "
+          << _state.scale.Y() << " "
+          << _state.scale.Z() << " "
+          << "</scale>";
 
         for (LinkState_M::const_iterator iter =
             _state.linkStates.begin(); iter != _state.linkStates.end();

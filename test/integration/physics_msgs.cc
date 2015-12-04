@@ -498,7 +498,7 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
     else
     {
       // Use physics API to resize
-      model->SetScale(scaleFactor * math::Vector3::One);
+      model->SetScale(scaleFactor * ignition::math::Vector3d::One);
     }
   }
 
