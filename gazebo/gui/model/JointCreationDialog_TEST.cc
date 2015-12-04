@@ -209,8 +209,8 @@ void JointCreationDialog_TEST::Links()
     }
   }
 
-  // Set child from dialog
-  childCombo->setCurrentIndex(2);
+  // Set child from 3D scene
+  jointCreationDialog->SetChild("model::link2");
 
   // Check that the child link was selected
   QVERIFY(configWidget->GetEnumWidgetValue("parentCombo") == "link1");
@@ -227,6 +227,38 @@ void JointCreationDialog_TEST::Links()
 
   for (auto button : pushButtons)
     QVERIFY(button->isEnabled());
+
+  // Get swap button
+  auto swapButton =
+      jointCreationDialog->findChild<QToolButton *>("JointCreationSwapButton");
+  QVERIFY(swapButton != NULL);
+
+  // Trigger swap
+  swapButton->click();
+
+  // Check that the parent link was selected
+  QVERIFY(configWidget->GetEnumWidgetValue("parentCombo") == "link2");
+  QVERIFY(configWidget->GetEnumWidgetValue("childCombo") == "link1");
+
+  // Set child from dialog, same as parent
+  childCombo->setCurrentIndex(1);
+
+  // Check that the child link was selected
+  QVERIFY(configWidget->GetEnumWidgetValue("parentCombo") == "link2");
+  QVERIFY(configWidget->GetEnumWidgetValue("childCombo") == "link2");
+
+  // Check that create button is disabled
+  for (auto button : pushButtons)
+  {
+    if (button->text() == "Create")
+    {
+      QVERIFY(!button->isEnabled());
+    }
+    else
+    {
+      QVERIFY(button->isEnabled());
+    }
+  }
 
   delete jointCreationDialog;
   delete jointMaker;

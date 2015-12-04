@@ -157,6 +157,7 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
 
   // Swap button
   this->dataPtr->swapButton = new QToolButton();
+  this->dataPtr->swapButton->setObjectName("JointCreationSwapButton");
   this->dataPtr->swapButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
   this->dataPtr->swapButton->setIcon(
       QPixmap(":/images/swap-parent-child.png"));
