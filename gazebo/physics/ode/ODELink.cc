@@ -434,10 +434,10 @@ math::Vector3 ODELink::GetWorldLinearVel(const math::Vector3 &_offset) const
 {
   math::Vector3 vel;
 
-  if (this->linkId)
+  if (this->linkId && this->inertial != NULL)
   {
     dVector3 dvel;
-    GZ_ASSERT(this->inertial != NULL, "Inertial pointer is NULL");
+ //   GZ_ASSERT(this->inertial != NULL, "Inertial pointer is NULL");
     math::Vector3 offsetFromCoG = _offset - this->inertial->GetCoG();
     dBodyGetRelPointVel(this->linkId, offsetFromCoG.x, offsetFromCoG.y,
         offsetFromCoG.z, dvel);

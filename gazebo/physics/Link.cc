@@ -673,7 +673,10 @@ math::Vector3 Link::GetRelativeLinearAccel() const
 //////////////////////////////////////////////////
 math::Vector3 Link::GetWorldLinearAccel() const
 {
-  return this->GetWorldForce() / this->inertial->GetMass();
+  if (this->inertial)
+    return this->GetWorldForce() / this->inertial->GetMass();
+  else
+    return math::Vector3::Zero;
 }
 
 //////////////////////////////////////////////////
