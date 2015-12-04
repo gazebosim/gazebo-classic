@@ -180,10 +180,10 @@ void JointCreationDialog_TEST::Links()
   }
 
   // Set parent from 3D scene
-  jointCreationDialog->SetParent("model::link1");
+  jointCreationDialog->SetParent(scopedLinkNames[0]);
 
   // Check that the parent link was selected
-  QVERIFY(configWidget->GetEnumWidgetValue("parentCombo") == "link1");
+  QVERIFY(configWidget->GetEnumWidgetValue("parentCombo") == linkNames[0]);
   QVERIFY(configWidget->GetEnumWidgetValue("childCombo") == "");
 
   // Check that now child is also enabled
@@ -210,11 +210,11 @@ void JointCreationDialog_TEST::Links()
   }
 
   // Set child from 3D scene
-  jointCreationDialog->SetChild("model::link2");
+  jointCreationDialog->SetChild(scopedLinkNames[1]);
 
   // Check that the child link was selected
-  QVERIFY(configWidget->GetEnumWidgetValue("parentCombo") == "link1");
-  QVERIFY(configWidget->GetEnumWidgetValue("childCombo") == "link2");
+  QVERIFY(configWidget->GetEnumWidgetValue("parentCombo") == linkNames[0]);
+  QVERIFY(configWidget->GetEnumWidgetValue("childCombo") == linkNames[1]);
 
   // Check that now all widgets are enabled
   QVERIFY(!configWidget->GetWidgetReadOnly("parentCombo"));
@@ -237,15 +237,15 @@ void JointCreationDialog_TEST::Links()
   swapButton->click();
 
   // Check that the parent link was selected
-  QVERIFY(configWidget->GetEnumWidgetValue("parentCombo") == "link2");
-  QVERIFY(configWidget->GetEnumWidgetValue("childCombo") == "link1");
+  QVERIFY(configWidget->GetEnumWidgetValue("parentCombo") == linkNames[1]);
+  QVERIFY(configWidget->GetEnumWidgetValue("childCombo") == linkNames[0]);
 
   // Set child from dialog, same as parent
   childCombo->setCurrentIndex(1);
 
   // Check that the child link was selected
-  QVERIFY(configWidget->GetEnumWidgetValue("parentCombo") == "link2");
-  QVERIFY(configWidget->GetEnumWidgetValue("childCombo") == "link2");
+  QVERIFY(configWidget->GetEnumWidgetValue("parentCombo") == linkNames[1]);
+  QVERIFY(configWidget->GetEnumWidgetValue("childCombo") == linkNames[1]);
 
   // Check that create button is disabled
   for (auto button : pushButtons)
@@ -259,6 +259,102 @@ void JointCreationDialog_TEST::Links()
       QVERIFY(button->isEnabled());
     }
   }
+
+  delete jointCreationDialog;
+  delete jointMaker;
+}
+
+/////////////////////////////////////////////////
+void JointCreationDialog_TEST::Axis()
+{
+  // Create a joint maker
+  auto jointMaker = new gazebo::gui::JointMaker();
+  QVERIFY(jointMaker != NULL);
+
+  // Add links to list
+  std::vector<std::string> scopedLinkNames =
+      {"model::link1", "model::link2", "model::link3"};
+  std::vector<std::string> linkNames;
+  for (auto scopedName : scopedLinkNames)
+  {
+    gazebo::gui::model::Events::linkInserted(scopedName);
+
+    linkNames.push_back(scopedName.substr(scopedName.find("::")+2));
+  }
+
+  // Create a dialog
+  auto jointCreationDialog = new gazebo::gui::JointCreationDialog(jointMaker);
+  QVERIFY(jointCreationDialog != NULL);
+
+  // Open it
+  jointCreationDialog->Open(gazebo::gui::JointMaker::JOINT_HINGE2);
+  QVERIFY(jointCreationDialog->isVisible());
+
+  // Get push buttons (reset, cancel, create)
+  auto pushButtons = jointCreationDialog->findChildren<QPushButton *>();
+  QCOMPARE(pushButtons.size(), 3);
+
+  // Get the config widget
+  auto configWidget =
+      jointCreationDialog->findChild<gazebo::gui::ConfigWidget *>();
+  QVERIFY(configWidget != NULL);
+
+  // Set child and parent from 3D scene
+  jointCreationDialog->SetParent(scopedLinkNames[0]);
+  jointCreationDialog->SetChild(scopedLinkNames[1]);
+
+  // Check that all widgets are enabled
+  QVERIFY(!configWidget->GetWidgetReadOnly("parentCombo"));
+  QVERIFY(!configWidget->GetWidgetReadOnly("childCombo"));
+  QVERIFY(!configWidget->GetWidgetReadOnly("axis1"));
+  QVERIFY(!configWidget->GetWidgetReadOnly("axis2"));
+  QVERIFY(!configWidget->GetWidgetReadOnly("align"));
+  QVERIFY(!configWidget->GetWidgetReadOnly("joint_pose"));
+  QVERIFY(!configWidget->GetWidgetReadOnly("relative_pose_general"));
+
+  for (auto button : pushButtons)
+    QVERIFY(button->isEnabled());
+
+  // Check that both joint axis widgets are visible
+  QVERIFY(configWidget->GetWidgetVisible("axis1"));
+  QVERIFY(configWidget->GetWidgetVisible("axis2"));
+
+  // Check default values
+  QVERIFY(configWidget->GetVector3WidgetValue("axis1") ==
+      ignition::math::Vector3d::UnitX);
+  QVERIFY(configWidget->GetVector3WidgetValue("axis2") ==
+      ignition::math::Vector3d::UnitY);
+
+  // Set an axis to be zero
+  auto axis1Widget = configWidget->ConfigChildWidgetByName("axis1");
+  QVERIFY(axis1Widget != NULL);
+
+  auto axis1Spins = axis1Widget->findChildren<QDoubleSpinBox *>();
+  QVERIFY(axis1Spins.size() == 3u);
+
+  axis1Spins[0]->setValue(0.0);
+  QTest::keyClick(axis1Spins[1], Qt::Key_Enter);
+
+  // Check that create button is disabled
+  for (auto button : pushButtons)
+  {
+    if (button->text() == "Create")
+    {
+      QVERIFY(!button->isEnabled());
+    }
+    else
+    {
+      QVERIFY(button->isEnabled());
+    }
+  }
+
+  // Set it back to a valid value
+  axis1Spins[2]->setValue(1.0);
+  QTest::keyClick(axis1Spins[1], Qt::Key_Enter);
+
+  // Check that all buttons are enabled again
+  for (auto button : pushButtons)
+    QVERIFY(button->isEnabled());
 
   delete jointCreationDialog;
   delete jointMaker;

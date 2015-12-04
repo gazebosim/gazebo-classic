@@ -28,9 +28,14 @@ class JointCreationDialog_TEST : public QTestFixture
   /// \brief Constructor
   public: JointCreationDialog_TEST() = default;
 
-  /// \brief Test type.
+  /// \brief Test joint type widget.
   private slots: void Type();
+
+  /// \brief Test joint child and parent links widget.
   private slots: void Links();
+
+  /// \brief Test joint axis widget.
+  private slots: void Axis();
 };
 
 #endif

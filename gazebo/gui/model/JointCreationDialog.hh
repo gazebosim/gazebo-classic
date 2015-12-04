@@ -132,6 +132,9 @@ namespace gazebo
       /// \param[in] _linkName Name of new child link.
       private: void OnChildImpl(const QString &_linkName);
 
+      // Documentation inherited
+      private: void keyPressEvent(QKeyEvent *_event);
+
       /// \internal
       /// \brief Pointer to private data.
       private: JointCreationDialogPrivate *dataPtr;

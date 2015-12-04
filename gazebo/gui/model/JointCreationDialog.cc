@@ -893,3 +893,12 @@ void JointCreationDialog::SetType(const int _typeInt)
 
   this->dataPtr->parentIcon->setStyleSheet(QString::fromStdString(sheet.str()));
 }
+
+/////////////////////////////////////////////////
+void JointCreationDialog::keyPressEvent(QKeyEvent *_event)
+{
+  if (_event->key() == Qt::Key_Enter)
+    _event->accept();
+  else
+    QDialog::keyPressEvent(_event);
+}
