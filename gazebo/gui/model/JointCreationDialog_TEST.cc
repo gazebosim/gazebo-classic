@@ -356,6 +356,26 @@ void JointCreationDialog_TEST::Axis()
   for (auto button : pushButtons)
     QVERIFY(button->isEnabled());
 
+  // Check new value
+  QVERIFY(configWidget->GetVector3WidgetValue("axis1") ==
+      ignition::math::Vector3d::UnitZ);
+  QVERIFY(configWidget->GetVector3WidgetValue("axis2") ==
+      ignition::math::Vector3d::UnitY);
+
+  // Get reset button
+  auto resetButton =
+      jointCreationDialog->findChild<QPushButton *>("JointCreationResetButton");
+  QVERIFY(resetButton != NULL);
+
+  // Trigger reset
+  resetButton->click();
+
+  // Check widgets were reset
+  QVERIFY(configWidget->GetVector3WidgetValue("axis1") ==
+      ignition::math::Vector3d::UnitX);
+  QVERIFY(configWidget->GetVector3WidgetValue("axis2") ==
+      ignition::math::Vector3d::UnitY);
+
   delete jointCreationDialog;
   delete jointMaker;
 }
@@ -452,6 +472,9 @@ void JointCreationDialog_TEST::Align()
 
   for (auto button : alignButtons)
     QVERIFY(!button->isChecked());
+
+  delete jointCreationDialog;
+  delete jointMaker;
 }
 
 /////////////////////////////////////////////////
@@ -516,13 +539,24 @@ void JointCreationDialog_TEST::RelativePose()
   // Check the widget was updated
   QVERIFY(configWidget->GetPoseWidgetValue("relative_pose") == pose);
 
-  // Get reset button
-  auto resetButton =
-      jointCreationDialog->findChild<QPushButton *>("JointCreationResetButton");
-  QVERIFY(resetButton != NULL);
+  // Get relative pose widget and check it has all the spins
+  auto relPosWidget = configWidget->ConfigChildWidgetByName("relative_pose");
+  QVERIFY(relPosWidget != NULL);
 
-  // Trigger reset
-  resetButton->click();
+  auto spins = relPosWidget->findChildren<QDoubleSpinBox *>();
+  QVERIFY(spins.size() == 6u);
+
+  // Change spin value and check it reflects on the widget
+  spins[0]->setValue(100.0);
+  QTest::keyClick(spins[1], Qt::Key_Enter);
+
+  // Check the relative pose was reset
+  QVERIFY(configWidget->GetPoseWidgetValue("relative_pose") ==
+      ignition::math::Pose3d(100.0, pose.Pos().Y(), pose.Pos().Z(),
+      pose.Rot().Roll(), pose.Rot().Pitch(), pose.Rot().Yaw()));
+
+  delete jointCreationDialog;
+  delete jointMaker;
 }
 
 // Generate a main function for the test
