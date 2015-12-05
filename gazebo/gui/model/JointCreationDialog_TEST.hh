@@ -42,6 +42,9 @@ class JointCreationDialog_TEST : public QTestFixture
 
   /// \brief Test the relative pose widget.
   private slots: void RelativePose();
+
+  /// \brief Test hitting the Cancel button.
+  private slots: void Cancel();
 };
 
 #endif

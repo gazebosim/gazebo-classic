@@ -260,6 +260,27 @@ void JointCreationDialog_TEST::Links()
     }
   }
 
+  // Set parent from dialog, valid value
+  parentCombo->setCurrentIndex(2);
+
+  // Check that the child link was selected
+  QVERIFY(configWidget->GetEnumWidgetValue("parentCombo") == linkNames[2]);
+  QVERIFY(configWidget->GetEnumWidgetValue("childCombo") == linkNames[1]);
+
+  // Check that all buttons are enabled
+  for (auto button : pushButtons)
+    QVERIFY(button->isEnabled());
+
+  // Trigger create
+  auto createButton = jointCreationDialog->findChild<QPushButton *>(
+      "JointCreationCreateButton");
+  QVERIFY(createButton != NULL);
+
+  createButton->click();
+
+  // Check dialog was closed
+  QVERIFY(!jointCreationDialog->isVisible());
+
   delete jointCreationDialog;
   delete jointMaker;
 }
@@ -554,6 +575,46 @@ void JointCreationDialog_TEST::RelativePose()
   QVERIFY(configWidget->GetPoseWidgetValue("relative_pose") ==
       ignition::math::Pose3d(100.0, pose.Pos().Y(), pose.Pos().Z(),
       pose.Rot().Roll(), pose.Rot().Pitch(), pose.Rot().Yaw()));
+
+  delete jointCreationDialog;
+  delete jointMaker;
+}
+
+/////////////////////////////////////////////////
+void JointCreationDialog_TEST::Cancel()
+{
+  // Create a joint maker
+  auto jointMaker = new gazebo::gui::JointMaker();
+  QVERIFY(jointMaker != NULL);
+
+  // Add links to list
+  std::vector<std::string> scopedLinkNames =
+      {"model::link1", "model::link2", "model::link3"};
+  std::vector<std::string> linkNames;
+  for (auto scopedName : scopedLinkNames)
+  {
+    gazebo::gui::model::Events::linkInserted(scopedName);
+
+    linkNames.push_back(scopedName.substr(scopedName.find("::")+2));
+  }
+
+  // Create a dialog
+  auto jointCreationDialog = new gazebo::gui::JointCreationDialog(jointMaker);
+  QVERIFY(jointCreationDialog != NULL);
+
+  // Open it
+  jointCreationDialog->Open(gazebo::gui::JointMaker::JOINT_HINGE2);
+  QVERIFY(jointCreationDialog->isVisible());
+
+  // Trigger cancel
+  auto cancelButton = jointCreationDialog->findChild<QPushButton *>(
+      "JointCreationCancelButton");
+  QVERIFY(cancelButton != NULL);
+
+  cancelButton->click();
+
+  // Check dialog was closed
+  QVERIFY(!jointCreationDialog->isVisible());
 
   delete jointCreationDialog;
   delete jointMaker;

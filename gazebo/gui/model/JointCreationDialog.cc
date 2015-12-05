@@ -417,10 +417,12 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
 
   // Cancel button
   QPushButton *cancelButton = new QPushButton(tr("Cancel"));
+  cancelButton->setObjectName("JointCreationCancelButton");
   connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
 
   // Create button
   this->dataPtr->createButton = new QPushButton(tr("Create"));
+  this->dataPtr->createButton->setObjectName("JointCreationCreateButton");
   this->dataPtr->createButton->setEnabled(false);
   connect(this->dataPtr->createButton, SIGNAL(clicked()), this,
       SLOT(OnCreate()));
