@@ -57,11 +57,11 @@ namespace gazebo
       /// \brief Publish the pose.
       private: void PublishPose();
 
-      /// \brief Light message container.
-      private: msgs::Light msg;
+      /// \internal
+      /// \brief Private data pointer
+      private: std::shared_ptr<LightPrivate> dataPtr;
     };
     /// \}
   }
 }
 #endif
-

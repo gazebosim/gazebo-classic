@@ -388,9 +388,21 @@ namespace gazebo
       /// \return The SDF values for the object.
       public: virtual const sdf::ElementPtr SDF() const;
 
+      /// \brief Constructor used by inherited classes
+      /// \param[in] _dataPtr Pointer to protected data
+      /// \param[in] _parent Parent of this object
+      protected: Base(BaseProtected &_dataPtr, BasePtr _parent);
+
+      /// \brief Construction helper function.
+      private: ConstructionHelper();
+
+      /// \internal
+      /// \brief Data pointer for protected data
+      protected: std::shared_ptr<BaseProtected> baseDPtr;
+
       /// \internal
       /// \brief Data pointer for private data
-      private: std::unique_ptr<BasePrivate> dataPtr;
+      private: std::unique_ptr<BasePrivate> pdPtr;
     };
     /// \}
   }

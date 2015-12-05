@@ -72,7 +72,7 @@ namespace gazebo
 
     /// \internal
     /// \brief Entity protected data.
-    class EntityPrivate : public EntityProtected
+    class EntityPrivate
     {
       /// \brief True if the object is static.
       private: bool isStatic;

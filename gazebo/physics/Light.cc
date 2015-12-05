@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
@@ -23,6 +22,7 @@
 
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/LightState.hh"
+#include "gazebo/physics/LightPrivate.hh"
 #include "gazebo/physics/Light.hh"
 
 using namespace gazebo;
@@ -30,7 +30,8 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 Light::Light(BasePtr _parent)
-  : Entity(_parent)
+  : Entity(new LightPrivate, _parent),
+  dataPtr(std::static_pointer_cast<LightPrivate>(this->dPtr))
 {
   this->AddType(LIGHT);
 }
@@ -40,7 +41,7 @@ void Light::Init()
 {
   // Record the light's initial pose (for resetting)
   ignition::math::Pose3d initPose =
-      this->sdf->Get<ignition::math::Pose3d>("pose");
+      this->dataPtr->sdf->Get<ignition::math::Pose3d>("pose");
   this->SetInitialRelativePose(initPose);
   this->SetRelativePose(initPose);
 }
@@ -54,27 +55,26 @@ void Light::ProcessMsg(const msgs::Light &_msg)
     this->worldPose = msgs::ConvertIgn(_msg.pose());
   }
 
-  this->msg.MergeFrom(_msg);
+  this->dataPtr->msg.MergeFrom(_msg);
 }
 
 //////////////////////////////////////////////////
 void Light::FillMsg(msgs::Light &_msg)
 {
-  _msg.MergeFrom(this->msg);
+  _msg.MergeFrom(this->dataPtr->msg);
 
-  _msg.set_name(this->GetScopedName());
+  _msg.set_name(this->ScopedName());
 
-  ignition::math::Pose3d relPose = this->GetRelativePose().Ign();
-  msgs::Set(_msg.mutable_pose(), relPose);
+  msgs::Set(_msg.mutable_pose(), this->RelativePose());
 }
 
 //////////////////////////////////////////////////
 void Light::SetState(const LightState &_state)
 {
-  if (this->worldPose == math::Pose(_state.Pose()))
+  if (this->dataPtr->worldPose == _state.Pose())
     return;
 
-  this->worldPose = math::Pose(_state.Pose());
+  this->worldPose = _state.Pose();
   this->PublishPose();
 }
 
@@ -89,4 +89,3 @@ void Light::PublishPose()
 void Light::OnPoseChange()
 {
 }
-

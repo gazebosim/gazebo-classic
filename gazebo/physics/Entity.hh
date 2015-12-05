@@ -369,6 +369,11 @@ namespace gazebo
       /// \return The dirty pose of the entity.
       public: const ignition::math::Pose3d &DirtyPose() const;
 
+      /// \brief Constructor used by inherited classes
+      /// \param[in] _dataPtr Pointer to protected data
+      /// \param[in] _parent Parent of this object
+      protected: Entity(EntityProtected &_dataPtr, BasePtr _parent);
+
       /// \brief This function is called when the entity's
       /// (or one of its parents) pose of the parent has changed.
       protected: virtual void OnPoseChange() = 0;
@@ -423,7 +428,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Private data pointer
-      private: std::unique_ptr<EntityPrivate> dataPtr;
+      private: std::unique_ptr<EntityPrivate> pdPtr;
     };
     /// \}
   }
