@@ -765,7 +765,7 @@ void JointCreationDialog::OnResetAll()
 
   this->dataPtr->configWidget->SetPoseWidgetValue("joint_pose",
       ignition::math::Pose3d::Zero);
- this->OnPoseFromDialog("joint_pose", ignition::math::Pose3d::Zero);
+  this->OnPoseFromDialog("joint_pose", ignition::math::Pose3d::Zero);
 }
 
 /////////////////////////////////////////////////
