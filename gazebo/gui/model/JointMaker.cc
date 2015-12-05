@@ -588,6 +588,7 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
   {
     return false;
   }
+  QApplication::setOverrideCursor(Qt::CrossCursor);
 
   // Get the active camera and scene.
   rendering::UserCameraPtr camera = gui::get_active_camera();

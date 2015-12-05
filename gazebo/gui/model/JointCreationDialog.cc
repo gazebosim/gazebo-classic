@@ -518,6 +518,7 @@ void JointCreationDialog::Open(JointMaker::JointType _type)
 
   this->move(0, 0);
   this->show();
+  QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
 }
 
 /////////////////////////////////////////////////
@@ -701,6 +702,7 @@ void JointCreationDialog::OnChildImpl(const QString &_linkName)
 
   // Hide selection text
   this->dataPtr->selectionsText->setVisible(false);
+  QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
 
   // Check if links are valid
   this->CheckLinksValid();
