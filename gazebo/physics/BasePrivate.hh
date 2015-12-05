@@ -31,19 +31,19 @@ namespace gazebo
       /// \brief Compute the scoped name of this object based on its
       /// parents.
       /// \sa Base::GetScopedName
-      protected: void ComputeScopedName();
+      public: void ComputeScopedName();
 
       /// \brief The SDF values for this object.
-      protected: sdf::ElementPtr sdf;
+      public: sdf::ElementPtr sdf;
 
       /// \brief Parent of this entity.
-      protected: BasePtr parent;
+      public: BasePtr parent;
 
       /// \brief Children of this entity.
-      protected: Base_V children;
+      public: Base_V children;
 
       /// \brief Pointer to the world.
-      protected: WorldPtr world;
+      public: WorldPtr world;
     };
 
     /// \internal
@@ -51,22 +51,22 @@ namespace gazebo
     class BasePrivate : public BaseProtected
     {
       /// \brief Set to true if the object should be saved.
-      private: bool saveable;
+      public: bool saveable;
 
       /// \brief This entities ID.
-      private: uint32_t id;
+      public: uint32_t id;
 
       /// \brief The type of this object.
-      private: unsigned int type;
+      public: unsigned int type;
 
       /// \brief True if selected.
-      private: bool selected;
+      public: bool selected;
 
       /// \brief Local copy of the sdf name.
-      private: std::string name;
+      public: std::string name;
 
       /// \brief Local copy of the scoped name.
-      private: std::string scopedName;
+      public: std::string scopedName;
     };
   }
 }

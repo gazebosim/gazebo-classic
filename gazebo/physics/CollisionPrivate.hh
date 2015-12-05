@@ -17,6 +17,8 @@
 #ifndef _GAZEBO_PHYSICS_COLLISION_PRIVATE_HH_
 #define _GAZEBO_PHYSICS_COLLISION_PRIVATE_HH_
 
+#include "gazebo/physics/CollisionState.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/EntityPrivate.hh"
 
 namespace gazebo

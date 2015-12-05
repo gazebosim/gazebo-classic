@@ -35,6 +35,9 @@ namespace gazebo
   /// \brief namespace for physics
   namespace physics
   {
+    // Forward declare protected data class.
+    class BaseProtected;
+
     // Forward declare private data class.
     class BasePrivate;
 
@@ -387,6 +390,10 @@ namespace gazebo
       /// \brief Get the SDF values for the object.
       /// \return The SDF values for the object.
       public: virtual const sdf::ElementPtr SDF() const;
+
+      /// \internal
+      /// \brief Data pointer for protected data
+      protected: std::shared_ptr<BaseProtected> dPtr;
 
       /// \internal
       /// \brief Data pointer for private data

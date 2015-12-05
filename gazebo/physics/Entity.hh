@@ -423,7 +423,11 @@ namespace gazebo
 
       /// \internal
       /// \brief Private data pointer
-      private: std::unique_ptr<EntityPrivate> dataPtr;
+      protected: std::shared_ptr<EntityPrivate> dataPtr;
+
+      /// \internal
+      /// \brief Private data pointer
+      private: std::unique_ptr<EntityPrivate> pdPtr;
     };
     /// \}
   }

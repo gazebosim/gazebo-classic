@@ -17,6 +17,7 @@
 #ifndef _GAZEBO_PHYSICS_COLLISION_HH_
 #define _GAZEBO_PHYSICS_COLLISION_HH_
 
+#include "gazebo/physics/CollisionState.hh"
 #include "gazebo/physics/Entity.hh"
 #include "gazebo/util/system.hh"
 
@@ -280,8 +281,12 @@ namespace gazebo
       private: msgs::Visual CreateCollisionVisual();
 
       /// \internal
+      /// \brief Protected data pointer
+      private: std::shared_ptr<CollisionPrivate> dataPtr;
+
+      /// \internal
       /// \brief Private data pointer
-      private: std::unique_ptr<CollisionPrivate> *dPtr;
+      private: std::unique_ptr<CollisionPrivate> pdPtr;
     };
     /// \}
   }

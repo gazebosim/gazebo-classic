@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: Collision class
- * Author: Nate Koenig
- * Date: 13 Feb 2006
- */
-
-#ifndef _ODECOLLISION_HH_
-#define _ODECOLLISION_HH_
+#ifndef _GAZEBO_PHYSICS_ODECOLLISION_HH_
+#define _GAZEBO_PHYSICS_ODECOLLISION_HH_
 
 #include "ode/ode.h"
 
@@ -35,6 +30,9 @@ namespace gazebo
 {
   namespace physics
   {
+    // Forward declare private data class.
+    class ODECollisionPrivate;
+
     /// \brief Base class for all ODE collisions.
     class GZ_PHYSICS_VISIBLE ODECollision : public Collision
     {
@@ -98,14 +96,9 @@ namespace gazebo
       /// \brief Empty pose change callback.
       private: void OnPoseChangeNull();
 
-      /// \brief Collision space for this.
-      protected: dSpaceID spaceId;
-
-      /// \brief ID for the collision.
-      protected: dGeomID collisionId;
-
-      /// \brief Function used to set the pose of the ODE object.
-      private: void (ODECollision::*onPoseChangeFunc)();
+      /// \internal
+      /// \brief Private data pointer.
+      private: std::shared_ptr<ODECollisionPrivate> dataPtr;
     };
   }
 }
