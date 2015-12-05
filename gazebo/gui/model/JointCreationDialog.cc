@@ -37,7 +37,7 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   this->setWindowFlags(Qt::WindowStaysOnTopHint);
 
   this->setMinimumWidth(500);
-  this->setMinimumHeight(1000);
+  this->setMinimumHeight(940);
 
   this->dataPtr->jointMaker = _jointMaker;
 
@@ -361,30 +361,11 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
       this->dataPtr->configWidget->CreatePoseWidget("relative_pose", 0);
   this->dataPtr->configWidget->AddConfigChildWidget("relative_pose",
       relativePoseWidget);
-
-  // Reset all button
-  QPushButton *resetAllButton = new QPushButton(tr(
-      "Reset all fields"));
-  resetAllButton->setObjectName("JointCreationResetButton");
-  resetAllButton->setToolTip("Reset all fields");
-  connect(resetAllButton, SIGNAL(clicked()), this,
-      SLOT(OnResetAll()));
-
-  // Relative pose general layout
-  QVBoxLayout *relativePoseGeneralLayout = new QVBoxLayout();
-  relativePoseGeneralLayout->setContentsMargins(0, 0, 0, 0);
-  relativePoseGeneralLayout->addWidget(relativePoseWidget);
-  relativePoseGeneralLayout->addWidget(resetAllButton);
-
-  ConfigChildWidget *relativePoseGeneralWidget = new ConfigChildWidget();
-  relativePoseGeneralWidget->setLayout(relativePoseGeneralLayout);
-  this->dataPtr->configWidget->AddConfigChildWidget("relative_pose_general",
-      relativePoseGeneralWidget);
-  this->dataPtr->configWidget->SetWidgetReadOnly("relative_pose_general", true);
+  this->dataPtr->configWidget->SetWidgetReadOnly("relative_pose", true);
 
   QWidget *relativePoseGroupWidget =
       this->dataPtr->configWidget->CreateGroupWidget(
-      "Relative Pose", relativePoseGeneralWidget, 0);
+      "Relative Pose", relativePoseWidget, 0);
 
   // Connect pose widgets signal
   connect(this->dataPtr->configWidget,
@@ -392,6 +373,10 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
       const ignition::math::Pose3d)),
       this, SLOT(OnPoseFromDialog(const QString,
       const ignition::math::Pose3d)));
+
+  // Spacer
+  QWidget *spacer = new QWidget();
+  spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
   // Config Widget layout
   QVBoxLayout *configLayout = new QVBoxLayout();
@@ -402,6 +387,7 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   configLayout->addWidget(alignGroupWidget);
   configLayout->addWidget(jointPoseGroupWidget);
   configLayout->addWidget(relativePoseGroupWidget);
+  configLayout->addWidget(spacer);
 
   this->dataPtr->configWidget->setLayout(configLayout);
 
@@ -414,6 +400,12 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   QVBoxLayout *generalLayout = new QVBoxLayout;
   generalLayout->setContentsMargins(0, 0, 0, 0);
   generalLayout->addWidget(scrollArea);
+
+  // Reset all button
+  QPushButton *resetAllButton = new QPushButton(tr("Reset"));
+  resetAllButton->setObjectName("JointCreationResetButton");
+  resetAllButton->setToolTip("Reset");
+  connect(resetAllButton, SIGNAL(clicked()), this, SLOT(OnResetAll()));
 
   // Cancel button
   QPushButton *cancelButton = new QPushButton(tr("Cancel"));
@@ -429,6 +421,7 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
 
   // Buttons layout
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
+  buttonsLayout->addWidget(resetAllButton);
   buttonsLayout->addWidget(cancelButton);
   buttonsLayout->addWidget(this->dataPtr->createButton);
   buttonsLayout->setAlignment(Qt::AlignRight);
