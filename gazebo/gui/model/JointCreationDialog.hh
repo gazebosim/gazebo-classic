@@ -59,9 +59,6 @@ namespace gazebo
       /// \param[in] _pose New pose.
       public: void UpdateRelativePose(const ignition::math::Pose3d &_pose);
 
-      // Documentation inherited
-      protected: virtual void enterEvent(QEvent *_event);
-
       /// \brief Qt callback when a link is chosen on the dialog.
       private slots: void OnLinkFromDialog();
 

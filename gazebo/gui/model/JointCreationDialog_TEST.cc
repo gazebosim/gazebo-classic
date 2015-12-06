@@ -159,25 +159,15 @@ void JointCreationDialog_TEST::Links()
   QVERIFY(configWidget->GetWidgetReadOnly("axis2"));
   QVERIFY(configWidget->GetWidgetReadOnly("align"));
   QVERIFY(configWidget->GetWidgetReadOnly("joint_pose"));
-  QVERIFY(configWidget->GetWidgetReadOnly("relative_pose_general"));
+  QVERIFY(configWidget->GetWidgetReadOnly("relative_pose"));
 
   // Get push buttons (reset, cancel, create)
   auto pushButtons = jointCreationDialog->findChildren<QPushButton *>();
   QCOMPARE(pushButtons.size(), 3);
 
-  // Check that create and reset buttons are disabled
+  // Check that create button is disabled
   for (auto button : pushButtons)
-  {
-    if (button->text() == "Create" ||
-        (button->text().toStdString()).find("Reset") != std::string::npos)
-    {
-      QVERIFY(!button->isEnabled());
-    }
-    else
-    {
-      QVERIFY(button->isEnabled());
-    }
-  }
+    QCOMPARE(button->isEnabled(), button->text() != "Create");
 
   // Set parent from 3D scene
   jointCreationDialog->SetParent(scopedLinkNames[0]);
@@ -193,21 +183,11 @@ void JointCreationDialog_TEST::Links()
   QVERIFY(configWidget->GetWidgetReadOnly("axis2"));
   QVERIFY(configWidget->GetWidgetReadOnly("align"));
   QVERIFY(configWidget->GetWidgetReadOnly("joint_pose"));
-  QVERIFY(configWidget->GetWidgetReadOnly("relative_pose_general"));
+  QVERIFY(configWidget->GetWidgetReadOnly("relative_pose"));
 
-  // Check that create and reset buttons are disabled
+  // Check that create button is disabled
   for (auto button : pushButtons)
-  {
-    if (button->text() == "Create" ||
-        (button->text().toStdString()).find("Reset") != std::string::npos)
-    {
-      QVERIFY(!button->isEnabled());
-    }
-    else
-    {
-      QVERIFY(button->isEnabled());
-    }
-  }
+    QCOMPARE(button->isEnabled(), button->text() != "Create");
 
   // Set child from 3D scene
   jointCreationDialog->SetChild(scopedLinkNames[1]);
@@ -223,7 +203,7 @@ void JointCreationDialog_TEST::Links()
   QVERIFY(!configWidget->GetWidgetReadOnly("axis2"));
   QVERIFY(!configWidget->GetWidgetReadOnly("align"));
   QVERIFY(!configWidget->GetWidgetReadOnly("joint_pose"));
-  QVERIFY(!configWidget->GetWidgetReadOnly("relative_pose_general"));
+  QVERIFY(!configWidget->GetWidgetReadOnly("relative_pose"));
 
   for (auto button : pushButtons)
     QVERIFY(button->isEnabled());
@@ -249,16 +229,7 @@ void JointCreationDialog_TEST::Links()
 
   // Check that create button is disabled
   for (auto button : pushButtons)
-  {
-    if (button->text() == "Create")
-    {
-      QVERIFY(!button->isEnabled());
-    }
-    else
-    {
-      QVERIFY(button->isEnabled());
-    }
-  }
+    QCOMPARE(button->isEnabled(), button->text() != "Create");
 
   // Set parent from dialog, valid value
   parentCombo->setCurrentIndex(2);
@@ -331,7 +302,7 @@ void JointCreationDialog_TEST::Axis()
   QVERIFY(!configWidget->GetWidgetReadOnly("axis2"));
   QVERIFY(!configWidget->GetWidgetReadOnly("align"));
   QVERIFY(!configWidget->GetWidgetReadOnly("joint_pose"));
-  QVERIFY(!configWidget->GetWidgetReadOnly("relative_pose_general"));
+  QVERIFY(!configWidget->GetWidgetReadOnly("relative_pose"));
 
   for (auto button : pushButtons)
     QVERIFY(button->isEnabled());
@@ -358,16 +329,7 @@ void JointCreationDialog_TEST::Axis()
 
   // Check that create button is disabled
   for (auto button : pushButtons)
-  {
-    if (button->text() == "Create")
-    {
-      QVERIFY(!button->isEnabled());
-    }
-    else
-    {
-      QVERIFY(button->isEnabled());
-    }
-  }
+    QCOMPARE(button->isEnabled(), button->text() != "Create");
 
   // Set it back to a valid value
   axis1Spins[2]->setValue(1.0);
@@ -447,7 +409,7 @@ void JointCreationDialog_TEST::Align()
   QVERIFY(!configWidget->GetWidgetReadOnly("axis2"));
   QVERIFY(!configWidget->GetWidgetReadOnly("align"));
   QVERIFY(!configWidget->GetWidgetReadOnly("joint_pose"));
-  QVERIFY(!configWidget->GetWidgetReadOnly("relative_pose_general"));
+  QVERIFY(!configWidget->GetWidgetReadOnly("relative_pose"));
 
   for (auto button : pushButtons)
     QVERIFY(button->isEnabled());
@@ -548,7 +510,7 @@ void JointCreationDialog_TEST::RelativePose()
   QVERIFY(!configWidget->GetWidgetReadOnly("axis2"));
   QVERIFY(!configWidget->GetWidgetReadOnly("align"));
   QVERIFY(!configWidget->GetWidgetReadOnly("joint_pose"));
-  QVERIFY(!configWidget->GetWidgetReadOnly("relative_pose_general"));
+  QVERIFY(!configWidget->GetWidgetReadOnly("relative_pose"));
 
   for (auto button : pushButtons)
     QVERIFY(button->isEnabled());

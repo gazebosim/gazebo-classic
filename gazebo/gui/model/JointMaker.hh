@@ -142,6 +142,7 @@ namespace gazebo
       public: void GenerateSDF();
 
       /// \brief Generate SDF for all joints.
+      /// \return Pointer to SDF element.
       public: sdf::ElementPtr GetSDF() const;
 
       /// \brief Get the axis count for joint type.
@@ -174,7 +175,7 @@ namespace gazebo
       public: void Stop();
 
       /// \brief Get the number of joints added.
-      /// return Number of joints.
+      /// \return Number of joints.
       public: unsigned int GetJointCount();
 
       /// \brief Create a joint from SDF. This is mainly used when editing
@@ -222,6 +223,9 @@ namespace gazebo
       public slots: void SetAxis(const QString &_axis,
           const ignition::math::Vector3d &_value);
 
+      /// \brief A new joint pose for the joint being created has been chosen.
+      /// To be used by other classes.
+      /// \param[in] _pose New joint pose.
       public: void SetJointPose(const ignition::math::Pose3d &_pose);
 
       /// \brief A new parent link for the joint being created has been chosen.
@@ -236,10 +240,20 @@ namespace gazebo
       /// \param[in] _name Link name, either the leaf or scoped.
       public: void SetChildLink(const std::string &_name);
 
-      /// \brief Set the relative pose
+      /// \brief A new relative pose for the child link of the joint being
+      /// created hass been chosen. The pose is expressed in the parent link
+      /// frame.
+      /// \param[in] _pose New pose.
+      /// \param[in] _reset Set to true to reset the relative pose to the
+      /// original one.
       public: void SetLinksRelativePose(
           const ignition::math::Pose3d &_pose, bool _reset);
 
+      /// \brief Align the parent and child links of the joint being created.
+      /// \param[in] True to align the child to the parent, false to align the
+      /// parent to the child.
+      /// \param[in] _axis Axis of alignment (x/y/z)
+      /// \param[in] _mode Alignment mode (min/center/max)
       public: void AlignLinks(
           const bool _childToParent, const std::string &_axis,
           const std::string &_mode);

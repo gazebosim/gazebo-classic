@@ -498,7 +498,7 @@ void JointCreationDialog::Open(JointMaker::JointType _type)
   this->dataPtr->configWidget->SetWidgetReadOnly("axis2", true);
   this->dataPtr->configWidget->SetWidgetReadOnly("align", true);
   this->dataPtr->configWidget->SetWidgetReadOnly("joint_pose", true);
-  this->dataPtr->configWidget->SetWidgetReadOnly("relative_pose_general",
+  this->dataPtr->configWidget->SetWidgetReadOnly("relative_pose",
       true);
   this->dataPtr->parentLinkWidget->setStyleSheet(
       ConfigWidget::StyleSheet("active", 1));
@@ -687,8 +687,7 @@ void JointCreationDialog::OnChildImpl(const QString &_linkName)
   this->dataPtr->configWidget->SetWidgetReadOnly("axis2", false);
   this->dataPtr->configWidget->SetWidgetReadOnly("align", false);
   this->dataPtr->configWidget->SetWidgetReadOnly("joint_pose", false);
-  this->dataPtr->configWidget->SetWidgetReadOnly("relative_pose_general",
-      false);
+  this->dataPtr->configWidget->SetWidgetReadOnly("relative_pose", false);
 
   // Remove empty option
   this->dataPtr->configWidget->RemoveItemEnumWidget("childCombo", "");
@@ -713,12 +712,6 @@ void JointCreationDialog::OnCreate()
 {
   this->accept();
   this->dataPtr->jointMaker->FinalizeCreation();
-}
-
-/////////////////////////////////////////////////
-void JointCreationDialog::enterEvent(QEvent */*_event*/)
-{
-//  QApplication::setOverrideCursor(Qt::ArrowCursor);
 }
 
 /////////////////////////////////////////////////
