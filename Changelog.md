@@ -52,6 +52,9 @@ flags from c functions. Windows did not like `CPPTYPE_*` in
 1. Light and light state for the server side
     * [Pull request #1920](https://bitbucket.org/osrf/gazebo/pull-request/1920)
 
+1. Add scale to model state so scaling works on log/playback.
+    * [Pull request #2020](https://bitbucket.org/osrf/gazebo/pull-request/2020)
+
 1. Added tests for WorldState
     * [Pull request #1968](https://bitbucket.org/osrf/gazebo/pull-request/1968)
 
