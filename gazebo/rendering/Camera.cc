@@ -389,7 +389,7 @@ void Camera::Update()
       if (direction.GetLength() < this->dataPtr->trackMinDistance)
         error = this->dataPtr->trackMinDistance - direction.GetLength();
       else if (direction.GetLength() > this->dataPtr->trackMaxDistance)
-        error =  direction.GetLength() - this->dataPtr->trackMaxDistance;
+        error = this->dataPtr->trackMaxDistance - direction.GetLength();
     }
     else
     {
@@ -407,13 +407,12 @@ void Camera::Update()
         {
           direction += this->dataPtr->trackPos;
         }
-        error = -direction.GetLength();
       }
       else
       {
         direction = this->dataPtr->trackPos - this->GetWorldPose().Ign().Pos();
-        error = -direction.GetLength();
       }
+      error = -direction.GetLength();
     }
 
     double scaling = this->dataPtr->trackVisualPID.Update(error, 0.3);
