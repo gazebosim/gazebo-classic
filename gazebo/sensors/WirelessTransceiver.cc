@@ -45,7 +45,8 @@ WirelessTransceiver::WirelessTransceiver()
 
 /////////////////////////////////////////////////
 WirelessTransceiver::WirelessTransceiver(WirelessTransceiverPrivate &_dataPtr)
-  : Sensor(_dataPtr, sensors::OTHER)
+: Sensor(_dataPtr, sensors::OTHER),
+  dataPtr(std::static_pointer_cast<WirelessTransceiverPrivate>(this->dPtr))
 {
   this->dataPtr->active = false;
 }

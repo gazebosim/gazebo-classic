@@ -74,27 +74,34 @@ void WirelessReceiver::Load(const std::string &_worldName)
 
   if (this->dataPtr->minFreq <= 0)
   {
-    gzthrow("Wireless receiver min. frequency must be > 0. Current value is ["
-      << this->dataPtr->minFreq << "]");
+    gzerr << "Attempting to set a wireless receiver min frequency"
+      << "of [" << this->dataPtr->minFreq << "]. Value must be > 0, "
+      << "using a value of 1.0\n";
+    this->dataPtr->minFreq = 1.0;
   }
 
   if (this->dataPtr->maxFreq <= 0)
   {
-    gzthrow("Wireless receiver max. frequency must be > 0. Current value is ["
-      << this->dataPtr->maxFreq << "]");
+    gzerr << "Attempting to set a wireless receiver max frequency"
+      << "of [" << this->dataPtr->maxFreq << "]. Value must be > 0, "
+      << "using a value of 1.0\n";
+    this->dataPtr->maxFreq = 1.0;
   }
 
   if (this->dataPtr->minFreq > this->dataPtr->maxFreq)
   {
-    gzthrow("Wireless receiver min. frequency must be less or equal than max. "
-        << "frequency. Current min. frequency is [" << this->dataPtr->minFreq <<
-        "] and max frequency is [" << this->dataPtr->maxFreq << "]");
+    gzerr << "Wireless receiver min frequency[" << this->dataPtr->minFreq << "]"
+      << " is greater than max frequency[" << this->dataPtr->maxFreq << "]."
+      << " Swapping the values.\n";
+    std::swap(this->dataPtr->maxFreq, this->dataPtr->minFreq);
   }
 
   if (this->dataPtr->sensitivity >= 0)
   {
-    gzthrow("Wireless receiver sensitivity must be < 0. Current value is ["
-      << this->dataPtr->sensitivity << "]");
+    gzerr << "Attempting to set a wireless sensitivity "
+      << "of [" << this->dataPtr->sensitivity << "]. Value must be > 0, "
+      << "using a value of 1.0\n";
+    this->dataPtr->sensitivity = 1.0;
   }
 }
 

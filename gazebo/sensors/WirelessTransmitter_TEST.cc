@@ -58,7 +58,7 @@ WirelessTransmitter_TEST::WirelessTransmitter_TEST()
   Load("worlds/empty.world");
 
   std::string txModelName = "tx";
-  std::string txSensorName = "wirelessTransmitter";
+  std::string txSensorName = "wirelessTransmitterConstructor";
   std::string txEssid = "GzTest";
   double freq = 2442.0;
   double power = 14.5;
@@ -132,13 +132,14 @@ void WirelessTransmitter_TEST::TestInvalidFreq()
   sdf::readString(transmitterSensorStringCopy, sdf);
 
   // Create the wireless receiver sensor
-  ASSERT_ANY_THROW(mgr->CreateSensor(sdf, "default", "ground_plane::link", 0));
+  ASSERT_NO_THROW(mgr->CreateSensor(sdf, "default", "ground_plane::link", 0));
 }
 
 /////////////////////////////////////////////////
 /// \brief Test the signal strength function
 void WirelessTransmitter_TEST::TestSignalStrength()
 {
+  printf("1\n");
   int samples = 100;
   double signStrengthAvg = 0.0;
   ignition::math::Pose3d txPose(
@@ -178,7 +179,7 @@ void WirelessTransmitter_TEST::TestUpdateImpl()
   node->Init("default");
 
   std::string txTopic =
-      "/gazebo/default/tx/link/wirelessTransmitter/transceiver";
+      "/gazebo/default/tx/link/wirelessTransmitterConstructor/transceiver";
   transport::SubscriberPtr sub = node->Subscribe(txTopic,
       &WirelessTransmitter_TEST::TxMsg, this);
 
@@ -221,7 +222,7 @@ void WirelessTransmitter_TEST::TestUpdateImplNoVisual()
   node->Init("default");
 
   std::string txTopic =
-      "/gazebo/default/txNoVisual/link/wirelessTransmitter/transceiver";
+      "/gazebo/default/txNoVisual/link/wirelessTransmitterNoVisual/transceiver";
   transport::SubscriberPtr sub = node->Subscribe(txTopic,
       &WirelessTransmitter_TEST::TxMsg, this);
 

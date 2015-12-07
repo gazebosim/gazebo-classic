@@ -35,7 +35,15 @@ class WirelessReceiver_TEST : public ServerFixture
   public: void TestIllegalSensitivity();
   public: void TestUpdateImpl();
 
+  /// \brief Create a sensor with an illegal value and checks that an exception
+  /// is thrown
+  /// \param[in] _sensorString Sensor SDF string
   private: void CheckIllegalValue(std::string _sensorString);
+
+  /// \brief Create a sensor with legal values and check that an exception
+  /// is not thrown
+  /// \param[in] _sensorString Sensor SDF string
+  private: void CheckLegalValue(std::string _sensorString);
 
   private: sensors::SensorManager *mgr;
   private: sdf::ElementPtr sdf;
@@ -102,14 +110,22 @@ void WirelessReceiver_TEST::TestCreateWirelessReceiver()
 }
 
 /////////////////////////////////////////////////
-/// \brief Create a sensor with an illegal value and checks that an exception
-/// is thrown
 void WirelessReceiver_TEST::CheckIllegalValue(std::string _sensorString)
 {
   sdf::readString(_sensorString, this->sdf);
 
   // Create the wireless receiver sensor
   ASSERT_ANY_THROW(this->mgr->CreateSensor(this->sdf,
+      "default", "ground_plane::link", 0));
+}
+
+/////////////////////////////////////////////////
+void WirelessReceiver_TEST::CheckLegalValue(std::string _sensorString)
+{
+  sdf::readString(_sensorString, this->sdf);
+
+  // Create the wireless receiver sensor
+  ASSERT_NO_THROW(this->mgr->CreateSensor(this->sdf,
       "default", "ground_plane::link", 0));
 }
 
@@ -135,7 +151,7 @@ void WirelessReceiver_TEST::TestIllegalPower()
       boost::regex_replace(this->receiverSensorString,
           re, "<power>-1.0</power>");
 
-  this->CheckIllegalValue(receiverSensorStringCopy);
+  this->CheckLegalValue(receiverSensorStringCopy);
 }
 
 /////////////////////////////////////////////////
@@ -147,7 +163,7 @@ void WirelessReceiver_TEST::TestIllegalGain()
   std::string receiverSensorStringCopy =
       boost::regex_replace(this->receiverSensorString, re, "<gain>-1.0</gain>");
 
-  this->CheckIllegalValue(receiverSensorStringCopy);
+  this->CheckLegalValue(receiverSensorStringCopy);
 }
 
 /////////////////////////////////////////////////
@@ -160,7 +176,7 @@ void WirelessReceiver_TEST::TestIllegalMinFreq()
       boost::regex_replace(this->receiverSensorString, re,
         "<min_frequency>-1.0</min_frequency>");
 
-  this->CheckIllegalValue(receiverSensorStringCopy);
+  this->CheckLegalValue(receiverSensorStringCopy);
 }
 
 /////////////////////////////////////////////////
@@ -173,7 +189,7 @@ void WirelessReceiver_TEST::TestIllegalMaxFreq()
       boost::regex_replace(this->receiverSensorString, re,
         "<max_frequency>-1.0</max_frequency>");
 
-  this->CheckIllegalValue(receiverSensorStringCopy);
+  this->CheckLegalValue(receiverSensorStringCopy);
 }
 
 /////////////////////////////////////////////////
@@ -191,7 +207,7 @@ void WirelessReceiver_TEST::TestIllegalMinMaxFreq()
       boost::regex_replace(receiverSensorStringCopy, re,
         "<min_frequency>2484.0</min_frequency>");
 
-  this->CheckIllegalValue(receiverSensorStringCopy);
+  this->CheckLegalValue(receiverSensorStringCopy);
 }
 
 /////////////////////////////////////////////////
@@ -204,7 +220,7 @@ void WirelessReceiver_TEST::TestIllegalSensitivity()
       boost::regex_replace(this->receiverSensorString, re,
         "<sensitivity>1.0</sensitivity>");
 
-  this->CheckIllegalValue(receiverSensorStringCopy);
+  this->CheckLegalValue(receiverSensorStringCopy);
 }
 
 /////////////////////////////////////////////////

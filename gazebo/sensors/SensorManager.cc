@@ -212,6 +212,7 @@ void SensorManager::Fini()
   }
 
   this->removeSensors.clear();
+  this->initSensors.clear();
 
   delete this->simTimeEventHandler;
   this->simTimeEventHandler = NULL;
