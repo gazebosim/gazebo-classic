@@ -15,30 +15,25 @@
  *
 */
 
-#ifndef _GAZEBO_MODEL_MAKER_TEST_HH_
-#define _GAZEBO_MODEL_MAKER_TEST_HH_
+#ifndef _GAZEBO_VISUAL_POSE_TEST_HH_
+#define _GAZEBO_VISUAL_POSE_TEST_HH_
 
+#include <string>
 #include "gazebo/gui/QTestFixture.hh"
 
-/// \brief A test class for the ModelMaker class.
-class ModelMaker_TEST : public QTestFixture
+class QtProperty;
+class QtTreePropertyBrowser;
+
+/// \brief Test undo / redo user commands.
+class VisualPoseTest : public QTestFixture
 {
   Q_OBJECT
 
-  /// \brief Test creating a simple shape.
-  private slots: void SimpleShape();
+  /// \brief Default constructor
+  public: VisualPoseTest() = default;
 
-  /// \brief Test creating a model from a file.
-  private slots: void FromFile();
-
-  /// \brief Test creating a nested model from a file
-  private slots: void FromNestedModelFile();
-
-  /// \brief Test creating a model by copying another model.
-  private slots: void FromModel();
-
-  /// \brief Test creating a nested model by copying another nested model.
-  private slots: void FromNestedModel();
+  /// \brief Test changing visual pose from physics.
+  private slots: void VisualPose();
 };
 
 #endif
