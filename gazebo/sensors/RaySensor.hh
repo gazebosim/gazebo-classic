@@ -224,7 +224,6 @@ namespace gazebo
       ///         SetActive(true).
       /// \param[in] _index Index of specific ray
       /// \return Retro (intensity) value for ray
-      /// \deprecated See Retro(unsigned int _index)
       public: double Retro(const unsigned int _index) const;
 
       /// \brief Get detected fiducial value for a ray.
@@ -248,7 +247,6 @@ namespace gazebo
       ///         SetActive(true).
       /// \param[in] _index Index value of specific ray
       /// \return Fiducial value
-      /// \deprecated See Fiducial(unsigned int _index)
       public: int Fiducial(const unsigned int _index) const;
 
       /// \brief Returns a pointer to the internal physics::MultiRayShape

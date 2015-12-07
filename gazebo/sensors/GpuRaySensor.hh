@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_GPURAYSENSOR_HH_
-#define _GAZEBO_GPURAYSENSOR_HH_
+#ifndef _GAZEBO_SENSORS_GPURAYSENSOR_HH_
+#define _GAZEBO_SENSORS_GPURAYSENSOR_HH_
 
 #include <vector>
 #include <string>
@@ -202,7 +202,6 @@ namespace gazebo
 
       /// \brief Set the vertical scan line top angle
       /// \param[in] _angle The Maximum angle of the scan block
-      /// \deprecated See VerticalAngleMax(double _angle)
       public: void SetVerticalAngleMax(const double _angle);
 
       /// \brief Get the vertical angle in radians between each range

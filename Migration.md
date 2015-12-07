@@ -81,6 +81,202 @@ release will remove the deprecated code.
 
 ### Deprecations
 
+1. **gazebo/sensors/CameraSensor.hh**
+    + ***Deprecation:** public: virtual std::string GetTopic() const;
+    + ***Replacement:** public: virtual std::string Topic() const;
+    + ***Deprecation:** public: rendering::CameraPtr GetCamera() const
+    + ***Replacement:** public: rendering::CameraPtr Camera() const;
+    + ***Deprecation:** public: unsigned int GetImageWidth() const;
+    + ***Replacement:** public: unsigned int ImageWidth() const;
+    + ***Deprecation:** public: unsigned int GetImageHeight() const;
+    + ***Replacement:** public: unsigned int ImageHeight() const;
+    + ***Deprecation:** public: const unsigned char *GetImageData();
+    + ***Replacement:** const unsigned char *ImageData() const;
+
+1. **gazebo/sensors/ContactSensor.hh**
+    + ***Deprecation:** public: msgs::Contacts GetContacts() const;
+    + ***Replacement:** public: msgs::Contacts Contacts() const;
+    + ***Deprecation:** public: std::map<std::string, physics::Contact> GetContacts(const std::string &_collisionName);
+    + ***Replacement:** public: std::map<std::string, physics::Contact> Contacts(const std::string &_collisionName) const;
+
+1. **gazebo/sensors/DepthCameraSensor.hh**
+    + ***Deprecation:** public: rendering::DepthCameraPtr GetDepthCamera() const
+    + ***Replacement:** public: rendering::DepthCameraPtr DepthCamera() const;
+
+1. **gazebo/sensors/ForceTorqueSensor.hh**
+    + ***Deprecation:** public: virtual std::string GetTopic() const
+    + ***Replacement:** public: virtual std::string Topic() const;
+    + ***Deprecation:** public: physics::JointPtr GetJoint() const;
+    + ***Replacement:** public: physics::JointPtr Joint() const;
+
+1. **gazebo/sensors/GpsSensor.hh**
+    + ***Deprecation:** public: double GetAltitude();
+    + ***Replacement:** public: double Altitude() const;
+
+1. **gazebo/sensors/GpuRaySensor.hh**
+    + ***Deprecation:** public: virtual std::string GetTopic() const;
+    + ***Replacement:** public: virtual std::string Topic() const;
+    + ***Deprecation:** public: rendering::GpuLaserPtr GetLaserCamera() const
+    + ***Replacement:** public: rendering::GpuLaserPtr LaserCamera() const;
+    + ***Deprecation:** public: double GetAngleResolution() const 
+    + ***Replacement:** public: double AngleResolution() const;
+    + ***Deprecation:** public: double GetRangeMin() const 
+    + ***Replacement:** public: double RangeMin() const;
+    + ***Deprecation:** public: double GetRangeMax() const
+    + ***Replacement:** public: double RangeMax() const;
+    + ***Deprecation:** public: double GetRangeResolution() const
+    + ***Replacement:** public: double RangeResolution() const;
+    + ***Deprecation:** public: int GetRayCount() const
+    + ***Replacement:** public: int RayCount() const;
+    + ***Deprecation:** public: int GetRangeCount() const
+    + ***Replacement:** public: int RangeCount() const;
+    + ***Deprecation:** public: int GetVerticalRayCount() const
+    + ***Replacement:** public: int VerticalRayCount()
+    + ***Deprecation:** public: int GetVerticalRangeCount() const;
+    + ***Replacement:** public: int VerticalRangeCount() const;
+    + ***Deprecation:** public: double GetVerticalAngleResolution() const
+    + ***Replacement:** public: double VerticalAngleResolution() const;
+    + ***Deprecation:** public: double GetRange(int _index)
+    + ***Replacement:** public: double Range(const int _index) const;
+    + ***Deprecation:** public: void GetRanges(std::vector<double> &_ranges)
+    + ***Replacement:** public: void Ranges(std::vector<double> &_ranges) const
+    + ***Deprecation:** public: double GetRetro(int _index) const
+    + ***Replacement:** public: double Retro(const int _index) const;
+    + ***Deprecation:** public: int GetFiducial(int _index) const
+    + ***Replacement:** public: int Fiducial(const unsigned int _index) const;
+    + ***Deprecation:** public: unsigned int GetCameraCount() const
+    + ***Replacement:** public: unsigned int CameraCount() const;
+    + ***Deprecation:** public: double GetRayCountRatio()
+    + ***Replacement:** public: double RayCountRatio() const;
+    + ***Deprecation:** public: double GetRangeCountRatio() const
+    + ***Replacement:** public: double RangeCountRatio() const;
+    + ***Deprecation:** public: double GetHorzFOV() const
+    + ***Replacement:** public: double HorzFOV() const;
+    + ***Deprecation:** public: double GetCosHorzFOV() const
+    + ***Replacement:** public: double CosHorzFOV() const;
+    + ***Deprecation:** public: double GetVertFOV() const
+    + ***Replacement:** public: double VertFOV() const;
+    + ***Deprecation:** public: double GetCosVertFOV() const
+    + ***Replacement:** public: double CosVertFOV() const;
+    + ***Deprecation:** public: double GetHorzHalfAngle() const
+    + ***Replacement:** public: double HorzHalfAngle() const;
+    + ***Deprecation:** public: double GetVertHalfAngle() const
+    + ***Replacement:** public: double VertHalfAngle() const;
+
+1. **gazebo/sensors/ImuSensor.hh**
+    + ***Deprecation:** public: msgs::IMU GetImuMessage() const
+    + ***Replacement:** public: msgs::IMU ImuMessage() const;
+
+1. **gazebo/sensors/MultiCameraSensor.hh**
+    + ***Deprecation:** public: virtual std::string GetTopic() const;
+    + ***Replacement:** public: virtual std::string Topic() const;
+    + ***Deprecation:** public: unsigned int GetCameraCount() const
+    + ***Replacement:** public: unsigned int CameraCount() const;
+    + ***Deprecation:** public: rendering::CameraPtr GetCamera(unsigned int _index) const
+    + ***Replacement:** public: rendering::CameraPtr Camera(const unsigned int _index) const;
+    + ***Deprecation:** public: unsigned int GetImageWidth(unsigned int _index) const
+    + ***Replacement:** public: unsigned int ImageWidth(const unsigned int _index) const;
+    + ***Deprecation:** public: unsigned int GetImageHeight(unsigned int _index) const
+    + ***Replacement:** public: unsigned int ImageHeight(const unsigned int _index) const;
+    + ***Deprecation:** public: const unsigned char *GetImageData(unsigned int _index)
+    + ***Replacement:** public: const unsigned char *ImageData(const unsigned int _index);
+
+1. **gazebo/sensors/RaySensor.hh**
+    + ***Deprecation:** public: virtual std::string GetTopic() const;
+    + ***Replacement:** public: virtual std::string Topic() const;
+    + ***Deprecation:** public: double GetAngleResolution() const
+    + ***Replacement:** public: double AngleResolution() const;
+    + ***Deprecation:** public: double GetRangeMin() const
+    + ***Replacement:** public: double RangeMin() const;
+    + ***Deprecation:** public: double GetRangeMax() const
+    + ***Replacement:** public: double RangeMax() const;
+    + ***Deprecation:** public: double GetRangeResolution() const
+    + ***Replacement:** public: double RangeResolution() const;
+    + ***Deprecation:** public: int GetRayCount() const
+    + ***Replacement:** public: int RayCount() const;
+    + ***Deprecation:** public: int GetRangeCount() const
+    + ***Replacement:** public: int RangeCount() const;
+    + ***Deprecation:** public: int GetVerticalRayCount() const
+    + ***Replacement:** public: int VerticalRayCount() const
+    + ***Deprecation:** public: int GetVerticalRangeCount() const
+    + ***Replacement:** public: int VerticalRangeCount() const;
+    + ***Deprecation:** public: double GetVerticalAngleResolution() const
+    + ***Replacement:** public: double VerticalAngleResolution() const;
+    + ***Deprecation:** public: double GetRange(unsigned int _index)
+    + ***Replacement:** public: double Range(const unsigned int _index) const;
+    + ***Deprecation:** public: void GetRanges(std::vector<double> &_ranges)
+    + ***Replacement:** public: void Ranges(std::vector<double> &_ranges) const;
+    + ***Deprecation:** public: double GetRetro(unsigned int _index)
+    + ***Replacement:** public: double Retro(const unsigned int _index) const;
+    + ***Deprecation:** public: int GetFiducial(unsigned int _index)
+    + ***Replacement:** public: int Fiducial(const unsigned int _index) const;
+    + ***Deprecation:** public: physics::MultiRayShapePtr GetLaserShape()
+    + ***Replacement:** public: physics::MultiRayShapePtr LaserShape() const;
+
+1. **gazebo/sensors/Sensor.hh**
+    + ***Deprecation:** public: std::string GetParentName() const
+    + ***Replacement:** public: std::string ParentName() const;
+    + ***Deprecation:** public: double GetUpdateRate()
+    + ***Replacement:** public: double UpdateRate() const;
+    + ***Deprecation:** public: std::string GetName() const
+    + ***Replacement:** public: std::string Name() const;
+    + ***Deprecation:** public: std::string GetScopedName() const
+    + ***Replacement:** public: std::string ScopedName() const;
+    + ***Deprecation:** public: std::string GetType() const
+    + ***Replacement:** public: std::string Type() const;
+    + ***Deprecation:** public: common::Time GetLastUpdateTime()
+    + ***Replacement:** public: common::Time LastUpdateTime() const;
+    + ***Deprecation:** public: common::Time GetLastMeasurementTime()
+    + ***Replacement:** public: common::Time LastMeasurementTime() const;
+    + ***Deprecation:** public: bool GetVisualize() const
+    + ***Replacement:** public: bool Visualize() const;
+    + ***Deprecation:** public: virtual std::string GetTopic() const
+    + ***Replacement:** public: virtual std::string Topic() const;
+    + ***Deprecation:** public: std::string GetWorldName() const
+    + ***Replacement:** public: std::string WorldName() const;
+    + ***Deprecation:** public: SensorCategory GetCategory() const
+    + ***Replacement:** public: SensorCategory Category() const;
+    + ***Deprecation:** public: uint32_t GetId() const
+    + ***Replacement:** public: uint32_t Id() const;
+    + ***Deprecation:** public: uint32_t GetParentId() const
+    + ***Replacement:** public: uint32_t ParentId() const;
+    + ***Deprecation:** public: NoisePtr GetNoise(const SensorNoiseType _type) const
+    + ***Replacement:** public: NoisePtr Noise(const SensorNoiseType _type) const;
+
+1. **gazebo/sensors/SonarSensor.hh**
+    + ***Deprecation:** public: virtual std::string GetTopic() const;
+    + ***Replacement:** public: virtual std::string Topic() const;
+    + ***Deprecation:** public: double GetRangeMin() const
+    + ***Replacement:** public: double RangeMin() const;
+    + ***Deprecation:** public: double GetRangeMax() const
+    + ***Replacement:** public: double RangeMax() const;
+    + ***Deprecation:** public: double GetRadius() const
+    + ***Replacement:** public: double Radius() const;
+    + ***Deprecation:** public: double GetRange()
+    + ***Replacement:** public: double Range();
+
+1. **gazebo/sensors/WirelessReceiver.hh**
+    + ***Deprecation:** public: double GetMinFreqFiltered() const
+    + ***Replacement:** public: double MinFreqFiltered() const;
+    + ***Deprecation:** public: double GetMaxFreqFiltered() const
+    + ***Replacement:** public: double MaxFreqFiltered() const;
+    + ***Deprecation:** public: double GetSensitivity() const
+    + ***Replacement:** public: double Sensitivity() const;
+
+1. **gazebo/sensors/WirelessTransceiver.hh**
+    + ***Deprecation:** public: virtual std::string GetTopic() const;
+    + ***Replacement:** public: virtual std::string Topic() const;
+    + ***Deprecation:** public: double GetGain() const
+    + ***Replacement:** public: double Gain() const;
+    + ***Deprecation:** public: double GetPower() const
+    + ***Replacement:** public: double Power() const;
+
+1. **gazebo/sensors/WirelessTransmitter.hh**
+    + ***Deprecation:** public: std::string GetESSID() const
+    + ***Replacement:** public: std::string ESSID() const;
+    + ***Deprecation:** public: double GetFreq() const 
+    + ***Replacement:** public: double Freq() const;
+
 1. **gazebo/rendering/ApplyWrenchVisual.hh**
     + ***Deprecation:*** public: void SetCoM(const math::Vector3 &_comVector)
     + ***Replacement:*** public: void SetCoM(const ignition::math::Vector3d &_comVector);

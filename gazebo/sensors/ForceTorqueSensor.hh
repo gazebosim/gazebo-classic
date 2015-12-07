@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_FORCETORQUESENSOR_HH_
-#define _GAZEBO_FORCETORQUESENSOR_HH_
+#ifndef _GAZEBO_SENSORS_FORCETORQUESENSOR_HH_
+#define _GAZEBO_SENSORS_FORCETORQUESENSOR_HH_
 
 #include <string>
 
@@ -77,16 +77,6 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual bool IsActive() const;
-
-      /// \brief Connect a to the  update signal.
-      /// \param[in] _subscriber Callback function.
-      /// \return The connection, which must be kept in scope.
-      /// \deprecated See ConnectUpdate that accepts a std::function
-      /// parameter.
-      /*public: event::ConnectionPtr ConnectUpdate(
-                  boost::function<void (msgs::WrenchStamped)> _subscriber)
-              GAZEBO_DEPRECATED(7.0);
-              */
 
       /// \brief Connect a to the  update signal.
       /// \param[in] _subscriber Callback function.
