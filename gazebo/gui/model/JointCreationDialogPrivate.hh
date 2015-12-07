@@ -17,7 +17,6 @@
 #ifndef _GAZEBO_JOINT_CREATION_DIALOG_PRIVATE_HH_
 #define _GAZEBO_JOINT_CREATION_DIALOG_PRIVATE_HH_
 
-#include <string>
 #include <vector>
 
 #include "gazebo/gui/qt.h"
@@ -59,16 +58,38 @@ namespace gazebo
       /// \brief Button to swap parent and child links.
       public: QToolButton *swapButton;
 
+      /// \brief Vector containing the 3 button groups.
       public: std::vector<QButtonGroup *> alignGroups;
+
+      /// \brief Combo box to select the alignment target.
       public: QComboBox *alignCombo;
+
+      /// \brief Label for joints without axes.
       public: QLabel *axis0Widget;
+
+      /// \brief Widget for axis 1.
       public: ConfigChildWidget *axis1Widget;
+
+      /// \brief Widget for axis 2.
       public: ConfigChildWidget *axis2Widget;
+
+      /// \brief Icon displayed at the parent link widget.
       public: QLabel *parentIcon;
+
+      /// \brief Text with instructions on how to select links.
       public: QLabel *selectionsText;
+
+      /// \brief Flag to indicate whether the current links are different from
+      /// each other.
       public: bool validLinks;
+
+      /// \brief Flag to indicate whether axis 1 is not zero.
       public: bool validAxis1;
+
+      /// \brief Flag to indicate whether axis 2 is not zero.
       public: bool validAxis2;
+
+      /// \brief Flag to indicate whether there's alignment pending.
       public: bool alignPending;
     };
   }

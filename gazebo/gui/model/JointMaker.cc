@@ -1290,8 +1290,12 @@ void JointData::UpdateMsg()
       }
       else
       {
-        msgs::Set(axisMsg->mutable_xyz(),
-            JointMaker::unitVectors[i%JointMaker::unitVectors.size()]);
+        if (this->axes.size() < i+1)
+        {
+          this->axes.push_back(
+              JointMaker::unitVectors[i%JointMaker::unitVectors.size()]);
+        }
+        msgs::Set(axisMsg->mutable_xyz(), this->axes[i]);
       }
       axisMsg->set_use_parent_model_frame(false);
       axisMsg->set_limit_lower(-GZ_DBL_MAX);
@@ -1609,7 +1613,7 @@ bool JointMaker::SetChildLink(rendering::VisualPtr _childLink)
 }
 
 /////////////////////////////////////////////////
-void JointMaker::SetType(const int _typeInt)
+void JointMaker::OnType(const int _typeInt)
 {
   this->jointType = static_cast<JointMaker::JointType>(_typeInt);
 
@@ -1629,12 +1633,14 @@ void JointMaker::SetAxis(const QString &_axis,
     if (_axis == "axis1" && this->newJoint->jointMsg->has_axis1())
     {
       msgs::Set(this->newJoint->jointMsg->mutable_axis1()->mutable_xyz(),
-      _value);
+        _value);
+      this->newJoint->axes[0] = _value;
     }
     else if (_axis == "axis2" && this->newJoint->jointMsg->has_axis2())
     {
       msgs::Set(this->newJoint->jointMsg->mutable_axis2()->mutable_xyz(),
-      _value);
+        _value);
+      this->newJoint->axes[1] = _value;
     }
     this->newJoint->dirty = true;
   }
@@ -1696,7 +1702,7 @@ rendering::VisualPtr JointMaker::LinkVisualFromName(const std::string &_name)
 
 /////////////////////////////////////////////////
 void JointMaker::SetLinksRelativePose(const ignition::math::Pose3d &_pose,
-    bool _reset)
+    const bool _reset)
 {
   if (!this->newJoint || !this->newJoint->parent || !this->newJoint->child)
   {
@@ -1751,7 +1757,7 @@ void JointMaker::AlignLinks(const bool _childToParent,
 }
 
 /////////////////////////////////////////////////
-void JointMaker::SetVisualMoved(rendering::VisualPtr _vis, bool _moved)
+void JointMaker::SetVisualMoved(rendering::VisualPtr _vis, const bool _moved)
 {
   if (_vis->GetChildCount() != 0)
   {

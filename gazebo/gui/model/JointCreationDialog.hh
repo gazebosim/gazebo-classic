@@ -18,9 +18,7 @@
 #ifndef _GAZEBO_JOINT_CREATION_DIALOG_HH_
 #define _GAZEBO_JOINT_CREATION_DIALOG_HH_
 
-#include <map>
 #include <string>
-#include <vector>
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/model/JointMaker.hh"
@@ -53,7 +51,7 @@ namespace gazebo
 
       /// \brief Open the dialog.
       /// \param[in] _type Joint type which will be selected when dialog opens.
-      public: void Open(JointMaker::JointType _type);
+      public: void Open(const JointMaker::JointType _type);
 
       /// \brief Update the relative pose widget.
       /// \param[in] _pose New pose.
@@ -87,11 +85,15 @@ namespace gazebo
       private slots: void OnResetAll();
 
       /// \brief Qt callback when the axis combo box is changed.
+      /// \param[in] _int Index of new value.
       private slots: void OnAlign(const int _int);
 
+      /// \brief Uncheck all align buttons.
       private slots: void UncheckAllAlign();
 
-      private slots: void SetType(const int _typeInt);
+      /// \brief Qt callback when type button is selected.
+      /// \param[in] _typeInt Index of new selection.
+      private slots: void OnType(const int _typeInt);
 
       /// \brief Qt callback when the Swap links button is pressed.
       private slots: void OnSwap();

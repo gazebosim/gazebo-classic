@@ -65,9 +65,9 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   this->dataPtr->typeButtons->addButton(ballJointRadio, 7);
   this->dataPtr->typeButtons->addButton(gearboxJointRadio, 8);
   connect(this->dataPtr->typeButtons, SIGNAL(buttonClicked(int)),
-      this->dataPtr->jointMaker, SLOT(SetType(int)));
+      this->dataPtr->jointMaker, SLOT(OnType(int)));
   connect(this->dataPtr->typeButtons, SIGNAL(buttonClicked(int)),
-      this, SLOT(SetType(int)));
+      this, SLOT(OnType(int)));
 
   for (auto button : this->dataPtr->typeButtons->buttons())
   {
@@ -210,7 +210,7 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   this->dataPtr->configWidget->SetWidgetReadOnly("axis2", true);
 
   // Axis general layout
-  auto *axisGeneralLayout = new QVBoxLayout();
+  auto axisGeneralLayout = new QVBoxLayout();
   axisGeneralLayout->setContentsMargins(0, 0, 0, 0);
   axisGeneralLayout->setSpacing(0);
   axisGeneralLayout->addWidget(this->dataPtr->axis0Widget);
@@ -450,7 +450,7 @@ JointCreationDialog::~JointCreationDialog()
 }
 
 /////////////////////////////////////////////////
-void JointCreationDialog::Open(JointMaker::JointType _type)
+void JointCreationDialog::Open(const JointMaker::JointType _type)
 {
   if (!this->dataPtr->jointMaker)
   {
@@ -462,7 +462,7 @@ void JointCreationDialog::Open(JointMaker::JointType _type)
   // Check joint type
   this->dataPtr->typeButtons->button(static_cast<int>(_type))
       ->setChecked(true);
-  this->SetType(_type);
+  this->OnType(_type);
 
   // Clear links
   this->dataPtr->configWidget->ClearEnumWidget("parentCombo");
@@ -860,7 +860,7 @@ void JointCreationDialog::UncheckAllAlign()
 }
 
 /////////////////////////////////////////////////
-void JointCreationDialog::SetType(const int _typeInt)
+void JointCreationDialog::OnType(const int _typeInt)
 {
   auto type = static_cast<JointMaker::JointType>(_typeInt);
   unsigned int axisCount = JointMaker::GetJointAxisCount(type);

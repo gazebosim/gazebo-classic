@@ -110,7 +110,7 @@ namespace gazebo
       /// \brief Create a joint with parent and child.
       /// \param[in] _parent Parent of the joint.
       /// \param[in] _child Child of the joint.
-      /// \return joint data.
+      /// \return Joint data.
       public: JointData *CreateJoint(rendering::VisualPtr _parent,
           rendering::VisualPtr _child);
 
@@ -141,12 +141,13 @@ namespace gazebo
       /// \brief Generate SDF for all joints.
       public: void GenerateSDF();
 
-      /// \brief Generate SDF for all joints.
+      /// \brief Get model SDF element containing all joints.
       /// \return Pointer to SDF element.
       public: sdf::ElementPtr GetSDF() const;
 
       /// \brief Get the axis count for joint type.
       /// \param[in] _type Type of joint.
+      /// \return Axis count.
       public: static unsigned int GetJointAxisCount(
           JointMaker::JointType _type);
 
@@ -214,7 +215,7 @@ namespace gazebo
       /// \brief A new type for the joint being created has been chosen.
       /// To be used by other classes.
       /// \param[in] _typeInt Integer corresponding to joint type enum.
-      public slots: void SetType(const int _typeInt);
+      public slots: void OnType(const int _typeInt);
 
       /// \brief A new axis for the joint being created has been chosen.
       /// To be used by other classes.
@@ -247,7 +248,7 @@ namespace gazebo
       /// \param[in] _reset Set to true to reset the relative pose to the
       /// original one.
       public: void SetLinksRelativePose(
-          const ignition::math::Pose3d &_pose, bool _reset);
+          const ignition::math::Pose3d &_pose, const bool _reset);
 
       /// \brief Align the parent and child links of the joint being created.
       /// \param[in] True to align the child to the parent, false to align the
@@ -326,7 +327,7 @@ namespace gazebo
       private: void OnLinkInserted(const std::string &_linkName);
 
       /// \brief Remove a link from the list.
-      /// \param[in] _linkId Unique link identifying name.
+      /// \param[in] _linkName Unique link identifying name.
       private: void OnLinkRemoved(const std::string &_linkName);
 
       /// \brief Create a joint line.
@@ -358,7 +359,8 @@ namespace gazebo
       /// a new joint.
       /// \param[in] _vis Visual to be highlighted.
       /// \param[in] _moved Whether it moved or not.
-      private: void SetVisualMoved(rendering::VisualPtr _vis, bool _moved);
+      private: void SetVisualMoved(rendering::VisualPtr _vis,
+          const bool _moved);
 
       /// \brief Qt signal when the joint creation process has ended.
       Q_SIGNALS: void JointAdded();
@@ -431,10 +433,12 @@ namespace gazebo
       /// \brief Dialog for creating a new joint.
       private: JointCreationDialog *jointCreationDialog;
 
-      /// \brief Visual currently selected to be the child link.
+      /// \brief Pose of link currently selected to be the parent of the joint
+      /// being created, before being selected.
       private: ignition::math::Pose3d parentLinkOriginalPose;
 
-      /// \brief Visual currently selected to be the child link.
+      /// \brief Pose of link currently selected to be the child of the joint
+      /// being created, before being selected.
       private: ignition::math::Pose3d childLinkOriginalPose;
     };
     /// \}
@@ -494,6 +498,9 @@ namespace gazebo
 
       /// \brief Type of joint.
       public: JointMaker::JointType type;
+
+      /// \brief Last known axes values.
+      public: std::vector<ignition::math::Vector3d> axes;
 
       /// \brief True if the joint needs update.
       public: bool dirty;
