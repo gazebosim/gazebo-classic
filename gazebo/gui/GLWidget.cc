@@ -126,9 +126,6 @@ GLWidget::GLWidget(QWidget *_parent)
 
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
-  this->modelPub = this->node->Advertise<msgs::Model>("~/model/modify");
-
-  this->factoryPub = this->node->Advertise<msgs::Factory>("~/factory");
 
   // Publishes information about user selections.
   this->selectionPub =
@@ -197,7 +194,6 @@ GLWidget::~GLWidget()
 
   this->connections.clear();
   this->node.reset();
-  this->modelPub.reset();
   this->selectionPub.reset();
 
   ModelManipulator::Instance()->Clear();
@@ -406,12 +402,6 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
     return;
 
   this->keyModifiers = _event->modifiers();
-
-  if (this->keyModifiers & Qt::ControlModifier &&
-      _event->key() == Qt::Key_Z)
-  {
-    this->PopHistory();
-  }
 
   /// Switch between RTS modes
   if (this->keyModifiers == Qt::NoModifier && this->state != "make_entity")
@@ -1203,36 +1193,6 @@ void GLWidget::OnSetSelectedEntity(const std::string &_name,
   {
     this->SetSelectedVisual(rendering::VisualPtr());
     this->scene->SelectVisual("", _mode);
-  }
-}
-
-/////////////////////////////////////////////////
-void GLWidget::PushHistory(const std::string &_visName, const math::Pose &_pose)
-{
-  if (this->moveHistory.empty() ||
-      this->moveHistory.back().first != _visName ||
-      this->moveHistory.back().second != _pose)
-  {
-    this->moveHistory.push_back(std::make_pair(_visName, _pose));
-  }
-}
-
-/////////////////////////////////////////////////
-void GLWidget::PopHistory()
-{
-  if (!this->moveHistory.empty())
-  {
-    msgs::Model msg;
-    msg.set_id(gui::get_entity_id(this->moveHistory.back().first));
-    msg.set_name(this->moveHistory.back().first);
-
-    msgs::Set(msg.mutable_pose(), this->moveHistory.back().second.Ign());
-    this->scene->GetVisual(this->moveHistory.back().first)->SetWorldPose(
-        this->moveHistory.back().second);
-
-    this->modelPub->Publish(msg);
-
-    this->moveHistory.pop_back();
   }
 }
 
