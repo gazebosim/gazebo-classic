@@ -44,7 +44,7 @@ GZ_REGISTER_STATIC_SENSOR("force_torque", ForceTorqueSensor)
 //////////////////////////////////////////////////
 ForceTorqueSensor::ForceTorqueSensor()
 : Sensor(*new ForceTorqueSensorPrivate, sensors::OTHER),
-  dataPtr(std::static_pointer_cast<ForceTorqueSensorPrivate>(this->dPtr))
+  dataPtr(std::static_pointer_cast<ForceTorqueSensorPrivate>(this->sensorDPtr))
 {
 }
 

@@ -43,7 +43,7 @@ GZ_REGISTER_STATIC_SENSOR("imu", ImuSensor)
 //////////////////////////////////////////////////
 ImuSensor::ImuSensor()
 : Sensor(*new ImuSensorPrivate, sensors::OTHER),
-  dataPtr(std::static_pointer_cast<ImuSensorPrivate>(this->dPtr))
+  dataPtr(std::static_pointer_cast<ImuSensorPrivate>(this->sensorDPtr))
 {
   this->dataPtr->dataIndex = 0;
   this->dataPtr->dataDirty = false;

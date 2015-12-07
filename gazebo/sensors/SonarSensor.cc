@@ -49,7 +49,7 @@ GZ_REGISTER_STATIC_SENSOR("sonar", SonarSensor)
 //////////////////////////////////////////////////
 SonarSensor::SonarSensor()
 : Sensor(*new SonarSensorPrivate, sensors::OTHER),
-  dataPtr(std::static_pointer_cast<SonarSensorPrivate>(this->dPtr))
+  dataPtr(std::static_pointer_cast<SonarSensorPrivate>(this->sensorDPtr))
 {
   this->dataPtr->emptyContactCount = 0;
 }

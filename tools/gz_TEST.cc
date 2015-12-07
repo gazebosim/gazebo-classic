@@ -673,7 +673,7 @@ TEST_F(gzTest, SDF)
     std::string output =
       custom_exec_str(std::string("gz sdf -p ") + path.string());
     std::string shasum = gazebo::common::get_sha1<std::string>(output);
-    EXPECT_EQ(shasum, "ea127f9858a5e07c40ef6d949ef6113236adddfa");
+    EXPECT_EQ(shasum, "6d90a711b6ab48242119100c47bd82cd54efeb7d");
   }
 
   path = PROJECT_BINARY_PATH;

@@ -298,11 +298,11 @@ namespace gazebo
 
       /// \internal
       /// \brief Data pointer for protected data
-      protected: std::shared_ptr<SensorProtected> dPtr;
+      protected: std::shared_ptr<SensorProtected> sensorDPtr;
 
       /// \internal
       /// \brief Data pointer for private data
-      private: std::unique_ptr<SensorPrivate> pdPtr;
+      private: std::unique_ptr<SensorPrivate> dataPtr;
     };
     /// \}
   }

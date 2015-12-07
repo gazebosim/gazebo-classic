@@ -40,7 +40,7 @@ GZ_REGISTER_STATIC_SENSOR("wireless_receiver", WirelessReceiver)
 /////////////////////////////////////////////////
 WirelessReceiver::WirelessReceiver()
 : WirelessTransceiver(*new WirelessReceiverPrivate),
-  dataPtr(std::static_pointer_cast<WirelessReceiverPrivate>(this->dPtr))
+  dataPtr(std::static_pointer_cast<WirelessReceiverPrivate>(this->sensorDPtr))
 {
 }
 

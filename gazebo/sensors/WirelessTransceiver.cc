@@ -38,7 +38,8 @@ using namespace sensors;
 /////////////////////////////////////////////////
 WirelessTransceiver::WirelessTransceiver()
 : Sensor(*new WirelessTransceiverPrivate, sensors::OTHER),
-  dataPtr(std::static_pointer_cast<WirelessTransceiverPrivate>(this->dPtr))
+  dataPtr(
+      std::static_pointer_cast<WirelessTransceiverPrivate>(this->sensorDPtr))
 {
   this->dataPtr->active = false;
 }
@@ -46,7 +47,8 @@ WirelessTransceiver::WirelessTransceiver()
 /////////////////////////////////////////////////
 WirelessTransceiver::WirelessTransceiver(WirelessTransceiverPrivate &_dataPtr)
 : Sensor(_dataPtr, sensors::OTHER),
-  dataPtr(std::static_pointer_cast<WirelessTransceiverPrivate>(this->dPtr))
+  dataPtr(
+      std::static_pointer_cast<WirelessTransceiverPrivate>(this->sensorDPtr))
 {
   this->dataPtr->active = false;
 }

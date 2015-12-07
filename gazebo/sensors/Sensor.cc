@@ -51,14 +51,14 @@ sdf::ElementPtr SensorPrivate::sdfSensor;
 
 //////////////////////////////////////////////////
 Sensor::Sensor(SensorCategory _cat)
-: dPtr(new SensorProtected), pdPtr(new SensorPrivate)
+: sensorDPtr(new SensorProtected), dataPtr(new SensorPrivate)
 {
   this->ConstructorHelper(_cat);
 }
 
 //////////////////////////////////////////////////
 Sensor::Sensor(SensorProtected &_dataPtr, SensorCategory _cat)
-: dPtr(&_dataPtr), pdPtr(new SensorPrivate)
+: sensorDPtr(&_dataPtr), dataPtr(new SensorPrivate)
 {
   this->ConstructorHelper(_cat);
 }
@@ -66,80 +66,81 @@ Sensor::Sensor(SensorProtected &_dataPtr, SensorCategory _cat)
 //////////////////////////////////////////////////
 void Sensor::ConstructorHelper(SensorCategory _cat)
 {
-  if (!this->pdPtr->sdfSensor)
+  if (!this->dataPtr->sdfSensor)
   {
-    this->pdPtr->sdfSensor.reset(new sdf::Element);
-    sdf::initFile("sensor.sdf", this->pdPtr->sdfSensor);
+    this->dataPtr->sdfSensor.reset(new sdf::Element);
+    sdf::initFile("sensor.sdf", this->dataPtr->sdfSensor);
   }
 
-  this->pdPtr->category = _cat;
+  this->dataPtr->category = _cat;
 
-  this->dPtr->sdf = this->pdPtr->sdfSensor->Clone();
+  this->sensorDPtr->sdf = this->dataPtr->sdfSensor->Clone();
 
-  this->dPtr->active = false;
+  this->sensorDPtr->active = false;
 
-  this->dPtr->node = transport::NodePtr(new transport::Node());
+  this->sensorDPtr->node = transport::NodePtr(new transport::Node());
 
-  this->pdPtr->updateDelay = common::Time(0.0);
-  this->dPtr->updatePeriod = common::Time(0.0);
+  this->dataPtr->updateDelay = common::Time(0.0);
+  this->sensorDPtr->updatePeriod = common::Time(0.0);
 
-  this->pdPtr->id = physics::getUniqueId();
+  this->dataPtr->id = physics::getUniqueId();
 }
 
 //////////////////////////////////////////////////
 Sensor::~Sensor()
 {
-  if (this->dPtr->node)
-    this->dPtr->node->Fini();
-  this->dPtr->node.reset();
+  if (this->sensorDPtr->node)
+    this->sensorDPtr->node->Fini();
+  this->sensorDPtr->node.reset();
 
-  if (this->dPtr->sdf)
-    this->dPtr->sdf->Reset();
-  this->dPtr->sdf.reset();
-  this->dPtr->connections.clear();
-  this->dPtr->noises.clear();
+  if (this->sensorDPtr->sdf)
+    this->sensorDPtr->sdf->Reset();
+  this->sensorDPtr->sdf.reset();
+  this->sensorDPtr->connections.clear();
+  this->sensorDPtr->noises.clear();
 }
 
 //////////////////////////////////////////////////
 void Sensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 {
-  this->dPtr->sdf->Copy(_sdf);
+  this->sensorDPtr->sdf->Copy(_sdf);
   this->Load(_worldName);
 }
 
 //////////////////////////////////////////////////
 void Sensor::Load(const std::string &_worldName)
 {
-  if (this->dPtr->sdf->HasElement("pose"))
+  if (this->sensorDPtr->sdf->HasElement("pose"))
   {
-    this->dPtr->pose = this->dPtr->sdf->Get<ignition::math::Pose3d>("pose");
+    this->sensorDPtr->pose =
+      this->sensorDPtr->sdf->Get<ignition::math::Pose3d>("pose");
   }
 
-  if (this->dPtr->sdf->Get<bool>("always_on"))
+  if (this->sensorDPtr->sdf->Get<bool>("always_on"))
     this->SetActive(true);
 
-  this->dPtr->world = physics::get_world(_worldName);
+  this->sensorDPtr->world = physics::get_world(_worldName);
 
-  if (this->pdPtr->category == IMAGE)
-    this->dPtr->scene = rendering::get_scene(_worldName);
+  if (this->dataPtr->category == IMAGE)
+    this->sensorDPtr->scene = rendering::get_scene(_worldName);
 
   // loaded, but not updated
-  this->dPtr->lastUpdateTime = common::Time(0.0);
+  this->sensorDPtr->lastUpdateTime = common::Time(0.0);
 
-  this->dPtr->node->Init(this->dPtr->world->GetName());
-  this->pdPtr->sensorPub =
-    this->dPtr->node->Advertise<msgs::Sensor>("~/sensor");
+  this->sensorDPtr->node->Init(this->sensorDPtr->world->GetName());
+  this->dataPtr->sensorPub =
+    this->sensorDPtr->node->Advertise<msgs::Sensor>("~/sensor");
 }
 
 //////////////////////////////////////////////////
 void Sensor::Init()
 {
-  this->SetUpdateRate(this->dPtr->sdf->Get<double>("update_rate"));
+  this->SetUpdateRate(this->sensorDPtr->sdf->Get<double>("update_rate"));
 
   // Load the plugins
-  if (this->dPtr->sdf->HasElement("plugin"))
+  if (this->sensorDPtr->sdf->HasElement("plugin"))
   {
-    sdf::ElementPtr pluginElem = this->dPtr->sdf->GetElement("plugin");
+    sdf::ElementPtr pluginElem = this->sensorDPtr->sdf->GetElement("plugin");
     while (pluginElem)
     {
       this->LoadPlugin(pluginElem);
@@ -149,14 +150,14 @@ void Sensor::Init()
 
   msgs::Sensor msg;
   this->FillMsg(msg);
-  this->pdPtr->sensorPub->Publish(msg);
+  this->dataPtr->sensorPub->Publish(msg);
 }
 
 //////////////////////////////////////////////////
 void Sensor::SetParent(const std::string &_name, const uint32_t _id)
 {
-  this->dPtr->parentName = _name;
-  this->dPtr->parentId = _id;
+  this->sensorDPtr->parentName = _name;
+  this->sensorDPtr->parentId = _id;
 }
 
 //////////////////////////////////////////////////
@@ -168,7 +169,7 @@ std::string Sensor::GetParentName() const
 //////////////////////////////////////////////////
 std::string Sensor::ParentName() const
 {
-  return this->dPtr->parentName;
+  return this->sensorDPtr->parentName;
 }
 
 //////////////////////////////////////////////////
@@ -180,7 +181,7 @@ uint32_t Sensor::GetId() const
 //////////////////////////////////////////////////
 uint32_t Sensor::Id() const
 {
-  return this->pdPtr->id;
+  return this->dataPtr->id;
 }
 
 //////////////////////////////////////////////////
@@ -192,7 +193,7 @@ uint32_t Sensor::GetParentId() const
 //////////////////////////////////////////////////
 uint32_t Sensor::ParentId() const
 {
-  return this->dPtr->parentId;
+  return this->sensorDPtr->parentId;
 }
 
 //////////////////////////////////////////////////
@@ -202,16 +203,16 @@ bool Sensor::NeedsUpdate()
   // sensor's update in the same thread.
 
   common::Time simTime;
-  if (this->pdPtr->category == IMAGE && this->dPtr->scene)
-    simTime = this->dPtr->scene->GetSimTime();
+  if (this->dataPtr->category == IMAGE && this->sensorDPtr->scene)
+    simTime = this->sensorDPtr->scene->GetSimTime();
   else
-    simTime = this->dPtr->world->GetSimTime();
+    simTime = this->sensorDPtr->world->GetSimTime();
 
-  if (simTime <= this->dPtr->lastMeasurementTime)
+  if (simTime <= this->sensorDPtr->lastMeasurementTime)
     return false;
 
-  return (simTime - this->dPtr->lastMeasurementTime +
-      this->pdPtr->updateDelay) >= this->dPtr->updatePeriod;
+  return (simTime - this->sensorDPtr->lastMeasurementTime +
+      this->dataPtr->updateDelay) >= this->sensorDPtr->updatePeriod;
 }
 
 //////////////////////////////////////////////////
@@ -220,43 +221,43 @@ void Sensor::Update(const bool _force)
   if (this->IsActive() || _force)
   {
     common::Time simTime;
-    if (this->pdPtr->category == IMAGE && this->dPtr->scene)
-      simTime = this->dPtr->scene->GetSimTime();
+    if (this->dataPtr->category == IMAGE && this->sensorDPtr->scene)
+      simTime = this->sensorDPtr->scene->GetSimTime();
     else
-      simTime = this->dPtr->world->GetSimTime();
+      simTime = this->sensorDPtr->world->GetSimTime();
 
     {
-      std::lock_guard<std::mutex> lock(this->pdPtr->mutexLastUpdateTime);
+      std::lock_guard<std::mutex> lock(this->dataPtr->mutexLastUpdateTime);
 
-      if (simTime <= this->dPtr->lastUpdateTime && !_force)
+      if (simTime <= this->sensorDPtr->lastUpdateTime && !_force)
         return;
 
       // Adjust time-to-update period to compensate for delays caused by another
       // sensor's update in the same thread.
       // NOTE: If you change this equation, also change the matching equation in
       // Sensor::NeedsUpdate
-      common::Time adjustedElapsed = simTime - this->dPtr->lastUpdateTime +
-        this->pdPtr->updateDelay;
+      common::Time adjustedElapsed = simTime -
+        this->sensorDPtr->lastUpdateTime + this->dataPtr->updateDelay;
 
-      if (adjustedElapsed < this->dPtr->updatePeriod && !_force)
+      if (adjustedElapsed < this->sensorDPtr->updatePeriod && !_force)
         return;
 
-      this->pdPtr->updateDelay = std::max(common::Time::Zero,
-          adjustedElapsed - this->dPtr->updatePeriod);
+      this->dataPtr->updateDelay = std::max(common::Time::Zero,
+          adjustedElapsed - this->sensorDPtr->updatePeriod);
 
       // if delay is more than a full update period, then give up trying
       // to catch up. This happens normally when the sensor just changed from
       // an inactive to an active state, or the sensor just cannot hit its
       // target update rate (worst case).
-      if (this->pdPtr->updateDelay >= this->dPtr->updatePeriod)
-        this->pdPtr->updateDelay = common::Time::Zero;
+      if (this->dataPtr->updateDelay >= this->sensorDPtr->updatePeriod)
+        this->dataPtr->updateDelay = common::Time::Zero;
     }
 
     if (this->UpdateImpl(_force))
     {
-      std::lock_guard<std::mutex> lock(this->pdPtr->mutexLastUpdateTime);
-      this->dPtr->lastUpdateTime = simTime;
-      this->pdPtr->updated();
+      std::lock_guard<std::mutex> lock(this->dataPtr->mutexLastUpdateTime);
+      this->sensorDPtr->lastUpdateTime = simTime;
+      this->dataPtr->updated();
     }
   }
 }
@@ -264,11 +265,11 @@ void Sensor::Update(const bool _force)
 //////////////////////////////////////////////////
 void Sensor::Fini()
 {
-  for (auto &it : this->dPtr->noises)
+  for (auto &it : this->sensorDPtr->noises)
     it.second->Fini();
 
-  this->dPtr->active = false;
-  this->dPtr->plugins.clear();
+  this->sensorDPtr->active = false;
+  this->sensorDPtr->plugins.clear();
 }
 
 //////////////////////////////////////////////////
@@ -280,7 +281,7 @@ std::string Sensor::GetName() const
 //////////////////////////////////////////////////
 std::string Sensor::Name() const
 {
-  return this->dPtr->sdf->Get<std::string>("name");
+  return this->sensorDPtr->sdf->Get<std::string>("name");
 }
 
 //////////////////////////////////////////////////
@@ -292,8 +293,8 @@ std::string Sensor::GetScopedName() const
 //////////////////////////////////////////////////
 std::string Sensor::ScopedName() const
 {
-  return this->dPtr->world->GetName() + "::" + this->dPtr->parentName + "::" +
-    this->Name();
+  return this->sensorDPtr->world->GetName() + "::" +
+         this->sensorDPtr->parentName + "::" + this->Name();
 }
 
 //////////////////////////////////////////////////
@@ -316,35 +317,35 @@ void Sensor::LoadPlugin(sdf::ElementPtr _sdf)
     SensorPtr myself = shared_from_this();
     plugin->Load(myself, _sdf);
     plugin->Init();
-    this->dPtr->plugins.push_back(plugin);
+    this->sensorDPtr->plugins.push_back(plugin);
   }
 }
 
 //////////////////////////////////////////////////
 void Sensor::SetActive(const bool _value)
 {
-  this->dPtr->active = _value;
+  this->sensorDPtr->active = _value;
 }
 
 //////////////////////////////////////////////////
 bool Sensor::IsActive() const
 {
-  return this->dPtr->active;
+  return this->sensorDPtr->active;
 }
 
 //////////////////////////////////////////////////
 ignition::math::Pose3d Sensor::Pose() const
 {
-  return this->dPtr->pose;
+  return this->sensorDPtr->pose;
 }
 
 //////////////////////////////////////////////////
 void Sensor::SetPose(const ignition::math::Pose3d &_pose)
 {
-  this->dPtr->pose = _pose;
+  this->sensorDPtr->pose = _pose;
 
   // Update the visualization with the pose information.
-  if (this->pdPtr->sensorPub && this->Visualize())
+  if (this->dataPtr->sensorPub && this->Visualize())
   {
     msgs::Sensor msg;
     msg.set_name(this->Name());
@@ -353,8 +354,8 @@ void Sensor::SetPose(const ignition::math::Pose3d &_pose)
     msg.set_parent_id(this->ParentId());
     msg.set_type(this->Type());
     msg.set_visualize(true);
-    msgs::Set(msg.mutable_pose(), this->dPtr->pose);
-    this->pdPtr->sensorPub->Publish(msg);
+    msgs::Set(msg.mutable_pose(), this->sensorDPtr->pose);
+    this->dataPtr->sensorPub->Publish(msg);
   }
 }
 
@@ -367,8 +368,8 @@ double Sensor::GetUpdateRate()
 //////////////////////////////////////////////////
 double Sensor::UpdateRate() const
 {
-  if (this->dPtr->updatePeriod.Double() > 0.0)
-    return 1.0/this->dPtr->updatePeriod.Double();
+  if (this->sensorDPtr->updatePeriod.Double() > 0.0)
+    return 1.0/this->sensorDPtr->updatePeriod.Double();
   else
     return 0.0;
 }
@@ -377,9 +378,9 @@ double Sensor::UpdateRate() const
 void Sensor::SetUpdateRate(const double _hz)
 {
   if (_hz > 0.0)
-    this->dPtr->updatePeriod = 1.0/_hz;
+    this->sensorDPtr->updatePeriod = 1.0/_hz;
   else
-    this->dPtr->updatePeriod = 0.0;
+    this->sensorDPtr->updatePeriod = 0.0;
 }
 
 //////////////////////////////////////////////////
@@ -391,7 +392,7 @@ common::Time Sensor::GetLastUpdateTime()
 //////////////////////////////////////////////////
 common::Time Sensor::LastUpdateTime() const
 {
-  return this->dPtr->lastUpdateTime;
+  return this->sensorDPtr->lastUpdateTime;
 }
 
 //////////////////////////////////////////////////
@@ -403,7 +404,7 @@ common::Time Sensor::GetLastMeasurementTime()
 //////////////////////////////////////////////////
 common::Time Sensor::LastMeasurementTime() const
 {
-  return this->dPtr->lastMeasurementTime;
+  return this->sensorDPtr->lastMeasurementTime;
 }
 
 //////////////////////////////////////////////////
@@ -415,7 +416,7 @@ std::string Sensor::GetType() const
 //////////////////////////////////////////////////
 std::string Sensor::Type() const
 {
-  return this->dPtr->sdf->Get<std::string>("type");
+  return this->sensorDPtr->sdf->Get<std::string>("type");
 }
 
 //////////////////////////////////////////////////
@@ -427,7 +428,7 @@ bool Sensor::GetVisualize() const
 //////////////////////////////////////////////////
 bool Sensor::Visualize() const
 {
-  return this->dPtr->sdf->Get<bool>("visualize");
+  return this->sensorDPtr->sdf->Get<bool>("visualize");
 }
 
 //////////////////////////////////////////////////
@@ -440,9 +441,9 @@ std::string Sensor::GetTopic() const
 std::string Sensor::Topic() const
 {
   std::string result;
-  if (this->dPtr->sdf->HasElement("topic") &&
-      this->dPtr->sdf->Get<std::string>("topic") != "__default__")
-    result = this->dPtr->sdf->Get<std::string>("topic");
+  if (this->sensorDPtr->sdf->HasElement("topic") &&
+      this->sensorDPtr->sdf->Get<std::string>("topic") != "__default__")
+    result = this->sensorDPtr->sdf->Get<std::string>("topic");
   return result;
 }
 
@@ -505,7 +506,7 @@ std::string Sensor::GetWorldName() const
 //////////////////////////////////////////////////
 std::string Sensor::WorldName() const
 {
-  return this->dPtr->world->GetName();
+  return this->sensorDPtr->world->GetName();
 }
 
 //////////////////////////////////////////////////
@@ -517,7 +518,7 @@ SensorCategory Sensor::GetCategory() const
 //////////////////////////////////////////////////
 SensorCategory Sensor::Category() const
 {
-  return this->pdPtr->category;
+  return this->dataPtr->category;
 }
 
 //////////////////////////////////////////////////
@@ -529,30 +530,30 @@ NoisePtr Sensor::GetNoise(const SensorNoiseType _type) const
 //////////////////////////////////////////////////
 NoisePtr Sensor::Noise(const SensorNoiseType _type) const
 {
-  if (this->dPtr->noises.find(_type) == this->dPtr->noises.end())
+  if (this->sensorDPtr->noises.find(_type) == this->sensorDPtr->noises.end())
   {
     gzerr << "Get noise index not valid" << std::endl;
     return NoisePtr();
   }
-  return this->dPtr->noises.at(_type);
+  return this->sensorDPtr->noises.at(_type);
 }
 
 //////////////////////////////////////////////////
 void Sensor::ResetLastUpdateTime()
 {
-  std::lock_guard<std::mutex> lock(this->pdPtr->mutexLastUpdateTime);
-  this->dPtr->lastUpdateTime = 0.0;
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutexLastUpdateTime);
+  this->sensorDPtr->lastUpdateTime = 0.0;
 }
 
 //////////////////////////////////////////////////
 event::ConnectionPtr Sensor::ConnectUpdated(std::function<void()> _subscriber)
 {
-  return this->pdPtr->updated.Connect(_subscriber);
+  return this->dataPtr->updated.Connect(_subscriber);
 }
 
 //////////////////////////////////////////////////
 void Sensor::DisconnectUpdated(event::ConnectionPtr &_c)
 {
-  this->pdPtr->updated.Disconnect(_c);
+  this->dataPtr->updated.Disconnect(_c);
 }
 

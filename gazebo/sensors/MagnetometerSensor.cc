@@ -40,7 +40,7 @@ GZ_REGISTER_STATIC_SENSOR("magnetometer", MagnetometerSensor)
 /////////////////////////////////////////////////
 MagnetometerSensor::MagnetometerSensor()
 : Sensor(*new MagnetometerSensorPrivate, sensors::OTHER),
-  dataPtr(std::static_pointer_cast<MagnetometerSensorPrivate>(this->dPtr))
+  dataPtr(std::static_pointer_cast<MagnetometerSensorPrivate>(this->sensorDPtr))
 {
 }
 

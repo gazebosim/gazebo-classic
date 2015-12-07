@@ -38,7 +38,7 @@ GZ_REGISTER_STATIC_SENSOR("altimeter", AltimeterSensor)
 /////////////////////////////////////////////////
 AltimeterSensor::AltimeterSensor()
 : Sensor(*new AltimeterSensorPrivate, sensors::OTHER),
-  dataPtr(std::static_pointer_cast<AltimeterSensorPrivate>(this->dPtr))
+  dataPtr(std::static_pointer_cast<AltimeterSensorPrivate>(this->sensorDPtr))
 {
 }
 
@@ -92,7 +92,7 @@ void AltimeterSensor::Load(const std::string &_worldName)
         altElem->GetElement("vertical_position")->HasElement("noise"))
     {
       sdf::ElementPtr vertPosElem = altElem->GetElement("vertical_position");
-      this->dPtr->noises[ALTIMETER_POSITION_NOISE_METERS] =
+      this->dataPtr->noises[ALTIMETER_POSITION_NOISE_METERS] =
       NoiseFactory::NewNoiseModel(vertPosElem->GetElement("noise"));
     }
 
