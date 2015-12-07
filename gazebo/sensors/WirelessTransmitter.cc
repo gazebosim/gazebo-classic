@@ -150,14 +150,6 @@ double WirelessTransmitter::GetFreq() const
 }
 
 /////////////////////////////////////////////////
-double WirelessTransmitter::GetSignalStrength(
-    const math::Pose &_receiver,
-    const double _rxGain)
-{
-  return this->SignalStrength(_receiver.Ign(), _rxGain);
-}
-
-/////////////////////////////////////////////////
 double WirelessTransmitter::SignalStrength(
     const ignition::math::Pose3d &_receiver,
     const double _rxGain)
