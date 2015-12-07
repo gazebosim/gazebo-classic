@@ -1960,7 +1960,8 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
         cam->SetTrackMaxDistance(maxDist);
       }
 
-      if (_msg->camera().track().has_name())
+      if (_msg->camera().track().has_name() &&
+          _msg->camera().track().name() != "__default__")
       {
         std::string name = _msg->camera().track().name();
         cam->AttachToVisual(name, false);
