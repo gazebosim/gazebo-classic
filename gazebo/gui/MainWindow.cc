@@ -219,7 +219,7 @@ MainWindow::MainWindow()
 
   // Do these things last
   {
-    (void) new QShortcut(Qt::Key_Q, this, SLOT(close()));
+    (void) new QShortcut(Qt::CTRL + Qt::Key_Q, this, SLOT(close()));
     this->CreateMenus();
   }
 
