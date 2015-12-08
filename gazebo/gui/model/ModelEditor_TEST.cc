@@ -188,11 +188,11 @@ void ModelEditor_TEST::InsertTab()
   QWidget *insertModel = NULL;
   for (int i = 0; i < mainTab->count(); ++i)
   {
-   if (mainTab->tabText(i) == tr("Insert"))
-   {
-     insertModel = mainTab->widget(i);
-     break;
-   }
+    if (mainTab->tabText(i) == tr("Insert"))
+    {
+      insertModel = mainTab->widget(i);
+      break;
+    }
   }
   QVERIFY(insertModel != NULL);
 
@@ -204,11 +204,11 @@ void ModelEditor_TEST::InsertTab()
   insertModel = NULL;
   for (int i = 0; i < mainTab->count(); ++i)
   {
-   if (mainTab->tabText(i) == tr("Insert"))
-   {
-     insertModel = mainTab->widget(i);
-     break;
-   }
+    if (mainTab->tabText(i) == tr("Insert"))
+    {
+      insertModel = mainTab->widget(i);
+      break;
+    }
   }
   QVERIFY(insertModel == NULL);
 
@@ -219,11 +219,11 @@ void ModelEditor_TEST::InsertTab()
   insertModel = NULL;
   for (int i = 0; i < mainTab->count(); ++i)
   {
-   if (mainTab->tabText(i) == tr("Insert"))
-   {
-     insertModel = mainTab->widget(i);
-     break;
-   }
+    if (mainTab->tabText(i) == tr("Insert"))
+    {
+      insertModel = mainTab->widget(i);
+      break;
+    }
   }
   QVERIFY(insertModel != NULL);
 
