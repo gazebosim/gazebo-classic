@@ -246,15 +246,15 @@ bool Server::ParseArgs(int _argc, char **_argv)
 
     gzmsg << "\nLog playback:\n"
       << "  Log Version: "
-      << util::LogPlay::Instance()->GetLogVersion() << "\n"
+      << util::LogPlay::Instance()->LogVersion() << "\n"
       << "  Gazebo Version: "
-      << util::LogPlay::Instance()->GetGazeboVersion() << "\n"
+      << util::LogPlay::Instance()->GazeboVersion() << "\n"
       << "  Random Seed: "
-      << util::LogPlay::Instance()->GetRandSeed() << "\n"
+      << util::LogPlay::Instance()->RandSeed() << "\n"
       << "  Log Start Time: "
-      << util::LogPlay::Instance()->GetLogStartTime() << "\n"
+      << util::LogPlay::Instance()->LogStartTime() << "\n"
       << "  Log End Time: "
-      << util::LogPlay::Instance()->GetLogEndTime() << "\n";
+      << util::LogPlay::Instance()->LogEndTime() << "\n";
 
     // Get the SDF world description from the log file
     std::string sdfString;
