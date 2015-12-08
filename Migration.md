@@ -81,6 +81,12 @@ release will remove the deprecated code.
 
 ### Deprecations
 
+1. **gazebo/util/OpenAL.hh**
+    + ***Deprecation:*** public: bool GetOnContact() const;
+    + ***Replacement:*** public: bool OnContact() const;
+    + ***Deprecation:*** public: std::vector<std::string> GetCollisionNames() const;
+    + ***Replacement:*** public: std::vector<std::string> CollisionNames() const;
+
 1. **gazebo/rendering/ApplyWrenchVisual.hh**
     + ***Deprecation:*** public: void SetCoM(const math::Vector3 &_comVector)
     + ***Replacement:*** public: void SetCoM(const ignition::math::Vector3d &_comVector);
