@@ -14,19 +14,13 @@
  * limitations under the License.
  *
 */
+#ifndef _GAZEBO_UTIL_DIAGNOSTICMANAGER_HH_
+#define _GAZEBO_UTIL_DIAGNOSTICMANAGER_HH_
 
-#ifndef _DIAGNOSTICMANAGER_HH_
-#define _DIAGNOSTICMANAGER_HH_
-
-#include <boost/unordered_map.hpp>
 #include <string>
 #include <boost/filesystem.hpp>
 
 #include "gazebo/gazebo_config.h"
-
-#include "gazebo/transport/TransportTypes.hh"
-
-#include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/common/UpdateInfo.hh"
 #include "gazebo/common/SingletonT.hh"
@@ -39,6 +33,12 @@ namespace gazebo
 {
   namespace util
   {
+    // Forward declare private data class
+    class DiagnosticManagerPrivate;
+
+    // Forward declare private data class
+    class DiagnosticTimerPrivate;
+
     /// \addtogroup gazebo_util Utility
     /// \{
 
@@ -100,26 +100,55 @@ namespace gazebo
 
       /// \brief Get the number of timers
       /// \return The number of timers
-      public: int GetTimerCount() const;
+      /// \deprecated See TimerCount() const
+      public: int GetTimerCount() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the number of timers
+      /// \return The number of timers
+      public: int TimerCount() const;
 
       /// \brief Get the time of a timer instance
       /// \param[in] _index The index of a timer instance
       /// \return Time of the specified timer
-      public: common::Time GetTime(int _index) const;
+      /// \deprecated See Time(const int) const;
+      public: common::Time GetTime(int _index) const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the time of a timer instance
+      /// \param[in] _index The index of a timer instance
+      /// \return Time of the specified timer
+      public: common::Time Time(const int _index) const;
 
       /// \brief Get a time based on a label
       /// \param[in] _label Name of the timer instance
       /// \return Time of the specified timer
-      public: common::Time GetTime(const std::string &_label) const;
+      /// \deprecated See Time(const std::string &_label) const
+      public: common::Time GetTime(const std::string &_label) const
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get a time based on a label
+      /// \param[in] _label Name of the timer instance
+      /// \return Time of the specified timer
+      public: common::Time Time(const std::string &_label) const;
 
       /// \brief Get a label for a timer
       /// \param[in] _index Index of a timer instance
       /// \return Label of the specified timer
-      public: std::string GetLabel(int _index) const;
+      /// \deprecated See Lable(const int) const
+      public: std::string GetLabel(int _index) const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get a label for a timer
+      /// \param[in] _index Index of a timer instance
+      /// \return Label of the specified timer
+      public: std::string Label(const int _index) const;
 
       /// \brief Get the path in which logs are stored.
       /// \return The path in which logs are stored.
-      public: boost::filesystem::path GetLogPath() const;
+      /// \deprecated See LogPath() const
+      public: boost::filesystem::path GetLogPath() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the path in which logs are stored.
+      /// \return The path in which logs are stored.
+      public: boost::filesystem::path LogPath() const;
 
       /// \brief Publishes diagnostic information.
       /// \param[in] _info World update information.
@@ -130,36 +159,19 @@ namespace gazebo
       /// \param[in] _wallTime Wall clock time stamp.
       /// \param[in] _elapsedTime Elapsed time, this is the time
       /// measurement.
-      private: void AddTime(const std::string &_name, common::Time &_wallTime,
-                   common::Time &_elapsedtime);
-
-      /// \brief Map of all the active timers.
-      private: typedef boost::unordered_map<std::string, DiagnosticTimerPtr>
-               TimerMap;
-
-      /// \brief dictionary of timers index by name
-      private: TimerMap timers;
-
-      /// \brief Path in which to store timing logs.
-      private: boost::filesystem::path logPath;
-
-      /// \brief Node for publishing diagnostic data.
-      private: transport::NodePtr node;
-
-      /// \brief Publisher of diagnostic data.
-      private: transport::PublisherPtr pub;
-
-      /// \brief The message to output
-      private: msgs::Diagnostics msg;
-
-      /// \brief Pointer to the update event connection
-      private: event::ConnectionPtr updateConnection;
+      private: void AddTime(const std::string &_name,
+                   const common::Time &_wallTime,
+                   const common::Time &_elapsedtime);
 
       // Singleton implementation
       private: friend class SingletonT<DiagnosticManager>;
 
       /// \brief Give DiagnosticTimer special rights.
       private: friend class DiagnosticTimer;
+
+      /// \internal
+      /// \brief Private data pointer
+      private: std::unique_ptr<DiagnosticManagerPrivate> dataPtr;
     };
 
     /// \class DiagnosticTimer Diagnostics.hh util/util.hh
@@ -185,17 +197,16 @@ namespace gazebo
 
       /// \brief Get the name of the timer
       /// \return The name of timer
-      public: inline const std::string GetName() const
-              { return this->name; }
+      /// \deprecated See Name() const
+      public: const std::string GetName() const GAZEBO_DEPRECATED(7.0);
 
-      /// \brief Name of the timer.
-      private: std::string name;
+      /// \brief Get the name of the timer
+      /// \return The name of timer
+      public: const std::string Name() const;
 
-      /// \brief Log file.
-      private: std::ofstream log;
-
-      /// \brief Time of the previous lap.
-      private: common::Time prevLap;
+      /// \internal
+      /// \brief Private data pointer
+      private: std::unique_ptr<DiagnosticTimerPrivate> dataPtr;
     };
     /// \}
   }
