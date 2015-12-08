@@ -39,5 +39,28 @@ void TimePanel_TEST::SetPaused()
   delete timePanel;
 }
 
+/////////////////////////////////////////////////
+void TimePanel_TEST::SpaceBar()
+{
+  this->Load("empty.world");
+
+  // Create a new time panel widget
+  auto timePanel = new gazebo::gui::TimePanel;
+  QVERIFY(timePanel != NULL);
+
+  // verify initial state
+  QVERIFY(!timePanel->IsPaused());
+
+  // Press space bar and check it was paused
+  QTest::keyClick(timePanel, Qt::Key_Space);
+  QVERIFY(timePanel->IsPaused());
+
+  // Press space bar and check it was unpaused
+  QTest::keyClick(timePanel, Qt::Key_Space);
+  QVERIFY(!timePanel->IsPaused());
+
+  delete timePanel;
+}
+
 // Generate a main function for the test
 QTEST_MAIN(TimePanel_TEST)
