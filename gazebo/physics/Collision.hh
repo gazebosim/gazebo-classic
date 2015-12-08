@@ -28,6 +28,9 @@ namespace gazebo
     // Forward declare private data class.
     class CollisionPrivate;
 
+    // Forward declare protected data class.
+    class CollisionProtected;
+
     /// \addtogroup gazebo_physics
     /// \{
 
@@ -276,10 +279,15 @@ namespace gazebo
       // Documentation inherited.
       public: virtual const ignition::math::Pose3d &WorldPose() const;
 
+      /// \internal
       /// \brief Constructor used by inherited classes
       /// \param[in] _dataPtr Pointer to protected data
-      /// \param[in] _link Link that contains this collision object.
+      /// \param[in] _link Pointer to parent link
       protected: Collision(CollisionProtected &_dataPtr, LinkPtr _link);
+
+      /// \brief Shared construction code.
+      /// \param[in] _link Pointer to parent link
+      private: void ConstructionHelper(LinkPtr _Link);
 
       /// \brief Helper function used to create a collision visual message.
       /// \return Visual message for a collision.
@@ -287,11 +295,11 @@ namespace gazebo
 
       /// \internal
       /// \brief Protected data pointer
-      private: std::shared_ptr<CollisionPrivate> dataPtr;
+      protected: std::shared_ptr<CollisionProtected> collDPtr;
 
       /// \internal
       /// \brief Private data pointer
-      private: std::unique_ptr<CollisionPrivate> pdPtr;
+      private: std::unique_ptr<CollisionPrivate> dataPtr;
     };
     /// \}
   }

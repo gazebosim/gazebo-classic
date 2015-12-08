@@ -46,15 +46,24 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 Collision::Collision(LinkPtr _link)
-: Entity(*new CollisionPrivate, _link), maxContacts(1),
-  dataPtr(std::static_pointer_cast<CollisionPrivate>(this->dPtr))
+: Entity(*new CollisionProtected, _link), maxContacts(1),
+  dataPtr(new CollisionPrivate),
+  collDPtr(std::static_pointer_cast<CollisionProtected>(this->entDPtr))
 {
+  this->ConstructionHelper(_link);
 }
 
 //////////////////////////////////////////////////
 Collision::Collision(CollisionProtected &_dataPtr, LinkPtr _link)
 : Entity(_dataPtr, _link), maxContacts(1),
-  dataPtr(std::static_pointer_cast<CollisionPrivate>(this->dPtr))
+  dataPtr(new CollisionPrivate),
+  collDPtr(std::static_pointer_cast<CollisionProtected>(this->entDPtr))
+{
+  this->ConstructionHelper(_link);
+}
+
+/////////////////////////////////////////////////
+void Collision::ConstructionHelper()
 {
   this->AddType(Base::COLLISION);
 

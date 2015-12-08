@@ -121,7 +121,7 @@ namespace gazebo
       /// \brief Get the absolute pose of the entity.
       /// \return The absolute pose of the entity.
       /// \deprecated See WorldPose();
-      public: inline virtual const math::Pose &GetWorldPose() const
+      public: virtual const math::Pose &GetWorldPose() const
               GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the absolute pose of the entity.
@@ -372,14 +372,19 @@ namespace gazebo
       /// \return The dirty pose of the entity.
       public: const ignition::math::Pose3d &DirtyPose() const;
 
-      /// \brief Constructor used by inherited classes
-      /// \param[in] _dataPtr Pointer to protected data
-      /// \param[in] _parent Parent of this object
-      protected: Entity(EntityProtected &_dataPtr, BasePtr _parent);
-
       /// \brief This function is called when the entity's
       /// (or one of its parents) pose of the parent has changed.
       protected: virtual void OnPoseChange() = 0;
+
+      /// \internal
+      /// \brief Constructor used by inherited classes
+      /// \param[in] _dataPtr Pointer to protected data
+      /// \param[in] _parent Parent of the entity.
+      protected: Entity(EntityProtected &_dataPtr, BasePtr _parent);
+
+      /// \brief Shared construction code.
+      /// \param[in] _link Pointer to parent link
+      private: void ConstructionHelper(LinkPtr _Link);
 
       /// \brief Publish the pose.
       private: virtual void PublishPose();
@@ -431,11 +436,11 @@ namespace gazebo
 
       /// \internal
       /// \brief Private data pointer
-      private: std::shared_ptr<EntityProtected> dataPtr;
+      protected: std::shared_ptr<EntityProtected> entDPtr;
 
       /// \internal
       /// \brief Private data pointer
-      private: std::unique_ptr<EntityPrivate> pdPtr;
+      private: std::unique_ptr<EntityPrivate> dataPtr;
     };
     /// \}
   }

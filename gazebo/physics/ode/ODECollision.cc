@@ -39,16 +39,16 @@ using namespace physics;
 //////////////////////////////////////////////////
 ODECollision::ODECollision(LinkPtr _link)
 : Collision(*new ODECollisionPrivate, _link),
-  dataPtr(std::static_pointer_cast<ODECollisionPrivate>(this->dPtr))
+  dataPtr(std::static_pointer_cast<ODECollisionPrivate>(this->baseDPtr))
 {
   this->SetName("ODE_Collision");
   this->dataPtr->collisionId = NULL;
-  this->onPoseChangeFunc = &ODECollision::OnPoseChangeNull;
+  this->dataPtr->onPoseChangeFunc = &ODECollision::OnPoseChangeNull;
 
   this->SetSpaceId(
-      boost::static_pointer_cast<ODELink>(this->link)->GetSpaceId());
+      boost::static_pointer_cast<ODELink>(this->dataPtr->link)->GetSpaceId());
 
-  this->surface.reset(new ODESurfaceParams());
+  this->dataPtr->surface.reset(new ODESurfaceParams());
 }
 
 //////////////////////////////////////////////////
@@ -71,10 +71,11 @@ void ODECollision::Load(sdf::ElementPtr _sdf)
   }
 
   // Force max correcting velocity to zero for certain collision entities
-  if (this->IsStatic() || this->shape->HasType(Base::HEIGHTMAP_SHAPE) ||
-      this->shape->HasType(Base::MAP_SHAPE))
+  if (this->IsStatic() ||
+      this->dataPtr->shape->HasType(Base::HEIGHTMAP_SHAPE) ||
+      this->dataPtr->shape->HasType(Base::MAP_SHAPE))
   {
-    this->GetODESurface()->maxVel = 0.0;
+    this->ODESurface()->maxVel = 0.0;
   }
 }
 
@@ -86,9 +87,9 @@ void ODECollision::Fini()
      dGeomDestroy(this->dataPtr->collisionId);
      this->dataPtr->collisionId = NULL;
 
-     if (this->spaceId)
-     dSpaceDestroy(this->spaceId);
-     this->spaceId = NULL;
+     if (this->dataPtr->spaceId)
+     dSpaceDestroy(this->dataPtr->spaceId);
+     this->dataPtr->spaceId = NULL;
      */
 
   Collision::Fini();
@@ -100,14 +101,19 @@ void ODECollision::OnPoseChange()
   // Update all the models
   // (*this.*onPoseChangeFunc)();
 
-  if (this->IsStatic() && this->dataPtr->collisionId && this->placeable)
+  if (this->IsStatic() && this->dataPtr->collisionId &&
+      this->dataPtr->placeable)
+  {
     this->OnPoseChangeGlobal();
-  else if (this->dataPtr->collisionId && this->placeable)
+  }
+  else if (this->dataPtr->collisionId && this->dataPtr->placeable)
+  {
     this->OnPoseChangeRelative();
+  }
 }
 
 //////////////////////////////////////////////////
-void ODECollision::SetCollision(dGeomID _collisionId, bool _placeable)
+void ODECollision::SetCollision(dGeomID _collisionId, const bool _placeable)
 {
   // Must go first in this function
   this->dataPtr->collisionId = _collisionId;
@@ -116,20 +122,21 @@ void ODECollision::SetCollision(dGeomID _collisionId, bool _placeable)
 
   if (dGeomGetSpace(this->dataPtr->collisionId) == 0)
   {
-    dSpaceAdd(this->spaceId, this->dataPtr->collisionId);
-    GZ_ASSERT(dGeomGetSpace(this->dataPtr->collisionId) != 0, "Collision ID is NULL");
+    dSpaceAdd(this->dataPtr->spaceId, this->dataPtr->collisionId);
+    GZ_ASSERT(dGeomGetSpace(this->dataPtr->collisionId) != 0,
+        "Collision ID is NULL");
   }
 
-  if (this->dataPtr->collisionId && this->placeable)
+  if (this->dataPtr->collisionId && this->dataPtr->placeable)
   {
     if (this->IsStatic())
-      this->onPoseChangeFunc = &ODECollision::OnPoseChangeGlobal;
+      this->dataPtr->onPoseChangeFunc = &ODECollision::OnPoseChangeGlobal;
     else
-      this->onPoseChangeFunc = &ODECollision::OnPoseChangeRelative;
+      this->dataPtr->onPoseChangeFunc = &ODECollision::OnPoseChangeRelative;
   }
   else
   {
-    this->onPoseChangeFunc = &ODECollision::OnPoseChangeNull;
+    this->dataPtr->onPoseChangeFunc = &ODECollision::OnPoseChangeNull;
   }
 
   dGeomSetData(this->dataPtr->collisionId, this);
@@ -138,11 +145,23 @@ void ODECollision::SetCollision(dGeomID _collisionId, bool _placeable)
 //////////////////////////////////////////////////
 dGeomID ODECollision::GetCollisionId() const
 {
+  return this->CollisionId();
+}
+
+//////////////////////////////////////////////////
+dGeomID ODECollision::CollisionId() const
+{
   return this->dataPtr->collisionId;
 }
 
 //////////////////////////////////////////////////
 int ODECollision::GetCollisionClass() const
+{
+  return this->CollisionClass();
+}
+
+//////////////////////////////////////////////////
+int ODECollision::CollisionClass() const
 {
   int result = 0;
 
@@ -155,27 +174,27 @@ int ODECollision::GetCollisionClass() const
 }
 
 //////////////////////////////////////////////////
-void ODECollision::SetCategoryBits(unsigned int _bits)
+void ODECollision::SetCategoryBits(const unsigned int _bits)
 {
   if (this->dataPtr->collisionId)
     dGeomSetCategoryBits(this->dataPtr->collisionId, _bits);
-  if (this->spaceId)
-    dGeomSetCategoryBits((dGeomID)this->spaceId, _bits);
+  if (this->dataPtr->spaceId)
+    dGeomSetCategoryBits((dGeomID)this->dataPtr->spaceId, _bits);
 }
 
 //////////////////////////////////////////////////
-void ODECollision::SetCollideBits(unsigned int _bits)
+void ODECollision::SetCollideBits(const unsigned int _bits)
 {
   if (this->dataPtr->collisionId)
     dGeomSetCollideBits(this->dataPtr->collisionId, _bits);
-  if (this->spaceId)
-    dGeomSetCollideBits((dGeomID)this->spaceId, _bits);
+  if (this->dataPtr->spaceId)
+    dGeomSetCollideBits((dGeomID)this->dataPtr->spaceId, _bits);
 }
 
 //////////////////////////////////////////////////
-math::Box ODECollision::GetBoundingBox() const
+ignition::math::Box ODECollision::BoundingBox() const
 {
-  math::Box box;
+  ignition::math::Box box;
   dReal aabb[6];
 
   memset(aabb, 0, 6 * sizeof(dReal));
@@ -183,8 +202,8 @@ math::Box ODECollision::GetBoundingBox() const
   // if (this->dataPtr->collisionId && this->type != Shape::PLANE)
   dGeomGetAABB(this->dataPtr->collisionId, aabb);
 
-  box.min.Set(aabb[0], aabb[2], aabb[4]);
-  box.max.Set(aabb[1], aabb[3], aabb[5]);
+  box.Min().Set(aabb[0], aabb[2], aabb[4]);
+  box.Max().Set(aabb[1], aabb[3], aabb[5]);
 
   return box;
 }
@@ -192,19 +211,31 @@ math::Box ODECollision::GetBoundingBox() const
 //////////////////////////////////////////////////
 dSpaceID ODECollision::GetSpaceId() const
 {
-  return this->spaceId;
+  return this->SpaceId();
 }
 
 //////////////////////////////////////////////////
-void ODECollision::SetSpaceId(dSpaceID _spaceid)
+dSpaceID ODECollision::SpaceId() const
 {
-  this->spaceId = _spaceid;
+  return this->dataPtr->spaceId;
+}
+
+//////////////////////////////////////////////////
+void ODECollision::SetSpaceId(const dSpaceID _spaceid)
+{
+  this->dataPtr->spaceId = _spaceid;
 }
 
 /////////////////////////////////////////////////
 ODESurfaceParamsPtr ODECollision::GetODESurface() const
 {
-  return boost::dynamic_pointer_cast<ODESurfaceParams>(this->surface);
+  return this->ODESurface();
+}
+
+/////////////////////////////////////////////////
+ODESurfaceParamsPtr ODECollision::ODESurface() const
+{
+  return boost::dynamic_pointer_cast<ODESurfaceParams>(this->dataPtr->surface);
 }
 
 /////////////////////////////////////////////////
@@ -213,19 +244,20 @@ void ODECollision::OnPoseChangeGlobal()
   dQuaternion q;
 
   // Transform into global pose since a static collision does not have a link
-  math::Pose localPose = this->GetWorldPose();
+  ignition::math::Pose3d localPose = this->WorldPose();
 
   // un-offset cog location
-  math::Vector3 cog_vec = this->link->GetInertial()->GetCoG();
-  localPose.pos = localPose.pos - cog_vec;
+  ignition::math::Vector3d cogVec =
+    this->dataPtr->link->Inertial()->GetCoG().Ign();
+  localPose.Pos() = localPose.Pos() - cogVec;
 
-  q[0] = localPose.rot.w;
-  q[1] = localPose.rot.x;
-  q[2] = localPose.rot.y;
-  q[3] = localPose.rot.z;
+  q[0] = localPose.Rot().W();
+  q[1] = localPose.Rot().X();
+  q[2] = localPose.Rot().Y();
+  q[3] = localPose.Rot().Z();
 
-  dGeomSetPosition(this->dataPtr->collisionId, localPose.pos.x, localPose.pos.y,
-                   localPose.pos.z);
+  dGeomSetPosition(this->dataPtr->collisionId,
+      localPose.Pos().X(), localPose.Pos().Y(), localPose.Pos().Z());
   dGeomSetQuaternion(this->dataPtr->collisionId, q);
 }
 
@@ -237,7 +269,8 @@ void ODECollision::OnPoseChangeRelative()
   ignition::math::Pose3d localPose = this->RelativePose();
 
   // un-offset cog location
-  ignition::math::Vector3d cog_vec = this->link->GetInertial()->GetCoG().Ign();
+  ignition::math::Vector3d cog_vec =
+    this->dataPtr->link->Inertial()->GetCoG().Ign();
   localPose.Pos() = localPose.Pos() - cog_vec;
 
   q[0] = localPose.Rot().W();

@@ -400,8 +400,18 @@ namespace gazebo
       private: void ConstructionHelper();
 
       /// \internal
+      /// \brief Constructor used by inherited classes
+      /// \param[in] _dataPtr Pointer to protected data
+      /// \param[in] _parent Pointer to parent of this object
+      protected: Base(BaseProtected &_dataPtr, BasePtr _parent);
+
+      /// \brief Shared construction code.
+      /// \param[in] _link Pointer to parent link
+      private: void ConstructionHelper(LinkPtr _Link);
+
+      /// \internal
       /// \brief Data pointer for protected data
-      protected: std::shared_ptr<BaseProtected> dPtr;
+      protected: std::shared_ptr<BaseProtected> baseDPtr;
 
       /// \internal
       /// \brief Data pointer for private data

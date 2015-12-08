@@ -52,40 +52,61 @@ namespace gazebo
       /// \brief Set the encapsulated collsion object.
       /// \param[in] _collisionId ODE id of the collision object.
       /// \param[in] _placeable True to make the object movable.
-      public: void SetCollision(dGeomID _collisionId, bool _placeable);
+      public: void SetCollision(dGeomID _collisionId, const bool _placeable);
 
       /// \brief Return the collision id.
       /// \return The collision id.
-      public: dGeomID GetCollisionId() const;
+      /// \deprecated See CollisionId()
+      public: dGeomID GetCollisionId() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Return the collision id.
+      /// \return The collision id.
+      public: dGeomID CollisionId() const;
 
       /// \brief Get the ODE collision class.
       /// \return The ODE collision class.
-      public: int GetCollisionClass() const;
+      /// \deprecated See CollisionClass()
+      public: int GetCollisionClass() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the ODE collision class.
+      /// \return The ODE collision class.
+      public: int CollisionClass() const;
 
       // Documentation inherited.
       public: virtual void OnPoseChange();
 
       // Documentation inherited.
-      public: virtual void SetCategoryBits(unsigned int bits);
+      public: virtual void SetCategoryBits(const unsigned int bits);
 
       // Documentation inherited.
-      public: virtual void SetCollideBits(unsigned int bits);
+      public: virtual void SetCollideBits(const unsigned int bits);
 
       // Documentation inherited.
-      public: virtual math::Box GetBoundingBox() const;
+      public: virtual ignition::math::Box BoundingBox() const;
 
       /// \brief Get the collision's space ID
       /// \return The collision's space ID
-      public: dSpaceID GetSpaceId() const;
+      /// \deprecated See SpaceId()
+      public: dSpaceID GetSpaceId() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the collision's space ID
+      /// \return The collision's space ID
+      public: dSpaceID SpaceId() const;
 
       /// \brief Set the collision's space ID
       /// \param[in] _spaceid ID of an ODE collision space.
-      public: void SetSpaceId(dSpaceID _spaceid);
+      public: void SetSpaceId(const dSpaceID _spaceid);
 
       /// \brief Similar to Collision::GetSurface, but provides dynamically
       ///        casted pointer to ODESurfaceParams.
       /// \return Dynamically casted pointer to ODESurfaceParams.
-      public: ODESurfaceParamsPtr GetODESurface() const;
+      /// \deprecated See ODESurface()
+      public: ODESurfaceParamsPtr GetODESurface() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Similar to Collision::GetSurface, but provides dynamically
+      ///        casted pointer to ODESurfaceParams.
+      /// \return Dynamically casted pointer to ODESurfaceParams.
+      public: ODESurfaceParamsPtr ODESurface() const;
 
       /// \brief Used when this is static to set the posse.
       private: void OnPoseChangeGlobal();
