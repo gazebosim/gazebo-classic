@@ -87,6 +87,7 @@ TimePanel::TimePanel(QWidget *_parent)
       boost::bind(&TimePanel::OnFullScreen, this, _1)));
 
   connect(g_playAct, SIGNAL(changed()), this, SLOT(OnPlayActionChanged()));
+  (void) new QShortcut(Qt::Key_Space, this, SLOT(TogglePause()));
 }
 
 /////////////////////////////////////////////////
@@ -196,6 +197,15 @@ void TimePanel::SetPaused(bool _paused)
     this->dataPtr->timeWidget->SetPaused(_paused);
   else if (this->dataPtr->logPlayWidget->isVisible())
     this->dataPtr->logPlayWidget->SetPaused(_paused);
+}
+
+/////////////////////////////////////////////////
+void TimePanel::TogglePause()
+{
+  if (this->IsPaused())
+    g_playAct->trigger();
+  else
+    g_pauseAct->trigger();
 }
 
 /////////////////////////////////////////////////
