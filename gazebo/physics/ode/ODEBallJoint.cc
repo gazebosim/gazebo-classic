@@ -28,7 +28,7 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 ODEBallJoint::ODEBallJoint(dWorldID _worldId, BasePtr _parent)
-: BallJoint<ODEJoint>(_parent)
+: BallJoint<ODEJoint>(*new ODEBallJointProtected, _parent)
 {
   this->jointId = dJointCreateBall(_worldId, NULL);
 }

@@ -391,19 +391,14 @@ namespace gazebo
       /// \return The SDF values for the object.
       public: virtual const sdf::ElementPtr SDF() const;
 
-      /// \brief Constructor used by inherited classes
-      /// \param[in] _dataPtr Pointer to protected data
-      /// \param[in] _parent Parent of this object
-      protected: Base(BaseProtected &_dataPtr, BasePtr _parent);
-
-      /// \brief Construction helper function.
-      private: void ConstructionHelper();
-
       /// \internal
       /// \brief Constructor used by inherited classes
       /// \param[in] _dataPtr Pointer to protected data
       /// \param[in] _parent Pointer to parent of this object
       protected: Base(BaseProtected &_dataPtr, BasePtr _parent);
+
+      /// \brief Construction helper function.
+      private: void ConstructionHelper();
 
       /// \brief Shared construction code.
       /// \param[in] _link Pointer to parent link

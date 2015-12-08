@@ -123,7 +123,7 @@ void ODEJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-LinkPtr ODEJoint::GetJointLink(unsigned int _index) const
+LinkPtr ODEJoint::JointLink(const unsigned int _index) const
 {
   LinkPtr result;
   if (!this->jointId)
@@ -160,7 +160,7 @@ bool ODEJoint::AreConnected(LinkPtr _one, LinkPtr _two) const
 
 //////////////////////////////////////////////////
 // child classes where appropriate
-double ODEJoint::GetParam(unsigned int /*parameter*/) const
+double ODEJoint::GetParam(const unsigned int /*parameter*/) const
 {
   return 0;
 }
@@ -215,7 +215,8 @@ void ODEJoint::Detach()
 
 //////////////////////////////////////////////////
 // where appropriate
-void ODEJoint::SetParam(unsigned int /*parameter*/, double /*value*/)
+void ODEJoint::SetParam(const unsigned int /*parameter*/,
+    const double /*value*/)
 {
   if (this->childLink)
     this->childLink->SetEnabled(true);
@@ -224,7 +225,7 @@ void ODEJoint::SetParam(unsigned int /*parameter*/, double /*value*/)
 }
 
 //////////////////////////////////////////////////
-void ODEJoint::SetERP(double _newERP)
+void ODEJoint::SetERP(const double _newERP)
 {
   this->SetParam(dParamSuspensionERP, _newERP);
 }
@@ -232,11 +233,17 @@ void ODEJoint::SetERP(double _newERP)
 //////////////////////////////////////////////////
 double ODEJoint::GetERP()
 {
-  return this->GetParam(dParamSuspensionERP);
+  return this->ERP();
 }
 
 //////////////////////////////////////////////////
-void ODEJoint::SetCFM(double _newCFM)
+double ODEJoint::ERP()
+{
+  return this->Param(dParamSuspensionERP);
+}
+
+//////////////////////////////////////////////////
+void ODEJoint::SetCFM(const double _newCFM)
 {
   this->SetParam(dParamSuspensionCFM, _newCFM);
 }
@@ -244,11 +251,23 @@ void ODEJoint::SetCFM(double _newCFM)
 //////////////////////////////////////////////////
 double ODEJoint::GetCFM()
 {
-  return this->GetParam(dParamSuspensionCFM);
+  return this->CFM();
+}
+
+//////////////////////////////////////////////////
+double ODEJoint::CFM() const
+{
+  return this->Param(dParamSuspensionCFM);
 }
 
 //////////////////////////////////////////////////
 dJointFeedback *ODEJoint::GetFeedback()
+{
+  return this->Feedback();
+}
+
+//////////////////////////////////////////////////
+dJointFeedback *ODEJoint::Feedback()
 {
   if (this->jointId)
     return dJointGetFeedback(this->jointId);
@@ -499,7 +518,7 @@ bool ODEJoint::SetParam(const std::string &_key, unsigned int _index,
 }
 
 //////////////////////////////////////////////////
-double ODEJoint::GetParam(const std::string &_key, unsigned int _index)
+double ODEJoint::Param(const std::string &_key, const unsigned int _index)
 {
   // Axis parameters for multi-axis joints use a group bitmask
   // to identify the variable.
@@ -976,8 +995,8 @@ void ODEJoint::KpKdToCFMERP(const double _dt,
 
 //////////////////////////////////////////////////
 void ODEJoint::CFMERPToKpKd(const double _dt,
-                           const double _cfm, const double _erp,
-                           double &_kp, double &_kd)
+                            const double _cfm, const double _erp,
+                            double &_kp, double &_kd)
 {
   /// \TODO: check for NaN cases
   _kp = _erp / (_dt * _cfm);
@@ -985,7 +1004,7 @@ void ODEJoint::CFMERPToKpKd(const double _dt,
 }
 
 //////////////////////////////////////////////////
-void ODEJoint::SetDamping(unsigned int _index, double _damping)
+void ODEJoint::SetDamping(const unsigned int _index, const double _damping)
 {
   if (_index < this->GetAngleCount())
   {
@@ -1002,7 +1021,7 @@ void ODEJoint::SetDamping(unsigned int _index, double _damping)
 }
 
 //////////////////////////////////////////////////
-void ODEJoint::SetStiffness(unsigned int _index, double _stiffness)
+void ODEJoint::SetStiffness(const unsigned int _index, const double _stiffness)
 {
   if (_index < this->GetAngleCount())
   {
@@ -1019,8 +1038,8 @@ void ODEJoint::SetStiffness(unsigned int _index, double _stiffness)
 }
 
 //////////////////////////////////////////////////
-void ODEJoint::SetStiffnessDamping(unsigned int _index,
-  double _stiffness, double _damping, double _reference)
+void ODEJoint::SetStiffnessDamping(const unsigned int _index,
+  const double _stiffness, const double _damping, const double _reference)
 {
   if (_index < this->GetAngleCount())
   {
@@ -1185,7 +1204,31 @@ void ODEJoint::ApplyExplicitStiffnessDamping()
 }
 
 //////////////////////////////////////////////////
-bool ODEJoint::SetPosition(unsigned int _index, double _position)
+bool ODEJoint::SetPosition(const unsigned int _index, const double _position)
 {
   return Joint::SetPositionMaximal(_index, _position);
+}
+
+//////////////////////////////////////////////////
+double ODEJoint::GetStopERP()
+{
+  return this->StopERP();
+}
+
+//////////////////////////////////////////////////
+double ODEJoint::StopERP()
+{
+  return this->stopERP;
+}
+
+//////////////////////////////////////////////////
+double ODEJoint::GetStopCFM()
+{
+  return this->StopCFM();
+}
+
+//////////////////////////////////////////////////
+double ODEJoint::StopCFM()
+{
+  return this->stopCFM;
 }
