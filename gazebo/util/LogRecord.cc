@@ -241,12 +241,10 @@ const std::string &LogRecord::Encoding() const
 //////////////////////////////////////////////////
 void LogRecord::Fini()
 {
-  do
   {
     std::unique_lock<std::mutex> lock(this->dataPtr->controlMutex);
     this->dataPtr->cleanupCondition.notify_all();
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-  } while (this->dataPtr->cleanupThread.joinable());
+  }
 
   this->dataPtr->cleanupThread.join();
 
