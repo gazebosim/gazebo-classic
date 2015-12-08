@@ -189,7 +189,7 @@ void ModelAlign::GetMinMax(std::vector<math::Vector3> _vertices,
 /////////////////////////////////////////////////
 void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
     const std::string &_axis, const std::string &_config,
-    const std::string &_target, bool _publish)
+    const std::string &_target, const bool _publish, const bool _inverted)
 {
   if (_config == "reset" || _publish)
   {
@@ -259,12 +259,27 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
     this->GetMinMax(vertices, min, max);
 
     math::Vector3 trans;
-    if (_config == "min")
-      trans = targetMin - min;
-    else if (_config == "center")
+    if (_config == "center")
+    {
       trans = (targetMin + (targetMax-targetMin)/2) - (min + (max-min)/2);
-    else if (_config == "max")
-      trans = targetMax - max;
+    }
+    else
+    {
+      if (!_inverted)
+      {
+        if (_config == "min")
+          trans = targetMin - min;
+        else if (_config == "max")
+          trans = targetMax - max;
+      }
+      else
+      {
+        if (_config == "min")
+          trans = targetMin - max;
+        else if (_config == "max")
+          trans = targetMax - min;
+      }
+    }
 
     if (!_publish)
     {

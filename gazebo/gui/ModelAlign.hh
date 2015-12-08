@@ -57,9 +57,11 @@ namespace gazebo
       /// \param[in] _config Either a configuration (min, center, max),
       /// or "reset" to restore the original pose.
       /// \param[in] _publish True to publish new alignment pose
+      /// \param[in] _inverted True to invert alignment direction.
       public: void AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
           const std::string &_axis, const std::string &_config,
-          const std::string &_target, bool _publish = true);
+          const std::string &_target, const bool _publish = true,
+          const bool _inverted = false);
 
       /// \brief Publish visual's pose to the server
       /// \param[in] _vis Pointer to the visual whose pose is to be published.
