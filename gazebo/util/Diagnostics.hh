@@ -133,7 +133,7 @@ namespace gazebo
       /// \brief Get a label for a timer
       /// \param[in] _index Index of a timer instance
       /// \return Label of the specified timer
-      /// \deprecated See Lable(const int) const
+      /// \deprecated See Label(const int) const
       public: std::string GetLabel(int _index) const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get a label for a timer
