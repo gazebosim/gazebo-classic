@@ -14,7 +14,6 @@
  * limitations under the License.
  *
  */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
@@ -30,10 +29,15 @@
   #define access _access
 #endif
 
-#include <boost/bind.hpp>
+#include <functional>
+
+#include <boost/archive/iterators/base64_from_binary.hpp>
+#include <boost/archive/iterators/insert_linebreaks.hpp>
+#include <boost/archive/iterators/transform_width.hpp>
+#include <boost/archive/iterators/ostream_iterator.hpp>
+
 #include <boost/date_time.hpp>
 #include <boost/filesystem.hpp>
-#include <boost/function.hpp>
 #include <boost/iostreams/filter/bzip2.hpp>
 #include <boost/iostreams/filter/zlib.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
@@ -52,6 +56,7 @@
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/gazebo_config.h"
 #include "gazebo/transport/transport.hh"
+#include "gazebo/util/LogRecordPrivate.hh"
 #include "gazebo/util/LogRecord.hh"
 
 using namespace gazebo;
@@ -59,14 +64,15 @@ using namespace util;
 
 //////////////////////////////////////////////////
 LogRecord::LogRecord()
+: dataPtr(new LogRecordPrivate)
 {
-  this->pauseState = false;
-  this->running = false;
-  this->paused = false;
-  this->initialized = false;
-  this->stopThread = false;
-  this->firstUpdate = true;
-  this->readyToStart = false;
+  this->dataPtr->pauseState = false;
+  this->dataPtr->running = false;
+  this->dataPtr->paused = false;
+  this->dataPtr->initialized = false;
+  this->dataPtr->stopThread = false;
+  this->dataPtr->firstUpdate = true;
+  this->dataPtr->readyToStart = false;
 
   // Get the user's home directory
 #ifndef _WIN32
@@ -80,24 +86,24 @@ LogRecord::LogRecord()
   if (!homePath)
   {
     common::SystemPaths *paths = common::SystemPaths::Instance();
-    this->logBasePath = paths->GetTmpPath() + "/gazebo";
+    this->dataPtr->logBasePath = paths->GetTmpPath() + "/gazebo";
   }
   else
-    this->logBasePath = boost::filesystem::path(homePath);
+    this->dataPtr->logBasePath = boost::filesystem::path(homePath);
 
-  this->logBasePath /= "/.gazebo/log/";
+  this->dataPtr->logBasePath /= "/.gazebo/log/";
 
-  this->logsEnd = this->logs.end();
+  this->dataPtr->logsEnd = this->dataPtr->logs.end();
 
-  this->connections.push_back(
+  this->dataPtr->connections.push_back(
      event::Events::ConnectPause(
-       boost::bind(&LogRecord::OnPause, this, _1)));
+       std::bind(&LogRecord::OnPause, this, std::placeholders::_1)));
 }
 
 //////////////////////////////////////////////////
-void LogRecord::OnPause(bool _pause)
+void LogRecord::OnPause(const bool _pause)
 {
-  this->pauseState = _pause;
+  this->dataPtr->pauseState = _pause;
 }
 
 //////////////////////////////////////////////////
@@ -116,16 +122,16 @@ bool LogRecord::Init(const std::string &_subdir)
     return false;
   }
 
-  this->logSubDir = _subdir;
+  this->dataPtr->logSubDir = _subdir;
 
   this->ClearLogs();
 
-  this->initialized = true;
-  this->running = false;
-  this->paused = false;
-  this->stopThread = false;
-  this->firstUpdate = true;
-  this->readyToStart = true;
+  this->dataPtr->initialized = true;
+  this->dataPtr->running = false;
+  this->dataPtr->paused = false;
+  this->dataPtr->stopThread = false;
+  this->dataPtr->firstUpdate = true;
+  this->dataPtr->readyToStart = true;
 
   return true;
 }
@@ -133,17 +139,17 @@ bool LogRecord::Init(const std::string &_subdir)
 //////////////////////////////////////////////////
 bool LogRecord::Start(const std::string &_encoding, const std::string &_path)
 {
-  boost::mutex::scoped_lock lock(this->controlMutex);
+  std::unique_lock<std::mutex> lock(this->dataPtr->controlMutex);
 
   // Make sure ::Init has been called.
-  if (!this->initialized)
+  if (!this->dataPtr->initialized)
   {
     gzerr << "LogRecord has not been initialized." << std::endl;
     return false;
   }
 
   // Check to see if the logger is already started.
-  if (this->running)
+  if (this->dataPtr->running)
   {
     /// \TODO replace this with gzlog
     gzerr << "LogRecord has already been started" << std::endl;
@@ -156,61 +162,65 @@ bool LogRecord::Start(const std::string &_encoding, const std::string &_path)
   // Override the default path settings if the _path parameter is set.
   if (!_path.empty())
   {
-    this->logBasePath = boost::filesystem::path(_path);
-    this->logCompletePath = this->logBasePath;
+    this->dataPtr->logBasePath = boost::filesystem::path(_path);
+    this->dataPtr->logCompletePath = this->dataPtr->logBasePath;
   }
   else
-    this->logCompletePath = this->logBasePath / logTimeDir / this->logSubDir;
+  {
+    this->dataPtr->logCompletePath = this->dataPtr->logBasePath /
+      logTimeDir / this->dataPtr->logSubDir;
+  }
 
   // Create the log directory if necessary
-  if (!boost::filesystem::exists(this->logCompletePath))
-    boost::filesystem::create_directories(logCompletePath);
+  if (!boost::filesystem::exists(this->dataPtr->logCompletePath))
+    boost::filesystem::create_directories(this->dataPtr->logCompletePath);
 
   if (_encoding != "bz2" && _encoding != "txt" && _encoding != "zlib")
     gzthrow("Invalid log encoding[" + _encoding +
             "]. Must be one of [bz2, zlib, txt]");
 
-  this->encoding = _encoding;
+  this->dataPtr->encoding = _encoding;
 
   {
-    boost::mutex::scoped_lock logLock(this->writeMutex);
-    this->logsEnd = this->logs.end();
+    std::unique_lock<std::mutex> logLock(this->dataPtr->writeMutex);
+    this->dataPtr->logsEnd = this->dataPtr->logs.end();
 
     // Start all the logs
-    for (Log_M::iterator iter = this->logs.begin();
-         iter != this->logsEnd; ++iter)
-      iter->second->Start(logCompletePath);
+    for (LogRecordPrivate::Log_M::iterator iter = this->dataPtr->logs.begin();
+         iter != this->dataPtr->logsEnd; ++iter)
+      iter->second->Start(this->dataPtr->logCompletePath);
   }
 
-  this->running = true;
-  this->paused = false;
-  this->firstUpdate = true;
-  this->stopThread = false;
-  this->readyToStart = false;
+  this->dataPtr->running = true;
+  this->dataPtr->paused = false;
+  this->dataPtr->firstUpdate = true;
+  this->dataPtr->stopThread = false;
+  this->dataPtr->readyToStart = false;
 
-  this->startTime = this->currTime = common::Time();
+  this->dataPtr->startTime = this->dataPtr->currTime = common::Time();
 
   // Create a thread to cleanup recording.
-  this->cleanupThread = boost::thread(boost::bind(&LogRecord::Cleanup, this));
+  this->dataPtr->cleanupThread = std::thread(
+      std::bind(&LogRecord::Cleanup, this));
   // Wait for thread to start
-  this->startThreadCondition.wait(lock);
+  this->dataPtr->startThreadCondition.wait(lock);
 
   // Start the update thread if it has not already been started
-  if (!this->updateThread)
+  if (!this->dataPtr->updateThread)
   {
-    boost::mutex::scoped_lock updateLock(this->updateMutex);
-    this->updateThread = new boost::thread(
-        boost::bind(&LogRecord::RunUpdate, this));
-    this->startThreadCondition.wait(updateLock);
+    std::unique_lock<std::mutex> updateLock(this->dataPtr->updateMutex);
+    this->dataPtr->updateThread = new std::thread(
+        std::bind(&LogRecord::RunUpdate, this));
+    this->dataPtr->startThreadCondition.wait(updateLock);
   }
 
   // Start the writing thread if it has not already been started
-  if (!this->writeThread)
+  if (!this->dataPtr->writeThread)
   {
-    boost::mutex::scoped_lock writeLock(this->runWriteMutex);
-    this->writeThread = new boost::thread(
-        boost::bind(&LogRecord::RunWrite, this));
-    this->startThreadCondition.wait(writeLock);
+    std::unique_lock<std::mutex> writeLock(this->dataPtr->runWriteMutex);
+    this->dataPtr->writeThread = new std::thread(
+        std::bind(&LogRecord::RunWrite, this));
+    this->dataPtr->startThreadCondition.wait(writeLock);
   }
 
   return true;
@@ -219,7 +229,13 @@ bool LogRecord::Start(const std::string &_encoding, const std::string &_path)
 //////////////////////////////////////////////////
 const std::string &LogRecord::GetEncoding() const
 {
-  return this->encoding;
+  return this->Encoding();
+}
+
+//////////////////////////////////////////////////
+const std::string &LogRecord::Encoding() const
+{
+  return this->dataPtr->encoding;
 }
 
 //////////////////////////////////////////////////
@@ -227,78 +243,93 @@ void LogRecord::Fini()
 {
   do
   {
-    boost::mutex::scoped_lock lock(this->controlMutex);
-    this->cleanupCondition.notify_all();
-  } while (this->cleanupThread.joinable() &&
-          !this->cleanupThread.timed_join(
-            boost::posix_time::milliseconds(1000)));
+    std::unique_lock<std::mutex> lock(this->dataPtr->controlMutex);
+    this->dataPtr->cleanupCondition.notify_all();
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  } while (this->dataPtr->cleanupThread.joinable());
 
-  boost::mutex::scoped_lock lock(this->controlMutex);
-  this->connections.clear();
+  this->dataPtr->cleanupThread.join();
+
+  std::lock_guard<std::mutex> lock(this->dataPtr->controlMutex);
+  this->dataPtr->connections.clear();
 
   // Remove all the logs.
   this->ClearLogs();
 
-  this->logControlSub.reset();
-  this->logStatusPub.reset();
-  this->node.reset();
+  this->dataPtr->logControlSub.reset();
+  this->dataPtr->logStatusPub.reset();
+  this->dataPtr->node.reset();
 }
 
 //////////////////////////////////////////////////
 void LogRecord::Stop()
 {
-  boost::mutex::scoped_lock lock(this->controlMutex);
+  std::lock_guard<std::mutex> lock(this->dataPtr->controlMutex);
 
-  this->running = false;
-  this->cleanupCondition.notify_all();
+  this->dataPtr->running = false;
+  this->dataPtr->cleanupCondition.notify_all();
 }
 
 //////////////////////////////////////////////////
 void LogRecord::ClearLogs()
 {
-  boost::mutex::scoped_lock logLock(this->writeMutex);
+  std::lock_guard<std::mutex> logLock(this->dataPtr->writeMutex);
 
   // Delete all the log objects
-  for (Log_M::iterator iter = this->logs.begin();
-      iter != this->logs.end(); ++iter)
+  for (LogRecordPrivate::Log_M::iterator iter = this->dataPtr->logs.begin();
+      iter != this->dataPtr->logs.end(); ++iter)
   {
     delete iter->second;
   }
 
-  this->logs.clear();
-  this->logsEnd = this->logs.end();
+  this->dataPtr->logs.clear();
+  this->dataPtr->logsEnd = this->dataPtr->logs.end();
 }
 
 //////////////////////////////////////////////////
-void LogRecord::SetPaused(bool _paused)
+void LogRecord::SetPaused(const bool _paused)
 {
-  this->paused = _paused;
+  this->dataPtr->paused = _paused;
 }
 
 //////////////////////////////////////////////////
 bool LogRecord::GetPaused() const
 {
-  return this->paused;
+  return this->Paused();
+}
+
+//////////////////////////////////////////////////
+bool LogRecord::Paused() const
+{
+  return this->dataPtr->paused;
 }
 
 //////////////////////////////////////////////////
 bool LogRecord::GetRunning() const
 {
-  return this->running;
+  return this->Running();
+}
+
+//////////////////////////////////////////////////
+bool LogRecord::Running() const
+{
+  return this->dataPtr->running;
 }
 
 //////////////////////////////////////////////////
 void LogRecord::Add(const std::string &_name, const std::string &_filename,
-                    boost::function<bool (std::ostringstream &)> _logCallback)
+                    std::function<bool (std::ostringstream &)> _logCallback)
 {
-  boost::mutex::scoped_lock logLock(this->writeMutex);
+  std::lock_guard<std::mutex> logLock(this->dataPtr->writeMutex);
 
   // Check to see if the log has already been added.
-  if (this->logs.find(_name) != this->logs.end())
+  if (this->dataPtr->logs.find(_name) != this->dataPtr->logs.end())
   {
-    GZ_ASSERT(this->logs.find(_name)->second != NULL, "Unable to find log");
+    GZ_ASSERT(this->dataPtr->logs.find(_name)->second != NULL,
+        "Unable to find log");
 
-    if (this->logs.find(_name)->second->GetRelativeFilename() != _filename)
+    if (this->dataPtr->logs.find(_name)->second->RelativeFilename() !=
+        _filename)
     {
       gzerr << "Attempting to add a duplicate log object named["
           << _name << "] with a filename of [" << _filename << "].\n";
@@ -310,53 +341,55 @@ void LogRecord::Add(const std::string &_name, const std::string &_filename,
     }
   }
 
-  LogRecord::Log *newLog;
+  LogRecordPrivate::Log *newLog;
 
   // Create a new log object
   try
   {
-    newLog = new LogRecord::Log(this, _filename, _logCallback);
+    newLog = new LogRecordPrivate::Log(this, _filename, _logCallback);
   }
   catch(...)
   {
     gzthrow("Unable to create log. File permissions are probably bad.");
   }
 
-  if (this->running)
-    newLog->Start(this->logCompletePath);
+  if (this->dataPtr->running)
+    newLog->Start(this->dataPtr->logCompletePath);
 
   // Add the log to our map
-  this->logs[_name] = newLog;
+  this->dataPtr->logs[_name] = newLog;
 
   // Update the pointer to the end of the log objects list.
-  this->logsEnd = this->logs.end();
+  this->dataPtr->logsEnd = this->dataPtr->logs.end();
 
-  if (!this->node)
+  if (!this->dataPtr->node)
   {
-    this->node = transport::NodePtr(new transport::Node());
-    this->node->Init();
+    this->dataPtr->node = transport::NodePtr(new transport::Node());
+    this->dataPtr->node->Init();
 
-    this->logControlSub = this->node->Subscribe("~/log/control",
-        &LogRecord::OnLogControl, this);
-    this->logStatusPub = this->node->Advertise<msgs::LogStatus>("~/log/status");
+    this->dataPtr->logControlSub =
+      this->dataPtr->node->Subscribe("~/log/control",
+          &LogRecord::OnLogControl, this);
+    this->dataPtr->logStatusPub =
+      this->dataPtr->node->Advertise<msgs::LogStatus>("~/log/status");
   }
 }
 
 //////////////////////////////////////////////////
 bool LogRecord::Remove(const std::string &_name)
 {
-  boost::mutex::scoped_lock logLock(this->writeMutex);
+  std::lock_guard<std::mutex> logLock(this->dataPtr->writeMutex);
 
   bool result = false;
 
-  Log_M::iterator iter = this->logs.find(_name);
-  if (iter != this->logs.end())
+  LogRecordPrivate::Log_M::iterator iter = this->dataPtr->logs.find(_name);
+  if (iter != this->dataPtr->logs.end())
   {
     delete iter->second;
-    this->logs.erase(iter);
+    this->dataPtr->logs.erase(iter);
 
     // Update the pointer to the end of the log objects list.
-    this->logsEnd = this->logs.end();
+    this->dataPtr->logsEnd = this->dataPtr->logs.end();
 
     result = true;
   }
@@ -367,18 +400,24 @@ bool LogRecord::Remove(const std::string &_name)
 //////////////////////////////////////////////////
 std::string LogRecord::GetFilename(const std::string &_name) const
 {
-  boost::mutex::scoped_lock logLock(this->writeMutex);
+  return this->Filename(_name);
+}
+
+//////////////////////////////////////////////////
+std::string LogRecord::Filename(const std::string &_name) const
+{
+  std::lock_guard<std::mutex> logLock(this->dataPtr->writeMutex);
 
   std::string result;
 
-  Log_M::const_iterator iter = this->logs.find(_name);
-  if (iter != this->logs.end())
+  LogRecordPrivate::Log_M::const_iterator iter = this->dataPtr->logs.find(_name);
+  if (iter != this->dataPtr->logs.end())
   {
     GZ_ASSERT(iter->second, "Invalid log");
-    result = iter->second->GetCompleteFilename();
+    result = iter->second->CompleteFilename();
   }
   else
-    result = this->logs.begin()->second->GetCompleteFilename();
+    result = this->dataPtr->logs.begin()->second->CompleteFilename();
 
   return result;
 }
@@ -386,10 +425,16 @@ std::string LogRecord::GetFilename(const std::string &_name) const
 //////////////////////////////////////////////////
 unsigned int LogRecord::GetFileSize(const std::string &_name) const
 {
+  return this->FileSize(_name);
+}
+
+//////////////////////////////////////////////////
+unsigned int LogRecord::FileSize(const std::string &_name) const
+{
   unsigned int result = 0;
 
   // Get the filename of the specified log object;
-  std::string filename = this->GetFilename(_name);
+  std::string filename = this->Filename(_name);
 
   // Get the size of the log file on disk.
   if (!filename.empty())
@@ -402,13 +447,13 @@ unsigned int LogRecord::GetFileSize(const std::string &_name) const
   // Add in the contents of the write buffer. This is the data that will be
   // written to disk soon.
   {
-    boost::mutex::scoped_lock lock(this->writeMutex);
-    Log_M::const_iterator iter = this->logs.find(_name);
+    std::lock_guard<std::mutex> lock(this->dataPtr->writeMutex);
+    LogRecordPrivate::Log_M::const_iterator iter = this->dataPtr->logs.find(_name);
 
-    if (iter != this->logs.end())
+    if (iter != this->dataPtr->logs.end())
     {
       GZ_ASSERT(iter->second, "Log object is NULL");
-      result += iter->second->GetBufferSize();
+      result += iter->second->BufferSize();
     }
   }
 
@@ -438,41 +483,53 @@ void LogRecord::SetBasePath(const std::string &_path)
     return;
   }
 
-  this->logBasePath = _path;
+  this->dataPtr->logBasePath = _path;
 }
 
 //////////////////////////////////////////////////
 std::string LogRecord::GetBasePath() const
 {
-  return this->logBasePath.string();
+  return this->BasePath();
+}
+
+//////////////////////////////////////////////////
+std::string LogRecord::BasePath() const
+{
+  return this->dataPtr->logBasePath.string();
 }
 
 //////////////////////////////////////////////////
 bool LogRecord::GetFirstUpdate() const
 {
-  return this->firstUpdate;
+  return this->FirstUpdate();
+}
+
+//////////////////////////////////////////////////
+bool LogRecord::FirstUpdate() const
+{
+  return this->dataPtr->firstUpdate;
 }
 
 //////////////////////////////////////////////////
 void LogRecord::Notify()
 {
-  if (this->running)
-    this->updateCondition.notify_all();
+  if (this->dataPtr->running)
+    this->dataPtr->updateCondition.notify_all();
 }
 
 //////////////////////////////////////////////////
 void LogRecord::RunUpdate()
 {
-  boost::mutex::scoped_lock updateLock(this->updateMutex);
-  this->startThreadCondition.notify_all();
+  std::unique_lock<std::mutex> updateLock(this->dataPtr->updateMutex);
+  this->dataPtr->startThreadCondition.notify_all();
 
   // This loop will write data to disk.
-  while (!this->stopThread)
+  while (!this->dataPtr->stopThread)
   {
     // Don't completely lock, just to be safe.
-    this->updateCondition.wait(updateLock);
+    this->dataPtr->updateCondition.wait(updateLock);
 
-    if (!this->stopThread)
+    if (!this->dataPtr->stopThread)
       this->Update();
   }
 }
@@ -480,32 +537,33 @@ void LogRecord::RunUpdate()
 //////////////////////////////////////////////////
 void LogRecord::Update()
 {
-  if (!this->paused)
+  if (!this->dataPtr->paused)
   {
     unsigned int size = 0;
 
     {
-      boost::mutex::scoped_lock lock(this->writeMutex);
+      std::lock_guard<std::mutex> lock(this->dataPtr->writeMutex);
 
       // Collect all the new log data. This will not write data to disk.
-      for (this->updateIter = this->logs.begin();
-           this->updateIter != this->logsEnd; ++this->updateIter)
+      for (this->dataPtr->updateIter = this->dataPtr->logs.begin();
+           this->dataPtr->updateIter != this->dataPtr->logsEnd;
+           ++this->dataPtr->updateIter)
       {
-        size += this->updateIter->second->Update();
+        size += this->dataPtr->updateIter->second->Update();
       }
     }
 
-    if (this->firstUpdate)
+    if (this->dataPtr->firstUpdate)
     {
-      this->firstUpdate = false;
-      this->startTime = common::Time::GetWallTime();
+      this->dataPtr->firstUpdate = false;
+      this->dataPtr->startTime = common::Time::GetWallTime();
     }
 
     // Signal that new data is available.
     if (size > 0)
-      this->dataAvailableCondition.notify_one();
+      this->dataPtr->dataAvailableCondition.notify_one();
 
-    this->currTime = common::Time::GetWallTime();
+    this->dataPtr->currTime = common::Time::GetWallTime();
 
     // Output the new log status
     this->PublishLogStatus();
@@ -516,40 +574,48 @@ void LogRecord::Update()
 void LogRecord::RunWrite()
 {
   // Wait for new data.
-  boost::mutex::scoped_lock lock(this->runWriteMutex);
-  this->startThreadCondition.notify_all();
+  std::unique_lock<std::mutex> lock(this->dataPtr->runWriteMutex);
+  this->dataPtr->startThreadCondition.notify_all();
 
   // This loop will write data to disk.
-  while (!this->stopThread)
+  while (!this->dataPtr->stopThread)
   {
-    this->dataAvailableCondition.wait(lock);
+    this->dataPtr->dataAvailableCondition.wait(lock);
 
     this->Write(false);
   }
 }
 
 //////////////////////////////////////////////////
-void LogRecord::Write(bool /*_force*/)
+void LogRecord::Write(const bool /*_force*/)
 {
-  boost::mutex::scoped_lock lock(this->writeMutex);
+  std::lock_guard<std::mutex> lock(this->dataPtr->writeMutex);
 
   // Collect all the new log data.
-  for (this->updateIter = this->logs.begin();
-      this->updateIter != this->logsEnd; ++this->updateIter)
+  for (this->dataPtr->updateIter = this->dataPtr->logs.begin();
+      this->dataPtr->updateIter != this->dataPtr->logsEnd;
+      ++this->dataPtr->updateIter)
   {
-    this->updateIter->second->Write();
+    this->dataPtr->updateIter->second->Write();
   }
 }
 
 //////////////////////////////////////////////////
 common::Time LogRecord::GetRunTime() const
 {
-  return this->currTime - this->startTime;
+  return this->RunTime();
 }
 
 //////////////////////////////////////////////////
-LogRecord::Log::Log(LogRecord *_parent, const std::string &_relativeFilename,
-                 boost::function<bool (std::ostringstream &)> _logCB)
+common::Time LogRecord::RunTime() const
+{
+  return this->dataPtr->currTime - this->dataPtr->startTime;
+}
+
+//////////////////////////////////////////////////
+LogRecordPrivate::Log::Log(LogRecord *_parent,
+    const std::string &_relativeFilename,
+    std::function<bool (std::ostringstream &)> _logCB)
 {
   this->parent = _parent;
   this->logCB = _logCB;
@@ -558,13 +624,13 @@ LogRecord::Log::Log(LogRecord *_parent, const std::string &_relativeFilename,
 }
 
 //////////////////////////////////////////////////
-LogRecord::Log::~Log()
+LogRecordPrivate::Log::~Log()
 {
   this->Stop();
 }
 
 //////////////////////////////////////////////////
-unsigned int LogRecord::Log::Update()
+unsigned int LogRecordPrivate::Log::Update()
 {
   std::ostringstream stream;
 
@@ -574,7 +640,7 @@ unsigned int LogRecord::Log::Update()
     std::string data = stream.str();
     if (!data.empty())
     {
-      const std::string &encodingLocal = this->parent->GetEncoding();
+      const std::string &encodingLocal = this->parent->Encoding();
 
       this->buffer.append("<chunk encoding='");
       this->buffer.append(encodingLocal);
@@ -626,31 +692,31 @@ unsigned int LogRecord::Log::Update()
 }
 
 //////////////////////////////////////////////////
-void LogRecord::Log::ClearBuffer()
+void LogRecordPrivate::Log::ClearBuffer()
 {
   this->buffer.clear();
 }
 
 //////////////////////////////////////////////////
-unsigned int LogRecord::Log::GetBufferSize()
+unsigned int LogRecordPrivate::Log::BufferSize()
 {
   return this->buffer.size();
 }
 
 //////////////////////////////////////////////////
-std::string LogRecord::Log::GetRelativeFilename() const
+std::string LogRecordPrivate::Log::RelativeFilename() const
 {
   return this->relativeFilename;
 }
 
 //////////////////////////////////////////////////
-std::string LogRecord::Log::GetCompleteFilename() const
+std::string LogRecordPrivate::Log::CompleteFilename() const
 {
   return this->completePath.string();
 }
 
 //////////////////////////////////////////////////
-void LogRecord::Log::Stop()
+void LogRecordPrivate::Log::Stop()
 {
   if (this->logFile.is_open())
   {
@@ -667,7 +733,7 @@ void LogRecord::Log::Stop()
 }
 
 //////////////////////////////////////////////////
-void LogRecord::Log::Start(const boost::filesystem::path &_path)
+void LogRecordPrivate::Log::Start(const boost::filesystem::path &_path)
 {
   // Make the full path for the log file
   this->completePath = _path / this->relativeFilename;
@@ -690,7 +756,7 @@ void LogRecord::Log::Start(const boost::filesystem::path &_path)
 }
 
 //////////////////////////////////////////////////
-void LogRecord::Log::Write()
+void LogRecordPrivate::Log::Write()
 {
   // Make sure the file is open for writing
   if (!this->logFile.is_open())
@@ -755,8 +821,8 @@ void LogRecord::OnLogControl(ConstLogControlPtr &_data)
 //////////////////////////////////////////////////
 void LogRecord::PublishLogStatus()
 {
-  if (this->logs.empty() || !this->logStatusPub ||
-      !this->logStatusPub->HasConnections())
+  if (this->dataPtr->logs.empty() || !this->dataPtr->logStatusPub ||
+      !this->dataPtr->logStatusPub->HasConnections())
     return;
 
   /// \todo right now this function will only report on the first log.
@@ -765,19 +831,19 @@ void LogRecord::PublishLogStatus()
   unsigned int size = 0;
 
   // Set the time of the status message
-  msgs::Set(msg.mutable_sim_time(), this->GetRunTime());
+  msgs::Set(msg.mutable_sim_time(), this->RunTime());
 
   // Set the log recording base path name
-  msg.mutable_log_file()->set_base_path(this->GetBasePath());
+  msg.mutable_log_file()->set_base_path(this->BasePath());
 
   // Get the full name of the log file
-  msg.mutable_log_file()->set_full_path(this->GetFilename());
+  msg.mutable_log_file()->set_full_path(this->Filename());
 
   // Set the URI of th log file
   msg.mutable_log_file()->set_uri(transport::Connection::GetLocalHostname());
 
   // Get the size of the log file
-  size = this->GetFileSize();
+  size = this->FileSize();
 
   if (size < 1000)
     msg.mutable_log_file()->set_size_units(msgs::LogStatus::LogFile::BYTES);
@@ -797,51 +863,51 @@ void LogRecord::PublishLogStatus()
     msg.mutable_log_file()->set_size_units(msgs::LogStatus::LogFile::G_BYTES);
   }
 
-  this->logStatusPub->Publish(msg);
+  this->dataPtr->logStatusPub->Publish(msg);
 }
 
 //////////////////////////////////////////////////
 void LogRecord::Cleanup()
 {
-  boost::mutex::scoped_lock lock(this->controlMutex);
-  this->startThreadCondition.notify_all();
+  std::unique_lock<std::mutex> lock(this->dataPtr->controlMutex);
+  this->dataPtr->startThreadCondition.notify_all();
 
   // Wait for the cleanup signal
-  this->cleanupCondition.wait(lock);
+  this->dataPtr->cleanupCondition.wait(lock);
 
-  bool currentPauseState = this->pauseState;
+  bool currentPauseState = this->dataPtr->pauseState;
   event::Events::pause(true);
 
   // Reset the flags
-  this->paused = false;
-  this->running = false;
-  this->stopThread = true;
+  this->dataPtr->paused = false;
+  this->dataPtr->running = false;
+  this->dataPtr->stopThread = true;
 
   // Kick the update thread
   {
-    boost::mutex::scoped_lock updateLock(this->updateMutex);
-    this->updateCondition.notify_all();
+    std::lock_guard<std::mutex> updateLock(this->dataPtr->updateMutex);
+    this->dataPtr->updateCondition.notify_all();
   }
 
   // Wait for the write thread, if it exists
-  if (this->updateThread)
-    this->updateThread->join();
+  if (this->dataPtr->updateThread)
+    this->dataPtr->updateThread->join();
 
   // Kick the write thread
   {
-    boost::mutex::scoped_lock lock2(this->runWriteMutex);
-    this->dataAvailableCondition.notify_all();
+    std::lock_guard<std::mutex> lock2(this->dataPtr->runWriteMutex);
+    this->dataPtr->dataAvailableCondition.notify_all();
   }
 
   // Wait for the write thread, if it exists
-  if (this->writeThread)
-    this->writeThread->join();
+  if (this->dataPtr->writeThread)
+    this->dataPtr->writeThread->join();
 
-  delete this->updateThread;
-  this->updateThread = NULL;
+  delete this->dataPtr->updateThread;
+  this->dataPtr->updateThread = NULL;
 
-  delete this->writeThread;
-  this->writeThread = NULL;
+  delete this->dataPtr->writeThread;
+  this->dataPtr->writeThread = NULL;
 
   // Update and write one last time to make sure we log all data.
   this->Update();
@@ -849,38 +915,45 @@ void LogRecord::Cleanup()
   this->Write(true);
 
   // Stop all the logs
-  for (Log_M::iterator iter = this->logs.begin();
-      iter != this->logsEnd; ++iter)
+  for (LogRecordPrivate::Log_M::iterator iter = this->dataPtr->logs.begin();
+      iter != this->dataPtr->logsEnd; ++iter)
   {
     iter->second->Stop();
   }
 
   // Reset the times
-  this->startTime = this->currTime = common::Time();
+  this->dataPtr->startTime = this->dataPtr->currTime = common::Time();
 
   // Output the new log status
   this->PublishLogStatus();
 
   event::Events::pause(currentPauseState);
-  this->readyToStart = true;
+  this->dataPtr->readyToStart = true;
 }
 
 //////////////////////////////////////////////////
 bool LogRecord::IsReadyToStart() const
 {
-  return this->readyToStart;
+  return this->dataPtr->readyToStart;
 }
 
 //////////////////////////////////////////////////
 unsigned int LogRecord::GetBufferSize() const
 {
-  boost::mutex::scoped_lock lock(this->writeMutex);
+  return this->BufferSize();
+}
+
+//////////////////////////////////////////////////
+unsigned int LogRecord::BufferSize() const
+{
+  std::lock_guard<std::mutex> lock(this->dataPtr->writeMutex);
   unsigned int size = 0;
 
-  for (Log_M::const_iterator iter = this->logs.begin();
-      iter != this->logs.end(); ++iter)
+  for (LogRecordPrivate::Log_M::const_iterator iter =
+       this->dataPtr->logs.begin();
+       iter != this->dataPtr->logs.end(); ++iter)
   {
-    size += iter->second->GetBufferSize();
+    size += iter->second->BufferSize();
   }
 
   return size;

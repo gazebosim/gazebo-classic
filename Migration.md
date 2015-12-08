@@ -78,6 +78,26 @@ release will remove the deprecated code.
 
 ### Deprecations
 
+1. **gazebo/util/LogRecord.hh**
+    + ***Deprecation:*** public: bool GetPaused() const;
+    + ***Replacement:*** public: bool Paused() const;
+    + ***Deprecation:*** public: bool GetRunning() const;
+    + ***Replacement:*** public: bool Running() const;
+    + ***Deprecation:*** public: const std::string &GetEncoding() const;
+    + ***Replacement:*** public: const std::string &Encoding() const;
+    + ***Deprecation:*** public: std::string GetFilename(const std::string &_name = "") const;
+    + ***Replacement:*** public: std::string Filename(const std::string &_name = "") const;
+    + ***Deprecation:*** public: unsigned int GetFileSize(const std::string &_name = "") const
+    + ***Replacement:*** public: unsigned int FileSize(const std::string &_name = "") const;
+    + ***Deprecation:*** public: std::string GetBasePath() const;
+    + ***Replacement:*** public: std::string BasePath() const;
+    + ***Deprecation:*** public: common::Time GetRunTime() const;
+    + ***Replacement:*** public: common::Time RunTime() const;
+    + ***Deprecation:*** public: bool GetFirstUpdate() const;
+    + ***Replacement:*** public: bool FirstUpdate() const;
+    + ***Deprecation:*** public: unsigned int GetBufferSize() const;
+    + ***Replacement:*** public: unsigned int BufferSize() const;
+
 1. **gazebo/rendering/ApplyWrenchVisual.hh**
     + ***Deprecation:*** public: void SetCoM(const math::Vector3 &_comVector)
     + ***Replacement:*** public: void SetCoM(const ignition::math::Vector3d &_comVector);
