@@ -101,9 +101,21 @@ namespace gazebo
       /// \brief Qt signal to hide the pause button.
       signals: void HidePause();
 
-      /// \brief Qt signal used to set the current time line edit.
-      /// \param[in] _string String representation of current time.
-      signals: void SetCurrentTime(const QString &);
+      /// \brief Qt signal used to set the current day line edit.
+      /// \param[in] _string String representation of current day.
+      signals: void SetCurrentDays(const QString &);
+
+      /// \brief Qt signal used to set the current hour line edit.
+      /// \param[in] _string String representation of current hour.
+      signals: void SetCurrentHours(const QString &);
+
+      /// \brief Qt signal used to set the current minute line edit.
+      /// \param[in] _string String representation of current minute.
+      signals: void SetCurrentMinutes(const QString &);
+
+      /// \brief Qt signal used to set the current second line edit.
+      /// \param[in] _string String representation of current second.
+      signals: void SetCurrentSeconds(const QString &);
 
       /// \brief Qt signal used to set the end time line edit.
       /// \param[in] _string String representation of current time.

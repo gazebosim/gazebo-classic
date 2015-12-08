@@ -75,8 +75,26 @@ namespace gazebo
       /// \brief Button to jump forward.
       public: QToolButton *forwardButton;
 
-      /// \brief Widget to edit the current time.
-      public: QLineEdit *currentTimeEdit;
+      /// \brief Widget to edit the current day.
+      public: QLineEdit *currentDayEdit;
+
+      /// \brief Widget to edit the current hour.
+      public: QLineEdit *currentHourEdit;
+
+      /// \brief Widget to edit the current minute.
+      public: QLineEdit *currentMinuteEdit;
+
+      /// \brief Widget to edit the current second.
+      public: QLineEdit *currentSecondEdit;
+
+      /// \brief Label for the day unit.
+      public: QLabel *dayLabel;
+
+      /// \brief Label for the hour unit.
+      public: QLabel *hourLabel;
+
+      /// \brief Label for the hour separator.
+      public: QLabel *hourSeparator;
 
       /// \brief Number of steps pending to be published once the simulation
       /// is paused.

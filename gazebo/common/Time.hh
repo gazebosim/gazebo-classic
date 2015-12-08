@@ -131,17 +131,6 @@ namespace gazebo
       public: std::string FormattedString(FormatOption _start = DAYS,
           FormatOption _end = MILLISECONDS) const;
 
-      /// \brief Set the time from a string formatted as "DD hh:mm:ss.mmm", with
-      /// the option to choose the start/end. The separators are enforced, but
-      /// the number of digits isn't.
-      /// \param[in] _timeStr String representing time.
-      /// \param[in] _start Start point.
-      /// \param[in] _end End point.
-      /// \return True if successful.
-      public: bool SetFromFormattedString(const std::string &_timeStr,
-          const FormatOption &_start = DAYS,
-          const FormatOption &_end = MILLISECONDS);
-
       /// \brief Sleep for the specified time
       /// \param[in] _time Sleep time
       /// \return Time actually slept
@@ -460,6 +449,13 @@ namespace gazebo
       /// \brief Nanoseconds
       public: int32_t nsec;
 
+      /// \brief Constant multiplier to convert from nanoseconds to seconds.
+      public: static const int32_t nsInSec;
+
+      /// \brief Constant multiplier to convert from nanoseconds to
+      /// milliseconds.
+      public: static const int32_t nsInMs;
+
       /// \brief a singleton value of the last GetWallTime() value
       private: static Time wallTime;
 
@@ -490,13 +486,6 @@ namespace gazebo
                }
 
       private: static struct timespec clockResolution;
-
-      /// \brief Constant multiplier to convert from nanoseconds to seconds.
-      private: static const int32_t nsInSec;
-
-      /// \brief Constant multiplier to convert from nanoseconds to
-      /// milliseconds.
-      private: static const int32_t nsInMs;
     };
     /// \}
   }

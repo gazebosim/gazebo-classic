@@ -22,9 +22,6 @@ release will remove the deprecated code.
     + public: double ElasticModulus() const;
     + public: void SetElasticModulus(double _modulus);
 
-1. **gazebo/common/Time.hh**
-    + public: bool SetFromFormattedString(const std::string &_timeStr, const FormatOption &_start = DAYS, const FormatOption &_end = MILLISECONDS);
-
 ### Modifications
 
 1. **gazebo/rendering/RenderTypes.hh**

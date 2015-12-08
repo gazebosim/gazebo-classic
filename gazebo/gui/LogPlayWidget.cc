@@ -124,23 +124,95 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
   connect(this, SIGNAL(SetEndTime(common::Time)), this->dataPtr->view,
       SLOT(SetEndTime(common::Time)));
 
-  // Time
-  this->dataPtr->currentTimeEdit = new QLineEdit();
-  this->dataPtr->currentTimeEdit->setObjectName("logPlayCurrentTime");
-  this->dataPtr->currentTimeEdit->setMaximumWidth(110);
-  this->dataPtr->currentTimeEdit->setAlignment(Qt::AlignRight);
-  connect(this, SIGNAL(SetCurrentTime(const QString &)),
-      this->dataPtr->currentTimeEdit, SLOT(setText(const QString &)));
-  connect(this->dataPtr->currentTimeEdit, SIGNAL(editingFinished()), this,
+  // Current time fields
+  // Day edit
+  this->dataPtr->currentDayEdit = new QLineEdit();
+  this->dataPtr->currentDayEdit->setAlignment(Qt::AlignRight);
+  this->dataPtr->currentDayEdit->setValidator(new QIntValidator(0, 99));
+  this->dataPtr->currentDayEdit->setMaximumWidth(25);
+  this->dataPtr->currentDayEdit->setText("00");
+  connect(this->dataPtr->currentDayEdit, SIGNAL(editingFinished()), this,
       SLOT(OnCurrentTime()));
+  connect(this, SIGNAL(SetCurrentDays(const QString &)),
+      this->dataPtr->currentDayEdit, SLOT(setText(const QString &)));
 
+  // Hour edit
+  this->dataPtr->currentHourEdit = new QLineEdit();
+  this->dataPtr->currentHourEdit->setAlignment(Qt::AlignRight);
+  this->dataPtr->currentHourEdit->setValidator(new QIntValidator(0, 23));
+  this->dataPtr->currentHourEdit->setMaximumWidth(25);
+  this->dataPtr->currentHourEdit->setText("00");
+  connect(this->dataPtr->currentHourEdit, SIGNAL(editingFinished()), this,
+      SLOT(OnCurrentTime()));
+  connect(this, SIGNAL(SetCurrentHours(const QString &)),
+      this->dataPtr->currentHourEdit, SLOT(setText(const QString &)));
+
+  // Minute edit
+  this->dataPtr->currentMinuteEdit = new QLineEdit();
+  this->dataPtr->currentMinuteEdit->setAlignment(Qt::AlignRight);
+  this->dataPtr->currentMinuteEdit->setValidator(new QIntValidator(0, 59));
+  this->dataPtr->currentMinuteEdit->setMaximumWidth(25);
+  this->dataPtr->currentMinuteEdit->setText("00");
+  connect(this->dataPtr->currentMinuteEdit, SIGNAL(editingFinished()), this,
+      SLOT(OnCurrentTime()));
+  connect(this, SIGNAL(SetCurrentMinutes(const QString &)),
+      this->dataPtr->currentMinuteEdit, SLOT(setText(const QString &)));
+
+  // Second edit
+  this->dataPtr->currentSecondEdit = new QLineEdit();
+  this->dataPtr->currentSecondEdit->setAlignment(Qt::AlignRight);
+  this->dataPtr->currentSecondEdit->setValidator(
+      new QDoubleValidator(0, 59.999, 3));
+  this->dataPtr->currentSecondEdit->setMaximumWidth(60);
+  this->dataPtr->currentSecondEdit->setText("00.000");
+  connect(this->dataPtr->currentSecondEdit, SIGNAL(editingFinished()), this,
+      SLOT(OnCurrentTime()));
+  connect(this, SIGNAL(SetCurrentSeconds(const QString &)),
+      this->dataPtr->currentSecondEdit, SLOT(setText(const QString &)));
+
+  // Labels
+  this->dataPtr->dayLabel = new QLabel("d");
+  this->dataPtr->hourLabel = new QLabel("h");
+  this->dataPtr->hourSeparator = new QLabel(":");
+
+  std::vector<QLabel *> currentTimeLabels;
+  currentTimeLabels.push_back(this->dataPtr->dayLabel);
+  currentTimeLabels.push_back(this->dataPtr->hourLabel);
+  currentTimeLabels.push_back(new QLabel("min"));
+  currentTimeLabels.push_back(new QLabel("s"));
+
+  // End time
   QLabel *endTime = new QLabel();
+  endTime->setMaximumHeight(10);
   connect(this, SIGNAL(SetEndTime(const QString &)), endTime,
       SLOT(setText(const QString &)));
 
-  QHBoxLayout *timeLayout = new QHBoxLayout();
-  timeLayout->addWidget(this->dataPtr->currentTimeEdit);
-  timeLayout->addWidget(endTime);
+  auto timeLayout = new QGridLayout();
+  timeLayout->setContentsMargins(0, 0, 0, 0);
+  timeLayout->addWidget(this->dataPtr->currentDayEdit, 0, 0);
+  timeLayout->addWidget(this->dataPtr->currentHourEdit, 0, 1);
+  timeLayout->addWidget(this->dataPtr->hourSeparator, 0, 2);
+  timeLayout->addWidget(this->dataPtr->currentMinuteEdit, 0, 3);
+  timeLayout->addWidget(new QLabel(":"), 0, 4);
+  timeLayout->addWidget(this->dataPtr->currentSecondEdit, 0, 5);
+  timeLayout->addWidget(currentTimeLabels[0], 1, 0);
+  timeLayout->addWidget(currentTimeLabels[1], 1, 1);
+  timeLayout->addWidget(currentTimeLabels[2], 1, 3);
+  timeLayout->addWidget(currentTimeLabels[3], 1, 5);
+  timeLayout->addWidget(endTime, 2, 0, 1, 6);
+
+  for (auto label : currentTimeLabels)
+  {
+    label->setStyleSheet("QLabel{font-size:11px; color:#444444}");
+    label->setMaximumHeight(10);
+    timeLayout->setAlignment(label, Qt::AlignRight);
+  }
+  timeLayout->setAlignment(endTime, Qt::AlignRight);
+
+  auto timeWidget = new QWidget();
+  timeWidget->setLayout(timeLayout);
+  timeWidget->setMaximumHeight(50);
+  timeWidget->setMaximumWidth(200);
 
   // Empty space on the right
   QWidget *rightSpacer = new QWidget();
@@ -151,7 +223,7 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
   mainLayout->addWidget(leftSpacer);
   mainLayout->addLayout(controlsLayout);
   mainLayout->addWidget(this->dataPtr->view);
-  mainLayout->addLayout(timeLayout);
+  mainLayout->addWidget(timeWidget);
   mainLayout->addWidget(rightSpacer);
 
   this->setLayout(mainLayout);
@@ -316,25 +388,19 @@ void LogPlayWidget::OnSeek(const common::Time &_time)
 /////////////////////////////////////////////////
 void LogPlayWidget::OnCurrentTime()
 {
-  auto timeStr = this->dataPtr->currentTimeEdit->text();
-  common::Time time;
+  auto day = this->dataPtr->currentDayEdit->text().toInt();
+  auto hour = this->dataPtr->currentHourEdit->text().toInt();
+  auto min = this->dataPtr->currentMinuteEdit->text().toInt();
+  auto sec = this->dataPtr->currentSecondEdit->text().toDouble();
 
-  if (this->dataPtr->lessThan1h &&
-      time.SetFromFormattedString(timeStr.toStdString(),
-      common::Time::FormatOption::MINUTES))
-  {
-    this->OnSeek(time);
-  }
-  else if (time.SetFromFormattedString(timeStr.toStdString()))
-  {
-    this->OnSeek(time);
-  }
-  // If input time is invalid, stay in current time
-  else
-  {
-    this->OnSeek(this->dataPtr->currentTime);
-  }
-  this->dataPtr->currentTimeEdit->clearFocus();
+  auto time = common::Time(24*60*60*day + 60*60*hour + 60*min + sec);
+
+  this->OnSeek(time);
+
+  this->dataPtr->currentDayEdit->clearFocus();
+  this->dataPtr->currentHourEdit->clearFocus();
+  this->dataPtr->currentMinuteEdit->clearFocus();
+  this->dataPtr->currentSecondEdit->clearFocus();
 }
 
 /////////////////////////////////////////////////
@@ -355,18 +421,39 @@ void LogPlayWidget::EmitSetCurrentTime(const common::Time &_time)
   this->dataPtr->pauseButton->setEnabled(time != this->dataPtr->endTime);
   this->dataPtr->playButton->setEnabled(time != this->dataPtr->endTime);
 
-  // Update current time line edit
-  if (!this->dataPtr->currentTimeEdit->hasFocus())
+  // Update current time line edit if the user is not editing it
+  if (!(this->dataPtr->currentDayEdit->hasFocus() ||
+        this->dataPtr->currentHourEdit->hasFocus() ||
+        this->dataPtr->currentMinuteEdit->hasFocus() ||
+        this->dataPtr->currentSecondEdit->hasFocus()))
   {
-    if (this->dataPtr->lessThan1h)
-    {
-      this->SetCurrentTime(QString::fromStdString(time.FormattedString(
-      common::Time::FormatOption::MINUTES)));
-    }
-    else
-    {
-      this->SetCurrentTime(QString::fromStdString(time.FormattedString()));
-    }
+    // milliseconds
+    double msec = time.nsec / common::Time::nsInMs;
+
+    // seconds
+    double s = time.sec;
+
+    int seconds = msec / 1000;
+    msec -= seconds * 1000;
+    s += seconds;
+
+    // days
+    unsigned int day = s / 86400;
+    s -= day * 86400;
+
+    // hours
+    unsigned int hour = s / 3600;
+    s -= hour * 3600;
+
+    // minutes
+    unsigned int min = s / 60;
+    s -= min * 60;
+
+    this->SetCurrentDays(QString::number(day));
+    this->SetCurrentHours(QString::number(hour));
+    this->SetCurrentMinutes(QString::number(min));
+
+    this->SetCurrentSeconds(QString::number(s + msec / 1000.0, 'f', 3));
   }
 
   // Update current time item in view
@@ -431,6 +518,13 @@ void LogPlayWidget::EmitSetEndTime(const common::Time &_time)
   // Keep current time within bounds
   if (this->dataPtr->endTime < this->dataPtr->currentTime)
     this->EmitSetCurrentTime(this->dataPtr->endTime);
+
+  // Hide unecessary widgets
+  this->dataPtr->currentDayEdit->setVisible(!this->dataPtr->lessThan1h);
+  this->dataPtr->currentHourEdit->setVisible(!this->dataPtr->lessThan1h);
+  this->dataPtr->dayLabel->setVisible(!this->dataPtr->lessThan1h);
+  this->dataPtr->hourLabel->setVisible(!this->dataPtr->lessThan1h);
+  this->dataPtr->hourSeparator->setVisible(!this->dataPtr->lessThan1h);
 }
 
 /////////////////////////////////////////////////
