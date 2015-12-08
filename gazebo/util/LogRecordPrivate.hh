@@ -127,13 +127,13 @@ namespace gazebo
       public: bool running;
 
       /// \brief Thread used to write data to disk.
-      public: std::thread *writeThread;
+      public: std::unique_ptr<std::thread> writeThread;
 
       /// \brief Thread used to update data.
-      public: std::thread *updateThread;
+      public: std::unique_ptr<std::thread> updateThread;
 
       /// \brief Thread to cleanup log recording.
-      public: std::thread cleanupThread;
+      public: std::unique_ptr<std::thread> cleanupThread;
 
       /// \brief Mutex to protect against parallel calls to Write()
       public: mutable std::mutex writeMutex;

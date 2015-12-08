@@ -200,8 +200,9 @@ bool LogRecord::Start(const std::string &_encoding, const std::string &_path)
   this->dataPtr->startTime = this->dataPtr->currTime = common::Time();
 
   // Create a thread to cleanup recording.
-  this->dataPtr->cleanupThread = std::thread(
-      std::bind(&LogRecord::Cleanup, this));
+  this->dataPtr->cleanupThread.reset(new std::thread(
+        std::bind(&LogRecord::Cleanup, this)));
+
   // Wait for thread to start
   this->dataPtr->startThreadCondition.wait(lock);
 
@@ -209,8 +210,8 @@ bool LogRecord::Start(const std::string &_encoding, const std::string &_path)
   if (!this->dataPtr->updateThread)
   {
     std::unique_lock<std::mutex> updateLock(this->dataPtr->updateMutex);
-    this->dataPtr->updateThread = new std::thread(
-        std::bind(&LogRecord::RunUpdate, this));
+    this->dataPtr->updateThread.reset(new std::thread(
+        std::bind(&LogRecord::RunUpdate, this)));
     this->dataPtr->startThreadCondition.wait(updateLock);
   }
 
@@ -218,8 +219,8 @@ bool LogRecord::Start(const std::string &_encoding, const std::string &_path)
   if (!this->dataPtr->writeThread)
   {
     std::unique_lock<std::mutex> writeLock(this->dataPtr->runWriteMutex);
-    this->dataPtr->writeThread = new std::thread(
-        std::bind(&LogRecord::RunWrite, this));
+    this->dataPtr->writeThread.reset(new std::thread(
+        std::bind(&LogRecord::RunWrite, this)));
     this->dataPtr->startThreadCondition.wait(writeLock);
   }
 
@@ -246,7 +247,9 @@ void LogRecord::Fini()
     this->dataPtr->cleanupCondition.notify_all();
   }
 
-  this->dataPtr->cleanupThread.join();
+  if (this->dataPtr->cleanupThread && this->dataPtr->cleanupThread->joinable())
+    this->dataPtr->cleanupThread->join();
+  this->dataPtr->cleanupThread.reset();
 
   std::lock_guard<std::mutex> lock(this->dataPtr->controlMutex);
   this->dataPtr->connections.clear();
@@ -262,10 +265,12 @@ void LogRecord::Fini()
 //////////////////////////////////////////////////
 void LogRecord::Stop()
 {
-  std::lock_guard<std::mutex> lock(this->dataPtr->controlMutex);
-
   this->dataPtr->running = false;
   this->dataPtr->cleanupCondition.notify_all();
+
+  if (this->dataPtr->cleanupThread && this->dataPtr->cleanupThread->joinable())
+    this->dataPtr->cleanupThread->join();
+  this->dataPtr->cleanupThread.reset();
 }
 
 //////////////////////////////////////////////////
@@ -903,11 +908,8 @@ void LogRecord::Cleanup()
   if (this->dataPtr->writeThread)
     this->dataPtr->writeThread->join();
 
-  delete this->dataPtr->updateThread;
-  this->dataPtr->updateThread = NULL;
-
-  delete this->dataPtr->writeThread;
-  this->dataPtr->writeThread = NULL;
+  this->dataPtr->updateThread.reset();
+  this->dataPtr->writeThread.reset();
 
   // Update and write one last time to make sure we log all data.
   this->Update();
