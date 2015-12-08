@@ -254,7 +254,8 @@ void Publisher::Fini()
   if (!this->messages.empty())
     this->SendMessage();
 
-  TopicManager::Instance()->Unadvertise(this->topic, this->id);
+  if (!this->topic.empty())
+    TopicManager::Instance()->Unadvertise(this->topic, this->id);
 
   common::Time slept;
 

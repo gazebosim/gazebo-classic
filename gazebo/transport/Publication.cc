@@ -418,7 +418,7 @@ void Publication::RemovePublisher(PublisherPtr _pub)
 }
 
 //////////////////////////////////////////////////
-void Publication::RemovePublisher(const uint32_t _id)
+bool Publication::RemovePublisher(const uint32_t _id)
 {
   boost::mutex::scoped_lock lock(this->callbackMutex);
 
@@ -429,9 +429,10 @@ void Publication::RemovePublisher(const uint32_t _id)
     if ((*pubIter)->Id() == _id)
     {
       this->publishers.erase(pubIter);
-      return;
+      return true;
     }
   }
+  return false;
 }
 
 //////////////////////////////////////////////////
