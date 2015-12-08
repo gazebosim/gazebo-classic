@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: A body that has a box shape
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
-
-#ifndef _HINGEJOINT_HH_
-#define _HINGEJOINT_HH_
+#ifndef _GAZEBO_PHYSICS_HINGEJOINT_HH_
+#define _GAZEBO_PHYSICS_HINGEJOINT_HH_
 
 #include "gazebo/math/Angle.hh"
 #include "gazebo/math/Vector3.hh"

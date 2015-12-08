@@ -99,7 +99,7 @@ void ODEHinge2Joint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
   if (this->parentLink)
   {
     globalAxis =
-      this->Parent()->GetModel()->WorldPose().Rot().RotateVector(_axis);
+      this->Parent()->Model()->WorldPose().Rot().RotateVector(_axis.Ign());
   }
 
   if (this->jointId)

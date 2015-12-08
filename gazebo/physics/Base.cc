@@ -36,7 +36,24 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 Base::Base(BasePtr _parent)
-: parent(_parent)
+: parent(_parent),
+  dataPtr(new BasePrivate),
+  baseDPtr(new BaseProtected)
+{
+  this->ConstructionHelper();
+}
+
+//////////////////////////////////////////////////
+Base::Base(BaseProtected &_dataPtr, BasePtr _parent)
+: parent(_parent),
+  dataPtr(new BasePrivate),
+  baseDPtr(&_dataPtr)
+{
+  this->ConstructionHelper();
+}
+
+//////////////////////////////////////////////////
+void Base::ConstructionHelper()
 {
   this->dataPtr->type = BASE;
   this->dataPtr->id = physics::getUniqueId();

@@ -32,8 +32,8 @@ RegionEventBoxPlugin::RegionEventBoxPlugin()
 void RegionEventBoxPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 {
   this->model = _parent;
-  this->modelName = _parent->GetName();
-  this->world = _parent->GetWorld();
+  this->modelName = _parent->Name();
+  this->world = _parent->World();
 
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
@@ -41,7 +41,7 @@ void RegionEventBoxPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
   this->modelSub = this->node->Subscribe("~/model/info",
       &RegionEventBoxPlugin::OnModelMsg, this);
 
-  sdf::ElementPtr linkEl = this->model->GetSDF()->GetElement("link");
+  sdf::ElementPtr linkEl = this->model->SDF()->GetElement("link");
 
 
   if (!linkEl->HasElement("visual"))
@@ -65,7 +65,7 @@ void RegionEventBoxPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 
   this->boxSize = boxEl->Get<ignition::math::Vector3d>("size");
   this->boxScale = ignition::math::Vector3d::One;
-  this->boxPose = this->model->GetWorldPose().Ign();
+  this->boxPose = this->model->WorldPose();
   this->UpdateRegion(this->boxSize * this->boxScale, this->boxPose);
 
   if (_sdf->HasElement("event"))
@@ -105,9 +105,9 @@ void RegionEventBoxPlugin::OnUpdate(const common::UpdateInfo &_info)
   // due to user interaction via the gui, if so update region dimensions
   {
     std::lock_guard<std::mutex> lock(this->receiveMutex);
-    if (this->boxPose != this->model->GetWorldPose().Ign())
+    if (this->boxPose != this->model->WorldPose())
     {
-      this->boxPose = this->model->GetWorldPose().Ign();
+      this->boxPose = this->model->WorldPose();
       this->hasStaleSizeAndPose = true;
     }
 
@@ -122,20 +122,20 @@ void RegionEventBoxPlugin::OnUpdate(const common::UpdateInfo &_info)
   // previously in the region has exited the region.
   for (unsigned int i = 0; i < this->world->GetModelCount(); ++i)
   {
-    physics::ModelPtr m = this->world->GetModel(i);
-    std::string name = m->GetName();
+    physics::ModelPtr m = this->world->Model(i);
+    std::string name = m->Name();
 
     if (name == "ground_plane" || name == this->modelName)
       continue;
 
-    auto it = this->insiders.find(m->GetName());
+    auto it = this->insiders.find(m->Name());
 
-    if (this->PointInRegion(m->GetWorldPose().pos.Ign(), this->box,
+    if (this->PointInRegion(m->WorldPose().Pos(), this->box,
         this->boxPose))
     {
       if (it == this->insiders.end())
       {
-        this->insiders[m->GetName()] = _info.simTime;
+        this->insiders[m->Name()] = _info.simTime;
         if (this->eventPub)
           this->SendEnteringRegionEvent(m);
       }
@@ -147,7 +147,7 @@ void RegionEventBoxPlugin::OnUpdate(const common::UpdateInfo &_info)
         if (this->eventPub)
           this->SendExitingRegionEvent(m);
 
-        this->insiders.erase(m->GetName());
+        this->insiders.erase(m->Name());
       }
     }
   }
@@ -187,7 +187,7 @@ void RegionEventBoxPlugin::SendEnteringRegionEvent(physics::ModelPtr _model)
   std::string json = "{";
   json += "\"state\":\"inside\",";
   json += "\"region\":\"" + this->modelName + "\", ";
-  json += "\"model\":\"" + _model->GetName() + "\"";
+  json += "\"model\":\"" + _model->Name() + "\"";
   json += "}";
 
   this->eventSource->Emit(json);
@@ -200,7 +200,7 @@ void RegionEventBoxPlugin::SendExitingRegionEvent(physics::ModelPtr _model)
   std::string json = "{";
   json += "\"state\":\"outside\",";
   json += "\"region\":\"" + this->modelName + "\", ";
-  json += "\"model\":\"" + _model->GetName() + "\"";
+  json += "\"model\":\"" + _model->Name() + "\"";
   json += "}";
 
   this->eventSource->Emit(json);

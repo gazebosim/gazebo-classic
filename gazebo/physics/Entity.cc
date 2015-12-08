@@ -49,7 +49,24 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 Entity::Entity(BasePtr _parent)
-  : Base(_parent)
+: Base(*new EntityProtected, _parent),
+  dataPtr(new EntityPrivate),
+  entDPtr(std::static_pointer_cast<EntityProtected>(this->baseDPtr)
+{
+  this->ConstructionHelper();
+}
+
+//////////////////////////////////////////////////
+Entity::Entity(EntityProtected &_dataPtr, BasePtr _parent)
+: Base(_dataPtr, _parent),
+  dataPtr(new EntityPrivate),
+  entDPtr(std::static_pointer_cast<EntityProtected>(this->baseDPtr)
+{
+  this->ConstructionHelper();
+}
+
+//////////////////////////////////////////////////
+void Entity::ConstructionHelper()
 {
   this->dataPtr->isCanonicalLink = false;
   this->dataPtr->node = transport::NodePtr(new transport::Node());

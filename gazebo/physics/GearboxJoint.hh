@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GEARBOXJOINT_HH_
-#define _GEARBOXJOINT_HH_
+#ifndef _GAZEBO_PHYSICS_GEARBOXJOINT_HH_
+#define _GAZEBO_PHYSICS_GEARBOXJOINT_HH_
 
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
@@ -30,6 +29,7 @@
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/util/system.hh"
+#include "gazebo/physics/Joint.hh"
 
 namespace gazebo
 {
