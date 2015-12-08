@@ -3,6 +3,9 @@
 1. Use more opaque pointers.
     * [Pull request #2026](https://bitbucket.org/osrf/gazebo/pull-request/2026)
 
+1. Updating physics library to use ignition math.
+    * [Pull request #2007](https://bitbucket.org/osrf/gazebo/pull-request/2007)
+
 1. Switching to ignition math for the rendering library.
     * [Pull request #1993](https://bitbucket.org/osrf/gazebo/pull-request/1993)
     * [Pull request #1994](https://bitbucket.org/osrf/gazebo/pull-request/1994)
