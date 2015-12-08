@@ -90,7 +90,7 @@ namespace gazebo
       /// \brief Get whether this body is enabled in the physics engine.
       /// \return True if the link is enabled.
       /// \deprecated See Enabled() const
-      public: virtual bool GetEnabled() const = 0 GAZEBO_DEPRECATED(7.0);
+      public: virtual bool GetEnabled() const GAZEBO_DEPRECATED(7.0) = 0;
 
       /// \brief Get whether this body is enabled in the physics engine.
       /// \return True if the link is enabled.
@@ -108,7 +108,7 @@ namespace gazebo
       /// \brief Get the gravity mode.
       /// \return True if gravity is enabled.
       /// \deprecated See GravityMode() const
-      public: virtual bool GetGravityMode() const = 0 GAZEBO_DEPRECATED(7.0);
+      public: virtual bool GetGravityMode() const GAZEBO_DEPRECATED(7.0) = 0;
 
       /// \brief Get the gravity mode.
       /// \return True if gravity is enabled.
@@ -156,8 +156,8 @@ namespace gazebo
       /// \brief Set the linear velocity of the body.
       /// \param[in] _vel Linear velocity.
       /// \deprecated See version that accepts ignition::math parameters
-      public: virtual void SetLinearVel(const math::Vector3 &_vel) = 0
-              GAZEBO_DEPRECATED(7.0);
+      public: virtual void SetLinearVel(const math::Vector3 &_vel)
+              GAZEBO_DEPRECATED(7.0) = 0;
 
       /// \brief Set the linear velocity of the body.
       /// \param[in] _vel Linear velocity.
@@ -167,8 +167,8 @@ namespace gazebo
       /// \brief Set the angular velocity of the body.
       /// \param[in] _vel Angular velocity.
       /// \deprecated See version that accepts ignition::math parameters
-      public: virtual void SetAngularVel(const math::Vector3 &_vel) = 0
-              GAZEBO_DEPRECATED(7.0);
+      public: virtual void SetAngularVel(const math::Vector3 &_vel)
+              GAZEBO_DEPRECATED(7.0) = 0;
 
       /// \brief Set the angular velocity of the body.
       /// \param[in] _vel Angular velocity.
@@ -198,8 +198,8 @@ namespace gazebo
       /// \brief Set the force applied to the body.
       /// \param[in] _force Force value.
       /// \deprecated See version that accepts ignition::math parameters
-      public: virtual void SetForce(const math::Vector3 &_force) = 0
-              GAZEBO_DEPRECATED(7.0);
+      public: virtual void SetForce(const math::Vector3 &_force)
+              GAZEBO_DEPRECATED(7.0) = 0;
 
       /// \brief Set the force applied to the body.
       /// \param[in] _force Force value.
@@ -208,8 +208,8 @@ namespace gazebo
       /// \brief Set the torque applied to the body.
       /// \param[in] _torque Torque value.
       /// \deprecated See version that accepts ignition::math parameters
-      public: virtual void SetTorque(const math::Vector3 &_torque) = 0
-              GAZEBO_DEPRECATED(7.0);
+      public: virtual void SetTorque(const math::Vector3 &_torque)
+              GAZEBO_DEPRECATED(7.0) = 0;
 
       /// \brief Set the torque applied to the body.
       /// \param[in] _torque Torque value.
@@ -219,8 +219,8 @@ namespace gazebo
       /// \brief Add a force to the body.
       /// \param[in] _force Force to add.
       /// \deprecated See version that accepts ignition::math parameters
-      public: virtual void AddForce(const math::Vector3 &_force) = 0
-              GAZEBO_DEPRECATED(7.0);
+      public: virtual void AddForce(const math::Vector3 &_force)
+              GAZEBO_DEPRECATED(7.0) = 0;
 
       /// \brief Add a force to the body.
       /// \param[in] _force Force to add.
@@ -230,8 +230,8 @@ namespace gazebo
       /// body's own frame of reference.
       /// \param[in] _force Force to add.
       /// \deprecated See version that accepts ignition::math parameters
-      public: virtual void AddRelativeForce(const math::Vector3 &_force) = 0
-              GAZEBO_DEPRECATED(7.0);
+      public: virtual void AddRelativeForce(const math::Vector3 &_force)
+              GAZEBO_DEPRECATED(7.0) = 0;
 
       /// \brief Add a force to the body, components are relative to the
       /// body's own frame of reference.
@@ -244,7 +244,7 @@ namespace gazebo
       /// \param[in] _pos Position in global coord frame to add the force.
       /// \deprecated See version that accepts ignition::math parameters
       public: virtual void AddForceAtWorldPosition(const math::Vector3 &_force,
-                  const math::Vector3 &_pos) = 0 GAZEBO_DEPRECATED(7.0);
+                  const math::Vector3 &_pos) GAZEBO_DEPRECATED(7.0) = 0;
 
       /// \brief Add a force to the body using a global position.
       /// \param[in] _force Force to add.
@@ -260,7 +260,7 @@ namespace gazebo
       /// \deprecated See version that accepts ignition::math parameters
       public: virtual void AddForceAtRelativePosition(
                   const math::Vector3 &_force,
-                  const math::Vector3 &_relPos) = 0 GAZEBO_DEPRECATED(7.0);
+                  const math::Vector3 &_relPos) GAZEBO_DEPRECATED(7.0) = 0;
 
       /// \brief Add a force to the body at position expressed to the body's
       /// own frame of reference.
@@ -278,8 +278,8 @@ namespace gazebo
       /// defaults to the link origin.
       /// \deprecated See version that accepts ignition::math parameters
       public: virtual void AddLinkForce(const math::Vector3 &_force,
-          const math::Vector3 &_offset = math::Vector3::Zero) = 0
-              GAZEBO_DEPRECATED(7.0);
+          const math::Vector3 &_offset = math::Vector3::Zero)
+              GAZEBO_DEPRECATED(7.0) = 0;
 
       /// \brief Add a force expressed in the link frame.
       /// \param[in] _force Direction vector expressed in the link frame. Each
@@ -295,8 +295,8 @@ namespace gazebo
       /// \brief Add a torque to the body.
       /// \param[in] _torque Torque value to add to the link.
       /// \deprecated See version that accepts ignition::math parameters
-      public: virtual void AddTorque(const math::Vector3 &_torque) = 0
-              GAZEBO_DEPRECATED(7.0);
+      public: virtual void AddTorque(const math::Vector3 &_torque)
+              GAZEBO_DEPRECATED(7.0) = 0;
 
       /// \brief Add a torque to the body.
       /// \param[in] _torque Torque value to add to the link.
@@ -307,8 +307,8 @@ namespace gazebo
       /// body's own frame of reference.
       /// \param[in] _torque Torque value to add.
       /// \deprecated See version that accepts ignition::math parameters
-      public: virtual void AddRelativeTorque(const math::Vector3 &_torque) = 0
-              GAZEBO_DEPRECATED(7.0);
+      public: virtual void AddRelativeTorque(const math::Vector3 &_torque)
+              GAZEBO_DEPRECATED(7.0) = 0;
 
       /// \brief Add a torque to the body, components are relative to the
       /// body's own frame of reference.
@@ -350,8 +350,8 @@ namespace gazebo
       /// \return Linear velocity of the point on the body
       /// \deprecated See WorldLinearVel()
       public: virtual math::Vector3 GetWorldLinearVel(
-                  const math::Vector3 &_offset) const = 0
-              GAZEBO_DEPRECATED(7.0);
+                  const math::Vector3 &_offset) const
+              GAZEBO_DEPRECATED(7.0) = 0;
 
       /// \brief Get the linear velocity of a point on the body in the world
       ///        frame, using an offset expressed in a body-fixed frame. If
@@ -362,7 +362,7 @@ namespace gazebo
       /// \return Linear velocity of the point on the body
       /// \deprecated See WorldLinearVel()
       public: virtual ignition::math::Vector3d WorldLinearVel(
-                  const ignition:;math::Vector3d &_offset) const = 0;
+                  const ignition::math::Vector3d &_offset) const = 0;
 
       /// \brief Get the linear velocity of a point on the body in the world
       ///        frame, using an offset expressed in an arbitrary frame.
@@ -374,7 +374,7 @@ namespace gazebo
       /// \deprecated See WorldLinearVel()
       public: virtual math::Vector3 GetWorldLinearVel(
                   const math::Vector3 &_offset,
-                  const math::Quaternion &_q) const = 0 GAZEBO_DEPRECATED(7.0);
+                  const math::Quaternion &_q) const GAZEBO_DEPRECATED(7.0) = 0;
 
       /// \brief Get the linear velocity of a point on the body in the world
       ///        frame, using an offset expressed in an arbitrary frame.
@@ -392,8 +392,8 @@ namespace gazebo
       /// \return Linear velocity at the body's center of gravity in the world
       ///         frame.
       /// \deprecated See WorldCoGLinearVel()
-      public: virtual math::Vector3 GetWorldCoGLinearVel() const = 0
-              GAZEBO_DEPRECATED(7.0);
+      public: virtual math::Vector3 GetWorldCoGLinearVel() const
+              GAZEBO_DEPRECATED(7.0) = 0;
 
       /// \brief Get the linear velocity at the body's center of gravity in the
       ///        world frame.
@@ -447,7 +447,7 @@ namespace gazebo
 
       /// \brief Get the angular acceleration of the body.
       /// \return Angular acceleration of the body.
-      public: ignition::math::Vector3d RelativeAngularAccel() const
+      public: ignition::math::Vector3d RelativeAngularAccel() const;
 
       /// \brief Get the angular momentum of the body CoG in the world frame,
       /// which is computed as (I * w), where
@@ -496,12 +496,12 @@ namespace gazebo
       /// \brief Get the force applied to the body in the world frame.
       /// \return Force applied to the body in the world frame.
       /// \deprecated See WorldForce()
-      public: virtual math::Vector3 GetWorldForce() const = 0
-              GAZEBO_DEPRECATED(7.0);
+      public: virtual math::Vector3 GetWorldForce() const
+              GAZEBO_DEPRECATED(7.0) = 0;
 
       /// \brief Get the force applied to the body in the world frame.
       /// \return Force applied to the body in the world frame.
-      public: virtual ignition::math::Vector3d WorldForce() const = 0
+      public: virtual ignition::math::Vector3d WorldForce() const = 0;
 
       /// \brief Get the torque applied to the body.
       /// \return Torque applied to the body.
@@ -515,8 +515,8 @@ namespace gazebo
       /// \brief Get the torque applied to the body in the world frame.
       /// \return Torque applied to the body in the world frame.
       /// \deprecated See WorldTorque()
-      public: virtual math::Vector3 GetWorldTorque() const = 0
-              GAZEBO_DEPRECATED(7.0);
+      public: virtual math::Vector3 GetWorldTorque() const
+              GAZEBO_DEPRECATED(7.0) = 0;
 
       /// \brief Get the torque applied to the body in the world frame.
       /// \return Torque applied to the body in the world frame.
@@ -578,7 +578,7 @@ namespace gazebo
       /// \return Pointer to the collision, NULL if the id is invalid.
       /// \deprecated SeeCollisionById(unsigned int) const
       public: CollisionPtr GetCollisionById(unsigned int _id) const
-              GAZEBO_DEPRCATED(7.0);
+              GAZEBO_DEPRECATED(7.0);
       /// \endcond
 
       /// \cond
@@ -626,7 +626,7 @@ namespace gazebo
       /// \brief Get the bounding box for the link and all the child
       /// elements.
       /// \return The link's bounding box.
-      public: virtual math::Box BoundingBox() const;
+      public: virtual ignition::math::Box BoundingBox() const;
 
       /// \brief Set the linear damping factor.
       /// \param[in] _damping Linear damping factor.
@@ -713,14 +713,12 @@ namespace gazebo
       /// \brief Connect to the add entity signal
       /// \param[in] _subscriber Subsciber callback function.
       /// \return Pointer to the connection, which must be kept in scope.
-      public: template<typename T>
-              event::ConnectionPtr ConnectEnabled(T _subscriber)
-              {return enabledSignal.Connect(_subscriber);}
+      public: event::ConnectionPtr ConnectEnabled(
+                  std::function<void(bool)> _subscriber);
 
       /// \brief Disconnect to the add entity signal.
       /// \param[in] _conn Connection pointer to disconnect.
-      public: void DisconnectEnabled(event::ConnectionPtr &_conn)
-              {enabledSignal.Disconnect(_conn);}
+      public: void DisconnectEnabled(event::ConnectionPtr &_conn);
 
       /// \brief Fill a link message
       /// \param[out] _msg Message to fill
@@ -832,7 +830,7 @@ namespace gazebo
       /// based on position in world frame and gravity.
       /// \return this link's potential energy,
       /// \deprecated See WorldEnergyPotential() const
-      public: double GetWorldEnergyPotential() const GAZEB_DEPRECATED(7.0);
+      public: double GetWorldEnergyPotential() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Returns this link's potential energy,
       /// based on position in world frame and gravity.

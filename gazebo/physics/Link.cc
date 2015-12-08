@@ -1862,3 +1862,15 @@ bool Link::Kinematic() const
 {
   return false;
 }
+
+//////////////////////////////////////////////////
+event::ConnectionPtr Link::ConnectEnabled(std::function<void(bool)> _subscriber)
+{
+  return this->pdPtr->enabledSignal.Connect(_subscriber);
+}
+
+//////////////////////////////////////////////////
+void Link::DisconnectEnabled(event::ConnectionPtr &_conn)
+{
+  enabledSignal.Disconnect(_conn);
+}

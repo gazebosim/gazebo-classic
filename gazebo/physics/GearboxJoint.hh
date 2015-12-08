@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GEARBOXJOINT_HH_
-#define _GEARBOXJOINT_HH_
+#ifndef _GAZEBO_PHYSICS_GEARBOXJOINT_HH_
+#define _GAZEBO_PHYSICS_GEARBOXJOINT_HH_
 
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
@@ -35,6 +34,9 @@ namespace gazebo
 {
   namespace physics
   {
+    // Forward declare protected data class.
+    class GearboxJointProtected;
+
     /// \addtogroup gazebo_physics
     /// \{
 
@@ -46,78 +48,93 @@ namespace gazebo
       /// \brief Constructor
       /// \param[in] _parent Parent link
       public: GearboxJoint(BasePtr _parent) : T(_parent), gearRatio(1.0)
-              { this->AddType(Base::GEARBOX_JOINT); }
+      {
+        this->AddType(Base::GEARBOX_JOINT);
+      }
+
       /// \brief Destructor
       public: virtual ~GearboxJoint()
-              { }
+      {
+      }
 
       // Documentation inherited.
-      public: virtual unsigned int GetAngleCount() const
-              {return 2;}
+      public: virtual unsigned int AngleCount() const
+      {
+        return 2;
+      }
 
       /// \brief Load joint
       /// \param[in] _sdf Pointer to SDF element
       public: virtual void Load(sdf::ElementPtr _sdf)
-              {
-                T::Load(_sdf);
-                if (_sdf->HasElement("gearbox_ratio"))
-                {
-                  this->gearRatio =
-                    _sdf->Get<double>("gearbox_ratio");
-                }
-                else
-                {
-                  gzerr << "gearbox_ratio_not_specified, set to 1.\n";
-                  this->gearRatio = 1.0;
-                  /* below should bring in default values for sdf 1.4+
-                  this->gearRatio =
-                    _sdf->Get<double>("gearbox_ratio");
-                  */
-                }
+      {
+        T::Load(_sdf);
 
-                if (_sdf->HasElement("gearbox_reference_body"))
-                {
-                  this->referenceBody =
-                    _sdf->Get<std::string>("gearbox_reference_body");
-                }
-                else
-                {
-                  gzerr << "Gearbox joint missing reference body.\n";
-                }
-              }
+        if (_sdf->HasElement("gearbox_ratio"))
+        {
+          this->gearDPtr->gearRatio =
+            _sdf->Get<double>("gearbox_ratio");
+        }
+        else
+        {
+          gzerr << "gearbox_ratio_not_specified, set to 1.\n";
+          this->gearDPtr->gearRatio = 1.0;
+          /* below should bring in default values for sdf 1.4+
+          this->gearRatio =
+            _sdf->Get<double>("gearbox_ratio");
+          */
+        }
+
+        if (_sdf->HasElement("gearbox_reference_body"))
+        {
+          this->gearDPtr->referenceBody =
+            _sdf->Get<std::string>("gearbox_reference_body");
+        }
+        else
+        {
+          gzerr << "Gearbox joint missing reference body.\n";
+        }
+      }
 
       /// \brief Initialize joint
       protected: virtual void Init()
-                 {
-                   T::Init();
-                 }
+      {
+        T::Init();
+      }
 
       /// \brief Get gearbox joint gear ratio.
       /// \return Gear ratio value.
-      public: virtual double GetGearboxRatio() const
-              { return this->gearRatio; }
+      /// \deprecated See GearboxRation() const
+      public: virtual double GetGearboxRatio() const GAZEBO_DEPRECATED(7.0)
+      {
+        return this->GearboxRatio();
+      }
+
+      /// \brief Get gearbox joint gear ratio.
+      /// \return Gear ratio value.
+      public: virtual double GearboxRatio() const
+      {
+        return this->gearDPtr->gearRatio;
+      }
 
       /// \brief Set gearbox joint gear ratio.
       ///
       /// This must be implemented in a child class
       /// \param[in] _index Index of the axis.
       /// \param[in] _gearRatio Gear ratio value.
-      public: virtual void SetGearboxRatio(double _gearRatio) = 0;
+      public: virtual void SetGearboxRatio(const double _gearRatio) = 0;
 
       // Documentation inherited
       public: virtual void FillMsg(msgs::Joint &_msg)
-              {
-                Joint::FillMsg(_msg);
-                msgs::Joint::Gearbox *gearboxMsg = _msg.mutable_gearbox();
-                gearboxMsg->set_gearbox_reference_body(this->referenceBody);
-                gearboxMsg->set_gearbox_ratio(this->gearRatio);
-              }
+      {
+        Joint::FillMsg(_msg);
+        msgs::Joint::Gearbox *gearboxMsg = _msg.mutable_gearbox();
+        gearboxMsg->set_gearbox_reference_body(this->gearDPtr->referenceBody);
+        gearboxMsg->set_gearbox_ratio(this->gearDPtr->gearRatio);
+      }
 
-      /// \brief Gearbox gearRatio
-      protected: double gearRatio;
-
-      /// \brief reference link/body for computing joint angles
-      protected: std::string referenceBody;
+      /// \internal
+      /// \brief Protected data pointer
+      protected: std::unique_ptr<GearboxJointProtected> gearDPtr;
     };
     /// \}
   }

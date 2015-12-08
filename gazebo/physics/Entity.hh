@@ -44,6 +44,9 @@ namespace gazebo
 {
   namespace physics
   {
+    // Forward declare protected data class.
+    class EntityProtected;
+
     // Forward declare private data class.
     class EntityPrivate;
 
@@ -425,6 +428,10 @@ namespace gazebo
       /// \brief Update an animation.
       /// \param[in] _info Update information.
       private: void UpdateAnimation(const common::UpdateInfo &_info);
+
+      /// \internal
+      /// \brief Private data pointer
+      private: std::shared_ptr<EntityProtected> dataPtr;
 
       /// \internal
       /// \brief Private data pointer

@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_FIXEDJOINT_HH_
-#define _GAZEBO_FIXEDJOINT_HH_
+#ifndef _GAZEBO_PHYSICS_FIXEDJOINT_HH_
+#define _GAZEBO_PHYSICS_FIXEDJOINT_HH_
 
 #include "gazebo/util/system.hh"
 
@@ -35,27 +35,33 @@ namespace gazebo
       /// \brief Constructor
       /// \param[in] _parent Parent link
       public: FixedJoint(BasePtr _parent) : T(_parent)
-              { this->AddType(Base::FIXED_JOINT); }
+      {
+        this->AddType(Base::FIXED_JOINT);
+      }
+
       /// \brief Destructor
       public: virtual ~FixedJoint()
-              { }
+      {
+      }
 
       // Documentation inherited.
-      public: virtual unsigned int GetAngleCount() const
-              {return 0;}
+      public: virtual unsigned int AngleCount() const
+      {
+        return 0;
+      }
 
       /// \brief Load joint
       /// \param[in] _sdf Pointer to SDF element
       public: virtual void Load(sdf::ElementPtr _sdf)
-              {
-                T::Load(_sdf);
-              }
+      {
+        T::Load(_sdf);
+      }
 
       /// \brief Initialize joint
       protected: virtual void Init()
-                 {
-                   T::Init();
-                 }
+      {
+        T::Init();
+      }
     };
     /// \}
   }

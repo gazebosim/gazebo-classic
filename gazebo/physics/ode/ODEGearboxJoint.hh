@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _ODEGEARBOXJOINT_HH_
-#define _ODEGEARBOXJOINT_HH_
+#ifndef _GAZEBO_PHYSICS_ODEGEARBOXJOINT_HH_
+#define _GAZEBO_PHYSICS_ODEGEARBOXJOINT_HH_
 
 #include "gazebo/math/Angle.hh"
 #include "gazebo/math/Vector3.hh"

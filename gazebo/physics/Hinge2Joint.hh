@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: A hinge joint with 2 degrees of freedom
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
-
-#ifndef _HINGE2JOINT_HH_
-#define _HINGE2JOINT_HH_
+#ifndef _GAZEBO_PHYSICS_HINGE2JOINT_HH_
+#define _GAZEBO_PHYSICS_HINGE2JOINT_HH_
 
 #include <sdf/sdf.hh>
 
@@ -38,34 +33,39 @@ namespace gazebo
 
     /// \class Hinge2Joint Hinge2Joint.hh physics/physics.hh
     /// \brief A two axis hinge joint
-    template< class T>
+    template<class T>
     class GZ_PHYSICS_VISIBLE Hinge2Joint : public T
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent link.
       public: explicit Hinge2Joint(BasePtr _parent) : T(_parent)
-              {this->AddType(Base::HINGE2_JOINT);}
+      {
+        this->AddType(Base::HINGE2_JOINT);
+      }
 
       /// \brief Destructor.
       public: virtual ~Hinge2Joint()
-              { }
+      {
+      }
 
       // Documentation inherited.
-      public: virtual unsigned int GetAngleCount() const
-              {return 2;}
+      public: virtual unsigned int AngleCount() const
+      {
+        return 2;
+      }
 
       /// \brief Load the joint.
       /// \param[in] _sdf SDF values to load from.
       public: virtual void Load(sdf::ElementPtr _sdf)
-              {
-                T::Load(_sdf);
+      {
+        T::Load(_sdf);
 
-                this->SetAxis(0,
-                    _sdf->GetElement("axis")->Get<math::Vector3>("xyz"));
+        this->SetAxis(0,
+            _sdf->GetElement("axis")->Get<math::Vector3>("xyz"));
 
-                this->SetAxis(1,
-                    _sdf->GetElement("axis2")->Get<math::Vector3>("xyz"));
-              }
+        this->SetAxis(1,
+            _sdf->GetElement("axis2")->Get<math::Vector3>("xyz"));
+      }
     };
     /// \}
   }

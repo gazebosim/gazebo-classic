@@ -17,6 +17,7 @@
 #ifndef _GAZEBO_PHYSICS_COLLISION_HH_
 #define _GAZEBO_PHYSICS_COLLISION_HH_
 
+#include "gazebo/physics/CollisionState.hh"
 #include "gazebo/physics/Entity.hh"
 #include "gazebo/util/system.hh"
 
@@ -275,13 +276,22 @@ namespace gazebo
       // Documentation inherited.
       public: virtual const ignition::math::Pose3d &WorldPose() const;
 
+      /// \brief Constructor used by inherited classes
+      /// \param[in] _dataPtr Pointer to protected data
+      /// \param[in] _link Link that contains this collision object.
+      protected: Collision(CollisionProtected &_dataPtr, LinkPtr _link);
+
       /// \brief Helper function used to create a collision visual message.
       /// \return Visual message for a collision.
       private: msgs::Visual CreateCollisionVisual();
 
       /// \internal
+      /// \brief Protected data pointer
+      private: std::shared_ptr<CollisionPrivate> dataPtr;
+
+      /// \internal
       /// \brief Private data pointer
-      private: std::unique_ptr<CollisionPrivate> *dPtr;
+      private: std::unique_ptr<CollisionPrivate> pdPtr;
     };
     /// \}
   }

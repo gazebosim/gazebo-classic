@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: A ball joint
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
-
-#ifndef _BALLJOINT_HH_
-#define _BALLJOINT_HH_
+#ifndef _GAZEBO_PHYSICS_BALLJOINT_HH_
+#define _GAZEBO_PHYSICS_BALLJOINT_HH_
 
 #include "gazebo/physics/Joint.hh"
 #include "gazebo/util/system.hh"
@@ -42,34 +37,33 @@ namespace gazebo
       /// \brief Constructor
       /// \param[in] _parent Pointer to the parent link.
       public: explicit BallJoint(BasePtr _parent) : T(_parent)
-              {
-                this->AddType(Base::BALL_JOINT);
-              }
+      {
+        this->AddType(Base::BALL_JOINT);
+      }
 
       /// \brief Destructor
       public: virtual ~BallJoint()
-              {
-              }
+      {
+      }
 
       /// \internal
-      public: virtual unsigned int GetAngleCount() const
-              {
-                return 0;
-              }
+      public: virtual unsigned int AngleCount() const
+      {
+        return 0;
+      }
 
       /// \brief Template to ::Load the BallJoint.
       /// \param[in] _sdf SDF to load the joint from.
       public: void Load(sdf::ElementPtr _sdf)
-              {
-                T::Load(_sdf);
-              }
-
+      {
+        T::Load(_sdf);
+      }
 
       /// \brief Initialize joint
       protected: virtual void Init()
-                 {
-                   T::Init();
-                 }
+      {
+        T::Init();
+      }
     };
     /// \}
   }

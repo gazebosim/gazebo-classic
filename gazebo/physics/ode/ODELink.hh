@@ -14,14 +14,9 @@
  * limitations under the License.
  *
 */
-/* Desc: ODE Link class
- * Author: Nate Koenig
- */
+#ifndef _GAZEBO_PHYSICS_ODELINK_HH_
+#define _GAZEBO_PHYSICS_ODELINK_HH_
 
-#ifndef _ODELINK_HH_
-#define _ODELINK_HH_
-
-#include "gazebo/physics/ode/ode_inc.h"
 #include "gazebo/physics/ode/ODETypes.hh"
 #include "gazebo/physics/Link.hh"
 #include "gazebo/util/system.hh"
@@ -30,6 +25,9 @@ namespace gazebo
 {
   namespace physics
   {
+    // Forward declare private data class.
+    class ODELinkPrivate;
+
     /// \brief ODE Link class.
     class GZ_PHYSICS_VISIBLE ODELink : public Link
     {
@@ -176,20 +174,9 @@ namespace gazebo
       // Documentation inherited
       public: virtual void SetLinkStatic(bool _static);
 
-      /// \brief ODE link handle
-      private: dBodyID linkId;
-
-      /// \brief Pointer to the ODE Physics engine
-      private: ODEPhysicsPtr odePhysics;
-
-      /// \brief Collision space id.
-      private: dSpaceID spaceId;
-
-      /// \brief Cache force applied on body
-      private: math::Vector3 force;
-
-      /// \brief Cache torque applied on body
-      private: math::Vector3 torque;
+      /// \internal
+      /// \brief Private data pointer.
+      private: std::shared_ptr<ODELinkPrivate> dataptr;
     };
   }
 }

@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: A slider or primastic joint
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
-
-#ifndef _SLIDERJOINT_HH_
-#define _SLIDERJOINT_HH_
+#ifndef _GAZEBO_PHYSICS_SLIDERJOINT_HH_
+#define _GAZEBO_PHYSICS_SLIDERJOINT_HH_
 
 #include "gazebo/physics/Joint.hh"
 #include "gazebo/util/system.hh"
@@ -40,20 +35,27 @@ namespace gazebo
       /// \brief Constructor.
       /// \param[in] _parent Parent of the joint.
       public: explicit SliderJoint(BasePtr _parent) : T(_parent)
-              {this->AddType(Base::SLIDER_JOINT);}
+      {
+        this->AddType(Base::SLIDER_JOINT);
+      }
 
       /// \brief Destructor.
       public: virtual ~SliderJoint()
-              {}
+      {
+      }
 
       /// \brief Load a SliderJoint.
       /// \param[in] _sdf SDF values to load from
       public: virtual void Load(sdf::ElementPtr _sdf)
-              {T::Load(_sdf);}
+      {
+        T::Load(_sdf);
+      }
 
       // Documentation inherited.
-      public: virtual unsigned int GetAngleCount() const
-              {return 1;}
+      public: virtual unsigned int AngleCount() const
+      {
+        return 1;
+      }
     };
     /// \}
   }

@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: An ODE ball joint
- * Author: Nate Koenig
- * Date: 13 Oct 2009
- */
-
-#ifndef _ODEBALLJOINT_HH_
-#define _ODEBALLJOINT_HH_
+#ifndef _GAZEBO_PHYSICS_ODEBALLJOINT_HH_
+#define _GAZEBO_PHYSICS_ODEBALLJOINT_HH_
 
 #include "gazebo/physics/BallJoint.hh"
 #include "gazebo/physics/ode/ODEJoint.hh"

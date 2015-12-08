@@ -14,12 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: A collision state
- * Author: Nate Koenig
- */
-
-#ifndef _COLLISIONSTATE_HH_
-#define _COLLISIONSTATE_HH_
+#ifndef _GAZEBO_PHYSICS_COLLISIONSTATE_HH_
+#define _GAZEBO_PHYSICS_COLLISIONSTATE_HH_
 
 #include "gazebo/physics/State.hh"
 #include "gazebo/math/Pose.hh"

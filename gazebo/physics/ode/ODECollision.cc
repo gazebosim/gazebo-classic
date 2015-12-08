@@ -14,11 +14,6 @@
  * limitations under the License.
  *
  */
-/* Desc: ODECollision class
- * Author: Nate Koenig
- * Date: 13 Feb 2006
- */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
@@ -34,6 +29,8 @@
 #include "gazebo/physics/ode/ODESurfaceParams.hh"
 #include "gazebo/physics/ode/ODEPhysics.hh"
 #include "gazebo/physics/ode/ODELink.hh"
+
+#include "gazebo/physics/ode/ODECollisionPrivate.hh"
 #include "gazebo/physics/ode/ODECollision.hh"
 
 using namespace gazebo;
@@ -41,10 +38,11 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 ODECollision::ODECollision(LinkPtr _link)
-: Collision(_link)
+: Collision(*new ODECollisionPrivate, _link),
+  dataPtr(std::static_pointer_cast<ODECollisionPrivate>(this->dPtr))
 {
   this->SetName("ODE_Collision");
-  this->collisionId = NULL;
+  this->dataPtr->collisionId = NULL;
   this->onPoseChangeFunc = &ODECollision::OnPoseChangeNull;
 
   this->SetSpaceId(
@@ -56,9 +54,9 @@ ODECollision::ODECollision(LinkPtr _link)
 //////////////////////////////////////////////////
 ODECollision::~ODECollision()
 {
-  if (this->collisionId)
-    dGeomDestroy(this->collisionId);
-  this->collisionId = NULL;
+  if (this->dataPtr->collisionId)
+    dGeomDestroy(this->dataPtr->collisionId);
+  this->dataPtr->collisionId = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -84,9 +82,9 @@ void ODECollision::Load(sdf::ElementPtr _sdf)
 void ODECollision::Fini()
 {
   /*
-     if (this->collisionId)
-     dGeomDestroy(this->collisionId);
-     this->collisionId = NULL;
+     if (this->dataPtr->collisionId)
+     dGeomDestroy(this->dataPtr->collisionId);
+     this->dataPtr->collisionId = NULL;
 
      if (this->spaceId)
      dSpaceDestroy(this->spaceId);
@@ -102,9 +100,9 @@ void ODECollision::OnPoseChange()
   // Update all the models
   // (*this.*onPoseChangeFunc)();
 
-  if (this->IsStatic() && this->collisionId && this->placeable)
+  if (this->IsStatic() && this->dataPtr->collisionId && this->placeable)
     this->OnPoseChangeGlobal();
-  else if (this->collisionId && this->placeable)
+  else if (this->dataPtr->collisionId && this->placeable)
     this->OnPoseChangeRelative();
 }
 
@@ -112,17 +110,17 @@ void ODECollision::OnPoseChange()
 void ODECollision::SetCollision(dGeomID _collisionId, bool _placeable)
 {
   // Must go first in this function
-  this->collisionId = _collisionId;
+  this->dataPtr->collisionId = _collisionId;
 
   Collision::SetCollision(_placeable);
 
-  if (dGeomGetSpace(this->collisionId) == 0)
+  if (dGeomGetSpace(this->dataPtr->collisionId) == 0)
   {
-    dSpaceAdd(this->spaceId, this->collisionId);
-    GZ_ASSERT(dGeomGetSpace(this->collisionId) != 0, "Collision ID is NULL");
+    dSpaceAdd(this->spaceId, this->dataPtr->collisionId);
+    GZ_ASSERT(dGeomGetSpace(this->dataPtr->collisionId) != 0, "Collision ID is NULL");
   }
 
-  if (this->collisionId && this->placeable)
+  if (this->dataPtr->collisionId && this->placeable)
   {
     if (this->IsStatic())
       this->onPoseChangeFunc = &ODECollision::OnPoseChangeGlobal;
@@ -134,13 +132,13 @@ void ODECollision::SetCollision(dGeomID _collisionId, bool _placeable)
     this->onPoseChangeFunc = &ODECollision::OnPoseChangeNull;
   }
 
-  dGeomSetData(this->collisionId, this);
+  dGeomSetData(this->dataPtr->collisionId, this);
 }
 
 //////////////////////////////////////////////////
 dGeomID ODECollision::GetCollisionId() const
 {
-  return this->collisionId;
+  return this->dataPtr->collisionId;
 }
 
 //////////////////////////////////////////////////
@@ -148,9 +146,9 @@ int ODECollision::GetCollisionClass() const
 {
   int result = 0;
 
-  if (this->collisionId)
+  if (this->dataPtr->collisionId)
   {
-    result = dGeomGetClass(this->collisionId);
+    result = dGeomGetClass(this->dataPtr->collisionId);
   }
 
   return result;
@@ -159,8 +157,8 @@ int ODECollision::GetCollisionClass() const
 //////////////////////////////////////////////////
 void ODECollision::SetCategoryBits(unsigned int _bits)
 {
-  if (this->collisionId)
-    dGeomSetCategoryBits(this->collisionId, _bits);
+  if (this->dataPtr->collisionId)
+    dGeomSetCategoryBits(this->dataPtr->collisionId, _bits);
   if (this->spaceId)
     dGeomSetCategoryBits((dGeomID)this->spaceId, _bits);
 }
@@ -168,8 +166,8 @@ void ODECollision::SetCategoryBits(unsigned int _bits)
 //////////////////////////////////////////////////
 void ODECollision::SetCollideBits(unsigned int _bits)
 {
-  if (this->collisionId)
-    dGeomSetCollideBits(this->collisionId, _bits);
+  if (this->dataPtr->collisionId)
+    dGeomSetCollideBits(this->dataPtr->collisionId, _bits);
   if (this->spaceId)
     dGeomSetCollideBits((dGeomID)this->spaceId, _bits);
 }
@@ -182,8 +180,8 @@ math::Box ODECollision::GetBoundingBox() const
 
   memset(aabb, 0, 6 * sizeof(dReal));
 
-  // if (this->collisionId && this->type != Shape::PLANE)
-  dGeomGetAABB(this->collisionId, aabb);
+  // if (this->dataPtr->collisionId && this->type != Shape::PLANE)
+  dGeomGetAABB(this->dataPtr->collisionId, aabb);
 
   box.min.Set(aabb[0], aabb[2], aabb[4]);
   box.max.Set(aabb[1], aabb[3], aabb[5]);
@@ -226,9 +224,9 @@ void ODECollision::OnPoseChangeGlobal()
   q[2] = localPose.rot.y;
   q[3] = localPose.rot.z;
 
-  dGeomSetPosition(this->collisionId, localPose.pos.x, localPose.pos.y,
+  dGeomSetPosition(this->dataPtr->collisionId, localPose.pos.x, localPose.pos.y,
                    localPose.pos.z);
-  dGeomSetQuaternion(this->collisionId, q);
+  dGeomSetQuaternion(this->dataPtr->collisionId, q);
 }
 
 /////////////////////////////////////////////////
@@ -249,9 +247,9 @@ void ODECollision::OnPoseChangeRelative()
 
   // Set the pose of the encapsulated collision; this is always relative
   // to the CoM
-  dGeomSetOffsetPosition(this->collisionId,
+  dGeomSetOffsetPosition(this->dataPtr->collisionId,
       localPose.Pos().X(), localPose.Pos().Y(), localPose.Pos().Z());
-  dGeomSetOffsetQuaternion(this->collisionId, q);
+  dGeomSetOffsetQuaternion(this->dataPtr->collisionId, q);
 }
 
 /////////////////////////////////////////////////

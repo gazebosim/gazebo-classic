@@ -35,6 +35,9 @@ namespace gazebo
   /// \brief namespace for physics
   namespace physics
   {
+    // Forward declare protected data class.
+    class BaseProtected;
+
     // Forward declare private data class.
     class BasePrivate;
 
@@ -394,11 +397,11 @@ namespace gazebo
       protected: Base(BaseProtected &_dataPtr, BasePtr _parent);
 
       /// \brief Construction helper function.
-      private: ConstructionHelper();
+      private: void ConstructionHelper();
 
       /// \internal
       /// \brief Data pointer for protected data
-      protected: std::shared_ptr<BaseProtected> baseDPtr;
+      protected: std::shared_ptr<BaseProtected> dPtr;
 
       /// \internal
       /// \brief Data pointer for private data

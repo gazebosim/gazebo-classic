@@ -28,6 +28,8 @@
 #include "gazebo/physics/ode/ODECollision.hh"
 #include "gazebo/physics/ode/ODESurfaceParams.hh"
 #include "gazebo/physics/ode/ODEPhysics.hh"
+
+#include "gazebo/physics/ode/ODEPrivateLink.hh"
 #include "gazebo/physics/ode/ODELink.hh"
 
 using namespace gazebo;
@@ -35,7 +37,7 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 ODELink::ODELink(EntityPtr _parent)
-    : Link(_parent)
+: Link(*new ODELinkPrivate, _parent)
 {
   this->linkId = NULL;
 }

@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: A body that has a box shape
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
-
-#ifndef _HINGEJOINT_HH_
-#define _HINGEJOINT_HH_
+#ifndef _GAZEBO_PHYSICS_HINGEJOINT_HH_
+#define _GAZEBO_PHYSICS_HINGEJOINT_HH_
 
 #include "gazebo/math/Angle.hh"
 #include "gazebo/math/Vector3.hh"
@@ -41,27 +36,33 @@ namespace gazebo
       /// \brief Constructor
       /// \param[in] _parent Parent link
       public: HingeJoint(BasePtr _parent) : T(_parent)
-              { this->AddType(Base::HINGE_JOINT); }
+      {
+        this->AddType(Base::HINGE_JOINT);
+      }
+
       ///  \brief Destructor
       public: virtual ~HingeJoint()
-              { }
+      {
+      }
 
       // Documentation inherited.
-      public: virtual unsigned int GetAngleCount() const
-              {return 1;}
+      public: virtual unsigned int AngleCount() const
+      {
+        return 1;
+      }
 
       /// \brief Load joint
       /// \param[in] _sdf Pointer to SDF element
       public: virtual void Load(sdf::ElementPtr _sdf)
-              {
-                T::Load(_sdf);
-              }
+      {
+        T::Load(_sdf);
+      }
 
       /// \brief Initialize joint
       protected: virtual void Init()
-                 {
-                   T::Init();
-                 }
+      {
+        T::Init();
+      }
     };
     /// \}
   }

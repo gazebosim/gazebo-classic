@@ -54,7 +54,7 @@ namespace gazebo
     };
 
     /// \brief Private Link data
-    class LinkPrivate : public EntityProtected
+    class LinkPrivate
     {
       /// \brief Event used when the link is enabled or disabled.
       private: event::EventT<void (bool)> enabledSignal;

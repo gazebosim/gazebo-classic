@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
@@ -47,7 +46,15 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 Collision::Collision(LinkPtr _link)
-    : Entity(_link), maxContacts(1)
+: Entity(*new CollisionPrivate, _link), maxContacts(1),
+  dataPtr(std::static_pointer_cast<CollisionPrivate>(this->dPtr))
+{
+}
+
+//////////////////////////////////////////////////
+Collision::Collision(CollisionProtected &_dataPtr, LinkPtr _link)
+: Entity(_dataPtr, _link), maxContacts(1),
+  dataPtr(std::static_pointer_cast<CollisionPrivate>(this->dPtr))
 {
   this->AddType(Base::COLLISION);
 

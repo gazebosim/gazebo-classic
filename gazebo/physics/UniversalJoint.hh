@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_UNIVERSALJOINT_HH_
-#define _GAZEBO_UNIVERSALJOINT_HH_
+#ifndef _GAZEBO_PHYSICS_UNIVERSALJOINT_HH_
+#define _GAZEBO_PHYSICS_UNIVERSALJOINT_HH_
 
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/Joint.hh"
@@ -46,35 +46,33 @@ namespace gazebo
       /// \brief Constructor.
       /// \param[in] _parent Parent link of the univeral joint.
       public: explicit UniversalJoint(BasePtr _parent) : T(_parent)
-              {this->AddType(Base::UNIVERSAL_JOINT);}
+      {
+        this->AddType(Base::UNIVERSAL_JOINT);
+      }
 
       /// \brief Destuctor.
       public: virtual ~UniversalJoint()
-              { }
+      {
+      }
 
       // Documentation inherited.
-      public: virtual unsigned int GetAngleCount() const
-              {return 2;}
+      public: virtual unsigned int AngleCount() const
+      {
+        return 2;
+      }
 
       /// \brief Load a UniversalJoint.
       /// \param[in] _sdf SDF values to load from.
       public: virtual void Load(sdf::ElementPtr _sdf)
-              {
-                T::Load(_sdf);
-
-                /*
-                this->SetAxis(0,
-                    this->sdf->GetElement("axis")->Get<math::Vector3("xyz"));
-                this->SetAxis(1,
-                    this->sdf->GetElement("axis2")->Get<math::Vector3>("xyz"));
-                    */
-              }
+      {
+        T::Load(_sdf);
+      }
 
       /// \brief Initialize joint
       protected: virtual void Init()
-                 {
-                   T::Init();
-                 }
+      {
+        T::Init();
+      }
     };
     /// \}
   }

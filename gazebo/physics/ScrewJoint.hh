@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _SCREWJOINT_HH_
-#define _SCREWJOINT_HH_
+#ifndef _GAZEBO_PHYSICS_SCREWJOINT_HH_
+#define _GAZEBO_PHYSICS_SCREWJOINT_HH_
 
 #include "gazebo/physics/Joint.hh"
 #include "gazebo/common/Console.hh"
@@ -26,6 +26,9 @@ namespace gazebo
 {
   namespace physics
   {
+    // Forward declare protected data class.
+    class ScrewJointProtected;
+
     /// \addtogroup gazebo_physics
     /// \{
 
@@ -37,25 +40,30 @@ namespace gazebo
       /// \brief Constructor.
       /// \param[in] _parent Parent of the joint.
       public: explicit ScrewJoint(BasePtr _parent) : T(_parent), threadPitch(0)
-              {this->AddType(Base::SCREW_JOINT);}
+      {
+        this->AddType(Base::SCREW_JOINT);
+      }
 
       /// \brief Destructor.
       public: virtual ~ScrewJoint()
-              { }
+      {
+      }
 
       // Documentation inherited.
-      public: virtual unsigned int GetAngleCount() const
-              {return 2;}
+      public: virtual unsigned int AngleCount() const
+      {
+        return 2;
+      }
 
       /// \brief Load a ScrewJoint.
       /// \param[in] _sdf SDF value to load from
       public: virtual void Load(sdf::ElementPtr _sdf)
-                 {
-                   T::Load(_sdf);
+      {
+        T::Load(_sdf);
 
-                   this->threadPitch =
-                     _sdf->GetElement("thread_pitch")->Get<double>();
-                 }
+        this->screwDPtr->threadPitch =
+          _sdf->GetElement("thread_pitch")->Get<double>();
+      }
 
       /// \brief Set screw joint thread pitch.
       /// Thread Pitch is defined as angular motion per linear
@@ -66,31 +74,33 @@ namespace gazebo
       /// (interior threads) while the parent Link is the bolt/screw
       /// (exterior threads).
       /// \param[in] _threadPitch Thread pitch value.
-      public: virtual void SetThreadPitch(double _threadPitch) = 0;
+      public: virtual void SetThreadPitch(const double _threadPitch) = 0;
 
       /// \brief Get screw joint thread pitch.
       /// Thread Pitch is defined as angular motion per linear
       /// motion or rad / m in metric.
       /// This must be implemented in a child class
       /// \return _threadPitch Thread pitch value.
-      public: virtual double GetThreadPitch() = 0;
+      /// \deprecated See ThreadPitch()
+      public: virtual double GetThreadPitch() GAZEBO_DEPRECATED(7.0) = 0;
 
       // Documentation inherited
       public: virtual void FillMsg(msgs::Joint &_msg)
-              {
-                Joint::FillMsg(_msg);
-                msgs::Joint::Screw *screwMsg = _msg.mutable_screw();
-                screwMsg->set_thread_pitch(this->threadPitch);
-              }
-
-      /// \brief Pitch of the thread.
-      protected: double threadPitch;
+      {
+        Joint::FillMsg(_msg);
+        msgs::Joint::Screw *screwMsg = _msg.mutable_screw();
+        screwMsg->set_thread_pitch(this->screwDPtr->threadPitch);
+      }
 
       /// \brief Initialize joint
       protected: virtual void Init()
-                 {
-                   T::Init();
-                 }
+      {
+        T::Init();
+      }
+
+      /// \internal
+      /// \brief Private screw joint protected
+      protected: std::unique_ptr<ScrewJointProtected> screwDPtr;
     };
     /// \}
   }
