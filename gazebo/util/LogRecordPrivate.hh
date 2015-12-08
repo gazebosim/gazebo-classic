@@ -17,6 +17,8 @@
 #ifndef _GAZEBO_UTIL_LOGRECORD_PRIVATE_HH_
 #define _GAZEBO_UTIL_LOGRECORD_PRIVATE_HH_
 
+#include <map>
+#include <string>
 #include <thread>
 #include <functional>
 #include <condition_variable>
@@ -32,6 +34,9 @@ namespace gazebo
     /// \brief Private data class for LogRecord.
     class LogRecordPrivate
     {
+      /// \brief Destructor (makes style checker happy)
+      public: virtual ~LogRecordPrivate() = default;
+
       /// \brief Log helper class
       public: class Log
       {

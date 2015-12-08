@@ -410,7 +410,8 @@ std::string LogRecord::Filename(const std::string &_name) const
 
   std::string result;
 
-  LogRecordPrivate::Log_M::const_iterator iter = this->dataPtr->logs.find(_name);
+  LogRecordPrivate::Log_M::const_iterator iter =
+    this->dataPtr->logs.find(_name);
   if (iter != this->dataPtr->logs.end())
   {
     GZ_ASSERT(iter->second, "Invalid log");
@@ -448,7 +449,8 @@ unsigned int LogRecord::FileSize(const std::string &_name) const
   // written to disk soon.
   {
     std::lock_guard<std::mutex> lock(this->dataPtr->writeMutex);
-    LogRecordPrivate::Log_M::const_iterator iter = this->dataPtr->logs.find(_name);
+    LogRecordPrivate::Log_M::const_iterator iter =
+      this->dataPtr->logs.find(_name);
 
     if (iter != this->dataPtr->logs.end())
     {
