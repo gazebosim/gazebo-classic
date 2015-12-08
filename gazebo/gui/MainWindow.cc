@@ -230,6 +230,10 @@ MainWindow::MainWindow()
   connect(this, SIGNAL(AddPlugins()),
           this, SLOT(OnAddPlugins()), Qt::QueuedConnection);
 
+  // Use a signal/slot to track a visual. This makes the process thread safe.
+  connect(this, SIGNAL(TrackVisual(const QString &)),
+          this, SLOT(OnTrackVisual(const QString &)));
+
   // Create data logger dialog
   this->dataLogger = new gui::DataLogger(this);
   connect(dataLogger, SIGNAL(rejected()), this, SLOT(OnDataLoggerClosed()));
@@ -1964,7 +1968,9 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
           _msg->camera().track().name() != "__default__")
       {
         std::string name = _msg->camera().track().name();
-        cam->AttachToVisual(name, false);
+        cam->TrackVisual(name);
+        // Call the signal to track a visual in the main thread.
+        this->TrackVisual(QString::fromStdString(name));
       }
     }
   }
@@ -2017,6 +2023,12 @@ void MainWindow::OnAddPlugins()
 
   g_overlayAct->setChecked(true);
   g_overlayAct->setEnabled(true);
+}
+
+/////////////////////////////////////////////////
+void MainWindow::OnTrackVisual(const QString &_visualName)
+{
+  gui::Events::follow(_visualName.toStdString());
 }
 
 /////////////////////////////////////////////////

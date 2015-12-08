@@ -10,6 +10,14 @@
       <uri>model://ground_plane</uri>
     </include>
 
+    <gui>
+      <camera name="user_camera">
+        <track_visual>
+          <name>box</name>
+        </track_visual>
+      </camera>
+    </gui>
+
     <model name="box">
       <pose>0 0 0.5 0 0 0</pose>
       <link name="link">

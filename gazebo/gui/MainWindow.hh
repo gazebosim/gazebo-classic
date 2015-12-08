@@ -120,6 +120,10 @@ namespace gazebo
       /// \brief A signal to trigger loading of GUI plugins.
       signals: void AddPlugins();
 
+      /// \brief A signal to track a visual.
+      /// \param[in] _visualName Name of the visual to attach the camera to.
+      signals: void TrackVisual(const QString &_visualName);
+
       /// \brief A signal to indicate the main window is about to close.
       signals: void Close();
 
@@ -234,6 +238,10 @@ namespace gazebo
 
       /// \brief Callback for adding plugins.
       private slots: void OnAddPlugins();
+
+      /// \brief Callback for tracking a visual.
+      /// \param[in] _visualName Name of the visual to attach the camera to.
+      private slots: void OnTrackVisual(const QString &_visualName);
 
       /// \brief Qt call back when one of the editor actions is triggered.
       /// \param[in] _action Action in the group which was triggered.
