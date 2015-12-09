@@ -15,6 +15,9 @@
  *
 */
 
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/math/Box.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Pose.hh"
@@ -211,66 +214,60 @@ void ConfigWidget_TEST::JointMsgWidget()
   // verify widget values
   {
     // joint
-    QVERIFY(jointConfigWidget->GetStringWidgetValue("name") ==
+    QVERIFY(jointConfigWidget->StringWidgetValue("name") ==
         "test_joint_updated");
-    QCOMPARE(jointConfigWidget->GetUIntWidgetValue("id"), 9999999u);
-    QVERIFY(jointConfigWidget->GetStringWidgetValue("parent") ==
+    QCOMPARE(jointConfigWidget->UIntWidgetValue("id"), 9999999u);
+    QVERIFY(jointConfigWidget->StringWidgetValue("parent") ==
         "test_joint_parent_updated");
-    QCOMPARE(jointConfigWidget->GetUIntWidgetValue("parent_id"), 1u);
-    QVERIFY(jointConfigWidget->GetStringWidgetValue("child") ==
+    QCOMPARE(jointConfigWidget->UIntWidgetValue("parent_id"), 1u);
+    QVERIFY(jointConfigWidget->StringWidgetValue("child") ==
         "test_joint_child_updated");
-    QCOMPARE(jointConfigWidget->GetUIntWidgetValue("child_id"), 2u);
+    QCOMPARE(jointConfigWidget->UIntWidgetValue("child_id"), 2u);
 
     // type
-    QCOMPARE(jointConfigWidget->GetEnumWidgetValue("type"),
+    QCOMPARE(jointConfigWidget->EnumWidgetValue("type"),
         gazebo::msgs::Joint_Type_Name(
         gazebo::msgs::Joint_Type_UNIVERSAL));
 
     // pose
-    gazebo::math::Vector3 pos(2.0, 9.0, -4.0);
-    gazebo::math::Quaternion quat(0.0, 0.0, 1.57);
-    QCOMPARE(jointConfigWidget->GetPoseWidgetValue("pose"),
-        gazebo::math::Pose(pos, quat));
+    ignition::math::Vector3d pos(2.0, 9.0, -4.0);
+    ignition::math::Quaterniond quat(0.0, 0.0, 1.57);
+    QCOMPARE(jointConfigWidget->PoseWidgetValue("pose"),
+        ignition::math::Pose3d(pos, quat));
 
     // axis1
-    QCOMPARE(jointConfigWidget->GetVector3WidgetValue("axis1::xyz"),
-        gazebo::math::Vector3::UnitY);
-    QCOMPARE(jointConfigWidget->GetBoolWidgetValue(
+    QCOMPARE(jointConfigWidget->Vector3WidgetValue("axis1::xyz"),
+        ignition::math::Vector3d::UnitY);
+    QCOMPARE(jointConfigWidget->BoolWidgetValue(
         "axis1::use_parent_model_frame"), true);
-    QCOMPARE(jointConfigWidget->GetDoubleWidgetValue("axis1::limit_lower"),
-        -1.2);
-    QCOMPARE(jointConfigWidget->GetDoubleWidgetValue("axis1::limit_upper"),
-        -1.0);
-    QCOMPARE(jointConfigWidget->GetDoubleWidgetValue("axis1::limit_effort"),
-        1.0);
-    QCOMPARE(jointConfigWidget->GetDoubleWidgetValue("axis1::limit_velocity"),
+    QCOMPARE(jointConfigWidget->DoubleWidgetValue("axis1::limit_lower"), -1.2);
+    QCOMPARE(jointConfigWidget->DoubleWidgetValue("axis1::limit_upper"), -1.0);
+    QCOMPARE(jointConfigWidget->DoubleWidgetValue("axis1::limit_effort"), 1.0);
+    QCOMPARE(jointConfigWidget->DoubleWidgetValue("axis1::limit_velocity"),
         100.0);
-    QCOMPARE(jointConfigWidget->GetDoubleWidgetValue("axis1::damping"), 0.9);
+    QCOMPARE(jointConfigWidget->DoubleWidgetValue("axis1::damping"), 0.9);
 
     // axis2
-    QCOMPARE(jointConfigWidget->GetVector3WidgetValue("axis2::xyz"),
-        gazebo::math::Vector3::UnitZ);
-    QCOMPARE(jointConfigWidget->GetBoolWidgetValue(
+    QCOMPARE(jointConfigWidget->Vector3WidgetValue("axis2::xyz"),
+        ignition::math::Vector3d::UnitZ);
+    QCOMPARE(jointConfigWidget->BoolWidgetValue(
         "axis1::use_parent_model_frame"), true);
-    QCOMPARE(jointConfigWidget->GetDoubleWidgetValue("axis2::limit_lower"),
-        -3.2);
-    QCOMPARE(jointConfigWidget->GetDoubleWidgetValue("axis2::limit_upper"),
-        -3.0);
-    QCOMPARE(jointConfigWidget->GetDoubleWidgetValue("axis2::limit_effort"),
-        3.0);
-    QCOMPARE(jointConfigWidget->GetDoubleWidgetValue("axis2::limit_velocity"),
+    QCOMPARE(jointConfigWidget->DoubleWidgetValue("axis2::limit_lower"), -3.2);
+    QCOMPARE(jointConfigWidget->DoubleWidgetValue("axis2::limit_upper"), -3.0);
+    QCOMPARE(jointConfigWidget->DoubleWidgetValue("axis2::limit_effort"), 3.0);
+    QCOMPARE(jointConfigWidget->DoubleWidgetValue("axis2::limit_velocity"),
         300.0);
-    QCOMPARE(jointConfigWidget->GetDoubleWidgetValue("axis2::damping"), 3.9);
+    QCOMPARE(jointConfigWidget->DoubleWidgetValue("axis2::damping"), 3.9);
 
     // other joint physics properties
-    QCOMPARE(jointConfigWidget->GetDoubleWidgetValue("cfm"), 0.9);
-    QCOMPARE(jointConfigWidget->GetDoubleWidgetValue("bounce"), 0.8);
-    QCOMPARE(jointConfigWidget->GetDoubleWidgetValue("velocity"), 0.7);
-    QCOMPARE(jointConfigWidget->GetDoubleWidgetValue("fudge_factor"), 0.6);
-    QCOMPARE(jointConfigWidget->GetDoubleWidgetValue("limit_cfm"), 0.5);
-    QCOMPARE(jointConfigWidget->GetDoubleWidgetValue("limit_erp"), 0.4);
-    QCOMPARE(jointConfigWidget->GetDoubleWidgetValue("suspension_cfm"), 0.3);
-    QCOMPARE(jointConfigWidget->GetDoubleWidgetValue("suspension_erp"), 0.2);
+    QCOMPARE(jointConfigWidget->DoubleWidgetValue("cfm"), 0.9);
+    QCOMPARE(jointConfigWidget->DoubleWidgetValue("bounce"), 0.8);
+    QCOMPARE(jointConfigWidget->DoubleWidgetValue("velocity"), 0.7);
+    QCOMPARE(jointConfigWidget->DoubleWidgetValue("fudge_factor"), 0.6);
+    QCOMPARE(jointConfigWidget->DoubleWidgetValue("limit_cfm"), 0.5);
+    QCOMPARE(jointConfigWidget->DoubleWidgetValue("limit_erp"), 0.4);
+    QCOMPARE(jointConfigWidget->DoubleWidgetValue("suspension_cfm"), 0.3);
+    QCOMPARE(jointConfigWidget->DoubleWidgetValue("suspension_erp"), 0.2);
   }
 
   // verify updates in new msg
@@ -377,36 +374,36 @@ void ConfigWidget_TEST::JointMsgWidget()
   // verify widget values
   {
     // joint
-    QVERIFY(jointConfigWidget->GetStringWidgetValue("name") ==
+    QVERIFY(jointConfigWidget->StringWidgetValue("name") ==
         "test_joint_updated2");
-    QCOMPARE(jointConfigWidget->GetUIntWidgetValue("id"), 2222222u);
-    QVERIFY(jointConfigWidget->GetStringWidgetValue("parent") ==
+    QCOMPARE(jointConfigWidget->UIntWidgetValue("id"), 2222222u);
+    QVERIFY(jointConfigWidget->StringWidgetValue("parent") ==
         "test_joint_parent_updated2");
-    QCOMPARE(jointConfigWidget->GetUIntWidgetValue("parent_id"), 10u);
-    QVERIFY(jointConfigWidget->GetStringWidgetValue("child") ==
+    QCOMPARE(jointConfigWidget->UIntWidgetValue("parent_id"), 10u);
+    QVERIFY(jointConfigWidget->StringWidgetValue("child") ==
         "test_joint_child_updated2");
-    QCOMPARE(jointConfigWidget->GetUIntWidgetValue("child_id"), 20u);
+    QCOMPARE(jointConfigWidget->UIntWidgetValue("child_id"), 20u);
 
     // type
-    QCOMPARE(jointConfigWidget->GetEnumWidgetValue("type"),
+    QCOMPARE(jointConfigWidget->EnumWidgetValue("type"),
         gazebo::msgs::Joint_Type_Name(
         gazebo::msgs::Joint_Type_BALL));
 
     // pose
-    gazebo::math::Vector3 pos(-2.0, 1.0, 2.0);
-    gazebo::math::Quaternion quat(0.0, 0.0, 0.0);
-    QCOMPARE(jointConfigWidget->GetPoseWidgetValue("pose"),
-        gazebo::math::Pose(pos, quat));
+    ignition::math::Vector3d pos(-2.0, 1.0, 2.0);
+    ignition::math::Quaterniond quat(0.0, 0.0, 0.0);
+    QCOMPARE(jointConfigWidget->PoseWidgetValue("pose"),
+        ignition::math::Pose3d(pos, quat));
 
     // other joint physics properties
-    QCOMPARE(jointConfigWidget->GetDoubleWidgetValue("cfm"), 0.19);
-    QCOMPARE(jointConfigWidget->GetDoubleWidgetValue("bounce"), 0.18);
-    QCOMPARE(jointConfigWidget->GetDoubleWidgetValue("velocity"), 2.7);
-    QCOMPARE(jointConfigWidget->GetDoubleWidgetValue("fudge_factor"), 0.26);
-    QCOMPARE(jointConfigWidget->GetDoubleWidgetValue("limit_cfm"), 0.15);
-    QCOMPARE(jointConfigWidget->GetDoubleWidgetValue("limit_erp"), 0.24);
-    QCOMPARE(jointConfigWidget->GetDoubleWidgetValue("suspension_cfm"), 0.13);
-    QCOMPARE(jointConfigWidget->GetDoubleWidgetValue("suspension_erp"), 0.12);
+    QCOMPARE(jointConfigWidget->DoubleWidgetValue("cfm"), 0.19);
+    QCOMPARE(jointConfigWidget->DoubleWidgetValue("bounce"), 0.18);
+    QCOMPARE(jointConfigWidget->DoubleWidgetValue("velocity"), 2.7);
+    QCOMPARE(jointConfigWidget->DoubleWidgetValue("fudge_factor"), 0.26);
+    QCOMPARE(jointConfigWidget->DoubleWidgetValue("limit_cfm"), 0.15);
+    QCOMPARE(jointConfigWidget->DoubleWidgetValue("limit_erp"), 0.24);
+    QCOMPARE(jointConfigWidget->DoubleWidgetValue("suspension_cfm"), 0.13);
+    QCOMPARE(jointConfigWidget->DoubleWidgetValue("suspension_erp"), 0.12);
   }
 
   // verify updates in new msg
@@ -632,25 +629,25 @@ void ConfigWidget_TEST::VisualMsgWidget()
 
   // verify widget values
   {
-    QVERIFY(visualConfigWidget->GetStringWidgetValue("name") ==
+    QVERIFY(visualConfigWidget->StringWidgetValue("name") ==
         "test_visual_updated");
-    QCOMPARE(visualConfigWidget->GetUIntWidgetValue("id"), 11111u);
-    QVERIFY(visualConfigWidget->GetStringWidgetValue("parent_name") ==
+    QCOMPARE(visualConfigWidget->UIntWidgetValue("id"), 11111u);
+    QVERIFY(visualConfigWidget->StringWidgetValue("parent_name") ==
         "test_visual_parent_updated");
-    QCOMPARE(visualConfigWidget->GetUIntWidgetValue("parent_id"), 55555u);
-    QCOMPARE(visualConfigWidget->GetBoolWidgetValue("cast_shadows"), false);
-    QCOMPARE(visualConfigWidget->GetDoubleWidgetValue("transparency"), 1.0);
-    QCOMPARE(visualConfigWidget->GetBoolWidgetValue("visible"), false);
-    QCOMPARE(visualConfigWidget->GetBoolWidgetValue("delete_me"), true);
-    QCOMPARE(visualConfigWidget->GetBoolWidgetValue("is_static"), true);
-    QCOMPARE(visualConfigWidget->GetVector3WidgetValue("scale"),
-        gazebo::math::Vector3(2.0, 1.5, 0.5));
+    QCOMPARE(visualConfigWidget->UIntWidgetValue("parent_id"), 55555u);
+    QCOMPARE(visualConfigWidget->BoolWidgetValue("cast_shadows"), false);
+    QCOMPARE(visualConfigWidget->DoubleWidgetValue("transparency"), 1.0);
+    QCOMPARE(visualConfigWidget->BoolWidgetValue("visible"), false);
+    QCOMPARE(visualConfigWidget->BoolWidgetValue("delete_me"), true);
+    QCOMPARE(visualConfigWidget->BoolWidgetValue("is_static"), true);
+    QCOMPARE(visualConfigWidget->Vector3WidgetValue("scale"),
+        ignition::math::Vector3d(2.0, 1.5, 0.5));
 
     // pose
-    gazebo::math::Vector3 pos(-2.0, -3.0, -4.0);
-    gazebo::math::Quaternion quat(0.0, 1.57, 0.0);
-    QCOMPARE(visualConfigWidget->GetPoseWidgetValue("pose"),
-        gazebo::math::Pose(pos, quat));
+    ignition::math::Vector3d pos(-2.0, -3.0, -4.0);
+    ignition::math::Quaterniond quat(0.0, 1.57, 0.0);
+    QCOMPARE(visualConfigWidget->PoseWidgetValue("pose"),
+        ignition::math::Pose3d(pos, quat));
 
     // geometry
     ignition::math::Vector3d dimensions;
@@ -660,20 +657,20 @@ void ConfigWidget_TEST::VisualMsgWidget()
     QCOMPARE(dimensions, ignition::math::Vector3d(5.0, 3.0, 4.0));
 
     // material
-    QVERIFY(visualConfigWidget->GetStringWidgetValue("material::normal_map") ==
+    QVERIFY(visualConfigWidget->StringWidgetValue("material::normal_map") ==
         "test_normal_map_updated");
-    QCOMPARE(visualConfigWidget->GetColorWidgetValue("material::ambient"),
+    QCOMPARE(visualConfigWidget->ColorWidgetValue("material::ambient"),
         gazebo::common::Color(0.2, 0.3, 0.4, 0.5));
-    QCOMPARE(visualConfigWidget->GetColorWidgetValue("material::diffuse"),
+    QCOMPARE(visualConfigWidget->ColorWidgetValue("material::diffuse"),
         gazebo::common::Color(0.1, 0.8, 0.6, 0.4));
-    QCOMPARE(visualConfigWidget->GetColorWidgetValue("material::specular"),
+    QCOMPARE(visualConfigWidget->ColorWidgetValue("material::specular"),
         gazebo::common::Color(0.5, 0.4, 0.3, 0.2));
-    QCOMPARE(visualConfigWidget->GetColorWidgetValue("material::emissive"),
+    QCOMPARE(visualConfigWidget->ColorWidgetValue("material::emissive"),
         gazebo::common::Color(0.4, 0.6, 0.8, 0.1));
-    QCOMPARE(visualConfigWidget->GetBoolWidgetValue("material::lighting"),
+    QCOMPARE(visualConfigWidget->BoolWidgetValue("material::lighting"),
         false);
     // material::script
-    QVERIFY(visualConfigWidget->GetStringWidgetValue("material::script::name")
+    QVERIFY(visualConfigWidget->StringWidgetValue("material::script::name")
         == "test_script_name_updated");
   }
 
@@ -799,11 +796,11 @@ void ConfigWidget_TEST::PluginMsgWidget()
 
   // verify widget values
   {
-    QVERIFY(pluginConfigWidget->GetStringWidgetValue("name") ==
+    QVERIFY(pluginConfigWidget->StringWidgetValue("name") ==
         "test_plugin_updated");
-    QVERIFY(pluginConfigWidget->GetStringWidgetValue("filename") ==
+    QVERIFY(pluginConfigWidget->StringWidgetValue("filename") ==
         "test_plugin_filename_updated");
-    QVERIFY(pluginConfigWidget->GetStringWidgetValue("innerxml") ==
+    QVERIFY(pluginConfigWidget->StringWidgetValue("innerxml") ==
         "<param2>new_param</param2>\n");
   }
 
@@ -876,13 +873,13 @@ void ConfigWidget_TEST::ConfigWidgetVisible()
     // group widget
     visualConfigWidget->SetWidgetVisible("material", false);
 
-    QCOMPARE(visualConfigWidget->GetWidgetVisible("id"), false);
-    QCOMPARE(visualConfigWidget->GetWidgetVisible("pose"), false);
-    QCOMPARE(visualConfigWidget->GetWidgetVisible("geometry"), false);
-    QCOMPARE(visualConfigWidget->GetWidgetVisible("material::diffuse"), false);
-    QCOMPARE(visualConfigWidget->GetWidgetVisible("material::script::name"),
+    QCOMPARE(visualConfigWidget->WidgetVisible("id"), false);
+    QCOMPARE(visualConfigWidget->WidgetVisible("pose"), false);
+    QCOMPARE(visualConfigWidget->WidgetVisible("geometry"), false);
+    QCOMPARE(visualConfigWidget->WidgetVisible("material::diffuse"), false);
+    QCOMPARE(visualConfigWidget->WidgetVisible("material::script::name"),
         false);
-    QCOMPARE(visualConfigWidget->GetWidgetVisible("material"), false);
+    QCOMPARE(visualConfigWidget->WidgetVisible("material"), false);
   }
 
   // set visible back to true
@@ -894,13 +891,13 @@ void ConfigWidget_TEST::ConfigWidgetVisible()
     visualConfigWidget->SetWidgetVisible("material::script::name", true);
     visualConfigWidget->SetWidgetVisible("material", true);
 
-    QCOMPARE(visualConfigWidget->GetWidgetVisible("id"), true);
-    QCOMPARE(visualConfigWidget->GetWidgetVisible("pose"), true);
-    QCOMPARE(visualConfigWidget->GetWidgetVisible("geometry"), true);
-    QCOMPARE(visualConfigWidget->GetWidgetVisible("material::diffuse"), true);
-    QCOMPARE(visualConfigWidget->GetWidgetVisible("material::script::name"),
+    QCOMPARE(visualConfigWidget->WidgetVisible("id"), true);
+    QCOMPARE(visualConfigWidget->WidgetVisible("pose"), true);
+    QCOMPARE(visualConfigWidget->WidgetVisible("geometry"), true);
+    QCOMPARE(visualConfigWidget->WidgetVisible("material::diffuse"), true);
+    QCOMPARE(visualConfigWidget->WidgetVisible("material::script::name"),
         true);
-    QCOMPARE(visualConfigWidget->GetWidgetVisible("material"), true);
+    QCOMPARE(visualConfigWidget->WidgetVisible("material"), true);
   }
 
   delete visualConfigWidget;
@@ -968,9 +965,9 @@ void ConfigWidget_TEST::CustomConfigWidgetReadOnly()
     configWidget->SetWidgetReadOnly("string", true);
     configWidget->SetWidgetReadOnly("custom", true);
 
-    QCOMPARE(configWidget->GetWidgetReadOnly("vector3d"), true);
-    QCOMPARE(configWidget->GetWidgetReadOnly("string"), true);
-    QCOMPARE(configWidget->GetWidgetReadOnly("custom"), true);
+    QCOMPARE(configWidget->WidgetReadOnly("vector3d"), true);
+    QCOMPARE(configWidget->WidgetReadOnly("string"), true);
+    QCOMPARE(configWidget->WidgetReadOnly("custom"), true);
     {
       auto childWidgets =
           configWidget->ConfigChildWidgetByName("custom")->
@@ -987,9 +984,9 @@ void ConfigWidget_TEST::CustomConfigWidgetReadOnly()
     configWidget->SetWidgetReadOnly("string", false);
     configWidget->SetWidgetReadOnly("custom", false);
 
-    QCOMPARE(configWidget->GetWidgetReadOnly("vector3d"), false);
-    QCOMPARE(configWidget->GetWidgetReadOnly("string"), false);
-    QCOMPARE(configWidget->GetWidgetReadOnly("custom"), false);
+    QCOMPARE(configWidget->WidgetReadOnly("vector3d"), false);
+    QCOMPARE(configWidget->WidgetReadOnly("string"), false);
+    QCOMPARE(configWidget->WidgetReadOnly("custom"), false);
     {
       auto childWidgets =
           configWidget->ConfigChildWidgetByName("custom")->
@@ -1006,9 +1003,9 @@ void ConfigWidget_TEST::CustomConfigWidgetReadOnly()
     configWidget->SetWidgetReadOnly("string", true);
     configWidget->SetWidgetReadOnly("custom", true);
 
-    QCOMPARE(configWidget->GetWidgetReadOnly("vector3d"), true);
-    QCOMPARE(configWidget->GetWidgetReadOnly("string"), true);
-    QCOMPARE(configWidget->GetWidgetReadOnly("custom"), true);
+    QCOMPARE(configWidget->WidgetReadOnly("vector3d"), true);
+    QCOMPARE(configWidget->WidgetReadOnly("string"), true);
+    QCOMPARE(configWidget->WidgetReadOnly("custom"), true);
     {
       auto childWidgets =
           configWidget->ConfigChildWidgetByName("custom")->
@@ -1075,13 +1072,13 @@ void ConfigWidget_TEST::ConfigWidgetReadOnly()
     // group widget
     visualConfigWidget->SetWidgetReadOnly("material", true);
 
-    QCOMPARE(visualConfigWidget->GetWidgetReadOnly("id"), true);
-    QCOMPARE(visualConfigWidget->GetWidgetReadOnly("pose"), true);
-    QCOMPARE(visualConfigWidget->GetWidgetReadOnly("geometry"), true);
-    QCOMPARE(visualConfigWidget->GetWidgetReadOnly("material::diffuse"), true);
-    QCOMPARE(visualConfigWidget->GetWidgetReadOnly("material::script::name"),
+    QCOMPARE(visualConfigWidget->WidgetReadOnly("id"), true);
+    QCOMPARE(visualConfigWidget->WidgetReadOnly("pose"), true);
+    QCOMPARE(visualConfigWidget->WidgetReadOnly("geometry"), true);
+    QCOMPARE(visualConfigWidget->WidgetReadOnly("material::diffuse"), true);
+    QCOMPARE(visualConfigWidget->WidgetReadOnly("material::script::name"),
         true);
-    QCOMPARE(visualConfigWidget->GetWidgetReadOnly("material"), true);
+    QCOMPARE(visualConfigWidget->WidgetReadOnly("material"), true);
   }
 
   // set read-only back to false
@@ -1093,13 +1090,13 @@ void ConfigWidget_TEST::ConfigWidgetReadOnly()
     visualConfigWidget->SetWidgetReadOnly("material::script::name", false);
     visualConfigWidget->SetWidgetReadOnly("material", false);
 
-    QCOMPARE(visualConfigWidget->GetWidgetReadOnly("id"), false);
-    QCOMPARE(visualConfigWidget->GetWidgetReadOnly("pose"), false);
-    QCOMPARE(visualConfigWidget->GetWidgetReadOnly("geometry"), false);
-    QCOMPARE(visualConfigWidget->GetWidgetReadOnly("material::diffuse"), false);
-    QCOMPARE(visualConfigWidget->GetWidgetReadOnly("material::script::name"),
+    QCOMPARE(visualConfigWidget->WidgetReadOnly("id"), false);
+    QCOMPARE(visualConfigWidget->WidgetReadOnly("pose"), false);
+    QCOMPARE(visualConfigWidget->WidgetReadOnly("geometry"), false);
+    QCOMPARE(visualConfigWidget->WidgetReadOnly("material::diffuse"), false);
+    QCOMPARE(visualConfigWidget->WidgetReadOnly("material::script::name"),
         false);
-    QCOMPARE(visualConfigWidget->GetWidgetReadOnly("material"), false);
+    QCOMPARE(visualConfigWidget->WidgetReadOnly("material"), false);
   }
 
   delete visualConfigWidget;
@@ -1181,17 +1178,17 @@ void ConfigWidget_TEST::CreatedExternally()
   QCOMPARE(configWidget->ConfigChildWidgetCount(), 10u);
 
   // Check that checking visibility works
-  QCOMPARE(configWidget->GetWidgetVisible("uint"), uintWidget->isVisible());
-  QCOMPARE(configWidget->GetWidgetVisible("int"), intWidget->isVisible());
-  QCOMPARE(configWidget->GetWidgetVisible("double"), doubleWidget->isVisible());
-  QCOMPARE(configWidget->GetWidgetVisible("string"), stringWidget->isVisible());
-  QCOMPARE(configWidget->GetWidgetVisible("bool"), boolWidget->isVisible());
-  QCOMPARE(configWidget->GetWidgetVisible("vector3d"),
+  QCOMPARE(configWidget->WidgetVisible("uint"), uintWidget->isVisible());
+  QCOMPARE(configWidget->WidgetVisible("int"), intWidget->isVisible());
+  QCOMPARE(configWidget->WidgetVisible("double"), doubleWidget->isVisible());
+  QCOMPARE(configWidget->WidgetVisible("string"), stringWidget->isVisible());
+  QCOMPARE(configWidget->WidgetVisible("bool"), boolWidget->isVisible());
+  QCOMPARE(configWidget->WidgetVisible("vector3d"),
       vector3dWidget->isVisible());
-  QCOMPARE(configWidget->GetWidgetVisible("color"), colorWidget->isVisible());
-  QCOMPARE(configWidget->GetWidgetVisible("pose"), poseWidget->isVisible());
-  QCOMPARE(configWidget->GetWidgetVisible("enum"), enumWidget->isVisible());
-  QCOMPARE(configWidget->GetWidgetVisible("custom"), customWidget->isVisible());
+  QCOMPARE(configWidget->WidgetVisible("color"), colorWidget->isVisible());
+  QCOMPARE(configWidget->WidgetVisible("pose"), poseWidget->isVisible());
+  QCOMPARE(configWidget->WidgetVisible("enum"), enumWidget->isVisible());
+  QCOMPARE(configWidget->WidgetVisible("custom"), customWidget->isVisible());
 
   // Set widgets values
   unsigned int uintValue = 123;
@@ -1218,18 +1215,18 @@ void ConfigWidget_TEST::CreatedExternally()
   QVERIFY(configWidget->SetStringWidgetValue("custom", customValue));
 
   // Get widgets values
-  QCOMPARE(configWidget->GetUIntWidgetValue("uint"), uintValue);
-  QCOMPARE(configWidget->GetIntWidgetValue("int"), intValue);
-  QCOMPARE(configWidget->GetDoubleWidgetValue("double"), doubleValue);
-  QCOMPARE(configWidget->GetStringWidgetValue("string"), stringValue);
-  QCOMPARE(configWidget->GetBoolWidgetValue("bool"), boolValue);
-  QCOMPARE(configWidget->GetVector3WidgetValue("vector3d"),
-      gazebo::math::Vector3(vector3dValue));
-  QCOMPARE(configWidget->GetColorWidgetValue("color"), colorValue);
-  QCOMPARE(configWidget->GetPoseWidgetValue("pose"),
-      gazebo::math::Pose(poseValue));
-  QCOMPARE(configWidget->GetEnumWidgetValue("enum"), enumValue);
-  QCOMPARE(configWidget->GetStringWidgetValue("custom"), customValue);
+  QCOMPARE(configWidget->UIntWidgetValue("uint"), uintValue);
+  QCOMPARE(configWidget->IntWidgetValue("int"), intValue);
+  QCOMPARE(configWidget->DoubleWidgetValue("double"), doubleValue);
+  QCOMPARE(configWidget->StringWidgetValue("string"), stringValue);
+  QCOMPARE(configWidget->BoolWidgetValue("bool"), boolValue);
+  QCOMPARE(configWidget->Vector3WidgetValue("vector3d"),
+      ignition::math::Vector3d(vector3dValue));
+  QCOMPARE(configWidget->ColorWidgetValue("color"), colorValue);
+  QCOMPARE(configWidget->PoseWidgetValue("pose"),
+      ignition::math::Pose3d(poseValue));
+  QCOMPARE(configWidget->EnumWidgetValue("enum"), enumValue);
+  QCOMPARE(configWidget->StringWidgetValue("custom"), customValue);
 
   // Group some widgets
   QVBoxLayout *groupLayout = new QVBoxLayout();
@@ -1338,7 +1335,7 @@ void ConfigWidget_TEST::ChildUIntSignal()
       SLOT(OnUIntValueChanged(const QString, uint)));
 
   // Check default uint
-  QVERIFY(configWidget->GetUIntWidgetValue("uint") == 0u);
+  QVERIFY(configWidget->UIntWidgetValue("uint") == 0u);
 
   // Get signal emitting widgets
   QList<QSpinBox *> spins = uintWidget->findChildren<QSpinBox *>();
@@ -1381,7 +1378,7 @@ void ConfigWidget_TEST::ChildIntSignal()
       SLOT(OnIntValueChanged(const QString, int)));
 
   // Check default int
-  QCOMPARE(configWidget->GetIntWidgetValue("int"), 0);
+  QCOMPARE(configWidget->IntWidgetValue("int"), 0);
 
   // Get signal emitting widgets
   QList<QSpinBox *> spins = intWidget->findChildren<QSpinBox *>();
@@ -1424,7 +1421,7 @@ void ConfigWidget_TEST::ChildDoubleSignal()
       SLOT(OnDoubleValueChanged(const QString, double)));
 
   // Check default double
-  QCOMPARE(configWidget->GetDoubleWidgetValue("double"), 0.0);
+  QCOMPARE(configWidget->DoubleWidgetValue("double"), 0.0);
 
   // Get signal emitting widgets
   QList<QDoubleSpinBox *> spins =
@@ -1468,7 +1465,7 @@ void ConfigWidget_TEST::ChildBoolSignal()
       SLOT(OnBoolValueChanged(const QString, bool)));
 
   // Check default bool
-  QCOMPARE(configWidget->GetBoolWidgetValue("bool"), false);
+  QCOMPARE(configWidget->BoolWidgetValue("bool"), false);
 
   // Get signal emitting widgets
   QList<QRadioButton *> radios =
@@ -1513,7 +1510,7 @@ void ConfigWidget_TEST::ChildStringSignal()
       SLOT(OnStringValueChanged(const QString, std::string)));
 
   // Check default string
-  QVERIFY(configWidget->GetStringWidgetValue("string") == "");
+  QVERIFY(configWidget->StringWidgetValue("string") == "");
 
   // Get signal emitting widgets
   QList<QLineEdit *> lineEdits =
@@ -1557,8 +1554,8 @@ void ConfigWidget_TEST::ChildVector3dSignal()
       SLOT(OnVector3dValueChanged(const QString, ignition::math::Vector3d)));
 
   // Check default vector3
-  QVERIFY(configWidget->GetVector3WidgetValue("vector3") ==
-      gazebo::math::Vector3());
+  QVERIFY(configWidget->Vector3WidgetValue("vector3") ==
+      ignition::math::Vector3d());
 
   // Get axes spins
   QList<QDoubleSpinBox *> spins =
@@ -1623,7 +1620,7 @@ void ConfigWidget_TEST::ChildColorSignal()
       SLOT(OnColorValueChanged(const QString, const gazebo::common::Color)));
 
   // Check default color
-  QVERIFY(configWidget->GetColorWidgetValue("color") ==
+  QVERIFY(configWidget->ColorWidgetValue("color") ==
       gazebo::common::Color());
 
   // Get signal emitting widgets
@@ -1668,7 +1665,7 @@ void ConfigWidget_TEST::ChildPoseSignal()
       SLOT(OnPoseValueChanged(const QString, const ignition::math::Pose3d)));
 
   // Check default pose
-  QVERIFY(configWidget->GetPoseWidgetValue("pose") == gazebo::math::Pose());
+  QVERIFY(configWidget->PoseWidgetValue("pose") == ignition::math::Pose3d());
 
   // Get signal emitting widgets
   QList<QDoubleSpinBox *> spins = poseWidget->findChildren<QDoubleSpinBox *>();
@@ -1770,7 +1767,7 @@ void ConfigWidget_TEST::ChildEnumSignal()
       SLOT(OnEnumValueChanged(const QString, const QString)));
 
   // Check default pose
-  QVERIFY(configWidget->GetEnumWidgetValue("enum") == "value1");
+  QVERIFY(configWidget->EnumWidgetValue("enum") == "value1");
 
   // Get signal emitting widgets
   QList<QComboBox *> comboBoxes = enumWidget->findChildren<QComboBox *>();
