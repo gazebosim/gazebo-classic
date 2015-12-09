@@ -84,7 +84,7 @@
           </material>
         </visual>
         <visual name='link_2w_visual'>
-          <pose frame=''>0 0 0 0 -0 0</pose>
+          <pose frame=''>0 0 0.1 0 -0 0</pose>
           <geometry>
             <box>
               <size>0.05 0.05 0.09</size>
@@ -163,7 +163,7 @@
         <parent>world</parent>
         <child>link_2</child>
         <axis>
-          <xyz>0 0 1</xyz>
+          <xyz>1 0 0</xyz>
           <limit>
             <lower>-1e+16</lower>
             <upper>1e+16</upper>
@@ -227,7 +227,7 @@
           </geometry>
         </visual>
         <visual name='link_2w_visual'>
-          <pose frame=''>0 0 0 0 -0 0</pose>
+          <pose frame=''>0 0 0.1 0 -0 0</pose>
           <geometry>
             <box>
               <size>0.05 0.05 0.09</size>
@@ -341,7 +341,7 @@
           </geometry>
         </visual>
         <visual name='link_1w_visual'>
-          <pose frame=''>0 0 0 0 -0 0</pose>
+          <pose frame=''>0 0 -0.1 0 -0 0</pose>
           <geometry>
             <box>
               <size>0.05 0.05 0.09</size>
@@ -489,7 +489,7 @@
           </material>
         </visual>
         <visual name='link_1w_visual'>
-          <pose frame=''>0 0 0 0 -0 0</pose>
+          <pose frame=''>0 0 0.1 0 -0 0</pose>
           <geometry>
             <box>
               <size>0.05 0.05 0.09</size>
@@ -627,7 +627,7 @@
           </geometry>
         </visual>
         <visual name='link_1w_visual'>
-          <pose frame=''>0 0 0 0 -0 0</pose>
+          <pose frame=''>0 0 -0.1 0 -0 0</pose>
           <geometry>
             <box>
               <size>0.05 0.05 0.09</size>
@@ -775,7 +775,7 @@
           </material>
         </visual>
         <visual name='link_1w_visual'>
-          <pose frame=''>0 0 0 0 -0 0</pose>
+          <pose frame=''>0 0 0.1 0 -0 0</pose>
           <geometry>
             <box>
               <size>0.05 0.05 0.09</size>

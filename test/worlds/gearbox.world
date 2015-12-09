@@ -370,20 +370,21 @@
         <self_collide>1</self_collide>
         <kinematic>0</kinematic>
       </link>
-      <!--
       <joint name="joint_02" type="revolute">
         <parent>world</parent>
         <child>link_2</child>
         <axis>
-          <xyz>0.000000 0.000000 1.000000</xyz>
+          <xyz>1.000000 0.000000 0.000000</xyz>
           <limit>
             <upper>-1000.0</upper>
             <lower>1000.0</lower>
           </limit>
+          <dynamics>
+            <damping>20</damping>
+          </dynamics>
           <use_parent_model_frame>true</use_parent_model_frame>
         </axis>
       </joint>
-      -->
       <joint name="joint_12" type="revolute">
         <parent>link_1</parent>
         <child>link_2</child>

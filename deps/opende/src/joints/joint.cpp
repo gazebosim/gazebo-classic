@@ -447,7 +447,9 @@ dReal getHingeAngle( dxBody *body1, dxBody *body2, dVector3 axis,
     if ( body1 && body2 )
     {
         dQuaternion qq;
+        // qq is the rotation from body1 to body2
         dQMultiply1( qq, body1->q, body2->q );
+        // qrel is the rotation from body1 to body2 accounting for q_initial
         dQMultiply2( qrel, qq, q_initial );
     }
     else if (body1)
