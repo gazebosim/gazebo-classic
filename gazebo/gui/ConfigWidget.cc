@@ -883,7 +883,8 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
 
       bool newWidget = true;
       std::string scopedName = _name.empty() ? name : _name + "::" + name;
-      if (this->dataPtr->configWidgets.find(scopedName) != this->dataPtr->configWidgets.end())
+      if (this->dataPtr->configWidgets.find(scopedName) !=
+          this->dataPtr->configWidgets.end())
       {
         newWidget = false;
         configChildWidget = this->dataPtr->configWidgets[scopedName];
@@ -2199,7 +2200,8 @@ void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
     if (!field->is_repeated() /*&& ref->HasField(*_msg, field)*/)
     {
       std::string scopedName = _name.empty() ? name : _name + "::" + name;
-      if (this->dataPtr->configWidgets.find(scopedName) == this->dataPtr->configWidgets.end())
+      if (this->dataPtr->configWidgets.find(scopedName) ==
+          this->dataPtr->configWidgets.end())
         continue;
 
       // don't update msgs field that are associated with read-only widgets
@@ -3299,7 +3301,8 @@ bool ConfigWidget::AddConfigChildWidget(const std::string &_name,
           << std::endl;
     return false;
   }
-  if (this->dataPtr->configWidgets.find(_name) != this->dataPtr->configWidgets.end())
+  if (this->dataPtr->configWidgets.find(_name) !=
+      this->dataPtr->configWidgets.end())
   {
     gzerr << "This config widget already has a child with that name. " <<
        "Names must be unique. Not adding child." << std::endl;
