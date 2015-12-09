@@ -511,6 +511,18 @@ bool ConfigWidget::SetVector3WidgetValue(const std::string &_name,
   auto iter = this->dataPtr->configWidgets.find(_name);
 
   if (iter != this->dataPtr->configWidgets.end())
+    return this->UpdateVector3Widget(iter->second, _value.Ign());
+
+  return false;
+}
+
+/////////////////////////////////////////////////
+bool ConfigWidget::SetVector3WidgetValue(const std::string &_name,
+    const ignition::math::Vector3d &_value)
+{
+  auto iter = this->dataPtr->configWidgets.find(_name);
+
+  if (iter != this->dataPtr->configWidgets.end())
     return this->UpdateVector3Widget(iter->second, _value);
 
   return false;
@@ -535,6 +547,18 @@ bool ConfigWidget::SetPoseWidgetValue(const std::string &_name,
   auto iter = this->dataPtr->configWidgets.find(_name);
 
   if (iter != this->dataPtr->configWidgets.end())
+    return this->UpdatePoseWidget(iter->second, _value.Ign());
+
+  return false;
+}
+
+/////////////////////////////////////////////////
+bool ConfigWidget::SetPoseWidgetValue(const std::string &_name,
+    const ignition::math::Pose3d &_value)
+{
+  auto iter = this->dataPtr->configWidgets.find(_name);
+
+  if (iter != this->dataPtr->configWidgets.end())
     return this->UpdatePoseWidget(iter->second, _value);
 
   return false;
@@ -543,6 +567,22 @@ bool ConfigWidget::SetPoseWidgetValue(const std::string &_name,
 /////////////////////////////////////////////////
 bool ConfigWidget::SetGeometryWidgetValue(const std::string &_name,
     const std::string &_value, const math::Vector3 &_dimensions,
+    const std::string &_uri)
+{
+  auto iter = this->dataPtr->configWidgets.find(_name);
+
+  if (iter != this->dataPtr->configWidgets.end())
+  {
+    return this->UpdateGeometryWidget(iter->second, _value, _dimensions.Ign(),
+        _uri);
+  }
+
+  return false;
+}
+
+/////////////////////////////////////////////////
+bool ConfigWidget::SetGeometryWidgetValue(const std::string &_name,
+    const std::string &_value, const ignition::math::Vector3d &_dimensions,
     const std::string &_uri)
 {
   auto iter = this->dataPtr->configWidgets.find(_name);
@@ -689,7 +729,7 @@ std::string ConfigWidget::StringWidgetValue(const std::string &_name) const
 math::Vector3 ConfigWidget::GetVector3WidgetValue(const std::string &_name)
     const
 {
-  math::Vector3 value;
+  ignition::math::Vector3d value;
   std::map <std::string, ConfigChildWidget *>::const_iterator iter =
       this->dataPtr->configWidgets.find(_name);
 
@@ -981,7 +1021,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
                     toStdString();
               }
 
-              math::Vector3 dimensions;
+              ignition::math::Vector3d dimensions;
               // dimensions
               for (int k = 0; k < valueDescriptor->field_count() ; ++k)
               {
@@ -1022,9 +1062,9 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
                       geomValueDescriptor->FindFieldByName("length");
                   double length = geomValueMsg->GetReflection()->GetDouble(
                       *geomValueMsg, geomLengthField);
-                  dimensions.x = radius * 2.0;
-                  dimensions.y = dimensions.x;
-                  dimensions.z = length;
+                  dimensions.X(radius * 2.0);
+                  dimensions.Y(dimensions.X());
+                  dimensions.Z(length);
                   break;
                 }
                 else if (geomMsgName == "SphereGeom")
@@ -1033,9 +1073,9 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
                       geomValueDescriptor->FindFieldByName("radius");
                   double radius = geomValueMsg->GetReflection()->GetDouble(
                       *geomValueMsg, geomRadiusField);
-                  dimensions.x = radius * 2.0;
-                  dimensions.y = dimensions.x;
-                  dimensions.z = dimensions.x;
+                  dimensions.X(radius * 2.0);
+                  dimensions.Y(dimensions.X());
+                  dimensions.Z(dimensions.X());
                   break;
                 }
                 else if (geomMsgName == "PolylineGeom")
@@ -1056,7 +1096,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
               newFieldWidget = configChildWidget;
             }
 
-            math::Pose value;
+            ignition::math::Pose3d value;
             const google::protobuf::Descriptor *valueDescriptor =
                 valueMsg->GetDescriptor();
             int valueMsgFieldCount = valueDescriptor->field_count();
@@ -1075,8 +1115,8 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
                 google::protobuf::Message *posValueMsg =
                     valueMsg->GetReflection()->MutableMessage(
                     valueMsg, valueField);
-                math::Vector3 vec3 = this->ParseVector3(posValueMsg);
-                value.pos = vec3;
+                ignition::math::Vector3d vec3 = this->ParseVector3(posValueMsg);
+                value.Pos() = vec3;
               }
               else if (valueField->message_type()->name() == "Quaternion")
               {
@@ -1094,9 +1134,9 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
                   quatValues.push_back(quatValueMsg->GetReflection()->GetDouble(
                       *quatValueMsg, quatValueField));
                 }
-                math::Quaternion quat(quatValues[3], quatValues[0],
+                ignition::math::Quaterniond quat(quatValues[3], quatValues[0],
                     quatValues[1], quatValues[2]);
-                value.rot = quat;
+                value.Rot() = quat;
               }
             }
             this->UpdatePoseWidget(configChildWidget, value);
@@ -1110,7 +1150,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
               newFieldWidget = configChildWidget;
             }
 
-            math::Vector3 vec3 = this->ParseVector3(valueMsg);
+            ignition::math::Vector3d vec3 = this->ParseVector3(valueMsg);
             this->UpdateVector3Widget(configChildWidget, vec3);
           }
           // parse and create custom color widgets
@@ -1387,10 +1427,10 @@ GroupWidget *ConfigWidget::CreateGroupWidget(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
-math::Vector3 ConfigWidget::ParseVector3(const google::protobuf::Message *_msg)
-    const
+ignition::math::Vector3d ConfigWidget::ParseVector3(
+    const google::protobuf::Message *_msg) const
 {
-  math::Vector3 vec3;
+  ignition::math::Vector3d vec3;
   const google::protobuf::Descriptor *valueDescriptor = _msg->GetDescriptor();
   std::vector<double> values;
   for (unsigned int i = 0; i < 3; ++i)
@@ -1399,9 +1439,9 @@ math::Vector3 ConfigWidget::ParseVector3(const google::protobuf::Message *_msg)
         valueDescriptor->field(i);
     values.push_back(_msg->GetReflection()->GetDouble(*_msg, valueField));
   }
-  vec3.x = values[0];
-  vec3.y = values[1];
-  vec3.z = values[2];
+  vec3.X(values[0]);
+  vec3.Y(values[1]);
+  vec3.Z(values[2]);
   return vec3;
 }
 
@@ -2267,7 +2307,7 @@ void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
                   childWidget->widgets[2])->value();
               double sizeZ = qobject_cast<QDoubleSpinBox *>(
                   childWidget->widgets[3])->value();
-              math::Vector3 geomSize(sizeX, sizeY, sizeZ);
+              ignition::math::Vector3d geomSize(sizeX, sizeY, sizeZ);
 
               // set type
               std::string typeStr =
@@ -2385,7 +2425,7 @@ void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
                       qobject_cast<QDoubleSpinBox *>(childWidget->widgets[k]);
                   values.push_back(valueSpinBox->value());
                 }
-                math::Vector3 vec3(values[0], values[1], values[2]);
+                ignition::math::Vector3d vec3(values[0], values[1], values[2]);
                 this->UpdateVector3Msg(posValueMsg, vec3);
               }
               else if (valueField->message_type()->name() == "Quaternion")
@@ -2429,7 +2469,7 @@ void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
                   qobject_cast<QDoubleSpinBox *>(childWidget->widgets[j]);
               values.push_back(valueSpinBox->value());
             }
-            math::Vector3 vec3(values[0], values[1], values[2]);
+            ignition::math::Vector3d vec3(values[0], values[1], values[2]);
             this->UpdateVector3Msg(valueMsg, vec3);
           }
           else if (field->message_type()->name() == "Color")
@@ -2485,14 +2525,14 @@ void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
 
 /////////////////////////////////////////////////
 void ConfigWidget::UpdateVector3Msg(google::protobuf::Message *_msg,
-    const math::Vector3 &_value)
+    const ignition::math::Vector3d &_value)
 {
   const google::protobuf::Descriptor *valueDescriptor = _msg->GetDescriptor();
 
   std::vector<double> values;
-  values.push_back(_value.x);
-  values.push_back(_value.y);
-  values.push_back(_value.z);
+  values.push_back(_value.X());
+  values.push_back(_value.Y());
+  values.push_back(_value.Z());
 
   for (unsigned int i = 0; i < 3; ++i)
   {
@@ -2602,27 +2642,27 @@ bool ConfigWidget::UpdateBoolWidget(ConfigChildWidget *_widget, bool _value)
 
 /////////////////////////////////////////////////
 bool ConfigWidget::UpdateVector3Widget(ConfigChildWidget *_widget,
-    const math::Vector3 &_vec)
+    const ignition::math::Vector3d &_vec)
 {
   if (_widget->widgets.size() == 4u)
   {
-    qobject_cast<QDoubleSpinBox *>(_widget->widgets[0])->setValue(_vec.x);
-    qobject_cast<QDoubleSpinBox *>(_widget->widgets[1])->setValue(_vec.y);
-    qobject_cast<QDoubleSpinBox *>(_widget->widgets[2])->setValue(_vec.z);
+    qobject_cast<QDoubleSpinBox *>(_widget->widgets[0])->setValue(_vec.X());
+    qobject_cast<QDoubleSpinBox *>(_widget->widgets[1])->setValue(_vec.Y());
+    qobject_cast<QDoubleSpinBox *>(_widget->widgets[2])->setValue(_vec.Z());
 
     // Update preset
     int preset = 0;
-    if (_vec == math::Vector3::UnitX)
+    if (_vec == ignition::math::Vector3d::UnitX)
       preset = 1;
-    else if (_vec == -math::Vector3::UnitX)
+    else if (_vec == -ignition::math::Vector3d::UnitX)
       preset = 2;
-    else if (_vec == math::Vector3::UnitY)
+    else if (_vec == ignition::math::Vector3d::UnitY)
       preset = 3;
-    else if (_vec == -math::Vector3::UnitY)
+    else if (_vec == -ignition::math::Vector3d::UnitY)
       preset = 4;
-    else if (_vec == math::Vector3::UnitZ)
+    else if (_vec == ignition::math::Vector3d::UnitZ)
       preset = 5;
-    else if (_vec == -math::Vector3::UnitZ)
+    else if (_vec == -ignition::math::Vector3d::UnitZ)
       preset = 6;
 
     qobject_cast<QComboBox *>(_widget->widgets[3])->setCurrentIndex(preset);
@@ -2657,18 +2697,21 @@ bool ConfigWidget::UpdateColorWidget(ConfigChildWidget *_widget,
 
 /////////////////////////////////////////////////
 bool ConfigWidget::UpdatePoseWidget(ConfigChildWidget *_widget,
-    const math::Pose &_pose)
+    const ignition::math::Pose3d &_pose)
 {
   if (_widget->widgets.size() == 6u)
   {
-    qobject_cast<QDoubleSpinBox *>(_widget->widgets[0])->setValue(_pose.pos.x);
-    qobject_cast<QDoubleSpinBox *>(_widget->widgets[1])->setValue(_pose.pos.y);
-    qobject_cast<QDoubleSpinBox *>(_widget->widgets[2])->setValue(_pose.pos.z);
+    qobject_cast<QDoubleSpinBox *>(_widget->widgets[0])->setValue(
+        _pose.Pos().X());
+    qobject_cast<QDoubleSpinBox *>(_widget->widgets[1])->setValue(
+        _pose.Pos().Y());
+    qobject_cast<QDoubleSpinBox *>(_widget->widgets[2])->setValue(
+        _pose.Pos().Z());
 
-    math::Vector3 rot = _pose.rot.GetAsEuler();
-    qobject_cast<QDoubleSpinBox *>(_widget->widgets[3])->setValue(rot.x);
-    qobject_cast<QDoubleSpinBox *>(_widget->widgets[4])->setValue(rot.y);
-    qobject_cast<QDoubleSpinBox *>(_widget->widgets[5])->setValue(rot.z);
+    ignition::math::Vector3d rot = _pose.Rot().Euler();
+    qobject_cast<QDoubleSpinBox *>(_widget->widgets[3])->setValue(rot.X());
+    qobject_cast<QDoubleSpinBox *>(_widget->widgets[4])->setValue(rot.Y());
+    qobject_cast<QDoubleSpinBox *>(_widget->widgets[5])->setValue(rot.Z());
     return true;
   }
   else
@@ -2680,7 +2723,7 @@ bool ConfigWidget::UpdatePoseWidget(ConfigChildWidget *_widget,
 
 /////////////////////////////////////////////////
 bool ConfigWidget::UpdateGeometryWidget(ConfigChildWidget *_widget,
-    const std::string &_value, const math::Vector3 &_dimensions,
+    const std::string &_value, const ignition::math::Vector3d &_dimensions,
     const std::string &_uri)
 {
   if (_widget->widgets.size() != 8u)
@@ -2705,23 +2748,23 @@ bool ConfigWidget::UpdateGeometryWidget(ConfigChildWidget *_widget,
   if (_value == "box" || isMesh)
   {
     qobject_cast<QDoubleSpinBox *>(_widget->widgets[1])->setValue(
-        _dimensions.x);
+        _dimensions.X());
     qobject_cast<QDoubleSpinBox *>(_widget->widgets[2])->setValue(
-        _dimensions.y);
+        _dimensions.Y());
     qobject_cast<QDoubleSpinBox *>(_widget->widgets[3])->setValue(
-        _dimensions.z);
+        _dimensions.Z());
   }
   else if (_value == "cylinder")
   {
     qobject_cast<QDoubleSpinBox *>(_widget->widgets[4])->setValue(
-        _dimensions.x*0.5);
+        _dimensions.X()*0.5);
     qobject_cast<QDoubleSpinBox *>(_widget->widgets[5])->setValue(
-        _dimensions.z);
+        _dimensions.Z());
   }
   else if (_value == "sphere")
   {
     qobject_cast<QDoubleSpinBox *>(_widget->widgets[4])->setValue(
-        _dimensions.x*0.5);
+        _dimensions.X()*0.5);
   }
   else if (_value == "polyline")
   {

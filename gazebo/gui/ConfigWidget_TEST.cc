@@ -173,14 +173,14 @@ void ConfigWidget_TEST::JointMsgWidget()
         gazebo::msgs::Joint_Type_UNIVERSAL));
 
     // pose
-    gazebo::math::Vector3 pos(2.0, 9.0, -4.0);
-    gazebo::math::Quaternion quat(0.0, 0.0, 1.57);
+    ignition::math::Vector3d pos(2.0, 9.0, -4.0);
+    ignition::math::Quaterniond quat(0.0, 0.0, 1.57);
     jointConfigWidget->SetPoseWidgetValue("pose",
-        gazebo::math::Pose(pos, quat));
+        ignition::math::Pose3d(pos, quat));
 
     // axis1
     jointConfigWidget->SetVector3WidgetValue("axis1::xyz",
-        gazebo::math::Vector3::UnitY);
+        ignition::math::Vector3d::UnitY);
     jointConfigWidget->SetBoolWidgetValue("axis1::use_parent_model_frame",
         true);
     jointConfigWidget->SetDoubleWidgetValue("axis1::limit_lower", -1.2);
@@ -191,7 +191,7 @@ void ConfigWidget_TEST::JointMsgWidget()
 
     // axis2
     jointConfigWidget->SetVector3WidgetValue("axis2::xyz",
-        gazebo::math::Vector3::UnitZ);
+        ignition::math::Vector3d::UnitZ);
     jointConfigWidget->SetBoolWidgetValue("axis2::use_parent_model_frame",
         true);
     jointConfigWidget->SetDoubleWidgetValue("axis2::limit_lower", -3.2);
@@ -355,10 +355,10 @@ void ConfigWidget_TEST::JointMsgWidget()
         gazebo::msgs::Joint_Type_BALL));
 
     // pose
-    gazebo::math::Vector3 pos(-2.0, 1.0, 2.0);
-    gazebo::math::Quaternion quat(0.0, 0.0, 0.0);
+    ignition::math::Vector3d pos(-2.0, 1.0, 2.0);
+    ignition::math::Quaterniond quat(0.0, 0.0, 0.0);
     jointConfigWidget->SetPoseWidgetValue("pose",
-        gazebo::math::Pose(pos, quat));
+        ignition::math::Pose3d(pos, quat));
 
     // other joint physics properties
     jointConfigWidget->SetDoubleWidgetValue("cfm", 0.19);
@@ -598,17 +598,17 @@ void ConfigWidget_TEST::VisualMsgWidget()
     visualConfigWidget->SetBoolWidgetValue("delete_me", true);
     visualConfigWidget->SetBoolWidgetValue("is_static", true);
     visualConfigWidget->SetVector3WidgetValue("scale",
-        gazebo::math::Vector3(2.0, 1.5, 0.5));
+        ignition::math::Vector3d(2.0, 1.5, 0.5));
 
     // pose
-    gazebo::math::Vector3 pos(-2.0, -3.0, -4.0);
-    gazebo::math::Quaternion quat(0.0, 1.57, 0.0);
+    ignition::math::Vector3d pos(-2.0, -3.0, -4.0);
+    ignition::math::Quaterniond quat(0.0, 1.57, 0.0);
     visualConfigWidget->SetPoseWidgetValue("pose",
-        gazebo::math::Pose(pos, quat));
+        ignition::math::Pose3d(pos, quat));
 
     // geometry
     visualConfigWidget->SetGeometryWidgetValue("geometry", "box",
-        gazebo::math::Vector3(5.0, 3.0, 4.0));
+        ignition::math::Vector3d(5.0, 3.0, 4.0));
 
     // material
     visualConfigWidget->SetStringWidgetValue("material::normal_map",
@@ -1208,7 +1208,7 @@ void ConfigWidget_TEST::CreatedExternally()
   QVERIFY(configWidget->SetStringWidgetValue("string", stringValue));
   QVERIFY(configWidget->SetBoolWidgetValue("bool", boolValue));
   QVERIFY(configWidget->SetVector3WidgetValue("vector3d",
-      gazebo::math::Vector3(vector3dValue)));
+      ignition::math::Vector3d(vector3dValue)));
   QVERIFY(configWidget->SetColorWidgetValue("color", colorValue));
   QVERIFY(configWidget->SetPoseWidgetValue("pose", poseValue));
   QVERIFY(configWidget->SetEnumWidgetValue("enum", enumValue));

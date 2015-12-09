@@ -294,8 +294,17 @@ namespace gazebo
       /// \param[in] _name Name of the child widget.
       /// \param[in] _value Value to set to.
       /// \return True if the value is set successfully.
+      /// \deprecated See SetVector3WidgetValue(const std::string &_name,
+      ///                                 const ignition::math::Vector3 &_value)
       public: bool SetVector3WidgetValue(const std::string &_name,
-          const math::Vector3 &_value);
+          const math::Vector3 &_value) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Set a vector3 value to a child widget.
+      /// \param[in] _name Name of the child widget.
+      /// \param[in] _value Value to set to.
+      /// \return True if the value is set successfully.
+      public: bool SetVector3WidgetValue(const std::string &_name,
+          const ignition::math::Vector3d &_value);
 
       /// \brief Set a color value to a child widget.
       /// \param[in] _name Name of the child widget.
@@ -308,8 +317,30 @@ namespace gazebo
       /// \param[in] _name Name of the child widget.
       /// \param[in] _value Value to set to.
       /// \return True if the value is set successfully.
+      /// \deprecated See SetPoseWidgetValue(const std::string &_name,
+      ///                                  const ignition::math::Pose3d &_value)
       public: bool SetPoseWidgetValue(const std::string &_name,
-          const math::Pose &_value);
+          const math::Pose &_value) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Set a pose value to a child widget.
+      /// \param[in] _name Name of the child widget.
+      /// \param[in] _value Value to set to.
+      /// \return True if the value is set successfully.
+      public: bool SetPoseWidgetValue(const std::string &_name,
+          const ignition::math::Pose3d &_value);
+
+      /// \brief Set a geometry value to a child widget.
+      /// \param[in] _name Name of the child widget.
+      /// \param[in] _value Type of geometry.
+      /// \param[in] _dimensions Dimensions of geometry.
+      /// \return True if the value is set successfully.
+      /// \deprecated See SetGeometryWidgetValue(const std::string &_name,
+      ///                           const std::string &_value,
+      ///                           const ignition::math::Vector3d &_dimensions,
+      ///                           const std::string &_uri = "")
+      public: bool SetGeometryWidgetValue(const std::string &_name,
+          const std::string &_value, const math::Vector3 &_dimensions,
+          const std::string &_uri = "") GAZEBO_DEPRECATED(7.0);
 
       /// \brief Set a geometry value to a child widget.
       /// \param[in] _name Name of the child widget.
@@ -317,7 +348,8 @@ namespace gazebo
       /// \param[in] _dimensions Dimensions of geometry.
       /// \return True if the value is set successfully.
       public: bool SetGeometryWidgetValue(const std::string &_name,
-          const std::string &_value, const math::Vector3 &_dimensions,
+          const std::string &_value,
+          const ignition::math::Vector3d &_dimensions,
           const std::string &_uri = "");
 
       /// \brief Set an enum value to a child widget.
@@ -625,7 +657,7 @@ namespace gazebo
       /// \brief Parse a vector3 message.
       /// param[in] _msg Input vector3d message.
       /// return Parsed vector.
-      private: math::Vector3 ParseVector3(
+      private: ignition::math::Vector3d ParseVector3(
           const google::protobuf::Message *_msg) const;
 
       /// \brief Update the message field using values from the widgets.
@@ -638,7 +670,7 @@ namespace gazebo
       /// \param[in] _msg Vector3d message to be updated.
       /// \param[in] _value Vector3 used for updating the message.
       private: void UpdateVector3Msg(google::protobuf::Message *_msg,
-          const math::Vector3 &_value);
+          const ignition::math::Vector3d &_value);
 
       /// \brief Update a child widget with an unsigned integer value.
       /// \param[in] _widget Pointer to the child widget.
@@ -680,7 +712,7 @@ namespace gazebo
       /// \param[in] _value Value to set to.
       /// \return True if the update completed successfully.
       private: bool UpdateVector3Widget(ConfigChildWidget *_widget,
-          const math::Vector3 &_value);
+          const ignition::math::Vector3d &_value);
 
       /// \brief Update a child widget with a color value.
       /// \param[in] _widget Pointer to the child widget.
@@ -694,7 +726,7 @@ namespace gazebo
       /// \param[in] _value Value to set to.
       /// \return True if the update completed successfully.
       private: bool UpdatePoseWidget(ConfigChildWidget *_widget,
-          const math::Pose &_value);
+          const ignition::math::Pose3d &_value);
 
       /// \brief Update a child widget with a geometry type and dimensions.
       /// \param[in] _widget Pointer to the child widget.
@@ -703,7 +735,8 @@ namespace gazebo
       /// \param[in] _uri URI of the geometry mesh, if any.
       /// \return True if the update completed successfully.
       private: bool UpdateGeometryWidget(ConfigChildWidget *_widget,
-          const std::string &_value, const math::Vector3 &_dimensions,
+          const std::string &_value,
+          const ignition::math::Vector3d &_dimensions,
           const std::string &_uri = "");
 
       /// \brief Update a child widget with an enum value.
