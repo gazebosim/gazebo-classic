@@ -1129,6 +1129,88 @@ size_t Link::BatteryCount() const
 }
 
 //////////////////////////////////////////////////
+bool Link::VisualId(const std::string &_visName, uint32_t &_visualId) const
+{
+  for (auto &iter : this->visuals)
+  {
+    if (iter.second.name() == _visName ||
+        iter.second.name() == this->GetScopedName() + "::" + _visName)
+    {
+      _visualId = iter.first;
+      return true;
+    }
+  }
+  gzerr << "Trying to get unique ID of visual from invalid visual name["
+        << _visName << "] for link [" << this->GetScopedName() << "]\n";
+  return false;
+}
+
+//////////////////////////////////////////////////
+bool Link::VisualPose(const uint32_t _id, ignition::math::Pose3d &_pose) const
+{
+  auto iter = this->visuals.find(_id);
+  if (iter == this->visuals.end())
+  {
+    gzerr << "Trying to get pose of visual from invalid visual id[" << _id
+          << "] for link [" << this->GetScopedName() << "]\n";
+    return false;
+  }
+  const msgs::Visual &msg = iter->second;
+  if (msg.has_pose())
+  {
+    _pose = msgs::ConvertIgn(msg.pose());
+  }
+  else
+  {
+    // Pose wasn't specified on SDF, use default value
+    _pose = ignition::math::Pose3d::Zero;
+  }
+  return true;
+}
+
+//////////////////////////////////////////////////
+bool Link::SetVisualPose(const uint32_t _id,
+                         const ignition::math::Pose3d &_pose)
+{
+  auto iter = this->visuals.find(_id);
+  if (iter == this->visuals.end())
+  {
+    gzerr << "Trying to set pose of visual from invalid visual id[" << _id
+          << "] for link [" << this->GetScopedName() << "]\n";
+    return false;
+  }
+  msgs::Visual &msg = iter->second;
+  msgs::Set(msg.mutable_pose(), _pose);
+  std::string linkName = this->GetScopedName();
+  if (this->sdf->HasElement("visual"))
+  {
+    sdf::ElementPtr visualElem = this->sdf->GetElement("visual");
+    while (visualElem)
+    {
+      std::string visName = linkName + "::" +
+        visualElem->Get<std::string>("name");
+
+      // update visual msg if it exists
+      if (msg.name() == visName)
+      {
+        visualElem->GetElement("pose")->Set(_pose);
+        break;
+      }
+
+      visualElem = visualElem->GetNextElement("visual");
+    }
+  }
+  msgs::Visual visual;
+  visual.set_name(msg.name());
+  visual.set_id(_id);
+  visual.set_parent_name(linkName);
+  visual.set_parent_id(this->GetId());
+  msgs::Set(visual.mutable_pose(), _pose);
+  this->visPub->Publish(visual);
+  return true;
+}
+
+//////////////////////////////////////////////////
 void Link::OnCollision(ConstContactsPtr &_msg)
 {
   std::string collisionName1;
