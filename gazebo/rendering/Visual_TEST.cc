@@ -417,7 +417,7 @@ TEST_F(Visual_TEST, ChildTransparency)
   vis1->SetTransparency(noCascade, false);
   EXPECT_NEAR(vis1->GetTransparency(), noCascade, 1e-10);
   EXPECT_NEAR(vis2->GetTransparency(), 0.0, 1e-10);
-  EXPECT_NEAR(vis2->DerivedTransparency(), explicitCascade, 1e-7);
+  EXPECT_NEAR(vis2->DerivedTransparency(), 0.0, 1e-7);
 
   // Set vis2's transparency
   float vis2Transparency = 0.4;
