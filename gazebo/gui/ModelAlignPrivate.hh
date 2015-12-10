@@ -42,8 +42,9 @@ namespace gazebo
       /// \brief Model publisher that publishes model pose to the server.
       public: transport::PublisherPtr modelPub;
 
-      /// \brief Pointer to the user camera.
-      public: rendering::UserCameraPtr userCamera;
+      /// \brief Publish user command messages for the server to place in the
+      /// undo queue.
+      public: transport::PublisherPtr userCmdPub;
 
       /// \brief Pointer to the scene where models are in.
       public: rendering::ScenePtr scene;

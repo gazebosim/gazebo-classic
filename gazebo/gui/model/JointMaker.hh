@@ -120,8 +120,9 @@ namespace gazebo
       /// \brief Update callback on PreRender.
       public: void Update();
 
-      /// \brief Remove joint by name
-      /// \param[in] _jointName Name of joint to be removed.
+      /// \brief Remove joint by name.
+      /// \param[in] _jointName Name of joint to be removed, or an empty string
+      /// to remove the new joint under creation.
       public: void RemoveJoint(const std::string &_jointName);
 
       /// \brief Remove all joints connected to link.
@@ -235,7 +236,7 @@ namespace gazebo
       /// \param[in] _visual Visual of the link.
       /// \return Centroid in world coordinates;
       private: math::Vector3 GetLinkWorldCentroid(
-          const rendering::VisualPtr _visual);
+          const rendering::VisualPtr &_visual);
 
       /// \brief Open joint inspector.
       /// \param[in] _name Name of joint.
@@ -281,6 +282,16 @@ namespace gazebo
       private: JointData *CreateJointLine(const std::string &_name,
           rendering::VisualPtr _parent);
 
+      /// \brief Set a new parent link for the joint being created.
+      /// \param[in] _parentLink Pointer to the link visual.
+      /// \return True if successfully set new parent.
+      private: bool SetParentLink(rendering::VisualPtr _parentLink);
+
+      /// \brief Set a new child link for the joint being created.
+      /// \param[in] _childLink Pointer to the link visual.
+      /// \return True if successfully set new child.
+      private: bool SetChildLink(rendering::VisualPtr _childLink);
+
       /// \brief Qt signal when the joint creation process has ended.
       Q_SIGNALS: void JointAdded();
 
@@ -299,17 +310,11 @@ namespace gazebo
       /// currently triggered by the context menu via right click.
       private slots: void OnDelete();
 
-      /// \brief Constant vector containing [UnitX, UnitY, UnitZ].
-      private: std::vector<ignition::math::Vector3d> unitVectors;
-
       /// \brief Type of joint to create
       private: JointMaker::JointType jointType;
 
       /// \brief Visual that is currently hovered over by the mouse
       private: rendering::VisualPtr hoverVis;
-
-      /// \brief Currently selected visual
-      private: rendering::VisualPtr selectedVis;
 
       /// \brief Name of joint that is currently being inspected.
       private: std::string inspectName;
@@ -318,13 +323,10 @@ namespace gazebo
       private: std::map<std::string, JointData *> joints;
 
       /// \brief Joint currently being created.
-      private: JointData *mouseJoint;
+      private: JointData *newJoint;
 
       /// \brief All the event connections.
       private: std::vector<event::ConnectionPtr> connections;
-
-      /// \brief Flag set to true when a joint has been connected.
-      private: bool newJointCreated;
 
       /// \brief The SDF element pointer to the model that contains the joints.
       private: sdf::ElementPtr modelSDF;
@@ -347,6 +349,9 @@ namespace gazebo
       /// \brief A map of joint type to its string value.
       public: static std::map<JointMaker::JointType, std::string> jointTypes;
 
+      /// \brief Constant vector containing [UnitX, UnitY, UnitZ].
+      public: static std::vector<ignition::math::Vector3d> unitVectors;
+
       /// \brief A map of joint type to its corresponding material.
       public: static std::map<JointMaker::JointType, std::string>
           jointMaterials;
@@ -367,8 +372,12 @@ namespace gazebo
       /// \brief Open the joint inspector.
       public: void OpenInspector();
 
-      /// \brief Update this joint data.
+      /// \brief Update this joint data. Avoid calling this directly, instead,
+      /// set dirty to true and this will be called on PreRender.
       public: void Update();
+
+      /// \brief Update the joint message based on the other fields.
+      public: void UpdateMsg();
 
       /// \brief Name of the joint.
       public: std::string name;
@@ -409,7 +418,7 @@ namespace gazebo
       /// \brief Type of joint.
       public: JointMaker::JointType type;
 
-      /// \brief True if the joint visual needs update.
+      /// \brief True if the joint needs update.
       public: bool dirty;
 
       /// \brief Msg containing joint data.

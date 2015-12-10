@@ -234,9 +234,17 @@ VisualPtr Visual::Clone(const std::string &_name, VisualPtr _newParent)
   VisualPtr result(new Visual(_name, _newParent));
   result->Load(this->dataPtr->sdf);
   result->SetScale(this->dataPtr->scale);
+  result->SetVisibilityFlags(this->dataPtr->visibilityFlags);
+  std::string visName = this->GetName();
   for (auto iter: this->dataPtr->children)
   {
-    iter->Clone(iter->GetName(), result);
+    // give a unique name by prefixing child visuals with the new clone name
+    std::string childName = iter->GetName();
+    std::string newName = childName;
+    size_t pos = childName.find(visName);
+    if (pos == 0)
+      newName = _name + childName.substr(pos+visName.size());
+    iter->Clone(newName, result);
   }
 
   if (_newParent == this->dataPtr->scene->GetWorldVisual())
@@ -1543,7 +1551,6 @@ void Visual::SetHighlighted(bool _highlighted)
   // If this is a link, highlight frame visual
   if (this->GetType() == VT_LINK)
   {
-    VisualPtr linkFrameVis;
     for (auto child : this->dataPtr->children)
     {
       if (child->GetName().find("LINK_FRAME_VISUAL__") != std::string::npos)
@@ -2535,7 +2542,7 @@ bool Visual::IsDescendantOf(const rendering::VisualPtr _visual) const
 //////////////////////////////////////////////////
 unsigned int Visual::GetDepth() const
 {
-  boost::shared_ptr<Visual const> p = shared_from_this();
+  std::shared_ptr<const Visual> p = shared_from_this();
   unsigned int depth = 0;
   while (p->GetParent())
   {
@@ -3147,4 +3154,10 @@ msgs::Visual::Type Visual::ConvertVisualType(const Visual::VisualType &_type)
       break;
   }
   return visualType;
+}
+
+//////////////////////////////////////////////////
+bool Visual::UseRTShader() const
+{
+  return this->dataPtr->useRTShader;
 }

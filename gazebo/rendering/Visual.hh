@@ -57,7 +57,7 @@ namespace gazebo
     /// \class Visual Visual.hh rendering/rendering.hh
     /// \brief A renderable object
     class GZ_RENDERING_VISIBLE Visual :
-      public boost::enable_shared_from_this<Visual>
+      public std::enable_shared_from_this<Visual>
     {
       /// \brief Type of visual
       public: enum VisualType
@@ -589,6 +589,10 @@ namespace gazebo
       /// \brief Set type of visual.
       /// \param[in] _type Visual type.
       public: void SetType(const Visual::VisualType _type);
+
+      /// \brief Get whether this visual uses RT shader system.
+      /// \return True if RT shader is used.
+      public: bool UseRTShader() const;
 
       /// \brief Convert from msgs::Visual::Type to VisualType.
       /// \param[in] _type A msgs::Visual::Type enum.

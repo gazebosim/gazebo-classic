@@ -314,6 +314,9 @@ namespace gazebo
       /// \brief Class to manage preset simulation parameter profiles.
       public: PresetManagerPtr presetManager;
 
+      /// \brief Class to manage user commands.
+      public: UserCmdManagerPtr userCmdManager;
+
       /// \brief True if sensors have been initialized. This should be set
       /// by the SensorManager.
       public: std::atomic_bool sensorsInitialized;

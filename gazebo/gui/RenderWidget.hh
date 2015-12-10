@@ -44,8 +44,8 @@ namespace gazebo
       public: void CreateScene(const std::string &_name);
 
       /// \brief Add a widget inside the render widget
-      /// \param[in] _widget Widget to be added.
       /// \param[in] _index Index in the splitter to add the widget at.
+      /// \param[in] _widget Widget to be added.
       public: void InsertWidget(unsigned int _index, QWidget *_widget);
 
       /// \brief Show the time panel.

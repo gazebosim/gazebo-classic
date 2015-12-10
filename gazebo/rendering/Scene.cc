@@ -1954,6 +1954,9 @@ void Scene::PreRender()
         std::front_inserter(this->dataPtr->linkMsgs));
   }
 
+  // update the rt shader
+  RTShaderSystem::Instance()->Update();
+
   {
     boost::recursive_mutex::scoped_lock lock(this->dataPtr->poseMsgMutex);
 
@@ -2105,7 +2108,7 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
     if (!parentVis)
       return false;
 
-    // image size is 0 if renering is unavailable
+    // image size is 0 if rendering is unavailable
     if (_msg->camera().image_size().x() > 0 &&
         _msg->camera().image_size().y() > 0)
     {
@@ -3283,7 +3286,7 @@ void Scene::ShowContacts(bool _show)
     this->dataPtr->visuals[this->dataPtr->contactVisId] = vis;
   }
   else
-    vis = boost::dynamic_pointer_cast<ContactVisual>(
+    vis = std::dynamic_pointer_cast<ContactVisual>(
         this->dataPtr->visuals[this->dataPtr->contactVisId]);
 
   if (vis)

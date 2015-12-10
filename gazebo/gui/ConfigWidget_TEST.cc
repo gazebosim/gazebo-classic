@@ -907,6 +907,122 @@ void ConfigWidget_TEST::ConfigWidgetVisible()
 }
 
 /////////////////////////////////////////////////
+void ConfigWidget_TEST::CustomConfigWidgetReadOnly()
+{
+  auto configWidget = new gazebo::gui::ConfigWidget;
+  auto configLayout = new QVBoxLayout();
+
+  // Create a child widget
+  {
+    auto vecWidget = configWidget->CreateVector3dWidget("vector3d", 0);
+    auto stringWidget = configWidget->CreateStringWidget("string", 0);
+
+    QVERIFY(configWidget->AddConfigChildWidget("vector3d", vecWidget));
+    QVERIFY(configWidget->AddConfigChildWidget("string", stringWidget));
+
+    auto *childLayout = new QVBoxLayout();
+    childLayout->addWidget(vecWidget);
+    childLayout->addWidget(stringWidget);
+
+    auto childWidget = new gazebo::gui::ConfigChildWidget();
+    childWidget->setLayout(childLayout);
+
+    auto groupWidget = configWidget->CreateGroupWidget("group",
+        childWidget, 0);
+
+    configLayout->addWidget(groupWidget);
+  }
+
+  // Create a custom child widget
+  {
+    auto customLabel = new QLabel("custom label");
+    customLabel->setObjectName("label");
+    auto custom1 = new QToolButton();
+    auto custom2 = new QDoubleSpinBox();
+    auto custom3 = new QLineEdit();
+
+    auto customLayout = new QGridLayout();
+    customLayout->addWidget(customLabel, 0, 0);
+    customLayout->addWidget(custom1, 0, 1);
+    customLayout->addWidget(custom2, 0, 2);
+    customLayout->addWidget(custom3, 0, 3);
+
+    auto customLayout2 = new QVBoxLayout();
+    customLayout2->addLayout(customLayout);
+
+    auto customWidget = new gazebo::gui::ConfigChildWidget();
+    customWidget->setLayout(customLayout2);
+
+    QVERIFY(configWidget->AddConfigChildWidget("custom", customWidget));
+
+    auto customGroupWidget = configWidget->CreateGroupWidget("custom group",
+        customWidget, 0);
+
+    configLayout->addWidget(customGroupWidget);
+  }
+  configWidget->setLayout(configLayout);
+
+  // set to be read-only
+  {
+    configWidget->SetWidgetReadOnly("vector3d", true);
+    configWidget->SetWidgetReadOnly("string", true);
+    configWidget->SetWidgetReadOnly("custom", true);
+
+    QCOMPARE(configWidget->GetWidgetReadOnly("vector3d"), true);
+    QCOMPARE(configWidget->GetWidgetReadOnly("string"), true);
+    QCOMPARE(configWidget->GetWidgetReadOnly("custom"), true);
+    {
+      auto childWidgets =
+          configWidget->ConfigChildWidgetByName("custom")->
+          findChildren<QWidget *>();
+      QCOMPARE(childWidgets.size(), 5);
+      for (auto it : childWidgets)
+        QCOMPARE(it->isEnabled(), false);
+    }
+  }
+
+  // set read-only back to false
+  {
+    configWidget->SetWidgetReadOnly("vector3d", false);
+    configWidget->SetWidgetReadOnly("string", false);
+    configWidget->SetWidgetReadOnly("custom", false);
+
+    QCOMPARE(configWidget->GetWidgetReadOnly("vector3d"), false);
+    QCOMPARE(configWidget->GetWidgetReadOnly("string"), false);
+    QCOMPARE(configWidget->GetWidgetReadOnly("custom"), false);
+    {
+      auto childWidgets =
+          configWidget->ConfigChildWidgetByName("custom")->
+          findChildren<QWidget *>();
+      QCOMPARE(childWidgets.size(), 5);
+      for (auto it : childWidgets)
+        QCOMPARE(it->isEnabled(), true);
+    }
+  }
+
+  // set read-only back to true
+  {
+    configWidget->SetWidgetReadOnly("vector3d", true);
+    configWidget->SetWidgetReadOnly("string", true);
+    configWidget->SetWidgetReadOnly("custom", true);
+
+    QCOMPARE(configWidget->GetWidgetReadOnly("vector3d"), true);
+    QCOMPARE(configWidget->GetWidgetReadOnly("string"), true);
+    QCOMPARE(configWidget->GetWidgetReadOnly("custom"), true);
+    {
+      auto childWidgets =
+          configWidget->ConfigChildWidgetByName("custom")->
+          findChildren<QWidget *>();
+      QCOMPARE(childWidgets.size(), 5);
+      for (auto it : childWidgets)
+        QCOMPARE(it->isEnabled(), false);
+    }
+  }
+
+  delete configWidget;
+}
+
+/////////////////////////////////////////////////
 void ConfigWidget_TEST::ConfigWidgetReadOnly()
 {
   gazebo::gui::ConfigWidget *visualConfigWidget =
@@ -1444,15 +1560,25 @@ void ConfigWidget_TEST::ChildVector3dSignal()
   QVERIFY(configWidget->GetVector3WidgetValue("vector3") ==
       gazebo::math::Vector3());
 
-  // Get signal emitting widgets
+  // Get axes spins
   QList<QDoubleSpinBox *> spins =
       vector3Widget->findChildren<QDoubleSpinBox *>();
   QCOMPARE(spins.size(), 3);
 
+  // Get preset combo
+  auto combos = vector3Widget->findChildren<QComboBox *>();
+  QCOMPARE(combos.size(), 1);
+
   // Change the X value and check new vector3 at OnVector3dValueChanged
+  QVERIFY(g_vector3SignalCount == 0);
   spins[0]->setValue(2.5);
   QTest::keyClick(spins[0], Qt::Key_Enter);
-  QVERIFY(g_vector3SignalReceived == true);
+  QVERIFY(g_vector3SignalCount == 1);
+
+  // Change the preset value and check new vector3 at OnVector3dValueChanged
+  combos[0]->setCurrentIndex(4);
+  QTest::keyClick(combos[0], Qt::Key_Enter);
+  QVERIFY(g_vector3SignalCount == 2);
 
   delete configWidget;
 }
@@ -1462,8 +1588,19 @@ void ConfigWidget_TEST::OnVector3dValueChanged(const QString &_name,
     const ignition::math::Vector3d &_vector3)
 {
   QVERIFY(_name == "vector3");
-  QVERIFY(_vector3 == ignition::math::Vector3d(2.5, 0, 0));
-  g_vector3SignalReceived = true;
+
+  // From spins
+  if (g_vector3SignalCount == 0)
+  {
+    QVERIFY(_vector3 == ignition::math::Vector3d(2.5, 0, 0));
+    g_vector3SignalCount++;
+  }
+  // From preset combo
+  else if (g_vector3SignalCount == 1)
+  {
+    QVERIFY(_vector3 == ignition::math::Vector3d(0, -1, 0));
+    g_vector3SignalCount++;
+  }
 }
 
 /////////////////////////////////////////////////
@@ -1555,6 +1692,61 @@ void ConfigWidget_TEST::OnPoseValueChanged(const QString &_name,
 }
 
 /////////////////////////////////////////////////
+void ConfigWidget_TEST::ChildGeometrySignal()
+{
+  gazebo::gui::ConfigWidget *configWidget = new gazebo::gui::ConfigWidget;
+
+  // Create child widget
+  gazebo::gui::ConfigChildWidget *geometryWidget =
+      configWidget->CreateGeometryWidget("geometry");
+  QVERIFY(geometryWidget != NULL);
+
+  // Add to config widget
+  QVERIFY(configWidget->AddConfigChildWidget("geometry", geometryWidget));
+
+  // Connect signals
+  connect(configWidget,
+      SIGNAL(GeometryValueChanged(const std::string &, const std::string &,
+      const ignition::math::Vector3d &, const std::string &)),
+      this,
+      SLOT(OnGeometryValueChanged(const std::string &, const std::string &,
+      const ignition::math::Vector3d &, const std::string &)));
+
+  // Check default
+  ignition::math::Vector3d dimensions;
+  std::string uri;
+  std::string value = configWidget->GeometryWidgetValue("geometry",
+      dimensions, uri);
+  QVERIFY(value == "box");
+  QVERIFY(dimensions == ignition::math::Vector3d(1, 1, 1));
+  QVERIFY(uri == "");
+
+  // Get signal emitting widgets
+  QList<QDoubleSpinBox *> spins =
+      geometryWidget->findChildren<QDoubleSpinBox *>();
+  QCOMPARE(spins.size(), 5);
+
+  // Change the value and check new pose at OnGeometryValueChanged
+  spins[2]->setValue(2.0);
+  QTest::keyClick(spins[2], Qt::Key_Enter);
+  QVERIFY(g_geometrySignalReceived == true);
+
+  delete configWidget;
+}
+
+/////////////////////////////////////////////////
+void ConfigWidget_TEST::OnGeometryValueChanged(const std::string &_name,
+    const std::string &_value, const ignition::math::Vector3d &_dimensions,
+    const std::string &_uri)
+{
+  QVERIFY(_name == "geometry");
+  QVERIFY(_value == "box");
+  QVERIFY(_dimensions == ignition::math::Vector3d(2, 1, 1));
+  QVERIFY(_uri == "");
+  g_geometrySignalReceived = true;
+}
+
+/////////////////////////////////////////////////
 void ConfigWidget_TEST::ChildEnumSignal()
 {
   gazebo::gui::ConfigWidget *configWidget = new gazebo::gui::ConfigWidget;
@@ -1599,6 +1791,42 @@ void ConfigWidget_TEST::OnEnumValueChanged(const QString &_name,
   QVERIFY(_name == "enum");
   QVERIFY(_value == "value3");
   g_enumSignalReceived = true;
+}
+
+/////////////////////////////////////////////////
+void ConfigWidget_TEST::GetChildWidgetByName()
+{
+  // Create config widget and check it has no children
+  gazebo::gui::ConfigWidget *configWidget = new gazebo::gui::ConfigWidget;
+  QVERIFY(configWidget != NULL);
+  QCOMPARE(configWidget->ConfigChildWidgetCount(), 0u);
+
+  // Try to get a child widget by name
+  gazebo::gui::ConfigChildWidget *widget =
+      configWidget->ConfigChildWidgetByName("child_widget");
+  QVERIFY(widget == NULL);
+
+  widget = configWidget->ConfigChildWidgetByName("");
+  QVERIFY(widget == NULL);
+
+  // Create child widget
+  gazebo::gui::ConfigChildWidget *childWidget =
+      configWidget->CreateBoolWidget("child_widget");
+  QVERIFY(childWidget != NULL);
+
+  // Add to config widget
+  QVERIFY(configWidget->AddConfigChildWidget("child_widget", childWidget));
+  QCOMPARE(configWidget->ConfigChildWidgetCount(), 1u);
+
+  // Get the widget by name
+  widget = configWidget->ConfigChildWidgetByName("child_widget");
+  QVERIFY(widget != NULL);
+
+  // Check that a bad name returns NULL
+  widget = configWidget->ConfigChildWidgetByName("bad_name");
+  QVERIFY(widget == NULL);
+
+  delete configWidget;
 }
 
 // Generate a main function for the test
