@@ -45,9 +45,8 @@ class UndoTest : public QTestFixture
   /// \brief Test undoing reset model poses commands.
   private slots: void UndoResetModelPoses();
 
-  /// \brief Test message passing between gui::UserCmdHistory and
-  /// physics::UserCmdManager.
-  private slots: void Wrench();
+  /// \brief Test undoing wrench commands.
+  private slots: void UndoWrench();
 
   /// \brief UndoRedo message received
   /// \param[in] _msg Message containing an undo/redo request.

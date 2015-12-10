@@ -355,6 +355,9 @@ void UndoTest::UndoResetTime()
   gzmsg << "Initial time [" << initialTime << "] new time [" << newTime
       << "]    sleep [" << sleep << "]" << std::endl;
   QVERIFY(newTime == initialTime);
+
+  delete mainWindow;
+  mainWindow = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -448,6 +451,9 @@ void UndoTest::UndoResetWorld()
         << "]    sleep [" << sleep << "]" << std::endl;
   QVERIFY(newTime == initialTime);
   QVERIFY(boxNewPose == boxFinalPose);
+
+  delete mainWindow;
+  mainWindow = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -535,10 +541,13 @@ void UndoTest::UndoResetModelPoses()
   gzmsg << "Initial pose [" << boxInitialPose << "] new pose [" << boxNewPose
         << "]    sleep [" << sleep << "]" << std::endl;
   QVERIFY(boxNewPose == boxFinalPose);
+
+  delete mainWindow;
+  mainWindow = NULL;
 }
 
 /////////////////////////////////////////////////
-void UndoTest::Wrench()
+void UndoTest::UndoWrench()
 {
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
@@ -546,7 +555,7 @@ void UndoTest::Wrench()
   this->Load("worlds/shapes.world");
 
   // Get world
-  gazebo::physics::WorldPtr world = gazebo::physics::get_world("default");
+  auto world = gazebo::physics::get_world("default");
   QVERIFY(world != NULL);
 
   // Get box
@@ -555,7 +564,7 @@ void UndoTest::Wrench()
   auto boxPose = box->GetWorldPose();
 
   // Create the main window.
-  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  auto mainWindow = new gazebo::gui::MainWindow();
   QVERIFY(mainWindow != NULL);
   mainWindow->Load();
   mainWindow->Init();
@@ -574,14 +583,16 @@ void UndoTest::Wrench()
   node = gazebo::transport::NodePtr(new gazebo::transport::Node());
   node->Init();
 
-  gazebo::transport::PublisherPtr userCmdPub =
-      node->Advertise<gazebo::msgs::UserCmd>("~/user_cmd");
+  auto userCmdPub = node->Advertise<gazebo::msgs::UserCmd>("~/user_cmd");
 
   // Apply wrench to box
   gazebo::msgs::Wrench wrenchMsg;
-  gazebo::msgs::Set(wrenchMsg.mutable_force(), ignition::math::Vector3d(10000, 0, 0));
-  gazebo::msgs::Set(wrenchMsg.mutable_torque(), ignition::math::Vector3d::Zero);
-  gazebo::msgs::Set(wrenchMsg.mutable_force_offset(), ignition::math::Vector3d::Zero);
+  gazebo::msgs::Set(wrenchMsg.mutable_force(),
+      ignition::math::Vector3d(10000, 0, 0));
+  gazebo::msgs::Set(wrenchMsg.mutable_torque(),
+      ignition::math::Vector3d::Zero);
+  gazebo::msgs::Set(wrenchMsg.mutable_force_offset(),
+      ignition::math::Vector3d::Zero);
 
   gazebo::msgs::UserCmd msg;
   msg.set_description("Apply wrench");
@@ -628,6 +639,9 @@ void UndoTest::Wrench()
   gzmsg << "Undo: Initial pose [" << boxPose << "] new pose [" << newBoxPose <<
       "]" << std::endl;
   QVERIFY(newBoxPose == boxPose);
+
+  delete mainWindow;
+  mainWindow = NULL;
 }
 
 // Generate a main function for the test
