@@ -3,6 +3,9 @@
 1 Use opaque pointers in the gui/ConfigWidget class.
     * [Pull request #2027](https://bitbucket.org/osrf/gazebo/pull-request/2027)
 
+1. Implemented private data pointer for the RTShaderSystem class. Minimized shader updates to once per render update.
+    * [Pull request #2003](https://bitbucket.org/osrf/gazebo/pull-request/2003)
+    
 1. Updating physics library to use ignition math.
     * [Pull request #2007](https://bitbucket.org/osrf/gazebo/pull-request/2007)
 
@@ -110,6 +113,10 @@ using the same arguments used in the command line.
 1. Fix minimum window height
    * [Pull request #1977](https://bitbucket.org/osrf/gazebo/pull-request/1977)
    * [Issue #1706](https://bitbucket.org/osrf/gazebo/issue/1706)
+
+1. Fix unadvertising a publisher - only unadvertise topic if it is the last publisher.
+   * [Pull request #2005](https://bitbucket.org/osrf/gazebo/pull-request/2005)
+   * [Issue #1782](https://bitbucket.org/osrf/gazebo/issue/1782)
 
 1. Log playback GUI for multistep, rewind, forward and seek
     * [Pull request #1791](https://bitbucket.org/osrf/gazebo/pull-request/1791)
