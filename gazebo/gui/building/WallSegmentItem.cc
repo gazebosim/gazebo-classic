@@ -29,7 +29,8 @@ using namespace gui;
 
 /////////////////////////////////////////////////
 WallSegmentItem::WallSegmentItem(const QPointF &_start, const QPointF &_end,
-    const double _height) : SegmentItem(*new WallSegmentItemPrivate), BuildingItem()
+    const double _height)
+    : SegmentItem(*new WallSegmentItemPrivate), BuildingItem()
 {
   auto dPtr = static_cast<WallSegmentItemPrivate *>(this->dataPtr);
 

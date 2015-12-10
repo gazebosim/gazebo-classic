@@ -18,6 +18,8 @@
 #ifndef _GAZEBO_BUILDING_RECT_ITEM_PRIVATE_HH_
 #define _GAZEBO_BUILDING_RECT_ITEM_PRIVATE_HH_
 
+#include <vector>
+
 #include "gazebo/gui/building/MeasureItem.hh"
 #include "gazebo/gui/building/RotateHandle.hh"
 #include "gazebo/gui/building/EditorItemPrivate.hh"

@@ -145,6 +145,9 @@ namespace gazebo
       /// \brief Update this item's measures.
       protected: void UpdateMeasures();
 
+      /// \brief Initialize this class.
+      private: void Init();
+
       /// \brief Filter Qt events and redirect them to the rotate handle.
       /// \param[in] _rotateHandle Rotate handle that will handle the event.
       /// \param[in] _event Qt event

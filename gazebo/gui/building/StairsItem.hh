@@ -18,10 +18,7 @@
 #ifndef _GAZEBO_BUILDING_STAIRS_ITEM_HH_
 #define _GAZEBO_BUILDING_STAIRS_ITEM_HH_
 
-//#include "gazebo/gui/qt.h"
 #include "gazebo/gui/building/RectItem.hh"
-//#include "gazebo/gui/building/BuildingItem.hh"
-//#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

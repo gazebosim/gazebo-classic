@@ -18,6 +18,8 @@
 #ifndef _GAZEBO_BUILDING_SEGMENT_ITEM_PRIVATE_HH_
 #define _GAZEBO_BUILDING_SEGMENT_ITEM_PRIVATE_HH_
 
+#include <vector>
+
 #include "gazebo/gui/building/EditorItemPrivate.hh"
 
 namespace gazebo

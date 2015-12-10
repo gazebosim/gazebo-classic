@@ -18,6 +18,8 @@
 #ifndef _GAZEBO_BUILDING_FLOOR_ITEM_PRIVATE_HH_
 #define _GAZEBO_BUILDING_FLOOR_ITEM_PRIVATE_HH_
 
+#include <vector>
+
 #include "gazebo/gui/building/RectItemPrivate.hh"
 
 namespace gazebo

@@ -1105,8 +1105,8 @@ void EditorView::OnAddLevel()
     // start / end
     for (int g = 0; g < 2; ++g)
     {
-      for (unsigned int i = 0; i < oldWall->Grabbers()[g]->linkedGrabbers.size();
-          ++i)
+      for (unsigned int i = 0;
+           i < oldWall->Grabbers()[g]->linkedGrabbers.size(); ++i)
       {
         WallSegmentItem *parentItem = dynamic_cast<WallSegmentItem*>(
             oldWall->Grabbers()[g]->linkedGrabbers[i]->parentItem());

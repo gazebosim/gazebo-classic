@@ -30,67 +30,18 @@ using namespace gui;
 /////////////////////////////////////////////////
 RectItem::RectItem() : EditorItem(*new RectItemPrivate)
 {
-  auto dPtr = static_cast<RectItemPrivate *>(this->dataPtr);
-
-  dPtr->editorType = "Rect";
-
-  dPtr->width = 100;
-  dPtr->height = 100;
-  dPtr->highlighted = true;
-
-  dPtr->drawingOriginX = 0;
-  dPtr->drawingOriginY = 0;
-
-  dPtr->positionOnWall = 0;
-  dPtr->angleOnWall = 0;
-
-  dPtr->drawingWidth = dPtr->width;
-  dPtr->drawingHeight = dPtr->height;
-
-  dPtr->borderColor = Qt::black;
-
-  for (int i = 0; i < 8; ++i)
-  {
-    GrabberHandle *grabber = new GrabberHandle(this, i);
-    dPtr->grabbers.push_back(grabber);
-  }
-  dPtr->rotateHandle = new RotateHandle(this);
-
-  this->setSelected(false);
-  this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable);
-  this->setFlag(QGraphicsItem::ItemSendsScenePositionChanges);
-
-  this->UpdateCornerPositions();
-  this->setAcceptHoverEvents(true);
-
-  dPtr->cursors.push_back(Qt::SizeFDiagCursor);
-  dPtr->cursors.push_back(Qt::SizeVerCursor);
-  dPtr->cursors.push_back(Qt::SizeBDiagCursor);
-  dPtr->cursors.push_back(Qt::SizeHorCursor);
-
-  this->setCursor(Qt::SizeAllCursor);
-
-  dPtr->rotationAngle = 0;
-
-  dPtr->zValueIdle = 1;
-  dPtr->zValueSelected = 5;
-
-  this->SetResizeFlag(ITEM_WIDTH | ITEM_HEIGHT);
-
-  dPtr->openInspectorAct = new QAction(tr("&Open Inspector"), this);
-  dPtr->openInspectorAct->setStatusTip(tr("Open Inspector"));
-  connect(dPtr->openInspectorAct, SIGNAL(triggered()),
-    this, SLOT(OnOpenInspector()));
-
-  dPtr->deleteItemAct = new QAction(tr("&Delete"), this);
-  dPtr->deleteItemAct->setStatusTip(tr("Delete"));
-  connect(dPtr->deleteItemAct, SIGNAL(triggered()),
-    this, SLOT(OnDeleteItem()));
+  this->Init();
 }
 
 //////////////////////////////////////////////////
 RectItem::RectItem(RectItemPrivate &_dataPtr)
     : EditorItem(_dataPtr)
+{
+  this->Init();
+}
+
+//////////////////////////////////////////////////
+void RectItem::Init()
 {
   auto dPtr = static_cast<RectItemPrivate *>(this->dataPtr);
 

@@ -31,44 +31,29 @@ const double SegmentItem::SnapLength = 0.25;
 SegmentItem::SegmentItem(QGraphicsItem *_parent)
     : EditorItem(*new SegmentItemPrivate), QGraphicsLineItem(_parent)
 {
-  auto dPtr = static_cast<SegmentItemPrivate *>(this->dataPtr);
-
-  dPtr->editorType = "Segment";
-  dPtr->itemScale = BuildingMaker::conversionScale;
-
   if (_parent)
     this->setParentItem(_parent);
 
-  this->setFlag(QGraphicsItem::ItemIsSelectable, true);
-  this->setAcceptHoverEvents(true);
-  this->setZValue(0);
-
-  GrabberHandle *grabber = new GrabberHandle(this, 0);
-  dPtr->grabberWidth = grabber->boundingRect().width();
-  dPtr->grabberHeight = grabber->boundingRect().height();
-  dPtr->grabbers.push_back(grabber);
-  grabber->setPos(
-      dPtr->start.x() - dPtr->grabberWidth/2.0,
-      dPtr->start.y() - dPtr->grabberHeight/2.0);
-
-  grabber = new GrabberHandle(this, 1);
-  dPtr->grabbers.push_back(grabber);
-  grabber->setPos(
-      dPtr->end.x() - grabber->boundingRect().width()/2.0,
-      dPtr->end.y() - grabber->boundingRect().height()/2.0);
+  this->Init();
 }
 
 //////////////////////////////////////////////////
 SegmentItem::SegmentItem(SegmentItemPrivate &_dataPtr, QGraphicsItem *_parent)
-    : EditorItem(_dataPtr)
+    : EditorItem(_dataPtr), QGraphicsLineItem(_parent)
+{
+  if (_parent)
+    this->setParentItem(_parent);
+
+  this->Init();
+}
+
+//////////////////////////////////////////////////
+void SegmentItem::Init()
 {
   auto dPtr = static_cast<SegmentItemPrivate *>(this->dataPtr);
 
   dPtr->editorType = "Segment";
   dPtr->itemScale = BuildingMaker::conversionScale;
-
-  if (_parent)
-    this->setParentItem(_parent);
 
   this->setFlag(QGraphicsItem::ItemIsSelectable, true);
   this->setAcceptHoverEvents(true);

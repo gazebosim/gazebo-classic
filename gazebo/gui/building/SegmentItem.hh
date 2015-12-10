@@ -19,9 +19,7 @@
 #define _SEGMENT_ITEM_HH_
 
 #include <vector>
-//#include "gazebo/gui/qt.h"
 #include "gazebo/gui/building/EditorItem.hh"
-//#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -120,6 +118,9 @@ namespace gazebo
       /// \param[in] _pos New position.
       protected: void UpdateLinkedGrabbers(GrabberHandle *_grabber,
           const QPointF &_pos);
+
+      /// \brief Initialize this class.
+      private: void Init();
 
       /// \brief Filter Qt events and redirect them to the another item.
       /// \param[in] _watched Item that watches and will handle the event.

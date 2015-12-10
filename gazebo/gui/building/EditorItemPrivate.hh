@@ -18,6 +18,8 @@
 #ifndef _GAZEBO_BUILDING_EDITOR_ITEM_PRIVATE_HH_
 #define _GAZEBO_BUILDING_EDITOR_ITEM_PRIVATE_HH_
 
+#include <string>
+
 namespace gazebo
 {
   namespace gui
