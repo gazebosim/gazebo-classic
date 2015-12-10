@@ -166,10 +166,6 @@ namespace gazebo
 
       private: void ClearSelection();
 
-      private: void PushHistory(const std::string &_visName,
-                                const math::Pose &_pose);
-      private: void PopHistory();
-
       /// \brief Set the selected visual, which will highlight the
       /// visual
       private: void SetSelectedVisual(rendering::VisualPtr _vis);
@@ -262,7 +258,6 @@ namespace gazebo
       private: SelectionLevels selectionLevel;
 
       private: transport::NodePtr node;
-      private: transport::PublisherPtr modelPub, factoryPub;
 
       /// \brief Publishes information about user selections.
       private: transport::PublisherPtr selectionPub;
@@ -276,8 +271,6 @@ namespace gazebo
       private: std::string copiedObject;
 
       private: std::string state;
-
-      private: std::list<std::pair<std::string, math::Pose> > moveHistory;
 
       /// \brief Name of entity that is being copied.
       private: std::string copyEntityName;
