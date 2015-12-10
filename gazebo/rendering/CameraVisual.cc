@@ -24,6 +24,7 @@
 #include <boost/bind.hpp>
 
 #include "gazebo/rendering/ogre_gazebo.h"
+#include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/DynamicLines.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/Camera.hh"
