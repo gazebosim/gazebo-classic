@@ -328,7 +328,7 @@ void VisualConfig::SetGeometry(const std::string &_name,
       std::string type = it.second->configWidget->GeometryWidgetValue(
           "geometry", dimensions, uri);
       it.second->configWidget->SetGeometryWidgetValue("geometry", type,
-          _size, _uri);
+          _size.Ign(), _uri);
       break;
     }
   }
