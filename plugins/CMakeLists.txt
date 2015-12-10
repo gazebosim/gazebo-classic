@@ -57,6 +57,7 @@ set (plugins
   LinearBatteryConsumerPlugin
   LinearBatteryPlugin
   ModelPropShop
+  MotorThermalPlugin
   MudPlugin
   PressurePlugin
   RandomVelocityPlugin

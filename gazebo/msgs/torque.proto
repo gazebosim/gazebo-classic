@@ -1,0 +1,11 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Torque 
+/// \brief Message that contains torque data, in newton-meters
+
+message Torque
+{
+  /// \brief Torque data, in newton-meters
+  required double torque = 1;
+}

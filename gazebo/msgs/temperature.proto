@@ -1,0 +1,23 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Temperature 
+/// \brief Message that contains temperature data
+
+message Temperature
+{
+  /// \brief Enum of temperature units
+  enum Units
+  {
+    KELVIN    = 1;
+    CELSIUS   = 2;
+    FARENHEIT = 3;
+  }
+
+  /// \brief Temperature data.
+  /// \sa units
+  required double temperature = 1;
+
+  /// \brief Units for the temperature value
+  optional Units units        = 2[default=KELVIN];
+}

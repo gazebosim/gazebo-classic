@@ -103,8 +103,10 @@ set (msgs
   surface.proto
   tactile.proto
   test.proto
+  temperature.proto
   time.proto
   topic_info.proto
+  torque.proto
   track_visual.proto
   undo_redo.proto
   user_cmd.proto

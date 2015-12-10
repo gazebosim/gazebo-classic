@@ -63,6 +63,7 @@ set (sources
   STLLoader.cc
   SystemPaths.cc
   SVGLoader.cc
+  Temperature.cc
   Time.cc
   Timer.cc
   Video.cc
@@ -145,6 +146,7 @@ set (gtest_sources
   SphericalCoordinates_TEST.cc
   SystemPaths_TEST.cc
   SVGLoader_TEST.cc
+  Temperature_TEST.cc
   Time_TEST.cc
 )
 
