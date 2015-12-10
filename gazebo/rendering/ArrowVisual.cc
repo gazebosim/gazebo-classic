@@ -45,56 +45,6 @@ ArrowVisual::ArrowVisual(const std::string &_name, VisualPtr _vis)
   dPtr->rotationNodeVisible = false;
 }
 
-/*/////////////////////////////////////////////////
-void ArrowVisual::Load()
-{
-  Visual::Load();
-
-  ArrowVisualPrivate *dPtr =
-      reinterpret_cast<ArrowVisualPrivate *>(this->dataPtr);
-
-  // Make sure the meshes are in Ogre
-  this->InsertMesh("axis_shaft");
-  this->InsertMesh("axis_head");
-
-  Ogre::MovableObject *shaftObj =
-    (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
-          this->GetName()+"__SHAFT__", "axis_shaft"));
-
-  Ogre::MovableObject *headObj =
-    (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
-          this->GetName()+"__HEAD__", "axis_head"));
-
-  dPtr->shaftNode =
-      dPtr->sceneNode->createChildSceneNode(
-      this->GetName() + "_SHAFT");
-  dPtr->shaftNode->attachObject(shaftObj);
-  dPtr->shaftNode->setPosition(0, 0, 0.1);
-
-  dPtr->headNode =
-      dPtr->sceneNode->createChildSceneNode(
-      this->GetName() + "_HEAD");
-  dPtr->headNode->attachObject(headObj);
-  dPtr->headNode->setPosition(0, 0, 0.24);
-
-  common::MeshManager::Instance()->CreateTube("rotation_tube",
-      0.035, 0.04, 0.01, 1, 32);
-  this->InsertMesh("rotation_tube");
-
-  Ogre::MovableObject *rotationObj =
-    (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
-          this->GetName()+"__ROTATION__", "rotation_tube"));
-
-  dPtr->rotationNode =
-      dPtr->sceneNode->createChildSceneNode(
-      this->GetName() + "_ROTATION");
-  dPtr->rotationNode->attachObject(rotationObj);
-  dPtr->rotationNode->setPosition(0, 0, 0.24);
-  this->ShowRotation(false);
-
-  this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
-}*/
-
 /////////////////////////////////////////////////
 void ArrowVisual::Load()
 {

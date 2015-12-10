@@ -606,7 +606,6 @@ namespace gazebo
       /// \param[in] _type Visual type.
       public: void SetType(const Visual::VisualType _type);
 
-      /// \internal
       /// \brief Get whether this visual uses RT shader system.
       /// \return True if RT shader is used.
       public: bool UseRTShader() const;
