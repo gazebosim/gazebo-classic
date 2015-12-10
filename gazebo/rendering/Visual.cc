@@ -237,9 +237,16 @@ VisualPtr Visual::Clone(const std::string &_name, VisualPtr _newParent)
   result->Load(this->dataPtr->sdf);
   result->SetScale(this->dataPtr->scale);
   result->SetVisibilityFlags(this->dataPtr->visibilityFlags);
+  std::string visName = this->GetName();
   for (auto iter: this->dataPtr->children)
   {
-    iter->Clone(iter->GetName(), result);
+    // give a unique name by prefixing child visuals with the new clone name
+    std::string childName = iter->GetName();
+    std::string newName = childName;
+    size_t pos = childName.find(visName);
+    if (pos == 0)
+      newName = _name + childName.substr(pos+visName.size());
+    iter->Clone(newName, result);
   }
 
   if (_newParent == this->dataPtr->scene->GetWorldVisual())

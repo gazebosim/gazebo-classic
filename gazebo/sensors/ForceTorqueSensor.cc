@@ -182,21 +182,9 @@ physics::JointPtr ForceTorqueSensor::GetJoint() const
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ForceTorqueSensor::GetForce() const
-{
-  return this->Force();
-}
-
-//////////////////////////////////////////////////
 ignition::math::Vector3d ForceTorqueSensor::Force() const
 {
   return msgs::ConvertIgn(this->wrenchMsg.wrench().force());
-}
-
-//////////////////////////////////////////////////
-math::Vector3 ForceTorqueSensor::GetTorque() const
-{
-  return this->Torque();
 }
 
 //////////////////////////////////////////////////
