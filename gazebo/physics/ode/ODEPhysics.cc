@@ -1196,6 +1196,25 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
     }
   }
 
+  // Set the elastic modulus
+  // Using Hertzian contact
+  // equation 5.26 from Contact Mechanics and Friction by Popov
+  double nu1 = surf1->FrictionPyramid()->PoissonsRatio();
+  double nu2 = surf2->FrictionPyramid()->PoissonsRatio();
+  double e1 = surf1->FrictionPyramid()->ElasticModulus();
+  double e2 = surf2->FrictionPyramid()->ElasticModulus();
+  if (e1 > 0 && e2 > 0)
+  {
+    contact.surface.elastic_modulus = 1.0 /
+      ((1.0 - nu1*nu1)/e1 + (1.0 - nu2*nu2)/e2);
+
+    // Turn on Contact Elastic Modulus model if elastic modulus > 0
+    if (contact.surface.elastic_modulus > 0.0)
+    {
+      contact.surface.mode |= dContactEM;
+    }
+  }
+
   // Set the bounce values
   contact.surface.bounce = std::min(surf1->bounce,
                                     surf2->bounce);
