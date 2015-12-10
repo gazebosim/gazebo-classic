@@ -182,6 +182,9 @@
             <upper>-1000.0</upper>
             <lower>1000.0</lower>
           </limit>
+          <dynamics>
+            <damping>1</damping>
+          </dynamics>
           <use_parent_model_frame>true</use_parent_model_frame>
         </axis>
       </joint>
@@ -191,6 +194,9 @@
         <axis>
           <xyz>1.000000 0.000000 0.000000</xyz>
           <use_parent_model_frame>true</use_parent_model_frame>
+          <dynamics>
+            <damping>1</damping>
+          </dynamics>
         </axis>
       </joint>
       <joint name="joint_23" type="revolute">
@@ -199,6 +205,9 @@
         <axis>
           <xyz>1.000000 0.000000 0.000000</xyz>
           <use_parent_model_frame>true</use_parent_model_frame>
+          <dynamics>
+            <damping>1</damping>
+          </dynamics>
         </axis>
       </joint>
       <joint name="joint_13" type="gearbox">
@@ -380,7 +389,7 @@
             <lower>1000.0</lower>
           </limit>
           <dynamics>
-            <damping>20</damping>
+            <damping>1</damping>
           </dynamics>
           <use_parent_model_frame>true</use_parent_model_frame>
         </axis>
@@ -391,6 +400,9 @@
         <axis>
           <xyz>1.000000 0.000000 0.000000</xyz>
           <use_parent_model_frame>true</use_parent_model_frame>
+          <dynamics>
+            <damping>1</damping>
+          </dynamics>
         </axis>
       </joint>
       <joint name="joint_23" type="revolute">
@@ -399,6 +411,9 @@
         <axis>
           <xyz>1.000000 0.000000 0.000000</xyz>
           <use_parent_model_frame>true</use_parent_model_frame>
+          <dynamics>
+            <damping>1</damping>
+          </dynamics>
         </axis>
       </joint>
       <joint name="joint_13" type="gearbox">

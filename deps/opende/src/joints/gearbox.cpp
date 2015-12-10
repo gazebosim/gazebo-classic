@@ -84,6 +84,23 @@ dxJointGearbox::getInfo2( dxJoint::Info2* info )
     // printf("a1(%f) a1cum(%f) a2(%f) a2cum(%f) err(%f)\n",
     //   ang1, cumulative_angle1, ang2, cumulative_angle2, err);
 
+    // this constraint is true if the assembly is stationary, but
+    // if the whole assembly is rotating in space, the constraint
+    // needs to be modified, but how?
+    // J1a * q1 = rotation speed of body 1 in inertial frame
+    // J2a * q2 = rotation speed of body 2 in inertial frame
+    // now the reference body:
+    // J1a * q1_ref_body = inertial rotation speed of body 1's refernce body
+    // J2a * q2_ref_body = inertial rotation speed of body 2's refernce body
+    // so the whole equation should be
+    //            J1a * q1 - J1a * q1_ref_body 
+    // + ratio * (J2a * q2 - J2a * q2_ref_body) = c
+    // can this be accomplished with just J1a and J2a?
+    // Current equation assumes q1_ref_body and q2_ref_body are zeros.
+    // What if we moved ref_body stuff to the right hand side?
+    //            J1a * q1 + ratio * J2a * q2
+    // = c  + J1a * q1_ref_body + ratio * J2a * q2_ref_body
+
     info->J1a[0] = globalAxis1[0];
     info->J1a[1] = globalAxis1[1];
     info->J1a[2] = globalAxis1[2];
@@ -93,7 +110,21 @@ dxJointGearbox::getInfo2( dxJoint::Info2* info )
     info->J2a[2] = ratio * globalAxis2[2];
 
     dReal k = info->fps * info->erp;
-    info->c[0] = -k * err;
+    info->c[0] = -k * err +
+                info->J1a[0] * refBody1->avel[0] +
+                info->J1a[1] * refBody1->avel[1] +
+                info->J1a[2] * refBody1->avel[2] +
+                info->J2a[0] * refBody2->avel[0] +
+                info->J2a[1] * refBody2->avel[1] +
+                info->J2a[2] * refBody2->avel[2];
+    // info->c[0] =
+    //           +(info->J1a[0] * refBody1->avel[0] +
+    //             info->J1a[1] * refBody1->avel[1] +
+    //             info->J1a[2] * refBody1->avel[2])
+    //           +(info->J2a[0] * refBody2->avel[0] +
+    //             info->J2a[1] * refBody2->avel[1] +
+    //             info->J2a[2] * refBody2->avel[2]);
+
 
     // dVector3 d;
     // dAddScaledVectors3(d, node[0].body->avel, node[1].body->avel,

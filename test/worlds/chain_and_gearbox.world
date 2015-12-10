@@ -109,6 +109,7 @@
           <dynamics>
             <spring_reference>0</spring_reference>
             <spring_stiffness>0</spring_stiffness>
+            <damping>1</damping>
           </dynamics>
           <use_parent_model_frame>1</use_parent_model_frame>
         </axis>
@@ -149,6 +150,7 @@
           <dynamics>
             <spring_reference>0</spring_reference>
             <spring_stiffness>0</spring_stiffness>
+            <damping>1</damping>
           </dynamics>
           <use_parent_model_frame>1</use_parent_model_frame>
         </axis>
@@ -168,6 +170,9 @@
             <lower>-1e+16</lower>
             <upper>1e+16</upper>
           </limit>
+          <dynamics>
+            <damping>1</damping>
+          </dynamics>
         </axis>
       </joint>
     </model>
@@ -252,6 +257,7 @@
           <dynamics>
             <spring_reference>0</spring_reference>
             <spring_stiffness>0</spring_stiffness>
+            <damping>1</damping>
           </dynamics>
           <use_parent_model_frame>1</use_parent_model_frame>
         </axis>
@@ -292,6 +298,7 @@
           <dynamics>
             <spring_reference>0</spring_reference>
             <spring_stiffness>0</spring_stiffness>
+            <damping>1</damping>
           </dynamics>
           <use_parent_model_frame>1</use_parent_model_frame>
         </axis>
@@ -311,6 +318,9 @@
             <lower>-1e+16</lower>
             <upper>1e+16</upper>
           </limit>
+          <dynamics>
+            <damping>1</damping>
+          </dynamics>
         </axis>
       </joint>
     </model>
@@ -395,6 +405,7 @@
           <dynamics>
             <spring_reference>0</spring_reference>
             <spring_stiffness>0</spring_stiffness>
+            <damping>1</damping>
           </dynamics>
           <use_parent_model_frame>1</use_parent_model_frame>
         </axis>
@@ -435,6 +446,7 @@
           <dynamics>
             <spring_reference>0</spring_reference>
             <spring_stiffness>0</spring_stiffness>
+            <damping>1</damping>
           </dynamics>
           <use_parent_model_frame>1</use_parent_model_frame>
         </axis>
@@ -454,6 +466,9 @@
             <lower>-1e+16</lower>
             <upper>1e+16</upper>
           </limit>
+          <dynamics>
+            <damping>1</damping>
+          </dynamics>
         </axis>
       </joint>
     </model>
@@ -538,6 +553,7 @@
           <dynamics>
             <spring_reference>0</spring_reference>
             <spring_stiffness>0</spring_stiffness>
+            <damping>1</damping>
           </dynamics>
           <use_parent_model_frame>1</use_parent_model_frame>
         </axis>
@@ -578,6 +594,7 @@
           <dynamics>
             <spring_reference>0</spring_reference>
             <spring_stiffness>0</spring_stiffness>
+            <damping>1</damping>
           </dynamics>
           <use_parent_model_frame>1</use_parent_model_frame>
         </axis>
@@ -588,6 +605,7 @@
         <gearbox_reference_body>link_2</gearbox_reference_body>
         <gearbox_ratio>1.0</gearbox_ratio>
       </joint>
+<!--
       <joint name='joint_w2' type='revolute'>
         <parent>world</parent>
         <child>link_1</child>
@@ -597,8 +615,12 @@
             <lower>-1e+16</lower>
             <upper>1e+16</upper>
           </limit>
+          <dynamics>
+            <damping>1</damping>
+          </dynamics>
         </axis>
       </joint>
+-->
     </model>
 
     <model name='model_l2p_pin1_neg'>
@@ -681,6 +703,7 @@
           <dynamics>
             <spring_reference>0</spring_reference>
             <spring_stiffness>0</spring_stiffness>
+            <damping>1</damping>
           </dynamics>
           <use_parent_model_frame>1</use_parent_model_frame>
         </axis>
@@ -721,6 +744,7 @@
           <dynamics>
             <spring_reference>0</spring_reference>
             <spring_stiffness>0</spring_stiffness>
+            <damping>1</damping>
           </dynamics>
           <use_parent_model_frame>1</use_parent_model_frame>
         </axis>
@@ -740,6 +764,9 @@
             <lower>-1e+16</lower>
             <upper>1e+16</upper>
           </limit>
+          <dynamics>
+            <damping>1</damping>
+          </dynamics>
         </axis>
       </joint>
     </model>
@@ -824,6 +851,7 @@
           <dynamics>
             <spring_reference>0</spring_reference>
             <spring_stiffness>0</spring_stiffness>
+            <damping>1</damping>
           </dynamics>
           <use_parent_model_frame>1</use_parent_model_frame>
         </axis>
@@ -864,6 +892,7 @@
           <dynamics>
             <spring_reference>0</spring_reference>
             <spring_stiffness>0</spring_stiffness>
+            <damping>1</damping>
           </dynamics>
           <use_parent_model_frame>1</use_parent_model_frame>
         </axis>
@@ -883,6 +912,9 @@
             <lower>-1e+16</lower>
             <upper>1e+16</upper>
           </limit>
+          <dynamics>
+            <damping>1</damping>
+          </dynamics>
         </axis>
       </joint>
     </model>
