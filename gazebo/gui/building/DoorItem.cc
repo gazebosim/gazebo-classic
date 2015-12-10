@@ -22,49 +22,52 @@
 #include "gazebo/gui/building/WindowDoorInspectorDialog.hh"
 #include "gazebo/gui/building/BuildingMaker.hh"
 #include "gazebo/gui/building/DoorItem.hh"
+#include "gazebo/gui/building/DoorItemPrivate.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-DoorItem::DoorItem(): RectItem(), BuildingItem()
+DoorItem::DoorItem(): RectItem(*new DoorItemPrivate), BuildingItem()
 {
-  this->editorType = "Door";
-  this->itemScale = BuildingMaker::conversionScale;
+  auto dPtr = static_cast<DoorItemPrivate *>(this->dataPtr);
 
-  this->level = 0;
-  this->levelBaseHeight = 0;
+  dPtr->editorType = "Door";
+  dPtr->itemScale = BuildingMaker::conversionScale;
 
-  this->doorDepth = 17;
-  this->doorHeight = 200;
-  this->doorWidth = 90;
-  this->doorElevation = 0;
+  dPtr->level = 0;
+  dPtr->levelBaseHeight = 0;
 
-  this->width = this->doorWidth;
-  this->height = this->doorDepth;
-  this->drawingWidth = this->width;
-  this->drawingHeight = this->height;
+  dPtr->doorDepth = 17;
+  dPtr->doorHeight = 200;
+  dPtr->doorWidth = 90;
+  dPtr->doorElevation = 0;
+
+  dPtr->width = dPtr->doorWidth;
+  dPtr->height = dPtr->doorDepth;
+  dPtr->drawingWidth = dPtr->width;
+  dPtr->drawingHeight = dPtr->height;
 
   this->UpdateCornerPositions();
   this->UpdateMeasures();
 
-  this->doorPos = this->scenePos();
+  dPtr->doorPos = this->scenePos();
 
-  this->zValueIdle = 3;
-  this->setZValue(this->zValueIdle);
+  dPtr->zValueIdle = 3;
+  this->setZValue(dPtr->zValueIdle);
 
-  this->inspector = new WindowDoorInspectorDialog(
+  dPtr->inspector = new WindowDoorInspectorDialog(
     WindowDoorInspectorDialog::DOOR);
-  this->inspector->setModal(false);
-  connect(this->inspector, SIGNAL(Applied()), this, SLOT(OnApply()));
+  dPtr->inspector->setModal(false);
+  connect(dPtr->inspector, SIGNAL(Applied()), this, SLOT(OnApply()));
 
-  this->openInspectorAct = new QAction(tr("&Open Door Inspector"), this);
-  this->openInspectorAct->setStatusTip(tr("Open Door Inspector"));
-  connect(this->openInspectorAct, SIGNAL(triggered()),
+  dPtr->openInspectorAct = new QAction(tr("&Open Door Inspector"), this);
+  dPtr->openInspectorAct->setStatusTip(tr("Open Door Inspector"));
+  connect(dPtr->openInspectorAct, SIGNAL(triggered()),
     this, SLOT(OnOpenInspector()));
-  this->deleteItemAct = new QAction(tr("&Delete"), this);
-  this->deleteItemAct->setStatusTip(tr("Delete"));
-  connect(this->deleteItemAct, SIGNAL(triggered()),
+  dPtr->deleteItemAct = new QAction(tr("&Delete"), this);
+  dPtr->deleteItemAct->setStatusTip(tr("Delete"));
+  connect(dPtr->deleteItemAct, SIGNAL(triggered()),
     this, SLOT(OnDeleteItem()));
 
   this->SetResizeFlag(ITEM_WIDTH);
@@ -73,73 +76,83 @@ DoorItem::DoorItem(): RectItem(), BuildingItem()
 /////////////////////////////////////////////////
 DoorItem::~DoorItem()
 {
-  delete this->inspector;
+  auto dPtr = static_cast<DoorItemPrivate *>(this->dataPtr);
+
+  delete dPtr->inspector;
 }
 
 /////////////////////////////////////////////////
 QVector3D DoorItem::GetSize() const
 {
-  return QVector3D(this->doorWidth, this->doorDepth, this->doorHeight);
+  auto dPtr = static_cast<DoorItemPrivate *>(this->dataPtr);
+
+  return QVector3D(dPtr->doorWidth, dPtr->doorDepth, dPtr->doorHeight);
 }
 
 /////////////////////////////////////////////////
 QVector3D DoorItem::GetScenePosition() const
 {
+  auto dPtr = static_cast<DoorItemPrivate *>(this->dataPtr);
+
   return QVector3D(this->scenePos().x(), this->scenePos().y(),
-      this->doorElevation);
+      dPtr->doorElevation);
 }
 
 /////////////////////////////////////////////////
 double DoorItem::GetSceneRotation() const
 {
-  return this->rotationAngle;
+  auto dPtr = static_cast<DoorItemPrivate *>(this->dataPtr);
+
+  return dPtr->rotationAngle;
 }
 
 /////////////////////////////////////////////////
 void DoorItem::paint(QPainter *_painter,
     const QStyleOptionGraphicsItem */*_option*/, QWidget */*_widget*/)
 {
+  auto dPtr = static_cast<DoorItemPrivate *>(this->dataPtr);
+
   if (this->isSelected())
     this->DrawBoundingBox(_painter);
   this->ShowHandles(this->isSelected());
 
-  QPointF topLeft(this->drawingOriginX - this->drawingWidth/2,
-      this->drawingOriginY - this->drawingHeight/2);
-  QPointF topRight(this->drawingOriginX + this->drawingWidth/2,
-      this->drawingOriginY - this->drawingHeight/2);
-  QPointF bottomLeft(this->drawingOriginX - this->drawingWidth/2,
-      this->drawingOriginY + this->drawingHeight/2);
-  QPointF bottomRight(this->drawingOriginX  + this->drawingWidth/2,
-      this->drawingOriginY + this->drawingHeight/2);
+  QPointF topLeft(dPtr->drawingOriginX - dPtr->drawingWidth/2,
+      dPtr->drawingOriginY - dPtr->drawingHeight/2);
+  QPointF topRight(dPtr->drawingOriginX + dPtr->drawingWidth/2,
+      dPtr->drawingOriginY - dPtr->drawingHeight/2);
+  QPointF bottomLeft(dPtr->drawingOriginX - dPtr->drawingWidth/2,
+      dPtr->drawingOriginY + dPtr->drawingHeight/2);
+  QPointF bottomRight(dPtr->drawingOriginX  + dPtr->drawingWidth/2,
+      dPtr->drawingOriginY + dPtr->drawingHeight/2);
 
   QPen doorPen;
   doorPen.setStyle(Qt::SolidLine);
-  doorPen.setColor(this->borderColor);
+  doorPen.setColor(dPtr->borderColor);
   _painter->setPen(doorPen);
 
-  _painter->drawLine(topLeft, bottomLeft + QPointF(0, this->drawingWidth));
-  QRect arcRect(topLeft.x() - this->drawingWidth,
-      topLeft.y() + this->drawingHeight - this->drawingWidth,
-      this->drawingWidth*2, this->drawingWidth*2);
+  _painter->drawLine(topLeft, bottomLeft + QPointF(0, dPtr->drawingWidth));
+  QRect arcRect(topLeft.x() - dPtr->drawingWidth,
+      topLeft.y() + dPtr->drawingHeight - dPtr->drawingWidth,
+      dPtr->drawingWidth*2, dPtr->drawingWidth*2);
   _painter->drawArc(arcRect, 0, -90 * 16);
 
-  doorPen.setWidth(this->doorDepth);
+  doorPen.setWidth(dPtr->doorDepth);
   _painter->setPen(doorPen);
-  _painter->drawLine(topLeft + QPointF(this->doorDepth/2.0,
-      this->doorDepth/2.0), topRight - QPointF(this->doorDepth/2.0,
-      -this->doorDepth/2.0));
+  _painter->drawLine(topLeft + QPointF(dPtr->doorDepth/2.0,
+      dPtr->doorDepth/2.0), topRight - QPointF(dPtr->doorDepth/2.0,
+      -dPtr->doorDepth/2.0));
 
   double borderSize = 1.0;
   doorPen.setColor(Qt::white);
-  doorPen.setWidth(this->doorDepth - borderSize*2);
+  doorPen.setWidth(dPtr->doorDepth - borderSize*2);
   _painter->setPen(doorPen);
-  _painter->drawLine(topLeft + QPointF(this->doorDepth/2.0,
-      this->doorDepth/2.0), topRight - QPointF(this->doorDepth/2.0,
-      -this->doorDepth/2.0));
+  _painter->drawLine(topLeft + QPointF(dPtr->doorDepth/2.0,
+      dPtr->doorDepth/2.0), topRight - QPointF(dPtr->doorDepth/2.0,
+      -dPtr->doorDepth/2.0));
 
-  this->doorWidth = this->drawingWidth;
-  this->doorDepth = this->drawingHeight;
-  this->doorPos = this->scenePos();
+  dPtr->doorWidth = dPtr->drawingWidth;
+  dPtr->doorDepth = dPtr->drawingHeight;
+  dPtr->doorPos = this->scenePos();
 }
 
 /////////////////////////////////////////////////
@@ -152,24 +165,26 @@ void DoorItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event)
 /////////////////////////////////////////////////
 void DoorItem::OnApply()
 {
+  auto dPtr = static_cast<DoorItemPrivate *>(this->dataPtr);
+
   WindowDoorInspectorDialog *dialog =
      qobject_cast<WindowDoorInspectorDialog *>(QObject::sender());
 
-  QPointF itemPos = this->doorPos * this->itemScale;
+  QPointF itemPos = dPtr->doorPos * dPtr->itemScale;
   itemPos.setY(-itemPos.y());
-  this->SetSize(QSize(dialog->GetWidth() / this->itemScale,
-      (dialog->GetDepth() / this->itemScale)));
-  this->doorWidth = dialog->GetWidth() / this->itemScale;
-  this->doorHeight = dialog->GetHeight() / this->itemScale;
-  this->doorDepth = dialog->GetDepth() / this->itemScale;
-  this->doorElevation = dialog->GetElevation() / this->itemScale;
+  this->SetSize(QSize(dialog->GetWidth() / dPtr->itemScale,
+      (dialog->GetDepth() / dPtr->itemScale)));
+  dPtr->doorWidth = dialog->GetWidth() / dPtr->itemScale;
+  dPtr->doorHeight = dialog->GetHeight() / dPtr->itemScale;
+  dPtr->doorDepth = dialog->GetDepth() / dPtr->itemScale;
+  dPtr->doorElevation = dialog->GetElevation() / dPtr->itemScale;
   if ((fabs(dialog->GetPosition().x() - itemPos.x()) >= 0.01)
       || (fabs(dialog->GetPosition().y() - itemPos.y()) >= 0.01))
   {
-    itemPos = dialog->GetPosition() / this->itemScale;
+    itemPos = dialog->GetPosition() / dPtr->itemScale;
     itemPos.setY(-itemPos.y());
-    this->doorPos = itemPos;
-    this->setPos(this->doorPos);
+    dPtr->doorPos = itemPos;
+    this->setPos(dPtr->doorPos);
 //    this->setParentItem(NULL);
   }
   this->DoorChanged();
@@ -178,33 +193,39 @@ void DoorItem::OnApply()
 /////////////////////////////////////////////////
 void DoorItem::OnOpenInspector()
 {
-  this->inspector->SetName(this->GetName());
-  this->inspector->SetWidth(this->doorWidth * this->itemScale);
-  this->inspector->SetDepth(this->doorDepth * this->itemScale);
-  this->inspector->SetHeight(this->doorHeight * this->itemScale);
-  this->inspector->SetElevation(this->doorElevation * this->itemScale);
-  QPointF itemPos = this->doorPos * this->itemScale;
+  auto dPtr = static_cast<DoorItemPrivate *>(this->dataPtr);
+
+  dPtr->inspector->SetName(this->GetName());
+  dPtr->inspector->SetWidth(dPtr->doorWidth * dPtr->itemScale);
+  dPtr->inspector->SetDepth(dPtr->doorDepth * dPtr->itemScale);
+  dPtr->inspector->SetHeight(dPtr->doorHeight * dPtr->itemScale);
+  dPtr->inspector->SetElevation(dPtr->doorElevation * dPtr->itemScale);
+  QPointF itemPos = dPtr->doorPos * dPtr->itemScale;
   itemPos.setY(-itemPos.y());
-  this->inspector->SetPosition(itemPos);
-  this->inspector->move(QCursor::pos());
-  this->inspector->show();
+  dPtr->inspector->SetPosition(itemPos);
+  dPtr->inspector->move(QCursor::pos());
+  dPtr->inspector->show();
 }
 
 /////////////////////////////////////////////////
 void DoorItem::DoorChanged()
 {
-  emit WidthChanged(this->doorWidth);
-  emit DepthChanged(this->doorDepth);
-  emit HeightChanged(this->doorHeight);
-  emit PositionChanged(this->doorPos.x(), this->doorPos.y(),
-      this->levelBaseHeight + this->doorElevation);
+  auto dPtr = static_cast<DoorItemPrivate *>(this->dataPtr);
+
+  emit WidthChanged(dPtr->doorWidth);
+  emit DepthChanged(dPtr->doorDepth);
+  emit HeightChanged(dPtr->doorHeight);
+  emit PositionChanged(dPtr->doorPos.x(), dPtr->doorPos.y(),
+      dPtr->levelBaseHeight + dPtr->doorElevation);
 }
 
 /////////////////////////////////////////////////
 void DoorItem::SizeChanged()
 {
-  emit WidthChanged(this->doorWidth);
-  emit DepthChanged(this->doorDepth);
+  auto dPtr = static_cast<DoorItemPrivate *>(this->dataPtr);
+
+  emit WidthChanged(dPtr->doorWidth);
+  emit DepthChanged(dPtr->doorDepth);
   this->UpdateMeasures();
 }
 

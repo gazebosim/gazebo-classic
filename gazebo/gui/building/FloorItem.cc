@@ -21,26 +21,29 @@
 #include "gazebo/gui/building/BuildingMaker.hh"
 #include "gazebo/gui/building/WallSegmentItem.hh"
 #include "gazebo/gui/building/FloorItem.hh"
+#include "gazebo/gui/building/FloorItemPrivate.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-FloorItem::FloorItem(): RectItem(), BuildingItem()
+FloorItem::FloorItem(): RectItem(*new FloorItemPrivate), BuildingItem()
 {
-  this->editorType = "Floor";
+  auto dPtr = static_cast<FloorItemPrivate *>(this->dataPtr);
 
-  this->level = 0;
-  this->levelBaseHeight = 0;
+  dPtr->editorType = "Floor";
 
-  this->floorWidth = 100;
-  this->floorDepth = 100;
-  this->floorHeight = 10;
+  dPtr->level = 0;
+  dPtr->levelBaseHeight = 0;
 
-  this->floorPos = this->scenePos();
+  dPtr->floorWidth = 100;
+  dPtr->floorDepth = 100;
+  dPtr->floorHeight = 10;
+
+  dPtr->floorPos = this->scenePos();
 
   this->setFlag(QGraphicsItem::ItemIsSelectable, false);
-  this->dirty = false;
+  dPtr->dirty = false;
 
   QTimer *timer = new QTimer(this);
   connect(timer, SIGNAL(timeout()), this, SLOT(RecalculateBoundingBox()));
@@ -55,14 +58,18 @@ FloorItem::~FloorItem()
 /////////////////////////////////////////////////
 QVector3D FloorItem::GetSize() const
 {
-  return QVector3D(this->floorWidth, this->floorDepth, this->floorHeight);
+  auto dPtr = static_cast<FloorItemPrivate *>(this->dataPtr);
+
+  return QVector3D(dPtr->floorWidth, dPtr->floorDepth, dPtr->floorHeight);
 }
 
 /////////////////////////////////////////////////
 QVector3D FloorItem::GetScenePosition() const
 {
-  return QVector3D(this->floorPos.x(), this->floorPos.y(),
-      this->levelBaseHeight);
+  auto dPtr = static_cast<FloorItemPrivate *>(this->dataPtr);
+
+  return QVector3D(dPtr->floorPos.x(), dPtr->floorPos.y(),
+      dPtr->levelBaseHeight);
 }
 
 /////////////////////////////////////////////////
@@ -74,9 +81,11 @@ double FloorItem::GetSceneRotation() const
 /////////////////////////////////////////////////
 void FloorItem::AttachWallSegment(WallSegmentItem *_wallSegmentItem)
 {
-  this->floorBoundingRect << _wallSegmentItem->boundingRect().topLeft();
-  this->floorBoundingRect << _wallSegmentItem->boundingRect().bottomRight();
-  this->wallSegments.push_back(_wallSegmentItem);
+  auto dPtr = static_cast<FloorItemPrivate *>(this->dataPtr);
+
+  dPtr->floorBoundingRect << _wallSegmentItem->boundingRect().topLeft();
+  dPtr->floorBoundingRect << _wallSegmentItem->boundingRect().bottomRight();
+  dPtr->wallSegments.push_back(_wallSegmentItem);
 
   connect(_wallSegmentItem, SIGNAL(WidthChanged(double)), this,
       SLOT(NotifyChange()));
@@ -94,52 +103,60 @@ void FloorItem::AttachWallSegment(WallSegmentItem *_wallSegmentItem)
 /////////////////////////////////////////////////
 void FloorItem::WallSegmentDeleted()
 {
+  auto dPtr = static_cast<FloorItemPrivate *>(this->dataPtr);
+
   EditorItem *wallSegmentItem = dynamic_cast<EditorItem *>(QObject::sender());
   if (wallSegmentItem)
   {
-    this->wallSegments.erase(std::remove(this->wallSegments.begin(),
-        this->wallSegments.end(), wallSegmentItem), this->wallSegments.end());
+    dPtr->wallSegments.erase(std::remove(dPtr->wallSegments.begin(),
+        dPtr->wallSegments.end(), wallSegmentItem), dPtr->wallSegments.end());
   }
-  this->dirty = true;
+  dPtr->dirty = true;
 }
 
 /////////////////////////////////////////////////
 void FloorItem::NotifyChange()
 {
-  this->dirty = true;
+  auto dPtr = static_cast<FloorItemPrivate *>(this->dataPtr);
+
+  dPtr->dirty = true;
 }
 
 /////////////////////////////////////////////////
 void FloorItem::RecalculateBoundingBox()
 {
-  if ((this->wallSegments.empty()) || !this->dirty)
+  auto dPtr = static_cast<FloorItemPrivate *>(this->dataPtr);
+
+  if ((dPtr->wallSegments.empty()) || !dPtr->dirty)
     return;
 
-  this->floorBoundingRect.clear();
-  for (unsigned int i = 0; i < this->wallSegments.size(); ++i)
+  dPtr->floorBoundingRect.clear();
+  for (unsigned int i = 0; i < dPtr->wallSegments.size(); ++i)
   {
-    this->floorBoundingRect <<
-        this->wallSegments[i]->boundingRect().topLeft();
-    this->floorBoundingRect <<
-        this->wallSegments[i]->boundingRect().bottomRight();
+    dPtr->floorBoundingRect <<
+        dPtr->wallSegments[i]->boundingRect().topLeft();
+    dPtr->floorBoundingRect <<
+        dPtr->wallSegments[i]->boundingRect().bottomRight();
   }
   this->Update();
-  this->dirty = false;
+  dPtr->dirty = false;
 }
 
 /////////////////////////////////////////////////
 void FloorItem::Update()
 {
-  QRectF allWallBound = this->floorBoundingRect.boundingRect();
-  this->floorWidth = allWallBound.width();
-  this->floorDepth = allWallBound.height();
+  auto dPtr = static_cast<FloorItemPrivate *>(this->dataPtr);
 
-  this->floorPos = QPointF(allWallBound.x()  + allWallBound.width()/2,
+  QRectF allWallBound = dPtr->floorBoundingRect.boundingRect();
+  dPtr->floorWidth = allWallBound.width();
+  dPtr->floorDepth = allWallBound.height();
+
+  dPtr->floorPos = QPointF(allWallBound.x()  + allWallBound.width()/2,
       allWallBound.y()+allWallBound.height()/2);
 
-  this->drawingWidth = this->floorWidth;
-  this->drawingHeight = this->floorDepth;
-  this->setPos(this->floorPos);
+  dPtr->drawingWidth = dPtr->floorWidth;
+  dPtr->drawingHeight = dPtr->floorDepth;
+  this->setPos(dPtr->floorPos);
 
   this->FloorChanged();
 }
@@ -158,22 +175,24 @@ void FloorItem::mousePressEvent(QGraphicsSceneMouseEvent *_event)
 void FloorItem::paint(QPainter *_painter,
     const QStyleOptionGraphicsItem */*_option*/, QWidget */*_widget*/)
 {
+  auto dPtr = static_cast<FloorItemPrivate *>(this->dataPtr);
+
   if (this->isSelected())
     this->DrawBoundingBox(_painter);
   this->ShowHandles(this->isSelected());
 
-  QPointF topLeft(this->drawingOriginX - this->drawingWidth/2,
-      this->drawingOriginY - this->drawingHeight/2);
-  QPointF topRight(this->drawingOriginX + this->drawingWidth/2,
-      this->drawingOriginY - this->drawingHeight/2);
-  QPointF bottomLeft(this->drawingOriginX - this->drawingWidth/2,
-      this->drawingOriginY + this->drawingHeight/2);
-  QPointF bottomRight(this->drawingOriginX  + this->drawingWidth/2,
-      this->drawingOriginY + this->drawingHeight/2);
+  QPointF topLeft(dPtr->drawingOriginX - dPtr->drawingWidth/2,
+      dPtr->drawingOriginY - dPtr->drawingHeight/2);
+  QPointF topRight(dPtr->drawingOriginX + dPtr->drawingWidth/2,
+      dPtr->drawingOriginY - dPtr->drawingHeight/2);
+  QPointF bottomLeft(dPtr->drawingOriginX - dPtr->drawingWidth/2,
+      dPtr->drawingOriginY + dPtr->drawingHeight/2);
+  QPointF bottomRight(dPtr->drawingOriginX  + dPtr->drawingWidth/2,
+      dPtr->drawingOriginY + dPtr->drawingHeight/2);
 
   QPen rectPen;
   rectPen.setStyle(Qt::SolidLine);
-  rectPen.setColor(borderColor);
+  rectPen.setColor(dPtr->borderColor);
   _painter->setPen(rectPen);
 
   _painter->drawLine(topLeft, topRight);
@@ -181,9 +200,9 @@ void FloorItem::paint(QPainter *_painter,
   _painter->drawLine(bottomRight, bottomLeft);
   _painter->drawLine(bottomLeft, topLeft);
 
-  this->floorWidth = this->drawingWidth;
-  this->floorDepth = this->drawingHeight;
-  this->floorPos = this->scenePos();
+  dPtr->floorWidth = dPtr->drawingWidth;
+  dPtr->floorDepth = dPtr->drawingHeight;
+  dPtr->floorPos = this->scenePos();
 
 //  QGraphicsPolygonItem::paint(_painter, _option, _widget);
 }
@@ -197,16 +216,20 @@ void FloorItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *_event)
 /////////////////////////////////////////////////
 void FloorItem::FloorChanged()
 {
-  emit WidthChanged(this->floorWidth);
-  emit DepthChanged(this->floorDepth);
-  emit HeightChanged(this->floorHeight);
-  emit PositionChanged(this->floorPos.x(), this->floorPos.y(),
-      this->levelBaseHeight/* + this->floorElevation*/);
+  auto dPtr = static_cast<FloorItemPrivate *>(this->dataPtr);
+
+  emit WidthChanged(dPtr->floorWidth);
+  emit DepthChanged(dPtr->floorDepth);
+  emit HeightChanged(dPtr->floorHeight);
+  emit PositionChanged(dPtr->floorPos.x(), dPtr->floorPos.y(),
+      dPtr->levelBaseHeight/* + dPtr->floorElevation*/);
 }
 
 /////////////////////////////////////////////////
 void FloorItem::SizeChanged()
 {
-  emit WidthChanged(this->floorWidth);
-  emit DepthChanged(this->floorDepth);
+  auto dPtr = static_cast<FloorItemPrivate *>(this->dataPtr);
+
+  emit WidthChanged(dPtr->floorWidth);
+  emit DepthChanged(dPtr->floorDepth);
 }

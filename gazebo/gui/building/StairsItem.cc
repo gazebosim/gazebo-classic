@@ -22,91 +22,106 @@
 #include "gazebo/gui/building/RectItem.hh"
 #include "gazebo/gui/building/BuildingMaker.hh"
 #include "gazebo/gui/building/StairsInspectorDialog.hh"
-#include "gazebo/gui/building/StairsItem.hh"
 #include "gazebo/gui/building/RotateHandle.hh"
+#include "gazebo/gui/building/StairsItem.hh"
+#include "gazebo/gui/building/StairsItemPrivate.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-StairsItem::StairsItem(): RectItem(), BuildingItem()
+StairsItem::StairsItem(): RectItem(*new StairsItemPrivate), BuildingItem()
 {
-  this->editorType = "Stairs";
-  this->itemScale = BuildingMaker::conversionScale;
+  auto dPtr = static_cast<StairsItemPrivate *>(this->dataPtr);
 
-  this->level = 0;
+  dPtr->editorType = "Stairs";
+  dPtr->itemScale = BuildingMaker::conversionScale;
 
-  this->stairsSteps = 15;
-  this->stairsDepth = 350;
-  this->stairsWidth = 100;
-  this->stairsHeight = 250;
+  dPtr->level = 0;
 
-  //  this->stairsUnitRise = 10;
-  //  this->stairsUnitRun = 10;
-  //  this->stairsDepth = this->stairsSteps * this->stairsUnitRun;
-  //  this->stairsHeight = this->stairsSteps * this->stairsUnitRise;
+  dPtr->stairsSteps = 15;
+  dPtr->stairsDepth = 350;
+  dPtr->stairsWidth = 100;
+  dPtr->stairsHeight = 250;
 
-  this->stairsPos = this->scenePos();
-  this->stairsElevation = 0;
+  //  dPtr->stairsUnitRise = 10;
+  //  dPtr->stairsUnitRun = 10;
+  //  dPtr->stairsDepth = dPtr->stairsSteps * dPtr->stairsUnitRun;
+  //  dPtr->stairsHeight = dPtr->stairsSteps * dPtr->stairsUnitRise;
 
-  this->width = this->stairsWidth;
-  this->height = this->stairsDepth;
-  this->drawingWidth = this->width;
-  this->drawingHeight = this->height;
+  dPtr->stairsPos = this->scenePos();
+  dPtr->stairsElevation = 0;
+
+  dPtr->width = dPtr->stairsWidth;
+  dPtr->height = dPtr->stairsDepth;
+  dPtr->drawingWidth = dPtr->width;
+  dPtr->drawingHeight = dPtr->height;
 
   this->UpdateCornerPositions();
 
-  this->zValueIdle = 3;
-  this->setZValue(this->zValueIdle);
+  dPtr->zValueIdle = 3;
+  this->setZValue(dPtr->zValueIdle);
 
-  this->inspector = new StairsInspectorDialog();
-  this->inspector->setModal(false);
-  connect(this->inspector, SIGNAL(Applied()), this, SLOT(OnApply()));
+  dPtr->inspector = new StairsInspectorDialog();
+  dPtr->inspector->setModal(false);
+  connect(dPtr->inspector, SIGNAL(Applied()), this, SLOT(OnApply()));
 
-  this->openInspectorAct = new QAction(tr("&Open Stairs Inspector"), this);
-  this->openInspectorAct->setStatusTip(tr("Open Stairs Inspector"));
-  connect(this->openInspectorAct, SIGNAL(triggered()),
+  dPtr->openInspectorAct = new QAction(tr("&Open Stairs Inspector"), this);
+  dPtr->openInspectorAct->setStatusTip(tr("Open Stairs Inspector"));
+  connect(dPtr->openInspectorAct, SIGNAL(triggered()),
       this, SLOT(OnOpenInspector()));
-  this->deleteItemAct = new QAction(tr("&Delete"), this);
-  this->deleteItemAct->setStatusTip(tr("Delete"));
-  connect(this->deleteItemAct, SIGNAL(triggered()),
+  dPtr->deleteItemAct = new QAction(tr("&Delete"), this);
+  dPtr->deleteItemAct->setStatusTip(tr("Delete"));
+  connect(dPtr->deleteItemAct, SIGNAL(triggered()),
       this, SLOT(OnDeleteItem()));
 }
 
 /////////////////////////////////////////////////
 StairsItem::~StairsItem()
 {
-  delete this->inspector;
+  auto dPtr = static_cast<StairsItemPrivate *>(this->dataPtr);
+
+  delete dPtr->inspector;
 }
 
 /////////////////////////////////////////////////
 QVector3D StairsItem::GetSize() const
 {
-  return QVector3D(this->stairsWidth, this->stairsDepth, this->stairsHeight);
+  auto dPtr = static_cast<StairsItemPrivate *>(this->dataPtr);
+
+  return QVector3D(dPtr->stairsWidth, dPtr->stairsDepth, dPtr->stairsHeight);
 }
 
 /////////////////////////////////////////////////
 QVector3D StairsItem::GetScenePosition() const
 {
+  auto dPtr = static_cast<StairsItemPrivate *>(this->dataPtr);
+
   return QVector3D(this->scenePos().x(), this->scenePos().y(),
-      this->stairsElevation);
+      dPtr->stairsElevation);
 }
 
 /////////////////////////////////////////////////
 double StairsItem::GetSceneRotation() const
 {
-  return this->rotationAngle;
+  auto dPtr = static_cast<StairsItemPrivate *>(this->dataPtr);
+
+  return dPtr->rotationAngle;
 }
 
 /////////////////////////////////////////////////
 int StairsItem::GetSteps() const
 {
-  return this->stairsSteps;
+  auto dPtr = static_cast<StairsItemPrivate *>(this->dataPtr);
+
+  return dPtr->stairsSteps;
 }
 
 /////////////////////////////////////////////////
 bool StairsItem::RotateEventFilter(RotateHandle *_rotate, QEvent *_event)
 {
+  auto dPtr = static_cast<StairsItemPrivate *>(this->dataPtr);
+
   QGraphicsSceneMouseEvent *mouseEvent =
     dynamic_cast<QGraphicsSceneMouseEvent*>(_event);
 
@@ -152,7 +167,7 @@ bool StairsItem::RotateEventFilter(RotateHandle *_rotate, QEvent *_event)
 
   if (_rotate->GetMouseState() == QEvent::GraphicsSceneMouseMove)
   {
-    QPoint localCenter(this->drawingOriginX, this->drawingOriginY);
+    QPoint localCenter(dPtr->drawingOriginX, dPtr->drawingOriginY);
     QPointF center = this->mapToScene(localCenter);
 
     QPointF newPoint = mouseEvent->scenePos();
@@ -161,7 +176,7 @@ bool StairsItem::RotateEventFilter(RotateHandle *_rotate, QEvent *_event)
     // limit stairs to right angles until there is proper csg support
     double angle = line.angle();
     double range = 45;
-    double angleToRotate = this->rotationAngle;
+    double angleToRotate = dPtr->rotationAngle;
     if (angle > (90 - range) && (angle < 90 + range))
       angleToRotate = 0;
     else if (angle > (180 - range) && (angle < 180 + range))
@@ -171,7 +186,7 @@ bool StairsItem::RotateEventFilter(RotateHandle *_rotate, QEvent *_event)
     else if (angle > (360 - range) || (angle < 0 + range))
       angleToRotate = 90;
 
-    if (fabs(angleToRotate - this->rotationAngle) > 0)
+    if (fabs(angleToRotate - dPtr->rotationAngle) > 0)
       this->SetRotation(angleToRotate);
   }
   return true;
@@ -181,18 +196,20 @@ bool StairsItem::RotateEventFilter(RotateHandle *_rotate, QEvent *_event)
 void StairsItem::paint(QPainter *_painter,
     const QStyleOptionGraphicsItem * /*_option*/, QWidget * /*_widget*/)
 {
-  QPointF topLeft(this->drawingOriginX - this->drawingWidth/2,
-      this->drawingOriginY - this->drawingHeight/2);
-  QPointF topRight(this->drawingOriginX + this->drawingWidth/2,
-      this->drawingOriginY - this->drawingHeight/2);
-  QPointF bottomLeft(this->drawingOriginX - this->drawingWidth/2,
-      this->drawingOriginY + this->drawingHeight/2);
-  QPointF bottomRight(this->drawingOriginX  + this->drawingWidth/2,
-      this->drawingOriginY + this->drawingHeight/2);
+  auto dPtr = static_cast<StairsItemPrivate *>(this->dataPtr);
 
-  this->stairsPos = this->scenePos();
-  this->stairsWidth = this->drawingWidth;
-  this->stairsDepth = this->drawingHeight;
+  QPointF topLeft(dPtr->drawingOriginX - dPtr->drawingWidth/2,
+      dPtr->drawingOriginY - dPtr->drawingHeight/2);
+  QPointF topRight(dPtr->drawingOriginX + dPtr->drawingWidth/2,
+      dPtr->drawingOriginY - dPtr->drawingHeight/2);
+  QPointF bottomLeft(dPtr->drawingOriginX - dPtr->drawingWidth/2,
+      dPtr->drawingOriginY + dPtr->drawingHeight/2);
+  QPointF bottomRight(dPtr->drawingOriginX  + dPtr->drawingWidth/2,
+      dPtr->drawingOriginY + dPtr->drawingHeight/2);
+
+  dPtr->stairsPos = this->scenePos();
+  dPtr->stairsWidth = dPtr->drawingWidth;
+  dPtr->stairsDepth = dPtr->drawingHeight;
 
   _painter->save();
 
@@ -202,16 +219,16 @@ void StairsItem::paint(QPainter *_painter,
 
   QPen stairsPen;
   stairsPen.setStyle(Qt::SolidLine);
-  stairsPen.setColor(borderColor);
+  stairsPen.setColor(dPtr->borderColor);
   _painter->setPen(stairsPen);
 
   QPointF drawStepLeft = topLeft;
   QPointF drawStepRight = topRight;
 
-  double stairsUnitRun = this->stairsDepth /
-    static_cast<double>(this->stairsSteps);
+  double stairsUnitRun = dPtr->stairsDepth /
+    static_cast<double>(dPtr->stairsSteps);
 
-  for (int i = 0; i <= this->stairsSteps; ++i)
+  for (int i = 0; i <= dPtr->stairsSteps; ++i)
   {
     double stepIncr = topLeft.y() + i*stairsUnitRun;
     drawStepLeft.setY(stepIncr);
@@ -233,30 +250,32 @@ void StairsItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event)
 /////////////////////////////////////////////////
 void StairsItem::OnApply()
 {
+  auto dPtr = static_cast<StairsItemPrivate *>(this->dataPtr);
+
   StairsInspectorDialog *dialog =
     qobject_cast<StairsInspectorDialog *>(QObject::sender());
 
-  QPointF startPos = this->stairsPos * this->itemScale;
+  QPointF startPos = dPtr->stairsPos * dPtr->itemScale;
   startPos.setY(-startPos.y());
-  this->SetSize(QSize(dialog->GetWidth() / this->itemScale,
-        dialog->GetDepth() / this->itemScale));
-  this->stairsWidth = dialog->GetWidth() / this->itemScale;
-  this->stairsHeight = dialog->GetHeight() / this->itemScale;
-  this->stairsDepth = dialog->GetDepth() / this->itemScale;
+  this->SetSize(QSize(dialog->GetWidth() / dPtr->itemScale,
+        dialog->GetDepth() / dPtr->itemScale));
+  dPtr->stairsWidth = dialog->GetWidth() / dPtr->itemScale;
+  dPtr->stairsHeight = dialog->GetHeight() / dPtr->itemScale;
+  dPtr->stairsDepth = dialog->GetDepth() / dPtr->itemScale;
   if ((fabs(dialog->GetStartPosition().x() - startPos.x()) >= 0.01)
       || (fabs(dialog->GetStartPosition().y() - startPos.y()) >= 0.01))
   {
-    this->stairsPos = dialog->GetStartPosition() / this->itemScale;
-    this->stairsPos.setY(-this->stairsPos.y());
-    this->setPos(stairsPos);
+    dPtr->stairsPos = dialog->GetStartPosition() / dPtr->itemScale;
+    dPtr->stairsPos.setY(-dPtr->stairsPos.y());
+    this->setPos(dPtr->stairsPos);
     this->setParentItem(NULL);
   }
-  if (this->stairsSteps != dialog->GetSteps())
+  if (dPtr->stairsSteps != dialog->GetSteps())
   {
-    this->stairsSteps = dialog->GetSteps();
+    dPtr->stairsSteps = dialog->GetSteps();
     this->StepsChanged();
   }
-  // this->stairsElevation = dialog->GetElevation();
+  // dPtr->stairsElevation = dialog->GetElevation();
   this->Set3dTexture(dialog->GetTexture());
   this->Set3dColor(dialog->GetColor());
   this->StairsChanged();
@@ -265,19 +284,21 @@ void StairsItem::OnApply()
 /////////////////////////////////////////////////
 void StairsItem::OnOpenInspector()
 {
-  this->inspector->SetName(this->GetName());
-  this->inspector->SetWidth(this->stairsWidth * this->itemScale);
-  this->inspector->SetDepth(this->stairsDepth * this->itemScale);
-  this->inspector->SetHeight(this->stairsHeight * this->itemScale);
-  this->inspector->SetSteps(this->stairsSteps);
-  //  dialog.SetElevation(this->stairsElevation);
-  QPointF startPos = this->stairsPos * this->itemScale;
+  auto dPtr = static_cast<StairsItemPrivate *>(this->dataPtr);
+
+  dPtr->inspector->SetName(this->GetName());
+  dPtr->inspector->SetWidth(dPtr->stairsWidth * dPtr->itemScale);
+  dPtr->inspector->SetDepth(dPtr->stairsDepth * dPtr->itemScale);
+  dPtr->inspector->SetHeight(dPtr->stairsHeight * dPtr->itemScale);
+  dPtr->inspector->SetSteps(dPtr->stairsSteps);
+  //  dialog.SetElevation(dPtr->stairsElevation);
+  QPointF startPos = dPtr->stairsPos * dPtr->itemScale;
   startPos.setY(-startPos.y());
-  this->inspector->SetStartPosition(startPos);
-  this->inspector->SetColor(this->visual3dColor);
-  this->inspector->SetTexture(this->visual3dTexture);
-  this->inspector->move(QCursor::pos());
-  this->inspector->show();
+  dPtr->inspector->SetStartPosition(startPos);
+  dPtr->inspector->SetColor(dPtr->visual3dColor);
+  dPtr->inspector->SetTexture(dPtr->visual3dTexture);
+  dPtr->inspector->move(QCursor::pos());
+  dPtr->inspector->show();
 }
 
 /////////////////////////////////////////////////
@@ -289,11 +310,13 @@ void StairsItem::OnDeleteItem()
 /////////////////////////////////////////////////
 void StairsItem::StairsChanged()
 {
-  emit WidthChanged(this->stairsWidth);
-  emit DepthChanged(this->stairsDepth);
-  emit HeightChanged(this->stairsHeight);
-  emit PositionChanged(this->stairsPos.x(), this->stairsPos.y(),
-      this->levelBaseHeight + this->stairsElevation);
+  auto dPtr = static_cast<StairsItemPrivate *>(this->dataPtr);
+
+  emit WidthChanged(dPtr->stairsWidth);
+  emit DepthChanged(dPtr->stairsDepth);
+  emit HeightChanged(dPtr->stairsHeight);
+  emit PositionChanged(dPtr->stairsPos.x(), dPtr->stairsPos.y(),
+      dPtr->levelBaseHeight + dPtr->stairsElevation);
 }
 
 /////////////////////////////////////////////////

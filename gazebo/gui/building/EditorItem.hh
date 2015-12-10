@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _EDITOR_ITEM_HH_
-#define _EDITOR_ITEM_HH_
+#ifndef _GAZEBO_BUILDING_EDITOR_ITEM_HH_
+#define _GAZEBO_BUILDING_EDITOR_ITEM_HH_
 
 #include <string>
 #include "gazebo/gui/qt.h"
@@ -26,6 +26,8 @@ namespace gazebo
 {
   namespace gui
   {
+    class EditorItemPrivate;
+
     /// \addtogroup gazebo_gui
     /// \{
 
@@ -37,6 +39,10 @@ namespace gazebo
 
       /// \brief Constructor
       public: EditorItem();
+
+      /// \internal
+      /// \brief Constructor used by inherited classes
+      protected: EditorItem(EditorItemPrivate &_dataPtr);
 
       /// \brief Destructor
       public: ~EditorItem();
@@ -104,6 +110,9 @@ namespace gazebo
       /// \brief Set whether this item should be highlighted or not.
       /// \param[in] _highlighted True for highlighted.
       public: virtual void SetHighlighted(bool _highlighted);
+
+      public: int ZValueIdle() const;
+      public: int ZValueSelected() const;
 
       /// \brief Qt signal emitted when the editor item size has changed.
       /// \param[in] _width Width of item in pixels.
@@ -206,40 +215,9 @@ namespace gazebo
       /// \param[in] _texture Texture.
       private slots: void OnTextureChanged(QString _texture);
 
-      /// \brief Z ordering of the rect item when idle (unselected.)
-      public: int zValueIdle;
-
-      /// \brief Z ordering of the rect item when selected.
-      public: int zValueSelected;
-
-      /// \brief Type of editor item.
-      protected: std::string editorType;
-
-      /// \brief Name of editor item.
-      protected: std::string name;
-
-      /// \brief Level that this item is on.
-      protected: int level;
-
-      /// \brief Vertical distance from the building's base to the base of
-      /// the level this editor is in.
-      protected: double levelBaseHeight;
-
-      /// \brief Color of the associated 3D visual.
-      protected: QColor visual3dColor;
-
-      /// \brief Texture of the associated 3D visual.
-      protected: QString visual3dTexture;
-
-      /// \brief Transparency of the associated 3D visual.
-      protected: float visual3dTransparency;
-
-      /// \brief Flag to indicate whether this item is currently highlighted or
-      /// not.
-      protected: bool highlighted;
-
-      /// \brief Scale for converting from pixel to metric units.
-      protected: double itemScale;
+      /// \internal
+      /// \brief Pointer to private data.
+      protected: EditorItemPrivate *dataPtr;
     };
     /// \}
   }

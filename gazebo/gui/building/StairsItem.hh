@@ -15,13 +15,13 @@
  *
 */
 
-#ifndef _STAIRS_ITEM_HH_
-#define _STAIRS_ITEM_HH_
+#ifndef _GAZEBO_BUILDING_STAIRS_ITEM_HH_
+#define _GAZEBO_BUILDING_STAIRS_ITEM_HH_
 
-#include "gazebo/gui/qt.h"
+//#include "gazebo/gui/qt.h"
 #include "gazebo/gui/building/RectItem.hh"
-#include "gazebo/gui/building/BuildingItem.hh"
-#include "gazebo/util/system.hh"
+//#include "gazebo/gui/building/BuildingItem.hh"
+//#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -85,27 +85,6 @@ namespace gazebo
 
       /// \brief Emit steps changed Qt signals.
       private: void StepsChanged();
-
-      /// \brief Depth of staircase item in pixels.
-      private: double stairsDepth;
-
-      /// \brief Height of staircase item in pixels.
-      private: double stairsHeight;
-
-      /// \brief Width of staircase item in pixels.
-      private: double stairsWidth;
-
-      /// \brief Scene position of staircase item in pixel coordinates.
-      private: QPointF stairsPos;
-
-      /// \brief Elevation of staircase item in pixels.
-      private: double stairsElevation;
-
-      /// \brief Number of steps in the staircase item.
-      private: int stairsSteps;
-
-      /// \brief Inspector for configuring the staircase item.
-      private: StairsInspectorDialog *inspector;
 
       // private: double stairsUnitRise;
 

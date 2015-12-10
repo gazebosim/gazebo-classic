@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _WALL_SEGMENT_ITEM_HH_
-#define _WALL_SEGMENT_ITEM_HH_
+#ifndef _GAZEBO_BUILDING_WALL_SEGMENT_ITEM_HH_
+#define _GAZEBO_BUILDING_WALL_SEGMENT_ITEM_HH_
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/building/MeasureItem.hh"
@@ -102,24 +102,6 @@ namespace gazebo
 
       // Documentation inherited
       private slots: void OnDeleteItem();
-
-      /// \brief Thickness of the wall segment in the 2d view, in pixels.
-      private: double wallThickness;
-
-      /// \brief Height of the wall segment in meters.
-      private: double wallHeight;
-
-      /// \brief This wall segment's measure item.
-      private: MeasureItem *measure;
-
-      /// \brief Qt action for opening the inspector.
-      private: QAction *openInspectorAct;
-
-      /// \brief Qt action for deleting the wall segment item.
-      private: QAction *deleteItemAct;
-
-      /// \brief Inspector for configuring the wall segment item.
-      private: WallInspectorDialog *inspector;
     };
     /// \}
   }

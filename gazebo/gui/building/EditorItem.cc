@@ -16,18 +16,30 @@
 */
 
 #include "gazebo/gui/building/EditorItem.hh"
+#include "gazebo/gui/building/EditorItemPrivate.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-EditorItem::EditorItem()
+EditorItem::EditorItem() : dataPtr(new EditorItemPrivate)
 {
-  this->editorType = "base";
-  this->name = "";
+  this->dataPtr->editorType = "base";
+  this->dataPtr->name = "";
 
-  this->level = 0;
-  this->levelBaseHeight = 0;
+  this->dataPtr->level = 0;
+  this->dataPtr->levelBaseHeight = 0;
+}
+
+//////////////////////////////////////////////////
+EditorItem::EditorItem(EditorItemPrivate &_dataPtr)
+    : dataPtr(&_dataPtr)
+{
+  this->dataPtr->editorType = "base";
+  this->dataPtr->name = "";
+
+  this->dataPtr->level = 0;
+  this->dataPtr->levelBaseHeight = 0;
 }
 
 /////////////////////////////////////////////////
@@ -57,92 +69,104 @@ double EditorItem::GetSceneRotation() const
 /////////////////////////////////////////////////
 std::string EditorItem::GetType() const
 {
-  return this->editorType;
+  return this->dataPtr->editorType;
 }
 
 /////////////////////////////////////////////////
 std::string EditorItem::GetName() const
 {
-  return this->name;
+  return this->dataPtr->name;
 }
 
 /////////////////////////////////////////////////
 QColor EditorItem::Get3dColor() const
 {
-  return this->visual3dColor;
+  return this->dataPtr->visual3dColor;
 }
 
 /////////////////////////////////////////////////
 QString EditorItem::Get3dTexture() const
 {
-  return this->visual3dTexture;
+  return this->dataPtr->visual3dTexture;
 }
 
 /////////////////////////////////////////////////
 void EditorItem::SetName(const std::string &_name)
 {
-  this->name = _name;
+  this->dataPtr->name = _name;
 }
 
 /////////////////////////////////////////////////
 void EditorItem::Set3dColor(QColor _color)
 {
-  this->visual3dColor = _color;
-  emit ColorChanged(this->visual3dColor);
+  this->dataPtr->visual3dColor = _color;
+  emit ColorChanged(this->dataPtr->visual3dColor);
 }
 
 /////////////////////////////////////////////////
 void EditorItem::OnColorChanged(QColor _color)
 {
-  this->visual3dColor = _color;
+  this->dataPtr->visual3dColor = _color;
 }
 
 /////////////////////////////////////////////////
 void EditorItem::Set3dTexture(QString _texture)
 {
-  this->visual3dTexture = _texture;
-  emit TextureChanged(this->visual3dTexture);
+  this->dataPtr->visual3dTexture = _texture;
+  emit TextureChanged(this->dataPtr->visual3dTexture);
 }
 
 /////////////////////////////////////////////////
 void EditorItem::OnTextureChanged(QString _texture)
 {
-  this->visual3dTexture = _texture;
+  this->dataPtr->visual3dTexture = _texture;
 }
 
 /////////////////////////////////////////////////
 void EditorItem::Set3dTransparency(float _transparency)
 {
-  this->visual3dTransparency = _transparency;
-  emit TransparencyChanged(this->visual3dTransparency);
+  this->dataPtr->visual3dTransparency = _transparency;
+  emit TransparencyChanged(this->dataPtr->visual3dTransparency);
 }
 
 /////////////////////////////////////////////////
 int EditorItem::GetLevel() const
 {
-  return this->level;
+  return this->dataPtr->level;
 }
 
 /////////////////////////////////////////////////
 void EditorItem::SetLevel(int _level)
 {
-  this->level = _level;
-  this->LevelChanged(this->level);
+  this->dataPtr->level = _level;
+  this->LevelChanged(this->dataPtr->level);
 }
 
 /////////////////////////////////////////////////
 double EditorItem::GetLevelBaseHeight() const
 {
-  return this->levelBaseHeight;
+  return this->dataPtr->levelBaseHeight;
 }
 
 /////////////////////////////////////////////////
 void EditorItem::SetLevelBaseHeight(double _height)
 {
-  this->levelBaseHeight = _height;
+  this->dataPtr->levelBaseHeight = _height;
 }
 
 /////////////////////////////////////////////////
 void EditorItem::SetHighlighted(bool /*_highlighted*/)
 {
+}
+
+/////////////////////////////////////////////////
+int EditorItem::ZValueIdle() const
+{
+  return this->dataPtr->zValueIdle;
+}
+
+/////////////////////////////////////////////////
+int EditorItem::ZValueSelected() const
+{
+  return this->dataPtr->zValueSelected;
 }

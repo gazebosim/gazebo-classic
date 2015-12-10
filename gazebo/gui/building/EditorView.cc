@@ -352,8 +352,8 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
                   distanceToClose)
               {
                 pf = anotherWall->GetStartPoint();
-                this->snapGrabberOther = anotherWall->grabbers[0];
-                this->snapGrabberCurrent = wallSegmentItem->grabbers[1];
+                this->snapGrabberOther = anotherWall->Grabbers()[0];
+                this->snapGrabberCurrent = wallSegmentItem->Grabbers()[1];
                 this->snapToGrabber = true;
                 break;
               }
@@ -361,8 +361,8 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
                   distanceToClose)
               {
                 pf = anotherWall->GetEndPoint();
-                this->snapGrabberOther = anotherWall->grabbers[1];
-                this->snapGrabberCurrent = wallSegmentItem->grabbers[1];
+                this->snapGrabberOther = anotherWall->Grabbers()[1];
+                this->snapGrabberCurrent = wallSegmentItem->Grabbers()[1];
                 this->snapToGrabber = true;
                 break;
               }
@@ -452,7 +452,7 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
         if (distance > 30 || t > 1.0 || t < 0.0)
         {
           editorItem->setParentItem(NULL);
-          wallSegmentItem->setZValue(wallSegmentItem->zValueIdle);
+          wallSegmentItem->setZValue(wallSegmentItem->ZValueIdle());
           editorItem->SetPositionOnWall(0);
           editorItem->SetAngleOnWall(0);
           this->buildingMaker->DetachManip(this->itemToVisualMap[editorItem],
@@ -494,7 +494,7 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
               scenePos)))
           {
             editorItem->setParentItem(wallSegmentItem);
-            wallSegmentItem->setZValue(wallSegmentItem->zValueIdle+5);
+            wallSegmentItem->setZValue(wallSegmentItem->ZValueIdle()+5);
             this->buildingMaker->AttachManip(
                 this->itemToVisualMap[editorItem],
                 this->itemToVisualMap[wallSegmentItem]);
@@ -575,7 +575,7 @@ void EditorView::mouseDoubleClickEvent(QMouseEvent *_event)
         this->currentMouseItem);
     this->itemToVisualMap.erase(wallSegmentItem);
 
-    this->UnlinkGrabbers(wallSegmentItem->grabbers[0]);
+    this->UnlinkGrabbers(wallSegmentItem->Grabbers()[0]);
 
     this->scene()->removeItem(this->currentMouseItem);
     delete this->currentMouseItem;
@@ -634,8 +634,8 @@ void EditorView::DeleteItem(EditorItem *_item)
       }
     }
 
-    this->UnlinkGrabbers(wallSegmentItem->grabbers[0]);
-    this->UnlinkGrabbers(wallSegmentItem->grabbers[1]);
+    this->UnlinkGrabbers(wallSegmentItem->Grabbers()[0]);
+    this->UnlinkGrabbers(wallSegmentItem->Grabbers()[1]);
 
     this->wallSegmentList.erase(std::remove(this->wallSegmentList.begin(),
         this->wallSegmentList.end(), dynamic_cast<WallSegmentItem *>(_item)),
@@ -704,16 +704,16 @@ void EditorView::DrawWall(const QPoint &_pos)
               <= distanceToClose)
           {
             wallSegmentItem->SetStartPoint(anotherWall->GetStartPoint());
-            this->LinkGrabbers(anotherWall->grabbers[0],
-                wallSegmentItem->grabbers[0]);
+            this->LinkGrabbers(anotherWall->Grabbers()[0],
+                wallSegmentItem->Grabbers()[0]);
             break;
           }
           else if (QVector2D(pointStart - anotherWall->GetEndPoint()).length()
               <= distanceToClose)
           {
             wallSegmentItem->SetStartPoint(anotherWall->GetEndPoint());
-            this->LinkGrabbers(anotherWall->grabbers[1],
-                wallSegmentItem->grabbers[0]);
+            this->LinkGrabbers(anotherWall->Grabbers()[1],
+                wallSegmentItem->Grabbers()[0]);
             break;
           }
         }
@@ -756,7 +756,7 @@ void EditorView::DrawWall(const QPoint &_pos)
     // Start from previous segment's end
     QPointF newPointStart = wallSegmentItem->GetEndPoint();
     QPointF newPointEnd = newPointStart + QPointF(1, 0);
-    GrabberHandle *grabberStart = wallSegmentItem->grabbers[1];
+    GrabberHandle *grabberStart = wallSegmentItem->Grabbers()[1];
 
     wallSegmentItem = new WallSegmentItem(newPointStart,
         newPointEnd, this->levelDefaultHeight);
@@ -766,7 +766,7 @@ void EditorView::DrawWall(const QPoint &_pos)
     this->scene()->addItem(wallSegmentItem);
     this->currentMouseItem = wallSegmentItem;
 
-    this->LinkGrabbers(grabberStart, wallSegmentItem->grabbers[0]);
+    this->LinkGrabbers(grabberStart, wallSegmentItem->Grabbers()[0]);
   }
 
   // 3D counterpart
@@ -1105,15 +1105,15 @@ void EditorView::OnAddLevel()
     // start / end
     for (int g = 0; g < 2; ++g)
     {
-      for (unsigned int i = 0; i < oldWall->grabbers[g]->linkedGrabbers.size();
+      for (unsigned int i = 0; i < oldWall->Grabbers()[g]->linkedGrabbers.size();
           ++i)
       {
         WallSegmentItem *parentItem = dynamic_cast<WallSegmentItem*>(
-            oldWall->grabbers[g]->linkedGrabbers[i]->parentItem());
-        int index = oldWall->grabbers[g]->linkedGrabbers[i]->GetIndex();
+            oldWall->Grabbers()[g]->linkedGrabbers[i]->parentItem());
+        int index = oldWall->Grabbers()[g]->linkedGrabbers[i]->GetIndex();
 
-        newWall->grabbers[g]->linkedGrabbers.push_back(
-            clonedWallMap[parentItem]->grabbers[index]);
+        newWall->Grabbers()[g]->linkedGrabbers.push_back(
+            clonedWallMap[parentItem]->Grabbers()[index]);
       }
     }
   }
@@ -1328,7 +1328,7 @@ void EditorView::CancelDrawMode()
 
       if (wallSegmentItem)
       {
-        this->UnlinkGrabbers(wallSegmentItem->grabbers[0]);
+        this->UnlinkGrabbers(wallSegmentItem->Grabbers()[0]);
       }
       this->scene()->removeItem(this->currentMouseItem);
       delete this->currentMouseItem;
@@ -1420,7 +1420,7 @@ void EditorView::LinkGrabbers(GrabberHandle *_grabber1,
     {
       // Add _grabber2 so it moves when _grabber1 is moved
       _grabber1->linkedGrabbers.push_back(_grabber2);
-      // also link _grabber1 to all grabbers already linked to _grabber2
+      // also link _grabber1 to all Grabbers() already linked to _grabber2
       for (unsigned int i2 = 0; i2 < _grabber2->linkedGrabbers.size(); ++i2)
       {
         this->LinkGrabbers(_grabber1, _grabber2->linkedGrabbers[i2]);
@@ -1433,7 +1433,7 @@ void EditorView::LinkGrabbers(GrabberHandle *_grabber1,
     {
       // Add _grabber1 so it moves when _grabber2 is moved
       _grabber2->linkedGrabbers.push_back(_grabber1);
-      // also link _grabber2 to all grabbers already linked to _grabber1
+      // also link _grabber2 to all Grabbers() already linked to _grabber1
       for (unsigned int i1 = 0; i1 < _grabber1->linkedGrabbers.size(); ++i1)
       {
         this->LinkGrabbers(_grabber2, _grabber1->linkedGrabbers[i1]);
@@ -1446,7 +1446,7 @@ void EditorView::LinkGrabbers(GrabberHandle *_grabber1,
 void EditorView::UnlinkGrabbers(GrabberHandle *_grabber1,
     GrabberHandle *_grabber2)
 {
-  // If only one grabber, erase it from all grabbers it is linked
+  // If only one grabber, erase it from all Grabbers() it is linked
   if (!_grabber2)
   {
     for (unsigned int i = 0; i < _grabber1->linkedGrabbers.size(); ++i)
@@ -1458,6 +1458,6 @@ void EditorView::UnlinkGrabbers(GrabberHandle *_grabber1,
     }
   }
 
-  // TODO: add option to unlink grabbers besides when deleting one of them,
+  // TODO: add option to unlink Grabbers() besides when deleting one of them,
   // perhaps using a hot-key or at the wall inspector
 }

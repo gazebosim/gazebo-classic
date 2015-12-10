@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _MEASURE_ITEM_HH_
-#define _MEASURE_ITEM_HH_
+#ifndef _GAZEBO_BUILDING_MEASURE_ITEM_HH_
+#define _GAZEBO_BUILDING_MEASURE_ITEM_HH_
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/building/SegmentItem.hh"
@@ -57,9 +57,6 @@ namespace gazebo
       /// \brief Set value in meters
       /// \param[in] _value Value measured in meters.
       public: void SetValue(double _value);
-
-      /// \brief Value measured in meters.
-      private: double value;
     };
     /// \}
   }

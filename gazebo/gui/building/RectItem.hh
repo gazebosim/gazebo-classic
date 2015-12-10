@@ -15,10 +15,9 @@
  *
 */
 
-#ifndef _RECT_ITEM_HH_
-#define _RECT_ITEM_HH_
+#ifndef _GAZEBO_BUILDING_RECT_ITEM_HH_
+#define _GAZEBO_BUILDING_RECT_ITEM_HH_
 
-#include <vector>
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/building/WallSegmentItem.hh"
 #include "gazebo/gui/building/EditorItem.hh"
@@ -28,6 +27,7 @@ namespace gazebo
 {
   namespace gui
   {
+    class RectItemPrivate;
     class GrabberHandle;
     class RotateHandle;
     class EditorItem;
@@ -94,6 +94,10 @@ namespace gazebo
 
       // Documentation inherited
       public: void SetHighlighted(bool _highlighted);
+
+      /// \internal
+      /// \brief Constructor used by inherited classes
+      protected: RectItem(RectItemPrivate &_dataPtr);
 
       /// \brief Helper method for Updating the corner positions of the rect
       /// item.
@@ -231,68 +235,6 @@ namespace gazebo
 
       /// \brief Qt callback when the item is being deleted.
       private slots: virtual void OnDeleteItem();
-
-      /// \brief Width of rect item in pixels.
-      protected: double width;
-
-      /// \brief Height of rect item in pixels.
-      protected: double height;
-
-      /// \brief Actual width of rect item drawn in pixels.
-      protected: double drawingWidth;
-
-      /// \brief Actual height of rect item drawn in pixels.
-      protected: double drawingHeight;
-
-      /// \brief X origin of the rect item in pixels.
-      protected: double drawingOriginX;
-
-      /// \brief Y origin of the rect item in pixels.
-      protected: double drawingOriginY;
-
-      /// \brief Border color of the rect item.
-      protected: QColor borderColor;
-
-      /// \brief Rotation angle of the rect item in degrees.
-      protected: double rotationAngle;
-
-      /// \brief Qt action for opening the inspector.
-      protected: QAction *openInspectorAct;
-
-      /// \brief Qt action for deleting the item.
-      protected: QAction *deleteItemAct;
-
-      /// \brief A vector containing this item's measure items.
-      /// Currently only used for windows and doors, containing one measure
-      /// towards each end of this item's parent wall.
-      protected: std::vector<MeasureItem *> measures;
-
-      /// \brief Mouse press position in pixel coordinates.
-      private: QPointF mousePressPos;
-
-      /// \brief Mouse press position in pixel coordinates.
-      private: int gridSpace;
-
-      /// \brief A list of grabber handles for this item. Four for corners and
-      /// four for edges, going clockwise with 0 being top left
-      private: std::vector<GrabberHandle *> grabbers;
-
-      /// \brief Rotate handle for rotating the rect item.
-      private: RotateHandle *rotateHandle;
-
-      /// \brief A list of resize cursors used when the mouse hovers over the
-      /// grabber handles.
-      private: std::vector<Qt::CursorShape> cursors;
-
-      /// \brief Resize flag that controls how the rect item can be resized.
-      private: unsigned int resizeFlag;
-
-      /// \brief Normalized position with respect to the wall segment's start
-      /// point.
-      private: double positionOnWall;
-
-      /// \brief Angle with respect to parent wall, either 0 or 180 degrees.
-      private: double angleOnWall;
     };
     /// \}
   }

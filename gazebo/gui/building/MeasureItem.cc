@@ -20,25 +20,28 @@
 #include "gazebo/gui/building/EditorView.hh"
 #include "gazebo/gui/building/EditorItem.hh"
 #include "gazebo/gui/building/MeasureItem.hh"
+#include "gazebo/gui/building/MeasureItemPrivate.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
 MeasureItem::MeasureItem(const QPointF &_start, const QPointF &_end)
-    : SegmentItem()
+    : SegmentItem(*new MeasureItemPrivate)
 {
-  this->editorType = "Measure";
+  auto dPtr = static_cast<MeasureItemPrivate *>(this->dataPtr);
+
+  dPtr->editorType = "Measure";
 
   this->setFlag(QGraphicsItem::ItemSendsGeometryChanges);
   this->setAcceptHoverEvents(true);
 
   this->SetLine(_start, _end);
-  this->zValueSelected = 8;
-  this->setZValue(this->zValueSelected);
+  dPtr->zValueSelected = 8;
+  this->setZValue(dPtr->zValueSelected);
   this->ShowHandles(false);
 
-  this->value = 0;
+  dPtr->value = 0;
 }
 
 /////////////////////////////////////////////////
@@ -50,6 +53,8 @@ MeasureItem::~MeasureItem()
 void MeasureItem::paint(QPainter *_painter,
     const QStyleOptionGraphicsItem */*_option*/, QWidget */*_widget*/)
 {
+  auto dPtr = static_cast<MeasureItemPrivate *>(this->dataPtr);
+
   QPointF p1 = this->line().p1();
   QPointF p2 = this->line().p2();
   double angle = GZ_DTOR(this->line().angle());
@@ -78,7 +83,7 @@ void MeasureItem::paint(QPainter *_painter,
   // Value
   std::ostringstream stream;
   stream << std::fixed << std::setprecision(3)
-         << this->value << " m";
+         << dPtr->value << " m";
 
   double margin = 10;
   float textWidth = _painter->fontMetrics().width(stream.str().c_str());
@@ -126,5 +131,7 @@ double MeasureItem::GetDistance() const
 /////////////////////////////////////////////////
 void MeasureItem::SetValue(double _value)
 {
-  this->value = _value;
+  auto dPtr = static_cast<MeasureItemPrivate *>(this->dataPtr);
+
+  dPtr->value = _value;
 }

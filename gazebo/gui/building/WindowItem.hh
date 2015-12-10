@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _WINDOW_ITEM_HH_
-#define _WINDOW_ITEM_HH_
+#ifndef _GAZEBO_BUILDING_WINDOW_ITEM_HH_
+#define _GAZEBO_BUILDING_WINDOW_ITEM_HH_
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/building/RectItem.hh"
@@ -74,27 +74,6 @@ namespace gazebo
 
         /// \brief Emit window changed Qt signals.
         public: void WindowChanged();
-
-        /// \brief Depth of the window item in pixels.
-        private: double windowDepth;
-
-        /// \brief Height of the window item in pixels.
-        private: double windowHeight;
-
-        /// \brief Width of the window item in pixels.
-        private: double windowWidth;
-
-        /// \brief Side bar of the window item in pixels.
-        private: double windowSideBar;
-
-        /// \brief Scene position of the window item in pixel coordinates.
-        private: QPointF windowPos;
-
-        /// \brief Elevation of the window item in pixels.
-        private: double windowElevation;
-
-        /// \brief Inspector for configuring the window item.
-        private: WindowDoorInspectorDialog *inspector;
     };
     /// \}
   }

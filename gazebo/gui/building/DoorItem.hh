@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _DOOR_ITEM_HH_
-#define _DOOR_ITEM_HH_
+#ifndef _GAZEBO_BUILDING_DOOR_ITEM_HH_
+#define _GAZEBO_BUILDING_DOOR_ITEM_HH_
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/building/RectItem.hh"
@@ -77,24 +77,6 @@ namespace gazebo
 
       /// \brief Emit size changed signals
       private: void SizeChanged();
-
-      /// \brief Door depth in pixels
-      private: double doorDepth;
-
-      /// \brief Door height in pixels
-      private: double doorHeight;
-
-      /// \brief Door width in pixels
-      private: double doorWidth;
-
-      /// \brief Door elevation in pixels
-      private: double doorElevation;
-
-      /// \brief Door scene position in pixel coordinates.
-      private: QPointF doorPos;
-
-      /// \brief Inspector for configuring the door item.
-      private: WindowDoorInspectorDialog *inspector;
     };
     /// \}
   }

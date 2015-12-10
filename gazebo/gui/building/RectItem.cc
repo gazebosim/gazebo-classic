@@ -20,37 +20,41 @@
 #include "gazebo/gui/building/GrabberHandle.hh"
 #include "gazebo/gui/building/RotateHandle.hh"
 #include "gazebo/gui/building/EditorItem.hh"
+#include "gazebo/gui/building/WallSegmentItem.hh"
 #include "gazebo/gui/building/RectItem.hh"
+#include "gazebo/gui/building/RectItemPrivate.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-RectItem::RectItem()
+RectItem::RectItem() : EditorItem(*new RectItemPrivate)
 {
-  this->editorType = "Rect";
+  auto dPtr = static_cast<RectItemPrivate *>(this->dataPtr);
 
-  this->width = 100;
-  this->height = 100;
-  this->highlighted = true;
+  dPtr->editorType = "Rect";
 
-  this->drawingOriginX = 0;
-  this->drawingOriginY = 0;
+  dPtr->width = 100;
+  dPtr->height = 100;
+  dPtr->highlighted = true;
 
-  this->positionOnWall = 0;
-  this->angleOnWall = 0;
+  dPtr->drawingOriginX = 0;
+  dPtr->drawingOriginY = 0;
 
-  this->drawingWidth = this->width;
-  this->drawingHeight = this->height;
+  dPtr->positionOnWall = 0;
+  dPtr->angleOnWall = 0;
 
-  this->borderColor = Qt::black;
+  dPtr->drawingWidth = dPtr->width;
+  dPtr->drawingHeight = dPtr->height;
+
+  dPtr->borderColor = Qt::black;
 
   for (int i = 0; i < 8; ++i)
   {
     GrabberHandle *grabber = new GrabberHandle(this, i);
-    this->grabbers.push_back(grabber);
+    dPtr->grabbers.push_back(grabber);
   }
-  this->rotateHandle = new RotateHandle(this);
+  dPtr->rotateHandle = new RotateHandle(this);
 
   this->setSelected(false);
   this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable);
@@ -59,65 +63,133 @@ RectItem::RectItem()
   this->UpdateCornerPositions();
   this->setAcceptHoverEvents(true);
 
-  this->cursors.push_back(Qt::SizeFDiagCursor);
-  this->cursors.push_back(Qt::SizeVerCursor);
-  this->cursors.push_back(Qt::SizeBDiagCursor);
-  this->cursors.push_back(Qt::SizeHorCursor);
+  dPtr->cursors.push_back(Qt::SizeFDiagCursor);
+  dPtr->cursors.push_back(Qt::SizeVerCursor);
+  dPtr->cursors.push_back(Qt::SizeBDiagCursor);
+  dPtr->cursors.push_back(Qt::SizeHorCursor);
 
   this->setCursor(Qt::SizeAllCursor);
 
-  this->rotationAngle = 0;
+  dPtr->rotationAngle = 0;
 
-  this->zValueIdle = 1;
-  this->zValueSelected = 5;
+  dPtr->zValueIdle = 1;
+  dPtr->zValueSelected = 5;
 
   this->SetResizeFlag(ITEM_WIDTH | ITEM_HEIGHT);
 
-  this->openInspectorAct = new QAction(tr("&Open Inspector"), this);
-  this->openInspectorAct->setStatusTip(tr("Open Inspector"));
-  connect(this->openInspectorAct, SIGNAL(triggered()),
+  dPtr->openInspectorAct = new QAction(tr("&Open Inspector"), this);
+  dPtr->openInspectorAct->setStatusTip(tr("Open Inspector"));
+  connect(dPtr->openInspectorAct, SIGNAL(triggered()),
     this, SLOT(OnOpenInspector()));
 
-  this->deleteItemAct = new QAction(tr("&Delete"), this);
-  this->deleteItemAct->setStatusTip(tr("Delete"));
-  connect(this->deleteItemAct, SIGNAL(triggered()),
+  dPtr->deleteItemAct = new QAction(tr("&Delete"), this);
+  dPtr->deleteItemAct->setStatusTip(tr("Delete"));
+  connect(dPtr->deleteItemAct, SIGNAL(triggered()),
+    this, SLOT(OnDeleteItem()));
+}
+
+//////////////////////////////////////////////////
+RectItem::RectItem(RectItemPrivate &_dataPtr)
+    : EditorItem(_dataPtr)
+{
+  auto dPtr = static_cast<RectItemPrivate *>(this->dataPtr);
+
+  dPtr->editorType = "Rect";
+
+  dPtr->width = 100;
+  dPtr->height = 100;
+  dPtr->highlighted = true;
+
+  dPtr->drawingOriginX = 0;
+  dPtr->drawingOriginY = 0;
+
+  dPtr->positionOnWall = 0;
+  dPtr->angleOnWall = 0;
+
+  dPtr->drawingWidth = dPtr->width;
+  dPtr->drawingHeight = dPtr->height;
+
+  dPtr->borderColor = Qt::black;
+
+  for (int i = 0; i < 8; ++i)
+  {
+    GrabberHandle *grabber = new GrabberHandle(this, i);
+    dPtr->grabbers.push_back(grabber);
+  }
+  dPtr->rotateHandle = new RotateHandle(this);
+
+  this->setSelected(false);
+  this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable);
+  this->setFlag(QGraphicsItem::ItemSendsScenePositionChanges);
+
+  this->UpdateCornerPositions();
+  this->setAcceptHoverEvents(true);
+
+  dPtr->cursors.push_back(Qt::SizeFDiagCursor);
+  dPtr->cursors.push_back(Qt::SizeVerCursor);
+  dPtr->cursors.push_back(Qt::SizeBDiagCursor);
+  dPtr->cursors.push_back(Qt::SizeHorCursor);
+
+  this->setCursor(Qt::SizeAllCursor);
+
+  dPtr->rotationAngle = 0;
+
+  dPtr->zValueIdle = 1;
+  dPtr->zValueSelected = 5;
+
+  this->SetResizeFlag(ITEM_WIDTH | ITEM_HEIGHT);
+
+  dPtr->openInspectorAct = new QAction(tr("&Open Inspector"), this);
+  dPtr->openInspectorAct->setStatusTip(tr("Open Inspector"));
+  connect(dPtr->openInspectorAct, SIGNAL(triggered()),
+    this, SLOT(OnOpenInspector()));
+
+  dPtr->deleteItemAct = new QAction(tr("&Delete"), this);
+  dPtr->deleteItemAct->setStatusTip(tr("Delete"));
+  connect(dPtr->deleteItemAct, SIGNAL(triggered()),
     this, SLOT(OnDeleteItem()));
 }
 
 /////////////////////////////////////////////////
 RectItem::~RectItem()
 {
+  auto dPtr = static_cast<RectItemPrivate *>(this->dataPtr);
+
   for (int i = 0; i < 8; ++i)
   {
-    this->grabbers[i]->setParentItem(NULL);
-    delete this->grabbers[i];
+    dPtr->grabbers[i]->setParentItem(NULL);
+    delete dPtr->grabbers[i];
   }
-  this->rotateHandle->setParentItem(NULL);
-  delete this->rotateHandle;
-  if (!this->measures.empty())
+  dPtr->rotateHandle->setParentItem(NULL);
+  delete dPtr->rotateHandle;
+  if (!dPtr->measures.empty())
   {
-    delete this->measures[0];
-    delete this->measures[1];
+    delete dPtr->measures[0];
+    delete dPtr->measures[1];
   }
 }
 
 /////////////////////////////////////////////////
 void RectItem::ShowHandles(bool _show)
 {
+  auto dPtr = static_cast<RectItemPrivate *>(this->dataPtr);
+
   for (int i = 0; i < 8; ++i)
   {
-    this->grabbers[i]->setVisible(_show && this->grabbers[i]->isEnabled());
+    dPtr->grabbers[i]->setVisible(_show && dPtr->grabbers[i]->isEnabled());
   }
-  this->rotateHandle->setVisible(_show);
+  dPtr->rotateHandle->setVisible(_show);
 }
 
 /////////////////////////////////////////////////
 void RectItem::AdjustSize(double _x, double _y)
 {
-  this->width += _x;
-  this->height += _y;
-  this->drawingWidth = this->width;
-  this->drawingHeight = this->height;
+  auto dPtr = static_cast<RectItemPrivate *>(this->dataPtr);
+
+  dPtr->width += _x;
+  dPtr->height += _y;
+  dPtr->drawingWidth = dPtr->width;
+  dPtr->drawingHeight = dPtr->height;
 }
 
 /////////////////////////////////////////////////
@@ -140,39 +212,41 @@ QVariant RectItem::itemChange(GraphicsItemChange _change,
 /////////////////////////////////////////////////
 void RectItem::SetHighlighted(bool _highlighted)
 {
+  auto dPtr = static_cast<RectItemPrivate *>(this->dataPtr);
+
   if (_highlighted)
   {
-    this->setZValue(zValueSelected);
+    this->setZValue(this->ZValueSelected());
     WallSegmentItem *wallItem = dynamic_cast<WallSegmentItem *>(
         this->parentItem());
     if (wallItem)
-      wallItem->setZValue(wallItem->zValueSelected);
+      wallItem->setZValue(wallItem->ZValueSelected());
 
     for (int i = 0; i < 8; ++i)
     {
-      if (this->grabbers[i]->isEnabled())
-        this->grabbers[i]->installSceneEventFilter(this);
+      if (dPtr->grabbers[i]->isEnabled())
+        dPtr->grabbers[i]->installSceneEventFilter(this);
     }
-    this->rotateHandle->installSceneEventFilter(this);
+    dPtr->rotateHandle->installSceneEventFilter(this);
     this->Set3dTransparency(0.0);
   }
   else
   {
-    this->setZValue(zValueIdle);
+    this->setZValue(this->ZValueIdle());
     WallSegmentItem *wallItem = dynamic_cast<WallSegmentItem *>(
         this->parentItem());
     if (wallItem)
-      wallItem->setZValue(wallItem->zValueIdle);
+      wallItem->setZValue(wallItem->ZValueIdle());
 
     for (int i = 0; i < 8; ++i)
     {
-      if (this->grabbers[i]->isEnabled())
-        this->grabbers[i]->removeSceneEventFilter(this);
+      if (dPtr->grabbers[i]->isEnabled())
+        dPtr->grabbers[i]->removeSceneEventFilter(this);
     }
-    this->rotateHandle->removeSceneEventFilter(this);
+    dPtr->rotateHandle->removeSceneEventFilter(this);
     this->Set3dTransparency(0.4);
   }
-  this->highlighted = _highlighted;
+  dPtr->highlighted = _highlighted;
   this->UpdateMeasures();
 }
 
@@ -193,6 +267,8 @@ bool RectItem::sceneEventFilter(QGraphicsItem * _watched, QEvent *_event)
 /////////////////////////////////////////////////
 bool RectItem::RotateEventFilter(RotateHandle *_rotate, QEvent *_event)
 {
+  auto dPtr = static_cast<RectItemPrivate *>(this->dataPtr);
+
   QGraphicsSceneMouseEvent *mouseEvent =
     dynamic_cast<QGraphicsSceneMouseEvent*>(_event);
 
@@ -241,7 +317,7 @@ bool RectItem::RotateEventFilter(RotateHandle *_rotate, QEvent *_event)
   if (_rotate->GetMouseState()
       == static_cast<int>(QEvent::GraphicsSceneMouseMove))
   {
-    QPoint localCenter(this->drawingOriginX, this->drawingOriginY);
+    QPoint localCenter(dPtr->drawingOriginX, dPtr->drawingOriginY);
     QPointF center = this->mapToScene(localCenter);
 
     QPointF newPoint = mouseEvent->scenePos();
@@ -251,8 +327,8 @@ bool RectItem::RotateEventFilter(RotateHandle *_rotate, QEvent *_event)
 
     if (this->parentItem())
     {
-      QPointF localCenterTop(this->drawingOriginX, this->drawingOriginY
-          + this->drawingHeight);
+      QPointF localCenterTop(dPtr->drawingOriginX, dPtr->drawingOriginY
+          + dPtr->drawingHeight);
       QPointF centerTop = this->mapToScene(localCenterTop);
       QLineF lineCenter(center.x(), center.y(), centerTop.x(), centerTop.y());
       angle = -lineCenter.angleTo(line);
@@ -283,6 +359,8 @@ bool RectItem::RotateEventFilter(RotateHandle *_rotate, QEvent *_event)
 /////////////////////////////////////////////////
 bool RectItem::GrabberEventFilter(GrabberHandle *_grabber, QEvent *_event)
 {
+  auto dPtr = static_cast<RectItemPrivate *>(this->dataPtr);
+
   QGraphicsSceneMouseEvent *mouseEvent =
     dynamic_cast<QGraphicsSceneMouseEvent*>(_event);
 
@@ -310,8 +388,8 @@ bool RectItem::GrabberEventFilter(GrabberHandle *_grabber, QEvent *_event)
     case QEvent::GraphicsSceneHoverEnter:
     case QEvent::GraphicsSceneHoverMove:
     {
-      double angle = this->rotationAngle
-          - static_cast<int>(rotationAngle/360) * 360;
+      double angle = dPtr->rotationAngle
+          - static_cast<int>(dPtr->rotationAngle/360) * 360;
       double range = 22.5;
       if (angle < 0)
         angle += 360;
@@ -320,24 +398,24 @@ bool RectItem::GrabberEventFilter(GrabberHandle *_grabber, QEvent *_event)
           || ((angle <= (180 + range)) && (angle > (180 - range))))
       {
         QApplication::setOverrideCursor(
-            QCursor(this->cursors[_grabber->GetIndex() % 4]));
+            QCursor(dPtr->cursors[_grabber->GetIndex() % 4]));
       }
       else if (((angle <= (360 - range)) && (angle > (270 + range)))
           || ((angle <= (180 - range)) && (angle > (90 + range))))
       {
         QApplication::setOverrideCursor(
-            QCursor(this->cursors[(_grabber->GetIndex() + 3) % 4]));
+            QCursor(dPtr->cursors[(_grabber->GetIndex() + 3) % 4]));
       }
       else if (((angle <= (270 + range)) && (angle > (270 - range)))
           || ((angle <= (90 + range)) && (angle > (90 - range))))
       {
         QApplication::setOverrideCursor(
-            QCursor(this->cursors[(_grabber->GetIndex() + 2) % 4]));
+            QCursor(dPtr->cursors[(_grabber->GetIndex() + 2) % 4]));
       }
       else
       {
         QApplication::setOverrideCursor(
-            QCursor(this->cursors[(_grabber->GetIndex() + 1) % 4]));
+            QCursor(dPtr->cursors[(_grabber->GetIndex() + 1) % 4]));
       }
       return true;
     }
@@ -428,23 +506,23 @@ bool RectItem::GrabberEventFilter(GrabberHandle *_grabber, QEvent *_event)
     double xMoved = _grabber->GetMouseDownX() - xPos;
     double yMoved = _grabber->GetMouseDownY() - yPos;
 
-    double newWidth = this->width + (xAxisSign * xMoved);
+    double newWidth = dPtr->width + (xAxisSign * xMoved);
     if (newWidth < 20)
       newWidth  = 20;
 
-    double newHeight = this->height + (yAxisSign * yMoved);
+    double newHeight = dPtr->height + (yAxisSign * yMoved);
     if (newHeight < 20)
       newHeight = 20;
 
-    double deltaWidth = newWidth - this->width;
-    double deltaHeight = newHeight - this->height;
+    double deltaWidth = newWidth - dPtr->width;
+    double deltaHeight = newHeight - dPtr->height;
 
     this->AdjustSize(deltaWidth, deltaHeight);
 
     deltaWidth *= (-1);
     deltaHeight *= (-1);
 
-    double angle = rotationAngle / 360.0 * (2 * M_PI);
+    double angle = dPtr->rotationAngle / 360.0 * (2 * M_PI);
     double dx = 0;
     double dy = 0;
     switch (_grabber->GetIndex())
@@ -507,12 +585,12 @@ bool RectItem::GrabberEventFilter(GrabberHandle *_grabber, QEvent *_event)
           {
             if (this->GetAngleOnWall() < 90)
             {
-              this->positionOnWall -= deltaWidth /
+              dPtr->positionOnWall -= deltaWidth /
                   (2*wallItem->line().length());
             }
             else
             {
-              this->positionOnWall += deltaWidth /
+              dPtr->positionOnWall += deltaWidth /
                   (2*wallItem->line().length());
             }
           }
@@ -539,12 +617,12 @@ bool RectItem::GrabberEventFilter(GrabberHandle *_grabber, QEvent *_event)
           {
             if (this->GetAngleOnWall() < 90)
             {
-              this->positionOnWall += deltaWidth /
+              dPtr->positionOnWall += deltaWidth /
                   (2*wallItem->line().length());
             }
             else
             {
-              this->positionOnWall -= deltaWidth /
+              dPtr->positionOnWall -= deltaWidth /
                   (2*wallItem->line().length());
             }
           }
@@ -563,48 +641,54 @@ bool RectItem::GrabberEventFilter(GrabberHandle *_grabber, QEvent *_event)
 /////////////////////////////////////////////////
 void RectItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *_event)
 {
-  /// TODO: uncomment to enable snap to grid
-/*  this->location.setX( (static_cast<int>(this->location.x())
-      / this->gridSpace) * this->gridSpace);
-  this->location.setY( (static_cast<int>(this->location.y())
-      / this->gridSpace) * this->gridSpace);*/
+  auto dPtr = static_cast<RectItemPrivate *>(this->dataPtr);
 
-  this->mousePressPos = QPointF(0, 0);
+  /// TODO: uncomment to enable snap to grid
+/*  dPtr->location.setX( (static_cast<int>(dPtr->location.x())
+      / dPtr->gridSpace) * dPtr->gridSpace);
+  dPtr->location.setY( (static_cast<int>(dPtr->location.y())
+      / dPtr->gridSpace) * dPtr->gridSpace);*/
+
+  dPtr->mousePressPos = QPointF(0, 0);
   _event->setAccepted(true);
 }
 
 /////////////////////////////////////////////////
 void RectItem::mousePressEvent(QGraphicsSceneMouseEvent *_event)
 {
+  auto dPtr = static_cast<RectItemPrivate *>(this->dataPtr);
+
 //  if (!this->isSelected())
 //    this->scene()->clearSelection();
 
 //  this->setSelected(true);
   QApplication::setOverrideCursor(QCursor(Qt::SizeAllCursor));
-  this->mousePressPos = this->mapFromScene(_event->scenePos());
+  dPtr->mousePressPos = this->mapFromScene(_event->scenePos());
   _event->setAccepted(true);
 }
 
 /////////////////////////////////////////////////
 void RectItem::mouseMoveEvent(QGraphicsSceneMouseEvent *_event)
 {
+  auto dPtr = static_cast<RectItemPrivate *>(this->dataPtr);
+
   if (!this->isSelected())
     return;
 
 //  QPointF delta = _event->scenePos() - _event->lastScenePos();
 //  this->SetPosition(this->scenePos() + delta);
-//  this->location += delta;
-//  this->SetPosition(this->location);
+//  dPtr->location += delta;
+//  this->SetPosition(dPtr->location);
 
   // keep track of mouse press pos for more accurate mouse movements than
   // purely relying on mouse translations because we expect items to rotate
   // arbitrary (snap to parent items) when dragged
-  QPointF trans = this->mapFromScene(_event->scenePos()) - this->mousePressPos;
+  QPointF trans = this->mapFromScene(_event->scenePos()) - dPtr->mousePressPos;
   QPointF rotatedTrans;
-  rotatedTrans.setX(cos(GZ_DTOR(this->rotationAngle))*-trans.x()
-    - sin(GZ_DTOR(this->rotationAngle))*-trans.y());
-  rotatedTrans.setY(sin(GZ_DTOR(this->rotationAngle))*-trans.x()
-    + cos(GZ_DTOR(this->rotationAngle))*-trans.y());
+  rotatedTrans.setX(cos(GZ_DTOR(dPtr->rotationAngle))*-trans.x()
+    - sin(GZ_DTOR(dPtr->rotationAngle))*-trans.y());
+  rotatedTrans.setY(sin(GZ_DTOR(dPtr->rotationAngle))*-trans.x()
+    + cos(GZ_DTOR(dPtr->rotationAngle))*-trans.y());
 
   this->SetPosition(this->pos() - rotatedTrans);
 }
@@ -618,6 +702,8 @@ void RectItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event)
 /////////////////////////////////////////////////
 void RectItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *_event)
 {
+  auto dPtr = static_cast<RectItemPrivate *>(this->dataPtr);
+
   if (!this->isSelected())
   {
     _event->ignore();
@@ -628,10 +714,10 @@ void RectItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *_event)
 
   for (int i = 0; i < 8; ++i)
   {
-    if (this->grabbers[i]->isEnabled())
-      this->grabbers[i]->removeSceneEventFilter(this);
+    if (dPtr->grabbers[i]->isEnabled())
+      dPtr->grabbers[i]->removeSceneEventFilter(this);
   }
-  this->rotateHandle->removeSceneEventFilter(this);
+  dPtr->rotateHandle->removeSceneEventFilter(this);
 }
 
 /////////////////////////////////////////////////
@@ -649,6 +735,8 @@ void RectItem::hoverMoveEvent(QGraphicsSceneHoverEvent *_event)
 /////////////////////////////////////////////////
 void RectItem::hoverEnterEvent(QGraphicsSceneHoverEvent *_event)
 {
+  auto dPtr = static_cast<RectItemPrivate *>(this->dataPtr);
+
   if (!this->isSelected())
   {
     _event->ignore();
@@ -657,46 +745,48 @@ void RectItem::hoverEnterEvent(QGraphicsSceneHoverEvent *_event)
 
   QApplication::setOverrideCursor(QCursor(Qt::SizeAllCursor));
 
-  for (unsigned int i = 0; i < this->grabbers.size(); ++i)
+  for (unsigned int i = 0; i < dPtr->grabbers.size(); ++i)
   {
-    if (this->grabbers[i]->isEnabled())
-      this->grabbers[i]->installSceneEventFilter(this);
+    if (dPtr->grabbers[i]->isEnabled())
+      dPtr->grabbers[i]->installSceneEventFilter(this);
   }
-  this->rotateHandle->installSceneEventFilter(this);
+  dPtr->rotateHandle->installSceneEventFilter(this);
 }
 
 /////////////////////////////////////////////////
 void RectItem::UpdateCornerPositions()
 {
-  int grabberWidth = (this->grabbers[0]->boundingRect().width())/2;
-  int grabberHeight = (this->grabbers[0]->boundingRect().height())/2;
+  auto dPtr = static_cast<RectItemPrivate *>(this->dataPtr);
 
-  this->grabbers[0]->setPos(
-      this->drawingOriginX - this->drawingWidth/2 - grabberWidth,
-      this->drawingOriginY - this->drawingHeight/2 - grabberHeight);
-  this->grabbers[2]->setPos(
-      this->drawingOriginX + this->drawingWidth/2 - grabberWidth,
-      this->drawingOriginY - this->drawingHeight/2 - grabberHeight);
-  this->grabbers[4]->setPos(
-      this->drawingOriginX + this->drawingWidth/2 - grabberWidth,
-      this->drawingOriginY + this->drawingHeight/2 - grabberHeight);
-  this->grabbers[6]->setPos(
-      this->drawingOriginX - this->drawingWidth/2 - grabberWidth,
-      this->drawingOriginY + this->drawingHeight/2 - grabberHeight);
+  int grabberWidth = (dPtr->grabbers[0]->boundingRect().width())/2;
+  int grabberHeight = (dPtr->grabbers[0]->boundingRect().height())/2;
 
-  this->grabbers[1]->setPos(this->drawingOriginX - grabberWidth,
-      this->drawingOriginY - this->drawingHeight/2 - grabberHeight);
-  this->grabbers[3]->setPos(
-      this->drawingOriginX + this->drawingWidth/2 - grabberWidth,
-      this->drawingOriginY - grabberHeight);
-  this->grabbers[5]->setPos(this->drawingOriginX - grabberWidth,
-      this->drawingOriginY + this->drawingHeight/2 - grabberHeight);
-  this->grabbers[7]->setPos(
-      this->drawingOriginX - this->drawingWidth/2 - grabberWidth,
-      this->drawingOriginY - grabberHeight);
+  dPtr->grabbers[0]->setPos(
+      dPtr->drawingOriginX - dPtr->drawingWidth/2 - grabberWidth,
+      dPtr->drawingOriginY - dPtr->drawingHeight/2 - grabberHeight);
+  dPtr->grabbers[2]->setPos(
+      dPtr->drawingOriginX + dPtr->drawingWidth/2 - grabberWidth,
+      dPtr->drawingOriginY - dPtr->drawingHeight/2 - grabberHeight);
+  dPtr->grabbers[4]->setPos(
+      dPtr->drawingOriginX + dPtr->drawingWidth/2 - grabberWidth,
+      dPtr->drawingOriginY + dPtr->drawingHeight/2 - grabberHeight);
+  dPtr->grabbers[6]->setPos(
+      dPtr->drawingOriginX - dPtr->drawingWidth/2 - grabberWidth,
+      dPtr->drawingOriginY + dPtr->drawingHeight/2 - grabberHeight);
 
-  this->rotateHandle->setPos(this->drawingOriginX,
-      this->drawingOriginY - this->drawingHeight/2);
+  dPtr->grabbers[1]->setPos(dPtr->drawingOriginX - grabberWidth,
+      dPtr->drawingOriginY - dPtr->drawingHeight/2 - grabberHeight);
+  dPtr->grabbers[3]->setPos(
+      dPtr->drawingOriginX + dPtr->drawingWidth/2 - grabberWidth,
+      dPtr->drawingOriginY - grabberHeight);
+  dPtr->grabbers[5]->setPos(dPtr->drawingOriginX - grabberWidth,
+      dPtr->drawingOriginY + dPtr->drawingHeight/2 - grabberHeight);
+  dPtr->grabbers[7]->setPos(
+      dPtr->drawingOriginX - dPtr->drawingWidth/2 - grabberWidth,
+      dPtr->drawingOriginY - grabberHeight);
+
+  dPtr->rotateHandle->setPos(dPtr->drawingOriginX,
+      dPtr->drawingOriginY - dPtr->drawingHeight/2);
 
   this->SizeChanged();
   this->setRect(this->boundingRect());
@@ -707,81 +797,101 @@ void RectItem::UpdateCornerPositions()
 /////////////////////////////////////////////////
 void RectItem::SetWidth(int _width)
 {
-  this->width = _width;
-  this->drawingWidth = this->width;
+  auto dPtr = static_cast<RectItemPrivate *>(this->dataPtr);
+
+  dPtr->width = _width;
+  dPtr->drawingWidth = dPtr->width;
   this->UpdateCornerPositions();
   this->update();
 
-  emit WidthChanged(this->drawingWidth);
+  emit WidthChanged(dPtr->drawingWidth);
 }
 
 /////////////////////////////////////////////////
 void RectItem::SetHeight(int _height)
 {
-  this->height = _height;
-  this->drawingHeight = this->height;
+  auto dPtr = static_cast<RectItemPrivate *>(this->dataPtr);
+
+  dPtr->height = _height;
+  dPtr->drawingHeight = dPtr->height;
   this->UpdateCornerPositions();
   this->update();
 
-  emit DepthChanged(this->drawingHeight);
+  emit DepthChanged(dPtr->drawingHeight);
 }
 
 /////////////////////////////////////////////////
 void RectItem::SetSize(QSize _size)
 {
-  this->width = _size.width();
-  this->drawingWidth = this->width;
-  this->height = _size.height();
-  this->drawingHeight = this->height;
+  auto dPtr = static_cast<RectItemPrivate *>(this->dataPtr);
+
+  dPtr->width = _size.width();
+  dPtr->drawingWidth = dPtr->width;
+  dPtr->height = _size.height();
+  dPtr->drawingHeight = dPtr->height;
   this->UpdateCornerPositions();
   this->update();
 
-  emit WidthChanged(this->drawingWidth);
-  emit DepthChanged(this->drawingHeight);
+  emit WidthChanged(dPtr->drawingWidth);
+  emit DepthChanged(dPtr->drawingHeight);
 }
 
 /////////////////////////////////////////////////
 double RectItem::GetWidth() const
 {
-  return this->drawingWidth;
+  auto dPtr = static_cast<RectItemPrivate *>(this->dataPtr);
+
+  return dPtr->drawingWidth;
 }
 
 /////////////////////////////////////////////////
 double RectItem::GetHeight() const
 {
-  return this->drawingHeight;
+  auto dPtr = static_cast<RectItemPrivate *>(this->dataPtr);
+
+  return dPtr->drawingHeight;
 }
 
 /////////////////////////////////////////////////
 void RectItem::SetPositionOnWall(double _positionOnWall)
 {
-  this->positionOnWall = _positionOnWall;
+  auto dPtr = static_cast<RectItemPrivate *>(this->dataPtr);
+
+  dPtr->positionOnWall = _positionOnWall;
   this->UpdateMeasures();
 }
 
 /////////////////////////////////////////////////
 double RectItem::GetPositionOnWall() const
 {
-  return this->positionOnWall;
+  auto dPtr = static_cast<RectItemPrivate *>(this->dataPtr);
+
+  return dPtr->positionOnWall;
 }
 
 /////////////////////////////////////////////////
 void RectItem::SetAngleOnWall(double _angleOnWall)
 {
-  this->angleOnWall = _angleOnWall;
+  auto dPtr = static_cast<RectItemPrivate *>(this->dataPtr);
+
+  dPtr->angleOnWall = _angleOnWall;
   this->UpdateMeasures();
 }
 
 /////////////////////////////////////////////////
 double RectItem::GetAngleOnWall() const
 {
-  return this->angleOnWall;
+  auto dPtr = static_cast<RectItemPrivate *>(this->dataPtr);
+
+  return dPtr->angleOnWall;
 }
 
 /////////////////////////////////////////////////
 QRectF RectItem::boundingRect() const
 {
-  return QRectF(-this->width/2, -this->height/2, this->width, this->height);
+  auto dPtr = static_cast<RectItemPrivate *>(this->dataPtr);
+
+  return QRectF(-dPtr->width/2, -dPtr->height/2, dPtr->width, dPtr->height);
 }
 
 /////////////////////////////////////////////////
@@ -802,7 +912,9 @@ void RectItem::DrawBoundingBox(QPainter *_painter)
 /////////////////////////////////////////////////
 QVector3D RectItem::GetSize() const
 {
-  return QVector3D(this->width, this->height, 0);
+  auto dPtr = static_cast<RectItemPrivate *>(this->dataPtr);
+
+  return QVector3D(dPtr->width, dPtr->height, 0);
 }
 
 /////////////////////////////////////////////////
@@ -814,27 +926,31 @@ QVector3D RectItem::GetScenePosition() const
 /////////////////////////////////////////////////
 double RectItem::GetSceneRotation() const
 {
-  return this->rotationAngle;
+  auto dPtr = static_cast<RectItemPrivate *>(this->dataPtr);
+
+  return dPtr->rotationAngle;
 }
 
 /////////////////////////////////////////////////
 void RectItem::paint(QPainter *_painter, const QStyleOptionGraphicsItem *,
     QWidget *)
 {
+  auto dPtr = static_cast<RectItemPrivate *>(this->dataPtr);
+
   _painter->save();
 
-  QPointF topLeft(this->drawingOriginX - this->drawingWidth/2,
-      this->drawingOriginY - this->drawingHeight/2);
-  QPointF topRight(this->drawingOriginX + this->drawingWidth/2,
-      this->drawingOriginY - this->drawingHeight/2);
-  QPointF bottomLeft(this->drawingOriginX - this->drawingWidth/2,
-      this->drawingOriginY + this->drawingHeight/2);
-  QPointF bottomRight(this->drawingOriginX  + this->drawingWidth/2,
-      this->drawingOriginY + this->drawingHeight/2);
+  QPointF topLeft(dPtr->drawingOriginX - dPtr->drawingWidth/2,
+      dPtr->drawingOriginY - dPtr->drawingHeight/2);
+  QPointF topRight(dPtr->drawingOriginX + dPtr->drawingWidth/2,
+      dPtr->drawingOriginY - dPtr->drawingHeight/2);
+  QPointF bottomLeft(dPtr->drawingOriginX - dPtr->drawingWidth/2,
+      dPtr->drawingOriginY + dPtr->drawingHeight/2);
+  QPointF bottomRight(dPtr->drawingOriginX  + dPtr->drawingWidth/2,
+      dPtr->drawingOriginY + dPtr->drawingHeight/2);
 
   QPen rectPen;
   rectPen.setStyle(Qt::SolidLine);
-  rectPen.setColor(borderColor);
+  rectPen.setColor(dPtr->borderColor);
   _painter->setPen(rectPen);
 
   _painter->drawLine(topLeft, topRight);
@@ -859,9 +975,11 @@ void RectItem::mousePressEvent(QGraphicsSceneDragDropEvent *_event)
 /////////////////////////////////////////////////
 void RectItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *_event)
 {
+  auto dPtr = static_cast<RectItemPrivate *>(this->dataPtr);
+
   QMenu menu;
-  menu.addAction(this->openInspectorAct);
-  menu.addAction(this->deleteItemAct);
+  menu.addAction(dPtr->openInspectorAct);
+  menu.addAction(dPtr->deleteItemAct);
   menu.exec(_event->screenPos());
   _event->accept();
 }
@@ -893,93 +1011,102 @@ void RectItem::SetPosition(double _x, double _y)
 /////////////////////////////////////////////////
 void RectItem::SetRotation(double _angle)
 {
-  this->rotate(_angle - this->rotationAngle);
-  this->rotationAngle = _angle;
-  emit YawChanged(this->rotationAngle);
+  auto dPtr = static_cast<RectItemPrivate *>(this->dataPtr);
+
+  this->rotate(_angle - dPtr->rotationAngle);
+  dPtr->rotationAngle = _angle;
+  emit YawChanged(dPtr->rotationAngle);
 }
 
 /////////////////////////////////////////////////
 double RectItem::GetRotation() const
 {
-  return this->rotationAngle;
+  auto dPtr = static_cast<RectItemPrivate *>(this->dataPtr);
+
+  return dPtr->rotationAngle;
 }
 
 /////////////////////////////////////////////////
 void RectItem::SizeChanged()
 {
-  emit DepthChanged(this->drawingHeight);
-  emit WidthChanged(this->drawingWidth);
+  auto dPtr = static_cast<RectItemPrivate *>(this->dataPtr);
+
+  emit DepthChanged(dPtr->drawingHeight);
+  emit WidthChanged(dPtr->drawingWidth);
   this->UpdateMeasures();
 }
 
 /////////////////////////////////////////////////
 void RectItem::SetResizeFlag(unsigned int _flag)
 {
-  if (this->resizeFlag == _flag)
+  auto dPtr = static_cast<RectItemPrivate *>(this->dataPtr);
+
+  if (dPtr->resizeFlag == _flag)
     return;
 
-  this->resizeFlag = _flag;
+  dPtr->resizeFlag = _flag;
   for (int i = 0; i < 8; ++i)
-    this->grabbers[i]->setEnabled(false);
+    dPtr->grabbers[i]->setEnabled(false);
 
-
-  if (resizeFlag & ITEM_WIDTH)
+  if (dPtr->resizeFlag & ITEM_WIDTH)
   {
-    this->grabbers[3]->setEnabled(true);
-    this->grabbers[7]->setEnabled(true);
+    dPtr->grabbers[3]->setEnabled(true);
+    dPtr->grabbers[7]->setEnabled(true);
   }
-  if (resizeFlag & ITEM_HEIGHT)
+  if (dPtr->resizeFlag & ITEM_HEIGHT)
   {
-    this->grabbers[1]->setEnabled(true);
-    this->grabbers[5]->setEnabled(true);
+    dPtr->grabbers[1]->setEnabled(true);
+    dPtr->grabbers[5]->setEnabled(true);
   }
-  if ((resizeFlag & ITEM_WIDTH) && (resizeFlag & ITEM_HEIGHT))
+  if ((dPtr->resizeFlag & ITEM_WIDTH) && (dPtr->resizeFlag & ITEM_HEIGHT))
   {
-    this->grabbers[0]->setEnabled(true);
-    this->grabbers[2]->setEnabled(true);
-    this->grabbers[4]->setEnabled(true);
-    this->grabbers[6]->setEnabled(true);
+    dPtr->grabbers[0]->setEnabled(true);
+    dPtr->grabbers[2]->setEnabled(true);
+    dPtr->grabbers[4]->setEnabled(true);
+    dPtr->grabbers[6]->setEnabled(true);
   }
 }
 
 /////////////////////////////////////////////////
 void RectItem::UpdateMeasures()
 {
+  auto dPtr = static_cast<RectItemPrivate *>(this->dataPtr);
+
   // Only windows and doors can have a wall as parent
   WallSegmentItem *wallItem = dynamic_cast<WallSegmentItem *>(
     this->parentItem());
   if (wallItem == NULL)
   {
-    for (unsigned int i = 0; i < this->measures.size(); ++i)
+    for (unsigned int i = 0; i < dPtr->measures.size(); ++i)
     {
-      this->measures[i]->setVisible(false);
+      dPtr->measures[i]->setVisible(false);
     }
     return;
   }
 
-  if (this->measures.empty())
+  if (dPtr->measures.empty())
   {
-    this->measures.push_back(new MeasureItem(QPointF(0, 0), QPointF(0, 1)));
-    this->measures.push_back(new MeasureItem(QPointF(0, 0), QPointF(0, 1)));
-    this->measures[0]->setVisible(false);
-    this->measures[1]->setVisible(false);
+    dPtr->measures.push_back(new MeasureItem(QPointF(0, 0), QPointF(0, 1)));
+    dPtr->measures.push_back(new MeasureItem(QPointF(0, 0), QPointF(0, 1)));
+    dPtr->measures[0]->setVisible(false);
+    dPtr->measures[1]->setVisible(false);
   }
 
-  this->measures[0]->setParentItem(wallItem);
-  this->measures[1]->setParentItem(wallItem);
-  this->measures[0]->setVisible(this->highlighted);
-  this->measures[1]->setVisible(this->highlighted);
+  dPtr->measures[0]->setParentItem(wallItem);
+  dPtr->measures[1]->setParentItem(wallItem);
+  dPtr->measures[0]->setVisible(dPtr->highlighted);
+  dPtr->measures[1]->setVisible(dPtr->highlighted);
 
-  if (this->highlighted)
+  if (dPtr->highlighted)
   {
     // Half wall thickness
     double t = wallItem->GetThickness()/2;
     // Distance in px between wall line and measure line
     double d = 20 + t;
     // Half the RectItem's length
-    double w = this->drawingWidth/2;
+    double w = dPtr->drawingWidth/2;
     // This item's angle on the scene
-    double angle = GZ_DTOR(this->rotationAngle);
+    double angle = GZ_DTOR(dPtr->rotationAngle);
     // Free vector of t on wall direction, for the extremes
     QPointF tVec(t*qCos(angle), t*qSin(angle));
     // Free vector of d perpendicular to the wall
@@ -1003,15 +1130,15 @@ void RectItem::UpdateMeasures()
     }
 
     // Measure 0, from extreme 1 to RectItem's start point
-    this->measures[0]->SetStartPoint(extreme1 - tVec - dVec);
-    this->measures[0]->SetEndPoint(p1rect - dVec);
+    dPtr->measures[0]->SetStartPoint(extreme1 - tVec - dVec);
+    dPtr->measures[0]->SetEndPoint(p1rect - dVec);
     // Measure 1, from RectItem's end point to extreme 2
-    this->measures[1]->SetStartPoint(p2rect - dVec);
-    this->measures[1]->SetEndPoint(extreme2 + tVec - dVec);
+    dPtr->measures[1]->SetStartPoint(p2rect - dVec);
+    dPtr->measures[1]->SetEndPoint(extreme2 + tVec - dVec);
 
-    this->measures[0]->SetValue(
-        (this->measures[0]->line().length())*this->itemScale);
-    this->measures[1]->SetValue(
-        (this->measures[1]->line().length())*this->itemScale);
+    dPtr->measures[0]->SetValue(
+        (dPtr->measures[0]->line().length())*dPtr->itemScale);
+    dPtr->measures[1]->SetValue(
+        (dPtr->measures[1]->line().length())*dPtr->itemScale);
   }
 }

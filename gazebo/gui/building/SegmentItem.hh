@@ -19,14 +19,15 @@
 #define _SEGMENT_ITEM_HH_
 
 #include <vector>
-#include "gazebo/gui/qt.h"
+//#include "gazebo/gui/qt.h"
 #include "gazebo/gui/building/EditorItem.hh"
-#include "gazebo/util/system.hh"
+//#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
+    class SegmentItemPrivate;
     class GrabberHandle;
     class EditorItem;
 
@@ -102,6 +103,15 @@ namespace gazebo
       // Documentation Inherited
       public: double GetSceneRotation() const;
 
+      /// \brief Get the grabber handles.
+      /// \return Vector of grabber pointers.
+      public: std::vector<GrabberHandle *>Grabbers() const;
+
+      /// \internal
+      /// \brief Constructor used by inherited classes
+      protected: SegmentItem(SegmentItemPrivate &_dataPtr,
+          QGraphicsItem *_parent = 0);
+
       /// \brief Update item.
       protected: virtual void SegmentUpdated();
 
@@ -156,33 +166,11 @@ namespace gazebo
       private: void paint(QPainter *_painter,
           const QStyleOptionGraphicsItem *_option, QWidget *_widget);
 
-      /// \brief A list of grabber handles for this item. One grabber for each
-      /// endpoint.
-      public: std::vector<GrabberHandle *> grabbers;
-
       /// \brief Angle to snap in degrees.
       public: static const double SnapAngle;
 
       /// \brief Length to snap in meters.
       public: static const double SnapLength;
-
-      /// \brief Segment's start position in pixel coordinates.
-      private: QPointF start;
-
-      /// \brief Segment's end position in pixel coordinates.
-      private: QPointF end;
-
-      /// \brief Keep track of mouse press position for translation.
-      private: QPointF segmentMouseMove;
-
-      /// \brief Thickness of the segment on the 2d view, in pixels.
-      private: double thickness;
-
-      /// \brief Width of grabbers in pixels.
-      private: double grabberWidth;
-
-      /// \brief Height of grabbers in pixels.
-      private: double grabberHeight;
     };
     /// \}
   }
