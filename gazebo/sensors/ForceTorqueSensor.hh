@@ -56,19 +56,7 @@ namespace gazebo
 
       /// \brief Get the current joint torque.
       /// \return The latest measured torque.
-      /// \deprecated See Torque() function that returns an
-      /// ignition::math::Vector3d object.
-      public: math::Vector3 GetTorque() const GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Get the current joint torque.
-      /// \return The latest measured torque.
       public: ignition::math::Vector3d Torque() const;
-
-      /// \brief Get the current joint force.
-      /// \return The latested measured force.
-      /// \deprecated See Force() function that returns an
-      /// ignition::math::Vector3d object.
-      public: math::Vector3 GetForce() const GAZEBO_DEPRECATED(6.0);
 
       /// \brief Get the current joint force.
       /// \return The latested measured force.
