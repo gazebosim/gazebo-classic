@@ -28,13 +28,13 @@ class TemperatureTest : public gazebo::testing::AutoLogFixture{};
 TEST_F(TemperatureTest, Constructor)
 {
   Temperature temp;
-  EXPECT_NEAR(tmp.Kelvin(), 0.0, 1e-6);
+  EXPECT_NEAR(temp.Kelvin(), 0.0, 1e-6);
 
-  Temperature temp2(1.1)
-  EXPECT_NEAR(tmp2.Kelvin(), 1.1, 1e-6);
+  Temperature temp2(1.1);
+  EXPECT_NEAR(temp2.Kelvin(), 1.1, 1e-6);
 
-  Temperature temp3(temp2)
-  EXPECT_NEAR(tmp3.Kelvin(), 1.1, 1e-6);
+  Temperature temp3(temp2);
+  EXPECT_NEAR(temp3.Kelvin(), 1.1, 1e-6);
 
   EXPECT_TRUE(temp2 == temp3);
   EXPECT_TRUE(temp2 == 1.1);
@@ -49,9 +49,9 @@ TEST_F(TemperatureTest, Constructor)
 
   EXPECT_FALSE(temp > temp2);
   EXPECT_FALSE(temp > 80.0);
-  EXPECT_FALSE(temp => temp2);
-  EXPECT_FALSE(temp => 0.1);
-  EXPECT_TRUE(temp => 0.0);
+  EXPECT_FALSE(temp >= temp2);
+  EXPECT_FALSE(temp >= 0.1);
+  EXPECT_TRUE(temp >= 0.0);
 }
 
 /////////////////////////////////////////////////
@@ -145,7 +145,7 @@ TEST(TemperatureTest, OperatorStreamIn)
   Temperature temp;
   std::istringstream stream("23.4");
   stream >> temp;
-  EXPECT_NEAR(temp.Kelvin(), 23.4);
+  EXPECT_NEAR(temp.Kelvin(), 23.4, 1e-6);
 }
 
 /////////////////////////////////////////////////

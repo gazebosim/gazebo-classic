@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_SENSORMANAGER_HH_
-#define _GAZEBO_SENSORMANAGER_HH_
+#ifndef _GAZEBO_SENSORS_SENSORMANAGER_HH_
+#define _GAZEBO_SENSORS_SENSORMANAGER_HH_
 
 #include <boost/thread.hpp>
 #include <string>

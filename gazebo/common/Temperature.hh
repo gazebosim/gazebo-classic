@@ -19,6 +19,7 @@
 
 #include <iostream>
 #include <memory>
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -29,7 +30,7 @@ namespace gazebo
 
     /// \brief A class that store temperature information, and allows
     /// conversion between different units.
-    class Temperature
+    class GZ_COMMON_VISIBLE Temperature
     {
       /// \brief Default constructor
       public: Temperature();
@@ -43,7 +44,7 @@ namespace gazebo
       public: Temperature(const Temperature &_temp);
 
       /// \brief Destructor
-      public: virtual ~Temperature() = default;
+      public: virtual ~Temperature();
 
       /// \brief Convert Kelvin to Celsius
       /// \param[in] _temp Temperature in Kelvin
