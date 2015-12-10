@@ -69,7 +69,7 @@ namespace gazebo
       /// \brief Frame that holds settings.
       public: QFrame *settingsFrame;
 
-      // public: QListWidget *logList;
+      /// \brief List of recorded logs.
       public: QTextBrowser *logList;
 
       /// \brief Dialog that displays confirmation after saving.
