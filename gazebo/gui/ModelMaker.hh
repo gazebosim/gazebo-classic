@@ -79,6 +79,10 @@ namespace gazebo
       /// \brief Internal init function.
       private: bool Init();
 
+      /// \brief Create the model visual from model SDF
+      /// \param[in] _modelElem Root model SDF element.
+      private: void CreateModelFromSDF(sdf::ElementPtr _modelElem);
+
       /// \brief Publish a factory message to create the entity.
       private: virtual void CreateTheEntity();
     };

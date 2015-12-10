@@ -24,6 +24,9 @@ release will remove the deprecated code.
 
 ### Modifications
 
+1. **gazebo/physics/Actor.hh**
+    + Type change of `protected: math::Vector3 lastPos;` to `protected: ignition::math::Vector3d lastPos;`
+
 1. **gazebo/rendering/RenderTypes.hh**
     + typedefs for Visual and its derived classes have been changed from boost to std pointers.
     + [pull request #1924](https://bitbucket.org/osrf/gazebo/pull-request/1924)
@@ -133,6 +136,43 @@ release will remove the deprecated code.
     + public: virtual void OnMouseDrag(const common::MouseEvent &_event);
     + protected: math::Vector3 GetSnappedPoint(math::Vector3 _p);
 
+1. **gazebo/sensors/ForceTorqueSensor.hh**
+    + public: math::Vector3 GetTorque() const
+    + public: math::Vector3 GetForce() const
+
+1. **gazebo/sensors/GpsSensor.hh**
+    + public: math::Angle GetLongitude()
+    + public: math::Angle GetLatitude()
+
+1. **gazebo/sensors/GpuRaySensor.hh**
+    + public: math::Angle GetAngleMin() const
+    + public: math::Angle GetAngleMax() const
+    + public: math::Angle GetVerticalAngleMin() const
+    + public: math::Angle GetVerticalAngleMax() const
+
+1. **gazebo/sensors/ImuSensor.hh**
+    + public: math::Vector3 GetAngularVelocity() const
+    + public: math::Vector3 GetLinearAcceleration() const
+    + public: math::Quaternion GetOrientation() const
+
+1. **gazebo/sensors/RFIDSensor.hh**
+    + private: bool CheckTagRange(const math::Pose &_pose)
+
+1. **gazebo/sensors/RFIDTag.hh**
+    + public: math::Pose GetTagPose() const
+
+1. **gazebo/sensors/RaySensor.hh**
+    + public: math::Angle GetAngleMin() const
+    + public: math::Angle GetAngleMax() const
+    + public: math::Angle GetVerticalAngleMin() const
+    + public: math::Angle GetVerticalAngleMax() const
+
+1. **gazebo/sensors/Sensor.hh**
+    + public: virtual math::Pose GetPose() const
+    + public: NoisePtr GetNoise(unsigned int _index = 0) const
+
+1. **gazebo/sensors/WirelessTransmitter.hh**
+    + public: double GetSignalStrength(const math::Pose &_receiver, const double _rxGain)
 
 ## Gazebo 5.X to 6.X
 
