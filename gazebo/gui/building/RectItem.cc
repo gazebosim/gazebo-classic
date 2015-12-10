@@ -15,7 +15,8 @@
  *
 */
 
-#include "gazebo/math/Angle.hh"
+#include <ignition/math/Angle.hh>
+
 #include "gazebo/gui/building/BuildingEditorWidget.hh"
 #include "gazebo/gui/building/GrabberHandle.hh"
 #include "gazebo/gui/building/RotateHandle.hh"
@@ -636,10 +637,10 @@ void RectItem::mouseMoveEvent(QGraphicsSceneMouseEvent *_event)
   // arbitrary (snap to parent items) when dragged
   QPointF trans = this->mapFromScene(_event->scenePos()) - dPtr->mousePressPos;
   QPointF rotatedTrans;
-  rotatedTrans.setX(cos(GZ_DTOR(dPtr->rotationAngle))*-trans.x()
-    - sin(GZ_DTOR(dPtr->rotationAngle))*-trans.y());
-  rotatedTrans.setY(sin(GZ_DTOR(dPtr->rotationAngle))*-trans.x()
-    + cos(GZ_DTOR(dPtr->rotationAngle))*-trans.y());
+  rotatedTrans.setX(cos(IGN_DTOR(dPtr->rotationAngle))*-trans.x()
+    - sin(IGN_DTOR(dPtr->rotationAngle))*-trans.y());
+  rotatedTrans.setY(sin(IGN_DTOR(dPtr->rotationAngle))*-trans.x()
+    + cos(IGN_DTOR(dPtr->rotationAngle))*-trans.y());
 
   this->SetPosition(this->pos() - rotatedTrans);
 }
@@ -1057,7 +1058,7 @@ void RectItem::UpdateMeasures()
     // Half the RectItem's length
     double w = dPtr->drawingWidth/2;
     // This item's angle on the scene
-    double angle = GZ_DTOR(dPtr->rotationAngle);
+    double angle = IGN_DTOR(dPtr->rotationAngle);
     // Free vector of t on wall direction, for the extremes
     QPointF tVec(t*qCos(angle), t*qSin(angle));
     // Free vector of d perpendicular to the wall

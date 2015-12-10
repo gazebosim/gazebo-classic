@@ -15,7 +15,8 @@
  *
 */
 
-#include "gazebo/math/Angle.hh"
+#include <ignition/math/Angle.hh>
+
 #include "gazebo/gui/building/BuildingMaker.hh"
 #include "gazebo/gui/building/GrabberHandle.hh"
 #include "gazebo/gui/building/SegmentItem.hh"
@@ -320,8 +321,8 @@ bool SegmentItem::GrabberEventFilter(GrabberHandle *_grabber, QEvent *_event)
     {
       // Snap to angular increments
       QLineF newLine(p1, p2);
-      double angle = GZ_DTOR(QLineF(p1, p2).angle());
-      double range = GZ_DTOR(SegmentItem::SnapAngle);
+      double angle = IGN_DTOR(QLineF(p1, p2).angle());
+      double range = IGN_DTOR(SegmentItem::SnapAngle);
       int angleIncrement = angle / range;
 
       if ((angle - range*angleIncrement) > range/2)

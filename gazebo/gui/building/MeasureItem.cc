@@ -15,8 +15,9 @@
  *
 */
 
+#include <ignition/math/Angle.hh>
+
 #include "gazebo/common/Exception.hh"
-#include "gazebo/math/Angle.hh"
 #include "gazebo/gui/building/EditorView.hh"
 #include "gazebo/gui/building/EditorItem.hh"
 #include "gazebo/gui/building/MeasureItem.hh"
@@ -57,7 +58,7 @@ void MeasureItem::paint(QPainter *_painter,
 
   QPointF p1 = this->line().p1();
   QPointF p2 = this->line().p2();
-  double angle = GZ_DTOR(this->line().angle());
+  double angle = IGN_DTOR(this->line().angle());
 
   QPen measurePen;
   measurePen.setStyle(Qt::SolidLine);
