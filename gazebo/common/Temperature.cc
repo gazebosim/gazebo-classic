@@ -40,6 +40,11 @@ Temperature::Temperature(const Temperature &_temp)
 }
 
 /////////////////////////////////////////////////
+Temperature::~Temperature()
+{
+}
+
+/////////////////////////////////////////////////
 double Temperature::KelvinToCelsius(const double _temp)
 {
   return _temp - 273.15;
