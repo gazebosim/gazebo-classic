@@ -4,6 +4,9 @@
 +    * [Pull request #1987](https://bitbucket.org/osrf/gazebo/pull-request/1987)
 +    * [Issue #1726](https://bitbucket.org/osrf/gazebo/issue/1726)
 
+1. Implemented private data pointer for the RTShaderSystem class. Minimized shader updates to once per render update.
+    * [Pull request #2003](https://bitbucket.org/osrf/gazebo/pull-request/2003)    
+
 1. Updating physics library to use ignition math.
     * [Pull request #2007](https://bitbucket.org/osrf/gazebo/pull-request/2007)
 

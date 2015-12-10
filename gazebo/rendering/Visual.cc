@@ -1532,7 +1532,7 @@ void Visual::UpdateTransparency(const bool _cascade)
 }
 
 //////////////////////////////////////////////////
-void Visual::SetTransparency(float _trans, const bool _cascade)
+void Visual::SetTransparency(float _trans)
 {
   if (math::equal(this->dataPtr->transparency, _trans))
     return;
@@ -1540,7 +1540,7 @@ void Visual::SetTransparency(float _trans, const bool _cascade)
   this->dataPtr->transparency = std::min(
       std::max(_trans, static_cast<float>(0.0)), static_cast<float>(1.0));
 
-  this->UpdateTransparency(_cascade);
+  this->UpdateTransparency(true);
 }
 
 //////////////////////////////////////////////////
