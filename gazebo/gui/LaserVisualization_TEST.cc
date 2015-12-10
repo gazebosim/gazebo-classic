@@ -67,6 +67,7 @@ void LaserVisualization_TEST::Lines()
 
   // Read a horizontal line in the middle of the screen
   unsigned int y = height / 2;
+  bool transitioning = false;
   for (unsigned int x = 0; x < width*depth; x += depth)
   {
     int r = data[y*(width*depth) + x];
@@ -75,13 +76,19 @@ void LaserVisualization_TEST::Lines()
 
     // check if current pixel is blue, prev pixel is also blue
     // and the two shades of blue are different
-    if (r == g && r < b && rPrev == gPrev && rPrev < bPrev &&
+    if (!transitioning && r == g && r < b && rPrev == gPrev && rPrev < bPrev &&
         r < rPrev)
+    {
       ++darkBlueTransition;
+      transitioning = true;
+    }
 
     // check if current and prev pixels are the same blue color
     if (r == g && r < b && r == rPrev && g == gPrev && b == bPrev)
+    {
       ++lightBlueCount;
+      transitioning = false;
+    }
 
     rPrev = r;
     bPrev = b;
