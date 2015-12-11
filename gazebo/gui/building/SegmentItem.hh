@@ -172,6 +172,10 @@ namespace gazebo
 
       /// \brief Length to snap in meters.
       public: static const double SnapLength;
+
+      /// \internal
+      /// \brief Pointer to private data.
+      protected: std::shared_ptr<SegmentItemPrivate> segDPtr;
     };
     /// \}
   }

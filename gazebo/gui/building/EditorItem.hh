@@ -19,6 +19,8 @@
 #define _GAZEBO_BUILDING_EDITOR_ITEM_HH_
 
 #include <string>
+#include <memory>
+
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
 
@@ -217,7 +219,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Pointer to private data.
-      protected: EditorItemPrivate *dataPtr;
+      protected: std::shared_ptr<EditorItemPrivate> editorDPtr;
     };
     /// \}
   }

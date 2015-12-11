@@ -27,6 +27,7 @@ namespace gazebo
     class RectItem;
     class BuildingItem;
     class StairsInspectorDialog;
+    class StairsItemPrivate;
 
     /// \addtogroup gazebo_gui
     /// \{
@@ -83,9 +84,9 @@ namespace gazebo
       /// \brief Emit steps changed Qt signals.
       private: void StepsChanged();
 
-      // private: double stairsUnitRise;
-
-      // private: double stairsUnitRun;
+      /// \internal
+      /// \brief Pointer to private data.
+      protected: std::shared_ptr<StairsItemPrivate> dataPtr;
     };
     /// \}
   }

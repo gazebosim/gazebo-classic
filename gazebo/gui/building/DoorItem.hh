@@ -30,6 +30,7 @@ namespace gazebo
     class RectItem;
     class BuildingItem;
     class WindowDoorInspectorDialog;
+    class DoorItemPrivate;
 
     /// \addtogroup gazebo_gui
     /// \{
@@ -45,7 +46,7 @@ namespace gazebo
       public: DoorItem();
 
       /// \brief Destructor
-      public: ~DoorItem();
+      public: ~DoorItem() = default;
 
       // Documentation inherited
       public: virtual QVector3D GetSize() const;
@@ -77,6 +78,10 @@ namespace gazebo
 
       /// \brief Emit size changed signals
       private: void SizeChanged();
+
+      /// \internal
+      /// \brief Pointer to private data.
+      protected: std::shared_ptr<DoorItemPrivate> dataPtr;
     };
     /// \}
   }

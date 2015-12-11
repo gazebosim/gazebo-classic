@@ -26,6 +26,7 @@ namespace gazebo
 {
   namespace gui
   {
+    class MeasureItemPrivate;
     class SegmentItem;
 
     /// \addtogroup gazebo_gui
@@ -57,6 +58,10 @@ namespace gazebo
       /// \brief Set value in meters
       /// \param[in] _value Value measured in meters.
       public: void SetValue(double _value);
+
+      /// \internal
+      /// \brief Pointer to private data.
+      protected: std::shared_ptr<MeasureItemPrivate> dataPtr;
     };
     /// \}
   }

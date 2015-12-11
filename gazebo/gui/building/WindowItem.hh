@@ -30,6 +30,7 @@ namespace gazebo
     class RectItem;
     class BuildingItem;
     class WindowDoorInspectorDialog;
+    class WindowItemPrivate;
 
     /// \addtogroup gazebo_gui
     /// \{
@@ -74,6 +75,10 @@ namespace gazebo
 
         /// \brief Emit window changed Qt signals.
         public: void WindowChanged();
+
+      /// \internal
+      /// \brief Pointer to private data.
+      protected: std::shared_ptr<WindowItemPrivate> dataPtr;
     };
     /// \}
   }

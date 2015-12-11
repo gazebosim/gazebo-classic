@@ -31,6 +31,7 @@ namespace gazebo
     class SegmentItem;
     class BuildingItem;
     class WallInspectorDialog;
+    class WallSegmentItemPrivate;
 
     /// \addtogroup gazebo_gui
     /// \{
@@ -102,6 +103,10 @@ namespace gazebo
 
       // Documentation inherited
       private slots: void OnDeleteItem();
+
+      /// \internal
+      /// \brief Pointer to private data.
+      protected: std::shared_ptr<WallSegmentItemPrivate> dataPtr;
     };
     /// \}
   }

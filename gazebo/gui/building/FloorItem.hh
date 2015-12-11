@@ -30,6 +30,7 @@ namespace gazebo
   {
     class BuildingItem;
     class WallSegmentItem;
+    class FloorItemPrivate;
 
     /// \addtogroup gazebo_gui
     /// \{
@@ -89,6 +90,10 @@ namespace gazebo
 
       /// \brief Emit size changed Qt signals.
       private: void SizeChanged();
+
+      /// \internal
+      /// \brief Pointer to private data.
+      protected: std::shared_ptr<FloorItemPrivate> dataPtr;
     };
     /// \}
   }

@@ -238,6 +238,10 @@ namespace gazebo
 
       /// \brief Qt callback when the item is being deleted.
       private slots: virtual void OnDeleteItem();
+
+      /// \internal
+      /// \brief Pointer to private data.
+      protected: std::shared_ptr<RectItemPrivate> rectDPtr;
     };
     /// \}
   }
