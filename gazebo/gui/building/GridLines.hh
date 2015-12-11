@@ -15,8 +15,10 @@
  *
 */
 
-#ifndef _GRID_LINES_HH_
-#define _GRID_LINES_HH_
+#ifndef _GAZEBO_BUILDING_GRID_LINES_HH_
+#define _GAZEBO_BUILDING_GRID_LINES_HH_
+
+#include <memory>
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
@@ -25,6 +27,8 @@ namespace gazebo
 {
   namespace gui
   {
+    class GridLinesPrivate;
+
     /// \addtogroup gazebo_gui
     /// \{
 
@@ -35,10 +39,10 @@ namespace gazebo
       /// \brief Constructor
       /// \param[in] _width Width of grid lines in pixels.
       /// \param[in] _height Height of grid lines in pixels.
-      public : GridLines(int _width, int _height);
+      public: GridLines(int _width, int _height);
 
       /// \brief Destructor
-      public : ~GridLines();
+      public: ~GridLines() = default;
 
       /// \return Set the size of grid lines in pixels.
       /// \param[in] _width Width of grid lines in pixels.
@@ -64,24 +68,9 @@ namespace gazebo
       /// \param[in] _event Qt mouse event
       private: virtual void mousePressEvent(QGraphicsSceneMouseEvent *_event);
 
-      /// \brief Qt mouse move event during drag and drop
-      /// \param[in] _event Qt mouse event
-      private: virtual void mouseMoveEvent(
-          QGraphicsSceneDragDropEvent *_event);
-
-      /// \brief Qt mouse press event
-      /// \param[in] _event Qt mouse event
-      private: virtual void mousePressEvent(
-          QGraphicsSceneDragDropEvent *_event);
-
-      /// \brief Width of grid lines in pixels.
-      private: int width;
-
-      /// \brief height of grid lines in pixels.
-      private: int height;
-
-      /// \brief Space between the lines in pixels.
-      private: int space;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<GridLinesPrivate> dataPtr;
     };
     /// \}
   }
