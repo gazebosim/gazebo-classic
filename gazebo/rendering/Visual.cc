@@ -3207,3 +3207,9 @@ msgs::Visual::Type Visual::ConvertVisualType(const Visual::VisualType &_type)
   }
   return visualType;
 }
+
+//////////////////////////////////////////////////
+bool Visual::UseRTShader() const
+{
+  return this->dataPtr->useRTShader;
+}
