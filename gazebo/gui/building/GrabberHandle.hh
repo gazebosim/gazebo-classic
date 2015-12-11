@@ -15,10 +15,17 @@
  *
 */
 
-#ifndef _GRABBER_HANDLE_HH_
-#define _GRABBER_HANDLE_HH_
+#ifndef _GAZEBO_BUILDING_GRABBER_HANDLE_HH_
+#define _GAZEBO_BUILDING_GRABBER_HANDLE_HH_
 
 #include <vector>
+#include <memory>
+
+#include <ignition/math/Vector2.hh>
+
+#include "gazebo/common/Color.hh"
+#include "gazebo/common/CommonTypes.hh"
+
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
 
@@ -26,6 +33,8 @@ namespace gazebo
 {
   namespace gui
   {
+    class GrabberHandlePrivate;
+
     class GZ_GUI_VISIBLE GrabberHandle : public QGraphicsItem
     {
       /// \brief Constructor
@@ -33,37 +42,80 @@ namespace gazebo
       /// \param[in] _index Index of the grabber handle
       public: GrabberHandle(QGraphicsItem *_parent = 0, int index = 0);
 
+      /// \brief
+      public: virtual ~GrabberHandle() = default;
+
       /// \brief Get the index of the grabber handle.
       /// \return Index of the grabber handle.
-      public: int GetIndex() const;
+      /// \deprecated
+      public: int GetIndex() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the index of the grabber handle.
+      /// \return Index of the grabber handle.
+      public: int Index() const;
 
       /// \brief Get the current mouse state.
       /// \return The current mouse state.
-      public: int  GetMouseState() const;
+      /// \deprecated
+      public: int GetMouseState() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the current mouse state.
+      /// \return The current mouse state.
+      public: int MouseState() const;
 
       /// \brief Get the center point of the grabber handle.
       /// \return Center point in pixel coordinates.
-      public: QPointF GetCenterPoint() const;
+      /// \deprecated
+      public: QPointF GetCenterPoint() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the center point of the grabber handle.
+      /// \return Center point in pixel coordinates.
+      public: ignition::math::Vector2d CenterPoint() const;
 
       /// \brief Get the X position of the mouse press.
       /// \return Mouse press X position in pixel coordinates.
-      public: double GetMouseDownX() const;
+      /// \deprecated
+      public: double GetMouseDownX() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the X position of the mouse press.
+      /// \return Mouse press X position in pixel coordinates.
+      public: double MouseDownX() const;
 
       /// \brief Get the Y position of the mouse press.
       /// \return Mouse press Y position in pixel coordinates.
-      public: double GetMouseDownY() const;
+      /// \deprecated
+      public: double GetMouseDownY() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the Y position of the mouse press.
+      /// \return Mouse press Y position in pixel coordinates.
+      public: double MouseDownY() const;
 
       /// \brief Get the width of the grabber handle.
       /// \return The width of the grabber handle in pixel coordinates.
-      public: double GetWidth() const;
+      /// \deprecated
+      public: double GetWidth() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the width of the grabber handle.
+      /// \return The width of the grabber handle in pixel coordinates.
+      public: double Width() const;
 
       /// \brief Get the height of the grabber handle.
       /// \return The height of the grabber handle in pixels.
-      public: double GetHeight() const;
+      /// \deprecated
+      public: double GetHeight() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the height of the grabber handle.
+      /// \return The height of the grabber handle in pixels.
+      public: double Height() const;
 
       /// \brief Get the fill color of the grabber handle.
       /// \return _color Fill color.
-      public: QColor GetColor() const;
+      /// \deprecated
+      public: QColor GetColor() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the fill color of the grabber handle.
+      /// \return _color Fill color.
+      public: common::Color Color() const;
 
       /// \brief Set the current mouse state.
       /// \param[in] _state Current mouse state.
@@ -96,6 +148,14 @@ namespace gazebo
       /// \brief Get the bounding box of the grabber handle.
       /// \return The grabber handle bounding box.
       public: virtual QRectF boundingRect() const;
+
+      /// \brief Get the vector of grabbers linked to this.
+      /// \return Vector of linked grabbers.
+      public: std::vector<GrabberHandle *> LinkedGrabbers() const;
+
+
+      public: void PushLinkedGrabber(GrabberHandle *_grabber);
+      public: void EraseLinkedGrabber(GrabberHandle *_grabber);
 
       /// \brief Qt paint function for drawing the grabber handle.
       /// \param[in] _painter Qt painter object.
@@ -132,38 +192,9 @@ namespace gazebo
       /// \param[in] _event Qt mouse drag and drop event.
       protected: void mouseMoveEvent(QGraphicsSceneDragDropEvent *_event);
 
-      /// \brief A list of grabbers linked to this grabber.
-      public: std::vector<GrabberHandle*> linkedGrabbers;
-
-      /// \brief Index of this corner grabber.
-      private: int index;
-
-      /// \brief Mouse press X position in pixel coordinates.
-      private: double mouseDownX;
-
-      /// \brief Mouse press Y position in pixel coordinates.
-      private: double mouseDownY;
-
-      /// \brief Fill color of the grabber handle.
-      private: QColor handleColor;
-
-      /// \brief Border color of the grabber handle.
-      private: QColor borderColor;
-
-      /// \brief Width of the grabber handle in pixels.
-      private: double width;
-
-      /// \brief Height of the grabber handle in pixels.
-      private: double height;
-
-      /// \brief Extra width around the grabber handle for mouse grabbing.
-      private: double widthGrabBuffer;
-
-      /// \brief Extra height around the grabber handle for mouse grabbing.
-      private: double heightGrabBuffer;
-
-      /// \brief Current mouse state.
-      private: int mouseButtonState;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::shared_ptr<GrabberHandlePrivate> dataPtr;
     };
     /// \}
   }
