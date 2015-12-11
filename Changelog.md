@@ -2,7 +2,7 @@
 
 1. Implemented private data pointer for the RTShaderSystem class. Minimized shader updates to once per render update.
     * [Pull request #2003](https://bitbucket.org/osrf/gazebo/pull-request/2003)
-    
+
 1. Updating physics library to use ignition math.
     * [Pull request #2007](https://bitbucket.org/osrf/gazebo/pull-request/2007)
 
@@ -211,6 +211,11 @@ using the same arguments used in the command line.
 
     1. Support inserting nested models from model maker
         * [Pull request #1982](https://bitbucket.org/osrf/gazebo/pull-request/1982)
+
+1. Building editor updates
+
+    1. PIMPLize GridLines class
+        * [Pull request #2032](https://bitbucket.org/osrf/gazebo/pull-request/2032)
 
 ## Gazebo 6.0
 
