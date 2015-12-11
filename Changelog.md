@@ -1,5 +1,8 @@
 ## Gazebo 7.0
 
+1. Use opaque pointers for the master library
+    * [Pull request #2036](https://bitbucket.org/osrf/gazebo/pull-request/2036)
+
 1. Updating physics library to use ignition math.
     * [Pull request #2007](https://bitbucket.org/osrf/gazebo/pull-request/2007)
 
