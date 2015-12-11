@@ -255,7 +255,7 @@ void Publisher::Fini()
     this->SendMessage();
 
   if (!this->topic.empty())
-    TopicManager::Instance()->Unadvertise(this->topic);
+    TopicManager::Instance()->Unadvertise(this->topic, this->id);
 
   common::Time slept;
 
@@ -290,4 +290,10 @@ MessagePtr Publisher::GetPrevMsgPtr() const
     return this->publication->GetPrevMsg(this->id);
   else
     return MessagePtr();
+}
+
+//////////////////////////////////////////////////
+uint32_t Publisher::Id() const
+{
+  return this->id;
 }
