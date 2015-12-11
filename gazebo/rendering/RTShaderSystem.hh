@@ -14,17 +14,12 @@
  * limitations under the License.
  *
 */
-/* Desc: Wrapper around the OGRE RTShader system
- * Author: Nate Koenig
- * Date: 27 Jan 2010
- */
 
-#ifndef _RTSHADERSYSTEM_HH_
-#define _RTSHADERSYSTEM_HH_
+#ifndef _GAZEBO_RTSHADERSYSTEM_HH_
+#define _GAZEBO_RTSHADERSYSTEM_HH_
 
 #include <list>
 #include <string>
-#include <vector>
 
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/gazebo_config.h"
@@ -37,8 +32,7 @@ namespace gazebo
 {
   namespace rendering
   {
-    class Visual;
-    class Scene;
+    class RTShaderSystemPrivate;
 
     /// \addtogroup gazebo_rendering
     /// \{
@@ -94,7 +88,7 @@ namespace gazebo
       /// \param[in] Name of the scene to remove.
       public: void RemoveScene(const std::string &_scene);
 
-      /// \brief Update the shaders. This should not be called frequently.
+      /// \brief Queue a call to update the shaders.
       public: void UpdateShaders();
 
       /// \brief Set an Ogre::Entity to use RT shaders.
@@ -146,6 +140,9 @@ namespace gazebo
       /// \return The Ogre PSSM Shadows camera setup.
       public: Ogre::PSSMShadowCameraSetup *GetPSSMShadowCameraSetup() const;
 
+      /// \brief Update the RT shaders. This should not be called frequently.
+      public: void Update();
+
       /// \brief Get paths for the shader system
       /// \param[out] _coreLibsPath Path to the core libraries.
       /// \param[out] _cachePath Path to where the generated shaders are
@@ -157,28 +154,12 @@ namespace gazebo
       /// \param[in] _vis Pointer to the visual to update.
       private: void UpdateShaders(VisualPtr _vis);
 
-#if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= 7
-      /// \brief The shader generator.
-      private: Ogre::RTShader::ShaderGenerator *shaderGenerator;
-
-      /// \brief Used to generate shadows.
-      private: Ogre::RTShader::SubRenderState *shadowRenderState;
-#endif
-
-      /// \brief True if initialized.
-      private: bool initialized;
-
-      /// \brief True if shadows have been applied.
-      private: bool shadowsApplied;
-
-      /// \brief All the scenes.
-      private: std::vector<ScenePtr> scenes;
-
-      /// \brief Parallel Split Shadow Map (PSSM) camera setup
-      private: Ogre::ShadowCameraSetupPtr pssmSetup;
-
       /// \brief Make the RTShader system a singleton.
       private: friend class SingletonT<RTShaderSystem>;
+
+      /// \internal
+      /// \brief Pointer to private data.
+      private: RTShaderSystemPrivate *dataPtr;
     };
     /// \}
   }
