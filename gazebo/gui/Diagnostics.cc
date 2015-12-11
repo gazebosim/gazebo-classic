@@ -15,12 +15,12 @@
  *
 */
 
-#include "gazebo/transport/TransportIface.hh"
-#include "gazebo/transport/Node.hh"
-#include "gazebo/transport/Publisher.hh"
-
 #include "gazebo/gui/IncrementalPlot.hh"
 #include "gazebo/gui/Diagnostics.hh"
+#include "gazebo/gui/DiagnosticsPrivate.hh"
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Publisher.hh"
+#include "gazebo/transport/TransportIface.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -55,15 +55,16 @@ class DragableListWidget : public QListWidget
 /////////////////////////////////////////////////
 Diagnostics::Diagnostics(QWidget *_parent)
   : QDialog(_parent)
+    dataPtr(new DiagnosticsPrivate())
 {
-  this->paused = false;
+  this->dataPtr->paused = false;
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));
   this->setWindowTitle("Gazebo: Diagnostics");
   this->setObjectName("diagnosticsPlot");
   this->setWindowFlags(Qt::Window | Qt::WindowTitleHint |
       Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
 
-  this->plotLayout = new QVBoxLayout;
+  this->dataPtr->plotLayout = new QVBoxLayout;
 
   QScrollArea *plotScrollArea = new QScrollArea(this);
   plotScrollArea->setLineWidth(0);
@@ -77,27 +78,27 @@ Diagnostics::Diagnostics(QWidget *_parent)
 
   QFrame *plotFrame = new QFrame(plotScrollArea);
   plotFrame->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-  plotFrame->setLayout(this->plotLayout);
+  plotFrame->setLayout(this->dataPtr->plotLayout);
 
   plotScrollArea->setWidget(plotFrame);
 
 
   IncrementalPlot *plot = new IncrementalPlot(this);
-  this->plots.push_back(plot);
-  this->plotLayout->addWidget(plot);
+  this->dataPtr->plots.push_back(plot);
+  this->dataPtr->plotLayout->addWidget(plot);
 
-  this->labelList = new DragableListWidget(this);
-  this->labelList->setDragEnabled(true);
-  this->labelList->setDragDropMode(QAbstractItemView::DragOnly);
+  this->dataPtr->labelList = new DragableListWidget(this);
+  this->dataPtr->labelList->setDragEnabled(true);
+  this->dataPtr->labelList->setDragDropMode(QAbstractItemView::DragOnly);
   QListWidgetItem *item = new QListWidgetItem("Real Time Factor");
   item->setToolTip(tr("Drag onto graph to plot"));
-  this->labelList->addItem(item);
+  this->dataPtr->labelList->addItem(item);
 
   QPushButton *addPlotButton = new QPushButton("Add");
   connect(addPlotButton, SIGNAL(clicked()), this, SLOT(OnAddPlot()));
 
   QCheckBox *pauseCheck = new QCheckBox;
-  pauseCheck->setChecked(this->paused);
+  pauseCheck->setChecked(this->dataPtr->paused);
   connect(pauseCheck, SIGNAL(clicked(bool)), this, SLOT(OnPause(bool)));
 
   QHBoxLayout *pauseLayout = new QHBoxLayout;
@@ -107,7 +108,7 @@ Diagnostics::Diagnostics(QWidget *_parent)
   pauseLayout->addStretch(1);
 
   QVBoxLayout *leftLayout = new QVBoxLayout;
-  leftLayout->addWidget(this->labelList);
+  leftLayout->addWidget(this->dataPtr->labelList);
   leftLayout->addLayout(pauseLayout);
 
   QHBoxLayout *mainLayout = new QHBoxLayout;
@@ -117,9 +118,10 @@ Diagnostics::Diagnostics(QWidget *_parent)
   this->setLayout(mainLayout);
   this->setSizeGripEnabled(true);
 
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init();
-  this->sub = this->node->Subscribe("~/diagnostics", &Diagnostics::OnMsg, this);
+  this->dataPtr->node = transport::NodePtr(new transport::Node());
+  this->dataPtr->node->Init();
+  this->dataPtr->sub = this->node->Subscribe("~/diagnostics",
+      &Diagnostics::OnMsg, this);
 
   QTimer *displayTimer = new QTimer(this);
   connect(displayTimer, SIGNAL(timeout()), this, SLOT(Update()));
@@ -134,13 +136,12 @@ Diagnostics::~Diagnostics()
 /////////////////////////////////////////////////
 void Diagnostics::Update()
 {
-  boost::mutex::scoped_lock lock(this->mutex);
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
   // Update all the plots
-  for (std::vector<IncrementalPlot *>::iterator iter = this->plots.begin();
-      iter != this->plots.end(); ++iter)
+  for (auto &plot : this->dataPtr->plots)
   {
-    (*iter)->Update();
+    plot.Update();
   }
 }
 
@@ -148,27 +149,26 @@ void Diagnostics::Update()
 void Diagnostics::OnMsg(ConstDiagnosticsPtr &_msg)
 {
   // Make sure plotting is not paused.
-  if (this->paused)
+  if (this->dataPtr->paused)
     return;
 
   // Make sure there is timing information
   if (_msg->time_size() == 0)
     return;
 
-  boost::mutex::scoped_lock lock(this->mutex);
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
   common::Time wallTime, elapsedTime;
 
   wallTime = msgs::Convert(_msg->real_time());
 
   // Add real-time factor if it has been requested.
-  for (std::vector<IncrementalPlot*>::iterator iter = this->plots.begin();
-      iter != this->plots.end(); ++iter)
+  for (auto &plot : this->dataPtr->plots)
   {
-    if ((*iter)->HasCurve(QString("Real Time Factor")))
+    if (plot.HasCurve(QString("Real Time Factor")))
     {
-      (*iter)->Add(QString("Real Time Factor"),
-                   QPointF(wallTime.Double(), _msg->real_time_factor()));
+      plot.Add(QString("Real Time Factor"),
+               QPointF(wallTime.Double(), _msg->real_time_factor()));
     }
   }
 
@@ -185,23 +185,22 @@ void Diagnostics::OnMsg(ConstDiagnosticsPtr &_msg)
     {
       QListWidgetItem *item = new QListWidgetItem(qstr);
       item->setToolTip(tr("Drag onto graph to plot"));
-      this->labelList->addItem(item);
+      this->dataPtr->labelList->addItem(item);
     }
 
     QString labelStr(_msg->time(i).name().c_str());
 
     // Check to see if the data belongs in a plot, and add it.
-    for (std::vector<IncrementalPlot*>::iterator iter = this->plots.begin();
-        iter != this->plots.end(); ++iter)
+    for (auto &plot : this->dataPtr->plots)
     {
-      if ((*iter)->HasCurve(labelStr))
+      if (plot.HasCurve(labelStr))
       {
         elapsedTime = msgs::Convert(_msg->time(i).elapsed());
 
         double msTime = elapsedTime.Double() * 1e3;
         QPointF pt(wallTime.Double(), msTime);
 
-        (*iter)->Add(labelStr, pt);
+        plot.Add(labelStr, pt);
       }
     }
   }
@@ -210,15 +209,15 @@ void Diagnostics::OnMsg(ConstDiagnosticsPtr &_msg)
 /////////////////////////////////////////////////
 void Diagnostics::OnPause(bool _value)
 {
-  this->paused = _value;
+  this->dataPtr->paused = _value;
 }
 
 /////////////////////////////////////////////////
 void Diagnostics::OnAddPlot()
 {
   IncrementalPlot *plot = new IncrementalPlot(this);
-  this->plotLayout->addWidget(plot);
-  this->plots.push_back(plot);
+  this->dataPtr->plotLayout->addWidget(plot);
+  this->dataPtr->plots.push_back(plot);
 }
 
 /////////////////////////////////////////////////

@@ -15,17 +15,9 @@
  *
 */
 
-#ifndef _DIAGNOSTICS_WIDGET_HH_
-#define _DIAGNOSTICS_WIDGET_HH_
+#ifndef _GAZEBO_DIAGNOSTICS_HH_
+#define _GAZEBO_DIAGNOSTICS_HH_
 
-#include <map>
-#include <list>
-#include <vector>
-#include <boost/thread/mutex.hpp>
-
-#include "gazebo/msgs/msgs.hh"
-#include "gazebo/common/Time.hh"
-#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
 
@@ -33,7 +25,7 @@ namespace gazebo
 {
   namespace gui
   {
-    class IncrementalPlot;
+    class DiagnosticsPrivate;
 
     /// \brief Plot diagnostic information
     class GZ_GUI_VISIBLE Diagnostics : public QDialog
@@ -66,31 +58,9 @@ namespace gazebo
       /// \brief Qt Callback when a plot should be added.
       private slots: void OnAddPlot();
 
-      /// \brief Node for communications.
-      private: transport::NodePtr node;
-
-      /// \brief Subscribes to diagnostic info.
-      private: transport::SubscriberPtr sub;
-
-      /// \brief The list of diagnostic labels.
-      private: QListWidget *labelList;
-
-      private: typedef std::map<QString, std::list<QPointF> > PointMap;
-
-      /// \brief The currently selected label.
-      private: PointMap selectedLabels;
-
-      /// \brief True when plotting is paused.
-      private: bool paused;
-
-      /// \brief Mutex to protect the point map
-      private: boost::mutex mutex;
-
-      /// \brief Plotting widget
-      private: std::vector<IncrementalPlot *> plots;
-
-      /// \brief Layout to hold all the plots.
-      private: QVBoxLayout *plotLayout;
+      /// \internal
+      /// \brief Pointer to private data.
+      protected: std::unique_ptr<DiagnosticsPrivate> dataPtr;
     };
   }
 }
