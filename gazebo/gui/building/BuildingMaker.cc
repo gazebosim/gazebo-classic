@@ -23,7 +23,6 @@
 
 #include <sstream>
 #include <set>
-#include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
 
 #include "gazebo/common/Exception.hh"
@@ -79,39 +78,41 @@ BuildingMaker::BuildingMaker() : dataPtr(new BuildingMakerPrivate())
   this->dataPtr->modelTemplateSDF->SetFromString(this->TemplateSDFString());
 
   this->dataPtr->connections.push_back(
-    gui::editor::Events::ConnectSaveBuildingEditor(
-      boost::bind(&BuildingMaker::OnSave, this)));
+      gui::editor::Events::ConnectSaveBuildingEditor(
+      std::bind(&BuildingMaker::OnSave, this)));
   this->dataPtr->connections.push_back(
-    gui::editor::Events::ConnectSaveAsBuildingEditor(
-      boost::bind(&BuildingMaker::OnSaveAs, this)));
+      gui::editor::Events::ConnectSaveAsBuildingEditor(
+      std::bind(&BuildingMaker::OnSaveAs, this)));
   this->dataPtr->connections.push_back(
-    gui::editor::Events::ConnectNewBuildingEditor(
-      boost::bind(&BuildingMaker::OnNew, this)));
+      gui::editor::Events::ConnectNewBuildingEditor(
+      std::bind(&BuildingMaker::OnNew, this)));
   this->dataPtr->connections.push_back(
-    gui::editor::Events::ConnectExitBuildingEditor(
-      boost::bind(&BuildingMaker::OnExit, this)));
+      gui::editor::Events::ConnectExitBuildingEditor(
+      std::bind(&BuildingMaker::OnExit, this)));
   this->dataPtr->connections.push_back(
-    gui::editor::Events::ConnectBuildingNameChanged(
-      boost::bind(&BuildingMaker::OnNameChanged, this, _1)));
+      gui::editor::Events::ConnectBuildingNameChanged(
+      std::bind(&BuildingMaker::OnNameChanged, this, std::placeholders::_1)));
   this->dataPtr->connections.push_back(
-  gui::editor::Events::ConnectChangeBuildingLevel(
-    boost::bind(&BuildingMaker::OnChangeLevel, this, _1)));
+      gui::editor::Events::ConnectChangeBuildingLevel(
+      std::bind(&BuildingMaker::OnChangeLevel, this, std::placeholders::_1)));
   this->dataPtr->connections.push_back(
       gui::editor::Events::ConnectColorSelected(
-      boost::bind(&BuildingMaker::OnColorSelected, this, _1)));
+      std::bind(&BuildingMaker::OnColorSelected, this, std::placeholders::_1)));
   this->dataPtr->connections.push_back(
       gui::editor::Events::ConnectTextureSelected(
-      boost::bind(&BuildingMaker::OnTextureSelected, this, _1)));
+      std::bind(&BuildingMaker::OnTextureSelected, this,
+      std::placeholders::_1)));
   this->dataPtr->connections.push_back(
       gui::editor::Events::ConnectToggleEditMode(
-      boost::bind(&BuildingMaker::OnEdit, this, _1)));
+      std::bind(&BuildingMaker::OnEdit, this, std::placeholders::_1)));
 
   this->dataPtr->saveDialog = new SaveDialog(SaveDialog::BUILDING);
 
   // Transport
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init();
-  this->dataPtr->makerPub = this->dataPtr->node->Advertise<msgs::Factory>("~/factory");
+  this->dataPtr->makerPub =
+      this->dataPtr->node->Advertise<msgs::Factory>("~/factory");
 
   this->Reset();
 }
@@ -133,13 +134,14 @@ void BuildingMaker::OnEdit(bool _checked)
   if (_checked)
   {
     MouseEventHandler::Instance()->AddPressFilter("building_maker",
-        boost::bind(&BuildingMaker::On3dMousePress, this, _1));
+        std::bind(&BuildingMaker::On3dMousePress, this, std::placeholders::_1));
     MouseEventHandler::Instance()->AddReleaseFilter("building_maker",
-        boost::bind(&BuildingMaker::On3dMouseRelease, this, _1));
+        std::bind(&BuildingMaker::On3dMouseRelease, this,
+        std::placeholders::_1));
     MouseEventHandler::Instance()->AddMoveFilter("building_maker",
-        boost::bind(&BuildingMaker::On3dMouseMove, this, _1));
+        std::bind(&BuildingMaker::On3dMouseMove, this, std::placeholders::_1));
     KeyEventHandler::Instance()->AddPressFilter("building_maker",
-        boost::bind(&BuildingMaker::On3dKeyPress, this, _1));
+        std::bind(&BuildingMaker::On3dKeyPress, this, std::placeholders::_1));
   }
   else
   {
@@ -304,8 +306,9 @@ std::string BuildingMaker::AddWall(const QVector3D &_size,
   linkNameStream << "Wall_" << this->dataPtr->wallCounter++;
   std::string linkName = linkNameStream.str();
 
-  rendering::VisualPtr linkVisual(new rendering::Visual(this->dataPtr->previewName +
-      "::" + linkName, this->dataPtr->previewVisual));
+  rendering::VisualPtr linkVisual(new rendering::Visual(
+      this->dataPtr->previewName + "::" + linkName,
+      this->dataPtr->previewVisual));
   linkVisual->Load();
 
   std::ostringstream visualName;
@@ -350,8 +353,9 @@ std::string BuildingMaker::AddWindow(const QVector3D &_size,
   linkNameStream << "Window_" << this->dataPtr->windowCounter++;
   std::string linkName = linkNameStream.str();
 
-  rendering::VisualPtr linkVisual(new rendering::Visual(this->dataPtr->previewName +
-      "::" + linkName, this->dataPtr->previewVisual));
+  rendering::VisualPtr linkVisual(new rendering::Visual(
+      this->dataPtr->previewName + "::" + linkName,
+      this->dataPtr->previewVisual));
   linkVisual->Load();
 
   std::ostringstream visualName;
@@ -525,8 +529,9 @@ std::string BuildingMaker::AddFloor(const QVector3D &_size,
   linkNameStream << "Floor_" << this->dataPtr->floorCounter++;
   std::string linkName = linkNameStream.str();
 
-  rendering::VisualPtr linkVisual(new rendering::Visual(this->dataPtr->previewName +
-      "::" + linkName, this->dataPtr->previewVisual));
+  rendering::VisualPtr linkVisual(new rendering::Visual(
+      this->dataPtr->previewName + "::" + linkName,
+      this->dataPtr->previewVisual));
   linkVisual->Load();
 
   std::ostringstream visualName;
@@ -610,16 +615,15 @@ void BuildingMaker::Reset()
   this->dataPtr->currentSaveState = NEVER_SAVED;
   this->SetModelName(this->dataPtr->buildingDefaultName);
 
-  this->dataPtr->previewVisual.reset(new rendering::Visual(this->dataPtr->previewName,
-      scene->GetWorldVisual()));
+  this->dataPtr->previewVisual.reset(new rendering::Visual(
+      this->dataPtr->previewName, scene->GetWorldVisual()));
 
   this->dataPtr->previewVisual->Load();
   this->dataPtr->previewVisual->SetPose(ignition::math::Pose3d::Zero);
   this->dataPtr->previewVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
 
-  std::map<std::string, BuildingModelManip *>::iterator it;
-  for (it = this->dataPtr->allItems.begin(); it != this->dataPtr->allItems.end(); ++it)
-    delete (*it).second;
+  for (auto it : this->dataPtr->allItems)
+    delete it.second;
   this->dataPtr->allItems.clear();
 }
 
@@ -635,9 +639,10 @@ void BuildingMaker::SetModelName(const std::string &_modelName)
   if (this->dataPtr->currentSaveState == NEVER_SAVED)
   {
     // Set new saveLocation
-    boost::filesystem::path oldPath(this->dataPtr->saveDialog->GetSaveLocation());
+    boost::filesystem::path oldPath(
+        this->dataPtr->saveDialog->GetSaveLocation());
 
-    boost::filesystem::path newPath = oldPath.parent_path() / this->dataPtr->folderName;
+    auto newPath = oldPath.parent_path() / this->dataPtr->folderName;
     this->dataPtr->saveDialog->SetSaveLocation(newPath.string());
   }
 }
@@ -691,17 +696,14 @@ void BuildingMaker::GenerateSDF()
   }
   modelElem->GetElement("pose")->Set(modelOrigin);
 
-  std::map<std::string, BuildingModelManip *>::iterator itemsIt;
-
   // loop through all model manips
-  for (itemsIt = this->dataPtr->allItems.begin(); itemsIt != this->dataPtr->allItems.end();
-      ++itemsIt)
+  for (auto itemsIt : this->dataPtr->allItems)
   {
     visualNameStream.str("");
     collisionNameStream.str("");
 
-    std::string name = itemsIt->first;
-    BuildingModelManip *buildingModelManip = itemsIt->second;
+    std::string name = itemsIt.first;
+    BuildingModelManip *buildingModelManip = itemsIt.second;
     rendering::VisualPtr visual = buildingModelManip->GetVisual();
     sdf::ElementPtr newLinkElem = templateLinkElem->Clone();
     visualElem = newLinkElem->GetElement("visual");
@@ -1012,15 +1014,13 @@ void BuildingMaker::GenerateSDFWithCSG()
 
   modelElem->GetAttribute("name")->Set(this->dataPtr->folderName);
 
-  std::map<std::string, BuildingModelManip *>::iterator itemsIt;
-  for (itemsIt = this->dataPtr->allItems.begin(); itemsIt != this->dataPtr->allItems.end();
-      ++itemsIt)
+  for (auto itemsIt : this->dataPtr->allItems)
   {
     visualNameStream.str("");
     collisionNameStream.str("");
 
-    std::string name = itemsIt->first;
-    BuildingModelManip *buildingModelManip = itemsIt->second;
+    std::string name = itemsIt.first;
+    BuildingModelManip *buildingModelManip = itemsIt.second;
     rendering::VisualPtr visual = buildingModelManip->GetVisual();
     sdf::ElementPtr newLinkElem = templateLinkElem->Clone();
     visualElem = newLinkElem->GetElement("visual");
@@ -1175,7 +1175,8 @@ void BuildingMaker::CreateTheEntity()
 
   msgs::Factory msg;
   // Create a new name if the model exists
-  sdf::ElementPtr modelElem = this->dataPtr->modelSDF->Root()->GetElement("model");
+  sdf::ElementPtr modelElem =
+      this->dataPtr->modelSDF->Root()->GetElement("model");
   std::string modelElemName = modelElem->Get<std::string>("name");
   if (has_entity_name(modelElemName))
   {
@@ -1183,7 +1184,7 @@ void BuildingMaker::CreateTheEntity()
     while (has_entity_name(modelElemName))
     {
       modelElemName = modelElem->Get<std::string>("name") + "_" +
-        boost::lexical_cast<std::string>(i++);
+          std::to_string(i++);
     }
     modelElem->GetAttribute("name")->Set(modelElemName);
   }
@@ -1725,7 +1726,8 @@ bool BuildingMaker::On3dMouseMove(const common::MouseEvent &_event)
     return true;
   }
 
-  if (this->dataPtr->selectedTexture == QString("") && !this->dataPtr->selectedColor.isValid())
+  if (this->dataPtr->selectedTexture == QString("") &&
+      !this->dataPtr->selectedColor.isValid())
   {
     QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
     userCamera->HandleMouseEvent(_event);
