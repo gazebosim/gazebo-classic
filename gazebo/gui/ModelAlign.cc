@@ -239,7 +239,7 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
   math::Vector3 targetMax;
   this->GetMinMax(targetVertices, targetMin, targetMax);
 
-  std::vector<rendering::VisualPtr> visToPub;
+  std::vector<rendering::VisualPtr> visualsToPublish;
   for (unsigned i = start; i < end; ++i)
   {
     rendering::VisualPtr vis = this->dataPtr->selectedVisuals[i];
@@ -294,7 +294,7 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
     }
 
     if (_publish)
-      visToPub.push_back(vis);
+      visualsToPublish.push_back(vis);
   }
   // Register user command on server
   if (_publish)
@@ -304,7 +304,7 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
         "Align to [" + this->dataPtr->targetVis->GetName() + "]");
     userCmdMsg.set_type(msgs::UserCmd::MOVING);
 
-    for (auto vis : visToPub)
+    for (const auto &vis : visualsToPublish)
     {
       // Only publish for models
       if (vis->GetType() == gazebo::rendering::Visual::VT_MODEL)
