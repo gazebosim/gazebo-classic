@@ -81,18 +81,43 @@ WindowItem::~WindowItem()
 /////////////////////////////////////////////////
 QVector3D WindowItem::GetSize() const
 {
-  return QVector3D(this->dataPtr->windowWidth, this->dataPtr->windowDepth, this->dataPtr->windowHeight);
+  return QVector3D(this->dataPtr->windowWidth,
+                   this->dataPtr->windowDepth,
+                   this->dataPtr->windowHeight);
+}
+
+/////////////////////////////////////////////////
+ignition::math::Vector3d WindowItem::Size() const
+{
+  return ignition::math::Vector3d(this->dataPtr->windowWidth,
+                                  this->dataPtr->windowDepth,
+                                  this->dataPtr->windowHeight);
 }
 
 /////////////////////////////////////////////////
 QVector3D WindowItem::GetScenePosition() const
 {
-  return QVector3D(this->scenePos().x(), this->scenePos().y(),
-      this->dataPtr->windowElevation);
+  return QVector3D(this->scenePos().x(),
+                   this->scenePos().y(),
+                   this->dataPtr->windowElevation);
+}
+
+/////////////////////////////////////////////////
+ignition::math::Vector3d WindowItem::ScenePosition() const
+{
+  return ignition::math::Vector3d(this->scenePos().x(),
+                                  this->scenePos().y(),
+                                  this->dataPtr->windowElevation);
 }
 
 /////////////////////////////////////////////////
 double WindowItem::GetSceneRotation() const
+{
+  return this->SceneRotation();
+}
+
+/////////////////////////////////////////////////
+double WindowItem::SceneRotation() const
 {
   return this->dataPtr->rotationAngle;
 }
@@ -206,7 +231,7 @@ void WindowItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *_event)
 /////////////////////////////////////////////////
 void WindowItem::OnOpenInspector()
 {
-  this->dataPtr->inspector->SetName(this->GetName());
+  this->dataPtr->inspector->SetName(this->Name());
   this->dataPtr->inspector->SetWidth(this->dataPtr->windowWidth * this->dataPtr->itemScale);
   this->dataPtr->inspector->SetHeight(this->dataPtr->windowHeight * this->dataPtr->itemScale);
   this->dataPtr->inspector->SetElevation(this->dataPtr->windowElevation * this->dataPtr->itemScale);

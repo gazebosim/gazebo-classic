@@ -18,6 +18,8 @@
 #ifndef _GAZEBO_BUILDING_DOOR_ITEM_HH_
 #define _GAZEBO_BUILDING_DOOR_ITEM_HH_
 
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/building/RectItem.hh"
 #include "gazebo/gui/building/BuildingItem.hh"
@@ -49,13 +51,22 @@ namespace gazebo
       public: ~DoorItem() = default;
 
       // Documentation inherited
-      public: virtual QVector3D GetSize() const;
+      public: virtual QVector3D GetSize() const GAZEBO_DEPRECATED(7.0);
 
       // Documentation inherited
-      public: virtual QVector3D GetScenePosition() const;
+      public: virtual QVector3D GetScenePosition() const GAZEBO_DEPRECATED(7.0);
 
       // Documentation inherited
-      public: virtual double GetSceneRotation() const;
+      public: virtual double GetSceneRotation() const GAZEBO_DEPRECATED(7.0);
+
+      // Documentation inherited
+      public: virtual ignition::math::Vector3d Size() const;
+
+      // Documentation inherited
+      public: virtual ignition::math::Vector3d ScenePosition() const;
+
+      // Documentation inherited
+      public: virtual double SceneRotation() const;
 
       // Documentation inherited
       private: virtual void paint(QPainter *_painter,

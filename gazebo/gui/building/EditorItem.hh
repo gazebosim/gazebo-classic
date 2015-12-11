@@ -21,6 +21,10 @@
 #include <string>
 #include <memory>
 
+#include <ignition/math/Vector3.hh>
+
+#include "gazebo/common/Color.hh"
+#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
 
@@ -51,38 +55,86 @@ namespace gazebo
 
       /// \brief Get the size of the item in pixels.
       /// \return Size in pixels.
-      public: virtual QVector3D GetSize() const;
+      /// \deprecated See function that returns an ignition::math object
+      public: virtual QVector3D GetSize() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the 3D size of the item in pixels.
+      /// \return Size in pixels.
+      public: virtual ignition::math::Vector3d Size() const;
 
       /// \brief Get the scene position of editor item.
       /// \return Scene position in pixel coordinates.
-      public: virtual QVector3D GetScenePosition() const;
+      /// \deprecated See function that returns an ignition::math object
+      public: virtual QVector3D GetScenePosition() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the 3D scene position of editor item.
+      /// \return Scene position in pixel coordinates.
+      public: virtual ignition::math::Vector3d ScenePosition() const;
 
       /// \brief Get the scene rotation of the editor item.
       /// \return Scene rotation in degrees.
-      public: virtual double GetSceneRotation() const;
+      /// \deprecated See public: double SceneRotation() const
+      public: virtual double GetSceneRotation() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the scene rotation (yaw) of the editor item.
+      /// \return Scene rotation in degrees.
+      public: virtual double SceneRotation() const;
 
       /// \brief Get the type of the editor item.
       /// \return Type of the item.
-      public: virtual std::string GetType() const;
+      /// \deprecated See public:
+      public: virtual std::string GetType() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the type of the editor item.
+      /// \return Type of the item.
+      public: virtual std::string Type() const;
 
       /// \brief Get the name of the editor item.
       /// \return Name of the item.
-      public: virtual std::string GetName() const;
+      /// \deprecated See public:
+      public: virtual std::string GetName() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the name of the editor item.
+      /// \return Name of the item.
+      public: virtual std::string Name() const;
 
       /// \brief Get the level in which this building item is located.
-      public: int GetLevel() const;
+      /// \return Level number.
+      /// \deprecated See public:
+      public: int GetLevel() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the level in which this building item is located.
+      /// \return Level number.
+      public: int Level() const;
 
       /// \brief Get the base height of this level relative to the ground
       /// plane.
-      public: double GetLevelBaseHeight() const;
+      /// \return The height.
+      /// \deprecated See public:
+      public: double GetLevelBaseHeight() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the base height of this level relative to the ground
+      /// plane.
+      /// \return The height.
+      public: double LevelBaseHeight() const;
 
       /// \brief Get the associated 3D visual's color.
       /// \return Color of the 3D visual.
-      public: virtual QColor Get3dColor() const;
+      /// \deprecated See public:
+      public: virtual QColor Get3dColor() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the associated 3D visual's color.
+      /// \return Color of the 3D visual.
+      public: virtual common::Color Color3d() const;
 
       /// \brief Get the associated 3D visual's texture.
       /// \return Texture of the 3D visual.
-      public: virtual QString Get3dTexture() const;
+      /// \deprecated See public:
+      public: virtual QString Get3dTexture() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the associated 3D visual's texture.
+      /// \return Texture of the 3D visual.
+      public: virtual std::string Texture3d() const;
 
       /// \brief Set the name of this editor item.
       /// \param[in] _name Name to set the editor item to.

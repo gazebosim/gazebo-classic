@@ -118,6 +118,13 @@ QPointF SegmentItem::GetStartPoint() const
 }
 
 /////////////////////////////////////////////////
+ignition::math::Vector2d SegmentItem::StartPoint() const
+{
+  return ignition::math::Vector2d(this->segDPtr->start.x(),
+                                  this->segDPtr->start.y());
+}
+
+/////////////////////////////////////////////////
 void SegmentItem::SetEndPoint(const QPointF &_end)
 {
   this->segDPtr->end = _end;
@@ -132,6 +139,13 @@ void SegmentItem::SetEndPoint(const QPointF &_end)
 
 /////////////////////////////////////////////////
 QPointF SegmentItem::GetEndPoint() const
+{
+  return ignition::math::Vector2d(this->segDPtr->end.x(),
+                                  this->segDPtr->end.y());
+}
+
+/////////////////////////////////////////////////
+ignition::math::Vector2d SegmentItem::EndPoint() const
 {
   return this->segDPtr->end;
 }
@@ -153,7 +167,19 @@ double SegmentItem::GetThickness() const
 }
 
 /////////////////////////////////////////////////
+double SegmentItem::Thickness() const
+{
+  return this->segDPtr->thickness;
+}
+
+/////////////////////////////////////////////////
 double SegmentItem::GetScale() const
+{
+  return this->segDPtr->itemScale;
+}
+
+/////////////////////////////////////////////////
+double SegmentItem::Scale() const
 {
   return this->segDPtr->itemScale;
 }

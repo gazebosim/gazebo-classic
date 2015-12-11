@@ -867,9 +867,14 @@ void RectItem::DrawBoundingBox(QPainter *_painter)
 /////////////////////////////////////////////////
 QVector3D RectItem::GetSize() const
 {
-  //auto this->rectDPtr = static_cast<RectItemPrivate *>(this->rectDPtr);
-
   return QVector3D(this->rectDPtr->width, this->rectDPtr->height, 0);
+}
+
+/////////////////////////////////////////////////
+ignition::math::Vector3d RectItem::Size() const
+{
+  return ignition::math::Vector3d(this->rectDPtr->width,
+                                  this->rectDPtr->height, 0);
 }
 
 /////////////////////////////////////////////////
@@ -879,10 +884,21 @@ QVector3D RectItem::GetScenePosition() const
 }
 
 /////////////////////////////////////////////////
+ignition::math::Vector3d RectItem::ScenePosition() const
+{
+  return ignition::math::Vector3d(this->scenePos().x(),
+                                  this->scenePos().y(), 0);
+}
+
+/////////////////////////////////////////////////
 double RectItem::GetSceneRotation() const
 {
-  //auto this->rectDPtr = static_cast<RectItemPrivate *>(this->rectDPtr);
+  return this->SceneRotation();
+}
 
+/////////////////////////////////////////////////
+double RectItem::SceneRotation() const
+{
   return this->rectDPtr->rotationAngle;
 }
 

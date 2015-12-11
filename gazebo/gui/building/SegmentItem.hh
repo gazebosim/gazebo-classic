@@ -15,10 +15,13 @@
  *
 */
 
-#ifndef _SEGMENT_ITEM_HH_
-#define _SEGMENT_ITEM_HH_
+#ifndef _GAZEBO_BUILDING_SEGMENT_ITEM_HH_
+#define _GAZEBO_BUILDING_SEGMENT_ITEM_HH_
 
 #include <vector>
+
+#include <ignition/math/Vector2.hh>
+
 #include "gazebo/gui/building/EditorItem.hh"
 
 namespace gazebo
@@ -55,7 +58,12 @@ namespace gazebo
 
       /// \brief Get the start point of the segment.
       /// \return Start point of the segment in pixel coordinates.
-      public: QPointF GetStartPoint() const;
+      /// \deprecated See
+      public: QPointF GetStartPoint() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the start point of the segment.
+      /// \return Start point of the segment in pixel coordinates.
+      public: ignition::math::Vector2d StartPoint() const;
 
       /// \brief Set the end point of the segment.
       /// \param[in] _end End point of the segment in pixel coordinates.
@@ -63,7 +71,12 @@ namespace gazebo
 
       /// \brief Get the end point of the segment.
       /// \return End point of the segment in pixel coordinates.
-      public: QPointF GetEndPoint() const;
+      /// \deprecated See
+      public: QPointF GetEndPoint() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the end point of the segment.
+      /// \return End point of the segment in pixel coordinates.
+      public: ignition::math::Vector2d EndPoint() const;
 
       /// \brief Set the thickness of the segment item on the 2d view.
       /// \param[in] _thickness Thickness in pixels.
@@ -71,11 +84,21 @@ namespace gazebo
 
       /// \brief Get the thickness of the segment item.
       /// \return Thickness in pixels.
-      public: double GetThickness() const;
+      /// \deprecated See
+      public: double GetThickness() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the thickness of the segment item.
+      /// \return Thickness in pixels.
+      public: double Thickness() const;
 
       /// \brief Get the scale of the segment item.
       /// \return Scale of the segment item in px/m.
-      public: double GetScale() const;
+      /// \deprecated See
+      public: double GetScale() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the scale of the segment item.
+      /// \return Scale of the segment item in px/m.
+      public: double Scale() const;
 
       /// \brief Set the scale of the segment item.
       /// param[in] _scale Scale of the segment item in px/m.
@@ -93,13 +116,22 @@ namespace gazebo
       public: void SegmentChanged();
 
       // Documentation Inherited
-      public: QVector3D GetSize() const;
+      public: QVector3D GetSize() const GAZEBO_DEPRECATED(7.0);
 
       // Documentation Inherited
-      public: QVector3D GetScenePosition() const;
+      public: QVector3D GetScenePosition() const GAZEBO_DEPRECATED(7.0);
 
       // Documentation Inherited
-      public: double GetSceneRotation() const;
+      public: double GetSceneRotation() const GAZEBO_DEPRECATED(7.0);
+
+      // Documentation inherited
+      public: virtual ignition::math::Vector3d Size() const;
+
+      // Documentation inherited
+      public: virtual ignition::math::Vector3d ScenePosition() const;
+
+      // Documentation inherited
+      public: virtual double SceneRotation() const;
 
       /// \brief Get the grabber handles.
       /// \return Vector of grabber pointers.

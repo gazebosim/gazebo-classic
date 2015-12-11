@@ -55,13 +55,31 @@ QVector3D EditorItem::GetSize() const
 }
 
 /////////////////////////////////////////////////
+ignition::math::Vector3d EditorItem::Size() const
+{
+  return ignition::math::Vector3d::Zero;
+}
+
+/////////////////////////////////////////////////
 QVector3D EditorItem::GetScenePosition() const
 {
   return QVector3D(0, 0, 0);
 }
 
 /////////////////////////////////////////////////
+ignition::math::Vector3d EditorItem::ScenePosition() const
+{
+  return ignition::math::Vector3d::Zero;
+}
+
+/////////////////////////////////////////////////
 double EditorItem::GetSceneRotation() const
+{
+  return 0;
+}
+
+/////////////////////////////////////////////////
+double EditorItem::SceneRotation() const
 {
   return 0;
 }
@@ -73,7 +91,19 @@ std::string EditorItem::GetType() const
 }
 
 /////////////////////////////////////////////////
+std::string EditorItem::Type() const
+{
+  return this->editorDPtr->editorType;
+}
+
+/////////////////////////////////////////////////
 std::string EditorItem::GetName() const
+{
+  return this->editorDPtr->name;
+}
+
+/////////////////////////////////////////////////
+std::string EditorItem::Name() const
 {
   return this->editorDPtr->name;
 }
@@ -85,9 +115,24 @@ QColor EditorItem::Get3dColor() const
 }
 
 /////////////////////////////////////////////////
+common::Color EditorItem::Color3d() const
+{
+  return common::Color(this->editorDPtr->visual3dColor.red(),
+                       this->editorDPtr->visual3dColor.green(),
+                       this->editorDPtr->visual3dColor.blue(),
+                       this->editorDPtr->visual3dColor.alpha());
+}
+
+/////////////////////////////////////////////////
 QString EditorItem::Get3dTexture() const
 {
   return this->editorDPtr->visual3dTexture;
+}
+
+/////////////////////////////////////////////////
+std::string EditorItem::Texture3d() const
+{
+  return this->editorDPtr->visual3dTexture.toStdString();
 }
 
 /////////////////////////////////////////////////

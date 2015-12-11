@@ -76,19 +76,43 @@ DoorItem::DoorItem(): RectItem(*new DoorItemPrivate), BuildingItem(),
 /////////////////////////////////////////////////
 QVector3D DoorItem::GetSize() const
 {
-  return QVector3D(this->dataPtr->doorWidth, this->dataPtr->doorDepth,
-      this->dataPtr->doorHeight);
+  return QVector3D(this->dataPtr->doorWidth,
+                   this->dataPtr->doorDepth,
+                   this->dataPtr->doorHeight);
+}
+
+/////////////////////////////////////////////////
+ignition::math::Vector3d DoorItem::Size() const
+{
+  return ignition::math::Vector3d(this->dataPtr->doorWidth,
+                                  this->dataPtr->doorDepth,
+                                  this->dataPtr->doorHeight);
 }
 
 /////////////////////////////////////////////////
 QVector3D DoorItem::GetScenePosition() const
 {
-  return QVector3D(this->scenePos().x(), this->scenePos().y(),
-      this->dataPtr->doorElevation);
+  return QVector3D(this->scenePos().x(),
+                   this->scenePos().y(),
+                   this->dataPtr->doorElevation);
+}
+
+/////////////////////////////////////////////////
+ignition::math::Vector3d DoorItem::ScenePosition() const
+{
+  return ignition::math::Vector3d(this->scenePos().x(),
+                                  this->scenePos().y(),
+                                  this->dataPtr->doorElevation);
 }
 
 /////////////////////////////////////////////////
 double DoorItem::GetSceneRotation() const
+{
+  return this->SceneRotation();
+}
+
+/////////////////////////////////////////////////
+double DoorItem::SceneRotation() const
 {
   return this->dataPtr->rotationAngle;
 }
@@ -176,7 +200,7 @@ void DoorItem::OnApply()
 /////////////////////////////////////////////////
 void DoorItem::OnOpenInspector()
 {
-  this->dataPtr->inspector->SetName(this->GetName());
+  this->dataPtr->inspector->SetName(this->Name());
   this->dataPtr->inspector->SetWidth(this->dataPtr->doorWidth * this->dataPtr->itemScale);
   this->dataPtr->inspector->SetDepth(this->dataPtr->doorDepth * this->dataPtr->itemScale);
   this->dataPtr->inspector->SetHeight(this->dataPtr->doorHeight * this->dataPtr->itemScale);

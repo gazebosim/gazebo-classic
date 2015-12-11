@@ -18,6 +18,8 @@
 #ifndef _GAZEBO_BUILDING_WINDOW_ITEM_HH_
 #define _GAZEBO_BUILDING_WINDOW_ITEM_HH_
 
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/building/RectItem.hh"
 #include "gazebo/gui/building/BuildingItem.hh"
@@ -40,41 +42,50 @@ namespace gazebo
     class GZ_GUI_VISIBLE WindowItem :
       public RectItem, public BuildingItem
     {
-        Q_OBJECT
+      Q_OBJECT
 
-        /// \brief Constructor
-        public: WindowItem();
+      /// \brief Constructor
+      public: WindowItem();
 
-        /// \brief Destructor
-        public: ~WindowItem();
+      /// \brief Destructor
+      public: ~WindowItem();
 
-        // Documentation inherited
-        public: virtual QVector3D GetSize() const;
+      // Documentation inherited
+      public: virtual QVector3D GetSize() const GAZEBO_DEPRECATED(7.0);
 
-        // Documentation inherited
-        public: virtual QVector3D GetScenePosition() const;
+      // Documentation inherited
+      public: virtual QVector3D GetScenePosition() const GAZEBO_DEPRECATED(7.0);
 
-        // Documentation inherited
-        public: virtual double GetSceneRotation() const;
+      // Documentation inherited
+      public: virtual double GetSceneRotation() const GAZEBO_DEPRECATED(7.0);
 
-        // Documentation inherited
-        private: virtual void paint(QPainter *_painter,
-            const QStyleOptionGraphicsItem *_option, QWidget *_widget);
+      // Documentation inherited
+      public: virtual ignition::math::Vector3d Size() const;
 
-        // Documentation inherited
-        private: void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event);
+      // Documentation inherited
+      public: virtual ignition::math::Vector3d ScenePosition() const;
 
-        // Documentation inherited
-        private slots: void OnApply();
+      // Documentation inherited
+      public: virtual double SceneRotation() const;
 
-        // Documentation inherited
-        private slots: void OnOpenInspector();
+      // Documentation inherited
+      private: virtual void paint(QPainter *_painter,
+          const QStyleOptionGraphicsItem *_option, QWidget *_widget);
 
-        // Documentation inherited
-        private slots: void OnDeleteItem();
+      // Documentation inherited
+      private: void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event);
 
-        /// \brief Emit window changed Qt signals.
-        public: void WindowChanged();
+      // Documentation inherited
+      private slots: void OnApply();
+
+      // Documentation inherited
+      private slots: void OnOpenInspector();
+
+      // Documentation inherited
+      private slots: void OnDeleteItem();
+
+      /// \brief Emit window changed Qt signals.
+      public: void WindowChanged();
 
       /// \internal
       /// \brief Pointer to private data.

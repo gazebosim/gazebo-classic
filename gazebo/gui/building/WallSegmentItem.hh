@@ -55,7 +55,12 @@ namespace gazebo
 
       /// \brief Get the height of the wall segment item.
       /// \return Height of the wall segment item in pixels.
-      public: double GetHeight() const;
+      /// \deprecated See
+      public: double GetHeight() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the height of the wall segment item.
+      /// \return Height of the wall segment item in pixels.
+      public: double Height() const;
 
       /// \brief Set the height of the wall segment item.
       /// param[in] _height Height of the wall segment item in pixels.

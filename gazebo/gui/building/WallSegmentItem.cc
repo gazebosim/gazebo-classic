@@ -35,8 +35,8 @@ WallSegmentItem::WallSegmentItem(const QPointF &_start, const QPointF &_end,
 {
   this->dataPtr->editorType = "WallSegment";
 
-  this->dataPtr->measure = new MeasureItem(this->GetStartPoint(),
-                                  this->GetEndPoint());
+  this->dataPtr->measure = new MeasureItem(this->StartPoint(),
+                                  this->EndPoint());
   this->dataPtr->measure->setParentItem(this);
   this->SegmentUpdated();
 
@@ -78,6 +78,12 @@ WallSegmentItem::~WallSegmentItem()
 /////////////////////////////////////////////////
 double WallSegmentItem::GetHeight() const
 {
+  return this->Height();
+}
+
+/////////////////////////////////////////////////
+double WallSegmentItem::Height() const
+{
   return this->dataPtr->wallHeight;
 }
 
@@ -90,8 +96,8 @@ void WallSegmentItem::SetHeight(double _height)
 /////////////////////////////////////////////////
 WallSegmentItem *WallSegmentItem::Clone() const
 {
-  WallSegmentItem *wallSegmentItem = new WallSegmentItem(this->GetStartPoint(),
-      this->GetEndPoint(), this->dataPtr->wallHeight);
+  WallSegmentItem *wallSegmentItem = new WallSegmentItem(this->StartPoint(),
+      this->EndPoint(), this->dataPtr->wallHeight);
 
   wallSegmentItem->SetLevel(this->dataPtr->level);
   wallSegmentItem->SetThickness(this->dataPtr->wallThickness);
@@ -122,7 +128,7 @@ void WallSegmentItem::UpdateInspector()
   QPointF segmentStartPoint = this->mapToScene(this->line().p1());
   QPointF segmentEndPoint = this->mapToScene(this->line().p2());
 
-  this->dataPtr->inspector->SetName(this->GetName());
+  this->dataPtr->inspector->SetName(this->Name());
   this->dataPtr->inspector->SetThickness(this->dataPtr->wallThickness * this->dataPtr->itemScale);
   this->dataPtr->inspector->SetHeight(this->dataPtr->wallHeight * this->dataPtr->itemScale);
   this->dataPtr->inspector->SetLength(segmentLength * this->dataPtr->itemScale);
@@ -141,10 +147,10 @@ void WallSegmentItem::SegmentUpdated()
 {
   // distance in px between wall and measure line
   double d = 20;
-  double t = this->GetThickness()/2;
+  double t = this->Thickness()/2;
 
-  QPointF p1 = this->GetStartPoint();
-  QPointF p2 = this->GetEndPoint();
+  QPointF p1 = this->StartPoint();
+  QPointF p2 = this->EndPoint();
   double angle = IGN_DTOR(this->line().angle());
 
   this->dataPtr->measure->SetStartPoint(
@@ -164,9 +170,9 @@ void WallSegmentItem::SegmentUpdated()
     RectItem *rectItem = dynamic_cast<RectItem *>(children[j]);
     if (rectItem)
     {
-      rectItem->SetRotation(-this->line().angle() + rectItem->GetAngleOnWall());
+      rectItem->SetRotation(-this->line().angle() + rectItem->AngleOnWall());
       QPointF segLine = this->line().p2() - this->line().p1();
-      rectItem->setPos(this->line().p1() + rectItem->GetPositionOnWall()*
+      rectItem->setPos(this->line().p1() + rectItem->PositionOnWall()*
           segLine);
     }
   }
@@ -265,8 +271,8 @@ void WallSegmentItem::OnApply()
     this->SetStartPoint(newStartPoint);
     this->SetEndPoint(newEndPoint);
   }
-  this->UpdateLinkedGrabbers(this->dataPtr->grabbers[0], this->GetStartPoint());
-  this->UpdateLinkedGrabbers(this->dataPtr->grabbers[1], this->GetEndPoint());
+  this->UpdateLinkedGrabbers(this->dataPtr->grabbers[0], this->StartPoint());
+  this->UpdateLinkedGrabbers(this->dataPtr->grabbers[1], this->EndPoint());
   this->update();
   this->UpdateInspector();
 }
