@@ -1511,7 +1511,7 @@ void Visual::UpdateTransparency(const bool _cascade)
 
   if (_cascade)
   {
-    for (auto child : this->dataPtr->children)
+    for (auto &child : this->dataPtr->children)
     {
       // Don't change some visualizations when link changes
       if (!(this->GetType() == VT_LINK &&
