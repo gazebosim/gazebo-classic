@@ -15,9 +15,10 @@
  *
 */
 
-#include "gazebo/gui/IncrementalPlot.hh"
 #include "gazebo/gui/Diagnostics.hh"
 #include "gazebo/gui/DiagnosticsPrivate.hh"
+#include "gazebo/gui/IncrementalPlot.hh"
+#include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/TransportIface.hh"
