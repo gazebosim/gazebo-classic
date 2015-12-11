@@ -14,13 +14,14 @@
  * limitations under the License.
  *
 */
-#ifndef _BUILDING_MAKER_HH_
-#define _BUILDING_MAKER_HH_
+#ifndef _GAZEBO_BUILDING_MAKER_HH_
+#define _GAZEBO_BUILDING_MAKER_HH_
 
 #include <list>
 #include <string>
 #include <vector>
 #include <map>
+#include <memory>
 #include <sdf/sdf.hh>
 
 #include "gazebo/math/Pose.hh"
@@ -35,8 +36,9 @@ namespace gazebo
 {
   namespace gui
   {
-    class EditorItem;
+    class BuildingMakerPrivate;
     class BuildingModelManip;
+    class EditorItem;
     class SaveDialog;
 
     /// \addtogroup gazebo_gui
@@ -47,7 +49,7 @@ namespace gazebo
     {
       /// \enum SaveState
       /// \brief Save states for the building editor.
-      private: enum SaveState
+      public: enum SaveState
       {
         // NEVER_SAVED: The building has never been saved.
         NEVER_SAVED,
@@ -312,76 +314,11 @@ namespace gazebo
       private: bool On3dKeyPress(const common::KeyEvent &_event);
 
       /// \brief Conversion scale used by the Convert helper functions.
-      public: static double conversionScale;
+      public: static const double conversionScale;
 
-      /// \brief A map of building part names to model manip objects which
-      /// manage the visuals representing the building part.
-      private: std::map<std::string, BuildingModelManip *> allItems;
-
-      /// \brief The building model in SDF format.
-      private: sdf::SDFPtr modelSDF;
-
-      /// \brief A template SDF of a simple box model.
-      private: sdf::SDFPtr modelTemplateSDF;
-
-      /// \brief Name of the building model.
-      private: std::string modelName;
-
-      /// \brief Folder name, which is the model name without spaces.
-      private: std::string folderName;
-
-      /// \brief Name of the building model preview.
-      private: static const std::string previewName;
-
-      /// \brief The root visual of the building model preview.
-      private: rendering::VisualPtr previewVisual;
-
-      /// \brief Counter for the number of walls in the model.
-      private: int wallCounter;
-
-      /// \brief Counter for the number of windows in the model.
-      private: int windowCounter;
-
-      /// \brief Counter for the number of doors in the model.
-      private: int doorCounter;
-
-      /// \brief Counter for the number of staircases in the model.
-      private: int stairsCounter;
-
-      /// \brief Counter for the number of floors in the model.
-      private: int floorCounter;
-
-      /// \brief Store the current save state of the model.
-      private: enum SaveState currentSaveState;
-
-      /// \brief A list of gui editor events connected to the building maker.
-      private: std::vector<event::ConnectionPtr> connections;
-
-      /// \brief Default name of building model
-      private: static const std::string buildingDefaultName;
-
-      /// \brief A dialog for setting building model name and save location.
-      private: SaveDialog *saveDialog;
-
-      /// \brief Visual that is currently hovered over by the mouse.
-      private: rendering::VisualPtr hoverVis;
-
-      /// \brief The color currently selected. If none is selected, it will be
-      /// QColor::Invalid.
-      private: QColor selectedColor;
-
-      /// \brief The texture currently selected. If none is selected, it will be
-      /// an empty string.
-      private: QString selectedTexture;
-
-      /// \brief The current level that is being edited.
-      private: int currentLevel;
-
-      /// \brief Node used to publish messages.
-      protected: transport::NodePtr node;
-
-      /// \brief Publisher for factory messages.
-      protected: transport::PublisherPtr makerPub;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<BuildingMakerPrivate> dataPtr;
     };
     /// \}
   }
