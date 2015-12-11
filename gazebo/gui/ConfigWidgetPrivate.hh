@@ -25,8 +25,6 @@ namespace google
   namespace protobuf
   {
     class Message;
-    class Reflection;
-    class FieldDescriptor;
   }
 }
 
@@ -37,7 +35,7 @@ namespace gazebo
     class ConfigChildWidget;
 
     /// \class ConfigWidgetPrivate ConfigWidgetPrivate.hh
-    /// \brief Private data for the ConfigWidgetPrivate class.
+    /// \brief Private data for the ConfigWidget class.
     class ConfigWidgetPrivate
     {
       /// \brief A map of unique scoped names to correpsonding widgets.

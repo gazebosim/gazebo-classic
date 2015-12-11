@@ -302,7 +302,7 @@ msgs::Joint *JointInspector::GetData() const
   }
 
   // Get updated message from widget
-  msgs::Joint *msg = dynamic_cast<msgs::Joint *>(this->configWidget->GetMsg());
+  msgs::Joint *msg = dynamic_cast<msgs::Joint *>(this->configWidget->Msg());
   if (!msg)
   {
     gzerr << "It wasn't possible to get the joint message" << std::endl;
@@ -383,7 +383,7 @@ void JointInspector::OnJointTypeChanged(const QString &_value)
 
     this->configWidget->SetWidgetVisible(axisStr, true);
     this->configWidget->SetWidgetReadOnly(axisStr, false);
-    this->configWidget->UpdateFromMsg(this->configWidget->GetMsg());
+    this->configWidget->UpdateFromMsg(this->configWidget->Msg());
   }
 
   for (unsigned int i = axisCount; i < 2u; ++i)
@@ -394,7 +394,7 @@ void JointInspector::OnJointTypeChanged(const QString &_value)
 
     this->configWidget->SetWidgetVisible(axisStr, false);
     this->configWidget->SetWidgetReadOnly(axisStr, true);
-    this->configWidget->UpdateFromMsg(this->configWidget->GetMsg());
+    this->configWidget->UpdateFromMsg(this->configWidget->Msg());
   }
 
   // toggle field visibility according to joint type.

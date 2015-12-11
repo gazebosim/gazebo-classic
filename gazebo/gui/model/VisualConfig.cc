@@ -310,7 +310,7 @@ msgs::Visual *VisualConfig::GetData(const std::string &_name) const
   for (auto const &it : this->configs)
   {
     if (it.second->name == _name)
-      return dynamic_cast<msgs::Visual *>(it.second->configWidget->GetMsg());
+      return dynamic_cast<msgs::Visual *>(it.second->configWidget->Msg());
   }
   return NULL;
 }
