@@ -39,6 +39,9 @@ namespace gazebo
 {
   class Master;
 
+  // forward declaration of private class
+  struct ServerPrivate;
+
   /// \class Master Master.hh gazebo_core.hh
   /// \brief Base class for simulation server that handles commandline options,
   /// starts a Master, runs World update and sensor generation loops.
@@ -117,38 +120,9 @@ namespace gazebo
     /// \brief Handle all control messages.
     private: void ProcessControlMsgs();
 
-    /// \brief Boolean used to stop the server.
-    private: static bool stop;
-
-    /// \brief Communication node.
-    private: transport::NodePtr node;
-
-    /// \brief Subscribe to server control messages.
-    private: transport::SubscriberPtr serverSub;
-
-    /// \brief Publisher for world modifications.
-    private: transport::PublisherPtr worldModPub;
-
-    /// \brief Mutex to protect controlMsgs.
-    private: boost::mutex receiveMutex;
-
-    /// \brief List of received control messages.
-    private: std::list<msgs::ServerControl> controlMsgs;
-
-    /// \brief Command line params that are passed to various Gazebo objects.
-    private: gazebo::common::StrStr_M params;
-
-    /// \brief Boost program options variable map.
-    private: boost::program_options::variables_map vm;
-
-    /// \brief True when initialized.
-    private: bool initialized;
-
-    /// \brief Save argc for access by system plugins.
-    private: int systemPluginsArgc;
-
-    /// \brief Save argv for access by system plugins.
-    private: char **systemPluginsArgv;
+    /// \internal
+    /// \brief Pointer to private data.
+    private: std::unique_ptr<ServerPrivate> dataPtr;
   };
 }
 

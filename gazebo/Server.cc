@@ -60,14 +60,54 @@
 namespace po = boost::program_options;
 using namespace gazebo;
 
-bool Server::stop = true;
-
-/////////////////////////////////////////////////
-Server::Server()
+namespace gazebo
 {
-  this->initialized = false;
-  this->systemPluginsArgc = 0;
-  this->systemPluginsArgv = NULL;
+  struct ServerPrivate
+  {
+    /// \brief Boolean used to stop the server.
+    static bool stop;
+
+    /// \brief Communication node.
+    transport::NodePtr node;
+
+    /// \brief Subscribe to server control messages.
+    transport::SubscriberPtr serverSub;
+
+    /// \brief Publisher for world modifications.
+    transport::PublisherPtr worldModPub;
+
+    /// \brief Mutex to protect controlMsgs.
+    boost::mutex receiveMutex;
+
+    /// \brief List of received control messages.
+    std::list<msgs::ServerControl> controlMsgs;
+
+    /// \brief Command line params that are passed to various Gazebo objects.
+    gazebo::common::StrStr_M params;
+
+    /// \brief Boost program options variable map.
+    boost::program_options::variables_map vm;
+
+    /// \brief True when initialized.
+    bool initialized;
+
+    /// \brief Save argc for access by system plugins.
+    int systemPluginsArgc;
+
+    /// \brief Save argv for access by system plugins.
+    char **systemPluginsArgv;
+  };
+}
+
+bool ServerPrivate::stop = true;
+ 
+/////////////////////////////////////////////////
+Server::Server() :
+  dataPtr(new ServerPrivate())
+{
+  this->dataPtr->initialized = false;
+  this->dataPtr->systemPluginsArgc = 0;
+  this->dataPtr->systemPluginsArgv = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -90,13 +130,13 @@ void Server::PrintUsage()
 bool Server::ParseArgs(int _argc, char **_argv)
 {
   // Save a copy of argc and argv for consumption by system plugins
-  this->systemPluginsArgc = _argc;
-  this->systemPluginsArgv = new char*[_argc];
+  this->dataPtr->systemPluginsArgc = _argc;
+  this->dataPtr->systemPluginsArgv = new char*[_argc];
   for (int i = 0; i < _argc; ++i)
   {
     int argvLen = strlen(_argv[i]) + 1;
-    this->systemPluginsArgv[i] = new char[argvLen];
-    snprintf(this->systemPluginsArgv[i], argvLen, "%s", _argv[i]);
+    this->dataPtr->systemPluginsArgv[i] = new char[argvLen];
+    snprintf(this->dataPtr->systemPluginsArgv[i], argvLen, "%s", _argv[i]);
   }
 
   po::options_description visibleDesc("Options");
@@ -136,9 +176,9 @@ bool Server::ParseArgs(int _argc, char **_argv)
   try
   {
     po::store(po::command_line_parser(_argc, _argv).options(desc).positional(
-          positionalDesc).allow_unregistered().run(), this->vm);
+          positionalDesc).allow_unregistered().run(), this->dataPtr->vm);
 
-    po::notify(this->vm);
+    po::notify(this->dataPtr->vm);
   }
   catch(boost::exception &_e)
   {
@@ -148,37 +188,37 @@ bool Server::ParseArgs(int _argc, char **_argv)
     return false;
   }
 
-  if (this->vm.count("version"))
+  if (this->dataPtr->vm.count("version"))
   {
     std::cout << GAZEBO_VERSION_HEADER << std::endl;
     return false;
   }
 
-  if (this->vm.count("help"))
+  if (this->dataPtr->vm.count("help"))
   {
     this->PrintUsage();
     std::cerr << visibleDesc << "\n";
     return false;
   }
 
-  if (this->vm.count("verbose"))
+  if (this->dataPtr->vm.count("verbose"))
   {
     gazebo::printVersion();
     gazebo::common::Console::SetQuiet(false);
   }
 
-  if (this->vm.count("minimal_comms"))
+  if (this->dataPtr->vm.count("minimal_comms"))
     gazebo::transport::setMinimalComms(true);
   else
     gazebo::transport::setMinimalComms(false);
 
   // Set the random number seed if present on the command line.
-  if (this->vm.count("seed"))
+  if (this->dataPtr->vm.count("seed"))
   {
     try
     {
-      math::Rand::SetSeed(this->vm["seed"].as<double>());
-      ignition::math::Rand::Seed(this->vm["seed"].as<double>());
+      math::Rand::SetSeed(this->dataPtr->vm["seed"].as<double>());
+      ignition::math::Rand::Seed(this->dataPtr->vm["seed"].as<double>());
     }
     catch(boost::bad_any_cast &_e)
     {
@@ -187,10 +227,10 @@ bool Server::ParseArgs(int _argc, char **_argv)
   }
 
   /// Load all the plugins specified on the command line
-  if (this->vm.count("server-plugin"))
+  if (this->dataPtr->vm.count("server-plugin"))
   {
     std::vector<std::string> pp =
-      this->vm["server-plugin"].as<std::vector<std::string> >();
+      this->dataPtr->vm["server-plugin"].as<std::vector<std::string> >();
 
     for (std::vector<std::string>::iterator iter = pp.begin();
          iter != pp.end(); ++iter)
@@ -200,32 +240,32 @@ bool Server::ParseArgs(int _argc, char **_argv)
   }
 
   // Set the parameter to record a log file
-  if (this->vm.count("record"))
+  if (this->dataPtr->vm.count("record"))
   {
-    this->params["record"] = this->vm["record_path"].as<std::string>();
-    this->params["record_encoding"] =
-        this->vm["record_encoding"].as<std::string>();
+    this->dataPtr->params["record"] = this->dataPtr->vm["record_path"].as<std::string>();
+    this->dataPtr->params["record_encoding"] =
+        this->dataPtr->vm["record_encoding"].as<std::string>();
   }
 
-  if (this->vm.count("iters"))
+  if (this->dataPtr->vm.count("iters"))
   {
     try
     {
-      this->params["iterations"] = boost::lexical_cast<std::string>(
-          this->vm["iters"].as<unsigned int>());
+      this->dataPtr->params["iterations"] = boost::lexical_cast<std::string>(
+          this->dataPtr->vm["iters"].as<unsigned int>());
     }
     catch(...)
     {
-      this->params["iterations"] = "0";
+      this->dataPtr->params["iterations"] = "0";
       gzerr << "Unable to set iterations of [" <<
-        this->vm["iters"].as<unsigned int>() << "]\n";
+        this->dataPtr->vm["iters"].as<unsigned int>() << "]\n";
     }
   }
 
-  if (this->vm.count("pause"))
-    this->params["pause"] = "true";
+  if (this->dataPtr->vm.count("pause"))
+    this->dataPtr->params["pause"] = "true";
   else
-    this->params["pause"] = "false";
+    this->dataPtr->params["pause"] = "false";
 
   if (!this->PreLoad())
   {
@@ -234,15 +274,15 @@ bool Server::ParseArgs(int _argc, char **_argv)
   }
 
   // The following "if" block must be processed directly before
-  // this->ProcessPrarams.
+  // this->dataPtr->ProcessPrarams.
   //
   // Set the parameter to playback a log file. The log file contains the
   // world description, so don't try to reead the world file from the
   // command line.
-  if (this->vm.count("play"))
+  if (this->dataPtr->vm.count("play"))
   {
     // Load the log file
-    util::LogPlay::Instance()->Open(this->vm["play"].as<std::string>());
+    util::LogPlay::Instance()->Open(this->dataPtr->vm["play"].as<std::string>());
 
     gzmsg << "\nLog playback:\n"
       << "  Log Version: "
@@ -269,22 +309,22 @@ bool Server::ParseArgs(int _argc, char **_argv)
     // Get the world file name from the command line, or use "empty.world"
     // if no world file is specified.
     std::string configFilename = "worlds/empty.world";
-    if (this->vm.count("world_file"))
-      configFilename = this->vm["world_file"].as<std::string>();
+    if (this->dataPtr->vm.count("world_file"))
+      configFilename = this->dataPtr->vm["world_file"].as<std::string>();
 
     // Get the physics engine name specified from the command line, or use ""
     // if no physics engine is specified.
     std::string physics;
-    if (this->vm.count("physics"))
-      physics = this->vm["physics"].as<std::string>();
+    if (this->dataPtr->vm.count("physics"))
+      physics = this->dataPtr->vm["physics"].as<std::string>();
 
     // Load the server
     if (!this->LoadFile(configFilename, physics))
       return false;
 
-    if (this->vm.count("profile"))
+    if (this->dataPtr->vm.count("profile"))
     {
-      std::string profileName = this->vm["profile"].as<std::string>();
+      std::string profileName = this->dataPtr->vm["profile"].as<std::string>();
       if (physics::get_world()->GetPresetManager()->HasProfile(profileName))
       {
         physics::get_world()->GetPresetManager()->CurrentProfile(profileName);
@@ -307,7 +347,7 @@ bool Server::ParseArgs(int _argc, char **_argv)
 /////////////////////////////////////////////////
 bool Server::GetInitialized() const
 {
-  return !this->stop && this->initialized;
+  return !this->dataPtr->stop && this->dataPtr->initialized;
 }
 
 /////////////////////////////////////////////////
@@ -364,7 +404,7 @@ bool Server::LoadString(const std::string &_sdfString)
 bool Server::PreLoad()
 {
   // setup gazebo
-  return gazebo::setupServer(this->systemPluginsArgc, this->systemPluginsArgv);
+  return gazebo::setupServer(this->dataPtr->systemPluginsArgc, this->dataPtr->systemPluginsArgv);
 }
 
 /////////////////////////////////////////////////
@@ -410,13 +450,14 @@ bool Server::LoadImpl(sdf::ElementPtr _elem,
     }
   }
 
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init("/gazebo");
-  this->serverSub = this->node->Subscribe("/gazebo/server/control",
-                                          &Server::OnControl, this);
+  this->dataPtr->node = transport::NodePtr(new transport::Node());
+  this->dataPtr->node->Init("/gazebo");
+  this->dataPtr->serverSub = 
+    this->dataPtr->node->Subscribe("/gazebo/server/control",
+                                   &Server::OnControl, this);
 
-  this->worldModPub =
-    this->node->Advertise<msgs::WorldModify>("/gazebo/world/modify");
+  this->dataPtr->worldModPub =
+    this->dataPtr->node->Advertise<msgs::WorldModify>("/gazebo/world/modify");
 
   common::Time waitTime(1, 0);
   int waitCount = 0;
@@ -436,7 +477,7 @@ bool Server::LoadImpl(sdf::ElementPtr _elem,
   }
 
   physics::init_worlds();
-  this->stop = false;
+  this->dataPtr->stop = false;
 
   return true;
 }
@@ -444,7 +485,7 @@ bool Server::LoadImpl(sdf::ElementPtr _elem,
 /////////////////////////////////////////////////
 void Server::SigInt(int)
 {
-  stop = true;
+  ServerPrivate::stop = true;
 
   // Signal to plugins/etc that a shutdown event has occured
   event::Events::sigInt();
@@ -453,7 +494,7 @@ void Server::SigInt(int)
 /////////////////////////////////////////////////
 void Server::Stop()
 {
-  this->stop = true;
+  this->dataPtr->stop = true;
 }
 
 /////////////////////////////////////////////////
@@ -478,7 +519,7 @@ void Server::Run()
     std::cerr << "sigaction(2) failed while setting up for SIGINT" << std::endl;
 #endif
 
-  if (this->stop)
+  if (this->dataPtr->stop)
     return;
 
   // Make sure the sensors are updated once before running the world.
@@ -489,8 +530,8 @@ void Server::Run()
   sensors::run_threads();
 
   unsigned int iterations = 0;
-  common::StrStr_M::iterator piter = this->params.find("iterations");
-  if (piter != this->params.end())
+  common::StrStr_M::iterator piter = this->dataPtr->params.find("iterations");
+  if (piter != this->dataPtr->params.end())
   {
     try
     {
@@ -507,10 +548,10 @@ void Server::Run()
   // Run each world. Each world starts a new thread
   physics::run_worlds(iterations);
 
-  this->initialized = true;
+  this->dataPtr->initialized = true;
 
   // Update the sensors.
-  while (!this->stop && physics::worlds_running())
+  while (!this->dataPtr->stop && physics::worlds_running())
   {
     this->ProcessControlMsgs();
     sensors::run_once();
@@ -525,7 +566,7 @@ void Server::Run()
 void Server::ProcessParams()
 {
   common::StrStr_M::const_iterator iter;
-  for (iter = this->params.begin(); iter != this->params.end(); ++iter)
+  for (iter = this->dataPtr->params.begin(); iter != this->dataPtr->params.end(); ++iter)
   {
     if (iter->first == "pause")
     {
@@ -553,7 +594,7 @@ void Server::ProcessParams()
     }
     else if (iter->first == "record")
     {
-      util::LogRecord::Instance()->Start(this->params["record_encoding"],
+      util::LogRecord::Instance()->Start(this->dataPtr->params["record_encoding"],
                                          iter->second);
     }
   }
@@ -564,22 +605,22 @@ void Server::SetParams(const common::StrStr_M &_params)
 {
   common::StrStr_M::const_iterator iter;
   for (iter = _params.begin(); iter != _params.end(); ++iter)
-    this->params[iter->first] = iter->second;
+    this->dataPtr->params[iter->first] = iter->second;
 }
 
 /////////////////////////////////////////////////
 void Server::OnControl(ConstServerControlPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(this->receiveMutex);
-  this->controlMsgs.push_back(*_msg);
+  boost::mutex::scoped_lock lock(this->dataPtr->receiveMutex);
+  this->dataPtr->controlMsgs.push_back(*_msg);
 }
 
 /////////////////////////////////////////////////
 void Server::ProcessControlMsgs()
 {
   std::list<msgs::ServerControl>::iterator iter;
-  for (iter = this->controlMsgs.begin();
-       iter != this->controlMsgs.end(); ++iter)
+  for (iter = this->dataPtr->controlMsgs.begin();
+       iter != this->dataPtr->controlMsgs.end(); ++iter)
   {
     if ((*iter).has_clone() && (*iter).clone())
     {
@@ -656,7 +697,7 @@ void Server::ProcessControlMsgs()
       worldMsg.set_cloned(success);
       if (success)
         worldMsg.set_cloned_uri("http://" + host + ":" + port);
-      this->worldModPub->Publish(worldMsg);
+      this->dataPtr->worldModPub->Publish(worldMsg);
     }
     else if ((*iter).has_save_world_name())
     {
@@ -679,7 +720,7 @@ void Server::ProcessControlMsgs()
       this->Stop();
     }
   }
-  this->controlMsgs.clear();
+  this->dataPtr->controlMsgs.clear();
 }
 
 /////////////////////////////////////////////////
