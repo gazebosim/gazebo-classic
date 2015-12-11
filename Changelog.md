@@ -1,6 +1,6 @@
 ## Gazebo 7.0
 
-1. Use opaque pointers for the sensor libraray
+1. Use opaque pointers for the sensor library
     * [Pull request #2022](https://bitbucket.org/osrf/gazebo/pull-request/2022)
 
 1. Implemented private data pointer for the RTShaderSystem class. Minimized shader updates to once per render update.
