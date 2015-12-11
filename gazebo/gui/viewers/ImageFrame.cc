@@ -39,7 +39,7 @@ ImageFrame::~ImageFrame()
 void ImageFrame::paintEvent(QPaintEvent * /*_event*/)
 {
   QPainter painter(this);
-  boost::mutex::scoped_lock lock(this->dataPtr->mutex);
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
   if (!this->dataPtr->image.isNull())
   {
@@ -111,20 +111,20 @@ void ImageFrame::OnImage(const msgs::Image &_msg)
     float *depthBuffer = new float[depthSamples];
     memcpy(depthBuffer, _msg.data().c_str(), depthBufferSize);
 
-    float maxDepth = depthBuffer[0];
-    for (unsigned int i = 1; i < _msg.height() * _msg.width(); ++i)
+    float maxDepth = 0;
+    for (unsigned int i = 0; i < _msg.height() * _msg.width(); ++i)
     {
-      if (depthBuffer[i] > maxDepth)
+      if (depthBuffer[i] > maxDepth && !std::isinf(depthBuffer[i]))
         maxDepth = depthBuffer[i];
     }
-
     unsigned int idx = 0;
+    double factor = 255 / maxDepth;
     for (unsigned int j = 0; j < _msg.height(); j++)
     {
       for (unsigned int i = 0; i < _msg.width(); i++)
       {
         float d = depthBuffer[idx++];
-        d = 255 - (d / maxDepth * 255);
+        d = 255 - (d * factor);
         QRgb value = qRgb(d, d, d);
         this->dataPtr->image.setPixel(i, j, value);
       }
@@ -136,7 +136,7 @@ void ImageFrame::OnImage(const msgs::Image &_msg)
   {
     memcpy(this->dataPtr->image.bits(), _msg.data().c_str(), imgSize);
   }
-  boost::mutex::scoped_lock lock(this->dataPtr->mutex);
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
   this->update();
 }
