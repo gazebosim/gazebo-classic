@@ -89,6 +89,10 @@ namespace gazebo
       /// \return The number of callbacks
       public: unsigned int GetCallbackCount() const;
 
+      /// \brief Get the number of publishers.
+      /// \return The number of publishers.
+      public: unsigned int PublisherCount() const;
+
       /// \brief Get the number of nodes
       /// \return The number of nodes
       public: unsigned int GetNodeCount() const;
@@ -124,6 +128,11 @@ namespace gazebo
       /// \brief Remove a publisher.
       /// \param[in] _pub Pointer to publisher object to remove.
       public: void RemovePublisher(PublisherPtr _pub);
+
+      /// \brief Remove a publisher, based on a publisher ID.
+      /// \param[in] _id ID of the publisher to remove.
+      /// \return True if successful.
+      public: bool RemovePublisher(const uint32_t id);
 
       /// \brief Set the previous message for a publisher.
       /// \param[in] _pubId ID of the publisher.

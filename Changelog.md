@@ -3,6 +3,22 @@
 1. Update depth camera sensor to publish depth values over a topic.
     * [Pull request #](https://bitbucket.org/osrf/gazebo/pull-request/)
 
+1. Implemented private data pointer for the RTShaderSystem class. Minimized shader updates to once per render update.
+    * [Pull request #2003](https://bitbucket.org/osrf/gazebo/pull-request/2003)
+    
+1. Updating physics library to use ignition math.
+    * [Pull request #2007](https://bitbucket.org/osrf/gazebo/pull-request/2007)
+
+1. Switching to ignition math for the rendering library.
+    * [Pull request #1993](https://bitbucket.org/osrf/gazebo/pull-request/1993)
+    * [Pull request #1994](https://bitbucket.org/osrf/gazebo/pull-request/1994)
+
+1. Removed deprecations
+    * [Pull request #1992]((https://bitbucket.org/osrf/gazebo/pull-request/1992)
+
+1. Add ability to set the pose of a visual from a link.
+    * [Pull request #1963](https://bitbucket.org/osrf/gazebo/pull-request/1963)
+
 1. Copy visual visibility flags on clone
     * [Pull request #2008](https://bitbucket.org/osrf/gazebo/pull-request/2008)
 
@@ -66,6 +82,9 @@ flags from c functions. Windows did not like `CPPTYPE_*` in
 1. Undo user motion commands during simulation, added physics::UserCmdManager and gui::UserCmdHistory.
     * [Pull request #1934](https://bitbucket.org/osrf/gazebo/pull-request/1934)
 
+1. Undo reset commands during simulation, forwarding commands
+    * [Pull request #1986](https://bitbucket.org/osrf/gazebo/pull-request/1986)
+
 1. Add function to get the derived scale of a Visual
     * [Pull request #1881](https://bitbucket.org/osrf/gazebo/pull-request/1881)
 
@@ -95,6 +114,10 @@ using the same arguments used in the command line.
    * [Pull request #1977](https://bitbucket.org/osrf/gazebo/pull-request/1977)
    * [Issue #1706](https://bitbucket.org/osrf/gazebo/issue/1706)
 
+1. Fix unadvertising a publisher - only unadvertise topic if it is the last publisher.
+   * [Pull request #2005](https://bitbucket.org/osrf/gazebo/pull-request/2005)
+   * [Issue #1782](https://bitbucket.org/osrf/gazebo/issue/1782)
+
 1. Log playback GUI for multistep, rewind, forward and seek
     * [Pull request #1791](https://bitbucket.org/osrf/gazebo/pull-request/1791)
 
@@ -121,6 +144,10 @@ using the same arguments used in the command line.
 
 1. Added hotkeys chart dialog
     * [Pull request #1835](https://bitbucket.org/osrf/gazebo/pull-request/1835)
+
+1. Space bar to play / pause
+   * [Pull request #2023](https://bitbucket.org/osrf/gazebo/pull-request/2023)
+   * [Issue #1798](https://bitbucket.org/osrf/gazebo/issue/1798)
 
 1. Make it possible to create custom ConfigWidgets
     * [Pull request #1861](https://bitbucket.org/osrf/gazebo/pull-request/1861)
@@ -184,6 +211,9 @@ using the same arguments used in the command line.
 
     1. Add Insert tab to model editor
         * [Pull request #1924](https://bitbucket.org/osrf/gazebo/pull-request/1924)
+
+    1. Support inserting nested models from model maker
+        * [Pull request #1982](https://bitbucket.org/osrf/gazebo/pull-request/1982)
 
 ## Gazebo 6.0
 

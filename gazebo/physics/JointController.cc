@@ -81,7 +81,20 @@ void JointController::Reset()
   this->dataPtr->positions.clear();
   this->dataPtr->velocities.clear();
   this->dataPtr->forces.clear();
-  // Should the PID's be reset as well?
+
+  std::map<std::string, common::PID>::iterator iter;
+
+  for (iter = this->dataPtr->posPids.begin();
+    iter != this->dataPtr->posPids.end(); ++iter)
+  {
+    iter->second.Reset();
+  }
+
+  for (iter = this->dataPtr->posPids.begin();
+    iter != this->dataPtr->posPids.end(); ++iter)
+  {
+    iter->second.Reset();
+  }
 }
 
 /////////////////////////////////////////////////
