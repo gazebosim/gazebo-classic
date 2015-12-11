@@ -47,7 +47,7 @@ namespace gazebo
 
       /// \brief Get the index of the grabber handle.
       /// \return Index of the grabber handle.
-      /// \deprecated
+      /// \deprecated See int Index() const
       public: int GetIndex() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the index of the grabber handle.
@@ -56,7 +56,7 @@ namespace gazebo
 
       /// \brief Get the current mouse state.
       /// \return The current mouse state.
-      /// \deprecated
+      /// \deprecated See int MouseState() const;
       public: int GetMouseState() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the current mouse state.
@@ -65,7 +65,7 @@ namespace gazebo
 
       /// \brief Get the center point of the grabber handle.
       /// \return Center point in pixel coordinates.
-      /// \deprecated
+      /// \deprecated See ignition::math::Vector2d CenterPoint()
       public: QPointF GetCenterPoint() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the center point of the grabber handle.
@@ -74,7 +74,7 @@ namespace gazebo
 
       /// \brief Get the X position of the mouse press.
       /// \return Mouse press X position in pixel coordinates.
-      /// \deprecated
+      /// \deprecated See double MouseDownX() const
       public: double GetMouseDownX() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the X position of the mouse press.
@@ -83,7 +83,7 @@ namespace gazebo
 
       /// \brief Get the Y position of the mouse press.
       /// \return Mouse press Y position in pixel coordinates.
-      /// \deprecated
+      /// \deprecated See double MouseDownY() const
       public: double GetMouseDownY() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the Y position of the mouse press.
@@ -92,7 +92,7 @@ namespace gazebo
 
       /// \brief Get the width of the grabber handle.
       /// \return The width of the grabber handle in pixel coordinates.
-      /// \deprecated
+      /// \deprecated See double Width() const
       public: double GetWidth() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the width of the grabber handle.
@@ -101,7 +101,7 @@ namespace gazebo
 
       /// \brief Get the height of the grabber handle.
       /// \return The height of the grabber handle in pixels.
-      /// \deprecated
+      /// \deprecated See double Height() const
       public: double GetHeight() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the height of the grabber handle.
@@ -110,7 +110,7 @@ namespace gazebo
 
       /// \brief Get the fill color of the grabber handle.
       /// \return _color Fill color.
-      /// \deprecated
+      /// \deprecated See common::Color Color() const
       public: QColor GetColor() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the fill color of the grabber handle.
@@ -153,8 +153,12 @@ namespace gazebo
       /// \return Vector of linked grabbers.
       public: std::vector<GrabberHandle *> LinkedGrabbers() const;
 
-
+      /// \brief Push a grabber to the list of grabbers linked to this.
+      /// \param[in] _grabber New grabber.
       public: void PushLinkedGrabber(GrabberHandle *_grabber);
+
+      /// \brief Erase a grabber from the list of grabbers linked to this.
+      /// \param[in] _grabber Grabber which will be removed.
       public: void EraseLinkedGrabber(GrabberHandle *_grabber);
 
       /// \brief Qt paint function for drawing the grabber handle.

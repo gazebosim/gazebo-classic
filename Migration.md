@@ -107,6 +107,24 @@ release will remove the deprecated code.
     + ***Deprecation:*** void DetachEntity(Visual *_vis)
     + ***No replacement for DetachEntity ***
 
+1. **gazebo/gui/building/GrabberHandle**
+    + ***Deprecation:*** public: int GetIndex() const
+    + ***Replacement:*** public: int Index() const
+    + ***Deprecation:*** public: int GetMouseState() const
+    + ***Replacement:*** public: int MouseState() const
+    + ***Deprecation:*** public: QPointF GetCenterPoint() const
+    + ***Replacement:*** public: ignition::math::Vector2d CenterPoint() const
+    + ***Deprecation:*** public: double GetMouseDownX() const
+    + ***Replacement:*** public: double MouseDownX() const
+    + ***Deprecation:*** public: double GetMouseDownY() const
+    + ***Replacement:*** public: double MouseDownY() const
+    + ***Deprecation:*** public: double GetWidth() const
+    + ***Replacement:*** public: double Width() const
+    + ***Deprecation:*** public: double GetHeight() const
+    + ***Replacement:*** public: double Height() const
+    + ***Deprecation:*** public: QColor GetColor() const
+    + ***Replacement:*** public: common::Color Color() const
+
 ### Deletions
 
 1. **plugins/rest_web/RestUiLogoutDialog.hh.hh**
