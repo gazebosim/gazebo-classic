@@ -111,20 +111,20 @@ namespace gazebo
       /// \param[in] _linkSdf The link to add the inertia to.
       /// \param[in] _pose Pose of the inertia.
       /// \param[in] _mass Mass of the inertia.
-      /// \param[in] _radiau Radius of the sphere.
-      private: void AddSphereInertia(sdf::ElementPtr _linkSdf,
-                                     const math::Pose &_pose,
-                                     double _mass, double _radius);
+      /// \param[in] _radius Radius of the sphere.
+      private: void AddSphereInertia(const sdf::ElementPtr &_linkSdf,
+                   const ignition::math::Pose3d &_pose,
+                   const double _mass, const double _radius);
 
       /// \brief Add a spherical collision object.
       /// \param[in] _linkSdf Link to add the collision to.
       /// \param[in] _name Name of the collision object.
       /// \param[in] _pose Pose of the collision object.
       /// \param[in] _radius Radius of the collision object.
-      private: void AddSphereCollision(sdf::ElementPtr _linkSdf,
-                                       const std::string &_name,
-                                       const math::Pose &_pose,
-                                       double _radius);
+      private: void AddSphereCollision(const sdf::ElementPtr &_linkSdf,
+                   const std::string &_name,
+                   const ignition::math::Pose3d &_pose,
+                   const double _radius);
 
       /// \brief Add a spherical visual object.
       /// \param[in] _linkSdf Link to add the visual to.
@@ -133,12 +133,10 @@ namespace gazebo
       /// \param[in] _radius Radius of the visual object.
       /// \param[in] _material Name of the visual material.
       /// \param[in] _ambient Ambient color.
-      private: void AddSphereVisual(sdf::ElementPtr _linkSdf,
-                                    const std::string &_name,
-                                    const math::Pose &_pose,
-                                    double _radius,
-                                    const std::string &_material,
-                                    const common::Color &_ambient);
+      private: void AddSphereVisual(const sdf::ElementPtr &_linkSdf,
+                   const std::string &_name,
+                   const ignition::math::Pose3d &_pose, const double _radius,
+                   const std::string &_material, const common::Color &_ambient);
 
       /// \brief Add a box visual object.
       /// \param[in] _linkSdf Link to add the visual to.
@@ -147,20 +145,20 @@ namespace gazebo
       /// \param[in] _size Dimensions of the visual object.
       /// \param[in] _material Name of the visual material.
       /// \param[in] _ambient Ambient color.
-      private: void AddBoxVisual(sdf::ElementPtr _linkSdf,
-                                 const std::string &_name,
-                                 const math::Pose &_pose,
-                                 const math::Vector3 &_size,
-                                 const std::string &_material,
-                                 const common::Color &_ambient);
+      private: void AddBoxVisual(const sdf::ElementPtr &_linkSdf,
+                   const std::string &_name,
+                   const ignition::math::Pose3d &_pose,
+                   const ignition::math::Vector3d &_size,
+                   const std::string &_material,
+                   const common::Color &_ambient);
 
       /// \brief Add an actor visual to a link.
       /// \param[in] _linkSdf Link to add the visual to.
       /// \param[in] _name Name of the visual.
       /// \param[in] _pose Pose of the visual.
-      private: void AddActorVisual(sdf::ElementPtr _linkSdf,
-                                   const std::string &_name,
-                                   const math::Pose &_pose);
+      private: void AddActorVisual(const sdf::ElementPtr &_linkSdf,
+                   const std::string &_name,
+                   const ignition::math::Pose3d &_pose);
 
       /// \brief Load an animation from SDF.
       /// \param[in] _sdf SDF element containing the animation.
@@ -235,7 +233,7 @@ namespace gazebo
       protected: std::map<std::string, bool> interpolateX;
 
       /// \brief Last position of the actor
-      protected: math::Vector3 lastPos;
+      protected: ignition::math::Vector3d lastPos;
 
       /// \brief Length of the actor's path.
       protected: double pathLength;
