@@ -37,7 +37,7 @@ namespace gazebo
   /// \brief A manager that directs topic connections, enables each gazebo
   /// network client to locate one another for peer-to-peer communication.
   class GAZEBO_VISIBLE Master
-  {    
+  {
     public:
       /// \def Map of unique id's to connections.
       typedef std::map<unsigned int, transport::ConnectionPtr> Connection_M;

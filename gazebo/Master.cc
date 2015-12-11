@@ -63,8 +63,8 @@ namespace gazebo
 }
 
 /////////////////////////////////////////////////
-Master::Master() :
-    dataPtr(new MasterPrivate())
+Master::Master()
+  : dataPtr(new MasterPrivate())
 {
   this->dataPtr->stop = false;
   this->dataPtr->runThread = NULL;
@@ -82,7 +82,8 @@ void Master::Init(uint16_t _port)
 {
   try
   {
-    this->dataPtr->connection->Listen(_port, boost::bind(&Master::OnAccept, this, _1));
+    this->dataPtr->connection->Listen(_port,
+          boost::bind(&Master::OnAccept, this, _1));
   }
   catch(std::exception &_e)
   {
@@ -186,8 +187,9 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
     worldNameMsg.ParseFromString(packet.serialized_data());
 
     std::list<std::string>::iterator iter;
-    iter = std::find(this->dataPtr->worldNames.begin(), this->dataPtr->worldNames.end(),
-        worldNameMsg.data());
+    iter = std::find(this->dataPtr->worldNames.begin(),
+                     this->dataPtr->worldNames.end(),
+                     worldNameMsg.data());
     if (iter == this->dataPtr->worldNames.end())
     {
       boost::recursive_mutex::scoped_lock lock(this->dataPtr->connectionMutex);
