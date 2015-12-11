@@ -125,7 +125,8 @@ void RectItem::ShowHandles(bool _show)
 {
   for (int i = 0; i < 8; ++i)
   {
-    this->rectDPtr->grabbers[i]->setVisible(_show && this->rectDPtr->grabbers[i]->isEnabled());
+    this->rectDPtr->grabbers[i]->setVisible(_show &&
+        this->rectDPtr->grabbers[i]->isEnabled());
   }
   this->rectDPtr->rotateHandle->setVisible(_show);
 }
@@ -260,7 +261,8 @@ bool RectItem::RotateEventFilter(RotateHandle *_rotate, QEvent *_event)
   if (_rotate->GetMouseState()
       == static_cast<int>(QEvent::GraphicsSceneMouseMove))
   {
-    QPoint localCenter(this->rectDPtr->drawingOriginX, this->rectDPtr->drawingOriginY);
+    QPoint localCenter(this->rectDPtr->drawingOriginX,
+        this->rectDPtr->drawingOriginY);
     QPointF center = this->mapToScene(localCenter);
 
     QPointF newPoint = mouseEvent->scenePos();
@@ -270,7 +272,8 @@ bool RectItem::RotateEventFilter(RotateHandle *_rotate, QEvent *_event)
 
     if (this->parentItem())
     {
-      QPointF localCenterTop(this->rectDPtr->drawingOriginX, this->rectDPtr->drawingOriginY
+      QPointF localCenterTop(this->rectDPtr->drawingOriginX,
+          this->rectDPtr->drawingOriginY
           + this->rectDPtr->drawingHeight);
       QPointF centerTop = this->mapToScene(localCenterTop);
       QLineF lineCenter(center.x(), center.y(), centerTop.x(), centerTop.y());
@@ -618,7 +621,8 @@ void RectItem::mouseMoveEvent(QGraphicsSceneMouseEvent *_event)
   // keep track of mouse press pos for more accurate mouse movements than
   // purely relying on mouse translations because we expect items to rotate
   // arbitrary (snap to parent items) when dragged
-  QPointF trans = this->mapFromScene(_event->scenePos()) - this->rectDPtr->mousePressPos;
+  QPointF trans = this->mapFromScene(_event->scenePos()) -
+      this->rectDPtr->mousePressPos;
   QPointF rotatedTrans;
   rotatedTrans.setX(cos(IGN_DTOR(this->rectDPtr->rotationAngle))*-trans.x()
     - sin(IGN_DTOR(this->rectDPtr->rotationAngle))*-trans.y());
@@ -691,27 +695,41 @@ void RectItem::UpdateCornerPositions()
   int grabberHeight = (this->rectDPtr->grabbers[0]->boundingRect().height())/2;
 
   this->rectDPtr->grabbers[0]->setPos(
-      this->rectDPtr->drawingOriginX - this->rectDPtr->drawingWidth/2 - grabberWidth,
-      this->rectDPtr->drawingOriginY - this->rectDPtr->drawingHeight/2 - grabberHeight);
+      this->rectDPtr->drawingOriginX - this->rectDPtr->drawingWidth/2 -
+      grabberWidth,
+      this->rectDPtr->drawingOriginY - this->rectDPtr->drawingHeight/2 -
+      grabberHeight);
   this->rectDPtr->grabbers[2]->setPos(
-      this->rectDPtr->drawingOriginX + this->rectDPtr->drawingWidth/2 - grabberWidth,
-      this->rectDPtr->drawingOriginY - this->rectDPtr->drawingHeight/2 - grabberHeight);
+      this->rectDPtr->drawingOriginX + this->rectDPtr->drawingWidth/2 -
+      grabberWidth,
+      this->rectDPtr->drawingOriginY - this->rectDPtr->drawingHeight/2 -
+      grabberHeight);
   this->rectDPtr->grabbers[4]->setPos(
-      this->rectDPtr->drawingOriginX + this->rectDPtr->drawingWidth/2 - grabberWidth,
-      this->rectDPtr->drawingOriginY + this->rectDPtr->drawingHeight/2 - grabberHeight);
+      this->rectDPtr->drawingOriginX + this->rectDPtr->drawingWidth/2 -
+      grabberWidth,
+      this->rectDPtr->drawingOriginY + this->rectDPtr->drawingHeight/2 -
+      grabberHeight);
   this->rectDPtr->grabbers[6]->setPos(
-      this->rectDPtr->drawingOriginX - this->rectDPtr->drawingWidth/2 - grabberWidth,
-      this->rectDPtr->drawingOriginY + this->rectDPtr->drawingHeight/2 - grabberHeight);
+      this->rectDPtr->drawingOriginX - this->rectDPtr->drawingWidth/2 -
+      grabberWidth,
+      this->rectDPtr->drawingOriginY + this->rectDPtr->drawingHeight/2 -
+      grabberHeight);
 
-  this->rectDPtr->grabbers[1]->setPos(this->rectDPtr->drawingOriginX - grabberWidth,
-      this->rectDPtr->drawingOriginY - this->rectDPtr->drawingHeight/2 - grabberHeight);
+  this->rectDPtr->grabbers[1]->setPos(this->rectDPtr->drawingOriginX -
+      grabberWidth,
+      this->rectDPtr->drawingOriginY - this->rectDPtr->drawingHeight/2 -
+      grabberHeight);
   this->rectDPtr->grabbers[3]->setPos(
-      this->rectDPtr->drawingOriginX + this->rectDPtr->drawingWidth/2 - grabberWidth,
+      this->rectDPtr->drawingOriginX + this->rectDPtr->drawingWidth/2 -
+      grabberWidth,
       this->rectDPtr->drawingOriginY - grabberHeight);
-  this->rectDPtr->grabbers[5]->setPos(this->rectDPtr->drawingOriginX - grabberWidth,
-      this->rectDPtr->drawingOriginY + this->rectDPtr->drawingHeight/2 - grabberHeight);
+  this->rectDPtr->grabbers[5]->setPos(this->rectDPtr->drawingOriginX -
+      grabberWidth,
+      this->rectDPtr->drawingOriginY + this->rectDPtr->drawingHeight/2 -
+      grabberHeight);
   this->rectDPtr->grabbers[7]->setPos(
-      this->rectDPtr->drawingOriginX - this->rectDPtr->drawingWidth/2 - grabberWidth,
+      this->rectDPtr->drawingOriginX - this->rectDPtr->drawingWidth/2 -
+      grabberWidth,
       this->rectDPtr->drawingOriginY - grabberHeight);
 
   this->rectDPtr->rotateHandle->setPos(this->rectDPtr->drawingOriginX,
@@ -800,7 +818,8 @@ double RectItem::GetAngleOnWall() const
 /////////////////////////////////////////////////
 QRectF RectItem::boundingRect() const
 {
-  return QRectF(-this->rectDPtr->width/2, -this->rectDPtr->height/2, this->rectDPtr->width, this->rectDPtr->height);
+  return QRectF(-this->rectDPtr->width/2, -this->rectDPtr->height/2,
+      this->rectDPtr->width, this->rectDPtr->height);
 }
 
 /////////////////////////////////////////////////
@@ -842,13 +861,17 @@ void RectItem::paint(QPainter *_painter, const QStyleOptionGraphicsItem *,
 {
   _painter->save();
 
-  QPointF topLeft(this->rectDPtr->drawingOriginX - this->rectDPtr->drawingWidth/2,
+  QPointF topLeft(
+      this->rectDPtr->drawingOriginX - this->rectDPtr->drawingWidth/2,
       this->rectDPtr->drawingOriginY - this->rectDPtr->drawingHeight/2);
-  QPointF topRight(this->rectDPtr->drawingOriginX + this->rectDPtr->drawingWidth/2,
+  QPointF topRight(
+      this->rectDPtr->drawingOriginX + this->rectDPtr->drawingWidth/2,
       this->rectDPtr->drawingOriginY - this->rectDPtr->drawingHeight/2);
-  QPointF bottomLeft(this->rectDPtr->drawingOriginX - this->rectDPtr->drawingWidth/2,
+  QPointF bottomLeft(
+      this->rectDPtr->drawingOriginX - this->rectDPtr->drawingWidth/2,
       this->rectDPtr->drawingOriginY + this->rectDPtr->drawingHeight/2);
-  QPointF bottomRight(this->rectDPtr->drawingOriginX  + this->rectDPtr->drawingWidth/2,
+  QPointF bottomRight(
+      this->rectDPtr->drawingOriginX + this->rectDPtr->drawingWidth/2,
       this->rectDPtr->drawingOriginY + this->rectDPtr->drawingHeight/2);
 
   QPen rectPen;
@@ -951,7 +974,8 @@ void RectItem::SetResizeFlag(unsigned int _flag)
     this->rectDPtr->grabbers[1]->setEnabled(true);
     this->rectDPtr->grabbers[5]->setEnabled(true);
   }
-  if ((this->rectDPtr->resizeFlag & ITEM_WIDTH) && (this->rectDPtr->resizeFlag & ITEM_HEIGHT))
+  if ((this->rectDPtr->resizeFlag & ITEM_WIDTH) &&
+      (this->rectDPtr->resizeFlag & ITEM_HEIGHT))
   {
     this->rectDPtr->grabbers[0]->setEnabled(true);
     this->rectDPtr->grabbers[2]->setEnabled(true);
@@ -1030,8 +1054,10 @@ void RectItem::UpdateMeasures()
     this->rectDPtr->measures[1]->SetEndPoint(extreme2 + tVec - dVec);
 
     this->rectDPtr->measures[0]->SetValue(
-        (this->rectDPtr->measures[0]->line().length())*this->rectDPtr->itemScale);
+        (this->rectDPtr->measures[0]->line().length()) *
+         this->rectDPtr->itemScale);
     this->rectDPtr->measures[1]->SetValue(
-        (this->rectDPtr->measures[1]->line().length())*this->rectDPtr->itemScale);
+        (this->rectDPtr->measures[1]->line().length()) *
+         this->rectDPtr->itemScale);
   }
 }
