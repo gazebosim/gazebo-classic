@@ -42,10 +42,6 @@ namespace gazebo
       /// \brief Constructor
       public: EditorItem();
 
-      /// \internal
-      /// \brief Constructor used by inherited classes
-      protected: EditorItem(EditorItemPrivate &_dataPtr);
-
       /// \brief Destructor
       public: ~EditorItem();
 
@@ -113,7 +109,12 @@ namespace gazebo
       /// \param[in] _highlighted True for highlighted.
       public: virtual void SetHighlighted(bool _highlighted);
 
+      /// \brief Get the z value of this item when in idle state.
+      /// \return Z value.
       public: int ZValueIdle() const;
+
+      /// \brief Get the z value of this item when in selected state.
+      /// \return Z value.
       public: int ZValueSelected() const;
 
       /// \brief Qt signal emitted when the editor item size has changed.
@@ -208,6 +209,11 @@ namespace gazebo
 
       /// \brief Qt signal emitted when the editor item is being deleted.
       Q_SIGNALS: void ItemDeleted();
+
+      /// \internal
+      /// \brief Constructor used by inherited classes
+      /// \param[in] _dataPtr Pointer to inherited class' private data.
+      protected: EditorItem(EditorItemPrivate &_dataPtr);
 
       /// \brief Qt callback when the color has been changed from the 3D view.
       /// \param[in] _color Color.

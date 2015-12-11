@@ -31,8 +31,6 @@ MeasureItem::MeasureItem(const QPointF &_start, const QPointF &_end)
     : SegmentItem(*new MeasureItemPrivate),
       dataPtr(std::static_pointer_cast<MeasureItemPrivate>(this->editorDPtr))
 {
-  //auto dPtr = static_cast<MeasureItemPrivate *>(this->dataPtr);
-
   this->dataPtr->editorType = "Measure";
 
   this->setFlag(QGraphicsItem::ItemSendsGeometryChanges);
@@ -55,8 +53,6 @@ MeasureItem::~MeasureItem()
 void MeasureItem::paint(QPainter *_painter,
     const QStyleOptionGraphicsItem */*_option*/, QWidget */*_widget*/)
 {
-  //auto this->dataPtr = static_cast<MeasureItemPrivate *>(this->dataPtr);
-
   QPointF p1 = this->line().p1();
   QPointF p2 = this->line().p2();
   double angle = IGN_DTOR(this->line().angle());
@@ -133,7 +129,5 @@ double MeasureItem::GetDistance() const
 /////////////////////////////////////////////////
 void MeasureItem::SetValue(double _value)
 {
-//  auto this->dataPtr = static_cast<MeasureItemPrivate *>(this->dataPtr);
-
   this->dataPtr->value = _value;
 }

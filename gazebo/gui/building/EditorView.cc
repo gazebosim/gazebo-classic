@@ -1420,7 +1420,7 @@ void EditorView::LinkGrabbers(GrabberHandle *_grabber1,
     {
       // Add _grabber2 so it moves when _grabber1 is moved
       _grabber1->linkedGrabbers.push_back(_grabber2);
-      // also link _grabber1 to all Grabbers() already linked to _grabber2
+      // also link _grabber1 to all grabbers already linked to _grabber2
       for (unsigned int i2 = 0; i2 < _grabber2->linkedGrabbers.size(); ++i2)
       {
         this->LinkGrabbers(_grabber1, _grabber2->linkedGrabbers[i2]);
@@ -1433,7 +1433,7 @@ void EditorView::LinkGrabbers(GrabberHandle *_grabber1,
     {
       // Add _grabber1 so it moves when _grabber2 is moved
       _grabber2->linkedGrabbers.push_back(_grabber1);
-      // also link _grabber2 to all Grabbers() already linked to _grabber1
+      // also link _grabber2 to all grabbers already linked to _grabber1
       for (unsigned int i1 = 0; i1 < _grabber1->linkedGrabbers.size(); ++i1)
       {
         this->LinkGrabbers(_grabber2, _grabber1->linkedGrabbers[i1]);
@@ -1446,7 +1446,7 @@ void EditorView::LinkGrabbers(GrabberHandle *_grabber1,
 void EditorView::UnlinkGrabbers(GrabberHandle *_grabber1,
     GrabberHandle *_grabber2)
 {
-  // If only one grabber, erase it from all Grabbers() it is linked
+  // If only one grabber, erase it from all grabbers it is linked
   if (!_grabber2)
   {
     for (unsigned int i = 0; i < _grabber1->linkedGrabbers.size(); ++i)
@@ -1458,6 +1458,6 @@ void EditorView::UnlinkGrabbers(GrabberHandle *_grabber1,
     }
   }
 
-  // TODO: add option to unlink Grabbers() besides when deleting one of them,
+  // TODO: add option to unlink grabbers besides when deleting one of them,
   // perhaps using a hot-key or at the wall inspector
 }

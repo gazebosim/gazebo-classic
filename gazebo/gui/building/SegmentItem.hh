@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _SEGMENT_ITEM_HH_
-#define _SEGMENT_ITEM_HH_
+#ifndef _GAZEBO_BUILDING_SEGMENT_ITEM_HH_
+#define _GAZEBO_BUILDING_SEGMENT_ITEM_HH_
 
 #include <vector>
 #include "gazebo/gui/building/EditorItem.hh"
@@ -107,6 +107,8 @@ namespace gazebo
 
       /// \internal
       /// \brief Constructor used by inherited classes
+      /// \param[in] _dataPtr Pointer to inherited class' private data.
+      /// \param[in] _parent Parent graphics item.
       protected: SegmentItem(SegmentItemPrivate &_dataPtr,
           QGraphicsItem *_parent = 0);
 

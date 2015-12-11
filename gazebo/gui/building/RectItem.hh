@@ -97,6 +97,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Constructor used by inherited classes
+      /// \param[in] _dataPtr Pointer to inherited class' private data.
       protected: RectItem(RectItemPrivate &_dataPtr);
 
       /// \brief Helper method for Updating the corner positions of the rect
