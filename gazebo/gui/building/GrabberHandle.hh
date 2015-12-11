@@ -42,7 +42,7 @@ namespace gazebo
       /// \param[in] _index Index of the grabber handle
       public: GrabberHandle(QGraphicsItem *_parent = 0, int index = 0);
 
-      /// \brief
+      /// \brief Destructor.
       public: virtual ~GrabberHandle() = default;
 
       /// \brief Get the index of the grabber handle.
