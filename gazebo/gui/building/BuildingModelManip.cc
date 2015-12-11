@@ -101,7 +101,7 @@ BuildingModelManip *BuildingModelManip::GetParent() const
 void BuildingModelManip::OnSizeChanged(double _width, double _depth,
     double _height)
 {
-  this->size = BuildingMaker::ConvertSize(_width, _depth, _height);
+  this->size = BuildingMaker::ConvertSizeIgn(_width, _depth, _height);
   double dScaleZ = this->visual->GetScale().z - this->size.z;
   this->visual->SetScale(this->size);
   math::Vector3 originalPos = this->visual->GetPosition();
@@ -193,7 +193,7 @@ void BuildingModelManip::OnPoseOriginTransformed(double _x, double _y,
     double _z, double _roll, double _pitch, double _yaw)
 {
   // Handle translations, currently used by polylines
-  math::Pose trans = BuildingMaker::ConvertPose(_x, -_y, _z, _roll, _pitch,
+  math::Pose trans = BuildingMaker::ConvertPoseIgn(_x, -_y, _z, _roll, _pitch,
       _yaw);
 
   math::Pose oldPose = this->visual->GetParent()->GetWorldPose();
@@ -366,7 +366,7 @@ void BuildingModelManip::SetRotation(double _roll, double _pitch, double _yaw)
 /////////////////////////////////////////////////
 void BuildingModelManip::SetSize(double _width, double _depth, double _height)
 {
-  this->size = BuildingMaker::ConvertSize(_width, _depth, _height);
+  this->size = BuildingMaker::ConvertSizeIgn(_width, _depth, _height);
 
   math::Vector3 dScale = this->visual->GetScale() - this->size;
 

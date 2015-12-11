@@ -163,7 +163,9 @@ namespace gazebo
       /// to Gazebo coordinate system.
       /// \param[in] _size Size vector in pixels.
       /// \return Size in metric units.
-      public: static math::Vector3 ConvertSize(const QVector3D &_size);
+      /// \deprecated See function that returns ignition::math
+      public: static math::Vector3 ConvertSize(const QVector3D &_size)
+           GAZEBO_DEPRECATED(7.0);
 
       /// \brief Helper method to convert size from editor coordinate system
       /// to Gazebo coordinate system.
@@ -171,16 +173,27 @@ namespace gazebo
       /// \param[in] _depth Depth in pixels.
       /// \param[in] _height Height in pixels.
       /// \return Size in metric units.
+      /// \deprecated See function that returns ignition::math
       public: static math::Vector3 ConvertSize(double _width, double _depth,
-          double _height);
+          double _height) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Helper method to convert size from editor coordinate system
+      /// to Gazebo coordinate system.
+      /// \param[in] _width Width in pixels.
+      /// \param[in] _depth Depth in pixels.
+      /// \param[in] _height Height in pixels.
+      /// \return Size in metric units.
+      public: static ignition::math::Vector3d ConvertSizeIgn(
+          const double _width, const double _depth, const double _height);
 
       /// \brief Helper method to convert pose from editor coordinate system
       /// to Gazebo coordinate system.
       /// \param[in] _pos Position in pixels.
       /// \param[in] _rot Rotation in degrees.
       /// \return Pose with position in metric units and rotation in radians.
+      /// \deprecated See function that returns ignition::math
       public: static math::Pose ConvertPose(const QVector3D &_pos,
-          const QVector3D &_rot);
+          const QVector3D &_rot) GAZEBO_DEPRECATED(7.0);
 
       /// \brief Helper method to convert pose from editor coordinate system
       /// to Gazebo coordinate system.
@@ -191,8 +204,22 @@ namespace gazebo
       /// \param[in] _pitch Pitch rotation in degrees.
       /// \param[in] _yaw Yaw rotation in degrees.
       /// \return Pose with position in metric units and rotation in radians.
+      /// \deprecated See function that returns ignition::math
       public: static math::Pose ConvertPose(double _x, double _y, double _z,
-          double _roll, double _pitch, double _yaw);
+          double _roll, double _pitch, double _yaw) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Helper method to convert pose from editor coordinate system
+      /// to Gazebo coordinate system.
+      /// \param[in] _x X position in pixels.
+      /// \param[in] _y Y position in pixels.
+      /// \param[in] _y Z position in pixels.
+      /// \param[in] _roll Roll rotation in degrees.
+      /// \param[in] _pitch Pitch rotation in degrees.
+      /// \param[in] _yaw Yaw rotation in degrees.
+      /// \return Pose with position in metric units and rotation in radians.
+      public: static ignition::math::Pose3d ConvertPoseIgn(const double _x,
+          const double _y, const double _z, const double _roll,
+          const double _pitch, const double _yaw);
 
       /// \param[in] _value Convert a value from pixels to metric units
       /// \param[in] _value Value in pixels.
@@ -227,7 +254,8 @@ namespace gazebo
       private: void GenerateSDFWithCSG();
 
       /// \brief Get a template SDF string of a simple model.
-      private: std::string GetTemplateSDFString();
+      /// \return A string containing a simple model.
+      private: std::string TemplateSDFString() const;
 
       /// \brief Internal helper function for QPointF comparison used by the
       /// surface subsivision algorithm.
