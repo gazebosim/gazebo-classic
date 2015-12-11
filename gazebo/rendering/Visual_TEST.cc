@@ -395,35 +395,29 @@ TEST_F(Visual_TEST, ChildTransparency)
   vis2->Load();
 
   // Check default transparency
-  EXPECT_NEAR(vis1->GetTransparency(), 0.0, 1e-10);
-  EXPECT_NEAR(vis2->GetTransparency(), 0.0, 1e-10);
+  EXPECT_FLOAT_EQ(vis1->GetTransparency(), 0.0);
+  EXPECT_FLOAT_EQ(vis2->GetTransparency(), 0.0);
 
-  // Set vis1's transparency with default cascade
-  float defaultCascade = 0.1;
-  vis1->SetTransparency(defaultCascade);
-  EXPECT_NEAR(vis1->GetTransparency(), defaultCascade, 1e-10);
-  EXPECT_NEAR(vis2->GetTransparency(), 0.0, 1e-10);
-  EXPECT_NEAR(vis2->DerivedTransparency(), defaultCascade, 1e-7);
+  // Set vis1's transparency with cascade
+  float cascade = 0.1;
+  vis1->SetTransparency(cascade);
+  EXPECT_FLOAT_EQ(vis1->GetTransparency(), cascade);
+  EXPECT_FLOAT_EQ(vis2->GetTransparency(), 0.0f);
 
-  // Set vis1's transparency with explicit cascade
-  float explicitCascade = 0.2;
-  vis1->SetTransparency(explicitCascade, true);
-  EXPECT_NEAR(vis1->GetTransparency(), explicitCascade, 1e-10);
-  EXPECT_NEAR(vis2->GetTransparency(), 0.0, 1e-10);
-  EXPECT_NEAR(vis2->DerivedTransparency(), explicitCascade, 1e-7);
-
-  // Set vis1's transparency with no cascade
-  float noCascade = 0.3;
-  vis1->SetTransparency(noCascade, false);
-  EXPECT_NEAR(vis1->GetTransparency(), noCascade, 1e-10);
-  EXPECT_NEAR(vis2->GetTransparency(), 0.0, 1e-10);
-  EXPECT_NEAR(vis2->DerivedTransparency(), 0.0, 1e-7);
+  // Set vis1's transparency again with cascade
+  float cascade2 = 0.2;
+  vis1->SetTransparency(cascade2);
+  EXPECT_FLOAT_EQ(vis1->GetTransparency(), cascade2);
+  EXPECT_FLOAT_EQ(vis2->GetTransparency(), 0.0f);
+  EXPECT_FLOAT_EQ(vis2->DerivedTransparency(), cascade2);
 
   // Set vis2's transparency
   float vis2Transparency = 0.4;
   vis2->SetTransparency(vis2Transparency);
-  EXPECT_NEAR(vis1->GetTransparency(), noCascade, 1e-10);
-  EXPECT_NEAR(vis2->GetTransparency(), vis2Transparency, 1e-10);
+  EXPECT_FLOAT_EQ(vis1->GetTransparency(), cascade2);
+  EXPECT_FLOAT_EQ(vis2->GetTransparency(), vis2Transparency);
+  EXPECT_FLOAT_EQ(vis2->DerivedTransparency(),
+      1.0 - ((1.0 - cascade2) * (1.0 - vis2Transparency)));
 }
 
 /////////////////////////////////////////////////
@@ -721,8 +715,7 @@ TEST_F(Visual_TEST, Wireframe)
   sdf::ElementPtr sphereSDF(new sdf::Element);
   sdf::initFile("visual.sdf", sphereSDF);
   sdf::readString(GetVisualSDFString("sphere_visual", "sphere",
-      ignition::math::Vector3d::One,
-      gazebo::math::Pose::Zero, 0), sphereSDF);
+      ignition::math::Vector3d::One, gazebo::math::Pose::Zero, 0), sphereSDF);
   gazebo::rendering::VisualPtr sphereVis(
       new gazebo::rendering::Visual("sphere_visual", scene));
   sphereVis->Load(sphereSDF);
@@ -730,8 +723,7 @@ TEST_F(Visual_TEST, Wireframe)
   sdf::ElementPtr boxSDF(new sdf::Element);
   sdf::initFile("visual.sdf", boxSDF);
   sdf::readString(GetVisualSDFString("box_visual", "box",
-      ignition::math::Vector3d::One,
-      gazebo::math::Pose::Zero, 0), boxSDF);
+      ignition::math::Vector3d::One, gazebo::math::Pose::Zero, 0), boxSDF);
   gazebo::rendering::VisualPtr boxVis(
       new gazebo::rendering::Visual("box_visual", sphereVis));
   boxVis->Load(boxSDF);

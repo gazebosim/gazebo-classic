@@ -36,9 +36,6 @@ ArrowVisual::ArrowVisual(const std::string &_name, VisualPtr _vis)
       reinterpret_cast<ArrowVisualPrivate *>(this->dataPtr);
 
   dPtr->type = VT_GUI;
-  dPtr->headNode = NULL;
-  dPtr->shaftNode = NULL;
-  dPtr->rotationNode = NULL;
 
   dPtr->headNodeVisible = true;
   dPtr->shaftNodeVisible = true;
@@ -57,33 +54,30 @@ void ArrowVisual::Load()
   this->InsertMesh("axis_shaft");
   this->InsertMesh("axis_head");
 
-  VisualPtr shaftVis(
+  dPtr->shaftVis.reset(
       new Visual(this->GetName()+"__SHAFT__", shared_from_this(), false));
-  shaftVis->Load();
-  shaftVis->AttachMesh("axis_shaft");
-  shaftVis->SetPosition(math::Vector3(0, 0, 0.1));
-  shaftVis->SetCastShadows(false);
-  dPtr->shaftNode = shaftVis->GetSceneNode();
+  dPtr->shaftVis->Load();
+  dPtr->shaftVis->AttachMesh("axis_shaft");
+  dPtr->shaftVis->SetPosition(math::Vector3(0, 0, 0.1));
+  dPtr->shaftVis->SetCastShadows(false);
 
-  VisualPtr headVis(
+  dPtr->headVis.reset(
       new Visual(this->GetName()+"__HEAD__", shared_from_this(), false));
-  headVis->Load();
-  headVis->AttachMesh("axis_head");
-  headVis->SetPosition(math::Vector3(0, 0, 0.24));
-  headVis->SetCastShadows(false);
-  dPtr->headNode = headVis->GetSceneNode();
+  dPtr->headVis->Load();
+  dPtr->headVis->AttachMesh("axis_head");
+  dPtr->headVis->SetPosition(math::Vector3(0, 0, 0.24));
+  dPtr->headVis->SetCastShadows(false);
 
   common::MeshManager::Instance()->CreateTube("rotation_tube",
       0.035, 0.04, 0.01, 1, 32);
   this->InsertMesh("rotation_tube");
 
-  VisualPtr rotationVis(
+  dPtr->rotationVis.reset(
       new Visual(this->GetName()+"__ROTATION__", shared_from_this(), false));
-  rotationVis->Load();
-  rotationVis->AttachMesh("rotation_tube");
-  rotationVis->SetPosition(math::Vector3(0, 0, 0.24));
-  rotationVis->SetCastShadows(false);
-  dPtr->rotationNode = rotationVis->GetSceneNode();
+  dPtr->rotationVis->Load();
+  dPtr->rotationVis->AttachMesh("rotation_tube");
+  dPtr->rotationVis->SetPosition(math::Vector3(0, 0, 0.24));
+  dPtr->rotationVis->SetCastShadows(false);
 
   this->ShowRotation(false);
 
@@ -98,8 +92,8 @@ void ArrowVisual::ShowShaft(bool _show)
 
   dPtr->shaftNodeVisible = _show;
 
-  if (dPtr->shaftNode)
-    dPtr->shaftNode->setVisible(_show);
+  if (dPtr->shaftVis)
+    dPtr->shaftVis->SetVisible(_show);
 }
 
 /////////////////////////////////////////////////
@@ -109,8 +103,8 @@ void ArrowVisual::ShowHead(bool _show)
       reinterpret_cast<ArrowVisualPrivate *>(this->dataPtr);
 
   dPtr->headNodeVisible = _show;
-  if (dPtr->headNode)
-    dPtr->headNode->setVisible(_show);
+  if (dPtr->headVis)
+    dPtr->headVis->SetVisible(_show);
 }
 
 /////////////////////////////////////////////////
@@ -121,8 +115,8 @@ void ArrowVisual::ShowRotation(bool _show)
 
   dPtr->rotationNodeVisible = _show;
 
-  if (dPtr->rotationNode)
-    dPtr->rotationNode->setVisible(_show);
+  if (dPtr->rotationVis)
+    dPtr->rotationVis->SetVisible(_show);
 }
 
 /////////////////////////////////////////////////
@@ -131,9 +125,9 @@ void ArrowVisual::SetVisible(bool _visible, bool _cascade)
   ArrowVisualPrivate *dPtr =
       reinterpret_cast<ArrowVisualPrivate *>(this->dataPtr);
 
-  dPtr->headNode->setVisible(dPtr->headNodeVisible && _visible, _cascade);
-  dPtr->shaftNode->setVisible(dPtr->shaftNodeVisible && _visible, _cascade);
-  dPtr->rotationNode->setVisible(
+  dPtr->headVis->SetVisible(dPtr->headNodeVisible && _visible, _cascade);
+  dPtr->shaftVis->SetVisible(dPtr->shaftNodeVisible && _visible, _cascade);
+  dPtr->rotationVis->SetVisible(
       dPtr->rotationNodeVisible && _visible, _cascade);
 
   this->dataPtr->visible = _visible;

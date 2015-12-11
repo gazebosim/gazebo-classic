@@ -275,8 +275,7 @@ namespace gazebo
       /// \brief Set the transparency.
       /// \param[in] _trans The transparency, between 0 and 1 where 0 is no
       /// transparency.
-      /// \param[in] _cascade Whether to set this parameter in children too.
-      public: void SetTransparency(float _trans, const bool _cascade = true);
+      public: void SetTransparency(float _trans);
 
       /// \brief Get the transparency.
       /// \return The transparency.

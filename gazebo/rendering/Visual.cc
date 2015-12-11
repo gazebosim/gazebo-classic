@@ -298,8 +298,9 @@ void Visual::Init()
   this->dataPtr->ribbonTrail = NULL;
   this->dataPtr->staticGeom = NULL;
   this->dataPtr->layer = -1;
-  this->dataPtr->scale = ignition::math::Vector3d::One;
   this->dataPtr->wireframe = false;
+  this->dataPtr->inheritTransparency = true;
+  this->dataPtr->scale = ignition::math::Vector3d::One;
 
   this->dataPtr->initialized = true;
 }
@@ -1438,6 +1439,8 @@ void Visual::SetTransparencyInnerLoop(Ogre::SceneNode *_sceneNode)
     if (!entity)
       continue;
 
+    // we may not need to check for this string anymore now that each visual
+    // has a type
     if (entity->getName().find("__COLLISION_VISUAL__") != std::string::npos)
       continue;
 
@@ -1531,7 +1534,7 @@ void Visual::UpdateTransparency(const bool _cascade)
 }
 
 //////////////////////////////////////////////////
-void Visual::SetTransparency(float _trans, const bool _cascade)
+void Visual::SetTransparency(float _trans)
 {
   if (math::equal(this->dataPtr->transparency, _trans))
     return;
@@ -1539,7 +1542,7 @@ void Visual::SetTransparency(float _trans, const bool _cascade)
   this->dataPtr->transparency = std::min(
       std::max(_trans, static_cast<float>(0.0)), static_cast<float>(1.0));
 
-  this->UpdateTransparency(_cascade);
+  this->UpdateTransparency(true);
 }
 
 //////////////////////////////////////////////////
@@ -2937,7 +2940,8 @@ void Visual::SetVisibilityFlags(uint32_t _flags)
 //////////////////////////////////////////////////
 void Visual::ShowJoints(bool _show)
 {
-  if (this->GetName().find("JOINT_VISUAL__") != std::string::npos)
+  if (this->dataPtr->type == VT_PHYSICS &&
+      this->GetName().find("JOINT_VISUAL__") != std::string::npos)
     this->SetVisible(_show);
 
   for (auto &child : this->dataPtr->children)
