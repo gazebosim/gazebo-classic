@@ -31,6 +31,7 @@ using namespace common;
 
 
 /////////////////////////////////////////////////
+// this local helper function transform a string to its lowecase equivalent
 std::string lowercase(const std::string &_in)
 {
   std::string out = _in;
@@ -39,6 +40,7 @@ std::string lowercase(const std::string &_in)
 }
 
 /////////////////////////////////////////////////
+// this local helper function transform a C string to its lowecase equivalent
 std::string lowercase(const char *_in)
 {
   std::string ins = _in;
@@ -46,6 +48,7 @@ std::string lowercase(const char *_in)
 }
 
 /////////////////////////////////////////////////
+// local helper function that splits a string according to the delimiting char
 std::vector<std::string> &split(const std::string &_s,
                                 char _delim,
                                 std::vector<std::string> &_elems)
@@ -60,6 +63,8 @@ std::vector<std::string> &split(const std::string &_s,
 }
 
 /////////////////////////////////////////////////
+// This local helper function takes in a SVG transformation string
+// and returns the corresponding transformation matrix
 ignition::math::Matrix3d ParseTransformMatrixStr(
                                               const std::string &_transformStr)
 {
@@ -114,7 +119,7 @@ ignition::math::Matrix3d ParseTransformMatrixStr(
     double deg = stod(numbers[0]);
     ignition::math::Angle angle;
     angle.Degree(deg);
-    // get the tangeant of the angle
+    // get the tangent of the angle
     double t = tan(angle.Radian());
     ignition::math::Matrix3d m(1, t, 0, 0, 1, 0, 0, 0, 1);
     return m;
@@ -131,7 +136,7 @@ ignition::math::Matrix3d ParseTransformMatrixStr(
     double deg = stod(numbers[0]);
     ignition::math::Angle angle;
     angle.Degree(deg);
-    // get the tangeant of the angle
+    // get the tangent of the angle
     double t = tan(angle.Radian());
     ignition::math::Matrix3d m(1, 0, 0, t, 1, 0, 0, 0, 1);
     return m;
@@ -141,7 +146,7 @@ ignition::math::Matrix3d ParseTransformMatrixStr(
   // if y is not provided, it is assumed to be equal to x.
   if (transform.find("scale") != std::string::npos)
   {
-    if (numbers.size() ==0 || numbers.size() > 2)
+    if (numbers.size() == 0 || numbers.size() > 2)
     {
       gzerr << "Unsupported scale transform with more than 2 parameters"
             << std::endl;
@@ -212,6 +217,7 @@ ignition::math::Matrix3d ParseTransformMatrixStr(
 }
 
 /////////////////////////////////////////////////
+// This local helper function interpolates a bezier curve at t (between 0 and 1)
 ignition::math::Vector2d bezierInterpolate(double _t,
                                            const ignition::math::Vector2d &_p0,
                                            const ignition::math::Vector2d &_p1,
@@ -233,6 +239,7 @@ ignition::math::Vector2d bezierInterpolate(double _t,
 }
 
 /////////////////////////////////////////////////
+// this helper function adds bezier interpolations to a list of points
 void cubicBezier(const ignition::math::Vector2d &_p0,
                  const ignition::math::Vector2d &_p1,
                  const ignition::math::Vector2d &_p2,
@@ -255,15 +262,16 @@ void cubicBezier(const ignition::math::Vector2d &_p0,
 }
 
 /////////////////////////////////////////////////
+// this helper function computes the square of a number
 static double Sqr(float _x)
 {
   return _x * _x;
 }
 
 /////////////////////////////////////////////////
+// this helper function computes the angle between 2 vectors, using acos
 static float VecAng(float _ux, float _uy, float _vx, float _vy)
 {
-  // computes the angle between 2 vectors, using acos
   double ux = _ux;
   double uy = _uy;
   double vx = _vx;
@@ -294,6 +302,7 @@ static float VecAng(float _ux, float _uy, float _vx, float _vy)
 }
 
 /////////////////////////////////////////////////
+// this helper function adds arc interpolations to a list of points
 void arcPath(const ignition::math::Vector2d &_p0,
              const double _rx,
              const double _ry,
@@ -734,9 +743,9 @@ void SVGLoader::GetPathCommands(const std::vector<std::string> &_tokens,
   if (_path.transform != ignition::math::Matrix3d::Identity)
   {
     // we need to transform all the points in the path
-    for (auto &polyline: _path.polylines)
+    for (auto &polyline : _path.polylines)
     {
-      for (auto  &polyPoint: polyline)
+      for (auto  &polyPoint : polyline)
       {
         // make a 3d vector form the 2d point
         ignition::math::Vector3d point3(polyPoint.X(), polyPoint.Y(), 1);

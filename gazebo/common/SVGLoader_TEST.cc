@@ -235,7 +235,7 @@ TEST_F(SVGLoader, Transforms)
   EXPECT_EQ(0u, openPolys.size());
   EXPECT_EQ(2u, closedPolys.size());
 
-  // without transform, the first segment of the firts polyline is
+  // without transform, the first segment of the first polyline is
   // about 132 units along y
   auto p0 = closedPolys[0][0];
   auto p1 = closedPolys[0][1];
