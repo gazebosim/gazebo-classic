@@ -24,6 +24,9 @@ release will remove the deprecated code.
 
 ### Modifications
 
+1. **gazebo/physics/Actor.hh**
+    + Type change of `protected: math::Vector3 lastPos;` to `protected: ignition::math::Vector3d lastPos;`
+
 1. **gazebo/rendering/RenderTypes.hh**
     + typedefs for Visual and its derived classes have been changed from boost to std pointers.
     + [pull request #1924](https://bitbucket.org/osrf/gazebo/pull-request/1924)
