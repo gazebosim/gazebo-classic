@@ -50,14 +50,11 @@ FloorItem::FloorItem(): RectItem(*new FloorItemPrivate), BuildingItem(),
 }
 
 /////////////////////////////////////////////////
-FloorItem::~FloorItem()
-{
-}
-
-/////////////////////////////////////////////////
 QVector3D FloorItem::GetSize() const
 {
-  return QVector3D(this->dataPtr->floorWidth, this->dataPtr->floorDepth, this->dataPtr->floorHeight);
+  return QVector3D(this->dataPtr->floorWidth,
+                   this->dataPtr->floorDepth,
+                   this->dataPtr->floorHeight);
 }
 
 /////////////////////////////////////////////////
@@ -76,8 +73,10 @@ double FloorItem::GetSceneRotation() const
 /////////////////////////////////////////////////
 void FloorItem::AttachWallSegment(WallSegmentItem *_wallSegmentItem)
 {
-  this->dataPtr->floorBoundingRect << _wallSegmentItem->boundingRect().topLeft();
-  this->dataPtr->floorBoundingRect << _wallSegmentItem->boundingRect().bottomRight();
+  this->dataPtr->floorBoundingRect <<
+      _wallSegmentItem->boundingRect().topLeft();
+  this->dataPtr->floorBoundingRect <<
+      _wallSegmentItem->boundingRect().bottomRight();
   this->dataPtr->wallSegments.push_back(_wallSegmentItem);
 
   connect(_wallSegmentItem, SIGNAL(WidthChanged(double)), this,
@@ -99,8 +98,10 @@ void FloorItem::WallSegmentDeleted()
   EditorItem *wallSegmentItem = dynamic_cast<EditorItem *>(QObject::sender());
   if (wallSegmentItem)
   {
-    this->dataPtr->wallSegments.erase(std::remove(this->dataPtr->wallSegments.begin(),
-        this->dataPtr->wallSegments.end(), wallSegmentItem), this->dataPtr->wallSegments.end());
+    this->dataPtr->wallSegments.erase(
+        std::remove(this->dataPtr->wallSegments.begin(),
+        this->dataPtr->wallSegments.end(), wallSegmentItem),
+        this->dataPtr->wallSegments.end());
   }
   this->dataPtr->dirty = true;
 }
@@ -164,13 +165,17 @@ void FloorItem::paint(QPainter *_painter,
     this->DrawBoundingBox(_painter);
   this->ShowHandles(this->isSelected());
 
-  QPointF topLeft(this->dataPtr->drawingOriginX - this->dataPtr->drawingWidth/2,
+  QPointF topLeft(
+      this->dataPtr->drawingOriginX - this->dataPtr->drawingWidth/2,
       this->dataPtr->drawingOriginY - this->dataPtr->drawingHeight/2);
-  QPointF topRight(this->dataPtr->drawingOriginX + this->dataPtr->drawingWidth/2,
+  QPointF topRight(
+      this->dataPtr->drawingOriginX + this->dataPtr->drawingWidth/2,
       this->dataPtr->drawingOriginY - this->dataPtr->drawingHeight/2);
-  QPointF bottomLeft(this->dataPtr->drawingOriginX - this->dataPtr->drawingWidth/2,
+  QPointF bottomLeft(
+      this->dataPtr->drawingOriginX - this->dataPtr->drawingWidth/2,
       this->dataPtr->drawingOriginY + this->dataPtr->drawingHeight/2);
-  QPointF bottomRight(this->dataPtr->drawingOriginX  + this->dataPtr->drawingWidth/2,
+  QPointF bottomRight(
+      this->dataPtr->drawingOriginX  + this->dataPtr->drawingWidth/2,
       this->dataPtr->drawingOriginY + this->dataPtr->drawingHeight/2);
 
   QPen rectPen;

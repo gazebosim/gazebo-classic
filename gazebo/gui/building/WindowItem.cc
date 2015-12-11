@@ -60,7 +60,8 @@ WindowItem::WindowItem(): RectItem(*new WindowItemPrivate), BuildingItem(),
   this->dataPtr->inspector->setModal(false);
   connect(this->dataPtr->inspector, SIGNAL(Applied()), this, SLOT(OnApply()));
 
-  this->dataPtr->openInspectorAct = new QAction(tr("&Open Window Inspector"), this);
+  this->dataPtr->openInspectorAct =
+      new QAction(tr("&Open Window Inspector"), this);
   this->dataPtr->openInspectorAct->setStatusTip(tr("Open Window Inspector"));
   connect(this->dataPtr->openInspectorAct, SIGNAL(triggered()),
     this, SLOT(OnOpenInspector()));
@@ -73,15 +74,11 @@ WindowItem::WindowItem(): RectItem(*new WindowItemPrivate), BuildingItem(),
 }
 
 /////////////////////////////////////////////////
-WindowItem::~WindowItem()
-{
-  delete this->dataPtr->inspector;
-}
-
-/////////////////////////////////////////////////
 QVector3D WindowItem::GetSize() const
 {
-  return QVector3D(this->dataPtr->windowWidth, this->dataPtr->windowDepth, this->dataPtr->windowHeight);
+  return QVector3D(this->dataPtr->windowWidth,
+                   this->dataPtr->windowDepth,
+                   this->dataPtr->windowHeight);
 }
 
 /////////////////////////////////////////////////
@@ -103,16 +100,20 @@ void WindowItem::paint(QPainter *_painter,
 {
   QPointF topLeft(this->dataPtr->drawingOriginX - this->dataPtr->drawingWidth/2,
       this->dataPtr->drawingOriginY - this->dataPtr->drawingHeight/2);
-  QPointF topRight(this->dataPtr->drawingOriginX + this->dataPtr->drawingWidth/2,
+  QPointF topRight(
+      this->dataPtr->drawingOriginX + this->dataPtr->drawingWidth/2,
       this->dataPtr->drawingOriginY - this->dataPtr->drawingHeight/2);
-  QPointF bottomLeft(this->dataPtr->drawingOriginX - this->dataPtr->drawingWidth/2,
+  QPointF bottomLeft(
+      this->dataPtr->drawingOriginX - this->dataPtr->drawingWidth/2,
       this->dataPtr->drawingOriginY + this->dataPtr->drawingHeight/2);
-  QPointF bottomRight(this->dataPtr->drawingOriginX  + this->dataPtr->drawingWidth/2,
+  QPointF bottomRight(
+      this->dataPtr->drawingOriginX  + this->dataPtr->drawingWidth/2,
       this->dataPtr->drawingOriginY + this->dataPtr->drawingHeight/2);
 
   QPointF midLeft(this->dataPtr->drawingOriginX - this->dataPtr->drawingWidth/2,
       this->dataPtr->drawingOriginY);
-  QPointF midRight(this->dataPtr->drawingOriginX + this->dataPtr->drawingWidth/2,
+  QPointF midRight(
+      this->dataPtr->drawingOriginX + this->dataPtr->drawingWidth/2,
       this->dataPtr->drawingOriginY);
 
   _painter->save();
@@ -169,7 +170,8 @@ void WindowItem::OnApply()
   this->dataPtr->windowWidth = dialog->GetWidth() / this->dataPtr->itemScale;
   this->dataPtr->windowHeight = dialog->GetHeight() / this->dataPtr->itemScale;
   this->dataPtr->windowDepth = dialog->GetDepth() / this->dataPtr->itemScale;
-  this->dataPtr->windowElevation = dialog->GetElevation() / this->dataPtr->itemScale;
+  this->dataPtr->windowElevation =
+      dialog->GetElevation() / this->dataPtr->itemScale;
   if ((fabs(dialog->GetPosition().x() - itemPos.x()) >= 0.01)
       || (fabs(dialog->GetPosition().y() - itemPos.y()) >= 0.01))
   {
@@ -188,7 +190,8 @@ void WindowItem::WindowChanged()
   emit WidthChanged(this->dataPtr->windowWidth);
   emit DepthChanged(this->dataPtr->windowDepth);
   emit HeightChanged(this->dataPtr->windowHeight);
-  emit PositionChanged(this->dataPtr->windowPos.x(), this->dataPtr->windowPos.y(),
+  emit PositionChanged(this->dataPtr->windowPos.x(),
+      this->dataPtr->windowPos.y(),
       this->dataPtr->levelBaseHeight + this->dataPtr->windowElevation);
 }
 
@@ -207,10 +210,14 @@ void WindowItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *_event)
 void WindowItem::OnOpenInspector()
 {
   this->dataPtr->inspector->SetName(this->GetName());
-  this->dataPtr->inspector->SetWidth(this->dataPtr->windowWidth * this->dataPtr->itemScale);
-  this->dataPtr->inspector->SetHeight(this->dataPtr->windowHeight * this->dataPtr->itemScale);
-  this->dataPtr->inspector->SetElevation(this->dataPtr->windowElevation * this->dataPtr->itemScale);
-  this->dataPtr->inspector->SetDepth(this->dataPtr->windowDepth * this->dataPtr->itemScale);
+  this->dataPtr->inspector->SetWidth(
+      this->dataPtr->windowWidth * this->dataPtr->itemScale);
+  this->dataPtr->inspector->SetHeight(
+      this->dataPtr->windowHeight * this->dataPtr->itemScale);
+  this->dataPtr->inspector->SetElevation(
+      this->dataPtr->windowElevation * this->dataPtr->itemScale);
+  this->dataPtr->inspector->SetDepth(
+      this->dataPtr->windowDepth * this->dataPtr->itemScale);
 
   QPointF itemPos = this->dataPtr->windowPos * this->dataPtr->itemScale;
   itemPos.setY(-itemPos.y());

@@ -43,7 +43,7 @@ namespace gazebo
       public: StairsItem();
 
       /// \brief Destructor
-      public: ~StairsItem();
+      public: ~StairsItem() = default;
 
       // Documentation inherited
       public: virtual QVector3D GetSize() const;

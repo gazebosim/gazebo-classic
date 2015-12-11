@@ -46,7 +46,7 @@ namespace gazebo
         public: WindowItem();
 
         /// \brief Destructor
-        public: ~WindowItem();
+        public: ~WindowItem() = default;
 
         // Documentation inherited
         public: virtual QVector3D GetSize() const;

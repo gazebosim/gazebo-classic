@@ -24,16 +24,18 @@ using namespace gui;
 /////////////////////////////////////////////////
 EditorItem::EditorItem() : editorDPtr(new EditorItemPrivate)
 {
-  this->editorDPtr->editorType = "base";
-  this->editorDPtr->name = "";
-
-  this->editorDPtr->level = 0;
-  this->editorDPtr->levelBaseHeight = 0;
+  this->Init();
 }
 
 //////////////////////////////////////////////////
 EditorItem::EditorItem(EditorItemPrivate &_editorDPtr)
     : editorDPtr(&_editorDPtr)
+{
+  this->Init();
+}
+
+//////////////////////////////////////////////////
+void EditorItem::Init()
 {
   this->editorDPtr->editorType = "base";
   this->editorDPtr->name = "";

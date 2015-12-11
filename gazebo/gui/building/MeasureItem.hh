@@ -45,7 +45,7 @@ namespace gazebo
       public: MeasureItem(const QPointF &_start, const QPointF &_end);
 
       /// \brief Destructor
-      public: ~MeasureItem();
+      public: ~MeasureItem() = default;
 
       // Documentation inherited
       private: virtual void paint(QPainter *_painter,

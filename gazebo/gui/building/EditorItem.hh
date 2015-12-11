@@ -45,6 +45,9 @@ namespace gazebo
       /// \brief Destructor
       public: ~EditorItem();
 
+      /// \brief Initialize this class.
+      private: void Init();
+
       /// \brief Get the size of the item in pixels.
       /// \return Size in pixels.
       public: virtual QVector3D GetSize() const;

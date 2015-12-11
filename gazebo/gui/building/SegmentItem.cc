@@ -76,11 +76,6 @@ void SegmentItem::Init()
 }
 
 /////////////////////////////////////////////////
-SegmentItem::~SegmentItem()
-{
-}
-
-/////////////////////////////////////////////////
 void SegmentItem::SetLine(const QPointF &_start, const QPointF &_end)
 {
   this->segDPtr->start = _start;
@@ -93,7 +88,8 @@ void SegmentItem::SetLine(const QPointF &_start, const QPointF &_end)
       this->segDPtr->end.x() - this->segDPtr->grabberWidth/2.0,
       this->segDPtr->end.y() - this->segDPtr->grabberHeight/2.0);
 
-  this->setLine(this->segDPtr->start.x(), this->segDPtr->start.y(), this->segDPtr->end.x(), this->segDPtr->end.y());
+  this->setLine(this->segDPtr->start.x(), this->segDPtr->start.y(),
+      this->segDPtr->end.x(), this->segDPtr->end.y());
 
   this->SegmentChanged();
 }
@@ -106,7 +102,8 @@ void SegmentItem::SetStartPoint(const QPointF &_start)
       this->segDPtr->start.x() - this->segDPtr->grabberWidth/2.0,
       this->segDPtr->start.y() - this->segDPtr->grabberHeight/2.0);
 
-  this->setLine(this->segDPtr->start.x(), this->segDPtr->start.y(), this->segDPtr->end.x(), this->segDPtr->end.y());
+  this->setLine(this->segDPtr->start.x(), this->segDPtr->start.y(),
+      this->segDPtr->end.x(), this->segDPtr->end.y());
 
   this->SegmentChanged();
 }
@@ -125,7 +122,8 @@ void SegmentItem::SetEndPoint(const QPointF &_end)
       this->segDPtr->end.x() - this->segDPtr->grabberWidth/2.0,
       this->segDPtr->end.y() - this->segDPtr->grabberHeight/2.0);
 
-  this->setLine(this->segDPtr->start.x(), this->segDPtr->start.y(), this->segDPtr->end.x(), this->segDPtr->end.y());
+  this->setLine(this->segDPtr->start.x(), this->segDPtr->start.y(),
+      this->segDPtr->end.x(), this->segDPtr->end.y());
 
   this->SegmentChanged();
 }
@@ -175,8 +173,10 @@ void SegmentItem::SetColor(QColor _color)
 /////////////////////////////////////////////////
 void SegmentItem::ShowHandles(bool _show)
 {
-  this->segDPtr->grabbers[0]->setVisible(_show && this->segDPtr->grabbers[0]->isEnabled());
-  this->segDPtr->grabbers[1]->setVisible(_show && this->segDPtr->grabbers[1]->isEnabled());
+  this->segDPtr->grabbers[0]->setVisible(_show &&
+      this->segDPtr->grabbers[0]->isEnabled());
+  this->segDPtr->grabbers[1]->setVisible(_show &&
+      this->segDPtr->grabbers[1]->isEnabled());
 }
 
 /////////////////////////////////////////////////
@@ -394,8 +394,10 @@ void SegmentItem::mouseMoveEvent(QGraphicsSceneMouseEvent *_event)
   this->SetStartPoint(this->segDPtr->start + trans);
   this->SetEndPoint(this->segDPtr->end + trans);
 
-  this->UpdateLinkedGrabbers(this->segDPtr->grabbers[0], this->segDPtr->start + trans);
-  this->UpdateLinkedGrabbers(this->segDPtr->grabbers[1], this->segDPtr->end + trans);
+  this->UpdateLinkedGrabbers(this->segDPtr->grabbers[0],
+      this->segDPtr->start + trans);
+  this->UpdateLinkedGrabbers(this->segDPtr->grabbers[1],
+      this->segDPtr->end + trans);
 
   this->segDPtr->segmentMouseMove = scenePosition;
 

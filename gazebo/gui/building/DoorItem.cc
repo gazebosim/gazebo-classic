@@ -101,13 +101,17 @@ void DoorItem::paint(QPainter *_painter,
     this->DrawBoundingBox(_painter);
   this->ShowHandles(this->isSelected());
 
-  QPointF topLeft(this->dataPtr->drawingOriginX - this->dataPtr->drawingWidth/2,
+  QPointF topLeft(
+      this->dataPtr->drawingOriginX - this->dataPtr->drawingWidth/2,
       this->dataPtr->drawingOriginY - this->dataPtr->drawingHeight/2);
-  QPointF topRight(this->dataPtr->drawingOriginX + this->dataPtr->drawingWidth/2,
+  QPointF topRight(
+      this->dataPtr->drawingOriginX + this->dataPtr->drawingWidth/2,
       this->dataPtr->drawingOriginY - this->dataPtr->drawingHeight/2);
-  QPointF bottomLeft(this->dataPtr->drawingOriginX - this->dataPtr->drawingWidth/2,
+  QPointF bottomLeft(
+      this->dataPtr->drawingOriginX - this->dataPtr->drawingWidth/2,
       this->dataPtr->drawingOriginY + this->dataPtr->drawingHeight/2);
-  QPointF bottomRight(this->dataPtr->drawingOriginX  + this->dataPtr->drawingWidth/2,
+  QPointF bottomRight(
+      this->dataPtr->drawingOriginX  + this->dataPtr->drawingWidth/2,
       this->dataPtr->drawingOriginY + this->dataPtr->drawingHeight/2);
 
   QPen doorPen;
@@ -115,7 +119,8 @@ void DoorItem::paint(QPainter *_painter,
   doorPen.setColor(this->dataPtr->borderColor);
   _painter->setPen(doorPen);
 
-  _painter->drawLine(topLeft, bottomLeft + QPointF(0, this->dataPtr->drawingWidth));
+  _painter->drawLine(topLeft, bottomLeft +
+      QPointF(0, this->dataPtr->drawingWidth));
   QRect arcRect(topLeft.x() - this->dataPtr->drawingWidth,
       topLeft.y() + this->dataPtr->drawingHeight - this->dataPtr->drawingWidth,
       this->dataPtr->drawingWidth*2, this->dataPtr->drawingWidth*2);
@@ -124,16 +129,16 @@ void DoorItem::paint(QPainter *_painter,
   doorPen.setWidth(this->dataPtr->doorDepth);
   _painter->setPen(doorPen);
   _painter->drawLine(topLeft + QPointF(this->dataPtr->doorDepth/2.0,
-      this->dataPtr->doorDepth/2.0), topRight - QPointF(this->dataPtr->doorDepth/2.0,
-      -this->dataPtr->doorDepth/2.0));
+      this->dataPtr->doorDepth/2.0), topRight -
+      QPointF(this->dataPtr->doorDepth/2.0, - this->dataPtr->doorDepth/2.0));
 
   double borderSize = 1.0;
   doorPen.setColor(Qt::white);
   doorPen.setWidth(this->dataPtr->doorDepth - borderSize*2);
   _painter->setPen(doorPen);
   _painter->drawLine(topLeft + QPointF(this->dataPtr->doorDepth/2.0,
-      this->dataPtr->doorDepth/2.0), topRight - QPointF(this->dataPtr->doorDepth/2.0,
-      -this->dataPtr->doorDepth/2.0));
+      this->dataPtr->doorDepth/2.0), topRight -
+      QPointF(this->dataPtr->doorDepth/2.0, - this->dataPtr->doorDepth/2.0));
 
   this->dataPtr->doorWidth = this->dataPtr->drawingWidth;
   this->dataPtr->doorDepth = this->dataPtr->drawingHeight;
@@ -160,7 +165,8 @@ void DoorItem::OnApply()
   this->dataPtr->doorWidth = dialog->GetWidth() / this->dataPtr->itemScale;
   this->dataPtr->doorHeight = dialog->GetHeight() / this->dataPtr->itemScale;
   this->dataPtr->doorDepth = dialog->GetDepth() / this->dataPtr->itemScale;
-  this->dataPtr->doorElevation = dialog->GetElevation() / this->dataPtr->itemScale;
+  this->dataPtr->doorElevation =
+      dialog->GetElevation() / this->dataPtr->itemScale;
   if ((fabs(dialog->GetPosition().x() - itemPos.x()) >= 0.01)
       || (fabs(dialog->GetPosition().y() - itemPos.y()) >= 0.01))
   {
@@ -177,10 +183,14 @@ void DoorItem::OnApply()
 void DoorItem::OnOpenInspector()
 {
   this->dataPtr->inspector->SetName(this->GetName());
-  this->dataPtr->inspector->SetWidth(this->dataPtr->doorWidth * this->dataPtr->itemScale);
-  this->dataPtr->inspector->SetDepth(this->dataPtr->doorDepth * this->dataPtr->itemScale);
-  this->dataPtr->inspector->SetHeight(this->dataPtr->doorHeight * this->dataPtr->itemScale);
-  this->dataPtr->inspector->SetElevation(this->dataPtr->doorElevation * this->dataPtr->itemScale);
+  this->dataPtr->inspector->SetWidth(
+      this->dataPtr->doorWidth * this->dataPtr->itemScale);
+  this->dataPtr->inspector->SetDepth(
+      this->dataPtr->doorDepth * this->dataPtr->itemScale);
+  this->dataPtr->inspector->SetHeight(
+      this->dataPtr->doorHeight * this->dataPtr->itemScale);
+  this->dataPtr->inspector->SetElevation(
+      this->dataPtr->doorElevation * this->dataPtr->itemScale);
   QPointF itemPos = this->dataPtr->doorPos * this->dataPtr->itemScale;
   itemPos.setY(-itemPos.y());
   this->dataPtr->inspector->SetPosition(itemPos);

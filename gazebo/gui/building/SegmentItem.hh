@@ -42,7 +42,7 @@ namespace gazebo
       public: SegmentItem(QGraphicsItem *_parent = 0);
 
       /// \brief Destructor
-      public: ~SegmentItem();
+      public: ~SegmentItem() = default;
 
       /// \brief Set the segment's line.
       /// \param[in] _start Start position of the line in pixel coordinates.

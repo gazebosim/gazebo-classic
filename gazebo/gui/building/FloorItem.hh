@@ -46,7 +46,7 @@ namespace gazebo
       public: FloorItem();
 
       /// \brief Destructor
-      public: ~FloorItem();
+      public: ~FloorItem() = default;
 
       // Documentation inherited.
       public: virtual QVector3D GetSize() const;

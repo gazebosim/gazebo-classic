@@ -59,7 +59,8 @@ WallSegmentItem::WallSegmentItem(const QPointF &_start, const QPointF &_end,
   this->dataPtr->inspector->setModal(false);
   connect(this->dataPtr->inspector, SIGNAL(Applied()), this, SLOT(OnApply()));
 
-  this->dataPtr->openInspectorAct = new QAction(tr("&Open Wall Inspector"), this);
+  this->dataPtr->openInspectorAct =
+      new QAction(tr("&Open Wall Inspector"), this);
   this->dataPtr->openInspectorAct->setStatusTip(tr("Open Wall Inspector"));
   connect(this->dataPtr->openInspectorAct, SIGNAL(triggered()),
     this, SLOT(OnOpenInspector()));
@@ -67,12 +68,6 @@ WallSegmentItem::WallSegmentItem(const QPointF &_start, const QPointF &_end,
   this->dataPtr->deleteItemAct->setStatusTip(tr("Delete"));
   connect(this->dataPtr->deleteItemAct, SIGNAL(triggered()),
     this, SLOT(OnDeleteItem()));
-}
-
-/////////////////////////////////////////////////
-WallSegmentItem::~WallSegmentItem()
-{
-  delete this->dataPtr->inspector;
 }
 
 /////////////////////////////////////////////////
@@ -123,8 +118,10 @@ void WallSegmentItem::UpdateInspector()
   QPointF segmentEndPoint = this->mapToScene(this->line().p2());
 
   this->dataPtr->inspector->SetName(this->GetName());
-  this->dataPtr->inspector->SetThickness(this->dataPtr->wallThickness * this->dataPtr->itemScale);
-  this->dataPtr->inspector->SetHeight(this->dataPtr->wallHeight * this->dataPtr->itemScale);
+  this->dataPtr->inspector->SetThickness(
+      this->dataPtr->wallThickness * this->dataPtr->itemScale);
+  this->dataPtr->inspector->SetHeight(
+      this->dataPtr->wallHeight * this->dataPtr->itemScale);
   this->dataPtr->inspector->SetLength(segmentLength * this->dataPtr->itemScale);
   QPointF startPos = segmentStartPoint * this->dataPtr->itemScale;
   startPos.setY(-startPos.y());
@@ -153,7 +150,8 @@ void WallSegmentItem::SegmentUpdated()
   this->dataPtr->measure->SetEndPoint(
       QPointF(p2.x()+(d+t)*qCos(angle+M_PI/2.0)-t*qCos(angle+M_PI),
               p2.y()-(d+t)*qSin(angle+M_PI/2.0)+t*qSin(angle+M_PI)));
-  this->dataPtr->measure->SetValue((this->line().length()+2*t)*this->dataPtr->itemScale);
+  this->dataPtr->measure->SetValue(
+      (this->line().length()+2*t)*this->dataPtr->itemScale);
 
   // Doors, windows...
   QList<QGraphicsItem *> children = this->childItems();
@@ -236,7 +234,8 @@ void WallSegmentItem::OnApply()
       qobject_cast<WallInspectorDialog *>(QObject::sender());
 
   double segmentLength = this->line().length() + this->dataPtr->wallThickness;
-  this->dataPtr->wallThickness = dialog->GetThickness() / this->dataPtr->itemScale;
+  this->dataPtr->wallThickness =
+      dialog->GetThickness() / this->dataPtr->itemScale;
   this->SetThickness(this->dataPtr->wallThickness);
   this->dataPtr->wallHeight = dialog->GetHeight() / this->dataPtr->itemScale;
   this->Set3dTexture(dialog->GetTexture());
@@ -257,7 +256,8 @@ void WallSegmentItem::OnApply()
   }
   else
   {
-    QPointF newStartPoint = dialog->GetStartPosition() / this->dataPtr->itemScale;
+    QPointF newStartPoint =
+        dialog->GetStartPosition() / this->dataPtr->itemScale;
     newStartPoint.setY(-newStartPoint.y());
     QPointF newEndPoint = dialog->GetEndPosition() / this->dataPtr->itemScale;
     newEndPoint.setY(-newEndPoint.y());

@@ -45,8 +45,10 @@ StairsItem::StairsItem(): RectItem(*new StairsItemPrivate), BuildingItem(),
 
   //  this->dataPtr->stairsUnitRise = 10;
   //  this->dataPtr->stairsUnitRun = 10;
-  //  this->dataPtr->stairsDepth = this->dataPtr->stairsSteps * this->dataPtr->stairsUnitRun;
-  //  this->dataPtr->stairsHeight = this->dataPtr->stairsSteps * this->dataPtr->stairsUnitRise;
+  //  this->dataPtr->stairsDepth =
+  //  this->dataPtr->stairsSteps * this->dataPtr->stairsUnitRun;
+  //  this->dataPtr->stairsHeight =
+  //  this->dataPtr->stairsSteps * this->dataPtr->stairsUnitRise;
 
   this->dataPtr->stairsPos = this->scenePos();
   this->dataPtr->stairsElevation = 0;
@@ -65,7 +67,8 @@ StairsItem::StairsItem(): RectItem(*new StairsItemPrivate), BuildingItem(),
   this->dataPtr->inspector->setModal(false);
   connect(this->dataPtr->inspector, SIGNAL(Applied()), this, SLOT(OnApply()));
 
-  this->dataPtr->openInspectorAct = new QAction(tr("&Open Stairs Inspector"), this);
+  this->dataPtr->openInspectorAct =
+      new QAction(tr("&Open Stairs Inspector"), this);
   this->dataPtr->openInspectorAct->setStatusTip(tr("Open Stairs Inspector"));
   connect(this->dataPtr->openInspectorAct, SIGNAL(triggered()),
       this, SLOT(OnOpenInspector()));
@@ -76,15 +79,11 @@ StairsItem::StairsItem(): RectItem(*new StairsItemPrivate), BuildingItem(),
 }
 
 /////////////////////////////////////////////////
-StairsItem::~StairsItem()
-{
-  delete this->dataPtr->inspector;
-}
-
-/////////////////////////////////////////////////
 QVector3D StairsItem::GetSize() const
 {
-  return QVector3D(this->dataPtr->stairsWidth, this->dataPtr->stairsDepth, this->dataPtr->stairsHeight);
+  return QVector3D(this->dataPtr->stairsWidth,
+                   this->dataPtr->stairsDepth,
+                   this->dataPtr->stairsHeight);
 }
 
 /////////////////////////////////////////////////
@@ -154,7 +153,8 @@ bool StairsItem::RotateEventFilter(RotateHandle *_rotate, QEvent *_event)
 
   if (_rotate->GetMouseState() == QEvent::GraphicsSceneMouseMove)
   {
-    QPoint localCenter(this->dataPtr->drawingOriginX, this->dataPtr->drawingOriginY);
+    QPoint localCenter(this->dataPtr->drawingOriginX,
+                       this->dataPtr->drawingOriginY);
     QPointF center = this->mapToScene(localCenter);
 
     QPointF newPoint = mouseEvent->scenePos();
@@ -185,11 +185,14 @@ void StairsItem::paint(QPainter *_painter,
 {
   QPointF topLeft(this->dataPtr->drawingOriginX - this->dataPtr->drawingWidth/2,
       this->dataPtr->drawingOriginY - this->dataPtr->drawingHeight/2);
-  QPointF topRight(this->dataPtr->drawingOriginX + this->dataPtr->drawingWidth/2,
+  QPointF topRight(
+      this->dataPtr->drawingOriginX + this->dataPtr->drawingWidth/2,
       this->dataPtr->drawingOriginY - this->dataPtr->drawingHeight/2);
-  QPointF bottomLeft(this->dataPtr->drawingOriginX - this->dataPtr->drawingWidth/2,
+  QPointF bottomLeft(
+      this->dataPtr->drawingOriginX - this->dataPtr->drawingWidth/2,
       this->dataPtr->drawingOriginY + this->dataPtr->drawingHeight/2);
-  QPointF bottomRight(this->dataPtr->drawingOriginX  + this->dataPtr->drawingWidth/2,
+  QPointF bottomRight(
+      this->dataPtr->drawingOriginX  + this->dataPtr->drawingWidth/2,
       this->dataPtr->drawingOriginY + this->dataPtr->drawingHeight/2);
 
   this->dataPtr->stairsPos = this->scenePos();
@@ -248,7 +251,8 @@ void StairsItem::OnApply()
   if ((fabs(dialog->GetStartPosition().x() - startPos.x()) >= 0.01)
       || (fabs(dialog->GetStartPosition().y() - startPos.y()) >= 0.01))
   {
-    this->dataPtr->stairsPos = dialog->GetStartPosition() / this->dataPtr->itemScale;
+    this->dataPtr->stairsPos =
+        dialog->GetStartPosition() / this->dataPtr->itemScale;
     this->dataPtr->stairsPos.setY(-this->dataPtr->stairsPos.y());
     this->setPos(this->dataPtr->stairsPos);
     this->setParentItem(NULL);
@@ -268,9 +272,12 @@ void StairsItem::OnApply()
 void StairsItem::OnOpenInspector()
 {
   this->dataPtr->inspector->SetName(this->GetName());
-  this->dataPtr->inspector->SetWidth(this->dataPtr->stairsWidth * this->dataPtr->itemScale);
-  this->dataPtr->inspector->SetDepth(this->dataPtr->stairsDepth * this->dataPtr->itemScale);
-  this->dataPtr->inspector->SetHeight(this->dataPtr->stairsHeight * this->dataPtr->itemScale);
+  this->dataPtr->inspector->SetWidth(
+      this->dataPtr->stairsWidth * this->dataPtr->itemScale);
+  this->dataPtr->inspector->SetDepth(
+      this->dataPtr->stairsDepth * this->dataPtr->itemScale);
+  this->dataPtr->inspector->SetHeight(
+      this->dataPtr->stairsHeight * this->dataPtr->itemScale);
   this->dataPtr->inspector->SetSteps(this->dataPtr->stairsSteps);
   //  dialog.SetElevation(this->dataPtr->stairsElevation);
   QPointF startPos = this->dataPtr->stairsPos * this->dataPtr->itemScale;
@@ -294,7 +301,8 @@ void StairsItem::StairsChanged()
   emit WidthChanged(this->dataPtr->stairsWidth);
   emit DepthChanged(this->dataPtr->stairsDepth);
   emit HeightChanged(this->dataPtr->stairsHeight);
-  emit PositionChanged(this->dataPtr->stairsPos.x(), this->dataPtr->stairsPos.y(),
+  emit PositionChanged(this->dataPtr->stairsPos.x(),
+      this->dataPtr->stairsPos.y(),
       this->dataPtr->levelBaseHeight + this->dataPtr->stairsElevation);
 }
 

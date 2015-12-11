@@ -51,7 +51,7 @@ namespace gazebo
           const double _height);
 
       /// \brief Destructor
-      public: ~WallSegmentItem();
+      public: ~WallSegmentItem() = default;
 
       /// \brief Get the height of the wall segment item.
       /// \return Height of the wall segment item in pixels.

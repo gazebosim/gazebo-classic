@@ -45,11 +45,6 @@ MeasureItem::MeasureItem(const QPointF &_start, const QPointF &_end)
 }
 
 /////////////////////////////////////////////////
-MeasureItem::~MeasureItem()
-{
-}
-
-/////////////////////////////////////////////////
 void MeasureItem::paint(QPainter *_painter,
     const QStyleOptionGraphicsItem */*_option*/, QWidget */*_widget*/)
 {
