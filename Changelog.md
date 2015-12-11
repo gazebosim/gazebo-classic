@@ -1,7 +1,7 @@
 ## Gazebo 7.0
 
 1 Use opaque pointers in the gui/ConfigWidget class.
-    * [Pull request #2027](https://bitbucket.org/osrf/gazebo/pull-request/2027)
+    * [Pull request #2028](https://bitbucket.org/osrf/gazebo/pull-request/2028)
 
 1. Implemented private data pointer for the RTShaderSystem class. Minimized shader updates to once per render update.
     * [Pull request #2003](https://bitbucket.org/osrf/gazebo/pull-request/2003)
