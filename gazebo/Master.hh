@@ -30,14 +30,27 @@
 
 namespace gazebo
 {
+  // Forward declare private data class
+  class MasterPrivate;
+
   /// \class Master Master.hh gazebo_core.hh
   /// \brief A manager that directs topic connections, enables each gazebo
   /// network client to locate one another for peer-to-peer communication.
   class GAZEBO_VISIBLE Master
-  {
-    /// \def Map of unique id's to connections.
-    typedef std::map<unsigned int, transport::ConnectionPtr> Connection_M;
+  {    
+    public:
+      /// \def Map of unique id's to connections.
+      typedef std::map<unsigned int, transport::ConnectionPtr> Connection_M;
 
+    public:
+      /// \def Map of publish messages to connections.
+      typedef std::list< std::pair<msgs::Publish, transport::ConnectionPtr> >
+        PubList;
+
+    public:
+      /// \def Map of subscribe messages to connections.
+      typedef std::list< std::pair<msgs::Subscribe, transport::ConnectionPtr> >
+        SubList;
 
     /// \brief Constructor
     public: Master();
@@ -94,7 +107,6 @@ namespace gazebo
     private: transport::ConnectionPtr FindConnection(const std::string &_host,
                                                      uint16_t _port);
 
-
     /// \brief Remove a connection.
     /// \param[in] _connIter Iterator to the connection to remove.
     /// _connIter will be incremented when removed.
@@ -110,43 +122,9 @@ namespace gazebo
     /// remove a subscriber.
     private: void RemoveSubscriber(const msgs::Subscribe _sub);
 
-    /// \def Map of publish messages to connections.
-    typedef std::list< std::pair<msgs::Publish, transport::ConnectionPtr> >
-      PubList;
-
-    /// \def Map of subscribe messages to connections.
-    typedef std::list< std::pair<msgs::Subscribe, transport::ConnectionPtr> >
-      SubList;
-
-    /// \brief All the known publishers.
-    private: PubList publishers;
-
-    /// \brief All the known subscribers.
-    private: SubList subscribers;
-
-    /// \brief All the known connections.
-    private: Connection_M connections;
-
-    /// \brief All th worlds.
-    private: std::list<std::string> worldNames;
-
-    /// \brief Incoming messages.
-    private: std::list<std::pair<unsigned int, std::string> > msgs;
-
-    /// \brief Our server connection.
-    private: transport::ConnectionPtr connection;
-
-    /// \brief Thread to run the main loop.
-    private: boost::thread *runThread;
-
-    /// \brief True to stop Master.
-    private: bool stop;
-
-    /// \brief Mutex to protect connections.
-    private: boost::recursive_mutex connectionMutex;
-
-    /// \brief Mutex to protect msg bufferes.
-    private: boost::recursive_mutex msgsMutex;
+    /// \internal
+    /// \brief Pointer to private data.
+    protected: std::unique_ptr<MasterPrivate> dataPtr;
   };
 }
 #endif
