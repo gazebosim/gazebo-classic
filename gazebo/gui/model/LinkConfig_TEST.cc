@@ -72,7 +72,7 @@ void LinkConfig_TEST::PoseUpdate()
   QVERIFY(cw != NULL);
 
   lc.SetPose(pose);
-  ignition::math::Pose3d p = cw->PoseWidgetValue("pose").Ign();
+  ignition::math::Pose3d p = cw->PoseWidgetValue("pose");
 
   QCOMPARE(p, pose);
 }
@@ -119,7 +119,7 @@ void LinkConfig_TEST::InertialPoseUpdate()
   QVERIFY(cw != NULL);
 
   lc.SetInertialPose(pose);
-  ignition::math::Pose3d p = cw->PoseWidgetValue("inertial::pose").Ign();
+  ignition::math::Pose3d p = cw->PoseWidgetValue("inertial::pose");
 
   QCOMPARE(p, pose);
   QCOMPARE(p.Pos().X(), pose.Pos().X());
