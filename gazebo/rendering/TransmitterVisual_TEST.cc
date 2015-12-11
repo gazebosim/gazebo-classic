@@ -23,16 +23,13 @@
 #include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
-class TransmitterVisual_TEST : public ServerFixture
+class TransmitterVisual_TEST : public RenderingFixture
 {
 };
 
 /////////////////////////////////////////////////
 TEST_F(TransmitterVisual_TEST, TransmitterVisualTest)
 {
-  // start rendering in test thread
-  rendering::load();
-
   Load("worlds/empty.world");
 
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene("default");
