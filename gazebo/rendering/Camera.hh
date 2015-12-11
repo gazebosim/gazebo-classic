@@ -491,7 +491,7 @@ namespace gazebo
       /// resulting ray
       /// \param[out] _dir Direction of the resulting ray
       /// \deprecated See function that accepts ignition::math parameters.
-      /// \sa CameraToViwportRay
+      /// \sa CameraToViewportRay
       public: void GetCameraToViewportRay(int _screenx, int _screeny,
                   math::Vector3 &_origin, math::Vector3 &_dir)
                   GAZEBO_DEPRECATED(7.0);
@@ -536,8 +536,8 @@ namespace gazebo
                   GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get point on a plane
-      /// \param[in] _x X cooridnate in camera's viewport, in pixels
-      /// \param[in] _y Y cooridnate in camera's viewport, in pixels
+      /// \param[in] _x X coordinate in camera's viewport, in pixels
+      /// \param[in] _y Y coordinate in camera's viewport, in pixels
       /// \param[in] _plane Plane on which to find the intersecting point
       /// \param[out] _result Point on the plane
       /// \return True if a valid point was found
