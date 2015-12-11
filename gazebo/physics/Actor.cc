@@ -14,8 +14,6 @@
  * limitations under the License.
  *
 */
-
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
@@ -91,9 +89,9 @@ void Actor::Load(sdf::ElementPtr _sdf)
     double angle = (2 * i * M_PI) / pointNum;
     double x = radius * sin(angle);
     double y = radius * cos(angle);
-    if (math::equal(x, 0.0))
+    if (ignition::math::equal(x, 0.0))
       x = 0;
-    if (math::equal(y, 0.0))
+    if (ignition::math::equal(y, 0.0))
       y = 0;
     std::cerr << x << " " << y << " 0 0 0 " << angle << "\n";
   }   */
@@ -118,13 +116,15 @@ void Actor::Load(sdf::ElementPtr _sdf)
     linkSdf->GetElement("self_collide")->Set(false);
     sdf::ElementPtr linkPose = linkSdf->GetElement("pose");
 
-//    this->AddSphereInertia(linkSdf, math::Pose(), 1.0, 0.01);
-//    this->AddSphereCollision(linkSdf, actorName + "_pose_col",
-//                                             math::Pose(), 0.02);
-    // this->AddBoxVisual(linkSdf, actorName + "_pose_vis", math::Pose(),
-    //                   math::Vector3(0.05, 0.05, 0.05), "Gazebo/White",
-    //                   Color::White);
-    this->AddActorVisual(linkSdf, actorName + "_visual", math::Pose());
+    // this->AddSphereInertia(linkSdf, ignition::math::Pose3d(), 1.0, 0.01);
+    // this->AddSphereCollision(linkSdf, actorName + "_pose_col",
+    //                          ignition::math::Pose3d(), 0.02);
+    // this->AddBoxVisual(linkSdf, actorName + "_pose_vis",
+    // ignition::math::Pose3d(),
+    // ignition::math::Vector3d(0.05, 0.05, 0.05), "Gazebo/White",
+    // Color::White);
+    this->AddActorVisual(linkSdf, actorName + "_visual",
+        ignition::math::Pose3d::Zero);
     std::string actorLinkName = actorName + "::" + actorName + "_pose";
     this->visualName = actorLinkName + "::"
                              + actorName + "_visual";
@@ -142,50 +142,53 @@ void Actor::Load(sdf::ElementPtr _sdf)
       ignition::math::Pose3d pose(bone->ModelTransform().Translation(),
                                   bone->ModelTransform().Rotation());
       if (bone->IsRootNode())
-        pose = ignition::math::Pose3d();
+        pose = ignition::math::Pose3d::Zero;
       linkPose->Set(pose);
 
       /// FIXME hardcoded inertia of a sphere with mass 1.0 and radius 0.01
-      this->AddSphereInertia(linkSdf, math::Pose(), 1.0, 0.01);
+      this->AddSphereInertia(linkSdf, ignition::math::Pose3d::Zero, 1.0, 0.01);
 
       /// FIXME hardcoded collision to sphere with radius 0.02
       this->AddSphereCollision(linkSdf, bone->GetName() + "_collision",
-                       math::Pose(), 0.02);
+                       ignition::math::Pose3d::Zero, 0.02);
 
       /// FIXME hardcoded visual to red sphere with radius 0.02
       if (bone->IsRootNode())
       {
         this->AddSphereVisual(linkSdf, bone->GetName() + "__SKELETON_VISUAL__",
-                            math::Pose(), 0.02, "Gazebo/Blue", Color::Blue);
+            ignition::math::Pose3d::Zero, 0.02, "Gazebo/Blue", Color::Blue);
       }
       else
         if (bone->GetChildCount() == 0)
         {
-            this->AddSphereVisual(linkSdf, bone->GetName() +
-                            "__SKELETON_VISUAL__", math::Pose(), 0.02,
-                            "Gazebo/Yellow", Color::Yellow);
+          this->AddSphereVisual(linkSdf, bone->GetName() +
+              "__SKELETON_VISUAL__", ignition::math::Pose3d::Zero, 0.02,
+              "Gazebo/Yellow", Color::Yellow);
         }
         else
+        {
           this->AddSphereVisual(linkSdf, bone->GetName() +
-                            "__SKELETON_VISUAL__", math::Pose(), 0.02,
-                            "Gazebo/Red", Color::Red);
+              "__SKELETON_VISUAL__", ignition::math::Pose3d::Zero, 0.02,
+              "Gazebo/Red", Color::Red);
+        }
 
       for (unsigned int i = 0; i < bone->GetChildCount(); ++i)
       {
         SkeletonNode *curChild = bone->GetChild(i);
 
-        math::Vector3 dir = curChild->ModelTransform().Translation() -
-            bone->ModelTransform().Translation();
-        double length = dir.GetLength();
+        ignition::math::Vector3d dir =
+          curChild->ModelTransform().Translation() -
+          bone->ModelTransform().Translation();
+        double length = dir.Length();
 
-        if (!math::equal(length, 0.0))
+        if (!ignition::math::equal(length, 0.0))
         {
           ignition::math::Vector3d r =
             curChild->Transform().Translation();
           ignition::math::Vector3d linkPos =
             ignition::math::Vector3d(r.X() / 2.0, r.Y() / 2.0, r.Z() / 2.0);
-          double theta = atan2(dir.y, dir.x);
-          double phi = acos(dir.z / length);
+          double theta = atan2(dir.Y(), dir.X());
+          double phi = acos(dir.Z() / length);
 
           ignition::math::Pose3d bonePose(linkPos,
               ignition::math::Quaterniond(0.0, phi, theta));
@@ -193,7 +196,8 @@ void Actor::Load(sdf::ElementPtr _sdf)
 
           this->AddBoxVisual(linkSdf, bone->GetName() + "_" +
             curChild->GetName() + "__SKELETON_VISUAL__", bonePose,
-            math::Vector3(0.02, 0.02, length), "Gazebo/Green", Color::Green);
+            ignition::math::Vector3d(0.02, 0.02, length),
+            "Gazebo/Green", Color::Green);
         }
       }
     }
@@ -264,7 +268,7 @@ void Actor::LoadScript(sdf::ElementPtr _sdf)
       unsigned int idx = iter - this->trajInfo.begin();
       this->trajInfo.insert(iter, tinfo);
 
-      std::map<double, math::Pose> points;
+      std::map<double, ignition::math::Pose3d> points;
 
       if (trajSdf->HasElement("waypoint"))
       {
@@ -272,11 +276,12 @@ void Actor::LoadScript(sdf::ElementPtr _sdf)
         while (wayptSdf)
         {
           points[wayptSdf->Get<double>("time")] =
-                                          wayptSdf->Get<math::Pose>("pose");
+            wayptSdf->Get<ignition::math::Pose3d>("pose");
           wayptSdf = wayptSdf->GetNextElement("waypoint");
         }
 
-        std::map<double, math::Pose>::reverse_iterator last = points.rbegin();
+        std::map<double, ignition::math::Pose3d>::reverse_iterator last =
+          points.rbegin();
         std::stringstream animName;
         animName << tinfo.type << "_" << tinfo.id;
         common::PoseAnimation *anim = new common::PoseAnimation(animName.str(),
@@ -284,19 +289,20 @@ void Actor::LoadScript(sdf::ElementPtr _sdf)
         this->trajInfo[idx].duration = last->first;
         this->trajInfo[idx].translated = true;
 
-        for (std::map<double, math::Pose>::iterator pIter = points.begin();
-              pIter != points.end(); ++pIter)
+        for (std::map<double, ignition::math::Pose3d>::iterator pIter =
+            points.begin(); pIter != points.end(); ++pIter)
         {
           common::PoseKeyFrame *key;
-          if (pIter == points.begin() && !math::equal(pIter->first, 0.0))
+          if (pIter == points.begin() &&
+              !ignition::math::equal(pIter->first, 0.0))
           {
             key = anim->CreateKeyFrame(0.0);
-            key->Translation(pIter->second.pos.Ign());
-            key->Rotation(pIter->second.rot.Ign());
+            key->Translation(pIter->second.Pos());
+            key->Rotation(pIter->second.Rot());
           }
           key = anim->CreateKeyFrame(pIter->first);
-          key->Translation(pIter->second.pos.Ign());
-          key->Rotation(pIter->second.rot.Ign());
+          key->Translation(pIter->second.Pos());
+          key->Rotation(pIter->second.Rot());
         }
 
         this->trajectories[this->trajInfo[idx].id] = anim;
@@ -650,9 +656,9 @@ const sdf::ElementPtr Actor::GetSDF()
 }
 
 //////////////////////////////////////////////////
-void Actor::AddSphereInertia(sdf::ElementPtr _linkSdf,
-                             const math::Pose &_pose,
-                             double _mass, double _radius)
+void Actor::AddSphereInertia(const sdf::ElementPtr &_linkSdf,
+                             const ignition::math::Pose3d &_pose,
+                             const double _mass, const double _radius)
 {
   double ixx = 2.0 * _mass * _radius * _radius / 5.0;
   sdf::ElementPtr inertialSdf = _linkSdf->GetElement("inertial");
@@ -669,10 +675,10 @@ void Actor::AddSphereInertia(sdf::ElementPtr _linkSdf,
 }
 
 //////////////////////////////////////////////////
-void Actor::AddSphereCollision(sdf::ElementPtr _linkSdf,
+void Actor::AddSphereCollision(const sdf::ElementPtr &_linkSdf,
                                const std::string &_name,
-                               const math::Pose &_pose,
-                               double _radius)
+                               const ignition::math::Pose3d &_pose,
+                               const double _radius)
 {
   sdf::ElementPtr collisionSdf = _linkSdf->GetElement("collision");
   collisionSdf->GetAttribute("name")->Set(_name);
@@ -684,9 +690,10 @@ void Actor::AddSphereCollision(sdf::ElementPtr _linkSdf,
 }
 
 //////////////////////////////////////////////////
-void Actor::AddSphereVisual(sdf::ElementPtr _linkSdf, const std::string &_name,
-            const math::Pose &_pose, double _radius,
-            const std::string &_material, const common::Color &_ambient)
+void Actor::AddSphereVisual(const sdf::ElementPtr &_linkSdf,
+    const std::string &_name, const ignition::math::Pose3d &_pose,
+    const double _radius, const std::string &_material,
+    const common::Color &_ambient)
 {
   sdf::ElementPtr visualSdf = _linkSdf->GetElement("visual");
   visualSdf->GetAttribute("name")->Set(_name);
@@ -702,9 +709,10 @@ void Actor::AddSphereVisual(sdf::ElementPtr _linkSdf, const std::string &_name,
 }
 
 //////////////////////////////////////////////////
-void Actor::AddBoxVisual(sdf::ElementPtr _linkSdf, const std::string &_name,
-    const math::Pose &_pose, const math::Vector3 &_size,
-    const std::string &_material, const common::Color &_ambient)
+void Actor::AddBoxVisual(const sdf::ElementPtr &_linkSdf,
+    const std::string &_name, const ignition::math::Pose3d &_pose,
+    const ignition::math::Vector3d &_size, const std::string &_material,
+    const common::Color &_ambient)
 {
   sdf::ElementPtr visualSdf = _linkSdf->AddElement("visual");
   visualSdf->GetAttribute("name")->Set(_name);
@@ -720,8 +728,8 @@ void Actor::AddBoxVisual(sdf::ElementPtr _linkSdf, const std::string &_name,
 }
 
 //////////////////////////////////////////////////
-void Actor::AddActorVisual(sdf::ElementPtr _linkSdf, const std::string &_name,
-                           const math::Pose &_pose)
+void Actor::AddActorVisual(const sdf::ElementPtr &_linkSdf,
+    const std::string &_name, const ignition::math::Pose3d &_pose)
 {
   sdf::ElementPtr visualSdf = _linkSdf->AddElement("visual");
   visualSdf->GetAttribute("name")->Set(_name);
