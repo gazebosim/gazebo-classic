@@ -90,8 +90,7 @@ void ConfigWidget::UpdateFromMsg(const google::protobuf::Message *_msg)
 /////////////////////////////////////////////////
 google::protobuf::Message *ConfigWidget::GetMsg()
 {
-  this->UpdateMsg(this->dataPtr->configMsg);
-  return this->dataPtr->configMsg;
+  return this->Msg();
 }
 
 /////////////////////////////////////////////////
@@ -104,10 +103,7 @@ google::protobuf::Message *ConfigWidget::Msg()
 /////////////////////////////////////////////////
 std::string ConfigWidget::GetHumanReadableKey(const std::string &_key)
 {
-  std::string humanKey = _key;
-  humanKey[0] = std::toupper(humanKey[0]);
-  std::replace(humanKey.begin(), humanKey.end(), '_', ' ');
-  return humanKey;
+  return this->HumanReadableKey(_key);
 }
 
 /////////////////////////////////////////////////
@@ -123,70 +119,7 @@ std::string ConfigWidget::HumanReadableKey(const std::string &_key) const
 std::string ConfigWidget::GetUnitFromKey(const std::string &_key,
     const std::string &_jointType)
 {
-  if (_key == "pos" || _key == "length" || _key == "min_depth")
-  {
-    return "m";
-  }
-
-  if (_key == "rot")
-    return "rad";
-
-  if (_key == "kp" || _key == "kd")
-    return "N/m";
-
-  if (_key == "max_vel")
-    return "m/s";
-
-  if (_key == "mass")
-    return "kg";
-
-  if (_key == "ixx" || _key == "ixy" || _key == "ixz" ||
-      _key == "iyy" || _key == "iyz" || _key == "izz")
-  {
-    return "kg&middot;m<sup>2</sup>";
-  }
-
-  if (_key == "limit_lower" || _key == "limit_upper")
-  {
-    if (_jointType == "PRISMATIC")
-      return "m";
-    else if (_jointType != "")
-      return "rad";
-  }
-
-  if (_key == "limit_effort")
-  {
-    if (_jointType == "PRISMATIC")
-      return "N";
-    else if (_jointType != "")
-      return "Nm";
-  }
-
-  if (_key == "limit_velocity" || _key == "velocity")
-  {
-    if (_jointType == "PRISMATIC")
-      return "m/s";
-    else if (_jointType != "")
-      return "rad/s";
-  }
-
-  if (_key == "damping")
-  {
-    if (_jointType == "PRISMATIC")
-      return "Ns/m";
-    else if (_jointType != "")
-      return "Ns";
-  }
-
-  if (_key == "friction")
-  {
-    if (_jointType == "PRISMATIC")
-      return "N";
-    else if (_jointType != "")
-      return "Nm";
-  }
-
-  return "";
+  return this->UnitFromKey(_key, _jointType);
 }
 
 /////////////////////////////////////////////////
@@ -263,29 +196,7 @@ std::string ConfigWidget::UnitFromKey(const std::string &_key,
 void ConfigWidget::GetRangeFromKey(const std::string &_key, double &_min,
     double &_max)
 {
-  // Maximum range by default
-  _min = -GZ_DBL_MAX;
-  _max = GZ_DBL_MAX;
-
-  if (_key == "mass" || _key == "ixx" || _key == "ixy" || _key == "ixz" ||
-      _key == "iyy" || _key == "iyz" || _key == "izz" || _key == "length" ||
-      _key == "min_depth")
-  {
-    _min = 0;
-  }
-  else if (_key == "bounce" || _key == "transparency" ||
-      _key == "laser_retro" || _key == "ambient" || _key == "diffuse" ||
-      _key == "specular" || _key == "emissive" ||
-      _key == "restitution_coefficient")
-  {
-    _min = 0;
-    _max = 1;
-  }
-  else if (_key == "fdir1" || _key == "xyz")
-  {
-    _min = -1;
-    _max = +1;
-  }
+  this->RangeFromKey(_key, _min, _max);
 }
 
 /////////////////////////////////////////////////
@@ -320,21 +231,7 @@ void ConfigWidget::RangeFromKey(const std::string &_key, double &_min,
 /////////////////////////////////////////////////
 bool ConfigWidget::GetWidgetVisible(const std::string &_name) const
 {
-  auto iter = this->dataPtr->configWidgets.find(_name);
-  if (iter != this->dataPtr->configWidgets.end())
-  {
-    if (iter->second->groupWidget)
-    {
-      GroupWidget *groupWidget =
-          qobject_cast<GroupWidget *>(iter->second->groupWidget);
-      if (groupWidget)
-      {
-        return groupWidget->isVisible();
-      }
-    }
-    return iter->second->isVisible();
-  }
-  return false;
+  return this->WidgetVisible(_name);
 }
 
 /////////////////////////////////////////////////
@@ -380,21 +277,7 @@ void ConfigWidget::SetWidgetVisible(const std::string &_name, bool _visible)
 /////////////////////////////////////////////////
 bool ConfigWidget::GetWidgetReadOnly(const std::string &_name) const
 {
-  auto iter = this->dataPtr->configWidgets.find(_name);
-  if (iter != this->dataPtr->configWidgets.end())
-  {
-    if (iter->second->groupWidget)
-    {
-      GroupWidget *groupWidget =
-          qobject_cast<GroupWidget *>(iter->second->groupWidget);
-      if (groupWidget)
-      {
-        return !groupWidget->isEnabled();
-      }
-    }
-    return !iter->second->isEnabled();
-  }
-  return false;
+  return this->WidgetReadOnly(_name);
 }
 
 /////////////////////////////////////////////////
@@ -508,12 +391,7 @@ bool ConfigWidget::SetStringWidgetValue(const std::string &_name,
 bool ConfigWidget::SetVector3WidgetValue(const std::string &_name,
     const math::Vector3 &_value)
 {
-  auto iter = this->dataPtr->configWidgets.find(_name);
-
-  if (iter != this->dataPtr->configWidgets.end())
-    return this->UpdateVector3Widget(iter->second, _value.Ign());
-
-  return false;
+  return this->SetVector3WidgetValue(_name, _value.Ign());
 }
 
 /////////////////////////////////////////////////
@@ -544,12 +422,7 @@ bool ConfigWidget::SetColorWidgetValue(const std::string &_name,
 bool ConfigWidget::SetPoseWidgetValue(const std::string &_name,
     const math::Pose &_value)
 {
-  auto iter = this->dataPtr->configWidgets.find(_name);
-
-  if (iter != this->dataPtr->configWidgets.end())
-    return this->UpdatePoseWidget(iter->second, _value.Ign());
-
-  return false;
+  return this->SetPoseWidgetValue(_name, _value.Ign());
 }
 
 /////////////////////////////////////////////////
@@ -569,15 +442,7 @@ bool ConfigWidget::SetGeometryWidgetValue(const std::string &_name,
     const std::string &_value, const math::Vector3 &_dimensions,
     const std::string &_uri)
 {
-  auto iter = this->dataPtr->configWidgets.find(_name);
-
-  if (iter != this->dataPtr->configWidgets.end())
-  {
-    return this->UpdateGeometryWidget(iter->second, _value, _dimensions.Ign(),
-        _uri);
-  }
-
-  return false;
+  return this->SetGeometryWidgetValue(_name, _value, _dimensions.Ign(), _uri);
 }
 
 /////////////////////////////////////////////////
@@ -608,13 +473,7 @@ bool ConfigWidget::SetEnumWidgetValue(const std::string &_name,
 /////////////////////////////////////////////////
 int ConfigWidget::GetIntWidgetValue(const std::string &_name) const
 {
-  int value = 0;
-  std::map <std::string, ConfigChildWidget *>::const_iterator iter =
-      this->dataPtr->configWidgets.find(_name);
-
-  if (iter != this->dataPtr->configWidgets.end())
-    value = this->IntWidgetValue(iter->second);
-  return value;
+  return this->IntWidgetValue(_name);
 }
 
 /////////////////////////////////////////////////
@@ -632,13 +491,7 @@ int ConfigWidget::IntWidgetValue(const std::string &_name) const
 /////////////////////////////////////////////////
 unsigned int ConfigWidget::GetUIntWidgetValue(const std::string &_name) const
 {
-  unsigned int value = 0;
-  std::map <std::string, ConfigChildWidget *>::const_iterator iter =
-      this->dataPtr->configWidgets.find(_name);
-
-  if (iter != this->dataPtr->configWidgets.end())
-    value = this->UIntWidgetValue(iter->second);
-  return value;
+  return this->UIntWidgetValue(_name);
 }
 
 /////////////////////////////////////////////////
@@ -656,13 +509,7 @@ unsigned int ConfigWidget::UIntWidgetValue(const std::string &_name) const
 /////////////////////////////////////////////////
 double ConfigWidget::GetDoubleWidgetValue(const std::string &_name) const
 {
-  double value = 0.0;
-  std::map <std::string, ConfigChildWidget *>::const_iterator iter =
-      this->dataPtr->configWidgets.find(_name);
-
-  if (iter != this->dataPtr->configWidgets.end())
-    value = this->DoubleWidgetValue(iter->second);
-  return value;
+  return this->DoubleWidgetValue(_name);
 }
 
 /////////////////////////////////////////////////
@@ -680,13 +527,7 @@ double ConfigWidget::DoubleWidgetValue(const std::string &_name) const
 /////////////////////////////////////////////////
 bool ConfigWidget::GetBoolWidgetValue(const std::string &_name) const
 {
-  bool value = false;
-  std::map <std::string, ConfigChildWidget *>::const_iterator iter =
-      this->dataPtr->configWidgets.find(_name);
-
-  if (iter != this->dataPtr->configWidgets.end())
-    value = this->BoolWidgetValue(iter->second);
-  return value;
+  return this->BoolWidgetValue(_name);
 }
 
 /////////////////////////////////////////////////
@@ -704,13 +545,7 @@ bool ConfigWidget::BoolWidgetValue(const std::string &_name) const
 /////////////////////////////////////////////////
 std::string ConfigWidget::GetStringWidgetValue(const std::string &_name) const
 {
-  std::string value;
-  std::map <std::string, ConfigChildWidget *>::const_iterator iter =
-      this->dataPtr->configWidgets.find(_name);
-
-  if (iter != this->dataPtr->configWidgets.end())
-    value = this->StringWidgetValue(iter->second);
-  return value;
+  return this->StringWidgetValue(_name);
 }
 
 /////////////////////////////////////////////////
@@ -729,13 +564,7 @@ std::string ConfigWidget::StringWidgetValue(const std::string &_name) const
 math::Vector3 ConfigWidget::GetVector3WidgetValue(const std::string &_name)
     const
 {
-  ignition::math::Vector3d value;
-  std::map <std::string, ConfigChildWidget *>::const_iterator iter =
-      this->dataPtr->configWidgets.find(_name);
-
-  if (iter != this->dataPtr->configWidgets.end())
-    value = this->Vector3WidgetValue(iter->second);
-  return value;
+  return this->Vector3WidgetValue(_name);
 }
 
 /////////////////////////////////////////////////
@@ -754,13 +583,7 @@ ignition::math::Vector3d ConfigWidget::Vector3WidgetValue(
 /////////////////////////////////////////////////
 common::Color ConfigWidget::GetColorWidgetValue(const std::string &_name) const
 {
-  common::Color value;
-  std::map <std::string, ConfigChildWidget *>::const_iterator iter =
-      this->dataPtr->configWidgets.find(_name);
-
-  if (iter != this->dataPtr->configWidgets.end())
-    value = this->ColorWidgetValue(iter->second);
-  return value;
+  return this->ColorWidgetValue(_name);
 }
 
 /////////////////////////////////////////////////
@@ -778,13 +601,7 @@ common::Color ConfigWidget::ColorWidgetValue(const std::string &_name) const
 /////////////////////////////////////////////////
 math::Pose ConfigWidget::GetPoseWidgetValue(const std::string &_name) const
 {
-  math::Pose value;
-  std::map <std::string, ConfigChildWidget *>::const_iterator iter =
-      this->dataPtr->configWidgets.find(_name);
-
-  if (iter != this->dataPtr->configWidgets.end())
-    value = this->PoseWidgetValue(iter->second);
-  return value;
+  return this->PoseWidgetValue(_name);
 }
 
 /////////////////////////////////////////////////
@@ -827,12 +644,7 @@ std::string ConfigWidget::GeometryWidgetValue(const std::string &_name,
 /////////////////////////////////////////////////
 std::string ConfigWidget::GetEnumWidgetValue(const std::string &_name) const
 {
-  std::string value;
-  auto iter = this->dataPtr->configWidgets.find(_name);
-
-  if (iter != this->dataPtr->configWidgets.end())
-    value = this->EnumWidgetValue(iter->second);
-  return value;
+  return this->EnumWidgetValue(_name);
 }
 
 /////////////////////////////////////////////////

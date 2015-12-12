@@ -38,7 +38,7 @@ void ConfigWidget_TEST::EmptyMsgWidget()
   gazebo::msgs::Visual visualMsg;
   visualConfigWidget->Load(&visualMsg);
   gazebo::msgs::Visual *retVisualMsg =
-      dynamic_cast<gazebo::msgs::Visual *>(visualConfigWidget->GetMsg());
+      dynamic_cast<gazebo::msgs::Visual *>(visualConfigWidget->Msg());
   QVERIFY(retVisualMsg != NULL);
   delete visualConfigWidget;
 
@@ -47,7 +47,7 @@ void ConfigWidget_TEST::EmptyMsgWidget()
   gazebo::msgs::Collision collisionMsg;
   collisionConfigWidget->Load(&collisionMsg);
   gazebo::msgs::Collision *retCollisionMsg =
-      dynamic_cast<gazebo::msgs::Collision *>(collisionConfigWidget->GetMsg());
+      dynamic_cast<gazebo::msgs::Collision *>(collisionConfigWidget->Msg());
   QVERIFY(retCollisionMsg != NULL);
   delete collisionConfigWidget;
 }
@@ -103,7 +103,7 @@ void ConfigWidget_TEST::JointMsgWidget()
   // verify that all values have not been changed.
   {
     gazebo::msgs::Joint *retJointMsg =
-        dynamic_cast<gazebo::msgs::Joint *>(jointConfigWidget->GetMsg());
+        dynamic_cast<gazebo::msgs::Joint *>(jointConfigWidget->Msg());
     QVERIFY(retJointMsg != NULL);
 
     // joint
@@ -273,7 +273,7 @@ void ConfigWidget_TEST::JointMsgWidget()
   // verify updates in new msg
   {
     gazebo::msgs::Joint *retJointMsg =
-        dynamic_cast<gazebo::msgs::Joint *>(jointConfigWidget->GetMsg());
+        dynamic_cast<gazebo::msgs::Joint *>(jointConfigWidget->Msg());
     QVERIFY(retJointMsg != NULL);
 
     // joint
@@ -409,7 +409,7 @@ void ConfigWidget_TEST::JointMsgWidget()
   // verify updates in new msg
   {
     gazebo::msgs::Joint *retJointMsg =
-        dynamic_cast<gazebo::msgs::Joint *>(jointConfigWidget->GetMsg());
+        dynamic_cast<gazebo::msgs::Joint *>(jointConfigWidget->Msg());
     QVERIFY(retJointMsg != NULL);
 
     // joint
@@ -512,7 +512,7 @@ void ConfigWidget_TEST::VisualMsgWidget()
   // verify that all values have not been changed.
   {
     gazebo::msgs::Visual *retVisualMsg =
-        dynamic_cast<gazebo::msgs::Visual *>(visualConfigWidget->GetMsg());
+        dynamic_cast<gazebo::msgs::Visual *>(visualConfigWidget->Msg());
     QVERIFY(retVisualMsg != NULL);
 
     // visual
@@ -677,7 +677,7 @@ void ConfigWidget_TEST::VisualMsgWidget()
   // verify updates in new msg
   {
     gazebo::msgs::Visual *retVisualMsg =
-        dynamic_cast<gazebo::msgs::Visual *>(visualConfigWidget->GetMsg());
+        dynamic_cast<gazebo::msgs::Visual *>(visualConfigWidget->Msg());
     QVERIFY(retVisualMsg != NULL);
 
     // visual
@@ -774,7 +774,7 @@ void ConfigWidget_TEST::PluginMsgWidget()
   // verify that all values have not been changed.
   {
     gazebo::msgs::Plugin *retPluginMsg =
-        dynamic_cast<gazebo::msgs::Plugin *>(pluginConfigWidget->GetMsg());
+        dynamic_cast<gazebo::msgs::Plugin *>(pluginConfigWidget->Msg());
     QVERIFY(retPluginMsg != NULL);
 
     // plugin
@@ -807,7 +807,7 @@ void ConfigWidget_TEST::PluginMsgWidget()
   // verify updates in new msg
   {
     gazebo::msgs::Plugin *retPluginMsg =
-        dynamic_cast<gazebo::msgs::Plugin *>(pluginConfigWidget->GetMsg());
+        dynamic_cast<gazebo::msgs::Plugin *>(pluginConfigWidget->Msg());
     QVERIFY(retPluginMsg != NULL);
 
     // plugin
