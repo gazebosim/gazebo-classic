@@ -107,6 +107,14 @@ release will remove the deprecated code.
     + ***Deprecation:*** void DetachEntity(Visual *_vis)
     + ***No replacement for DetachEntity ***
 
+1. **gazebo/gui/building/BuildingMaker.hh**
+    + ***Deprecation:*** public: static math::Vector3 ConvertSize(const QVector3D &_size)
+    + ***Deprecation:*** public: static math::Vector3 ConvertSize(double _width, double _depth, double _height);
+    + ***Replacement:*** public: static ignition::math::Vector3d ConvertSizeIgn(const double _width, const double _depth, const double _height)
+    + ***Deprecation:*** public: static math::Pose ConvertPose(const QVector3D &_pos, const QVector3D &_rot)
+    + ***Deprecation:*** public: static math::Pose ConvertPose(double _x, double _y, double _z, double _roll, double _pitch, double _yaw)
+    + ***Replacement:*** public: static ignition::math::Pose3d ConvertPoseIgn(const double _x, const double _y, const double _z, const double _roll, const double _pitch, const double _yaw)
+
 ### Deletions
 
 1. **plugins/rest_web/RestUiLogoutDialog.hh.hh**
