@@ -99,6 +99,46 @@ release will remove the deprecated code.
     + ***Deprecation:*** public: void ScaleZAxis(const math::Vector3 &_scale)
     + ***Replacement:*** public: void ScaleZAxis(const ignition::math::Vector3d &_scale);
 
+1. **gazebo/gui/ConfigWidget.hh**
+    + ***Deprecation:*** google::protobuf::Message *GetMsg()
+    + ***Replacement:*** google::protobuf::Message *Msg()
+    + ***Deprecation:*** std::string GetHumanReadableKey(const std::string &_key)
+    + ***Replacement:*** std::string HumanReadableKey(const std::string &_key) const
+    + ***Deprecation:*** std::string GetUnitFromKey(const std::string &_key, const std::string &_jointType = "")
+    + ***Replacement:*** UnitFromKey(const std::string &_key, const std::string &_jointType = "") const
+    + ***Deprecation:*** void GetRangeFromKey(const std::string &_key, double &_min, double &_max)
+    + ***Replacement:*** RangeFromKey(const std::string &_key, double &_min, double &_max) const
+    + ***Deprecation:*** bool GetWidgetVisible(const std::string &_name)
+    + ***Replacement:*** bool WidgetVisible(const std::string &_name) const
+    + ***Deprecation:*** bool GetWidgetReadOnly(const std::string &_name) const
+    + ***Replacement:*** bool WidgetReadOnly(const std::string &_name) const
+    + ***Deprecation:*** bool SetVector3WidgetValue(const std::string &_name, const math::Vector3 &_value)
+    + ***Replacement:*** bool SetVector3WidgetValue(const std::string &_name, const ignition::math::Vector3d &_value)
+    + ***Deprecation:*** bool SetPoseWidgetValue(const std::string &_name, const math::Pose &_value)
+    + ***Replacement:*** bool SetPoseWidgetValue(const std::string &_name, const ignition::math::Pose3d &_value)
+    + ***Deprecation:*** bool SetGeometryWidgetValue(const std::string &_name, const std::string &_value, const math::Vector3 &_dimensions, const std::string &_uri = "")
+    + ***Replacement:*** bool SetGeometryWidgetValue(const std::string &_name, const std::string &_value, const ignition::math::Vector3d &_dimensions, const std::string &_uri = "")
+    + ***Deprecation:*** int GetIntWidgetValue(const std::string &_name) const
+    + ***Replacement:*** int IntWidgetValue(const std::string &_name) const
+    + ***Deprecation:*** unsigned int GetUIntWidgetValue(const std::string &_name) const
+    + ***Replacement:*** unsigned int UIntWidgetValue(const std::string &_name) const
+    + ***Deprecation:*** double GetDoubleWidgetValue(const std::string &_name) const
+    + ***Replacement:*** double DoubleWidgetValue(const std::string &_name) const
+    + ***Deprecation:*** bool GetBoolWidgetValue(const std::string &_name) const
+    + ***Replacement:*** bool BoolWidgetValue(const std::string &_name) const
+    + ***Deprecation:*** std::string GetStringWidgetValue(const std::string &_name) const
+    + ***Replacement:*** std::string StringWidgetValue(const std::string &_name) const
+    + ***Deprecation:*** math::Vector3 GetVector3WidgetValue(const std::string &_name)
+    + ***Replacement:*** ignition::math::Vector3d Vector3WidgetValue(const std::string &_name) const
+    + ***Deprecation:*** common::Color GetColorWidgetValue(const std::string &_name) const
+    + ***Replacement:*** common::Color ColorWidgetValue(const std::string &_name) const
+    + ***Deprecation:*** math::Pose GetPoseWidgetValue(const std::string &_name) const
+    + ***Replacement:*** ignition::math::Pose3d PoseWidgetValue(const std::string &_name) const
+    + ***Deprecation:*** std::string GetGeometryWidgetValue(const std::string &_name, math::Vector3 &_dimensions, std::string &_uri) const
+    + ***Replacement:*** std::string GeometryWidgetValue(const std::string &_name, ignition::math::Vector3d &_dimensions, std::string &_uri) const
+    + ***Deprecation:*** std::string GetEnumWidgetValue(const std::string &_name) const
+    + ***Replacement:*** std::string EnumWidgetValue(const std::string &_name) const
+
 1. **gazebo/gui/RTShaderSystem.hh**
     + ***Deprecation:*** void AttachEntity(Visual *vis)
     + ***No replacement for AttachEntity ***

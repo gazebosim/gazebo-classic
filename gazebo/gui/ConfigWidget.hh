@@ -160,7 +160,7 @@ namespace gazebo
 
       /// \brief Get the updated message.
       /// \return Updated message.
-      /// \deprecated See Msg() const
+      /// \deprecated See Msg().
       public: google::protobuf::Message *GetMsg() GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the updated message.
