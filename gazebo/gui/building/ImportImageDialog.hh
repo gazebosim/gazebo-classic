@@ -14,8 +14,10 @@
  * limitations under the License.
  *
 */
-#ifndef _IMPORT_IMAGE_DIALOG_HH_
-#define _IMPORT_IMAGE_DIALOG_HH_
+#ifndef _GAZEBO_BUILDING_IMPORT_IMAGE_DIALOG_HH_
+#define _GAZEBO_BUILDING_IMPORT_IMAGE_DIALOG_HH_
+
+#include <memory>
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
@@ -25,13 +27,15 @@ namespace gazebo
   namespace gui
   {
     class EditorView;
+    class ImportImageDialogPrivate;
     class ImportImageView;
 
     /// \addtogroup gazebo_gui
     /// \{
-
     class GZ_GUI_VISIBLE ImportImageDialog : public QDialog
     {
+      friend class ImportImageView;
+
       Q_OBJECT
 
       /// \brief Constructor
@@ -66,41 +70,9 @@ namespace gazebo
       /// \brief Qt callback when the resolution spin's value is changed.
       private slots: void OnChangeResolution(double _resolution);
 
-      /// \brief Distance spin box.
-      public: QDoubleSpinBox *distanceSpin;
-
-      /// \brief Resolution spin box.
-      public: QDoubleSpinBox *resolutionSpin;
-
-      /// \brief Building editor 2D view.
-      private: EditorView *view;
-
-      /// \brief Stacked layout of steps 1 and 2.
-      private: QStackedLayout *stackedStepLayout;
-
-      /// \brief Next button.
-      private: QPushButton *nextButton;
-
-      /// \brief Ok button.
-      private: QPushButton *okButton;
-
-      /// \brief File path line edit.
-      private: QLineEdit *fileLineEdit;
-
-      /// \brief Import image view width.
-      private: int imageDisplayWidth;
-
-      /// \brief Import image view height.
-      private: int imageDisplayHeight;
-
-      /// \brief Import image view.
-      private: ImportImageView *importImageView;
-
-      /// \brief Point where measure line starts.
-      private: QPointF measureLineStart;
-
-      /// \brief Indicates whether currently drawing a line or not.
-      private: bool drawingLine;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<ImportImageDialogPrivate> dataPtr;
     };
     /// \}
   }
