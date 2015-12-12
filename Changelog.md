@@ -1,5 +1,11 @@
 ## Gazebo 7.0
 
+1. Implemented private data pointer for the RTShaderSystem class. Minimized shader updates to once per render update.
+    * [Pull request #2003](https://bitbucket.org/osrf/gazebo/pull-request/2003)
+    
+1. Updating physics library to use ignition math.
+    * [Pull request #2007](https://bitbucket.org/osrf/gazebo/pull-request/2007)
+
 1. Switching to ignition math for the rendering library.
     * [Pull request #1993](https://bitbucket.org/osrf/gazebo/pull-request/1993)
     * [Pull request #1994](https://bitbucket.org/osrf/gazebo/pull-request/1994)
@@ -25,6 +31,9 @@
 1. Improve overall speed of log playback. Added new functions to LogPlay.
    Use tinyxml2 for playback.
     * [Pull request #1931](https://bitbucket.org/osrf/gazebo/pull-request/1931)
+
+1. Enter time during log playback
+    * [Pull request #2000](https://bitbucket.org/osrf/gazebo/pull-request/2000)
 
 1 Added Ignition Transport dependency.
   * [Pull request #1930](https://bitbucket.org/osrf/gazebo/pull-request/1930)
@@ -105,6 +114,10 @@ using the same arguments used in the command line.
    * [Pull request #1977](https://bitbucket.org/osrf/gazebo/pull-request/1977)
    * [Issue #1706](https://bitbucket.org/osrf/gazebo/issue/1706)
 
+1. Fix unadvertising a publisher - only unadvertise topic if it is the last publisher.
+   * [Pull request #2005](https://bitbucket.org/osrf/gazebo/pull-request/2005)
+   * [Issue #1782](https://bitbucket.org/osrf/gazebo/issue/1782)
+
 1. Log playback GUI for multistep, rewind, forward and seek
     * [Pull request #1791](https://bitbucket.org/osrf/gazebo/pull-request/1791)
 
@@ -131,6 +144,10 @@ using the same arguments used in the command line.
 
 1. Added hotkeys chart dialog
     * [Pull request #1835](https://bitbucket.org/osrf/gazebo/pull-request/1835)
+
+1. Space bar to play / pause
+   * [Pull request #2023](https://bitbucket.org/osrf/gazebo/pull-request/2023)
+   * [Issue #1798](https://bitbucket.org/osrf/gazebo/issue/1798)
 
 1. Make it possible to create custom ConfigWidgets
     * [Pull request #1861](https://bitbucket.org/osrf/gazebo/pull-request/1861)
