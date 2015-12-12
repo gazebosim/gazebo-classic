@@ -322,6 +322,9 @@ void JointInspector::OnEnumChanged(const QString &_name,
     this->OnJointTypeChanged(_value);
   else if (_name == "parentCombo" || _name == "childCombo")
     this->OnLinksChanged(_value);
+
+  if (this->CheckValid())
+    emit Applied();
 }
 
 /////////////////////////////////////////////////
@@ -416,9 +419,6 @@ void JointInspector::OnJointTypeChanged(const QString &_value)
           (matAmbient[2] * 255) << "); }";
 
   this->parentIcon->setStyleSheet(QString::fromStdString(sheet.str()));
-
-  if (this->CheckValid())
-    emit Applied();
 }
 
 /////////////////////////////////////////////////
@@ -441,10 +441,6 @@ void JointInspector::OnLinksChanged(const QString &/*_linkName*/)
     this->childLinkWidget->setStyleSheet(ConfigWidget::StyleSheet("normal"));
   }
   this->validLinks = currentParent != currentChild;
-
-  // Only apply if all fields are valid
-  if (this->CheckValid())
-    emit Applied();
 }
 
 /////////////////////////////////////////////////
@@ -564,12 +560,7 @@ void JointInspector::RestoreOriginalData()
   this->Update(jointPtr);
 
   // Update joint type and parent icon
-  // Only unblock signals if they are not blocked from outside
-  bool unblock = !this->signalsBlocked();
-  this->blockSignals(true);
   this->OnJointTypeChanged(tr(msgs::Joint_Type_Name(jointPtr->type()).c_str()));
-  if (unblock)
-    this->blockSignals(false);
 
   // Update custom widgets
   std::string originalParent =
