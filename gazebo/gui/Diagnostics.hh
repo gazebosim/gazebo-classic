@@ -18,7 +18,10 @@
 #ifndef _GAZEBO_DIAGNOSTICS_HH_
 #define _GAZEBO_DIAGNOSTICS_HH_
 
+#include <memory>
+
 #include "gazebo/gui/qt.h"
+#include "gazebo/msgs/msgs.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo

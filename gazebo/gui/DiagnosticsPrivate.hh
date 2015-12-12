@@ -32,7 +32,7 @@ namespace gazebo
     class IncrementalPlot;
 
     /// \brief public data for the EntityMaker class
-    class EntityMakerpublic
+    class DiagnosticsPrivate
     {
       /// \def PointMap
       public: using PointMap = std::map<QString, std::list<QPointF>>;

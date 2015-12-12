@@ -18,7 +18,6 @@
 #include "gazebo/gui/Diagnostics.hh"
 #include "gazebo/gui/DiagnosticsPrivate.hh"
 #include "gazebo/gui/IncrementalPlot.hh"
-#include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/TransportIface.hh"
@@ -55,7 +54,7 @@ class DragableListWidget : public QListWidget
 
 /////////////////////////////////////////////////
 Diagnostics::Diagnostics(QWidget *_parent)
-  : QDialog(_parent)
+  : QDialog(_parent),
     dataPtr(new DiagnosticsPrivate())
 {
   this->dataPtr->paused = false;
@@ -121,7 +120,7 @@ Diagnostics::Diagnostics(QWidget *_parent)
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init();
-  this->dataPtr->sub = this->node->Subscribe("~/diagnostics",
+  this->dataPtr->sub = this->dataPtr->node->Subscribe("~/diagnostics",
       &Diagnostics::OnMsg, this);
 
   QTimer *displayTimer = new QTimer(this);
@@ -142,7 +141,7 @@ void Diagnostics::Update()
   // Update all the plots
   for (auto &plot : this->dataPtr->plots)
   {
-    plot.Update();
+    plot->Update();
   }
 }
 
@@ -166,9 +165,9 @@ void Diagnostics::OnMsg(ConstDiagnosticsPtr &_msg)
   // Add real-time factor if it has been requested.
   for (auto &plot : this->dataPtr->plots)
   {
-    if (plot.HasCurve(QString("Real Time Factor")))
+    if (plot->HasCurve(QString("Real Time Factor")))
     {
-      plot.Add(QString("Real Time Factor"),
+      plot->Add(QString("Real Time Factor"),
                QPointF(wallTime.Double(), _msg->real_time_factor()));
     }
   }
@@ -179,7 +178,7 @@ void Diagnostics::OnMsg(ConstDiagnosticsPtr &_msg)
     QString qstr = QString::fromStdString(_msg->time(i).name());
 
     // Add the time label to the list if it's not already there.
-    QList<QListWidgetItem*> items = this->labelList->findItems(qstr,
+    QList<QListWidgetItem*> items = this->dataPtr->labelList->findItems(qstr,
         Qt::MatchExactly);
 
     if (items.size() == 0)
@@ -194,14 +193,14 @@ void Diagnostics::OnMsg(ConstDiagnosticsPtr &_msg)
     // Check to see if the data belongs in a plot, and add it.
     for (auto &plot : this->dataPtr->plots)
     {
-      if (plot.HasCurve(labelStr))
+      if (plot->HasCurve(labelStr))
       {
         elapsedTime = msgs::Convert(_msg->time(i).elapsed());
 
         double msTime = elapsedTime.Double() * 1e3;
         QPointF pt(wallTime.Double(), msTime);
 
-        plot.Add(labelStr, pt);
+        plot->Add(labelStr, pt);
       }
     }
   }
