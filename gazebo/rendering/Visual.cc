@@ -2951,7 +2951,8 @@ void Visual::ShowJoints(bool _show)
 //////////////////////////////////////////////////
 void Visual::ShowCOM(bool _show)
 {
-  if (this->GetName().find("COM_VISUAL__") != std::string::npos)
+  if (this->dataPtr->type == VT_PHYSICS &&
+      this->GetName().find("COM_VISUAL__") != std::string::npos)
     this->SetVisible(_show);
 
   for (auto &child : this->dataPtr->children)
@@ -2963,7 +2964,8 @@ void Visual::ShowCOM(bool _show)
 //////////////////////////////////////////////////
 void Visual::ShowInertia(bool _show)
 {
-  if (this->GetName().find("INERTIA_VISUAL__") != std::string::npos)
+  if (this->dataPtr->type == VT_PHYSICS &&
+     this->GetName().find("INERTIA_VISUAL__") != std::string::npos)
     this->SetVisible(_show);
 
   for (auto &child : this->dataPtr->children)
@@ -2975,7 +2977,8 @@ void Visual::ShowInertia(bool _show)
 //////////////////////////////////////////////////
 void Visual::ShowLinkFrame(bool _show)
 {
-  if (this->GetName().find("LINK_FRAME_VISUAL__") != std::string::npos)
+  if (this->dataPtr->type == VT_PHYSICS &&
+      this->GetName().find("LINK_FRAME_VISUAL__") != std::string::npos)
     this->SetVisible(_show);
 
   for (auto &child : this->dataPtr->children)
