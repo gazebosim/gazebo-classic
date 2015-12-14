@@ -60,7 +60,7 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   this->dataPtr->modelTree = new ModelTreeWidget(_mainWindow);
   this->dataPtr->modelTree->hide();
   this->Init("modelEditorTab", "Insert", this->dataPtr->modelPalette);
-  this->tabWidget->addTab(this->dataPtr->modelTree, tr("Settings"));
+  this->tabWidget->addTab(this->dataPtr->modelTree, tr("Model"));
 
   GZ_ASSERT(this->tabWidget != NULL, "Editor tab widget is NULL");
 
@@ -440,40 +440,45 @@ void ModelEditor::ToggleInsertWidget()
 
   if (!this->dataPtr->active)
   {
+    if (this->dataPtr->insertModel)
+      this->dataPtr->modelPalette->RemoveWidget(this->dataPtr->insertModel);
     this->dataPtr->modelTree->hide();
     mainTab->setCurrentIndex(0);
     return;
   }
 
-  if (!this->dataPtr->insertModel)
+  for (int i = 0; i < mainTab->count(); ++i)
   {
-    for (int i = 0; i < mainTab->count(); ++i)
+    if (mainTab->tabText(i) == tr("Insert"))
     {
-      if (mainTab->tabText(i) == tr("Insert"))
-      {
-        QWidget *insertModel = mainTab->widget(i);
-        this->dataPtr->insertModel = insertModel;
-        break;
-      }
+      auto insertModel = mainTab->widget(i);
+
+      // Remove from main tab before inserting in new layout
+      mainTab->removeTab(i);
+
+      // Add title
+      auto databaseLabel = new QLabel(tr(
+          "<font size=4 color='white'>Model Database</font>"));
+
+      // Insert in new layout with title
+      auto insertLayout = new QVBoxLayout();
+      insertLayout->addWidget(databaseLabel);
+      insertLayout->addWidget(insertModel);
+
+      auto insertWidget = new QWidget();
+      insertWidget->setLayout(insertLayout);
+
+      this->dataPtr->insertModel = insertWidget;
+
+      // Insert in palette
+      this->dataPtr->modelPalette->InsertWidget(1, insertWidget);
+      this->dataPtr->modelPalette->show();
+      insertModel->show();
+      this->tabWidget->setCurrentIndex(0);
+
+      break;
     }
   }
-
-  int insertModelIdx =
-      mainTab->indexOf(this->dataPtr->insertModel);
-
-  if (insertModelIdx < 0)
-  {
-    gzerr << "Insert tab not found. It will not be available in the"
-        << " model editor" << std::endl;
-    return;
-  }
-
-  mainTab->removeTab(insertModelIdx);
-
-  this->dataPtr->modelPalette->InsertWidget(1, this->dataPtr->insertModel);
-  this->dataPtr->modelPalette->show();
-  this->dataPtr->insertModel->show();
-  this->tabWidget->setCurrentIndex(0);
 }
 
 /////////////////////////////////////////////////
