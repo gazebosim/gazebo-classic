@@ -24,16 +24,13 @@
 #include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
-class SelectionObj_TEST : public ServerFixture
+class SelectionObj_TEST : public RenderingFixture
 {
 };
 
 /////////////////////////////////////////////////
 TEST_F(SelectionObj_TEST, SelectionObjTest)
 {
-  // start rendering in test thread
-  rendering::load();
-
   Load("worlds/empty.world");
 
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene("default");
@@ -123,9 +120,6 @@ TEST_F(SelectionObj_TEST, SelectionObjTest)
 /////////////////////////////////////////////////
 TEST_F(SelectionObj_TEST, LoadFini)
 {
-  // start rendering in test thread
-  rendering::load();
-
   Load("worlds/empty.world");
 
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene("default");
