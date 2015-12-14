@@ -9,44 +9,52 @@ else
 fi
 
 # Create a logfile based on the current time
+PREFIX=$HOME/ws/tmp
 timestamp=`eval date +%Y_%m_%d_%R:%S`
-logfilePrefix="/tmp/gazebo_test-$timestamp"
-logfile="${logfilePrefix}.txt"
-logfileSummary="${logfilePrefix}-summary.txt"
-logfileVerbose="${logfilePrefix}-verbose.txt"
-BUILD_ROOT=/tmp/gazebo_build
+logfile="${PREFIX}/gazebo_test-$timestamp.txt"
+logfileSummary="${PREFIX}/gazebo_test-$timestamp-summary.txt"
+logfileVerbose="${PREFIX}/gazebo_test-$timestamp-verbose.txt"
+BUILD_ROOT=${PREFIX}/gazebo_build
 logfileRaw=$BUILD_ROOT/raw.log
-testCount=30
+testCount=20
 
-# Create working directory
+# Create catkin workspace
 cd 
 rm -rf $BUILD_ROOT
-mkdir -p $BUILD_ROOT
+mkdir -p $BUILD_ROOT/src
 
 # Clone
 GAZEBO_ORIGIN=https://bitbucket.org/osrf/gazebo
+SDFORMAT_ORIGIN=https://bitbucket.org/osrf/sdformat
 if [ `hostname` == t2 ]
 then
-  hg clone $HOME/osrf/gazebo $BUILD_ROOT/source
+  hg clone $HOME/osrf/gazebo $BUILD_ROOT/src/gazebo
+  cd $BUILD_ROOT/src/gazebo
+  hg pull $GAZEBO_ORIGIN
+  hg clone $HOME/osrf/sdformat $BUILD_ROOT/src/sdformat
+  cd $BUILD_ROOT/src/sdformat
+  hg pull $ORIGIN
+  hg pull $SDFORMAT_ORIGIN
 else
-  hg clone $ORIGIN $BUILD_ROOT/source
+  hg clone $GAZEBO_ORIGIN $BUILD_ROOT/src/gazebo
+  hg clone $SDFORMAT_ORIGIN $BUILD_ROOT/src/sdformat
 fi
-cd $BUILD_ROOT/source
-hg pull ${GAZEBO_ORIGIN}
+
+# get package.xml files
+curl https://bitbucket.org/scpeters/unix-stuff/raw/master/package_xml/package_gazebo.xml > $BUILD_ROOT/src/gazebo/package.xml
+curl https://bitbucket.org/scpeters/unix-stuff/raw/master/package_xml/package_sdformat.xml > $BUILD_ROOT/src/sdformat/package.xml
+cd $BUILD_ROOT && catkin init
 
 start_time=`eval date +%s`
 
 export DISPLAY=:0
-export PATH=$BUILD_ROOT/install/bin:$PATH
-export LD_LIBRARY_PATH=$BUILD_ROOT/install/lib:$BUILD_ROOT/install/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
-export PKG_CONFIG_PATH=$BUILD_ROOT/install/lib/x86_64-linux-gnu/pkgconfig:$PKG_CONFIG_PATH
 ulimit -c unlimited
 
 # Process each branch from the command line
 for branch in $branches
 do
   # Get the correct branch
-  cd $BUILD_ROOT/source
+  cd $BUILD_ROOT/src/gazebo
   echo hg up $branch
   hg up $branch
 
@@ -55,15 +63,13 @@ do
   patch -p1 < $HOME/bin/gz_build_test_scpeters.patch
 
   # Build
-  rm -rf build
-  mkdir build
-  cd build
-  cmake .. \
-    -DCMAKE_INSTALL_PREFIX=$BUILD_ROOT/install \
+  catkin clean -a
+  catkin config --cmake-args \
     -DENABLE_SCREEN_TESTS:BOOL=True \
     -DFORCE_GRAPHIC_TESTS_COMPILATION:BOOL=True
-  make -j4 install
-  . $BUILD_ROOT/install/share/gazebo/setup.sh
+  catkin build
+  . $BUILD_ROOT/devel/setup.bash
+  . $BUILD_ROOT/devel/share/gazebo/setup.sh
 
   echo "Branch: $branch" >> $logfile
   echo "hg id: `hg id`" >> $logfile
@@ -79,7 +85,7 @@ do
   for i in `seq $testCount`
   do
     echo "Test results try $i of $testCount" >> $logfile
-    cd $BUILD_ROOT/source/build
+    cd $BUILD_ROOT/build/gazebo
 
     # make test with verbose output
     make test ARGS="-VV" &> $logfileRaw
@@ -113,7 +119,7 @@ hour=`expr $duration / 3600`
 min=`expr $(( $duration - $hour * 3600 )) / 60`
 sec=`expr $duration - $hour \* 3600 - $min \* 60`
 echo "Duration: $hour hr $min min $sec sec" >> $logfile
-cp $logfileRaw /tmp
+cp $logfileRaw $PREFIX
 
 # Cleanup
 cd
