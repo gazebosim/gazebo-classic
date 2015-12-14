@@ -62,8 +62,7 @@ namespace gazebo
       /// See SetParam documentation for descriptions of duplicate parameters.
       /// \param[in] _key String key
       /// Below is a list of _key parameter definitions:
-      ///       -# "direction" (double) - wind direction
-      ///       -# "magnitude" (double) - wind magnitude
+      ///       -# "linear_vel" (Vector3d) - wind linear velocity
       ///
       /// \param[in] _value The value to set to
       /// \return true if SetParam is successful, false if operation fails.

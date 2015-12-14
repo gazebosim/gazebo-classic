@@ -104,7 +104,7 @@ void WindTest::WindParam()
     EXPECT_NO_THROW(wind->SetParam("fake_param_name", 0));
 
     // Try SetParam with wrong type
-    EXPECT_NO_THROW(wind->SetParam("direction", std::string("wrong")));
+    EXPECT_NO_THROW(wind->SetParam("linear_velocity", std::string("wrong")));
   }
 
   {
