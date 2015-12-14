@@ -73,8 +73,8 @@ void WindTest::WindParam()
   transport::SubscriberPtr responsePub = windNode->Subscribe("~/response",
       &WindTest::OnWindMsgResponse, this);
 
-  windPubMsg.set_direction(45.0);
-  windPubMsg.set_magnitude(1.03);
+  windPubMsg.mutable_linear_velocity()->CopyFrom(
+    msgs::Convert(ignition::math::Vector3d(0.7, 0.7, 0)));
 
   windPub->Publish(windPubMsg);
 
@@ -90,17 +90,15 @@ void WindTest::WindParam()
 
   ASSERT_LT(waitCount, maxWaitCount);
 
-  EXPECT_DOUBLE_EQ(windResponseMsg.direction(),
-      windPubMsg.direction());
-  EXPECT_DOUBLE_EQ(windResponseMsg.magnitude(),
-      windPubMsg.magnitude());
+  EXPECT_EQ(msgs::ConvertIgn(windResponseMsg.linear_velocity()),
+            msgs::ConvertIgn(windPubMsg.linear_velocity()));
 
   // Test Wind::[GS]etParam()
   {
     physics::WindPtr wind = world->GetWind();
-    boost::any direction = wind->Param("direction");
-    EXPECT_DOUBLE_EQ(boost::any_cast<double>(direction),
-      windPubMsg.direction());
+    ignition::math::Vector3d vel = boost::any_cast<ignition::math::Vector3d>(
+      wind->Param("linear_velocity"));
+    EXPECT_EQ(vel, msgs::ConvertIgn(windPubMsg.linear_velocity()));
 
     EXPECT_NO_THROW(wind->Param("fake_param_name"));
     EXPECT_NO_THROW(wind->SetParam("fake_param_name", 0));
@@ -115,14 +113,10 @@ void WindTest::WindParam()
     try
     {
       boost::any value;
-      double direction = 3.14;
-      double magnitude = 1.03;
-      EXPECT_TRUE(wind->SetParam("direction", direction));
-      EXPECT_TRUE(wind->Param("direction", value));
-      EXPECT_NEAR(boost::any_cast<double>(value), direction, 1e-6);
-      EXPECT_TRUE(wind->SetParam("magnitude", magnitude));
-      EXPECT_TRUE(wind->Param("magnitude", value));
-      EXPECT_NEAR(boost::any_cast<double>(value), magnitude, 1e-6);
+      ignition::math::Vector3d vel = {-1.03, 0, 0};
+      EXPECT_TRUE(wind->SetParam("linear_velocity", vel));
+      EXPECT_TRUE(wind->Param("linear_velocity", value));
+      EXPECT_EQ(boost::any_cast<ignition::math::Vector3d>(value), vel);
     }
     catch(boost::bad_any_cast &_e)
     {
@@ -154,10 +148,12 @@ void WindTest::WindParamBool()
   boost::any value;
 
   // Test wind parameter(s)
-  EXPECT_TRUE(wind->Param("direction", value));
-  EXPECT_NEAR(boost::any_cast<double>(value), 0.0, 1e-6);
-  EXPECT_TRUE(wind->Param("magnitude", value));
-  EXPECT_NEAR(boost::any_cast<double>(value), 0.0, 1e-6);
+  EXPECT_TRUE(wind->Param("linear_velocity", value));
+  const ignition::math::Vector3d &vel =
+    boost::any_cast<ignition::math::Vector3d>(value);
+  EXPECT_NEAR(vel.X(), 0.0, 1e-6);
+  EXPECT_NEAR(vel.Y(), 0.0, 1e-6);
+  EXPECT_NEAR(vel.Z(), 0.0, 1e-6);
 
   EXPECT_FALSE(wind->Param("param_does_not_exist", value));
 }

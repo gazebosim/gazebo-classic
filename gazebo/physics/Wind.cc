@@ -38,8 +38,6 @@ Wind::Wind(WorldPtr _world)
 {
   this->dataPtr->world = _world;
 
-  this->dataPtr->direction = 0.0;
-
   this->dataPtr->sdf.reset(new sdf::Element);
   sdf::initFile("wind.sdf", this->dataPtr->sdf);
 
@@ -99,42 +97,13 @@ ignition::math::Vector3d Wind::RelativeLinearVel(const Entity *_entity)
 //////////////////////////////////////////////////
 void Wind::SetLinearVel(const ignition::math::Vector3d& _vel)
 {
-  this->dataPtr->vel = _vel;
+  this->dataPtr->linearVel = _vel;
 }
 
 //////////////////////////////////////////////////
 const ignition::math::Vector3d& Wind::LinearVel(void) const
 {
-  return this->dataPtr->vel;
-}
-
-//////////////////////////////////////////////////
-double Wind::Direction(void) const
-{
-  return GZ_RTOD(this->dataPtr->direction);
-}
-
-//////////////////////////////////////////////////
-void Wind::SetMagnitude(double _magnitude)
-{
-  this->dataPtr->vel.X(_magnitude * cos(this->dataPtr->direction));  // North
-  this->dataPtr->vel.Y(_magnitude * sin(this->dataPtr->direction));  // East
-  this->dataPtr->vel.Z(0.0);  // Down
-}
-
-//////////////////////////////////////////////////
-double Wind::Magnitude(void) const
-{
-  return this->dataPtr->vel.Length();
-}
-
-//////////////////////////////////////////////////
-void Wind::SetDirection(double _direction)
-{
-  // _direction is the angle that the wind is blowing *towards*
-  this->dataPtr->direction = GZ_DTOR(_direction);
-  while (this->dataPtr->direction < 0) this->dataPtr->direction += 2 * M_PI;
-  this->SetMagnitude(this->Magnitude());
+  return this->dataPtr->linearVel;
 }
 
 //////////////////////////////////////////////////
@@ -143,17 +112,12 @@ bool Wind::SetParam(const std::string &_key,
 {
   try
   {
-    if (_key == "direction")
+    if (_key == "linear_velocity")
     {
-      double value = boost::any_cast<double>(_value);
-      this->dataPtr->sdf->GetElement("direction")->Set(value);
-      this->SetDirection(value);
-    }
-    else if (_key == "magnitude")
-    {
-      double value = boost::any_cast<double>(_value);
-      this->dataPtr->sdf->GetElement("magnitude")->Set(value);
-      this->SetMagnitude(value);
+      ignition::math::Vector3d vel =
+          boost::any_cast<ignition::math::Vector3d>(_value);
+      this->dataPtr->sdf->GetElement("linear_velocity")->Set(vel);
+      this->SetLinearVel(vel);
     }
     else
     {
@@ -188,10 +152,8 @@ boost::any Wind::Param(const std::string &_key) const
 bool Wind::Param(const std::string &_key,
     boost::any &_value) const
 {
-  if (_key == "direction")
-    _value = this->Direction();
-  else if (_key == "magnitude")
-    _value = this->Magnitude();
+  if (_key == "linear_velocity")
+    _value = this->LinearVel();
   else
   {
     gzwarn << "Param failed for [" << _key << "] in wind " << std::endl;
@@ -213,15 +175,10 @@ void Wind::Load(sdf::ElementPtr _sdf)
 {
   this->dataPtr->sdf->Copy(_sdf);
 
-  if (this->dataPtr->sdf->HasElement("direction"))
+  if (this->dataPtr->sdf->HasElement("linear_velocity"))
   {
-    this->SetDirection(
-        this->dataPtr->sdf->GetElement("direction")->Get<double>());
-  }
-  if (this->dataPtr->sdf->HasElement("magnitude"))
-  {
-    this->SetMagnitude(
-        this->dataPtr->sdf->GetElement("magnitude")->Get<double>());
+    this->SetLinearVel(
+        this->dataPtr->sdf->Get<ignition::math::Vector3d>("linear_velocity"));
   }
 }
 
@@ -237,8 +194,8 @@ void Wind::OnRequest(ConstRequestPtr &_msg)
   if (_msg->request() == "wind_info")
   {
     msgs::Wind windMsg;
-    windMsg.set_direction(this->Direction());
-    windMsg.set_magnitude(this->Magnitude());
+    windMsg.mutable_linear_velocity()->CopyFrom(
+      msgs::Convert(this->dataPtr->linearVel));
     windMsg.set_enable_wind(this->dataPtr->world->GetEnableWind());
 
     response.set_type(windMsg.GetTypeName());
@@ -250,11 +207,8 @@ void Wind::OnRequest(ConstRequestPtr &_msg)
 /////////////////////////////////////////////////
 void Wind::OnWindMsg(ConstWindPtr &_msg)
 {
-  if (_msg->has_direction())
-    this->SetDirection(_msg->direction());
-
-  if (_msg->has_magnitude())
-    this->SetMagnitude(_msg->magnitude());
+  if (_msg->has_linear_velocity())
+    this->SetLinearVel(msgs::ConvertIgn(_msg->linear_velocity()));
 
   if (_msg->has_enable_wind())
     this->dataPtr->world->EnableWind(_msg->enable_wind());

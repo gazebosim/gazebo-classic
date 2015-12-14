@@ -46,11 +46,8 @@ namespace gazebo
       /// \brief Subscribe to the request topic.
       public: transport::SubscriberPtr requestSub;
 
-      /// \brief Wind heading is the direction the wind is blowing towards.
-      public: double direction;
-
-      /// \brief Wind vector.
-      public: ignition::math::Vector3d vel;
+      /// \brief Wind linear velocity.
+      public: ignition::math::Vector3d linearVel;
 
       /// \brief The function used to to calculate the wind velocity at an
       /// entity's location.

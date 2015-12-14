@@ -13,8 +13,7 @@
     </include>
 
     <wind>
-      <direction>45.0</direction>
-      <magnitude>15.0</magnitude>
+      <linear_velocity>11 11 0</linear_velocity>
     </wind>
 
     <!-- Load the plugin for the wind -->

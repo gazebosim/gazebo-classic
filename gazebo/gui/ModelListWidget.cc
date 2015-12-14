@@ -781,13 +781,9 @@ void ModelListWidget::WindPropertyChanged(QtProperty * /*_item*/)
     {
       msg.set_enable_wind(this->variantManager->value((*iter)).toBool());
     }
-    else if ((*iter)->propertyName().toStdString() == "direction")
+    else if ((*iter)->propertyName().toStdString() == "linear_velocity")
     {
-      msg.set_direction(this->variantManager->value((*iter)).toDouble());
-    }
-    else if ((*iter)->propertyName().toStdString() == "magnitude")
-    {
-      msg.set_magnitude(this->variantManager->value((*iter)).toDouble());
+      this->FillVector3Msg((*iter), msg.mutable_linear_velocity());
     }
   }
 
@@ -2843,21 +2839,19 @@ void ModelListWidget::FillPropertyTree(const msgs::Wind &_msg,
     item->setValue(_msg.enable_wind());
   this->propTreeBrowser->addProperty(item);
 
-  item = this->variantManager->addProperty(QVariant::Double, tr("direction"));
-  static_cast<QtVariantPropertyManager*>
-    (this->variantFactory->propertyManager(item))->setAttribute(
-        item, "decimals", 6);
-  if (_msg.has_direction())
-    item->setValue(_msg.direction());
-  this->propTreeBrowser->addProperty(item);
-
-  item = this->variantManager->addProperty(QVariant::Double, tr("magnitude"));
-  static_cast<QtVariantPropertyManager*>
-    (this->variantFactory->propertyManager(item))->setAttribute(
-        item, "decimals", 6);
-  if (_msg.has_magnitude())
-    item->setValue(_msg.magnitude());
-  this->propTreeBrowser->addProperty(item);
+  QtProperty *linearVelocityItem = this->variantManager->addProperty(
+      QtVariantPropertyManager::groupTypeId(), tr("linear velocity"));
+  this->propTreeBrowser->addProperty(linearVelocityItem);
+  if (_msg.has_linear_velocity())
+    this->FillVector3dProperty(_msg.linear_velocity(), linearVelocityItem);
+  else
+  {
+    msgs::Vector3d xyz;
+    xyz.set_x(0.0);
+    xyz.set_y(0.0);
+    xyz.set_z(0.0);
+    this->FillVector3dProperty(xyz, linearVelocityItem);
+  }
 }
 
 /////////////////////////////////////////////////

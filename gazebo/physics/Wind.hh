@@ -95,30 +95,6 @@ namespace gazebo
       /// \param[in] _msg Request message.
       private: void OnRequest(ConstRequestPtr &_msg);
 
-      /// \brief Get the wind magnitude.
-      /// \return Wind magnitude in meters/second.
-      public: double Magnitude(void) const;
-
-      /// \brief Set the wind magnitude.
-      /// \param[in] _magnitude Wind magnitude in meters/second.
-      public: void SetMagnitude(double _magnitude);
-
-      /// \brief Get the direction that the wind is coming from.
-      /// The direction is defined as north=0 and increases counterclockwise.
-      /// \return Wind heading in degrees.
-      public: double Direction(void) const;
-
-      /// \brief Set the direction that the wind is coming from.
-      /// The direction is defined as north=0 and increases counterclockwise
-      /// to 360 (degrees). The vertical component of wind is assumed to be
-      /// zero - and is forcibly set to zero. This function sets the wind vector
-      /// components based on the supplied direction. The magnitude of the
-      /// wind in the vector is preserved (assuming the vertical component is
-      /// non-zero).
-      /// \param[in] _direction Wind direction in the horizontal plane, in
-      /// degrees.
-      public: void SetDirection(double _direction);
-
       /// \brief Get the wind velocity at an entity location in the
       /// world coordinate frame.
       /// \param[in] _entity Entity at which location the wind is applied.
