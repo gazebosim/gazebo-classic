@@ -32,12 +32,15 @@
    Use tinyxml2 for playback.
     * [Pull request #1931](https://bitbucket.org/osrf/gazebo/pull-request/1931)
 
+1. Enter time during log playback
+    * [Pull request #2000](https://bitbucket.org/osrf/gazebo/pull-request/2000)
+
 1 Added Ignition Transport dependency.
     * [Pull request #1930](https://bitbucket.org/osrf/gazebo/pull-request/1930)
 
 1 Make latched subscribers receive the message only once
     * [Issue #1789](https://bitbucket.org/osrf/gazebo/issue/1789)
-    * [Pull request #2016](https://bitbucket.org/osrf/gazebo/pull-request/2016)
+    * [Pull request #2019](https://bitbucket.org/osrf/gazebo/pull-request/2019)
 
 1. KeyEvent constructor should be in a source file. Removed a few visibility
 flags from c functions. Windows did not like `CPPTYPE_*` in
