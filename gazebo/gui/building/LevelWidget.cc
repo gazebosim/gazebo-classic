@@ -15,48 +15,48 @@
  *
 */
 
-#include <boost/bind.hpp>
-#include <sstream>
-#include "gazebo/gui/building/LevelWidget.hh"
 #include "gazebo/gui/building/BuildingEditorEvents.hh"
+#include "gazebo/gui/building/LevelWidget.hh"
+#include "gazebo/gui/building/LevelWidgetPrivate.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 //////////////////////////////////////////////////
-LevelWidget::LevelWidget(QWidget *_parent) : QWidget(_parent)
+LevelWidget::LevelWidget(QWidget *_parent)
+  : QWidget(_parent), dataPtr(new LevelWidgetPrivate)
 {
   this->setObjectName("levelWidget");
   this->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
   QHBoxLayout *levelLayout = new QHBoxLayout;
-  this->levelCounter = 0;
+  this->dataPtr->levelCounter = 0;
 
-  this->showFloorplanAct = new QAction("Floorplan", this);
-  this->showElementsAct = new QAction("Features", this);
-  this->showFloorplanAct->setCheckable(true);
-  this->showElementsAct->setCheckable(true);
-  this->showFloorplanAct->setChecked(true);
-  this->showElementsAct->setChecked(true);
-  this->showFloorplanAct->setShortcut(tr("F"));
-  this->showElementsAct->setShortcut(tr("G"));
-  connect(this->showFloorplanAct, SIGNAL(triggered()), this, SLOT(
+  this->dataPtr->showFloorplanAct = new QAction("Floorplan", this);
+  this->dataPtr->showElementsAct = new QAction("Features", this);
+  this->dataPtr->showFloorplanAct->setCheckable(true);
+  this->dataPtr->showElementsAct->setCheckable(true);
+  this->dataPtr->showFloorplanAct->setChecked(true);
+  this->dataPtr->showElementsAct->setChecked(true);
+  this->dataPtr->showFloorplanAct->setShortcut(tr("F"));
+  this->dataPtr->showElementsAct->setShortcut(tr("G"));
+  connect(this->dataPtr->showFloorplanAct, SIGNAL(triggered()), this, SLOT(
       OnShowFloorplan()));
-  connect(this->showElementsAct, SIGNAL(triggered()), this, SLOT(
+  connect(this->dataPtr->showElementsAct, SIGNAL(triggered()), this, SLOT(
       OnShowElements()));
 
   QMenu *showMenu = new QMenu(this);
-  showMenu->addAction(this->showFloorplanAct);
-  showMenu->addAction(this->showElementsAct);
+  showMenu->addAction(this->dataPtr->showFloorplanAct);
+  showMenu->addAction(this->dataPtr->showElementsAct);
   QPushButton *showButton = new QPushButton("View", this);
   showButton->setMenu(showMenu);
 
-  this->levelComboBox = new QComboBox;
-  this->levelComboBox->addItem(QString("Level 1"));
-  int comboBoxwidth = levelComboBox->minimumSizeHint().width();
-  int comboBoxHeight = levelComboBox->minimumSizeHint().height();
-  this->levelComboBox->setMinimumWidth(comboBoxwidth*3);
-  this->levelComboBox->setMinimumHeight(comboBoxHeight);
+  this->dataPtr->levelComboBox = new QComboBox;
+  this->dataPtr->levelComboBox->addItem(QString("Level 1"));
+  int comboBoxwidth = this->dataPtr->levelComboBox->minimumSizeHint().width();
+  int comboBoxHeight = this->dataPtr->levelComboBox->minimumSizeHint().height();
+  this->dataPtr->levelComboBox->setMinimumWidth(comboBoxwidth*3);
+  this->dataPtr->levelComboBox->setMinimumHeight(comboBoxHeight);
   this->setMinimumWidth(comboBoxwidth*6);
 
   QPushButton *deleteLevelButton = new QPushButton("-");
@@ -65,30 +65,31 @@ LevelWidget::LevelWidget(QWidget *_parent) : QWidget(_parent)
   addLevelButton->setToolTip("Add new level");
 
   levelLayout->addWidget(showButton);
-  levelLayout->addWidget(this->levelComboBox);
+  levelLayout->addWidget(this->dataPtr->levelComboBox);
   levelLayout->addWidget(deleteLevelButton);
   levelLayout->addWidget(addLevelButton);
 
-  connect(this->levelComboBox, SIGNAL(currentIndexChanged(int)),
+  connect(this->dataPtr->levelComboBox, SIGNAL(currentIndexChanged(int)),
       this, SLOT(OnCurrentLevelChanged(int)));
   connect(deleteLevelButton, SIGNAL(clicked()), this, SLOT(OnDeleteLevel()));
   connect(addLevelButton, SIGNAL(clicked()), this, SLOT(OnAddLevel()));
 
-  this->connections.push_back(
+  this->dataPtr->connections.push_back(
       gui::editor::Events::ConnectUpdateLevelWidget(
-      boost::bind(&LevelWidget::OnUpdateLevelWidget, this, _1, _2)));
+      std::bind(&LevelWidget::OnUpdateLevelWidget, this, std::placeholders::_1,
+      std::placeholders::_2)));
 
-  this->connections.push_back(
+  this->dataPtr->connections.push_back(
       gui::editor::Events::ConnectTriggerShowFloorplan(
-      boost::bind(&LevelWidget::OnTriggerShowFloorplan, this)));
+      std::bind(&LevelWidget::OnTriggerShowFloorplan, this)));
 
-  this->connections.push_back(
+  this->dataPtr->connections.push_back(
       gui::editor::Events::ConnectTriggerShowElements(
-      boost::bind(&LevelWidget::OnTriggerShowElements, this)));
+      std::bind(&LevelWidget::OnTriggerShowElements, this)));
 
-  this->connections.push_back(
+  this->dataPtr->connections.push_back(
       gui::editor::Events::ConnectNewBuildingModel(
-      boost::bind(&LevelWidget::OnDiscard, this)));
+      std::bind(&LevelWidget::OnDiscard, this)));
 
   this->setLayout(levelLayout);
 }
@@ -122,32 +123,32 @@ void LevelWidget::OnUpdateLevelWidget(int _level, const std::string &_newName)
   // Delete
   if (_newName.empty())
   {
-    this->levelComboBox->removeItem(_level);
+    this->dataPtr->levelComboBox->removeItem(_level);
     if (_level-1 >= 0)
-      this->levelComboBox->setCurrentIndex(_level-1);
+      this->dataPtr->levelComboBox->setCurrentIndex(_level-1);
     return;
   }
 
   // Add
-  if (_level == this->levelComboBox->count())
+  if (_level == this->dataPtr->levelComboBox->count())
   {
-    this->levelComboBox->addItem(tr(_newName.c_str()));
-    this->levelComboBox->setCurrentIndex(_level);
-    this->levelCounter++;
+    this->dataPtr->levelComboBox->addItem(tr(_newName.c_str()));
+    this->dataPtr->levelComboBox->setCurrentIndex(_level);
+    this->dataPtr->levelCounter++;
   }
   // Change name
   else
   {
-    this->levelComboBox->setItemText(_level, tr(_newName.c_str()));
+    this->dataPtr->levelComboBox->setItemText(_level, tr(_newName.c_str()));
   }
 }
 
 //////////////////////////////////////////////////
 void LevelWidget::OnDiscard()
 {
-  this->levelComboBox->clear();
-  this->levelComboBox->addItem(QString("Level 1"));
-  this->levelCounter = 0;
+  this->dataPtr->levelComboBox->clear();
+  this->dataPtr->levelComboBox->addItem(QString("Level 1"));
+  this->dataPtr->levelCounter = 0;
 }
 
 //////////////////////////////////////////////////
@@ -160,7 +161,8 @@ void LevelWidget::OnShowFloorplan()
 void LevelWidget::OnTriggerShowFloorplan()
 {
   this->OnShowFloorplan();
-  this->showFloorplanAct->setChecked(!this->showFloorplanAct->isChecked());
+  this->dataPtr->showFloorplanAct->setChecked(
+      !this->dataPtr->showFloorplanAct->isChecked());
 }
 
 //////////////////////////////////////////////////
@@ -173,5 +175,6 @@ void LevelWidget::OnShowElements()
 void LevelWidget::OnTriggerShowElements()
 {
   this->OnShowElements();
-  this->showElementsAct->setChecked(!this->showElementsAct->isChecked());
+  this->dataPtr->showElementsAct->setChecked(
+      !this->dataPtr->showElementsAct->isChecked());
 }

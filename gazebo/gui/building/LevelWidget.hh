@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _LEVEL_WIDGET_HH_
-#define _LEVEL_WIDGET_HH_
+#ifndef _GAZEBO_BUILDING_LEVEL_WIDGET_HH_
+#define _GAZEBO_BUILDING_LEVEL_WIDGET_HH_
 
 #include <string>
 #include <vector>
@@ -28,6 +28,8 @@ namespace gazebo
 {
   namespace gui
   {
+    class LevelWidgetPrivate;
+
     /// \addtogroup gazebo_gui
     /// \{
 
@@ -46,6 +48,7 @@ namespace gazebo
 
       /// \brief Qt callback when the selection of the level combo box has been
       /// changed.
+      /// \param[in] _level Chosen level.
       public slots: void OnCurrentLevelChanged(int _level);
 
       /// \brief Qt callback when the add level button has been pressed.
@@ -67,26 +70,17 @@ namespace gazebo
       public slots: void OnTriggerShowElements();
 
       /// \brief Callback received when levels are changed externally.
+      /// \param[in] _level Level number.
+      /// \param[in] _newName New level name.
       private: void OnUpdateLevelWidget(int _level,
           const std::string &_newName);
 
       /// \brief Callback received when the widget must be reset.
       private: void OnDiscard();
 
-      /// \brief Combo box for selecting the current level.
-      private: QComboBox *levelComboBox;
-
-      /// \brief A list of gui editor events connected to this widget
-      private: std::vector<event::ConnectionPtr> connections;
-
-      /// \brief Counter for the total number of levels.
-      private: int levelCounter;
-
-      /// \brief Action to show floorplan.
-      private: QAction *showFloorplanAct;
-
-      /// \brief Action to show elements.
-      private: QAction *showElementsAct;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<LevelWidgetPrivate> dataPtr;
     };
     /// \}
   }
