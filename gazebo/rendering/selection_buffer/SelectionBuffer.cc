@@ -25,16 +25,46 @@
 using namespace gazebo;
 using namespace rendering;
 
+namespace gazebo
+{
+  namespace rendering
+  {
+    struct SelectionBufferPrivate
+    {
+      /// \brief This is the material listener - Note: it is controlled by a
+      /// separate RenderTargetListener, not applied globally to all
+      /// targets.
+      MaterialSwitcher *materialSwitchListener;
+
+      SelectionRenderListener *selectionTargetListener;
+
+      Ogre::SceneManager *sceneMgr;
+      Ogre::Camera *camera;
+      Ogre::RenderTarget *renderTarget;
+      Ogre::TexturePtr texture;
+      Ogre::RenderTexture *renderTexture;
+      uint8_t *buffer;
+      Ogre::PixelBox *pixelBox;
+      Ogre::Overlay *selectionDebugOverlay;
+    };
+  }
+}
+
 /////////////////////////////////////////////////
 SelectionBuffer::SelectionBuffer(const std::string &_cameraName,
     Ogre::SceneManager *_mgr, Ogre::RenderTarget *_renderTarget)
-: sceneMgr(_mgr), renderTarget(_renderTarget), renderTexture(0),
-  buffer(0), pixelBox(0)
+: dataPtr(new SelectionBufferPrivate)
 {
-  this->camera = this->sceneMgr->getCamera(_cameraName);
-  this->materialSwitchListener = new MaterialSwitcher();
-  this->selectionTargetListener = new SelectionRenderListener(
-      this->materialSwitchListener);
+  this->dataPtr->sceneMgr = _mgr;
+  this->dataPtr->renderTarget = _renderTarget;
+  this->dataPtr->renderTexture = 0;
+  this->dataPtr->buffer = 0;
+  this->dataPtr->pixelBox = 0;
+
+  this->dataPtr->camera = this->dataPtr->sceneMgr->getCamera(_cameraName);
+  this->dataPtr->materialSwitchListener = new MaterialSwitcher();
+  this->dataPtr->selectionTargetListener = new SelectionRenderListener(
+      this->dataPtr->materialSwitchListener);
   this->CreateRTTBuffer();
   this->CreateRTTOverlays();
 }
@@ -43,18 +73,18 @@ SelectionBuffer::SelectionBuffer(const std::string &_cameraName,
 SelectionBuffer::~SelectionBuffer()
 {
   this->DeleteRTTBuffer();
-  delete this->selectionTargetListener;
-  delete this->materialSwitchListener;
+  delete this->dataPtr->selectionTargetListener;
+  delete this->dataPtr->materialSwitchListener;
 }
 
 /////////////////////////////////////////////////
 void SelectionBuffer::Update()
 {
-  if (!this->renderTexture)
+  if (!this->dataPtr->renderTexture)
     return;
 
   this->UpdateBufferSize();
-  this->materialSwitchListener->Reset();
+  this->dataPtr->materialSwitchListener->Reset();
 
   // FIXME: added try-catch block to prevent crash in deferred rendering mode.
   // RTT does not like VPL.material as it references a texture in the compositor
@@ -62,36 +92,36 @@ void SelectionBuffer::Update()
   // compositors to the renderTexture
   try
   {
-    this->renderTexture->update();
+    this->dataPtr->renderTexture->update();
   }
   catch(...)
   {
   }
 
-  this->renderTexture->copyContentsToMemory(*this->pixelBox,
+  this->dataPtr->renderTexture->copyContentsToMemory(*this->dataPtr->pixelBox,
       Ogre::RenderTarget::FB_FRONT);
 }
 
 /////////////////////////////////////////////////
 void SelectionBuffer::DeleteRTTBuffer()
 {
-  if (!this->texture.isNull() && this->texture->isLoaded())
-    this->texture->unload();
-  if (this->buffer)
-    delete [] this->buffer;
-  if (this->pixelBox)
-    delete this->pixelBox;
+  if (!this->dataPtr->texture.isNull() && this->dataPtr->texture->isLoaded())
+    this->dataPtr->texture->unload();
+  if (this->dataPtr->buffer)
+    delete [] this->dataPtr->buffer;
+  if (this->dataPtr->pixelBox)
+    delete this->dataPtr->pixelBox;
 }
 
 /////////////////////////////////////////////////
 void SelectionBuffer::CreateRTTBuffer()
 {
-  unsigned int width = this->renderTarget->getWidth();
-  unsigned int height = this->renderTarget->getHeight();
+  unsigned int width = this->dataPtr->renderTarget->getWidth();
+  unsigned int height = this->dataPtr->renderTarget->getHeight();
 
   try
   {
-    this->texture = Ogre::TextureManager::getSingleton().createManual(
+    this->dataPtr->texture = Ogre::TextureManager::getSingleton().createManual(
         "SelectionPassTex",
         Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
         Ogre::TEX_TYPE_2D, width, height, 0, Ogre::PF_R8G8B8,
@@ -99,41 +129,41 @@ void SelectionBuffer::CreateRTTBuffer()
   }
   catch(...)
   {
-    this->renderTexture = NULL;
+    this->dataPtr->renderTexture = NULL;
     gzerr << "Unable to create selection buffer.\n";
     return;
   }
 
-  this->renderTexture = this->texture->getBuffer()->getRenderTarget();
-  this->renderTexture->setAutoUpdated(false);
-  this->renderTexture->setPriority(0);
-  this->renderTexture->addViewport(this->camera);
-  this->renderTexture->getViewport(0)->setOverlaysEnabled(false);
-  this->renderTexture->getViewport(0)->setClearEveryFrame(true);
-  this->renderTexture->addListener(this->selectionTargetListener);
-  this->renderTexture->getViewport(0)->setMaterialScheme("aa");
-  this->renderTexture->getViewport(0)->setVisibilityMask(
+  this->dataPtr->renderTexture = this->dataPtr->texture->getBuffer()->getRenderTarget();
+  this->dataPtr->renderTexture->setAutoUpdated(false);
+  this->dataPtr->renderTexture->setPriority(0);
+  this->dataPtr->renderTexture->addViewport(this->dataPtr->camera);
+  this->dataPtr->renderTexture->getViewport(0)->setOverlaysEnabled(false);
+  this->dataPtr->renderTexture->getViewport(0)->setClearEveryFrame(true);
+  this->dataPtr->renderTexture->addListener(this->dataPtr->selectionTargetListener);
+  this->dataPtr->renderTexture->getViewport(0)->setMaterialScheme("aa");
+  this->dataPtr->renderTexture->getViewport(0)->setVisibilityMask(
       GZ_VISIBILITY_SELECTABLE);
-  Ogre::HardwarePixelBufferSharedPtr pixelBuffer = this->texture->getBuffer();
+  Ogre::HardwarePixelBufferSharedPtr pixelBuffer = this->dataPtr->texture->getBuffer();
   size_t bufferSize = pixelBuffer->getSizeInBytes();
 
-  this->buffer = new uint8_t[bufferSize];
-  this->pixelBox = new Ogre::PixelBox(pixelBuffer->getWidth(),
+  this->dataPtr->buffer = new uint8_t[bufferSize];
+  this->dataPtr->pixelBox = new Ogre::PixelBox(pixelBuffer->getWidth(),
       pixelBuffer->getHeight(), pixelBuffer->getDepth(),
-      pixelBuffer->getFormat(), this->buffer);
+      pixelBuffer->getFormat(), this->dataPtr->buffer);
 }
 
 /////////////////////////////////////////////////
 void SelectionBuffer::UpdateBufferSize()
 {
-  if (!this->renderTexture)
+  if (!this->dataPtr->renderTexture)
     return;
 
-  unsigned int width = this->renderTarget->getWidth();
-  unsigned int height = this->renderTarget->getHeight();
+  unsigned int width = this->dataPtr->renderTarget->getWidth();
+  unsigned int height = this->dataPtr->renderTarget->getHeight();
 
-  if (width != this->renderTexture->getWidth() ||
-     height != this->renderTexture->getHeight())
+  if (width != this->dataPtr->renderTexture->getWidth() ||
+     height != this->dataPtr->renderTexture->getHeight())
   {
     this->DeleteRTTBuffer();
     this->CreateRTTBuffer();
@@ -143,29 +173,29 @@ void SelectionBuffer::UpdateBufferSize()
 /////////////////////////////////////////////////
 Ogre::Entity *SelectionBuffer::OnSelectionClick(int _x, int _y)
 {
-  if (!this->renderTexture)
+  if (!this->dataPtr->renderTexture)
     return NULL;
 
   if (_x < 0 || _y < 0
-      || _x >= static_cast<int>(this->renderTarget->getWidth())
-      || _y >= static_cast<int>(this->renderTarget->getHeight()))
+      || _x >= static_cast<int>(this->dataPtr->renderTarget->getWidth())
+      || _y >= static_cast<int>(this->dataPtr->renderTarget->getHeight()))
     return 0;
 
   this->Update();
-  size_t posInStream = (this->pixelBox->getWidth() * _y) * 4;
+  size_t posInStream = (this->dataPtr->pixelBox->getWidth() * _y) * 4;
   posInStream += _x * 4;
   common::Color::BGRA color(0);
-  memcpy(static_cast<void *>(&color), this->buffer + posInStream, 4);
+  memcpy(static_cast<void *>(&color), this->dataPtr->buffer + posInStream, 4);
   common::Color cv;
   cv.SetFromARGB(color);
 
   cv.a = 1.0;
-  const std::string &entName = this->materialSwitchListener->GetEntityName(cv);
+  const std::string &entName = this->dataPtr->materialSwitchListener->GetEntityName(cv);
 
   if (entName.empty())
     return 0;
   else
-    return this->sceneMgr->getEntity(entName);
+    return this->dataPtr->sceneMgr->getEntity(entName);
 }
 
 /////////////////////////////////////////////////
@@ -186,7 +216,7 @@ void SelectionBuffer::CreateRTTOverlays()
     createTextureUnitState();
   textureUnit->setTextureName("SelectionPassTex");
 
-  this->selectionDebugOverlay = mgr->create("SelectionDebugOverlay");
+  this->dataPtr->selectionDebugOverlay = mgr->create("SelectionDebugOverlay");
 
   Ogre::OverlayContainer *panel =
     static_cast<Ogre::OverlayContainer *>(
@@ -199,8 +229,8 @@ void SelectionBuffer::CreateRTTOverlays()
     panel->setDimensions(400, 280);
     panel->setMaterialName("SelectionDebugMaterial");
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR  <= 9
-    this->selectionDebugOverlay->add2D(panel);
-    this->selectionDebugOverlay->hide();
+    this->dataPtr->selectionDebugOverlay->add2D(panel);
+    this->dataPtr->selectionDebugOverlay->hide();
 #endif
   }
   else
@@ -216,9 +246,9 @@ void SelectionBuffer::CreateRTTOverlays()
 void SelectionBuffer::ShowOverlay(bool _show)
 {
   if (_show)
-    this->selectionDebugOverlay->show();
+    this->dataPtr->selectionDebugOverlay->show();
   else
-    this->selectionDebugOverlay->hide();
+    this->dataPtr->selectionDebugOverlay->hide();
 }
 #else
 void SelectionBuffer::ShowOverlay(bool /*_show*/)

@@ -34,6 +34,7 @@ namespace gazebo
 {
   namespace rendering
   {
+    struct SelectionBufferPrivate;
     class MaterialSwitcher;
     class SelectionRenderListener;
     class Scene;
@@ -76,21 +77,9 @@ namespace gazebo
       /// \brief Update the size of the offscreen render texture.
       private: void UpdateBufferSize();
 
-      /// \brief This is the material listener - Note: it is controlled by a
-      /// separate RenderTargetListener, not applied globally to all
-      /// targets.
-      private: MaterialSwitcher *materialSwitchListener;
-
-      private: SelectionRenderListener *selectionTargetListener;
-
-      private: Ogre::SceneManager *sceneMgr;
-      private: Ogre::Camera *camera;
-      private: Ogre::RenderTarget *renderTarget;
-      private: Ogre::TexturePtr texture;
-      private: Ogre::RenderTexture *renderTexture;
-      private: uint8_t *buffer;
-      private: Ogre::PixelBox *pixelBox;
-      private: Ogre::Overlay *selectionDebugOverlay;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<SelectionBufferPrivate> dataPtr;
     };
   }
 }
