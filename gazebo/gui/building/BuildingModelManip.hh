@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _BUILDING_MODEL_MANIP_HH_
-#define _BUILDING_MODEL_MANIP_HH_
+#ifndef _GAZEBO_BUILDING_MODEL_MANIP_HH_
+#define _GAZEBO_BUILDING_MODEL_MANIP_HH_
 
 #include <string>
 #include <vector>
@@ -32,6 +32,7 @@ namespace gazebo
   namespace gui
   {
     class BuildingMaker;
+    class BuildingModelManipPrivate;
 
     /// \addtogroup gazebo_gui
     /// \{
@@ -285,41 +286,9 @@ namespace gazebo
       /// \param[in] _level The level that is currently being edited.
       private: void OnChangeLevel(int _level);
 
-      /// \brief Name of the manip.
-      private: std::string name;
-
-      /// \brief A pointer to the visual managed by the manip.
-      private: rendering::VisualPtr visual;
-
-      /// \brief Size of the manipular.
-      private: math::Vector3 size;
-
-      /// \brief Pose of the manip.
-      private: math::Pose pose;
-
-      /// \brief Maker that manages this manip.
-      private: BuildingMaker *maker;
-
-      /// \brief A list of attached manips.
-      private: std::vector<BuildingModelManip *> attachedManips;
-
-      /// \brief Parent manip.
-      private: BuildingModelManip *parent;
-
-      /// \brief Visual's transparency.
-      private: double transparency;
-
-      /// \brief Visual's color.
-      private: common::Color color;
-
-      /// \brief Visual's texture.
-      private: std::string texture;
-
-      /// \brief Level this manipulator is on.
-      private: int level;
-
-      /// \brief A list of gui editor events connected to this view.
-      private: std::vector<event::ConnectionPtr> connections;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<BuildingModelManipPrivate> dataPtr;
     };
     /// \}
   }
