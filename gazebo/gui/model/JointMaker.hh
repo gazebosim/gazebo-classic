@@ -255,9 +255,10 @@ namespace gazebo
       /// parent to the child.
       /// \param[in] _axis Axis of alignment (x/y/z)
       /// \param[in] _mode Alignment mode (min/center/max)
-      public: void AlignLinks(
-          const bool _childToParent, const std::string &_axis,
-          const std::string &_mode);
+      /// \param[in] _reverse True to reverse alignment.
+      public: void AlignLinks(const bool _childToParent,
+          const std::string &_axis, const std::string &_mode,
+          const bool _reverse);
 
       /// \brief Finalize joint creation.
       public: void FinalizeCreation();

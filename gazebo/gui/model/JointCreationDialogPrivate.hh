@@ -64,6 +64,15 @@ namespace gazebo
       /// \brief Combo box to select the alignment target.
       public: QComboBox *alignCombo;
 
+      /// \brief Check box to toggle reverse X alignment.
+      public: QCheckBox *reverseXBox;
+
+      /// \brief Check box to toggle reverse Y alignment.
+      public: QCheckBox *reverseYBox;
+
+      /// \brief Check box to toggle reverse Z alignment.
+      public: QCheckBox *reverseZBox;
+
       /// \brief Label for joints without axes.
       public: QLabel *axis0Widget;
 

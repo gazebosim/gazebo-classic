@@ -34,7 +34,7 @@ int main(int _argc, char **_argv)
 
   // Publish to a Gazebo topic
   gazebo::transport::PublisherPtr pub =
-    node->Advertise<gazebo::msgs::Pose>("~/pose_example");
+    node->Advertise<gazebo::msgs::Pose>("~/pioneer2dx/vel_cmd");
 
   // Wait for a subscriber to connect
   pub->WaitForConnection();
@@ -46,7 +46,7 @@ int main(int _argc, char **_argv)
     gazebo::common::Time::MSleep(100);
 
     // Generate a pose
-    ignition::math::Pose3d pose(1, 2, 3, 4, 5, 6);
+    ignition::math::Pose3d pose(1, 1, 0, 0, 0, 0);
 
     // Convert to a pose message
     gazebo::msgs::Pose msg;

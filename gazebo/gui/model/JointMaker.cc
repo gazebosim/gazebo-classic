@@ -1737,7 +1737,7 @@ void JointMaker::SetLinksRelativePose(const ignition::math::Pose3d &_pose,
 
 /////////////////////////////////////////////////
 void JointMaker::AlignLinks(const bool _childToParent,
-    const std::string &_axis, const std::string &_config)
+    const std::string &_axis, const std::string &_config, const bool _reverse)
 {
   if (!this->newJoint || !this->newJoint->parent || !this->newJoint->child)
   {
@@ -1753,7 +1753,7 @@ void JointMaker::AlignLinks(const bool _childToParent,
   std::string target = _childToParent ? "first" : "last";
 
   ModelAlign::Instance()->AlignVisuals(links, _axis, _config,
-      target, true);
+      target, true, _reverse);
 }
 
 /////////////////////////////////////////////////
