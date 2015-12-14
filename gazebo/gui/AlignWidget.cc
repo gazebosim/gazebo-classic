@@ -45,7 +45,7 @@ AlignWidget::AlignWidget(QWidget *_parent)
   labelFont.setPointSize(labelFont.pointSize());
   noteLabel->setFont(labelFont);
 
-  auto invertedBox = new QCheckBox("Inverted");
+  auto invertedBox = new QCheckBox("Reverse");
   connect(invertedBox, SIGNAL(toggled(bool)), this,
       SLOT(OnDirectionChanged(bool)));
 
