@@ -30,9 +30,6 @@ namespace gazebo
     /// \brief Private data for ImportImageView
     class ImportImageViewPrivate
     {
-      /// \brief Constructor
-      public: ImportImageViewPrivate() : currentMouseItem(0) {};
-
       /// \brief Width of the pixmap in pixels.
       public: int pixmapWidthPx;
 
