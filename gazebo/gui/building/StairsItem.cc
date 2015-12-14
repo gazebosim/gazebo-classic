@@ -150,7 +150,7 @@ bool StairsItem::RotateEventFilter(RotateHandle *_rotate, QEvent *_event)
   if (mouseEvent == NULL)
     return false;
 
-  if (_rotate->GetMouseState() == QEvent::GraphicsSceneMouseMove)
+  if (_rotate->MouseState() == QEvent::GraphicsSceneMouseMove)
   {
     QPoint localCenter(this->drawingOriginX, this->drawingOriginY);
     QPointF center = this->mapToScene(localCenter);

@@ -16,19 +16,23 @@
 */
 
 #include "gazebo/gui/building/RotateHandle.hh"
+#include "gazebo/gui/building/RotateHandlePrivate.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-RotateHandle::RotateHandle(QGraphicsItem *_parent) : QGraphicsItem(_parent)
+RotateHandle::RotateHandle(QGraphicsItem *_parent)
+  : QGraphicsItem(_parent), dataPtr(new RotateHandlePrivate)
 {
   this->setParentItem(_parent);
   this->setAcceptHoverEvents(true);
-  this->handleSize = 6;
-  this->handleOffsetHeight = 10;
-  this->origin = QPointF(0, 0);
-  this->handleOffset = this->origin - QPointF(0, handleOffsetHeight);
+  this->dataPtr->handleSize = 6;
+  this->dataPtr->handleOffsetHeight = 10;
+  this->dataPtr->origin = ignition::math::Vector2d::Zero;
+  this->dataPtr->borderColor = common::Color::Black;
+  this->dataPtr->handleOffset = this->dataPtr->origin -
+      ignition::math::Vector2d(0, this->dataPtr->handleOffsetHeight);
 }
 
 /////////////////////////////////////////////////
@@ -39,37 +43,55 @@ RotateHandle::~RotateHandle()
 /////////////////////////////////////////////////
 void RotateHandle::SetMouseState(int _state)
 {
-  this->mouseButtonState = _state;
+  this->dataPtr->mouseButtonState = _state;
 }
 
 /////////////////////////////////////////////////
 int RotateHandle::GetMouseState() const
 {
-  return this->mouseButtonState;
+  return this->MouseState();
+}
+
+/////////////////////////////////////////////////
+int RotateHandle::MouseState() const
+{
+  return this->dataPtr->mouseButtonState;
 }
 
 /////////////////////////////////////////////////
 void RotateHandle::SetMouseDownX(double _x)
 {
-  this->mouseDownX = _x;
+  this->dataPtr->mouseDownX = _x;
 }
 
 /////////////////////////////////////////////////
 void RotateHandle::SetMouseDownY(double _y)
 {
-  this->mouseDownY = _y;
+  this->dataPtr->mouseDownY = _y;
 }
 
 /////////////////////////////////////////////////
 double RotateHandle::GetMouseDownX() const
 {
-  return this->mouseDownX;
+  return this->MouseDownX();
+}
+
+/////////////////////////////////////////////////
+double RotateHandle::MouseDownX() const
+{
+  return this->dataPtr->mouseDownX;
 }
 
 /////////////////////////////////////////////////
 double RotateHandle::GetMouseDownY() const
 {
-  return this->mouseDownY;
+  return this->MouseDownY();
+}
+
+/////////////////////////////////////////////////
+double RotateHandle::MouseDownY() const
+{
+  return this->dataPtr->mouseDownY;
 }
 
 /////////////////////////////////////////////////
@@ -93,37 +115,43 @@ void RotateHandle::mouseMoveEvent(QGraphicsSceneMouseEvent *_event)
 /////////////////////////////////////////////////
 void RotateHandle::hoverLeaveEvent(QGraphicsSceneHoverEvent *)
 {
-  this->borderColor = Qt::black;
+  this->dataPtr->borderColor = common::Color::Black;
   this->update();
 }
 
 /////////////////////////////////////////////////
 void RotateHandle::hoverEnterEvent(QGraphicsSceneHoverEvent *)
 {
-  this->borderColor = Qt::red;
+  this->dataPtr->borderColor = common::Color::Red;
   this->update();
 }
 
 /////////////////////////////////////////////////
 QRectF RotateHandle::boundingRect() const
 {
-  return QRectF(-this->handleSize/2.0,
-      -(this->handleOffsetHeight + this->handleSize),
-      this->handleSize, this->handleOffsetHeight + this->handleSize);
+  return QRectF(-this->dataPtr->handleSize/2.0,
+      -(this->dataPtr->handleOffsetHeight + this->dataPtr->handleSize),
+      this->dataPtr->handleSize,
+      this->dataPtr->handleOffsetHeight + this->dataPtr->handleSize);
 }
 
 /////////////////////////////////////////////////
-void RotateHandle::paint(QPainter *_painter, const QStyleOptionGraphicsItem *,
-  QWidget *)
+void RotateHandle::paint(QPainter *_painter,
+    const QStyleOptionGraphicsItem */*_options*/, QWidget */*_widget*/)
 {
   QPen borderPen;
-  borderPen.setColor(this->borderColor);
+  borderPen.setColor(QColor(this->dataPtr->borderColor[0],
+                            this->dataPtr->borderColor[1],
+                            this->dataPtr->borderColor[2]));
 
   borderPen.setStyle(Qt::SolidLine);
   _painter->setPen(borderPen);
 
-  QRectF rotateRect(handleOffset.x() - handleSize/2.0,
-      handleOffset.y() - handleSize, handleSize, handleSize);
-  _painter->drawLine(origin, handleOffset);
+  QRectF rotateRect(this->dataPtr->handleOffset.X() -
+      this->dataPtr->handleSize/2.0,
+      this->dataPtr->handleOffset.Y() - this->dataPtr->handleSize,
+      this->dataPtr->handleSize, this->dataPtr->handleSize);
+  _painter->drawLine(this->dataPtr->origin.X(), this->dataPtr->origin.Y(),
+      this->dataPtr->handleOffset.X(), this->dataPtr->handleOffset.Y());
   _painter->drawArc(rotateRect, 0, 16*360);
 }

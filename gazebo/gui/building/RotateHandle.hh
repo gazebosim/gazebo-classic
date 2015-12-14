@@ -15,9 +15,12 @@
  *
 */
 
-#ifndef _ROTATE_HANDLE_HH_
-#define _ROTATE_HANDLE_HH_
+#ifndef _GAZEBO_BUILDING_ROTATE_HANDLE_HH_
+#define _GAZEBO_BUILDING_ROTATE_HANDLE_HH_
 
+#include <memory>
+
+#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
 
@@ -25,6 +28,8 @@ namespace gazebo
 {
   namespace gui
   {
+    class RotateHandlePrivate;
+
     /// \addtogroup gazebo_gui
     /// \{
 
@@ -39,26 +44,50 @@ namespace gazebo
       /// \brief Destructor
       public: ~RotateHandle();
 
-      /// \brief Set the current mouse state
+      /// \brief Set the current mouse state.
+      /// \param[in] _state Integer corresponding to Qt QEvent type.
+      /// http://doc.qt.io/qt-4.8/qevent.html#Type-enum
+      /// \sa int MouseState() const
       public: void SetMouseState(int _state);
 
       /// \brief Get the current mouse state
-      public: int  GetMouseState() const;
+      /// \return The current mouse state.
+      /// \deprecated See int MouseState() const
+      public: int GetMouseState() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the X position of the mouse press.
       /// \return Mouse press X position in pixel coordinates.
-      public: double GetMouseDownX() const;
+      /// \deprecated See double MouseDownX() const
+      public: double GetMouseDownX() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the Y position of the mouse press.
       /// \return Mouse press Y position in pixel coordinates.
-      public: double GetMouseDownY() const;
+      /// \deprecated See double MouseDownY() const
+      public: double GetMouseDownY() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the current mouse state
+      /// \return The current mouse state.
+      /// \sa void SetMouseState(int _state)
+      public: int MouseState() const;
+
+      /// \brief Get the X position of the mouse press.
+      /// \return Mouse press X position in pixel coordinates.
+      /// \sa void SetMouseDownX(double _x)
+      public: double MouseDownX() const;
+
+      /// \brief Get the Y position of the mouse press.
+      /// \return Mouse press Y position in pixel coordinates.
+      /// \sa void SetMouseDownY(double _y)
+      public: double MouseDownY() const;
 
       /// \brief Set the X position of the mouse press.
       /// \param[in] _x Mouse press X position in pixel coordinates.
+      /// \sa double MouseDownX() const
       public: void SetMouseDownX(double _x);
 
       /// \brief Set the Y position of the mouse press.
       /// \param[in] _y Mouse press Y position in pixel coordinates.
+      /// \sa double MouseDownY() const
       public: void SetMouseDownY(double _y);
 
       /// \brief Qt mouse hover enter event
@@ -92,29 +121,9 @@ namespace gazebo
       private: void paint(QPainter *_painter,
           const QStyleOptionGraphicsItem *_option, QWidget *_widget);
 
-      /// \brief Current mouse state.
-      private: int mouseButtonState;
-
-      /// \brief Mouse press X position in pixel coordinates.
-      private: double mouseDownX;
-
-      /// \brief Mouse press Y position in pixel coordinates.
-      private: double mouseDownY;
-
-      /// \brief Border color of the rotate handle.
-      private: QColor borderColor;
-
-      /// \brief Size of the rotate handle in pixels.
-      private: double handleSize;
-
-      /// \brief Offset height of the rotate handle (from the item) in pixels.
-      private: double handleOffsetHeight;
-
-      /// \brief Origin of the rotate handle.
-      private: QPointF origin;
-
-      /// \brief Offset position of the rotate handle in pixel coordinates.
-      private: QPointF handleOffset;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<RotateHandlePrivate> dataPtr;
     };
     /// \}
   }
