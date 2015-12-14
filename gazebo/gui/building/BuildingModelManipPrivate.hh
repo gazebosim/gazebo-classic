@@ -18,6 +18,7 @@
 #ifndef _GAZEBO_BUILDING_MODEL_MANIP_PRIVATE_HH_
 #define _GAZEBO_BUILDING_MODEL_MANIP_PRIVATE_HH_
 
+#include <string>
 #include <vector>
 
 namespace gazebo

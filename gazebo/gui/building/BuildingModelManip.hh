@@ -51,23 +51,48 @@ namespace gazebo
 
       /// \brief Get the name of the manip object.
       /// \return Name of the manip object.
-      public: std::string GetName() const;
+      /// \deprecated See std::string Name() const
+      public: std::string GetName() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the name of the manip object.
+      /// \return Name of the manip object.
+      public: std::string Name() const;
 
       /// \brief Get the visual this manip manages.
       /// \return A pointer to the visual object.
-      public: rendering::VisualPtr GetVisual() const;
+      /// \deprecated See rendering::VisualPtr Visual() const
+      public: rendering::VisualPtr GetVisual() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the visual this manip manages.
+      /// \return A pointer to the visual object.
+      public: rendering::VisualPtr Visual() const;
 
       /// \brief Get the transparency of the manip.
       /// \return Transparency.
-      public: double GetTransparency() const;
+      /// \deprecated See double Transparency() const
+      public: double GetTransparency() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the transparency of the manip.
+      /// \return Transparency.
+      public: double Transparency() const;
 
       /// \brief Get the color of the manip.
       /// \return Color.
-      public: common::Color GetColor() const;
+      /// \deprecated See common::Color Color() const
+      public: common::Color GetColor() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the color of the manip.
+      /// \return Color.
+      public: common::Color Color() const;
 
       /// \brief Get the texture of the manip.
       /// \return Texture.
-      public: std::string GetTexture() const;
+      /// \deprecated See std::string Texture() const
+      public: std::string GetTexture() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the texture of the manip.
+      /// \return Texture.
+      public: std::string Texture() const;
 
       /// \brief Set the name of the manip object.
       /// \param[in] _name Name to set the manip to.
@@ -83,7 +108,12 @@ namespace gazebo
 
       /// \brief Get the parent of this manip.
       /// \return Parent manip.
-      public: BuildingModelManip *GetParent() const;
+      /// \deprecated See BuildingModelManip *Parent() const
+      public: BuildingModelManip *GetParent() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the parent of this manip.
+      /// \return Parent manip.
+      public: BuildingModelManip *Parent() const;
 
       /// \brief Attach a manip as a child to this manip.
       /// \param[in] _manip manip to be attached.
@@ -103,13 +133,27 @@ namespace gazebo
       /// \brief Get a child manip by index.
       /// \param[in] _index Index of the child manip.
       /// \return The attached manip at index _index.
-      public: BuildingModelManip *GetAttachedManip(unsigned int _index) const;
+      /// \deprecated See BuildingModelManip *AttachedManip(
+      /// const unsigned int _index) const
+      public: BuildingModelManip *GetAttachedManip(unsigned int _index) const
+          GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get a child manip by index.
+      /// \param[in] _index Index of the child manip.
+      /// \return The attached manip at index _index.
+      public: BuildingModelManip *AttachedManip(
+          const unsigned int _index) const;
 
       /// \brief Get the number of child manips attached to this
       /// manip.
-      /// \param[in] _index Index of the child manip.
       /// \return The number of attached manips.
-      public: unsigned int GetAttachedManipCount() const;
+      /// \deprecated See unsigned int AttachedManipCount() const
+      public: unsigned int GetAttachedManipCount() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the number of child manips attached to this
+      /// manip.
+      /// \return The number of attached manips.
+      public: unsigned int AttachedManipCount() const;
 
       /// \brief Get whether or not this manip is attached to another.
       /// \return True if attached, false otherwise.
@@ -165,7 +209,12 @@ namespace gazebo
 
       /// \brief Get the level for this manip.
       /// \return The level for this manip.
-      public: int GetLevel() const;
+      /// \deprecated See int Level() const
+      public: int GetLevel() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the level for this manip.
+      /// \return The level for this manip.
+      public: int Level() const;
 
       /// \brief Qt signal emitted when the manip's color has changed from the
       /// 3D view.

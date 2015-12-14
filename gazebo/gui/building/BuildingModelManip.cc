@@ -61,11 +61,23 @@ void BuildingModelManip::SetVisual(const rendering::VisualPtr &_visual)
 /////////////////////////////////////////////////
 std::string BuildingModelManip::GetName() const
 {
+  return this->Name();
+}
+
+/////////////////////////////////////////////////
+std::string BuildingModelManip::Name() const
+{
   return this->dataPtr->name;
 }
 
 /////////////////////////////////////////////////
 rendering::VisualPtr BuildingModelManip::GetVisual() const
+{
+  return this->Visual();
+}
+
+/////////////////////////////////////////////////
+rendering::VisualPtr BuildingModelManip::Visual() const
 {
   return this->dataPtr->visual;
 }
@@ -73,17 +85,35 @@ rendering::VisualPtr BuildingModelManip::GetVisual() const
 /////////////////////////////////////////////////
 double BuildingModelManip::GetTransparency() const
 {
+  return this->Transparency();
+}
+
+/////////////////////////////////////////////////
+double BuildingModelManip::Transparency() const
+{
   return this->dataPtr->transparency;
 }
 
 /////////////////////////////////////////////////
 common::Color BuildingModelManip::GetColor() const
 {
+  return this->Color();
+}
+
+/////////////////////////////////////////////////
+common::Color BuildingModelManip::Color() const
+{
   return this->dataPtr->color;
 }
 
 /////////////////////////////////////////////////
 std::string BuildingModelManip::GetTexture() const
+{
+  return this->Texture();
+}
+
+/////////////////////////////////////////////////
+std::string BuildingModelManip::Texture() const
 {
   return this->dataPtr->texture;
 }
@@ -96,6 +126,12 @@ void BuildingModelManip::SetMaker(BuildingMaker *_maker)
 
 /////////////////////////////////////////////////
 BuildingModelManip *BuildingModelManip::GetParent() const
+{
+  return this->Parent();
+}
+
+/////////////////////////////////////////////////
+BuildingModelManip *BuildingModelManip::Parent() const
 {
   return this->dataPtr->parent;
 }
@@ -167,6 +203,13 @@ void BuildingModelManip::SetAttachedTo(BuildingModelManip *_parent)
 BuildingModelManip *BuildingModelManip::GetAttachedManip(
     unsigned int _index) const
 {
+  return this->AttachedManip(_index);
+}
+
+/////////////////////////////////////////////////
+BuildingModelManip *BuildingModelManip::AttachedManip(
+    const unsigned int _index) const
+{
   if (_index >= this->dataPtr->attachedManips.size())
     gzthrow("Index too large");
 
@@ -175,6 +218,12 @@ BuildingModelManip *BuildingModelManip::GetAttachedManip(
 
 /////////////////////////////////////////////////
 unsigned int BuildingModelManip::GetAttachedManipCount() const
+{
+  return this->AttachedManipCount();
+}
+
+/////////////////////////////////////////////////
+unsigned int BuildingModelManip::AttachedManipCount() const
 {
   return this->dataPtr->attachedManips.size();
 }
@@ -439,6 +488,12 @@ void BuildingModelManip::SetLevel(const int _level)
 
 /////////////////////////////////////////////////
 int BuildingModelManip::GetLevel() const
+{
+  return this->Level();
+}
+
+/////////////////////////////////////////////////
+int BuildingModelManip::Level() const
 {
   return this->dataPtr->level;
 }
