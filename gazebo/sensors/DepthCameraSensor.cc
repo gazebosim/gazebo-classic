@@ -20,6 +20,7 @@
   #include <Winsock2.h>
 #endif
 
+#include <boost/algorithm/string/replace.hpp>
 #include <boost/bind.hpp>
 #include <sstream>
 
