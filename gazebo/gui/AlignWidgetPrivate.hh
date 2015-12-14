@@ -41,6 +41,10 @@ namespace gazebo
 
       /// \brief Keep track whether to align with first or last selected entity.
       public: int alignRelativeTarget;
+
+      /// \brief Keep track whether to align in the default direction (min to
+      /// min, max to max) or in the inverted direction (min to max).
+      public: bool inverted = false;
     };
   }
 }
