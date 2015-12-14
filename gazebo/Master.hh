@@ -31,7 +31,7 @@
 namespace gazebo
 {
   // Forward declare private data class
-  class MasterPrivate;
+  struct MasterPrivate;
 
   /// \class Master Master.hh gazebo_core.hh
   /// \brief A manager that directs topic connections, enables each gazebo
