@@ -114,6 +114,10 @@ using the same arguments used in the command line.
    * [Pull request #1977](https://bitbucket.org/osrf/gazebo/pull-request/1977)
    * [Issue #1706](https://bitbucket.org/osrf/gazebo/issue/1706)
 
+1. Add option to reverse alignment direction 
+   * [Pull request #2040](https://bitbucket.org/osrf/gazebo/pull-request/2040)
+   * [Issue #1242](https://bitbucket.org/osrf/gazebo/issue/1242)
+
 1. Fix unadvertising a publisher - only unadvertise topic if it is the last publisher.
    * [Pull request #2005](https://bitbucket.org/osrf/gazebo/pull-request/2005)
    * [Issue #1782](https://bitbucket.org/osrf/gazebo/issue/1782)
