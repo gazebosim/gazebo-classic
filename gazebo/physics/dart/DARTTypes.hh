@@ -169,7 +169,7 @@ namespace gazebo
       /// \brief Convert an eigen isometry3d to ignition math pose
       /// \param[in] _T Eigen iosmetry3d to convert.
       /// \return Ignition math pose
-      public: static igntion::math::Pose3d ConvPoseIgn(
+      public: static ignition::math::Pose3d ConvPoseIgn(
                   const Eigen::Isometry3d &_T)
       {
         ignition::math::Pose3d pose;
