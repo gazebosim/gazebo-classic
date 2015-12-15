@@ -99,6 +99,10 @@ release will remove the deprecated code.
     + ***Deprecation:*** public: void ScaleZAxis(const math::Vector3 &_scale)
     + ***Replacement:*** public: void ScaleZAxis(const ignition::math::Vector3d &_scale);
 
+1. **gazebo/gui/CloneWindow.hh**
+    + ***Deprecation:*** int GetPort()
+    + ***Replacement:*** int Port() const
+
 1. **gazebo/gui/RTShaderSystem.hh**
     + ***Deprecation:*** void AttachEntity(Visual *vis)
     + ***No replacement for AttachEntity ***
