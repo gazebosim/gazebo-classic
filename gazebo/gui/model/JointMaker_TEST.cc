@@ -618,5 +618,180 @@ void JointMaker_TEST::LinkList()
   delete jointMaker;
 }
 
+/////////////////////////////////////////////////
+void JointMaker_TEST::UpdateMsg()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/shapes.world", false, false, false);
+
+  // Create joint maker
+  auto jointMaker = new gui::JointMaker();
+  QVERIFY(jointMaker != NULL);
+  QCOMPARE(jointMaker->GetJointCount(), 0u);
+
+  // Create main window
+  auto mainWindow = new gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Process some events, and draw the screen
+  for (unsigned int i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  auto cam = gui::get_active_camera();
+  Q_ASSERT(cam);
+  auto scene = cam->GetScene();
+  Q_ASSERT(scene);
+
+  auto boxLink = scene->GetVisual("box::link");
+  auto sphereLink = scene->GetVisual("sphere::link");
+
+  Q_ASSERT(boxLink.get());
+  Q_ASSERT(sphereLink.get());
+
+  // Add a revolute joint
+  jointMaker->AddJoint(gui::JointMaker::JOINT_HINGE);
+  auto jointData = jointMaker->CreateJoint(boxLink, sphereLink);
+  jointMaker->CreateHotSpot(jointData);
+  QCOMPARE(jointMaker->GetJointCount(), 1u);
+
+  // Check data was properly generated
+  auto name1 = jointData->name;
+  QVERIFY(name1 == "link_JOINT_0");
+
+  auto type1 = jointData->type;
+  QCOMPARE(type1, gui::JointMaker::JOINT_HINGE);
+
+  auto msg1 = jointData->jointMsg;
+  QVERIFY(msg1 != NULL);
+  QVERIFY(msg1->name() == name1);
+  QVERIFY(gui::JointMaker::ConvertJointType(
+      msgs::ConvertJointType(msg1->type())) == type1);
+  QVERIFY(msg1->has_axis1());
+  QVERIFY(!msg1->has_axis2());
+  QCOMPARE(msgs::ConvertIgn(msg1->pose()), ignition::math::Pose3d::Zero);
+
+  auto parentVis = jointData->parent;
+  QVERIFY(parentVis != NULL);
+
+  auto childVis = jointData->child;
+  QVERIFY(childVis != NULL);
+
+  auto hotspot = jointData->hotspot;
+  QVERIFY(hotspot != NULL);
+
+  auto visual = jointData->visual;
+  QVERIFY(visual != NULL);
+
+  auto line = jointData->line;
+  QVERIFY(line != NULL);
+
+  auto handles = jointData->handles;
+  QVERIFY(handles != NULL);
+
+  auto inspector = jointData->inspector;
+  QVERIFY(inspector != NULL);
+
+  QVERIFY(jointData->dirty);
+
+  // Check there's no joint visual until update
+  auto jointVisual = jointData->jointVisual;
+  QVERIFY(jointVisual == NULL);
+
+  jointData->Update();
+
+  QVERIFY(!jointData->dirty);
+
+  jointVisual = jointData->jointVisual;
+  QVERIFY(jointVisual != NULL);
+
+  // Change data and update - 1 axis -> 2 axes
+  std::string name2 = "new_name";
+  auto type2 = gui::JointMaker::JOINT_UNIVERSAL;
+  auto pose2 = ignition::math::Pose3d(1, 2, -3, 0, -0.2, 1);
+
+  jointData->name = name2;
+  jointData->type = type2;
+  msgs::Set(jointData->jointMsg->mutable_pose(), pose2);
+
+  jointData->Update();
+
+  // Verify changes
+  auto msg2 = jointData->jointMsg;
+  QVERIFY(msg1 != msg2);
+
+  QVERIFY(msg1->name() != msg2->name());
+  QVERIFY(name2 == msg2->name());
+
+  QVERIFY(msg1->type() != msg2->type());
+  QVERIFY(gui::JointMaker::ConvertJointType(
+      msgs::ConvertJointType(msg2->type())) == type2);
+  QVERIFY(msg2->has_axis1());
+  QVERIFY(msg2->has_axis2());
+  QCOMPARE(msgs::ConvertIgn(msg2->pose()), pose2);
+
+  // Change data and update - 2 axes -> 0 axes
+  std::string name3 = "new_name2";
+  gui::JointMaker::JointType type3 = gui::JointMaker::JOINT_BALL;
+  auto pose3 = ignition::math::Pose3d(4, -5, 6, -0.1, 0, 0);
+
+  jointData->name = name3;
+  jointData->type = type3;
+  msgs::Set(jointData->jointMsg->mutable_pose(), pose3);
+
+  jointData->Update();
+
+  // Verify changes
+  auto msg3 = jointData->jointMsg;
+  QVERIFY(msg2 != msg3);
+
+  QVERIFY(msg2->name() != msg3->name());
+  QVERIFY(name3 == msg3->name());
+
+  QVERIFY(msg2->type() != msg3->type());
+  QVERIFY(gui::JointMaker::ConvertJointType(
+      msgs::ConvertJointType(msg3->type())) == type3);
+  QVERIFY(!msg3->has_axis1());
+  QVERIFY(!msg3->has_axis2());
+  QCOMPARE(msgs::ConvertIgn(msg3->pose()), pose3);
+
+  // Change data and update - 0 axes -> 1 axis
+  std::string name4 = "new_name3";
+  gui::JointMaker::JointType type4 = gui::JointMaker::JOINT_SLIDER;
+  auto pose4 = ignition::math::Pose3d(-2, 0, 3, 0.4, 1, 0.5);
+
+  jointData->name = name4;
+  jointData->type = type4;
+  msgs::Set(jointData->jointMsg->mutable_pose(), pose4);
+
+  jointData->Update();
+
+  // Verify changes
+  auto msg4 = jointData->jointMsg;
+  QVERIFY(msg3 != msg4);
+
+  QVERIFY(msg3->name() != msg4->name());
+  QVERIFY(name4 == msg4->name());
+
+  QVERIFY(msg3->type() != msg4->type());
+  QVERIFY(gui::JointMaker::ConvertJointType(
+      msgs::ConvertJointType(msg4->type())) == type4);
+  QVERIFY(msg4->has_axis1());
+  QVERIFY(!msg4->has_axis2());
+  QCOMPARE(msgs::ConvertIgn(msg4->pose()), pose4);
+
+  delete jointMaker;
+  mainWindow->close();
+  delete mainWindow;
+}
+
 // Generate a main function for the test
 QTEST_MAIN(JointMaker_TEST)

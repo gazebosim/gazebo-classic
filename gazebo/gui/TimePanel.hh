@@ -85,6 +85,9 @@ namespace gazebo
       /// indicates the simulation is running
       public: void SetPaused(bool _paused);
 
+      /// \brief Toggle simulation paused state.
+      public slots: void TogglePause();
+
       /// \brief Qt call back when the step value in the spinbox changed
       /// \param[in] _value New step value.
       public slots: void OnStepValueChanged(int _value);

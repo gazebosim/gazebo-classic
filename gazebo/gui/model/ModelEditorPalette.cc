@@ -132,7 +132,7 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
 
   this->splitter = new QSplitter(Qt::Vertical, this);
   this->splitter->addWidget(paletteWidget);
-  splitter->setCollapsible(0, false);
+  this->splitter->setCollapsible(0, false);
 
   frameLayout->addWidget(this->splitter);
   frameLayout->setContentsMargins(0, 0, 0, 0);
