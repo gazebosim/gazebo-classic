@@ -20,6 +20,7 @@
   #include <Winsock2.h>
 #endif
 
+#include <boost/algorithm/string.hpp>
 #include <boost/range/adaptor/reversed.hpp>
 
 #include "gazebo/transport/transport.hh"
