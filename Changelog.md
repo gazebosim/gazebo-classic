@@ -215,6 +215,11 @@ using the same arguments used in the command line.
     1. Support inserting nested models from model maker
         * [Pull request #1982](https://bitbucket.org/osrf/gazebo/pull-request/1982)
 
+1. Building editor updates
+
+    1. PIMPLize LevelWidget class
+        * [Pull request #2041](https://bitbucket.org/osrf/gazebo/pull-request/2041)
+
 ## Gazebo 6.0
 
 ### Gazebo 6.5.0 (2015-10-22)
