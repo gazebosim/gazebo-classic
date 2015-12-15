@@ -1,5 +1,8 @@
 ## Gazebo 7.0
 
+1. Use opaque pointers in the terrain editor.
+    * [Pull request #2026](https://bitbucket.org/osrf/gazebo/pull-request/2026)
+
 1. Use opaque pointers in the gui/DataLogger class.
     * [Pull request #2029](https://bitbucket.org/osrf/gazebo/pull-request/2029)
 
