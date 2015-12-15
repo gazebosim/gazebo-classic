@@ -51,7 +51,6 @@ namespace gazebo
 
     class MainWindowPrivate
     {
-
       public: QToolBar *playToolbar;
 
       public: RenderWidget *renderWidget;
