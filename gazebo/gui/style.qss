@@ -754,17 +754,6 @@ QAbstractSpinBox::down-arrow:hover
   height: 10px;
 }
 
-QLineEdit#logPlayCurrentTime
-{
-  background-color: #808080;
-        color: #cfcfcf;
-        font-size: 15px;
-}
-QLineEdit#logPlayCurrentTime:focus
-{
-  background-color: #707070;
-}
-
 QTextEdit#splashVersionTextEdit
 {
   color: #f58113;

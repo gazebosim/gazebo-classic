@@ -35,6 +35,9 @@
    Use tinyxml2 for playback.
     * [Pull request #1931](https://bitbucket.org/osrf/gazebo/pull-request/1931)
 
+1. Enter time during log playback
+    * [Pull request #2000](https://bitbucket.org/osrf/gazebo/pull-request/2000)
+
 1 Added Ignition Transport dependency.
   * [Pull request #1930](https://bitbucket.org/osrf/gazebo/pull-request/1930)
 
@@ -81,6 +84,9 @@ flags from c functions. Windows did not like `CPPTYPE_*` in
 
 1. Undo user motion commands during simulation, added physics::UserCmdManager and gui::UserCmdHistory.
     * [Pull request #1934](https://bitbucket.org/osrf/gazebo/pull-request/1934)
+    
+1. Forward user command messages for undo.
+    * [Pull request #2009](https://bitbucket.org/osrf/gazebo/pull-request/2009)
 
 1. Undo reset commands during simulation, forwarding commands
     * [Pull request #1986](https://bitbucket.org/osrf/gazebo/pull-request/1986)
@@ -144,6 +150,10 @@ using the same arguments used in the command line.
 
 1. Added hotkeys chart dialog
     * [Pull request #1835](https://bitbucket.org/osrf/gazebo/pull-request/1835)
+
+1. Space bar to play / pause
+   * [Pull request #2023](https://bitbucket.org/osrf/gazebo/pull-request/2023)
+   * [Issue #1798](https://bitbucket.org/osrf/gazebo/issue/1798)
 
 1. Make it possible to create custom ConfigWidgets
     * [Pull request #1861](https://bitbucket.org/osrf/gazebo/pull-request/1861)
