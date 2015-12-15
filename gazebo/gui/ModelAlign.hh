@@ -61,10 +61,6 @@ namespace gazebo
           const std::string &_axis, const std::string &_config,
           const std::string &_target, bool _publish = true);
 
-      /// \brief Publish visual's pose to the server
-      /// \param[in] _vis Pointer to the visual whose pose is to be published.
-      private: void PublishVisualPose(rendering::VisualPtr _vis);
-
       /// \brief Get the minimum and maximum values of a list of vertices.
       /// \param[in] _vertices A list of input vertices.
       /// \param[out] _min Minimum x, y, z values.

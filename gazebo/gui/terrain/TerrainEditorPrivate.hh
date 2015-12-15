@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,22 @@
  * limitations under the License.
  *
 */
+#ifndef _GAZEBO_TERRAIN_EDITOR_PRIVATE_HH_
+#define _GAZEBO_TERRAIN_EDITOR_PRIVATE_HH_
 
-#ifndef _TIMEPANEL_TEST_HH_
-#define _TIMEPANEL_TEST_HH_
-
-#include "gazebo/gui/QTestFixture.hh"
-
-/// \brief A test class for the TimePanel widget.
-class TimePanel_TEST : public QTestFixture
+namespace gazebo
 {
-  Q_OBJECT
+  namespace gui
+  {
+    class TerrainEditorPalette;
 
-  /// \brief Test setting the play/pause state.
-  private slots: void SetPaused();
-
-  /// \brief Test pressing the space bar.
-  private slots: void SpaceBar();
-};
-
+    /// \class TerrainEditorPrivate TerrainEditorPrivate.hh
+    /// \brief Private data for the TerrainEditorPrivate class.
+    class TerrainEditorPrivate
+    {
+      /// \brief Contains all the terrain editor tools.
+      public: TerrainEditorPalette *terrainPalette;
+    };
+  }
+}
 #endif
