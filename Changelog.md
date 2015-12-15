@@ -1,6 +1,6 @@
 ## Gazebo 7.0
 
-1. Use opaque pointers for the sensor libraray
+1. Use opaque pointers for the sensor library
     * [Pull request #2022](https://bitbucket.org/osrf/gazebo/pull-request/2022)
 
 1. Fix visual transparency issues
