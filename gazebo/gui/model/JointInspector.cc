@@ -266,9 +266,6 @@ JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
   // Initialize variables
   this->validJointName = true;
   this->validLinks = true;
-
-  // Set initial joint type
-  this->OnJointTypeChanged(tr(msgs::Joint_Type_Name(jointMsg.type()).c_str()));
 }
 
 /////////////////////////////////////////////////
@@ -299,8 +296,6 @@ msgs::Joint *JointInspector::GetData() const
 
   if (currentParent == currentChild)
   {
-    gzerr << "Parent link equal to child link - not updating joint."
-        << std::endl;
     return NULL;
   }
 
@@ -515,9 +510,12 @@ void JointInspector::Open()
   std::string currentChild =
       this->configWidget->GetStringWidgetValue("child");
 
+
   this->configWidget->blockSignals(true);
-  this->configWidget->SetEnumWidgetValue("parentCombo", currentParent);
-  this->configWidget->SetEnumWidgetValue("childCombo", currentChild);
+  if (!currentParent.empty())
+    this->configWidget->SetEnumWidgetValue("parentCombo", currentParent);
+  if (!currentChild.empty())
+    this->configWidget->SetEnumWidgetValue("childCombo", currentChild);
   this->configWidget->blockSignals(false);
 
   // Reset states
@@ -561,14 +559,28 @@ void JointInspector::RestoreOriginalData()
   this->Update(jointPtr);
 
   // Update joint type and parent icon
+  this->blockSignals(true);
   this->OnJointTypeChanged(tr(msgs::Joint_Type_Name(jointPtr->type()).c_str()));
+  this->blockSignals(false);
 
   // Update custom widgets
-  this->configWidget->SetEnumWidgetValue("parentCombo",
-      this->configWidget->GetStringWidgetValue("parent"));
-  this->configWidget->SetEnumWidgetValue("childCombo",
-      this->configWidget->GetStringWidgetValue("child"));
+  std::string originalParent =
+      this->configWidget->GetStringWidgetValue("parent");
+  std::string originalChild =
+      this->configWidget->GetStringWidgetValue("child");
+
+  if (!originalParent.empty())
+    this->configWidget->SetEnumWidgetValue("parentCombo", originalParent);
+  if (!originalChild.empty())
+    this->configWidget->SetEnumWidgetValue("childCombo", originalChild);
   this->configWidget->blockSignals(false);
+
+  // Reset variables, we assume the original data was valid
+  this->validJointName = true;
+  this->validLinks = true;
+  this->nameWidget->setStyleSheet(ConfigWidget::StyleSheet("normal"));
+  this->parentLinkWidget->setStyleSheet(ConfigWidget::StyleSheet("normal"));
+  this->childLinkWidget->setStyleSheet(ConfigWidget::StyleSheet("normal"));
 
   if (this->CheckValid())
     emit Applied();

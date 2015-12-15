@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _LINK_CONFIG_HH_
-#define _LINK_CONFIG_HH_
+#ifndef _GAZEBO_LINK_CONFIG_HH_
+#define _GAZEBO_LINK_CONFIG_HH_
 
 #include <string>
 
@@ -36,7 +36,7 @@ namespace gazebo
 
     /// \class LinkConfig LinkConfig.hh
     /// \brief A tab for configuring properties of a link.
-    class LinkConfig : public QWidget
+    class GZ_GUI_VISIBLE LinkConfig : public QWidget
     {
       Q_OBJECT
 
@@ -76,6 +76,10 @@ namespace gazebo
       /// \brief Set the inertial pose of the link.
       /// \param[in] _pose Inertial pose to set the link to.
       public: void SetInertialPose(const ignition::math::Pose3d &_pose);
+
+      /// \brief Get the config widget for the link
+      /// \return Config widget for the link.
+      public: const ConfigWidget *LinkConfigWidget() const;
 
       /// \brief Initialize widget.
       public: void Init();
