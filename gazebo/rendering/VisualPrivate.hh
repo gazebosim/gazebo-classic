@@ -79,7 +79,6 @@ namespace gazebo
                 geomSize(ignition::math::Vector3d::One),
                 inheritTransparency(true),
                 wireframe(false)
-
       {
       }
 
