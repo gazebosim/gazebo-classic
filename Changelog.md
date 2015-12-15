@@ -1,9 +1,12 @@
 ## Gazebo 7.0
 
+1. Use opaque pointers in the gui/DataLogger class.
+    * [Pull request #2029](https://bitbucket.org/osrf/gazebo/pull-request/2029)
+
 1. Fix visual transparency issues
-+    * [Pull request #2031](https://bitbucket.org/osrf/gazebo/pull-request/2031)
-+    * [Issue #1726](https://bitbucket.org/osrf/gazebo/issue/1726)
-+    * [Issue #1790](https://bitbucket.org/osrf/gazebo/issue/1790)
+    * [Pull request #2031](https://bitbucket.org/osrf/gazebo/pull-request/2031)
+    * [Issue #1726](https://bitbucket.org/osrf/gazebo/issue/1726)
+    * [Issue #1790](https://bitbucket.org/osrf/gazebo/issue/1790)
 
 1. Implemented private data pointer for the RTShaderSystem class. Minimized shader updates to once per render update.
     * [Pull request #2003](https://bitbucket.org/osrf/gazebo/pull-request/2003)
