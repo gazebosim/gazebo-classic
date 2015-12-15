@@ -82,12 +82,7 @@ namespace gazebo
       public: common::Time lastMeasurementTime;
 
       /// \brief Noise added to sensor data
-      /// The key maps to a SensorNoiseType, and is kept as an int value
-      /// for backward compatibilty with Gazebo 5&6.
-      /// \todo: Change to std::map<SensorNoiseType, NoisePtr> in Gazebo7.
-      /// Adding the word GAZEBO_DEPRECATED here so that a grep will find
-      /// the above note.
-      public: std::map<int, NoisePtr> noises;
+      public: std::map<SensorNoiseType, NoisePtr> noises;
     };
 
     /// \internal
