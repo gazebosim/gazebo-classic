@@ -1,7 +1,7 @@
 ## Gazebo 7.0
 
 1. Use more opaque pointers
-    * [Pull request #xxxx](https://bitbucket.org/osrf/gazebo/pull-request/xxxx)
+    * [Pull request #2044](https://bitbucket.org/osrf/gazebo/pull-request/2044)
     
 1. Fix visual transparency issues
 +    * [Pull request #2031](https://bitbucket.org/osrf/gazebo/pull-request/2031)
