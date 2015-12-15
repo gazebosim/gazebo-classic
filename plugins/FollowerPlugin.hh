@@ -37,7 +37,7 @@ namespace gazebo
     public: FollowerPlugin();
 
     /// \brief Destructor.
-    public: ~FollowerPlugin();
+    public: virtual ~FollowerPlugin();
 
     // Documentation Inherited.
     public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
@@ -59,11 +59,8 @@ namespace gazebo
     /// \brief Find revolute joints in the model.
     private: void FindJoints();
 
-    /// \brief Update the folloewr
+    /// \brief Update the follower.
     private: void UpdateFollower();
-
-    /// \brief Publish velocity command
-    private: void PublishVelCmd();
 
     /// \brief Pointer to the update event connection.
     private: event::ConnectionPtr updateConnection;
@@ -74,14 +71,8 @@ namespace gazebo
     /// \brief Subscriber pointer.
     private: transport::SubscriberPtr imageSub;
 
-    /// \brief Publisher pointer.
-    private: transport::PublisherPtr velPub;
-
-    /// \brief Pointer to the model;
+    /// \brief Pointer to the model.
     private: physics::ModelPtr model;
-
-    /// \brief keep track of update sim-time.
-    private: gazebo::common::Time lastUpdateTime;
 
     /// \brief Update mutex.
     private: std::mutex mutex;
@@ -89,18 +80,19 @@ namespace gazebo
     /// \brief Input depth image topic.
     private: std::string imageTopic;
 
-    /// \brief Topic to publish velocity commands to.
-    private: std::string velTopic;
-
     /// \brief Local copy of input image.
     private: msgs::Image imageMsg;
 
+    /// \brief Revolute joints for moving the wheels of the vehicle.
     private: physics::JointPtr leftJoint, rightJoint;
 
+    /// \brief Left/Right wheel speed.
     private: double wheelSpeed[2];
 
+    /// \brief Wheel separation.
     private: double wheelSeparation;
 
+    /// \brief Wheel radius.
     private: double wheelRadius;
   };
 }

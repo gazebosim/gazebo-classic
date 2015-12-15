@@ -30,6 +30,7 @@ using namespace gazebo;
 
 GZ_REGISTER_MODEL_PLUGIN(FollowerPlugin)
 
+// Used for left/right wheel.
 enum {RIGHT, LEFT};
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -60,9 +61,6 @@ void FollowerPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   if (this->imageTopic.empty())
     this->FindSensor();
 
-  // if (this->imageTopic.empty())
-  //  return;
-
   // diff drive params
   if (_sdf->HasElement("left_joint"))
   {
@@ -75,14 +73,6 @@ void FollowerPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     this->rightJoint = _model->GetJoint(
         _sdf->GetElement("right_joint")->Get<std::string>());
   }
-
-/*  this->velTopic = std::string("~/") + this->model->GetName() + "/vel_cmd";
-  if (!_sdf->HasElement("vel_topic"))
-  {
-    gzerr << "Unable to find the <vel_topic> parameter." << std::endl;
-    return;
-  }
-  this->velTopic = _sdf->Get<std::string>("vel_topic");*/
 
   if (!this->leftJoint || !this->rightJoint)
     this->FindJoints();
@@ -101,10 +91,8 @@ void FollowerPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   // Initialize transport.
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
-  this->velPub = this->node->Advertise<msgs::Pose>(this->velTopic);
   this->imageSub = this->node->Subscribe(this->imageTopic,
       &FollowerPlugin::OnImage, this);
-  std::cerr << " load " << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -112,9 +100,6 @@ void FollowerPlugin::Init()
 {
   if (!this->leftJoint || !this->rightJoint)
     return;
-
-  // if (this->imageTopic.empty())
-  //  return;
 
   this->wheelSeparation = this->leftJoint->GetAnchor(0).Distance(
       this->rightJoint->GetAnchor(0));
@@ -125,7 +110,6 @@ void FollowerPlugin::Init()
   math::Box bb = parent->GetBoundingBox();
   // This assumes that the largest dimension of the wheel is the diameter
   this->wheelRadius = bb.GetSize().GetMax() * 0.5;
-  std::cerr << " init " << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -181,8 +165,7 @@ void FollowerPlugin::Update(const common::UpdateInfo &/*_info*/)
 {
   std::lock_guard<std::mutex> lock(this->mutex);
 
-
-  // update tracker
+  // Update follower.
   this->UpdateFollower();
 }
 
@@ -199,7 +182,7 @@ void FollowerPlugin::UpdateFollower()
   double minRange = 0.1;
   double maxRange = 5;
 
-  // find closest point
+  // Find closest point.
   int mid = this->imageMsg.height() * 0.5;
 
   unsigned int depthSamples = this->imageMsg.width() * this->imageMsg.height();
@@ -216,19 +199,26 @@ void FollowerPlugin::UpdateFollower()
     float d = depthBuffer[mid * this->imageMsg.width() + i];
     if (d > minRange && d < maxRange && d < minDepth)
     {
+      // Update minimum depth.
       minDepth = d;
-      // store index of pixel with min range
-      idx = static_cast<int>(i);
+      // Store index of pixel with min range.
+      idx = i;
     }
   }
+  delete[] depthBuffer;
 
-  if (idx < 0)
+  if (idx < 0 || minDepth < 0.4)
+  {
+    // Brakes on!
+    this->leftJoint->SetVelocity(0, 0);
+    this->rightJoint->SetVelocity(0, 0);
     return;
+  }
 
-  // set turn rate based on idx of min range in the image
-  double turn = -(idx / this->imageMsg.width() * 2 - 1.0);
+  // Set turn rate based on idx of min range in the image.
+  double turn = -(idx / (this->imageMsg.width() / 2.0)) + 1.0;
 
-  double vr = 0.1;
+  double vr = -0.1;
   double maxTurnRate = 0.1;
 
   double va = turn * maxTurnRate;
@@ -241,10 +231,4 @@ void FollowerPlugin::UpdateFollower()
 
   this->leftJoint->SetVelocity(0, leftVelDesired);
   this->rightJoint->SetVelocity(0, rightVelDesired);
-
-}
-
-/////////////////////////////////////////////////
-void FollowerPlugin::PublishVelCmd()
-{
 }
