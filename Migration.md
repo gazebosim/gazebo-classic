@@ -107,6 +107,26 @@ release will remove the deprecated code.
     + ***Deprecation:*** void DetachEntity(Visual *_vis)
     + ***No replacement for DetachEntity ***
 
+1. **gazebo/gui/building/BuildingModelManip.hh**
+    + ***Deprecation:*** public: std::string GetName() const
+    + ***Replacement:*** public: std::string Name() const
+    + ***Deprecation:*** public: rendering::VisualPtr GetVisual() const
+    + ***Replacement:*** public: rendering::VisualPtr Visual() const
+    + ***Deprecation:*** public: double GetTransparency() const
+    + ***Replacement:*** public: double Transparency() const
+    + ***Deprecation:*** public: common::Color GetColor() const
+    + ***Replacement:*** public: common::Color Color()
+    + ***Deprecation:*** public: std::string GetTexture() const
+    + ***Replacement:*** public: std::string Texture() const
+    + ***Deprecation:*** public: BuildingModelManip *GetParent() const
+    + ***Replacement:*** public: BuildingModelManip *Parent() const
+    + ***Deprecation:*** public: BuildingModelManip *GetAttachedManip(unsigned int _index) const
+    + ***Replacement:*** public: BuildingModelManip *AttachedManip(const unsigned int _index) const
+    + ***Deprecation:*** public: unsigned int GetAttachedManipCount() const
+    + ***Replacement:*** public: unsigned int AttachedManipCount() const
+    + ***Deprecation:*** public: int GetLevel() const
+    + ***Replacement:*** public: int Level() const
+
 ### Deletions
 
 1. **plugins/rest_web/RestUiLogoutDialog.hh.hh**
