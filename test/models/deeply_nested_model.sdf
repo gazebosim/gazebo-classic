@@ -1,0 +1,137 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <model name="model_00">
+    <pose>0 0 0.5 0 0 0</pose>
+    <link name="link_00">
+      <pose>0.25 0 0 0 0 0</pose>
+      <collision name="collision_00">
+        <geometry>
+          <sphere>
+            <radius>0.5</radius>
+          </sphere>
+        </geometry>
+      </collision>
+      <visual name="visual_00">
+        <geometry>
+          <sphere>
+            <radius>0.5</radius>
+          </sphere>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Grey</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+
+    <model name="model_01">
+      <pose>1.25 0 0.0 0 0 0</pose>
+      <link name="link_01">
+        <pose>0.25 0 0.0 0 0 0</pose>
+        <collision name="collision_01">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual_01">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Red</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+      <model name="model_02">
+        <pose>1.25 0 0.0 0 0 0</pose>
+        <link name="link_02">
+          <pose>0.25 0 0.0 0 0 0</pose>
+          <collision name="collision_02">
+            <geometry>
+              <cylinder>
+                <radius>0.5</radius>
+                <length>1</length>
+              </cylinder>
+            </geometry>
+          </collision>
+          <visual name="visual_02">
+            <geometry>
+              <cylinder>
+                <radius>0.5</radius>
+                <length>1</length>
+              </cylinder>
+            </geometry>
+            <material>
+              <script>
+                <uri>file://media/materials/scripts/gazebo.material</uri>
+                <name>Gazebo/Green</name>
+              </script>
+            </material>
+          </visual>
+        </link>
+        <model name="model_03">
+          <pose>1.25 0 0.0 0 0 0</pose>
+          <link name="link_03">
+            <pose>0.25 0 0.0 0 0 0</pose>
+            <collision name="collision_03">
+              <geometry>
+                <box>
+                  <size>1 1 1</size>
+                </box>
+              </geometry>
+            </collision>
+            <visual name="visual_03">
+              <geometry>
+                <box>
+                  <size>1 1 1</size>
+                </box>
+              </geometry>
+              <material>
+                <script>
+                  <uri>file://media/materials/scripts/gazebo.material</uri>
+                  <name>Gazebo/Blue</name>
+                </script>
+              </material>
+            </visual>
+          </link>
+        </model>
+      </model>
+    </model>
+
+    <joint name="joint_00" type="revolute">
+      <parent>link_00</parent>
+      <child>model_01::link_01</child>
+      <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+      <axis>
+        <xyz>1.0 0.0 0.0</xyz>
+      </axis>
+    </joint>
+
+    <joint name="joint_01" type="revolute">
+      <parent>model_01::link_01</parent>
+      <child>model_01::model_02::link_02</child>
+      <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+      <axis>
+        <xyz>1.0 0.0 0.0</xyz>
+      </axis>
+    </joint>
+
+    <joint name="joint_02" type="revolute">
+      <parent>model_01::model_02::link_02</parent>
+      <child>model_01::model_02::model_03::link_03</child>
+      <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+      <axis>
+        <xyz>1.0 0.0 0.0</xyz>
+      </axis>
+    </joint>
+  </model>
+</sdf>
