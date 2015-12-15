@@ -146,7 +146,7 @@ void UserCmdManager::OnUserCmdMsg(ConstUserCmdPtr &_msg)
   UserCmdPtr cmd(new UserCmd(id, this->dataPtr->world, _msg->description(),
       _msg->type()));
 
-  // Forward message after we've save the current state
+  // Forward message after we've saved the current state
   if (_msg->type() == msgs::UserCmd::MOVING)
   {
     for (int i = 0; i < _msg->model_size(); ++i)
