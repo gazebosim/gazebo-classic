@@ -24,7 +24,7 @@
 
 
 using namespace gazebo;
-class Visual_TEST : public ServerFixture
+class Visual_TEST : public RenderingFixture
 {
 };
 
