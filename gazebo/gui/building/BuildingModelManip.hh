@@ -337,7 +337,8 @@ namespace gazebo
 
       /// \internal
       /// \brief Pointer to private data.
-      private: std::unique_ptr<BuildingModelManipPrivate> dataPtr;
+      /// Can't use unique pointer - it causes crashes.
+      private: std::shared_ptr<BuildingModelManipPrivate> dataPtr;
     };
     /// \}
   }
