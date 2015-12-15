@@ -49,6 +49,9 @@ namespace gazebo
     class SpaceNav;
     class UserCmdHistory;
 
+    // Forward declare private data
+    class MainWindowPrivate;
+
     class GZ_GUI_VISIBLE MainWindow : public QMainWindow
     {
       Q_OBJECT
@@ -295,101 +298,7 @@ namespace gazebo
       /// \param[in] _mode Window mode, such as "Simulation", "LogPlayback"...
       private: void OnWindowMode(const std::string &_mode);
 
-      private: QToolBar *playToolbar;
-
-      private: RenderWidget *renderWidget;
-      private: ToolsWidget *toolsWidget;
-      private: ModelListWidget *modelListWidget;
-
-      private: transport::NodePtr node;
-      private: transport::PublisherPtr worldControlPub;
-      private: transport::PublisherPtr serverControlPub;
-      private: transport::PublisherPtr requestPub;
-      private: transport::PublisherPtr scenePub;
-
-      /// \brief Publish user command messages for the server to place in the
-      /// undo queue.
-      private: transport::PublisherPtr userCmdPub;
-
-      private: transport::SubscriberPtr responseSub;
-      private: transport::SubscriberPtr guiSub;
-      private: transport::SubscriberPtr newEntitySub, statsSub;
-      private: transport::SubscriberPtr worldModSub;
-
-      /// \brief Subscriber to the light modify topic.
-      private: transport::SubscriberPtr lightModifySub;
-
-      /// \brief Subscriber to the light factory topic.
-      private: transport::SubscriberPtr lightFactorySub;
-
-      private: QDockWidget *toolsDock;
-
-      private: std::vector<event::ConnectionPtr> connections;
-
-      // A map that associates physics_id's with entity names
-      private: std::map<std::string, unsigned int> entities;
-
-      /// \brief Message used to field requests.
-      private: msgs::Request *requestMsg;
-
-      /// \brief The left-hand tab widget
-      private: QTabWidget *tabWidget;
-
-      /// \brief Mainwindow's menubar
-      private: QMenuBar *menuBar;
-
-      /// \brief The Edit menu.
-      private: QMenu *editMenu;
-
-      /// \brief A layout for the menu bar.
-      private: QHBoxLayout *menuLayout;
-
-      /// \brief Used to control size of each pane.
-      private: QStackedWidget *leftColumn;
-
-      /// \brief Map of names to widgets in the leftColumn QStackedWidget
-      private: std::map<std::string, int> leftColumnStack;
-
-      /// \brief The filename set via "Save As". This filename is used by
-      /// the "Save" feature.
-      private: std::string saveFilename;
-
-      /// \brief User specified step size for manually stepping the world
-      private: int inputStepSize;
-
-      /// \brief Map of all the editors to their names.
-      private: std::map<std::string, Editor *> editors;
-
-      /// \brief List of all the align action groups.
-      private: std::vector<QActionGroup *> alignActionGroups;
-
-      /// \brief Space navigator interface.
-      private: SpaceNav *spacenav;
-
-#ifdef HAVE_OCULUS
-      private: gui::OculusWindow *oculusWindow;
-#endif
-
-      /// \brief Buffer of plugin messages to process.
-      private: std::vector<boost::shared_ptr<msgs::Plugin const> > pluginMsgs;
-
-      /// \brief Mutext to protect plugin loading.
-      private: boost::mutex pluginLoadMutex;
-
-      /// \brief Splitter for the main window.
-      private: QSplitter *splitter;
-
-      /// \brief Data logger dialog.
-      private: gui::DataLogger *dataLogger;
-
-      /// \brief Hotkey chart dialog.
-      private: gui::HotkeyDialog *hotkeyDialog;
-
-      /// \brief Tab to insert models.
-      private: InsertModelWidget *insertModel;
-
-      /// \brief Class which manages user commands and undoing / redoing them.
-      private: UserCmdHistory *userCmdHistory;
+      private: std::unique_ptr<MainWindowPrivate> dataPtr;
     };
   }
 }
