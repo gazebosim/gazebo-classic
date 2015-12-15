@@ -67,7 +67,7 @@ namespace gazebo
       /// \param[in] _vec3 Ignition math vector3
       /// \return Eigen::Vector3d
       public: static Eigen::Vector3d ConvVec3(
-                  const ignition::math::Vector3 &_vec3)
+                  const ignition::math::Vector3d &_vec3)
       {
         return Eigen::Vector3d(_vec3.X(), _vec3.Y(), _vec3.Z());
       }
