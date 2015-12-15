@@ -27,6 +27,10 @@
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/test/helper_physics_generator.hh"
 
+#ifdef HAVE_BULLET
+#include "gazebo/physics/bullet/bullet_math_inc.h"
+#endif
+
 #define PHYSICS_TOL 1e-2
 using namespace gazebo;
 
@@ -283,8 +287,15 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
       // Check that model is resting on ground
       pose1 = model->GetWorldPose();
       x0 = modelPos[name].x;
-      EXPECT_NEAR(pose1.pos.x, x0, PHYSICS_TOL);
-      EXPECT_NEAR(pose1.pos.y, 0, PHYSICS_TOL);
+      double posTolerance = PHYSICS_TOL;
+#ifdef HAVE_BULLET
+      if (_physicsEngine == "bullet" && sizeof(btScalar) == 4)
+      {
+        posTolerance *= 1400;
+      }
+#endif
+      EXPECT_NEAR(pose1.pos.x, x0, posTolerance);
+      EXPECT_NEAR(pose1.pos.y, 0, posTolerance);
 
       // debug
       // if (physics->GetType()  == "bullet")
@@ -945,70 +956,76 @@ void PhysicsTest::InelasticCollision(const std::string &_physicsEngine)
     for (int i = 0; i < steps; ++i)
     {
       double t = world->GetSimTime().Double();
+      double velTolerance = PHYSICS_TOL;
+#ifdef HAVE_BULLET
+      if (_physicsEngine == "bullet" && sizeof(btScalar) == 4)
+      {
+        velTolerance *= 11;
+      }
+#endif
 
       world->Step(1);  // theoretical contact, but
+
+      if (box_model)
       {
-        if (box_model)
+        math::Vector3 vel = box_model->GetWorldLinearVel();
+        math::Pose pose = box_model->GetWorldPose();
+
+        // gzdbg << "box time [" << t
+        //      << "] sim x [" << pose.pos.x
+        //      << "] ideal x [" << x
+        //      << "] sim vx [" << vel.x
+        //      << "] ideal vx [" << v
+        //      << "]\n";
+
+        if (i == 0)
         {
-          math::Vector3 vel = box_model->GetWorldLinearVel();
-          math::Pose pose = box_model->GetWorldPose();
-
-          // gzdbg << "box time [" << t
-          //      << "] sim x [" << pose.pos.x
-          //      << "] ideal x [" << x
-          //      << "] sim vx [" << vel.x
-          //      << "] ideal vx [" << v
-          //      << "]\n";
-
-          if (i == 0)
-          {
-            box_model->GetLink("link")->SetForce(math::Vector3(f, 0, 0));
-            // The following has been failing since pull request #1284,
-            // so it has been disabled.
-            // See bitbucket.org/osrf/gazebo/issue/1394
-            // EXPECT_EQ(box_model->GetLink("link")->GetWorldForce(),
-            //   math::Vector3(f, 0, 0));
-          }
-
-          if (t > 1.000 && t < 1.01)
-          {
-            // collision transition, do nothing
-          }
-          else
-          {
-            // collision happened
-            EXPECT_NEAR(pose.pos.x, x, PHYSICS_TOL);
-            EXPECT_NEAR(vel.x, v, PHYSICS_TOL);
-          }
+          box_model->GetLink("link")->SetForce(math::Vector3(f, 0, 0));
+          // The following has been failing since pull request #1284,
+          // so it has been disabled.
+          // See bitbucket.org/osrf/gazebo/issue/1394
+          // EXPECT_EQ(box_model->GetLink("link")->GetWorldForce(),
+          //   math::Vector3(f, 0, 0));
         }
 
-        physics::ModelPtr sphere_model = world->GetModel("sphere");
-        if (sphere_model)
+        if (t > 1.000 && t < 1.01)
         {
-          math::Vector3 vel = sphere_model->GetWorldLinearVel();
-          math::Pose pose = sphere_model->GetWorldPose();
-          // gzdbg << "sphere time [" << world->GetSimTime().Double()
-          //      << "] sim x [" << pose.pos.x
-          //      << "] ideal x [" << x
-          //      << "] sim vx [" << vel.x
-          //      << "] ideal vx [" << v
-          //      << "]\n";
-          if (t > 1.000 && t < 1.01)
-          {
-            // collision transition, do nothing
-          }
-          else if (t <= 1.00)
-          {
-            // no collision
-            EXPECT_EQ(pose.pos.x, 2);
-            EXPECT_EQ(vel.x, 0);
-          }
-          else
-          {
-            // collision happened
-            EXPECT_NEAR(pose.pos.x, x + 1.0, PHYSICS_TOL);
-            EXPECT_NEAR(vel.x, v, PHYSICS_TOL);
-          }
+          // collision transition, do nothing
+        }
+        else
+        {
+          // collision happened
+          EXPECT_NEAR(pose.pos.x, x, PHYSICS_TOL);
+          EXPECT_NEAR(vel.x, v, velTolerance);
+        }
+      }
+
+      physics::ModelPtr sphere_model = world->GetModel("sphere");
+      if (sphere_model)
+      {
+        math::Vector3 vel = sphere_model->GetWorldLinearVel();
+        math::Pose pose = sphere_model->GetWorldPose();
+        // gzdbg << "sphere time [" << world->GetSimTime().Double()
+        //      << "] sim x [" << pose.pos.x
+        //      << "] ideal x [" << x
+        //      << "] sim vx [" << vel.x
+        //      << "] ideal vx [" << v
+        //      << "]\n";
+        if (t > 1.000 && t < 1.01)
+        {
+          // collision transition, do nothing
+        }
+        else if (t <= 1.00)
+        {
+          // no collision
+          EXPECT_EQ(pose.pos.x, 2);
+          EXPECT_EQ(vel.x, 0);
+        }
+        else
+        {
+          // collision happened
+          EXPECT_NEAR(pose.pos.x, x + 1.0, PHYSICS_TOL);
+          EXPECT_NEAR(vel.x, v, velTolerance);
         }
       }
 
