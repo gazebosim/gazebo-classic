@@ -173,8 +173,8 @@ namespace gazebo
                   const Eigen::Isometry3d &_T)
       {
         ignition::math::Pose3d pose;
-        pose.Pos(ConvVec3Ign(_T.translation()));
-        pose.Rot(ConvQuatIgn(Eigen::Quaterniond(_T.linear())));
+        pose.Pos() = ConvVec3Ign(_T.translation());
+        pose.Rot() = ConvQuatIgn(Eigen::Quaterniond(_T.linear()));
         return pose;
       }
 

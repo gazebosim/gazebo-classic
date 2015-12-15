@@ -74,8 +74,8 @@ void DARTRayShape::SetPoints(const math::Vector3& _posStart,
 }
 
 //////////////////////////////////////////////////
-void DARTRayShape::SetPoints(const math::Vector3& _posStart,
-                             const math::Vector3& _posEnd)
+void DARTRayShape::SetPoints(const ignition::math::Vector3d& _posStart,
+                             const ignition::math::Vector3d& _posEnd)
 {
   RayShape::SetPoints(_posStart, _posEnd);
 

@@ -17,7 +17,7 @@
 #ifndef _GAZEBO_PHYSICS_DARTMESH_HH_
 #define _GAZEBO_PHYSICS_DARTMESH_HH_
 
-#include <math/ignition/Vector3.hh>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/physics/dart/DARTTypes.hh"
 #include "gazebo/util/system.hh"
