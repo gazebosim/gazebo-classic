@@ -1,5 +1,8 @@
 ## Gazebo 7.0
 
+1. Use opaque pointers in the gui/KeyEventHandler class.
+    * [Pull request #2053](https://bitbucket.org/osrf/gazebo/pull-request/2053)
+
 1. Use more opaque pointers.
     * [Pull request #2025](https://bitbucket.org/osrf/gazebo/pull-request/2025)
 
