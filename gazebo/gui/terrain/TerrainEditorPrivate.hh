@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_GIU_TERRAINEDITOR_PRIVATE_HH_
-#define _GAZEBO_GIU_TERRAINEDITOR_PRIVATE_HH_
+#ifndef _GAZEBO_GUI_TERRAINEDITOR_PRIVATE_HH_
+#define _GAZEBO_GUI_TERRAINEDITOR_PRIVATE_HH_
 
 namespace gazebo
 {
