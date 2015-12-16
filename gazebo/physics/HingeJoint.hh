@@ -17,8 +17,6 @@
 #ifndef _GAZEBO_PHYSICS_HINGEJOINT_HH_
 #define _GAZEBO_PHYSICS_HINGEJOINT_HH_
 
-#include "gazebo/math/Angle.hh"
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo

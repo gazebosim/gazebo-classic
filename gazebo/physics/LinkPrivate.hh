@@ -17,6 +17,7 @@
 #ifndef _GAZEBO_PHYSICS_LINK_PRIVATE_HH_
 #define _GAZEBO_PHYSICS_LINK_PRIVATE_HH_
 
+#include "gazebo/util/OpenAL.hh"
 #include "gazebo/physics/EntityPrivate.hh"
 
 namespace gazebo
@@ -28,89 +29,89 @@ namespace gazebo
     class LinkProtected : public EntityProtected
     {
       /// \brief Inertial properties.
-      protected: InertialPtr inertial;
+      public: InertialPtr inertial;
 
       /// \brief Center of gravity visual elements.
-      protected: std::vector<std::string> cgVisuals;
+      public: std::vector<std::string> cgVisuals;
 
       /// \def Visuals_M
       /// \brief Map of unique ID to visual message.
       typedef std::map<uint32_t, msgs::Visual> Visuals_M;
 
       /// \brief Link visual elements.
-      protected: Visuals_M visuals;
+      public: Visuals_M visuals;
 
       /// \brief Linear acceleration.
-      protected: math::Vector3 linearAccel;
+      public: math::Vector3 linearAccel;
 
       /// \brief Angular acceleration.
-      protected: math::Vector3 angularAccel;
+      public: math::Vector3 angularAccel;
 
       /// \brief Offsets for the attached models.
-      protected: std::vector<math::Pose> attachedModelsOffset;
+      public: std::vector<math::Pose> attachedModelsOffset;
 
       /// \brief This flag is set to true when the link is initialized.
-      protected: bool initialized;
+      public: bool initialized = false;
     };
 
     /// \brief Private Link data
     class LinkPrivate
     {
       /// \brief Event used when the link is enabled or disabled.
-      private: event::EventT<void (bool)> enabledSignal;
+      public: event::EventT<void (bool)> enabledSignal;
 
       /// \brief This flag is used to trigger the enabled
-      private: bool enabled;
+      public: bool enabled;
 
       /// \brief Names of all the sensors attached to the link.
-      private: std::vector<std::string> sensors;
+      public: std::vector<std::string> sensors;
 
       /// \brief All the parent joints.
-      private: std::vector<JointPtr> parentJoints;
+      public: std::vector<JointPtr> parentJoints;
 
       /// \brief All the child joints.
-      private: std::vector<JointPtr> childJoints;
+      public: std::vector<JointPtr> childJoints;
 
       /// \brief All the attached models.
-      private: std::vector<ModelPtr> attachedModels;
+      public: std::vector<ModelPtr> attachedModels;
 
       /// \brief Link data publisher
-      private: transport::PublisherPtr dataPub;
+      public: transport::PublisherPtr dataPub;
 
       /// \brief Link data message
-      private: msgs::LinkData linkDataMsg;
+      public: msgs::LinkData linkDataMsg;
 
       /// \brief True to publish data, false otherwise
-      private: bool publishData;
+      public: bool publishData;
 
       /// \brief Mutex to protect the publishData variable
-      private: boost::recursive_mutex *publishDataMutex;
+      public: boost::recursive_mutex *publishDataMutex;
 
       /// \brief Cached list of collisions. This is here for performance.
-      private: Collision_V collisions;
+      public: Collision_V collisions;
 
       /// \brief Wrench subscriber.
-      private: transport::SubscriberPtr wrenchSub;
+      public: transport::SubscriberPtr wrenchSub;
 
       /// \brief Vector of wrench messages to be processed.
-      private: std::vector<msgs::Wrench> wrenchMsgs;
+      public: std::vector<msgs::Wrench> wrenchMsgs;
 
       /// \brief Mutex to protect the wrenchMsgs variable.
-      private: boost::mutex wrenchMsgMutex;
+      public: boost::mutex wrenchMsgMutex;
 
       /// \brief All the attached batteries.
-      private: std::vector<common::BatteryPtr> batteries;
+      public: std::vector<common::BatteryPtr> batteries;
 
 #ifdef HAVE_OPENAL
       /// \brief All the audio sources
-      private: std::vector<util::OpenALSourcePtr> audioSources;
+      public: std::vector<util::OpenALSourcePtr> audioSources;
 
       /// \brief An audio sink
-      private: util::OpenALSinkPtr audioSink;
+      public: util::OpenALSinkPtr audioSink;
 
       /// \brief Subscriber to contacts with this collision. Used for audio
       /// playback.
-      private: transport::SubscriberPtr audioContactsSub;
+      public: transport::SubscriberPtr audioContactsSub;
 #endif
     };
   }

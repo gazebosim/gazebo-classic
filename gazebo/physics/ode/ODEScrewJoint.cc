@@ -14,11 +14,6 @@
  * limitations under the License.
  *
  */
-/* Desc: A screw or primastic joint
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
-
 #include <boost/bind.hpp>
 
 #include <string>
@@ -244,7 +239,7 @@ void ODEScrewJoint::SetParam(unsigned int _parameter, double _value)
 }
 
 //////////////////////////////////////////////////
-double ODEScrewJoint::GetParam(unsigned int _parameter) const
+double ODEScrewJoint::Param(const unsigned int _parameter) const
 {
   double result = 0;
 
@@ -279,10 +274,11 @@ bool ODEScrewJoint::SetParam(const std::string &_key,
 }
 
 //////////////////////////////////////////////////
-double ODEScrewJoint::GetParam(const std::string &_key, unsigned int _index)
+double ODEScrewJoint::Param(const std::string &_key,
+    const unsigned int _index) const
 {
   if (_key  == "thread_pitch")
-    return this->threadPitch;
+    return this->GearboxRatio();
   else
-    return ODEJoint::GetParam(_key, _index);
+    return ODEJoint::Param(_key, _index);
 }

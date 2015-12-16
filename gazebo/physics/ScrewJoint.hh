@@ -39,7 +39,7 @@ namespace gazebo
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent of the joint.
-      public: explicit ScrewJoint(BasePtr _parent) : T(_parent), threadPitch(0)
+      public: explicit ScrewJoint(BasePtr _parent) : T(_parent)
       {
         this->AddType(Base::SCREW_JOINT);
       }

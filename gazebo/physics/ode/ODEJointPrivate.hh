@@ -16,12 +16,17 @@
 */
 #ifndef _GAZEBO_PHYSICS_ODEJOINT_PRIVATE_HH_
 #define _GAZEBO_PHYSICS_ODEJOINT_PRIVATE_HH_
+
+#include "gazebo/physics/Joint.hh"
+#include "gazebo/physics/JointPrivate.hh"
+#include "gazebo/physics/ode/ode_inc.h"
+
 namespace gazebo
 {
   namespace physics
   {
     /// \brief ODE joint protected class
-    class ODEJointProtected
+    class ODEJointProtected : public JointProtected
     {
       /// \brief This is our ODE ID
       public: dJointID jointId;

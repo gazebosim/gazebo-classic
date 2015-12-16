@@ -24,6 +24,9 @@ namespace gazebo
 {
   namespace physics
   {
+    // Forward declare private data class.
+    class LightPrivate;
+
     class LightState;
 
     /// \addtogroup gazebo_physics

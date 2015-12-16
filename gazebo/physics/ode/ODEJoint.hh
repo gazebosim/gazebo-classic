@@ -28,6 +28,12 @@ namespace gazebo
 {
   namespace physics
   {
+    // Forward declare protected data class
+    class ODEJointProtected;
+
+    // Forward declare private data class
+    class ODEJointPrivate;
+
     /// \brief ODE joint interface
     class GZ_PHYSICS_VISIBLE ODEJoint : public Joint
     {
@@ -163,7 +169,7 @@ namespace gazebo
 
       /// \brief Get access to stopCFM
       /// \return Returns joint's cfm for end stops
-      public: double StopCFM();
+      public: double StopCFM() const;
 
       /// \brief Get access to stopERP
       /// \return Returns joint's erp for end stops
@@ -215,10 +221,12 @@ namespace gazebo
                                       const ignition::math::Angle &_angle);
 
       // Documentation inherited.
-      public: virtual ignition::math::Angle HighStop(const unsigned int _index);
+      public: virtual ignition::math::Angle HighStop(
+                  const unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual ignition::math::Angle LowStop(const unsigned int _index);
+      public: virtual ignition::math::Angle LowStop(
+                  const unsigned int _index) const;
 
       // Documentation inherited.
       public: virtual ignition::math::Vector3d LinkForce(

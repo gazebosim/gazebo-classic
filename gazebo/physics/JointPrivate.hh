@@ -17,6 +17,11 @@
 #ifndef _GAZEBO_PHYSICS_JOINT_PRIVATE_HH_
 #define _GAZEBO_PHYSICS_JOINT_PRIVATE_HH_
 
+#include <ignition/math/Vector3.hh>
+
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/physics/BasePrivate.hh"
+
 namespace gazebo
 {
   namespace physics

@@ -26,7 +26,7 @@ namespace gazebo
     class ScrewJointProtected
     {
       /// \brief Pitch of the thread.
-      protected: double threadPitch;
+      protected: double threadPitch = 0.0;
     };
   }
 }

@@ -31,7 +31,7 @@ namespace gazebo
     /// \brief Base class for a ball joint
     ///
     /// Each physics engine should implement this class.
-    template< class T>
+    template<class T>
     class GZ_PHYSICS_VISIBLE BallJoint : public T
     {
       /// \brief Constructor

@@ -33,6 +33,9 @@ namespace gazebo
     // Forward declare private data class
     class LinkPrivate;
 
+    // Forward declare protected data class
+    class LinkProtected;
+
     /// \addtogroup gazebo_physics
     /// \{
 
@@ -957,6 +960,12 @@ namespace gazebo
       public: bool SetVisualPose(const uint32_t _id,
                                  const ignition::math::Pose3d &_pose);
 
+      /// \internal
+      /// \brief Constructor used by inherited classes.
+      /// \param[in] _dataPtr Protected data class
+      /// \param[in] _parent Pointer to parent entity.
+      protected: Link(LinkProtected &_dataPtr, EntityPtr _parent);
+
       /// \brief Publish timestamped link data such as velocity.
       private: void PublishData();
 
@@ -1000,6 +1009,10 @@ namespace gazebo
       /// \brief Load a battery.
       /// \param[in] _sdf SDF parameter.
       private: void LoadBattery(const sdf::ElementPtr _sdf);
+
+      /// \internal
+      /// \brief Internal data pointer
+      protected: std::shared_ptr<LinkProtected> linkDPtr;
 
       /// \internal
       /// \brief Internal data pointer

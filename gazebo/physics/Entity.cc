@@ -50,8 +50,8 @@ using namespace physics;
 //////////////////////////////////////////////////
 Entity::Entity(BasePtr _parent)
 : Base(*new EntityProtected, _parent),
-  dataPtr(new EntityPrivate),
-  entDPtr(std::static_pointer_cast<EntityProtected>(this->baseDPtr)
+  entityDPtr(std::static_pointer_cast<EntityProtected>(this->baseDPtr),
+  dataPtr(new EntityPrivate)
 {
   this->ConstructionHelper();
 }
@@ -59,8 +59,8 @@ Entity::Entity(BasePtr _parent)
 //////////////////////////////////////////////////
 Entity::Entity(EntityProtected &_dataPtr, BasePtr _parent)
 : Base(_dataPtr, _parent),
-  dataPtr(new EntityPrivate),
-  entDPtr(std::static_pointer_cast<EntityProtected>(this->baseDPtr)
+  entityDPtr(std::static_pointer_cast<EntityProtected>(this->baseDPtr),
+  dataPtr(new EntityPrivate)
 {
   this->ConstructionHelper();
 }

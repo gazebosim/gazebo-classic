@@ -77,7 +77,7 @@ namespace gazebo
       public: virtual void SetVelocity(unsigned int _index, double _angle);
 
       // Documentation inherited
-      public: virtual double GetParam(unsigned int _parameter) const;
+      public: virtual double Param(const unsigned int _parameter) const;
 
       // Documentation inherited
       public: virtual void SetParam(unsigned int _parameter, double _value);

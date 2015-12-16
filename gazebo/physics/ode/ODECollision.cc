@@ -46,7 +46,7 @@ ODECollision::ODECollision(LinkPtr _link)
   this->dataPtr->onPoseChangeFunc = &ODECollision::OnPoseChangeNull;
 
   this->SetSpaceId(
-      boost::static_pointer_cast<ODELink>(this->dataPtr->link)->GetSpaceId());
+      boost::static_pointer_cast<ODELink>(this->dataPtr->link)->SpaceId());
 
   this->dataPtr->surface.reset(new ODESurfaceParams());
 }
@@ -247,8 +247,7 @@ void ODECollision::OnPoseChangeGlobal()
   ignition::math::Pose3d localPose = this->WorldPose();
 
   // un-offset cog location
-  ignition::math::Vector3d cogVec =
-    this->dataPtr->link->Inertial()->GetCoG().Ign();
+  ignition::math::Vector3d cogVec = this->dataPtr->link->Inertial()->CoG();
   localPose.Pos() = localPose.Pos() - cogVec;
 
   q[0] = localPose.Rot().W();
@@ -269,8 +268,7 @@ void ODECollision::OnPoseChangeRelative()
   ignition::math::Pose3d localPose = this->RelativePose();
 
   // un-offset cog location
-  ignition::math::Vector3d cog_vec =
-    this->dataPtr->link->Inertial()->GetCoG().Ign();
+  ignition::math::Vector3d cog_vec = this->dataPtr->link->Inertial()->CoG();
   localPose.Pos() = localPose.Pos() - cog_vec;
 
   q[0] = localPose.Rot().W();

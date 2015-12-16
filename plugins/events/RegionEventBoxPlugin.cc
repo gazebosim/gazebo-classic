@@ -122,7 +122,7 @@ void RegionEventBoxPlugin::OnUpdate(const common::UpdateInfo &_info)
   // previously in the region has exited the region.
   for (unsigned int i = 0; i < this->world->GetModelCount(); ++i)
   {
-    physics::ModelPtr m = this->world->Model(i);
+    physics::ModelPtr m = this->world->GetModel(i);
     std::string name = m->Name();
 
     if (name == "ground_plane" || name == this->modelName)
