@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef _GAZEBO_CLONE_WINDOW_HH_
-#define _GAZEBO_CLONE_WINDOW_HH_
+#ifndef _GAZEBO_GUI_CLONEWINDOW_HH_
+#define _GAZEBO_GUI_CLONEWINDOW_HH_
 
 #include <memory>
 
@@ -33,7 +33,7 @@ namespace gazebo
     /// \addtogroup gazebo_gui
     /// \{
 
-    /// \class CloneConfig CloneConfig.hh gui/CloneConfig.hh
+    /// \class CloneWindow CloneWindow.hh gui/CloneWindow.hh
     /// \brief A dialog window used to set some parameters before cloning a
     /// simulation.
     class GZ_GUI_VISIBLE CloneWindow : public QDialog
@@ -72,7 +72,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Pointer to private data.
-      protected: std::unique_ptr<CloneWindowPrivate> dataPtr;
+      private: std::unique_ptr<CloneWindowPrivate> dataPtr;
     };
   }
 }
