@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_DIAGNOSTICS_HH_
-#define _GAZEBO_DIAGNOSTICS_HH_
+#ifndef _GAZEBO_GUI_DIAGNOSTICS_HH_
+#define _GAZEBO_GUI_DIAGNOSTICS_HH_
 
 #include <memory>
 
