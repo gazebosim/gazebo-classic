@@ -99,6 +99,7 @@ void Visual::Init(const std::string &_name, ScenePtr _scene,
   this->dataPtr->castShadows = true;
   this->dataPtr->visible = true;
   this->dataPtr->layer = -1;
+  this->dataPtr->inheritTransparency = true;
 
   std::string uniqueName = this->GetName();
   int index = 0;
@@ -136,6 +137,7 @@ void Visual::Init(const std::string &_name, VisualPtr _parent,
   this->dataPtr->castShadows = true;
   this->dataPtr->visible = true;
   this->dataPtr->layer = -1;
+  this->dataPtr->inheritTransparency = true;
 
   Ogre::SceneNode *pnode = NULL;
   if (_parent)
@@ -3095,6 +3097,12 @@ msgs::Visual::Type Visual::ConvertVisualType(const Visual::VisualType &_type)
       break;
   }
   return visualType;
+}
+
+//////////////////////////////////////////////////
+bool Visual::UseRTShader() const
+{
+  return this->dataPtr->useRTShader;
 }
 
 /////////////////////////////////////////////////

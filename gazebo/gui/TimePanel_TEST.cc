@@ -15,6 +15,8 @@
  *
 */
 
+#include "gazebo/gui/MainWindow.hh"
+#include "gazebo/gui/RenderWidget.hh"
 #include "gazebo/gui/TimePanel.hh"
 #include "gazebo/gui/TimePanel_TEST.hh"
 
@@ -36,6 +38,63 @@ void TimePanel_TEST::SetPaused()
 
   timePanel->SetPaused(false);
   QVERIFY(!timePanel->IsPaused());
+  delete timePanel;
+}
+
+/////////////////////////////////////////////////
+void TimePanel_TEST::SpaceBar()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("empty.world");
+
+  // Create the main window.
+  auto mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Process some events, and draw the screen
+  for (unsigned int i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Get the time panel
+  auto timePanel = mainWindow->GetRenderWidget()->GetTimePanel();
+  QVERIFY(timePanel != NULL);
+
+  // verify initial state
+  QVERIFY(!timePanel->IsPaused());
+
+  // Press space bar
+  QTest::keyClick(timePanel, Qt::Key_Space);
+
+  // Process some events until it gets paused
+  for (unsigned int i = 0; i < 10 && !timePanel->IsPaused(); ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+  QVERIFY(timePanel->IsPaused());
+
+  // Press space bar
+  QTest::keyClick(timePanel, Qt::Key_Space);
+
+  // Process some events until it gets unpaused
+  for (unsigned int i = 0; i < 10 && timePanel->IsPaused(); ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+  QVERIFY(!timePanel->IsPaused());
+
   delete timePanel;
 }
 

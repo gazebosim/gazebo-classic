@@ -14,8 +14,10 @@
  * limitations under the License.
  *
 */
-#ifndef _TERRAIN_EDITOR_HH_
-#define _TERRAIN_EDITOR_HH_
+#ifndef _GAZEBO_TERRAIN_EDITOR_HH_
+#define _GAZEBO_TERRAIN_EDITOR_HH_
+
+#include <memory>
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/Editor.hh"
@@ -25,7 +27,7 @@ namespace gazebo
 {
   namespace gui
   {
-    class TerrainEditorPalette;
+    class TerrainEditorPrivate;
 
     /// \class TerrainEditor TerrainEditor.hh gui/gui.hh
     /// \brief Interface to the terrain editor.
@@ -44,8 +46,9 @@ namespace gazebo
       /// \param[in] _checked True if the menu item is checked
       private slots: void OnEdit(bool _checked);
 
-      /// \brief Contains all the terrain editor tools.
-      private: TerrainEditorPalette *terrainPalette;
+      /// \internal
+      /// \brief Pointer to private data.
+      protected: std::unique_ptr<TerrainEditorPrivate> dataPtr;
     };
   }
 }
