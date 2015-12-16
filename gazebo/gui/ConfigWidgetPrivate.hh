@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_CONFIG_WIDGET_PRIVATE_HH_
-#define _GAZEBO_CONFIG_WIDGET_PRIVATE_HH_
+#ifndef _GAZEBO_GUI_CONFIGWIDGET_PRIVATE_HH_
+#define _GAZEBO_GUI_CONFIGWIDGET_PRIVATE_HH_
 
 #include <map>
 #include <string>

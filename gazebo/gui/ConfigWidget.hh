@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_CONFIG_WIDGET_HH_
-#define _GAZEBO_CONFIG_WIDGET_HH_
+#ifndef _GAZEBO_GUI_CONFIGWIDGET_HH_
+#define _GAZEBO_GUI_CONFIGWIDGET_HH_
 
 #include <map>
 #include <memory>
@@ -919,7 +919,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Pointer to private data.
-      protected: std::unique_ptr<ConfigWidgetPrivate> dataPtr;
+      private: std::unique_ptr<ConfigWidgetPrivate> dataPtr;
     };
   }
 }
