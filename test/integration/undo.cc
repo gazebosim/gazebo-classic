@@ -281,7 +281,7 @@ void UndoTest::UndoTranslateModel()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/shapes.world", false, false, true);
+  this->Load("worlds/shapes.world", false, false, false);
 
   // Get world
   auto world = gazebo::physics::get_world("default");
@@ -378,7 +378,7 @@ void UndoTest::UndoRotateLight()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/shapes.world", false, false, true);
+  this->Load("worlds/shapes.world", false, false, false);
 
   // Get world
   auto world = gazebo::physics::get_world("default");
@@ -475,7 +475,7 @@ void UndoTest::UndoSnap()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/shapes.world", false, false, true);
+  this->Load("worlds/shapes.world", false, false, false);
 
   // Get world
   auto world = gazebo::physics::get_world("default");
@@ -573,7 +573,7 @@ void UndoTest::UndoAlign()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/shapes.world", false, false, true);
+  this->Load("worlds/shapes.world", false, false, false);
 
   // Get world
   auto world = gazebo::physics::get_world("default");
@@ -694,7 +694,7 @@ void UndoTest::UndoResetTime()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/shapes.world", false, false, true);
+  this->Load("worlds/shapes.world", false, false, false);
 
   // Get world
   gazebo::physics::WorldPtr world = gazebo::physics::get_world("default");
@@ -785,7 +785,7 @@ void UndoTest::UndoResetWorld()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/shapes.world", false, false, true);
+  this->Load("worlds/shapes.world", false, false, false);
 
   // Get world
   gazebo::physics::WorldPtr world = gazebo::physics::get_world("default");
@@ -881,7 +881,7 @@ void UndoTest::UndoResetModelPoses()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/shapes.world", false, false, true);
+  this->Load("worlds/shapes.world", false, false, false);
 
   // Get world
   gazebo::physics::WorldPtr world = gazebo::physics::get_world("default");
@@ -971,7 +971,7 @@ void UndoTest::UndoWrench()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/shapes.world");
+  this->Load("worlds/shapes.world", false, false, false);
 
   // Get world
   auto world = gazebo::physics::get_world("default");
