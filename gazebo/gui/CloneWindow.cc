@@ -16,6 +16,7 @@
  */
 
 #include "gazebo/gui/CloneWindow.hh"
+#include "gazebo/gui/CloneWindowPrivate.hh"
 #include "gazebo/gui/qt.h"
 
 using namespace gazebo;
@@ -24,8 +25,10 @@ using namespace gui;
 /////////////////////////////////////////////////
 CloneWindow::CloneWindow(QWidget *_parent)
   : QDialog(_parent),
-    validPort(false)
+    dataPtr(new CloneWindowPrivate())
 {
+  this->dataPtr->validPort = false;
+
   this->setWindowTitle(tr("Gazebo: Cloning a simulation"));
   this->setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
       Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
@@ -43,23 +46,23 @@ CloneWindow::CloneWindow(QWidget *_parent)
   // Port widget.
   QHBoxLayout *portLayout = new QHBoxLayout;
   QLabel *portLabel = new QLabel("Cloned server port (1025-65535):");
-  this->portEdit = new QLineEdit("11346");
-  this->portEdit->setFixedWidth(50);
-  this->portEdit->setMaxLength(5);
-  this->portEdit->setValidator(new QIntValidator(1025, 65535, this));
+  this->dataPtr->portEdit = new QLineEdit("11346");
+  this->dataPtr->portEdit->setFixedWidth(50);
+  this->dataPtr->portEdit->setMaxLength(5);
+  this->dataPtr->portEdit->setValidator(new QIntValidator(1025, 65535, this));
   portLayout->setContentsMargins(4, 4, 4, 30);
   portLayout->addWidget(portLabel);
-  portLayout->addWidget(this->portEdit);
+  portLayout->addWidget(this->dataPtr->portEdit);
 
   // Buttons.
   QHBoxLayout *buttonLayout = new QHBoxLayout;
   QPushButton *cancelButton = new QPushButton("Cancel");
   connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
-  this->okayButton = new QPushButton("Ok");
-  connect(this->okayButton, SIGNAL(clicked()), this, SLOT(OnOkay()));
+  this->dataPtr->okayButton = new QPushButton("Ok");
+  connect(this->dataPtr->okayButton, SIGNAL(clicked()), this, SLOT(OnOkay()));
   buttonLayout->addWidget(cancelButton);
   buttonLayout->addStretch(2);
-  buttonLayout->addWidget(this->okayButton);
+  buttonLayout->addWidget(this->dataPtr->okayButton);
 
   // Compose the main frame.
   mainLayout->addWidget(portInfo);
@@ -81,22 +84,32 @@ CloneWindow::~CloneWindow()
 /////////////////////////////////////////////////
 int CloneWindow::GetPort()
 {
-  if (this->validPort)
-    return this->port;
+  if (this->dataPtr->validPort)
+    return this->dataPtr->port;
   else
     return 0;
 }
 
 /////////////////////////////////////////////////
-bool CloneWindow::IsValidPort()
+int CloneWindow::Port() const
 {
-  return this->validPort;
+  if (this->dataPtr->validPort)
+    return this->dataPtr->port;
+  else
+    return 0;
+}
+
+/////////////////////////////////////////////////
+bool CloneWindow::IsValidPort() const
+{
+  return this->dataPtr->validPort;
 }
 
 /////////////////////////////////////////////////
 void CloneWindow::Update()
 {
-  this->port = this->portEdit->text().toInt(&this->validPort);
+  this->dataPtr->port =
+    this->dataPtr->portEdit->text().toInt(&this->dataPtr->validPort);
 }
 
 /////////////////////////////////////////////////
