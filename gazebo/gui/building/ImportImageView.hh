@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_BUILDING_IMPORT_IMAGE_VIEW_HH_
-#define _GAZEBO_BUILDING_IMPORT_IMAGE_VIEW_HH_
+#ifndef _GAZEBO_GUI_IMPORT_IMAGE_VIEW_HH_
+#define _GAZEBO_GUI_IMPORT_IMAGE_VIEW_HH_
 
 #include <memory>
 #include <string>
