@@ -296,7 +296,33 @@ namespace gazebo
       /// use this.
       SENSOR_NOISE_TYPE_END
     };
+
+    /// \brief Types of supported noise models
+    enum NoiseType
+    {
+      /// \internal
+      /// \brief Indicator used to create an iterator over the enum. Do not
+      /// use this.
+      NOISE_TYPE_BEGIN = 0,
+
+      /// \brief No noise model
+      NONE             = 1,
+
+      /// \brief Custom noise model
+      CUSTOM           = 2,
+
+      /// \brief Guassian noise model
+      GAUSSIAN         = 3,
+
+      /// \internal
+      /// \brief Indicator used to create an iterator over the enum. Do not
+      /// use this.
+      NOISE_TYPE_END
+    };
+
     /// \}
   }
+
+
 }
 #endif

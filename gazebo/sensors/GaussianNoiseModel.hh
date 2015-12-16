@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_GAUSSIAN_NOISE_MODEL_HH_
-#define _GAZEBO_GAUSSIAN_NOISE_MODEL_HH_
+#ifndef _GAZEBO_SENSORS_GAUSSIAN_NOISE_MODEL_HH_
+#define _GAZEBO_SENSORS_GAUSSIAN_NOISE_MODEL_HH_
 
 #include <vector>
 #include <string>
@@ -38,57 +37,67 @@ namespace gazebo
 
   namespace sensors
   {
+    // Forward declare protected data class
+    class GaussianNoiseModelProtected;
+
+    // Forward declare protected data class
+    class ImageGaussianNoiseModelProtected;
+
     /// \class GaussianNoiseModel
     /// \brief Gaussian noise class
     class GAZEBO_VISIBLE GaussianNoiseModel : public Noise
     {
-        /// \brief Constructor.
-        public: GaussianNoiseModel();
+      /// \brief Constructor.
+      public: GaussianNoiseModel();
 
-        /// \brief Destructor.
-        public: virtual ~GaussianNoiseModel();
+      /// \brief Destructor.
+      public: virtual ~GaussianNoiseModel();
 
-        // Documentation inherited.
-        public: virtual void Load(sdf::ElementPtr _sdf);
+      // Documentation inherited.
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
-        // Documentation inherited.
-        public: virtual void Fini();
+      // Documentation inherited.
+      public: virtual void Fini();
 
-        // Documentation inherited.
-        public: double ApplyImpl(double _in);
+      // Documentation inherited.
+      public: double ApplyImpl(const double _in);
 
-        /// \brief Accessor for mean.
-        /// \return Mean of Gaussian noise.
-        public: double GetMean() const;
+      /// \brief Accessor for mean.
+      /// \return Mean of Gaussian noise.
+      /// \deprecated See Mean()
+      public: double GetMean() const GAZEBO_DEPRECATED(7.0);
 
-        /// \brief Accessor for stddev.
-        /// \return Standard deviation of Gaussian noise.
-        public: double GetStdDev() const;
+      /// \brief Accessor for mean.
+      /// \return Mean of Gaussian noise.
+      public: double Mean() const;
 
-        /// \brief Accessor for bias.
-        /// \return Bias on output.
-        public: double GetBias() const;
+      /// \brief Accessor for stddev.
+      /// \return Standard deviation of Gaussian noise.
+      /// \deprecated See StdDev()
+      public: double GetStdDev() const GAZEBO_DEPRECATED(7.0);
 
-        /// Documentation inherited
-        public: virtual void Print(std::ostream &_out) const;
+      /// \brief Accessor for stddev.
+      /// \return Standard deviation of Gaussian noise.
+      public: double StdDev() const;
 
-        /// \brief If type starts with GAUSSIAN, the mean of the distribution
-        /// from which we sample when adding noise.
-        protected: double mean;
+      /// \brief Accessor for bias.
+      /// \return Bias on output.
+      /// \deprecated See Bias()
+      public: double GetBias() const GAZEBO_DEPRECATED(7.0);
 
-        /// \brief If type starts with GAUSSIAN, the standard deviation of the
-        /// distribution from which we sample when adding noise.
-        protected: double stdDev;
+      /// \brief Accessor for bias.
+      /// \return Bias on output.
+      public: double Bias() const;
 
-        /// \brief If type starts with GAUSSIAN, the bias we'll add.
-        protected: double bias;
+      /// Documentation inherited
+      public: virtual void Print(std::ostream &_out) const;
 
-        /// \brief If type==GAUSSIAN_QUANTIZED, the precision to which
-        /// the output signal is rounded.
-        protected: double precision;
+      /// \brief Constructor for dervied classes.
+      protected: GaussianNoiseModel(const GaussianNodeModelProtected &_dPtr);
 
-        /// \brief True if the type is GAUSSIAN_QUANTIZED
-        protected: bool quantized;
+      /// \internal
+      /// \brief Protected data pointer
+      protected: GaussianNoiseModelProtected *gaussDPtr;
     };
 
     /// \class GaussianNoiseModel
@@ -113,12 +122,18 @@ namespace gazebo
       /// Documentation inherited
       public: virtual void Print(std::ostream &_out) const;
 
-      /// \brief Gaussian noise compositor.
-      public: Ogre::CompositorInstance *gaussianNoiseInstance;
+      /// \brief Get a pointer to the ogre compositor instance.
+      /// \return Pointer to the ogre compositor instance.
+      public: Ogre::CompositorInstance *CompositorInstance() const;
 
-      /// \brief Gaussian noise compositor listener
-      public: boost::shared_ptr<GaussianNoiseCompositorListener>
-        gaussianNoiseCompositorListener;
+      /// \brief Get a pointer to the gaussian noise compositor listener.
+      /// \return A pointer to the gaussian noise compositor listener.
+      public: std::shared_ptr<GaussianNoiseCompositorListener>
+              CompositorListener() const
+
+      /// \internal
+      /// \brief Protected data pointer.
+      protected: ImageGaussianNoiseModelProtected *imgGaussDPtr;
     };
     /// \}
   }

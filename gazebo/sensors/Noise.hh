@@ -14,14 +14,11 @@
  * limitations under the License.
  *
 */
+#ifndef _GAZEBO_SENSORS_NOISE_HH_
+#define _GAZEBO_SENSORS_NOISE_HH_
 
-#ifndef _GAZEBO_NOISE_HH_
-#define _GAZEBO_NOISE_HH_
-
-#include <vector>
 #include <string>
-
-#include <boost/function.hpp>
+#include <functional>
 #include <sdf/sdf.hh>
 
 #include "gazebo/rendering/RenderTypes.hh"
@@ -54,20 +51,12 @@ namespace gazebo
     /// \brief Noise models for sensor output signals.
     class GAZEBO_VISIBLE Noise
     {
-      /// \brief Which noise types we support
-      public: enum NoiseType
-      {
-        NONE,
-        CUSTOM,
-        GAUSSIAN
-      };
-
       /// \brief Constructor. This should not be called directly unless creating
       /// an empty noise model. Use NoiseFactory::NewNoiseModel to instantiate
       /// a new noise model.
       /// \param[in] _type Type of noise model.
       /// \sa NoiseFactory::NewNoiseModel
-      public: explicit Noise(NoiseType _type);
+      public: explicit Noise(const NoiseType _type);
 
       /// \brief Destructor.
       public: virtual ~Noise();
@@ -80,27 +69,33 @@ namespace gazebo
       /// \brief Apply noise to input data value.
       /// \param[in] _in Input data value.
       /// \return Data with noise applied.
-      public: double Apply(double _in);
+      public: double Apply(const double _in);
 
       /// \brief Apply noise to input data value. This gets overriden by
       /// derived classes, and called by Apply.
       /// \param[in] _in Input data value.
       /// \return Data with noise applied.
-      public: virtual double ApplyImpl(double _in);
+      public: virtual double ApplyImpl(const double _in);
 
       /// \brief Finalize the noise model
       public: virtual void Fini();
 
       /// \brief Accessor for NoiseType.
       /// \return Type of noise currently in use.
-      public: NoiseType GetNoiseType() const;
+      /// \deprecated See Type() const
+      public: NoiseType GetNoiseType() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Accessor for NoiseType.
+      /// \return Type of noise currently in use.
+      /// \deprecated See NoiseType() const
+      public: NoiseType Type() const;
 
       /// \brief Register a custom noise callback.
       /// \param[in] _cb Callback function for applying a custom noise model.
       /// This is useful if users want to use their own noise model from a
       /// sensor plugin.
       public: virtual void SetCustomNoiseCallback(
-          boost::function<double (double)> _cb);
+          std::function<double (double)> _cb);
 
       /// \brief Set camera needed to create image noise. This is only needed
       /// for image sensors, i.e. camera/multicamera/depth sensors, which use
@@ -112,14 +107,9 @@ namespace gazebo
       /// \param[in] _out Output stream
       public: virtual void Print(std::ostream &_out) const;
 
-      /// \brief Which type of noise we're applying
-      private: NoiseType type;
-
-      /// \brief Noise sdf element.
-      private: sdf::ElementPtr sdf;
-
-      /// \brief Callback function for applying custom noise to sensor data.
-      private: boost::function<double (double)> customNoiseCallback;
+      /// \internal
+      /// \brief Private data pointer.
+      private: std::unique_ptr<NoisePrivate> dataPtr;
     };
     /// \}
   }

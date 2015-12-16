@@ -23,6 +23,7 @@ set (sources
   RFIDTag.cc
   SensorsIface.cc
   Sensor.cc
+  SensorContainer.cc
   SensorFactory.cc
   SensorManager.cc
   SensorTypes.cc

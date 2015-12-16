@@ -69,7 +69,8 @@ namespace gazebo
       GZ_ASSERT(!params.isNull(), "Null OGRE material GPU parameters");
 
       params->setNamedConstant("offsets", offsets);
-      params->setNamedConstant("mean", static_cast<Ogre::Real>(this->mean));
+      params->setNamedConstant("mean",
+          static_cast<Ogre::Real>(this->gaussDPtr->mean));
       params->setNamedConstant("stddev", static_cast<Ogre::Real>(this->stddev));
     }
 
@@ -86,18 +87,23 @@ using namespace sensors;
 
 //////////////////////////////////////////////////
 GaussianNoiseModel::GaussianNoiseModel()
-  : Noise(Noise::GAUSSIAN),
-    mean(0.0),
-    stdDev(0.0),
-    bias(0.0),
-    precision(0.0),
-    quantized(false)
+: Noise(Noise::GAUSSIAN),
+  gaussDPtr(new GaussianNodeModelProtected)
+{
+}
+
+//////////////////////////////////////////////////
+GaussianNoiseModel::GaussianNoiseModel(const GaussianNodeModelProtected &_dPtr)
+: Noise(Noise::Gaussian),
+  gaussDPtr(&_dPtr)
 {
 }
 
 //////////////////////////////////////////////////
 GaussianNoiseModel::~GaussianNoiseModel()
 {
+  delete this->gaussDPtr;
+  this->gaussDPtr = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -105,8 +111,8 @@ void GaussianNoiseModel::Load(sdf::ElementPtr _sdf)
 {
   Noise::Load(_sdf);
 
-  this->mean = _sdf->Get<double>("mean");
-  this->stdDev = _sdf->Get<double>("stddev");
+  this->gaussDPtr->mean = _sdf->Get<double>("mean");
+  this->gaussDPtr->stdDev = _sdf->Get<double>("stddev");
   // Sample the bias
   double biasMean = 0;
   double biasStdDev = 0;
@@ -114,28 +120,28 @@ void GaussianNoiseModel::Load(sdf::ElementPtr _sdf)
     biasMean = _sdf->Get<double>("bias_mean");
   if (_sdf->HasElement("bias_stddev"))
     biasStdDev = _sdf->Get<double>("bias_stddev");
-  this->bias = ignition::math::Rand::DblNormal(biasMean, biasStdDev);
+  this->gaussDPtr->bias = ignition::math::Rand::DblNormal(biasMean, biasStdDev);
   // With equal probability, we pick a negative bias (by convention,
   // rateBiasMean should be positive, though it would work fine if
   // negative).
   if (ignition::math::Rand::DblUniform() < 0.5)
-    this->bias = -this->bias;
+    this->gaussDPtr->bias = -this->gaussDPtr->bias;
 
   /// \todo Remove this, and use Noise::Print. See ImuSensor for an example
-  gzlog << "applying Gaussian noise model with mean " << this->mean
-    << ", stddev " << this->stdDev
-    << ", bias " << this->bias << std::endl;
+  gzlog << "applying Gaussian noise model with mean " << this->gaussDPtr->mean
+    << ", stddev " << this->gaussDPtr->stdDev
+    << ", bias " << this->gaussDPtr->bias << std::endl;
 
   if (_sdf->HasElement("precision"))
   {
-    this->precision = _sdf->Get<double>("precision");
-    if (this->precision < 0)
+    this->gaussDPtr->precision = _sdf->Get<double>("precision");
+    if (this->gaussDPtr->precision < 0)
     {
       gzerr << "Noise precision cannot be less than 0" << std::endl;
     }
-    else if (!ignition::math::equal(this->precision, 0.0, 1e-6))
+    else if (!ignition::math::equal(this->gaussDPtr->precision, 0.0, 1e-6))
     {
-      this->quantized = true;
+      this->gaussDPtr->quantized = true;
     }
   }
 }
@@ -150,14 +156,16 @@ void GaussianNoiseModel::Fini()
 double GaussianNoiseModel::ApplyImpl(double _in)
 {
   // Add independent (uncorrelated) Gaussian noise to each input value.
-  double whiteNoise = ignition::math::Rand::DblNormal(this->mean, this->stdDev);
-  double output = _in + this->bias + whiteNoise;
-  if (this->quantized)
+  double whiteNoise = ignition::math::Rand::DblNormal(this->gaussDPtr->mean,
+      this->gaussDPtr->stdDev);
+  double output = _in + this->gaussDPtr->bias + whiteNoise;
+  if (this->gaussDPtr->quantized)
   {
-    // Apply this->precision
-    if (!ignition::math::equal(this->precision, 0.0, 1e-6))
+    // Apply this->gaussDPtr->precision
+    if (!ignition::math::equal(this->gaussDPtr->precision, 0.0, 1e-6))
     {
-      output = std::round(output / this->precision) * this->precision;
+      output = std::round(output / this->gaussDPtr->precision) *
+        this->gaussDPtr->precision;
     }
   }
   return output;
@@ -166,40 +174,60 @@ double GaussianNoiseModel::ApplyImpl(double _in)
 //////////////////////////////////////////////////
 double GaussianNoiseModel::GetMean() const
 {
-  return this->mean;
+  return this->Mean();
+}
+
+//////////////////////////////////////////////////
+double GaussianNoiseModel::Mean() const
+{
+  return this->gaussDPtr->mean;
 }
 
 //////////////////////////////////////////////////
 double GaussianNoiseModel::GetStdDev() const
 {
-  return this->stdDev;
+  return this->StdDev();
+}
+
+//////////////////////////////////////////////////
+double GaussianNoiseModel::StdDev() const
+{
+  return this->gaussDPtr->stdDev;
 }
 
 //////////////////////////////////////////////////
 double GaussianNoiseModel::GetBias() const
 {
-  return this->bias;
+  return this->Bias();
+}
+
+//////////////////////////////////////////////////
+double GaussianNoiseModel::Bias() const
+{
+  return this->gaussDPtr->bias;
 }
 
 //////////////////////////////////////////////////
 void GaussianNoiseModel::Print(std::ostream &_out) const
 {
-  _out << "Gaussian noise, mean[" << this->mean << "], "
-    << "stdDev[" << this->stdDev << "] "
-    << "bias[" << this->bias << "] "
-    << "precision[" << this->precision << "] "
-    << "quantized[" << this->quantized << "]";
+  _out << "Gaussian noise, mean[" << this->gaussDPtr->mean << "], "
+    << "stdDev[" << this->gaussDPtr->stdDev << "] "
+    << "bias[" << this->gaussDPtr->bias << "] "
+    << "precision[" << this->gaussDPtr->precision << "] "
+    << "quantized[" << this->gaussDPtr->quantized << "]";
 }
 
 //////////////////////////////////////////////////
 ImageGaussianNoiseModel::ImageGaussianNoiseModel()
-  : GaussianNoiseModel()
+: GaussianNoiseModel(*new ImageGaussianNodeModeProtected),
+  imgGaussDPtr(static_cast<ImageGaussianNodeModeProtected>(this->gaussDPtr))
 {
 }
 
 //////////////////////////////////////////////////
 ImageGaussianNoiseModel::~ImageGaussianNoiseModel()
 {
+  this->imgGaussDPtr = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -213,34 +241,35 @@ void ImageGaussianNoiseModel::SetCamera(rendering::CameraPtr _camera)
 {
   GZ_ASSERT(_camera, "Unable to apply gaussian noise, camera is NULL");
 
-  this->gaussianNoiseCompositorListener.reset(new
-        GaussianNoiseCompositorListener(this->mean, this->stdDev));
+  this->imgGaussDPtr->gaussianNoiseCompositorListener.reset(new
+        GaussianNoiseCompositorListener(this->gaussDPtr->mean,
+          this->gaussDPtr->stdDev));
 
-  this->gaussianNoiseInstance =
+  this->imgGaussDPtr->gaussianNoiseInstance =
     Ogre::CompositorManager::getSingleton().addCompositor(
       _camera->GetViewport(), "CameraNoise/Gaussian");
-  this->gaussianNoiseInstance->setEnabled(true);
-  this->gaussianNoiseInstance->addListener(
-    this->gaussianNoiseCompositorListener.get());
+  this->imgGaussDPtr->gaussianNoiseInstance->setEnabled(true);
+  this->imgGaussDPtr->gaussianNoiseInstance->addListener(
+    this->imgGaussDPtr->gaussianNoiseCompositorListener.get());
 }
 
 //////////////////////////////////////////////////
 void ImageGaussianNoiseModel::Fini()
 {
   GaussianNoiseModel::Fini();
-  if (this->gaussianNoiseCompositorListener)
+  if (this->imgGaussDPtr->gaussianNoiseCompositorListener)
   {
-    this->gaussianNoiseInstance->removeListener(
-      this->gaussianNoiseCompositorListener.get());
+    this->imgGaussDPtr->gaussianNoiseInstance->removeListener(
+      this->imgGaussDPtr->gaussianNoiseCompositorListener.get());
   }
 }
 
 //////////////////////////////////////////////////
 void ImageGaussianNoiseModel::Print(std::ostream &_out) const
 {
-  _out << "Image Gaussian noise, mean[" << this->mean << "], "
-    << "stdDev[" << this->stdDev << "] "
-    << "bias[" << this->bias << "] "
-    << "precision[" << this->precision << "] "
-    << "quantized[" << this->quantized << "]";
+  _out << "Image Gaussian noise, mean[" << this->imgGaussDPtr->mean << "], "
+    << "stdDev[" << this->imgGaussDPtr->stdDev << "] "
+    << "bias[" << this->imgGaussDPtr->bias << "] "
+    << "precision[" << this->imgGaussDPtr->precision << "] "
+    << "quantized[" << this->imgGaussDPtr->quantized << "]";
 }

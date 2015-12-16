@@ -21,7 +21,6 @@
   #include <Winsock2.h>
 #endif
 
-#include <boost/function.hpp>
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 
@@ -78,9 +77,8 @@ NoisePtr NoiseFactory::NewNoiseModel(sdf::ElementPtr _sdf,
 }
 
 //////////////////////////////////////////////////
-Noise::Noise(NoiseType _type)
-  : type(_type),
-    customNoiseCallback(NULL)
+Noise::Noise(const NoiseType _type)
+: dataPtr(new NoisePrivate(_type))
 {
 }
 
@@ -92,8 +90,8 @@ Noise::~Noise()
 //////////////////////////////////////////////////
 void Noise::Load(sdf::ElementPtr _sdf)
 {
-  this->sdf = _sdf;
-  GZ_ASSERT(this->sdf != NULL, "this->sdf is NULL");
+  this->dataPtr->sdf = _sdf;
+  GZ_ASSERT(this->dataPtr->sdf != NULL, "this->dataPtr->sdf is NULL");
 }
 
 //////////////////////////////////////////////////
@@ -103,14 +101,14 @@ void Noise::SetCamera(rendering::CameraPtr /*_camera*/)
 }
 
 //////////////////////////////////////////////////
-double Noise::Apply(double _in)
+double Noise::Apply(const double _in)
 {
-  if (this->type == NONE)
+  if (this->dataPtr->type == NONE)
     return _in;
-  else if (this->type == CUSTOM)
+  else if (this->dataPtr->type == CUSTOM)
   {
-    if (this->customNoiseCallback)
-      return this->customNoiseCallback(_in);
+    if (this->dataPtr->customNoiseCallback)
+      return this->dataPtr->customNoiseCallback(_in);
     else
     {
       gzerr << "Custom noise callback function not set!"
@@ -124,7 +122,7 @@ double Noise::Apply(double _in)
 }
 
 //////////////////////////////////////////////////
-double Noise::ApplyImpl(double _in)
+double Noise::ApplyImpl(const double _in)
 {
   return _in;
 }
@@ -132,26 +130,32 @@ double Noise::ApplyImpl(double _in)
 //////////////////////////////////////////////////
 Noise::NoiseType Noise::GetNoiseType() const
 {
-  return this->type;
+  return this->NoiseType();
 }
 
 //////////////////////////////////////////////////
-void Noise::SetCustomNoiseCallback(boost::function<double (double)> _cb)
+Noise::NoiseType Noise::Type() const
 {
-  this->type = CUSTOM;
-  this->customNoiseCallback = _cb;
+  return this->dataPtr->type;
+}
+
+//////////////////////////////////////////////////
+void Noise::SetCustomNoiseCallback(std::function<double (double)> _cb)
+{
+  this->dataPtr->type = CUSTOM;
+  this->dataPtr->customNoiseCallback = _cb;
 }
 
 //////////////////////////////////////////////////
 void Noise::Fini()
 {
-  this->customNoiseCallback = NULL;
+  this->dataPtr->customNoiseCallback = NULL;
 }
 
 //////////////////////////////////////////////////
 void Noise::Print(std::ostream &_out) const
 {
-  _out << "Noise with type[" << this->type << "] "
+  _out << "Noise with type[" << this->dataPtr->type << "] "
     << "does not have an overloaded Print function. "
     << "No more information is available.";
 }
