@@ -237,6 +237,9 @@ using the same arguments used in the command line.
 
 1. Building editor updates
 
+    1. PIMPLize ImportImageDialog and ImportImageView classes
+        * [Pull request #2039](https://bitbucket.org/osrf/gazebo/pull-request/2039)
+
     1. Removed unused class: BuildingItem
         * [Pull request #2045](https://bitbucket.org/osrf/gazebo/pull-request/2045)
 
