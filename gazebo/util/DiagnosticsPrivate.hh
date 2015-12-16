@@ -31,6 +31,7 @@ namespace gazebo
 {
   namespace util
   {
+    /// \brief Private data for the DiagnosticManager class
     class DiagnosticManagerPrivate
     {
       /// \brief dictionary of timers index by name
@@ -52,6 +53,7 @@ namespace gazebo
       public: event::ConnectionPtr updateConnection;
     };
 
+    /// \brief Private data for the DiagnosticTimer class
     class DiagnosticTimerPrivate
     {
       /// \brief Name of the timer.
