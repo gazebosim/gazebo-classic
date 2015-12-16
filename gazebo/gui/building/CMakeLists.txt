@@ -6,7 +6,6 @@ set (sources ${sources}
   building/BuildingEditorEvents.cc
   building/BuildingEditorPalette.cc
   building/BuildingEditorWidget.cc
-  building/BuildingItem.cc
   building/BuildingMaker.cc
   building/BuildingModelManip.cc
   building/DoorItem.cc
