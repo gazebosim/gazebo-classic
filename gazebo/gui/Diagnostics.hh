@@ -63,7 +63,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Pointer to private data.
-      protected: std::unique_ptr<DiagnosticsPrivate> dataPtr;
+      private: std::unique_ptr<DiagnosticsPrivate> dataPtr;
     };
   }
 }
