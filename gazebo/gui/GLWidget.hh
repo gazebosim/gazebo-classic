@@ -14,37 +14,26 @@
  * limitations under the License.
  *
 */
-#ifndef _GL_WIDGET_HH_
-#define _GL_WIDGET_HH_
+#ifndef _GAZEBO_GUI_GLWIDGET_HH_
+#define _GAZEBO_GUI_GLWIDGET_HH_
 
 #include <string>
 #include <vector>
-#include <utility>
-#include <list>
 
-#include <boost/thread/mutex.hpp>
-
-#include "gazebo/gui/qt.h"
-#include "gazebo/rendering/RenderTypes.hh"
-
-#include "gazebo/transport/TransportTypes.hh"
-
-#include "gazebo/common/MouseEvent.hh"
-#include "gazebo/common/KeyEvent.hh"
 #include "gazebo/common/Event.hh"
-
-#include "gazebo/math/Pose.hh"
-
+#include "gazebo/common/KeyEvent.hh"
+#include "gazebo/common/MouseEvent.hh"
+#include "gazebo/gui/qt.h"
 #include "gazebo/msgs/msgs.hh"
-
-#include "gazebo/gui/ModelMaker.hh"
-#include "gazebo/gui/LightMaker.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
+    class GLWidgetPrivate;
+
     class GZ_GUI_VISIBLE GLWidget : public QWidget
     {
       Q_OBJECT
@@ -92,7 +81,7 @@ namespace gazebo
       /// \param[in] _e The QT show event information.
       protected: virtual void showEvent(QShowEvent *_e);
 
-      protected: virtual void enterEvent(QEvent * event);
+      protected: virtual void enterEvent(QEvent *_event);
 
 
       protected: void keyPressEvent(QKeyEvent *_event);
@@ -221,65 +210,9 @@ namespace gazebo
       /// \param[in] _button The QT mouse buttons
       private: void SetMouseEventButtons(const Qt::MouseButtons &_buttons);
 
-      private: int windowId;
-
-      private: rendering::UserCameraPtr userCamera;
-      private: rendering::ScenePtr scene;
-      private: QFrame *renderFrame;
-      private: common::MouseEvent mouseEvent;
-
-      /// \brief The most recent keyboard event.
-      private: common::KeyEvent keyEvent;
-
-      private: std::vector<event::ConnectionPtr> connections;
-
-      /// \brief Pointer to the current maker.
-      private: EntityMaker *entityMaker;
-
-      /// \brief Model maker.
-      private: ModelMaker modelMaker;
-
-      /// \brief Point light maker
-      private: PointLightMaker pointLightMaker;
-
-      /// \brief Spot light maker
-      private: SpotLightMaker spotLightMaker;
-
-      /// \brief Directional light maker
-      private: DirectionalLightMaker directionalLightMaker;
-
-      /// \brief Light maker
-      private: LightMaker lightMaker;
-
-      /// \brief A list of selected visuals.
-      private: std::vector<rendering::VisualPtr> selectedVisuals;
-
-      /// \brief Indicates how deep into the model to select.
-      private: SelectionLevels selectionLevel;
-
-      private: transport::NodePtr node;
-
-      /// \brief Publishes information about user selections.
-      private: transport::PublisherPtr selectionPub;
-
-      private: transport::SubscriberPtr requestSub;
-
-      private: std::string keyText;
-      private: Qt::KeyboardModifiers keyModifiers;
-      private: QPoint onShiftMousePos;
-
-      private: std::string copiedObject;
-
-      private: std::string state;
-
-      /// \brief Name of entity that is being copied.
-      private: std::string copyEntityName;
-
-      /// \brief True if the model editor is up, false otherwise
-      private: bool modelEditorEnabled;
-
-      /// \brief Mutext to protect selectedVisuals array.
-      private: boost::mutex selectedVisMutex;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<GLWidgetPrivate> dataPtr;
     };
   }
 }
