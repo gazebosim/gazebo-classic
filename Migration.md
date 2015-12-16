@@ -81,6 +81,46 @@ release will remove the deprecated code.
 
 ### Deprecations
 
+1. **gazebo/util/Diagnostics.hh**
+    + ***Deprecation:*** public: int GetTimerCount() const;
+    + ***Replacement:*** public: int TimerCount() const;
+    + ***Deprecation:*** public: common::Time GetTime(int _index) const;
+    + ***Replacement:*** public: common::Time Time(const int _index) const;
+    + ***Deprecation:*** public: common::Time GetTime(const std::string &_label) const;
+    + ***Replacement:*** public: common::Time Time(const std::string &_label) const;
+    + ***Deprecation:*** public: std::string GetLabel(int _index) const;
+    + ***Replacement:*** public: std::string Label(const int _index) const;
+    + ***Deprecation:*** public: boost::filesystem::path GetLogPath() const
+    + ***Replacement:*** public: boost::filesystem::path LogPath() const;
+
+1. **gazebo/util/LogPlay.hh**
+    + ***Deprecation:*** public: std::string GetLogVersion() const;
+    + ***Replacement:*** public: std::string LogVersion() const;
+    + ***Deprecation:*** public: std::string GetGazeboVersion() const;
+    + ***Replacement:*** public: std::string GazeboVersion() const;
+    + ***Deprecation:*** public: uint32_t GetRandSeed() const
+    + ***Replacement:*** public: uint32_t RandSeed() const;
+    + ***Deprecation:*** public: common::Time GetLogStartTime() const;
+    + ***Replacement:*** public: common::Time LogStartTime() const;
+    + ***Deprecation:*** public: common::Time GetLogEndTime() const;
+    + ***Replacement:*** public: common::Time LogEndTime() const;
+    + ***Deprecation:*** public: std::string GetFilename() const;
+    + ***Replacement:*** public: std::string Filename() const;
+    + ***Deprecation:*** public: std::string GetFullPathFilename() const;
+    + ***Replacement:*** public: std::string FullPathFilename() const;
+    + ***Deprecation:*** public: uintmax_t GetFileSize() const
+    + ***Replacement:*** public: uintmax_t FileSize() const;
+    + ***Deprecation:*** public: unsigned int GetChunkCount() const;
+    + ***Replacement:*** public: unsigned int ChunkCount() const;
+    + ***Deprecation:*** public: bool GetChunk(unsigned int _index, std::string &_data);
+    + ***Replacement:*** public: bool Chunk(const unsigned int _index, std::string &_data) const;
+    + ***Deprecation:*** public: std::string GetEncoding() const
+    + ***Replacement:*** public: std::string Encoding() const;
+    + ***Deprecation:*** public: std::string GetHeader() const
+    + ***Replacement:*** public: std::string Header() const;
+    + ***Deprecation:*** public: uint64_t GetInitialIterations() const
+    + ***Replacement:*** public: uint64_t InitialIterations() const;
+
 1. **gazebo/rendering/ApplyWrenchVisual.hh**
     + ***Deprecation:*** public: void SetCoM(const math::Vector3 &_comVector)
     + ***Replacement:*** public: void SetCoM(const ignition::math::Vector3d &_comVector);

@@ -1,5 +1,8 @@
 ## Gazebo 7.0
 
+1. Use more opaque pointers.
+    * [Pull request #2025](https://bitbucket.org/osrf/gazebo/pull-request/2025)
+
 1. Use opaque pointers in the gui/CloneWindow class.
     * [Pull request #2027](https://bitbucket.org/osrf/gazebo/pull-request/2027)
 
@@ -16,7 +19,7 @@
 
 1. Implemented private data pointer for the RTShaderSystem class. Minimized shader updates to once per render update.
     * [Pull request #2003](https://bitbucket.org/osrf/gazebo/pull-request/2003)
-
+    
 1. Updating physics library to use ignition math.
     * [Pull request #2007](https://bitbucket.org/osrf/gazebo/pull-request/2007)
 
