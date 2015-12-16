@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_BUILDING_GRABBER_HANDLE_HH_
-#define _GAZEBO_BUILDING_GRABBER_HANDLE_HH_
+#ifndef _GAZEBO_GUI_GRABBER_HANDLE_HH_
+#define _GAZEBO_GUI_GRABBER_HANDLE_HH_
 
 #include <vector>
 #include <memory>
