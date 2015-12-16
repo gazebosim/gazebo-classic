@@ -149,9 +149,9 @@ release will remove the deprecated code.
     + ***Deprecation:*** std::string GetHumanReadableKey(const std::string &_key)
     + ***Replacement:*** std::string HumanReadableKey(const std::string &_key) const
     + ***Deprecation:*** std::string GetUnitFromKey(const std::string &_key, const std::string &_jointType = "")
-    + ***Replacement:*** UnitFromKey(const std::string &_key, const std::string &_jointType = "") const
+    + ***Replacement:*** std::string UnitFromKey(const std::string &_key, const std::string &_jointType = "") const
     + ***Deprecation:*** void GetRangeFromKey(const std::string &_key, double &_min, double &_max)
-    + ***Replacement:*** RangeFromKey(const std::string &_key, double &_min, double &_max) const
+    + ***Replacement:*** void RangeFromKey(const std::string &_key, double &_min, double &_max) const
     + ***Deprecation:*** bool GetWidgetVisible(const std::string &_name)
     + ***Replacement:*** bool WidgetVisible(const std::string &_name) const
     + ***Deprecation:*** bool GetWidgetReadOnly(const std::string &_name) const
