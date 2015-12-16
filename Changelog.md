@@ -1,5 +1,8 @@
 ## Gazebo 7.0
 
+1. Use opaque pointers in the gui/JointControlWidget class.
+    * [Pull request #2052](https://bitbucket.org/osrf/gazebo/pull-request/2052)
+
 1. Use more opaque pointers.
     * [Pull request #2025](https://bitbucket.org/osrf/gazebo/pull-request/2025)
 
