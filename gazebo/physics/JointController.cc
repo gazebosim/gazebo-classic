@@ -90,8 +90,8 @@ void JointController::Reset()
     iter->second.Reset();
   }
 
-  for (iter = this->dataPtr->posPids.begin();
-    iter != this->dataPtr->posPids.end(); ++iter)
+  for (iter = this->dataPtr->velPids.begin();
+    iter != this->dataPtr->velPids.end(); ++iter)
   {
     iter->second.Reset();
   }

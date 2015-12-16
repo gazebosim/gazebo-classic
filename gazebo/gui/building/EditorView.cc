@@ -18,7 +18,6 @@
 
 #include "gazebo/math/Angle.hh"
 #include "gazebo/gui/building/ImportImageDialog.hh"
-#include "gazebo/gui/building/BuildingItem.hh"
 #include "gazebo/gui/building/GridLines.hh"
 #include "gazebo/gui/building/EditorItem.hh"
 #include "gazebo/gui/building/RectItem.hh"

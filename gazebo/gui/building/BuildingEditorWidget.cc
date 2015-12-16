@@ -15,7 +15,6 @@
  *
 */
 
-#include "gazebo/gui/building/BuildingItem.hh"
 #include "gazebo/gui/building/EditorView.hh"
 #include "gazebo/gui/building/EditorItem.hh"
 #include "gazebo/gui/building/LevelWidget.hh"
