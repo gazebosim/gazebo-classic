@@ -24,7 +24,7 @@ namespace gazebo
     class TerrainEditorPalette;
 
     /// \class TerrainEditorPrivate TerrainEditorPrivate.hh
-    /// \brief Private data for the TerrainEditorPrivate class.
+    /// \brief Private data for the TerrainEditor class.
     class TerrainEditorPrivate
     {
       /// \brief Contains all the terrain editor tools.
