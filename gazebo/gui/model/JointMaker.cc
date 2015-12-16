@@ -54,7 +54,6 @@ JointMaker::JointMaker()
   this->unitVectors.push_back(ignition::math::Vector3d::UnitY);
   this->unitVectors.push_back(ignition::math::Vector3d::UnitZ);
 
-  this->newJointCreated = false;
   this->newJoint = NULL;
   this->modelSDF.reset();
   this->jointType = JointMaker::JOINT_NONE;
@@ -140,7 +139,6 @@ JointMaker::~JointMaker()
 void JointMaker::Reset()
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
-  this->newJointCreated = false;
   if (this->newJoint)
   {
     delete this->newJoint;
@@ -1109,17 +1107,17 @@ void JointData::Update()
     // Parent - child
     if (this->child && this->jointVisual)
     {
-      this->line->SetPoint(0, this->child->GetWorldPose().pos
-          - this->child->GetParent()->GetWorldPose().pos);
+      this->line->SetPoint(0, (this->child->GetWorldPose().pos
+          - this->child->GetParent()->GetWorldPose().pos).Ign());
       this->line->SetPoint(1,
-          this->jointVisual->GetWorldPose().pos
-          - this->child->GetParent()->GetWorldPose().pos);
+          (this->jointVisual->GetWorldPose().pos
+          - this->child->GetParent()->GetWorldPose().pos).Ign());
     }
     // Parent - mouse
     else if (this->parent && this->parent->GetParent())
     {
-      math::Vector3 origin = this->parent->GetWorldPose().pos
-          - this->parent->GetParent()->GetWorldPose().pos;
+      ignition::math::Vector3d origin = (this->parent->GetWorldPose().pos
+          - this->parent->GetParent()->GetWorldPose().pos).Ign();
       this->line->SetPoint(0, origin);
     }
   }
