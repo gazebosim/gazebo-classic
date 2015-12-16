@@ -23,7 +23,7 @@
 
 using namespace gazebo;
 
-const double g_big = 1e29;
+const double g_big = 1e17;
 const double g_physics_tol = 1e-2;
 
 class PhysicsCollisionTest : public ServerFixture,

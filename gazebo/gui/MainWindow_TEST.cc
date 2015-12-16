@@ -1167,6 +1167,5 @@ void MainWindow_TEST::MinimumSize()
   delete mainWindow;
 }
 
-
 // Generate a main function for the test
 QTEST_MAIN(MainWindow_TEST)

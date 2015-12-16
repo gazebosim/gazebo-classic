@@ -1,5 +1,22 @@
 ## Gazebo 7.0
 
+1. Use more opaque pointers.
+    * [Pull request #2025](https://bitbucket.org/osrf/gazebo/pull-request/2025)
+
+1. Use opaque pointers in the gui/CloneWindow class.
+    * [Pull request #2027](https://bitbucket.org/osrf/gazebo/pull-request/2027)
+
+1. Use opaque pointers in the terrain editor.
+    * [Pull request #2026](https://bitbucket.org/osrf/gazebo/pull-request/2026)
+
+1. Use opaque pointers in the gui/DataLogger class.
+    * [Pull request #2029](https://bitbucket.org/osrf/gazebo/pull-request/2029)
+
+1. Fix visual transparency issues
+    * [Pull request #2031](https://bitbucket.org/osrf/gazebo/pull-request/2031)
+    * [Issue #1726](https://bitbucket.org/osrf/gazebo/issue/1726)
+    * [Issue #1790](https://bitbucket.org/osrf/gazebo/issue/1790)
+
 1. Implemented private data pointer for the RTShaderSystem class. Minimized shader updates to once per render update.
     * [Pull request #2003](https://bitbucket.org/osrf/gazebo/pull-request/2003)
 
@@ -31,6 +48,9 @@
 1. Improve overall speed of log playback. Added new functions to LogPlay.
    Use tinyxml2 for playback.
     * [Pull request #1931](https://bitbucket.org/osrf/gazebo/pull-request/1931)
+
+1. Enter time during log playback
+    * [Pull request #2000](https://bitbucket.org/osrf/gazebo/pull-request/2000)
 
 1 Added Ignition Transport dependency.
   * [Pull request #1930](https://bitbucket.org/osrf/gazebo/pull-request/1930)
@@ -78,6 +98,9 @@ flags from c functions. Windows did not like `CPPTYPE_*` in
 
 1. Undo user motion commands during simulation, added physics::UserCmdManager and gui::UserCmdHistory.
     * [Pull request #1934](https://bitbucket.org/osrf/gazebo/pull-request/1934)
+
+1. Forward user command messages for undo.
+    * [Pull request #2009](https://bitbucket.org/osrf/gazebo/pull-request/2009)
 
 1. Undo reset commands during simulation, forwarding commands
     * [Pull request #1986](https://bitbucket.org/osrf/gazebo/pull-request/1986)
@@ -214,10 +237,27 @@ using the same arguments used in the command line.
 
 1. Building editor updates
 
+    1. Removed unused class: BuildingItem
+        * [Pull request #2045](https://bitbucket.org/osrf/gazebo/pull-request/2045)
+
     1. PIMPL opaque pointers for Building Maker
         * [Pull request #2038](https://bitbucket.org/osrf/gazebo/pull-request/2038)
 
 ## Gazebo 6.0
+
+### Gazebo 6.X.X (201X-XX-XX)
+
+1. Backport model editor toolbar fixed joint option from [pull request #1794](https://bitbucket.org/osrf/gazebo/pull-request/1794)
+    * [Pull request #1957](https://bitbucket.org/osrf/gazebo/pull-request/1957)
+
+1. Fix minimum window height
+    * Backport of [pull request #1977](https://bitbucket.org/osrf/gazebo/pull-request/1977)
+    * [Pull request #1998](https://bitbucket.org/osrf/gazebo/pull-request/1998)
+    * [Issue #1706](https://bitbucket.org/osrf/gazebo/issue/1706)
+
+1. Fix visual transparency issues
+    * [Pull request #1967](https://bitbucket.org/osrf/gazebo/pull-request/1967)
+    * [Issue #1726](https://bitbucket.org/osrf/gazebo/issue/1726)
 
 ### Gazebo 6.5.0 (2015-10-22)
 
@@ -621,6 +661,11 @@ compilation on Windows.
 ## Gazebo 5.0
 
 ### Gazebo 5.x.x
+
+1. Fix minimum window height
+    * Backport of [pull request #1977](https://bitbucket.org/osrf/gazebo/pull-request/1977)
+    * [Pull request #2002](https://bitbucket.org/osrf/gazebo/pull-request/2002)
+    * [Issue #1706](https://bitbucket.org/osrf/gazebo/issue/1706)
 
 ### Gazebo 5.2.0 (2015-10-02)
 
