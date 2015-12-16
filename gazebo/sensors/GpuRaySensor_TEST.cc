@@ -14,8 +14,6 @@
  * limitations under the License.
  *
 */
-
-#include <boost/bind.hpp>
 #include <gtest/gtest.h>
 #include <ignition/math/Angle.hh>
 #include "gazebo/test/ServerFixture.hh"
@@ -47,7 +45,7 @@ TEST_F(GPURaySensor_TEST, CreateLaser)
 
   // Get a pointer to the Ray sensor
   sensors::GpuRaySensorPtr sensor =
-     boost::dynamic_pointer_cast<sensors::GpuRaySensor>
+     std::dynamic_pointer_cast<sensors::GpuRaySensor>
      (mgr->GetSensor(sensorName));
 
   // Make sure the above dynamic cast worked.

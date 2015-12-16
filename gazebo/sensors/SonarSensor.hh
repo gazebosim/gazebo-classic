@@ -18,10 +18,7 @@
 #define _GAZEBO_SENSORS_SONARSENSOR_HH_
 
 #include <string>
-#include <list>
-#include <ignition/math/Pose3.hh>
 
-#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/util/system.hh"
 
@@ -132,7 +129,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Internal data pointer
-      private: std::shared_ptr<SonarSensorPrivate> dataPtr;
+      private: std::unique_ptr<SonarSensorPrivate> dataPtr;
     };
     /// \}
   }

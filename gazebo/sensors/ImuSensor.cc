@@ -19,8 +19,7 @@
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
-
-#include <boost/algorithm/string.hpp>
+#include <regex>
 #include <ignition/math/Rand.hh>
 
 #include "gazebo/transport/Node.hh"
@@ -42,8 +41,8 @@ GZ_REGISTER_STATIC_SENSOR("imu", ImuSensor)
 
 //////////////////////////////////////////////////
 ImuSensor::ImuSensor()
-: Sensor(*new ImuSensorPrivate, sensors::OTHER),
-  dataPtr(std::static_pointer_cast<ImuSensorPrivate>(this->sensorDPtr))
+: Sensor(sensors::OTHER),
+  dataPtr(new ImuSensorPrivate)
 {
   this->dataPtr->dataIndex = 0;
   this->dataPtr->dataDirty = false;
@@ -62,27 +61,28 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
   Sensor::Load(_worldName, _sdf);
 
   // CASE 1 : Topic is specified in the sensor itself (should be deprecated!)
-  if (this->dataPtr->sdf->HasElement("imu") &&
-      this->dataPtr->sdf->GetElement("imu")->HasElement("topic") &&
-      this->dataPtr->sdf->GetElement("imu")->Get<std::string>("topic")
+  if (this->sdf->HasElement("imu") &&
+      this->sdf->GetElement("imu")->HasElement("topic") &&
+      this->sdf->GetElement("imu")->Get<std::string>("topic")
       != "__default_topic__")
   {
-    this->dataPtr->pub = this->dataPtr->node->Advertise<msgs::IMU>(
-        this->dataPtr->sdf->GetElement("imu")->Get<std::string>("topic"), 500);
+    this->dataPtr->pub = this->node->Advertise<msgs::IMU>(
+        this->sdf->GetElement("imu")->Get<std::string>("topic"), 500);
   }
   // CASE 2 : Topic is specified in parent sensor definition
   else
   {
     std::string topicName = "~/";
     topicName += this->ParentName() + "/" + this->Name() + "/imu";
-    boost::replace_all(topicName, "::", "/");
+    topicName = std::regex_replace(topicName, std::regex("::"),
+        std::string("/"));
 
     this->dataPtr->pub =
-      this->dataPtr->node->Advertise<msgs::IMU>(topicName, 500);
+      this->node->Advertise<msgs::IMU>(topicName, 500);
   }
 
   // Get the imu element pointer
-  sdf::ElementPtr imuElem = this->dataPtr->sdf->GetElement("imu");
+  sdf::ElementPtr imuElem = this->sdf->GetElement("imu");
 
   // If an angular velocity noise models have been specified, create them
   if (imuElem->HasElement("angular_velocity"))
@@ -97,36 +97,36 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
     if (angularElem->HasElement("x") &&
         angularElem->GetElement("x")->HasElement("noise"))
     {
-      this->dataPtr->noises[IMU_ANGVEL_X_NOISE_RADIANS_PER_S] =
+      this->noises[IMU_ANGVEL_X_NOISE_RADIANS_PER_S] =
         NoiseFactory::NewNoiseModel(
             angularElem->GetElement("x")->GetElement("noise"));
 
       out << "  X: ";
-      this->dataPtr->noises[IMU_ANGVEL_X_NOISE_RADIANS_PER_S]->Print(out);
+      this->noises[IMU_ANGVEL_X_NOISE_RADIANS_PER_S]->Print(out);
       out << std::endl;
     }
 
     if (angularElem->HasElement("y") &&
         angularElem->GetElement("y")->HasElement("noise"))
     {
-      this->dataPtr->noises[IMU_ANGVEL_Y_NOISE_RADIANS_PER_S] =
+      this->noises[IMU_ANGVEL_Y_NOISE_RADIANS_PER_S] =
         NoiseFactory::NewNoiseModel(
             angularElem->GetElement("y")->GetElement("noise"));
 
       out << "  Y: ";
-      this->dataPtr->noises[IMU_ANGVEL_Y_NOISE_RADIANS_PER_S]->Print(out);
+      this->noises[IMU_ANGVEL_Y_NOISE_RADIANS_PER_S]->Print(out);
       out << std::endl;
     }
 
     if (angularElem->HasElement("z") &&
         angularElem->GetElement("z")->HasElement("noise"))
     {
-      this->dataPtr->noises[IMU_ANGVEL_Z_NOISE_RADIANS_PER_S] =
+      this->noises[IMU_ANGVEL_Z_NOISE_RADIANS_PER_S] =
         NoiseFactory::NewNoiseModel(
             angularElem->GetElement("z")->GetElement("noise"));
 
       out << "  Z: ";
-      this->dataPtr->noises[IMU_ANGVEL_Z_NOISE_RADIANS_PER_S]->Print(out);
+      this->noises[IMU_ANGVEL_Z_NOISE_RADIANS_PER_S]->Print(out);
       out << std::endl;
     }
 
@@ -144,36 +144,36 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
     if (linearElem->HasElement("x") &&
         linearElem->GetElement("x")->HasElement("noise"))
     {
-      this->dataPtr->noises[IMU_LINACC_X_NOISE_METERS_PER_S_SQR] =
+      this->noises[IMU_LINACC_X_NOISE_METERS_PER_S_SQR] =
         NoiseFactory::NewNoiseModel(
             linearElem->GetElement("x")->GetElement("noise"));
 
       out << "  X: ";
-      this->dataPtr->noises[IMU_LINACC_X_NOISE_METERS_PER_S_SQR]->Print(out);
+      this->noises[IMU_LINACC_X_NOISE_METERS_PER_S_SQR]->Print(out);
       out << std::endl;
     }
 
     if (linearElem->HasElement("y") &&
         linearElem->GetElement("y")->HasElement("noise"))
     {
-      this->dataPtr->noises[IMU_LINACC_Y_NOISE_METERS_PER_S_SQR] =
+      this->noises[IMU_LINACC_Y_NOISE_METERS_PER_S_SQR] =
         NoiseFactory::NewNoiseModel(
             linearElem->GetElement("y")->GetElement("noise"));
 
       out << "  Y: ";
-      this->dataPtr->noises[IMU_LINACC_Y_NOISE_METERS_PER_S_SQR]->Print(out);
+      this->noises[IMU_LINACC_Y_NOISE_METERS_PER_S_SQR]->Print(out);
       out << std::endl;
     }
 
     if (linearElem->HasElement("z") &&
         linearElem->GetElement("z")->HasElement("noise"))
     {
-      this->dataPtr->noises[IMU_LINACC_Z_NOISE_METERS_PER_S_SQR] =
+      this->noises[IMU_LINACC_Z_NOISE_METERS_PER_S_SQR] =
         NoiseFactory::NewNoiseModel(
             linearElem->GetElement("z")->GetElement("noise"));
 
       out << "  Z: ";
-      this->dataPtr->noises[IMU_LINACC_Z_NOISE_METERS_PER_S_SQR]->Print(out);
+      this->noises[IMU_LINACC_Z_NOISE_METERS_PER_S_SQR]->Print(out);
       out << std::endl;
     }
 
@@ -184,7 +184,7 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
   this->dataPtr->parentEntity->SetPublishData(true);
 
   std::string topic = "~/" + this->dataPtr->parentEntity->GetScopedName();
-  this->dataPtr->linkDataSub = this->dataPtr->node->Subscribe(topic,
+  this->dataPtr->linkDataSub = this->node->Subscribe(topic,
     &ImuSensor::OnLinkData, this);
 }
 
@@ -194,14 +194,14 @@ void ImuSensor::Load(const std::string &_worldName)
   Sensor::Load(_worldName);
 
   this->dataPtr->parentEntity = boost::dynamic_pointer_cast<physics::Link>(
-      this->dataPtr->world->GetEntity(this->ParentName()));
+      this->world->GetEntity(this->ParentName()));
 
   if (!this->dataPtr->parentEntity)
   {
     gzthrow("IMU has invalid parent[" + this->ParentName() +
             "]. Must be a link\n");
   }
-  this->dataPtr->referencePose = this->dataPtr->pose +
+  this->dataPtr->referencePose = this->pose +
     this->dataPtr->parentEntity->GetWorldPose().Ign();
   this->dataPtr->lastLinearVel =
     this->dataPtr->referencePose.Rot().RotateVector(
@@ -274,7 +274,7 @@ ignition::math::Quaterniond ImuSensor::Orientation() const
 void ImuSensor::SetReferencePose()
 {
   this->dataPtr->referencePose =
-    this->dataPtr->pose + this->dataPtr->parentEntity->GetWorldPose().Ign();
+    this->pose + this->dataPtr->parentEntity->GetWorldPose().Ign();
 }
 
 //////////////////////////////////////////////////
@@ -300,9 +300,9 @@ bool ImuSensor::UpdateImpl(bool /*_force*/)
 
   common::Time timestamp = msgs::Convert(msg.time());
 
-  double dt = (timestamp - this->dataPtr->lastMeasurementTime).Double();
+  double dt = (timestamp - this->lastMeasurementTime).Double();
 
-  this->dataPtr->lastMeasurementTime = timestamp;
+  this->lastMeasurementTime = timestamp;
 
   if (dt > 0.0)
   {
@@ -311,13 +311,13 @@ bool ImuSensor::UpdateImpl(bool /*_force*/)
     this->dataPtr->imuMsg.set_entity_name(this->ParentName());
 
     this->dataPtr->gravity =
-      this->dataPtr->world->GetPhysicsEngine()->GetGravity().Ign();
+      this->world->GetPhysicsEngine()->GetGravity().Ign();
 
     msgs::Set(this->dataPtr->imuMsg.mutable_stamp(), timestamp);
 
     ignition::math::Pose3d parentEntityPose =
       this->dataPtr->parentEntity->GetWorldPose().Ign();
-    ignition::math::Pose3d imuPose = this->dataPtr->pose + parentEntityPose;
+    ignition::math::Pose3d imuPose = this->pose + parentEntityPose;
 
     // Get the angular velocity
     ignition::math::Vector3d imuWorldAngularVel = msgs::ConvertIgn(
@@ -351,7 +351,7 @@ bool ImuSensor::UpdateImpl(bool /*_force*/)
     this->dataPtr->lastLinearVel = imuWorldLinearVel;
 
     // Apply noise models
-    for (auto const &keyNoise : this->dataPtr->noises)
+    for (auto const &keyNoise : this->noises)
     {
       switch (keyNoise.first)
       {
@@ -391,7 +391,7 @@ bool ImuSensor::UpdateImpl(bool /*_force*/)
           keyNoise.second->Print(out);
           out << std::endl;
           gzwarn << out.str() << std::endl;
-          this->dataPtr->noises.erase(keyNoise.first);
+          this->noises.erase(keyNoise.first);
           break;
       }
     }
@@ -407,6 +407,6 @@ bool ImuSensor::UpdateImpl(bool /*_force*/)
 //////////////////////////////////////////////////
 bool ImuSensor::IsActive() const
 {
-  return this->dataPtr->active ||
+  return this->active ||
          (this->dataPtr->pub && this->dataPtr->pub->HasConnections());
 }

@@ -45,9 +45,8 @@ const double WirelessTransmitterPrivate::MaxRadius = 10.0;
 
 /////////////////////////////////////////////////
 WirelessTransmitter::WirelessTransmitter()
-: WirelessTransceiver(*new WirelessTransmitterPrivate),
-  dataPtr(
-      std::static_pointer_cast<WirelessTransmitterPrivate>(this->sensorDPtr))
+: WirelessTransceiver(),
+  dataPtr(new WirelessTransmitterPrivate)
 {
 }
 
@@ -62,9 +61,9 @@ void WirelessTransmitter::Load(const std::string &_worldName)
   WirelessTransceiver::Load(_worldName);
 
   sdf::ElementPtr transceiverElem =
-    this->dataPtr->sdf->GetElement("transceiver");
+    this->sdf->GetElement("transceiver");
 
-  this->dataPtr->visualize = this->dataPtr->sdf->Get<bool>("visualize");
+  this->dataPtr->visualize = this->sdf->Get<bool>("visualize");
   this->dataPtr->essid = transceiverElem->Get<std::string>("essid");
   this->dataPtr->freq = transceiverElem->Get<double>("frequency");
 
@@ -75,9 +74,9 @@ void WirelessTransmitter::Load(const std::string &_worldName)
     this->dataPtr->freq = 1.0;
   }
 
-  this->dataPtr->pub =
-    this->dataPtr->node->Advertise<msgs::PropagationGrid>(this->Topic(), 30);
-  GZ_ASSERT(this->dataPtr->pub != NULL,
+  this->pub =
+    this->node->Advertise<msgs::PropagationGrid>(this->Topic(), 30);
+  GZ_ASSERT(this->pub != NULL,
       "wirelessTransmitterSensor did not get a valid publisher pointer");
 }
 
@@ -89,15 +88,15 @@ void WirelessTransmitter::Init()
   // This ray will be used in SignalStrength() for checking obstacles
   // between the transmitter and a given point.
   this->dataPtr->testRay = boost::dynamic_pointer_cast<RayShape>(
-      this->dataPtr->world->GetPhysicsEngine()->CreateShape("ray",
+      this->world->GetPhysicsEngine()->CreateShape("ray",
         CollisionPtr()));
 }
 
 //////////////////////////////////////////////////
 bool WirelessTransmitter::UpdateImpl(const bool /*_force*/)
 {
-  this->dataPtr->referencePose = this->dataPtr->pose +
-    this->dataPtr->parentEntity.lock()->GetWorldPose().Ign();
+  this->referencePose = this->pose +
+    this->parentEntity.lock()->GetWorldPose().Ign();
 
   if (this->dataPtr->visualize)
   {
@@ -117,9 +116,9 @@ bool WirelessTransmitter::UpdateImpl(const bool /*_force*/)
       {
         pos.Set(x, y, 0.0, 0, 0, 0);
 
-        worldPose = pos + this->dataPtr->referencePose;
+        worldPose = pos + this->referencePose;
 
-        if (this->dataPtr->referencePose.Pos().Distance(worldPose.Pos()) <=
+        if (this->referencePose.Pos().Distance(worldPose.Pos()) <=
             this->dataPtr->MaxRadius)
         {
           // For the propagation model assume the receiver antenna has the same
@@ -134,7 +133,7 @@ bool WirelessTransmitter::UpdateImpl(const bool /*_force*/)
         }
       }
     }
-    this->dataPtr->pub->Publish(msg);
+    this->pub->Publish(msg);
   }
 
   return true;
@@ -172,7 +171,7 @@ double WirelessTransmitter::SignalStrength(
   std::string entityName;
   double dist;
   ignition::math::Vector3d end = _receiver.Pos();
-  ignition::math::Vector3d start = this->dataPtr->referencePose.Pos();
+  ignition::math::Vector3d start = this->referencePose.Pos();
 
   // Avoid computing the intersection of coincident points
   // This prevents an assertion in bullet (issue #849)
@@ -183,7 +182,7 @@ double WirelessTransmitter::SignalStrength(
 
   // Acquire the mutex for avoiding race condition with the physics engine
   boost::recursive_mutex::scoped_lock lock(*(
-        this->dataPtr->world->GetPhysicsEngine()->GetPhysicsUpdateMutex()));
+        this->world->GetPhysicsEngine()->GetPhysicsUpdateMutex()));
 
   // Compute the value of n depending on the obstacles between Tx and Rx
   double n = WirelessTransmitterPrivate::NEmpty;
@@ -199,7 +198,7 @@ double WirelessTransmitter::SignalStrength(
   }
 
   double distance = std::max(1.0,
-      this->dataPtr->referencePose.Pos().Distance(_receiver.Pos()));
+      this->referencePose.Pos().Distance(_receiver.Pos()));
   double x = std::abs(ignition::math::Rand::DblNormal(0.0,
         WirelessTransmitterPrivate::ModelStdDev));
   double wavelength = common::SpeedOfLight / (this->Freq() * 1000000);

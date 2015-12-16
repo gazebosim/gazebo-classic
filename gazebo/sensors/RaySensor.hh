@@ -14,16 +14,14 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_RAYSENSOR_HH_
-#define _GAZEBO_RAYSENSOR_HH_
+#ifndef _GAZEBO_SENSORS_RAYSENSOR_HH_
+#define _GAZEBO_SENSORS_RAYSENSOR_HH_
 
 #include <vector>
 #include <string>
 
 #include <ignition/math/Angle.hh>
-#include <ignition/math/Pose3.hh>
 
-#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/util/system.hh"
 
@@ -265,7 +263,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Private data pointer.
-      private: std::shared_ptr<RaySensorPrivate> dataPtr;
+      private: std::unique_ptr<RaySensorPrivate> dataPtr;
     };
     /// \}
   }

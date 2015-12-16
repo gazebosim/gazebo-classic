@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_MULTICAMERASENSOR_HH_
-#define _GAZEBO_MULTICAMERASENSOR_HH_
+#ifndef _GAZEBO_SENSORS_MULTICAMERASENSOR_HH_
+#define _GAZEBO_SENSORS_MULTICAMERASENSOR_HH_
 
 #include <string>
 #include <vector>
@@ -76,7 +76,8 @@ namespace gazebo
 
       /// \brief Returns a pointer to a rendering::Camera.
       /// \param[in] _index Index of the camera to get
-      /// \return The Pointer to the camera sensor.
+      /// \return The Pointer to the camera sensor, NULL if the _index
+      /// is invalid.
       /// \sa MultiCameraSensor::CameraCount
       public: rendering::CameraPtr Camera(const unsigned int _index) const;
 
@@ -144,7 +145,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Private data pointer
-      private: std::shared_ptr<MultiCameraSensorPrivate> dataPtr;
+      private: std::unique_ptr<MultiCameraSensorPrivate> dataPtr;
     };
     /// \}
   }

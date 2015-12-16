@@ -14,10 +14,9 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_CAMERASENSOR_PRIVATE_HH_
-#define _GAZEBO_CAMERASENSOR_PRIVATE_HH_
+#ifndef _GAZEBO_SENSORS_CAMERASENSOR_PRIVATE_HH_
+#define _GAZEBO_SENSORS_CAMERASENSOR_PRIVATE_HH_
 
-#include "gazebo/sensors/SensorPrivate.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
 
@@ -27,16 +26,10 @@ namespace gazebo
   {
     /// \internal
     /// \brief CameraSensor private data
-    class CameraSensorPrivate : public SensorProtected
+    class CameraSensorPrivate
     {
-      /// \brief Pointer to the camera.
-      public: rendering::CameraPtr camera;
-
-      /// \brief Publisher of image messages.
-      public: transport::PublisherPtr imagePub;
-
       /// \brief True if the sensor was rendered.
-      public: bool rendered;
+      public: bool rendered = false;
     };
   }
 }

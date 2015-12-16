@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_WIRELESS_TRANSMITTER_HH_
-#define _GAZEBO_WIRELESS_TRANSMITTER_HH_
+#ifndef _GAZEBO_SENSORS_WIRELESSTRANSMITTER_HH_
+#define _GAZEBO_SENSORS_WIRELESSTRANSMITTER_HH_
 
 #include <string>
 #include "gazebo/physics/physics.hh"
@@ -84,7 +84,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Private data pointer
-      private: std::shared_ptr<WirelessTransmitterPrivate> dataPtr;
+      private: std::unique_ptr<WirelessTransmitterPrivate> dataPtr;
     };
     /// \}
   }

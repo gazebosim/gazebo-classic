@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_GPSSENSOR_HH_
-#define _GAZEBO_GPSSENSOR_HH_
+#ifndef _GAZEBO_SENSORS_GPSSENSOR_HH_
+#define _GAZEBO_SENSORS_GPSSENSOR_HH_
 
 #include <string>
 
@@ -81,7 +81,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Private data pointer
-      private: std::shared_ptr<GpsSensorPrivate> dataPtr;
+      private: std::unique_ptr<GpsSensorPrivate> dataPtr;
     };
     /// \}
   }

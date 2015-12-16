@@ -19,9 +19,7 @@
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
-
-#include <boost/algorithm/string.hpp>
-
+#include <regex>
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/MultiRayShape.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
@@ -48,8 +46,8 @@ GZ_REGISTER_STATIC_SENSOR("ray", RaySensor)
 
 //////////////////////////////////////////////////
 RaySensor::RaySensor()
-: Sensor(*new RaySensorPrivate, sensors::RAY),
-  dataPtr(std::static_pointer_cast<RaySensorPrivate>(this->sensorDPtr))
+: Sensor(sensors::RAY),
+  dataPtr(new RaySensorPrivate)
 {
 }
 
@@ -63,7 +61,7 @@ std::string RaySensor::Topic() const
 {
   std::string topicName = "~/";
   topicName += this->ParentName() + "/" + this->Name() + "/scan";
-  boost::replace_all(topicName, "::", "/");
+  topicName = std::regex_replace(topicName, std::regex("::"), std::string("/"));
 
   return topicName;
 }
@@ -73,13 +71,13 @@ void RaySensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
   this->dataPtr->scanPub =
-    this->dataPtr->node->Advertise<msgs::LaserScanStamped>(this->Topic(), 50);
+    this->node->Advertise<msgs::LaserScanStamped>(this->Topic(), 50);
 
-  GZ_ASSERT(this->dataPtr->world != NULL,
+  GZ_ASSERT(this->world != NULL,
       "RaySensor did not get a valid World pointer");
 
   physics::PhysicsEnginePtr physicsEngine =
-    this->dataPtr->world->GetPhysicsEngine();
+    this->world->GetPhysicsEngine();
 
   GZ_ASSERT(physicsEngine != NULL,
       "Unable to get a pointer to the physics engine");
@@ -91,8 +89,8 @@ void RaySensor::Load(const std::string &_worldName)
       "Unable to create a multiray collision using the physics engine.");
 
   this->dataPtr->laserCollision->SetName("ray_sensor_collision");
-  this->dataPtr->laserCollision->SetRelativePose(this->dataPtr->pose);
-  this->dataPtr->laserCollision->SetInitialRelativePose(this->dataPtr->pose);
+  this->dataPtr->laserCollision->SetRelativePose(this->pose);
+  this->dataPtr->laserCollision->SetInitialRelativePose(this->pose);
 
   this->dataPtr->laserShape =
     boost::dynamic_pointer_cast<physics::MultiRayShape>(
@@ -101,20 +99,20 @@ void RaySensor::Load(const std::string &_worldName)
   GZ_ASSERT(this->dataPtr->laserShape != NULL,
       "Unable to get the laser shape from the multi-ray collision.");
 
-  this->dataPtr->laserShape->Load(this->dataPtr->sdf);
+  this->dataPtr->laserShape->Load(this->sdf);
   this->dataPtr->laserShape->Init();
 
   // Handle noise model settings.
-  sdf::ElementPtr rayElem = this->dataPtr->sdf->GetElement("ray");
+  sdf::ElementPtr rayElem = this->sdf->GetElement("ray");
   if (rayElem->HasElement("noise"))
   {
-    this->dataPtr->noises[RAY_NOISE] =
+    this->noises[RAY_NOISE] =
         NoiseFactory::NewNoiseModel(rayElem->GetElement("noise"),
         this->Type());
   }
 
   this->dataPtr->parentEntity =
-    this->dataPtr->world->GetEntity(this->ParentName());
+    this->world->GetEntity(this->ParentName());
 
   GZ_ASSERT(this->dataPtr->parentEntity != NULL,
       "Unable to get the parent entity.");
@@ -431,19 +429,19 @@ bool RaySensor::UpdateImpl(const bool /*_force*/)
   // need to move mutex lock after this? or make the OnNewLaserScan connection
   // call somewhere else?
   this->dataPtr->laserShape->Update();
-  this->dataPtr->lastMeasurementTime = this->dataPtr->world->GetSimTime();
+  this->lastMeasurementTime = this->world->GetSimTime();
 
   // moving this behind laserShape update
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
   msgs::Set(this->dataPtr->laserMsg.mutable_time(),
-            this->dataPtr->lastMeasurementTime);
+            this->lastMeasurementTime);
 
   msgs::LaserScan *scan = this->dataPtr->laserMsg.mutable_scan();
 
   // Store the latest laser scans into laserMsg
   msgs::Set(scan->mutable_world_pose(),
-      this->dataPtr->pose + this->dataPtr->parentEntity->GetWorldPose().Ign());
+      this->pose + this->dataPtr->parentEntity->GetWorldPose().Ign());
   scan->set_angle_min(this->AngleMin().Radian());
   scan->set_angle_max(this->AngleMax().Radian());
   scan->set_angle_step(this->AngleResolution());
@@ -567,11 +565,11 @@ bool RaySensor::UpdateImpl(const bool /*_force*/)
       {
         range = -IGN_DBL_INF;
       }
-      else if (this->dataPtr->noises.find(RAY_NOISE) !=
-               this->dataPtr->noises.end())
+      else if (this->noises.find(RAY_NOISE) !=
+               this->noises.end())
       {
         // currently supports only one noise model per laser sensor
-        range = this->dataPtr->noises[RAY_NOISE]->Apply(range);
+        range = this->noises[RAY_NOISE]->Apply(range);
         range = ignition::math::clamp(range,
             this->RangeMin(), this->RangeMax());
       }

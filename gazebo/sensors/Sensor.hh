@@ -14,12 +14,11 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_SENSOR_HH_
-#define _GAZEBO_SENSOR_HH_
+#ifndef _GAZEBO_SENSORS_SENSOR_HH_
+#define _GAZEBO_SENSORS_SENSOR_HH_
 
-#include <boost/enable_shared_from_this.hpp>
-#include <boost/thread/mutex.hpp>
 #include <vector>
+#include <memory>
 #include <map>
 #include <string>
 
@@ -40,9 +39,6 @@ namespace gazebo
 {
   namespace sensors
   {
-    // Forward declare protected data
-    class SensorProtected;
-
     // Forward declare private data
     class SensorPrivate;
 
@@ -51,7 +47,7 @@ namespace gazebo
 
     /// \class Sensor Sensor.hh sensors/sensors.hh
     /// \brief Base class for sensors
-    class GAZEBO_VISIBLE Sensor : public boost::enable_shared_from_this<Sensor>
+    class GAZEBO_VISIBLE Sensor : public std::enable_shared_from_this<Sensor>
     {
       /// \brief Constructor.
       /// \param[in] _cat Category of the sensor
@@ -269,12 +265,6 @@ namespace gazebo
       /// \deprecated See Noise(const SensorNoiseType _type) function
       public: NoisePtr Noise(const SensorNoiseType _type) const;
 
-      /// \internal
-      /// \brief Constructor used by inherited classes
-      /// \param[in] _dataPtr Pointer to private data.
-      /// \param[in] _cat Category of the sensor
-      protected: Sensor(SensorProtected &_dataPtr, SensorCategory _cat);
-
       /// \brief This gets overwritten by derived sensor types.
       ///        This function is called during Sensor::Update.
       ///        And in turn, Sensor::Update is called by
@@ -291,14 +281,49 @@ namespace gazebo
       /// \param[in] _sdf SDF parameters.
       private: void LoadPlugin(sdf::ElementPtr _sdf);
 
-      /// \brief Shared construction code. This should only be called from
-      /// a constructor.
-      /// \param[in] _cat Category of the sensor
-      private: void ConstructorHelper(SensorCategory _cat);
+      /// \brief True if sensor generation is active.
+      protected: bool active;
 
-      /// \internal
-      /// \brief Data pointer for protected data
-      protected: std::shared_ptr<SensorProtected> sensorDPtr;
+      /// \brief Pointer the the SDF element for the sensor.
+      protected: sdf::ElementPtr sdf;
+
+      /// \brief Pose of the sensor.
+      protected: ignition::math::Pose3d pose;
+
+      /// \brief All event connections.
+      protected: std::vector<event::ConnectionPtr> connections;
+
+      /// \brief Node for communication.
+      protected: transport::NodePtr node;
+
+      /// \brief Name of the parent.
+      protected: std::string parentName;
+
+      /// \brief The sensor's parent ID.
+      protected: uint32_t parentId;
+
+      /// \brief All the plugins for the sensor.
+      protected: std::vector<SensorPluginPtr> plugins;
+
+      /// \brief Pointer to the world.
+      protected: gazebo::physics::WorldPtr world;
+
+      /// \brief Pointer to the Scene
+      protected: gazebo::rendering::ScenePtr scene;
+
+      /// \brief Desired time between updates, set indirectly by
+      ///        Sensor::SetUpdateRate.
+      protected: common::Time updatePeriod;
+
+      /// \brief Time of the last update.
+      protected: common::Time lastUpdateTime;
+
+      /// \brief Stores last time that a sensor measurement was generated;
+      ///        this value must be updated within each sensor's UpdateImpl
+      protected: common::Time lastMeasurementTime;
+
+      /// \brief Noise added to sensor data
+      protected: std::map<SensorNoiseType, NoisePtr> noises;
 
       /// \internal
       /// \brief Data pointer for private data

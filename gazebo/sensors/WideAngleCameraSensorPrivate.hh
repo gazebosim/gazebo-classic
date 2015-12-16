@@ -14,13 +14,13 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_WIDEANGLE_CAMERA_SENSOR_PRIVATE_HH_
-#define _GAZEBO_WIDEANGLE_CAMERA_SENSOR_PRIVATE_HH_
+#ifndef _GAZEBO_SENSORS_WIDEANGLECAMERASENSOR_PRIVATE_HH_
+#define _GAZEBO_SENSORS_WIDEANGLECAMERASENSOR_PRIVATE_HH_
 
 #include <mutex>
 #include <queue>
 
-#include "gazebo/sensors/CameraSensorPrivate.hh"
+#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/msgs/MessageTypes.hh"
 
 namespace gazebo
@@ -29,7 +29,7 @@ namespace gazebo
   {
     /// \internal
     /// \brief Wide angle camera sensor private data.
-    class WideAngleCameraSensorPrivate : public CameraSensorPrivate
+    class WideAngleCameraSensorPrivate
     {
       /// \brief Publisher of lens info messages
       public: transport::PublisherPtr lensPub;

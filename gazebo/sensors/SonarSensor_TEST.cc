@@ -82,8 +82,7 @@ void SonarSensor_TEST::CreateSonar(const std::string &_physicsEngine,
 
   // Get a pointer to the sonar sensor
   sensors::SonarSensorPtr sensor =
-    boost::dynamic_pointer_cast<sensors::SonarSensor>(
-        mgr->GetSensor(sensorName));
+    std::dynamic_pointer_cast<sensors::SonarSensor>(mgr->GetSensor(sensorName));
 
   // Make sure the above dynamic cast worked.
   ASSERT_TRUE(sensor != NULL);
@@ -120,8 +119,7 @@ void SonarSensor_TEST::DemoWorld(const std::string &_physicsEngine,
 
   // Get a pointer to the sonar sensor
   sensors::SonarSensorPtr sensor =
-    boost::dynamic_pointer_cast<sensors::SonarSensor>(
-        mgr->GetSensor(sensorName));
+    std::dynamic_pointer_cast<sensors::SonarSensor>(mgr->GetSensor(sensorName));
 
   // Make sure the above dynamic cast worked.
   ASSERT_TRUE(sensor != NULL);

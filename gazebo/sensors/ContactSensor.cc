@@ -19,10 +19,7 @@
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
-
-#include <boost/algorithm/string.hpp>
-#include <sstream>
-
+#include <regex>
 #include "gazebo/common/Exception.hh"
 
 #include "gazebo/transport/Node.hh"
@@ -45,8 +42,8 @@ GZ_REGISTER_STATIC_SENSOR("contact", ContactSensor)
 
 //////////////////////////////////////////////////
 ContactSensor::ContactSensor()
-: Sensor(*new ContactSensorPrivate, sensors::OTHER),
-  dataPtr(std::static_pointer_cast<ContactSensorPrivate>(this->sensorDPtr))
+: Sensor(sensors::OTHER),
+  dataPtr(new ContactSensorPrivate)
 {
 }
 
@@ -62,14 +59,14 @@ void ContactSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
   Sensor::Load(_worldName, _sdf);
 
   // Create a publisher for the contact information.
-  if (this->dataPtr->sdf->HasElement("contact") &&
-      this->dataPtr->sdf->GetElement("contact")->HasElement("topic") &&
-      this->dataPtr->sdf->GetElement("contact")->Get<std::string>("topic")
+  if (this->sdf->HasElement("contact") &&
+      this->sdf->GetElement("contact")->HasElement("topic") &&
+      this->sdf->GetElement("contact")->Get<std::string>("topic")
       != "__default_topic__")
   {
     // This will create a topic based on the name specified in SDF.
-    this->dataPtr->contactsPub = this->dataPtr->node->Advertise<msgs::Contacts>(
-      this->dataPtr->sdf->GetElement("contact")->Get<std::string>("topic"),
+    this->dataPtr->contactsPub = this->node->Advertise<msgs::Contacts>(
+      this->sdf->GetElement("contact")->Get<std::string>("topic"),
       100);
   }
   else
@@ -78,10 +75,11 @@ void ContactSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
     // name of the sensor.
     std::string topicName = "~/";
     topicName += this->ParentName() + "/" + this->Name();
-    boost::replace_all(topicName, "::", "/");
+    topicName = std::regex_replace(topicName, std::regex("::"),
+        std::string("/"));
 
     this->dataPtr->contactsPub =
-      this->dataPtr->node->Advertise<msgs::Contacts>(topicName, 100);
+      this->node->Advertise<msgs::Contacts>(topicName, 100);
   }
 }
 
@@ -94,10 +92,10 @@ void ContactSensor::Load(const std::string &_worldName)
   std::string collisionScopedName;
 
   sdf::ElementPtr collisionElem =
-    this->dataPtr->sdf->GetElement("contact")->GetElement("collision");
+    this->sdf->GetElement("contact")->GetElement("collision");
 
   std::string entityName =
-      this->dataPtr->world->GetEntity(this->ParentName())->GetScopedName();
+      this->world->GetEntity(this->ParentName())->GetScopedName();
   std::string filterName = entityName + "::" + this->Name();
 
   // Get all the collision elements
@@ -118,12 +116,12 @@ void ContactSensor::Load(const std::string &_worldName)
     // request the contact manager to publish messages to a custom topic for
     // this sensor
     physics::ContactManager *mgr =
-        this->dataPtr->world->GetPhysicsEngine()->GetContactManager();
+        this->world->GetPhysicsEngine()->GetContactManager();
     std::string topic = mgr->CreateFilter(filterName,
         this->dataPtr->collisions);
     if (!this->dataPtr->contactSub)
     {
-      this->dataPtr->contactSub = this->dataPtr->node->Subscribe(topic,
+      this->dataPtr->contactSub = this->node->Subscribe(topic,
           &ContactSensor::OnContacts, this);
     }
   }
@@ -196,14 +194,14 @@ bool ContactSensor::UpdateImpl(bool /*_force*/)
   // Clear the incoming contact list.
   this->dataPtr->incomingContacts.clear();
 
-  this->dataPtr->lastMeasurementTime = this->dataPtr->world->GetSimTime();
+  this->lastMeasurementTime = this->world->GetSimTime();
 
   // Generate a outgoing message only if someone is listening.
   if (this->dataPtr->contactsPub &&
       this->dataPtr->contactsPub->HasConnections())
   {
     msgs::Set(this->dataPtr->contactsMsg.mutable_time(),
-              this->dataPtr->lastMeasurementTime);
+              this->lastMeasurementTime);
     this->dataPtr->contactsPub->Publish(this->dataPtr->contactsMsg);
   }
 
@@ -213,14 +211,14 @@ bool ContactSensor::UpdateImpl(bool /*_force*/)
 //////////////////////////////////////////////////
 void ContactSensor::Fini()
 {
-  if (this->dataPtr->world && this->dataPtr->world->GetRunning())
+  if (this->world && this->world->GetRunning())
   {
     std::string entityName =
-        this->dataPtr->world->GetEntity(this->ParentName())->GetScopedName();
+        this->world->GetEntity(this->ParentName())->GetScopedName();
     std::string filterName = entityName + "::" + this->Name();
 
     physics::ContactManager *mgr =
-        this->dataPtr->world->GetPhysicsEngine()->GetContactManager();
+        this->world->GetPhysicsEngine()->GetContactManager();
     mgr->RemoveFilter(filterName);
   }
 
@@ -338,7 +336,7 @@ void ContactSensor::OnContacts(ConstContactsPtr &_msg)
 //////////////////////////////////////////////////
 bool ContactSensor::IsActive() const
 {
-  return this->dataPtr->active ||
+  return this->active ||
     (this->dataPtr->contactsPub &&
      this->dataPtr->contactsPub->HasConnections());
 }

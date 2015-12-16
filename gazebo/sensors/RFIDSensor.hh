@@ -14,15 +14,10 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_RFIDSENSOR_HH_
-#define _GAZEBO_RFIDSENSOR_HH_
+#ifndef _GAZEBO_SENSORS_RFIDSENSOR_HH_
+#define _GAZEBO_SENSORS_RFIDSENSOR_HH_
 
-#include <vector>
 #include <string>
-
-#include "gazebo/physics/PhysicsTypes.hh"
-
-#include "gazebo/transport/TransportTypes.hh"
 
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/util/system.hh"
@@ -81,7 +76,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Private data pointer
-      private: std::shared_ptr<RFIDSensorPrivate> dataPtr;
+      private: std::unique_ptr<RFIDSensorPrivate> dataPtr;
     };
     /// \}
   }

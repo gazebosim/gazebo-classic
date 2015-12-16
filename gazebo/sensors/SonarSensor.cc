@@ -19,9 +19,7 @@
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
-
-#include <boost/algorithm/string.hpp>
-
+#include <regex>
 #include <ignition/math/Vector3.hh>
 
 #include "gazebo/physics/World.hh"
@@ -33,9 +31,8 @@
 
 #include "gazebo/common/Assert.hh"
 
-#include "gazebo/transport/Node.hh"
-#include "gazebo/transport/Publisher.hh"
 #include "gazebo/msgs/msgs.hh"
+#include "gazebo/transport/transport.hh"
 
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/SonarSensorPrivate.hh"
@@ -48,8 +45,8 @@ GZ_REGISTER_STATIC_SENSOR("sonar", SonarSensor)
 
 //////////////////////////////////////////////////
 SonarSensor::SonarSensor()
-: Sensor(*new SonarSensorPrivate, sensors::OTHER),
-  dataPtr(std::static_pointer_cast<SonarSensorPrivate>(this->sensorDPtr))
+: Sensor(sensors::OTHER),
+  dataPtr(new SonarSensorPrivate)
 {
   this->dataPtr->emptyContactCount = 0;
 }
@@ -69,7 +66,7 @@ std::string SonarSensor::Topic() const
 {
   std::string topicName = "~/";
   topicName += this->ParentName() + "/" + this->Name() + "/sonar";
-  boost::replace_all(topicName, "::", "/");
+  topicName = std::regex_replace(topicName, std::regex("::"), std::string("/"));
 
   return topicName;
 }
@@ -77,7 +74,7 @@ std::string SonarSensor::Topic() const
 //////////////////////////////////////////////////
 void SonarSensor::Load(const std::string &_worldName)
 {
-  sdf::ElementPtr sonarElem = this->dataPtr->sdf->GetElement("sonar");
+  sdf::ElementPtr sonarElem = this->sdf->GetElement("sonar");
   if (!sonarElem)
   {
     gzerr << "Sonar sensor is missing <sonar> SDF element";
@@ -112,17 +109,17 @@ void SonarSensor::Load(const std::string &_worldName)
   }
 
   Sensor::Load(_worldName);
-  GZ_ASSERT(this->dataPtr->world != NULL,
+  GZ_ASSERT(this->world != NULL,
       "SonarSensor did not get a valid World pointer");
 
   this->dataPtr->parentEntity =
-    this->dataPtr->world->GetEntity(this->ParentName());
+    this->world->GetEntity(this->ParentName());
 
   GZ_ASSERT(this->dataPtr->parentEntity != NULL,
       "Unable to get the parent entity.");
 
   physics::PhysicsEnginePtr physicsEngine =
-    this->dataPtr->world->GetPhysicsEngine();
+    this->world->GetPhysicsEngine();
 
   GZ_ASSERT(physicsEngine != NULL,
       "Unable to get a pointer to the physics engine");
@@ -158,9 +155,9 @@ void SonarSensor::Load(const std::string &_worldName)
   // Position the collision shape properly. Without this, the shape will be
   // centered at the start of the sonar.
   ignition::math::Vector3d offset(0, 0, range * 0.5);
-  offset = this->dataPtr->pose.Rot().RotateVector(offset);
-  this->dataPtr->sonarMidPose.Set(this->dataPtr->pose.Pos() - offset,
-      this->dataPtr->pose.Rot());
+  offset = this->pose.Rot().RotateVector(offset);
+  this->dataPtr->sonarMidPose.Set(this->pose.Pos() - offset,
+      this->pose.Rot());
 
   this->dataPtr->sonarCollision->SetRelativePose(this->dataPtr->sonarMidPose);
   this->dataPtr->sonarCollision->SetInitialRelativePose(
@@ -176,21 +173,21 @@ void SonarSensor::Load(const std::string &_worldName)
   collisions.push_back(this->dataPtr->sonarCollision->GetScopedName());
 
   physics::ContactManager *contactMgr =
-    this->dataPtr->world->GetPhysicsEngine()->GetContactManager();
+    this->world->GetPhysicsEngine()->GetContactManager();
     */
 
   // Create a contact topic for the collision shape
   std::string topic =
-    this->dataPtr->world->GetPhysicsEngine()->GetContactManager()->CreateFilter(
+    this->world->GetPhysicsEngine()->GetContactManager()->CreateFilter(
         this->dataPtr->sonarCollision->GetScopedName(),
         this->dataPtr->sonarCollision->GetScopedName());
 
   // Subscribe to the contact topic
-  this->dataPtr->contactSub = this->dataPtr->node->Subscribe(topic,
+  this->dataPtr->contactSub = this->node->Subscribe(topic,
       &SonarSensor::OnContacts, this);
 
   // Advertise the sensor's topic on which we will output range data.
-  this->dataPtr->sonarPub = this->dataPtr->node->Advertise<msgs::SonarStamped>(
+  this->dataPtr->sonarPub = this->node->Advertise<msgs::SonarStamped>(
       this->Topic());
 
   // Initialize the message that will be published on this->dataPtr->sonarPub.
@@ -212,7 +209,7 @@ void SonarSensor::Init()
   Sensor::Init();
   this->dataPtr->sonarMsg.mutable_sonar()->set_frame(this->ParentName());
   msgs::Set(this->dataPtr->sonarMsg.mutable_time(),
-      this->dataPtr->world->GetSimTime());
+      this->world->GetSimTime());
   this->dataPtr->sonarMsg.mutable_sonar()->set_range(this->dataPtr->rangeMax);
 
   if (this->dataPtr->sonarPub)
@@ -222,10 +219,10 @@ void SonarSensor::Init()
 //////////////////////////////////////////////////
 void SonarSensor::Fini()
 {
-  if (this->dataPtr->world && this->dataPtr->world->GetRunning())
+  if (this->world && this->world->GetRunning())
   {
     physics::ContactManager *mgr =
-        this->dataPtr->world->GetPhysicsEngine()->GetContactManager();
+        this->world->GetPhysicsEngine()->GetContactManager();
     mgr->RemoveFilter(this->dataPtr->sonarCollision->GetScopedName());
   }
 
@@ -288,12 +285,12 @@ bool SonarSensor::UpdateImpl(const bool /*_force*/)
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
-  this->dataPtr->lastMeasurementTime = this->dataPtr->world->GetSimTime();
+  this->lastMeasurementTime = this->world->GetSimTime();
   msgs::Set(this->dataPtr->sonarMsg.mutable_time(),
-            this->dataPtr->lastMeasurementTime);
+            this->lastMeasurementTime);
 
   ignition::math::Pose3d referencePose =
-    this->dataPtr->pose + this->dataPtr->parentEntity->GetWorldPose().Ign();
+    this->pose + this->dataPtr->parentEntity->GetWorldPose().Ign();
   ignition::math::Vector3d pos;
 
   // A 5-step hysteresis window was chosen to reduce range value from

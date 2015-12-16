@@ -36,7 +36,7 @@ TEST_F(CameraSensor_TEST, CreateCamera)
 
   // Get a pointer to the camera sensor
   sensors::CameraSensorPtr sensor =
-     boost::dynamic_pointer_cast<sensors::CameraSensor>
+     std::dynamic_pointer_cast<sensors::CameraSensor>
      (mgr->GetSensor(sensorName));
 
   // Make sure the above dynamic cast worked.

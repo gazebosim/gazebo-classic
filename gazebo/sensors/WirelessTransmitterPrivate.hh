@@ -14,12 +14,11 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_WIRELESS_TRANSMITTER_PRIVATE_HH_
-#define _GAZEBO_WIRELESS_TRANSMITTER_PRIVATE_HH_
+#ifndef _GAZEBO_SENSORS_WIRELESSTRANSMITTER_PRIVATE_HH_
+#define _GAZEBO_SENSORS_WIRELESSTRANSMITTER_PRIVATE_HH_
 
 #include <string>
 #include "gazebo/physics/PhysicsTypes.hh"
-#include "gazebo/sensors/WirelessTransceiverPrivate.hh"
 
 namespace gazebo
 {
@@ -27,16 +26,8 @@ namespace gazebo
   {
     /// \internal
     /// \brief Wireless transmitter private data
-    class WirelessTransmitterPrivate : public WirelessTransceiverPrivate
+    class WirelessTransmitterPrivate
     {
-      /// \brief Constructor
-      public: WirelessTransmitterPrivate() :
-              visualize(false),
-              essid("MyESSID"),
-              freq(2442.0)
-      {
-      }
-
       /// \brief Constant used in the propagation model when there are no
       /// obstacles between transmitter and receiver
       public: static const double NEmpty;
@@ -58,13 +49,13 @@ namespace gazebo
 
       // \brief When true it will publish the propagation grid to be used
       // by the transmitter visual layer
-      public: bool visualize;
+      public: bool visualize = false;
 
       /// \brief Service Set Identifier (network name).
-      public: std::string essid;
+      public: std::string essid = "MyESSID";
 
       /// \brief Reception frequency (MHz).
-      public: double freq;
+      public: double freq = 2442.0;
 
       // \brief Ray used to test for collisions when placing entities
       public: physics::RayShapePtr testRay;

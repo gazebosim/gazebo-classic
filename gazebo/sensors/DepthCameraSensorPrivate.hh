@@ -14,10 +14,9 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_DEPTHCAMERASENSOR_PRIVATE_HH_
-#define _GAZEBO_DEPTHCAMERASENSOR_PRIVATE_HH_
+#ifndef _GAZEBO_SENSORS_DEPTHCAMERASENSOR_PRIVATE_HH_
+#define _GAZEBO_SENSORS_DEPTHCAMERASENSOR_PRIVATE_HH_
 
-#include "gazebo/sensors/SensorPrivate.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 
 namespace gazebo
@@ -26,7 +25,7 @@ namespace gazebo
   {
     /// \internal
     /// \brief Depth camera sensor private data.
-    class DepthCameraSensorPrivate : public SensorProtected
+    class DepthCameraSensorPrivate
     {
       /// \brief Pointer to the camera.
       public: rendering::DepthCameraPtr camera;

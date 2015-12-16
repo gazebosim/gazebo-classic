@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_DEPTHCAMERASENSOR_HH_
-#define _GAZEBO_DEPTHCAMERASENSOR_HH_
+#ifndef _GAZEBO_SENSORS_DEPTHCAMERASENSOR_HH_
+#define _GAZEBO_SENSORS_DEPTHCAMERASENSOR_HH_
 
 #include <string>
 
@@ -91,7 +91,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Private data pointer
-      private: std::shared_ptr<DepthCameraSensorPrivate> dataPtr;
+      private: std::unique_ptr<DepthCameraSensorPrivate> dataPtr;
     };
     /// \}
   }

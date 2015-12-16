@@ -15,8 +15,7 @@
  *
 */
 #include <mutex>
-
-#include <boost/algorithm/string.hpp>
+#include <regex>
 
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Exception.hh"
@@ -46,9 +45,8 @@ GZ_REGISTER_STATIC_SENSOR("wideanglecamera", WideAngleCameraSensor)
 
 //////////////////////////////////////////////////
 WideAngleCameraSensor::WideAngleCameraSensor()
-: CameraSensor(*new WideAngleCameraSensorPrivate),
-  dataPtr(
-      std::static_pointer_cast<WideAngleCameraSensorPrivate>(this->sensorDPtr))
+: CameraSensor(),
+  dataPtr(new WideAngleCameraSensorPrivate)
 {
 }
 
@@ -63,61 +61,61 @@ void WideAngleCameraSensor::Init()
     return;
   }
 
-  std::string worldName = this->dataPtr->world->GetName();
+  std::string worldName = this->world->GetName();
 
   if (!worldName.empty())
   {
-    this->dataPtr->scene = rendering::get_scene(worldName);
-    if (!this->dataPtr->scene)
+    this->scene = rendering::get_scene(worldName);
+    if (!this->scene)
     {
-      this->dataPtr->scene = rendering::create_scene(worldName, false, true);
+      this->scene = rendering::create_scene(worldName, false, true);
 
       // This usually means rendering is not available
-      if (!this->dataPtr->scene)
+      if (!this->scene)
       {
         gzerr << "Unable to create WideAngleCameraSensor." << std::endl;
         return;
       }
     }
 
-    this->dataPtr->camera = this->dataPtr->scene->CreateWideAngleCamera(
-        this->dataPtr->sdf->Get<std::string>("name"), false);
+    this->camera = this->scene->CreateWideAngleCamera(
+        this->sdf->Get<std::string>("name"), false);
 
-    if (!this->dataPtr->camera)
+    if (!this->camera)
     {
       gzerr << "Unable to create wide angle camera sensor[mono_camera]"
           << std::endl;
       return;
     }
-    this->dataPtr->camera->SetCaptureData(true);
+    this->camera->SetCaptureData(true);
 
-    sdf::ElementPtr cameraSdf = this->dataPtr->sdf->GetElement("camera");
-    this->dataPtr->camera->Load(cameraSdf);
+    sdf::ElementPtr cameraSdf = this->sdf->GetElement("camera");
+    this->camera->Load(cameraSdf);
 
     // Do some sanity checks
-    if (this->dataPtr->camera->GetImageWidth() == 0 ||
-        this->dataPtr->camera->GetImageHeight() == 0)
+    if (this->camera->GetImageWidth() == 0 ||
+        this->camera->GetImageHeight() == 0)
     {
       gzerr << "image has zero size" << std::endl;
       return;
     }
 
-    this->dataPtr->camera->Init();
-    this->dataPtr->camera->CreateRenderTexture(this->Name() + "_RttTex");
+    this->camera->Init();
+    this->camera->CreateRenderTexture(this->Name() + "_RttTex");
 
-    ignition::math::Pose3d cameraPose = this->dataPtr->pose;
+    ignition::math::Pose3d cameraPose = this->pose;
     if (cameraSdf->HasElement("pose"))
       cameraPose = cameraSdf->Get<ignition::math::Pose3d>("pose") + cameraPose;
 
-    this->dataPtr->camera->SetWorldPose(cameraPose);
-    this->dataPtr->camera->AttachToVisual(this->ParentId(), true);
+    this->camera->SetWorldPose(cameraPose);
+    this->camera->AttachToVisual(this->ParentId(), true);
 
     if (cameraSdf->HasElement("noise"))
     {
-      this->dataPtr->noises[CAMERA_NOISE] =
+      this->noises[CAMERA_NOISE] =
         NoiseFactory::NewNoiseModel(cameraSdf->GetElement("noise"),
         this->Type());
-      this->dataPtr->noises[CAMERA_NOISE]->SetCamera(this->dataPtr->camera);
+      this->noises[CAMERA_NOISE]->SetCamera(this->camera);
     }
   }
   else
@@ -125,7 +123,7 @@ void WideAngleCameraSensor::Init()
 
   // Disable clouds and moon on server side until fixed and also to improve
   // performance
-  this->dataPtr->scene->SetSkyXMode(rendering::Scene::GZ_SKYX_ALL &
+  this->scene->SetSkyXMode(rendering::Scene::GZ_SKYX_ALL &
       ~rendering::Scene::GZ_SKYX_CLOUDS &
       ~rendering::Scene::GZ_SKYX_MOON);
 
@@ -136,22 +134,23 @@ void WideAngleCameraSensor::Init()
 void WideAngleCameraSensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
-  this->dataPtr->imagePub = this->dataPtr->node->Advertise<msgs::ImageStamped>(
+  this->imagePub = this->node->Advertise<msgs::ImageStamped>(
       this->Topic(), 50);
 
   std::string lensTopicName = "~/";
   lensTopicName += this->ParentName() + "/" + this->Name() + "/lens/";
-  boost::replace_all(lensTopicName, "::", "/");
+  lensTopicName = std::regex_replace(lensTopicName, std::regex("::"),
+      std::string("/"));
 
   sdf::ElementPtr lensSdf =
-    this->dataPtr->sdf->GetElement("camera")->GetElement("lens");
+    this->sdf->GetElement("camera")->GetElement("lens");
 
   // create a topic that publishes lens states
-  this->dataPtr->lensPub = this->dataPtr->node->Advertise<msgs::CameraLens>(
+  this->dataPtr->lensPub = this->node->Advertise<msgs::CameraLens>(
     lensTopicName+"info", 1);
 
   this->dataPtr->lensSub =
-    this->dataPtr->node->Subscribe(lensTopicName + "control",
+    this->node->Subscribe(lensTopicName + "control",
         &WideAngleCameraSensor::OnCtrlMessage, this);
 }
 
@@ -177,7 +176,7 @@ bool WideAngleCameraSensor::UpdateImpl(bool _force)
     for (; !this->dataPtr->hfovCmdQueue.empty();
         this->dataPtr->hfovCmdQueue.pop())
     {
-      this->dataPtr->camera->SetHFOV(ignition::math::Angle(
+      this->camera->SetHFOV(ignition::math::Angle(
             this->dataPtr->hfovCmdQueue.front()));
     }
 
@@ -185,7 +184,7 @@ bool WideAngleCameraSensor::UpdateImpl(bool _force)
 
     rendering::WideAngleCameraPtr wcamera =
       boost::dynamic_pointer_cast<rendering::WideAngleCamera>(
-          this->dataPtr->camera);
+          this->camera);
 
     const rendering::CameraLens *lens = wcamera->Lens();
 
@@ -216,7 +215,7 @@ void WideAngleCameraSensor::OnCtrlMessage(ConstCameraLensPtr &_msg)
 
   rendering::WideAngleCameraPtr wcamera =
       boost::dynamic_pointer_cast<rendering::WideAngleCamera>(
-          this->dataPtr->camera);
+          this->camera);
 
   rendering::CameraLens *lens = (wcamera->Lens());
 

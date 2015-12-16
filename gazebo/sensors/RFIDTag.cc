@@ -22,6 +22,9 @@
 
 #include "gazebo/common/Exception.hh"
 
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/Entity.hh"
+
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/msgs/msgs.hh"
@@ -39,10 +42,10 @@ GZ_REGISTER_STATIC_SENSOR("rfidtag", RFIDTag)
 
 /////////////////////////////////////////////////
 RFIDTag::RFIDTag()
-: Sensor(*new RFIDTagPrivate, sensors::OTHER),
-  dataPtr(std::static_pointer_cast<RFIDTagPrivate>(this->sensorDPtr))
+: Sensor(sensors::OTHER),
+  dataPtr(new RFIDTagPrivate)
 {
-  this->dataPtr->active = false;
+  this->active = false;
 }
 
 /////////////////////////////////////////////////
@@ -61,13 +64,13 @@ void RFIDTag::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
 
-  if (this->dataPtr->sdf->GetElement("topic"))
+  if (this->sdf->GetElement("topic"))
   {
-    this->dataPtr->scanPub = this->dataPtr->node->Advertise<msgs::Pose>(
-        this->dataPtr->sdf->GetElement("topic")->Get<std::string>());
+    this->dataPtr->scanPub = this->node->Advertise<msgs::Pose>(
+        this->sdf->GetElement("topic")->Get<std::string>());
   }
 
-  this->dataPtr->entity = this->dataPtr->world->GetEntity(this->ParentName());
+  this->dataPtr->entity = this->world->GetEntity(this->ParentName());
 
   // Add the tag to all the RFID sensors.
   Sensor_V sensors = SensorManager::Instance()->GetSensors();
@@ -75,7 +78,7 @@ void RFIDTag::Load(const std::string &_worldName)
   {
     if ((*iter)->Type() == "rfid")
     {
-      boost::dynamic_pointer_cast<RFIDSensor>(*iter)->AddTag(this);
+      std::dynamic_pointer_cast<RFIDSensor>(*iter)->AddTag(this);
     }
   }
 }

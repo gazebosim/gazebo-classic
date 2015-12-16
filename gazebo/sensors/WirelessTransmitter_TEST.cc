@@ -29,9 +29,9 @@ class WirelessTransmitter_TEST : public ServerFixture
     public: void TestInvalidFreq();
     private: void TxMsg(const ConstPropagationGridPtr &_msg);
 
-    private: boost::mutex mutex;
+    private: std::mutex mutex;
     private: bool receivedMsg;
-    private: boost::shared_ptr<msgs::PropagationGrid const> gridMsg;
+    private: std::shared_ptr<msgs::PropagationGrid const> gridMsg;
     private: sensors::WirelessTransmitterPtr tx;
     private: sensors::WirelessTransmitterPtr txNoVisual;
 };
@@ -71,7 +71,7 @@ WirelessTransmitter_TEST::WirelessTransmitter_TEST()
   SpawnWirelessTransmitterSensor(txModelName, txSensorName, txPose.Pos(),
       txPose.Rot().Euler(), txEssid, freq, power, gain);
 
-  this->tx = boost::static_pointer_cast<sensors::WirelessTransmitter>(
+  this->tx = std::static_pointer_cast<sensors::WirelessTransmitter>(
       sensors::SensorManager::Instance()->GetSensor(txSensorName));
 
   this->receivedMsg = false;
@@ -100,7 +100,7 @@ void WirelessTransmitter_TEST::TestCreateWirelessTransmitter()
 
   // Get a pointer to the wireless receiver sensor
   sensors::WirelessTransmitterPtr sensor =
-    boost::dynamic_pointer_cast<sensors::WirelessTransmitter>(
+    std::dynamic_pointer_cast<sensors::WirelessTransmitter>(
         mgr->GetSensor(sensorName));
 
   // Make sure the above dynamic cast worked.
@@ -124,10 +124,10 @@ void WirelessTransmitter_TEST::TestInvalidFreq()
   sdf::initFile("sensor.sdf", sdf);
 
   // Replace the essid by an empty value
-  boost::regex re("<frequency>.*<\\/frequency>");
   std::string transmitterSensorStringCopy =
-      boost::regex_replace(transmitterSensorString, re,
-        "<frequency>-1.0</frequency>");
+      std::regex_replace(transmitterSensorString,
+          "<frequency>.*<\\/frequency>",
+          "<frequency>-1.0</frequency>");
 
   sdf::readString(transmitterSensorStringCopy, sdf);
 
@@ -164,7 +164,7 @@ void WirelessTransmitter_TEST::TestSignalStrength()
 /// \brief Callback executed for every propagation grid message received
 void WirelessTransmitter_TEST::TxMsg(const ConstPropagationGridPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(this->mutex);
+  std::lock_guard<std::mutex> lock(this->mutex);
   // Just copy the message
   this->gridMsg = _msg;
   this->receivedMsg = true;
@@ -190,7 +190,7 @@ void WirelessTransmitter_TEST::TestUpdateImpl()
     common::Time::MSleep(100);
   }
 
-  boost::mutex::scoped_lock lock(this->mutex);
+  std::lock_guard<std::mutex> lock(this->mutex);
   EXPECT_TRUE(this->receivedMsg);
 }
 
@@ -214,7 +214,7 @@ void WirelessTransmitter_TEST::TestUpdateImplNoVisual()
       txNoVisualSensorName, txPose.Pos(), txPose.Rot().Euler(),
       txEssid + "NoVisual", freq, power, gain, false);
 
-  txNoVisual = boost::static_pointer_cast<sensors::WirelessTransmitter>(
+  txNoVisual = std::static_pointer_cast<sensors::WirelessTransmitter>(
       sensors::SensorManager::Instance()->GetSensor(txNoVisualSensorName));
 
   // Initialize gazebo transport layer
@@ -233,7 +233,7 @@ void WirelessTransmitter_TEST::TestUpdateImplNoVisual()
     common::Time::MSleep(100);
   }
 
-  boost::mutex::scoped_lock lock(this->mutex);
+  std::lock_guard<std::mutex> lock(this->mutex);
   EXPECT_FALSE(this->receivedMsg);
 }
 

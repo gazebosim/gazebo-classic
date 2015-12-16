@@ -14,10 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_WIRELESS_RECEIVER_PRIVATE_HH_
-#define _GAZEBO_WIRELESS_RECEIVER_PRIVATE_HH_
-
-#include "gazebo/sensors/WirelessTransceiverPrivate.hh"
+#ifndef _GAZEBO_SENSORS_WIRELESSRECEIVER_PRIVATE_HH_
+#define _GAZEBO_SENSORS_WIRELESSRECEIVER_PRIVATE_HH_
 
 namespace gazebo
 {
@@ -25,23 +23,16 @@ namespace gazebo
   {
     /// \internal
     /// \brief Wireless receiver private data
-    class WirelessReceiverPrivate : public WirelessTransceiverPrivate
+    class WirelessReceiverPrivate
     {
-      public: WirelessReceiverPrivate() :
-              minFreq(2412.0),
-              maxFreq(2484.0),
-              sensitivity(-90.0)
-      {
-      }
-
       /// \brief Reception low filter frequency (MHz).
-      public: double minFreq;
+      public: double minFreq = 2412.0;
 
       /// \brief Reception high filter frequency (MHz).
-      public: double maxFreq;
+      public: double maxFreq = 2484.0;
 
       /// \brief Antenna's sensitivity of the receiver (dBm).
-      public: double sensitivity;
+      public: double sensitivity = -90.0;
     };
   }
 }

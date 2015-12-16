@@ -14,15 +14,14 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_RAY_SENSOR_PRIVATE_HH_
-#define _GAZEBO_RAY_SENSOR_PRIVATE_HH_
+#ifndef _GAZEBO_SENSORS_RAYSENSOR_PRIVATE_HH_
+#define _GAZEBO_SENSORS_RAYSENSOR_PRIVATE_HH_
 
 #include <mutex>
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
-#include "gazebo/sensors/SensorPrivate.hh"
 
 namespace gazebo
 {
@@ -30,7 +29,7 @@ namespace gazebo
   {
     /// \internal
     /// \brief Ray sensor private data.
-    class RaySensorPrivate : public SensorProtected
+    class RaySensorPrivate
     {
       /// \brief Laser collision pointer.
       public: physics::CollisionPtr laserCollision;

@@ -19,8 +19,6 @@
 
 #include <vector>
 #include <string>
-#include <boost/function.hpp>
-#include <boost/thread/mutex.hpp>
 
 #include <ignition/math/Angle.hh>
 #include <ignition/math/Pose3.hh>
@@ -412,7 +410,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Private data pointer.
-      private: std::shared_ptr<GpuRaySensorPrivate> dataPtr;
+      private: std::unique_ptr<GpuRaySensorPrivate> dataPtr;
     };
     /// \}
   }

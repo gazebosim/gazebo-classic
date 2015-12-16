@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_CONTACTSENSOR_HH_
-#define _GAZEBO_CONTACTSENSOR_HH_
+#ifndef _GAZEBO_SENSORS_CONTACTSENSOR_HH_
+#define _GAZEBO_SENSORS_CONTACTSENSOR_HH_
 
 #include <map>
 #include <string>
@@ -187,7 +187,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Private data pointer
-      private: std::shared_ptr<ContactSensorPrivate> dataPtr;
+      private: std::unique_ptr<ContactSensorPrivate> dataPtr;
     };
     /// \}
   }

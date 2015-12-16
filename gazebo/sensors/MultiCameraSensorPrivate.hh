@@ -14,15 +14,14 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_MULTICAMERA_SENSOR_PRIVATE_HH_
-#define _GAZEBO_MULTICAMERA_SENSOR_PRIVATE_HH_
+#ifndef _GAZEBO_SENSORS_MULTICAMERA_SENSOR_PRIVATE_HH_
+#define _GAZEBO_SENSORS_MULTICAMERA_SENSOR_PRIVATE_HH_
 
 #include <vector>
 #include <mutex>
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportTypes.hh"
-#include "gazebo/sensors/SensorPrivate.hh"
 
 namespace gazebo
 {
@@ -30,7 +29,7 @@ namespace gazebo
   {
     /// \internal
     /// \brief Multicamera sensor private data.
-    class MultiCameraSensorPrivate : public SensorProtected
+    class MultiCameraSensorPrivate
     {
       /// \brief All the cameras.
       public: std::vector<rendering::CameraPtr> cameras;

@@ -14,16 +14,14 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_MAGNETOMETER_SENSOR_PRIVATE_HH_
-#define _GAZEBO_MAGNETOMETER_SENSOR_PRIVATE_HH_
+#ifndef _GAZEBO_SENSORS_MAGNETOMETER_SENSOR_PRIVATE_HH_
+#define _GAZEBO_SENSORS_MAGNETOMETER_SENSOR_PRIVATE_HH_
 
 #include <mutex>
 
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/sensors/SensorPrivate.hh"
 
 namespace gazebo
 {
@@ -31,7 +29,7 @@ namespace gazebo
   {
     /// \internal
     /// \brief MagnetometerSensor private data.
-    class MagnetometerSensorPrivate : public SensorProtected
+    class MagnetometerSensorPrivate
     {
       /// \brief Mutex to protect reads and writes.
       public: mutable std::mutex mutex;

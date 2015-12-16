@@ -14,15 +14,14 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_FORCETORQUESENSOR_PRIVATE_HH_
-#define _GAZEBO_FORCETORQUESENSOR_PRIVATE_HH_
+#ifndef _GAZEBO_SENSORS_FORCETORQUESENSOR_PRIVATE_HH_
+#define _GAZEBO_SENSORS_FORCETORQUESENSOR_PRIVATE_HH_
 
 #include <mutex>
 #include <ignition/math/Matrix3.hh>
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
-#include "gazebo/sensors/SensorPrivate.hh"
 
 namespace gazebo
 {
@@ -30,7 +29,7 @@ namespace gazebo
   {
     /// \internal
     /// \brief Force torque sensor private data.
-    class ForceTorqueSensorPrivate : public SensorProtected
+    class ForceTorqueSensorPrivate
     {
       /// \brief Update event.
       public: event::EventT<void(msgs::WrenchStamped)> update;

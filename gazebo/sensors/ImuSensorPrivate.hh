@@ -14,10 +14,14 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_IMUSENSOR_PRIVATE_HH_
-#define _GAZEBO_IMUSENSOR_PRIVATE_HH_
+#ifndef _GAZEBO_SENSORS_IMUSENSOR_PRIVATE_HH_
+#define _GAZEBO_SENSORS_IMUSENSOR_PRIVATE_HH_
 
-#include "gazebo/sensors/SensorPrivate.hh"
+#include <ignition/math/Vector3.hh>
+#include <ignition/math/Pose3.hh>
+
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/transport/TransportTypes.hh"
 
 namespace gazebo
 {
@@ -25,7 +29,7 @@ namespace gazebo
   {
     /// \internal
     /// \brief Imu sensor private data.
-    class ImuSensorPrivate : public SensorProtected
+    class ImuSensorPrivate
     {
       /// \brief Imu reference pose
       public: ignition::math::Pose3d referencePose;
@@ -55,7 +59,8 @@ namespace gazebo
       public: mutable std::mutex mutex;
 
       /// \brief Buffer for storing link data
-      public: boost::shared_ptr<msgs::LinkData const> incomingLinkData[2];
+      public: std::array<boost::shared_ptr<msgs::LinkData const>, 2>
+              incomingLinkData;
 
       /// \brief Index for accessing element in the link data array
       public: unsigned int dataIndex;

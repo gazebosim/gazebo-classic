@@ -96,7 +96,7 @@ namespace gazebo
 
       // \internal
       // \brief Private data pointer
-      private: std::shared_ptr<LogicalCameraSensorPrivate> dataPtr;
+      private: std::unique_ptr<LogicalCameraSensorPrivate> dataPtr;
     };
     /// \}
   }

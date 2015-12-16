@@ -14,14 +14,13 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_GPURAYENSOR_PRIVATE_HH_
-#define _GAZEBO_GPURAYENSOR_PRIVATE_HH_
+#ifndef _GAZEBO_SENSORS_GPURAYENSOR_PRIVATE_HH_
+#define _GAZEBO_SENSORS_GPURAYENSOR_PRIVATE_HH_
 
 #include <mutex>
 #include <sdf/sdf.hh>
 
 #include "gazebo/rendering/RenderTypes.hh"
-#include "gazebo/sensors/SensorPrivate.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/msgs/msgs.hh"
@@ -32,7 +31,7 @@ namespace gazebo
   {
     /// \internal
     /// \brief GPU Ray sensor private data.
-    class GpuRaySensorPrivate : public SensorProtected
+    class GpuRaySensorPrivate
     {
       /// \brief Scan SDF elementz.
       public: sdf::ElementPtr scanElem;

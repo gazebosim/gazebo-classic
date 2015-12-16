@@ -98,7 +98,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Private data pointer
-      private: std::shared_ptr<ForceTorqueSensorPrivate> dataPtr;
+      private: std::unique_ptr<ForceTorqueSensorPrivate> dataPtr;
     };
     /// \}
   }

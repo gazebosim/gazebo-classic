@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_WIDEANGLE_CAMERA_SENSOR_HH_
-#define _GAZEBO_WIDEANGLE_CAMERA_SENSOR_HH_
+#ifndef _GAZEBO_SENSORS_WIDEANGLECAMERASENSOR_HH_
+#define _GAZEBO_SENSORS_WIDEANGLECAMERASENSOR_HH_
 
 #include <memory>
 #include <string>
@@ -68,10 +67,9 @@ namespace gazebo
 
       /// \internal
       /// \brief Private data pointer.
-      private: std::shared_ptr<WideAngleCameraSensorPrivate> dataPtr;
+      private: std::unique_ptr<WideAngleCameraSensorPrivate> dataPtr;
     };
     /// \}
   }
 }
-
 #endif

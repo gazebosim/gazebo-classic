@@ -14,13 +14,12 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_ALTIMETER_SENSOR_PRIVATE_HH_
-#define _GAZEBO_ALTIMETER_SENSOR_PRIVATE_HH_
+#ifndef _GAZEBO_SENSORS_ALTIMETERSENSOR_PRIVATE_HH_
+#define _GAZEBO_SENSORS_ALTIMETERSENSOR_PRIVATE_HH_
 
 #include <mutex>
 #include <string>
 
-#include "gazebo/sensors/SensorPrivate.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/msgs/msgs.hh"
@@ -31,7 +30,7 @@ namespace gazebo
   {
     /// \internal
     /// \brief AltimeterSensor private data
-    class AltimeterSensorPrivate : public SensorProtected
+    class AltimeterSensorPrivate
     {
       /// \brief Mutex to protect reads and writes.
       public: mutable std::mutex mutex;

@@ -19,10 +19,8 @@
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
-
-#include <boost/algorithm/string.hpp>
-#include <boost/bind.hpp>
-#include <boost/function.hpp>
+#include <functional>
+#include <regex>
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Entity.hh"
 #include "gazebo/physics/Model.hh"
@@ -49,14 +47,14 @@ GZ_REGISTER_STATIC_SENSOR("gpu_ray", GpuRaySensor)
 
 //////////////////////////////////////////////////
 GpuRaySensor::GpuRaySensor()
-: Sensor(*new GpuRaySensorPrivate, sensors::IMAGE),
-  dataPtr(std::static_pointer_cast<GpuRaySensorPrivate>(this->sensorDPtr))
+: Sensor(sensors::IMAGE),
+  dataPtr(new GpuRaySensorPrivate)
 {
   this->dataPtr->rendered = false;
-  this->dataPtr->active = false;
-  this->dataPtr->connections.push_back(
+  this->active = false;
+  this->connections.push_back(
       event::Events::ConnectRender(
-        boost::bind(&GpuRaySensor::Render, this)));
+        std::bind(&GpuRaySensor::Render, this)));
 }
 
 //////////////////////////////////////////////////
@@ -69,7 +67,7 @@ std::string GpuRaySensor::Topic() const
 {
   std::string topicName = "~/";
   topicName += this->ParentName() + "/" + this->Name() + "/scan";
-  boost::replace_all(topicName, "::", "/");
+  topicName = std::regex_replace(topicName, std::regex("::"), std::string("/"));
 
   return topicName;
 }
@@ -86,9 +84,9 @@ void GpuRaySensor::Load(const std::string &_worldName)
   Sensor::Load(_worldName);
 
   this->dataPtr->scanPub =
-    this->dataPtr->node->Advertise<msgs::LaserScanStamped>(this->Topic(), 50);
+    this->node->Advertise<msgs::LaserScanStamped>(this->Topic(), 50);
 
-  sdf::ElementPtr rayElem = this->dataPtr->sdf->GetElement("ray");
+  sdf::ElementPtr rayElem = this->sdf->GetElement("ray");
   this->dataPtr->scanElem = rayElem->GetElement("scan");
   this->dataPtr->horzElem = this->dataPtr->scanElem->GetElement("horizontal");
   this->dataPtr->rangeElem = rayElem->GetElement("range");
@@ -110,13 +108,13 @@ void GpuRaySensor::Load(const std::string &_worldName)
   // Handle noise model settings.
   if (rayElem->HasElement("noise"))
   {
-    this->dataPtr->noises[GPU_RAY_NOISE] =
+    this->noises[GPU_RAY_NOISE] =
         NoiseFactory::NewNoiseModel(rayElem->GetElement("noise"),
         this->Type());
   }
 
   this->dataPtr->parentEntity =
-    this->dataPtr->world->GetEntity(this->ParentName());
+    this->world->GetEntity(this->ParentName());
 
   GZ_ASSERT(this->dataPtr->parentEntity != NULL,
       "Unable to get the parent entity.");
@@ -132,17 +130,17 @@ void GpuRaySensor::Init()
     return;
   }
 
-  std::string worldName = this->dataPtr->world->GetName();
+  std::string worldName = this->world->GetName();
 
   if (!worldName.empty())
   {
-    this->dataPtr->scene = rendering::get_scene(worldName);
+    this->scene = rendering::get_scene(worldName);
 
-    if (!this->dataPtr->scene)
-      this->dataPtr->scene = rendering::create_scene(worldName, false, true);
+    if (!this->scene)
+      this->scene = rendering::create_scene(worldName, false, true);
 
-    this->dataPtr->laserCam = this->dataPtr->scene->CreateGpuLaser(
-        this->dataPtr->sdf->Get<std::string>("name"), false);
+    this->dataPtr->laserCam = this->scene->CreateGpuLaser(
+        this->sdf->Get<std::string>("name"), false);
 
     if (!this->dataPtr->laserCam)
     {
@@ -298,7 +296,7 @@ void GpuRaySensor::Init()
         this->ScopedName() + "_RttTex_Laser");
     this->dataPtr->laserCam->CreateRenderTexture(
         this->ScopedName() + "_RttTex_Image");
-    this->dataPtr->laserCam->SetWorldPose(this->dataPtr->pose);
+    this->dataPtr->laserCam->SetWorldPose(this->pose);
     this->dataPtr->laserCam->AttachToVisual(this->ParentId(), true);
 
     this->dataPtr->laserMsg.mutable_scan()->set_frame(this->ParentName());
@@ -308,7 +306,7 @@ void GpuRaySensor::Init()
 
   // Disable clouds and moon on server side until fixed and also to improve
   // performance
-  this->dataPtr->scene->SetSkyXMode(rendering::Scene::GZ_SKYX_ALL &
+  this->scene->SetSkyXMode(rendering::Scene::GZ_SKYX_ALL &
       ~rendering::Scene::GZ_SKYX_CLOUDS &
       ~rendering::Scene::GZ_SKYX_MOON);
 
@@ -319,9 +317,9 @@ void GpuRaySensor::Init()
 void GpuRaySensor::Fini()
 {
   Sensor::Fini();
-  this->dataPtr->scene->RemoveCamera(this->dataPtr->laserCam->GetName());
+  this->scene->RemoveCamera(this->dataPtr->laserCam->GetName());
   this->dataPtr->laserCam.reset();
-  this->dataPtr->scene.reset();
+  this->scene.reset();
 }
 
 //////////////////////////////////////////////////
@@ -683,7 +681,7 @@ void GpuRaySensor::Render()
   if (!this->dataPtr->laserCam || !this->IsActive() || !this->NeedsUpdate())
     return;
 
-  this->dataPtr->lastMeasurementTime = this->dataPtr->scene->GetSimTime();
+  this->lastMeasurementTime = this->scene->GetSimTime();
 
   this->dataPtr->laserCam->Render();
   this->dataPtr->rendered = true;
@@ -700,13 +698,13 @@ bool GpuRaySensor::UpdateImpl(bool /*_force*/)
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
   msgs::Set(this->dataPtr->laserMsg.mutable_time(),
-      this->dataPtr->lastMeasurementTime);
+      this->lastMeasurementTime);
 
   msgs::LaserScan *scan = this->dataPtr->laserMsg.mutable_scan();
 
   // Store the latest laser scans into laserMsg
   msgs::Set(scan->mutable_world_pose(),
-      this->dataPtr->pose + this->dataPtr->parentEntity->GetWorldPose().Ign());
+      this->pose + this->dataPtr->parentEntity->GetWorldPose().Ign());
   scan->set_angle_min(this->AngleMin().Radian());
   scan->set_angle_max(this->AngleMax().Radian());
   scan->set_angle_step(this->AngleResolution());
@@ -739,10 +737,10 @@ bool GpuRaySensor::UpdateImpl(bool /*_force*/)
       {
         range = -GZ_DBL_INF;
       }
-      else if (this->dataPtr->noises.find(GPU_RAY_NOISE) !=
-               this->dataPtr->noises.end())
+      else if (this->noises.find(GPU_RAY_NOISE) !=
+               this->noises.end())
       {
-        range = this->dataPtr->noises[GPU_RAY_NOISE]->Apply(range);
+        range = this->noises[GPU_RAY_NOISE]->Apply(range);
         range = ignition::math::clamp(range,
             this->RangeMin(), this->RangeMax());
       }

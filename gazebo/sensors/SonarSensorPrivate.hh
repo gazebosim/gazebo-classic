@@ -14,17 +14,17 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_SONAR_SENSOR_PRIVATE_HH_
-#define _GAZEBO_SONAR_SENSOR_PRIVATE_HH_
+#ifndef _GAZEBO_SENSORS_SONARSENSOR_PRIVATE_HH_
+#define _GAZEBO_SENSORS_SONARSENSOR_PRIVATE_HH_
 
 #include <list>
+#include <memory>
 #include <mutex>
 #include <ignition/math/Pose3.hh>
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/sensors/SensorPrivate.hh"
 
 namespace gazebo
 {
@@ -32,7 +32,7 @@ namespace gazebo
   {
     /// \internal
     /// \brief Sonar sensor private data
-    class SonarSensorPrivate : public SensorProtected
+    class SonarSensorPrivate
     {
       /// \brief Contact messages list type
       typedef std::list<boost::shared_ptr<msgs::Contacts const> > ContactMsgs_L;

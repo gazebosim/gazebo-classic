@@ -39,8 +39,8 @@ GZ_REGISTER_STATIC_SENSOR("wireless_receiver", WirelessReceiver)
 
 /////////////////////////////////////////////////
 WirelessReceiver::WirelessReceiver()
-: WirelessTransceiver(*new WirelessReceiverPrivate),
-  dataPtr(std::static_pointer_cast<WirelessReceiverPrivate>(this->sensorDPtr))
+: WirelessTransceiver(),
+  dataPtr(new WirelessReceiverPrivate)
 {
 }
 
@@ -60,13 +60,13 @@ void WirelessReceiver::Load(const std::string &_worldName)
 {
   WirelessTransceiver::Load(_worldName);
 
-  this->dataPtr->pub = this->dataPtr->node->Advertise<msgs::WirelessNodes>(
+  this->pub = this->node->Advertise<msgs::WirelessNodes>(
       this->Topic(), 30);
-  GZ_ASSERT(this->dataPtr->pub != NULL,
+  GZ_ASSERT(this->pub != NULL,
       "wirelessReceiverSensor did not get a valid publisher pointer");
 
   sdf::ElementPtr transceiverElem =
-    this->dataPtr->sdf->GetElement("transceiver");
+    this->sdf->GetElement("transceiver");
 
   this->dataPtr->minFreq = transceiverElem->Get<double>("min_frequency");
   this->dataPtr->maxFreq = transceiverElem->Get<double>("max_frequency");
@@ -113,17 +113,17 @@ bool WirelessReceiver::UpdateImpl(bool /*_force*/)
   double rxPower;
   double txFreq;
 
-  this->dataPtr->referencePose = this->dataPtr->pose +
-    this->dataPtr->parentEntity.lock()->GetWorldPose().Ign();
+  this->referencePose = this->pose +
+    this->parentEntity.lock()->GetWorldPose().Ign();
 
-  ignition::math::Pose3d myPos = this->dataPtr->referencePose;
+  ignition::math::Pose3d myPos = this->referencePose;
   Sensor_V sensors = SensorManager::Instance()->GetSensors();
   for (Sensor_V::iterator it = sensors.begin(); it != sensors.end(); ++it)
   {
     if ((*it)->Type() == "wireless_transmitter")
     {
-      boost::shared_ptr<gazebo::sensors::WirelessTransmitter> transmitter =
-          boost::static_pointer_cast<WirelessTransmitter>(*it);
+      std::shared_ptr<gazebo::sensors::WirelessTransmitter> transmitter =
+          std::static_pointer_cast<WirelessTransmitter>(*it);
 
       txFreq = transmitter->Freq();
       rxPower = transmitter->SignalStrength(myPos, this->Gain());
@@ -147,7 +147,7 @@ bool WirelessReceiver::UpdateImpl(bool /*_force*/)
   }
   if (msg.node_size() > 0)
   {
-    this->dataPtr->pub->Publish(msg);
+    this->pub->Publish(msg);
   }
 
   return true;

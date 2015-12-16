@@ -19,8 +19,7 @@
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
-
-#include <boost/algorithm/string.hpp>
+#include <regex>
 #include "gazebo/transport/transport.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/World.hh"
@@ -37,9 +36,8 @@ GZ_REGISTER_STATIC_SENSOR("logical_camera", LogicalCameraSensor)
 
 //////////////////////////////////////////////////
 LogicalCameraSensor::LogicalCameraSensor()
-: Sensor(*new LogicalCameraSensorPrivate, sensors::OTHER),
-  dataPtr(
-      std::static_pointer_cast<LogicalCameraSensorPrivate>(this->sensorDPtr))
+: Sensor(sensors::OTHER),
+  dataPtr(new LogicalCameraSensorPrivate)
 {
 }
 
@@ -57,7 +55,7 @@ void LogicalCameraSensor::Load(const std::string &_worldName,
   // Get a pointer to the parent link. This will be used to adjust the
   // orientation of the logical camera.
   physics::EntityPtr parentEntity =
-    this->dataPtr->world->GetEntity(this->ParentName());
+    this->world->GetEntity(this->ParentName());
   this->dataPtr->parentLink =
     boost::dynamic_pointer_cast<physics::Link>(parentEntity);
 
@@ -70,7 +68,7 @@ std::string LogicalCameraSensor::GetTopic() const
 {
   std::string topicName = "~/" + this->ParentName() + "/" + this->Name() +
     "/models";
-  boost::replace_all(topicName, "::", "/");
+  topicName = std::regex_replace(topicName, std::regex("::"), std::string("/"));
 
   return topicName;
 }
@@ -82,17 +80,17 @@ void LogicalCameraSensor::Load(const std::string &_worldName)
 
   // Create publisher of the logical camera images
   this->dataPtr->pub =
-    this->dataPtr->node->Advertise<msgs::LogicalCameraImage>(this->Topic(), 50);
+    this->node->Advertise<msgs::LogicalCameraImage>(this->Topic(), 50);
 }
 
 //////////////////////////////////////////////////
 void LogicalCameraSensor::Init()
 {
   // Read configuration values
-  if (this->dataPtr->sdf->HasElement("logical_camera"))
+  if (this->sdf->HasElement("logical_camera"))
   {
     sdf::ElementPtr cameraSdf =
-      this->dataPtr->sdf->GetElement("logical_camera");
+      this->sdf->GetElement("logical_camera");
 
     // These values are required in SDF, so no need to check for their
     // existence.
@@ -122,7 +120,7 @@ bool LogicalCameraSensor::UpdateImpl(bool _force)
     this->dataPtr->msg.clear_model();
 
     // Get the pose of the camera's parent.
-    ignition::math::Pose3d myPose = this->dataPtr->pose +
+    ignition::math::Pose3d myPose = this->pose +
       this->dataPtr->parentLink->GetWorldPose().Ign();
 
     // Update the pose of the frustum.
@@ -132,7 +130,7 @@ bool LogicalCameraSensor::UpdateImpl(bool _force)
     msgs::Set(this->dataPtr->msg.mutable_pose(), myPose);
 
     // Check all models for inclusion in the frustum.
-    for (auto const &model : this->dataPtr->world->GetModels())
+    for (auto const &model : this->world->GetModels())
     {
       // Add the the model to the output if it is in the frustum, and
       // we are not detecting ourselves.

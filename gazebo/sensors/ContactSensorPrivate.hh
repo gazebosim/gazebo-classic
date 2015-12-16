@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_CONTACTSENSOR_PRIVATE_HH_
-#define _GAZEBO_CONTACTSENSOR_PRIVATE_HH_
+#ifndef _GAZEBO_SENSORS_CONTACTSENSOR_PRIVATE_HH_
+#define _GAZEBO_SENSORS_CONTACTSENSOR_PRIVATE_HH_
 
 #include <vector>
 #include <list>
@@ -24,7 +24,6 @@
 
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/sensors/SensorPrivate.hh"
 
 namespace gazebo
 {
@@ -32,7 +31,7 @@ namespace gazebo
   {
     /// \internal
     /// \brief Contact sensor private data.
-    class ContactSensorPrivate : public SensorProtected
+    class ContactSensorPrivate
     {
       /// \brief Collisions this sensor monitors for contacts
       public: std::vector<std::string> collisions;

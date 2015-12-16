@@ -14,12 +14,11 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_RFID_TAG_PRIVATE_HH_
-#define _GAZEBO_RFID_TAG_PRIVATE_HH_
+#ifndef _GAZEBO_SENSORS_RFIDTAG_PRIVATE_HH_
+#define _GAZEBO_SENSORS_RFIDTAG_PRIVATE_HH_
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
-#include "gazebo/sensors/SensorPrivate.hh"
 
 namespace gazebo
 {
@@ -27,7 +26,7 @@ namespace gazebo
   {
     /// \internal
     /// \brief RFID tag private data.
-    class RFIDTagPrivate : public SensorProtected
+    class RFIDTagPrivate
     {
       /// \brief Pointer the entity that has the RFID tag.
       public: physics::EntityPtr entity;

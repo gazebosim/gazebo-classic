@@ -25,8 +25,8 @@ class Sensor_TEST : public ServerFixture
 {
 };
 
-boost::condition_variable g_hokuyoCountCondition;
-boost::condition_variable g_imuCountCondition;
+std::condition_variable g_hokuyoCountCondition;
+std::condition_variable g_imuCountCondition;
 
 // global variable and callback for tracking hokuyo sensor messages
 unsigned int g_hokuyoMsgCount;
@@ -97,8 +97,8 @@ TEST_F(Sensor_TEST, UpdateAfterReset)
 
   // Wait for messages to arrive
   {
-    boost::mutex countMutex;
-    boost::mutex::scoped_lock lock(countMutex);
+    std::mutex countMutex;
+    std::unique_lock<std::mutex> lock(countMutex);
     g_hokuyoCountCondition.wait(lock);
     g_imuCountCondition.wait(lock);
   }

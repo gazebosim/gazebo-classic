@@ -19,9 +19,7 @@
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
-
-#include <boost/algorithm/string.hpp>
-
+#include <regex>
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/Joint.hh"
@@ -43,8 +41,8 @@ GZ_REGISTER_STATIC_SENSOR("force_torque", ForceTorqueSensor)
 
 //////////////////////////////////////////////////
 ForceTorqueSensor::ForceTorqueSensor()
-: Sensor(*new ForceTorqueSensorPrivate, sensors::OTHER),
-  dataPtr(std::static_pointer_cast<ForceTorqueSensorPrivate>(this->sensorDPtr))
+: Sensor(sensors::OTHER),
+  dataPtr(new ForceTorqueSensorPrivate)
 {
 }
 
@@ -58,7 +56,7 @@ std::string ForceTorqueSensor::Topic() const
 {
   std::string topicName = "~/";
   topicName += this->ParentName() + "/" + this->Name() + "/wrench";
-  boost::replace_all(topicName, "::", "/");
+  topicName = std::regex_replace(topicName, std::regex("::"), std::string("/"));
 
   return topicName;
 }
@@ -70,7 +68,7 @@ void ForceTorqueSensor::Load(const std::string &_worldName,
   Sensor::Load(_worldName, _sdf);
 
   sdf::ElementPtr forceTorqueElem =
-    this->dataPtr->sdf->GetElement("force_torque");
+    this->sdf->GetElement("force_torque");
 
   GZ_ASSERT(forceTorqueElem,
     "force_torque element should be present in a ForceTorqueSensor sdf");
@@ -112,7 +110,7 @@ void ForceTorqueSensor::Load(const std::string &_worldName,
   GZ_ASSERT(this->dataPtr->parentJoint,
             "parentJoint should be defined by single argument Load()");
   ignition::math::Quaterniond rotationChildSensor =
-    (this->dataPtr->pose +
+    (this->pose +
      this->dataPtr->parentJoint->GetInitialAnchorPose().Ign()).Rot();
 
   this->dataPtr->rotationSensorChild = rotationChildSensor.Inverse();
@@ -150,11 +148,11 @@ void ForceTorqueSensor::Load(const std::string &_worldName,
 void ForceTorqueSensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
-  GZ_ASSERT(this->dataPtr->world != NULL,
+  GZ_ASSERT(this->world != NULL,
       "ForceTorqueSensor did not get a valid World pointer");
 
   this->dataPtr->parentJoint = boost::dynamic_pointer_cast<physics::Joint>(
-      this->dataPtr->world->GetByName(this->ParentName()));
+      this->world->GetByName(this->ParentName()));
 
   if (!this->dataPtr->parentJoint)
   {
@@ -164,7 +162,7 @@ void ForceTorqueSensor::Load(const std::string &_worldName)
   }
 
   this->dataPtr->wrenchPub =
-    this->dataPtr->node->Advertise<msgs::WrenchStamped>(this->Topic());
+    this->node->Advertise<msgs::WrenchStamped>(this->Topic());
 }
 
 //////////////////////////////////////////////////
@@ -210,9 +208,9 @@ bool ForceTorqueSensor::UpdateImpl(bool /*_force*/)
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
-  this->dataPtr->lastMeasurementTime = this->dataPtr->world->GetSimTime();
+  this->lastMeasurementTime = this->world->GetSimTime();
   msgs::Set(this->dataPtr->wrenchMsg.mutable_time(),
-      this->dataPtr->lastMeasurementTime);
+      this->lastMeasurementTime);
 
   physics::JointWrench wrench = this->dataPtr->parentJoint->GetForceTorque(0u);
 
@@ -288,7 +286,7 @@ bool ForceTorqueSensor::IsActive() const
 
 //////////////////////////////////////////////////
 /*event::ConnectionPtr ForceTorqueSensor::ConnectUpdate(
-    boost::function<void (msgs::WrenchStamped)> _subscriber)
+    std::function<void (msgs::WrenchStamped)> _subscriber)
 {
   return this->dataPtr->update.Connect(_subscriber);
 }*/

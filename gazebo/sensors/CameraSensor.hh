@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_CAMERASENSOR_HH_
-#define _GAZEBO_CAMERASENSOR_HH_
+#ifndef _GAZEBO_SENSORS_CAMERASENSOR_HH_
+#define _GAZEBO_SENSORS_CAMERASENSOR_HH_
 
 #include <string>
 
@@ -107,11 +107,6 @@ namespace gazebo
       // Documentation inherited
       public: virtual bool IsActive() const;
 
-      /// \internal
-      /// \brief Constructor used by inherited classes
-      /// \param[in] _dataPtr Pointer to private data.
-      protected: CameraSensor(CameraSensorPrivate &_dataPtr);
-
       // Documentation inherited
       protected: virtual bool UpdateImpl(const bool _force);
 
@@ -121,9 +116,15 @@ namespace gazebo
       /// \brief Handle the render event.
       private: void Render();
 
+      /// \brief Pointer to the camera.
+      protected: rendering::CameraPtr camera;
+
+      /// \brief Publisher of image messages.
+      protected: transport::PublisherPtr imagePub;
+
       /// \internal
       /// \brief Private data pointer
-      private: std::shared_ptr<CameraSensorPrivate> dataPtr;
+      private: std::unique_ptr<CameraSensorPrivate> dataPtr;
     };
     /// \}
   }

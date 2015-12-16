@@ -14,16 +14,12 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_IMUSENSOR_HH_
-#define _GAZEBO_IMUSENSOR_HH_
+#ifndef _GAZEBO_SENSORS_IMUSENSOR_HH_
+#define _GAZEBO_SENSORS_IMUSENSOR_HH_
 
-#include <vector>
 #include <string>
-#include <ignition/math/Pose3.hh>
 #include <ignition/math/Quaternion.hh>
-#include <ignition/math/Vector3.hh>
 
-#include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/util/system.hh"
 
@@ -102,7 +98,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Private data pointer.
-      private: std::shared_ptr<ImuSensorPrivate> dataPtr;
+      private: std::unique_ptr<ImuSensorPrivate> dataPtr;
     };
     /// \}
   }

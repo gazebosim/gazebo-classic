@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_SENSOR_PRIVATE_HH_
-#define _GAZEBO_SENSOR_PRIVATE_HH_
+#ifndef _GAZEBO_SENSORS_SENSOR_PRIVATE_HH_
+#define _GAZEBO_SENSORS_SENSOR_PRIVATE_HH_
 
 #include <vector>
 #include <mutex>
@@ -36,55 +36,6 @@ namespace gazebo
 {
   namespace sensors
   {
-    /// \internal
-    /// \brief Sensor protected data.
-    class SensorProtected
-    {
-      /// \brief True if sensor generation is active.
-      public: bool active;
-
-      /// \brief Pointer the the SDF element for the sensor.
-      public: sdf::ElementPtr sdf;
-
-      /// \brief Pose of the sensor.
-      public: ignition::math::Pose3d pose;
-
-      /// \brief All event connections.
-      public: std::vector<event::ConnectionPtr> connections;
-
-      /// \brief Node for communication.
-      public: transport::NodePtr node;
-
-      /// \brief Name of the parent.
-      public: std::string parentName;
-
-      /// \brief The sensor's parent ID.
-      public: uint32_t parentId;
-
-      /// \brief All the plugins for the sensor.
-      public: std::vector<SensorPluginPtr> plugins;
-
-      /// \brief Pointer to the world.
-      public: gazebo::physics::WorldPtr world;
-
-      /// \brief Pointer to the Scene
-      public: gazebo::rendering::ScenePtr scene;
-
-      /// \brief Desired time between updates, set indirectly by
-      ///        Sensor::SetUpdateRate.
-      public: common::Time updatePeriod;
-
-      /// \brief Time of the last update.
-      public: common::Time lastUpdateTime;
-
-      /// \brief Stores last time that a sensor measurement was generated;
-      ///        this value must be updated within each sensor's UpdateImpl
-      public: common::Time lastMeasurementTime;
-
-      /// \brief Noise added to sensor data
-      public: std::map<SensorNoiseType, NoisePtr> noises;
-    };
-
     /// \internal
     /// \brief Sensor private data.
     class SensorPrivate

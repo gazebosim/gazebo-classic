@@ -21,8 +21,8 @@
 #endif
 
 #include <functional>
+#include <regex>
 
-#include <boost/algorithm/string.hpp>
 #include <ignition/math/Pose3.hh>
 
 #include "gazebo/common/Exception.hh"
@@ -52,11 +52,11 @@ GZ_REGISTER_STATIC_SENSOR("multicamera", MultiCameraSensor)
 
 //////////////////////////////////////////////////
 MultiCameraSensor::MultiCameraSensor()
-: Sensor(*new MultiCameraSensorPrivate, sensors::IMAGE),
-  dataPtr(std::static_pointer_cast<MultiCameraSensorPrivate>(this->sensorDPtr))
+: Sensor(sensors::IMAGE),
+  dataPtr(new MultiCameraSensorPrivate)
 {
   this->dataPtr->rendered = false;
-  this->dataPtr->connections.push_back(
+  this->connections.push_back(
       event::Events::ConnectRender(
         std::bind(&MultiCameraSensor::Render, this)));
 }
@@ -76,7 +76,7 @@ std::string MultiCameraSensor::Topic() const
   {
     topic = "~/";
     topic += this->ParentName() + "/" + this->Name() + "/images";
-    boost::replace_all(topic, "::", "/");
+    topic = std::regex_replace(topic, std::regex("::"), std::string("/"));
   }
 
   return topic;
@@ -89,7 +89,7 @@ void MultiCameraSensor::Load(const std::string &_worldName)
 
   // Create the publisher of image data.
   this->dataPtr->imagePub =
-    this->dataPtr->node->Advertise<msgs::ImagesStamped>(this->Topic(), 50);
+    this->node->Advertise<msgs::ImagesStamped>(this->Topic(), 50);
 }
 
 //////////////////////////////////////////////////
@@ -102,7 +102,7 @@ void MultiCameraSensor::Init()
     return;
   }
 
-  std::string worldName = this->dataPtr->world->GetName();
+  std::string worldName = this->world->GetName();
 
   if (worldName.empty())
   {
@@ -110,14 +110,14 @@ void MultiCameraSensor::Init()
     return;
   }
 
-  this->dataPtr->scene = rendering::get_scene(worldName);
+  this->scene = rendering::get_scene(worldName);
 
-  if (!this->dataPtr->scene)
+  if (!this->scene)
   {
-    this->dataPtr->scene = rendering::create_scene(worldName, false, true);
+    this->scene = rendering::create_scene(worldName, false, true);
 
     // This usually means rendering is not available
-    if (!this->dataPtr->scene)
+    if (!this->scene)
     {
       gzerr << "Unable to create MultiCameraSensor.\n";
       return;
@@ -128,10 +128,10 @@ void MultiCameraSensor::Init()
   common::EnumIterator<SensorNoiseType> noiseIndex = SENSOR_NOISE_TYPE_BEGIN;
 
   // Create and initialize all the cameras
-  sdf::ElementPtr cameraSdf = this->dataPtr->sdf->GetElement("camera");
+  sdf::ElementPtr cameraSdf = this->sdf->GetElement("camera");
   while (cameraSdf)
   {
-    rendering::CameraPtr camera = this->dataPtr->scene->CreateCamera(
+    rendering::CameraPtr camera = this->scene->CreateCamera(
           cameraSdf->Get<std::string>("name"), false);
 
     if (!camera)
@@ -151,22 +151,22 @@ void MultiCameraSensor::Init()
     camera->Init();
     camera->CreateRenderTexture(camera->GetName() + "_RttTex");
 
-    ignition::math::Pose3d cameraPose = this->dataPtr->pose;
+    ignition::math::Pose3d cameraPose = this->pose;
     if (cameraSdf->HasElement("pose"))
       cameraPose = cameraSdf->Get<ignition::math::Pose3d>("pose") + cameraPose;
     camera->SetWorldPose(cameraPose);
-    camera->AttachToVisual(this->dataPtr->parentId, true);
+    camera->AttachToVisual(this->parentId, true);
 
     if (cameraSdf->HasElement("noise"))
     {
       // Create a noise model and attach the camera
-      this->dataPtr->noises[*noiseIndex] = NoiseFactory::NewNoiseModel(
+      this->noises[*noiseIndex] = NoiseFactory::NewNoiseModel(
         cameraSdf->GetElement("noise"), this->Type());
-      this->dataPtr->noises[*noiseIndex]->SetCamera(camera);
+      this->noises[*noiseIndex]->SetCamera(camera);
     }
     else
     {
-      this->dataPtr->noises[*noiseIndex].reset(
+      this->noises[*noiseIndex].reset(
           new sensors::Noise(sensors::Noise::NONE));
     }
 
@@ -190,7 +190,7 @@ void MultiCameraSensor::Init()
 
   // Disable clouds and moon on server side until fixed and also to improve
   // performance
-  this->dataPtr->scene->SetSkyXMode(rendering::Scene::GZ_SKYX_ALL &
+  this->scene->SetSkyXMode(rendering::Scene::GZ_SKYX_ALL &
       ~rendering::Scene::GZ_SKYX_CLOUDS &
       ~rendering::Scene::GZ_SKYX_MOON);
 
@@ -212,7 +212,7 @@ void MultiCameraSensor::Fini()
     (*iter)->GetScene()->RemoveCamera((*iter)->GetName());
   }
   this->dataPtr->cameras.clear();
-  this->dataPtr->scene.reset();
+  this->scene.reset();
 }
 
 //////////////////////////////////////////////////
@@ -229,8 +229,11 @@ rendering::CameraPtr MultiCameraSensor::Camera(const unsigned int _index) const
   if (_index < this->dataPtr->cameras.size())
     return this->dataPtr->cameras[_index];
   else
-    gzthrow("camera index out of range. Valid range[0.." +
-        boost::lexical_cast<std::string>(this->dataPtr->cameras.size()-1));
+  {
+    gzerr << "camera index out of range. Valid range[0.." <<
+        this->dataPtr->cameras.size()-1 << "]\n";
+  }
+  return rendering::CameraPtr();
 }
 
 //////////////////////////////////////////////////
@@ -250,7 +253,7 @@ void MultiCameraSensor::Render()
   }
 
   this->dataPtr->rendered = true;
-  this->dataPtr->lastMeasurementTime = this->dataPtr->scene->GetSimTime();
+  this->lastMeasurementTime = this->scene->GetSimTime();
 }
 
 //////////////////////////////////////////////////
@@ -264,7 +267,7 @@ bool MultiCameraSensor::UpdateImpl(const bool /*_force*/)
   bool publish = this->dataPtr->imagePub->HasConnections();
 
   msgs::Set(this->dataPtr->msg.mutable_time(),
-            this->dataPtr->lastMeasurementTime);
+            this->lastMeasurementTime);
 
   int index = 0;
   for (auto iter = this->dataPtr->cameras.begin();

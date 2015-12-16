@@ -20,15 +20,10 @@
   #include <Winsock2.h>
 #endif
 
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/transport/transport.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Entity.hh"
-
-#include "gazebo/common/Exception.hh"
-
-#include "gazebo/transport/Node.hh"
-#include "gazebo/transport/Publisher.hh"
-
-#include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/sensors/RFIDTag.hh"
 #include "gazebo/sensors/SensorFactory.hh"
@@ -42,10 +37,10 @@ GZ_REGISTER_STATIC_SENSOR("rfid", RFIDSensor)
 
 /////////////////////////////////////////////////
 RFIDSensor::RFIDSensor()
-: Sensor(*new RFIDSensorPrivate, sensors::OTHER),
-  dataPtr(std::static_pointer_cast<RFIDSensorPrivate>(this->sensorDPtr))
+: Sensor(sensors::OTHER),
+  dataPtr(new RFIDSensorPrivate)
 {
-  this->dataPtr->active = false;
+  this->active = false;
 }
 
 /////////////////////////////////////////////////
@@ -67,15 +62,15 @@ void RFIDSensor::Load(const std::string &_worldName)
 
   // std::cout << "load rfid sensor" << std::endl;
 
-  if (this->dataPtr->sdf->GetElement("topic"))
+  if (this->sdf->GetElement("topic"))
   {
-    this->dataPtr->scanPub = this->dataPtr->node->Advertise<msgs::Pose>(
-        this->dataPtr->sdf->GetElement("topic")->Get<std::string>());
+    this->dataPtr->scanPub = this->node->Advertise<msgs::Pose>(
+        this->sdf->GetElement("topic")->Get<std::string>());
   }
 
-  this->dataPtr->entity = this->dataPtr->world->GetEntity(this->ParentName());
+  this->dataPtr->entity = this->world->GetEntity(this->ParentName());
 
-  // this->dataPtr->sdf->PrintDescription("something");
+  // this->sdf->PrintDescription("something");
   /*std::cout << " setup ray" << std::endl;
   physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
 
@@ -89,7 +84,7 @@ void RFIDSensor::Load(const std::string &_worldName)
   this->laserShape = boost::dynamic_pointer_cast<physics::RayShape>(
       this->laserCollision->GetShape());
 
-  this->laserShape->Load(this->dataPtr->sdf);
+  this->laserShape->Load(this->sdf);
 
   this->laserShape->Init();
   */
@@ -127,7 +122,7 @@ void RFIDSensor::Init()
 bool RFIDSensor::UpdateImpl(const bool /*_force*/)
 {
   this->EvaluateTags();
-  this->dataPtr->lastMeasurementTime = this->dataPtr->world->GetSimTime();
+  this->lastMeasurementTime = this->world->GetSimTime();
 
   if (this->dataPtr->scanPub)
   {

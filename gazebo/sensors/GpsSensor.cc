@@ -20,7 +20,7 @@
   #include <Winsock2.h>
 #endif
 
-#include <boost/algorithm/string.hpp>
+#include <regex>
 
 #include "gazebo/sensors/SensorFactory.hh"
 
@@ -39,8 +39,8 @@ GZ_REGISTER_STATIC_SENSOR("gps", GpsSensor)
 
 /////////////////////////////////////////////////
 GpsSensor::GpsSensor()
-: Sensor(*new GpsSensorPrivate, sensors::OTHER),
-  dataPtr(std::static_pointer_cast<GpsSensorPrivate>(this->sensorDPtr))
+: Sensor(sensors::OTHER),
+  dataPtr(new GpsSensorPrivate)
 {
 }
 
@@ -61,36 +61,37 @@ void GpsSensor::Load(const std::string &_worldName)
   Sensor::Load(_worldName);
 
   physics::EntityPtr parentEntity =
-    this->dataPtr->world->GetEntity(this->ParentName());
+    this->world->GetEntity(this->ParentName());
   this->dataPtr->parentLink =
     boost::dynamic_pointer_cast<physics::Link>(parentEntity);
 
   this->dataPtr->lastGpsMsg.set_link_name(this->ParentName());
 
   this->dataPtr->topicName = "~/" + this->ParentName() + '/' + this->Name();
-  if (this->dataPtr->sdf->HasElement("topic"))
+  if (this->sdf->HasElement("topic"))
   {
     this->dataPtr->topicName += '/' +
-      this->dataPtr->sdf->Get<std::string>("topic");
+      this->sdf->Get<std::string>("topic");
   }
-  boost::replace_all(this->dataPtr->topicName, "::", "/");
+  this->dataPtr->topicName = std::regex_replace(this->dataPtr->topicName,
+      std::regex("::"), std::string("/"));
 
   this->dataPtr->gpsPub =
-    this->dataPtr->node->Advertise<msgs::GPS>(this->dataPtr->topicName, 50);
+    this->node->Advertise<msgs::GPS>(this->dataPtr->topicName, 50);
 
   // Parse sdf noise parameters
-  sdf::ElementPtr gpsElem = this->dataPtr->sdf->GetElement("gps");
+  sdf::ElementPtr gpsElem = this->sdf->GetElement("gps");
 
   // Load position noise parameters
   {
     sdf::ElementPtr posElem = gpsElem->GetElement("position_sensing");
-    this->dataPtr->noises[GPS_POSITION_LATITUDE_NOISE_METERS] =
+    this->noises[GPS_POSITION_LATITUDE_NOISE_METERS] =
       NoiseFactory::NewNoiseModel(
           posElem->GetElement("horizontal")->GetElement("noise"));
-    this->dataPtr->noises[GPS_POSITION_LONGITUDE_NOISE_METERS] =
+    this->noises[GPS_POSITION_LONGITUDE_NOISE_METERS] =
       NoiseFactory::NewNoiseModel(
           posElem->GetElement("horizontal")->GetElement("noise"));
-    this->dataPtr->noises[GPS_POSITION_ALTITUDE_NOISE_METERS] =
+    this->noises[GPS_POSITION_ALTITUDE_NOISE_METERS] =
       NoiseFactory::NewNoiseModel(
           posElem->GetElement("vertical")->GetElement("noise"));
   }
@@ -98,13 +99,13 @@ void GpsSensor::Load(const std::string &_worldName)
   // Load velocity noise parameters
   {
     sdf::ElementPtr velElem = gpsElem->GetElement("velocity_sensing");
-    this->dataPtr->noises[GPS_VELOCITY_LATITUDE_NOISE_METERS] =
+    this->noises[GPS_VELOCITY_LATITUDE_NOISE_METERS] =
       NoiseFactory::NewNoiseModel(
           velElem->GetElement("horizontal")->GetElement("noise"));
-    this->dataPtr->noises[GPS_VELOCITY_LONGITUDE_NOISE_METERS] =
+    this->noises[GPS_VELOCITY_LONGITUDE_NOISE_METERS] =
       NoiseFactory::NewNoiseModel(
           velElem->GetElement("horizontal")->GetElement("noise"));
-    this->dataPtr->noises[GPS_VELOCITY_ALTITUDE_NOISE_METERS] =
+    this->noises[GPS_VELOCITY_ALTITUDE_NOISE_METERS] =
       NoiseFactory::NewNoiseModel(
           velElem->GetElement("vertical")->GetElement("noise"));
   }
@@ -124,7 +125,7 @@ void GpsSensor::Init()
   Sensor::Init();
 
   this->dataPtr->sphericalCoordinates =
-    this->dataPtr->world->GetSphericalCoordinates();
+    this->world->GetSphericalCoordinates();
 }
 
 //////////////////////////////////////////////////
@@ -136,18 +137,18 @@ bool GpsSensor::UpdateImpl(const bool /*_force*/)
     // Measure position and apply noise
     {
       // Get postion in Cartesian gazebo frame
-      ignition::math::Pose3d gpsPose = this->dataPtr->pose +
+      ignition::math::Pose3d gpsPose = this->pose +
         this->dataPtr->parentLink->GetWorldPose().Ign();
 
       // Apply position noise before converting to global frame
       gpsPose.Pos().X(
-        this->dataPtr->noises[GPS_POSITION_LATITUDE_NOISE_METERS]->Apply(
+        this->noises[GPS_POSITION_LATITUDE_NOISE_METERS]->Apply(
           gpsPose.Pos().X()));
       gpsPose.Pos().Y(
-        this->dataPtr->noises[GPS_POSITION_LONGITUDE_NOISE_METERS]->Apply(
+        this->noises[GPS_POSITION_LONGITUDE_NOISE_METERS]->Apply(
           gpsPose.Pos().Y()));
       gpsPose.Pos().Z(
-        this->dataPtr->noises[GPS_POSITION_ALTITUDE_NOISE_METERS]->Apply(
+        this->noises[GPS_POSITION_ALTITUDE_NOISE_METERS]->Apply(
           gpsPose.Pos().Z()));
 
       // Convert to global frames
@@ -162,7 +163,7 @@ bool GpsSensor::UpdateImpl(const bool /*_force*/)
     {
       ignition::math::Vector3d gpsVelocity =
         this->dataPtr->parentLink->GetWorldLinearVel(
-            this->dataPtr->pose.Pos()).Ign();
+            this->pose.Pos()).Ign();
 
       // Convert to global frame
       gpsVelocity =
@@ -170,13 +171,13 @@ bool GpsSensor::UpdateImpl(const bool /*_force*/)
 
       // Apply noise after converting to global frame
       gpsVelocity.X(
-        this->dataPtr->noises[GPS_VELOCITY_LATITUDE_NOISE_METERS]->Apply(
+        this->noises[GPS_VELOCITY_LATITUDE_NOISE_METERS]->Apply(
           gpsVelocity.X()));
       gpsVelocity.Y(
-        this->dataPtr->noises[GPS_VELOCITY_LONGITUDE_NOISE_METERS]->Apply(
+        this->noises[GPS_VELOCITY_LONGITUDE_NOISE_METERS]->Apply(
           gpsVelocity.Y()));
       gpsVelocity.Z(
-        this->dataPtr->noises[GPS_VELOCITY_ALTITUDE_NOISE_METERS]->Apply(
+        this->noises[GPS_VELOCITY_ALTITUDE_NOISE_METERS]->Apply(
           gpsVelocity.Z()));
 
       this->dataPtr->lastGpsMsg.set_velocity_east(gpsVelocity.X());
@@ -184,9 +185,9 @@ bool GpsSensor::UpdateImpl(const bool /*_force*/)
       this->dataPtr->lastGpsMsg.set_velocity_up(gpsVelocity.Z());
     }
   }
-  this->dataPtr->lastMeasurementTime = this->dataPtr->world->GetSimTime();
+  this->lastMeasurementTime = this->world->GetSimTime();
   msgs::Set(this->dataPtr->lastGpsMsg.mutable_time(),
-      this->dataPtr->lastMeasurementTime);
+      this->lastMeasurementTime);
 
   if (this->dataPtr->gpsPub)
     this->dataPtr->gpsPub->Publish(this->dataPtr->lastGpsMsg);

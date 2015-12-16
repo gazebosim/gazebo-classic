@@ -20,7 +20,7 @@
   #include <Winsock2.h>
 #endif
 
-#include <boost/bind.hpp>
+#include <functional>
 #include <sstream>
 
 #include "gazebo/physics/World.hh"
@@ -46,13 +46,13 @@ GZ_REGISTER_STATIC_SENSOR("depth", DepthCameraSensor)
 
 //////////////////////////////////////////////////
 DepthCameraSensor::DepthCameraSensor()
-: Sensor(*new DepthCameraSensorPrivate, sensors::IMAGE),
-  dataPtr(std::static_pointer_cast<DepthCameraSensorPrivate>(this->sensorDPtr))
+: Sensor(sensors::IMAGE),
+  dataPtr(new DepthCameraSensorPrivate)
 {
   this->dataPtr->rendered = false;
-  this->dataPtr->connections.push_back(
+  this->connections.push_back(
       event::Events::ConnectRender(
-        boost::bind(&DepthCameraSensor::Render, this)));
+        std::bind(&DepthCameraSensor::Render, this)));
 }
 
 //////////////////////////////////////////////////
@@ -83,17 +83,17 @@ void DepthCameraSensor::Init()
     return;
   }
 
-  std::string worldName = this->dataPtr->world->GetName();
+  std::string worldName = this->world->GetName();
 
   if (!worldName.empty())
   {
-    this->dataPtr->scene = rendering::get_scene(worldName);
+    this->scene = rendering::get_scene(worldName);
 
-    if (!this->dataPtr->scene)
-      this->dataPtr->scene = rendering::create_scene(worldName, false, true);
+    if (!this->scene)
+      this->scene = rendering::create_scene(worldName, false, true);
 
-    this->dataPtr->camera = this->dataPtr->scene->CreateDepthCamera(
-        this->dataPtr->sdf->Get<std::string>("name"), false);
+    this->dataPtr->camera = this->scene->CreateDepthCamera(
+        this->sdf->Get<std::string>("name"), false);
 
     if (!this->dataPtr->camera)
     {
@@ -102,7 +102,7 @@ void DepthCameraSensor::Init()
     }
     this->dataPtr->camera->SetCaptureData(true);
 
-    sdf::ElementPtr cameraSdf = this->dataPtr->sdf->GetElement("camera");
+    sdf::ElementPtr cameraSdf = this->sdf->GetElement("camera");
     this->dataPtr->camera->Load(cameraSdf);
 
     // Do some sanity checks
@@ -123,7 +123,7 @@ void DepthCameraSensor::Init()
 
   // Disable clouds and moon on server side until fixed and also to improve
   // performance
-  this->dataPtr->scene->SetSkyXMode(rendering::Scene::GZ_SKYX_ALL &
+  this->scene->SetSkyXMode(rendering::Scene::GZ_SKYX_ALL &
       ~rendering::Scene::GZ_SKYX_CLOUDS &
       ~rendering::Scene::GZ_SKYX_MOON);
 
@@ -134,9 +134,9 @@ void DepthCameraSensor::Init()
 void DepthCameraSensor::Fini()
 {
   Sensor::Fini();
-  this->dataPtr->scene->RemoveCamera(this->dataPtr->camera->GetName());
+  this->scene->RemoveCamera(this->dataPtr->camera->GetName());
   this->dataPtr->camera.reset();
-  this->dataPtr->scene.reset();
+  this->scene.reset();
 }
 
 //////////////////////////////////////////////////
@@ -154,7 +154,7 @@ void DepthCameraSensor::Render()
   this->dataPtr->camera->Render();
 
   this->dataPtr->rendered = true;
-  this->dataPtr->lastMeasurementTime = this->dataPtr->scene->GetSimTime();
+  this->lastMeasurementTime = this->scene->GetSimTime();
 }
 
 //////////////////////////////////////////////////

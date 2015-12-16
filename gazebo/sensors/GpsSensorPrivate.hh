@@ -14,15 +14,14 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_GPSSENSOR_PRIVATE_HH_
-#define _GAZEBO_GPSSENSOR_PRIVATE_HH_
+#ifndef _GAZEBO_SENSORS_GPSSENSOR_PRIVATE_HH_
+#define _GAZEBO_SENSORS_GPSSENSOR_PRIVATE_HH_
 
 #include <string>
 
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/sensors/SensorPrivate.hh"
 
 namespace gazebo
 {
@@ -30,7 +29,7 @@ namespace gazebo
   {
     /// \internal
     /// \brief GPS sensor private data.
-    class GpsSensorPrivate : public SensorProtected
+    class GpsSensorPrivate
     {
       /// \brief GPS data publisher.
       public: transport::PublisherPtr gpsPub;

@@ -14,24 +14,21 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_WIRELESS_TRANSCEIVER_HH_
-#define _GAZEBO_WIRELESS_TRANSCEIVER_HH_
+#ifndef _GAZEBO_SENSORS_WIRELESSTRANSCEIVER_HH_
+#define _GAZEBO_SENSORS_WIRELESSTRANSCEIVER_HH_
 
 #include <string>
 #include <ignition/math/Pose3.hh>
 
+#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/sensors/Sensor.hh"
-#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace sensors
   {
-    // Forward declare private data class
-    class WirelessTransceiverPrivate;
-
     /// \addtogroup gazebo_sensors
     /// \{
 
@@ -75,14 +72,20 @@ namespace gazebo
       /// \return Receiver power (dBm).
       public: double Power() const;
 
-      /// \internal
-      /// \brief Constructor used by inherited classes
-      /// \param[in] _dataPtr Pointer to private data.
-      protected: WirelessTransceiver(WirelessTransceiverPrivate &_dataPtr);
+      /// \brief Publisher to publish propagation model data
+      protected: transport::PublisherPtr pub;
 
-      /// \internal
-      /// \brief Private data pointer
-      private: std::shared_ptr<WirelessTransceiverPrivate> dataPtr;
+      /// \brief Receiver's power (dBm).
+      protected: double power = 14.5;
+
+      /// \brief Antenna's gain of the receiver (dBi).
+      protected: double gain = 2.5;
+
+      /// \brief Parent entity which the sensor is attached to
+      protected: boost::weak_ptr<physics::Link> parentEntity;
+
+      /// \brief Sensor reference pose
+      protected: ignition::math::Pose3d referencePose;
     };
     /// \}
   }
