@@ -515,6 +515,7 @@ void Publication::RemoveNodes()
 //////////////////////////////////////////////////
 MessagePtr Publication::GetPrevMsg(uint32_t _pubId)
 {
+  boost::mutex::scoped_lock lock(this->callbackMutex);
   if (this->prevMsgs.find(_pubId) != this->prevMsgs.end())
     return this->prevMsgs[_pubId];
   else
