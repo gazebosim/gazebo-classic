@@ -238,6 +238,11 @@ using the same arguments used in the command line.
     1. Support inserting nested models from model maker
         * [Pull request #1982](https://bitbucket.org/osrf/gazebo/pull-request/1982)
 
+1. Building editor updates
+
+    1. Removed unused class: BuildingItem
+        * [Pull request #2045](https://bitbucket.org/osrf/gazebo/pull-request/2045)
+
 ## Gazebo 6.0
 
 ### Gazebo 6.X.X (201X-XX-XX)
