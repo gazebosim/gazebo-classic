@@ -17,7 +17,6 @@
 
 #include "gazebo/gui/building/EditorView.hh"
 #include "gazebo/gui/building/BuildingEditorWidget.hh"
-#include "gazebo/gui/building/BuildingItem.hh"
 #include "gazebo/gui/building/EditorItem.hh"
 #include "gazebo/gui/building/RectItem.hh"
 #include "gazebo/gui/building/BuildingMaker.hh"
@@ -29,7 +28,7 @@ using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-StairsItem::StairsItem(): RectItem(), BuildingItem()
+StairsItem::StairsItem(): RectItem()
 {
   this->editorType = "Stairs";
   this->itemScale = BuildingMaker::conversionScale;
