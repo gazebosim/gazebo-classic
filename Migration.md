@@ -79,6 +79,10 @@ release will remove the deprecated code.
     + ***Removed:*** public: virtual void Stop() = 0;
     + ***Replacement:*** public: virtual void Stop();
 
+1. **gazebo/gui/ModelAlign.hh**
+    + ***Removed:*** public: void AlignVisuals(std::vector<rendering::VisualPtr> _visuals, const std::string &_axis, const std::string &_config, const std::string &_target, bool _publish = true);
+    + ***Replacement:*** public: void AlignVisuals(std::vector<rendering::VisualPtr> _visuals, const std::string &_axis, const std::string &_config, const std::string &_target, bool _publish = true, const bool _inverted = false);
+
 ### Deprecations
 
 1. **gazebo/rendering/ApplyWrenchVisual.hh**
