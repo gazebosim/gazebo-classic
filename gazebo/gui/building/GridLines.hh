@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_BUILDING_GRID_LINES_HH_
-#define _GAZEBO_BUILDING_GRID_LINES_HH_
+#ifndef _GAZEBO_GUI_GRID_LINES_HH_
+#define _GAZEBO_GUI_GRID_LINES_HH_
 
 #include <memory>
 
