@@ -303,14 +303,14 @@ void MainWindow::Init()
 
   this->setGeometry(winXPos, winYPos, winWidth, winHeight);
 
-  if ( this->width() > winWidth )
+  if (this->width() > winWidth)
   {
     gzwarn << "Requested geometry.width of " << winWidth
            << " but the minimum width of the window is "
            << this->width() << "." << std::endl;
   }
 
-  if ( this->height() > winHeight )
+  if (this->height() > winHeight)
   {
     gzwarn << "Requested geometry.height of " << winHeight
            << " but the minimum height of the window is "
@@ -562,7 +562,7 @@ void MainWindow::Clone()
     msgs::ServerControl msg;
     msg.set_save_world_name("");
     msg.set_clone(true);
-    msg.set_new_port(cloneWindow->GetPort());
+    msg.set_new_port(cloneWindow->Port());
     this->dataPtr->serverControlPub->Publish(msg);
   }
 }
