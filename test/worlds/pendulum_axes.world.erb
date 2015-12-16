@@ -1,0 +1,89 @@
+<?xml version="1.0" ?>
+<%
+  # Pendulum axes test
+  # Pendulums with different link frame orientations
+  require "matrix"
+
+  # Inertial parameters
+  # Aluminum 2700 kg/m^3
+  density = 2700.0
+
+  # Largest pendulum box dimension
+  dd = 0.1
+
+  # Initial angle of revolute joints
+  theta = 0.1* Math::PI
+
+  pendula = {
+    "longZ_Xaxis" => {:pose => [0, 0, -dd/2, 0, 0, 0], :size => [dd/10, dd/10, dd], :axis => [1, 0, 0]},
+    "longZ_Yaxis" => {:pose => [0, 0, -dd/2, 0, 0, 0], :size => [dd/10, dd/10, dd], :axis => [0, 1, 0]},
+    "longX_Xaxis" => {:pose => [dd/2, 0, 0, 0, Math::PI/2, 0], :size => [dd, dd/10, dd/10], :axis => [1, 0, 0]},
+    "longX_Yaxis" => {:pose => [dd/2, 0, 0, 0, Math::PI/2, 0], :size => [dd, dd/10, dd/10], :axis => [0, 1, 0]},
+    "longY_Xaxis" => {:pose => [0, -dd/2, 0, Math::PI/2, 0, 0], :size => [dd/10, dd, dd/10], :axis => [1, 0, 0]},
+    "longY_Yaxis" => {:pose => [0, -dd/2, 0, Math::PI/2, 0, 0], :size => [dd/10, dd, dd/10], :axis => [0, 1, 0]},
+
+  }
+%>
+<sdf version="1.5">
+  <world name="default">
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <%  # Revolute joints
+        i = 0
+        pendula.keys.each do |p|
+          i = i + 1
+          name = 'pendulum_' + p
+          size = Vector.elements(pendula[p][:size])
+          dx = size[0]
+          dy = size[1]
+          dz = size[2]
+          mass = density * dx * dy * dz 
+          ixx = 1.0 / 12 * mass * (dy*dy + dz*dz)
+          iyy = 1.0 / 12 * mass * (dz*dz + dx*dx)
+          izz = 1.0 / 12 * mass * (dx*dx + dy*dy)
+          pose = Vector.elements(pendula[p][:pose])
+          axis = Vector.elements(pendula[p][:axis])
+    %>
+    <%= "<model name='#{name}'>" %>
+      <pose><%= dd*2.1*i %> 0 <%= dd*1.8 %>  <%= (theta*axis).to_a.join(" ") %></pose>
+      <link name="link">
+        <pose><%= pose.to_a.join(" ") %></pose>
+        <inertial>
+          <mass><%= mass %></mass>
+          <inertia>
+            <ixx><%= ixx %></ixx>
+            <iyy><%= iyy %></iyy>
+            <izz><%= izz %></izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size><%= size.to_a.join(" ") %></size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size><%= dx %> <%= dy %> <%= dz %></size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+      <joint name="joint" type="revolute">
+        <pose><%= (-1 * pose).to_a.join(" ") %></pose>
+        <parent>world</parent>
+        <child>link</child>
+        <axis>
+          <xyz><%= axis.to_a.join(" ") %></xyz>
+        </axis>
+      </joint>
+    </model>
+    <% end %>
+  </world>
+</sdf>
