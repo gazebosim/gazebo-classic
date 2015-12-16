@@ -14,14 +14,12 @@
  * limitations under the License.
  *
 */
-
-#include <boost/bind.hpp>
-
 #include "gazebo/gazebo_config.h"
 #include "gazebo/common/Console.hh"
 
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/Link.hh"
+#include "gazebo/physics/ode/ODEJointPrivate.hh"
 #include "gazebo/physics/ode/ODEFixedJoint.hh"
 
 using namespace gazebo;
@@ -29,9 +27,9 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 ODEFixedJoint::ODEFixedJoint(dWorldID _worldId, BasePtr _parent)
-    : FixedJoint<ODEJoint>(_parent)
+: FixedJoint<ODEJoint>(_parent)
 {
-  this->jointId = dJointCreateFixed(_worldId, NULL);
+  this->odeJointDPtr->jointId = dJointCreateFixed(_worldId, NULL);
 }
 
 //////////////////////////////////////////////////
@@ -46,78 +44,83 @@ void ODEFixedJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODEFixedJoint::GetAnchor(unsigned int /*index*/) const
+ignition::math::Vector3d ODEFixedJoint::Anchor(
+    const unsigned int /*index*/) const
 {
   gzwarn << "SimbodyFixedJoint: called method "
          << "GetAnchor that is not valid for joints of type fixed.\n";
-  return math::Vector3();
+  return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
-void ODEFixedJoint::SetAnchor(unsigned int /*index*/,
-    const math::Vector3 &/*_anchor*/)
+void ODEFixedJoint::SetAnchor(const unsigned int /*index*/,
+    const ignition::math::Vector3d &/*_anchor*/)
 {
-  if (this->childLink)
-    this->childLink->SetEnabled(true);
-  if (this->parentLink)
-    this->parentLink->SetEnabled(true);
+  if (this->jointDPtr->childLink)
+    this->jointDPtr->childLink->SetEnabled(true);
+  if (this->jointDPtr->parentLink)
+    this->jointDPtr->parentLink->SetEnabled(true);
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODEFixedJoint::GetGlobalAxis(unsigned int /*_index*/) const
+ignition::math::Vector3d ODEFixedJoint::GlobalAxis(
+    const unsigned int /*_index*/) const
 {
   gzwarn << "SimbodyFixedJoint: called method "
          << "GetGlobalAxis that is not valid for joints of type fixed.\n";
-  return math::Vector3();
+  return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
-void ODEFixedJoint::SetAxis(unsigned int /*_index*/,
-                            const math::Vector3 &/*_axis*/)
+void ODEFixedJoint::SetAxis(const unsigned int /*_index*/,
+                            const ignition::math::Vector3d &/*_axis*/)
 {
   gzwarn << "ODEFixedJoint: called method "
          << "SetAxis that is not valid for joints of type fixed.\n";
 }
 
 //////////////////////////////////////////////////
-math::Angle ODEFixedJoint::GetAngleImpl(unsigned int /*index*/) const
+ignition::math::Angle ODEFixedJoint::AngleImpl(
+    const unsigned int /*index*/) const
 {
   gzwarn << "ODEFixedJoint: called method "
-         << "GetAngleImpl that is not valid for joints of type fixed.\n";
-  return math::Angle();
+    << "GetAngleImpl that is not valid for joints of type fixed.\n";
+  return ignition::math::Angle();
 }
 
 //////////////////////////////////////////////////
-double ODEFixedJoint::GetVelocity(unsigned int /*index*/) const
+double ODEFixedJoint::Velocity(const unsigned int /*index*/) const
 {
   gzwarn << "ODEFixedJoint: called method "
-         << "GetVelocity that is not valid for joints of type fixed.\n";
+    << "GetVelocity that is not valid for joints of type fixed.\n";
   return 0.0;
 }
 
 //////////////////////////////////////////////////
-void ODEFixedJoint::SetVelocity(unsigned int /*_index*/, double /*_angle*/)
+void ODEFixedJoint::SetVelocity(const unsigned int /*_index*/,
+    const double /*_angle*/)
 {
   gzwarn << "ODEFixedJoint: called method "
-         << "SetVelocity that is not valid for joints of type fixed.\n";
+    << "SetVelocity that is not valid for joints of type fixed.\n";
 }
 
 //////////////////////////////////////////////////
-void ODEFixedJoint::SetForceImpl(unsigned int /*_index*/, double /*_effort*/)
+void ODEFixedJoint::SetForceImpl(const unsigned int /*_index*/,
+    const double /*_effort*/)
 {
   gzwarn << "ODEFixedJoint: called method "
-         << "SetForceImpl that is not valid for joints of type fixed.\n";
+    << "SetForceImpl that is not valid for joints of type fixed.\n";
 }
 
 //////////////////////////////////////////////////
 void ODEFixedJoint::Attach(LinkPtr _parent, LinkPtr _child)
 {
-    gazebo::physics::ODEJoint::Attach(_parent, _child);
+  gazebo::physics::ODEJoint::Attach(_parent, _child);
 
-    // Once we attach the links to the fixed joint,
-    // we also call the dJointSetFixed method to
-    // the current desired relative offset and desired
-    // relative rotation between the bodies.
+  // Once we attach the links to the fixed joint,
+  // we also call the dJointSetFixed method to
+  // the current desired relative offset and desired
+  // relative rotation between the bodies.
 
-    dJointSetFixed(this->jointId);
+  dJointSetFixed(this->odeJointDPtr->jointId);
 }

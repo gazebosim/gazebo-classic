@@ -153,7 +153,12 @@ namespace gazebo
 
       /// \brief Return the ID of this link
       /// \return ODE link id
-      public: dBodyID GetODEId() const;
+      /// \deprecated See ODEId() const
+      public: dBodyID GetODEId() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Return the ID of this link
+      /// \return ODE link id
+      public: dBodyID ODEId() const;
 
       /// \brief Get the ID of the collision space this link is in.
       /// \return The collision space ID for the link.

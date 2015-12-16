@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PHYSICS_ODEJOINT_HH_
-#define _GAZEBO_PHYSICS_ODEJOINT_HH_
+#ifndef _GAZEBO_PHYSICS_ODE_ODEJOINT_HH_
+#define _GAZEBO_PHYSICS_ODE_ODEJOINT_HH_
 
 #include <boost/any.hpp>
 #include <string>
@@ -28,6 +28,12 @@ namespace gazebo
 {
   namespace physics
   {
+    // Forward declare protected data
+    class ODEJointProtected;
+
+    // Forward declare private data
+    class ODEJointPrivate;
+
     /// \brief ODE joint interface
     class GZ_PHYSICS_VISIBLE ODEJoint : public Joint
     {

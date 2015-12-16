@@ -39,7 +39,7 @@ namespace gazebo
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent of the joint.
-      public: explicit ScrewJoint(BasePtr _parent) : T(_parent), threadPitch(0)
+      public: explicit ScrewJoint(BasePtr _parent) : T(_parent)
       {
         this->AddType(Base::SCREW_JOINT);
       }
@@ -82,7 +82,17 @@ namespace gazebo
       /// This must be implemented in a child class
       /// \return _threadPitch Thread pitch value.
       /// \deprecated See ThreadPitch()
-      public: virtual double GetThreadPitch() GAZEBO_DEPRECATED(7.0) = 0;
+      public: virtual double GetThreadPitch() GAZEBO_DEPRECATED(7.0)
+      {
+        return this->ThreadPitch();
+      }
+
+      /// \brief Get screw joint thread pitch.
+      /// Thread Pitch is defined as angular motion per linear
+      /// motion or rad / m in metric.
+      /// This must be implemented in a child class
+      /// \return _threadPitch Thread pitch value.
+      public: virtual double ThreadPitch() = 0;
 
       // Documentation inherited
       public: virtual void FillMsg(msgs::Joint &_msg)

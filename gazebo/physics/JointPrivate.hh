@@ -17,6 +17,26 @@
 #ifndef _GAZEBO_PHYSICS_JOINT_PRIVATE_HH_
 #define _GAZEBO_PHYSICS_JOINT_PRIVATE_HH_
 
+#include <array>
+#include <string>
+#include <vector>
+
+#include <sdf/sdf.hh>
+#include <ignition/math/Vector3.hh>
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Angle.hh>
+
+#include "gazebo/common/Event.hh"
+
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/physics/JointWrench.hh"
+#include "gazebo/physics/BasePrivate.hh"
+
+/// \brief maximum number of axis per joint anticipated.
+/// Currently, this is 2 as 3-axis joints (e.g. ball)
+/// actuation, control is not there yet.
+#define MAX_JOINT_AXIS 2
+
 namespace gazebo
 {
   namespace physics
@@ -52,28 +72,28 @@ namespace gazebo
       public: LinkPtr anchorLink;
 
       /// \brief joint viscous damping coefficient
-      public: double dissipationCoefficient[MAX_JOINT_AXIS];
+      public: std::array<double, MAX_JOINT_AXIS> dissipationCoefficient;
 
       /// \brief joint stiffnessCoefficient
-      public: double stiffnessCoefficient[MAX_JOINT_AXIS];
+      public: std::array<double, MAX_JOINT_AXIS> stiffnessCoefficient;
 
       /// \brief joint spring reference (zero load) position
-      public: double springReferencePosition[MAX_JOINT_AXIS];
+      public: std::array<double, MAX_JOINT_AXIS> springReferencePosition;
 
       /// \brief apply damping for adding viscous damping forces on updates
       public: gazebo::event::ConnectionPtr applyDamping;
 
       /// \brief Store Joint effort limit as specified in SDF
-      public: double effortLimit[MAX_JOINT_AXIS];
+      public: std::array<double, MAX_JOINT_AXIS> effortLimit;
 
       /// \brief Store Joint velocity limit as specified in SDF
-      public: double velocityLimit[MAX_JOINT_AXIS];
+      public: std::array<double, MAX_JOINT_AXIS> velocityLimit;
 
       /// \brief Store Joint position lower limit as specified in SDF
-      public: ignition::math::Angle lowerLimit[MAX_JOINT_AXIS];
+      public: std::array<ignition::math::Angle, MAX_JOINT_AXIS> lowerLimit;
 
       /// \brief Store Joint position upper limit as specified in SDF
-      public: ignition::math::Angle upperLimit[MAX_JOINT_AXIS];
+      public: std::array<ignition::math::Angle, MAX_JOINT_AXIS> upperLimit;
 
       /// \brief Cache Joint force torque values in case physics engine
       /// clears them at the end of update step.
@@ -82,7 +102,7 @@ namespace gazebo
       /// \brief Flags that are set to true if an axis value is expressed
       /// in the parent model frame. Otherwise use the joint frame.
       /// See issue #494.
-      public: bool axisParentModelFrame[MAX_JOINT_AXIS];
+      public: std::array<bool, MAX_JOINT_AXIS> axisParentModelFrame;
 
       /// \brief Provide Feedback data for contact forces
       public: bool provideFeedback;
@@ -106,10 +126,10 @@ namespace gazebo
       public: ignition::math::Angle staticAngle;
 
       /// \brief Joint stop stiffness
-      public: double stopStiffness[MAX_JOINT_AXIS];
+      public: std::array<double, MAX_JOINT_AXIS> stopStiffness;
 
       /// \brief Joint stop dissipation
-      public: double stopDissipation[MAX_JOINT_AXIS];
+      public: std::array<double, MAX_JOINT_AXIS> stopDissipation;
     };
   }
 }

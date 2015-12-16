@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PHYSICS_SCREWJOINT_PROTECTED_HH_
-#define _GAZEBO_PHYSICS_SCREWJOINT_PROTECTED_HH_
+#ifndef _GAZEBO_PHYSICS_SCREWJOINT_PRIVATE_HH_
+#define _GAZEBO_PHYSICS_SCREWJOINT_PRIVATE_HH_
 
 namespace gazebo
 {
@@ -26,7 +26,7 @@ namespace gazebo
     class ScrewJointProtected
     {
       /// \brief Pitch of the thread.
-      protected: double threadPitch;
+      public: double threadPitch = 0;
     };
   }
 }

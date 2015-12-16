@@ -275,9 +275,14 @@ void ODELink::OnPoseChange()
 //////////////////////////////////////////////////
 dBodyID ODELink::GetODEId() const
 {
-  return this->dataPtr->linkId;
+  return this->ODEId();
 }
 
+//////////////////////////////////////////////////
+dBodyID ODELink::ODEId() const
+{
+  return this->dataPtr->linkId;
+}
 
 //////////////////////////////////////////////////
 void ODELink::SetEnabled(bool _enable) const
