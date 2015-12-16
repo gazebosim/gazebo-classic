@@ -51,25 +51,44 @@ namespace gazebo
 
     class MainWindowPrivate
     {
-      public: QToolBar *playToolbar;
-
+      /// \brief Pointer to the render widget.
       public: RenderWidget *renderWidget;
+
+      /// \brief Pointer to the tools widget.
       public: ToolsWidget *toolsWidget;
+
+      /// \brief Pointer to the model list widget.
       public: ModelListWidget *modelListWidget;
 
+      /// \brief Transport node used for communication.
       public: transport::NodePtr node;
+
+      /// \brief Publish world control messages.
       public: transport::PublisherPtr worldControlPub;
+
+      /// \brief Publish server control messages.
       public: transport::PublisherPtr serverControlPub;
+
+      /// \brief Publish request messages.
       public: transport::PublisherPtr requestPub;
+
+      /// \brief Publish scene messages.
       public: transport::PublisherPtr scenePub;
 
       /// \brief Publish user command messages for the server to place in the
       /// undo queue.
       public: transport::PublisherPtr userCmdPub;
 
+      /// \brief Subscribe to response messages.
       public: transport::SubscriberPtr responseSub;
+
+      /// \brief Subscribe to response messages.
       public: transport::SubscriberPtr guiSub;
-      public: transport::SubscriberPtr newEntitySub, statsSub;
+
+      /// \brief Subscribe to model info messages.
+      public: transport::SubscriberPtr newEntitySub;
+
+      /// \brief Subscribe to world modify messages.
       public: transport::SubscriberPtr worldModSub;
 
       /// \brief Subscriber to the light modify topic.
@@ -78,11 +97,10 @@ namespace gazebo
       /// \brief Subscriber to the light factory topic.
       public: transport::SubscriberPtr lightFactorySub;
 
-      public: QDockWidget *toolsDock;
-
+      /// \brief Vector of event connections.
       public: std::vector<event::ConnectionPtr> connections;
 
-      // A map that associates physics_id's with entity names
+      /// \brief A map that associates physics_id's with entity names
       public: std::map<std::string, unsigned int> entities;
 
       /// \brief Message used to field requests.
@@ -123,13 +141,14 @@ namespace gazebo
       public: SpaceNav *spacenav;
 
 #ifdef HAVE_OCULUS
+      /// \brief Window for Oculus VR set.
       public: gui::OculusWindow *oculusWindow;
 #endif
 
       /// \brief Buffer of plugin messages to process.
       public: std::vector<boost::shared_ptr<msgs::Plugin const> > pluginMsgs;
 
-      /// \brief Mutext to protect plugin loading.
+      /// \brief Mutex to protect plugin loading.
       public: boost::mutex pluginLoadMutex;
 
       /// \brief Splitter for the main window.
