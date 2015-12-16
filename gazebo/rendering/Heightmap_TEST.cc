@@ -20,7 +20,7 @@
 #include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
-class Heightmap_TEST : public ServerFixture
+class Heightmap_TEST : public RenderingFixture
 {
 };
 
