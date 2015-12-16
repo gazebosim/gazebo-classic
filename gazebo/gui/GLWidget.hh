@@ -56,8 +56,24 @@ namespace gazebo
       /// name "gzclient_camera".
       /// \param[in] _scene Pointer to the scene to visualize.
       public: void ViewScene(rendering::ScenePtr _scene);
-      public: rendering::UserCameraPtr GetCamera() const;
-      public: rendering::ScenePtr GetScene() const;
+
+      /// \brief Return the user camera.
+      /// \return User camera.
+      /// \deprecated See rendering::UserCameraPtr Camera() const.
+      public: rendering::UserCameraPtr GetCamera() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Return the user camera.
+      /// \return User camera.
+      public: rendering::UserCameraPtr Camera() const;
+
+      /// \brief Return the scene.
+      /// \return Scene.
+      /// \deprecated See rendering::ScenePtr Scene() const.
+      public: rendering::ScenePtr GetScene() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Return the scene.
+      /// \return Scene.
+      public: rendering::ScenePtr Scene() const;
 
       public: void Clear();
 
@@ -97,7 +113,7 @@ namespace gazebo
       /// \return NULL.
       protected: virtual QPaintEngine *paintEngine() const;
 
-      private: std::string GetOgreHandle() const;
+      private: std::string OgreHandle() const;
 
       /// \brief Callback for a mouse move event.
       /// \param[in] _event The mouse move event

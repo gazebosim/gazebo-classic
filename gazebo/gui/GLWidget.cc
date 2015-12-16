@@ -229,7 +229,7 @@ void GLWidget::showEvent(QShowEvent *_event)
   QApplication::syncX();
 
   // Get the window handle in a form that OGRE can use.
-  std::string winHandle = this->GetOgreHandle();
+  std::string winHandle = this->OgreHandle();
 
   // Create the OGRE render window
   this->dataPtr->windowId =
@@ -875,6 +875,12 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
 /////////////////////////////////////////////////
 rendering::ScenePtr GLWidget::GetScene() const
 {
+  return this->Scene();
+}
+
+/////////////////////////////////////////////////
+rendering::ScenePtr GLWidget::Scene() const
+{
   return this->dataPtr->scene;
 }
 
@@ -891,11 +897,17 @@ void GLWidget::Clear()
 //////////////////////////////////////////////////
 rendering::UserCameraPtr GLWidget::GetCamera() const
 {
+  return this->Camera();
+}
+
+//////////////////////////////////////////////////
+rendering::UserCameraPtr GLWidget::Camera() const
+{
   return this->dataPtr->userCamera;
 }
 
 //////////////////////////////////////////////////
-std::string GLWidget::GetOgreHandle() const
+std::string GLWidget::OgreHandle() const
 {
   std::string ogreHandle;
 
