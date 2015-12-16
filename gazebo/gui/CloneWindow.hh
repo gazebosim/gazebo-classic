@@ -33,7 +33,7 @@ namespace gazebo
     /// \addtogroup gazebo_gui
     /// \{
 
-    /// \class CloneWindow CloneWindow.hh gui/CloneWindo.hh
+    /// \class CloneWindow CloneWindow.hh gui/CloneWindow.hh
     /// \brief A dialog window used to set some parameters before cloning a
     /// simulation.
     class GZ_GUI_VISIBLE CloneWindow : public QDialog
