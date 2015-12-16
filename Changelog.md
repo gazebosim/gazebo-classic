@@ -6,6 +6,9 @@
 1. Use opaque pointers in the gui/CloneWindow class.
     * [Pull request #2027](https://bitbucket.org/osrf/gazebo/pull-request/2027)
 
+1. Use opaque pointers in the gui/MainWindow class.
+    * [Pull request #2046](https://bitbucket.org/osrf/gazebo/pull-request/2046)
+
 1. Use opaque pointers in the terrain editor.
     * [Pull request #2026](https://bitbucket.org/osrf/gazebo/pull-request/2026)
 
@@ -19,7 +22,7 @@
 
 1. Implemented private data pointer for the RTShaderSystem class. Minimized shader updates to once per render update.
     * [Pull request #2003](https://bitbucket.org/osrf/gazebo/pull-request/2003)
-    
+
 1. Updating physics library to use ignition math.
     * [Pull request #2007](https://bitbucket.org/osrf/gazebo/pull-request/2007)
 
@@ -98,7 +101,7 @@ flags from c functions. Windows did not like `CPPTYPE_*` in
 
 1. Undo user motion commands during simulation, added physics::UserCmdManager and gui::UserCmdHistory.
     * [Pull request #1934](https://bitbucket.org/osrf/gazebo/pull-request/1934)
-    
+
 1. Forward user command messages for undo.
     * [Pull request #2009](https://bitbucket.org/osrf/gazebo/pull-request/2009)
 
