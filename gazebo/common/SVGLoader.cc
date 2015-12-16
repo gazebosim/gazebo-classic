@@ -31,7 +31,7 @@ using namespace common;
 
 
 /////////////////////////////////////////////////
-// this local helper function transform a string to its lowecase equivalent
+// This local helper function transforms a string to its lowecase equivalent
 std::string lowercase(const std::string &_in)
 {
   std::string out = _in;
@@ -40,7 +40,7 @@ std::string lowercase(const std::string &_in)
 }
 
 /////////////////////////////////////////////////
-// this local helper function transform a C string to its lowecase equivalent
+// This local helper function transforms a C string to its lowecase equivalent
 std::string lowercase(const char *_in)
 {
   std::string ins = _in;
@@ -48,7 +48,7 @@ std::string lowercase(const char *_in)
 }
 
 /////////////////////////////////////////////////
-// local helper function that splits a string according to the delimiting char
+// Local helper function that splits a string according to the delimiting char
 std::vector<std::string> &split(const std::string &_s,
                                 char _delim,
                                 std::vector<std::string> &_elems)
@@ -239,7 +239,7 @@ ignition::math::Vector2d bezierInterpolate(double _t,
 }
 
 /////////////////////////////////////////////////
-// this helper function adds bezier interpolations to a list of points
+// This helper function adds bezier interpolations to a list of points
 void cubicBezier(const ignition::math::Vector2d &_p0,
                  const ignition::math::Vector2d &_p1,
                  const ignition::math::Vector2d &_p2,
@@ -262,14 +262,14 @@ void cubicBezier(const ignition::math::Vector2d &_p0,
 }
 
 /////////////////////////////////////////////////
-// this helper function computes the square of a number
+// This helper function computes the square of a number
 static double Sqr(float _x)
 {
   return _x * _x;
 }
 
 /////////////////////////////////////////////////
-// this helper function computes the angle between 2 vectors, using acos
+// This helper function computes the angle between 2 vectors, using acos
 static float VecAng(float _ux, float _uy, float _vx, float _vy)
 {
   double ux = _ux;
@@ -302,7 +302,7 @@ static float VecAng(float _ux, float _uy, float _vx, float _vy)
 }
 
 /////////////////////////////////////////////////
-// this helper function adds arc interpolations to a list of points
+// This helper function adds arc interpolations to a list of points
 void arcPath(const ignition::math::Vector2d &_p0,
              const double _rx,
              const double _ry,
