@@ -1,5 +1,9 @@
 package gazebo.msgs;
 
+import "light.proto";
+import "model.proto";
+import "world_control.proto";
+
 /// \ingroup gazebo_msgs
 /// \interface UserCmd
 /// \brief Notifies that a new command has been executed by a user
@@ -11,6 +15,9 @@ message UserCmd
   {
     /// \brief Moving a model.
     MOVING = 1;
+
+    /// \brief Controlling the world.
+    WORLD_CONTROL = 2;
   }
 
   /// \brief Unique id for user command.
@@ -21,4 +28,13 @@ message UserCmd
 
   /// \brief Type of command.
   required Type type = 3;
+
+  /// \brief For model modify commands.
+  repeated Model model = 4;
+
+  /// \brief For light modify commands.
+  repeated Light light = 5;
+
+  /// \brief For World Control commands.
+  optional WorldControl world_control = 6;
 }

@@ -63,19 +63,7 @@ namespace gazebo
 
       /// \brief Accessor for current longitude angle
       /// \return Current longitude angle.
-      /// \deprecated See Longitude() function that return an
-      /// ignition::math::Angle object.
-      public: math::Angle GetLongitude() const GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Accessor for current longitude angle
-      /// \return Current longitude angle.
       public: ignition::math::Angle Longitude() const;
-
-      /// \brief Accessor for current latitude angle
-      /// \return Current latitude angle.
-      /// \deprecated See Latitude() function that return an
-      /// ignition::math::Angle object.
-      public: math::Angle GetLatitude() const GAZEBO_DEPRECATED(6.0);
 
       /// \brief Accessor for current latitude angle
       /// \return Current latitude angle.

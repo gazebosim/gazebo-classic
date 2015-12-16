@@ -24,6 +24,9 @@ release will remove the deprecated code.
 
 ### Modifications
 
+1. **gazebo/physics/Actor.hh**
+    + Type change of `protected: math::Vector3 lastPos;` to `protected: ignition::math::Vector3d lastPos;`
+
 1. **gazebo/rendering/RenderTypes.hh**
     + typedefs for Visual and its derived classes have been changed from boost to std pointers.
     + [pull request #1924](https://bitbucket.org/osrf/gazebo/pull-request/1924)
@@ -86,6 +89,68 @@ release will remove the deprecated code.
     + ***Deprecation:***  public: math::Vector3 GetPoint(unsigned int _index) const
     + ***Replacement:*** public: const ignition::math::Vector3d &Point(const unsigned int _index) const;
 
+1. **gazebo/util/Diagnostics.hh**
+    + ***Deprecation:*** public: int GetTimerCount() const;
+    + ***Replacement:*** public: int TimerCount() const;
+    + ***Deprecation:*** public: common::Time GetTime(int _index) const;
+    + ***Replacement:*** public: common::Time Time(const int _index) const;
+    + ***Deprecation:*** public: common::Time GetTime(const std::string &_label) const;
+    + ***Replacement:*** public: common::Time Time(const std::string &_label) const;
+    + ***Deprecation:*** public: std::string GetLabel(int _index) const;
+    + ***Replacement:*** public: std::string Label(const int _index) const;
+    + ***Deprecation:*** public: boost::filesystem::path GetLogPath() const
+    + ***Replacement:*** public: boost::filesystem::path LogPath() const;
+
+1. **gazebo/util/LogPlay.hh**
+    + ***Deprecation:*** public: std::string GetLogVersion() const;
+    + ***Replacement:*** public: std::string LogVersion() const;
+    + ***Deprecation:*** public: std::string GetGazeboVersion() const;
+    + ***Replacement:*** public: std::string GazeboVersion() const;
+    + ***Deprecation:*** public: uint32_t GetRandSeed() const
+    + ***Replacement:*** public: uint32_t RandSeed() const;
+    + ***Deprecation:*** public: common::Time GetLogStartTime() const;
+    + ***Replacement:*** public: common::Time LogStartTime() const;
+    + ***Deprecation:*** public: common::Time GetLogEndTime() const;
+    + ***Replacement:*** public: common::Time LogEndTime() const;
+    + ***Deprecation:*** public: std::string GetFilename() const;
+    + ***Replacement:*** public: std::string Filename() const;
+    + ***Deprecation:*** public: std::string GetFullPathFilename() const;
+    + ***Replacement:*** public: std::string FullPathFilename() const;
+    + ***Deprecation:*** public: uintmax_t GetFileSize() const
+    + ***Replacement:*** public: uintmax_t FileSize() const;
+    + ***Deprecation:*** public: unsigned int GetChunkCount() const;
+    + ***Replacement:*** public: unsigned int ChunkCount() const;
+    + ***Deprecation:*** public: bool GetChunk(unsigned int _index, std::string &_data);
+    + ***Replacement:*** public: bool Chunk(const unsigned int _index, std::string &_data) const;
+    + ***Deprecation:*** public: std::string GetEncoding() const
+    + ***Replacement:*** public: std::string Encoding() const;
+    + ***Deprecation:*** public: std::string GetHeader() const
+    + ***Replacement:*** public: std::string Header() const;
+    + ***Deprecation:*** public: uint64_t GetInitialIterations() const
+    + ***Replacement:*** public: uint64_t InitialIterations() const;
+
+1. **gazebo/rendering/ApplyWrenchVisual.hh**
+    + ***Deprecation:*** public: void SetCoM(const math::Vector3 &_comVector)
+    + ***Replacement:*** public: void SetCoM(const ignition::math::Vector3d &_comVector);
+    + ***Deprecation:*** public: void SetForcePos(const math::Vector3 &_forcePosVector)
+    + ***Replacement:*** public: void SetForcePos(const ignition::math::Vector3d &_forcePosVector);
+    + ***Deprecation:*** public: void SetForce(const math::Vector3 &_forceVector,const bool _rotatedByMouse);
+    + ***Replacement:*** public: void SetForce(const ignition::math::Vector3d &_forceVector, const bool _rotatedByMouse);
+    + ***Deprecation:*** public: void SetTorque(const math::Vector3 &_torqueVector,const bool _rotatedByMouse);
+    + ***Replacement:*** public: void SetTorque(const ignition::math::Vector3d &_torqueVector, const bool _rotatedByMouse);
+
+1. **gazebo/rendering/AxisVisual.hh**
+    + ***Deprecation:*** public: void ScaleXAxis(const math::Vector3 &_scale)
+    + ***Replacement:*** public: void ScaleXAxis(const ignition::math::Vector3d &_scale);
+    + ***Deprecation:*** public: void ScaleYAxis(const math::Vector3 &_scale)
+    + ***Replacement:*** public: void ScaleYAxis(const ignition::math::Vector3d &_scale);
+    + ***Deprecation:*** public: void ScaleZAxis(const math::Vector3 &_scale)
+    + ***Replacement:*** public: void ScaleZAxis(const ignition::math::Vector3d &_scale);
+
+1. **gazebo/gui/CloneWindow.hh**
+    + ***Deprecation:*** int GetPort()
+    + ***Replacement:*** int Port() const
+
 1. **gazebo/gui/RTShaderSystem.hh**
     + ***Deprecation:*** void AttachEntity(Visual *vis)
     + ***No replacement for AttachEntity ***
@@ -123,6 +188,43 @@ release will remove the deprecated code.
     + public: virtual void OnMouseDrag(const common::MouseEvent &_event);
     + protected: math::Vector3 GetSnappedPoint(math::Vector3 _p);
 
+1. **gazebo/sensors/ForceTorqueSensor.hh**
+    + public: math::Vector3 GetTorque() const
+    + public: math::Vector3 GetForce() const
+
+1. **gazebo/sensors/GpsSensor.hh**
+    + public: math::Angle GetLongitude()
+    + public: math::Angle GetLatitude()
+
+1. **gazebo/sensors/GpuRaySensor.hh**
+    + public: math::Angle GetAngleMin() const
+    + public: math::Angle GetAngleMax() const
+    + public: math::Angle GetVerticalAngleMin() const
+    + public: math::Angle GetVerticalAngleMax() const
+
+1. **gazebo/sensors/ImuSensor.hh**
+    + public: math::Vector3 GetAngularVelocity() const
+    + public: math::Vector3 GetLinearAcceleration() const
+    + public: math::Quaternion GetOrientation() const
+
+1. **gazebo/sensors/RFIDSensor.hh**
+    + private: bool CheckTagRange(const math::Pose &_pose)
+
+1. **gazebo/sensors/RFIDTag.hh**
+    + public: math::Pose GetTagPose() const
+
+1. **gazebo/sensors/RaySensor.hh**
+    + public: math::Angle GetAngleMin() const
+    + public: math::Angle GetAngleMax() const
+    + public: math::Angle GetVerticalAngleMin() const
+    + public: math::Angle GetVerticalAngleMax() const
+
+1. **gazebo/sensors/Sensor.hh**
+    + public: virtual math::Pose GetPose() const
+    + public: NoisePtr GetNoise(unsigned int _index = 0) const
+
+1. **gazebo/sensors/WirelessTransmitter.hh**
+    + public: double GetSignalStrength(const math::Pose &_receiver, const double _rxGain)
 
 ## Gazebo 5.X to 6.X
 
