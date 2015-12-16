@@ -31,7 +31,7 @@ namespace gazebo
   {
     class IncrementalPlot;
 
-    /// \brief public data for the EntityMaker class
+    /// \brief public data for the Diagnostics class
     class DiagnosticsPrivate
     {
       /// \def PointMap
@@ -64,4 +64,3 @@ namespace gazebo
   }
 }
 #endif
-
