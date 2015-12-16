@@ -45,14 +45,13 @@ MarkerVisual::~MarkerVisual()
 /////////////////////////////////////////////////
 void MarkerVisual::Load(const msgs::Marker &_msg)
 {
- std::lock_guard<std::mutex> lock(this->dPtr->mutex);
- Visual::Load();
+  std::lock_guard<std::mutex> lock(this->dPtr->mutex);
+  Visual::Load();
 
- if (_msg.action() == msgs::Marker::ADD_MODIFY)
- {
-   this->AddModify(_msg);
- }
-
+  if (_msg.action() == msgs::Marker::ADD_MODIFY)
+  {
+    this->AddModify(_msg);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -61,7 +60,7 @@ void MarkerVisual::AddModify(const msgs::Marker &_msg)
   // Set the type of visual
   if (this->dPtr->msg.type() != _msg.type())
   {
-    switch(_msg.type())
+    switch (_msg.type())
     {
       case msgs::Marker::CUBE:
         this->DetachObjects();

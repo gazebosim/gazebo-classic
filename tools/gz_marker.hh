@@ -17,6 +17,7 @@
 #ifndef _GZ_TOOL_MARKER_HH_
 #define _GZ_TOOL_MARKER_HH_
 
+#include <string>
 #include "gz.hh"
 
 namespace gazebo
@@ -39,8 +40,8 @@ namespace gazebo
 
     /// \brief Add or modify a marker.
     private: void Add(const std::string &_ns, const unsigned int _id,
-    const std::string &_type, const common::Time _lifetime,
-    const std::string &_parent) const;
+                 const std::string &_type, const common::Time _lifetime,
+                 const std::string &_parent) const;
 
     /// \brief Node pointer.
     private: transport::NodePtr node;

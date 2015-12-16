@@ -33,7 +33,7 @@ MarkerCommand::MarkerCommand()
   this->visibleOptions.add_options()
     ("world-name,w", po::value<std::string>(), "World name.")
     ("add,a", "Add or modify a visual marker")
-    ("namespace,n", po::value<std::string>(),"Namespace for the visual marker")
+    ("namespace,n", po::value<std::string>(), "Namespace for the visual marker")
     ("id,i", po::value<unsigned int>(),
      "Positive integer value of a visual marker")
     ("type,t", po::value<std::string>(),

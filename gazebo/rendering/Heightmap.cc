@@ -133,7 +133,6 @@ void Heightmap::LoadFromMsg(ConstVisualPtr &_msg)
   }
 
   this->Load();
-
 }
 
 //////////////////////////////////////////////////

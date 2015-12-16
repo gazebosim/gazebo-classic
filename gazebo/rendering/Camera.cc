@@ -632,8 +632,8 @@ void Camera::SetClipDist()
   if (this->camera)
   {
     this->camera->setNearClipDistance(clipElem->Get<double>("near"));
-    this->camera->setFarClipDistance(10000);//clipElem->Get<double>("far"));
-    this->camera->setRenderingDistance(10000);//clipElem->Get<double>("far"));
+    this->camera->setFarClipDistance(clipElem->Get<double>("far"));
+    this->camera->setRenderingDistance(clipElem->Get<double>("far"));
   }
   else
     gzerr << "Setting clip distances failed -- no camera yet\n";
