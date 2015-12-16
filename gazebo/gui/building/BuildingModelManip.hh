@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_BUILDING_MODEL_MANIP_HH_
-#define _GAZEBO_BUILDING_MODEL_MANIP_HH_
+#ifndef _GAZEBO_GUI_BUILDING_MODEL_MANIP_HH_
+#define _GAZEBO_GUI_BUILDING_MODEL_MANIP_HH_
 
 #include <string>
 #include <vector>
