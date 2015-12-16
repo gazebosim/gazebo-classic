@@ -15,16 +15,14 @@
  *
 */
 
-#ifndef _INCREMENTAL_PLOT_HH_
-#define _INCREMENTAL_PLOT_HH_
+#ifndef _GAZEBO_GUI_INCREMENTALPLOT_HH_
+#define _GAZEBO_GUI_INCREMENTALPLOT_HH_
 
-#include <map>
 #include <list>
+#include <memory>
 
 #include <qwt/qwt_plot_magnifier.h>
 #include <qwt/qwt_plot.h>
-
-#include "gazebo/math/Vector2d.hh"
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
@@ -36,6 +34,8 @@ namespace gazebo
 {
   namespace gui
   {
+    class IncrementalPlotPrivate;
+
     /// \brief A plotting widget that handles incremental addition of data.
     class GZ_GUI_VISIBLE IncrementalPlot : public QwtPlot
     {
@@ -97,18 +97,9 @@ namespace gazebo
       /// \return A pointer to the new curve.
       private: QwtPlotCurve *AddCurve(const QString &_label);
 
-      /// \def DiagnosticTimerPtr
-      /// \brief A map of strings to qwt plot curves.
-      private: typedef std::map<QString, QwtPlotCurve *> CurveMap;
-
-      /// \brief The curve to draw.
-      private: CurveMap curves;
-
-      /// \brief Drawing utility
-      private: QwtPlotDirectPainter *directPainter;
-
-      /// \brief Pointer to the plot maginfier
-      private: QwtPlotMagnifier *magnifier;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<IncrementalPlotPrivate> dataPtr;
     };
   }
 }

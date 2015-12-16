@@ -28,6 +28,7 @@
 #include <qwt/qwt_plot_grid.h>
 #include <qwt/qwt_plot_canvas.h>
 #include <qwt/qwt_plot_curve.h>
+#include <qwt/qwt_plot_magnifier.h>
 #include <qwt/qwt_curve_fitter.h>
 #include <qwt/qwt_symbol.h>
 #include <qwt/qwt_legend.h>
@@ -38,6 +39,7 @@
 
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/gui/IncrementalPlot.hh"
+#include "gazebo/gui/IncrementalPlotPrivate.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -86,15 +88,16 @@ class CurveData: public QwtArraySeriesData<QPointF>
 
 /////////////////////////////////////////////////
 IncrementalPlot::IncrementalPlot(QWidget *_parent)
-  : QwtPlot(_parent)
+  : QwtPlot(_parent),
+    dataPtr(new IncrementalPlotPrivate())
 {
-  this->directPainter = new QwtPlotDirectPainter(this);
+  this->dataPtr->directPainter = new QwtPlotDirectPainter(this);
 
   // panning with the left mouse button
   (void) new QwtPlotPanner(this->canvas());
 
   // zoom in/out with the wheel
-  this->magnifier = new QwtPlotMagnifier(this->canvas());
+  this->dataPtr->magnifier = new QwtPlotMagnifier(this->canvas());
 
 #if defined(Q_WS_X11)
   this->canvas()->setAttribute(Qt::WA_PaintOutsidePaintEvent, true);
@@ -133,13 +136,13 @@ IncrementalPlot::IncrementalPlot(QWidget *_parent)
 /////////////////////////////////////////////////
 IncrementalPlot::~IncrementalPlot()
 {
-  for (CurveMap::iterator iter = this->curves.begin();
-       iter != this->curves.end(); ++iter)
+  for (CurveMap::iterator iter = this->dataPtr->curves.begin();
+       iter != this->dataPtr->curves.end(); ++iter)
   {
     delete iter->second;
   }
 
-  this->curves.clear();
+  this->dataPtr->curves.clear();
 }
 
 /////////////////////////////////////////////////
@@ -151,7 +154,7 @@ void IncrementalPlot::Add(const QString &_label,
 
   QwtPlotCurve *curve = NULL;
 
-  CurveMap::iterator iter = this->curves.find(_label);
+  CurveMap::iterator iter = this->dataPtr->curves.find(_label);
   if (iter == this->curves.end())
     curve = this->AddCurve(_label);
   else
@@ -183,7 +186,7 @@ void IncrementalPlot::Add(const QString &_label, const QPointF &_pt)
 
   QwtPlotCurve *curve = NULL;
 
-  CurveMap::iterator iter = this->curves.find(_label);
+  CurveMap::iterator iter = this->dataPtr->curves.find(_label);
   if (iter == this->curves.end())
     curve = this->AddCurve(_label);
   else
@@ -228,12 +231,12 @@ void IncrementalPlot::AdjustCurve(QwtPlotCurve *_curve)
     r.moveCenter(center.toPoint());
     clipRegion += r;
 
-    this->directPainter->setClipRegion(clipRegion);
+    this->dataPtr->directPainter->setClipRegion(clipRegion);
   }
 
   this->setAxisScale(this->xBottom,
       std::max(0.0, static_cast<double>(lastPoint.x() -
-          5.0 * this->magnifier->wheelFactor())),
+          5.0 * this->dataPtr->magnifier->wheelFactor())),
       std::max(1.0, static_cast<double>(lastPoint.x())));
 
   // this->setAxisScale(_curve->yAxis(), 0.0, _curve->maxYValue() * 2.0);
@@ -241,7 +244,7 @@ void IncrementalPlot::AdjustCurve(QwtPlotCurve *_curve)
   // this->setAxisAutoScale(this->yRight, true);
   // this->setAxisAutoScale(this->yLeft, true);
 
-  this->directPainter->drawSeries(_curve,
+  this->dataPtr->directPainter->drawSeries(_curve,
       curveData->size() - 1, curveData->size() - 1);
 
   this->replot();
@@ -256,17 +259,17 @@ QwtPlotCurve *IncrementalPlot::AddCurve(const QString &_label)
   curve->setData(new CurveData());
 
   // Delete an old curve if it exists.
-  if (this->curves.find(_label) != this->curves.end())
+  if (this->dataPtr->curves.find(_label) != this->dataPtr->curves.end())
   {
     CurveData *curveData = static_cast<CurveData*>(
-        this->curves[_label]->data());
+        this->dataPtr->curves[_label]->data());
     curveData->Clear();
-    delete this->curves[_label];
+    delete this->dataPtr->curves[_label];
   }
 
-  this->curves[_label] = curve;
+  this->dataPtr->curves[_label] = curve;
 
-  QColor penColor = Colors[(this->curves.size()-1) % ColorCount];
+  QColor penColor = Colors[(this->dataPtr->curves.size()-1) % ColorCount];
 
   /// \todo The following will add the curve to the right hand axis. Need
   /// a better way to do this based on user input.
@@ -290,16 +293,16 @@ QwtPlotCurve *IncrementalPlot::AddCurve(const QString &_label)
 /////////////////////////////////////////////////
 void IncrementalPlot::Clear(const QString &_label)
 {
-  CurveMap::iterator iter = this->curves.find(_label);
+  CurveMap::iterator iter = this->dataPtr->curves.find(_label);
 
-  if (iter == this->curves.end())
+  if (iter == this->dataPtr->curves.end())
     return;
 
   CurveData *curveData = static_cast<CurveData *>(iter->second->data());
   curveData->Clear();
 
   delete iter->second;
-  this->curves.erase(iter);
+  this->dataPtr->curves.erase(iter);
 
   this->replot();
 }
@@ -307,7 +310,7 @@ void IncrementalPlot::Clear(const QString &_label)
 /////////////////////////////////////////////////
 void IncrementalPlot::Clear()
 {
-  for (CurveMap::iterator iter = this->curves.begin();
+  for (CurveMap::iterator iter = this->dataPtr->curves.begin();
        iter != this->curves.end(); ++iter)
   {
     CurveData *curveData = static_cast<CurveData *>(iter->second->data());
@@ -315,7 +318,7 @@ void IncrementalPlot::Clear()
     delete iter->second;
   }
 
-  this->curves.clear();
+  this->dataPtr->curves.clear();
 
   this->replot();
 }
@@ -342,7 +345,7 @@ void IncrementalPlot::dragEnterEvent(QDragEnterEvent *_evt)
 /////////////////////////////////////////////////
 bool IncrementalPlot::HasCurve(const QString &_label)
 {
-  return this->curves.find(_label) != this->curves.end();
+  return this->dataPtr->curves.find(_label) != this->dataPtr->curves.end();
 }
 
 /////////////////////////////////////////////////
@@ -355,7 +358,7 @@ void IncrementalPlot::dropEvent(QDropEvent *_evt)
 /////////////////////////////////////////////////
 void IncrementalPlot::Update()
 {
-  for (CurveMap::iterator iter = this->curves.begin();
+  for (CurveMap::iterator iter = this->dataPtr->curves.begin();
        iter != this->curves.end(); ++iter)
   {
     this->AdjustCurve(iter->second);
