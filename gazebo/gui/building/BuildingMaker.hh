@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_BUILDING_MAKER_HH_
-#define _GAZEBO_BUILDING_MAKER_HH_
+#ifndef _GAZEBO_GUI_BUILDING_MAKER_HH_
+#define _GAZEBO_GUI_BUILDING_MAKER_HH_
 
 #include <list>
 #include <string>

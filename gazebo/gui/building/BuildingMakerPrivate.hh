@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_BUILDING_MAKER_PRIVATE_HH_
-#define _GAZEBO_BUILDING_MAKER_PRIVATE_HH_
+#ifndef _GAZEBO_GUI_BUILDING_MAKER_PRIVATE_HH_
+#define _GAZEBO_GUI_BUILDING_MAKER_PRIVATE_HH_
 
 #include <map>
 #include <string>
