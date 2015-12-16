@@ -16,6 +16,7 @@
 */
 
 #include <gtest/gtest.h>
+#include <condition_variable>
 #include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/common/Time.hh"
 #include "gazebo/test/ServerFixture.hh"

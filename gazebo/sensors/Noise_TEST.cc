@@ -225,7 +225,7 @@ TEST_F(NoiseTest, ApplyGaussian)
       sensors::NoisePtr noise = sensors::NoiseFactory::NewNoiseModel(
           NoiseSdf("gaussian", mean, stddev, biasMean, biasStddev, 0));
       sensors::GaussianNoiseModelPtr gaussianNoise =
-        boost::dynamic_pointer_cast<sensors::GaussianNoiseModel>(noise);
+        std::dynamic_pointer_cast<sensors::GaussianNoiseModel>(noise);
       acc(gaussianNoise->GetBias());
     }
 

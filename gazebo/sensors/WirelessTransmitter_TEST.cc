@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-
+#include <regex>
 #include <gtest/gtest.h>
 #include "gazebo/test/ServerFixture.hh"
 
@@ -31,7 +31,7 @@ class WirelessTransmitter_TEST : public ServerFixture
 
     private: std::mutex mutex;
     private: bool receivedMsg;
-    private: std::shared_ptr<msgs::PropagationGrid const> gridMsg;
+    private: boost::shared_ptr<msgs::PropagationGrid const> gridMsg;
     private: sensors::WirelessTransmitterPtr tx;
     private: sensors::WirelessTransmitterPtr txNoVisual;
 };
@@ -126,8 +126,8 @@ void WirelessTransmitter_TEST::TestInvalidFreq()
   // Replace the essid by an empty value
   std::string transmitterSensorStringCopy =
       std::regex_replace(transmitterSensorString,
-          "<frequency>.*<\\/frequency>",
-          "<frequency>-1.0</frequency>");
+          std::regex("<frequency>.*<\\/frequency>"),
+          std::string("<frequency>-1.0</frequency>"));
 
   sdf::readString(transmitterSensorStringCopy, sdf);
 

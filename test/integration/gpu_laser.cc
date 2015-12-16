@@ -107,11 +107,11 @@ TEST_F(GPURaySensorTest, LaserUnitBox)
 
   sensors::SensorPtr sensor = sensors::get_sensor(raySensorName);
   sensors::GpuRaySensorPtr raySensor =
-    boost::dynamic_pointer_cast<sensors::GpuRaySensor>(sensor);
+    std::dynamic_pointer_cast<sensors::GpuRaySensor>(sensor);
 
   sensors::SensorPtr sensor2 = sensors::get_sensor(raySensorName2);
   sensors::GpuRaySensorPtr raySensor2 =
-    boost::dynamic_pointer_cast<sensors::GpuRaySensor>(sensor2);
+    std::dynamic_pointer_cast<sensors::GpuRaySensor>(sensor2);
 
   // Make sure the above dynamic cast worked.
   EXPECT_TRUE(raySensor != NULL);
@@ -127,8 +127,9 @@ TEST_F(GPURaySensorTest, LaserUnitBox)
   int scanCount = 0;
   event::ConnectionPtr c =
     raySensor->ConnectNewLaserFrame(
-        boost::bind(&::OnNewLaserFrame, &scanCount, scan,
-          _1, _2, _3, _4, _5));
+        std::bind(&::OnNewLaserFrame, &scanCount, scan,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
 
   // wait for a few laser scans
   int i = 0;
@@ -156,8 +157,9 @@ TEST_F(GPURaySensorTest, LaserUnitBox)
   int scanCount2 = 0;
   event::ConnectionPtr c2 =
     raySensor->ConnectNewLaserFrame(
-        boost::bind(&::OnNewLaserFrame, &scanCount2, scan2,
-          _1, _2, _3, _4, _5));
+        std::bind(&::OnNewLaserFrame, &scanCount2, scan2,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
 
   // wait for a few laser scans
   i = 0;
@@ -276,11 +278,11 @@ TEST_F(GPURaySensorTest, NameCollision)
 
   sensors::SensorPtr sensor = sensors::get_sensor(raySensorName);
   sensors::GpuRaySensorPtr raySensor =
-    boost::dynamic_pointer_cast<sensors::GpuRaySensor>(sensor);
+    std::dynamic_pointer_cast<sensors::GpuRaySensor>(sensor);
 
   sensors::SensorPtr sensor2 = sensors::get_sensor(raySensorName2);
   sensors::GpuRaySensorPtr raySensor2 =
-    boost::dynamic_pointer_cast<sensors::GpuRaySensor>(sensor2);
+    std::dynamic_pointer_cast<sensors::GpuRaySensor>(sensor2);
 
   // Make sure the above dynamic cast worked.
   EXPECT_TRUE(raySensor != NULL);
@@ -312,7 +314,7 @@ TEST_F(GPURaySensorTest, Heightmap)
   ASSERT_LT(t, 100);
   sensors::SensorPtr sensor = sensors::get_sensor(gpuLaserName);
   sensors::GpuRaySensorPtr raySensor =
-    boost::dynamic_pointer_cast<sensors::GpuRaySensor>(sensor);
+    std::dynamic_pointer_cast<sensors::GpuRaySensor>(sensor);
 
   EXPECT_TRUE(raySensor != NULL);
 
@@ -322,8 +324,9 @@ TEST_F(GPURaySensorTest, Heightmap)
   int scanCount = 0;
   event::ConnectionPtr c =
     raySensor->ConnectNewLaserFrame(
-        boost::bind(&::OnNewLaserFrame, &scanCount, scan,
-          _1, _2, _3, _4, _5));
+        std::bind(&::OnNewLaserFrame, &scanCount, scan,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
 
   // wait for a few laser scans
   int i = 0;

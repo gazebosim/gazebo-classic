@@ -84,7 +84,7 @@ TEST_F(RenderingSensorTest, Timestamp)
   EXPECT_TRUE(sensor != NULL);
 
   sensors::CameraSensorPtr camSensor1 =
-    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
   EXPECT_TRUE(camSensor1 != NULL);
 
   std::string modelName2 = "camera_model2";
@@ -98,7 +98,7 @@ TEST_F(RenderingSensorTest, Timestamp)
   EXPECT_TRUE(sensor2 != NULL);
 
   sensors::CameraSensorPtr camSensor2 =
-    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor2);
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor2);
   EXPECT_TRUE(camSensor2 != NULL);
 
   // spawn gpu ray sensor
@@ -121,7 +121,7 @@ TEST_F(RenderingSensorTest, Timestamp)
   ASSERT_TRUE(sensor3 != NULL);
 
   sensors::GpuRaySensorPtr gpuRaySensor =
-    boost::dynamic_pointer_cast<sensors::GpuRaySensor>(sensor3);
+    std::dynamic_pointer_cast<sensors::GpuRaySensor>(sensor3);
   EXPECT_TRUE(gpuRaySensor != NULL);
 
   camSensor1->SetActive(true);

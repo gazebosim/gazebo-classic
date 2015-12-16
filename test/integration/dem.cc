@@ -51,7 +51,7 @@ TEST_F(Dem_TEST, GPS)
 
   // Get a pointer to the GPS sensor.
   sensors::GpsSensorPtr sensor =
-    boost::dynamic_pointer_cast<sensors::GpsSensor>(
+    std::dynamic_pointer_cast<sensors::GpsSensor>(
         mgr->GetSensor("gps"));
 
   // Make sure the above dynamic cast worked.

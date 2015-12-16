@@ -78,19 +78,19 @@ TEST_F(MultiCameraSensor, CameraRotationTest)
 
   sensors::SensorPtr sensor = sensors::get_sensor(cameraUnrotated);
   sensors::MultiCameraSensorPtr camSensorUnrotated =
-    boost::dynamic_pointer_cast<sensors::MultiCameraSensor>(sensor);
+    std::dynamic_pointer_cast<sensors::MultiCameraSensor>(sensor);
 
   sensor = sensors::get_sensor(cameraTranslated);
   sensors::CameraSensorPtr camSensorTranslated =
-    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
 
   sensor = sensors::get_sensor(cameraRotated1);
   sensors::MultiCameraSensorPtr camSensorRotated1 =
-    boost::dynamic_pointer_cast<sensors::MultiCameraSensor>(sensor);
+    std::dynamic_pointer_cast<sensors::MultiCameraSensor>(sensor);
 
   sensor = sensors::get_sensor(cameraRotated2);
   sensors::MultiCameraSensorPtr camSensorRotated2 =
-    boost::dynamic_pointer_cast<sensors::MultiCameraSensor>(sensor);
+    std::dynamic_pointer_cast<sensors::MultiCameraSensor>(sensor);
 
   unsigned int width  = 1024;
   unsigned int height = 544;
@@ -116,33 +116,40 @@ TEST_F(MultiCameraSensor, CameraRotationTest)
     // connect to camera image updates
     event::ConnectionPtr c0Left =
       camSensorUnrotated->Camera(0)->ConnectNewImageFrame(
-          boost::bind(&::OnNewFrameTest, &imageCount0Left, img0Left,
-            _1, _2, _3, _4, _5));
+          std::bind(&::OnNewFrameTest, &imageCount0Left, img0Left,
+            std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+            std::placeholders::_4, std::placeholders::_5));
     event::ConnectionPtr ct =
       camSensorTranslated->Camera()->ConnectNewImageFrame(
-          boost::bind(&::OnNewFrameTest, &imageCountt, imgt,
-            _1, _2, _3, _4, _5));
+          std::bind(&::OnNewFrameTest, &imageCountt, imgt,
+            std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+            std::placeholders::_4, std::placeholders::_5));
     event::ConnectionPtr c1Left =
       camSensorRotated1->Camera(0)->ConnectNewImageFrame(
-          boost::bind(&::OnNewFrameTest, &imageCount1Left, img1Left,
-            _1, _2, _3, _4, _5));
+          std::bind(&::OnNewFrameTest, &imageCount1Left, img1Left,
+            std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+            std::placeholders::_4, std::placeholders::_5));
     event::ConnectionPtr c2Left =
       camSensorRotated2->Camera(0)->ConnectNewImageFrame(
-          boost::bind(&::OnNewFrameTest, &imageCount2Left, img2Left,
-            _1, _2, _3, _4, _5));
+          std::bind(&::OnNewFrameTest, &imageCount2Left, img2Left,
+            std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+            std::placeholders::_4, std::placeholders::_5));
 
     event::ConnectionPtr c0Right =
       camSensorUnrotated->Camera(1)->ConnectNewImageFrame(
-          boost::bind(&::OnNewFrameTest, &imageCount0Right, img0Right,
-            _1, _2, _3, _4, _5));
+          std::bind(&::OnNewFrameTest, &imageCount0Right, img0Right,
+            std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+            std::placeholders::_4, std::placeholders::_5));
     event::ConnectionPtr c1Right =
       camSensorRotated1->Camera(1)->ConnectNewImageFrame(
-          boost::bind(&::OnNewFrameTest, &imageCount1Right, img1Right,
-            _1, _2, _3, _4, _5));
+          std::bind(&::OnNewFrameTest, &imageCount1Right, img1Right,
+            std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+            std::placeholders::_4, std::placeholders::_5));
     event::ConnectionPtr c2Right =
       camSensorRotated2->Camera(1)->ConnectNewImageFrame(
-          boost::bind(&::OnNewFrameTest, &imageCount2Right, img2Right,
-            _1, _2, _3, _4, _5));
+          std::bind(&::OnNewFrameTest, &imageCount2Right, img2Right,
+            std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+            std::placeholders::_4, std::placeholders::_5));
 
     // activate camera
     camSensorUnrotated->SetActive(true);
@@ -350,22 +357,22 @@ TEST_F(MultiCameraSensor, CameraRotationWorldPoseTest)
   physics::ModelPtr model1 = world->GetModel(modelUnrotated);
   sensors::SensorPtr sensor1 = sensors::get_sensor(multicameraUnrotated);
   sensors::MultiCameraSensorPtr multicamera1 =
-    boost::dynamic_pointer_cast<sensors::MultiCameraSensor>(sensor1);
+    std::dynamic_pointer_cast<sensors::MultiCameraSensor>(sensor1);
 
   physics::ModelPtr model2 = world->GetModel(modelTranslated);
   sensors::SensorPtr sensor2 = sensors::get_sensor(cameraTranslated);
   sensors::CameraSensorPtr camera2 =
-    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor2);
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor2);
 
   physics::ModelPtr model3 = world->GetModel(modelRotated1);
   sensors::SensorPtr sensor3 = sensors::get_sensor(multicameraRotated1);
   sensors::MultiCameraSensorPtr multicamera3 =
-    boost::dynamic_pointer_cast<sensors::MultiCameraSensor>(sensor3);
+    std::dynamic_pointer_cast<sensors::MultiCameraSensor>(sensor3);
 
   physics::ModelPtr model4 = world->GetModel(modelRotated2);
   sensors::SensorPtr sensor4 = sensors::get_sensor(multicameraRotated2);
   sensors::MultiCameraSensorPtr multicamera4 =
-    boost::dynamic_pointer_cast<sensors::MultiCameraSensor>(sensor4);
+    std::dynamic_pointer_cast<sensors::MultiCameraSensor>(sensor4);
 
   ASSERT_TRUE(model1 != NULL);
   ASSERT_TRUE(model2 != NULL);

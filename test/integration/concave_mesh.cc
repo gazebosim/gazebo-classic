@@ -40,7 +40,7 @@ void ConcaveMeshTest::SubmeshNoCollisionTest(const std::string &_physicsEngine)
   world->Step(100);
 
   sensors::RaySensorPtr raySensor =
-    boost::dynamic_pointer_cast<sensors::RaySensor>(
+    std::dynamic_pointer_cast<sensors::RaySensor>(
     sensors::get_sensor("default::hokuyo::link::laser"));
   EXPECT_TRUE(raySensor != NULL);
 
@@ -59,7 +59,7 @@ void ConcaveMeshTest::SubmeshCollisionTest(const std::string &_physicsEngine)
   world->Step(100);
 
   sensors::RaySensorPtr raySensor =
-    boost::dynamic_pointer_cast<sensors::RaySensor>(
+    std::dynamic_pointer_cast<sensors::RaySensor>(
     sensors::get_sensor("default::hokuyo::link::laser"));
   EXPECT_TRUE(raySensor != NULL);
 
@@ -95,7 +95,7 @@ void ConcaveMeshTest::RayTest(const std::string &_physicsEngine)
   world->Step(100);
 
   sensors::RaySensorPtr raySensor =
-    boost::dynamic_pointer_cast<sensors::RaySensor>(
+    std::dynamic_pointer_cast<sensors::RaySensor>(
     sensors::get_sensor("default::hokuyo::link::laser"));
   EXPECT_TRUE(raySensor != NULL);
 

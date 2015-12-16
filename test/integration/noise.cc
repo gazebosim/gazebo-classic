@@ -89,7 +89,7 @@ void NoiseTest::NoisePlugin(const std::string &_physicsEngine)
 
   sensors::SensorPtr sensor = sensors::get_sensor(raySensorName);
   sensors::RaySensorPtr raySensor =
-    boost::dynamic_pointer_cast<sensors::RaySensor>(sensor);
+    std::dynamic_pointer_cast<sensors::RaySensor>(sensor);
 
   EXPECT_TRUE(raySensor != NULL);
 

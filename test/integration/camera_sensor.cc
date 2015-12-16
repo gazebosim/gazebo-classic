@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-
+#include <mutex>
 #include <ignition/math/Rand.hh>
 
 #include "gazebo/physics/physics.hh"
@@ -32,7 +32,7 @@ class CameraSensor : public ServerFixture
 {
 };
 
-boost::mutex mutex;
+std::mutex mutex;
 
 unsigned char* img = NULL;
 unsigned char* img2 = NULL;
@@ -47,7 +47,7 @@ void OnNewCameraFrame(int* _imageCounter, unsigned char* _imageDest,
                   unsigned int _depth,
                   const std::string &_format)
 {
-  boost::mutex::scoped_lock lock(mutex);
+  std::lock_guard<std::mutex> lock(mutex);
   pixelFormat = _format;
   memcpy(_imageDest, _image, _width * _height * _depth);
   *_imageCounter += 1;
@@ -78,12 +78,13 @@ TEST_F(CameraSensor, CheckThrottle)
       setPose.rot.GetAsEuler(), width, height, updateRate);
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
   sensors::CameraSensorPtr camSensor =
-    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
   imageCount = 0;
   img = new unsigned char[width * height*3];
   event::ConnectionPtr c = camSensor->Camera()->ConnectNewImageFrame(
-        boost::bind(&::OnNewCameraFrame, &imageCount, img,
-          _1, _2, _3, _4, _5));
+        std::bind(&::OnNewCameraFrame, &imageCount, img,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
   common::Timer timer;
   timer.Start();
 
@@ -128,7 +129,7 @@ TEST_F(CameraSensor, FillMsg)
       setPose.rot.GetAsEuler(), width, height, updateRate);
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
   sensors::CameraSensorPtr camSensor =
-    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
 
   msgs::Sensor msg;
   sensor->FillMsg(msg);
@@ -194,13 +195,14 @@ TEST_F(CameraSensor, UnlimitedTest)
       setPose.rot.GetAsEuler(), width, height, updateRate);
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
   sensors::CameraSensorPtr camSensor =
-    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
   imageCount = 0;
   img = new unsigned char[width * height*3];
   event::ConnectionPtr c =
     camSensor->Camera()->ConnectNewImageFrame(
-        boost::bind(&::OnNewCameraFrame, &imageCount, img,
-          _1, _2, _3, _4, _5));
+        std::bind(&::OnNewCameraFrame, &imageCount, img,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
   common::Timer timer;
   timer.Start();
   // time how long it takes to get N images
@@ -247,12 +249,12 @@ TEST_F(CameraSensor, MultiSenseHigh)
       setPose.rot.GetAsEuler(), width, height, updateRate);
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
   sensors::CameraSensorPtr camSensor =
-    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
   imageCount = 0;
   img = new unsigned char[width * height*3];
   event::ConnectionPtr c =
     camSensor->Camera()->ConnectNewImageFrame(
-        boost::bind(&::OnNewCameraFrame, &imageCount, img,
+        std::bind(&::OnNewCameraFrame, &imageCount, img,
           _1, _2, _3, _4, _5));
   common::Timer timer;
   timer.Start();
@@ -302,12 +304,12 @@ TEST_F(CameraSensor, MultiSenseLow)
       setPose.rot.GetAsEuler(), width, height, updateRate);
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
   sensors::CameraSensorPtr camSensor =
-    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
   imageCount = 0;
   img = new unsigned char[width * height*3];
   event::ConnectionPtr c =
     camSensor->Camera()->ConnectNewImageFrame(
-        boost::bind(&::OnNewCameraFrame, &imageCount, img,
+        std::bind(&::OnNewCameraFrame, &imageCount, img,
           _1, _2, _3, _4, _5));
   common::Timer timer;
   timer.Start();
@@ -359,10 +361,10 @@ TEST_F(CameraSensor, CheckNoise)
       "gaussian", noiseMean, noiseStdDev);
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
   sensors::CameraSensorPtr camSensor =
-    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
   sensor = sensors::get_sensor(cameraNameNoisy);
   sensors::CameraSensorPtr camSensorNoisy =
-    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
 
   imageCount = 0;
   imageCount2 = 0;
@@ -370,12 +372,14 @@ TEST_F(CameraSensor, CheckNoise)
   img2 = new unsigned char[width * height*3];
   event::ConnectionPtr c =
     camSensor->Camera()->ConnectNewImageFrame(
-        boost::bind(&::OnNewCameraFrame, &imageCount, img,
-          _1, _2, _3, _4, _5));
+        std::bind(&::OnNewCameraFrame, &imageCount, img,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
   event::ConnectionPtr c2 =
     camSensorNoisy->Camera()->ConnectNewImageFrame(
-        boost::bind(&::OnNewCameraFrame, &imageCount2, img2,
-          _1, _2, _3, _4, _5));
+        std::bind(&::OnNewCameraFrame, &imageCount2, img2,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
 
   // Get some images
   while (imageCount < 10 || imageCount2 < 10)
@@ -427,10 +431,10 @@ TEST_F(CameraSensor, CheckDistortion)
       "", 0, 0, true, -0.25349, 0.11868, 0.0, -0.00028, 0.00005, 0.5, 0.5);
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
   sensors::CameraSensorPtr camSensor =
-    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
   sensor = sensors::get_sensor(cameraNameDistorted);
   sensors::CameraSensorPtr camSensorDistorted =
-    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
 
   imageCount = 0;
   imageCount2 = 0;
@@ -438,12 +442,14 @@ TEST_F(CameraSensor, CheckDistortion)
   img2 = new unsigned char[width * height*3];
   event::ConnectionPtr c =
     camSensor->Camera()->ConnectNewImageFrame(
-        boost::bind(&::OnNewCameraFrame, &imageCount, img,
-          _1, _2, _3, _4, _5));
+        std::bind(&::OnNewCameraFrame, &imageCount, img,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
   event::ConnectionPtr c2 =
     camSensorDistorted->Camera()->ConnectNewImageFrame(
-        boost::bind(&::OnNewCameraFrame, &imageCount2, img2,
-          _1, _2, _3, _4, _5));
+        std::bind(&::OnNewCameraFrame, &imageCount2, img2,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
 
   // Get some images
   while (imageCount < 10 || imageCount2 < 10)
@@ -533,10 +539,10 @@ TEST_F(CameraSensor, CompareSideBySideCamera)
 
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
   sensors::CameraSensorPtr camSensor =
-    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
   sensor = sensors::get_sensor(cameraName2);
   sensors::CameraSensorPtr camSensor2 =
-    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
 
   imageCount = 0;
   imageCount2 = 0;
@@ -546,12 +552,14 @@ TEST_F(CameraSensor, CompareSideBySideCamera)
   unsigned char *prevImg2 = new unsigned char[width * height*3];
   event::ConnectionPtr c =
     camSensor->Camera()->ConnectNewImageFrame(
-        boost::bind(&::OnNewCameraFrame, &imageCount, img,
-          _1, _2, _3, _4, _5));
+        std::bind(&::OnNewCameraFrame, &imageCount, img,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
   event::ConnectionPtr c2 =
     camSensor2->Camera()->ConnectNewImageFrame(
-        boost::bind(&::OnNewCameraFrame, &imageCount2, img2,
-          _1, _2, _3, _4, _5));
+        std::bind(&::OnNewCameraFrame, &imageCount2, img2,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
 
   while (imageCount < 10 || imageCount2 < 10)
     common::Time::MSleep(10);
@@ -579,7 +587,7 @@ TEST_F(CameraSensor, CompareSideBySideCamera)
       unsigned int diffMax2 = 0;
       double diffAvg2 = 0.0;
 
-      boost::mutex::scoped_lock lock(mutex);
+      std::lock_guard<std::mutex> lock(mutex);
       this->ImageCompare(img, prevImg, width, height, 3,
                          diffMax, diffSum, diffAvg);
       this->ImageCompare(prevImg2, prevImg2, width, height, 3,

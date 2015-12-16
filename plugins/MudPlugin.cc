@@ -15,7 +15,7 @@
  *
 */
 
-#include <boost/algorithm/string.hpp>
+#include <regex>
 #include <boost/unordered_map.hpp>
 #include <boost/unordered_set.hpp>
 
@@ -112,12 +112,12 @@ void MudPlugin::Init()
     if (!this->sdf->HasElement("contact_surface_bitmask"))
     {
       std::string name = this->contactSensorName;
-      boost::replace_all(name, "/", "::");
+      name = std::regex_replace(name, std::regex("/"), std::string("::"));
       name = this->world->GetName() + "::"+ this->modelName + "::" + name;
       sensors::SensorManager *mgr = sensors::SensorManager::Instance();
       // Get a pointer to the contact sensor
       sensors::ContactSensorPtr sensor =
-          boost::dynamic_pointer_cast<sensors::ContactSensor>
+          std::dynamic_pointer_cast<sensors::ContactSensor>
           (mgr->GetSensor(name));
       if (sensor)
       {
@@ -159,7 +159,7 @@ void MudPlugin::Init()
   }
 
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-          boost::bind(&MudPlugin::OnUpdate, this));
+          std::bind(&MudPlugin::OnUpdate, this));
 }
 
 /////////////////////////////////////////////////

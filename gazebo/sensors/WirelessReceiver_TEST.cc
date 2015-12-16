@@ -134,10 +134,10 @@ void WirelessReceiver_TEST::TestIllegalTransceiver()
 {
   // Make a copy of the sdf string for avoid affecting other tests
   std::string receiverSensorStringCopy = this->receiverSensorString;
-  receiverSensorStringCopy = std::regex_replac(receiverSensorStringCopy,
-      "<transceiver>", "");
   receiverSensorStringCopy = std::regex_replace(receiverSensorStringCopy,
-      "</transceiver>", "");
+      std::regex("<transceiver>"), std::string(""));
+  receiverSensorStringCopy = std::regex_replace(receiverSensorStringCopy,
+      std::regex("</transceiver>"), std::string(""));
 
   this->CheckIllegalValue(receiverSensorStringCopy);
 }
@@ -149,7 +149,8 @@ void WirelessReceiver_TEST::TestIllegalPower()
   // Replace the power by an incorrect value
   std::string receiverSensorStringCopy =
       std::regex_replace(this->receiverSensorString,
-          "<power>.*<\\/power>", "<power>-1.0</power>");
+          std::regex("<power>.*<\\/power>"),
+          std::string("<power>-1.0</power>"));
 
   this->CheckLegalValue(receiverSensorStringCopy);
 }
@@ -161,7 +162,7 @@ void WirelessReceiver_TEST::TestIllegalGain()
   // Replace the gain by an incorrect value
   std::string receiverSensorStringCopy =
       std::regex_replace(this->receiverSensorString,
-          "<gain>.*<\\/gain>", "<gain>-1.0</gain>");
+          std::regex("<gain>.*<\\/gain>"), std::string("<gain>-1.0</gain>"));
 
   this->CheckLegalValue(receiverSensorStringCopy);
 }
@@ -173,8 +174,8 @@ void WirelessReceiver_TEST::TestIllegalMinFreq()
   // Replace the min frequency by an incorrect value
   std::string receiverSensorStringCopy =
       std::regex_replace(this->receiverSensorString,
-          "<min_frequency>.*<\\/min_frequency>",
-          "<min_frequency>-1.0</min_frequency>");
+          std::regex("<min_frequency>.*<\\/min_frequency>"),
+          std::string("<min_frequency>-1.0</min_frequency>"));
 
   this->CheckLegalValue(receiverSensorStringCopy);
 }
@@ -186,8 +187,8 @@ void WirelessReceiver_TEST::TestIllegalMaxFreq()
   // Replace the max frequency by an incorrect value
   std::string receiverSensorStringCopy =
       std::regex_replace(this->receiverSensorString,
-          "<max_frequency>.*<\\/max_frequency>",
-          "<max_frequency>-1.0</max_frequency>");
+          std::regex("<max_frequency>.*<\\/max_frequency>"),
+          std::string("<max_frequency>-1.0</max_frequency>"));
 
   this->CheckLegalValue(receiverSensorStringCopy);
 }
@@ -199,13 +200,13 @@ void WirelessReceiver_TEST::TestIllegalMinMaxFreq()
   // Swap min_frequency and max_frequency
   std::string receiverSensorStringCopy =
       std::regex_replace(this->receiverSensorString,
-          "<max_frequency>.*<\\/max_frequency>",
-          "<max_frequency>2412.0</max_frequency>");
+          std::regex("<max_frequency>.*<\\/max_frequency>"),
+          std::string("<max_frequency>2412.0</max_frequency>"));
 
   receiverSensorStringCopy =
       std::regex_replace(receiverSensorStringCopy,
-          "<min_frequency>.*<\\/min_frequency>",
-          "<min_frequency>2484.0</min_frequency>");
+          std::regex("<min_frequency>.*<\\/min_frequency>"),
+          std::string("<min_frequency>2484.0</min_frequency>"));
 
   this->CheckLegalValue(receiverSensorStringCopy);
 }
@@ -217,8 +218,8 @@ void WirelessReceiver_TEST::TestIllegalSensitivity()
   // Replace the sensitivity by an incorrect value
   std::string receiverSensorStringCopy =
       std::regex_replace(this->receiverSensorString,
-          "<sensitivity>.*<\\/sensitivity>",
-          "<sensitivity>1.0</sensitivity>");
+          std::regex("<sensitivity>.*<\\/sensitivity>"),
+          std::string("<sensitivity>1.0</sensitivity>"));
 
   this->CheckLegalValue(receiverSensorStringCopy);
 }
