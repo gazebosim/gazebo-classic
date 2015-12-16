@@ -7,7 +7,7 @@
     * [Pull request #2027](https://bitbucket.org/osrf/gazebo/pull-request/2027)
 
 1. Use opaque pointers in the gui/MainWindow class.
-    * [Pull request #2046](https://bitbucket.org/osrf/gazebo/pull-request/2046)
+    * [Pull request #2042](https://bitbucket.org/osrf/gazebo/pull-request/2042)
 
 1. Use opaque pointers in the terrain editor.
     * [Pull request #2026](https://bitbucket.org/osrf/gazebo/pull-request/2026)
