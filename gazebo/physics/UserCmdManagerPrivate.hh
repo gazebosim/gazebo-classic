@@ -79,6 +79,12 @@ namespace gazebo
       /// \brief Publisher of undo redo statistics messages.
       public: transport::PublisherPtr userCmdStatsPub;
 
+      /// \brief Publisher of model modify messages.
+      public: transport::PublisherPtr modelModifyPub;
+
+      /// \brief Publisher of light modify messages.
+      public: transport::PublisherPtr lightModifyPub;
+
       /// \brief Publisher of world control messages.
       public: transport::PublisherPtr worldControlPub;
 

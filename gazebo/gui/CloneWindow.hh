@@ -18,6 +18,9 @@
 #ifndef _GAZEBO_CLONE_WINDOW_HH_
 #define _GAZEBO_CLONE_WINDOW_HH_
 
+#include <memory>
+
+#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
 
@@ -25,6 +28,8 @@ namespace gazebo
 {
   namespace gui
   {
+    class CloneWindowPrivate;
+
     /// \addtogroup gazebo_gui
     /// \{
 
@@ -44,12 +49,17 @@ namespace gazebo
 
       /// \brief Get the port for the new gzserver specified by the user.
       /// \return The port for the new gzserver.
-      public: int GetPort();
+      /// \deprecated See Port() const
+      public: int GetPort() GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the port for the new gzserver specified by the user.
+      /// \return The port for the new gzserver.
+      public: int Port() const;
 
       /// \brief True if the stored port is a valid one. A valid port is an
       /// integer number in the 1025-65535 range.
       /// \return True when the port is valid or false otherwise.
-      public: bool IsValidPort();
+      public: bool IsValidPort() const;
 
       /// \brief Callback when okay button is selected.
       private slots: void OnOkay();
@@ -60,17 +70,9 @@ namespace gazebo
       /// \brief Update the member variables after the user pressed okay.
       private: void Update();
 
-      /// \brief Button used to finalize port selection.
-      private: QPushButton *okayButton;
-
-      /// \brief QT widget for reading the port used in the cloned server.
-      private: QLineEdit *portEdit;
-
-      /// \brief Port used for the cloned server.
-      private: int port;
-
-      /// \brief Used to flag if the text entered by the user is a valid port.
-      private: bool validPort;
+      /// \internal
+      /// \brief Pointer to private data.
+      protected: std::unique_ptr<CloneWindowPrivate> dataPtr;
     };
   }
 }
