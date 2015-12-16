@@ -690,5 +690,11 @@ namespace gazebo
     /// \brief Counter for unique name generation.
     private: int uniqueCounter;
   };
+
+  class GAZEBO_VISIBLE RenderingFixture : public ServerFixture
+  {
+    // Documentation inherited.
+    public: virtual void SetUp();
+  };
 }       // namespace gazebo
 #endif  // define _GAZEBO_SERVER_FIXTURE_HH_
