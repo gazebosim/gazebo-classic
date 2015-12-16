@@ -45,7 +45,7 @@ void DARTPlaneShape::CreatePlane()
   PlaneShape::CreatePlane();
 
   DARTCollisionPtr dartCollisionParent =
-      boost::dynamic_pointer_cast<DARTCollision>(this->collisionParent);
+      std::dynamic_pointer_cast<DARTCollision>(this->collisionParent);
 
   // math::Vector3 n = this->GetNormal();
 

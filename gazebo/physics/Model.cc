@@ -435,7 +435,7 @@ void Model::UpdateParameters(sdf::ElementPtr _sdf)
     sdf::ElementPtr linkElem = _sdf->GetElement("link");
     while (linkElem)
     {
-      LinkPtr link = boost::dynamic_pointer_cast<Link>(
+      LinkPtr link = std::dynamic_pointer_cast<Link>(
           this->GetChild(linkElem->Get<std::string>("name")));
       link->UpdateParameters(linkElem);
       linkElem = linkElem->GetNextElement("link");
@@ -448,7 +448,7 @@ void Model::UpdateParameters(sdf::ElementPtr _sdf)
     sdf::ElementPtr jointElem = _sdf->GetElement("joint");
     while (jointElem)
     {
-      JointPtr joint = boost::dynamic_pointer_cast<Joint>(this->GetChild(jointElem->Get<std::string>("name")));
+      JointPtr joint = std::dynamic_pointer_cast<Joint>(this->GetChild(jointElem->Get<std::string>("name")));
       joint->UpdateParameters(jointElem);
       jointElem = jointElem->GetNextElement("joint");
     }
@@ -788,7 +788,7 @@ LinkPtr Model::GetLinkById(unsigned int _id) const
 //////////////////////////////////////////////////
 LinkPtr Model::LinkById(const unsigned int _id) const
 {
-  return boost::dynamic_pointer_cast<Link>(this->BaseById(_id));
+  return std::dynamic_pointer_cast<Link>(this->BaseById(_id));
 }
 
 //////////////////////////////////////////////////
@@ -866,7 +866,7 @@ void Model::LoadJoint(sdf::ElementPtr _sdf)
 
   if (!this->dataPtr->jointController)
     this->dataPtr->jointController.reset(new JointController(
-        boost::dynamic_pointer_cast<Model>(shared_from_this())));
+        std::dynamic_pointer_cast<Model>(shared_from_this())));
   this->dataPtr->jointController->AddJoint(joint);
 }
 

@@ -14,8 +14,6 @@
  * limitations under the License.
  *
  */
-#include <boost/bind.hpp>
-
 #include <string>
 
 #include "gazebo/gazebo_config.h"
@@ -30,113 +28,124 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 ODEScrewJoint::ODEScrewJoint(dWorldID _worldId, BasePtr _parent)
-    : ScrewJoint<ODEJoint>(_parent)
+: ScrewJoint<ODEJoint>(_parent)
 {
-  this->jointId = dJointCreateScrew(_worldId, NULL);
+  this->odeJointDPtr->jointId = dJointCreateScrew(_worldId, NULL);
 }
 
 //////////////////////////////////////////////////
 ODEScrewJoint::~ODEScrewJoint()
 {
-  if (this->applyDamping)
-    physics::Joint::DisconnectJointUpdate(this->applyDamping);
+  if (this->odeJointDPtr->applyDamping)
+    physics::Joint::DisconnectJointUpdate(this->odeJointDPtr->applyDamping);
 }
 
 //////////////////////////////////////////////////
 void ODEScrewJoint::Load(sdf::ElementPtr _sdf)
 {
   ScrewJoint<ODEJoint>::Load(_sdf);
-  this->SetThreadPitch(this->threadPitch);
+  this->SetThreadPitch(this->screwDPtr->threadPitch);
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODEScrewJoint::GetAnchor(unsigned int /*index*/) const
+ignition::math::Vector3d ODEScrewJoint::GetAnchor(unsigned int /*index*/) const
 {
   dVector3 result;
   // initialize to 0
   result[0] = result[1] = result[2] = 0.0;
 
-  if (this->jointId)
-    dJointGetScrewAnchor(this->jointId, result);
+  if (this->odeJointDPtr->jointId)
+    dJointGetScrewAnchor(this->odeJointDPtr->jointId, result);
   else
     gzerr << "ODE Joint ID is invalid, returning 0 vector.\n";
 
-  return math::Vector3(result[0], result[1], result[2]);
+  return ignition::math::Vector3d(result[0], result[1], result[2]);
 }
 
 //////////////////////////////////////////////////
 void ODEScrewJoint::SetAnchor(unsigned int /*index*/,
-    const math::Vector3 &_anchor)
+    const ignition::math::Vector3d &_anchor)
 {
-  if (!this->jointId)
+  if (!this->odeJointDPtr->jointId)
   {
     gzerr << "ODE Joint ID is invalid, anchor not set.\n";
     return;
   }
 
-  if (this->childLink)
-    this->childLink->SetEnabled(true);
-  if (this->parentLink)
-    this->parentLink->SetEnabled(true);
+  if (this->odeJointDPtr->childLink)
+    this->odeJointDPtr->childLink->SetEnabled(true);
+  if (this->odeJointDPtr->parentLink)
+    this->odeJointDPtr->parentLink->SetEnabled(true);
 
-  if (this->jointId)
-    dJointSetScrewAnchor(this->jointId, _anchor.x, _anchor.y, _anchor.z);
+  if (this->odeJointDPtr->jointId)
+  {
+    dJointSetScrewAnchor(this->odeJointDPtr->jointId,
+        _anchor.X(), _anchor.Y(), _anchor.Z());
+  }
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODEScrewJoint::GetGlobalAxis(unsigned int /*_index*/) const
+ignition::math::Vector3d ODEScrewJoint::GlobalAxis(
+    const unsigned int /*_index*/) const
 {
   dVector3 result;
 
-  if (this->jointId)
-    dJointGetScrewAxis(this->jointId, result);
+  if (this->odeJointDPtr->jointId)
+    dJointGetScrewAxis(this->odeJointDPtr->jointId, result);
   else
     gzerr << "ODE Joint ID is invalid\n";
 
-  return math::Vector3(result[0], result[1], result[2]);
+  return ignition::math::Vector3d(result[0], result[1], result[2]);
 }
 
 //////////////////////////////////////////////////
-void ODEScrewJoint::SetAxis(unsigned int /*_index*/, const math::Vector3 &_axis)
+void ODEScrewJoint::SetAxis(const unsigned int /*_index*/,
+    const ignition::math::Vector3d &_axis)
 {
-  if (this->childLink)
-    this->childLink->SetEnabled(true);
-  if (this->parentLink)
-    this->parentLink->SetEnabled(true);
+  if (this->odeJointDPtr->childLink)
+    this->odeJointDPtr->childLink->SetEnabled(true);
+  if (this->odeJointDPtr->parentLink)
+    this->odeJointDPtr->parentLink->SetEnabled(true);
 
   /// ODE needs global axis
   /// \TODO: currently we assume joint axis is specified in model frame,
   /// this is incorrect, and should be corrected to be
   /// joint frame which is specified in child link frame.
-  math::Vector3 globalAxis = _axis;
-  if (this->parentLink)
+  ignition::math::Vector3d globalAxis = _axis;
+  if (this->odeJointDPtr->parentLink)
+  {
     globalAxis =
-      this->GetParent()->GetModel()->GetWorldPose().rot.RotateVector(_axis);
+      this->GetParent()->GetModel()->WorldPose().Rot().RotateVector(_axis);
+  }
 
-  if (this->jointId)
-    dJointSetScrewAxis(this->jointId, globalAxis.x, globalAxis.y, globalAxis.z);
+  if (this->odeJointDPtr->jointId)
+  {
+    dJointSetScrewAxis(this->odeJointDPtr->jointId,
+        globalAxis.X(), globalAxis.Y(), globalAxis.Z());
+  }
   else
     gzerr << "ODE Joint ID is invalid\n";
 }
 
 //////////////////////////////////////////////////
-math::Angle ODEScrewJoint::GetAngleImpl(unsigned int _index) const
+ignition::math::Angle ODEScrewJoint::AngleImpl(
+    const unsigned int _index) const
 {
-  math::Angle result;
-  if (this->jointId)
+  ignition::math::Angle result;
+  if (this->odeJointDPtr->jointId)
   {
-    if (_index < this->GetAngleCount())
+    if (_index < this->AngleCount())
     {
       if (_index == 0)
-        result = dJointGetScrewAngle(this->jointId);
+        result = dJointGetScrewAngle(this->odeJointDPtr->jointId);
       else if (_index == 1)
-        result = dJointGetScrewPosition(this->jointId);
+        result = dJointGetScrewPosition(this->odeJointDPtr->jointId);
     }
     else
     {
       gzwarn << "ODEScrewJoint::GetAngleImpl(" << _index
              << "): invalid index exceeds allowed range("
-             << this->GetAngleCount() << ").\n";
+             << this->AngleCount() << ").\n";
     }
   }
   else
@@ -146,24 +155,24 @@ math::Angle ODEScrewJoint::GetAngleImpl(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-double ODEScrewJoint::GetVelocity(unsigned int _index) const
+double ODEScrewJoint::Velocity(const unsigned int _index) const
 {
   double result = 0;
 
-  if (this->jointId)
+  if (this->odeJointDPtr->jointId)
   {
-    if (_index < this->GetAngleCount())
+    if (_index < this->AngleCount())
     {
       if (_index == 0)
-        result = dJointGetScrewAngleRate(this->jointId);
+        result = dJointGetScrewAngleRate(this->odeJointDPtr->jointId);
       else if (_index == 1)
-        result = dJointGetScrewPositionRate(this->jointId);
+        result = dJointGetScrewPositionRate(this->odeJointDPtr->jointId);
     }
     else
     {
       gzwarn << "ODEScrewJoint::GetAngleImpl(" << _index
              << "): invalid index exceeds allowed range("
-             << this->GetAngleCount() << ").\n";
+             << this->AngleCount() << ").\n";
     }
   }
   else
@@ -173,67 +182,71 @@ double ODEScrewJoint::GetVelocity(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-void ODEScrewJoint::SetVelocity(unsigned int /*index*/, double _angle)
+void ODEScrewJoint::SetVelocity(const unsigned int /*index*/,
+    const double _angle)
 {
   this->SetParam(dParamVel, _angle);
 }
 
 //////////////////////////////////////////////////
-void ODEScrewJoint::SetThreadPitch(unsigned int /*_index*/, double _threadPitch)
+void ODEScrewJoint::SetThreadPitch(const unsigned int /*_index*/,
+    const double _threadPitch)
 {
-  if (this->jointId)
+  if (this->odeJointDPtr->jointId)
   {
     /// \TODO: create an issue on making thread pitch = translation / angle
     /// \TODO: create an issue on making thread pitch = translation / angle
-    dJointSetScrewThreadPitch(this->jointId, -_threadPitch);
+    dJointSetScrewThreadPitch(this->odeJointDPtr->jointId, -_threadPitch);
   }
   else
     gzerr << "ODE Joint ID is invalid\n";
 }
 
 //////////////////////////////////////////////////
-void ODEScrewJoint::SetThreadPitch(double _threadPitch)
+void ODEScrewJoint::SetThreadPitch(const double _threadPitch)
 {
-  if (this->jointId)
+  if (this->odeJointDPtr->jointId)
   {
     /// \TODO: create an issue on making thread pitch = translation / angle
-    dJointSetScrewThreadPitch(this->jointId, -_threadPitch);
+    dJointSetScrewThreadPitch(this->odeJointDPtr->jointId, -_threadPitch);
   }
   else
     gzerr << "ODE Joint ID is invalid\n";
 }
 
 //////////////////////////////////////////////////
-double ODEScrewJoint::GetThreadPitch(unsigned int /*_index*/)
+double ODEScrewJoint::ThreadPitch(unsigned int /*_index*/)
 {
-  return this->GetThreadPitch();
+  return this->ThreadPitch();
 }
 
 //////////////////////////////////////////////////
-double ODEScrewJoint::GetThreadPitch()
+double ODEScrewJoint::ThreadPitch()
 {
-  return this->threadPitch;
+  return this->screwDPtr->threadPitch;
 }
 
 //////////////////////////////////////////////////
-void ODEScrewJoint::SetForceImpl(unsigned int /*_index*/, double _effort)
+void ODEScrewJoint::SetForceImpl(const unsigned int /*_index*/,
+    const double _effort)
 {
-  if (this->jointId)
+  if (this->odeJointDPtr->jointId)
   {
-    // dJointAddScrewForce(this->jointId, _effort);
-    dJointAddScrewTorque(this->jointId, _effort);
+    // dJointAddScrewForce(this->odeJointDPtr->jointId, _effort);
+    dJointAddScrewTorque(this->odeJointDPtr->jointId, _effort);
   }
   else
     gzerr << "ODE Joint ID is invalid\n";
 }
 
 //////////////////////////////////////////////////
-void ODEScrewJoint::SetParam(unsigned int _parameter, double _value)
+void ODEScrewJoint::SetParam(const unsigned int _parameter,
+    const double _value)
 {
   ODEJoint::SetParam(_parameter, _value);
 
-  if (this->jointId)
-    dJointSetScrewParam(this->jointId, _parameter, _value);
+  if (this->odeJointDPtr->jointId)
+    dJointSetScrewParam(this->odeJointDPtr->jointId, _parameter, _value);
   else
     gzerr << "ODE Joint ID is invalid\n";
 }
@@ -243,23 +256,23 @@ double ODEScrewJoint::Param(const unsigned int _parameter) const
 {
   double result = 0;
 
-  if (this->jointId)
-    result = dJointGetScrewParam(this->jointId, _parameter);
+  if (this->odeJointDPtr->jointId)
+    result = dJointGetScrewParam(this->odeJointDPtr->jointId, _parameter);
   else
     gzerr << "ODE Joint ID is invalid\n";
 
   return result;
 }
 
-//////////////////////////////////////////////////
+/////j////////////////////////////////////////////
 bool ODEScrewJoint::SetParam(const std::string &_key,
-  unsigned int _index, const boost::any &_value)
+  const unsigned int _index, const boost::any &_value)
 {
   if (_key  == "thread_pitch")
   {
     try
     {
-      this->threadPitch = boost::any_cast<double>(_value);
+      this->screwDPtr->threadPitch = boost::any_cast<double>(_value);
     }
     catch(const boost::bad_any_cast &e)
     {

@@ -70,7 +70,7 @@ namespace gazebo
                 BoxShape::SetSize(size);
 
                 SimbodyCollisionPtr bParent;
-                bParent = boost::dynamic_pointer_cast<SimbodyCollision>(
+                bParent = std::dynamic_pointer_cast<SimbodyCollision>(
                     this->collisionParent);
               }
     };

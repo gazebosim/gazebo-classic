@@ -359,7 +359,7 @@ void World::Init()
   this->dataPtr->presetManager = PresetManagerPtr(
       new PresetManager(this->dataPtr->physicsEngine, this->dataPtr->sdf));
 
-  this->dataPtr->testRay = boost::dynamic_pointer_cast<RayShape>(
+  this->dataPtr->testRay = std::dynamic_pointer_cast<RayShape>(
       this->GetPhysicsEngine()->CreateShape("ray", CollisionPtr()));
 
   this->dataPtr->prevStates[0].SetWorld(shared_from_this());
@@ -892,7 +892,7 @@ BasePtr World::GetByName(const std::string &_name)
 /////////////////////////////////////////////////
 ModelPtr World::GetModelById(unsigned int _id)
 {
-  return boost::dynamic_pointer_cast<Model>(
+  return std::dynamic_pointer_cast<Model>(
       this->dataPtr->rootElement->GetById(_id));
 }
 
@@ -900,20 +900,20 @@ ModelPtr World::GetModelById(unsigned int _id)
 ModelPtr World::GetModel(const std::string &_name)
 {
   boost::mutex::scoped_lock lock(*this->dataPtr->loadModelMutex);
-  return boost::dynamic_pointer_cast<Model>(this->GetByName(_name));
+  return std::dynamic_pointer_cast<Model>(this->GetByName(_name));
 }
 
 //////////////////////////////////////////////////
 LightPtr World::Light(const std::string &_name)
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->loadLightMutex);
-  return boost::dynamic_pointer_cast<physics::Light>(this->GetByName(_name));
+  return std::dynamic_pointer_cast<physics::Light>(this->GetByName(_name));
 }
 
 //////////////////////////////////////////////////
 EntityPtr World::GetEntity(const std::string &_name)
 {
-  return boost::dynamic_pointer_cast<Entity>(this->GetByName(_name));
+  return std::dynamic_pointer_cast<Entity>(this->GetByName(_name));
 }
 
 //////////////////////////////////////////////////
@@ -1496,7 +1496,7 @@ void World::ProcessRequestMsgs()
         if (entity->HasType(Base::MODEL))
         {
           msgs::Model *modelMsg = modelVMsg.add_models();
-          ModelPtr model = boost::dynamic_pointer_cast<Model>(entity);
+          ModelPtr model = std::dynamic_pointer_cast<Model>(entity);
           model->FillMsg(*modelMsg);
         }
       }
@@ -1518,7 +1518,7 @@ void World::ProcessRequestMsgs()
         if (entity->HasType(Base::MODEL))
         {
           msgs::Model modelMsg;
-          ModelPtr model = boost::dynamic_pointer_cast<Model>(entity);
+          ModelPtr model = std::dynamic_pointer_cast<Model>(entity);
           model->FillMsg(modelMsg);
 
           std::string *serializedData = response.mutable_serialized_data();
@@ -1528,7 +1528,7 @@ void World::ProcessRequestMsgs()
         else if (entity->HasType(Base::LINK))
         {
           msgs::Link linkMsg;
-          LinkPtr link = boost::dynamic_pointer_cast<Link>(entity);
+          LinkPtr link = std::dynamic_pointer_cast<Link>(entity);
           link->FillMsg(linkMsg);
 
           std::string *serializedData = response.mutable_serialized_data();
@@ -1539,7 +1539,7 @@ void World::ProcessRequestMsgs()
         {
           msgs::Collision collisionMsg;
           CollisionPtr collision =
-            boost::dynamic_pointer_cast<Collision>(entity);
+            std::dynamic_pointer_cast<Collision>(entity);
           collision->FillMsg(collisionMsg);
 
           std::string *serializedData = response.mutable_serialized_data();
@@ -1549,7 +1549,7 @@ void World::ProcessRequestMsgs()
         else if (entity->HasType(Base::JOINT))
         {
           msgs::Joint jointMsg;
-          JointPtr joint = boost::dynamic_pointer_cast<Joint>(entity);
+          JointPtr joint = std::dynamic_pointer_cast<Joint>(entity);
           joint->FillMsg(jointMsg);
 
           std::string *serializedData = response.mutable_serialized_data();

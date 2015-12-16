@@ -403,7 +403,7 @@ void Link::UpdateParameters(sdf::ElementPtr _sdf)
     sdf::ElementPtr collisionElem = this->sdf->GetElement("collision");
     while (collisionElem)
     {
-      CollisionPtr collision = boost::dynamic_pointer_cast<Collision>(
+      CollisionPtr collision = std::dynamic_pointer_cast<Collision>(
           this->GetChild(collisionElem->Get<std::string>("name")));
 
       if (collision)
@@ -642,7 +642,7 @@ CollisionPtr Link::GetCollisionById(unsigned int _id) const
 //////////////////////////////////////////////////
 CollisionPtr Link::CollisionById(const unsigned int _id) const
 {
-  return boost::dynamic_pointer_cast<Collision>(this->BaseById(_id));
+  return std::dynamic_pointer_cast<Collision>(this->BaseById(_id));
 }
 
 //////////////////////////////////////////////////
@@ -660,7 +660,7 @@ CollisionPtr Link::Collision(const std::string &_name) const
   {
     if ((*biter)->GetName() == _name)
     {
-      result = boost::dynamic_pointer_cast<Collision>(*biter);
+      result = std::dynamic_pointer_cast<Collision>(*biter);
       break;
     }
   }
@@ -861,7 +861,7 @@ ModelPtr Link::GetModel() const
 //////////////////////////////////////////////////
 ModelPtr Link::Model() const
 {
-  return boost::dynamic_pointer_cast<Model>(this->Parent());
+  return std::dynamic_pointer_cast<Model>(this->Parent());
 }
 
 //////////////////////////////////////////////////

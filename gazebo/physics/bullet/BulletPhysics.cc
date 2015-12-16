@@ -682,7 +682,7 @@ ShapePtr BulletPhysics::CreateShape(const std::string &_type,
 {
   ShapePtr shape;
   BulletCollisionPtr collision =
-    boost::dynamic_pointer_cast<BulletCollision>(_collision);
+    std::dynamic_pointer_cast<BulletCollision>(_collision);
 
   if (_type == "plane")
     shape.reset(new BulletPlaneShape(collision));

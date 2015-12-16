@@ -69,7 +69,7 @@ void SimbodyModel::Init()
   // rebuild simbody state
   // this needs to happen before this->joints are used
   physics::SimbodyPhysicsPtr simbodyPhysics =
-    boost::dynamic_pointer_cast<physics::SimbodyPhysics>(
+    std::dynamic_pointer_cast<physics::SimbodyPhysics>(
       this->GetWorld()->GetPhysicsEngine());
   if (simbodyPhysics)
     simbodyPhysics->InitModel(
@@ -112,7 +112,7 @@ void SimbodyModel::Init()
 //   // rebuild simbody state
 //   // this needs to happen before this->joints are used
 //   physics::SimbodyPhysicsPtr simbodyPhysics =
-//     boost::dynamic_pointer_cast<physics::SimbodyPhysics>(
+//     std::dynamic_pointer_cast<physics::SimbodyPhysics>(
 //       this->GetWorld()->GetPhysicsEngine());
 //   if (simbodyPhysics)
 //     simbodyPhysics->InitModel(this);

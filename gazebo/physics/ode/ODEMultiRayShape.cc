@@ -66,7 +66,7 @@ ODEMultiRayShape::~ODEMultiRayShape()
 //////////////////////////////////////////////////
 void ODEMultiRayShape::UpdateRays()
 {
-  ODEPhysicsPtr ode = boost::dynamic_pointer_cast<ODEPhysics>(
+  ODEPhysicsPtr ode = std::dynamic_pointer_cast<ODEPhysics>(
       this->GetWorld()->GetPhysicsEngine());
 
   if (ode == NULL)

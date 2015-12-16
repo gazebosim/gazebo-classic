@@ -179,7 +179,7 @@ bool JointEventSource::LookupJoint()
       for (unsigned int i = 0; i < this->world->GetModelCount(); ++i)
       {
         physics::ModelPtr m = this->world->GetModel(i);
-        size_t pos = m->GetName().find(this->modelName);
+        size_t pos = m->Name().find(this->modelName);
         if (pos == 0)
         {
           this->model = m;
@@ -191,7 +191,7 @@ bool JointEventSource::LookupJoint()
   // if we have a model, let's look for the joint (full joint name only)
   if (this->model && !this->joint)
   {
-    this->joint = this->model->GetJoint(this->jointName);
+    this->joint = this->model->Joint(this->jointName);
   }
 
   if (!this->model || !this->joint)
@@ -210,13 +210,13 @@ void JointEventSource::Update()
   bool oldState = this->isTriggered;
   double value = 0;
 
-  double position = this->joint->GetAngle(0).Radian();
-  math::Angle a = this->joint->GetAngle(0);
+  double position = this->joint->Angle(0).Radian();
+  math::Angle a = this->joint->Angle(0);
   // get a value between -PI and PI
   a.Normalize();
   double angle = a.Radian();
-  double force = this->joint->GetForce(0);
-  double velocity = this->joint->GetVelocity(0);
+  double force = this->joint->Force(0);
+  double velocity = this->joint->Velocity(0);
 
   switch (this->range)
   {

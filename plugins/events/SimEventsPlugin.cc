@@ -163,7 +163,7 @@ void SimEventsPlugin::Init()
   // seed the map with the initial models
   for (unsigned int i = 0; i < world->GetModelCount(); ++i)
   {
-    std::string name = world->GetModel(i)->GetName();
+    std::string name = world->GetModel(i)->Name();
     models.insert(name);
   }
 }

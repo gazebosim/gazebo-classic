@@ -71,7 +71,7 @@ void BulletHeightmapShape::Init()
 
   // Get a pointer to the parent collision
   BulletCollisionPtr bParent;
-  bParent = boost::dynamic_pointer_cast<BulletCollision>(this->collisionParent);
+  bParent = std::dynamic_pointer_cast<BulletCollision>(this->collisionParent);
 
   GZ_ASSERT(bParent != NULL, "Bullet collision parent of a heightmap is NULL");
 
@@ -80,7 +80,7 @@ void BulletHeightmapShape::Init()
   btVector3 min, max;
   this->heightFieldShape->getAabb(btTransform::getIdentity(), min, max);
 
-  BulletLinkPtr bLink = boost::dynamic_pointer_cast<BulletLink>(
+  BulletLinkPtr bLink = std::dynamic_pointer_cast<BulletLink>(
       bParent->GetParent());
 
   GZ_ASSERT(bLink != NULL, "Bullet heightmap does not have a link.");

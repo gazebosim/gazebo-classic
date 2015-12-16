@@ -59,7 +59,7 @@ void BulletCollision::Load(sdf::ElementPtr _sdf)
 void BulletCollision::OnPoseChange()
 {
   math::Pose pose = this->GetRelativePose();
-  BulletLinkPtr bbody = boost::dynamic_pointer_cast<BulletLink>(this->parent);
+  BulletLinkPtr bbody = std::dynamic_pointer_cast<BulletLink>(this->parent);
 
   // bbody->motionState.setWorldTransform(this, pose);
 }
@@ -110,7 +110,7 @@ math::Box BulletCollision::GetBoundingBox() const
     if (this->GetShapeType() & PLANE_SHAPE)
     {
       PlaneShapePtr plane =
-        boost::dynamic_pointer_cast<PlaneShape>(this->shape);
+        std::dynamic_pointer_cast<PlaneShape>(this->shape);
       math::Vector3 normal = plane->GetNormal();
       if (normal == math::Vector3::UnitZ)
       {
@@ -153,5 +153,5 @@ void BulletCollision::SetCompoundShapeIndex(int /*_index*/)
 /////////////////////////////////////////////////
 BulletSurfaceParamsPtr BulletCollision::GetBulletSurface() const
 {
-  return boost::dynamic_pointer_cast<BulletSurfaceParams>(this->surface);
+  return std::dynamic_pointer_cast<BulletSurfaceParams>(this->surface);
 }

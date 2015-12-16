@@ -60,7 +60,7 @@ void DARTSphereShape::SetRadius(double _radius)
   SphereShape::SetRadius(_radius);
 
   DARTCollisionPtr dartCollisionParent =
-      boost::dynamic_pointer_cast<DARTCollision>(this->collisionParent);
+      std::dynamic_pointer_cast<DARTCollision>(this->collisionParent);
 
   if (dartCollisionParent->GetDARTCollisionShape() == NULL)
   {

@@ -50,7 +50,7 @@ DARTLink::~DARTLink()
 //////////////////////////////////////////////////
 void DARTLink::Load(sdf::ElementPtr _sdf)
 {
-  this->dataPtr->dartPhysics = boost::dynamic_pointer_cast<DARTPhysics>(
+  this->dataPtr->dartPhysics = std::dynamic_pointer_cast<DARTPhysics>(
       this->GetWorld()->GetPhysicsEngine());
 
   if (this->dataPtr->dartPhysics == NULL)
@@ -663,7 +663,7 @@ void DARTLink::SetSelfCollide(bool _collide)
         if (links[i].get() != this && links[i]->GetSelfCollide())
         {
           dart::dynamics::BodyNode *itdtBodyNode =
-            boost::dynamic_pointer_cast<DARTLink>(links[i])->GetDARTBodyNode();
+            std::dynamic_pointer_cast<DARTLink>(links[i])->GetDARTBodyNode();
 
           // If this->dataPtr->dtBodyNode and itdtBodyNode are connected then
           // don't enable the pair.
@@ -689,9 +689,9 @@ void DARTLink::SetSelfCollide(bool _collide)
         for (size_t j = i + 1; j < links.size(); ++j)
         {
           dart::dynamics::BodyNode *itdtBodyNode1 =
-            boost::dynamic_pointer_cast<DARTLink>(links[i])->GetDARTBodyNode();
+            std::dynamic_pointer_cast<DARTLink>(links[i])->GetDARTBodyNode();
           dart::dynamics::BodyNode *itdtBodyNode2 =
-            boost::dynamic_pointer_cast<DARTLink>(links[j])->GetDARTBodyNode();
+            std::dynamic_pointer_cast<DARTLink>(links[j])->GetDARTBodyNode();
 
           // If this->dataPtr->dtBodyNode and itdtBodyNode are connected then
           // don't enable the pair.
@@ -717,7 +717,7 @@ void DARTLink::SetSelfCollide(bool _collide)
         if (links[i].get() != this)
         {
           dart::dynamics::BodyNode *itdtBodyNode =
-            boost::dynamic_pointer_cast<DARTLink>(links[i])->GetDARTBodyNode();
+            std::dynamic_pointer_cast<DARTLink>(links[i])->GetDARTBodyNode();
           dtCollDet->disablePair(dtBodyNode, itdtBodyNode);
         }
       }
@@ -819,7 +819,7 @@ void DARTLink::updateDirtyPoseFromDARTTransformation()
 //////////////////////////////////////////////////
 DARTPhysicsPtr DARTLink::GetDARTPhysics(void) const
 {
-  return boost::dynamic_pointer_cast<DARTPhysics>(
+  return std::dynamic_pointer_cast<DARTPhysics>(
         this->GetWorld()->GetPhysicsEngine());
 }
 
@@ -832,7 +832,7 @@ dart::simulation::World *DARTLink::GetDARTWorld(void) const
 //////////////////////////////////////////////////
 DARTModelPtr DARTLink::GetDARTModel() const
 {
-  return boost::dynamic_pointer_cast<DARTModel>(this->GetModel());
+  return std::dynamic_pointer_cast<DARTModel>(this->GetModel());
 }
 
 //////////////////////////////////////////////////

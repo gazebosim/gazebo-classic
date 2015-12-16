@@ -129,9 +129,9 @@ void DARTModel::Init()
       for (size_t j = i + 1; j < linkList.size(); ++j)
       {
         dart::dynamics::BodyNode *itdtBodyNode1 =
-          boost::dynamic_pointer_cast<DARTLink>(linkList[i])->GetDARTBodyNode();
+          std::dynamic_pointer_cast<DARTLink>(linkList[i])->GetDARTBodyNode();
         dart::dynamics::BodyNode *itdtBodyNode2 =
-          boost::dynamic_pointer_cast<DARTLink>(linkList[j])->GetDARTBodyNode();
+          std::dynamic_pointer_cast<DARTLink>(linkList[j])->GetDARTBodyNode();
 
         // If this->dtBodyNode and itdtBodyNode are connected then don't enable
         // the pair.
@@ -199,7 +199,7 @@ dart::dynamics::Skeleton *DARTModel::GetDARTSkeleton()
 //////////////////////////////////////////////////
 DARTPhysicsPtr DARTModel::GetDARTPhysics(void) const
 {
-  return boost::dynamic_pointer_cast<DARTPhysics>(
+  return std::dynamic_pointer_cast<DARTPhysics>(
     this->GetWorld()->GetPhysicsEngine());
 }
 

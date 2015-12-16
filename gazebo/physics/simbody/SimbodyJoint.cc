@@ -46,7 +46,7 @@ SimbodyJoint::~SimbodyJoint()
 void SimbodyJoint::Load(sdf::ElementPtr _sdf)
 {
   // store a pointer to the simbody physics engine for convenience
-  this->simbodyPhysics = boost::dynamic_pointer_cast<SimbodyPhysics>(
+  this->simbodyPhysics = std::dynamic_pointer_cast<SimbodyPhysics>(
     this->model->GetWorld()->GetPhysicsEngine());
 
   Joint::Load(_sdf);

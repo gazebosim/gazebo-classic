@@ -81,7 +81,7 @@ void Light::SetState(const LightState &_state)
 //////////////////////////////////////////////////
 void Light::PublishPose()
 {
-  this->world->PublishLightPose(boost::dynamic_pointer_cast<Light>(
+  this->world->PublishLightPose(std::dynamic_pointer_cast<Light>(
       shared_from_this()));
 }
 

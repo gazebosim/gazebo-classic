@@ -36,7 +36,7 @@ using namespace physics;
 //////////////////////////////////////////////////
 DARTJoint::DARTJoint(BasePtr _parent)
   : Joint(_parent),
-    dataPtr(new DARTJointPrivate(boost::dynamic_pointer_cast<DARTPhysics>(
+    dataPtr(new DARTJointPrivate(std::dynamic_pointer_cast<DARTPhysics>(
       this->GetWorld()->GetPhysicsEngine())))
 {
 }
@@ -580,7 +580,7 @@ void DARTJoint::ApplyDamping()
 /////////////////////////////////////////////////
 DARTModelPtr DARTJoint::GetDARTModel() const
 {
-  return boost::dynamic_pointer_cast<DARTModel>(this->model);
+  return std::dynamic_pointer_cast<DARTModel>(this->model);
 }
 
 /////////////////////////////////////////////////

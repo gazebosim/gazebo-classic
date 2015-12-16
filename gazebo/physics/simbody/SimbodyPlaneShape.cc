@@ -44,7 +44,7 @@ void SimbodyPlaneShape::CreatePlane()
 {
   PlaneShape::CreatePlane();
   SimbodyCollisionPtr bParent;
-  bParent = boost::dynamic_pointer_cast<SimbodyCollision>(
+  bParent = std::dynamic_pointer_cast<SimbodyCollision>(
       this->collisionParent);
 
   math::Vector3 n = this->GetNormal();

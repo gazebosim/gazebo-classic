@@ -14,12 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A slider or primastic joint
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
-#include <boost/bind.hpp>
-
 #include "gazebo/gazebo_config.h"
 #include "gazebo/common/Console.hh"
 
@@ -33,16 +27,16 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 ODESliderJoint::ODESliderJoint(dWorldID _worldId, BasePtr _parent)
-    : SliderJoint<ODEJoint>(_parent)
+: SliderJoint<ODEJoint>(_parent)
 {
-  this->jointId = dJointCreateSlider(_worldId, NULL);
+  this->odeJointDPtr->jointId = dJointCreateSlider(_worldId, NULL);
 }
 
 //////////////////////////////////////////////////
 ODESliderJoint::~ODESliderJoint()
 {
-  if (this->applyDamping)
-    physics::Joint::DisconnectJointUpdate(this->applyDamping);
+  if (this->odeJointDPtr->applyDamping)
+    physics::Joint::DisconnectJointUpdate(this->odeJointDPtr->applyDamping);
 }
 
 //////////////////////////////////////////////////
@@ -52,23 +46,25 @@ void ODESliderJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODESliderJoint::GetGlobalAxis(unsigned int /*_index*/) const
+ignition::math::Vector3d ODESliderJoint::GlobalAxis(
+    const unsigned int /*_index*/) const
 {
   dVector3 result;
-  if (this->jointId)
-    dJointGetSliderAxis(this->jointId, result);
+  if (this->odeJointDPtr->jointId)
+    dJointGetSliderAxis(this->odeJointDPtr->jointId, result);
   else
     gzerr << "ODE Joint ID is invalid\n";
 
-  return math::Vector3(result[0], result[1], result[2]);
+  return ignition::math::Vector3d(result[0], result[1], result[2]);
 }
 
 //////////////////////////////////////////////////
-math::Angle ODESliderJoint::GetAngleImpl(unsigned int /*_index*/) const
+ignition::math::Angle ODESliderJoint::AngleImpl(
+    const unsigned int /*_index*/) const
 {
-  math::Angle result;
-  if (this->jointId)
-    result = dJointGetSliderPosition(this->jointId);
+  ignition::math::Angle result;
+  if (this->odeJointDPtr->jointId)
+    result = dJointGetSliderPosition(this->odeJointDPtr->jointId);
   else
     gzerr << "ODE Joint ID is invalid\n";
 
@@ -76,11 +72,11 @@ math::Angle ODESliderJoint::GetAngleImpl(unsigned int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-double ODESliderJoint::GetVelocity(unsigned int /*index*/) const
+double ODESliderJoint::Velocity(const unsigned int /*index*/) const
 {
   double result = 0;
-  if (this->jointId)
-    result = dJointGetSliderPositionRate(this->jointId);
+  if (this->odeJointDPtr->jointId)
+    result = dJointGetSliderPositionRate(this->odeJointDPtr->jointId);
   else
     gzerr << "ODE Joint ID is invalid\n";
 
@@ -88,55 +84,59 @@ double ODESliderJoint::GetVelocity(unsigned int /*index*/) const
 }
 
 //////////////////////////////////////////////////
-void ODESliderJoint::SetVelocity(unsigned int _index, double _angle)
+void ODESliderJoint::SetVelocity(const unsigned int _index,
+    cons double _angle)
 {
   this->SetVelocityMaximal(_index, _angle);
 }
 
 //////////////////////////////////////////////////
-void ODESliderJoint::SetAxis(unsigned int /*index*/, const math::Vector3 &_axis)
+void ODESliderJoint::SetAxis(const unsigned int /*index*/,
+    const ignition::math::Vector3d &_axis)
 {
-  if (this->childLink)
-    this->childLink->SetEnabled(true);
-  if (this->parentLink)
-    this->parentLink->SetEnabled(true);
+  if (tihs->odeJointDPtr->childLink)
+    tihs->odeJointDPtr->childLink->SetEnabled(true);
+  if (tihs->odeJointDPtr->parentLink)
+    tihs->odeJointDPtr->parentLink->SetEnabled(true);
 
   // ODE needs global axis
-  math::Quaternion axisFrame = this->GetAxisFrame(0);
-  math::Vector3 globalAxis = axisFrame.RotateVector(_axis);
+  ignition::math::Quaterniond axisFrame = this->AxisFrame(0);
+  ignition::math::Vector3d globalAxis = axisFrame.RotateVector(_axis);
 
-  if (this->jointId)
+  if (this->odeJointDPtr->jointId)
   {
-    dJointSetSliderAxis(this->jointId,
-                        globalAxis.x, globalAxis.y, globalAxis.z);
+    dJointSetSliderAxis(this->odeJointDPtr->jointId,
+                        globalAxis.X(), globalAxis.Y(), globalAxis.Z());
   }
   else
     gzerr << "ODE Joint ID is invalid\n";
 }
 
 //////////////////////////////////////////////////
-void ODESliderJoint::SetForceImpl(unsigned int /*_index*/, double _effort)
+void ODESliderJoint::SetForceImpl(const unsigned int /*_index*/,
+    const double _effort)
 {
-  if (this->jointId)
-    dJointAddSliderForce(this->jointId, _effort);
+  if (this->odeJointDPtr->jointId)
+    dJointAddSliderForce(this->odeJointDPtr->jointId, _effort);
   else
     gzerr << "ODE Joint ID is invalid\n";
 }
 
 //////////////////////////////////////////////////
-void ODESliderJoint::SetParam(unsigned int _parameter, double _value)
+void ODESliderJoint::SetParam(const unsigned int _parameter,
+    const double _value)
 {
   ODEJoint::SetParam(_parameter, _value);
-  dJointSetSliderParam(this->jointId, _parameter, _value);
+  dJointSetSliderParam(this->odeJointDPtr->jointId, _parameter, _value);
 }
 
 //////////////////////////////////////////////////
-double ODESliderJoint::GetParam(unsigned int _parameter) const
+double ODESliderJoint::Param(const unsigned int _parameter) const
 {
   double result = 0;
 
-  if (this->jointId)
-    result = dJointGetSliderParam(this->jointId, _parameter);
+  if (this->odeJointDPtr->jointId)
+    result = dJointGetSliderParam(this->odeJointDPtr->jointId, _parameter);
   else
     gzerr << "ODE Joint ID is invalid\n";
 
@@ -144,16 +144,17 @@ double ODESliderJoint::GetParam(unsigned int _parameter) const
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODESliderJoint::GetAnchor(unsigned int /*_index*/) const
+ignition::math::Vector3d ODESliderJoint::Anchor(
+    const unsigned int /*_index*/) const
 {
   dVector3 result;
   gzlog << "ODESliderJoint::GetAnchor not implemented.\n";
-  return math::Vector3(result[0], result[1], result[2]);
+  return ignition::math::Vector3d(result[0], result[1], result[2]);
 }
 
 //////////////////////////////////////////////////
-void ODESliderJoint::SetAnchor(unsigned int /*_index*/,
-  const math::Vector3 &/*_anchor*/)
+void ODESliderJoint::SetAnchor(const unsigned int /*_index*/,
+  const ignition::math::Vector3d &/*_anchor*/)
 {
   gzlog << "ODESliderJoint::SetAnchor not implemented.\n";
 }

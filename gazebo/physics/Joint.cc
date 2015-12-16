@@ -242,17 +242,17 @@ void Joint::Load(sdf::ElementPtr _sdf)
     if (!this->jointDPtr->childLink)
     {
       // need to do this if child link belongs to another model
-      this->jointDPtr->childLink = boost::dynamic_pointer_cast<Link>(
+      this->jointDPtr->childLink = std::dynamic_pointer_cast<Link>(
           this->GetWorld()->GetByName(childName));
     }
     this->jointDPtr->parentLink = this->jointDPtr->model->GetLink(parentName);
   }
   else
   {
-    this->jointDPtr->childLink = boost::dynamic_pointer_cast<Link>(
+    this->jointDPtr->childLink = std::dynamic_pointer_cast<Link>(
         this->GetWorld()->GetByName(childName));
 
-    this->jointDPtr->parentLink = boost::dynamic_pointer_cast<Link>(
+    this->jointDPtr->parentLink = std::dynamic_pointer_cast<Link>(
         this->GetWorld()->GetByName(parentName));
   }
 
@@ -268,7 +268,7 @@ void Joint::Load(sdf::ElementPtr _sdf)
       std::string scopedParentName =
           parentModel->GetScopedName() + "::" + parentName;
 
-      this->jointDPtr->parentLink = boost::dynamic_pointer_cast<Link>(
+      this->jointDPtr->parentLink = std::dynamic_pointer_cast<Link>(
           this->GetWorld()->GetByName(scopedParentName));
 
       parentModel = parentModel->GetParent();
@@ -279,7 +279,7 @@ void Joint::Load(sdf::ElementPtr _sdf)
           parentName.substr(parentName.find("::"));
       parentNameThisModel = parentModel->GetName() + parentNameThisModel;
 
-      this->jointDPtr->parentLink = boost::dynamic_pointer_cast<Link>(
+      this->jointDPtr->parentLink = std::dynamic_pointer_cast<Link>(
           this->GetWorld()->GetByName(parentNameThisModel));
     }
     if (!this->jointDPtr->parentLink)
@@ -294,7 +294,7 @@ void Joint::Load(sdf::ElementPtr _sdf)
     {
       std::string scopedChildName =
           parentModel->GetScopedName() + "::" + childName;
-      this->jointDPtr->childLink = boost::dynamic_pointer_cast<Link>(
+      this->jointDPtr->childLink = std::dynamic_pointer_cast<Link>(
           this->GetWorld()->GetByName(scopedChildName));
 
         parentModel = parentModel->GetParent();
@@ -304,7 +304,7 @@ void Joint::Load(sdf::ElementPtr _sdf)
       std::string childNameThisModel = childName.substr(childName.find("::"));
       childNameThisModel = parentModel->GetName() + childNameThisModel;
 
-      this->jointDPtr->childLink = boost::dynamic_pointer_cast<Link>(
+      this->jointDPtr->childLink = std::dynamic_pointer_cast<Link>(
           this->GetWorld()->GetByName(childNameThisModel));
     }
     if (!this->jointDPtr->childLink)

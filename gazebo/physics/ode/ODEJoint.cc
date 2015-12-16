@@ -137,12 +137,15 @@ LinkPtr ODEJoint::JointLink(const unsigned int _index) const
 
   if (_index == 0 || _index == 1)
   {
-    ODELinkPtr odeLink1 = boost::static_pointer_cast<ODELink>(this->jointDPtr->childLink);
-    ODELinkPtr odeLink2 = boost::static_pointer_cast<ODELink>(this->jointDPtr->parentLink);
+    ODELinkPtr odeLink1 =
+      boost::static_pointer_cast<ODELink>(this->jointDPtr->childLink);
+    ODELinkPtr odeLink2 =
+      boost::static_pointer_cast<ODELink>(this->jointDPtr->parentLink);
     if (odeLink1 != NULL &&
         dJointGetBody(this->odeJointDPtr->jointId, _index) == odeLink1->ODEId())
     {
       result = this->jointDPtr->childLink;
+    }
     else if (odeLink2)
     {
       result = this->jointDPtr->parentLink;
@@ -155,8 +158,8 @@ LinkPtr ODEJoint::JointLink(const unsigned int _index) const
 //////////////////////////////////////////////////
 bool ODEJoint::AreConnected(LinkPtr _one, LinkPtr _two) const
 {
-  ODELinkPtr odeLink1 = boost::dynamic_pointer_cast<ODELink>(_one);
-  ODELinkPtr odeLink2 = boost::dynamic_pointer_cast<ODELink>(_two);
+  ODELinkPtr odeLink1 = std::dynamic_pointer_cast<ODELink>(_one);
+  ODELinkPtr odeLink2 = std::dynamic_pointer_cast<ODELink>(_two);
 
   if (odeLink1 == NULL || odeLink2 == NULL)
     gzthrow("ODEJoint requires ODE bodies\n");
@@ -176,9 +179,9 @@ void ODEJoint::Attach(LinkPtr _parent, LinkPtr _child)
 {
   Joint::Attach(_parent, _child);
 
-  ODELinkPtr odechild = boost::dynamic_pointer_cast<ODELink>(
+  ODELinkPtr odechild = std::dynamic_pointer_cast<ODELink>(
       this->jointDPtr->childLink);
-  ODELinkPtr odeparent = boost::dynamic_pointer_cast<ODELink>(this->jointDPtr->parentLink);
+  ODELinkPtr odeparent = std::dynamic_pointer_cast<ODELink>(this->jointDPtr->parentLink);
 
   if (odechild == NULL && odeparent == NULL)
     gzthrow("ODEJoint requires at least one ODE link\n");

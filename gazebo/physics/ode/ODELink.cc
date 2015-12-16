@@ -51,7 +51,7 @@ ODELink::~ODELink()
 //////////////////////////////////////////////////
 void ODELink::Load(sdf::ElementPtr _sdf)
 {
-  this->dataPtr->odePhysics = boost::dynamic_pointer_cast<ODEPhysics>(
+  this->dataPtr->odePhysics = std::dynamic_pointer_cast<ODEPhysics>(
       this->World()->GetPhysicsEngine());
 
   if (this->dataPtr->odePhysics == NULL)
