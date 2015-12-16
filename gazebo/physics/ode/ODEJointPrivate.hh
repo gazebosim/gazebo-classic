@@ -14,17 +14,19 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PHYSICS_ODEJOINT_PRIVATE_HH_
-#define _GAZEBO_PHYSICS_ODEJOINT_PRIVATE_HH_
+#ifndef _GAZEBO_PHYSICS_ODE_ODEJOINT_PRIVATE_HH_
+#define _GAZEBO_PHYSICS_ODE_ODEJOINT_PRIVATE_HH_
 
-#include "gazebo/physics/Joint.hh"
-#include "gazebo/physics/JointPrivate.hh"
+#include "gazebo/common/Time.hh"
+
 #include "gazebo/physics/ode/ode_inc.h"
+#include "gazebo/physics/JointPrivate.hh"
 
 namespace gazebo
 {
   namespace physics
   {
+    /// \internal
     /// \brief ODE joint protected class
     class ODEJointProtected : public JointProtected
     {
@@ -32,6 +34,7 @@ namespace gazebo
       public: dJointID jointId;
     };
 
+    /// \internal
     /// \brief ODE joint private class
     class ODEJointPrivate
     {
@@ -49,20 +52,20 @@ namespace gazebo
       /// equivalent of simulated force torque sensor reading
       /// Allocate a 2 vector in case hinge2 joint is used.
       /// This is used by ODE to store external force applied by the user.
-      public: double forceApplied[MAX_JOINT_AXIS];
+      public: std::array<double, MAX_JOINT_AXIS> forceApplied;
 
       /// \brief Save time at which force is applied by user
       /// This will let us know if it's time to clean up forceApplied.
       public: common::Time forceAppliedTime;
 
       /// \brief internal variable to keep track of implicit damping internals
-      public: int implicitDampingState[MAX_JOINT_AXIS];
+      public: std::array<int, MAX_JOINT_AXIS> implicitDampingState;
 
       /// \brief save current implicit damping coefficient
-      public: double currentKd[MAX_JOINT_AXIS];
+      public: std::array<double, MAX_JOINT_AXIS> currentKd;
 
       /// \brief save current implicit stiffness coefficient
-      public: double currentKp[MAX_JOINT_AXIS];
+      public: std::array<double, MAX_JOINT_AXIS> currentKp;
 
       /// \brief internal variable to keep track if ConnectJointUpdate
       /// has been called on a damping method

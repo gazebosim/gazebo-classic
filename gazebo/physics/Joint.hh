@@ -33,11 +33,6 @@
 #include "gazebo/physics/JointWrench.hh"
 #include "gazebo/util/system.hh"
 
-/// \brief maximum number of axis per joint anticipated.
-/// Currently, this is 2 as 3-axis joints (e.g. ball)
-/// actuation, control is not there yet.
-#define MAX_JOINT_AXIS 2
-
 namespace gazebo
 {
   namespace physics

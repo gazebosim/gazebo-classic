@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PHYSICS_ODEBALLJOINT_HH_
-#define _GAZEBO_PHYSICS_ODEBALLJOINT_HH_
+#ifndef _GAZEBO_PHYSICS_ODE_ODEBALLJOINT_HH_
+#define _GAZEBO_PHYSICS_ODE_ODEBALLJOINT_HH_
 
 #include "gazebo/physics/BallJoint.hh"
 #include "gazebo/physics/ode/ODEJoint.hh"
@@ -42,7 +42,7 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual void SetAnchor(const unsigned int _index,
-                  const ignition::math::Vector3d &_anchor);
+                                     const ignition::math::Vector3d &_anchor);
 
       // Documentation inherited
       public: virtual ignition::math::Vector3d GlobalAxis(
@@ -64,10 +64,12 @@ namespace gazebo
                                    const ignition::math::Vector3d &_axis);
 
       // Documentation inherited.
-      public: virtual ignition::math::Angle HighStop(const unsigned int _index);
+      public: virtual ignition::math::Angle HighStop(
+                  const unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual ignition::math::Angle LowStop(const unsigned int _index);
+      public: virtual ignition::math::Angle LowStop(
+                  const unsigned int _index) const;
 
       // Documentation inherited.
       public: virtual bool SetHighStop(const unsigned int _index,
@@ -78,7 +80,8 @@ namespace gazebo
                                       const ignition::math::Angle &_angle);
 
       // Documentation inherited.
-      protected: virtual void SetForceImpl(unsigned int _index, double _torque);
+      protected: virtual void SetForceImpl(const unsigned int _index,
+                     const double _torque);
     };
   }
 }

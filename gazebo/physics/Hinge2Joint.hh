@@ -20,6 +20,7 @@
 #include <sdf/sdf.hh>
 
 #include <ignition/math/Vector3.hh>
+
 #include "gazebo/physics/Joint.hh"
 #include "gazebo/util/system.hh"
 

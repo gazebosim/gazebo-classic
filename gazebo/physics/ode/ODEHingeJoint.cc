@@ -14,8 +14,10 @@
  * limitations under the License.
  *
 */
+#include "gazebo/gazebo_config.h"
 #include "gazebo/common/Console.hh"
 
+#include "gazebo/physics/Model.hh"
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/ode/ODEJointPrivate.hh"
 #include "gazebo/physics/ode/ODEHingeJoint.hh"
@@ -33,8 +35,8 @@ ODEHingeJoint::ODEHingeJoint(dWorldID _worldId, BasePtr _parent)
 //////////////////////////////////////////////////
 ODEHingeJoint::~ODEHingeJoint()
 {
-  if (this->odeJointDPtr->applyDamping)
-    physics::Joint::DisconnectJointUpdate(this->odeJointDPtr->applyDamping);
+  if (this->jointDPtr->applyDamping)
+    physics::Joint::DisconnectJointUpdate(this->jointDPtr->applyDamping);
 }
 
 //////////////////////////////////////////////////
@@ -61,10 +63,10 @@ ignition::math::Vector3d ODEHingeJoint::Anchor(
 void ODEHingeJoint::SetAnchor(const unsigned int /*index*/,
     const ignition::math::Vector3d &_anchor)
 {
-  if (this->odeJointDPtr->childLink)
-    this->odeJointDPtr->childLink->SetEnabled(true);
-  if (this->odeJointDPtr->parentLink)
-    this->odeJointDPtr->parentLink->SetEnabled(true);
+  if (this->jointDPtr->childLink)
+    this->jointDPtr->childLink->SetEnabled(true);
+  if (this->jointDPtr->parentLink)
+    this->jointDPtr->parentLink->SetEnabled(true);
 
   if (this->odeJointDPtr->jointId)
   {
@@ -95,10 +97,10 @@ void ODEHingeJoint::SetAxis(const unsigned int _index,
 {
   ODEJoint::SetAxis(_index, _axis);
 
-  if (this->odeJointDPtr->childLink)
-    this->odeJointDPtr->childLink->SetEnabled(true);
-  if (this->odeJointDPtr->parentLink)
-    this->odeJointDPtr->parentLink->SetEnabled(true);
+  if (this->jointDPtr->childLink)
+    this->jointDPtr->childLink->SetEnabled(true);
+  if (this->jointDPtr->parentLink)
+    this->jointDPtr->parentLink->SetEnabled(true);
 
   // ODE needs global axis
   ignition::math::Quaterniond axisFrame = this->AxisFrame(0);

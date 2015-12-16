@@ -35,8 +35,8 @@ ODEHinge2Joint::ODEHinge2Joint(dWorldID _worldId, BasePtr _parent)
 //////////////////////////////////////////////////
 ODEHinge2Joint::~ODEHinge2Joint()
 {
-  if (this->odeJointDPtr->applyDamping)
-    physics::Joint::DisconnectJointUpdate(this->odeJointDPtr->applyDamping);
+  if (this->jointDPtr->applyDamping)
+    physics::Joint::DisconnectJointUpdate(this->jointDPtr->applyDamping);
 }
 
 //////////////////////////////////////////////////
@@ -67,10 +67,10 @@ ignition::math::Vector3d ODEHinge2Joint::Anchor(const unsigned int _index) const
 void ODEHinge2Joint::SetAnchor(const unsigned int /*_index*/,
     const ignition::math::Vector3d &_anchor)
 {
-  if (this->odeJointDPtr->childLink)
-    this->odeJointDPtr->childLink->SetEnabled(true);
-  if (this->odeJointDPtr->parentLink)
-    this->odeJointDPtr->parentLink->SetEnabled(true);
+  if (this->jointDPtr->childLink)
+    this->jointDPtr->childLink->SetEnabled(true);
+  if (this->jointDPtr->parentLink)
+    this->jointDPtr->parentLink->SetEnabled(true);
 
   if (this->odeJointDPtr->jointId)
   {
@@ -85,29 +85,34 @@ void ODEHinge2Joint::SetAnchor(const unsigned int /*_index*/,
 void ODEHinge2Joint::SetAxis(const unsigned int _index,
     const ignition::math::Vector3d &_axis)
 {
-  if (this->odeJointDPtr->childLink)
-    this->odeJointDPtr->childLink->SetEnabled(true);
-  if (this->odeJointDPtr->parentLink)
-    this->odeJointDPtr->parentLink->SetEnabled(true);
+  if (this->jointDPtr->childLink)
+    this->jointDPtr->childLink->SetEnabled(true);
+  if (this->jointDPtr->parentLink)
+    this->jointDPtr->parentLink->SetEnabled(true);
 
   /// ODE needs global axis
   /// \TODO: currently we assume joint axis is specified in model frame,
   /// this is incorrect, and should be corrected to be
   /// joint frame which is specified in child link frame.
   ignition::math::Vector3d globalAxis = _axis;
-  if (this->odeJointDPtr->parentLink)
+  if (this->jointDPtr->parentLink)
   {
-    globalAxis = this->Parent()->Model()->WorldPose().Rot().RotateVector(_axis);
+    globalAxis =
+      this->Parent()->Model()->WorldPose().Rot().RotateVector(_axis);
   }
 
   if (this->odeJointDPtr->jointId)
   {
     if (_index == 0)
+    {
       dJointSetHinge2Axis1(this->odeJointDPtr->jointId,
         globalAxis.X(), globalAxis.Y(), globalAxis.Z());
+    }
     else
+    {
       dJointSetHinge2Axis2(this->odeJointDPtr->jointId,
         globalAxis.X(), globalAxis.Y(), globalAxis.Z());
+    }
   }
   else
     gzerr << "ODE Joint ID is invalid\n";
@@ -163,8 +168,7 @@ double ODEHinge2Joint::Velocity(const unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-void ODEHinge2Joint::SetVelocity(const unsigned int _index,
-    const double _angle)
+void ODEHinge2Joint::SetVelocity(const unsigned int _index, const double _angle)
 {
   if (_index == 0)
     this->SetParam(dParamVel, _angle);

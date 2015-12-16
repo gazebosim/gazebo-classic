@@ -158,7 +158,7 @@ namespace gazebo
 
       /// \brief Return the ID of this link
       /// \return ODE link id
-      /// \deprecated See ODEId()
+      /// \deprecated See ODEId() const
       public: dBodyID GetODEId() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Return the ID of this link

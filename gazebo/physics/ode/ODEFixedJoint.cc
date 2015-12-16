@@ -14,8 +14,10 @@
  * limitations under the License.
  *
 */
+#include "gazebo/gazebo_config.h"
 #include "gazebo/common/Console.hh"
 
+#include "gazebo/physics/Model.hh"
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/ode/ODEJointPrivate.hh"
 #include "gazebo/physics/ode/ODEFixedJoint.hh"
@@ -25,7 +27,7 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 ODEFixedJoint::ODEFixedJoint(dWorldID _worldId, BasePtr _parent)
-    : FixedJoint<ODEJoint>(_parent)
+: FixedJoint<ODEJoint>(_parent)
 {
   this->odeJointDPtr->jointId = dJointCreateFixed(_worldId, NULL);
 }
@@ -54,10 +56,10 @@ ignition::math::Vector3d ODEFixedJoint::Anchor(
 void ODEFixedJoint::SetAnchor(const unsigned int /*index*/,
     const ignition::math::Vector3d &/*_anchor*/)
 {
-  if (this->odeJointDPtr->childLink)
-    this->odeJointDPtr->childLink->SetEnabled(true);
-  if (this->odeJointDPtr->parentLink)
-    this->odeJointDPtr->parentLink->SetEnabled(true);
+  if (this->jointDPtr->childLink)
+    this->jointDPtr->childLink->SetEnabled(true);
+  if (this->jointDPtr->parentLink)
+    this->jointDPtr->parentLink->SetEnabled(true);
 }
 
 //////////////////////////////////////////////////
@@ -82,7 +84,7 @@ ignition::math::Angle ODEFixedJoint::AngleImpl(
     const unsigned int /*index*/) const
 {
   gzwarn << "ODEFixedJoint: called method "
-         << "GetAngleImpl that is not valid for joints of type fixed.\n";
+    << "GetAngleImpl that is not valid for joints of type fixed.\n";
   return ignition::math::Angle();
 }
 
@@ -90,7 +92,7 @@ ignition::math::Angle ODEFixedJoint::AngleImpl(
 double ODEFixedJoint::Velocity(const unsigned int /*index*/) const
 {
   gzwarn << "ODEFixedJoint: called method "
-         << "GetVelocity that is not valid for joints of type fixed.\n";
+    << "GetVelocity that is not valid for joints of type fixed.\n";
   return 0.0;
 }
 
@@ -99,7 +101,7 @@ void ODEFixedJoint::SetVelocity(const unsigned int /*_index*/,
     const double /*_angle*/)
 {
   gzwarn << "ODEFixedJoint: called method "
-         << "SetVelocity that is not valid for joints of type fixed.\n";
+    << "SetVelocity that is not valid for joints of type fixed.\n";
 }
 
 //////////////////////////////////////////////////
@@ -107,7 +109,7 @@ void ODEFixedJoint::SetForceImpl(const unsigned int /*_index*/,
     const double /*_effort*/)
 {
   gzwarn << "ODEFixedJoint: called method "
-         << "SetForceImpl that is not valid for joints of type fixed.\n";
+    << "SetForceImpl that is not valid for joints of type fixed.\n";
 }
 
 //////////////////////////////////////////////////

@@ -14,13 +14,14 @@
  * limitations under the License.
  *
 */
+#include "gazebo/gazebo_config.h"
 #include "gazebo/common/Console.hh"
 
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/ode/ODELink.hh"
-#include "gazebo/physics/ode/ODEJointPrivate.hh"
 #include "gazebo/physics/GearboxJointPrivate.hh"
+#include "gazebo/physics/ode/ODEJointPrivate.hh"
 #include "gazebo/physics/ode/ODEGearboxJoint.hh"
 
 using namespace gazebo;
@@ -42,7 +43,7 @@ ODEGearboxJoint::~ODEGearboxJoint()
 void ODEGearboxJoint::Init()
 {
   Joint::Init();
-  LinkPtr link = this->odeJointDPtr->model->Link(this->gearDPtr->referenceBody);
+  LinkPtr link = this->jointDPtr->model->Link(this->gearDPtr->referenceBody);
   this->SetReferenceBody(link);
 }
 
@@ -101,10 +102,10 @@ void ODEGearboxJoint::SetAxis(const unsigned int _index,
 {
   ODEJoint::SetAxis(_index, _axis);
 
-  if (this->odeJointDPtr->childLink)
-    this->odeJointDPtr->childLink->SetEnabled(true);
-  if (this->odeJointDPtr->parentLink)
-    this->odeJointDPtr->parentLink->SetEnabled(true);
+  if (this->jointDPtr->childLink)
+    this->jointDPtr->childLink->SetEnabled(true);
+  if (this->jointDPtr->parentLink)
+    this->jointDPtr->parentLink->SetEnabled(true);
 
   /// ODE needs global axis
   ignition::math::Quaterniond axisFrame = this->AxisFrame(_index);
@@ -135,7 +136,7 @@ ignition::math::Angle ODEGearboxJoint::AngleImpl(
 //////////////////////////////////////////////////
 double ODEGearboxJoint::Velocity(const unsigned int /*index*/) const
 {
-  gzlog << "GetVelocity not implemented for gearbox\n";
+  gzlog << "Velocity not implemented for gearbox\n";
   return 0;
 }
 
@@ -152,7 +153,7 @@ void ODEGearboxJoint::SetForceImpl(const unsigned int /*_index*/,
     const double /*_effort*/)
 {
   if (this->odeJointDPtr->jointId)
-    gzlog << "SetForce not implemented for gearbox\n";
+    gzlog << "SetForceImpl not implemented for gearbox\n";
   else
     gzerr << "ODE Joint ID is invalid\n";
 }
@@ -160,7 +161,7 @@ void ODEGearboxJoint::SetForceImpl(const unsigned int /*_index*/,
 //////////////////////////////////////////////////
 double ODEGearboxJoint::Param(const unsigned int /*_parameter*/) const
 {
-  gzlog << "GetParam not implemented for gearbox\n";
+  gzlog << "Param not implemented for gearbox\n";
   return 0;
 }
 
@@ -177,7 +178,7 @@ ignition::math::Vector3d ODEGearboxJoint::Anchor(
     const unsigned int /*_index*/) const
 {
   dVector3 result;
-  gzlog << "ODEGearboxJoint::GetAnchor not implemented.\n";
+  gzlog << "ODEGearboxJoint::Anchor not implemented.\n";
   return ignition::math::Vector3d(result[0], result[1], result[2]);
 }
 

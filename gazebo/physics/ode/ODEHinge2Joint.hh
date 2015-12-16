@@ -76,8 +76,8 @@ namespace gazebo
                   const double _value);
 
       // Documentation inherited.
-      protected: virtual void SetForceImpl(
-                     const unsigned int _index, const double _effort);
+      protected: virtual void SetForceImpl(const unsigned int _index,
+                     const double _effort);
     };
   }
 }

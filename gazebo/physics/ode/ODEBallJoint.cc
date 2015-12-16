@@ -32,8 +32,8 @@ ODEBallJoint::ODEBallJoint(dWorldID _worldId, BasePtr _parent)
 //////////////////////////////////////////////////
 ODEBallJoint::~ODEBallJoint()
 {
-  if (this->odeJointDPtr->applyDamping)
-    physics::Joint::DisconnectJointUpdate(this->odeJointDPtr->applyDamping);
+  if (this->jointDPtr->applyDamping)
+    physics::Joint::DisconnectJointUpdate(this->jointDPtr->applyDamping);
 }
 
 //////////////////////////////////////////////////
@@ -48,7 +48,6 @@ ignition::math::Vector3d ODEBallJoint::Anchor(
 
   return ignition::math::Vector3d(result[0], result[1], result[2]);
 }
-
 
 //////////////////////////////////////////////////
 void ODEBallJoint::SetAnchor(const unsigned int /*_index*/,
@@ -92,7 +91,7 @@ double ODEBallJoint::Velocity(const unsigned int /*_index*/) const
 ignition::math::Angle ODEBallJoint::AngleImpl(
     const unsigned int /*_index*/) const
 {
-  return ignition::math::Angle();
+  return ignition::math::Angle(0);
 }
 
 //////////////////////////////////////////////////
@@ -103,14 +102,16 @@ void ODEBallJoint::SetAxis(const unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-ignition::math::Angle ODEBallJoint::HighStop(const unsigned int /*_index*/)
+ignition::math::Angle ODEBallJoint::HighStop(
+    const unsigned int /*_index*/) const
 {
   gzerr << "ODEBallJoint::GetHighStop not implemented" << std::endl;
   return ignition::math::Angle();
 }
 
 //////////////////////////////////////////////////
-ignition::math::Angle ODEBallJoint::LowStop(const unsigned int /*_index*/)
+ignition::math::Angle ODEBallJoint::LowStop(
+    const unsigned int /*_index*/) const
 {
   gzerr << "ODEBallJoint::GetLowStop not implemented" << std::endl;
   return ignition::math::Angle();

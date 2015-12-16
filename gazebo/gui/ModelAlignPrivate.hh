@@ -39,9 +39,6 @@ namespace gazebo
       /// \brief Transportation node.
       public: transport::NodePtr node;
 
-      /// \brief Model publisher that publishes model pose to the server.
-      public: transport::PublisherPtr modelPub;
-
       /// \brief Publish user command messages for the server to place in the
       /// undo queue.
       public: transport::PublisherPtr userCmdPub;
