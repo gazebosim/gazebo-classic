@@ -72,8 +72,8 @@ void HeightmapTest::PhysicsLoad(const std::string &_physicsEngine)
   EXPECT_TRUE(shape != NULL);
   EXPECT_TRUE(shape->HasType(physics::Base::HEIGHTMAP_SHAPE));
 
-  EXPECT_TRUE(shape->GetPos() == ignition::math::Vector3d(0, 0, 0));
-  EXPECT_TRUE(shape->GetSize() == ignition::math::Vector3d(129, 129, 10));
+  EXPECT_TRUE(shape->Pos() == ignition::math::Vector3d(0, 0, 0));
+  EXPECT_TRUE(shape->Size() == ignition::math::Vector3d(129, 129, 10));
 
   common::Image trueImage("media/materials/textures/heightmap_bowl.png");
   common::Image testImage = shape->GetImage();
@@ -125,9 +125,9 @@ void HeightmapTest::WhiteAlpha(const std::string &_physicsEngine)
   EXPECT_TRUE(shape->HasType(physics::Base::HEIGHTMAP_SHAPE));
 
   int x, y;
-  for (y = 0; y < shape->GetVertexCount().y; ++y)
+  for (y = 0; y < shape->VertexCount().Y(); ++y)
   {
-    for (x = 0; x < shape->GetVertexCount().x; ++x)
+    for (x = 0; x < shape->VertexCount().X(); ++x)
     {
       EXPECT_NEAR(shape->GetHeight(x, y), 10.0, 1e-4);
     }
@@ -157,9 +157,9 @@ void HeightmapTest::WhiteNoAlpha(const std::string &_physicsEngine)
   EXPECT_TRUE(shape->HasType(physics::Base::HEIGHTMAP_SHAPE));
 
   int x, y;
-  for (y = 0; y < shape->GetVertexCount().y; ++y)
+  for (y = 0; y < shape->VertexCount().Y(); ++y)
   {
-    for (x = 0; x < shape->GetVertexCount().x; ++x)
+    for (x = 0; x < shape->VertexCount().X(); ++x)
     {
       EXPECT_EQ(shape->GetHeight(x, y), 10.0);
     }
@@ -275,8 +275,8 @@ void HeightmapTest::Heights(const std::string &_physicsEngine)
   EXPECT_TRUE(shape);
   EXPECT_TRUE(shape->HasType(physics::Base::HEIGHTMAP_SHAPE));
 
-  EXPECT_TRUE(shape->GetPos() == ignition::math::Vector3d(0, 0, 0));
-  EXPECT_TRUE(shape->GetSize() == ignition::math::Vector3d(129, 129, 10));
+  EXPECT_TRUE(shape->Pos() == ignition::math::Vector3d(0, 0, 0));
+  EXPECT_TRUE(shape->Size() == ignition::math::Vector3d(129, 129, 10));
 
   std::vector<float> physicsTest;
   std::vector<float> renderTest;
@@ -336,11 +336,11 @@ void HeightmapTest::Heights(const std::string &_physicsEngine)
   // This will print the heights
   // printf("static float __heights[] = {");
   // unsigned int i=0;
-  // for (y = 0; y < shape->GetVertexCount().y; ++y)
+  // for (y = 0; y < shape->VertexCount().Y(); ++y)
   // {
-  //   for (x = 0; x < shape->GetVertexCount().x; ++x)
+  //   for (x = 0; x < shape->VertexCount().X(); ++x)
   //   {
-  //     if (y == shape->GetVertexCount().y && x == shape->GetVertexCount().x)
+  //     if (y == shape->VertexCount().Y() && x == shape->VertexCount().X())
   //       break;
 
   //     if (i % 7 == 0)
