@@ -24,15 +24,16 @@
 #include <ignition/math/Vector2.hh>
 
 #include "gazebo/common/Color.hh"
-#include "gazebo/common/CommonTypes.hh"
 
 #include "gazebo/gui/qt.h"
+
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
+    // Forward declare private data class.
     class GrabberHandlePrivate;
 
     class GZ_GUI_VISIBLE GrabberHandle : public QGraphicsItem
@@ -43,12 +44,7 @@ namespace gazebo
       public: GrabberHandle(QGraphicsItem *_parent = 0, int index = 0);
 
       /// \brief Destructor.
-      public: virtual ~GrabberHandle() = default;
-
-      /// \brief Get the index of the grabber handle.
-      /// \return Index of the grabber handle.
-      /// \deprecated See int Index() const
-      public: int GetIndex() const GAZEBO_DEPRECATED(7.0);
+      public: virtual ~GrabberHandle();
 
       /// \brief Get the index of the grabber handle.
       /// \return Index of the grabber handle.
@@ -56,17 +52,7 @@ namespace gazebo
 
       /// \brief Get the current mouse state.
       /// \return The current mouse state.
-      /// \deprecated See int MouseState() const;
-      public: int GetMouseState() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get the current mouse state.
-      /// \return The current mouse state.
       public: int MouseState() const;
-
-      /// \brief Get the center point of the grabber handle.
-      /// \return Center point in pixel coordinates.
-      /// \deprecated See ignition::math::Vector2d CenterPoint()
-      public: QPointF GetCenterPoint() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the center point of the grabber handle.
       /// \return Center point in pixel coordinates.
@@ -74,44 +60,18 @@ namespace gazebo
 
       /// \brief Get the X position of the mouse press.
       /// \return Mouse press X position in pixel coordinates.
-      /// \deprecated See double MouseDownX() const
-      public: double GetMouseDownX() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get the X position of the mouse press.
-      /// \return Mouse press X position in pixel coordinates.
       public: double MouseDownX() const;
 
       /// \brief Get the Y position of the mouse press.
       /// \return Mouse press Y position in pixel coordinates.
-      /// \deprecated See double MouseDownY() const
-      public: double GetMouseDownY() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get the Y position of the mouse press.
-      /// \return Mouse press Y position in pixel coordinates.
       public: double MouseDownY() const;
-
-      /// \brief Get the width of the grabber handle.
-      /// \return The width of the grabber handle in pixel coordinates.
-      /// \deprecated See double Width() const
-      public: double GetWidth() const GAZEBO_DEPRECATED(7.0);
-
       /// \brief Get the width of the grabber handle.
       /// \return The width of the grabber handle in pixel coordinates.
       public: double Width() const;
 
       /// \brief Get the height of the grabber handle.
       /// \return The height of the grabber handle in pixels.
-      /// \deprecated See double Height() const
-      public: double GetHeight() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get the height of the grabber handle.
-      /// \return The height of the grabber handle in pixels.
       public: double Height() const;
-
-      /// \brief Get the fill color of the grabber handle.
-      /// \return _color Fill color.
-      /// \deprecated See common::Color Color() const
-      public: QColor GetColor() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the fill color of the grabber handle.
       /// \return _color Fill color.
@@ -198,7 +158,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Pointer to private data.
-      private: std::shared_ptr<GrabberHandlePrivate> dataPtr;
+      private: std::unique_ptr<GrabberHandlePrivate> dataPtr;
     };
     /// \}
   }

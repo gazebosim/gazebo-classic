@@ -15,6 +15,9 @@
  *
 */
 
+#include <ignition/math/Vector2.hh>
+
+#include "gazebo/gui/qt.h"
 #include "gazebo/gui/building/GrabberHandle.hh"
 #include "gazebo/gui/building/GrabberHandlePrivate.hh"
 
@@ -44,9 +47,8 @@ GrabberHandle::GrabberHandle(QGraphicsItem *_parent, int _index)
 }
 
 /////////////////////////////////////////////////
-int GrabberHandle::GetIndex() const
+GrabberHandle::~GrabberHandle()
 {
-  return this->Index();
 }
 
 /////////////////////////////////////////////////
@@ -62,23 +64,9 @@ void GrabberHandle::SetMouseState(int _state)
 }
 
 /////////////////////////////////////////////////
-int GrabberHandle::GetMouseState() const
-{
-  return this->MouseState();
-}
-
-/////////////////////////////////////////////////
 int GrabberHandle::MouseState() const
 {
   return this->dataPtr->mouseButtonState;
-}
-
-/////////////////////////////////////////////////
-QPointF GrabberHandle::GetCenterPoint() const
-{
-  return QPointF(
-      pos().x() + (this->dataPtr->width + this->dataPtr->widthGrabBuffer/2),
-      pos().y() + (this->dataPtr->height + this->dataPtr->heightGrabBuffer)/2);
 }
 
 /////////////////////////////////////////////////
@@ -102,21 +90,9 @@ void GrabberHandle::SetHeight(double _height)
 }
 
 /////////////////////////////////////////////////
-double GrabberHandle::GetWidth() const
-{
-  return this->Width();
-}
-
-/////////////////////////////////////////////////
 double GrabberHandle::Width() const
 {
   return this->dataPtr->width;
-}
-
-/////////////////////////////////////////////////
-double GrabberHandle::GetHeight() const
-{
-  return this->Height();
 }
 
 /////////////////////////////////////////////////
@@ -129,12 +105,6 @@ double GrabberHandle::Height() const
 void GrabberHandle::SetColor(const QColor &_color)
 {
   this->dataPtr->handleColor = _color;
-}
-
-/////////////////////////////////////////////////
-QColor GrabberHandle::GetColor() const
-{
-  return this->dataPtr->handleColor;
 }
 
 /////////////////////////////////////////////////
@@ -159,21 +129,9 @@ void GrabberHandle::SetMouseDownY(double _y)
 }
 
 /////////////////////////////////////////////////
-double GrabberHandle::GetMouseDownX() const
-{
-  return this->MouseDownX();
-}
-
-/////////////////////////////////////////////////
 double GrabberHandle::MouseDownX() const
 {
   return this->dataPtr->mouseDownX;
-}
-
-/////////////////////////////////////////////////
-double GrabberHandle::GetMouseDownY() const
-{
-  return this->MouseDownY();
 }
 
 /////////////////////////////////////////////////

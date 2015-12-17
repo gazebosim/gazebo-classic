@@ -20,10 +20,14 @@
 
 #include <vector>
 
+#include "gazebo/gui/qt.h"
+
 namespace gazebo
 {
   namespace gui
   {
+    class GrabberHandle;
+
     /// \internal
     /// \brief Private data for GrabberHandle
     class GrabberHandlePrivate
