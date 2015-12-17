@@ -929,7 +929,7 @@ void PhysicsMsgsTest::JointMsg(const std::string &_physicsEngine)
     EXPECT_DOUBLE_EQ(axis1Msg.damping(), 0.2);
     // only ode and bullet return correct hinge friction param value
     if (_physicsEngine == "ode" || _physicsEngine == "bullet")
-      EXPECT_DOUBLE_EQ(axis1Msg.friction(), 0.1);
+      EXPECT_FLOAT_EQ(axis1Msg.friction(), 0.1);
   }
 
   {
