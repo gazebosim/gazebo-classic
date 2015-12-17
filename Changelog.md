@@ -1,5 +1,8 @@
 ## Gazebo 7.0
 
+1. Use opaque pointers in the gui/GLWidget class.
+    * [Pull request #2051](https://bitbucket.org/osrf/gazebo/pull-request/2051)
+
 1. Use more opaque pointers.
     * [Pull request #2025](https://bitbucket.org/osrf/gazebo/pull-request/2025)
 
