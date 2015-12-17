@@ -20,7 +20,6 @@
 #include <string>
 
 #include "gazebo/gui/qt.h"
-#include "gazebo/gui/building/BuildingEditorTypes.hh"
 
 #include "gazebo/rendering/RenderTypes.hh"
 

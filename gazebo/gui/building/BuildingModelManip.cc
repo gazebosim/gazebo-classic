@@ -17,6 +17,7 @@
 
 #include <functional>
 #include <ignition/math/Pose3.hh>
+#include <ignition/math/Quaternion.hh>
 #include <ignition/math/Vector3.hh>
 
 #include "gazebo/rendering/Visual.hh"
@@ -289,7 +290,7 @@ void BuildingModelManip::SetRotation(double _roll, double _pitch, double _yaw)
   double yawRad = BuildingMaker::ConvertAngle(_yaw);
 
   this->dataPtr->visual->GetParent()->SetRotation(
-      math::Quaternion(rollRad, pitchRad, -yawRad));
+      ignition::math::Quaterniond(rollRad, pitchRad, -yawRad));
 }
 
 /////////////////////////////////////////////////

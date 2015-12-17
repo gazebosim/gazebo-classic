@@ -215,7 +215,7 @@ void BuildingMaker::AttachManip(const std::string &_child,
   if (it != this->attachmentMap.end())
   {
     auto children = it->second;
-    if (std::find(children.begin(), children.end(),_child) ==
+    if (std::find(children.begin(), children.end(), _child) ==
         children.end())
     {
       it->second.push_back(_child);

@@ -29,13 +29,13 @@
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/KeyEvent.hh"
 #include "gazebo/gui/qt.h"
-#include "gazebo/gui/building/BuildingEditorTypes.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
+    class BuildingModelManip;
     class EditorItem;
     class SaveDialog;
 
