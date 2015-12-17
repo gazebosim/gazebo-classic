@@ -179,7 +179,7 @@ void ConfigWidget_TEST::JointMsgWidget()
         ignition::math::Pose3d(pos, quat));
 
     // axis1
-    jointConfigWidget->SetVector3WidgetValue("axis1::xyz",
+    jointConfigWidget->SetVector3dWidgetValue("axis1::xyz",
         ignition::math::Vector3d::UnitY);
     jointConfigWidget->SetBoolWidgetValue("axis1::use_parent_model_frame",
         true);
@@ -190,7 +190,7 @@ void ConfigWidget_TEST::JointMsgWidget()
     jointConfigWidget->SetDoubleWidgetValue("axis1::damping", 0.9);
 
     // axis2
-    jointConfigWidget->SetVector3WidgetValue("axis2::xyz",
+    jointConfigWidget->SetVector3dWidgetValue("axis2::xyz",
         ignition::math::Vector3d::UnitZ);
     jointConfigWidget->SetBoolWidgetValue("axis2::use_parent_model_frame",
         true);
@@ -236,7 +236,7 @@ void ConfigWidget_TEST::JointMsgWidget()
         ignition::math::Pose3d(pos, quat));
 
     // axis1
-    QCOMPARE(jointConfigWidget->Vector3WidgetValue("axis1::xyz"),
+    QCOMPARE(jointConfigWidget->Vector3dWidgetValue("axis1::xyz"),
         ignition::math::Vector3d::UnitY);
     QCOMPARE(jointConfigWidget->BoolWidgetValue(
         "axis1::use_parent_model_frame"), true);
@@ -248,7 +248,7 @@ void ConfigWidget_TEST::JointMsgWidget()
     QCOMPARE(jointConfigWidget->DoubleWidgetValue("axis1::damping"), 0.9);
 
     // axis2
-    QCOMPARE(jointConfigWidget->Vector3WidgetValue("axis2::xyz"),
+    QCOMPARE(jointConfigWidget->Vector3dWidgetValue("axis2::xyz"),
         ignition::math::Vector3d::UnitZ);
     QCOMPARE(jointConfigWidget->BoolWidgetValue(
         "axis1::use_parent_model_frame"), true);
@@ -597,7 +597,7 @@ void ConfigWidget_TEST::VisualMsgWidget()
     visualConfigWidget->SetBoolWidgetValue("visible", false);
     visualConfigWidget->SetBoolWidgetValue("delete_me", true);
     visualConfigWidget->SetBoolWidgetValue("is_static", true);
-    visualConfigWidget->SetVector3WidgetValue("scale",
+    visualConfigWidget->SetVector3dWidgetValue("scale",
         ignition::math::Vector3d(2.0, 1.5, 0.5));
 
     // pose
@@ -640,7 +640,7 @@ void ConfigWidget_TEST::VisualMsgWidget()
     QCOMPARE(visualConfigWidget->BoolWidgetValue("visible"), false);
     QCOMPARE(visualConfigWidget->BoolWidgetValue("delete_me"), true);
     QCOMPARE(visualConfigWidget->BoolWidgetValue("is_static"), true);
-    QCOMPARE(visualConfigWidget->Vector3WidgetValue("scale"),
+    QCOMPARE(visualConfigWidget->Vector3dWidgetValue("scale"),
         ignition::math::Vector3d(2.0, 1.5, 0.5));
 
     // pose
@@ -1207,7 +1207,7 @@ void ConfigWidget_TEST::CreatedExternally()
   QVERIFY(configWidget->SetDoubleWidgetValue("double", doubleValue));
   QVERIFY(configWidget->SetStringWidgetValue("string", stringValue));
   QVERIFY(configWidget->SetBoolWidgetValue("bool", boolValue));
-  QVERIFY(configWidget->SetVector3WidgetValue("vector3d",
+  QVERIFY(configWidget->SetVector3dWidgetValue("vector3d",
       ignition::math::Vector3d(vector3dValue)));
   QVERIFY(configWidget->SetColorWidgetValue("color", colorValue));
   QVERIFY(configWidget->SetPoseWidgetValue("pose", poseValue));
@@ -1220,7 +1220,7 @@ void ConfigWidget_TEST::CreatedExternally()
   QCOMPARE(configWidget->DoubleWidgetValue("double"), doubleValue);
   QCOMPARE(configWidget->StringWidgetValue("string"), stringValue);
   QCOMPARE(configWidget->BoolWidgetValue("bool"), boolValue);
-  QCOMPARE(configWidget->Vector3WidgetValue("vector3d"),
+  QCOMPARE(configWidget->Vector3dWidgetValue("vector3d"),
       ignition::math::Vector3d(vector3dValue));
   QCOMPARE(configWidget->ColorWidgetValue("color"), colorValue);
   QCOMPARE(configWidget->PoseWidgetValue("pose"),
@@ -1554,7 +1554,7 @@ void ConfigWidget_TEST::ChildVector3dSignal()
       SLOT(OnVector3dValueChanged(const QString, ignition::math::Vector3d)));
 
   // Check default vector3
-  QVERIFY(configWidget->Vector3WidgetValue("vector3") ==
+  QVERIFY(configWidget->Vector3dWidgetValue("vector3") ==
       ignition::math::Vector3d());
 
   // Get axes spins

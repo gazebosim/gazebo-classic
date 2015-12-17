@@ -391,17 +391,17 @@ bool ConfigWidget::SetStringWidgetValue(const std::string &_name,
 bool ConfigWidget::SetVector3WidgetValue(const std::string &_name,
     const math::Vector3 &_value)
 {
-  return this->SetVector3WidgetValue(_name, _value.Ign());
+  return this->SetVector3dWidgetValue(_name, _value.Ign());
 }
 
 /////////////////////////////////////////////////
-bool ConfigWidget::SetVector3WidgetValue(const std::string &_name,
+bool ConfigWidget::SetVector3dWidgetValue(const std::string &_name,
     const ignition::math::Vector3d &_value)
 {
   auto iter = this->dataPtr->configWidgets.find(_name);
 
   if (iter != this->dataPtr->configWidgets.end())
-    return this->UpdateVector3Widget(iter->second, _value);
+    return this->UpdateVector3dWidget(iter->second, _value);
 
   return false;
 }
@@ -564,11 +564,11 @@ std::string ConfigWidget::StringWidgetValue(const std::string &_name) const
 math::Vector3 ConfigWidget::GetVector3WidgetValue(const std::string &_name)
     const
 {
-  return this->Vector3WidgetValue(_name);
+  return this->Vector3dWidgetValue(_name);
 }
 
 /////////////////////////////////////////////////
-ignition::math::Vector3d ConfigWidget::Vector3WidgetValue(
+ignition::math::Vector3d ConfigWidget::Vector3dWidgetValue(
     const std::string &_name) const
 {
   ignition::math::Vector3d value;
@@ -576,7 +576,7 @@ ignition::math::Vector3d ConfigWidget::Vector3WidgetValue(
       this->dataPtr->configWidgets.find(_name);
 
   if (iter != this->dataPtr->configWidgets.end())
-    value = this->Vector3WidgetValue(iter->second);
+    value = this->Vector3dWidgetValue(iter->second);
   return value;
 }
 
@@ -862,7 +862,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
                   google::protobuf::Message *geomDimMsg =
                       geomValueMsg->GetReflection()->MutableMessage(
                       geomValueMsg, geomValueDescriptor->field(fieldIdx));
-                  dimensions = this->ParseVector3(geomDimMsg);
+                  dimensions = this->ParseVector3d(geomDimMsg);
                   break;
                 }
                 else if (geomMsgName == "CylinderGeom")
@@ -928,7 +928,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
                 google::protobuf::Message *posValueMsg =
                     valueMsg->GetReflection()->MutableMessage(
                     valueMsg, valueField);
-                ignition::math::Vector3d vec3 = this->ParseVector3(posValueMsg);
+                auto vec3 = this->ParseVector3d(posValueMsg);
                 value.Pos() = vec3;
               }
               else if (valueField->message_type()->name() == "Quaternion")
@@ -963,8 +963,8 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
               newFieldWidget = configChildWidget;
             }
 
-            ignition::math::Vector3d vec3 = this->ParseVector3(valueMsg);
-            this->UpdateVector3Widget(configChildWidget, vec3);
+            ignition::math::Vector3d vec3 = this->ParseVector3d(valueMsg);
+            this->UpdateVector3dWidget(configChildWidget, vec3);
           }
           // parse and create custom color widgets
           else if (field->message_type()->name() == "Color")
@@ -1240,7 +1240,7 @@ GroupWidget *ConfigWidget::CreateGroupWidget(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
-ignition::math::Vector3d ConfigWidget::ParseVector3(
+ignition::math::Vector3d ConfigWidget::ParseVector3d(
     const google::protobuf::Message *_msg) const
 {
   ignition::math::Vector3d vec3;
@@ -2140,7 +2140,7 @@ void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
               google::protobuf::Message *geomDimensionMsg =
                   geomValueMsg->GetReflection()->MutableMessage(geomValueMsg,
                   geomValueMsg->GetDescriptor()->field(fieldIdx));
-              this->UpdateVector3Msg(geomDimensionMsg, geomSize);
+              this->UpdateVector3dMsg(geomDimensionMsg, geomSize);
 
               if (geomType == "mesh")
               {
@@ -2240,7 +2240,7 @@ void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
                   values.push_back(valueSpinBox->value());
                 }
                 ignition::math::Vector3d vec3(values[0], values[1], values[2]);
-                this->UpdateVector3Msg(posValueMsg, vec3);
+                this->UpdateVector3dMsg(posValueMsg, vec3);
               }
               else if (valueField->message_type()->name() == "Quaternion")
               {
@@ -2284,7 +2284,7 @@ void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
               values.push_back(valueSpinBox->value());
             }
             ignition::math::Vector3d vec3(values[0], values[1], values[2]);
-            this->UpdateVector3Msg(valueMsg, vec3);
+            this->UpdateVector3dMsg(valueMsg, vec3);
           }
           else if (field->message_type()->name() == "Color")
           {
@@ -2338,7 +2338,7 @@ void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
 }
 
 /////////////////////////////////////////////////
-void ConfigWidget::UpdateVector3Msg(google::protobuf::Message *_msg,
+void ConfigWidget::UpdateVector3dMsg(google::protobuf::Message *_msg,
     const ignition::math::Vector3d &_value)
 {
   const google::protobuf::Descriptor *valueDescriptor = _msg->GetDescriptor();
@@ -2455,7 +2455,7 @@ bool ConfigWidget::UpdateBoolWidget(ConfigChildWidget *_widget, bool _value)
 }
 
 /////////////////////////////////////////////////
-bool ConfigWidget::UpdateVector3Widget(ConfigChildWidget *_widget,
+bool ConfigWidget::UpdateVector3dWidget(ConfigChildWidget *_widget,
     const ignition::math::Vector3d &_vec)
 {
   if (_widget->widgets.size() == 4u)
@@ -2707,7 +2707,7 @@ bool ConfigWidget::BoolWidgetValue(ConfigChildWidget *_widget) const
 }
 
 /////////////////////////////////////////////////
-ignition::math::Vector3d ConfigWidget::Vector3WidgetValue(
+ignition::math::Vector3d ConfigWidget::Vector3dWidgetValue(
     ConfigChildWidget *_widget) const
 {
   ignition::math::Vector3d value;
@@ -2958,10 +2958,10 @@ void ConfigWidget::OnVector3dValueChanged()
   if (!widget)
     return;
 
-  auto value = this->Vector3WidgetValue(widget);
+  auto value = this->Vector3dWidgetValue(widget);
 
   // Update preset
-  this->UpdateVector3Widget(widget, value);
+  this->UpdateVector3dWidget(widget, value);
 
   // Signal
   emit Vector3dValueChanged(widget->scopedName.c_str(), value);
@@ -2997,7 +2997,7 @@ void ConfigWidget::OnVector3dPresetChanged(const int _index)
   else
     return;
 
-  this->UpdateVector3Widget(widget, vec);
+  this->UpdateVector3dWidget(widget, vec);
 
   // Signal
   emit Vector3dValueChanged(widget->scopedName.c_str(), vec);

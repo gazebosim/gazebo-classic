@@ -294,7 +294,7 @@ namespace gazebo
       /// \param[in] _name Name of the child widget.
       /// \param[in] _value Value to set to.
       /// \return True if the value is set successfully.
-      /// \deprecated See SetVector3WidgetValue(const std::string &_name,
+      /// \deprecated See SetVector3dWidgetValue(const std::string &_name,
       ///                                 const ignition::math::Vector3 &_value)
       public: bool SetVector3WidgetValue(const std::string &_name,
           const math::Vector3 &_value) GAZEBO_DEPRECATED(7.0);
@@ -303,7 +303,7 @@ namespace gazebo
       /// \param[in] _name Name of the child widget.
       /// \param[in] _value Value to set to.
       /// \return True if the value is set successfully.
-      public: bool SetVector3WidgetValue(const std::string &_name,
+      public: bool SetVector3dWidgetValue(const std::string &_name,
           const ignition::math::Vector3d &_value);
 
       /// \brief Set a color value to a child widget.
@@ -441,14 +441,14 @@ namespace gazebo
       /// \brief Get a vector3 value from a child widget.
       /// \param[in] _name Name of the child widget.
       /// \return Vector3 value.
-      /// \deprecated See Vector3WidgetValue(const std::string &_name) const
+      /// \deprecated See Vector3dWidgetValue(const std::string &_name) const
       public: math::Vector3 GetVector3WidgetValue(const std::string &_name)
           const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get a vector3 value from a child widget.
       /// \param[in] _name Name of the child widget.
       /// \return Vector3 value.
-      public: ignition::math::Vector3d Vector3WidgetValue(
+      public: ignition::math::Vector3d Vector3dWidgetValue(
           const std::string &_name) const;
 
       /// \brief Get a color value from a child widget.
@@ -657,7 +657,7 @@ namespace gazebo
       /// \brief Parse a vector3 message.
       /// param[in] _msg Input vector3d message.
       /// return Parsed vector.
-      private: ignition::math::Vector3d ParseVector3(
+      private: ignition::math::Vector3d ParseVector3d(
           const google::protobuf::Message *_msg) const;
 
       /// \brief Update the message field using values from the widgets.
@@ -669,7 +669,7 @@ namespace gazebo
       /// \brief Update a vector3d message.
       /// \param[in] _msg Vector3d message to be updated.
       /// \param[in] _value Vector3 used for updating the message.
-      private: void UpdateVector3Msg(google::protobuf::Message *_msg,
+      private: void UpdateVector3dMsg(google::protobuf::Message *_msg,
           const ignition::math::Vector3d &_value);
 
       /// \brief Update a child widget with an unsigned integer value.
@@ -711,7 +711,7 @@ namespace gazebo
       /// \param[in] _widget Pointer to the child widget.
       /// \param[in] _value Value to set to.
       /// \return True if the update completed successfully.
-      private: bool UpdateVector3Widget(ConfigChildWidget *_widget,
+      private: bool UpdateVector3dWidget(ConfigChildWidget *_widget,
           const ignition::math::Vector3d &_value);
 
       /// \brief Update a child widget with a color value.
@@ -774,7 +774,7 @@ namespace gazebo
       /// \brief Get a vector3 value from a child widget.
       /// \param[in] _widget Pointer to the child widget.
       /// \return Value of the widget.
-      private: ignition::math::Vector3d Vector3WidgetValue(
+      private: ignition::math::Vector3d Vector3dWidgetValue(
           ConfigChildWidget *_widget) const;
 
       /// \brief Get a color value from a child widget.
