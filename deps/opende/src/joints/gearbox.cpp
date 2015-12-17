@@ -81,8 +81,14 @@ dxJointGearbox::getInfo2( dxJoint::Info2* info )
     // cumulative angles might snap to wrong angular value.
 
     // Debug
-    // printf("a1(%f) a1cum(%f) a2(%f) a2cum(%f) err(%f)\n",
-    //   ang1, cumulative_angle1, ang2, cumulative_angle2, err);
+    printf("a1(%f, %f, %f) a2(%f, %f, %f)\n",
+      axis1[0], axis1[1], axis1[2],
+      axis2[0], axis2[1], axis2[2]);
+    printf("    global a1(%f, %f, %f) a2(%f, %f, %f)\n",
+      globalAxis1[0], globalAxis1[1], globalAxis1[2],
+      globalAxis2[0], globalAxis2[1], globalAxis2[2]);
+    printf("    a1(%f) a1cum(%f) a2(%f) a2cum(%f) err(%f)\n",
+      ang1, cumulative_angle1, ang2, cumulative_angle2, err);
 
     // this constraint is true if the assembly is stationary, but
     // if the whole assembly is rotating in space, the constraint
@@ -110,7 +116,7 @@ dxJointGearbox::getInfo2( dxJoint::Info2* info )
     info->J2a[2] = ratio * globalAxis2[2];
 
     dReal k = info->fps * info->erp;
-    info->c[0] = -k * err +
+    info->c[0] = 0*-k * err +
                 info->J1a[0] * refBody1->avel[0] +
                 info->J1a[1] * refBody1->avel[1] +
                 info->J1a[2] * refBody1->avel[2] +
@@ -131,6 +137,7 @@ dxJointGearbox::getInfo2( dxJoint::Info2* info )
     // 		       1.0, ratio);
 
     // printf("d: %f\n", dCalcVectorDot3(globalAxis1, d));
+    info->findex[0] = -2;
 }
 
 void dJointSetGearboxAxis1( dJointID j, dReal x, dReal y, dReal z )
