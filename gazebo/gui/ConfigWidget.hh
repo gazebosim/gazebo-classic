@@ -170,7 +170,7 @@ namespace gazebo
       /// \brief Create a human readable key, capitalizing the first letter
       /// and removing characters like "_".
       /// \param[in] _key Non-human-readable key.
-      /// \return Human-redadable key.
+      /// \return Human-readable key.
       /// \deprecated See HumanReadableKey(const std::string &_key) const
       public: std::string GetHumanReadableKey(const std::string &_key)
           GAZEBO_DEPRECATED(7.0);
@@ -178,7 +178,7 @@ namespace gazebo
       /// \brief Create a human readable key, capitalizing the first letter
       /// and removing characters like "_".
       /// \param[in] _key Non-human-readable key.
-      /// \return Human-redadable key.
+      /// \return Human-readable key.
       public: std::string HumanReadableKey(const std::string &_key) const;
 
       /// \brief Returns the unit for a given key. For example, the key "mass"
