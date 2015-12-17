@@ -41,13 +41,13 @@ namespace gazebo
       public: transport::PublisherPtr jointPub;
 
       /// \brief Sliders for force control
-      public: std::map<std::string, JointForceControl*> sliders;
+      public: std::map<std::string, JointForceControl *> sliders;
 
       /// \brief Sliders for position control
-      public: std::map<std::string, JointPIDPosControl*> pidPosSliders;
+      public: std::map<std::string, JointPIDPosControl *> pidPosSliders;
 
       /// \brief Sliders for velocity control
-      public: std::map<std::string, JointPIDVelControl*> pidVelSliders;
+      public: std::map<std::string, JointPIDVelControl *> pidVelSliders;
 
       /// \brief Label for the name of the current model being controlled.
       public: QLabel *modelLabel;
@@ -78,8 +78,17 @@ namespace gazebo
     /// \brief Private data for the JointPIDPosControl class.
     class JointPIDPosControlPrivate
     {
-      /// \brief Sliders for the position, P gain, I gain, and D gain.
-      public: QDoubleSpinBox *posSpin, *pGainSpin, *iGainSpin, *dGainSpin;
+      /// \brief Slider for the position.
+      public: QDoubleSpinBox *posSpin;
+
+      /// \brief Sliders for the P gain.
+      public: QDoubleSpinBox *pGainSpin;
+
+      /// \brief Sliders for the I gain.
+      public: QDoubleSpinBox *iGainSpin;
+
+      /// \brief Sliders for the D gain.
+      public: QDoubleSpinBox *dGainSpin;
 
       /// \brief Name of the joint.
       public: std::string name;
@@ -91,8 +100,17 @@ namespace gazebo
     /// \brief Private data for the JointPIDVelControl class.
     class JointPIDVelControlPrivate
     {
-      /// \brief Sliders for the position, P gain, I gain, and D gain.
-      public: QDoubleSpinBox *posSpin, *pGainSpin, *iGainSpin, *dGainSpin;
+      /// \brief Slider for the position.
+      public: QDoubleSpinBox *posSpin;
+
+      /// \brief Sliders for the P gain.
+      public: QDoubleSpinBox *pGainSpin;
+
+      /// \brief Sliders for the I gain.
+      public: QDoubleSpinBox *iGainSpin;
+
+      /// \brief Sliders for the D gain.
+      public: QDoubleSpinBox *dGainSpin;
 
       /// \brief Name of the joint.
       public: std::string name;
