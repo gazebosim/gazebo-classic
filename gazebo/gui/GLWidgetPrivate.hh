@@ -20,7 +20,6 @@
 #include <mutex>
 #include <string>
 #include <vector>
-#include <boost/thread/mutex.hpp>
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/GLWidget.hh"
