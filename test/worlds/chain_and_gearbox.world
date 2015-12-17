@@ -461,15 +461,26 @@
         <parent>world</parent>
         <child>link_1</child>
         <axis>
-          <xyz>0 0 1</xyz>
+          <!--
+          <xyz>1 0 1</xyz>
+          -->
+          <xyz>1 0 0</xyz>
           <limit>
-            <lower>-1e+16</lower>
-            <upper>1e+16</upper>
+            <lower>-0.1</lower>
+            <upper>0.1</upper>
           </limit>
           <dynamics>
             <damping>1</damping>
           </dynamics>
         </axis>
+        <physics>
+          <ode>
+            <limit>
+              <cfm>0.0000</cfm>
+              <erp>0.5</erp>
+            </limit>
+          </ode>
+        </physics>
       </joint>
     </model>
 
