@@ -145,7 +145,7 @@ release will remove the deprecated code.
 
 1. **gazebo/gui/GLWidget.hh**
     + ***Deprecation:*** rendering::UserCameraPtr GetCamera() const
-    + ***Replacement:*** rendering::UserCameraPtr Camera() const const
+    + ***Replacement:*** rendering::UserCameraPtr Camera() const
     + ***Deprecation:*** rendering::ScenePtr GetScene() const
     + ***Replacement:*** rendering::ScenePtr Scene() const
 
