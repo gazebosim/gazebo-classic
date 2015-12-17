@@ -183,6 +183,12 @@ release will remove the deprecated code.
     + ***Deprecation:*** public: std::string GetEnumWidgetValue(const std::string &_name) const
     + ***Replacement:*** public: std::string EnumWidgetValue(const std::string &_name) const
 
+1. **gazebo/gui/GLWidget.hh**
+    + ***Deprecation:*** rendering::UserCameraPtr GetCamera() const
+    + ***Replacement:*** rendering::UserCameraPtr Camera() const
+    + ***Deprecation:*** rendering::ScenePtr GetScene() const
+    + ***Replacement:*** rendering::ScenePtr Scene() const
+
 1. **gazebo/gui/RTShaderSystem.hh**
     + ***Deprecation:*** void AttachEntity(Visual *vis)
     + ***No replacement for AttachEntity ***

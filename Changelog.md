@@ -3,6 +3,9 @@
 1 Use opaque pointers in the gui/ConfigWidget class.
     * [Pull request #2028](https://bitbucket.org/osrf/gazebo/pull-request/2028)
 
+1. Use opaque pointers in the gui/GLWidget class.
+    * [Pull request #2051](https://bitbucket.org/osrf/gazebo/pull-request/2051)
+
 1. Use more opaque pointers.
     * [Pull request #2025](https://bitbucket.org/osrf/gazebo/pull-request/2025)
 
@@ -22,7 +25,7 @@
 
 1. Implemented private data pointer for the RTShaderSystem class. Minimized shader updates to once per render update.
     * [Pull request #2003](https://bitbucket.org/osrf/gazebo/pull-request/2003)
-    
+
 1. Updating physics library to use ignition math.
     * [Pull request #2007](https://bitbucket.org/osrf/gazebo/pull-request/2007)
 
@@ -101,12 +104,15 @@ flags from c functions. Windows did not like `CPPTYPE_*` in
 
 1. Undo user motion commands during simulation, added physics::UserCmdManager and gui::UserCmdHistory.
     * [Pull request #1934](https://bitbucket.org/osrf/gazebo/pull-request/1934)
-    
+
 1. Forward user command messages for undo.
     * [Pull request #2009](https://bitbucket.org/osrf/gazebo/pull-request/2009)
 
 1. Undo reset commands during simulation, forwarding commands
     * [Pull request #1986](https://bitbucket.org/osrf/gazebo/pull-request/1986)
+
+1. Undo apply force / torque during simulation
+    * [Pull request #2030](https://bitbucket.org/osrf/gazebo/pull-request/2030)
 
 1. Add function to get the derived scale of a Visual
     * [Pull request #1881](https://bitbucket.org/osrf/gazebo/pull-request/1881)
@@ -237,6 +243,11 @@ using the same arguments used in the command line.
 
     1. Support inserting nested models from model maker
         * [Pull request #1982](https://bitbucket.org/osrf/gazebo/pull-request/1982)
+
+1. Building editor updates
+
+    1. Removed unused class: BuildingItem
+        * [Pull request #2045](https://bitbucket.org/osrf/gazebo/pull-request/2045)
 
 ## Gazebo 6.0
 
