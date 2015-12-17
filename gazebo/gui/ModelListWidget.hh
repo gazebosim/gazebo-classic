@@ -49,8 +49,6 @@ namespace gazebo
 {
   namespace gui
   {
-    class ModelEditWidget;
-
     class GZ_GUI_VISIBLE ModelListWidget : public QWidget
     {
       Q_OBJECT

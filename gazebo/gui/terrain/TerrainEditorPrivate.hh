@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_TERRAIN_EDITOR_PRIVATE_HH_
-#define _GAZEBO_TERRAIN_EDITOR_PRIVATE_HH_
+#ifndef _GAZEBO_GUI_TERRAINEDITOR_PRIVATE_HH_
+#define _GAZEBO_GUI_TERRAINEDITOR_PRIVATE_HH_
 
 namespace gazebo
 {
@@ -24,7 +24,7 @@ namespace gazebo
     class TerrainEditorPalette;
 
     /// \class TerrainEditorPrivate TerrainEditorPrivate.hh
-    /// \brief Private data for the TerrainEditorPrivate class.
+    /// \brief Private data for the TerrainEditor class.
     class TerrainEditorPrivate
     {
       /// \brief Contains all the terrain editor tools.
