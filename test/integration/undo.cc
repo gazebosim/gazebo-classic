@@ -294,7 +294,7 @@ void UndoTest::UndoTranslateModel()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/shapes.world", false, false, true);
+  this->Load("worlds/shapes.world", false, false, false);
 
   // Get world
   auto world = gazebo::physics::get_world("default");
@@ -391,7 +391,7 @@ void UndoTest::UndoRotateLight()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/shapes.world", false, false, true);
+  this->Load("worlds/shapes.world", false, false, false);
 
   // Get world
   auto world = gazebo::physics::get_world("default");
@@ -488,7 +488,7 @@ void UndoTest::UndoSnap()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/shapes.world", false, false, true);
+  this->Load("worlds/shapes.world", false, false, false);
 
   // Get world
   auto world = gazebo::physics::get_world("default");
@@ -586,7 +586,7 @@ void UndoTest::UndoAlign()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/shapes.world", false, false, true);
+  this->Load("worlds/shapes.world", false, false, false);
 
   // Get world
   auto world = gazebo::physics::get_world("default");
@@ -707,7 +707,7 @@ void UndoTest::UndoResetTime()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/shapes.world", false, false, true);
+  this->Load("worlds/shapes.world", false, false, false);
 
   // Get world
   gazebo::physics::WorldPtr world = gazebo::physics::get_world("default");
@@ -797,6 +797,9 @@ void UndoTest::UndoResetTime()
   gzmsg << "Initial time [" << initialTime << "] new time [" << newTime
       << "]    sleep [" << sleep << "]" << std::endl;
   QVERIFY(newTime == initialTime);
+
+  delete mainWindow;
+  mainWindow = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -805,7 +808,7 @@ void UndoTest::UndoResetWorld()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/shapes.world", false, false, true);
+  this->Load("worlds/shapes.world", false, false, false);
 
   // Get world
   gazebo::physics::WorldPtr world = gazebo::physics::get_world("default");
@@ -898,6 +901,9 @@ void UndoTest::UndoResetWorld()
         << "]    sleep [" << sleep << "]" << std::endl;
   QVERIFY(newTime == initialTime);
   QVERIFY(boxNewPose == boxFinalPose);
+
+  delete mainWindow;
+  mainWindow = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -906,7 +912,7 @@ void UndoTest::UndoResetModelPoses()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/shapes.world", false, false, true);
+  this->Load("worlds/shapes.world", false, false, false);
 
   // Get world
   gazebo::physics::WorldPtr world = gazebo::physics::get_world("default");
@@ -993,6 +999,107 @@ void UndoTest::UndoResetModelPoses()
   gzmsg << "Initial pose [" << boxInitialPose << "] new pose [" << boxNewPose
         << "]    sleep [" << sleep << "]" << std::endl;
   QVERIFY(boxNewPose == boxFinalPose);
+
+  delete mainWindow;
+  mainWindow = NULL;
+}
+
+/////////////////////////////////////////////////
+void UndoTest::UndoWrench()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/shapes.world", false, false, false);
+
+  // Get world
+  auto world = gazebo::physics::get_world("default");
+  QVERIFY(world != NULL);
+
+  // Get box
+  auto box = world->GetModel("box");
+  QVERIFY(box != NULL);
+  auto boxPose = box->GetWorldPose();
+
+  // Create the main window.
+  auto mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Process some events and draw the screen
+  for (size_t i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Transport
+  gazebo::transport::NodePtr node;
+  node = gazebo::transport::NodePtr(new gazebo::transport::Node());
+  node->Init();
+
+  auto userCmdPub = node->Advertise<gazebo::msgs::UserCmd>("~/user_cmd");
+
+  // Apply wrench to box
+  gazebo::msgs::Wrench wrenchMsg;
+  gazebo::msgs::Set(wrenchMsg.mutable_force(),
+      ignition::math::Vector3d(10000, 0, 0));
+  gazebo::msgs::Set(wrenchMsg.mutable_torque(),
+      ignition::math::Vector3d::Zero);
+  gazebo::msgs::Set(wrenchMsg.mutable_force_offset(),
+      ignition::math::Vector3d::Zero);
+
+  gazebo::msgs::UserCmd msg;
+  msg.set_description("Apply wrench");
+  msg.set_type(gazebo::msgs::UserCmd::WRENCH);
+  msg.mutable_wrench()->CopyFrom(wrenchMsg);
+  msg.set_entity_name("box::link");
+
+  userCmdPub->Publish(msg);
+
+  // Check box has moved
+  int sleep = 0;
+  int maxSleep = 100;
+  auto newBoxPose = box->GetWorldPose();
+  while (newBoxPose == boxPose && sleep < maxSleep)
+  {
+    newBoxPose = box->GetWorldPose();
+    gazebo::common::Time::MSleep(100);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+    sleep++;
+  }
+  gzmsg << "Command: Initial pose [" << boxPose << "] new pose [" << newBoxPose
+      << "]    sleep [" << sleep << "]" << std::endl;
+  QVERIFY(newBoxPose != boxPose);
+
+  // Undo
+  QVERIFY(gazebo::gui::g_undoAct != NULL);
+  QVERIFY(gazebo::gui::g_undoAct->isEnabled() == true);
+
+  gazebo::gui::g_undoAct->trigger();
+
+  // Check box is back at original pose
+  sleep = 0;
+  maxSleep = 10;
+  newBoxPose = box->GetWorldPose();
+  while (newBoxPose != boxPose && sleep < maxSleep)
+  {
+    newBoxPose = box->GetWorldPose();
+    gazebo::common::Time::MSleep(100);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+    sleep++;
+  }
+  gzmsg << "Undo: Initial pose [" << boxPose << "] new pose [" << newBoxPose <<
+      "]" << std::endl;
+  QVERIFY(newBoxPose == boxPose);
+
+  delete mainWindow;
+  mainWindow = NULL;
 }
 
 // Generate a main function for the test

@@ -4,6 +4,7 @@ import "factory.proto";
 import "light.proto";
 import "model.proto";
 import "world_control.proto";
+import "wrench.proto";
 
 /// \ingroup gazebo_msgs
 /// \interface UserCmd
@@ -20,8 +21,11 @@ message UserCmd
     /// \brief Controlling the world.
     WORLD_CONTROL = 2;
 
+    /// \brief Applying wrench.
+    WRENCH = 3;
+
     /// \brief New model insertion
-    INSERTING = 3;
+    INSERTING = 4;
   }
 
   /// \brief Unique id for user command.
@@ -39,12 +43,15 @@ message UserCmd
   /// \brief For light modify or factory commands.
   repeated Light light = 5;
 
+  /// \brief Name of entity targeted by command
+  optional string entity_name = 6;
+
   /// \brief For World Control commands.
-  optional WorldControl world_control = 6;
+  optional WorldControl world_control = 7;
+
+  /// \brief Wrench for apply wrench commands.
+  optional Wrench wrench = 8;
 
   /// \brief For model factory commands.
-  optional Factory factory = 7;
-
-  /// \brief Name of entity related to the command.
-  optional string entity_name = 8;
+  optional Factory factory = 9;
 }
