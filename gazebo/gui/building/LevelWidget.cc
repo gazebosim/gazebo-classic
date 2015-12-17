@@ -15,6 +15,7 @@
  *
 */
 
+#include "gazebo/gui/qt.h"
 #include "gazebo/gui/building/BuildingEditorEvents.hh"
 #include "gazebo/gui/building/LevelWidget.hh"
 #include "gazebo/gui/building/LevelWidgetPrivate.hh"

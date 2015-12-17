@@ -18,22 +18,24 @@
 #ifndef _GAZEBO_GUI_LEVEL_WIDGET_HH_
 #define _GAZEBO_GUI_LEVEL_WIDGET_HH_
 
+#include <memory>
 #include <string>
-#include <vector>
+
 #include "gazebo/gui/qt.h"
-#include "gazebo/common/Event.hh"
+
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
+    // Forward declare private data.
     class LevelWidgetPrivate;
 
     /// \addtogroup gazebo_gui
     /// \{
 
-    /// \class GridLines GridLines.hh
+    /// \class LevelWidget LevelWidget.hh
     /// \brief A widget for adding and changing building levels.
     class GZ_GUI_VISIBLE LevelWidget : public QWidget
     {
