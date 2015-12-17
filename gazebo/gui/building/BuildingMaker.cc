@@ -156,7 +156,9 @@ void BuildingMaker::OnEdit(bool _checked)
 void BuildingMaker::ConnectItem(const std::string &_partName,
     const EditorItem *_item)
 {
-  BuildingModelManip *manip = this->allItems[_partName];
+  auto manip = this->allItems[_partName];
+  if (!manip)
+    return;
 
   // Make sure each connection calls BuildingMaker::BuildingChanged
 
@@ -209,66 +211,68 @@ void BuildingMaker::ConnectItem(const std::string &_partName,
 void BuildingMaker::AttachManip(const std::string &_child,
     const std::string &_parent)
 {
-  std::map<std::string, BuildingModelManip *>::const_iterator it =
-      this->allItems.find(_child);
-  if (it == this->allItems.end())
+  auto it = this->attachmentMap.find(_parent);
+  if (it != this->attachmentMap.end())
   {
-    gzerr << "Child manip " << _child << " not found." << std::endl;
-    return;
+    auto children = it->second;
+    if (std::find(children.begin(), children.end(),_child) ==
+        children.end())
+    {
+      it->second.push_back(_child);
+    }
   }
-
-  it = this->allItems.find(_parent);
-  if (it == this->allItems.end())
+  else
   {
-    gzerr << "Parent manip " << _parent << " not found." << std::endl;
-    return;
+    this->attachmentMap[_parent].push_back(_child);
   }
-
-  BuildingModelManip *child = this->allItems[_child];
-  BuildingModelManip *parent = this->allItems[_parent];
-  parent->AttachManip(child);
 }
 
 /////////////////////////////////////////////////
-void BuildingMaker::DetachManip(const std::string &_child,
-    const std::string &_parent)
+void BuildingMaker::DetachFromParent(const std::string &_child)
 {
-  std::map<std::string, BuildingModelManip *>::const_iterator it =
-      this->allItems.find(_child);
-  if (it == this->allItems.end())
+  for (auto &parentManip : this->attachmentMap)
   {
-    gzerr << "Child manip " << _child << " not found." << std::endl;
-    return;
-  }
+    parentManip.second.erase(std::remove(parentManip.second.begin(),
+        parentManip.second.end(), _child), parentManip.second.end());
 
-  it = this->allItems.find(_parent);
-  if (it == this->allItems.end())
-  {
-    gzerr << "Parent manip " << _parent << " not found." << std::endl;
-    return;
+    if (parentManip.second.empty())
+      this->DetachAllChildren(parentManip.first);
   }
-
-  BuildingModelManip *child = this->allItems[_child];
-  BuildingModelManip *parent = this->allItems[_parent];
-  parent->DetachManip(child);
 }
 
 /////////////////////////////////////////////////
-void BuildingMaker::DetachAllChildren(const std::string &_manip)
+void BuildingMaker::DetachAllChildren(const std::string &_parent)
 {
-  std::map<std::string, BuildingModelManip *>::const_iterator it =
-      this->allItems.find(_manip);
-  if (it == this->allItems.end())
-  {
-    gzerr << "Manip " << _manip << " not found." << std::endl;
+  auto it = this->attachmentMap.find(_parent);
+  if (it == this->attachmentMap.end())
     return;
-  }
 
-  BuildingModelManip *manip = this->allItems[_manip];
-  for (int i = manip->AttachedManipCount()-1; i >= 0; i--)
+  it->second.clear();
+  this->attachmentMap.erase(_parent);
+}
+
+/////////////////////////////////////////////////
+bool BuildingMaker::IsAttached(const std::string &_child) const
+{
+  for (auto const &parentManip : this->attachmentMap)
   {
-    (manip->AttachedManip(i))->DetachFromParent();
+    if (std::find(parentManip.second.begin(), parentManip.second.end(), _child)
+        != parentManip.second.end())
+    {
+      return true;
+    }
   }
+  return false;
+}
+
+/////////////////////////////////////////////////
+BuildingModelManip *BuildingMaker::ManipByName(const std::string &_name)
+{
+  auto it = this->allItems.find(_name);
+  if (it == this->allItems.end())
+    return NULL;
+  else
+    return this->allItems[_name];
 }
 
 /////////////////////////////////////////////////
@@ -574,6 +578,10 @@ void BuildingMaker::RemovePart(const std::string &_partName)
   if (visParent)
     scene->RemoveVisual(visParent);
   this->allItems.erase(_partName);
+
+  this->DetachAllChildren(_partName);
+  this->DetachFromParent(_partName);
+
   delete manip;
   this->BuildingChanged();
 }
@@ -616,6 +624,8 @@ void BuildingMaker::Reset()
   for (it = this->allItems.begin(); it != this->allItems.end(); ++it)
     delete (*it).second;
   this->allItems.clear();
+
+  this->attachmentMap.clear();
 }
 
 /////////////////////////////////////////////////
@@ -712,7 +722,7 @@ void BuildingMaker::GenerateSDF()
       if (name.find("Window") != std::string::npos
           || name.find("Door") != std::string::npos)
       {
-        if (buildingModelManip->IsAttached())
+        if (this->IsAttached(name))
           continue;
         visualElem->GetAttribute("name")->Set(buildingModelManip->Name()
             + "_Visual");
@@ -729,18 +739,23 @@ void BuildingMaker::GenerateSDF()
       else if (name.find("Wall") != std::string::npos)
       {
         // check if walls have attached children, i.e. windows or doors
-        if (buildingModelManip->AttachedManipCount() != 0 )
+        auto parentManip = this->attachmentMap.find(name);
+        if (parentManip != this->attachmentMap.end() &&
+            !parentManip->second.empty())
         {
           std::vector<QRectF> holes;
           rendering::VisualPtr wallVis = visual;
           math::Pose wallPose = wallVis->GetParent()->GetWorldPose() -
               modelOrigin;
           math::Vector3 wallSize = wallVis->GetScale();
-          for (unsigned int i = 0; i <
-              buildingModelManip->AttachedManipCount(); ++i)
+          for (auto const &childManip : parentManip->second)
           {
-            BuildingModelManip *attachedObj =
-                buildingModelManip->AttachedManip(i);
+            auto attachedObj = this->ManipByName(childManip);
+            if (!attachedObj)
+            {
+              gzerr << "Manip [" << childManip << "] not found." << std::endl;
+              continue;
+            }
             std::string objName = attachedObj->Name();
             if (objName.find("Window") != std::string::npos
                 || objName.find("Door") != std::string::npos)
@@ -830,17 +845,22 @@ void BuildingMaker::GenerateSDF()
       else if (name.find("Floor") != std::string::npos)
       {
         // check if floors have attached children, i.e. stairs
-        if (buildingModelManip->AttachedManipCount() != 0 )
+        auto parentManip = this->attachmentMap.find(name);
+        if (parentManip != this->attachmentMap.end() &&
+            !parentManip->second.empty())
         {
           std::vector<QRectF> holes;
           rendering::VisualPtr floorVis = visual;
           math::Pose floorPose = floorVis->GetWorldPose() - modelOrigin;
           math::Vector3 floorSize = floorVis->GetScale();
-          for (unsigned int i = 0; i <
-              buildingModelManip->AttachedManipCount(); ++i)
+          for (auto const &childManip : parentManip->second)
           {
-            BuildingModelManip *attachedObj =
-                buildingModelManip->AttachedManip(i);
+            auto attachedObj = this->ManipByName(childManip);
+            if (!attachedObj)
+            {
+              gzerr << "Manip [" << childManip << "] not found." << std::endl;
+              continue;
+            }
             std::string objName = attachedObj->Name();
             if (objName.find("Stairs") != std::string::npos)
             {
@@ -1020,14 +1040,15 @@ void BuildingMaker::GenerateSDFWithCSG()
     newLinkElem->GetElement("pose")->Set(visual->GetParent()->GetWorldPose());
 
     // create a hole to represent a window/door in the wall
+    auto parentManip = this->attachmentMap.find(name);
     if (name.find("Window") != std::string::npos
         || name.find("Door") != std::string::npos)
     {
-      if (buildingModelManip->IsAttached())
+      if (!this->IsAttached(name))
         continue;
     }
     else if (name.find("Wall") != std::string::npos
-        && buildingModelManip->AttachedManipCount() != 0)
+        && !parentManip->second.empty())
     {
       rendering::VisualPtr wallVis = visual;
       math::Pose wallPose = wallVis->GetWorldPose();
@@ -1055,8 +1076,7 @@ void BuildingMaker::GenerateSDFWithCSG()
 
       std::string booleanMeshName = buildingModelManip->Name() + "_Boolean";
       common::Mesh *booleanMesh = NULL;
-      for (unsigned int i = 0; i < buildingModelManip->AttachedManipCount();
-          ++i)
+      for (auto const &childManip : parentManip->second)
       {
         if (booleanMesh)
         {
@@ -1064,8 +1084,12 @@ void BuildingMaker::GenerateSDFWithCSG()
           m1 = booleanMesh;
         }
 
-        BuildingModelManip *attachedObj =
-            buildingModelManip->AttachedManip(i);
+        auto attachedObj = this->ManipByName(childManip);
+        if (!attachedObj)
+        {
+          gzerr << "Manip [" << childManip << "] not found." << std::endl;
+          continue;
+        }
         std::string objName = attachedObj->Name();
         if (objName.find("Window") != std::string::npos
             || objName.find("Door") != std::string::npos)

@@ -18,20 +18,26 @@
 #define _GAZEBO_GUI_BUILDING_MODEL_MANIP_HH_
 
 #include <string>
-#include <vector>
+
 #include "gazebo/gui/qt.h"
-#include "gazebo/common/Color.hh"
-#include "gazebo/common/Event.hh"
-#include "gazebo/math/Pose.hh"
-#include "gazebo/math/Vector3.hh"
+#include "gazebo/gui/building/BuildingEditorTypes.hh"
+
 #include "gazebo/rendering/RenderTypes.hh"
+
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
+  namespace common
+  {
+    class Color;
+  }
+
   namespace gui
   {
+    // Forward declare pointers.
     class BuildingMaker;
+    // Forward declare private data.
     class BuildingModelManipPrivate;
 
     /// \addtogroup gazebo_gui
@@ -51,17 +57,7 @@ namespace gazebo
 
       /// \brief Get the name of the manip object.
       /// \return Name of the manip object.
-      /// \deprecated See std::string Name() const
-      public: std::string GetName() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get the name of the manip object.
-      /// \return Name of the manip object.
       public: std::string Name() const;
-
-      /// \brief Get the visual this manip manages.
-      /// \return A pointer to the visual object.
-      /// \deprecated See rendering::VisualPtr Visual() const
-      public: rendering::VisualPtr GetVisual() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the visual this manip manages.
       /// \return A pointer to the visual object.
@@ -69,26 +65,11 @@ namespace gazebo
 
       /// \brief Get the transparency of the manip.
       /// \return Transparency.
-      /// \deprecated See double Transparency() const
-      public: double GetTransparency() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get the transparency of the manip.
-      /// \return Transparency.
       public: double Transparency() const;
 
       /// \brief Get the color of the manip.
       /// \return Color.
-      /// \deprecated See common::Color Color() const
-      public: common::Color GetColor() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get the color of the manip.
-      /// \return Color.
       public: common::Color Color() const;
-
-      /// \brief Get the texture of the manip.
-      /// \return Texture.
-      /// \deprecated See std::string Texture() const
-      public: std::string GetTexture() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the texture of the manip.
       /// \return Texture.
@@ -105,59 +86,6 @@ namespace gazebo
       /// \brief Set the maker that the manip is managed by.
       /// \param[in] _maker Maker that manages the manip.
       public: void SetMaker(BuildingMaker *_maker);
-
-      /// \brief Get the parent of this manip.
-      /// \return Parent manip.
-      /// \deprecated See BuildingModelManip *Parent() const
-      public: BuildingModelManip *GetParent() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get the parent of this manip.
-      /// \return Parent manip.
-      public: BuildingModelManip *Parent() const;
-
-      /// \brief Attach a manip as a child to this manip.
-      /// \param[in] _manip manip to be attached.
-      public: void AttachManip(BuildingModelManip *_manip);
-
-      /// \brief Detach a child manip from this manip.
-      /// \param[in] _manip manip to be detached.
-      public: void DetachManip(BuildingModelManip *_manip);
-
-      /// \brief Set the parent manip of this manip.
-      /// \param[in] _parent Parent manip
-      public: void SetAttachedTo(BuildingModelManip *_parent);
-
-      /// \brief Detach this manip from its parent.
-      public: void DetachFromParent();
-
-      /// \brief Get a child manip by index.
-      /// \param[in] _index Index of the child manip.
-      /// \return The attached manip at index _index.
-      /// \deprecated See BuildingModelManip *AttachedManip(
-      /// const unsigned int _index) const
-      public: BuildingModelManip *GetAttachedManip(unsigned int _index) const
-          GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get a child manip by index.
-      /// \param[in] _index Index of the child manip.
-      /// \return The attached manip at index _index.
-      public: BuildingModelManip *AttachedManip(
-          const unsigned int _index) const;
-
-      /// \brief Get the number of child manips attached to this
-      /// manip.
-      /// \return The number of attached manips.
-      /// \deprecated See unsigned int AttachedManipCount() const
-      public: unsigned int GetAttachedManipCount() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get the number of child manips attached to this
-      /// manip.
-      /// \return The number of attached manips.
-      public: unsigned int AttachedManipCount() const;
-
-      /// \brief Get whether or not this manip is attached to another.
-      /// \return True if attached, false otherwise.
-      public: bool IsAttached() const;
 
       /// \brief Set the pose of the manip.
       /// \param[in] _x X position in pixel coordinates.
@@ -206,11 +134,6 @@ namespace gazebo
       /// \brief Set the level for this manip.
       /// \param[in] _level The level for this manip.
       public: void SetLevel(const int _level);
-
-      /// \brief Get the level for this manip.
-      /// \return The level for this manip.
-      /// \deprecated See int Level() const
-      public: int GetLevel() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the level for this manip.
       /// \return The level for this manip.
@@ -337,8 +260,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Pointer to private data.
-      /// Can't use unique pointer - it causes crashes.
-      private: std::shared_ptr<BuildingModelManipPrivate> dataPtr;
+      private: std::unique_ptr<BuildingModelManipPrivate> dataPtr;
     };
     /// \}
   }

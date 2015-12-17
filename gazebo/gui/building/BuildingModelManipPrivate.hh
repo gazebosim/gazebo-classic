@@ -21,10 +21,21 @@
 #include <string>
 #include <vector>
 
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Vector3.hh>
+
+#include "gazebo/common/Color.hh"
+#include "gazebo/common/CommonTypes.hh"
+
+#include "gazebo/rendering/RenderTypes.hh"
+
 namespace gazebo
 {
   namespace gui
   {
+    // Forward declare pointers.
+    class BuildingMaker;
+
     /// \internal
     /// \brief Private data for the BuildingModelManip class
     class BuildingModelManipPrivate
@@ -43,12 +54,6 @@ namespace gazebo
 
       /// \brief Maker that manages this manip.
       public: BuildingMaker *maker;
-
-      /// \brief A list of attached manips.
-      public: std::vector<BuildingModelManip *> attachedManips;
-
-      /// \brief Parent manip.
-      public: BuildingModelManip *parent;
 
       /// \brief Visual's transparency.
       public: double transparency;

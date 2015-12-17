@@ -15,7 +15,9 @@
  *
 */
 
-#include "gazebo/common/Exception.hh"
+#include <functional>
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/rendering/Visual.hh"
 
@@ -31,7 +33,6 @@ using namespace gui;
 BuildingModelManip::BuildingModelManip()
   : dataPtr(new BuildingModelManipPrivate)
 {
-  this->dataPtr->parent = NULL;
   this->dataPtr->level = 0;
 
   this->dataPtr->connections.push_back(
@@ -43,7 +44,6 @@ BuildingModelManip::BuildingModelManip()
 /////////////////////////////////////////////////
 BuildingModelManip::~BuildingModelManip()
 {
-  this->DetachFromParent();
 }
 
 /////////////////////////////////////////////////
@@ -59,21 +59,9 @@ void BuildingModelManip::SetVisual(const rendering::VisualPtr &_visual)
 }
 
 /////////////////////////////////////////////////
-std::string BuildingModelManip::GetName() const
-{
-  return this->Name();
-}
-
-/////////////////////////////////////////////////
 std::string BuildingModelManip::Name() const
 {
   return this->dataPtr->name;
-}
-
-/////////////////////////////////////////////////
-rendering::VisualPtr BuildingModelManip::GetVisual() const
-{
-  return this->Visual();
 }
 
 /////////////////////////////////////////////////
@@ -83,33 +71,15 @@ rendering::VisualPtr BuildingModelManip::Visual() const
 }
 
 /////////////////////////////////////////////////
-double BuildingModelManip::GetTransparency() const
-{
-  return this->Transparency();
-}
-
-/////////////////////////////////////////////////
 double BuildingModelManip::Transparency() const
 {
   return this->dataPtr->transparency;
 }
 
 /////////////////////////////////////////////////
-common::Color BuildingModelManip::GetColor() const
-{
-  return this->Color();
-}
-
-/////////////////////////////////////////////////
 common::Color BuildingModelManip::Color() const
 {
   return this->dataPtr->color;
-}
-
-/////////////////////////////////////////////////
-std::string BuildingModelManip::GetTexture() const
-{
-  return this->Texture();
 }
 
 /////////////////////////////////////////////////
@@ -125,18 +95,6 @@ void BuildingModelManip::SetMaker(BuildingMaker *_maker)
 }
 
 /////////////////////////////////////////////////
-BuildingModelManip *BuildingModelManip::GetParent() const
-{
-  return this->Parent();
-}
-
-/////////////////////////////////////////////////
-BuildingModelManip *BuildingModelManip::Parent() const
-{
-  return this->dataPtr->parent;
-}
-
-/////////////////////////////////////////////////
 void BuildingModelManip::OnSizeChanged(double _width, double _depth,
     double _height)
 {
@@ -149,89 +107,6 @@ void BuildingModelManip::OnSizeChanged(double _width, double _depth,
   auto newPos = originalPos - ignition::math::Vector3d(0, 0, dScaleZ/2.0);
   this->dataPtr->visual->SetPosition(newPos);
   this->dataPtr->maker->BuildingChanged();
-}
-
-/////////////////////////////////////////////////
-void BuildingModelManip::AttachManip(BuildingModelManip *_manip)
-{
-  if (!_manip->IsAttached())
-  {
-    _manip->SetAttachedTo(this);
-    this->dataPtr->attachedManips.push_back(_manip);
-  }
-}
-
-/////////////////////////////////////////////////
-void BuildingModelManip::DetachManip(BuildingModelManip *_manip)
-{
-  if (_manip)
-  {
-    auto it = std::remove(this->dataPtr->attachedManips.begin(),
-                          this->dataPtr->attachedManips.end(), _manip);
-    if (it != this->dataPtr->attachedManips.end())
-    {
-      _manip->DetachFromParent();
-      this->dataPtr->attachedManips.erase(it,
-          this->dataPtr->attachedManips.end());
-    }
-  }
-}
-
-/////////////////////////////////////////////////
-void BuildingModelManip::DetachFromParent()
-{
-  if (this->dataPtr->parent)
-  {
-    BuildingModelManip *tmp = this->dataPtr->parent;
-    this->dataPtr->parent = NULL;
-    tmp->DetachManip(this);
-  }
-}
-
-/////////////////////////////////////////////////
-void BuildingModelManip::SetAttachedTo(BuildingModelManip *_parent)
-{
-  if (this->IsAttached())
-  {
-    gzerr << this->dataPtr->name << " is already attached to a parent \n";
-    return;
-  }
-  this->dataPtr->parent = _parent;
-}
-
-/////////////////////////////////////////////////
-BuildingModelManip *BuildingModelManip::GetAttachedManip(
-    unsigned int _index) const
-{
-  return this->AttachedManip(_index);
-}
-
-/////////////////////////////////////////////////
-BuildingModelManip *BuildingModelManip::AttachedManip(
-    const unsigned int _index) const
-{
-  if (_index >= this->dataPtr->attachedManips.size())
-    gzthrow("Index too large");
-
-  return this->dataPtr->attachedManips[_index];
-}
-
-/////////////////////////////////////////////////
-unsigned int BuildingModelManip::GetAttachedManipCount() const
-{
-  return this->AttachedManipCount();
-}
-
-/////////////////////////////////////////////////
-unsigned int BuildingModelManip::AttachedManipCount() const
-{
-  return this->dataPtr->attachedManips.size();
-}
-
-/////////////////////////////////////////////////
-bool BuildingModelManip::IsAttached() const
-{
-  return (this->dataPtr->parent != NULL);
 }
 
 /////////////////////////////////////////////////
@@ -484,12 +359,6 @@ void BuildingModelManip::SetVisible(bool _visible)
 void BuildingModelManip::SetLevel(const int _level)
 {
   this->dataPtr->level = _level;
-}
-
-/////////////////////////////////////////////////
-int BuildingModelManip::GetLevel() const
-{
-  return this->Level();
 }
 
 /////////////////////////////////////////////////
