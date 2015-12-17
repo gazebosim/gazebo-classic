@@ -157,5 +157,80 @@ void ModelEditor_TEST::OnEdit()
   mainWindow = NULL;
 }
 
+/////////////////////////////////////////////////
+void ModelEditor_TEST::InsertTab()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/empty.world");
+
+  // Create the main window.
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Process some events, and draw the screen
+  for (unsigned int i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Get the main tab
+  auto mainTab = mainWindow->findChild<QTabWidget *>("mainTab");
+  QVERIFY(mainTab != NULL);
+
+  // Get the insert tab
+  QWidget *insertModel = NULL;
+  for (int i = 0; i < mainTab->count(); ++i)
+  {
+    if (mainTab->tabText(i) == tr("Insert"))
+    {
+      insertModel = mainTab->widget(i);
+      break;
+    }
+  }
+  QVERIFY(insertModel != NULL);
+
+  // Switch to editor mode
+  QVERIFY(gui::g_editModelAct != NULL);
+  gui::g_editModelAct->toggle();
+
+  // Check that the insert tab is not in mainTab anymore
+  insertModel = NULL;
+  for (int i = 0; i < mainTab->count(); ++i)
+  {
+    if (mainTab->tabText(i) == tr("Insert"))
+    {
+      insertModel = mainTab->widget(i);
+      break;
+    }
+  }
+  QVERIFY(insertModel == NULL);
+
+  // Switch back to simulation
+  gui::g_editModelAct->toggle();
+
+  // Check that the insert tab in mainTab again
+  insertModel = NULL;
+  for (int i = 0; i < mainTab->count(); ++i)
+  {
+    if (mainTab->tabText(i) == tr("Insert"))
+    {
+      insertModel = mainTab->widget(i);
+      break;
+    }
+  }
+  QVERIFY(insertModel != NULL);
+
+  mainWindow->close();
+  delete mainWindow;
+  mainWindow = NULL;
+}
+
 // Generate a main function for the test
 QTEST_MAIN(ModelEditor_TEST)
