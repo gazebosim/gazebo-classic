@@ -17,29 +17,32 @@
 #ifndef _GAZEBO_GUI_BUILDING_MAKER_HH_
 #define _GAZEBO_GUI_BUILDING_MAKER_HH_
 
-#include <list>
 #include <string>
 #include <vector>
-#include <map>
 #include <memory>
-#include <sdf/sdf.hh>
+
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Vector3.hh>
+
+#include "gazebo/common/CommonTypes.hh"
+#include "gazebo/common/KeyEvent.hh"
+#include "gazebo/common/MouseEvent.hh"
+
+#include "gazebo/gui/qt.h"
 
 #include "gazebo/math/Pose.hh"
-#include "gazebo/transport/TransportTypes.hh"
-#include "gazebo/rendering/RenderTypes.hh"
-#include "gazebo/common/Events.hh"
-#include "gazebo/common/KeyEvent.hh"
-#include "gazebo/gui/qt.h"
+#include "gazebo/math/Vector3.hh"
+
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
+    // Forward declare provate data.
     class BuildingMakerPrivate;
-    class BuildingModelManip;
+    // Forward declare pointers.
     class EditorItem;
-    class SaveDialog;
 
     /// \addtogroup gazebo_gui
     /// \{

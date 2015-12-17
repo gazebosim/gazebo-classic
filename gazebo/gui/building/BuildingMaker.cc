@@ -22,10 +22,21 @@
 #endif
 
 #include <sstream>
-#include <set>
 #include <boost/filesystem.hpp>
 
+#include "gazebo/gazebo_config.h"
+
 #include "gazebo/common/Exception.hh"
+
+#include "gazebo/gui/GuiIface.hh"
+#include "gazebo/gui/KeyEventHandler.hh"
+#include "gazebo/gui/MouseEventHandler.hh"
+#include "gazebo/gui/SaveDialog.hh"
+#include "gazebo/gui/building/BuildingEditorEvents.hh"
+#include "gazebo/gui/building/BuildingMaker.hh"
+#include "gazebo/gui/building/BuildingMakerPrivate.hh"
+#include "gazebo/gui/building/BuildingModelManip.hh"
+#include "gazebo/gui/building/EditorItem.hh"
 
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Visual.hh"
@@ -35,23 +46,11 @@
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/Node.hh"
 
-#include "gazebo/gui/GuiIface.hh"
-#include "gazebo/gui/KeyEventHandler.hh"
-#include "gazebo/gui/MouseEventHandler.hh"
-
 #ifdef HAVE_GTS
   #include "gazebo/common/Mesh.hh"
   #include "gazebo/common/MeshManager.hh"
   #include "gazebo/common/MeshCSG.hh"
 #endif
-
-#include "gazebo/gazebo_config.h"
-#include "gazebo/gui/SaveDialog.hh"
-#include "gazebo/gui/building/BuildingEditorEvents.hh"
-#include "gazebo/gui/building/BuildingModelManip.hh"
-#include "gazebo/gui/building/EditorItem.hh"
-#include "gazebo/gui/building/BuildingMaker.hh"
-#include "gazebo/gui/building/BuildingMakerPrivate.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -106,7 +105,7 @@ BuildingMaker::BuildingMaker() : dataPtr(new BuildingMakerPrivate())
       gui::editor::Events::ConnectToggleEditMode(
       std::bind(&BuildingMaker::OnEdit, this, std::placeholders::_1)));
 
-  this->dataPtr->saveDialog = new SaveDialog(SaveDialog::BUILDING);
+  this->dataPtr->saveDialog.reset(new SaveDialog(SaveDialog::BUILDING));
 
   // Transport
   this->dataPtr->node = transport::NodePtr(new transport::Node());
@@ -120,9 +119,6 @@ BuildingMaker::BuildingMaker() : dataPtr(new BuildingMakerPrivate())
 /////////////////////////////////////////////////
 BuildingMaker::~BuildingMaker()
 {
-  if (this->dataPtr->saveDialog)
-    delete this->dataPtr->saveDialog;
-
   this->dataPtr->node->Fini();
   this->dataPtr->node.reset();
   this->dataPtr->makerPub.reset();

@@ -19,17 +19,29 @@
 #define _GAZEBO_GUI_BUILDING_MAKER_PRIVATE_HH_
 
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
-#include "gazebo/common/Events.hh"
+#include <sdf/sdf.hh>
+
+#include "gazebo/common/CommonTypes.hh"
+
 #include "gazebo/gui/building/BuildingMaker.hh"
 #include "gazebo/gui/qt.h"
+
+#include "gazebo/rendering/RenderTypes.hh"
+
+#include "gazebo/transport/TransportTypes.hh"
 
 namespace gazebo
 {
   namespace gui
   {
+    // Forward declare pointers.
+    class BuildingModelManip;
+    class SaveDialog;
+
     /// \internal
     /// \brief Private data for BuildingMaker
     class BuildingMakerPrivate
@@ -81,7 +93,7 @@ namespace gazebo
       public: std::vector<event::ConnectionPtr> connections;
 
       /// \brief A dialog for setting building model name and save location.
-      public: SaveDialog *saveDialog;
+      public: std::unique_ptr<SaveDialog> saveDialog;
 
       /// \brief Visual that is currently hovered over by the mouse.
       public: rendering::VisualPtr hoverVis;
