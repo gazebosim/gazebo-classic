@@ -20,39 +20,36 @@
   #include <Winsock2.h>
 #endif
 
+#include <functional>
 #include <boost/algorithm/string.hpp>
-#include <boost/bind.hpp>
 #include <math.h>
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/math/gzmath.hh"
-
-#include "gazebo/transport/transport.hh"
-
 #include "gazebo/rendering/Conversions.hh"
+#include "gazebo/rendering/FPSViewController.hh"
 #include "gazebo/rendering/Heightmap.hh"
+#include "gazebo/rendering/OrbitViewController.hh"
+#include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/RenderEvents.hh"
 #include "gazebo/rendering/RenderingIface.hh"
-#include "gazebo/rendering/Visual.hh"
-#include "gazebo/rendering/WindowManager.hh"
-#include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/UserCamera.hh"
-#include "gazebo/rendering/OrbitViewController.hh"
-#include "gazebo/rendering/FPSViewController.hh"
-
-#include "gazebo/gui/ModelAlign.hh"
-#include "gazebo/gui/ModelSnap.hh"
-#include "gazebo/gui/ModelManipulator.hh"
-#include "gazebo/gui/MouseEventHandler.hh"
-#include "gazebo/gui/KeyEventHandler.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/WindowManager.hh"
 #include "gazebo/gui/Actions.hh"
-#include "gazebo/gui/GuiIface.hh"
-#include "gazebo/gui/ModelRightMenu.hh"
-#include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/GLWidget.hh"
 #include "gazebo/gui/GLWidgetPrivate.hh"
+#include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/gui/GuiIface.hh"
+#include "gazebo/gui/KeyEventHandler.hh"
+#include "gazebo/gui/ModelAlign.hh"
+#include "gazebo/gui/ModelManipulator.hh"
+#include "gazebo/gui/ModelRightMenu.hh"
+#include "gazebo/gui/ModelSnap.hh"
+#include "gazebo/gui/MouseEventHandler.hh"
+#include "gazebo/transport/transport.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -91,35 +88,39 @@ GLWidget::GLWidget(QWidget *_parent)
 
   this->dataPtr->connections.push_back(
       rendering::Events::ConnectRemoveScene(
-        boost::bind(&GLWidget::OnRemoveScene, this, _1)));
+        std::bind(&GLWidget::OnRemoveScene, this, std::placeholders::_1)));
 
   this->dataPtr->connections.push_back(
       gui::Events::ConnectMoveMode(
-        boost::bind(&GLWidget::OnMoveMode, this, _1)));
+        std::bind(&GLWidget::OnMoveMode, this, std::placeholders::_1)));
 
   this->dataPtr->connections.push_back(
       gui::Events::ConnectCreateEntity(
-        boost::bind(&GLWidget::OnCreateEntity, this, _1, _2)));
+        std::bind(&GLWidget::OnCreateEntity, this, std::placeholders::_1,
+          std::placeholders::_2)));
 
   this->dataPtr->connections.push_back(
       gui::Events::ConnectFPS(
-        boost::bind(&GLWidget::OnFPS, this)));
+        std::bind(&GLWidget::OnFPS, this)));
 
   this->dataPtr->connections.push_back(
       gui::Events::ConnectOrbit(
-        boost::bind(&GLWidget::OnOrbit, this)));
+        std::bind(&GLWidget::OnOrbit, this)));
 
   this->dataPtr->connections.push_back(
       gui::Events::ConnectManipMode(
-        boost::bind(&GLWidget::OnManipMode, this, _1)));
+        std::bind(&GLWidget::OnManipMode, this, std::placeholders::_1)));
 
   this->dataPtr->connections.push_back(
-     event::Events::ConnectSetSelectedEntity(
-       boost::bind(&GLWidget::OnSetSelectedEntity, this, _1, _2)));
+    event::Events::ConnectSetSelectedEntity(
+      std::bind(&GLWidget::OnSetSelectedEntity, this, std::placeholders::_1,
+        std::placeholders::_2)));
 
   this->dataPtr->connections.push_back(
       gui::Events::ConnectAlignMode(
-        boost::bind(&GLWidget::OnAlignMode, this, _1, _2, _3, _4)));
+        std::bind(&GLWidget::OnAlignMode, this, std::placeholders::_1,
+          std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4)));
 
   this->dataPtr->renderFrame->setMouseTracking(true);
   this->setMouseTracking(true);
@@ -140,16 +141,16 @@ GLWidget::GLWidget(QWidget *_parent)
   this->dataPtr->keyModifiers = 0;
 
   MouseEventHandler::Instance()->AddPressFilter("glwidget",
-      boost::bind(&GLWidget::OnMousePress, this, _1));
+      std::bind(&GLWidget::OnMousePress, this, std::placeholders::_1));
 
   MouseEventHandler::Instance()->AddReleaseFilter("glwidget",
-      boost::bind(&GLWidget::OnMouseRelease, this, _1));
+      std::bind(&GLWidget::OnMouseRelease, this, std::placeholders::_1));
 
   MouseEventHandler::Instance()->AddMoveFilter("glwidget",
-      boost::bind(&GLWidget::OnMouseMove, this, _1));
+      std::bind(&GLWidget::OnMouseMove, this, std::placeholders::_1));
 
   MouseEventHandler::Instance()->AddDoubleClickFilter("glwidget",
-      boost::bind(&GLWidget::OnMouseDoubleClick, this, _1));
+      std::bind(&GLWidget::OnMouseDoubleClick, this, std::placeholders::_1));
 
   connect(g_copyAct, SIGNAL(triggered()), this, SLOT(OnCopy()));
   connect(g_pasteAct, SIGNAL(triggered()), this, SLOT(OnPaste()));

@@ -21,6 +21,7 @@
 #include <string>
 #include <vector>
 
+#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/GLWidget.hh"
 #include "gazebo/gui/LightMaker.hh"
