@@ -22,16 +22,16 @@
 #include <string>
 
 #include "gazebo/gui/qt.h"
+
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
-    class EditorItem;
-    class MeasureItem;
-    class GridLines;
+    // Forward declare friend class.
     class ImportImageDialog;
+    // Forward declare provate data.
     class ImportImageViewPrivate;
 
     /// \addtogroup gazebo_gui

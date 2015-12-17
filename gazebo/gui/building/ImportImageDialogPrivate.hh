@@ -18,10 +18,16 @@
 #ifndef _GAZEBO_GUI_IMPORT_IMAGE_DIALOG_PRIVATE_HH_
 #define _GAZEBO_GUI_IMPORT_IMAGE_DIALOG_PRIVATE_HH_
 
+#include "gazebo/gui/qt.h"
+
 namespace gazebo
 {
   namespace gui
   {
+    // Forward declare pointers
+    class EditorView;
+    class ImportImageView;
+
     /// \internal
     /// \brief Private data for ImportImageDialog
     class ImportImageDialogPrivate
@@ -55,9 +61,6 @@ namespace gazebo
 
       /// \brief Import image view.
       public: ImportImageView *importImageView;
-
-      /// \brief Point where measure line starts.
-      public: QPointF measureLineStart;
 
       /// \brief Indicates whether currently drawing a line or not.
       public: bool drawingLine;

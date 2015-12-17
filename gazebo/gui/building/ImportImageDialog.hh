@@ -14,20 +14,23 @@
  * limitations under the License.
  *
 */
+
 #ifndef _GAZEBO_GUI_IMPORT_IMAGE_DIALOG_HH_
 #define _GAZEBO_GUI_IMPORT_IMAGE_DIALOG_HH_
 
 #include <memory>
 
 #include "gazebo/gui/qt.h"
+
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
-    class EditorView;
+    // Forward declare private data.
     class ImportImageDialogPrivate;
+    // Forward declare friend class.
     class ImportImageView;
 
     /// \addtogroup gazebo_gui

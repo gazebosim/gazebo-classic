@@ -20,12 +20,19 @@
 
 #include <vector>
 
-#include "gazebo/common/Events.hh"
+#include "gazebo/common/CommonTypes.hh"
+
+#include "gazebo/gui/qt.h"
 
 namespace gazebo
 {
   namespace gui
   {
+    // Forward declare pointers.
+    class GridLines;
+    class ImportImageDialog;
+    class MeasureItem;
+
     /// \internal
     /// \brief Private data for ImportImageView
     class ImportImageViewPrivate
