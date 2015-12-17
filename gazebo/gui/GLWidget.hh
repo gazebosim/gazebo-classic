@@ -17,12 +17,10 @@
 #ifndef _GAZEBO_GUI_GLWIDGET_HH_
 #define _GAZEBO_GUI_GLWIDGET_HH_
 
+#include <memory>
 #include <string>
 #include <vector>
 
-#include "gazebo/common/Event.hh"
-#include "gazebo/common/KeyEvent.hh"
-#include "gazebo/common/MouseEvent.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/rendering/RenderTypes.hh"
@@ -30,6 +28,11 @@
 
 namespace gazebo
 {
+  namespace common
+  {
+    class MouseEvent;
+  }
+
   namespace gui
   {
     class GLWidgetPrivate;
