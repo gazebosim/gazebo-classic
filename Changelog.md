@@ -105,6 +105,9 @@ flags from c functions. Windows did not like `CPPTYPE_*` in
 1. Undo reset commands during simulation, forwarding commands
     * [Pull request #1986](https://bitbucket.org/osrf/gazebo/pull-request/1986)
 
+1. Undo apply force / torque during simulation
+    * [Pull request #2030](https://bitbucket.org/osrf/gazebo/pull-request/2030)
+
 1. Add function to get the derived scale of a Visual
     * [Pull request #1881](https://bitbucket.org/osrf/gazebo/pull-request/1881)
 
