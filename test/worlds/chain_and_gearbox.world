@@ -84,7 +84,7 @@
           </material>
         </visual>
         <visual name='link_2w_visual'>
-          <pose frame=''>0 0 0 0 -0 0</pose>
+          <pose frame=''>0 0 0.1 0 -0 0</pose>
           <geometry>
             <box>
               <size>0.05 0.05 0.09</size>
@@ -109,6 +109,7 @@
           <dynamics>
             <spring_reference>0</spring_reference>
             <spring_stiffness>0</spring_stiffness>
+            <damping>1</damping>
           </dynamics>
           <use_parent_model_frame>1</use_parent_model_frame>
         </axis>
@@ -149,6 +150,7 @@
           <dynamics>
             <spring_reference>0</spring_reference>
             <spring_stiffness>0</spring_stiffness>
+            <damping>1</damping>
           </dynamics>
           <use_parent_model_frame>1</use_parent_model_frame>
         </axis>
@@ -163,11 +165,14 @@
         <parent>world</parent>
         <child>link_2</child>
         <axis>
-          <xyz>0 0 1</xyz>
+          <xyz>1 0 0</xyz>
           <limit>
             <lower>-1e+16</lower>
             <upper>1e+16</upper>
           </limit>
+          <dynamics>
+            <damping>1</damping>
+          </dynamics>
         </axis>
       </joint>
     </model>
@@ -227,7 +232,7 @@
           </geometry>
         </visual>
         <visual name='link_2w_visual'>
-          <pose frame=''>0 0 0 0 -0 0</pose>
+          <pose frame=''>0 0 0.1 0 -0 0</pose>
           <geometry>
             <box>
               <size>0.05 0.05 0.09</size>
@@ -252,6 +257,7 @@
           <dynamics>
             <spring_reference>0</spring_reference>
             <spring_stiffness>0</spring_stiffness>
+            <damping>1</damping>
           </dynamics>
           <use_parent_model_frame>1</use_parent_model_frame>
         </axis>
@@ -292,6 +298,7 @@
           <dynamics>
             <spring_reference>0</spring_reference>
             <spring_stiffness>0</spring_stiffness>
+            <damping>1</damping>
           </dynamics>
           <use_parent_model_frame>1</use_parent_model_frame>
         </axis>
@@ -311,6 +318,9 @@
             <lower>-1e+16</lower>
             <upper>1e+16</upper>
           </limit>
+          <dynamics>
+            <damping>1</damping>
+          </dynamics>
         </axis>
       </joint>
     </model>
@@ -341,7 +351,7 @@
           </geometry>
         </visual>
         <visual name='link_1w_visual'>
-          <pose frame=''>0 0 0 0 -0 0</pose>
+          <pose frame=''>0 0 -0.1 0 -0 0</pose>
           <geometry>
             <box>
               <size>0.05 0.05 0.09</size>
@@ -395,6 +405,7 @@
           <dynamics>
             <spring_reference>0</spring_reference>
             <spring_stiffness>0</spring_stiffness>
+            <damping>1</damping>
           </dynamics>
           <use_parent_model_frame>1</use_parent_model_frame>
         </axis>
@@ -435,6 +446,7 @@
           <dynamics>
             <spring_reference>0</spring_reference>
             <spring_stiffness>0</spring_stiffness>
+            <damping>1</damping>
           </dynamics>
           <use_parent_model_frame>1</use_parent_model_frame>
         </axis>
@@ -449,12 +461,26 @@
         <parent>world</parent>
         <child>link_1</child>
         <axis>
-          <xyz>0 0 1</xyz>
+          <!--
+          <xyz>1 0 1</xyz>
+          -->
+          <xyz>1 0 0</xyz>
           <limit>
-            <lower>-1e+16</lower>
-            <upper>1e+16</upper>
+            <lower>-0.1</lower>
+            <upper>0.1</upper>
           </limit>
+          <dynamics>
+            <damping>1</damping>
+          </dynamics>
         </axis>
+        <physics>
+          <ode>
+            <limit>
+              <cfm>0.0000</cfm>
+              <erp>0.5</erp>
+            </limit>
+          </ode>
+        </physics>
       </joint>
     </model>
 
@@ -489,7 +515,7 @@
           </material>
         </visual>
         <visual name='link_1w_visual'>
-          <pose frame=''>0 0 0 0 -0 0</pose>
+          <pose frame=''>0 0 0.1 0 -0 0</pose>
           <geometry>
             <box>
               <size>0.05 0.05 0.09</size>
@@ -538,6 +564,7 @@
           <dynamics>
             <spring_reference>0</spring_reference>
             <spring_stiffness>0</spring_stiffness>
+            <damping>1</damping>
           </dynamics>
           <use_parent_model_frame>1</use_parent_model_frame>
         </axis>
@@ -578,6 +605,7 @@
           <dynamics>
             <spring_reference>0</spring_reference>
             <spring_stiffness>0</spring_stiffness>
+            <damping>1</damping>
           </dynamics>
           <use_parent_model_frame>1</use_parent_model_frame>
         </axis>
@@ -588,6 +616,7 @@
         <gearbox_reference_body>link_2</gearbox_reference_body>
         <gearbox_ratio>1.0</gearbox_ratio>
       </joint>
+<!--
       <joint name='joint_w2' type='revolute'>
         <parent>world</parent>
         <child>link_1</child>
@@ -597,8 +626,12 @@
             <lower>-1e+16</lower>
             <upper>1e+16</upper>
           </limit>
+          <dynamics>
+            <damping>1</damping>
+          </dynamics>
         </axis>
       </joint>
+-->
     </model>
 
     <model name='model_l2p_pin1_neg'>
@@ -627,7 +660,7 @@
           </geometry>
         </visual>
         <visual name='link_1w_visual'>
-          <pose frame=''>0 0 0 0 -0 0</pose>
+          <pose frame=''>0 0 -0.1 0 -0 0</pose>
           <geometry>
             <box>
               <size>0.05 0.05 0.09</size>
@@ -681,6 +714,7 @@
           <dynamics>
             <spring_reference>0</spring_reference>
             <spring_stiffness>0</spring_stiffness>
+            <damping>1</damping>
           </dynamics>
           <use_parent_model_frame>1</use_parent_model_frame>
         </axis>
@@ -721,6 +755,7 @@
           <dynamics>
             <spring_reference>0</spring_reference>
             <spring_stiffness>0</spring_stiffness>
+            <damping>1</damping>
           </dynamics>
           <use_parent_model_frame>1</use_parent_model_frame>
         </axis>
@@ -740,6 +775,9 @@
             <lower>-1e+16</lower>
             <upper>1e+16</upper>
           </limit>
+          <dynamics>
+            <damping>1</damping>
+          </dynamics>
         </axis>
       </joint>
     </model>
@@ -775,7 +813,7 @@
           </material>
         </visual>
         <visual name='link_1w_visual'>
-          <pose frame=''>0 0 0 0 -0 0</pose>
+          <pose frame=''>0 0 0.1 0 -0 0</pose>
           <geometry>
             <box>
               <size>0.05 0.05 0.09</size>
@@ -824,6 +862,7 @@
           <dynamics>
             <spring_reference>0</spring_reference>
             <spring_stiffness>0</spring_stiffness>
+            <damping>1</damping>
           </dynamics>
           <use_parent_model_frame>1</use_parent_model_frame>
         </axis>
@@ -864,6 +903,7 @@
           <dynamics>
             <spring_reference>0</spring_reference>
             <spring_stiffness>0</spring_stiffness>
+            <damping>1</damping>
           </dynamics>
           <use_parent_model_frame>1</use_parent_model_frame>
         </axis>
@@ -883,6 +923,9 @@
             <lower>-1e+16</lower>
             <upper>1e+16</upper>
           </limit>
+          <dynamics>
+            <damping>1</damping>
+          </dynamics>
         </axis>
       </joint>
     </model>

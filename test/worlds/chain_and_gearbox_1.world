@@ -1,0 +1,191 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="default">
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <physics type="ode">
+      <gravity>0.000000 0.000000 0.00000</gravity>
+      <max_step_size>0.000100</max_step_size>
+      <ode>
+        <solver>
+          <type>quick</type>
+          <iters>200</iters>
+          <precon_iters>0</precon_iters>
+          <sor>1.000000</sor>
+        </solver>
+        <constraints>
+          <cfm>0.000000</cfm>
+          <erp>1.000000</erp>
+          <contact_max_correcting_vel>0.000000</contact_max_correcting_vel>
+          <contact_surface_layer>0.000000</contact_surface_layer>
+        </constraints>
+      </ode>
+      <real_time_update_rate>0.000000</real_time_update_rate>
+    </physics>
+
+    <model name='model_l2p_pin1'>
+      <pose frame=''>0 0 0 0 -0 0</pose>
+      <link name='link_1'>
+        <pose frame=''>0 0 2.0 0 -0 0</pose>
+        <inertial>
+          <pose frame=''>0 0 -0.5 0 -0 0</pose>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.00123</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.00123</iyy>
+            <iyz>0</iyz>
+            <izz>0.00123</izz>
+          </inertia>
+        </inertial>
+        <visual name='link_1_visual'>
+          <pose frame=''>0 0 -0.5 0 -0 0</pose>
+          <geometry>
+            <cylinder>
+              <length>1.0</length>
+              <radius>0.01</radius>
+            </cylinder>
+          </geometry>
+        </visual>
+        <visual name='link_1w_visual'>
+          <pose frame=''>0 0 -0.1 0 -0 0</pose>
+          <geometry>
+            <box>
+              <size>0.05 0.05 0.09</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.5 1.0 0.5 1</ambient>
+            <diffuse>0.5 1.0 0.5 0.5</diffuse>
+            <specular>0.5 1.0 0.5 0.8</specular>
+          </material>
+        </visual>
+      </link>
+      <link name='link_2'>
+        <pose frame=''>0 0 2.0 0 -0 0</pose>
+        <inertial>
+          <pose frame=''>0 0 0.5 0 -0 0</pose>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.00123</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.00123</iyy>
+            <iyz>0</iyz>
+            <izz>0.00123</izz>
+          </inertia>
+        </inertial>
+        <visual name='link_2_visual'>
+          <pose frame=''>0 0 0.5 0 -0 0</pose>
+          <geometry>
+            <cylinder>
+              <length>1.0</length>
+              <radius>0.02</radius>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>1.0 0.5 0.5 1</ambient>
+            <diffuse>1.0 0.5 0.5 0.5</diffuse>
+            <specular>1.0 0.5 0.5 0.8</specular>
+          </material>
+        </visual>
+      </link>
+      <joint name='joint_12' type='revolute'>
+        <parent>link_2</parent>
+        <child>link_1</child>
+        <axis>
+          <xyz>1 0 0</xyz>
+          <limit>
+            <lower>-1e+16</lower>
+            <upper>1e+16</upper>
+          </limit>
+          <dynamics>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+            <damping>1</damping>
+          </dynamics>
+          <use_parent_model_frame>1</use_parent_model_frame>
+        </axis>
+      </joint>
+      <link name='link_3'>
+        <pose frame=''>0 0 3.0 0 -0 0</pose>
+        <inertial>
+          <pose frame=''>0 0 0.5 0 -0 0</pose>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.00123</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.00123</iyy>
+            <iyz>0</iyz>
+            <izz>0.00123</izz>
+          </inertia>
+        </inertial>
+        <visual name='link_3_visual'>
+          <pose frame=''>0 0 0.5 0 -0 0</pose>
+          <geometry>
+            <cylinder>
+              <length>1.0</length>
+              <radius>0.03</radius>
+            </cylinder>
+          </geometry>
+        </visual>
+      </link>
+      <joint name='joint_23' type='revolute'>
+        <parent>link_2</parent>
+        <child>link_3</child>
+        <axis>
+          <xyz>1 0 0</xyz>
+          <limit>
+            <lower>-1e+16</lower>
+            <upper>1e+16</upper>
+          </limit>
+          <dynamics>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+            <damping>1</damping>
+          </dynamics>
+          <use_parent_model_frame>1</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name='gearbox_123' type='gearbox'>
+        <parent>link_1</parent>
+        <child>link_3</child>
+        <gearbox_reference_body>link_2</gearbox_reference_body>
+        <gearbox_ratio>1.0</gearbox_ratio>
+      </joint>
+      <joint name='joint_w2' type='revolute'>
+        <parent>world</parent>
+        <child>link_1</child>
+        <axis>
+          <!--
+          <xyz>1 0 1</xyz>
+          -->
+          <xyz>1 0 0</xyz>
+          <limit>
+            <lower>-0.1</lower>
+            <upper>0.1</upper>
+          </limit>
+          <dynamics>
+            <damping>1</damping>
+          </dynamics>
+        </axis>
+        <physics>
+          <ode>
+            <limit>
+              <cfm>0.0000</cfm>
+              <erp>0.5</erp>
+            </limit>
+          </ode>
+        </physics>
+      </joint>
+    </model>
+  </world>
+</sdf>

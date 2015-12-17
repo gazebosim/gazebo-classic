@@ -78,6 +78,24 @@ release will remove the deprecated code.
 
 ### Deprecations
 
+1. **gazebo/rendering/ApplyWrenchVisual.hh**
+    + ***Deprecation:*** public: void SetCoM(const math::Vector3 &_comVector)
+    + ***Replacement:*** public: void SetCoM(const ignition::math::Vector3d &_comVector);
+    + ***Deprecation:*** public: void SetForcePos(const math::Vector3 &_forcePosVector)
+    + ***Replacement:*** public: void SetForcePos(const ignition::math::Vector3d &_forcePosVector);
+    + ***Deprecation:*** public: void SetForce(const math::Vector3 &_forceVector,const bool _rotatedByMouse);
+    + ***Replacement:*** public: void SetForce(const ignition::math::Vector3d &_forceVector, const bool _rotatedByMouse);
+    + ***Deprecation:*** public: void SetTorque(const math::Vector3 &_torqueVector,const bool _rotatedByMouse);
+    + ***Replacement:*** public: void SetTorque(const ignition::math::Vector3d &_torqueVector, const bool _rotatedByMouse);
+
+1. **gazebo/rendering/AxisVisual.hh**
+    + ***Deprecation:*** public: void ScaleXAxis(const math::Vector3 &_scale)
+    + ***Replacement:*** public: void ScaleXAxis(const ignition::math::Vector3d &_scale);
+    + ***Deprecation:*** public: void ScaleYAxis(const math::Vector3 &_scale)
+    + ***Replacement:*** public: void ScaleYAxis(const ignition::math::Vector3d &_scale);
+    + ***Deprecation:*** public: void ScaleZAxis(const math::Vector3 &_scale)
+    + ***Replacement:*** public: void ScaleZAxis(const ignition::math::Vector3d &_scale);
+
 1. **gazebo/gui/RTShaderSystem.hh**
     + ***Deprecation:*** void AttachEntity(Visual *vis)
     + ***No replacement for AttachEntity ***
@@ -115,6 +133,43 @@ release will remove the deprecated code.
     + public: virtual void OnMouseDrag(const common::MouseEvent &_event);
     + protected: math::Vector3 GetSnappedPoint(math::Vector3 _p);
 
+1. **gazebo/sensors/ForceTorqueSensor.hh**
+    + public: math::Vector3 GetTorque() const
+    + public: math::Vector3 GetForce() const
+
+1. **gazebo/sensors/GpsSensor.hh**
+    + public: math::Angle GetLongitude()
+    + public: math::Angle GetLatitude()
+
+1. **gazebo/sensors/GpuRaySensor.hh**
+    + public: math::Angle GetAngleMin() const
+    + public: math::Angle GetAngleMax() const
+    + public: math::Angle GetVerticalAngleMin() const
+    + public: math::Angle GetVerticalAngleMax() const
+
+1. **gazebo/sensors/ImuSensor.hh**
+    + public: math::Vector3 GetAngularVelocity() const
+    + public: math::Vector3 GetLinearAcceleration() const
+    + public: math::Quaternion GetOrientation() const
+
+1. **gazebo/sensors/RFIDSensor.hh**
+    + private: bool CheckTagRange(const math::Pose &_pose)
+
+1. **gazebo/sensors/RFIDTag.hh**
+    + public: math::Pose GetTagPose() const
+
+1. **gazebo/sensors/RaySensor.hh**
+    + public: math::Angle GetAngleMin() const
+    + public: math::Angle GetAngleMax() const
+    + public: math::Angle GetVerticalAngleMin() const
+    + public: math::Angle GetVerticalAngleMax() const
+
+1. **gazebo/sensors/Sensor.hh**
+    + public: virtual math::Pose GetPose() const
+    + public: NoisePtr GetNoise(unsigned int _index = 0) const
+
+1. **gazebo/sensors/WirelessTransmitter.hh**
+    + public: double GetSignalStrength(const math::Pose &_receiver, const double _rxGain)
 
 ## Gazebo 5.X to 6.X
 
