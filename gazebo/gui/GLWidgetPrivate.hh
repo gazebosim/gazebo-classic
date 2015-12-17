@@ -107,7 +107,7 @@ namespace gazebo
       /// \brief True if the model editor is up, false otherwise
       public: bool modelEditorEnabled;
 
-      /// \brief Mutext to protect selectedVisuals array.
+      /// \brief Mutex to protect selectedVisuals array.
       public: std::mutex selectedVisMutex;
     };
   }
