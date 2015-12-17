@@ -29,27 +29,27 @@
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/util/system.hh"
 
-class QTreeWidget;
-class QTreeWidgetItem;
-class QPushButton;
-class QtTreePropertyBrowser;
-class QtVariantPropertyManager;
+//class QTreeWidget;
+//class QTreeWidgetItem;
+//class QPushButton;
+//class QtTreePropertyBrowser;
+//class QtVariantPropertyManager;
 class QtProperty;
-class QtTreePropertyItem;
+//class QtTreePropertyItem;
 class QtBrowserItem;
-class QtVariantEditorFactory;
-
+//class QtVariantEditorFactory;
+/*
 namespace boost
 {
   class recursive_mutex;
   class mutex;
 }
-
+*/
 namespace gazebo
 {
   namespace gui
   {
-    class ModelEditWidget;
+    class ModelListWidgetPrivate;
 
     class GZ_GUI_VISIBLE ModelListWidget : public QWidget
     {
@@ -202,73 +202,9 @@ namespace gazebo
       /// \param[in] _item The item that was changed.
       private: void GUIPropertyChanged(QtProperty *_item);
 
-      private: QTreeWidget *modelTreeWidget;
-      private: QtTreePropertyBrowser *propTreeBrowser;
-
-      private: transport::NodePtr node;
-      private: transport::PublisherPtr requestPub;
-      private: transport::PublisherPtr modelPub;
-      private: transport::PublisherPtr scenePub;
-      private: transport::PublisherPtr physicsPub;
-      private: transport::PublisherPtr lightPub;
-
-      private: transport::SubscriberPtr responseSub;
-      private: transport::SubscriberPtr requestSub;
-
-      /// \brief GUI tree item.
-      private: QTreeWidgetItem *guiItem;
-
-      /// \brief Scene tree item.
-      private: QTreeWidgetItem *sceneItem;
-
-      /// \brief Physics tree item.
-      private: QTreeWidgetItem *physicsItem;
-
-      /// \brief Models tree item.
-      private: QTreeWidgetItem *modelsItem;
-
-      /// \brief Lights tree item.
-      private: QTreeWidgetItem *lightsItem;
-
-      /// \brief Spherical coordinates tree item.
-      private: QTreeWidgetItem *sphericalCoordItem;
-
-      private: QtVariantPropertyManager *variantManager;
-      private: QtVariantEditorFactory *variantFactory;
-      private: boost::mutex *propMutex, *receiveMutex;
-      private: sdf::ElementPtr sdfElement;
-      private: std::string selectedEntityName;
-      private: bool fillingPropertyTree;
-      private: QtProperty *selectedProperty;
-
-      private: msgs::Request *requestMsg;
-
-      private: std::vector<event::ConnectionPtr> connections;
-
-      typedef std::list<msgs::Model> ModelMsgs_L;
-      private: ModelMsgs_L modelMsgs;
-
-      typedef std::list<msgs::Light> LightMsgs_L;
-      private: LightMsgs_L lightMsgs;
-
-      typedef std::list<std::string> RemoveEntity_L;
-      private: RemoveEntity_L removeEntityList;
-
-      private: msgs::Model modelMsg;
-      private: msgs::Link linkMsg;
-      private: msgs::Scene sceneMsg;
-      private: msgs::Joint jointMsg;
-      private: msgs::Physics physicsMsg;
-      private: msgs::Light lightMsg;
-      private: msgs::SphericalCoordinates sphericalCoordMsg;
-
-      private: bool fillPropertyTree;
-      private: std::deque<std::string> fillTypes;
-
-      private: msgs::Light::LightType lightType;
-
-      /// \brief Type of physics engine.
-      private: msgs::Physics_Type physicsType;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<ModelListWidgetPrivate> dataPtr;
     };
 
     class GZ_GUI_VISIBLE ModelListSheetDelegate: public QItemDelegate
