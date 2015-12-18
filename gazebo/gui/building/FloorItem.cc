@@ -17,7 +17,6 @@
 
 #include "gazebo/gui/building/EditorItem.hh"
 #include "gazebo/gui/building/RectItem.hh"
-#include "gazebo/gui/building/BuildingItem.hh"
 #include "gazebo/gui/building/BuildingMaker.hh"
 #include "gazebo/gui/building/WallSegmentItem.hh"
 #include "gazebo/gui/building/FloorItem.hh"
@@ -26,7 +25,7 @@ using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-FloorItem::FloorItem(): RectItem(), BuildingItem()
+FloorItem::FloorItem(): RectItem()
 {
   this->editorType = "Floor";
 
