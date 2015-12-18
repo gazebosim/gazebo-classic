@@ -454,8 +454,8 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
           wallSegmentItem->setZValue(wallSegmentItem->zValueIdle);
           editorItem->SetPositionOnWall(0);
           editorItem->SetAngleOnWall(0);
-          this->buildingMaker->DetachManip(this->itemToVisualMap[editorItem],
-                this->itemToVisualMap[wallSegmentItem]);
+          this->buildingMaker->DetachFromParent(
+              this->itemToVisualMap[editorItem]);
           editorItem->SetRotation(editorItem->GetRotation()
             - this->mousePressRotation);
           editorItem->SetPosition(mousePoint);

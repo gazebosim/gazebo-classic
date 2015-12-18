@@ -44,7 +44,6 @@ set (sources
   ModelAlign.cc
   ModelManipulator.cc
   ModelSnap.cc
-  ModelEditWidget.cc
   ModelListWidget.cc
   ModelMaker.cc
   ModelRightMenu.cc
@@ -87,7 +86,6 @@ set (qt_headers
   LogPlayWidget.hh
   MainWindow.hh
   ModelListWidget.hh
-  ModelEditWidget.hh
   ModelRightMenu.hh
   RenderWidget.hh
   SaveDialog.hh
