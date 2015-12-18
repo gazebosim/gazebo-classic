@@ -111,8 +111,8 @@ math::Box BulletCollision::GetBoundingBox() const
     {
       PlaneShapePtr plane =
         std::dynamic_pointer_cast<PlaneShape>(this->shape);
-      math::Vector3 normal = plane->GetNormal();
-      if (normal == math::Vector3::UnitZ)
+      ignition::math::Vector3d normal = plane->Normal();
+      if (normal == ignition::math::Vector3d::UnitZ)
       {
         // Should check altitude, but it's not implemented
         result.max.z =  0.0;

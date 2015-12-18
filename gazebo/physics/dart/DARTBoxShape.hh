@@ -40,7 +40,7 @@ namespace gazebo
       public: virtual ~DARTBoxShape();
 
       // Documentation inherited.
-      public: virtual void SetSize(const math::Vector3 &_size);
+      public: virtual void SetSize(const ignition::math::Vector3d &_size);
 
       /// \internal
       /// \brief Pointer to private data

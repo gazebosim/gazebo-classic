@@ -14,13 +14,10 @@
  * limitations under the License.
  *
 */
-/* Desc: Box geometry
- * Author: Nate Koenig, Andrew Howard
- * Date: 8 May 2003
- */
+#ifndef _GAZEBO_PHYSICS_BOXSHAPE_HH_
+#define _GAZEBO_PHYSICS_BOXSHAPE_HH_
 
-#ifndef _BOXSHAPE_HH_
-#define _BOXSHAPE_HH_
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/physics/Shape.hh"
 #include "gazebo/util/system.hh"
@@ -48,15 +45,32 @@ namespace gazebo
 
       /// \brief Set the size of the box.
       /// \param[in] _size Size of each side of the box.
-      public: virtual void SetSize(const math::Vector3 &_size);
+      /// \deprecated See function that accepts ignition::math parameters
+      public: virtual void SetSize(const math::Vector3 &_size)
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Set the size of the box.
+      /// \param[in] _size Size of each side of the box.
+      public: virtual void SetSize(const ignition::math::Vector3d &_size);
 
       /// \brief Set the scale of the box.
       /// \param[in] _scale Scale of the box.
-      public: virtual void SetScale(const math::Vector3 &_scale);
+      /// \deprecated See function that accepts ignition::math parameters
+      public: virtual void SetScale(const math::Vector3 &_scale)
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Set the scale of the box.
+      /// \param[in] _scale Scale of the box.
+      public: virtual void SetScale(const ignition::math::Vector3d &_scale);
 
       /// \brief Get the size of the box.
       /// \return The size of each side of the box.
-      public: math::Vector3 GetSize() const;
+      /// \deprecated See function that returns an ignition::math object.
+      public: math::Vector3 GetSize() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the size of the box.
+      /// \return The size of each side of the box.
+      public: ignition::math::Vector3d Size() const;
 
       /// \brief Fill in the values for a geomertry message.
       /// \param[out] _msg The geometry message to fill.

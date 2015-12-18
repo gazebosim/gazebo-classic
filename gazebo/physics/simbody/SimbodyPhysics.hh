@@ -22,6 +22,9 @@
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
 
+#include <ignition/math/Vector3.hh>
+#include <ignition/math/Quaternion.hh>
+
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/Shape.hh"
@@ -106,9 +109,15 @@ namespace gazebo
       public: virtual ModelPtr CreateModel(BasePtr _parent);
 
       /// \brief Convert gazebo::math::Quaternion to SimTK::Quaternion
-      /// \param[in] _q Gazeb's math::Quaternion object
+      /// \param[in] _q Gazebo's math::Quaternion object
       /// \return Simbody's SimTK::Quaternion object
       public: static SimTK::Quaternion QuadToQuad(const math::Quaternion &_q);
+
+      /// \brief Convert ignition::math::Quaterniond to SimTK::Quaternion
+      /// \param[in] _q ignition::math::Quaterniond object
+      /// \return Simbody's SimTK::Quaternion object
+      public: static SimTK::Quaternion QuadToQuad(
+                  const ignition::math::Quaterniond &_q);
 
       /// \brief Convert SimTK::Quaternion to gazebo::math::Quaternion
       /// \param[in] _q Simbody's SimTK::Quaternion object
@@ -116,9 +125,15 @@ namespace gazebo
       public: static math::Quaternion QuadToQuad(const SimTK::Quaternion &_q);
 
       /// \brief Convert gazebo::math::Vector3 to SimTK::Vec3
-      /// \param[in] _v Gazeb's math::Vector3 object
+      /// \param[in] _v Gazebo's math::Vector3 object
       /// \return Simbody's SimTK::Vec3 object
       public: static SimTK::Vec3 Vector3ToVec3(const math::Vector3 &_v);
+
+      /// \brief Convert ignition::math::Vector3d to SimTK::Vec3
+      /// \param[in] _v ignition::math::Vector3d object
+      /// \return Simbody's SimTK::Vec3 object
+      public: static SimTK::Vec3 Vector3ToVec3(
+                  const ignition::math::Vector3d &_v);
 
       /// \brief Convert SimTK::Vec3 to gazebo::math::Vector3
       /// \param[in] _v Simbody's SimTK::Vec3 object

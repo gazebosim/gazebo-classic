@@ -1932,7 +1932,7 @@ EntityPtr World::GetEntityBelowPoint(const math::Vector3 &_pt)
   end.z -= 1000;
 
   this->dataPtr->physicsEngine->InitForThread();
-  this->dataPtr->testRay->SetPoints(_pt, end);
+  this->dataPtr->testRay->SetPoints(_pt.Ign(), end.Ign());
   this->dataPtr->testRay->GetIntersection(dist, entityName);
   return this->GetEntity(entityName);
 }
@@ -2217,9 +2217,9 @@ void World::PublishWorldStats()
   {
     msgs::LogPlaybackStatistics logStats;
     msgs::Set(logStats.mutable_start_time(),
-        util::LogPlay::Instance()->GetLogStartTime());
+        util::LogPlay::Instance()->LogStartTime());
     msgs::Set(logStats.mutable_end_time(),
-        util::LogPlay::Instance()->GetLogEndTime());
+        util::LogPlay::Instance()->LogEndTime());
 
     this->dataPtr->worldStatsMsg.mutable_log_playback_stats()->CopyFrom(
         logStats);

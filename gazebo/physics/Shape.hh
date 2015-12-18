@@ -24,6 +24,7 @@
 #endif
 
 #include <string>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/msgs/msgs.hh"
 
@@ -53,7 +54,7 @@ namespace gazebo
 
       /// \brief Set the scale of the shape.
       /// \param[in] _scale Scale to set the shape to.
-      /// \deprecated See version that accepts igntion::math parameters.
+      /// \deprecated See function that accepts ignition::math parameters
       public: virtual void SetScale(const math::Vector3 &_scale)
               GAZEBO_DEPRECATED(7.0);
 
@@ -63,7 +64,7 @@ namespace gazebo
 
       /// \brief Get the scale of the shape.
       /// \return Scale of the shape.
-      /// \deprecated See Scale() const
+      /// \deprecatred See function that returns an ignition::math object
       public: virtual math::Vector3 GetScale() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the scale of the shape.

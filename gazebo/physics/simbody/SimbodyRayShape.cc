@@ -67,7 +67,14 @@ void SimbodyRayShape::GetIntersection(double &_dist, std::string &_entity)
 
 //////////////////////////////////////////////////
 void SimbodyRayShape::SetPoints(const math::Vector3 &_posStart,
-                                   const math::Vector3 &_posEnd)
+                                const math::Vector3 &_posEnd)
+{
+  this->SetPoints(_posStart.Ign(), _posEnd.Ign());
+}
+
+//////////////////////////////////////////////////
+void SimbodyRayShape::SetPoints(const ignition::math::Vector3d &_posStart,
+                                const ignition::math::Vector3d &_posEnd)
 {
   this->globalStartPos = _posStart;
   this->globalEndPos = _posEnd;

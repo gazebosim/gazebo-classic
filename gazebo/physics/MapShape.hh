@@ -14,15 +14,12 @@
  * limitations under the License.
  *
 */
-/* Desc: Occupancy grid collision
- * Author: Nate Koenig
-*/
-
-#ifndef _MAPSHAPE_HH_
-#define _MAPSHAPE_HH_
+#ifndef _GAZEBO_PHYSICS_MAPSHAPE_HH_
+#define _GAZEBO_PHYSICS_MAPSHAPE_HH_
 
 #include <deque>
 #include <string>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/common/CommonTypes.hh"
 
@@ -77,11 +74,21 @@ namespace gazebo
 
       /// \brief Set the scale of the map shape.
       /// \param[in] _scale Scale to set the map shape to.
-      public: void SetScale(const math::Vector3 &_scale);
+      /// \deprecated See function that accepts ignition::math parameters.
+      public: void SetScale(const math::Vector3 &_scale) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Set the scale of the map shape.
+      /// \param[in] _scale Scale to set the map shape to.
+      public: void SetScale(const ignition::math::Vector3d &_scale);
 
       /// \brief Returns scaling factor for this geometry.
       /// \return Scaling factor.
-      public: virtual math::Vector3 GetScale() const;
+      /// \deprecated See function that returns an ignition::math object
+      public: virtual math::Vector3 GetScale() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Returns scaling factor for this geometry.
+      /// \return Scaling factor.
+      public: virtual ignition::math::Vector3d Scale() const;
 
       /// \brief Returns image threshold for this geometry.
       /// All regions in image with value larger than MapShape::scale

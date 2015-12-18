@@ -70,6 +70,13 @@ void DARTRayShape::GetIntersection(double &_dist, std::string &_entity)
 void DARTRayShape::SetPoints(const math::Vector3& _posStart,
                              const math::Vector3& _posEnd)
 {
+  this->SetPoints(_posStart.Ign(), _posEnd.Ign());
+}
+
+//////////////////////////////////////////////////
+void DARTRayShape::SetPoints(const ignition::math::Vector3d& _posStart,
+                             const ignition::math::Vector3d& _posEnd)
+{
   RayShape::SetPoints(_posStart, _posEnd);
 
   // Not implemented yet, please see issue #911

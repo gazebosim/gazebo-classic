@@ -67,6 +67,14 @@ void DARTMesh::Init(const common::SubMesh *_subMesh,
                     DARTCollisionPtr _collision,
                     const math::Vector3 &_scale)
 {
+  this->Init(_subMesh, _collision, _scale.Ign());
+}
+
+//////////////////////////////////////////////////
+void DARTMesh::Init(const common::SubMesh *_subMesh,
+                    DARTCollisionPtr _collision,
+                    const ignition::math::Vector3d &_scale)
+{
   float *vertices = NULL;
   int *indices = NULL;
 
@@ -88,6 +96,14 @@ void DARTMesh::Init(const common::Mesh *_mesh,
                     DARTCollisionPtr _collision,
                     const math::Vector3 &_scale)
 {
+  this->Init(_mesh, _collision, _scale.Ign());
+}
+
+//////////////////////////////////////////////////
+void DARTMesh::Init(const common::Mesh *_mesh,
+                    DARTCollisionPtr _collision,
+                    const ignition::math::Vector3d &_scale)
+{
   float *vertices = NULL;
   int *indices = NULL;
 
@@ -106,7 +122,7 @@ void DARTMesh::Init(const common::Mesh *_mesh,
 /////////////////////////////////////////////////
 void DARTMesh::CreateMesh(float *_vertices, int *_indices,
     unsigned int _numVertices, unsigned int _numIndices,
-    DARTCollisionPtr _collision, const math::Vector3 &_scale)
+    DARTCollisionPtr _collision, const ignition::math::Vector3d &_scale)
 {
   GZ_ASSERT(_collision, "DART collision is null");
 

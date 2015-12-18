@@ -229,7 +229,7 @@ ShapePtr Collision::Shape() const
 //////////////////////////////////////////////////
 void Collision::SetScale(const math::Vector3 &_scale)
 {
-  this->shape->SetScale(_scale);
+  this->shape->SetScale(_scale.Ign());
 }
 
 //////////////////////////////////////////////////

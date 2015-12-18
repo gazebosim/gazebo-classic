@@ -25,7 +25,7 @@ using namespace physics;
 CylinderShape::CylinderShape(CollisionPtr _parent) : Shape(_parent)
 {
   this->AddType(Base::CYLINDER_SHAPE);
-  this->scale = math::Vector3::One;
+  this->scale = ignition::math::Vector3d::One;
   sdf::initFile("cylinder_shape.sdf", this->sdf);
 }
 
@@ -71,17 +71,23 @@ void CylinderShape::SetSize(double _radius, double _length)
 //////////////////////////////////////////////////
 void CylinderShape::SetScale(const math::Vector3 &_scale)
 {
-  if (_scale.x < 0 || _scale.y < 0 || _scale.z < 0)
+  this->SetScale(_scale.Ign());
+}
+
+//////////////////////////////////////////////////
+void CylinderShape::SetScale(const ignition::math::Vector3d &_scale)
+{
+  if (_scale.Min() < 0)
     return;
 
   if (_scale == this->scale)
     return;
 
-  double newRadius = std::max(_scale.x, _scale.y);
-  double oldRadius = std::max(this->scale.x, this->scale.y);
+  double newRadius = std::max(_scale.X(), _scale.Y());
+  double oldRadius = std::max(this->scale.X(), this->scale.Y());
 
   this->SetRadius((newRadius/oldRadius)*this->GetRadius());
-  this->SetLength((_scale.z/this->scale.z)*this->GetLength());
+  this->SetLength((_scale.Z()/this->scale.Z())*this->GetLength());
 
   this->scale = _scale;
 }

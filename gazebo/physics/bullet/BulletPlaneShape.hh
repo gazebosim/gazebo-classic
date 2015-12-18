@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: Plane shape
- * Author: Nate Koenig
- * Date: 14 Oct 2009
- */
-
-#ifndef _BULLETPLANESHAPE_HH_
-#define _BULLETPLANESHAPE_HH_
+#ifndef _GAZEBO_PHYSICS_BULLETPLANESHAPE_HH_
+#define _GAZEBO_PHYSICS_BULLETPLANESHAPE_HH_
 
 #include <iostream>
 
@@ -46,12 +41,6 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~BulletPlaneShape() {}
 
-      /// \brief Set the altitude of the plane
-      public: void SetAltitude(const math::Vector3 &pos)
-              {
-                PlaneShape::SetAltitude(pos);
-              }
-
       /// \brief Create the plane
       public: void CreatePlane()
               {
@@ -60,8 +49,8 @@ namespace gazebo
                 bParent = std::dynamic_pointer_cast<BulletCollision>(
                     this->collisionParent);
 
-                math::Vector3 n = this->GetNormal();
-                btVector3 vec(n.x, n.y, n.z);
+                ignition::math::Vector3d n = this->Normal();
+                btVector3 vec(n.X(), n.Y(), n.Z());
 
                 bParent->SetCollisionShape(new btStaticPlaneShape(vec, 0.0),
                     false);

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _ODECYLINDERSHAPE_HH_
-#define _ODECYLINDERSHAPE_HH_
+#ifndef _GAZEBO_PHYSICS_ODECYLINDERSHAPE_HH_
+#define _GAZEBO_PHYSICS_ODECYLINDERSHAPE_HH_
 
 #include "gazebo/physics/CylinderShape.hh"
 #include "gazebo/physics/ode/ODEPhysics.hh"

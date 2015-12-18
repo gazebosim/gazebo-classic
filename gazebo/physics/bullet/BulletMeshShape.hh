@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_BULLETMESHSHAPE_HH_
-#define _GAZEBO_BULLETMESHSHAPE_HH_
+#ifndef _GAZEBO_PHYSICS_BULLETMESHSHAPE_HH_
+#define _GAZEBO_PHYSICS_BULLETMESHSHAPE_HH_
 
 #include "gazebo/physics/MeshShape.hh"
 #include "gazebo/util/system.hh"

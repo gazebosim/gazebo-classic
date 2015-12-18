@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_DARTPLANESHAPE_HH_
-#define _GAZEBO_DARTPLANESHAPE_HH_
+#ifndef _GAZEBO_PHYSICS_DARTPLANESHAPE_HH_
+#define _GAZEBO_PHYSICS_DARTPLANESHAPE_HH_
 
 #include "gazebo/physics/PlaneShape.hh"
 #include "gazebo/physics/dart/DARTPhysics.hh"
@@ -40,9 +40,6 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual void CreatePlane();
-
-      // Documentation inherited
-      public: virtual void SetAltitude(const math::Vector3 &_pos);
 
       /// \internal
       /// \brief Pointer to private data

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_BULLETPOLYLINESHAPE_HH_
-#define _GAZEBO_BULLETPOLYLINESHAPE_HH_
+#ifndef _GAZEBO_PHYSICS_BULLETPOLYLINESHAPE_HH_
+#define _GAZEBO_PHYSICS_BULLETPOLYLINESHAPE_HH_
 
 #include "gazebo/physics/PolylineShape.hh"
 #include "gazebo/util/system.hh"

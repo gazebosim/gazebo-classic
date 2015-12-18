@@ -146,7 +146,7 @@ void RaySensor::Fini()
 ignition::math::Angle RaySensor::AngleMin() const
 {
   if (this->laserShape)
-    return this->laserShape->GetMinAngle().Ign();
+    return this->laserShape->MinAngle();
   else
     return -1;
 }
@@ -155,7 +155,7 @@ ignition::math::Angle RaySensor::AngleMin() const
 ignition::math::Angle RaySensor::AngleMax() const
 {
   if (this->laserShape)
-    return ignition::math::Angle(this->laserShape->GetMaxAngle().Radian());
+    return this->laserShape->MaxAngle();
   else
     return -1;
 }
@@ -228,8 +228,10 @@ int RaySensor::GetVerticalRayCount() const
 int RaySensor::GetVerticalRangeCount() const
 {
   if (this->laserShape)
+  {
     return this->laserShape->GetVerticalSampleCount() *
       this->laserShape->GetVerticalScanResolution();
+  }
   else
     return -1;
 }
@@ -238,10 +240,7 @@ int RaySensor::GetVerticalRangeCount() const
 ignition::math::Angle RaySensor::VerticalAngleMin() const
 {
   if (this->laserShape)
-  {
-    return ignition::math::Angle(
-        this->laserShape->GetVerticalMinAngle().Radian());
-  }
+    return this->laserShape->VerticalMinAngle();
   else
     return -1;
 }
@@ -250,10 +249,7 @@ ignition::math::Angle RaySensor::VerticalAngleMin() const
 ignition::math::Angle RaySensor::VerticalAngleMax() const
 {
   if (this->laserShape)
-  {
-    return ignition::math::Angle(
-        this->laserShape->GetVerticalMaxAngle().Radian());
-  }
+    return this->laserShape->VerticalMaxAngle();
   else
     return -1;
 }
