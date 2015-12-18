@@ -14,21 +14,35 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_GUI_TERRAINEDITOR_PRIVATE_HH_
-#define _GAZEBO_GUI_TERRAINEDITOR_PRIVATE_HH_
+#ifndef _GAZEBO_GUI_CONFIGWIDGET_PRIVATE_HH_
+#define _GAZEBO_GUI_CONFIGWIDGET_PRIVATE_HH_
+
+#include <map>
+#include <string>
+
+namespace google
+{
+  namespace protobuf
+  {
+    class Message;
+  }
+}
 
 namespace gazebo
 {
   namespace gui
   {
-    class TerrainEditorPalette;
+    class ConfigChildWidget;
 
-    /// \class TerrainEditorPrivate TerrainEditorPrivate.hh
-    /// \brief Private data for the TerrainEditor class.
-    class TerrainEditorPrivate
+    /// \class ConfigWidgetPrivate ConfigWidgetPrivate.hh
+    /// \brief Private data for the ConfigWidget class.
+    class ConfigWidgetPrivate
     {
-      /// \brief Contains all the terrain editor tools.
-      public: TerrainEditorPalette *terrainPalette;
+      /// \brief A map of unique scoped names to correpsonding widgets.
+      public: std::map <std::string, ConfigChildWidget *> configWidgets;
+
+      /// \brief A copy of the message with fields to be configured by widgets.
+      public: google::protobuf::Message *configMsg;
     };
   }
 }
