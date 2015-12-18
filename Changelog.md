@@ -190,6 +190,9 @@ using the same arguments used in the command line.
 1. Refactored makers
     * [Pull request #1828](https://bitbucket.org/osrf/gazebo/pull-request/1828)
 
+1. Added gui::Conversions to convert between Gazebo and Qt
+    * [Pull request #2034](https://bitbucket.org/osrf/gazebo/pull-request/2034)
+
 1. Model editor updates
 
     1. Make non-editable background models white in model editor
