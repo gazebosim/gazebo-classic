@@ -20,6 +20,8 @@
 
 #include <vector>
 
+#include "gazebo/gui/qt.h"
+
 namespace gazebo
 {
   namespace gui

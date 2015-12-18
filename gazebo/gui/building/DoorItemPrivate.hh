@@ -18,6 +18,8 @@
 #ifndef _GAZEBO_GUI_DOOR_ITEM_PRIVATE_HH_
 #define _GAZEBO_GUI_DOOR_ITEM_PRIVATE_HH_
 
+#include "gazebo/gui/qt.h"
+
 namespace gazebo
 {
   namespace gui

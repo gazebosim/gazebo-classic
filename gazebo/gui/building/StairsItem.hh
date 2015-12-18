@@ -22,6 +22,8 @@
 
 #include "gazebo/gui/building/RectItem.hh"
 
+#include "gazebo/util/system.hh"
+
 namespace gazebo
 {
   namespace gui

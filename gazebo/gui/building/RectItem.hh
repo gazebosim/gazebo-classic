@@ -19,9 +19,9 @@
 #define _GAZEBO_GUI_RECT_ITEM_HH_
 
 #include <memory>
+#include <vector>
 
 #include "gazebo/gui/qt.h"
-#include "gazebo/gui/building/WallSegmentItem.hh"
 #include "gazebo/gui/building/EditorItem.hh"
 
 #include "gazebo/util/system.hh"

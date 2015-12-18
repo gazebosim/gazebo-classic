@@ -22,6 +22,7 @@
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/building/SegmentItem.hh"
+
 #include "gazebo/util/system.hh"
 
 namespace gazebo

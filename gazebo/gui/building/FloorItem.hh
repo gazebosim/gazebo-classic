@@ -30,6 +30,8 @@ namespace gazebo
   namespace gui
   {
     class WallSegmentItem;
+
+    // Forward declare private data.
     class FloorItemPrivate;
 
     /// \addtogroup gazebo_gui

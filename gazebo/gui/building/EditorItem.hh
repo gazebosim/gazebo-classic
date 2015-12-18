@@ -22,6 +22,7 @@
 #include <memory>
 
 #include "gazebo/gui/qt.h"
+
 #include "gazebo/util/system.hh"
 
 namespace gazebo
