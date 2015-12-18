@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_BUILDING_STAIRS_ITEM_HH_
-#define _GAZEBO_BUILDING_STAIRS_ITEM_HH_
+#ifndef _GAZEBO_GUI_STAIRS_ITEM_HH_
+#define _GAZEBO_GUI_STAIRS_ITEM_HH_
 
 #include "gazebo/gui/building/RectItem.hh"
 
@@ -34,8 +34,7 @@ namespace gazebo
 
     /// \class StairsItem StairsItem.hh
     /// \brief 2D representation of a staircase.
-    class GZ_GUI_VISIBLE StairsItem :
-      public RectItem, public BuildingItem
+    class GZ_GUI_VISIBLE StairsItem : public RectItem
     {
       Q_OBJECT
 

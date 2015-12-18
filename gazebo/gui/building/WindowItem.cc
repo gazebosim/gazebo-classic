@@ -16,7 +16,6 @@
 */
 
 #include "gazebo/gui/building/EditorView.hh"
-#include "gazebo/gui/building/BuildingItem.hh"
 #include "gazebo/gui/building/EditorItem.hh"
 #include "gazebo/gui/building/RectItem.hh"
 #include "gazebo/gui/building/WindowDoorInspectorDialog.hh"
@@ -28,7 +27,7 @@ using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-WindowItem::WindowItem(): RectItem(*new WindowItemPrivate), BuildingItem(),
+WindowItem::WindowItem(): RectItem(*new WindowItemPrivate),
     dataPtr(std::static_pointer_cast<WindowItemPrivate>(this->rectDPtr))
 {
   this->dataPtr->editorType = "Window";

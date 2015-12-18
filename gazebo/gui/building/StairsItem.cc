@@ -17,7 +17,6 @@
 
 #include "gazebo/gui/building/EditorView.hh"
 #include "gazebo/gui/building/BuildingEditorWidget.hh"
-#include "gazebo/gui/building/BuildingItem.hh"
 #include "gazebo/gui/building/EditorItem.hh"
 #include "gazebo/gui/building/RectItem.hh"
 #include "gazebo/gui/building/BuildingMaker.hh"
@@ -30,7 +29,7 @@ using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-StairsItem::StairsItem(): RectItem(*new StairsItemPrivate), BuildingItem(),
+StairsItem::StairsItem(): RectItem(*new StairsItemPrivate),
     dataPtr(std::static_pointer_cast<StairsItemPrivate>(this->rectDPtr))
 {
   this->dataPtr->editorType = "Stairs";

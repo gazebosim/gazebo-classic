@@ -20,7 +20,6 @@
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/building/RectItem.hh"
-#include "gazebo/gui/building/BuildingItem.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -28,7 +27,6 @@ namespace gazebo
   namespace gui
   {
     class RectItem;
-    class BuildingItem;
     class WindowDoorInspectorDialog;
     class WindowItemPrivate;
 
@@ -37,8 +35,7 @@ namespace gazebo
 
     /// \class WindowItem WindowItem.hh
     /// \brief 2D representation of a window.
-    class GZ_GUI_VISIBLE WindowItem :
-      public RectItem, public BuildingItem
+    class GZ_GUI_VISIBLE WindowItem : public RectItem
     {
         Q_OBJECT
 

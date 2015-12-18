@@ -21,7 +21,6 @@
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/building/MeasureItem.hh"
 #include "gazebo/gui/building/SegmentItem.hh"
-#include "gazebo/gui/building/BuildingItem.hh"
 
 namespace gazebo
 {
@@ -29,7 +28,6 @@ namespace gazebo
   {
     class MeasureItem;
     class SegmentItem;
-    class BuildingItem;
     class WallInspectorDialog;
     class WallSegmentItemPrivate;
 
@@ -38,8 +36,7 @@ namespace gazebo
 
     /// \class WallSegmentItem WallSegmentItem.hh
     /// \brief 2D representation of a wall.
-    class GZ_GUI_VISIBLE WallSegmentItem : public SegmentItem, public
-        BuildingItem
+    class GZ_GUI_VISIBLE WallSegmentItem : public SegmentItem
     {
       Q_OBJECT
 

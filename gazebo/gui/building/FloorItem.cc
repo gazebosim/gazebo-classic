@@ -17,7 +17,6 @@
 
 #include "gazebo/gui/building/EditorItem.hh"
 #include "gazebo/gui/building/RectItem.hh"
-#include "gazebo/gui/building/BuildingItem.hh"
 #include "gazebo/gui/building/BuildingMaker.hh"
 #include "gazebo/gui/building/WallSegmentItem.hh"
 #include "gazebo/gui/building/FloorItem.hh"
@@ -27,7 +26,7 @@ using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-FloorItem::FloorItem(): RectItem(*new FloorItemPrivate), BuildingItem(),
+FloorItem::FloorItem(): RectItem(*new FloorItemPrivate),
     dataPtr(std::static_pointer_cast<FloorItemPrivate>(this->rectDPtr))
 {
   this->dataPtr->editorType = "Floor";

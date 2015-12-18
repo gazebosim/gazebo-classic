@@ -30,7 +30,7 @@ using namespace gui;
 /////////////////////////////////////////////////
 WallSegmentItem::WallSegmentItem(const QPointF &_start, const QPointF &_end,
     const double _height)
-    : SegmentItem(*new WallSegmentItemPrivate), BuildingItem(),
+    : SegmentItem(*new WallSegmentItemPrivate),
       dataPtr(std::static_pointer_cast<WallSegmentItemPrivate>(this->segDPtr))
 {
   this->dataPtr->editorType = "WallSegment";
