@@ -35,6 +35,7 @@ namespace gazebo
     class GAZEBO_VISIBLE UserCmd
     {
       /// \brief Constructor
+      /// \param[in] _manager Pointer to the user command manager.
       /// \param[in] _id Unique ID for this command
       /// \param[in] _world Pointer to the world
       /// \param[in] _description Description for the command, such as
@@ -50,9 +51,11 @@ namespace gazebo
       public: virtual ~UserCmd();
 
       /// \brief Undo this command.
+      /// \sa Redo()
       public: virtual void Undo();
 
       /// \brief Redo this command.
+      /// \sa Undo()
       public: virtual void Redo();
 
       /// \brief Return this command's unique ID.
@@ -69,10 +72,12 @@ namespace gazebo
 
       /// \brief Set the name of the entity related tot he command.
       /// \param[in] _name Entity name.
+      /// \sa std::string EntityName() const
       public: void SetEntityName(const std::string &_name);
 
       /// \brief Get the name of the entity related tot he command.
       /// \return Entity name.
+      /// \sa void SetEntityName(const std::string &_name)
       public: std::string EntityName() const;
 
       /// \internal
@@ -109,7 +114,7 @@ namespace gazebo
       /// \brief Called every world update iteration.
       private: void ProcessPendingStates();
 
-      // The UserCmd class is a friend so it can use the transport node.
+      // UserCmd class is a friend so it can use resources such as transport.
       private: friend class UserCmd;
 
       /// \internal

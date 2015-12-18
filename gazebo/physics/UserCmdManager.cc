@@ -78,10 +78,8 @@ void UserCmd::Undo()
     // Keep sdf for redo
     if (!this->dataPtr->sdf)
     {
-      physics::ModelPtr model =
-          this->dataPtr->world->GetModel(this->dataPtr->entityName);
-      physics::LightPtr light =
-          this->dataPtr->world->Light(this->dataPtr->entityName);
+      auto model = this->dataPtr->world->GetModel(this->dataPtr->entityName);
+      auto light = this->dataPtr->world->Light(this->dataPtr->entityName);
       if (!model && !light)
       {
         gzerr << "Entity [" << this->dataPtr->entityName << "] not found."

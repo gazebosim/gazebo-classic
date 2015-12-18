@@ -14,23 +14,25 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_USER_CMD_MANAGER_PRIVATE_HH_
-#define _GAZEBO_USER_CMD_MANAGER_PRIVATE_HH_
+#ifndef _GAZEBO_PHYSICS_USER_CMD_MANAGER_PRIVATE_HH_
+#define _GAZEBO_PHYSICS_USER_CMD_MANAGER_PRIVATE_HH_
 
 #include <string>
 #include <vector>
 #include <sdf/sdf.hh>
 
+#include "gazebo/common/CommonTypes.hh"
+
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/physics/WorldState.hh"
+
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Subscriber.hh"
-#include "gazebo/physics/PhysicsTypes.hh"
 
 namespace gazebo
 {
   namespace physics
   {
-    class WorldState;
-
     /// \internal
     /// \brief Private data for the UserCmdManager class
     class UserCmdPrivate
@@ -57,7 +59,10 @@ namespace gazebo
       /// \brief Type of command, such as MOVING or DELETING.
       public: std::string entityName;
 
+      /// \brief SDF for the entity being inserted or deleted.
       public: sdf::SDFPtr sdf;
+
+      /// \brief Pointer to the user command manager.
       public: UserCmdManagerPtr manager;
     };
 
@@ -109,7 +114,10 @@ namespace gazebo
       /// \brief All the event connections.
       public: event::Connection_V connections;
 
+      /// \brief Name of entity whose insertion is pending.
       public: std::string insertionPending;
+
+      /// \brief Vector of states waiting to be applied.
       public: std::list<WorldState> pendingStates;
     };
   }
