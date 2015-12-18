@@ -645,7 +645,7 @@ void Camera::SetClipDist(float _near, float _far)
   sdf::ElementPtr elem = this->sdf->GetElement("clip");
 
   elem->GetElement("near")->Set(_near);
-  elem->GetElement("far")->Set(10000);
+  elem->GetElement("far")->Set(_far);
 
   this->SetClipDist();
 }
