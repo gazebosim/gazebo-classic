@@ -17,7 +17,10 @@
 
 #include <ignition/math/Vector2.hh>
 
+#include "gazebo/common/Color.hh"
+
 #include "gazebo/gui/qt.h"
+#include "gazebo/gui/Conversions.hh"
 #include "gazebo/gui/building/GrabberHandle.hh"
 #include "gazebo/gui/building/GrabberHandlePrivate.hh"
 
@@ -31,7 +34,7 @@ GrabberHandle::GrabberHandle(QGraphicsItem *_parent, int _index)
   this->dataPtr->index = _index;
   this->dataPtr->mouseDownX = 0;
   this->dataPtr->mouseDownY = 0;
-  this->dataPtr->borderColor = Qt::black;
+  this->dataPtr->borderColor = common::Color::Black;
   this->dataPtr->width = 8;
   this->dataPtr->height = 8;
   this->dataPtr->widthGrabBuffer = 10;
@@ -42,8 +45,8 @@ GrabberHandle::GrabberHandle(QGraphicsItem *_parent, int _index)
   this->setZValue(_parent->zValue() + 1);
   // this->setZValue(5);
   this->setAcceptHoverEvents(true);
-  this->dataPtr->handleColor = Qt::black;
-  this->dataPtr->borderColor = QColor(247, 142, 30);
+  this->dataPtr->handleColor = common::Color::Black;
+  this->dataPtr->borderColor = common::Color(247, 142, 30);
 }
 
 /////////////////////////////////////////////////
@@ -102,7 +105,7 @@ double GrabberHandle::Height() const
 }
 
 /////////////////////////////////////////////////
-void GrabberHandle::SetColor(const QColor &_color)
+void GrabberHandle::SetColor(const common::Color &_color)
 {
   this->dataPtr->handleColor = _color;
 }
@@ -110,10 +113,7 @@ void GrabberHandle::SetColor(const QColor &_color)
 /////////////////////////////////////////////////
 common::Color GrabberHandle::Color() const
 {
-  return common::Color(this->dataPtr->handleColor.red(),
-                       this->dataPtr->handleColor.green(),
-                       this->dataPtr->handleColor.blue(),
-                       this->dataPtr->handleColor.alpha());
+  return common::Color(this->dataPtr->handleColor);
 }
 
 /////////////////////////////////////////////////
@@ -195,7 +195,7 @@ QRectF GrabberHandle::boundingRect() const
 }
 
 /////////////////////////////////////////////////
-void GrabberHandle::SetBorderColor(const QColor &_borderColor)
+void GrabberHandle::SetBorderColor(const common::Color &_borderColor)
 {
   this->dataPtr->borderColor = _borderColor;
 }
@@ -211,7 +211,7 @@ void GrabberHandle::paint(QPainter *_painter,
 
   QPen borderPen;
   borderPen.setWidth(1);
-  borderPen.setColor(this->dataPtr->handleColor);
+  borderPen.setColor(Conversions::Convert(this->dataPtr->handleColor));
 
   borderPen.setCapStyle(Qt::SquareCap);
   borderPen.setStyle(Qt::SolidLine);
@@ -226,9 +226,9 @@ void GrabberHandle::paint(QPainter *_painter,
   QRectF rect(topLeft, bottomRight);
 
   QBrush brush(Qt::SolidPattern);
-  brush.setColor(this->dataPtr->borderColor);
+  brush.setColor(Conversions::Convert(this->dataPtr->borderColor));
   _painter->fillRect(borderRect, brush);
-  brush.setColor(this->dataPtr->handleColor);
+  brush.setColor(Conversions::Convert(this->dataPtr->handleColor));
   _painter->fillRect(rect, brush);
 
   _painter->restore();

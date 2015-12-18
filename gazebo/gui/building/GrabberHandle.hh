@@ -23,14 +23,17 @@
 
 #include <ignition/math/Vector2.hh>
 
-#include "gazebo/common/Color.hh"
-
 #include "gazebo/gui/qt.h"
 
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
+  namespace common
+  {
+    class Color;
+  }
+
   namespace gui
   {
     // Forward declare private data class.
@@ -99,11 +102,11 @@ namespace gazebo
 
       /// \brief Set the fill color of the grabber handle.
       /// \param[in] _color Fill Color.
-      public: void SetColor(const QColor &_color);
+      public: void SetColor(const common::Color &_color);
 
       /// \brief Set the border color of the grabber handle.
       /// \param[in] _borderColor Border Color.
-      public: void SetBorderColor(const QColor &_borderColor);
+      public: void SetBorderColor(const common::Color &_borderColor);
 
       /// \brief Get the bounding box of the grabber handle.
       /// \return The grabber handle bounding box.

@@ -20,7 +20,7 @@
 
 #include <vector>
 
-#include "gazebo/gui/qt.h"
+#include "gazebo/common/Color.hh"
 
 namespace gazebo
 {
@@ -45,10 +45,10 @@ namespace gazebo
       public: double mouseDownY;
 
       /// \brief Fill color of the grabber handle.
-      public: QColor handleColor;
+      public: common::Color handleColor;
 
       /// \brief Border color of the grabber handle.
-      public: QColor borderColor;
+      public: common::Color borderColor;
 
       /// \brief Width of the grabber handle in pixels.
       public: double width;
