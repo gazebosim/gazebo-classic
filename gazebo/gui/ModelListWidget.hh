@@ -29,22 +29,9 @@
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/util/system.hh"
 
-//class QTreeWidget;
-//class QTreeWidgetItem;
-//class QPushButton;
-//class QtTreePropertyBrowser;
-//class QtVariantPropertyManager;
 class QtProperty;
-//class QtTreePropertyItem;
 class QtBrowserItem;
-//class QtVariantEditorFactory;
-/*
-namespace boost
-{
-  class recursive_mutex;
-  class mutex;
-}
-*/
+
 namespace gazebo
 {
   namespace gui
