@@ -16,7 +16,6 @@
 */
 
 #include "gazebo/gui/building/EditorView.hh"
-#include "gazebo/gui/building/BuildingItem.hh"
 #include "gazebo/gui/building/EditorItem.hh"
 #include "gazebo/gui/building/RectItem.hh"
 #include "gazebo/gui/building/WindowDoorInspectorDialog.hh"
@@ -27,7 +26,7 @@ using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-WindowItem::WindowItem(): RectItem(), BuildingItem()
+WindowItem::WindowItem(): RectItem()
 {
   this->editorType = "Window";
   this->itemScale = BuildingMaker::conversionScale;

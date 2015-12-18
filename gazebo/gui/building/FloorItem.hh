@@ -21,14 +21,12 @@
 #include <vector>
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/building/RectItem.hh"
-#include "gazebo/gui/building/BuildingItem.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
-    class BuildingItem;
     class WallSegmentItem;
 
     /// \addtogroup gazebo_gui
@@ -36,8 +34,7 @@ namespace gazebo
 
     /// \class FloorItem FloorItem.hh
     /// \brief 2D representation of a floor.
-    class GZ_GUI_VISIBLE FloorItem :
-      public RectItem, public BuildingItem
+    class GZ_GUI_VISIBLE FloorItem : public RectItem
     {
       Q_OBJECT
 
