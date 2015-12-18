@@ -86,7 +86,7 @@ release will remove the deprecated code.
     + ***Replacement:*** public: void AddPoint(const ignition::math::Vector3d &_pt,const common::Color &_color = common::Color::White);
     + ***Deprecation:*** public: void SetPoint(unsigned int _index, const math::Vector3 &_value)
     + ***Replacement:*** public: void SetPoint(unsigned int _index,const ignition::math::Vector3d &_value);
-    + ***Deprecation:***  public: math::Vector3 GetPoint(unsigned int _index) const
+    + ***Deprecation:*** public: math::Vector3 GetPoint(unsigned int _index) const
     + ***Replacement:*** public: ignition::math::Vector3d Point(const unsigned int _index) const;
 
 1. **gazebo/util/Diagnostics.hh**
