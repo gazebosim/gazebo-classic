@@ -57,6 +57,7 @@ namespace Ogre
   class Viewport;
   class SceneNode;
   class AnimationState;
+  class Matrix4;
 }
 
 namespace gazebo
@@ -91,12 +92,49 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~Camera();
 
-      /// \brief Load the camera with a set of parmeters
+      /// \brief Load the camera with a set of parameters
       /// \param[in] _sdf The SDF camera info
       public: virtual void Load(sdf::ElementPtr _sdf);
 
-      /// \brief Load the camera with default parmeters
+      /// \brief Load the camera with default parameters
       public: virtual void Load();
+
+      /// \brief Load the camera intrinsics parameters from the sdf
+      public: virtual void LoadCameraIntrinsics();
+
+      /// \brief 
+      /// \param[in] _left Left vertical clipping plane
+      /// \param[in] _right Right vertical clipping plane
+      /// \param[in] _bottom Bottom horizontal clipping plane
+      /// \param[in] _top Top horizontal clipping plane
+      /// \param[in] _near Distance to the nearer depth clipping plane (this value is negative if the plane is to be behind the camera)
+      /// \param[in] _far Distance to the farther depth clipping plane (this value is negative if the plane is to be behind the camera)
+      /// \return Ogre NDC (Normalized Device Coordinates) 4x4 homogeneous matrix
+      public: Ogre::Matrix4 BuildNormalizedDeviceCoordinatesMatrix(double _left, double _right, double _bottom, double _top, double _near, double _far);
+
+      /// \brief 
+      /// \param[in] _intrinsicsFx Horizontal focal length (in pixels)
+      /// \param[in] _intrinsicsFy Vertical focal length (in pixels)
+      /// \param[in] _intrinsicsCx X coordinate of the principal point (in pixels)
+      /// \param[in] _intrinsicsCy Y coordinate of the principal point (in pixels)
+      /// \param[in] _intrinsicsS Skew coefficient defining the angle between the x and y pixel axes
+      /// \param[in] _clipNear Distance to the nearer depth clipping plane (this value is negative if the plane is to be behind the camera)
+      /// \param[in] _clipFar Distance to the farther depth clipping plane (this value is negative if the plane is to be behind the camera)
+      /// \return Ogre 4x4 homogeneous perspective matrix
+      public: Ogre::Matrix4 BuildPerspectiveMatrix(double _intrinsicsFx, double _intrinsicsFy, double _intrinsicsCx, double _intrinsicsCy, double _intrinsicsS, double _clipNear, double _clipFar);
+
+      /// \brief 
+      /// \param[in] _imageWidth Image width (in pixels)
+      /// \param[in] _imageHeight Image height (in pixels)
+      /// \param[in] _intrinsicsFx Horizontal focal length (in pixels)
+      /// \param[in] _intrinsicsFy Vertical focal length (in pixels)
+      /// \param[in] _intrinsicsCx X coordinate of the principal point (in pixels)
+      /// \param[in] _intrinsicsCy Y coordinate of the principal point (in pixels)
+      /// \param[in] _intrinsicsS Skew coefficient defining the angle between the x and y pixel axes
+      /// \param[in] _clipNear Distance to the nearer depth clipping plane (this value is negative if the plane is to be behind the camera)
+      /// \param[in] _clipFar Distance to the farther depth clipping plane (this value is negative if the plane is to be behind the camera)
+      /// \return Ogre 4x4 homogeneous projective matrix
+      public: Ogre::Matrix4 BuildProjectiveMatrix(double _imageWidth, double _imageHeight, double _intrinsicsFx, double _intrinsicsFy, double _intrinsicsCx, double _intrinsicsCy, double _intrinsicsS, double _clipNear, double _clipFar);
 
       /// \brief Initialize the camera
       public: virtual void Init();
@@ -791,6 +829,12 @@ namespace gazebo
 
       /// \brief The OGRE camera
       protected: Ogre::Camera *camera;
+
+      /// \brief Camera projective matrix
+      protected: Ogre::Matrix4 cameraProjectiveMatrix;
+
+      /// \brief Flag for signaling the usage of camera intrinsics within OGRE
+      protected: bool cameraUsingIntrinsics;
 
       /// \brief Viewport the ogre camera uses.
       protected: Ogre::Viewport *viewport;
