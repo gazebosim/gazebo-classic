@@ -58,6 +58,9 @@
    Use tinyxml2 for playback.
     * [Pull request #1931](https://bitbucket.org/osrf/gazebo/pull-request/1931)
 
+1. Improve SVG import. Added support for transforms in paths.
+    * [Pull request #1981](https://bitbucket.org/osrf/gazebo/pull-request/1981)
+
 1. Enter time during log playback
     * [Pull request #2000](https://bitbucket.org/osrf/gazebo/pull-request/2000)
 
@@ -249,8 +252,14 @@ using the same arguments used in the command line.
 
 1. Building editor updates
 
+    1. PIMPLize LevelWidget class
+        * [Pull request #2041](https://bitbucket.org/osrf/gazebo/pull-request/2041)
+
     1. Removed unused class: BuildingItem
         * [Pull request #2045](https://bitbucket.org/osrf/gazebo/pull-request/2045)
+
+    1. PIMPLize gui/building/BuildingModelManip, move attachment logic to BuildingMaker
+        * [Pull request #2046](https://bitbucket.org/osrf/gazebo/pull-request/2046)
 
 ## Gazebo 6.0
 
