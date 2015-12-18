@@ -28,9 +28,6 @@ namespace gazebo
     // Forward declare private data class.
     class CollisionPrivate;
 
-    // Forward declare protected data class.
-    class CollisionProtected;
-
     /// \addtogroup gazebo_physics
     /// \{
 
@@ -295,11 +292,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Protected data pointer
-      protected: std::shared_ptr<CollisionProtected> collDPtr;
-
-      /// \internal
-      /// \brief Private data pointer
-      private: std::unique_ptr<CollisionPrivate> dataPtr;
+      protected: CollisionPrivate *collDPtr;
     };
     /// \}
   }

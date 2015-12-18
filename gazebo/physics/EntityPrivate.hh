@@ -27,8 +27,8 @@ namespace gazebo
   namespace physics
   {
     /// \internal
-    /// \brief Entity protected data.
-    class EntityProtected : public BaseProtected
+    /// \brief Entity private data.
+    class EntityPrivate : public BasePrivate
     {
       /// \brief A helper that prevents numerous dynamic_casts.
       public: EntityPtr parentEntity;
@@ -68,12 +68,7 @@ namespace gazebo
 
       /// \brief Scale of the entity
       public: ignition::math::Vector3d scale;
-    };
 
-    /// \internal
-    /// \brief Entity protected data.
-    class EntityPrivate
-    {
       /// \brief True if the object is static.
       public: bool isStatic;
 

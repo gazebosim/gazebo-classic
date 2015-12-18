@@ -25,8 +25,8 @@ namespace gazebo
   namespace physics
   {
     /// \internal
-    /// \brief Base protected data.
-    class BaseProtected
+    /// \brief Base private data.
+    class BasePrivate
     {
       /// \brief Compute the scoped name of this object based on its
       /// parents.
@@ -44,12 +44,7 @@ namespace gazebo
 
       /// \brief Pointer to the world.
       public: WorldPtr world;
-    };
 
-    /// \internal
-    /// \brief Base private data.
-    class BasePrivate : public BaseProtected
-    {
       /// \brief Set to true if the object should be saved.
       public: bool saveable;
 

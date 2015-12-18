@@ -20,10 +20,6 @@
   #include <Winsock2.h>
 #endif
 
-#include <boost/bind.hpp>
-#include <boost/function.hpp>
-#include <boost/thread/recursive_mutex.hpp>
-
 #include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/common/Assert.hh"
@@ -50,8 +46,7 @@ using namespace physics;
 //////////////////////////////////////////////////
 Entity::Entity(BasePtr _parent)
 : Base(*new EntityProtected, _parent),
-  entityDPtr(std::static_pointer_cast<EntityProtected>(this->baseDPtr),
-  dataPtr(new EntityPrivate)
+  entityDPtr(static_pointer<EntityPrivate>(this->baseDPtr)
 {
   this->ConstructionHelper();
 }
@@ -59,8 +54,7 @@ Entity::Entity(BasePtr _parent)
 //////////////////////////////////////////////////
 Entity::Entity(EntityProtected &_dataPtr, BasePtr _parent)
 : Base(_dataPtr, _parent),
-  entityDPtr(std::static_pointer_cast<EntityProtected>(this->baseDPtr),
-  dataPtr(new EntityPrivate)
+  entityDPtr(static_pointer<EntityPrivate>(this->baseDPtr),
 {
   this->ConstructionHelper();
 }
@@ -68,33 +62,33 @@ Entity::Entity(EntityProtected &_dataPtr, BasePtr _parent)
 //////////////////////////////////////////////////
 void Entity::ConstructionHelper()
 {
-  this->dataPtr->isCanonicalLink = false;
-  this->dataPtr->node = transport::NodePtr(new transport::Node());
+  this->entityDPtr->isCanonicalLink = false;
+  this->entityDPtr->node = transport::NodePtr(new transport::Node());
   this->AddType(ENTITY);
 
-  this->dataPtr->visualMsg = new msgs::Visual;
-  this->dataPtr->visualMsg->set_id(this->id);
+  this->entityDPtr->visualMsg = new msgs::Visual;
+  this->entityDPtr->visualMsg->set_id(this->id);
 
   if (this->world)
-    this->dataPtr->visualMsg->set_parent_name(this->world->Name());
+    this->entityDPtr->visualMsg->set_parent_name(this->world->Name());
   else
   {
     gzerr << "No world set when constructing an Entity.\n";
-    this->dataPtr->visualMsg->set_parent_name("no_world_name");
+    this->entityDPtr->visualMsg->set_parent_name("no_world_name");
   }
 
   if (this->parent && this->parent->HasType(ENTITY))
   {
-    this->dataPtr->parentEntity =
+    this->entityDPtr->parentEntity =
       std::dynamic_pointer_cast<Entity>(this->parent);
-    this->dataPtr->visualMsg->set_parent_name(
-        this->dataPtr->parentEntity->ScopedName());
-    this->SetStatic(this->dataPtr->parentEntity->IsStatic());
+    this->entityDPtr->visualMsg->set_parent_name(
+        this->entityDPtr->parentEntity->ScopedName());
+    this->SetStatic(this->entityDPtr->parentEntity->IsStatic());
   }
 
   this->setWorldPoseFunc = &Entity::SetWorldPoseDefault;
 
-  this->dataPtr->scale = ignition::math::Vector3d::One;
+  this->entityDPtr->scale = ignition::math::Vector3d::One;
 }
 
 //////////////////////////////////////////////////
@@ -103,67 +97,67 @@ Entity::~Entity()
   // TODO: put this back in
   // this->World()->GetPhysicsEngine()->RemoveEntity(this);
 
-  delete this->dataPtr->visualMsg;
-  this->dataPtr->visualMsg = NULL;
+  delete this->entityDPtr->visualMsg;
+  this->entityDPtr->visualMsg = NULL;
 
-  this->dataPtr->visPub.reset();
-  this->dataPtr->requestPub.reset();
-  this->dataPtr->poseSub.reset();
-  this->dataPtr->node.reset();
+  this->entityDPtr->visPub.reset();
+  this->entityDPtr->requestPub.reset();
+  this->entityDPtr->poseSub.reset();
+  this->entityDPtr->node.reset();
 }
 
 //////////////////////////////////////////////////
 void Entity::Load(sdf::ElementPtr _sdf)
 {
   Base::Load(_sdf);
-  this->dataPtr->node->Init(this->World()->GetName());
+  this->entityDPtr->node->Init(this->World()->GetName());
 
-  this->dataPtr->poseSub = this->dataPtr->node->Subscribe("~/pose/modify",
+  this->entityDPtr->poseSub = this->entityDPtr->node->Subscribe("~/pose/modify",
       &Entity::OnPoseMsg, this);
-  this->dataPtr->visPub =
-    this->dataPtr->node->Advertise<msgs::Visual>("~/visual", 200);
-  this->dataPtr->requestPub =
-    this->dataPtr->node->Advertise<msgs::Request>("~/request");
+  this->entityDPtr->visPub =
+    this->entityDPtr->node->Advertise<msgs::Visual>("~/visual", 200);
+  this->entityDPtr->requestPub =
+    this->entityDPtr->node->Advertise<msgs::Request>("~/request");
 
-  this->dataPtr->visualMsg->set_name(this->ScopedName());
+  this->entityDPtr->visualMsg->set_name(this->ScopedName());
 
   {
-    if (this->parent && this->dataPtr->parentEntity)
+    if (this->parent && this->entityDPtr->parentEntity)
     {
-      this->dataPtr->worldPose =
+      this->entityDPtr->worldPose =
         this->sdf->Get<ignition::math::Pose3d>("pose") +
-        this->dataPtr->parentEntity->worldPose;
+        this->entityDPtr->parentEntity->worldPose;
     }
     else
     {
-      this->dataPtr->worldPose =
+      this->entityDPtr->worldPose =
         this->sdf->Get<ignition::math::Pose3d>("pose");
     }
 
-    this->dataPtr->initialRelativePose =
+    this->entityDPtr->initialRelativePose =
       this->sdf->Get<ignition::math::Pose3d>("pose");
   }
 
   if (this->parent)
   {
-    this->dataPtr->visualMsg->set_parent_name(this->parent->ScopedName());
-    this->dataPtr->visualMsg->set_parent_id(this->parent->Id());
+    this->entityDPtr->visualMsg->set_parent_name(this->parent->ScopedName());
+    this->entityDPtr->visualMsg->set_parent_id(this->parent->Id());
   }
   else
   {
-    this->dataPtr->visualMsg->set_parent_name(this->world->Name());
-    this->dataPtr->visualMsg->set_parent_id(0);
+    this->entityDPtr->visualMsg->set_parent_name(this->world->Name());
+    this->entityDPtr->visualMsg->set_parent_id(0);
   }
-  msgs::Set(this->dataPtr->visualMsg->mutable_pose(), this->RelativePose());
+  msgs::Set(this->entityDPtr->visualMsg->mutable_pose(), this->RelativePose());
 
   if (this->HasType(Base::MODEL))
-    this->dataPtr->visualMsg->set_type(msgs::Visual::MODEL);
+    this->entityDPtr->visualMsg->set_type(msgs::Visual::MODEL);
   if (this->HasType(Base::LINK))
-    this->dataPtr->visualMsg->set_type(msgs::Visual::LINK);
+    this->entityDPtr->visualMsg->set_type(msgs::Visual::LINK);
   if (this->HasType(Base::COLLISION))
-    this->dataPtr->visualMsg->set_type(msgs::Visual::COLLISION);
+    this->entityDPtr->visualMsg->set_type(msgs::Visual::COLLISION);
 
-  this->dataPtr->visPub->Publish(*this->dataPtr->visualMsg);
+  this->entityDPtr->visPub->Publish(*this->entityDPtr->visualMsg);
 
   if (this->HasType(Base::MODEL))
     this->setWorldPoseFunc = &Entity::SetWorldPoseModel;
@@ -186,7 +180,7 @@ void Entity::SetStatic(const bool &_s)
 {
   Base_V::iterator iter;
 
-  this->dataPtr->isStatic = _s;
+  this->entityDPtr->isStatic = _s;
 
   for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
@@ -199,7 +193,7 @@ void Entity::SetStatic(const bool &_s)
 //////////////////////////////////////////////////
 bool Entity::IsStatic() const
 {
-  return this->dataPtr->isStatic;
+  return this->entityDPtr->isStatic;
 }
 
 //////////////////////////////////////////////////
@@ -211,7 +205,7 @@ void Entity::SetInitialRelativePose(const math::Pose &_p)
 //////////////////////////////////////////////////
 void Entity::SetInitialRelativePose(const ignition::math::Pose3d &_p)
 {
-  this->dataPtr->initialRelativePose = _p;
+  this->entityDPtr->initialRelativePose = _p;
 }
 
 //////////////////////////////////////////////////
@@ -223,7 +217,7 @@ math::Pose Entity::GetInitialRelativePose() const
 //////////////////////////////////////////////////
 ignition::math::Pose3d Entity::InitialRelativePose() const
 {
-  return this->dataPtr->initialRelativePose;
+  return this->entityDPtr->initialRelativePose;
 }
 
 //////////////////////////////////////////////////
@@ -242,44 +236,44 @@ ignition::math::Box Entity::BoundingBox() const
 //////////////////////////////////////////////////
 void Entity::SetCanonicalLink(const bool _value)
 {
-  this->dataPtr->isCanonicalLink = _value;
+  this->entityDPtr->isCanonicalLink = _value;
 }
 
 //////////////////////////////////////////////////
 void Entity::SetAnimation(common::PoseAnimationPtr _anim)
 {
-  this->dataPtr->animationStartPose = this->dataPtr->worldPose;
+  this->entityDPtr->animationStartPose = this->entityDPtr->worldPose;
 
-  this->dataPtr->prevAnimationTime = this->world->GetSimTime();
-  this->dataPtr->anmiation = _anim;
-  this->dataPtr->onAnimationComplete.clear();
-  this->dataPtr->animationConnection = event::Events::ConnectWorldUpdateBegin(
-      boost::bind(&Entity::UpdateAnimation, this, _1));
+  this->entityDPtr->prevAnimationTime = this->world->GetSimTime();
+  this->entityDPtr->anmiation = _anim;
+  this->entityDPtr->onAnimationComplete.clear();
+  this->entityDPtr->animationConnection = event::Events::ConnectWorldUpdateBegin(
+      std::bind(&Entity::UpdateAnimation, this, std::placeholders::_1));
 }
 
 //////////////////////////////////////////////////
 void Entity::SetAnimation(const common::PoseAnimationPtr &_anim,
                           std::function<void()> _onComplete)
 {
-  this->dataPtr->animationStartPose = this->dataPtr->worldPose;
+  this->entityDPtr->animationStartPose = this->entityDPtr->worldPose;
 
-  this->dataPtr->prevAnimationTime = this->world->GetSimTime();
-  this->dataPtr->anmiation = _anim;
-  this->dataPtr->onAnimationComplete = _onComplete;
-  this->dataPtr->animationConnection = event::Events::ConnectWorldUpdateBegin(
-      boost::bind(&Entity::UpdateAnimation, this, _1));
+  this->entityDPtr->prevAnimationTime = this->world->GetSimTime();
+  this->entityDPtr->anmiation = _anim;
+  this->entityDPtr->onAnimationComplete = _onComplete;
+  this->entityDPtr->animationConnection = event::Events::ConnectWorldUpdateBegin(
+      std::bind(&Entity::UpdateAnimation, this, std::placeholders::_1));
 }
 
 //////////////////////////////////////////////////
 void Entity::StopAnimation()
 {
-  this->dataPtr->anmiation.reset();
-  this->dataPtr->onAnimationComplete.clear();
-  if (this->dataPtr->animationConnection)
+  this->entityDPtr->anmiation.reset();
+  this->entityDPtr->onAnimationComplete.clear();
+  if (this->entityDPtr->animationConnection)
   {
     event::Events::DisconnectWorldUpdateBegin(
-        this->dataPtr->animationConnection);
-    this->dataPtr->animationConnection.reset();
+        this->entityDPtr->animationConnection);
+    this->entityDPtr->animationConnection.reset();
   }
 }
 
@@ -307,15 +301,15 @@ ignition::math::Pose3d Entity::RelativePose() const
   // poses. It may simplify pose updating.
   if (this->IsCanonicalLink() || this->HasType(COLLISION))
   {
-    return this->dataPtr->initialRelativePose;
+    return this->entityDPtr->initialRelativePose;
   }
-  else if (this->parent && this->dataPtr->parentEntity)
+  else if (this->parent && this->entityDPtr->parentEntity)
   {
-    return this->dataPtr->worldPose - this->dataPtr->parentEntity->WorldPose();
+    return this->entityDPtr->worldPose - this->entityDPtr->parentEntity->WorldPose();
   }
   else
   {
-    return this->dataPtr->worldPose;
+    return this->entityDPtr->worldPose;
   }
 }
 
@@ -330,10 +324,10 @@ void Entity::SetRelativePose(const math::Pose &_pose, bool _notify,
 void Entity::SetRelativePose(const ignition::math::Pose3d &_pose,
     const bool _notify, const bool _publish)
 {
-  if (this->parent && this->dataPtr->parentEntity)
+  if (this->parent && this->entityDPtr->parentEntity)
   {
     this->SetWorldPose(_pose +
-        this->dataPtr->parentEntity->WorldPose(), _notify, _publish);
+        this->entityDPtr->parentEntity->WorldPose(), _notify, _publish);
   }
   else
   {
@@ -380,11 +374,11 @@ void Entity::SetWorldTwist(const ignition::math::Vector3d &_linear,
 void Entity::SetWorldPoseModel(const ignition:;math::Pose3d &_pose,
     const bool _notify, const bool _publish)
 {
-  ignition::math::Pose3d oldModelWorldPose = this->dataPtr->worldPose;
+  ignition::math::Pose3d oldModelWorldPose = this->entityDPtr->worldPose;
 
   // initialization: (no children?) set own worldPose
-  this->dataPtr->worldPose = _pose;
-  this->dataPtr->worldPose.Correct();
+  this->entityDPtr->worldPose = _pose;
+  this->entityDPtr->worldPose.Correct();
 
   // (OnPoseChange uses GetWorldPose)
   if (_notify)
@@ -452,23 +446,23 @@ void Entity::SetWorldPoseCanonicalLink(
     const ignition::math::Pose3d &_pose, const bool _notify,
     const bool _publish)
 {
-  this->dataPtr->worldPose = _pose;
-  this->dataPtr->worldPose.Correct();
+  this->entityDPtr->worldPose = _pose;
+  this->entityDPtr->worldPose.Correct();
 
   if (_notify)
     this->UpdatePhysicsPose(true);
 
-  if (!this->dataPtr->parentEntity->HasType(MODEL))
+  if (!this->entityDPtr->parentEntity->HasType(MODEL))
   {
     gzerr << "SetWorldPose for Canonical Body [" << this->Name()
-        << "] but parent[" << this->dataPtr->parentEntity->Name()
+        << "] but parent[" << this->entityDPtr->parentEntity->Name()
         << "] is not a MODEL!" << std::endl;
     return;
   }
 
-  EntityPtr parentEnt = this->dataPtr->parentEntity;
+  EntityPtr parentEnt = this->entityDPtr->parentEntity;
   ignition::math::Pose3d relativePose =
-    this->dataPtr->initialRelativePose.Ign();
+    this->entityDPtr->initialRelativePose.Ign();
   ignition::math::Pose3d updatePose = _pose;
 
   // recursively update parent model pose based on new canonical link pose
@@ -484,7 +478,7 @@ void Entity::SetWorldPoseCanonicalLink(
       parentEnt->UpdatePhysicsPose(false);
 
     if (_publish)
-      this->dataPtr->parentEntity->PublishPose();
+      this->entityDPtr->parentEntity->PublishPose();
 
     updatePose = parentEnt->worldPose;
     relativePose = parentEnt->InitialRelativePose();
@@ -511,8 +505,8 @@ void Entity::SetWorldPoseDefault(
     const ignition::math::Pose3d &_pose, const bool _notify,
     const bool /*_publish*/)
 {
-  this->dataPtr->worldPose = _pose;
-  this->dataPtr->worldPose.Correct();
+  this->entityDPtr->worldPose = _pose;
+  this->entityDPtr->worldPose.Correct();
 
   if (_notify)
     this->UpdatePhysicsPose(true);
@@ -558,7 +552,7 @@ void Entity::SetWorldPose(const ignition::math::Pose3d &_pose,
     const bool _notify, const bool _publish)
 {
   {
-    boost::mutex::scoped_lock lock(*this->World()->GetSetWorldPoseMutex());
+    std::lock_guard<std::mutex> lock(*this->World()->SetWorldPoseMutex());
     (*this.*setWorldPoseFunc)(_pose, _notify, _publish);
   }
   if (_publish)
@@ -597,10 +591,10 @@ void Entity::UpdatePhysicsPose(const bool _updateChildren)
       {
         // update collision pose
         //   to model's world pose + it's intial relative pose
-        coll->worldPose.Pos() = this->dataPtr->worldPose.Pos() +
-          this->dataPtr->worldPose.Rot().RotateVector(
+        coll->worldPose.Pos() = this->entityDPtr->worldPose.Pos() +
+          this->entityDPtr->worldPose.Rot().RotateVector(
               coll->initialRelativePose.Pos());
-        coll->worldPose.Rot() = this->dataPtr->worldPose.Rot() *
+        coll->worldPose.Rot() = this->entityDPtr->worldPose.Rot() *
           coll->initialRelativePose.Rot();
         coll->OnPoseChange();
       }
@@ -679,27 +673,27 @@ void Entity::OnPoseMsg(ConstPosePtr &_msg)
 //////////////////////////////////////////////////
 void Entity::Fini()
 {
-  if (this->dataPtr->requestPub)
+  if (this->entityDPtr->requestPub)
   {
     msgs::Request *msg = msgs::CreateRequest("entity_delete",
         this->ScopedName());
-    this->dataPtr->requestPub->Publish(*msg, true);
+    this->entityDPtr->requestPub->Publish(*msg, true);
   }
 
-  this->dataPtr->parentEntity.reset();
+  this->entityDPtr->parentEntity.reset();
   Base::Fini();
 
   this->connections.clear();
-  this->dataPtr->node->Fini();
+  this->entityDPtr->node->Fini();
 }
 
 //////////////////////////////////////////////////
 void Entity::Reset()
 {
   if (this->HasType(Base::MODEL))
-    this->SetWorldPose(this->dataPtr->initialRelativePose);
+    this->SetWorldPose(this->entityDPtr->initialRelativePose);
   else
-    this->SetRelativePose(this->dataPtr->initialRelativePose);
+    this->SetRelativePose(this->entityDPtr->initialRelativePose);
 }
 
 //////////////////////////////////////////////////
@@ -708,8 +702,8 @@ void Entity::UpdateParameters(sdf::ElementPtr _sdf)
   Base::UpdateParameters(_sdf);
 
   ignition::math::Pose3d parentPose;
-  if (this->parent && this->dataPtr->parentEntity)
-    parentPose = this->dataPtr->parentEntity->worldPose;
+  if (this->parent && this->entityDPtr->parentEntity)
+    parentPose = this->entityDPtr->parentEntity->worldPose;
 
   ignition::math::Pose3d newPose = _sdf->Get<ignition::math::Pose3d>("pose");
   if (newPose != this->RelativePose())
@@ -723,26 +717,26 @@ void Entity::UpdateAnimation(const common::UpdateInfo &_info)
 {
   common::PoseKeyFrame kf(0);
 
-  this->dataPtr->anmiation->AddTime(
-      (_info.simTime - this->dataPtr->prevAnimationTime).Double());
-  this->dataPtr->anmiation->GetInterpolatedKeyFrame(kf);
+  this->entityDPtr->anmiation->AddTime(
+      (_info.simTime - this->entityDPtr->prevAnimationTime).Double());
+  this->entityDPtr->anmiation->GetInterpolatedKeyFrame(kf);
 
   ignition::math::Pose3d offset;
   offset.Pos() = kf.Translation();
   offset.Rot() = kf.Rotation();
 
   this->SetWorldPose(offset);
-  this->dataPtr->prevAnimationTime = _info.simTime;
+  this->entityDPtr->prevAnimationTime = _info.simTime;
 
-  if (this->dataPtr->anmiation->GetLength() <=
-      this->dataPtr->anmiation->GetTime())
+  if (this->entityDPtr->anmiation->GetLength() <=
+      this->entityDPtr->anmiation->GetTime())
   {
     event::Events::DisconnectWorldUpdateBegin(
-        this->dataPtr->animationConnection);
-    this->dataPtr->animationConnection.reset();
-    if (this->dataPtr->onAnimationComplete)
+        this->entityDPtr->animationConnection);
+    this->entityDPtr->animationConnection.reset();
+    if (this->entityDPtr->onAnimationComplete)
     {
-      this->dataPtr->onAnimationComplete();
+      this->entityDPtr->onAnimationComplete();
     }
   }
 }
@@ -756,7 +750,7 @@ const math::Pose &Entity::GetDirtyPose() const
 //////////////////////////////////////////////////
 const ignition::math::Pose3d &Entity::DirtyPose() const
 {
-  return this->dataPtr->dirtyPose;
+  return this->entityDPtr->dirtyPose;
 }
 
 //////////////////////////////////////////////////
@@ -768,7 +762,7 @@ math::Box Entity::GetCollisionBoundingBox() const
 //////////////////////////////////////////////////
 ignition::math::Box Entity::CollisionBoundingBox() const
 {
-  BasePtr base = boost::const_pointer_cast<Base>(shared_from_this());
+  BasePtr base = std::const_pointer_cast<Base>(shared_from_this());
   return this->CollisionBoundingBoxHelper(base);
 }
 
@@ -849,7 +843,7 @@ const math::Pose &Entity::GetWorldPose() const
 //////////////////////////////////////////////////
 const ignition::math::Pose3d &Entity::WorldPose() const
 {
-  return this->dataPtr->worldPose;
+  return this->entityDPtr->worldPose;
 }
 
 //////////////////////////////////////////////////

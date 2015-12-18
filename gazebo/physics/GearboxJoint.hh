@@ -48,7 +48,8 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] _parent Parent link
-      public: GearboxJoint(BasePtr _parent) : T(_parent)
+      public: GearboxJoint(BasePtr _parent)
+              : T(_parent), gearDPtr(new GearboxJointPrivate)
       {
         this->AddType(Base::GEARBOX_JOINT);
       }
@@ -56,6 +57,8 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~GearboxJoint()
       {
+        delete this->gearDPtr;
+        this->gearDPtr = NULL;
       }
 
       // Documentation inherited.
@@ -64,8 +67,7 @@ namespace gazebo
         return 2;
       }
 
-      /// \brief Load joint
-      /// \param[in] _sdf Pointer to SDF element
+      // Documentation inherited.
       public: virtual void Load(sdf::ElementPtr _sdf)
       {
         T::Load(_sdf);
@@ -96,7 +98,7 @@ namespace gazebo
         }
       }
 
-      /// \brief Initialize joint
+      // Documentation inherited.
       protected: virtual void Init()
       {
         T::Init();
@@ -135,7 +137,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Protected data pointer
-      protected: std::unique_ptr<GearboxJointProtected> gearDPtr;
+      protected: GearboxJointPrivate *gearDPtr;
     };
     /// \}
   }

@@ -27,7 +27,7 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
-    /// \class BallJoint BallJoint.hh physics/physics.hh
+    /// \class BallJoint BallJoint.hh gazebo/physics/physics.hh
     /// \brief Base class for a ball joint
     ///
     /// Each physics engine should implement this class.

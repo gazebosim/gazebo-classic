@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PHYSICS_MODEL_PRIVATE_HH_
-#define _GAZEBO_PHYSICS_MODEL_PRIVATE_HH_
+#ifndef _GAZEBO_PHYSICS_ACTORPRIVATE_HH_
+#define _GAZEBO_PHYSICS_ACTORPRIVATE_HH_
 
 #include <map>
 #include <vector>
@@ -52,7 +52,7 @@ namespace gazebo
       public: bool translated;
     };
 
-    class ActorPrivate : public Model
+    class ActorPrivate : public ModelPrivate
     {
       /// \brief Pointer to the actor's mesh.
       public: const common::Mesh *mesh;
@@ -127,9 +127,6 @@ namespace gazebo
 
       /// \brief Where to send bone info.
       public: transport::PublisherPtr bonePosePub;
-
-      /// \brief THe old action.
-      public: std::string oldAction;
     };
   }
 }

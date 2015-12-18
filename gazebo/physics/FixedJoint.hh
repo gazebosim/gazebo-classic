@@ -50,14 +50,13 @@ namespace gazebo
         return 0;
       }
 
-      /// \brief Load joint
-      /// \param[in] _sdf Pointer to SDF element
+      // Documentation inherited.
       public: virtual void Load(sdf::ElementPtr _sdf)
       {
         T::Load(_sdf);
       }
 
-      /// \brief Initialize joint
+      // Documentation inherited.
       protected: virtual void Init()
       {
         T::Init();

@@ -20,7 +20,6 @@
 #include <string>
 #include <vector>
 
-#include <boost/function.hpp>
 #include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/transport/TransportTypes.hh"
@@ -35,18 +34,10 @@
 #include "gazebo/physics/Base.hh"
 #include "gazebo/util/system.hh"
 
-namespace boost
-{
-  class recursive_mutex;
-}
-
 namespace gazebo
 {
   namespace physics
   {
-    // Forward declare protected data class.
-    class EntityProtected;
-
     // Forward declare private data class.
     class EntityPrivate;
 
@@ -436,11 +427,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Private data pointer
-      protected: std::shared_ptr<EntityProtected> entDPtr;
-
-      /// \internal
-      /// \brief Private data pointer
-      private: std::unique_ptr<EntityPrivate> dataPtr;
+      protected: EntityPrivate *dataPtr;
     };
     /// \}
   }

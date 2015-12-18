@@ -46,12 +46,12 @@
 using namespace gazebo;
 using namespace physics;
 
-
 //////////////////////////////////////////////////
 HeightmapShape::HeightmapShape(CollisionPtr _parent)
-    : Shape(_parent)
+: Shape(&new HeightmapShapePrivate, _parent),
+  heightmapShapeDPtr(static_cast<HeightmapShapePrivate*>(this->shapeDPtr))
 {
-  this->vertSize = 0;
+  this->heightmapShapeDPtr = 0;
   this->AddType(Base::HEIGHTMAP_SHAPE);
 }
 
@@ -78,21 +78,21 @@ void HeightmapShape::OnRequest(ConstRequestPtr &_msg)
     std::string *serializedData = response.mutable_serialized_data();
     msg.SerializeToString(serializedData);
 
-    this->responsePub->Publish(response);
+    this->heightmapShapeDptr->responsePudb->Publish(response);
   }
 }
 
 //////////////////////////////////////////////////
 int HeightmapShape::LoadImageAsTerrain(const std::string &_filename)
 {
-  if (this->img.Load(_filename) != 0)
+  if (this->heightmapShapeDPtr->img.Load(_filename) != 0)
   {
     gzerr << "Unable to load an image as a terrain [" << _filename << "]\n";
     return -1;
   }
 
-  this->heightmapData = static_cast<common::HeightmapData*>(&this->img);
-  this->heightmapSize = this->sdf->Get<ignition::math::Vector3d>("size");
+  this->heightmapData = static_cast<common::HeightmapData*>(&this->heightmapShapeDPtr->img);
+  this->heightmapSize = this->hgithmapShapeDptr->sdf->Get<ignition::math::Vector3d>("size");
 
   return 0;
 }
@@ -107,9 +107,9 @@ int HeightmapShape::LoadDEMAsTerrain(const std::string &_filename)
     return -1;
   }
 
-  if (this->sdf->HasElement("size"))
+  if (this->hgithmapShapeDptr->sdf->HasElement("size"))
   {
-    this->heightmapSize = this->sdf->Get<ignition::math::Vector3d>("size");
+    this->heightmapSize = this->hgithmapShapeDptr->sdf->Get<ignition::math::Vector3d>("size");
   }
   else
   {
@@ -188,11 +188,12 @@ void HeightmapShape::Load(sdf::ElementPtr _sdf)
 {
   Base::Load(_sdf);
 
-  std::string filename = common::find_file(this->sdf->Get<std::string>("uri"));
+  std::string filename = common::find_file(
+      this->hgithmapShapeDptr->sdf->Get<std::string>("uri"));
   if (filename.empty())
   {
     gzerr << "Unable to find heightmap[" +
-             this->sdf->Get<std::string>("uri") + "]\n";
+             this->hgithmapShapeDptr->sdf->Get<std::string>("uri") + "]\n";
     return;
   }
 
@@ -203,8 +204,8 @@ void HeightmapShape::Load(sdf::ElementPtr _sdf)
   }
 
   // Check if the geometry of the terrain data matches Ogre constrains
-  if (this->heightmapData->GetWidth() != this->heightmapData->GetHeight() ||
-      !ignition::math::isPowerOfTwo(this->heightmapData->GetWidth() - 1))
+  if (this->heightmapData->Width() != this->heightmapData->Height() ||
+      !ignition::math::isPowerOfTwo(this->heightmapData->Width() - 1))
   {
     gzerr << "Heightmap data size must be square, with a size of 2^n+1\n";
     return;
@@ -214,7 +215,13 @@ void HeightmapShape::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 int HeightmapShape::GetSubSampling() const
 {
-  return this->subSampling;
+  return this->SubSampling();
+}
+
+//////////////////////////////////////////////////
+int HeightmapShape::SubSampling() const
+{
+  return this->heightmapsShapeDptr->subSampling;
 }
 
 //////////////////////////////////////////////////
@@ -225,25 +232,25 @@ void HeightmapShape::Init()
 
   this->requestSub = this->node->Subscribe("~/request",
       &HeightmapShape::OnRequest, this, true);
-  this->responsePub = this->node->Advertise<msgs::Response>("~/response");
+  this->heightmapShapeDptr->responsePudb = this->node->Advertise<msgs::Response>("~/response");
 
-  this->subSampling = 2;
+  this->heightmapsShapeDptr->subSampling = 2;
 
   ignition::math::Vector3d terrainSize = this->Size();
 
   // sampling size along image width and height
-  this->vertSize = (this->heightmapData->GetWidth() * this->subSampling)-1;
-  this->scale.X(terrainSize.X() / this->vertSize);
-  this->scale.Y(terrainSize.Y() / this->vertSize);
+  this->heightmapShapeDPtr = (this->heightmapData->Width() * this->heightmapsShapeDptr->subSampling)-1;
+  this->scale.X(terrainSize.X() / this->heightmapShapeDPtr);
+  this->scale.Y(terrainSize.Y() / this->heightmapShapeDPtr);
 
-  if (ignition::math::equal(this->heightmapData->GetMaxElevation(), 0.0f))
+  if (ignition::math::equal(this->heightmapData->MaxElevation(), 0.0f))
     this->scale.Z(fabs(terrainSize.Z()));
   else
     this->scale.Z(fabs(terrainSize.Z()) /
-                  this->heightmapData->GetMaxElevation());
+                  this->heightmapData->MaxElevation());
 
   // Step 1: Construct the heightmap lookup table
-  this->heightmapData->FillHeightMap(this->subSampling, this->vertSize,
+  this->heightmapData->FillHeightMap(this->heightmapsShapeDptr->subSampling, this->heightmapShapeDPtr,
       this->Size(), this->scale, this->flipY, this->heights);
 }
 
@@ -265,7 +272,13 @@ void HeightmapShape::SetScale(const ignition::math::Vector3d &_scale)
 //////////////////////////////////////////////////
 std::string HeightmapShape::GetURI() const
 {
-  return this->sdf->Get<std::string>("uri");
+  return this->URI();
+}
+
+//////////////////////////////////////////////////
+std::string HeightmapShape::URI() const
+{
+  return this->hgithmapShapeDptr->sdf->Get<std::string>("uri");
 }
 
 //////////////////////////////////////////////////
@@ -289,7 +302,7 @@ math::Vector3 HeightmapShape::GetPos() const
 //////////////////////////////////////////////////
 ignition::math::Vector3d HeightmapShape::Pos() const
 {
-  return this->sdf->Get<ignition::math::Vector3d>("pos");
+  return this->hgithmapShapeDptr->sdf->Get<ignition::math::Vector3d>("pos");
 }
 
 //////////////////////////////////////////////////
@@ -297,21 +310,21 @@ void HeightmapShape::FillMsg(msgs::Geometry &_msg)
 {
   _msg.set_type(msgs::Geometry::HEIGHTMAP);
 
-  _msg.mutable_heightmap()->set_width(this->vertSize);
-  _msg.mutable_heightmap()->set_height(this->vertSize);
+  _msg.mutable_heightmap()->set_width(this->heightmapShapeDPtr);
+  _msg.mutable_heightmap()->set_height(this->heightmapShapeDPtr);
 
-  for (unsigned int y = 0; y < this->vertSize; ++y)
+  for (unsigned int y = 0; y < this->heightmapShapeDPtr; ++y)
   {
-    for (unsigned int x = 0; x < this->vertSize; ++x)
+    for (unsigned int x = 0; x < this->heightmapShapeDPtr; ++x)
     {
-      int index = (this->vertSize - y - 1) * this->vertSize + x;
+      int index = (this->heightmapShapeDPtr - y - 1) * this->heightmapShapeDPtr + x;
       _msg.mutable_heightmap()->add_heights(this->heights[index]);
     }
   }
 
   msgs::Set(_msg.mutable_heightmap()->mutable_size(), this->Size());
   msgs::Set(_msg.mutable_heightmap()->mutable_origin(), this->Pos());
-  _msg.mutable_heightmap()->set_filename(this->img.GetFilename());
+  _msg.mutable_heightmap()->set_filename(this->heightmapShapeDPtr->img.GetFilename());
 }
 
 //////////////////////////////////////////////////
@@ -329,22 +342,34 @@ math::Vector2i HeightmapShape::GetVertexCount() const
 //////////////////////////////////////////////////
 ignition::math::Vector2i HeightmapShape::VertexCount() const
 {
-  return ignition::math::Vector2i(this->vertSize, this->vertSize);
+  return ignition::math::Vector2i(this->heightmapShapeDPtr, this->heightmapShapeDPtr);
 }
 
 /////////////////////////////////////////////////
 float HeightmapShape::GetHeight(int _x, int _y) const
 {
+  return this->Height(_x, _y);
+}
+
+/////////////////////////////////////////////////
+float HeightmapShape::Height(const int _x, const int _y) const
+{
   if (_x < 0 || _y < 0)
     return 0.0;
 
-  return this->heights[_y * this->vertSize + _x];
+  return this->heights[_y * this->heightmapShapeDPtr + _x];
 }
 
 /////////////////////////////////////////////////
 float HeightmapShape::GetMaxHeight() const
 {
-  float max = GZ_FLT_MIN;
+  return this->MaxHeight();
+}
+
+/////////////////////////////////////////////////
+float HeightmapShape::MaxHeight() const
+{
+  float max = IGN_FLT_MIN;
   for (unsigned int i = 0; i < this->heights.size(); ++i)
   {
     if (this->heights[i] > max)
@@ -357,7 +382,19 @@ float HeightmapShape::GetMaxHeight() const
 /////////////////////////////////////////////////
 float HeightmapShape::GetMinHeight() const
 {
-  float min = GZ_FLT_MAX;
+  return this->MinHeight();
+}
+
+/////////////////////////////////////////////////
+float HeightmapShape::GetMinHeight() const
+{
+  return this->MinHeight();
+}
+
+/////////////////////////////////////////////////
+float HeightmapShape::MinHeight() const
+{
+  float min = IGN_FLT_MAX;
   for (unsigned int i = 0; i < this->heights.size(); ++i)
   {
     if (this->heights[i] < min)
@@ -370,14 +407,20 @@ float HeightmapShape::GetMinHeight() const
 //////////////////////////////////////////////////
 common::Image HeightmapShape::GetImage() const
 {
+  return this->Image();
+}
+
+//////////////////////////////////////////////////
+common::Image HeightmapShape::Image() const
+{
   double height = 0.0;
   unsigned char *imageData = NULL;
 
   /// \todo Support multiple terrain objects
-  double minHeight = this->GetMinHeight();
-  double maxHeight = this->GetMaxHeight() - minHeight;
+  double minHeight = this->MinHeight();
+  double maxHeight = this->MaxHeight() - minHeight;
 
-  int size = (this->vertSize+1) / this->subSampling;
+  int size = (this->heightmapShapeDPtr+1) / this->heightmapsShapeDptr->subSampling;
 
   // Create the image data buffer
   imageData = new unsigned char[size * size];
@@ -387,16 +430,16 @@ common::Image HeightmapShape::GetImage() const
   {
     for (uint16_t x = 0; x < size; ++x)
     {
-      int sx = static_cast<int>(x * this->subSampling);
+      int sx = static_cast<int>(x * this->heightmapsShapeDptr->subSampling);
       int sy;
 
       if (!this->flipY)
-        sy = static_cast<int>(y * this->subSampling);
+        sy = static_cast<int>(y * this->heightmapsShapeDptr->subSampling);
       else
-        sy = static_cast<int>(size - 1 -y) * this->subSampling;
+        sy = static_cast<int>(size - 1 -y) * this->heightmapsShapeDptr->subSampling;
 
       // Normalize height value
-      height = (this->GetHeight(sx, sy) - minHeight) / maxHeight;
+      height = (this->Height(sx, sy) - minHeight) / maxHeight;
 
       GZ_ASSERT(height <= 1.0, "Normalized terrain height > 1.0");
       GZ_ASSERT(height >= 0.0, "Normalized terrain height < 0.0");

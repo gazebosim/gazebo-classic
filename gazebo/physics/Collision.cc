@@ -46,9 +46,8 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 Collision::Collision(LinkPtr _link)
-: Entity(*new CollisionProtected, _link), maxContacts(1),
-  collDPtr(std::static_pointer_cast<CollisionProtected>(this->entityDPtr)),
-  dataPtr(new CollisionPrivate)
+: Entity(*new CollisionPrivate, _link), maxContacts(1),
+  collDPtr(static_cast<CollisionPrivate>(this->entityDPtr))
 {
   this->ConstructionHelper(_link);
 }
@@ -56,8 +55,7 @@ Collision::Collision(LinkPtr _link)
 //////////////////////////////////////////////////
 Collision::Collision(CollisionProtected &_dataPtr, LinkPtr _link)
 : Entity(_dataPtr, _link), maxContacts(1),
-  collDPtr(std::static_pointer_cast<CollisionProtected>(this->entityDPtr)),
-  dataPtr(new CollisionPrivate)
+  collDPtr(static_pointer<CollisionPrivate>(this->entityDPtr))
 {
   this->ConstructionHelper(_link);
 }
@@ -67,13 +65,13 @@ void Collision::ConstructionHelper()
 {
   this->AddType(Base::COLLISION);
 
-  this->link = _link;
+  this->colllDptr->link = _link;
 
-  this->placeable = false;
+  this->collDPtr->placeable = false;
 
   sdf::initFile("collision.sdf", this->sdf);
 
-  this->collisionVisualId = physics::getUniqueId();
+  this->collDPtr->collisionVisualId = physics::getUniqueId();
 }
 
 //////////////////////////////////////////////////
@@ -92,9 +90,9 @@ void Collision::Fini()
   }
 
   Entity::Fini();
-  this->link.reset();
-  this->shape.reset();
-  this->surface.reset();
+  this->colllDptr->link.reset();
+  this->collDptr->shape.reset();
+  this->collDPtr->surface.reset();
 }
 
 //////////////////////////////////////////////////
@@ -102,18 +100,18 @@ void Collision::Load(sdf::ElementPtr _sdf)
 {
   Entity::Load(_sdf);
 
-  this->maxContacts = _sdf->Get<unsigned int>("max_contacts");
-  this->SetMaxContacts(this->maxContacts);
+  this->collDPtr->maxContacts = _sdf->Get<unsigned int>("max_contacts");
+  this->SetMaxContacts(this->collDPtr->maxContacts);
 
   if (this->sdf->HasElement("laser_retro"))
     this->SetLaserRetro(this->sdf->Get<double>("laser_retro"));
 
   this->SetRelativePose(this->sdf->Get<math::Pose>("pose"));
 
-  this->surface->Load(this->sdf->GetElement("surface"));
+  this->collDPtr->surface->Load(this->sdf->GetElement("surface"));
 
-  if (this->shape)
-    this->shape->Load(this->sdf->GetElement("geometry")->GetFirstElement());
+  if (this->collDptr->shape)
+    this->collDptr->shape->Load(this->sdf->GetElement("geometry")->GetFirstElement());
   else
     gzwarn << "No shape has been specified. Error!!!\n";
 }
@@ -121,7 +119,7 @@ void Collision::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Collision::Init()
 {
-  this->shape->Init();
+  this->collDptr->shape->Init();
 
   this->SetRelativePose(
     this->sdf->Get<math::Pose>("pose"));
@@ -130,7 +128,7 @@ void Collision::Init()
 //////////////////////////////////////////////////
 void Collision::SetCollision(const bool _placeable)
 {
-  this->placeable = _placeable;
+  this->collDPtr->placeable = _placeable;
 
   if (this->IsStatic())
   {
@@ -148,7 +146,7 @@ void Collision::SetCollision(const bool _placeable)
 //////////////////////////////////////////////////
 bool Collision::IsPlaceable() const
 {
-  return this->placeable;
+  return this->collDPtr->placeable;
 }
 
 
@@ -156,7 +154,7 @@ bool Collision::IsPlaceable() const
 void Collision::SetLaserRetro(const float _retro)
 {
   this->sdf->GetElement("laser_retro")->Set(_retro);
-  this->laserRetro = _retro;
+  this->collDPtr->laserRetro = _retro;
 }
 
 //////////////////////////////////////////////////
@@ -168,7 +166,7 @@ float Collision::GetLaserRetro() const
 //////////////////////////////////////////////////
 float Collision::LaserRetro() const
 {
-  return this->laserRetro;
+  return this->collDPtr->laserRetro;
 }
 
 //////////////////////////////////////////////////
@@ -180,7 +178,7 @@ LinkPtr Collision::GetLink() const
 //////////////////////////////////////////////////
 LinkPtr Collision::Link() const
 {
-  return this->link;
+  return this->colllDptr->link;
 }
 
 //////////////////////////////////////////////////
@@ -192,7 +190,7 @@ ModelPtr Collision::GetModel() const
 //////////////////////////////////////////////////
 ModelPtr Collision::Model() const
 {
-  return this->link->Model();
+  return this->colllDptr->link->Model();
 }
 
 //////////////////////////////////////////////////
@@ -204,13 +202,13 @@ unsigned int Collision::GetShapeType() const
 //////////////////////////////////////////////////
 unsigned int Collision::ShapeType() const
 {
-  return this->shape->Type();
+  return this->collDptr->shape->Type();
 }
 
 //////////////////////////////////////////////////
 void Collision::SetShape(ShapePtr _shape)
 {
-  this->shape = _shape;
+  this->collDptr->shape = _shape;
 }
 
 //////////////////////////////////////////////////
@@ -223,13 +221,13 @@ ShapePtr Collision::GetShape() const
 ShapePtr Collision::Shape() const
 {
 
-  return this->shape;
+  return this->collDptr->shape;
 }
 
 //////////////////////////////////////////////////
 void Collision::SetScale(const math::Vector3 &_scale)
 {
-  this->shape->SetScale(_scale.Ign());
+  this->collDptr->shape->SetScale(_scale.Ign());
 }
 
 //////////////////////////////////////////////////
@@ -241,8 +239,8 @@ math::Vector3 Collision::GetRelativeLinearVel() const
 //////////////////////////////////////////////////
 math::Vector3 Collision::GetRelativeLinearVel() const
 {
-  if (this->link)
-    return this->link->RelativeLinearVel();
+  if (this->colllDptr->link)
+    return this->colllDptr->link->RelativeLinearVel();
   else
     return ignition::math::Vector3d();
 }
@@ -256,8 +254,8 @@ math::Vector3 Collision::GetWorldLinearVel() const
 //////////////////////////////////////////////////
 math::Vector3 Collision::WorldLinearVel() const
 {
-  if (this->link)
-    return this->link->WorldLinearVel();
+  if (this->colllDptr->link)
+    return this->colllDptr->link->WorldLinearVel();
   else
     return math::Vector3();
 }
@@ -271,8 +269,8 @@ math::Vector3 Collision::GetRelativeAngularVel() const
 //////////////////////////////////////////////////
 math::Vector3 Collision::RelativeAngularVel() const
 {
-  if (this->link)
-    return this->link->RelativeAngularVel();
+  if (this->colllDptr->link)
+    return this->colllDptr->link->RelativeAngularVel();
   else
     return ignition::math::Vector3d();
 }
@@ -286,8 +284,8 @@ math::Vector3 Collision::GetWorldAngularVel() const
 //////////////////////////////////////////////////
 math::Vector3 Collision::WorldAngularVel() const
 {
-  if (this->link)
-    return this->link->WorldAngularVel();
+  if (this->colllDptr->link)
+    return this->colllDptr->link->WorldAngularVel();
   else
     return ignition::math::Vector3d();
 }
@@ -301,8 +299,8 @@ math::Vector3 Collision::GetRelativeLinearAccel() const
 //////////////////////////////////////////////////
 math::Vector3 Collision::RelativeLinearAccel() const
 {
-  if (this->link)
-    return this->link->RelativeLinearAccel();
+  if (this->colllDptr->link)
+    return this->colllDptr->link->RelativeLinearAccel();
   else
     return ignition::math::Vector3d();
 }
@@ -316,8 +314,8 @@ math::Vector3 Collision::GetWorldLinearAccel() const
 //////////////////////////////////////////////////
 math::Vector3 Collision::WorldLinearAccel() const
 {
-  if (this->link)
-    return this->link->WorldLinearAccel();
+  if (this->colllDptr->link)
+    return this->colllDptr->link->WorldLinearAccel();
   else
     return ignition::math::Vector3d();
 }
@@ -331,8 +329,8 @@ math::Vector3 Collision::GetRelativeAngularAccel() const
 //////////////////////////////////////////////////
 math::Vector3 Collision::RelativeAngularAccel() const
 {
-  if (this->link)
-    return this->link->RelativeAngularAccel();
+  if (this->colllDptr->link)
+    return this->colllDptr->link->RelativeAngularAccel();
   else
     return ignition::math::Vector3d();
 }
@@ -346,8 +344,8 @@ math::Vector3 Collision::GetWorldAngularAccel() const
 //////////////////////////////////////////////////
 ignition::math::Vector3d Collision::WorldAngularAccel() const
 {
-  if (this->link)
-    return this->link->WorldAngularAccel();
+  if (this->colllDptr->link)
+    return this->colllDptr->link->WorldAngularAccel();
   else
     return math::Vector3();
 }
@@ -366,8 +364,8 @@ void Collision::FillMsg(msgs::Collision &_msg)
   _msg.set_name(this->GetScopedName());
   _msg.set_laser_retro(this->GetLaserRetro());
 
-  this->shape->FillMsg(*_msg.mutable_geometry());
-  this->surface->FillMsg(*_msg.mutable_surface());
+  this->collDptr->shape->FillMsg(*_msg.mutable_geometry());
+  this->collDPtr->surface->FillMsg(*_msg.mutable_surface());
 
   msgs::Set(this->visualMsg->mutable_pose(), this->GetRelativePose().Ign());
 
@@ -395,20 +393,20 @@ void Collision::ProcessMsg(const msgs::Collision &_msg)
 
   if (_msg.has_pose())
   {
-    this->link->SetEnabled(true);
+    this->colllDptr->link->SetEnabled(true);
     this->SetRelativePose(msgs::ConvertIgn(_msg.pose()));
   }
 
   if (_msg.has_geometry())
   {
-    this->link->SetEnabled(true);
-    this->shape->ProcessMsg(_msg.geometry());
+    this->colllDptr->link->SetEnabled(true);
+    this->collDptr->shape->ProcessMsg(_msg.geometry());
   }
 
   if (_msg.has_surface())
   {
-    this->link->SetEnabled(true);
-    this->surface->ProcessMsg(_msg.surface());
+    this->colllDptr->link->SetEnabled(true);
+    this->collDPtr->surface->ProcessMsg(_msg.surface());
   }
 }
 
@@ -419,7 +417,7 @@ msgs::Visual Collision::CreateCollisionVisual()
   msg.set_name(this->GetScopedName()+"__COLLISION_VISUAL__");
 
   // Put in a unique ID because this is a special visual.
-  msg.set_id(this->collisionVisualId);
+  msg.set_id(this->collDPtr->collisionVisualId);
   msg.set_parent_name(this->parent->GetScopedName());
   msg.set_parent_id(this->parent->GetId());
   msg.set_is_static(this->IsStatic());
@@ -439,13 +437,13 @@ msgs::Visual Collision::CreateCollisionVisual()
 /////////////////////////////////////////////////
 CollisionState Collision::GetState()
 {
-  return this->state;
+  return this->collDPtr->state;
 }
 
 /////////////////////////////////////////////////
 CollisionState Collision::State()
 {
-  return this->state;
+  return this->collDPtr->state;
 }
 
 /////////////////////////////////////////////////
@@ -457,7 +455,7 @@ void Collision::SetState(const CollisionState &_state)
 /////////////////////////////////////////////////
 void Collision::SetMaxContacts(const unsigned int _maxContacts)
 {
-  this->maxContacts = _maxContacts;
+  this->collDPtr->maxContacts = _maxContacts;
   this->sdf->GetElement("max_contacts")->GetValue()->Set(_maxContacts);
 }
 
@@ -470,7 +468,7 @@ unsigned int Collision::GetMaxContacts()
 /////////////////////////////////////////////////
 unsigned int Collision::MaxContacts()
 {
-  return this->maxContacts;
+  return this->collDPtr->maxContacts;
 }
 
 /////////////////////////////////////////////////
@@ -478,11 +476,11 @@ const ignition::math::Pose3d &Collision::WorldPose() const
 {
   // If true, compute a new world pose value.
   //
-  if (this->worldPoseDirty)
+  if (this->collDPtr->worldPoseDirty)
   {
     this->worldPose = this->InitialRelativePose() +
-                      this->link->WorldPose();
-    this->worldPoseDirty = false;
+                      this->colllDptr->link->WorldPose();
+    this->collDPtr->worldPoseDirty = false;
   }
 
   return this->worldPose;
@@ -493,11 +491,11 @@ void Collision::SetWorldPoseDirty()
 {
   // Tell the collision object that the next call to ::WorldPose should
   // compute a new worldPose value.
-  this->worldPoseDirty = true;
+  this->collDPtr->worldPoseDirty = true;
 }
 
 /////////////////////////////////////////////////
 SurfaceParamsPtr Collision::Surface() const
 {
-  return this->surface;
+  return this->collDPtr->surface;
 }

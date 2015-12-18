@@ -23,7 +23,6 @@
   #include <Winsock2.h>
 #endif
 
-#include <boost/enable_shared_from_this.hpp>
 #include <string>
 #include <memory>
 #include <sdf/sdf.hh>
@@ -35,9 +34,6 @@ namespace gazebo
   /// \brief namespace for physics
   namespace physics
   {
-    // Forward declare protected data class.
-    class BaseProtected;
-
     // Forward declare private data class.
     class BasePrivate;
 
@@ -75,7 +71,7 @@ namespace gazebo
 
     /// \class Base Base.hh physics/physics.hh
     /// \brief Base class for most physics classes
-    class GZ_PHYSICS_VISIBLE Base : public boost::enable_shared_from_this<Base>
+    class GZ_PHYSICS_VISIBLE Base : public std::enable_shared_from_this<Base>
     {
       /// \enum EntityType
       /// \brief Unique identifiers for all entity types.
@@ -405,12 +401,8 @@ namespace gazebo
       private: void ConstructionHelper(LinkPtr _Link);
 
       /// \internal
-      /// \brief Data pointer for protected data
-      protected: std::shared_ptr<BaseProtected> baseDPtr;
-
-      /// \internal
       /// \brief Data pointer for private data
-      private: std::unique_ptr<BasePrivate> pdPtr;
+      protected: BasePrivate baseDPtr;
     };
     /// \}
   }

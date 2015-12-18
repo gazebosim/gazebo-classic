@@ -2,7 +2,7 @@ namespace gazebo
 {
   namespace physics
   {
-    class GearboxJointProtected
+    class GearboxJointPrivate
     {
       /// \brief Gearbox gearRatio
       public: double gearRatio = 1.0;

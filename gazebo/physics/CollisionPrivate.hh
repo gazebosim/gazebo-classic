@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PHYSICS_COLLISION_PRIVATE_HH_
-#define _GAZEBO_PHYSICS_COLLISION_PRIVATE_HH_
+#ifndef _GAZEBO_PHYSICS_COLLISIONPRIVATE_HH_
+#define _GAZEBO_PHYSICS_COLLISIONPRIVATE_HH_
 
 #include "gazebo/physics/CollisionState.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
@@ -26,8 +26,8 @@ namespace gazebo
   namespace physics
   {
     /// \internal
-    /// \brief Protected Collision data
-    class CollisionProtected : public EntityProtected
+    /// \brief Private Collision data
+    class CollisionPrivate : public EntityPrivate
     {
       /// \brief The link this collision belongs to
       public: LinkPtr link;
@@ -40,11 +40,7 @@ namespace gazebo
 
       /// \brief The surface parameters.
       public: SurfaceParamsPtr surface;
-    };
 
-    /// \brief Private Link data
-    class CollisionPrivate
-    {
       /// \brief The laser retro value.
       public: float laserRetro;
 

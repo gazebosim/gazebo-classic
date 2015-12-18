@@ -40,7 +40,7 @@ BoxShape::~BoxShape()
 //////////////////////////////////////////////////
 void BoxShape::Init()
 {
-  this->SetSize(this->sdf->Get<ignition::math::Vector3d>("size"));
+  this->SetSize(this->shapeDPtr->sdf->Get<ignition::math::Vector3d>("size"));
 }
 
 //////////////////////////////////////////////////
@@ -52,7 +52,7 @@ void BoxShape::SetSize(const math::Vector3 &_size)
 //////////////////////////////////////////////////
 void BoxShape::SetSize(const ignition::math::Vector3d &_size)
 {
-  this->sdf->GetElement("size")->Set(_size);
+  this->shapeDPtr->sdf->GetElement("size")->Set(_size);
 }
 
 //////////////////////////////////////////////////
@@ -64,7 +64,7 @@ math::Vector3 BoxShape::GetSize() const
 //////////////////////////////////////////////////
 ignition::math::Vector3d BoxShape::Size() const
 {
-  return this->sdf->Get<ignition::math::Vector3d>("size");
+  return this->shapeDPtr->sdf->Get<ignition::math::Vector3d>("size");
 }
 
 //////////////////////////////////////////////////
@@ -84,11 +84,11 @@ void BoxShape::SetScale(const ignition::math::Vector3d &_scale)
 
   this->SetSize((_scale/this->scale) * this->Size());
 
-  this->scale = _scale;
+  this->shapeDptr->scale = _scale;
 }
 
 //////////////////////////////////////////////////
-void BoxShape::FillMsg(msgs::Geometry &_msg)
+void BoxShape::FillMsg(const msgs::Geometry &_msg)
 {
   _msg.set_type(msgs::Geometry::BOX);
   msgs::Set(_msg.mutable_box()->mutable_size(), this->Size());

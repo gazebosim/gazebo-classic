@@ -33,7 +33,7 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
-    /// \class CylinderShape CylinderShape.hh physics/physics.hh
+    /// \class CylinderShape CylinderShape.hh gazebo/physics/physics.hh
     /// \brief Cylinder collision
     class GZ_PHYSICS_VISIBLE CylinderShape : public Shape
     {
@@ -49,24 +49,34 @@ namespace gazebo
 
       /// \brief Set radius.
       /// \param[in} _radius New radius of the cylinder.
-      public: void SetRadius(double _radius);
+      public: void SetRadius(const double _radius);
 
       /// \brief Set length.
       /// \param[in] _length New length of the cylinder.
-      public: void SetLength(double _length);
+      public: void SetLength(const double _length);
 
       /// \brief Get radius.
       /// \return The cylinder radius.
-      public: double GetRadius() const;
+      /// \deprecated See Radius() const
+      public: double GetRadius() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get radius.
+      /// \return The cylinder radius.
+      public: double Radius() const;
 
       /// \brief Get length.
       /// \return The cylinder length.
-      public: double GetLength() const;
+      /// \deprecated See Length()
+      public: double GetLength() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get length.
+      /// \return The cylinder length.
+      public: double Length() const;
 
       /// \brief Set the size of the cylinder.
       /// \param[in] _radius New radius.
       /// \param[in] _lenght New length.
-      public: virtual void SetSize(double _radius, double _length);
+      public: virtual void SetSize(const double _radius, const double _length);
 
       // Documentation inherited
       public: virtual void SetScale(const math::Vector3 &_scale)
@@ -77,7 +87,7 @@ namespace gazebo
 
       /// \brief Fill in the values for a geomertry message.
       /// \param[out] _msg The geometry message to fill.
-      public: void FillMsg(msgs::Geometry &_msg);
+      public: void FillMsg(const msgs::Geometry &_msg);
 
       /// \brief Update values based on a message.
       /// \param[in] _msg Message to update from.

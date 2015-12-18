@@ -66,7 +66,12 @@ namespace gazebo
 
       /// \brief Get the URI of the heightmap image.
       /// \return The heightmap image URI.
-      public: std::string GetURI() const;
+      /// \deprecate See URI() const
+      public: std::string GetURI() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the URI of the heightmap image.
+      /// \return The heightmap image URI.
+      public: std::string URI() const;
 
       /// \brief Get the size in meters.
       /// \return The size in meters.
@@ -103,10 +108,17 @@ namespace gazebo
       /// \param[in] _x X position.
       /// \param[in] _y Y position.
       /// \return The height at a the specified location.
-      public: float GetHeight(int _x, int _y) const;
+      /// \deprecated See Height(const int, const int) const
+      public: float GetHeight(int _x, int _y) const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get a height at a position.
+      /// \param[in] _x X position.
+      /// \param[in] _y Y position.
+      /// \return The height at a the specified location.
+      public: float Height(const int _x, const int _y) const;
 
       /// \brief Fill a geometry message with this shape's data.
-      /// \param[in] _msg Message to fill.
+      /// \param[out] _msg Message to fill.
       public: void FillMsg(msgs::Geometry &_msg);
 
       /// \brief Update the heightmap from a message.
@@ -118,20 +130,42 @@ namespace gazebo
 
       /// \brief Get the maximum height.
       /// \return The maximum height.
-      public: float GetMaxHeight() const;
+      /// \deprecated See MaxHeight() const
+      public: float GetMaxHeight() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the maximum height.
+      /// \return The maximum height.
+      public: float MaxHeight() const;
 
       /// \brief Get the minimum height.
       /// \return The minimum height.
-      public: float GetMinHeight() const;
+      /// \deprecated See MinHeight() const
+      public: float GetMinHeight() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the minimum height.
+      /// \return The minimum height.
+      public: float MinHeight() const;
 
       /// \brief Get the amount of subsampling.
       /// \return Amount of subsampling.
-      public: int GetSubSampling() const;
+      /// \deprecated See SubSampling() const
+      public: int GetSubSampling() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the amount of subsampling.
+      /// \return Amount of subsampling.
+      /// \deprecated See SubSampling() const
+      public: int SubSampling() const;
 
       /// \brief Return an image representation of the heightmap.
       /// \return Image where white pixels represents the highest locations,
       /// and black pixels the lowest.
-      public: common::Image GetImage() const;
+      /// \deprecated See Image() const
+      public: common::Image GetImage() const GAZEBO_DEPRCATED(7.0);
+
+      /// \brief Return an image representation of the heightmap.
+      /// \return Image where white pixels represents the highest locations,
+      /// and black pixels the lowest.
+      public: common::Image Image() const;
 
       /// \brief Load a terrain file specified by _filename. The terrain file
       /// format might be an image or a DEM file. libgdal is required to enable
@@ -175,25 +209,9 @@ namespace gazebo
       /// \brief The amount of subsampling. Default is 2.
       protected: int subSampling;
 
-      /// \brief Transportation node.
-      private: transport::NodePtr node;
-
-      /// \brief Subscriber to request messages.
-      private: transport::SubscriberPtr requestSub;
-
-      /// \brief Publisher for request response messages.
-      private: transport::PublisherPtr responsePub;
-
-      /// \brief File format of the heightmap
-      private: std::string fileFormat;
-
-      /// \brief Terrain size
-      private: ignition::math::Vector3d heightmapSize;
-
-      #ifdef HAVE_GDAL
-      /// \brief DEM used to generate the heights.
-      private: common::Dem dem;
-      #endif
+      /// \internal
+      /// \brief Private data pointer.
+      protected:  HeightmapShapePrivate *heightmapShapeDPtr;
     };
     /// \}
   }

@@ -74,7 +74,7 @@ namespace gazebo
 
       /// \brief Fill in the values for a geomertry message.
       /// \param[out] _msg The geometry message to fill.
-      public: void FillMsg(msgs::Geometry &_msg);
+      public: void FillMsg(const msgs::Geometry &_msg);
 
       /// \brief Process a geometry message.
       /// \param[in] _msg The message to set values from.

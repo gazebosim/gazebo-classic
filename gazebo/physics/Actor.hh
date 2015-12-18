@@ -150,7 +150,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Private data pointer.
-      private: std::unique_ptr<ActorPrivate> dataPtr;
+      private: ActorPrivate *dataPtr;
     };
     /// \}
   }
