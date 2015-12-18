@@ -19,6 +19,7 @@
 #define _GAZEBO_GUI_JOINT_INSPECTOR_PRIVATE_HH_
 
 #include <string>
+#include <vector>
 
 #include "gazebo/common/CommonTypes.hh"
 
