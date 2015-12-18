@@ -27,7 +27,7 @@ using namespace gui;
 
 /////////////////////////////////////////////////
 WallSegmentItem::WallSegmentItem(const QPointF &_start, const QPointF &_end,
-    const double _height) : SegmentItem(), BuildingItem()
+    const double _height) : SegmentItem()
 {
   this->editorType = "WallSegment";
 
