@@ -31,8 +31,6 @@ email: projectileman@yahoo.com
 -----------------------------------------------------------------------------
 */
 
-#include "config.h"
-
 #include <math.h>
 #include <float.h>
 #if HAVE_SYS_TYPES_H
