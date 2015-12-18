@@ -14,22 +14,22 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_GUI_TERRAINEDITOR_PRIVATE_HH_
-#define _GAZEBO_GUI_TERRAINEDITOR_PRIVATE_HH_
 
-namespace gazebo
+#ifndef _GAZEBO_GUI_BUILDING_MAKER_TEST_HH_
+#define _GAZEBO_GUI_BUILDING_MAKER_TEST_HH_
+
+#include "gazebo/gui/QTestFixture.hh"
+
+/// \brief A test class for the BuildingMaker class.
+class BuildingMaker_TEST : public QTestFixture
 {
-  namespace gui
-  {
-    class TerrainEditorPalette;
+  Q_OBJECT
 
-    /// \class TerrainEditorPrivate TerrainEditorPrivate.hh
-    /// \brief Private data for the TerrainEditor class.
-    class TerrainEditorPrivate
-    {
-      /// \brief Contains all the terrain editor tools.
-      public: TerrainEditorPalette *terrainPalette;
-    };
-  }
-}
+  /// \brief Constructor
+  public: BuildingMaker_TEST() = default;
+
+  /// \brief Test attaching and detaching manips.
+  private slots: void Attach();
+};
+
 #endif
