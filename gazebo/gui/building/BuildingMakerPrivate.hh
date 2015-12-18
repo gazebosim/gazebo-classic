@@ -27,8 +27,8 @@
 
 #include "gazebo/common/CommonTypes.hh"
 
-#include "gazebo/gui/building/BuildingMaker.hh"
 #include "gazebo/gui/qt.h"
+#include "gazebo/gui/building/BuildingMaker.hh"
 
 #include "gazebo/rendering/RenderTypes.hh"
 
@@ -38,7 +38,6 @@ namespace gazebo
 {
   namespace gui
   {
-    // Forward declare pointers.
     class BuildingModelManip;
     class SaveDialog;
 
