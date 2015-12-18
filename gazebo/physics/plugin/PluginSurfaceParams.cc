@@ -80,9 +80,9 @@ void PluginSurfaceParams::Load(sdf::ElementPtr _sdf)
       {
         gzerr << "Surface friction plugin physics sdf member is"
               << " not defined." << std::endl;
-        this->frictionPyramid.SetMuPrimary(1);
-        this->frictionPyramid.SetMuSecondary(1);
-        this->frictionPyramid.direction1 = math::Vector3(1, 0, 0);
+        this->frictionPyramid->SetMuPrimary(1);
+        this->frictionPyramid->SetMuSecondary(1);
+        this->frictionPyramid->direction1 = math::Vector3(1, 0, 0);
         this->slip1 = 0;
         this->slip2 = 0;
       }
@@ -112,12 +112,12 @@ void PluginSurfaceParams::FillMsg(msgs::Surface &_msg)
 {
   SurfaceParams::FillMsg(_msg);
 
-  _msg.mutable_friction()->set_mu(this->frictionPyramid.GetMuPrimary());
-  _msg.mutable_friction()->set_mu2(this->frictionPyramid.GetMuSecondary());
+  _msg.mutable_friction()->set_mu(this->frictionPyramid->GetMuPrimary());
+  _msg.mutable_friction()->set_mu2(this->frictionPyramid->GetMuSecondary());
   _msg.mutable_friction()->set_slip1(this->slip1);
   _msg.mutable_friction()->set_slip2(this->slip2);
   msgs::Set(_msg.mutable_friction()->mutable_fdir1(),
-            this->frictionPyramid.direction1);
+            this->frictionPyramid->direction1.Ign());
 
   _msg.set_restitution_coefficient(this->bounce);
   _msg.set_bounce_threshold(this->bounceThreshold);
@@ -138,16 +138,16 @@ void PluginSurfaceParams::ProcessMsg(const msgs::Surface &_msg)
   if (_msg.has_friction())
   {
     if (_msg.friction().has_mu())
-      this->frictionPyramid.SetMuPrimary(_msg.friction().mu());
+      this->frictionPyramid->SetMuPrimary(_msg.friction().mu());
     if (_msg.friction().has_mu2())
-      this->frictionPyramid.SetMuSecondary(_msg.friction().mu2());
+      this->frictionPyramid->SetMuSecondary(_msg.friction().mu2());
     if (_msg.friction().has_slip1())
       this->slip1 = _msg.friction().slip1();
     if (_msg.friction().has_slip2())
       this->slip2 = _msg.friction().slip2();
     if (_msg.friction().has_fdir1())
-      this->frictionPyramid.direction1 =
-        msgs::Convert(_msg.friction().fdir1());
+      this->frictionPyramid->direction1 =
+        msgs::ConvertIgn(_msg.friction().fdir1());
   }
 
   if (_msg.has_restitution_coefficient())

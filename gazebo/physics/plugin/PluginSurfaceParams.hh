@@ -104,7 +104,7 @@ namespace gazebo
       /// by fdir1, otherwise a vector constrained to be perpendicular to the
       /// contact normal in the global y-z plane is used.
       /// \sa    http://www.plugin.org/plugin-latest-userguide.html#sec_7_3_7
-      public: FrictionPyramid frictionPyramid;
+      public: FrictionPyramidPtr frictionPyramid;
 
       /// \brief Artificial contact slip in the primary friction direction.
       /// \sa    See dContactSlip1 in
