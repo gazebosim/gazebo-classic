@@ -50,6 +50,10 @@ namespace gazebo
       /// manage the visuals representing the building part.
       public: std::map<std::string, BuildingModelManip *> allItems;
 
+      /// \brief A map of building part names to model manip objects which
+      /// manage the visuals representing the building part.
+      public: std::map<std::string, std::vector<std::string>> attachmentMap;
+
       /// \brief The building model in SDF format.
       public: sdf::SDFPtr modelSDF;
 

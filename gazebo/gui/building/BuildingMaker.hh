@@ -30,19 +30,17 @@
 
 #include "gazebo/gui/qt.h"
 
-#include "gazebo/math/Pose.hh"
-#include "gazebo/math/Vector3.hh"
-
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
+    class BuildingModelManip;
+    class EditorItem;
+
     // Forward declare provate data.
     class BuildingMakerPrivate;
-    // Forward declare pointers.
-    class EditorItem;
 
     /// \addtogroup gazebo_gui
     /// \{
@@ -147,6 +145,7 @@ namespace gazebo
 
       /// \brief Attach a building part to another, this is currently used for
       /// making holes in walls and floors.
+      /// This function doesn't check if the parts exist.
       /// \param[in] _child Name of the child building part
       /// \param[in] _parent Name of the parent building part.
       public: void AttachManip(const std::string &_child,
@@ -154,21 +153,20 @@ namespace gazebo
 
       /// \brief Detach a child building part from its parent.
       /// \param[in] _child Name of the child building part.
-      /// \param[in] _parent Name of the parent building part.
-      public: void DetachManip(const std::string &_child,
-          const std::string &_parent);
+      public: void DetachFromParent(const std::string &_child);
+
+      /// \brief Detach all child building parts from the given manip.
+      /// \param[in] _parent Name of the building part.
+      public: void DetachAllChildren(const std::string &_parent);
+
+      /// \brief Whether the given manip is attached to another manip or not.
+      /// \param[in] _child Name of manip.
+      /// \return True if manip has a parent.
+      public: bool IsAttached(const std::string &_child) const;
 
       /// \brief Detach all child building parts from the given manip.
       /// \param[in] _manip Name of the building part.
-      public: void DetachAllChildren(const std::string &_manip);
-
-      /// \brief Helper method to convert size from editor coordinate system
-      /// to Gazebo coordinate system.
-      /// \param[in] _size Size vector in pixels.
-      /// \return Size in metric units.
-      /// \deprecated See function that returns ignition::math
-      public: static math::Vector3 ConvertSize(const QVector3D &_size)
-           GAZEBO_DEPRECATED(7.0);
+      public: BuildingModelManip *ManipByName(const std::string &_name);
 
       /// \brief Helper method to convert size from editor coordinate system
       /// to Gazebo coordinate system.
@@ -176,30 +174,11 @@ namespace gazebo
       /// \param[in] _depth Depth in pixels.
       /// \param[in] _height Height in pixels.
       /// \return Size in metric units.
-      /// \deprecated See function that returns ignition::math
-      public: static math::Vector3 ConvertSize(double _width, double _depth,
-          double _height) GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Helper method to convert size from editor coordinate system
-      /// to Gazebo coordinate system.
-      /// \param[in] _width Width in pixels.
-      /// \param[in] _depth Depth in pixels.
-      /// \param[in] _height Height in pixels.
-      /// \return Size in metric units.
-      public: static ignition::math::Vector3d ConvertSizeIgn(
+      public: static ignition::math::Vector3d ConvertSize(
           const double _width, const double _depth, const double _height);
 
       /// \brief Helper method to convert pose from editor coordinate system
       /// to Gazebo coordinate system.
-      /// \param[in] _pos Position in pixels.
-      /// \param[in] _rot Rotation in degrees.
-      /// \return Pose with position in metric units and rotation in radians.
-      /// \deprecated See function that returns ignition::math
-      public: static math::Pose ConvertPose(const QVector3D &_pos,
-          const QVector3D &_rot) GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Helper method to convert pose from editor coordinate system
-      /// to Gazebo coordinate system.
       /// \param[in] _x X position in pixels.
       /// \param[in] _y Y position in pixels.
       /// \param[in] _y Z position in pixels.
@@ -207,20 +186,7 @@ namespace gazebo
       /// \param[in] _pitch Pitch rotation in degrees.
       /// \param[in] _yaw Yaw rotation in degrees.
       /// \return Pose with position in metric units and rotation in radians.
-      /// \deprecated See function that returns ignition::math
-      public: static math::Pose ConvertPose(double _x, double _y, double _z,
-          double _roll, double _pitch, double _yaw) GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Helper method to convert pose from editor coordinate system
-      /// to Gazebo coordinate system.
-      /// \param[in] _x X position in pixels.
-      /// \param[in] _y Y position in pixels.
-      /// \param[in] _y Z position in pixels.
-      /// \param[in] _roll Roll rotation in degrees.
-      /// \param[in] _pitch Pitch rotation in degrees.
-      /// \param[in] _yaw Yaw rotation in degrees.
-      /// \return Pose with position in metric units and rotation in radians.
-      public: static ignition::math::Pose3d ConvertPoseIgn(const double _x,
+      public: static ignition::math::Pose3d ConvertPose(const double _x,
           const double _y, const double _z, const double _roll,
           const double _pitch, const double _yaw);
 
