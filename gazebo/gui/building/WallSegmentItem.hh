@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_BUILDING_WALL_SEGMENT_ITEM_HH_
-#define _GAZEBO_BUILDING_WALL_SEGMENT_ITEM_HH_
+#ifndef _GAZEBO_GUI_WALL_SEGMENT_ITEM_HH_
+#define _GAZEBO_GUI_WALL_SEGMENT_ITEM_HH_
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/building/MeasureItem.hh"
@@ -48,7 +48,7 @@ namespace gazebo
           const double _height);
 
       /// \brief Destructor
-      public: ~WallSegmentItem() = default;
+      public: ~WallSegmentItem();
 
       /// \brief Get the height of the wall segment item.
       /// \return Height of the wall segment item in pixels.
@@ -103,7 +103,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Pointer to private data.
-      protected: std::shared_ptr<WallSegmentItemPrivate> dataPtr;
+      private: std::unique_ptr<WallSegmentItemPrivate> dataPtr;
     };
     /// \}
   }

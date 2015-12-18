@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_BUILDING_WALL_SEGMENT_ITEM_PRIVATE_HH_
-#define _GAZEBO_BUILDING_WALL_SEGMENT_ITEM_PRIVATE_HH_
+#ifndef _GAZEBO_GUI_WALL_SEGMENT_ITEM_PRIVATE_HH_
+#define _GAZEBO_GUI_WALL_SEGMENT_ITEM_PRIVATE_HH_
 
 #include "gazebo/gui/building/SegmentItemPrivate.hh"
 
@@ -25,7 +25,7 @@ namespace gazebo
   namespace gui
   {
     /// \brief Private data for the WallSegmentItem class
-    class WallSegmentItemPrivate : public SegmentItemPrivate
+    class WallSegmentItemPrivate
     {
       /// \brief Thickness of the wall segment in the 2d view, in pixels.
       public: double wallThickness;

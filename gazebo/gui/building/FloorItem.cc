@@ -26,13 +26,12 @@ using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-FloorItem::FloorItem(): RectItem(*new FloorItemPrivate),
-    dataPtr(std::static_pointer_cast<FloorItemPrivate>(this->rectDPtr))
+FloorItem::FloorItem(): RectItem(), dataPtr(new FloorItemPrivate())
 {
-  this->dataPtr->editorType = "Floor";
+  this->editorType = "Floor";
 
-  this->dataPtr->level = 0;
-  this->dataPtr->levelBaseHeight = 0;
+  this->level = 0;
+  this->levelBaseHeight = 0;
 
   this->dataPtr->floorWidth = 100;
   this->dataPtr->floorDepth = 100;
@@ -49,6 +48,11 @@ FloorItem::FloorItem(): RectItem(*new FloorItemPrivate),
 }
 
 /////////////////////////////////////////////////
+FloorItem::~FloorItem()
+{
+}
+
+/////////////////////////////////////////////////
 QVector3D FloorItem::GetSize() const
 {
   return QVector3D(this->dataPtr->floorWidth,
@@ -60,7 +64,7 @@ QVector3D FloorItem::GetSize() const
 QVector3D FloorItem::GetScenePosition() const
 {
   return QVector3D(this->dataPtr->floorPos.x(), this->dataPtr->floorPos.y(),
-      this->dataPtr->levelBaseHeight);
+      this->levelBaseHeight);
 }
 
 /////////////////////////////////////////////////
@@ -139,8 +143,8 @@ void FloorItem::Update()
   this->dataPtr->floorPos = QPointF(allWallBound.x()  + allWallBound.width()/2,
       allWallBound.y()+allWallBound.height()/2);
 
-  this->dataPtr->drawingWidth = this->dataPtr->floorWidth;
-  this->dataPtr->drawingHeight = this->dataPtr->floorDepth;
+  this->drawingWidth = this->dataPtr->floorWidth;
+  this->drawingHeight = this->dataPtr->floorDepth;
   this->setPos(this->dataPtr->floorPos);
 
   this->FloorChanged();
@@ -165,21 +169,21 @@ void FloorItem::paint(QPainter *_painter,
   this->ShowHandles(this->isSelected());
 
   QPointF topLeft(
-      this->dataPtr->drawingOriginX - this->dataPtr->drawingWidth/2,
-      this->dataPtr->drawingOriginY - this->dataPtr->drawingHeight/2);
+      this->drawingOriginX - this->drawingWidth/2,
+      this->drawingOriginY - this->drawingHeight/2);
   QPointF topRight(
-      this->dataPtr->drawingOriginX + this->dataPtr->drawingWidth/2,
-      this->dataPtr->drawingOriginY - this->dataPtr->drawingHeight/2);
+      this->drawingOriginX + this->drawingWidth/2,
+      this->drawingOriginY - this->drawingHeight/2);
   QPointF bottomLeft(
-      this->dataPtr->drawingOriginX - this->dataPtr->drawingWidth/2,
-      this->dataPtr->drawingOriginY + this->dataPtr->drawingHeight/2);
+      this->drawingOriginX - this->drawingWidth/2,
+      this->drawingOriginY + this->drawingHeight/2);
   QPointF bottomRight(
-      this->dataPtr->drawingOriginX  + this->dataPtr->drawingWidth/2,
-      this->dataPtr->drawingOriginY + this->dataPtr->drawingHeight/2);
+      this->drawingOriginX  + this->drawingWidth/2,
+      this->drawingOriginY + this->drawingHeight/2);
 
   QPen rectPen;
   rectPen.setStyle(Qt::SolidLine);
-  rectPen.setColor(this->dataPtr->borderColor);
+  rectPen.setColor(this->borderColor);
   _painter->setPen(rectPen);
 
   _painter->drawLine(topLeft, topRight);
@@ -187,8 +191,8 @@ void FloorItem::paint(QPainter *_painter,
   _painter->drawLine(bottomRight, bottomLeft);
   _painter->drawLine(bottomLeft, topLeft);
 
-  this->dataPtr->floorWidth = this->dataPtr->drawingWidth;
-  this->dataPtr->floorDepth = this->dataPtr->drawingHeight;
+  this->dataPtr->floorWidth = this->drawingWidth;
+  this->dataPtr->floorDepth = this->drawingHeight;
   this->dataPtr->floorPos = this->scenePos();
 
 //  QGraphicsPolygonItem::paint(_painter, _option, _widget);
@@ -207,7 +211,7 @@ void FloorItem::FloorChanged()
   emit DepthChanged(this->dataPtr->floorDepth);
   emit HeightChanged(this->dataPtr->floorHeight);
   emit PositionChanged(this->dataPtr->floorPos.x(), this->dataPtr->floorPos.y(),
-      this->dataPtr->levelBaseHeight/* + this->dataPtr->floorElevation*/);
+      this->levelBaseHeight/* + this->dataPtr->floorElevation*/);
 }
 
 /////////////////////////////////////////////////

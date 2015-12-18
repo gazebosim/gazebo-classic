@@ -42,7 +42,7 @@ namespace gazebo
       public: StairsItem();
 
       /// \brief Destructor
-      public: ~StairsItem() = default;
+      public: ~StairsItem();
 
       // Documentation inherited
       public: virtual QVector3D GetSize() const;
@@ -85,7 +85,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Pointer to private data.
-      protected: std::shared_ptr<StairsItemPrivate> dataPtr;
+      private: std::unique_ptr<StairsItemPrivate> dataPtr;
     };
     /// \}
   }

@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_BUILDING_MEASURE_ITEM_HH_
-#define _GAZEBO_BUILDING_MEASURE_ITEM_HH_
+#ifndef _GAZEBO_GUI_MEASURE_ITEM_HH_
+#define _GAZEBO_GUI_MEASURE_ITEM_HH_
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/building/SegmentItem.hh"
@@ -45,7 +45,7 @@ namespace gazebo
       public: MeasureItem(const QPointF &_start, const QPointF &_end);
 
       /// \brief Destructor
-      public: ~MeasureItem() = default;
+      public: ~MeasureItem();
 
       // Documentation inherited
       private: virtual void paint(QPainter *_painter,
@@ -61,7 +61,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Pointer to private data.
-      protected: std::shared_ptr<MeasureItemPrivate> dataPtr;
+      private: std::unique_ptr<MeasureItemPrivate> dataPtr;
     };
     /// \}
   }

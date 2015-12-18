@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_BUILDING_MEASURE_ITEM_PRIVATE_HH_
-#define _GAZEBO_BUILDING_MEASURE_ITEM_PRIVATE_HH_
+#ifndef _GAZEBO_GUI_MEASURE_ITEM_PRIVATE_HH_
+#define _GAZEBO_GUI_MEASURE_ITEM_PRIVATE_HH_
 
 #include "gazebo/gui/building/SegmentItemPrivate.hh"
 
@@ -25,7 +25,7 @@ namespace gazebo
   namespace gui
   {
     /// \brief Private data for the MeasureItem class
-    class MeasureItemPrivate : public SegmentItemPrivate
+    class MeasureItemPrivate
     {
       /// \brief Value measured in meters.
       public: double value;

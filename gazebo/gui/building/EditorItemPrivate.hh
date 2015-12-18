@@ -15,10 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_BUILDING_EDITOR_ITEM_PRIVATE_HH_
-#define _GAZEBO_BUILDING_EDITOR_ITEM_PRIVATE_HH_
-
-#include <string>
+#ifndef _GAZEBO_GUI_EDITOR_ITEM_PRIVATE_HH_
+#define _GAZEBO_GUI_EDITOR_ITEM_PRIVATE_HH_
 
 namespace gazebo
 {
@@ -27,40 +25,6 @@ namespace gazebo
     /// \brief Private data for the EditorItem class
     class EditorItemPrivate
     {
-      /// \brief Z ordering of the rect item when idle (unselected.)
-      public: int zValueIdle;
-
-      /// \brief Z ordering of the rect item when selected.
-      public: int zValueSelected;
-
-      /// \brief Type of editor item.
-      public: std::string editorType;
-
-      /// \brief Name of editor item.
-      public: std::string name;
-
-      /// \brief Level that this item is on.
-      public: int level;
-
-      /// \brief Vertical distance from the building's base to the base of
-      /// the level this editor is in.
-      public: double levelBaseHeight;
-
-      /// \brief Color of the associated 3D visual.
-      public: QColor visual3dColor;
-
-      /// \brief Texture of the associated 3D visual.
-      public: QString visual3dTexture;
-
-      /// \brief Transparency of the associated 3D visual.
-      public: float visual3dTransparency;
-
-      /// \brief Flag to indicate whether this item is currently highlighted or
-      /// not.
-      public: bool highlighted;
-
-      /// \brief Scale for converting from pixel to metric units.
-      public: double itemScale;
     };
   }
 }

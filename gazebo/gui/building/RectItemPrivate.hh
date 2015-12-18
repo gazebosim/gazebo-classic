@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_BUILDING_RECT_ITEM_PRIVATE_HH_
-#define _GAZEBO_BUILDING_RECT_ITEM_PRIVATE_HH_
+#ifndef _GAZEBO_GUI_RECT_ITEM_PRIVATE_HH_
+#define _GAZEBO_GUI_RECT_ITEM_PRIVATE_HH_
 
 #include <vector>
 
@@ -29,43 +29,8 @@ namespace gazebo
   namespace gui
   {
     /// \brief Private data for the RectItem class
-    class RectItemPrivate : public EditorItemPrivate
+    class RectItemPrivate
     {
-      /// \brief Width of rect item in pixels.
-      public: double width;
-
-      /// \brief Height of rect item in pixels.
-      public: double height;
-
-      /// \brief Actual width of rect item drawn in pixels.
-      public: double drawingWidth;
-
-      /// \brief Actual height of rect item drawn in pixels.
-      public: double drawingHeight;
-
-      /// \brief X origin of the rect item in pixels.
-      public: double drawingOriginX;
-
-      /// \brief Y origin of the rect item in pixels.
-      public: double drawingOriginY;
-
-      /// \brief Border color of the rect item.
-      public: QColor borderColor;
-
-      /// \brief Rotation angle of the rect item in degrees.
-      public: double rotationAngle;
-
-      /// \brief Qt action for opening the inspector.
-      public: QAction *openInspectorAct;
-
-      /// \brief Qt action for deleting the item.
-      public: QAction *deleteItemAct;
-
-      /// \brief A vector containing this item's measure items.
-      /// Currently only used for windows and doors, containing one measure
-      /// towards each end of this item's parent wall.
-      public: std::vector<MeasureItem *> measures;
-
       /// \brief Mouse press position in pixel coordinates.
       public: QPointF mousePressPos;
 

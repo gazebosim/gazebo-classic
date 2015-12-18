@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_BUILDING_FLOOR_ITEM_HH_
-#define _GAZEBO_BUILDING_FLOOR_ITEM_HH_
+#ifndef _GAZEBO_GUI_FLOOR_ITEM_HH_
+#define _GAZEBO_GUI_FLOOR_ITEM_HH_
 
 #include <vector>
 #include "gazebo/gui/qt.h"
@@ -43,7 +43,7 @@ namespace gazebo
       public: FloorItem();
 
       /// \brief Destructor
-      public: ~FloorItem() = default;
+      public: ~FloorItem();
 
       // Documentation inherited.
       public: virtual QVector3D GetSize() const;
@@ -90,7 +90,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Pointer to private data.
-      protected: std::shared_ptr<FloorItemPrivate> dataPtr;
+      private: std::unique_ptr<FloorItemPrivate> dataPtr;
     };
     /// \}
   }

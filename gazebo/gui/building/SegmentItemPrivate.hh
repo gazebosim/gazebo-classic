@@ -15,24 +15,16 @@
  *
 */
 
-#ifndef _GAZEBO_BUILDING_SEGMENT_ITEM_PRIVATE_HH_
-#define _GAZEBO_BUILDING_SEGMENT_ITEM_PRIVATE_HH_
-
-#include <vector>
-
-#include "gazebo/gui/building/EditorItemPrivate.hh"
+#ifndef _GAZEBO_GUI_SEGMENT_ITEM_PRIVATE_HH_
+#define _GAZEBO_GUI_SEGMENT_ITEM_PRIVATE_HH_
 
 namespace gazebo
 {
   namespace gui
   {
     /// \brief Private data for the SegmentItem class
-    class SegmentItemPrivate : public EditorItemPrivate
+    class SegmentItemPrivate
     {
-      /// \brief A list of grabber handles for this item. One grabber for each
-      /// endpoint.
-      public: std::vector<GrabberHandle *> grabbers;
-
       /// \brief Segment's start position in pixel coordinates.
       public: QPointF start;
 

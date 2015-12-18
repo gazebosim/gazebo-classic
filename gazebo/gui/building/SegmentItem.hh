@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_BUILDING_SEGMENT_ITEM_HH_
-#define _GAZEBO_BUILDING_SEGMENT_ITEM_HH_
+#ifndef _GAZEBO_GUI_SEGMENT_ITEM_HH_
+#define _GAZEBO_GUI_SEGMENT_ITEM_HH_
 
 #include <vector>
 #include "gazebo/gui/building/EditorItem.hh"
@@ -42,7 +42,7 @@ namespace gazebo
       public: SegmentItem(QGraphicsItem *_parent = 0);
 
       /// \brief Destructor
-      public: ~SegmentItem() = default;
+      public: ~SegmentItem();
 
       /// \brief Set the segment's line.
       /// \param[in] _start Start position of the line in pixel coordinates.
@@ -105,13 +105,6 @@ namespace gazebo
       /// \return Vector of grabber pointers.
       public: std::vector<GrabberHandle *>Grabbers() const;
 
-      /// \internal
-      /// \brief Constructor used by inherited classes
-      /// \param[in] _dataPtr Pointer to inherited class' private data.
-      /// \param[in] _parent Parent graphics item.
-      protected: SegmentItem(SegmentItemPrivate &_dataPtr,
-          QGraphicsItem *_parent = 0);
-
       /// \brief Update item.
       protected: virtual void SegmentUpdated();
 
@@ -120,9 +113,6 @@ namespace gazebo
       /// \param[in] _pos New position.
       protected: void UpdateLinkedGrabbers(GrabberHandle *_grabber,
           const QPointF &_pos);
-
-      /// \brief Initialize this class.
-      private: void Init();
 
       /// \brief Filter Qt events and redirect them to the another item.
       /// \param[in] _watched Item that watches and will handle the event.
@@ -175,9 +165,13 @@ namespace gazebo
       /// \brief Length to snap in meters.
       public: static const double SnapLength;
 
+      /// \brief A list of grabber handles for this item. One grabber for each
+      /// endpoint.
+      protected: std::vector<GrabberHandle *> grabbers;
+
       /// \internal
       /// \brief Pointer to private data.
-      protected: std::shared_ptr<SegmentItemPrivate> segDPtr;
+      private: std::unique_ptr<SegmentItemPrivate> dataPtr;
     };
     /// \}
   }

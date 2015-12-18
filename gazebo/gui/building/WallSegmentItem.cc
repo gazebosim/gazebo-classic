@@ -29,18 +29,17 @@ using namespace gui;
 
 /////////////////////////////////////////////////
 WallSegmentItem::WallSegmentItem(const QPointF &_start, const QPointF &_end,
-    const double _height)
-    : SegmentItem(*new WallSegmentItemPrivate),
-      dataPtr(std::static_pointer_cast<WallSegmentItemPrivate>(this->segDPtr))
+    const double _height) : SegmentItem(),
+      dataPtr(new WallSegmentItemPrivate())
 {
-  this->dataPtr->editorType = "WallSegment";
+  this->editorType = "WallSegment";
 
   this->dataPtr->measure = new MeasureItem(this->GetStartPoint(),
                                   this->GetEndPoint());
   this->dataPtr->measure->setParentItem(this);
   this->SegmentUpdated();
 
-  this->dataPtr->level = 0;
+  this->level = 0;
 
   this->dataPtr->wallThickness = 15;
   this->dataPtr->wallHeight = _height;
@@ -49,8 +48,8 @@ WallSegmentItem::WallSegmentItem(const QPointF &_start, const QPointF &_end,
   this->SetLine(_start, _end);
   this->SetColor(QColor(247, 142, 30));
 
-  this->dataPtr->zValueIdle = 0;
-  this->dataPtr->zValueSelected = 5;
+  this->zValueIdle = 0;
+  this->zValueSelected = 5;
 
   this->setFlag(QGraphicsItem::ItemSendsGeometryChanges);
   this->setAcceptHoverEvents(true);
@@ -71,6 +70,11 @@ WallSegmentItem::WallSegmentItem(const QPointF &_start, const QPointF &_end,
 }
 
 /////////////////////////////////////////////////
+WallSegmentItem::~WallSegmentItem()
+{
+}
+
+/////////////////////////////////////////////////
 double WallSegmentItem::GetHeight() const
 {
   return this->dataPtr->wallHeight;
@@ -88,7 +92,7 @@ WallSegmentItem *WallSegmentItem::Clone() const
   WallSegmentItem *wallSegmentItem = new WallSegmentItem(this->GetStartPoint(),
       this->GetEndPoint(), this->dataPtr->wallHeight);
 
-  wallSegmentItem->SetLevel(this->dataPtr->level);
+  wallSegmentItem->SetLevel(this->level);
   wallSegmentItem->SetThickness(this->dataPtr->wallThickness);
 
   return wallSegmentItem;
@@ -106,7 +110,7 @@ void WallSegmentItem::WallSegmentChanged()
 {
   emit DepthChanged(this->dataPtr->wallThickness);
   emit HeightChanged(this->dataPtr->wallHeight);
-  emit PosZChanged(this->dataPtr->levelBaseHeight);
+  emit PosZChanged(this->levelBaseHeight);
   this->SegmentUpdated();
 }
 
@@ -119,18 +123,18 @@ void WallSegmentItem::UpdateInspector()
 
   this->dataPtr->inspector->SetName(this->GetName());
   this->dataPtr->inspector->SetThickness(
-      this->dataPtr->wallThickness * this->dataPtr->itemScale);
+      this->dataPtr->wallThickness * this->itemScale);
   this->dataPtr->inspector->SetHeight(
-      this->dataPtr->wallHeight * this->dataPtr->itemScale);
-  this->dataPtr->inspector->SetLength(segmentLength * this->dataPtr->itemScale);
-  QPointF startPos = segmentStartPoint * this->dataPtr->itemScale;
+      this->dataPtr->wallHeight * this->itemScale);
+  this->dataPtr->inspector->SetLength(segmentLength * this->itemScale);
+  QPointF startPos = segmentStartPoint * this->itemScale;
   startPos.setY(-startPos.y());
   this->dataPtr->inspector->SetStartPosition(startPos);
-  QPointF endPos = segmentEndPoint * this->dataPtr->itemScale;
+  QPointF endPos = segmentEndPoint * this->itemScale;
   endPos.setY(-endPos.y());
   this->dataPtr->inspector->SetEndPosition(endPos);
-  this->dataPtr->inspector->SetColor(this->dataPtr->visual3dColor);
-  this->dataPtr->inspector->SetTexture(this->dataPtr->visual3dTexture);
+  this->dataPtr->inspector->SetColor(this->visual3dColor);
+  this->dataPtr->inspector->SetTexture(this->visual3dTexture);
 }
 
 /////////////////////////////////////////////////
@@ -151,7 +155,7 @@ void WallSegmentItem::SegmentUpdated()
       QPointF(p2.x()+(d+t)*qCos(angle+M_PI/2.0)-t*qCos(angle+M_PI),
               p2.y()-(d+t)*qSin(angle+M_PI/2.0)+t*qSin(angle+M_PI)));
   this->dataPtr->measure->SetValue(
-      (this->line().length()+2*t)*this->dataPtr->itemScale);
+      (this->line().length()+2*t)*this->itemScale);
 
   // Doors, windows...
   QList<QGraphicsItem *> children = this->childItems();
@@ -213,7 +217,7 @@ void WallSegmentItem::SetHighlighted(bool _highlighted)
   {
     this->ShowHandles(true);
     this->dataPtr->measure->setVisible(true);
-    this->setZValue(this->dataPtr->zValueSelected);
+    this->setZValue(this->zValueSelected);
     this->SetColor(QColor(247, 142, 30));
     this->Set3dTransparency(0.0);
   }
@@ -221,7 +225,7 @@ void WallSegmentItem::SetHighlighted(bool _highlighted)
   {
     this->ShowHandles(false);
     this->dataPtr->measure->setVisible(false);
-    this->setZValue(this->dataPtr->zValueIdle);
+    this->setZValue(this->zValueIdle);
     this->SetColor(Qt::black);
     this->Set3dTransparency(0.4);
   }
@@ -235,14 +239,14 @@ void WallSegmentItem::OnApply()
 
   double segmentLength = this->line().length() + this->dataPtr->wallThickness;
   this->dataPtr->wallThickness =
-      dialog->GetThickness() / this->dataPtr->itemScale;
+      dialog->GetThickness() / this->itemScale;
   this->SetThickness(this->dataPtr->wallThickness);
-  this->dataPtr->wallHeight = dialog->GetHeight() / this->dataPtr->itemScale;
+  this->dataPtr->wallHeight = dialog->GetHeight() / this->itemScale;
   this->Set3dTexture(dialog->GetTexture());
   this->Set3dColor(dialog->GetColor());
   this->WallSegmentChanged();
 
-  double newLength = dialog->GetLength() / this->dataPtr->itemScale;
+  double newLength = dialog->GetLength() / this->itemScale;
 
   // The if statement below limits the change to either the length of
   // the wall segment or its start/end pos.
@@ -257,16 +261,16 @@ void WallSegmentItem::OnApply()
   else
   {
     QPointF newStartPoint =
-        dialog->GetStartPosition() / this->dataPtr->itemScale;
+        dialog->GetStartPosition() / this->itemScale;
     newStartPoint.setY(-newStartPoint.y());
-    QPointF newEndPoint = dialog->GetEndPosition() / this->dataPtr->itemScale;
+    QPointF newEndPoint = dialog->GetEndPosition() / this->itemScale;
     newEndPoint.setY(-newEndPoint.y());
 
     this->SetStartPoint(newStartPoint);
     this->SetEndPoint(newEndPoint);
   }
-  this->UpdateLinkedGrabbers(this->dataPtr->grabbers[0], this->GetStartPoint());
-  this->UpdateLinkedGrabbers(this->dataPtr->grabbers[1], this->GetEndPoint());
+  this->UpdateLinkedGrabbers(this->grabbers[0], this->GetStartPoint());
+  this->UpdateLinkedGrabbers(this->grabbers[1], this->GetEndPoint());
   this->update();
   this->UpdateInspector();
 }

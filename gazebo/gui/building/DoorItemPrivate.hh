@@ -15,17 +15,17 @@
  *
 */
 
-#ifndef _GAZEBO_BUILDING_DOOR_ITEM_PRIVATE_HH_
-#define _GAZEBO_BUILDING_DOOR_ITEM_PRIVATE_HH_
-
-#include "gazebo/gui/building/RectItemPrivate.hh"
+#ifndef _GAZEBO_GUI_DOOR_ITEM_PRIVATE_HH_
+#define _GAZEBO_GUI_DOOR_ITEM_PRIVATE_HH_
 
 namespace gazebo
 {
   namespace gui
   {
+    class WindowDoorInspectorDialog;
+
     /// \brief Private data for the DoorItem class
-    class DoorItemPrivate : public RectItemPrivate
+    class DoorItemPrivate
     {
       /// \brief Door depth in pixels
       public: double doorDepth;

@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_BUILDING_DOOR_ITEM_HH_
-#define _GAZEBO_BUILDING_DOOR_ITEM_HH_
+#ifndef _GAZEBO_GUI_DOOR_ITEM_HH_
+#define _GAZEBO_GUI_DOOR_ITEM_HH_
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/building/RectItem.hh"
@@ -43,7 +43,7 @@ namespace gazebo
       public: DoorItem();
 
       /// \brief Destructor
-      public: ~DoorItem() = default;
+      public: ~DoorItem();
 
       // Documentation inherited
       public: virtual QVector3D GetSize() const;
@@ -78,7 +78,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Pointer to private data.
-      protected: std::shared_ptr<DoorItemPrivate> dataPtr;
+      private: std::unique_ptr<DoorItemPrivate> dataPtr;
     };
     /// \}
   }

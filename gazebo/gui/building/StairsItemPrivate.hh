@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_BUILDING_STAIRS_ITEM_PRIVATE_HH_
-#define _GAZEBO_BUILDING_STAIRS_ITEM_PRIVATE_HH_
+#ifndef _GAZEBO_GUI_STAIRS_ITEM_PRIVATE_HH_
+#define _GAZEBO_GUI_STAIRS_ITEM_PRIVATE_HH_
 
 #include "gazebo/gui/building/RectItemPrivate.hh"
 
@@ -25,7 +25,7 @@ namespace gazebo
   namespace gui
   {
     /// \brief Private data for the StairsItem class
-    class StairsItemPrivate : public RectItemPrivate
+    class StairsItemPrivate
     {
       /// \brief Depth of staircase item in pixels.
       public: double stairsDepth;

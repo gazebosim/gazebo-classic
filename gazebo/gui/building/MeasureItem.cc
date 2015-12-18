@@ -28,20 +28,24 @@ using namespace gui;
 
 /////////////////////////////////////////////////
 MeasureItem::MeasureItem(const QPointF &_start, const QPointF &_end)
-    : SegmentItem(*new MeasureItemPrivate),
-      dataPtr(std::static_pointer_cast<MeasureItemPrivate>(this->editorDPtr))
+    : SegmentItem(), dataPtr(new MeasureItemPrivate())
 {
-  this->dataPtr->editorType = "Measure";
+  this->editorType = "Measure";
 
   this->setFlag(QGraphicsItem::ItemSendsGeometryChanges);
   this->setAcceptHoverEvents(true);
 
   this->SetLine(_start, _end);
-  this->dataPtr->zValueSelected = 8;
-  this->setZValue(this->dataPtr->zValueSelected);
+  this->zValueSelected = 8;
+  this->setZValue(this->zValueSelected);
   this->ShowHandles(false);
 
   this->dataPtr->value = 0;
+}
+
+/////////////////////////////////////////////////
+MeasureItem::~MeasureItem()
+{
 }
 
 /////////////////////////////////////////////////

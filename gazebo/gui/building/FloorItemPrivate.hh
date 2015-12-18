@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_BUILDING_FLOOR_ITEM_PRIVATE_HH_
-#define _GAZEBO_BUILDING_FLOOR_ITEM_PRIVATE_HH_
+#ifndef _GAZEBO_GUI_FLOOR_ITEM_PRIVATE_HH_
+#define _GAZEBO_GUI_FLOOR_ITEM_PRIVATE_HH_
 
 #include <vector>
 
@@ -27,7 +27,7 @@ namespace gazebo
   namespace gui
   {
     /// \brief Private data for the FloorItem class
-    class FloorItemPrivate : public RectItemPrivate
+    class FloorItemPrivate
     {
       /// \brief Depth of floor item in pixels.
       public: double floorDepth;

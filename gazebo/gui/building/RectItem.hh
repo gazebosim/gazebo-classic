@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_BUILDING_RECT_ITEM_HH_
-#define _GAZEBO_BUILDING_RECT_ITEM_HH_
+#ifndef _GAZEBO_GUI_RECT_ITEM_HH_
+#define _GAZEBO_GUI_RECT_ITEM_HH_
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/building/WallSegmentItem.hh"
@@ -95,11 +95,6 @@ namespace gazebo
       // Documentation inherited
       public: void SetHighlighted(bool _highlighted);
 
-      /// \internal
-      /// \brief Constructor used by inherited classes
-      /// \param[in] _dataPtr Pointer to inherited class' private data.
-      protected: RectItem(RectItemPrivate &_dataPtr);
-
       /// \brief Helper method for Updating the corner positions of the rect
       /// item.
       protected: void UpdateCornerPositions();
@@ -145,9 +140,6 @@ namespace gazebo
 
       /// \brief Update this item's measures.
       protected: void UpdateMeasures();
-
-      /// \brief Initialize this class.
-      private: void Init();
 
       /// \brief Filter Qt events and redirect them to the rotate handle.
       /// \param[in] _rotateHandle Rotate handle that will handle the event.
@@ -240,9 +232,44 @@ namespace gazebo
       /// \brief Qt callback when the item is being deleted.
       private slots: virtual void OnDeleteItem();
 
+      /// \brief Width of rect item in pixels.
+      protected: double width;
+
+      /// \brief Height of rect item in pixels.
+      protected: double height;
+
+      /// \brief Actual width of rect item drawn in pixels.
+      protected: double drawingWidth;
+
+      /// \brief Actual height of rect item drawn in pixels.
+      protected: double drawingHeight;
+
+      /// \brief X origin of the rect item in pixels.
+      protected: double drawingOriginX;
+
+      /// \brief Y origin of the rect item in pixels.
+      protected: double drawingOriginY;
+
+      /// \brief Border color of the rect item.
+      protected: QColor borderColor;
+
+      /// \brief Rotation angle of the rect item in degrees.
+      protected: double rotationAngle;
+
+      /// \brief Qt action for opening the inspector.
+      protected: QAction *openInspectorAct;
+
+      /// \brief Qt action for deleting the item.
+      protected: QAction *deleteItemAct;
+
+      /// \brief A vector containing this item's measure items.
+      /// Currently only used for windows and doors, containing one measure
+      /// towards each end of this item's parent wall.
+      protected: std::vector<MeasureItem *> measures;
+
       /// \internal
       /// \brief Pointer to private data.
-      protected: std::shared_ptr<RectItemPrivate> rectDPtr;
+      private: std::unique_ptr<RectItemPrivate> dataPtr;
     };
     /// \}
   }
