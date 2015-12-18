@@ -38,7 +38,7 @@ JointForceControl::JointForceControl(const std::string &_name,
 {
   this->dataPtr->name = _name;
   this->dataPtr->forceSpin = new QDoubleSpinBox;
-  this->dataPtr->forceSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
+  this->dataPtr->forceSpin->setRange(-IGN_DBL_MAX, IGN_DBL_MAX);
   this->dataPtr->forceSpin->setSingleStep(0.001);
   this->dataPtr->forceSpin->setDecimals(3);
   this->dataPtr->forceSpin->setValue(0.000);
@@ -75,25 +75,25 @@ JointPIDPosControl::JointPIDPosControl(const std::string &_name,
 {
   this->dataPtr->name = _name;
   this->dataPtr->posSpin = new QDoubleSpinBox;
-  this->dataPtr->posSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
+  this->dataPtr->posSpin->setRange(-IGN_DBL_MAX, IGN_DBL_MAX);
   this->dataPtr->posSpin->setSingleStep(0.001);
   this->dataPtr->posSpin->setDecimals(3);
   this->dataPtr->posSpin->setValue(0.000);
 
   this->dataPtr->pGainSpin = new QDoubleSpinBox;
-  this->dataPtr->pGainSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
+  this->dataPtr->pGainSpin->setRange(-IGN_DBL_MAX, IGN_DBL_MAX);
   this->dataPtr->pGainSpin->setSingleStep(0.01);
   this->dataPtr->pGainSpin->setDecimals(3);
   this->dataPtr->pGainSpin->setValue(1.000);
 
   this->dataPtr->iGainSpin = new QDoubleSpinBox;
-  this->dataPtr->iGainSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
+  this->dataPtr->iGainSpin->setRange(-IGN_DBL_MAX, IGN_DBL_MAX);
   this->dataPtr->iGainSpin->setSingleStep(0.01);
   this->dataPtr->iGainSpin->setDecimals(3);
   this->dataPtr->iGainSpin->setValue(0.100);
 
   this->dataPtr->dGainSpin = new QDoubleSpinBox;
-  this->dataPtr->dGainSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
+  this->dataPtr->dGainSpin->setRange(-IGN_DBL_MAX, IGN_DBL_MAX);
   this->dataPtr->dGainSpin->setSingleStep(0.01);
   this->dataPtr->dGainSpin->setDecimals(3);
   this->dataPtr->dGainSpin->setValue(0.010);
@@ -184,25 +184,25 @@ JointPIDVelControl::JointPIDVelControl(const std::string &_name,
 {
   this->dataPtr->name = _name;
   this->dataPtr->posSpin = new QDoubleSpinBox;
-  this->dataPtr->posSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
+  this->dataPtr->posSpin->setRange(-IGN_DBL_MAX, IGN_DBL_MAX);
   this->dataPtr->posSpin->setSingleStep(0.001);
   this->dataPtr->posSpin->setDecimals(3);
   this->dataPtr->posSpin->setValue(0.000);
 
   this->dataPtr->pGainSpin = new QDoubleSpinBox;
-  this->dataPtr->pGainSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
+  this->dataPtr->pGainSpin->setRange(-IGN_DBL_MAX, IGN_DBL_MAX);
   this->dataPtr->pGainSpin->setSingleStep(0.01);
   this->dataPtr->pGainSpin->setDecimals(3);
   this->dataPtr->pGainSpin->setValue(1.000);
 
   this->dataPtr->iGainSpin = new QDoubleSpinBox;
-  this->dataPtr->iGainSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
+  this->dataPtr->iGainSpin->setRange(-IGN_DBL_MAX, IGN_DBL_MAX);
   this->dataPtr->iGainSpin->setSingleStep(0.01);
   this->dataPtr->iGainSpin->setDecimals(3);
   this->dataPtr->iGainSpin->setValue(0.100);
 
   this->dataPtr->dGainSpin = new QDoubleSpinBox;
-  this->dataPtr->dGainSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
+  this->dataPtr->dGainSpin->setRange(-IGN_DBL_MAX, IGN_DBL_MAX);
   this->dataPtr->dGainSpin->setSingleStep(0.01);
   this->dataPtr->dGainSpin->setDecimals(3);
   this->dataPtr->dGainSpin->setValue(0.010);
