@@ -53,7 +53,7 @@ JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
     std::stringstream axis;
     axis << "axis" << i+1;
     std::string axisStr = axis.str();
-    this->configWidget->SetVector3WidgetValue(axisStr + "::xyz",
+    this->configWidget->SetVector3dWidgetValue(axisStr + "::xyz",
         axisElem->Get<ignition::math::Vector3d>("xyz"));
     this->configWidget->SetDoubleWidgetValue(axisStr + "::limit_lower",
         axisLimitElem->Get<double>("lower"));
