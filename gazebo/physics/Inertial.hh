@@ -146,12 +146,12 @@ namespace gazebo
       /// specified in the Link frame.
       /// \return The inertial pose.
       /// \deprecated See Pose() const
-      public: inline const math::Pose GetPose() const GAZEBO_DEPRECATED(7.0);
+      public: const math::Pose GetPose() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the pose about which the mass and inertia matrix is
       /// specified in the Link frame.
       /// \return The inertial pose.
-      public: inline const ignition::math::Pose3d Pose() const;
+      public: const ignition::math::Pose3d Pose() const;
 
       /// \brief Get the principal moments of inertia (Ixx, Iyy, Izz).
       /// \return The principal moments.

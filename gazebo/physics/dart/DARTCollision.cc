@@ -37,7 +37,7 @@ using namespace physics;
 DARTCollision::DARTCollision(LinkPtr _link)
   : Collision(_link),
     dataPtr(new DARTCollisionPrivate(
-      boost::static_pointer_cast<DARTLink>(this->link)->GetDARTBodyNode()))
+      std::static_pointer_cast<DARTLink>(this->link)->GetDARTBodyNode()))
 
 {
   this->SetName("DART_Collision");

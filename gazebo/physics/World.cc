@@ -1354,7 +1354,7 @@ void World::BuildSceneMsg(msgs::Scene &_scene, BasePtr _entity)
     if (_entity->HasType(Entity::MODEL))
     {
       msgs::Model *modelMsg = _scene.add_model();
-      boost::static_pointer_cast<Model>(_entity)->FillMsg(*modelMsg);
+      std::static_pointer_cast<Model>(_entity)->FillMsg(*modelMsg);
     }
 
     for (unsigned int i = 0; i < _entity->GetChildCount(); ++i)
@@ -1401,7 +1401,7 @@ void World::LoadPlugins()
   {
     if (this->dataPtr->rootElement->GetChild(i)->HasType(Base::MODEL))
     {
-      ModelPtr model = boost::static_pointer_cast<Model>(
+      ModelPtr model = std::static_pointer_cast<Model>(
           this->dataPtr->rootElement->GetChild(i));
       model->LoadPlugins();
     }

@@ -14,14 +14,11 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PHYSICS_ODE_ODELINK_PRIVATE_HH_
-#define _GAZEBO_PHYSICS_ODE_ODELINK_PRIVATE_HH_
+#ifndef _GAZEBO_PHYSICS_ODE_ODEMESHPRIVATE_HH_
+#define _GAZEBO_PHYSICS_ODE_ODEMESHPRIVATE_HH_
 
-#include <ignition/math/Vector3.hh>
-
-#include "gazebo/physics/ode/ode_inc.h"
 #include "gazebo/physics/ode/ODETypes.hh"
-#include "gazebo/physics/LinkPrivate.hh"
+#include "gazebo/physics/ode/ode_inc.h"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -29,23 +26,26 @@ namespace gazebo
   namespace physics
   {
     /// \internal
-    /// \brief ODELink private data
-    class ODELinkPrivate : public LinkProtected
+    /// \brief ODEMesh private data
+    class ODEMeshPrivate
     {
-      /// \brief ODE link handle
-      public: dBodyID linkId;
+      /// \brief Transform matrix.
+      public: dReal transform[32];
 
-      /// \brief Pointer to the ODE Physics engine
-      public: ODEPhysicsPtr odePhysics;
+      /// \brief Transform matrix index.
+      public: int transformIndex;
 
-      /// \brief Collision space id.
-      public: dSpaceID spaceId;
+      /// \brief Array of vertex values.
+      public: float *vertices;
 
-      /// \brief Cache force applied on body
-      public: ignition::math::Vector3d force;
+      /// \brief Array of index values.
+      public: int *indices;
 
-      /// \brief Cache torque applied on body
-      public: ignition::math::Vector3d torque;
+      /// \brief ODE trimesh data.
+      public: dTriMeshDataID odeData;
+
+      /// \brief The collision id that this mesh is attached to.
+      public: dGeomID collisionId;
     };
   }
 }

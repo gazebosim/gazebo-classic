@@ -78,7 +78,8 @@ void Inertial::UpdateParameters(sdf::ElementPtr _sdf)
   this->dataPtr->sdf = _sdf;
 
   // use default pose (identity) if not specified in sdf
-  math::Pose pose = this->dataPtr->sdf->Get<math::Pose>("pose");
+  ignition::math::Pose3d pose =
+    this->dataPtr->sdf->Get<ignition::math::Pose3d>("pose");
   this->SetCoG(pose);
 
   // if (this->dataPtr->sdf->HasElement("inertia"))

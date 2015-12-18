@@ -56,9 +56,9 @@ void SimbodyModel::Init()
        iter!= this->children.end(); ++iter)
   {
     if ((*iter)->HasType(Base::LINK))
-      boost::static_pointer_cast<Link>(*iter)->Init();
+      std::static_pointer_cast<Link>(*iter)->Init();
     else if ((*iter)->HasType(Base::MODEL))
-      boost::static_pointer_cast<SimbodyModel>(*iter)->Init();
+      std::static_pointer_cast<SimbodyModel>(*iter)->Init();
   }
 
   for (unsigned int i = 0; i < this->GetGripperCount(); ++i)
@@ -73,7 +73,7 @@ void SimbodyModel::Init()
       this->GetWorld()->GetPhysicsEngine());
   if (simbodyPhysics)
     simbodyPhysics->InitModel(
-        boost::static_pointer_cast<Model>(shared_from_this()));
+        std::static_pointer_cast<Model>(shared_from_this()));
 
   // Initialize the joints last.
   Joint_V myJoints = this->GetJoints();

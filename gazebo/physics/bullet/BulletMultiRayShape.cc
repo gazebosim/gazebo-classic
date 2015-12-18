@@ -33,7 +33,7 @@ BulletMultiRayShape::BulletMultiRayShape(CollisionPtr _parent)
 : MultiRayShape(_parent)
 {
   this->SetName("Bullet Multiray Shape");
-  this->physicsEngine = boost::static_pointer_cast<BulletPhysics>(
+  this->physicsEngine = std::static_pointer_cast<BulletPhysics>(
       this->collisionParent->GetWorld()->GetPhysicsEngine());
 }
 

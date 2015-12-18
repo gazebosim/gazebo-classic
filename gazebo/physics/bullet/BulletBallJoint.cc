@@ -57,9 +57,9 @@ void BulletBallJoint::Init()
 
   // Cast to BulletLink
   BulletLinkPtr bulletChildLink =
-    boost::static_pointer_cast<BulletLink>(this->childLink);
+    std::static_pointer_cast<BulletLink>(this->childLink);
   BulletLinkPtr bulletParentLink =
-    boost::static_pointer_cast<BulletLink>(this->parentLink);
+    std::static_pointer_cast<BulletLink>(this->parentLink);
 
   // Local variables used to compute pivots and axes in body-fixed frames
   // for the parent and child links.

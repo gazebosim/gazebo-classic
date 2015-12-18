@@ -54,9 +54,9 @@ void BulletFixedJoint::Init()
 
   // Cast to BulletLink
   BulletLinkPtr bulletChildLink =
-      boost::static_pointer_cast<BulletLink>(this->childLink);
+      std::static_pointer_cast<BulletLink>(this->childLink);
   BulletLinkPtr bulletParentLink =
-      boost::static_pointer_cast<BulletLink>(this->parentLink);
+      std::static_pointer_cast<BulletLink>(this->parentLink);
 
   // Get axis unit vector (expressed in world frame).
   math::Vector3 axis = math::Vector3::UnitZ;

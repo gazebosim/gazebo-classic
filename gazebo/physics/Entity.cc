@@ -368,7 +368,7 @@ void Entity::SetWorldTwist(const ignition::math::Vector3d &_linear,
       {
         if ((*iter)->HasType(ENTITY))
         {
-          EntityPtr entity = boost::static_pointer_cast<Entity>(*iter);
+          EntityPtr entity = std::static_pointer_cast<Entity>(*iter);
           entity->SetWorldTwist(_linear, _angular, _updateChildren);
         }
       }
@@ -402,7 +402,7 @@ void Entity::SetWorldPoseModel(const ignition:;math::Pose3d &_pose,
   {
     if ((*iter)->HasType(ENTITY))
     {
-      EntityPtr entity = boost::static_pointer_cast<Entity>(*iter);
+      EntityPtr entity = std::static_pointer_cast<Entity>(*iter);
 
       if (entity->HasType(LINK))
       {
@@ -427,7 +427,7 @@ void Entity::SetWorldPoseModel(const ignition:;math::Pose3d &_pose,
           if ((*iterC)->HasType(COLLISION))
           {
             CollisionPtr entityC =
-                boost::static_pointer_cast<Collision>(*iterC);
+                std::static_pointer_cast<Collision>(*iterC);
             entityC->SetWorldPoseDirty();
           }
         }
@@ -500,7 +500,7 @@ void Entity::SetWorldPoseCanonicalLink(
   {
     if ((*iterC)->HasType(COLLISION))
     {
-      CollisionPtr entityC = boost::static_pointer_cast<Collision>(*iterC);
+      CollisionPtr entityC = std::static_pointer_cast<Collision>(*iterC);
       entityC->SetWorldPoseDirty();
     }
   }
@@ -579,7 +579,7 @@ void Entity::UpdatePhysicsPose(const bool _updateChildren)
       if ((*iter)->HasType(LINK))
       {
         // call child Link::OnPoseChange()
-        boost::static_pointer_cast<Link>(*iter)->OnPoseChange();
+        std::static_pointer_cast<Link>(*iter)->OnPoseChange();
       }
     }
   }
@@ -592,7 +592,7 @@ void Entity::UpdatePhysicsPose(const bool _updateChildren)
     for (Base_V::iterator iter = this->children.begin();
          iter != this->children.end(); ++iter)
     {
-      CollisionPtr coll = boost::static_pointer_cast<Collision>(*iter);
+      CollisionPtr coll = std::static_pointer_cast<Collision>(*iter);
       if (coll && (*iter)->HasType(COLLISION))
       {
         // update collision pose

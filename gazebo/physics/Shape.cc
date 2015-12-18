@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
@@ -37,8 +36,6 @@ Shape::Shape(CollisionPtr _p)
 
   if (_p)
     this->collisionParent = _p;
-
-  this->scale = math::Vector3::One;
 }
 
 //////////////////////////////////////////////////
@@ -50,6 +47,12 @@ Shape::~Shape()
 
 //////////////////////////////////////////////////
 math::Vector3 Shape::GetScale() const
+{
+  return this->Scale();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d Shape::Scale() const
 {
   return this->scale;
 }
@@ -65,6 +68,13 @@ double Shape::ComputeVolume() const
   gzwarn << "ComputeVolume not fully implemented for this shape type, returning"
          << " bounding box approximation" << std::endl;
 
-  math::Vector3 size = this->collisionParent->GetBoundingBox().GetSize();
-  return size.x * size.y * size.z;
+  ignition::math::Vector3d size =
+    this->collisionParent->GetBoundingBox().GetSize();
+  return size.X() * size.Y() * size.Z();
+}
+
+//////////////////////////////////////////////////
+void Shape::SetScale(const math::Vector3 &_scale)
+{
+  this->SetScale(_scale.Ign());
 }

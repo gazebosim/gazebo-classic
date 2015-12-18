@@ -57,6 +57,6 @@ void DARTPolylineShape::Init()
   }
 
   this->dataPtr->dartMesh->Init(this->mesh,
-      boost::static_pointer_cast<DARTCollision>(this->collisionParent),
+      std::static_pointer_cast<DARTCollision>(this->collisionParent),
       math::Vector3(1, 1, 1));
 }

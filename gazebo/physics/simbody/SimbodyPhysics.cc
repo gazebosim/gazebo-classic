@@ -682,7 +682,7 @@ void SimbodyPhysics::UpdatePhysics()
         simbodyLink->masterMobod.getBodyTransform(s));
       simbodyLink->SetDirtyPose(pose);
       this->world->dataPtr->dirtyPoses.push_back(
-        boost::static_pointer_cast<Entity>(*lx).get());
+        std::static_pointer_cast<Entity>(*lx).get());
     }
 
     physics::Joint_V joints = (*mi)->GetJoints();

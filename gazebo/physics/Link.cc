@@ -278,7 +278,7 @@ void Link::Init()
   {
     if ((*iter)->HasType(Base::COLLISION))
     {
-      CollisionPtr collision = boost::static_pointer_cast<Collision>(*iter);
+      CollisionPtr collision = std::static_pointer_cast<Collision>(*iter);
       this->dataPtr->collisions.push_back(collision);
       collision->Init();
     }
@@ -625,7 +625,7 @@ void Link::LoadCollision(sdf::ElementPtr _sdf)
     this->SetStatic(true);
 
   collision = this->GetWorld()->GetPhysicsEngine()->CreateCollision(geomType,
-      boost::static_pointer_cast<Link>(shared_from_this()));
+      std::static_pointer_cast<Link>(shared_from_this()));
 
   if (!collision)
     gzthrow("Unknown Collisionetry Type[" + geomType + "]");
@@ -691,7 +691,7 @@ CollisionPtr Link::Collision(const unsigned int _index) const
 {
   CollisionPtr collision;
   if (_index <= this->GetChildCount())
-    collision = boost::static_pointer_cast<Collision>(this->GetChild(_index));
+    collision = std::static_pointer_cast<Collision>(this->GetChild(_index));
   else
     gzerr << "Index is out of range\n";
 
@@ -1007,7 +1007,7 @@ void Link::FillMsg(msgs::Link &_msg)
   {
     if (child->HasType(Base::COLLISION))
     {
-      CollisionPtr collision = boost::static_pointer_cast<Collision>(child);
+      CollisionPtr collision = std::static_pointer_cast<Collision>(child);
       collision->FillMsg(*_msg.add_collision());
     }
   }
@@ -1481,7 +1481,7 @@ void Link::SetScale(const ignition::math::Vector3d &_scale)
   {
     if ((*biter)->HasType(Base::COLLISION))
     {
-      boost::static_pointer_cast<Collision>(*biter)->SetScale(_scale);
+      std::static_pointer_cast<Collision>(*biter)->SetScale(_scale);
     }
   }
 

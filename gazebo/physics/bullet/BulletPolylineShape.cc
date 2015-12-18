@@ -55,6 +55,6 @@ void BulletPolylineShape::Init()
   }
 
   this->bulletMesh->Init(this->mesh,
-      boost::static_pointer_cast<BulletCollision>(this->collisionParent),
+      std::static_pointer_cast<BulletCollision>(this->collisionParent),
       math::Vector3(1, 1, 1));
 }

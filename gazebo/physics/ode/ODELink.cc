@@ -104,7 +104,7 @@ void ODELink::Init()
     {
       if (child->HasType(Base::COLLISION))
       {
-        ODECollisionPtr g = boost::static_pointer_cast<ODECollision>(child);
+        ODECollisionPtr g = std::static_pointer_cast<ODECollision>(child);
         if (g->IsPlaceable() && g->CollisionId())
         {
           dGeomSetBody(g->CollisionId(), this->dataPtr->linkId);
@@ -328,7 +328,7 @@ void ODELink::UpdateCollisionOffsets()
     {
       if (child->HasType(Base::COLLISION))
       {
-        ODECollisionPtr g = boost::static_pointer_cast<ODECollision>(child);
+        ODECollisionPtr g = std::static_pointer_cast<ODECollision>(child);
         if (g->IsPlaceable() && g->CollisionId())
         {
           // update pose immediately
@@ -364,7 +364,7 @@ void ODELink::UpdateSurface()
   {
     if (child->HasType(Base::COLLISION))
     {
-      ODECollisionPtr g = boost::static_pointer_cast<ODECollision>(child);
+      ODECollisionPtr g = std::static_pointer_cast<ODECollision>(child);
       if (g->IsPlaceable() && g->CollisionId())
       {
         // Set max_vel and min_depth
@@ -417,17 +417,17 @@ void ODELink::UpdateMass()
   GZ_ASSERT(this->dataPtr->inertial != NULL, "Inertial pointer is NULL");
 
   // give ODE un-rotated inertia
-  ignition::math::Matrix3d moi = this->dataPtr->inertial->GetMOI(
+  ignition::math::Matrix3d moi = this->dataPtr->inertial->MOI(
     ignition::math::Pose3d(this->dataPtr->inertial->CoG(),
       ignition::math::Quaterniond()));
 
-  ignition::math::Vector3d principals(moi[0][0], moi[1][1], moi[2][2]);
-  ignition::math::Vector3d products(moi[0][1], moi[0][2], moi[1][2]);
+  ignition::math::Vector3d principals(moi(0, 0), moi(1, 1), moi(2, 2));
+  ignition::math::Vector3d products(moi(0, 1), moi(0, 2), moi(1, 2));
 
-  dMassSetParameters(&odeMass, this->dataPtr->inertial->GetMass(),
-      cog.x, cog.y, cog.z,
-      principals.x, principals.y, principals.z,
-      products.x, products.y, products.z);
+  dMassSetParameters(&odeMass, this->dataPtr->inertial->Mass(),
+      cog.X(), cog.Y(), cog.Z(),
+      principals.X(), principals.Y(), principals.Z(),
+      products.X(), products.Y(), products.Z());
 
   dBodySetMass(this->dataPtr->linkId, &odeMass);
 
@@ -462,7 +462,7 @@ ignition::math::Vector3d ODELink::WorldLinearVel(
     GZ_ASSERT(this->dataPtr->inertial != NULL, "Inertial pointer is NULL");
 
     ignition::math::Vector3d offsetFromCoG = _offset -
-      this->dataPtr->inertial->GetCoG();
+      this->dataPtr->inertial->CoG();
 
     dBodyGetRelPointVel(this->dataPtr->linkId,
         offsetFromCoG.X(), offsetFromCoG.Y(), offsetFromCoG.Z(), dvel);
@@ -510,7 +510,7 @@ ignition::math::Vector3d ODELink::WorldLinearVel(
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d ODELink:WorldCoGLinearVel() const
+ignition::math::Vector3d ODELink::WorldCoGLinearVel() const
 {
   ignition::math::Vector3d vel;
 
@@ -678,7 +678,7 @@ void ODELink::AddLinkForce(const ignition::math::Vector3d &_force,
       this->WorldPose().Rot().RotateVector(_force);
     // Does this need to be rotated?
     ignition::math::Vector3d offsetCoG =
-      _offset - this->dataPtr->inertial->GetCoG();
+      _offset - this->dataPtr->inertial->CoG();
 
     this->SetEnabled(true);
     dBodyAddForceAtRelPos(this->dataPtr->linkId,
@@ -724,13 +724,13 @@ void ODELink::AddRelativeTorque(const ignition::math::Vector3d &_torque)
 /////////////////////////////////////////////////
 ignition::math::Vector3d ODELink::WorldForce() const
 {
-  return this->force;
+  return this->dataPtr->force;
 }
 
 //////////////////////////////////////////////////
 ignition::math::Vector3d ODELink::WorldTorque() const
 {
-  return this->torque;
+  return this->dataPtr->torque;
 }
 
 //////////////////////////////////////////////////
@@ -811,7 +811,7 @@ bool ODELink::Kinematic() const
 //////////////////////////////////////////////////
 void ODELink::SetAutoDisable(const bool _disable)
 {
-  if (this->GetModel()->GetJointCount() == 0 && this->dataPtr->linkId)
+  if (this->Model()->JointCount() == 0 && this->dataPtr->linkId)
   {
     dBodySetAutoDisableFlag(this->dataPtr->linkId, _disable);
   }

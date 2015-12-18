@@ -105,7 +105,7 @@ void BulletLink::Init()
     if ((*iter)->HasType(Base::COLLISION))
     {
       BulletCollisionPtr collision;
-      collision = boost::static_pointer_cast<BulletCollision>(*iter);
+      collision = std::static_pointer_cast<BulletCollision>(*iter);
       btCollisionShape *shape = collision->GetCollisionShape();
 
       SurfaceParamsPtr surface = collision->GetSurface();
@@ -181,7 +181,7 @@ void BulletLink::Init()
   {
     if ((*iter)->HasType(Base::COLLISION))
     {
-      collision = boost::static_pointer_cast<BulletCollision>(*iter);
+      collision = std::static_pointer_cast<BulletCollision>(*iter);
       categortyBits = collision->GetCategoryBits();
       collideBits = collision->GetCollideBits();
       break;

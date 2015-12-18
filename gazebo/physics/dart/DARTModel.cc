@@ -71,7 +71,7 @@ void DARTModel::Init()
   for (unsigned int i = 0; i < linkList.size(); ++i)
   {
     dart::dynamics::BodyNode *dtBodyNode
-        = boost::static_pointer_cast<DARTLink>(linkList[i])->GetDARTBodyNode();
+        = std::static_pointer_cast<DARTLink>(linkList[i])->GetDARTBodyNode();
 
     if (dtBodyNode->getParentJoint() == NULL)
     {

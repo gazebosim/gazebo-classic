@@ -51,7 +51,7 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
   EXPECT_EQ(physics->GetType(), physicsEngineStr);
 
   ODEPhysicsPtr odePhysics
-      = boost::static_pointer_cast<ODEPhysics>(physics);
+      = std::static_pointer_cast<ODEPhysics>(physics);
   ASSERT_TRUE(odePhysics != NULL);
 
   std::string type = "quick";

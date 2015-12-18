@@ -240,10 +240,10 @@ LinkPtr SimbodyJoint::GetJointLink(unsigned int _index) const
   if (_index == 0 || _index == 1)
   {
     SimbodyLinkPtr simbodyLink1 =
-      boost::static_pointer_cast<SimbodyLink>(this->childLink);
+      std::static_pointer_cast<SimbodyLink>(this->childLink);
 
     SimbodyLinkPtr simbodyLink2 =
-      boost::static_pointer_cast<SimbodyLink>(this->parentLink);
+      std::static_pointer_cast<SimbodyLink>(this->parentLink);
   }
 
   return result;

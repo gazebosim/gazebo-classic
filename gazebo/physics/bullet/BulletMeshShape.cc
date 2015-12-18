@@ -51,7 +51,7 @@ void BulletMeshShape::Init()
   MeshShape::Init();
 
   BulletCollisionPtr bParent =
-    boost::static_pointer_cast<BulletCollision>(this->collisionParent);
+    std::static_pointer_cast<BulletCollision>(this->collisionParent);
 
   if (this->submesh)
   {

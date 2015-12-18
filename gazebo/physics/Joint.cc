@@ -324,13 +324,13 @@ bool Joint::LoadImpl(const ignition::math::Pose3d &_pose)
   if (this->jointDPtr->parentLink)
   {
     this->jointDPtr->parentLink->AddChildJoint(
-        boost::static_pointer_cast<Joint>(myBase));
+        std::static_pointer_cast<Joint>(myBase));
   }
 
   if (this->jointDPtr->childLink)
   {
     this->jointDPtr->childLink->AddParentJoint(
-        boost::static_pointer_cast<Joint>(myBase));
+        std::static_pointer_cast<Joint>(myBase));
   }
 
   if (!this->jointDPtr->parentLink && !this->jointDPtr->childLink)

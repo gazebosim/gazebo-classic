@@ -144,7 +144,7 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
 
     PhysicsEnginePtr engine = collisionPtr1->GetWorld()->GetPhysicsEngine();
     BulletPhysicsPtr bulletPhysics =
-          boost::static_pointer_cast<BulletPhysics>(engine);
+          std::static_pointer_cast<BulletPhysics>(engine);
 
     // Add a new contact to the manager. This will return NULL if no one is
     // listening for contact information.

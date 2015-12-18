@@ -231,7 +231,7 @@ void DARTLink::Init()
     if (child->HasType(Base::COLLISION))
     {
       CollisionPtr collision =
-          boost::static_pointer_cast<Collision>(child);
+          std::static_pointer_cast<Collision>(child);
 
       SurfaceParamsPtr surface = collision->GetSurface();
       GZ_ASSERT(surface, "Surface pointer for is invalid");

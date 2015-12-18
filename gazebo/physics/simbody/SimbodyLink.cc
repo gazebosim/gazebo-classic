@@ -90,7 +90,7 @@ void SimbodyLink::Init()
     if ((*iter)->HasType(Base::COLLISION))
     {
       SimbodyCollisionPtr collision;
-      collision = boost::static_pointer_cast<SimbodyCollision>(*iter);
+      collision = std::static_pointer_cast<SimbodyCollision>(*iter);
 
       math::Pose relativePose = collision->GetRelativePose();
       relativePose.pos -= cogVec;

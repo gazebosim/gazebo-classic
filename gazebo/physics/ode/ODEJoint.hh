@@ -150,7 +150,7 @@ namespace gazebo
 
       /// \brief Get flag indicating whether implicit spring damper is enabled.
       /// \return True if implicit spring damper is used.
-      public: bool UsesImplicitSpringDamper();
+      public: bool UsesImplicitSpringDamper() const;
 
       /// \brief Set flag indicating whether implicit spring damper is enabled.
       /// \param[in] _implicit True if implicit spring damper is used.
@@ -179,38 +179,6 @@ namespace gazebo
       /// \brief Get access to stopERP
       /// \return Returns joint's erp for end stops
       public: double StopERP() const;
-
-      /// \brief EXPERIMENTAL: If specified damping coefficient is negative,
-      /// apply adaptive damping.  What this means is that
-      /// if resulting acceleration is outside of stability region,
-      /// then increase damping using a limiter based on (f, v).
-      /// This approach safeguards dynamics against unstable joint behavior
-      /// at low speed (|v| < vThreshold) and
-      /// high force (|f| > fThreshold) scenarios.
-      /// Stability region is determined by:
-      ///   max_damping_coefficient = f / ( sign(v) * max( |v|, vThreshold ) )
-      private: double ApplyAdaptiveDamping(const unsigned int _index,
-                                           const double _damping);
-
-      /// \brief Helper funciton to convert Kp and Kd to CFM and ERP
-      /// \param[in] _dt time step size
-      /// \param[in] _kp spring stiffness
-      /// \param[in] _kd spring damping
-      /// \param[out] _cfm equivalent constraint force mixing
-      /// \param[out] _erp equivalent error reduction parameter
-      private: void KpKdToCFMERP(const double _dt,
-                                 const double _kp, const double _kd,
-                                 double &_cfm, double &_erp);
-
-      /// \brief Helper funciton to convert CFM and ERP to Kp and Kd
-      /// \param[in] _dt time step size
-      /// \param[in] _cfm constraint force mixing
-      /// \param[in] _erp error reduction parameter
-      /// \param[out] _kp equivalent spring stiffness
-      /// \param[out] _kd equivalent spring damping
-      private: void CFMERPToKpKd(const double _dt,
-                                 const double _cfm, const double _erp,
-                                 double &_kp, double &_kd);
 
       // Documentation inherited.
       public: virtual bool SetHighStop(const unsigned int _index,
@@ -281,6 +249,39 @@ namespace gazebo
       /// \param[in] _index Index of the axis.
       /// \param[in] _force Force value.
       private: void SaveForce(const unsigned int _index, const double _force);
+
+      /// \brief EXPERIMENTAL: If specified damping coefficient is negative,
+      /// apply adaptive damping.  What this means is that
+      /// if resulting acceleration is outside of stability region,
+      /// then increase damping using a limiter based on (f, v).
+      /// This approach safeguards dynamics against unstable joint behavior
+      /// at low speed (|v| < vThreshold) and
+      /// high force (|f| > fThreshold) scenarios.
+      /// Stability region is determined by:
+      ///   max_damping_coefficient = f / ( sign(v) * max( |v|, vThreshold ) )
+      private: double ApplyAdaptiveDamping(const unsigned int _index,
+                                           const double _damping);
+
+      /// \brief Helper funciton to convert Kp and Kd to CFM and ERP
+      /// \param[in] _dt time step size
+      /// \param[in] _kp spring stiffness
+      /// \param[in] _kd spring damping
+      /// \param[out] _cfm equivalent constraint force mixing
+      /// \param[out] _erp equivalent error reduction parameter
+      private: void KpKdToCFMERP(const double _dt,
+                                 const double _kp, const double _kd,
+                                 double &_cfm, double &_erp) const;
+
+      /// \brief Helper funciton to convert CFM and ERP to Kp and Kd
+      /// \param[in] _dt time step size
+      /// \param[in] _cfm constraint force mixing
+      /// \param[in] _erp error reduction parameter
+      /// \param[out] _kp equivalent spring stiffness
+      /// \param[out] _kd equivalent spring damping
+      private: void CFMERPToKpKd(const double _dt,
+                                 const double _cfm, const double _erp,
+                                 double &_kp, double &_kd) const;
+
 
       /// \internal
       /// \brief Protected data pointer

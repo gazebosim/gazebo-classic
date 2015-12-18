@@ -116,7 +116,7 @@ void Model::LoadLinks()
     {
       // Create a new link
       LinkPtr link = this->GetWorld()->GetPhysicsEngine()->CreateLink(
-          boost::static_pointer_cast<Model>(shared_from_this()));
+          std::static_pointer_cast<Model>(shared_from_this()));
 
       /// \TODO: canonical link is hardcoded to the first link.
       ///        warn users for now, need  to add parsing of
@@ -131,7 +131,7 @@ void Model::LoadLinks()
         BasePtr entity = this->GetParent();
         while (entity && entity->HasType(MODEL))
         {
-          ModelPtr model = boost::static_pointer_cast<Model>(entity);
+          ModelPtr model = std::static_pointer_cast<Model>(entity);
           LinkPtr tmpLink = model->GetLink();
           if (tmpLink)
           {
@@ -155,7 +155,7 @@ void Model::LoadLinks()
           entity = this->GetParent();
           while (entity && entity->HasType(MODEL))
           {
-            ModelPtr model = boost::static_pointer_cast<Model>(entity);
+            ModelPtr model = std::static_pointer_cast<Model>(entity);
             model->canonicalLink = tihs->dataPtr->canonicalLink;
             entity = entity->GetParent();
           }
@@ -182,7 +182,7 @@ void Model::LoadModels()
     {
       // Create a new model
       ModelPtr model = this->GetWorld()->GetPhysicsEngine()->CreateModel(
-          boost::static_pointer_cast<Model>(shared_from_this()));
+          std::static_pointer_cast<Model>(shared_from_this()));
       model->SetWorld(this->GetWorld());
       model->Load(modelElem);
       this->dataPtr->models.push_back(model);
@@ -249,7 +249,7 @@ void Model::Init()
   {
     if ((*iter)->HasType(Base::LINK))
     {
-      LinkPtr link = boost::static_pointer_cast<Link>(*iter);
+      LinkPtr link = std::static_pointer_cast<Link>(*iter);
       if (link)
         link->Init();
       else
@@ -257,7 +257,7 @@ void Model::Init()
               << "] has type Base::LINK, but cannot be dynamically casted\n";
     }
     else if ((*iter)->HasType(Base::MODEL))
-      boost::static_pointer_cast<Model>(*iter)->Init();
+      std::static_pointer_cast<Model>(*iter)->Init();
   }
 
   // Initialize the joints last.
@@ -409,7 +409,7 @@ void Model::RemoveChild(EntityPtr _child)
 //////////////////////////////////////////////////
 boost::shared_ptr<Model> Model::shared_from_this()
 {
-  return boost::static_pointer_cast<Model>(Entity::shared_from_this());
+  return std::static_pointer_cast<Model>(Entity::shared_from_this());
 }
 
 //////////////////////////////////////////////////
@@ -842,7 +842,7 @@ void Model::LoadJoint(sdf::ElementPtr _sdf)
   std::string stype = _sdf->Get<std::string>("type");
 
   joint = this->GetWorld()->GetPhysicsEngine()->CreateJoint(stype,
-     boost::static_pointer_cast<Model>(shared_from_this()));
+     std::static_pointer_cast<Model>(shared_from_this()));
   if (!joint)
   {
     gzerr << "Unable to create joint of type[" << stype << "]\n";
@@ -850,7 +850,7 @@ void Model::LoadJoint(sdf::ElementPtr _sdf)
     return;
   }
 
-  joint->SetModel(boost::static_pointer_cast<Model>(shared_from_this()));
+  joint->SetModel(std::static_pointer_cast<Model>(shared_from_this()));
 
   // Load the joint
   joint->Load(_sdf);
@@ -874,7 +874,7 @@ void Model::LoadJoint(sdf::ElementPtr _sdf)
 void Model::LoadGripper(sdf::ElementPtr _sdf)
 {
   GripperPtr gripper(new Gripper(
-      boost::static_pointer_cast<Model>(shared_from_this())));
+      std::static_pointer_cast<Model>(shared_from_this())));
   gripper->Load(_sdf);
   this->dataPtr->grippers.push_back(gripper);
 }
@@ -1004,7 +1004,7 @@ void Model::LoadPlugin(sdf::ElementPtr _sdf)
       return;
     }
 
-    ModelPtr myself = boost::static_pointer_cast<Model>(shared_from_this());
+    ModelPtr myself = std::static_pointer_cast<Model>(shared_from_this());
 
     try
     {
@@ -1273,7 +1273,7 @@ void Model::SetScale(const ignition::math::Vector3d &_scale)
   {
     if (*iter && (*iter)->HasType(LINK))
     {
-      boost::static_pointer_cast<Link>(*iter)->SetScale(_scale);
+      std::static_pointer_cast<Link>(*iter)->SetScale(_scale);
     }
   }
 }
