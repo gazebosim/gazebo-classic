@@ -43,7 +43,6 @@ set (sources
   ModelAlign.cc
   ModelManipulator.cc
   ModelSnap.cc
-  ModelEditWidget.cc
   ModelListWidget.cc
   ModelMaker.cc
   ModelRightMenu.cc
@@ -56,6 +55,7 @@ set (sources
   ToolsWidget.cc
   TopicSelector.cc
   TopToolbar.cc
+  UserCmdHistory.cc
   ViewAngleWidget.cc
 )
 
@@ -84,7 +84,6 @@ set (qt_headers
   LogPlayWidget.hh
   MainWindow.hh
   ModelListWidget.hh
-  ModelEditWidget.hh
   ModelRightMenu.hh
   RenderWidget.hh
   SaveDialog.hh
@@ -94,6 +93,7 @@ set (qt_headers
   ToolsWidget.hh
   TopicSelector.hh
   TopToolbar.hh
+  UserCmdHistory.hh
   ViewAngleWidget.hh
 )
 

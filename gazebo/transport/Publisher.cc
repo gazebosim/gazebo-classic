@@ -192,10 +192,12 @@ void Publisher::SendMessage()
         iter != localBuffer.end(); ++iter, ++pubIter)
     {
       // Send the latest message.
-      this->pubIds[*pubIter] = this->publication->Publish(*iter,
+      int result = this->publication->Publish(*iter,
           boost::bind(&Publisher::OnPublishComplete, this, _1), *pubIter);
 
-      if (this->pubIds[*pubIter] <= 0)
+      if (result > 0)
+        this->pubIds[*pubIter] = result;
+      else
         this->pubIds.erase(*pubIter);
     }
 
@@ -253,7 +255,7 @@ void Publisher::Fini()
     this->SendMessage();
 
   if (!this->topic.empty())
-    TopicManager::Instance()->Unadvertise(this->topic);
+    TopicManager::Instance()->Unadvertise(this->topic, this->id);
 
   common::Time slept;
 
@@ -288,4 +290,10 @@ MessagePtr Publisher::GetPrevMsgPtr() const
     return this->publication->GetPrevMsg(this->id);
   else
     return MessagePtr();
+}
+
+//////////////////////////////////////////////////
+uint32_t Publisher::Id() const
+{
+  return this->id;
 }

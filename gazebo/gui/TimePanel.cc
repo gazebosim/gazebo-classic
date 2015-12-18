@@ -73,8 +73,8 @@ TimePanel::TimePanel(QWidget *_parent)
   this->dataPtr->statsSub = this->dataPtr->node->Subscribe(
       "~/world_stats", &TimePanel::OnStats, this);
 
-  this->dataPtr->worldControlPub = this->dataPtr->node->
-      Advertise<msgs::WorldControl>("~/world_control");
+  this->dataPtr->userCmdPub =
+      this->dataPtr->node->Advertise<msgs::UserCmd>("~/user_cmd");
 
   // Timer
   QTimer *timer = new QTimer(this);
@@ -87,6 +87,11 @@ TimePanel::TimePanel(QWidget *_parent)
       boost::bind(&TimePanel::OnFullScreen, this, _1)));
 
   connect(g_playAct, SIGNAL(changed()), this, SLOT(OnPlayActionChanged()));
+
+  QShortcut *space = new QShortcut(Qt::Key_Space, this);
+  QObject::connect(space, SIGNAL(activated()), this, SLOT(TogglePause()));
+
+  this->dataPtr->paused = false;
 }
 
 /////////////////////////////////////////////////
@@ -196,6 +201,15 @@ void TimePanel::SetPaused(bool _paused)
     this->dataPtr->timeWidget->SetPaused(_paused);
   else if (this->dataPtr->logPlayWidget->isVisible())
     this->dataPtr->logPlayWidget->SetPaused(_paused);
+}
+
+/////////////////////////////////////////////////
+void TimePanel::TogglePause()
+{
+  if (this->IsPaused())
+    g_playAct->trigger();
+  else
+    g_pauseAct->trigger();
 }
 
 /////////////////////////////////////////////////
@@ -323,7 +337,13 @@ void TimePanel::OnTimeReset()
   msgs::WorldControl msg;
   msg.mutable_reset()->set_all(false);
   msg.mutable_reset()->set_time_only(true);
-  this->dataPtr->worldControlPub->Publish(msg);
+
+  // Register user command on server
+  msgs::UserCmd userCmdMsg;
+  userCmdMsg.set_description("Reset time");
+  userCmdMsg.set_type(msgs::UserCmd::WORLD_CONTROL);
+  userCmdMsg.mutable_world_control()->CopyFrom(msg);
+  this->dataPtr->userCmdPub->Publish(userCmdMsg);
 }
 
 /////////////////////////////////////////////////

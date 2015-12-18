@@ -83,6 +83,7 @@ set (sources ${sources}
   SphereShape.cc
   State.cc
   SurfaceParams.cc
+  UserCmdManager.cc
   World.cc
   WorldState.cc
 )
@@ -136,6 +137,7 @@ set (headers
   State.hh
   SurfaceParams.hh
   UniversalJoint.hh
+  UserCmdManager.hh
   World.hh
   WorldState.hh)
 
@@ -193,5 +195,7 @@ set (gtest_sources
   PresetManager_TEST.cc
   Road_TEST.cc
   SphereShape_TEST.cc
+  UserCmdManager_TEST.cc
+  WorldState_TEST.cc
 )
 gz_build_tests(${gtest_sources})

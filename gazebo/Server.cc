@@ -30,6 +30,8 @@
 
 #include <sdf/sdf.hh>
 
+#include <ignition/math/Rand.hh>
+
 #include "gazebo/gazebo.hh"
 #include "gazebo/transport/transport.hh"
 
@@ -179,6 +181,7 @@ bool Server::ParseArgs(int _argc, char **_argv)
     try
     {
       math::Rand::SetSeed(this->vm["seed"].as<double>());
+      ignition::math::Rand::Seed(this->vm["seed"].as<double>());
     }
     catch(boost::bad_any_cast &_e)
     {
@@ -246,15 +249,15 @@ bool Server::ParseArgs(int _argc, char **_argv)
 
     gzmsg << "\nLog playback:\n"
       << "  Log Version: "
-      << util::LogPlay::Instance()->GetLogVersion() << "\n"
+      << util::LogPlay::Instance()->LogVersion() << "\n"
       << "  Gazebo Version: "
-      << util::LogPlay::Instance()->GetGazeboVersion() << "\n"
+      << util::LogPlay::Instance()->GazeboVersion() << "\n"
       << "  Random Seed: "
-      << util::LogPlay::Instance()->GetRandSeed() << "\n"
+      << util::LogPlay::Instance()->RandSeed() << "\n"
       << "  Log Start Time: "
-      << util::LogPlay::Instance()->GetLogStartTime() << "\n"
+      << util::LogPlay::Instance()->LogStartTime() << "\n"
       << "  Log End Time: "
-      << util::LogPlay::Instance()->GetLogEndTime() << "\n";
+      << util::LogPlay::Instance()->LogEndTime() << "\n";
 
     // Get the SDF world description from the log file
     std::string sdfString;

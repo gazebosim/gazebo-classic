@@ -126,12 +126,6 @@ bool RFIDTag::UpdateImpl(bool /*_force*/)
 }
 
 /////////////////////////////////////////////////
-math::Pose RFIDTag::GetTagPose() const
-{
-  return this->TagPose();
-}
-
-/////////////////////////////////////////////////
 ignition::math::Pose3d RFIDTag::TagPose() const
 {
   return entity->GetWorldPose().Ign();

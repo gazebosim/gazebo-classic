@@ -75,7 +75,7 @@ void ModelSnap::Clear()
   this->dataPtr->hoverVis.reset();
 
   this->dataPtr->node.reset();
-  this->dataPtr->modelPub.reset();
+  this->dataPtr->userCmdPub.reset();
 
   if (this->dataPtr->updateMutex)
   {
@@ -127,8 +127,8 @@ void ModelSnap::Init()
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init();
-  this->dataPtr->modelPub =
-      this->dataPtr->node->Advertise<msgs::Model>("~/model/modify");
+  this->dataPtr->userCmdPub =
+      this->dataPtr->node->Advertise<msgs::UserCmd>("~/user_cmd");
 
   this->dataPtr->rayQuery.reset(
       new rendering::RayQuery(this->dataPtr->userCamera));
@@ -351,15 +351,27 @@ void ModelSnap::PublishVisualPose(rendering::VisualPtr _vis)
   if (!_vis)
     return;
 
-  // Check to see if the visual is a model.
-  if (gui::get_entity_id(_vis->GetName()))
+  // Only publish for models
+  if (_vis->GetType() == gazebo::rendering::Visual::VT_MODEL)
   {
-    msgs::Model msg;
-    msg.set_id(gui::get_entity_id(_vis->GetName()));
-    msg.set_name(_vis->GetName());
+    // Register user command on server
+    msgs::UserCmd userCmdMsg;
+    userCmdMsg.set_description("Snap [" + _vis->GetName() + "]");
+    userCmdMsg.set_type(msgs::UserCmd::MOVING);
 
+    msgs::Model msg;
+
+    auto id = gui::get_entity_id(_vis->GetName());
+    if (id)
+      msg.set_id(id);
+
+    msg.set_name(_vis->GetName());
     msgs::Set(msg.mutable_pose(), _vis->GetWorldPose().Ign());
-    this->dataPtr->modelPub->Publish(msg);
+
+    auto modelMsg = userCmdMsg.add_model();
+    modelMsg->CopyFrom(msg);
+
+    this->dataPtr->userCmdPub->Publish(userCmdMsg);
   }
 }
 

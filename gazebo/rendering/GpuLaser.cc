@@ -62,6 +62,8 @@ GpuLaser::GpuLaser(const std::string &_namePrefix, ScenePtr _scene,
   this->orthoCam = NULL;
   this->w2nd = 0;
   this->h2nd = 0;
+  this->cameraCount = 0;
+  this->textureCount = 0;
   this->visual.reset();
 }
 

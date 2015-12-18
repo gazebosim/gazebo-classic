@@ -202,7 +202,9 @@ namespace gazebo
     /// \brief Eumeration of all sensor noise types
     enum SensorNoiseType
     {
-      /// \brief Marks the start of the enum.
+      /// \internal
+      /// \brief Indicator used to create an iterator over the enum. Do not
+      /// use this.
       SENSOR_NOISE_TYPE_BEGIN = 0,
 
       /// \brief Noise streams for the Camera sensor
@@ -289,7 +291,9 @@ namespace gazebo
       /// \sa ImuSensor
       IMU_LINACC_Z_NOISE_METERS_PER_S_SQR = 20,
 
-      /// \brief Marks the end of the enum.
+      /// \internal
+      /// \brief Indicator used to create an iterator over the enum. Do not
+      /// use this.
       SENSOR_NOISE_TYPE_END
     };
     /// \}

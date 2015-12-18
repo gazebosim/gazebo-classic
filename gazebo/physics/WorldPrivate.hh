@@ -79,13 +79,6 @@ namespace gazebo
       /// \brief Number of steps in increment by.
       public: int stepInc;
 
-      /// \brief Stores the simulation time target during a 'seek' operation.
-      public: common::Time targetSimTime;
-
-      /// \brief When there is a 'seek' command pending during a log file
-      /// playback this member variable should be true.
-      public: bool seekPending;
-
       /// \brief All the event connections.
       public: event::Connection_V connections;
 
@@ -320,6 +313,9 @@ namespace gazebo
 
       /// \brief Class to manage preset simulation parameter profiles.
       public: PresetManagerPtr presetManager;
+
+      /// \brief Class to manage user commands.
+      public: UserCmdManagerPtr userCmdManager;
 
       /// \brief Pointer to the physics plugin
       public: PhysicsPlugin *physicsPlugin;
