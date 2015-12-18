@@ -18,16 +18,22 @@
 #ifndef _GAZEBO_GUI_SEGMENT_ITEM_HH_
 #define _GAZEBO_GUI_SEGMENT_ITEM_HH_
 
+#include <memory>
 #include <vector>
+
+#include "gazebo/gui/qt.h"
 #include "gazebo/gui/building/EditorItem.hh"
+
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
-    class SegmentItemPrivate;
     class GrabberHandle;
-    class EditorItem;
+
+    // Forward declare private data.
+    class SegmentItemPrivate;
 
     /// \addtogroup gazebo_gui
     /// \{

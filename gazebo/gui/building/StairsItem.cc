@@ -15,13 +15,13 @@
  *
  */
 
-#include "gazebo/gui/building/EditorView.hh"
 #include "gazebo/gui/building/BuildingEditorWidget.hh"
-#include "gazebo/gui/building/EditorItem.hh"
-#include "gazebo/gui/building/RectItem.hh"
 #include "gazebo/gui/building/BuildingMaker.hh"
-#include "gazebo/gui/building/StairsInspectorDialog.hh"
+#include "gazebo/gui/building/EditorItem.hh"
+#include "gazebo/gui/building/EditorView.hh"
+#include "gazebo/gui/building/RectItem.hh"
 #include "gazebo/gui/building/RotateHandle.hh"
+#include "gazebo/gui/building/StairsInspectorDialog.hh"
 #include "gazebo/gui/building/StairsItem.hh"
 #include "gazebo/gui/building/StairsItemPrivate.hh"
 

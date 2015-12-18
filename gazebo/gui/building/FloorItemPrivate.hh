@@ -20,12 +20,12 @@
 
 #include <vector>
 
-#include "gazebo/gui/building/RectItemPrivate.hh"
-
 namespace gazebo
 {
   namespace gui
   {
+    class WallSegmentItem;
+
     /// \brief Private data for the FloorItem class
     class FloorItemPrivate
     {

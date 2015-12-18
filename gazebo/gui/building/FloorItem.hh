@@ -18,9 +18,11 @@
 #ifndef _GAZEBO_GUI_FLOOR_ITEM_HH_
 #define _GAZEBO_GUI_FLOOR_ITEM_HH_
 
-#include <vector>
+#include <memory>
+
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/building/RectItem.hh"
+
 #include "gazebo/util/system.hh"
 
 namespace gazebo

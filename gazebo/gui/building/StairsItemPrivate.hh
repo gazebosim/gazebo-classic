@@ -18,12 +18,14 @@
 #ifndef _GAZEBO_GUI_STAIRS_ITEM_PRIVATE_HH_
 #define _GAZEBO_GUI_STAIRS_ITEM_PRIVATE_HH_
 
-#include "gazebo/gui/building/RectItemPrivate.hh"
+#include "gazebo/gui/qt.h"
 
 namespace gazebo
 {
   namespace gui
   {
+    class StairsInspectorDialog;
+
     /// \brief Private data for the StairsItem class
     class StairsItemPrivate
     {

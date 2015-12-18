@@ -28,6 +28,7 @@ namespace gazebo
 {
   namespace gui
   {
+    // Forward declare private data.
     class EditorItemPrivate;
 
     /// \addtogroup gazebo_gui

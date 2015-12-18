@@ -18,16 +18,18 @@
 #ifndef _GAZEBO_GUI_DOOR_ITEM_HH_
 #define _GAZEBO_GUI_DOOR_ITEM_HH_
 
+#include <memory>
+
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/building/RectItem.hh"
+
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
-    class RectItem;
-    class WindowDoorInspectorDialog;
+    // Forward declare private data.
     class DoorItemPrivate;
 
     /// \addtogroup gazebo_gui

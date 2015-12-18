@@ -18,19 +18,24 @@
 #ifndef _GAZEBO_GUI_RECT_ITEM_HH_
 #define _GAZEBO_GUI_RECT_ITEM_HH_
 
+#include <memory>
+
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/building/WallSegmentItem.hh"
 #include "gazebo/gui/building/EditorItem.hh"
+
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
-    class RectItemPrivate;
     class GrabberHandle;
+    class MeasureItem;
     class RotateHandle;
-    class EditorItem;
+
+    // Forward declare private data.
+    class RectItemPrivate;
 
     /// \addtogroup gazebo_gui
     /// \{
@@ -43,8 +48,17 @@ namespace gazebo
       Q_OBJECT
 
       /// \brief Resize flags used to indicate which dimension can be resized.
-      public: enum ResizeFlags {NONE = 0x00,
-          ITEM_WIDTH = 0x01, ITEM_HEIGHT = 0x02};
+      public: enum ResizeFlags
+          {
+            /// \brief No dimensions.
+            NONE = 0x00,
+
+            /// \brief Width
+            ITEM_WIDTH = 0x01,
+
+            /// \brief Height
+            ITEM_HEIGHT = 0x02
+          };
 
       /// \brief Constructor
       public: RectItem();

@@ -16,11 +16,10 @@
 */
 
 #include "gazebo/gui/building/EditorItem.hh"
-#include "gazebo/gui/building/RectItem.hh"
-#include "gazebo/gui/building/BuildingMaker.hh"
-#include "gazebo/gui/building/WallSegmentItem.hh"
 #include "gazebo/gui/building/FloorItem.hh"
 #include "gazebo/gui/building/FloorItemPrivate.hh"
+#include "gazebo/gui/building/RectItem.hh"
+#include "gazebo/gui/building/WallSegmentItem.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -168,17 +167,13 @@ void FloorItem::paint(QPainter *_painter,
     this->DrawBoundingBox(_painter);
   this->ShowHandles(this->isSelected());
 
-  QPointF topLeft(
-      this->drawingOriginX - this->drawingWidth/2,
+  QPointF topLeft(this->drawingOriginX - this->drawingWidth/2,
       this->drawingOriginY - this->drawingHeight/2);
-  QPointF topRight(
-      this->drawingOriginX + this->drawingWidth/2,
+  QPointF topRight(this->drawingOriginX + this->drawingWidth/2,
       this->drawingOriginY - this->drawingHeight/2);
-  QPointF bottomLeft(
-      this->drawingOriginX - this->drawingWidth/2,
+  QPointF bottomLeft(this->drawingOriginX - this->drawingWidth/2,
       this->drawingOriginY + this->drawingHeight/2);
-  QPointF bottomRight(
-      this->drawingOriginX  + this->drawingWidth/2,
+  QPointF bottomRight(this->drawingOriginX  + this->drawingWidth/2,
       this->drawingOriginY + this->drawingHeight/2);
 
   QPen rectPen;

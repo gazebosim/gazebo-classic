@@ -18,8 +18,6 @@
 #ifndef _GAZEBO_GUI_MEASURE_ITEM_PRIVATE_HH_
 #define _GAZEBO_GUI_MEASURE_ITEM_PRIVATE_HH_
 
-#include "gazebo/gui/building/SegmentItemPrivate.hh"
-
 namespace gazebo
 {
   namespace gui

@@ -18,12 +18,14 @@
 #ifndef _GAZEBO_GUI_WINDOW_ITEM_PRIVATE_HH_
 #define _GAZEBO_GUI_WINDOW_ITEM_PRIVATE_HH_
 
-#include "gazebo/gui/building/RectItemPrivate.hh"
+#include "gazebo/gui/qt.h"
 
 namespace gazebo
 {
   namespace gui
   {
+    class WindowDoorInspectorDialog;
+
     /// \brief Private data for the WindowItem class
     class WindowItemPrivate
     {

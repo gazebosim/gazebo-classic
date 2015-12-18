@@ -19,11 +19,12 @@
 
 #include "gazebo/gui/building/BuildingEditorWidget.hh"
 #include "gazebo/gui/building/GrabberHandle.hh"
-#include "gazebo/gui/building/RotateHandle.hh"
 #include "gazebo/gui/building/EditorItem.hh"
-#include "gazebo/gui/building/WallSegmentItem.hh"
+#include "gazebo/gui/building/MeasureItem.hh"
 #include "gazebo/gui/building/RectItem.hh"
 #include "gazebo/gui/building/RectItemPrivate.hh"
+#include "gazebo/gui/building/RotateHandle.hh"
+#include "gazebo/gui/building/WallSegmentItem.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -90,13 +91,6 @@ RectItem::RectItem() : EditorItem(), dataPtr(new RectItemPrivate())
 /////////////////////////////////////////////////
 RectItem::~RectItem()
 {
-  for (int i = 0; i < 8; ++i)
-  {
-    this->dataPtr->grabbers[i]->setParentItem(NULL);
-    delete this->dataPtr->grabbers[i];
-  }
-  this->dataPtr->rotateHandle->setParentItem(NULL);
-  delete this->dataPtr->rotateHandle;
   if (!this->measures.empty())
   {
     delete this->measures[0];
@@ -245,8 +239,7 @@ bool RectItem::RotateEventFilter(RotateHandle *_rotate, QEvent *_event)
   if (_rotate->GetMouseState()
       == static_cast<int>(QEvent::GraphicsSceneMouseMove))
   {
-    QPoint localCenter(this->drawingOriginX,
-        this->drawingOriginY);
+    QPoint localCenter(this->drawingOriginX, this->drawingOriginY);
     QPointF center = this->mapToScene(localCenter);
 
     QPointF newPoint = mouseEvent->scenePos();
@@ -256,8 +249,7 @@ bool RectItem::RotateEventFilter(RotateHandle *_rotate, QEvent *_event)
 
     if (this->parentItem())
     {
-      QPointF localCenterTop(this->drawingOriginX,
-          this->drawingOriginY
+      QPointF localCenterTop(this->drawingOriginX, this->drawingOriginY
           + this->drawingHeight);
       QPointF centerTop = this->mapToScene(localCenterTop);
       QLineF lineCenter(center.x(), center.y(), centerTop.x(), centerTop.y());
@@ -679,41 +671,29 @@ void RectItem::UpdateCornerPositions()
   int grabberHeight = (this->dataPtr->grabbers[0]->boundingRect().height())/2;
 
   this->dataPtr->grabbers[0]->setPos(
-      this->drawingOriginX - this->drawingWidth/2 -
-      grabberWidth,
-      this->drawingOriginY - this->drawingHeight/2 -
-      grabberHeight);
+      this->drawingOriginX - this->drawingWidth/2 - grabberWidth,
+      this->drawingOriginY - this->drawingHeight/2 - grabberHeight);
   this->dataPtr->grabbers[2]->setPos(
-      this->drawingOriginX + this->drawingWidth/2 -
-      grabberWidth,
-      this->drawingOriginY - this->drawingHeight/2 -
-      grabberHeight);
+      this->drawingOriginX + this->drawingWidth/2 - grabberWidth,
+      this->drawingOriginY - this->drawingHeight/2 - grabberHeight);
   this->dataPtr->grabbers[4]->setPos(
-      this->drawingOriginX + this->drawingWidth/2 -
-      grabberWidth,
-      this->drawingOriginY + this->drawingHeight/2 -
-      grabberHeight);
+      this->drawingOriginX + this->drawingWidth/2 - grabberWidth,
+      this->drawingOriginY + this->drawingHeight/2 - grabberHeight);
   this->dataPtr->grabbers[6]->setPos(
-      this->drawingOriginX - this->drawingWidth/2 -
-      grabberWidth,
-      this->drawingOriginY + this->drawingHeight/2 -
-      grabberHeight);
+      this->drawingOriginX - this->drawingWidth/2 -grabberWidth,
+      this->drawingOriginY + this->drawingHeight/2 - grabberHeight);
 
-  this->dataPtr->grabbers[1]->setPos(this->drawingOriginX -
-      grabberWidth,
-      this->drawingOriginY - this->drawingHeight/2 -
-      grabberHeight);
+  this->dataPtr->grabbers[1]->setPos(
+      this->drawingOriginX - grabberWidth,
+      this->drawingOriginY - this->drawingHeight/2 - grabberHeight);
   this->dataPtr->grabbers[3]->setPos(
-      this->drawingOriginX + this->drawingWidth/2 -
-      grabberWidth,
+      this->drawingOriginX + this->drawingWidth/2 - grabberWidth,
       this->drawingOriginY - grabberHeight);
-  this->dataPtr->grabbers[5]->setPos(this->drawingOriginX -
-      grabberWidth,
-      this->drawingOriginY + this->drawingHeight/2 -
-      grabberHeight);
+  this->dataPtr->grabbers[5]->setPos(
+      this->drawingOriginX - grabberWidth,
+      this->drawingOriginY + this->drawingHeight/2 - grabberHeight);
   this->dataPtr->grabbers[7]->setPos(
-      this->drawingOriginX - this->drawingWidth/2 -
-      grabberWidth,
+      this->drawingOriginX - this->drawingWidth/2 - grabberWidth,
       this->drawingOriginY - grabberHeight);
 
   this->dataPtr->rotateHandle->setPos(this->drawingOriginX,
@@ -802,8 +782,7 @@ double RectItem::GetAngleOnWall() const
 /////////////////////////////////////////////////
 QRectF RectItem::boundingRect() const
 {
-  return QRectF(-this->width/2, -this->height/2,
-      this->width, this->height);
+  return QRectF(-this->width/2, -this->height/2, this->width, this->height);
 }
 
 /////////////////////////////////////////////////
@@ -845,17 +824,13 @@ void RectItem::paint(QPainter *_painter, const QStyleOptionGraphicsItem *,
 {
   _painter->save();
 
-  QPointF topLeft(
-      this->drawingOriginX - this->drawingWidth/2,
+  QPointF topLeft(this->drawingOriginX - this->drawingWidth/2,
       this->drawingOriginY - this->drawingHeight/2);
-  QPointF topRight(
-      this->drawingOriginX + this->drawingWidth/2,
+  QPointF topRight(this->drawingOriginX + this->drawingWidth/2,
       this->drawingOriginY - this->drawingHeight/2);
-  QPointF bottomLeft(
-      this->drawingOriginX - this->drawingWidth/2,
+  QPointF bottomLeft(this->drawingOriginX - this->drawingWidth/2,
       this->drawingOriginY + this->drawingHeight/2);
-  QPointF bottomRight(
-      this->drawingOriginX + this->drawingWidth/2,
+  QPointF bottomRight(this->drawingOriginX + this->drawingWidth/2,
       this->drawingOriginY + this->drawingHeight/2);
 
   QPen rectPen;
@@ -985,10 +960,8 @@ void RectItem::UpdateMeasures()
 
   if (this->measures.empty())
   {
-    this->measures.push_back(
-        new MeasureItem(QPointF(0, 0), QPointF(0, 1)));
-    this->measures.push_back(
-        new MeasureItem(QPointF(0, 0), QPointF(0, 1)));
+    this->measures.push_back(new MeasureItem(QPointF(0, 0), QPointF(0, 1)));
+    this->measures.push_back(new MeasureItem(QPointF(0, 0), QPointF(0, 1)));
     this->measures[0]->setVisible(false);
     this->measures[1]->setVisible(false);
   }
@@ -1038,8 +1011,8 @@ void RectItem::UpdateMeasures()
     this->measures[1]->SetEndPoint(extreme2 + tVec - dVec);
 
     this->measures[0]->SetValue(
-        (this->measures[0]->line().length()) * this->itemScale);
+        (this->measures[0]->line().length())*this->itemScale);
     this->measures[1]->SetValue(
-        (this->measures[1]->line().length()) * this->itemScale);
+        (this->measures[1]->line().length())*this->itemScale);
   }
 }

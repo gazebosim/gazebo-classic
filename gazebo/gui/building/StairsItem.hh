@@ -18,15 +18,17 @@
 #ifndef _GAZEBO_GUI_STAIRS_ITEM_HH_
 #define _GAZEBO_GUI_STAIRS_ITEM_HH_
 
+#include <memory>
+
 #include "gazebo/gui/building/RectItem.hh"
 
 namespace gazebo
 {
   namespace gui
   {
-    class RectItem;
-    class BuildingItem;
-    class StairsInspectorDialog;
+    class RotateHandle;
+
+    // Forward declare private data.
     class StairsItemPrivate;
 
     /// \addtogroup gazebo_gui

@@ -20,14 +20,13 @@
 
 #include <vector>
 
-#include "gazebo/gui/building/MeasureItem.hh"
-#include "gazebo/gui/building/RotateHandle.hh"
-#include "gazebo/gui/building/EditorItemPrivate.hh"
-
 namespace gazebo
 {
   namespace gui
   {
+    class GrabberHandle;
+    class RotateHandle;
+
     /// \brief Private data for the RectItem class
     class RectItemPrivate
     {

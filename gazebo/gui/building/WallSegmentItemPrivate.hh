@@ -18,12 +18,13 @@
 #ifndef _GAZEBO_GUI_WALL_SEGMENT_ITEM_PRIVATE_HH_
 #define _GAZEBO_GUI_WALL_SEGMENT_ITEM_PRIVATE_HH_
 
-#include "gazebo/gui/building/SegmentItemPrivate.hh"
-
 namespace gazebo
 {
   namespace gui
   {
+    class MeasureItem;
+    class WallInspectorDialog;
+
     /// \brief Private data for the WallSegmentItem class
     class WallSegmentItemPrivate
     {

@@ -18,6 +18,8 @@
 #ifndef _GAZEBO_GUI_MEASURE_ITEM_HH_
 #define _GAZEBO_GUI_MEASURE_ITEM_HH_
 
+#include <memory>
+
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/building/SegmentItem.hh"
 #include "gazebo/util/system.hh"
@@ -26,8 +28,8 @@ namespace gazebo
 {
   namespace gui
   {
+    // Forward declare private data.
     class MeasureItemPrivate;
-    class SegmentItem;
 
     /// \addtogroup gazebo_gui
     /// \{

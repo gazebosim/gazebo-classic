@@ -18,17 +18,16 @@
 #ifndef _GAZEBO_GUI_WALL_SEGMENT_ITEM_HH_
 #define _GAZEBO_GUI_WALL_SEGMENT_ITEM_HH_
 
+#include <memory>
+
 #include "gazebo/gui/qt.h"
-#include "gazebo/gui/building/MeasureItem.hh"
 #include "gazebo/gui/building/SegmentItem.hh"
 
 namespace gazebo
 {
   namespace gui
   {
-    class MeasureItem;
-    class SegmentItem;
-    class WallInspectorDialog;
+    // Forward declare private data.
     class WallSegmentItemPrivate;
 
     /// \addtogroup gazebo_gui

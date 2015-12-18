@@ -18,7 +18,7 @@
 #include <ignition/math/Angle.hh>
 
 #include "gazebo/gui/building/EditorView.hh"
-#include "gazebo/gui/building/EditorItem.hh"
+#include "gazebo/gui/building/MeasureItem.hh"
 #include "gazebo/gui/building/RectItem.hh"
 #include "gazebo/gui/building/WallInspectorDialog.hh"
 #include "gazebo/gui/building/WallSegmentItem.hh"
@@ -29,13 +29,12 @@ using namespace gui;
 
 /////////////////////////////////////////////////
 WallSegmentItem::WallSegmentItem(const QPointF &_start, const QPointF &_end,
-    const double _height) : SegmentItem(),
-      dataPtr(new WallSegmentItemPrivate())
+    const double _height) : SegmentItem(), dataPtr(new WallSegmentItemPrivate())
 {
   this->editorType = "WallSegment";
 
   this->dataPtr->measure = new MeasureItem(this->GetStartPoint(),
-                                  this->GetEndPoint());
+                                           this->GetEndPoint());
   this->dataPtr->measure->setParentItem(this);
   this->SegmentUpdated();
 
