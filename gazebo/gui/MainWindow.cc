@@ -131,7 +131,7 @@ MainWindow::MainWindow()
 
   this->dataPtr->toolsWidget = new ToolsWidget();
 
-  this->dataPtr->renderWidget = new RenderWidget(mainWidget);
+  this->dataPtr->renderWidget = new gui::RenderWidget(mainWidget);
 
   this->CreateEditors();
 
@@ -841,13 +841,13 @@ void MainWindow::OnShowToolbars(bool _value)
 {
   if (_value)
   {
-    this->GetRenderWidget()->GetTimePanel()->show();
-    this->GetRenderWidget()->GetToolbar()->show();
+    this->RenderWidget()->GetTimePanel()->show();
+    this->RenderWidget()->GetToolbar()->show();
   }
   else
   {
-    this->GetRenderWidget()->GetTimePanel()->hide();
-    this->GetRenderWidget()->GetToolbar()->hide();
+    this->RenderWidget()->GetTimePanel()->hide();
+    this->RenderWidget()->GetToolbar()->hide();
   }
   g_showToolbarsAct->setChecked(_value);
 }
@@ -917,7 +917,7 @@ void MainWindow::SetWireframe()
 /////////////////////////////////////////////////
 void MainWindow::ShowGUIOverlays()
 {
-  this->GetRenderWidget()->SetOverlaysVisible(g_overlayAct->isChecked());
+  this->RenderWidget()->SetOverlaysVisible(g_overlayAct->isChecked());
 }
 
 /////////////////////////////////////////////////
@@ -1914,18 +1914,18 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
     {
       const msgs::Pose &msg_pose = _msg->camera().pose();
 
-      math::Vector3 cam_pose_pos = math::Vector3(
+      auto cam_pose_pos = ignition::math::Vector3d(
         msg_pose.position().x(),
         msg_pose.position().y(),
         msg_pose.position().z());
 
-      math::Quaternion cam_pose_rot = math::Quaternion(
+      auto cam_pose_rot = ignition::math::Quaterniond(
         msg_pose.orientation().w(),
         msg_pose.orientation().x(),
         msg_pose.orientation().y(),
         msg_pose.orientation().z());
 
-      math::Pose cam_pose(cam_pose_pos, cam_pose_rot);
+      ignition::math::Pose3d cam_pose(cam_pose_pos, cam_pose_rot);
 
       cam->SetDefaultPose(cam_pose);
       cam->SetUseSDFPose(true);
@@ -2081,7 +2081,7 @@ void MainWindow::OnResponse(ConstResponsePtr &_msg)
 }
 
 /////////////////////////////////////////////////
-unsigned int MainWindow::GetEntityId(const std::string &_name)
+unsigned int MainWindow::EntityId(const std::string &_name)
 {
   unsigned int result = 0;
 
@@ -2180,7 +2180,7 @@ void MainWindow::ShowLeftColumnWidget(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-RenderWidget *MainWindow::GetRenderWidget() const
+RenderWidget *MainWindow::RenderWidget() const
 {
   return this->dataPtr->renderWidget;
 }
@@ -2253,7 +2253,7 @@ void MainWindow::OnEditorGroup(QAction *_action)
 }
 
 /////////////////////////////////////////////////
-Editor *MainWindow::GetEditor(const std::string &_name) const
+Editor *MainWindow::Editor(const std::string &_name) const
 {
   auto iter = this->dataPtr->editors.find(_name);
   if (iter != this->dataPtr->editors.end())

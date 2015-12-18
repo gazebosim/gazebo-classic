@@ -56,13 +56,26 @@ namespace gazebo
     {
       Q_OBJECT
 
+      /// \brief Construcor
       public: MainWindow();
+
+      /// \brief Destructor
       public: virtual ~MainWindow();
 
+      /// \brief Load the mainwindow
       public: void Load();
+
+      /// \brief Initialization
       public: void Init();
 
-      public: unsigned int GetEntityId(const std::string &_name);
+      /// \brief Get an entity id
+      /// \param[in] _name The name of the entity
+      /// \return The entity id
+      public: unsigned int EntityId(const std::string &_name);
+
+      /// \brief Has an entity name
+      /// \param[in] _name The entity name
+      /// \return True if the entity has a name
       public: bool HasEntityName(const std::string &_name);
 
       /// \brief Add a widget to the left column stack of widgets.
@@ -79,7 +92,7 @@ namespace gazebo
 
       /// \brief Get a pointer to the render widget.
       /// \return A pointer to the render widget.
-      public: RenderWidget *GetRenderWidget() const;
+      public: gui::RenderWidget *RenderWidget() const;
 
       /// \brief Returns the state of the simulation, true if paused.
       /// \return True if paused, false otherwise.
@@ -118,7 +131,7 @@ namespace gazebo
       /// \brief Get an editor by name
       /// \param[in] _name Name of the editor.
       /// \return Pointer to the editor.
-      public: Editor *GetEditor(const std::string &_name) const;
+      public: gui::Editor *Editor(const std::string &_name) const;
 
       /// \brief A signal to trigger loading of GUI plugins.
       signals: void AddPlugins();
