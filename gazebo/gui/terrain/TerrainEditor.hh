@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_TERRAIN_EDITOR_HH_
-#define _GAZEBO_TERRAIN_EDITOR_HH_
+#ifndef _GAZEBO_GUI_TERRAINEDITOR_HH_
+#define _GAZEBO_GUI_TERRAINEDITOR_HH_
 
 #include <memory>
 
@@ -48,7 +48,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Pointer to private data.
-      protected: std::unique_ptr<TerrainEditorPrivate> dataPtr;
+      private: std::unique_ptr<TerrainEditorPrivate> dataPtr;
     };
   }
 }
