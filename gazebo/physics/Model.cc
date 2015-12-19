@@ -408,8 +408,8 @@ void Model::SetJointPositions(
     {
       // assume joint index is 0
       // FIXME: get index from user for multi dof joints.
-      const unsigned int id = 0;
-      joint->SetPosition(id, jiter->second);
+      const unsigned int jid = 0;
+      joint->SetPosition(jid, jiter->second);
     }
     else
     {
