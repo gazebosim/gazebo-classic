@@ -183,7 +183,8 @@ ModelCreator::ModelCreator()
 
   this->connections.push_back(
       gui::model::Events::ConnectRequestModelPluginInsertion(
-      boost::bind(&ModelCreator::AddModelPlugin, this, _1, _2, _3)));
+      std::bind(&ModelCreator::OnAddModelPlugin, this,
+      std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
 
   if (g_copyAct)
   {
@@ -2445,7 +2446,7 @@ ModelCreator::SaveState ModelCreator::GetCurrentSaveState() const
 }
 
 /////////////////////////////////////////////////
-void ModelCreator::AddModelPlugin(const std::string &_name,
+void ModelCreator::OnAddModelPlugin(const std::string &_name,
     const std::string &_filename, const std::string &_innerxml)
 {
   if (_name.empty() || _filename.empty())
@@ -2486,6 +2487,8 @@ void ModelCreator::AddModelPlugin(const sdf::ElementPtr _pluginElem)
 
     // Notify addition
     gui::model::Events::modelPluginInserted(name);
+
+    this->ModelChanged();
   }
 }
 

@@ -221,7 +221,7 @@ namespace gazebo
       /// \param[in] _name Name of plugin
       /// \param[in] _filename Plugin filename
       /// \param[in] _innerxml Plugin SDF elements in string
-      public: void AddModelPlugin(const std::string &_name,
+      public: void OnAddModelPlugin(const std::string &_name,
           const std::string &_filename, const std::string &_innerxml);
 
       /// \brief Add a model plugin to the model

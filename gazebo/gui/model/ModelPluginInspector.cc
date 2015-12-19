@@ -42,9 +42,7 @@ ModelPluginInspector::ModelPluginInspector(QWidget *_parent)
   this->dataPtr->configWidget = new ConfigWidget;
   this->dataPtr->configWidget->Load(&pluginMsg);
 
-  this->dataPtr->configWidget->SetWidgetReadOnly("name", true);
-  this->dataPtr->configWidget->SetWidgetReadOnly("filename", true);
-  this->dataPtr->configWidget->SetWidgetReadOnly("innerxml", true);
+  this->SetReadOnly(true);
 
   // set a more user friendly label for name
   QWidget *childWidget =
@@ -116,10 +114,10 @@ ModelPluginInspector::~ModelPluginInspector()
 /////////////////////////////////////////////////
 void ModelPluginInspector::OnRemove()
 {
+  std::string pluginName =
+      this->dataPtr->configWidget->GetStringWidgetValue("name");
   this->OnCancel();
-
-  model::Events::requestModelPluginRemoval(
-      this->dataPtr->configWidget->GetStringWidgetValue("name"));
+  model::Events::requestModelPluginRemoval(pluginName);
 }
 
 /////////////////////////////////////////////////
@@ -152,6 +150,7 @@ void ModelPluginInspector::Update(ConstPluginPtr _pluginMsg)
 /////////////////////////////////////////////////
 void ModelPluginInspector::SetReadOnly(const bool _readOnly)
 {
+  this->dataPtr->readOnly = _readOnly;
   this->dataPtr->configWidget->SetWidgetReadOnly("name", _readOnly);
   this->dataPtr->configWidget->SetWidgetReadOnly("filename", _readOnly);
   this->dataPtr->configWidget->SetWidgetReadOnly("innerxml", _readOnly);
@@ -160,6 +159,8 @@ void ModelPluginInspector::SetReadOnly(const bool _readOnly)
 /////////////////////////////////////////////////
 void ModelPluginInspector::Clear()
 {
+  if (this->dataPtr->readOnly)
+    return;
   this->dataPtr->configWidget->SetStringWidgetValue("name", "");
   this->dataPtr->configWidget->SetStringWidgetValue("filename", "");
   this->dataPtr->configWidget->SetStringWidgetValue("innerxml", "");

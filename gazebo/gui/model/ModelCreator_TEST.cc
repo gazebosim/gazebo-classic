@@ -397,7 +397,7 @@ void ModelCreator_TEST::ModelPlugin()
   QVERIFY(cylinder != NULL);
 
   // add model plugin
-  modelCreator->AddModelPlugin("test_name", "test_filename",
+  modelCreator->OnAddModelPlugin("test_name", "test_filename",
       "<data>test</data>");
   gazebo::gui::ModelPluginData *modelPluginData =
        modelCreator->ModelPlugin("test_name");

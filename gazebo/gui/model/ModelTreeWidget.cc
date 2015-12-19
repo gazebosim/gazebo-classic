@@ -91,21 +91,9 @@ ModelTreeWidget::ModelTreeWidget(QWidget *_parent)
   this->modelPluginsItem->setFont(0, headerFont);
   this->modelTreeWidget->addTopLevelItem(this->modelPluginsItem);
 
-  // add Model Plugins button
-  QTreeWidgetItem *addModelPluginItem = new QTreeWidgetItem(
-      this->modelPluginsItem);
-  this->modelPluginsItem->setExpanded(true);
-  QPushButton *addPluginButton = new QPushButton(tr("Add"));
-  addPluginButton->setMaximumWidth(60);
-  addPluginButton->setFlat(true);
-  this->modelTreeWidget->setItemWidget(addModelPluginItem, 0,
-      addPluginButton);
   this->modelPluginInspector = new ModelPluginInspector(_parent);
   this->modelPluginInspector->SetReadOnly(false);
   this->modelPluginInspector->hide();
-
-  connect(addPluginButton,
-      SIGNAL(clicked()), this, SLOT(OnAddModelPlugin()));
   connect(this->modelPluginInspector,
       SIGNAL(Applied()), this, SLOT(OnModelPluginApply()));
 
@@ -240,6 +228,8 @@ ModelTreeWidget::ModelTreeWidget(QWidget *_parent)
   this->connections.push_back(
      gui::model::Events::ConnectSetSelectedModelPlugin(
      boost::bind(&ModelTreeWidget::OnSetSelectedModelPlugin, this, _1, _2)));
+
+  this->ClearModelTree();
 }
 
 /////////////////////////////////////////////////
@@ -542,6 +532,19 @@ void ModelTreeWidget::ClearModelTree()
   this->jointsItem->takeChildren();
   // Remove all model plugins
   this->modelPluginsItem->takeChildren();
+
+  // add Model Plugins button
+  QTreeWidgetItem *addModelPluginItem =
+      new QTreeWidgetItem(this->modelPluginsItem);
+  this->modelPluginsItem->setExpanded(true);
+  QPushButton *addPluginButton = new QPushButton(tr("Add"));
+  addPluginButton->setMaximumWidth(60);
+  addPluginButton->setFlat(true);
+  this->modelTreeWidget->setItemWidget(addModelPluginItem, 0,
+      addPluginButton);
+
+  connect(addPluginButton,
+      SIGNAL(clicked()), this, SLOT(OnAddModelPlugin()));
 }
 
 /////////////////////////////////////////////////
