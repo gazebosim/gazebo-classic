@@ -100,10 +100,10 @@ namespace gazebo
 }
 
 bool ServerPrivate::stop = true;
- 
+
 /////////////////////////////////////////////////
-Server::Server() :
-  dataPtr(new ServerPrivate())
+Server::Server()
+  : dataPtr(new ServerPrivate())
 {
   this->dataPtr->initialized = false;
   this->dataPtr->systemPluginsArgc = 0;
@@ -242,7 +242,8 @@ bool Server::ParseArgs(int _argc, char **_argv)
   // Set the parameter to record a log file
   if (this->dataPtr->vm.count("record"))
   {
-    this->dataPtr->params["record"] = this->dataPtr->vm["record_path"].as<std::string>();
+    this->dataPtr->params["record"] =
+        this->dataPtr->vm["record_path"].as<std::string>();
     this->dataPtr->params["record_encoding"] =
         this->dataPtr->vm["record_encoding"].as<std::string>();
   }
@@ -282,7 +283,8 @@ bool Server::ParseArgs(int _argc, char **_argv)
   if (this->dataPtr->vm.count("play"))
   {
     // Load the log file
-    util::LogPlay::Instance()->Open(this->dataPtr->vm["play"].as<std::string>());
+    util::LogPlay::Instance()->Open(
+        this->dataPtr->vm["play"].as<std::string>());
 
     gzmsg << "\nLog playback:\n"
       << "  Log Version: "
@@ -404,7 +406,8 @@ bool Server::LoadString(const std::string &_sdfString)
 bool Server::PreLoad()
 {
   // setup gazebo
-  return gazebo::setupServer(this->dataPtr->systemPluginsArgc, this->dataPtr->systemPluginsArgv);
+  return gazebo::setupServer(this->dataPtr->systemPluginsArgc,
+                             this->dataPtr->systemPluginsArgv);
 }
 
 /////////////////////////////////////////////////
@@ -452,7 +455,7 @@ bool Server::LoadImpl(sdf::ElementPtr _elem,
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init("/gazebo");
-  this->dataPtr->serverSub = 
+  this->dataPtr->serverSub =
     this->dataPtr->node->Subscribe("/gazebo/server/control",
                                    &Server::OnControl, this);
 
@@ -566,7 +569,9 @@ void Server::Run()
 void Server::ProcessParams()
 {
   common::StrStr_M::const_iterator iter;
-  for (iter = this->dataPtr->params.begin(); iter != this->dataPtr->params.end(); ++iter)
+  for (iter = this->dataPtr->params.begin();
+       iter != this->dataPtr->params.end();
+       ++iter)
   {
     if (iter->first == "pause")
     {
@@ -594,8 +599,8 @@ void Server::ProcessParams()
     }
     else if (iter->first == "record")
     {
-      util::LogRecord::Instance()->Start(this->dataPtr->params["record_encoding"],
-                                         iter->second);
+      util::LogRecord::Instance()->Start(
+          this->dataPtr->params["record_encoding"], iter->second);
     }
   }
 }
