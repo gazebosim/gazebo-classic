@@ -1,5 +1,17 @@
 ## Gazebo 7.0
 
+1. Use opaque pointers in the gui/JointControlWidget class.
+    * [Pull request #2052](https://bitbucket.org/osrf/gazebo/pull-request/2052)
+
+1. Use opaque pointers in the gui/KeyEventHandler class.
+    * [Pull request #2053](https://bitbucket.org/osrf/gazebo/pull-request/2053)
+
+1 Use opaque pointers in the gui/ConfigWidget class.
+    * [Pull request #2028](https://bitbucket.org/osrf/gazebo/pull-request/2028)
+
+1. Use opaque pointers in the gui/GLWidget class.
+    * [Pull request #2051](https://bitbucket.org/osrf/gazebo/pull-request/2051)
+
 1. Use more opaque pointers.
     * [Pull request #2025](https://bitbucket.org/osrf/gazebo/pull-request/2025)
 
@@ -48,6 +60,9 @@
 1. Improve overall speed of log playback. Added new functions to LogPlay.
    Use tinyxml2 for playback.
     * [Pull request #1931](https://bitbucket.org/osrf/gazebo/pull-request/1931)
+
+1. Improve SVG import. Added support for transforms in paths.
+    * [Pull request #1981](https://bitbucket.org/osrf/gazebo/pull-request/1981)
 
 1. Enter time during log playback
     * [Pull request #2000](https://bitbucket.org/osrf/gazebo/pull-request/2000)
@@ -104,6 +119,9 @@ flags from c functions. Windows did not like `CPPTYPE_*` in
 
 1. Undo reset commands during simulation, forwarding commands
     * [Pull request #1986](https://bitbucket.org/osrf/gazebo/pull-request/1986)
+
+1. Undo apply force / torque during simulation
+    * [Pull request #2030](https://bitbucket.org/osrf/gazebo/pull-request/2030)
 
 1. Add function to get the derived scale of a Visual
     * [Pull request #1881](https://bitbucket.org/osrf/gazebo/pull-request/1881)
@@ -236,6 +254,17 @@ using the same arguments used in the command line.
 
     1. Support inserting nested models from model maker
         * [Pull request #1982](https://bitbucket.org/osrf/gazebo/pull-request/1982)
+
+1. Building editor updates
+
+    1. PIMPLize LevelWidget class
+        * [Pull request #2041](https://bitbucket.org/osrf/gazebo/pull-request/2041)
+
+    1. Removed unused class: BuildingItem
+        * [Pull request #2045](https://bitbucket.org/osrf/gazebo/pull-request/2045)
+
+    1. PIMPLize gui/building/BuildingModelManip, move attachment logic to BuildingMaker
+        * [Pull request #2046](https://bitbucket.org/osrf/gazebo/pull-request/2046)
 
 ## Gazebo 6.0
 

@@ -20,7 +20,6 @@
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/building/RectItem.hh"
-#include "gazebo/gui/building/BuildingItem.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -28,7 +27,6 @@ namespace gazebo
   namespace gui
   {
     class RectItem;
-    class BuildingItem;
     class StairsInspectorDialog;
 
     /// \addtogroup gazebo_gui
@@ -36,8 +34,7 @@ namespace gazebo
 
     /// \class StairsItem StairsItem.hh
     /// \brief 2D representation of a staircase.
-    class GZ_GUI_VISIBLE StairsItem :
-      public RectItem, public BuildingItem
+    class GZ_GUI_VISIBLE StairsItem : public RectItem
     {
       Q_OBJECT
 
