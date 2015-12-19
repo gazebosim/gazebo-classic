@@ -93,3 +93,4 @@ endif()
 
 gz_install_library(gazebo_opcode)
 gz_install_includes("opcode" ${headers})
+gz_install_includes("ICE" Ice/IcePreprocessor.h)
