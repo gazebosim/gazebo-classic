@@ -1,5 +1,11 @@
 ## Gazebo 7.0
 
+1. Use opaque pointers in the gui/JointControlWidget class.
+    * [Pull request #2052](https://bitbucket.org/osrf/gazebo/pull-request/2052)
+
+1. Use opaque pointers in the gui/KeyEventHandler class.
+    * [Pull request #2053](https://bitbucket.org/osrf/gazebo/pull-request/2053)
+
 1 Use opaque pointers in the gui/ConfigWidget class.
     * [Pull request #2028](https://bitbucket.org/osrf/gazebo/pull-request/2028)
 
