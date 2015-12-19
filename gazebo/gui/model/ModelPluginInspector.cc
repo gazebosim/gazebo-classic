@@ -115,7 +115,7 @@ ModelPluginInspector::~ModelPluginInspector()
 void ModelPluginInspector::OnRemove()
 {
   std::string pluginName =
-      this->dataPtr->configWidget->GetStringWidgetValue("name");
+      this->dataPtr->configWidget->StringWidgetValue("name");
   this->OnCancel();
   model::Events::requestModelPluginRemoval(pluginName);
 }
@@ -170,7 +170,7 @@ void ModelPluginInspector::Clear()
 msgs::Plugin *ModelPluginInspector::Data() const
 {
   msgs::Plugin *msg = dynamic_cast<msgs::Plugin *>(
-      this->dataPtr->configWidget->GetMsg());
+      this->dataPtr->configWidget->Msg());
   if (!msg)
   {
     gzerr << "It wasn't possible to get the plugin message" << std::endl;
