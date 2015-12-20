@@ -124,6 +124,33 @@ void ModelPluginInspector_TEST::RemoveButton()
 }
 
 /////////////////////////////////////////////////
+void ModelPluginInspector_TEST::ReadOnly()
+{
+  gazebo::gui::ModelPluginInspector *inspector =
+      new gazebo::gui::ModelPluginInspector();
+  QVERIFY(inspector != NULL);
+
+  // Check fields
+  QList<QLineEdit *> lineEdits = inspector->findChildren<QLineEdit *>();
+  QList<QPlainTextEdit *> plainTextEdits =
+      inspector->findChildren<QPlainTextEdit *>();
+  QCOMPARE(lineEdits.size(), 2);
+  QCOMPARE(plainTextEdits.size(), 1);
+
+  QVERIFY(!lineEdits[0]->isEnabled());
+  QVERIFY(!lineEdits[1]->isEnabled());
+  QVERIFY(!plainTextEdits[0]->isEnabled());
+
+  inspector->SetReadOnly(false);
+  QVERIFY(lineEdits[0]->isEnabled());
+  QVERIFY(lineEdits[1]->isEnabled());
+  QVERIFY(plainTextEdits[0]->isEnabled());
+
+  // Destructor
+  delete inspector;
+}
+
+/////////////////////////////////////////////////
 void ModelPluginInspector_TEST::Clear()
 {
   gazebo::gui::ModelPluginInspector *inspector =
@@ -152,6 +179,7 @@ void ModelPluginInspector_TEST::Clear()
   QCOMPARE(plainTextEdits[0]->toPlainText(), QString("<data>test</data>"));
 
   // clear and verify values are empty
+  inspector->SetReadOnly(false);
   inspector->Clear();
 
   QCOMPARE(lineEdits[0]->text(), QString());
@@ -167,32 +195,6 @@ void ModelPluginInspector_TEST::Clear()
   delete inspector;
 }
 
-/////////////////////////////////////////////////
-void ModelPluginInspector_TEST::ReadOnly()
-{
-  gazebo::gui::ModelPluginInspector *inspector =
-      new gazebo::gui::ModelPluginInspector();
-  QVERIFY(inspector != NULL);
-
-  // Check fields
-  QList<QLineEdit *> lineEdits = inspector->findChildren<QLineEdit *>();
-  QList<QPlainTextEdit *> plainTextEdits =
-      inspector->findChildren<QPlainTextEdit *>();
-  QCOMPARE(lineEdits.size(), 2);
-  QCOMPARE(plainTextEdits.size(), 1);
-
-  QVERIFY(!lineEdits[0]->isEnabled());
-  QVERIFY(!lineEdits[1]->isEnabled());
-  QVERIFY(!plainTextEdits[0]->isEnabled());
-
-  inspector->SetReadOnly(false);
-  QVERIFY(lineEdits[0]->isEnabled());
-  QVERIFY(lineEdits[1]->isEnabled());
-  QVERIFY(plainTextEdits[0]->isEnabled());
-
-  // Destructor
-  delete inspector;
-}
 
 /////////////////////////////////////////////////
 void ModelPluginInspector_TEST::GetData()
