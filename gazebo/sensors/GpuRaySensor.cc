@@ -636,7 +636,7 @@ bool GpuRaySensor::UpdateImpl(bool /*_force*/)
 }
 
 //////////////////////////////////////////////////
-bool GpuRaySensor::IsActive()
+bool GpuRaySensor::IsActive() const
 {
   return Sensor::IsActive() ||
     (this->scanPub && this->scanPub->HasConnections());

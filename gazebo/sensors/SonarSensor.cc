@@ -317,7 +317,7 @@ bool SonarSensor::UpdateImpl(bool /*_force*/)
 }
 
 //////////////////////////////////////////////////
-bool SonarSensor::IsActive()
+bool SonarSensor::IsActive() const
 {
   return Sensor::IsActive() || this->sonarPub->HasConnections();
 }

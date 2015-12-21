@@ -138,7 +138,7 @@ void DepthCameraSensor::Fini()
 }
 
 //////////////////////////////////////////////////
-void DepthCameraSensor::SetActive(bool value)
+void DepthCameraSensor::SetActive(const bool value)
 {
   Sensor::SetActive(value);
 }

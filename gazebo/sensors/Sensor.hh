@@ -70,7 +70,7 @@ namespace gazebo
       /// \brief Set the sensor's parent.
       /// \param[in] _name The sensor's parent's name.
       /// \param[in] _id The sensor's parent's ID.
-      public: void SetParent(const std::string &_name, uint32_t _id);
+      public: void SetParent(const std::string &_name, const uint32_t _id);
 
       /// \brief Returns the name of the sensor parent.  The parent name is
       ///        set by Sensor::SetParent.
@@ -79,7 +79,7 @@ namespace gazebo
 
       /// \brief Update the sensor.
       /// \param[in] _force True to force update, false otherwise.
-      public: void Update(bool _force);
+      public: void Update(const bool _force);
 
       /// \brief Get the update rate of the sensor.
       /// \return _hz update rate of sensor.  Returns 0 if unthrottled.
@@ -87,7 +87,7 @@ namespace gazebo
 
       /// \brief Set the update rate of the sensor.
       /// \param[in] _hz update rate of sensor.
-      public: void SetUpdateRate(double _hz);
+      public: void SetUpdateRate(const double _hz);
 
       /// \brief Finalize the sensor.
       public: virtual void Fini();
@@ -112,11 +112,11 @@ namespace gazebo
 
       /// \brief Set whether the sensor is active or not.
       /// \param[in] _value True if active, false if not.
-      public: virtual void SetActive(bool _value);
+      public: virtual void SetActive(const bool _value);
 
       /// \brief Returns true if sensor generation is active.
       /// \return True if active, false if not.
-      public: virtual bool IsActive();
+      public: virtual bool IsActive() const;
 
       /// \brief Get sensor type.
       /// \return Type of sensor.

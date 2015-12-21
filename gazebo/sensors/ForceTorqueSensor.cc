@@ -263,7 +263,7 @@ bool ForceTorqueSensor::UpdateImpl(bool /*_force*/)
 }
 
 //////////////////////////////////////////////////
-bool ForceTorqueSensor::IsActive()
+bool ForceTorqueSensor::IsActive() const
 {
   return Sensor::IsActive() || this->wrenchPub->HasConnections();
 }
