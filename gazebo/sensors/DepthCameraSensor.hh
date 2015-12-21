@@ -53,10 +53,6 @@ namespace gazebo
       /// \return The pointer to the depth data array.
       public: virtual const float *GetDepthData() const;
 
-      /// \brief Gets the point cloud data topic name of the sensor
-      /// \return Topic name
-      public: virtual std::string GetPointCloudTopic() const;
-
       /// \brief Initialize the camera
       public: virtual void Init();
 

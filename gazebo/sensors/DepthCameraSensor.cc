@@ -59,16 +59,6 @@ DepthCameraSensor::~DepthCameraSensor()
 }
 
 //////////////////////////////////////////////////
-std::string DepthCameraSensor::GetPointCloudTopic() const
-{
-  std::string topicName = "~/";
-  topicName += this->parentName + "/" + this->GetName() + "/points";
-  boost::replace_all(topicName, "::", "/");
-
-  return topicName;
-}
-
-//////////////////////////////////////////////////
 void DepthCameraSensor::Load(const std::string &_worldName)
 {
   CameraSensor::Load(_worldName);
