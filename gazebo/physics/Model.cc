@@ -408,8 +408,8 @@ void Model::SetJointPositions(
     {
       // assume joint index is 0
       // FIXME: get index from user for multi dof joints.
-      const unsigned int id = 0;
-      joint->SetPosition(id, jiter->second);
+      const unsigned int jid = 0;
+      joint->SetPosition(jid, jiter->second);
     }
     else
     {
@@ -460,6 +460,12 @@ void Model::RemoveChild(EntityPtr _child)
   {
     (*liter)->SetEnabled(true);
   }
+}
+
+//////////////////////////////////////////////////
+boost::shared_ptr<Model> Model::shared_from_this()
+{
+  return boost::static_pointer_cast<Model>(Entity::shared_from_this());
 }
 
 //////////////////////////////////////////////////
@@ -1167,6 +1173,15 @@ void Model::SetState(const ModelState &_state)
       gzerr << "Unable to find link[" << iter->first << "]\n";
   }
 
+  for (const auto &ms : _state.NestedModelStates())
+  {
+    ModelPtr model = this->NestedModel(ms.first);
+    if (model)
+      model->SetState(ms.second);
+    else
+      gzerr << "Unable to find model[" << ms.first << "]\n";
+  }
+
   // For now we don't use the joint state values to set the state of
   // simulation.
   // for (unsigned int i = 0; i < _state.GetJointStateCount(); ++i)
@@ -1332,4 +1347,52 @@ double Model::GetWorldEnergyKinetic() const
 double Model::GetWorldEnergy() const
 {
   return this->GetWorldEnergyPotential() + this->GetWorldEnergyKinetic();
+}
+
+/////////////////////////////////////////////////
+gazebo::physics::JointPtr Model::CreateJoint(
+  const std::string &_name, const std::string &_type,
+  physics::LinkPtr _parent, physics::LinkPtr _child)
+{
+  gazebo::physics::JointPtr joint;
+  if (this->GetJoint(_name))
+  {
+    gzwarn << "Model [" << this->GetName()
+           << "] already has a joint named [" << _name
+           << "], skipping creating joint.\n";
+    return joint;
+  }
+  joint =
+    this->world->GetPhysicsEngine()->CreateJoint(_type, shared_from_this());
+  joint->SetName(_name);
+  joint->Attach(_parent, _child);
+  // need to call Joint::Load to clone Joint::sdfJoint into Joint::sdf
+  joint->Load(_parent, _child, gazebo::math::Pose());
+  this->joints.push_back(joint);
+  return joint;
+}
+
+/////////////////////////////////////////////////
+bool Model::RemoveJoint(const std::string &_name)
+{
+  bool paused = this->world->IsPaused();
+  gazebo::physics::JointPtr joint = this->GetJoint(_name);
+  if (joint)
+  {
+    this->world->SetPaused(true);
+    joint->Detach();
+
+    this->joints.erase(
+      std::remove(this->joints.begin(), this->joints.end(), joint),
+      this->joints.end());
+    this->world->SetPaused(paused);
+    return true;
+  }
+  else
+  {
+    gzwarn << "Joint [" << _name
+           << "] does not exist in model [" << this->GetName()
+           << "], not removed.\n";
+    return false;
+  }
 }

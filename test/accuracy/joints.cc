@@ -120,7 +120,7 @@ void JointsTest::OneDof(const std::string &_physicsEngine
 
   // Create box with inertia based on box of uniform density
   msgs::Model msgModel;
-  msgs::AddBoxLink(msgModel, mass, math::Vector3(dx, dy, dz));
+  msgs::AddBoxLink(msgModel, mass, ignition::math::Vector3d(dx, dy, dz));
   msgModel.add_joint();
   {
     msgs::Joint *joint = msgModel.mutable_joint(0);
@@ -128,7 +128,7 @@ void JointsTest::OneDof(const std::string &_physicsEngine
     joint->set_type(msgs::ConvertJointType(_jointType));
     joint->set_parent("world");
     joint->set_child(msgModel.link(0).name());
-    msgs::Set(joint->mutable_axis1()->mutable_xyz(), axis);
+    msgs::Set(joint->mutable_axis1()->mutable_xyz(), axis.Ign());
   }
 
   // spawn multiple boxes
@@ -178,7 +178,7 @@ void JointsTest::OneDof(const std::string &_physicsEngine
     msgModel.set_name(this->GetUniqueString("model"));
     // give models unique positions
     msgs::Set(msgModel.mutable_pose()->mutable_position(),
-              math::Vector3(0.0, dz*2*i, 0.0));
+              ignition::math::Vector3d(0.0, dz*2*i, 0.0));
 
     model = this->SpawnModel(msgModel);
     ASSERT_TRUE(model != NULL);

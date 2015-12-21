@@ -1430,6 +1430,42 @@ material Gazebo/CameraDistortionMap
   }
 }
 
+vertex_program Gazebo/WideLensMapVS glsl
+{
+  source wide_lens_map_vs.glsl
+  default_params
+  {
+    param_named ratio float 1
+  }
+}
+
+fragment_program Gazebo/WideLensMapFS glsl
+{
+  source wide_lens_map_fp.glsl
+  default_params
+  {
+    param_named envMap int 0
+    param_named c1 float 1
+    param_named c2 float 1
+    param_named c3 float 0
+    param_named f float 1
+    param_named fun float3 0 1
+    param_named cutOffAngle float 3.14
+  }
+}
+
+material Gazebo/WideLensMap
+{
+  technique
+  {
+    pass
+    {
+      vertex_program_ref Gazebo/WideLensMapVS { }
+      fragment_program_ref Gazebo/WideLensMapFS { }
+    }
+  }
+}
+
 material Gazebo/PointCloud
 {
    technique
@@ -1513,6 +1549,34 @@ material Gazebo/Grass
         filtering anisotropic
         max_anisotropy 16
       }
+    }
+  }
+}
+
+material Gazebo/Editor
+{
+  technique
+  {
+    pass ambient
+    {
+      ambient 1.0 1.0 1.0 1.0
+      diffuse 1.0 1.0 1.0 1
+      specular .1 .1 .1 128
+    }
+  }
+}
+
+material Gazebo/EditorPlane
+{
+  technique
+  {
+    pass
+    {
+      scene_blend colour_blend
+
+      ambient .3 .3 .3  1.0
+      diffuse .7 .7 .7  1.0
+      specular 0.01 0.01 0.01 1.000000 1.500000
     }
   }
 }

@@ -89,7 +89,7 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
 
   // Create box with inertia based on box of uniform density
   msgs::Model msgModel;
-  msgs::AddBoxLink(msgModel, mass, math::Vector3(dx, dy, dz));
+  msgs::AddBoxLink(msgModel, mass, ignition::math::Vector3d(dx, dy, dz));
 
   // spawn multiple boxes
   // compute error statistics only on the last box
@@ -128,7 +128,7 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
     msgModel.set_name(this->GetUniqueString("model"));
     // give models unique positions
     msgs::Set(msgModel.mutable_pose()->mutable_position(),
-              math::Vector3(dz*2*i, 0.0, 0.0));
+              ignition::math::Vector3d(dz*2*i, 0.0, 0.0));
 
     model = this->SpawnModel(msgModel);
     ASSERT_TRUE(model != NULL);

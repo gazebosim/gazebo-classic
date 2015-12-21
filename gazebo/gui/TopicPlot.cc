@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <boost/algorithm/string.hpp>
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/message.h>
 

@@ -122,7 +122,7 @@ void RigidBodyTest::InertiaRatioBox(const std::string &_physicsEngine
     msgs::Geometry *msgGeometry = msgCollision->mutable_geometry();
     msgGeometry->set_type(msgs::Geometry_Type_BOX);
     msgs::Set(msgGeometry->mutable_box()->mutable_size(),
-      math::Vector3(_side, _side, _side));
+      ignition::math::Vector3d(_side, _side, _side));
 
     // add visual doesn't work
     // msgLink->add_visual();
@@ -133,7 +133,7 @@ void RigidBodyTest::InertiaRatioBox(const std::string &_physicsEngine
     // msgs::Set(msgGeometry->mutable_box()->mutable_size(),
     //   math::Vector3(_side, _side, _side));
 
-    math::Vector3 pos(0, 0, 0.5 * _side);
+    ignition::math::Vector3d pos(0, 0, 0.5 * _side);
     msgs::Set(msgModel.mutable_pose()->mutable_position(), pos);
 
     models.push_back(this->SpawnModel(msgModel));

@@ -133,7 +133,7 @@ void RigidBodyTest::InertiaRatioSphereStack(const std::string &_physicsEngine
     // msgGeometry->set_type(msgs::Geometry_Type_SPHERE);
     // msgGeometry->mutable_sphere()->set_radius(radius);
 
-    math::Vector3 pos(0, 0, radius * (1.0 + 2.0 * i));
+    ignition::math::Vector3d pos(0, 0, radius * (1.0 + 2.0 * i));
     msgs::Set(msgModel.mutable_pose()->mutable_position(), pos);
 
     models.push_back(this->SpawnModel(msgModel));

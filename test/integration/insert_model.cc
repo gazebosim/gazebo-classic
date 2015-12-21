@@ -128,6 +128,9 @@ void InsertModelTest::ReadPermissions()
 
   // Delete all test files
   boost::filesystem::remove_all(testDir);
+
+  delete insertModelWidget;
+  insertModelWidget = NULL;
 }
 
 // Generate a main function for the test

@@ -2215,7 +2215,7 @@ TEST_F(MsgsTest, FrictionToSDF)
   const double mu2 = 2.345;
   const double slip1 = 0.123;
   const double slip2 = -0.123;
-  const math::Vector3 fdir1(1, 2, -3);
+  const ignition::math::Vector3d fdir1(1, 2, -3);
 
   msgs::Friction msg;
   msg.set_mu(mu);

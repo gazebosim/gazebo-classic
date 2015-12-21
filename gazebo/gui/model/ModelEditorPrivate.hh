@@ -18,8 +18,10 @@
 #ifndef _GAZEBO_MODEL_EDITOR_PRIVATE_HH_
 #define _GAZEBO_MODEL_EDITOR_PRIVATE_HH_
 
+#include <vector>
 #include <string>
 
+#include "gazebo/gui/model/ModelEditorTypes.hh"
 #include "gazebo/gui/qt.h"
 
 namespace gazebo
@@ -27,6 +29,7 @@ namespace gazebo
   namespace gui
   {
     class SchematicViewWidget;
+    class ModelTreeWidget;
     class ModelEditorPalette;
 
     /// \internal
@@ -37,8 +40,11 @@ namespace gazebo
       /// \brief Menubar containing actions related to the editor.
       public: QMenuBar *menuBar;
 
-      /// \brief Contains all the model editor tools.
+      /// \brief A palette of entities that can be inserted into the editor.
       public: ModelEditorPalette *modelPalette;
+
+      /// \brief A display of model settings and its child entities
+      public: ModelTreeWidget *modelTree;
 
       /// \brief True if model editor is active.
       public: bool active;
@@ -74,6 +80,9 @@ namespace gazebo
       /// \brief Pointer to the schematic view widget.
       public: SchematicViewWidget *svWidget;
 
+      /// \brief Pointer to the Insert model widget in main window.
+      public: QWidget *insertModel;
+
       /// \brief Show toolbars action cloned from main window.
       public: QAction *showToolbarsAct;
 
@@ -85,6 +94,13 @@ namespace gazebo
 
       /// \brief Camera perspective view action cloned from main window.
       public: QAction *cameraPerspectiveAct;
+
+      /// \brief A list of event connections.
+      public: std::vector<event::ConnectionPtr> connections;
+
+      /// \brief Model editor material switcher used to switch the non-editable
+      /// models in the background to use a different material
+      public: EditorMaterialSwitcherPtr materialSwitcher;
     };
   }
 }
