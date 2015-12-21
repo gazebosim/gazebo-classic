@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_TERRAIN_EDITOR_PALETTE_HH_
-#define _GAZEBO_TERRAIN_EDITOR_PALETTE_HH_
+#ifndef _GAZEBO_GUI_TERRAINEDITORPALETTE_HH_
+#define _GAZEBO_GUI_TERRAINEDITORPALETTE_HH_
 
 #include <memory>
 #include <string>
@@ -131,7 +131,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Pointer to private data.
-      protected: std::unique_ptr<TerrainEditorPalettePrivate> dataPtr;
+      private: std::unique_ptr<TerrainEditorPalettePrivate> dataPtr;
     };
   }
 }

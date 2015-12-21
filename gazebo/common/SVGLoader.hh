@@ -72,7 +72,7 @@ namespace gazebo
       std::string style;
 
       /// \brief A 2D transform (or a list of transforms)
-      std::string transform;
+      ignition::math::Matrix3d transform;
 
       /// \brief A list of subpaths (as lists of commands)
       std::vector< std::vector<SVGCommand> > subpaths;
