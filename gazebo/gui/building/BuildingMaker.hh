@@ -35,8 +35,8 @@ namespace gazebo
 {
   namespace gui
   {
-    class EditorItem;
     class BuildingModelManip;
+    class EditorItem;
     class SaveDialog;
 
     /// \addtogroup gazebo_gui
@@ -142,6 +142,7 @@ namespace gazebo
 
       /// \brief Attach a building part to another, this is currently used for
       /// making holes in walls and floors.
+      /// This function doesn't check if the parts exist.
       /// \param[in] _child Name of the child building part
       /// \param[in] _parent Name of the parent building part.
       public: void AttachManip(const std::string &_child,
@@ -149,13 +150,20 @@ namespace gazebo
 
       /// \brief Detach a child building part from its parent.
       /// \param[in] _child Name of the child building part.
-      /// \param[in] _parent Name of the parent building part.
-      public: void DetachManip(const std::string &_child,
-          const std::string &_parent);
+      public: void DetachFromParent(const std::string &_child);
+
+      /// \brief Detach all child building parts from the given manip.
+      /// \param[in] _parent Name of the building part.
+      public: void DetachAllChildren(const std::string &_parent);
+
+      /// \brief Whether the given manip is attached to another manip or not.
+      /// \param[in] _child Name of manip.
+      /// \return True if manip has a parent.
+      public: bool IsAttached(const std::string &_child) const;
 
       /// \brief Detach all child building parts from the given manip.
       /// \param[in] _manip Name of the building part.
-      public: void DetachAllChildren(const std::string &_manip);
+      public: BuildingModelManip *ManipByName(const std::string &_name);
 
       /// \brief Helper method to convert size from editor coordinate system
       /// to Gazebo coordinate system.
@@ -317,6 +325,10 @@ namespace gazebo
       /// \brief A map of building part names to model manip objects which
       /// manage the visuals representing the building part.
       private: std::map<std::string, BuildingModelManip *> allItems;
+
+      /// \brief A map of building part names to model manip objects which
+      /// manage the visuals representing the building part.
+      private: std::map<std::string, std::vector<std::string>> attachmentMap;
 
       /// \brief The building model in SDF format.
       private: sdf::SDFPtr modelSDF;

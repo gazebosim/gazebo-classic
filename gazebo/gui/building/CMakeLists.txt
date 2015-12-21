@@ -56,3 +56,9 @@ set (internal_qt_headers ${internal_qt_headers}
   building/WindowItem.hh
   PARENT_SCOPE
 )
+
+set (qt_tests_local
+  BuildingMaker_TEST.cc
+)
+
+gz_build_qt_tests(${qt_tests_local})
