@@ -108,7 +108,7 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   this->linkButtonGroup->addButton(customButton);
 
   this->modelCreator = new ModelCreator();
-  connect(modelCreator, SIGNAL(LinkAdded()), this, SLOT(OnLinkAdded()));
+  connect(this->modelCreator, SIGNAL(LinkAdded()), this, SLOT(OnLinkAdded()));
 
   this->otherItemsLayout = new QVBoxLayout();
   this->otherItemsLayout->setContentsMargins(0, 0, 0, 0);

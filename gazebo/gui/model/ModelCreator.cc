@@ -219,7 +219,7 @@ ModelCreator::~ModelCreator()
   delete this->saveDialog;
   delete this->updateMutex;
 
-  delete jointMaker;
+  delete this->jointMaker;
 }
 
 /////////////////////////////////////////////////

@@ -251,8 +251,8 @@ namespace gazebo
           const ignition::math::Pose3d &_pose, const bool _reset);
 
       /// \brief Align the parent and child links of the joint being created.
-      /// \param[in] True to align the child to the parent, false to align the
-      /// parent to the child.
+      /// \param[in] _childToParent True to align the child to the parent,
+      /// false to align the parent to the child.
       /// \param[in] _axis Axis of alignment (x/y/z)
       /// \param[in] _mode Alignment mode (min/center/max)
       public: void AlignLinks(

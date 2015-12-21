@@ -33,8 +33,6 @@ namespace gazebo
 {
   namespace gui
   {
-    class JointMaker;
-
     // Forward declare private data.
     class JointCreationDialogPrivate;
 
