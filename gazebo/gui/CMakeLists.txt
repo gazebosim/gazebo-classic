@@ -75,7 +75,6 @@ set (qt_headers
   ApplyWrenchDialog.hh
   CloneWindow.hh
   ConfigWidget.hh
-  Conversions.hh
   DataLogger.hh
   Editor.hh
   GLWidget.hh
@@ -102,6 +101,7 @@ set (qt_headers
 set (headers
   qt.h
   qt_test.h
+  Conversions.hh
   EntityMaker.hh
   GuiIface.hh
   GuiEvents.hh
