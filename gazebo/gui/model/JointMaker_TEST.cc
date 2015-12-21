@@ -197,7 +197,6 @@ void JointMaker_TEST::CreateRemoveNestedJoint()
 
   jointMaker->RemoveJointsByLink(link03Vis->GetName());
   QVERIFY(jointMaker->GetJointCount() <= jointCount);
-  jointCount = jointMaker->GetJointCount();
 
   // no more joints left
   QCOMPARE(jointMaker->GetJointCount(), 0u);
