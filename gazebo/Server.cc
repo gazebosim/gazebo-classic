@@ -77,7 +77,7 @@ namespace gazebo
     transport::PublisherPtr worldModPub;
 
     /// \brief Mutex to protect controlMsgs.
-    boost::mutex receiveMutex;
+    std::mutex receiveMutex;
 
     /// \brief List of received control messages.
     std::list<msgs::ServerControl> controlMsgs;
