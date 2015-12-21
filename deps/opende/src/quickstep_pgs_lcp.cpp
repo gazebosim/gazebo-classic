@@ -115,17 +115,21 @@ static void* ComputeRows(void *p)
   //for (int i=startRow; i<startRow+nRows; i++) // swap within boundary of our own segment
   //  printf("wwwwwwwwwwwww>id %d start %d n %d  order[%d].index=%d\n",thread_id,startRow,nRows,i,order[i].index);
 
-  /*  DEBUG PRINTOUTS
+  /*  DEBUG PRINTOUTS */
   // print J_orig
-  printf("J_orig\n");
+  printf("J_orig:\n=================================================\n");
   for (int i=startRow; i<startRow+nRows; i++) {
+    printf("  b1 [%+d] b2[%+d] ", jb[i*2], jb[i*2+1]);
     for (int j=0; j < 12 ; j++) {
-      printf("  %12.6f",J_orig[i*12+j]);
+      printf(" %8.3f",J_orig[i*12+j]);
+      if (j == 5)
+        printf(" | ");
     }
     printf("\n");
   }
   printf("\n");
 
+/*
   // print J, J_precon (already premultiplied by inverse of diagonal of LHS) and rhs_precon and rhs
   printf("J_precon\n");
   for (int i=startRow; i<startRow+nRows; i++) {
