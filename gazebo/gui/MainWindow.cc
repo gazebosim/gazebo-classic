@@ -243,10 +243,7 @@ MainWindow::MainWindow()
 /////////////////////////////////////////////////
 MainWindow::~MainWindow()
 {
-  delete this->userCmdHistory;
-  this->userCmdHistory = NULL;
-
-  this->DeleteActions();
+  this->close();
 }
 
 /////////////////////////////////////////////////
@@ -365,6 +362,17 @@ void MainWindow::closeEvent(QCloseEvent * /*_event*/)
   // Cleanup the space navigator
   delete this->spacenav;
   this->spacenav = NULL;
+
+  // Cleanup user command history
+  delete this->userCmdHistory;
+  this->userCmdHistory = NULL;
+
+  // Cleanup editors
+  for (auto &editor : this->editors)
+    delete editor.second;
+
+  // Cleanup global actions
+  this->DeleteActions();
 
   emit Close();
 

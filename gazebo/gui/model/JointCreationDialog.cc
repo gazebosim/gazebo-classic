@@ -23,6 +23,8 @@
 #include "gazebo/rendering/Material.hh"
 
 #include "gazebo/gui/ConfigWidget.hh"
+#include "gazebo/gui/GuiIface.hh"
+#include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/model/JointCreationDialog.hh"
 #include "gazebo/gui/model/JointCreationDialogPrivate.hh"
 #include "gazebo/gui/model/JointMaker.hh"
@@ -522,7 +524,11 @@ void JointCreationDialog::Open(const JointMaker::JointType _type)
   this->dataPtr->axis2Widget->setStyleSheet(
       ConfigWidget::StyleSheet("normal", 1));
 
-  this->move(0, 0);
+  auto mainWindow = gui::get_main_window();
+  if (!mainWindow)
+    return;
+
+  this->move(mainWindow->pos());
   this->show();
   QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
 }

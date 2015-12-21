@@ -136,6 +136,10 @@ JointMaker::~JointMaker()
     this->joints.clear();
   }
 
+  this->jointCreationDialog->close();
+  delete this->jointCreationDialog;
+
+  // Delete this last
   delete this->updateMutex;
 }
 
