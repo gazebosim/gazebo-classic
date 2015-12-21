@@ -46,15 +46,15 @@ dxJointGearbox::dxJointGearbox(dxWorld* w) :
 void
 dxJointGearbox::getSureMaxInfo( SureMaxInfo* info )
 {
-    info->max_m = 1;
+    info->max_m = 1;  // make this 2?
 }
 
 
 void
 dxJointGearbox::getInfo1( dxJoint::Info1* info )
 {
-    info->m = 1;
-    info->nub = 1;
+    info->m = 1;  // make this 2?
+    info->nub = 1;  // make this 2?
 }
 
 
@@ -106,6 +106,22 @@ dxJointGearbox::getInfo2( dxJoint::Info2* info )
     // What if we moved ref_body stuff to the right hand side?
     //            J1a * q1 + ratio * J2a * q2
     // = c  + J1a * q1_ref_body + ratio * J2a * q2_ref_body
+    //
+    // below is not possible unless we can manipulate b1 and b2
+    // in quickstep.cpp.
+    // how about doing this in 2 rows:
+    //            J1a * q1 - J1a * q1_ref_body
+    // = ratio * (J2a * q2 - J2a * q2_ref_body) + c1
+    // and
+    //   ratio * (J2a * q2 - J2a * q2_ref_body)
+    // =          J1a * q1 - J1a * q1_ref_body  + c2
+    //
+    // or this:
+    //   J1a * q1          + ratio * J2a * q2
+    // = J1a * q1_ref_body + ratio * J2a * q2_ref_body + c1
+    // and
+    //   J1a * q1_ref_body + ratio * J2a * q2_ref_body
+    // = J1a * q1          + ratio * J2a * q2          + c1
 
     info->J1a[0] = globalAxis1[0];
     info->J1a[1] = globalAxis1[1];
