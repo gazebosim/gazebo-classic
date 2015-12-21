@@ -683,6 +683,7 @@ int dxJointLimitMotor::addLimot( dxJoint *joint,
       dReal k = info->fps * stop_erp;
       info->c[row] = -k * limit_err;
       info->cfm[row] = stop_cfm;
+      info->findex[row] = -2;
 
       if (_dequal(lostop, histop))
       {
