@@ -53,8 +53,10 @@ namespace gazebo
     /// \param[in] _msg New image message.
     private: void OnImage(ConstImageStampedPtr &_msg);
 
-    /// \brief Find a depth sensor in this model.
-    private: void FindSensor();
+    /// \brief Find a depth sensor in the model.
+    /// \param[in] _model Model to search for depth sensor.
+    /// \return True if depth sensor is found.
+    private: bool FindSensor(physics::ModelPtr _model);
 
     /// \brief Find revolute joints in the model.
     private: void FindJoints();

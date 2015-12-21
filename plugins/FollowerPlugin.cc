@@ -59,7 +59,7 @@ void FollowerPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     this->imageTopic = _sdf->Get<std::string>("depth_image_topic");
 
   if (this->imageTopic.empty())
-    this->FindSensor();
+    this->FindSensor(this->model);
 
   // diff drive params
   if (_sdf->HasElement("left_joint"))
@@ -134,10 +134,10 @@ void FollowerPlugin::FindJoints()
 }
 
 /////////////////////////////////////////////////
-void FollowerPlugin::FindSensor()
+bool FollowerPlugin::FindSensor(physics::ModelPtr _model)
 {
   sensors::SensorPtr depthSensor;
-  for (const auto l : this->model->GetLinks())
+  for (const auto l : _model->GetLinks())
   {
     for (unsigned int i = 0; i < l->GetSensorCount(); ++i)
     {
@@ -149,15 +149,20 @@ void FollowerPlugin::FindSensor()
       if (sensor->GetType() == "depth")
       {
         depthSensor = sensor;
-        break;
+        this->imageTopic = depthSensor->GetTopic();
+        return true;
       }
     }
   }
 
-  if (!depthSensor)
-    return;
+  // recursively look for sensor in nested models
+  for (const auto &m : _model->NestedModels())
+  {
+    if (this->FindSensor(m))
+      return true;
+  }
 
-  this->imageTopic = depthSensor->GetTopic();
+  return false;
 }
 
 /////////////////////////////////////////////////
