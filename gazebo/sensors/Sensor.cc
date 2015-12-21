@@ -447,6 +447,6 @@ void Sensor::ResetLastUpdateTime()
 //////////////////////////////////////////////////
 void Sensor::DisconnectUpdated(event::ConnectionPtr &_c)
 {
-  this->dataPtr->updated.Disconnect(_c);
+  this->updated.Disconnect(_c);
 }
 
