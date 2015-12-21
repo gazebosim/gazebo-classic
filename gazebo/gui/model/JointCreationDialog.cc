@@ -611,16 +611,16 @@ void JointCreationDialog::SetParent(const std::string &_linkName)
     return;
   }
 
-  std::string leafName = _linkName;
-  size_t idx = _linkName.find_last_of("::");
+  std::string unscopedName = _linkName;
+  size_t idx = _linkName.find("::");
   if (idx != std::string::npos)
-    leafName = _linkName.substr(idx+1);
+    unscopedName = _linkName.substr(idx+2);
 
   this->dataPtr->configWidget->blockSignals(true);
   if (!this->dataPtr->configWidget->SetEnumWidgetValue("parentCombo",
-      leafName))
+      unscopedName))
   {
-    gzerr << "Requested link [" << leafName << "] not found" << std::endl;
+    gzerr << "Requested link [" << unscopedName << "] not found" << std::endl;
     return;
   }
   this->dataPtr->configWidget->blockSignals(false);
@@ -644,15 +644,16 @@ void JointCreationDialog::SetChild(const std::string &_linkName)
   }
 
   // Update child combo box
-  std::string leafName = _linkName;
-  size_t idx = _linkName.find_last_of("::");
+  std::string unscopedName = _linkName;
+  size_t idx = _linkName.find("::");
   if (idx != std::string::npos)
-    leafName = _linkName.substr(idx+1);
+    unscopedName = _linkName.substr(idx+2);
 
   this->dataPtr->configWidget->blockSignals(true);
-  if (!this->dataPtr->configWidget->SetEnumWidgetValue("childCombo", leafName))
+  if (!this->dataPtr->configWidget->SetEnumWidgetValue("childCombo",
+      unscopedName))
   {
-    gzerr << "Requested link [" << leafName << "] not found" << std::endl;
+    gzerr << "Requested link [" << unscopedName << "] not found" << std::endl;
     return;
   }
   this->dataPtr->configWidget->blockSignals(false);

@@ -110,24 +110,30 @@ void SchematicViewWidget::Init()
 }
 
 /////////////////////////////////////////////////
-std::string SchematicViewWidget::GetLeafName(const std::string &_scopedName)
+std::string SchematicViewWidget::GetUnscopedName(const std::string &_scopedName)
 {
   if (_scopedName.empty())
     return "";
 
-  std::string leafName = _scopedName;
-  size_t idx = _scopedName.rfind("::");
+  std::string unscopedName = _scopedName;
+  size_t idx = _scopedName.find("::");
   if (idx != std::string::npos)
-    leafName = _scopedName.substr(idx+2);
-  return leafName;
+    unscopedName = _scopedName.substr(idx+2);
+
+  // TODO support nested model links
+  // if the namestill scoped then it could be a nested link - ignore for now.
+  if (unscopedName.find("::") != std::string::npos)
+    return "";
+
+  return unscopedName;
 }
 
 /////////////////////////////////////////////////
 void SchematicViewWidget::AddNode(const std::string &_node)
 {
-  std::string name = this->GetLeafName(_node);
+  std::string name = this->GetUnscopedName(_node);
 
-  if (this->scene->HasNode(name))
+  if (name.empty() || this->scene->HasNode(name))
     return;
 
   // this must be called before making changes to the graph
@@ -155,9 +161,9 @@ void SchematicViewWidget::RemoveNode(const std::string &_node)
   auto it = this->nodes.find(_node);
   if (it != this->nodes.end())
   {
-    std::string node = this->GetLeafName(_node);
+    std::string node = this->GetUnscopedName(_node);
 
-    if (!this->scene->HasNode(node))
+    if (node.empty() || !this->scene->HasNode(node))
       return;
 
     // this must be called before making changes to the graph
@@ -182,8 +188,11 @@ void SchematicViewWidget::AddEdge(const std::string &_id,
     const std::string &/*_name*/, const std::string &_type,
     const std::string &_parent, const std::string &_child)
 {
-  std::string parentNode = this->GetLeafName(_parent);
-  std::string childNode = this->GetLeafName(_child);
+  std::string parentNode = this->GetUnscopedName(_parent);
+  std::string childNode = this->GetUnscopedName(_child);
+
+  if (parentNode.empty() || childNode.empty())
+    return;
 
   // this must be called before making changes to the graph
   this->scene->clearLayout();
@@ -300,7 +309,7 @@ void SchematicViewWidget::OnCustomContextMenu(const QString &_id)
   std::string itemId = _id.toStdString();
   if (this->edges.find(itemId) != this->edges.end())
     gui::model::Events::showJointContextMenu(itemId);
-  else if (this->scene->HasNode(this->GetLeafName(itemId)))
+  else if (this->scene->HasNode(this->GetUnscopedName(itemId)))
     gui::model::Events::showLinkContextMenu(itemId);
 }
 

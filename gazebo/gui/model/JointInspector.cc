@@ -464,13 +464,13 @@ void JointInspector::OnSwap()
 /////////////////////////////////////////////////
 void JointInspector::OnLinkInserted(const std::string &_linkName)
 {
-  std::string leafName = _linkName;
-  size_t idx = _linkName.rfind("::");
+  std::string unscopedName = _linkName;
+  size_t idx = _linkName.find("::");
   if (idx != std::string::npos)
-    leafName = _linkName.substr(idx+2);
+    unscopedName = _linkName.substr(idx+2);
 
-  this->configWidget->AddItemEnumWidget("parentCombo", leafName);
-  this->configWidget->AddItemEnumWidget("childCombo", leafName);
+  this->configWidget->AddItemEnumWidget("parentCombo", unscopedName);
+  this->configWidget->AddItemEnumWidget("childCombo", unscopedName);
 
   this->OnLinksChanged();
 }
@@ -478,13 +478,13 @@ void JointInspector::OnLinkInserted(const std::string &_linkName)
 /////////////////////////////////////////////////
 void JointInspector::OnLinkRemoved(const std::string &_linkName)
 {
-  std::string leafName = _linkName;
-  size_t idx = _linkName.rfind("::");
+  std::string unscopedName = _linkName;
+  size_t idx = _linkName.find("::");
   if (idx != std::string::npos)
-    leafName = _linkName.substr(idx+2);
+    unscopedName = _linkName.substr(idx+2);
 
-  this->configWidget->RemoveItemEnumWidget("parentCombo", leafName);
-  this->configWidget->RemoveItemEnumWidget("childCombo", leafName);
+  this->configWidget->RemoveItemEnumWidget("parentCombo", unscopedName);
+  this->configWidget->RemoveItemEnumWidget("childCombo", unscopedName);
 
   this->OnLinksChanged();
 }
@@ -507,7 +507,6 @@ void JointInspector::Open()
       this->configWidget->StringWidgetValue("parent");
   std::string currentChild =
       this->configWidget->StringWidgetValue("child");
-
 
   this->configWidget->blockSignals(true);
   if (!currentParent.empty())

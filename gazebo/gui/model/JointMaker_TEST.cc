@@ -26,6 +26,7 @@
 
 using namespace gazebo;
 
+
 /////////////////////////////////////////////////
 void JointMaker_TEST::JointState()
 {
@@ -122,6 +123,120 @@ void JointMaker_TEST::CreateRemoveJoint()
 
   // Remove the two joints connected to the sphere
   jointMaker->RemoveJointsByLink(sphereLink->GetName());
+  QCOMPARE(jointMaker->GetJointCount(), 1u);
+
+  // Remove the last joint
+  jointMaker->RemoveJoint(ballJointData->hotspot->GetName());
+  QCOMPARE(jointMaker->GetJointCount(), 0u);
+
+  delete jointMaker;
+  mainWindow->close();
+  delete mainWindow;
+}
+
+/////////////////////////////////////////////////
+void JointMaker_TEST::CreateRemoveNestedJoint()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/deeply_nested_models.world", false, false, false);
+
+  gui::JointMaker *jointMaker = new gui::JointMaker();
+  QCOMPARE(jointMaker->GetState(), gui::JointMaker::JOINT_NONE);
+  QCOMPARE(jointMaker->GetJointCount(), 0u);
+
+  gui::MainWindow *mainWindow = new gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Process some events, and draw the screen
+  for (unsigned int i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  rendering::UserCameraPtr cam = gui::get_active_camera();
+  Q_ASSERT(cam);
+  rendering::ScenePtr scene = cam->GetScene();
+  Q_ASSERT(scene);
+
+  // Get the top level model link
+  gazebo::rendering::VisualPtr link00Vis =
+      scene->GetVisual("model_00::link_00");
+  QVERIFY(link00Vis != NULL);
+
+  // Get the nested model links
+  gazebo::rendering::VisualPtr link01Vis =
+      scene->GetVisual("model_00::model_01::link_01");
+  QVERIFY(link01Vis != NULL);
+  gazebo::rendering::VisualPtr link02Vis =
+      scene->GetVisual("model_00::model_01::model_02::link_02");
+  QVERIFY(link02Vis != NULL);
+  gazebo::rendering::VisualPtr link03Vis =
+      scene->GetVisual("model_00::model_01::model_02::model_03::link_03");
+  QVERIFY(link03Vis != NULL);
+
+  unsigned int jointCount = jointMaker->GetJointCount();
+
+  // Remove joints connected to the each link
+  jointMaker->RemoveJointsByLink(link00Vis->GetName());
+  QVERIFY(jointMaker->GetJointCount() <= jointCount);
+  jointCount = jointMaker->GetJointCount();
+
+  jointMaker->RemoveJointsByLink(link01Vis->GetName());
+  QVERIFY(jointMaker->GetJointCount() <= jointCount);
+  jointCount = jointMaker->GetJointCount();
+
+  jointMaker->RemoveJointsByLink(link02Vis->GetName());
+  QVERIFY(jointMaker->GetJointCount() <= jointCount);
+  jointCount = jointMaker->GetJointCount();
+
+  jointMaker->RemoveJointsByLink(link03Vis->GetName());
+  QVERIFY(jointMaker->GetJointCount() <= jointCount);
+  jointCount = jointMaker->GetJointCount();
+
+  // no more joints left
+  QCOMPARE(jointMaker->GetJointCount(), 0u);
+
+  // Add a revolute joint
+  jointMaker->AddJoint(gui::JointMaker::JOINT_HINGE);
+  gui::JointData *revoluteJointData =
+      jointMaker->CreateJoint(link00Vis, link01Vis);
+  jointMaker->CreateHotSpot(revoluteJointData);
+  QCOMPARE(jointMaker->GetJointCount(), 1u);
+
+  // Add a prismatic joint
+  jointMaker->AddJoint(gui::JointMaker::JOINT_SLIDER);
+  gui::JointData *prismaticJointData =
+      jointMaker->CreateJoint(link01Vis, link02Vis);
+  jointMaker->CreateHotSpot(prismaticJointData);
+  QCOMPARE(jointMaker->GetJointCount(), 2u);
+
+  // Add a screw joint
+  jointMaker->AddJoint(gui::JointMaker::JOINT_SCREW);
+  gui::JointData *screwJointData =
+      jointMaker->CreateJoint(link00Vis, link02Vis);
+  jointMaker->CreateHotSpot(screwJointData);
+  QCOMPARE(jointMaker->GetJointCount(), 3u);
+
+  // Remove the screw joint
+  jointMaker->RemoveJoint(screwJointData->hotspot->GetName());
+  QCOMPARE(jointMaker->GetJointCount(), 2u);
+
+  // Add a ball joint
+  jointMaker->AddJoint(gui::JointMaker::JOINT_BALL);
+  gui::JointData *ballJointData =
+      jointMaker->CreateJoint(link00Vis, link03Vis);
+  jointMaker->CreateHotSpot(ballJointData);
+  QCOMPARE(jointMaker->GetJointCount(), 3u);
+
+  // Remove the two joints connected to link01
+  jointMaker->RemoveJointsByLink(link01Vis->GetName());
   QCOMPARE(jointMaker->GetJointCount(), 1u);
 
   // Remove the last joint

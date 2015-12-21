@@ -1140,7 +1140,7 @@ LinkData *ModelCreator::CreateLinkFromSDF(const sdf::ElementPtr &_linkElem,
   linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
 
   // Top-level links only
-  if (_parentVis == this->previewVisual)
+//  if (_parentVis == this->previewVisual)
     gui::model::Events::linkInserted(linkName);
 
   {

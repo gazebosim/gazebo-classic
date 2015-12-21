@@ -1215,12 +1215,12 @@ void JointData::UpdateMsg()
   if (this->parent)
   {
     std::string jointParentName = this->parent->GetName();
-    std::string leafName = jointParentName;
-    size_t pIdx = jointParentName.rfind("::");
+    std::string unscopedName = jointParentName;
+    size_t pIdx = jointParentName.find("::");
     if (pIdx != std::string::npos)
-      leafName = jointParentName.substr(pIdx+2);
+      unscopedName = jointParentName.substr(pIdx+2);
 
-    this->jointMsg->set_parent(leafName);
+    this->jointMsg->set_parent(unscopedName);
     this->jointMsg->set_parent_id(this->parent->GetId());
   }
 
@@ -1228,12 +1228,12 @@ void JointData::UpdateMsg()
   if (this->child)
   {
     std::string jointChildName = this->child->GetName();
-    std::string leafName = jointChildName;
-    size_t pIdx = jointChildName.rfind("::");
+    std::string unscopedName = jointChildName;
+    size_t pIdx = jointChildName.find("::");
     if (pIdx != std::string::npos)
-      leafName = jointChildName.substr(pIdx+2);
+      unscopedName = jointChildName.substr(pIdx+2);
 
-    this->jointMsg->set_child(leafName);
+    this->jointMsg->set_child(unscopedName);
     this->jointMsg->set_child_id(this->child->GetId());
   }
 
@@ -1482,12 +1482,12 @@ void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
 /////////////////////////////////////////////////
 void JointMaker::OnLinkInserted(const std::string &_linkName)
 {
-  std::string leafName = _linkName;
-  size_t idx = _linkName.rfind("::");
+  std::string unscopedName = _linkName;
+  size_t idx = unscopedName.find("::");
   if (idx != std::string::npos)
-    leafName = _linkName.substr(idx+2);
+    unscopedName = _linkName.substr(idx+2);
 
-  this->linkList[_linkName] = leafName;
+  this->linkList[_linkName] = unscopedName;
 
   this->EmitLinkInserted(_linkName);
 }
