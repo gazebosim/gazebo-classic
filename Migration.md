@@ -189,6 +189,10 @@ release will remove the deprecated code.
     + ***Deprecation:*** rendering::ScenePtr GetScene() const
     + ***Replacement:*** rendering::ScenePtr Scene() const
 
+1. **gazebo/gui/KeyEventHandler.hh**
+    + ***Deprecation:*** bool GetAutoRepeat() const
+    + ***Replacement:*** bool AutoRepeat() const
+
 1. **gazebo/gui/RTShaderSystem.hh**
     + ***Deprecation:*** void AttachEntity(Visual *vis)
     + ***No replacement for AttachEntity ***
