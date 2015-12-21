@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_SENSOR_HH_
-#define _GAZEBO_SENSOR_HH_
+#ifndef _GAZEBO_SENSORS_SENSOR_HH_
+#define _GAZEBO_SENSORS_SENSOR_HH_
 
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/thread/mutex.hpp>
@@ -48,7 +48,7 @@ namespace gazebo
     class GAZEBO_VISIBLE Sensor : public boost::enable_shared_from_this<Sensor>
     {
       /// \brief Constructor.
-      /// \param[in] _class
+      /// \param[in] _cat Category of the sensor
       public: explicit Sensor(SensorCategory _cat);
 
       /// \brief Destructor.
@@ -80,14 +80,6 @@ namespace gazebo
       /// \brief Update the sensor.
       /// \param[in] _force True to force update, false otherwise.
       public: void Update(bool _force);
-
-      /// \brief This gets overwritten by derived sensor types.
-      ///        This function is called during Sensor::Update.
-      ///        And in turn, Sensor::Update is called by
-      ///        SensorManager::Update
-      /// \param[in] _force True if update is forced, false if not
-      /// \return True if the sensor was updated.
-      protected: virtual bool UpdateImpl(bool /*_force*/) {return false;}
 
       /// \brief Get the update rate of the sensor.
       /// \return _hz update rate of sensor.  Returns 0 if unthrottled.
@@ -167,8 +159,7 @@ namespace gazebo
       /// \brief Disconnect from a the updated signal.
       /// \param[in] _c The connection to disconnect
       /// \sa Sensor::ConnectUpdated
-      public: void DisconnectUpdated(event::ConnectionPtr &_c)
-              {this->updated.Disconnect(_c);}
+      public: void DisconnectUpdated(event::ConnectionPtr &_c);
 
       /// \brief Get the category of the sensor.
       /// \return The category of the sensor.
@@ -192,6 +183,14 @@ namespace gazebo
       /// \return The sensor's noise model for the given noise type
       public: NoisePtr GetNoise(const SensorNoiseType _type) const;
 
+      /// \brief This gets overwritten by derived sensor types.
+      ///        This function is called during Sensor::Update.
+      ///        And in turn, Sensor::Update is called by
+      ///        SensorManager::Update
+      /// \param[in] _force True if update is forced, false if not
+      /// \return True if the sensor was updated.
+      protected: virtual bool UpdateImpl(const bool /*_force*/) {return false;}
+
       /// \brief Return true if the sensor needs to be updated.
       /// \return True when sensor should be updated.
       protected: bool NeedsUpdate();
@@ -214,9 +213,6 @@ namespace gazebo
 
       /// \brief Node for communication.
       protected: transport::NodePtr node;
-
-      /// \brief Subscribe to pose updates.
-      protected: transport::SubscriberPtr poseSub;
 
       /// \brief Name of the parent.
       protected: std::string parentName;

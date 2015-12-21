@@ -443,3 +443,10 @@ void Sensor::ResetLastUpdateTime()
   boost::mutex::scoped_lock lock(this->mutexLastUpdateTime);
   this->lastUpdateTime = 0.0;
 }
+
+//////////////////////////////////////////////////
+void Sensor::DisconnectUpdated(event::ConnectionPtr &_c)
+{
+  this->dataPtr->updated.Disconnect(_c);
+}
+
