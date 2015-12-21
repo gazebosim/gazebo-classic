@@ -121,7 +121,7 @@ std::string SchematicViewWidget::GetUnscopedName(const std::string &_scopedName)
     unscopedName = _scopedName.substr(idx+2);
 
   // TODO support nested model links
-  // if the namestill scoped then it could be a nested link - ignore for now.
+  // if the name is still scoped then it could be a nested link.
   if (unscopedName.find("::") != std::string::npos)
     return "";
 

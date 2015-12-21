@@ -26,7 +26,6 @@
 
 using namespace gazebo;
 
-
 /////////////////////////////////////////////////
 void JointMaker_TEST::JointState()
 {

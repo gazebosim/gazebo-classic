@@ -247,7 +247,6 @@ void JointCreationDialog_TEST::Links()
   QVERIFY(configWidget->EnumWidgetValue("parentCombo") == linkNames[2]);
   QVERIFY(configWidget->EnumWidgetValue("childCombo") == linkNames[3]);
 
-
   // Check that all buttons are enabled
   for (auto button : pushButtons)
     QVERIFY(button->isEnabled());
