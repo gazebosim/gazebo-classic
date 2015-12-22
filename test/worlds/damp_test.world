@@ -98,12 +98,12 @@
                 <inertial>
                     <pose>0.0 0.0 -10.0 0.0 0.0 0.0</pose>
                     <inertia>
-                        <ixx>0.0</ixx>
+                        <ixx>1.0</ixx>
                         <ixy>0.0</ixy>
                         <ixz>0.0</ixz>
-                        <iyy>0.0</iyy>
+                        <iyy>0.5</iyy>
                         <iyz>0.0</iyz>
-                        <izz>0.0</izz>
+                        <izz>0.5</izz>
                     </inertia>
                     <mass>0.1</mass>
                 </inertial>
@@ -158,12 +158,12 @@
                 <inertial>
                     <pose>0.0 0.0 -10.0 0.0 0.0 0.0</pose>
                     <inertia>
-                        <ixx>0.0</ixx>
+                        <ixx>1.0</ixx>
                         <ixy>0.0</ixy>
                         <ixz>0.0</ixz>
-                        <iyy>0.0</iyy>
+                        <iyy>0.5</iyy>
                         <iyz>0.0</iyz>
-                        <izz>0.0</izz>
+                        <izz>0.5</izz>
                     </inertia>
                     <mass>1.0</mass>
                 </inertial>
