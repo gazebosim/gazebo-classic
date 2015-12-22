@@ -106,7 +106,7 @@ namespace gazebo
 
 
       // Documentation inherited
-      public: virtual bool IsActive();
+      public: virtual bool IsActive() const;
 
       /// \brief Connect a to the new update signal.
       /// \param[in] _subscriber Callback function.

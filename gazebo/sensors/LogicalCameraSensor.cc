@@ -156,7 +156,7 @@ bool LogicalCameraSensor::UpdateImpl(bool _force)
 }
 
 //////////////////////////////////////////////////
-bool LogicalCameraSensor::IsActive()
+bool LogicalCameraSensor::IsActive() const
 {
   return Sensor::IsActive() ||
     (this->dataPtr->pub && this->dataPtr->pub->HasConnections());
