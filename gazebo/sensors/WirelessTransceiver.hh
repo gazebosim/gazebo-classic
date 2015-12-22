@@ -66,10 +66,10 @@ namespace gazebo
       protected: transport::PublisherPtr pub;
 
       /// \brief Receiver's power (dBm).
-      protected: double power;
+      protected: double power = 14.5;
 
       /// \brief Antenna's gain of the receiver (dBi).
-      protected: double gain;
+      protected: double gain = 2.5;
 
       /// \brief Parent entity which the sensor is attached to
       protected: boost::weak_ptr<physics::Link> parentEntity;
