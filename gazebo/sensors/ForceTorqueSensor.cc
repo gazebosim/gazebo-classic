@@ -194,7 +194,7 @@ ignition::math::Vector3d ForceTorqueSensor::Torque() const
 }
 
 //////////////////////////////////////////////////
-bool ForceTorqueSensor::UpdateImpl(bool /*_force*/)
+bool ForceTorqueSensor::UpdateImpl(const bool /*_force*/)
 {
   boost::mutex::scoped_lock lock(this->mutex);
 

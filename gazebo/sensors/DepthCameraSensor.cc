@@ -156,7 +156,7 @@ void DepthCameraSensor::Render()
 }
 
 //////////////////////////////////////////////////
-bool DepthCameraSensor::UpdateImpl(bool /*_force*/)
+bool DepthCameraSensor::UpdateImpl(const bool /*_force*/)
 {
   // Sensor::Update(force);
   if (!this->rendered)

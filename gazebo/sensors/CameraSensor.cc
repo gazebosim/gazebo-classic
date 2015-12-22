@@ -191,7 +191,7 @@ void CameraSensor::Render()
 }
 
 //////////////////////////////////////////////////
-bool CameraSensor::UpdateImpl(bool /*_force*/)
+bool CameraSensor::UpdateImpl(const bool /*_force*/)
 {
   if (!this->rendered)
     return false;

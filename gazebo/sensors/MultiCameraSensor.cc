@@ -239,7 +239,7 @@ void MultiCameraSensor::Render()
 }
 
 //////////////////////////////////////////////////
-bool MultiCameraSensor::UpdateImpl(bool /*_force*/)
+bool MultiCameraSensor::UpdateImpl(const bool /*_force*/)
 {
   boost::mutex::scoped_lock lock(this->cameraMutex);
 
