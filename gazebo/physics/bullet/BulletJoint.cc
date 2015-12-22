@@ -568,6 +568,7 @@ void BulletJoint::ApplyStiffnessDamping()
         axisChild = childPose.rot.RotateVectorReverse(axis);
         axisChild = axisChild.Normalize();
       }
+
       if (bulletChildLink && bulletParentLink)
       {
         this->stiffnessDampingConstraint = new btGeneric6DofSpring2Constraint(
@@ -596,6 +597,22 @@ void BulletJoint::ApplyStiffnessDamping()
           RO_XYZ
           );
       }
+
+      for (unsigned int l = 0; l < 6; ++l)
+      {
+        this->stiffnessDampingConstraint->setLimit(l,
+          SIMD_INFINITY, -SIMD_INFINITY);
+        this->stiffnessDampingConstraint->enableSpring(l, true);
+        this->stiffnessDampingConstraint->setStiffness(l,
+          this->stiffnessCoefficient[i]);
+        this->stiffnessDampingConstraint->setDamping(l,
+          this->dissipationCoefficient[i]);
+        this->stiffnessDampingConstraint->setEquilibriumPoint(l,
+          this->springReferencePosition[_index]);
+      }
+      this->bulletWorld->addConstraint(this->stiffnessDampingConstraint, true);
+ 
+      /*
       for (unsigned int l = 0; l < 3; ++l)
       {
         this->stiffnessDampingConstraint->setParam(
@@ -608,7 +625,6 @@ void BulletJoint::ApplyStiffnessDamping()
           BT_CONSTRAINT_CFM, 100.0, l);
       }
       // this->stiffnessDampingConstraint->setAngularLowerLimit
-      /*
       btGeneric6DofConstraint(
           btRigidBody& rbA,
           btRigidBody& rbB,
@@ -616,7 +632,7 @@ void BulletJoint::ApplyStiffnessDamping()
           const btTransform& frameInB,
           bool useLinearReferenceFrameA);
       */
-      gzerr << "damping done\n";
+      // gzerr << "damping done\n";
     }
   }
 }
