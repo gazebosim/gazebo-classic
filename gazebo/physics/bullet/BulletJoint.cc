@@ -608,7 +608,7 @@ void BulletJoint::ApplyStiffnessDamping()
         this->stiffnessDampingConstraint->setDamping(l,
           this->dissipationCoefficient[i]);
         this->stiffnessDampingConstraint->setEquilibriumPoint(l,
-          this->springReferencePosition[_index]);
+          this->springReferencePosition[i]);
       }
       this->bulletWorld->addConstraint(this->stiffnessDampingConstraint, true);
  
