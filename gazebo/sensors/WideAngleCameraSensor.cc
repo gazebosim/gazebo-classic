@@ -164,7 +164,7 @@ void WideAngleCameraSensor::Fini()
 }
 
 //////////////////////////////////////////////////
-bool WideAngleCameraSensor::UpdateImpl(bool _force)
+bool WideAngleCameraSensor::UpdateImpl(const bool _force)
 {
   if (!CameraSensor::UpdateImpl(_force))
     return false;

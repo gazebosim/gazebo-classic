@@ -204,7 +204,7 @@ ignition::math::Vector3d ForceTorqueSensor::Torque() const
 }
 
 //////////////////////////////////////////////////
-bool ForceTorqueSensor::UpdateImpl(bool /*_force*/)
+bool ForceTorqueSensor::UpdateImpl(const bool /*_force*/)
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 

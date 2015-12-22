@@ -52,9 +52,6 @@ namespace gazebo
       // Documentation inherited
       public: virtual void Fini();
 
-      // Documentation inherited
-      private: virtual bool UpdateImpl(const bool _force);
-
       /// \brief Returns the minimum frequency filtered (MHz).
       /// \return Reception frequency (MHz).
       /// \deprecated See MinFreqFiltered()
@@ -81,6 +78,9 @@ namespace gazebo
       /// \brief Returns the receiver sensitivity (dBm).
       /// \return Receiver sensitivity (dBm).
       public: double Sensitivity() const;
+
+      // Documentation inherited
+      protected: virtual bool UpdateImpl(const bool _force);
 
       /// \internal
       /// \brief Private data pointer

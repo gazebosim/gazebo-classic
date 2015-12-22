@@ -278,7 +278,7 @@ void ImuSensor::SetReferencePose()
 }
 
 //////////////////////////////////////////////////
-bool ImuSensor::UpdateImpl(bool /*_force*/)
+bool ImuSensor::UpdateImpl(const bool /*_force*/)
 {
   msgs::LinkData msg;
   int readIndex = 0;

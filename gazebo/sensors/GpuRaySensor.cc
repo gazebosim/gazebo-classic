@@ -688,7 +688,7 @@ void GpuRaySensor::Render()
 }
 
 //////////////////////////////////////////////////
-bool GpuRaySensor::UpdateImpl(bool /*_force*/)
+bool GpuRaySensor::UpdateImpl(const bool /*_force*/)
 {
   if (!this->dataPtr->rendered)
     return false;
