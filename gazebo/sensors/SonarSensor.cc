@@ -338,3 +338,10 @@ void SonarSensor::OnContacts(ConstContactsPtr &_msg)
       this->incomingContacts.pop_front();
   }
 }
+
+//////////////////////////////////////////////////
+void SonarSensor::DisconnectUpdate(event::ConnectionPtr &_conn)
+{
+  this->update.Disconnect(_conn);
+}
+
