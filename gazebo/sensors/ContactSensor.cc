@@ -14,20 +14,12 @@
  * limitations under the License.
  *
 */
-/* Desc: Contact sensor
- * Author: Nate Koenig
- * Date: 09 Sept. 2008
-*/
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
-
-#include <boost/algorithm/string.hpp>
-#include <sstream>
-
+#include <regex>
 #include "gazebo/common/Exception.hh"
 
 #include "gazebo/transport/Node.hh"
@@ -80,7 +72,8 @@ void ContactSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
     // name of the sensor.
     std::string topicName = "~/";
     topicName += this->parentName + "/" + this->GetName();
-    boost::replace_all(topicName, "::", "/");
+    topicName = std::regex_replace(topicName, std::regex("::"),
+        std::string("/"));
 
     this->contactsPub = this->node->Advertise<msgs::Contacts>(topicName, 100);
   }

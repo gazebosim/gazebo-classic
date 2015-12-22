@@ -20,7 +20,7 @@
   #include <Winsock2.h>
 #endif
 
-#include <boost/algorithm/string.hpp>
+#include <regex>
 
 #include "gazebo/sensors/SensorFactory.hh"
 
@@ -66,7 +66,8 @@ void GpsSensor::Load(const std::string &_worldName)
   this->topicName = "~/" + this->parentName + '/' + this->GetName();
   if (this->sdf->HasElement("topic"))
     this->topicName += '/' + this->sdf->Get<std::string>("topic");
-  boost::replace_all(this->topicName, "::", "/");
+  this->dataPtr->topicName = std::regex_replace(this->dataPtr->topicName,
+      std::regex("::"), std::string("/"));
 
   this->gpsPub = this->node->Advertise<msgs::GPS>(this->topicName, 50);
 

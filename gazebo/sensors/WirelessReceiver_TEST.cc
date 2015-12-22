@@ -15,9 +15,8 @@
  *
 */
 
+#include <regex>
 #include <gtest/gtest.h>
-#include <boost/algorithm/string.hpp>
-#include <boost/regex.hpp>
 #include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
@@ -35,6 +34,9 @@ class WirelessReceiver_TEST : public ServerFixture
   public: void TestIllegalSensitivity();
   public: void TestUpdateImpl();
 
+  /// \brief Create a sensor with an illegal value and checks that an exception
+  /// is thrown
+  /// \param[in] _sensorString Sensor SDF string
   private: void CheckIllegalValue(std::string _sensorString);
 
   private: sensors::SensorManager *mgr;
@@ -102,8 +104,6 @@ void WirelessReceiver_TEST::TestCreateWirelessReceiver()
 }
 
 /////////////////////////////////////////////////
-/// \brief Create a sensor with an illegal value and checks that an exception
-/// is thrown
 void WirelessReceiver_TEST::CheckIllegalValue(std::string _sensorString)
 {
   sdf::readString(_sensorString, this->sdf);
@@ -119,8 +119,10 @@ void WirelessReceiver_TEST::TestIllegalTransceiver()
 {
   // Make a copy of the sdf string for avoid affecting other tests
   std::string receiverSensorStringCopy = this->receiverSensorString;
-  boost::replace_first(receiverSensorStringCopy, "<transceiver>", "");
-  boost::replace_first(receiverSensorStringCopy, "</transceiver>", "");
+  receiverSensorStringCopy = std::regex_replace(receiverSensorStringCopy,
+      std::regex("<transceiver>"), std::string(""));
+  receiverSensorStringCopy = std::regex_replace(receiverSensorStringCopy,
+      std::regex("</transceiver>"), std::string(""));
 
   this->CheckIllegalValue(receiverSensorStringCopy);
 }
@@ -130,10 +132,10 @@ void WirelessReceiver_TEST::TestIllegalTransceiver()
 void WirelessReceiver_TEST::TestIllegalPower()
 {
   // Replace the power by an incorrect value
-  boost::regex re("<power>.*<\\/power>");
   std::string receiverSensorStringCopy =
-      boost::regex_replace(this->receiverSensorString,
-          re, "<power>-1.0</power>");
+      std::regex_replace(this->receiverSensorString,
+          std::regex("<power>.*<\\/power>"),
+          std::string("<power>-1.0</power>"));
 
   this->CheckIllegalValue(receiverSensorStringCopy);
 }
@@ -143,9 +145,9 @@ void WirelessReceiver_TEST::TestIllegalPower()
 void WirelessReceiver_TEST::TestIllegalGain()
 {
   // Replace the gain by an incorrect value
-  boost::regex re("<gain>.*<\\/gain>");
   std::string receiverSensorStringCopy =
-      boost::regex_replace(this->receiverSensorString, re, "<gain>-1.0</gain>");
+      std::regex_replace(this->receiverSensorString,
+          std::regex("<gain>.*<\\/gain>"), std::string("<gain>-1.0</gain>"));
 
   this->CheckIllegalValue(receiverSensorStringCopy);
 }
@@ -155,10 +157,10 @@ void WirelessReceiver_TEST::TestIllegalGain()
 void WirelessReceiver_TEST::TestIllegalMinFreq()
 {
   // Replace the min frequency by an incorrect value
-  boost::regex re("<min_frequency>.*<\\/min_frequency>");
   std::string receiverSensorStringCopy =
-      boost::regex_replace(this->receiverSensorString, re,
-        "<min_frequency>-1.0</min_frequency>");
+      std::regex_replace(this->receiverSensorString,
+          std::regex("<min_frequency>.*<\\/min_frequency>"),
+          std::string("<min_frequency>-1.0</min_frequency>"));
 
   this->CheckIllegalValue(receiverSensorStringCopy);
 }
@@ -168,10 +170,10 @@ void WirelessReceiver_TEST::TestIllegalMinFreq()
 void WirelessReceiver_TEST::TestIllegalMaxFreq()
 {
   // Replace the max frequency by an incorrect value
-  boost::regex re("<max_frequency>.*<\\/max_frequency>");
   std::string receiverSensorStringCopy =
-      boost::regex_replace(this->receiverSensorString, re,
-        "<max_frequency>-1.0</max_frequency>");
+      std::regex_replace(this->receiverSensorString,
+          std::regex("<max_frequency>.*<\\/max_frequency>"),
+          std::string("<max_frequency>-1.0</max_frequency>"));
 
   this->CheckIllegalValue(receiverSensorStringCopy);
 }
@@ -181,15 +183,15 @@ void WirelessReceiver_TEST::TestIllegalMaxFreq()
 void WirelessReceiver_TEST::TestIllegalMinMaxFreq()
 {
   // Swap min_frequency and max_frequency
-  boost::regex re("<max_frequency>.*<\\/max_frequency>");
   std::string receiverSensorStringCopy =
-      boost::regex_replace(this->receiverSensorString, re,
-        "<max_frequency>2412.0</max_frequency>");
+      std::regex_replace(this->receiverSensorString,
+          std::regex("<max_frequency>.*<\\/max_frequency>"),
+          std::string("<max_frequency>2412.0</max_frequency>"));
 
-  re = "<min_frequency>.*<\\/min_frequency>";
   receiverSensorStringCopy =
-      boost::regex_replace(receiverSensorStringCopy, re,
-        "<min_frequency>2484.0</min_frequency>");
+      std::regex_replace(receiverSensorStringCopy,
+          std::regex("<min_frequency>.*<\\/min_frequency>"),
+          std::string("<min_frequency>2484.0</min_frequency>"));
 
   this->CheckIllegalValue(receiverSensorStringCopy);
 }
@@ -199,10 +201,10 @@ void WirelessReceiver_TEST::TestIllegalMinMaxFreq()
 void WirelessReceiver_TEST::TestIllegalSensitivity()
 {
   // Replace the sensitivity by an incorrect value
-  boost::regex re("<sensitivity>.*<\\/sensitivity>");
   std::string receiverSensorStringCopy =
-      boost::regex_replace(this->receiverSensorString, re,
-        "<sensitivity>1.0</sensitivity>");
+      std::regex_replace(this->receiverSensorString,
+          std::regex("<sensitivity>.*<\\/sensitivity>"),
+          std::string("<sensitivity>1.0</sensitivity>"));
 
   this->CheckIllegalValue(receiverSensorStringCopy);
 }

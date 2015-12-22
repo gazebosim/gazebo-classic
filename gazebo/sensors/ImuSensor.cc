@@ -19,8 +19,7 @@
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
-
-#include <boost/algorithm/string.hpp>
+#include <regex>
 #include <ignition/math/Rand.hh>
 
 #include "gazebo/transport/Node.hh"
@@ -73,7 +72,8 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
   {
     std::string topicName = "~/";
     topicName += this->parentName + "/" + this->GetName() + "/imu";
-    boost::replace_all(topicName, "::", "/");
+    topicName = std::regex_replace(topicName, std::regex("::"),
+        std::string("/"));
 
     this->pub = this->node->Advertise<msgs::IMU>(topicName, 500);
   }

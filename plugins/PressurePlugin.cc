@@ -14,11 +14,7 @@
  * limitations under the License.
  *
 */
-/*
- * Desc: Pressure sensor plugin
- * Author: Steve Peters
- */
-#include <boost/algorithm/string.hpp>
+#include <regex>
 #include <gazebo/physics/Base.hh>
 #include "PressurePlugin.hh"
 
@@ -51,7 +47,7 @@ void PressurePlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr /*_sdf*/)
 
   // Connect to the sensor update event.
   this->updateConnection = this->parentSensor->ConnectUpdated(
-      boost::bind(&PressurePlugin::OnUpdate, this));
+      std::bind(&PressurePlugin::OnUpdate, this));
 
   // Make sure the parent sensor is active.
   this->parentSensor->SetActive(true);
@@ -119,7 +115,8 @@ void PressurePlugin::Init()
   {
     // Create publisher for tactile messages
     std::string topicName = "~/" + this->parentSensorName + "/tactile";
-    boost::replace_all(topicName, "::", "/");
+    topicName = std::regex_replace(topicName, std::regex("::"),
+        std::string("/"));
     this->tactilePub = this->node->Advertise<msgs::Tactile>(topicName);
   }
 }
