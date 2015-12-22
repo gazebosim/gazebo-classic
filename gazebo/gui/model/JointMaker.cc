@@ -137,10 +137,7 @@ JointMaker::~JointMaker()
   }
 
   if (this->jointCreationDialog)
-  {
-    this->jointCreationDialog->close();
     delete this->jointCreationDialog;
-  }
 
   // Delete this last
   delete this->updateMutex;
