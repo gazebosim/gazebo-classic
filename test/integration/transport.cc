@@ -36,6 +36,18 @@ int g_createdBeforePub = 0;
 int g_noLatchCreatedAfterPub = 0;
 int g_latchCreatedAfterPub = 0;
 int g_latchCreatedAfterPub2 = 0;
+int g_subBeforeClear = 0;
+int g_subAfterClear = 0;
+
+void ReceiveBeforeClear(ConstVector3dPtr &/*_msg*/)
+{
+  g_subBeforeClear++;
+}
+
+void ReceiveAfterClear(ConstVector3dPtr &/*_msg*/)
+{
+  g_subAfterClear++;
+}
 
 void ReceiveNoLatchCreatedAfterPub(ConstVector3dPtr &/*_msg*/)
 {
@@ -432,6 +444,86 @@ TEST_F(TransportTest, IfaceGetAdvertisedTopics)
 
   EXPECT_FALSE(topics.empty());
   EXPECT_TRUE(topicMap.find("gazebo.msgs.PosesStamped") != topicMap.end());
+}
+
+/////////////////////////////////////////////////
+// Test clearing buffers
+TEST_F(TransportTest, ClearBuffers)
+{
+  this->Load("worlds/empty.world");
+
+  // Check that transport is running and there are advertised topics
+  EXPECT_FALSE(transport::is_stopped());
+  EXPECT_TRUE(transport::ConnectionManager::Instance()->IsRunning());
+  EXPECT_FALSE(transport::getAdvertisedTopics().empty());
+
+  std::string fullTopic = "/gazebo/" +  node->GetTopicNamespace() +
+      "/test_topic";
+
+  // Initialize transport node
+  auto node = transport::NodePtr(new transport::Node());
+  node->Init();
+  ASSERT_TRUE(node != NULL);
+
+  // Advertise publisher
+  auto pub = node->Advertise<msgs::Vector3d>(fullTopic);
+  ASSERT_TRUE(pub != NULL);
+
+  // Publish a message
+  msgs::Vector3d msg;
+  msg.set_x(1);
+  msg.set_y(2);
+  msg.set_z(3);
+  pub->Publish(msg);
+
+  // FIXME: Need to sleep a bit before creating the latched subscriber,
+  // otherwise it might receive the message twice.
+  common::Time::MSleep(100);
+
+  // Check that no messages have been received in callback yet
+  EXPECT_EQ(g_subBeforeClear, 0);
+
+  // Create a latched subscriber after publishing
+  auto subBeforeClear = node->Subscribe(fullTopic,
+      &ReceiveBeforeClear, true);
+  ASSERT_TRUE(subBeforeClear != NULL);
+
+  // Check that message is in buffer, since it's received by latched subscriber
+  int sleep = 0;
+  int maxSleep = 30;
+  while (g_subBeforeClear != 1 && sleep < maxSleep)
+  {
+    common::Time::MSleep(100);
+    sleep++;
+  }
+  EXPECT_EQ(g_subBeforeClear, 1);
+
+  // Clear buffers
+  transport::clear_buffers();
+
+  // Check that transport is still running
+  EXPECT_FALSE(transport::is_stopped());
+  EXPECT_TRUE(transport::ConnectionManager::Instance()->IsRunning());
+  EXPECT_FALSE(transport::getAdvertisedTopics().empty());
+
+  // Create another latched subscriber after publishing
+  auto subAfterClear = node->Subscribe(fullTopic, &ReceiveAfterClear, true);
+  ASSERT_TRUE(subAfterClear != NULL);
+
+  // Check that previous message is not received by new latched subscriber
+  sleep = 0;
+  while (g_subAfterClear != 1 && sleep < maxSleep)
+  {
+    common::Time::MSleep(100);
+    sleep++;
+  }
+  EXPECT_EQ(g_subBeforeClear, 1);
+  EXPECT_EQ(g_subAfterClear, 0);
+
+  pub.reset();
+  subBeforeClear.reset();
+  subAfterClear.reset();
+  node.reset();
 }
 
 /////////////////////////////////////////////////
