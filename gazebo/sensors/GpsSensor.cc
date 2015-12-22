@@ -66,7 +66,7 @@ void GpsSensor::Load(const std::string &_worldName)
   this->topicName = "~/" + this->parentName + '/' + this->GetName();
   if (this->sdf->HasElement("topic"))
     this->topicName += '/' + this->sdf->Get<std::string>("topic");
-  this->dataPtr->topicName = std::regex_replace(this->dataPtr->topicName,
+  this->topicName = std::regex_replace(this->topicName,
       std::regex("::"), std::string("/"));
 
   this->gpsPub = this->node->Advertise<msgs::GPS>(this->topicName, 50);
