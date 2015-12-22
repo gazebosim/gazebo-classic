@@ -19,7 +19,9 @@
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
-#include <regex>
+
+#include <boost/algorithm/string.hpp>
+
 #include <ignition/math/Vector3.hh>
 
 #include "gazebo/physics/World.hh"
@@ -66,7 +68,7 @@ std::string SonarSensor::Topic() const
 {
   std::string topicName = "~/";
   topicName += this->ParentName() + "/" + this->Name() + "/sonar";
-  topicName = std::regex_replace(topicName, std::regex("::"), std::string("/"));
+  boost::replace_all(topicName, "::", "/");
 
   return topicName;
 }

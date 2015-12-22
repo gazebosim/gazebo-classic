@@ -20,7 +20,8 @@
   #include <Winsock2.h>
 #endif
 
-#include <regex>
+#include <boost/algorithm/string.hpp>
+#include <sstream>
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/SensorManager.hh"
@@ -50,7 +51,7 @@ std::string WirelessTransceiver::Topic() const
 {
   std::string topicName = "~/";
   topicName += this->ParentName() + "/" + this->Name() + "/transceiver";
-  topicName = std::regex_replace(topicName, std::regex("::"), std::string("/"));
+  boost::replace_all(topicName, "::", "/");
 
   return topicName;
 }

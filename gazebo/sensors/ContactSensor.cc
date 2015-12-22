@@ -19,7 +19,10 @@
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
-#include <regex>
+
+#include <boost/algorithm/string.hpp>
+#include <sstream>
+
 #include "gazebo/common/Exception.hh"
 
 #include "gazebo/transport/Node.hh"
@@ -75,8 +78,7 @@ void ContactSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
     // name of the sensor.
     std::string topicName = "~/";
     topicName += this->ParentName() + "/" + this->Name();
-    topicName = std::regex_replace(topicName, std::regex("::"),
-        std::string("/"));
+    boost::replace_all(topicName, "::", "/");
 
     this->dataPtr->contactsPub =
       this->node->Advertise<msgs::Contacts>(topicName, 100);

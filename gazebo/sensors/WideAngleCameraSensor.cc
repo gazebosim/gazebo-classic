@@ -14,8 +14,10 @@
  * limitations under the License.
  *
 */
+
 #include <mutex>
-#include <regex>
+
+#include <boost/algorithm/string.hpp>
 
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Exception.hh"
@@ -139,8 +141,7 @@ void WideAngleCameraSensor::Load(const std::string &_worldName)
 
   std::string lensTopicName = "~/";
   lensTopicName += this->ParentName() + "/" + this->Name() + "/lens/";
-  lensTopicName = std::regex_replace(lensTopicName, std::regex("::"),
-      std::string("/"));
+  boost::replace_all(lensTopicName, "::", "/");
 
   sdf::ElementPtr lensSdf =
     this->sdf->GetElement("camera")->GetElement("lens");

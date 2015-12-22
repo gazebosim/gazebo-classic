@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include <regex>
+#include <boost/algorithm/string.hpp>
 #include <gazebo/physics/Base.hh>
 #include "PressurePlugin.hh"
 
@@ -115,8 +115,7 @@ void PressurePlugin::Init()
   {
     // Create publisher for tactile messages
     std::string topicName = "~/" + this->parentSensorName + "/tactile";
-    topicName = std::regex_replace(topicName, std::regex("::"),
-        std::string("/"));
+    boost::replace_all(topicName, "::", "/");
     this->tactilePub = this->node->Advertise<msgs::Tactile>(topicName);
   }
 }

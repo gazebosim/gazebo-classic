@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include <regex>
+
 #include <gtest/gtest.h>
 #include "gazebo/test/ServerFixture.hh"
 
@@ -124,10 +124,10 @@ void WirelessTransmitter_TEST::TestInvalidFreq()
   sdf::initFile("sensor.sdf", sdf);
 
   // Replace the essid by an empty value
+  boost::regex re("<frequency>.*<\\/frequency>");
   std::string transmitterSensorStringCopy =
-      std::regex_replace(transmitterSensorString,
-          std::regex("<frequency>.*<\\/frequency>"),
-          std::string("<frequency>-1.0</frequency>"));
+      boost::regex_replace(transmitterSensorString, re,
+        "<frequency>-1.0</frequency>");
 
   sdf::readString(transmitterSensorStringCopy, sdf);
 
