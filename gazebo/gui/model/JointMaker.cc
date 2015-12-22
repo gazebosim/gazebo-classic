@@ -80,7 +80,6 @@ JointMaker::JointMaker()
   this->jointTypes[JOINT_GEARBOX]   = "gearbox";
   this->jointTypes[JOINT_NONE]      = "none";
 
-  // this->jointCreationDialog = new JointCreationDialog(this);
   this->jointCreationDialog = NULL;
 
   this->connections.push_back(
