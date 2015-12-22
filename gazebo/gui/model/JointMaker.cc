@@ -80,7 +80,8 @@ JointMaker::JointMaker()
   this->jointTypes[JOINT_GEARBOX]   = "gearbox";
   this->jointTypes[JOINT_NONE]      = "none";
 
-  this->jointCreationDialog = new JointCreationDialog(this);
+  // this->jointCreationDialog = new JointCreationDialog(this);
+  this->jointCreationDialog = NULL;
 
   this->connections.push_back(
       event::Events::ConnectPreRender(
@@ -136,8 +137,11 @@ JointMaker::~JointMaker()
     this->joints.clear();
   }
 
-  this->jointCreationDialog->close();
-  delete this->jointCreationDialog;
+  if (this->jointCreationDialog)
+  {
+    this->jointCreationDialog->close();
+    delete this->jointCreationDialog;
+  }
 
   // Delete this last
   delete this->updateMutex;
@@ -421,8 +425,11 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
           if (!this->SetParentLink(this->hoverVis))
             return false;
 
-          this->jointCreationDialog->SetParent(
-              this->newJoint->parent->GetName());
+          if (this->jointCreationDialog)
+          {
+            this->jointCreationDialog->SetParent(
+                this->newJoint->parent->GetName());
+          }
         }
         // Pressed child link
         else if (this->newJoint && this->newJoint->parent != this->hoverVis)
@@ -430,7 +437,11 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
           if (!this->SetChildLink(this->hoverVis))
             return false;
 
-          this->jointCreationDialog->SetChild(this->newJoint->child->GetName());
+          if (this->jointCreationDialog)
+          {
+            this->jointCreationDialog->SetChild(
+                this->newJoint->child->GetName());
+          }
         }
 
         if (this->hoverVis)
@@ -544,6 +555,11 @@ void JointMaker::AddJoint(JointMaker::JointType _type)
   // Start joint creation
   if (_type != JointMaker::JOINT_NONE)
   {
+    if (!this->jointCreationDialog)
+    {
+      auto mainWindow = gui::get_main_window();
+      this->jointCreationDialog = new JointCreationDialog(this, mainWindow);
+    }
     this->jointCreationDialog->Open(_type);
   }
   // End joint creation
@@ -840,17 +856,17 @@ void JointMaker::Update()
               this->jointCreationDialog->isVisible())
           {
             // Get poses as homogeneous transforms
-            ignition::math::Matrix4d parent_world(
+            ignition::math::Matrix4d parentWorld(
                 this->newJoint->parent->GetWorldPose().Ign());
-            ignition::math::Matrix4d child_world(
+            ignition::math::Matrix4d childWorld(
                 this->newJoint->child->GetWorldPose().Ign());
 
             // w_T_c = w_T_p * p_T_c
             // w_T_p^-1 * w_T_c = p_T_c
-            ignition::math::Matrix4d child_parent = parent_world.Inverse() *
-                child_world;
+            ignition::math::Matrix4d childParent = parentWorld.Inverse() *
+                childWorld;
 
-            this->jointCreationDialog->UpdateRelativePose(child_parent.Pose());
+            this->jointCreationDialog->UpdateRelativePose(childParent.Pose());
           }
         }
       }
