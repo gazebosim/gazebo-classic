@@ -81,6 +81,14 @@ release will remove the deprecated code.
 
 ### Deprecations
 
+1. **gazebo/rendering/WindowManager.hh**
+    + ***Deprecation:*** public: uint32_t GetAvgFPS(uint32_t _id);
+    + ***Replacement:*** public: uint32_t AvgFPS(const uint32_t _id) const;
+    + ***Deprecation:*** public: uint32_t GetTriangleCount(uint32_t _id);
+    + ***Replacement:*** public: uint32_t TriangleCount(const uint32_t _id) const;
+    + ***Deprecation:*** public: Ogre::RenderWindow *GetWindow(uint32_t _id);
+    + ***Replacement:*** public: Ogre::RenderWindow *Window(const uint32_t _id) const;
+
 1. **gazebo/util/Diagnostics.hh**
     + ***Deprecation:*** public: int GetTimerCount() const;
     + ***Replacement:*** public: int TimerCount() const;
