@@ -20,9 +20,8 @@
   #include <Winsock2.h>
 #endif
 
+#include <boost/algorithm/string.hpp>
 #include <functional>
-#include <regex>
-
 #include <ignition/math/Pose3.hh>
 
 #include "gazebo/common/Exception.hh"
@@ -73,7 +72,7 @@ std::string MultiCameraSensor::GetTopic() const
   {
     topic = "~/";
     topic += this->parentName + "/" + this->GetName() + "/images";
-    topic = std::regex_replace(topic, std::regex("::"), std::string("/"));
+    boost::replace_all(topic, "::", "/");
   }
 
   return topic;

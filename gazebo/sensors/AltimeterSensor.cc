@@ -20,7 +20,7 @@
   #include <Winsock2.h>
 #endif
 
-#include <regex>
+#include <boost/algorithm/string.hpp>
 #include "gazebo/common/common.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/transport.hh"
@@ -59,7 +59,7 @@ std::string AltimeterSensor::GetTopic() const
   std::string topicName = "~/" + this->parentName + '/' + this->GetName();
   if (this->sdf->HasElement("topic"))
     topicName += '/' + this->sdf->Get<std::string>("topic");
-  topicName = std::regex_replace(topicName, std::regex("::"), std::string("/"));
+  boost::replace_all(topicName, "::", "/");
 
   return topicName;
 }

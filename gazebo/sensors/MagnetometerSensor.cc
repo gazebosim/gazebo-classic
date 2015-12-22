@@ -20,7 +20,7 @@
   #include <Winsock2.h>
 #endif
 
-#include <regex>
+#include <boost/algorithm/string.hpp>
 #include <ignition/math/Pose3.hh>
 
 #include "gazebo/transport/Node.hh"
@@ -62,7 +62,7 @@ std::string MagnetometerSensor::GetTopic() const
   std::string topicName = "~/" + this->parentName + '/' + this->GetName();
   if (this->sdf->HasElement("topic"))
     topicName += '/' + this->sdf->Get<std::string>("topic");
-  topicName = std::regex_replace(topicName, std::regex("::"), std::string("/"));
+  boost::replace_all(topicName, "::", "/");
 
   return topicName;
 }

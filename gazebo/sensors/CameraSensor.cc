@@ -19,8 +19,8 @@
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
+#include <boost/algorithm/string.hpp>
 #include <functional>
-#include <regex>
 
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Exception.hh"
@@ -72,7 +72,7 @@ std::string CameraSensor::GetTopic() const
 {
   std::string topicName = "~/";
   topicName += this->parentName + "/" + this->GetName() + "/image";
-  topicName = std::regex_replace(topicName, std::regex("::"), std::string("/"));
+  boost::replace_all(topicName, "::", "/");
 
   return topicName;
 }

@@ -15,7 +15,7 @@
  *
 */
 
-#include <regex>
+#include <boost/algorithm/string.hpp>
 #include <boost/unordered_map.hpp>
 #include <boost/unordered_set.hpp>
 
@@ -112,7 +112,7 @@ void MudPlugin::Init()
     if (!this->sdf->HasElement("contact_surface_bitmask"))
     {
       std::string name = this->contactSensorName;
-      name = std::regex_replace(name, std::regex("/"), std::string("::"));
+      boost::replace_all(name, "/", "::");
       name = this->world->GetName() + "::"+ this->modelName + "::" + name;
       sensors::SensorManager *mgr = sensors::SensorManager::Instance();
       // Get a pointer to the contact sensor
