@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-
 #include <mutex>
 
 #include <boost/algorithm/string.hpp>
@@ -40,7 +39,6 @@
 #include "gazebo/sensors/WideAngleCameraSensorPrivate.hh"
 #include "gazebo/sensors/WideAngleCameraSensor.hh"
 
-
 using namespace gazebo;
 using namespace sensors;
 
@@ -48,7 +46,8 @@ GZ_REGISTER_STATIC_SENSOR("wideanglecamera", WideAngleCameraSensor)
 
 //////////////////////////////////////////////////
 WideAngleCameraSensor::WideAngleCameraSensor()
-  : dataPtr(new WideAngleCameraSensorPrivate)
+: CameraSensor(),
+  dataPtr(new WideAngleCameraSensorPrivate)
 {
 }
 

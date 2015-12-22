@@ -44,8 +44,6 @@ AltimeterSensor::AltimeterSensor()
 /////////////////////////////////////////////////
 AltimeterSensor::~AltimeterSensor()
 {
-  delete this->dataPtr;
-  this->dataPtr = NULL;
 }
 
 /////////////////////////////////////////////////
