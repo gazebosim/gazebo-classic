@@ -615,7 +615,7 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
           ignition::math::Planed(ignition::math::Vector3d(0, 0, 1)), pt);
 
       parentPos = this->GetLinkWorldCentroid(this->newJoint->parent).Ign()
-          - this->newJoint->line->Point(0) - pt.Ign();
+          - this->newJoint->line->Point(0) - pt;
     }
     this->newJoint->line->SetPoint(1,
         (this->GetLinkWorldCentroid(this->hoverVis) - parentPos).Ign());
