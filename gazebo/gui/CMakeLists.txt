@@ -77,6 +77,7 @@ set (qt_headers
   DataLogger.hh
   Editor.hh
   GLWidget.hh
+  GuiTypes.hh
   HotkeyDialog.hh
   InsertModelWidget.hh
   JointControlWidget.hh
