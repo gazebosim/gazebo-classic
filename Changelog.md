@@ -1,5 +1,8 @@
 ## Gazebo 7.0
 
+1. Use opaque pointers in the rendering/DepthCamera class.
+    * [Pull request #](https://bitbucket.org/osrf/gazebo/pull-request/)
+
 1. Use opaque pointers in the gui/JointControlWidget class.
     * [Pull request #2052](https://bitbucket.org/osrf/gazebo/pull-request/2052)
 
