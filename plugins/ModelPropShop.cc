@@ -213,7 +213,7 @@ void ModelPropShop::Update()
       // Perspective view
       pose.pos.Set(1.6, -1.6, 1.2);
       pose.rot.SetFromEuler(0, GZ_DTOR(30), GZ_DTOR(-225));
-      this->light->SetDirection(math::Vector3(-0.4, 0.4, -0.4));
+      this->light->SetDirection(ignition::math::Vector3d(-0.4, 0.4, -0.4));
       this->camera->SetWorldPose(pose);
       this->camera->Update();
       this->camera->Render(true);
@@ -223,7 +223,7 @@ void ModelPropShop::Update()
       // Top view
       pose.pos.Set(0, 0, 2.2);
       pose.rot.SetFromEuler(0, GZ_DTOR(90), 0);
-      this->light->SetDirection(math::Vector3(0, 0, -1.0));
+      this->light->SetDirection(ignition::math::Vector3d(0, 0, -1.0));
       this->camera->SetWorldPose(pose);
       this->camera->Update();
       this->camera->Render(true);
@@ -233,7 +233,7 @@ void ModelPropShop::Update()
       // Front view
       pose.pos.Set(2.2, 0, 0);
       pose.rot.SetFromEuler(0, 0, GZ_DTOR(-180));
-      this->light->SetDirection(math::Vector3(-0.6, 0.0, -0.4));
+      this->light->SetDirection(ignition::math::Vector3d(-0.6, 0.0, -0.4));
       this->camera->SetWorldPose(pose);
       this->camera->Update();
       this->camera->Render(true);
@@ -243,7 +243,7 @@ void ModelPropShop::Update()
       // Side view
       pose.pos.Set(0, 2.2, 0);
       pose.rot.SetFromEuler(0, 0, GZ_DTOR(-90));
-      this->light->SetDirection(math::Vector3(0, -0.6, -0.4));
+      this->light->SetDirection(ignition::math::Vector3d(0, -0.6, -0.4));
       this->camera->SetWorldPose(pose);
       this->camera->Update();
       this->camera->Render(true);
@@ -253,7 +253,7 @@ void ModelPropShop::Update()
       // Back view
       pose.pos.Set(-2.2, 0, 0);
       pose.rot.SetFromEuler(0, 0, 0);
-      this->light->SetDirection(math::Vector3(0.6, 0, -0.4));
+      this->light->SetDirection(ignition::math::Vector3d(0.6, 0, -0.4));
       this->camera->SetWorldPose(pose);
       this->camera->Update();
       this->camera->Render(true);
