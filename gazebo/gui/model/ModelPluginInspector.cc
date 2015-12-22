@@ -99,7 +99,7 @@ void ModelPluginInspector::OnRemove()
   this->close();
 
   model::Events::requestModelPluginRemoval(
-      this->dataPtr->configWidget->GetStringWidgetValue("name"));
+      this->dataPtr->configWidget->StringWidgetValue("name"));
 }
 
 /////////////////////////////////////////////////

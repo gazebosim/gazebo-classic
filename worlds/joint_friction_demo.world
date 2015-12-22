@@ -14,7 +14,7 @@
           <mass>3.375</mass>
           <inertia>
             <ixx>0.071015625</ixx>
-            <iyy>0.00140625</iyy>
+            <iyy>0.0014062500000000004</iyy>
             <izz>0.071015625</izz>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
@@ -57,7 +57,7 @@
           <mass>3.375</mass>
           <inertia>
             <ixx>0.071015625</ixx>
-            <iyy>0.00140625</iyy>
+            <iyy>0.0014062500000000004</iyy>
             <izz>0.071015625</izz>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
@@ -93,14 +93,14 @@
     </model>
     
     <model name='pendulum_3'>
-      <pose>3.15 0 0.9  0.0 0 0</pose>
+      <pose>3.1500000000000004 0 0.9  0.0 0 0</pose>
       <link name="link">
         <pose>0 0 -0.25  0 0 0</pose>
         <inertial>
           <mass>3.375</mass>
           <inertia>
             <ixx>0.071015625</ixx>
-            <iyy>0.00140625</iyy>
+            <iyy>0.0014062500000000004</iyy>
             <izz>0.071015625</izz>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
@@ -143,7 +143,7 @@
           <mass>3.375</mass>
           <inertia>
             <ixx>0.071015625</ixx>
-            <iyy>0.00140625</iyy>
+            <iyy>0.0014062500000000004</iyy>
             <izz>0.071015625</izz>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
@@ -187,7 +187,7 @@
           <mass>3.375</mass>
           <inertia>
             <ixx>0.071015625</ixx>
-            <iyy>0.00140625</iyy>
+            <iyy>0.0014062500000000004</iyy>
             <izz>0.071015625</izz>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
@@ -236,7 +236,7 @@
           <mass>3.375</mass>
           <inertia>
             <ixx>0.071015625</ixx>
-            <iyy>0.00140625</iyy>
+            <iyy>0.0014062500000000004</iyy>
             <izz>0.071015625</izz>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
@@ -278,14 +278,14 @@
     </model>
     
     <model name='universal_axis1_3'>
-      <pose>3.15 -1.5 0.9  0.0 0 0</pose>
+      <pose>3.1500000000000004 -1.5 0.9  0.0 0 0</pose>
       <link name="link">
         <pose>0 0 -0.25  0 0 0</pose>
         <inertial>
           <mass>3.375</mass>
           <inertia>
             <ixx>0.071015625</ixx>
-            <iyy>0.00140625</iyy>
+            <iyy>0.0014062500000000004</iyy>
             <izz>0.071015625</izz>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
@@ -334,7 +334,7 @@
           <mass>3.375</mass>
           <inertia>
             <ixx>0.071015625</ixx>
-            <iyy>0.00140625</iyy>
+            <iyy>0.0014062500000000004</iyy>
             <izz>0.071015625</izz>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
@@ -384,7 +384,7 @@
           <mass>3.375</mass>
           <inertia>
             <ixx>0.071015625</ixx>
-            <iyy>0.00140625</iyy>
+            <iyy>0.0014062500000000004</iyy>
             <izz>0.071015625</izz>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
@@ -433,7 +433,7 @@
           <mass>3.375</mass>
           <inertia>
             <ixx>0.071015625</ixx>
-            <iyy>0.00140625</iyy>
+            <iyy>0.0014062500000000004</iyy>
             <izz>0.071015625</izz>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
@@ -475,14 +475,14 @@
     </model>
     
     <model name='universal_axis2_3'>
-      <pose>3.15 -3.0 0.9  0.0 0 0</pose>
+      <pose>3.1500000000000004 -3.0 0.9  0.0 0 0</pose>
       <link name="link">
         <pose>0 0 -0.25  0 0 0</pose>
         <inertial>
           <mass>3.375</mass>
           <inertia>
             <ixx>0.071015625</ixx>
-            <iyy>0.00140625</iyy>
+            <iyy>0.0014062500000000004</iyy>
             <izz>0.071015625</izz>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
@@ -531,7 +531,7 @@
           <mass>3.375</mass>
           <inertia>
             <ixx>0.071015625</ixx>
-            <iyy>0.00140625</iyy>
+            <iyy>0.0014062500000000004</iyy>
             <izz>0.071015625</izz>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
@@ -577,6 +577,17 @@
       <pose>1.05 1.5 0.9  0 0 0</pose>
       <link name="link">
         <pose>0 0 -0.25  0 0 0</pose>
+        <inertial>
+          <mass>3.375</mass>
+          <inertia>
+            <ixx>0.071015625</ixx>
+            <iyy>0.0014062500000000004</iyy>
+            <izz>0.071015625</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
         <collision name="collision">
           <geometry>
             <box>
@@ -608,6 +619,17 @@
       <pose>2.1 1.5 0.9  0 0 0</pose>
       <link name="link">
         <pose>0 0 -0.25  0 0 0</pose>
+        <inertial>
+          <mass>3.375</mass>
+          <inertia>
+            <ixx>0.071015625</ixx>
+            <iyy>0.0014062500000000004</iyy>
+            <izz>0.071015625</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
         <collision name="collision">
           <geometry>
             <box>
@@ -636,9 +658,20 @@
     </model>
     
     <model name='slider_3'>
-      <pose>3.15 1.5 0.9  0 0 0</pose>
+      <pose>3.1500000000000004 1.5 0.9  0 0 0</pose>
       <link name="link">
         <pose>0 0 -0.25  0 0 0</pose>
+        <inertial>
+          <mass>3.375</mass>
+          <inertia>
+            <ixx>0.071015625</ixx>
+            <iyy>0.0014062500000000004</iyy>
+            <izz>0.071015625</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
         <collision name="collision">
           <geometry>
             <box>
@@ -670,6 +703,17 @@
       <pose>4.2 1.5 0.9  0 0 0</pose>
       <link name="link">
         <pose>0 0 -0.25  0 0 0</pose>
+        <inertial>
+          <mass>3.375</mass>
+          <inertia>
+            <ixx>0.071015625</ixx>
+            <iyy>0.0014062500000000004</iyy>
+            <izz>0.071015625</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
         <collision name="collision">
           <geometry>
             <box>
