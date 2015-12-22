@@ -247,10 +247,6 @@ MainWindow::~MainWindow()
   delete this->userCmdHistory;
   this->userCmdHistory = NULL;
 
-  // Cleanup editors
-  for (auto &editor : this->editors)
-    delete editor.second;
-
   // Cleanup global actions
   this->DeleteActions();
 }
