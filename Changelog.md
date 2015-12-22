@@ -1,7 +1,7 @@
 ## Gazebo 7.0
 
 1. Use opaque pointers in the rendering/Light class.
-    * [Pull request #](https://bitbucket.org/osrf/gazebo/pull-request/)
+    * [Pull request #2066](https://bitbucket.org/osrf/gazebo/pull-request/2066)
 
 1. Use opaque pointers in the gui/JointControlWidget class.
     * [Pull request #2052](https://bitbucket.org/osrf/gazebo/pull-request/2052)
