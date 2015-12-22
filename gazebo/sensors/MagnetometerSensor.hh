@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_MAGNETOMETER_SENSOR_HH_
-#define _GAZEBO_MAGNETOMETER_SENSOR_HH_
+#ifndef _GAZEBO_SENSORS_MAGNETOMETER_SENSOR_HH_
+#define _GAZEBO_SENSORS_MAGNETOMETER_SENSOR_HH_
 
 #include <string>
 

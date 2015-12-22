@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_WIRELESS_TRANSCEIVER_HH_
-#define _GAZEBO_WIRELESS_TRANSCEIVER_HH_
+#ifndef _GAZEBO_SENSORS_WIRELESSTRANSCEIVER_HH_
+#define _GAZEBO_SENSORS_WIRELESSTRANSCEIVER_HH_
 
 #include <string>
 #include <ignition/math/Pose3.hh>
