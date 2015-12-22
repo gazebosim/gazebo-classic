@@ -156,7 +156,7 @@ void DepthCameraSensorTest::DepthUnitBox()
   EXPECT_DOUBLE_EQ(this->depthBuffer[left], IGN_DBL_INF);
   EXPECT_DOUBLE_EQ(this->depthBuffer[right], IGN_DBL_INF);
 
-  // move the box just within the near clipping plane
+  // move the box closer than near clipping plane
   world->GetModel(box01)->SetWorldPose(
       ignition::math::Pose3d((near * 0.9) + unitBoxSize * 0.5, 0, 0, 0, 0, 0));
 
