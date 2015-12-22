@@ -35,7 +35,7 @@ namespace gazebo
     /// there.  In order to support more, either expand this class or make sure
     /// that objects that will not get treated correctly will not have materials
     /// generated for them.
-    class GZ_RENDERING_DEFERRED_VISIBLE MergeMaterialGenerator :
+    class GZ_RENDERING_VISIBLE MergeMaterialGenerator :
       public MaterialGenerator
     {
       /// The relevant options for materials

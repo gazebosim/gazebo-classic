@@ -44,6 +44,12 @@ Vector2i::Vector2i(const Vector2i &_pt)
 }
 
 //////////////////////////////////////////////////
+Vector2i::Vector2i(const ignition::math::Vector2i &_pt)
+  : x(_pt.X()), y(_pt.Y())
+{
+}
+
+//////////////////////////////////////////////////
 Vector2i::~Vector2i()
 {
 }
@@ -76,6 +82,15 @@ Vector2i &Vector2i::operator =(const Vector2i &_pt)
 {
   this->x = _pt.x;
   this->y = _pt.y;
+
+  return *this;
+}
+
+//////////////////////////////////////////////////
+Vector2i &Vector2i::operator=(const ignition::math::Vector2i &_pt)
+{
+  this->x = _pt.X();
+  this->y = _pt.Y();
 
   return *this;
 }
@@ -206,4 +221,8 @@ int Vector2i::operator[](unsigned int index) const
   }
 }
 
-
+//////////////////////////////////////////////////
+ignition::math::Vector2i Vector2i::Ign() const
+{
+  return ignition::math::Vector2i(this->x, this->y);
+}

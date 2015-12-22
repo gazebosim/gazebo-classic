@@ -17,7 +17,6 @@
 
 #include <gtest/gtest.h>
 #include <sdf/sdf.hh>
-#include "gazebo/math/Angle.hh"
 #include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
@@ -107,10 +106,10 @@ TEST_F(RaySensor_TEST, CreateLaser)
   // Make sure the above dynamic cast worked.
   EXPECT_TRUE(sensor != NULL);
 
-  double angleRes = (sensor->GetAngleMax() - sensor->GetAngleMin()).Radian() /
+  double angleRes = (sensor->AngleMax() - sensor->AngleMin()).Radian() /
                     sensor->GetRayCount();
-  EXPECT_EQ(sensor->GetAngleMin(), math::Angle(-2.2689));
-  EXPECT_EQ(sensor->GetAngleMax(), math::Angle(2.2689));
+  EXPECT_EQ(sensor->AngleMin(), ignition::math::Angle(-2.2689));
+  EXPECT_EQ(sensor->AngleMax(), ignition::math::Angle(2.2689));
   EXPECT_NEAR(sensor->GetRangeMin(), 0.08, 1e-6);
   EXPECT_NEAR(sensor->GetRangeMax(), 10.0, 1e-6);
   EXPECT_NEAR(sensor->GetAngleResolution(), angleRes, 1e-3);
@@ -120,8 +119,8 @@ TEST_F(RaySensor_TEST, CreateLaser)
 
   EXPECT_EQ(sensor->GetVerticalRayCount(), 1);
   EXPECT_EQ(sensor->GetVerticalRangeCount(), 1);
-  EXPECT_EQ(sensor->GetVerticalAngleMin(), 0);
-  EXPECT_EQ(sensor->GetVerticalAngleMax(), 0);
+  EXPECT_EQ(sensor->VerticalAngleMin(), 0);
+  EXPECT_EQ(sensor->VerticalAngleMax(), 0);
 
   EXPECT_TRUE(sensor->IsActive());
 

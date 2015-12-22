@@ -1,3 +1,7 @@
+if (WIN32)
+  add_definitions(-DBUILDING_DLL -DBUILDING_DLL_GZ_PLUGIN)
+endif()
+
 include_directories(
   ${PROJECT_SOURCE_DIR}
   ${PROTOBUF_INCLUDE_DIR}
@@ -50,15 +54,19 @@ set (plugins
   InitialVelocityPlugin
   JointTrajectoryPlugin
   LiftDragPlugin
+  LinearBatteryConsumerPlugin
+  LinearBatteryPlugin
   ModelPropShop
   MudPlugin
   PressurePlugin
+  RandomVelocityPlugin
   RayPlugin
   RaySensorNoisePlugin
   RubblePlugin
   SkidSteerDrivePlugin
   SonarPlugin
   SphereAtlasDemoPlugin
+  TransporterPlugin
   VehiclePlugin)
 
 if (HAVE_USB AND UNIX AND NOT APPLE)
@@ -74,7 +82,7 @@ set (GUIplugins
 )
 
 set(GAZEBO_PLUGIN_INSTALL_DIR
-  ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/gazebo-${GAZEBO_VERSION}/plugins/
+  ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/gazebo-${GAZEBO_MAJOR_VERSION}/plugins/
 )
 foreach (src ${plugins})
   add_library(${src} SHARED ${src}.cc)
@@ -97,4 +105,7 @@ foreach (src ${GUIplugins})
 endforeach (src ${GUIplugins})
 
 add_subdirectory(events)
-add_subdirectory(rest_web)
+
+if (NOT WIN32)
+  add_subdirectory(rest_web)
+endif()

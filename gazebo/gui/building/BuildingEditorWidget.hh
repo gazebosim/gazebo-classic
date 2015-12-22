@@ -34,7 +34,7 @@ namespace gazebo
     /// \class BuildingEditorWidget BuildingEditorWidget.hh
     /// \brief The parent widget of the building editor, level widget and scale
     /// widget.
-    class GZ_GUI_BUILDING_VISIBLE BuildingEditorWidget : public QWidget
+    class GZ_GUI_VISIBLE BuildingEditorWidget : public QWidget
     {
       /// \brief Constructor
       /// \param[in] _parent Parent QWidget.

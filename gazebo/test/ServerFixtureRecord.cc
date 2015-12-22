@@ -14,6 +14,11 @@
  * limitations under the License.
  *
 */
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
 
 #include <string>
 
@@ -26,7 +31,9 @@ using namespace gazebo;
 /////////////////////////////////////////////////
 void ServerFixture::Record(const std::string &_name, const double _data)
 {
-  RecordProperty(_name, std::to_string(_data));
+  std::ostringstream stream;
+  stream << _data;
+  RecordProperty(_name, stream.str());
 }
 
 /////////////////////////////////////////////////

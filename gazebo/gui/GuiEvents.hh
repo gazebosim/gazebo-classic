@@ -26,7 +26,7 @@ namespace gazebo
 {
   namespace gui
   {
-    class GAZEBO_VISIBLE Events
+    class GZ_GUI_VISIBLE Events
     {
       /////////////////////////////////////////////////
       /// \brief Connect a signal the add entity signal
@@ -176,6 +176,17 @@ namespace gazebo
               { editModel.Disconnect(_subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
+      /// \brief Connect a signal to the window mode signal
+      public: template<typename T>
+              static event::ConnectionPtr ConnectWindowMode(T _subscriber)
+              { return windowMode.Connect(_subscriber); }
+
+      /// \brief Disconnect a signal from the window mode signal
+      public: static void DisconnectWindowMode(
+              event::ConnectionPtr _subscriber)
+              { windowMode.Disconnect(_subscriber); }
+
+      //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a signal to the main window ready signal
       public: template<typename T>
               static event::ConnectionPtr ConnectMainWindowReady(T _subscriber)
@@ -248,6 +259,10 @@ namespace gazebo
       /// \brief Event triggered when the user selects edit a model. The model
       /// name is given as the function parameter.
       public: static event::EventT<void (const std::string &)> editModel;
+
+      /// \brief Event triggered when changing window mode. Possible modes are:
+      /// "Simulation", "ModelEditor", "LogPlayback"
+      public: static event::EventT<void (const std::string &)> windowMode;
 
       /// \brief Event triggered when a key is pressed
       public: static event::EventT<void (std::string)> keyPress;

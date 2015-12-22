@@ -15,12 +15,13 @@
  *
 */
 
+#include <cmath>
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/sensors/sensors.hh"
 #include "gazebo/common/common.hh"
 #include "scans_cmp.h"
-#include "helper_physics_generator.hh"
+#include "gazebo/test/helper_physics_generator.hh"
 
 #define TOL 1e-4
 
@@ -85,7 +86,7 @@ void ContactSensor::MoveTool(const std::string &_physicsEngine)
   msgs::Model msg;
   msg.set_name(modelName);
   msg.set_id(model->GetId());
-  msgs::Set(msg.mutable_pose(), pose);
+  msgs::Set(msg.mutable_pose(), pose.Ign());
   modelPub->Publish(msg);
 
   while (pose != model->GetWorldPose())
@@ -342,7 +343,7 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
 
         EXPECT_NEAR(contacts[k].contact(i).normal(j).x(), 0, TOL);
         EXPECT_NEAR(contacts[k].contact(i).normal(j).y(), 0, TOL);
-        EXPECT_NEAR(contacts[k].contact(i).normal(j).z(), 1, TOL);
+        EXPECT_NEAR(std::abs(contacts[k].contact(i).normal(j).z()), 1, TOL);
 
         if (body1)
         {

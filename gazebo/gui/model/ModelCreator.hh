@@ -48,7 +48,9 @@ namespace gazebo
 
   namespace gui
   {
+    class NestedModelData;
     class LinkData;
+    class ModelPluginData;
     class SaveDialog;
     class JointMaker;
 
@@ -57,26 +59,28 @@ namespace gazebo
 
     /// \class ModelCreator ModelCreator.hh
     /// \brief Create and manage 3D visuals of a model with links and joints.
-    class GZ_GUI_MODEL_VISIBLE ModelCreator : public QObject
+    class GZ_GUI_VISIBLE ModelCreator : public QObject
     {
       Q_OBJECT
 
-      /// \enum Link types
-      /// \brief Unique identifiers for link types that can be created.
-      public: enum LinkType
+      /// \enum Entity types
+      /// \brief Unique identifiers for entity types that can be created.
+      public: enum EntityType
       {
         /// \brief none
-        LINK_NONE,
+        ENTITY_NONE,
         /// \brief Box
-        LINK_BOX,
+        ENTITY_BOX,
         /// \brief Sphere
-        LINK_SPHERE,
+        ENTITY_SPHERE,
         /// \brief Cylinder
-        LINK_CYLINDER,
+        ENTITY_CYLINDER,
         /// \brief Imported 3D mesh
-        LINK_MESH,
+        ENTITY_MESH,
         /// \brief Extruded polyline
-        LINK_POLYLINE
+        ENTITY_POLYLINE,
+        /// \brief Nested model
+        ENTITY_MODEL
       };
 
       /// \enum SaveState
@@ -110,40 +114,20 @@ namespace gazebo
       /// \brief Set save state upon a change to the model.
       public: void ModelChanged();
 
-      /// \brief Callback for newing the model.
-      private: void OnNew();
-
       /// \brief Helper function to manage writing files to disk.
       public: void SaveModelFiles();
-
-      /// \brief Callback for saving the model.
-      /// \return True if the user chose to save, false if the user cancelled.
-      private: bool OnSave();
-
-      /// \brief Callback for selecting a folder and saving the model.
-      /// \return True if the user chose to save, false if the user cancelled.
-      private: bool OnSaveAs();
-
-      /// \brief Callback for when the name is changed through the Palette.
-      /// \param[in] _modelName The newly entered model name.
-      private: void OnNameChanged(const std::string &_modelName);
-
-      /// \brief Callback received when exiting the editor mode.
-      private: void OnExit();
-
-      /// \brief Update callback on PreRender.
-      private: void Update();
 
       /// \brief Finish the model and create the entity on the gzserver.
       public: void FinishModel();
 
       /// \brief Add a link to the model.
-      /// \param[in] _type Type of link to add: box, cylinder, or sphere.
+      /// \param[in] _type Type of link to add: ENTITY_BOX, ENTITY_CYLINDER,
+      /// ENTITY_SPHERE, ENTITY_MESH or ENTITY_POLYLINE.
       /// \param[in] _size Size of the link.
       /// \param[in] _pose Pose of the link.
       /// \param[in] _samples Number of samples for polyline.
       /// \return Name of the link that has been added.
-      public: std::string AddShape(LinkType _type,
+      public: std::string AddShape(EntityType _type,
           const math::Vector3 &_size = math::Vector3::One,
           const math::Pose &_pose = math::Pose::Zero,
           const std::string &_uri = "", unsigned int _samples = 5);
@@ -184,9 +168,13 @@ namespace gazebo
       /// \param[in] _type Type of joint to add.
       public: void AddJoint(const std::string &_type);
 
-      /// \brief Remove a link from the model.
-      /// \param[in] _linkName Name of the link to remove
-      public: void RemoveLink(const std::string &_linkName);
+      /// \brief Remove an entity from the model.
+      /// \param[in] _entityName Name of the entity to remove
+      public: void RemoveEntity(const std::string &_entityName);
+
+      /// \brief Remove a model plugin from the model.
+      /// \param[in] _pluginName Name of the model plugin to remove.
+      public: void RemoveModelPlugin(const std::string &_pluginName);
 
       /// \brief Set the model to be static
       /// \param[in] _static True to make the model static.
@@ -221,9 +209,17 @@ namespace gazebo
       /// \return Current save state.
       public: enum SaveState GetCurrentSaveState() const;
 
+      /// \brief Add an entity to the model
+      /// \param[in] _sdf SDF describing the entity.
+      public: void AddEntity(sdf::ElementPtr _sdf);
+
       /// \brief Add a link to the model
       /// \param[in] _type Type of link to be added
-      public: void AddLink(LinkType _type);
+      public: void AddLink(EntityType _type);
+
+      /// \brief Add a model plugin to the model
+      /// \param[in] _pluginElem Pointer to plugin SDF element
+      public: void AddModelPlugin(const sdf::ElementPtr _pluginElem);
 
       /// \brief Generate the SDF from model link and joint visuals.
       public: void GenerateSDF();
@@ -232,6 +228,39 @@ namespace gazebo
       /// \param[in] _link Link data used to generate the sdf.
       /// \return SDF element describing the link.
       private: sdf::ElementPtr GenerateLinkSDF(LinkData *_link);
+
+      /// \brief Callback for newing the model.
+      private: void OnNew();
+
+      /// \brief Callback for saving the model.
+      /// \return True if the user chose to save, false if the user cancelled.
+      private: bool OnSave();
+
+      /// \brief Callback for selecting a folder and saving the model.
+      /// \return True if the user chose to save, false if the user cancelled.
+      private: bool OnSaveAs();
+
+      /// \brief Callback for when the name is changed through the model
+      /// settings tab.
+      /// \param[in] _modelName The newly entered model name.
+      private: void OnNameChanged(const std::string &_modelName);
+
+      /// \brief Event received when the model properties changed.
+      /// \param[in] _static New static property of the model.
+      /// \param[in] _autoDisable New allow_auto_disable property of the model.
+      private: void OnPropertiesChanged(const bool _static,
+          const bool _autoDisable);
+
+      /// \brief Callback received when exiting the editor mode.
+      private: void OnExit();
+
+      /// \brief Update callback on PreRender.
+      private: void Update();
+
+      /// \brief Internal helper function to remove a nestedModel without
+      /// removing the joints.
+      /// \param[in] _nestedModelName Name of the nestedModel to remove
+      private: void RemoveNestedModelImpl(const std::string &_nestedModelName);
 
       /// \brief Internal helper function to remove a link without removing
       /// the joints.
@@ -294,6 +323,13 @@ namespace gazebo
       private: void OnSetSelectedLink(const std::string &_name,
           const bool _selected);
 
+      /// \brief Callback when a model plugin is selected.
+      /// \param[in] _name Name of plugin.
+      /// \param[in] _selected True if the plugin is selected, false if
+      /// deselected.
+      private: void OnSetSelectedModelPlugin(const std::string &_name,
+          const bool _selected);
+
       /// \brief Create link with default properties from a visual. This
       /// function creates a link that will become the parent of the
       /// input visual. A collision visual with the same geometry as the input
@@ -306,16 +342,23 @@ namespace gazebo
       /// \return Cloned link.
       private: LinkData *CloneLink(const std::string &_linkName);
 
-      /// \brief Create a link from an SDF.
-      /// \param[in] _link SDF element of the link that will be used to
+      /// \brief Create a link from an SDF with the specified parent visual.
+      /// \param[in] _linkElem SDF element of the link that will be used to
       /// recreate its visual representation in the model editor.
-      private: void CreateLinkFromSDF(sdf::ElementPtr _linkElem);
+      /// \param[in] _parentVis Parent visual that the link will be attached to.
+      /// \return Data describing this link.
+      private: LinkData *CreateLinkFromSDF(const sdf::ElementPtr &_linkElem,
+          const rendering::VisualPtr &_parentVis);
 
       /// \brief Open the link inspector.
       /// \param[in] _name Name of link.
       private: void OpenInspector(const std::string &_name);
 
-      // Documentation inherited
+      /// \brief Open the model plugin inspector.
+      /// \param[in] _name Name of model plugin.
+      private: void OpenModelPluginInspector(const std::string &_name);
+
+      /// \brief Spawn the entity in simulation.
       private: virtual void CreateTheEntity();
 
       /// \brief Internal init function.
@@ -326,9 +369,16 @@ namespace gazebo
       private: std::string CreateModel();
 
       /// \brief Load a model SDF file and create visuals in the model editor.
-      /// This is used mainly when editing existing models.
+      /// This is used mainly when editing existing models. The function is
+      /// called recursively to create nested models.
       /// \param[in] _sdf SDF of a model to be loaded
-      private: void LoadSDF(sdf::ElementPtr _sdf);
+      /// \param[in] _parentVis If this is not the root model, it will have a
+      /// parent visual for its parent model.
+      /// \param[in] _emit True to emit nested model inserted events.
+      /// \return Data describing the model.
+      private: NestedModelData *CreateModelFromSDF(const sdf::ElementPtr &_sdf,
+          const rendering::VisualPtr &_parentVis = NULL,
+          const bool _emit = true);
 
       /// \brief Callback when a specific alignment configuration is set.
       /// \param[in] _axis Axis of alignment: x, y, or z.
@@ -346,8 +396,15 @@ namespace gazebo
       private: void OnEntityScaleChanged(const std::string &_name,
           const math::Vector3 &_scale);
 
-      /// \brief Deselect all currently selected link visuals.
+      /// \brief Deselect anything whose selection is handled here, such as
+      /// links and model plugins.
       private: void DeselectAll();
+
+      /// \brief Deselect all currently selected links.
+      private: void DeselectAllLinks();
+
+      /// \brief Deselect all currently selected model plugins.
+      private: void DeselectAllModelPlugins();
 
       /// \brief Set visibilty of a visual recursively while storing their
       /// original values
@@ -366,6 +423,15 @@ namespace gazebo
       /// \param[in] _link Name of link the context menu is associated with.
       private: void ShowContextMenu(const std::string &_link);
 
+      /// \brief Show a model plugin's context menu
+      /// \param[in] _name Name of model plugin.
+      private: void ShowModelPluginContextMenu(const std::string &_name);
+
+      /// \brief Helper function to emit nestedModelInserted events.
+      /// \param[in] _vis Visual representing the nested mdoel.
+      private: void EmitNestedModelInsertedEvent(
+          const rendering::VisualPtr &_vis) const;
+
       /// \brief Qt callback when a delete signal has been emitted. This is
       /// currently triggered by the context menu via right click.
       private slots: void OnDelete();
@@ -376,6 +442,14 @@ namespace gazebo
 
       /// \brief Qt Callback to open link inspector
       private slots: void OnOpenInspector();
+
+      /// \brief Qt Callback to open model plugin inspector.
+      /// \param[in] _name Name of model plugin.
+      private slots: void OnOpenModelPluginInspector(const QString &_name);
+
+      /// \brief Qt Callback to remove model plugin.
+      /// \param[in] _name Name of model plugin.
+      private slots: void OnRemoveModelPlugin(const QString &_name);
 
       /// \brief Qt signal when the a link has been added.
       Q_SIGNALS: void LinkAdded();
@@ -398,11 +472,12 @@ namespace gazebo
       /// \brief The root visual of the model.
       private: rendering::VisualPtr previewVisual;
 
-      /// \brief The root visual of the model.
+      /// \brief Visual currently being inserted into the model, which is
+      /// attached to the mouse.
       private: rendering::VisualPtr mouseVisual;
 
       /// \brief The pose of the model.
-      private: math::Pose modelPose;
+      private: ignition::math::Pose3d modelPose;
 
       /// \brief True to create a static model.
       private: bool isStatic;
@@ -419,11 +494,17 @@ namespace gazebo
       /// \brief Counter for generating a unique model name.
       private: int modelCounter;
 
-      /// \brief Type of link being added.
-      private: LinkType addLinkType;
+      /// \brief Type of entity being added.
+      private: EntityType addEntityType;
 
-      /// \brief A map of model link names to and their visuals.
+      /// \brief A map of nested model names to and their visuals.
+      private: std::map<std::string, NestedModelData *> allNestedModels;
+
+      /// \brief A map of model link names to and their data.
       private: std::map<std::string, LinkData *> allLinks;
+
+      /// \brief A map of model plugin names to and their data.
+      private: std::map<std::string, ModelPluginData *> allModelPlugins;
 
       /// \brief Transport node
       private: transport::NodePtr node;
@@ -444,6 +525,9 @@ namespace gazebo
 
       /// \brief A list of selected link visuals.
       private: std::vector<rendering::VisualPtr> selectedLinks;
+
+      /// \brief A list of selected model plugins.
+      private: std::vector<std::string> selectedModelPlugins;
 
       /// \brief Names of links copied through g_copyAct
       private: std::vector<std::string> copiedLinkNames;
@@ -488,6 +572,9 @@ namespace gazebo
       /// \brief A map of all visuals of the model to be edited to their
       /// visibility.
       private: std::map<uint32_t, bool> serverModelVisible;
+
+      /// \brief Name of the canonical model
+      private: std::string canonicalModel;
 
       /// \brief Name of the canonical link in the model
       private: std::string canonicalLink;

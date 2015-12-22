@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
 
 #include "gazebo/rendering/skyx/include/SkyX.h"
@@ -32,9 +33,11 @@
 #include "gazebo/rendering/SonarVisual.hh"
 #include "gazebo/rendering/WrenchVisual.hh"
 #include "gazebo/rendering/CameraVisual.hh"
+#include "gazebo/rendering/LogicalCameraVisual.hh"
 #include "gazebo/rendering/JointVisual.hh"
 #include "gazebo/rendering/COMVisual.hh"
 #include "gazebo/rendering/InertiaVisual.hh"
+#include "gazebo/rendering/LinkFrameVisual.hh"
 #include "gazebo/rendering/ContactVisual.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Light.hh"
@@ -42,6 +45,7 @@
 #include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Camera.hh"
+#include "gazebo/rendering/WideAngleCamera.hh"
 #include "gazebo/rendering/DepthCamera.hh"
 #include "gazebo/rendering/GpuLaser.hh"
 #include "gazebo/rendering/Grid.hh"
@@ -96,6 +100,7 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations,
   this->dataPtr->initialized = false;
   this->dataPtr->showCOMs = false;
   this->dataPtr->showInertias = false;
+  this->dataPtr->showLinkFrames = false;
   this->dataPtr->showCollisions = false;
   this->dataPtr->showJoints = false;
   this->dataPtr->transparent = false;
@@ -127,11 +132,13 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations,
   this->dataPtr->visSub =
       this->dataPtr->node->Subscribe("~/visual", &Scene::OnVisualMsg, this);
 
-  this->dataPtr->lightPub =
-      this->dataPtr->node->Advertise<msgs::Light>("~/light");
+  this->dataPtr->lightFactorySub =
+      this->dataPtr->node->Subscribe("~/factory/light",
+      &Scene::OnLightFactoryMsg, this);
 
-  this->dataPtr->lightSub =
-      this->dataPtr->node->Subscribe("~/light", &Scene::OnLightMsg, this);
+  this->dataPtr->lightModifySub =
+      this->dataPtr->node->Subscribe("~/light/modify",
+      &Scene::OnLightModifyMsg, this);
 
   if (_isServer)
   {
@@ -181,7 +188,8 @@ void Scene::Clear()
   this->dataPtr->node->Fini();
   this->dataPtr->modelMsgs.clear();
   this->dataPtr->visualMsgs.clear();
-  this->dataPtr->lightMsgs.clear();
+  this->dataPtr->lightFactoryMsgs.clear();
+  this->dataPtr->lightModifyMsgs.clear();
   this->dataPtr->poseMsgs.clear();
   this->dataPtr->sceneMsgs.clear();
   this->dataPtr->jointMsgs.clear();
@@ -195,11 +203,11 @@ void Scene::Clear()
   this->dataPtr->skeletonPoseSub.reset();
   this->dataPtr->visSub.reset();
   this->dataPtr->skySub.reset();
-  this->dataPtr->lightSub.reset();
+  this->dataPtr->lightFactorySub.reset();
+  this->dataPtr->lightModifySub.reset();
   this->dataPtr->requestSub.reset();
   this->dataPtr->responseSub.reset();
   this->dataPtr->modelInfoSub.reset();
-  this->dataPtr->lightPub.reset();
   this->dataPtr->responsePub.reset();
   this->dataPtr->requestPub.reset();
 
@@ -207,9 +215,6 @@ void Scene::Clear()
 
   delete this->dataPtr->terrain;
   this->dataPtr->terrain = NULL;
-
-  delete this->dataPtr->skyx;
-  this->dataPtr->skyx = NULL;
 
   while (!this->dataPtr->visuals.empty())
     this->RemoveVisual(this->dataPtr->visuals.begin()->first);
@@ -245,8 +250,10 @@ void Scene::Clear()
     this->dataPtr->userCameras[i]->Fini();
   this->dataPtr->userCameras.clear();
 
+  delete this->dataPtr->skyx;
+  this->dataPtr->skyx = NULL;
+
   RTShaderSystem::Instance()->RemoveScene(this->GetName());
-  RTShaderSystem::Instance()->Clear();
 
   this->dataPtr->connections.clear();
 
@@ -337,8 +344,7 @@ void Scene::Init()
   // Create Fog
   if (this->dataPtr->sdf->HasElement("fog"))
   {
-    boost::shared_ptr<sdf::Element> fogElem =
-        this->dataPtr->sdf->GetElement("fog");
+    sdf::ElementPtr fogElem = this->dataPtr->sdf->GetElement("fog");
     this->SetFog(fogElem->Get<std::string>("type"),
                  fogElem->Get<common::Color>("color"),
                  fogElem->Get<double>("density"),
@@ -544,6 +550,17 @@ DepthCameraPtr Scene::CreateDepthCamera(const std::string &_name,
                                         bool _autoRender)
 {
   DepthCameraPtr camera(new DepthCamera(this->dataPtr->name + "::" + _name,
+        shared_from_this(), _autoRender));
+  this->dataPtr->cameras.push_back(camera);
+
+  return camera;
+}
+
+//////////////////////////////////////////////////
+WideAngleCameraPtr Scene::CreateWideAngleCamera(const std::string &_name,
+                                                const bool _autoRender)
+{
+  WideAngleCameraPtr camera(new WideAngleCamera(_name,
         shared_from_this(), _autoRender));
   this->dataPtr->cameras.push_back(camera);
 
@@ -1454,7 +1471,7 @@ bool Scene::ProcessSceneMsg(ConstScenePtr &_msg)
   for (int i = 0; i < _msg->light_size(); ++i)
   {
     boost::shared_ptr<msgs::Light> lm(new msgs::Light(_msg->light(i)));
-    this->dataPtr->lightMsgs.push_back(lm);
+    this->dataPtr->lightFactoryMsgs.push_back(lm);
   }
 
   for (int i = 0; i < _msg->joint_size(); ++i)
@@ -1523,7 +1540,6 @@ bool Scene::ProcessSceneMsg(ConstScenePtr &_msg)
                  elem->Get<double>("start"),
                  elem->Get<double>("end"));
   }
-
   return true;
 }
 
@@ -1630,6 +1646,12 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
     }
   }
 
+  for (int i = 0; i < _msg.model_size(); ++i)
+  {
+    boost::shared_ptr<msgs::Model> mm(new msgs::Model(_msg.model(i)));
+    this->dataPtr->modelMsgs.push_back(mm);
+  }
+
   return true;
 }
 
@@ -1709,7 +1731,8 @@ void Scene::PreRender()
   SceneMsgs_L sceneMsgsCopy;
   ModelMsgs_L modelMsgsCopy;
   SensorMsgs_L sensorMsgsCopy;
-  LightMsgs_L lightMsgsCopy;
+  LightMsgs_L lightFactoryMsgsCopy;
+  LightMsgs_L lightModifyMsgsCopy;
   VisualMsgs_L modelVisualMsgsCopy;
   VisualMsgs_L linkVisualMsgsCopy;
   VisualMsgs_L visualMsgsCopy;
@@ -1733,9 +1756,15 @@ void Scene::PreRender()
               std::back_inserter(sensorMsgsCopy));
     this->dataPtr->sensorMsgs.clear();
 
-    std::copy(this->dataPtr->lightMsgs.begin(), this->dataPtr->lightMsgs.end(),
-              std::back_inserter(lightMsgsCopy));
-    this->dataPtr->lightMsgs.clear();
+    std::copy(this->dataPtr->lightFactoryMsgs.begin(),
+              this->dataPtr->lightFactoryMsgs.end(),
+              std::back_inserter(lightFactoryMsgsCopy));
+    this->dataPtr->lightFactoryMsgs.clear();
+
+    std::copy(this->dataPtr->lightModifyMsgs.begin(),
+              this->dataPtr->lightModifyMsgs.end(),
+              std::back_inserter(lightModifyMsgsCopy));
+    this->dataPtr->lightModifyMsgs.clear();
 
     std::copy(this->dataPtr->modelVisualMsgs.begin(),
               this->dataPtr->modelVisualMsgs.end(),
@@ -1799,11 +1828,22 @@ void Scene::PreRender()
       ++sensorIter;
   }
 
-  // Process the light messages.
-  for (lightIter = lightMsgsCopy.begin(); lightIter != lightMsgsCopy.end();)
+  // Process the light factory messages.
+  for (lightIter = lightFactoryMsgsCopy.begin();
+      lightIter != lightFactoryMsgsCopy.end();)
   {
-    if (this->ProcessLightMsg(*lightIter))
-      lightMsgsCopy.erase(lightIter++);
+    if (this->ProcessLightFactoryMsg(*lightIter))
+      lightFactoryMsgsCopy.erase(lightIter++);
+    else
+      ++lightIter;
+  }
+
+  // Process the light modify messages.
+  for (lightIter = lightModifyMsgsCopy.begin();
+      lightIter != lightModifyMsgsCopy.end();)
+  {
+    if (this->ProcessLightModifyMsg(*lightIter))
+      lightModifyMsgsCopy.erase(lightIter++);
     else
       ++lightIter;
   }
@@ -1812,7 +1852,7 @@ void Scene::PreRender()
   for (visualIter = modelVisualMsgsCopy.begin();
       visualIter != modelVisualMsgsCopy.end();)
   {
-    if (this->ProcessVisualMsg(*visualIter, VT_MODEL))
+    if (this->ProcessVisualMsg(*visualIter, Visual::VT_MODEL))
       modelVisualMsgsCopy.erase(visualIter++);
     else
       ++visualIter;
@@ -1822,7 +1862,7 @@ void Scene::PreRender()
   for (visualIter = linkVisualMsgsCopy.begin();
       visualIter != linkVisualMsgsCopy.end();)
   {
-    if (this->ProcessVisualMsg(*visualIter, VT_LINK))
+    if (this->ProcessVisualMsg(*visualIter, Visual::VT_LINK))
       linkVisualMsgsCopy.erase(visualIter++);
     else
       ++visualIter;
@@ -1831,7 +1871,11 @@ void Scene::PreRender()
   // Process the visual messages.
   for (visualIter = visualMsgsCopy.begin(); visualIter != visualMsgsCopy.end();)
   {
-    if (this->ProcessVisualMsg(*visualIter, VT_VISUAL))
+    Visual::VisualType visualType = Visual::VT_VISUAL;
+    if ((*visualIter)->has_type())
+      visualType = Visual::ConvertVisualType((*visualIter)->type());
+
+    if (this->ProcessVisualMsg(*visualIter, visualType))
       visualMsgsCopy.erase(visualIter++);
     else
       ++visualIter;
@@ -1841,7 +1885,7 @@ void Scene::PreRender()
   for (visualIter = collisionVisualMsgsCopy.begin();
       visualIter != collisionVisualMsgsCopy.end();)
   {
-    if (this->ProcessVisualMsg(*visualIter, VT_COLLISION))
+    if (this->ProcessVisualMsg(*visualIter, Visual::VT_COLLISION))
       collisionVisualMsgsCopy.erase(visualIter++);
     else
       ++visualIter;
@@ -1885,8 +1929,11 @@ void Scene::PreRender()
     std::copy(sensorMsgsCopy.begin(), sensorMsgsCopy.end(),
         std::front_inserter(this->dataPtr->sensorMsgs));
 
-    std::copy(lightMsgsCopy.begin(), lightMsgsCopy.end(),
-        std::front_inserter(this->dataPtr->lightMsgs));
+    std::copy(lightFactoryMsgsCopy.begin(), lightFactoryMsgsCopy.end(),
+        std::front_inserter(this->dataPtr->lightFactoryMsgs));
+
+    std::copy(lightModifyMsgsCopy.begin(), lightModifyMsgsCopy.end(),
+        std::front_inserter(this->dataPtr->lightModifyMsgs));
 
     std::copy(modelVisualMsgsCopy.begin(), modelVisualMsgsCopy.end(),
         std::front_inserter(this->dataPtr->modelVisualMsgs));
@@ -1907,6 +1954,9 @@ void Scene::PreRender()
         std::front_inserter(this->dataPtr->linkMsgs));
   }
 
+  // update the rt shader
+  RTShaderSystem::Instance()->Update();
+
   {
     boost::recursive_mutex::scoped_lock lock(this->dataPtr->poseMsgMutex);
 
@@ -1922,9 +1972,10 @@ void Scene::PreRender()
         // If an object is selected, don't let the physics engine move it.
         if (!this->dataPtr->selectedVis
             || this->dataPtr->selectionMode != "move" ||
-            iter->first != this->dataPtr->selectedVis->GetId())
+            (iter->first != this->dataPtr->selectedVis->GetId() &&
+            !this->dataPtr->selectedVis->IsAncestorOf(iter->second)))
         {
-          math::Pose pose = msgs::Convert(pIter->second);
+          ignition::math::Pose3d pose = msgs::ConvertIgn(pIter->second);
           GZ_ASSERT(iter->second, "Visual pointer is NULL");
           iter->second->SetPose(pose);
           PoseMsgs_M::iterator prev = pIter++;
@@ -1954,9 +2005,10 @@ void Scene::PreRender()
             // If an object is selected, don't let the physics engine move it.
             if (!this->dataPtr->selectedVis ||
                 this->dataPtr->selectionMode != "move" ||
-                iter->first != this->dataPtr->selectedVis->GetId())
+                (iter->first != this->dataPtr->selectedVis->GetId()&&
+                !this->dataPtr->selectedVis->IsAncestorOf(iter->second)))
             {
-              math::Pose pose = msgs::Convert(pose_msg);
+              ignition::math::Pose3d pose = msgs::ConvertIgn(pose_msg);
               iter2->second->SetPose(pose);
             }
           }
@@ -2056,7 +2108,7 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
     if (!parentVis)
       return false;
 
-    // image size is 0 if renering is unavailable
+    // image size is 0 if rendering is unavailable
     if (_msg->camera().image_size().x() > 0 &&
         _msg->camera().image_size().y() > 0)
     {
@@ -2070,11 +2122,37 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
         // parentVis' children list so that it can be properly deleted.
         parentVis->AttachVisual(cameraVis);
 
-        cameraVis->SetPose(msgs::Convert(_msg->pose()));
+        cameraVis->SetPose(msgs::ConvertIgn(_msg->pose()));
         cameraVis->SetId(_msg->id());
         cameraVis->Load(_msg->camera());
         this->dataPtr->visuals[cameraVis->GetId()] = cameraVis;
       }
+    }
+  }
+  else if (_msg->type() == "logical_camera" && _msg->visualize())
+  {
+    VisualPtr parentVis = this->GetVisual(_msg->parent_id());
+    if (!parentVis)
+      return false;
+
+    Visual_M::iterator iter = this->dataPtr->visuals.find(_msg->id());
+    if (iter == this->dataPtr->visuals.end())
+    {
+      LogicalCameraVisualPtr cameraVis(new LogicalCameraVisual(
+            _msg->name()+"_GUIONLY_logical_camera_vis", parentVis));
+
+      // need to call AttachVisual in order for cameraVis to be added to
+      // parentVis' children list so that it can be properly deleted.
+      parentVis->AttachVisual(cameraVis);
+
+      cameraVis->SetPose(msgs::ConvertIgn(_msg->pose()));
+      cameraVis->SetId(_msg->id());
+      cameraVis->Load(_msg->logical_camera());
+      this->dataPtr->visuals[cameraVis->GetId()] = cameraVis;
+    }
+    else if (_msg->has_pose())
+    {
+      iter->second->SetPose(msgs::ConvertIgn(_msg->pose()));
     }
   }
   else if (_msg->type() == "contact" && _msg->visualize() &&
@@ -2156,6 +2234,11 @@ bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
     this->CreateInertiaVisual(_msg, linkVis);
   }
 
+  if (!this->GetVisual(_msg->name() + "_LINK_FRAME_VISUAL__"))
+  {
+    this->CreateLinkFrameVisual(_msg, linkVis);
+  }
+
   for (int i = 0; i < _msg->projector_size(); ++i)
   {
     std::string pname = _msg->name() + "::" + _msg->projector(i).name();
@@ -2215,6 +2298,8 @@ void Scene::OnResponse(ConstResponsePtr &_msg)
   msgs::Scene sceneMsg;
   sceneMsg.ParseFromString(_msg->serialized_data());
   boost::shared_ptr<msgs::Scene> sm(new msgs::Scene(sceneMsg));
+
+  boost::mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
   this->dataPtr->sceneMsgs.push_back(sm);
   this->dataPtr->requestMsg = NULL;
 }
@@ -2385,6 +2470,30 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
         vis->ShowInertia(false);
     }
   }
+  else if (_msg->request() == "show_link_frame")
+  {
+    if (_msg->data() == "all")
+      this->ShowLinkFrames(true);
+    else
+    {
+      VisualPtr vis = this->GetVisual(_msg->data());
+      if (vis)
+        vis->ShowLinkFrame(true);
+      else
+        gzerr << "Unable to find link frame visual[" << _msg->data() << "]\n";
+    }
+  }
+  else if (_msg->request() == "hide_link_frame")
+  {
+    if (_msg->data() == "all")
+      this->ShowLinkFrames(false);
+    else
+    {
+      VisualPtr vis = this->GetVisual(_msg->data());
+      if (vis)
+        vis->ShowLinkFrame(false);
+    }
+  }
   else if (_msg->request() == "set_transparent")
   {
     if (_msg->data() == "all")
@@ -2439,7 +2548,7 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, rendering::VisualType _type)
+bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
 {
   bool result = false;
   Visual_M::iterator iter = this->dataPtr->visuals.end();
@@ -2544,9 +2653,11 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, rendering::VisualType _type)
 
       visual->ShowCOM(this->dataPtr->showCOMs);
       visual->ShowInertia(this->dataPtr->showInertias);
+      visual->ShowLinkFrame(this->dataPtr->showLinkFrames);
       visual->ShowCollision(this->dataPtr->showCollisions);
       visual->ShowJoints(this->dataPtr->showJoints);
-      visual->SetTransparency(this->dataPtr->transparent ? 0.5 : 0.0);
+      if (visual->GetType() == Visual::VT_MODEL)
+        visual->SetTransparency(this->dataPtr->transparent ? 0.5 : 0.0);
       visual->SetWireframe(this->dataPtr->wireframe);
     }
   }
@@ -2600,16 +2711,22 @@ void Scene::OnSkeletonPoseMsg(ConstPoseAnimationPtr &_msg)
   this->dataPtr->skeletonPoseMsgs.push_back(_msg);
 }
 
-
 /////////////////////////////////////////////////
-void Scene::OnLightMsg(ConstLightPtr &_msg)
+void Scene::OnLightFactoryMsg(ConstLightPtr &_msg)
 {
   boost::mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
-  this->dataPtr->lightMsgs.push_back(_msg);
+  this->dataPtr->lightFactoryMsgs.push_back(_msg);
 }
 
 /////////////////////////////////////////////////
-bool Scene::ProcessLightMsg(ConstLightPtr &_msg)
+void Scene::OnLightModifyMsg(ConstLightPtr &_msg)
+{
+  boost::mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
+  this->dataPtr->lightModifyMsgs.push_back(_msg);
+}
+
+/////////////////////////////////////////////////
+bool Scene::ProcessLightFactoryMsg(ConstLightPtr &_msg)
 {
   Light_M::iterator iter;
   iter = this->dataPtr->lights.find(_msg->name());
@@ -2620,6 +2737,28 @@ bool Scene::ProcessLightMsg(ConstLightPtr &_msg)
     light->LoadFromMsg(_msg);
     this->dataPtr->lights[_msg->name()] = light;
     RTShaderSystem::Instance()->UpdateShaders();
+  }
+  else
+  {
+    gzerr << "Light [" << _msg->name() << "] already exists."
+        << " Use topic ~/light/modify to modify it." << std::endl;
+    return false;
+  }
+
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool Scene::ProcessLightModifyMsg(ConstLightPtr &_msg)
+{
+  Light_M::iterator iter;
+  iter = this->dataPtr->lights.find(_msg->name());
+
+  if (iter == this->dataPtr->lights.end())
+  {
+    gzerr << "Light [" << _msg->name() << "] not found."
+        << " Use topic ~/factory/light to spawn a new light." << std::endl;
+    return false;
   }
   else
   {
@@ -2642,6 +2781,9 @@ void Scene::OnSkyMsg(ConstSkyPtr &_msg)
 {
   if (!this->dataPtr->skyx)
     return;
+
+  Ogre::Root::getSingletonPtr()->addFrameListener(this->dataPtr->skyx);
+  this->dataPtr->skyx->update(0);
 
   this->dataPtr->skyx->setVisible(true);
 
@@ -2780,9 +2922,6 @@ void Scene::SetSky()
   // vclouds->getLightningManager()->setLightningTimeMultiplier(
   //    preset.vcLightningsTM);
 
-  Ogre::Root::getSingletonPtr()->addFrameListener(this->dataPtr->skyx);
-
-  this->dataPtr->skyx->update(0);
   this->dataPtr->skyx->setVisible(false);
 }
 
@@ -3030,14 +3169,24 @@ void Scene::CreateInertiaVisual(sdf::ElementPtr _elem, VisualPtr _linkVisual)
 }
 
 /////////////////////////////////////////////////
+void Scene::CreateLinkFrameVisual(ConstLinkPtr &_msg, VisualPtr _linkVisual)
+{
+  LinkFrameVisualPtr linkFrameVis(new LinkFrameVisual(_msg->name() +
+      "_LINK_FRAME_VISUAL__", _linkVisual));
+  linkFrameVis->Load();
+  linkFrameVis->SetVisible(this->dataPtr->showLinkFrames);
+  this->dataPtr->visuals[linkFrameVis->GetId()] = linkFrameVis;
+}
+
+/////////////////////////////////////////////////
 void Scene::RemoveVisualizations(rendering::VisualPtr _vis)
 {
   std::vector<VisualPtr> toRemove;
   for (unsigned int i = 0; i < _vis->GetChildCount(); ++i)
   {
     rendering::VisualPtr childVis = _vis->GetChild(i);
-    rendering::VisualType visType = childVis->GetType();
-    if (visType == VT_PHYSICS || visType == VT_SENSOR)
+    Visual::VisualType visType = childVis->GetType();
+    if (visType == Visual::VT_PHYSICS || visType == Visual::VT_SENSOR)
     {
       toRemove.push_back(childVis);
     }
@@ -3065,7 +3214,8 @@ void Scene::SetTransparent(bool _show)
   this->dataPtr->transparent = _show;
   for (auto visual : this->dataPtr->visuals)
   {
-    visual.second->SetTransparency(_show ? 0.5 : 0.0);
+    if (visual.second->GetType() == Visual::VT_MODEL)
+      visual.second->SetTransparency(_show ? 0.5 : 0.0);
   }
 }
 
@@ -3086,6 +3236,16 @@ void Scene::ShowInertias(bool _show)
   for (auto visual : this->dataPtr->visuals)
   {
     visual.second->ShowInertia(_show);
+  }
+}
+
+/////////////////////////////////////////////////
+void Scene::ShowLinkFrames(bool _show)
+{
+  this->dataPtr->showLinkFrames = _show;
+  for (auto visual : this->dataPtr->visuals)
+  {
+    visual.second->ShowLinkFrame(_show);
   }
 }
 
@@ -3123,7 +3283,7 @@ void Scene::ShowContacts(bool _show)
     this->dataPtr->visuals[this->dataPtr->contactVisId] = vis;
   }
   else
-    vis = boost::dynamic_pointer_cast<ContactVisual>(
+    vis = std::dynamic_pointer_cast<ContactVisual>(
         this->dataPtr->visuals[this->dataPtr->contactVisId]);
 
   if (vis)

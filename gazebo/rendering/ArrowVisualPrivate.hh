@@ -33,9 +33,23 @@ namespace gazebo
     /// \brief Private data for the Arrow Visual class
     class ArrowVisualPrivate : public VisualPrivate
     {
-      public: Ogre::SceneNode *headNode;
-      public: Ogre::SceneNode *shaftNode;
-      public: Ogre::SceneNode *rotationNode;
+      /// \brief Head visual.
+      public: VisualPtr headVis;
+
+      /// \brief Shaft visual.
+      public: VisualPtr shaftVis;
+
+      /// \brief Rotation visual.
+      public: VisualPtr rotationVis;
+
+      /// \brief Head node visible flag.
+      public: bool headNodeVisible;
+
+      /// \brief Shaft node visible flag.
+      public: bool shaftNodeVisible;
+
+      /// \brief Rotation node visible flag.
+      public: bool rotationNodeVisible;
     };
   }
 }

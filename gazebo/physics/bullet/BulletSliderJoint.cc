@@ -316,22 +316,6 @@ math::Angle BulletSliderJoint::GetLowStop(unsigned int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-void BulletSliderJoint::SetMaxForce(unsigned int /*_index*/, double _force)
-{
-  if (this->bulletSlider)
-    this->bulletSlider->setMaxLinMotorForce(_force);
-}
-
-//////////////////////////////////////////////////
-double BulletSliderJoint::GetMaxForce(unsigned int /*_index*/)
-{
-  double result = 0;
-  if (this->bulletSlider)
-    result = this->bulletSlider->getMaxLinMotorForce();
-  return result;
-}
-
-//////////////////////////////////////////////////
 math::Vector3 BulletSliderJoint::GetGlobalAxis(unsigned int /*_index*/) const
 {
   math::Vector3 result = this->initialWorldAxis;

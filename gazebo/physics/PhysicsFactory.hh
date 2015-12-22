@@ -75,11 +75,10 @@ namespace gazebo
     /// \param[in] name Physics type name, as it appears in the world file.
     /// \param[in] classname C++ class name for the physics engine.
     #define GZ_REGISTER_PHYSICS_ENGINE(name, classname) \
-    GZ_PHYSICS_VISIBLE PhysicsEnginePtr New##classname(WorldPtr _world) \
+    PhysicsEnginePtr New##classname(WorldPtr _world) \
     { \
       return PhysicsEnginePtr(new gazebo::physics::classname(_world)); \
     } \
-    GZ_PHYSICS_VISIBLE \
     void Register##classname() \
     {\
       PhysicsFactory::RegisterPhysicsEngine(name, New##classname);\

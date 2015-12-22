@@ -20,6 +20,7 @@
 # include <mach/mach.h>
 #endif  // __MACH__
 
+#include <boost/bind.hpp>
 #include <unistd.h>
 
 #include "gazebo/common/Console.hh"
@@ -42,6 +43,9 @@ QTestFixture::QTestFixture()
 /////////////////////////////////////////////////
 void QTestFixture::initTestCase()
 {
+  // Verbose mode
+  gazebo::common::Console::SetQuiet(false);
+
   // Initialize the informational logger. This will log warnings, and
   // errors.
   gzLogInit("qtest-", "test.log");

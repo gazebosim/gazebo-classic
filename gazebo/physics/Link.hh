@@ -56,6 +56,7 @@ namespace gazebo
   {
     class Model;
     class Collision;
+    class Battery;
 
     /// \addtogroup gazebo_physics
     /// \{
@@ -554,6 +555,41 @@ namespace gazebo
         const LinkPtr &_originalParentLink,
         Link_V &_connectedLinks, bool _fistLink = false);
 
+      /// \brief Get a battery by name.
+      /// \param[in] _name Name of the battery to get.
+      /// \return Pointer to the battery, NULL if the name is invalid.
+      public: common::BatteryPtr Battery(const std::string &_name) const;
+
+      /// \brief Get a battery based on an index.
+      /// \return A pointer to a Battery. Null if the _index is invalid.
+      public: common::BatteryPtr Battery(const size_t _index) const;
+
+      /// \brief Get the number of batteries in this link.
+      /// \return Size of this->batteries array.
+      /// \sa Link::Battery()
+      public: size_t BatteryCount() const;
+
+      /// \brief Get the unique ID of a visual.
+      /// \param[in] _visName Name of the visual.
+      /// \param[out] _visualId The unique ID of the visual.
+      /// \return True if getting the unique ID of the visual was successful.
+      public: bool VisualId(const std::string &_visName, uint32_t &_visualId)
+        const;
+
+      /// \brief Get the pose of a visual.
+      /// \param[in] _id Unique ID of visual.
+      /// \param[out] _pose Pose of the visual relative to this link.
+      /// \return True if getting the pose of the visual was successful.
+      public: bool VisualPose(const uint32_t _id,
+                  ignition::math::Pose3d &_pose) const;
+
+      /// \brief Set the pose of a visual.
+      /// \param[in] _id Unique ID of visual message.
+      /// \param[in] _pose Pose relative to this link to place the visual.
+      /// \return True if setting the pose of the visual was successful.
+      public: bool SetVisualPose(const uint32_t _id,
+                                 const ignition::math::Pose3d &_pose);
+
       /// \brief Publish timestamped link data such as velocity.
       private: void PublishData();
 
@@ -593,6 +629,10 @@ namespace gazebo
       /// \brief Process the message and add force and torque.
       /// \param[in] _msg The message to set the wrench from.
       private: void ProcessWrenchMsg(const msgs::Wrench &_msg);
+
+      /// \brief Load a battery.
+      /// \param[in] _sdf SDF parameter.
+      private: void LoadBattery(const sdf::ElementPtr _sdf);
 
       /// \brief Inertial properties.
       protected: InertialPtr inertial;
@@ -660,6 +700,9 @@ namespace gazebo
 
       /// \brief Mutex to protect the wrenchMsgs variable.
       private: boost::mutex wrenchMsgMutex;
+
+      /// \brief All the attached batteries.
+      private: std::vector<common::BatteryPtr> batteries;
 
 #ifdef HAVE_OPENAL
       /// \brief All the audio sources

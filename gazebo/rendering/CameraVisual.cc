@@ -21,7 +21,10 @@
   #include <Winsock2.h>
 #endif
 
+#include <boost/bind.hpp>
+
 #include "gazebo/rendering/ogre_gazebo.h"
+#include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/DynamicLines.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/Camera.hh"
@@ -52,7 +55,7 @@ void CameraVisual::Load(const msgs::CameraSensor &_msg)
   CameraVisualPrivate *dPtr =
       reinterpret_cast<CameraVisualPrivate *>(this->dataPtr);
 
-  math::Vector2d imageSize = msgs::Convert(_msg.image_size());
+  math::Vector2d imageSize = msgs::ConvertIgn(_msg.image_size());
 
   double dist = 2.0;
   double width = 1.0;

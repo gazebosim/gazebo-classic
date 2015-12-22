@@ -14,16 +14,14 @@
  * limitations under the License.
  *
 */
-/* Desc: A camera sensor using OpenGL
- * Author: Nate Koenig
- * Date: 15 July 2003
- */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
+
+#include <boost/algorithm/string.hpp>
+#include <boost/bind.hpp>
 
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Exception.hh"
@@ -137,20 +135,19 @@ void CameraSensor::Init()
 
     this->camera->Init();
     this->camera->CreateRenderTexture(this->GetName() + "_RttTex");
-    math::Pose cameraPose = this->pose;
+    ignition::math::Pose3d cameraPose = this->pose;
     if (cameraSdf->HasElement("pose"))
-      cameraPose = cameraSdf->Get<math::Pose>("pose") + cameraPose;
+      cameraPose = cameraSdf->Get<ignition::math::Pose3d>("pose") + cameraPose;
 
     this->camera->SetWorldPose(cameraPose);
     this->camera->AttachToVisual(this->parentId, true);
 
     if (cameraSdf->HasElement("noise"))
     {
-      NoisePtr noise =
-          NoiseFactory::NewNoiseModel(cameraSdf->GetElement("noise"),
+      this->noises[CAMERA_NOISE] =
+        NoiseFactory::NewNoiseModel(cameraSdf->GetElement("noise"),
         this->GetType());
-      this->noises.push_back(noise);
-      noise->SetCamera(this->camera);
+      this->noises[CAMERA_NOISE]->SetCamera(this->camera);
     }
   }
   else
@@ -228,7 +225,10 @@ unsigned int CameraSensor::GetImageWidth() const
 {
   if (this->camera)
     return this->camera->GetImageWidth();
-  return 0;
+
+  sdf::ElementPtr cameraSdf = this->sdf->GetElement("camera");
+  sdf::ElementPtr elem = cameraSdf->GetElement("image");
+  return elem->Get<unsigned int>("width");
 }
 
 //////////////////////////////////////////////////
@@ -236,20 +236,30 @@ unsigned int CameraSensor::GetImageHeight() const
 {
   if (this->camera)
     return this->camera->GetImageHeight();
-  return 0;
+
+  sdf::ElementPtr cameraSdf = this->sdf->GetElement("camera");
+  sdf::ElementPtr elem = cameraSdf->GetElement("image");
+  return elem->Get<unsigned int>("height");
 }
 
 //////////////////////////////////////////////////
 const unsigned char *CameraSensor::GetImageData()
 {
-  return this->camera->GetImageData(0);
+  if (this->camera)
+    return this->camera->GetImageData(0);
+  else
+    return NULL;
 }
 
 //////////////////////////////////////////////////
 bool CameraSensor::SaveFrame(const std::string &_filename)
 {
   this->SetActive(true);
-  return this->camera->SaveFrame(_filename);
+
+  if (this->camera)
+    return this->camera->SaveFrame(_filename);
+  else
+    return false;
 }
 
 //////////////////////////////////////////////////

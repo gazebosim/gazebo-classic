@@ -24,32 +24,26 @@
 #include <sdf/sdf.hh>
 
 #include "gazebo/math/Pose.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/KeyEvent.hh"
-#include "gazebo/gui/EntityMaker.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
-  namespace msgs
-  {
-    class Visual;
-  }
-
   namespace gui
   {
-    class EntityMaker;
-    class EditorItem;
     class BuildingModelManip;
+    class EditorItem;
     class SaveDialog;
 
     /// \addtogroup gazebo_gui
     /// \{
 
-    /// \class BuildingMaker BuildingMaker.hh
     /// \brief Create and manage 3D visuals of a building.
-    class GZ_GUI_BUILDING_VISIBLE BuildingMaker : public EntityMaker
+    class GZ_GUI_VISIBLE BuildingMaker
     {
       /// \enum SaveState
       /// \brief Save states for the building editor.
@@ -69,7 +63,7 @@ namespace gazebo
       public: BuildingMaker();
 
       /// \brief Destructor
-      public: virtual ~BuildingMaker();
+      public: ~BuildingMaker();
 
       /// \brief QT callback when entering or leaving building edit mode
       /// \param[in] _checked True if the menu item is checked
@@ -148,6 +142,7 @@ namespace gazebo
 
       /// \brief Attach a building part to another, this is currently used for
       /// making holes in walls and floors.
+      /// This function doesn't check if the parts exist.
       /// \param[in] _child Name of the child building part
       /// \param[in] _parent Name of the parent building part.
       public: void AttachManip(const std::string &_child,
@@ -155,13 +150,20 @@ namespace gazebo
 
       /// \brief Detach a child building part from its parent.
       /// \param[in] _child Name of the child building part.
-      /// \param[in] _parent Name of the parent building part.
-      public: void DetachManip(const std::string &_child,
-          const std::string &_parent);
+      public: void DetachFromParent(const std::string &_child);
+
+      /// \brief Detach all child building parts from the given manip.
+      /// \param[in] _parent Name of the building part.
+      public: void DetachAllChildren(const std::string &_parent);
+
+      /// \brief Whether the given manip is attached to another manip or not.
+      /// \param[in] _child Name of manip.
+      /// \return True if manip has a parent.
+      public: bool IsAttached(const std::string &_child) const;
 
       /// \brief Detach all child building parts from the given manip.
       /// \param[in] _manip Name of the building part.
-      public: void DetachAllChildren(const std::string &_manip);
+      public: BuildingModelManip *ManipByName(const std::string &_name);
 
       /// \brief Helper method to convert size from editor coordinate system
       /// to Gazebo coordinate system.
@@ -211,23 +213,14 @@ namespace gazebo
       /// \brief Reset the building maker and the SDF.
       public: void Reset();
 
-      // Documentation inherited
-      public: virtual void Start(const rendering::UserCameraPtr _camera);
-
-      // Documentation inherited
-      public: virtual void Stop();
-
       /// \brief Generate the SDF from building part visuals.
       public: void GenerateSDF();
-
-      // Documentation inherited
-      public: virtual bool IsActive() const;
 
       /// \brief Set save state upon a change to the building.
       public: void BuildingChanged();
 
-      // Documentation inherited
-      private: virtual void CreateTheEntity();
+      /// \brief Publish a factory message to spawn the new building.
+      private: void CreateTheEntity();
 
       /// \brief Internal init function.
       private: bool Init();
@@ -333,6 +326,10 @@ namespace gazebo
       /// manage the visuals representing the building part.
       private: std::map<std::string, BuildingModelManip *> allItems;
 
+      /// \brief A map of building part names to model manip objects which
+      /// manage the visuals representing the building part.
+      private: std::map<std::string, std::vector<std::string>> attachmentMap;
+
       /// \brief The building model in SDF format.
       private: sdf::SDFPtr modelSDF;
 
@@ -391,6 +388,12 @@ namespace gazebo
 
       /// \brief The current level that is being edited.
       private: int currentLevel;
+
+      /// \brief Node used to publish messages.
+      protected: transport::NodePtr node;
+
+      /// \brief Publisher for factory messages.
+      protected: transport::PublisherPtr makerPub;
     };
     /// \}
   }

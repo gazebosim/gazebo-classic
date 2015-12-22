@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _EDITOR_HH_
-#define _EDITOR_HH_
+#ifndef _GAZEBO_GUI_EDITOR_HH_
+#define _GAZEBO_GUI_EDITOR_HH_
 
 #include <string>
 #include <vector>
@@ -32,7 +32,7 @@ namespace gazebo
 
     /// \brief Base class for editors, such as BuildingEditor and
     /// TerrainEditor.
-    class GAZEBO_VISIBLE Editor : public QObject
+    class GZ_GUI_VISIBLE Editor : public QObject
     {
       Q_OBJECT
 

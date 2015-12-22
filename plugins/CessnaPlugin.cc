@@ -30,7 +30,7 @@ using namespace gazebo;
 GZ_REGISTER_MODEL_PLUGIN(CessnaPlugin)
 
 ////////////////////////////////////////////////////////////////////////////////
-CessnaPlugin::CessnaPlugin()
+CessnaPlugin::CessnaPlugin() : cmds {{0, 0, 0, 0, 0, 0, 0}}
 {
   // PID default parameters.
   this->propellerPID.Init(50.0, 0.1, 1, 0.0, 0.0, 20000.0, -20000.0);

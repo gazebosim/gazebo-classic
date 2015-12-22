@@ -74,6 +74,14 @@ namespace gazebo
       /// \param[in] _event Qt key event.
       private: void keyPressEvent(QKeyEvent *_event);
 
+      /// \brief Qt signal emitted when a context menu event is triggered.
+      /// \param[in] _id Unique id of an item.
+      Q_SIGNALS: void customContextMenuRequested(QString _id);
+
+      /// \brief Qt signal emitted when an item is double clicked.
+      /// \param[in] _id Unique id of an item.
+      Q_SIGNALS: void itemDoubleClicked(QString _id);
+
       /// \brief Scale (zoom level) of the editor view.
       private: double viewScale;
     };

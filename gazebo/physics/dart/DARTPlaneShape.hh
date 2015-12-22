@@ -25,41 +25,28 @@ namespace gazebo
 {
   namespace physics
   {
+    /// Forward declare private data class
+    class DARTPlaneShapePrivate;
+
     /// \brief An DART Plane shape.
     class GZ_PHYSICS_VISIBLE DARTPlaneShape : public PlaneShape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent Collision.
-      public: explicit DARTPlaneShape(CollisionPtr _parent)
-              : PlaneShape(_parent) {}
+      public: explicit DARTPlaneShape(CollisionPtr _parent);
 
       /// \brief Destructor.
-      public: virtual ~DARTPlaneShape() {}
+      public: virtual ~DARTPlaneShape();
 
       // Documentation inherited
-      public: virtual void CreatePlane()
-      {
-        PlaneShape::CreatePlane();
-
-        DARTCollisionPtr dartCollisionParent =
-            boost::dynamic_pointer_cast<DARTCollision>(this->collisionParent);
-
-        // math::Vector3 n = this->GetNormal();
-
-        dart::dynamics::BodyNode *dtBodyNode =
-            dartCollisionParent->GetDARTBodyNode();
-        dart::dynamics::BoxShape *dtBoxShape =
-            new dart::dynamics::BoxShape(Eigen::Vector3d(2100, 2100, 0.01));
-        dtBodyNode->addCollisionShape(dtBoxShape);
-        dtBoxShape->setOffset(Eigen::Vector3d(0.0, 0.0, -0.005));
-        dartCollisionParent->SetDARTCollisionShape(dtBoxShape, false);
-      }
+      public: virtual void CreatePlane();
 
       // Documentation inherited
-      public: virtual void SetAltitude(const math::Vector3 &_pos)
-      {
-        PlaneShape::SetAltitude(_pos);
-      }
+      public: virtual void SetAltitude(const math::Vector3 &_pos);
+
+      /// \internal
+      /// \brief Pointer to private data
+      private: DARTPlaneShapePrivate *dataPtr;
     };
   }
 }
