@@ -30,10 +30,6 @@
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/util/system.hh"
 
-namespace boost
-{
-  class mutex;
-}
 
 namespace gazebo
 {

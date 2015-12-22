@@ -24,6 +24,7 @@
 
 #include <stdio.h>
 #include <signal.h>
+#include <mutex>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
@@ -77,7 +78,7 @@ namespace gazebo
     transport::PublisherPtr worldModPub;
 
     /// \brief Mutex to protect controlMsgs.
-    boost::mutex receiveMutex;
+    std::mutex receiveMutex;
 
     /// \brief List of received control messages.
     std::list<msgs::ServerControl> controlMsgs;
@@ -616,7 +617,7 @@ void Server::SetParams(const common::StrStr_M &_params)
 /////////////////////////////////////////////////
 void Server::OnControl(ConstServerControlPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(this->dataPtr->receiveMutex);
+  std::unique_lock<std::mutex> lock(this->dataPtr->receiveMutex);
   this->dataPtr->controlMsgs.push_back(*_msg);
 }
 
