@@ -54,7 +54,7 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited
-      protected: virtual bool UpdateImpl(const bool _force);
+      protected: virtual bool UpdateImpl(bool _force);
 
       // Documentation inherited
       protected: virtual void Fini();
@@ -86,7 +86,7 @@ namespace gazebo
       public: void SetReferencePose();
 
       // Documentation inherited.
-      public: virtual bool IsActive() const;
+      public: virtual bool IsActive();
 
       /// \brief Callback when link data is received
       /// \param[in] _msg Message containing link data

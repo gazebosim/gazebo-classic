@@ -267,9 +267,3 @@ bool ForceTorqueSensor::IsActive() const
 {
   return Sensor::IsActive() || this->wrenchPub->HasConnections();
 }
-
-//////////////////////////////////////////////////
-void ForceTorqueSensor::DisconnectUpdate(event::ConnectionPtr &_conn)
-{
-  this->update.Disconnect(_conn);
-}

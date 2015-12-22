@@ -55,7 +55,7 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited
-      protected: virtual bool UpdateImpl(const bool _force);
+      protected: virtual bool UpdateImpl(bool _force);
 
       // Documentation inherited
       public: virtual void Fini();

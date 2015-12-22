@@ -383,7 +383,7 @@ bool ImuSensor::UpdateImpl(bool /*_force*/)
 }
 
 //////////////////////////////////////////////////
-bool ImuSensor::IsActive() const
+bool ImuSensor::IsActive()
 {
   return this->active ||
          (this->pub && this->pub->HasConnections());

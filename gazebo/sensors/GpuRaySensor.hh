@@ -72,7 +72,7 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited
-      protected: virtual bool UpdateImpl(const bool _force);
+      protected: virtual bool UpdateImpl(bool _force);
 
       /// \brief Finalize the ray
       protected: virtual void Fini();
@@ -252,7 +252,7 @@ namespace gazebo
       public: void DisconnectNewLaserFrame(event::ConnectionPtr &_conn);
 
       // Documentation inherited
-      public: virtual bool IsActive() const;
+      public: virtual bool IsActive();
 
       /// brief Render the camera.
       private: void Render();

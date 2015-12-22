@@ -61,7 +61,7 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited
-      protected: virtual bool UpdateImpl(const bool _force);
+      protected: virtual bool UpdateImpl(bool _force);
 
       // Documentation inherited
       protected: virtual void Fini();
@@ -164,7 +164,7 @@ namespace gazebo
               {return this->laserShape;}
 
       // Documentation inherited
-      public: virtual bool IsActive() const;
+      public: virtual bool IsActive();
 
       private: physics::CollisionPtr laserCollision;
       private: physics::MultiRayShapePtr laserShape;

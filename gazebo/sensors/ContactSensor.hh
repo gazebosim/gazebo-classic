@@ -129,7 +129,7 @@ namespace gazebo
                   const std::string &_collisionName);
 
       // Documentation inherited.
-      public: virtual bool IsActive() const;
+      public: virtual bool IsActive();
 
       /// \brief Callback for contact messages from the physics engine.
       private: void OnContacts(ConstContactsPtr &_msg);

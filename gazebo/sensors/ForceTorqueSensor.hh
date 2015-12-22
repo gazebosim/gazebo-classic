@@ -67,7 +67,7 @@ namespace gazebo
       public: physics::JointPtr GetJoint() const;
 
       // Documentation inherited.
-      public: virtual bool IsActive() const;
+      public: virtual bool IsActive();
 
       /// \brief Connect a to the  update signal.
       /// \param[in] _subscriber Callback function.
@@ -78,7 +78,8 @@ namespace gazebo
 
       /// \brief Disconnect from the update signal.
       /// \param[in] _conn Connection to remove.
-      public: void DisconnectUpdate(event::ConnectionPtr &_conn);
+      public: void DisconnectUpdate(event::ConnectionPtr &_conn)
+              {update.Disconnect(_conn);}
 
       // Documentation inherited.
       protected: virtual bool UpdateImpl(bool _force);

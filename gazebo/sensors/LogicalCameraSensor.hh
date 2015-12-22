@@ -92,7 +92,7 @@ namespace gazebo
       protected: virtual void Fini();
 
       // Documentation inherited
-      public: virtual bool IsActive() const;
+      public: virtual bool IsActive();
 
       // \internal
       // \brief Private data pointer
