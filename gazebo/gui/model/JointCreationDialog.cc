@@ -39,7 +39,8 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
 {
   this->setObjectName("JointCreationDialog");
   this->setWindowTitle(tr("Create Joint"));
-  this->setWindowFlags(Qt::WindowStaysOnTopHint);
+  this->setWindowFlags(this->windowFlags() | Qt::WindowStaysOnTopHint);
+  this->setModal(false);
 
   this->setMinimumWidth(500);
   this->setMinimumHeight(940);
@@ -524,11 +525,8 @@ void JointCreationDialog::Open(const JointMaker::JointType _type)
   this->dataPtr->axis2Widget->setStyleSheet(
       ConfigWidget::StyleSheet("normal", 1));
 
-  auto mainWindow = gui::get_main_window();
-  if (!mainWindow)
-    return;
-
-  this->move(mainWindow->pos());
+  if (this->parentWidget())
+    this->move(this->parentWidget()->pos());
   this->show();
   QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
 }
