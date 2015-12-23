@@ -45,6 +45,10 @@ AlignWidget::AlignWidget(QWidget *_parent)
   labelFont.setPointSize(labelFont.pointSize());
   noteLabel->setFont(labelFont);
 
+  auto invertedBox = new QCheckBox("Reverse");
+  connect(invertedBox, SIGNAL(toggled(bool)), this,
+      SLOT(OnDirectionChanged(bool)));
+
   QComboBox *targetComboBox = new QComboBox(this);
   targetComboBox->addItem(tr("Relative to First"));
   targetComboBox->addItem(tr("Relative to Last"));
@@ -55,6 +59,7 @@ AlignWidget::AlignWidget(QWidget *_parent)
   alignLayout->addWidget(this->dataPtr->xAlignBar);
   alignLayout->addWidget(this->dataPtr->yAlignBar);
   alignLayout->addWidget(this->dataPtr->zAlignBar);
+  alignLayout->addWidget(invertedBox);
   alignLayout->addWidget(targetComboBox);
   alignLayout->addWidget(noteLabel);
   alignLayout->setAlignment(this->dataPtr->xAlignBar, Qt::AlignHCenter);
@@ -112,7 +117,8 @@ void AlignWidget::OnAlignMode(QString _mode)
 {
   std::string mode = _mode.toStdString();
   gui::Events::alignMode(mode.substr(0, 1), mode.substr(1),
-      this->dataPtr->alignRelativeTarget ? "last" : "first", false);
+      this->dataPtr->alignRelativeTarget ? "last" : "first", false,
+      this->dataPtr->inverted);
 }
 
 /////////////////////////////////////////////////
@@ -146,6 +152,12 @@ void AlignWidget::OnAlignTargetChanged(int _index)
 }
 
 /////////////////////////////////////////////////
+void AlignWidget::OnDirectionChanged(bool _checked)
+{
+  this->dataPtr->inverted = _checked;
+}
+
+/////////////////////////////////////////////////
 bool AlignWidget::eventFilter(QObject *_obj, QEvent *_event)
 {
   if (this->isEnabled())
@@ -157,12 +169,14 @@ bool AlignWidget::eventFilter(QObject *_obj, QEvent *_event)
       if (_event->type() == QEvent::Enter)
       {
         gui::Events::alignMode(axis, config,
-            this->dataPtr->alignRelativeTarget ? "last" : "first" , true);
+            this->dataPtr->alignRelativeTarget ? "last" : "first" , true,
+            this->dataPtr->inverted);
       }
       else if (_event->type() == QEvent::Leave)
       {
         gui::Events::alignMode("", "reset",
-            this->dataPtr->alignRelativeTarget ? "last" : "first", true);
+            this->dataPtr->alignRelativeTarget ? "last" : "first", true,
+            this->dataPtr->inverted);
       }
     }
   }
