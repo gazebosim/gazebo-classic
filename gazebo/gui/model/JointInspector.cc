@@ -15,6 +15,8 @@
  *
 */
 
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Assert.hh"
 
@@ -51,8 +53,8 @@ JointInspector::JointInspector(JointMaker *_jointMaker, QWidget *_parent)
     std::stringstream axis;
     axis << "axis" << i+1;
     std::string axisStr = axis.str();
-    this->configWidget->SetVector3WidgetValue(axisStr + "::xyz",
-        axisElem->Get<math::Vector3>("xyz"));
+    this->configWidget->SetVector3dWidgetValue(axisStr + "::xyz",
+        axisElem->Get<ignition::math::Vector3d>("xyz"));
     this->configWidget->SetDoubleWidgetValue(axisStr + "::limit_lower",
         axisLimitElem->Get<double>("lower"));
     this->configWidget->SetDoubleWidgetValue(axisStr + "::limit_upper",
@@ -282,17 +284,17 @@ void JointInspector::Update(ConstJointPtr _jointMsg)
 /////////////////////////////////////////////////
 void JointInspector::SetPose(const math::Pose &_pose)
 {
-  this->configWidget->SetPoseWidgetValue("pose", _pose);
+  this->configWidget->SetPoseWidgetValue("pose", _pose.Ign());
 }
 
 /////////////////////////////////////////////////
 msgs::Joint *JointInspector::GetData() const
 {
   std::string currentParent =
-      this->configWidget->GetEnumWidgetValue("parentCombo");
+      this->configWidget->EnumWidgetValue("parentCombo");
 
   std::string currentChild =
-      this->configWidget->GetEnumWidgetValue("childCombo");
+      this->configWidget->EnumWidgetValue("childCombo");
 
   if (currentParent == currentChild)
   {
@@ -300,7 +302,7 @@ msgs::Joint *JointInspector::GetData() const
   }
 
   // Get updated message from widget
-  msgs::Joint *msg = dynamic_cast<msgs::Joint *>(this->configWidget->GetMsg());
+  msgs::Joint *msg = dynamic_cast<msgs::Joint *>(this->configWidget->Msg());
   if (!msg)
   {
     gzerr << "It wasn't possible to get the joint message" << std::endl;
@@ -322,6 +324,9 @@ void JointInspector::OnEnumChanged(const QString &_name,
     this->OnJointTypeChanged(_value);
   else if (_name == "parentCombo" || _name == "childCombo")
     this->OnLinksChanged(_value);
+
+  if (this->CheckValid())
+    emit Applied();
 }
 
 /////////////////////////////////////////////////
@@ -381,7 +386,7 @@ void JointInspector::OnJointTypeChanged(const QString &_value)
 
     this->configWidget->SetWidgetVisible(axisStr, true);
     this->configWidget->SetWidgetReadOnly(axisStr, false);
-    this->configWidget->UpdateFromMsg(this->configWidget->GetMsg());
+    this->configWidget->UpdateFromMsg(this->configWidget->Msg());
   }
 
   for (unsigned int i = axisCount; i < 2u; ++i)
@@ -392,7 +397,7 @@ void JointInspector::OnJointTypeChanged(const QString &_value)
 
     this->configWidget->SetWidgetVisible(axisStr, false);
     this->configWidget->SetWidgetReadOnly(axisStr, true);
-    this->configWidget->UpdateFromMsg(this->configWidget->GetMsg());
+    this->configWidget->UpdateFromMsg(this->configWidget->Msg());
   }
 
   // toggle field visibility according to joint type.
@@ -416,18 +421,15 @@ void JointInspector::OnJointTypeChanged(const QString &_value)
           (matAmbient[2] * 255) << "); }";
 
   this->parentIcon->setStyleSheet(QString::fromStdString(sheet.str()));
-
-  if (this->CheckValid())
-    emit Applied();
 }
 
 /////////////////////////////////////////////////
 void JointInspector::OnLinksChanged(const QString &/*_linkName*/)
 {
   std::string currentParent =
-      this->configWidget->GetEnumWidgetValue("parentCombo");
+      this->configWidget->EnumWidgetValue("parentCombo");
   std::string currentChild =
-      this->configWidget->GetEnumWidgetValue("childCombo");
+      this->configWidget->EnumWidgetValue("childCombo");
 
   // Warning if parent and child are equal
   if (currentParent == currentChild)
@@ -441,10 +443,6 @@ void JointInspector::OnLinksChanged(const QString &/*_linkName*/)
     this->childLinkWidget->setStyleSheet(ConfigWidget::StyleSheet("normal"));
   }
   this->validLinks = currentParent != currentChild;
-
-  // Only apply if all fields are valid
-  if (this->CheckValid())
-    emit Applied();
 }
 
 /////////////////////////////////////////////////
@@ -452,9 +450,9 @@ void JointInspector::OnSwap()
 {
   // Get current values
   std::string currentParent =
-      this->configWidget->GetEnumWidgetValue("parentCombo");
+      this->configWidget->EnumWidgetValue("parentCombo");
   std::string currentChild =
-      this->configWidget->GetEnumWidgetValue("childCombo");
+      this->configWidget->EnumWidgetValue("childCombo");
 
   // Choose new values. We only need signals to be emitted once.
   this->configWidget->blockSignals(true);
@@ -506,9 +504,9 @@ void JointInspector::Open()
 
   // Select current parent / child
   std::string currentParent =
-      this->configWidget->GetStringWidgetValue("parent");
+      this->configWidget->StringWidgetValue("parent");
   std::string currentChild =
-      this->configWidget->GetStringWidgetValue("child");
+      this->configWidget->StringWidgetValue("child");
 
 
   this->configWidget->blockSignals(true);
@@ -528,6 +526,11 @@ void JointInspector::Open()
   auto msg = this->GetData();
   if (msg)
     this->originalDataMsg.CopyFrom(*msg);
+
+  // Make sure the dialog opens with the proper fields showing
+  this->blockSignals(true);
+  this->RestoreOriginalData();
+  this->blockSignals(false);
 
   this->move(QCursor::pos());
   this->show();
@@ -559,15 +562,13 @@ void JointInspector::RestoreOriginalData()
   this->Update(jointPtr);
 
   // Update joint type and parent icon
-  this->blockSignals(true);
   this->OnJointTypeChanged(tr(msgs::Joint_Type_Name(jointPtr->type()).c_str()));
-  this->blockSignals(false);
 
   // Update custom widgets
   std::string originalParent =
-      this->configWidget->GetStringWidgetValue("parent");
+      this->configWidget->StringWidgetValue("parent");
   std::string originalChild =
-      this->configWidget->GetStringWidgetValue("child");
+      this->configWidget->StringWidgetValue("child");
 
   if (!originalParent.empty())
     this->configWidget->SetEnumWidgetValue("parentCombo", originalParent);

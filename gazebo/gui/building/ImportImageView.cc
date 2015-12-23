@@ -15,34 +15,37 @@
  *
 */
 
-#include "gazebo/gui/building/ImportImageDialog.hh"
-#include "gazebo/gui/building/GridLines.hh"
 #include "gazebo/gui/building/EditorItem.hh"
+#include "gazebo/gui/building/GridLines.hh"
 #include "gazebo/gui/building/MeasureItem.hh"
+#include "gazebo/gui/building/ImportImageDialog.hh"
+#include "gazebo/gui/building/ImportImageDialogPrivate.hh"
 #include "gazebo/gui/building/ImportImageView.hh"
+#include "gazebo/gui/building/ImportImageViewPrivate.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
 ImportImageView::ImportImageView(ImportImageDialog *_parent)
-  : QGraphicsView(_parent), currentMouseItem(0)
+  : QGraphicsView(_parent),
+    dataPtr(new ImportImageViewPrivate)
 {
   this->setObjectName("importImageView");
 
-  this->parent = _parent;
+  this->dataPtr->dialog = _parent;
 
-  this->drawInProgress = false;
+  this->dataPtr->drawInProgress = false;
 
   this->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
-  this->gridLines = NULL;
-  this->imageItem = NULL;
-  this->imagePixmap = NULL;
+  this->dataPtr->gridLines = NULL;
+  this->dataPtr->imageItem = NULL;
+  this->dataPtr->imagePixmap = NULL;
 
-  this->noImageText = NULL;
+  this->dataPtr->noImageText = NULL;
 
-  this->measureItem = NULL;
-  this->drawDistanceEnabled = false;
+  this->dataPtr->measureItem = NULL;
+  this->dataPtr->drawDistanceEnabled = false;
 }
 
 /////////////////////////////////////////////////
@@ -53,40 +56,40 @@ ImportImageView::~ImportImageView()
 /////////////////////////////////////////////////
 void ImportImageView::SetImage(const std::string &_filename)
 {
-  if (this->imageItem)
-    this->scene()->removeItem(this->imageItem);
-  if (this->gridLines)
+  if (this->dataPtr->imageItem)
+    this->scene()->removeItem(this->dataPtr->imageItem);
+  if (this->dataPtr->gridLines)
   {
-    this->scene()->removeItem(this->gridLines);
-    this->gridLines = NULL;
+    this->scene()->removeItem(this->dataPtr->gridLines);
+    this->dataPtr->gridLines = NULL;
   }
-  if (this->noImageText)
+  if (this->dataPtr->noImageText)
   {
-    this->scene()->removeItem(this->noImageText);
-    this->noImageText = NULL;
+    this->scene()->removeItem(this->dataPtr->noImageText);
+    this->dataPtr->noImageText = NULL;
   }
-  if (this->measureItem)
-    this->scene()->removeItem(this->measureItem);
+  if (this->dataPtr->measureItem)
+    this->scene()->removeItem(this->dataPtr->measureItem);
 
-  this->imagePixmap = new QPixmap(QString(_filename.c_str()));
-  this->imageWidthPx = this->imagePixmap->width();
-  this->imageItem = new QGraphicsPixmapItem(this->imagePixmap->scaled(
-      this->scene()->sceneRect().width(),
+  this->dataPtr->imagePixmap = new QPixmap(QString(_filename.c_str()));
+  this->dataPtr->imageWidthPx = this->dataPtr->imagePixmap->width();
+  this->dataPtr->imageItem = new QGraphicsPixmapItem(
+      this->dataPtr->imagePixmap->scaled(this->scene()->sceneRect().width(),
       this->scene()->sceneRect().height(), Qt::KeepAspectRatio));
 
-  this->pixmapWidthPx = this->imageItem->pixmap().width();
-  this->pixmapHeightPx = this->imageItem->pixmap().height();
+  this->dataPtr->pixmapWidthPx = this->dataPtr->imageItem->pixmap().width();
+  this->dataPtr->pixmapHeightPx = this->dataPtr->imageItem->pixmap().height();
 
-  if (this->imageItem)
+  if (this->dataPtr->imageItem)
   {
-    this->scene()->addItem(this->imageItem);
-    this->parent->resolutionSpin->setButtonSymbols(
+    this->scene()->addItem(this->dataPtr->imageItem);
+    this->dataPtr->dialog->dataPtr->resolutionSpin->setButtonSymbols(
         QAbstractSpinBox::UpDownArrows);
-    this->parent->resolutionSpin->setReadOnly(false);
+    this->dataPtr->dialog->dataPtr->resolutionSpin->setReadOnly(false);
   }
   else
   {
-    this->scene()->addItem(this->gridLines);
+    this->scene()->addItem(this->dataPtr->gridLines);
   }
 }
 
@@ -98,57 +101,60 @@ void ImportImageView::resizeEvent(QResizeEvent *_event)
     this->scene()->setSceneRect(0, 0, _event->size().width(),
                                       _event->size().height());
 
-    if (!this->imageItem)
+    if (!this->dataPtr->imageItem)
     {
-      if (!this->gridLines)
+      if (!this->dataPtr->gridLines)
       {
-        this->gridLines = new GridLines(_event->size().width(),
+        this->dataPtr->gridLines = new GridLines(_event->size().width(),
             _event->size().height());
-        this->scene()->addItem(this->gridLines);
+        this->scene()->addItem(this->dataPtr->gridLines);
 
-        this->noImageText = new QGraphicsTextItem;
-        this->noImageText->setPlainText("No image selected");
-        this->noImageText->setDefaultTextColor(Qt::gray);
-        this->scene()->addItem(this->noImageText);
+        this->dataPtr->noImageText = new QGraphicsTextItem;
+        this->dataPtr->noImageText->setPlainText("No image selected");
+        this->dataPtr->noImageText->setDefaultTextColor(Qt::gray);
+        this->scene()->addItem(this->dataPtr->noImageText);
       }
       else
       {
-        this->gridLines->SetSize(_event->size().width(),
+        this->dataPtr->gridLines->SetSize(_event->size().width(),
               _event->size().height());
       }
     }
     else
     {
-      this->scene()->removeItem(this->imageItem);
-      this->imageItem = new QGraphicsPixmapItem(this->imagePixmap->scaled(
-          this->scene()->sceneRect().width(),
+      this->scene()->removeItem(this->dataPtr->imageItem);
+      this->dataPtr->imageItem = new QGraphicsPixmapItem(
+          this->dataPtr->imagePixmap->scaled(this->scene()->sceneRect().width(),
           this->scene()->sceneRect().height(), Qt::KeepAspectRatio));
-      this->scene()->addItem(this->imageItem);
+      this->scene()->addItem(this->dataPtr->imageItem);
 
-      if (this->measureItem)
+      if (this->dataPtr->measureItem)
       {
-        double scaleWidth = this->imageItem->pixmap().width() /
-            static_cast<double>(this->pixmapWidthPx);
-        double scaleHeight = this->imageItem->pixmap().height() /
-            static_cast<double>(this->pixmapHeightPx);
+        double scaleWidth = this->dataPtr->imageItem->pixmap().width() /
+            static_cast<double>(this->dataPtr->pixmapWidthPx);
+        double scaleHeight = this->dataPtr->imageItem->pixmap().height() /
+            static_cast<double>(this->dataPtr->pixmapHeightPx);
 
-        QPointF p1 = measureItem->mapToScene(measureItem->line().p1());
-        QPointF p2 = measureItem->mapToScene(measureItem->line().p2());
+        QPointF p1 = this->dataPtr->measureItem->mapToScene(
+            this->dataPtr->measureItem->line().p1());
+        QPointF p2 = this->dataPtr->measureItem->mapToScene(
+            this->dataPtr->measureItem->line().p2());
 
         p1.setX(p1.x() * scaleWidth);
         p2.setX(p2.x() * scaleWidth);
         p1.setY(p1.y() * scaleHeight);
         p2.setY(p2.y() * scaleHeight);
 
-        this->measureItem->SetStartPoint(p1);
-        this->measureItem->SetEndPoint(p2);
+        this->dataPtr->measureItem->SetStartPoint(p1);
+        this->dataPtr->measureItem->SetEndPoint(p2);
       }
     }
 
-    if (this->imageItem)
+    if (this->dataPtr->imageItem)
     {
-      this->pixmapWidthPx = this->imageItem->pixmap().width();
-      this->pixmapHeightPx = this->imageItem->pixmap().height();
+      this->dataPtr->pixmapWidthPx = this->dataPtr->imageItem->pixmap().width();
+      this->dataPtr->pixmapHeightPx =
+          this->dataPtr->imageItem->pixmap().height();
     }
   }
 }
@@ -156,15 +162,15 @@ void ImportImageView::resizeEvent(QResizeEvent *_event)
 /////////////////////////////////////////////////
 void ImportImageView::mouseMoveEvent(QMouseEvent *_event)
 {
-  if (this->drawInProgress && this->measureItem)
+  if (this->dataPtr->drawInProgress && this->dataPtr->measureItem)
   {
     QPointF p2 = this->mapToScene(_event->pos());
 
     if (!(QApplication::keyboardModifiers() & Qt::ShiftModifier))
     {
       // snap to 0/90/180 degrees
-      QPointF p1 = this->measureItem->mapToScene(
-          this->measureItem->line().p1());
+      QPointF p1 = this->dataPtr->measureItem->mapToScene(
+          this->dataPtr->measureItem->line().p1());
       QLineF newLine(p1, p2);
       double angle = newLine.angle();
       double range = 10;
@@ -180,10 +186,10 @@ void ImportImageView::mouseMoveEvent(QMouseEvent *_event)
       }
     }
 
-    this->measureItem->SetEndPoint(p2);
+    this->dataPtr->measureItem->SetEndPoint(p2);
   }
 
-  if (!drawInProgress)
+  if (!this->dataPtr->drawInProgress)
   {
     QGraphicsView::mouseMoveEvent(_event);
   }
@@ -198,14 +204,14 @@ void ImportImageView::mousePressEvent(QMouseEvent *_event)
 /////////////////////////////////////////////////
 void ImportImageView::mouseReleaseEvent(QMouseEvent *_event)
 {
-  if (this->imageItem)
+  if (this->dataPtr->imageItem)
   {
     this->DrawMeasure(_event->pos());
   }
 
-  if (!this->drawInProgress)
+  if (!this->dataPtr->drawInProgress)
   {
-    this->currentMouseItem = NULL;
+    this->dataPtr->currentMouseItem = NULL;
   }
 
   QGraphicsView::mouseReleaseEvent(_event);
@@ -216,10 +222,10 @@ void ImportImageView::keyPressEvent(QKeyEvent *_event)
 {
   if (_event->key() == Qt::Key_Escape)
   {
-    this->drawInProgress = false;
-    if (this->measureItem)
+    this->dataPtr->drawInProgress = false;
+    if (this->dataPtr->measureItem)
     {
-      this->scene()->removeItem(this->measureItem);
+      this->scene()->removeItem(this->dataPtr->measureItem);
     }
     QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
     return;
@@ -230,14 +236,14 @@ void ImportImageView::keyPressEvent(QKeyEvent *_event)
 /////////////////////////////////////////////////
 void ImportImageView::DrawMeasure(const QPoint &_pos)
 {
-  if (!this->drawDistanceEnabled)
+  if (!this->dataPtr->drawDistanceEnabled)
     return;
 
-  if (!this->drawInProgress)
+  if (!this->dataPtr->drawInProgress)
   {
-    if (this->measureItem)
+    if (this->dataPtr->measureItem)
     {
-      this->scene()->removeItem(this->measureItem);
+      this->scene()->removeItem(this->dataPtr->measureItem);
     }
 
     QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
@@ -245,35 +251,37 @@ void ImportImageView::DrawMeasure(const QPoint &_pos)
     QPointF pointStart = mapToScene(_pos);
     QPointF pointEnd = pointStart + QPointF(1, 0);
 
-    this->measureItem = new MeasureItem(pointStart, pointEnd);
-    this->measureItem->SetValue(this->parent->distanceSpin->value());
-    this->scene()->addItem(this->measureItem);
-    this->currentMouseItem = this->measureItem;
-    this->drawInProgress = true;
+    this->dataPtr->measureItem = new MeasureItem(pointStart, pointEnd);
+    this->dataPtr->measureItem->SetValue(
+        this->dataPtr->dialog->dataPtr->distanceSpin->value());
+    this->scene()->addItem(this->dataPtr->measureItem);
+    this->dataPtr->currentMouseItem = this->dataPtr->measureItem;
+    this->dataPtr->drawInProgress = true;
   }
   else
   {
-    this->measureItem = dynamic_cast<MeasureItem *>(this->currentMouseItem);
-    if (this->measureItem)
+    this->dataPtr->measureItem = dynamic_cast<MeasureItem *>(
+        this->dataPtr->currentMouseItem);
+    if (this->dataPtr->measureItem)
     {
-      this->measureScenePx = this->measureItem->GetDistance();
+      this->dataPtr->measureScenePx = this->dataPtr->measureItem->GetDistance();
 
-      this->parent->distanceSpin->setButtonSymbols(
+      this->dataPtr->dialog->dataPtr->distanceSpin->setButtonSymbols(
           QAbstractSpinBox::UpDownArrows);
-      this->parent->distanceSpin->setReadOnly(false);
+      this->dataPtr->dialog->dataPtr->distanceSpin->setReadOnly(false);
     }
 
     // Calculate distance
-    double distanceImage = this->measureScenePx * this->imageWidthPx
-        / this->pixmapWidthPx;
-    this->parent->resolutionSpin->setValue(
-        distanceImage / this->parent->distanceSpin->value());
+    double distanceImage = this->dataPtr->measureScenePx *
+        this->dataPtr->imageWidthPx / this->dataPtr->pixmapWidthPx;
+    this->dataPtr->dialog->dataPtr->resolutionSpin->setValue(
+        distanceImage / this->dataPtr->dialog->dataPtr->distanceSpin->value());
 
-    this->currentMouseItem = NULL;
-    this->drawInProgress = false;
+    this->dataPtr->currentMouseItem = NULL;
+    this->dataPtr->drawInProgress = false;
     this->releaseKeyboard();
-    this->parent->distanceSpin->setFocus();
-    this->parent->distanceSpin->selectAll();
+    this->dataPtr->dialog->dataPtr->distanceSpin->setFocus();
+    this->dataPtr->dialog->dataPtr->distanceSpin->selectAll();
     QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
   }
 }
@@ -281,12 +289,12 @@ void ImportImageView::DrawMeasure(const QPoint &_pos)
 /////////////////////////////////////////////////
 void ImportImageView::RefreshDistance(double _distance)
 {
-  this->measureItem->SetValue(_distance);
+  this->dataPtr->measureItem->SetValue(_distance);
   this->scene()->update();
 }
 
 /////////////////////////////////////////////////
 void ImportImageView::EnableDrawDistance(bool _enable)
 {
-  this->drawDistanceEnabled = _enable;
+  this->dataPtr->drawDistanceEnabled = _enable;
 }

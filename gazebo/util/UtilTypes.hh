@@ -17,7 +17,9 @@
 #ifndef _GAZEBO_UTIL_TYPES_HH_
 #define _GAZEBO_UTIL_TYPES_HH_
 
-#include <boost/shared_ptr.hpp>
+#include <unordered_map>
+#include <memory>
+#include <string>
 #include "gazebo/util/system.hh"
 
 /// \file
@@ -35,17 +37,20 @@ namespace gazebo
 
     /// \def DiagnosticTimerPtr
     /// \brief boost::shared_ptr to a DiagnosticTimer class
-    typedef boost::shared_ptr<DiagnosticTimer> DiagnosticTimerPtr;
+    typedef std::shared_ptr<DiagnosticTimer> DiagnosticTimerPtr;
 
     /// \def OpenALSinkPtr
     /// \brief boost::shared_ptr to a OpenALSink class
-    typedef boost::shared_ptr<OpenALSink> OpenALSinkPtr;
+    typedef std::shared_ptr<OpenALSink> OpenALSinkPtr;
 
     /// \def OpenALSourcePtr
     /// \brief boost::shared_ptr to a OpenALSource class
-    typedef boost::shared_ptr<OpenALSource> OpenALSourcePtr;
+    typedef std::shared_ptr<OpenALSource> OpenALSourcePtr;
+
+    /// \def TimerMap
+    /// \brief Map of all the active timers.
+    typedef std::unordered_map<std::string, DiagnosticTimerPtr> TimerMap;
   }
 }
 /// \}
-
 #endif

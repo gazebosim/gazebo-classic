@@ -63,6 +63,13 @@ std::string gazebo::custom_exec(std::string _cmd)
 }
 
 /////////////////////////////////////////////////
+void RenderingFixture::SetUp()
+{
+  // start rendering in test thread
+  rendering::load();
+}
+
+/////////////////////////////////////////////////
 ServerFixture::ServerFixture()
 {
   this->server = NULL;
