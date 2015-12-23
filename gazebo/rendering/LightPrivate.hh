@@ -20,7 +20,7 @@
 #include <sdf/sdf.hh>
 
 #include "gazebo/rendering/RenderTypes.hh"
-#include "gazebo/common/Event.hh"
+#include "gazebo/common/CommonTypes.hh"
 
 namespace Ogre
 {
