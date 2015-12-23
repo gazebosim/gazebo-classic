@@ -20,9 +20,6 @@
 #include <string>
 #include <list>
 
-#include <boost/program_options.hpp>
-#include <boost/thread.hpp>
-
 #include <sdf/sdf.hh>
 
 #include "gazebo/msgs/msgs.hh"

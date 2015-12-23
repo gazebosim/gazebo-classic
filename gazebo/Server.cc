@@ -25,9 +25,10 @@
 #include <stdio.h>
 #include <signal.h>
 #include <mutex>
-#include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/program_options.hpp>
 
 #include <sdf/sdf.hh>
 
