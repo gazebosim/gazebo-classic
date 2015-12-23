@@ -305,7 +305,7 @@ bool OculusCamera::AttachToVisualImpl(VisualPtr _visual,
   Camera::AttachToVisualImpl(_visual, _inheritOrientation);
   if (_visual)
   {
-    math::Pose origPose = this->GetWorldPose();
+    math::Pose origPose = this->WorldPose();
     double yaw = _visual->GetWorldPose().rot.GetAsEuler().z;
 
     double zDiff = origPose.pos.z - _visual->GetWorldPose().pos.z;
@@ -314,12 +314,12 @@ bool OculusCamera::AttachToVisualImpl(VisualPtr _visual,
     if (fabs(zDiff) > 1e-3)
     {
       double dist = _visual->GetWorldPose().pos.Distance(
-          this->GetWorldPose().pos);
+          this->WorldPose().Pos());
       pitch = acos(zDiff/dist);
     }
 
-    this->Yaw(yaw);
-    this->Pitch(pitch);
+    this->Yaw(ignition::math::Angle(yaw));
+    this->Pitch(ignition::math::Angle(pitch));
 
     math::Box bb = _visual->GetBoundingBox();
     math::Vector3 pos = bb.GetCenter();
@@ -365,7 +365,7 @@ void OculusCamera::Resize(unsigned int /*_w*/, unsigned int /*_h*/)
 //////////////////////////////////////////////////
 bool OculusCamera::MoveToPosition(const math::Pose &_pose, double _time)
 {
-  return Camera::MoveToPosition(_pose, _time);
+  return Camera::MoveToPosition(_pose.Ign(), _time);
 }
 
 //////////////////////////////////////////////////
@@ -393,7 +393,7 @@ void OculusCamera::MoveToVisual(VisualPtr _visual)
   math::Vector3 size = box.GetSize();
   double maxSize = std::max(std::max(size.x, size.y), size.z);
 
-  math::Vector3 start = this->GetWorldPose().pos;
+  math::Vector3 start = this->WorldPose().Pos();
   start.Correct();
   math::Vector3 end = box.GetCenter() + _visual->GetWorldPose().pos;
   end.Correct();
@@ -418,7 +418,7 @@ void OculusCamera::MoveToVisual(VisualPtr _visual)
 
   dir.Normalize();
 
-  double scale = maxSize / tan((this->GetHFOV()/2.0).Radian());
+  double scale = maxSize / tan((this->HFOV()/2.0).Radian());
 
   end = mid + dir*(dist - scale);
 
