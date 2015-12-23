@@ -586,14 +586,7 @@ void Camera::SetWorldPose(const ignition::math::Pose3d &_pose)
 //////////////////////////////////////////////////
 math::Pose Camera::GetWorldPose() const
 {
-#ifndef _WIN32
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return math::Pose(this->GetWorldPosition(), this->GetWorldRotation());
-#ifndef _WIN32
-#pragma GCC diagnostic pop
-#endif
+  return WorldPose();
 }
 
 //////////////////////////////////////////////////
