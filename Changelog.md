@@ -3,6 +3,9 @@
 1. Use opaque pointers in the rendering/DepthCamera class.
     * [Pull request #](https://bitbucket.org/osrf/gazebo/pull-request/)
     
+1. Use opaque pointers in the rendering/WindowManager class.
+    * [Pull request #2064](https://bitbucket.org/osrf/gazebo/pull-request/2064)
+    
 1. Use opaque pointers in the rendering/Light class.
     * [Pull request #2066](https://bitbucket.org/osrf/gazebo/pull-request/2066)
 
