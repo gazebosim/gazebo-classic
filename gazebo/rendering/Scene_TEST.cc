@@ -92,35 +92,28 @@ TEST_F(Scene_TEST, RemoveModelVisual)
   ASSERT_TRUE(sphere != NULL);
   ASSERT_TRUE(cylinder != NULL);
 
-  // Check that the link visuals were properly added
-  EXPECT_TRUE(scene->GetVisual("box::link") != NULL);
-  EXPECT_TRUE(scene->GetVisual("cylinder::link") != NULL);
-  EXPECT_TRUE(scene->GetVisual("sphere::link") != NULL);
+  const std::vector<std::string> models = {
+    "box",
+    "cylinder",
+    "sphere"};
 
-  // Check that the "visual visuals" were properly added
-  EXPECT_TRUE(scene->GetVisual("box::link::visual") != NULL);
-  EXPECT_TRUE(scene->GetVisual("cylinder::link::visual") != NULL);
-  EXPECT_TRUE(scene->GetVisual("sphere::link::visual") != NULL);
+  const std::vector<std::string> suffixes = {
+    "",
+    "::link",
+    "::link::visual",
+    "::link::collision",
+    "::link_INERTIA_VISUAL__",
+    "::link_COM_VISUAL__",
+    "::link_LINK_FRAME_VISUAL__"};
 
-  // Check that the collision visuals were properly added
-  EXPECT_TRUE(scene->GetVisual("box::link::collision") != NULL);
-  EXPECT_TRUE(scene->GetVisual("cylinder::link::collision") != NULL);
-  EXPECT_TRUE(scene->GetVisual("sphere::link::collision") != NULL);
-
-  // Check that the inertia visuals were properly added
-  EXPECT_TRUE(scene->GetVisual("box::link_INERTIA_VISUAL__") != NULL);
-  EXPECT_TRUE(scene->GetVisual("cylinder::link_INERTIA_VISUAL__") != NULL);
-  EXPECT_TRUE(scene->GetVisual("sphere::link_INERTIA_VISUAL__") != NULL);
-
-  // Check that the COM visuals were properly added
-  EXPECT_TRUE(scene->GetVisual("box::link_COM_VISUAL__") != NULL);
-  EXPECT_TRUE(scene->GetVisual("cylinder::link_COM_VISUAL__") != NULL);
-  EXPECT_TRUE(scene->GetVisual("sphere::link_COM_VISUAL__") != NULL);
-
-  // Check that the link frame visuals were properly added
-  EXPECT_TRUE(scene->GetVisual("box::link_LINK_FRAME_VISUAL__") != NULL);
-  EXPECT_TRUE(scene->GetVisual("cylinder::link_LINK_FRAME_VISUAL__") != NULL);
-  EXPECT_TRUE(scene->GetVisual("sphere::link_LINK_FRAME_VISUAL__") != NULL);
+  for (auto const &modelName : models)
+  {
+    for (auto const &suffix : suffixes)
+    {
+      gzdbg << "check visual exists: " << modelName + suffix << std::endl;
+      EXPECT_TRUE(scene->GetVisual(modelName + suffix) != NULL);
+    }
+  }
 
   // Send request to delete the box model
   transport::NodePtr node = transport::NodePtr(new transport::Node());
@@ -136,23 +129,11 @@ TEST_F(Scene_TEST, RemoveModelVisual)
   }
   ASSERT_TRUE(box == NULL);
 
-  // Check that the link visuals were properly removed
-  EXPECT_TRUE(scene->GetVisual("box::link") == NULL);
-
-  // Check that the "visual visuals" were properly removed
-  EXPECT_TRUE(scene->GetVisual("box::link::visual") == NULL);
-
-  // Check that the collision visuals were properly removed
-  EXPECT_TRUE(scene->GetVisual("box::link::collision") == NULL);
-
-  // Check that the inertia visuals were properly removed
-  EXPECT_TRUE(scene->GetVisual("box::link_INERTIA_VISUAL__") == NULL);
-
-  // Check that the COM visuals were properly removed
-  EXPECT_TRUE(scene->GetVisual("box::link_COM_VISUAL__") == NULL);
-
-  // Check that the link frame visuals were properly removed
-  EXPECT_TRUE(scene->GetVisual("box::link_LINK_FRAME_VISUAL__") == NULL);
+  for (auto const &suffix : suffixes)
+  {
+    gzdbg << "check visual does not exist: " << "box" + suffix << std::endl;
+    EXPECT_TRUE(scene->GetVisual("box" + suffix) == NULL);
+  }
 }
 
 /////////////////////////////////////////////////
