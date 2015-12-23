@@ -38,6 +38,7 @@
 1. Switching to ignition math for the rendering library.
     * [Pull request #1993](https://bitbucket.org/osrf/gazebo/pull-request/1993)
     * [Pull request #1994](https://bitbucket.org/osrf/gazebo/pull-request/1994)
+    * [Pull request #1995](https://bitbucket.org/osrf/gazebo/pull-request/1995)
     * [Pull request #1996](https://bitbucket.org/osrf/gazebo/pull-request/1996)
 
 1. Removed deprecations
