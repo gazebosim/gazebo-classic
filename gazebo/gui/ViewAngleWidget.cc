@@ -166,7 +166,7 @@ void ViewAngleWidget::LookDirection(const ignition::math::Vector3d &_dir)
   }
 
   // Keep current distance to look target
-  ignition::math::Vector3d camPos = cam->GetWorldPose().pos.Ign();
+  ignition::math::Vector3d camPos = cam->WorldPose().Pos();
   double distance = std::fabs((camPos - lookAt).Length());
 
   // Calculate camera position

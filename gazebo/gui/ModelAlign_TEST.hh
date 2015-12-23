@@ -28,14 +28,23 @@ class ModelAlign_TEST : public QTestFixture
   /// \brief Test aligning models at min x.
   private slots: void AlignXMin();
 
+  /// \brief Test aligning models at min x, reversed.
+  private slots: void AlignXMinReverse();
+
   /// \brief Test centering models in the x axis.
   private slots: void AlignXCenter();
 
   /// \brief Test aligning models at max x.
   private slots: void AlignXMax();
 
+  /// \brief Test aligning models at max x, reversed.
+  private slots: void AlignXMaxReverse();
+
   /// \brief Test aligning models at min y.
   private slots: void AlignYMin();
+
+  /// \brief Test aligning models at min y, reversed.
+  private slots: void AlignYMinReverse();
 
   /// \brief Test centering models in the y axis.
   private slots: void AlignYCenter();
@@ -43,14 +52,23 @@ class ModelAlign_TEST : public QTestFixture
   /// \brief Test aligning models at max y.
   private slots: void AlignYMax();
 
+  /// \brief Test aligning models at max y, reversed.
+  private slots: void AlignYMaxReverse();
+
   /// \brief Test aligning models at min z.
   private slots: void AlignZMin();
+
+  /// \brief Test aligning models at min z, reversed.
+  private slots: void AlignZMinReverse();
 
   /// \brief Test centering models in the z axis.
   private slots: void AlignZCenter();
 
   /// \brief Test aligning models at max z.
   private slots: void AlignZMax();
+
+  /// \brief Test aligning models at max z, reversed.
+  private slots: void AlignZMaxReverse();
 
   /// \brief Test aligning models with non unit scale.
   private slots: void AlignScale();
