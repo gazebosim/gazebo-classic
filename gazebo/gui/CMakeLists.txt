@@ -25,6 +25,7 @@ set (sources
   ApplyWrenchDialog.cc
   CloneWindow.cc
   ConfigWidget.cc
+  Conversions.cc
   DataLogger.cc
   Editor.cc
   EntityMaker.cc
@@ -100,6 +101,7 @@ set (qt_headers
 set (headers
   qt.h
   qt_test.h
+  Conversions.hh
   EntityMaker.hh
   GuiIface.hh
   GuiEvents.hh
@@ -135,6 +137,7 @@ endif ()
 #endif()
 
 set (qt_tests
+  Conversions_TEST.cc
   DataLogger_TEST.cc
   GuiIface_TEST.cc
   HotkeyDialog_TEST.cc
