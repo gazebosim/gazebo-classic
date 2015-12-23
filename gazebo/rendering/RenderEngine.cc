@@ -129,8 +129,8 @@ void RenderEngine::Load()
 
 #if (OGRE_VERSION >= ((1 << 16) | (9 << 8) | 0))
     // OgreOverlay is a component on its own in ogre 1.9 so must manually
-    // initialize it. Must be created after this->dataPtr->root, but before this->dataPtr->root
-    // is initialized.
+    // initialize it. Must be created after this->dataPtr->root,
+    // but before this->dataPtr->root is initialized.
     if (!this->dataPtr->overlaySystem)
       this->dataPtr->overlaySystem = new Ogre::OverlaySystem();
 #endif
@@ -152,7 +152,8 @@ void RenderEngine::Load()
   // testing, this is a hard requirement by Apple. We also need it to
   // properly initialize GLWidget and UserCameras. See the GLWidget
   // constructor.
-  this->dataPtr->windowManager->CreateWindow(std::to_string(this->dummyWindowId), 1, 1);
+  this->dataPtr->windowManager->CreateWindow(
+      std::to_string(this->dummyWindowId), 1, 1);
 
   this->CheckSystemCapabilities();
 }
