@@ -17,6 +17,8 @@
 #include <boost/bind.hpp>
 #include "gazebo/rendering/ogre_gazebo.h"
 
+#include "gazebo/math/Pose.hh"
+
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Events.hh"

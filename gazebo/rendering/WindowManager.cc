@@ -111,7 +111,7 @@ int WindowManager::CreateWindow(const std::string &_ogreHandle,
   {
     try
     {
-      window = RenderEngine::Instance()->root->createRenderWindow(
+      window = RenderEngine::Instance()->Root()->createRenderWindow(
           stream.str(), _width, _height, false, &params);
     }
     catch(...)
