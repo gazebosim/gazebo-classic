@@ -56,6 +56,12 @@ namespace gazebo
       /// \return Gazebo vector
       public: static math::Vector3 Convert(const Ogre::Vector3 &_v);
 
+      /// \brief return ignition::math::Vector3d from ogre Vector3
+      /// \param[in] _v Ogre vector
+      /// \return ignition::math::Vector3d
+      public: static ignition::math::Vector3d ConvertIgn(
+                  const Ogre::Vector3 &_v);
+
       /// \brief Gazebo quaternion to Ogre quaternion
       /// \param[in] _v Gazebo quaternion
       /// \return Ogre quaternion

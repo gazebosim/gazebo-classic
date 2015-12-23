@@ -239,7 +239,7 @@ void MultiCameraSensor::Render()
 }
 
 //////////////////////////////////////////////////
-bool MultiCameraSensor::UpdateImpl(bool /*_force*/)
+bool MultiCameraSensor::UpdateImpl(const bool /*_force*/)
 {
   boost::mutex::scoped_lock lock(this->cameraMutex);
 
@@ -322,7 +322,7 @@ bool MultiCameraSensor::SaveFrame(const std::vector<std::string> &_filenames)
 }
 
 //////////////////////////////////////////////////
-bool MultiCameraSensor::IsActive()
+bool MultiCameraSensor::IsActive() const
 {
   return Sensor::IsActive() ||
     (this->imagePub && this->imagePub->HasConnections());

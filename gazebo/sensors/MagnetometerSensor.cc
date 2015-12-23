@@ -129,7 +129,7 @@ void MagnetometerSensor::Init()
 }
 
 //////////////////////////////////////////////////
-bool MagnetometerSensor::UpdateImpl(bool /*_force*/)
+bool MagnetometerSensor::UpdateImpl(const bool /*_force*/)
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 

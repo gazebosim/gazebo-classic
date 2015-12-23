@@ -136,7 +136,7 @@ void ContactSensor::Init()
 }
 
 //////////////////////////////////////////////////
-bool ContactSensor::UpdateImpl(bool /*_force*/)
+bool ContactSensor::UpdateImpl(const bool /*_force*/)
 {
   boost::mutex::scoped_lock lock(this->mutex);
 
@@ -316,7 +316,7 @@ void ContactSensor::OnContacts(ConstContactsPtr &_msg)
 }
 
 //////////////////////////////////////////////////
-bool ContactSensor::IsActive()
+bool ContactSensor::IsActive() const
 {
   return this->active ||
          (this->contactsPub && this->contactsPub->HasConnections());
