@@ -97,6 +97,14 @@ release will remove the deprecated code.
     + ***Deprecation:*** public: math::Vector3 GetPoint(unsigned int _index) const
     + ***Replacement:*** public: ignition::math::Vector3d Point(const unsigned int _index) const;
 
+1. **gazebo/rendering/WindowManager.hh**
+    + ***Deprecation:*** public: uint32_t GetAvgFPS(uint32_t _id);
+    + ***Replacement:*** public: uint32_t AvgFPS(const uint32_t _id) const;
+    + ***Deprecation:*** public: uint32_t GetTriangleCount(uint32_t _id);
+    + ***Replacement:*** public: uint32_t TriangleCount(const uint32_t _id) const;
+    + ***Deprecation:*** public: Ogre::RenderWindow *GetWindow(uint32_t _id);
+    + ***Replacement:*** public: Ogre::RenderWindow *Window(const uint32_t _id) const;
+
 1. **gazebo/rendering/Light.hh**
     + ***Deprecation:*** public: std::string GetName() const;
     + ***Replacement:*** public: std::string Name() const;
