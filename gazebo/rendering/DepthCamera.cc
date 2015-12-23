@@ -39,8 +39,8 @@ using namespace rendering;
 //////////////////////////////////////////////////
 DepthCamera::DepthCamera(const std::string &_namePrefix, ScenePtr _scene,
                          bool _autoRender)
-  : Camera(_namePrefix, _scene, _autoRender), dataPtr(new DepthCameraPrivate)
-
+  : Camera(_namePrefix, _scene, _autoRender),
+    dataPtr(new DepthCameraPrivate)
 {
   this->depthTarget = NULL;
   this->dataPtr->depthBuffer = NULL;
