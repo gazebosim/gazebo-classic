@@ -272,6 +272,9 @@ using the same arguments used in the command line.
     1. Removed unused class: BuildingItem
         * [Pull request #2045](https://bitbucket.org/osrf/gazebo/pull-request/2045)
 
+    1. PIMPL BuildingEditorWidget
+        * [Pull request #2055](https://bitbucket.org/osrf/gazebo/pull-request/2055)
+
     1. PIMPLize gui/building/BuildingModelManip, move attachment logic to BuildingMaker
         * [Pull request #2046](https://bitbucket.org/osrf/gazebo/pull-request/2046)
 
