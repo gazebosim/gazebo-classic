@@ -97,6 +97,30 @@ release will remove the deprecated code.
     + ***Deprecation:*** public: math::Vector3 GetPoint(unsigned int _index) const
     + ***Replacement:*** public: ignition::math::Vector3d Point(const unsigned int _index) const;
 
+1. **gazebo/rendering/Light.hh**
+    + ***Deprecation:*** public: std::string GetName() const;
+    + ***Replacement:*** public: std::string Name() const;
+    + ***Deprecation:*** public: std::string GetType() const;
+    + ***Replacement:*** public: std::string Type() const;
+    + ***Deprecation:*** public: public: void SetPosition(const math::Vector3 &_p);
+    + ***Replacement:*** public: void SetPosition(const ignition::math::Vector3d &_p);
+    + ***Deprecation:*** public: math::Vector3 GetPosition();
+    + ***Replacement:*** public: ignition::math::Vector3d Position() const;
+    + ***Deprecation:*** public: void SetRotation(const math::Quaternion &_q);
+    + ***Replacement:*** public: void SetRotation(const ignition::math::Quaterniond &_q);
+    + ***Deprecation:*** public: math::Quaternion GetRotation() const;
+    + ***Replacement:*** public: ignition::math::Quaterniond Rotation() const;
+    + ***Deprecation:*** public: bool GetVisible() const;
+    + ***Replacement:*** public: bool Visible() const;
+    + ***Deprecation:*** public: common::Color GetDiffuseColor() const;
+    + ***Replacement:*** public: common::Color DiffuseColor() const;
+    + ***Deprecation:*** public: common::Color GetSpecularColor() const;
+    + ***Replacement:*** public: common::Color SpecularColor() const;
+    + ***Deprecation:*** public: void SetDirection(const math::Vector3 &_dir);
+    + ***Replacement:*** public: void SetDirection(const ignition::math::Vector3d &_dir);
+    + ***Deprecation:*** public: math::Vector3 GetDirection() const;
+    + ***Replacement:*** public: ignition::math::Vector3d Direction() const;
+
 1. **gazebo/util/Diagnostics.hh**
     + ***Deprecation:*** public: int GetTimerCount() const;
     + ***Replacement:*** public: int TimerCount() const;
