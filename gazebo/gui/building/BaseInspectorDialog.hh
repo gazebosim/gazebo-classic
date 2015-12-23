@@ -15,16 +15,22 @@
  *
 */
 
-#ifndef _GAZEBO_BASE_INSPECTOR_DIALOG_HH_
-#define _GAZEBO_BASE_INSPECTOR_DIALOG_HH_
+#ifndef _GAZEBO_GUI_BASE_INSPECTOR_DIALOG_HH_
+#define _GAZEBO_GUI_BASE_INSPECTOR_DIALOG_HH_
 
 #include <string>
 #include <vector>
+
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
+  namespace common
+  {
+    class Color;
+  }
+
   namespace gui
   {
     /// \addtogroup gazebo_gui
@@ -51,31 +57,31 @@ namespace gazebo
 
       /// \brief Get the color.
       /// \return Color.
-      public: QColor GetColor() const;
+      public: common::Color Color() const;
 
       /// \brief Get the texture.
       /// \return Texture.
-      public: QString GetTexture() const;
+      public: std::string Texture() const;
 
       /// \brief Set the color.
       /// \param[in] _color Color.
-      public: void SetColor(const QColor _color);
+      public: void SetColor(const common::Color _color);
 
       /// \brief Set the texture.
       /// \param[in] _texture Texture.
-      public: void SetTexture(const QString _texture);
+      public: void SetTexture(const std::string _texture);
 
       /// \brief Combo box for selecting the color.
-      public: QComboBox *colorComboBox;
+      protected: QComboBox *colorComboBox;
 
       /// \brief Vector of color options.
-      public: std::vector<QColor> colorList;
+      protected: std::vector<common::Color> colorList;
 
       /// \brief Combo box for selecting the texture.
-      public: QComboBox *textureComboBox;
+      protected: QComboBox *textureComboBox;
 
       /// \brief Vector of texture options.
-      public: std::vector<QString> textureList;
+      protected: std::vector<std::string> textureList;
     };
     /// \}
   }

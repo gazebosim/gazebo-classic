@@ -16,6 +16,7 @@
 */
 
 #include "gazebo/common/Assert.hh"
+#include "gazebo/gui/Conversions.hh"
 #include "gazebo/gui/building/BaseInspectorDialog.hh"
 
 using namespace gazebo;
@@ -39,12 +40,12 @@ void BaseInspectorDialog::InitColorComboBox()
   this->colorComboBox->setMinimumWidth(50);
   this->colorComboBox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
   QPixmap colorIcon(15, 15);
-  this->colorList.push_back(QColor(255, 255, 255, 255));
-  this->colorList.push_back(QColor(194, 169, 160, 255));
-  this->colorList.push_back(QColor(235, 206, 157, 255));
-  this->colorList.push_back(QColor(254, 121,   5, 255));
-  this->colorList.push_back(QColor(255, 195,  78, 255));
-  this->colorList.push_back(QColor(111, 203, 172, 255));
+  this->colorList.push_back(Conversions::Convert(QColor(255, 255, 255, 255)));
+  this->colorList.push_back(Conversions::Convert(QColor(194, 169, 160, 255)));
+  this->colorList.push_back(Conversions::Convert(QColor(235, 206, 157, 255)));
+  this->colorList.push_back(Conversions::Convert(QColor(254, 121,   5, 255)));
+  this->colorList.push_back(Conversions::Convert(QColor(255, 195,  78, 255)));
+  this->colorList.push_back(Conversions::Convert(QColor(111, 203, 172, 255)));
   for (unsigned int i = 0; i < this->colorList.size(); ++i)
   {
     colorIcon.fill(this->colorList.at(i));
@@ -73,15 +74,15 @@ void BaseInspectorDialog::InitTextureComboBox()
 }
 
 /////////////////////////////////////////////////
-QColor BaseInspectorDialog::GetColor() const
+common::Color BaseInspectorDialog::Color() const
 {
   return this->colorList[this->colorComboBox->currentIndex()];
 }
 
 /////////////////////////////////////////////////
-QString BaseInspectorDialog::GetTexture() const
+std::string BaseInspectorDialog::Texture() const
 {
-  QString texture = QString("");
+  std::string texture("");
   if (this->textureComboBox->currentIndex() != -1 &&
       this->textureComboBox->currentIndex() <
       this->textureComboBox->count() - 1)
@@ -92,7 +93,7 @@ QString BaseInspectorDialog::GetTexture() const
 }
 
 /////////////////////////////////////////////////
-void BaseInspectorDialog::SetColor(const QColor _color)
+void BaseInspectorDialog::SetColor(const common::Color _color)
 {
   int index = -1;
   for (unsigned int i = 0; i < this->colorList.size(); ++i)
@@ -118,7 +119,7 @@ void BaseInspectorDialog::SetColor(const QColor _color)
 }
 
 /////////////////////////////////////////////////
-void BaseInspectorDialog::SetTexture(QString _texture)
+void BaseInspectorDialog::SetTexture(std::string _texture)
 {
   // Find index corresponding to texture (only a few textures allowed so far)
   int index = this->textureComboBox->count()-1;
