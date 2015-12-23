@@ -42,8 +42,8 @@ namespace gazebo
   namespace physics
   {
     /// \internal
-    /// \brief Protected data for joints
-    class JointProtected : public BaseProtected
+    /// \brief Private data for joints
+    class JointPrivate : public BasePrivate
     {
       /// \brief The first link this joint connects to
       public: LinkPtr childLink;
@@ -106,12 +106,7 @@ namespace gazebo
 
       /// \brief Provide Feedback data for contact forces
       public: bool provideFeedback;
-    };
 
-    /// \internal
-    /// \brief Private data for joints
-    class JointPrivate
-    {
       /// \brief An SDF pointer that allows us to only read the joint.sdf
       /// file once, which in turns limits disk reads.
       public: static sdf::ElementPtr sdfJoint;

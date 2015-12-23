@@ -27,17 +27,12 @@ namespace gazebo
   namespace physics
   {
     /// \internal
-    /// \brief ODE joint protected class
-    class ODEJointProtected : public JointProtected
+    /// \brief ODE joint private class
+    class ODEJointPrivate : public JointPrivate
     {
       /// \brief This is our ODE ID
       public: dJointID jointId;
-    };
 
-    /// \internal
-    /// \brief ODE joint private class
-    class ODEJointPrivate
-    {
       /// \brief Feedback data for this joint
       public: dJointFeedback *feedback;
 

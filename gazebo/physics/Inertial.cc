@@ -111,7 +111,7 @@ void Inertial::UpdateParameters(sdf::ElementPtr _sdf)
 
   this->SetMass(this->dataPtr->sdf->Get<double>("mass"));
   this->dataPtr->sdf->GetElement("mass")->GetValue()->SetUpdateFunc(
-      std::bind(&Inertial::GetMass, this));
+      std::bind(&Inertial::Mass, this));
 }
 
 //////////////////////////////////////////////////

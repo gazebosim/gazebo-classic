@@ -280,7 +280,7 @@ namespace gazebo
       /// \brief Constructor used by inherited classes
       /// \param[in] _dataPtr Pointer to protected data
       /// \param[in] _link Pointer to parent link
-      protected: Collision(CollisionProtected &_dataPtr, LinkPtr _link);
+      protected: Collision(CollisionPrivate &_dataPtr, LinkPtr _link);
 
       /// \brief Shared construction code.
       /// \param[in] _link Pointer to parent link

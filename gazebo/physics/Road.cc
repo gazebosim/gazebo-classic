@@ -14,27 +14,27 @@
  * limitations under the License.
  *
 */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
 
-#include <algorithm>
 #include <string>
-#include <vector>
 
 #include "gazebo/transport/transport.hh"
-#include "gazebo/physics/Road.hh"
 #include "gazebo/msgs/msgs.hh"
+
+#include "gazebo/physics/RoadPrivate.hh"
+#include "gazebo/physics/Road.hh"
 
 using namespace gazebo;
 using namespace physics;
 
 /////////////////////////////////////////////////
 Road::Road(BasePtr _parent)
-  : Base(_parent)
+: Base(*new RoadPrivate, _parent),
+  roadDPtr(static_cast<RoadPrivate*>(this->baseDPtr))
 {
 }
 
@@ -53,22 +53,22 @@ void Road::Load(sdf::ElementPtr _elem)
 /////////////////////////////////////////////////
 void Road::Init()
 {
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init();
+  this->roadDPtr->node = transport::NodePtr(new transport::Node());
+  this->roadDPtr->node->Init();
 
-  this->roadPub = this->node->Advertise<msgs::Road>("~/roads", 10);
+  this->roadPub = this->roadDPtr->node->Advertise<msgs::Road>("~/roads", 10);
 
   msgs::Road msg;
 
   msg.set_name(this->GetName());
 
-  this->width = this->sdf->Get<double>("width");
+  this->roadDPtr->width = this->roadDPtr->sdf->Get<double>("width");
   msg.set_width(this->width);
 
-  if (this->sdf->HasElement("material"))
+  if (this->roadDPtr->sdf->HasElement("material"))
   {
     sdf::ElementPtr matElem =
-        this->sdf->GetElement("material");
+        this->roadDPtr->sdf->GetElement("material");
     if (matElem->HasElement("script"))
     {
       sdf::ElementPtr scriptElem = matElem->GetElement("script");
@@ -92,7 +92,7 @@ void Road::Init()
       }
     }
   }
-  sdf::ElementPtr pointElem = this->sdf->GetElement("point");
+  sdf::ElementPtr pointElem = this->roadDPtr->sdf->GetElement("point");
   while (pointElem)
   {
     ignition::math::Vector3d point = pointElem->Get<ignition::math::Vector3d>();
@@ -106,13 +106,29 @@ void Road::Init()
 }
 
 /////////////////////////////////////////////////
-const std::vector<math::Vector3> &Road::GetPoints() const
+std::vector<math::Vector3> Road::GetPoints() const
+{
+  std::vector<math::Vector3> result;
+  std::vector<ignition::math::Vector3d> tmp;
+  for (auto pt : this->points)
+    result.push_back(pt);
+  return pt;
+}
+
+/////////////////////////////////////////////////
+const std::vector<ignition::math::Vector3d> &Road::Points() const
 {
   return this->points;
 }
 
 /////////////////////////////////////////////////
 double Road::GetWidth() const
+{
+  return this->Width();
+}
+
+/////////////////////////////////////////////////
+double Road::Width() const
 {
   return this->width;
 }

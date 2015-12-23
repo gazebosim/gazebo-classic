@@ -17,6 +17,7 @@
 
 #include "gazebo/common/Mesh.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/physics/PolylineShapePrivate.hh"
 #include "gazebo/physics/ode/ODEMesh.hh"
 #include "gazebo/physics/ode/ODECollision.hh"
 #include "gazebo/physics/ode/ODEPhysics.hh"
@@ -54,13 +55,14 @@ void ODEPolylineShape::Load(sdf::ElementPtr _sdf)
 void ODEPolylineShape::Init()
 {
   PolylineShape::Init();
-  if (!this->mesh)
+  if (!this->polylineShapeDPtr->mesh)
   {
     gzerr << "Unable to create polyline in ode. Mesh pointer is null.\n";
     return;
   }
 
-  this->odeMesh->Init(this->mesh,
-      std::static_pointer_cast<ODECollision>(this->collisionParent),
+  this->odeMesh->Init(this->polylineShapeDPtr->mesh,
+      std::static_pointer_cast<ODECollision>(
+        this->polylineShapeDPtr->collisionParent),
       ignition::math::Vector3d::One);
 }

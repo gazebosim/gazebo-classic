@@ -32,6 +32,9 @@ namespace gazebo
 {
   namespace physics
   {
+    // Forward declar private data class
+    class MultiRayShapePrivate;
+
     /// \addtogroup gazebo_physics
     /// \{
 
@@ -60,37 +63,80 @@ namespace gazebo
       /// \brief Get detected range for a ray.
       /// \param[in] _index Index of the ray.
       /// \returns Returns DBL_MAX for no detection.
-      public: double GetRange(unsigned int _index);
+      /// \deprecated See Range(const unsigned int) const
+      public: double GetRange(unsigned int _index) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get detected range for a ray.
+      /// \param[in] _index Index of the ray.
+      /// \returns Returns IGN_DBL_INF for no detection.
+      public: double Range(unsigned int _index) const;
 
       /// \brief Get detected retro (intensity) value for a ray.
       /// \param[in] _index Index of the ray.
       /// \return Retro value for the ray.
-      public: double GetRetro(unsigned int _index);
+      /// \deprecated See Retro(const unsigned int) const
+      public: double GetRetro(unsigned int _index) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get detected retro (intensity) value for a ray.
+      /// \param[in] _index Index of the ray.
+      /// \return Retro value for the ray, IGN_DBL_INF on error.
+      public: double Retro(const unsigned int _index) const;
 
       /// \brief Get detected fiducial value for a ray.
       /// \param[in] _index Index of the ray.
       /// \return Fiducial value for the ray.
-      public: int GetFiducial(unsigned int _index);
+      /// \deprecated See Fiducial(const unsigned int) const
+      public: int GetFiducial(unsigned int _index) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get detected fiducial value for a ray.
+      /// \param[in] _index Index of the ray.
+      /// \return Fiducial value for the ray, IGN_DBL_INF on error.
+      public: int Fiducial(const unsigned int _index) const;
 
       /// \brief Get the minimum range.
       /// \return Minimum range of all the rays.
-      public: double GetMinRange() const;
+      /// \deprecated See MinRange() const
+      public: double GetMinRange() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the minimum range.
+      /// \return Minimum range of all the rays.
+      public: double MinRange() const;
 
       /// \brief Get the maximum range.
       /// \return Maximum range of all the rays.
-      public: double GetMaxRange() const;
+      /// \deprecated See MaxRange() const
+      public: double GetMaxRange() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the maximum range.
+      /// \return Maximum range of all the rays.
+      public: double MaxRange() const;
 
       /// \brief Get the range resolution.
       /// \return Range resolution of all the rays.
-      public: double GetResRange() const;
+      /// \deprecated See ResolutionRange() const
+      public: double GetResRange() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the range resolution.
+      /// \return Range resolution of all the rays.
+      public: double ResolutionRange() const;
 
       /// \brief Get the horizontal sample count.
       /// \return Horizontal sample count.
-      public: int GetSampleCount() const;
+      /// \deprecated See SampleCount() const
+      public: int GetSampleCount() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the horizontal sample count.
+      /// \return Horizontal sample count.
+      public: int SampleCount() const;
 
       /// \brief Get the horizontal resolution.
       /// \return Horizontal resolution.
-      public: double GetScanResolution() const;
+      /// \deprecated See ScanResolution() const
+      public: double GetScanResolution() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the horizontal resolution.
+      /// \return Horizontal resolution.
+      public: double ScanResolution() const;
 
       /// \brief Get the minimum angle.
       /// \return Minimum angle of ray scan.
@@ -112,11 +158,21 @@ namespace gazebo
 
       /// \brief Get the vertical sample count.
       /// \return Verical sample count.
-      public: int GetVerticalSampleCount() const;
+      /// \deprecated See VerticalSampleCount() const
+      public: int GetVerticalSampleCount() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the vertical sample count.
+      /// \return Verical sample count.
+      public: int VerticalSampleCount() const;
 
       /// \brief Get the vertical range resolution.
       /// \return Vertical range resolution.
-      public: double GetVerticalScanResolution() const;
+      /// \deprecated See VerticalScanResolution() const
+      public: double GetVerticalScanResolution() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the vertical range resolution.
+      /// \return Vertical range resolution.
+      public: double VerticalScanResolution() const;
 
       /// \brief Get the vertical min angle.
       /// \return Vertical min angle.
@@ -155,14 +211,12 @@ namespace gazebo
       /// \brief Connect a to the new laser scan signal.
       /// \param[in] _subscriber Callback function.
       /// \return The connection, which must be kept in scope.
-      public: template<typename T>
-              event::ConnectionPtr ConnectNewLaserScans(T _subscriber)
-              {return this->newLaserScans.Connect(_subscriber);}
+      public: event::ConnectionPtr ConnectNewLaserScans(
+                  std::function<void ()> _subscriber);
 
       /// \brief Disconnect from the new laser scans signal.
       /// \param[in] _conn Connection to remove.
-      public: void DisconnectNewLaserScans(event::ConnectionPtr &_conn)
-              {this->newLaserScans.Disconnect(_conn);}
+      public: void DisconnectNewLaserScans(event::ConnectionPtr &_conn);
 
       /// \brief Physics engine specific method for updating the rays.
       protected: virtual void UpdateRays() = 0;
@@ -180,29 +234,9 @@ namespace gazebo
       protected: virtual void AddRay(const ignition::math::Vector3d &_start,
                      const ignition::math::Vector3d &_end);
 
-      /// \brief Ray data
-      protected: std::vector<RayShapePtr> rays;
-
-      /// \brief Pose offset of all the rays.
-      protected: ignition::math::Pose3d offset;
-
-      /// \brief Ray SDF element pointer.
-      protected: sdf::ElementPtr rayElem;
-
-      /// \brief Scan SDF element pointer.
-      protected: sdf::ElementPtr scanElem;
-
-      /// \brief Horizontal SDF element pointer.
-      protected: sdf::ElementPtr horzElem;
-
-      /// \brief Vertical SDF element pointer.
-      protected: sdf::ElementPtr vertElem;
-
-      /// \brief Range SDF element pointer.
-      protected: sdf::ElementPtr rangeElem;
-
-      /// \brief New laser scans event.
-      protected: event::EventT<void()> newLaserScans;
+      /// \internal
+      /// \brief Private data pointer.
+      protected: MultiRayShapePrivate *multiRayShapeDPtr;
     };
     /// \}
   }

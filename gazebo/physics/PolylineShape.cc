@@ -24,11 +24,13 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-PolylineShape::PolylineShape(CollisionPtr _parent) : Shape(_parent)
+PolylineShape::PolylineShape(CollisionPtr _parent)
+: Shape(*new PolylineShapePrivate, _parent),
+  polylineShapeDPtr(static_cast<PolylineShapePrivate*>(this->shapeDPtr))
 {
   this->AddType(Base::POLYLINE_SHAPE);
-  this->scale = ignition::math::Vector3d::One;
-  sdf::initFile("polyline_shape.sdf", this->sdf);
+  this->polylineShapeDPtr->scale = ignition::math::Vector3d::One;
+  sdf::initFile("polyline_shape.sdf", this->polylineShapeDPtr->sdf);
 }
 
 //////////////////////////////////////////////////
@@ -39,14 +41,14 @@ PolylineShape::~PolylineShape()
 //////////////////////////////////////////////////
 void PolylineShape::Init()
 {
-  this->SetPolylineShape(this->GetHeight(), this->Vertices());
+  this->SetPolylineShape(this->Height(), this->Vertices());
 
   std::string meshName =
       boost::lexical_cast<std::string>(physics::getUniqueId()) +
       "_extruded_polyline";
 
   common::MeshManager::Instance()->CreateExtrudedPolyline(
-      meshName, this->Vertices(), this->GetHeight());
+      meshName, this->Vertices(), this->Height());
 
   this->mesh = common::MeshManager::Instance()->GetMesh(meshName);
 
@@ -60,7 +62,7 @@ PolylineShape::Vertices() const
 {
   std::vector<std::vector<ignition::math::Vector2d> > paths;
 
-  sdf::ElementPtr polylineElem = this->sdf;
+  sdf::ElementPtr polylineElem = this->polylineShapeDPtr->sdf;
   while (polylineElem)
   {
     sdf::ElementPtr pointElem = polylineElem->GetElement("point");
@@ -81,7 +83,7 @@ PolylineShape::Vertices() const
 //////////////////////////////////////////////////
 void PolylineShape::SetHeight(const double &_height)
 {
-  sdf::ElementPtr polylineElem = this->sdf;
+  sdf::ElementPtr polylineElem = this->polylineShapeDPtr->sdf;
   while (polylineElem)
   {
     polylineElem->GetElement("height")->Set(_height);
@@ -92,7 +94,13 @@ void PolylineShape::SetHeight(const double &_height)
 //////////////////////////////////////////////////
 double PolylineShape::GetHeight() const
 {
-  return this->sdf->Get<double>("height");
+  return this->Height();
+}
+
+//////////////////////////////////////////////////
+double PolylineShape::Height() const
+{
+  return this->polylineShapeDPtr->sdf->Get<double>("height");
 }
 
 //////////////////////////////////////////////////
@@ -107,17 +115,17 @@ void PolylineShape::SetScale(const ignition::math::Vector3d &_scale)
   if (_scale.X() < 0 || _scale.Y() < 0 || _scale.Z() < 0)
     return;
 
-  if (_scale == this->scale)
+  if (_scale == this->polylineShapeDPtr->scale)
     return;
 
-  this->scale = _scale;
+  this->polylineShapeDPtr->scale = _scale;
 }
 
 ////////////////////////////////////////////////////
 void PolylineShape::SetVertices(
     const std::vector<std::vector<ignition::math::Vector2d> > &_vertices)
 {
-  sdf::ElementPtr polylineElem = this->sdf;
+  sdf::ElementPtr polylineElem = this->polylineShapeDPtr->sdf;
   for (unsigned int i = 0; i < _vertices.size(); ++i)
   {
     std::vector<ignition::math::Vector2d> v = _vertices[i];
@@ -136,7 +144,7 @@ void PolylineShape::SetVertices(
 void PolylineShape::SetVertices(const msgs::Geometry &_msg)
 {
   sdf::ElementPtr geomSDF = msgs::GeometryToSDF(_msg);
-  this->sdf = geomSDF->GetElement("polyline");
+  this->polylineShapeDPtr->sdf = geomSDF->GetElement("polyline");
 }
 
 //////////////////////////////////////////////////
@@ -150,7 +158,7 @@ void PolylineShape::SetPolylineShape(const double &_height,
 //////////////////////////////////////////////////
 void PolylineShape::FillMsg(msgs::Geometry &_msg)
 {
-  _msg = msgs::GeometryFromSDF(this->sdf->GetParent());
+  _msg = msgs::GeometryFromSDF(this->polylineShapeDPtr->sdf->GetParent());
 }
 
 //////////////////////////////////////////////////

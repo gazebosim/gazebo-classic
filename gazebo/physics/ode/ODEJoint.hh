@@ -28,9 +28,6 @@ namespace gazebo
 {
   namespace physics
   {
-    // Forward declare protected data class
-    class ODEJointProtected;
-
     // Forward declare private data class
     class ODEJointPrivate;
 
@@ -282,14 +279,9 @@ namespace gazebo
                                  const double _cfm, const double _erp,
                                  double &_kp, double &_kd) const;
 
-
-      /// \internal
-      /// \brief Protected data pointer
-      protected: std::shared_ptr<ODEJointProtected> odeJointDPtr;
-
       /// \internal
       /// \brief Private data pointer
-      private: std::unique_ptr<ODEJointPrivate> dataPtr;
+      protected: ODEJointPrivate *odeJointDPtr;
     };
   }
 }

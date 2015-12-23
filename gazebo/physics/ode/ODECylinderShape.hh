@@ -18,7 +18,6 @@
 #define _GAZEBO_PHYSICS_ODECYLINDERSHAPE_HH_
 
 #include "gazebo/physics/CylinderShape.hh"
-#include "gazebo/physics/ode/ODEPhysics.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -30,25 +29,13 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] _parent Collision parent.
-      public: explicit ODECylinderShape(CollisionPtr _parent)
-              : CylinderShape(_parent) {}
+      public: explicit ODECylinderShape(CollisionPtr _parent);
 
       /// \brief Destructor.
-      public: virtual ~ODECylinderShape() {}
+      public: virtual ~ODECylinderShape() = default;
 
       // Documentation inerited.
-      public: void SetSize(double _radius, double _length)
-      {
-        CylinderShape::SetSize(_radius, _length);
-        ODECollisionPtr oParent;
-        oParent =
-          std::dynamic_pointer_cast<ODECollision>(this->collisionParent);
-
-        if (oParent->GetCollisionId() == NULL)
-          oParent->SetCollision(dCreateCylinder(0, _radius, _length), true);
-        else
-          dGeomCylinderSetParams(oParent->GetCollisionId(), _radius, _length);
-      }
+      public: void SetSize(const double _radius, const double _length);
     };
   }
 }

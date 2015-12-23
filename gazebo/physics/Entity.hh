@@ -371,7 +371,7 @@ namespace gazebo
       /// \brief Constructor used by inherited classes
       /// \param[in] _dataPtr Pointer to protected data
       /// \param[in] _parent Parent of the entity.
-      protected: Entity(EntityProtected &_dataPtr, BasePtr _parent);
+      protected: Entity(EntityPrivate &_dataPtr, BasePtr _parent);
 
       /// \brief Shared construction code.
       /// \param[in] _link Pointer to parent link

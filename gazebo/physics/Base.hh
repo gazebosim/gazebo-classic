@@ -391,7 +391,7 @@ namespace gazebo
       /// \brief Constructor used by inherited classes
       /// \param[in] _dataPtr Pointer to protected data
       /// \param[in] _parent Pointer to parent of this object
-      protected: Base(BaseProtected &_dataPtr, BasePtr _parent);
+      protected: Base(BasePrivate &_dataPtr, BasePtr _parent);
 
       /// \brief Construction helper function.
       private: void ConstructionHelper();
@@ -402,7 +402,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Data pointer for private data
-      protected: BasePrivate baseDPtr;
+      protected: BasePrivate *baseDPtr;
     };
     /// \}
   }

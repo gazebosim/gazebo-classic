@@ -30,7 +30,7 @@ namespace gazebo
   {
     /// \internal
     /// \brief ODELink private data
-    class ODELinkPrivate : public LinkProtected
+    class ODELinkPrivate : public LinkPrivate
     {
       /// \brief ODE link handle
       public: dBodyID linkId;

@@ -35,26 +35,26 @@ using namespace physics;
 //////////////////////////////////////////////////
 ODELink::ODELink(EntityPtr _parent)
 : Link(*new ODELinkPrivate, _parent),
-  dataPtr(std::static_pointer_cast<ODELinkPrivate>(this->linkDPtr))
+  odeLinkDPtr(static_cast<ODELinkPrivate*>(this->linkDPtr))
 {
-  this->dataPtr->linkId = NULL;
+  this->odeLinkDPtr->linkId = NULL;
 }
 
 //////////////////////////////////////////////////
 ODELink::~ODELink()
 {
-  if (this->dataPtr->linkId)
-    dBodyDestroy(this->dataPtr->linkId);
-  this->dataPtr->linkId = NULL;
+  if (this->odeLinkDPtr->linkId)
+    dBodyDestroy(this->odeLinkDPtr->linkId);
+  this->odeLinkDPtr->linkId = NULL;
 }
 
 //////////////////////////////////////////////////
 void ODELink::Load(sdf::ElementPtr _sdf)
 {
-  this->dataPtr->odePhysics = std::dynamic_pointer_cast<ODEPhysics>(
+  this->odeLinkDPtr->odePhysics = std::dynamic_pointer_cast<ODEPhysics>(
       this->World()->GetPhysicsEngine());
 
-  if (this->dataPtr->odePhysics == NULL)
+  if (this->odeLinkDPtr->odePhysics == NULL)
   {
     gzerr << "Not using the ode physics engine. Unable to create an ODE Link\n";
     return;
@@ -68,51 +68,51 @@ void ODELink::Init()
 {
   if (!this->IsStatic())
   {
-    this->dataPtr->linkId =
-      dBodyCreate(this->dataPtr->odePhysics->GetWorldId());
+    this->odeLinkDPtr->linkId =
+      dBodyCreate(this->odeLinkDPtr->odePhysics->GetWorldId());
 
-    dBodySetData(this->dataPtr->linkId, this);
+    dBodySetData(this->odeLinkDPtr->linkId, this);
 
     // Only use auto disable if no joints and no sensors are present
     if (this->Model()->AutoDisable() && this->Model()->JointCount() == 0 &&
         this->SensorCount() == 0)
     {
-      dBodySetAutoDisableDefaults(this->dataPtr->linkId);
-      dBodySetAutoDisableFlag(this->dataPtr->linkId, 1);
+      dBodySetAutoDisableDefaults(this->odeLinkDPtr->linkId);
+      dBodySetAutoDisableFlag(this->odeLinkDPtr->linkId, 1);
     }
     else
     {
-      dBodySetAutoDisableFlag(this->dataPtr->linkId, 0);
+      dBodySetAutoDisableFlag(this->odeLinkDPtr->linkId, 0);
     }
   }
 
-  GZ_ASSERT(this->dataPtr->sdf != NULL,
+  GZ_ASSERT(this->odeLinkDPtr->sdf != NULL,
       "Unable to initialize link, SDF is NULL");
-  this->SetKinematic(this->dataPtr->sdf->Get<bool>("kinematic"));
-  this->SetGravityMode(this->dataPtr->sdf->Get<bool>("gravity"));
+  this->SetKinematic(this->odeLinkDPtr->sdf->Get<bool>("kinematic"));
+  this->SetGravityMode(this->odeLinkDPtr->sdf->Get<bool>("gravity"));
 
   this->SetLinearDamping(this->LinearDamping());
   this->SetAngularDamping(this->AngularDamping());
 
   Link::Init();
 
-  if (this->dataPtr->linkId)
+  if (this->odeLinkDPtr->linkId)
   {
     GZ_ASSERT(this->linkDPtr->inertial != NULL, "Inertial pointer is NULL");
-    ignition::math::Vector3d cogVec = this->dataPtr->inertial->CoG();
-    for (auto const &child : this->dataPtr->children)
+    ignition::math::Vector3d cogVec = this->odeLinkDPtr->inertial->CoG();
+    for (auto const &child : this->odeLinkDPtr->children)
     {
       if (child->HasType(Base::COLLISION))
       {
         ODECollisionPtr g = std::static_pointer_cast<ODECollision>(child);
         if (g->IsPlaceable() && g->CollisionId())
         {
-          dGeomSetBody(g->CollisionId(), this->dataPtr->linkId);
+          dGeomSetBody(g->CollisionId(), this->odeLinkDPtr->linkId);
         }
       }
     }
   }
-  else if (!this->IsStatic() && this->dataPtr->initialized)
+  else if (!this->IsStatic() && this->odeLinkDPtr->initialized)
   {
     gzlog << "ODE body for link [" << this->ScopedName() << "]"
           << " does not exist, unable to place collision bodies"
@@ -126,12 +126,12 @@ void ODELink::Init()
   if (!this->Kinematic())
     this->UpdateMass();
 
-  if (this->dataPtr->linkId)
+  if (this->odeLinkDPtr->linkId)
   {
-    dBodySetMovedCallback(this->dataPtr->linkId, MoveCallback);
-    dBodySetDisabledCallback(this->dataPtr->linkId, DisabledCallback);
+    dBodySetMovedCallback(this->odeLinkDPtr->linkId, MoveCallback);
+    dBodySetDisabledCallback(this->odeLinkDPtr->linkId, DisabledCallback);
   }
-  else if (!this->IsStatic() && this->dataPtr->initialized)
+  else if (!this->IsStatic() && this->odeLinkDPtr->initialized)
   {
     gzlog << "ODE body for link [" << this->ScopedName() << "]"
           << " does not exist, unable to set callbacks in ODELink::Init"
@@ -155,18 +155,18 @@ void ODELink::MoveCallback(const dBodyID _id)
   p = dBodyGetPosition(_id);
   r = dBodyGetQuaternion(_id);
 
-  self->dataPtr->dirtyPose.Pos().Set(p[0], p[1], p[2]);
-  self->dataPtr->dirtyPose.Rot().Set(r[0], r[1], r[2], r[3]);
+  self->odeLinkDPtr->dirtyPose.Pos().Set(p[0], p[1], p[2]);
+  self->odeLinkDPtr->dirtyPose.Rot().Set(r[0], r[1], r[2], r[3]);
 
   // subtracting cog location from ode pose
-  GZ_ASSERT(self->dataPtr->inertial != NULL, "Inertial pointer is NULL");
-  ignition::math::Vector3d cog = self->dataPtr->dirtyPose.Rot().RotateVector(
-      self->dataPtr->inertial->CoG());
+  GZ_ASSERT(self->odeLinkDPtr->inertial != NULL, "Inertial pointer is NULL");
+  ignition::math::Vector3d cog = self->odeLinkDPtr->dirtyPose.Rot().RotateVector(
+      self->odeLinkDPtr->inertial->CoG());
 
-  self->dataPtr->dirtyPose.Pos() -= cog;
+  self->odeLinkDPtr->dirtyPose.Pos() -= cog;
 
   // Tell the world that our pose has changed.
-  self->dataPtr->world->_AddDirty(self);
+  self->odeLinkDPtr->world->_AddDirty(self);
 
   // self->poseMutex->unlock();
 
@@ -174,10 +174,10 @@ void ODELink::MoveCallback(const dBodyID _id)
   if (_id)
   {
     const dReal *dforce = dBodyGetForce(_id);
-    self->dataPtr->force.Set(dforce[0], dforce[1], dforce[2]);
+    self->odeLinkDPtr->force.Set(dforce[0], dforce[1], dforce[2]);
 
     const dReal *dtorque = dBodyGetTorque(_id);
-    self->dataPtr->torque.Set(dtorque[0], dtorque[1], dtorque[2]);
+    self->odeLinkDPtr->torque.Set(dtorque[0], dtorque[1], dtorque[2]);
   }
 }
 
@@ -185,22 +185,22 @@ void ODELink::MoveCallback(const dBodyID _id)
 void ODELink::Fini()
 {
   Link::Fini();
-  if (this->dataPtr->linkId)
-    dBodyDestroy(this->dataPtr->linkId);
-  this->dataPtr->linkId = NULL;
+  if (this->odeLinkDPtr->linkId)
+    dBodyDestroy(this->odeLinkDPtr->linkId);
+  this->odeLinkDPtr->linkId = NULL;
 
-  this->dataPtr->odePhysics.reset();
+  this->odeLinkDPtr->odePhysics.reset();
 }
 
 //////////////////////////////////////////////////
 void ODELink::SetGravityMode(const bool _mode)
 {
-  this->dataPtr->sdf->GetElement("gravity")->Set(_mode);
-  if (this->dataPtr->linkId)
+  this->odeLinkDPtr->sdf->GetElement("gravity")->Set(_mode);
+  if (this->odeLinkDPtr->linkId)
   {
-    dBodySetGravityMode(this->dataPtr->linkId, _mode ? 1: 0);
+    dBodySetGravityMode(this->odeLinkDPtr->linkId, _mode ? 1: 0);
   }
-  else if (!this->IsStatic() && this->dataPtr->initialized)
+  else if (!this->IsStatic() && this->odeLinkDPtr->initialized)
   {
     gzlog << "ODE body for link [" << this->ScopedName() << "]"
           << " does not exist, unable to SetGravityMode" << std::endl;
@@ -211,11 +211,11 @@ void ODELink::SetGravityMode(const bool _mode)
 bool ODELink::GravityMode() const
 {
   int mode = 0;
-  if (this->dataPtr->linkId)
+  if (this->odeLinkDPtr->linkId)
   {
-    mode = dBodyGetGravityMode(this->dataPtr->linkId);
+    mode = dBodyGetGravityMode(this->odeLinkDPtr->linkId);
   }
-  else if (!this->IsStatic() && this->dataPtr->initialized)
+  else if (!this->IsStatic() && this->odeLinkDPtr->initialized)
   {
     gzlog << "ODE body for link [" << this->ScopedName() << "]"
           << " does not exist, GetGravityMode returns default of "
@@ -228,9 +228,9 @@ bool ODELink::GravityMode() const
 //////////////////////////////////////////////////
 void ODELink::SetSelfCollide(const bool _collide)
 {
-  this->dataPtr->sdf->GetElement("self_collide")->Set(_collide);
+  this->odeLinkDPtr->sdf->GetElement("self_collide")->Set(_collide);
   if (_collide)
-    this->dataPtr->spaceId = dSimpleSpaceCreate(this->dataPtr->odePhysics->GetSpaceId());
+    this->odeLinkDPtr->spaceId = dSimpleSpaceCreate(this->odeLinkDPtr->odePhysics->GetSpaceId());
 }
 
 //////////////////////////////////////////////////
@@ -238,9 +238,9 @@ void ODELink::OnPoseChange()
 {
   Link::OnPoseChange();
 
-  if (!this->dataPtr->linkId)
+  if (!this->odeLinkDPtr->linkId)
   {
-    if (!this->IsStatic() && this->dataPtr->initialized)
+    if (!this->IsStatic() && this->odeLinkDPtr->initialized)
       gzlog << "ODE body for link [" << this->ScopedName() << "]"
             << " does not exist, unable to respond to OnPoseChange"
             << std::endl;
@@ -251,12 +251,12 @@ void ODELink::OnPoseChange()
 
   const ignition::math::Pose3d myPose = this->WorldPose();
 
-  GZ_ASSERT(this->dataPtr->inertial != NULL, "Inertial pointer is NULL");
+  GZ_ASSERT(this->odeLinkDPtr->inertial != NULL, "Inertial pointer is NULL");
   ignition::math::Vector3d cog = myPose.Rot().RotateVector(
-      this->dataPtr->inertial->CoG());
+      this->odeLinkDPtr->inertial->CoG());
 
   // adding cog location for ode pose
-  dBodySetPosition(this->dataPtr->linkId,
+  dBodySetPosition(this->odeLinkDPtr->linkId,
       myPose.Pos().X() + cog.X(),
       myPose.Pos().Y() + cog.Y(),
       myPose.Pos().Z() + cog.Z());
@@ -268,7 +268,7 @@ void ODELink::OnPoseChange()
   q[3] = myPose.Rot().Z();
 
   // Set the rotation of the ODE link
-  dBodySetQuaternion(this->dataPtr->linkId, q);
+  dBodySetQuaternion(this->odeLinkDPtr->linkId, q);
 }
 
 //////////////////////////////////////////////////
@@ -280,24 +280,24 @@ dBodyID ODELink::GetODEId() const
 //////////////////////////////////////////////////
 dBodyID ODELink::ODEId() const
 {
-  return this->dataPtr->linkId;
+  return this->odeLinkDPtr->linkId;
 }
 
 //////////////////////////////////////////////////
 void ODELink::SetEnabled(const bool _enable) const
 {
-  if (!this->dataPtr->linkId)
+  if (!this->odeLinkDPtr->linkId)
   {
-    if (!this->IsStatic() && this->dataPtr->initialized)
+    if (!this->IsStatic() && this->odeLinkDPtr->initialized)
       gzlog << "ODE body for link [" << this->ScopedName() << "]"
             << " does not exist, unable to SetEnabled" << std::endl;
     return;
   }
 
   if (_enable)
-    dBodyEnable(this->dataPtr->linkId);
+    dBodyEnable(this->odeLinkDPtr->linkId);
   else
-    dBodyDisable(this->dataPtr->linkId);
+    dBodyDisable(this->odeLinkDPtr->linkId);
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -305,9 +305,9 @@ bool ODELink::Enabled() const
 {
   bool result = true;
 
-  if (this->dataPtr->linkId)
-    result = dBodyIsEnabled(this->dataPtr->linkId);
-  else if (!this->IsStatic() && this->dataPtr->initialized)
+  if (this->odeLinkDPtr->linkId)
+    result = dBodyIsEnabled(this->odeLinkDPtr->linkId);
+  else if (!this->IsStatic() && this->odeLinkDPtr->initialized)
   {
     gzlog << "ODE body for link [" << this->ScopedName() << "]"
           << " does not exist, GetEnabled returns default of "
@@ -320,11 +320,11 @@ bool ODELink::Enabled() const
 /////////////////////////////////////////////////////////////////////
 void ODELink::UpdateCollisionOffsets()
 {
-  if (this->dataPtr->linkId)
+  if (this->odeLinkDPtr->linkId)
   {
-    GZ_ASSERT(this->dataPtr->inertial != NULL, "Inertial pointer is NULL");
-    ignition::math::Vector3d cogVec = this->dataPtr->inertial->CoG();
-    for (auto const &child : this->dataPtr->children)
+    GZ_ASSERT(this->odeLinkDPtr->inertial != NULL, "Inertial pointer is NULL");
+    ignition::math::Vector3d cogVec = this->odeLinkDPtr->inertial->CoG();
+    for (auto const &child : this->odeLinkDPtr->children)
     {
       if (child->HasType(Base::COLLISION))
       {
@@ -355,12 +355,12 @@ void ODELink::UpdateCollisionOffsets()
 /////////////////////////////////////////////////////////////////////
 void ODELink::UpdateSurface()
 {
-  if (!this->dataPtr->linkId)
+  if (!this->odeLinkDPtr->linkId)
   {
     return;
   }
 
-  for (auto const &child : this->dataPtr->children)
+  for (auto const &child : this->odeLinkDPtr->children)
   {
     if (child->HasType(Base::COLLISION))
     {
@@ -383,8 +383,8 @@ void ODELink::UpdateSurface()
           }
         }
         // Set surface properties max_vel and min_depth
-        dBodySetMaxVel(this->dataPtr->linkId, g->ODESurface()->maxVel);
-        dBodySetMinDepth(this->dataPtr->linkId, g->ODESurface()->minDepth);
+        dBodySetMaxVel(this->odeLinkDPtr->linkId, g->ODESurface()->maxVel);
+        dBodySetMinDepth(this->odeLinkDPtr->linkId, g->ODESurface()->minDepth);
       }
     }
   }
@@ -393,19 +393,19 @@ void ODELink::UpdateSurface()
 /////////////////////////////////////////////////////////////////////
 void ODELink::UpdateMass()
 {
-  if (!this->dataPtr->linkId)
+  if (!this->odeLinkDPtr->linkId)
   {
-    if (!this->IsStatic() && this->dataPtr->initialized)
+    if (!this->IsStatic() && this->odeLinkDPtr->initialized)
       gzlog << "ODE body for link [" << this->ScopedName() << "]"
             << " does not exist, unable to UpdateMass" << std::endl;
     return;
   }
 
-  if (this->dataPtr->inertial->Mass() <= 0)
+  if (this->odeLinkDPtr->inertial->Mass() <= 0)
   {
     gzerr << "Setting custom link " << this->ScopedName()
           << "mass to zero or less is an error. Using a value of 1.0.\n";
-    this->dataPtr->inertial->SetMass(1.0);
+    this->odeLinkDPtr->inertial->SetMass(1.0);
   }
 
   dMass odeMass;
@@ -414,22 +414,22 @@ void ODELink::UpdateMass()
   // The CoG must always be (0, 0, 0)
   ignition::math::Vector3d cog(0, 0, 0);
 
-  GZ_ASSERT(this->dataPtr->inertial != NULL, "Inertial pointer is NULL");
+  GZ_ASSERT(this->odeLinkDPtr->inertial != NULL, "Inertial pointer is NULL");
 
   // give ODE un-rotated inertia
-  ignition::math::Matrix3d moi = this->dataPtr->inertial->MOI(
-    ignition::math::Pose3d(this->dataPtr->inertial->CoG(),
+  ignition::math::Matrix3d moi = this->odeLinkDPtr->inertial->MOI(
+    ignition::math::Pose3d(this->odeLinkDPtr->inertial->CoG(),
       ignition::math::Quaterniond()));
 
   ignition::math::Vector3d principals(moi(0, 0), moi(1, 1), moi(2, 2));
   ignition::math::Vector3d products(moi(0, 1), moi(0, 2), moi(1, 2));
 
-  dMassSetParameters(&odeMass, this->dataPtr->inertial->Mass(),
+  dMassSetParameters(&odeMass, this->odeLinkDPtr->inertial->Mass(),
       cog.X(), cog.Y(), cog.Z(),
       principals.X(), principals.Y(), principals.Z(),
       products.X(), products.Y(), products.Z());
 
-  dBodySetMass(this->dataPtr->linkId, &odeMass);
+  dBodySetMass(this->odeLinkDPtr->linkId, &odeMass);
 
   // In case the center of mass changed:
   this->UpdateCollisionOffsets();
@@ -439,9 +439,9 @@ void ODELink::UpdateMass()
 //////////////////////////////////////////////////
 void ODELink::SetLinearVel(const ignition::math::Vector3d &_vel)
 {
-  if (this->dataPtr->linkId)
+  if (this->odeLinkDPtr->linkId)
   {
-    dBodySetLinearVel(this->dataPtr->linkId, _vel.X(), _vel.Y(), _vel.Z());
+    dBodySetLinearVel(this->odeLinkDPtr->linkId, _vel.X(), _vel.Y(), _vel.Z());
   }
   else if (!this->IsStatic())
   {
@@ -456,19 +456,19 @@ ignition::math::Vector3d ODELink::WorldLinearVel(
 {
   ignition::math::Vector3d vel;
 
-  if (this->dataPtr->linkId)
+  if (this->odeLinkDPtr->linkId)
   {
     dVector3 dvel;
-    GZ_ASSERT(this->dataPtr->inertial != NULL, "Inertial pointer is NULL");
+    GZ_ASSERT(this->odeLinkDPtr->inertial != NULL, "Inertial pointer is NULL");
 
     ignition::math::Vector3d offsetFromCoG = _offset -
-      this->dataPtr->inertial->CoG();
+      this->odeLinkDPtr->inertial->CoG();
 
-    dBodyGetRelPointVel(this->dataPtr->linkId,
+    dBodyGetRelPointVel(this->odeLinkDPtr->linkId,
         offsetFromCoG.X(), offsetFromCoG.Y(), offsetFromCoG.Z(), dvel);
     vel.Set(dvel[0], dvel[1], dvel[2]);
   }
-  else if (!this->IsStatic() && this->dataPtr->initialized)
+  else if (!this->IsStatic() && this->odeLinkDPtr->initialized)
   {
     gzlog << "ODE body for link [" << this->ScopedName() << "]"
           << " does not exist, GetWorldLinearVel returns default of "
@@ -484,22 +484,22 @@ ignition::math::Vector3d ODELink::WorldLinearVel(
 {
   ignition::math::Vector3d vel;
 
-  if (this->dataPtr->linkId)
+  if (this->odeLinkDPtr->linkId)
   {
     dVector3 dvel;
     ignition::math::Pose3d wPose = this->WorldPose();
 
-    GZ_ASSERT(this->dataPtr->inertial != NULL, "Inertial pointer is NULL");
+    GZ_ASSERT(this->odeLinkDPtr->inertial != NULL, "Inertial pointer is NULL");
 
     ignition::math::Vector3d offsetFromCoG =
         wPose.Rot().RotateVectorReverse(_q * _offset)
-        - this->dataPtr->inertial->CoG();
+        - this->odeLinkDPtr->inertial->CoG();
 
-    dBodyGetRelPointVel(this->dataPtr->linkId,
+    dBodyGetRelPointVel(this->odeLinkDPtr->linkId,
         offsetFromCoG.X(), offsetFromCoG.Y(), offsetFromCoG.Z(), dvel);
     vel.Set(dvel[0], dvel[1], dvel[2]);
   }
-  else if (!this->IsStatic() && this->dataPtr->initialized)
+  else if (!this->IsStatic() && this->odeLinkDPtr->initialized)
   {
     gzlog << "ODE body for link [" << this->ScopedName() << "]"
           << " does not exist, GetWorldLinearVel returns default of "
@@ -514,13 +514,13 @@ ignition::math::Vector3d ODELink::WorldCoGLinearVel() const
 {
   ignition::math::Vector3d vel;
 
-  if (this->dataPtr->linkId)
+  if (this->odeLinkDPtr->linkId)
   {
     const dReal *dvel;
-    dvel = dBodyGetLinearVel(this->dataPtr->linkId);
+    dvel = dBodyGetLinearVel(this->odeLinkDPtr->linkId);
     vel.Set(dvel[0], dvel[1], dvel[2]);
   }
-  else if (!this->IsStatic() && this->dataPtr->initialized)
+  else if (!this->IsStatic() && this->odeLinkDPtr->initialized)
   {
     gzlog << "ODE body for link [" << this->ScopedName() << "]"
           << " does not exist, GetWorldCoGLinearVel returns default of "
@@ -533,9 +533,9 @@ ignition::math::Vector3d ODELink::WorldCoGLinearVel() const
 //////////////////////////////////////////////////
 void ODELink::SetAngularVel(const ignition::math::Vector3d &_vel)
 {
-  if (this->dataPtr->linkId)
+  if (this->odeLinkDPtr->linkId)
   {
-    dBodySetAngularVel(this->dataPtr->linkId, _vel.X(), _vel.Y(), _vel.Z());
+    dBodySetAngularVel(this->odeLinkDPtr->linkId, _vel.X(), _vel.Y(), _vel.Z());
   }
   else if (!this->IsStatic())
   {
@@ -549,15 +549,15 @@ ignition::math::Vector3d ODELink::WorldAngularVel() const
 {
   ignition::math::Vector3d vel;
 
-  if (this->dataPtr->linkId)
+  if (this->odeLinkDPtr->linkId)
   {
     const dReal *dvel;
 
-    dvel = dBodyGetAngularVel(this->dataPtr->linkId);
+    dvel = dBodyGetAngularVel(this->odeLinkDPtr->linkId);
 
     vel.Set(dvel[0], dvel[1], dvel[2]);
   }
-  else if (!this->IsStatic() && this->dataPtr->initialized)
+  else if (!this->IsStatic() && this->odeLinkDPtr->initialized)
   {
     gzlog << "ODE body for link [" << this->ScopedName() << "]"
           << " does not exist, GetWorldAngularVel returns default of "
@@ -570,10 +570,10 @@ ignition::math::Vector3d ODELink::WorldAngularVel() const
 //////////////////////////////////////////////////
 void ODELink::SetForce(const ignition::math::Vector3d &_force)
 {
-  if (this->dataPtr->linkId)
+  if (this->odeLinkDPtr->linkId)
   {
     this->SetEnabled(true);
-    dBodySetForce(this->dataPtr->linkId, _force.X(), _force.Y(), _force.Z());
+    dBodySetForce(this->odeLinkDPtr->linkId, _force.X(), _force.Y(), _force.Z());
   }
   else if (!this->IsStatic())
   {
@@ -585,10 +585,10 @@ void ODELink::SetForce(const ignition::math::Vector3d &_force)
 //////////////////////////////////////////////////
 void ODELink::SetTorque(const ignition::math::Vector3d &_torque)
 {
-  if (this->dataPtr->linkId)
+  if (this->odeLinkDPtr->linkId)
   {
     this->SetEnabled(true);
-    dBodySetTorque(this->dataPtr->linkId,
+    dBodySetTorque(this->odeLinkDPtr->linkId,
         _torque.X(), _torque.Y(), _torque.Z());
   }
   else if (!this->IsStatic())
@@ -601,10 +601,10 @@ void ODELink::SetTorque(const ignition::math::Vector3d &_torque)
 //////////////////////////////////////////////////
 void ODELink::AddForce(const ignition::math::Vector3d &_force)
 {
-  if (this->dataPtr->linkId)
+  if (this->odeLinkDPtr->linkId)
   {
     this->SetEnabled(true);
-    dBodyAddForce(this->dataPtr->linkId, _force.X(), _force.Y(), _force.Z());
+    dBodyAddForce(this->odeLinkDPtr->linkId, _force.X(), _force.Y(), _force.Z());
   }
   else if (!this->IsStatic())
   {
@@ -616,10 +616,10 @@ void ODELink::AddForce(const ignition::math::Vector3d &_force)
 /////////////////////////////////////////////////
 void ODELink::AddRelativeForce(const ignition::math::Vector3d &_force)
 {
-  if (this->dataPtr->linkId)
+  if (this->odeLinkDPtr->linkId)
   {
     this->SetEnabled(true);
-    dBodyAddRelForce(this->dataPtr->linkId, _force.X(), _force.Y(), _force.Z());
+    dBodyAddRelForce(this->odeLinkDPtr->linkId, _force.X(), _force.Y(), _force.Z());
   }
   else if (!this->IsStatic())
   {
@@ -633,10 +633,10 @@ void ODELink::AddForceAtRelativePosition(
     const ignition::math::Vector3d &_force,
     const ignition::math::Vector3d &_relpos)
 {
-  if (this->dataPtr->linkId)
+  if (this->odeLinkDPtr->linkId)
   {
     this->SetEnabled(true);
-    dBodyAddForceAtRelPos(this->dataPtr->linkId,
+    dBodyAddForceAtRelPos(this->odeLinkDPtr->linkId,
         _force.X(), _force.Y(), _force.Z(),
         _relpos.X(), _relpos.Y(), _relpos.Z());
   }
@@ -652,10 +652,10 @@ void ODELink::AddForceAtRelativePosition(
 void ODELink::AddForceAtWorldPosition(const ignition::math::Vector3d &_force,
                                       const ignition::math::Vector3d &_pos)
 {
-  if (this->dataPtr->linkId)
+  if (this->odeLinkDPtr->linkId)
   {
     this->SetEnabled(true);
-    dBodyAddForceAtPos(this->dataPtr->linkId,
+    dBodyAddForceAtPos(this->odeLinkDPtr->linkId,
         _force.X(), _force.Y(), _force.Z(), _pos.X(), _pos.Y(), _pos.Z());
   }
   else if (!this->IsStatic())
@@ -670,7 +670,7 @@ void ODELink::AddForceAtWorldPosition(const ignition::math::Vector3d &_force,
 void ODELink::AddLinkForce(const ignition::math::Vector3d &_force,
     const ignition::math::Vector3d &_offset)
 {
-  if (this->dataPtr->linkId)
+  if (this->odeLinkDPtr->linkId)
   {
     // Force vector represents a direction only, so it should be rotated but
     // not translated
@@ -678,10 +678,10 @@ void ODELink::AddLinkForce(const ignition::math::Vector3d &_force,
       this->WorldPose().Rot().RotateVector(_force);
     // Does this need to be rotated?
     ignition::math::Vector3d offsetCoG =
-      _offset - this->dataPtr->inertial->CoG();
+      _offset - this->odeLinkDPtr->inertial->CoG();
 
     this->SetEnabled(true);
-    dBodyAddForceAtRelPos(this->dataPtr->linkId,
+    dBodyAddForceAtRelPos(this->odeLinkDPtr->linkId,
         forceWorld.X(), forceWorld.Y(), forceWorld.Z(),
         offsetCoG.X(), offsetCoG.Y(), offsetCoG.Z());
   }
@@ -696,10 +696,10 @@ void ODELink::AddLinkForce(const ignition::math::Vector3d &_force,
 /////////////////////////////////////////////////
 void ODELink::AddTorque(const ignition::math::Vector3d &_torque)
 {
-  if (this->dataPtr->linkId)
+  if (this->odeLinkDPtr->linkId)
   {
     this->SetEnabled(true);
-    dBodyAddTorque(this->dataPtr->linkId,
+    dBodyAddTorque(this->odeLinkDPtr->linkId,
         _torque.X(), _torque.Y(), _torque.Z());
   }
   else if (!this->IsStatic())
@@ -710,10 +710,10 @@ void ODELink::AddTorque(const ignition::math::Vector3d &_torque)
 /////////////////////////////////////////////////
 void ODELink::AddRelativeTorque(const ignition::math::Vector3d &_torque)
 {
-  if (this->dataPtr->linkId)
+  if (this->odeLinkDPtr->linkId)
   {
     this->SetEnabled(true);
-    dBodyAddRelTorque(this->dataPtr->linkId,
+    dBodyAddRelTorque(this->odeLinkDPtr->linkId,
         _torque.X(), _torque.Y(), _torque.Z());
   }
   else if (!this->IsStatic())
@@ -724,13 +724,13 @@ void ODELink::AddRelativeTorque(const ignition::math::Vector3d &_torque)
 /////////////////////////////////////////////////
 ignition::math::Vector3d ODELink::WorldForce() const
 {
-  return this->dataPtr->force;
+  return this->odeLinkDPtr->force;
 }
 
 //////////////////////////////////////////////////
 ignition::math::Vector3d ODELink::WorldTorque() const
 {
-  return this->dataPtr->torque;
+  return this->odeLinkDPtr->torque;
 }
 
 //////////////////////////////////////////////////
@@ -742,13 +742,13 @@ dSpaceID ODELink::GetSpaceId() const
 //////////////////////////////////////////////////
 dSpaceID ODELink::SpaceId() const
 {
-  return this->dataPtr->spaceId;
+  return this->odeLinkDPtr->spaceId;
 }
 
 //////////////////////////////////////////////////
 void ODELink::SetSpaceId(const dSpaceID _spaceid)
 {
-  this->dataPtr->spaceId = _spaceid;
+  this->odeLinkDPtr->spaceId = _spaceid;
 }
 
 //////////////////////////////////////////////////
@@ -756,7 +756,7 @@ void ODELink::SetLinearDamping(const double _damping)
 {
   if (this->ODEId())
     dBodySetLinearDamping(this->ODEId(), _damping);
-  else if (!this->IsStatic() && this->dataPtr->initialized)
+  else if (!this->IsStatic() && this->odeLinkDPtr->initialized)
   {
     gzlog << "ODE body for link [" << this->ScopedName() << "]"
           << " does not exist, unable to SetLinearDamping" << std::endl;
@@ -768,7 +768,7 @@ void ODELink::SetAngularDamping(const double _damping)
 {
   if (this->ODEId())
     dBodySetAngularDamping(this->ODEId(), _damping);
-  else if (!this->IsStatic() && this->dataPtr->initialized)
+  else if (!this->IsStatic() && this->odeLinkDPtr->initialized)
   {
     gzlog << "ODE body for link [" << this->ScopedName() << "]"
           << " does not exist, unable to SetAngularDamping" << std::endl;
@@ -778,15 +778,15 @@ void ODELink::SetAngularDamping(const double _damping)
 //////////////////////////////////////////////////
 void ODELink::SetKinematic(const bool &_state)
 {
-  this->dataPtr->sdf->GetElement("kinematic")->Set(_state);
-  if (this->dataPtr->linkId)
+  this->odeLinkDPtr->sdf->GetElement("kinematic")->Set(_state);
+  if (this->odeLinkDPtr->linkId)
   {
-    if (_state && !dBodyIsKinematic(this->dataPtr->linkId))
-      dBodySetKinematic(this->dataPtr->linkId);
-    else if (dBodyIsKinematic(this->dataPtr->linkId))
-      dBodySetDynamic(this->dataPtr->linkId);
+    if (_state && !dBodyIsKinematic(this->odeLinkDPtr->linkId))
+      dBodySetKinematic(this->odeLinkDPtr->linkId);
+    else if (dBodyIsKinematic(this->odeLinkDPtr->linkId))
+      dBodySetDynamic(this->odeLinkDPtr->linkId);
   }
-  else if (!this->IsStatic() && this->dataPtr->initialized)
+  else if (!this->IsStatic() && this->odeLinkDPtr->initialized)
     gzlog << "ODE body for link [" << this->ScopedName() << "]"
           << " does not exist, unable to SetKinematic" << std::endl;
 }
@@ -796,9 +796,9 @@ bool ODELink::Kinematic() const
 {
   bool result = false;
 
-  if (this->dataPtr->linkId)
-    result = dBodyIsKinematic(this->dataPtr->linkId);
-  else if (!this->IsStatic() && this->dataPtr->initialized)
+  if (this->odeLinkDPtr->linkId)
+    result = dBodyIsKinematic(this->odeLinkDPtr->linkId);
+  else if (!this->IsStatic() && this->odeLinkDPtr->initialized)
   {
     gzlog << "ODE body for link [" << this->ScopedName() << "]"
           << " does not exist, GetKinematic returns default of "
@@ -811,11 +811,11 @@ bool ODELink::Kinematic() const
 //////////////////////////////////////////////////
 void ODELink::SetAutoDisable(const bool _disable)
 {
-  if (this->Model()->JointCount() == 0 && this->dataPtr->linkId)
+  if (this->Model()->JointCount() == 0 && this->odeLinkDPtr->linkId)
   {
-    dBodySetAutoDisableFlag(this->dataPtr->linkId, _disable);
+    dBodySetAutoDisableFlag(this->odeLinkDPtr->linkId, _disable);
   }
-  else if (!this->dataPtr->linkId)
+  else if (!this->odeLinkDPtr->linkId)
   {
     gzlog << "ODE body for link [" << this->ScopedName() << "]"
           << " does not exist, unable to SetAutoDisable" << std::endl;

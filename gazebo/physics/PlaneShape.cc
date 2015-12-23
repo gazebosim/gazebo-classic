@@ -29,7 +29,7 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 PlaneShape::PlaneShape(CollisionPtr _parent)
-  : Shape(_parent)
+: Shape(_parent)
 {
   this->AddType(PLANE_SHAPE);
   this->SetName("plane_shape");

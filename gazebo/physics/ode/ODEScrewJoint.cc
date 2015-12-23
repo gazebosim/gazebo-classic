@@ -21,6 +21,7 @@
 
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/Link.hh"
+#include "gazebo/physics/ode/ODEJointPrivate.hh"
 #include "gazebo/physics/ode/ODEScrewJoint.hh"
 
 using namespace gazebo;
@@ -44,7 +45,7 @@ ODEScrewJoint::~ODEScrewJoint()
 void ODEScrewJoint::Load(sdf::ElementPtr _sdf)
 {
   ScrewJoint<ODEJoint>::Load(_sdf);
-  this->SetThreadPitch(this->screwDPtr->threadPitch);
+  this->SetThreadPitch(this->threadPitch);
 }
 
 //////////////////////////////////////////////////
@@ -221,9 +222,9 @@ double ODEScrewJoint::ThreadPitch(unsigned int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-double ODEScrewJoint::ThreadPitch()
+double ODEScrewJoint::ThreadPitch() const
 {
-  return this->screwDPtr->threadPitch;
+  return this->threadPitch;
 }
 
 //////////////////////////////////////////////////
@@ -272,7 +273,7 @@ bool ODEScrewJoint::SetParam(const std::string &_key,
   {
     try
     {
-      this->screwDPtr->threadPitch = boost::any_cast<double>(_value);
+      this->threadPitch = boost::any_cast<double>(_value);
     }
     catch(const boost::bad_any_cast &e)
     {

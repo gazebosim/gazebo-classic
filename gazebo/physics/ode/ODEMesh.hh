@@ -83,7 +83,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Private data pointer
-      private: std::unique_ptr<ODEMeshPrivate> dataPtr;
+      protected: ODEMeshPrivate *odeMeshDPtr;
     };
   }
 }

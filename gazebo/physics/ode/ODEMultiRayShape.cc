@@ -22,6 +22,7 @@
 #include "gazebo/physics/ode/ODELink.hh"
 #include "gazebo/physics/ode/ODECollision.hh"
 #include "gazebo/physics/ode/ODEPhysics.hh"
+#include "gazebo/physics/MultiRayShapePrivate.hh"
 #include "gazebo/physics/ode/ODERayShape.hh"
 #include "gazebo/physics/ode/ODEMultiRayShape.hh"
 
@@ -47,10 +48,11 @@ ODEMultiRayShape::ODEMultiRayShape(CollisionPtr _parent)
 
   // These three lines may be unessecary
   ODELinkPtr pLink =
-    std::static_pointer_cast<ODELink>(this->collisionParent->GetLink());
+    std::static_pointer_cast<ODELink>(
+        this->multiRayShapeDPtr->collisionParent->Link());
   pLink->SetSpaceId(this->raySpaceId);
-  std::static_pointer_cast<ODECollision>(this->collisionParent)->SetSpaceId(
-      this->raySpaceId);
+  std::static_pointer_cast<ODECollision>(
+      this->multiRayShapeDPtr->collisionParent)->SetSpaceId(this->raySpaceId);
 }
 
 //////////////////////////////////////////////////
@@ -67,7 +69,7 @@ ODEMultiRayShape::~ODEMultiRayShape()
 void ODEMultiRayShape::UpdateRays()
 {
   ODEPhysicsPtr ode = std::dynamic_pointer_cast<ODEPhysics>(
-      this->GetWorld()->GetPhysicsEngine());
+      this->World()->GetPhysicsEngine());
 
   if (ode == NULL)
     gzthrow("Invalid physics engine. Must use ODE.");
@@ -159,8 +161,8 @@ void ODEMultiRayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
       if (n > 0)
       {
         RayShapePtr shape = std::static_pointer_cast<RayShape>(
-            rayCollision->GetShape());
-        if (contact.depth < shape->GetLength())
+            rayCollision->Shape());
+        if (contact.depth < shape->Length())
         {
           // gzerr << "ODEMultiRayShape UpdateCallback dSpaceCollide2 "
           //      << " depth[" << contact.depth << "]"
@@ -168,13 +170,13 @@ void ODEMultiRayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
           //        << ", " << contact.pos[1]
           //        << ", " << contact.pos[2]
           //        << ", " << "]"
-          //      << " ray[" << rayCollision->GetScopedName() << "]"
-          //      << " pose[" << rayCollision->GetWorldPose() << "]"
-          //      << " hit[" << hitCollision->GetScopedName() << "]"
-          //      << " pose[" << hitCollision->GetWorldPose() << "]"
+          //      << " ray[" << rayCollision->ScopedName() << "]"
+          //      << " pose[" << rayCollision->WorldPose() << "]"
+          //      << " hit[" << hitCollision->ScopedName() << "]"
+          //      << " pose[" << hitCollision->WorldPose() << "]"
           //      << "\n";
           shape->SetLength(contact.depth);
-          shape->SetRetro(hitCollision->GetLaserRetro());
+          shape->SetRetro(hitCollision->LaserRetro());
         }
       }
     }
@@ -188,7 +190,7 @@ void ODEMultiRayShape::AddRay(const ignition::math::Vector3d &_start,
   MultiRayShape::AddRay(_start, _end);
 
   ODECollisionPtr odeCollision(new ODECollision(
-        this->collisionParent->GetLink()));
+        this->multiRayShapeDPtr->collisionParent->Link()));
   odeCollision->SetName("ode_ray_collision");
   odeCollision->SetSpaceId(this->raySpaceId);
 
@@ -196,5 +198,5 @@ void ODEMultiRayShape::AddRay(const ignition::math::Vector3d &_start,
   odeCollision->SetShape(ray);
 
   ray->SetPoints(_start, _end);
-  this->rays.push_back(ray);
+  this->multiRayShapeDPtr->rays.push_back(ray);
 }

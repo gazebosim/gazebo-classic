@@ -21,6 +21,7 @@
 #include "gazebo/physics/ode/ODEMesh.hh"
 #include "gazebo/physics/ode/ODECollision.hh"
 #include "gazebo/physics/ode/ODEPhysics.hh"
+#include "gazebo/physics/MeshShapePrivate.hh"
 #include "gazebo/physics/ode/ODEMeshShape.hh"
 
 using namespace gazebo;
@@ -54,19 +55,21 @@ void ODEMeshShape::Load(sdf::ElementPtr _sdf)
 void ODEMeshShape::Init()
 {
   MeshShape::Init();
-  if (!this->mesh)
+  if (!this->meshShapeDPtr->mesh)
     return;
 
-  if (this->submesh)
+  if (this->meshShapeDPtr->submesh)
   {
-    this->odeMesh->Init(this->submesh,
-        std::static_pointer_cast<ODECollision>(this->collisionParent),
-        this->sdf->Get<ignition::math::Vector3d>("scale"));
+    this->odeMesh->Init(this->meshShapeDPtr->submesh,
+        std::static_pointer_cast<ODECollision>(
+          this->meshShapeDPtr->collisionParent),
+        this->meshShapeDPtr->sdf->Get<ignition::math::Vector3d>("scale"));
   }
   else
   {
-    this->odeMesh->Init(this->mesh,
-        std::static_pointer_cast<ODECollision>(this->collisionParent),
-        this->sdf->Get<ignition::math::Vector3d>("scale"));
+    this->odeMesh->Init(this->meshShapeDPtr->mesh,
+        std::static_pointer_cast<ODECollision>(
+          this->meshShapeDPtr->collisionParent),
+        this->meshShapeDPtr->sdf->Get<ignition::math::Vector3d>("scale"));
   }
 }

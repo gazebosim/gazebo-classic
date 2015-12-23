@@ -29,10 +29,13 @@ namespace gazebo
 {
   namespace physics
   {
+    // Forward declare private data class
+    class MeshShapePrivate;
+
     /// \addtogroup gazebo_physics
     /// \{
 
-    /// \class MeshShape MeshShape.hh physics/physics.hh
+    /// \class MeshShape MeshShape.hh gazebo/physics/MeshShape.hh
     /// \brief Triangle mesh collision shape
     class GZ_PHYSICS_VISIBLE MeshShape : public Shape
     {
@@ -60,7 +63,12 @@ namespace gazebo
 
       /// \brief Get the URI of the mesh data.
       /// \return The URI of the mesh data.
-      public: std::string GetMeshURI() const;
+      /// \deprecated See MeshURI() const
+      public: std::string GetMeshURI() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the URI of the mesh data.
+      /// \return The URI of the mesh data.
+      public: std::string MeshURI() const;
 
       /// \brief Set the mesh uri and submesh name.
       /// \param[in] _uri Filename of the mesh file to load from.
@@ -69,13 +77,13 @@ namespace gazebo
       /// specified in the _uri.
       public: void SetMesh(const std::string &_uri,
                            const std::string &_submesh = "",
-                           bool _center = false);
+                           const bool _center = false);
 
 
       /// \brief Set the scaling factor.
       /// \param[in] _scale Scaling factor.
       /// \deprecated See function that accepts ignition::math params
-      public: void SetScale(const math::Vector3 &_scale);
+      public: void SetScale(const math::Vector3 &_scale) GAZEBO_DEPRECATED(7.0);
 
       /// \brief Set the scaling factor.
       /// \param[in] _scale Scaling factor.
@@ -90,11 +98,9 @@ namespace gazebo
       /// \param[in] _msg Message that contains triangle mesh info.
       public: virtual void ProcessMsg(const msgs::Geometry &_msg);
 
-      /// \brief Pointer to the mesh data.
-      protected: const common::Mesh *mesh;
-
-      /// \brief The submesh to use from within the parent mesh.
-      protected: common::SubMesh *submesh;
+      /// \internal
+      /// \brief Pointer to mesh shape private data
+      protected: MeshShapePrivate *meshShapeDPtr;
     };
     /// \}
   }

@@ -55,18 +55,16 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 Link::Link(EntityPtr _parent)
-: Entity(_parent),
-  linkDPtr(std::static_pointer_cast<LinkDPtr>(this->entityDPtr)),
-  dataPtr(new LinkPrivate),
+: Entity(*new LinkPrivate, _parent),
+  linkDPtr(static_cast<LinkPrivate*>(this->entityDPtr)),
 {
   this->ConstructionHelper();
 }
 
 //////////////////////////////////////////////////
-Link::Link(LinkProtected &_dataPtr, EntityPtr _parent)
+Link::Link(LinkPrivate &_dataPtr, EntityPtr _parent)
 : Entity(_dataPtr, _parent),
-  linkDPtr(std::static_pointer_cast<LinkDPtr>(this->entityDPtr)),
-  dataPtr(new LinkPrivate),
+  linkDPtr(static_cast<LinkPrivate*>(this->entityDPtr)),
 {
   this->ConstructionHelper();
 }
@@ -76,16 +74,16 @@ void Link::ConstructionHelper()
 {
   this->AddType(Base::LINK);
   this->linkDPtr->inertial.reset(new Inertial);
-  this->dataPtr->parentJoints.clear();
-  this->dataPtr->childJoints.clear();
-  this->dataPtr->publishData = false;
-  this->dataPtr->publishDataMutex = new boost::recursive_mutex();
+  this->linkDPtr->parentJoints.clear();
+  this->linkDPtr->childJoints.clear();
+  this->linkDPtr->publishData = false;
+  this->linkDPtr->publishDataMutex = new boost::recursive_mutex();
 }
 
 //////////////////////////////////////////////////
 Link::~Link()
 {
-  this->dataPtr->attachedModels.clear();
+  this->linkDPtr->attachedModels.clear();
 
   for (Visuals_M::iterator iter = this->linkDPtr->visuals.begin();
       iter != this->linkDPtr->visuals.end(); ++iter)
@@ -125,18 +123,18 @@ Link::~Link()
   }
 
   this->visPub.reset();
-  this->dataPtr->sensors.clear();
+  this->linkDPtr->sensors.clear();
 
   this->requestPub.reset();
-  this->dataPtr->dataPub.reset();
-  this->dataPtr->wrenchSub.reset();
+  this->linkDPtr->dataPub.reset();
+  this->linkDPtr->wrenchSub.reset();
   this->connections.clear();
 
-  delete this->dataPtr->publishDataMutex;
-  this->dataPtr->publishDataMutex = NULL;
+  delete this->linkDPtr->publishDataMutex;
+  this->linkDPtr->publishDataMutex = NULL;
 
-  this->dataPtr->collisions.clear();
-  this->dataPtr->batteries.clear();
+  this->linkDPtr->collisions.clear();
+  this->linkDPtr->batteries.clear();
 }
 
 //////////////////////////////////////////////////
@@ -189,7 +187,7 @@ void Link::Load(sdf::ElementPtr _sdf)
         std::string sensorName =
           sensors::create_sensor(sensorElem, this->GetWorld()->GetName(),
               this->GetScopedName(), this->GetId());
-        this->dataPtr->sensors.push_back(sensorName);
+        this->linkDPtr->sensors.push_back(sensorName);
       }
       sensorElem = sensorElem->GetNextElement("sensor");
     }
@@ -216,7 +214,7 @@ void Link::Load(sdf::ElementPtr _sdf)
       std::copy(names.begin(), names.end(), std::back_inserter(collisionNames));
 
       audioElem = audioElem->GetNextElement("audio_source");
-      this->dataPtr->audioSources.push_back(source);
+      this->linkDPtr->audioSources.push_back(source);
     }
 
     if (!collisionNames.empty())
@@ -230,14 +228,14 @@ void Link::Load(sdf::ElementPtr _sdf)
       std::string topic =
         this->world->GetPhysicsEngine()->GetContactManager()->CreateFilter(
             this->GetScopedName() + "/audio_collision", collisionNames);
-      this->dataPtr->audioContactsSub = this->node->Subscribe(topic,
+      this->linkDPtr->audioContactsSub = this->node->Subscribe(topic,
           &Link::OnCollision, this);
     }
   }
 
   if (_sdf->HasElement("audio_sink"))
   {
-    this->dataPtr->audioSink = util::OpenAL::Instance()->CreateSink(
+    this->linkDPtr->audioSink = util::OpenAL::Instance()->CreateSink(
         _sdf->GetElement("audio_sink"));
   }
 #endif
@@ -257,7 +255,7 @@ void Link::Load(sdf::ElementPtr _sdf)
 
   std::string topicName = "~/" + this->GetScopedName() + "/wrench";
   boost::replace_all(topicName, "::", "/");
-  this->dataPtr->wrenchSub = this->node->Subscribe(topicName, &Link::OnWrenchMsg, this);
+  this->linkDPtr->wrenchSub = this->node->Subscribe(topicName, &Link::OnWrenchMsg, this);
 }
 
 //////////////////////////////////////////////////
@@ -266,7 +264,7 @@ void Link::Init()
   this->linkDPtr->linearAccel.Set(0, 0, 0);
   this->linkDPtr->angularAccel.Set(0, 0, 0);
 
-  this->dataPtr->enabled = true;
+  this->linkDPtr->enabled = true;
 
   // Set Link pose before setting pose of child collisions
   this->SetRelativePose(this->sdf->Get<math::Pose>("pose"));
@@ -279,13 +277,13 @@ void Link::Init()
     if ((*iter)->HasType(Base::COLLISION))
     {
       CollisionPtr collision = std::static_pointer_cast<Collision>(*iter);
-      this->dataPtr->collisions.push_back(collision);
+      this->linkDPtr->collisions.push_back(collision);
       collision->Init();
     }
   }
 
   // Initialize all the batteries
-  for (auto &battery : this->dataPtr->batteries)
+  for (auto &battery : this->linkDPtr->batteries)
   {
     battery->Init();
   }
@@ -296,18 +294,18 @@ void Link::Init()
 //////////////////////////////////////////////////
 void Link::Fini()
 {
-  this->dataPtr->parentJoints.clear();
-  this->dataPtr->childJoints.clear();
-  this->dataPtr->collisions.clear();
+  this->linkDPtr->parentJoints.clear();
+  this->linkDPtr->childJoints.clear();
+  this->linkDPtr->collisions.clear();
   this->linkDPtr->inertial.reset();
-  this->dataPtr->batteries.clear();
+  this->linkDPtr->batteries.clear();
 
-  for (std::vector<std::string>::iterator iter = this->dataPtr->sensors.begin();
-       iter != this->dataPtr->sensors.end(); ++iter)
+  for (std::vector<std::string>::iterator iter = this->linkDPtr->sensors.begin();
+       iter != this->linkDPtr->sensors.end(); ++iter)
   {
     sensors::remove_sensor(*iter);
   }
-  this->dataPtr->sensors.clear();
+  this->linkDPtr->sensors.clear();
 
   for (Visuals_M::iterator iter = this->linkDPtr->visuals.begin();
        iter != this->linkDPtr->visuals.end(); ++iter)
@@ -327,7 +325,7 @@ void Link::Fini()
 #ifdef HAVE_OPENAL
   this->world->GetPhysicsEngine()->GetContactManager()->RemoveFilter(
       this->GetScopedName() + "/audio_collision");
-  this->dataPtr->audioSink.reset();
+  this->linkDPtr->audioSink.reset();
 #endif
 
   Entity::Fini();
@@ -465,8 +463,8 @@ void Link::SetCollideMode(const std::string &_mode)
     return;
   }
 
-  for (Collision_V::iterator iter = this->dataPtr->collisions.begin();
-       iter != this->dataPtr->collisions.end(); ++iter)
+  for (Collision_V::iterator iter = this->linkDPtr->collisions.begin();
+       iter != this->linkDPtr->collisions.end(); ++iter)
   {
     if ((*iter))
     {
@@ -495,8 +493,8 @@ bool Link::SelfCollide() const
 //////////////////////////////////////////////////
 void Link::SetLaserRetro(float _retro)
 {
-  for (Collision_V::iterator iter = this->dataPtr->collisions.begin();
-       iter != this->dataPtr->collisions.end(); ++iter)
+  for (Collision_V::iterator iter = this->linkDPtr->collisions.begin();
+       iter != this->linkDPtr->collisions.end(); ++iter)
   {
     (*iter)->SetLaserRetro(_retro);
   }
@@ -506,15 +504,15 @@ void Link::SetLaserRetro(float _retro)
 void Link::Update(const common::UpdateInfo & /*_info*/)
 {
 #ifdef HAVE_OPENAL
-  if (this->dataPtr->audioSink)
+  if (this->linkDPtr->audioSink)
   {
-    this->dataPtr->audioSink->SetPose(this->GetWorldPose().Ign());
-    this->dataPtr->audioSink->SetVelocity(this->GetWorldLinearVel().Ign());
+    this->linkDPtr->audioSink->SetPose(this->GetWorldPose().Ign());
+    this->linkDPtr->audioSink->SetVelocity(this->GetWorldLinearVel().Ign());
   }
 
   // Update all the audio sources
   for (std::vector<util::OpenALSourcePtr>::iterator iter =
-      this->dataPtr->audioSources.begin(); iter != this->dataPtr->audioSources.end(); ++iter)
+      this->linkDPtr->audioSources.begin(); iter != this->linkDPtr->audioSources.end(); ++iter)
   {
     (*iter)->SetPose(this->GetWorldPose().Ign());
     (*iter)->SetVelocity(this->GetWorldLinearVel().Ign());
@@ -522,19 +520,19 @@ void Link::Update(const common::UpdateInfo & /*_info*/)
 #endif
 
   // FIXME: race condition on factory-based model loading!!!!!
-   /*if (this->GetEnabled() != this->dataPtr->enabled)
+   /*if (this->GetEnabled() != this->linkDPtr->enabled)
    {
-     this->dataPtr->enabled = this->GetEnabled();
-     this->dataPtr->enabledSignal(this->dataPtr->enabled);
+     this->linkDPtr->enabled = this->GetEnabled();
+     this->linkDPtr->enabledSignal(this->linkDPtr->enabled);
    }*/
 
-  if (!this->dataPtr->wrenchMsgs.empty())
+  if (!this->linkDPtr->wrenchMsgs.empty())
   {
     std::vector<msgs::Wrench> messages;
     {
-      boost::mutex::scoped_lock lock(this->dataPtr->wrenchMsgMutex);
-      messages = this->dataPtr->wrenchMsgs;
-      this->dataPtr->wrenchMsgs.clear();
+      boost::mutex::scoped_lock lock(this->linkDPtr->wrenchMsgMutex);
+      messages = this->linkDPtr->wrenchMsgs;
+      this->linkDPtr->wrenchMsgs.clear();
     }
 
     for (auto it : messages)
@@ -544,7 +542,7 @@ void Link::Update(const common::UpdateInfo & /*_info*/)
   }
 
   // Update the batteries.
-  for (auto &battery : this->dataPtr->batteries)
+  for (auto &battery : this->linkDPtr->batteries)
   {
     battery->Update();
   }
@@ -559,7 +557,7 @@ Joint_V Link::GetParentJoints() const
 /////////////////////////////////////////////////
 Joint_V Link::ParentJoints() const
 {
-  return this->dataPtr->parentJoints;
+  return this->linkDPtr->parentJoints;
 }
 
 /////////////////////////////////////////////////
@@ -571,7 +569,7 @@ Joint_V Link::GetChildJoints() const
 /////////////////////////////////////////////////
 Joint_V Link::ChildJoints() const
 {
-  return this->dataPtr->childJoints;
+  return this->linkDPtr->childJoints;
 }
 
 /////////////////////////////////////////////////
@@ -584,8 +582,8 @@ Link_V Link::GetChildJointsLinks() const
 Link_V Link::ChildJointsLinks() const
 {
   Link_V links;
-  for (std::vector<JointPtr>::const_iterator iter = this->dataPtr->childJoints.begin();
-                                             iter != this->dataPtr->childJoints.end();
+  for (std::vector<JointPtr>::const_iterator iter = this->linkDPtr->childJoints.begin();
+                                             iter != this->linkDPtr->childJoints.end();
                                              ++iter)
   {
     if ((*iter)->GetChild())
@@ -604,8 +602,8 @@ Link_V Link::GetParentJointsLinks() const
 Link_V Link::ParentJointsLinks() const
 {
   Link_V links;
-  for (std::vector<JointPtr>::const_iterator iter = this->dataPtr->parentJoints.begin();
-                                             iter != this->dataPtr->parentJoints.end();
+  for (std::vector<JointPtr>::const_iterator iter = this->linkDPtr->parentJoints.begin();
+                                             iter != this->linkDPtr->parentJoints.end();
                                              ++iter)
   {
     if ((*iter)->Parent())
@@ -677,7 +675,7 @@ Collision_V Link::GetCollisions() const
 //////////////////////////////////////////////////
 Collision_V Link::Collisions() const
 {
-  return this->dataPtr->collisions;
+  return this->linkDPtr->collisions;
 }
 
 //////////////////////////////////////////////////
@@ -872,8 +870,8 @@ ignition::math::Box Link::BoundingBox() const
   box.Min().Set(IGN_DBL_MAX, IGN_DBL_MAX, IGn_DBL_MAX);
   box.Max().Set(0, 0, 0);
 
-  for (Collision_V::const_iterator iter = this->dataPtr->collisions.begin();
-       iter != this->dataPtr->collisions.end(); ++iter)
+  for (Collision_V::const_iterator iter = this->linkDPtr->collisions.begin();
+       iter != this->linkDPtr->collisions.end(); ++iter)
   {
     box += (*iter)->BoundingBox();
   }
@@ -936,26 +934,26 @@ ignition::math::Matrix3d Link::WorldInertiaMatrix() const
 //////////////////////////////////////////////////
 void Link::AddParentJoint(JointPtr _joint)
 {
-  this->dataPtr->parentJoints.push_back(_joint);
+  this->linkDPtr->parentJoints.push_back(_joint);
 }
 
 //////////////////////////////////////////////////
 void Link::AddChildJoint(JointPtr _joint)
 {
-  this->dataPtr->childJoints.push_back(_joint);
+  this->linkDPtr->childJoints.push_back(_joint);
 }
 
 //////////////////////////////////////////////////
 void Link::RemoveParentJoint(const std::string &_jointName)
 {
-  for (std::vector<JointPtr>::iterator iter = this->dataPtr->parentJoints.begin();
-                                       iter != this->dataPtr->parentJoints.end();
+  for (std::vector<JointPtr>::iterator iter = this->linkDPtr->parentJoints.begin();
+                                       iter != this->linkDPtr->parentJoints.end();
                                        ++iter)
   {
     /// @todo: can we assume there are no repeats?
     if ((*iter)->GetName() == _jointName)
     {
-      this->dataPtr->parentJoints.erase(iter);
+      this->linkDPtr->parentJoints.erase(iter);
       break;
     }
   }
@@ -964,14 +962,14 @@ void Link::RemoveParentJoint(const std::string &_jointName)
 //////////////////////////////////////////////////
 void Link::RemoveChildJoint(const std::string &_jointName)
 {
-  for (std::vector<JointPtr>::iterator iter = this->dataPtr->childJoints.begin();
-                                       iter != this->dataPtr->childJoints.end();
+  for (std::vector<JointPtr>::iterator iter = this->linkDPtr->childJoints.begin();
+                                       iter != this->linkDPtr->childJoints.end();
                                        ++iter)
   {
     /// @todo: can we assume there are no repeats?
     if ((*iter)->GetName() == _jointName)
     {
-      this->dataPtr->childJoints.erase(iter);
+      this->linkDPtr->childJoints.erase(iter);
       break;
     }
   }
@@ -1012,8 +1010,8 @@ void Link::FillMsg(msgs::Link &_msg)
     }
   }
 
-  for (std::vector<std::string>::iterator iter = this->dataPtr->sensors.begin();
-      iter != this->dataPtr->sensors.end(); ++iter)
+  for (std::vector<std::string>::iterator iter = this->linkDPtr->sensors.begin();
+      iter != this->linkDPtr->sensors.end(); ++iter)
   {
     sensors::SensorPtr sensor = sensors::get_sensor(*iter);
     if (sensor)
@@ -1050,7 +1048,7 @@ void Link::FillMsg(msgs::Link &_msg)
     _msg.set_canonical(true);
 
   // Fill message with battery information
-  for (auto &battery : this->dataPtr->batteries)
+  for (auto &battery : this->linkDPtr->batteries)
   {
     msgs::Battery *bat = _msg.add_battery();
     bat->set_name(battery->Name());
@@ -1114,7 +1112,7 @@ unsigned int Link::GetSensorCount() const
 //////////////////////////////////////////////////
 unsigned int Link::SensorCount() const
 {
-  return this->dataPtr->sensors.size();
+  return this->linkDPtr->sensors.size();
 }
 
 //////////////////////////////////////////////////
@@ -1126,8 +1124,8 @@ std::string Link::GetSensorName(unsigned int _i) const
 //////////////////////////////////////////////////
 std::string Link::SensorName(const unsigned int _i) const
 {
-  if (_i < this->dataPtr->sensors.size())
-    return this->dataPtr->sensors[_i];
+  if (_i < this->linkDPtr->sensors.size())
+    return this->linkDPtr->sensors[_i];
 
   return std::string();
 }
@@ -1148,18 +1146,18 @@ void Link::AttachStaticModel(ModelPtr &_model,
     return;
   }
 
-  this->dataPtr->attachedModels.push_back(_model);
+  this->linkDPtr->attachedModels.push_back(_model);
   this->linkDPtr->attachedModelsOffset.push_back(_offset);
 }
 
 //////////////////////////////////////////////////
 void Link::DetachStaticModel(const std::string &_modelName)
 {
-  for (unsigned int i = 0; i < this->dataPtr->attachedModels.size(); i++)
+  for (unsigned int i = 0; i < this->linkDPtr->attachedModels.size(); i++)
   {
-    if (this->dataPtr->attachedModels[i]->GetName() == _modelName)
+    if (this->linkDPtr->attachedModels[i]->GetName() == _modelName)
     {
-      this->dataPtr->attachedModels.erase(this->dataPtr->attachedModels.begin()+i);
+      this->linkDPtr->attachedModels.erase(this->linkDPtr->attachedModels.begin()+i);
       this->linkDPtr->attachedModelsOffset.erase(this->linkDPtr->attachedModelsOffset.begin()+i);
       break;
     }
@@ -1169,7 +1167,7 @@ void Link::DetachStaticModel(const std::string &_modelName)
 //////////////////////////////////////////////////
 void Link::DetachAllStaticModels()
 {
-  this->dataPtr->attachedModels.clear();
+  this->linkDPtr->attachedModels.clear();
   this->linkDPtr->attachedModelsOffset.clear();
 }
 
@@ -1177,13 +1175,13 @@ void Link::DetachAllStaticModels()
 void Link::OnPoseChange()
 {
   math::Pose p;
-  for (unsigned int i = 0; i < this->dataPtr->attachedModels.size(); i++)
+  for (unsigned int i = 0; i < this->linkDPtr->attachedModels.size(); i++)
   {
     p = this->GetWorldPose();
     p.pos += this->linkDPtr->attachedModelsOffset[i].pos;
     p.rot = p.rot * this->linkDPtr->attachedModelsOffset[i].rot;
 
-    this->dataPtr->attachedModels[i]->SetWorldPose(p, true);
+    this->linkDPtr->attachedModels[i]->SetWorldPose(p, true);
   }
 }
 
@@ -1249,23 +1247,23 @@ void Link::SetKinematic(const bool &/*_kinematic*/)
 void Link::SetPublishData(const bool _enable)
 {
   {
-    boost::recursive_mutex::scoped_lock lock(*this->dataPtr->publishDataMutex);
-    if (this->dataPtr->publishData == _enable)
+    boost::recursive_mutex::scoped_lock lock(*this->linkDPtr->publishDataMutex);
+    if (this->linkDPtr->publishData == _enable)
       return;
 
-    this->dataPtr->publishData = _enable;
+    this->linkDPtr->publishData = _enable;
   }
   if (_enable)
   {
     std::string topic = "~/" + this->GetScopedName();
-    this->dataPtr->dataPub = this->node->Advertise<msgs::LinkData>(topic);
+    this->linkDPtr->dataPub = this->node->Advertise<msgs::LinkData>(topic);
     this->connections.push_back(
       event::Events::ConnectWorldUpdateEnd(
         boost::bind(&Link::PublishData, this)));
   }
   else
   {
-    this->dataPtr->dataPub.reset();
+    this->linkDPtr->dataPub.reset();
     this->connections.clear();
   }
 }
@@ -1273,7 +1271,7 @@ void Link::SetPublishData(const bool _enable)
 /////////////////////////////////////////////////
 void Link::PublishData()
 {
-  if (this->dataPtr->publishData && this->dataPtr->dataPub->HasConnections())
+  if (this->linkDPtr->publishData && this->linkDPtr->dataPub->HasConnections())
   {
     msgs::Set(this->linkDataMsg.mutable_time(), this->world->GetSimTime());
     linkDataMsg.set_name(this->GetScopedName());
@@ -1281,7 +1279,7 @@ void Link::PublishData()
         this->GetWorldLinearVel().Ign());
     msgs::Set(this->linkDataMsg.mutable_angular_velocity(),
         this->GetWorldAngularVel().Ign());
-    this->dataPtr->dataPub->Publish(this->linkDataMsg);
+    this->linkDPtr->dataPub->Publish(this->linkDataMsg);
   }
 }
 
@@ -1290,7 +1288,7 @@ common::BatteryPtr Link::Battery(const std::string &_name) const
 {
   common::BatteryPtr result;
 
-  for (auto &battery : this->dataPtr->batteries)
+  for (auto &battery : this->linkDPtr->batteries)
   {
     if (battery->Name() == _name)
     {
@@ -1305,8 +1303,8 @@ common::BatteryPtr Link::Battery(const std::string &_name) const
 /////////////////////////////////////////////////
 common::BatteryPtr Link::Battery(const size_t _index) const
 {
-  if (_index < this->dataPtr->batteries.size())
-    return this->dataPtr->batteries[_index];
+  if (_index < this->linkDPtr->batteries.size())
+    return this->linkDPtr->batteries[_index];
   else
     return common::BatteryPtr();
 }
@@ -1314,7 +1312,7 @@ common::BatteryPtr Link::Battery(const size_t _index) const
 /////////////////////////////////////////////////
 size_t Link::BatteryCount() const
 {
-  return this->dataPtr->batteries.size();
+  return this->linkDPtr->batteries.size();
 }
 
 //////////////////////////////////////////////////
@@ -1421,7 +1419,7 @@ void Link::OnCollision(ConstContactsPtr &_msg)
 
 #ifdef HAVE_OPENAL
     for (std::vector<util::OpenALSourcePtr>::iterator iter =
-        this->dataPtr->audioSources.begin(); iter != this->dataPtr->audioSources.end(); ++iter)
+        this->linkDPtr->audioSources.begin(); iter != this->linkDPtr->audioSources.end(); ++iter)
     {
       if ((*iter)->HasCollisionName(collisionName1) ||
           (*iter)->HasCollisionName(collisionName2))
@@ -1456,12 +1454,12 @@ void Link::RemoveChild(EntityPtr _child)
 /////////////////////////////////////////////////
 void Link::RemoveCollision(const std::string &_name)
 {
-  for (Collision_V::iterator iter = this->dataPtr->collisions.begin();
-       iter != this->dataPtr->collisions.end(); ++iter)
+  for (Collision_V::iterator iter = this->linkDPtr->collisions.begin();
+       iter != this->linkDPtr->collisions.end(); ++iter)
   {
     if ((*iter)->GetName() == _name || (*iter)->GetScopedName() == _name)
     {
-      this->dataPtr->collisions.erase(iter);
+      this->linkDPtr->collisions.erase(iter);
       break;
     }
   }
@@ -1816,8 +1814,8 @@ msgs::Visual Link::VisualMessage(const std::string &_name) const
 //////////////////////////////////////////////////
 void Link::OnWrenchMsg(ConstWrenchPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(this->dataPtr->wrenchMsgMutex);
-  this->dataPtr->wrenchMsgs.push_back(*_msg);
+  boost::mutex::scoped_lock lock(this->linkDPtr->wrenchMsgMutex);
+  this->linkDPtr->wrenchMsgs.push_back(*_msg);
 }
 
 //////////////////////////////////////////////////
@@ -1841,7 +1839,7 @@ void Link::LoadBattery(sdf::ElementPtr _sdf)
 {
   common::BatteryPtr battery(new common::Battery());
   battery->Load(_sdf);
-  this->dataPtr->batteries.push_back(battery);
+  this->linkDPtr->batteries.push_back(battery);
 }
 
 //////////////////////////////////////////////////
@@ -1890,4 +1888,117 @@ event::ConnectionPtr Link::ConnectEnabled(std::function<void(bool)> _subscriber)
 void Link::DisconnectEnabled(event::ConnectionPtr &_conn)
 {
   enabledSignal.Disconnect(_conn);
+}
+
+//////////////////////////////////////////////////
+bool Link::GetEnabled() const
+{
+  return this->Enabled();
+}
+
+//////////////////////////////////////////////////
+bool Link::GetGravityMode() const
+{
+  return this->GravityMode();
+}
+
+/////////////////////////////////////////////////
+void Link::SetLinearVel(const math::Vector3 &_vel)
+{
+  this->SetLinearVel(_vel.Ign());
+}
+
+/////////////////////////////////////////////////
+void Link::SetAngularVel(const math::Vector3 &_vel)
+{
+  this->SetAngluarVel(_vel.Ign());
+}
+
+/////////////////////////////////////////////////
+void Link::SetForce(const math::Vector3 &_force)
+{
+  this->SetForce(_force.Ign());
+}
+
+/////////////////////////////////////////////////
+void Link::SetTorque(const math::Vector3 &_torque)
+{
+  this->SetTorque(_torque.Ign());
+}
+
+/////////////////////////////////////////////////
+void Link::AddForce(const math::Vector3 &_force)
+{
+  this->AddForce(_force.Ign());
+}
+
+/////////////////////////////////////////////////
+void Link::AddRelativeForce(const math::Vector3 &_force)
+{
+  this->AddRelativeForce(_force.Ign());
+}
+
+/////////////////////////////////////////////////
+void Link::AddForceAtWorldPosition(const math::Vector3 &_force,
+    const math::Vector3 &_pos)
+{
+  this->AddForceAtWorldPosition(_force.Ign(), _pos.Ign());
+}
+
+/////////////////////////////////////////////////
+void Link::AddForceAtRelativePosition(const math::Vector3 &_force,
+    const math::Vector3 &_relPos)
+{
+  this->AddForceAtRelativePosition(_force.Ign(), relPos.Ign());
+}
+
+/////////////////////////////////////////////////
+void Link::AddLinkForce(const math::Vector3 &_force,
+    const math::Vector3 &_offset)
+{
+  this->AddLinkForce(_force->Ign(), _offset.Ign());
+}
+
+/////////////////////////////////////////////////
+void Link::AddTorque(const math::Vector3 &_torque)
+{
+  this->AddTorque(_torque.Ign());
+}
+
+/////////////////////////////////////////////////
+void Link::AddRelativeTorque(const math::Vector3 &_torque)
+{
+  this->AddRelativeTorque(_torque.Ign());
+}
+
+/////////////////////////////////////////////////
+math::Vector3 Link::GetWorldLinearVel(const math::Vector3 &_offset) const
+{
+  return this->WorldLinearVel(_offset.Ign());
+}
+
+/////////////////////////////////////////////////
+math::Vector3 Link::GetWorldLinearVel(
+    const math::Vector3 &_offset,
+    const math::Quaternion &_q) const
+{
+  return this->WorldLinearvel(_offset.Ign(), _q.Ign());
+}
+
+/////////////////////////////////////////////////
+math::Vector3 Link::GetWorldCoGLinearVel() const
+{
+  return this->WorldCoGLinearVel();
+}
+
+/////////////////////////////////////////////////
+math::Vector3 Link::GetWorldForce() const
+{
+  return this->WorldForce();
+}
+
+/////////////////////////////////////////////////
+math::Vector3 Link::GetWorldTorque() const
+{
+  return this->WorldTorque();
 }

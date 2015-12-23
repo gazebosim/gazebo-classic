@@ -52,7 +52,7 @@ Entity::Entity(BasePtr _parent)
 }
 
 //////////////////////////////////////////////////
-Entity::Entity(EntityProtected &_dataPtr, BasePtr _parent)
+Entity::Entity(EntityPrivate &_dataPtr, BasePtr _parent)
 : Base(_dataPtr, _parent),
   entityDPtr(static_pointer<EntityPrivate>(this->baseDPtr),
 {

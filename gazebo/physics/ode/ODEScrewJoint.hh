@@ -67,6 +67,9 @@ namespace gazebo
       public: virtual double ThreadPitch(const unsigned int _index) const;
 
       // Documentation inherited
+      public: virtual double ThreadPitch() const;
+
+      // Documentation inherited
       public: virtual double GetThreadPitch() const;
 
       // Documentation inherited

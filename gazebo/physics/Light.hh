@@ -65,7 +65,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Private data pointer
-      private: std::shared_ptr<LightPrivate> dataPtr;
+      private: LightPrivate *lightDPtr;
     };
     /// \}
   }

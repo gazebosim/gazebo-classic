@@ -14,12 +14,9 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PHYSICS_ODESPHERESHAPE_HH_
-#define _GAZEBO_PHYSICS_ODESPHERESHAPE_HH_
+#ifndef _GAZEBO_PHYSICS_ODE_ODESPHERESHAPE_HH_
+#define _GAZEBO_PHYSICS_ODE_ODESPHERESHAPE_HH_
 
-#include "gazebo/physics/ode/ODEPhysics.hh"
-#include "gazebo/physics/ode/ODECollision.hh"
-#include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/SphereShape.hh"
 #include "gazebo/util/system.hh"
 
@@ -32,26 +29,13 @@ namespace gazebo
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent Collision.
-      public: explicit ODESphereShape(ODECollisionPtr _parent)
-              : SphereShape(_parent) {}
+      public: explicit ODESphereShape(ODECollisionPtr _parent);
 
       /// \brief Destructor.
-      public: virtual ~ODESphereShape() {}
+      public: virtual ~ODESphereShape() = default;
 
       // Documentation inherited.
-      public: virtual void SetRadius(double _radius)
-      {
-        SphereShape::SetRadius(_radius);
-        ODECollisionPtr oParent;
-        oParent =
-          std::dynamic_pointer_cast<ODECollision>(this->collisionParent);
-
-        // Create the sphere geometry
-        if (oParent->GetCollisionId() == NULL)
-          oParent->SetCollision(dCreateSphere(0, _radius), true);
-        else
-          dGeomSphereSetRadius(oParent->GetCollisionId(), _radius);
-      }
+      public: virtual void SetRadius(const double _radius);
     };
   }
 }

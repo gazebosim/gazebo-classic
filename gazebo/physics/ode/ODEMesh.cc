@@ -29,19 +29,19 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 ODEMesh::ODEMesh()
-: dataPtr(new ODEMeshPrivate)
+: odeMeshDPtr(new ODEMeshPrivate)
 {
-  this->dataPtr->odeData = NULL;
-  this->dataPtr->vertices = NULL;
-  this->dataPtr->indices = NULL;
+  this->odeMeshDPtr->odeData = NULL;
+  this->odeMeshDPtr->vertices = NULL;
+  this->odeMeshDPtr->indices = NULL;
 }
 
 //////////////////////////////////////////////////
 ODEMesh::~ODEMesh()
 {
-  delete [] this->dataPtr->vertices;
-  delete [] this->dataPtr->indices;
-  dGeomTriMeshDataDestroy(this->dataPtr->odeData);
+  delete [] this->odeMeshDPtr->vertices;
+  delete [] this->odeMeshDPtr->indices;
+  dGeomTriMeshDataDestroy(this->odeMeshDPtr->odeData);
 }
 
 //////////////////////////////////////////////////
@@ -53,10 +53,10 @@ void ODEMesh::Update()
   // this is fairly important for good results.
 
   // Fill in the (4x4) matrix.
-  dReal *matrix = this->dataPtr->transform +
-    (this->dataPtr->transformIndex * 16);
-  const dReal *pos = dGeomGetPosition(this->dataPtr->collisionId);
-  const dReal *rot = dGeomGetRotation(this->dataPtr->collisionId);
+  dReal *matrix = this->odeMeshDPtr->transform +
+    (this->odeMeshDPtr->transformIndex * 16);
+  const dReal *pos = dGeomGetPosition(this->odeMeshDPtr->collisionId);
+  const dReal *rot = dGeomGetRotation(this->odeMeshDPtr->collisionId);
 
   matrix[ 0] = rot[0];
   matrix[ 1] = rot[1];
@@ -76,11 +76,11 @@ void ODEMesh::Update()
   matrix[15] = 1;
 
   // Flip to other matrix.
-  this->dataPtr->transformIndex = !this->dataPtr->transformIndex;
+  this->odeMeshDPtr->transformIndex = !this->odeMeshDPtr->transformIndex;
 
-  dGeomTriMeshSetLastTransform(this->dataPtr->collisionId,
-      *reinterpret_cast<dMatrix4*>(this->dataPtr->transform +
-                                   this->dataPtr->transformIndex * 16));
+  dGeomTriMeshSetLastTransform(this->odeMeshDPtr->collisionId,
+      *reinterpret_cast<dMatrix4*>(this->odeMeshDPtr->transform +
+                                   this->odeMeshDPtr->transformIndex * 16));
 }
 
 //////////////////////////////////////////////////
@@ -102,13 +102,14 @@ void ODEMesh::Init(const common::SubMesh *_subMesh,
   unsigned int numVertices = _subMesh->GetVertexCount();
   unsigned int numIndices = _subMesh->GetIndexCount();
 
-  this->dataPtr->vertices = NULL;
-  this->dataPtr->indices = NULL;
+  this->odeMeshDPtr->vertices = NULL;
+  this->odeMeshDPtr->indices = NULL;
 
   // Get all the vertex and index data
-  _subMesh->FillArrays(&this->dataPtr->vertices, &this->dataPtr->indices);
+  _subMesh->FillArrays(&this->odeMeshDPtr->vertices,
+      &this->odeMeshDPtr->indices);
 
-  this->dataPtr->collisionId = _collision->CollisionId();
+  this->odeMeshDPtr->collisionId = _collision->CollisionId();
 
   this->CreateMesh(numVertices, numIndices, _collision, _scale);
 }
@@ -130,13 +131,13 @@ void ODEMesh::Init(const common::Mesh *_mesh, ODECollisionPtr _collision,
   unsigned int numVertices = _mesh->GetVertexCount();
   unsigned int numIndices = _mesh->GetIndexCount();
 
-  this->dataPtr->vertices = NULL;
-  this->dataPtr->indices = NULL;
+  this->odeMeshDPtr->vertices = NULL;
+  this->odeMeshDPtr->indices = NULL;
 
   // Get all the vertex and index data
-  _mesh->FillArrays(&this->dataPtr->vertices, &this->dataPtr->indices);
+  _mesh->FillArrays(&this->odeMeshDPtr->vertices, &this->odeMeshDPtr->indices);
 
-  this->dataPtr->collisionId = _collision->CollisionId();
+  this->odeMeshDPtr->collisionId = _collision->CollisionId();
   this->CreateMesh(numVertices, numIndices, _collision, _scale);
 }
 
@@ -147,37 +148,37 @@ void ODEMesh::CreateMesh(const unsigned int _numVertices,
     const ignition::math::Vector3d &_scale)
 {
   /// This will hold the vertex data of the triangle mesh
-  if (this->dataPtr->odeData == NULL)
-    this->dataPtr->odeData = dGeomTriMeshDataCreate();
+  if (this->odeMeshDPtr->odeData == NULL)
+    this->odeMeshDPtr->odeData = dGeomTriMeshDataCreate();
 
   // Scale the vertex data
   for (unsigned int j = 0;  j < _numVertices; ++j)
   {
-    this->dataPtr->vertices[j*3+0] = this->dataPtr->vertices[j*3+0] *
+    this->odeMeshDPtr->vertices[j*3+0] = this->odeMeshDPtr->vertices[j*3+0] *
       _scale.X();
-    this->dataPtr->vertices[j*3+1] = this->dataPtr->vertices[j*3+1] *
+    this->odeMeshDPtr->vertices[j*3+1] = this->odeMeshDPtr->vertices[j*3+1] *
       _scale.Y();
-    this->dataPtr->vertices[j*3+2] = this->dataPtr->vertices[j*3+2] *
+    this->odeMeshDPtr->vertices[j*3+2] = this->odeMeshDPtr->vertices[j*3+2] *
       _scale.Z();
   }
 
   // Build the ODE triangle mesh
-  dGeomTriMeshDataBuildSingle(this->dataPtr->odeData,
-      this->dataPtr->vertices, 3*sizeof(this->dataPtr->vertices[0]),
-      _numVertices, this->dataPtr->indices, _numIndices,
-      3*sizeof(this->dataPtr->indices[0]));
+  dGeomTriMeshDataBuildSingle(this->odeMeshDPtr->odeData,
+      this->odeMeshDPtr->vertices, 3*sizeof(this->odeMeshDPtr->vertices[0]),
+      _numVertices, this->odeMeshDPtr->indices, _numIndices,
+      3*sizeof(this->odeMeshDPtr->indices[0]));
 
   if (_collision->CollisionId() == NULL)
   {
     _collision->SetSpaceId(dSimpleSpaceCreate(_collision->SpaceId()));
     _collision->SetCollision(dCreateTriMesh(_collision->SpaceId(),
-          this->dataPtr->odeData, 0, 0, 0), true);
+          this->odeMeshDPtr->odeData, 0, 0, 0), true);
   }
   else
   {
-    dGeomTriMeshSetData(_collision->CollisionId(), this->dataPtr->odeData);
+    dGeomTriMeshSetData(_collision->CollisionId(), this->odeMeshDPtr->odeData);
   }
 
-  memset(this->dataPtr->transform, 0, 32*sizeof(dReal));
-  this->dataPtr->transformIndex = 0;
+  memset(this->odeMeshDPtr->transform, 0, 32*sizeof(dReal));
+  this->odeMeshDPtr->transformIndex = 0;
 }

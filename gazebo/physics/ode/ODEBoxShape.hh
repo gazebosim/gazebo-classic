@@ -17,13 +17,8 @@
 #ifndef _GAZEBO_PHYSICS_ODEBOXSHAPE_HH_
 #define _GAZEBO_PHYSICS_ODEBOXSHAPE_HH_
 
-#include "gazebo/math/Vector3.hh"
+#include <ignition/math/Vector3.hh>
 
-#include "gazebo/physics/ode/ODEPhysics.hh"
-#include "gazebo/physics/ode/ODETypes.hh"
-#include "gazebo/physics/ode/ODECollision.hh"
-
-#include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/BoxShape.hh"
 #include "gazebo/util/system.hh"
 
@@ -36,32 +31,13 @@ namespace gazebo
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent Collision.
-      public: explicit ODEBoxShape(ODECollisionPtr _parent)
-              : BoxShape(_parent) {}
+      public: explicit ODEBoxShape(ODECollisionPtr _parent);
 
       /// \brief Destructor.
-      public: virtual ~ODEBoxShape() {}
+      public: virtual ~ODEBoxShape() = default;
 
       // Documentation inherited.
-      public: virtual void SetSize(const ignition::math::Vector3d &_size)
-      {
-        BoxShape::SetSize(_size);
-
-        ODECollisionPtr oParent;
-        oParent = std::dynamic_pointer_cast<ODECollision>(
-            this->collisionParent);
-
-        if (oParent->GetCollisionId() == NULL)
-        {
-          oParent->SetCollision(
-              dCreateBox(0, _size.X(), _size.Y(), _size.Z()), true);
-        }
-        else
-        {
-          dGeomBoxSetLengths(oParent->GetCollisionId(),
-                             _size.X(), _size.Y(), _size.Z());
-        }
-      }
+      public: virtual void SetSize(const ignition::math::Vector3d &_size);
     };
   }
 }

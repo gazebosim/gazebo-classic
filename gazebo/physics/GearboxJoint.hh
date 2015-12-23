@@ -35,9 +35,6 @@ namespace gazebo
 {
   namespace physics
   {
-    // Forward declare protected data class.
-    class GearboxJointProtected;
-
     /// \addtogroup gazebo_physics
     /// \{
 
@@ -49,16 +46,13 @@ namespace gazebo
       /// \brief Constructor
       /// \param[in] _parent Parent link
       public: GearboxJoint(BasePtr _parent)
-              : T(_parent), gearDPtr(new GearboxJointPrivate)
-      {
+              : T(_parent)      {
         this->AddType(Base::GEARBOX_JOINT);
       }
 
       /// \brief Destructor
       public: virtual ~GearboxJoint()
       {
-        delete this->gearDPtr;
-        this->gearDPtr = NULL;
       }
 
       // Documentation inherited.
@@ -74,13 +68,12 @@ namespace gazebo
 
         if (_sdf->HasElement("gearbox_ratio"))
         {
-          this->gearDPtr->gearRatio =
-            _sdf->Get<double>("gearbox_ratio");
+          this->gearRatio = _sdf->Get<double>("gearbox_ratio");
         }
         else
         {
           gzerr << "gearbox_ratio_not_specified, set to 1.\n";
-          this->gearDPtr->gearRatio = 1.0;
+          this->gearRatio = 1.0;
           /* below should bring in default values for sdf 1.4+
           this->gearRatio =
             _sdf->Get<double>("gearbox_ratio");
@@ -89,7 +82,7 @@ namespace gazebo
 
         if (_sdf->HasElement("gearbox_reference_body"))
         {
-          this->gearDPtr->referenceBody =
+          this->referenceBody =
             _sdf->Get<std::string>("gearbox_reference_body");
         }
         else
@@ -116,7 +109,7 @@ namespace gazebo
       /// \return Gear ratio value.
       public: virtual double GearboxRatio() const
       {
-        return this->gearDPtr->gearRatio;
+        return this->gearRatio;
       }
 
       /// \brief Set gearbox joint gear ratio.
@@ -131,13 +124,15 @@ namespace gazebo
       {
         Joint::FillMsg(_msg);
         msgs::Joint::Gearbox *gearboxMsg = _msg.mutable_gearbox();
-        gearboxMsg->set_gearbox_reference_body(this->gearDPtr->referenceBody);
-        gearboxMsg->set_gearbox_ratio(this->gearDPtr->gearRatio);
+        gearboxMsg->set_gearbox_reference_body(this->referenceBody);
+        gearboxMsg->set_gearbox_ratio(this->gearRatio);
       }
 
-      /// \internal
-      /// \brief Protected data pointer
-      protected: GearboxJointPrivate *gearDPtr;
+      /// \brief Gearbox gearRatio
+      protected: double gearRatio = 1.0;
+
+      /// \brief reference link/body for computing joint angles
+      protected: std::string referenceBody;
     };
     /// \}
   }

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _PHYSICSIFACE_HH_
-#define _PHYSICSIFACE_HH_
+#ifndef _GAZEBO_PHYSICS_PHYSICSIFACE_HH_
+#define _GAZEBO_PHYSICS_PHYSICSIFACE_HH_
 
 #include <string>
 #include <sdf/sdf.hh>

@@ -26,6 +26,7 @@
 #include "gazebo/physics/GearboxJoint.hh"
 #include "gazebo/physics/ScrewJoint.hh"
 #include "gazebo/physics/JointWrench.hh"
+#include "gazebo/physics/Inertial.hh"
 
 #include "gazebo/physics/ode/ODEJointPrivate.hh"
 #include "gazebo/physics/ode/ODEJoint.hh"
@@ -35,24 +36,23 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 ODEJoint::ODEJoint(BasePtr _parent)
-: Joint(*new ODEJointProtected, _parent),
-  odeJointDPtr(std::static_pointer_cast<ODEJointProtected>(this->jointDPtr)),
-  dataPtr(new ODEJointPrivate)
+: Joint(*new ODEJointPrivate, _parent),
+  odeJointDPtr(static_cast<ODEJointPrivate*>(this->jointDPtr))
 {
   this->odeJointDPtr->jointId = NULL;
-  this->dataPtr->implicitDampingState[0] = ODEJoint::NONE;
-  this->dataPtr->implicitDampingState[1] = ODEJoint::NONE;
-  this->dataPtr->stiffnessDampingInitialized = false;
-  this->dataPtr->feedback = NULL;
-  this->dataPtr->currentKd[0] = 0;
-  this->dataPtr->currentKd[1] = 0;
-  this->dataPtr->currentKp[0] = 0;
-  this->dataPtr->currentKp[1] = 0;
-  this->dataPtr->forceApplied[0] = 0;
-  this->dataPtr->forceApplied[1] = 0;
-  this->dataPtr->useImplicitSpringDamper = false;
-  this->dataPtr->stopERP = 0.0;
-  this->dataPtr->stopCFM = 0.0;
+  this->odeJointDPtr->implicitDampingState[0] = ODEJoint::NONE;
+  this->odeJointDPtr->implicitDampingState[1] = ODEJoint::NONE;
+  this->odeJointDPtr->stiffnessDampingInitialized = false;
+  this->odeJointDPtr->feedback = NULL;
+  this->odeJointDPtr->currentKd[0] = 0;
+  this->odeJointDPtr->currentKd[1] = 0;
+  this->odeJointDPtr->currentKp[0] = 0;
+  this->odeJointDPtr->currentKp[1] = 0;
+  this->odeJointDPtr->forceApplied[0] = 0;
+  this->odeJointDPtr->forceApplied[1] = 0;
+  this->odeJointDPtr->useImplicitSpringDamper = false;
+  this->odeJointDPtr->stopERP = 0.0;
+  this->odeJointDPtr->stopCFM = 0.0;
 }
 
 //////////////////////////////////////////////////
@@ -61,7 +61,7 @@ ODEJoint::~ODEJoint()
   if (this->jointDPtr->applyDamping)
     physics::Joint::DisconnectJointUpdate(this->jointDPtr->applyDamping);
 
-  delete this->dataPtr->feedback;
+  delete this->odeJointDPtr->feedback;
   this->Detach();
 
   if (this->odeJointDPtr->jointId)
@@ -80,18 +80,18 @@ void ODEJoint::Load(sdf::ElementPtr _sdf)
 
     if (elem->HasElement("implicit_spring_damper"))
     {
-      this->dataPtr->useImplicitSpringDamper = elem->Get<bool>("implicit_spring_damper");
+      this->odeJointDPtr->useImplicitSpringDamper = elem->Get<bool>("implicit_spring_damper");
     }
 
     // initializa both axis, \todo: make cfm, erp per axis
-    this->dataPtr->stopERP = elem->GetElement("limit")->Get<double>("erp");
+    this->odeJointDPtr->stopERP = elem->GetElement("limit")->Get<double>("erp");
     for (unsigned int i = 0; i < this->AngleCount(); ++i)
-      this->SetParam("stop_erp", i, this->dataPtr->stopERP);
+      this->SetParam("stop_erp", i, this->odeJointDPtr->stopERP);
 
     // initializa both axis, \todo: make cfm, erp per axis
-    this->dataPtr->stopCFM = elem->GetElement("limit")->Get<double>("cfm");
+    this->odeJointDPtr->stopCFM = elem->GetElement("limit")->Get<double>("cfm");
     for (unsigned int i = 0; i < this->AngleCount(); ++i)
-      this->SetParam("stop_cfm", i, this->dataPtr->stopCFM);
+      this->SetParam("stop_cfm", i, this->odeJointDPtr->stopCFM);
 
     if (elem->HasElement("suspension"))
     {
@@ -860,13 +860,13 @@ JointWrench ODEJoint::ForceTorque(const unsigned int /*_index*/) const
 //////////////////////////////////////////////////
 bool ODEJoint::UsesImplicitSpringDamper() const
 {
-  return this->dataPtr->useImplicitSpringDamper;
+  return this->odeJointDPtr->useImplicitSpringDamper;
 }
 
 //////////////////////////////////////////////////
 void ODEJoint::UseImplicitSpringDamper(const bool _implicit)
 {
-  this->dataPtr->useImplicitSpringDamper = _implicit;
+  this->odeJointDPtr->useImplicitSpringDamper = _implicit;
 }
 
 //////////////////////////////////////////////////
@@ -894,17 +894,17 @@ void ODEJoint::ApplyImplicitStiffnessDamping()
         angle >= this->jointDPtr->upperLimit[i].Radian() ||
         angle <= this->jointDPtr->lowerLimit[i].Radian())
     {
-      if (this->dataPtr->implicitDampingState[i] != ODEJoint::JOINT_LIMIT)
+      if (this->odeJointDPtr->implicitDampingState[i] != ODEJoint::JOINT_LIMIT)
       {
         // We have hit the actual joint limit!
         // turn off simulated damping by recovering cfm and erp,
         // and recover joint limits
-        this->SetParam("stop_erp", i, this->dataPtr->stopERP);
-        this->SetParam("stop_cfm", i, this->dataPtr->stopCFM);
+        this->SetParam("stop_erp", i, this->odeJointDPtr->stopERP);
+        this->SetParam("stop_cfm", i, this->odeJointDPtr->stopCFM);
         this->SetParam("hi_stop", i, this->jointDPtr->upperLimit[i].Radian());
         this->SetParam("lo_stop", i, this->jointDPtr->lowerLimit[i].Radian());
         this->SetParam("hi_stop", i, this->jointDPtr->upperLimit[i].Radian());
-        this->dataPtr->implicitDampingState[i] = ODEJoint::JOINT_LIMIT;
+        this->odeJointDPtr->implicitDampingState[i] = ODEJoint::JOINT_LIMIT;
       }
       /* test to see if we can reduce jitter at joint limits
       // apply spring damper explicitly if in joint limit
@@ -932,13 +932,13 @@ void ODEJoint::ApplyImplicitStiffnessDamping()
 
       // update if going into DAMPING_ACTIVE mode, or
       // if current applied damping value is not the same as predicted.
-      if (this->dataPtr->implicitDampingState[i] != ODEJoint::DAMPING_ACTIVE ||
-          !ignition::math::equal(kd, this->dataPtr->currentKd[i]) ||
-          !ignition::math::equal(kp, this->dataPtr->currentKp[i]))
+      if (this->odeJointDPtr->implicitDampingState[i] != ODEJoint::DAMPING_ACTIVE ||
+          !ignition::math::equal(kd, this->odeJointDPtr->currentKd[i]) ||
+          !ignition::math::equal(kp, this->odeJointDPtr->currentKp[i]))
       {
         // save kp, kd applied for efficiency
-        this->dataPtr->currentKd[i] = kd;
-        this->dataPtr->currentKp[i] = kp;
+        this->odeJointDPtr->currentKd[i] = kd;
+        this->odeJointDPtr->currentKp[i] = kp;
 
         // convert kp, kd to cfm, erp
         double erp, cfm;
@@ -954,7 +954,7 @@ void ODEJoint::ApplyImplicitStiffnessDamping()
             this->jointDPtr->springReferencePosition[i]);
         this->SetParam("hi_stop", i,
             this->jointDPtr->springReferencePosition[i]);
-        this->dataPtr->implicitDampingState[i] = ODEJoint::DAMPING_ACTIVE;
+        this->odeJointDPtr->implicitDampingState[i] = ODEJoint::DAMPING_ACTIVE;
       }
     }
   }
@@ -1058,11 +1058,11 @@ void ODEJoint::SetStiffnessDamping(const unsigned int _index,
     this->jointDPtr->springReferencePosition[_index] = _reference;
 
     /// reset state of implicit damping state machine.
-    if (this->dataPtr->useImplicitSpringDamper)
+    if (this->odeJointDPtr->useImplicitSpringDamper)
     {
       if (static_cast<unsigned int>(_index) < this->AngleCount())
       {
-        this->dataPtr->implicitDampingState[_index] = ODEJoint::NONE;
+        this->odeJointDPtr->implicitDampingState[_index] = ODEJoint::NONE;
       }
       else
       {
@@ -1081,13 +1081,13 @@ void ODEJoint::SetStiffnessDamping(const unsigned int _index,
     bool childStatic =
       this->Child() ? this->Child()->IsStatic() : false;
 
-    if (!this->dataPtr->stiffnessDampingInitialized)
+    if (!this->odeJointDPtr->stiffnessDampingInitialized)
     {
       if (!parentStatic && !childStatic)
       {
         this->odeJointDPtr->applyDamping = physics::Joint::ConnectJointUpdate(
           boost::bind(&ODEJoint::ApplyStiffnessDamping, this));
-        this->dataPtr->stiffnessDampingInitialized = true;
+        this->odeJointDPtr->stiffnessDampingInitialized = true;
       }
       else
       {
@@ -1108,25 +1108,25 @@ void ODEJoint::SetProvideFeedback(bool _enable)
 
   if (this->jointDPtr->provideFeedback)
   {
-    if (this->dataPtr->feedback == NULL)
+    if (this->odeJointDPtr->feedback == NULL)
     {
-      this->dataPtr->feedback = new dJointFeedback;
-      this->dataPtr->feedback->f1[0] = 0;
-      this->dataPtr->feedback->f1[1] = 0;
-      this->dataPtr->feedback->f1[2] = 0;
-      this->dataPtr->feedback->t1[0] = 0;
-      this->dataPtr->feedback->t1[1] = 0;
-      this->dataPtr->feedback->t1[2] = 0;
-      this->dataPtr->feedback->f2[0] = 0;
-      this->dataPtr->feedback->f2[1] = 0;
-      this->dataPtr->feedback->f2[2] = 0;
-      this->dataPtr->feedback->t2[0] = 0;
-      this->dataPtr->feedback->t2[1] = 0;
-      this->dataPtr->feedback->t2[2] = 0;
+      this->odeJointDPtr->feedback = new dJointFeedback;
+      this->odeJointDPtr->feedback->f1[0] = 0;
+      this->odeJointDPtr->feedback->f1[1] = 0;
+      this->odeJointDPtr->feedback->f1[2] = 0;
+      this->odeJointDPtr->feedback->t1[0] = 0;
+      this->odeJointDPtr->feedback->t1[1] = 0;
+      this->odeJointDPtr->feedback->t1[2] = 0;
+      this->odeJointDPtr->feedback->f2[0] = 0;
+      this->odeJointDPtr->feedback->f2[1] = 0;
+      this->odeJointDPtr->feedback->f2[2] = 0;
+      this->odeJointDPtr->feedback->t2[0] = 0;
+      this->odeJointDPtr->feedback->t2[1] = 0;
+      this->odeJointDPtr->feedback->t2[2] = 0;
     }
 
     if (this->odeJointDPtr->jointId)
-      dJointSetFeedback(this->odeJointDPtr->jointId, this->dataPtr->feedback);
+      dJointSetFeedback(this->odeJointDPtr->jointId, this->odeJointDPtr->feedback);
     else
       gzerr << "ODE Joint ID is invalid\n";
   }
@@ -1153,14 +1153,14 @@ void ODEJoint::SaveForce(unsigned int _index, double _force)
   // it simply records the forces commanded inside forceApplied.
   if (_index < this->AngleCount())
   {
-    if (this->dataPtr->forceAppliedTime < this->World()->GetSimTime())
+    if (this->odeJointDPtr->forceAppliedTime < this->World()->GetSimTime())
     {
       // reset forces if time step is new
-      this->dataPtr->forceAppliedTime = this->World()->GetSimTime();
-      this->dataPtr->forceApplied[0] = this->dataPtr->forceApplied[1] = 0;
+      this->odeJointDPtr->forceAppliedTime = this->World()->GetSimTime();
+      this->odeJointDPtr->forceApplied[0] = this->odeJointDPtr->forceApplied[1] = 0;
     }
 
-    this->dataPtr->forceApplied[_index] += _force;
+    this->odeJointDPtr->forceApplied[_index] += _force;
   }
   else
     gzerr << "Something's wrong, joint [" << this->ScopedName()
@@ -1173,7 +1173,7 @@ double ODEJoint::Force(const unsigned int _index) const
 {
   if (_index < this->AngleCount())
   {
-    return this->dataPtr->forceApplied[_index];
+    return this->odeJointDPtr->forceApplied[_index];
   }
   else
   {
@@ -1186,7 +1186,7 @@ double ODEJoint::Force(const unsigned int _index) const
 //////////////////////////////////////////////////
 void ODEJoint::ApplyStiffnessDamping()
 {
-  if (this->dataPtr->useImplicitSpringDamper)
+  if (this->odeJointDPtr->useImplicitSpringDamper)
     this->ApplyImplicitStiffnessDamping();
   else
     this->ApplyExplicitStiffnessDamping();
@@ -1228,7 +1228,7 @@ double ODEJoint::GetStopERP()
 //////////////////////////////////////////////////
 double ODEJoint::StopERP() const
 {
-  return this->dataPtr->stopERP;
+  return this->odeJointDPtr->stopERP;
 }
 
 //////////////////////////////////////////////////
@@ -1240,5 +1240,5 @@ double ODEJoint::GetStopCFM()
 //////////////////////////////////////////////////
 double ODEJoint::StopCFM() const
 {
-  return this->dataPtr->stopCFM;
+  return this->odeJointDPtr->stopCFM;
 }

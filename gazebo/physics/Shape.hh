@@ -23,7 +23,6 @@
   #include <Winsock2.h>
 #endif
 
-#include <string>
 #include <ignition/math/Vector3.hh>
 
 #include "gazebo/msgs/msgs.hh"
@@ -35,6 +34,9 @@ namespace gazebo
 {
   namespace physics
   {
+    // Forward declare private data class.
+    class ShapePrivate;
+
     /// \addtogroup gazebo_physics
     /// \{
 
@@ -73,7 +75,7 @@ namespace gazebo
 
       /// \brief Fill in the values for a geometry message.
       /// \param[out] _msg The geometry message to fill.
-      public: virtual void FillMsg(const msgs::Geometry &_msg) = 0;
+      public: virtual void FillMsg(msgs::Geometry &_msg) = 0;
 
       /// \brief Process a geometry message.
       /// \param[in] _msg The message to set values from.
@@ -84,11 +86,15 @@ namespace gazebo
       /// \return The shape volume in kg/m^3.
       public: virtual double ComputeVolume() const;
 
-      /// \brief This shape's collision parent.
-      protected: CollisionPtr collisionParent;
+      /// \internal
+      /// \brief Constructor used by inherited classes
+      /// \param[in] _dataPtr Pointer to protected data
+      /// \param[in] _parent Pointer to parent of this object
+      protected: Shape(ShapePrivate &_dataPtr, BasePtr _parent);
 
-      /// \brief This shape's scale;
-      protected: ignition::math::Vector3d scale = ignition::math::Vector3d::One;
+      /// \internal
+      /// \brief Private data pointer
+      protected: ShapePrivate *shapeDPtr;
     };
     /// \}
   }

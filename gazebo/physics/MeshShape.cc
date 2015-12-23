@@ -30,6 +30,7 @@
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/MeshShapePrivate.hh"
 #include "gazebo/physics/MeshShape.hh"
 
 using namespace gazebo;
@@ -37,9 +38,10 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 MeshShape::MeshShape(CollisionPtr _parent)
-  : Shape(_parent)
+: Shape(*new MeshShapePrivate, _parent),
+  meshShapeDPtr(static_cast<MeshShapePrivate*>(this->shapeDPtr))
 {
-  this->submesh = NULL;
+  this->meshShapeDPtr->meshShapeDPtr->submesh = NULL;
   this->AddType(Base::MESH_SHAPE);
   sdf::initFile("mesh_shape.sdf", this->sdf);
 }
@@ -55,9 +57,9 @@ void MeshShape::Init()
   std::string meshStr = this->sdf->Get<std::string>("uri");
 
   common::MeshManager *meshManager = common::MeshManager::Instance();
-  this->mesh = meshManager->GetMesh(meshStr);
+  this->meshShapeDPtr->mesh = meshManager->GetMesh(meshStr);
 
-  if (!this->mesh)
+  if (!this->meshShapeDPtr->mesh)
   {
     meshStr = common::find_file(this->sdf->Get<std::string>("uri"));
 
@@ -67,13 +69,13 @@ void MeshShape::Init()
       return;
     }
 
-    if ((this->mesh = meshManager->Load(meshStr)) == NULL)
+    if ((this->meshShapeDPtr->mesh = meshManager->Load(meshStr)) == NULL)
       gzerr << "Unable to load mesh from file[" << meshStr << "]\n";
   }
 
-  if (this->submesh)
-    delete this->submesh;
-  this->submesh = NULL;
+  if (this->meshShapeDPtr->meshShapeDPtr->submesh)
+    delete this->meshShapeDPtr->meshShapeDPtr->submesh;
+  this->meshShapeDPtr->meshShapeDPtr->submesh = NULL;
 
   if (this->sdf->HasElement("submesh"))
   {
@@ -81,13 +83,14 @@ void MeshShape::Init()
     std::string submeshName = submeshElem->Get<std::string>("name");
     if (submeshName != "__default__" && !submeshName.empty())
     {
-      const common::SubMesh *smesh = this->mesh->GetSubMesh(submeshName);
+      const common::SubMesh *smesh =
+        this->meshShapeDPtr->mesh->GetSubMesh(submeshName);
       if (smesh)
       {
-        this->submesh = new common::SubMesh(
-          this->mesh->GetSubMesh(submeshName));
+        this->meshShapeDPtr->meshShapeDPtr->submesh = new common::SubMesh(
+          this->meshShapeDPtr->mesh->GetSubMesh(submeshName));
 
-        if (!this->submesh)
+        if (!this->meshShapeDPtr->meshShapeDPtr->submesh)
           gzthrow("Unable to get submesh with name[" +
               submeshElem->Get<std::string>("name") + "]");
 
@@ -95,7 +98,8 @@ void MeshShape::Init()
         if (submeshElem->HasElement("center") &&
             submeshElem->Get<bool>("center"))
         {
-          this->submesh->Center(ignition::math::Vector3d::Zero);
+          this->meshShapeDPtr->meshShapeDPtr->submesh->Center(
+              ignition::math::Vector3d::Zero);
         }
       }
     }
@@ -129,13 +133,19 @@ ignition::math::Vector3d MeshShape::Size() const
 //////////////////////////////////////////////////
 std::string MeshShape::GetMeshURI() const
 {
+  return this->MeshURI();
+}
+
+//////////////////////////////////////////////////
+std::string MeshShape::MeshURI() const
+{
   return this->sdf->Get<std::string>("uri");
 }
 
 //////////////////////////////////////////////////
 void MeshShape::SetMesh(const std::string &_uri,
-                           const std::string &_submesh,
-                           bool _center)
+                        const std::string &_submesh,
+                        const bool _center)
 {
   this->sdf->GetElement("uri")->Set(_uri);
 

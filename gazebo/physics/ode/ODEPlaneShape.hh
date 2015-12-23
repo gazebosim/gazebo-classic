@@ -16,9 +16,9 @@
 */
 #ifndef _GAZEBO_PHYSICS_ODE_ODEPLANESHAPE_HH_
 #define _GAZEBO_PHYSICS_ODE_ODEPLANESHAPE_HH_
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/physics/PlaneShape.hh"
-#include "gazebo/physics/ode/ODEPhysics.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -30,48 +30,16 @@ namespace gazebo
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent Collision.
-      public: explicit ODEPlaneShape(CollisionPtr _parent)
-              : PlaneShape(_parent) {}
+      public: explicit ODEPlaneShape(CollisionPtr _parent);
 
       /// \brief Destructor.
-      public: virtual ~ODEPlaneShape() {}
+      public: virtual ~ODEPlaneShape() = default;
 
       // Documentation inherited
-      public: virtual void CreatePlane()
-      {
-        PlaneShape::CreatePlane();
-        ODECollisionPtr oParent;
-        oParent =
-          std::dynamic_pointer_cast<ODECollision>(this->collisionParent);
-        ignition::math::Pose3d pose = oParent->GetWorldPose().Ign();
-        double altitude = pose.Pos().Z();
-        ignition::math::Vector3d n = this->Normal();
-        if (oParent->GetCollisionId() == NULL)
-          oParent->SetCollision(dCreatePlane(oParent->GetSpaceId(),
-                n.X(), n.Y(), n.Z(), altitude), false);
-        else
-          dGeomPlaneSetParams(oParent->GetCollisionId(),
-                              n.X(), n.Y(), n.Z(), altitude);
-      }
+      public: virtual void CreatePlane();
 
       // Documentation inherited
-      public: virtual void SetAltitude(const ignition::math::Vector3d &_pos)
-      {
-        PlaneShape::SetAltitude(_pos);
-        ODECollisionPtr odeParent;
-        odeParent =
-          std::dynamic_pointer_cast<ODECollision>(this->collisionParent);
-
-        dVector4 vec4;
-
-        dGeomPlaneGetParams(odeParent->GetCollisionId(), vec4);
-
-        // Compute "altitude": scalar product of position and normal
-        vec4[3] = vec4[0] * _pos.X() + vec4[1] * _pos.Y() + vec4[2] * _pos.Z();
-
-        dGeomPlaneSetParams(odeParent->GetCollisionId(), vec4[0], vec4[1],
-                            vec4[2], vec4[3]);
-      }
+      public: virtual void SetAltitude(const ignition::math::Vector3d &_pos);
     };
   }
 }

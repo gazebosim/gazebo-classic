@@ -2,7 +2,9 @@ include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
 set (sources ${sources}
   ode/ODEBallJoint.cc
+  ode/ODEBoxShape.cc
   ode/ODECollision.cc
+  ode/ODECylinderShape.cc
   ode/ODEFixedJoint.cc
   ode/ODEGearboxJoint.cc
   ode/ODEHeightmapShape.cc
@@ -14,10 +16,12 @@ set (sources ${sources}
   ode/ODEMeshShape.cc
   ode/ODEMultiRayShape.cc
   ode/ODEPhysics.cc
+  ode/ODEPlaneShape.cc
   ode/ODEPolylineShape.cc
   ode/ODERayShape.cc
   ode/ODEScrewJoint.cc
   ode/ODESliderJoint.cc
+  ode/ODESphereShape.cc
   ode/ODESurfaceParams.cc
   ode/ODEUniversalJoint.cc
   PARENT_SCOPE

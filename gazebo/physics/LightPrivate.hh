@@ -26,7 +26,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief Light entity private data.
-    class LightPrivate : public EntityProtected
+    class LightPrivate : public EntityPrivate
     {
       /// \brief Light message container.
       public: msgs::Light msg;

@@ -21,12 +21,7 @@
 #include <vector>
 #include <ignition/math/Vector3.hh>
 
-#include "gazebo/common/ImageHeightmap.hh"
-#include "gazebo/common/HeightmapData.hh"
-#include "gazebo/common/Dem.hh"
 #include "gazebo/math/Vector3.hh"
-#include "gazebo/transport/TransportTypes.hh"
-#include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Shape.hh"
 #include "gazebo/util/system.hh"
 
@@ -34,10 +29,14 @@ namespace gazebo
 {
   namespace physics
   {
+    // Forward declare private data class.
+    class HeightmapShapePrivate;
+
     /// \addtogroup gazebo_physics
     /// \{
 
-    /// \class HeightmapShape HeightmapShape.hh physics/physics.hh
+    /// \class HeightmapShape HeightmapShape.hh
+    /// gazebo/physics/HeightmapShape.hh
     /// \brief HeightmapShape collision shape builds a heightmap from
     /// an image.  The supplied image must be square with
     /// N*N+1 pixels per side, where N is an integer.
@@ -160,7 +159,7 @@ namespace gazebo
       /// \return Image where white pixels represents the highest locations,
       /// and black pixels the lowest.
       /// \deprecated See Image() const
-      public: common::Image GetImage() const GAZEBO_DEPRCATED(7.0);
+      public: common::Image GetImage() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Return an image representation of the heightmap.
       /// \return Image where white pixels represents the highest locations,
@@ -190,24 +189,6 @@ namespace gazebo
       /// \brief Handle request messages.
       /// \param[in] _msg The request message.
       private: void OnRequest(ConstRequestPtr &_msg);
-
-      /// \brief Lookup table of heights.
-      protected: std::vector<float> heights;
-
-      /// \brief Image used to generate the heights.
-      protected: common::ImageHeightmap img;
-
-      /// \brief HeightmapData used to generate the heights.
-      protected: common::HeightmapData *heightmapData;
-
-      /// \brief Size of the height lookup table.
-      protected: unsigned int vertSize;
-
-      /// \brief True to flip the heights along the y direction.
-      protected: bool flipY;
-
-      /// \brief The amount of subsampling. Default is 2.
-      protected: int subSampling;
 
       /// \internal
       /// \brief Private data pointer.

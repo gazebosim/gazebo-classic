@@ -37,9 +37,6 @@ namespace gazebo
 {
   namespace physics
   {
-    // Forward declare protected data class.
-    class JointProtected;
-
     // Forward declare private data class.
     class JointPrivate;
 
@@ -927,7 +924,7 @@ namespace gazebo
       /// \brief Constructor used by inherited classes
       /// \param[in] _dataPtr Pointer to protected data
       /// \param[in] _parent Parent of the joint.
-      protected: Joint(JointProtected &_dataPtr, BasePtr _parent);
+      protected: Joint(JointPrivate &_dataPtr, BasePtr _parent);
 
       /// \brief Helper function for maximal coordinate solver SetPosition.
       /// The child links of this joint are updated based on position change.
@@ -1006,11 +1003,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Private data pointer
-      protected: std::shared_ptr<JointProtected> jointDPtr;
-
-      /// \internal
-      /// \brief Private data pointer
-      private: std::unique_ptr<JointPrivate> dataPtr;
+      protected: JointPrivate *jointDPtr;
     };
     /// \}
   }

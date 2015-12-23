@@ -19,7 +19,6 @@
 
 #include <string>
 
-#include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Shape.hh"
 #include "gazebo/util/system.hh"
 
@@ -27,10 +26,13 @@ namespace gazebo
 {
   namespace physics
   {
+    // Forward declare private data class
+    class RayShapePrivate;
+
     /// \addtogroup gazebo_physics
     /// \{
 
-    /// \class RayShape RayShape.hh physics/physics.hh
+    /// \class RayShape RayShape.hh gazebo/physics/RayShape.hh
     /// \brief Base class for Ray collision geometry
     class GZ_PHYSICS_VISIBLE RayShape : public Shape
     {
@@ -60,7 +62,6 @@ namespace gazebo
       public: virtual void SetPoints(const ignition::math::Vector3d &_posStart,
                                      const ignition::math::Vector3d &_posEnd);
 
-
       /// \brief Get the relative starting and ending points.
       /// \param[in] _posA Returns the starting point.
       /// \param[in] _posB Returns the ending point.
@@ -69,8 +70,8 @@ namespace gazebo
                   math::Vector3 &_posB) GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the relative starting and ending points.
-      /// \param[in] _posA Returns the starting point.
-      /// \param[in] _posB Returns the ending point.
+      /// \param[out] _posA Returns the starting point.
+      /// \param[out] _posB Returns the ending point.
       public: virtual void RelativePoints(ignition::math::Vector3d &_posA,
                   ignition::math::Vector3d &_posB);
 
@@ -89,11 +90,16 @@ namespace gazebo
 
       /// \brief Set the length of the ray.
       /// \param[in] _len Length of the array.
-      public: virtual void SetLength(double _len);
+      public: virtual void SetLength(const double _len);
 
       /// \brief Get the length of the ray.
       /// \return The ray length.
-      public: double GetLength() const;
+      /// \deprecated See Length() const
+      public: double GetLength() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the length of the ray.
+      /// \return The ray length.
+      public: double Length() const;
 
       /// \brief Set the scale of the ray
       /// \deprecated See function that accepts ignition::math parameters.
@@ -109,24 +115,41 @@ namespace gazebo
       /// \brief Get the nearest intersection.
       /// \param[out] _dist Distance to the intersection.
       /// \param[out] _entity Name of the entity the ray intersected with.
+      /// \deprecated See Intersection(double, std::string)
       public: virtual void GetIntersection(double &_dist,
-                                           std::string &_entity) = 0;
+                  std::string &_entity) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the nearest intersection.
+      /// \param[out] _dist Distance to the intersection.
+      /// \param[out] _entity Name of the entity the ray intersected with.
+      public: virtual void Intersection(double &_dist,
+                  std::string &_entity) = 0;
 
       /// \brief Set the retro-reflectivness detected by this ray.
       /// \param[in] _retro Retro reflectance value.
-      public: void SetRetro(float _retro);
+      public: void SetRetro(const float _retro);
 
       /// \brief Get the retro-reflectivness detected by this ray.
       /// \return Retro reflectance value.
-      public: float GetRetro() const;
+      /// \deprecated See Retro() const
+      public: float GetRetro() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the retro-reflectivness detected by this ray.
+      /// \return Retro reflectance value.
+      public: float Retro() const;
 
       /// \brief Set the fiducial id detected by this ray.
       /// \param[in] _fid Fiducial id detected by this ray.
-      public: void SetFiducial(int _fid);
+      public: void SetFiducial(const int _fid);
 
       /// \brief Get the fiducial id detected by this ray.
       /// \return Fiducial id detected.
-      public: int GetFiducial() const;
+      /// \deprecated See Fiducial() const
+      public: int GetFiducial() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the fiducial id detected by this ray.
+      /// \return Fiducial id detected.
+      public: int Fiducial() const;
 
       /// \brief In the ray.
       public: virtual void Init();
@@ -144,28 +167,9 @@ namespace gazebo
       /// Documentation inherited
       public: virtual double ComputeVolume() const;
 
-      // Contact information; this is filled out during collision
-      // detection.
-      /// \brief Length of the ray.
-      protected: double contactLen;
-
-      /// \brief Retro reflectance value
-      protected: double contactRetro;
-
-      /// \brief Fiducial ID value.
-      protected: int contactFiducial;
-
-      /// \brief Start position of the ray, relative to the body
-      protected: ignition::math::Vector3d relativeStartPos;
-
-      /// \brief End position of the ray, relative to the body
-      protected: ignition::math::Vector3d relativeEndPos;
-
-      /// \brief Start position of the ray in global cs
-      protected: ignition::math::Vector3d globalStartPos;
-
-      /// \brief End position of the ray in global cs
-      protected: ignition::math::Vector3d globalEndPos;
+      /// \internal
+      /// \brief Private class pointer
+      protected: RayShapePrivate *rayShapeDPtr;
     };
     /// \}
   }

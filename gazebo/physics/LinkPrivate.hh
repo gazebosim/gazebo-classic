@@ -16,17 +16,25 @@
 */
 #ifndef _GAZEBO_PHYSICS_LINK_PRIVATE_HH_
 #define _GAZEBO_PHYSICS_LINK_PRIVATE_HH_
+#include <vector>
+#include <map>
+#include <string>
+#include <ignition/math/Vector3.hh>
+#include <ignition/math/Pose3.hh>
 
+#include "gazebo/transport/transport.hh"
 #include "gazebo/util/OpenAL.hh"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/physics/Inertial.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/EntityPrivate.hh"
 
 namespace gazebo
 {
   namespace physics
   {
-    /// \internal
-    /// \brief Protected Link data
-    class LinkProtected : public EntityProtected
+    /// \brief Private Link data
+    class LinkPrivate : public EntityPrivate
     {
       /// \brief Inertial properties.
       public: InertialPtr inertial;
@@ -42,21 +50,17 @@ namespace gazebo
       public: Visuals_M visuals;
 
       /// \brief Linear acceleration.
-      public: math::Vector3 linearAccel;
+      public: ignition::math::Vector3d linearAccel;
 
       /// \brief Angular acceleration.
-      public: math::Vector3 angularAccel;
+      public: ignition::math::Vector3d angularAccel;
 
       /// \brief Offsets for the attached models.
-      public: std::vector<math::Pose> attachedModelsOffset;
+      public: std::vector<ignition::math::Pose3d> attachedModelsOffset;
 
       /// \brief This flag is set to true when the link is initialized.
       public: bool initialized = false;
-    };
 
-    /// \brief Private Link data
-    class LinkPrivate
-    {
       /// \brief Event used when the link is enabled or disabled.
       public: event::EventT<void (bool)> enabledSignal;
 

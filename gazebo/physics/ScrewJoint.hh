@@ -26,8 +26,8 @@ namespace gazebo
 {
   namespace physics
   {
-    // Forward declare protected data class.
-    class ScrewJointProtected;
+    // Forward declare private data class.
+    class ScrewJointPrivate;
 
     /// \addtogroup gazebo_physics
     /// \{
@@ -61,7 +61,7 @@ namespace gazebo
       {
         T::Load(_sdf);
 
-        this->screwDPtr->threadPitch =
+        this->threadPitch =
           _sdf->GetElement("thread_pitch")->Get<double>();
       }
 
@@ -92,14 +92,14 @@ namespace gazebo
       /// motion or rad / m in metric.
       /// This must be implemented in a child class
       /// \return _threadPitch Thread pitch value.
-      public: virtual double ThreadPitch() = 0;
+      public: virtual double ThreadPitch() const = 0;
 
       // Documentation inherited
       public: virtual void FillMsg(msgs::Joint &_msg)
       {
         Joint::FillMsg(_msg);
         msgs::Joint::Screw *screwMsg = _msg.mutable_screw();
-        screwMsg->set_thread_pitch(this->screwDPtr->threadPitch);
+        screwMsg->set_thread_pitch(this->threadPitch);
       }
 
       /// \brief Initialize joint
@@ -108,9 +108,8 @@ namespace gazebo
         T::Init();
       }
 
-      /// \internal
-      /// \brief Private screw joint protected
-      protected: std::unique_ptr<ScrewJointProtected> screwDPtr;
+      /// \brief Pitch of the thread.
+      protected: double threadPitch = 0.0;
     };
     /// \}
   }

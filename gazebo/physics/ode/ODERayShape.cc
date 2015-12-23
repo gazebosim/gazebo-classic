@@ -17,6 +17,7 @@
 #include "gazebo/common/Assert.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Link.hh"
+#include "gazebo/physics/RayShapePrivate.hh"
 #include "gazebo/physics/ode/ODEPhysics.hh"
 #include "gazebo/physics/ode/ODETypes.hh"
 #include "gazebo/physics/ode/ODECollision.hh"
@@ -36,7 +37,7 @@ ODERayShape::ODERayShape(PhysicsEnginePtr _physicsEngine)
   this->geomId = dCreateRay(this->physicsEngine->GetSpaceId(), 2.0);
   dGeomSetCategoryBits(this->geomId, GZ_SENSOR_COLLIDE);
   dGeomSetCollideBits(this->geomId, ~GZ_SENSOR_COLLIDE);
-  this->collisionParent.reset();
+  this->shapeDPtr->collisionParent.reset();
 }
 
 
@@ -48,13 +49,13 @@ ODERayShape::ODERayShape(CollisionPtr _parent)
   this->SetName("ODE Ray Shape");
 
   ODECollisionPtr collision =
-    std::static_pointer_cast<ODECollision>(this->collisionParent);
+    std::static_pointer_cast<ODECollision>(this->rayShapeDPtr->collisionParent);
 
   this->physicsEngine = std::static_pointer_cast<ODEPhysics>(
-      this->collisionParent->GetWorld()->GetPhysicsEngine());
+      this->shapeDPtr->collisionParent->World()->GetPhysicsEngine());
 
-  GZ_ASSERT(collision->GetSpaceId() != 0, "Ray collision space is NULL");
-  this->geomId = dCreateRay(collision->GetSpaceId(), 1.0);
+  GZ_ASSERT(collision->SpaceId() != 0, "Ray collision space is NULL");
+  this->geomId = dCreateRay(collision->SpaceId(), 1.0);
 
   // Create default ray with unit length
   collision->SetCollision(this->geomId, false);
@@ -73,42 +74,43 @@ void ODERayShape::Update()
 {
   ignition::math::Vector3d dir;
 
-  if (this->collisionParent)
+  if (this->shapeDPtr->collisionParent)
   {
     ODECollisionPtr collision =
-      std::static_pointer_cast<ODECollision>(this->collisionParent);
+      std::static_pointer_cast<ODECollision>(this->shapeDPtr->collisionParent);
 
-    this->globalStartPos =
-      this->collisionParent->GetLink()->GetWorldPose().CoordPositionAdd(
-          this->relativeStartPos).Ign();
+    this->rayShapeDPtr->globalStartPos =
+      this->shapeDPtr->collisionParent->Link()->WorldPose().CoordPositionAdd(
+          this->rayShapeDPtr->relativeStartPos);
 
-    this->globalEndPos =
-      this->collisionParent->GetLink()->GetWorldPose().CoordPositionAdd(
-          this->relativeEndPos).Ign();
+    this->rayShapeDPtr->globalEndPos =
+      this->shapeDPtr->collisionParent->Link()->WorldPose().CoordPositionAdd(
+          this->rayShapeDPtr->relativeEndPos);
   }
 
-  dir = this->globalEndPos - this->globalStartPos;
+  dir = this->rayShapeDPtr->globalEndPos - this->rayShapeDPtr->globalStartPos;
   dir.Normalize();
 
-  if (!ignition::math::equal(this->contactLen, 0.0))
+  if (!ignition::math::equal(this->rayShapeDPtr->contactLen, 0.0))
   {
     dGeomRaySet(this->geomId,
-        this->globalStartPos.X(),
-        this->globalStartPos.Y(),
-        this->globalStartPos.Z(),
+        this->rayShapeDPtr->globalStartPos.X(),
+        this->rayShapeDPtr->globalStartPos.Y(),
+        this->rayShapeDPtr->globalStartPos.Z(),
         dir.X(), dir.Y(), dir.Z());
 
     dGeomRaySetLength(this->geomId,
-        this->globalStartPos.Distance(this->globalEndPos));
+        this->rayShapeDPtr->globalStartPos.Distance(
+          this->rayShapeDPtr->globalEndPos));
   }
 }
 
 //////////////////////////////////////////////////
-void ODERayShape::GetIntersection(double &_dist, std::string &_entity)
+void ODERayShape::Intersection(double &_dist, std::string &_entity)
 {
   if (this->physicsEngine)
   {
-    Intersection intersection;
+    ODERayShape::Intersection intersection;
     intersection.depth = 1000;
 
     {
@@ -124,13 +126,6 @@ void ODERayShape::GetIntersection(double &_dist, std::string &_entity)
     _dist = intersection.depth;
     _entity = intersection.name;
   }
-}
-
-//////////////////////////////////////////////////
-void ODERayShape::SetPoints(const math::Vector3 &_posStart,
-                            const math::Vector3 &_posEnd)
-{
-  this->SetPoints(_posStart.Ign(), _posEnd.Ign());
 }
 
 //////////////////////////////////////////////////
@@ -207,7 +202,7 @@ void ODERayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
         if (contact.depth < inter->depth)
         {
           inter->depth = contact.depth;
-          inter->name = hitCollision->GetScopedName();
+          inter->name = hitCollision->ScopedName();
         }
       }
     }

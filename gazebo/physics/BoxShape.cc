@@ -88,7 +88,7 @@ void BoxShape::SetScale(const ignition::math::Vector3d &_scale)
 }
 
 //////////////////////////////////////////////////
-void BoxShape::FillMsg(const msgs::Geometry &_msg)
+void BoxShape::FillMsg(msgs::Geometry &_msg)
 {
   _msg.set_type(msgs::Geometry::BOX);
   msgs::Set(_msg.mutable_box()->mutable_size(), this->Size());

@@ -45,7 +45,7 @@ sdf::ElementPtr Joint::sdfJoint;
 //////////////////////////////////////////////////
 Joint::Joint(BasePtr _parent)
 : Base(*new JointPrivate, _parent),
-  jointDPtr(std::static_pointer_cast<JointProtected>(this->baseDPtr))
+  jointDPtr(static_cast<JointPrivate*>(this->baseDPtr))
 {
   this->ConstructionHelper();
 }
@@ -53,7 +53,7 @@ Joint::Joint(BasePtr _parent)
 //////////////////////////////////////////////////
 Joint::Joint(BasePtr _parent)
 : Base(*new JointPrivate, _parent),
-  jointDPtr(std::static_pointer_cast<JointProtected>(this->baseDPtr)
+  jointDPtr(static_cast<JointPrivate*>(this->baseDPtr)
 {
   this->ConstructionHelper();
 }
@@ -77,19 +77,19 @@ void Joint::ConstructionHelper()
   this->jointDPtr->springReferencePosition[0] = 0;
   this->jointDPtr->springReferencePosition[1] = 0;
   this->jointDPtr->provideFeedback = false;
-  this->dataPtr->stopStiffness[0] = 1e8;
-  this->dataPtr->stopDissipation[0] = 1.0;
-  this->dataPtr->stopStiffness[1] = 1e8;
-  this->dataPtr->stopDissipation[1] = 1.0;
+  this->jointDPtr->stopStiffness[0] = 1e8;
+  this->jointDPtr->stopDissipation[0] = 1.0;
+  this->jointDPtr->stopStiffness[1] = 1e8;
+  this->jointDPtr->stopDissipation[1] = 1.0;
   // these flags are related to issue #494
   // set default to true for backward compatibility
   this->jointDPtr->axisParentModelFrame[0] = true;
   this->jointDPtr->axisParentModelFrame[1] = true;
 
-  if (!this->dataPtr->sdfJoint)
+  if (!this->jointDPtr->sdfJoint)
   {
-    this->dataPtr->sdfJoint.reset(new sdf::Element);
-    sdf::initFile("joint.sdf", this->dataPtr->sdfJoint);
+    this->jointDPtr->sdfJoint.reset(new sdf::Element);
+    sdf::initFile("joint.sdf", this->jointDPtr->sdfJoint);
   }
 }
 
@@ -135,7 +135,7 @@ bool Joint::Load(LinkPtr _parent, LinkPtr _child,
 
   // Joint is loaded without sdf from a model
   // Initialize this->jointDPtr->sdf so it can be used for data storage
-  this->jointDPtr->sdf = this->dataPtr->sdfJoint->Clone();
+  this->jointDPtr->sdf = this->jointDPtr->sdfJoint->Clone();
 
   return this->LoadImpl(_pose);
 }
@@ -219,8 +219,8 @@ void Joint::Load(sdf::ElementPtr _sdf)
       this->jointDPtr->upperLimit[index] = limitElem->Get<double>("upper");
       this->jointDPtr->lowerLimit[index] = limitElem->Get<double>("lower");
       // store joint stop stiffness and dissipation coefficients
-      this->dataPtr->stopStiffness[index] = limitElem->Get<double>("stiffness");
-      this->dataPtr->stopDissipation[index] = limitElem->Get<double>("dissipation");
+      this->jointDPtr->stopStiffness[index] = limitElem->Get<double>("stiffness");
+      this->jointDPtr->stopDissipation[index] = limitElem->Get<double>("dissipation");
       // store joint effort and velocity limits
       this->jointDPtr->effortLimit[index] = limitElem->Get<double>("effort");
       this->jointDPtr->velocityLimit[index] = limitElem->Get<double>("velocity");
@@ -534,7 +534,7 @@ double Joint::VelocityLimit(const unsigned int _index) const
 //////////////////////////////////////////////////
 void Joint::Update()
 {
-  this->dataPtr->jointUpdate();
+  this->jointDPtr->jointUpdate();
 }
 
 //////////////////////////////////////////////////
@@ -550,7 +550,7 @@ void Joint::Reset()
   {
     this->SetVelocity(i, 0.0);
   }
-  this->dataPtr->staticAngle.SetFromRadian(0);
+  this->jointDPtr->staticAngle.SetFromRadian(0);
 }
 
 //////////////////////////////////////////////////
@@ -751,7 +751,7 @@ math::Angle Joint::GetAngle(unsigned int _index) const
 ignition::math::Angle Joint::Angle(const unsigned int _index) const
 {
   if (this->jointDPtr->model->IsStatic())
-    return this->dataPtr->staticAngle;
+    return this->jointDPtr->staticAngle;
   else
     return this->AngleImpl(_index);
 }
@@ -796,13 +796,13 @@ bool Joint::SetPosition(const unsigned int /*_index*/, const double _position)
   {
     if (this->jointDPtr->model->IsStatic())
     {
-      this->dataPtr->staticAngle = _position;
+      this->jointDPtr->staticAngle = _position;
     }
   }
   else
   {
     gzwarn << "model not setup yet, setting staticAngle.\n";
-    this->dataPtr->staticAngle = _position;
+    this->jointDPtr->staticAngle = _position;
   }
   return true;
 }
@@ -1353,7 +1353,7 @@ void Joint::SetStopStiffness(const unsigned int _index, const double _stiffness)
 {
   if (_index < this->AngleCount())
   {
-    this->dataPtr->stopStiffness[_index] = _stiffness;
+    this->jointDPtr->stopStiffness[_index] = _stiffness;
   }
   else
   {
@@ -1368,7 +1368,7 @@ void Joint::SetStopDissipation(const unsigned int _index,
 {
   if (_index < this->AngleCount())
   {
-    this->dataPtr->stopDissipation[_index] = _dissipation;
+    this->jointDPtr->stopDissipation[_index] = _dissipation;
   }
   else
   {
@@ -1388,7 +1388,7 @@ double Joint::StopStiffness(const unsigned int _index) const
 {
   if (_index < this->AngleCount())
   {
-    return this->dataPtr->stopStiffness[_index];
+    return this->jointDPtr->stopStiffness[_index];
   }
   else
   {
@@ -1409,7 +1409,7 @@ double Joint::StopDissipation(const unsigned int _index) const
 {
   if (_index < this->AngleCount())
   {
-    return this->dataPtr->stopDissipation[_index];
+    return this->jointDPtr->stopDissipation[_index];
   }
   else
   {
@@ -1666,7 +1666,7 @@ ignition::math::Pose3d Joint::ChildLinkPose(const unsigned int _index,
     // Joint Trajectory velocity and use time step since last update.
     /*
     double dt =
-      this->dataPtr->model->GetWorld()->GetPhysicsEngine()->GetMaxStepTime();
+      this->jointDPtr->model->GetWorld()->GetPhysicsEngine()->GetMaxStepTime();
     this->ComputeAndSetLinkTwist(_link, newWorldPose, newWorldPose, dt);
     */
   }
@@ -1687,7 +1687,7 @@ ignition::math::Pose3d Joint::ChildLinkPose(const unsigned int _index,
     /// velocity and use time step since last update.
     /*
     double dt =
-      this->dataPtr->model->GetWorld()->GetPhysicsEngine()->GetMaxStepTime();
+      this->jointDPtr->model->GetWorld()->GetPhysicsEngine()->GetMaxStepTime();
     this->ComputeAndSetLinkTwist(_link, newWorldPose, newWorldPose, dt);
     */
   }
@@ -1717,13 +1717,13 @@ void Joint::SetAxis(unsigned int _index,
 event::ConnectionPtr Joint::ConnectJointUpdate(
     std::function<void()> _subscriber)
 {
-  return this->dataPtr->jointUpdate.Connect(_subscriber);
+  return this->jointDPtr->jointUpdate.Connect(_subscriber);
 }
 
 /////////////////////////////////////////////////
 void Joint::DisconnectJointUpdate(event::ConnectionPtr &_conn)
 {
-  this->dataPtr->jointUpdate.Disconnect(_conn);
+  this->jointDPtr->jointUpdate.Disconnect(_conn);
 }
 
 /////////////////////////////////////////////////

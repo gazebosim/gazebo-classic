@@ -26,6 +26,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/math/Box.hh"
 
+#include "gazebo/physics/Inertial.hh"
 #include "gazebo/physics/ode/ODESurfaceParams.hh"
 #include "gazebo/physics/ode/ODEPhysics.hh"
 #include "gazebo/physics/ode/ODELink.hh"
@@ -39,24 +40,24 @@ using namespace physics;
 //////////////////////////////////////////////////
 ODECollision::ODECollision(LinkPtr _link)
 : Collision(*new ODECollisionPrivate, _link),
-  dataPtr(std::static_pointer_cast<ODECollisionPrivate>(this->baseDPtr))
+  odeCollisionDPtr(static_cast<ODECollisionPrivate*>(this->collDPtr))
 {
   this->SetName("ODE_Collision");
-  this->dataPtr->collisionId = NULL;
-  this->dataPtr->onPoseChangeFunc = &ODECollision::OnPoseChangeNull;
+  this->odeCollisionDPtr->collisionId = NULL;
+  this->odeCollisionDPtr->onPoseChangeFunc = &ODECollision::OnPoseChangeNull;
 
   this->SetSpaceId(
-      std::static_pointer_cast<ODELink>(this->dataPtr->link)->SpaceId());
+      std::static_pointer_cast<ODELink>(this->odeCollisionDPtr->link)->SpaceId());
 
-  this->dataPtr->surface.reset(new ODESurfaceParams());
+  this->odeCollisionDPtr->surface.reset(new ODESurfaceParams());
 }
 
 //////////////////////////////////////////////////
 ODECollision::~ODECollision()
 {
-  if (this->dataPtr->collisionId)
-    dGeomDestroy(this->dataPtr->collisionId);
-  this->dataPtr->collisionId = NULL;
+  if (this->odeCollisionDPtr->collisionId)
+    dGeomDestroy(this->odeCollisionDPtr->collisionId);
+  this->odeCollisionDPtr->collisionId = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -72,8 +73,8 @@ void ODECollision::Load(sdf::ElementPtr _sdf)
 
   // Force max correcting velocity to zero for certain collision entities
   if (this->IsStatic() ||
-      this->dataPtr->shape->HasType(Base::HEIGHTMAP_SHAPE) ||
-      this->dataPtr->shape->HasType(Base::MAP_SHAPE))
+      this->odeCollisionDPtr->shape->HasType(Base::HEIGHTMAP_SHAPE) ||
+      this->odeCollisionDPtr->shape->HasType(Base::MAP_SHAPE))
   {
     this->ODESurface()->maxVel = 0.0;
   }
@@ -83,13 +84,13 @@ void ODECollision::Load(sdf::ElementPtr _sdf)
 void ODECollision::Fini()
 {
   /*
-     if (this->dataPtr->collisionId)
-     dGeomDestroy(this->dataPtr->collisionId);
-     this->dataPtr->collisionId = NULL;
+     if (this->odeCollisionDPtr->collisionId)
+     dGeomDestroy(this->odeCollisionDPtr->collisionId);
+     this->odeCollisionDPtr->collisionId = NULL;
 
-     if (this->dataPtr->spaceId)
-     dSpaceDestroy(this->dataPtr->spaceId);
-     this->dataPtr->spaceId = NULL;
+     if (this->odeCollisionDPtr->spaceId)
+     dSpaceDestroy(this->odeCollisionDPtr->spaceId);
+     this->odeCollisionDPtr->spaceId = NULL;
      */
 
   Collision::Fini();
@@ -101,12 +102,12 @@ void ODECollision::OnPoseChange()
   // Update all the models
   // (*this.*onPoseChangeFunc)();
 
-  if (this->IsStatic() && this->dataPtr->collisionId &&
-      this->dataPtr->placeable)
+  if (this->IsStatic() && this->odeCollisionDPtr->collisionId &&
+      this->odeCollisionDPtr->placeable)
   {
     this->OnPoseChangeGlobal();
   }
-  else if (this->dataPtr->collisionId && this->dataPtr->placeable)
+  else if (this->odeCollisionDPtr->collisionId && this->odeCollisionDPtr->placeable)
   {
     this->OnPoseChangeRelative();
   }
@@ -116,30 +117,30 @@ void ODECollision::OnPoseChange()
 void ODECollision::SetCollision(dGeomID _collisionId, const bool _placeable)
 {
   // Must go first in this function
-  this->dataPtr->collisionId = _collisionId;
+  this->odeCollisionDPtr->collisionId = _collisionId;
 
   Collision::SetCollision(_placeable);
 
-  if (dGeomGetSpace(this->dataPtr->collisionId) == 0)
+  if (dGeomGetSpace(this->odeCollisionDPtr->collisionId) == 0)
   {
-    dSpaceAdd(this->dataPtr->spaceId, this->dataPtr->collisionId);
-    GZ_ASSERT(dGeomGetSpace(this->dataPtr->collisionId) != 0,
+    dSpaceAdd(this->odeCollisionDPtr->spaceId, this->odeCollisionDPtr->collisionId);
+    GZ_ASSERT(dGeomGetSpace(this->odeCollisionDPtr->collisionId) != 0,
         "Collision ID is NULL");
   }
 
-  if (this->dataPtr->collisionId && this->dataPtr->placeable)
+  if (this->odeCollisionDPtr->collisionId && this->odeCollisionDPtr->placeable)
   {
     if (this->IsStatic())
-      this->dataPtr->onPoseChangeFunc = &ODECollision::OnPoseChangeGlobal;
+      this->odeCollisionDPtr->onPoseChangeFunc = &ODECollision::OnPoseChangeGlobal;
     else
-      this->dataPtr->onPoseChangeFunc = &ODECollision::OnPoseChangeRelative;
+      this->odeCollisionDPtr->onPoseChangeFunc = &ODECollision::OnPoseChangeRelative;
   }
   else
   {
-    this->dataPtr->onPoseChangeFunc = &ODECollision::OnPoseChangeNull;
+    this->odeCollisionDPtr->onPoseChangeFunc = &ODECollision::OnPoseChangeNull;
   }
 
-  dGeomSetData(this->dataPtr->collisionId, this);
+  dGeomSetData(this->odeCollisionDPtr->collisionId, this);
 }
 
 //////////////////////////////////////////////////
@@ -151,7 +152,7 @@ dGeomID ODECollision::GetCollisionId() const
 //////////////////////////////////////////////////
 dGeomID ODECollision::CollisionId() const
 {
-  return this->dataPtr->collisionId;
+  return this->odeCollisionDPtr->collisionId;
 }
 
 //////////////////////////////////////////////////
@@ -165,9 +166,9 @@ int ODECollision::CollisionClass() const
 {
   int result = 0;
 
-  if (this->dataPtr->collisionId)
+  if (this->odeCollisionDPtr->collisionId)
   {
-    result = dGeomGetClass(this->dataPtr->collisionId);
+    result = dGeomGetClass(this->odeCollisionDPtr->collisionId);
   }
 
   return result;
@@ -176,19 +177,19 @@ int ODECollision::CollisionClass() const
 //////////////////////////////////////////////////
 void ODECollision::SetCategoryBits(const unsigned int _bits)
 {
-  if (this->dataPtr->collisionId)
-    dGeomSetCategoryBits(this->dataPtr->collisionId, _bits);
-  if (this->dataPtr->spaceId)
-    dGeomSetCategoryBits((dGeomID)this->dataPtr->spaceId, _bits);
+  if (this->odeCollisionDPtr->collisionId)
+    dGeomSetCategoryBits(this->odeCollisionDPtr->collisionId, _bits);
+  if (this->odeCollisionDPtr->spaceId)
+    dGeomSetCategoryBits((dGeomID)this->odeCollisionDPtr->spaceId, _bits);
 }
 
 //////////////////////////////////////////////////
 void ODECollision::SetCollideBits(const unsigned int _bits)
 {
-  if (this->dataPtr->collisionId)
-    dGeomSetCollideBits(this->dataPtr->collisionId, _bits);
-  if (this->dataPtr->spaceId)
-    dGeomSetCollideBits((dGeomID)this->dataPtr->spaceId, _bits);
+  if (this->odeCollisionDPtr->collisionId)
+    dGeomSetCollideBits(this->odeCollisionDPtr->collisionId, _bits);
+  if (this->odeCollisionDPtr->spaceId)
+    dGeomSetCollideBits((dGeomID)this->odeCollisionDPtr->spaceId, _bits);
 }
 
 //////////////////////////////////////////////////
@@ -199,8 +200,8 @@ ignition::math::Box ODECollision::BoundingBox() const
 
   memset(aabb, 0, 6 * sizeof(dReal));
 
-  // if (this->dataPtr->collisionId && this->type != Shape::PLANE)
-  dGeomGetAABB(this->dataPtr->collisionId, aabb);
+  // if (this->odeCollisionDPtr->collisionId && this->type != Shape::PLANE)
+  dGeomGetAABB(this->odeCollisionDPtr->collisionId, aabb);
 
   box.Min().Set(aabb[0], aabb[2], aabb[4]);
   box.Max().Set(aabb[1], aabb[3], aabb[5]);
@@ -217,13 +218,13 @@ dSpaceID ODECollision::GetSpaceId() const
 //////////////////////////////////////////////////
 dSpaceID ODECollision::SpaceId() const
 {
-  return this->dataPtr->spaceId;
+  return this->odeCollisionDPtr->spaceId;
 }
 
 //////////////////////////////////////////////////
 void ODECollision::SetSpaceId(const dSpaceID _spaceid)
 {
-  this->dataPtr->spaceId = _spaceid;
+  this->odeCollisionDPtr->spaceId = _spaceid;
 }
 
 /////////////////////////////////////////////////
@@ -235,7 +236,7 @@ ODESurfaceParamsPtr ODECollision::GetODESurface() const
 /////////////////////////////////////////////////
 ODESurfaceParamsPtr ODECollision::ODESurface() const
 {
-  return std::dynamic_pointer_cast<ODESurfaceParams>(this->dataPtr->surface);
+  return std::dynamic_pointer_cast<ODESurfaceParams>(this->odeCollisionDPtr->surface);
 }
 
 /////////////////////////////////////////////////
@@ -247,7 +248,8 @@ void ODECollision::OnPoseChangeGlobal()
   ignition::math::Pose3d localPose = this->WorldPose();
 
   // un-offset cog location
-  ignition::math::Vector3d cogVec = this->dataPtr->link->Inertial()->CoG();
+  ignition::math::Vector3d cogVec =
+    this->odeCollisionDPtr->link->Inertial()->CoG();
   localPose.Pos() = localPose.Pos() - cogVec;
 
   q[0] = localPose.Rot().W();
@@ -255,9 +257,9 @@ void ODECollision::OnPoseChangeGlobal()
   q[2] = localPose.Rot().Y();
   q[3] = localPose.Rot().Z();
 
-  dGeomSetPosition(this->dataPtr->collisionId,
+  dGeomSetPosition(this->odeCollisionDPtr->collisionId,
       localPose.Pos().X(), localPose.Pos().Y(), localPose.Pos().Z());
-  dGeomSetQuaternion(this->dataPtr->collisionId, q);
+  dGeomSetQuaternion(this->odeCollisionDPtr->collisionId, q);
 }
 
 /////////////////////////////////////////////////
@@ -268,7 +270,7 @@ void ODECollision::OnPoseChangeRelative()
   ignition::math::Pose3d localPose = this->RelativePose();
 
   // un-offset cog location
-  ignition::math::Vector3d cog_vec = this->dataPtr->link->Inertial()->CoG();
+  ignition::math::Vector3d cog_vec = this->odeCollisionDPtr->link->Inertial()->CoG();
   localPose.Pos() = localPose.Pos() - cog_vec;
 
   q[0] = localPose.Rot().W();
@@ -278,9 +280,9 @@ void ODECollision::OnPoseChangeRelative()
 
   // Set the pose of the encapsulated collision; this is always relative
   // to the CoM
-  dGeomSetOffsetPosition(this->dataPtr->collisionId,
+  dGeomSetOffsetPosition(this->odeCollisionDPtr->collisionId,
       localPose.Pos().X(), localPose.Pos().Y(), localPose.Pos().Z());
-  dGeomSetOffsetQuaternion(this->dataPtr->collisionId, q);
+  dGeomSetOffsetQuaternion(this->odeCollisionDPtr->collisionId, q);
 }
 
 /////////////////////////////////////////////////

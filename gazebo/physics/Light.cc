@@ -30,8 +30,8 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 Light::Light(BasePtr _parent)
-  : Entity(new LightPrivate, _parent),
-  dataPtr(std::static_pointer_cast<LightPrivate>(this->dPtr))
+: Entity(new LightPrivate, _parent),
+  lightDPtr(static_cast<LightPrivate*>(this->entityDPtr))
 {
   this->AddType(LIGHT);
 }
@@ -41,7 +41,7 @@ void Light::Init()
 {
   // Record the light's initial pose (for resetting)
   ignition::math::Pose3d initPose =
-      this->dataPtr->sdf->Get<ignition::math::Pose3d>("pose");
+      this->lightDPtr->sdf->Get<ignition::math::Pose3d>("pose");
   this->SetInitialRelativePose(initPose);
   this->SetRelativePose(initPose);
 }
@@ -55,13 +55,13 @@ void Light::ProcessMsg(const msgs::Light &_msg)
     this->worldPose = msgs::ConvertIgn(_msg.pose());
   }
 
-  this->dataPtr->msg.MergeFrom(_msg);
+  this->lightDPtr->msg.MergeFrom(_msg);
 }
 
 //////////////////////////////////////////////////
 void Light::FillMsg(msgs::Light &_msg)
 {
-  _msg.MergeFrom(this->dataPtr->msg);
+  _msg.MergeFrom(this->lightDPtr->msg);
 
   _msg.set_name(this->ScopedName());
 
@@ -71,7 +71,7 @@ void Light::FillMsg(msgs::Light &_msg)
 //////////////////////////////////////////////////
 void Light::SetState(const LightState &_state)
 {
-  if (this->dataPtr->worldPose == _state.Pose())
+  if (this->lightDPtr->worldPose == _state.Pose())
     return;
 
   this->worldPose = _state.Pose();

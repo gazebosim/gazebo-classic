@@ -31,8 +31,10 @@ namespace gazebo
 {
   namespace physics
   {
-    class SpaceTree;
     class QuadNode;
+
+    // Forward declare private data class
+    class MapShapePrivate;
 
     /// \addtogroup gazebo_physics
     /// \{
@@ -70,7 +72,12 @@ namespace gazebo
 
       /// \brief Returns the image URI for this geometry.
       /// \return The image URI that was used to load the map.
-      public: std::string GetURI() const;
+      /// \deprecated See URI() const
+      public: std::string GetURI() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Returns the image URI for this geometry.
+      /// \return The image URI that was used to load the map.
+      public: std::string URI() const;
 
       /// \brief Set the scale of the map shape.
       /// \param[in] _scale Scale to set the map shape to.
@@ -94,18 +101,38 @@ namespace gazebo
       /// All regions in image with value larger than MapShape::scale
       /// will be replaced by boxes with MapShape::height.
       /// \return Image threshold value.
-      public: int GetThreshold() const;
+      /// \deprecated See Threshold() const
+      public: int GetThreshold() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Returns image threshold for this geometry.
+      /// All regions in image with value larger than MapShape::scale
+      /// will be replaced by boxes with MapShape::height.
+      /// \return Image threshold value.
+      public: int Threshold() const;
 
       /// \brief Returns height of this geometry.  All regions in image with
       /// value larger than MapShape::scale will be replaced by boxes
       /// with MapShape::height.
       /// \return Height of the map shapes.
-      public: double GetHeight() const;
+      /// \deprecated See Height() const
+      public: double GetHeight() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Returns height of this geometry.  All regions in image with
+      /// value larger than MapShape::scale will be replaced by boxes
+      /// with MapShape::height.
+      /// \return Height of the map shapes.
+      public: double Height() const;
 
       /// \brief Returns granularity of this geometry.
       /// \return Granularity (amount of error betweent the image pixels and
       /// the 3D shapes created).
-      public: int GetGranularity() const;
+      /// \deprecated See Granularity() const
+      public: int GetGranularity() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Returns granularity of this geometry.
+      /// \return Granularity (amount of error betweent the image pixels and
+      /// the 3D shapes created).
+      public: int Granularity() const;
 
       /// \brief Build the quadtree.
       /// \param[in] _node Quad tree node to build.
@@ -118,10 +145,12 @@ namespace gazebo
       /// \param[in] _height Height over which to get the pixel count.
       /// \param[out] _freePixels Number of unoccupied pixels.
       /// \param[out] _occPixels Number of occupied pixels.
-      private: void GetPixelCount(unsigned int _xStart, unsigned int _yStart,
-                                  unsigned int _width, unsigned int _height,
-                                  unsigned int &_freePixels,
-                                  unsigned int &_occPixels);
+      private: void PixelCount(const unsigned int _xStart,
+                   const unsigned int _yStart,
+                   const unsigned int _width,
+                   const unsigned int _height,
+                   unsigned int &_freePixels,
+                   unsigned int &_occPixels);
 
       /// \brief Reduce the number of nodes in the tree.
       /// \param[in] _node Quad tree node to reduce.
@@ -139,81 +168,10 @@ namespace gazebo
       /// \param[in] _node Quad tree node to create boxes from.
       private: void CreateBoxes(QuadNode *_node);
 
-      /// \brief Image used to create the map.
-      private: common::Image *mapImage;
-
-      /// \brief Root of the quad tree.
-      private: QuadNode *root;
-
-      /// \brief True if the quad tree nodes have been merged.
-      private: bool merged;
-
-      /// \brief Counter used to create unique names for each collision
-      /// object.
-      private: static unsigned int collisionCounter;
+      /// \internal
+      /// \brief Private data pointer
+      private: MapShapePrivate *mapShapeDPtr;
     };
-
-
-    /// \class QuadNode MapShape.hh physics/physics.hh
-    /// \cond
-    class GZ_PHYSICS_VISIBLE QuadNode
-    {
-      /// \brief Constructor
-      /// \param[in] _parent Parent quad tree node.
-      public: QuadNode(QuadNode *_parent)
-              : x(0), y(0), width(0), height(0)
-              {
-                parent = _parent;
-                occupied = false;
-                leaf = true;
-                valid = true;
-              }
-
-      /// \brief Destructor.
-      public: ~QuadNode()
-              {
-                std::deque<QuadNode*>::iterator iter;
-                for (iter = children.begin(); iter != children.end(); ++iter)
-                    delete (*iter);
-              }
-
-      /// \brief Print this quad tree node, and all its children.
-      /// \param[in] _space String of spaces that formats the printfs.
-      public: void Print(std::string _space)
-              {
-                std::deque<QuadNode*>::iterator iter;
-
-                printf("%sXY[%d %d] WH[%d %d] O[%d] L[%d] V[%d]\n",
-                    _space.c_str(), x, y, width, height, occupied, leaf, valid);
-                _space += "  ";
-                for (iter = children.begin(); iter != children.end(); ++iter)
-                  if ((*iter)->occupied)
-                    (*iter)->Print(_space);
-              }
-
-      /// \brief X and Y location of the node.
-      public: uint32_t x, y;
-
-      /// \brief Width and height of the node.
-      public: uint32_t width, height;
-
-      /// \brief Parent node.
-      public: QuadNode *parent;
-
-      /// \brief Children nodes.
-      public: std::deque<QuadNode*> children;
-
-      /// \brief True if the node is occupied
-      public: bool occupied;
-
-      /// \brief True if the node is a leaf.
-      public: bool leaf;
-
-      /// \brief True if the node is valid.
-      public: bool valid;
-    };
-    /// \endcond
-
     /// \}
   }
 }

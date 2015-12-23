@@ -15,6 +15,7 @@
  *
 */
 #include "gazebo/common/Exception.hh"
+#include "gazebo/physics/HeightmapShapePrivate.hh"
 #include "gazebo/physics/ode/ODECollision.hh"
 #include "gazebo/physics/ode/ODEHeightmapShape.hh"
 
@@ -23,9 +24,9 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 ODEHeightmapShape::ODEHeightmapShape(CollisionPtr _parent)
-    : HeightmapShape(_parent)
+: HeightmapShape(_parent)
 {
-  this->flipY = false;
+  this->heightmapShapeDPtr->flipY = false;
 }
 
 //////////////////////////////////////////////////
@@ -37,7 +38,7 @@ ODEHeightmapShape::~ODEHeightmapShape()
 dReal ODEHeightmapShape::GetHeightCallback(void *_data, int _x, int _y)
 {
   // Return the height at a specific vertex
-  return static_cast<ODEHeightmapShape*>(_data)->GetHeight(_x, _y);
+  return static_cast<ODEHeightmapShape*>(_data)->Height(_x, _y);
 }
 
 //////////////////////////////////////////////////
@@ -45,8 +46,8 @@ void ODEHeightmapShape::Init()
 {
   HeightmapShape::Init();
 
-  ODECollisionPtr oParent =
-    std::static_pointer_cast<ODECollision>(this->collisionParent);
+  ODECollisionPtr oParent = std::static_pointer_cast<ODECollision>(
+      this->heightmapShapeDPtr->collisionParent);
 
   // Step 2: Create the ODE heightfield collision
   this->odeData = dGeomHeightfieldDataCreate();
@@ -54,16 +55,16 @@ void ODEHeightmapShape::Init()
   // Step 3: Setup a callback method for ODE
   dGeomHeightfieldDataBuildSingle(
       this->odeData,
-      &this->heights[0],
+      &this->heightmapShapeDPtr->heights[0],
       0,
       // in meters
       this->Size().X(),
       // in meters
       this->Size().Y(),
       // width sampling size
-      this->vertSize,
+      this->heightmapShapeDPtr->vertSize,
       // depth sampling size (along height of image)
-      this->vertSize,
+      this->heightmapShapeDPtr->vertSize,
       // vertical (z-axis) scaling
       1.0,
       // vertical (z-axis) offset

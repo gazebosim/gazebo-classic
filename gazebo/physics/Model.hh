@@ -613,7 +613,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Private data pointer
-      private: std::unique_ptr<ModelPrivate> dataPtr;
+      protected: ModelPrivate *modelDPtr;
     };
     /// \}
   }

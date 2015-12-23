@@ -22,6 +22,7 @@
 
 #include "gazebo/common/Console.hh"
 #include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/ShapePrivate.hh"
 #include "gazebo/physics/Shape.hh"
 
 using namespace gazebo;
@@ -29,13 +30,26 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 Shape::Shape(CollisionPtr _p)
-  : Base(_p)
+: Base(*new ShapePrivate, _p),
+  shapeDPtr(static_cast<ShapePrivate*>(this->baseDPtr))
 {
   this->AddType(Base::SHAPE);
   this->SetName("shape");
 
   if (_p)
-    this->collisionParent = _p;
+    this->shapeDPtr->collisionParent = _p;
+}
+
+//////////////////////////////////////////////////
+Shape::Shape(ShapePrivate &_dataPtr, BasePtr _parent)
+: Base(_dataPtr, _parent),
+  shapeDPtr(static_cast<ShapePrivate*>(this->baseDPtr))
+{
+  this->AddType(Base::SHAPE);
+  this->SetName("shape");
+
+  if (_p)
+    this->shapeDPtr->collisionParent = _p;
 }
 
 //////////////////////////////////////////////////

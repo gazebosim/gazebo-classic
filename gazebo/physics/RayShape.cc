@@ -19,24 +19,9 @@
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
-
-#include <vector>
-#include <list>
-#include <string>
-#include <boost/enable_shared_from_this.hpp>
-#include <boost/shared_ptr.hpp>
-
-#include <sdf/sdf.hh>
-
-#include "gazebo/transport/TransportTypes.hh"
-
-#include "gazebo/math/Helpers.hh"
-
-#include "gazebo/common/CommonTypes.hh"
-#include "gazebo/common/Event.hh"
-
-#include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Collision.hh"
+
+#include "gazebo/physics/RayShapePrivate.hh"
 #include "gazebo/physics/RayShape.hh"
 
 using namespace gazebo;
@@ -44,14 +29,15 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 RayShape::RayShape(PhysicsEnginePtr /*_physicsEngine*/)
-  : Shape(CollisionPtr())
+: Shape(*new RayShapePrivate, CollisionPtr()),
+  rayShapeDPtr(static_cast<RayShapePrivate*>(this->shapeDPtr))
 {
   this->AddType(RAY_SHAPE);
   this->SetName("Ray");
 
-  this->contactLen = GZ_DBL_MAX;
-  this->contactRetro = 0.0;
-  this->contactFiducial = -1;
+  this->rayShapeDPtr->contactLen = GZ_DBL_MAX;
+  this->rayShapeDPtr->contactRetro = 0.0;
+  this->rayShapeDPtr->contactFiducial = -1;
 }
 
 //////////////////////////////////////////////////
@@ -61,9 +47,9 @@ RayShape::RayShape(CollisionPtr _parent)
   this->AddType(RAY_SHAPE);
   this->SetName("Ray");
 
-  this->contactLen = GZ_DBL_MAX;
-  this->contactRetro = 0.0;
-  this->contactFiducial = -1;
+  this->rayShapeDPtr->contactLen = GZ_DBL_MAX;
+  this->rayShapeDPtr->contactRetro = 0.0;
+  this->rayShapeDPtr->contactFiducial = -1;
 
   if (collisionParent)
     this->collisionParent->SetSaveable(false);
@@ -87,26 +73,26 @@ void RayShape::SetPoints(const ignition::math::Vector3d &_posStart,
 {
   ignition::math::Vector3d dir;
 
-  this->relativeStartPos = _posStart;
-  this->relativeEndPos = _posEnd;
+  this->rayShapeDPtr->relativeStartPos = _posStart;
+  this->rayShapeDPtr->relativeEndPos = _posEnd;
 
   if (this->collisionParent)
   {
-    this->globalStartPos =
+    this->rayShapeDPtr->globalStartPos =
       this->collisionParent->GetWorldPose().CoordPositionAdd(
-        this->relativeStartPos).Ign();
-    this->globalEndPos =
+        this->rayShapeDPtr->relativeStartPos).Ign();
+    this->rayShapeDPtr->globalEndPos =
       this->collisionParent->GetWorldPose().CoordPositionAdd(
-        this->relativeEndPos).Ign();
+        this->rayShapeDPtr->relativeEndPos).Ign();
   }
   else
   {
-    this->globalStartPos = this->relativeStartPos;
-    this->globalEndPos = this->relativeEndPos;
+    this->rayShapeDPtr->globalStartPos = this->rayShapeDPtr->relativeStartPos;
+    this->rayShapeDPtr->globalEndPos = this->rayShapeDPtr->relativeEndPos;
   }
 
   // Compute the direction of the ray
-  dir = this->globalEndPos - this->globalStartPos;
+  dir = this->rayShapeDPtr->globalEndPos - this->rayShapeDPtr->globalStartPos;
   dir.Normalize();
 }
 
@@ -123,8 +109,8 @@ void RayShape::GetRelativePoints(math::Vector3 &_posA, math::Vector3 &_posB)
 void RayShape::RelativePoints(ignition::math::Vector3d &_posA,
     ignition::math::Vector3d &_posB)
 {
-  _posA = this->relativeStartPos;
-  _posB = this->relativeEndPos;
+  _posA = this->rayShapeDPtr->relativeStartPos;
+  _posB = this->rayShapeDPtr->relativeEndPos;
 }
 
 //////////////////////////////////////////////////
@@ -140,19 +126,21 @@ void RayShape::GetGlobalPoints(math::Vector3 &_posA, math::Vector3 &_posB)
 void RayShape::GlobalPoints(ignition::math::Vector3d &_posA,
                             ignition::math::Vector3d &_posB)
 {
-  _posA = this->globalStartPos;
-  _posB = this->globalEndPos;
+  _posA = this->rayShapeDPtr->globalStartPos;
+  _posB = this->rayShapeDPtr->globalEndPos;
 }
 
 //////////////////////////////////////////////////
-void RayShape::SetLength(double _len)
+void RayShape::SetLength(const double _len)
 {
-  this->contactLen = _len;
+  this->rayShapeDPtr->contactLen = _len;
 
-  ignition::math::Vector3d dir = this->relativeEndPos - this->relativeStartPos;
+  ignition::math::Vector3d dir = this->rayShapeDPtr->relativeEndPos -
+    this->rayShapeDPtr->relativeStartPos;
   dir.Normalize();
 
-  this->relativeEndPos = dir * _len + this->relativeStartPos;
+  this->rayShapeDPtr->relativeEndPos = dir * _len +
+    this->rayShapeDPtr->relativeStartPos;
 }
 
 //////////////////////////////////////////////////
@@ -164,10 +152,10 @@ void RayShape::SetScale(const math::Vector3 &_scale)
 //////////////////////////////////////////////////
 void RayShape::SetScale(const ignition::math::Vector3d &_scale)
 {
-  if (this->scale == _scale)
+  if (this->rayShapeDPtr->scale == _scale)
     return;
 
-  this->scale = _scale;
+  this->rayShapeDPtr->scale = _scale;
 
   /// TODO RayShape::SetScale not yet implemented.
 }
@@ -175,31 +163,49 @@ void RayShape::SetScale(const ignition::math::Vector3d &_scale)
 //////////////////////////////////////////////////
 double RayShape::GetLength() const
 {
-  return this->contactLen;
+  return this->Length();
 }
 
 //////////////////////////////////////////////////
-void RayShape::SetRetro(float _retro)
+double RayShape::Length() const
 {
-  this->contactRetro = _retro;
+  return this->rayShapeDPtr->contactLen;
+}
+
+//////////////////////////////////////////////////
+void RayShape::SetRetro(const float _retro)
+{
+  this->rayShapeDPtr->contactRetro = _retro;
 }
 
 //////////////////////////////////////////////////
 float RayShape::GetRetro() const
 {
-  return this->contactRetro;
+  return this->Retro();
 }
 
 //////////////////////////////////////////////////
-void RayShape::SetFiducial(int _fid)
+float RayShape::Retro() const
 {
-  this->contactFiducial = _fid;
+  return this->rayShapeDPtr->contactRetro;
+}
+
+//////////////////////////////////////////////////
+void RayShape::SetFiducial(const int _fid)
+{
+  this->rayShapeDPtr->contactFiducial = _fid;
 }
 
 //////////////////////////////////////////////////
 int RayShape::GetFiducial() const
 {
-  return this->contactFiducial;
+  return this->Fiducial();
+}
+
+//////////////////////////////////////////////////
+int RayShape::Fiducial() const
+{
+  return this->rayShapeDPtr->contactFiducial;
 }
 
 //////////////////////////////////////////////////
@@ -221,4 +227,10 @@ void RayShape::ProcessMsg(const msgs::Geometry &/*_msg*/)
 double RayShape::ComputeVolume() const
 {
   return 0;
+}
+
+//////////////////////////////////////////////////
+void RayShape::GetIntersection(double &_dist, std::string &_entity)
+{
+  this->Intersection(_dist, _entity);
 }

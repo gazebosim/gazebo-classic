@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PHYSICS_MODEL_PRIVATE_HH_
-#define _GAZEBO_PHYSICS_MODEL_PRIVATE_HH_
+#ifndef _GAZEBO_PHYSICS_MODELPRIVATE_HH_
+#define _GAZEBO_PHYSICS_MODELPRIVATE_HH_
 
 #include <vector>
 #include <mutex>
@@ -31,9 +31,8 @@ namespace gazebo
 {
   namespace physics
   {
-    /// \internal
-    /// \brief Protected Model data
-    class ModelProtected : public EntityProtected
+    /// \brief Private Model data
+    class ModelPrivate : public EntityPrivate
     {
       /// used by Model::AttachStaticModel
       public: std::vector<ModelPtr> attachedModels;
@@ -43,11 +42,7 @@ namespace gazebo
 
       /// \brief Publisher for joint info.
       public: transport::PublisherPtr jointPub;
-    };
 
-    /// \brief Private Model data
-    class ModelPrivate : public ModelProtected
-    {
       /// \brief The canonical link of the model.
       public: LinkPtr canonicalLink;
 

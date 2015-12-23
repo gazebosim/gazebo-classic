@@ -25,7 +25,7 @@ namespace gazebo
   {
     /// \internal
     /// \brief ODE collision private data
-    class ODECollisionPrivate : public CollisionProtected
+    class ODECollisionPrivate : public CollisionPrivate
     {
       /// \brief Collision space for this.
       public: dSpaceID spaceId;

@@ -30,6 +30,9 @@ namespace gazebo
 {
   namespace physics
   {
+    // Forward declare private data class
+    class PolylineShapePrivate;
+
     /// \addtogroup gazebo_physics
     /// \{
 
@@ -57,7 +60,12 @@ namespace gazebo
 
       /// \brief Get the height of the polylines.
       /// \return The height of the polylines.
-      public: double GetHeight() const;
+      /// \deprecated See Height() const
+      public: double GetHeight() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the height of the polylines.
+      /// \return The height of the polylines.
+      public: double Height() const;
 
       /// \brief Fill in the values for a geomertry message.
       /// \param[out] _msg The geometry message to fill.
@@ -105,8 +113,9 @@ namespace gazebo
       /// \param[in] _height Height of the polylines.
       private: virtual void SetHeight(const double &_height);
 
-      /// \brief Pointer to the mesh data.
-      protected: const common::Mesh *mesh;
+      /// \internal
+      /// \brief Private data pointer
+      protected: PolylineShapePrivate *polylineShapeDPtr;
     };
     /// \}
   }

@@ -32,29 +32,30 @@
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/BoxShape.hh"
 #include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/MapShapePrivate.hh"
 #include "gazebo/physics/MapShape.hh"
 
 using namespace gazebo;
 using namespace physics;
 
-
-unsigned int MapShape::collisionCounter = 0;
+unsigned int MapShapePrivate::collisionCounter = 0;
 
 //////////////////////////////////////////////////
 MapShape::MapShape(CollisionPtr _parent)
-    : Shape(_parent)
+: Shape(*new MapShapePrivate, _parent),
+  mapShapeDPtr(static_cast<MapShapePrivate*>(this->shapeDPtr)
 {
   this->AddType(Base::MAP_SHAPE);
 
-  this->root = new QuadNode(NULL);
+  this->mapShapeDPtr->root = new QuadNode(NULL);
 }
 
 //////////////////////////////////////////////////
 MapShape::~MapShape()
 {
-  delete this->root;
-  delete this->mapImage;
-  this->mapImage = NULL;
+  delete this->mapShapeDPtr->root;
+  delete this->mapShapeDPtr->mapImage;
+  this->mapShapeDPtr->mapImage = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -78,32 +79,32 @@ void MapShape::Load(sdf::ElementPtr _sdf)
     _sdf->GetElement("height")->Set(1.0);
 
   // Load the image
-  this->mapImage = new common::Image();
-  this->mapImage->Load(imageFilename);
+  this->mapShapeDPtr->mapImage = new common::Image();
+  this->mapShapeDPtr->mapImage->Load(imageFilename);
 
-  if (!this->mapImage->Valid())
+  if (!this->mapShapeDPtr->mapImage->Valid())
     gzthrow(std::string("Unable to open image file[") + imageFilename + "]");
 }
 
 //////////////////////////////////////////////////
 void MapShape::Init()
 {
-  this->root->x = 0;
-  this->root->y = 0;
+  this->mapShapeDPtr->root->x = 0;
+  this->mapShapeDPtr->root->y = 0;
 
-  this->root->width = this->mapImage->GetWidth();
-  this->root->height = this->mapImage->GetHeight();
+  this->mapShapeDPtr->root->width = this->mapShapeDPtr->mapImage->GetWidth();
+  this->mapShapeDPtr->root->height = this->mapShapeDPtr->mapImage->GetHeight();
 
-  this->BuildTree(this->root);
+  this->BuildTree(this->mapShapeDPtr->root);
 
-  this->merged = true;
-  while (this->merged)
+  this->mapShapeDPtr->merged = true;
+  while (this->mapShapeDPtr->merged)
   {
-    this->merged = false;
-    this->ReduceTree(this->root);
+    this->mapShapeDPtr->merged = false;
+    this->ReduceTree(this->mapShapeDPtr->root);
   }
 
-  this->CreateBoxes(this->root);
+  this->CreateBoxes(this->mapShapeDPtr->root);
 }
 
 //////////////////////////////////////////////////
@@ -120,6 +121,12 @@ void MapShape::FillMsg(msgs::Geometry &_msg)
 
 //////////////////////////////////////////////////
 std::string MapShape::GetURI() const
+{
+  return this->URI();
+}
+
+//////////////////////////////////////////////////
+std::string MapShape::URI() const
 {
   return this->sdf->Get<std::string>("uri");
 }
@@ -159,17 +166,35 @@ ignition::math::Vector3d MapShape::Scale() const
 //////////////////////////////////////////////////
 int MapShape::GetThreshold() const
 {
+  return this->Threshold();
+}
+
+//////////////////////////////////////////////////
+int MapShape::Threshold() const
+{
   return this->sdf->Get<int>("threshold");
 }
 
 //////////////////////////////////////////////////
 double MapShape::GetHeight() const
 {
+  return this->Height();
+}
+
+//////////////////////////////////////////////////
+double MapShape::Height() const
+{
   return this->sdf->Get<double>("height");
 }
 
 //////////////////////////////////////////////////
 int MapShape::GetGranularity() const
+{
+  return this->Granularity();
+}
+
+//////////////////////////////////////////////////
+int MapShape::Granularity() const
 {
   return this->sdf->Get<int>("granularity");
 }
@@ -311,7 +336,7 @@ void MapShape::Merge(QuadNode *_nodeA, QuadNode *_nodeB)
       _nodeB->valid = false;
       _nodeA->valid = true;
 
-      this->merged = true;
+      this->mapShapeDPtr->merged = true;
     }
 
     if (_nodeB->x == _nodeA->x &&
@@ -322,7 +347,7 @@ void MapShape::Merge(QuadNode *_nodeA, QuadNode *_nodeB)
       _nodeB->valid = false;
       _nodeA->valid = true;
 
-      this->merged = true;
+      this->mapShapeDPtr->merged = true;
     }
   }
   else
@@ -344,7 +369,7 @@ void MapShape::BuildTree(QuadNode *_node)
 {
   unsigned int freePixels, occPixels;
 
-  this->GetPixelCount(_node->x, _node->y, _node->width, _node->height,
+  this->PixelCount(_node->x, _node->y, _node->width, _node->height,
                       freePixels, occPixels);
 
   // int diff = labs(freePixels - occPixels);
@@ -414,10 +439,12 @@ void MapShape::BuildTree(QuadNode *_node)
 }
 
 //////////////////////////////////////////////////
-void MapShape::GetPixelCount(unsigned int xStart, unsigned int yStart,
-                                 unsigned int width, unsigned int height,
-                                 unsigned int &freePixels,
-                                 unsigned int &occPixels)
+void MapShape::PixelCount(const unsigned int xStart,
+    const unsigned int yStart,
+    const unsigned int width,
+    const unsigned int height,
+    unsigned int &freePixels,
+    unsigned int &occPixels)
 {
   common::Color pixColor;
   unsigned char v;
@@ -425,11 +452,11 @@ void MapShape::GetPixelCount(unsigned int xStart, unsigned int yStart,
 
   freePixels = occPixels = 0;
 
-  for (y = yStart; y < yStart + height; y++)
+  for (y = yStart; y < yStart + height; ++y)
   {
-    for (x = xStart; x < xStart + width; x++)
+    for (x = xStart; x < xStart + width; ++x)
     {
-      pixColor = this->mapImage->GetPixel(x, y);
+      pixColor = this->mapShapeDPtr->mapImage->GetPixel(x, y);
 
       v = (unsigned char)(255 *
           ((pixColor.r + pixColor.g + pixColor.b) / 3.0));

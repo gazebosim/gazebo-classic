@@ -13,16 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
+ */
+#ifndef _GAZEBO_PHYSICS_ROAD_HH_
+#define _GAZEBO_PHYSICS_ROAD_HH_
 
-#ifndef _ROAD_HH_
-#define _ROAD_HH_
-
-#include <string>
 #include <vector>
-#include <algorithm>
+#include <sdf/sdf.hh>
+#include <ignition/math/Vector3.hh>
 
-#include <gazebo/math/Vector3.hh>
+#include "gazebo/math/Vector3.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/physics/Base.hh"
 #include "gazebo/util/system.hh"
@@ -31,6 +30,9 @@ namespace gazebo
 {
   namespace physics
   {
+    // Forward declare private data class
+    class RoadPrivate;
+
     /// \addtogroup gazebo_physics
     /// \{
 
@@ -54,23 +56,26 @@ namespace gazebo
 
       /// \brief Get the point that define the road.
       /// \return The vector of points that define the road.
-      public: const std::vector<math::Vector3> &GetPoints() const;
+      /// \deprecated See Points() const
+      public: std::vector<math::Vector3> GetPoints() const
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the point that define the road.
+      /// \return The vector of points that define the road.
+      public: const std::vector<ignition::math::Vector3d> &Points() const;
 
       /// \brief Get the road width in meters.
       /// \return Road width in meters.
-      public: double GetWidth() const;
+      /// \deprecated See Width() const
+      public: double GetWidth() const GAZEBO_DEPRECATED(7.0);
 
-      /// \brief Width of the road.
-      private: double width;
+      /// \brief Get the road width in meters.
+      /// \return Road width in meters.
+      public: double Width() const;
 
-      /// \brief Points that makes up the mid-line of the road.
-      private: std::vector<math::Vector3> points;
-
-      /// \brief Transportation node.
-      private: transport::NodePtr node;
-
-      /// \brief Publisher for road information.
-      private: transport::PublisherPtr roadPub;
+      /// \internal
+      /// \brief Private data pointer
+      protected: RoadPrivate *roadDPtr;
     };
     /// \}
   }

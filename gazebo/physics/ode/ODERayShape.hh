@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PHYSICS_ODERAYSHAPE_HH_
-#define _GAZEBO_PHYSICS_ODERAYSHAPE_HH_
+#ifndef _GAZEBO_PHYSICS_ODE_ODERAYSHAPE_HH_
+#define _GAZEBO_PHYSICS_ODE_ODERAYSHAPE_HH_
 
 #include <string>
 
@@ -47,15 +47,7 @@ namespace gazebo
       /// \brief Get the nearest intersection
       /// \param[out] _dist Distance to the intersection.
       /// \param[out] _entity Name of the entity that was hit.
-      public: virtual void GetIntersection(double &_dist, std::string &_entity);
-
-      /// \brief Set the ray based on starting and ending points relative to
-      ///        the body
-      /// \param[in] _posStart Start position, relative the body
-      /// \param[in] _posEnd End position, relative to the body
-      /// \deprecation See function that accepts ignition::math parameters.
-      public: virtual void SetPoints(const math::Vector3 &_posStart,
-                  const math::Vector3 &_posEnd) GAZEBO_DEPRECATED(7.0);
+      public: virtual void Intersection(double &_dist, std::string &_entity);
 
       /// \brief Set the ray based on starting and ending points relative to
       /// the body

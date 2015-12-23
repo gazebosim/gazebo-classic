@@ -117,7 +117,7 @@ double CylinderShape::Length() const
 }
 
 /////////////////////////////////////////////////
-void CylinderShape::FillMsg(const msgs::Geometry &_msg)
+void CylinderShape::FillMsg(msgs::Geometry &_msg)
 {
   _msg.set_type(msgs::Geometry::CYLINDER);
   _msg.mutable_cylinder()->set_radius(this->Radius());
