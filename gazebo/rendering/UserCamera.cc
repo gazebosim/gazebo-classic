@@ -134,7 +134,7 @@ void UserCamera::Init()
     this->sceneNode->attachObject(this->dataPtr->rightCamera);
   }
 
-  this->SetHFOV(GZ_DTOR(60));
+  this->SetHFOV(static_cast<ignition::math::Angle>(IGN_DTOR(60)));
 
   // Careful when setting this value.
   // A far clip that is too close will have bad side effects on the
@@ -220,7 +220,7 @@ math::Pose UserCamera::DefaultPose() const
 //////////////////////////////////////////////////
 void UserCamera::SetWorldPose(const math::Pose &_pose)
 {
-  Camera::SetWorldPose(_pose);
+  Camera::SetWorldPose(_pose.Ign());
   this->dataPtr->viewController->Init();
 }
 
@@ -233,7 +233,7 @@ void UserCamera::Update()
     this->dataPtr->viewController->Update();
 
   // publish camera pose
-  this->dataPtr->posePub->Publish(msgs::Convert(this->GetWorldPose().Ign()));
+  this->dataPtr->posePub->Publish(msgs::Convert(this->WorldPose()));
 }
 
 //////////////////////////////////////////////////
@@ -312,16 +312,16 @@ bool UserCamera::AttachToVisualImpl(VisualPtr _visual, bool _inheritOrientation,
   Camera::AttachToVisualImpl(_visual, _inheritOrientation);
   if (_visual)
   {
-    math::Pose origPose = this->GetWorldPose();
-    double yaw = _visual->GetWorldPose().rot.GetAsEuler().z;
+    ignition::math::Pose3d origPose = this->WorldPose();
+    ignition::math::Angle yaw = _visual->GetWorldPose().rot.GetAsEuler().z;
 
-    double zDiff = origPose.pos.z - _visual->GetWorldPose().pos.z;
-    double pitch = 0;
+    double zDiff = origPose.Pos().Z() - _visual->GetWorldPose().pos.z;
+    ignition::math::Angle pitch = 0;
 
     if (fabs(zDiff) > 1e-3)
     {
-      double dist = _visual->GetWorldPose().pos.Distance(
-          this->GetWorldPose().pos);
+      double dist = _visual->GetWorldPose().pos.Ign().Distance(
+          this->WorldPose().Pos());
       pitch = acos(zDiff/dist);
     }
 
@@ -486,7 +486,7 @@ void UserCamera::ShowVisual(bool /*_s*/)
 //////////////////////////////////////////////////
 bool UserCamera::MoveToPosition(const math::Pose &_pose, double _time)
 {
-  return Camera::MoveToPosition(_pose, _time);
+  return Camera::MoveToPosition(_pose.Ign(), _time);
 }
 
 //////////////////////////////////////////////////
@@ -510,37 +510,37 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
     this->scene->GetManager()->destroyAnimation("cameratrack");
   }
 
-  math::Box box = _visual->GetBoundingBox();
-  math::Vector3 size = box.GetSize();
-  double maxSize = std::max(std::max(size.x, size.y), size.z);
+  ignition::math::Box box = _visual->GetBoundingBox().Ign();
+  ignition::math::Vector3d size = box.Size();
+  double maxSize = size.Max();
 
-  math::Vector3 start = this->GetWorldPose().pos;
+  ignition::math::Vector3d start = this->WorldPose().Pos();
   start.Correct();
-  math::Vector3 end = box.GetCenter() + _visual->GetWorldPose().pos;
+  ignition::math::Vector3d end = box.Center() +
+    _visual->GetWorldPose().pos.Ign();
   end.Correct();
-  math::Vector3 dir = end - start;
+  ignition::math::Vector3d dir = end - start;
   dir.Correct();
   dir.Normalize();
 
   double dist = start.Distance(end) - maxSize;
 
-  math::Vector3 mid = start + dir*(dist*.5);
-  mid.z = box.GetCenter().z + box.GetSize().z + 2.0;
+  ignition::math::Vector3d mid = start + dir*(dist*.5);
+  mid.Z(box.Center().Z() + box.Size().Z() + 2.0);
 
   dir = end - mid;
   dir.Correct();
 
   dist = mid.Distance(end) - maxSize;
 
-  double yawAngle = atan2(dir.y, dir.x);
-  double pitchAngle = atan2(-dir.z, sqrt(dir.x*dir.x + dir.y*dir.y));
-  math::Quaternion pitchYawOnly(0, pitchAngle, yawAngle);
-  Ogre::Quaternion pitchYawFinal(pitchYawOnly.w, pitchYawOnly.x,
-    pitchYawOnly.y, pitchYawOnly.z);
+  double yawAngle = atan2(dir.Y(), dir.X());
+  double pitchAngle = atan2(-dir.Z(), sqrt(dir.X()*dir.X() + dir.Y()*dir.Y()));
+  ignition::math::Quaterniond pitchYawOnly(0, pitchAngle, yawAngle);
+  Ogre::Quaternion pitchYawFinal = Conversions::Convert(pitchYawOnly);
 
   dir.Normalize();
 
-  double scale = maxSize / tan((this->GetHFOV()/2.0).Radian());
+  double scale = maxSize / tan((this->HFOV()/2.0).Radian());
 
   end = mid + dir*(dist - scale);
 
@@ -554,11 +554,10 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
 
   Ogre::NodeAnimationTrack *strack = anim->createNodeTrack(0, this->sceneNode);
 
-
   Ogre::TransformKeyFrame *key;
 
   key = strack->createNodeKeyFrame(0);
-  key->setTranslate(Ogre::Vector3(start.x, start.y, start.z));
+  key->setTranslate(Conversions::Convert(start));
   key->setRotation(this->sceneNode->getOrientation());
 
   /*key = strack->createNodeKeyFrame(time * 0.5);
@@ -567,7 +566,7 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
   */
 
   key = strack->createNodeKeyFrame(time);
-  key->setTranslate(Ogre::Vector3(end.x, end.y, end.z));
+  key->setTranslate(Conversions::Convert(end));
   key->setRotation(pitchYawFinal);
 
   this->animState =
@@ -588,8 +587,8 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
 void UserCamera::OnMoveToVisualComplete()
 {
   this->dataPtr->orbitViewController->SetDistance(
-      this->GetWorldPose().pos.Distance(
-      this->dataPtr->orbitViewController->GetFocalPoint()));
+      this->WorldPose().Pos().Distance(
+      this->dataPtr->orbitViewController->GetFocalPoint().Ign()));
 }
 
 //////////////////////////////////////////////////
@@ -752,7 +751,7 @@ void UserCamera::OnJoyTwist(ConstJoystickPtr &_msg)
   if (this->dataPtr->joyTwistControl &&
       (_msg->has_translation() || _msg->has_rotation()))
   {
-    math::Pose pose = this->GetWorldPose();
+    ignition::math::Pose3d pose = this->WorldPose();
 
     // Get the joystick XYZ
     if (_msg->has_translation())
@@ -760,7 +759,7 @@ void UserCamera::OnJoyTwist(ConstJoystickPtr &_msg)
       const double transRotRatio = 0.05;
       ignition::math::Vector3d trans =
         msgs::ConvertIgn(_msg->translation()) * transRotRatio;
-      pose.pos = pose.rot.RotateVector(trans) + pose.pos;
+      pose.Pos() = pose.Rot().RotateVector(trans) + pose.Pos();
     }
 
     // Get the jostick RPY. We are disabling rotation around x.
@@ -768,7 +767,7 @@ void UserCamera::OnJoyTwist(ConstJoystickPtr &_msg)
     {
       ignition::math::Vector3d rot =
         msgs::ConvertIgn(_msg->rotation()) * rpyFactor;
-      pose.rot.SetFromEuler(pose.rot.GetAsEuler() + rot);
+      pose.Rot().Euler(pose.Rot().Euler() + rot);
     }
 
     this->SetWorldPose(pose);

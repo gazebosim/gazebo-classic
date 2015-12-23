@@ -125,8 +125,8 @@ void ContactVisual::Update()
       dPtr->points[c]->sceneNode->setVisible(true);
       dPtr->points[c]->sceneNode->setPosition(Conversions::Convert(pos));
 
-      dPtr->points[c]->normal->SetPoint(1, normal*normalScale);
-      dPtr->points[c]->depth->SetPoint(1, normal*-depth*10);
+      dPtr->points[c]->normal->SetPoint(1, (normal*normalScale).Ign());
+      dPtr->points[c]->depth->SetPoint(1, (normal*-depth*10).Ign());
 
       dPtr->points[c]->normal->setMaterial("Gazebo/LightOn");
       dPtr->points[c]->depth->setMaterial("Gazebo/LightOff");
@@ -205,11 +205,11 @@ void ContactVisual::CreateNewPoint()
   cp->normal = new DynamicLines(RENDERING_LINE_LIST);
   cp->depth = new DynamicLines(RENDERING_LINE_LIST);
 
-  cp->normal->AddPoint(math::Vector3(0, 0, 0));
-  cp->normal->AddPoint(math::Vector3(0, 0, 0.1));
+  cp->normal->AddPoint(ignition::math::Vector3d(0, 0, 0));
+  cp->normal->AddPoint(ignition::math::Vector3d(0, 0, 0.1));
 
-  cp->depth->AddPoint(math::Vector3(0, 0, 0));
-  cp->depth->AddPoint(math::Vector3(0, 0, -1));
+  cp->depth->AddPoint(ignition::math::Vector3d(0, 0, 0));
+  cp->depth->AddPoint(ignition::math::Vector3d(0, 0, -1));
 
   obj->setVisibilityFlags(GZ_VISIBILITY_GUI);
   cp->depth->setVisibilityFlags(GZ_VISIBILITY_GUI);
