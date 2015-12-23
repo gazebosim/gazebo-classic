@@ -14,21 +14,26 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PHYSICS_SCREWJOINT_PRIVATE_HH_
-#define _GAZEBO_PHYSICS_SCREWJOINT_PRIVATE_HH_
+#ifndef _GAZEBO_PHYSICS_MESHSHAPEPRIVATE_HH_
+#define _GAZEBO_PHYSICS_MESHSHAPEPRIVATE_HH_
+
+#include "gazebo/common/CommonTypes.hh"
+#include "gazebo/physics/ShapePrivate.hh"
 
 namespace gazebo
 {
   namespace physics
   {
     /// \internal
-    /// \brief Screw joint protected data
-    class ScrewJointProtected
+    /// \brief Private data for MeshShape
+    class MeshShapePrivate : public ShapePrivate
     {
-      /// \brief Pitch of the thread.
-      protected: double threadPitch = 0.0;
+      /// \brief Pointer to the mesh data.
+      public: const common::Mesh *mesh;
+
+      /// \brief The submesh to use from within the parent mesh.
+      public: common::SubMesh *submesh;
     };
   }
 }
-
 #endif
