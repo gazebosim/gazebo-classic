@@ -89,7 +89,7 @@ void WirelessReceiver_TEST::TestCreateWirelessReceiver()
 
   // Get a pointer to the wireless receiver sensor
   sensors::WirelessReceiverPtr sensor =
-    boost::dynamic_pointer_cast<sensors::WirelessReceiver>(
+    std::dynamic_pointer_cast<sensors::WirelessReceiver>(
         this->mgr->GetSensor(sensorName));
 
   // Make sure the above dynamic cast worked.
@@ -227,7 +227,7 @@ void WirelessReceiver_TEST::TestUpdateImpl()
 
   // Get a pointer to the wireless receiver sensor
   sensors::WirelessReceiverPtr sensor =
-    boost::dynamic_pointer_cast<sensors::WirelessReceiver>(
+    std::dynamic_pointer_cast<sensors::WirelessReceiver>(
         this->mgr->GetSensor(sensorName));
 
   // Make sure the above dynamic cast worked.
