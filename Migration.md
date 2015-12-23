@@ -79,6 +79,14 @@ release will remove the deprecated code.
     + ***Removed:*** public: virtual void Stop() = 0;
     + ***Replacement:*** public: virtual void Stop();
 
+1. **gazebo/gui/ModelAlign.hh**
+    + ***Removed:*** public: void AlignVisuals(std::vector<rendering::VisualPtr> _visuals, const std::string &_axis, const std::string &_config, const std::string &_target, bool _publish = true);
+    + ***Replacement:*** public: void AlignVisuals(std::vector<rendering::VisualPtr> _visuals, const std::string &_axis, const std::string &_config, const std::string &_target, bool _publish = true, const bool _inverted = false);
+
+1. **gazebo/gui/GuiEvents.hh**
+    + ***Removed:*** public: static event::EventT<void (std::string, std::string, std::string, bool)> alignMode; std::string, std::string, bool)> alignMode;
+    + ***Replacement:*** public: static event::EventT<void (std::string, std::string, std::string, bool)> alignMode; std::string, std::string, bool, bool)> alignMode;
+
 ### Deprecations
 
 1. **gazebo/rendering/DynamicLines.hh**
