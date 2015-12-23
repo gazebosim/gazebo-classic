@@ -556,7 +556,7 @@ void GpuRaySensor::Render()
 }
 
 //////////////////////////////////////////////////
-bool GpuRaySensor::UpdateImpl(bool /*_force*/)
+bool GpuRaySensor::UpdateImpl(const bool /*_force*/)
 {
   if (!this->rendered)
     return false;
@@ -636,7 +636,7 @@ bool GpuRaySensor::UpdateImpl(bool /*_force*/)
 }
 
 //////////////////////////////////////////////////
-bool GpuRaySensor::IsActive()
+bool GpuRaySensor::IsActive() const
 {
   return Sensor::IsActive() ||
     (this->scanPub && this->scanPub->HasConnections());

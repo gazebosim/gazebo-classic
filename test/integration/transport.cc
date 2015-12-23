@@ -32,12 +32,12 @@ bool g_stringMsg = false;
 bool g_stringMsg2 = false;
 bool g_stringMsg3 = false;
 bool g_stringMsg4 = false;
-int g_subBeforeClear = 0;
-int g_subAfterClear = 0;
 int g_createdBeforePub = 0;
 int g_noLatchCreatedAfterPub = 0;
 int g_latchCreatedAfterPub = 0;
 int g_latchCreatedAfterPub2 = 0;
+int g_subBeforeClear = 0;
+int g_subAfterClear = 0;
 
 void ReceiveBeforeClear(ConstVector3dPtr &/*_msg*/)
 {
