@@ -73,7 +73,7 @@ void GpsSensor::Load(const std::string &_worldName)
     this->dataPtr->topicName += '/' +
       this->sdf->Get<std::string>("topic");
   }
-  boost::replace_all(this->topicName, "::", "/");
+  boost::replace_all(this->dataPtr->topicName, "::", "/");
 
   this->dataPtr->gpsPub =
     this->node->Advertise<msgs::GPS>(this->dataPtr->topicName, 50);
