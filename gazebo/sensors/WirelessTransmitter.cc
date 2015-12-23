@@ -93,7 +93,7 @@ void WirelessTransmitter::Init()
 }
 
 //////////////////////////////////////////////////
-bool WirelessTransmitter::UpdateImpl(bool /*_force*/)
+bool WirelessTransmitter::UpdateImpl(const bool /*_force*/)
 {
   this->referencePose =
       this->pose + this->parentEntity.lock()->GetWorldPose().Ign();

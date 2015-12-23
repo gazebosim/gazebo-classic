@@ -79,7 +79,23 @@ release will remove the deprecated code.
     + ***Removed:*** public: virtual void Stop() = 0;
     + ***Replacement:*** public: virtual void Stop();
 
+1. **gazebo/gui/ModelAlign.hh**
+    + ***Removed:*** public: void AlignVisuals(std::vector<rendering::VisualPtr> _visuals, const std::string &_axis, const std::string &_config, const std::string &_target, bool _publish = true);
+    + ***Replacement:*** public: void AlignVisuals(std::vector<rendering::VisualPtr> _visuals, const std::string &_axis, const std::string &_config, const std::string &_target, bool _publish = true, const bool _inverted = false);
+
+1. **gazebo/gui/GuiEvents.hh**
+    + ***Removed:*** public: static event::EventT<void (std::string, std::string, std::string, bool)> alignMode; std::string, std::string, bool)> alignMode;
+    + ***Replacement:*** public: static event::EventT<void (std::string, std::string, std::string, bool)> alignMode; std::string, std::string, bool, bool)> alignMode;
+
 ### Deprecations
+
+1. **gazebo/rendering/DynamicLines.hh**
+    + ***Deprecation:*** public: void AddPoint(const math::Vector3 &_pt,const common::Color &_color = common::Color::White)
+    + ***Replacement:*** public: void AddPoint(const ignition::math::Vector3d &_pt,const common::Color &_color = common::Color::White);
+    + ***Deprecation:*** public: void SetPoint(unsigned int _index, const math::Vector3 &_value)
+    + ***Replacement:*** public: void SetPoint(unsigned int _index,const ignition::math::Vector3d &_value);
+    + ***Deprecation:*** public: math::Vector3 GetPoint(unsigned int _index) const
+    + ***Replacement:*** public: ignition::math::Vector3d Point(const unsigned int _index) const;
 
 1. **gazebo/rendering/WindowManager.hh**
     + ***Deprecation:*** public: uint32_t GetAvgFPS(uint32_t _id);

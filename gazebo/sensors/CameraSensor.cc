@@ -191,7 +191,7 @@ void CameraSensor::Render()
 }
 
 //////////////////////////////////////////////////
-bool CameraSensor::UpdateImpl(bool /*_force*/)
+bool CameraSensor::UpdateImpl(const bool /*_force*/)
 {
   if (!this->rendered)
     return false;
@@ -263,7 +263,7 @@ bool CameraSensor::SaveFrame(const std::string &_filename)
 }
 
 //////////////////////////////////////////////////
-bool CameraSensor::IsActive()
+bool CameraSensor::IsActive() const
 {
   return Sensor::IsActive() ||
     (this->imagePub && this->imagePub->HasConnections());
