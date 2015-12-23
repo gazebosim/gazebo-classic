@@ -104,7 +104,19 @@ TEST_F(Scene_TEST, RemoveModelVisual)
     "::link::collision",
     "::link_INERTIA_VISUAL__",
     "::link_COM_VISUAL__",
-    "::link_LINK_FRAME_VISUAL__"};
+    "::link_LINK_FRAME_VISUAL__",
+    "::link_LINK_FRAME_VISUAL___X_AXIS",
+    "::link_LINK_FRAME_VISUAL___X_AXIS__SHAFT__",
+    "::link_LINK_FRAME_VISUAL___X_AXIS__HEAD__",
+    "::link_LINK_FRAME_VISUAL___X_AXIS__ROTATION__",
+    "::link_LINK_FRAME_VISUAL___Y_AXIS",
+    "::link_LINK_FRAME_VISUAL___Y_AXIS__SHAFT__",
+    "::link_LINK_FRAME_VISUAL___Y_AXIS__HEAD__",
+    "::link_LINK_FRAME_VISUAL___Y_AXIS__ROTATION__",
+    "::link_LINK_FRAME_VISUAL___Z_AXIS",
+    "::link_LINK_FRAME_VISUAL___Z_AXIS__SHAFT__",
+    "::link_LINK_FRAME_VISUAL___Z_AXIS__HEAD__",
+    "::link_LINK_FRAME_VISUAL___Z_AXIS__ROTATION__"};
 
   for (auto const &modelName : models)
   {
