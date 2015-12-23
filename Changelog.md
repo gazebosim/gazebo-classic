@@ -278,6 +278,9 @@ using the same arguments used in the command line.
     1. PIMPLize gui/building/BuildingModelManip, move attachment logic to BuildingMaker
         * [Pull request #2046](https://bitbucket.org/osrf/gazebo/pull-request/2046)
 
+    1. PIMPLize GridLines class
+        * [Pull request #2032](https://bitbucket.org/osrf/gazebo/pull-request/2032)
+
 ## Gazebo 6.0
 
 ### Gazebo 6.X.X (201X-XX-XX)
