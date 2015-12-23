@@ -92,7 +92,7 @@ void RFIDTag::Init()
 }
 
 //////////////////////////////////////////////////
-bool RFIDTag::UpdateImpl(bool /*_force*/)
+bool RFIDTag::UpdateImpl(const bool /*_force*/)
 {
   if (this->scanPub)
   {

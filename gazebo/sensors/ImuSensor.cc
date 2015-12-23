@@ -266,7 +266,7 @@ void ImuSensor::SetReferencePose()
 }
 
 //////////////////////////////////////////////////
-bool ImuSensor::UpdateImpl(bool /*_force*/)
+bool ImuSensor::UpdateImpl(const bool /*_force*/)
 {
   msgs::LinkData msg;
   int readIndex = 0;
@@ -383,7 +383,7 @@ bool ImuSensor::UpdateImpl(bool /*_force*/)
 }
 
 //////////////////////////////////////////////////
-bool ImuSensor::IsActive()
+bool ImuSensor::IsActive() const
 {
   return this->active ||
          (this->pub && this->pub->HasConnections());
