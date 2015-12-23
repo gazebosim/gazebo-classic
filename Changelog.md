@@ -251,6 +251,9 @@ using the same arguments used in the command line.
         * [Pull request #1904](https://bitbucket.org/osrf/gazebo/pull-request/1904)
         * [Issue #1543](https://bitbucket.org/osrf/gazebo/issue/1543)
 
+    1. PIMPL JointInspector
+        * [Pull request #2059](https://bitbucket.org/osrf/gazebo/pull-request/2059)
+
     1. Apply inspector changes in real time and add reset button
         * [Pull request #1945](https://bitbucket.org/osrf/gazebo/pull-request/1945)
         * [Issue #1472](https://bitbucket.org/osrf/gazebo/issue/1472)

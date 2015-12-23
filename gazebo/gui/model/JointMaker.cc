@@ -944,7 +944,7 @@ unsigned int JointMaker::GetJointCount()
 void JointData::OnApply()
 {
   // Get data from inspector
-  msgs::Joint *inspectorMsg = this->inspector->GetData();
+  msgs::Joint *inspectorMsg = this->inspector->Data();
   if (!inspectorMsg)
     return;
 
