@@ -15,14 +15,19 @@
  *
 */
 
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/common/Console.hh"
 
 #include "gazebo/rendering/Material.hh"
 
 #include "gazebo/gui/ConfigWidget.hh"
-#include "gazebo/gui/model/JointMaker.hh"
-#include "gazebo/gui/model/JointCreationDialogPrivate.hh"
+#include "gazebo/gui/GuiIface.hh"
+#include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/model/JointCreationDialog.hh"
+#include "gazebo/gui/model/JointCreationDialogPrivate.hh"
+#include "gazebo/gui/model/JointMaker.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -34,7 +39,8 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
 {
   this->setObjectName("JointCreationDialog");
   this->setWindowTitle(tr("Create Joint"));
-  this->setWindowFlags(Qt::WindowStaysOnTopHint);
+  this->setWindowFlags(this->windowFlags() | Qt::WindowStaysOnTopHint);
+  this->setModal(false);
 
   this->setMinimumWidth(500);
   this->setMinimumHeight(940);
@@ -46,7 +52,6 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
 
   // Joint types
   QRadioButton *fixedJointRadio = new QRadioButton(tr("Fixed"));
-  fixedJointRadio->setStyleSheet("QLabel{color : black}");
   QRadioButton *prismaticJointRadio = new QRadioButton(tr("Prismatic"));
   QRadioButton *revoluteJointRadio = new QRadioButton(tr("Revolute"));
   QRadioButton *revolute2JointRadio = new QRadioButton(tr("Revolute2"));
@@ -196,7 +201,7 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
       this->dataPtr->configWidget->CreateVector3dWidget("axis1", 0);
   this->dataPtr->configWidget->AddConfigChildWidget("axis1",
       this->dataPtr->axis1Widget);
-  this->dataPtr->configWidget->SetVector3WidgetValue("axis1",
+  this->dataPtr->configWidget->SetVector3dWidgetValue("axis1",
       ignition::math::Vector3d::UnitX);
   this->dataPtr->configWidget->SetWidgetReadOnly("axis1", true);
 
@@ -205,7 +210,7 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
       this->dataPtr->configWidget->CreateVector3dWidget("axis2", 0);
   this->dataPtr->configWidget->AddConfigChildWidget("axis2",
       this->dataPtr->axis2Widget);
-  this->dataPtr->configWidget->SetVector3WidgetValue("axis2",
+  this->dataPtr->configWidget->SetVector3dWidgetValue("axis2",
       ignition::math::Vector3d::UnitY);
   this->dataPtr->configWidget->SetWidgetReadOnly("axis2", true);
 
@@ -241,46 +246,55 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   auto xAlignMin = new QToolButton();
   xAlignMin->setToolButtonStyle(Qt::ToolButtonIconOnly);
   xAlignMin->setIcon(QIcon(":/images/x_min.png"));
+  xAlignMin->setToolTip("X Align Min");
   xAlignMin->setCheckable(true);
 
   auto xAlignCenter = new QToolButton();
   xAlignCenter->setToolButtonStyle(Qt::ToolButtonIconOnly);
   xAlignCenter->setIcon(QIcon(":/images/x_center.png"));
+  xAlignCenter->setToolTip("X Align Center");
   xAlignCenter->setCheckable(true);
 
   auto xAlignMax = new QToolButton();
   xAlignMax->setToolButtonStyle(Qt::ToolButtonIconOnly);
   xAlignMax->setIcon(QIcon(":/images/x_max.png"));
+  xAlignMax->setToolTip("X Align Max");
   xAlignMax->setCheckable(true);
 
   auto yAlignMin = new QToolButton();
   yAlignMin->setToolButtonStyle(Qt::ToolButtonIconOnly);
   yAlignMin->setIcon(QIcon(":/images/y_min.png"));
+  yAlignMin->setToolTip("Y Align Min");
   yAlignMin->setCheckable(true);
 
   auto yAlignCenter = new QToolButton();
   yAlignCenter->setToolButtonStyle(Qt::ToolButtonIconOnly);
   yAlignCenter->setIcon(QIcon(":/images/y_center.png"));
+  yAlignCenter->setToolTip("Y Align Center");
   yAlignCenter->setCheckable(true);
 
   auto yAlignMax = new QToolButton();
   yAlignMax->setToolButtonStyle(Qt::ToolButtonIconOnly);
   yAlignMax->setIcon(QIcon(":/images/y_max.png"));
+  yAlignMax->setToolTip("Y Align Max");
   yAlignMax->setCheckable(true);
 
   auto zAlignMin = new QToolButton();
   zAlignMin->setToolButtonStyle(Qt::ToolButtonIconOnly);
   zAlignMin->setIcon(QIcon(":/images/z_min.png"));
+  zAlignMin->setToolTip("Z Align Min");
   zAlignMin->setCheckable(true);
 
   auto zAlignCenter = new QToolButton();
   zAlignCenter->setToolButtonStyle(Qt::ToolButtonIconOnly);
   zAlignCenter->setIcon(QIcon(":/images/z_center.png"));
+  zAlignCenter->setToolTip("Z Align Center");
   zAlignCenter->setCheckable(true);
 
   auto zAlignMax = new QToolButton();
   zAlignMax->setToolButtonStyle(Qt::ToolButtonIconOnly);
   zAlignMax->setIcon(QIcon(":/images/z_max.png"));
+  zAlignMax->setToolTip("Z Align Max");
   zAlignMax->setCheckable(true);
 
   auto alignXButtonGroup = new QButtonGroup();
@@ -327,6 +341,7 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   this->dataPtr->alignCombo = new QComboBox();
   this->dataPtr->alignCombo->addItem("Child to Parent", 0);
   this->dataPtr->alignCombo->addItem("Parent to Child", 1);
+  this->dataPtr->alignCombo->setToolTip("Choose alignment reference");
   connect(this->dataPtr->alignCombo, SIGNAL(currentIndexChanged(const int)),
       this, SLOT(OnAlign(const int)));
 
@@ -370,10 +385,11 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
       jointPoseWidget);
   this->dataPtr->configWidget->SetWidgetReadOnly("joint_pose", true);
 
-  // Joint pose group
   QWidget *jointPoseGroupWidget =
       this->dataPtr->configWidget->CreateGroupWidget(
       "Joint Pose", jointPoseWidget, 0);
+  jointPoseGroupWidget->setToolTip(
+      "Joint pose expressed in the child link frame");
 
   // Relative pose widget
   ConfigChildWidget *relativePoseWidget =
@@ -385,6 +401,8 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   QWidget *relativePoseGroupWidget =
       this->dataPtr->configWidget->CreateGroupWidget(
       "Relative Pose", relativePoseWidget, 0);
+  relativePoseGroupWidget->setToolTip(
+      "Child link pose expressed in parent link frame");
 
   // Connect pose widgets signal
   connect(this->dataPtr->configWidget,
@@ -464,8 +482,6 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
 /////////////////////////////////////////////////
 JointCreationDialog::~JointCreationDialog()
 {
-  delete this->dataPtr;
-  this->dataPtr = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -499,9 +515,9 @@ void JointCreationDialog::Open(const JointMaker::JointType _type)
   }
 
   // Reset fields
-  this->dataPtr->configWidget->SetVector3WidgetValue("axis1",
+  this->dataPtr->configWidget->SetVector3dWidgetValue("axis1",
       ignition::math::Vector3d::UnitX);
-  this->dataPtr->configWidget->SetVector3WidgetValue("axis2",
+  this->dataPtr->configWidget->SetVector3dWidgetValue("axis2",
       ignition::math::Vector3d::UnitY);
   this->dataPtr->configWidget->SetPoseWidgetValue("joint_pose",
       ignition::math::Pose3d());
@@ -528,7 +544,8 @@ void JointCreationDialog::Open(const JointMaker::JointType _type)
   this->dataPtr->axis2Widget->setStyleSheet(
       ConfigWidget::StyleSheet("normal", 1));
 
-  this->move(0, 0);
+  if (this->parentWidget())
+    this->move(this->parentWidget()->pos());
   this->show();
   QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
 }
@@ -537,9 +554,9 @@ void JointCreationDialog::Open(const JointMaker::JointType _type)
 void JointCreationDialog::OnLinkFromDialog()
 {
   std::string currentParent =
-      this->dataPtr->configWidget->GetEnumWidgetValue("parentCombo");
+      this->dataPtr->configWidget->EnumWidgetValue("parentCombo");
   std::string currentChild =
-      this->dataPtr->configWidget->GetEnumWidgetValue("childCombo");
+      this->dataPtr->configWidget->EnumWidgetValue("childCombo");
 
   // Notify so 3D is updated
   if (currentParent != currentChild)
@@ -551,10 +568,10 @@ void JointCreationDialog::OnLinkFromDialog()
   }
 
   if (currentParent != "")
-    this->OnParentImpl(QString::fromStdString(currentParent));
+    this->OnParentImpl(currentParent);
 
   if (currentChild != "")
-    this->OnChildImpl(QString::fromStdString(currentChild));
+    this->OnChildImpl(currentChild);
 
   this->UncheckAllAlign();
 }
@@ -631,7 +648,7 @@ void JointCreationDialog::SetParent(const std::string &_linkName)
   }
   this->dataPtr->configWidget->blockSignals(false);
 
-  this->OnParentImpl(QString::fromStdString(_linkName));
+  this->OnParentImpl(_linkName);
 }
 
 /////////////////////////////////////////////////
@@ -643,7 +660,7 @@ void JointCreationDialog::SetChild(const std::string &_linkName)
     return;
   }
 
-  if (this->dataPtr->configWidget->GetWidgetReadOnly("childCombo"))
+  if (this->dataPtr->configWidget->WidgetReadOnly("childCombo"))
   {
     gzerr << "It's not possible to set child yet." << std::endl;
     return;
@@ -663,13 +680,13 @@ void JointCreationDialog::SetChild(const std::string &_linkName)
   }
   this->dataPtr->configWidget->blockSignals(false);
 
-  this->OnChildImpl(QString::fromStdString(_linkName));
+  this->OnChildImpl(_linkName);
 }
 
 /////////////////////////////////////////////////
-void JointCreationDialog::OnParentImpl(const QString &_linkName)
+void JointCreationDialog::OnParentImpl(const std::string &_linkName)
 {
-  if (_linkName.isEmpty())
+  if (_linkName.empty())
   {
     gzerr << "Empty link name for parent" << std::endl;
     return;
@@ -682,7 +699,7 @@ void JointCreationDialog::OnParentImpl(const QString &_linkName)
   this->CheckLinksValid();
 
   // Enable child selection
-  if (this->dataPtr->configWidget->GetWidgetReadOnly("childCombo"))
+  if (this->dataPtr->configWidget->WidgetReadOnly("childCombo"))
   {
     this->dataPtr->configWidget->SetWidgetReadOnly("childCombo", false);
     this->dataPtr->childLinkWidget->setStyleSheet(
@@ -691,9 +708,9 @@ void JointCreationDialog::OnParentImpl(const QString &_linkName)
 }
 
 /////////////////////////////////////////////////
-void JointCreationDialog::OnChildImpl(const QString &_linkName)
+void JointCreationDialog::OnChildImpl(const std::string &_linkName)
 {
-  if (_linkName.isEmpty())
+  if (_linkName.empty())
   {
     gzerr << "Empty link name for child" << std::endl;
     return;
@@ -738,9 +755,9 @@ void JointCreationDialog::OnSwap()
 {
   // Get current values
   std::string currentParent =
-      this->dataPtr->configWidget->GetEnumWidgetValue("parentCombo");
+      this->dataPtr->configWidget->EnumWidgetValue("parentCombo");
   std::string currentChild =
-      this->dataPtr->configWidget->GetEnumWidgetValue("childCombo");
+      this->dataPtr->configWidget->EnumWidgetValue("childCombo");
 
   // Choose new values
   this->dataPtr->configWidget->SetEnumWidgetValue("parentCombo", currentChild);
@@ -751,8 +768,7 @@ void JointCreationDialog::OnSwap()
 void JointCreationDialog::UpdateRelativePose(
     const ignition::math::Pose3d &_pose)
 {
-  this->dataPtr->configWidget->SetPoseWidgetValue("relative_pose",
-      math::Pose(_pose));
+  this->dataPtr->configWidget->SetPoseWidgetValue("relative_pose", _pose);
 
   if (this->dataPtr->alignPending)
     this->dataPtr->alignPending = false;
@@ -765,9 +781,9 @@ void JointCreationDialog::OnResetAll()
 {
   this->dataPtr->jointMaker->SetLinksRelativePose(ignition::math::Pose3d::Zero,
       true);
-  this->dataPtr->configWidget->SetVector3WidgetValue("axis1",
+  this->dataPtr->configWidget->SetVector3dWidgetValue("axis1",
       ignition::math::Vector3d::UnitX);
-  this->dataPtr->configWidget->SetVector3WidgetValue("axis2",
+  this->dataPtr->configWidget->SetVector3dWidgetValue("axis2",
       ignition::math::Vector3d::UnitY);
 
   this->dataPtr->configWidget->SetPoseWidgetValue("joint_pose",
@@ -787,9 +803,9 @@ void JointCreationDialog::OnEnumChanged(const QString &_name,
 void JointCreationDialog::CheckLinksValid()
 {
   std::string currentParent =
-      this->dataPtr->configWidget->GetEnumWidgetValue("parentCombo");
+      this->dataPtr->configWidget->EnumWidgetValue("parentCombo");
   std::string currentChild =
-      this->dataPtr->configWidget->GetEnumWidgetValue("childCombo");
+      this->dataPtr->configWidget->EnumWidgetValue("childCombo");
 
   // Warning if parent is the same as the child and don't allow creation
   if (currentParent == currentChild)
@@ -804,7 +820,7 @@ void JointCreationDialog::CheckLinksValid()
   {
     this->dataPtr->parentLinkWidget->setStyleSheet(
         ConfigWidget::StyleSheet("normal", 1));
-    if (!this->dataPtr->configWidget->GetWidgetReadOnly("childCombo"))
+    if (!this->dataPtr->configWidget->WidgetReadOnly("childCombo"))
     {
       this->dataPtr->childLinkWidget->setStyleSheet(
           ConfigWidget::StyleSheet("normal", 1));

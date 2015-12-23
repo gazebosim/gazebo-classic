@@ -15,23 +15,25 @@
  *
 */
 
-#ifndef _GAZEBO_JOINT_CREATION_DIALOG_HH_
-#define _GAZEBO_JOINT_CREATION_DIALOG_HH_
+#ifndef _GAZEBO_GUI_JOINT_CREATION_DIALOG_HH_
+#define _GAZEBO_GUI_JOINT_CREATION_DIALOG_HH_
 
+#include <memory>
 #include <string>
+
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/model/JointMaker.hh"
-#include "gazebo/util/system.hh"
 
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
-    class JointMaker;
-    class ConfigWidget;
-    class ConfigChildWidget;
+    // Forward declare private data.
     class JointCreationDialogPrivate;
 
     /// \class JointCreationDialog gui/JointCreationDialog.hh
@@ -123,20 +125,20 @@ namespace gazebo
       /// \brief Handles choosing the parent link, whether it is chosen from the
       /// dialog or the 3D scene.
       /// \param[in] _linkName Name of new parent link.
-      private: void OnParentImpl(const QString &_linkName);
+      private: void OnParentImpl(const std::string &_linkName);
 
       /// \internal
       /// \brief Handles choosing the child link, whether it is chosen from the
       /// dialog or the 3D scene.
       /// \param[in] _linkName Name of new child link.
-      private: void OnChildImpl(const QString &_linkName);
+      private: void OnChildImpl(const std::string &_linkName);
 
       // Documentation inherited
       private: void keyPressEvent(QKeyEvent *_event);
 
       /// \internal
       /// \brief Pointer to private data.
-      private: JointCreationDialogPrivate *dataPtr;
+      private: std::unique_ptr<JointCreationDialogPrivate> dataPtr;
     };
     /// \}
   }

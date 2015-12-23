@@ -56,8 +56,8 @@ void JointCreationDialog_TEST::Type()
   }
 
   // Check there's one joint axis widget
-  QVERIFY(configWidget->GetWidgetVisible("axis1"));
-  QVERIFY(!configWidget->GetWidgetVisible("axis2"));
+  QVERIFY(configWidget->WidgetVisible("axis1"));
+  QVERIFY(!configWidget->WidgetVisible("axis2"));
 
   // Set type to ball joint
   radioButtons[6]->click();
@@ -72,8 +72,8 @@ void JointCreationDialog_TEST::Type()
   }
 
   // Check there's no joint axis widget
-  QVERIFY(!configWidget->GetWidgetVisible("axis1"));
-  QVERIFY(!configWidget->GetWidgetVisible("axis2"));
+  QVERIFY(!configWidget->WidgetVisible("axis1"));
+  QVERIFY(!configWidget->WidgetVisible("axis2"));
 
   // Set type to Revolute 2 joint
   radioButtons[2]->click();
@@ -88,8 +88,8 @@ void JointCreationDialog_TEST::Type()
   }
 
   // Check there are both joint axis widgets
-  QVERIFY(configWidget->GetWidgetVisible("axis1"));
-  QVERIFY(configWidget->GetWidgetVisible("axis2"));
+  QVERIFY(configWidget->WidgetVisible("axis1"));
+  QVERIFY(configWidget->WidgetVisible("axis2"));
 
   delete jointCreationDialog;
   delete jointMaker;
@@ -149,17 +149,17 @@ void JointCreationDialog_TEST::Links()
   }
 
   // Check there are no links selected yet
-  QVERIFY(configWidget->GetEnumWidgetValue("parentCombo") == "");
-  QVERIFY(configWidget->GetEnumWidgetValue("childCombo") == "");
+  QVERIFY(configWidget->EnumWidgetValue("parentCombo") == "");
+  QVERIFY(configWidget->EnumWidgetValue("childCombo") == "");
 
   // Check only parent is enabled
-  QVERIFY(!configWidget->GetWidgetReadOnly("parentCombo"));
-  QVERIFY(configWidget->GetWidgetReadOnly("childCombo"));
-  QVERIFY(configWidget->GetWidgetReadOnly("axis1"));
-  QVERIFY(configWidget->GetWidgetReadOnly("axis2"));
-  QVERIFY(configWidget->GetWidgetReadOnly("align"));
-  QVERIFY(configWidget->GetWidgetReadOnly("joint_pose"));
-  QVERIFY(configWidget->GetWidgetReadOnly("relative_pose"));
+  QVERIFY(!configWidget->WidgetReadOnly("parentCombo"));
+  QVERIFY(configWidget->WidgetReadOnly("childCombo"));
+  QVERIFY(configWidget->WidgetReadOnly("axis1"));
+  QVERIFY(configWidget->WidgetReadOnly("axis2"));
+  QVERIFY(configWidget->WidgetReadOnly("align"));
+  QVERIFY(configWidget->WidgetReadOnly("joint_pose"));
+  QVERIFY(configWidget->WidgetReadOnly("relative_pose"));
 
   // Get push buttons (reset, cancel, create)
   auto pushButtons = jointCreationDialog->findChildren<QPushButton *>();
@@ -173,17 +173,17 @@ void JointCreationDialog_TEST::Links()
   jointCreationDialog->SetParent(scopedLinkNames[0]);
 
   // Check that the parent link was selected
-  QVERIFY(configWidget->GetEnumWidgetValue("parentCombo") == linkNames[0]);
-  QVERIFY(configWidget->GetEnumWidgetValue("childCombo") == "");
+  QVERIFY(configWidget->EnumWidgetValue("parentCombo") == linkNames[0]);
+  QVERIFY(configWidget->EnumWidgetValue("childCombo") == "");
 
   // Check that now child is also enabled
-  QVERIFY(!configWidget->GetWidgetReadOnly("parentCombo"));
-  QVERIFY(!configWidget->GetWidgetReadOnly("childCombo"));
-  QVERIFY(configWidget->GetWidgetReadOnly("axis1"));
-  QVERIFY(configWidget->GetWidgetReadOnly("axis2"));
-  QVERIFY(configWidget->GetWidgetReadOnly("align"));
-  QVERIFY(configWidget->GetWidgetReadOnly("joint_pose"));
-  QVERIFY(configWidget->GetWidgetReadOnly("relative_pose"));
+  QVERIFY(!configWidget->WidgetReadOnly("parentCombo"));
+  QVERIFY(!configWidget->WidgetReadOnly("childCombo"));
+  QVERIFY(configWidget->WidgetReadOnly("axis1"));
+  QVERIFY(configWidget->WidgetReadOnly("axis2"));
+  QVERIFY(configWidget->WidgetReadOnly("align"));
+  QVERIFY(configWidget->WidgetReadOnly("joint_pose"));
+  QVERIFY(configWidget->WidgetReadOnly("relative_pose"));
 
   // Check that create button is disabled
   for (auto button : pushButtons)
@@ -193,17 +193,17 @@ void JointCreationDialog_TEST::Links()
   jointCreationDialog->SetChild(scopedLinkNames[1]);
 
   // Check that the child link was selected
-  QVERIFY(configWidget->GetEnumWidgetValue("parentCombo") == linkNames[0]);
-  QVERIFY(configWidget->GetEnumWidgetValue("childCombo") == linkNames[1]);
+  QVERIFY(configWidget->EnumWidgetValue("parentCombo") == linkNames[0]);
+  QVERIFY(configWidget->EnumWidgetValue("childCombo") == linkNames[1]);
 
   // Check that now all widgets are enabled
-  QVERIFY(!configWidget->GetWidgetReadOnly("parentCombo"));
-  QVERIFY(!configWidget->GetWidgetReadOnly("childCombo"));
-  QVERIFY(!configWidget->GetWidgetReadOnly("axis1"));
-  QVERIFY(!configWidget->GetWidgetReadOnly("axis2"));
-  QVERIFY(!configWidget->GetWidgetReadOnly("align"));
-  QVERIFY(!configWidget->GetWidgetReadOnly("joint_pose"));
-  QVERIFY(!configWidget->GetWidgetReadOnly("relative_pose"));
+  QVERIFY(!configWidget->WidgetReadOnly("parentCombo"));
+  QVERIFY(!configWidget->WidgetReadOnly("childCombo"));
+  QVERIFY(!configWidget->WidgetReadOnly("axis1"));
+  QVERIFY(!configWidget->WidgetReadOnly("axis2"));
+  QVERIFY(!configWidget->WidgetReadOnly("align"));
+  QVERIFY(!configWidget->WidgetReadOnly("joint_pose"));
+  QVERIFY(!configWidget->WidgetReadOnly("relative_pose"));
 
   for (auto button : pushButtons)
     QVERIFY(button->isEnabled());
@@ -217,15 +217,15 @@ void JointCreationDialog_TEST::Links()
   swapButton->click();
 
   // Check that the parent link was selected
-  QVERIFY(configWidget->GetEnumWidgetValue("parentCombo") == linkNames[1]);
-  QVERIFY(configWidget->GetEnumWidgetValue("childCombo") == linkNames[0]);
+  QVERIFY(configWidget->EnumWidgetValue("parentCombo") == linkNames[1]);
+  QVERIFY(configWidget->EnumWidgetValue("childCombo") == linkNames[0]);
 
   // Set child from dialog, same as parent
   childCombo->setCurrentIndex(1);
 
   // Check that the child link was selected
-  QVERIFY(configWidget->GetEnumWidgetValue("parentCombo") == linkNames[1]);
-  QVERIFY(configWidget->GetEnumWidgetValue("childCombo") == linkNames[1]);
+  QVERIFY(configWidget->EnumWidgetValue("parentCombo") == linkNames[1]);
+  QVERIFY(configWidget->EnumWidgetValue("childCombo") == linkNames[1]);
 
   // Check that create button is disabled
   for (auto button : pushButtons)
@@ -235,8 +235,8 @@ void JointCreationDialog_TEST::Links()
   parentCombo->setCurrentIndex(2);
 
   // Check that the child link was selected
-  QVERIFY(configWidget->GetEnumWidgetValue("parentCombo") == linkNames[2]);
-  QVERIFY(configWidget->GetEnumWidgetValue("childCombo") == linkNames[1]);
+  QVERIFY(configWidget->EnumWidgetValue("parentCombo") == linkNames[2]);
+  QVERIFY(configWidget->EnumWidgetValue("childCombo") == linkNames[1]);
 
   // Check that all buttons are enabled
   for (auto button : pushButtons)
@@ -296,25 +296,25 @@ void JointCreationDialog_TEST::Axis()
   jointCreationDialog->SetChild(scopedLinkNames[1]);
 
   // Check that all widgets are enabled
-  QVERIFY(!configWidget->GetWidgetReadOnly("parentCombo"));
-  QVERIFY(!configWidget->GetWidgetReadOnly("childCombo"));
-  QVERIFY(!configWidget->GetWidgetReadOnly("axis1"));
-  QVERIFY(!configWidget->GetWidgetReadOnly("axis2"));
-  QVERIFY(!configWidget->GetWidgetReadOnly("align"));
-  QVERIFY(!configWidget->GetWidgetReadOnly("joint_pose"));
-  QVERIFY(!configWidget->GetWidgetReadOnly("relative_pose"));
+  QVERIFY(!configWidget->WidgetReadOnly("parentCombo"));
+  QVERIFY(!configWidget->WidgetReadOnly("childCombo"));
+  QVERIFY(!configWidget->WidgetReadOnly("axis1"));
+  QVERIFY(!configWidget->WidgetReadOnly("axis2"));
+  QVERIFY(!configWidget->WidgetReadOnly("align"));
+  QVERIFY(!configWidget->WidgetReadOnly("joint_pose"));
+  QVERIFY(!configWidget->WidgetReadOnly("relative_pose"));
 
   for (auto button : pushButtons)
     QVERIFY(button->isEnabled());
 
   // Check that both joint axis widgets are visible
-  QVERIFY(configWidget->GetWidgetVisible("axis1"));
-  QVERIFY(configWidget->GetWidgetVisible("axis2"));
+  QVERIFY(configWidget->WidgetVisible("axis1"));
+  QVERIFY(configWidget->WidgetVisible("axis2"));
 
   // Check default values
-  QVERIFY(configWidget->GetVector3WidgetValue("axis1") ==
+  QVERIFY(configWidget->Vector3dWidgetValue("axis1") ==
       ignition::math::Vector3d::UnitX);
-  QVERIFY(configWidget->GetVector3WidgetValue("axis2") ==
+  QVERIFY(configWidget->Vector3dWidgetValue("axis2") ==
       ignition::math::Vector3d::UnitY);
 
   // Set an axis to be zero
@@ -340,9 +340,9 @@ void JointCreationDialog_TEST::Axis()
     QVERIFY(button->isEnabled());
 
   // Check new value
-  QVERIFY(configWidget->GetVector3WidgetValue("axis1") ==
+  QVERIFY(configWidget->Vector3dWidgetValue("axis1") ==
       ignition::math::Vector3d::UnitZ);
-  QVERIFY(configWidget->GetVector3WidgetValue("axis2") ==
+  QVERIFY(configWidget->Vector3dWidgetValue("axis2") ==
       ignition::math::Vector3d::UnitY);
 
   // Get reset button
@@ -354,9 +354,9 @@ void JointCreationDialog_TEST::Axis()
   resetButton->click();
 
   // Check widgets were reset
-  QVERIFY(configWidget->GetVector3WidgetValue("axis1") ==
+  QVERIFY(configWidget->Vector3dWidgetValue("axis1") ==
       ignition::math::Vector3d::UnitX);
-  QVERIFY(configWidget->GetVector3WidgetValue("axis2") ==
+  QVERIFY(configWidget->Vector3dWidgetValue("axis2") ==
       ignition::math::Vector3d::UnitY);
 
   delete jointCreationDialog;
@@ -403,13 +403,13 @@ void JointCreationDialog_TEST::Align()
   jointCreationDialog->SetChild(scopedLinkNames[1]);
 
   // Check that all widgets are enabled
-  QVERIFY(!configWidget->GetWidgetReadOnly("parentCombo"));
-  QVERIFY(!configWidget->GetWidgetReadOnly("childCombo"));
-  QVERIFY(!configWidget->GetWidgetReadOnly("axis1"));
-  QVERIFY(!configWidget->GetWidgetReadOnly("axis2"));
-  QVERIFY(!configWidget->GetWidgetReadOnly("align"));
-  QVERIFY(!configWidget->GetWidgetReadOnly("joint_pose"));
-  QVERIFY(!configWidget->GetWidgetReadOnly("relative_pose"));
+  QVERIFY(!configWidget->WidgetReadOnly("parentCombo"));
+  QVERIFY(!configWidget->WidgetReadOnly("childCombo"));
+  QVERIFY(!configWidget->WidgetReadOnly("axis1"));
+  QVERIFY(!configWidget->WidgetReadOnly("axis2"));
+  QVERIFY(!configWidget->WidgetReadOnly("align"));
+  QVERIFY(!configWidget->WidgetReadOnly("joint_pose"));
+  QVERIFY(!configWidget->WidgetReadOnly("relative_pose"));
 
   for (auto button : pushButtons)
     QVERIFY(button->isEnabled());
@@ -496,7 +496,7 @@ void JointCreationDialog_TEST::RelativePose()
   QVERIFY(configWidget != NULL);
 
   // Check the default value
-  QVERIFY(configWidget->GetPoseWidgetValue("relative_pose") ==
+  QVERIFY(configWidget->PoseWidgetValue("relative_pose") ==
       ignition::math::Pose3d::Zero);
 
   // Set child and parent from 3D scene
@@ -504,13 +504,13 @@ void JointCreationDialog_TEST::RelativePose()
   jointCreationDialog->SetChild(scopedLinkNames[1]);
 
   // Check that all widgets are enabled
-  QVERIFY(!configWidget->GetWidgetReadOnly("parentCombo"));
-  QVERIFY(!configWidget->GetWidgetReadOnly("childCombo"));
-  QVERIFY(!configWidget->GetWidgetReadOnly("axis1"));
-  QVERIFY(!configWidget->GetWidgetReadOnly("axis2"));
-  QVERIFY(!configWidget->GetWidgetReadOnly("align"));
-  QVERIFY(!configWidget->GetWidgetReadOnly("joint_pose"));
-  QVERIFY(!configWidget->GetWidgetReadOnly("relative_pose"));
+  QVERIFY(!configWidget->WidgetReadOnly("parentCombo"));
+  QVERIFY(!configWidget->WidgetReadOnly("childCombo"));
+  QVERIFY(!configWidget->WidgetReadOnly("axis1"));
+  QVERIFY(!configWidget->WidgetReadOnly("axis2"));
+  QVERIFY(!configWidget->WidgetReadOnly("align"));
+  QVERIFY(!configWidget->WidgetReadOnly("joint_pose"));
+  QVERIFY(!configWidget->WidgetReadOnly("relative_pose"));
 
   for (auto button : pushButtons)
     QVERIFY(button->isEnabled());
@@ -520,7 +520,7 @@ void JointCreationDialog_TEST::RelativePose()
   jointCreationDialog->UpdateRelativePose(pose);
 
   // Check the widget was updated
-  QVERIFY(configWidget->GetPoseWidgetValue("relative_pose") == pose);
+  QVERIFY(configWidget->PoseWidgetValue("relative_pose") == pose);
 
   // Get relative pose widget and check it has all the spins
   auto relPosWidget = configWidget->ConfigChildWidgetByName("relative_pose");
@@ -534,7 +534,7 @@ void JointCreationDialog_TEST::RelativePose()
   QTest::keyClick(spins[1], Qt::Key_Enter);
 
   // Check the relative pose was reset
-  QVERIFY(configWidget->GetPoseWidgetValue("relative_pose") ==
+  QVERIFY(configWidget->PoseWidgetValue("relative_pose") ==
       ignition::math::Pose3d(100.0, pose.Pos().Y(), pose.Pos().Z(),
       pose.Rot().Roll(), pose.Rot().Pitch(), pose.Rot().Yaw()));
 

@@ -14,9 +14,10 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_MODEL_EDITOR_HH_
-#define _GAZEBO_MODEL_EDITOR_HH_
+#ifndef _GAZEBO_GUI_MODEL_EDITOR_HH_
+#define _GAZEBO_GUI_MODEL_EDITOR_HH_
 
+#include <memory>
 #include <string>
 
 #include <sdf/sdf.hh>
@@ -115,7 +116,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Pointer to private data.
-      private: ModelEditorPrivate *dataPtr;
+      private: std::unique_ptr<ModelEditorPrivate> dataPtr;
     };
   }
 }

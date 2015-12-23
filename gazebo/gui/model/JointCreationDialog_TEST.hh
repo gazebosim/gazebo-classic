@@ -15,12 +15,12 @@
  *
 */
 
-#ifndef _GAZEBO_JOINT_CREATION_DIALOG_TEST_HH_
-#define _GAZEBO_JOINT_CREATION_DIALOG_TEST_HH_
+#ifndef _GAZEBO_GUI_JOINT_CREATION_DIALOG_TEST_HH_
+#define _GAZEBO_GUI_JOINT_CREATION_DIALOG_TEST_HH_
 
 #include "gazebo/gui/QTestFixture.hh"
 
-/// \brief A test class for the link inspector.
+/// \brief A test class for the joint creation dialog.
 class JointCreationDialog_TEST : public QTestFixture
 {
   Q_OBJECT

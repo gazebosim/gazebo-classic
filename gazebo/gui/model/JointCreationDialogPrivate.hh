@@ -14,10 +14,12 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_JOINT_CREATION_DIALOG_PRIVATE_HH_
-#define _GAZEBO_JOINT_CREATION_DIALOG_PRIVATE_HH_
+#ifndef _GAZEBO_GUI_JOINT_CREATION_DIALOG_PRIVATE_HH_
+#define _GAZEBO_GUI_JOINT_CREATION_DIALOG_PRIVATE_HH_
 
 #include <vector>
+
+#include "gazebo/common/CommonTypes.hh"
 
 #include "gazebo/gui/qt.h"
 
@@ -25,6 +27,10 @@ namespace gazebo
 {
   namespace gui
   {
+    class ConfigChildWidget;
+    class ConfigWidget;
+    class JointMaker;
+
     /// \brief Private data for the JointCreationDialog class
     class JointCreationDialogPrivate
     {
