@@ -18,7 +18,6 @@
 
 #include "gazebo/math/Angle.hh"
 #include "gazebo/gui/building/ImportImageDialog.hh"
-#include "gazebo/gui/building/BuildingItem.hh"
 #include "gazebo/gui/building/GridLines.hh"
 #include "gazebo/gui/building/EditorItem.hh"
 #include "gazebo/gui/building/RectItem.hh"
@@ -455,8 +454,8 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
           wallSegmentItem->setZValue(wallSegmentItem->zValueIdle);
           editorItem->SetPositionOnWall(0);
           editorItem->SetAngleOnWall(0);
-          this->buildingMaker->DetachManip(this->itemToVisualMap[editorItem],
-                this->itemToVisualMap[wallSegmentItem]);
+          this->buildingMaker->DetachFromParent(
+              this->itemToVisualMap[editorItem]);
           editorItem->SetRotation(editorItem->GetRotation()
             - this->mousePressRotation);
           editorItem->SetPosition(mousePoint);

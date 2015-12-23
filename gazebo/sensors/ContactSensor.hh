@@ -62,7 +62,7 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited
-      protected: virtual bool UpdateImpl(bool _force);
+      protected: virtual bool UpdateImpl(const bool _force);
 
       /// \brief Finalize the sensor.
       protected: virtual void Fini();
@@ -129,7 +129,7 @@ namespace gazebo
                   const std::string &_collisionName);
 
       // Documentation inherited.
-      public: virtual bool IsActive();
+      public: virtual bool IsActive() const;
 
       /// \brief Callback for contact messages from the physics engine.
       private: void OnContacts(ConstContactsPtr &_msg);

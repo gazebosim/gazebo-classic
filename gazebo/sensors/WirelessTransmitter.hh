@@ -53,7 +53,7 @@ namespace gazebo
       public: virtual ~WirelessTransmitter();
 
       // Documentation inherited
-      protected: virtual bool UpdateImpl(bool _force);
+      protected: virtual bool UpdateImpl(const bool _force);
 
       // Documentation inherited
       public: virtual void Load(const std::string &_worldName);
@@ -68,15 +68,6 @@ namespace gazebo
       /// \brief Returns reception frequency (MHz).
       /// \return Reception frequency (MHz).
       public: double GetFreq() const;
-
-      /// \brief Returns the signal strength in a given world's point (dBm).
-      /// \param[in] _receiver Pose of the receiver
-      /// \param[in] _rxGain Receiver gain value
-      /// \return Signal strength in a world's point (dBm).
-      /// \deprecated See SignalStrength() function that accepts an
-      /// ignition::math::Pose3d object.
-      public: double GetSignalStrength(const math::Pose &_receiver,
-          const double _rxGain) GAZEBO_DEPRECATED(6.0);
 
       /// \brief Returns the signal strength in a given world's point (dBm).
       /// \param[in] _receiver Pose of the receiver

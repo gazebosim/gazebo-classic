@@ -191,7 +191,7 @@ void CameraSensor::Render()
 }
 
 //////////////////////////////////////////////////
-bool CameraSensor::UpdateImpl(bool /*_force*/)
+bool CameraSensor::UpdateImpl(const bool /*_force*/)
 {
   if (!this->rendered)
     return false;
@@ -225,7 +225,10 @@ unsigned int CameraSensor::GetImageWidth() const
 {
   if (this->camera)
     return this->camera->GetImageWidth();
-  return 0;
+
+  sdf::ElementPtr cameraSdf = this->sdf->GetElement("camera");
+  sdf::ElementPtr elem = cameraSdf->GetElement("image");
+  return elem->Get<unsigned int>("width");
 }
 
 //////////////////////////////////////////////////
@@ -233,24 +236,34 @@ unsigned int CameraSensor::GetImageHeight() const
 {
   if (this->camera)
     return this->camera->GetImageHeight();
-  return 0;
+
+  sdf::ElementPtr cameraSdf = this->sdf->GetElement("camera");
+  sdf::ElementPtr elem = cameraSdf->GetElement("image");
+  return elem->Get<unsigned int>("height");
 }
 
 //////////////////////////////////////////////////
 const unsigned char *CameraSensor::GetImageData()
 {
-  return this->camera->GetImageData(0);
+  if (this->camera)
+    return this->camera->GetImageData(0);
+  else
+    return NULL;
 }
 
 //////////////////////////////////////////////////
 bool CameraSensor::SaveFrame(const std::string &_filename)
 {
   this->SetActive(true);
-  return this->camera->SaveFrame(_filename);
+
+  if (this->camera)
+    return this->camera->SaveFrame(_filename);
+  else
+    return false;
 }
 
 //////////////////////////////////////////////////
-bool CameraSensor::IsActive()
+bool CameraSensor::IsActive() const
 {
   return Sensor::IsActive() ||
     (this->imagePub && this->imagePub->HasConnections());

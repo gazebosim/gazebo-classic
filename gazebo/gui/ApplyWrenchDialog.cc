@@ -20,7 +20,6 @@
   #include <Winsock2.h>
 #endif
 
-#include <boost/algorithm/string.hpp>
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
 
@@ -387,6 +386,9 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init();
 
+  this->dataPtr->userCmdPub =
+      this->dataPtr->node->Advertise<msgs::UserCmd>("~/user_cmd");
+
   this->dataPtr->comVector = math::Vector3::Zero;
   this->dataPtr->forceVector = math::Vector3::Zero;
   this->dataPtr->torqueVector = math::Vector3::Zero;
@@ -437,7 +439,7 @@ void ApplyWrenchDialog::Fini()
   if (this->dataPtr->mainWindow)
     this->dataPtr->mainWindow->removeEventFilter(this);
 
-  this->dataPtr->wrenchPub.reset();
+  this->dataPtr->userCmdPub.reset();
   this->dataPtr->node->Fini();
   this->dataPtr->connections.clear();
 
@@ -574,15 +576,6 @@ bool ApplyWrenchDialog::SetLink(const std::string &_linkName)
   this->dataPtr->linkVisual = vis;
   this->AttachVisuals();
 
-  // Set publisher
-  std::string topicName = "~/";
-  topicName += this->dataPtr->linkName + "/wrench";
-  boost::replace_all(topicName, "::", "/");
-
-  this->dataPtr->wrenchPub.reset();
-  this->dataPtr->wrenchPub =
-      this->dataPtr->node->Advertise<msgs::Wrench>(topicName);
-
   // Filter main window activate events
   if (this->dataPtr->mainWindow)
     this->dataPtr->mainWindow->installEventFilter(this);
@@ -615,33 +608,60 @@ void ApplyWrenchDialog::SetLink(const QString _linkName)
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::OnApplyAll()
 {
+  // Publish wrench message
   msgs::Wrench msg;
   msgs::Set(msg.mutable_force(), this->dataPtr->forceVector.Ign());
   msgs::Set(msg.mutable_torque(), this->dataPtr->torqueVector.Ign());
   msgs::Set(msg.mutable_force_offset(), this->dataPtr->forcePosVector.Ign());
 
-  this->dataPtr->wrenchPub->Publish(msg);
+  // Register user command on server
+  // The wrench will be applied from the server
+  msgs::UserCmd userCmdMsg;
+  userCmdMsg.set_description("Apply wrench to [" + this->dataPtr->linkName +
+      "]");
+  userCmdMsg.set_entity_name(this->dataPtr->linkName);
+  userCmdMsg.set_type(msgs::UserCmd::WRENCH);
+  userCmdMsg.mutable_wrench()->CopyFrom(msg);
+  this->dataPtr->userCmdPub->Publish(userCmdMsg);
 }
 
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::OnApplyForce()
 {
+  // Publish wrench message
   msgs::Wrench msg;
   msgs::Set(msg.mutable_force(), this->dataPtr->forceVector.Ign());
   msgs::Set(msg.mutable_torque(), ignition::math::Vector3d::Zero);
   msgs::Set(msg.mutable_force_offset(), this->dataPtr->forcePosVector.Ign());
 
-  this->dataPtr->wrenchPub->Publish(msg);
+  // Register user command on server
+  // The wrench will be applied from the server
+  msgs::UserCmd userCmdMsg;
+  userCmdMsg.set_description("Apply force to [" + this->dataPtr->linkName +
+      "]");
+  userCmdMsg.set_entity_name(this->dataPtr->linkName);
+  userCmdMsg.set_type(msgs::UserCmd::WRENCH);
+  userCmdMsg.mutable_wrench()->CopyFrom(msg);
+  this->dataPtr->userCmdPub->Publish(userCmdMsg);
 }
 
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::OnApplyTorque()
 {
+  // Publish wrench message
   msgs::Wrench msg;
   msgs::Set(msg.mutable_force(), ignition::math::Vector3d::Zero);
   msgs::Set(msg.mutable_torque(), this->dataPtr->torqueVector.Ign());
 
-  this->dataPtr->wrenchPub->Publish(msg);
+  // Register user command on server
+  // The wrench will be applied from the server
+  msgs::UserCmd userCmdMsg;
+  userCmdMsg.set_description("Apply torque to [" + this->dataPtr->linkName +
+      "]");
+  userCmdMsg.set_entity_name(this->dataPtr->linkName);
+  userCmdMsg.set_type(msgs::UserCmd::WRENCH);
+  userCmdMsg.mutable_wrench()->CopyFrom(msg);
+  this->dataPtr->userCmdPub->Publish(userCmdMsg);
 }
 
 /////////////////////////////////////////////////
@@ -764,7 +784,8 @@ void ApplyWrenchDialog::SetForcePos(const math::Vector3 &_forcePos)
     return;
   }
 
-  this->dataPtr->applyWrenchVisual->SetForcePos(this->dataPtr->forcePosVector);
+  this->dataPtr->applyWrenchVisual->SetForcePos(
+      this->dataPtr->forcePosVector.Ign());
 }
 
 /////////////////////////////////////////////////
@@ -802,7 +823,7 @@ void ApplyWrenchDialog::SetForce(const math::Vector3 &_force,
     return;
   }
 
-  this->dataPtr->applyWrenchVisual->SetForce(_force, _rotatedByMouse);
+  this->dataPtr->applyWrenchVisual->SetForce(_force.Ign(), _rotatedByMouse);
 }
 
 /////////////////////////////////////////////////
@@ -840,7 +861,7 @@ void ApplyWrenchDialog::SetTorque(const math::Vector3 &_torque,
     return;
   }
 
-  this->dataPtr->applyWrenchVisual->SetTorque(_torque, _rotatedByMouse);
+  this->dataPtr->applyWrenchVisual->SetTorque(_torque.Ign(), _rotatedByMouse);
 }
 
 /////////////////////////////////////////////////
@@ -855,7 +876,7 @@ void ApplyWrenchDialog::SetCoM(const math::Vector3 &_com)
     return;
   }
 
-  this->dataPtr->applyWrenchVisual->SetCoM(this->dataPtr->comVector);
+  this->dataPtr->applyWrenchVisual->SetCoM(this->dataPtr->comVector.Ign());
 }
 
 /////////////////////////////////////////////////

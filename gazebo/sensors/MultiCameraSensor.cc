@@ -25,6 +25,7 @@
 #include <ignition/math/Pose3.hh>
 
 #include "gazebo/common/Exception.hh"
+#include "gazebo/common/EnumIface.hh"
 #include "gazebo/common/Image.hh"
 
 #include "gazebo/physics/World.hh"
@@ -238,7 +239,7 @@ void MultiCameraSensor::Render()
 }
 
 //////////////////////////////////////////////////
-bool MultiCameraSensor::UpdateImpl(bool /*_force*/)
+bool MultiCameraSensor::UpdateImpl(const bool /*_force*/)
 {
   boost::mutex::scoped_lock lock(this->cameraMutex);
 
@@ -321,7 +322,7 @@ bool MultiCameraSensor::SaveFrame(const std::vector<std::string> &_filenames)
 }
 
 //////////////////////////////////////////////////
-bool MultiCameraSensor::IsActive()
+bool MultiCameraSensor::IsActive() const
 {
   return Sensor::IsActive() ||
     (this->imagePub && this->imagePub->HasConnections());

@@ -36,9 +36,6 @@
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/msgs/msgs.hh"
 
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Rand.hh"
-
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/RaySensor.hh"
 #include "gazebo/sensors/Noise.hh"
@@ -146,24 +143,12 @@ void RaySensor::Fini()
 }
 
 //////////////////////////////////////////////////
-math::Angle RaySensor::GetAngleMin() const
-{
-  return this->AngleMin();
-}
-
-//////////////////////////////////////////////////
 ignition::math::Angle RaySensor::AngleMin() const
 {
   if (this->laserShape)
     return this->laserShape->GetMinAngle().Ign();
   else
     return -1;
-}
-
-//////////////////////////////////////////////////
-math::Angle RaySensor::GetAngleMax() const
-{
-  return this->AngleMax();
 }
 
 //////////////////////////////////////////////////
@@ -250,12 +235,6 @@ int RaySensor::GetVerticalRangeCount() const
 }
 
 //////////////////////////////////////////////////
-math::Angle RaySensor::GetVerticalAngleMin() const
-{
-  return this->VerticalAngleMin();
-}
-
-//////////////////////////////////////////////////
 ignition::math::Angle RaySensor::VerticalAngleMin() const
 {
   if (this->laserShape)
@@ -265,12 +244,6 @@ ignition::math::Angle RaySensor::VerticalAngleMin() const
   }
   else
     return -1;
-}
-
-//////////////////////////////////////////////////
-math::Angle RaySensor::GetVerticalAngleMax() const
-{
-  return math::Angle(this->VerticalAngleMax().Radian());
 }
 
 //////////////////////////////////////////////////
@@ -364,7 +337,7 @@ int RaySensor::GetFiducial(unsigned int _index)
 }
 
 //////////////////////////////////////////////////
-bool RaySensor::UpdateImpl(bool /*_force*/)
+bool RaySensor::UpdateImpl(const bool /*_force*/)
 {
   // do the collision checks
   // this eventually call OnNewScans, so move mutex lock behind it in case
@@ -525,7 +498,7 @@ bool RaySensor::UpdateImpl(bool /*_force*/)
 }
 
 //////////////////////////////////////////////////
-bool RaySensor::IsActive()
+bool RaySensor::IsActive() const
 {
   return Sensor::IsActive() ||
     (this->scanPub && this->scanPub->HasConnections());

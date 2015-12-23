@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_SENSORTYPES_HH_
-#define _GAZEBO_SENSORTYPES_HH_
+#ifndef _GAZEBO_SENSORS_SENSORTYPES_HH_
+#define _GAZEBO_SENSORS_SENSORTYPES_HH_
 
 #include <vector>
 #include <boost/shared_ptr.hpp>
@@ -202,7 +202,9 @@ namespace gazebo
     /// \brief Eumeration of all sensor noise types
     enum SensorNoiseType
     {
-      /// \brief Marks the start of the enum.
+      /// \internal
+      /// \brief Indicator used to create an iterator over the enum. Do not
+      /// use this.
       SENSOR_NOISE_TYPE_BEGIN = 0,
 
       /// \brief Noise streams for the Camera sensor
@@ -289,10 +291,32 @@ namespace gazebo
       /// \sa ImuSensor
       IMU_LINACC_Z_NOISE_METERS_PER_S_SQR = 20,
 
-      /// \brief Marks the end of the enum.
+      /// \internal
+      /// \brief Indicator used to create an iterator over the enum. Do not
+      /// use this.
       SENSOR_NOISE_TYPE_END
     };
     /// \}
+
+    /// \brief SensorCategory is used to categorize sensors. This is used to
+    /// put sensors into different threads.
+    enum SensorCategory
+    {
+      // IMAGE must be the first element, and it must start with 0. Do not
+      // change this! See SensorManager::sensorContainers for reference.
+      /// \brief Image based sensor class. This type requires the rendering
+      /// engine.
+      IMAGE = 0,
+
+      /// \brief Ray based sensor class.
+      RAY = 1,
+
+      /// \brief A type of sensor is not a RAY or IMAGE sensor.
+      OTHER = 2,
+
+      /// \brief Number of Sensor Categories
+      CATEGORY_COUNT = 3
+    };
   }
 }
 #endif

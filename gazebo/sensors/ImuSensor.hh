@@ -54,7 +54,7 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited
-      protected: virtual bool UpdateImpl(bool _force);
+      protected: virtual bool UpdateImpl(const bool _force);
 
       // Documentation inherited
       protected: virtual void Fini();
@@ -62,26 +62,6 @@ namespace gazebo
       /// \brief Returns the imu message
       /// \return Imu message.
       public: msgs::IMU GetImuMessage() const;
-
-      /// \brief Returns the angular velocity.
-      /// \return Angular velocity.
-      /// \deprecated See AngularVelocity() function that returns an
-      /// ignition::math::Vector3d object.
-      public: math::Vector3 GetAngularVelocity() const GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Returns the imu linear acceleration
-      /// \return Linear acceleration.
-      /// \deprecated See LinearVelocity() function that returns an
-      /// ignition::math::Vector3d object.
-      public: math::Vector3 GetLinearAcceleration() const
-              GAZEBO_DEPRECATED(6.0);
-
-      /// \brief get orientation of the IMU relative to the reference pose
-      /// \return returns the orientation quaternion of the IMU relative to
-      /// the imu reference pose.
-      /// \deprecated See Orientation() function that returns an
-      /// ignition::math::Quaterniond object.
-      public: math::Quaternion GetOrientation() const GAZEBO_DEPRECATED(6.0);
 
       /// \brief Returns the angular velocity.
       /// \param[in] _noiseFree True if the returned measurement should
@@ -106,7 +86,7 @@ namespace gazebo
       public: void SetReferencePose();
 
       // Documentation inherited.
-      public: virtual bool IsActive();
+      public: virtual bool IsActive() const;
 
       /// \brief Callback when link data is received
       /// \param[in] _msg Message containing link data

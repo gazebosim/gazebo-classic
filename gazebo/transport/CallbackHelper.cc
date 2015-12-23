@@ -42,12 +42,14 @@ std::string CallbackHelper::GetMsgType() const
 /////////////////////////////////////////////////
 bool CallbackHelper::GetLatching() const
 {
+  std::lock_guard<std::mutex> lock(this->latchingMutex);
   return this->latching;
 }
 
 /////////////////////////////////////////////////
 void CallbackHelper::SetLatching(bool _latch)
 {
+  std::lock_guard<std::mutex> lock(this->latchingMutex);
   this->latching = _latch;
 }
 

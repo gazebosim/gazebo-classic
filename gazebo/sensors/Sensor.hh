@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_SENSOR_HH_
-#define _GAZEBO_SENSOR_HH_
+#ifndef _GAZEBO_SENSORS_SENSOR_HH_
+#define _GAZEBO_SENSORS_SENSOR_HH_
 
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/thread/mutex.hpp>
@@ -33,7 +33,6 @@
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Time.hh"
-#include "gazebo/math/Pose.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/util/system.hh"
 
@@ -41,26 +40,6 @@ namespace gazebo
 {
   namespace sensors
   {
-    /// \brief SensorClass is used to categorize sensors. This is used to
-    /// put sensors into different threads.
-    enum SensorCategory
-    {
-      // IMAGE must be the first element, and it must start with 0. Do not
-      // change this! See SensorManager::sensorContainers for reference.
-      /// \brief Image based sensor class. This type requires the rendering
-      /// engine.
-      IMAGE = 0,
-
-      /// \brief Ray based sensor class.
-      RAY = 1,
-
-      /// \brief A type of sensor is not a RAY or IMAGE sensor.
-      OTHER = 2,
-
-      /// \brief Number of Sensor Categories
-      CATEGORY_COUNT = 3
-    };
-
     /// \addtogroup gazebo_sensors
     /// \{
 
@@ -69,7 +48,7 @@ namespace gazebo
     class GAZEBO_VISIBLE Sensor : public boost::enable_shared_from_this<Sensor>
     {
       /// \brief Constructor.
-      /// \param[in] _class
+      /// \param[in] _cat Category of the sensor
       public: explicit Sensor(SensorCategory _cat);
 
       /// \brief Destructor.
@@ -91,7 +70,7 @@ namespace gazebo
       /// \brief Set the sensor's parent.
       /// \param[in] _name The sensor's parent's name.
       /// \param[in] _id The sensor's parent's ID.
-      public: void SetParent(const std::string &_name, uint32_t _id);
+      public: void SetParent(const std::string &_name, const uint32_t _id);
 
       /// \brief Returns the name of the sensor parent.  The parent name is
       ///        set by Sensor::SetParent.
@@ -100,15 +79,7 @@ namespace gazebo
 
       /// \brief Update the sensor.
       /// \param[in] _force True to force update, false otherwise.
-      public: void Update(bool _force);
-
-      /// \brief This gets overwritten by derived sensor types.
-      ///        This function is called during Sensor::Update.
-      ///        And in turn, Sensor::Update is called by
-      ///        SensorManager::Update
-      /// \param[in] _force True if update is forced, false if not
-      /// \return True if the sensor was updated.
-      protected: virtual bool UpdateImpl(bool /*_force*/) {return false;}
+      public: void Update(const bool _force);
 
       /// \brief Get the update rate of the sensor.
       /// \return _hz update rate of sensor.  Returns 0 if unthrottled.
@@ -116,7 +87,7 @@ namespace gazebo
 
       /// \brief Set the update rate of the sensor.
       /// \param[in] _hz update rate of sensor.
-      public: void SetUpdateRate(double _hz);
+      public: void SetUpdateRate(const double _hz);
 
       /// \brief Finalize the sensor.
       public: virtual void Fini();
@@ -131,12 +102,6 @@ namespace gazebo
 
       /// \brief Get the current pose.
       /// \return Current pose of the sensor.
-      /// \deprecated See Pose() function that returns an
-      /// ignition::math::Pose3d object.
-      public: virtual math::Pose GetPose() const GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Get the current pose.
-      /// \return Current pose of the sensor.
       /// \sa SetPose()
       public: virtual ignition::math::Pose3d Pose() const;
 
@@ -147,11 +112,11 @@ namespace gazebo
 
       /// \brief Set whether the sensor is active or not.
       /// \param[in] _value True if active, false if not.
-      public: virtual void SetActive(bool _value);
+      public: virtual void SetActive(const bool _value);
 
       /// \brief Returns true if sensor generation is active.
       /// \return True if active, false if not.
-      public: virtual bool IsActive();
+      public: virtual bool IsActive() const;
 
       /// \brief Get sensor type.
       /// \return Type of sensor.
@@ -194,8 +159,7 @@ namespace gazebo
       /// \brief Disconnect from a the updated signal.
       /// \param[in] _c The connection to disconnect
       /// \sa Sensor::ConnectUpdated
-      public: void DisconnectUpdated(event::ConnectionPtr &_c)
-              {this->updated.Disconnect(_c);}
+      public: void DisconnectUpdated(event::ConnectionPtr &_c);
 
       /// \brief Get the category of the sensor.
       /// \return The category of the sensor.
@@ -213,20 +177,19 @@ namespace gazebo
       /// \return The sensor's parent's ID.
       public: uint32_t GetParentId() const;
 
-      /// \brief Get the sensor's noise model.
-      /// Depracted in favour of GetNoise(const SensorNoiseType _type)
-      /// which explicitly specifies the noise stream
-      /// \param[in] _index Index of the noise model. For most sensors this
-      /// will be 0. For a multi camera sensor the index can be >=0.
-      /// \return The sensor's noise model.
-      public: NoisePtr GetNoise(unsigned int _index = 0) const
-              GAZEBO_DEPRECATED(6.0);
-
       /// \brief Get the sensor's noise model for a specified noise type.
       /// \param[in] _type Index of the noise type. Refer to
       /// SensorNoiseType enumeration for possible indices
       /// \return The sensor's noise model for the given noise type
       public: NoisePtr GetNoise(const SensorNoiseType _type) const;
+
+      /// \brief This gets overwritten by derived sensor types.
+      ///        This function is called during Sensor::Update.
+      ///        And in turn, Sensor::Update is called by
+      ///        SensorManager::Update
+      /// \param[in] _force True if update is forced, false if not
+      /// \return True if the sensor was updated.
+      protected: virtual bool UpdateImpl(const bool /*_force*/) {return false;}
 
       /// \brief Return true if the sensor needs to be updated.
       /// \return True when sensor should be updated.
@@ -250,9 +213,6 @@ namespace gazebo
 
       /// \brief Node for communication.
       protected: transport::NodePtr node;
-
-      /// \brief Subscribe to pose updates.
-      protected: transport::SubscriberPtr poseSub;
 
       /// \brief Name of the parent.
       protected: std::string parentName;
@@ -281,12 +241,7 @@ namespace gazebo
       protected: common::Time lastMeasurementTime;
 
       /// \brief Noise added to sensor data
-      /// The key maps to a SensorNoiseType, and is kept as an int value
-      /// for backward compatibilty with Gazebo 5&6.
-      /// \todo: Change to std::map<SensorNoiseType, NoisePtr> in Gazebo7.
-      /// Adding the word GAZEBO_DEPRECATED here so that a grep will find
-      /// the above note.
-      protected: std::map<int, NoisePtr> noises;
+      protected: std::map<SensorNoiseType, NoisePtr> noises;
 
       /// \brief Mutex to protect resetting lastUpdateTime.
       private: boost::mutex mutexLastUpdateTime;

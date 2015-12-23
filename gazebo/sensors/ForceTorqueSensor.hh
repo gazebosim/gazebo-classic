@@ -56,19 +56,7 @@ namespace gazebo
 
       /// \brief Get the current joint torque.
       /// \return The latest measured torque.
-      /// \deprecated See Torque() function that returns an
-      /// ignition::math::Vector3d object.
-      public: math::Vector3 GetTorque() const GAZEBO_DEPRECATED(6.0);
-
-      /// \brief Get the current joint torque.
-      /// \return The latest measured torque.
       public: ignition::math::Vector3d Torque() const;
-
-      /// \brief Get the current joint force.
-      /// \return The latested measured force.
-      /// \deprecated See Force() function that returns an
-      /// ignition::math::Vector3d object.
-      public: math::Vector3 GetForce() const GAZEBO_DEPRECATED(6.0);
 
       /// \brief Get the current joint force.
       /// \return The latested measured force.
@@ -79,7 +67,7 @@ namespace gazebo
       public: physics::JointPtr GetJoint() const;
 
       // Documentation inherited.
-      public: virtual bool IsActive();
+      public: virtual bool IsActive() const;
 
       /// \brief Connect a to the  update signal.
       /// \param[in] _subscriber Callback function.
@@ -90,11 +78,10 @@ namespace gazebo
 
       /// \brief Disconnect from the update signal.
       /// \param[in] _conn Connection to remove.
-      public: void DisconnectUpdate(event::ConnectionPtr &_conn)
-              {update.Disconnect(_conn);}
+      public: void DisconnectUpdate(event::ConnectionPtr &_conn);
 
       // Documentation inherited.
-      protected: virtual bool UpdateImpl(bool _force);
+      protected: virtual bool UpdateImpl(const bool _force);
 
       // Documentation inherited.
       protected: virtual void Fini();
