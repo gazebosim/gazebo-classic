@@ -38,6 +38,7 @@
 1. Switching to ignition math for the rendering library.
     * [Pull request #1993](https://bitbucket.org/osrf/gazebo/pull-request/1993)
     * [Pull request #1994](https://bitbucket.org/osrf/gazebo/pull-request/1994)
+    * [Pull request #1996](https://bitbucket.org/osrf/gazebo/pull-request/1996)
 
 1. Removed deprecations
     * [Pull request #1992]((https://bitbucket.org/osrf/gazebo/pull-request/1992)
@@ -68,7 +69,14 @@
     * [Pull request #2000](https://bitbucket.org/osrf/gazebo/pull-request/2000)
 
 1 Added Ignition Transport dependency.
-  * [Pull request #1930](https://bitbucket.org/osrf/gazebo/pull-request/1930)
+    * [Pull request #1930](https://bitbucket.org/osrf/gazebo/pull-request/1930)
+
+1 Make latched subscribers receive the message only once
+    * [Issue #1789](https://bitbucket.org/osrf/gazebo/issue/1789)
+    * [Pull request #2019](https://bitbucket.org/osrf/gazebo/pull-request/2019)
+
+1 Implemented transport clear buffers
+  * [Pull request #2017](https://bitbucket.org/osrf/gazebo/pull-request/2017)
 
 1. KeyEvent constructor should be in a source file. Removed a few visibility
 flags from c functions. Windows did not like `CPPTYPE_*` in
@@ -151,6 +159,10 @@ using the same arguments used in the command line.
 1. Fix minimum window height
    * [Pull request #1977](https://bitbucket.org/osrf/gazebo/pull-request/1977)
    * [Issue #1706](https://bitbucket.org/osrf/gazebo/issue/1706)
+
+1. Add option to reverse alignment direction 
+   * [Pull request #2040](https://bitbucket.org/osrf/gazebo/pull-request/2040)
+   * [Issue #1242](https://bitbucket.org/osrf/gazebo/issue/1242)
 
 1. Fix unadvertising a publisher - only unadvertise topic if it is the last publisher.
    * [Pull request #2005](https://bitbucket.org/osrf/gazebo/pull-request/2005)
@@ -260,11 +272,20 @@ using the same arguments used in the command line.
     1. PIMPLize LevelWidget class
         * [Pull request #2041](https://bitbucket.org/osrf/gazebo/pull-request/2041)
 
+    1. PIMPLize ImportImageDialog and ImportImageView classes
+        * [Pull request #2039](https://bitbucket.org/osrf/gazebo/pull-request/2039)
+
     1. Removed unused class: BuildingItem
         * [Pull request #2045](https://bitbucket.org/osrf/gazebo/pull-request/2045)
 
+    1. PIMPL BuildingEditorWidget
+        * [Pull request #2055](https://bitbucket.org/osrf/gazebo/pull-request/2055)
+
     1. PIMPLize gui/building/BuildingModelManip, move attachment logic to BuildingMaker
         * [Pull request #2046](https://bitbucket.org/osrf/gazebo/pull-request/2046)
+
+    1. PIMPLize GridLines class
+        * [Pull request #2032](https://bitbucket.org/osrf/gazebo/pull-request/2032)
 
 ## Gazebo 6.0
 

@@ -53,12 +53,6 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited
-      protected: virtual bool UpdateImpl(bool _force);
-
-      // Documentation inherited
-      protected: virtual void Fini();
-
-      // Documentation inherited
       public: virtual std::string GetTopic() const;
 
       /// \brief Get the minimum range of the sonar
@@ -84,7 +78,7 @@ namespace gazebo
       public: double GetRange();
 
       // Documentation inherited
-      public: virtual bool IsActive();
+      public: virtual bool IsActive() const;
 
       /// \brief Connect a to the new update signal.
       /// \param[in] _subscriber Callback function.
@@ -95,8 +89,13 @@ namespace gazebo
 
       /// \brief Disconnect from the update signal.
       /// \param[in] _conn Connection to remove.
-      public: void DisconnectUpdate(event::ConnectionPtr &_conn)
-              {update.Disconnect(_conn);}
+      public: void DisconnectUpdate(event::ConnectionPtr &_conn);
+
+      // Documentation inherited
+      protected: virtual bool UpdateImpl(const bool _force);
+
+      // Documentation inherited
+      protected: virtual void Fini();
 
       /// \brief Update event.
       protected: event::EventT<void(msgs::SonarStamped)> update;

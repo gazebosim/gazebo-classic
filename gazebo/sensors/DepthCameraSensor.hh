@@ -58,14 +58,14 @@ namespace gazebo
       protected: virtual void Init();
 
       // Documentation inherited
-      protected: virtual bool UpdateImpl(bool _force);
+      protected: virtual bool UpdateImpl(const bool _force);
 
       /// Finalize the camera
       protected: virtual void Fini();
 
       /// \brief Set whether the sensor is active or not
       /// \param[in] _value True if active, false if not
-      public: virtual void SetActive(bool _value);
+      public: virtual void SetActive(const bool _value);
 
       /// \brief Returns a pointer to the rendering::DepthCamera
       /// \return Depth Camera pointer
