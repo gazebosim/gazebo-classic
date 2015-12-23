@@ -17,11 +17,13 @@
 
 #ifndef _GAZEBO_RENDERING_DEPTHCAMERA_HH_
 #define _GAZEBO_RENDERING_DEPTHCAMERA_HH_
+
+#include <memory>
 #include <string>
 
 #include <sdf/sdf.hh>
 
-#include "gazebo/common/Event.hh"
+#include "gazebo/common/CommonTypes.hh"
 
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/util/system.hh"
