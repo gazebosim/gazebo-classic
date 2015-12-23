@@ -1,11 +1,11 @@
 ## Gazebo 7.0
 
 1. Use opaque pointers in the rendering/DepthCamera class.
-    * [Pull request #](https://bitbucket.org/osrf/gazebo/pull-request/)
-    
+    * [Pull request #2069](https://bitbucket.org/osrf/gazebo/pull-request/2069)
+
 1. Use opaque pointers in the rendering/WindowManager class.
     * [Pull request #2064](https://bitbucket.org/osrf/gazebo/pull-request/2064)
-    
+
 1. Use opaque pointers in the rendering/Light class.
     * [Pull request #2066](https://bitbucket.org/osrf/gazebo/pull-request/2066)
 
@@ -170,7 +170,7 @@ using the same arguments used in the command line.
    * [Pull request #1977](https://bitbucket.org/osrf/gazebo/pull-request/1977)
    * [Issue #1706](https://bitbucket.org/osrf/gazebo/issue/1706)
 
-1. Add option to reverse alignment direction 
+1. Add option to reverse alignment direction
    * [Pull request #2040](https://bitbucket.org/osrf/gazebo/pull-request/2040)
    * [Issue #1242](https://bitbucket.org/osrf/gazebo/issue/1242)
 
