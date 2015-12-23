@@ -105,6 +105,30 @@ release will remove the deprecated code.
     + ***Deprecation:*** public: Ogre::RenderWindow *GetWindow(uint32_t _id);
     + ***Replacement:*** public: Ogre::RenderWindow *Window(const uint32_t _id) const;
 
+1. **gazebo/rendering/Light.hh**
+    + ***Deprecation:*** public: std::string GetName() const;
+    + ***Replacement:*** public: std::string Name() const;
+    + ***Deprecation:*** public: std::string GetType() const;
+    + ***Replacement:*** public: std::string Type() const;
+    + ***Deprecation:*** public: public: void SetPosition(const math::Vector3 &_p);
+    + ***Replacement:*** public: void SetPosition(const ignition::math::Vector3d &_p);
+    + ***Deprecation:*** public: math::Vector3 GetPosition();
+    + ***Replacement:*** public: ignition::math::Vector3d Position() const;
+    + ***Deprecation:*** public: void SetRotation(const math::Quaternion &_q);
+    + ***Replacement:*** public: void SetRotation(const ignition::math::Quaterniond &_q);
+    + ***Deprecation:*** public: math::Quaternion GetRotation() const;
+    + ***Replacement:*** public: ignition::math::Quaterniond Rotation() const;
+    + ***Deprecation:*** public: bool GetVisible() const;
+    + ***Replacement:*** public: bool Visible() const;
+    + ***Deprecation:*** public: common::Color GetDiffuseColor() const;
+    + ***Replacement:*** public: common::Color DiffuseColor() const;
+    + ***Deprecation:*** public: common::Color GetSpecularColor() const;
+    + ***Replacement:*** public: common::Color SpecularColor() const;
+    + ***Deprecation:*** public: void SetDirection(const math::Vector3 &_dir);
+    + ***Replacement:*** public: void SetDirection(const ignition::math::Vector3d &_dir);
+    + ***Deprecation:*** public: math::Vector3 GetDirection() const;
+    + ***Replacement:*** public: ignition::math::Vector3d Direction() const;
+
 1. **gazebo/util/Diagnostics.hh**
     + ***Deprecation:*** public: int GetTimerCount() const;
     + ***Replacement:*** public: int TimerCount() const;
@@ -216,6 +240,48 @@ release will remove the deprecated code.
 1. **gazebo/gui/KeyEventHandler.hh**
     + ***Deprecation:*** bool GetAutoRepeat() const
     + ***Replacement:*** bool AutoRepeat() const
+
+1. **gazebo/rendering/Camera.hh**
+    + ***Deprecation:*** public: math::Vector3 GetWorldPosition() const
+    + ***Replacement:*** public: ignition::math::Vector3d WorldPosition() const;
+    + ***Deprecation:*** public: math::Quaternion GetWorldRotation() const 
+    + ***Replacement:*** public: ignition::math::Quaterniond WorldRotation() const;
+    + ***Deprecation:*** public: virtual void SetWorldPose(const math::Pose &_pose)
+    + ***Replacement:*** public: virtual void SetWorldPose(const ignition::math::Pose3d &_pose);
+    + ***Deprecation:***  public: math::Pose GetWorldPose() const
+    + ***Replacement:*** public: ignition::math::Pose3d WorldPose() const;
+    + ***Deprecation:*** public: void SetWorldPosition(const math::Vector3 &_pos);
+    + ***Replacement:*** public: void SetWorldPosition(const ignition::math::Vector3d &_pos);
+    + ***Deprecation:*** public: void SetWorldRotation(const math::Quaternion &_quat);
+    + ***Replacement:*** public: void SetWorldRotation(const ignition::math::Quaterniond &_quat);
+    + ***Deprecation:*** public: void Translate(const math::Vector3 &_direction)
+    + ***Replacement:*** public: void Translate(const ignition::math::Vector3d &_direction);
+    + ***Deprecation:***  public: void Roll(const math::Angle &_angle,Ogre::Node::TransformSpace _relativeTo =Ogre::Node::TS_LOCAL);
+    + ***Replacement:*** public: void Roll(const ignition::math::Angle &_angle,Ogre::Node::TransformSpace _relativeTo =Ogre::Node::TS_LOCAL);
+    + ***Deprecation:***  public: void Pitch(const math::Angle &_angle,Ogre::Node::TransformSpace _relativeTo =Ogre::Node::TS_LOCAL);
+    + ***Replacement:*** public: void Pitch(const ignition::math::Angle &_angle,Ogre::Node::TransformSpace _relativeTo =Ogre::Node::TS_LOCAL);
+    + ***Deprecation:***  public: void Yaw(const math::Angle &_angle,Ogre::Node::TransformSpace _relativeTo =Ogre::Node::TS_LOCAL);
+    + ***Replacement:*** public: void Yaw(const ignition::math::Angle &_angle,Ogre::Node::TransformSpace _relativeTo =Ogre::Node::TS_LOCAL);
+    + ***Deprecation:*** public: void SetHFOV(math::Angle _angle);
+    + ***Replacement:*** public: void SetHFOV(const ignition::math::Angle &_angle);
+    + ***Deprecation:*** public: math::Angle GetHFOV() const
+    + ***Replacement:*** public: ignition::math::Angle HFOV() const;
+    + ***Deprecation:*** public: math::Angle GetVFOV() const;
+    + ***Replacement:*** public: ignition::math::Angle VFOV() const;
+    + ***Deprecation:*** public: math::Vector3 GetUp();
+    + ***Replacement:*** public: ignition::math::Vector3d Up() const;
+    + ***Deprecation:*** public: math::Vector3 GetRight();
+    + ***Replacement:*** public: ignition::math::Vector3d Right() const;
+    + ***Deprecation:*** public: void GetCameraToViewportRay(int _screenx, int _screeny,math::Vector3 &_origin, math::Vector3 &_dir);
+    + ***Replacement:*** public: void CameraToViewportRay(int _screenx, int _screeny,ignition::math::Vector3d &_origin,ignition::math::Vector3d &_dir) const;
+    + ***Deprecation:*** public: bool GetWorldPointOnPlane(int _x, int _y,const math::Plane &_plane, math::Vector3 &_result);
+    + ***Replacement:*** public: bool WorldPointOnPlane(int _x, int _y,const ignition::math::Planed &_plane,ignition::math::Vector3d &_result);
+    + ***Deprecation:*** public: math::Vector3 GetDirection();
+    + ***Replacement:*** public: ignition::math::Vector3d Direction() const;
+    + ***Deprecation:*** public: virtual bool MoveToPosition(const math::Pose &_pose,double _time);
+    + ***Replacement:***  public: virtual bool MoveToPosition(const ignition::math::Pose3d &_pose,double _time);
+    + ***Deprecation:*** public: bool MoveToPositions(const std::vector<math::Pose> &_pts,double _time,boost::function<void()> _onComplete = NULL);
+    + ***Replacement:*** public: bool MoveToPositions(const std::vector<ignition::math::Pose3d> &_pts,double _time,boost::function<void()> _onComplete = NULL);
 
 1. **gazebo/gui/RTShaderSystem.hh**
     + ***Deprecation:*** void AttachEntity(Visual *vis)

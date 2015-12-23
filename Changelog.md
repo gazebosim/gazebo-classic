@@ -2,6 +2,9 @@
 
 1. Use opaque pointers in the rendering/WindowManager class.
     * [Pull request #2064](https://bitbucket.org/osrf/gazebo/pull-request/2064)
+    
+1. Use opaque pointers in the rendering/Light class.
+    * [Pull request #2066](https://bitbucket.org/osrf/gazebo/pull-request/2066)
 
 1. Use opaque pointers in the gui/JointControlWidget class.
     * [Pull request #2052](https://bitbucket.org/osrf/gazebo/pull-request/2052)
@@ -41,6 +44,7 @@
 1. Switching to ignition math for the rendering library.
     * [Pull request #1993](https://bitbucket.org/osrf/gazebo/pull-request/1993)
     * [Pull request #1994](https://bitbucket.org/osrf/gazebo/pull-request/1994)
+    * [Pull request #1995](https://bitbucket.org/osrf/gazebo/pull-request/1995)
     * [Pull request #1996](https://bitbucket.org/osrf/gazebo/pull-request/1996)
 
 1. Removed deprecations
@@ -253,6 +257,9 @@ using the same arguments used in the command line.
     1. Delete self from inspector
         * [Pull request #1904](https://bitbucket.org/osrf/gazebo/pull-request/1904)
         * [Issue #1543](https://bitbucket.org/osrf/gazebo/issue/1543)
+
+    1. PIMPL JointInspector
+        * [Pull request #2059](https://bitbucket.org/osrf/gazebo/pull-request/2059)
 
     1. Apply inspector changes in real time and add reset button
         * [Pull request #1945](https://bitbucket.org/osrf/gazebo/pull-request/1945)
