@@ -14,6 +14,9 @@
  * limitations under the License.
  *
 */
+
+#include <functional>
+
 #include "plugins/DepthCameraPlugin.hh"
 
 using namespace gazebo;

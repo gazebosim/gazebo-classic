@@ -370,7 +370,7 @@ void DepthCamera::RenderImpl()
 //////////////////////////////////////////////////
 const float* DepthCamera::GetDepthData()
 {
-  return DepthData();
+  return this->DepthData();
 }
 
 //////////////////////////////////////////////////
