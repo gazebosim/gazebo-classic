@@ -2,10 +2,10 @@
 
 1. Use opaque pointers for the Master class.
     * [Pull request #2036](https://bitbucket.org/osrf/gazebo/pull-request/2036)
-    
+
 1. Use opaque pointers in the rendering/WindowManager class.
     * [Pull request #2064](https://bitbucket.org/osrf/gazebo/pull-request/2064)
-    
+
 1. Use opaque pointers in the rendering/Light class.
     * [Pull request #2066](https://bitbucket.org/osrf/gazebo/pull-request/2066)
 
@@ -132,6 +132,9 @@ flags from c functions. Windows did not like `CPPTYPE_*` in
 1. Undo user motion commands during simulation, added physics::UserCmdManager and gui::UserCmdHistory.
     * [Pull request #1934](https://bitbucket.org/osrf/gazebo/pull-request/1934)
 
+1. Forward user command messages for undo.
+    * [Pull request #2009](https://bitbucket.org/osrf/gazebo/pull-request/2009)
+
 1. Undo reset commands during simulation, forwarding commands
     * [Pull request #1986](https://bitbucket.org/osrf/gazebo/pull-request/1986)
 
@@ -167,7 +170,7 @@ using the same arguments used in the command line.
    * [Pull request #1977](https://bitbucket.org/osrf/gazebo/pull-request/1977)
    * [Issue #1706](https://bitbucket.org/osrf/gazebo/issue/1706)
 
-1. Add option to reverse alignment direction 
+1. Add option to reverse alignment direction
    * [Pull request #2040](https://bitbucket.org/osrf/gazebo/pull-request/2040)
    * [Issue #1242](https://bitbucket.org/osrf/gazebo/issue/1242)
 
@@ -278,12 +281,16 @@ using the same arguments used in the command line.
     1. PIMPL LinkInspector
         * [Pull request #2056](https://bitbucket.org/osrf/gazebo/pull-request/2056)
 
+1. Building editor updates
+
     1. PIMPLize LevelWidget class
         * [Pull request #2041](https://bitbucket.org/osrf/gazebo/pull-request/2041)
 
     1. PIMPLize ImportImageDialog and ImportImageView classes
         * [Pull request #2039](https://bitbucket.org/osrf/gazebo/pull-request/2039)
 
+    1. Removed unused class: BuildingItem
+        * [Pull request #2045](https://bitbucket.org/osrf/gazebo/pull-request/2045)
 
     1. PIMPL BuildingEditorWidget
         * [Pull request #2055](https://bitbucket.org/osrf/gazebo/pull-request/2055)
@@ -293,7 +300,22 @@ using the same arguments used in the command line.
 
     1. PIMPLize GridLines class
         * [Pull request #2032](https://bitbucket.org/osrf/gazebo/pull-request/2032)
+
 ## Gazebo 6.0
+
+### Gazebo 6.X.X (201X-XX-XX)
+
+1. Backport model editor toolbar fixed joint option from [pull request #1794](https://bitbucket.org/osrf/gazebo/pull-request/1794)
+    * [Pull request #1957](https://bitbucket.org/osrf/gazebo/pull-request/1957)
+
+1. Fix minimum window height
+    * Backport of [pull request #1977](https://bitbucket.org/osrf/gazebo/pull-request/1977)
+    * [Pull request #1998](https://bitbucket.org/osrf/gazebo/pull-request/1998)
+    * [Issue #1706](https://bitbucket.org/osrf/gazebo/issue/1706)
+
+1. Fix visual transparency issues
+    * [Pull request #1967](https://bitbucket.org/osrf/gazebo/pull-request/1967)
+    * [Issue #1726](https://bitbucket.org/osrf/gazebo/issue/1726)
 
 ### Gazebo 6.5.0 (2015-10-22)
 
@@ -697,6 +719,11 @@ compilation on Windows.
 ## Gazebo 5.0
 
 ### Gazebo 5.x.x
+
+1. Fix minimum window height
+    * Backport of [pull request #1977](https://bitbucket.org/osrf/gazebo/pull-request/1977)
+    * [Pull request #2002](https://bitbucket.org/osrf/gazebo/pull-request/2002)
+    * [Issue #1706](https://bitbucket.org/osrf/gazebo/issue/1706)
 
 ### Gazebo 5.2.0 (2015-10-02)
 
