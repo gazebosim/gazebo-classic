@@ -16,6 +16,8 @@
 */
 
 #include "gazebo/common/Assert.hh"
+#include "gazebo/common/Color.hh"
+
 #include "gazebo/gui/Conversions.hh"
 #include "gazebo/gui/building/BaseInspectorDialog.hh"
 
@@ -48,7 +50,7 @@ void BaseInspectorDialog::InitColorComboBox()
   this->colorList.push_back(Conversions::Convert(QColor(111, 203, 172, 255)));
   for (unsigned int i = 0; i < this->colorList.size(); ++i)
   {
-    colorIcon.fill(this->colorList.at(i));
+    colorIcon.fill(Conversions::Convert(this->colorList.at(i)));
     this->colorComboBox->addItem(colorIcon, QString(""));
   }
 }
@@ -66,8 +68,9 @@ void BaseInspectorDialog::InitTextureComboBox()
   this->textureList.push_back(":bricks.png");
   for (unsigned int i = 0; i < this->textureList.size(); ++i)
   {
-    this->textureComboBox->addItem(QPixmap(this->textureList[i]).scaled(
-        QSize(90, 90), Qt::IgnoreAspectRatio), QString(""));
+    this->textureComboBox->addItem(QPixmap(QString::fromStdString(
+        this->textureList[i])).scaled(QSize(90, 90), Qt::IgnoreAspectRatio),
+        QString(""));
   }
   this->textureComboBox->addItem("X");
   this->textureComboBox->setCurrentIndex(this->textureComboBox->count()-1);
@@ -110,7 +113,7 @@ void BaseInspectorDialog::SetColor(const common::Color _color)
     // Add a new color
     this->colorList.push_back(_color);
     QPixmap colorIcon(15, 15);
-    colorIcon.fill(this->colorList.back());
+    colorIcon.fill(Conversions::Convert(this->colorList.back()));
     this->colorComboBox->addItem(colorIcon, QString(""));
     index = this->colorComboBox->count()-1;
   }

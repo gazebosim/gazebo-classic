@@ -17,6 +17,10 @@
 #include <boost/bind.hpp>
 
 #include "gazebo/math/Angle.hh"
+
+#include "gazebo/common/Color.hh"
+
+#include "gazebo/gui/Conversions.hh"
 #include "gazebo/gui/building/ImportImageDialog.hh"
 #include "gazebo/gui/building/GridLines.hh"
 #include "gazebo/gui/building/EditorItem.hh"
@@ -1282,8 +1286,9 @@ void EditorView::OnOpenLevelInspector()
   if (floorItem)
   {
     this->levelInspector->floorWidget->show();
-    this->levelInspector->SetColor(floorItem->Get3dColor());
-    this->levelInspector->SetTexture(floorItem->Get3dTexture());
+    this->levelInspector->SetColor(Conversions::Convert(
+        floorItem->Get3dColor()));
+    this->levelInspector->SetTexture(floorItem->Get3dTexture().toStdString());
   }
   else
   {
@@ -1304,8 +1309,8 @@ void EditorView::OnLevelApply()
   FloorItem *floorItem = this->levels[this->currentLevel]->floorItem;
   if (floorItem)
   {
-    floorItem->Set3dTexture(dialog->GetTexture());
-    floorItem->Set3dColor(dialog->GetColor());
+    floorItem->Set3dTexture(QString::fromStdString(dialog->Texture()));
+    floorItem->Set3dColor(Conversions::Convert(dialog->Color()));
     floorItem->Set3dTransparency(0.4);
     floorItem->FloorChanged();
   }

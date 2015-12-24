@@ -15,6 +15,9 @@
  *
  */
 
+#include "gazebo/common/Color.hh"
+
+#include "gazebo/gui/Conversions.hh"
 #include "gazebo/gui/building/EditorView.hh"
 #include "gazebo/gui/building/BuildingEditorWidget.hh"
 #include "gazebo/gui/building/EditorItem.hh"
@@ -256,8 +259,8 @@ void StairsItem::OnApply()
     this->StepsChanged();
   }
   // this->stairsElevation = dialog->GetElevation();
-  this->Set3dTexture(dialog->GetTexture());
-  this->Set3dColor(dialog->GetColor());
+  this->Set3dTexture(QString::fromStdString(dialog->Texture()));
+  this->Set3dColor(Conversions::Convert(dialog->Color()));
   this->StairsChanged();
 }
 
@@ -273,8 +276,8 @@ void StairsItem::OnOpenInspector()
   QPointF startPos = this->stairsPos * this->itemScale;
   startPos.setY(-startPos.y());
   this->inspector->SetStartPosition(startPos);
-  this->inspector->SetColor(this->visual3dColor);
-  this->inspector->SetTexture(this->visual3dTexture);
+  this->inspector->SetColor(Conversions::Convert(this->visual3dColor));
+  this->inspector->SetTexture(this->visual3dTexture.toStdString());
   this->inspector->move(QCursor::pos());
   this->inspector->show();
 }

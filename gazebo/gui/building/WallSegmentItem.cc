@@ -16,6 +16,10 @@
 */
 
 #include "gazebo/math/Angle.hh"
+
+#include "gazebo/common/Color.hh"
+
+#include "gazebo/gui/Conversions.hh"
 #include "gazebo/gui/building/EditorView.hh"
 #include "gazebo/gui/building/EditorItem.hh"
 #include "gazebo/gui/building/RectItem.hh"
@@ -128,8 +132,8 @@ void WallSegmentItem::UpdateInspector()
   QPointF endPos = segmentEndPoint * this->itemScale;
   endPos.setY(-endPos.y());
   this->inspector->SetEndPosition(endPos);
-  this->inspector->SetColor(this->visual3dColor);
-  this->inspector->SetTexture(this->visual3dTexture);
+  this->inspector->SetColor(Conversions::Convert(this->visual3dColor));
+  this->inspector->SetTexture(this->visual3dTexture.toStdString());
 }
 
 /////////////////////////////////////////////////
@@ -235,8 +239,8 @@ void WallSegmentItem::OnApply()
   this->wallThickness = dialog->GetThickness() / this->itemScale;
   this->SetThickness(this->wallThickness);
   this->wallHeight = dialog->GetHeight() / this->itemScale;
-  this->Set3dTexture(dialog->GetTexture());
-  this->Set3dColor(dialog->GetColor());
+  this->Set3dTexture(QString::fromStdString(dialog->Texture()));
+  this->Set3dColor(Conversions::Convert(dialog->Color()));
   this->WallSegmentChanged();
 
   double newLength = dialog->GetLength() / this->itemScale;
