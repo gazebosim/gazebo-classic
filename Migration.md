@@ -119,7 +119,6 @@ release will remove the deprecated code.
     + ***Deprecation:*** public: double GetRayCountRatio() const;
     + ***Replacement:*** public: double RayCountRatio() const;
 
-
 1. **gazebo/rendering/DynamicLines.hh**
     + ***Deprecation:*** public: void AddPoint(const math::Vector3 &_pt,const common::Color &_color = common::Color::White)
     + ***Replacement:*** public: void AddPoint(const ignition::math::Vector3d &_pt,const common::Color &_color = common::Color::White);
