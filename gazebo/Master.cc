@@ -14,6 +14,11 @@
  * limitations under the License.
  *
 */
+
+#include <functional>
+#include <thread>
+#include <mutex>
+
 #include <boost/bind.hpp>
 #include <boost/make_shared.hpp>
 #include <google/protobuf/descriptor.h>
@@ -28,38 +33,38 @@ using namespace gazebo;
 
 namespace gazebo
 {
-    struct MasterPrivate
-    {
-        /// \brief All the known publishers.
-        gazebo::Master::PubList publishers;
+  struct MasterPrivate
+  {
+    /// \brief All the known publishers.
+    gazebo::Master::PubList publishers;
 
-        /// \brief All the known subscribers.
-        gazebo::Master::SubList subscribers;
+    /// \brief All the known subscribers.
+    gazebo::Master::SubList subscribers;
 
-        /// \brief All the known connections.
-        gazebo::Master::Connection_M connections;
+    /// \brief All the known connections.
+    gazebo::Master::Connection_M connections;
 
-        /// \brief All th worlds.
-        std::list<std::string> worldNames;
+    /// \brief All th worlds.
+    std::list<std::string> worldNames;
 
-        /// \brief Incoming messages.
-        std::list<std::pair<unsigned int, std::string> > msgs;
+    /// \brief Incoming messages.
+    std::list<std::pair<unsigned int, std::string> > msgs;
 
-        /// \brief Our server connection.
-        transport::ConnectionPtr connection;
+    /// \brief Our server connection.
+    transport::ConnectionPtr connection;
 
-        /// \brief Thread to run the main loop.
-        boost::thread *runThread;
+    /// \brief Thread to run the main loop.
+    std::thread *runThread;
 
-        /// \brief True to stop Master.
-        bool stop;
+    /// \brief True to stop Master.
+    bool stop;
 
-        /// \brief Mutex to protect connections.
-        boost::recursive_mutex connectionMutex;
+    /// \brief Mutex to protect connections.
+    std::mutex connectionMutex;
 
-        /// \brief Mutex to protect msg bufferes.
-        boost::recursive_mutex msgsMutex;
-    };
+    /// \brief Mutex to protect msg bufferes.
+    std::mutex msgsMutex;
+  };
 }
 
 /////////////////////////////////////////////////
@@ -125,7 +130,7 @@ void Master::OnAccept(transport::ConnectionPtr _newConnection)
 
   // Add the connection to our list
   {
-    boost::recursive_mutex::scoped_lock lock(this->dataPtr->connectionMutex);
+    std::lock_guard<std::mutex> lock(this->dataPtr->connectionMutex);
     int index = this->dataPtr->connections.size();
 
     this->dataPtr->connections[index] = _newConnection;
@@ -157,7 +162,7 @@ void Master::OnRead(const unsigned int _connectionIndex,
   // Store the message if it's not empty
   if (!_data.empty())
   {
-    boost::recursive_mutex::scoped_lock lock(this->dataPtr->msgsMutex);
+    std::lock_guard<std::mutex> lock(this->dataPtr->msgsMutex);
     this->dataPtr->msgs.push_back(std::make_pair(_connectionIndex, _data));
   }
   else
@@ -192,7 +197,7 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
                      worldNameMsg.data());
     if (iter == this->dataPtr->worldNames.end())
     {
-      boost::recursive_mutex::scoped_lock lock(this->dataPtr->connectionMutex);
+      std::lock_guard<std::mutex> lock(this->dataPtr->connectionMutex);
       this->dataPtr->worldNames.push_back(worldNameMsg.data());
 
       Connection_M::iterator iter2;
@@ -206,7 +211,7 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
   }
   else if (packet.type() == "advertise")
   {
-    boost::recursive_mutex::scoped_lock lock(this->dataPtr->connectionMutex);
+    std::lock_guard<std::mutex> lock(this->dataPtr->connectionMutex);
     msgs::Publish pub;
     pub.ParseFromString(packet.serialized_data());
 
@@ -380,7 +385,7 @@ void Master::Run()
 //////////////////////////////////////////////////
 void Master::RunThread()
 {
-  this->dataPtr->runThread = new boost::thread(boost::bind(&Master::Run, this));
+  this->dataPtr->runThread = new std::thread(std::bind(&Master::Run, this));
 }
 
 //////////////////////////////////////////////////
@@ -390,7 +395,7 @@ void Master::RunOnce()
 
   // Process the incoming message queue
   {
-    boost::recursive_mutex::scoped_lock lock(this->dataPtr->msgsMutex);
+    std::lock_guard<std::mutex> lock(this->dataPtr->msgsMutex);
     while (!this->dataPtr->msgs.empty())
     {
       this->ProcessMessage(this->dataPtr->msgs.front().first,
@@ -401,7 +406,7 @@ void Master::RunOnce()
 
   // Process all the connections
   {
-    boost::recursive_mutex::scoped_lock lock(this->dataPtr->connectionMutex);
+    std::lock_guard<std::mutex> lock(this->dataPtr->connectionMutex);
     for (iter = this->dataPtr->connections.begin();
         iter != this->dataPtr->connections.end();)
     {
@@ -428,7 +433,7 @@ void Master::RemoveConnection(Connection_M::iterator _connIter)
 
   // Remove all messages for this->dataPtr connection
   {
-    boost::recursive_mutex::scoped_lock lock(this->dataPtr->msgsMutex);
+    std::lock_guard<std::mutex> lock(this->dataPtr->msgsMutex);
     msgIter = this->dataPtr->msgs.begin();
     while (msgIter != this->dataPtr->msgs.end())
     {
@@ -486,7 +491,7 @@ void Master::RemoveConnection(Connection_M::iterator _connIter)
 void Master::RemovePublisher(const msgs::Publish _pub)
 {
   {
-    boost::recursive_mutex::scoped_lock lock(this->dataPtr->connectionMutex);
+    std::lock_guard<std::mutex> lock(this->dataPtr->connectionMutex);
     Connection_M::iterator iter2;
     for (iter2 = this->dataPtr->connections.begin();
         iter2 != this->dataPtr->connections.end(); ++iter2)
@@ -609,7 +614,7 @@ transport::ConnectionPtr Master::FindConnection(const std::string &_host,
   Connection_M::iterator iter;
 
   {
-    boost::recursive_mutex::scoped_lock lock(this->dataPtr->connectionMutex);
+    std::lock_guard<std::mutex> lock(this->dataPtr->connectionMutex);
     for (iter = this->dataPtr->connections.begin();
         iter != this->dataPtr->connections.end(); ++iter)
     {

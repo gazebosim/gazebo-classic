@@ -38,18 +38,18 @@ namespace gazebo
   /// network client to locate one another for peer-to-peer communication.
   class GAZEBO_VISIBLE Master
   {
-    public:
-      /// \def Map of unique id's to connections.
-      typedef std::map<unsigned int, transport::ConnectionPtr> Connection_M;
+    /// \def Map of unique id's to connections.
+    public: typedef
+        std::map<unsigned int, transport::ConnectionPtr> Connection_M;
 
-    public:
-      /// \def Map of publish messages to connections.
-      typedef std::list< std::pair<msgs::Publish, transport::ConnectionPtr> >
+    /// \def Map of publish messages to connections.
+    public: typedef
+        std::list< std::pair<msgs::Publish, transport::ConnectionPtr> >
         PubList;
 
-    public:
-      /// \def Map of subscribe messages to connections.
-      typedef std::list< std::pair<msgs::Subscribe, transport::ConnectionPtr> >
+    /// \def Map of subscribe messages to connections.
+    public: typedef
+        std::list< std::pair<msgs::Subscribe, transport::ConnectionPtr> >
         SubList;
 
     /// \brief Constructor
