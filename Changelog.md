@@ -275,6 +275,9 @@ using the same arguments used in the command line.
     1. Support inserting nested models from model maker
         * [Pull request #1982](https://bitbucket.org/osrf/gazebo/pull-request/1982)
 
+    1. PIMPL LinkInspector
+        * [Pull request #2056](https://bitbucket.org/osrf/gazebo/pull-request/2056)
+
 1. Building editor updates
 
     1. PIMPLize LevelWidget class
