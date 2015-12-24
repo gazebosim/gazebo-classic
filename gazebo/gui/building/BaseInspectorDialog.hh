@@ -65,11 +65,11 @@ namespace gazebo
 
       /// \brief Set the color.
       /// \param[in] _color Color.
-      public: void SetColor(const common::Color _color);
+      public: void SetColor(const common::Color &_color);
 
       /// \brief Set the texture.
       /// \param[in] _texture Texture.
-      public: void SetTexture(const std::string _texture);
+      public: void SetTexture(const std::string &_texture);
 
       /// \brief Combo box for selecting the color.
       protected: QComboBox *colorComboBox;

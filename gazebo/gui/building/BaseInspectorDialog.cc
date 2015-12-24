@@ -96,7 +96,7 @@ std::string BaseInspectorDialog::Texture() const
 }
 
 /////////////////////////////////////////////////
-void BaseInspectorDialog::SetColor(const common::Color _color)
+void BaseInspectorDialog::SetColor(const common::Color &_color)
 {
   int index = -1;
   for (unsigned int i = 0; i < this->colorList.size(); ++i)
@@ -122,7 +122,7 @@ void BaseInspectorDialog::SetColor(const common::Color _color)
 }
 
 /////////////////////////////////////////////////
-void BaseInspectorDialog::SetTexture(std::string _texture)
+void BaseInspectorDialog::SetTexture(const std::string &_texture)
 {
   // Find index corresponding to texture (only a few textures allowed so far)
   int index = this->textureComboBox->count()-1;
