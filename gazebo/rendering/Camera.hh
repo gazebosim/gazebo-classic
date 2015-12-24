@@ -260,7 +260,7 @@ namespace gazebo
       /// \param[in] _angle Pitch amount
       /// \param[in] _relativeTo Coordinate frame to rotate in. Valid values
       /// are Ogre::TS_LOCAL, Ogre::TS_PARENT, and Ogre::TS_WORLD. Default
-      /// Ogre::TS_WORLD
+      /// is Ogre::TS_LOCAL
       /// \deprecated See function the accepts an ignition::math parameter
       public: void Pitch(const math::Angle &_angle,
                   Ogre::Node::TransformSpace _relativeTo =
@@ -277,7 +277,7 @@ namespace gazebo
       /// \param[in] _angle Rotation amount
       /// \param[in] _relativeTo Coordinate frame to rotate in. Valid values
       /// are Ogre::TS_LOCAL, Ogre::TS_PARENT, and Ogre::TS_WORLD. Default
-      /// Ogre::TS_WORLD
+      /// is Ogre::TS_WORLD
       /// \deprecated See function the accepts an ignition::math parameter
       public: void Yaw(const math::Angle &_angle,
                   Ogre::Node::TransformSpace _relativeTo =
@@ -286,7 +286,7 @@ namespace gazebo
       /// \brief Rotate the camera around the z-axis
       /// \param[in] _angle Rotation amount
       /// \param[in] _relativeTo Coordinate frame to rotate in. Valid values
-      /// are RF_LOCAL, RF_PARENT, and RF_WORLD. Default is RF_LOCAL
+      /// are RF_LOCAL, RF_PARENT, and RF_WORLD. Default is RF_WORLD
       public: void Yaw(const ignition::math::Angle &_angle,
                   ReferenceFrame _relativeTo = RF_WORLD);
 
@@ -572,6 +572,7 @@ namespace gazebo
 
       /// \brief Get the camera's scene node
       /// \return The scene node the camera is attached to
+      /// \deprecated See SceneNode()
       public: Ogre::SceneNode *GetSceneNode() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the camera's scene node
@@ -720,6 +721,7 @@ namespace gazebo
 
       /// \brief Get the render texture
       /// \return Pointer to the render texture
+      /// \deprecated See RenderTexture()
       public: Ogre::Texture *GetRenderTexture() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the render texture
@@ -913,7 +915,8 @@ namespace gazebo
 
       /// \brief Get the next frame filename based on SDF parameters
       /// \return The frame's filename
-      protected: std::string GetFrameFilename();
+      /// \deprecated See FrameFilename()
+      protected: std::string GetFrameFilename() GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the next frame filename based on SDF parameters
       /// \return The frame's filename

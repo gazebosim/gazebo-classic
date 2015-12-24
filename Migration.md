@@ -346,7 +346,6 @@ release will remove the deprecated code.
     + ***Deprecation:*** public: std::string GetProjectionType() const;
     + ***Replacement:*** public: std::string ProjectionType() const;
 
-
 1. **gazebo/gui/RTShaderSystem.hh**
     + ***Deprecation:*** void AttachEntity(Visual *vis)
     + ***No replacement for AttachEntity ***

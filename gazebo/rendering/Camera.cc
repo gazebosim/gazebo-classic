@@ -907,8 +907,8 @@ size_t Camera::ImageByteSize() const
 {
   sdf::ElementPtr elem = this->sdf->GetElement("image");
   return this->ImageByteSize(elem->Get<int>("width"),
-                                elem->Get<int>("height"),
-                                this->ImageFormat());
+                             elem->Get<int>("height"),
+                             this->ImageFormat());
 }
 
 //////////////////////////////////////////////////

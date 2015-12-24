@@ -230,16 +230,16 @@ namespace gazebo
       RENDERING_MESH_RESOURCE = 6
     };
 
-    /// \brief Frame of reference for transforms
+    /// \brief Frame of reference
     enum ReferenceFrame
     {
-      /// \brief Local transformation
+      /// \brief Local frame
       RF_LOCAL,
 
-      /// \brief Transformation in parent frame
+      /// \brief Parent frame
       RF_PARENT,
 
-      /// \brief Transformation in world frame
+      /// \brief World frame
       RF_WORLD
     };
   }
