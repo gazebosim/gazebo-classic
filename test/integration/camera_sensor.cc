@@ -160,7 +160,7 @@ TEST_F(CameraSensor, FillMsg)
   ASSERT_TRUE(msg.has_camera());
   auto cameraMsg = msg.camera();
   auto cam = camSensor->GetCamera();
-  EXPECT_EQ(cameraMsg.horizontal_fov(), cam->GetHFOV().Radian());
+  EXPECT_EQ(cameraMsg.horizontal_fov(), cam->HFOV().Radian());
   EXPECT_EQ(cameraMsg.image_size().x(), camSensor->GetImageWidth());
   EXPECT_EQ(cameraMsg.image_size().y(), camSensor->GetImageHeight());
   EXPECT_EQ(cameraMsg.image_format(), cam->GetImageFormat());
