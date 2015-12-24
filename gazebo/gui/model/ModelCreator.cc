@@ -135,7 +135,7 @@ ModelCreator::ModelCreator()
 
   this->connections.push_back(
       gui::Events::ConnectAlignMode(
-        boost::bind(&ModelCreator::OnAlignMode, this, _1, _2, _3, _4)));
+        boost::bind(&ModelCreator::OnAlignMode, this, _1, _2, _3, _4, _5)));
 
   this->connections.push_back(
       gui::Events::ConnectManipMode(
@@ -2205,10 +2205,11 @@ sdf::ElementPtr ModelCreator::GenerateLinkSDF(LinkData *_link)
 
 /////////////////////////////////////////////////
 void ModelCreator::OnAlignMode(const std::string &_axis,
-    const std::string &_config, const std::string &_target, bool _preview)
+    const std::string &_config, const std::string &_target, const bool _preview,
+    const bool _inverted)
 {
   ModelAlign::Instance()->AlignVisuals(this->selectedLinks, _axis, _config,
-      _target, !_preview);
+      _target, !_preview, _inverted);
 }
 
 /////////////////////////////////////////////////

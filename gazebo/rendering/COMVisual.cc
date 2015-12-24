@@ -166,18 +166,18 @@ void COMVisual::Load()
   this->SetMaterial("Gazebo/CoM");
 
   // CoM position indicator
-  math::Vector3 p1(0, 0, box.min.z - dPtr->inertiaPose.pos.z);
-  math::Vector3 p2(0, 0, box.max.z - dPtr->inertiaPose.pos.z);
-  math::Vector3 p3(0, box.min.y - dPtr->inertiaPose.pos.y, 0);
-  math::Vector3 p4(0, box.max.y - dPtr->inertiaPose.pos.y, 0);
-  math::Vector3 p5(box.min.x - dPtr->inertiaPose.pos.x, 0, 0);
-  math::Vector3 p6(box.max.x - dPtr->inertiaPose.pos.x, 0, 0);
-  p1 += dPtr->inertiaPose.pos;
-  p2 += dPtr->inertiaPose.pos;
-  p3 += dPtr->inertiaPose.pos;
-  p4 += dPtr->inertiaPose.pos;
-  p5 += dPtr->inertiaPose.pos;
-  p6 += dPtr->inertiaPose.pos;
+  ignition::math::Vector3d p1(0, 0, box.min.z - dPtr->inertiaPose.pos.z);
+  ignition::math::Vector3d p2(0, 0, box.max.z - dPtr->inertiaPose.pos.z);
+  ignition::math::Vector3d p3(0, box.min.y - dPtr->inertiaPose.pos.y, 0);
+  ignition::math::Vector3d p4(0, box.max.y - dPtr->inertiaPose.pos.y, 0);
+  ignition::math::Vector3d p5(box.min.x - dPtr->inertiaPose.pos.x, 0, 0);
+  ignition::math::Vector3d p6(box.max.x - dPtr->inertiaPose.pos.x, 0, 0);
+  p1 += dPtr->inertiaPose.pos.Ign();
+  p2 += dPtr->inertiaPose.pos.Ign();
+  p3 += dPtr->inertiaPose.pos.Ign();
+  p4 += dPtr->inertiaPose.pos.Ign();
+  p5 += dPtr->inertiaPose.pos.Ign();
+  p6 += dPtr->inertiaPose.pos.Ign();
 
   dPtr->crossLines = this->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
   dPtr->crossLines->setMaterial("Gazebo/Green");
