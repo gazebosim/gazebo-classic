@@ -40,7 +40,7 @@ namespace gazebo
     /// \brief Private data for the RenderEngine class
     class RenderEnginePrivate
     {
-      /// \brief Pointer to the root scene node
+      /// \brief Pointer to ogre root.
       public: Ogre::Root *root;
 
       /// \brief All of the scenes
