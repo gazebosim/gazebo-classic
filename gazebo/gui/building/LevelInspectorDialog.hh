@@ -53,11 +53,11 @@ namespace gazebo
 
       /// \brief Get the name of the level.
       /// \return The level name.
-      public: std::string GetLevelName() const;
+      public: std::string LevelName() const;
 
       /// \brief Get the height of the level.
       /// \return The level height in pixels.
-      public: double GetHeight() const;
+      public: double Height() const;
 
       /// \brief Set the name of the level.
       /// \param[in] _levelName New level name.

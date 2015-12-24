@@ -53,23 +53,23 @@ namespace gazebo
 
       /// \brief Get start position (bottom-end) of the staircase.
       /// \return The start position of the staircase in pixel coordinates.
-      public: QPointF GetStartPosition() const;
+      public: QPointF StartPosition() const;
 
       /// \brief Get the width the staircase.
       /// \return Staircase width in pixels.
-      public: double GetWidth() const;
+      public: double Width() const;
 
       /// \brief Get the depth the staircase.
       /// \return Staircase depth in pixels.
-      public: double GetDepth() const;
+      public: double Depth() const;
 
       /// \brief Get the height the staircase.
       /// \return Staircase height in pixels.
-      public: double GetHeight() const;
+      public: double Height() const;
 
       /// \brief Get the number of steps in the staircase.
       /// \return Number of steps in the staircase.
-      public: int GetSteps() const;
+      public: int Steps() const;
 
       /// \brief Set the name of the staircase.
       /// \param[in] _name Name to set to.

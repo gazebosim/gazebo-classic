@@ -156,16 +156,16 @@ void DoorItem::OnApply()
 
   QPointF itemPos = this->doorPos * this->itemScale;
   itemPos.setY(-itemPos.y());
-  this->SetSize(QSize(dialog->GetWidth() / this->itemScale,
-      (dialog->GetDepth() / this->itemScale)));
-  this->doorWidth = dialog->GetWidth() / this->itemScale;
-  this->doorHeight = dialog->GetHeight() / this->itemScale;
-  this->doorDepth = dialog->GetDepth() / this->itemScale;
-  this->doorElevation = dialog->GetElevation() / this->itemScale;
-  if ((fabs(dialog->GetPosition().x() - itemPos.x()) >= 0.01)
-      || (fabs(dialog->GetPosition().y() - itemPos.y()) >= 0.01))
+  this->SetSize(QSize(dialog->Width() / this->itemScale,
+      (dialog->Depth() / this->itemScale)));
+  this->doorWidth = dialog->Width() / this->itemScale;
+  this->doorHeight = dialog->Height() / this->itemScale;
+  this->doorDepth = dialog->Depth() / this->itemScale;
+  this->doorElevation = dialog->Elevation() / this->itemScale;
+  if ((fabs(dialog->Position().x() - itemPos.x()) >= 0.01)
+      || (fabs(dialog->Position().y() - itemPos.y()) >= 0.01))
   {
-    itemPos = dialog->GetPosition() / this->itemScale;
+    itemPos = dialog->Position() / this->itemScale;
     itemPos.setY(-itemPos.y());
     this->doorPos = itemPos;
     this->setPos(this->doorPos);

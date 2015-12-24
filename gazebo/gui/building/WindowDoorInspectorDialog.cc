@@ -173,38 +173,38 @@ WindowDoorInspectorDialog::~WindowDoorInspectorDialog()
 }
 
 /////////////////////////////////////////////////
-double WindowDoorInspectorDialog::GetWidth() const
+double WindowDoorInspectorDialog::Width() const
 {
   return this->dataPtr->widthSpinBox->value();
 }
 
 /////////////////////////////////////////////////
-double WindowDoorInspectorDialog::GetDepth() const
+double WindowDoorInspectorDialog::Depth() const
 {
   return this->dataPtr->depthSpinBox->value();
 }
 
 /////////////////////////////////////////////////
-double WindowDoorInspectorDialog::GetHeight() const
+double WindowDoorInspectorDialog::Height() const
 {
   return this->dataPtr->heightSpinBox->value();
 }
 
 /////////////////////////////////////////////////
-QPointF WindowDoorInspectorDialog::GetPosition() const
+QPointF WindowDoorInspectorDialog::Position() const
 {
   return QPointF(this->dataPtr->positionXSpinBox->value(),
       this->dataPtr->positionYSpinBox->value());
 }
 
 /////////////////////////////////////////////////
-double WindowDoorInspectorDialog::GetElevation() const
+double WindowDoorInspectorDialog::Elevation() const
 {
   return this->dataPtr->elevationSpinBox->value();
 }
 
 /////////////////////////////////////////////////
-std::string WindowDoorInspectorDialog::GetType() const
+std::string WindowDoorInspectorDialog::Type() const
 {
   return this->dataPtr->typeComboBox->currentText().toStdString();
 }

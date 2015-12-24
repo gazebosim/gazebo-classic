@@ -51,23 +51,23 @@ namespace gazebo
 
       /// \brief Get the length the wall segment.
       /// \return Wall segment length in pixels.
-      public: double GetLength() const;
+      public: double Length() const;
 
       /// \brief Get the start position of the wall segment.
       /// \return Wall segment start position in pixel coordinates.
-      public: QPointF GetStartPosition() const;
+      public: QPointF StartPosition() const;
 
       /// \brief Get the end position of the wall segment.
       /// \return Wall segment end position in pixel coordinates.
-      public: QPointF GetEndPosition() const;
+      public: QPointF EndPosition() const;
 
       /// \brief Get the height of the wall.
       /// \return Wall height in pixels.
-      public: double GetHeight() const;
+      public: double Height() const;
 
       /// \brief Get the thickness of the wall.
       /// \return Wall thickness in pixels.
-      public: double GetThickness() const;
+      public: double Thickness() const;
 
       /// \brief Set the name of the wall.
       /// \param[in] _name Name to set the wall to.

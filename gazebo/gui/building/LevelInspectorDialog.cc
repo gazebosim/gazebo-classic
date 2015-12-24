@@ -106,13 +106,13 @@ LevelInspectorDialog::~LevelInspectorDialog()
 }
 
 /////////////////////////////////////////////////
-std::string LevelInspectorDialog::GetLevelName() const
+std::string LevelInspectorDialog::LevelName() const
 {
   return this->dataPtr->levelNameLineEdit->text().toStdString();
 }
 
 /////////////////////////////////////////////////
-double LevelInspectorDialog::GetHeight() const
+double LevelInspectorDialog::Height() const
 {
   return this->dataPtr->heightSpinBox->value();
 }

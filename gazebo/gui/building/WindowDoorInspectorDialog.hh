@@ -56,27 +56,27 @@ namespace gazebo
 
       /// \brief Get the item width.
       /// \return Width in pixels.
-      public: double GetWidth() const;
+      public: double Width() const;
 
       /// \brief Get the item height.
       /// \return Height in pixels.
-      public: double GetHeight() const;
+      public: double Height() const;
 
       /// \brief Get the item depth.
       /// \return Depth in pixels.
-      public: double GetDepth() const;
+      public: double Depth() const;
 
       /// \brief Get the item position.
       /// \return Item position in pixel coordinates.
-      public: QPointF GetPosition() const;
+      public: QPointF Position() const;
 
       /// \brief Get the item elevation.
       /// \return Item elevation in pixels.
-      public: double GetElevation() const;
+      public: double Elevation() const;
 
       /// \brief Get the item type.
       /// \return Item type.
-      public: std::string GetType() const;
+      public: std::string Type() const;
 
       /// \brief Set the item name.
       /// \param[in] _name Name to set to.

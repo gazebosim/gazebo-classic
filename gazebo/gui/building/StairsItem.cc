@@ -240,25 +240,25 @@ void StairsItem::OnApply()
 
   QPointF startPos = this->stairsPos * this->itemScale;
   startPos.setY(-startPos.y());
-  this->SetSize(QSize(dialog->GetWidth() / this->itemScale,
-        dialog->GetDepth() / this->itemScale));
-  this->stairsWidth = dialog->GetWidth() / this->itemScale;
-  this->stairsHeight = dialog->GetHeight() / this->itemScale;
-  this->stairsDepth = dialog->GetDepth() / this->itemScale;
-  if ((fabs(dialog->GetStartPosition().x() - startPos.x()) >= 0.01)
-      || (fabs(dialog->GetStartPosition().y() - startPos.y()) >= 0.01))
+  this->SetSize(QSize(dialog->Width() / this->itemScale,
+        dialog->Depth() / this->itemScale));
+  this->stairsWidth = dialog->Width() / this->itemScale;
+  this->stairsHeight = dialog->Height() / this->itemScale;
+  this->stairsDepth = dialog->Depth() / this->itemScale;
+  if ((fabs(dialog->StartPosition().x() - startPos.x()) >= 0.01)
+      || (fabs(dialog->StartPosition().y() - startPos.y()) >= 0.01))
   {
-    this->stairsPos = dialog->GetStartPosition() / this->itemScale;
+    this->stairsPos = dialog->StartPosition() / this->itemScale;
     this->stairsPos.setY(-this->stairsPos.y());
     this->setPos(stairsPos);
     this->setParentItem(NULL);
   }
-  if (this->stairsSteps != dialog->GetSteps())
+  if (this->stairsSteps != dialog->Steps())
   {
-    this->stairsSteps = dialog->GetSteps();
+    this->stairsSteps = dialog->Steps();
     this->StepsChanged();
   }
-  // this->stairsElevation = dialog->GetElevation();
+  // this->stairsElevation = dialog->Elevation();
   this->Set3dTexture(QString::fromStdString(dialog->Texture()));
   this->Set3dColor(Conversions::Convert(dialog->Color()));
   this->StairsChanged();

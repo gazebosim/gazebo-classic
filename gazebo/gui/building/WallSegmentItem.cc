@@ -236,14 +236,14 @@ void WallSegmentItem::OnApply()
       qobject_cast<WallInspectorDialog *>(QObject::sender());
 
   double segmentLength = this->line().length() + this->wallThickness;
-  this->wallThickness = dialog->GetThickness() / this->itemScale;
+  this->wallThickness = dialog->Thickness() / this->itemScale;
   this->SetThickness(this->wallThickness);
-  this->wallHeight = dialog->GetHeight() / this->itemScale;
+  this->wallHeight = dialog->Height() / this->itemScale;
   this->Set3dTexture(QString::fromStdString(dialog->Texture()));
   this->Set3dColor(Conversions::Convert(dialog->Color()));
   this->WallSegmentChanged();
 
-  double newLength = dialog->GetLength() / this->itemScale;
+  double newLength = dialog->Length() / this->itemScale;
 
   // The if statement below limits the change to either the length of
   // the wall segment or its start/end pos.
@@ -257,9 +257,9 @@ void WallSegmentItem::OnApply()
   }
   else
   {
-    QPointF newStartPoint = dialog->GetStartPosition() / this->itemScale;
+    QPointF newStartPoint = dialog->StartPosition() / this->itemScale;
     newStartPoint.setY(-newStartPoint.y());
-    QPointF newEndPoint = dialog->GetEndPosition() / this->itemScale;
+    QPointF newEndPoint = dialog->EndPosition() / this->itemScale;
     newEndPoint.setY(-newEndPoint.y());
 
     this->SetStartPoint(newStartPoint);

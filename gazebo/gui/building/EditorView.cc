@@ -1304,7 +1304,7 @@ void EditorView::OnLevelApply()
   LevelInspectorDialog *dialog =
       qobject_cast<LevelInspectorDialog *>(QObject::sender());
 
-  std::string newLevelName = dialog->GetLevelName();
+  std::string newLevelName = dialog->LevelName();
   this->levels[this->currentLevel]->name = newLevelName;
   FloorItem *floorItem = this->levels[this->currentLevel]->floorItem;
   if (floorItem)

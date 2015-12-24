@@ -219,33 +219,33 @@ WallInspectorDialog::~WallInspectorDialog()
 }
 
 /////////////////////////////////////////////////
-double WallInspectorDialog::GetLength() const
+double WallInspectorDialog::Length() const
 {
   return this->dataPtr->lengthSpinBox->value();
 }
 
 /////////////////////////////////////////////////
-QPointF WallInspectorDialog::GetStartPosition() const
+QPointF WallInspectorDialog::StartPosition() const
 {
   return QPointF(this->dataPtr->startXSpinBox->value(),
       this->dataPtr->startYSpinBox->value());
 }
 
 /////////////////////////////////////////////////
-QPointF WallInspectorDialog::GetEndPosition() const
+QPointF WallInspectorDialog::EndPosition() const
 {
   return QPointF(this->dataPtr->endXSpinBox->value(),
       this->dataPtr->endYSpinBox->value());
 }
 
 /////////////////////////////////////////////////
-double WallInspectorDialog::GetHeight() const
+double WallInspectorDialog::Height() const
 {
   return this->dataPtr->heightSpinBox->value();
 }
 
 /////////////////////////////////////////////////
-double WallInspectorDialog::GetThickness() const
+double WallInspectorDialog::Thickness() const
 {
   return this->dataPtr->thicknessSpinBox->value();
 }

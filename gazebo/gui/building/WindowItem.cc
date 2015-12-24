@@ -161,16 +161,16 @@ void WindowItem::OnApply()
 
   QPointF itemPos = this->windowPos * this->itemScale;
   itemPos.setY(-itemPos.y());
-  this->SetSize(QSize(dialog->GetWidth() / this->itemScale,
-      dialog->GetDepth() / this->itemScale));
-  this->windowWidth = dialog->GetWidth() / this->itemScale;
-  this->windowHeight = dialog->GetHeight() / this->itemScale;
-  this->windowDepth = dialog->GetDepth() / this->itemScale;
-  this->windowElevation = dialog->GetElevation() / this->itemScale;
-  if ((fabs(dialog->GetPosition().x() - itemPos.x()) >= 0.01)
-      || (fabs(dialog->GetPosition().y() - itemPos.y()) >= 0.01))
+  this->SetSize(QSize(dialog->Width() / this->itemScale,
+      dialog->Depth() / this->itemScale));
+  this->windowWidth = dialog->Width() / this->itemScale;
+  this->windowHeight = dialog->Height() / this->itemScale;
+  this->windowDepth = dialog->Depth() / this->itemScale;
+  this->windowElevation = dialog->Elevation() / this->itemScale;
+  if ((fabs(dialog->Position().x() - itemPos.x()) >= 0.01)
+      || (fabs(dialog->Position().y() - itemPos.y()) >= 0.01))
   {
-    itemPos = dialog->GetPosition() / this->itemScale;
+    itemPos = dialog->Position() / this->itemScale;
     itemPos.setY(-itemPos.y());
     this->windowPos = itemPos;
     this->setPos(this->windowPos);

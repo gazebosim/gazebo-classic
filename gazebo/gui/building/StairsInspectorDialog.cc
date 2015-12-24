@@ -170,32 +170,32 @@ StairsInspectorDialog::~StairsInspectorDialog()
 }
 
 /////////////////////////////////////////////////
-QPointF StairsInspectorDialog::GetStartPosition() const
+QPointF StairsInspectorDialog::StartPosition() const
 {
   return QPointF(this->dataPtr->startXSpinBox->value(),
       this->dataPtr->startYSpinBox->value());
 }
 
 /////////////////////////////////////////////////
-double StairsInspectorDialog::GetWidth() const
+double StairsInspectorDialog::Width() const
 {
   return this->dataPtr->widthSpinBox->value();
 }
 
 /////////////////////////////////////////////////
-double StairsInspectorDialog::GetDepth() const
+double StairsInspectorDialog::Depth() const
 {
   return this->dataPtr->depthSpinBox->value();
 }
 
 /////////////////////////////////////////////////
-double StairsInspectorDialog::GetHeight() const
+double StairsInspectorDialog::Height() const
 {
   return this->dataPtr->heightSpinBox->value();
 }
 
 /////////////////////////////////////////////////
-int StairsInspectorDialog::GetSteps() const
+int StairsInspectorDialog::Steps() const
 {
   return this->dataPtr->stepsSpinBox->value();
 }
