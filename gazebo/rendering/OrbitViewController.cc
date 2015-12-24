@@ -78,8 +78,8 @@ void OrbitViewController::Init()
   ignition::math::Vector3d fp;
 
   // Try to get a point on a plane to use as the reference point
-  int width = this->camera->GetViewportWidth();
-  int height = this->camera->GetViewportHeight();
+  int width = this->camera->ViewportWidth();
+  int height = this->camera->ViewportHeight();
 
   if (this->camera->WorldPointOnPlane(width/2.0, height/2.0,
         ignition::math::Planed(ignition::math::Vector3d(0, 0, 1)), fp))
@@ -154,8 +154,8 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
 
   ignition::math::Vector3d directionVec(0, 0, 0);
 
-  int width = this->camera->GetViewportWidth();
-  int height = this->camera->GetViewportHeight();
+  int width = this->camera->ViewportWidth();
+  int height = this->camera->ViewportHeight();
 
   // If the event is the initial press of a mouse button, then update
   // the focal point and distance.
@@ -206,7 +206,7 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
 
     double fovY = this->camera->VFOV().Radian();
     double fovX = 2.0f * atan(tan(fovY / 2.0f) *
-        this->camera->GetAspectRatio());
+        this->camera->AspectRatio());
 
     ignition::math::Vector3d translation;
 
@@ -379,7 +379,7 @@ void OrbitViewController::UpdateRefVisual()
 /////////////////////////////////////////////////
 void OrbitViewController::Orbit(double _dy, double _dp)
 {
-  Ogre::SceneNode *cameraNode = this->camera->GetSceneNode();
+  Ogre::SceneNode *cameraNode = this->camera->SceneNode();
   Ogre::Node *parentNode = cameraNode->getParent();
   Ogre::Vector3 pos = cameraNode->_getDerivedPosition();
 
@@ -390,7 +390,7 @@ void OrbitViewController::Orbit(double _dy, double _dp)
 
   // Add the camera node to to the reference visual, and update the
   // reference visual's position.
-  this->refVisual->GetSceneNode()->addChild(this->camera->GetSceneNode());
+  this->refVisual->GetSceneNode()->addChild(this->camera->SceneNode());
   this->refVisual->SetPosition(this->focalPoint);
 
   // Move the camera to it's starting location. Now we can rotate the

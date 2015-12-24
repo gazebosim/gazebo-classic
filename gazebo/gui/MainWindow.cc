@@ -506,7 +506,7 @@ void MainWindow::Save()
       cameraElem->GetElement("view_controller")->Set(
           cam->GetViewControllerTypeString());
 
-      cameraElem->GetElement("projection_type")->Set(cam->GetProjectionType());
+      cameraElem->GetElement("projection_type")->Set(cam->ProjectionType());
 
       // TODO: export track_visual properties as well.
       msgData = sdf_parsed.Root()->ToString("");
@@ -795,7 +795,7 @@ void MainWindow::CaptureScreenshot()
   rendering::UserCameraPtr cam = gui::get_active_camera();
   cam->SetCaptureDataOnce();
   this->renderWidget->DisplayOverlayMsg(
-      "Screenshot saved in: " + cam->GetScreenshotPath(), 2000);
+      "Screenshot saved in: " + cam->ScreenshotPath(), 2000);
 }
 
 /////////////////////////////////////////////////

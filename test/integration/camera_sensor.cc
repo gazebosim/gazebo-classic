@@ -163,9 +163,9 @@ TEST_F(CameraSensor, FillMsg)
   EXPECT_EQ(cameraMsg.horizontal_fov(), cam->HFOV().Radian());
   EXPECT_EQ(cameraMsg.image_size().x(), camSensor->GetImageWidth());
   EXPECT_EQ(cameraMsg.image_size().y(), camSensor->GetImageHeight());
-  EXPECT_EQ(cameraMsg.image_format(), cam->GetImageFormat());
-  EXPECT_EQ(cameraMsg.near_clip(), cam->GetNearClip());
-  EXPECT_EQ(cameraMsg.far_clip(), cam->GetFarClip());
+  EXPECT_EQ(cameraMsg.image_format(), cam->ImageFormat());
+  EXPECT_EQ(cameraMsg.near_clip(), cam->NearClip());
+  EXPECT_EQ(cameraMsg.far_clip(), cam->FarClip());
 }
 
 /////////////////////////////////////////////////

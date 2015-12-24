@@ -111,9 +111,9 @@ void GpuLaser::Load()
 void GpuLaser::Init()
 {
   Camera::Init();
-  this->w2nd = this->GetImageWidth();
-  this->h2nd = this->GetImageHeight();
-  this->visual.reset(new Visual(this->GetName()+"second_pass_canvas",
+  this->w2nd = this->ImageWidth();
+  this->h2nd = this->ImageHeight();
+  this->visual.reset(new Visual(this->Name()+"second_pass_canvas",
      this->GetScene()->GetWorldVisual()));
 }
 
@@ -155,7 +155,7 @@ void GpuLaser::CreateLaserTexture(const std::string &_textureName)
     this->firstPassTextures[i] =
       Ogre::TextureManager::getSingleton().createManual(
       texName.str(), "General", Ogre::TEX_TYPE_2D,
-      this->GetImageWidth(), this->GetImageHeight(), 0,
+      this->ImageWidth(), this->ImageHeight(), 0,
       Ogre::PF_FLOAT32_RGB, Ogre::TU_RENDERTARGET).getPointer();
 
     this->Set1stPassTarget(
@@ -173,7 +173,7 @@ void GpuLaser::CreateLaserTexture(const std::string &_textureName)
       _textureName + "second_pass",
       "General",
       Ogre::TEX_TYPE_2D,
-      this->GetImageWidth(), this->GetImageHeight(), 0,
+      this->ImageWidth(), this->ImageHeight(), 0,
       Ogre::PF_FLOAT32_RGB,
       Ogre::TU_RENDERTARGET).getPointer();
 
@@ -562,8 +562,8 @@ void GpuLaser::Set2ndPassTarget(Ogre::RenderTarget *_target)
         GZ_VISIBILITY_ALL & ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
   }
   Ogre::Matrix4 p = this->BuildScaledOrthoMatrix(
-      0, static_cast<float>(this->GetImageWidth() / 10.0),
-      0, static_cast<float>(this->GetImageHeight() / 10.0),
+      0, static_cast<float>(this->ImageWidth() / 10.0),
+      0, static_cast<float>(this->ImageHeight() / 10.0),
       0.01, 0.02);
 
   this->orthoCam->setCustomProjectionMatrix(true, p);
@@ -579,7 +579,7 @@ void GpuLaser::SetRangeCount(unsigned int _w, unsigned int _h)
 /////////////////////////////////////////////////
 void GpuLaser::CreateMesh()
 {
-  std::string meshName = this->GetName() + "_undistortion_mesh";
+  std::string meshName = this->Name() + "_undistortion_mesh";
 
   common::Mesh *mesh = new common::Mesh();
   mesh->SetName(meshName);
@@ -589,7 +589,7 @@ void GpuLaser::CreateMesh()
   double dx, dy;
   submesh->SetPrimitiveType(common::SubMesh::POINTS);
 
-  double viewHeight = this->GetImageHeight()/10.0;
+  double viewHeight = this->ImageHeight()/10.0;
 
   if (h2nd == 1)
     dy = 0;
@@ -605,7 +605,7 @@ void GpuLaser::CreateMesh()
 
   double vAngMin = -phi;
 
-  if (this->GetImageHeight() == 1)
+  if (this->ImageHeight() == 1)
     phi = 0;
 
   unsigned int ptsOnLine = 0;
@@ -633,7 +633,7 @@ void GpuLaser::CreateMesh()
       delta = delta - theta;
 
       startX -= dx;
-      if (ptsOnLine == this->GetImageWidth())
+      if (ptsOnLine == this->ImageWidth())
       {
         ptsOnLine = 0;
         startX = 0;
