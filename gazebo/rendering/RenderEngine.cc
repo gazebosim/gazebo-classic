@@ -43,8 +43,6 @@
   #include "gazebo/common/win_dirent.h"
 #endif
 
-
-
 #include "gazebo/gazebo_config.h"
 
 #include "gazebo/common/CommonIface.hh"
@@ -273,7 +271,6 @@ unsigned int RenderEngine::SceneCount() const
 {
   return this->dataPtr->scenes.size();
 }
-
 
 //////////////////////////////////////////////////
 void RenderEngine::PreRender()
