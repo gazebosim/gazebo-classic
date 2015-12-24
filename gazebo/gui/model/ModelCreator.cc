@@ -2464,9 +2464,12 @@ void ModelCreator::OnAddModelPlugin(const std::string &_name,
   tmp << "<plugin name='" << _name << "' filename='" << _filename << "'>";
   tmp << _innerxml;
   tmp << "</plugin></sdf>";
-  sdf::readString(tmp.str(), modelPluginSDF);
 
-  this->AddModelPlugin(modelPluginSDF);
+  if (sdf::readString(tmp.str(), modelPluginSDF))
+  {
+    this->AddModelPlugin(modelPluginSDF);
+    this->ModelChanged();
+  }
 }
 
 /////////////////////////////////////////////////
@@ -2488,8 +2491,6 @@ void ModelCreator::AddModelPlugin(const sdf::ElementPtr _pluginElem)
 
     // Notify addition
     gui::model::Events::modelPluginInserted(name);
-
-    this->ModelChanged();
   }
 }
 
