@@ -610,12 +610,12 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
     // Set end point to mouse plane intersection
     else
     {
-      math::Vector3 pt;
-      camera->GetWorldPointOnPlane(_event.Pos().X(), _event.Pos().Y(),
-          math::Plane(math::Vector3(0, 0, 1)), pt);
+      ignition::math::Vector3d pt;
+      camera->WorldPointOnPlane(_event.Pos().X(), _event.Pos().Y(),
+          ignition::math::Planed(ignition::math::Vector3d(0, 0, 1)), pt);
 
       parentPos = this->GetLinkWorldCentroid(this->newJoint->parent).Ign()
-          - this->newJoint->line->Point(0) - pt.Ign();
+          - this->newJoint->line->Point(0) - pt;
     }
     this->newJoint->line->SetPoint(1,
         (this->GetLinkWorldCentroid(this->hoverVis) - parentPos).Ign());
@@ -944,7 +944,7 @@ unsigned int JointMaker::GetJointCount()
 void JointData::OnApply()
 {
   // Get data from inspector
-  msgs::Joint *inspectorMsg = this->inspector->GetData();
+  msgs::Joint *inspectorMsg = this->inspector->Data();
   if (!inspectorMsg)
     return;
 
