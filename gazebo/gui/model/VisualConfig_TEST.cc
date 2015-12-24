@@ -61,7 +61,7 @@ void VisualConfig_TEST::VisualUpdates()
     if (it.second->name == "v1")
     {
       const VisualConfigData *configData = it.second;
-      QCOMPARE(configData->configWidget->GetDoubleWidgetValue("transparency"),
+      QCOMPARE(configData->configWidget->DoubleWidgetValue("transparency"),
           0.50);
       foundConfig = true;
       break;

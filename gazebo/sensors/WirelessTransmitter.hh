@@ -53,7 +53,7 @@ namespace gazebo
       public: virtual ~WirelessTransmitter();
 
       // Documentation inherited
-      protected: virtual bool UpdateImpl(bool _force);
+      protected: virtual bool UpdateImpl(const bool _force);
 
       // Documentation inherited
       public: virtual void Load(const std::string &_worldName);

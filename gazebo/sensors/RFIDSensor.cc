@@ -127,7 +127,7 @@ void RFIDSensor::Init()
 }
 
 //////////////////////////////////////////////////
-bool RFIDSensor::UpdateImpl(bool /*_force*/)
+bool RFIDSensor::UpdateImpl(const bool /*_force*/)
 {
   this->EvaluateTags();
   this->lastMeasurementTime = this->world->GetSimTime();
