@@ -29,7 +29,7 @@ RotateHandle::RotateHandle(QGraphicsItem *_parent)
   this->setAcceptHoverEvents(true);
   this->dataPtr->handleSize = 6;
   this->dataPtr->handleOffsetHeight = 10;
-  this->dataPtr->origin = ignition::math::Vector2d::Zero;
+  this->dataPtr->origin = ignition::math::Vector2d(0, 0);
   this->dataPtr->borderColor = common::Color::Black;
   this->dataPtr->handleOffset = this->dataPtr->origin -
       ignition::math::Vector2d(0, this->dataPtr->handleOffsetHeight);
