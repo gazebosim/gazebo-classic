@@ -15,10 +15,12 @@
  *
 */
 
-#ifndef _WINDOW_DOOR_INSPECTOR_DIALOG_HH_
-#define _WINDOW_DOOR_INSPECTOR_DIALOG_HH_
+#ifndef _GAZEBO_GUI_WINDOWDOORINSPECTORDIALOG_HH_
+#define _GAZEBO_GUI_WINDOWDOORINSPECTORDIALOG_HH_
 
+#include <memory>
 #include <string>
+
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
 #include "gazebo/gui/building/BaseInspectorDialog.hh"
@@ -27,6 +29,14 @@ namespace gazebo
 {
   namespace gui
   {
+    // Forward declare private data.
+    class WindowDoorInspectorDialogPrivate;
+
+    /// \addtogroup gazebo_gui
+    /// \{
+
+    /// \class WindowDoorInspectorDialog WindowDoorInspectorDialog.hh
+    /// \brief Dialog for configuring a window or door item.
     class GZ_GUI_VISIBLE WindowDoorInspectorDialog
       : public BaseInspectorDialog
     {
@@ -96,41 +106,9 @@ namespace gazebo
       /// \param[in] _type Item type.
       public: void SetType(const std::string &_type);
 
-      /// \brief Qt signal emitted to indicate that changes should be applied.
-      Q_SIGNALS: void Applied();
-
-      /// \brief Qt callback when the Cancel button is pressed.
-      private slots: void OnCancel();
-
-      /// \brief Qt callback when the Apply button is pressed.
-      private slots: void OnApply();
-
-      /// \brief Qt callback when the Ok button is pressed.
-      private slots: void OnOK();
-
-      /// \brief Label that displays the name of the item.
-      private: QLabel* itemNameLabel;
-
-      /// \brief Spin box for configuring the width of the item.
-      private: QDoubleSpinBox *widthSpinBox;
-
-      /// \brief Spin box for configuring the depth of the item.
-      private: QDoubleSpinBox *depthSpinBox;
-
-      /// \brief Spin box for configuring the height of the item.
-      private: QDoubleSpinBox *heightSpinBox;
-
-      /// \brief Spin box for configuring the X position of the item.
-      private: QDoubleSpinBox *positionXSpinBox;
-
-      /// \brief Spin box for configuring the Y position of the item.
-      private: QDoubleSpinBox *positionYSpinBox;
-
-      /// \brief Spin box for configuring the elevation of the item.
-      private: QDoubleSpinBox *elevationSpinBox;
-
-      /// \brief Combo box for selecting the type of the item to use.
-      private: QComboBox *typeComboBox;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<WindowDoorInspectorDialogPrivate> dataPtr;
     };
     /// \}
   }

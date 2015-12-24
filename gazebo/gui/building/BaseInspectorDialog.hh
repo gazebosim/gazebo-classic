@@ -15,9 +15,10 @@
  *
 */
 
-#ifndef _GAZEBO_GUI_BASE_INSPECTOR_DIALOG_HH_
-#define _GAZEBO_GUI_BASE_INSPECTOR_DIALOG_HH_
+#ifndef _GAZEBO_GUI_BASEINSPECTORDIALOG_HH_
+#define _GAZEBO_GUI_BASEINSPECTORDIALOG_HH_
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -33,6 +34,9 @@ namespace gazebo
 
   namespace gui
   {
+    // Forward declare private data.
+    class BaseInspectorDialogPrivate;
+
     /// \addtogroup gazebo_gui
     /// \{
 
@@ -71,17 +75,27 @@ namespace gazebo
       /// \param[in] _texture Texture.
       public: void SetTexture(const std::string &_texture);
 
+      /// \brief Qt signal emitted to indicate that changes should be applied.
+      Q_SIGNALS: void Applied();
+
+      /// \brief Qt callback when the Cancel button is pressed.
+      protected slots: void OnCancel();
+
+      /// \brief Qt callback when the Apply button is pressed.
+      protected slots: void OnApply();
+
+      /// \brief Qt callback when the Ok button is pressed.
+      protected slots: void OnOK();
+
       /// \brief Combo box for selecting the color.
       protected: QComboBox *colorComboBox;
-
-      /// \brief Vector of color options.
-      protected: std::vector<common::Color> colorList;
 
       /// \brief Combo box for selecting the texture.
       protected: QComboBox *textureComboBox;
 
-      /// \brief Vector of texture options.
-      protected: std::vector<std::string> textureList;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<BaseInspectorDialogPrivate> dataPtr;
     };
     /// \}
   }

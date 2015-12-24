@@ -15,19 +15,25 @@
  *
 */
 
-#ifndef _STAIRS_INSPECTOR_DIALOG_HH_
-#define _STAIRS_INSPECTOR_DIALOG_HH_
+#ifndef _GAZEBO_GUI_STAIRSINSPECTORDIALOG_HH_
+#define _GAZEBO_GUI_STAIRSINSPECTORDIALOG_HH_
 
+#include <memory>
 #include <string>
 #include <vector>
+
 #include "gazebo/gui/qt.h"
-#include "gazebo/util/system.hh"
 #include "gazebo/gui/building/BaseInspectorDialog.hh"
+
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
+    // Forward declare private data.
+    class StairsInspectorDialogPrivate;
+
     /// \addtogroup gazebo_gui
     /// \{
 
@@ -89,40 +95,9 @@ namespace gazebo
       /// \param[in] _steps Number of steps.
       public: void SetSteps(int _steps);
 
-      /// \brief Qt signal emitted to indicate that changes should be applied.
-      Q_SIGNALS: void Applied();
-
-      /// \brief Qt callback when the Cancel button is pressed.
-      private slots: void OnCancel();
-
-      /// \brief Qt callback when the Apply button is pressed.
-      private slots: void OnApply();
-
-      /// \brief Qt callback when the Ok button is pressed.
-      private slots: void OnOK();
-
-      /// \brief Spin box for configuring the X start position of the
-      /// staircase.
-      private: QDoubleSpinBox *startXSpinBox;
-
-      /// \brief Spin box for configuring the Y start position of the
-      /// staircase.
-      private: QDoubleSpinBox *startYSpinBox;
-
-      /// \brief Spin box for configuring the width of the staircase.
-      private: QDoubleSpinBox *widthSpinBox;
-
-      /// \brief Spin box for configuring the depth of the staircase.
-      private: QDoubleSpinBox *depthSpinBox;
-
-      /// \brief Spin box for configuring the height of the staircase.
-      private: QDoubleSpinBox *heightSpinBox;
-
-      /// \brief Spin box for configuring the number of steps in the staircase.
-      private: QSpinBox *stepsSpinBox;
-
-      /// \brief Label that holds the name of the staircase.
-      private: QLabel* stairsNameLabel;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<StairsInspectorDialogPrivate> dataPtr;
     };
     /// \}
   }

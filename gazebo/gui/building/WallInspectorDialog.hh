@@ -15,9 +15,10 @@
  *
 */
 
-#ifndef _WALL_INSPECTOR_DIALOG_HH_
-#define _WALL_INSPECTOR_DIALOG_HH_
+#ifndef _GAZEBO_GUI_WALLINSPECTORDIALOG_HH_
+#define _GAZEBO_GUI_WALLINSPECTORDIALOG_HH_
 
+#include <memory>
 #include <string>
 #include <vector>
 #include "gazebo/gui/qt.h"
@@ -28,6 +29,9 @@ namespace gazebo
 {
   namespace gui
   {
+    // Forward declare private data.
+    class WallInspectorDialogPrivate;
+
     /// \addtogroup gazebo_gui
     /// \{
 
@@ -90,45 +94,9 @@ namespace gazebo
       /// \param[in] _thickness Thickness of wall in pixels.
       public: void SetThickness(double _thickness);
 
-      /// \brief Qt signal emitted to indicate that changes should be applied.
-      Q_SIGNALS: void Applied();
-
-      /// \brief Qt callback when the Cancel button is pressed.
-      private slots: void OnCancel();
-
-      /// \brief Qt callback when the Apply button is pressed.
-      private slots: void OnApply();
-
-      /// \brief Qt callback when the Ok button is pressed.
-      private slots: void OnOK();
-
-      /// \brief Spin box for configuring the X start position of the wall
-      /// segment.
-      private: QDoubleSpinBox *startXSpinBox;
-
-      /// \brief Spin box for configuring the Y start position of the wall
-      /// segment.
-      private: QDoubleSpinBox *startYSpinBox;
-
-      /// \brief Spin box for configuring the X end position of the wall
-      /// segment.
-      private: QDoubleSpinBox *endXSpinBox;
-
-      /// \brief Spin box for configuring the Y end position of the wall
-      /// segment.
-      private: QDoubleSpinBox *endYSpinBox;
-
-      /// \brief Spin box for configuring the height of the wall.
-      private: QDoubleSpinBox *heightSpinBox;
-
-      /// \brief Spin box for configuring the thickness of the wall.
-      private: QDoubleSpinBox *thicknessSpinBox;
-
-      /// \brief Spin box for configuring the length of the wall segment.
-      private: QDoubleSpinBox *lengthSpinBox;
-
-      /// \brief Label that holds the name of the wall.
-      private: QLabel* wallNameLabel;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<WallInspectorDialogPrivate> dataPtr;
     };
     /// \}
   }

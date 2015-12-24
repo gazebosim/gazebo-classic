@@ -1285,14 +1285,14 @@ void EditorView::OnOpenLevelInspector()
   FloorItem *floorItem = this->levels[this->currentLevel]->floorItem;
   if (floorItem)
   {
-    this->levelInspector->floorWidget->show();
+    this->levelInspector->ShowFloorWidget(true);
     this->levelInspector->SetColor(Conversions::Convert(
         floorItem->Get3dColor()));
     this->levelInspector->SetTexture(floorItem->Get3dTexture().toStdString());
   }
   else
   {
-    this->levelInspector->floorWidget->hide();
+    this->levelInspector->ShowFloorWidget(false);
   }
   this->levelInspector->move(QCursor::pos());
   this->levelInspector->show();
