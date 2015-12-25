@@ -60,10 +60,10 @@ namespace gazebo
     bool stop;
 
     /// \brief Mutex to protect connections.
-    std::mutex connectionMutex;
+    std::recursive_mutex connectionMutex;
 
     /// \brief Mutex to protect msg bufferes.
-    std::mutex msgsMutex;
+    std::recursive_mutex msgsMutex;
   };
 }
 
@@ -130,7 +130,7 @@ void Master::OnAccept(transport::ConnectionPtr _newConnection)
 
   // Add the connection to our list
   {
-    std::lock_guard<std::mutex> lock(this->dataPtr->connectionMutex);
+    std::lock_guard<std::recursive_mutex> lock(this->dataPtr->connectionMutex);
     int index = this->dataPtr->connections.size();
 
     this->dataPtr->connections[index] = _newConnection;
@@ -162,7 +162,7 @@ void Master::OnRead(const unsigned int _connectionIndex,
   // Store the message if it's not empty
   if (!_data.empty())
   {
-    std::lock_guard<std::mutex> lock(this->dataPtr->msgsMutex);
+    std::lock_guard<std::recursive_mutex> lock(this->dataPtr->msgsMutex);
     this->dataPtr->msgs.push_back(std::make_pair(_connectionIndex, _data));
   }
   else
@@ -197,7 +197,8 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
                      worldNameMsg.data());
     if (iter == this->dataPtr->worldNames.end())
     {
-      std::lock_guard<std::mutex> lock(this->dataPtr->connectionMutex);
+      std::lock_guard<std::recursive_mutex>
+          lock(this->dataPtr->connectionMutex);
       this->dataPtr->worldNames.push_back(worldNameMsg.data());
 
       Connection_M::iterator iter2;
@@ -211,7 +212,7 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
   }
   else if (packet.type() == "advertise")
   {
-    std::lock_guard<std::mutex> lock(this->dataPtr->connectionMutex);
+    std::lock_guard<std::recursive_mutex> lock(this->dataPtr->connectionMutex);
     msgs::Publish pub;
     pub.ParseFromString(packet.serialized_data());
 
@@ -395,7 +396,7 @@ void Master::RunOnce()
 
   // Process the incoming message queue
   {
-    std::lock_guard<std::mutex> lock(this->dataPtr->msgsMutex);
+    std::lock_guard<std::recursive_mutex> lock(this->dataPtr->msgsMutex);
     while (!this->dataPtr->msgs.empty())
     {
       this->ProcessMessage(this->dataPtr->msgs.front().first,
@@ -406,7 +407,7 @@ void Master::RunOnce()
 
   // Process all the connections
   {
-    std::lock_guard<std::mutex> lock(this->dataPtr->connectionMutex);
+    std::lock_guard<std::recursive_mutex> lock(this->dataPtr->connectionMutex);
     for (iter = this->dataPtr->connections.begin();
         iter != this->dataPtr->connections.end();)
     {
@@ -433,7 +434,7 @@ void Master::RemoveConnection(Connection_M::iterator _connIter)
 
   // Remove all messages for this->dataPtr connection
   {
-    std::lock_guard<std::mutex> lock(this->dataPtr->msgsMutex);
+    std::lock_guard<std::recursive_mutex> lock(this->dataPtr->msgsMutex);
     msgIter = this->dataPtr->msgs.begin();
     while (msgIter != this->dataPtr->msgs.end())
     {
@@ -491,7 +492,7 @@ void Master::RemoveConnection(Connection_M::iterator _connIter)
 void Master::RemovePublisher(const msgs::Publish _pub)
 {
   {
-    std::lock_guard<std::mutex> lock(this->dataPtr->connectionMutex);
+    std::lock_guard<std::recursive_mutex> lock(this->dataPtr->connectionMutex);
     Connection_M::iterator iter2;
     for (iter2 = this->dataPtr->connections.begin();
         iter2 != this->dataPtr->connections.end(); ++iter2)
@@ -614,7 +615,7 @@ transport::ConnectionPtr Master::FindConnection(const std::string &_host,
   Connection_M::iterator iter;
 
   {
-    std::lock_guard<std::mutex> lock(this->dataPtr->connectionMutex);
+    std::lock_guard<std::recursive_mutex> lock(this->dataPtr->connectionMutex);
     for (iter = this->dataPtr->connections.begin();
         iter != this->dataPtr->connections.end(); ++iter)
     {
