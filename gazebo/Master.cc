@@ -44,7 +44,7 @@ namespace gazebo
     /// \brief All the known connections.
     gazebo::Master::Connection_M connections;
 
-    /// \brief All th worlds.
+    /// \brief All the worlds.
     std::list<std::string> worldNames;
 
     /// \brief Incoming messages.
@@ -432,7 +432,7 @@ void Master::RemoveConnection(Connection_M::iterator _connIter)
   if (_connIter == this->dataPtr->connections.end() || !_connIter->second)
     return;
 
-  // Remove all messages for this->dataPtr connection
+  // Remove all messages for this connection
   {
     std::lock_guard<std::recursive_mutex> lock(this->dataPtr->msgsMutex);
     msgIter = this->dataPtr->msgs.begin();
@@ -445,7 +445,7 @@ void Master::RemoveConnection(Connection_M::iterator _connIter)
     }
   }
 
-  // Remove all publishers for this->dataPtr connection
+  // Remove all publishers for this connection
   bool done = false;
   while (!done)
   {
@@ -470,7 +470,7 @@ void Master::RemoveConnection(Connection_M::iterator _connIter)
   {
     done = true;
 
-    // Remove all subscribers for this->dataPtr connection
+    // Remove all subscribers for this connection
     SubList::iterator subIter = this->dataPtr->subscribers.begin();
     while (subIter != this->dataPtr->subscribers.end())
     {
