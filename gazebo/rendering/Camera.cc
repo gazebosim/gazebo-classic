@@ -451,7 +451,7 @@ void Camera::ReadPixelBuffer()
     {
       // Create the render texture
       this->renderTexture = (Ogre::TextureManager::getSingleton().createManual(
-        this->renderTarget->Name() + "_tex",
+        this->renderTarget->getName() + "_tex",
         "General",
         Ogre::TEX_TYPE_2D,
         this->ImageWidth(),
@@ -515,14 +515,14 @@ void Camera::PostRender()
   {
     if (this->captureDataOnce)
     {
-      this->SaveFrame(this->GetFrameFilename());
+      this->SaveFrame(this->FrameFilename());
       this->captureDataOnce = false;
     }
 
     if (this->sdf->HasElement("save") &&
         this->sdf->GetElement("save")->Get<bool>("enabled"))
     {
-      this->SaveFrame(this->GetFrameFilename());
+      this->SaveFrame(this->FrameFilename());
     }
 
     unsigned int width = this->ImageWidth();
