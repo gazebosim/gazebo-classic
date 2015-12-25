@@ -52,11 +52,11 @@ void ViewAngleWidget_TEST::EmptyWorld()
   QVERIFY(cam != NULL);
 
   // Get camera default pose and check that's the current pose
-  gazebo::math::Pose defaultPose = cam->DefaultPose();
-  QVERIFY(defaultPose == cam->GetWorldPose());
+  ignition::math::Pose3d defaultPose = cam->DefaultPose().Ign();
+  QVERIFY(defaultPose == cam->WorldPose());
 
   // Get the camera distance from the world origin (zoom level)
-  double dist = defaultPose.pos.GetLength();
+  double dist = defaultPose.Pos().Length();
 
   // Get the view angle widget
   gazebo::gui::ViewAngleWidget *viewAngleWidget =
@@ -91,8 +91,8 @@ void ViewAngleWidget_TEST::EmptyWorld()
 
   // Check the camera position
   double tol = 1;
-  gazebo::math::Pose pose = cam->GetWorldPose();
-  QVERIFY((pose.pos - gazebo::math::Vector3(0, 0, dist)).GetLength() < tol);
+  ignition::math::Pose3d pose = cam->WorldPose();
+  QVERIFY((pose.Pos() - ignition::math::Vector3d(0, 0, dist)).Length() < tol);
 
   // Trigger the front view button
   buttons[2]->click();
@@ -106,8 +106,8 @@ void ViewAngleWidget_TEST::EmptyWorld()
   }
 
   // Check the camera position
-  pose = cam->GetWorldPose();
-  QVERIFY((pose.pos - gazebo::math::Vector3(dist, 0, 0)).GetLength() < tol);
+  pose = cam->WorldPose();
+  QVERIFY((pose.Pos() - ignition::math::Vector3d(dist, 0, 0)).Length() < tol);
 
   // Trigger the left view button
   buttons[5]->click();
@@ -121,8 +121,8 @@ void ViewAngleWidget_TEST::EmptyWorld()
   }
 
   // Check the camera position
-  pose = cam->GetWorldPose();
-  QVERIFY((pose.pos - gazebo::math::Vector3(0, -dist, 0)).GetLength() < tol);
+  pose = cam->WorldPose();
+  QVERIFY((pose.Pos() - ignition::math::Vector3d(0, -dist, 0)).Length() < tol);
 
   // Trigger the bottom view button
   buttons[1]->click();
@@ -136,8 +136,8 @@ void ViewAngleWidget_TEST::EmptyWorld()
   }
 
   // Check the camera position
-  pose = cam->GetWorldPose();
-  QVERIFY((pose.pos - gazebo::math::Vector3(0, 0, -dist)).GetLength() < tol);
+  pose = cam->WorldPose();
+  QVERIFY((pose.Pos() - ignition::math::Vector3d(0, 0, -dist)).Length() < tol);
 
   // Trigger the back view button
   buttons[3]->click();
@@ -151,8 +151,8 @@ void ViewAngleWidget_TEST::EmptyWorld()
   }
 
   // Check the camera position
-  pose = cam->GetWorldPose();
-  QVERIFY((pose.pos - gazebo::math::Vector3(-dist, 0, 0)).GetLength() < tol);
+  pose = cam->WorldPose();
+  QVERIFY((pose.Pos() - ignition::math::Vector3d(-dist, 0, 0)).Length() < tol);
 
   // Trigger the right view button
   buttons[4]->click();
@@ -166,8 +166,8 @@ void ViewAngleWidget_TEST::EmptyWorld()
   }
 
   // Check the camera position
-  pose = cam->GetWorldPose();
-  QVERIFY((pose.pos - gazebo::math::Vector3(0, dist, 0)).GetLength() < tol);
+  pose = cam->WorldPose();
+  QVERIFY((pose.Pos() - ignition::math::Vector3d(0, dist, 0)).Length() < tol);
 
   // Trigger the reset view button
   buttons[6]->click();
@@ -181,8 +181,8 @@ void ViewAngleWidget_TEST::EmptyWorld()
   }
 
   // Check the camera position
-  pose = cam->GetWorldPose();
-  QVERIFY((pose.pos - defaultPose.pos).GetLength() < tol);
+  pose = cam->WorldPose();
+  QVERIFY((pose.Pos() - defaultPose.Pos()).Length() < tol);
 
   // Clean up
   cam->Fini();

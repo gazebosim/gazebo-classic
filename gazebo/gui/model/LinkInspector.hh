@@ -15,9 +15,10 @@
  *
 */
 
-#ifndef _GAZEBO_LINK_INSPECTOR_HH_
-#define _GAZEBO_LINK_INSPECTOR_HH_
+#ifndef _GAZEBO_GUI_LINK_INSPECTOR_HH_
+#define _GAZEBO_GUI_LINK_INSPECTOR_HH_
 
+#include <memory>
 #include <string>
 
 #include "gazebo/gui/qt.h"
@@ -27,9 +28,12 @@ namespace gazebo
 {
   namespace gui
   {
+    class CollisionConfig;
     class LinkConfig;
     class VisualConfig;
-    class CollisionConfig;
+
+    // Forward declare private data.
+    class LinkInspectorPrivate;
 
     class GZ_GUI_VISIBLE LinkInspector : public QDialog
     {
@@ -48,7 +52,7 @@ namespace gazebo
 
       /// \brief Get the name of the link.
       /// \return Name of the link.
-      public: std::string GetName() const;
+      public: std::string Name() const;
 
       /// \brief Get configurations of the link.
       /// \return Tab widget with link configurations.
@@ -103,23 +107,9 @@ namespace gazebo
       /// \param[in] _event Qt key event.
       private: void keyPressEvent(QKeyEvent *_event);
 
-      /// \brief Main tab widget within the link inspector.
-      private: QTabWidget *tabWidget;
-
-      /// \brief Label that displays the name of the link.
-      private: QLabel* linkNameLabel;
-
-      /// \brief Widget with configurable link properties.
-      private: LinkConfig *linkConfig;
-
-      /// \brief Widget with configurable visual properties.
-      private: VisualConfig *visualConfig;
-
-      /// \brief Widget with configurable collision properties.
-      private: CollisionConfig *collisionConfig;
-
-      /// \brief Unique id for this link.
-      private: std::string linkId;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<LinkInspectorPrivate> dataPtr;
     };
     /// \}
   }

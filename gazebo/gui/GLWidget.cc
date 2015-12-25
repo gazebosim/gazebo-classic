@@ -120,7 +120,7 @@ GLWidget::GLWidget(QWidget *_parent)
       gui::Events::ConnectAlignMode(
         std::bind(&GLWidget::OnAlignMode, this, std::placeholders::_1,
           std::placeholders::_2, std::placeholders::_3,
-          std::placeholders::_4)));
+          std::placeholders::_4, std::placeholders::_5)));
 
   this->dataPtr->renderFrame->setMouseTracking(true);
   this->setMouseTracking(true);
@@ -566,16 +566,17 @@ bool GLWidget::OnMouseDoubleClick(const common::MouseEvent & /*_event*/)
   {
     if (vis->IsPlane())
     {
-      math::Pose pose, camPose;
-      camPose = this->dataPtr->userCamera->GetWorldPose();
+      math::Pose pose;
+      ignition::math::Pose3d camPose;
+      camPose = this->dataPtr->userCamera->WorldPose();
       if (this->dataPtr->scene->GetFirstContact(this->dataPtr->userCamera,
             this->dataPtr->mouseEvent.Pos(), pose.pos))
       {
         this->dataPtr->userCamera->SetFocalPoint(pose.pos);
-        math::Vector3 dir = pose.pos - camPose.pos;
-        pose.pos = camPose.pos + (dir * 0.8);
-        pose.rot = this->dataPtr->userCamera->GetWorldRotation();
-        this->dataPtr->userCamera->MoveToPosition(pose, 0.5);
+        ignition::math::Vector3d dir = pose.pos.Ign() - camPose.Pos();
+        pose.pos = camPose.Pos() + (dir * 0.8);
+        pose.rot = this->dataPtr->userCamera->WorldRotation();
+        this->dataPtr->userCamera->MoveToPosition(pose.Ign(), 0.5);
       }
     }
     else
@@ -1281,10 +1282,10 @@ void GLWidget::OnRequest(ConstRequestPtr &_msg)
 
 /////////////////////////////////////////////////
 void GLWidget::OnAlignMode(const std::string &_axis, const std::string &_config,
-    const std::string &_target, bool _preview)
+    const std::string &_target, const bool _preview, const bool _inverted)
 {
   ModelAlign::Instance()->AlignVisuals(this->dataPtr->selectedVisuals, _axis,
-      _config, _target, !_preview);
+      _config, _target, !_preview, _inverted);
 }
 
 /////////////////////////////////////////////////

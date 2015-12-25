@@ -61,7 +61,7 @@ namespace gazebo
       protected: void Fini() override;
 
       // Documentation inherited
-      protected: bool UpdateImpl(bool _force) override;
+      protected: bool UpdateImpl(const bool _force) override;
 
       /// \brief Handle incoming control message
       /// \param[in] _msg Message received from topic

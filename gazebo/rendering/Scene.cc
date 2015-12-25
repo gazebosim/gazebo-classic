@@ -3065,10 +3065,10 @@ void Scene::SetVisualId(VisualPtr _vis, uint32_t _id)
 /////////////////////////////////////////////////
 void Scene::AddLight(LightPtr _light)
 {
-  std::string n = this->StripSceneName(_light->GetName());
-  Light_M::iterator iter = this->dataPtr->lights.find(n);
+  std::string n = this->StripSceneName(_light->Name());
+  const auto iter = this->dataPtr->lights.find(n);
   if (iter != this->dataPtr->lights.end())
-    gzerr << "Duplicate lights detected[" << _light->GetName() << "]\n";
+    gzerr << "Duplicate lights detected[" << _light->Name() << "]\n";
 
   this->dataPtr->lights[n] = _light;
 }
@@ -3079,7 +3079,7 @@ void Scene::RemoveLight(LightPtr _light)
   if (_light)
   {
     // Delete the light
-    std::string n = this->StripSceneName(_light->GetName());
+    std::string n = this->StripSceneName(_light->Name());
     this->dataPtr->lights.erase(n);
   }
 }
