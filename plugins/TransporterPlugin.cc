@@ -62,7 +62,6 @@ void TransporterPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
     // Set the pad's name and destination
     pad->name = padElem->Get<std::string>("name");
     pad->dest = padElem->Get<std::string>("destination");
-    pad->activated = false;
 
     // Check that a pad does not exist
     if (this->dataPtr->pads.find(pad->name) != this->dataPtr->pads.end())
