@@ -16,6 +16,7 @@
 */
 
 #include "gazebo/common/Assert.hh"
+
 #include "gazebo/gui/building/StairsInspectorDialog.hh"
 #include "gazebo/gui/building/StairsInspectorDialogPrivate.hh"
 
@@ -170,9 +171,10 @@ StairsInspectorDialog::~StairsInspectorDialog()
 }
 
 /////////////////////////////////////////////////
-QPointF StairsInspectorDialog::StartPosition() const
+ignition::math::Vector2d StairsInspectorDialog::StartPosition() const
 {
-  return QPointF(this->dataPtr->startXSpinBox->value(),
+  return ignition::math::Vector2d(
+      this->dataPtr->startXSpinBox->value(),
       this->dataPtr->startYSpinBox->value());
 }
 
@@ -207,27 +209,28 @@ void StairsInspectorDialog::SetName(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-void StairsInspectorDialog::SetStartPosition(const QPointF &_pos)
+void StairsInspectorDialog::SetStartPosition(
+    const ignition::math::Vector2d &_pos)
 {
-  this->dataPtr->startXSpinBox->setValue(_pos.x());
-  this->dataPtr->startYSpinBox->setValue(_pos.y());
+  this->dataPtr->startXSpinBox->setValue(_pos.X());
+  this->dataPtr->startYSpinBox->setValue(_pos.Y());
 }
 
 /////////////////////////////////////////////////
-void StairsInspectorDialog::SetWidth(double _width)
+void StairsInspectorDialog::SetWidth(const double _width)
 {
   this->dataPtr->widthSpinBox->setValue(_width);
 }
 
 /////////////////////////////////////////////////
-void StairsInspectorDialog::SetDepth(double _depth)
+void StairsInspectorDialog::SetDepth(const double _depth)
 {
   this->dataPtr->depthSpinBox->setValue(_depth);
 }
 
 
 /////////////////////////////////////////////////
-void StairsInspectorDialog::SetHeight(double _height)
+void StairsInspectorDialog::SetHeight(const double _height)
 {
   this->dataPtr->heightSpinBox->setValue(_height);
 }

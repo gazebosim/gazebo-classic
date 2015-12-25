@@ -27,6 +27,9 @@ class Conversions_TEST : public QTestFixture
 
   /// \brief Test converting color.
   private slots: void Color();
+
+  /// \brief Test converting point.
+  private slots: void Point2d();
 };
 
 #endif

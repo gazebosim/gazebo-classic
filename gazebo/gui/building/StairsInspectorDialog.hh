@@ -20,7 +20,7 @@
 
 #include <memory>
 #include <string>
-#include <vector>
+#include <ignition/math/Vector2.hh>
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/building/BaseInspectorDialog.hh"
@@ -53,7 +53,7 @@ namespace gazebo
 
       /// \brief Get start position (bottom-end) of the staircase.
       /// \return The start position of the staircase in pixel coordinates.
-      public: QPointF StartPosition() const;
+      public: ignition::math::Vector2d StartPosition() const;
 
       /// \brief Get the width the staircase.
       /// \return Staircase width in pixels.
@@ -77,23 +77,23 @@ namespace gazebo
 
       /// \brief Set the start position of the staircase.
       /// \param[in] _pos Start position in pixel coordinates.
-      public: void SetStartPosition(const QPointF &_pos);
+      public: void SetStartPosition(const ignition::math::Vector2d &_pos);
 
       /// \brief Set the width of the staircase.
       /// \param[in] _width Width in pixels.
-      public: void SetWidth(double _width);
+      public: void SetWidth(const double _width);
 
       /// \brief Set the depth of the staircase.
       /// \param[in] _depth Depth in pixels.
-      public: void SetDepth(double _depth);
+      public: void SetDepth(const double _depth);
 
       /// \brief Set the height of the staircase.
       /// \param[in] _height Height in pixels.
-      public: void SetHeight(double _height);
+      public: void SetHeight(const double _height);
 
       /// \brief Set the number of steps in the staircase.
       /// \param[in] _steps Number of steps.
-      public: void SetSteps(int _steps);
+      public: void SetSteps(const int _steps);
 
       /// \internal
       /// \brief Pointer to private data.

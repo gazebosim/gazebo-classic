@@ -245,10 +245,11 @@ void StairsItem::OnApply()
   this->stairsWidth = dialog->Width() / this->itemScale;
   this->stairsHeight = dialog->Height() / this->itemScale;
   this->stairsDepth = dialog->Depth() / this->itemScale;
-  if ((fabs(dialog->StartPosition().x() - startPos.x()) >= 0.01)
-      || (fabs(dialog->StartPosition().y() - startPos.y()) >= 0.01))
+  if ((fabs(dialog->StartPosition().X() - startPos.x()) >= 0.01)
+      || (fabs(dialog->StartPosition().X() - startPos.y()) >= 0.01))
   {
-    this->stairsPos = dialog->StartPosition() / this->itemScale;
+    this->stairsPos =
+        Conversions::Convert(dialog->StartPosition()) / this->itemScale;
     this->stairsPos.setY(-this->stairsPos.y());
     this->setPos(stairsPos);
     this->setParentItem(NULL);
@@ -275,7 +276,7 @@ void StairsItem::OnOpenInspector()
   //  dialog.SetElevation(this->stairsElevation);
   QPointF startPos = this->stairsPos * this->itemScale;
   startPos.setY(-startPos.y());
-  this->inspector->SetStartPosition(startPos);
+  this->inspector->SetStartPosition(Conversions::Convert(startPos));
   this->inspector->SetColor(Conversions::Convert(this->visual3dColor));
   this->inspector->SetTexture(this->visual3dTexture.toStdString());
   this->inspector->move(QCursor::pos());

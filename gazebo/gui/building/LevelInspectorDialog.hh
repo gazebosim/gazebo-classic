@@ -20,7 +20,6 @@
 
 #include <memory>
 #include <string>
-#include <vector>
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/building/BaseInspectorDialog.hh"
@@ -65,7 +64,7 @@ namespace gazebo
 
       /// \brief Set the height of the level.
       /// \param[in] _height Level height in pixels.
-      public: void SetHeight(double _height);
+      public: void SetHeight(const double _height);
 
       /// \brief Set the height of the level.
       /// \param[in] _height Level height in pixels.

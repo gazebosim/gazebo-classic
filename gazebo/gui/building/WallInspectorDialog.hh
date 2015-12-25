@@ -20,10 +20,12 @@
 
 #include <memory>
 #include <string>
-#include <vector>
+#include <ignition/math/Vector2.hh>
+
 #include "gazebo/gui/qt.h"
-#include "gazebo/util/system.hh"
 #include "gazebo/gui/building/BaseInspectorDialog.hh"
+
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -55,11 +57,11 @@ namespace gazebo
 
       /// \brief Get the start position of the wall segment.
       /// \return Wall segment start position in pixel coordinates.
-      public: QPointF StartPosition() const;
+      public: ignition::math::Vector2d StartPosition() const;
 
       /// \brief Get the end position of the wall segment.
       /// \return Wall segment end position in pixel coordinates.
-      public: QPointF EndPosition() const;
+      public: ignition::math::Vector2d EndPosition() const;
 
       /// \brief Get the height of the wall.
       /// \return Wall height in pixels.
@@ -75,24 +77,24 @@ namespace gazebo
 
       /// \brief Set the length of the wall segment.
       /// \param[in] _length Length of the wall segment in pixels.
-      public: void SetLength(double _length);
+      public: void SetLength(const double _length);
 
       /// \brief Set the start position of the wall segment.
       /// \param[in] _pos Start position of the wall segment in pixel
       /// coordinates.
-      public: void SetStartPosition(const QPointF &_pos);
+      public: void SetStartPosition(const ignition::math::Vector2d &_pos);
 
       /// \brief Set the end position of the wall segment.
       /// \param[in] _pos end position of the wall segment in pixel coordinates.
-      public: void SetEndPosition(const QPointF &_pos);
+      public: void SetEndPosition(const ignition::math::Vector2d &_pos);
 
       /// \brief Set the height of the wall.
       /// \param[in] _height Height of wall in pixels.
-      public: void SetHeight(double _height);
+      public: void SetHeight(const double _height);
 
       /// \brief Set the thickness of the wall.
       /// \param[in] _thickness Thickness of wall in pixels.
-      public: void SetThickness(double _thickness);
+      public: void SetThickness(const double _thickness);
 
       /// \internal
       /// \brief Pointer to private data.

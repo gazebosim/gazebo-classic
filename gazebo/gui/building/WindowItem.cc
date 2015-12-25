@@ -15,6 +15,7 @@
  *
 */
 
+#include "gazebo/gui/Conversions.hh"
 #include "gazebo/gui/building/EditorView.hh"
 #include "gazebo/gui/building/EditorItem.hh"
 #include "gazebo/gui/building/RectItem.hh"
@@ -167,10 +168,10 @@ void WindowItem::OnApply()
   this->windowHeight = dialog->Height() / this->itemScale;
   this->windowDepth = dialog->Depth() / this->itemScale;
   this->windowElevation = dialog->Elevation() / this->itemScale;
-  if ((fabs(dialog->Position().x() - itemPos.x()) >= 0.01)
-      || (fabs(dialog->Position().y() - itemPos.y()) >= 0.01))
+  if ((fabs(dialog->Position().X() - itemPos.x()) >= 0.01)
+      || (fabs(dialog->Position().Y() - itemPos.y()) >= 0.01))
   {
-    itemPos = dialog->Position() / this->itemScale;
+    itemPos = Conversions::Convert(dialog->Position()) / this->itemScale;
     itemPos.setY(-itemPos.y());
     this->windowPos = itemPos;
     this->setPos(this->windowPos);
@@ -211,7 +212,7 @@ void WindowItem::OnOpenInspector()
 
   QPointF itemPos = this->windowPos * this->itemScale;
   itemPos.setY(-itemPos.y());
-  this->inspector->SetPosition(itemPos);
+  this->inspector->SetPosition(Conversions::Convert(itemPos));
   this->inspector->move(QCursor::pos());
   this->inspector->show();
 }

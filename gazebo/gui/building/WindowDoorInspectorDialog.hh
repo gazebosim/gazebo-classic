@@ -20,10 +20,12 @@
 
 #include <memory>
 #include <string>
+#include <ignition/math/Vector2.hh>
 
 #include "gazebo/gui/qt.h"
-#include "gazebo/util/system.hh"
 #include "gazebo/gui/building/BaseInspectorDialog.hh"
+
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -43,7 +45,13 @@ namespace gazebo
       Q_OBJECT
 
       /// \brief Dialog modes
-      public: enum mode {WINDOW, DOOR};
+      public: enum mode
+          {
+            /// \brief Window mode
+            WINDOW,
+
+            /// \brief Door mode
+            DOOR};
 
       /// \brief Constructor
       /// \param[in] _mode Dialog mode
@@ -68,7 +76,7 @@ namespace gazebo
 
       /// \brief Get the item position.
       /// \return Item position in pixel coordinates.
-      public: QPointF Position() const;
+      public: ignition::math::Vector2d Position() const;
 
       /// \brief Get the item elevation.
       /// \return Item elevation in pixels.
@@ -84,23 +92,23 @@ namespace gazebo
 
       /// \brief Set the item width.
       /// \param[in] _width Width in pixels.
-      public: void SetWidth(double _width);
+      public: void SetWidth(const double _width);
 
       /// \brief Set the item height.
       /// \param[in] _height Height in pixels.
-      public: void SetHeight(double _height);
+      public: void SetHeight(const double _height);
 
       /// \brief Set the item depth.
       /// \param[in] _depth Depth in pixels.
-      public: void SetDepth(double _depth);
+      public: void SetDepth(const double _depth);
 
       /// \brief Set the item scene position.
       /// \param[in] _pos Position in pixel coordinates.
-      public: void SetPosition(const QPointF &_pos);
+      public: void SetPosition(const ignition::math::Vector2d &_pos);
 
       /// \brief Set the item elevation.
       /// \param[in] _elevation Item elevation in pixels.
-      public: void SetElevation(double _elevation);
+      public: void SetElevation(const double _elevation);
 
       /// \brief Set the item type.
       /// \param[in] _type Item type.

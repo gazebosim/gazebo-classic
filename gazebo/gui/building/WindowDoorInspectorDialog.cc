@@ -191,9 +191,10 @@ double WindowDoorInspectorDialog::Height() const
 }
 
 /////////////////////////////////////////////////
-QPointF WindowDoorInspectorDialog::Position() const
+ignition::math::Vector2d WindowDoorInspectorDialog::Position() const
 {
-  return QPointF(this->dataPtr->positionXSpinBox->value(),
+  return ignition::math::Vector2d(
+      this->dataPtr->positionXSpinBox->value(),
       this->dataPtr->positionYSpinBox->value());
 }
 
@@ -216,32 +217,33 @@ void WindowDoorInspectorDialog::SetName(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-void WindowDoorInspectorDialog::SetWidth(double _width)
+void WindowDoorInspectorDialog::SetWidth(const double _width)
 {
   this->dataPtr->widthSpinBox->setValue(_width);
 }
 
 /////////////////////////////////////////////////
-void WindowDoorInspectorDialog::SetHeight(double _height)
+void WindowDoorInspectorDialog::SetHeight(const double _height)
 {
   this->dataPtr->heightSpinBox->setValue(_height);
 }
 
 /////////////////////////////////////////////////
-void WindowDoorInspectorDialog::SetDepth(double _depth)
+void WindowDoorInspectorDialog::SetDepth(const double _depth)
 {
   this->dataPtr->depthSpinBox->setValue(_depth);
 }
 
 /////////////////////////////////////////////////
-void WindowDoorInspectorDialog::SetPosition(const QPointF &_pos)
+void WindowDoorInspectorDialog::SetPosition(
+    const ignition::math::Vector2d &_pos)
 {
-  this->dataPtr->positionXSpinBox->setValue(_pos.x());
-  this->dataPtr->positionYSpinBox->setValue(_pos.y());
+  this->dataPtr->positionXSpinBox->setValue(_pos.X());
+  this->dataPtr->positionYSpinBox->setValue(_pos.Y());
 }
 
 /////////////////////////////////////////////////
-void WindowDoorInspectorDialog::SetElevation(double _elevation)
+void WindowDoorInspectorDialog::SetElevation(const double _elevation)
 {
   this->dataPtr->elevationSpinBox->setValue(_elevation);
 }

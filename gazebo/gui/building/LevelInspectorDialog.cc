@@ -125,7 +125,7 @@ void LevelInspectorDialog::SetLevelName(const std::string &_levelName)
 
 
 /////////////////////////////////////////////////
-void LevelInspectorDialog::SetHeight(double _height)
+void LevelInspectorDialog::SetHeight(const double _height)
 {
   this->dataPtr->heightSpinBox->setValue(_height);
 }

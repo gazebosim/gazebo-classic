@@ -17,6 +17,8 @@
 #ifndef _GAZEBO_GUI_CONVERSIONS_HH_
 #define _GAZEBO_GUI_CONVERSIONS_HH_
 
+#include <ignition/math/Vector2.hh>
+
 #include "gazebo/gui/qt.h"
 
 #include "gazebo/util/system.hh"
@@ -47,6 +49,16 @@ namespace gazebo
       /// \param[in] _color Qt color to convert
       /// \return Gazebo color value
       public: static common::Color Convert(const QColor &_color);
+
+      /// \brief Return the equivalent QPointF.
+      /// \param[in] _point Ignition point to convert.
+      /// \return QPointF
+      public: static QPointF Convert(const ignition::math::Vector2d &_pt);
+
+      /// \brief Return the equivalent gazebo color
+      /// \param[in] _color Qt color to convert
+      /// \return Gazebo color value
+      public: static ignition::math::Vector2d Convert(const QPointF &_pt);
     };
     /// \}
   }

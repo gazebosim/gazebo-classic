@@ -16,6 +16,7 @@
 */
 
 #include "gazebo/common/Assert.hh"
+
 #include "gazebo/gui/building/WallInspectorDialog.hh"
 #include "gazebo/gui/building/WallInspectorDialogPrivate.hh"
 
@@ -112,7 +113,6 @@ WallInspectorDialog::WallInspectorDialog(QWidget *_parent)
   QHBoxLayout *xyLayout = new QHBoxLayout;
   xyLayout->addLayout(startXYLayout);
   xyLayout->addLayout(endXYLayout);
-
 
   QVBoxLayout *positionGroupLayout = new QVBoxLayout;
   positionGroupLayout->addLayout(startEndLayout);
@@ -225,16 +225,16 @@ double WallInspectorDialog::Length() const
 }
 
 /////////////////////////////////////////////////
-QPointF WallInspectorDialog::StartPosition() const
+ignition::math::Vector2d WallInspectorDialog::StartPosition() const
 {
-  return QPointF(this->dataPtr->startXSpinBox->value(),
+  return ignition::math::Vector2d(this->dataPtr->startXSpinBox->value(),
       this->dataPtr->startYSpinBox->value());
 }
 
 /////////////////////////////////////////////////
-QPointF WallInspectorDialog::EndPosition() const
+ignition::math::Vector2d WallInspectorDialog::EndPosition() const
 {
-  return QPointF(this->dataPtr->endXSpinBox->value(),
+  return ignition::math::Vector2d(this->dataPtr->endXSpinBox->value(),
       this->dataPtr->endYSpinBox->value());
 }
 
@@ -257,33 +257,33 @@ void WallInspectorDialog::SetName(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-void WallInspectorDialog::SetLength(double _length)
+void WallInspectorDialog::SetLength(const double _length)
 {
   this->dataPtr->lengthSpinBox->setValue(_length);
 }
 
 /////////////////////////////////////////////////
-void WallInspectorDialog::SetStartPosition(const QPointF &_pos)
+void WallInspectorDialog::SetStartPosition(const ignition::math::Vector2d &_pos)
 {
-  this->dataPtr->startXSpinBox->setValue(_pos.x());
-  this->dataPtr->startYSpinBox->setValue(_pos.y());
+  this->dataPtr->startXSpinBox->setValue(_pos.X());
+  this->dataPtr->startYSpinBox->setValue(_pos.Y());
 }
 
 /////////////////////////////////////////////////
-void WallInspectorDialog::SetEndPosition(const QPointF &_pos)
+void WallInspectorDialog::SetEndPosition(const ignition::math::Vector2d &_pos)
 {
-  this->dataPtr->endXSpinBox->setValue(_pos.x());
-  this->dataPtr->endYSpinBox->setValue(_pos.y());
+  this->dataPtr->endXSpinBox->setValue(_pos.X());
+  this->dataPtr->endYSpinBox->setValue(_pos.Y());
 }
 
 /////////////////////////////////////////////////
-void WallInspectorDialog::SetHeight(double _height)
+void WallInspectorDialog::SetHeight(const double _height)
 {
   this->dataPtr->heightSpinBox->setValue(_height);
 }
 
 /////////////////////////////////////////////////
-void WallInspectorDialog::SetThickness(double _thickness)
+void WallInspectorDialog::SetThickness(const double _thickness)
 {
   this->dataPtr->thicknessSpinBox->setValue(_thickness);
 }

@@ -128,10 +128,10 @@ void WallSegmentItem::UpdateInspector()
   this->inspector->SetLength(segmentLength * this->itemScale);
   QPointF startPos = segmentStartPoint * this->itemScale;
   startPos.setY(-startPos.y());
-  this->inspector->SetStartPosition(startPos);
+  this->inspector->SetStartPosition(Conversions::Convert(startPos));
   QPointF endPos = segmentEndPoint * this->itemScale;
   endPos.setY(-endPos.y());
-  this->inspector->SetEndPosition(endPos);
+  this->inspector->SetEndPosition(Conversions::Convert(endPos));
   this->inspector->SetColor(Conversions::Convert(this->visual3dColor));
   this->inspector->SetTexture(this->visual3dTexture.toStdString());
 }
@@ -257,9 +257,12 @@ void WallSegmentItem::OnApply()
   }
   else
   {
-    QPointF newStartPoint = dialog->StartPosition() / this->itemScale;
+    QPointF newStartPoint =
+        Conversions::Convert(dialog->StartPosition()) / this->itemScale;
     newStartPoint.setY(-newStartPoint.y());
-    QPointF newEndPoint = dialog->EndPosition() / this->itemScale;
+
+    QPointF newEndPoint =
+        Conversions::Convert(dialog->EndPosition() / this->itemScale);
     newEndPoint.setY(-newEndPoint.y());
 
     this->SetStartPoint(newStartPoint);
