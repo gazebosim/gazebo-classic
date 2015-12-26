@@ -14,8 +14,9 @@
  * limitations under the License.
  *
  */
-#ifndef _GAZEBO_USER_CMD_MANAGER_HH_
-#define _GAZEBO_USER_CMD_MANAGER_HH_
+
+#ifndef _GAZEBO_PHYSICS_USERCMDMANAGER_HH_
+#define _GAZEBO_PHYSICS_USERCMDMANAGER_HH_
 
 #include <string>
 
@@ -111,7 +112,8 @@ namespace gazebo
       /// \brief Publish a message about current user command statistics.
       private: void PublishCurrentStats();
 
-      /// \brief Called every world update iteration.
+      /// \brief Called every world update iteration, it processes world states
+      /// in order.
       private: void ProcessPendingStates();
 
       // UserCmd class is a friend so it can use resources such as transport.

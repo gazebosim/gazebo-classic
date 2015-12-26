@@ -14,8 +14,9 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PHYSICS_USER_CMD_MANAGER_PRIVATE_HH_
-#define _GAZEBO_PHYSICS_USER_CMD_MANAGER_PRIVATE_HH_
+
+#ifndef _GAZEBO_PHYSICS_USERCMDMANAGER_PRIVATE_HH_
+#define _GAZEBO_PHYSICS_USERCMDMANAGER_PRIVATE_HH_
 
 #include <string>
 #include <vector>
@@ -23,11 +24,12 @@
 
 #include "gazebo/common/CommonTypes.hh"
 
+#include "gazebo/msgs/msgs.hh"
+
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/WorldState.hh"
 
-#include "gazebo/transport/Node.hh"
-#include "gazebo/transport/Subscriber.hh"
+#include "gazebo/transport/TransportTypes.hh"
 
 namespace gazebo
 {
@@ -114,8 +116,8 @@ namespace gazebo
       /// \brief All the event connections.
       public: event::Connection_V connections;
 
-      /// \brief Name of entity whose insertion is pending.
-      public: std::string insertionPending;
+      /// \brief Vector of entities whose insertions are pending.
+      public: std::vector<std::string> insertionsPending;
 
       /// \brief Vector of states waiting to be applied.
       public: std::list<WorldState> pendingStates;

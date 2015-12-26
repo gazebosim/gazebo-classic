@@ -1102,5 +1102,195 @@ void UndoTest::UndoWrench()
   mainWindow = NULL;
 }
 
+/////////////////////////////////////////////////
+void UndoTest::UndoInsertModel()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/shapes.world", false, false, false);
+
+  // Get world
+  auto world = gazebo::physics::get_world("default");
+  QVERIFY(world != NULL);
+
+  // Create the main window.
+  auto mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Process some events and draw the screen
+  for (size_t i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Transport
+  gazebo::transport::NodePtr node;
+  node = gazebo::transport::NodePtr(new gazebo::transport::Node());
+  node->Init();
+
+  auto userCmdPub = node->Advertise<gazebo::msgs::UserCmd>("~/user_cmd");
+
+  // Insert a cylinder
+  gazebo::msgs::Model modelMsg;
+  modelMsg.set_name("spawned_cylinder");
+  gazebo::msgs::Set(modelMsg.mutable_pose(),
+      ignition::math::Pose3d(0, 10, 0.5, 0, 0, 0));
+  gazebo::msgs::AddCylinderLink(modelMsg, 1.0, 0.5, 1.0);
+  auto linkMsg = modelMsg.mutable_link(0);
+  linkMsg->set_name("link");
+  linkMsg->mutable_collision(0)->set_name("collision");
+
+  std::ostringstream modelStr;
+  modelStr << "<sdf version='" << SDF_VERSION << "'>"
+    << gazebo::msgs::ModelToSDF(modelMsg)->ToString("")
+    << "</sdf>";
+
+  gazebo::msgs::Factory factoryMsg;
+  factoryMsg.set_sdf(modelStr.str());
+
+  gazebo::msgs::UserCmd msg;
+  msg.set_description("Insert cylinder");
+  msg.set_type(gazebo::msgs::UserCmd::INSERTING);
+  msg.mutable_factory()->CopyFrom(factoryMsg);
+  msg.set_entity_name("spawned_cylinder");
+
+  userCmdPub->Publish(msg);
+
+  // Check model was inserted
+  int sleep = 0;
+  int maxSleep = 100;
+  auto model = world->GetModel("spawned_cylinder");
+  while (model == NULL && sleep < maxSleep)
+  {
+    gazebo::common::Time::MSleep(100);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+    sleep++;
+
+    model = world->GetModel("spawned_cylinder");
+  }
+  QVERIFY(model != NULL);
+
+  // Undo
+  QVERIFY(gazebo::gui::g_undoAct != NULL);
+  QVERIFY(gazebo::gui::g_undoAct->isEnabled() == true);
+
+  gazebo::gui::g_undoAct->trigger();
+
+  // Check model is gone
+  sleep = 0;
+  model = world->GetModel("spawned_cylinder");
+  while (model != NULL && sleep < maxSleep)
+  {
+    gazebo::common::Time::MSleep(100);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+    sleep++;
+
+    model = world->GetModel("spawned_cylinder");
+  }
+  QVERIFY(model == NULL);
+
+  delete mainWindow;
+  mainWindow = NULL;
+}
+
+/////////////////////////////////////////////////
+void UndoTest::UndoInsertLight()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/shapes.world", false, false, false);
+
+  // Get world
+  auto world = gazebo::physics::get_world("default");
+  QVERIFY(world != NULL);
+
+  // Create the main window.
+  auto mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Process some events and draw the screen
+  for (size_t i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Transport
+  gazebo::transport::NodePtr node;
+  node = gazebo::transport::NodePtr(new gazebo::transport::Node());
+  node->Init();
+
+  auto userCmdPub = node->Advertise<gazebo::msgs::UserCmd>("~/user_cmd");
+
+  // Insert a light
+  gazebo::msgs::Light lightMsg;
+  lightMsg.set_name("spawned_light");
+  gazebo::msgs::Set(lightMsg.mutable_pose(),
+      ignition::math::Pose3d(0, 10, 1, 0, 0, 0));
+  lightMsg.set_type(gazebo::msgs::Light::POINT);
+
+  gazebo::msgs::UserCmd msg;
+  msg.set_description("Insert light");
+  msg.set_type(gazebo::msgs::UserCmd::INSERTING);
+
+  auto lightCmdMsg = msg.add_light();
+  lightCmdMsg->CopyFrom(lightMsg);
+
+  msg.set_entity_name("spawned_light");
+
+  userCmdPub->Publish(msg);
+
+  // Check light was inserted
+  int sleep = 0;
+  int maxSleep = 100;
+  auto light = world->Light("spawned_light");
+  while (light == NULL && sleep < maxSleep)
+  {
+    gazebo::common::Time::MSleep(100);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+    sleep++;
+
+    light = world->Light("spawned_light");
+  }
+  QVERIFY(light != NULL);
+
+  // Undo
+  QVERIFY(gazebo::gui::g_undoAct != NULL);
+  QVERIFY(gazebo::gui::g_undoAct->isEnabled() == true);
+
+  gazebo::gui::g_undoAct->trigger();
+
+  // Check light is gone
+  sleep = 0;
+  light = world->Light("spawned_light");
+  while (light != NULL && sleep < maxSleep)
+  {
+    gazebo::common::Time::MSleep(100);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+    sleep++;
+
+    light = world->Light("spawned_light");
+  }
+  QVERIFY(light == NULL);
+
+  delete mainWindow;
+  mainWindow = NULL;
+}
+
 // Generate a main function for the test
 QTEST_MAIN(UndoTest)

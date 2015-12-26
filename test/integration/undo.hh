@@ -60,6 +60,12 @@ class UndoTest : public QTestFixture
   /// \brief Test undoing wrench commands.
   private slots: void UndoWrench();
 
+  /// \brief Test undoing insert model commands.
+  private slots: void UndoInsertModel();
+
+  /// \brief Test undoing insert light commands.
+  private slots: void UndoInsertLight();
+
   /// \brief UndoRedo message received
   /// \param[in] _msg Message containing an undo/redo request.
   private: void OnUndoRedo(ConstUndoRedoPtr &_msg);

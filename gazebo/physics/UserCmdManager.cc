@@ -69,6 +69,8 @@ UserCmd::~UserCmd()
 void UserCmd::Undo()
 {
   // Record / override the state for redo
+  // FIXME: If there are pending deletions for example, the state will be wrongly recorded here
+  // Manage the state recording from the manager? Make a queue?
   this->dataPtr->endState = WorldState(this->dataPtr->world);
 
   // Undo insertion
@@ -124,8 +126,8 @@ void UserCmd::Redo()
       this->dataPtr->manager->dataPtr->lightFactoryPub->Publish(msg);
     }
 
-    this->dataPtr->manager->dataPtr->insertionPending =
-        this->dataPtr->entityName;
+    this->dataPtr->manager->dataPtr->insertionsPending.push_back(
+        this->dataPtr->entityName);
   }
 
   // Set state to the moment undo was triggered
@@ -202,7 +204,6 @@ UserCmdManager::UserCmdManager(const WorldPtr _world)
       this->dataPtr->node->Advertise<msgs::Light>("~/factory/light");
 
   this->dataPtr->idCounter = 0;
-  this->dataPtr->insertionPending = "";
 }
 
 /////////////////////////////////////////////////
@@ -421,14 +422,24 @@ void UserCmdManager::ProcessPendingStates()
   if (this->dataPtr->pendingStates.empty())
     return;
 
-  // Insertion pending
-  if (!this->dataPtr->insertionPending.empty())
+  // Check if there are insertions missing before changing state
+  if (!this->dataPtr->insertionsPending.empty())
   {
-    // Model hasn't been inserted yet
-    if (!this->dataPtr->world->GetModel(this->dataPtr->insertionPending))
+    bool insertionMissing = false;
+    for (auto it = this->dataPtr->insertionsPending.begin();
+         it != this->dataPtr->insertionsPending.end();)
+    {
+      if (!(this->dataPtr->world->GetModel(*it) ||
+            this->dataPtr->world->Light(*it)))
+      {
+        insertionMissing = true;
+        ++it;
+      }
+      else
+        this->dataPtr->insertionsPending.erase(it);
+    }
+    if (insertionMissing)
       return;
-    else
-      this->dataPtr->insertionPending = "";
   }
 
   // Reset physics states for the whole world
