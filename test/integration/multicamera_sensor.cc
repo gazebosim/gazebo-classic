@@ -395,7 +395,7 @@ TEST_F(MultiCameraSensor, CameraRotationWorldPoseTest)
 
   // multicamera1 sensor's camera 0 has a pose offset from the sensor
   EXPECT_NE(multicamera1->Pose() + model1->GetWorldPose().Ign(),
-      multicamera1->GetCamera(0)->WorldPose());
+      multicamera1->Camera(0)->WorldPose());
 
   // Get multicamera1's local pose. There is current no GetPose() in Camera,
   // so grab it from it's ogre scene node
