@@ -642,6 +642,8 @@ release will remove the deprecated code.
     * [Pull request #1778](https://bitbucket.org/osrf/gazebo/pull-request/1778)
 
 1. Gazebo client's should now use `gazebo/gazebo_client.hh` and `libgazebo_client.so` instead of `gazebo/gazebo.hh` and `libgazebo.so`. This separates running a Gazebo server from a Gazebo client.
+    + ***Removed:*** bool gazebo::setupClient(int _argc = 0, char **_argv = 0);
+    + ***Replacement:*** bool gazebo::client::setup(int _argc = 0, char **_argv = 0);
 
 1. **gazebo/rendering/GpuLaser.hh**
     + ***Removed:*** protected: double near

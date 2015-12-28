@@ -3,6 +3,9 @@
 1. Use opaque pointers in the rendering/GpuLaser class.
     * [Pull request #2070](https://bitbucket.org/osrf/gazebo/pull-request/2070)
 
+1. Use opaque pointers for the Master class.
+    * [Pull request #2036](https://bitbucket.org/osrf/gazebo/pull-request/2036)
+
 1. Use opaque pointers in the rendering/WindowManager class.
     * [Pull request #2064](https://bitbucket.org/osrf/gazebo/pull-request/2064)
 
