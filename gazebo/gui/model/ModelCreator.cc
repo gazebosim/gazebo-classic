@@ -1645,6 +1645,12 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
     if (_event.Button() == common::MouseEvent::RIGHT)
       return true;
 
+    if (this->allLinks.empty() && this->allNestedModels.empty())
+    {
+      this->modelPose = this->mouseVisual->GetWorldPose();
+      this->previewModel-SetWorldPose(this->modelPose);
+    }
+
     // set the link data pose
     auto linkIt = this->allLinks.find(this->mouseVisual->GetName());
     if (linkIt != this->allLinks.end())
@@ -2035,7 +2041,7 @@ void ModelCreator::GenerateSDF()
 
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
 
-  if (this->serverModelName.empty())
+  /*if (this->serverModelName.empty())
   {
     // set center of all links and nested models to be origin
     /// \todo issue #1485 set a better origin other than the centroid
@@ -2067,10 +2073,10 @@ void ModelCreator::GenerateSDF()
     }
 
     this->modelPose.Pos() = mid;
-  }
+  }*/
 
   // Update poses in case they changed
-  this->previewVisual->SetWorldPose(this->modelPose);
+  // this->previewVisual->SetWorldPose(this->modelPose);
   for (auto &linksIt : this->allLinks)
   {
     LinkData *link = linksIt.second;
