@@ -35,7 +35,7 @@ using namespace sensors;
 
 /////////////////////////////////////////////////
 WirelessTransceiver::WirelessTransceiver()
-: Sensor(sensors::OTHER)
+  : Sensor(sensors::OTHER)
 {
   this->active = false;
 }
