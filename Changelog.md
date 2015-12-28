@@ -1,5 +1,14 @@
 ## Gazebo 7.0
 
+1. Use opaque pointers for the Master class.
+    * [Pull request #2036](https://bitbucket.org/osrf/gazebo/pull-request/2036)
+
+1. Use opaque pointers in the rendering/WindowManager class.
+    * [Pull request #2064](https://bitbucket.org/osrf/gazebo/pull-request/2064)
+
+1. Use opaque pointers in the rendering/Light class.
+    * [Pull request #2066](https://bitbucket.org/osrf/gazebo/pull-request/2066)
+
 1. Use opaque pointers in the gui/JointControlWidget class.
     * [Pull request #2052](https://bitbucket.org/osrf/gazebo/pull-request/2052)
 
@@ -15,6 +24,8 @@
 1. Use more opaque pointers.
     * [Pull request #2022](https://bitbucket.org/osrf/gazebo/pull-request/2022)
     * [Pull request #2025](https://bitbucket.org/osrf/gazebo/pull-request/2025)
+    * [Pull request #2065](https://bitbucket.org/osrf/gazebo/pull-request/2065)
+    * [Pull request #2067](https://bitbucket.org/osrf/gazebo/pull-request/2067)
 
 1. Use opaque pointers in the gui/CloneWindow class.
     * [Pull request #2027](https://bitbucket.org/osrf/gazebo/pull-request/2027)
@@ -39,6 +50,7 @@
 1. Switching to ignition math for the rendering library.
     * [Pull request #1993](https://bitbucket.org/osrf/gazebo/pull-request/1993)
     * [Pull request #1994](https://bitbucket.org/osrf/gazebo/pull-request/1994)
+    * [Pull request #1995](https://bitbucket.org/osrf/gazebo/pull-request/1995)
     * [Pull request #1996](https://bitbucket.org/osrf/gazebo/pull-request/1996)
 
 1. Removed deprecations
@@ -161,6 +173,10 @@ using the same arguments used in the command line.
    * [Pull request #1977](https://bitbucket.org/osrf/gazebo/pull-request/1977)
    * [Issue #1706](https://bitbucket.org/osrf/gazebo/issue/1706)
 
+1. Add option to reverse alignment direction
+   * [Pull request #2040](https://bitbucket.org/osrf/gazebo/pull-request/2040)
+   * [Issue #1242](https://bitbucket.org/osrf/gazebo/issue/1242)
+
 1. Fix unadvertising a publisher - only unadvertise topic if it is the last publisher.
    * [Pull request #2005](https://bitbucket.org/osrf/gazebo/pull-request/2005)
    * [Issue #1782](https://bitbucket.org/osrf/gazebo/issue/1782)
@@ -248,6 +264,9 @@ using the same arguments used in the command line.
         * [Pull request #1904](https://bitbucket.org/osrf/gazebo/pull-request/1904)
         * [Issue #1543](https://bitbucket.org/osrf/gazebo/issue/1543)
 
+    1. PIMPL JointInspector
+        * [Pull request #2059](https://bitbucket.org/osrf/gazebo/pull-request/2059)
+
     1. Apply inspector changes in real time and add reset button
         * [Pull request #1945](https://bitbucket.org/osrf/gazebo/pull-request/1945)
         * [Issue #1472](https://bitbucket.org/osrf/gazebo/issue/1472)
@@ -262,6 +281,9 @@ using the same arguments used in the command line.
     1. Support inserting nested models from model maker
         * [Pull request #1982](https://bitbucket.org/osrf/gazebo/pull-request/1982)
 
+    1. PIMPL LinkInspector
+        * [Pull request #2056](https://bitbucket.org/osrf/gazebo/pull-request/2056)
+
 1. Building editor updates
 
     1. PIMPLize LevelWidget class
@@ -273,8 +295,14 @@ using the same arguments used in the command line.
     1. Removed unused class: BuildingItem
         * [Pull request #2045](https://bitbucket.org/osrf/gazebo/pull-request/2045)
 
+    1. PIMPL BuildingEditorWidget
+        * [Pull request #2055](https://bitbucket.org/osrf/gazebo/pull-request/2055)
+
     1. PIMPLize gui/building/BuildingModelManip, move attachment logic to BuildingMaker
         * [Pull request #2046](https://bitbucket.org/osrf/gazebo/pull-request/2046)
+
+    1. PIMPLize GridLines class
+        * [Pull request #2032](https://bitbucket.org/osrf/gazebo/pull-request/2032)
 
 ## Gazebo 6.0
 
