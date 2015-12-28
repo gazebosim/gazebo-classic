@@ -2,6 +2,9 @@
 
 1. Use opaque pointers in the rendering/DepthCamera class.
     * [Pull request #2069](https://bitbucket.org/osrf/gazebo/pull-request/2069)
+    
+1. Use opaque pointers for the Master class.
+    * [Pull request #2036](https://bitbucket.org/osrf/gazebo/pull-request/2036)
 
 1. Use opaque pointers in the rendering/WindowManager class.
     * [Pull request #2064](https://bitbucket.org/osrf/gazebo/pull-request/2064)
@@ -277,6 +280,9 @@ using the same arguments used in the command line.
 
     1. Support inserting nested models from model maker
         * [Pull request #1982](https://bitbucket.org/osrf/gazebo/pull-request/1982)
+
+    1. PIMPL LinkInspector
+        * [Pull request #2056](https://bitbucket.org/osrf/gazebo/pull-request/2056)
 
 1. Building editor updates
 
