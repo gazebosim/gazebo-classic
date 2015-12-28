@@ -134,17 +134,20 @@ void SelectionBuffer::CreateRTTBuffer()
     return;
   }
 
-  this->dataPtr->renderTexture = this->dataPtr->texture->getBuffer()->getRenderTarget();
+  this->dataPtr->renderTexture =
+    this->dataPtr->texture->getBuffer()->getRenderTarget();
   this->dataPtr->renderTexture->setAutoUpdated(false);
   this->dataPtr->renderTexture->setPriority(0);
   this->dataPtr->renderTexture->addViewport(this->dataPtr->camera);
   this->dataPtr->renderTexture->getViewport(0)->setOverlaysEnabled(false);
   this->dataPtr->renderTexture->getViewport(0)->setClearEveryFrame(true);
-  this->dataPtr->renderTexture->addListener(this->dataPtr->selectionTargetListener);
+  this->dataPtr->renderTexture->addListener(
+                                 this->dataPtr->selectionTargetListener);
   this->dataPtr->renderTexture->getViewport(0)->setMaterialScheme("aa");
   this->dataPtr->renderTexture->getViewport(0)->setVisibilityMask(
       GZ_VISIBILITY_SELECTABLE);
-  Ogre::HardwarePixelBufferSharedPtr pixelBuffer = this->dataPtr->texture->getBuffer();
+  Ogre::HardwarePixelBufferSharedPtr pixelBuffer =
+    this->dataPtr->texture->getBuffer();
   size_t bufferSize = pixelBuffer->getSizeInBytes();
 
   this->dataPtr->buffer = new uint8_t[bufferSize];
@@ -190,7 +193,8 @@ Ogre::Entity *SelectionBuffer::OnSelectionClick(int _x, int _y)
   cv.SetFromARGB(color);
 
   cv.a = 1.0;
-  const std::string &entName = this->dataPtr->materialSwitchListener->GetEntityName(cv);
+  const std::string &entName =
+    this->dataPtr->materialSwitchListener->GetEntityName(cv);
 
   if (entName.empty())
     return 0;
