@@ -89,6 +89,27 @@ release will remove the deprecated code.
 
 ### Deprecations
 
+1. **gazebo/rendering/Heightmap.hh**
+    + ***Deprecation:*** public: double GetHeight(double _x, double _y, double _z = 1000);
+    + ***Replacement:*** public: double Height(const double _x, const double _y, const double _z = 1000) const;
+    + ***Deprecation:*** public: bool Flatten(CameraPtr _camera, math::Vector2i _mousePos, double _outsideRadius, double _insideRadius, double _weight = 0.1)
+    + ***Replacement:*** public: bool Flatten(CameraPtr _camera, const ignition::math::Vector2i &_mousePos, const double _outsideRadius, const double _insideRadius, const double _weight = 0.1);
+    + ***Deprecation:*** public: bool Smooth(CameraPtr _camera, math::Vector2i _mousePos, double _outsideRadius, double _insideRadius, double _weight = 0.1);
+    + ***Replacement:*** public: bool Smooth(CameraPtr _camera, const ignition::math::Vector2i &_mousePos, const double _outsideRadius, const double _insideRadius, const double _weight = 0.1);
+    + ***Deprecation:*** public: bool Raise(CameraPtr _camera, math::Vector2i _mousePos,
+ double _outsideRadius, double _insideRadius, double _weight = 0.1)
+    + ***Replacement:*** public: bool Raise(CameraPtr _camera, const ignition::math::Vector2i &_mousePos, const double _outsideRadius, const double _insideRadius, const double _weight = 0.1)
+    + ***Deprecation:*** public: bool Lower(CameraPtr _camera, math::Vector2i _mousePos, double _outsideRadius, double _insideRadius, double _weight = 0.1)
+    + ***Replacement:*** public: bool Lower(CameraPtr _camera, const ignition::math::Vector2i &_mousePos, const double _outsideRadius, const double _insideRadius, const double _weight = 0.1)
+    + ***Deprecation:*** public: double GetAvgHeight(Ogre::Vector3 _pos, double _brushSize);
+    + ***Replacement:*** public: double AvgHeight(const ignition::math::Vector3d &_pos, const double _brushSize) const
+    + ***Deprecation:*** public: Ogre::TerrainGroup *GetOgreTerrain() const;
+    + ***Replacement:*** public: Ogre::TerrainGroup *OgreTerrain() const;
+    + ***Deprecation:*** public: Ogre::TerrainGroup::RayResult GetMouseHit(CameraPtr _camera, math::Vector2i _mousePos);
+    + ***Replacement:*** public: Ogre::TerrainGroup::RayResult MouseHit(CameraPtr _camera, const ignition::math::Vector2i &_mousePos) const;
+    + ***Deprecation:*** public: unsigned int GetTerrainSubdivisionCount() const;
+    + ***Replacement:*** public: unsigned int TerrainSubdivisionCount() const;
+
 1. **gazebo/rendering/DynamicLines.hh**
     + ***Deprecation:*** public: void AddPoint(const math::Vector3 &_pt,const common::Color &_color = common::Color::White)
     + ***Replacement:*** public: void AddPoint(const ignition::math::Vector3d &_pt,const common::Color &_color = common::Color::White);
@@ -244,7 +265,7 @@ release will remove the deprecated code.
 1. **gazebo/rendering/Camera.hh**
     + ***Deprecation:*** public: math::Vector3 GetWorldPosition() const
     + ***Replacement:*** public: ignition::math::Vector3d WorldPosition() const;
-    + ***Deprecation:*** public: math::Quaternion GetWorldRotation() const 
+    + ***Deprecation:*** public: math::Quaternion GetWorldRotation() const
     + ***Replacement:*** public: ignition::math::Quaterniond WorldRotation() const;
     + ***Deprecation:*** public: virtual void SetWorldPose(const math::Pose &_pose)
     + ***Replacement:*** public: virtual void SetWorldPose(const ignition::math::Pose3d &_pose);
