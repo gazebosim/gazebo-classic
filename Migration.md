@@ -24,6 +24,10 @@ release will remove the deprecated code.
 
 ### Modifications
 
+1. **gazebo/sensors/Sensor.hh**
+    + ***Removed:*** public: template<typename T> event::ConnectionPtr ConnectUpdated(T _subscriber);
+    + ***Replacement:*** public: event::ConnectionPtr ConnectUpdated(std::function<void()> _subscriber);
+
 1. **gazebo/physics/Actor.hh**
     + Type change of `protected: math::Vector3 lastPos;` to `protected: ignition::math::Vector3d lastPos;`
 
@@ -206,9 +210,9 @@ release will remove the deprecated code.
     + ***Replacement:** public: virtual std::string Topic() const;
     + ***Deprecation:** public: rendering::GpuLaserPtr GetLaserCamera() const
     + ***Replacement:** public: rendering::GpuLaserPtr LaserCamera() const;
-    + ***Deprecation:** public: double GetAngleResolution() const 
+    + ***Deprecation:** public: double GetAngleResolution() const
     + ***Replacement:** public: double AngleResolution() const;
-    + ***Deprecation:** public: double GetRangeMin() const 
+    + ***Deprecation:** public: double GetRangeMin() const
     + ***Replacement:** public: double RangeMin() const;
     + ***Deprecation:** public: double GetRangeMax() const
     + ***Replacement:** public: double RangeMax() const;
@@ -362,7 +366,7 @@ release will remove the deprecated code.
 1. **gazebo/sensors/WirelessTransmitter.hh**
     + ***Deprecation:** public: std::string GetESSID() const
     + ***Replacement:** public: std::string ESSID() const;
-    + ***Deprecation:** public: double GetFreq() const 
+    + ***Deprecation:** public: double GetFreq() const
     + ***Replacement:** public: double Freq() const;
 
 1. **gazebo/rendering/ApplyWrenchVisual.hh**
@@ -440,7 +444,7 @@ release will remove the deprecated code.
 1. **gazebo/rendering/Camera.hh**
     + ***Deprecation:*** public: math::Vector3 GetWorldPosition() const
     + ***Replacement:*** public: ignition::math::Vector3d WorldPosition() const;
-    + ***Deprecation:*** public: math::Quaternion GetWorldRotation() const 
+    + ***Deprecation:*** public: math::Quaternion GetWorldRotation() const
     + ***Replacement:*** public: ignition::math::Quaterniond WorldRotation() const;
     + ***Deprecation:*** public: virtual void SetWorldPose(const math::Pose &_pose)
     + ***Replacement:*** public: virtual void SetWorldPose(const ignition::math::Pose3d &_pose);

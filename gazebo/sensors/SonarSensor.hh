@@ -80,7 +80,6 @@ namespace gazebo
 
       /// \brief Get the radius of the sonar cone at maximum range.
       /// \return The radisu of the sonar cone at max range.
-      /// \deprecated See Radius()
       public: double Radius() const;
 
       /// \brief Get detected range for a sonar.

@@ -232,7 +232,6 @@ namespace gazebo
       ///         SetActive(true).
       /// \param[in] _index Index of specific ray
       /// \return Returns RangeMax for no detection.
-      /// \deprecated See Range(int _index)
       public: double Range(const int _index) const;
 
       /// \brief Get all the ranges
@@ -361,6 +360,7 @@ namespace gazebo
       public: double GetVertFOV() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the vertical field-of-view.
+      /// \return Vertical field of view.
       public: double VertFOV() const;
 
       /// \brief Get Cos Vert field-of-view
@@ -388,7 +388,6 @@ namespace gazebo
 
       /// \brief Get (vertical_max_angle + vertical_min_angle) * 0.5
       /// \return (vertical_max_angle + vertical_min_angle) * 0.5
-      /// \deprecated See VertHalfAngle
       public: double VertHalfAngle() const;
 
       /// \brief Connect to the new laser frame event.

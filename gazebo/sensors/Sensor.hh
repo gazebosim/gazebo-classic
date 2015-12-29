@@ -179,7 +179,6 @@ namespace gazebo
       /// \brief Return true if user requests the sensor to be visualized
       ///        via tag:  <visualize>true</visualize> in SDF.
       /// \return True if visualized, false if not.
-      /// \deprecated See Visualize() function
       public: bool Visualize() const;
 
       /// \brief Returns the topic name as set in SDF.
@@ -238,7 +237,6 @@ namespace gazebo
 
       /// \brief Get the sensor's ID.
       /// \return The sensor's ID.
-      /// \deprecated See Id() function
       public: uint32_t Id() const;
 
       /// \brief Get the sensor's parent's ID.
@@ -262,7 +260,6 @@ namespace gazebo
       /// \param[in] _type Index of the noise type. Refer to
       /// SensorNoiseType enumeration for possible indices
       /// \return The sensor's noise model for the given noise type
-      /// \deprecated See Noise(const SensorNoiseType _type) function
       public: NoisePtr Noise(const SensorNoiseType _type) const;
 
       /// \brief This gets overwritten by derived sensor types.

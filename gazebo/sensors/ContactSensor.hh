@@ -122,7 +122,7 @@ namespace gazebo
       ///                           CG of perspective links for each collision
       ///                           body, specified in the inertial frame.
       ///    \li Time time          time at which this contact happened.
-      /// \deprecated See Contact()
+      /// \deprecated See Contacts()
       public: msgs::Contacts GetContacts() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get all the contacts for the ContactSensor
@@ -163,7 +163,6 @@ namespace gazebo
       ///                           CG of perspective links for each collision
       ///                           body, specified in the inertial frame.
       ///    \li Time time          time at which this contact happened.
-      /// \deprecated See Contact()
       public: msgs::Contacts Contacts() const;
 
       /// \brief Gets contacts of a collision

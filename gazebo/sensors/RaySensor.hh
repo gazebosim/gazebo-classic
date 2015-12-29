@@ -121,7 +121,6 @@ namespace gazebo
 
       /// \brief Get the ray count
       /// \return The number of rays
-      /// \deprecated See RayCount()
       public: int RayCount() const;
 
       /// \brief Get the range count
@@ -198,7 +197,7 @@ namespace gazebo
               GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get all the ranges
-      /// \param _ranges A vector that will contain all the range data
+      /// \param[out] _ranges A vector that will contain all the range data
       public: void Ranges(std::vector<double> &_ranges) const;
 
       /// \brief Get detected retro (intensity) value for a ray.
@@ -255,7 +254,6 @@ namespace gazebo
 
       /// \brief Returns a pointer to the internal physics::MultiRayShape
       /// \return Pointer to ray shape
-      /// \deprecated See LaserShape()
       public: physics::MultiRayShapePtr LaserShape() const;
 
       // Documentation inherited

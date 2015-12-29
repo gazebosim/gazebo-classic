@@ -78,7 +78,6 @@ namespace gazebo
 
       /// \brief Returns a pointer to the rendering::DepthCamera
       /// \return Depth Camera pointer
-      /// \deprecated See DepthCamera()
       public: rendering::DepthCameraPtr DepthCamera() const;
 
       /// \brief Saves an image frame of depth camera sensor to file

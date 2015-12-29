@@ -17,12 +17,8 @@
 #ifndef _GAZEBO_SENSORS_SENSOR_PRIVATE_HH_
 #define _GAZEBO_SENSORS_SENSOR_PRIVATE_HH_
 
-#include <vector>
 #include <mutex>
-#include <map>
-#include <string>
 #include <sdf/sdf.hh>
-#include <ignition/math/Pose3.hh>
 
 #include "gazebo/rendering/RenderTypes.hh"
 
