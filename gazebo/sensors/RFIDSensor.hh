@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_RFIDSENSOR_HH_
-#define _GAZEBO_RFIDSENSOR_HH_
+#ifndef _GAZEBO_SENSORS_RFIDSENSOR_HH_
+#define _GAZEBO_SENSORS_RFIDSENSOR_HH_
 
 #include <vector>
 #include <string>
