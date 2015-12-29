@@ -28,6 +28,12 @@ release will remove the deprecated code.
     + ***Removed:*** public: template<typename T> event::ConnectionPtr ConnectUpdated(T _subscriber);
     + ***Replacement:*** public: event::ConnectionPtr ConnectUpdated(std::function<void()> _subscriber);
 
+1. **gazebo/rendering/DepthCamera.hh**
+    + ***Removed:*** public: template<typename T> event::ConnectionPtr ConnectNewDepthFrame(T _subscriber)
+    + ***Replacement:*** public: event::ConnectionPtr ConnectNewDepthFrame(std::function<void (const float *, unsigned int, unsigned int, unsigned int, const std::string &)>  _subscriber);
+    + ***Removed:*** public: template<typename T> event::ConnectionPtr ConnectNewRGBPointCloud(T _subscriber)
+    + ***Replacement:*** public: event::ConnectionPtr ConnectNewRGBPointCloud(std::function<void (const float *, unsigned int, unsigned int, unsigned int, const std::string &)>  _subscriber);
+
 1. **gazebo/physics/Actor.hh**
     + Type change of `protected: math::Vector3 lastPos;` to `protected: ignition::math::Vector3d lastPos;`
 
@@ -92,6 +98,10 @@ release will remove the deprecated code.
     + ***Replacement:*** public: static event::EventT<void (std::string, std::string, std::string, bool)> alignMode; std::string, std::string, bool, bool)> alignMode;
 
 ### Deprecations
+
+1. **gazebo/rendering/DepthCamera.hh**
+    + ***Deprecation:*** public: virtual const float *GetDepthData();
+    + ***Replacement:*** public: virtual const float *DepthData() const;
 
 1. **gazebo/rendering/DynamicLines.hh**
     + ***Deprecation:*** public: void AddPoint(const math::Vector3 &_pt,const common::Color &_color = common::Color::White)
