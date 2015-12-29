@@ -136,8 +136,16 @@ endif ()
 #  )
 #endif()
 
-set (qt_tests
+set (gtest_sources
   Conversions_TEST.cc
+)
+gz_build_tests(${gtest_sources})
+foreach(gtest_file ${gtest_sources})
+  string(REGEX REPLACE ".cc" "" BINARY_NAME ${gtest_file})
+  target_link_libraries(${TEST_TYPE}_${BINARY_NAME} gazebo_gui)
+endforeach()
+
+set (qt_tests
   DataLogger_TEST.cc
   GuiIface_TEST.cc
   HotkeyDialog_TEST.cc
