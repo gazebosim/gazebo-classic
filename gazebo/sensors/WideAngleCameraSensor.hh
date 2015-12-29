@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_WIDEANGLE_CAMERA_SENSOR_HH_
-#define _GAZEBO_WIDEANGLE_CAMERA_SENSOR_HH_
+#ifndef _GAZEBO_SENSORS_WIDEANGLECAMERASENSOR_HH_
+#define _GAZEBO_SENSORS_WIDEANGLECAMERASENSOR_HH_
 
 #include <memory>
 #include <string>
@@ -27,7 +26,6 @@
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/sensors/CameraSensor.hh"
 #include "gazebo/util/system.hh"
-
 
 namespace gazebo
 {
@@ -74,5 +72,4 @@ namespace gazebo
     /// \}
   }
 }
-
 #endif
