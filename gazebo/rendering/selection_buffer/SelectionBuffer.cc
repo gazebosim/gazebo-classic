@@ -33,18 +33,36 @@ namespace gazebo
     {
       /// \brief This is the material listener - Note: it is controlled by a
       /// separate RenderTargetListener, not applied globally to all
-      /// targets.
+      /// targets. The class associates a color to an ogre entity
       MaterialSwitcher *materialSwitchListener;
 
+      /// \brief A render target listener that sets up the material switcher
+      /// to run on every update of this render target.
       SelectionRenderListener *selectionTargetListener;
 
+      /// \brief Ogre scene manager
       Ogre::SceneManager *sceneMgr;
+
+      /// \brief Pointer to the camera that will be used to render to texture
       Ogre::Camera *camera;
+
+      /// \brief Ogre render target
       Ogre::RenderTarget *renderTarget;
+
+      /// \brief Ogre texture
       Ogre::TexturePtr texture;
+
+      /// \brief Ogre render texture
       Ogre::RenderTexture *renderTexture;
+
+      /// \brief Render texture data buffer
       uint8_t *buffer;
+
+      /// \brief Ogre pixel box that contains description of the data buffer
       Ogre::PixelBox *pixelBox;
+
+      /// \brief A 2D overlay used for debugging the selection buffer. It
+      /// is hidden by default.
       Ogre::Overlay *selectionDebugOverlay;
     };
   }
