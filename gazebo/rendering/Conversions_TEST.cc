@@ -17,10 +17,11 @@
 
 #include <gtest/gtest.h>
 
+#include "gazebo/test/ServerFixture.hh"
+
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/rendering/Conversions.hh"
-#include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
 class Conversions_TEST : public ServerFixture
