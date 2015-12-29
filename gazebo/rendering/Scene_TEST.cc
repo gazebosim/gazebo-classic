@@ -122,8 +122,8 @@ TEST_F(Scene_TEST, RemoveModelVisual)
   {
     for (auto const &suffix : suffixes)
     {
-      gzdbg << "check visual exists: " << modelName + suffix << std::endl;
-      EXPECT_TRUE(scene->GetVisual(modelName + suffix) != NULL);
+      EXPECT_TRUE(scene->GetVisual(modelName + suffix) != NULL)
+          << "check visual exists: " << modelName + suffix;
     }
   }
 
@@ -143,8 +143,8 @@ TEST_F(Scene_TEST, RemoveModelVisual)
 
   for (auto const &suffix : suffixes)
   {
-    gzdbg << "check visual does not exist: " << "box" + suffix << std::endl;
-    EXPECT_TRUE(scene->GetVisual("box" + suffix) == NULL);
+    EXPECT_TRUE(scene->GetVisual("box" + suffix) == NULL)
+        << "check visual does not exist: ";
   }
 }
 
