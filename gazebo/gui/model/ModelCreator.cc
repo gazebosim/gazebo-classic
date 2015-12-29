@@ -511,7 +511,8 @@ void ModelCreator::OnNew()
 {
   this->Stop();
 
-  if (this->allLinks.empty() && this->allNestedModels.empty())
+  if (this->allLinks.empty() && this->allNestedModels.empty() &&
+      this->allModelPlugins.empty())
   {
     this->Reset();
     gui::model::Events::newModel();
@@ -625,7 +626,8 @@ void ModelCreator::OnExit()
 {
   this->Stop();
 
-  if (this->allLinks.empty() && this->allNestedModels.empty())
+  if (this->allLinks.empty() && this->allNestedModels.empty() &&
+      this->allModelPlugins.empty())
   {
     if (!this->serverModelName.empty())
       this->SetModelVisible(this->serverModelName, true);
