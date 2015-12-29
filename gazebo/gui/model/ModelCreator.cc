@@ -2472,6 +2472,11 @@ void ModelCreator::OnAddModelPlugin(const std::string &_name,
     this->AddModelPlugin(modelPluginSDF);
     this->ModelChanged();
   }
+  else
+  {
+    gzerr << "Error reading Plugin SDF. Unable to parse Innerxml:\n"
+        << _innerxml << std::endl;
+  }
 }
 
 /////////////////////////////////////////////////
