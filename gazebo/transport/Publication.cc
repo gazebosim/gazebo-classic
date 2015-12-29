@@ -107,6 +107,13 @@ void Publication::SetPrevMsg(uint32_t _pubId, MessagePtr _msg)
 }
 
 //////////////////////////////////////////////////
+void Publication::ClearPrevMsgs()
+{
+  boost::mutex::scoped_lock lock(this->callbackMutex);
+  this->prevMsgs.clear();
+}
+
+//////////////////////////////////////////////////
 void Publication::AddTransport(const PublicationTransportPtr &_publink)
 {
   bool add = true;
@@ -508,8 +515,10 @@ void Publication::RemoveNodes()
 //////////////////////////////////////////////////
 MessagePtr Publication::GetPrevMsg(uint32_t _pubId)
 {
+  boost::mutex::scoped_lock lock(this->callbackMutex);
   if (this->prevMsgs.find(_pubId) != this->prevMsgs.end())
     return this->prevMsgs[_pubId];
   else
     return MessagePtr();
 }
+

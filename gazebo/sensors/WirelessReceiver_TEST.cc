@@ -35,7 +35,7 @@ class WirelessReceiver_TEST : public ServerFixture
   public: void TestIllegalSensitivity();
   public: void TestUpdateImpl();
 
-  /// \brief Create a sensor with an illegal value and checks that an exception
+  /// \brief Create a sensor with an illegal value and check that an exception
   /// is thrown
   /// \param[in] _sensorString Sensor SDF string
   private: void CheckIllegalValue(std::string _sensorString);
