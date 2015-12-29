@@ -144,7 +144,7 @@ TEST_F(Scene_TEST, RemoveModelVisual)
   for (auto const &suffix : suffixes)
   {
     EXPECT_TRUE(scene->GetVisual("box" + suffix) == NULL)
-        << "check visual does not exist: ";
+        << "check visual does not exist: " << "box" + suffix;
   }
 }
 
