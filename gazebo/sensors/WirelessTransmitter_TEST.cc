@@ -139,7 +139,6 @@ void WirelessTransmitter_TEST::TestInvalidFreq()
 /// \brief Test the signal strength function
 void WirelessTransmitter_TEST::TestSignalStrength()
 {
-  printf("1\n");
   int samples = 100;
   double signStrengthAvg = 0.0;
   ignition::math::Pose3d txPose(
