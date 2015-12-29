@@ -3,6 +3,12 @@
 1. Deprecate functions in the rendering/Camera class.
     * [Pull request #2076](https://bitbucket.org/osrf/gazebo/pull-request/2076)
 
+1. Use opaque pointers in the rendering/DepthCamera class.
+    * [Pull request #2069](https://bitbucket.org/osrf/gazebo/pull-request/2069)
+    
+1. Use opaque pointers for the Master class.
+    * [Pull request #2036](https://bitbucket.org/osrf/gazebo/pull-request/2036)
+
 1. Use opaque pointers in the rendering/WindowManager class.
     * [Pull request #2064](https://bitbucket.org/osrf/gazebo/pull-request/2064)
 
@@ -23,6 +29,8 @@
 
 1. Use more opaque pointers.
     * [Pull request #2025](https://bitbucket.org/osrf/gazebo/pull-request/2025)
+    * [Pull request #2065](https://bitbucket.org/osrf/gazebo/pull-request/2065)
+    * [Pull request #2067](https://bitbucket.org/osrf/gazebo/pull-request/2067)
 
 1. Use opaque pointers in the gui/CloneWindow class.
     * [Pull request #2027](https://bitbucket.org/osrf/gazebo/pull-request/2027)

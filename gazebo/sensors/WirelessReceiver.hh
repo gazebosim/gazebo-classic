@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _WIRELESS_RECEIVER_HH_
-#define _WIRELESS_RECEIVER_HH_
+#ifndef _GAZEBO_SENSORS_WIRELESSRECEIVER_HH_
+#define _GAZEBO_SENSORS_WIRELESSRECEIVER_HH_
 
 #include <string>
 #include "gazebo/physics/PhysicsTypes.hh"
