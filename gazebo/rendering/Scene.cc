@@ -3098,7 +3098,7 @@ void Scene::CreateInertiaVisual(sdf::ElementPtr _elem, VisualPtr _linkVisual)
 }
 
 /////////////////////////////////////////////////
-void Scene::CreateLinkFrameVisual(ConstLinkPtr &_msg, VisualPtr _linkVisual)
+void Scene::CreateLinkFrameVisual(ConstLinkPtr &/*_msg*/, VisualPtr _linkVisual)
 {
   LinkFrameVisualPtr linkFrameVis(new LinkFrameVisual(_linkVisual->GetName() +
       "_LINK_FRAME_VISUAL__", _linkVisual));
