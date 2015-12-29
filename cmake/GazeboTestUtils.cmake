@@ -30,7 +30,7 @@ macro (gz_build_tests)
 
 
     target_link_libraries(${BINARY_NAME}
-      # This two libraries are need to workaround on bug 
+      # This two libraries are need to workaround on bug
       # https://bitbucket.org/osrf/gazebo/issue/1516
       gazebo_physics
       gazebo_sensors
@@ -57,7 +57,12 @@ macro (gz_build_tests)
     # Check that the test produced a result and create a failure if it didn't.
     # Guards against crashed and timed out tests.
     add_test(check_${BINARY_NAME} ${PROJECT_SOURCE_DIR}/tools/check_test_ran.py
-	${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
+    ${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
+
+    if(GAZEBO_RUN_VALGRIND_TESTS AND VALGRIND_PROGRAM)
+      add_test(memcheck_${BINARY_NAME} ${VALGRIND_PROGRAM} --leak-check=full
+               --error-exitcode=1 --show-leak-kinds=all ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME})
+    endif()
   endforeach()
 
   set(GZ_BUILD_TESTS_EXTRA_EXE_SRCS "")
@@ -93,7 +98,7 @@ if (VALID_DISPLAY)
       )
 
     target_link_libraries(${BINARY_NAME}
-      # This two libraries are need to workaround on bug 
+      # This two libraries are need to workaround on bug
       # https://bitbucket.org/osrf/gazebo/issue/1516
       gazebo_physics
       gazebo_sensors
@@ -122,7 +127,12 @@ if (VALID_DISPLAY)
     # Guards against crashed and timed out tests.
     add_test(check_${BINARY_NAME} ${PROJECT_SOURCE_DIR}/tools/check_test_ran.py
 	${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
-    endforeach()
+
+	if(GAZEBO_RUN_VALGRIND_TESTS AND VALGRIND_PROGRAM)
+      add_test(memcheck_${BINARY_NAME} ${VALGRIND_PROGRAM} --leak-check=full
+               --error-exitcode=1 --show-leak-kinds=all ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME})
+    endif()
+   endforeach()
   endmacro()
 endif()
 
