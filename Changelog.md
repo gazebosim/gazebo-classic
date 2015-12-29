@@ -1,11 +1,11 @@
 ## Gazebo 7.0
 
 1. Use opaque pointers for the rendering/Heightmap class.
-    * [Pull request #](https://bitbucket.org/osrf/gazebo/pull-request/)
+    * [Pull request #2074](https://bitbucket.org/osrf/gazebo/pull-request/2074)
 
 1. Use opaque pointers in the rendering/DepthCamera class.
     * [Pull request #2069](https://bitbucket.org/osrf/gazebo/pull-request/2069)
-    
+
 1. Use opaque pointers for the Master class.
     * [Pull request #2036](https://bitbucket.org/osrf/gazebo/pull-request/2036)
 
