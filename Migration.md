@@ -24,6 +24,12 @@ release will remove the deprecated code.
 
 ### Modifications
 
+1. **gazebo/rendering/DepthCamera.hh**
+    + ***Removed:*** public: template<typename T> event::ConnectionPtr ConnectNewDepthFrame(T _subscriber)
+    + ***Replacement:*** public: event::ConnectionPtr ConnectNewDepthFrame(std::function<void (const float *, unsigned int, unsigned int, unsigned int, const std::string &)>  _subscriber);
+    + ***Removed:*** public: template<typename T> event::ConnectionPtr ConnectNewRGBPointCloud(T _subscriber)
+    + ***Replacement:*** public: event::ConnectionPtr ConnectNewRGBPointCloud(std::function<void (const float *, unsigned int, unsigned int, unsigned int, const std::string &)>  _subscriber);
+
 1. **gazebo/physics/Actor.hh**
     + Type change of `protected: math::Vector3 lastPos;` to `protected: ignition::math::Vector3d lastPos;`
 
@@ -88,6 +94,10 @@ release will remove the deprecated code.
     + ***Replacement:*** public: static event::EventT<void (std::string, std::string, std::string, bool)> alignMode; std::string, std::string, bool, bool)> alignMode;
 
 ### Deprecations
+
+1. **gazebo/rendering/DepthCamera.hh**
+    + ***Deprecation:*** public: virtual const float *GetDepthData();
+    + ***Replacement:*** public: virtual const float *DepthData() const;
 
 1. **gazebo/rendering/DynamicLines.hh**
     + ***Deprecation:*** public: void AddPoint(const math::Vector3 &_pt,const common::Color &_color = common::Color::White)
@@ -612,6 +622,8 @@ release will remove the deprecated code.
     * [Pull request #1778](https://bitbucket.org/osrf/gazebo/pull-request/1778)
 
 1. Gazebo client's should now use `gazebo/gazebo_client.hh` and `libgazebo_client.so` instead of `gazebo/gazebo.hh` and `libgazebo.so`. This separates running a Gazebo server from a Gazebo client.
+    + ***Removed:*** bool gazebo::setupClient(int _argc = 0, char **_argv = 0);
+    + ***Replacement:*** bool gazebo::client::setup(int _argc = 0, char **_argv = 0);
 
 1. **gazebo/rendering/GpuLaser.hh**
     + ***Removed:*** protected: double near
