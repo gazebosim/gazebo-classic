@@ -118,18 +118,18 @@ void InertiaVisual::Load(const math::Pose &_pose,
   ignition::math::Vector3d p4(0, 2*_scale.y, 0);
   ignition::math::Vector3d p5(-2*_scale.x, 0, 0);
   ignition::math::Vector3d p6(2*_scale.x, 0, 0);
-  p1 += _pose.pos.Ign();
-  p2 += _pose.pos.Ign();
-  p3 += _pose.pos.Ign();
-  p4 += _pose.pos.Ign();
-  p5 += _pose.pos.Ign();
-  p6 += _pose.pos.Ign();
   p1 = _pose.rot.RotateVector(p1).Ign();
   p2 = _pose.rot.RotateVector(p2).Ign();
   p3 = _pose.rot.RotateVector(p3).Ign();
   p4 = _pose.rot.RotateVector(p4).Ign();
   p5 = _pose.rot.RotateVector(p5).Ign();
   p6 = _pose.rot.RotateVector(p6).Ign();
+  p1 += _pose.pos.Ign();
+  p2 += _pose.pos.Ign();
+  p3 += _pose.pos.Ign();
+  p4 += _pose.pos.Ign();
+  p5 += _pose.pos.Ign();
+  p6 += _pose.pos.Ign();
 
   dPtr->crossLines = this->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
   dPtr->crossLines->setMaterial("Gazebo/Green");
