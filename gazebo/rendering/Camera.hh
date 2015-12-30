@@ -489,12 +489,12 @@ namespace gazebo
 
       /// \brief Get a pointer to the Ogre::Viewport
       /// \return Pointer to the Ogre::Viewport
-      /// \deprecated See Viewport()
+      /// \deprecated See OgreViewport()
       public: Ogre::Viewport *GetViewport() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get a pointer to the Ogre::Viewport
       /// \return Pointer to the Ogre::Viewport
-      public: Ogre::Viewport *Viewport() const;
+      public: Ogre::Viewport *OgreViewport() const;
 
       /// \brief Get the viewport width in pixels
       /// \return The viewport width

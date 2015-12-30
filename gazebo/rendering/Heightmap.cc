@@ -711,9 +711,9 @@ Ogre::TerrainGroup::RayResult Heightmap::GetMouseHit(CameraPtr _camera,
 {
   Ogre::Ray mouseRay = _camera->OgreCamera()->getCameraToViewportRay(
       static_cast<float>(_mousePos.x) /
-      _camera->Viewport()->getActualWidth(),
+      _camera->OgreViewport()->getActualWidth(),
       static_cast<float>(_mousePos.y) /
-      _camera->Viewport()->getActualHeight());
+      _camera->OgreViewport()->getActualHeight());
 
   // The terrain uses a special ray intersection test.
   return this->terrainGroup->rayIntersects(mouseRay);

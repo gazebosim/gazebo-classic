@@ -314,7 +314,7 @@ release will remove the deprecated code.
     + ***Deprecation:*** public: Ogre::Camera *GetOgreCamera() const;
     + ***Replacement:*** public: Ogre::Camera *OgreCamera() const;
     + ***Deprecation:*** public: Ogre::Viewport *GetViewport() const;
-    + ***Replacement:*** public: Ogre::Viewport *Viewport() const;
+    + ***Replacement:*** public: Ogre::Viewport *OgreViewport() const;
     + ***Deprecation:*** public: unsigned int GetViewportWidth() const;
     + ***Replacement:*** public: unsigned int ViewportWidth() const;
     + ***Deprecation:*** public: unsigned int GetViewportHeight() const;

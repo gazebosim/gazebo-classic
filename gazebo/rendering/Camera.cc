@@ -1013,11 +1013,11 @@ Ogre::Camera *Camera::OgreCamera() const
 //////////////////////////////////////////////////
 Ogre::Viewport *Camera::GetViewport() const
 {
-  return this->Viewport();
+  return this->OgreViewport();
 }
 
 //////////////////////////////////////////////////
-Ogre::Viewport *Camera::Viewport() const
+Ogre::Viewport *Camera::OgreViewport() const
 {
   return this->viewport;
 }

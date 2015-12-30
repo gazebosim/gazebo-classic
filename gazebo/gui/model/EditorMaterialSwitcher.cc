@@ -51,24 +51,24 @@ EditorMaterialSwitcher::EditorMaterialSwitcher(
 /////////////////////////////////////////////////
 void EditorMaterialSwitcher::SetMaterialScheme(const std::string &_scheme)
 {
-  if (!this->camera || !this->camera->Viewport())
+  if (!this->camera || !this->camera->OgreViewport())
     return;
 
   this->materialScheme = _scheme;
   if (_scheme.empty())
   {
-    this->camera->Viewport()->setMaterialScheme(
+    this->camera->OgreViewport()->setMaterialScheme(
         this->originalMaterialScheme);
-    this->camera->Viewport()->getTarget()->removeListener(
+    this->camera->OgreViewport()->getTarget()->removeListener(
         this->renderTargetListener.get());
   }
   else
   {
     this->originalMaterialScheme =
-        this->camera->Viewport()->getMaterialScheme();
+        this->camera->OgreViewport()->getMaterialScheme();
 
-    this->camera->Viewport()->setMaterialScheme(_scheme);
-    this->camera->Viewport()->getTarget()->addListener(
+    this->camera->OgreViewport()->setMaterialScheme(_scheme);
+    this->camera->OgreViewport()->getTarget()->addListener(
         this->renderTargetListener.get());
   }
 }

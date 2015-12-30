@@ -212,7 +212,7 @@ void Distortion::SetCamera(CameraPtr _camera)
       "Gazebo/CameraDistortionMap");
   this->dataPtr->lensDistortionInstance =
       Ogre::CompositorManager::getSingleton().addCompositor(
-      _camera->Viewport(), "CameraDistortionMap/Default");
+      _camera->OgreViewport(), "CameraDistortionMap/Default");
   this->dataPtr->lensDistortionInstance->setEnabled(true);
 
   // create the distortion map texture
