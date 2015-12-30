@@ -59,7 +59,7 @@ TEST_F(Scene_TEST, AddRemoveCameras)
   EXPECT_TRUE(scene->GetCamera("test_camera") == NULL);
   EXPECT_TRUE(scene->GetCamera("test_camera2") != NULL);
 
- // Remove the remaining camera and check that it has been removed
+  // Remove the remaining camera and check that it has been removed
   scene->RemoveCamera(camera2->GetName());
   EXPECT_EQ(scene->GetCameraCount(), 0u);
   EXPECT_TRUE(scene->GetCamera("test_camera") == NULL);

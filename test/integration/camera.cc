@@ -64,8 +64,8 @@ TEST_F(CameraTest, Follow)
   transport::NodePtr node(new transport::Node());
   node->Init("default");
 
-  transport::PublisherPtr pub =
-    node->Advertise<msgs::CameraCmd>("~/test_camera_model/body/test_camera/cmd");
+  transport::PublisherPtr pub = node->Advertise<msgs::CameraCmd>(
+      "~/test_camera_model/body/test_camera/cmd");
 
   pub->WaitForConnection();
   pub->Publish(msg, true);
