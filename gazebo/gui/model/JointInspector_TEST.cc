@@ -108,7 +108,6 @@ void JointInspector_TEST::AddRemoveNestedLink()
   QVERIFY(parentBox->itemText(0) == "model_0::link1");
   QVERIFY(childBox->itemText(0) == "model_0::link1");
 
-
   // Send link inserted event
   gazebo::gui::model::Events::linkInserted("model::link2");
 
