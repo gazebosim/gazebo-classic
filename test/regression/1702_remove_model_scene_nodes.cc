@@ -119,7 +119,7 @@ void Issue1702Test::SpawnDeleteSpawnAgain(const std::string &_physicsEngine)
   // Look through a camera to ensure visuals are generated
   rendering::ScenePtr scene = rendering::get_scene();
   ASSERT_TRUE(scene != NULL);
-  rendering::CameraPtr camera = scene->GetCamera("camera");
+  rendering::CameraPtr camera = scene->GetCamera("camera::link::camera");
   ASSERT_TRUE(camera != NULL);
   int sleep = 0;
   int maxSleep = 5;
