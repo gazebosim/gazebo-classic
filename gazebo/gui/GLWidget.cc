@@ -1145,7 +1145,7 @@ void GLWidget::OnManipMode(const std::string &_mode)
               it != --this->dataPtr->selectedVisuals.end();)
       {
         (*it)->SetHighlighted(false);
-         it = this->dataPtr->selectedVisuals.erase(it);
+        it = this->dataPtr->selectedVisuals.erase(it);
       }
     }
   }

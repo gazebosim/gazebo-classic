@@ -39,7 +39,6 @@ class ModelMaker_TEST : public QTestFixture
 
   /// \brief Test creating a nested model by copying another nested model.
   private slots: void FromNestedModel();
-
 };
 
 #endif
