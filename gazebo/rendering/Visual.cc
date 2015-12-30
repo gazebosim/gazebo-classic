@@ -99,6 +99,7 @@ void Visual::Init(const std::string &_name, ScenePtr _scene,
   this->dataPtr->castShadows = true;
   this->dataPtr->visible = true;
   this->dataPtr->layer = -1;
+  this->dataPtr->inheritTransparency = true;
 
   std::string uniqueName = this->GetName();
   int index = 0;
@@ -136,6 +137,7 @@ void Visual::Init(const std::string &_name, VisualPtr _parent,
   this->dataPtr->castShadows = true;
   this->dataPtr->visible = true;
   this->dataPtr->layer = -1;
+  this->dataPtr->inheritTransparency = true;
 
   Ogre::SceneNode *pnode = NULL;
   if (_parent)
@@ -234,6 +236,7 @@ VisualPtr Visual::Clone(const std::string &_name, VisualPtr _newParent)
   VisualPtr result(new Visual(_name, _newParent));
   result->Load(this->dataPtr->sdf);
   result->SetScale(this->dataPtr->scale);
+  result->SetVisibilityFlags(this->dataPtr->visibilityFlags);
   std::string visName = this->GetName();
   for (auto iter: this->dataPtr->children)
   {
@@ -249,6 +252,7 @@ VisualPtr Visual::Clone(const std::string &_name, VisualPtr _newParent)
   if (_newParent == this->dataPtr->scene->GetWorldVisual())
     result->SetWorldPose(this->GetWorldPose());
   result->ShowCollision(false);
+  result->SetInheritTransparency(this->InheritTransparency());
 
   result->SetName(_name);
   return result;
@@ -299,6 +303,8 @@ void Visual::Init()
   this->dataPtr->ribbonTrail = NULL;
   this->dataPtr->staticGeom = NULL;
   this->dataPtr->layer = -1;
+  this->dataPtr->wireframe = false;
+  this->dataPtr->inheritTransparency = true;
   this->dataPtr->scale = ignition::math::Vector3d::One;
 
   this->dataPtr->initialized = true;
@@ -514,7 +520,8 @@ void Visual::Update()
        liter != this->dataPtr->lineVertices.end(); ++liter)
   {
     liter->first->SetPoint(liter->second,
-        Conversions::Convert(this->dataPtr->sceneNode->_getDerivedPosition()));
+        Conversions::ConvertIgn(
+          this->dataPtr->sceneNode->_getDerivedPosition()));
     liter->first->Update();
   }
 
@@ -1362,13 +1369,19 @@ common::Color Visual::GetEmissive() const
 //////////////////////////////////////////////////
 void Visual::SetWireframe(bool _show)
 {
-  std::vector<VisualPtr>::iterator iter;
-  for (iter = this->dataPtr->children.begin();
-      iter != this->dataPtr->children.end(); ++iter)
+  if (this->dataPtr->type == VT_GUI || this->dataPtr->type == VT_PHYSICS ||
+      this->dataPtr->type == VT_SENSOR)
+    return;
+
+  for (auto &iter : this->dataPtr->children)
   {
-    (*iter)->SetWireframe(_show);
+    iter->SetWireframe(_show);
   }
 
+  if (this->dataPtr->wireframe == _show)
+    return;
+
+  this->dataPtr->wireframe = _show;
   for (unsigned int i = 0; i < this->dataPtr->sceneNode->numAttachedObjects();
       i++)
   {
@@ -1411,8 +1424,17 @@ void Visual::SetWireframe(bool _show)
 }
 
 //////////////////////////////////////////////////
+bool Visual::Wireframe() const
+{
+  return this->dataPtr->wireframe;
+}
+
+//////////////////////////////////////////////////
 void Visual::SetTransparencyInnerLoop(Ogre::SceneNode *_sceneNode)
 {
+  float derivedTransparency = this->dataPtr->inheritTransparency ?
+      this->DerivedTransparency() : this->dataPtr->transparency;
+
   for (unsigned int i = 0; i < _sceneNode->numAttachedObjects(); ++i)
   {
     Ogre::Entity *entity = NULL;
@@ -1423,6 +1445,8 @@ void Visual::SetTransparencyInnerLoop(Ogre::SceneNode *_sceneNode)
     if (!entity)
       continue;
 
+    // we may not need to check for this string anymore now that each visual
+    // has a type
     if (entity->getName().find("__COLLISION_VISUAL__") != std::string::npos)
       continue;
 
@@ -1453,7 +1477,7 @@ void Visual::SetTransparencyInnerLoop(Ogre::SceneNode *_sceneNode)
             pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
           }
 
-          if (this->dataPtr->transparency > 0.0)
+          if (derivedTransparency > 0.0)
           {
             pass->setDepthWriteEnabled(false);
           }
@@ -1463,7 +1487,7 @@ void Visual::SetTransparencyInnerLoop(Ogre::SceneNode *_sceneNode)
           }
 
           dc = pass->getDiffuse();
-          dc.a = (1.0f - this->dataPtr->transparency);
+          dc.a = (1.0f - derivedTransparency);
           pass->setDiffuse(dc);
           this->dataPtr->diffuse = Conversions::Convert(dc);
 
@@ -1477,7 +1501,7 @@ void Visual::SetTransparencyInnerLoop(Ogre::SceneNode *_sceneNode)
             {
               textureUnitState->setAlphaOperation(
                   Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL, Ogre::LBS_CURRENT,
-                  1.0 - this->dataPtr->transparency);
+                  1.0 - derivedTransparency);
             }
           }
         }
@@ -1487,13 +1511,9 @@ void Visual::SetTransparencyInnerLoop(Ogre::SceneNode *_sceneNode)
 }
 
 //////////////////////////////////////////////////
-void Visual::SetTransparency(float _trans, const bool _cascade)
+void Visual::UpdateTransparency(const bool _cascade)
 {
-  if (math::equal(this->dataPtr->transparency, _trans))
-    return;
-
-  this->dataPtr->transparency = std::min(
-      std::max(_trans, static_cast<float>(0.0)), static_cast<float>(1.0));
+  this->SetTransparencyInnerLoop(this->dataPtr->sceneNode);
 
   if (_cascade)
   {
@@ -1505,26 +1525,40 @@ void Visual::SetTransparency(float _trans, const bool _cascade)
            child->GetType() == VT_PHYSICS ||
            child->GetType() == VT_SENSOR)))
       {
-        child->SetTransparency(_trans);
+        child->UpdateTransparency(_cascade);
       }
     }
-  }
-
-  this->SetTransparencyInnerLoop(this->dataPtr->sceneNode);
-
-  // For child nodes' scene nodes
-  for (unsigned int i = 0; i < this->dataPtr->sceneNode->numChildren(); ++i)
-  {
-    Ogre::SceneNode *childSceneNode = dynamic_cast<Ogre::SceneNode*>(
-        this->dataPtr->sceneNode->getChild(i));
-
-    this->SetTransparencyInnerLoop(childSceneNode);
   }
 
   if (this->dataPtr->useRTShader && this->dataPtr->scene->GetInitialized())
     RTShaderSystem::Instance()->UpdateShaders();
 
-  this->dataPtr->sdf->GetElement("transparency")->Set(_trans);
+  this->dataPtr->sdf->GetElement("transparency")->Set(
+      this->dataPtr->transparency);
+}
+
+//////////////////////////////////////////////////
+void Visual::SetTransparency(float _trans)
+{
+  if (math::equal(this->dataPtr->transparency, _trans))
+    return;
+
+  this->dataPtr->transparency = std::min(
+      std::max(_trans, static_cast<float>(0.0)), static_cast<float>(1.0));
+
+  this->UpdateTransparency(true);
+}
+
+//////////////////////////////////////////////////
+void Visual::SetInheritTransparency(const bool _inherit)
+{
+  this->dataPtr->inheritTransparency = _inherit;
+}
+
+//////////////////////////////////////////////////
+bool Visual::InheritTransparency() const
+{
+  return this->dataPtr->inheritTransparency;
 }
 
 //////////////////////////////////////////////////
@@ -1575,6 +1609,29 @@ bool Visual::GetHighlighted() const
 float Visual::GetTransparency()
 {
   return this->dataPtr->transparency;
+}
+
+//////////////////////////////////////////////////
+float Visual::DerivedTransparency() const
+{
+  if (!this->InheritTransparency())
+    return this->dataPtr->transparency;
+
+  float derivedTransparency = this->dataPtr->transparency;
+
+  VisualPtr worldVis = this->dataPtr->scene->GetWorldVisual();
+  VisualPtr vis = this->GetParent();
+
+  while (vis && vis != worldVis)
+  {
+    derivedTransparency = 1 - ((1 - derivedTransparency) *
+        (1 - vis->GetTransparency()));
+    if (!vis->InheritTransparency())
+      break;
+    vis = vis->GetParent();
+  }
+
+  return derivedTransparency;
 }
 
 //////////////////////////////////////////////////
@@ -1871,7 +1928,7 @@ void Visual::DeleteDynamicLine(DynamicLines *_line)
 void Visual::AttachLineVertex(DynamicLines *_line, unsigned int _index)
 {
   this->dataPtr->lineVertices.push_back(std::make_pair(_line, _index));
-  _line->SetPoint(_index, this->GetWorldPose().pos);
+  _line->SetPoint(_index, this->GetWorldPose().pos.Ign());
 }
 
 //////////////////////////////////////////////////
@@ -2887,7 +2944,8 @@ void Visual::SetVisibilityFlags(uint32_t _flags)
 //////////////////////////////////////////////////
 void Visual::ShowJoints(bool _show)
 {
-  if (this->GetName().find("JOINT_VISUAL__") != std::string::npos)
+  if (this->dataPtr->type == VT_PHYSICS &&
+      this->GetName().find("JOINT_VISUAL__") != std::string::npos)
     this->SetVisible(_show);
 
   for (auto &child : this->dataPtr->children)
@@ -2899,7 +2957,8 @@ void Visual::ShowJoints(bool _show)
 //////////////////////////////////////////////////
 void Visual::ShowCOM(bool _show)
 {
-  if (this->GetName().find("COM_VISUAL__") != std::string::npos)
+  if (this->dataPtr->type == VT_PHYSICS &&
+      this->GetName().find("COM_VISUAL__") != std::string::npos)
     this->SetVisible(_show);
 
   for (auto &child : this->dataPtr->children)
@@ -2911,7 +2970,8 @@ void Visual::ShowCOM(bool _show)
 //////////////////////////////////////////////////
 void Visual::ShowInertia(bool _show)
 {
-  if (this->GetName().find("INERTIA_VISUAL__") != std::string::npos)
+  if (this->dataPtr->type == VT_PHYSICS &&
+     this->GetName().find("INERTIA_VISUAL__") != std::string::npos)
     this->SetVisible(_show);
 
   for (auto &child : this->dataPtr->children)
@@ -2923,7 +2983,8 @@ void Visual::ShowInertia(bool _show)
 //////////////////////////////////////////////////
 void Visual::ShowLinkFrame(bool _show)
 {
-  if (this->GetName().find("LINK_FRAME_VISUAL__") != std::string::npos)
+  if (this->dataPtr->type == VT_PHYSICS &&
+      this->GetName().find("LINK_FRAME_VISUAL__") != std::string::npos)
     this->SetVisible(_show);
 
   for (auto &child : this->dataPtr->children)
@@ -3156,4 +3217,10 @@ msgs::Visual::Type Visual::ConvertVisualType(const Visual::VisualType &_type)
       break;
   }
   return visualType;
+}
+
+//////////////////////////////////////////////////
+bool Visual::UseRTShader() const
+{
+  return this->dataPtr->useRTShader;
 }

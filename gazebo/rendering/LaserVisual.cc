@@ -124,13 +124,13 @@ void LaserVisual::Update()
       dPtr->rayFans.push_back(
           this->CreateDynamicLine(rendering::RENDERING_TRIANGLE_FAN));
       dPtr->rayFans[j]->setMaterial("Gazebo/BlueLaser");
-      dPtr->rayFans[j]->AddPoint(math::Vector3(0, 0, 0));
+      dPtr->rayFans[j]->AddPoint(ignition::math::Vector3d(0, 0, 0));
 
       // No hit ray fans display rays that do not hit obstacles.
       dPtr->noHitRayFans.push_back(
           this->CreateDynamicLine(rendering::RENDERING_TRIANGLE_FAN));
       dPtr->noHitRayFans[j]->setMaterial("Gazebo/LightBlueLaser");
-      dPtr->noHitRayFans[j]->AddPoint(math::Vector3(0, 0, 0));
+      dPtr->noHitRayFans[j]->AddPoint(ignition::math::Vector3d(0, 0, 0));
 
       dPtr->rayLines.push_back(
           this->CreateDynamicLine(rendering::RENDERING_LINE_LIST));

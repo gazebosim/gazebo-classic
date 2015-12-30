@@ -121,7 +121,7 @@ void LinkConfig::SetInertialPose(const ignition::math::Pose3d &_pose)
 /////////////////////////////////////////////////
 msgs::Link *LinkConfig::GetData() const
 {
-  return dynamic_cast<msgs::Link *>(this->configWidget->GetMsg());
+  return dynamic_cast<msgs::Link *>(this->configWidget->Msg());
 }
 
 /////////////////////////////////////////////////
@@ -142,4 +142,10 @@ void LinkConfig::RestoreOriginalData()
   this->configWidget->blockSignals(true);
   this->Update(linkPtr);
   this->configWidget->blockSignals(false);
+}
+
+/////////////////////////////////////////////////
+const ConfigWidget *LinkConfig::LinkConfigWidget() const
+{
+  return this->configWidget;
 }

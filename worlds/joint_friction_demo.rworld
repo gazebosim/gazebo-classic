@@ -196,6 +196,17 @@
       <pose><%= dd*2.1*i %> <%= dd*3 %> <%= dd*1.8 %>  0 0 0</pose>
       <link name="link">
         <pose>0 0 <%= -dd/2 %>  0 0 0</pose>
+        <inertial>
+          <mass><%= mass %></mass>
+          <inertia>
+            <ixx><%= ixx %></ixx>
+            <iyy><%= iyy %></iyy>
+            <izz><%= izz %></izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
         <collision name="collision">
           <geometry>
             <box>

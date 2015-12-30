@@ -1954,6 +1954,9 @@ void Scene::PreRender()
         std::front_inserter(this->dataPtr->linkMsgs));
   }
 
+  // update the rt shader
+  RTShaderSystem::Instance()->Update();
+
   {
     boost::recursive_mutex::scoped_lock lock(this->dataPtr->poseMsgMutex);
 
@@ -2105,7 +2108,7 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
     if (!parentVis)
       return false;
 
-    // image size is 0 if renering is unavailable
+    // image size is 0 if rendering is unavailable
     if (_msg->camera().image_size().x() > 0 &&
         _msg->camera().image_size().y() > 0)
     {
@@ -2655,7 +2658,8 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
       visual->ShowLinkFrame(this->dataPtr->showLinkFrames);
       visual->ShowCollision(this->dataPtr->showCollisions);
       visual->ShowJoints(this->dataPtr->showJoints);
-      visual->SetTransparency(this->dataPtr->transparent ? 0.5 : 0.0);
+      if (visual->GetType() == Visual::VT_MODEL)
+        visual->SetTransparency(this->dataPtr->transparent ? 0.5 : 0.0);
       visual->SetWireframe(this->dataPtr->wireframe);
     }
   }
@@ -3062,10 +3066,10 @@ void Scene::SetVisualId(VisualPtr _vis, uint32_t _id)
 /////////////////////////////////////////////////
 void Scene::AddLight(LightPtr _light)
 {
-  std::string n = this->StripSceneName(_light->GetName());
-  Light_M::iterator iter = this->dataPtr->lights.find(n);
+  std::string n = this->StripSceneName(_light->Name());
+  const auto iter = this->dataPtr->lights.find(n);
   if (iter != this->dataPtr->lights.end())
-    gzerr << "Duplicate lights detected[" << _light->GetName() << "]\n";
+    gzerr << "Duplicate lights detected[" << _light->Name() << "]\n";
 
   this->dataPtr->lights[n] = _light;
 }
@@ -3076,7 +3080,7 @@ void Scene::RemoveLight(LightPtr _light)
   if (_light)
   {
     // Delete the light
-    std::string n = this->StripSceneName(_light->GetName());
+    std::string n = this->StripSceneName(_light->Name());
     this->dataPtr->lights.erase(n);
   }
 }
@@ -3211,12 +3215,8 @@ void Scene::SetTransparent(bool _show)
   this->dataPtr->transparent = _show;
   for (auto visual : this->dataPtr->visuals)
   {
-    if (visual.second->GetType() != Visual::VT_GUI &&
-        visual.second->GetType() != Visual::VT_PHYSICS &&
-        visual.second->GetType() != Visual::VT_SENSOR)
-    {
+    if (visual.second->GetType() == Visual::VT_MODEL)
       visual.second->SetTransparency(_show ? 0.5 : 0.0);
-    }
   }
 }
 

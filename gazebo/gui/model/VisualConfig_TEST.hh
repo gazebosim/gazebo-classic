@@ -28,6 +28,15 @@ class VisualConfig_TEST : public QTestFixture
   /// \brief Constructor
   public: VisualConfig_TEST() = default;
 
+  /// \brief Test initialization.
+  private slots: void Initialization();
+
+  /// \brief Test visual data management
+  private slots: void VisualUpdates();
+
+  /// \brief Test geometry data management
+  private slots: void GeometryUpdates();
+
   /// \brief Test that the Applied signal is emitted when widgets are edited.
   private slots: void AppliedSignal();
 

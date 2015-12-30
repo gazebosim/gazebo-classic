@@ -591,6 +591,7 @@ void ModelMaker_TEST::FromNestedModel()
 
   // Check the clone is in the left panel
   hasModel = mainWindow->HasEntityName("model_00_clone");
+  hasModel = mainWindow->HasEntityName("model_00_clone");
   QVERIFY(hasModel);
 
   // Terminate

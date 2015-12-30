@@ -21,8 +21,7 @@
 #endif
 
 #include <boost/algorithm/string.hpp>
-#include <boost/bind.hpp>
-#include <boost/function.hpp>
+#include <functional>
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Entity.hh"
 #include "gazebo/physics/Model.hh"
@@ -54,7 +53,7 @@ GpuRaySensor::GpuRaySensor()
   this->active = false;
   this->connections.push_back(
       event::Events::ConnectRender(
-        boost::bind(&GpuRaySensor::Render, this)));
+        std::bind(&GpuRaySensor::Render, this)));
 }
 
 //////////////////////////////////////////////////
@@ -378,12 +377,6 @@ double GpuRaySensor::GetRangeCountRatio() const
 }
 
 //////////////////////////////////////////////////
-math::Angle GpuRaySensor::GetAngleMin() const
-{
-  return this->AngleMin();
-}
-
-//////////////////////////////////////////////////
 ignition::math::Angle GpuRaySensor::AngleMin() const
 {
   return this->horzElem->Get<double>("min_angle");
@@ -393,12 +386,6 @@ ignition::math::Angle GpuRaySensor::AngleMin() const
 void GpuRaySensor::SetAngleMin(double _angle)
 {
   this->horzElem->GetElement("min_angle")->Set(_angle);
-}
-
-//////////////////////////////////////////////////
-math::Angle GpuRaySensor::GetAngleMax() const
-{
-  return this->AngleMax();
 }
 
 //////////////////////////////////////////////////
@@ -477,12 +464,6 @@ int GpuRaySensor::GetVerticalRangeCount() const
 }
 
 //////////////////////////////////////////////////
-math::Angle GpuRaySensor::GetVerticalAngleMin() const
-{
-  return this->VerticalAngleMin();
-}
-
-//////////////////////////////////////////////////
 ignition::math::Angle GpuRaySensor::VerticalAngleMin() const
 {
   if (this->scanElem->HasElement("vertical"))
@@ -496,12 +477,6 @@ void GpuRaySensor::SetVerticalAngleMin(double _angle)
 {
   if (this->scanElem->HasElement("vertical"))
     this->vertElem->GetElement("min_angle")->Set(_angle);
-}
-
-//////////////////////////////////////////////////
-math::Angle GpuRaySensor::GetVerticalAngleMax() const
-{
-  return this->VerticalAngleMax();
 }
 
 //////////////////////////////////////////////////
@@ -580,7 +555,7 @@ void GpuRaySensor::Render()
 }
 
 //////////////////////////////////////////////////
-bool GpuRaySensor::UpdateImpl(bool /*_force*/)
+bool GpuRaySensor::UpdateImpl(const bool /*_force*/)
 {
   if (!this->rendered)
     return false;
@@ -660,7 +635,7 @@ bool GpuRaySensor::UpdateImpl(bool /*_force*/)
 }
 
 //////////////////////////////////////////////////
-bool GpuRaySensor::IsActive()
+bool GpuRaySensor::IsActive() const
 {
   return Sensor::IsActive() ||
     (this->scanPub && this->scanPub->HasConnections());

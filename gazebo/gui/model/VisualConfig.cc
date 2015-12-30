@@ -310,7 +310,7 @@ msgs::Visual *VisualConfig::GetData(const std::string &_name) const
   for (auto const &it : this->configs)
   {
     if (it.second->name == _name)
-      return dynamic_cast<msgs::Visual *>(it.second->configWidget->GetMsg());
+      return dynamic_cast<msgs::Visual *>(it.second->configWidget->Msg());
   }
   return NULL;
 }
@@ -328,7 +328,7 @@ void VisualConfig::SetGeometry(const std::string &_name,
       std::string type = it.second->configWidget->GeometryWidgetValue(
           "geometry", dimensions, uri);
       it.second->configWidget->SetGeometryWidgetValue("geometry", type,
-          _size, _uri);
+          _size.Ign(), _uri);
       break;
     }
   }
@@ -371,6 +371,12 @@ void VisualConfig::SetMaterial(const std::string &_name,
       break;
     }
   }
+}
+
+/////////////////////////////////////////////////
+const std::map<int, VisualConfigData *> &VisualConfig::ConfigData() const
+{
+  return this->configs;
 }
 
 /////////////////////////////////////////////////

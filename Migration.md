@@ -16,7 +16,22 @@ release will remove the deprecated code.
     + public: bool RemoveJoint(const std::string &_name);
     + public: boost::shared_ptr<Model> shared_from_this();
 
+1. **gazebo/physics/SurfaceParams.hh**
+    + public: double PoissonsRatio() const;
+    + public: void SetPoissonsRatio(double _ratio);
+    + public: double ElasticModulus() const;
+    + public: void SetElasticModulus(double _modulus);
+
 ### Modifications
+
+1. **gazebo/rendering/DepthCamera.hh**
+    + ***Removed:*** public: template<typename T> event::ConnectionPtr ConnectNewDepthFrame(T _subscriber)
+    + ***Replacement:*** public: event::ConnectionPtr ConnectNewDepthFrame(std::function<void (const float *, unsigned int, unsigned int, unsigned int, const std::string &)>  _subscriber);
+    + ***Removed:*** public: template<typename T> event::ConnectionPtr ConnectNewRGBPointCloud(T _subscriber)
+    + ***Replacement:*** public: event::ConnectionPtr ConnectNewRGBPointCloud(std::function<void (const float *, unsigned int, unsigned int, unsigned int, const std::string &)>  _subscriber);
+
+1. **gazebo/physics/Actor.hh**
+    + Type change of `protected: math::Vector3 lastPos;` to `protected: ignition::math::Vector3d lastPos;`
 
 1. **gazebo/rendering/RenderTypes.hh**
     + typedefs for Visual and its derived classes have been changed from boost to std pointers.
@@ -70,7 +85,213 @@ release will remove the deprecated code.
     + ***Removed:*** public: virtual void Stop() = 0;
     + ***Replacement:*** public: virtual void Stop();
 
+1. **gazebo/gui/ModelAlign.hh**
+    + ***Removed:*** public: void AlignVisuals(std::vector<rendering::VisualPtr> _visuals, const std::string &_axis, const std::string &_config, const std::string &_target, bool _publish = true);
+    + ***Replacement:*** public: void AlignVisuals(std::vector<rendering::VisualPtr> _visuals, const std::string &_axis, const std::string &_config, const std::string &_target, bool _publish = true, const bool _inverted = false);
+
+1. **gazebo/gui/GuiEvents.hh**
+    + ***Removed:*** public: static event::EventT<void (std::string, std::string, std::string, bool)> alignMode; std::string, std::string, bool)> alignMode;
+    + ***Replacement:*** public: static event::EventT<void (std::string, std::string, std::string, bool)> alignMode; std::string, std::string, bool, bool)> alignMode;
+
 ### Deprecations
+
+1. **gazebo/rendering/DepthCamera.hh**
+    + ***Deprecation:*** public: virtual const float *GetDepthData();
+    + ***Replacement:*** public: virtual const float *DepthData() const;
+
+1. **gazebo/rendering/DynamicLines.hh**
+    + ***Deprecation:*** public: void AddPoint(const math::Vector3 &_pt,const common::Color &_color = common::Color::White)
+    + ***Replacement:*** public: void AddPoint(const ignition::math::Vector3d &_pt,const common::Color &_color = common::Color::White);
+    + ***Deprecation:*** public: void SetPoint(unsigned int _index, const math::Vector3 &_value)
+    + ***Replacement:*** public: void SetPoint(unsigned int _index,const ignition::math::Vector3d &_value);
+    + ***Deprecation:*** public: math::Vector3 GetPoint(unsigned int _index) const
+    + ***Replacement:*** public: ignition::math::Vector3d Point(const unsigned int _index) const;
+
+1. **gazebo/rendering/WindowManager.hh**
+    + ***Deprecation:*** public: uint32_t GetAvgFPS(uint32_t _id);
+    + ***Replacement:*** public: uint32_t AvgFPS(const uint32_t _id) const;
+    + ***Deprecation:*** public: uint32_t GetTriangleCount(uint32_t _id);
+    + ***Replacement:*** public: uint32_t TriangleCount(const uint32_t _id) const;
+    + ***Deprecation:*** public: Ogre::RenderWindow *GetWindow(uint32_t _id);
+    + ***Replacement:*** public: Ogre::RenderWindow *Window(const uint32_t _id) const;
+
+1. **gazebo/rendering/Light.hh**
+    + ***Deprecation:*** public: std::string GetName() const;
+    + ***Replacement:*** public: std::string Name() const;
+    + ***Deprecation:*** public: std::string GetType() const;
+    + ***Replacement:*** public: std::string Type() const;
+    + ***Deprecation:*** public: public: void SetPosition(const math::Vector3 &_p);
+    + ***Replacement:*** public: void SetPosition(const ignition::math::Vector3d &_p);
+    + ***Deprecation:*** public: math::Vector3 GetPosition();
+    + ***Replacement:*** public: ignition::math::Vector3d Position() const;
+    + ***Deprecation:*** public: void SetRotation(const math::Quaternion &_q);
+    + ***Replacement:*** public: void SetRotation(const ignition::math::Quaterniond &_q);
+    + ***Deprecation:*** public: math::Quaternion GetRotation() const;
+    + ***Replacement:*** public: ignition::math::Quaterniond Rotation() const;
+    + ***Deprecation:*** public: bool GetVisible() const;
+    + ***Replacement:*** public: bool Visible() const;
+    + ***Deprecation:*** public: common::Color GetDiffuseColor() const;
+    + ***Replacement:*** public: common::Color DiffuseColor() const;
+    + ***Deprecation:*** public: common::Color GetSpecularColor() const;
+    + ***Replacement:*** public: common::Color SpecularColor() const;
+    + ***Deprecation:*** public: void SetDirection(const math::Vector3 &_dir);
+    + ***Replacement:*** public: void SetDirection(const ignition::math::Vector3d &_dir);
+    + ***Deprecation:*** public: math::Vector3 GetDirection() const;
+    + ***Replacement:*** public: ignition::math::Vector3d Direction() const;
+
+1. **gazebo/util/Diagnostics.hh**
+    + ***Deprecation:*** public: int GetTimerCount() const;
+    + ***Replacement:*** public: int TimerCount() const;
+    + ***Deprecation:*** public: common::Time GetTime(int _index) const;
+    + ***Replacement:*** public: common::Time Time(const int _index) const;
+    + ***Deprecation:*** public: common::Time GetTime(const std::string &_label) const;
+    + ***Replacement:*** public: common::Time Time(const std::string &_label) const;
+    + ***Deprecation:*** public: std::string GetLabel(int _index) const;
+    + ***Replacement:*** public: std::string Label(const int _index) const;
+    + ***Deprecation:*** public: boost::filesystem::path GetLogPath() const
+    + ***Replacement:*** public: boost::filesystem::path LogPath() const;
+
+1. **gazebo/util/LogPlay.hh**
+    + ***Deprecation:*** public: std::string GetLogVersion() const;
+    + ***Replacement:*** public: std::string LogVersion() const;
+    + ***Deprecation:*** public: std::string GetGazeboVersion() const;
+    + ***Replacement:*** public: std::string GazeboVersion() const;
+    + ***Deprecation:*** public: uint32_t GetRandSeed() const
+    + ***Replacement:*** public: uint32_t RandSeed() const;
+    + ***Deprecation:*** public: common::Time GetLogStartTime() const;
+    + ***Replacement:*** public: common::Time LogStartTime() const;
+    + ***Deprecation:*** public: common::Time GetLogEndTime() const;
+    + ***Replacement:*** public: common::Time LogEndTime() const;
+    + ***Deprecation:*** public: std::string GetFilename() const;
+    + ***Replacement:*** public: std::string Filename() const;
+    + ***Deprecation:*** public: std::string GetFullPathFilename() const;
+    + ***Replacement:*** public: std::string FullPathFilename() const;
+    + ***Deprecation:*** public: uintmax_t GetFileSize() const
+    + ***Replacement:*** public: uintmax_t FileSize() const;
+    + ***Deprecation:*** public: unsigned int GetChunkCount() const;
+    + ***Replacement:*** public: unsigned int ChunkCount() const;
+    + ***Deprecation:*** public: bool GetChunk(unsigned int _index, std::string &_data);
+    + ***Replacement:*** public: bool Chunk(const unsigned int _index, std::string &_data) const;
+    + ***Deprecation:*** public: std::string GetEncoding() const
+    + ***Replacement:*** public: std::string Encoding() const;
+    + ***Deprecation:*** public: std::string GetHeader() const
+    + ***Replacement:*** public: std::string Header() const;
+    + ***Deprecation:*** public: uint64_t GetInitialIterations() const
+    + ***Replacement:*** public: uint64_t InitialIterations() const;
+
+1. **gazebo/rendering/ApplyWrenchVisual.hh**
+    + ***Deprecation:*** public: void SetCoM(const math::Vector3 &_comVector)
+    + ***Replacement:*** public: void SetCoM(const ignition::math::Vector3d &_comVector);
+    + ***Deprecation:*** public: void SetForcePos(const math::Vector3 &_forcePosVector)
+    + ***Replacement:*** public: void SetForcePos(const ignition::math::Vector3d &_forcePosVector);
+    + ***Deprecation:*** public: void SetForce(const math::Vector3 &_forceVector,const bool _rotatedByMouse);
+    + ***Replacement:*** public: void SetForce(const ignition::math::Vector3d &_forceVector, const bool _rotatedByMouse);
+    + ***Deprecation:*** public: void SetTorque(const math::Vector3 &_torqueVector,const bool _rotatedByMouse);
+    + ***Replacement:*** public: void SetTorque(const ignition::math::Vector3d &_torqueVector, const bool _rotatedByMouse);
+
+1. **gazebo/rendering/AxisVisual.hh**
+    + ***Deprecation:*** public: void ScaleXAxis(const math::Vector3 &_scale)
+    + ***Replacement:*** public: void ScaleXAxis(const ignition::math::Vector3d &_scale);
+    + ***Deprecation:*** public: void ScaleYAxis(const math::Vector3 &_scale)
+    + ***Replacement:*** public: void ScaleYAxis(const ignition::math::Vector3d &_scale);
+    + ***Deprecation:*** public: void ScaleZAxis(const math::Vector3 &_scale)
+    + ***Replacement:*** public: void ScaleZAxis(const ignition::math::Vector3d &_scale);
+
+1. **gazebo/gui/CloneWindow.hh**
+    + ***Deprecation:*** int GetPort()
+    + ***Replacement:*** int Port() const
+
+1. **gazebo/gui/ConfigWidget.hh**
+    + ***Deprecation:*** public: google::protobuf::Message *GetMsg()
+    + ***Replacement:*** public: google::protobuf::Message *Msg()
+    + ***Deprecation:*** public: std::string GetHumanReadableKey(const std::string &_key)
+    + ***Replacement:*** public: std::string HumanReadableKey(const std::string &_key) const
+    + ***Deprecation:*** public: std::string GetUnitFromKey(const std::string &_key, const std::string &_jointType = "")
+    + ***Replacement:*** public: std::string UnitFromKey(const std::string &_key, const std::string &_jointType = "") const
+    + ***Deprecation:*** public: void GetRangeFromKey(const std::string &_key, double &_min, double &_max)
+    + ***Replacement:*** public: void RangeFromKey(const std::string &_key, double &_min, double &_max) const
+    + ***Deprecation:*** public: bool GetWidgetVisible(const std::string &_name)
+    + ***Replacement:*** public: bool WidgetVisible(const std::string &_name) const
+    + ***Deprecation:*** public: bool GetWidgetReadOnly(const std::string &_name) const
+    + ***Replacement:*** public: bool WidgetReadOnly(const std::string &_name) const
+    + ***Deprecation:*** public: bool SetVector3WidgetValue(const std::string &_name, const math::Vector3 &_value)
+    + ***Replacement:*** public: bool SetVector3dWidgetValue(const std::string &_name, const ignition::math::Vector3d &_value)
+    + ***Deprecation:*** public: bool SetPoseWidgetValue(const std::string &_name, const math::Pose &_value)
+    + ***Replacement:*** public: bool SetPoseWidgetValue(const std::string &_name, const ignition::math::Pose3d &_value)
+    + ***Deprecation:*** public: bool SetGeometryWidgetValue(const std::string &_name, const std::string &_value, const math::Vector3 &_dimensions, const std::string &_uri = "")
+    + ***Replacement:*** public: bool SetGeometryWidgetValue(const std::string &_name, const std::string &_value, const ignition::math::Vector3d &_dimensions, const std::string &_uri = "")
+    + ***Deprecation:*** public: int GetIntWidgetValue(const std::string &_name) const
+    + ***Replacement:*** public: int IntWidgetValue(const std::string &_name) const
+    + ***Deprecation:*** public: unsigned int GetUIntWidgetValue(const std::string &_name) const
+    + ***Replacement:*** public: unsigned int UIntWidgetValue(const std::string &_name) const
+    + ***Deprecation:*** public: double GetDoubleWidgetValue(const std::string &_name) const
+    + ***Replacement:*** public: double DoubleWidgetValue(const std::string &_name) const
+    + ***Deprecation:*** public: bool GetBoolWidgetValue(const std::string &_name) const
+    + ***Replacement:*** public: bool BoolWidgetValue(const std::string &_name) const
+    + ***Deprecation:*** public: std::string GetStringWidgetValue(const std::string &_name) const
+    + ***Replacement:*** public: std::string StringWidgetValue(const std::string &_name) const
+    + ***Deprecation:*** public: math::Vector3 GetVector3WidgetValue(const std::string &_name)
+    + ***Replacement:*** public: ignition::math::Vector3d Vector3dWidgetValue(const std::string &_name) const
+    + ***Deprecation:*** public: common::Color GetColorWidgetValue(const std::string &_name) const
+    + ***Replacement:*** public: common::Color ColorWidgetValue(const std::string &_name) const
+    + ***Deprecation:*** public: math::Pose GetPoseWidgetValue(const std::string &_name) const
+    + ***Replacement:*** public: ignition::math::Pose3d PoseWidgetValue(const std::string &_name) const
+    + ***Deprecation:*** public: std::string GetGeometryWidgetValue(const std::string &_name, math::Vector3 &_dimensions, std::string &_uri) const
+    + ***Replacement:*** public: std::string GeometryWidgetValue(const std::string &_name, ignition::math::Vector3d &_dimensions, std::string &_uri) const
+    + ***Deprecation:*** public: std::string GetEnumWidgetValue(const std::string &_name) const
+    + ***Replacement:*** public: std::string EnumWidgetValue(const std::string &_name) const
+
+1. **gazebo/gui/GLWidget.hh**
+    + ***Deprecation:*** rendering::UserCameraPtr GetCamera() const
+    + ***Replacement:*** rendering::UserCameraPtr Camera() const
+    + ***Deprecation:*** rendering::ScenePtr GetScene() const
+    + ***Replacement:*** rendering::ScenePtr Scene() const
+
+1. **gazebo/gui/KeyEventHandler.hh**
+    + ***Deprecation:*** bool GetAutoRepeat() const
+    + ***Replacement:*** bool AutoRepeat() const
+
+1. **gazebo/rendering/Camera.hh**
+    + ***Deprecation:*** public: math::Vector3 GetWorldPosition() const
+    + ***Replacement:*** public: ignition::math::Vector3d WorldPosition() const;
+    + ***Deprecation:*** public: math::Quaternion GetWorldRotation() const 
+    + ***Replacement:*** public: ignition::math::Quaterniond WorldRotation() const;
+    + ***Deprecation:*** public: virtual void SetWorldPose(const math::Pose &_pose)
+    + ***Replacement:*** public: virtual void SetWorldPose(const ignition::math::Pose3d &_pose);
+    + ***Deprecation:***  public: math::Pose GetWorldPose() const
+    + ***Replacement:*** public: ignition::math::Pose3d WorldPose() const;
+    + ***Deprecation:*** public: void SetWorldPosition(const math::Vector3 &_pos);
+    + ***Replacement:*** public: void SetWorldPosition(const ignition::math::Vector3d &_pos);
+    + ***Deprecation:*** public: void SetWorldRotation(const math::Quaternion &_quat);
+    + ***Replacement:*** public: void SetWorldRotation(const ignition::math::Quaterniond &_quat);
+    + ***Deprecation:*** public: void Translate(const math::Vector3 &_direction)
+    + ***Replacement:*** public: void Translate(const ignition::math::Vector3d &_direction);
+    + ***Deprecation:***  public: void Roll(const math::Angle &_angle,Ogre::Node::TransformSpace _relativeTo =Ogre::Node::TS_LOCAL);
+    + ***Replacement:*** public: void Roll(const ignition::math::Angle &_angle,Ogre::Node::TransformSpace _relativeTo =Ogre::Node::TS_LOCAL);
+    + ***Deprecation:***  public: void Pitch(const math::Angle &_angle,Ogre::Node::TransformSpace _relativeTo =Ogre::Node::TS_LOCAL);
+    + ***Replacement:*** public: void Pitch(const ignition::math::Angle &_angle,Ogre::Node::TransformSpace _relativeTo =Ogre::Node::TS_LOCAL);
+    + ***Deprecation:***  public: void Yaw(const math::Angle &_angle,Ogre::Node::TransformSpace _relativeTo =Ogre::Node::TS_LOCAL);
+    + ***Replacement:*** public: void Yaw(const ignition::math::Angle &_angle,Ogre::Node::TransformSpace _relativeTo =Ogre::Node::TS_LOCAL);
+    + ***Deprecation:*** public: void SetHFOV(math::Angle _angle);
+    + ***Replacement:*** public: void SetHFOV(const ignition::math::Angle &_angle);
+    + ***Deprecation:*** public: math::Angle GetHFOV() const
+    + ***Replacement:*** public: ignition::math::Angle HFOV() const;
+    + ***Deprecation:*** public: math::Angle GetVFOV() const;
+    + ***Replacement:*** public: ignition::math::Angle VFOV() const;
+    + ***Deprecation:*** public: math::Vector3 GetUp();
+    + ***Replacement:*** public: ignition::math::Vector3d Up() const;
+    + ***Deprecation:*** public: math::Vector3 GetRight();
+    + ***Replacement:*** public: ignition::math::Vector3d Right() const;
+    + ***Deprecation:*** public: void GetCameraToViewportRay(int _screenx, int _screeny,math::Vector3 &_origin, math::Vector3 &_dir);
+    + ***Replacement:*** public: void CameraToViewportRay(int _screenx, int _screeny,ignition::math::Vector3d &_origin,ignition::math::Vector3d &_dir) const;
+    + ***Deprecation:*** public: bool GetWorldPointOnPlane(int _x, int _y,const math::Plane &_plane, math::Vector3 &_result);
+    + ***Replacement:*** public: bool WorldPointOnPlane(int _x, int _y,const ignition::math::Planed &_plane,ignition::math::Vector3d &_result);
+    + ***Deprecation:*** public: math::Vector3 GetDirection();
+    + ***Replacement:*** public: ignition::math::Vector3d Direction() const;
+    + ***Deprecation:*** public: virtual bool MoveToPosition(const math::Pose &_pose,double _time);
+    + ***Replacement:***  public: virtual bool MoveToPosition(const ignition::math::Pose3d &_pose,double _time);
+    + ***Deprecation:*** public: bool MoveToPositions(const std::vector<math::Pose> &_pts,double _time,boost::function<void()> _onComplete = NULL);
+    + ***Replacement:*** public: bool MoveToPositions(const std::vector<ignition::math::Pose3d> &_pts,double _time,boost::function<void()> _onComplete = NULL);
 
 1. **gazebo/gui/RTShaderSystem.hh**
     + ***Deprecation:*** void AttachEntity(Visual *vis)
@@ -81,6 +302,8 @@ release will remove the deprecated code.
     + ***No replacement for DetachEntity ***
 
 ### Deletions
+
+1. **plugins/rest_web/RestUiLogoutDialog.hh.hh**
 
 1. **gazebo rendering libraries**
     * The following libraries have been removed: `libgazebo_skyx`, `libgazebo_selection_buffer`, `libgazebo_rendering_deferred`. Gazebo now combines all the different rendering libraries into `libgazebo_rendering.so`.
@@ -107,6 +330,43 @@ release will remove the deprecated code.
     + public: virtual void OnMouseDrag(const common::MouseEvent &_event);
     + protected: math::Vector3 GetSnappedPoint(math::Vector3 _p);
 
+1. **gazebo/sensors/ForceTorqueSensor.hh**
+    + public: math::Vector3 GetTorque() const
+    + public: math::Vector3 GetForce() const
+
+1. **gazebo/sensors/GpsSensor.hh**
+    + public: math::Angle GetLongitude()
+    + public: math::Angle GetLatitude()
+
+1. **gazebo/sensors/GpuRaySensor.hh**
+    + public: math::Angle GetAngleMin() const
+    + public: math::Angle GetAngleMax() const
+    + public: math::Angle GetVerticalAngleMin() const
+    + public: math::Angle GetVerticalAngleMax() const
+
+1. **gazebo/sensors/ImuSensor.hh**
+    + public: math::Vector3 GetAngularVelocity() const
+    + public: math::Vector3 GetLinearAcceleration() const
+    + public: math::Quaternion GetOrientation() const
+
+1. **gazebo/sensors/RFIDSensor.hh**
+    + private: bool CheckTagRange(const math::Pose &_pose)
+
+1. **gazebo/sensors/RFIDTag.hh**
+    + public: math::Pose GetTagPose() const
+
+1. **gazebo/sensors/RaySensor.hh**
+    + public: math::Angle GetAngleMin() const
+    + public: math::Angle GetAngleMax() const
+    + public: math::Angle GetVerticalAngleMin() const
+    + public: math::Angle GetVerticalAngleMax() const
+
+1. **gazebo/sensors/Sensor.hh**
+    + public: virtual math::Pose GetPose() const
+    + public: NoisePtr GetNoise(unsigned int _index = 0) const
+
+1. **gazebo/sensors/WirelessTransmitter.hh**
+    + public: double GetSignalStrength(const math::Pose &_receiver, const double _rxGain)
 
 ## Gazebo 5.X to 6.X
 
@@ -362,6 +622,8 @@ release will remove the deprecated code.
     * [Pull request #1778](https://bitbucket.org/osrf/gazebo/pull-request/1778)
 
 1. Gazebo client's should now use `gazebo/gazebo_client.hh` and `libgazebo_client.so` instead of `gazebo/gazebo.hh` and `libgazebo.so`. This separates running a Gazebo server from a Gazebo client.
+    + ***Removed:*** bool gazebo::setupClient(int _argc = 0, char **_argv = 0);
+    + ***Replacement:*** bool gazebo::client::setup(int _argc = 0, char **_argv = 0);
 
 1. **gazebo/rendering/GpuLaser.hh**
     + ***Removed:*** protected: double near

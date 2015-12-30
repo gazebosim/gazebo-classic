@@ -292,3 +292,21 @@ QAction *TopToolbar::InsertWidget(const QString &_before, QWidget *_widget)
 
   return this->dataPtr->toolbar->insertWidget(beforeAction, _widget);
 }
+
+/////////////////////////////////////////////////
+void TopToolbar::AddAction(QAction *_action)
+{
+  this->dataPtr->toolbar->addAction(_action);
+}
+
+/////////////////////////////////////////////////
+QAction *TopToolbar::AddSeparator()
+{
+  return this->dataPtr->toolbar->addSeparator();
+}
+
+/////////////////////////////////////////////////
+QAction *TopToolbar::AddWidget(QWidget *_widget)
+{
+  return this->dataPtr->toolbar->addWidget(_widget);
+}
