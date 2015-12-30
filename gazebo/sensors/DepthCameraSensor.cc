@@ -20,7 +20,7 @@
   #include <Winsock2.h>
 #endif
 
-#include <boost/bind.hpp>
+#include <functional>
 #include <sstream>
 
 #include "gazebo/physics/World.hh"
@@ -142,7 +142,7 @@ const float *DepthCameraSensor::GetDepthData() const
 }
 
 //////////////////////////////////////////////////
-bool DepthCameraSensor::UpdateImpl(bool /*_force*/)
+bool DepthCameraSensor::UpdateImpl(const bool /*_force*/)
 {
   if (!this->rendered)
     return false;
@@ -172,7 +172,7 @@ bool DepthCameraSensor::UpdateImpl(bool /*_force*/)
     if (!this->depthBuffer)
       this->depthBuffer = new float[depthSamples];
 
-    memcpy(this->depthBuffer, depthCamera->GetDepthData(), depthBufferSize);
+    memcpy(this->depthBuffer, depthCamera->DepthData(), depthBufferSize);
 
     for (unsigned int i = 0; i < depthSamples; ++i)
     {

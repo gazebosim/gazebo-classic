@@ -528,7 +528,7 @@ void Heightmap::ConfigureTerrainDefaults()
   for (unsigned int i = 0; i < this->scene->GetLightCount(); ++i)
   {
     LightPtr light = this->scene->GetLight(i);
-    if (light->GetType() == "directional")
+    if (light->Type() == "directional")
     {
       directionalLight = light;
       break;
@@ -543,10 +543,10 @@ void Heightmap::ConfigureTerrainDefaults()
   if (directionalLight)
   {
     this->terrainGlobals->setLightMapDirection(
-        Conversions::Convert(directionalLight->GetDirection()));
+        Conversions::Convert(directionalLight->Direction()));
 
     this->terrainGlobals->setCompositeMapDiffuse(
-        Conversions::Convert(directionalLight->GetDiffuseColor()));
+        Conversions::Convert(directionalLight->DiffuseColor()));
   }
   else
   {

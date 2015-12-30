@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_CAMERASENSOR_HH_
-#define _GAZEBO_CAMERASENSOR_HH_
+#ifndef _GAZEBO_SENSORS_CAMERASENSOR_HH_
+#define _GAZEBO_SENSORS_CAMERASENSOR_HH_
 
 #include <string>
 
@@ -85,10 +85,10 @@ namespace gazebo
       public: bool SaveFrame(const std::string &_filename);
 
       // Documentation inherited
-      public: virtual bool IsActive();
+      public: virtual bool IsActive() const;
 
       // Documentation inherited
-      protected: virtual bool UpdateImpl(bool _force);
+      protected: virtual bool UpdateImpl(const bool _force);
 
       /// \brief Finalize the camera
       protected: virtual void Fini();

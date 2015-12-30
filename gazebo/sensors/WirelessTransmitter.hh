@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_WIRELESS_TRANSMITTER_HH_
-#define _GAZEBO_WIRELESS_TRANSMITTER_HH_
+#ifndef _GAZEBO_SENSORS_WIRELESSTRANSMITTER_HH_
+#define _GAZEBO_SENSORS_WIRELESSTRANSMITTER_HH_
 
 #include <string>
 #include "gazebo/physics/physics.hh"
@@ -53,7 +53,7 @@ namespace gazebo
       public: virtual ~WirelessTransmitter();
 
       // Documentation inherited
-      protected: virtual bool UpdateImpl(bool _force);
+      protected: virtual bool UpdateImpl(const bool _force);
 
       // Documentation inherited
       public: virtual void Load(const std::string &_worldName);

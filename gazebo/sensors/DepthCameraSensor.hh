@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_DEPTHCAMERASENSOR_HH_
-#define _GAZEBO_DEPTHCAMERASENSOR_HH_
+#ifndef _GAZEBO_SENSORS_DEPTHCAMERASENSOR_HH_
+#define _GAZEBO_SENSORS_DEPTHCAMERASENSOR_HH_
 
 #include <string>
 
@@ -61,7 +61,7 @@ namespace gazebo
       protected: virtual void Load(const std::string &_worldName);
 
       // Documentation inherited
-      protected: virtual bool UpdateImpl(bool _force);
+      protected: virtual bool UpdateImpl(const bool _force);
 
       /// \brief Depth data buffer.
       protected: float *depthBuffer;

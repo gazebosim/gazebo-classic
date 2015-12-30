@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: RaySensor proximity sensor
- * Author: Mihai Emanuel Dolha
- * Date: 29 March 2012
-*/
-
-#ifndef _GPURAYSENSOR_HH_
-#define _GPURAYSENSOR_HH_
+#ifndef _GAZEBO_SENSORS_GPURAYSENSOR_HH_
+#define _GAZEBO_SENSORS_GPURAYSENSOR_HH_
 
 #include <vector>
 #include <string>
@@ -72,7 +67,7 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited
-      protected: virtual bool UpdateImpl(bool _force);
+      protected: virtual bool UpdateImpl(const bool _force);
 
       /// \brief Finalize the ray
       protected: virtual void Fini();
@@ -252,7 +247,7 @@ namespace gazebo
       public: void DisconnectNewLaserFrame(event::ConnectionPtr &_conn);
 
       // Documentation inherited
-      public: virtual bool IsActive();
+      public: virtual bool IsActive() const;
 
       /// brief Render the camera.
       private: void Render();

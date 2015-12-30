@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include <sstream>
+
 #ifndef _WIN32
   #include <dirent.h>
 #else
@@ -24,47 +24,48 @@
   #include "gazebo/common/win_dirent.h"
 #endif
 
-#include "gazebo/rendering/ogre_gazebo.h"
-#include "gazebo/rendering/RTShaderSystem.hh"
-
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Console.hh"
-#include "gazebo/common/Exception.hh"
-#include "gazebo/math/Pose.hh"
 
-#include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/DepthCamera.hh"
+#include "gazebo/rendering/DepthCameraPrivate.hh"
 
 using namespace gazebo;
 using namespace rendering;
 
-
 //////////////////////////////////////////////////
 DepthCamera::DepthCamera(const std::string &_namePrefix, ScenePtr _scene,
                          bool _autoRender)
-: Camera(_namePrefix, _scene, _autoRender)
+  : Camera(_namePrefix, _scene, _autoRender),
+    dataPtr(new DepthCameraPrivate)
 {
   this->depthTarget = NULL;
-  this->depthBuffer = NULL;
-  this->depthMaterial = NULL;
-  this->pcdTarget = NULL;
-  this->pcdBuffer = NULL;
-  this->pcdMaterial = NULL;
-  this->outputPoints = false;
+  this->dataPtr->depthBuffer = NULL;
+  this->dataPtr->depthMaterial = NULL;
+  this->dataPtr->pcdTarget = NULL;
+  this->dataPtr->pcdBuffer = NULL;
+  this->dataPtr->pcdMaterial = NULL;
+  this->dataPtr->outputPoints = false;
 }
 
 //////////////////////////////////////////////////
 DepthCamera::~DepthCamera()
 {
+  if (this->dataPtr->depthBuffer)
+    delete [] this->dataPtr->depthBuffer;
+
+  if (this->dataPtr->pcdBuffer)
+    delete [] this->dataPtr->pcdBuffer;
 }
 
 //////////////////////////////////////////////////
 void DepthCamera::Load(sdf::ElementPtr _sdf)
 {
   Camera::Load(_sdf);
-  this->outputPoints =
+  this->dataPtr->outputPoints =
     (_sdf->GetElement("depth_camera")->Get<std::string>("output")
     == "points");
 }
@@ -122,14 +123,15 @@ void DepthCamera::CreateDepthTexture(const std::string &_textureName)
   matPtr->getTechnique(0)->getPass(0)->createTextureUnitState(
       _textureName);
 
-  this->depthMaterial = (Ogre::Material*)(
+  this->dataPtr->depthMaterial = (Ogre::Material*)(
       Ogre::MaterialManager::getSingleton().getByName("Gazebo/DepthMap").get());
 
-  this->depthMaterial->load();
+  this->dataPtr->depthMaterial->load();
 
-  if (this->outputPoints)
+  if (this->dataPtr->outputPoints)
   {
-    this->pcdTexture = Ogre::TextureManager::getSingleton().createManual(
+    this->dataPtr->pcdTexture =
+        Ogre::TextureManager::getSingleton().createManual(
         _textureName + "_pcd",
         "General",
         Ogre::TEX_TYPE_2D,
@@ -137,24 +139,26 @@ void DepthCamera::CreateDepthTexture(const std::string &_textureName)
         Ogre::PF_FLOAT32_RGBA,
         Ogre::TU_RENDERTARGET).getPointer();
 
-    this->pcdTarget = this->pcdTexture->getBuffer()->getRenderTarget();
-    this->pcdTarget->setAutoUpdated(false);
+    this->dataPtr->pcdTarget =
+        this->dataPtr->pcdTexture->getBuffer()->getRenderTarget();
+    this->dataPtr->pcdTarget->setAutoUpdated(false);
 
-    this->pcdViewport = this->pcdTarget->addViewport(this->camera);
-    this->pcdViewport->setClearEveryFrame(true);
-    this->pcdViewport->setBackgroundColour(
+    this->dataPtr->pcdViewport =
+        this->dataPtr->pcdTarget->addViewport(this->camera);
+    this->dataPtr->pcdViewport->setClearEveryFrame(true);
+    this->dataPtr->pcdViewport->setBackgroundColour(
         Conversions::Convert(this->scene->GetBackgroundColor()));
-    this->pcdViewport->setOverlaysEnabled(false);
-    this->pcdViewport->setVisibilityMask(
+    this->dataPtr->pcdViewport->setOverlaysEnabled(false);
+    this->dataPtr->pcdViewport->setVisibilityMask(
         GZ_VISIBILITY_ALL & ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
 
-    this->pcdMaterial = (Ogre::Material*)(
+    this->dataPtr->pcdMaterial = (Ogre::Material*)(
     Ogre::MaterialManager::getSingleton().getByName("Gazebo/XYZPoints").get());
 
-    this->pcdMaterial->getTechnique(0)->getPass(0)->createTextureUnitState(
-              this->renderTexture->getName());
+    this->dataPtr->pcdMaterial->getTechnique(0)->getPass(0)->
+        createTextureUnitState(this->renderTexture->getName());
 
-    this->pcdMaterial->load();
+    this->dataPtr->pcdMaterial->load();
   }
 
 /*
@@ -180,15 +184,15 @@ void DepthCamera::CreateDepthTexture(const std::string &_textureName)
 void DepthCamera::PostRender()
 {
   this->depthTarget->swapBuffers();
-  if (this->outputPoints)
-    this->pcdTarget->swapBuffers();
+  if (this->dataPtr->outputPoints)
+    this->dataPtr->pcdTarget->swapBuffers();
 
   if (this->newData && this->captureData)
   {
     unsigned int width = this->GetImageWidth();
     unsigned int height = this->GetImageHeight();
 
-    if (!this->outputPoints)
+    if (!this->dataPtr->outputPoints)
     {
       Ogre::HardwarePixelBufferSharedPtr pixelBuffer;
 
@@ -198,41 +202,43 @@ void DepthCamera::PostRender()
       Ogre::PixelFormat format = pixelBuffer->getFormat();
 
       // Blit the depth buffer if needed
-      if (!this->depthBuffer)
-        this->depthBuffer = new float[width * height];
+      if (!this->dataPtr->depthBuffer)
+        this->dataPtr->depthBuffer = new float[width * height];
 
       Ogre::Box src_box(0, 0, width, height);
       Ogre::PixelBox dst_box(width, height,
-          1, format, this->depthBuffer);
+          1, format, this->dataPtr->depthBuffer);
 
       pixelBuffer->lock(Ogre::HardwarePixelBuffer::HBL_NORMAL);
       pixelBuffer->blitToMemory(src_box, dst_box);
       pixelBuffer->unlock();  // FIXME: do we need to lock/unlock still?
 
-      this->newDepthFrame(this->depthBuffer, width, height, 1, "FLOAT32");
+      this->dataPtr->newDepthFrame(
+          this->dataPtr->depthBuffer, width, height, 1, "FLOAT32");
     }
     else
     {
       Ogre::HardwarePixelBufferSharedPtr pcdPixelBuffer;
 
       // Get access to the buffer and make an image and write it to file
-      pcdPixelBuffer = this->pcdTexture->getBuffer();
+      pcdPixelBuffer = this->dataPtr->pcdTexture->getBuffer();
 
       // Blit the depth buffer if needed
-      if (!this->pcdBuffer)
-        this->pcdBuffer = new float[width * height * 4];
+      if (!this->dataPtr->pcdBuffer)
+        this->dataPtr->pcdBuffer = new float[width * height * 4];
 
-      memset(this->pcdBuffer, 0, width * height * 4);
+      memset(this->dataPtr->pcdBuffer, 0, width * height * 4);
 
       Ogre::Box pcd_src_box(0, 0, width, height);
       Ogre::PixelBox pcd_dst_box(width, height,
-          1, Ogre::PF_FLOAT32_RGBA, this->pcdBuffer);
+          1, Ogre::PF_FLOAT32_RGBA, this->dataPtr->pcdBuffer);
 
       pcdPixelBuffer->lock(Ogre::HardwarePixelBuffer::HBL_NORMAL);
       pcdPixelBuffer->blitToMemory(pcd_src_box, pcd_dst_box);
       pcdPixelBuffer->unlock();
 
-      this->newRGBPointCloud(this->pcdBuffer, width, height, 1, "RGBPOINTS");
+      this->dataPtr->newRGBPointCloud(
+          this->dataPtr->pcdBuffer, width, height, 1, "RGBPOINTS");
     }
   }
 
@@ -336,7 +342,7 @@ void DepthCamera::RenderImpl()
   sceneMgr->_suppressRenderStateChanges(true);
 
   this->UpdateRenderTarget(this->depthTarget,
-                  this->depthMaterial, "Gazebo/DepthMap");
+                  this->dataPtr->depthMaterial, "Gazebo/DepthMap");
 
   // Does actual rendering
   this->depthTarget->update(false);
@@ -347,15 +353,15 @@ void DepthCamera::RenderImpl()
   // for camera image
   Camera::RenderImpl();
 
-  if (this->outputPoints)
+  if (this->dataPtr->outputPoints)
   {
     sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_NONE);
     sceneMgr->_suppressRenderStateChanges(true);
 
-    this->UpdateRenderTarget(this->pcdTarget,
-                  this->pcdMaterial, "Gazebo/XYZPoints");
+    this->UpdateRenderTarget(this->dataPtr->pcdTarget,
+                  this->dataPtr->pcdMaterial, "Gazebo/XYZPoints");
 
-    this->pcdTarget->update(false);
+    this->dataPtr->pcdTarget->update(false);
 
     sceneMgr->_suppressRenderStateChanges(false);
     sceneMgr->setShadowTechnique(shadowTech);
@@ -365,7 +371,13 @@ void DepthCamera::RenderImpl()
 //////////////////////////////////////////////////
 const float* DepthCamera::GetDepthData()
 {
-  return this->depthBuffer;
+  return this->DepthData();
+}
+
+//////////////////////////////////////////////////
+const float* DepthCamera::DepthData() const
+{
+  return this->dataPtr->depthBuffer;
 }
 
 //////////////////////////////////////////////////
@@ -386,10 +398,38 @@ void DepthCamera::SetDepthTarget(Ogre::RenderTarget *_target)
     double ratio = static_cast<double>(this->depthViewport->getActualWidth()) /
                    static_cast<double>(this->depthViewport->getActualHeight());
 
-    double hfov = this->GetHFOV().Radian();
+    double hfov = this->HFOV().Radian();
     double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
     // gzerr << "debug " << hfov << " " << vfov << " " << ratio << "\n";
     this->camera->setAspectRatio(ratio);
     this->camera->setFOVy(Ogre::Radian(vfov));
   }
+}
+
+//////////////////////////////////////////////////
+event::ConnectionPtr DepthCamera::ConnectNewDepthFrame(
+    std::function<void (const float *, unsigned int, unsigned int, unsigned int,
+    const std::string &)>  _subscriber)
+{
+  return this->dataPtr->newDepthFrame.Connect(_subscriber);
+}
+
+//////////////////////////////////////////////////
+void DepthCamera::DisconnectNewDepthFrame(event::ConnectionPtr &_c)
+{
+  this->dataPtr->newDepthFrame.Disconnect(_c);
+}
+
+//////////////////////////////////////////////////
+event::ConnectionPtr DepthCamera::ConnectNewRGBPointCloud(
+    std::function<void (const float *, unsigned int, unsigned int, unsigned int,
+    const std::string &)>  _subscriber)
+{
+  return this->dataPtr->newRGBPointCloud.Connect(_subscriber);
+}
+
+//////////////////////////////////////////////////
+void DepthCamera::DisconnectNewRGBPointCloud(event::ConnectionPtr &_c)
+{
+  this->dataPtr->newRGBPointCloud.Disconnect(_c);
 }
