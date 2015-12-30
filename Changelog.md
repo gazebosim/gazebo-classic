@@ -292,7 +292,7 @@ using the same arguments used in the command line.
         * [Pull request #2056](https://bitbucket.org/osrf/gazebo/pull-request/2056)
 
     1. Support joint creation between links in nested model.
-        * [Pull request #](https://bitbucket.org/osrf/gazebo/pull-request/)
+        * [Pull request #2080](https://bitbucket.org/osrf/gazebo/pull-request/2080)
 
 1. Building editor updates
 
