@@ -283,6 +283,9 @@ using the same arguments used in the command line.
     1. Support inserting nested models from model maker
         * [Pull request #1982](https://bitbucket.org/osrf/gazebo/pull-request/1982)
 
+    1. Added joint creation dialog
+        * [Pull request #2021](https://bitbucket.org/osrf/gazebo/pull-request/2021)
+        
     1. PIMPL LinkInspector
         * [Pull request #2056](https://bitbucket.org/osrf/gazebo/pull-request/2056)
 
