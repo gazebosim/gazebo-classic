@@ -488,8 +488,8 @@ void JointInspector::OnLinkInserted(const std::string &_linkName)
   if (idx != std::string::npos)
     unscopedName = _linkName.substr(idx+2);
 
-  this->configWidget->AddItemEnumWidget("parentCombo", unscopedName);
-  this->configWidget->AddItemEnumWidget("childCombo", unscopedName);
+  this->dataPtr->configWidget->AddItemEnumWidget("parentCombo", unscopedName);
+  this->dataPtr->configWidget->AddItemEnumWidget("childCombo", unscopedName);
 
   this->OnLinksChanged();
 }
@@ -502,8 +502,9 @@ void JointInspector::OnLinkRemoved(const std::string &_linkName)
   if (idx != std::string::npos)
     unscopedName = _linkName.substr(idx+2);
 
-  this->configWidget->RemoveItemEnumWidget("parentCombo", unscopedName);
-  this->configWidget->RemoveItemEnumWidget("childCombo", unscopedName);
+  this->dataPtr->configWidget->RemoveItemEnumWidget("parentCombo",
+      unscopedName);
+  this->dataPtr->configWidget->RemoveItemEnumWidget("childCombo", unscopedName);
 
   this->OnLinksChanged();
 }
@@ -668,4 +669,3 @@ void JointInspector::keyPressEvent(QKeyEvent *_event)
   else
     QDialog::keyPressEvent(_event);
 }
-
