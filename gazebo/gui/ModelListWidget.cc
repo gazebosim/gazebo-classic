@@ -221,7 +221,7 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
           QtVariantPropertyManager::groupTypeId(), tr("pose"));
       {
         topItem->addSubProperty(item);
-        ignition::math::Pose3d cameraPose = cam->GetWorldPose().Ign();
+        ignition::math::Pose3d cameraPose = cam->WorldPose();
 
         this->FillPoseProperty(msgs::Convert(cameraPose), item);
         // set expanded to true by default for easier viewing

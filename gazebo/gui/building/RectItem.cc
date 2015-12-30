@@ -320,24 +320,24 @@ bool RectItem::GrabberEventFilter(GrabberHandle *_grabber, QEvent *_event)
           || ((angle <= (180 + range)) && (angle > (180 - range))))
       {
         QApplication::setOverrideCursor(
-            QCursor(this->cursors[_grabber->GetIndex() % 4]));
+            QCursor(this->cursors[_grabber->Index() % 4]));
       }
       else if (((angle <= (360 - range)) && (angle > (270 + range)))
           || ((angle <= (180 - range)) && (angle > (90 + range))))
       {
         QApplication::setOverrideCursor(
-            QCursor(this->cursors[(_grabber->GetIndex() + 3) % 4]));
+            QCursor(this->cursors[(_grabber->Index() + 3) % 4]));
       }
       else if (((angle <= (270 + range)) && (angle > (270 - range)))
           || ((angle <= (90 + range)) && (angle > (90 - range))))
       {
         QApplication::setOverrideCursor(
-            QCursor(this->cursors[(_grabber->GetIndex() + 2) % 4]));
+            QCursor(this->cursors[(_grabber->Index() + 2) % 4]));
       }
       else
       {
         QApplication::setOverrideCursor(
-            QCursor(this->cursors[(_grabber->GetIndex() + 1) % 4]));
+            QCursor(this->cursors[(_grabber->Index() + 1) % 4]));
       }
       return true;
     }
@@ -354,7 +354,7 @@ bool RectItem::GrabberEventFilter(GrabberHandle *_grabber, QEvent *_event)
     return false;
 
 
-  if (_grabber->GetMouseState()
+  if (_grabber->MouseState()
       == static_cast<int>(QEvent::GraphicsSceneMouseMove))
   {
     double xPos = mouseEvent->pos().x();
@@ -366,7 +366,7 @@ bool RectItem::GrabberEventFilter(GrabberHandle *_grabber, QEvent *_event)
 
     int xAxisSign = 0;
     int yAxisSign = 0;
-    switch (_grabber->GetIndex())
+    switch (_grabber->Index())
     {
       // corners
       case 0:
@@ -425,8 +425,8 @@ bool RectItem::GrabberEventFilter(GrabberHandle *_grabber, QEvent *_event)
     // if the mouse is being dragged, calculate a new size and also position
     // for resizing the box
 
-    double xMoved = _grabber->GetMouseDownX() - xPos;
-    double yMoved = _grabber->GetMouseDownY() - yPos;
+    double xMoved = _grabber->MouseDownX() - xPos;
+    double yMoved = _grabber->MouseDownY() - yPos;
 
     double newWidth = this->width + (xAxisSign * xMoved);
     if (newWidth < 20)
@@ -447,7 +447,7 @@ bool RectItem::GrabberEventFilter(GrabberHandle *_grabber, QEvent *_event)
     double angle = rotationAngle / 360.0 * (2 * M_PI);
     double dx = 0;
     double dy = 0;
-    switch (_grabber->GetIndex())
+    switch (_grabber->Index())
     {
       // grabbers
       case 0:

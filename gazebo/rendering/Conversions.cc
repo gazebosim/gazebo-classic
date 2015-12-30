@@ -33,15 +33,27 @@ common::Color Conversions::Convert(const Ogre::ColourValue &_clr)
 }
 
 //////////////////////////////////////////////////
-Ogre::Vector3 Conversions::Convert(const math::Vector3 &v)
+Ogre::Vector3 Conversions::Convert(const math::Vector3 &_v)
 {
-  return Ogre::Vector3(v.x, v.y, v.z);
+  return Ogre::Vector3(_v.x, _v.y, _v.z);
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Conversions::Convert(const Ogre::Vector3 &v)
+Ogre::Vector3 Conversions::Convert(const ignition::math::Vector3d &_v)
 {
-  return math::Vector3(v.x, v.y, v.z);
+  return Ogre::Vector3(_v.X(), _v.Y(), _v.Z());
+}
+
+//////////////////////////////////////////////////
+math::Vector3 Conversions::Convert(const Ogre::Vector3 &_v)
+{
+  return math::Vector3(_v.x, _v.y, _v.z);
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d Conversions::ConvertIgn(const Ogre::Vector3 &_v)
+{
+  return ignition::math::Vector3d(_v.x, _v.y, _v.z);
 }
 
 //////////////////////////////////////////////////
@@ -56,5 +68,8 @@ math::Quaternion Conversions::Convert(const Ogre::Quaternion &_v)
   return math::Quaternion(_v.w, _v.x, _v.y, _v.z);
 }
 
-
-
+//////////////////////////////////////////////////
+ignition::math::Quaterniond Conversions::ConvertIgn(const Ogre::Quaternion &_v)
+{
+  return ignition::math::Quaterniond(_v.w, _v.x, _v.y, _v.z);
+}
