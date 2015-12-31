@@ -400,7 +400,7 @@ void ModelCreator_TEST::ModelPlugin()
   // Inserting a few links
   modelCreator->AddShape(gui::ModelCreator::ENTITY_CYLINDER);
   gazebo::rendering::VisualPtr cylinder =
-      scene->GetVisual("ModelPreview_0::link_0");
+      scene->GetVisual("ModelPreview_0_0::link_0");
   QVERIFY(cylinder != NULL);
 
   // add model plugin
