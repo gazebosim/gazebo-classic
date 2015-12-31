@@ -664,12 +664,14 @@ void GpuLaser::CreateMesh()
       if (this->isHorizontal)
       {
         u = -(cos(phi) * tan(delta))/(2 * tan(theta) * cos(gamma)) + 0.5;
-        v = math::equal(phi, 0.0) ? -tan(gamma)/(2 * tan(phi)) + 0.5 : 0.5;
+        v = ignition::math::equal(phi, 0.0) ?
+            -tan(gamma)/(2 * tan(phi)) + 0.5 : 0.5;
       }
       else
       {
         v = -(cos(theta) * tan(gamma))/(2 * tan(phi) * cos(delta)) + 0.5;
-        u = math::equal(theta, 0.0) ? -tan(delta)/(2 * tan(theta)) + 0.5 : 0.5;
+        u = ignition::math::equal(theta, 0.0) ?
+            -tan(delta)/(2 * tan(theta)) + 0.5 : 0.5;
       }
       submesh->AddTexCoord(u, v);
     }
@@ -712,9 +714,9 @@ void GpuLaser::CreateCanvas()
   this->dataPtr->object->setVisibilityFlags(GZ_VISIBILITY_ALL
       & ~GZ_VISIBILITY_SELECTABLE);
 
-  math::Pose pose;
-  pose.pos = math::Vector3(0.01, 0, 0);
-  pose.rot.SetFromEuler(math::Vector3(0, 0, 0));
+  ignition::math::Pose3d pose;
+  pose.Pos() = ignition::math::Vector3d(0.01, 0, 0);
+  pose.Rot().Euler(ignition::math::Vector3d(0, 0, 0));
 
   this->dataPtr->visual->SetPose(pose);
 
