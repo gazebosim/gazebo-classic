@@ -243,9 +243,11 @@ MainWindow::MainWindow()
 /////////////////////////////////////////////////
 MainWindow::~MainWindow()
 {
+  // Cleanup user command history
   delete this->userCmdHistory;
   this->userCmdHistory = NULL;
 
+  // Cleanup global actions
   this->DeleteActions();
 }
 

@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: RaySensor proximity sensor
- * Author: Mihai Emanuel Dolha
- * Date: 29 March 2012
-*/
-
-#ifndef _GPURAYSENSOR_HH_
-#define _GPURAYSENSOR_HH_
+#ifndef _GAZEBO_SENSORS_GPURAYSENSOR_HH_
+#define _GAZEBO_SENSORS_GPURAYSENSOR_HH_
 
 #include <vector>
 #include <string>
