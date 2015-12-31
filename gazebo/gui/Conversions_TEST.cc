@@ -16,13 +16,15 @@
 */
 
 #include "gazebo/common/Color.hh"
-
-#include "gazebo/gui/qt.h"
 #include "gazebo/gui/Conversions.hh"
-#include "gazebo/gui/Conversions_TEST.hh"
+#include "test/util.hh"
+
+using namespace gazebo;
+
+class GuiConversionsTest : public gazebo::testing::AutoLogFixture { };
 
 /////////////////////////////////////////////////
-void Conversions_TEST::Color()
+TEST_F(GuiConversionsTest, Color)
 {
   // Gazebo to Qt to Gazebo
   {
@@ -37,10 +39,10 @@ void Conversions_TEST::Color()
     auto newColor = gazebo::gui::Conversions::Convert(
                     gazebo::gui::Conversions::Convert(color));
 
-    QVERIFY(fabs(newColor.r - newColor.r) < tol);
-    QVERIFY(fabs(newColor.g - newColor.g) < tol);
-    QVERIFY(fabs(newColor.b - newColor.b) < tol);
-    QVERIFY(fabs(newColor.a - newColor.a) < tol);
+    EXPECT_NEAR(newColor.r, newColor.r, tol);
+    EXPECT_NEAR(newColor.g, newColor.g, tol);
+    EXPECT_NEAR(newColor.b, newColor.b, tol);
+    EXPECT_NEAR(newColor.a, newColor.a, tol);
   }
 
   // Qt to Gazebo to Qt
@@ -51,13 +53,13 @@ void Conversions_TEST::Color()
     int alpha = 186;
 
     QColor color(red, green, blue, alpha);
-    QCOMPARE(gazebo::gui::Conversions::Convert(
-             gazebo::gui::Conversions::Convert(color)), color);
+    EXPECT_EQ(gazebo::gui::Conversions::Convert(
+              gazebo::gui::Conversions::Convert(color)), color);
   }
 }
 
 /////////////////////////////////////////////////
-void Conversions_TEST::Point2d()
+TEST_F(GuiConversionsTest, Point2d)
 {
   // Gazebo to Qt to Gazebo
   {
@@ -65,8 +67,8 @@ void Conversions_TEST::Point2d()
     double y = 123;
 
     ignition::math::Vector2d point(x, y);
-    QCOMPARE(gazebo::gui::Conversions::Convert(
-             gazebo::gui::Conversions::Convert(point)), point);
+    EXPECT_EQ(gazebo::gui::Conversions::Convert(
+              gazebo::gui::Conversions::Convert(point)), point);
   }
 
   // Qt to Gazebo to Qt
@@ -75,10 +77,7 @@ void Conversions_TEST::Point2d()
     double y = 123;
 
     QPointF point(x, y);
-    QCOMPARE(gazebo::gui::Conversions::Convert(
-             gazebo::gui::Conversions::Convert(point)), point);
+    EXPECT_EQ(gazebo::gui::Conversions::Convert(
+              gazebo::gui::Conversions::Convert(point)), point);
   }
 }
-
-// Generate a main function for the test
-QTEST_MAIN(Conversions_TEST)

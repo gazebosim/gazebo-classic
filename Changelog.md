@@ -1,8 +1,14 @@
 ## Gazebo 7.0
 
+1. Use opaque pointers in the rendering/DepthCamera class.
+    * [Pull request #2069](https://bitbucket.org/osrf/gazebo/pull-request/2069)
+    
+1. Use opaque pointers for the Master class.
+    * [Pull request #2036](https://bitbucket.org/osrf/gazebo/pull-request/2036)
+
 1. Use opaque pointers in the rendering/WindowManager class.
     * [Pull request #2064](https://bitbucket.org/osrf/gazebo/pull-request/2064)
-    
+
 1. Use opaque pointers in the rendering/Light class.
     * [Pull request #2066](https://bitbucket.org/osrf/gazebo/pull-request/2066)
 
@@ -20,6 +26,8 @@
 
 1. Use more opaque pointers.
     * [Pull request #2025](https://bitbucket.org/osrf/gazebo/pull-request/2025)
+    * [Pull request #2065](https://bitbucket.org/osrf/gazebo/pull-request/2065)
+    * [Pull request #2067](https://bitbucket.org/osrf/gazebo/pull-request/2067)
 
 1. Use opaque pointers in the gui/CloneWindow class.
     * [Pull request #2027](https://bitbucket.org/osrf/gazebo/pull-request/2027)
@@ -167,7 +175,7 @@ using the same arguments used in the command line.
    * [Pull request #1977](https://bitbucket.org/osrf/gazebo/pull-request/1977)
    * [Issue #1706](https://bitbucket.org/osrf/gazebo/issue/1706)
 
-1. Add option to reverse alignment direction 
+1. Add option to reverse alignment direction
    * [Pull request #2040](https://bitbucket.org/osrf/gazebo/pull-request/2040)
    * [Issue #1242](https://bitbucket.org/osrf/gazebo/issue/1242)
 
@@ -222,6 +230,8 @@ using the same arguments used in the command line.
     * [Pull request #2034](https://bitbucket.org/osrf/gazebo/pull-request/2034)
 
 1. Model editor updates
+    1. Support adding model plugins in model editor
+        * [Pull request #2060](https://bitbucket.org/osrf/gazebo/pull-request/2060)
 
     1. Make non-editable background models white in model editor
         * [Pull request #1950](https://bitbucket.org/osrf/gazebo/pull-request/1950)
@@ -278,6 +288,9 @@ using the same arguments used in the command line.
     1. Support inserting nested models from model maker
         * [Pull request #1982](https://bitbucket.org/osrf/gazebo/pull-request/1982)
 
+    1. Added joint creation dialog
+        * [Pull request #2021](https://bitbucket.org/osrf/gazebo/pull-request/2021)
+        
     1. PIMPL LinkInspector
         * [Pull request #2056](https://bitbucket.org/osrf/gazebo/pull-request/2056)
 
