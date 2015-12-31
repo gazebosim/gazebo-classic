@@ -226,7 +226,7 @@ void RenderEngine::RemoveScene(const std::string &_name)
   std::vector<ScenePtr>::iterator iter;
 
   for (iter = this->scenes.begin(); iter != this->scenes.end(); ++iter)
-    if ((*iter)->GetName() == _name)
+    if ((*iter)->Name() == _name)
       break;
 
   if (iter != this->scenes.end())
@@ -248,7 +248,7 @@ ScenePtr RenderEngine::GetScene(const std::string &_name)
   std::vector<ScenePtr>::iterator iter;
 
   for (iter = this->scenes.begin(); iter != this->scenes.end(); ++iter)
-    if (_name.empty() || (*iter)->GetName() == _name)
+    if (_name.empty() || (*iter)->Name() == _name)
       return (*iter);
 
   return ScenePtr();
@@ -348,7 +348,7 @@ void RenderEngine::Fini()
   // Deallocate memory for every scene
   while (!this->scenes.empty())
   {
-    this->RemoveScene(this->scenes.front()->GetName());
+    this->RemoveScene(this->scenes.front()->Name());
   }
 
 #if (OGRE_VERSION >= ((1 << 16) | (9 << 8) | 0))

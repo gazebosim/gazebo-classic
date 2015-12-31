@@ -1,8 +1,11 @@
 ## Gazebo 7.0
 
+1. Deprecate functions in the rendering/Scene class.
+    * [Pull request #](https://bitbucket.org/osrf/gazebo/pull-request/)
+
 1. Use opaque pointers in the rendering/DepthCamera class.
     * [Pull request #2069](https://bitbucket.org/osrf/gazebo/pull-request/2069)
-    
+
 1. Use opaque pointers for the Master class.
     * [Pull request #2036](https://bitbucket.org/osrf/gazebo/pull-request/2036)
 
@@ -290,7 +293,7 @@ using the same arguments used in the command line.
 
     1. Added joint creation dialog
         * [Pull request #2021](https://bitbucket.org/osrf/gazebo/pull-request/2021)
-        
+
     1. PIMPL LinkInspector
         * [Pull request #2056](https://bitbucket.org/osrf/gazebo/pull-request/2056)
 

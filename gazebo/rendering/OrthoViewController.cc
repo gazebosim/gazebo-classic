@@ -109,7 +109,7 @@ void OrthoViewController::HandleMouseEvent(const common::MouseEvent &_event)
   // the focal point and distance.
   if (_event.PressPos() == _event.Pos())
   {
-    if (!this->camera->GetScene()->GetFirstContact(
+    if (!this->camera->GetScene()->FirstContact(
          this->camera, _event.PressPos(), this->focalPoint))
     {
       ignition::math::Vector3d origin, dir;
@@ -197,7 +197,7 @@ void OrthoViewController::HandleMouseEvent(const common::MouseEvent &_event)
   // The scroll wheel controls zoom.
   else if (_event.Type() == common::MouseEvent::SCROLL)
   {
-    if (!this->camera->GetScene()->GetFirstContact(
+    if (!this->camera->GetScene()->FirstContact(
          this->camera, _event.Pos(), this->focalPoint))
     {
       ignition::math::Vector3d origin, dir;

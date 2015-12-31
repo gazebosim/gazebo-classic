@@ -344,7 +344,7 @@ void Heightmap::Load()
   boost::filesystem::path terrainDirPath;
   boost::filesystem::path prefix;
   boost::shared_ptr<msgs::Response> response = transport::request(
-     this->scene->GetName(), "heightmap_data");
+     this->scene->Name(), "heightmap_data");
 
   if (response->response() != "error" &&
       response->type() == geomMsg.GetTypeName())
@@ -403,7 +403,7 @@ void Heightmap::Load()
   // Param 4: World size of each terrain instance, in meters.
 
   this->terrainGroup = new Ogre::TerrainGroup(
-      this->scene->GetManager(), Ogre::Terrain::ALIGN_X_Y,
+      this->scene->OgreSceneManager(), Ogre::Terrain::ALIGN_X_Y,
       1 + ((this->dataSize - 1) / sqrtN),
       this->terrainSize.x / (sqrtN));
 
@@ -457,11 +457,11 @@ void Heightmap::Load()
     this->pageManager->setPageProvider(&this->dummyPageProvider);
 
     // Add cameras
-    for (unsigned int i = 0; i < this->scene->GetCameraCount(); ++i)
+    for (unsigned int i = 0; i < this->scene->CameraCount(); ++i)
     {
       this->pageManager->addCamera(this->scene->GetCamera(i)->GetOgreCamera());
     }
-    for (unsigned int i = 0; i < this->scene->GetUserCameraCount(); ++i)
+    for (unsigned int i = 0; i < this->scene->UserCameraCount(); ++i)
     {
       this->pageManager->addCamera(
           this->scene->GetUserCamera(i)->GetOgreCamera());
@@ -525,7 +525,7 @@ void Heightmap::ConfigureTerrainDefaults()
 
   // Get the first directional light
   LightPtr directionalLight;
-  for (unsigned int i = 0; i < this->scene->GetLightCount(); ++i)
+  for (unsigned int i = 0; i < this->scene->LightCount(); ++i)
   {
     LightPtr light = this->scene->GetLight(i);
     if (light->Type() == "directional")
@@ -536,7 +536,7 @@ void Heightmap::ConfigureTerrainDefaults()
   }
 
   this->terrainGlobals->setCompositeMapAmbient(
-      this->scene->GetManager()->getAmbientLight());
+      this->scene->OgreSceneManager()->getAmbientLight());
 
   // Important to set these so that the terrain knows what to use for
   // derived (non-realtime) data

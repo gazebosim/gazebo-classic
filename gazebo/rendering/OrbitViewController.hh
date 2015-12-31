@@ -136,7 +136,7 @@ namespace gazebo
       protected: bool init;
 
       /// \brief The focal point.
-      protected: math::Vector3 focalPoint;
+      protected: ignition::math::Vector3d focalPoint;
     };
     /// \}
   }

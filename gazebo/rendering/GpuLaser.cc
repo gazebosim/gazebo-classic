@@ -88,7 +88,7 @@ GpuLaser::~GpuLaser()
   }
 
   if (this->scene && this->orthoCam)
-    this->scene->GetManager()->destroyCamera(this->orthoCam);
+    this->scene->OgreSceneManager()->destroyCamera(this->orthoCam);
 
   this->visual.reset();
   this->texIdx.clear();
@@ -114,7 +114,7 @@ void GpuLaser::Init()
   this->w2nd = this->GetImageWidth();
   this->h2nd = this->GetImageHeight();
   this->visual.reset(new Visual(this->GetName()+"second_pass_canvas",
-     this->GetScene()->GetWorldVisual()));
+     this->GetScene()->WorldVisual()));
 }
 
 //////////////////////////////////////////////////
@@ -280,10 +280,10 @@ void GpuLaser::UpdateRenderTarget(Ogre::RenderTarget *_target,
 {
   Ogre::RenderSystem *renderSys;
   Ogre::Viewport *vp = NULL;
-  Ogre::SceneManager *sceneMgr = this->scene->GetManager();
+  Ogre::SceneManager *sceneMgr = this->scene->OgreSceneManager();
   Ogre::Pass *pass;
 
-  renderSys = this->scene->GetManager()->getDestinationRenderSystem();
+  renderSys = this->scene->OgreSceneManager()->getDestinationRenderSystem();
   // Get pointer to the material pass
   pass = _material->getBestTechnique()->getPass(0);
 
@@ -376,7 +376,7 @@ void GpuLaser::notifyRenderSingleObject(Ogre::Renderable *_rend,
 
   Ogre::Pass *pass = this->currentMat->getBestTechnique()->getPass(0);
   Ogre::RenderSystem *renderSys =
-                  this->scene->GetManager()->getDestinationRenderSystem();
+                  this->scene->OgreSceneManager()->getDestinationRenderSystem();
 
   Ogre::AutoParamDataSource autoParamDataSource;
 
@@ -387,7 +387,7 @@ void GpuLaser::notifyRenderSingleObject(Ogre::Renderable *_rend,
   autoParamDataSource.setCurrentPass(pass);
   autoParamDataSource.setCurrentViewport(vp);
   autoParamDataSource.setCurrentRenderTarget(this->currentTarget);
-  autoParamDataSource.setCurrentSceneManager(this->scene->GetManager());
+  autoParamDataSource.setCurrentSceneManager(this->scene->OgreSceneManager());
   autoParamDataSource.setCurrentCamera(this->camera, true);
 
   pass->_updateAutoParams(&autoParamDataSource,
@@ -415,7 +415,7 @@ void GpuLaser::RenderImpl()
 
   firstPassTimer.Start();
 
-  Ogre::SceneManager *sceneMgr = this->scene->GetManager();
+  Ogre::SceneManager *sceneMgr = this->scene->OgreSceneManager();
 
   sceneMgr->_suppressRenderStateChanges(true);
   sceneMgr->addRenderObjectListener(this);
@@ -469,9 +469,9 @@ const float* GpuLaser::GetLaserData()
 void GpuLaser::CreateOrthoCam()
 {
   this->pitchNodeOrtho =
-    this->GetScene()->GetWorldVisual()->GetSceneNode()->createChildSceneNode();
+    this->GetScene()->WorldVisual()->GetSceneNode()->createChildSceneNode();
 
-  this->orthoCam = this->scene->GetManager()->createCamera(
+  this->orthoCam = this->scene->OgreSceneManager()->createCamera(
         this->pitchNodeOrtho->getName() + "_ortho_cam");
 
   // Use X/Y as horizon, Z up

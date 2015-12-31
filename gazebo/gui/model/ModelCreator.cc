@@ -1325,7 +1325,7 @@ void ModelCreator::Reset()
     scene->RemoveVisual(this->previewVisual);
 
   this->previewVisual.reset(new rendering::Visual(this->previewName,
-      scene->GetWorldVisual()));
+      scene->WorldVisual()));
 
   this->previewVisual->Load();
   this->modelPose = ignition::math::Pose3d::Zero;
