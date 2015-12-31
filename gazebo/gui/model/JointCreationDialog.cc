@@ -42,8 +42,16 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   this->setWindowFlags(this->windowFlags() | Qt::WindowStaysOnTopHint);
   this->setModal(false);
 
+  // Dialog size
   this->setMinimumWidth(500);
-  this->setMinimumHeight(940);
+  this->setMinimumHeight(300);
+  int desiredHeight = 940;
+  MainWindow *mainWindow = qobject_cast<MainWindow *>(_parent);
+  if (mainWindow)
+  {
+    desiredHeight = std::min(desiredHeight, (mainWindow->height()-100));
+  }
+  this->resize(500, desiredHeight);
 
   this->dataPtr->jointMaker = _jointMaker;
 

@@ -94,8 +94,8 @@ WrenchVisual::WrenchVisual(const std::string &_name, VisualPtr _vis,
   dPtr->coneZNode->setScale(0.02, 0.02, 0.02);
 
   dPtr->forceLine = new DynamicLines(RENDERING_LINE_LIST);
-  dPtr->forceLine->AddPoint(math::Vector3(0, 0, 0));
-  dPtr->forceLine->AddPoint(math::Vector3(0, 0, 0));
+  dPtr->forceLine->AddPoint(ignition::math::Vector3d(0, 0, 0));
+  dPtr->forceLine->AddPoint(ignition::math::Vector3d(0, 0, 0));
   dPtr->forceLine->setMaterial("__GAZEBO_TRANS_PURPLE_MATERIAL__");
 
   dPtr->forceNode = dPtr->sceneNode->createChildSceneNode(this->GetName() +
