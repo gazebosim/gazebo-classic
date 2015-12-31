@@ -15,22 +15,27 @@
  *
 */
 
-#ifndef _GAZEBO_JOINTMAKER_HH_
-#define _GAZEBO_JOINTMAKER_HH_
+#ifndef _GAZEBO_GUI_JOINTMAKER_HH_
+#define _GAZEBO_GUI_JOINTMAKER_HH_
 
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Vector3.hh>
+
 #include <sdf/sdf.hh>
 
-#include "gazebo/common/MouseEvent.hh"
-#include "gazebo/common/KeyEvent.hh"
 #include "gazebo/common/CommonTypes.hh"
-#include "gazebo/msgs/msgs.hh"
-#include "gazebo/math/Pose.hh"
-#include "gazebo/rendering/RenderTypes.hh"
+
 #include "gazebo/gui/qt.h"
+
+#include "gazebo/msgs/msgs.hh"
+
+#include "gazebo/rendering/RenderTypes.hh"
+
 #include "gazebo/util/system.hh"
 
 namespace Ogre
@@ -45,17 +50,25 @@ namespace boost
 
 namespace gazebo
 {
+  namespace common
+  {
+    class KeyEvent;
+    class MouseEvent;
+  }
+
   namespace gui
   {
-    class JointCreationDialog;
     class JointData;
     class JointInspector;
+
+    // Forward declare private data.
+    class JointMakerPrivate;
 
     /// \addtogroup gazebo_gui
     /// \{
 
     /// \class JointMaker JointMaker.hh
-    /// \brief Joint visualization
+    /// \brief Handles the creation of joints in the model editor.
     class GZ_GUI_VISIBLE JointMaker : public QObject
     {
       Q_OBJECT
@@ -290,7 +303,7 @@ namespace gazebo
       /// \brief Get the centroid of the link visual in world coordinates.
       /// \param[in] _visual Visual of the link.
       /// \return Centroid in world coordinates;
-      private: math::Vector3 GetLinkWorldCentroid(
+      private: ignition::math::Vector3d LinkWorldCentroid(
           const rendering::VisualPtr &_visual);
 
       /// \brief Open joint inspector.
@@ -374,47 +387,11 @@ namespace gazebo
       Q_SIGNALS: void EmitLinkRemoved(const std::string &_linkId);
 
       /// \brief Qt Callback to open joint inspector
-      private slots: void OnOpenInspector();
+      public slots: void OnOpenInspector();
 
       /// \brief Qt callback when a delete signal has been emitted. This is
       /// currently triggered by the context menu via right click.
-      private slots: void OnDelete();
-
-      /// \brief Type of joint to create
-      private: JointMaker::JointType jointType;
-
-      /// \brief Visual that is currently hovered over by the mouse
-      private: rendering::VisualPtr hoverVis;
-
-      /// \brief Name of joint that is currently being inspected.
-      private: std::string inspectName;
-
-      /// \brief All joints created by joint maker.
-      private: std::map<std::string, JointData *> joints;
-
-      /// \brief Joint currently being created.
-      private: JointData *newJoint;
-
-      /// \brief All the event connections.
-      private: std::vector<event::ConnectionPtr> connections;
-
-      /// \brief The SDF element pointer to the model that contains the joints.
-      private: sdf::ElementPtr modelSDF;
-
-      /// \brief Counter for the number of joints in the model.
-      private: int jointCounter;
-
-      /// \brief Qt action for opening the joint inspector.
-      private: QAction *inspectAct;
-
-      /// \brief Mutex to protect the list of joints
-      private: boost::recursive_mutex *updateMutex;
-
-      /// \brief A list of selected link visuals.
-      private: std::vector<rendering::VisualPtr> selectedJoints;
-
-      /// \brief A list of scoped link names.
-      private: std::vector<std::string> scopedLinkedNames;
+      public slots: void OnDelete();
 
       /// \brief A map of joint type to its string value.
       public: static std::map<JointMaker::JointType, std::string> jointTypes;
@@ -426,20 +403,9 @@ namespace gazebo
       public: static std::map<JointMaker::JointType, std::string>
           jointMaterials;
 
-      /// \brief List of all links currently in the editor. The first string is
-      /// the link's fully scoped name and the second is the leaf name.
-      private: std::map<std::string, std::string> linkList;
-
-      /// \brief Dialog for creating a new joint.
-      private: JointCreationDialog *jointCreationDialog;
-
-      /// \brief Pose of link currently selected to be the parent of the joint
-      /// being created, before being selected.
-      private: ignition::math::Pose3d parentLinkOriginalPose;
-
-      /// \brief Pose of link currently selected to be the child of the joint
-      /// being created, before being selected.
-      private: ignition::math::Pose3d childLinkOriginalPose;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<JointMakerPrivate> dataPtr;
     };
     /// \}
 
