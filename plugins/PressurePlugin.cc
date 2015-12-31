@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/*
- * Desc: Pressure sensor plugin
- * Author: Steve Peters
- */
 #include <boost/algorithm/string.hpp>
 #include <gazebo/physics/Base.hh>
 #include "PressurePlugin.hh"
@@ -51,7 +47,7 @@ void PressurePlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr /*_sdf*/)
 
   // Connect to the sensor update event.
   this->updateConnection = this->parentSensor->ConnectUpdated(
-      boost::bind(&PressurePlugin::OnUpdate, this));
+      std::bind(&PressurePlugin::OnUpdate, this));
 
   // Make sure the parent sensor is active.
   this->parentSensor->SetActive(true);

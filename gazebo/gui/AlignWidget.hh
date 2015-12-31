@@ -77,8 +77,8 @@ namespace gazebo
       private slots: void OnAlignTargetChanged(int _index);
 
       /// \brief Qt callback when the align direction is changed.
-      /// \param[in] _checked Whether the button was checked or unchecked. True
-      /// means the default alignment (min to min / max to max), false means
+      /// \param[in] _checked Whether the button was checked or unchecked. False
+      /// means the default alignment (min to min / max to max), true means
       /// min to max.
       private slots: void OnDirectionChanged(bool _checked);
 

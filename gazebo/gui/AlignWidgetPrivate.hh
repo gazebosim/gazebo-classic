@@ -43,7 +43,8 @@ namespace gazebo
       public: int alignRelativeTarget;
 
       /// \brief Keep track whether to align in the default direction (min to
-      /// min, max to max) or in the inverted direction (min to max).
+      /// min, max to max) or in the inverted direction (min to max). It doesn't
+      /// affect center align.
       public: bool inverted = false;
     };
   }
