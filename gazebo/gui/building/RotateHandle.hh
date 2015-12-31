@@ -15,12 +15,13 @@
  *
 */
 
-#ifndef _GAZEBO_BUILDING_ROTATE_HANDLE_HH_
-#define _GAZEBO_BUILDING_ROTATE_HANDLE_HH_
+#ifndef _GAZEBO_BUILDING_ROTATEHANDLE_HH_
+#define _GAZEBO_BUILDING_ROTATEHANDLE_HH_
 
 #include <memory>
 
 #include "gazebo/common/CommonTypes.hh"
+
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
 
@@ -28,6 +29,7 @@ namespace gazebo
 {
   namespace gui
   {
+    // Forward declare private data.
     class RotateHandlePrivate;
 
     /// \addtogroup gazebo_gui

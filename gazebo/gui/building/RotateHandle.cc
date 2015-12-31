@@ -15,6 +15,7 @@
  *
 */
 
+#include "gazebo/gui/Conversions.hh"
 #include "gazebo/gui/building/RotateHandle.hh"
 #include "gazebo/gui/building/RotateHandlePrivate.hh"
 
@@ -140,9 +141,7 @@ void RotateHandle::paint(QPainter *_painter,
     const QStyleOptionGraphicsItem */*_options*/, QWidget */*_widget*/)
 {
   QPen borderPen;
-  borderPen.setColor(QColor(this->dataPtr->borderColor[0],
-                            this->dataPtr->borderColor[1],
-                            this->dataPtr->borderColor[2]));
+  borderPen.setColor(Conversions::Convert(this->dataPtr->borderColor));
 
   borderPen.setStyle(Qt::SolidLine);
   _painter->setPen(borderPen);
