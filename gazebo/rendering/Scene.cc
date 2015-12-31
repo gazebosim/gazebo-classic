@@ -14,7 +14,9 @@
  * limitations under the License.
  *
 */
-#include <boost/bind.hpp>
+
+#include <functional>
+
 #include <boost/lexical_cast.hpp>
 
 #include "gazebo/rendering/skyx/include/SkyX.h"
@@ -127,11 +129,11 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
   this->dataPtr->receiveMutex = new std::mutex();
 
   this->dataPtr->connections.push_back(
-      event::Events::ConnectPreRender(boost::bind(&Scene::PreRender, this)));
+      event::Events::ConnectPreRender(std::bind(&Scene::PreRender, this)));
 
   this->dataPtr->connections.push_back(
       rendering::Events::ConnectToggleLayer(
-        boost::bind(&Scene::ToggleLayer, this, _1)));
+        std::bind(&Scene::ToggleLayer, this, std::placeholders::_1)));
 
   this->dataPtr->sensorSub = this->dataPtr->node->Subscribe("~/sensor",
                                           &Scene::OnSensorMsg, this, true);
