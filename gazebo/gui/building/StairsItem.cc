@@ -79,6 +79,7 @@ StairsItem::StairsItem() : RectItem(), dataPtr(new StairsItemPrivate())
 /////////////////////////////////////////////////
 StairsItem::~StairsItem()
 {
+  delete this->dataPtr->inspector;
 }
 
 /////////////////////////////////////////////////

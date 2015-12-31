@@ -73,6 +73,7 @@ WindowItem::WindowItem() : RectItem(), dataPtr(new WindowItemPrivate())
 /////////////////////////////////////////////////
 WindowItem::~WindowItem()
 {
+  delete this->dataPtr->inspector;
 }
 
 /////////////////////////////////////////////////

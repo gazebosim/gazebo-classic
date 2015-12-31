@@ -74,6 +74,7 @@ DoorItem::DoorItem() : RectItem(), dataPtr(new DoorItemPrivate)
 /////////////////////////////////////////////////
 DoorItem::~DoorItem()
 {
+  delete this->dataPtr->inspector;
 }
 
 /////////////////////////////////////////////////

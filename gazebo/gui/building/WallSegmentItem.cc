@@ -71,6 +71,7 @@ WallSegmentItem::WallSegmentItem(const QPointF &_start, const QPointF &_end,
 /////////////////////////////////////////////////
 WallSegmentItem::~WallSegmentItem()
 {
+  delete this->dataPtr->inspector;
 }
 
 /////////////////////////////////////////////////

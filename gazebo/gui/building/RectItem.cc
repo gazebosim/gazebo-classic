@@ -91,6 +91,15 @@ RectItem::RectItem() : EditorItem(), dataPtr(new RectItemPrivate())
 /////////////////////////////////////////////////
 RectItem::~RectItem()
 {
+  for (int i = 0; i < 8; ++i)
+  {
+    this->dataPtr->grabbers[i]->setParentItem(NULL);
+    delete this->dataPtr->grabbers[i];
+  }
+
+  this->dataPtr->rotateHandle->setParentItem(NULL);
+  delete this->dataPtr->rotateHandle;
+
   if (!this->measures.empty())
   {
     delete this->measures[0];
