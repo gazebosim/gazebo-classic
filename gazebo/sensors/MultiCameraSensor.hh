@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_MULTICAMERASENSOR_HH_
-#define _GAZEBO_MULTICAMERASENSOR_HH_
+#ifndef _GAZEBO_SENSORS_MULTICAMERASENSOR_HH_
+#define _GAZEBO_SENSORS_MULTICAMERASENSOR_HH_
 
 #include <string>
 #include <vector>
