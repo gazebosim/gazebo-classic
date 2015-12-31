@@ -96,8 +96,10 @@ void JointVisual::Load(ConstJointPtr &_msg)
   }
 
   // Scale according to the link it is attached to
-  double linkSize = std::max(0.1,
-      dPtr->parent->GetBoundingBox().GetSize().GetLength());
+  double linkSize = 1.0;
+  auto parent = dPtr->parent.lock();
+  if (parent)
+      linkSize = std::max(0.1, parent->GetBoundingBox().GetSize().GetLength());
   dPtr->scaleToLink = math::Vector3(linkSize * 0.7,
                                     linkSize * 0.7,
                                     linkSize * 0.7);

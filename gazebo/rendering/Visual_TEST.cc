@@ -1074,6 +1074,34 @@ TEST_F(Visual_TEST, ConvertVisualType)
 }
 
 /////////////////////////////////////////////////
+TEST_F(Visual_TEST, CicularVisualPointer)
+{
+  Load("worlds/blank.world");
+
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
+  ASSERT_TRUE(scene != NULL);
+
+  // Get world visual
+  gazebo::rendering::VisualPtr world = scene->GetWorldVisual();
+  ASSERT_TRUE(world != NULL);
+
+  // Create a parent visual
+  gazebo::rendering::VisualPtr parent;
+  parent.reset(new gazebo::rendering::Visual("parent", scene->GetWorldVisual()));
+  parent->Load();
+
+  // Create a child visual
+  gazebo::rendering::VisualPtr child;
+  child.reset(new gazebo::rendering::Visual("child", parent));
+  child->Load();
+
+  scene->RemoveVisual(parent);
+  parent.reset();
+
+  EXPECT_TRUE(child->GetParent() == NULL);
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

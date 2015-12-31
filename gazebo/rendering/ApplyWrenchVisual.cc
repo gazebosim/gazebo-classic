@@ -376,7 +376,11 @@ void ApplyWrenchVisual::UpdateTorqueVisual()
       math::Vector3(0, M_PI/2.0, 0)));
 
   // Position towards comVector
-  double linkDiagonal = dPtr->parent->GetBoundingBox().GetSize().GetLength();
+  double linkDiagonal = 1.0;
+  auto parent = dPtr->parent.lock();
+  if (parent)
+    linkDiagonal = parent->GetBoundingBox().GetSize().GetLength();
+
   dPtr->torqueVisual->SetPosition(normVec*linkDiagonal*0.75 + dPtr->comVector);
   dPtr->torqueLine->SetPoint(1,
       math::Vector3(0, 0, -linkDiagonal*0.75)/dPtr->torqueVisual->GetScale());
@@ -393,7 +397,8 @@ void ApplyWrenchVisual::Resize()
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
-  if (!dPtr->parent || !dPtr->forceVisual || !dPtr->torqueVisual ||
+  auto parent = dPtr->parent.lock();
+  if (!parent || !dPtr->forceVisual || !dPtr->torqueVisual ||
       !dPtr->rotTool)
   {
     gzwarn << "ApplyWrenchVisual is incomplete." << std::endl;
@@ -404,7 +409,7 @@ void ApplyWrenchVisual::Resize()
   std::lock_guard<std::mutex> lock(dPtr->mutex);
 
   double linkSize = std::max(0.1,
-      dPtr->parent->GetBoundingBox().GetSize().GetLength());
+      parent->GetBoundingBox().GetSize().GetLength());
 
   // Force visual
   dPtr->forceVisual->SetScale(math::Vector3(2*linkSize,
@@ -516,4 +521,3 @@ void ApplyWrenchVisual::SetMode(Mode _mode)
     dPtr->rotTool->SetHandleVisible(SelectionObj::ROT_Z, false);
   }
 }
-

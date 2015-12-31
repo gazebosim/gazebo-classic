@@ -139,15 +139,16 @@ void SelectionObj::Attach(rendering::VisualPtr _vis)
   SelectionObjPrivate *dPtr =
       reinterpret_cast<SelectionObjPrivate *>(this->dataPtr);
 
-  if (dPtr->parent)
+  auto parent = dPtr->parent.lock();
+  if (parent)
   {
-    if (dPtr->parent == _vis)
+    if (parent == _vis)
       return;
-    dPtr->parent->DetachVisual(shared_from_this());
+    parent->DetachVisual(shared_from_this());
   }
 
   dPtr->parent = _vis;
-  dPtr->parent->AttachVisual(shared_from_this());
+  _vis->AttachVisual(shared_from_this());
   this->SetPosition(math::Vector3(0, 0, 0));
 
   this->UpdateSize();
@@ -159,14 +160,16 @@ void SelectionObj::UpdateSize()
   SelectionObjPrivate *dPtr =
       reinterpret_cast<SelectionObjPrivate *>(this->dataPtr);
 
-  VisualPtr vis = dPtr->parent;
+  auto vis = dPtr->parent.lock();
+  if (!vis)
+    return
 
   // don't include the selection obj itself when calculating the size.
   this->Detach();
   math::Vector3 bboxSize = vis->GetBoundingBox().GetSize()
       * vis->GetScale();
   dPtr->parent = vis;
-  dPtr->parent->AttachVisual(shared_from_this());
+  vis->AttachVisual(shared_from_this());
 
   double max = std::max(std::max(bboxSize.x, bboxSize.y), bboxSize.z);
 
@@ -195,8 +198,9 @@ void SelectionObj::Detach()
   SelectionObjPrivate *dPtr =
       reinterpret_cast<SelectionObjPrivate *>(this->dataPtr);
 
-  if (dPtr->parent)
-    dPtr->parent->DetachVisual(shared_from_this());
+  auto parent = dPtr->parent.lock();
+  if (parent)
+    parent->DetachVisual(shared_from_this());
   dPtr->parent.reset();
 }
 

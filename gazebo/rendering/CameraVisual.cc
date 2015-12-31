@@ -121,8 +121,9 @@ void CameraVisual::Load(const msgs::CameraSensor &_msg)
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
 
-  if (dPtr->parent)
-    dPtr->parent->AttachVisual(shared_from_this());
+  auto parent = dPtr->parent.lock();
+  if (parent)
+    parent->AttachVisual(shared_from_this());
 
   dPtr->connections.push_back(
       event::Events::ConnectRender(

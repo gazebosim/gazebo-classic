@@ -115,8 +115,9 @@ void LogicalCameraVisual::Load(const msgs::LogicalCameraSensor &_msg)
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
 
-  if (this->dataPtr->parent)
-    this->dataPtr->parent->AttachVisual(shared_from_this());
+  auto parent = this->dataPtr->parent.lock();
+  if (parent)
+    parent->AttachVisual(shared_from_this());
 }
 
 /////////////////////////////////////////////////
