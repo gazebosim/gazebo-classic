@@ -61,7 +61,7 @@ TEST_F(GuiConversionsTest, Color)
 /////////////////////////////////////////////////
 TEST_F(GuiConversionsTest, Point2d)
 {
-  // Gazebo to Qt to Gazebo
+  // Ignition to Qt to Ignition
   {
     double x = -0.5;
     double y = 123;
@@ -71,7 +71,7 @@ TEST_F(GuiConversionsTest, Point2d)
               gazebo::gui::Conversions::Convert(point)), point);
   }
 
-  // Qt to Gazebo to Qt
+  // Qt to Ignition to Qt
   {
     double x = -0.5;
     double y = 123;
