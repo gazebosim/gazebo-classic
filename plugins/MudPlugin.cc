@@ -159,7 +159,7 @@ void MudPlugin::Init()
   }
 
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-          boost::bind(&MudPlugin::OnUpdate, this));
+          std::bind(&MudPlugin::OnUpdate, this));
 }
 
 /////////////////////////////////////////////////

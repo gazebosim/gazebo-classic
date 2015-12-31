@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_RAYSENSOR_HH_
-#define _GAZEBO_RAYSENSOR_HH_
+#ifndef _GAZEBO_SENSORS_RAYSENSOR_HH_
+#define _GAZEBO_SENSORS_RAYSENSOR_HH_
 
 #include <vector>
 #include <string>

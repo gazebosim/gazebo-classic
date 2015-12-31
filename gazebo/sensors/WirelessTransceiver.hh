@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_WIRELESS_TRANSCEIVER_HH_
-#define _GAZEBO_WIRELESS_TRANSCEIVER_HH_
+#ifndef _GAZEBO_SENSORS_WIRELESSTRANSCEIVER_HH_
+#define _GAZEBO_SENSORS_WIRELESSTRANSCEIVER_HH_
 
 #include <string>
 #include <ignition/math/Pose3.hh>
@@ -66,10 +66,10 @@ namespace gazebo
       protected: transport::PublisherPtr pub;
 
       /// \brief Receiver's power (dBm).
-      protected: double power;
+      protected: double power = 14.5;
 
       /// \brief Antenna's gain of the receiver (dBi).
-      protected: double gain;
+      protected: double gain = 2.5;
 
       /// \brief Parent entity which the sensor is attached to
       protected: boost::weak_ptr<physics::Link> parentEntity;

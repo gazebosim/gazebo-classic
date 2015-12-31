@@ -37,15 +37,14 @@ GZ_REGISTER_STATIC_SENSOR("altimeter", AltimeterSensor)
 
 /////////////////////////////////////////////////
 AltimeterSensor::AltimeterSensor()
-: Sensor(sensors::OTHER), dataPtr(new AltimeterSensorPrivate)
+: Sensor(sensors::OTHER),
+  dataPtr(new AltimeterSensorPrivate)
 {
 }
 
 /////////////////////////////////////////////////
 AltimeterSensor::~AltimeterSensor()
 {
-  delete this->dataPtr;
-  this->dataPtr = NULL;
 }
 
 /////////////////////////////////////////////////

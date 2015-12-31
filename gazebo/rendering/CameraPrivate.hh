@@ -22,6 +22,7 @@
 #include <list>
 #include <ignition/math/Pose3.hh>
 
+#include "gazebo/common/PID.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/util/system.hh"
 
