@@ -25,6 +25,7 @@ set (sources
   ApplyWrenchDialog.cc
   CloneWindow.cc
   ConfigWidget.cc
+  Conversions.cc
   DataLogger.cc
   Editor.cc
   EntityMaker.cc
@@ -100,6 +101,7 @@ set (qt_headers
 set (headers
   qt.h
   qt_test.h
+  Conversions.hh
   EntityMaker.hh
   GuiIface.hh
   GuiEvents.hh
@@ -133,6 +135,15 @@ endif ()
 #    IncrementalPlot.hh
 #  )
 #endif()
+
+set (gtest_sources
+  Conversions_TEST.cc
+)
+gz_build_tests(${gtest_sources})
+foreach(gtest_file ${gtest_sources})
+  string(REGEX REPLACE ".cc" "" BINARY_NAME ${gtest_file})
+  target_link_libraries(${TEST_TYPE}_${BINARY_NAME} gazebo_gui)
+endforeach()
 
 set (qt_tests
   DataLogger_TEST.cc
