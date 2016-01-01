@@ -181,6 +181,11 @@ ModelCreator::ModelCreator()
       gui::model::Events::ConnectModelPropertiesChanged(
       boost::bind(&ModelCreator::OnPropertiesChanged, this, _1, _2)));
 
+  this->connections.push_back(
+      gui::model::Events::ConnectRequestModelPluginInsertion(
+      std::bind(&ModelCreator::OnAddModelPlugin, this,
+      std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+
   if (g_copyAct)
   {
     g_copyAct->setEnabled(false);
@@ -219,7 +224,7 @@ ModelCreator::~ModelCreator()
   delete this->saveDialog;
   delete this->updateMutex;
 
-  delete jointMaker;
+  delete this->jointMaker;
 }
 
 /////////////////////////////////////////////////
@@ -507,7 +512,8 @@ void ModelCreator::OnNew()
 {
   this->Stop();
 
-  if (this->allLinks.empty() && this->allNestedModels.empty())
+  if (this->allLinks.empty() && this->allNestedModels.empty() &&
+      this->allModelPlugins.empty())
   {
     this->Reset();
     gui::model::Events::newModel();
@@ -621,7 +627,8 @@ void ModelCreator::OnExit()
 {
   this->Stop();
 
-  if (this->allLinks.empty() && this->allNestedModels.empty())
+  if (this->allLinks.empty() && this->allNestedModels.empty() &&
+      this->allModelPlugins.empty())
   {
     if (!this->serverModelName.empty())
       this->SetModelVisible(this->serverModelName, true);
@@ -2448,6 +2455,37 @@ ModelCreator::SaveState ModelCreator::GetCurrentSaveState() const
 }
 
 /////////////////////////////////////////////////
+void ModelCreator::OnAddModelPlugin(const std::string &_name,
+    const std::string &_filename, const std::string &_innerxml)
+{
+  if (_name.empty() || _filename.empty())
+  {
+    gzerr << "Cannot add model plugin. Empty name or filename" << std::endl;
+    return;
+  }
+
+  // Use the SDF parser to read all the inner xml.
+  sdf::ElementPtr modelPluginSDF(new sdf::Element);
+  sdf::initFile("plugin.sdf", modelPluginSDF);
+  std::stringstream tmp;
+  tmp << "<sdf version='" << SDF_VERSION << "'>";
+  tmp << "<plugin name='" << _name << "' filename='" << _filename << "'>";
+  tmp << _innerxml;
+  tmp << "</plugin></sdf>";
+
+  if (sdf::readString(tmp.str(), modelPluginSDF))
+  {
+    this->AddModelPlugin(modelPluginSDF);
+    this->ModelChanged();
+  }
+  else
+  {
+    gzerr << "Error reading Plugin SDF. Unable to parse Innerxml:\n"
+        << _innerxml << std::endl;
+  }
+}
+
+/////////////////////////////////////////////////
 void ModelCreator::AddModelPlugin(const sdf::ElementPtr _pluginElem)
 {
   if (_pluginElem->HasAttribute("name"))
@@ -2467,6 +2505,15 @@ void ModelCreator::AddModelPlugin(const sdf::ElementPtr _pluginElem)
     // Notify addition
     gui::model::Events::modelPluginInserted(name);
   }
+}
+
+/////////////////////////////////////////////////
+ModelPluginData *ModelCreator::ModelPlugin(const std::string &_name)
+{
+  auto it = this->allModelPlugins.find(_name);
+  if (it != this->allModelPlugins.end())
+    return it->second;
+  return NULL;
 }
 
 /////////////////////////////////////////////////
