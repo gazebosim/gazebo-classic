@@ -42,15 +42,9 @@ RotateHandle::~RotateHandle()
 }
 
 /////////////////////////////////////////////////
-void RotateHandle::SetMouseState(int _state)
+void RotateHandle::SetMouseState(const int _state)
 {
   this->dataPtr->mouseButtonState = _state;
-}
-
-/////////////////////////////////////////////////
-int RotateHandle::GetMouseState() const
-{
-  return this->MouseState();
 }
 
 /////////////////////////////////////////////////
@@ -60,33 +54,21 @@ int RotateHandle::MouseState() const
 }
 
 /////////////////////////////////////////////////
-void RotateHandle::SetMouseDownX(double _x)
+void RotateHandle::SetMouseDownX(const double _x)
 {
   this->dataPtr->mouseDownX = _x;
 }
 
 /////////////////////////////////////////////////
-void RotateHandle::SetMouseDownY(double _y)
+void RotateHandle::SetMouseDownY(const double _y)
 {
   this->dataPtr->mouseDownY = _y;
-}
-
-/////////////////////////////////////////////////
-double RotateHandle::GetMouseDownX() const
-{
-  return this->MouseDownX();
 }
 
 /////////////////////////////////////////////////
 double RotateHandle::MouseDownX() const
 {
   return this->dataPtr->mouseDownX;
-}
-
-/////////////////////////////////////////////////
-double RotateHandle::GetMouseDownY() const
-{
-  return this->MouseDownY();
 }
 
 /////////////////////////////////////////////////

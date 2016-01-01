@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_BUILDING_ROTATEHANDLE_HH_
-#define _GAZEBO_BUILDING_ROTATEHANDLE_HH_
+#ifndef _GAZEBO_GUI_ROTATEHANDLE_HH_
+#define _GAZEBO_GUI_ROTATEHANDLE_HH_
 
 #include <memory>
 
@@ -54,21 +54,6 @@ namespace gazebo
 
       /// \brief Get the current mouse state
       /// \return The current mouse state.
-      /// \deprecated See int MouseState() const
-      public: int GetMouseState() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get the X position of the mouse press.
-      /// \return Mouse press X position in pixel coordinates.
-      /// \deprecated See double MouseDownX() const
-      public: double GetMouseDownX() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get the Y position of the mouse press.
-      /// \return Mouse press Y position in pixel coordinates.
-      /// \deprecated See double MouseDownY() const
-      public: double GetMouseDownY() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get the current mouse state
-      /// \return The current mouse state.
       /// \sa void SetMouseState(int _state)
       public: int MouseState() const;
 
@@ -85,12 +70,12 @@ namespace gazebo
       /// \brief Set the X position of the mouse press.
       /// \param[in] _x Mouse press X position in pixel coordinates.
       /// \sa double MouseDownX() const
-      public: void SetMouseDownX(double _x);
+      public: void SetMouseDownX(const double _x);
 
       /// \brief Set the Y position of the mouse press.
       /// \param[in] _y Mouse press Y position in pixel coordinates.
       /// \sa double MouseDownY() const
-      public: void SetMouseDownY(double _y);
+      public: void SetMouseDownY(const double _y);
 
       /// \brief Qt mouse hover enter event
       /// \param[in] _event Qt mouse hover event
