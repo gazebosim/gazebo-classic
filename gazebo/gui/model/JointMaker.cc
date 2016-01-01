@@ -310,7 +310,7 @@ void JointMaker::RemoveJointsByLink(const std::string &_linkName)
 }
 
 /////////////////////////////////////////////////
-std::vector<JointData *> JointMaker::GetJointDataByLink(
+std::vector<JointData *> JointMaker::JointDataByLink(
     const std::string &_linkName) const
 {
   std::vector<JointData *> linkJoints;
@@ -463,17 +463,17 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
 
 /////////////////////////////////////////////////
 JointData *JointMaker::CreateJointLine(const std::string &_name,
-    rendering::VisualPtr _parent)
+    const rendering::VisualPtr &_parent)
 {
   rendering::VisualPtr jointVis(
       new rendering::Visual(_name, _parent->GetParent()));
   jointVis->Load();
   rendering::DynamicLines *jointLine =
       jointVis->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
-  math::Vector3 origin = _parent->GetWorldPose().pos
-      - _parent->GetParent()->GetWorldPose().pos;
-  jointLine->AddPoint(origin.Ign());
-  jointLine->AddPoint(origin.Ign() + ignition::math::Vector3d(0, 0, 0.1));
+  auto origin = _parent->GetWorldPose().Ign().Pos()
+      - _parent->GetParent()->GetWorldPose().Ign().Pos();
+  jointLine->AddPoint(origin);
+  jointLine->AddPoint(origin + ignition::math::Vector3d(0, 0, 0.1));
   jointVis->GetSceneNode()->setInheritScale(false);
   jointVis->GetSceneNode()->setInheritOrientation(false);
 
@@ -496,8 +496,8 @@ JointData *JointMaker::CreateJointLine(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
-JointData *JointMaker::CreateJoint(rendering::VisualPtr _parent,
-    rendering::VisualPtr _child)
+JointData *JointMaker::CreateJoint(const rendering::VisualPtr &_parent,
+    const rendering::VisualPtr &_child)
 {
   std::stringstream ss;
   ss << _parent->GetName() << "_JOINT_" << this->dataPtr->jointCounter++;
@@ -535,7 +535,7 @@ JointMaker::JointType JointMaker::ConvertJointType(const std::string &_type)
 }
 
 /////////////////////////////////////////////////
-std::string JointMaker::GetJointMaterial(const std::string &_type)
+std::string JointMaker::JointMaterial(const std::string &_type)
 {
   auto it = jointMaterials.find(ConvertJointType(_type));
   if (it != jointMaterials.end())
@@ -551,7 +551,7 @@ void JointMaker::AddJoint(const std::string &_type)
 }
 
 /////////////////////////////////////////////////
-void JointMaker::AddJoint(JointMaker::JointType _type)
+void JointMaker::AddJoint(const JointMaker::JointType _type)
 {
   this->dataPtr->jointType = _type;
   // Start joint creation
@@ -830,13 +830,13 @@ void JointMaker::Update()
       if (joint->child && joint->parent)
       {
         bool poseUpdate = false;
-        if (joint->parentPose != joint->parent->GetWorldPose() ||
-            joint->childPose != joint->child->GetWorldPose() ||
-            joint->childScale != joint->child->GetScale())
+        if (joint->parentPose != joint->parent->GetWorldPose().Ign() ||
+            joint->childPose != joint->child->GetWorldPose().Ign() ||
+            joint->childScale != joint->child->GetScale().Ign())
          {
-           joint->parentPose = joint->parent->GetWorldPose();
-           joint->childPose = joint->child->GetWorldPose();
-           joint->childScale = joint->child->GetScale();
+           joint->parentPose = joint->parent->GetWorldPose().Ign();
+           joint->childPose = joint->child->GetWorldPose().Ign();
+           joint->childScale = joint->child->GetScale().Ign();
            poseUpdate = true;
 
            // Highlight links connected to joint being created if they have
@@ -892,7 +892,7 @@ void JointMaker::AddScopedLinkName(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-std::string JointMaker::GetScopedLinkName(const std::string &_name)
+std::string JointMaker::ScopedLinkName(const std::string &_name)
 {
   for (unsigned int i = 0; i < this->dataPtr->scopedLinkedNames.size(); ++i)
   {
@@ -918,7 +918,7 @@ void JointMaker::GenerateSDF()
     sdf::ElementPtr jointElem = this->dataPtr->modelSDF->AddElement("joint");
 
     msgs::JointPtr jointMsg = joint->jointMsg;
-    unsigned int axisCount = GetJointAxisCount(joint->type);
+    unsigned int axisCount = this->JointAxisCount(joint->type);
     for (unsigned int i = axisCount; i < 2u; ++i)
     {
       if (i == 0u)
@@ -945,13 +945,13 @@ void JointMaker::GenerateSDF()
 }
 
 /////////////////////////////////////////////////
-sdf::ElementPtr JointMaker::GetSDF() const
+sdf::ElementPtr JointMaker::SDF() const
 {
   return this->dataPtr->modelSDF;
 }
 
 /////////////////////////////////////////////////
-std::string JointMaker::GetTypeAsString(JointMaker::JointType _type)
+std::string JointMaker::TypeAsString(const JointMaker::JointType _type)
 {
   std::string jointTypeStr = "";
 
@@ -963,7 +963,7 @@ std::string JointMaker::GetTypeAsString(JointMaker::JointType _type)
 }
 
 /////////////////////////////////////////////////
-unsigned int JointMaker::GetJointAxisCount(JointMaker::JointType _type)
+unsigned int JointMaker::JointAxisCount(const JointMaker::JointType _type)
 {
   if (_type == JOINT_FIXED)
   {
@@ -1002,7 +1002,7 @@ unsigned int JointMaker::GetJointAxisCount(JointMaker::JointType _type)
 }
 
 /////////////////////////////////////////////////
-JointMaker::JointType JointMaker::GetState() const
+JointMaker::JointType JointMaker::State() const
 {
   return this->dataPtr->jointType;
 }
@@ -1027,7 +1027,7 @@ ignition::math::Vector3d JointMaker::LinkWorldCentroid(
 }
 
 /////////////////////////////////////////////////
-unsigned int JointMaker::GetJointCount()
+unsigned int JointMaker::JointCount()
 {
   return this->dataPtr->joints.size();
 }
@@ -1120,30 +1120,30 @@ void JointData::Update()
   // Hotspot and parent handle
   if (this->parent && this->child && this->hotspot && this->handles)
   {
-    math::Vector3 parentOrigin = this->parent->GetWorldPose().pos;
-    math::Vector3 childOrigin = this->child->GetWorldPose().pos;
+    auto parentOrigin = this->parent->GetWorldPose().Ign().Pos();
+    auto childOrigin = this->child->GetWorldPose().Ign().Pos();
 
     // Hotspot position
-    math::Vector3 dPos = (childOrigin - parentOrigin);
-    math::Vector3 center = dPos * 0.5;
-    double length = std::max(dPos.GetLength(), 0.001);
-    this->hotspot->SetScale(math::Vector3(0.008, 0.008, length));
+    auto dPos = childOrigin - parentOrigin;
+    auto center = dPos * 0.5;
+    double length = std::max(dPos.Length(), 0.001);
+    this->hotspot->SetScale(ignition::math::Vector3d(0.008, 0.008, length));
     this->hotspot->SetWorldPosition(parentOrigin + center);
 
     // Hotspot orientation
-    math::Vector3 u = dPos.Normalize();
-    math::Vector3 v = math::Vector3::UnitZ;
+    auto u = dPos.Normalize();
+    auto v = ignition::math::Vector3d::UnitZ;
     double cosTheta = v.Dot(u);
     double angle = acos(cosTheta);
-    math::Vector3 w = (v.Cross(u)).Normalize();
-    math::Quaternion q;
-    q.SetFromAxis(w, angle);
+    auto w = (v.Cross(u)).Normalize();
+    ignition::math::Quaterniond q;
+    q.Axis(w, angle);
     this->hotspot->SetWorldRotation(q);
 
     // Parent handle position
     this->handles->getBillboard(0)->setPosition(
         rendering::Conversions::Convert(parentOrigin -
-        this->hotspot->GetWorldPose().pos));
+        this->hotspot->GetWorldPose().Ign().Pos()));
     this->handles->_updateBounds();
 
     // set new material if joint type has changed
@@ -1280,10 +1280,10 @@ void JointData::UpdateMsg()
 
   // Type
   this->jointMsg->set_type(
-      msgs::ConvertJointType(JointMaker::GetTypeAsString(this->type)));
+      msgs::ConvertJointType(JointMaker::TypeAsString(this->type)));
 
   // Axes
-  unsigned int axisCount = JointMaker::GetJointAxisCount(this->type);
+  unsigned int axisCount = JointMaker::JointAxisCount(this->type);
   for (unsigned int i = 0; i < axisCount; ++i)
   {
     msgs::Axis *axisMsg;
@@ -1401,7 +1401,7 @@ void JointMaker::SetSelected(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
-void JointMaker::SetSelected(rendering::VisualPtr _jointVis,
+void JointMaker::SetSelected(const rendering::VisualPtr &_jointVis,
     const bool _selected)
 {
   if (!_jointVis)
@@ -1488,10 +1488,10 @@ void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
   rendering::DynamicLines *jointLine =
       jointVis->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
 
-  math::Vector3 origin = parentVis->GetWorldPose().pos
-      - parentVis->GetParent()->GetWorldPose().pos;
-  jointLine->AddPoint(origin.Ign());
-  jointLine->AddPoint(origin.Ign() + ignition::math::Vector3d(0, 0, 0.1));
+  auto origin = parentVis->GetWorldPose().Ign().Pos()
+      - parentVis->GetParent()->GetWorldPose().Ign().Pos();
+  jointLine->AddPoint(origin);
+  jointLine->AddPoint(origin + ignition::math::Vector3d(0, 0, 0.1));
 
   jointVis->GetSceneNode()->setInheritScale(false);
   jointVis->GetSceneNode()->setInheritOrientation(false);
@@ -1554,7 +1554,7 @@ void JointMaker::ShowJoints(bool _show)
 }
 
 /////////////////////////////////////////////////
-bool JointMaker::SetParentLink(rendering::VisualPtr _parentLink)
+bool JointMaker::SetParentLink(const rendering::VisualPtr &_parentLink)
 {
   if (!_parentLink)
   {
@@ -1593,7 +1593,7 @@ bool JointMaker::SetParentLink(rendering::VisualPtr _parentLink)
 }
 
 /////////////////////////////////////////////////
-bool JointMaker::SetChildLink(rendering::VisualPtr _childLink)
+bool JointMaker::SetChildLink(const rendering::VisualPtr &_childLink)
 {
   if (!_childLink)
   {
@@ -1658,7 +1658,7 @@ void JointMaker::OnType(const int _typeInt)
 }
 
 /////////////////////////////////////////////////
-void JointMaker::SetAxis(const QString &_axis,
+void JointMaker::SetAxis(const std::string &_axis,
       const ignition::math::Vector3d &_value)
 {
   if (this->dataPtr->newJoint && this->dataPtr->newJoint->jointMsg)
@@ -1796,7 +1796,8 @@ void JointMaker::AlignLinks(const bool _childToParent,
 }
 
 /////////////////////////////////////////////////
-void JointMaker::SetVisualMoved(rendering::VisualPtr _vis, const bool _moved)
+void JointMaker::SetVisualMoved(const rendering::VisualPtr &_vis,
+    const bool _moved)
 {
   if (_vis->GetChildCount() != 0)
   {

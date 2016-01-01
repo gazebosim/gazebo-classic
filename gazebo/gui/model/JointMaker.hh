@@ -118,14 +118,14 @@ namespace gazebo
 
       /// \brief Add a joint
       /// \param[in] _type Type of joint to be added
-      public: void AddJoint(JointType _type);
+      public: void AddJoint(const JointType _type);
 
       /// \brief Create a joint with parent and child.
       /// \param[in] _parent Parent of the joint.
       /// \param[in] _child Child of the joint.
       /// \return Joint data.
-      public: JointData *CreateJoint(rendering::VisualPtr _parent,
-          rendering::VisualPtr _child);
+      public: JointData *CreateJoint(const rendering::VisualPtr &_parent,
+          const rendering::VisualPtr &_child);
 
       /// \brief Helper method to create hotspot visual for mouse interaction.
       /// \param[in] _joint Joint data used for creating the hotspot
@@ -148,7 +148,7 @@ namespace gazebo
       /// the given link.
       /// \param[in] _linkName Name of the link.
       /// \return Vector with joint data.
-      public: std::vector<JointData *> GetJointDataByLink(
+      public: std::vector<JointData *> JointDataByLink(
           const std::string &_linkName) const;
 
       /// \brief Generate SDF for all joints.
@@ -156,18 +156,18 @@ namespace gazebo
 
       /// \brief Get model SDF element containing all joints.
       /// \return Pointer to SDF element.
-      public: sdf::ElementPtr GetSDF() const;
+      public: sdf::ElementPtr SDF() const;
 
       /// \brief Get the axis count for joint type.
       /// \param[in] _type Type of joint.
       /// \return Axis count.
-      public: static unsigned int GetJointAxisCount(
-          JointMaker::JointType _type);
+      public: static unsigned int JointAxisCount(
+          const JointMaker::JointType _type);
 
       /// \brief Get the joint type in string.
       /// \param[in] _type Type of joint.
       /// \return Joint type in string.
-      public: static std::string GetTypeAsString(JointMaker::JointType _type);
+      public: static std::string TypeAsString(const JointMaker::JointType _type);
 
       /// \brief Convert a joint type string to enum.
       /// \param[in] _type Joint type in string.
@@ -177,20 +177,20 @@ namespace gazebo
       /// \brief Get the material for the joint type.
       /// \param[in] _type Type of joint.
       /// \return Name of material.
-      public: static std::string GetJointMaterial(const std::string &_type);
+      public: static std::string JointMaterial(const std::string &_type);
 
       /// \brief Get state
       /// \return Current state of the joint maker. If mouse is enabled to
       /// create a new joint, it returns the type of joint. Otherwise, it
       /// returns JOINT_NONE.
-      public: JointMaker::JointType GetState() const;
+      public: JointMaker::JointType State() const;
 
       /// \brief Stop the process of adding joint to the model.
       public: void Stop();
 
       /// \brief Get the number of joints added.
       /// \return Number of joints.
-      public: unsigned int GetJointCount();
+      public: unsigned int JointCount();
 
       /// \brief Create a joint from SDF. This is mainly used when editing
       /// existing models.
@@ -208,7 +208,7 @@ namespace gazebo
 
       /// \brief Qt Callback to show / hide joint visuals.
       /// \param[in] _show True to show joints, false to hide them.
-      public slots: void ShowJoints(bool _show);
+      public slots: void ShowJoints(const bool _show);
 
       /// \brief Set the select state of a joint.
       /// \param[in] _name Name of the joint.
@@ -218,7 +218,7 @@ namespace gazebo
       /// \brief Set the select state of a joint visual.
       /// \param[in] _jointVis Pointer to the joint visual.
       /// \param[in] _selected True to select the joint.
-      public: void SetSelected(rendering::VisualPtr _jointVis,
+      public: void SetSelected(const rendering::VisualPtr &_jointVis,
           const bool selected);
 
       /// \brief Get the list of links.
@@ -234,7 +234,7 @@ namespace gazebo
       /// To be used by other classes.
       /// \param[in] _axis Axis which was changed, either "axis1" or "axis2".
       /// \param[in] _value New value for the axis
-      public slots: void SetAxis(const QString &_axis,
+      public slots: void SetAxis(const std::string &_axis,
           const ignition::math::Vector3d &_value);
 
       /// \brief A new joint pose for the joint being created has been chosen.
@@ -244,13 +244,13 @@ namespace gazebo
 
       /// \brief A new parent link for the joint being created has been chosen.
       /// To be used by other classes.
-      /// \sa SetParentLink(rendering::VisualPtr _parentLink)
+      /// \sa SetParentLink(const rendering::VisualPtr &_parentLink)
       /// \param[in] _name Link name, either the leaf or scoped.
       public: void SetParentLink(const std::string &_name);
 
       /// \brief A new child link for the joint being created has been chosen.
       /// To be used by other classes.
-      /// \sa SetChildLink(rendering::VisualPtr _childLink)
+      /// \sa SetChildLink(const rendering::VisualPtr &_childLink)
       /// \param[in] _name Link name, either the leaf or scoped.
       public: void SetChildLink(const std::string &_name);
 
@@ -313,7 +313,7 @@ namespace gazebo
       /// \brief Get the scoped name of a link.
       /// \param[in] _name Unscoped link name.
       /// \return Scoped link name.
-      private: std::string GetScopedLinkName(const std::string &_name);
+      private: std::string ScopedLinkName(const std::string &_name);
 
       /// \brief Show a joint's context menu
       /// \param[in] _joint Name of joint the context menu is associated with.
@@ -348,7 +348,7 @@ namespace gazebo
       /// \param[in] _parent Parent of the joint.
       /// \return joint data.
       private: JointData *CreateJointLine(const std::string &_name,
-          rendering::VisualPtr _parent);
+          const rendering::VisualPtr &_parent);
 
       /// \brief Get a link's visual from the link's name.
       /// \param[in] _name Link name, scoped or not.
@@ -360,19 +360,19 @@ namespace gazebo
       /// \sa SetParentLink(const std::string &_name);
       /// \param[in] _parentLink Pointer to the link visual.
       /// \return True if successfully set new parent.
-      private: bool SetParentLink(rendering::VisualPtr _parentLink);
+      private: bool SetParentLink(const rendering::VisualPtr &_parentLink);
 
       /// \brief Set a new child link for the joint being created.
       /// \sa SetChildLink(const std::string &_name);
       /// \param[in] _childLink Pointer to the link visual.
       /// \return True if successfully set new child.
-      private: bool SetChildLink(rendering::VisualPtr _childLink);
+      private: bool SetChildLink(const rendering::VisualPtr &_childLink);
 
       /// \brief Highlight link visuals which have been moved while creating
       /// a new joint.
       /// \param[in] _vis Visual to be highlighted.
       /// \param[in] _moved Whether it moved or not.
-      private: void SetVisualMoved(rendering::VisualPtr _vis,
+      private: void SetVisualMoved(const rendering::VisualPtr &_vis,
           const bool _moved);
 
       /// \brief Qt signal when the joint creation process has ended.
@@ -446,15 +446,15 @@ namespace gazebo
 
       /// \internal
       /// \brief Parent visual pose used to determine if updates are needed.
-      public: math::Pose parentPose;
+      public: ignition::math::Pose3d parentPose;
 
       /// \internal
       /// \brief Child visual pose used to determine if updates are needed.
-      public: math::Pose childPose;
+      public: ignition::math::Pose3d childPose;
 
       /// \internal
       /// \brief Child visual scale used to determine if updates are needed.
-      public: math::Vector3 childScale;
+      public: ignition::math::Vector3d childScale;
 
       /// \brief Visual line used to represent joint connecting parent and child
       public: rendering::DynamicLines *line;
