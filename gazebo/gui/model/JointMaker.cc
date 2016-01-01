@@ -15,8 +15,6 @@
  *
 */
 
-#include <boost/bind.hpp>
-#include <boost/thread/recursive_mutex.hpp>
 #include <string>
 #include <vector>
 
@@ -85,38 +83,38 @@ JointMaker::JointMaker() : dataPtr(new JointMakerPrivate())
 
   this->dataPtr->connections.push_back(
       event::Events::ConnectPreRender(
-      boost::bind(&JointMaker::Update, this)));
+      std::bind(&JointMaker::Update, this)));
 
   this->dataPtr->connections.push_back(
       gui::model::Events::ConnectOpenJointInspector(
-      boost::bind(&JointMaker::OpenInspector, this, _1)));
+      std::bind(&JointMaker::OpenInspector, this, std::placeholders::_1)));
 
   this->dataPtr->connections.push_back(
       gui::model::Events::ConnectShowJointContextMenu(
-      boost::bind(&JointMaker::ShowContextMenu, this, _1)));
+      std::bind(&JointMaker::ShowContextMenu, this, std::placeholders::_1)));
 
   this->dataPtr->connections.push_back(
       gui::model::Events::ConnectSetSelectedJoint(
-      boost::bind(&JointMaker::OnSetSelectedJoint, this, _1, _2)));
+      std::bind(&JointMaker::OnSetSelectedJoint, this, std::placeholders::_1,
+      std::placeholders::_2)));
 
   this->dataPtr->connections.push_back(
       event::Events::ConnectSetSelectedEntity(
-      boost::bind(&JointMaker::OnSetSelectedEntity, this, _1, _2)));
+      std::bind(&JointMaker::OnSetSelectedEntity, this, std::placeholders::_1,
+      std::placeholders::_2)));
 
   this->dataPtr->inspectAct = new QAction(tr("Open Joint Inspector"), this);
   connect(this->dataPtr->inspectAct, SIGNAL(triggered()), this,
       SLOT(OnOpenInspector()));
 
-  this->dataPtr->updateMutex = new boost::recursive_mutex();
-
   // Gazebo event connections
   this->dataPtr->connections.push_back(
       gui::model::Events::ConnectLinkInserted(
-      boost::bind(&JointMaker::OnLinkInserted, this, _1)));
+      std::bind(&JointMaker::OnLinkInserted, this, std::placeholders::_1)));
 
   this->dataPtr->connections.push_back(
       gui::model::Events::ConnectLinkRemoved(
-      boost::bind(&JointMaker::OnLinkRemoved, this, _1)));
+      std::bind(&JointMaker::OnLinkRemoved, this, std::placeholders::_1)));
 }
 
 /////////////////////////////////////////////////
@@ -129,7 +127,7 @@ JointMaker::~JointMaker()
   }
 
   {
-    boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
+    std::lock_guard<std::recursive_mutex> lock(this->dataPtr->updateMutex);
     while (this->dataPtr->joints.size() > 0)
     {
       std::string jointName = this->dataPtr->joints.begin()->first;
@@ -140,15 +138,12 @@ JointMaker::~JointMaker()
 
   if (this->dataPtr->jointCreationDialog)
     delete this->dataPtr->jointCreationDialog;
-
-  // Delete this last
-  delete this->dataPtr->updateMutex;
 }
 
 /////////////////////////////////////////////////
 void JointMaker::Reset()
 {
-  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->updateMutex);
   if (this->dataPtr->newJoint)
   {
     delete this->dataPtr->newJoint;
@@ -174,19 +169,19 @@ void JointMaker::Reset()
 void JointMaker::EnableEventHandlers()
 {
   MouseEventHandler::Instance()->AddDoubleClickFilter("model_joint",
-    boost::bind(&JointMaker::OnMouseDoubleClick, this, _1));
+      std::bind(&JointMaker::OnMouseDoubleClick, this, std::placeholders::_1));
 
   MouseEventHandler::Instance()->AddReleaseFilter("model_joint",
-      boost::bind(&JointMaker::OnMouseRelease, this, _1));
+      std::bind(&JointMaker::OnMouseRelease, this, std::placeholders::_1));
 
   MouseEventHandler::Instance()->AddPressFilter("model_joint",
-      boost::bind(&JointMaker::OnMousePress, this, _1));
+      std::bind(&JointMaker::OnMousePress, this, std::placeholders::_1));
 
   MouseEventHandler::Instance()->AddMoveFilter("model_joint",
-      boost::bind(&JointMaker::OnMouseMove, this, _1));
+      std::bind(&JointMaker::OnMouseMove, this, std::placeholders::_1));
 
   KeyEventHandler::Instance()->AddPressFilter("model_joint",
-      boost::bind(&JointMaker::OnKeyPress, this, _1));
+      std::bind(&JointMaker::OnKeyPress, this, std::placeholders::_1));
 }
 
 /////////////////////////////////////////////////
@@ -202,7 +197,7 @@ void JointMaker::DisableEventHandlers()
 /////////////////////////////////////////////////
 void JointMaker::RemoveJoint(const std::string &_jointId)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->updateMutex);
 
   std::string jointId = _jointId;
   JointData *joint = NULL;
@@ -820,7 +815,7 @@ std::string JointMaker::CreateHotSpot(JointData *_joint)
 /////////////////////////////////////////////////
 void JointMaker::Update()
 {
-  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->updateMutex);
   // Update each joint
   for (auto it : this->dataPtr->joints)
   {
@@ -1562,7 +1557,7 @@ bool JointMaker::SetParentLink(const rendering::VisualPtr &_parentLink)
     return false;
   }
 
-  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->updateMutex);
 
   // Choosing parent for the first time
   if (!this->dataPtr->newJoint)
@@ -1607,7 +1602,7 @@ bool JointMaker::SetChildLink(const rendering::VisualPtr &_childLink)
     return false;
   }
 
-  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->updateMutex);
 
   // Choosing child for the first time
   if (!this->dataPtr->newJoint->child)

@@ -69,7 +69,7 @@ namespace gazebo
       public: QAction *inspectAct;
 
       /// \brief Mutex to protect the list of joints
-      public: boost::recursive_mutex *updateMutex;
+      public: std::recursive_mutex updateMutex;
 
       /// \brief A list of selected link visuals.
       public: std::vector<rendering::VisualPtr> selectedJoints;

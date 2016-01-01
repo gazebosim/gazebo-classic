@@ -167,7 +167,8 @@ namespace gazebo
       /// \brief Get the joint type in string.
       /// \param[in] _type Type of joint.
       /// \return Joint type in string.
-      public: static std::string TypeAsString(const JointMaker::JointType _type);
+      public: static std::string TypeAsString(
+          const JointMaker::JointType _type);
 
       /// \brief Convert a joint type string to enum.
       /// \param[in] _type Joint type in string.
