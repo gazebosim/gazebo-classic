@@ -145,7 +145,7 @@ if (HAVE_OCULUS)
 endif ()
 
 set (gtest_sources
-  Conversions_TEST.cc
+  RenderingConversions_TEST.cc
 )
 
 gz_build_tests(${gtest_sources})
