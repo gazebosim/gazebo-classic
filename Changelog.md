@@ -290,7 +290,10 @@ using the same arguments used in the command line.
 
     1. Added joint creation dialog
         * [Pull request #2021](https://bitbucket.org/osrf/gazebo/pull-request/2021)
-        
+
+    1. Added reverse checkboxes to joint creation dialog
+        * [Pull request #2086](https://bitbucket.org/osrf/gazebo/pull-request/2086)
+
     1. PIMPL LinkInspector
         * [Pull request #2056](https://bitbucket.org/osrf/gazebo/pull-request/2056)
 
