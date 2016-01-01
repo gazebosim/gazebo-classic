@@ -147,6 +147,9 @@ Ogre::Technique *EditorMaterialListener::handleSchemeNotFound(
         return NULL;
       }
 
+      if (entity->getUserObjectBindings().getUserAny().isEmpty())
+        return NULL;
+
       std::string userAny = "";
       try
       {

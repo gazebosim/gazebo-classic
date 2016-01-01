@@ -15,25 +15,26 @@
  *
 */
 
-#ifndef _GAZEBO_MODEL_PLUGIN_INSPECTOR_PRIVATE_HH_
-#define _GAZEBO_MODEL_PLUGIN_INSPECTOR_PRIVATE_HH_
+#include "gazebo/common/Color.hh"
 
-#include "gazebo/gui/ConfigWidget.hh"
 #include "gazebo/gui/qt.h"
+#include "gazebo/gui/Conversions.hh"
 
-namespace gazebo
+using namespace gazebo;
+using namespace gui;
+
+//////////////////////////////////////////////////
+QColor Conversions::Convert(const common::Color &_color)
 {
-  namespace gui
-  {
-    /// \brief Private data for the ModelPluginInspector class
-    class ModelPluginInspectorPrivate
-    {
-      /// \brief Config widget for configuring properties.
-      public: ConfigWidget *configWidget;
-
-      /// \brief True if the inspector is in read-only mode.
-      public: bool readOnly;
-    };
-  }
+  return QColor(_color.r*255.0, _color.g*255.0, _color.b*255.0, _color.a*255.0);
 }
-#endif
+
+//////////////////////////////////////////////////
+common::Color Conversions::Convert(const QColor &_color)
+{
+  return common::Color(_color.red() / 255.0,
+                       _color.green() / 255.0,
+                       _color.blue() / 255.0,
+                       _color.alpha() / 255.0);
+}
+
