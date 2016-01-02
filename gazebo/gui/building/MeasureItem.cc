@@ -15,6 +15,8 @@
  *
 */
 
+#include <iomanip>
+
 #include "gazebo/common/Exception.hh"
 #include "gazebo/math/Angle.hh"
 #include "gazebo/gui/building/EditorView.hh"

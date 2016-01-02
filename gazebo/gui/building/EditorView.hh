@@ -15,14 +15,14 @@
  *
 */
 
-#ifndef _EDITOR_VIEW_HH_
-#define _EDITOR_VIEW_HH_
+#ifndef _GAZEBO_GUI_EDITORVIEW_HH_
+#define _GAZEBO_GUI_EDITORVIEW_HH_
 
-#include <map>
+#include <memory>
 #include <string>
-#include <vector>
+
 #include "gazebo/gui/qt.h"
-#include "gazebo/common/Event.hh"
+
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -31,14 +31,10 @@ namespace gazebo
   {
     class EditorItem;
     class GrabberHandle;
-    class WindowItem;
-    class StairsItem;
-    class DoorItem;
-    class WallSegmentItem;
     class FloorItem;
-    class BuildingMaker;
-    class LevelInspectorDialog;
-    class GridLines;
+
+    // Forward declare private data.
+    class EditorViewPrivate;
 
     /// \class Level EditorView.hh
     /// \brief A convenient structure for storing level information
@@ -248,96 +244,9 @@ namespace gazebo
       private: void UnlinkGrabbers(GrabberHandle *_grabber1,
           GrabberHandle *_grabber2 = NULL);
 
-      /// \brief Current draw mode
-      private: int drawMode;
-
-      /// \brief Indicate whether or not a drawing operation is taking place.
-      private: bool drawInProgress;
-
-      /// \brief Indicate whether or not the floorplan is visible.
-      private: bool floorplanVisible;
-
-      /// \brief Indicate whether or not the editor items are visible.
-      private: bool elementsVisible;
-
-      /// \brief A list of wall segment items in the scene.
-      private: std::vector<WallSegmentItem*> wallSegmentList;
-
-      /// \brief A list of window items in the scene.
-      private: std::vector<WindowItem*> windowList;
-
-      /// \brief A list of door items in the scene.
-      private: std::vector<DoorItem*> doorList;
-
-      /// \brief A list of staircase items in the scene.
-      private: std::vector<StairsItem*> stairsList;
-
-      /// \brief A list of floor items in the scene.
-      private: std::vector<FloorItem*> floorList;
-
-      /// \brief Mapping between 2D editor items to 3D visuals.
-      private: std::map<EditorItem *, std::string> itemToVisualMap;
-
-      /// \brief A list of gui editor events connected to this view.
-      private: std::vector<event::ConnectionPtr> connections;
-
-      /// \brief Editor item currently attached to the mouse during a drawing
-      /// operation.
-      private: QGraphicsItem *currentMouseItem;
-
-      /// \brief Currently selected editor item.
-      private: QGraphicsItem *currentSelectedItem;
-
-      /// \brief Building maker manages the creation of 3D visuals
-      private: BuildingMaker *buildingMaker;
-
-      /// \brief Current building level associated to the view.
-      private: int currentLevel;
-
-      /// \brief A list of building levels in the scene.
-      private: std::vector<Level *> levels;
-
-      /// \brief A counter that holds the total number of levels in the building
-      /// model.
-      private: int levelCounter;
-
-      /// \brief Default height for levels
-      private: double levelDefaultHeight;
-
-      /// \brief Qt action for opening a building level inspector.
-      private: QAction *openLevelInspectorAct;
-
-      /// \brief Qt action for adding a level to the building model.
-      private: QAction *addLevelAct;
-
-      /// \brief Qt action for deleting a level from the building model.
-      private: QAction *deleteLevelAct;
-
-      /// \brief Rotation in degrees when a mouse is pressed and dragged for
-      /// rotating an item.
-      private: double mousePressRotation;
-
-      /// \brief Inspector for a building level.
-      private: LevelInspectorDialog *levelInspector;
-
-      /// \brief Grid lines drawn on the background of the editor.
-      private: GridLines *gridLines;
-
-      /// \brief Scale (zoom level) of the editor view.
-      private: double viewScale;
-
-      /// \brief Indicate whether or not the wall will snap to a grabber
-      /// during a draw wall operation.
-      private: bool snapToGrabber;
-
-      /// \brief Existing grabber to snap towards.
-      private: GrabberHandle *snapGrabberOther;
-
-      /// \brief Currently held grabber which will be snapped.
-      private: GrabberHandle *snapGrabberCurrent;
-
-      /// \brief Text tooltip to follow the mouse.
-      private: QGraphicsTextItem *mouseTooltip;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<EditorViewPrivate> dataPtr;
     };
     /// \}
   }
