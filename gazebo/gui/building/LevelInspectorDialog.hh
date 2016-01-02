@@ -15,19 +15,24 @@
  *
 */
 
-#ifndef _LEVEL_INSPECTOR_DIALOG_HH_
-#define _LEVEL_INSPECTOR_DIALOG_HH_
+#ifndef _GAZEBO_GUI_LEVELINSPECTORDIALOG_HH_
+#define _GAZEBO_GUI_LEVELINSPECTORDIALOG_HH_
 
+#include <memory>
 #include <string>
-#include <vector>
+
 #include "gazebo/gui/qt.h"
-#include "gazebo/util/system.hh"
 #include "gazebo/gui/building/BaseInspectorDialog.hh"
+
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
+    // Forward declare private data.
+    class LevelInspectorDialogPrivate;
+
     /// \addtogroup gazebo_gui
     /// \{
 
@@ -47,11 +52,11 @@ namespace gazebo
 
       /// \brief Get the name of the level.
       /// \return The level name.
-      public: std::string GetLevelName() const;
+      public: std::string LevelName() const;
 
       /// \brief Get the height of the level.
       /// \return The level height in pixels.
-      public: double GetHeight() const;
+      public: double Height() const;
 
       /// \brief Set the name of the level.
       /// \param[in] _levelName New level name.
@@ -59,31 +64,15 @@ namespace gazebo
 
       /// \brief Set the height of the level.
       /// \param[in] _height Level height in pixels.
-      public: void SetHeight(double _height);
+      public: void SetHeight(const double _height);
 
-      /// \brief Qt signal emitted to indicate that changes should be applied.
-      Q_SIGNALS: void Applied();
+      /// \brief Set the height of the level.
+      /// \param[in] _height Level height in pixels.
+      public: void ShowFloorWidget(const bool _show);
 
-      /// \brief Qt callback when the Cancel button is pressed.
-      private slots: void OnCancel();
-
-      /// \brief Qt callback when the Apply button is pressed.
-      private slots: void OnApply();
-
-      /// \brief Qt callback when the Ok button is pressed.
-      private slots: void OnOK();
-
-      /// \brief Widget containing the floor specs.
-      public: QWidget *floorWidget;
-
-      /// \brief Editable line that holds the the level name.
-      private: QLineEdit *levelNameLineEdit;
-
-      /// \brief Spin box for configuring the level height.
-      private: QDoubleSpinBox *heightSpinBox;
-
-      /// \brief Spin box for configuring the floor thickness.
-      private: QDoubleSpinBox *floorThicknessSpinBox;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<LevelInspectorDialogPrivate> dataPtr;
     };
     /// \}
   }

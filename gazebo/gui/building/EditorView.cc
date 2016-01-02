@@ -17,6 +17,10 @@
 #include <boost/bind.hpp>
 
 #include "gazebo/math/Angle.hh"
+
+#include "gazebo/common/Color.hh"
+
+#include "gazebo/gui/Conversions.hh"
 #include "gazebo/gui/building/ImportImageDialog.hh"
 #include "gazebo/gui/building/GridLines.hh"
 #include "gazebo/gui/building/EditorItem.hh"
@@ -1283,13 +1287,14 @@ void EditorView::OnOpenLevelInspector()
   FloorItem *floorItem = this->dataPtr->levels[this->dataPtr->currentLevel]->floorItem;
   if (floorItem)
   {
-    this->dataPtr->levelInspector->floorWidget->show();
-    this->dataPtr->levelInspector->SetColor(floorItem->Get3dColor());
-    this->dataPtr->levelInspector->SetTexture(floorItem->Get3dTexture());
+    this->dataPtr->levelInspector->ShowFloorWidget(true);
+    this->dataPtr->levelInspector->SetColor(Conversions::Convert(
+        floorItem->Get3dColor()));
+    this->dataPtr->levelInspector->SetTexture(floorItem->Get3dTexture().toStdString());
   }
   else
   {
-    this->dataPtr->levelInspector->floorWidget->hide();
+    this->dataPtr->levelInspector->ShowFloorWidget(false);
   }
   this->dataPtr->levelInspector->move(QCursor::pos());
   this->dataPtr->levelInspector->show();
@@ -1301,13 +1306,13 @@ void EditorView::OnLevelApply()
   LevelInspectorDialog *dialog =
       qobject_cast<LevelInspectorDialog *>(QObject::sender());
 
-  std::string newLevelName = dialog->GetLevelName();
+  std::string newLevelName = dialog->LevelName();
   this->dataPtr->levels[this->dataPtr->currentLevel]->name = newLevelName;
   FloorItem *floorItem = this->dataPtr->levels[this->dataPtr->currentLevel]->floorItem;
   if (floorItem)
   {
-    floorItem->Set3dTexture(dialog->GetTexture());
-    floorItem->Set3dColor(dialog->GetColor());
+    floorItem->Set3dTexture(QString::fromStdString(dialog->Texture()));
+    floorItem->Set3dColor(Conversions::Convert(dialog->Color()));
     floorItem->Set3dTransparency(0.4);
     floorItem->FloorChanged();
   }
