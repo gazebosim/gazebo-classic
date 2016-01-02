@@ -49,6 +49,7 @@
 #endif
 
 #include "gazebo/gazebo_config.h"
+#include "gazebo/gui/Conversions.hh"
 #include "gazebo/gui/SaveDialog.hh"
 #include "gazebo/gui/building/BuildingEditorEvents.hh"
 #include "gazebo/gui/building/BuildingModelManip.hh"
@@ -1696,17 +1697,17 @@ void BuildingMaker::OnExit()
 }
 
 /////////////////////////////////////////////////
-void BuildingMaker::OnColorSelected(QColor _color)
+void BuildingMaker::OnColorSelected(const common::Color &_color)
 {
   this->selectedTexture = "";
-  this->selectedColor = _color;
+  this->selectedColor = Conversions::Convert(_color);
 }
 
 /////////////////////////////////////////////////
-void BuildingMaker::OnTextureSelected(QString _texture)
+void BuildingMaker::OnTextureSelected(const std::string &_texture)
 {
   this->selectedColor = QColor::Invalid;
-  this->selectedTexture = _texture;
+  this->selectedTexture = QString::fromStdString(_texture);
 }
 
 /////////////////////////////////////////////////
@@ -1873,8 +1874,8 @@ void BuildingMaker::StopMaterialModes()
 {
   this->ResetHoverVis();
   this->selectedColor = QColor::Invalid;
-  gui::editor::Events::colorSelected(this->selectedColor.convertTo(
-      QColor::Invalid));
+  gui::editor::Events::colorSelected(Conversions::Convert(this->selectedColor.convertTo(
+      QColor::Invalid)));
   gui::editor::Events::createBuildingEditorItem(std::string());
 }
 

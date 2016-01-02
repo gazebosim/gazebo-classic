@@ -21,12 +21,19 @@
 #include <memory>
 #include <string>
 
+#include <ignition/math/Vector2.hh>
+
 #include "gazebo/gui/qt.h"
 
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
+  namespace common
+  {
+    class Color;
+  }
+
   namespace gui
   {
     class EditorItem;
@@ -112,7 +119,7 @@ namespace gazebo
       /// \param[in] _filename Name of the image file.
       /// \param[in] _scale Image scale, in meters/pixel.
       public: void SetBackgroundImage(const std::string &_filename,
-                  double _scale);
+                  const double _scale);
 
       /// \brief Qt resize event received when the parent widget changes size.
       /// \param[in] _event Qt resize event
@@ -157,22 +164,22 @@ namespace gazebo
 
       /// \brief Draw a wall in the scene.
       /// \param[in] _pos Start position of the wall in pixel coordinates.
-      private: void DrawWall(const QPoint &_pos);
+      private: void DrawWall(const ignition::math::Vector2i &_pos);
 
       /// \brief Draw a window in the scene.
       /// \param[in] _pos Scene position in pixel coordinates to draw the
       /// window.
-      private: void DrawWindow(const QPoint &_pos);
+      private: void DrawWindow(const ignition::math::Vector2i &_pos);
 
       /// \brief Draw a door in the scene
       /// \param[in] _pos Scene position in pixel coordinates to draw the
       /// door.
-      private: void DrawDoor(const QPoint &_pos);
+      private: void DrawDoor(const ignition::math::Vector2i &_pos);
 
       /// \brief Draw a staircase in the scene
       /// \param[in] _pos Scene position in pixel coordinates to draw the
       /// staircase.
-      private: void DrawStairs(const QPoint &_pos);
+      private: void DrawStairs(const ignition::math::Vector2i &_pos);
 
       /// \brief Callback triggered when the user chooses to draw an editor item
       /// in the scene
@@ -182,12 +189,12 @@ namespace gazebo
       /// \brief Callback triggered when the user chooses a color on the
       /// palette.
       /// \param[in] _color Selected color.
-      private: void OnColorSelected(QColor _color);
+      private: void OnColorSelected(const common::Color &_color);
 
       /// \brief Callback triggered when the user chooses a texture on the
       /// palette.
       /// \param[in] _texture Selected texture.
-      private: void OnTextureSelected(QString _texture);
+      private: void OnTextureSelected(const std::string &_texture);
 
       /// \brief Callback received when the model has been completed and
       /// uploaded onto the server.
@@ -212,11 +219,11 @@ namespace gazebo
       /// \brief Callback received when a level on a building model is to
       /// be changed.
       /// \param[in] _level The level that is currently being edited.
-      private: void OnChangeLevel(int _level);
+      private: void OnChangeLevel(const int _level);
 
       /// \brief Delete a level from the building model
       /// \param[in] _level Level number to delete.
-      private: void DeleteLevel(int _level);
+      private: void DeleteLevel(const int _level);
 
       /// \brief Cancel the current drawing operation.
       private: void CancelDrawMode();

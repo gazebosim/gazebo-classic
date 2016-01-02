@@ -17,8 +17,10 @@
  * thenounproject.com
  * Stairs designed by Brian Oppenlander from the thenounproject.com
 */
+
 #include <boost/bind.hpp>
 
+#include "gazebo/gui/Conversions.hh"
 #include "gazebo/gui/building/BuildingEditorPalettePrivate.hh"
 #include "gazebo/gui/building/BuildingEditorPalette.hh"
 #include "gazebo/gui/building/BuildingEditorEvents.hh"
@@ -400,8 +402,8 @@ void BuildingEditorPalette::OnNameChanged(const QString &_name)
 /////////////////////////////////////////////////
 void BuildingEditorPalette::OnCreateEditorItem(const std::string &_mode)
 {
-  gui::editor::Events::colorSelected(QColor::Invalid);
-  gui::editor::Events::textureSelected(QString(""));
+  gui::editor::Events::colorSelected(Conversions::Convert(QColor::Invalid));
+  gui::editor::Events::textureSelected("");
 
   if (_mode.empty() || this->dataPtr->currentMode == _mode)
   {
@@ -461,7 +463,7 @@ void BuildingEditorPalette::OnCustomColor(const QColor _color)
 /////////////////////////////////////////////////
 void BuildingEditorPalette::OnColor(QColor _color)
 {
-  gui::editor::Events::colorSelected(_color);
+  gui::editor::Events::colorSelected(Conversions::Convert(_color));
   QPixmap colorCursor(30, 30);
   colorCursor.fill(_color);
   QApplication::setOverrideCursor(QCursor(colorCursor));
@@ -475,7 +477,7 @@ void BuildingEditorPalette::OnTexture(int _textureId)
   QString texture = this->dataPtr->textureList[_textureId];
   if (this->dataPtr->currentMode != textureStr.str())
   {
-    gui::editor::Events::textureSelected(texture);
+    gui::editor::Events::textureSelected(texture.toStdString());
     this->dataPtr->currentMode = textureStr.str();
 
     QPixmap textureCursor(this->dataPtr->textureList[_textureId]);

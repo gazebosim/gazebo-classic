@@ -22,8 +22,8 @@ using namespace gui;
 
 event::EventT<void (bool)> editor::Events::toggleEditMode;
 event::EventT<void (std::string)> editor::Events::createBuildingEditorItem;
-event::EventT<void (QColor)> editor::Events::colorSelected;
-event::EventT<void (QString)> editor::Events::textureSelected;
+event::EventT<void (common::Color)> editor::Events::colorSelected;
+event::EventT<void (std::string)> editor::Events::textureSelected;
 event::EventT<void (std::string)> editor::Events::saveBuildingModel;
 event::EventT<void ()> editor::Events::finishBuildingModel;
 event::EventT<void ()> editor::Events::newBuildingModel;

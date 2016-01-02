@@ -59,6 +59,16 @@ namespace gazebo
       /// \param[in] _color QPointF to convert
       /// \return Ignition Vector2d.
       public: static ignition::math::Vector2d Convert(const QPointF &_pt);
+
+      /// \brief Return the equivalent QPoint.
+      /// \param[in] _point Ignition vector to convert.
+      /// \return QPoint.
+      public: static QPoint Convert(const ignition::math::Vector2i &_pt);
+
+      /// \brief Return the equivalent ignition vector.
+      /// \param[in] _color QPoint to convert
+      /// \return Ignition Vector2i.
+      public: static ignition::math::Vector2i Convert(const QPoint &_pt);
     };
     /// \}
   }

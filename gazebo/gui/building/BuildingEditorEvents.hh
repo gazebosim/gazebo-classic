@@ -14,11 +14,12 @@
  * limitations under the License.
  *
 */
-#ifndef _BUILDING_EDITOR_EVENTS_HH_
-#define _BUILDING_EDITOR_EVENTS_HH_
+#ifndef _GAZEBO_GUI_BUILDINGEDITOREVENTS_HH_
+#define _GAZEBO_GUI_BUILDINGEDITOREVENTS_HH_
 
 #include <string>
 #include "gazebo/gui/qt.h"
+#include "gazebo/common/Color.hh"
 #include "gazebo/common/Event.hh"
 #include "gazebo/util/system.hh"
 
@@ -330,10 +331,10 @@ namespace gazebo
             createBuildingEditorItem;
 
         /// \brief A color has been selected.
-        public: static event::EventT<void (QColor)> colorSelected;
+        public: static event::EventT<void (common::Color)> colorSelected;
 
         /// \brief A texture has been selected.
-        public: static event::EventT<void (QString)> textureSelected;
+        public: static event::EventT<void (std::string)> textureSelected;
 
         /// \brief A model has been saved with a name and a location
         public: static event::EventT<void (std::string)> saveBuildingModel;

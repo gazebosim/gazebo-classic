@@ -81,3 +81,27 @@ TEST_F(GuiConversionsTest, Point2d)
               gazebo::gui::Conversions::Convert(point)), point);
   }
 }
+
+/////////////////////////////////////////////////
+TEST_F(GuiConversionsTest, Point2i)
+{
+  // Ignition to Qt to Ignition
+  {
+    double x = 1;
+    double y = -37;
+
+    ignition::math::Vector2i point(x, y);
+    EXPECT_EQ(gazebo::gui::Conversions::Convert(
+              gazebo::gui::Conversions::Convert(point)), point);
+  }
+
+  // Qt to Ignition to Qt
+  {
+    double x = 0;
+    double y = 123;
+
+    QPoint point(x, y);
+    EXPECT_EQ(gazebo::gui::Conversions::Convert(
+              gazebo::gui::Conversions::Convert(point)), point);
+  }
+}

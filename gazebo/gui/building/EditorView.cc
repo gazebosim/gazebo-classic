@@ -272,7 +272,7 @@ void EditorView::mouseReleaseEvent(QMouseEvent *_event)
 {
   if (this->dataPtr->drawMode == WALL)
   {
-    this->DrawWall(_event->pos());
+    this->DrawWall(Conversions::Convert(_event->pos()));
   }
   else if (this->dataPtr->drawMode != NONE)
   {
@@ -404,13 +404,13 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
       break;
     }
     case WINDOW:
-      this->DrawWindow(_event->pos());
+      this->DrawWindow(Conversions::Convert(_event->pos()));
       break;
     case DOOR:
-      this->DrawDoor(_event->pos());
+      this->DrawDoor(Conversions::Convert(_event->pos()));
       break;
     case STAIRS:
-      this->DrawStairs(_event->pos());
+      this->DrawStairs(Conversions::Convert(_event->pos()));
       break;
     case COLOR:
     case TEXTURE:
@@ -676,14 +676,14 @@ void EditorView::DeleteItem(EditorItem *_item)
 }
 
 /////////////////////////////////////////////////
-void EditorView::DrawWall(const QPoint &_pos)
+void EditorView::DrawWall(const ignition::math::Vector2i &_pos)
 {
   WallSegmentItem *wallSegmentItem = NULL;
 
   // First point on the chain
   if (!this->dataPtr->drawInProgress)
   {
-    QPointF pointStart = mapToScene(_pos);
+    QPointF pointStart = mapToScene(Conversions::Convert(_pos));
     QPointF pointEnd = pointStart + QPointF(1, 0);
 
     wallSegmentItem = new WallSegmentItem(pointStart, pointEnd,
@@ -780,7 +780,7 @@ void EditorView::DrawWall(const QPoint &_pos)
 }
 
 /////////////////////////////////////////////////
-void EditorView::DrawWindow(const QPoint &_pos)
+void EditorView::DrawWindow(const ignition::math::Vector2i &_pos)
 {
   WindowItem *windowItem = NULL;
   if (!this->dataPtr->drawInProgress)
@@ -797,13 +797,13 @@ void EditorView::DrawWindow(const QPoint &_pos)
   windowItem = dynamic_cast<WindowItem*>(this->dataPtr->currentMouseItem);
   if (windowItem)
   {
-    QPointF scenePos = this->mapToScene(_pos);
+    QPointF scenePos = this->mapToScene(Conversions::Convert(_pos));
     windowItem->SetPosition(scenePos.x(), scenePos.y());
   }
 }
 
 /////////////////////////////////////////////////
-void EditorView::DrawDoor(const QPoint &_pos)
+void EditorView::DrawDoor(const ignition::math::Vector2i &_pos)
 {
   DoorItem *doorItem = NULL;
   if (!this->dataPtr->drawInProgress)
@@ -819,13 +819,13 @@ void EditorView::DrawDoor(const QPoint &_pos)
   doorItem = dynamic_cast<DoorItem*>(this->dataPtr->currentMouseItem);
   if (doorItem)
   {
-    QPointF scenePos = this->mapToScene(_pos);
+    QPointF scenePos = this->mapToScene(Conversions::Convert(_pos));
     doorItem->SetPosition(scenePos.x(), scenePos.y());
   }
 }
 
 /////////////////////////////////////////////////
-void EditorView::DrawStairs(const QPoint &_pos)
+void EditorView::DrawStairs(const ignition::math::Vector2i &_pos)
 {
   StairsItem *stairsItem = NULL;
   if (!this->dataPtr->drawInProgress)
@@ -843,7 +843,7 @@ void EditorView::DrawStairs(const QPoint &_pos)
   stairsItem = dynamic_cast<StairsItem*>(this->dataPtr->currentMouseItem);
   if (stairsItem)
   {
-    QPointF scenePos = this->mapToScene(_pos);
+    QPointF scenePos = this->mapToScene(Conversions::Convert(_pos));
     stairsItem->SetPosition(scenePos.x(), scenePos.y());
   }
 }
@@ -969,9 +969,10 @@ void EditorView::OnCreateEditorItem(const std::string &_type)
 }
 
 /////////////////////////////////////////////////
-void EditorView::OnColorSelected(QColor _color)
+void EditorView::OnColorSelected(const common::Color &_color)
 {
-  if (!_color.isValid())
+  QColor color = Conversions::Convert(_color);
+  if (!color.isValid())
     return;
 
   this->CancelDrawMode();
@@ -980,9 +981,9 @@ void EditorView::OnColorSelected(QColor _color)
 }
 
 /////////////////////////////////////////////////
-void EditorView::OnTextureSelected(QString _texture)
+void EditorView::OnTextureSelected(const std::string &_texture)
 {
-  if (_texture == QString(""))
+  if (_texture == "")
     return;
 
   this->CancelDrawMode();
@@ -1261,7 +1262,7 @@ void EditorView::DeleteLevel(int _level)
 }
 
 /////////////////////////////////////////////////
-void EditorView::OnChangeLevel(int _level)
+void EditorView::OnChangeLevel(const int _level)
 {
   if (_level < 0)
     return;

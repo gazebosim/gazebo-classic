@@ -292,12 +292,12 @@ namespace gazebo
       /// \brief Callback received when a color has been selected on the
       /// palette.
       /// \param[in] _color Selected color.
-      private: void OnColorSelected(QColor _color);
+      private: void OnColorSelected(const common::Color &_color);
 
       /// \brief Callback received when a texture has been selected on the
       /// palette.
       /// \param[in] _texture Selected texture.
-      private: void OnTextureSelected(QString _texture);
+      private: void OnTextureSelected(const std::string &_texture);
 
       /// \brief Mouse event filter callback when mouse is moved.
       /// \param[in] _event The mouse event.
