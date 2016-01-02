@@ -56,6 +56,11 @@ namespace gazebo
     class MouseEvent;
   }
 
+  namespace rendering
+  {
+    class DynamicLines;
+  }
+
   namespace gui
   {
     class JointData;
@@ -388,11 +393,11 @@ namespace gazebo
       Q_SIGNALS: void EmitLinkRemoved(const std::string &_linkId);
 
       /// \brief Qt Callback to open joint inspector
-      public slots: void OnOpenInspector();
+      private slots: void OnOpenInspector();
 
       /// \brief Qt callback when a delete signal has been emitted. This is
       /// currently triggered by the context menu via right click.
-      public slots: void OnDelete();
+      private slots: void OnDelete();
 
       /// \brief A map of joint type to its string value.
       public: static std::map<JointMaker::JointType, std::string> jointTypes;
