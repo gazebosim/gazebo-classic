@@ -14,12 +14,13 @@
  * limitations under the License.
  *
 */
-#ifndef _MODEL_EDITOR_EVENTS_HH_
-#define _MODEL_EDITOR_EVENTS_HH_
+#ifndef _GAZEBO_GUI_MODELEDITOREVENTS_HH_
+#define _GAZEBO_GUI_MODELEDITOREVENTS_HH_
 
 #include <string>
-#include "gazebo/math/Pose.hh"
+
 #include "gazebo/common/Event.hh"
+
 #include "gazebo/util/system.hh"
 
 namespace gazebo
