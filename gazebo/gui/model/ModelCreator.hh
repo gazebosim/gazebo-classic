@@ -14,23 +14,22 @@
  * limitations under the License.
  *
 */
-#ifndef _MODEL_CREATOR_HH_
-#define _MODEL_CREATOR_HH_
+
+#ifndef _GAZEBO_GUI_MODELCREATOR_HH_
+#define _GAZEBO_GUI_MODELCREATOR_HH_
+
+#include <memory>
+#include <string>
 
 #include <sdf/sdf.hh>
 
-#include <list>
-#include <map>
-#include <string>
-#include <vector>
-
-#include "gazebo/common/KeyEvent.hh"
-#include "gazebo/common/MouseEvent.hh"
-#include "gazebo/math/Pose.hh"
-#include "gazebo/transport/TransportTypes.hh"
-#include "gazebo/rendering/Visual.hh"
-#include "gazebo/gui/model/LinkInspector.hh"
 #include "gazebo/gui/qt.h"
+
+#include "gazebo/math/Pose.hh"
+
+#include "gazebo/rendering/RenderTypes.hh"
+
+#include "gazebo/transport/TransportTypes.hh"
 
 #include "gazebo/util/system.hh"
 
@@ -41,9 +40,10 @@ namespace boost
 
 namespace gazebo
 {
-  namespace msgs
+  namespace common
   {
-    class Visual;
+    class KeyEvent;
+    class MouseEvent;
   }
 
   namespace gui
@@ -51,8 +51,10 @@ namespace gazebo
     class NestedModelData;
     class LinkData;
     class ModelPluginData;
-    class SaveDialog;
     class JointMaker;
+
+    // Forward declare private data.
+    class ModelCreatorPrivate;
 
     /// \addtogroup gazebo_gui
     /// \{
@@ -467,130 +469,9 @@ namespace gazebo
       /// \brief Qt signal when the a link has been added.
       Q_SIGNALS: void LinkAdded();
 
-      /// \brief The model in SDF format.
-      private: sdf::SDFPtr modelSDF;
-
-      /// \brief A template SDF of a simple box model.
-      private: sdf::SDFPtr modelTemplateSDF;
-
-      /// \brief Name of the model.
-      private: std::string modelName;
-
-      /// \brief Folder name, which is the model name without spaces.
-      private: std::string folderName;
-
-      /// \brief Name of the model preview.
-      private: static const std::string previewName;
-
-      /// \brief The root visual of the model.
-      private: rendering::VisualPtr previewVisual;
-
-      /// \brief Visual currently being inserted into the model, which is
-      /// attached to the mouse.
-      private: rendering::VisualPtr mouseVisual;
-
-      /// \brief The pose of the model.
-      private: ignition::math::Pose3d modelPose;
-
-      /// \brief True to create a static model.
-      private: bool isStatic;
-
-      /// \brief True to auto disable model when it is at rest.
-      private: bool autoDisable;
-
-      /// \brief A list of gui editor events connected to the model creator.
-      private: std::vector<event::ConnectionPtr> connections;
-
-      /// \brief Counter for the number of links in the model.
-      private: int linkCounter;
-
-      /// \brief Counter for generating a unique model name.
-      private: int modelCounter;
-
-      /// \brief Type of entity being added.
-      private: EntityType addEntityType;
-
-      /// \brief A map of nested model names to and their visuals.
-      private: std::map<std::string, NestedModelData *> allNestedModels;
-
-      /// \brief A map of model link names to and their data.
-      private: std::map<std::string, LinkData *> allLinks;
-
-      /// \brief A map of model plugin names to and their data.
-      private: std::map<std::string, ModelPluginData *> allModelPlugins;
-
-      /// \brief Transport node
-      private: transport::NodePtr node;
-
-      /// \brief Publisher that publishes msg to the server once the model is
-      /// created.
-      private: transport::PublisherPtr makerPub;
-
-      /// \brief Publisher that publishes delete entity msg to remove the
-      /// editor visual.
-      private: transport::PublisherPtr requestPub;
-
-      /// \brief Joint maker.
-      private: JointMaker *jointMaker;
-
-      /// \brief origin of the model.
-      private: math::Pose origin;
-
-      /// \brief A list of selected link visuals.
-      private: std::vector<rendering::VisualPtr> selectedLinks;
-
-      /// \brief A list of selected model plugins.
-      private: std::vector<std::string> selectedModelPlugins;
-
-      /// \brief Names of links copied through g_copyAct
-      private: std::vector<std::string> copiedLinkNames;
-
-      /// \brief The last mouse event
-      private: common::MouseEvent lastMouseEvent;
-
-      /// \brief Qt action for opening the link inspector.
-      private: QAction *inspectAct;
-
-      /// \brief Name of link that is currently being inspected.
-      private: std::string inspectName;
-
-      /// \brief True if the model editor mode is active.
-      private: bool active;
-
-      /// \brief Current model manipulation mode.
-      private: std::string manipMode;
-
-      /// \brief Default name of the model.
-      private: static const std::string modelDefaultName;
-
-      /// \brief A dialog with options to save the model.
-      private: SaveDialog *saveDialog;
-
-      /// \brief Store the current save state of the model.
-      private: enum SaveState currentSaveState;
-
-      /// \brief Mutex to protect updates
-      private: boost::recursive_mutex *updateMutex;
-
-      /// \brief A list of link names whose scale has changed externally.
-      private: std::map<std::string, math::Vector3> linkScaleUpdate;
-
-      /// \brief Name of model on the server that is being edited here in the
-      /// model editor.
-      private: std::string serverModelName;
-
-      /// \brief SDF element of the model on the server.
-      private: sdf::ElementPtr serverModelSDF;
-
-      /// \brief A map of all visuals of the model to be edited to their
-      /// visibility.
-      private: std::map<uint32_t, bool> serverModelVisible;
-
-      /// \brief Name of the canonical model
-      private: std::string canonicalModel;
-
-      /// \brief Name of the canonical link in the model
-      private: std::string canonicalLink;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<ModelCreatorPrivate> dataPtr;
     };
     /// \}
   }

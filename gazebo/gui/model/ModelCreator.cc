@@ -28,6 +28,8 @@
 #include <string>
 
 #include "gazebo/common/Exception.hh"
+#include "gazebo/common/KeyEvent.hh"
+#include "gazebo/common/MouseEvent.hh"
 #include "gazebo/common/SVGLoader.hh"
 
 #include "gazebo/rendering/UserCamera.hh"
@@ -57,38 +59,39 @@
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/ModelEditorEvents.hh"
 #include "gazebo/gui/model/ModelCreator.hh"
+#include "gazebo/gui/model/ModelCreatorPrivate.hh"
 
 using namespace gazebo;
 using namespace gui;
 
-const std::string ModelCreator::modelDefaultName = "Untitled";
-const std::string ModelCreator::previewName = "ModelPreview";
+const std::string ModelCreatorPrivate::modelDefaultName = "Untitled";
+const std::string ModelCreatorPrivate::previewName = "ModelPreview";
 
 /////////////////////////////////////////////////
-ModelCreator::ModelCreator()
+ModelCreator::ModelCreator() : dataPtr(new ModelCreatorPrivate)
 {
-  this->active = false;
+  this->dataPtr->active = false;
 
-  this->modelTemplateSDF.reset(new sdf::SDF);
-  this->modelTemplateSDF->SetFromString(ModelData::GetTemplateSDFString());
+  this->dataPtr->modelTemplateSDF.reset(new sdf::SDF);
+  this->dataPtr->modelTemplateSDF->SetFromString(ModelData::GetTemplateSDFString());
 
-  this->updateMutex = new boost::recursive_mutex();
+  this->dataPtr->updateMutex = new boost::recursive_mutex();
 
-  this->manipMode = "";
-  this->linkCounter = 0;
-  this->modelCounter = 0;
+  this->dataPtr->manipMode = "";
+  this->dataPtr->linkCounter = 0;
+  this->dataPtr->modelCounter = 0;
 
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init();
-  this->makerPub = this->node->Advertise<msgs::Factory>("~/factory");
-  this->requestPub = this->node->Advertise<msgs::Request>("~/request");
+  this->dataPtr->node = transport::NodePtr(new transport::Node());
+  this->dataPtr->node->Init();
+  this->dataPtr->makerPub = this->dataPtr->node->Advertise<msgs::Factory>("~/factory");
+  this->dataPtr->requestPub = this->dataPtr->node->Advertise<msgs::Request>("~/request");
 
-  this->jointMaker = new JointMaker();
+  this->dataPtr->jointMaker = new JointMaker();
 
   connect(g_editModelAct, SIGNAL(toggled(bool)), this, SLOT(OnEdit(bool)));
 
-  this->inspectAct = new QAction(tr("Open Link Inspector"), this);
-  connect(this->inspectAct, SIGNAL(triggered()), this,
+  this->dataPtr->inspectAct = new QAction(tr("Open Link Inspector"), this);
+  connect(this->dataPtr->inspectAct, SIGNAL(triggered()), this,
       SLOT(OnOpenInspector()));
 
   if (g_deleteAct)
@@ -97,91 +100,91 @@ ModelCreator::ModelCreator()
         SLOT(OnDelete(const std::string &)));
   }
 
-  this->connections.push_back(
+  this->dataPtr->connections.push_back(
       gui::Events::ConnectEditModel(
       boost::bind(&ModelCreator::OnEditModel, this, _1)));
 
-  this->connections.push_back(
+  this->dataPtr->connections.push_back(
       gui::model::Events::ConnectSaveModelEditor(
       boost::bind(&ModelCreator::OnSave, this)));
 
-  this->connections.push_back(
+  this->dataPtr->connections.push_back(
       gui::model::Events::ConnectSaveAsModelEditor(
       boost::bind(&ModelCreator::OnSaveAs, this)));
 
-  this->connections.push_back(
+  this->dataPtr->connections.push_back(
       gui::model::Events::ConnectNewModelEditor(
       boost::bind(&ModelCreator::OnNew, this)));
 
-  this->connections.push_back(
+  this->dataPtr->connections.push_back(
       gui::model::Events::ConnectExitModelEditor(
       boost::bind(&ModelCreator::OnExit, this)));
 
-  this->connections.push_back(
+  this->dataPtr->connections.push_back(
     gui::model::Events::ConnectModelNameChanged(
       boost::bind(&ModelCreator::OnNameChanged, this, _1)));
 
-  this->connections.push_back(
+  this->dataPtr->connections.push_back(
       gui::model::Events::ConnectModelChanged(
       boost::bind(&ModelCreator::ModelChanged, this)));
 
-  this->connections.push_back(
+  this->dataPtr->connections.push_back(
       gui::model::Events::ConnectOpenLinkInspector(
       boost::bind(&ModelCreator::OpenInspector, this, _1)));
 
-  this->connections.push_back(
+  this->dataPtr->connections.push_back(
       gui::model::Events::ConnectOpenModelPluginInspector(
       boost::bind(&ModelCreator::OpenModelPluginInspector, this, _1)));
 
-  this->connections.push_back(
+  this->dataPtr->connections.push_back(
       gui::Events::ConnectAlignMode(
         boost::bind(&ModelCreator::OnAlignMode, this, _1, _2, _3, _4, _5)));
 
-  this->connections.push_back(
+  this->dataPtr->connections.push_back(
       gui::Events::ConnectManipMode(
         boost::bind(&ModelCreator::OnManipMode, this, _1)));
 
-  this->connections.push_back(
+  this->dataPtr->connections.push_back(
      event::Events::ConnectSetSelectedEntity(
        boost::bind(&ModelCreator::OnSetSelectedEntity, this, _1, _2)));
 
-  this->connections.push_back(
+  this->dataPtr->connections.push_back(
      gui::model::Events::ConnectSetSelectedLink(
        boost::bind(&ModelCreator::OnSetSelectedLink, this, _1, _2)));
 
-  this->connections.push_back(
+  this->dataPtr->connections.push_back(
      gui::model::Events::ConnectSetSelectedModelPlugin(
        boost::bind(&ModelCreator::OnSetSelectedModelPlugin, this, _1, _2)));
 
-  this->connections.push_back(
+  this->dataPtr->connections.push_back(
       gui::Events::ConnectScaleEntity(
       boost::bind(&ModelCreator::OnEntityScaleChanged, this, _1, _2)));
 
-  this->connections.push_back(
+  this->dataPtr->connections.push_back(
       gui::model::Events::ConnectShowLinkContextMenu(
       boost::bind(&ModelCreator::ShowContextMenu, this, _1)));
 
-  this->connections.push_back(
+  this->dataPtr->connections.push_back(
       gui::model::Events::ConnectShowModelPluginContextMenu(
       boost::bind(&ModelCreator::ShowModelPluginContextMenu, this, _1)));
 
-  this->connections.push_back(
+  this->dataPtr->connections.push_back(
       gui::model::Events::ConnectRequestLinkRemoval(
         boost::bind(&ModelCreator::RemoveEntity, this, _1)));
 
-  this->connections.push_back(
+  this->dataPtr->connections.push_back(
       gui::model::Events::ConnectRequestModelPluginRemoval(
         boost::bind(&ModelCreator::RemoveModelPlugin, this, _1)));
 
-  this->connections.push_back(
+  this->dataPtr->connections.push_back(
       event::Events::ConnectPreRender(
         boost::bind(&ModelCreator::Update, this)));
 
-  this->connections.push_back(
+  this->dataPtr->connections.push_back(
       gui::model::Events::ConnectModelPropertiesChanged(
       boost::bind(&ModelCreator::OnPropertiesChanged, this, _1, _2)));
 
-  this->connections.push_back(
+  this->dataPtr->connections.push_back(
       gui::model::Events::ConnectRequestModelPluginInsertion(
       std::bind(&ModelCreator::OnAddModelPlugin, this,
       std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
@@ -197,7 +200,7 @@ ModelCreator::ModelCreator()
     connect(g_pasteAct, SIGNAL(triggered()), this, SLOT(OnPaste()));
   }
 
-  this->saveDialog = new SaveDialog(SaveDialog::MODEL);
+  this->dataPtr->saveDialog = new SaveDialog(SaveDialog::MODEL);
 
   this->Reset();
 }
@@ -205,26 +208,26 @@ ModelCreator::ModelCreator()
 /////////////////////////////////////////////////
 ModelCreator::~ModelCreator()
 {
-  while (!this->allLinks.empty())
-    this->RemoveLinkImpl(this->allLinks.begin()->first);
+  while (!this->dataPtr->allLinks.empty())
+    this->RemoveLinkImpl(this->dataPtr->allLinks.begin()->first);
 
-  while (!this->allNestedModels.empty())
-    this->RemoveNestedModelImpl(this->allNestedModels.begin()->first);
+  while (!this->dataPtr->allNestedModels.empty())
+    this->RemoveNestedModelImpl(this->dataPtr->allNestedModels.begin()->first);
 
-  this->allNestedModels.clear();
-  this->allLinks.clear();
-  this->allModelPlugins.clear();
-  this->node->Fini();
-  this->node.reset();
-  this->modelTemplateSDF.reset();
-  this->requestPub.reset();
-  this->makerPub.reset();
-  this->connections.clear();
+  this->dataPtr->allNestedModels.clear();
+  this->dataPtr->allLinks.clear();
+  this->dataPtr->allModelPlugins.clear();
+  this->dataPtr->node->Fini();
+  this->dataPtr->node.reset();
+  this->dataPtr->modelTemplateSDF.reset();
+  this->dataPtr->requestPub.reset();
+  this->dataPtr->makerPub.reset();
+  this->dataPtr->connections.clear();
 
-  delete this->saveDialog;
-  delete this->updateMutex;
+  delete this->dataPtr->saveDialog;
+  delete this->dataPtr->updateMutex;
 
-  delete this->jointMaker;
+  delete this->dataPtr->jointMaker;
 }
 
 /////////////////////////////////////////////////
@@ -232,8 +235,8 @@ void ModelCreator::OnEdit(bool _checked)
 {
   if (_checked)
   {
-    this->active = true;
-    this->modelCounter++;
+    this->dataPtr->active = true;
+    this->dataPtr->modelCounter++;
     KeyEventHandler::Instance()->AddPressFilter("model_creator",
         boost::bind(&ModelCreator::OnKeyPress, this, _1));
 
@@ -249,18 +252,18 @@ void ModelCreator::OnEdit(bool _checked)
     MouseEventHandler::Instance()->AddDoubleClickFilter("model_creator",
         boost::bind(&ModelCreator::OnMouseDoubleClick, this, _1));
 
-    this->jointMaker->EnableEventHandlers();
+    this->dataPtr->jointMaker->EnableEventHandlers();
   }
   else
   {
-    this->active = false;
+    this->dataPtr->active = false;
     KeyEventHandler::Instance()->RemovePressFilter("model_creator");
     MouseEventHandler::Instance()->RemovePressFilter("model_creator");
     MouseEventHandler::Instance()->RemoveReleaseFilter("model_creator");
     MouseEventHandler::Instance()->RemoveMoveFilter("model_creator");
     MouseEventHandler::Instance()->RemoveDoubleClickFilter("model_creator");
-    this->jointMaker->DisableEventHandlers();
-    this->jointMaker->Stop();
+    this->dataPtr->jointMaker->DisableEventHandlers();
+    this->dataPtr->jointMaker->Stop();
 
     this->DeselectAll();
   }
@@ -277,7 +280,7 @@ void ModelCreator::OnEditModel(const std::string &_modelName)
     return;
   }
 
-  if (!this->active)
+  if (!this->dataPtr->active)
   {
     gzwarn << "Model Editor must be active before loading a model. " <<
               "Not loading model " << _modelName << std::endl;
@@ -324,12 +327,12 @@ void ModelCreator::OnEditModel(const std::string &_modelName)
           if (visual)
           {
             pose = visual->GetWorldPose().Ign();
-            this->previewVisual->SetWorldPose(pose);
+            this->dataPtr->previewVisual->SetWorldPose(pose);
           }
 
-          this->serverModelName = _modelName;
-          this->serverModelSDF = model;
-          this->modelPose = pose;
+          this->dataPtr->serverModelName = _modelName;
+          this->dataPtr->serverModelSDF = model;
+          this->dataPtr->modelPose = pose;
 
           return;
         }
@@ -363,25 +366,25 @@ NestedModelData *ModelCreator::CreateModelFromSDF(
     this->Reset();
 
     // Keep previewModel with previewName to avoid conflicts
-    modelVisual = this->previewVisual;
-    modelNameStream << this->previewName << "_" << this->modelCounter;
+    modelVisual = this->dataPtr->previewVisual;
+    modelNameStream << this->dataPtr->previewName << "_" << this->dataPtr->modelCounter;
 
     // Model general info
     if (_modelElem->HasAttribute("name"))
       this->SetModelName(_modelElem->Get<std::string>("name"));
 
     if (_modelElem->HasElement("pose"))
-      this->modelPose = _modelElem->Get<ignition::math::Pose3d>("pose");
+      this->dataPtr->modelPose = _modelElem->Get<ignition::math::Pose3d>("pose");
     else
-      this->modelPose = ignition::math::Pose3d::Zero;
-    this->previewVisual->SetPose(this->modelPose);
+      this->dataPtr->modelPose = ignition::math::Pose3d::Zero;
+    this->dataPtr->previewVisual->SetPose(this->dataPtr->modelPose);
 
     if (_modelElem->HasElement("static"))
-      this->isStatic = _modelElem->Get<bool>("static");
+      this->dataPtr->isStatic = _modelElem->Get<bool>("static");
     if (_modelElem->HasElement("allow_auto_disable"))
-      this->autoDisable = _modelElem->Get<bool>("allow_auto_disable");
-    gui::model::Events::modelPropertiesChanged(this->isStatic,
-        this->autoDisable);
+      this->dataPtr->autoDisable = _modelElem->Get<bool>("allow_auto_disable");
+    gui::model::Events::modelPropertiesChanged(this->dataPtr->isStatic,
+        this->dataPtr->autoDisable);
     gui::model::Events::modelNameChanged(this->GetModelName());
 
     modelData->modelVisual = modelVisual;
@@ -392,23 +395,23 @@ NestedModelData *ModelCreator::CreateModelFromSDF(
     // Internal name
     std::stringstream parentNameStream;
     parentNameStream << _parentVis->GetName();
-    if (_parentVis->GetName() == this->previewName)
-      parentNameStream << "_" << this->modelCounter;
+    if (_parentVis->GetName() == this->dataPtr->previewName)
+      parentNameStream << "_" << this->dataPtr->modelCounter;
 
     modelNameStream << parentNameStream.str() << "::" <<
         _modelElem->Get<std::string>("name");
     nestedModelName = modelNameStream.str();
 
     // Generate unique name
-    auto itName = this->allNestedModels.find(nestedModelName);
+    auto itName = this->dataPtr->allNestedModels.find(nestedModelName);
     int nameCounter = 0;
     std::string uniqueName;
-    while (itName != this->allNestedModels.end())
+    while (itName != this->dataPtr->allNestedModels.end())
     {
       std::stringstream uniqueNameStr;
       uniqueNameStr << nestedModelName << "_" << nameCounter++;
       uniqueName = uniqueNameStr.str();
-      itName = this->allNestedModels.find(uniqueName);
+      itName = this->dataPtr->allNestedModels.find(uniqueName);
     }
     if (!uniqueName.empty())
       nestedModelName = uniqueName;
@@ -434,8 +437,8 @@ NestedModelData *ModelCreator::CreateModelFromSDF(
   // Notify nested model insertion
   if (_parentVis)
   {
-    boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
-    this->allNestedModels[nestedModelName] = modelData;
+    boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
+    this->dataPtr->allNestedModels[nestedModelName] = modelData;
 
     // fire nested inserted events only when the nested model is
     //  not attached to the mouse
@@ -451,8 +454,8 @@ NestedModelData *ModelCreator::CreateModelFromSDF(
      nestedModelElem = _modelElem->GetElement("model");
   while (nestedModelElem)
   {
-    if (this->canonicalModel.empty())
-      this->canonicalModel = nestedModelName;
+    if (this->dataPtr->canonicalModel.empty())
+      this->dataPtr->canonicalModel = nestedModelName;
 
     NestedModelData *nestedModelData =
         this->CreateModelFromSDF(nestedModelElem, modelVisual, _emit);
@@ -470,7 +473,7 @@ NestedModelData *ModelCreator::CreateModelFromSDF(
     LinkData *linkData = this->CreateLinkFromSDF(linkElem, modelVisual);
 
     // if its parent is not the preview visual then the link has to be nested
-    if (modelVisual != this->previewVisual)
+    if (modelVisual != this->dataPtr->previewVisual)
       linkData->nested = true;
     rendering::VisualPtr linkVis = linkData->linkVisual;
 
@@ -488,7 +491,7 @@ NestedModelData *ModelCreator::CreateModelFromSDF(
 
     while (jointElem)
     {
-      this->jointMaker->CreateJointFromSDF(jointElem, modelNameStream.str());
+      this->dataPtr->jointMaker->CreateJointFromSDF(jointElem, modelNameStream.str());
       jointElem = jointElem->GetNextElement("joint");
     }
 
@@ -511,8 +514,8 @@ void ModelCreator::OnNew()
 {
   this->Stop();
 
-  if (this->allLinks.empty() && this->allNestedModels.empty() &&
-      this->allModelPlugins.empty())
+  if (this->dataPtr->allLinks.empty() && this->dataPtr->allNestedModels.empty() &&
+      this->dataPtr->allModelPlugins.empty())
   {
     this->Reset();
     gui::model::Events::newModel();
@@ -525,7 +528,7 @@ void ModelCreator::OnNew()
   msgBox.setEscapeButton(cancelButton);
   QPushButton *saveButton = new QPushButton("Save");
 
-  switch (this->currentSaveState)
+  switch (this->dataPtr->currentSaveState)
   {
     case ALL_SAVED:
     {
@@ -574,12 +577,12 @@ bool ModelCreator::OnSave()
 {
   this->Stop();
 
-  switch (this->currentSaveState)
+  switch (this->dataPtr->currentSaveState)
   {
     case UNSAVED_CHANGES:
     {
       this->SaveModelFiles();
-      gui::model::Events::saveModel(this->modelName);
+      gui::model::Events::saveModel(this->dataPtr->modelName);
       return true;
     }
     case NEVER_SAVED:
@@ -596,14 +599,14 @@ bool ModelCreator::OnSaveAs()
 {
   this->Stop();
 
-  if (this->saveDialog->OnSaveAs())
+  if (this->dataPtr->saveDialog->OnSaveAs())
   {
     // Prevent changing save location
-    this->currentSaveState = ALL_SAVED;
+    this->dataPtr->currentSaveState = ALL_SAVED;
     // Get name set by user
-    this->SetModelName(this->saveDialog->GetModelName());
+    this->SetModelName(this->dataPtr->saveDialog->GetModelName());
     // Update name on palette
-    gui::model::Events::saveModel(this->modelName);
+    gui::model::Events::saveModel(this->dataPtr->modelName);
     // Generate and save files
     this->SaveModelFiles();
     return true;
@@ -614,7 +617,7 @@ bool ModelCreator::OnSaveAs()
 /////////////////////////////////////////////////
 void ModelCreator::OnNameChanged(const std::string &_name)
 {
-  if (_name.compare(this->modelName) == 0)
+  if (_name.compare(this->dataPtr->modelName) == 0)
     return;
 
   this->SetModelName(_name);
@@ -626,18 +629,18 @@ void ModelCreator::OnExit()
 {
   this->Stop();
 
-  if (this->allLinks.empty() && this->allNestedModels.empty() &&
-      this->allModelPlugins.empty())
+  if (this->dataPtr->allLinks.empty() && this->dataPtr->allNestedModels.empty() &&
+      this->dataPtr->allModelPlugins.empty())
   {
-    if (!this->serverModelName.empty())
-      this->SetModelVisible(this->serverModelName, true);
+    if (!this->dataPtr->serverModelName.empty())
+      this->SetModelVisible(this->dataPtr->serverModelName, true);
     this->Reset();
     gui::model::Events::newModel();
     gui::model::Events::finishModel();
     return;
   }
 
-  switch (this->currentSaveState)
+  switch (this->dataPtr->currentSaveState)
   {
     case ALL_SAVED:
     {
@@ -691,10 +694,10 @@ void ModelCreator::OnExit()
   }
 
   // Create entity on main window up to the saved point
-  if (this->currentSaveState != NEVER_SAVED)
+  if (this->dataPtr->currentSaveState != NEVER_SAVED)
     this->FinishModel();
   else
-    this->SetModelVisible(this->serverModelName, true);
+    this->SetModelVisible(this->dataPtr->serverModelName, true);
 
   this->Reset();
 
@@ -706,34 +709,34 @@ void ModelCreator::OnExit()
 void ModelCreator::OnPropertiesChanged(const bool _static,
     const bool _autoDisable)
 {
-  this->autoDisable = _autoDisable;
-  this->isStatic = _static;
+  this->dataPtr->autoDisable = _autoDisable;
+  this->dataPtr->isStatic = _static;
   this->ModelChanged();
 }
 
 /////////////////////////////////////////////////
 void ModelCreator::SaveModelFiles()
 {
-  this->saveDialog->GenerateConfig();
-  this->saveDialog->SaveToConfig();
+  this->dataPtr->saveDialog->GenerateConfig();
+  this->dataPtr->saveDialog->SaveToConfig();
   this->GenerateSDF();
-  this->saveDialog->SaveToSDF(this->modelSDF);
-  this->currentSaveState = ALL_SAVED;
+  this->dataPtr->saveDialog->SaveToSDF(this->dataPtr->modelSDF);
+  this->dataPtr->currentSaveState = ALL_SAVED;
 }
 
 /////////////////////////////////////////////////
 std::string ModelCreator::CreateModel()
 {
   this->Reset();
-  return this->folderName;
+  return this->dataPtr->folderName;
 }
 
 /////////////////////////////////////////////////
 void ModelCreator::AddJoint(const std::string &_type)
 {
   this->Stop();
-  if (this->jointMaker)
-    this->jointMaker->AddJoint(_type);
+  if (this->dataPtr->jointMaker)
+    this->dataPtr->jointMaker->AddJoint(_type);
 }
 
 /////////////////////////////////////////////////
@@ -741,18 +744,18 @@ std::string ModelCreator::AddShape(EntityType _type,
     const math::Vector3 &_size, const math::Pose &_pose,
     const std::string &_uri, unsigned int _samples)
 {
-  if (!this->previewVisual)
+  if (!this->dataPtr->previewVisual)
   {
     this->Reset();
   }
 
   std::stringstream linkNameStream;
-  linkNameStream << this->previewName << "_" << this->modelCounter
-      << "::link_" << this->linkCounter++;
+  linkNameStream << this->dataPtr->previewName << "_" << this->dataPtr->modelCounter
+      << "::link_" << this->dataPtr->linkCounter++;
   std::string linkName = linkNameStream.str();
 
   rendering::VisualPtr linkVisual(new rendering::Visual(linkName,
-      this->previewVisual));
+      this->dataPtr->previewVisual));
   linkVisual->Load();
   linkVisual->SetTransparency(ModelData::GetEditTransparency());
 
@@ -760,7 +763,7 @@ std::string ModelCreator::AddShape(EntityType _type,
   visualName << linkName << "::visual";
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
       linkVisual));
-  sdf::ElementPtr visualElem =  this->modelTemplateSDF->Root()
+  sdf::ElementPtr visualElem =  this->dataPtr->modelTemplateSDF->Root()
       ->GetElement("model")->GetElement("link")->GetElement("visual");
 
   sdf::ElementPtr geomElem =  visualElem->GetElement("geometry");
@@ -881,7 +884,7 @@ std::string ModelCreator::AddShape(EntityType _type,
   // than inserting it in the model frame.
   linkVisual->SetWorldPose(math::Pose(linkPos, math::Quaternion()));
 
-  this->mouseVisual = linkVisual;
+  this->dataPtr->mouseVisual = linkVisual;
 
   return linkName;
 }
@@ -946,10 +949,10 @@ void ModelCreator::CreateLink(const rendering::VisualPtr &_visual)
   link->SetName(leafName);
 
   {
-    boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
-    this->allLinks[linkName] = link;
-    if (this->canonicalLink.empty())
-      this->canonicalLink = linkName;
+    boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
+    this->dataPtr->allLinks[linkName] = link;
+    if (this->dataPtr->canonicalLink.empty())
+      this->dataPtr->canonicalLink = linkName;
   }
 
   rendering::ScenePtr scene = link->linkVisual->GetScene();
@@ -960,10 +963,10 @@ void ModelCreator::CreateLink(const rendering::VisualPtr &_visual)
 /////////////////////////////////////////////////
 LinkData *ModelCreator::CloneLink(const std::string &_linkName)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
 
-  auto it = this->allLinks.find(_linkName);
-  if (it == allLinks.end())
+  auto it = this->dataPtr->allLinks.find(_linkName);
+  if (it == this->dataPtr->allLinks.end())
   {
     gzerr << "No link with name: " << _linkName << " found."  << std::endl;
     return NULL;
@@ -971,14 +974,14 @@ LinkData *ModelCreator::CloneLink(const std::string &_linkName)
 
   // generate unique name.
   std::string newName = _linkName + "_clone";
-  auto itName = this->allLinks.find(newName);
+  auto itName = this->dataPtr->allLinks.find(newName);
   int nameCounter = 0;
-  while (itName != this->allLinks.end())
+  while (itName != this->dataPtr->allLinks.end())
   {
     std::stringstream newLinkName;
     newLinkName << _linkName << "_clone_" << nameCounter++;
     newName = newLinkName.str();
-    itName = this->allLinks.find(newName);
+    itName = this->dataPtr->allLinks.find(newName);
   }
 
   std::string leafName = newName;
@@ -987,7 +990,7 @@ LinkData *ModelCreator::CloneLink(const std::string &_linkName)
     leafName = newName.substr(idx+2);
   LinkData *link = it->second->Clone(leafName);
 
-  this->allLinks[newName] = link;
+  this->dataPtr->allLinks[newName] = link;
 
   this->ModelChanged();
 
@@ -1012,15 +1015,15 @@ LinkData *ModelCreator::CreateLinkFromSDF(const sdf::ElementPtr &_linkElem,
   std::stringstream linkNameStream;
   std::string leafName = link->GetName();
 
-  if (_parentVis->GetName() == this->previewName)
-    linkNameStream << this->previewName << "_" << this->modelCounter << "::";
+  if (_parentVis->GetName() == this->dataPtr->previewName)
+    linkNameStream << this->dataPtr->previewName << "_" << this->dataPtr->modelCounter << "::";
   else
     linkNameStream << _parentVis->GetName() << "::";
   linkNameStream << leafName;
   std::string linkName = linkNameStream.str();
 
-  if (this->canonicalLink.empty())
-    this->canonicalLink = linkName;
+  if (this->dataPtr->canonicalLink.empty())
+    this->dataPtr->canonicalLink = linkName;
 
   link->SetName(leafName);
 
@@ -1028,7 +1031,7 @@ LinkData *ModelCreator::CreateLinkFromSDF(const sdf::ElementPtr &_linkElem,
   // The joint maker needs to know about this in order to specify the correct
   // parent and child links in sdf generation step.
   if (leafName.find("::") != std::string::npos)
-    this->jointMaker->AddScopedLinkName(leafName);
+    this->dataPtr->jointMaker->AddScopedLinkName(leafName);
 
   rendering::VisualPtr linkVisual(new rendering::Visual(linkName, _parentVis));
   linkVisual->Load();
@@ -1120,7 +1123,7 @@ LinkData *ModelCreator::CreateLinkFromSDF(const sdf::ElementPtr &_linkElem,
       collisionPose.Set(0, 0, 0, 0, 0, 0);
 
     // Make a visual element from the collision element
-    sdf::ElementPtr colVisualElem =  this->modelTemplateSDF->Root()
+    sdf::ElementPtr colVisualElem =  this->dataPtr->modelTemplateSDF->Root()
         ->GetElement("model")->GetElement("link")->GetElement("visual");
 
     sdf::ElementPtr geomElem = colVisualElem->GetElement("geometry");
@@ -1147,12 +1150,12 @@ LinkData *ModelCreator::CreateLinkFromSDF(const sdf::ElementPtr &_linkElem,
   linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
 
   // Top-level links only
-  if (_parentVis == this->previewVisual)
+  if (_parentVis == this->dataPtr->previewVisual)
     gui::model::Events::linkInserted(linkName);
 
   {
-    boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
-    this->allLinks[linkName] = link;
+    boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
+    this->dataPtr->allLinks[linkName] = link;
   }
 
   this->ModelChanged();
@@ -1163,7 +1166,7 @@ LinkData *ModelCreator::CreateLinkFromSDF(const sdf::ElementPtr &_linkElem,
 /////////////////////////////////////////////////
 void ModelCreator::RemoveNestedModelImpl(const std::string &_nestedModelName)
 {
-  if (!this->previewVisual)
+  if (!this->dataPtr->previewVisual)
   {
     this->Reset();
     return;
@@ -1171,13 +1174,13 @@ void ModelCreator::RemoveNestedModelImpl(const std::string &_nestedModelName)
 
   NestedModelData *modelData = NULL;
   {
-    boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
-    if (this->allNestedModels.find(_nestedModelName) ==
-        this->allNestedModels.end())
+    boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
+    if (this->dataPtr->allNestedModels.find(_nestedModelName) ==
+        this->dataPtr->allNestedModels.end())
     {
       return;
     }
-    modelData = this->allNestedModels[_nestedModelName];
+    modelData = this->dataPtr->allNestedModels[_nestedModelName];
   }
 
   if (!modelData)
@@ -1194,11 +1197,11 @@ void ModelCreator::RemoveNestedModelImpl(const std::string &_nestedModelName)
   for (auto &linkIt : modelData->links)
   {
     // if it's a link
-    if (this->allLinks.find(linkIt.first) != this->allLinks.end())
+    if (this->dataPtr->allLinks.find(linkIt.first) != this->dataPtr->allLinks.end())
     {
-      if (this->jointMaker)
+      if (this->dataPtr->jointMaker)
       {
-        this->jointMaker->RemoveJointsByLink(linkIt.first);
+        this->dataPtr->jointMaker->RemoveJointsByLink(linkIt.first);
       }
       this->RemoveLinkImpl(linkIt.first);
     }
@@ -1212,8 +1215,8 @@ void ModelCreator::RemoveNestedModelImpl(const std::string &_nestedModelName)
 
   modelData->modelVisual.reset();
   {
-    boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
-    this->allNestedModels.erase(_nestedModelName);
+    boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
+    this->dataPtr->allNestedModels.erase(_nestedModelName);
     delete modelData;
   }
   gui::model::Events::nestedModelRemoved(nestedModelName);
@@ -1224,7 +1227,7 @@ void ModelCreator::RemoveNestedModelImpl(const std::string &_nestedModelName)
 /////////////////////////////////////////////////
 void ModelCreator::RemoveLinkImpl(const std::string &_linkName)
 {
-  if (!this->previewVisual)
+  if (!this->dataPtr->previewVisual)
   {
     this->Reset();
     return;
@@ -1232,9 +1235,9 @@ void ModelCreator::RemoveLinkImpl(const std::string &_linkName)
 
   LinkData *link = NULL;
   {
-    boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
-    auto linkIt = this->allLinks.find(_linkName);
-    if (linkIt == this->allLinks.end())
+    boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
+    auto linkIt = this->dataPtr->allLinks.find(_linkName);
+    if (linkIt == this->dataPtr->allLinks.end())
       return;
     link = linkIt->second;
   }
@@ -1265,8 +1268,8 @@ void ModelCreator::RemoveLinkImpl(const std::string &_linkName)
 
   link->linkVisual.reset();
   {
-    boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
-    this->allLinks.erase(linkName);
+    boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
+    this->dataPtr->allLinks.erase(linkName);
     delete link;
   }
   gui::model::Events::linkRemoved(linkName);
@@ -1277,11 +1280,11 @@ void ModelCreator::RemoveLinkImpl(const std::string &_linkName)
 /////////////////////////////////////////////////
 void ModelCreator::Reset()
 {
-  delete this->saveDialog;
-  this->saveDialog = new SaveDialog(SaveDialog::MODEL);
+  delete this->dataPtr->saveDialog;
+  this->dataPtr->saveDialog = new SaveDialog(SaveDialog::MODEL);
 
-  this->jointMaker->Reset();
-  this->selectedLinks.clear();
+  this->dataPtr->jointMaker->Reset();
+  this->dataPtr->selectedLinks.clear();
 
   if (g_copyAct)
     g_copyAct->setEnabled(false);
@@ -1289,103 +1292,103 @@ void ModelCreator::Reset()
   if (g_pasteAct)
     g_pasteAct->setEnabled(false);
 
-  this->currentSaveState = NEVER_SAVED;
-  this->SetModelName(this->modelDefaultName);
-  this->serverModelName = "";
-  this->serverModelSDF.reset();
-  this->serverModelVisible.clear();
-  this->canonicalLink = "";
+  this->dataPtr->currentSaveState = NEVER_SAVED;
+  this->SetModelName(this->dataPtr->modelDefaultName);
+  this->dataPtr->serverModelName = "";
+  this->dataPtr->serverModelSDF.reset();
+  this->dataPtr->serverModelVisible.clear();
+  this->dataPtr->canonicalLink = "";
 
-  this->modelTemplateSDF.reset(new sdf::SDF);
-  this->modelTemplateSDF->SetFromString(ModelData::GetTemplateSDFString());
+  this->dataPtr->modelTemplateSDF.reset(new sdf::SDF);
+  this->dataPtr->modelTemplateSDF->SetFromString(ModelData::GetTemplateSDFString());
 
-  this->modelSDF.reset(new sdf::SDF);
+  this->dataPtr->modelSDF.reset(new sdf::SDF);
 
-  this->isStatic = false;
-  this->autoDisable = true;
-  gui::model::Events::modelPropertiesChanged(this->isStatic, this->autoDisable);
+  this->dataPtr->isStatic = false;
+  this->dataPtr->autoDisable = true;
+  gui::model::Events::modelPropertiesChanged(this->dataPtr->isStatic, this->dataPtr->autoDisable);
   gui::model::Events::modelNameChanged(this->GetModelName());
 
-  while (!this->allLinks.empty())
-    this->RemoveLinkImpl(this->allLinks.begin()->first);
-  this->allLinks.clear();
+  while (!this->dataPtr->allLinks.empty())
+    this->RemoveLinkImpl(this->dataPtr->allLinks.begin()->first);
+  this->dataPtr->allLinks.clear();
 
-  while (!this->allNestedModels.empty())
-    this->RemoveNestedModelImpl(this->allNestedModels.begin()->first);
-  this->allNestedModels.clear();
+  while (!this->dataPtr->allNestedModels.empty())
+    this->RemoveNestedModelImpl(this->dataPtr->allNestedModels.begin()->first);
+  this->dataPtr->allNestedModels.clear();
 
-  this->allModelPlugins.clear();
+  this->dataPtr->allModelPlugins.clear();
 
   if (!gui::get_active_camera() ||
     !gui::get_active_camera()->GetScene())
   return;
 
   rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
-  if (this->previewVisual)
-    scene->RemoveVisual(this->previewVisual);
+  if (this->dataPtr->previewVisual)
+    scene->RemoveVisual(this->dataPtr->previewVisual);
 
-  this->previewVisual.reset(new rendering::Visual(this->previewName,
+  this->dataPtr->previewVisual.reset(new rendering::Visual(this->dataPtr->previewName,
       scene->GetWorldVisual()));
 
-  this->previewVisual->Load();
-  this->modelPose = ignition::math::Pose3d::Zero;
-  this->previewVisual->SetPose(this->modelPose);
+  this->dataPtr->previewVisual->Load();
+  this->dataPtr->modelPose = ignition::math::Pose3d::Zero;
+  this->dataPtr->previewVisual->SetPose(this->dataPtr->modelPose);
 }
 
 /////////////////////////////////////////////////
 void ModelCreator::SetModelName(const std::string &_modelName)
 {
-  this->modelName = _modelName;
-  this->saveDialog->SetModelName(_modelName);
+  this->dataPtr->modelName = _modelName;
+  this->dataPtr->saveDialog->SetModelName(_modelName);
 
-  this->folderName = this->saveDialog->
-      GetFolderNameFromModelName(this->modelName);
+  this->dataPtr->folderName = this->dataPtr->saveDialog->
+      GetFolderNameFromModelName(this->dataPtr->modelName);
 
-  if (this->currentSaveState == NEVER_SAVED)
+  if (this->dataPtr->currentSaveState == NEVER_SAVED)
   {
     // Set new saveLocation
-    boost::filesystem::path oldPath(this->saveDialog->GetSaveLocation());
+    boost::filesystem::path oldPath(this->dataPtr->saveDialog->GetSaveLocation());
 
-    boost::filesystem::path newPath = oldPath.parent_path() / this->folderName;
-    this->saveDialog->SetSaveLocation(newPath.string());
+    boost::filesystem::path newPath = oldPath.parent_path() / this->dataPtr->folderName;
+    this->dataPtr->saveDialog->SetSaveLocation(newPath.string());
   }
 }
 
 /////////////////////////////////////////////////
 std::string ModelCreator::GetModelName() const
 {
-  return this->modelName;
+  return this->dataPtr->modelName;
 }
 
 /////////////////////////////////////////////////
 void ModelCreator::SetStatic(bool _static)
 {
-  this->isStatic = _static;
+  this->dataPtr->isStatic = _static;
   this->ModelChanged();
 }
 
 /////////////////////////////////////////////////
 void ModelCreator::SetAutoDisable(bool _auto)
 {
-  this->autoDisable = _auto;
+  this->dataPtr->autoDisable = _auto;
   this->ModelChanged();
 }
 
 /////////////////////////////////////////////////
 void ModelCreator::FinishModel()
 {
-  if (!this->serverModelName.empty())
+  if (!this->dataPtr->serverModelName.empty())
   {
     // delete model on server first before spawning the updated one.
     transport::request(gui::get_world(), "entity_delete",
-        this->serverModelName);
+        this->dataPtr->serverModelName);
     int timeoutCounter = 0;
     int timeout = 100;
     while (timeoutCounter < timeout)
     {
       boost::shared_ptr<msgs::Response> response =
           transport::request(gui::get_world(), "entity_info",
-          this->serverModelName);
+          this->dataPtr->serverModelName);
       // Make sure the response is correct
       if (response->response() == "nonexistent")
         break;
@@ -1402,7 +1405,7 @@ void ModelCreator::FinishModel()
 /////////////////////////////////////////////////
 void ModelCreator::CreateTheEntity()
 {
-  if (!this->modelSDF->Root()->HasElement("model"))
+  if (!this->dataPtr->modelSDF->Root()->HasElement("model"))
   {
     gzerr << "Generated invalid SDF! Cannot create entity." << std::endl;
     return;
@@ -1410,7 +1413,7 @@ void ModelCreator::CreateTheEntity()
 
   msgs::Factory msg;
   // Create a new name if the model exists
-  sdf::ElementPtr modelElem = this->modelSDF->Root()->GetElement("model");
+  sdf::ElementPtr modelElem = this->dataPtr->modelSDF->Root()->GetElement("model");
   std::string modelElemName = modelElem->Get<std::string>("name");
   if (has_entity_name(modelElemName))
   {
@@ -1423,15 +1426,15 @@ void ModelCreator::CreateTheEntity()
     modelElem->GetAttribute("name")->Set(modelElemName);
   }
 
-  msg.set_sdf(this->modelSDF->ToString());
-  msgs::Set(msg.mutable_pose(), this->modelPose);
-  this->makerPub->Publish(msg);
+  msg.set_sdf(this->dataPtr->modelSDF->ToString());
+  msgs::Set(msg.mutable_pose(), this->dataPtr->modelPose);
+  this->dataPtr->makerPub->Publish(msg);
 }
 
 /////////////////////////////////////////////////
 void ModelCreator::AddEntity(sdf::ElementPtr _sdf)
 {
-  if (!this->previewVisual)
+  if (!this->dataPtr->previewVisual)
   {
     this->Reset();
   }
@@ -1442,26 +1445,26 @@ void ModelCreator::AddEntity(sdf::ElementPtr _sdf)
   {
     // Create a top-level nested model
     NestedModelData *modelData =
-        this->CreateModelFromSDF(_sdf, this->previewVisual, false);
+        this->CreateModelFromSDF(_sdf, this->dataPtr->previewVisual, false);
 
-    this->addEntityType = ENTITY_MODEL;
+    this->dataPtr->addEntityType = ENTITY_MODEL;
     rendering::VisualPtr entityVisual = modelData->modelVisual;
 
-    this->mouseVisual = entityVisual;
+    this->dataPtr->mouseVisual = entityVisual;
   }
 }
 
 /////////////////////////////////////////////////
 void ModelCreator::AddLink(EntityType _type)
 {
-  if (!this->previewVisual)
+  if (!this->dataPtr->previewVisual)
   {
     this->Reset();
   }
 
   this->Stop();
 
-  this->addEntityType = _type;
+  this->dataPtr->addEntityType = _type;
   if (_type != ENTITY_NONE)
     this->AddShape(_type);
 }
@@ -1469,24 +1472,24 @@ void ModelCreator::AddLink(EntityType _type)
 /////////////////////////////////////////////////
 void ModelCreator::Stop()
 {
-  if (this->addEntityType != ENTITY_NONE && this->mouseVisual)
+  if (this->dataPtr->addEntityType != ENTITY_NONE && this->dataPtr->mouseVisual)
   {
-    this->RemoveEntity(this->mouseVisual->GetName());
-    this->mouseVisual.reset();
+    this->RemoveEntity(this->dataPtr->mouseVisual->GetName());
+    this->dataPtr->mouseVisual.reset();
     emit LinkAdded();
   }
-  if (this->jointMaker)
-    this->jointMaker->Stop();
+  if (this->dataPtr->jointMaker)
+    this->dataPtr->jointMaker->Stop();
 }
 
 /////////////////////////////////////////////////
 void ModelCreator::OnDelete()
 {
-  if (this->inspectName.empty())
+  if (this->dataPtr->inspectName.empty())
     return;
 
-  this->OnDelete(this->inspectName);
-  this->inspectName = "";
+  this->OnDelete(this->dataPtr->inspectName);
+  this->dataPtr->inspectName = "";
 }
 
 /////////////////////////////////////////////////
@@ -1498,20 +1501,20 @@ void ModelCreator::OnDelete(const std::string &_entity)
 /////////////////////////////////////////////////
 void ModelCreator::RemoveEntity(const std::string &_entity)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
 
   // if it's a nestedModel
-  if (this->allNestedModels.find(_entity) != this->allNestedModels.end())
+  if (this->dataPtr->allNestedModels.find(_entity) != this->dataPtr->allNestedModels.end())
   {
     this->RemoveNestedModelImpl(_entity);
     return;
   }
 
   // if it's a link
-  if (this->allLinks.find(_entity) != this->allLinks.end())
+  if (this->dataPtr->allLinks.find(_entity) != this->dataPtr->allLinks.end())
   {
-    if (this->jointMaker)
-      this->jointMaker->RemoveJointsByLink(_entity);
+    if (this->dataPtr->jointMaker)
+      this->dataPtr->jointMaker->RemoveJointsByLink(_entity);
     this->RemoveLinkImpl(_entity);
     return;
   }
@@ -1524,13 +1527,13 @@ void ModelCreator::RemoveEntity(const std::string &_entity)
     rendering::VisualPtr parentLink = vis->GetParent();
     std::string parentLinkName = parentLink->GetName();
 
-    if (this->allLinks.find(parentLinkName) != this->allLinks.end())
+    if (this->dataPtr->allLinks.find(parentLinkName) != this->dataPtr->allLinks.end())
     {
       // remove the parent link if it's the only child
       if (parentLink->GetChildCount() == 1)
       {
-        if (this->jointMaker)
-          this->jointMaker->RemoveJointsByLink(parentLink->GetName());
+        if (this->dataPtr->jointMaker)
+          this->dataPtr->jointMaker->RemoveJointsByLink(parentLink->GetName());
         this->RemoveLinkImpl(parentLink->GetName());
         return;
       }
@@ -1547,10 +1550,10 @@ void ModelCreator::OnRemoveModelPlugin(const QString &_name)
 /////////////////////////////////////////////////
 void ModelCreator::RemoveModelPlugin(const std::string &_name)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
 
-  auto it = this->allModelPlugins.find(_name);
-  if (it == this->allModelPlugins.end())
+  auto it = this->dataPtr->allModelPlugins.find(_name);
+  if (it == this->dataPtr->allModelPlugins.end())
   {
     return;
   }
@@ -1558,7 +1561,7 @@ void ModelCreator::RemoveModelPlugin(const std::string &_name)
   ModelPluginData *data = it->second;
 
   // Remove from map
-  this->allModelPlugins.erase(_name);
+  this->dataPtr->allModelPlugins.erase(_name);
   delete data;
 
   // Notify removal
@@ -1574,17 +1577,17 @@ bool ModelCreator::OnKeyPress(const common::KeyEvent &_event)
   }
   else if (_event.key == Qt::Key_Delete)
   {
-    if (!this->selectedLinks.empty())
+    if (!this->dataPtr->selectedLinks.empty())
     {
-      for (const auto &linkVis : this->selectedLinks)
+      for (const auto &linkVis : this->dataPtr->selectedLinks)
       {
         this->OnDelete(linkVis->GetName());
       }
       this->DeselectAll();
     }
-    else if (!this->selectedModelPlugins.empty())
+    else if (!this->dataPtr->selectedModelPlugins.empty())
     {
-      for (const auto &plugin : this->selectedModelPlugins)
+      for (const auto &plugin : this->dataPtr->selectedModelPlugins)
       {
         this->RemoveModelPlugin(plugin);
       }
@@ -1614,7 +1617,7 @@ bool ModelCreator::OnMousePress(const common::MouseEvent &_event)
   if (!userCamera)
     return false;
 
-  if (this->jointMaker->GetState() != JointMaker::JOINT_NONE)
+  if (this->dataPtr->jointMaker->GetState() != JointMaker::JOINT_NONE)
   {
     userCamera->HandleMouseEvent(_event);
     return true;
@@ -1645,37 +1648,37 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
   if (!userCamera)
     return false;
 
-  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
 
-  if (this->mouseVisual)
+  if (this->dataPtr->mouseVisual)
   {
     if (_event.Button() == common::MouseEvent::RIGHT)
       return true;
 
     // set the link data pose
-    auto linkIt = this->allLinks.find(this->mouseVisual->GetName());
-    if (linkIt != this->allLinks.end())
+    auto linkIt = this->dataPtr->allLinks.find(this->dataPtr->mouseVisual->GetName());
+    if (linkIt != this->dataPtr->allLinks.end())
     {
       LinkData *link = linkIt->second;
-      link->SetPose((this->mouseVisual->GetWorldPose()-this->modelPose).Ign());
-      gui::model::Events::linkInserted(this->mouseVisual->GetName());
+      link->SetPose((this->dataPtr->mouseVisual->GetWorldPose()-this->dataPtr->modelPose).Ign());
+      gui::model::Events::linkInserted(this->dataPtr->mouseVisual->GetName());
     }
     else
     {
-      auto modelIt = this->allNestedModels.find(this->mouseVisual->GetName());
-      if (modelIt != this->allNestedModels.end())
+      auto modelIt = this->dataPtr->allNestedModels.find(this->dataPtr->mouseVisual->GetName());
+      if (modelIt != this->dataPtr->allNestedModels.end())
       {
         NestedModelData *modelData = modelIt->second;
         modelData->SetPose((
-            this->mouseVisual->GetWorldPose()-this->modelPose).Ign());
+            this->dataPtr->mouseVisual->GetWorldPose()-this->dataPtr->modelPose).Ign());
 
-        this->EmitNestedModelInsertedEvent(this->mouseVisual);
+        this->EmitNestedModelInsertedEvent(this->dataPtr->mouseVisual);
       }
     }
 
     // reset and return
     emit LinkAdded();
-    this->mouseVisual.reset();
+    this->dataPtr->mouseVisual.reset();
     this->AddLink(ENTITY_NONE);
     return true;
   }
@@ -1688,8 +1691,8 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
       return false;
 
     // Is link
-    if (this->allLinks.find(topLevelVis->GetName()) !=
-        this->allLinks.end())
+    if (this->dataPtr->allLinks.find(topLevelVis->GetName()) !=
+        this->dataPtr->allLinks.end())
     {
       // Handle snap from GLWidget
       if (g_snapAct->isChecked())
@@ -1698,9 +1701,9 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
       // trigger link inspector on right click
       if (_event.Button() == common::MouseEvent::RIGHT)
       {
-        this->inspectName = topLevelVis->GetName();
+        this->dataPtr->inspectName = topLevelVis->GetName();
 
-        this->ShowContextMenu(this->inspectName);
+        this->ShowContextMenu(this->dataPtr->inspectName);
         return true;
       }
 
@@ -1715,10 +1718,10 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
       {
         this->DeselectAllModelPlugins();
 
-        auto it = std::find(this->selectedLinks.begin(),
-            this->selectedLinks.end(), topLevelVis);
+        auto it = std::find(this->dataPtr->selectedLinks.begin(),
+            this->dataPtr->selectedLinks.end(), topLevelVis);
         // Highlight and select clicked link if not already selected
-        if (it == this->selectedLinks.end())
+        if (it == this->dataPtr->selectedLinks.end())
         {
           this->SetSelected(topLevelVis, true);
         }
@@ -1729,10 +1732,10 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
         }
       }
 
-      if (this->manipMode == "translate" || this->manipMode == "rotate" ||
-          this->manipMode == "scale")
+      if (this->dataPtr->manipMode == "translate" || this->dataPtr->manipMode == "rotate" ||
+          this->dataPtr->manipMode == "scale")
       {
-        this->OnManipMode(this->manipMode);
+        this->OnManipMode(this->dataPtr->manipMode);
       }
 
       return true;
@@ -1743,7 +1746,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
       this->DeselectAll();
 
       g_alignAct->setEnabled(false);
-      g_copyAct->setEnabled(!this->selectedLinks.empty());
+      g_copyAct->setEnabled(!this->dataPtr->selectedLinks.empty());
 
       if (!vis->IsPlane())
         return true;
@@ -1759,8 +1762,8 @@ void ModelCreator::EmitNestedModelInsertedEvent(
   if (!_vis)
     return;
 
-  auto modelIt = this->allNestedModels.find(_vis->GetName());
-  if (modelIt != this->allNestedModels.end())
+  auto modelIt = this->dataPtr->allNestedModels.find(_vis->GetName());
+  if (modelIt != this->dataPtr->allNestedModels.end())
     gui::model::Events::nestedModelInserted(_vis->GetName());
   else
     return;
@@ -1772,8 +1775,8 @@ void ModelCreator::EmitNestedModelInsertedEvent(
 /////////////////////////////////////////////////
 void ModelCreator::ShowContextMenu(const std::string &_link)
 {
-  auto it = this->allLinks.find(_link);
-  if (it == this->allLinks.end())
+  auto it = this->dataPtr->allLinks.find(_link);
+  if (it == this->dataPtr->allLinks.end())
     return;
 
   // disable interacting with nested links for now
@@ -1781,15 +1784,15 @@ void ModelCreator::ShowContextMenu(const std::string &_link)
   if (link->nested)
     return;
 
-  this->inspectName = _link;
+  this->dataPtr->inspectName = _link;
   QMenu menu;
-  if (this->inspectAct)
+  if (this->dataPtr->inspectAct)
   {
-    menu.addAction(this->inspectAct);
+    menu.addAction(this->dataPtr->inspectAct);
 
-    if (this->jointMaker)
+    if (this->dataPtr->jointMaker)
     {
-      std::vector<JointData *> joints = this->jointMaker->GetJointDataByLink(
+      std::vector<JointData *> joints = this->dataPtr->jointMaker->GetJointDataByLink(
           _link);
 
       if (!joints.empty())
@@ -1816,8 +1819,8 @@ void ModelCreator::ShowContextMenu(const std::string &_link)
 /////////////////////////////////////////////////
 void ModelCreator::ShowModelPluginContextMenu(const std::string &_name)
 {
-  auto it = this->allModelPlugins.find(_name);
-  if (it == this->allModelPlugins.end())
+  auto it = this->dataPtr->allModelPlugins.find(_name);
+  if (it == this->dataPtr->allModelPlugins.end())
     return;
 
   // Open inspector
@@ -1855,12 +1858,12 @@ void ModelCreator::ShowModelPluginContextMenu(const std::string &_name)
 /////////////////////////////////////////////////
 bool ModelCreator::OnMouseMove(const common::MouseEvent &_event)
 {
-  this->lastMouseEvent = _event;
+  this->dataPtr->lastMouseEvent = _event;
   rendering::UserCameraPtr userCamera = gui::get_active_camera();
   if (!userCamera)
     return false;
 
-  if (!this->mouseVisual)
+  if (!this->dataPtr->mouseVisual)
   {
     rendering::VisualPtr vis = userCamera->GetVisual(_event.Pos());
     if (vis && !vis->IsPlane())
@@ -1871,12 +1874,12 @@ bool ModelCreator::OnMouseMove(const common::MouseEvent &_event)
 
       // Main window models always handled here
       // Not possible to interact with nested models yet
-      if (this->allLinks.find(topLevelVis->GetName()) ==
-          this->allLinks.end())
+      if (this->dataPtr->allLinks.find(topLevelVis->GetName()) ==
+          this->dataPtr->allLinks.end())
       {
         // Prevent highlighting for snapping
-        if (this->manipMode == "snap" || this->manipMode == "select" ||
-            this->manipMode == "")
+        if (this->dataPtr->manipMode == "snap" || this->dataPtr->manipMode == "select" ||
+            this->dataPtr->manipMode == "")
         {
           // Don't change cursor on hover
           QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
@@ -1893,7 +1896,7 @@ bool ModelCreator::OnMouseMove(const common::MouseEvent &_event)
     return false;
   }
 
-  math::Pose pose = this->mouseVisual->GetWorldPose();
+  math::Pose pose = this->dataPtr->mouseVisual->GetWorldPose();
   pose.pos = ModelManipulator::GetMousePositionOnPlane(
       userCamera, _event);
 
@@ -1901,9 +1904,9 @@ bool ModelCreator::OnMouseMove(const common::MouseEvent &_event)
   {
     pose.pos = ModelManipulator::SnapPoint(pose.pos);
   }
-  pose.pos.z = this->mouseVisual->GetWorldPose().pos.z;
+  pose.pos.z = this->dataPtr->mouseVisual->GetWorldPose().pos.z;
 
-  this->mouseVisual->SetWorldPose(pose);
+  this->dataPtr->mouseVisual->SetWorldPose(pose);
 
   return true;
 }
@@ -1916,10 +1919,10 @@ bool ModelCreator::OnMouseDoubleClick(const common::MouseEvent &_event)
   if (!vis)
     return false;
 
-  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
 
-  auto it = this->allLinks.find(vis->GetParent()->GetName());
-  if (it != this->allLinks.end())
+  auto it = this->dataPtr->allLinks.find(vis->GetParent()->GetName());
+  if (it != this->dataPtr->allLinks.end())
   {
     this->OpenInspector(vis->GetParent()->GetName());
     return true;
@@ -1931,19 +1934,19 @@ bool ModelCreator::OnMouseDoubleClick(const common::MouseEvent &_event)
 /////////////////////////////////////////////////
 void ModelCreator::OnOpenInspector()
 {
-  if (this->inspectName.empty())
+  if (this->dataPtr->inspectName.empty())
     return;
 
-  this->OpenInspector(this->inspectName);
-  this->inspectName = "";
+  this->OpenInspector(this->dataPtr->inspectName);
+  this->dataPtr->inspectName = "";
 }
 
 /////////////////////////////////////////////////
 void ModelCreator::OpenInspector(const std::string &_name)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
-  auto it = this->allLinks.find(_name);
-  if (it == this->allLinks.end())
+  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
+  auto it = this->dataPtr->allLinks.find(_name);
+  if (it == this->dataPtr->allLinks.end())
   {
     gzerr << "Link [" << _name << "] not found." << std::endl;
     return;
@@ -1954,7 +1957,7 @@ void ModelCreator::OpenInspector(const std::string &_name)
   if (link->nested)
     return;
 
-  link->SetPose((link->linkVisual->GetWorldPose()-this->modelPose).Ign());
+  link->SetPose((link->linkVisual->GetWorldPose()-this->dataPtr->modelPose).Ign());
   link->UpdateConfig();
   link->inspector->Open();
 }
@@ -1965,12 +1968,12 @@ void ModelCreator::OnCopy()
   if (!g_editModelAct->isChecked())
     return;
 
-  if (!this->selectedLinks.empty())
+  if (!this->dataPtr->selectedLinks.empty())
   {
-    this->copiedLinkNames.clear();
-    for (auto vis : this->selectedLinks)
+    this->dataPtr->copiedLinkNames.clear();
+    for (auto vis : this->dataPtr->selectedLinks)
     {
-      this->copiedLinkNames.push_back(vis->GetName());
+      this->dataPtr->copiedLinkNames.push_back(vis->GetName());
     }
     g_pasteAct->setEnabled(true);
   }
@@ -1979,16 +1982,16 @@ void ModelCreator::OnCopy()
 /////////////////////////////////////////////////
 void ModelCreator::OnPaste()
 {
-  if (this->copiedLinkNames.empty() || !g_editModelAct->isChecked())
+  if (this->dataPtr->copiedLinkNames.empty() || !g_editModelAct->isChecked())
   {
     return;
   }
 
-  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
 
   // For now, only copy the last selected model
-  auto it = this->allLinks.find(this->copiedLinkNames.back());
-  if (it != this->allLinks.end())
+  auto it = this->dataPtr->allLinks.find(this->dataPtr->copiedLinkNames.back());
+  if (it != this->dataPtr->allLinks.end())
   {
     LinkData *copiedLink = it->second;
     if (!copiedLink)
@@ -1997,7 +2000,7 @@ void ModelCreator::OnPaste()
     this->Stop();
     this->DeselectAll();
 
-    if (!this->previewVisual)
+    if (!this->dataPtr->previewVisual)
     {
       this->Reset();
     }
@@ -2010,21 +2013,21 @@ void ModelCreator::OnPaste()
     {
       math::Vector3 mousePosition =
         ModelManipulator::GetMousePositionOnPlane(userCamera,
-                                                  this->lastMouseEvent);
+                                                  this->dataPtr->lastMouseEvent);
       clonePose.pos.x = mousePosition.x;
       clonePose.pos.y = mousePosition.y;
     }
 
     clonedLink->linkVisual->SetWorldPose(clonePose);
-    this->addEntityType = ENTITY_MESH;
-    this->mouseVisual = clonedLink->linkVisual;
+    this->dataPtr->addEntityType = ENTITY_MESH;
+    this->dataPtr->mouseVisual = clonedLink->linkVisual;
   }
 }
 
 /////////////////////////////////////////////////
 JointMaker *ModelCreator::GetJointMaker() const
 {
-  return this->jointMaker;
+  return this->dataPtr->jointMaker;
 }
 
 /////////////////////////////////////////////////
@@ -2032,23 +2035,23 @@ void ModelCreator::GenerateSDF()
 {
   sdf::ElementPtr modelElem;
 
-  this->modelSDF.reset(new sdf::SDF);
-  this->modelSDF->SetFromString(ModelData::GetTemplateSDFString());
+  this->dataPtr->modelSDF.reset(new sdf::SDF);
+  this->dataPtr->modelSDF->SetFromString(ModelData::GetTemplateSDFString());
 
-  modelElem = this->modelSDF->Root()->GetElement("model");
+  modelElem = this->dataPtr->modelSDF->Root()->GetElement("model");
 
   modelElem->ClearElements();
-  modelElem->GetAttribute("name")->Set(this->folderName);
+  modelElem->GetAttribute("name")->Set(this->dataPtr->folderName);
 
-  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
 
-  if (this->serverModelName.empty())
+  if (this->dataPtr->serverModelName.empty())
   {
     // set center of all links and nested models to be origin
     /// \todo issue #1485 set a better origin other than the centroid
     ignition::math::Vector3d mid;
     int entityCount = 0;
-    for (auto &linksIt : this->allLinks)
+    for (auto &linksIt : this->dataPtr->allLinks)
     {
       LinkData *link = linksIt.second;
       if (link->nested)
@@ -2056,7 +2059,7 @@ void ModelCreator::GenerateSDF()
       mid += link->Pose().Pos();
       entityCount++;
     }
-    for (auto &nestedModelsIt : this->allNestedModels)
+    for (auto &nestedModelsIt : this->dataPtr->allNestedModels)
     {
       NestedModelData *modelData = nestedModelsIt.second;
 
@@ -2068,25 +2071,25 @@ void ModelCreator::GenerateSDF()
       entityCount++;
     }
 
-    if (!(this->allLinks.empty() && this->allNestedModels.empty()))
+    if (!(this->dataPtr->allLinks.empty() && this->dataPtr->allNestedModels.empty()))
     {
       mid /= entityCount;
     }
 
-    this->modelPose.Pos() = mid;
+    this->dataPtr->modelPose.Pos() = mid;
   }
 
   // Update poses in case they changed
-  this->previewVisual->SetWorldPose(this->modelPose);
-  for (auto &linksIt : this->allLinks)
+  this->dataPtr->previewVisual->SetWorldPose(this->dataPtr->modelPose);
+  for (auto &linksIt : this->dataPtr->allLinks)
   {
     LinkData *link = linksIt.second;
     if (link->nested)
       continue;
-    link->SetPose((link->linkVisual->GetWorldPose() - this->modelPose).Ign());
+    link->SetPose((link->linkVisual->GetWorldPose() - this->dataPtr->modelPose).Ign());
     link->linkVisual->SetPose(link->Pose());
   }
-  for (auto &nestedModelsIt : this->allNestedModels)
+  for (auto &nestedModelsIt : this->dataPtr->allNestedModels)
   {
     NestedModelData *modelData = nestedModelsIt.second;
 
@@ -2098,15 +2101,15 @@ void ModelCreator::GenerateSDF()
       continue;
 
     modelData->SetPose(modelData->modelVisual->GetWorldPose().Ign() -
-        this->modelPose);
+        this->dataPtr->modelPose);
     modelData->modelVisual->SetPose(modelData->Pose());
   }
 
   // generate canonical link sdf first.
-  if (!this->canonicalLink.empty())
+  if (!this->dataPtr->canonicalLink.empty())
   {
-    auto canonical = this->allLinks.find(this->canonicalLink);
-    if (canonical != this->allLinks.end())
+    auto canonical = this->dataPtr->allLinks.find(this->dataPtr->canonicalLink);
+    if (canonical != this->dataPtr->allLinks.end())
     {
       LinkData *link = canonical->second;
       if (!link->nested)
@@ -2119,11 +2122,11 @@ void ModelCreator::GenerateSDF()
   }
 
   // loop through rest of all links and generate sdf
-  for (auto &linksIt : this->allLinks)
+  for (auto &linksIt : this->dataPtr->allLinks)
   {
     LinkData *link = linksIt.second;
 
-    if (linksIt.first == this->canonicalLink || link->nested)
+    if (linksIt.first == this->dataPtr->canonicalLink || link->nested)
       continue;
 
     link->UpdateConfig();
@@ -2133,10 +2136,10 @@ void ModelCreator::GenerateSDF()
   }
 
   // generate canonical model sdf first.
-  if (!this->canonicalModel.empty())
+  if (!this->dataPtr->canonicalModel.empty())
   {
-    auto canonical = this->allNestedModels.find(this->canonicalModel);
-    if (canonical != this->allNestedModels.end())
+    auto canonical = this->dataPtr->allNestedModels.find(this->dataPtr->canonicalModel);
+    if (canonical != this->dataPtr->allNestedModels.end())
     {
       NestedModelData *nestedModelData = canonical->second;
       modelElem->InsertElement(nestedModelData->modelSDF);
@@ -2144,11 +2147,11 @@ void ModelCreator::GenerateSDF()
   }
 
   // loop through rest of all nested models and add sdf
-  for (auto &nestedModelsIt : this->allNestedModels)
+  for (auto &nestedModelsIt : this->dataPtr->allNestedModels)
   {
     NestedModelData *nestedModelData = nestedModelsIt.second;
 
-    if (nestedModelsIt.first == this->canonicalModel ||
+    if (nestedModelsIt.first == this->dataPtr->canonicalModel ||
         nestedModelData->Depth() != 2)
       continue;
 
@@ -2156,8 +2159,8 @@ void ModelCreator::GenerateSDF()
   }
 
   // Add joint sdf elements
-  this->jointMaker->GenerateSDF();
-  sdf::ElementPtr jointsElem = this->jointMaker->GetSDF();
+  this->dataPtr->jointMaker->GenerateSDF();
+  sdf::ElementPtr jointsElem = this->dataPtr->jointMaker->GetSDF();
 
   sdf::ElementPtr jointElem;
   if (jointsElem->HasElement("joint"))
@@ -2169,11 +2172,11 @@ void ModelCreator::GenerateSDF()
   }
 
   // Model settings
-  modelElem->GetElement("static")->Set(this->isStatic);
-  modelElem->GetElement("allow_auto_disable")->Set(this->autoDisable);
+  modelElem->GetElement("static")->Set(this->dataPtr->isStatic);
+  modelElem->GetElement("allow_auto_disable")->Set(this->dataPtr->autoDisable);
 
   // Add plugin elements
-  for (auto modelPlugin : this->allModelPlugins)
+  for (auto modelPlugin : this->dataPtr->allModelPlugins)
     modelElem->InsertElement(modelPlugin.second->modelPluginSDF->Clone());
 }
 
@@ -2187,7 +2190,7 @@ sdf::ElementPtr ModelCreator::GenerateLinkSDF(LinkData *_link)
 
   sdf::ElementPtr newLinkElem = _link->linkSDF->Clone();
   newLinkElem->GetElement("pose")->Set(_link->linkVisual->GetWorldPose()
-      - this->modelPose);
+      - this->dataPtr->modelPose);
 
   // visuals
   for (auto const &it : _link->visuals)
@@ -2215,7 +2218,7 @@ void ModelCreator::OnAlignMode(const std::string &_axis,
     const std::string &_config, const std::string &_target, const bool _preview,
     const bool _inverted)
 {
-  ModelAlign::Instance()->AlignVisuals(this->selectedLinks, _axis, _config,
+  ModelAlign::Instance()->AlignVisuals(this->dataPtr->selectedLinks, _axis, _config,
       _target, !_preview, _inverted);
 }
 
@@ -2229,11 +2232,11 @@ void ModelCreator::DeselectAll()
 /////////////////////////////////////////////////
 void ModelCreator::DeselectAllLinks()
 {
-  while (!this->selectedLinks.empty())
+  while (!this->dataPtr->selectedLinks.empty())
   {
-    rendering::VisualPtr vis = this->selectedLinks[0];
+    rendering::VisualPtr vis = this->dataPtr->selectedLinks[0];
     vis->SetHighlighted(false);
-    this->selectedLinks.erase(this->selectedLinks.begin());
+    this->dataPtr->selectedLinks.erase(this->dataPtr->selectedLinks.begin());
     model::Events::setSelectedLink(vis->GetName(), false);
   }
 }
@@ -2241,11 +2244,11 @@ void ModelCreator::DeselectAllLinks()
 /////////////////////////////////////////////////
 void ModelCreator::DeselectAllModelPlugins()
 {
-  while (!this->selectedModelPlugins.empty())
+  while (!this->dataPtr->selectedModelPlugins.empty())
   {
-    auto it = this->selectedModelPlugins.begin();
-    std::string name = this->selectedModelPlugins[0];
-    this->selectedModelPlugins.erase(it);
+    auto it = this->dataPtr->selectedModelPlugins.begin();
+    std::string name = this->dataPtr->selectedModelPlugins[0];
+    this->dataPtr->selectedModelPlugins.erase(it);
     model::Events::setSelectedModelPlugin(name, false);
   }
 }
@@ -2253,8 +2256,8 @@ void ModelCreator::DeselectAllModelPlugins()
 /////////////////////////////////////////////////
 void ModelCreator::SetSelected(const std::string &_name, const bool _selected)
 {
-  auto it = this->allLinks.find(_name);
-  if (it == this->allLinks.end())
+  auto it = this->dataPtr->allLinks.find(_name);
+  if (it == this->dataPtr->allLinks.end())
     return;
 
   this->SetSelected((*it).second->linkVisual, _selected);
@@ -2268,50 +2271,50 @@ void ModelCreator::SetSelected(rendering::VisualPtr _linkVis,
     return;
 
   _linkVis->SetHighlighted(_selected);
-  auto it = std::find(this->selectedLinks.begin(),
-      this->selectedLinks.end(), _linkVis);
+  auto it = std::find(this->dataPtr->selectedLinks.begin(),
+      this->dataPtr->selectedLinks.end(), _linkVis);
   if (_selected)
   {
-    if (it == this->selectedLinks.end())
+    if (it == this->dataPtr->selectedLinks.end())
     {
-      this->selectedLinks.push_back(_linkVis);
+      this->dataPtr->selectedLinks.push_back(_linkVis);
       model::Events::setSelectedLink(_linkVis->GetName(), _selected);
     }
   }
   else
   {
-    if (it != this->selectedLinks.end())
+    if (it != this->dataPtr->selectedLinks.end())
     {
-      this->selectedLinks.erase(it);
+      this->dataPtr->selectedLinks.erase(it);
       model::Events::setSelectedLink(_linkVis->GetName(), _selected);
     }
   }
-  g_copyAct->setEnabled(!this->selectedLinks.empty());
-  g_alignAct->setEnabled(this->selectedLinks.size() > 1);
+  g_copyAct->setEnabled(!this->dataPtr->selectedLinks.empty());
+  g_alignAct->setEnabled(this->dataPtr->selectedLinks.size() > 1);
 }
 
 /////////////////////////////////////////////////
 void ModelCreator::OnManipMode(const std::string &_mode)
 {
-  if (!this->active)
+  if (!this->dataPtr->active)
     return;
 
-  this->manipMode = _mode;
+  this->dataPtr->manipMode = _mode;
 
-  if (!this->selectedLinks.empty())
+  if (!this->dataPtr->selectedLinks.empty())
   {
     ModelManipulator::Instance()->SetAttachedVisual(
-        this->selectedLinks.back());
+        this->dataPtr->selectedLinks.back());
   }
 
   ModelManipulator::Instance()->SetManipulationMode(_mode);
   ModelSnap::Instance()->Reset();
 
   // deselect 0 to n-1 models.
-  if (this->selectedLinks.size() > 1)
+  if (this->dataPtr->selectedLinks.size() > 1)
   {
     rendering::VisualPtr link =
-        this->selectedLinks[this->selectedLinks.size()-1];
+        this->dataPtr->selectedLinks[this->dataPtr->selectedLinks.size()-1];
     this->DeselectAll();
     this->SetSelected(link, true);
   }
@@ -2335,60 +2338,60 @@ void ModelCreator::OnSetSelectedLink(const std::string &_name,
 void ModelCreator::OnSetSelectedModelPlugin(const std::string &_name,
     const bool _selected)
 {
-  auto plugin = this->allModelPlugins.find(_name);
-  if (plugin == this->allModelPlugins.end())
+  auto plugin = this->dataPtr->allModelPlugins.find(_name);
+  if (plugin == this->dataPtr->allModelPlugins.end())
     return;
 
-  auto it = std::find(this->selectedModelPlugins.begin(),
-      this->selectedModelPlugins.end(), _name);
-  if (_selected && it == this->selectedModelPlugins.end())
+  auto it = std::find(this->dataPtr->selectedModelPlugins.begin(),
+      this->dataPtr->selectedModelPlugins.end(), _name);
+  if (_selected && it == this->dataPtr->selectedModelPlugins.end())
   {
-    this->selectedModelPlugins.push_back(_name);
+    this->dataPtr->selectedModelPlugins.push_back(_name);
   }
-  else if (!_selected && it != this->selectedModelPlugins.end())
+  else if (!_selected && it != this->dataPtr->selectedModelPlugins.end())
   {
-    this->selectedModelPlugins.erase(it);
+    this->dataPtr->selectedModelPlugins.erase(it);
   }
 }
 
 /////////////////////////////////////////////////
 void ModelCreator::ModelChanged()
 {
-  if (this->currentSaveState != NEVER_SAVED)
-    this->currentSaveState = UNSAVED_CHANGES;
+  if (this->dataPtr->currentSaveState != NEVER_SAVED)
+    this->dataPtr->currentSaveState = UNSAVED_CHANGES;
 }
 
 /////////////////////////////////////////////////
 void ModelCreator::Update()
 {
-  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
 
   // Check if any links have been moved or resized and trigger ModelChanged
-  for (auto &linksIt : this->allLinks)
+  for (auto &linksIt : this->dataPtr->allLinks)
   {
     LinkData *link = linksIt.second;
     if (link->Pose() != link->linkVisual->GetPose().Ign())
     {
-      link->SetPose((link->linkVisual->GetWorldPose() - this->modelPose).Ign());
+      link->SetPose((link->linkVisual->GetWorldPose() - this->dataPtr->modelPose).Ign());
       this->ModelChanged();
     }
-    for (auto &scaleIt : this->linkScaleUpdate)
+    for (auto &scaleIt : this->dataPtr->linkScaleUpdate)
     {
       if (link->linkVisual->GetName() == scaleIt.first)
         link->SetScale(scaleIt.second.Ign());
     }
   }
-  if (!this->linkScaleUpdate.empty())
+  if (!this->dataPtr->linkScaleUpdate.empty())
     this->ModelChanged();
-  this->linkScaleUpdate.clear();
+  this->dataPtr->linkScaleUpdate.clear();
 }
 
 /////////////////////////////////////////////////
 void ModelCreator::OnEntityScaleChanged(const std::string &_name,
   const math::Vector3 &_scale)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
-  for (auto linksIt : this->allLinks)
+  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
+  for (auto linksIt : this->dataPtr->allLinks)
   {
     std::string linkName;
     size_t pos = _name.rfind("::");
@@ -2396,7 +2399,7 @@ void ModelCreator::OnEntityScaleChanged(const std::string &_name,
       linkName = _name.substr(0, pos);
     if (_name == linksIt.first || linkName == linksIt.first)
     {
-      this->linkScaleUpdate[linksIt.first] = _scale;
+      this->dataPtr->linkScaleUpdate[linksIt.first] = _scale;
       break;
     }
   }
@@ -2428,14 +2431,14 @@ void ModelCreator::SetModelVisible(rendering::VisualPtr _visual, bool _visible)
   if (!_visible)
   {
     // store original visibility
-    this->serverModelVisible[_visual->GetId()] = _visual->GetVisible();
+    this->dataPtr->serverModelVisible[_visual->GetId()] = _visual->GetVisible();
     _visual->SetVisible(_visible);
   }
   else
   {
     // restore original visibility
-    auto it = this->serverModelVisible.find(_visual->GetId());
-    if (it != this->serverModelVisible.end())
+    auto it = this->dataPtr->serverModelVisible.find(_visual->GetId());
+    if (it != this->dataPtr->serverModelVisible.end())
     {
       _visual->SetVisible(it->second, false);
     }
@@ -2445,7 +2448,7 @@ void ModelCreator::SetModelVisible(rendering::VisualPtr _visual, bool _visible)
 /////////////////////////////////////////////////
 ModelCreator::SaveState ModelCreator::GetCurrentSaveState() const
 {
-  return this->currentSaveState;
+  return this->dataPtr->currentSaveState;
 }
 
 /////////////////////////////////////////////////
@@ -2492,8 +2495,8 @@ void ModelCreator::AddModelPlugin(const sdf::ElementPtr _pluginElem)
 
     // Add to map
     {
-      boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
-      this->allModelPlugins[name] = modelPlugin;
+      boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
+      this->dataPtr->allModelPlugins[name] = modelPlugin;
     }
 
     // Notify addition
@@ -2504,8 +2507,8 @@ void ModelCreator::AddModelPlugin(const sdf::ElementPtr _pluginElem)
 /////////////////////////////////////////////////
 ModelPluginData *ModelCreator::ModelPlugin(const std::string &_name)
 {
-  auto it = this->allModelPlugins.find(_name);
-  if (it != this->allModelPlugins.end())
+  auto it = this->dataPtr->allModelPlugins.find(_name);
+  if (it != this->dataPtr->allModelPlugins.end())
     return it->second;
   return NULL;
 }
@@ -2519,10 +2522,10 @@ void ModelCreator::OnOpenModelPluginInspector(const QString &_name)
 /////////////////////////////////////////////////
 void ModelCreator::OpenModelPluginInspector(const std::string &_name)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
 
-  auto it = this->allModelPlugins.find(_name);
-  if (it == this->allModelPlugins.end())
+  auto it = this->dataPtr->allModelPlugins.find(_name);
+  if (it == this->dataPtr->allModelPlugins.end())
   {
     gzerr << "Model plugin [" << _name << "] not found." << std::endl;
     return;

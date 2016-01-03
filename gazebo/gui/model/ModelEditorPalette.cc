@@ -19,6 +19,8 @@
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Events.hh"
+#include "gazebo/common/KeyEvent.hh"
+#include "gazebo/common/MouseEvent.hh"
 
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/GuiIface.hh"
