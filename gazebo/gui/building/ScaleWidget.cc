@@ -15,24 +15,26 @@
  *
 */
 
-#include <boost/bind.hpp>
 #include <sstream>
+
 #include "gazebo/gui/building/BuildingEditorEvents.hh"
 #include "gazebo/gui/building/ScaleWidget.hh"
+#include "gazebo/gui/building/ScaleWidgetPrivate.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 //////////////////////////////////////////////////
-ScaleWidget::ScaleWidget(QWidget *_parent) : QWidget(_parent)
+ScaleWidget::ScaleWidget(QWidget *_parent)
+  : QWidget(_parent), dataPtr(new ScaleWidgetPrivate)
 {
   this->setObjectName("scaleWidget");
-  this->scaleText = "1.00 m";
+  this->dataPtr->scaleText = "1.00 m";
 
   this->setAttribute(Qt::WA_TransparentForMouseEvents);
-  this->connections.push_back(
-    gui::editor::Events::ConnectChangeBuildingEditorZoom(
-    boost::bind(&ScaleWidget::OnChangeZoom, this, _1)));
+  this->dataPtr->connections.push_back(
+      gui::editor::Events::ConnectChangeBuildingEditorZoom(
+      std::bind(&ScaleWidget::OnChangeZoom, this, std::placeholders::_1)));
 }
 
 //////////////////////////////////////////////////
@@ -62,14 +64,14 @@ void ScaleWidget::paintEvent(QPaintEvent *)
     (bottomRight.y() - topLeft.y()));
   QRect rulerRect(textTopLeft, textBottomRight);
   painter.drawText(rulerRect, Qt::AlignHCenter,
-    QString(this->scaleText.c_str()));
+    QString(this->dataPtr->scaleText.c_str()));
 }
 
 //////////////////////////////////////////////////
-void ScaleWidget::OnChangeZoom(double _zoomFactor)
+void ScaleWidget::OnChangeZoom(const double _zoomFactor)
 {
   std::stringstream str;
   double places = pow(10.0, 2);
   str << round((1.0/_zoomFactor) * places) / places << " m";
-  this->scaleText = str.str();
+  this->dataPtr->scaleText = str.str();
 }
