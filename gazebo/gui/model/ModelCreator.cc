@@ -21,7 +21,6 @@
   #include <Winsock2.h>
 #endif
 
-#include <boost/thread/recursive_mutex.hpp>
 #include <boost/filesystem.hpp>
 #include <sstream>
 #include <string>
@@ -72,8 +71,6 @@ ModelCreator::ModelCreator() : dataPtr(new ModelCreatorPrivate)
   this->dataPtr->modelTemplateSDF.reset(new sdf::SDF);
   this->dataPtr->modelTemplateSDF->SetFromString(
       ModelData::GetTemplateSDFString());
-
-  this->dataPtr->updateMutex = new boost::recursive_mutex();
 
   this->dataPtr->manipMode = "";
   this->dataPtr->linkCounter = 0;
@@ -234,7 +231,6 @@ ModelCreator::~ModelCreator()
   this->dataPtr->connections.clear();
 
   delete this->dataPtr->saveDialog;
-  delete this->dataPtr->updateMutex;
 
   delete this->dataPtr->jointMaker;
 }
@@ -300,8 +296,7 @@ void ModelCreator::OnEditModel(const std::string &_modelName)
   // Get SDF model element from model name
   // TODO replace with entity_info and parse gazebo.msgs.Model msgs
   // or handle model_sdf requests in world.
-  boost::shared_ptr<msgs::Response> response =
-    transport::request(gui::get_world(), "world_sdf");
+  auto response = transport::request(gui::get_world(), "world_sdf");
 
   msgs::GzString msg;
   // Make sure the response is correct
@@ -453,7 +448,7 @@ NestedModelData *ModelCreator::CreateModelFromSDF(
   // Notify nested model insertion
   if (_parentVis)
   {
-    boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
+    std::unique_lock<std::recursive_mutex> lock(this->dataPtr->updateMutex);
     this->dataPtr->allNestedModels[nestedModelName] = modelData;
 
     // fire nested inserted events only when the nested model is
@@ -970,7 +965,7 @@ void ModelCreator::CreateLink(const rendering::VisualPtr &_visual)
   link->SetName(leafName);
 
   {
-    boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
+    std::unique_lock<std::recursive_mutex> lock(this->dataPtr->updateMutex);
     this->dataPtr->allLinks[linkName] = link;
     if (this->dataPtr->canonicalLink.empty())
       this->dataPtr->canonicalLink = linkName;
@@ -984,7 +979,7 @@ void ModelCreator::CreateLink(const rendering::VisualPtr &_visual)
 /////////////////////////////////////////////////
 LinkData *ModelCreator::CloneLink(const std::string &_linkName)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
+  std::unique_lock<std::recursive_mutex> lock(this->dataPtr->updateMutex);
 
   auto it = this->dataPtr->allLinks.find(_linkName);
   if (it == this->dataPtr->allLinks.end())
@@ -1180,7 +1175,7 @@ LinkData *ModelCreator::CreateLinkFromSDF(const sdf::ElementPtr &_linkElem,
     gui::model::Events::linkInserted(linkName);
 
   {
-    boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
+    std::unique_lock<std::recursive_mutex> lock(this->dataPtr->updateMutex);
     this->dataPtr->allLinks[linkName] = link;
   }
 
@@ -1200,7 +1195,7 @@ void ModelCreator::RemoveNestedModelImpl(const std::string &_nestedModelName)
 
   NestedModelData *modelData = NULL;
   {
-    boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
+    std::unique_lock<std::recursive_mutex> lock(this->dataPtr->updateMutex);
     if (this->dataPtr->allNestedModels.find(_nestedModelName) ==
         this->dataPtr->allNestedModels.end())
     {
@@ -1242,7 +1237,7 @@ void ModelCreator::RemoveNestedModelImpl(const std::string &_nestedModelName)
 
   modelData->modelVisual.reset();
   {
-    boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
+    std::unique_lock<std::recursive_mutex> lock(this->dataPtr->updateMutex);
     this->dataPtr->allNestedModels.erase(_nestedModelName);
     delete modelData;
   }
@@ -1262,7 +1257,7 @@ void ModelCreator::RemoveLinkImpl(const std::string &_linkName)
 
   LinkData *link = NULL;
   {
-    boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
+    std::unique_lock<std::recursive_mutex> lock(this->dataPtr->updateMutex);
     auto linkIt = this->dataPtr->allLinks.find(_linkName);
     if (linkIt == this->dataPtr->allLinks.end())
       return;
@@ -1295,7 +1290,7 @@ void ModelCreator::RemoveLinkImpl(const std::string &_linkName)
 
   link->linkVisual.reset();
   {
-    boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
+    std::unique_lock<std::recursive_mutex> lock(this->dataPtr->updateMutex);
     this->dataPtr->allLinks.erase(linkName);
     delete link;
   }
@@ -1416,8 +1411,7 @@ void ModelCreator::FinishModel()
     int timeout = 100;
     while (timeoutCounter < timeout)
     {
-      boost::shared_ptr<msgs::Response> response =
-          transport::request(gui::get_world(), "entity_info",
+      auto response = transport::request(gui::get_world(), "entity_info",
           this->dataPtr->serverModelName);
       // Make sure the response is correct
       if (response->response() == "nonexistent")
@@ -1451,7 +1445,7 @@ void ModelCreator::CreateTheEntity()
     while (has_entity_name(modelElemName))
     {
       modelElemName = modelElem->Get<std::string>("name") + "_" +
-        boost::lexical_cast<std::string>(i++);
+        std::to_string(i++);
     }
     modelElem->GetAttribute("name")->Set(modelElemName);
   }
@@ -1531,7 +1525,7 @@ void ModelCreator::OnDelete(const std::string &_entity)
 /////////////////////////////////////////////////
 void ModelCreator::RemoveEntity(const std::string &_entity)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
+  std::unique_lock<std::recursive_mutex> lock(this->dataPtr->updateMutex);
 
   // if it's a nestedModel
   if (this->dataPtr->allNestedModels.find(_entity) !=
@@ -1582,7 +1576,7 @@ void ModelCreator::OnRemoveModelPlugin(const QString &_name)
 /////////////////////////////////////////////////
 void ModelCreator::RemoveModelPlugin(const std::string &_name)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
+  std::unique_lock<std::recursive_mutex> lock(this->dataPtr->updateMutex);
 
   auto it = this->dataPtr->allModelPlugins.find(_name);
   if (it == this->dataPtr->allModelPlugins.end())
@@ -1680,7 +1674,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
   if (!userCamera)
     return false;
 
-  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
+  std::unique_lock<std::recursive_mutex> lock(this->dataPtr->updateMutex);
 
   if (this->dataPtr->mouseVisual)
   {
@@ -1956,7 +1950,7 @@ bool ModelCreator::OnMouseDoubleClick(const common::MouseEvent &_event)
   if (!vis)
     return false;
 
-  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
+  std::unique_lock<std::recursive_mutex> lock(this->dataPtr->updateMutex);
 
   auto it = this->dataPtr->allLinks.find(vis->GetParent()->GetName());
   if (it != this->dataPtr->allLinks.end())
@@ -1981,7 +1975,7 @@ void ModelCreator::OnOpenInspector()
 /////////////////////////////////////////////////
 void ModelCreator::OpenInspector(const std::string &_name)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
+  std::unique_lock<std::recursive_mutex> lock(this->dataPtr->updateMutex);
   auto it = this->dataPtr->allLinks.find(_name);
   if (it == this->dataPtr->allLinks.end())
   {
@@ -2025,7 +2019,7 @@ void ModelCreator::OnPaste()
     return;
   }
 
-  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
+  std::unique_lock<std::recursive_mutex> lock(this->dataPtr->updateMutex);
 
   // For now, only copy the last selected model
   auto it = this->dataPtr->allLinks.find(this->dataPtr->copiedLinkNames.back());
@@ -2080,7 +2074,7 @@ void ModelCreator::GenerateSDF()
   modelElem->ClearElements();
   modelElem->GetAttribute("name")->Set(this->dataPtr->folderName);
 
-  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
+  std::unique_lock<std::recursive_mutex> lock(this->dataPtr->updateMutex);
 
   if (this->dataPtr->serverModelName.empty())
   {
@@ -2404,7 +2398,7 @@ void ModelCreator::ModelChanged()
 /////////////////////////////////////////////////
 void ModelCreator::Update()
 {
-  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
+  std::unique_lock<std::recursive_mutex> lock(this->dataPtr->updateMutex);
 
   // Check if any links have been moved or resized and trigger ModelChanged
   for (auto &linksIt : this->dataPtr->allLinks)
@@ -2431,7 +2425,7 @@ void ModelCreator::Update()
 void ModelCreator::OnEntityScaleChanged(const std::string &_name,
   const ignition::math::Vector3d &_scale)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
+  std::unique_lock<std::recursive_mutex> lock(this->dataPtr->updateMutex);
   for (auto linksIt : this->dataPtr->allLinks)
   {
     std::string linkName;
@@ -2538,7 +2532,7 @@ void ModelCreator::AddModelPlugin(const sdf::ElementPtr &_pluginElem)
 
     // Add to map
     {
-      boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
+      std::unique_lock<std::recursive_mutex> lock(this->dataPtr->updateMutex);
       this->dataPtr->allModelPlugins[name] = modelPlugin;
     }
 
@@ -2565,7 +2559,7 @@ void ModelCreator::OnOpenModelPluginInspector(const QString &_name)
 /////////////////////////////////////////////////
 void ModelCreator::OpenModelPluginInspector(const std::string &_name)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
+  std::unique_lock<std::recursive_mutex> lock(this->dataPtr->updateMutex);
 
   auto it = this->dataPtr->allModelPlugins.find(_name);
   if (it == this->dataPtr->allModelPlugins.end())

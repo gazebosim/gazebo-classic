@@ -36,11 +36,6 @@
 
 #include "gazebo/transport/TransportTypes.hh"
 
-namespace boost
-{
-  class recursive_mutex;
-}
-
 namespace gazebo
 {
   namespace gui
@@ -159,7 +154,7 @@ namespace gazebo
       public: ModelCreator::SaveState currentSaveState;
 
       /// \brief Mutex to protect updates
-      public: boost::recursive_mutex *updateMutex;
+      public: std::recursive_mutex updateMutex;
 
       /// \brief A list of link names whose scale has changed externally.
       public: std::map<std::string, ignition::math::Vector3d> linkScaleUpdate;

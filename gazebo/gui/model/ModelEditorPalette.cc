@@ -199,7 +199,8 @@ void ModelEditorPalette::OnCustom()
           info.completeSuffix().toLower() == "stl")
       {
         this->modelCreator->AddShape(ModelCreator::ENTITY_MESH,
-            ignition::math::Vector3d::One, ignition::math::Pose3d::Zero, importDialog.GetImportPath());
+            ignition::math::Vector3d::One, ignition::math::Pose3d::Zero,
+            importDialog.GetImportPath());
       }
       else if (info.completeSuffix().toLower() == "svg")
       {
