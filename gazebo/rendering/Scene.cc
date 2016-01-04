@@ -1954,6 +1954,9 @@ void Scene::PreRender()
         std::front_inserter(this->dataPtr->linkMsgs));
   }
 
+  // update the rt shader
+  RTShaderSystem::Instance()->Update();
+
   {
     boost::recursive_mutex::scoped_lock lock(this->dataPtr->poseMsgMutex);
 
@@ -2105,7 +2108,7 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
     if (!parentVis)
       return false;
 
-    // image size is 0 if renering is unavailable
+    // image size is 0 if rendering is unavailable
     if (_msg->camera().image_size().x() > 0 &&
         _msg->camera().image_size().y() > 0)
     {
@@ -2221,17 +2224,18 @@ bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
     return false;
   }
 
-  if (!this->GetVisual(_msg->name() + "_COM_VISUAL__"))
+  std::string linkName = linkVis->GetName();
+  if (!this->GetVisual(linkName + "_COM_VISUAL__"))
   {
     this->CreateCOMVisual(_msg, linkVis);
   }
 
-  if (!this->GetVisual(_msg->name() + "_INERTIA_VISUAL__"))
+  if (!this->GetVisual(linkName + "_INERTIA_VISUAL__"))
   {
     this->CreateInertiaVisual(_msg, linkVis);
   }
 
-  if (!this->GetVisual(_msg->name() + "_LINK_FRAME_VISUAL__"))
+  if (!this->GetVisual(linkName + "_LINK_FRAME_VISUAL__"))
   {
     this->CreateLinkFrameVisual(_msg, linkVis);
   }
@@ -2653,7 +2657,8 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
       visual->ShowLinkFrame(this->dataPtr->showLinkFrames);
       visual->ShowCollision(this->dataPtr->showCollisions);
       visual->ShowJoints(this->dataPtr->showJoints);
-      visual->SetTransparency(this->dataPtr->transparent ? 0.5 : 0.0);
+      if (visual->GetType() == Visual::VT_MODEL)
+        visual->SetTransparency(this->dataPtr->transparent ? 0.5 : 0.0);
       visual->SetWireframe(this->dataPtr->wireframe);
     }
   }
@@ -3061,10 +3066,10 @@ void Scene::SetVisualId(VisualPtr _vis, uint32_t _id)
 /////////////////////////////////////////////////
 void Scene::AddLight(LightPtr _light)
 {
-  std::string n = this->StripSceneName(_light->GetName());
-  Light_M::iterator iter = this->dataPtr->lights.find(n);
+  std::string n = this->StripSceneName(_light->Name());
+  const auto iter = this->dataPtr->lights.find(n);
   if (iter != this->dataPtr->lights.end())
-    gzerr << "Duplicate lights detected[" << _light->GetName() << "]\n";
+    gzerr << "Duplicate lights detected[" << _light->Name() << "]\n";
 
   this->dataPtr->lights[n] = _light;
 }
@@ -3075,7 +3080,7 @@ void Scene::RemoveLight(LightPtr _light)
   if (_light)
   {
     // Delete the light
-    std::string n = this->StripSceneName(_light->GetName());
+    std::string n = this->StripSceneName(_light->Name());
     this->dataPtr->lights.erase(n);
   }
 }
@@ -3127,7 +3132,7 @@ Heightmap *Scene::GetHeightmap() const
 /////////////////////////////////////////////////
 void Scene::CreateCOMVisual(ConstLinkPtr &_msg, VisualPtr _linkVisual)
 {
-  COMVisualPtr comVis(new COMVisual(_msg->name() + "_COM_VISUAL__",
+  COMVisualPtr comVis(new COMVisual(_linkVisual->GetName() + "_COM_VISUAL__",
                                     _linkVisual));
   comVis->Load(_msg);
   comVis->SetVisible(this->dataPtr->showCOMs);
@@ -3147,7 +3152,7 @@ void Scene::CreateCOMVisual(sdf::ElementPtr _elem, VisualPtr _linkVisual)
 /////////////////////////////////////////////////
 void Scene::CreateInertiaVisual(ConstLinkPtr &_msg, VisualPtr _linkVisual)
 {
-  InertiaVisualPtr inertiaVis(new InertiaVisual(_msg->name() +
+  InertiaVisualPtr inertiaVis(new InertiaVisual(_linkVisual->GetName() +
       "_INERTIA_VISUAL__", _linkVisual));
   inertiaVis->Load(_msg);
   inertiaVis->SetVisible(this->dataPtr->showInertias);
@@ -3165,9 +3170,9 @@ void Scene::CreateInertiaVisual(sdf::ElementPtr _elem, VisualPtr _linkVisual)
 }
 
 /////////////////////////////////////////////////
-void Scene::CreateLinkFrameVisual(ConstLinkPtr &_msg, VisualPtr _linkVisual)
+void Scene::CreateLinkFrameVisual(ConstLinkPtr &/*_msg*/, VisualPtr _linkVisual)
 {
-  LinkFrameVisualPtr linkFrameVis(new LinkFrameVisual(_msg->name() +
+  LinkFrameVisualPtr linkFrameVis(new LinkFrameVisual(_linkVisual->GetName() +
       "_LINK_FRAME_VISUAL__", _linkVisual));
   linkFrameVis->Load();
   linkFrameVis->SetVisible(this->dataPtr->showLinkFrames);
@@ -3182,7 +3187,8 @@ void Scene::RemoveVisualizations(rendering::VisualPtr _vis)
   {
     rendering::VisualPtr childVis = _vis->GetChild(i);
     Visual::VisualType visType = childVis->GetType();
-    if (visType == Visual::VT_PHYSICS || visType == Visual::VT_SENSOR)
+    if (visType == Visual::VT_PHYSICS || visType == Visual::VT_SENSOR
+       || visType == Visual::VT_GUI)
     {
       toRemove.push_back(childVis);
     }
@@ -3210,12 +3216,8 @@ void Scene::SetTransparent(bool _show)
   this->dataPtr->transparent = _show;
   for (auto visual : this->dataPtr->visuals)
   {
-    if (visual.second->GetType() != Visual::VT_GUI &&
-        visual.second->GetType() != Visual::VT_PHYSICS &&
-        visual.second->GetType() != Visual::VT_SENSOR)
-    {
+    if (visual.second->GetType() == Visual::VT_MODEL)
       visual.second->SetTransparency(_show ? 0.5 : 0.0);
-    }
   }
 }
 

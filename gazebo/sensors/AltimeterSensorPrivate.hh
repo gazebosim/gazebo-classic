@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_ALTIMETER_SENSOR_PRIVATE_HH_
-#define _GAZEBO_ALTIMETER_SENSOR_PRIVATE_HH_
+#ifndef _GAZEBO_SENSORS_ALTIMETERSENSOR_PRIVATE_HH_
+#define _GAZEBO_SENSORS_ALTIMETERSENSOR_PRIVATE_HH_
 
 #include <mutex>
 #include <string>
