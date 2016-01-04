@@ -14,8 +14,11 @@
  * limitations under the License.
  *
 */
-#ifndef _BUILDING_EDITOR_HH_
-#define _BUILDING_EDITOR_HH_
+
+#ifndef _GAZEBO_GUI_BUILDINGEDITOR_HH_
+#define _GAZEBO_GUI_BUILDINGEDITOR_HH_
+
+#include <memory>
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/Editor.hh"
@@ -25,8 +28,8 @@ namespace gazebo
 {
   namespace gui
   {
-    class BuildingEditorPalette;
-    class BuildingEditorWidget;
+    // Forward declare private data.
+    class BuildingEditorPrivate;
 
     /// \class TerrainEditor TerrainEditor.hh gui/gui.hh
     /// \brief Interface to the terrain editor.
@@ -63,13 +66,7 @@ namespace gazebo
 
       /// \brief QT callback when entering building edit mode
       /// \param[in] _checked True if the menu item is checked
-      private slots: void OnEdit(bool _checked);
-
-      /// \brief Contains all the building editor tools.
-      private: BuildingEditorPalette *buildingPalette;
-
-      /// \brief Building editor widget for creating a building model
-      private: BuildingEditorWidget *buildingEditorWidget;
+      private slots: void OnEdit(const bool _checked);
 
       /// \brief Create menus
       private: void CreateMenus();
@@ -80,26 +77,9 @@ namespace gazebo
       /// \return True if the event is handled.
       private: bool eventFilter(QObject *_obj, QEvent *_event);
 
-      /// \brief Our custom menubar
-      private: QMenuBar *menuBar;
-
-      /// \brief Action to save model.
-      private: QAction *saveAct;
-
-      /// \brief Action to save model as.
-      private: QAction *saveAsAct;
-
-      /// \brief Action to start a new model.
-      private: QAction *newAct;
-
-      /// \brief Action to exit the editor.
-      private: QAction *exitAct;
-
-      /// \brief Save the main window paused state to use when returning.
-      private: bool mainWindowPaused;
-
-      /// \brief Label which shows tips when clicked or hovered.
-      private: QLabel *tipsLabel;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<BuildingEditorPrivate> dataPtr;
     };
   }
 }
