@@ -14,17 +14,16 @@
  * limitations under the License.
  *
 */
-#include <boost/bind.hpp>
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/RenderWidget.hh"
-#include "gazebo/gui/building/BuildingEditorWidget.hh"
+#include "gazebo/gui/building/BuildingEditor.hh"
 #include "gazebo/gui/building/BuildingEditorEvents.hh"
 #include "gazebo/gui/building/BuildingEditorPalette.hh"
-#include "gazebo/gui/building/BuildingEditor.hh"
 #include "gazebo/gui/building/BuildingEditorPrivate.hh"
+#include "gazebo/gui/building/BuildingEditorWidget.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -79,7 +78,7 @@ BuildingEditor::BuildingEditor(MainWindow *_mainWindow)
 
   this->connections.push_back(
       gui::editor::Events::ConnectFinishBuildingModel(
-      boost::bind(&BuildingEditor::OnFinish, this)));
+      std::bind(&BuildingEditor::OnFinish, this)));
 
   this->dataPtr->buildingEditorWidget = new BuildingEditorWidget(
       this->mainWindow->GetRenderWidget());
