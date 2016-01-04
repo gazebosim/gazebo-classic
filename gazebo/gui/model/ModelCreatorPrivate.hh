@@ -22,6 +22,8 @@
 #include <vector>
 #include <string>
 
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Vector3.hh>
 #include <sdf/sdf.hh>
 
 #include "gazebo/common/CommonTypes.hh"
@@ -29,8 +31,6 @@
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/model/ModelCreator.hh"
-
-#include "gazebo/math/Pose.hh"
 
 #include "gazebo/rendering/RenderTypes.hh"
 
@@ -126,7 +126,7 @@ namespace gazebo
       public: JointMaker *jointMaker;
 
       /// \brief origin of the model.
-      public: math::Pose origin;
+      public: ignition::math::Pose3d origin;
 
       /// \brief A list of selected link visuals.
       public: std::vector<rendering::VisualPtr> selectedLinks;
@@ -162,7 +162,7 @@ namespace gazebo
       public: boost::recursive_mutex *updateMutex;
 
       /// \brief A list of link names whose scale has changed externally.
-      public: std::map<std::string, math::Vector3> linkScaleUpdate;
+      public: std::map<std::string, ignition::math::Vector3d> linkScaleUpdate;
 
       /// \brief Name of model on the server that is being edited here in the
       /// model editor.

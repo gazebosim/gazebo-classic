@@ -14,16 +14,23 @@
  * limitations under the License.
  *
 */
-#ifndef _GUI_EVENTS_HH_
-#define _GUI_EVENTS_HH_
+#ifndef _GAZEBO_GUI_GUIEVENTS_HH_
+#define _GAZEBO_GUI_GUIEVENTS_HH_
 
 #include <string>
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/common/Event.hh"
-#include "gazebo/msgs/msgs.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
+  namespace msgs
+  {
+    class Light;
+    class Model;
+  }
+
   namespace gui
   {
     class GZ_GUI_VISIBLE Events
@@ -278,7 +285,7 @@ namespace gazebo
 
       /// \brief Scale entity event.
       public: static event::EventT<void (const std::string &,
-          const math::Vector3 &)> scaleEntity;
+          const ignition::math::Vector3d &)> scaleEntity;
     };
   }
 }

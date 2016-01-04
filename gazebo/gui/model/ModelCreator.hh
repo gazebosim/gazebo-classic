@@ -21,22 +21,15 @@
 #include <memory>
 #include <string>
 
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Vector3.hh>
 #include <sdf/sdf.hh>
 
 #include "gazebo/gui/qt.h"
 
-#include "gazebo/math/Pose.hh"
-
 #include "gazebo/rendering/RenderTypes.hh"
 
-#include "gazebo/transport/TransportTypes.hh"
-
 #include "gazebo/util/system.hh"
-
-namespace boost
-{
-  class recursive_mutex;
-}
 
 namespace gazebo
 {
@@ -48,10 +41,10 @@ namespace gazebo
 
   namespace gui
   {
-    class NestedModelData;
+    class JointMaker;
     class LinkData;
     class ModelPluginData;
-    class JointMaker;
+    class NestedModelData;
 
     // Forward declare private data.
     class ModelCreatorPrivate;
@@ -60,7 +53,8 @@ namespace gazebo
     /// \{
 
     /// \class ModelCreator ModelCreator.hh
-    /// \brief Create and manage 3D visuals of a model with links and joints.
+    /// \brief Create and manage 3D visuals of a model with links, nested models
+    /// and joints.
     class GZ_GUI_VISIBLE ModelCreator : public QObject
     {
       Q_OBJECT
@@ -89,13 +83,13 @@ namespace gazebo
       /// \brief Save states for the model editor.
       public: enum SaveState
       {
-        // NEVER_SAVED: The model has never been saved.
+        /// \brief The model has never been saved.
         NEVER_SAVED,
 
-        // ALL_SAVED: All changes have been saved.
+        /// \brief All changes have been saved.
         ALL_SAVED,
 
-        // UNSAVED_CHANGES: Has been saved before, but has unsaved changes.
+        /// \brief Has been saved before, but has unsaved changes.
         UNSAVED_CHANGES
       };
 
@@ -111,7 +105,7 @@ namespace gazebo
 
       /// \brief Get the name of the model.
       /// \return Name of model.
-      public: std::string GetModelName() const;
+      public: std::string ModelName() const;
 
       /// \brief Set save state upon a change to the model.
       public: void ModelChanged();
@@ -129,33 +123,34 @@ namespace gazebo
       /// \param[in] _pose Pose of the link.
       /// \param[in] _samples Number of samples for polyline.
       /// \return Name of the link that has been added.
-      public: std::string AddShape(EntityType _type,
-          const math::Vector3 &_size = math::Vector3::One,
-          const math::Pose &_pose = math::Pose::Zero,
-          const std::string &_uri = "", unsigned int _samples = 5);
+      public: std::string AddShape(const EntityType _type,
+          const ignition::math::Vector3d &_size = ignition::math::Vector3d::One,
+          const ignition::math::Pose3d &_pose = ignition::math::Pose3d::Zero,
+          const std::string &_uri = "", const unsigned int _samples = 5);
 
       /// \brief Add a box to the model.
       /// \param[in] _size Size of the box.
       /// \param[in] _pose Pose of the box.
       /// \return Name of the box that has been added.
       public: std::string AddBox(
-          const math::Vector3 &_size = math::Vector3::One,
-          const math::Pose &_pose = math::Pose::Zero);
+          const ignition::math::Vector3d &_size = ignition::math::Vector3d::One,
+          const ignition::math::Pose3d &_pose = ignition::math::Pose3d::Zero);
 
       /// \brief Add a sphere to the model.
       /// \param[in] _radius Radius of the sphere.
       /// \param[in] _pose Pose of the sphere.
       /// \return Name of the sphere that has been added.
-      public: std::string AddSphere(double _radius = 0.5,
-          const math::Pose &_pose = math::Pose::Zero);
+      public: std::string AddSphere(const double _radius = 0.5,
+          const ignition::math::Pose3d &_pose = ignition::math::Pose3d::Zero);
 
       /// \brief Add a cylinder to the model.
       /// \param[in] _radius Radius of the cylinder.
       /// \param[in] _length Length of the cylinder.
       /// \param[in] _pose Pose of the cylinder.
       /// \return Name of the cylinder that has been added.
-      public: std::string AddCylinder(double _radius = 0.5,
-          double _length = 1.0, const math::Pose &_pose = math::Pose::Zero);
+      public: std::string AddCylinder(const double _radius = 0.5,
+          const double _length = 1.0,
+          const ignition::math::Pose3d &_pose = ignition::math::Pose3d::Zero);
 
       /// \brief Add a custom link to the model
       /// \param[in] _name Name of the custom link.
@@ -163,8 +158,9 @@ namespace gazebo
       /// \param[in] _pose Pose of the custom link.
       /// \return Name of the custom that has been added.
       public: std::string AddCustom(const std::string &_name,
-          const math::Vector3 &_scale = math::Vector3::One,
-          const math::Pose &_pose = math::Pose::Zero);
+          const ignition::math::Vector3d &_scale =
+          ignition::math::Vector3d::One,
+          const ignition::math::Pose3d &_pose = ignition::math::Pose3d::Zero);
 
       /// \brief Add a joint to the model.
       /// \param[in] _type Type of joint to add.
@@ -180,11 +176,11 @@ namespace gazebo
 
       /// \brief Set the model to be static
       /// \param[in] _static True to make the model static.
-      public: void SetStatic(bool _static);
+      public: void SetStatic(const bool _static);
 
       /// \brief Set the model to allow auto disable at rest.
       /// \param[in] _auto True to allow the model to auto disable.
-      public: void SetAutoDisable(bool _auto);
+      public: void SetAutoDisable(const bool _auto);
 
       /// \brief Reset the model creator and the SDF.
       public: void Reset();
@@ -204,20 +200,20 @@ namespace gazebo
       /// \brief Set the select state of a link visual.
       /// \param[in] _linkVis Pointer to the link visual.
       /// \param[in] _selected True to select the link.
-      public: void SetSelected(rendering::VisualPtr _linkVis,
+      public: void SetSelected(const rendering::VisualPtr &_linkVis,
           const bool selected);
 
       /// \brief Get current save state.
       /// \return Current save state.
-      public: enum SaveState GetCurrentSaveState() const;
+      public: enum SaveState CurrentSaveState() const;
 
       /// \brief Add an entity to the model
       /// \param[in] _sdf SDF describing the entity.
-      public: void AddEntity(sdf::ElementPtr _sdf);
+      public: void AddEntity(const sdf::ElementPtr &_sdf);
 
       /// \brief Add a link to the model
       /// \param[in] _type Type of link to be added
-      public: void AddLink(EntityType _type);
+      public: void AddLink(const EntityType _type);
 
       /// \brief Add a model plugin to the model
       /// \param[in] _name Name of plugin
@@ -228,7 +224,7 @@ namespace gazebo
 
       /// \brief Add a model plugin to the model
       /// \param[in] _pluginElem Pointer to plugin SDF element
-      public: void AddModelPlugin(const sdf::ElementPtr _pluginElem);
+      public: void AddModelPlugin(const sdf::ElementPtr &_pluginElem);
 
       /// \brief Get a model plugin data by its name
       /// \param[in] _name Name of model plugin
@@ -409,7 +405,7 @@ namespace gazebo
       /// \param[in] _name Name of entity.
       /// \param[in] _scale New scale.
       private: void OnEntityScaleChanged(const std::string &_name,
-          const math::Vector3 &_scale);
+          const ignition::math::Vector3d &_scale);
 
       /// \brief Deselect anything whose selection is handled here, such as
       /// links and model plugins.
@@ -425,14 +421,15 @@ namespace gazebo
       /// original values
       /// \param[in] _name Name of visual.
       /// \param[in] _visible True to set the visual to be visible.
-      private: void SetModelVisible(const std::string &_name, bool _visible);
+      private: void SetModelVisible(const std::string &_name,
+          const bool _visible);
 
       /// \brief Set visibilty of a visual recursively while storing their
       /// original values
       /// \param[in] _visual Pointer to the visual.
       /// \param[in] _visible True to set the visual to be visible.
-      private: void SetModelVisible(rendering::VisualPtr _visual,
-          bool _visible);
+      private: void SetModelVisible(const rendering::VisualPtr &_visual,
+          const bool _visible);
 
       /// \brief Show a link's context menu
       /// \param[in] _link Name of link the context menu is associated with.

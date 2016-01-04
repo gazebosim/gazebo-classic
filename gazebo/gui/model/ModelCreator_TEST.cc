@@ -211,29 +211,29 @@ void ModelCreator_TEST::SaveState()
 
   // Start never saved
   gui::ModelCreator *modelCreator = new gui::ModelCreator();
-  QCOMPARE(modelCreator->GetCurrentSaveState(), gui::ModelCreator::NEVER_SAVED);
+  QCOMPARE(modelCreator->CurrentSaveState(), gui::ModelCreator::NEVER_SAVED);
 
   // Inserting a link and it still is never saved
   modelCreator->AddShape(gui::ModelCreator::ENTITY_CYLINDER);
   gazebo::rendering::VisualPtr cylinder =
       scene->GetVisual("ModelPreview_0::link_0");
   QVERIFY(cylinder != NULL);
-  QCOMPARE(modelCreator->GetCurrentSaveState(),
+  QCOMPARE(modelCreator->CurrentSaveState(),
       gui::ModelCreator::NEVER_SAVED);
 
   // Save all changes
   modelCreator->SaveModelFiles();
-  QCOMPARE(modelCreator->GetCurrentSaveState(),
+  QCOMPARE(modelCreator->CurrentSaveState(),
       gui::ModelCreator::ALL_SAVED);
 
   // Insert another link to have unsaved changes
   modelCreator->AddShape(gui::ModelCreator::ENTITY_BOX);
-  QCOMPARE(modelCreator->GetCurrentSaveState(),
+  QCOMPARE(modelCreator->CurrentSaveState(),
       gui::ModelCreator::UNSAVED_CHANGES);
 
   // Save all changes
   modelCreator->SaveModelFiles();
-  QCOMPARE(modelCreator->GetCurrentSaveState(),
+  QCOMPARE(modelCreator->CurrentSaveState(),
       gui::ModelCreator::ALL_SAVED);
 
   // Move a link to have unsaved changes
@@ -245,22 +245,22 @@ void ModelCreator_TEST::SaveState()
     QCoreApplication::processEvents();
     mainWindow->repaint();
   }
-  QCOMPARE(modelCreator->GetCurrentSaveState(),
+  QCOMPARE(modelCreator->CurrentSaveState(),
       gui::ModelCreator::UNSAVED_CHANGES);
 
   // Save all changes
   modelCreator->SaveModelFiles();
-  QCOMPARE(modelCreator->GetCurrentSaveState(),
+  QCOMPARE(modelCreator->CurrentSaveState(),
       gui::ModelCreator::ALL_SAVED);
 
   // Remove a link to have unsaved changes
   modelCreator->RemoveEntity(cylinder->GetName());
-  QCOMPARE(modelCreator->GetCurrentSaveState(),
+  QCOMPARE(modelCreator->CurrentSaveState(),
       gui::ModelCreator::UNSAVED_CHANGES);
 
   // Save all changes
   modelCreator->SaveModelFiles();
-  QCOMPARE(modelCreator->GetCurrentSaveState(),
+  QCOMPARE(modelCreator->CurrentSaveState(),
       gui::ModelCreator::ALL_SAVED);
 
   delete modelCreator;
