@@ -320,6 +320,9 @@ using the same arguments used in the command line.
     1. PIMPLize GridLines class
         * [Pull request #2032](https://bitbucket.org/osrf/gazebo/pull-request/2032)
 
+    1. PIMPLize RotateHandle class
+        * [Pull request #2082](https://bitbucket.org/osrf/gazebo/pull-request/2082)
+
 ## Gazebo 6.0
 
 ### Gazebo 6.X.X (201X-XX-XX)
