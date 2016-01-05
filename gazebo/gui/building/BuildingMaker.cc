@@ -156,7 +156,9 @@ void BuildingMaker::OnEdit(bool _checked)
 void BuildingMaker::ConnectItem(const std::string &_partName,
     const EditorItem *_item)
 {
-  BuildingModelManip *manip = this->allItems[_partName];
+  auto manip = this->allItems[_partName];
+  if (!manip)
+    return;
 
   // Make sure each connection calls BuildingMaker::BuildingChanged
 
@@ -209,66 +211,68 @@ void BuildingMaker::ConnectItem(const std::string &_partName,
 void BuildingMaker::AttachManip(const std::string &_child,
     const std::string &_parent)
 {
-  std::map<std::string, BuildingModelManip *>::const_iterator it =
-      this->allItems.find(_child);
-  if (it == this->allItems.end())
+  auto it = this->attachmentMap.find(_parent);
+  if (it != this->attachmentMap.end())
   {
-    gzerr << "Child manip " << _child << " not found." << std::endl;
-    return;
+    auto children = it->second;
+    if (std::find(children.begin(), children.end(), _child) ==
+        children.end())
+    {
+      it->second.push_back(_child);
+    }
   }
-
-  it = this->allItems.find(_parent);
-  if (it == this->allItems.end())
+  else
   {
-    gzerr << "Parent manip " << _parent << " not found." << std::endl;
-    return;
+    this->attachmentMap[_parent].push_back(_child);
   }
-
-  BuildingModelManip *child = this->allItems[_child];
-  BuildingModelManip *parent = this->allItems[_parent];
-  parent->AttachManip(child);
 }
 
 /////////////////////////////////////////////////
-void BuildingMaker::DetachManip(const std::string &_child,
-    const std::string &_parent)
+void BuildingMaker::DetachFromParent(const std::string &_child)
 {
-  std::map<std::string, BuildingModelManip *>::const_iterator it =
-      this->allItems.find(_child);
-  if (it == this->allItems.end())
+  for (auto &parentManip : this->attachmentMap)
   {
-    gzerr << "Child manip " << _child << " not found." << std::endl;
-    return;
-  }
+    parentManip.second.erase(std::remove(parentManip.second.begin(),
+        parentManip.second.end(), _child), parentManip.second.end());
 
-  it = this->allItems.find(_parent);
-  if (it == this->allItems.end())
-  {
-    gzerr << "Parent manip " << _parent << " not found." << std::endl;
-    return;
+    if (parentManip.second.empty())
+      this->DetachAllChildren(parentManip.first);
   }
-
-  BuildingModelManip *child = this->allItems[_child];
-  BuildingModelManip *parent = this->allItems[_parent];
-  parent->DetachManip(child);
 }
 
 /////////////////////////////////////////////////
-void BuildingMaker::DetachAllChildren(const std::string &_manip)
+void BuildingMaker::DetachAllChildren(const std::string &_parent)
 {
-  std::map<std::string, BuildingModelManip *>::const_iterator it =
-      this->allItems.find(_manip);
-  if (it == this->allItems.end())
-  {
-    gzerr << "Manip " << _manip << " not found." << std::endl;
+  auto it = this->attachmentMap.find(_parent);
+  if (it == this->attachmentMap.end())
     return;
-  }
 
-  BuildingModelManip *manip = this->allItems[_manip];
-  for (int i = manip->GetAttachedManipCount()-1; i >= 0; i--)
+  it->second.clear();
+  this->attachmentMap.erase(_parent);
+}
+
+/////////////////////////////////////////////////
+bool BuildingMaker::IsAttached(const std::string &_child) const
+{
+  for (auto const &parentManip : this->attachmentMap)
   {
-    (manip->GetAttachedManip(i))->DetachFromParent();
+    if (std::find(parentManip.second.begin(), parentManip.second.end(), _child)
+        != parentManip.second.end())
+    {
+      return true;
+    }
   }
+  return false;
+}
+
+/////////////////////////////////////////////////
+BuildingModelManip *BuildingMaker::ManipByName(const std::string &_name)
+{
+  auto it = this->allItems.find(_name);
+  if (it == this->allItems.end())
+    return NULL;
+  else
+    return this->allItems[_name];
 }
 
 /////////////////////////////////////////////////
@@ -567,13 +571,17 @@ void BuildingMaker::RemovePart(const std::string &_partName)
   }
   BuildingModelManip *manip = this->allItems[_partName];
 
-  rendering::VisualPtr vis = manip->GetVisual();
+  rendering::VisualPtr vis = manip->Visual();
   rendering::VisualPtr visParent = vis->GetParent();
   rendering::ScenePtr scene = vis->GetScene();
   scene->RemoveVisual(vis);
   if (visParent)
     scene->RemoveVisual(visParent);
   this->allItems.erase(_partName);
+
+  this->DetachAllChildren(_partName);
+  this->DetachFromParent(_partName);
+
   delete manip;
   this->BuildingChanged();
 }
@@ -616,6 +624,8 @@ void BuildingMaker::Reset()
   for (it = this->allItems.begin(); it != this->allItems.end(); ++it)
     delete (*it).second;
   this->allItems.clear();
+
+  this->attachmentMap.clear();
 }
 
 /////////////////////////////////////////////////
@@ -697,11 +707,11 @@ void BuildingMaker::GenerateSDF()
 
     std::string name = itemsIt->first;
     BuildingModelManip *buildingModelManip = itemsIt->second;
-    rendering::VisualPtr visual = buildingModelManip->GetVisual();
+    rendering::VisualPtr visual = buildingModelManip->Visual();
     sdf::ElementPtr newLinkElem = templateLinkElem->Clone();
     visualElem = newLinkElem->GetElement("visual");
     collisionElem = newLinkElem->GetElement("collision");
-    newLinkElem->GetAttribute("name")->Set(buildingModelManip->GetName());
+    newLinkElem->GetAttribute("name")->Set(buildingModelManip->Name());
     newLinkElem->GetElement("pose")->Set(visual->GetParent()->GetWorldPose() -
         modelOrigin);
 
@@ -712,11 +722,11 @@ void BuildingMaker::GenerateSDF()
       if (name.find("Window") != std::string::npos
           || name.find("Door") != std::string::npos)
       {
-        if (buildingModelManip->IsAttached())
+        if (this->IsAttached(name))
           continue;
-        visualElem->GetAttribute("name")->Set(buildingModelManip->GetName()
+        visualElem->GetAttribute("name")->Set(buildingModelManip->Name()
             + "_Visual");
-        collisionElem->GetAttribute("name")->Set(buildingModelManip->GetName()
+        collisionElem->GetAttribute("name")->Set(buildingModelManip->Name()
             + "_Collision");
         visualElem->GetElement("pose")->Set(visual->GetPose());
         collisionElem->GetElement("pose")->Set(visual->GetPose());
@@ -729,23 +739,28 @@ void BuildingMaker::GenerateSDF()
       else if (name.find("Wall") != std::string::npos)
       {
         // check if walls have attached children, i.e. windows or doors
-        if (buildingModelManip->GetAttachedManipCount() != 0 )
+        auto parentManip = this->attachmentMap.find(name);
+        if (parentManip != this->attachmentMap.end() &&
+            !parentManip->second.empty())
         {
           std::vector<QRectF> holes;
           rendering::VisualPtr wallVis = visual;
           math::Pose wallPose = wallVis->GetParent()->GetWorldPose() -
               modelOrigin;
           math::Vector3 wallSize = wallVis->GetScale();
-          for (unsigned int i = 0; i <
-              buildingModelManip->GetAttachedManipCount(); ++i)
+          for (auto const &childManip : parentManip->second)
           {
-            BuildingModelManip *attachedObj =
-                buildingModelManip->GetAttachedManip(i);
-            std::string objName = attachedObj->GetName();
+            auto attachedObj = this->ManipByName(childManip);
+            if (!attachedObj)
+            {
+              gzerr << "Manip [" << childManip << "] not found." << std::endl;
+              continue;
+            }
+            std::string objName = attachedObj->Name();
             if (objName.find("Window") != std::string::npos
                 || objName.find("Door") != std::string::npos)
             {
-              rendering::VisualPtr attachedVis = attachedObj->GetVisual();
+              rendering::VisualPtr attachedVis = attachedObj->Visual();
               math::Pose offset = attachedVis->GetParent()->GetWorldPose() -
                   modelOrigin - wallPose;
               math::Vector3 size = attachedVis->GetScale();
@@ -767,7 +782,7 @@ void BuildingMaker::GenerateSDF()
           this->SubdivideRectSurface(surface, holes, subdivisions);
 
           newLinkElem->ClearElements();
-          newLinkElem->GetAttribute("name")->Set(buildingModelManip->GetName());
+          newLinkElem->GetAttribute("name")->Set(buildingModelManip->Name());
           newLinkElem->GetElement("pose")->Set(
               visual->GetParent()->GetWorldPose() - modelOrigin);
           // create a link element of box geom for each subdivision
@@ -777,10 +792,10 @@ void BuildingMaker::GenerateSDF()
             collisionNameStream.str("");
             visualElem = templateVisualElem->Clone();
             collisionElem = templateCollisionElem->Clone();
-            visualNameStream << buildingModelManip->GetName() << "_Visual_"
+            visualNameStream << buildingModelManip->Name() << "_Visual_"
                 << i;
             visualElem->GetAttribute("name")->Set(visualNameStream.str());
-            collisionNameStream << buildingModelManip->GetName()
+            collisionNameStream << buildingModelManip->Name()
                 << "_Collision_" << i;
             collisionElem->GetAttribute("name")->Set(collisionNameStream.str());
 
@@ -800,9 +815,9 @@ void BuildingMaker::GenerateSDF()
             collisionElem->GetElement("geometry")->GetElement("box")->
                 GetElement("size")->Set(blockSize);
             visualElem->GetElement("material")->GetElement("ambient")->
-                Set(buildingModelManip->GetColor());
+                Set(buildingModelManip->Color());
             visualElem->GetElement("material")->GetElement("script")
-                ->GetElement("name")->Set(buildingModelManip->GetTexture());
+                ->GetElement("name")->Set(buildingModelManip->Texture());
             newLinkElem->InsertElement(visualElem);
             newLinkElem->InsertElement(collisionElem);
           }
@@ -810,9 +825,9 @@ void BuildingMaker::GenerateSDF()
         // Wall without windows or doors
         else
         {
-          visualElem->GetAttribute("name")->Set(buildingModelManip->GetName()
+          visualElem->GetAttribute("name")->Set(buildingModelManip->Name()
               + "_Visual");
-          collisionElem->GetAttribute("name")->Set(buildingModelManip->GetName()
+          collisionElem->GetAttribute("name")->Set(buildingModelManip->Name()
               + "_Collision");
           visualElem->GetElement("pose")->Set(visual->GetPose());
           collisionElem->GetElement("pose")->Set(visual->GetPose());
@@ -821,30 +836,35 @@ void BuildingMaker::GenerateSDF()
           collisionElem->GetElement("geometry")->GetElement("box")->
               GetElement("size")->Set(visual->GetScale());
           visualElem->GetElement("material")->GetElement("ambient")->
-              Set(buildingModelManip->GetColor());
+              Set(buildingModelManip->Color());
           visualElem->GetElement("material")->GetElement("script")
-              ->GetElement("name")->Set(buildingModelManip->GetTexture());
+              ->GetElement("name")->Set(buildingModelManip->Texture());
         }
       }
       // Floor
       else if (name.find("Floor") != std::string::npos)
       {
         // check if floors have attached children, i.e. stairs
-        if (buildingModelManip->GetAttachedManipCount() != 0 )
+        auto parentManip = this->attachmentMap.find(name);
+        if (parentManip != this->attachmentMap.end() &&
+            !parentManip->second.empty())
         {
           std::vector<QRectF> holes;
           rendering::VisualPtr floorVis = visual;
           math::Pose floorPose = floorVis->GetWorldPose() - modelOrigin;
           math::Vector3 floorSize = floorVis->GetScale();
-          for (unsigned int i = 0; i <
-              buildingModelManip->GetAttachedManipCount(); ++i)
+          for (auto const &childManip : parentManip->second)
           {
-            BuildingModelManip *attachedObj =
-                buildingModelManip->GetAttachedManip(i);
-            std::string objName = attachedObj->GetName();
+            auto attachedObj = this->ManipByName(childManip);
+            if (!attachedObj)
+            {
+              gzerr << "Manip [" << childManip << "] not found." << std::endl;
+              continue;
+            }
+            std::string objName = attachedObj->Name();
             if (objName.find("Stairs") != std::string::npos)
             {
-              rendering::VisualPtr attachedVis = attachedObj->GetVisual();
+              rendering::VisualPtr attachedVis = attachedObj->Visual();
               math::Pose offset = attachedVis->GetParent()->GetWorldPose() -
                   modelOrigin - floorPose;
               math::Vector3 size = attachedVis->GetScale();
@@ -869,7 +889,7 @@ void BuildingMaker::GenerateSDF()
           this->SubdivideRectSurface(surface, holes, subdivisions);
 
           newLinkElem->ClearElements();
-          newLinkElem->GetAttribute("name")->Set(buildingModelManip->GetName());
+          newLinkElem->GetAttribute("name")->Set(buildingModelManip->Name());
           newLinkElem->GetElement("pose")->Set(
               visual->GetParent()->GetWorldPose() - modelOrigin);
           // create a link element of box geom for each subdivision
@@ -879,10 +899,10 @@ void BuildingMaker::GenerateSDF()
             collisionNameStream.str("");
             visualElem = templateVisualElem->Clone();
             collisionElem = templateCollisionElem->Clone();
-            visualNameStream << buildingModelManip->GetName() << "_Visual_"
+            visualNameStream << buildingModelManip->Name() << "_Visual_"
                 << i;
             visualElem->GetAttribute("name")->Set(visualNameStream.str());
-            collisionNameStream << buildingModelManip->GetName()
+            collisionNameStream << buildingModelManip->Name()
                 << "_Collision_" << i;
             collisionElem->GetAttribute("name")->Set(collisionNameStream.str());
 
@@ -902,9 +922,9 @@ void BuildingMaker::GenerateSDF()
             collisionElem->GetElement("geometry")->GetElement("box")->
                 GetElement("size")->Set(blockSize);
             visualElem->GetElement("material")->GetElement("ambient")->
-                Set(buildingModelManip->GetColor());
+                Set(buildingModelManip->Color());
             visualElem->GetElement("material")->GetElement("script")
-                ->GetElement("name")->Set(buildingModelManip->GetTexture());
+                ->GetElement("name")->Set(buildingModelManip->Texture());
             newLinkElem->InsertElement(visualElem);
             newLinkElem->InsertElement(collisionElem);
           }
@@ -912,9 +932,9 @@ void BuildingMaker::GenerateSDF()
         // Floor without stairs
         else
         {
-          visualElem->GetAttribute("name")->Set(buildingModelManip->GetName()
+          visualElem->GetAttribute("name")->Set(buildingModelManip->Name()
               + "_Visual");
-          collisionElem->GetAttribute("name")->Set(buildingModelManip->GetName()
+          collisionElem->GetAttribute("name")->Set(buildingModelManip->Name()
               + "_Collision");
           visualElem->GetElement("pose")->Set(visual->GetPose());
           collisionElem->GetElement("pose")->Set(visual->GetPose());
@@ -923,9 +943,9 @@ void BuildingMaker::GenerateSDF()
           collisionElem->GetElement("geometry")->GetElement("box")->
               GetElement("size")->Set(visual->GetScale());
           visualElem->GetElement("material")->GetElement("ambient")->
-              Set(buildingModelManip->GetColor());
+              Set(buildingModelManip->Color());
           visualElem->GetElement("material")->GetElement("script")
-              ->GetElement("name")->Set(buildingModelManip->GetTexture());
+              ->GetElement("name")->Set(buildingModelManip->Texture());
         }
       }
     }
@@ -942,9 +962,9 @@ void BuildingMaker::GenerateSDF()
         collisionNameStream.str("");
         visualElem = templateVisualElem->Clone();
         collisionElem = templateCollisionElem->Clone();
-        visualNameStream << buildingModelManip->GetName() << "_Visual_" << i;
+        visualNameStream << buildingModelManip->Name() << "_Visual_" << i;
         visualElem->GetAttribute("name")->Set(visualNameStream.str());
-        collisionNameStream << buildingModelManip->GetName()
+        collisionNameStream << buildingModelManip->Name()
             << "_Collision_" << i;
         collisionElem->GetAttribute("name")->Set(collisionNameStream.str());
         rendering::VisualPtr childVisual = visual->GetChild(i);
@@ -957,9 +977,9 @@ void BuildingMaker::GenerateSDF()
         collisionElem->GetElement("geometry")->GetElement("box")->
             GetElement("size")->Set(visual->GetScale()*childVisual->GetScale());
         visualElem->GetElement("material")->GetElement("ambient")->
-              Set(buildingModelManip->GetColor());
+              Set(buildingModelManip->Color());
         visualElem->GetElement("material")->GetElement("script")
-            ->GetElement("name")->Set(buildingModelManip->GetTexture());
+            ->GetElement("name")->Set(buildingModelManip->Texture());
         newLinkElem->InsertElement(visualElem);
         newLinkElem->InsertElement(collisionElem);
       }
@@ -1012,22 +1032,23 @@ void BuildingMaker::GenerateSDFWithCSG()
 
     std::string name = itemsIt->first;
     BuildingModelManip *buildingModelManip = itemsIt->second;
-    rendering::VisualPtr visual = buildingModelManip->GetVisual();
+    rendering::VisualPtr visual = buildingModelManip->Visual();
     sdf::ElementPtr newLinkElem = templateLinkElem->Clone();
     visualElem = newLinkElem->GetElement("visual");
     collisionElem = newLinkElem->GetElement("collision");
-    newLinkElem->GetAttribute("name")->Set(buildingModelManip->GetName());
+    newLinkElem->GetAttribute("name")->Set(buildingModelManip->Name());
     newLinkElem->GetElement("pose")->Set(visual->GetParent()->GetWorldPose());
 
     // create a hole to represent a window/door in the wall
+    auto parentManip = this->attachmentMap.find(name);
     if (name.find("Window") != std::string::npos
         || name.find("Door") != std::string::npos)
     {
-      if (buildingModelManip->IsAttached())
+      if (!this->IsAttached(name))
         continue;
     }
     else if (name.find("Wall") != std::string::npos
-        && buildingModelManip->GetAttachedManipCount() != 0)
+        && !parentManip->second.empty())
     {
       rendering::VisualPtr wallVis = visual;
       math::Pose wallPose = wallVis->GetWorldPose();
@@ -1053,10 +1074,9 @@ void BuildingMaker::GenerateSDFWithCSG()
       }
       m1->SetScale(wallVis->GetScale().Ign());
 
-      std::string booleanMeshName = buildingModelManip->GetName() + "_Boolean";
+      std::string booleanMeshName = buildingModelManip->Name() + "_Boolean";
       common::Mesh *booleanMesh = NULL;
-      for (unsigned int i = 0; i < buildingModelManip->GetAttachedManipCount();
-          ++i)
+      for (auto const &childManip : parentManip->second)
       {
         if (booleanMesh)
         {
@@ -1064,13 +1084,17 @@ void BuildingMaker::GenerateSDFWithCSG()
           m1 = booleanMesh;
         }
 
-        BuildingModelManip *attachedObj =
-            buildingModelManip->GetAttachedManip(i);
-        std::string objName = attachedObj->GetName();
+        auto attachedObj = this->ManipByName(childManip);
+        if (!attachedObj)
+        {
+          gzerr << "Manip [" << childManip << "] not found." << std::endl;
+          continue;
+        }
+        std::string objName = attachedObj->Name();
         if (objName.find("Window") != std::string::npos
             || objName.find("Door") != std::string::npos)
         {
-          rendering::VisualPtr attachedVis = attachedObj->GetVisual();
+          rendering::VisualPtr attachedVis = attachedObj->Visual();
           math::Pose offset = attachedVis->GetWorldPose() - wallPose;
           const common::Mesh *attachedMesh = common::MeshManager::Instance()->
               GetMesh(attachedVis->GetMeshName());
@@ -1104,9 +1128,9 @@ void BuildingMaker::GenerateSDFWithCSG()
       common::MeshManager::Instance()->AddMesh(booleanMesh);
 
       // finally create the sdf elements
-      visualElem->GetAttribute("name")->Set(buildingModelManip->GetName()
+      visualElem->GetAttribute("name")->Set(buildingModelManip->Name()
           + "_Visual");
-      collisionElem->GetAttribute("name")->Set(buildingModelManip->GetName()
+      collisionElem->GetAttribute("name")->Set(buildingModelManip->Name()
           + "_Collision");
       sdf::ElementPtr visGeomElem = visualElem->GetElement("geometry");
       visGeomElem->ClearElements();
@@ -1130,9 +1154,9 @@ void BuildingMaker::GenerateSDFWithCSG()
         collisionNameStream.str("");
         visualElem = templateVisualElem->Clone();
         collisionElem = templateCollisionElem->Clone();
-        visualNameStream << buildingModelManip->GetName() << "_Visual_" << i;
+        visualNameStream << buildingModelManip->Name() << "_Visual_" << i;
         visualElem->GetAttribute("name")->Set(visualNameStream.str());
-        collisionNameStream << buildingModelManip->GetName() << "_Collision_"
+        collisionNameStream << buildingModelManip->Name() << "_Collision_"
             << i;
         collisionElem->GetAttribute("name")->Set(collisionNameStream.str());
         rendering::VisualPtr childVisual = visual->GetChild(i);
@@ -1755,7 +1779,7 @@ bool BuildingMaker::On3dMouseMove(const common::MouseEvent &_event)
 
         // Must set material before color, otherwise color is overwritten
         this->hoverVis->SetMaterial(material);
-        this->hoverVis->SetAmbient((*it).second->GetColor());
+        this->hoverVis->SetAmbient((*it).second->Color());
       }
 
       this->hoverVis->SetTransparency(0);
@@ -1873,9 +1897,9 @@ void BuildingMaker::ResetHoverVis()
     {
       BuildingModelManip *manip = this->allItems[hoverName];
       // Must set material before color, otherwise color is overwritten
-      this->hoverVis->SetMaterial(manip->GetTexture());
-      this->hoverVis->SetAmbient(manip->GetColor());
-      this->hoverVis->SetTransparency(manip->GetTransparency());
+      this->hoverVis->SetMaterial(manip->Texture());
+      this->hoverVis->SetAmbient(manip->Color());
+      this->hoverVis->SetTransparency(manip->Transparency());
     }
     this->hoverVis.reset();
   }

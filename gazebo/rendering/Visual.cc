@@ -515,7 +515,8 @@ void Visual::Update()
        liter != this->dataPtr->lineVertices.end(); ++liter)
   {
     liter->first->SetPoint(liter->second,
-        Conversions::Convert(this->dataPtr->sceneNode->_getDerivedPosition()));
+        Conversions::ConvertIgn(
+          this->dataPtr->sceneNode->_getDerivedPosition()));
     liter->first->Update();
   }
 
@@ -1924,7 +1925,7 @@ void Visual::DeleteDynamicLine(DynamicLines *_line)
 void Visual::AttachLineVertex(DynamicLines *_line, unsigned int _index)
 {
   this->dataPtr->lineVertices.push_back(std::make_pair(_line, _index));
-  _line->SetPoint(_index, this->GetWorldPose().pos);
+  _line->SetPoint(_index, this->GetWorldPose().pos.Ign());
 }
 
 //////////////////////////////////////////////////

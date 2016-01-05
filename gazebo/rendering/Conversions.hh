@@ -14,8 +14,10 @@
  * limitations under the License.
  *
 */
-#ifndef _CONVERSIONS_HH_
-#define _CONVERSIONS_HH_
+#ifndef _GAZEBO_CONVERSIONS_HH_
+#define _GAZEBO_CONVERSIONS_HH_
+
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/rendering/ogre_gazebo.h"
 
@@ -51,10 +53,21 @@ namespace gazebo
       /// \return Ogre vector
       public: static Ogre::Vector3 Convert(const math::Vector3 &_v);
 
+      /// \brief return Ogre Vector from ignition::math::Vector3d
+      /// \param[in] _v ignition::math::Vector3d
+      /// \return Ogre vector
+      public: static Ogre::Vector3 Convert(const ignition::math::Vector3d &_v);
+
       /// \brief return gazebo Vector from ogre Vector3
       /// \param[in] _v Ogre vector
       /// \return Gazebo vector
       public: static math::Vector3 Convert(const Ogre::Vector3 &_v);
+
+      /// \brief return ignition::math::Vector3d from ogre Vector3
+      /// \param[in] _v Ogre vector
+      /// \return ignition::math::Vector3d
+      public: static ignition::math::Vector3d ConvertIgn(
+                  const Ogre::Vector3 &_v);
 
       /// \brief Gazebo quaternion to Ogre quaternion
       /// \param[in] _v Gazebo quaternion
@@ -65,6 +78,12 @@ namespace gazebo
       /// \param[in] _v Ogre quaternion
       /// return Gazebo quaternion
       public: static math::Quaternion Convert(const Ogre::Quaternion &_v);
+
+      /// \brief Ogre quaternion to ignition::math::Quaterniond
+      /// \param[in] _v Ogre quaternion
+      /// return Ignition math quaternion
+      public: static ignition::math::Quaterniond ConvertIgn(
+                  const Ogre::Quaternion &_v);
     };
     /// \}
   }

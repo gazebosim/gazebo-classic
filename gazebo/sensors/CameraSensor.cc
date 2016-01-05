@@ -19,9 +19,8 @@
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
-
 #include <boost/algorithm/string.hpp>
-#include <boost/bind.hpp>
+#include <functional>
 
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Exception.hh"
@@ -54,7 +53,7 @@ CameraSensor::CameraSensor()
   this->rendered = false;
   this->connections.push_back(
       event::Events::ConnectRender(
-        boost::bind(&CameraSensor::Render, this)));
+        std::bind(&CameraSensor::Render, this)));
 }
 
 //////////////////////////////////////////////////
@@ -191,7 +190,7 @@ void CameraSensor::Render()
 }
 
 //////////////////////////////////////////////////
-bool CameraSensor::UpdateImpl(bool /*_force*/)
+bool CameraSensor::UpdateImpl(const bool /*_force*/)
 {
   if (!this->rendered)
     return false;
@@ -263,7 +262,7 @@ bool CameraSensor::SaveFrame(const std::string &_filename)
 }
 
 //////////////////////////////////////////////////
-bool CameraSensor::IsActive()
+bool CameraSensor::IsActive() const
 {
   return Sensor::IsActive() ||
     (this->imagePub && this->imagePub->HasConnections());
