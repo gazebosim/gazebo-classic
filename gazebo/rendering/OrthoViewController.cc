@@ -112,8 +112,8 @@ void OrthoViewController::HandleMouseEvent(const common::MouseEvent &_event)
     if (!this->camera->GetScene()->GetFirstContact(
          this->camera, _event.PressPos(), this->focalPoint))
     {
-      math::Vector3 origin, dir;
-      this->camera->GetCameraToViewportRay(
+      ignition::math::Vector3d origin, dir;
+      this->camera->CameraToViewportRay(
           _event.PressPos().X(), _event.PressPos().Y(), origin, dir);
       this->focalPoint = origin + dir * 10.0;
     }
@@ -121,8 +121,8 @@ void OrthoViewController::HandleMouseEvent(const common::MouseEvent &_event)
     // pseudo distance
     this->distance = 1000.0/this->dataPtr->scale;
 
-    this->yaw = this->camera->GetWorldRotation().GetAsEuler().z;
-    this->pitch = this->camera->GetWorldRotation().GetAsEuler().y;
+    this->yaw = this->camera->WorldRotation().Euler().Z();
+    this->pitch = this->camera->WorldRotation().Euler().Y();
   }
 
   // Turn on the reference visual.
@@ -200,8 +200,8 @@ void OrthoViewController::HandleMouseEvent(const common::MouseEvent &_event)
     if (!this->camera->GetScene()->GetFirstContact(
          this->camera, _event.Pos(), this->focalPoint))
     {
-      math::Vector3 origin, dir;
-      this->camera->GetCameraToViewportRay(
+      ignition::math::Vector3d origin, dir;
+      this->camera->CameraToViewportRay(
           _event.Pos().X(), _event.Pos().Y(), origin, dir);
       this->focalPoint = origin + dir * 10.0;
     }

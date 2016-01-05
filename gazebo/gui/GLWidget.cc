@@ -566,16 +566,17 @@ bool GLWidget::OnMouseDoubleClick(const common::MouseEvent & /*_event*/)
   {
     if (vis->IsPlane())
     {
-      math::Pose pose, camPose;
-      camPose = this->dataPtr->userCamera->GetWorldPose();
+      math::Pose pose;
+      ignition::math::Pose3d camPose;
+      camPose = this->dataPtr->userCamera->WorldPose();
       if (this->dataPtr->scene->GetFirstContact(this->dataPtr->userCamera,
             this->dataPtr->mouseEvent.Pos(), pose.pos))
       {
         this->dataPtr->userCamera->SetFocalPoint(pose.pos);
-        math::Vector3 dir = pose.pos - camPose.pos;
-        pose.pos = camPose.pos + (dir * 0.8);
-        pose.rot = this->dataPtr->userCamera->GetWorldRotation();
-        this->dataPtr->userCamera->MoveToPosition(pose, 0.5);
+        ignition::math::Vector3d dir = pose.pos.Ign() - camPose.Pos();
+        pose.pos = camPose.Pos() + (dir * 0.8);
+        pose.rot = this->dataPtr->userCamera->WorldRotation();
+        this->dataPtr->userCamera->MoveToPosition(pose.Ign(), 0.5);
       }
     }
     else

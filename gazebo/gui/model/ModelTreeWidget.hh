@@ -32,6 +32,8 @@ namespace gazebo
 {
   namespace gui
   {
+    class ModelPluginInspector;
+
     /// \addtogroup gazebo_gui
     /// \{
 
@@ -108,6 +110,13 @@ namespace gazebo
       /// \param[in] _pt Position of the context menu event that the widget
       ///  receives.
       private slots: void OnCustomContextMenu(const QPoint &_pt);
+
+      /// \brief Qt callback when add model plugin button is clicked.
+      private slots: void OnAddModelPlugin();
+
+      /// \brief Qt callback when the changes in model plugin inspector has been
+      /// applied.
+      private slots: void OnModelPluginApply();
 
       /// \brief Add a link to the tree.
       /// \param[in] _linkName Scoped link name.
@@ -216,6 +225,9 @@ namespace gazebo
 
       /// \brief Keeps track of selected items.
       private: QList<QTreeWidgetItem *> selected;
+
+      /// \brief Model Plugin inspector for adding new model plugins.
+      private: ModelPluginInspector *modelPluginInspector;
     };
   }
 }
