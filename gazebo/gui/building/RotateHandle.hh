@@ -50,21 +50,21 @@ namespace gazebo
       /// \param[in] _state Integer corresponding to Qt QEvent type.
       /// http://doc.qt.io/qt-4.8/qevent.html#Type-enum
       /// \sa int MouseState() const
-      public: void SetMouseState(int _state);
+      public: void SetMouseState(const int _state);
 
       /// \brief Get the current mouse state
       /// \return The current mouse state.
-      /// \sa void SetMouseState(int _state)
+      /// \sa void SetMouseState(const int _state)
       public: int MouseState() const;
 
       /// \brief Get the X position of the mouse press.
       /// \return Mouse press X position in pixel coordinates.
-      /// \sa void SetMouseDownX(double _x)
+      /// \sa void SetMouseDownX(const double _x)
       public: double MouseDownX() const;
 
       /// \brief Get the Y position of the mouse press.
       /// \return Mouse press Y position in pixel coordinates.
-      /// \sa void SetMouseDownY(double _y)
+      /// \sa void SetMouseDownY(const double _y)
       public: double MouseDownY() const;
 
       /// \brief Set the X position of the mouse press.
