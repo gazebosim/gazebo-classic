@@ -84,8 +84,7 @@ namespace gazebo
 
       /// \brief Qt context menu event received on a mouse double click.
       /// \param[in] _event Qt double click event.
-      private: void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *
-          _event);
+      private: void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event);
 
       /// \brief React to item changes notified by Qt.
       /// \param[in] _change Qt change type, e.g. selected change

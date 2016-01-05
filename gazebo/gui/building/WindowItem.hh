@@ -39,41 +39,41 @@ namespace gazebo
     /// \brief 2D representation of a window.
     class GZ_GUI_VISIBLE WindowItem : public RectItem
     {
-        Q_OBJECT
+      Q_OBJECT
 
-        /// \brief Constructor
-        public: WindowItem();
+      /// \brief Constructor
+      public: WindowItem();
 
-        /// \brief Destructor
-        public: ~WindowItem();
+      /// \brief Destructor
+      public: ~WindowItem();
 
-        // Documentation inherited
-        public: virtual QVector3D GetSize() const;
+      // Documentation inherited
+      public: virtual QVector3D GetSize() const;
 
-        // Documentation inherited
-        public: virtual QVector3D GetScenePosition() const;
+      // Documentation inherited
+      public: virtual QVector3D GetScenePosition() const;
 
-        // Documentation inherited
-        public: virtual double GetSceneRotation() const;
+      // Documentation inherited
+      public: virtual double GetSceneRotation() const;
 
-        // Documentation inherited
-        private: virtual void paint(QPainter *_painter,
-            const QStyleOptionGraphicsItem *_option, QWidget *_widget);
+      // Documentation inherited
+      private: virtual void paint(QPainter *_painter,
+          const QStyleOptionGraphicsItem *_option, QWidget *_widget);
 
-        // Documentation inherited
-        private: void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event);
+      // Documentation inherited
+      private: void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event);
 
-        // Documentation inherited
-        private slots: void OnApply();
+      // Documentation inherited
+      private slots: void OnApply();
 
-        // Documentation inherited
-        private slots: void OnOpenInspector();
+      // Documentation inherited
+      private slots: void OnOpenInspector();
 
-        // Documentation inherited
-        private slots: void OnDeleteItem();
+      // Documentation inherited
+      private slots: void OnDeleteItem();
 
-        /// \brief Emit window changed Qt signals.
-        public: void WindowChanged();
+      /// \brief Emit window changed Qt signals.
+      public: void WindowChanged();
 
       /// \internal
       /// \brief Pointer to private data.
