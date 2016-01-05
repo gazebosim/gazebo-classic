@@ -1738,8 +1738,6 @@ void JointMaker::SetLinksRelativePose(const ignition::math::Pose3d &_pose,
   if (!this->dataPtr->newJoint || !this->dataPtr->newJoint->parent ||
       !this->dataPtr->newJoint->child)
   {
-    gzerr << "Can't set relative pose without new joint's parent and child "
-        << "links." << std::endl;
     return;
   }
 

@@ -523,15 +523,7 @@ void JointCreationDialog::Open(const JointMaker::JointType _type)
   }
 
   // Reset fields
-  this->dataPtr->configWidget->SetVector3dWidgetValue("axis1",
-      ignition::math::Vector3d::UnitX);
-  this->dataPtr->configWidget->SetVector3dWidgetValue("axis2",
-      ignition::math::Vector3d::UnitY);
-  this->dataPtr->configWidget->SetPoseWidgetValue("joint_pose",
-      ignition::math::Pose3d());
-  this->dataPtr->configWidget->SetPoseWidgetValue("relative_pose",
-      ignition::math::Pose3d());
-  this->UncheckAllAlign();
+  this->OnResetAll();
 
   // Reset enabled states
   this->dataPtr->createButton->setEnabled(false);
@@ -797,6 +789,8 @@ void JointCreationDialog::OnResetAll()
   this->dataPtr->configWidget->SetPoseWidgetValue("joint_pose",
       ignition::math::Pose3d::Zero);
   this->OnPoseFromDialog("joint_pose", ignition::math::Pose3d::Zero);
+
+  this->UncheckAllAlign();
 }
 
 /////////////////////////////////////////////////
@@ -906,6 +900,10 @@ void JointCreationDialog::UncheckAllAlign()
     for (auto button : group->buttons())
       button->setChecked(false);
   }
+
+  this->dataPtr->reverseXBox->setChecked(false);
+  this->dataPtr->reverseYBox->setChecked(false);
+  this->dataPtr->reverseZBox->setChecked(false);
 }
 
 /////////////////////////////////////////////////

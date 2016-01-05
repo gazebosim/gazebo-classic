@@ -262,7 +262,7 @@ namespace gazebo
 
       /// \brief A new relative pose for the child link of the joint being
       /// created hass been chosen. The pose is expressed in the parent link
-      /// frame.
+      /// frame. This has no effect if triggered before both links are chosen.
       /// \param[in] _pose New pose.
       /// \param[in] _reset Set to true to reset the relative pose to the
       /// original one.
