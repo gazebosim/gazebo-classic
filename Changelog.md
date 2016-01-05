@@ -26,8 +26,10 @@
 
 1. Use more opaque pointers.
     * [Pull request #2025](https://bitbucket.org/osrf/gazebo/pull-request/2025)
+    * [Pull request #2043](https://bitbucket.org/osrf/gazebo/pull-request/2043)
     * [Pull request #2065](https://bitbucket.org/osrf/gazebo/pull-request/2065)
     * [Pull request #2067](https://bitbucket.org/osrf/gazebo/pull-request/2067)
+    * [Pull request #2044](https://bitbucket.org/osrf/gazebo/pull-request/2044)
 
 1. Use opaque pointers in the gui/CloneWindow class.
     * [Pull request #2027](https://bitbucket.org/osrf/gazebo/pull-request/2027)
