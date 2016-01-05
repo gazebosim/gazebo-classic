@@ -38,11 +38,11 @@ TEST_F(GzCamera, Follow)
   SpawnBox("box", math::Vector3(1, 1, 1), math::Vector3(10, 10, 1),
       math::Vector3(0, 0, 0));
 
-  math::Pose cameraStartPose(0, 0, 0, 0, 0, 0);
+  ignition::math::Pose3d cameraStartPose(0, 0, 0, 0, 0, 0);
 
   // Spawn a camera that will do the following
   SpawnCamera("test_camera_model", "test_camera",
-      cameraStartPose.pos, cameraStartPose.rot.GetAsEuler());
+      cameraStartPose.Pos(), cameraStartPose.Rot().Euler());
 
   rendering::ScenePtr scene = rendering::get_scene();
   ASSERT_TRUE(scene != NULL);
@@ -51,7 +51,7 @@ TEST_F(GzCamera, Follow)
   ASSERT_TRUE(camera != NULL);
 
   // Make sure the sensor is at the correct initial pose
-  EXPECT_EQ(camera->GetWorldPose(), cameraStartPose);
+  EXPECT_EQ(camera->WorldPose(), cameraStartPose);
 
   SetPause(true);
 
@@ -61,10 +61,10 @@ TEST_F(GzCamera, Follow)
   world->Step(5000);
 
   // Make sure the camera is not at the initial pose.
-  EXPECT_TRUE(camera->GetWorldPose() != cameraStartPose);
+  EXPECT_TRUE(camera->WorldPose() != cameraStartPose);
 
-  EXPECT_NEAR(camera->GetWorldPose().pos.x, 9.9, 0.1);
-  EXPECT_NEAR(camera->GetWorldPose().pos.y, 9.9, 0.1);
+  EXPECT_NEAR(camera->WorldPose().Pos().X(), 9.9, 0.1);
+  EXPECT_NEAR(camera->WorldPose().Pos().Y(), 9.9, 0.1);
 }
 
 /////////////////////////////////////////////////

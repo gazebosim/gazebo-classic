@@ -21,13 +21,13 @@
   #include <Winsock2.h>
 #endif
 
-#include <boost/bind.hpp>
-
+#include <functional>
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/transport/transport.hh"
+#include "gazebo/util/DiagnosticsPrivate.hh"
 #include "gazebo/util/Diagnostics.hh"
 
 using namespace gazebo;
@@ -35,13 +35,14 @@ using namespace util;
 
 //////////////////////////////////////////////////
 DiagnosticManager::DiagnosticManager()
+: dataPtr(new DiagnosticManagerPrivate)
 {
 #ifndef _WIN32
   const char *homePath = common::getEnv("HOME");
 #else
   const char *homePath = common::getEnv("HOMEPATH");
 #endif
-  this->logPath = homePath;
+  this->dataPtr->logPath = homePath;
 
   // Get the base of the time logging path
   if (!homePath)
@@ -49,11 +50,11 @@ DiagnosticManager::DiagnosticManager()
     common::SystemPaths *paths = common::SystemPaths::Instance();
     gzwarn << "HOME environment variable missing. Diagnostic timing " <<
       "information will be logged to " << paths->GetTmpPath() << "\n";
-    this->logPath = paths->GetTmpPath() + "/gazebo";
+    this->dataPtr->logPath = paths->GetTmpPath() + "/gazebo";
   }
   else
   {
-    this->logPath /= ".gazebo";
+    this->dataPtr->logPath /= ".gazebo";
   }
 
   std::string timeStr = common::Time::GetWallTimeAsISOString();
@@ -62,60 +63,72 @@ DiagnosticManager::DiagnosticManager()
   std::replace(timeStr.begin(), timeStr.end(), ':', '_');
 #endif
 
-  this->logPath = this->logPath / "diagnostics" / timeStr;
+  this->dataPtr->logPath = this->dataPtr->logPath / "diagnostics" / timeStr;
 
   // Make sure the path exists.
-  if (!boost::filesystem::exists(this->logPath))
-    boost::filesystem::create_directories(this->logPath);
+  if (!boost::filesystem::exists(this->dataPtr->logPath))
+    boost::filesystem::create_directories(this->dataPtr->logPath);
 }
 
 //////////////////////////////////////////////////
 DiagnosticManager::~DiagnosticManager()
 {
-  event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
+  event::Events::DisconnectWorldUpdateBegin(this->dataPtr->updateConnection);
 }
 
 //////////////////////////////////////////////////
 void DiagnosticManager::Init(const std::string &_worldName)
 {
-  this->node.reset(new transport::Node());
+  this->dataPtr->node.reset(new transport::Node());
 
-  this->node->Init(_worldName);
+  this->dataPtr->node->Init(_worldName);
 
-  this->pub = this->node->Advertise<msgs::Diagnostics>("~/diagnostics");
+  this->dataPtr->pub =
+    this->dataPtr->node->Advertise<msgs::Diagnostics>("~/diagnostics");
 
-  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-      boost::bind(&DiagnosticManager::Update, this, _1));
+  this->dataPtr->updateConnection = event::Events::ConnectWorldUpdateBegin(
+      std::bind(&DiagnosticManager::Update, this, std::placeholders::_1));
 }
 
 //////////////////////////////////////////////////
 boost::filesystem::path DiagnosticManager::GetLogPath() const
 {
-  return this->logPath;
+  return this->LogPath();
+}
+
+//////////////////////////////////////////////////
+boost::filesystem::path DiagnosticManager::LogPath() const
+{
+  return this->dataPtr->logPath;
 }
 
 //////////////////////////////////////////////////
 void DiagnosticManager::Update(const common::UpdateInfo &_info)
 {
   if (_info.realTime > common::Time::Zero)
-    this->msg.set_real_time_factor((_info.simTime / _info.realTime).Double());
+  {
+    this->dataPtr->msg.set_real_time_factor(
+        (_info.simTime / _info.realTime).Double());
+  }
   else
-    this->msg.set_real_time_factor(0.0);
+  {
+    this->dataPtr->msg.set_real_time_factor(0.0);
+  }
 
-  msgs::Set(this->msg.mutable_real_time(), _info.realTime);
-  msgs::Set(this->msg.mutable_sim_time(), _info.simTime);
+  msgs::Set(this->dataPtr->msg.mutable_real_time(), _info.realTime);
+  msgs::Set(this->dataPtr->msg.mutable_sim_time(), _info.simTime);
 
-  if (this->pub && this->pub->HasConnections())
-    this->pub->Publish(this->msg);
+  if (this->dataPtr->pub && this->dataPtr->pub->HasConnections())
+    this->dataPtr->pub->Publish(this->dataPtr->msg);
 
-  this->msg.clear_time();
+  this->dataPtr->msg.clear_time();
 }
 
 //////////////////////////////////////////////////
 void DiagnosticManager::AddTime(const std::string &_name,
-    common::Time &_wallTime, common::Time &_elapsedTime)
+    const common::Time &_wallTime, const common::Time &_elapsedTime)
 {
-  msgs::Diagnostics::DiagTime *time = this->msg.add_time();
+  msgs::Diagnostics::DiagTime *time = this->dataPtr->msg.add_time();
   time->set_name(_name);
   msgs::Set(time->mutable_elapsed(), _elapsedTime);
   msgs::Set(time->mutable_wall(), _wallTime);
@@ -124,23 +137,24 @@ void DiagnosticManager::AddTime(const std::string &_name,
 //////////////////////////////////////////////////
 void DiagnosticManager::StartTimer(const std::string &_name)
 {
-  TimerMap::iterator iter = this->timers.find(_name);
-  if (iter != this->timers.end())
+  TimerMap::iterator iter = this->dataPtr->timers.find(_name);
+  if (iter != this->dataPtr->timers.end())
   {
     GZ_ASSERT(iter->second != NULL, "DiagnosticTimerPtr is NULL");
     iter->second->Start();
   }
   else
   {
-    this->timers[_name] = DiagnosticTimerPtr(new DiagnosticTimer(_name));
+    this->dataPtr->timers[_name] =
+      DiagnosticTimerPtr(new DiagnosticTimer(_name));
   }
 }
 
 //////////////////////////////////////////////////
 void DiagnosticManager::StopTimer(const std::string &_name)
 {
-  TimerMap::iterator iter = this->timers.find(_name);
-  if (iter != this->timers.end())
+  TimerMap::iterator iter = this->dataPtr->timers.find(_name);
+  if (iter != this->dataPtr->timers.end())
   {
     GZ_ASSERT(iter->second, "DiagnosticTimerPtr is NULL");
     iter->second->Stop();
@@ -154,9 +168,9 @@ void DiagnosticManager::Lap(const std::string &_name,
                             const std::string &_prefix)
 {
   TimerMap::iterator iter;
-  iter = this->timers.find(_name);
+  iter = this->dataPtr->timers.find(_name);
 
-  if (iter == this->timers.end())
+  if (iter == this->dataPtr->timers.end())
     gzerr << "Unable to find timer with name[" << _name << "]\n";
   else
   {
@@ -169,25 +183,37 @@ void DiagnosticManager::Lap(const std::string &_name,
 //////////////////////////////////////////////////
 int DiagnosticManager::GetTimerCount() const
 {
-  return this->timers.size();
+  return this->TimerCount();
+}
+
+//////////////////////////////////////////////////
+int DiagnosticManager::TimerCount() const
+{
+  return this->dataPtr->timers.size();
 }
 
 //////////////////////////////////////////////////
 common::Time DiagnosticManager::GetTime(int _index) const
 {
-  if (_index < 0 || static_cast<size_t>(_index) > this->timers.size())
+  return this->Time(_index);
+}
+
+//////////////////////////////////////////////////
+common::Time DiagnosticManager::Time(const int _index) const
+{
+  if (_index < 0 || static_cast<size_t>(_index) > this->dataPtr->timers.size())
   {
     gzerr << "Invalid index of[" << _index << "]. Must be between 0 and "
-      << this->timers.size()-1 << ", inclusive.\n";
+      << this->dataPtr->timers.size()-1 << ", inclusive.\n";
     return common::Time();
   }
 
   TimerMap::const_iterator iter;
 
-  iter = this->timers.begin();
+  iter = this->dataPtr->timers.begin();
   std::advance(iter, _index);
 
-  if (iter != this->timers.end())
+  if (iter != this->dataPtr->timers.end())
   {
     GZ_ASSERT(iter->second, "DiagnosticTimerPtr is NULL");
     return iter->second->GetElapsed();
@@ -201,18 +227,24 @@ common::Time DiagnosticManager::GetTime(int _index) const
 //////////////////////////////////////////////////
 std::string DiagnosticManager::GetLabel(int _index) const
 {
-  if (_index < 0 || static_cast<size_t>(_index) > this->timers.size())
+  return this->Label(_index);
+}
+
+//////////////////////////////////////////////////
+std::string DiagnosticManager::Label(const int _index) const
+{
+  if (_index < 0 || static_cast<size_t>(_index) > this->dataPtr->timers.size())
   {
     gzerr << "Invalid index of[" << _index << "]. Must be between 0 and "
-      << this->timers.size()-1 << ", inclusive.\n";
+      << this->dataPtr->timers.size()-1 << ", inclusive.\n";
     return std::string();
   }
   TimerMap::const_iterator iter;
 
-  iter = this->timers.begin();
+  iter = this->dataPtr->timers.begin();
   std::advance(iter, _index);
 
-  if (iter != this->timers.end())
+  if (iter != this->dataPtr->timers.end())
     return iter->first;
   else
     gzerr << "Erorr getting label\n";
@@ -223,10 +255,16 @@ std::string DiagnosticManager::GetLabel(int _index) const
 //////////////////////////////////////////////////
 common::Time DiagnosticManager::GetTime(const std::string &_label) const
 {
-  TimerMap::const_iterator iter;
-  iter = this->timers.find(_label);
+  return this->Time(_label);
+}
 
-  if (iter != this->timers.end())
+//////////////////////////////////////////////////
+common::Time DiagnosticManager::Time(const std::string &_label) const
+{
+  TimerMap::const_iterator iter;
+  iter = this->dataPtr->timers.find(_label);
+
+  if (iter != this->dataPtr->timers.end())
   {
     GZ_ASSERT(iter->second, "DiagnosticTimerPtr is NULL");
     return iter->second->GetElapsed();
@@ -238,14 +276,17 @@ common::Time DiagnosticManager::GetTime(const std::string &_label) const
 }
 
 //////////////////////////////////////////////////
-DiagnosticTimer::DiagnosticTimer(const std::string &_name) : Timer()
+DiagnosticTimer::DiagnosticTimer(const std::string &_name)
+: Timer(),
+  dataPtr(new DiagnosticTimerPrivate)
 {
   boost::filesystem::path logPath;
 
-  logPath = DiagnosticManager::Instance()->GetLogPath() / (_name + ".log");
-  this->log.open(logPath.string().c_str(), std::ios::out | std::ios::app);
+  logPath = DiagnosticManager::Instance()->LogPath() / (_name + ".log");
+  this->dataPtr->log.open(logPath.string().c_str(),
+      std::ios::out | std::ios::app);
 
-  this->name = _name;
+  this->dataPtr->name = _name;
   this->Start();
 }
 
@@ -253,7 +294,7 @@ DiagnosticTimer::DiagnosticTimer(const std::string &_name) : Timer()
 DiagnosticTimer::~DiagnosticTimer()
 {
   this->Stop();
-  this->log.close();
+  this->dataPtr->log.close();
 }
 
 //////////////////////////////////////////////////
@@ -266,7 +307,7 @@ void DiagnosticTimer::Start()
     Timer::Start();
 
     // Make sure the prev lap is reset
-    this->prevLap.Set(0, 0);
+    this->dataPtr->prevLap.Set(0, 0);
   }
 }
 
@@ -283,14 +324,15 @@ void DiagnosticTimer::Stop()
     common::Time currTime = common::Time::GetWallTime();
 
     // Write out the total elapsed time.
-    this->log << this->name << " " << currTime << " "
+    this->dataPtr->log << this->dataPtr->name << " " << currTime << " "
       << elapsed.Double() << std::endl;
-    this->log.flush();
+    this->dataPtr->log.flush();
 
-    DiagnosticManager::Instance()->AddTime(this->name, currTime, elapsed);
+    DiagnosticManager::Instance()->AddTime(this->dataPtr->name,
+        currTime, elapsed);
 
     // Reset the lap time
-    this->prevLap.Set(0, 0);
+    this->dataPtr->prevLap.Set(0, 0);
   }
 }
 
@@ -299,16 +341,28 @@ void DiagnosticTimer::Lap(const std::string &_prefix)
 {
   // Get the current elapsed time.
   common::Time elapsed = this->GetElapsed();
-  common::Time delta = elapsed - this->prevLap;
+  common::Time delta = elapsed - this->dataPtr->prevLap;
   common::Time currTime = common::Time::GetWallTime();
 
   // Write out the delta time.
-  this->log << this->name << ":" << _prefix << " " <<
+  this->dataPtr->log << this->dataPtr->name << ":" << _prefix << " " <<
     currTime << " " << delta.Double() << std::endl;
 
-  DiagnosticManager::Instance()->AddTime(this->name + ":" + _prefix,
+  DiagnosticManager::Instance()->AddTime(this->dataPtr->name + ":" + _prefix,
       currTime, delta);
 
   // Store the prev lap time.
-  this->prevLap = elapsed;
+  this->dataPtr->prevLap = elapsed;
+}
+
+//////////////////////////////////////////////////
+const std::string DiagnosticTimer::GetName() const
+{
+  return this->Name();
+}
+
+//////////////////////////////////////////////////
+const std::string DiagnosticTimer::Name() const
+{
+  return this->dataPtr->name;
 }
