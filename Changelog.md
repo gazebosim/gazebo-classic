@@ -2,7 +2,7 @@
 
 1. Use opaque pointers in the rendering/DepthCamera class.
     * [Pull request #2069](https://bitbucket.org/osrf/gazebo/pull-request/2069)
-    
+
 1. Use opaque pointers for the Master class.
     * [Pull request #2036](https://bitbucket.org/osrf/gazebo/pull-request/2036)
 
@@ -273,6 +273,9 @@ using the same arguments used in the command line.
 
     1. PIMPL JointInspector
         * [Pull request #2059](https://bitbucket.org/osrf/gazebo/pull-request/2059)
+
+    1. PIMPL JointMaker
+        * [Pull request #2087](https://bitbucket.org/osrf/gazebo/pull-request/2087)
 
     1. Apply inspector changes in real time and add reset button
         * [Pull request #1945](https://bitbucket.org/osrf/gazebo/pull-request/1945)
