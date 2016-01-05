@@ -197,7 +197,7 @@ void SchematicViewWidget::AddEdge(const std::string &_id,
 
   this->edges[_id] = edge;
 
-  std::string materialName = JointMaker::GetJointMaterial(_type);
+  std::string materialName = JointMaker::JointMaterial(_type);
 
   common::Color edgeColor = common::Color::Black;
   if (!materialName.empty())

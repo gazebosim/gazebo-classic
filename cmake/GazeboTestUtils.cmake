@@ -30,10 +30,6 @@ macro (gz_build_tests)
 
 
     target_link_libraries(${BINARY_NAME}
-      # This two libraries are need to workaround on bug 
-      # https://bitbucket.org/osrf/gazebo/issue/1516
-      gazebo_physics
-      gazebo_sensors
       # libgazebo will bring all most of gazebo libraries as dependencies
       libgazebo
       gazebo_test_fixture
@@ -93,11 +89,8 @@ if (VALID_DISPLAY)
       )
 
     target_link_libraries(${BINARY_NAME}
-      # This two libraries are need to workaround on bug 
-      # https://bitbucket.org/osrf/gazebo/issue/1516
-      gazebo_physics
-      gazebo_sensors
-      # gazebo_gui and libgazebo will bring all most of gazebo libraries as dependencies
+      # gazebo_gui and libgazebo will bring all most of gazebo
+      # libraries as dependencies
       libgazebo
       gazebo_gui
       ${QT_QTTEST_LIBRARY}
