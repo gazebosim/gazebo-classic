@@ -128,8 +128,8 @@ void OculusWindow::AttachCameraToVisual()
 
   double pitch = atan2(-delta.z, sqrt(delta.x*delta.x + delta.y*delta.y));
 
-  this->oculusCamera->SetWorldPose(math::Pose(
-        camPos, math::Vector3(0, pitch, yaw)));
+  this->oculusCamera->SetWorldPose(ignition::math::Pose3d(
+        camPos.Ign(), ignition::math::Vector3d(0, pitch, yaw)));
 }
 
 /////////////////////////////////////////////////

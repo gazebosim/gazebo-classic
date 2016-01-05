@@ -137,7 +137,7 @@ void Sensor::Init()
 }
 
 //////////////////////////////////////////////////
-void Sensor::SetParent(const std::string &_name, uint32_t _id)
+void Sensor::SetParent(const std::string &_name, const uint32_t _id)
 {
   this->parentName = _name;
   this->parentId = _id;
@@ -181,7 +181,7 @@ bool Sensor::NeedsUpdate()
 }
 
 //////////////////////////////////////////////////
-void Sensor::Update(bool _force)
+void Sensor::Update(const bool _force)
 {
   if (this->IsActive() || _force)
   {
@@ -275,13 +275,13 @@ void Sensor::LoadPlugin(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void Sensor::SetActive(bool _value)
+void Sensor::SetActive(const bool _value)
 {
   this->active = _value;
 }
 
 //////////////////////////////////////////////////
-bool Sensor::IsActive()
+bool Sensor::IsActive() const
 {
   return this->active;
 }
@@ -322,7 +322,7 @@ double Sensor::GetUpdateRate()
 }
 
 //////////////////////////////////////////////////
-void Sensor::SetUpdateRate(double _hz)
+void Sensor::SetUpdateRate(const double _hz)
 {
   if (_hz > 0.0)
     this->updatePeriod = 1.0/_hz;
@@ -393,7 +393,7 @@ void Sensor::FillMsg(msgs::Sensor &_msg)
     CameraSensor *camSensor = static_cast<CameraSensor*>(this);
     msgs::CameraSensor *camMsg = _msg.mutable_camera();
     auto cam = camSensor->GetCamera();
-    camMsg->set_horizontal_fov(cam->GetHFOV().Radian());
+    camMsg->set_horizontal_fov(cam->HFOV().Radian());
     camMsg->mutable_image_size()->set_x(camSensor->GetImageWidth());
     camMsg->mutable_image_size()->set_y(camSensor->GetImageHeight());
     camMsg->set_image_format(cam->GetImageFormat());
@@ -443,3 +443,10 @@ void Sensor::ResetLastUpdateTime()
   boost::mutex::scoped_lock lock(this->mutexLastUpdateTime);
   this->lastUpdateTime = 0.0;
 }
+
+//////////////////////////////////////////////////
+void Sensor::DisconnectUpdated(event::ConnectionPtr &_c)
+{
+  this->updated.Disconnect(_c);
+}
+
