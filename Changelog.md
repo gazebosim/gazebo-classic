@@ -29,6 +29,8 @@
 
 1. Use more opaque pointers.
     * [Pull request #2025](https://bitbucket.org/osrf/gazebo/pull-request/2025)
+    * [Pull request #2065](https://bitbucket.org/osrf/gazebo/pull-request/2065)
+    * [Pull request #2067](https://bitbucket.org/osrf/gazebo/pull-request/2067)
 
 1. Use opaque pointers in the gui/CloneWindow class.
     * [Pull request #2027](https://bitbucket.org/osrf/gazebo/pull-request/2027)
@@ -227,7 +229,12 @@ using the same arguments used in the command line.
 1. Refactored makers
     * [Pull request #1828](https://bitbucket.org/osrf/gazebo/pull-request/1828)
 
+1. Added gui::Conversions to convert between Gazebo and Qt
+    * [Pull request #2034](https://bitbucket.org/osrf/gazebo/pull-request/2034)
+
 1. Model editor updates
+    1. Support adding model plugins in model editor
+        * [Pull request #2060](https://bitbucket.org/osrf/gazebo/pull-request/2060)
 
     1. Make non-editable background models white in model editor
         * [Pull request #1950](https://bitbucket.org/osrf/gazebo/pull-request/1950)
@@ -270,6 +277,9 @@ using the same arguments used in the command line.
     1. PIMPL JointInspector
         * [Pull request #2059](https://bitbucket.org/osrf/gazebo/pull-request/2059)
 
+    1. PIMPL JointMaker
+        * [Pull request #2087](https://bitbucket.org/osrf/gazebo/pull-request/2087)
+
     1. Apply inspector changes in real time and add reset button
         * [Pull request #1945](https://bitbucket.org/osrf/gazebo/pull-request/1945)
         * [Issue #1472](https://bitbucket.org/osrf/gazebo/issue/1472)
@@ -284,6 +294,9 @@ using the same arguments used in the command line.
     1. Support inserting nested models from model maker
         * [Pull request #1982](https://bitbucket.org/osrf/gazebo/pull-request/1982)
 
+    1. Added joint creation dialog
+        * [Pull request #2021](https://bitbucket.org/osrf/gazebo/pull-request/2021)
+
     1. PIMPL LinkInspector
         * [Pull request #2056](https://bitbucket.org/osrf/gazebo/pull-request/2056)
 
@@ -291,6 +304,9 @@ using the same arguments used in the command line.
 
     1. PIMPLize LevelWidget class
         * [Pull request #2041](https://bitbucket.org/osrf/gazebo/pull-request/2041)
+
+    1. PIMPLize GrabberHandle, add *LinkedGrabbers functions
+        * [Pull request #2034](https://bitbucket.org/osrf/gazebo/pull-request/2034)
 
     1. PIMPLize ImportImageDialog and ImportImageView classes
         * [Pull request #2039](https://bitbucket.org/osrf/gazebo/pull-request/2039)
@@ -306,6 +322,9 @@ using the same arguments used in the command line.
 
     1. PIMPLize GridLines class
         * [Pull request #2032](https://bitbucket.org/osrf/gazebo/pull-request/2032)
+
+    1. PIMPLize RotateHandle class
+        * [Pull request #2082](https://bitbucket.org/osrf/gazebo/pull-request/2082)
 
 ## Gazebo 6.0
 

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_CONTACTSENSOR_HH_
-#define _GAZEBO_CONTACTSENSOR_HH_
+#ifndef _GAZEBO_SENSORS_CONTACTSENSOR_HH_
+#define _GAZEBO_SENSORS_CONTACTSENSOR_HH_
 
 #include <vector>
 #include <map>

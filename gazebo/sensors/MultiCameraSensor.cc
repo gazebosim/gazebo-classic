@@ -21,7 +21,7 @@
 #endif
 
 #include <boost/algorithm/string.hpp>
-#include <boost/bind.hpp>
+#include <functional>
 #include <ignition/math/Pose3.hh>
 
 #include "gazebo/common/Exception.hh"
@@ -54,7 +54,7 @@ MultiCameraSensor::MultiCameraSensor()
   this->rendered = false;
   this->connections.push_back(
       event::Events::ConnectRender(
-        boost::bind(&MultiCameraSensor::Render, this)));
+        std::bind(&MultiCameraSensor::Render, this)));
 }
 
 //////////////////////////////////////////////////

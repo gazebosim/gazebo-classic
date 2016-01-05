@@ -260,13 +260,13 @@ bool SegmentItem::GrabberEventFilter(GrabberHandle *_grabber, QEvent *_event)
   if (!mouseEvent)
     return false;
 
-  if (_grabber->GetMouseState() == QEvent::GraphicsSceneMouseMove)
+  if (_grabber->MouseState() == QEvent::GraphicsSceneMouseMove)
   {
     QPointF p1, pf;
     QPointF p2 = _grabber->mapToScene(mouseEvent->pos());
     pf = p2;
 
-    int index = _grabber->GetIndex();
+    int index = _grabber->Index();
     if (index == 0)
       p1 = this->GetEndPoint();
     else if (index == 1)
@@ -311,10 +311,9 @@ bool SegmentItem::GrabberEventFilter(GrabberHandle *_grabber, QEvent *_event)
 void SegmentItem::UpdateLinkedGrabbers(GrabberHandle *_grabber,
     const QPointF &_pos)
 {
-  for (unsigned int i = 0; i < _grabber->linkedGrabbers.size(); ++i)
+  for (auto linkedGrabber : _grabber->LinkedGrabbers())
   {
-    GrabberHandle *linkedGrabber = _grabber->linkedGrabbers[i];
-    int index = linkedGrabber->GetIndex();
+    int index = linkedGrabber->Index();
     SegmentItem *parentSegment = dynamic_cast<SegmentItem *>(
         linkedGrabber->parentItem());
     if (index == 0)
