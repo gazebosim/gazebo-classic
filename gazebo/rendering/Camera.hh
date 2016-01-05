@@ -931,7 +931,7 @@ namespace gazebo
 
       /// \brief if user requests bayer image, post process rgb from ogre
       ///        to generate bayer formats
-      /// \param[in] _dst Destination buffer for the image data
+      /// \param[out] _dst Destination buffer for the image data
       /// \param[in] _src Source image buffer
       /// \param[in] _format Format of the source buffer
       /// \param[in] _width Image width

@@ -1055,7 +1055,7 @@ double Camera::FarClip() const
 //////////////////////////////////////////////////
 unsigned int Camera::GetViewportWidth() const
 {
-  return ViewportWidth();
+  return this->ViewportWidth();
 }
 
 //////////////////////////////////////////////////
@@ -1072,7 +1072,7 @@ unsigned int Camera::ViewportWidth() const
 //////////////////////////////////////////////////
 unsigned int Camera::GetViewportHeight() const
 {
-  return ViewportHeight();
+  return this->ViewportHeight();
 }
 
 //////////////////////////////////////////////////
