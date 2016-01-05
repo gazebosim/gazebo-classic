@@ -51,14 +51,15 @@ void computeRHSPrecon(dxWorldProcessContext *context, const int m, const int nb,
                       const dReal /*stepsize1*/, dRealMutablePtr /*c*/, dRealMutablePtr J,
                       int *jb, dRealMutablePtr rhs_precon)
 {
-    /************************************************************************************/
-    /*                                                                                  */
-    /*               compute preconditioned rhs                                         */
-    /*                                                                                  */
-    /*  J J' lambda = J * ( M * dv / dt + fe )                                          */
-    /*                                                                                  */
-    /************************************************************************************/
-    // mimic computation of rhs, but do it with J*M*inv(J) prefixed for preconditioned case.
+    /**************************************************************************/
+    /*                                                                        */
+    /*               compute preconditioned rhs                               */
+    /*                                                                        */
+    /*  J J' lambda = J * ( M * dv / dt + fe )                                */
+    /*                                                                        */
+    /**************************************************************************/
+    // mimic computation of rhs, but do it with J*M*inv(J) prefixed for
+    // preconditioned case.
     BEGIN_STATE_SAVE(context, tmp2state) {
       IFTIMING (dTimerNow ("compute rhs_precon"));
 
