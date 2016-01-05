@@ -95,6 +95,12 @@ release will remove the deprecated code.
 
 ### Deprecations
 
+1. **gazebo/util/OpenAL.hh**
+    + ***Deprecation:*** public: bool GetOnContact() const;
+    + ***Replacement:*** public: bool OnContact() const;
+    + ***Deprecation:*** public: std::vector<std::string> GetCollisionNames() const;
+    + ***Replacement:*** public: std::vector<std::string> CollisionNames() const;
+
 1. **gazebo/util/LogRecord.hh**
     + ***Deprecation:*** public: bool GetPaused() const;
     + ***Replacement:*** public: bool Paused() const;
