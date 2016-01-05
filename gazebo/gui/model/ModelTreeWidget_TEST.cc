@@ -70,10 +70,10 @@ void ModelTreeWidget_TEST::AddRemoveNestedModels()
 /////////////////////////////////////////////////
 void ModelTreeWidget_TEST::LoadNestedModel()
 {
-  this->resMaxPercentChange = 5.0;
+  this->resMaxPercentChange = 5.5;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("test/worlds/deeply_nested_models.world");
+  this->Load("test/worlds/deeply_nested_models.world", false, false, false);
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
@@ -162,6 +162,7 @@ void ModelTreeWidget_TEST::LoadNestedModel()
   QVERIFY(jointsItem->child(2)->data(0, Qt::UserRole) ==
       "ModelPreview_1::joint_02_UNIQUE_ID_");
 
+  mainWindow->close();
   delete mainWindow;
   mainWindow = NULL;
 }
@@ -266,29 +267,37 @@ void ModelTreeWidget_TEST::AddRemoveModelPlugins()
   QTreeWidgetItem *modelPluginsItem = trees[0]->topLevelItem(0);
   QVERIFY(modelPluginsItem->text(0) == "Model Plugins");
 
+  // 1 because of the add model plugins button
+  int buttonCount = 1;
+
   // Check number of model plugins
-  QCOMPARE(modelPluginsItem->childCount(), 0);
+  QCOMPARE(modelPluginsItem->childCount(), 0 + buttonCount);
 
   // Insert a plugin and check number again
   gazebo::gui::model::Events::modelPluginInserted("plugin1");
-  QCOMPARE(modelPluginsItem->childCount(), 1);
-  QVERIFY(modelPluginsItem->child(0)->data(0, Qt::UserRole) == "plugin1");
+  QCOMPARE(modelPluginsItem->childCount(), 1 + buttonCount);
+  QVERIFY(modelPluginsItem->child(0 + buttonCount)->data(0, Qt::UserRole)
+      == "plugin1");
 
   // Insert another plugin and check number again
   gazebo::gui::model::Events::modelPluginInserted("plugin2");
-  QCOMPARE(modelPluginsItem->childCount(), 2);
-  QVERIFY(modelPluginsItem->child(0)->data(0, Qt::UserRole) == "plugin1");
-  QVERIFY(modelPluginsItem->child(1)->data(0, Qt::UserRole) == "plugin2");
+  QCOMPARE(modelPluginsItem->childCount(), 2 + buttonCount);
+  QVERIFY(modelPluginsItem->child(0 + buttonCount)->data(0, Qt::UserRole)
+      == "plugin1");
+  QVERIFY(modelPluginsItem->child(1 + buttonCount)->data(0, Qt::UserRole)
+      == "plugin2");
 
   // Remove a plugin and check number again
   gazebo::gui::model::Events::modelPluginRemoved("plugin1");
-  QCOMPARE(modelPluginsItem->childCount(), 1);
-  QVERIFY(modelPluginsItem->child(0)->data(0, Qt::UserRole) == "plugin2");
+  QCOMPARE(modelPluginsItem->childCount(), 1 + buttonCount);
+  QVERIFY(modelPluginsItem->child(0 + buttonCount)->data(0, Qt::UserRole)
+      == "plugin2");
 
   // Try to remove inexistent plugin
   gazebo::gui::model::Events::modelPluginRemoved("plugin3");
-  QCOMPARE(modelPluginsItem->childCount(), 1);
-  QVERIFY(modelPluginsItem->child(0)->data(0, Qt::UserRole) == "plugin2");
+  QCOMPARE(modelPluginsItem->childCount(), 1 + buttonCount);
+  QVERIFY(modelPluginsItem->child(0 + buttonCount)->data(0, Qt::UserRole)
+      == "plugin2");
 
   delete modelTree;
   modelTree = NULL;
