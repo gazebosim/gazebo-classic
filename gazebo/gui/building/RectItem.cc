@@ -99,7 +99,7 @@ RectItem::~RectItem()
   this->dataPtr->rotateHandle->setParentItem(NULL);
   delete this->dataPtr->rotateHandle;
 
-  if (!this->measures.empty())
+  if (!this->parentItem() && !this->measures.empty())
   {
     delete this->measures[0];
     delete this->measures[1];
@@ -1023,4 +1023,12 @@ void RectItem::UpdateMeasures()
     this->measures[1]->SetValue(
         (this->measures[1]->line().length())*this->itemScale);
   }
+}
+
+/////////////////////////////////////////////////
+void RectItem::DetachFromParent()
+{
+  this->setParentItem(NULL);
+  for (unsigned int i = 0; i < this->measures.size(); i++)
+    this->measures[i]->setParentItem(NULL);
 }

@@ -109,6 +109,9 @@ namespace gazebo
       // Documentation inherited
       public: void SetHighlighted(bool _highlighted);
 
+      /// \brief Detach the rect item from its parent.
+      public: void DetachFromParent();
+
       /// \brief Helper method for Updating the corner positions of the rect
       /// item.
       protected: void UpdateCornerPositions();

@@ -450,7 +450,7 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
         double distance = fabs(deltaLineMouse2) / sqrt(deltaLine2);
         if (distance > 30 || t > 1.0 || t < 0.0)
         {
-          editorItem->setParentItem(NULL);
+          editorItem->DetachFromParent();
           wallSegmentItem->setZValue(wallSegmentItem->ZValueIdle());
           editorItem->SetPositionOnWall(0);
           editorItem->SetAngleOnWall(0);
