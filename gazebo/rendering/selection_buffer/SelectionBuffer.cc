@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <memory>
 
 #include "gazebo/common/Console.hh"
 #include "gazebo/rendering/ogre_gazebo.h"
@@ -34,11 +35,11 @@ namespace gazebo
       /// \brief This is the material listener - Note: it is controlled by a
       /// separate RenderTargetListener, not applied globally to all
       /// targets. The class associates a color to an ogre entity
-      MaterialSwitcher *materialSwitchListener;
+      std::unique_ptr<MaterialSwitcher> materialSwitchListener;
 
       /// \brief A render target listener that sets up the material switcher
       /// to run on every update of this render target.
-      SelectionRenderListener *selectionTargetListener;
+      std::unique_ptr<SelectionRenderListener> selectionTargetListener;
 
       /// \brief Ogre scene manager
       Ogre::SceneManager *sceneMgr;
@@ -80,9 +81,9 @@ SelectionBuffer::SelectionBuffer(const std::string &_cameraName,
   this->dataPtr->pixelBox = 0;
 
   this->dataPtr->camera = this->dataPtr->sceneMgr->getCamera(_cameraName);
-  this->dataPtr->materialSwitchListener = new MaterialSwitcher();
-  this->dataPtr->selectionTargetListener = new SelectionRenderListener(
-      this->dataPtr->materialSwitchListener);
+  this->dataPtr->materialSwitchListener.reset(new MaterialSwitcher());
+  this->dataPtr->selectionTargetListener.reset(new SelectionRenderListener(
+      this->dataPtr->materialSwitchListener));
   this->CreateRTTBuffer();
   this->CreateRTTOverlays();
 }
@@ -91,8 +92,6 @@ SelectionBuffer::SelectionBuffer(const std::string &_cameraName,
 SelectionBuffer::~SelectionBuffer()
 {
   this->DeleteRTTBuffer();
-  delete this->dataPtr->selectionTargetListener;
-  delete this->dataPtr->materialSwitchListener;
 }
 
 /////////////////////////////////////////////////
