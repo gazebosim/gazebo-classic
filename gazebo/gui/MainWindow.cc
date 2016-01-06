@@ -243,9 +243,11 @@ MainWindow::MainWindow()
 /////////////////////////////////////////////////
 MainWindow::~MainWindow()
 {
+  // Cleanup user command history
   delete this->userCmdHistory;
   this->userCmdHistory = NULL;
 
+  // Cleanup global actions
   this->DeleteActions();
 }
 
@@ -299,14 +301,14 @@ void MainWindow::Init()
 
   this->setGeometry(winXPos, winYPos, winWidth, winHeight);
 
-  if ( this->width() > winWidth )
+  if (this->width() > winWidth)
   {
     gzwarn << "Requested geometry.width of " << winWidth
            << " but the minimum width of the window is "
            << this->width() << "." << std::endl;
   }
 
-  if ( this->height() > winHeight )
+  if (this->height() > winHeight)
   {
     gzwarn << "Requested geometry.height of " << winHeight
            << " but the minimum height of the window is "
@@ -502,7 +504,7 @@ void MainWindow::Save()
       sdf::ElementPtr cameraElem = guiElem->GetElement("camera");
       rendering::UserCameraPtr cam = gui::get_active_camera();
 
-      cameraElem->GetElement("pose")->Set(cam->GetWorldPose());
+      cameraElem->GetElement("pose")->Set(cam->WorldPose());
       cameraElem->GetElement("view_controller")->Set(
           cam->GetViewControllerTypeString());
 
@@ -552,7 +554,7 @@ void MainWindow::Clone()
     msgs::ServerControl msg;
     msg.set_save_world_name("");
     msg.set_clone(true);
-    msg.set_new_port(cloneWindow->GetPort());
+    msg.set_new_port(cloneWindow->Port());
     this->serverControlPub->Publish(msg);
   }
 }

@@ -15,18 +15,21 @@
  *
 */
 
-#ifndef _BUILDING_EDITOR_WIDGET_HH_
-#define _BUILDING_EDITOR_WIDGET_HH_
+#ifndef _GAZEBO_GUI_BUILDING_EDITOR_WIDGET_HH_
+#define _GAZEBO_GUI_BUILDING_EDITOR_WIDGET_HH_
+
+#include <memory>
 
 #include "gazebo/gui/qt.h"
+
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
-    class LevelWidget;
-    class ScaleWidget;
+    // Forward declare private data.
+    class BuildingEditorWidgetPrivate;
 
     /// \addtogroup gazebo_gui
     /// \{
@@ -41,7 +44,7 @@ namespace gazebo
       public: BuildingEditorWidget(QWidget *_parent = 0);
 
       /// \brief Destructor
-      public: ~BuildingEditorWidget();
+      public: ~BuildingEditorWidget() = default;
 
       /// \brief Qt event received when the widget is being resized
       /// \param[in] _event Resize event.
@@ -50,20 +53,9 @@ namespace gazebo
       /// \brief Custom rotation cursor
       public: static QCursor rotateCursor;
 
-      /// \brief A widget to display and change building levels.
-      private: LevelWidget *levelWidget;
-
-      /// \brief A widget to display the scale of the 2D editor view.
-      private: ScaleWidget *scaleWidget;
-
-      /// \brief Qt Graphics Scene where graphics items are drawn in
-      private: QGraphicsScene *scene;
-
-      /// \brief Minimum width of the Qt graphics scene
-      private: int minimumWidth;
-
-      /// \brief Minimum height of the Qt graphics scene
-      private: int minimumHeight;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<BuildingEditorWidgetPrivate> dataPtr;
     };
     /// \}
   }
