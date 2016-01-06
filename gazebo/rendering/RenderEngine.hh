@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-
 #ifndef _GAZEBO_RENDERING_RENDERENGINE_HH_
 #define _GAZEBO_RENDERING_RENDERENGINE_HH_
 

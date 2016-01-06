@@ -22,7 +22,7 @@
 
 #include <string>
 #include <iostream>
-#include <boost/bind.hpp>
+#include <functional>
 #include <boost/filesystem.hpp>
 #include <sys/types.h>
 
@@ -101,11 +101,11 @@ void RenderEngine::Load()
   if (!this->dataPtr->root)
   {
     this->dataPtr->connections.push_back(event::Events::ConnectPreRender(
-          boost::bind(&RenderEngine::PreRender, this)));
+          std::bind(&RenderEngine::PreRender, this)));
     this->dataPtr->connections.push_back(event::Events::ConnectRender(
-          boost::bind(&RenderEngine::Render, this)));
+          std::bind(&RenderEngine::Render, this)));
     this->dataPtr->connections.push_back(event::Events::ConnectPostRender(
-          boost::bind(&RenderEngine::PostRender, this)));
+          std::bind(&RenderEngine::PostRender, this)));
 
     // Create a new log manager and prevent output from going to stdout
     this->dataPtr->logManager = new Ogre::LogManager();
