@@ -117,7 +117,7 @@ void MudPlugin::Init()
       sensors::SensorManager *mgr = sensors::SensorManager::Instance();
       // Get a pointer to the contact sensor
       sensors::ContactSensorPtr sensor =
-          boost::dynamic_pointer_cast<sensors::ContactSensor>
+          std::dynamic_pointer_cast<sensors::ContactSensor>
           (mgr->GetSensor(name));
       if (sensor)
       {

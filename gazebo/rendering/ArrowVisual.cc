@@ -60,6 +60,7 @@ void ArrowVisual::Load()
   dPtr->shaftVis->AttachMesh("axis_shaft");
   dPtr->shaftVis->SetPosition(math::Vector3(0, 0, 0.1));
   dPtr->shaftVis->SetCastShadows(false);
+  dPtr->shaftVis->SetType(VT_GUI);
 
   dPtr->headVis.reset(
       new Visual(this->GetName()+"__HEAD__", shared_from_this(), false));
@@ -67,6 +68,7 @@ void ArrowVisual::Load()
   dPtr->headVis->AttachMesh("axis_head");
   dPtr->headVis->SetPosition(math::Vector3(0, 0, 0.24));
   dPtr->headVis->SetCastShadows(false);
+  dPtr->headVis->SetType(VT_GUI);
 
   common::MeshManager::Instance()->CreateTube("rotation_tube",
       0.035, 0.04, 0.01, 1, 32);
@@ -78,6 +80,7 @@ void ArrowVisual::Load()
   dPtr->rotationVis->AttachMesh("rotation_tube");
   dPtr->rotationVis->SetPosition(math::Vector3(0, 0, 0.24));
   dPtr->rotationVis->SetCastShadows(false);
+  dPtr->rotationVis->SetType(VT_GUI);
 
   this->ShowRotation(false);
 
