@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_UTIL_TYPES_HH_
-#define _GAZEBO_UTIL_TYPES_HH_
+#ifndef _GAZEBO_UTIL_UTILTYPES_HH_
+#define _GAZEBO_UTIL_UTILTYPES_HH_
 
 #include <unordered_map>
 #include <memory>
@@ -36,15 +36,15 @@ namespace gazebo
     class OpenALSource;
 
     /// \def DiagnosticTimerPtr
-    /// \brief boost::shared_ptr to a DiagnosticTimer class
+    /// \brief std::shared_ptr to a DiagnosticTimer class
     typedef std::shared_ptr<DiagnosticTimer> DiagnosticTimerPtr;
 
     /// \def OpenALSinkPtr
-    /// \brief boost::shared_ptr to a OpenALSink class
+    /// \brief std::shared_ptr to a OpenALSink class
     typedef std::shared_ptr<OpenALSink> OpenALSinkPtr;
 
     /// \def OpenALSourcePtr
-    /// \brief boost::shared_ptr to a OpenALSource class
+    /// \brief std::shared_ptr to a OpenALSource class
     typedef std::shared_ptr<OpenALSource> OpenALSourcePtr;
 
     /// \def TimerMap

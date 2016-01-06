@@ -29,8 +29,11 @@
 
 1. Use more opaque pointers.
     * [Pull request #2025](https://bitbucket.org/osrf/gazebo/pull-request/2025)
+    * [Pull request #2043](https://bitbucket.org/osrf/gazebo/pull-request/2043)
+    * [Pull request #2044](https://bitbucket.org/osrf/gazebo/pull-request/2044)
     * [Pull request #2065](https://bitbucket.org/osrf/gazebo/pull-request/2065)
     * [Pull request #2067](https://bitbucket.org/osrf/gazebo/pull-request/2067)
+    * [Pull request #2079](https://bitbucket.org/osrf/gazebo/pull-request/2079)
 
 1. Use opaque pointers in the gui/CloneWindow class.
     * [Pull request #2027](https://bitbucket.org/osrf/gazebo/pull-request/2027)
@@ -277,6 +280,9 @@ using the same arguments used in the command line.
     1. PIMPL JointInspector
         * [Pull request #2059](https://bitbucket.org/osrf/gazebo/pull-request/2059)
 
+    1. PIMPL JointMaker
+        * [Pull request #2087](https://bitbucket.org/osrf/gazebo/pull-request/2087)
+
     1. Apply inspector changes in real time and add reset button
         * [Pull request #1945](https://bitbucket.org/osrf/gazebo/pull-request/1945)
         * [Issue #1472](https://bitbucket.org/osrf/gazebo/issue/1472)
@@ -319,6 +325,9 @@ using the same arguments used in the command line.
 
     1. PIMPLize GridLines class
         * [Pull request #2032](https://bitbucket.org/osrf/gazebo/pull-request/2032)
+
+    1. PIMPLize RotateHandle class
+        * [Pull request #2082](https://bitbucket.org/osrf/gazebo/pull-request/2082)
 
 ## Gazebo 6.0
 

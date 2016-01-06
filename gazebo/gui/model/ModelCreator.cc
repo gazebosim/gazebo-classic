@@ -1614,7 +1614,7 @@ bool ModelCreator::OnMousePress(const common::MouseEvent &_event)
   if (!userCamera)
     return false;
 
-  if (this->jointMaker->GetState() != JointMaker::JOINT_NONE)
+  if (this->jointMaker->State() != JointMaker::JOINT_NONE)
   {
     userCamera->HandleMouseEvent(_event);
     return true;
@@ -1789,7 +1789,7 @@ void ModelCreator::ShowContextMenu(const std::string &_link)
 
     if (this->jointMaker)
     {
-      std::vector<JointData *> joints = this->jointMaker->GetJointDataByLink(
+      std::vector<JointData *> joints = this->jointMaker->JointDataByLink(
           _link);
 
       if (!joints.empty())
@@ -2157,7 +2157,7 @@ void ModelCreator::GenerateSDF()
 
   // Add joint sdf elements
   this->jointMaker->GenerateSDF();
-  sdf::ElementPtr jointsElem = this->jointMaker->GetSDF();
+  sdf::ElementPtr jointsElem = this->jointMaker->SDF();
 
   sdf::ElementPtr jointElem;
   if (jointsElem->HasElement("joint"))
