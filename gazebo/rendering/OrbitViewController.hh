@@ -19,6 +19,8 @@
 
 #include <string>
 
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/ViewController.hh"
 #include "gazebo/math/Vector3.hh"

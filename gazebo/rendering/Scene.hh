@@ -116,7 +116,6 @@ namespace gazebo
 
       /// \brief Get the OGRE scene manager.
       /// \return Pointer to the Ogre SceneManager.
-      /// \deprecated See Name()
       public: Ogre::SceneManager *OgreSceneManager() const;
 
       /// \brief Get the name of the scene.

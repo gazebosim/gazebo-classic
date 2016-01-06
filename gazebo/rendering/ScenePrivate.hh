@@ -21,6 +21,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <mutex>
 
 #include <boost/unordered/unordered_map.hpp>
 
@@ -42,11 +43,6 @@ namespace Ogre
 {
   class SceneManager;
   class RaySceneQuery;
-}
-
-namespace boost
-{
-  class mutex;
 }
 
 namespace gazebo
