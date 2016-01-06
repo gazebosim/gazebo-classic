@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_GUI_WINDOWDOORINSPECTORDIALOG_PRIVATE_HH_
-#define _GAZEBO_GUI_WINDOWDOORINSPECTORDIALOG_PRIVATE_HH_
+#ifndef _GAZEBO_GUI_BUILDING_WINDOWDOORINSPECTORDIALOGPRIVATE_HH_
+#define _GAZEBO_GUI_BUILDING_WINDOWDOORINSPECTORDIALOGPRIVATE_HH_
 
 #include "gazebo/gui/qt.h"
 
@@ -54,5 +53,4 @@ namespace gazebo
     };
   }
 }
-
 #endif

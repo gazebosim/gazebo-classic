@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_GUI_WALLINSPECTORDIALOG_PRIVATE_HH_
-#define _GAZEBO_GUI_WALLINSPECTORDIALOG_PRIVATE_HH_
+#ifndef _GAZEBO_GUI_BUILDING_WALLINSPECTORDIALOGPRIVATE_HH_
+#define _GAZEBO_GUI_BUILDING_WALLINSPECTORDIALOGPRIVATE_HH_
 
 #include "gazebo/gui/qt.h"
 
@@ -58,5 +57,4 @@ namespace gazebo
     };
   }
 }
-
 #endif

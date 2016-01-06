@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_GUI_STAIRSINSPECTORDIALOG_HH_
-#define _GAZEBO_GUI_STAIRSINSPECTORDIALOG_HH_
+#ifndef _GAZEBO_GUI_BUILDING_STAIRSINSPECTORDIALOG_HH_
+#define _GAZEBO_GUI_BUILDING_STAIRSINSPECTORDIALOG_HH_
 
 #include <memory>
 #include <string>
@@ -102,5 +101,4 @@ namespace gazebo
     /// \}
   }
 }
-
 #endif

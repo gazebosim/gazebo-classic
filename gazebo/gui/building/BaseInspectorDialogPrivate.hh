@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_GUI_BASEINSPECTORDIALOG_PRIVATE_HH_
-#define _GAZEBO_GUI_BASEINSPECTORDIALOG_PRIVATE_HH_
+#ifndef _GAZEBO_GUI_BUILDING_BASEINSPECTORDIALOG_PRIVATE_HH_
+#define _GAZEBO_GUI_BUILDING_BASEINSPECTORDIALOG_PRIVATE_HH_
 
 #include <string>
 #include <vector>
@@ -39,5 +38,4 @@ namespace gazebo
     };
   }
 }
-
 #endif

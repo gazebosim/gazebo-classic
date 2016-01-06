@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_GUI_LEVELINSPECTORDIALOG_HH_
-#define _GAZEBO_GUI_LEVELINSPECTORDIALOG_HH_
+#ifndef _GAZEBO_GUI_BUILDING_LEVELINSPECTORDIALOG_HH_
+#define _GAZEBO_GUI_BUILDING_LEVELINSPECTORDIALOG_HH_
 
 #include <memory>
 #include <string>
@@ -66,8 +65,8 @@ namespace gazebo
       /// \param[in] _height Level height in pixels.
       public: void SetHeight(const double _height);
 
-      /// \brief Set the height of the level.
-      /// \param[in] _height Level height in pixels.
+      /// \brief Show or hide the floor widget
+      /// \param[in] _show True to show the widget, false to hide.
       public: void ShowFloorWidget(const bool _show);
 
       /// \internal
@@ -77,5 +76,4 @@ namespace gazebo
     /// \}
   }
 }
-
 #endif

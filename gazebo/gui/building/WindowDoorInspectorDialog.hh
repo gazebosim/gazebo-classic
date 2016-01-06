@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_GUI_WINDOWDOORINSPECTORDIALOG_HH_
-#define _GAZEBO_GUI_WINDOWDOORINSPECTORDIALOG_HH_
+#ifndef _GAZEBO_GUI_BUILDING_WINDOWDOORINSPECTORDIALOG_HH_
+#define _GAZEBO_GUI_BUILDING_WINDOWDOORINSPECTORDIALOG_HH_
 
 #include <memory>
 #include <string>
@@ -121,5 +120,4 @@ namespace gazebo
     /// \}
   }
 }
-
 #endif
