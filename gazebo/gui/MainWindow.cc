@@ -516,7 +516,7 @@ void MainWindow::Save()
       cameraElem->GetElement("view_controller")->Set(
           cam->GetViewControllerTypeString());
 
-      cameraElem->GetElement("projection_type")->Set(cam->GetProjectionType());
+      cameraElem->GetElement("projection_type")->Set(cam->ProjectionType());
 
       // TODO: export track_visual properties as well.
       msgData = sdf_parsed.Root()->ToString("");
