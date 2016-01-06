@@ -139,6 +139,12 @@ release will remove the deprecated code.
     + ***Deprecation:*** public: virtual const float *GetDepthData();
     + ***Replacement:*** public: virtual const float *DepthData() const;
 
+1. **gazebo/rendering/RenderEngine.hh**
+    + ***Deprecation:*** public: unsigned int GetSceneCount() const;
+    + ***Replacement:*** public: unsigned int SceneCount() const;
+    + ***Deprecation:*** public: Ogre::OverlaySystem *GetOverlaySystem() const;
+    + ***Replacement:*** public: Ogre::OverlaySystem *OverlaySystem() const;
+
 1. **gazebo/rendering/GpuLaser.hh**
     + ***Deprecation:*** public: const float *GetLaserData();
     + ***Replacement:*** public: const float *LaserData() const;
