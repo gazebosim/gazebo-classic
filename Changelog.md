@@ -3,6 +3,12 @@
 1. Use opaque pointers for the rendering/Heightmap class.
     * [Pull request #2074](https://bitbucket.org/osrf/gazebo/pull-request/2074)
 
+1. Use opaque pointers in the rendering/GpuLaser class.
+    * [Pull request #2070](https://bitbucket.org/osrf/gazebo/pull-request/2070)
+
+1. Use opaque pointers in the rendering/RenderEngine class.
+    * [Pull request #2071](https://bitbucket.org/osrf/gazebo/pull-request/2071)
+
 1. Use opaque pointers in the gui/Diagnostics class.
     * [Pull request #2037](https://bitbucket.org/osrf/gazebo/pull-request/2037)
 
@@ -307,6 +313,9 @@ using the same arguments used in the command line.
         * [Pull request #2056](https://bitbucket.org/osrf/gazebo/pull-request/2056)
 
 1. Building editor updates
+
+    1. PIMPL opaque pointers for Building Maker
+        * [Pull request #2038](https://bitbucket.org/osrf/gazebo/pull-request/2038)
 
     1. PIMPLize LevelWidget class
         * [Pull request #2041](https://bitbucket.org/osrf/gazebo/pull-request/2041)

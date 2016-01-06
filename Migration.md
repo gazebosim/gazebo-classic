@@ -32,6 +32,12 @@ release will remove the deprecated code.
       will need to switch from `boost::*_pointer_cast` to `std::*_pointer_cast`.
     + [pull request #2079](https://bitbucket.org/osrf/gazebo/pull-request/2079)
 
+1. **gazebo/rendering/GpuLaser.hh**
+    + ***Removed:*** public: void SetCameraCount(double _cameraCount);
+    + ***Replacement:*** public: void SetCameraCount(const unsigned int _cameraCount);
+    + ***Removed:*** public: template<typename T> event::ConnectionPtr ConnectNewLaserFrame(T _subscriber);
+    + ***Replacement:*** public: event::ConnectionPtr ConnectNewLaserFrame(std::function<void (const float *_frame, unsigned int _width, unsigned int _height, unsigned int _depth, const std::string &_format)> _subscriber);
+
 1. **gazebo/rendering/DepthCamera.hh**
     + ***Removed:*** public: template<typename T> event::ConnectionPtr ConnectNewDepthFrame(T _subscriber)
     + ***Replacement:*** public: event::ConnectionPtr ConnectNewDepthFrame(std::function<void (const float *, unsigned int, unsigned int, unsigned int, const std::string &)>  _subscriber);
@@ -155,6 +161,36 @@ release will remove the deprecated code.
     + ***Replacement:*** public: Ogre::TerrainGroup::RayResult MouseHit(CameraPtr _camera, const ignition::math::Vector2i &_mousePos) const;
     + ***Deprecation:*** public: unsigned int GetTerrainSubdivisionCount() const;
     + ***Replacement:*** public: unsigned int TerrainSubdivisionCount() const;
+
+1. **gazebo/rendering/RenderEngine.hh**
+    + ***Deprecation:*** public: unsigned int GetSceneCount() const;
+    + ***Replacement:*** public: unsigned int SceneCount() const;
+    + ***Deprecation:*** public: Ogre::OverlaySystem *GetOverlaySystem() const;
+    + ***Replacement:*** public: Ogre::OverlaySystem *OverlaySystem() const;
+
+1. **gazebo/rendering/GpuLaser.hh**
+    + ***Deprecation:*** public: const float *GetLaserData();
+    + ***Replacement:*** public: const float *LaserData() const;
+    + ***Deprecation:*** public: double GetHorzHalfAngle() const;
+    + ***Replacement:*** public: double HorzHalfAngle() const;
+    + ***Deprecation:*** public: double GetVertHalfAngle() const;
+    + ***Replacement:*** public: double VertHalfAngle() const;
+    + ***Deprecation:*** public: double GetHorzFOV() const;
+    + ***Replacement:*** public: double HorzFOV() const;
+    + ***Deprecation:*** public: double GetCosHorzFOV() const;
+    + ***Replacement:*** public: double CosHorzFOV() const;
+    + ***Deprecation:*** public: double GetVertFOV() const;
+    + ***Replacement:*** public: double VertFOV() const;
+    + ***Deprecation:*** public: double GetCosVertFOV() const;
+    + ***Replacement:*** public: double CosVertFOV() const;
+    + ***Deprecation:*** public: double GetNearClip() const;
+    + ***Replacement:*** public: double NearClip() const;
+    + ***Deprecation:*** public: double GetFarClip() const;
+    + ***Replacement:*** public: double FarClip() const;
+    + ***Deprecation:*** public: double CameraCount() const;
+    + ***Replacement:*** public: unsigned int CameraCount() const;
+    + ***Deprecation:*** public: double GetRayCountRatio() const;
+    + ***Replacement:*** public: double RayCountRatio() const;
 
 1. **gazebo/rendering/DynamicLines.hh**
     + ***Deprecation:*** public: void AddPoint(const math::Vector3 &_pt,const common::Color &_color = common::Color::White)
