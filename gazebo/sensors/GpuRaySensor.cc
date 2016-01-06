@@ -297,7 +297,7 @@ void GpuRaySensor::Init()
 void GpuRaySensor::Fini()
 {
   Sensor::Fini();
-  this->scene->RemoveCamera(this->laserCam->GetName());
+  this->scene->RemoveCamera(this->laserCam->Name());
   this->laserCam.reset();
   this->scene.reset();
 }
