@@ -19,9 +19,9 @@
 #define _GAZEBO_RENDERING_CAMERA_HH_
 
 #include <memory>
+#include <functional>
 
 #include <boost/enable_shared_from_this.hpp>
-#include <boost/function.hpp>
 #include <string>
 #include <utility>
 #include <list>
@@ -812,7 +812,7 @@ namespace gazebo
       /// \deprecated See function that accepts ignition::math parameters.
       public: bool MoveToPositions(const std::vector<math::Pose> &_pts,
                                    double _time,
-                                   boost::function<void()> _onComplete = NULL)
+                                   std::function<void()> _onComplete = NULL)
                                    GAZEBO_DEPRECATED(7.0);
 
       /// \brief Move the camera to a series of poses (this is an
@@ -825,7 +825,7 @@ namespace gazebo
       public: bool MoveToPositions(
                   const std::vector<ignition::math::Pose3d> &_pts,
                   const double _time,
-                  boost::function<void()> _onComplete = NULL);
+                  std::function<void()> _onComplete = NULL);
 
       /// \brief Get the path to saved screenshots.
       /// \return Path to saved screenshots.
@@ -1048,7 +1048,7 @@ namespace gazebo
       protected: common::Time prevAnimTime;
 
       /// \brief User callback for when an animation completes.
-      protected: boost::function<void()> onAnimationComplete;
+      protected: std::function<void()> onAnimationComplete;
 
       /// \internal
       /// \brief Pointer to private data.

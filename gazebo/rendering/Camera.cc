@@ -24,9 +24,7 @@
 #include <sstream>
 
 #include <boost/algorithm/string.hpp>
-#include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
-#include <boost/function.hpp>
 #include <sdf/sdf.hh>
 
 #ifndef _WIN32
@@ -104,15 +102,15 @@ Camera::Camera(const std::string &_name, ScenePtr _scene,
 
   // Connect to the render signal
   this->connections.push_back(
-      event::Events::ConnectPostRender(boost::bind(&Camera::Update, this)));
+      event::Events::ConnectPostRender(std::bind(&Camera::Update, this)));
 
   if (_autoRender)
   {
     this->connections.push_back(event::Events::ConnectRender(
-          boost::bind(&Camera::Render, this, false)));
+          std::bind(&Camera::Render, this, false)));
     this->connections.push_back(
         event::Events::ConnectPostRender(
-          boost::bind(&Camera::PostRender, this)));
+          std::bind(&Camera::PostRender, this)));
   }
 
   this->lastRenderWallTime = common::Time::GetWallTime();
@@ -273,7 +271,7 @@ void Camera::SetScene(ScenePtr _scene)
 //////////////////////////////////////////////////
 void Camera::Update()
 {
-  boost::mutex::scoped_lock lock(this->dataPtr->receiveMutex);
+  std::lock_guard<std::mutex> lock(this->dataPtr->receiveMutex);
 
   // Process all the command messages.
   for (CameraPrivate::CameraCmdMsgs_L::iterator iter =
@@ -1925,7 +1923,7 @@ bool Camera::MoveToPosition(const ignition::math::Pose3d &_pose,
 /////////////////////////////////////////////////
 bool Camera::MoveToPositions(const std::vector<math::Pose> &_pts,
                              const double _time,
-                             boost::function<void()> _onComplete)
+                             std::function<void()> _onComplete)
 {
   std::vector<ignition::math::Pose3d> pts;
   for (auto const p : _pts)
@@ -1937,7 +1935,7 @@ bool Camera::MoveToPositions(const std::vector<math::Pose> &_pts,
 /////////////////////////////////////////////////
 bool Camera::MoveToPositions(const std::vector<ignition::math::Pose3d> &_pts,
                              const double _time,
-                             boost::function<void()> _onComplete)
+                             std::function<void()> _onComplete)
 {
   if (this->animState)
     return false;
@@ -2048,7 +2046,7 @@ bool Camera::Initialized() const
 //////////////////////////////////////////////////
 void Camera::OnCmdMsg(ConstCameraCmdPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(this->dataPtr->receiveMutex);
+  std::lock_guard<std::mutex> lock(this->dataPtr->receiveMutex);
   this->dataPtr->commandMsgs.push_back(_msg);
 }
 
