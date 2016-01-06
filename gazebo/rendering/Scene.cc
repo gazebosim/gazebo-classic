@@ -291,7 +291,7 @@ void Scene::Load(sdf::ElementPtr _sdf)
 void Scene::Load()
 {
   this->dataPtr->initialized = false;
-  Ogre::Root *root = RenderEngine::Instance()->root;
+  Ogre::Root *root = RenderEngine::Instance()->Root();
 
   if (this->dataPtr->manager)
     root->destroySceneManager(this->dataPtr->manager);
@@ -302,7 +302,7 @@ void Scene::Load()
 
 #if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR >= 9
   this->dataPtr->manager->addRenderQueueListener(
-      RenderEngine::Instance()->GetOverlaySystem());
+      RenderEngine::Instance()->OverlaySystem());
 #endif
 }
 

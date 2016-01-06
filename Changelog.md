@@ -3,6 +3,12 @@
 1. Deprecate functions in the rendering/Camera class.
     * [Pull request #2076](https://bitbucket.org/osrf/gazebo/pull-request/2076)
 
+1. Use opaque pointers in the rendering/GpuLaser class.
+    * [Pull request #2070](https://bitbucket.org/osrf/gazebo/pull-request/2070)
+
+1. Use opaque pointers in the rendering/RenderEngine class.
+    * [Pull request #2071](https://bitbucket.org/osrf/gazebo/pull-request/2071)
+
 1. Use opaque pointers in the gui/Diagnostics class.
     * [Pull request #2037](https://bitbucket.org/osrf/gazebo/pull-request/2037)
 
