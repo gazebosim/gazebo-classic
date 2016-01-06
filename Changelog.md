@@ -1,5 +1,11 @@
 ## Gazebo 7.0
 
+1. Use opaque pointers in the gui/Diagnostics class.
+    * [Pull request #2037](https://bitbucket.org/osrf/gazebo/pull-request/2037)
+
+1. Use opaque pointers in the rendering/DepthCamera class.
+    * [Pull request #2069](https://bitbucket.org/osrf/gazebo/pull-request/2069)
+
 1. Use opaque pointers in the rendering library
     * [Pull request #2069](https://bitbucket.org/osrf/gazebo/pull-request/2069)
     * [Pull request #2064](https://bitbucket.org/osrf/gazebo/pull-request/2064)
@@ -25,7 +31,6 @@
     * [Pull request #2065](https://bitbucket.org/osrf/gazebo/pull-request/2065)
     * [Pull request #2067](https://bitbucket.org/osrf/gazebo/pull-request/2067)
     * [Pull request #2079](https://bitbucket.org/osrf/gazebo/pull-request/2079)
-
 
 1. Fix visual transparency issues
     * [Pull request #2031](https://bitbucket.org/osrf/gazebo/pull-request/2031)
