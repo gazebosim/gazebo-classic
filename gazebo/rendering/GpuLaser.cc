@@ -17,6 +17,10 @@
 
 #include <sstream>
 
+#include <ignition/math/Helpers.hh>
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Vector3.hh>
+
 #ifndef _WIN32
   #include <dirent.h>
 #else
@@ -25,10 +29,6 @@
   #include <Winsock2.h>
   #include "gazebo/common/win_dirent.h"
 #endif
-
-#include <ignition/math/Helpers.hh>
-#include <ignition/math/Pose3.hh>
-#include <ignition/math/Vector3.hh>
 
 #include "gazebo/rendering/ogre_gazebo.h"
 
