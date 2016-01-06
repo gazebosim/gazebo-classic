@@ -490,13 +490,13 @@ void Heightmap::Load()
     for (unsigned int i = 0; i < this->dataPtr->scene->GetCameraCount(); ++i)
     {
       this->dataPtr->pageManager->addCamera(
-          this->dataPtr->scene->GetCamera(i)->GetOgreCamera());
+          this->dataPtr->scene->GetCamera(i)->OgreCamera());
     }
     for (unsigned int i = 0; i < this->dataPtr->scene->GetUserCameraCount();
         ++i)
     {
       this->dataPtr->pageManager->addCamera(
-          this->dataPtr->scene->GetUserCamera(i)->GetOgreCamera());
+          this->dataPtr->scene->GetUserCamera(i)->OgreCamera());
     }
 
     this->dataPtr->terrainPaging =
@@ -763,11 +763,11 @@ Ogre::TerrainGroup::RayResult Heightmap::GetMouseHit(CameraPtr _camera,
 Ogre::TerrainGroup::RayResult Heightmap::MouseHit(CameraPtr _camera,
     const ignition::math::Vector2i &_mousePos) const
 {
-  Ogre::Ray mouseRay = _camera->GetOgreCamera()->getCameraToViewportRay(
+  Ogre::Ray mouseRay = _camera->OgreCamera()->getCameraToViewportRay(
       static_cast<float>(_mousePos.X()) /
-      _camera->GetViewport()->getActualWidth(),
+      _camera->OgreViewport()->getActualWidth(),
       static_cast<float>(_mousePos.Y()) /
-      _camera->GetViewport()->getActualHeight());
+      _camera->OgreViewport()->getActualHeight());
 
   // The terrain uses a special ray intersection test.
   return this->dataPtr->terrainGroup->rayIntersects(mouseRay);
