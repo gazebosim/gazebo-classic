@@ -290,6 +290,7 @@ using the same arguments used in the command line.
         * [Pull request #2055](https://bitbucket.org/osrf/gazebo/pull-request/2055)
         * [Pull request #2032](https://bitbucket.org/osrf/gazebo/pull-request/2032)
         * [Pull request #2082](https://bitbucket.org/osrf/gazebo/pull-request/2082)
+        * [Pull request #2038](https://bitbucket.org/osrf/gazebo/pull-request/2038)
 
     1. Use opaque pointers for GrabberHandle, add *LinkedGrabbers functions
         * [Pull request #2034](https://bitbucket.org/osrf/gazebo/pull-request/2034)
