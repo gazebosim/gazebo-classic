@@ -1,20 +1,16 @@
 ## Gazebo 7.0
 
-1. Use opaque pointers in the gui/Diagnostics class.
-    * [Pull request #2037](https://bitbucket.org/osrf/gazebo/pull-request/2037)
-
-1. Use opaque pointers in the rendering/DepthCamera class.
-    * [Pull request #2069](https://bitbucket.org/osrf/gazebo/pull-request/2069)
-
 1. Use opaque pointers in the rendering library
     * [Pull request #2069](https://bitbucket.org/osrf/gazebo/pull-request/2069)
     * [Pull request #2064](https://bitbucket.org/osrf/gazebo/pull-request/2064)
     * [Pull request #2066](https://bitbucket.org/osrf/gazebo/pull-request/2066)
+    * [Pull request #2069](https://bitbucket.org/osrf/gazebo/pull-request/2069)
 
 1. Use opaque pointers for the Master class.
     * [Pull request #2036](https://bitbucket.org/osrf/gazebo/pull-request/2036)
 
 1. Use opaque pointers in the gui library
+    * [Pull request #2037](https://bitbucket.org/osrf/gazebo/pull-request/2037)
     * [Pull request #2052](https://bitbucket.org/osrf/gazebo/pull-request/2052)
     * [Pull request #2053](https://bitbucket.org/osrf/gazebo/pull-request/2053)
     * [Pull request #2028](https://bitbucket.org/osrf/gazebo/pull-request/2028)
@@ -264,12 +260,6 @@ using the same arguments used in the command line.
         * [Pull request #1904](https://bitbucket.org/osrf/gazebo/pull-request/1904)
         * [Issue #1543](https://bitbucket.org/osrf/gazebo/issue/1543)
 
-    1. PIMPL JointInspector
-        * [Pull request #2059](https://bitbucket.org/osrf/gazebo/pull-request/2059)
-
-    1. PIMPL JointMaker
-        * [Pull request #2087](https://bitbucket.org/osrf/gazebo/pull-request/2087)
-
     1. Apply inspector changes in real time and add reset button
         * [Pull request #1945](https://bitbucket.org/osrf/gazebo/pull-request/1945)
         * [Issue #1472](https://bitbucket.org/osrf/gazebo/issue/1472)
@@ -287,8 +277,10 @@ using the same arguments used in the command line.
     1. Added joint creation dialog
         * [Pull request #2021](https://bitbucket.org/osrf/gazebo/pull-request/2021)
 
-    1. PIMPL LinkInspector
+    1. Use opaque pointers in the model editor
         * [Pull request #2056](https://bitbucket.org/osrf/gazebo/pull-request/2056)
+        * [Pull request #2059](https://bitbucket.org/osrf/gazebo/pull-request/2059)
+        * [Pull request #2087](https://bitbucket.org/osrf/gazebo/pull-request/2087)
 
 1. Building editor updates
 
