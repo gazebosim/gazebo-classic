@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-
 #ifndef _GAZEBO_GUI_DIAGNOSTICS_HH_
 #define _GAZEBO_GUI_DIAGNOSTICS_HH_
 
@@ -28,6 +27,7 @@ namespace gazebo
 {
   namespace gui
   {
+    // Forward declare private data class
     class DiagnosticsPrivate;
 
     /// \brief Plot diagnostic information

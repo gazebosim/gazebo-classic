@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_GUI_DIAGNOSTICS_PRIVATE_HH_
-#define _GAZEBO_GUI_DIAGNOSTICS_PRIVATE_HH_
+#ifndef _GAZEBO_GUI_DIAGNOSTICSPRIVATE_HH_
+#define _GAZEBO_GUI_DIAGNOSTICSPRIVATE_HH_
 
 #include <list>
 #include <map>
