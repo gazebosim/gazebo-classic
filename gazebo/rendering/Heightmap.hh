@@ -14,24 +14,21 @@
  * limitations under the License.
  *
 */
-
 #ifndef _GAZEBO_RENDERING_HEIGHTMAP_HH_
 #define _GAZEBO_RENDERING_HEIGHTMAP_HH_
 
-#include <memory>
-#include <string>
 #include <vector>
+#include <string>
 
 #include <ignition/math/Vector2.hh>
 #include <ignition/math/Vector3.hh>
 
 #include "gazebo/msgs/MessageTypes.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/common/CommonTypes.hh"
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Vector2d.hh"
 #include "gazebo/math/Vector2i.hh"
 #include "gazebo/rendering/ogre_gazebo.h"
-#include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/util/system.hh"
 
 namespace boost
@@ -59,42 +56,6 @@ namespace gazebo
   {
     // Forward declare private data.
     class HeightmapPrivate;
-
-    class GzTerrainMatGen;
-
-    /// \class DummyPageProvider Heightmap.hh rendering/rendering.hh
-    /// \brief Pretends to provide procedural page content to avoid page loading
-    class GZ_RENDERING_VISIBLE DummyPageProvider : public Ogre::PageProvider
-    {
-      /// \brief Give a provider the opportunity to prepare page content
-      /// procedurally. The parameters are not used.
-      public: bool prepareProceduralPage(Ogre::Page*, Ogre::PagedWorldSection*)
-      {
-        return true;
-      }
-
-      /// \brief Give a provider the opportunity to load page content
-      /// procedurally. The parameters are not used.
-      public: bool loadProceduralPage(Ogre::Page*, Ogre::PagedWorldSection*)
-      {
-        return true;
-      }
-
-      /// \brief Give a provider the opportunity to unload page content
-      /// procedurally. The parameters are not used.
-      public: bool unloadProceduralPage(Ogre::Page*, Ogre::PagedWorldSection*)
-      {
-        return true;
-      }
-
-      /// \brief Give a provider the opportunity to unprepare page content
-      /// procedurally. The parameters are not used.
-      public:
-          bool unprepareProceduralPage(Ogre::Page*, Ogre::PagedWorldSection*)
-      {
-        return true;
-      }
-    };
 
     /// \addtogroup gazebo_rendering
     /// \{
@@ -372,195 +333,6 @@ namespace gazebo
       private: std::unique_ptr<HeightmapPrivate> dataPtr;
     };
     /// \}
-
-    /// \internal
-    /// \brief Custom terrain material generator for GLSL terrains.
-    /// A custom material generator that lets Gazebo use GLSL shaders
-    /// (as opposed to the default Cg shaders provided by Ogre) for rendering
-    /// terrain.
-    class GZ_RENDERING_VISIBLE GzTerrainMatGen
-      : public Ogre::TerrainMaterialGeneratorA
-    {
-      /// \brief Constructor
-      public: GzTerrainMatGen();
-
-      /// \brief Destructor
-      public: virtual ~GzTerrainMatGen();
-
-      /// \brief Shader model 2 profile target.
-      public: class SM2Profile :
-              public Ogre::TerrainMaterialGeneratorA::SM2Profile
-      {
-        /// \brief Constructor
-        public: SM2Profile(Ogre::TerrainMaterialGenerator *_parent,
-                    const Ogre::String &_name, const Ogre::String &_desc);
-
-        /// \brief Destructor
-        public: virtual ~SM2Profile();
-
-        public: Ogre::MaterialPtr generate(const Ogre::Terrain *_terrain);
-
-        public: Ogre::MaterialPtr generateForCompositeMap(
-                    const Ogre::Terrain *_terrain);
-
-        public: void UpdateParams(const Ogre::MaterialPtr &_mat,
-                                  const Ogre::Terrain *_terrain);
-
-        public: void UpdateParamsForCompositeMap(const Ogre::MaterialPtr &_mat,
-                                                 const Ogre::Terrain *_terrain);
-
-        protected: virtual void addTechnique(const Ogre::MaterialPtr &_mat,
-                       const Ogre::Terrain *_terrain, TechniqueType _tt);
-
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Woverloaded-virtual"
-#endif  // ifdef __clang__
-        /// \brief Utility class to help with generating shaders for GLSL.
-        /// The class contains a collection of functions that are used to
-        /// dynamically generate a complete vertex or fragment shader program
-        /// in a string format.
-        protected: class ShaderHelperGLSL :
-            public Ogre::TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSL
-        {
-          public: virtual Ogre::HighLevelGpuProgramPtr generateVertexProgram(
-                      const SM2Profile *_prof, const Ogre::Terrain *_terrain,
-                      TechniqueType _tt);
-
-          public: virtual Ogre::HighLevelGpuProgramPtr generateFragmentProgram(
-                      const SM2Profile *_prof, const Ogre::Terrain *_terrain,
-                      TechniqueType _tt);
-
-          public: virtual void updateParams(const SM2Profile *_prof,
-                      const Ogre::MaterialPtr &_mat,
-                      const Ogre::Terrain *_terrain, bool _compositeMap);
-
-          protected: virtual void generateVpHeader(const SM2Profile *_prof,
-                         const Ogre::Terrain *_terrain, TechniqueType _tt,
-                         Ogre::StringStream &_outStream);
-
-          protected: virtual void generateVpFooter(const SM2Profile *_prof,
-                         const Ogre::Terrain *_terrain, TechniqueType _tt,
-                         Ogre::StringStream &_outStream);
-
-          protected: virtual void generateVertexProgramSource(
-                         const SM2Profile *_prof, const Ogre::Terrain *_terrain,
-                         TechniqueType _tt,
-                         Ogre::StringStream &_outStream);
-
-          protected: virtual void defaultVpParams(const SM2Profile *_prof,
-                         const Ogre::Terrain *_terrain, TechniqueType _tt,
-                         const Ogre::HighLevelGpuProgramPtr &_prog);
-
-          protected: virtual unsigned int generateVpDynamicShadowsParams(
-                         unsigned int _texCoordStart, const SM2Profile *_prof,
-                         const Ogre::Terrain *_terrain, TechniqueType _tt,
-                         Ogre::StringStream &_outStream);
-
-          protected: virtual void generateVpDynamicShadows(
-                         const SM2Profile *_prof, const Ogre::Terrain *_terrain,
-                         TechniqueType _tt,
-                         Ogre::StringStream &_outStream);
-
-          protected: virtual void generateFpHeader(const SM2Profile *_prof,
-                         const Ogre::Terrain *_terrain,
-                         TechniqueType tt,
-                         Ogre::StringStream &_outStream);
-
-          protected: virtual void generateFpLayer(const SM2Profile *_prof,
-                         const Ogre::Terrain *_terrain, TechniqueType tt,
-                         Ogre::uint _layer,
-                         Ogre::StringStream &_outStream);
-
-          protected: virtual void generateFpFooter(const SM2Profile *_prof,
-                         const Ogre::Terrain *_terrain,
-                         TechniqueType tt,
-                         Ogre::StringStream &_outStream);
-
-          protected: virtual void generateFpDynamicShadowsParams(
-                         Ogre::uint *_texCoord, Ogre::uint *_sampler,
-                         const SM2Profile *_prof, const Ogre::Terrain *_terrain,
-                         TechniqueType _tt,
-                         Ogre::StringStream &_outStream);
-
-          protected: virtual void generateFpDynamicShadowsHelpers(
-                         const SM2Profile *_prof,
-                         const Ogre::Terrain *_terrain,
-                         TechniqueType tt,
-                         Ogre::StringStream &_outStream);
-
-          protected: void generateFpDynamicShadows(const SM2Profile *_prof,
-                         const Ogre::Terrain *_terrain, TechniqueType _tt,
-                         Ogre::StringStream &_outStream);
-
-          protected: virtual void generateFragmentProgramSource(
-                         const SM2Profile *_prof,
-                         const Ogre::Terrain *_terrain,
-                         TechniqueType _tt,
-                         Ogre::StringStream &_outStream);
-
-          protected: virtual void updateVpParams(const SM2Profile *_prof,
-                         const Ogre::Terrain *_terrain, TechniqueType _tt,
-                         const Ogre::GpuProgramParametersSharedPtr &_params);
-
-          private: Ogre::String GetChannel(Ogre::uint _idx);
-        };
-
-        // Needed to allow access from ShaderHelperGLSL to protected members
-        // of SM2Profile.
-        friend ShaderHelperGLSL;
-
-        /// Keeping the CG shader for reference.
-        /// \brief Utility class to help with generating shaders for Cg / HLSL.
-        /// Original implementation from Ogre that generates Cg shaders
-        protected: class ShaderHelperCg :
-            public Ogre::TerrainMaterialGeneratorA::SM2Profile::ShaderHelperCg
-        {
-          public: virtual Ogre::HighLevelGpuProgramPtr generateFragmentProgram(
-                      const SM2Profile *_prof, const Ogre::Terrain *_terrain,
-                      TechniqueType _tt);
-
-          public: virtual Ogre::HighLevelGpuProgramPtr generateVertexProgram(
-                      const SM2Profile *_prof, const Ogre::Terrain *_terrain,
-                      TechniqueType _tt);
-
-          protected: virtual void generateVpHeader(const SM2Profile *_prof,
-                         const Ogre::Terrain *_terrain, TechniqueType _tt,
-                         Ogre::StringStream &_outStream);
-
-          protected: virtual void generateVpFooter(const SM2Profile *_prof,
-                         const Ogre::Terrain *_terrain, TechniqueType _tt,
-                         Ogre::StringStream &_outStream);
-
-          protected: virtual void generateVertexProgramSource(
-                         const SM2Profile *_prof, const Ogre::Terrain *_terrain,
-                         TechniqueType _tt,
-                         Ogre::StringStream &_outStream);
-
-          protected: virtual void defaultVpParams(const SM2Profile *_prof,
-                         const Ogre::Terrain *_terrain, TechniqueType _tt,
-                         const Ogre::HighLevelGpuProgramPtr &_prog);
-
-          protected: virtual unsigned int generateVpDynamicShadowsParams(
-                         unsigned int _texCoordStart, const SM2Profile *_prof,
-                         const Ogre::Terrain *_terrain, TechniqueType _tt,
-                         Ogre::StringStream &_outStream);
-
-          protected: virtual void generateVpDynamicShadows(
-                         const SM2Profile *_prof, const Ogre::Terrain *_terrain,
-                         TechniqueType _tt,
-                         Ogre::StringStream &_outStream);
-        };
-
-        // Needed to allow access from ShaderHelperCg to protected members
-        // of SM2Profile.
-        friend ShaderHelperCg;
-
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif  // ifdef __clang__
-      };
-    };
   }
 }
 #endif

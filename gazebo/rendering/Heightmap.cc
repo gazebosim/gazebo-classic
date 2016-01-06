@@ -21,6 +21,8 @@
   #include <Winsock2.h>
 #endif
 
+#include <memory>
+
 #include <string.h>
 #include <math.h>
 
@@ -37,10 +39,11 @@
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/Light.hh"
 #include "gazebo/rendering/Conversions.hh"
-#include "gazebo/rendering/Heightmap.hh"
-#include "gazebo/rendering/HeightmapPrivate.hh"
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/RenderEngine.hh"
+
+#include "gazebo/rendering/Heightmap.hh"
+#include "gazebo/rendering/HeightmapPrivate.hh"
 
 using namespace gazebo;
 using namespace rendering;
