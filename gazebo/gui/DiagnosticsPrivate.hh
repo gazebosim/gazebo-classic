@@ -35,7 +35,7 @@ namespace gazebo
     class DiagnosticsPrivate
     {
       /// \def PointMap
-      public: using PointMap = std::map<QString, std::list<QPointF>>;
+      public: using PointMap = std::map<QString, std::list<QPointF> >;
 
       /// \brief Node for communications.
       public: transport::NodePtr node;

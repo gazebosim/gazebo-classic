@@ -305,6 +305,9 @@ using the same arguments used in the command line.
 
 1. Building editor updates
 
+    1. PIMPL opaque pointers for Building Maker
+        * [Pull request #2038](https://bitbucket.org/osrf/gazebo/pull-request/2038)
+
     1. PIMPLize LevelWidget class
         * [Pull request #2041](https://bitbucket.org/osrf/gazebo/pull-request/2041)
 
