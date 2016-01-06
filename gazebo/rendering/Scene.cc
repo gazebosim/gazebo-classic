@@ -1163,9 +1163,12 @@ Ogre::Entity *Scene::OgreEntityAt(CameraPtr _camera,
       // Get the mesh information
       this->MeshInformation(ogreEntity->getMesh().get(), vertex_count,
           vertices, index_count, indices,
-          ogreEntity->getParentNode()->_getDerivedPosition(),
-          ogreEntity->getParentNode()->_getDerivedOrientation(),
-          ogreEntity->getParentNode()->_getDerivedScale());
+          Conversions::ConvertIgn(
+            ogreEntity->getParentNode()->_getDerivedPosition()),
+          Conversions::ConvertIgn(
+          ogreEntity->getParentNode()->_getDerivedOrientation()),
+          Conversions::ConvertIgn(
+          ogreEntity->getParentNode()->_getDerivedScale()));
 
       bool new_closest_found = false;
       for (int i = 0; i < static_cast<int>(index_count); i += 3)
@@ -1269,9 +1272,12 @@ bool Scene::FirstContact(CameraPtr _camera,
       // Get the mesh information
       this->MeshInformation(ogreEntity->getMesh().get(), vertexCount,
           vertices, indexCount, indices,
-          ogreEntity->getParentNode()->_getDerivedPosition(),
-          ogreEntity->getParentNode()->_getDerivedOrientation(),
-          ogreEntity->getParentNode()->_getDerivedScale());
+          Conversions::ConvertIgn(
+          ogreEntity->getParentNode()->_getDerivedPosition()),
+          Conversions::ConvertIgn(
+          ogreEntity->getParentNode()->_getDerivedOrientation()),
+          Conversions::ConvertIgn(
+          ogreEntity->getParentNode()->_getDerivedScale()));
 
       for (int i = 0; i < static_cast<int>(indexCount); i += 3)
       {
@@ -1483,9 +1489,9 @@ void Scene::MeshInformation(const Ogre::Mesh *_mesh,
                             Ogre::Vector3* &_vertices,
                             size_t &_index_count,
                             uint64_t* &_indices,
-                            const Ogre::Vector3 &_position,
-                            const Ogre::Quaternion &_orient,
-                            const Ogre::Vector3 &_scale)
+                            const ignition::math::Vector3d &_position,
+                            const ignition::math::Quaterniond &_orient,
+                            const ignition::math::Vector3d &_scale)
 {
   bool added_shared = false;
   size_t current_offset = 0;
@@ -1561,8 +1567,9 @@ void Scene::MeshInformation(const Ogre::Mesh *_mesh,
            ++j, vertex += vbuf->getVertexSize())
       {
         posElem->baseVertexPointerToElement(vertex, &pReal);
-        Ogre::Vector3 pt(pReal[0], pReal[1], pReal[2]);
-        _vertices[current_offset + j] = (_orient * (pt * _scale)) + _position;
+        ignition::math::Vector3d pt(pReal[0], pReal[1], pReal[2]);
+        _vertices[current_offset + j] =
+            Conversions::Convert((_orient * (pt * _scale)) + _position);
       }
 
       vbuf->unlock();
@@ -3246,7 +3253,7 @@ void Scene::RemoveLight(LightPtr _light)
 }
 
 /////////////////////////////////////////////////
-void Scene::SetGrid(bool _enabled)
+void Scene::SetGrid(const bool _enabled)
 {
   if (_enabled && this->dataPtr->grids.empty())
   {
@@ -3268,7 +3275,7 @@ void Scene::SetGrid(bool _enabled)
 }
 
 /////////////////////////////////////////////////
-void Scene::ShowOrigin(bool _show)
+void Scene::ShowOrigin(const bool _show)
 {
   this->dataPtr->originVisual->SetVisible(_show);
 }

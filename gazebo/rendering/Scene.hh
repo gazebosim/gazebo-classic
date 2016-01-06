@@ -528,11 +528,11 @@ namespace gazebo
 
       /// \brief Set the grid on or off
       /// \param[in] _enabled Set to true to turn on the grid
-      public: void SetGrid(bool _enabled);
+      public: void SetGrid(const bool _enabled);
 
       /// \brief Show/hide the world origin indicator.
       /// \param[in] _show True to show the origin.
-      public: void ShowOrigin(bool _show);
+      public: void ShowOrigin(const bool _show);
 
       /// \brief Get the top level world visual.
       /// \return Pointer to the world visual.
@@ -615,7 +615,7 @@ namespace gazebo
       /// clouds and moon.
       /// \param[in] _mode SkyX mode bitmask.
       /// \sa Scene::SkyXMode
-      public: void SetSkyXMode(unsigned int _mode);
+      public: void SetSkyXMode(const unsigned int _mode);
 
       /// \brief Get the sky in the scene.
       /// \return Pointer to the sky.
@@ -694,9 +694,9 @@ namespace gazebo
                                     Ogre::Vector3* &_vertices,
                                     size_t &_indexCount,
                                     uint64_t* &_indices,
-                                    const Ogre::Vector3 &_position,
-                                    const Ogre::Quaternion &_orient,
-                                    const Ogre::Vector3 &_scale);
+                                    const ignition::math::Vector3d &_position,
+                                    const ignition::math::Quaterniond &_orient,
+                                    const ignition::math::Vector3d &_scale);
 
       /// \brief Print scene graph.
       /// \param[in] _prefix String to prefix each line of output with.
