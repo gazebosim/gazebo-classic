@@ -1,7 +1,7 @@
 ## Gazebo 7.0
 
 1. Deprecate functions in the rendering/Scene class.
-    * [Pull request #](https://bitbucket.org/osrf/gazebo/pull-request/)
+    * [Pull request #2084](https://bitbucket.org/osrf/gazebo/pull-request/2084)
 
 1. Use opaque pointers in the rendering/DepthCamera class.
     * [Pull request #2069](https://bitbucket.org/osrf/gazebo/pull-request/2069)
