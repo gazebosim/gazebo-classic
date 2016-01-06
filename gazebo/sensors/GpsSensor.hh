@@ -23,15 +23,16 @@
 
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/common/CommonTypes.hh"
-#include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/sensors/SensorTypes.hh"
-#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace sensors
   {
+    // Forward declare private data class
+    class GpsSensorPrivate;
+
     /// \addtogroup gazebo_sensors
     /// \{
 
@@ -71,22 +72,16 @@ namespace gazebo
 
       /// \brief Accessor for current altitude
       /// \return Current altitude above sea level.
-      public: double GetAltitude() const;
+      /// \deprecated See Altitude()
+      public: double GetAltitude() const GAZEBO_DEPRECATED(7.0);
 
-      /// \brief GPS data publisher.
-      private: transport::PublisherPtr gpsPub;
+      /// \brief Accessor for current altitude
+      /// \return Current altitude above sea level.
+      public: double Altitude() const;
 
-      /// \brief Topic name for GPS data publisher.
-      private: std::string topicName;
-
-      /// \brief Parent link of this sensor.
-      private: physics::LinkPtr parentLink;
-
-      /// \brief Pointer to SphericalCoordinates converter.
-      private: common::SphericalCoordinatesPtr sphericalCoordinates;
-
-      /// \brief Stores most recent GPS sensor data.
-      private: msgs::GPS lastGpsMsg;
+      /// \internal
+      /// \brief Private data pointer
+      private: std::unique_ptr<GpsSensorPrivate> dataPtr;
     };
     /// \}
   }

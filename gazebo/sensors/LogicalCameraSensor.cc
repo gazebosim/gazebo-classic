@@ -55,7 +55,8 @@ void LogicalCameraSensor::Load(const std::string &_worldName,
 
   // Get a pointer to the parent link. This will be used to adjust the
   // orientation of the logical camera.
-  physics::EntityPtr parentEntity = this->world->GetEntity(this->parentName);
+  physics::EntityPtr parentEntity =
+    this->world->GetEntity(this->ParentName());
   this->dataPtr->parentLink =
     boost::dynamic_pointer_cast<physics::Link>(parentEntity);
 
@@ -66,7 +67,7 @@ void LogicalCameraSensor::Load(const std::string &_worldName,
 //////////////////////////////////////////////////
 std::string LogicalCameraSensor::GetTopic() const
 {
-  std::string topicName = "~/" + this->parentName + "/" + this->GetName() +
+  std::string topicName = "~/" + this->ParentName() + "/" + this->Name() +
     "/models";
   boost::replace_all(topicName, "::", "/");
 
@@ -79,8 +80,8 @@ void LogicalCameraSensor::Load(const std::string &_worldName)
   Sensor::Load(_worldName);
 
   // Create publisher of the logical camera images
-  this->dataPtr->pub = this->node->Advertise<msgs::LogicalCameraImage>(
-      this->GetTopic(), 50);
+  this->dataPtr->pub =
+    this->node->Advertise<msgs::LogicalCameraImage>(this->Topic(), 50);
 }
 
 //////////////////////////////////////////////////
@@ -89,7 +90,8 @@ void LogicalCameraSensor::Init()
   // Read configuration values
   if (this->sdf->HasElement("logical_camera"))
   {
-    sdf::ElementPtr cameraSdf = this->sdf->GetElement("logical_camera");
+    sdf::ElementPtr cameraSdf =
+      this->sdf->GetElement("logical_camera");
 
     // These values are required in SDF, so no need to check for their
     // existence.

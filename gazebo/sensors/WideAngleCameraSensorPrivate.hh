@@ -20,6 +20,7 @@
 #include <mutex>
 #include <queue>
 
+#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/msgs/MessageTypes.hh"
 
 namespace gazebo
