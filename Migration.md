@@ -133,6 +133,12 @@ release will remove the deprecated code.
     + ***Deprecation:*** public: virtual const float *GetDepthData();
     + ***Replacement:*** public: virtual const float *DepthData() const;
 
+1. **gazebo/rendering/RenderEngine.hh**
+    + ***Deprecation:*** public: unsigned int GetSceneCount() const;
+    + ***Replacement:*** public: unsigned int SceneCount() const;
+    + ***Deprecation:*** public: Ogre::OverlaySystem *GetOverlaySystem() const;
+    + ***Replacement:*** public: Ogre::OverlaySystem *OverlaySystem() const;
+
 1. **gazebo/rendering/DynamicLines.hh**
     + ***Deprecation:*** public: void AddPoint(const math::Vector3 &_pt,const common::Color &_color = common::Color::White)
     + ***Replacement:*** public: void AddPoint(const ignition::math::Vector3d &_pt,const common::Color &_color = common::Color::White);
