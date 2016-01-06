@@ -22,8 +22,8 @@
 #include <vector>
 #include <boost/filesystem.hpp>
 
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Vector2d.hh"
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/rendering/RenderTypes.hh"
 
 namespace Ogre
