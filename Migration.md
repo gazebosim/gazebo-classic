@@ -24,6 +24,14 @@ release will remove the deprecated code.
 
 ### Modifications
 
+1. **gazebo/sensor/SensorTypes.hh**
+    + All `typedef`'s of `shared_ptr`'s to Sensor's are changed
+      from `boost::shared_ptr` to `std::shared_ptr`.
+      Any downstream code that does a pointer cast
+      (such as `dynamic_pointer_cast` or `static_pointer_cast`)
+      will need to switch from `boost::*_pointer_cast` to `std::*_pointer_cast`.
+    + [pull request #2079](https://bitbucket.org/osrf/gazebo/pull-request/2079)
+
 1. **gazebo/rendering/DepthCamera.hh**
     + ***Removed:*** public: template<typename T> event::ConnectionPtr ConnectNewDepthFrame(T _subscriber)
     + ***Replacement:*** public: event::ConnectionPtr ConnectNewDepthFrame(std::function<void (const float *, unsigned int, unsigned int, unsigned int, const std::string &)>  _subscriber);
