@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_RAYSENSOR_HH_
-#define _GAZEBO_RAYSENSOR_HH_
+#ifndef _GAZEBO_SENSORS_RAYSENSOR_HH_
+#define _GAZEBO_SENSORS_RAYSENSOR_HH_
 
 #include <vector>
 #include <string>
@@ -61,7 +61,7 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited
-      protected: virtual bool UpdateImpl(bool _force);
+      protected: virtual bool UpdateImpl(const bool _force);
 
       // Documentation inherited
       protected: virtual void Fini();
@@ -164,7 +164,7 @@ namespace gazebo
               {return this->laserShape;}
 
       // Documentation inherited
-      public: virtual bool IsActive();
+      public: virtual bool IsActive() const;
 
       private: physics::CollisionPtr laserCollision;
       private: physics::MultiRayShapePtr laserShape;
