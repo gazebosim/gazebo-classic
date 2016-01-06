@@ -3,6 +3,9 @@
 1. Use opaque pointers in the rendering/RenderEngine class.
     * [Pull request #2071](https://bitbucket.org/osrf/gazebo/pull-request/2071)
 
+1. Use opaque pointers in the gui/Diagnostics class.
+    * [Pull request #2037](https://bitbucket.org/osrf/gazebo/pull-request/2037)
+
 1. Use opaque pointers in the rendering/DepthCamera class.
     * [Pull request #2069](https://bitbucket.org/osrf/gazebo/pull-request/2069)
 
