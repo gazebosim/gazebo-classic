@@ -122,7 +122,7 @@ void NoNoise(sensors::NoisePtr _noise, unsigned int _count)
 void GaussianNoise(sensors::NoisePtr _noise, unsigned int _count)
 {
   sensors::GaussianNoiseModelPtr noiseModel =
-      boost::dynamic_pointer_cast<sensors::GaussianNoiseModel>(_noise);
+      std::dynamic_pointer_cast<sensors::GaussianNoiseModel>(_noise);
 
   ASSERT_TRUE(noiseModel != NULL);
 
@@ -194,7 +194,7 @@ TEST_F(NoiseTest, ApplyGaussian)
     sensors::NoisePtr noise = sensors::NoiseFactory::NewNoiseModel(
         NoiseSdf("gaussian", mean, stddev, biasMean, biasStddev, 0));
     sensors::GaussianNoiseModelPtr gaussianNoise =
-      boost::dynamic_pointer_cast<sensors::GaussianNoiseModel>(noise);
+      std::dynamic_pointer_cast<sensors::GaussianNoiseModel>(noise);
     EXPECT_NEAR(gaussianNoise->GetBias(), 0.0, 1e-6);
     GaussianNoise(noise, g_applyCount);
   }
@@ -225,7 +225,7 @@ TEST_F(NoiseTest, ApplyGaussian)
       sensors::NoisePtr noise = sensors::NoiseFactory::NewNoiseModel(
           NoiseSdf("gaussian", mean, stddev, biasMean, biasStddev, 0));
       sensors::GaussianNoiseModelPtr gaussianNoise =
-        boost::dynamic_pointer_cast<sensors::GaussianNoiseModel>(noise);
+        std::dynamic_pointer_cast<sensors::GaussianNoiseModel>(noise);
       acc(gaussianNoise->GetBias());
     }
 
@@ -271,7 +271,7 @@ TEST_F(NoiseTest, ApplyGaussianQuantized)
         NoiseSdf("gaussian_quantized", mean, stddev, biasMean,
         biasStddev, precision));
     sensors::GaussianNoiseModelPtr gaussianNoise =
-      boost::dynamic_pointer_cast<sensors::GaussianNoiseModel>(noise);
+      std::dynamic_pointer_cast<sensors::GaussianNoiseModel>(noise);
     EXPECT_NEAR(gaussianNoise->GetBias(), 0.0, 1e-6);
 
     GaussianNoise(noise, g_applyCount);
@@ -309,7 +309,7 @@ TEST_F(NoiseTest, ApplyGaussianQuantized)
           NoiseSdf("gaussian_quantized", mean, stddev, biasMean,
           biasStddev, precision));
       sensors::GaussianNoiseModelPtr gaussianNoise =
-        boost::dynamic_pointer_cast<sensors::GaussianNoiseModel>(noise);
+        std::dynamic_pointer_cast<sensors::GaussianNoiseModel>(noise);
       acc(gaussianNoise->GetBias());
     }
 
