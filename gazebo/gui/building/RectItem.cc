@@ -238,7 +238,7 @@ bool RectItem::RotateEventFilter(RotateHandle *_rotate, QEvent *_event)
   if (!mouseEvent)
     return false;
 
-  if (_rotate->GetMouseState()
+  if (_rotate->MouseState()
       == static_cast<int>(QEvent::GraphicsSceneMouseMove))
   {
     QPoint localCenter(this->drawingOriginX, this->drawingOriginY);
