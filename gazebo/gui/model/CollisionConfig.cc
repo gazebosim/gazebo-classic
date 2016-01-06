@@ -248,16 +248,13 @@ void CollisionConfig::AddCollision(const std::string &_name,
   configData->widget = item;
   configData->name = _name;
 
-  connect(headerButton, SIGNAL(toggled(bool)), configData,
-           SLOT(OnToggleItem(bool)));
+  this->connect(headerButton, SIGNAL(toggled(bool)), configData,
+      SLOT(OnToggleItem(bool)));
 
-  connect(headerButton, SIGNAL(toggled(bool)),
-      configData, SLOT(OnToggleItem(bool)));
+  this->connect(configWidget, SIGNAL(GeometryChanged()), configData,
+      SLOT(OnGeometryChanged()));
 
-  connect(configWidget, SIGNAL(GeometryChanged()),
-      configData, SLOT(OnGeometryChanged()));
-
-  connect(configData, SIGNAL(CollisionChanged(
+  this->connect(configData, SIGNAL(CollisionChanged(
       const std::string &, const std::string &)),
       this, SLOT(OnCollisionChanged(
       const std::string &, const std::string &)));

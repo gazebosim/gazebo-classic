@@ -85,8 +85,9 @@ namespace gazebo
 
       /// \brief Computes mass moment of inertia of associated link.
       /// \param[in] _mass Mass of the link.
-      /// \return The inertia matrix.
-      private: ignition::math::Vector3d ComputeInertia(double _mass) const;
+      /// \return Vector containing principal moments of inertia.
+      private: ignition::math::Vector3d ComputeInertia(
+          const double _mass) const;
 
       /// \brief Set the item name.
       /// \param[in] _name Name to set to.
@@ -113,11 +114,11 @@ namespace gazebo
 
       /// \brief Callback for density changes in link config.
       /// \param[in] _value The new density value.
-      private slots: void OnDensityValueChanged(const double &_value);
+      private slots: void OnDensityValueChanged(const double _value);
 
       /// \brief Callback for mass changes in link config.
       /// \param[in] _value The new mass value.
-      private slots: void OnMassValueChanged(const double &_value);
+      private slots: void OnMassValueChanged(const double _value);
 
       /// \brief Callback for changes to collisions.
       /// \param[in] _name Name of the collision.

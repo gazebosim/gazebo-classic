@@ -727,7 +727,7 @@ double LinkData::ComputeVolume(const msgs::Collision &_collision)
 
 /////////////////////////////////////////////////
 ignition::math::Vector3d LinkData::ComputeMomentOfInertia(
-    const msgs::Collision &_collision, double _mass)
+    const msgs::Collision &_collision, const double _mass)
 {
   ignition::math::Vector3d result;
   result.Set(0, 0, 0);

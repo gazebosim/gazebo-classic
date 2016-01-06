@@ -107,11 +107,11 @@ namespace gazebo
 
       /// \brief Callback when the geometry type is changed.
       /// \param[in] _text New geometry type in string.
-      private slots: void OnGeometryTypeChanged(const QString _text);
+      private slots: void OnGeometryTypeChanged(const QString &_text);
 
       /// \brief Callback when geometry size changes.
       /// \param[in] _value Size value that changed.
-      private slots: void OnGeometrySizeChanged(double _value);
+      private slots: void OnGeometrySizeChanged(const double _value);
 
       /// \brief Callback when the file button is clicked.
       private slots: void OnSelectFile();
@@ -128,7 +128,7 @@ namespace gazebo
 
       /// \brief Updates the widget's density value.
       /// \param[in] _density New density value.
-      public: void SetDensity(double _density);
+      public: void SetDensity(const double _density);
 
       /// \brief Accessor for the widget's density value.
       /// \return The density.
@@ -136,23 +136,23 @@ namespace gazebo
 
       /// \brief Callback when the density combo box is changed.
       /// \param[in] _text New density type in string.
-      private slots: void OnComboBoxChanged(const QString _text);
+      private slots: void OnComboBoxChanged(const QString &_text);
 
       /// \brief Callback when the density spin box is changed.
       /// \param[in] _text New density value in string.
-      private slots: void OnSpinBoxChanged(const QString _text);
+      private slots: void OnSpinBoxChanged(const QString &_text);
 
       /// \brief Signal emitted when density has changed.
       /// \param[in] _value Density value.
       Q_SIGNALS: void DensityValueChanged(const double &_value);
 
-      /// \brief A combo box for selecting a material density
+      /// \brief A combo box for selecting a material density.
       public: QComboBox *comboBox;
 
-      /// \brief A spin box for entering a density value
+      /// \brief A spin box for entering a density value.
       public: QDoubleSpinBox *spinBox;
 
-      /// \brief Current density value
+      /// \brief Current density value.
       private: double density;
     };
 
@@ -400,7 +400,7 @@ namespace gazebo
       /// \param[in] _value Density value to set to.
       /// \return True if the value is set successfully.
       public: bool SetDensityWidgetValue(const std::string &_name,
-          double _value);
+          const double _value);
 
       /// \brief Set an enum value to a child widget.
       /// \param[in] _name Name of the child widget.
@@ -813,7 +813,7 @@ namespace gazebo
       /// \param[in] _value Density value.
       /// \return True if the update completed successfully.
       private: bool UpdateDensityWidget(ConfigChildWidget *_widget,
-          double _value);
+          const double _value);
 
       /// \brief Get an integer value from a child widget.
       /// \param[in] _widget Pointer to the child widget.
@@ -994,7 +994,7 @@ namespace gazebo
 
       /// \brief Callback when mass value changes in child widget.
       /// \param[in] _value Mass value.
-      private slots: void OnMassValueChanged(double _value);
+      private slots: void OnMassValueChanged(const double _value);
 
       /// \brief Callback when geometry changes.
       private slots: void OnGeometryChanged();

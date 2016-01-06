@@ -467,7 +467,7 @@ bool ConfigWidget::SetGeometryWidgetValue(const std::string &_name,
 
 /////////////////////////////////////////////////
 bool ConfigWidget::SetDensityWidgetValue(const std::string &_name,
-    double _value)
+    const double _value)
 {
   auto iter = this->dataPtr->configWidgets.find(_name);
 
@@ -1998,11 +1998,11 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   connect(geometryComboBox, SIGNAL(currentIndexChanged(const QString)),
       widget, SLOT(OnGeometryTypeChanged(const QString)));
 
-  connect(geomFilenameButton, SIGNAL(clicked()),
-      widget, SLOT(OnSelectFile()));
+  connect(geomFilenameButton, SIGNAL(clicked()), widget, SLOT(OnSelectFile()));
 
-  connect(widget, SIGNAL(GeometryChanged()),
-      this, SLOT(OnGeometryChanged()));
+  connect(geomFilenameButton, SIGNAL(clicked()), widget, SLOT(OnSelectFile()));
+
+  connect(widget, SIGNAL(GeometryChanged()), this, SLOT(OnGeometryChanged()));
 
   connect(geomSizeXSpinBox, SIGNAL(valueChanged(double)),
       widget, SLOT(OnGeometrySizeChanged(double)));
@@ -2061,7 +2061,6 @@ ConfigChildWidget *ConfigWidget::CreateEnumWidget(
   EnumConfigWidget *widget = new EnumConfigWidget();
   widget->setLayout(widgetLayout);
   widget->setFrameStyle(QFrame::Box);
-
   connect(enumComboBox, SIGNAL(currentIndexChanged(const QString &)),
       widget, SLOT(EnumChanged(const QString &)));
 
@@ -2097,7 +2096,7 @@ ConfigChildWidget *ConfigWidget::CreateDensityWidget(
 
   double min = 0;
   double max = 0;
-  this->GetRangeFromKey("density", min, max);
+  this->RangeFromKey("density", min, max);
 
   QDoubleSpinBox *spinBox = new QDoubleSpinBox;
   spinBox->setRange(min, max);
@@ -2107,7 +2106,7 @@ ConfigChildWidget *ConfigWidget::CreateDensityWidget(
   spinBox->setAlignment(Qt::AlignRight);
   spinBox->setMaximumWidth(100);
 
-  std::string unit = this->GetUnitFromKey("density");
+  std::string unit = this->UnitFromKey("density");
   QLabel *unitLabel = new QLabel(QString::fromStdString(unit));
 
   QHBoxLayout *widgetLayout = new QHBoxLayout;
@@ -2126,11 +2125,11 @@ ConfigChildWidget *ConfigWidget::CreateDensityWidget(
   widget->comboBox = comboBox;
   widget->spinBox = spinBox;
 
-  connect(comboBox, SIGNAL(currentIndexChanged(const QString)),
-      widget, SLOT(OnComboBoxChanged(const QString)));
+  connect(comboBox, SIGNAL(currentIndexChanged(const QString &)),
+      widget, SLOT(OnComboBoxChanged(const QString &)));
 
-  connect(spinBox, SIGNAL(valueChanged(const QString)),
-      widget, SLOT(OnSpinBoxChanged(const QString)));
+  connect(spinBox, SIGNAL(valueChanged(const QString &)),
+      widget, SLOT(OnSpinBoxChanged(const QString &)));
 
   connect(widget, SIGNAL(DensityValueChanged(const double &)),
       this, SLOT(OnDensityValueChanged(const double &)));
@@ -2796,7 +2795,7 @@ bool ConfigWidget::UpdateEnumWidget(ConfigChildWidget *_widget,
 
 /////////////////////////////////////////////////
 bool ConfigWidget::UpdateDensityWidget(ConfigChildWidget *_widget,
-          double _value)
+          const double _value)
 {
   DensityConfigWidget *densityWidget =
       qobject_cast<DensityConfigWidget *>(_widget);
@@ -3359,7 +3358,7 @@ void ConfigWidget::OnDensityValueChanged(const double &_value)
 }
 
 /////////////////////////////////////////////////
-void ConfigWidget::OnMassValueChanged(double _value)
+void ConfigWidget::OnMassValueChanged(const double _value)
 {
   emit MassValueChanged(_value);
 }
@@ -3380,7 +3379,7 @@ void GroupWidget::Toggle(bool _checked)
 }
 
 /////////////////////////////////////////////////
-void GeometryConfigWidget::OnGeometryTypeChanged(const QString _text)
+void GeometryConfigWidget::OnGeometryTypeChanged(const QString &_text)
 {
   QWidget *widget= qobject_cast<QWidget *>(QObject::sender());
 
@@ -3422,7 +3421,7 @@ void GeometryConfigWidget::OnGeometryTypeChanged(const QString _text)
 }
 
 /////////////////////////////////////////////////
-void GeometryConfigWidget::OnGeometrySizeChanged(double /*_value*/)
+void GeometryConfigWidget::OnGeometrySizeChanged(const double /*_value*/)
 {
   emit GeometryChanged();
 }
@@ -3455,20 +3454,20 @@ void GeometryConfigWidget::OnSelectFile()
 }
 
 /////////////////////////////////////////////////
-void DensityConfigWidget::OnComboBoxChanged(const QString /*_text*/)
+void DensityConfigWidget::OnComboBoxChanged(const QString &/*_text*/)
 {
   QVariant variant = this->comboBox->itemData(this->comboBox->currentIndex());
   this->SetDensity(variant.toDouble());
 }
 
 /////////////////////////////////////////////////
-void DensityConfigWidget::OnSpinBoxChanged(const QString /*_text*/)
+void DensityConfigWidget::OnSpinBoxChanged(const QString &/*_text*/)
 {
   this->SetDensity(this->spinBox->value());
 }
 
 /////////////////////////////////////////////////
-void DensityConfigWidget::SetDensity(double _density)
+void DensityConfigWidget::SetDensity(const double _density)
 {
   bool comboSigState = this->comboBox->blockSignals(true);
   bool spinSigState = this->spinBox->blockSignals(true);

@@ -22,15 +22,15 @@
 #endif
 
 #include <sstream>
+#include <ignition/math/Helpers.hh>
 
-#include "gazebo/math/Helpers.hh"
 #include "gazebo/gui/model/DensityModel.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-DensityEntry::DensityEntry(const std::string &_desc, double _value)
+DensityEntry::DensityEntry(const std::string &_desc, const double _value)
 {
   this->desc = _desc;
   this->value = _value;
@@ -103,11 +103,11 @@ const DensityEntry *DensityModel::EntryByDesc(const std::string &_desc) const
 }
 
 /////////////////////////////////////////////////
-const DensityEntry *DensityModel::EntryByValue(double _value) const
+const DensityEntry *DensityModel::EntryByValue(const double _value) const
 {
   for (auto it : this->entries)
   {
-    if (math::equal(it->value, _value))
+    if (ignition::math::equal(it->value, _value))
       return it;
   }
   return NULL;
