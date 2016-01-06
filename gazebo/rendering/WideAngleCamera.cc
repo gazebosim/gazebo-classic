@@ -465,7 +465,7 @@ void WideAngleCamera::Load()
     this->dataPtr->lens->Load();
 
   std::string lensType = this->dataPtr->lens->Type();
-  if (lensType == "gnomonical" && this->GetHFOV() > (IGN_PI/2.0))
+  if (lensType == "gnomonical" && this->HFOV() > (IGN_PI/2.0))
   {
     gzerr << "The recommended camera horizontal FOV should be <= PI/2"
         << " for lens of type 'gnomonical'." << std::endl;
@@ -692,7 +692,7 @@ void WideAngleCamera::notifyMaterialRender(Ogre::uint32 /*_pass_id*/,
 
   this->Lens()->SetUniformVariables(pPass,
     this->GetAspectRatio(),
-    this->GetHFOV().Radian());
+    this->HFOV().Radian());
 
 #if defined(HAVE_OPENGL)
   // XXX: OGRE doesn't allow to enable cubemap filtering extention thru its API

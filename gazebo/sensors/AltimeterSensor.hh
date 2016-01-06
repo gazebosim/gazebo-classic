@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_ALTIMETER_SENSOR_HH_
-#define _GAZEBO_ALTIMETER_SENSOR_HH_
+#ifndef _GAZEBO_SENSORS_ALTIMETERSENSOR_HH_
+#define _GAZEBO_SENSORS_ALTIMETERSENSOR_HH_
 
 #include <string>
 
@@ -62,7 +62,7 @@ namespace gazebo
       public: virtual std::string GetTopic() const;
 
       // Documentation inherited
-      protected: virtual bool UpdateImpl(bool _force);
+      protected: virtual bool UpdateImpl(const bool _force);
 
       // Documentation inherited
       public: virtual void Fini();
@@ -85,7 +85,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Private data pointer
-      private: AltimeterSensorPrivate *dataPtr;
+      private: std::unique_ptr<AltimeterSensorPrivate> dataPtr;
     };
     /// \}
   }

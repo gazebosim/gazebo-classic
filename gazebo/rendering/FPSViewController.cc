@@ -68,7 +68,8 @@ void FPSViewController::Update()
       this->camera->GetLastRenderWallTime();
     float dt = interval.Float();
 
-    math::Vector3 trans = this->xVelocity + this->yVelocity;
+    ignition::math::Vector3d trans = this->xVelocity.Ign() +
+                                     this->yVelocity.Ign();
     this->camera->Translate(trans * dt);
   }
 }
@@ -83,8 +84,10 @@ void FPSViewController::HandleMouseEvent(const common::MouseEvent &_event)
 
   if (_event.Buttons() & common::MouseEvent::LEFT)
   {
-    this->camera->Yaw(GZ_DTOR(-drag.X()*0.1));
-    this->camera->Pitch(GZ_DTOR(drag.Y()*0.1));
+    this->camera->Yaw(static_cast<ignition::math::Angle>(
+          IGN_DTOR(-drag.X()*0.1)));
+    this->camera->Pitch(static_cast<ignition::math::Angle>(
+          IGN_DTOR(drag.Y()*0.1)));
   }
   else if (_event.Type() == common::MouseEvent::SCROLL)
   {

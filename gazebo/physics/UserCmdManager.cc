@@ -20,6 +20,7 @@
   #include <Winsock2.h>
 #endif
 
+#include <boost/algorithm/string.hpp>
 #include <boost/range/adaptor/reversed.hpp>
 
 #include "gazebo/transport/transport.hh"
@@ -119,6 +120,12 @@ UserCmdManager::UserCmdManager(const WorldPtr _world)
   this->dataPtr->worldControlPub =
       this->dataPtr->node->Advertise<msgs::WorldControl>("~/world_control");
 
+  this->dataPtr->modelModifyPub =
+      this->dataPtr->node->Advertise<msgs::Model>("~/model/modify");
+
+  this->dataPtr->lightModifyPub =
+      this->dataPtr->node->Advertise<msgs::Light>("~/light/modify");
+
   this->dataPtr->idCounter = 0;
 }
 
@@ -139,9 +146,17 @@ void UserCmdManager::OnUserCmdMsg(ConstUserCmdPtr &_msg)
   UserCmdPtr cmd(new UserCmd(id, this->dataPtr->world, _msg->description(),
       _msg->type()));
 
-  if (_msg->type() == msgs::UserCmd::WORLD_CONTROL)
+  // Forward message after we've saved the current state
+  if (_msg->type() == msgs::UserCmd::MOVING)
   {
-    // Publish world control message after we've save the current state
+    for (int i = 0; i < _msg->model_size(); ++i)
+      this->dataPtr->modelModifyPub->Publish(_msg->model(i));
+
+    for (int i = 0; i < _msg->light_size(); ++i)
+      this->dataPtr->lightModifyPub->Publish(_msg->light(i));
+  }
+  else if (_msg->type() == msgs::UserCmd::WORLD_CONTROL)
+  {
     if (_msg->has_world_control())
     {
       this->dataPtr->worldControlPub->Publish(_msg->world_control());
@@ -152,6 +167,16 @@ void UserCmdManager::OnUserCmdMsg(ConstUserCmdPtr &_msg)
           "] without a world control message. Command won't be executed."
           << std::endl;
     }
+  }
+  else if (_msg->type() == msgs::UserCmd::WRENCH)
+  {
+    // Set publisher
+    std::string topicName = "~/";
+    topicName += _msg->entity_name() + "/wrench";
+    boost::replace_all(topicName, "::", "/");
+
+    auto wrenchPub = this->dataPtr->node->Advertise<msgs::Wrench>(topicName);
+    wrenchPub->Publish(_msg->wrench());
   }
 
   // Add it to undo list

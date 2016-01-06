@@ -6,6 +6,7 @@ set (sources_local
   model/EditorMaterialSwitcher.cc
   model/ExtrudeDialog.cc
   model/ImportDialog.cc
+  model/JointCreationDialog.cc
   model/JointInspector.cc
   model/JointMaker.cc
   model/LinkConfig.cc
@@ -25,6 +26,7 @@ set (qt_headers_local
   model/DensityModel.hh
   model/ExtrudeDialog.hh
   model/ImportDialog.hh
+  model/JointCreationDialog.hh
   model/JointInspector.hh
   model/JointMaker.hh
   model/LinkConfig.hh
@@ -45,6 +47,7 @@ set (headers_install
 
 set (qt_tests_local
   CollisionConfig_TEST.cc
+  JointCreationDialog_TEST.cc
   JointInspector_TEST.cc
   LinkConfig_TEST.cc
   LinkInspector_TEST.cc

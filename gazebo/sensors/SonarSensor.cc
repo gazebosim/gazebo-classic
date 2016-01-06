@@ -247,7 +247,7 @@ double SonarSensor::GetRange()
 }
 
 //////////////////////////////////////////////////
-bool SonarSensor::UpdateImpl(bool /*_force*/)
+bool SonarSensor::UpdateImpl(const bool /*_force*/)
 {
   boost::mutex::scoped_lock lock(this->mutex);
 
@@ -317,7 +317,7 @@ bool SonarSensor::UpdateImpl(bool /*_force*/)
 }
 
 //////////////////////////////////////////////////
-bool SonarSensor::IsActive()
+bool SonarSensor::IsActive() const
 {
   return Sensor::IsActive() || this->sonarPub->HasConnections();
 }
@@ -338,3 +338,10 @@ void SonarSensor::OnContacts(ConstContactsPtr &_msg)
       this->incomingContacts.pop_front();
   }
 }
+
+//////////////////////////////////////////////////
+void SonarSensor::DisconnectUpdate(event::ConnectionPtr &_conn)
+{
+  this->update.Disconnect(_conn);
+}
+
