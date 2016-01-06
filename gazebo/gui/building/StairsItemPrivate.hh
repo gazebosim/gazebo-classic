@@ -15,8 +15,10 @@
  *
 */
 
-#ifndef _GAZEBO_GUI_STAIRS_ITEM_PRIVATE_HH_
-#define _GAZEBO_GUI_STAIRS_ITEM_PRIVATE_HH_
+#ifndef _GAZEBO_GUI_STAIRSITEM_PRIVATE_HH_
+#define _GAZEBO_GUI_STAIRSITEM_PRIVATE_HH_
+
+#include <ignition/math/Vector2.hh>
 
 #include "gazebo/gui/qt.h"
 
@@ -39,7 +41,7 @@ namespace gazebo
       public: double stairsWidth;
 
       /// \brief Scene position of staircase item in pixel coordinates.
-      public: QPointF stairsPos;
+      public: ignition::math::Vector2d stairsPos;
 
       /// \brief Elevation of staircase item in pixels.
       public: double stairsElevation;

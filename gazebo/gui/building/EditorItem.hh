@@ -15,11 +15,14 @@
  *
 */
 
-#ifndef _GAZEBO_GUI_EDITOR_ITEM_HH_
-#define _GAZEBO_GUI_EDITOR_ITEM_HH_
+#ifndef _GAZEBO_GUI_EDITORITEM_HH_
+#define _GAZEBO_GUI_EDITORITEM_HH_
 
 #include <string>
 #include <memory>
+#include <ignition/math/Vector3.hh>
+
+#include "gazebo/common/Color.hh"
 
 #include "gazebo/gui/qt.h"
 
@@ -49,38 +52,38 @@ namespace gazebo
 
       /// \brief Get the size of the item in pixels.
       /// \return Size in pixels.
-      public: virtual QVector3D GetSize() const;
+      public: virtual ignition::math::Vector3d Size() const;
 
       /// \brief Get the scene position of editor item.
       /// \return Scene position in pixel coordinates.
-      public: virtual QVector3D GetScenePosition() const;
+      public: virtual ignition::math::Vector3d ScenePosition() const;
 
       /// \brief Get the scene rotation of the editor item.
       /// \return Scene rotation in degrees.
-      public: virtual double GetSceneRotation() const;
+      public: virtual double SceneRotation() const;
 
       /// \brief Get the type of the editor item.
       /// \return Type of the item.
-      public: virtual std::string GetType() const;
+      public: virtual std::string ItemType() const;
 
       /// \brief Get the name of the editor item.
       /// \return Name of the item.
-      public: virtual std::string GetName() const;
+      public: virtual std::string Name() const;
 
       /// \brief Get the level in which this building item is located.
-      public: int GetLevel() const;
+      public: int Level() const;
 
       /// \brief Get the base height of this level relative to the ground
       /// plane.
-      public: double GetLevelBaseHeight() const;
+      public: double LevelBaseHeight() const;
 
       /// \brief Get the associated 3D visual's color.
       /// \return Color of the 3D visual.
-      public: virtual QColor Get3dColor() const;
+      public: virtual common::Color Color3d() const;
 
       /// \brief Get the associated 3D visual's texture.
       /// \return Texture of the 3D visual.
-      public: virtual QString Get3dTexture() const;
+      public: virtual std::string Texture3d() const;
 
       /// \brief Set the name of this editor item.
       /// \param[in] _name Name to set the editor item to.
@@ -88,28 +91,28 @@ namespace gazebo
 
       /// \brief Set the level of this building item.
       /// \param[in] _level Level number.
-      public: void SetLevel(int _level);
+      public: void SetLevel(const int _level);
 
       /// \brief Set the base height of this level relative to the ground
       /// plane.
       /// \param[in] _height Base height.
-      public: void SetLevelBaseHeight(double _height);
+      public: void SetLevelBaseHeight(const double _height);
 
       /// \brief Set the associated 3D visual's color.
       /// \param[in] _color Color.
-      public: void Set3dColor(QColor _color);
+      public: void SetColor3d(const common::Color &_color);
 
       /// \brief Set the associated 3D visual's texture.
       /// \param[in] _texture Texture.
-      public: void Set3dTexture(QString _texture);
+      public: void SetTexture3d(const std::string &_texture);
 
       /// \brief Set the transparency of the associated 3D visual.
       /// \param[in] _transparency Transparency.
-      public: void Set3dTransparency(float _transparency);
+      public: void Set3dTransparency(const float _transparency);
 
       /// \brief Set whether this item should be highlighted or not.
       /// \param[in] _highlighted True for highlighted.
-      public: virtual void SetHighlighted(bool _highlighted);
+      public: virtual void SetHighlighted(const bool _highlighted);
 
       /// \brief Get the z value of this item when in idle state.
       /// \return Z value.
@@ -197,28 +200,28 @@ namespace gazebo
       /// \brief Qt signal emitted when the editor item's 3D color has
       /// changed.
       /// \param[in] _color Color.
-      Q_SIGNALS: void ColorChanged(QColor _color);
+      Q_SIGNALS: void ColorChanged(const common::Color &_color);
 
       /// \brief Qt signal emitted when the editor item's 3D texture has
       /// changed.
       /// \param[in] _texture Texture.
-      Q_SIGNALS: void TextureChanged(QString _texture);
+      Q_SIGNALS: void TextureChanged(const std::string &_texture);
 
       /// \brief Qt signal emitted when the editor item's 3D transparency has
       /// changed.
       /// \param[in] _transparency Transparency.
-      Q_SIGNALS: void TransparencyChanged(float _transparency);
+      Q_SIGNALS: void TransparencyChanged(const float _transparency);
 
       /// \brief Qt signal emitted when the editor item is being deleted.
       Q_SIGNALS: void ItemDeleted();
 
       /// \brief Qt callback when the color has been changed from the 3D view.
       /// \param[in] _color Color.
-      private slots: void OnColorChanged(QColor _color);
+      private slots: void OnColorChanged(const common::Color &_color);
 
       /// \brief Qt callback when the texture has been changed from the 3D view.
       /// \param[in] _texture Texture.
-      private slots: void OnTextureChanged(QString _texture);
+      private slots: void OnTextureChanged(const std::string &_texture);
 
       /// \brief Z ordering of the rect item when idle (unselected.)
       protected: int zValueIdle;
@@ -240,10 +243,10 @@ namespace gazebo
       protected: double levelBaseHeight;
 
       /// \brief Color of the associated 3D visual.
-      protected: QColor visual3dColor;
+      protected: common::Color visual3dColor;
 
       /// \brief Texture of the associated 3D visual.
-      protected: QString visual3dTexture;
+      protected: std::string visual3dTexture;
 
       /// \brief Transparency of the associated 3D visual.
       protected: float visual3dTransparency;

@@ -15,8 +15,10 @@
  *
 */
 
-#ifndef _GAZEBO_GUI_SEGMENT_ITEM_PRIVATE_HH_
-#define _GAZEBO_GUI_SEGMENT_ITEM_PRIVATE_HH_
+#ifndef _GAZEBO_GUI_SEGMENTITEM_PRIVATE_HH_
+#define _GAZEBO_GUI_SEGMENTITEM_PRIVATE_HH_
+
+#include <ignition/math/Vector2.hh>
 
 #include "gazebo/gui/qt.h"
 
@@ -28,13 +30,13 @@ namespace gazebo
     class SegmentItemPrivate
     {
       /// \brief Segment's start position in pixel coordinates.
-      public: QPointF start;
+      public: ignition::math::Vector2d start;
 
       /// \brief Segment's end position in pixel coordinates.
-      public: QPointF end;
+      public: ignition::math::Vector2d end;
 
       /// \brief Keep track of mouse press position for translation.
-      public: QPointF segmentMouseMove;
+      public: ignition::math::Vector2d segmentMouseMove;
 
       /// \brief Thickness of the segment on the 2d view, in pixels.
       public: double thickness;

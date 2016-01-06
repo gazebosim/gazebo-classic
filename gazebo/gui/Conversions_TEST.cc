@@ -58,3 +58,46 @@ TEST_F(GuiConversionsTest, Color)
   }
 }
 
+/////////////////////////////////////////////////
+TEST_F(GuiConversionsTest, Point2d)
+{
+  double x = -0.5;
+  double y = 123;
+
+  // Ignition to Qt to Ignition
+  {
+    ignition::math::Vector2d point(x, y);
+    EXPECT_EQ(gazebo::gui::Conversions::Convert(
+              gazebo::gui::Conversions::Convert(point)), point);
+  }
+
+  // Qt to Ignition to Qt
+  {
+    QPointF point(x, y);
+    EXPECT_EQ(gazebo::gui::Conversions::Convert(
+              gazebo::gui::Conversions::Convert(point)), point);
+  }
+}
+
+/////////////////////////////////////////////////
+TEST_F(GuiConversionsTest, Vector3d)
+{
+  double x = -0.1;
+  double y = 0;
+  double z = 1234;
+
+  // Ignition to Qt to Ignition
+  {
+    ignition::math::Vector3d vec(x, y, z);
+    EXPECT_EQ(gazebo::gui::Conversions::Convert(
+              gazebo::gui::Conversions::Convert(vec)), vec);
+  }
+
+  // Qt to Ignition to Qt
+  {
+    QVector3D vec(x, y, z);
+    EXPECT_EQ(gazebo::gui::Conversions::Convert(
+              gazebo::gui::Conversions::Convert(vec)), vec);
+  }
+}
+

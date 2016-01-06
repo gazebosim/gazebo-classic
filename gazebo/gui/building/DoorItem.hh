@@ -15,10 +15,11 @@
  *
 */
 
-#ifndef _GAZEBO_GUI_DOOR_ITEM_HH_
-#define _GAZEBO_GUI_DOOR_ITEM_HH_
+#ifndef _GAZEBO_GUI_DOORITEM_HH_
+#define _GAZEBO_GUI_DOORITEM_HH_
 
 #include <memory>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/building/RectItem.hh"
@@ -48,13 +49,13 @@ namespace gazebo
       public: ~DoorItem();
 
       // Documentation inherited
-      public: virtual QVector3D GetSize() const;
+      public: virtual ignition::math::Vector3d Size() const;
 
       // Documentation inherited
-      public: virtual QVector3D GetScenePosition() const;
+      public: virtual ignition::math::Vector3d ScenePosition() const;
 
       // Documentation inherited
-      public: virtual double GetSceneRotation() const;
+      public: virtual double SceneRotation() const;
 
       // Documentation inherited
       private: virtual void paint(QPainter *_painter,

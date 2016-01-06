@@ -15,8 +15,10 @@
  *
 */
 
-#ifndef _GAZEBO_GUI_DOOR_ITEM_PRIVATE_HH_
-#define _GAZEBO_GUI_DOOR_ITEM_PRIVATE_HH_
+#ifndef _GAZEBO_GUI_DOORITEM_PRIVATE_HH_
+#define _GAZEBO_GUI_DOORITEM_PRIVATE_HH_
+
+#include <ignition/math/Vector2.hh>
 
 #include "gazebo/gui/qt.h"
 
@@ -42,7 +44,7 @@ namespace gazebo
       public: double doorElevation;
 
       /// \brief Door scene position in pixel coordinates.
-      public: QPointF doorPos;
+      public: ignition::math::Vector2d doorPos;
 
       /// \brief Inspector for configuring the door item.
       public: WindowDoorInspectorDialog *inspector;

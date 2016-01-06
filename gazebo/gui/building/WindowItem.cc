@@ -15,6 +15,7 @@
  *
 */
 
+#include "gazebo/gui/Conversions.hh"
 #include "gazebo/gui/building/BuildingMaker.hh"
 #include "gazebo/gui/building/EditorView.hh"
 #include "gazebo/gui/building/RectItem.hh"
@@ -77,22 +78,22 @@ WindowItem::~WindowItem()
 }
 
 /////////////////////////////////////////////////
-QVector3D WindowItem::GetSize() const
+ignition::math::Vector3d WindowItem::Size() const
 {
-  return QVector3D(this->dataPtr->windowWidth,
+  return ignition::math::Vector3d(this->dataPtr->windowWidth,
                    this->dataPtr->windowDepth,
                    this->dataPtr->windowHeight);
 }
 
 /////////////////////////////////////////////////
-QVector3D WindowItem::GetScenePosition() const
+ignition::math::Vector3d WindowItem::ScenePosition() const
 {
-  return QVector3D(this->scenePos().x(), this->scenePos().y(),
+  return ignition::math::Vector3d(this->scenePos().x(), this->scenePos().y(),
       this->dataPtr->windowElevation);
 }
 
 /////////////////////////////////////////////////
-double WindowItem::GetSceneRotation() const
+double WindowItem::SceneRotation() const
 {
   return this->rotationAngle;
 }
@@ -127,7 +128,7 @@ void WindowItem::paint(QPainter *_painter,
 
   QPen windowPen;
   windowPen.setStyle(Qt::SolidLine);
-  windowPen.setColor(this->borderColor);
+  windowPen.setColor(Conversions::Convert(this->borderColor));
   _painter->setPen(windowPen);
 
   _painter->drawLine(topLeft, bottomLeft);
@@ -168,7 +169,7 @@ void WindowItem::OnApply()
 
   QPointF itemPos = this->dataPtr->windowPos * this->itemScale;
   itemPos.setY(-itemPos.y());
-  this->SetSize(QSize(dialog->GetWidth() / this->itemScale,
+  this->SetSize(ignition::math::Vector2i(dialog->GetWidth() / this->itemScale,
       dialog->GetDepth() / this->itemScale));
   this->dataPtr->windowWidth = dialog->GetWidth() / this->itemScale;
   this->dataPtr->windowHeight = dialog->GetHeight() / this->itemScale;
@@ -212,7 +213,7 @@ void WindowItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *_event)
 /////////////////////////////////////////////////
 void WindowItem::OnOpenInspector()
 {
-  this->dataPtr->inspector->SetName(this->GetName());
+  this->dataPtr->inspector->SetName(this->Name());
   this->dataPtr->inspector->SetWidth(
       this->dataPtr->windowWidth * this->itemScale);
   this->dataPtr->inspector->SetHeight(
