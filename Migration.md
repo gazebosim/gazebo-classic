@@ -24,6 +24,20 @@ release will remove the deprecated code.
 
 ### Modifications
 
+1. **gazebo/sensor/SensorTypes.hh**
+    + All `typedef`'s of `shared_ptr`'s to Sensor's are changed
+      from `boost::shared_ptr` to `std::shared_ptr`.
+      Any downstream code that does a pointer cast
+      (such as `dynamic_pointer_cast` or `static_pointer_cast`)
+      will need to switch from `boost::*_pointer_cast` to `std::*_pointer_cast`.
+    + [pull request #2079](https://bitbucket.org/osrf/gazebo/pull-request/2079)
+
+1. **gazebo/rendering/GpuLaser.hh**
+    + ***Removed:*** public: void SetCameraCount(double _cameraCount);
+    + ***Replacement:*** public: void SetCameraCount(const unsigned int _cameraCount);
+    + ***Removed:*** public: template<typename T> event::ConnectionPtr ConnectNewLaserFrame(T _subscriber);
+    + ***Replacement:*** public: event::ConnectionPtr ConnectNewLaserFrame(std::function<void (const float *_frame, unsigned int _width, unsigned int _height, unsigned int _depth, const std::string &_format)> _subscriber);
+
 1. **gazebo/rendering/DepthCamera.hh**
     + ***Removed:*** public: template<typename T> event::ConnectionPtr ConnectNewDepthFrame(T _subscriber)
     + ***Replacement:*** public: event::ConnectionPtr ConnectNewDepthFrame(std::function<void (const float *, unsigned int, unsigned int, unsigned int, const std::string &)>  _subscriber);
@@ -95,9 +109,65 @@ release will remove the deprecated code.
 
 ### Deprecations
 
+1. **gazebo/util/OpenAL.hh**
+    + ***Deprecation:*** public: bool GetOnContact() const;
+    + ***Replacement:*** public: bool OnContact() const;
+    + ***Deprecation:*** public: std::vector<std::string> GetCollisionNames() const;
+    + ***Replacement:*** public: std::vector<std::string> CollisionNames() const;
+
+1. **gazebo/util/LogRecord.hh**
+    + ***Deprecation:*** public: bool GetPaused() const;
+    + ***Replacement:*** public: bool Paused() const;
+    + ***Deprecation:*** public: bool GetRunning() const;
+    + ***Replacement:*** public: bool Running() const;
+    + ***Deprecation:*** public: const std::string &GetEncoding() const;
+    + ***Replacement:*** public: const std::string &Encoding() const;
+    + ***Deprecation:*** public: std::string GetFilename(const std::string &_name = "") const;
+    + ***Replacement:*** public: std::string Filename(const std::string &_name = "") const;
+    + ***Deprecation:*** public: unsigned int GetFileSize(const std::string &_name = "") const
+    + ***Replacement:*** public: unsigned int FileSize(const std::string &_name = "") const;
+    + ***Deprecation:*** public: std::string GetBasePath() const;
+    + ***Replacement:*** public: std::string BasePath() const;
+    + ***Deprecation:*** public: common::Time GetRunTime() const;
+    + ***Replacement:*** public: common::Time RunTime() const;
+    + ***Deprecation:*** public: bool GetFirstUpdate() const;
+    + ***Replacement:*** public: bool FirstUpdate() const;
+    + ***Deprecation:*** public: unsigned int GetBufferSize() const;
+    + ***Replacement:*** public: unsigned int BufferSize() const;
+
 1. **gazebo/rendering/DepthCamera.hh**
     + ***Deprecation:*** public: virtual const float *GetDepthData();
     + ***Replacement:*** public: virtual const float *DepthData() const;
+
+1. **gazebo/rendering/RenderEngine.hh**
+    + ***Deprecation:*** public: unsigned int GetSceneCount() const;
+    + ***Replacement:*** public: unsigned int SceneCount() const;
+    + ***Deprecation:*** public: Ogre::OverlaySystem *GetOverlaySystem() const;
+    + ***Replacement:*** public: Ogre::OverlaySystem *OverlaySystem() const;
+
+1. **gazebo/rendering/GpuLaser.hh**
+    + ***Deprecation:*** public: const float *GetLaserData();
+    + ***Replacement:*** public: const float *LaserData() const;
+    + ***Deprecation:*** public: double GetHorzHalfAngle() const;
+    + ***Replacement:*** public: double HorzHalfAngle() const;
+    + ***Deprecation:*** public: double GetVertHalfAngle() const;
+    + ***Replacement:*** public: double VertHalfAngle() const;
+    + ***Deprecation:*** public: double GetHorzFOV() const;
+    + ***Replacement:*** public: double HorzFOV() const;
+    + ***Deprecation:*** public: double GetCosHorzFOV() const;
+    + ***Replacement:*** public: double CosHorzFOV() const;
+    + ***Deprecation:*** public: double GetVertFOV() const;
+    + ***Replacement:*** public: double VertFOV() const;
+    + ***Deprecation:*** public: double GetCosVertFOV() const;
+    + ***Replacement:*** public: double CosVertFOV() const;
+    + ***Deprecation:*** public: double GetNearClip() const;
+    + ***Replacement:*** public: double NearClip() const;
+    + ***Deprecation:*** public: double GetFarClip() const;
+    + ***Replacement:*** public: double FarClip() const;
+    + ***Deprecation:*** public: double CameraCount() const;
+    + ***Replacement:*** public: unsigned int CameraCount() const;
+    + ***Deprecation:*** public: double GetRayCountRatio() const;
+    + ***Replacement:*** public: double RayCountRatio() const;
 
 1. **gazebo/rendering/DynamicLines.hh**
     + ***Deprecation:*** public: void AddPoint(const math::Vector3 &_pt,const common::Color &_color = common::Color::White)
@@ -254,7 +324,7 @@ release will remove the deprecated code.
 1. **gazebo/rendering/Camera.hh**
     + ***Deprecation:*** public: math::Vector3 GetWorldPosition() const
     + ***Replacement:*** public: ignition::math::Vector3d WorldPosition() const;
-    + ***Deprecation:*** public: math::Quaternion GetWorldRotation() const 
+    + ***Deprecation:*** public: math::Quaternion GetWorldRotation() const
     + ***Replacement:*** public: ignition::math::Quaterniond WorldRotation() const;
     + ***Deprecation:*** public: virtual void SetWorldPose(const math::Pose &_pose)
     + ***Replacement:*** public: virtual void SetWorldPose(const ignition::math::Pose3d &_pose);

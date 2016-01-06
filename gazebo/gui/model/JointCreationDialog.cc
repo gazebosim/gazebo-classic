@@ -611,7 +611,7 @@ void JointCreationDialog::OnVector3dFromDialog(const QString &_name,
   }
 
   if (this->CheckValid())
-    this->dataPtr->jointMaker->SetAxis(_name, _value);
+    this->dataPtr->jointMaker->SetAxis(_name.toStdString(), _value);
 }
 
 /////////////////////////////////////////////////
@@ -887,7 +887,7 @@ void JointCreationDialog::UncheckAllAlign()
 void JointCreationDialog::OnType(const int _typeInt)
 {
   auto type = static_cast<JointMaker::JointType>(_typeInt);
-  unsigned int axisCount = JointMaker::GetJointAxisCount(type);
+  unsigned int axisCount = JointMaker::JointAxisCount(type);
 
   // Display correct number of axes for this type
   this->dataPtr->axis0Widget->setVisible(axisCount == 0);
