@@ -17,10 +17,10 @@
 #ifndef _GAZEBO_SENSORS_SENSOR_HH_
 #define _GAZEBO_SENSORS_SENSOR_HH_
 
-#include <boost/enable_shared_from_this.hpp>
 #include <boost/thread/mutex.hpp>
 #include <vector>
 #include <map>
+#include <memory>
 #include <string>
 
 #include <sdf/sdf.hh>
@@ -45,7 +45,7 @@ namespace gazebo
 
     /// \class Sensor Sensor.hh sensors/sensors.hh
     /// \brief Base class for sensors
-    class GAZEBO_VISIBLE Sensor : public boost::enable_shared_from_this<Sensor>
+    class GAZEBO_VISIBLE Sensor : public std::enable_shared_from_this<Sensor>
     {
       /// \brief Constructor.
       /// \param[in] _cat Category of the sensor

@@ -98,7 +98,7 @@ void ModelEditorTest::SaveModelPose()
   jointMaker->AddJoint(gazebo::gui::JointMaker::JOINT_HINGE);
   auto jointData = jointMaker->CreateJoint(cylinder, box);
   jointMaker->CreateHotSpot(jointData);
-  QCOMPARE(jointMaker->GetJointCount(), 1u);
+  QCOMPARE(jointMaker->JointCount(), 1u);
 
   // Process some events, and draw the screen
   for (unsigned int i = 0; i < 10; ++i)
