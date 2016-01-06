@@ -54,8 +54,8 @@ void OrthoViewController::Init()
   this->dataPtr->scale = 100;
   this->distance = 1000.0/this->dataPtr->scale;
 
-  int width = this->camera->GetViewportWidth();
-  int height = this->camera->GetViewportHeight();
+  int width = this->camera->ViewportWidth();
+  int height = this->camera->ViewportHeight();
 
   if (width > 0 && height > 0)
   {
@@ -72,8 +72,8 @@ void OrthoViewController::Init(const math::Vector3 &_focalPoint,
 {
   this->dataPtr->scale = 100;
 
-  int width = this->camera->GetViewportWidth();
-  int height = this->camera->GetViewportHeight();
+  int width = this->camera->ViewportWidth();
+  int height = this->camera->ViewportHeight();
 
   if (width > 0 && height > 0)
   {
@@ -100,8 +100,8 @@ void OrthoViewController::HandleMouseEvent(const common::MouseEvent &_event)
 
   math::Vector3 directionVec(0, 0, 0);
 
-  int width = this->camera->GetViewportWidth();
-  int height = this->camera->GetViewportHeight();
+  int width = this->camera->ViewportWidth();
+  int height = this->camera->ViewportHeight();
   double orthoWidth = width/this->dataPtr->scale;
   double orthoHeight = height/this->dataPtr->scale;
 
@@ -236,8 +236,8 @@ void OrthoViewController::Zoom(const float _amount,
   // Translate back to mouse cursor position
 
   math::Vector3 translation;
-  int width = this->camera->GetViewportWidth();
-  int height = this->camera->GetViewportHeight();
+  int width = this->camera->ViewportWidth();
+  int height = this->camera->ViewportHeight();
 
   double orthoWidth = width / this->dataPtr->scale;
   double orthoHeight = height / this->dataPtr->scale;
@@ -262,7 +262,7 @@ void OrthoViewController::Zoom(const float _amount,
        height / this->dataPtr->scale / 2.0,
       -500, 500);
 
-  this->camera->GetOgreCamera()->setCustomProjectionMatrix(true, proj);
+  this->camera->OgreCamera()->setCustomProjectionMatrix(true, proj);
 
   double newOrthoWidth = width / this->dataPtr->scale;
   double newOrthoHeight = height / this->dataPtr->scale;
@@ -289,7 +289,7 @@ void OrthoViewController::Resize(
        _height / this->dataPtr->scale / 2.0,
       -500, 500);
 
-  this->camera->GetOgreCamera()->setCustomProjectionMatrix(true, proj);
+  this->camera->OgreCamera()->setCustomProjectionMatrix(true, proj);
 }
 
 //////////////////////////////////////////////////

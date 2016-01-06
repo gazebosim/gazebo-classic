@@ -392,7 +392,7 @@ TEST_F(MultiCameraSensor, CameraRotationWorldPoseTest)
 
   // Get multicamera1's local pose. There is current no GetPose() in Camera,
   // so grab it from it's ogre scene node
-  Ogre::SceneNode *cameraNode = multicamera1->GetCamera(0)->GetSceneNode();
+  Ogre::SceneNode *cameraNode = multicamera1->GetCamera(0)->SceneNode();
   ignition::math::Pose3d cameraPose(
       rendering::Conversions::Convert(cameraNode->getPosition()).Ign(),
       rendering::Conversions::Convert(cameraNode->getOrientation()).Ign());
@@ -459,7 +459,7 @@ TEST_F(MultiCameraSensor, CameraRotationWorldPoseTest)
   EXPECT_NE(multicamera3->Pose() + model3->GetWorldPose().Ign(),
       multicamera3->GetCamera(0)->WorldPose());
   // Get multicamera3 sensor's camera 0 local pose
-  cameraNode = multicamera3->GetCamera(0)->GetSceneNode();
+  cameraNode = multicamera3->GetCamera(0)->SceneNode();
   cameraPose = ignition::math::Pose3d(
       rendering::Conversions::Convert(cameraNode->getPosition()).Ign(),
       rendering::Conversions::Convert(cameraNode->getOrientation()).Ign());
@@ -511,7 +511,7 @@ TEST_F(MultiCameraSensor, CameraRotationWorldPoseTest)
   EXPECT_NE(model4->GetWorldPose().Ign(),
       multicamera4->GetCamera(0)->WorldPose());
   // Get multicamera4's camera 0 local pose
-  cameraNode = multicamera4->GetCamera(0)->GetSceneNode();
+  cameraNode = multicamera4->GetCamera(0)->SceneNode();
   cameraPose = ignition::math::Pose3d(
       rendering::Conversions::Convert(cameraNode->getPosition()).Ign(),
       rendering::Conversions::Convert(cameraNode->getOrientation()).Ign());
@@ -537,7 +537,7 @@ TEST_F(MultiCameraSensor, CameraRotationWorldPoseTest)
   EXPECT_NE(model4->GetWorldPose().Ign(),
       multicamera4->GetCamera(1)->WorldPose());
   // Get multicamera4 sensor's camera 1 local pose
-  cameraNode = multicamera4->GetCamera(1)->GetSceneNode();
+  cameraNode = multicamera4->GetCamera(1)->SceneNode();
   cameraPose = ignition::math::Pose3d(
       rendering::Conversions::Convert(cameraNode->getPosition()).Ign(),
       rendering::Conversions::Convert(cameraNode->getOrientation()).Ign());
