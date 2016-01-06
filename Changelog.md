@@ -22,7 +22,6 @@
     * [Pull request #2027](https://bitbucket.org/osrf/gazebo/pull-request/2027)
     * [Pull request #2026](https://bitbucket.org/osrf/gazebo/pull-request/2026)
     * [Pull request #2029](https://bitbucket.org/osrf/gazebo/pull-request/2029)
-    * [Pull request #2083](https://bitbucket.org/osrf/gazebo/pull-request/2083)
 
 1. Use more opaque pointers.
     * [Pull request #2025](https://bitbucket.org/osrf/gazebo/pull-request/2025)
@@ -293,29 +292,24 @@ using the same arguments used in the command line.
 
 1. Building editor updates
 
-    1. PIMPLize LevelWidget class
+    1. Use opaque pointers in the building editor
         * [Pull request #2041](https://bitbucket.org/osrf/gazebo/pull-request/2041)
-
-    1. PIMPLize GrabberHandle, add *LinkedGrabbers functions
-        * [Pull request #2034](https://bitbucket.org/osrf/gazebo/pull-request/2034)
-
-    1. PIMPLize ImportImageDialog and ImportImageView classes
         * [Pull request #2039](https://bitbucket.org/osrf/gazebo/pull-request/2039)
+        * [Pull request #2055](https://bitbucket.org/osrf/gazebo/pull-request/2055)
+        * [Pull request #2032](https://bitbucket.org/osrf/gazebo/pull-request/2032)
+        * [Pull request #2082](https://bitbucket.org/osrf/gazebo/pull-request/2082)
+
+    1. Use opaque pointers for GrabberHandle, add *LinkedGrabbers functions
+        * [Pull request #2034](https://bitbucket.org/osrf/gazebo/pull-request/2034)
 
     1. Removed unused class: BuildingItem
         * [Pull request #2045](https://bitbucket.org/osrf/gazebo/pull-request/2045)
 
-    1. PIMPL BuildingEditorWidget
-        * [Pull request #2055](https://bitbucket.org/osrf/gazebo/pull-request/2055)
-
-    1. PIMPLize gui/building/BuildingModelManip, move attachment logic to BuildingMaker
+    1. Use opaque pointers for BuildingModelManip, move attachment logic to BuildingMaker
         * [Pull request #2046](https://bitbucket.org/osrf/gazebo/pull-request/2046)
 
-    1. PIMPLize GridLines class
-        * [Pull request #2032](https://bitbucket.org/osrf/gazebo/pull-request/2032)
-
-    1. PIMPLize RotateHandle class
-        * [Pull request #2082](https://bitbucket.org/osrf/gazebo/pull-request/2082)
+    1. Use opaque pointers for all Dialog classes, add conversion from QPointF, move common logic to BaseInspectorDialog.
+        * [Pull request #2083](https://bitbucket.org/osrf/gazebo/pull-request/2083)
 
 ## Gazebo 6.0
 
