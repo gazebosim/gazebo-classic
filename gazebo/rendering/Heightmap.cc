@@ -24,6 +24,8 @@
 #include <string.h>
 #include <math.h>
 
+#include <boost/filesystem.hpp>
+
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Exception.hh"
@@ -156,6 +158,12 @@ Ogre::TerrainGroup *Heightmap::OgreTerrain() const
 
 //////////////////////////////////////////////////
 common::Image Heightmap::GetImage() const
+{
+  return this->Image();
+}
+
+//////////////////////////////////////////////////
+common::Image Heightmap::Image() const
 {
   common::Image result;
 
@@ -392,7 +400,7 @@ void Heightmap::Load()
     }
   }
 
-  if (!math::isPowerOfTwo(this->dataPtr->dataSize - 1))
+  if (!ignition::math::isPowerOfTwo(this->dataPtr->dataSize - 1))
     gzthrow("Heightmap image size must be square, with a size of 2^n+1\n");
 
   // If the paging is enabled we modify the number of subterrains
@@ -418,16 +426,16 @@ void Heightmap::Load()
   this->dataPtr->terrainGroup = new Ogre::TerrainGroup(
       this->dataPtr->scene->GetManager(), Ogre::Terrain::ALIGN_X_Y,
       1 + ((this->dataPtr->dataSize - 1) / sqrtN),
-      this->dataPtr->terrainSize.x / (sqrtN));
+      this->dataPtr->terrainSize.X() / (sqrtN));
 
   this->dataPtr->terrainGroup->setFilenameConvention(
     Ogre::String(prefix.string()), Ogre::String("dat"));
 
   Ogre::Vector3 orig = Conversions::Convert(this->dataPtr->terrainOrigin);
-  ignition::math::Vector3d origin(orig.x -0.5 * this->dataPtr->terrainSize.x +
-      0.5 * this->dataPtr->terrainSize.x / sqrtN,
-      orig.y -0.5 * this->dataPtr->terrainSize.x +
-      0.5 * this->dataPtr->terrainSize.x / sqrtN,
+  ignition::math::Vector3d origin(orig.x -0.5 * this->dataPtr->terrainSize.X() +
+      0.5 * this->dataPtr->terrainSize.X() / sqrtN,
+      orig.y -0.5 * this->dataPtr->terrainSize.X() +
+      0.5 * this->dataPtr->terrainSize.X() / sqrtN,
       orig.z);
 
   this->dataPtr->terrainGroup->setOrigin(Conversions::Convert(origin));
@@ -493,8 +501,8 @@ void Heightmap::Load()
     this->dataPtr->world = this->dataPtr->pageManager->createWorld();
     this->dataPtr->terrainPaging->createWorldSection(
         this->dataPtr->world, this->dataPtr->terrainGroup,
-        this->dataPtr->loadRadiusFactor * this->dataPtr->terrainSize.x,
-        this->dataPtr->holdRadiusFactor * this->dataPtr->terrainSize.x,
+        this->dataPtr->loadRadiusFactor * this->dataPtr->terrainSize.X(),
+        this->dataPtr->holdRadiusFactor * this->dataPtr->terrainSize.X(),
         0, 0, sqrtN - 1, sqrtN - 1);
   }
 
@@ -584,7 +592,7 @@ void Heightmap::ConfigureTerrainDefaults()
     this->dataPtr->terrainGroup->getDefaultImportSettings();
 
   defaultimp.terrainSize = this->dataPtr->dataSize;
-  defaultimp.worldSize = this->dataPtr->terrainSize.x;
+  defaultimp.worldSize = this->dataPtr->terrainSize.X();
 
   defaultimp.inputScale = 1.0;
 
@@ -957,7 +965,7 @@ void Heightmap::ModifyTerrain(Ogre::Vector3 _pos, const double _outsideRadius,
 
       if (dist > _insideRadius)
       {
-        weight = math::clamp(dist / _outsideRadius, 0.0, 1.0);
+        weight = ignition::math::clamp(dist / _outsideRadius, 0.0, 1.0);
         weight = 1.0 - (weight * weight);
       }
 

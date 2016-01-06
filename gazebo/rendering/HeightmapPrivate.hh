@@ -22,21 +22,25 @@
 #include <vector>
 #include <boost/filesystem.hpp>
 
-#include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Vector2d.hh"
-#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 
 namespace Ogre
 {
+  class PageManager;
+  class PagedWorld;
   class TerrainGlobalOptions;
   class TerrainGroup;
+  class TerrainPaging;
 }
 
 namespace gazebo
 {
   namespace rendering
   {
+    class GzTerrainMatGen;
+
     /// \internal
     /// \brief Private data for the Heightmap class
     class HeightmapPrivate
@@ -74,13 +78,13 @@ namespace gazebo
       public: ScenePtr scene;
 
       /// \brief Size of the terrain.
-      public: math::Vector3 terrainSize;
+      public: ignition::math::Vector3d terrainSize;
 
       /// \brief Size of the heightmap data.
       public: unsigned int dataSize;
 
       /// \brief Origin of the terrain.
-      public: math::Vector3 terrainOrigin;
+      public: ignition::math::Vector3d terrainOrigin;
 
       /// \brief Global options.
       public: Ogre::TerrainGlobalOptions *terrainGlobals;

@@ -115,6 +115,8 @@ release will remove the deprecated code.
     + ***Replacement:*** public: double AvgHeight(const ignition::math::Vector3d &_pos, const double _brushSize) const
     + ***Deprecation:*** public: Ogre::TerrainGroup *GetOgreTerrain() const;
     + ***Replacement:*** public: Ogre::TerrainGroup *OgreTerrain() const;
+    + ***Deprecation:*** public: common::Image GetImage() const;
+    + ***Replacement:*** public: public: common::Image Image() const;
     + ***Deprecation:*** public: Ogre::TerrainGroup::RayResult GetMouseHit(CameraPtr _camera, math::Vector2i _mousePos);
     + ***Replacement:*** public: Ogre::TerrainGroup::RayResult MouseHit(CameraPtr _camera, const ignition::math::Vector2i &_mousePos) const;
     + ***Deprecation:*** public: unsigned int GetTerrainSubdivisionCount() const;

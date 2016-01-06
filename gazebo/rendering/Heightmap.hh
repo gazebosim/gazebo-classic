@@ -21,17 +21,26 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include <boost/filesystem.hpp>
 
 #include <ignition/math/Vector2.hh>
 #include <ignition/math/Vector3.hh>
 
-#include "gazebo/rendering/ogre_gazebo.h"
-#include "gazebo/common/Image.hh"
+#include "gazebo/msgs/MessageTypes.hh"
+#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Vector2d.hh"
-#include "gazebo/rendering/Scene.hh"
+#include "gazebo/math/Vector2i.hh"
+#include "gazebo/rendering/ogre_gazebo.h"
+#include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/util/system.hh"
+
+namespace boost
+{
+  namespace filesystem
+  {
+    class path;
+  }
+}
 
 namespace Ogre
 {
@@ -41,6 +50,11 @@ namespace Ogre
 
 namespace gazebo
 {
+  namespace common
+  {
+    class Image;
+  }
+
   namespace rendering
   {
     // Forward declare private data.
@@ -111,7 +125,6 @@ namespace gazebo
       /// \deprecated See Height()
       public: double GetHeight(double _x, double _y, double _z = 1000)
           GAZEBO_DEPRECATED(7.0);
-
 
       /// \brief Get the height at a location
       /// \param[in] _x X location
@@ -265,7 +278,12 @@ namespace gazebo
 
       /// \brief Get the heightmap as an image
       /// \return An image that contains the terrain data.
-      public: common::Image GetImage() const;
+      /// \deprecated See Image()
+      public: common::Image GetImage() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the heightmap as an image
+      /// \return An image that contains the terrain data.
+      public: common::Image Image() const;
 
       /// \brief Calculate a mouse ray hit on the terrain.
       /// \param[in] _camera Camera associated with the mouse press.
@@ -357,6 +375,9 @@ namespace gazebo
 
     /// \internal
     /// \brief Custom terrain material generator for GLSL terrains.
+    /// A custom material generator that lets Gazebo use GLSL shaders
+    /// (as opposed to the default Cg shaders provided by Ogre) for rendering
+    /// terrain.
     class GZ_RENDERING_VISIBLE GzTerrainMatGen
       : public Ogre::TerrainMaterialGeneratorA
     {
@@ -396,6 +417,9 @@ namespace gazebo
 #pragma clang diagnostic ignored "-Woverloaded-virtual"
 #endif  // ifdef __clang__
         /// \brief Utility class to help with generating shaders for GLSL.
+        /// The class contains a collection of functions that are used to
+        /// dynamically generate a complete vertex or fragment shader program
+        /// in a string format.
         protected: class ShaderHelperGLSL :
             public Ogre::TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSL
         {
@@ -487,7 +511,8 @@ namespace gazebo
         friend ShaderHelperGLSL;
 
         /// Keeping the CG shader for reference.
-        /// Utility class to help with generating shaders for Cg / HLSL.
+        /// \brief Utility class to help with generating shaders for Cg / HLSL.
+        /// Original implementation from Ogre that generates Cg shaders
         protected: class ShaderHelperCg :
             public Ogre::TerrainMaterialGeneratorA::SM2Profile::ShaderHelperCg
         {
