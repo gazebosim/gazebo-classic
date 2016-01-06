@@ -19,6 +19,8 @@
 #include <mutex>
 #include <string>
 
+#include <ignition/math/Box.hh>
+
 #include <sdf/sdf.hh>
 
 #include <gazebo/common/Assert.hh>
@@ -27,6 +29,7 @@
 #include <gazebo/rendering/DepthCamera.hh>
 #include <gazebo/physics/physics.hh>
 #include <gazebo/sensors/sensors.hh>
+
 #include "plugins/FollowerPlugin.hh"
 
 using namespace gazebo;
@@ -148,9 +151,9 @@ void FollowerPlugin::Init()
   physics::EntityPtr parent = boost::dynamic_pointer_cast<physics::Entity>(
       this->dataPtr->leftJoint->GetChild());
 
-  math::Box bb = parent->GetBoundingBox();
+  ignition::math::Box bb = parent->GetBoundingBox().Ign();
   // This assumes that the largest dimension of the wheel is the diameter
-  this->dataPtr->wheelRadius = bb.GetSize().GetMax() * 0.5;
+  this->dataPtr->wheelRadius = bb.Size().Max() * 0.5;
 }
 
 /////////////////////////////////////////////////

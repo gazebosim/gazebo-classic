@@ -487,6 +487,10 @@ void Model::ResetPhysicsStates()
   {
     (*liter)->ResetPhysicsStates();
   }
+
+  // reset nested model physics states
+  for (auto &m : this->models)
+    m->ResetPhysicsStates();
 }
 
 //////////////////////////////////////////////////
