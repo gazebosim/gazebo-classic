@@ -337,7 +337,7 @@ int RaySensor::GetFiducial(unsigned int _index)
 }
 
 //////////////////////////////////////////////////
-bool RaySensor::UpdateImpl(bool /*_force*/)
+bool RaySensor::UpdateImpl(const bool /*_force*/)
 {
   // do the collision checks
   // this eventually call OnNewScans, so move mutex lock behind it in case
@@ -498,7 +498,7 @@ bool RaySensor::UpdateImpl(bool /*_force*/)
 }
 
 //////////////////////////////////////////////////
-bool RaySensor::IsActive()
+bool RaySensor::IsActive() const
 {
   return Sensor::IsActive() ||
     (this->scanPub && this->scanPub->HasConnections());

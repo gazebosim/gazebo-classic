@@ -248,7 +248,7 @@ MainWindow::~MainWindow()
 {
   delete this->dataPtr->userCmdHistory;
   this->dataPtr->userCmdHistory = NULL;
-
+  // Cleanup global actions
   this->DeleteActions();
 }
 
@@ -512,7 +512,7 @@ void MainWindow::Save()
       sdf::ElementPtr cameraElem = guiElem->GetElement("camera");
       rendering::UserCameraPtr cam = gui::get_active_camera();
 
-      cameraElem->GetElement("pose")->Set(cam->GetWorldPose());
+      cameraElem->GetElement("pose")->Set(cam->WorldPose());
       cameraElem->GetElement("view_controller")->Set(
           cam->GetViewControllerTypeString());
 
@@ -2186,6 +2186,12 @@ RenderWidget *MainWindow::RenderWidget() const
 }
 
 /////////////////////////////////////////////////
+RenderWidget *MainWindow::GetRenderWidget() const
+{
+  return this->RenderWidget();
+}
+
+/////////////////////////////////////////////////
 bool MainWindow::IsPaused() const
 {
   if (this->dataPtr->renderWidget)
@@ -2260,6 +2266,12 @@ Editor *MainWindow::Editor(const std::string &_name) const
     return iter->second;
 
   return NULL;
+}
+
+/////////////////////////////////////////////////
+Editor *MainWindow::GetEditor(const std::string &_name) const
+{
+  return this->Editor(_name);
 }
 
 /////////////////////////////////////////////////

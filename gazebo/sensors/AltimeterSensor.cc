@@ -37,15 +37,14 @@ GZ_REGISTER_STATIC_SENSOR("altimeter", AltimeterSensor)
 
 /////////////////////////////////////////////////
 AltimeterSensor::AltimeterSensor()
-: Sensor(sensors::OTHER), dataPtr(new AltimeterSensorPrivate)
+: Sensor(sensors::OTHER),
+  dataPtr(new AltimeterSensorPrivate)
 {
 }
 
 /////////////////////////////////////////////////
 AltimeterSensor::~AltimeterSensor()
 {
-  delete this->dataPtr;
-  this->dataPtr = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -126,7 +125,7 @@ void AltimeterSensor::Init()
 }
 
 //////////////////////////////////////////////////
-bool AltimeterSensor::UpdateImpl(bool /*_force*/)
+bool AltimeterSensor::UpdateImpl(const bool /*_force*/)
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 

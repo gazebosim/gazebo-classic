@@ -126,10 +126,10 @@ void UndoTest::MsgPassing()
 
     // Save sim times
     cmdTimes.push_back(world->GetSimTime());
-    if (num == 0)
-      QVERIFY(cmdTimes[num] > gazebo::common::Time::Zero);
+    if (num == 1)
+      QVERIFY(cmdTimes[num-1] > gazebo::common::Time::Zero);
     else
-      QVERIFY(cmdTimes[num] > cmdTimes[num-1]);
+      QVERIFY(cmdTimes[num-1] > cmdTimes[num-2]);
 
     // Check that the server received the message and published proper stats
     QCOMPARE(g_undoCmdCount, num);

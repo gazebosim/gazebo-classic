@@ -90,6 +90,11 @@ namespace gazebo
       /// the main tab.
       public: void ShowLeftColumnWidget(const std::string &_name = "default");
 
+
+      /// \brief Get a pointer to the render widget.
+      /// \return A pointer to the render widget.
+      public: gui::RenderWidget *GetRenderWidget() const GAZEBO_DEPRECATED(7.0);
+
       /// \brief Get a pointer to the render widget.
       /// \return A pointer to the render widget.
       public: gui::RenderWidget *RenderWidget() const;
@@ -127,6 +132,12 @@ namespace gazebo
       /// \param[in] _parent Parent for the new action.
       /// \return The new action.
       public: QAction *CloneAction(QAction *_action, QObject *_parent);
+
+      /// \brief Get an editor by name
+      /// \param[in] _name Name of the editor.
+      /// \return Pointer to the editor.
+      public: gui::Editor *GetEditor(
+          const std::string &_name) const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get an editor by name
       /// \param[in] _name Name of the editor.

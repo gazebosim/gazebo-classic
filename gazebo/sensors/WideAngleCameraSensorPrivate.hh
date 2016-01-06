@@ -14,14 +14,13 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_WIDEANGLE_CAMERA_SENSOR_PRIVATE_HH_
-#define _GAZEBO_WIDEANGLE_CAMERA_SENSOR_PRIVATE_HH_
+#ifndef _GAZEBO_SENSORS_WIDEANGLECAMERASENSOR_PRIVATE_HH_
+#define _GAZEBO_SENSORS_WIDEANGLECAMERASENSOR_PRIVATE_HH_
 
 #include <mutex>
 #include <queue>
 
 #include "gazebo/msgs/MessageTypes.hh"
-
 
 namespace gazebo
 {

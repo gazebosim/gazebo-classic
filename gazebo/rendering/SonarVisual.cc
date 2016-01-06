@@ -136,7 +136,8 @@ void SonarVisual::Update()
       !math::equal(dPtr->coneNode->getScale().x, radiusScale))
   {
     dPtr->coneNode->setScale(radiusScale, radiusScale, rangeDelta);
-    dPtr->sonarRay->SetPoint(0, math::Vector3(0, 0, rangeDelta * 0.5));
+    dPtr->sonarRay->SetPoint(0,
+        ignition::math::Vector3d(0, 0, rangeDelta * 0.5));
   }
 
   ignition::math::Pose3d pose =
@@ -151,7 +152,7 @@ void SonarVisual::Update()
   }
   else
   {
-    dPtr->sonarRay->SetPoint(1, math::Vector3(0, 0,
+    dPtr->sonarRay->SetPoint(1, ignition::math::Vector3d(0, 0,
           (rangeDelta * 0.5) - dPtr->sonarMsg->sonar().range()));
   }
   dPtr->receivedMsg = false;
