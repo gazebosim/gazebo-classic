@@ -291,7 +291,7 @@ void Scene::Load(sdf::ElementPtr _sdf)
 void Scene::Load()
 {
   this->dataPtr->initialized = false;
-  Ogre::Root *root = RenderEngine::Instance()->root;
+  Ogre::Root *root = RenderEngine::Instance()->Root();
 
   if (this->dataPtr->manager)
     root->destroySceneManager(this->dataPtr->manager);
@@ -302,7 +302,7 @@ void Scene::Load()
 
 #if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR >= 9
   this->dataPtr->manager->addRenderQueueListener(
-      RenderEngine::Instance()->GetOverlaySystem());
+      RenderEngine::Instance()->OverlaySystem());
 #endif
 }
 
@@ -483,19 +483,19 @@ void Scene::SetBackgroundColor(const common::Color &_color)
   for (iter = this->dataPtr->cameras.begin();
       iter != this->dataPtr->cameras.end(); ++iter)
   {
-    if ((*iter)->GetViewport() &&
-        (*iter)->GetViewport()->getBackgroundColour() != clr)
-      (*iter)->GetViewport()->setBackgroundColour(clr);
+    if ((*iter)->OgreViewport() &&
+        (*iter)->OgreViewport()->getBackgroundColour() != clr)
+      (*iter)->OgreViewport()->setBackgroundColour(clr);
   }
 
   std::vector<UserCameraPtr>::iterator iter2;
   for (iter2 = this->dataPtr->userCameras.begin();
        iter2 != this->dataPtr->userCameras.end(); ++iter2)
   {
-    if ((*iter2)->GetViewport() &&
-        (*iter2)->GetViewport()->getBackgroundColour() != clr)
+    if ((*iter2)->OgreViewport() &&
+        (*iter2)->OgreViewport()->getBackgroundColour() != clr)
     {
-      (*iter2)->GetViewport()->setBackgroundColour(clr);
+      (*iter2)->OgreViewport()->setBackgroundColour(clr);
     }
   }
 }
@@ -603,7 +603,7 @@ CameraPtr Scene::GetCamera(const std::string &_name) const
   for (iter = this->dataPtr->cameras.begin();
       iter != this->dataPtr->cameras.end(); ++iter)
   {
-    if ((*iter)->GetName() == _name)
+    if ((*iter)->Name() == _name)
       result = *iter;
   }
 
@@ -670,7 +670,7 @@ void Scene::RemoveCamera(const std::string &_name)
   for (iter = this->dataPtr->cameras.begin();
       iter != this->dataPtr->cameras.end(); ++iter)
   {
-    if ((*iter)->GetName() == _name)
+    if ((*iter)->Name() == _name)
     {
       (*iter)->Fini();
       (*iter).reset();
@@ -1000,7 +1000,7 @@ Ogre::Entity *Scene::GetOgreEntityAt(CameraPtr _camera,
                                      const math::Vector2i &_mousePos,
                                      bool _ignoreSelectionObj)
 {
-  Ogre::Camera *ogreCam = _camera->GetOgreCamera();
+  Ogre::Camera *ogreCam = _camera->OgreCamera();
 
   Ogre::Real closest_distance = -1.0f;
   Ogre::Ray mouseRay = ogreCam->getCameraToViewportRay(
@@ -1090,7 +1090,7 @@ bool Scene::GetFirstContact(CameraPtr _camera,
                             math::Vector3 &_position)
 {
   bool valid = false;
-  Ogre::Camera *ogreCam = _camera->GetOgreCamera();
+  Ogre::Camera *ogreCam = _camera->OgreCamera();
 
   _position = math::Vector3::Zero;
 
@@ -2938,7 +2938,7 @@ void Scene::SetShadowsEnabled(bool _value)
        iter != this->dataPtr->userCameras.end() && shadowOverride; ++iter)
   {
     shadowOverride = !(*iter)->StereoEnabled() &&
-                     (*iter)->GetProjectionType() != "orthographic";
+                     (*iter)->ProjectionType() != "orthographic";
   }
 
   _value = _value && shadowOverride;

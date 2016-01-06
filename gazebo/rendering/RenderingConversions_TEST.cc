@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,33 +16,37 @@
 */
 
 #include <gtest/gtest.h>
-#include <gazebo/rendering/rendering.hh>
+
 #include "gazebo/test/ServerFixture.hh"
 
+#include "gazebo/rendering/ogre_gazebo.h"
+#include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/rendering/Conversions.hh"
+
 using namespace gazebo;
-class Issue846Test : public ServerFixture
+class Conversions_TEST : public ServerFixture
 {
 };
 
-
 /////////////////////////////////////////////////
-// \brief Test for issue #846
-TEST_F(Issue846Test, CaptureData)
+TEST_F(Conversions_TEST, TransformSpace)
 {
-  Load("worlds/empty.world");
+  EXPECT_EQ(rendering::Conversions::Convert(Ogre::Node::TS_LOCAL),
+      rendering::RF_LOCAL);
+  EXPECT_EQ(rendering::Conversions::Convert(Ogre::Node::TS_PARENT),
+      rendering::RF_PARENT);
+  EXPECT_EQ(rendering::Conversions::Convert(Ogre::Node::TS_WORLD),
+      rendering::RF_WORLD);
 
-  gazebo::rendering::CameraPtr camera(new gazebo::rendering::Camera("",
-        this->GetScene(), false));
-
-  EXPECT_FALSE(camera->CaptureData());
-  camera->EnableSaveFrame(true);
-  EXPECT_TRUE(camera->CaptureData());
-  camera->EnableSaveFrame(false);
-  EXPECT_FALSE(camera->CaptureData());
+  EXPECT_EQ(rendering::Conversions::Convert(rendering::RF_LOCAL),
+      Ogre::Node::TS_LOCAL);
+  EXPECT_EQ(rendering::Conversions::Convert(rendering::RF_PARENT),
+      Ogre::Node::TS_PARENT);
+  EXPECT_EQ(rendering::Conversions::Convert(rendering::RF_WORLD),
+      Ogre::Node::TS_WORLD);
 }
 
 /////////////////////////////////////////////////
-/// Main
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
