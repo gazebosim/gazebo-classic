@@ -16,41 +16,45 @@
 */
 
 #include "gazebo/gui/building/GridLines.hh"
+#include "gazebo/gui/building/GridLinesPrivate.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-GridLines::GridLines(int _w, int _h) : QGraphicsItem(), width(_w), height(_h),
-  space(10)
+GridLines::GridLines(int _w, int _h) : QGraphicsItem(),
+    dataPtr(new GridLinesPrivate())
 {
   this->setFlag(QGraphicsItem::ItemIsSelectable, false);
   this->setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
-}
 
-/////////////////////////////////////////////////
-GridLines::~GridLines()
-{
+  this->dataPtr->width = _w;
+  this->dataPtr->height = _h;
+  this->dataPtr->space = 10;
 }
 
 /////////////////////////////////////////////////
 void GridLines::paint(QPainter *_painter,
     const QStyleOptionGraphicsItem */*_option*/, QWidget */*_widget*/)
 {
-  // re-draw the grid lines from 0,0 to this->width, this->height
+  // re-draw the grid lines from 0,0 to this->dataPtr->width,
+  // this->dataPtr->height
   // do horizontal first
   QColor c(200, 200, 255, 125);
 
   _painter->setPen(c);
 
-  for (int yPos = -this->height; yPos < this->height; yPos+=this->space)
+  for (int yPos = -this->dataPtr->height; yPos < this->dataPtr->height;
+      yPos+=this->dataPtr->space)
   {
-    _painter->drawLine(-this->width, yPos, this->width, yPos);
+    _painter->drawLine(-this->dataPtr->width, yPos, this->dataPtr->width, yPos);
   }
 
-  for (int xPos = -this->width; xPos < this->width; xPos+=this->space)
+  for (int xPos = -this->dataPtr->width; xPos < this->dataPtr->width;
+      xPos+=this->dataPtr->space)
   {
-    _painter->drawLine(xPos, -this->height, xPos, this->height);
+    _painter->drawLine(xPos, -this->dataPtr->height, xPos,
+        this->dataPtr->height);
   }
 }
 
@@ -63,18 +67,8 @@ QRectF GridLines::boundingRect() const
 /////////////////////////////////////////////////
 void GridLines::SetSize(int _width, int _height)
 {
-  this->width = _width;
-  this->height = _height;
-}
-
-/////////////////////////////////////////////////
-void GridLines::mouseMoveEvent(QGraphicsSceneDragDropEvent *)
-{
-}
-
-/////////////////////////////////////////////////
-void GridLines::mousePressEvent(QGraphicsSceneDragDropEvent *)
-{
+  this->dataPtr->width = _width;
+  this->dataPtr->height = _height;
 }
 
 /////////////////////////////////////////////////

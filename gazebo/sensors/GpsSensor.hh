@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_GPSSENSOR_HH_
-#define _GAZEBO_GPSSENSOR_HH_
+#ifndef _GAZEBO_SENSORS_GPSSENSOR_HH_
+#define _GAZEBO_SENSORS_GPSSENSOR_HH_
 
 #include <string>
 
@@ -56,7 +56,7 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited
-      protected: virtual bool UpdateImpl(bool _force);
+      protected: virtual bool UpdateImpl(const bool _force);
 
       // Documentation inherited
       public: virtual void Fini();

@@ -63,6 +63,13 @@ std::string gazebo::custom_exec(std::string _cmd)
 }
 
 /////////////////////////////////////////////////
+void RenderingFixture::SetUp()
+{
+  // start rendering in test thread
+  rendering::load();
+}
+
+/////////////////////////////////////////////////
 ServerFixture::ServerFixture()
 {
   this->server = NULL;
@@ -500,7 +507,7 @@ void ServerFixture::GetFrame(const std::string &_cameraName,
   sensors::SensorPtr sensor = sensors::get_sensor(_cameraName);
   EXPECT_TRUE(sensor != NULL);
   sensors::CameraSensorPtr camSensor =
-    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
 
   _width = camSensor->GetImageWidth();
   _height = camSensor->GetImageHeight();
@@ -724,7 +731,7 @@ sensors::SonarSensorPtr ServerFixture::SpawnSonar(const std::string &_modelName,
 
   WaitUntilEntitySpawn(_modelName, 100, 100);
   WaitUntilSensorSpawn(_sonarName, 100, 100);
-  return boost::dynamic_pointer_cast<sensors::SonarSensor>(
+  return std::dynamic_pointer_cast<sensors::SonarSensor>(
       sensors::get_sensor(_sonarName));
 }
 

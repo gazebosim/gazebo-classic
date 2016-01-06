@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_MAGNETOMETER_SENSOR_HH_
-#define _GAZEBO_MAGNETOMETER_SENSOR_HH_
+#ifndef _GAZEBO_SENSORS_MAGNETOMETER_SENSOR_HH_
+#define _GAZEBO_SENSORS_MAGNETOMETER_SENSOR_HH_
 
 #include <string>
 
@@ -61,7 +60,7 @@ namespace gazebo
       public: virtual std::string GetTopic() const;
 
       // Documentation inherited
-      protected: virtual bool UpdateImpl(bool _force);
+      protected: virtual bool UpdateImpl(const bool _force);
 
       // Documentation inherited
       public: virtual void Fini();
@@ -71,7 +70,7 @@ namespace gazebo
       public: ignition::math::Vector3d MagneticField() const;
 
       /// \brief Private data pointer.
-      private: MagnetometerSensorPrivate *dataPtr;
+      private: std::unique_ptr<MagnetometerSensorPrivate> dataPtr;
     };
     /// \}
   }
