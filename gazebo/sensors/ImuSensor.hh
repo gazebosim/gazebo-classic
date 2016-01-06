@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_IMUSENSOR_HH_
-#define _GAZEBO_IMUSENSOR_HH_
+#ifndef _GAZEBO_SENSORS_IMUSENSOR_HH_
+#define _GAZEBO_SENSORS_IMUSENSOR_HH_
 
 #include <vector>
 #include <string>
@@ -54,7 +54,7 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited
-      protected: virtual bool UpdateImpl(bool _force);
+      protected: virtual bool UpdateImpl(const bool _force);
 
       // Documentation inherited
       protected: virtual void Fini();
@@ -86,7 +86,7 @@ namespace gazebo
       public: void SetReferencePose();
 
       // Documentation inherited.
-      public: virtual bool IsActive();
+      public: virtual bool IsActive() const;
 
       /// \brief Callback when link data is received
       /// \param[in] _msg Message containing link data

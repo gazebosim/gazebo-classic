@@ -291,7 +291,7 @@ void Scene::Load(sdf::ElementPtr _sdf)
 void Scene::Load()
 {
   this->dataPtr->initialized = false;
-  Ogre::Root *root = RenderEngine::Instance()->root;
+  Ogre::Root *root = RenderEngine::Instance()->Root();
 
   if (this->dataPtr->manager)
     root->destroySceneManager(this->dataPtr->manager);
@@ -302,7 +302,7 @@ void Scene::Load()
 
 #if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR >= 9
   this->dataPtr->manager->addRenderQueueListener(
-      RenderEngine::Instance()->GetOverlaySystem());
+      RenderEngine::Instance()->OverlaySystem());
 #endif
 }
 
@@ -483,19 +483,19 @@ void Scene::SetBackgroundColor(const common::Color &_color)
   for (iter = this->dataPtr->cameras.begin();
       iter != this->dataPtr->cameras.end(); ++iter)
   {
-    if ((*iter)->GetViewport() &&
-        (*iter)->GetViewport()->getBackgroundColour() != clr)
-      (*iter)->GetViewport()->setBackgroundColour(clr);
+    if ((*iter)->OgreViewport() &&
+        (*iter)->OgreViewport()->getBackgroundColour() != clr)
+      (*iter)->OgreViewport()->setBackgroundColour(clr);
   }
 
   std::vector<UserCameraPtr>::iterator iter2;
   for (iter2 = this->dataPtr->userCameras.begin();
        iter2 != this->dataPtr->userCameras.end(); ++iter2)
   {
-    if ((*iter2)->GetViewport() &&
-        (*iter2)->GetViewport()->getBackgroundColour() != clr)
+    if ((*iter2)->OgreViewport() &&
+        (*iter2)->OgreViewport()->getBackgroundColour() != clr)
     {
-      (*iter2)->GetViewport()->setBackgroundColour(clr);
+      (*iter2)->OgreViewport()->setBackgroundColour(clr);
     }
   }
 }
@@ -603,7 +603,7 @@ CameraPtr Scene::GetCamera(const std::string &_name) const
   for (iter = this->dataPtr->cameras.begin();
       iter != this->dataPtr->cameras.end(); ++iter)
   {
-    if ((*iter)->GetName() == _name)
+    if ((*iter)->Name() == _name)
       result = *iter;
   }
 
@@ -670,7 +670,7 @@ void Scene::RemoveCamera(const std::string &_name)
   for (iter = this->dataPtr->cameras.begin();
       iter != this->dataPtr->cameras.end(); ++iter)
   {
-    if ((*iter)->GetName() == _name)
+    if ((*iter)->Name() == _name)
     {
       (*iter)->Fini();
       (*iter).reset();
@@ -1000,7 +1000,7 @@ Ogre::Entity *Scene::GetOgreEntityAt(CameraPtr _camera,
                                      const math::Vector2i &_mousePos,
                                      bool _ignoreSelectionObj)
 {
-  Ogre::Camera *ogreCam = _camera->GetOgreCamera();
+  Ogre::Camera *ogreCam = _camera->OgreCamera();
 
   Ogre::Real closest_distance = -1.0f;
   Ogre::Ray mouseRay = ogreCam->getCameraToViewportRay(
@@ -1090,7 +1090,7 @@ bool Scene::GetFirstContact(CameraPtr _camera,
                             math::Vector3 &_position)
 {
   bool valid = false;
-  Ogre::Camera *ogreCam = _camera->GetOgreCamera();
+  Ogre::Camera *ogreCam = _camera->OgreCamera();
 
   _position = math::Vector3::Zero;
 
@@ -2224,17 +2224,18 @@ bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
     return false;
   }
 
-  if (!this->GetVisual(_msg->name() + "_COM_VISUAL__"))
+  std::string linkName = linkVis->GetName();
+  if (!this->GetVisual(linkName + "_COM_VISUAL__"))
   {
     this->CreateCOMVisual(_msg, linkVis);
   }
 
-  if (!this->GetVisual(_msg->name() + "_INERTIA_VISUAL__"))
+  if (!this->GetVisual(linkName + "_INERTIA_VISUAL__"))
   {
     this->CreateInertiaVisual(_msg, linkVis);
   }
 
-  if (!this->GetVisual(_msg->name() + "_LINK_FRAME_VISUAL__"))
+  if (!this->GetVisual(linkName + "_LINK_FRAME_VISUAL__"))
   {
     this->CreateLinkFrameVisual(_msg, linkVis);
   }
@@ -2937,7 +2938,7 @@ void Scene::SetShadowsEnabled(bool _value)
        iter != this->dataPtr->userCameras.end() && shadowOverride; ++iter)
   {
     shadowOverride = !(*iter)->StereoEnabled() &&
-                     (*iter)->GetProjectionType() != "orthographic";
+                     (*iter)->ProjectionType() != "orthographic";
   }
 
   _value = _value && shadowOverride;
@@ -3065,10 +3066,10 @@ void Scene::SetVisualId(VisualPtr _vis, uint32_t _id)
 /////////////////////////////////////////////////
 void Scene::AddLight(LightPtr _light)
 {
-  std::string n = this->StripSceneName(_light->GetName());
-  Light_M::iterator iter = this->dataPtr->lights.find(n);
+  std::string n = this->StripSceneName(_light->Name());
+  const auto iter = this->dataPtr->lights.find(n);
   if (iter != this->dataPtr->lights.end())
-    gzerr << "Duplicate lights detected[" << _light->GetName() << "]\n";
+    gzerr << "Duplicate lights detected[" << _light->Name() << "]\n";
 
   this->dataPtr->lights[n] = _light;
 }
@@ -3079,7 +3080,7 @@ void Scene::RemoveLight(LightPtr _light)
   if (_light)
   {
     // Delete the light
-    std::string n = this->StripSceneName(_light->GetName());
+    std::string n = this->StripSceneName(_light->Name());
     this->dataPtr->lights.erase(n);
   }
 }
@@ -3131,7 +3132,7 @@ Heightmap *Scene::GetHeightmap() const
 /////////////////////////////////////////////////
 void Scene::CreateCOMVisual(ConstLinkPtr &_msg, VisualPtr _linkVisual)
 {
-  COMVisualPtr comVis(new COMVisual(_msg->name() + "_COM_VISUAL__",
+  COMVisualPtr comVis(new COMVisual(_linkVisual->GetName() + "_COM_VISUAL__",
                                     _linkVisual));
   comVis->Load(_msg);
   comVis->SetVisible(this->dataPtr->showCOMs);
@@ -3151,7 +3152,7 @@ void Scene::CreateCOMVisual(sdf::ElementPtr _elem, VisualPtr _linkVisual)
 /////////////////////////////////////////////////
 void Scene::CreateInertiaVisual(ConstLinkPtr &_msg, VisualPtr _linkVisual)
 {
-  InertiaVisualPtr inertiaVis(new InertiaVisual(_msg->name() +
+  InertiaVisualPtr inertiaVis(new InertiaVisual(_linkVisual->GetName() +
       "_INERTIA_VISUAL__", _linkVisual));
   inertiaVis->Load(_msg);
   inertiaVis->SetVisible(this->dataPtr->showInertias);
@@ -3169,9 +3170,9 @@ void Scene::CreateInertiaVisual(sdf::ElementPtr _elem, VisualPtr _linkVisual)
 }
 
 /////////////////////////////////////////////////
-void Scene::CreateLinkFrameVisual(ConstLinkPtr &_msg, VisualPtr _linkVisual)
+void Scene::CreateLinkFrameVisual(ConstLinkPtr &/*_msg*/, VisualPtr _linkVisual)
 {
-  LinkFrameVisualPtr linkFrameVis(new LinkFrameVisual(_msg->name() +
+  LinkFrameVisualPtr linkFrameVis(new LinkFrameVisual(_linkVisual->GetName() +
       "_LINK_FRAME_VISUAL__", _linkVisual));
   linkFrameVis->Load();
   linkFrameVis->SetVisible(this->dataPtr->showLinkFrames);
@@ -3186,7 +3187,8 @@ void Scene::RemoveVisualizations(rendering::VisualPtr _vis)
   {
     rendering::VisualPtr childVis = _vis->GetChild(i);
     Visual::VisualType visType = childVis->GetType();
-    if (visType == Visual::VT_PHYSICS || visType == Visual::VT_SENSOR)
+    if (visType == Visual::VT_PHYSICS || visType == Visual::VT_SENSOR
+       || visType == Visual::VT_GUI)
     {
       toRemove.push_back(childVis);
     }

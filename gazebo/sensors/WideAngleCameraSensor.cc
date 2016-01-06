@@ -40,7 +40,6 @@
 #include "gazebo/sensors/WideAngleCameraSensorPrivate.hh"
 #include "gazebo/sensors/WideAngleCameraSensor.hh"
 
-
 using namespace gazebo;
 using namespace sensors;
 
@@ -48,7 +47,8 @@ GZ_REGISTER_STATIC_SENSOR("wideanglecamera", WideAngleCameraSensor)
 
 //////////////////////////////////////////////////
 WideAngleCameraSensor::WideAngleCameraSensor()
-  : dataPtr(new WideAngleCameraSensorPrivate)
+: CameraSensor(),
+  dataPtr(new WideAngleCameraSensorPrivate)
 {
 }
 
@@ -95,8 +95,8 @@ void WideAngleCameraSensor::Init()
     this->camera->Load(cameraSdf);
 
     // Do some sanity checks
-    if (this->camera->GetImageWidth() == 0 ||
-        this->camera->GetImageHeight() == 0)
+    if (this->camera->ImageWidth() == 0 ||
+        this->camera->ImageHeight() == 0)
     {
       gzerr << "image has zero size" << std::endl;
       return;
@@ -163,7 +163,7 @@ void WideAngleCameraSensor::Fini()
 }
 
 //////////////////////////////////////////////////
-bool WideAngleCameraSensor::UpdateImpl(bool _force)
+bool WideAngleCameraSensor::UpdateImpl(const bool _force)
 {
   if (!CameraSensor::UpdateImpl(_force))
     return false;
@@ -196,7 +196,7 @@ bool WideAngleCameraSensor::UpdateImpl(bool _force)
     msg.set_fun(lens->Fun());
     msg.set_scale_to_hfov(lens->ScaleToHFOV());
     msg.set_cutoff_angle(lens->CutOffAngle());
-    msg.set_hfov(wcamera->GetHFOV().Radian());
+    msg.set_hfov(wcamera->HFOV().Radian());
 
     msg.set_env_texture_size(wcamera->EnvTextureSize());
 
