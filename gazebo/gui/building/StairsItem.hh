@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_GUI_STAIRS_ITEM_HH_
-#define _GAZEBO_GUI_STAIRS_ITEM_HH_
+#ifndef _GAZEBO_GUI_BUILDING_STAIRSITEM_HH_
+#define _GAZEBO_GUI_BUILDING_STAIRSITEM_HH_
 
 #include <memory>
 

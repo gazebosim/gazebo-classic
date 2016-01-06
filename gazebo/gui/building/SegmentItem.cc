@@ -18,7 +18,6 @@
 #include <ignition/math/Angle.hh>
 
 #include "gazebo/gui/building/BuildingMaker.hh"
-#include "gazebo/gui/building/EditorItem.hh"
 #include "gazebo/gui/building/GrabberHandle.hh"
 #include "gazebo/gui/building/SegmentItem.hh"
 #include "gazebo/gui/building/SegmentItemPrivate.hh"

@@ -19,8 +19,6 @@
 #include "gazebo/gui/building/DoorItem.hh"
 #include "gazebo/gui/building/DoorItemPrivate.hh"
 #include "gazebo/gui/building/EditorView.hh"
-#include "gazebo/gui/building/EditorItem.hh"
-#include "gazebo/gui/building/RectItem.hh"
 #include "gazebo/gui/building/WindowDoorInspectorDialog.hh"
 
 using namespace gazebo;

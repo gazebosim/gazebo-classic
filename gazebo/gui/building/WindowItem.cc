@@ -17,7 +17,6 @@
 
 #include "gazebo/gui/building/BuildingMaker.hh"
 #include "gazebo/gui/building/EditorView.hh"
-#include "gazebo/gui/building/RectItem.hh"
 #include "gazebo/gui/building/WindowDoorInspectorDialog.hh"
 #include "gazebo/gui/building/WindowItem.hh"
 #include "gazebo/gui/building/WindowItemPrivate.hh"

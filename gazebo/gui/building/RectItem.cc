@@ -19,7 +19,6 @@
 
 #include "gazebo/gui/building/BuildingEditorWidget.hh"
 #include "gazebo/gui/building/GrabberHandle.hh"
-#include "gazebo/gui/building/EditorItem.hh"
 #include "gazebo/gui/building/MeasureItem.hh"
 #include "gazebo/gui/building/RectItem.hh"
 #include "gazebo/gui/building/RectItemPrivate.hh"

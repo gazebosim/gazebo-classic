@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_GUI_EDITOR_ITEM_HH_
-#define _GAZEBO_GUI_EDITOR_ITEM_HH_
+#ifndef _GAZEBO_GUI_BUILDING_EDITORITEM_HH_
+#define _GAZEBO_GUI_BUILDING_EDITORITEM_HH_
 
 #include <string>
 #include <memory>

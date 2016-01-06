@@ -15,10 +15,8 @@
  *
 */
 
-#include "gazebo/gui/building/EditorItem.hh"
 #include "gazebo/gui/building/FloorItem.hh"
 #include "gazebo/gui/building/FloorItemPrivate.hh"
-#include "gazebo/gui/building/RectItem.hh"
 #include "gazebo/gui/building/WallSegmentItem.hh"
 
 using namespace gazebo;

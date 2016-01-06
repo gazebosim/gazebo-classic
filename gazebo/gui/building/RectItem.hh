@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_GUI_RECT_ITEM_HH_
-#define _GAZEBO_GUI_RECT_ITEM_HH_
+#ifndef _GAZEBO_GUI_BUILDING_RECTITEM_HH_
+#define _GAZEBO_GUI_BUILDING_RECTITEM_HH_
 
 #include <memory>
 #include <vector>
@@ -162,7 +162,7 @@ namespace gazebo
           QEvent *_event);
 
       /// \brief Filter Qt events and redirect them to the grabber handle.
-      /// \param[in] _rotateHandle Grabber handle that will handle the event.
+      /// \param[in] _grabber Grabber handle that will handle the event.
       /// \param[in] _event Qt event
       private: virtual bool GrabberEventFilter(GrabberHandle *_grabber,
           QEvent *_event);

@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_GUI_DOOR_ITEM_HH_
-#define _GAZEBO_GUI_DOOR_ITEM_HH_
+#ifndef _GAZEBO_GUI_BUILDING_DOORITEM_HH_
+#define _GAZEBO_GUI_BUILDING_DOORITEM_HH_
 
 #include <memory>
 

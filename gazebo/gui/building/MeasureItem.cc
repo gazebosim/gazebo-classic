@@ -20,10 +20,8 @@
 
 #include <ignition/math/Angle.hh>
 
-#include "gazebo/gui/building/EditorItem.hh"
 #include "gazebo/gui/building/MeasureItem.hh"
 #include "gazebo/gui/building/MeasureItemPrivate.hh"
-#include "gazebo/gui/building/SegmentItem.hh"
 
 using namespace gazebo;
 using namespace gui;
