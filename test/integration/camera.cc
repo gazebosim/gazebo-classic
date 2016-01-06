@@ -37,11 +37,11 @@ TEST_F(CameraTest, Follow)
   SpawnBox("box", math::Vector3(1, 1, 1), math::Vector3(10, 10, 1),
       math::Vector3(0, 0, 0));
 
-  math::Pose cameraStartPose(0, 0, 0, 0, 0, 0);
+  ignition::math::Pose3d cameraStartPose(0, 0, 0, 0, 0, 0);
 
   // Spawn a camera that will do the following
   SpawnCamera("test_camera_model", "test_camera",
-      cameraStartPose.pos, cameraStartPose.rot.GetAsEuler());
+      cameraStartPose.Pos(), cameraStartPose.Rot().Euler());
 
   rendering::ScenePtr scene = rendering::get_scene();
   ASSERT_TRUE(scene != NULL);
@@ -50,7 +50,7 @@ TEST_F(CameraTest, Follow)
   ASSERT_TRUE(camera != NULL);
 
   // Make sure the sensor is at the correct initial pose
-  EXPECT_EQ(camera->GetWorldPose(), cameraStartPose);
+  EXPECT_EQ(camera->WorldPose(), cameraStartPose);
 
   SetPause(true);
 
@@ -71,10 +71,10 @@ TEST_F(CameraTest, Follow)
   world->Step(1000);
 
   // Make sure the sensor is at the correct initial pose
-  EXPECT_TRUE(camera->GetWorldPose() != cameraStartPose);
+  EXPECT_TRUE(camera->WorldPose() != cameraStartPose);
 
-  EXPECT_NEAR(camera->GetWorldPose().pos.x, 4.3, 0.1);
-  EXPECT_NEAR(camera->GetWorldPose().pos.y, 4.3, 0.1);
+  EXPECT_NEAR(camera->WorldPose().Pos().X(), 4.3, 0.1);
+  EXPECT_NEAR(camera->WorldPose().Pos().Y(), 4.3, 0.1);
 }
 
 /////////////////////////////////////////////////
@@ -91,12 +91,12 @@ TEST_F(CameraTest, Visible)
   SpawnBox("box", math::Vector3(1, 1, 1), math::Vector3(1, 0, 0.5),
       math::Vector3(0, 0, 0));
 
-  math::Pose cameraStartPose(0, 0, 0, 0, 0, 0);
+  ignition::math::Pose3d cameraStartPose(0, 0, 0, 0, 0, 0);
 
   std::string cameraName = "test_camera";
   // Spawn a camera facing the box
   SpawnCamera("test_camera_model", cameraName,
-      cameraStartPose.pos, cameraStartPose.rot.GetAsEuler());
+      cameraStartPose.Pos(), cameraStartPose.Rot().Euler());
 
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
   ASSERT_TRUE(sensor != NULL);
@@ -109,7 +109,7 @@ TEST_F(CameraTest, Visible)
   ASSERT_TRUE(camera != NULL);
 
   // Make sure the camera is at the correct initial pose
-  EXPECT_EQ(camera->GetWorldPose(), cameraStartPose);
+  EXPECT_EQ(camera->WorldPose(), cameraStartPose);
 
   int sleep = 0;
   int maxSleep = 5;
@@ -178,7 +178,7 @@ TEST_F(CameraTest, Visible)
   EXPECT_TRUE(!camera->IsVisible(visual->GetName()));
 
   // rotate the camera counter-clockwise to see the box
-  camera->Yaw(math::Angle(1.57));
+  camera->Yaw(ignition::math::Angle(1.57));
   EXPECT_TRUE(camera->IsVisible(visual));
   EXPECT_TRUE(camera->IsVisible(visual->GetName()));
 

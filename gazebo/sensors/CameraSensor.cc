@@ -19,8 +19,8 @@
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
+#include <boost/algorithm/string.hpp>
 #include <functional>
-#include <regex>
 
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Exception.hh"
@@ -32,15 +32,15 @@
 #include "gazebo/physics/World.hh"
 
 #include "gazebo/rendering/RenderEngine.hh"
+#include "gazebo/rendering/Camera.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/RenderingIface.hh"
-#include "gazebo/rendering/Camera.hh"
 
 #include "gazebo/sensors/SensorFactory.hh"
+#include "gazebo/sensors/CameraSensor.hh"
 #include "gazebo/sensors/Noise.hh"
 
 #include "gazebo/sensors/CameraSensorPrivate.hh"
-#include "gazebo/sensors/CameraSensor.hh"
 
 using namespace gazebo;
 using namespace sensors;
@@ -73,8 +73,8 @@ void CameraSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 std::string CameraSensor::Topic() const
 {
   std::string topicName = "~/";
-  topicName += this->ParentName() + "/" + this->Name() + "/image";
-  topicName = std::regex_replace(topicName, std::regex("::"), std::string("/"));
+  topicName += this->parentName + "/" + this->GetName() + "/image";
+  boost::replace_all(topicName, "::", "/");
 
   return topicName;
 }

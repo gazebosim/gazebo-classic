@@ -19,8 +19,9 @@
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
+
+#include <boost/algorithm/string.hpp>
 #include <functional>
-#include <regex>
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Entity.hh"
 #include "gazebo/physics/Model.hh"
@@ -66,8 +67,8 @@ GpuRaySensor::~GpuRaySensor()
 std::string GpuRaySensor::Topic() const
 {
   std::string topicName = "~/";
-  topicName += this->ParentName() + "/" + this->Name() + "/scan";
-  topicName = std::regex_replace(topicName, std::regex("::"), std::string("/"));
+  topicName += this->parentName + "/" + this->GetName() + "/scan";
+  boost::replace_all(topicName, "::", "/");
 
   return topicName;
 }
@@ -688,7 +689,7 @@ void GpuRaySensor::Render()
 }
 
 //////////////////////////////////////////////////
-bool GpuRaySensor::UpdateImpl(bool /*_force*/)
+bool GpuRaySensor::UpdateImpl(const bool /*_force*/)
 {
   if (!this->dataPtr->rendered)
     return false;

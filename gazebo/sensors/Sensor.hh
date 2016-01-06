@@ -18,8 +18,8 @@
 #define _GAZEBO_SENSORS_SENSOR_HH_
 
 #include <vector>
-#include <memory>
 #include <map>
+#include <memory>
 #include <string>
 
 #include <sdf/sdf.hh>

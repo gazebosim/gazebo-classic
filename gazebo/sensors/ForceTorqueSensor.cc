@@ -19,7 +19,9 @@
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
-#include <regex>
+
+#include <boost/algorithm/string.hpp>
+
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/Joint.hh"
@@ -55,8 +57,8 @@ ForceTorqueSensor::~ForceTorqueSensor()
 std::string ForceTorqueSensor::Topic() const
 {
   std::string topicName = "~/";
-  topicName += this->ParentName() + "/" + this->Name() + "/wrench";
-  topicName = std::regex_replace(topicName, std::regex("::"), std::string("/"));
+  topicName += this->parentName + "/" + this->GetName() + "/wrench";
+  boost::replace_all(topicName, "::", "/");
 
   return topicName;
 }
@@ -204,7 +206,7 @@ ignition::math::Vector3d ForceTorqueSensor::Torque() const
 }
 
 //////////////////////////////////////////////////
-bool ForceTorqueSensor::UpdateImpl(bool /*_force*/)
+bool ForceTorqueSensor::UpdateImpl(const bool /*_force*/)
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
@@ -283,13 +285,6 @@ bool ForceTorqueSensor::IsActive() const
 {
   return Sensor::IsActive() || this->dataPtr->wrenchPub->HasConnections();
 }
-
-//////////////////////////////////////////////////
-/*event::ConnectionPtr ForceTorqueSensor::ConnectUpdate(
-    std::function<void (msgs::WrenchStamped)> _subscriber)
-{
-  return this->dataPtr->update.Connect(_subscriber);
-}*/
 
 //////////////////////////////////////////////////
 event::ConnectionPtr ForceTorqueSensor::ConnectUpdate(

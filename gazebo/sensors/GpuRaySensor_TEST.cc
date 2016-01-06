@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <functional>
 #include <gtest/gtest.h>
 #include <ignition/math/Angle.hh>
 #include "gazebo/test/ServerFixture.hh"

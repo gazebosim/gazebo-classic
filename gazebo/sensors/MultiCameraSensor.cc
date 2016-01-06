@@ -21,7 +21,7 @@
 #endif
 
 #include <functional>
-#include <regex>
+#include <boost/algorithm/string.hpp>
 
 #include <ignition/math/Pose3.hh>
 
@@ -75,8 +75,8 @@ std::string MultiCameraSensor::Topic() const
   if (topic.empty())
   {
     topic = "~/";
-    topic += this->ParentName() + "/" + this->Name() + "/images";
-    topic = std::regex_replace(topic, std::regex("::"), std::string("/"));
+    topic += this->parentName + "/" + this->GetName() + "/images";
+    boost::replace_all(topic, "::", "/");
   }
 
   return topic;

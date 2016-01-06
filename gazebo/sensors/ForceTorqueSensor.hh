@@ -91,7 +91,7 @@ namespace gazebo
       public: void DisconnectUpdate(event::ConnectionPtr &_conn);
 
       // Documentation inherited.
-      protected: virtual bool UpdateImpl(bool _force);
+      protected: virtual bool UpdateImpl(const bool _force);
 
       // Documentation inherited.
       protected: virtual void Fini();
