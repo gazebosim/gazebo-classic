@@ -103,7 +103,7 @@ void SensorManager::Update(bool _force)
   {
     boost::recursive_mutex::scoped_lock lock(this->mutex);
 
-    if (physics::worlds_running() && this->worlds.empty() && this->initialized)
+    if (this->worlds.empty() && physics::worlds_running() && this->initialized)
     {
       auto world = physics::get_world();
       this->worlds[world->GetName()] = world;
