@@ -20,16 +20,26 @@
 #include <vector>
 #include <string>
 
-#include <ignition/math/Vector2.hh>
-#include <ignition/math/Vector3.hh>
-
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/common/CommonTypes.hh"
-#include "gazebo/math/Vector2d.hh"
-#include "gazebo/math/Vector2i.hh"
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/util/system.hh"
+
+namespace ignition
+{
+  namespace math
+  {
+    template<class T>
+    class Vector2;
+
+    template<class T>
+    class Vector3;
+
+    typedef Vector3<double> Vector3d;
+    typedef Vector2<int> Vector2i;
+  }
+}
 
 namespace boost
 {
@@ -47,6 +57,11 @@ namespace Ogre
 
 namespace gazebo
 {
+  namespace math
+  {
+    class Vector2i;
+  }
+
   namespace common
   {
     class Image;
