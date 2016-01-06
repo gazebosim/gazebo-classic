@@ -187,7 +187,7 @@ void ModelPropShop::Update()
     event::Events::preRender();
 
   if (this->camera && this->scene->GetInitialized() &&
-      this->camera->GetInitialized())
+      this->camera->Initialized())
   {
     rendering::VisualPtr vis = this->scene->GetVisual(this->modelName);
     if (vis)

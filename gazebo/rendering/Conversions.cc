@@ -73,3 +73,35 @@ ignition::math::Quaterniond Conversions::ConvertIgn(const Ogre::Quaternion &_v)
 {
   return ignition::math::Quaterniond(_v.w, _v.x, _v.y, _v.z);
 }
+
+//////////////////////////////////////////////////
+ReferenceFrame Conversions::Convert(const Ogre::Node::TransformSpace &_ts)
+{
+  switch (_ts)
+  {
+    case Ogre::Node::TS_LOCAL:
+      return RF_LOCAL;
+    case Ogre::Node::TS_PARENT:
+      return RF_PARENT;
+    case Ogre::Node::TS_WORLD:
+      return RF_WORLD;
+    default:
+      return RF_LOCAL;
+  }
+}
+
+//////////////////////////////////////////////////
+Ogre::Node::TransformSpace Conversions::Convert(const ReferenceFrame &_rf)
+{
+  switch (_rf)
+  {
+    case RF_LOCAL:
+      return Ogre::Node::TS_LOCAL;
+    case RF_PARENT:
+      return Ogre::Node::TS_PARENT;
+    case RF_WORLD:
+      return Ogre::Node::TS_WORLD;
+    default:
+      return Ogre::Node::TS_LOCAL;
+  }
+}
