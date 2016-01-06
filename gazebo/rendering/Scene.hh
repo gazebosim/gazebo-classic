@@ -672,16 +672,16 @@ namespace gazebo
       /// \brief Helper function for GetVisualAt functions.
       /// \param[in] _camera Pointer to the camera.
       /// \param[in] _mousePos 2D position of the mouse in pixels.
-      /// \param[in] _ignorSelectionObj True to ignore selection objects,
+      /// \param[in] _ignoreSelectionObj True to ignore selection objects,
       /// which are GUI objects use to manipulate objects.
       /// \return Pointer to the Ogre::Entity, NULL if none.
       private: Ogre::Entity *OgreEntityAt(CameraPtr _camera,
           const ignition::math::Vector2i &_mousePos,
-          const bool _ignorSelectionObj);
+          const bool _ignoreSelectionObj);
 
       /// \brief Get the mesh information for the given mesh.
       /// \param[in] _mesh Mesh to get info about.
-      /// \param[out] _count Number of vertices in the mesh.
+      /// \param[out] _vertexCount Number of vertices in the mesh.
       /// \param[out] _vertices Array of the vertices.
       /// \param[out] _indexCount Number if indices.
       /// \param[out] _indices Array of the indices.
