@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_GUI_BUILDING_MAKER_PRIVATE_HH_
-#define _GAZEBO_GUI_BUILDING_MAKER_PRIVATE_HH_
+#ifndef _GAZEBO_GUI_BUILDING_BUILDINGMAKERPRIVATE_HH_
+#define _GAZEBO_GUI_BUILDING_BUILDINGMAKERPRIVATE_HH_
 
 #include <map>
 #include <memory>
@@ -45,6 +44,20 @@ namespace gazebo
     /// \brief Private data for BuildingMaker
     class BuildingMakerPrivate
     {
+      /// \enum SaveState
+      /// \brief Save states for the building editor.
+      public: enum SaveState
+      {
+        // NEVER_SAVED: The building has never been saved.
+        NEVER_SAVED,
+
+        // ALL_SAVED: All changes have been saved.
+        ALL_SAVED,
+
+        // UNSAVED_CHANGES: Has been saved before, but has unsaved changes.
+        UNSAVED_CHANGES
+      };
+
       /// \brief A map of building part names to model manip objects which
       /// manage the visuals representing the building part.
       public: std::map<std::string, BuildingModelManip *> allItems;
@@ -90,7 +103,7 @@ namespace gazebo
       public: int floorCounter;
 
       /// \brief Store the current save state of the model.
-      public: enum BuildingMaker::SaveState currentSaveState;
+      public: enum SaveState currentSaveState;
 
       /// \brief A list of gui editor events connected to the building maker.
       public: std::vector<event::ConnectionPtr> connections;

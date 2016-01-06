@@ -611,7 +611,7 @@ void BuildingMaker::Reset()
   if (this->dataPtr->previewVisual)
     scene->RemoveVisual(this->dataPtr->previewVisual);
 
-  this->dataPtr->currentSaveState = NEVER_SAVED;
+  this->dataPtr->currentSaveState = BuildingMakerPrivate::NEVER_SAVED;
   this->SetModelName(this->dataPtr->buildingDefaultName);
 
   this->dataPtr->previewVisual.reset(new rendering::Visual(
@@ -637,7 +637,7 @@ void BuildingMaker::SetModelName(const std::string &_modelName)
   this->dataPtr->folderName = this->dataPtr->saveDialog->
       GetFolderNameFromModelName(this->dataPtr->modelName);
 
-  if (this->dataPtr->currentSaveState == NEVER_SAVED)
+  if (this->dataPtr->currentSaveState == BuildingMakerPrivate::NEVER_SAVED)
   {
     // Set new saveLocation
     boost::filesystem::path oldPath(
@@ -1506,7 +1506,7 @@ void BuildingMaker::OnNew()
 
   switch (this->dataPtr->currentSaveState)
   {
-    case ALL_SAVED:
+    case BuildingMakerPrivate::ALL_SAVED:
     {
       msg.append("Are you sure you want to close this model and open a new "
                  "canvas?\n\n");
@@ -1515,8 +1515,8 @@ void BuildingMaker::OnNew()
       msgBox.setDefaultButton(newButton);
       break;
     }
-    case UNSAVED_CHANGES:
-    case NEVER_SAVED:
+    case BuildingMakerPrivate::UNSAVED_CHANGES:
+    case BuildingMakerPrivate::NEVER_SAVED:
     {
       msg.append("You have unsaved changes. Do you want to save this model "
                  "and open a new canvas?\n\n");
@@ -1556,7 +1556,7 @@ void BuildingMaker::SaveModelFiles()
   this->dataPtr->saveDialog->SaveToConfig();
   this->GenerateSDF();
   this->dataPtr->saveDialog->SaveToSDF(this->dataPtr->modelSDF);
-  this->dataPtr->currentSaveState = ALL_SAVED;
+  this->dataPtr->currentSaveState = BuildingMakerPrivate::ALL_SAVED;
 }
 
 /////////////////////////////////////////////////
@@ -1564,14 +1564,14 @@ bool BuildingMaker::OnSave()
 {
   switch (this->dataPtr->currentSaveState)
   {
-    case UNSAVED_CHANGES:
+    case BuildingMakerPrivate::UNSAVED_CHANGES:
     {
       // TODO: Subtle filesystem race condition
       this->SaveModelFiles();
       gui::editor::Events::saveBuildingModel(this->dataPtr->modelName);
       return true;
     }
-    case NEVER_SAVED:
+    case BuildingMakerPrivate::NEVER_SAVED:
     {
       return this->OnSaveAs();
     }
@@ -1586,7 +1586,7 @@ bool BuildingMaker::OnSaveAs()
   if (this->dataPtr->saveDialog->OnSaveAs())
   {
     // Prevent changing save location
-    this->dataPtr->currentSaveState = ALL_SAVED;
+    this->dataPtr->currentSaveState = BuildingMakerPrivate::ALL_SAVED;
     // Get name set by user
     this->SetModelName(this->dataPtr->saveDialog->GetModelName());
     // Update name on palette
@@ -1621,7 +1621,7 @@ void BuildingMaker::OnExit()
 
   switch (this->dataPtr->currentSaveState)
   {
-    case ALL_SAVED:
+    case BuildingMakerPrivate::ALL_SAVED:
     {
       QString msg("Once you exit the Building Editor, "
       "your building will no longer be editable.\n\n"
@@ -1643,8 +1643,8 @@ void BuildingMaker::OnExit()
       this->FinishModel();
       break;
     }
-    case UNSAVED_CHANGES:
-    case NEVER_SAVED:
+    case BuildingMakerPrivate::UNSAVED_CHANGES:
+    case BuildingMakerPrivate::NEVER_SAVED:
     {
       QString msg("Save Changes before exiting?\n\n"
           "Note: Once you exit the Building Editor, "
@@ -1677,7 +1677,7 @@ void BuildingMaker::OnExit()
   }
 
   // Create entity on main window up to the saved point
-  if (this->dataPtr->currentSaveState != NEVER_SAVED)
+  if (this->dataPtr->currentSaveState != BuildingMakerPrivate::NEVER_SAVED)
     this->FinishModel();
 
   this->Reset();
@@ -1906,6 +1906,6 @@ void BuildingMaker::OnChangeLevel(int _level)
 /////////////////////////////////////////////////
 void BuildingMaker::BuildingChanged()
 {
-  if (this->dataPtr->currentSaveState != NEVER_SAVED)
-    this->dataPtr->currentSaveState = UNSAVED_CHANGES;
+  if (this->dataPtr->currentSaveState != BuildingMakerPrivate::NEVER_SAVED)
+    this->dataPtr->currentSaveState = BuildingMakerPrivate::UNSAVED_CHANGES;
 }

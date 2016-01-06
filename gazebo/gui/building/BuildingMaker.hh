@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_GUI_BUILDING_MAKER_HH_
-#define _GAZEBO_GUI_BUILDING_MAKER_HH_
+#ifndef _GAZEBO_GUI_BUILDING_BUILDINGMAKER_HH_
+#define _GAZEBO_GUI_BUILDING_BUILDINGMAKER_HH_
 
 #include <string>
 #include <vector>
@@ -47,20 +47,6 @@ namespace gazebo
     /// \brief Create and manage 3D visuals of a building.
     class GZ_GUI_VISIBLE BuildingMaker
     {
-      /// \enum SaveState
-      /// \brief Save states for the building editor.
-      public: enum SaveState
-      {
-        // NEVER_SAVED: The building has never been saved.
-        NEVER_SAVED,
-
-        // ALL_SAVED: All changes have been saved.
-        ALL_SAVED,
-
-        // UNSAVED_CHANGES: Has been saved before, but has unsaved changes.
-        UNSAVED_CHANGES
-      };
-
       /// \brief Constructor
       public: BuildingMaker();
 
