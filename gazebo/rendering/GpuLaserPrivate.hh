@@ -21,15 +21,19 @@
 #include <string>
 #include <vector>
 
-#include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/RenderTypes.hh"
 
 #include "gazebo/common/Event.hh"
 
 namespace Ogre
 {
+  class Camera;
   class Material;
   class MovableObject;
+  class RenderTarget;
+  class SceneNode;
+  class Texture;
+  class Viewport;
 }
 
 namespace gazebo

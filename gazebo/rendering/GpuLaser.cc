@@ -26,6 +26,10 @@
   #include "gazebo/common/win_dirent.h"
 #endif
 
+#include <ignition/math/Helpers.hh>
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/rendering/ogre_gazebo.h"
 
 #include "gazebo/common/Assert.hh"
@@ -35,7 +39,6 @@
 #include "gazebo/common/Mesh.hh"
 #include "gazebo/common/MeshManager.hh"
 #include "gazebo/common/Timer.hh"
-#include "gazebo/math/Pose.hh"
 
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/Conversions.hh"
