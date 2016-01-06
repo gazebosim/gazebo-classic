@@ -1,28 +1,22 @@
 ## Gazebo 7.0
 
-1. Use opaque pointers in the rendering/DepthCamera class.
+1. Use opaque pointers in the rendering library
     * [Pull request #2069](https://bitbucket.org/osrf/gazebo/pull-request/2069)
+    * [Pull request #2064](https://bitbucket.org/osrf/gazebo/pull-request/2064)
+    * [Pull request #2066](https://bitbucket.org/osrf/gazebo/pull-request/2066)
 
 1. Use opaque pointers for the Master class.
     * [Pull request #2036](https://bitbucket.org/osrf/gazebo/pull-request/2036)
 
-1. Use opaque pointers in the rendering/WindowManager class.
-    * [Pull request #2064](https://bitbucket.org/osrf/gazebo/pull-request/2064)
-
-1. Use opaque pointers in the rendering/Light class.
-    * [Pull request #2066](https://bitbucket.org/osrf/gazebo/pull-request/2066)
-
-1. Use opaque pointers in the gui/JointControlWidget class.
+1. Use opaque pointers in the gui library
     * [Pull request #2052](https://bitbucket.org/osrf/gazebo/pull-request/2052)
-
-1. Use opaque pointers in the gui/KeyEventHandler class.
     * [Pull request #2053](https://bitbucket.org/osrf/gazebo/pull-request/2053)
-
-1 Use opaque pointers in the gui/ConfigWidget class.
     * [Pull request #2028](https://bitbucket.org/osrf/gazebo/pull-request/2028)
-
-1. Use opaque pointers in the gui/GLWidget class.
     * [Pull request #2051](https://bitbucket.org/osrf/gazebo/pull-request/2051)
+    * [Pull request #2027](https://bitbucket.org/osrf/gazebo/pull-request/2027)
+    * [Pull request #2026](https://bitbucket.org/osrf/gazebo/pull-request/2026)
+    * [Pull request #2029](https://bitbucket.org/osrf/gazebo/pull-request/2029)
+    * [Pull request #2083](https://bitbucket.org/osrf/gazebo/pull-request/2083)
 
 1. Use more opaque pointers.
     * [Pull request #2025](https://bitbucket.org/osrf/gazebo/pull-request/2025)
@@ -32,14 +26,6 @@
     * [Pull request #2067](https://bitbucket.org/osrf/gazebo/pull-request/2067)
     * [Pull request #2079](https://bitbucket.org/osrf/gazebo/pull-request/2079)
 
-1. Use opaque pointers in the gui/CloneWindow class.
-    * [Pull request #2027](https://bitbucket.org/osrf/gazebo/pull-request/2027)
-
-1. Use opaque pointers in the terrain editor.
-    * [Pull request #2026](https://bitbucket.org/osrf/gazebo/pull-request/2026)
-
-1. Use opaque pointers in the gui/DataLogger class.
-    * [Pull request #2029](https://bitbucket.org/osrf/gazebo/pull-request/2029)
 
 1. Fix visual transparency issues
     * [Pull request #2031](https://bitbucket.org/osrf/gazebo/pull-request/2031)
