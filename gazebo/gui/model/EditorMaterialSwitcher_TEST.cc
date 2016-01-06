@@ -57,7 +57,7 @@ void EditorMaterialSwitcher_TEST::CreateMaterialSwitcher()
   materialSwitcher->SetMaterialScheme(scheme);
   QCOMPARE(materialSwitcher->MaterialScheme(), scheme);
 
-  scene->RemoveCamera(camera->GetName());
+  scene->RemoveCamera(camera->Name());
 }
 
 // Generate a main function for the test

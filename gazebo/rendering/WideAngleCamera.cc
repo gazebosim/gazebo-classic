@@ -691,7 +691,7 @@ void WideAngleCamera::notifyMaterialRender(Ogre::uint32 /*_pass_id*/,
   }
 
   this->Lens()->SetUniformVariables(pPass,
-    this->GetAspectRatio(),
+    this->AspectRatio(),
     this->HFOV().Radian());
 
 #if defined(HAVE_OPENGL)

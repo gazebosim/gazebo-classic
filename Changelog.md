@@ -1,5 +1,8 @@
 ## Gazebo 7.0
 
+1. Deprecate functions in the rendering/Camera class.
+    * [Pull request #2076](https://bitbucket.org/osrf/gazebo/pull-request/2076)
+
 1. Use opaque pointers in the rendering/GpuLaser class.
     * [Pull request #2070](https://bitbucket.org/osrf/gazebo/pull-request/2070)
 

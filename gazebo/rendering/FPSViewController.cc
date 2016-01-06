@@ -65,7 +65,7 @@ void FPSViewController::Update()
     // Move based on the camera's current velocity
     // Calculate delta based on frame rate
     common::Time interval = common::Time::GetWallTime() -
-      this->camera->GetLastRenderWallTime();
+      this->camera->LastRenderWallTime();
     float dt = interval.Float();
 
     ignition::math::Vector3d trans = this->xVelocity.Ign() +
