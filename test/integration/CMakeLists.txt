@@ -81,6 +81,7 @@ set(tests
   road.cc
   sensor.cc
   server_fixture.cc
+  scaling.cc
   sim_events.cc
   speed.cc
   speed_thread_pr2.cc
