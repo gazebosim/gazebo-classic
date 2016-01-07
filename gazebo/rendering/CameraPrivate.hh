@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_RENDERING_CAMERA_PRIVATE_HH_
-#define _GAZEBO_RENDERING_CAMERA_PRIVATE_HH_
+#ifndef _GAZEBO_RENDERING_CAMERAPRIVATE_HH_
+#define _GAZEBO_RENDERING_CAMERAPRIVATE_HH_
 
 #include <deque>
 #include <mutex>

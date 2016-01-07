@@ -20,6 +20,7 @@
 
 #include <memory>
 #include <functional>
+
 #include <boost/enable_shared_from_this.hpp>
 #include <string>
 #include <utility>
@@ -717,7 +718,7 @@ namespace gazebo
       /// the visual
       /// \param[in] _maxDist Maximum distance the camera is allowd to get from
       /// the visual
-      public: void AttachToVisual(uint32_t _id,
+      public: void AttachToVisual(const uint32_t _id,
                   const bool _inheritOrientation,
                   const double _minDist, const double _maxDist);
 
@@ -725,7 +726,7 @@ namespace gazebo
       /// \param[in] _id ID of the visual to attach the camera to
       /// \param[in] _inheritOrientation True means camera acquires the visual's
       /// orientation
-      public: void AttachToVisual(uint32_t _id,
+      public: void AttachToVisual(const uint32_t _id,
                                   const bool _inheritOrientation);
 
       /// \brief Set the camera to track a scene node
@@ -980,7 +981,7 @@ namespace gazebo
       /// \param[in] _maxDist Maximum distance the camera is allowd to get from
       /// the visual
       /// \return True on success
-      protected: virtual bool AttachToVisualImpl(uint32_t _id,
+      protected: virtual bool AttachToVisualImpl(const uint32_t _id,
                      const bool _inheritOrientation,
                      const double _minDist = 0, const double _maxDist = 0);
 

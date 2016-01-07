@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
@@ -259,7 +260,7 @@ void Camera::SetWindowId(unsigned int _windowId)
 //////////////////////////////////////////////////
 unsigned int Camera::GetWindowId() const
 {
-  return this->windowId;
+  return this->WindowId();
 }
 
 //////////////////////////////////////////////////
@@ -919,7 +920,7 @@ unsigned int Camera::TextureWidth() const
 //////////////////////////////////////////////////
 unsigned int Camera::GetTextureHeight() const
 {
-  return this->renderTexture->getBuffer(0, 0)->getHeight();
+  return this->TextureHeight();
 }
 
 //////////////////////////////////////////////////
@@ -1385,7 +1386,6 @@ void Camera::GetCameraToViewportRay(int _screenx, int _screeny,
   _dir.Set(ray.getDirection().x, ray.getDirection().y, ray.getDirection().z);
 }
 
-
 //////////////////////////////////////////////////
 void Camera::CameraToViewportRay(const int _screenx, const int _screeny,
     ignition::math::Vector3d &_origin,
@@ -1694,7 +1694,7 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
 }
 
 //////////////////////////////////////////////////
-void Camera::AttachToVisual(uint32_t _visualId,
+void Camera::AttachToVisual(const uint32_t _visualId,
                             const bool _inheritOrientation,
                             const double _minDist, const double _maxDist)
 {
@@ -1704,7 +1704,7 @@ void Camera::AttachToVisual(uint32_t _visualId,
 }
 
 //////////////////////////////////////////////////
-void Camera::AttachToVisual(uint32_t _visualId,
+void Camera::AttachToVisual(const uint32_t _visualId,
                             const bool _inheritOrientation)
 {
   msgs::Request request;
@@ -1775,7 +1775,7 @@ void Camera::TrackVisual(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
-bool Camera::AttachToVisualImpl(uint32_t _id,
+bool Camera::AttachToVisualImpl(const uint32_t _id,
     const bool _inheritOrientation, const double _minDist,
     const double _maxDist)
 {
