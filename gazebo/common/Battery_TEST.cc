@@ -16,14 +16,12 @@
 */
 
 #include "gazebo/common/Battery.hh"
-#include "gazebo/test/ServerFixture.hh"
+#include "gazebo/common/Console.hh"
 #include "test/util.hh"
 
 using namespace gazebo;
 
-class BatteryTest : public ServerFixture
-{
-};
+class BatteryTest : public gazebo::testing::AutoLogFixture { };
 
 /////////////////////////////////////////////////
 TEST_F(BatteryTest, Construction)
