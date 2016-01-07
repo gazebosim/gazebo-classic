@@ -15,6 +15,7 @@
  *
 */
 
+#include "gazebo/gui/Conversions.hh"
 #include "gazebo/gui/building/BuildingMaker.hh"
 #include "gazebo/gui/building/EditorView.hh"
 #include "gazebo/gui/building/WindowDoorInspectorDialog.hh"
@@ -167,17 +168,16 @@ void WindowItem::OnApply()
 
   QPointF itemPos = this->dataPtr->windowPos * this->itemScale;
   itemPos.setY(-itemPos.y());
-  this->SetSize(QSize(dialog->GetWidth() / this->itemScale,
-      dialog->GetDepth() / this->itemScale));
-  this->dataPtr->windowWidth = dialog->GetWidth() / this->itemScale;
-  this->dataPtr->windowHeight = dialog->GetHeight() / this->itemScale;
-  this->dataPtr->windowDepth = dialog->GetDepth() / this->itemScale;
-  this->dataPtr->windowElevation =
-      dialog->GetElevation() / this->itemScale;
-  if ((fabs(dialog->GetPosition().x() - itemPos.x()) >= 0.01)
-      || (fabs(dialog->GetPosition().y() - itemPos.y()) >= 0.01))
+  this->SetSize(QSize(dialog->Width() / this->itemScale,
+      dialog->Depth() / this->itemScale));
+  this->dataPtr->windowWidth = dialog->Width() / this->itemScale;
+  this->dataPtr->windowHeight = dialog->Height() / this->itemScale;
+  this->dataPtr->windowDepth = dialog->Depth() / this->itemScale;
+  this->dataPtr->windowElevation = dialog->Elevation() / this->itemScale;
+  if ((fabs(dialog->Position().X() - itemPos.x()) >= 0.01)
+      || (fabs(dialog->Position().Y() - itemPos.y()) >= 0.01))
   {
-    itemPos = dialog->GetPosition() / this->itemScale;
+    itemPos = Conversions::Convert(dialog->Position()) / this->itemScale;
     itemPos.setY(-itemPos.y());
     this->dataPtr->windowPos = itemPos;
     this->setPos(this->dataPtr->windowPos);
@@ -223,7 +223,7 @@ void WindowItem::OnOpenInspector()
 
   QPointF itemPos = this->dataPtr->windowPos * this->itemScale;
   itemPos.setY(-itemPos.y());
-  this->dataPtr->inspector->SetPosition(itemPos);
+  this->dataPtr->inspector->SetPosition(Conversions::Convert(itemPos));
   this->dataPtr->inspector->move(QCursor::pos());
   this->dataPtr->inspector->show();
 }

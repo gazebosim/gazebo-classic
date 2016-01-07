@@ -15,6 +15,9 @@
  *
  */
 
+#include "gazebo/common/Color.hh"
+
+#include "gazebo/gui/Conversions.hh"
 #include "gazebo/gui/building/BuildingEditorWidget.hh"
 #include "gazebo/gui/building/BuildingMaker.hh"
 #include "gazebo/gui/building/EditorView.hh"
@@ -245,28 +248,28 @@ void StairsItem::OnApply()
 
   QPointF startPos = this->dataPtr->stairsPos * this->itemScale;
   startPos.setY(-startPos.y());
-  this->SetSize(QSize(dialog->GetWidth() / this->itemScale,
-        dialog->GetDepth() / this->itemScale));
-  this->dataPtr->stairsWidth = dialog->GetWidth() / this->itemScale;
-  this->dataPtr->stairsHeight = dialog->GetHeight() / this->itemScale;
-  this->dataPtr->stairsDepth = dialog->GetDepth() / this->itemScale;
-  if ((fabs(dialog->GetStartPosition().x() - startPos.x()) >= 0.01)
-      || (fabs(dialog->GetStartPosition().y() - startPos.y()) >= 0.01))
+  this->SetSize(QSize(dialog->Width() / this->itemScale,
+        dialog->Depth() / this->itemScale));
+  this->dataPtr->stairsWidth = dialog->Width() / this->itemScale;
+  this->dataPtr->stairsHeight = dialog->Height() / this->itemScale;
+  this->dataPtr->stairsDepth = dialog->Depth() / this->itemScale;
+  if ((fabs(dialog->StartPosition().X() - startPos.x()) >= 0.01)
+      || (fabs(dialog->StartPosition().Y() - startPos.y()) >= 0.01))
   {
     this->dataPtr->stairsPos =
-        dialog->GetStartPosition() / this->itemScale;
+        Conversions::Convert(dialog->StartPosition()) / this->itemScale;
     this->dataPtr->stairsPos.setY(-this->dataPtr->stairsPos.y());
     this->setPos(this->dataPtr->stairsPos);
     this->setParentItem(NULL);
   }
-  if (this->dataPtr->stairsSteps != dialog->GetSteps())
+  if (this->dataPtr->stairsSteps != dialog->Steps())
   {
-    this->dataPtr->stairsSteps = dialog->GetSteps();
+    this->dataPtr->stairsSteps = dialog->Steps();
     this->StepsChanged();
   }
-  // this->dataPtr->stairsElevation = dialog->GetElevation();
-  this->Set3dTexture(dialog->GetTexture());
-  this->Set3dColor(dialog->GetColor());
+  // this->dataPtr->stairsElevation = dialog->Elevation();
+  this->Set3dTexture(QString::fromStdString(dialog->Texture()));
+  this->Set3dColor(Conversions::Convert(dialog->Color()));
   this->StairsChanged();
 }
 
@@ -284,9 +287,9 @@ void StairsItem::OnOpenInspector()
   //  dialog.SetElevation(this->dataPtr->stairsElevation);
   QPointF startPos = this->dataPtr->stairsPos * this->itemScale;
   startPos.setY(-startPos.y());
-  this->dataPtr->inspector->SetStartPosition(startPos);
-  this->dataPtr->inspector->SetColor(this->visual3dColor);
-  this->dataPtr->inspector->SetTexture(this->visual3dTexture);
+  this->dataPtr->inspector->SetStartPosition(Conversions::Convert(startPos));
+  this->dataPtr->inspector->SetColor(Conversions::Convert(this->visual3dColor));
+  this->dataPtr->inspector->SetTexture(this->visual3dTexture.toStdString());
   this->dataPtr->inspector->move(QCursor::pos());
   this->dataPtr->inspector->show();
 }
