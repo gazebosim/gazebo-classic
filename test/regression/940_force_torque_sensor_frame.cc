@@ -123,7 +123,7 @@ void Issue940Test::ExpectForceTorqueMeasure(const std::string &_sensorName,
                                             sensors::SensorManager *_mgr)
 {
   sensors::ForceTorqueSensorPtr sensor =
-    boost::dynamic_pointer_cast<sensors::ForceTorqueSensor>(
+    std::dynamic_pointer_cast<sensors::ForceTorqueSensor>(
         _mgr->GetSensor(_sensorName));
 
   // Make sure the above dynamic cast worked.

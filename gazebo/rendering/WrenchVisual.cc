@@ -48,7 +48,7 @@ WrenchVisual::WrenchVisual(const std::string &_name, VisualPtr _vis,
   dPtr->receivedMsg = false;
 
   dPtr->node = transport::NodePtr(new transport::Node());
-  dPtr->node->Init(dPtr->scene->GetName());
+  dPtr->node->Init(dPtr->scene->Name());
 
   dPtr->wrenchSub = dPtr->node->Subscribe(_topicName,
       &WrenchVisual::OnMsg, this, true);
@@ -56,17 +56,17 @@ WrenchVisual::WrenchVisual(const std::string &_name, VisualPtr _vis,
   // Make sure the meshes are in Ogre
   this->InsertMesh("unit_cone");
   Ogre::MovableObject *coneXObj =
-    (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+    (Ogre::MovableObject*)(dPtr->scene->OgreSceneManager()->createEntity(
           this->GetName()+"__WRENCH_X_CONE__", "unit_cone"));
   ((Ogre::Entity*)coneXObj)->setMaterialName("__GAZEBO_TRANS_RED_MATERIAL__");
 
   Ogre::MovableObject *coneYObj =
-    (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+    (Ogre::MovableObject*)(dPtr->scene->OgreSceneManager()->createEntity(
           this->GetName()+"__WRENCH_Y_CONE__", "unit_cone"));
   ((Ogre::Entity*)coneYObj)->setMaterialName("__GAZEBO_TRANS_GREEN_MATERIAL__");
 
   Ogre::MovableObject *coneZObj =
-    (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+    (Ogre::MovableObject*)(dPtr->scene->OgreSceneManager()->createEntity(
           this->GetName()+"__WRENCH_Z_CONE__", "unit_cone"));
   ((Ogre::Entity*)coneZObj)->setMaterialName("__GAZEBO_TRANS_BLUE_MATERIAL__");
 
