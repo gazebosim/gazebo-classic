@@ -1020,7 +1020,7 @@ double Scene::HeightBelowPoint(const ignition::math::Vector3d &_pt)
   if (this->dataPtr->terrain)
   {
     double terrainHeight =
-        this->dataPtr->terrain->GetHeight(_pt.X(), _pt.Y(), _pt.Z());
+        this->dataPtr->terrain->Height(_pt.X(), _pt.Y(), _pt.Z());
     if (terrainHeight <= _pt.Z())
       height = std::max(height, terrainHeight);
   }
@@ -1310,7 +1310,7 @@ bool Scene::FirstContact(CameraPtr _camera,
   {
     // The terrain uses a special ray intersection test.
     Ogre::TerrainGroup::RayResult terrainResult =
-      this->dataPtr->terrain->GetOgreTerrain()->rayIntersects(mouseRay);
+      this->dataPtr->terrain->OgreTerrain()->rayIntersects(mouseRay);
 
     if (terrainResult.hit)
     {
