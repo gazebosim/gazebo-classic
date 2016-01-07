@@ -6,6 +6,7 @@
     * [Pull request #2066](https://bitbucket.org/osrf/gazebo/pull-request/2066)
     * [Pull request #2069](https://bitbucket.org/osrf/gazebo/pull-request/2069)
     * [Pull request #2074](https://bitbucket.org/osrf/gazebo/pull-request/2074)
+    * [Pull request #2076](https://bitbucket.org/osrf/gazebo/pull-request/2076)
     * [Pull request #2070](https://bitbucket.org/osrf/gazebo/pull-request/2070)
     * [Pull request #2071](https://bitbucket.org/osrf/gazebo/pull-request/2071)
     * [Pull request #2084](https://bitbucket.org/osrf/gazebo/pull-request/2084)
