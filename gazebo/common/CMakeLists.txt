@@ -33,6 +33,7 @@ set (sources
   Animation.cc
   Assert.cc
   AudioDecoder.cc
+  Battery.cc
   Base64.cc
   BVHLoader.cc
   ColladaExporter.cc
@@ -46,6 +47,7 @@ set (sources
   Exception.cc
   Image.cc
   ImageHeightmap.cc
+  KeyEvent.cc
   KeyFrame.cc
   Material.cc
   Mesh.cc
@@ -53,6 +55,7 @@ set (sources
   MeshLoader.cc
   MeshManager.cc
   ModelDatabase.cc
+  MouseEvent.cc
   PID.cc
   SkeletonAnimation.cc
   Skeleton.cc
@@ -79,6 +82,7 @@ set (headers
   Animation.hh
   Assert.hh
   AudioDecoder.hh
+  Battery.hh
   Base64.hh
   BVHLoader.hh
   ColladaLoader.hh
@@ -87,6 +91,7 @@ set (headers
   Color.hh
   Console.hh
   Dem.hh
+  EnumIface.hh
   Event.hh
   Events.hh
   Exception.hh
@@ -120,12 +125,14 @@ set (headers
 
 set (gtest_sources
   Animation_TEST.cc
+  Battery_TEST.cc
   ColladaExporter_TEST.cc
   ColladaLoader_TEST.cc
   Color_TEST.cc
   CommonIface_TEST.cc
   Console_TEST.cc
   Dem_TEST.cc
+  EnumIface_TEST.cc
   Exception_TEST.cc
   Event_TEST.cc
   Image_TEST.cc
@@ -133,12 +140,22 @@ set (gtest_sources
   Material_TEST.cc
   Mesh_TEST.cc
   MeshManager_TEST.cc
+  MouseEvent_TEST.cc
   MovingWindowFilter_TEST.cc
   SphericalCoordinates_TEST.cc
   SystemPaths_TEST.cc
   SVGLoader_TEST.cc
   Time_TEST.cc
 )
+
+# Timer test fails on OSX
+# See issue #1626
+if (NOT APPLE)
+  set (gtest_sources
+    ${gtest_sources}
+    Timer_TEST.cc
+  )
+endif()
 
 if (HAVE_GTS)
 set (sources
@@ -196,6 +213,7 @@ set_property(
 
 target_link_libraries(gazebo_common
   gazebo_math
+  ${IGNITION-MATH_LIBRARIES}
   ${libdl_library}
   ${libtool_library}
   ${Boost_LIBRARIES}

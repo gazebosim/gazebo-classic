@@ -14,7 +14,15 @@
  * limitations under the License.
  *
  */
+
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <vector>
+#include <boost/bind.hpp>
 #include <boost/thread/mutex.hpp>
 #include <sdf/sdf.hh>
 
@@ -104,59 +112,6 @@ bool gazebo::setupServer(const std::vector<std::string> &_args)
   bool result = gazebo::setupServer(_args.size(), &pointers[0]);
 
   // Deallocate memory for the command line arguments allocated with strdup.
-  for (size_t i = 0; i < pointers.size(); ++i)
-    free(pointers.at(i));
-
-  return result;
-}
-
-/////////////////////////////////////////////////
-bool gazebo::setupClient(int _argc, char **_argv)
-{
-  if (!gazebo_shared::setup("client-", _argc, _argv, g_plugins))
-  {
-    gzerr << "Unable to setup Gazebo\n";
-    return false;
-  }
-
-  common::Time waitTime(1, 0);
-  int waitCount = 0;
-  int maxWaitCount = 10;
-
-  // Wait for namespaces.
-  while (!gazebo::transport::waitForNamespaces(waitTime) &&
-      (waitCount++) < maxWaitCount)
-  {
-    gzwarn << "Waited " << waitTime.Double() << "seconds for namespaces.\n";
-  }
-
-  if (waitCount >= maxWaitCount)
-  {
-    gzerr << "Waited " << (waitTime * waitCount).Double()
-      << " seconds for namespaces. Giving up.\n";
-  }
-
-  return true;
-}
-
-/////////////////////////////////////////////////
-bool gazebo::setupClient(const std::vector<std::string> &_args)
-{
-  std::vector<char *> pointers(_args.size());
-  std::transform(_args.begin(), _args.end(), pointers.begin(),
-                 g_vectorStringDup());
-  pointers.push_back(0);
-
-#ifndef _WIN32
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  bool result = gazebo::setupClient(_args.size(), &pointers[0]);
-#ifndef _WIN32
-#pragma GCC diagnostic pop
-#endif
-
-  // Deallocate memory for the command line arguments alloocated with strdup.
   for (size_t i = 0; i < pointers.size(); ++i)
     free(pointers.at(i));
 

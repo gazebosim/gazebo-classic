@@ -14,14 +14,15 @@
  * limitations under the License.
  *
 */
-#ifndef _RAYSENSOR_HH_
-#define _RAYSENSOR_HH_
+#ifndef _GAZEBO_SENSORS_RAYSENSOR_HH_
+#define _GAZEBO_SENSORS_RAYSENSOR_HH_
 
 #include <vector>
 #include <string>
 
-#include "gazebo/math/Angle.hh"
-#include "gazebo/math/Pose.hh"
+#include <ignition/math/Angle.hh>
+#include <ignition/math/Pose3.hh>
+
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/util/system.hh"
@@ -60,7 +61,7 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited
-      protected: virtual bool UpdateImpl(bool _force);
+      protected: virtual bool UpdateImpl(const bool _force);
 
       // Documentation inherited
       protected: virtual void Fini();
@@ -70,11 +71,11 @@ namespace gazebo
 
       /// \brief Get the minimum angle
       /// \return The minimum angle object
-      public: math::Angle GetAngleMin() const;
+      public: ignition::math::Angle AngleMin() const;
 
       /// \brief Get the maximum angle
       /// \return the maximum angle object
-      public: math::Angle GetAngleMax() const;
+      public: ignition::math::Angle AngleMax() const;
 
       /// \brief Get the angle in radians between each range
       /// \return Resolution of the angle
@@ -110,11 +111,11 @@ namespace gazebo
 
       /// \brief Get the vertical scan bottom angle
       /// \return The minimum angle of the scan block
-      public: math::Angle GetVerticalAngleMin() const;
+      public: ignition::math::Angle VerticalAngleMin() const;
 
       /// \brief Get the vertical scan line top angle
       /// \return The Maximum angle of the scan block
-      public: math::Angle GetVerticalAngleMax() const;
+      public: ignition::math::Angle VerticalAngleMax() const;
 
       /// \brief Get the vertical angle in radians between each range
       /// \return Resolution of the angle
@@ -163,7 +164,7 @@ namespace gazebo
               {return this->laserShape;}
 
       // Documentation inherited
-      public: virtual bool IsActive();
+      public: virtual bool IsActive() const;
 
       private: physics::CollisionPtr laserCollision;
       private: physics::MultiRayShapePtr laserShape;

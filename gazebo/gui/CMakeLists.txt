@@ -4,31 +4,32 @@ include ( ${QT_USE_FILE} )
 
 link_directories(
   ${Boost_LIBRARY_DIRS}
+  ${tinyxml_LIBRARY_DIRS}
 )
 
 include_directories(
   ${CMAKE_SOURCE_DIR}/deps
 )
 
+include_directories(${tinyxml_INCLUDE_DIRS})
+
 add_definitions(${QT_DEFINITIONS})
 
 add_subdirectory(qtpropertybrowser)
-add_subdirectory(building)
-add_subdirectory(model)
-add_subdirectory(terrain)
-add_subdirectory(viewers)
+
+set (internal_qt_headers)
 
 set (sources
   Actions.cc
   AlignWidget.cc
   ApplyWrenchDialog.cc
-  BoxMaker.cc
   CloneWindow.cc
   ConfigWidget.cc
-  CylinderMaker.cc
+  Conversions.cc
   DataLogger.cc
   Editor.cc
   EntityMaker.cc
+  HotkeyDialog.cc
   RenderWidget.cc
   GLWidget.cc
   GuiIface.cc
@@ -36,26 +37,37 @@ set (sources
   InsertModelWidget.cc
   JointControlWidget.cc
   KeyEventHandler.cc
+  LayersWidget.cc
   LightMaker.cc
   LogPlayWidget.cc
   MainWindow.cc
   ModelAlign.cc
   ModelManipulator.cc
   ModelSnap.cc
-  MeshMaker.cc
-  ModelEditWidget.cc
   ModelListWidget.cc
   ModelMaker.cc
   ModelRightMenu.cc
   MouseEventHandler.cc
   SaveDialog.cc
   SpaceNav.cc
-  SphereMaker.cc
+  SplashScreen.cc
   TimePanel.cc
   TimeWidget.cc
   ToolsWidget.cc
   TopicSelector.cc
+  TopToolbar.cc
+  UserCmdHistory.cc
+  ViewAngleWidget.cc
 )
+
+if (NOT USE_EXTERNAL_TINYXML)
+  include_directories (${CMAKE_SOURCE_DIR}/deps/win/tinyxml)
+  set (sources ${sources}
+       ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinystr.cpp
+       ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxml.cpp
+       ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxmlerror.cpp
+       ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxmlparser.cpp)
+endif()
 
 set (qt_headers
   Actions.hh
@@ -66,26 +78,30 @@ set (qt_headers
   DataLogger.hh
   Editor.hh
   GLWidget.hh
+  HotkeyDialog.hh
   InsertModelWidget.hh
   JointControlWidget.hh
+  LayersWidget.hh
   LogPlayWidget.hh
   MainWindow.hh
   ModelListWidget.hh
-  ModelEditWidget.hh
   ModelRightMenu.hh
   RenderWidget.hh
   SaveDialog.hh
+  SplashScreen.hh
   TimePanel.hh
   TimeWidget.hh
   ToolsWidget.hh
   TopicSelector.hh
+  TopToolbar.hh
+  UserCmdHistory.hh
+  ViewAngleWidget.hh
 )
 
 set (headers
   qt.h
   qt_test.h
-  BoxMaker.hh
-  CylinderMaker.hh
+  Conversions.hh
   EntityMaker.hh
   GuiIface.hh
   GuiEvents.hh
@@ -95,11 +111,9 @@ set (headers
   ModelAlign.hh
   ModelManipulator.hh
   ModelSnap.hh
-  MeshMaker.hh
   MouseEventHandler.hh
   ModelMaker.hh
   SpaceNav.hh
-  SphereMaker.hh
 )
 
 if (HAVE_OCULUS)
@@ -122,28 +136,63 @@ endif ()
 #  )
 #endif()
 
+set (gtest_sources
+  Conversions_TEST.cc
+)
+gz_build_tests(${gtest_sources})
+foreach(gtest_file ${gtest_sources})
+  string(REGEX REPLACE ".cc" "" BINARY_NAME ${gtest_file})
+  target_link_libraries(${TEST_TYPE}_${BINARY_NAME} gazebo_gui)
+endforeach()
+
 set (qt_tests
-  ApplyWrenchDialog_TEST.cc
   DataLogger_TEST.cc
   GuiIface_TEST.cc
+  HotkeyDialog_TEST.cc
+  LightMaker_TEST.cc
   ModelAlign_TEST.cc
+  ModelMaker_TEST.cc
   RenderWidget_TEST.cc
   SaveDialog_TEST.cc
+  SplashScreen_TEST.cc
   TimePanel_TEST.cc
   TimeWidget_TEST.cc
+  TopToolbar_TEST.cc
+  ViewAngleWidget_TEST.cc
 )
+
+add_subdirectory(viewers)
+add_subdirectory(terrain)
+add_subdirectory(building)
+add_subdirectory(model)
+
+if (HAVE_GRAPHVIZ)
+  add_definitions(-DWITH_CGRAPH)
+  add_definitions(-DHAVE_STRING_H)
+  # Activate Export macro for building the library itself
+  # if QGVCORE_LIB is not set or equal 0 (null), import macro is used
+  add_definitions(-DQGVCORE_LIB)
+  include_directories(${GRAPHVIZ_INCLUDE_DIR})
+  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/qgv)
+  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/qgv/private)
+  add_subdirectory(qgv)
+endif()
 
 # MainWindow is using screen rendering
 if (ENABLE_SCREEN_TESTS)
   set (qt_tests
       ${qt_tests}
+      ApplyWrenchDialog_TEST.cc
       BuildingEditor_TEST.cc
       ConfigWidget_TEST.cc
       GLWidget_TEST.cc
       GLWidget_TEST2.cc
+      LaserVisualization_TEST.cc
+      LayersWidget_TEST.cc
       MainWindow_TEST.cc
       ModelListWidget_TEST.cc
-      ModelSnap_TEST.cc)
+      ModelSnap_TEST.cc
+      Projection_TEST.cc)
 endif()
 
 # Generate executables for each of the QT unit tests
@@ -151,14 +200,16 @@ gz_build_qt_tests(${qt_tests})
 
 set (resources resources.qrc)
 
-QT4_WRAP_CPP(headers_MOC ${qt_headers})
+QT4_WRAP_CPP(headers_MOC ${qt_headers} ${internal_qt_headers})
 QT4_ADD_RESOURCES(resources_RCC ${resources})
 
-gz_add_library(gazebo_gui ${sources} ${headers_MOC} ${headers} ${resources_RCC})
-gz_add_executable(gzclient main.cc)
+gz_add_library(gazebo_gui ${sources} ${headers_MOC})
+gz_add_executable(gzclient main.cc ${resources_RCC})
 
 add_dependencies(gazebo_gui gazebo_msgs)
 add_dependencies(gzclient gazebo_gui)
+
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GZ_GUI")
 
 target_link_libraries(gazebo_gui
   libgazebo_client
@@ -166,27 +217,31 @@ target_link_libraries(gazebo_gui
   gazebo_transport
   gazebo_rendering
   gazebo_msgs
-  gazebo_gui_building
-  gazebo_gui_model
-  gazebo_gui_terrain
-  gazebo_gui_viewers
   gzqtpropertybrowser
   ${QT_LIBRARIES}
   ${ogre_libraries}
   ${Boost_LIBRARIES}
+  ${tinyxml_LIBRARIES}
 )
 
 if (UNIX)
   target_link_libraries(gazebo_gui pthread)
 endif()
 
+if (HAVE_GRAPHVIZ)
+  target_link_libraries(gazebo_gui ${GRAPHVIZ_LIBRARIES})
+endif()
+
 target_link_libraries(gzclient gazebo_gui)
+
+if (UNIX)
+  target_link_libraries(gzclient pthread)
+endif()
 
 if (SPNAV_LIBRARY)
   target_link_libraries(gazebo_gui ${SPNAV_LIBRARY})
   target_link_libraries(gzclient ${SPNAV_LIBRARY})
 endif()
-
 
 add_definitions(${QT_DEFINITIONS})
 
@@ -200,4 +255,7 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/gui.hh.in ${CMAKE_CURRENT_BINARY_DIR
 gz_install_library(gazebo_gui)
 gz_install_includes("gui" ${headers} ${qt_headers} ${CMAKE_CURRENT_BINARY_DIR}/gui.hh)
 gz_install_executable(gzclient)
-manpage(gzclient 1)
+
+if (UNIX)
+  manpage(gzclient 1)
+endif()

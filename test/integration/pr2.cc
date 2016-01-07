@@ -18,7 +18,7 @@
 #include <boost/filesystem.hpp>
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
-#include "helper_physics_generator.hh"
+#include "gazebo/test/helper_physics_generator.hh"
 
 using namespace gazebo;
 class PR2Test : public ServerFixture,
@@ -62,7 +62,7 @@ void PR2Test::LoadPR2(std::string _physicsEngine)
   EXPECT_TRUE(sensor != NULL);
 
   sensors::CameraSensorPtr camSensor =
-    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
   EXPECT_TRUE(camSensor != NULL);
 
   while (!camSensor->SaveFrame(paths->GetDefaultTestPath() + "/frame_10.jpg"))

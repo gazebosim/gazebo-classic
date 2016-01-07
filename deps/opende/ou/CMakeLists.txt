@@ -20,5 +20,4 @@ else()
   gz_add_library(gazebo_opende_ou ${sources})
 endif()
 
-#target_link_libraries(gazebo_fcl gazebo_ccd gazebo_ann)
 gz_install_library(gazebo_opende_ou)

@@ -1,6 +1,463 @@
+## Gazebo 7.0
+
+1. Fix circular dependency so that physics does not call the sensors API.
+    * [Pull request #2089](https://bitbucket.org/osrf/gazebo/pull-request/2089)
+    * [Issue #1516](https://bitbucket.org/osrf/gazebo/issues/1516)
+
+1. Use opaque pointers and deprecate functions in the rendering library
+    * [Pull request #2069](https://bitbucket.org/osrf/gazebo/pull-request/2069)
+    * [Pull request #2064](https://bitbucket.org/osrf/gazebo/pull-request/2064)
+    * [Pull request #2066](https://bitbucket.org/osrf/gazebo/pull-request/2066)
+    * [Pull request #2069](https://bitbucket.org/osrf/gazebo/pull-request/2069)
+    * [Pull request #2074](https://bitbucket.org/osrf/gazebo/pull-request/2074)
+    * [Pull request #2076](https://bitbucket.org/osrf/gazebo/pull-request/2076)
+    * [Pull request #2070](https://bitbucket.org/osrf/gazebo/pull-request/2070)
+    * [Pull request #2071](https://bitbucket.org/osrf/gazebo/pull-request/2071)
+    * [Pull request #2084](https://bitbucket.org/osrf/gazebo/pull-request/2084)
+
+1. Use opaque pointers for the Master class.
+    * [Pull request #2036](https://bitbucket.org/osrf/gazebo/pull-request/2036)
+
+1. Use opaque pointers in the gui library
+    * [Pull request #2037](https://bitbucket.org/osrf/gazebo/pull-request/2037)
+    * [Pull request #2052](https://bitbucket.org/osrf/gazebo/pull-request/2052)
+    * [Pull request #2053](https://bitbucket.org/osrf/gazebo/pull-request/2053)
+    * [Pull request #2028](https://bitbucket.org/osrf/gazebo/pull-request/2028)
+    * [Pull request #2051](https://bitbucket.org/osrf/gazebo/pull-request/2051)
+    * [Pull request #2027](https://bitbucket.org/osrf/gazebo/pull-request/2027)
+    * [Pull request #2026](https://bitbucket.org/osrf/gazebo/pull-request/2026)
+    * [Pull request #2029](https://bitbucket.org/osrf/gazebo/pull-request/2029)
+
+1. Use more opaque pointers.
+    * [Pull request #2025](https://bitbucket.org/osrf/gazebo/pull-request/2025)
+    * [Pull request #2043](https://bitbucket.org/osrf/gazebo/pull-request/2043)
+    * [Pull request #2044](https://bitbucket.org/osrf/gazebo/pull-request/2044)
+    * [Pull request #2065](https://bitbucket.org/osrf/gazebo/pull-request/2065)
+    * [Pull request #2067](https://bitbucket.org/osrf/gazebo/pull-request/2067)
+    * [Pull request #2079](https://bitbucket.org/osrf/gazebo/pull-request/2079)
+
+1. Fix visual transparency issues
+    * [Pull request #2031](https://bitbucket.org/osrf/gazebo/pull-request/2031)
+    * [Issue #1726](https://bitbucket.org/osrf/gazebo/issue/1726)
+    * [Issue #1790](https://bitbucket.org/osrf/gazebo/issue/1790)
+
+1. Implemented private data pointer for the RTShaderSystem class. Minimized shader updates to once per render update.
+    * [Pull request #2003](https://bitbucket.org/osrf/gazebo/pull-request/2003)
+
+1. Updating physics library to use ignition math.
+    * [Pull request #2007](https://bitbucket.org/osrf/gazebo/pull-request/2007)
+
+1. Switching to ignition math for the rendering library.
+    * [Pull request #1993](https://bitbucket.org/osrf/gazebo/pull-request/1993)
+    * [Pull request #1994](https://bitbucket.org/osrf/gazebo/pull-request/1994)
+    * [Pull request #1995](https://bitbucket.org/osrf/gazebo/pull-request/1995)
+    * [Pull request #1996](https://bitbucket.org/osrf/gazebo/pull-request/1996)
+
+1. Removed deprecations
+    * [Pull request #1992]((https://bitbucket.org/osrf/gazebo/pull-request/1992)
+
+1. Add ability to set the pose of a visual from a link.
+    * [Pull request #1963](https://bitbucket.org/osrf/gazebo/pull-request/1963)
+
+1. Copy visual visibility flags on clone
+    * [Pull request #2008](https://bitbucket.org/osrf/gazebo/pull-request/2008)
+
+1. Publish camera sensor image size when rendering is not enabled
+    * [Pull request #1969](https://bitbucket.org/osrf/gazebo/pull-request/1969)
+
+1. Added Poissons Ratio and Elastic Modulus for ODE.
+    * [Pull request #1974](https://bitbucket.org/osrf/gazebo/pull-request/1974)
+
+1. Update rest web plugin to publish response messages and display login user name in toolbar.
+    * [Pull request #1956](https://bitbucket.org/osrf/gazebo/pull-request/1956)
+
+1. Improve overall speed of log playback. Added new functions to LogPlay.
+   Use tinyxml2 for playback.
+    * [Pull request #1931](https://bitbucket.org/osrf/gazebo/pull-request/1931)
+
+1. Improve SVG import. Added support for transforms in paths.
+    * [Pull request #1981](https://bitbucket.org/osrf/gazebo/pull-request/1981)
+
+1. Enter time during log playback
+    * [Pull request #2000](https://bitbucket.org/osrf/gazebo/pull-request/2000)
+
+1 Added Ignition Transport dependency.
+    * [Pull request #1930](https://bitbucket.org/osrf/gazebo/pull-request/1930)
+
+1 Make latched subscribers receive the message only once
+    * [Issue #1789](https://bitbucket.org/osrf/gazebo/issue/1789)
+    * [Pull request #2019](https://bitbucket.org/osrf/gazebo/pull-request/2019)
+
+1 Implemented transport clear buffers
+  * [Pull request #2017](https://bitbucket.org/osrf/gazebo/pull-request/2017)
+
+1. KeyEvent constructor should be in a source file. Removed a few visibility
+flags from c functions. Windows did not like `CPPTYPE_*` in
+`gazebo/gui/ConfigWidget.cc`, so I replaced it with `TYPE_*`.
+    * [Pull request #1943](https://bitbucket.org/osrf/gazebo/pull-request/1943)
+
+1. Added wide angle camera sensor.
+    * [Pull request #1866](https://bitbucket.org/osrf/gazebo/pull-request/1866)
+
+1. Change the `near` and `far` members of `gazebo/msgs/logical_camera_sensors.proto` to `near_clip` and `far_clip`
+    + [Pull request #1942](https://bitbucket.org/osrf/gazebo/pull-request/1942)
+
+1. Resolve issue #1702
+    * [Issue #1702](https://bitbucket.org/osrf/gazebo/issue/1702)
+    * [Pull request #1905](https://bitbucket.org/osrf/gazebo/pull-request/1905)
+    * [Pull request #1913](https://bitbucket.org/osrf/gazebo/pull-request/1913)
+    * [Pull request #1914](https://bitbucket.org/osrf/gazebo/pull-request/1914)
+
+1. Update physics when the world is reset
+    * [Pull request #1903](https://bitbucket.org/osrf/gazebo/pull-request/1903)
+
+1. Light and light state for the server side
+    * [Pull request #1920](https://bitbucket.org/osrf/gazebo/pull-request/1920)
+
+1. Added tests for WorldState
+    * [Pull request #1968](https://bitbucket.org/osrf/gazebo/pull-request/1968)
+
+1. Rename Reset to Reset Time in time widget
+    * [Pull request #1892](https://bitbucket.org/osrf/gazebo/pull-request/1892)
+    * [Issue #1730](https://bitbucket.org/osrf/gazebo/issue/1730)
+
+1. Set QTestfFxture to verbose
+    * [Pull request #1944](https://bitbucket.org/osrf/gazebo/pull-request/1944)
+    * [Issue #1756](https://bitbucket.org/osrf/gazebo/issue/1756)
+
+1. Added torsional friction
+    * [Pull request #1831](https://bitbucket.org/osrf/gazebo/pull-request/1831)
+
+1. Support loading and spawning nested models
+    * [Pull request #1868](https://bitbucket.org/osrf/gazebo/pull-request/1868)
+    * [Pull request #1895](https://bitbucket.org/osrf/gazebo/pull-request/1895)
+
+1. Undo user motion commands during simulation, added physics::UserCmdManager and gui::UserCmdHistory.
+    * [Pull request #1934](https://bitbucket.org/osrf/gazebo/pull-request/1934)
+
+1. Forward user command messages for undo.
+    * [Pull request #2009](https://bitbucket.org/osrf/gazebo/pull-request/2009)
+
+1. Undo reset commands during simulation, forwarding commands
+    * [Pull request #1986](https://bitbucket.org/osrf/gazebo/pull-request/1986)
+
+1. Undo apply force / torque during simulation
+    * [Pull request #2030](https://bitbucket.org/osrf/gazebo/pull-request/2030)
+
+1. Add function to get the derived scale of a Visual
+    * [Pull request #1881](https://bitbucket.org/osrf/gazebo/pull-request/1881)
+
+1. Added EnumIface, which supports iterators over enums.
+    * [Pull request #1847](https://bitbucket.org/osrf/gazebo/pull-request/1847)
+
+1. Added RegionEventBoxPlugin - fires events when models enter / exit the region
+    * [Pull request #1856](https://bitbucket.org/osrf/gazebo/pull-request/1856)
+
+1. Added tests for checking the playback control via messages.
+    * [Pull request #1885](https://bitbucket.org/osrf/gazebo/pull-request/1885)
+
+1. Added LoadArgs() function to ServerFixture for being able to load a server
+using the same arguments used in the command line.
+    * [Pull request #1874](https://bitbucket.org/osrf/gazebo/pull-request/1874)
+
+1. Added battery class, plugins and test world.
+    * [Pull request #1872](https://bitbucket.org/osrf/gazebo/pull-request/1872)
+
+1. Display gearbox and screw joint properties in property tree
+    * [Pull request #1838](https://bitbucket.org/osrf/gazebo/pull-request/1838)
+
+1. Set window flags for dialogs and file dialogs
+    * [Pull request #1816](https://bitbucket.org/osrf/gazebo/pull-request/1816)
+
+1. Fix minimum window height
+   * [Pull request #1977](https://bitbucket.org/osrf/gazebo/pull-request/1977)
+   * [Issue #1706](https://bitbucket.org/osrf/gazebo/issue/1706)
+
+1. Add option to reverse alignment direction
+   * [Pull request #2040](https://bitbucket.org/osrf/gazebo/pull-request/2040)
+   * [Issue #1242](https://bitbucket.org/osrf/gazebo/issue/1242)
+
+1. Fix unadvertising a publisher - only unadvertise topic if it is the last publisher.
+   * [Pull request #2005](https://bitbucket.org/osrf/gazebo/pull-request/2005)
+   * [Issue #1782](https://bitbucket.org/osrf/gazebo/issue/1782)
+
+1. Log playback GUI for multistep, rewind, forward and seek
+    * [Pull request #1791](https://bitbucket.org/osrf/gazebo/pull-request/1791)
+
+1. Added Apply Force/Torque movable text
+    * [Pull request #1789](https://bitbucket.org/osrf/gazebo/pull-request/1789)
+
+1. Added cascade parameter (apply to children) for Visual SetMaterial, SetAmbient, SetEmissive, SetSpecular, SetDiffuse, SetTransparency
+    * [Pull request #1851](https://bitbucket.org/osrf/gazebo/pull-request/1851)
+
+1. Tweaks to Data Logger, such as multiline text edit for path
+    * [Pull request #1800](https://bitbucket.org/osrf/gazebo/pull-request/1800)
+
+1. Added TopToolbar and hide / disable several widgets according to WindowMode
+    * [Pull request #1869](https://bitbucket.org/osrf/gazebo/pull-request/1869)
+
+1. Added Visual::IsAncestorOf and Visual::IsDescendantOf
+    * [Pull request #1850](https://bitbucket.org/osrf/gazebo/pull-request/1850)
+
+1. Added msgs::PluginFromSDF and tests
+    * [Pull request #1858](https://bitbucket.org/osrf/gazebo/pull-request/1858)
+
+1. Added msgs::CollisionFromSDF msgs::SurfaceFromSDF and msgs::FrictionFromSDF
+    * [Pull request #1900](https://bitbucket.org/osrf/gazebo/pull-request/1900)
+
+1. Added hotkeys chart dialog
+    * [Pull request #1835](https://bitbucket.org/osrf/gazebo/pull-request/1835)
+
+1. Space bar to play / pause
+   * [Pull request #2023](https://bitbucket.org/osrf/gazebo/pull-request/2023)
+   * [Issue #1798](https://bitbucket.org/osrf/gazebo/issue/1798)
+
+1. Make it possible to create custom ConfigWidgets
+    * [Pull request #1861](https://bitbucket.org/osrf/gazebo/pull-request/1861)
+
+1. AddItem / RemoveItem / Clear enum config widgets
+    * [Pull request #1878](https://bitbucket.org/osrf/gazebo/pull-request/1878)
+
+1. Make all child ConfigWidgets emit signals.
+    * [Pull request #1884](https://bitbucket.org/osrf/gazebo/pull-request/1884)
+
+1. Refactored makers
+    * [Pull request #1828](https://bitbucket.org/osrf/gazebo/pull-request/1828)
+
+1. Added gui::Conversions to convert between Gazebo and Qt
+    * [Pull request #2034](https://bitbucket.org/osrf/gazebo/pull-request/2034)
+
+1. Model editor updates
+    1. Support adding model plugins in model editor
+        * [Pull request #2060](https://bitbucket.org/osrf/gazebo/pull-request/2060)
+
+    1. Make non-editable background models white in model editor
+        * [Pull request #1950](https://bitbucket.org/osrf/gazebo/pull-request/1950)
+
+    1. Choose / swap parent and child links in joint inspector
+        * [Pull request #1887](https://bitbucket.org/osrf/gazebo/pull-request/1887)
+        * [Issue #1500](https://bitbucket.org/osrf/gazebo/issue/1500)
+
+    1. Presets combo box for Vector3 config widget
+        * [Pull request #1954](https://bitbucket.org/osrf/gazebo/pull-request/1954)
+
+    1. Added support for more joint types (gearbox and fixed joints).
+        * [Pull request #1794](https://bitbucket.org/osrf/gazebo/pull-request/1794)
+
+    1. Added support for selecting links and joints, opening context menu and inspectors in Schematic View.
+        * [Pull request #1787](https://bitbucket.org/osrf/gazebo/pull-request/1787)
+
+    1. Color-coded edges in Schematic View to match joint color.
+        * [Pull request #1781](https://bitbucket.org/osrf/gazebo/pull-request/1781)
+
+    1. Scale link mass and inertia when a link is scaled
+        * [Pull request #1836](https://bitbucket.org/osrf/gazebo/pull-request/1836)
+
+    1. Added icons for child and parent link in joint inspector
+        * [Pull request #1953](https://bitbucket.org/osrf/gazebo/pull-request/1953)
+
+    1. Load and save nested models
+        * [Pull request #1894](https://bitbucket.org/osrf/gazebo/pull-request/1894)
+
+    1. Display model plugins on the left panel and added model plugin inspector
+        * [Pull request #1863](https://bitbucket.org/osrf/gazebo/pull-request/1863)
+
+    1. Context menu and deletion for model plugins
+        * [Pull request #1890](https://bitbucket.org/osrf/gazebo/pull-request/1890)
+
+    1. Delete self from inspector
+        * [Pull request #1904](https://bitbucket.org/osrf/gazebo/pull-request/1904)
+        * [Issue #1543](https://bitbucket.org/osrf/gazebo/issue/1543)
+
+    1. Apply inspector changes in real time and add reset button
+        * [Pull request #1945](https://bitbucket.org/osrf/gazebo/pull-request/1945)
+        * [Issue #1472](https://bitbucket.org/osrf/gazebo/issue/1472)
+
+    1. Set physics to be paused when exiting model editor mode
+        * [Pull request #1893](https://bitbucket.org/osrf/gazebo/pull-request/1893)
+        * [Issue #1734](https://bitbucket.org/osrf/gazebo/issue/1734)
+
+    1. Add Insert tab to model editor
+        * [Pull request #1924](https://bitbucket.org/osrf/gazebo/pull-request/1924)
+
+    1. Support inserting nested models from model maker
+        * [Pull request #1982](https://bitbucket.org/osrf/gazebo/pull-request/1982)
+
+    1. Added joint creation dialog
+        * [Pull request #2021](https://bitbucket.org/osrf/gazebo/pull-request/2021)
+
+    1. Use opaque pointers in the model editor
+        * [Pull request #2056](https://bitbucket.org/osrf/gazebo/pull-request/2056)
+        * [Pull request #2059](https://bitbucket.org/osrf/gazebo/pull-request/2059)
+        * [Pull request #2087](https://bitbucket.org/osrf/gazebo/pull-request/2087)
+
+1. Building editor updates
+
+    1. Use opaque pointers in the building editor
+        * [Pull request #2041](https://bitbucket.org/osrf/gazebo/pull-request/2041)
+        * [Pull request #2039](https://bitbucket.org/osrf/gazebo/pull-request/2039)
+        * [Pull request #2055](https://bitbucket.org/osrf/gazebo/pull-request/2055)
+        * [Pull request #2032](https://bitbucket.org/osrf/gazebo/pull-request/2032)
+        * [Pull request #2082](https://bitbucket.org/osrf/gazebo/pull-request/2082)
+        * [Pull request #2038](https://bitbucket.org/osrf/gazebo/pull-request/2038)
+
+    1. Use opaque pointers for GrabberHandle, add *LinkedGrabbers functions
+        * [Pull request #2034](https://bitbucket.org/osrf/gazebo/pull-request/2034)
+
+    1. Removed unused class: BuildingItem
+        * [Pull request #2045](https://bitbucket.org/osrf/gazebo/pull-request/2045)
+
+    1. Use opaque pointers for BuildingModelManip, move attachment logic to BuildingMaker
+        * [Pull request #2046](https://bitbucket.org/osrf/gazebo/pull-request/2046)
+
+    1. Use opaque pointers for all Dialog classes, add conversion from QPointF, move common logic to BaseInspectorDialog.
+        * [Pull request #2083](https://bitbucket.org/osrf/gazebo/pull-request/2083)
+
 ## Gazebo 6.0
+
+### Gazebo 6.X.X (201X-XX-XX)
+
+1. Backport model editor toolbar fixed joint option from [pull request #1794](https://bitbucket.org/osrf/gazebo/pull-request/1794)
+    * [Pull request #1957](https://bitbucket.org/osrf/gazebo/pull-request/1957)
+
+1. Fix minimum window height
+    * Backport of [pull request #1977](https://bitbucket.org/osrf/gazebo/pull-request/1977)
+    * [Pull request #1998](https://bitbucket.org/osrf/gazebo/pull-request/1998)
+    * [Issue #1706](https://bitbucket.org/osrf/gazebo/issue/1706)
+
+1. Fix visual transparency issues
+    * [Pull request #1967](https://bitbucket.org/osrf/gazebo/pull-request/1967)
+    * [Issue #1726](https://bitbucket.org/osrf/gazebo/issue/1726)
+
+### Gazebo 6.5.0 (2015-10-22)
+
+1. Added ability to convert from spherical coordinates to local coordinates.
+    * [Pull request #1955](https://bitbucket.org/osrf/gazebo/pull-request/1955)
+
+### Gazebo 6.4.0 (2015-10-14)
+
+1. Fix ABI problem. Make `Sensor::SetPose` function non virtual.
+    * [Pull request #1947](https://bitbucket.org/osrf/gazebo/pull-request/1947)
+
+1. Update inertia properties during simulation
+    * [Pull request #1909](https://bitbucket.org/osrf/gazebo/pull-requests/1909)
+    * [Design document](https://bitbucket.org/osrf/gazebo_design/src/default/inertia_resize/inertia_resize.md)
+
+1. Fix transparency correction for opaque materials
+    * [Pull request #1946](https://bitbucket.org/osrf/gazebo/pull-requests/1946/fix-transparency-correction-for-opaque/diff)
+
+### Gazebo 6.3.0 (2015-10-06)
+
+1. Added `Sensor::SetPose` function
+    * [Pull request #1935](https://bitbucket.org/osrf/gazebo/pull-request/1935)
+
+### Gazebo 6.2.0 (2015-10-02)
+
+1. Update physics when the world is reset
+    * Backport of [pull request #1903](https://bitbucket.org/osrf/gazebo/pull-request/1903)
+    * [Pull request #1916](https://bitbucket.org/osrf/gazebo/pull-request/1916)
+    * [Issue #101](https://bitbucket.org/osrf/gazebo/issue/101)
+
+1. Added Copy constructor and assignment operator to MouseEvent
+    * [Pull request #1855](https://bitbucket.org/osrf/gazebo/pull-request/1855)
+
+### Gazebo 6.1.0 (2015-08-02)
+
+1. Added logical_camera sensor.
+    * [Pull request #1845](https://bitbucket.org/osrf/gazebo/pull-request/1845)
+
+1. Added RandomVelocityPlugin, which applies a random velocity to a model's link.
+    * [Pull request #1839](https://bitbucket.org/osrf/gazebo/pull-request/1839)
+
+1. Sim events for joint position, velocity and applied force
+    * [Pull request #1849](https://bitbucket.org/osrf/gazebo/pull-request/1849)
+
+### Gazebo 6.0.0 (2015-07-27)
+
+1. Added magnetometer sensor. A contribution from Andrew Symington.
+    * [Pull request #1788](https://bitbucket.org/osrf/gazebo/pull-request/1788)
+
+1. Added altimeter sensor. A contribution from Andrew Symington.
+    * [Pull request #1792](https://bitbucket.org/osrf/gazebo/pull-request/1792)
+
+1. Implement more control options for log playback:
+  1. Rewind: The simulation starts from the beginning.
+  1. Forward: The simulation jumps to the end of the log file.
+  1. Seek: The simulation jumps to a specific point specified by its simulation
+  time.
+      * [Pull request #1737](https://bitbucket.org/osrf/gazebo/pull-request/1737)
+
+1. Added Gazebo splash screen
+    * [Pull request #1745](https://bitbucket.org/osrf/gazebo/pull-request/1745)
+
+1. Added a transporter plugin which allows models to move from one location
+   to another based on their location and the location of transporter pads.
+    * [Pull request #1738](https://bitbucket.org/osrf/gazebo/pull-request/1738)
+
+1. Implement forward/backwards multi-step for log playback. Now, the semantics
+of a multi-step while playing back a log session are different from a multi-step
+during a live simulation. While playback, a multi-step simulates all the
+intermediate steps as before, but the client only perceives a single step.
+E.g: You have a log file containing a 1 hour simulation session. You want to
+jump to the minute 00H::30M::00S to check a specific aspect of the simulation.
+You should not see continuous updates until minute 00H:30M:00S. Instead, you
+should visualize a single jump to the specific instant of the simulation that
+you are interested.
+    * [Pull request #1623](https://bitbucket.org/osrf/gazebo/pull-request/1623)
+
+1. Added browse button to log record dialog.
+    * [Pull request #1719](https://bitbucket.org/osrf/gazebo/pull-request/1719)
+
+1. Improved SVG support: arcs in paths, and contours made of multiple paths.
+    * [Pull request #1608](https://bitbucket.org/osrf/gazebo/pull-request/1608)
+
+1. Added simulation iterations to the world state.
+    * [Pull request #1722](https://bitbucket.org/osrf/gazebo/pull-request/1722)
+
+1. Added multiple LiftDrag plugins to the cessna_demo.world to allow the Cessna
+C-172 model to fly.
+    * [Pull request #1715](https://bitbucket.org/osrf/gazebo/pull-request/1715)
+
+1. Added a plugin to control a Cessna C-172 via messages (CessnaPlugin), and a
+GUI plugin to test this functionality with the keyboard (CessnaGUIPlugin). Added
+world with the Cessna model and the two previous plugins loaded
+(cessna_demo.world).
+    * [Pull request #1712](https://bitbucket.org/osrf/gazebo/pull-request/1712)
+
+1. Added world with OSRF building and an elevator
+    * [Pull request #1697](https://bitbucket.org/osrf/gazebo/pull-request/1697)
+
+1. Fixed collide bitmask by changing default value from 0x1 to 0xffff.
+    * [Pull request #1696](https://bitbucket.org/osrf/gazebo/pull-request/1696)
+
+1. Added a plugin to control an elevator (ElevatorPlugin), and an OccupiedEvent plugin that sends a message when a model is within a specified region.
+    * [Pull request #1694](https://bitbucket.org/osrf/gazebo/pull-request/1694)
+    * [Pull request #1775](https://bitbucket.org/osrf/gazebo/pull-request/1775)
+
+1. Added Layers tab and meta information for visuals.
+    * [Pull request #1674](https://bitbucket.org/osrf/gazebo/pull-request/1674)
+
+1. Added countdown behavior for common::Timer and exposed the feature in TimerGUIPlugin.
+    * [Pull request #1690](https://bitbucket.org/osrf/gazebo/pull-request/1690)
+
+1. Added BuoyancyPlugin for simulating the buoyancy of an object in a column of fluid.
+    * [Pull request #1622](https://bitbucket.org/osrf/gazebo/pull-request/1622)
+
 1. Added ComputeVolume function for simple shape subclasses of Shape.hh.
     * [Pull request #1605](https://bitbucket.org/osrf/gazebo/pull-request/1605)
+
+1. Add option to parallelize the ODE quickstep constraint solver,
+which solves an LCP twice with different parameters in order
+to corrected for position projection errors.
+    * [Pull request #1561](https://bitbucket.org/osrf/gazebo/pull-request/1561)
+
+1. Get/Set user camera pose in GUI.
+    * [Pull request #1649](https://bitbucket.org/osrf/gazebo/pull-request/1649)
+    * [Issue #1595](https://bitbucket.org/osrf/gazebo/issue/1595)
+
+1. Added ViewAngleWidget, removed hard-coded reset view and removed MainWindow::Reset(). Also added GLWidget::GetSelectedVisuals().
+    * [Pull request #1768](https://bitbucket.org/osrf/gazebo/pull-request/1768)
+    * [Issue #1507](https://bitbucket.org/osrf/gazebo/issue/1507)
 
 1. Windows support. This consists mostly of numerous small changes to support
 compilation on Windows.
@@ -24,6 +481,16 @@ compilation on Windows.
     * [Pull request #1651](https://bitbucket.org/osrf/gazebo/pull-request/1651)
     * [Pull request #1653](https://bitbucket.org/osrf/gazebo/pull-request/1653)
     * [Pull request #1654](https://bitbucket.org/osrf/gazebo/pull-request/1654)
+    * [Pull request #1657](https://bitbucket.org/osrf/gazebo/pull-request/1657)
+    * [Pull request #1658](https://bitbucket.org/osrf/gazebo/pull-request/1658)
+    * [Pull request #1659](https://bitbucket.org/osrf/gazebo/pull-request/1659)
+    * [Pull request #1660](https://bitbucket.org/osrf/gazebo/pull-request/1660)
+    * [Pull request #1661](https://bitbucket.org/osrf/gazebo/pull-request/1661)
+    * [Pull request #1669](https://bitbucket.org/osrf/gazebo/pull-request/1669)
+    * [Pull request #1670](https://bitbucket.org/osrf/gazebo/pull-request/1670)
+    * [Pull request #1672](https://bitbucket.org/osrf/gazebo/pull-request/1672)
+    * [Pull request #1682](https://bitbucket.org/osrf/gazebo/pull-request/1682)
+    * [Pull request #1683](https://bitbucket.org/osrf/gazebo/pull-request/1683)
 
 1. Install `libgazebo_server_fixture`. This will facilitate tests external to the main gazebo repository. See `examples/stand_alone/test_fixture`.
     * [Pull request #1606](https://bitbucket.org/osrf/gazebo/pull-request/1606)
@@ -31,6 +498,21 @@ compilation on Windows.
 1. Laser visualization renders light blue for rays that do not hit obstacles, and dark blue for other rays.
     * [Pull request #1607](https://bitbucket.org/osrf/gazebo/pull-request/1607)
     * [Issue #1576](https://bitbucket.org/osrf/gazebo/issue/1576)
+
+1. Add VisualType enum to Visual and clean up visuals when entity is deleted.
+    * [Pull request #1614](https://bitbucket.org/osrf/gazebo/pull-request/1614)
+
+1. Alert user of connection problems when using the REST service plugin
+    * [Pull request #1655](https://bitbucket.org/osrf/gazebo/pull-request/1655)
+    * [Issue #1574](https://bitbucket.org/osrf/gazebo/issue/1574)
+
+1. ignition-math is now a dependency.
+    + [http://ignitionrobotics.org/libraries/math](http://ignitionrobotics.org/libraries/math)
+    + [Gazebo::math migration](https://bitbucket.org/osrf/gazebo/src/583edbeb90759d43d994cc57c0797119dd6d2794/ign-math-migration.md)
+
+1. Detect uuid library during compilation.
+    * [Pull request #1655](https://bitbucket.org/osrf/gazebo/pull-request/1655)
+    * [Issue #1572](https://bitbucket.org/osrf/gazebo/issue/1572)
 
 1. New accessors in LogPlay class.
     * [Pull request #1577](https://bitbucket.org/osrf/gazebo/pull-request/1577)
@@ -51,13 +533,22 @@ compilation on Windows.
 1. Show/hide GUI overlays using the menu bar.
     * [Pull request #1555](https://bitbucket.org/osrf/gazebo/pull-request/1555)
 
+1. Added world origin indicator rendering::OriginVisual.
+    * [Pull request #1700](https://bitbucket.org/osrf/gazebo/pull-request/1700)
+
 1. Show/hide toolbars using the menu bars and shortcut.
    Added MainWindow::CloneAction.
    Added Window menu to Model Editor.
     * [Pull request #1584](https://bitbucket.org/osrf/gazebo/pull-request/1584)
 
+1. Added event to show/hide toolbars.
+    * [Pull request #1707](https://bitbucket.org/osrf/gazebo/pull-request/1707)
+
 1. Added optional start/stop/reset buttons to timer GUI plugin.
     * [Pull request #1576](https://bitbucket.org/osrf/gazebo/pull-request/1576)
+
+1. Timer GUI Plugin: Treat negative positions as positions from the ends
+    * [Pull request #1703](https://bitbucket.org/osrf/gazebo/pull-request/1703)
 
 1. Added Visual::GetDepth() and Visual::GetNthAncestor()
     * [Pull request #1613](https://bitbucket.org/osrf/gazebo/pull-request/1613)
@@ -67,6 +558,15 @@ compilation on Windows.
 
 1. Separate TimePanel's display into TimeWidget and LogPlayWidget.
     * [Pull request #1564](https://bitbucket.org/osrf/gazebo/pull-request/1564)
+
+1. Display confirmation message after log is saved
+    * [Pull request #1646](https://bitbucket.org/osrf/gazebo/pull-request/1646)
+
+1. Added LogPlayView to display timeline and LogPlaybackStatistics message type.
+    * [Pull request #1724](https://bitbucket.org/osrf/gazebo/pull-request/1724)
+
+1. Added Time::FormattedString and removed all other FormatTime functions.
+    * [Pull request #1710](https://bitbucket.org/osrf/gazebo/pull-request/1710)
 
 1. Added support for Oculus DK2
     * [Pull request #1526](https://bitbucket.org/osrf/gazebo/pull-request/1526)
@@ -89,6 +589,9 @@ compilation on Windows.
 1. Set material of SelectionObj's handles.
     * [Pull request #1472](https://bitbucket.org/osrf/gazebo/pull-request/1472)
 
+1. Add SelectionObj::Fini with tests and make Visual::Fini virtual
+    * [Pull request #1685](https://bitbucket.org/osrf/gazebo/pull-request/1685)
+
 1. Allow link selection with the mouse if parent model already selected.
     * [Pull request #1409](https://bitbucket.org/osrf/gazebo/pull-request/1409)
 
@@ -107,6 +610,10 @@ compilation on Windows.
 
 1. Added View Inertia and InertiaVisual, changed COMVisual to sphere proportional to mass.
     * [Pull request #1445](https://bitbucket.org/osrf/gazebo/pull-request/1445)
+
+1. Added View Link Frame and LinkFrameVisual. Visual::SetTransparency goes into texture_unit.
+    * [Pull request #1762](https://bitbucket.org/osrf/gazebo/pull-request/1762)
+    * [Issue #853](https://bitbucket.org/osrf/gazebo/issue/853)
 
 1. Changed the position of Save and Cancel buttons on editor dialogs
     * [Pull request #1442](https://bitbucket.org/osrf/gazebo/pull-request/1442)
@@ -133,6 +640,15 @@ compilation on Windows.
 
 1. Added Apply Force/Torque dialog
     * [Pull request #1600](https://bitbucket.org/osrf/gazebo/pull-request/1600)
+
+1. Added Apply Force/Torque visuals
+    * [Pull request #1619](https://bitbucket.org/osrf/gazebo/pull-request/1619)
+
+1. Added Apply Force/Torque OnMouseRelease and ActivateWindow
+    * [Pull request #1699](https://bitbucket.org/osrf/gazebo/pull-request/1699)
+
+1. Added Apply Force/Torque mouse interactions, modes, activation
+    * [Pull request #1731](https://bitbucket.org/osrf/gazebo/pull-request/1731)
 
 1. Added inertia pose getter for COMVisual and COMVisual_TEST
     * [Pull request #1581](https://bitbucket.org/osrf/gazebo/pull-request/1581)
@@ -168,6 +684,9 @@ compilation on Windows.
         * [Pull request #1489](https://bitbucket.org/osrf/gazebo/pull-request/1489)
         * [Issue #1457](https://bitbucket.org/osrf/gazebo/issue/1457)
 
+    1. Moved DataLogger from Window menu to the toolbar and moved screenshot button to the right.
+        * [Pull request #1665](https://bitbucket.org/osrf/gazebo/pull-request/1665)
+
     1. Keep loaded model's name.
         * [Pull request #1516](https://bitbucket.org/osrf/gazebo/pull-request/1516)
         * [Issue #1504](https://bitbucket.org/osrf/gazebo/issue/1504)
@@ -202,9 +721,39 @@ compilation on Windows.
         * [Pull request #1519](https://bitbucket.org/osrf/gazebo/pull-request/1519)
         * [Issue #1370](https://bitbucket.org/osrf/gazebo/issue/1370)
 
+    1. Add measurement unit to building inspectors.
+        * [Pull request #1741](https://bitbucket.org/osrf/gazebo/pull-request/1741)
+        * [Issue #1363](https://bitbucket.org/osrf/gazebo/issue/1363)
+
+    1. Add `BaseInspectorDialog` as a base class for inspectors.
+        * [Pull request #1749](https://bitbucket.org/osrf/gazebo/pull-request/1749)
+
 ## Gazebo 5.0
 
 ### Gazebo 5.x.x
+
+1. Fix minimum window height
+    * Backport of [pull request #1977](https://bitbucket.org/osrf/gazebo/pull-request/1977)
+    * [Pull request #2002](https://bitbucket.org/osrf/gazebo/pull-request/2002)
+    * [Issue #1706](https://bitbucket.org/osrf/gazebo/issue/1706)
+
+### Gazebo 5.2.0 (2015-10-02)
+
+1. Initialize sigact struct fields that valgrind said were being used uninitialized
+    * [Pull request #1809](https://bitbucket.org/osrf/gazebo/pull-request/1809)
+
+1. Add missing ogre includes to ensure macros are properly defined
+    * [Pull request #1813](https://bitbucket.org/osrf/gazebo/pull-request/1813)
+
+1. Use ToSDF functions to simplify physics_friction test
+    * [Pull request #1808](https://bitbucket.org/osrf/gazebo/pull-request/1808)
+
+1. Added lines to laser sensor visualization
+    * [Pull request #1742](https://bitbucket.org/osrf/gazebo/pull-request/1742)
+    * [Issue #935](https://bitbucket.org/osrf/gazebo/issue/935)
+
+1. Fix BulletSliderJoint friction for bullet 2.83
+    * [Pull request #1686](https://bitbucket.org/osrf/gazebo/pull-request/1686)
 
 1. Fix heightmap model texture loading.
     * [Pull request #1592](https://bitbucket.org/osrf/gazebo/pull-request/1592)
@@ -461,6 +1010,24 @@ compilation on Windows.
     * [Pull request #1318](https://bitbucket.org/osrf/gazebo/pull-request/1318)
 
 ## Gazebo 4.0
+
+### Gazebo 4.x.x (2015-xx-xx)
+
+1. Fix build for Bullet 2.83, enable angle wrapping for BulletHingeJoint
+    * [Pull request #1664](https://bitbucket.org/osrf/gazebo/pull-request/1664)
+
+### Gazebo 4.1.3 (2015-05-07)
+
+1. Fix saving visual geom SDF values
+    * [Pull request #1597](https://bitbucket.org/osrf/gazebo/pull-request/1597)
+1. Fix heightmap model texture loading.
+    * [Pull request #1595](https://bitbucket.org/osrf/gazebo/pull-request/1595)
+1. Fix visual collision scale on separate client
+    * [Pull request #1585](https://bitbucket.org/osrf/gazebo/pull-request/1585)
+1. Fix several clang compiler warnings
+    * [Pull request #1594](https://bitbucket.org/osrf/gazebo/pull-request/1594)
+1. Fix blank save / browse dialogs
+    * [Pull request #1544](https://bitbucket.org/osrf/gazebo/pull-request/1544)
 
 ### Gazebo 4.1.2 (2015-03-20)
 
@@ -752,6 +1319,31 @@ compilation on Windows.
 
 ## Gazebo 2.0
 
+### Gazebo 2.2.6 (2015-09-28)
+
+1. Backport fixes to setup.sh from pull request #1430 to 2.2 branch
+    * [Pull request 1889](https://bitbucket.org/osrf/gazebo/pull-request/1889)
+1. Fix heightmap texture loading (2.2)
+    * [Pull request 1596](https://bitbucket.org/osrf/gazebo/pull-request/1596)
+1. Prevent out of bounds array access in SkidSteerDrivePlugin (found by cppcheck 1.68)
+    * [Pull request 1379](https://bitbucket.org/osrf/gazebo/pull-request/1379)
+1. Fix build with boost 1.57 for 2.2 branch (#1399)
+    * [Pull request 1358](https://bitbucket.org/osrf/gazebo/pull-request/1358)
+1. Fix manpage test failures by incrementing year to 2015
+    * [Pull request 1361](https://bitbucket.org/osrf/gazebo/pull-request/1361)
+1. Fix build for OS X 10.10 (#1304, #1289)
+    * [Pull request 1346](https://bitbucket.org/osrf/gazebo/pull-request/1346)
+1. Restore ODELink ABI, use Link variables instead (#1354)
+    * [Pull request 1347](https://bitbucket.org/osrf/gazebo/pull-request/1347)
+1. Fix inertia_ratio test
+    * [Pull request 1344](https://bitbucket.org/osrf/gazebo/pull-request/1344)
+1. backport collision visual fix -> 2.2
+    * [Pull request 1343](https://bitbucket.org/osrf/gazebo/pull-request/1343)
+1. Fix two code_check errors on 2.2
+    * [Pull request 1314](https://bitbucket.org/osrf/gazebo/pull-request/1314)
+1. issue #243 fix Link::GetWorldLinearAccel and Link::GetWorldAngularAccel for ODE
+    * [Pull request 1284](https://bitbucket.org/osrf/gazebo/pull-request/1284)
+
 ### Gazebo 2.2.3 (2014-04-29)
 
 1. Removed redundant call to World::Init
@@ -765,6 +1357,11 @@ compilation on Windows.
     * [Issue #1087](https://bitbucket.org/osrf/gazebo/issue/1087)
 1. Fixed memory leak in image conversion
     * [Pull request #1073](https://bitbucket.org/osrf/gazebo/pull-request/1073)
+
+### Gazebo 2.2.1 (xxxx-xx-xx)
+
+1. Fix heightmap model texture loading.
+    * [Pull request #1596](https://bitbucket.org/osrf/gazebo/pull-request/1596)
 
 ### Gazebo 2.2.0 (2014-01-10)
 

@@ -19,11 +19,11 @@
 
 #include "gazebo/physics/physics.hh"
 #include "gazebo/test/ServerFixture.hh"
-#include "test/integration/helper_physics_generator.hh"
+#include "gazebo/test/helper_physics_generator.hh"
 
 using namespace gazebo;
 
-const double g_big = 1e29;
+const double g_big = 1e17;
 const double g_physics_tol = 1e-2;
 
 class PhysicsCollisionTest : public ServerFixture,

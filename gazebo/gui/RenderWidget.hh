@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  */
-#ifndef _RENDER_WIDGET_HH_
-#define _RENDER_WIDGET_HH_
+#ifndef _GAZEBO_RENDER_WIDGET_HH_
+#define _GAZEBO_RENDER_WIDGET_HH_
 
 #include <string>
 #include <vector>
@@ -25,19 +25,16 @@
 #include "gazebo/common/Event.hh"
 #include "gazebo/util/system.hh"
 
-class QLineEdit;
-class QLabel;
-class QFrame;
-class QHBoxLayout;
 
 namespace gazebo
 {
   namespace gui
   {
+    class TopToolbar;
     class GLWidget;
     class TimePanel;
 
-    class GAZEBO_VISIBLE RenderWidget : public QWidget
+    class GZ_GUI_VISIBLE RenderWidget : public QWidget
     {
       Q_OBJECT
       public: RenderWidget(QWidget *_parent = 0);
@@ -47,8 +44,8 @@ namespace gazebo
       public: void CreateScene(const std::string &_name);
 
       /// \brief Add a widget inside the render widget
-      /// \param[in] _widget Widget to be added.
       /// \param[in] _index Index in the splitter to add the widget at.
+      /// \param[in] _widget Widget to be added.
       public: void InsertWidget(unsigned int _index, QWidget *_widget);
 
       /// \brief Show the time panel.
@@ -80,7 +77,7 @@ namespace gazebo
 
       /// \brief Get the toolbar on top of the render widget
       /// \return Toolbar
-      public: QToolBar *GetToolbar() const;
+      public: TopToolbar *GetToolbar() const;
 
       /// \brief Set the visibility of the toolbar.
       /// \param[in] _show Whether or not to show the toolbar.
@@ -96,9 +93,6 @@ namespace gazebo
       /// \param[in] _modelName Name of the model that is being followed.
       private: void OnFollow(const std::string &_modelName);
 
-      /// \brief Handle align model user event.
-      private: void OnAlign();
-
       /// \brief Widget used to draw the scene.
       private: GLWidget *glWidget;
 
@@ -112,25 +106,7 @@ namespace gazebo
       private: QFrame *bottomFrame;
 
       /// \brief Frame which holds the top toolbar.
-      private: QFrame *toolFrame;
-
-      private: QLabel *xyzLabel;
-      private: QLineEdit *xPosEdit;
-      private: QLineEdit *yPosEdit;
-      private: QLineEdit *zPosEdit;
-
-      private: QLabel *rpyLabel;
-      private: QLineEdit *rollEdit;
-      private: QLineEdit *pitchEdit;
-      private: QLineEdit *yawEdit;
-      private: QLineEdit *fpsEdit;
-      private: QLineEdit *trianglesEdit;
-
-      /// \brief Widget for the top toolbar
-      private: QToolBar *toolbar;
-
-      private: QToolBar *mouseToolbar;
-      private: QToolBar *editToolbar;
+      private: TopToolbar *topToolbar;
 
       /// \brief An overlay label on the 3D render widget
       private: QLabel *msgOverlayLabel;

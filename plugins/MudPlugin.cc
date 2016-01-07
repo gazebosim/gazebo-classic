@@ -15,6 +15,7 @@
  *
 */
 
+#include <boost/algorithm/string.hpp>
 #include <boost/unordered_map.hpp>
 #include <boost/unordered_set.hpp>
 
@@ -116,7 +117,7 @@ void MudPlugin::Init()
       sensors::SensorManager *mgr = sensors::SensorManager::Instance();
       // Get a pointer to the contact sensor
       sensors::ContactSensorPtr sensor =
-          boost::dynamic_pointer_cast<sensors::ContactSensor>
+          std::dynamic_pointer_cast<sensors::ContactSensor>
           (mgr->GetSensor(name));
       if (sensor)
       {
@@ -158,7 +159,7 @@ void MudPlugin::Init()
   }
 
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-          boost::bind(&MudPlugin::OnUpdate, this));
+          std::bind(&MudPlugin::OnUpdate, this));
 }
 
 /////////////////////////////////////////////////
@@ -238,7 +239,8 @@ void MudPlugin::OnUpdate()
             for (unsigned int j = 0; j < pc; ++j)
             {
               contactPositionAverage +=
-                msgs::Convert(this->newestContactsMsg.contact(i).position(j));
+                msgs::ConvertIgn(
+                    this->newestContactsMsg.contact(i).position(j));
             }
             // Then divide by numer of contact points
             contactPositionAverage /= static_cast<double>(pc);

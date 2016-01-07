@@ -203,7 +203,7 @@ void RestApi::PostJsonData(const char *_route, const char *_json)
     boost::mutex::scoped_lock lock(this->postsMutex);
     this->posts.push_back(post);
   }
-  SendUnpostedPosts();
+  this->SendUnpostedPosts();
 }
 
 /////////////////////////////////////////////////
@@ -232,6 +232,13 @@ std::string RestApi::Login(const std::string &_urlStr,
 }
 
 /////////////////////////////////////////////////
+void RestApi::Logout()
+{
+  this->isLoggedIn = false;
+  gzmsg << "Logout" << std::endl;
+}
+
+/////////////////////////////////////////////////
 void RestApi::SendUnpostedPosts()
 {
   if (this->isLoggedIn)
@@ -242,12 +249,13 @@ void RestApi::SendUnpostedPosts()
       {
         boost::mutex::scoped_lock lock(this->postsMutex);
         post = this->posts.front();
+
+        //  You can generate a similar request on the cmd line like so:
+        //  curl --verbose --connect-timeout 5 -X POST
+        //    -H \"Content-Type: application/json \" -k --user"
+        this->Request(post.route, post.json);
         this->posts.pop_front();
       }
-      //  You can generate a similar request on the cmd line like so:
-      //  curl --verbose --connect-timeout 5 -X POST
-      //    -H \"Content-Type: application/json \" -k --user"
-      this->Request(post.route.c_str(), post.json.c_str());
     }
   }
   else
@@ -352,8 +360,8 @@ std::string RestApi::Request(const std::string &_reqUrl,
   curl_easy_cleanup(curl);
   if (res != CURLE_OK)
   {
-    gzerr << "Request to " << url << " failed: ";
-    gzerr << curl_easy_strerror(res) << std::endl;
+    gzerr << "Request to " << url << " failed: "
+          << curl_easy_strerror(res) << std::endl;
     throw RestException(curl_easy_strerror(res));
   }
   // copy the data into a string

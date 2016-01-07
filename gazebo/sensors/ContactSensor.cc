@@ -14,17 +14,13 @@
  * limitations under the License.
  *
 */
-/* Desc: Contact sensor
- * Author: Nate Koenig
- * Date: 09 Sept. 2008
-*/
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
 
+#include <boost/algorithm/string.hpp>
 #include <sstream>
 
 #include "gazebo/common/Exception.hh"
@@ -135,7 +131,7 @@ void ContactSensor::Init()
 }
 
 //////////////////////////////////////////////////
-bool ContactSensor::UpdateImpl(bool /*_force*/)
+bool ContactSensor::UpdateImpl(const bool /*_force*/)
 {
   boost::mutex::scoped_lock lock(this->mutex);
 
@@ -315,7 +311,7 @@ void ContactSensor::OnContacts(ConstContactsPtr &_msg)
 }
 
 //////////////////////////////////////////////////
-bool ContactSensor::IsActive()
+bool ContactSensor::IsActive() const
 {
   return this->active ||
          (this->contactsPub && this->contactsPub->HasConnections());

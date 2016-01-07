@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Base class for all sensors
- * Author: Nathan Koenig
- * Date: 25 May 2007
- */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
@@ -43,6 +38,7 @@
 #include "gazebo/rendering/Scene.hh"
 
 #include "gazebo/sensors/CameraSensor.hh"
+#include "gazebo/sensors/LogicalCameraSensor.hh"
 #include "gazebo/sensors/Noise.hh"
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/sensors/SensorManager.hh"
@@ -86,9 +82,7 @@ Sensor::~Sensor()
     this->sdf->Reset();
   this->sdf.reset();
   this->connections.clear();
-
-  for (unsigned int i = 0; i < this->noises.size(); ++i)
-    this->noises[i].reset();
+  this->noises.clear();
 }
 
 //////////////////////////////////////////////////
@@ -103,7 +97,7 @@ void Sensor::Load(const std::string &_worldName)
 {
   if (this->sdf->HasElement("pose"))
   {
-    this->pose = this->sdf->Get<math::Pose>("pose");
+    this->pose = this->sdf->Get<ignition::math::Pose3d>("pose");
   }
 
   if (this->sdf->Get<bool>("always_on"))
@@ -143,7 +137,7 @@ void Sensor::Init()
 }
 
 //////////////////////////////////////////////////
-void Sensor::SetParent(const std::string &_name, uint32_t _id)
+void Sensor::SetParent(const std::string &_name, const uint32_t _id)
 {
   this->parentName = _name;
   this->parentId = _id;
@@ -175,7 +169,7 @@ bool Sensor::NeedsUpdate()
 
   common::Time simTime;
   if (this->category == IMAGE && this->scene)
-    simTime = this->scene->GetSimTime();
+    simTime = this->scene->SimTime();
   else
     simTime = this->world->GetSimTime();
 
@@ -187,13 +181,13 @@ bool Sensor::NeedsUpdate()
 }
 
 //////////////////////////////////////////////////
-void Sensor::Update(bool _force)
+void Sensor::Update(const bool _force)
 {
   if (this->IsActive() || _force)
   {
     common::Time simTime;
     if (this->category == IMAGE && this->scene)
-      simTime = this->scene->GetSimTime();
+      simTime = this->scene->SimTime();
     else
       simTime = this->world->GetSimTime();
 
@@ -236,8 +230,8 @@ void Sensor::Update(bool _force)
 //////////////////////////////////////////////////
 void Sensor::Fini()
 {
-  for (unsigned int i= 0; i < this->noises.size(); ++i)
-    this->noises[i]->Fini();
+  for (auto &it : this->noises)
+    it.second->Fini();
 
   this->active = false;
   this->plugins.clear();
@@ -281,21 +275,41 @@ void Sensor::LoadPlugin(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void Sensor::SetActive(bool _value)
+void Sensor::SetActive(const bool _value)
 {
   this->active = _value;
 }
 
 //////////////////////////////////////////////////
-bool Sensor::IsActive()
+bool Sensor::IsActive() const
 {
   return this->active;
 }
 
 //////////////////////////////////////////////////
-math::Pose Sensor::GetPose() const
+ignition::math::Pose3d Sensor::Pose() const
 {
   return this->pose;
+}
+
+//////////////////////////////////////////////////
+void Sensor::SetPose(const ignition::math::Pose3d &_pose)
+{
+  this->pose = _pose;
+
+  // Update the visualization with the pose information.
+  if (this->sensorPub && this->GetVisualize())
+  {
+    msgs::Sensor msg;
+    msg.set_name(this->GetName());
+    msg.set_id(this->GetId());
+    msg.set_parent(this->GetParentName());
+    msg.set_parent_id(this->GetParentId());
+    msg.set_type(this->GetType());
+    msg.set_visualize(true);
+    msgs::Set(msg.mutable_pose(), this->pose);
+    this->sensorPub->Publish(msg);
+  }
 }
 
 //////////////////////////////////////////////////
@@ -308,7 +322,7 @@ double Sensor::GetUpdateRate()
 }
 
 //////////////////////////////////////////////////
-void Sensor::SetUpdateRate(double _hz)
+void Sensor::SetUpdateRate(const double _hz)
 {
   if (_hz > 0.0)
     this->updatePeriod = 1.0/_hz;
@@ -358,19 +372,34 @@ void Sensor::FillMsg(msgs::Sensor &_msg)
   _msg.set_type(this->GetType());
   _msg.set_parent(this->GetParentName());
   _msg.set_parent_id(this->GetParentId());
-  msgs::Set(_msg.mutable_pose(), this->GetPose());
+  msgs::Set(_msg.mutable_pose(), this->Pose());
 
-  _msg.set_visualize(this->GetVisualize());
+  _msg.set_always_on(this->IsActive());
   _msg.set_topic(this->GetTopic());
+  _msg.set_update_rate(this->GetUpdateRate());
+  _msg.set_visualize(this->GetVisualize());
 
-  if (this->GetType() == "camera")
+  if (this->GetType() == "logical_camera")
+  {
+    LogicalCameraSensor *camSensor = static_cast<LogicalCameraSensor*>(this);
+    msgs::LogicalCameraSensor *camMsg = _msg.mutable_logical_camera();
+    camMsg->set_near_clip(camSensor->Near());
+    camMsg->set_far_clip(camSensor->Far());
+    camMsg->set_horizontal_fov(camSensor->HorizontalFOV().Radian());
+    camMsg->set_aspect_ratio(camSensor->AspectRatio());
+  }
+  else if (this->GetType() == "camera" || this->GetType() == "wideanglecamera")
   {
     CameraSensor *camSensor = static_cast<CameraSensor*>(this);
     msgs::CameraSensor *camMsg = _msg.mutable_camera();
+    auto cam = camSensor->GetCamera();
+    camMsg->set_horizontal_fov(cam->HFOV().Radian());
     camMsg->mutable_image_size()->set_x(camSensor->GetImageWidth());
     camMsg->mutable_image_size()->set_y(camSensor->GetImageHeight());
-    rendering::DistortionPtr distortion =
-        camSensor->GetCamera()->GetDistortion();
+    camMsg->set_image_format(cam->ImageFormat());
+    camMsg->set_near_clip(cam->NearClip());
+    camMsg->set_far_clip(cam->FarClip());
+    auto distortion = cam->GetDistortion();
     if (distortion)
     {
       msgs::Distortion *distortionMsg = camMsg->mutable_distortion();
@@ -398,14 +427,14 @@ SensorCategory Sensor::GetCategory() const
 }
 
 //////////////////////////////////////////////////
-NoisePtr Sensor::GetNoise(unsigned int _index) const
+NoisePtr Sensor::GetNoise(const SensorNoiseType _type) const
 {
-  if (_index >= this->noises.size())
+  if (this->noises.find(_type) == this->noises.end())
   {
-    gzerr << "Get noise index out of range" << std::endl;
+    gzerr << "Get noise index not valid" << std::endl;
     return NoisePtr();
   }
-  return this->noises[_index];
+  return this->noises.at(_type);
 }
 
 //////////////////////////////////////////////////
@@ -413,4 +442,10 @@ void Sensor::ResetLastUpdateTime()
 {
   boost::mutex::scoped_lock lock(this->mutexLastUpdateTime);
   this->lastUpdateTime = 0.0;
+}
+
+//////////////////////////////////////////////////
+void Sensor::DisconnectUpdated(event::ConnectionPtr &_c)
+{
+  this->updated.Disconnect(_c);
 }

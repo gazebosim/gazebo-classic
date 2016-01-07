@@ -37,7 +37,7 @@ namespace gazebo
 
     /// \brief Load the name of the event from the world file
     /// \param[in] _sdf the event element in the world file
-    public: virtual void Load(const sdf::ElementPtr &_sdf);
+    public: virtual void Load(const sdf::ElementPtr _sdf);
 
     /// \brief Update for every time step
     /// \param[in] _info Update information provided by the server.

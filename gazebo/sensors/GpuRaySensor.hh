@@ -14,20 +14,17 @@
  * limitations under the License.
  *
 */
-/* Desc: RaySensor proximity sensor
- * Author: Mihai Emanuel Dolha
- * Date: 29 March 2012
-*/
-
-#ifndef _GPURAYSENSOR_HH_
-#define _GPURAYSENSOR_HH_
+#ifndef _GAZEBO_SENSORS_GPURAYSENSOR_HH_
+#define _GAZEBO_SENSORS_GPURAYSENSOR_HH_
 
 #include <vector>
 #include <string>
+#include <boost/function.hpp>
 #include <boost/thread/mutex.hpp>
 
-#include "gazebo/math/Angle.hh"
-#include "gazebo/math/Pose.hh"
+#include <ignition/math/Angle.hh>
+#include <ignition/math/Pose3.hh>
+
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/rendering/RenderTypes.hh"
@@ -42,6 +39,7 @@ namespace gazebo
     /// \class GpuRaySensor GpuRaySensor.hh sensors/sensors.hh
     /// \addtogroup gazebo_sensors
     /// \{
+
     /// \brief GPU based laser sensor
     ///
     /// This sensor cast rays into the world, tests for intersections, and
@@ -69,7 +67,7 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited
-      protected: virtual bool UpdateImpl(bool _force);
+      protected: virtual bool UpdateImpl(const bool _force);
 
       /// \brief Finalize the ray
       protected: virtual void Fini();
@@ -84,7 +82,7 @@ namespace gazebo
 
       /// \brief Get the minimum angle
       /// \return The minimum angle
-      public: math::Angle GetAngleMin() const;
+      public: ignition::math::Angle AngleMin() const;
 
       /// \brief Set the scan minimum angle
       /// \param[in] _angle The minimum angle
@@ -92,7 +90,7 @@ namespace gazebo
 
       /// \brief Get the maximum angle
       /// \return the maximum angle
-      public: math::Angle GetAngleMax() const;
+      public: ignition::math::Angle AngleMax() const;
 
       /// \brief Set the scan maximum angle
       /// \param[in] _angle The maximum angle
@@ -136,7 +134,7 @@ namespace gazebo
 
       /// \brief Get the vertical scan bottom angle
       /// \return The minimum angle of the scan block
-      public: math::Angle GetVerticalAngleMin() const;
+      public: ignition::math::Angle VerticalAngleMin() const;
 
       /// \brief Set the vertical scan bottom angle
       /// \param[in] _angle The minimum angle of the scan block
@@ -144,7 +142,7 @@ namespace gazebo
 
       /// \brief Get the vertical scan line top angle
       /// \return The Maximum angle of the scan block
-      public: math::Angle GetVerticalAngleMax() const;
+      public: ignition::math::Angle VerticalAngleMax() const;
 
       /// \brief Set the vertical scan line top angle
       /// \param[in] _angle The Maximum angle of the scan block
@@ -249,7 +247,7 @@ namespace gazebo
       public: void DisconnectNewLaserFrame(event::ConnectionPtr &_conn);
 
       // Documentation inherited
-      public: virtual bool IsActive();
+      public: virtual bool IsActive() const;
 
       /// brief Render the camera.
       private: void Render();

@@ -18,14 +18,14 @@
 #ifndef _GAZEBO_IMU_SENSOR_PLUGIN_HH_
 #define _GAZEBO_IMU_SENSOR_PLUGIN_HH_
 
-#include "gazebo/sensors/sensors.hh"
 #include "gazebo/common/Plugin.hh"
+#include "gazebo/sensors/sensors.hh"
 #include "gazebo/common/Events.hh"
 
 namespace gazebo
 {
   /// \brief An base class plugin for custom imu sensor processing.
-  class ImuSensorPlugin : public SensorPlugin
+  class GAZEBO_VISIBLE ImuSensorPlugin : public SensorPlugin
   {
     /// \brief Constructor
     public: ImuSensorPlugin();

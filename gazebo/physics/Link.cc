@@ -21,7 +21,10 @@
   #include <Winsock2.h>
 #endif
 
+#include <boost/algorithm/string.hpp>
+#include <boost/bind.hpp>
 #include <sstream>
+#include <functional>
 
 #include "gazebo/msgs/msgs.hh"
 
@@ -35,9 +38,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Assert.hh"
-
-#include "gazebo/sensors/SensorsIface.hh"
-#include "gazebo/sensors/Sensor.hh"
+#include "gazebo/common/Battery.hh"
 
 #include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/physics/Model.hh"
@@ -116,6 +117,7 @@ Link::~Link()
   this->publishDataMutex = NULL;
 
   this->collisions.clear();
+  this->batteries.clear();
 }
 
 //////////////////////////////////////////////////
@@ -134,7 +136,7 @@ void Link::Load(sdf::ElementPtr _sdf)
     this->SetSelfCollide(this->GetModel()->GetSelfCollide());
   }
   this->sdf->GetElement("self_collide")->GetValue()->SetUpdateFunc(
-      boost::bind(&Link::GetSelfCollide, this));
+      std::bind(&Link::GetSelfCollide, this));
 
   // Parse visuals from SDF
   this->ParseVisuals();
@@ -165,9 +167,14 @@ void Link::Load(sdf::ElementPtr _sdf)
       }
       else if (sensorElem->Get<std::string>("type") != "__default__")
       {
-        std::string sensorName =
-          sensors::create_sensor(sensorElem, this->GetWorld()->GetName(),
-              this->GetScopedName(), this->GetId());
+        // This must match the implementation in Sensors::GetScopedName
+        std::string sensorName = this->GetScopedName(true) + "::" +
+          sensorElem->Get<std::string>("name");
+
+        // Tell the sensor library to create a sensor.
+        event::Events::createSensor(sensorElem,
+            this->GetWorld()->GetName(), this->GetScopedName(), this->GetId());
+
         this->sensors.push_back(sensorName);
       }
       sensorElem = sensorElem->GetNextElement("sensor");
@@ -191,7 +198,7 @@ void Link::Load(sdf::ElementPtr _sdf)
       util::OpenALSourcePtr source = util::OpenAL::Instance()->CreateSource(
           audioElem);
 
-      std::vector<std::string> names = source->GetCollisionNames();
+      std::vector<std::string> names = source->CollisionNames();
       std::copy(names.begin(), names.end(), std::back_inserter(collisionNames));
 
       audioElem = audioElem->GetNextElement("audio_source");
@@ -220,6 +227,16 @@ void Link::Load(sdf::ElementPtr _sdf)
         _sdf->GetElement("audio_sink"));
   }
 #endif
+
+  if (this->sdf->HasElement("battery"))
+  {
+    sdf::ElementPtr batteryElem = this->sdf->GetElement("battery");
+    while (batteryElem)
+    {
+      this->LoadBattery(batteryElem);
+      batteryElem = batteryElem->GetNextElement("battery");
+    }
+  }
 
   this->connections.push_back(event::Events::ConnectWorldUpdateBegin(
       boost::bind(&Link::Update, this, _1)));
@@ -253,6 +270,12 @@ void Link::Init()
     }
   }
 
+  // Initialize all the batteries
+  for (auto &battery : this->batteries)
+  {
+    battery->Init();
+  }
+
   this->initialized = true;
 }
 
@@ -263,12 +286,14 @@ void Link::Fini()
   this->childJoints.clear();
   this->collisions.clear();
   this->inertial.reset();
+  this->batteries.clear();
 
-  for (std::vector<std::string>::iterator iter = this->sensors.begin();
-       iter != this->sensors.end(); ++iter)
+  // Remove all the sensors attached to the link
+  for (auto const &iter : this->sensors)
   {
-    sensors::remove_sensor(*iter);
+    event::Events::removeSensor(iter);
   }
+
   this->sensors.clear();
 
   for (Visuals_M::iterator iter = this->visuals.begin();
@@ -352,6 +377,7 @@ void Link::UpdateParameters(sdf::ElementPtr _sdf)
       msg.set_name(this->GetScopedName() + "::" + msg.name());
       msg.set_parent_name(this->GetScopedName());
       msg.set_is_static(this->IsStatic());
+      msg.set_type(msgs::Visual::VISUAL);
 
       this->visPub->Publish(msg);
 
@@ -370,6 +396,21 @@ void Link::UpdateParameters(sdf::ElementPtr _sdf)
       if (collision)
         collision->UpdateParameters(collisionElem);
       collisionElem = collisionElem->GetNextElement("collision");
+    }
+  }
+
+  // Update the battery information
+  if (this->sdf->HasElement("battery"))
+  {
+    sdf::ElementPtr batteryElem = this->sdf->GetElement("battery");
+    while (batteryElem)
+    {
+      common::BatteryPtr battery = this->Battery(
+          batteryElem->Get<std::string>("name"));
+
+      if (battery)
+        battery->UpdateParameters(batteryElem);
+      batteryElem = batteryElem->GetNextElement("battery");
     }
   }
 }
@@ -448,16 +489,16 @@ void Link::Update(const common::UpdateInfo & /*_info*/)
 #ifdef HAVE_OPENAL
   if (this->audioSink)
   {
-    this->audioSink->SetPose(this->GetWorldPose());
-    this->audioSink->SetVelocity(this->GetWorldLinearVel());
+    this->audioSink->SetPose(this->GetWorldPose().Ign());
+    this->audioSink->SetVelocity(this->GetWorldLinearVel().Ign());
   }
 
   // Update all the audio sources
   for (std::vector<util::OpenALSourcePtr>::iterator iter =
       this->audioSources.begin(); iter != this->audioSources.end(); ++iter)
   {
-    (*iter)->SetPose(this->GetWorldPose());
-    (*iter)->SetVelocity(this->GetWorldLinearVel());
+    (*iter)->SetPose(this->GetWorldPose().Ign());
+    (*iter)->SetVelocity(this->GetWorldLinearVel().Ign());
   }
 #endif
 
@@ -481,6 +522,12 @@ void Link::Update(const common::UpdateInfo & /*_info*/)
     {
       this->ProcessWrenchMsg(it);
     }
+  }
+
+  // Update the batteries.
+  for (auto &battery : this->batteries)
+  {
+    battery->Update();
   }
 }
 
@@ -786,9 +833,9 @@ void Link::FillMsg(msgs::Link &_msg)
   _msg.set_gravity(this->GetGravityMode());
   _msg.set_kinematic(this->GetKinematic());
   _msg.set_enabled(this->GetEnabled());
-  msgs::Set(_msg.mutable_pose(), relPose);
+  msgs::Set(_msg.mutable_pose(), relPose.Ign());
 
-  msgs::Set(this->visualMsg->mutable_pose(), relPose);
+  msgs::Set(this->visualMsg->mutable_pose(), relPose.Ign());
   _msg.add_visual()->CopyFrom(*this->visualMsg);
 
   _msg.mutable_inertial()->set_mass(this->inertial->GetMass());
@@ -798,20 +845,30 @@ void Link::FillMsg(msgs::Link &_msg)
   _msg.mutable_inertial()->set_iyy(this->inertial->GetIYY());
   _msg.mutable_inertial()->set_iyz(this->inertial->GetIYZ());
   _msg.mutable_inertial()->set_izz(this->inertial->GetIZZ());
-  msgs::Set(_msg.mutable_inertial()->mutable_pose(), this->inertial->GetPose());
+  msgs::Set(_msg.mutable_inertial()->mutable_pose(),
+      this->inertial->GetPose().Ign());
 
-  for (Collision_V::iterator iter = this->collisions.begin();
-      iter != this->collisions.end(); ++iter)
+  for (auto &child : this->children)
   {
-    (*iter)->FillMsg(*_msg.add_collision());
+    if (child->HasType(Base::COLLISION))
+    {
+      CollisionPtr collision = boost::static_pointer_cast<Collision>(child);
+      collision->FillMsg(*_msg.add_collision());
+    }
   }
 
-  for (std::vector<std::string>::iterator iter = this->sensors.begin();
-      iter != this->sensors.end(); ++iter)
+  // Add in the sensor data.
+  if (this->sdf->HasElement("sensor"))
   {
-    sensors::SensorPtr sensor = sensors::get_sensor(*iter);
-    if (sensor)
-      sensor->FillMsg(*_msg.add_sensor());
+    sdf::ElementPtr sensorElem = this->sdf->GetElement("sensor");
+    while (sensorElem)
+    {
+      msgs::Sensor *msg = _msg.add_sensor();
+      msg->CopyFrom(msgs::SensorFromSDF(sensorElem));
+      msg->set_parent(this->GetScopedName());
+      msg->set_parent_id(this->GetId());
+      sensorElem = sensorElem->GetNextElement("sensor");
+    }
   }
 
   if (this->visuals.empty())
@@ -837,11 +894,19 @@ void Link::FillMsg(msgs::Link &_msg)
     proj->set_fov(elem->Get<double>("fov"));
     proj->set_near_clip(elem->Get<double>("near_clip"));
     proj->set_far_clip(elem->Get<double>("far_clip"));
-    msgs::Set(proj->mutable_pose(), elem->Get<math::Pose>("pose"));
+    msgs::Set(proj->mutable_pose(), elem->Get<ignition::math::Pose3d>("pose"));
   }
 
   if (this->IsCanonicalLink())
     _msg.set_canonical(true);
+
+  // Fill message with battery information
+  for (auto &battery : this->batteries)
+  {
+    msgs::Battery *bat = _msg.add_battery();
+    bat->set_name(battery->Name());
+    bat->set_voltage(battery->Voltage());
+  }
 }
 
 //////////////////////////////////////////////////
@@ -870,13 +935,15 @@ void Link::ProcessMsg(const msgs::Link &_msg)
   {
     this->inertial->ProcessMsg(_msg.inertial());
     this->SetEnabled(true);
-    this->UpdateMass();
+    // Only update the Center of Mass if object is dynamic
+    if (!this->GetKinematic())
+      this->UpdateMass();
   }
 
   if (_msg.has_pose())
   {
     this->SetEnabled(true);
-    this->SetRelativePose(msgs::Convert(_msg.pose()));
+    this->SetRelativePose(msgs::ConvertIgn(_msg.pose()));
   }
 
   for (int i = 0; i < _msg.collision_size(); i++)
@@ -956,6 +1023,12 @@ void Link::OnPoseChange()
 void Link::SetState(const LinkState &_state)
 {
   this->SetWorldPose(_state.GetPose());
+  this->SetLinearVel(_state.GetVelocity().pos);
+  this->SetAngularVel(_state.GetVelocity().rot.GetAsEuler());
+  this->SetLinearAccel(_state.GetAcceleration().pos);
+  this->SetAngularAccel(_state.GetAcceleration().rot.GetAsEuler());
+  this->SetForce(_state.GetWrench().pos);
+  this->SetTorque(_state.GetWrench().rot.GetAsEuler());
 
   /*
   for (unsigned int i = 0; i < _state.GetCollisionStateCount(); ++i)
@@ -1025,11 +1098,125 @@ void Link::PublishData()
     msgs::Set(this->linkDataMsg.mutable_time(), this->world->GetSimTime());
     linkDataMsg.set_name(this->GetScopedName());
     msgs::Set(this->linkDataMsg.mutable_linear_velocity(),
-        this->GetWorldLinearVel());
+        this->GetWorldLinearVel().Ign());
     msgs::Set(this->linkDataMsg.mutable_angular_velocity(),
-        this->GetWorldAngularVel());
+        this->GetWorldAngularVel().Ign());
     this->dataPub->Publish(this->linkDataMsg);
   }
+}
+
+//////////////////////////////////////////////////
+common::BatteryPtr Link::Battery(const std::string &_name) const
+{
+  common::BatteryPtr result;
+
+  for (auto &battery : this->batteries)
+  {
+    if (battery->Name() == _name)
+    {
+      result = battery;
+      break;
+    }
+  }
+
+  return result;
+}
+
+/////////////////////////////////////////////////
+common::BatteryPtr Link::Battery(const size_t _index) const
+{
+  if (_index < this->batteries.size())
+    return this->batteries[_index];
+  else
+    return common::BatteryPtr();
+}
+
+/////////////////////////////////////////////////
+size_t Link::BatteryCount() const
+{
+  return this->batteries.size();
+}
+
+//////////////////////////////////////////////////
+bool Link::VisualId(const std::string &_visName, uint32_t &_visualId) const
+{
+  for (auto &iter : this->visuals)
+  {
+    if (iter.second.name() == _visName ||
+        iter.second.name() == this->GetScopedName() + "::" + _visName)
+    {
+      _visualId = iter.first;
+      return true;
+    }
+  }
+  gzerr << "Trying to get unique ID of visual from invalid visual name["
+        << _visName << "] for link [" << this->GetScopedName() << "]\n";
+  return false;
+}
+
+//////////////////////////////////////////////////
+bool Link::VisualPose(const uint32_t _id, ignition::math::Pose3d &_pose) const
+{
+  auto iter = this->visuals.find(_id);
+  if (iter == this->visuals.end())
+  {
+    gzerr << "Trying to get pose of visual from invalid visual id[" << _id
+          << "] for link [" << this->GetScopedName() << "]\n";
+    return false;
+  }
+  const msgs::Visual &msg = iter->second;
+  if (msg.has_pose())
+  {
+    _pose = msgs::ConvertIgn(msg.pose());
+  }
+  else
+  {
+    // Pose wasn't specified on SDF, use default value
+    _pose = ignition::math::Pose3d::Zero;
+  }
+  return true;
+}
+
+//////////////////////////////////////////////////
+bool Link::SetVisualPose(const uint32_t _id,
+                         const ignition::math::Pose3d &_pose)
+{
+  auto iter = this->visuals.find(_id);
+  if (iter == this->visuals.end())
+  {
+    gzerr << "Trying to set pose of visual from invalid visual id[" << _id
+          << "] for link [" << this->GetScopedName() << "]\n";
+    return false;
+  }
+  msgs::Visual &msg = iter->second;
+  msgs::Set(msg.mutable_pose(), _pose);
+  std::string linkName = this->GetScopedName();
+  if (this->sdf->HasElement("visual"))
+  {
+    sdf::ElementPtr visualElem = this->sdf->GetElement("visual");
+    while (visualElem)
+    {
+      std::string visName = linkName + "::" +
+        visualElem->Get<std::string>("name");
+
+      // update visual msg if it exists
+      if (msg.name() == visName)
+      {
+        visualElem->GetElement("pose")->Set(_pose);
+        break;
+      }
+
+      visualElem = visualElem->GetNextElement("visual");
+    }
+  }
+  msgs::Visual visual;
+  visual.set_name(msg.name());
+  visual.set_id(_id);
+  visual.set_parent_name(linkName);
+  visual.set_parent_id(this->GetId());
+  msgs::Set(visual.mutable_pose(), _pose);
+  this->visPub->Publish(visual);
+  return true;
 }
 
 //////////////////////////////////////////////////
@@ -1203,6 +1390,7 @@ void Link::UpdateVisualMsg()
         msg.set_parent_name(this->GetScopedName());
         msg.set_parent_id(this->GetId());
         msg.set_is_static(this->IsStatic());
+        msg.set_type(msgs::Visual::VISUAL);
 
         auto iter = this->visuals.find(msg.id());
         if (iter != this->visuals.end())
@@ -1420,12 +1608,20 @@ void Link::ProcessWrenchMsg(const msgs::Wrench &_msg)
   math::Vector3 pos = math::Vector3::Zero;
   if (_msg.has_force_offset())
   {
-    pos = msgs::Convert(_msg.force_offset());
+    pos = msgs::ConvertIgn(_msg.force_offset());
   }
 
-  const math::Vector3 force = msgs::Convert(_msg.force());
+  const ignition::math::Vector3d force = msgs::ConvertIgn(_msg.force());
   this->AddLinkForce(force, pos);
 
-  const math::Vector3 torque = msgs::Convert(_msg.torque());
+  const ignition::math::Vector3d torque = msgs::ConvertIgn(_msg.torque());
   this->AddRelativeTorque(torque);
+}
+
+//////////////////////////////////////////////////
+void Link::LoadBattery(sdf::ElementPtr _sdf)
+{
+  common::BatteryPtr battery(new common::Battery());
+  battery->Load(_sdf);
+  this->batteries.push_back(battery);
 }

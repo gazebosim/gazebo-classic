@@ -78,19 +78,19 @@ TEST_F(MultiCameraSensor, CameraRotationTest)
 
   sensors::SensorPtr sensor = sensors::get_sensor(cameraUnrotated);
   sensors::MultiCameraSensorPtr camSensorUnrotated =
-    boost::dynamic_pointer_cast<sensors::MultiCameraSensor>(sensor);
+    std::dynamic_pointer_cast<sensors::MultiCameraSensor>(sensor);
 
   sensor = sensors::get_sensor(cameraTranslated);
   sensors::CameraSensorPtr camSensorTranslated =
-    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
 
   sensor = sensors::get_sensor(cameraRotated1);
   sensors::MultiCameraSensorPtr camSensorRotated1 =
-    boost::dynamic_pointer_cast<sensors::MultiCameraSensor>(sensor);
+    std::dynamic_pointer_cast<sensors::MultiCameraSensor>(sensor);
 
   sensor = sensors::get_sensor(cameraRotated2);
   sensors::MultiCameraSensorPtr camSensorRotated2 =
-    boost::dynamic_pointer_cast<sensors::MultiCameraSensor>(sensor);
+    std::dynamic_pointer_cast<sensors::MultiCameraSensor>(sensor);
 
   unsigned int width  = 1024;
   unsigned int height = 544;
@@ -350,22 +350,22 @@ TEST_F(MultiCameraSensor, CameraRotationWorldPoseTest)
   physics::ModelPtr model1 = world->GetModel(modelUnrotated);
   sensors::SensorPtr sensor1 = sensors::get_sensor(multicameraUnrotated);
   sensors::MultiCameraSensorPtr multicamera1 =
-    boost::dynamic_pointer_cast<sensors::MultiCameraSensor>(sensor1);
+    std::dynamic_pointer_cast<sensors::MultiCameraSensor>(sensor1);
 
   physics::ModelPtr model2 = world->GetModel(modelTranslated);
   sensors::SensorPtr sensor2 = sensors::get_sensor(cameraTranslated);
   sensors::CameraSensorPtr camera2 =
-    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor2);
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor2);
 
   physics::ModelPtr model3 = world->GetModel(modelRotated1);
   sensors::SensorPtr sensor3 = sensors::get_sensor(multicameraRotated1);
   sensors::MultiCameraSensorPtr multicamera3 =
-    boost::dynamic_pointer_cast<sensors::MultiCameraSensor>(sensor3);
+    std::dynamic_pointer_cast<sensors::MultiCameraSensor>(sensor3);
 
   physics::ModelPtr model4 = world->GetModel(modelRotated2);
   sensors::SensorPtr sensor4 = sensors::get_sensor(multicameraRotated2);
   sensors::MultiCameraSensorPtr multicamera4 =
-    boost::dynamic_pointer_cast<sensors::MultiCameraSensor>(sensor4);
+    std::dynamic_pointer_cast<sensors::MultiCameraSensor>(sensor4);
 
   ASSERT_TRUE(model1 != NULL);
   ASSERT_TRUE(model2 != NULL);
@@ -381,27 +381,27 @@ TEST_F(MultiCameraSensor, CameraRotationWorldPoseTest)
 
   // model 1
   // multicamera1 sensor has zero pose offset from the model
-  EXPECT_EQ(model1->GetWorldPose(),
-    multicamera1->GetPose() + model1->GetWorldPose());
-  EXPECT_EQ(model1->GetWorldPose(),
-    sensor1->GetPose() + model1->GetWorldPose());
+  EXPECT_EQ(model1->GetWorldPose().Ign(),
+    multicamera1->Pose() + model1->GetWorldPose().Ign());
+  EXPECT_EQ(model1->GetWorldPose().Ign(),
+    sensor1->Pose() + model1->GetWorldPose().Ign());
 
   // multicamera1 sensor's camera 0 has a pose offset from the sensor
-  EXPECT_NE(multicamera1->GetPose() + model1->GetWorldPose(),
-      multicamera1->GetCamera(0)->GetWorldPose());
+  EXPECT_NE(multicamera1->Pose() + model1->GetWorldPose().Ign(),
+      multicamera1->GetCamera(0)->WorldPose());
 
   // Get multicamera1's local pose. There is current no GetPose() in Camera,
   // so grab it from it's ogre scene node
-  Ogre::SceneNode *cameraNode = multicamera1->GetCamera(0)->GetSceneNode();
-  math::Pose cameraPose(
-      rendering::Conversions::Convert(cameraNode->getPosition()),
-      rendering::Conversions::Convert(cameraNode->getOrientation()));
+  Ogre::SceneNode *cameraNode = multicamera1->GetCamera(0)->SceneNode();
+  ignition::math::Pose3d cameraPose(
+      rendering::Conversions::Convert(cameraNode->getPosition()).Ign(),
+      rendering::Conversions::Convert(cameraNode->getOrientation()).Ign());
 
   // Wait for the AttachToVisual request msg to be processed so that the camera
   // is attached to the parent visual.
   int sleep = 0;
   int maxSleep = 100;
-  while (cameraPose == multicamera1->GetCamera(0)->GetWorldPose()
+  while (cameraPose == multicamera1->GetCamera(0)->WorldPose()
       && sleep < maxSleep)
   {
     common::Time::MSleep(100);
@@ -409,61 +409,66 @@ TEST_F(MultiCameraSensor, CameraRotationWorldPoseTest)
   }
 
   // verify multicamera sensor's camera world pose
-  EXPECT_EQ(cameraPose + multicamera1->GetPose() + model1->GetWorldPose(),
-    multicamera1->GetCamera(0)->GetWorldPose());
-  EXPECT_EQ(model1->GetWorldPose().rot * multicamera1->GetPose().rot
-      * cameraPose.rot, multicamera1->GetCamera(0)->GetWorldRotation());
+  EXPECT_EQ(cameraPose + multicamera1->Pose() + model1->GetWorldPose().Ign(),
+    multicamera1->GetCamera(0)->WorldPose());
+  EXPECT_EQ(model1->GetWorldPose().rot.Ign() * multicamera1->Pose().Rot()
+      * cameraPose.Rot(),
+      multicamera1->GetCamera(0)->WorldRotation());
 
   // multicamera1 sensor's camera 1 has zero pose offset from the sensor
-  EXPECT_EQ(multicamera1->GetPose() + model1->GetWorldPose(),
-      multicamera1->GetCamera(1)->GetWorldPose());
+  EXPECT_EQ(multicamera1->Pose() + model1->GetWorldPose().Ign(),
+      multicamera1->GetCamera(1)->WorldPose());
 
   gzdbg << "model1 [" << model1->GetWorldPose() << "]\n"
-        << "sensor1 [" << sensor1->GetPose() + model1->GetWorldPose() << "]\n"
-        << "multicamera1 [" << multicamera1->GetPose() + model1->GetWorldPose()
+        << "sensor1 ["
+        << sensor1->Pose() + model1->GetWorldPose().Ign() << "]\n"
+        << "multicamera1 ["
+        << multicamera1->Pose() + model1->GetWorldPose().Ign()
         << "]\n"
         << "camera left WorldPose ["
-        << multicamera1->GetCamera(0)->GetWorldPose() << "]\n"
+        << multicamera1->GetCamera(0)->WorldPose() << "]\n"
         << "camera right WorldPose ["
-        << multicamera1->GetCamera(1)->GetWorldPose() << "]\n";
+        << multicamera1->GetCamera(1)->WorldPose() << "]\n";
 
   // model 2
   // camera2 sensor has zero pose offset from the model
-  EXPECT_EQ(model2->GetWorldPose(),
-    camera2->GetPose() + model2->GetWorldPose());
-  EXPECT_EQ(model2->GetWorldPose(),
-    sensor2->GetPose() + model2->GetWorldPose());
+  EXPECT_EQ(model2->GetWorldPose().Ign(),
+    camera2->Pose() + model2->GetWorldPose().Ign());
+  EXPECT_EQ(model2->GetWorldPose().Ign(),
+    sensor2->Pose() + model2->GetWorldPose().Ign());
 
   // camera2 sensor's camera has zero pose offset from the sensor
-  EXPECT_EQ(model2->GetWorldPose(), camera2->GetCamera()->GetWorldPose());
+  EXPECT_EQ(model2->GetWorldPose().Ign(), camera2->GetCamera()->WorldPose());
 
   gzdbg << "model2 [" << model2->GetWorldPose() << "]\n"
-        << "sensor2 [" << sensor2->GetPose() + model2->GetWorldPose() << "]\n"
-        << "camera2 [" << camera2->GetPose() + model2->GetWorldPose() << "]\n"
-        << "camera WorldPose [" << camera2->GetCamera()->GetWorldPose()
+        << "sensor2 ["
+        << sensor2->Pose() + model2->GetWorldPose().Ign() << "]\n"
+        << "camera2 ["
+        << camera2->Pose() + model2->GetWorldPose().Ign() << "]\n"
+        << "camera WorldPose [" << camera2->GetCamera()->WorldPose()
         << "]\n";
 
   // model 3
   // multicamera3 sensor has zero pose offset from the model
-  EXPECT_EQ(model3->GetWorldPose(),
-      multicamera3->GetPose() + model3->GetWorldPose());
-  EXPECT_EQ(model3->GetWorldPose(),
-      sensor3->GetPose() + model3->GetWorldPose());
+  EXPECT_EQ(model3->GetWorldPose().Ign(),
+      multicamera3->Pose() + model3->GetWorldPose().Ign());
+  EXPECT_EQ(model3->GetWorldPose().Ign(),
+      sensor3->Pose() + model3->GetWorldPose().Ign());
 
   // multicamera3 sensor's camera 0 has a pose offset from the sensor
-  EXPECT_NE(multicamera3->GetPose() + model3->GetWorldPose(),
-      multicamera3->GetCamera(0)->GetWorldPose());
+  EXPECT_NE(multicamera3->Pose() + model3->GetWorldPose().Ign(),
+      multicamera3->GetCamera(0)->WorldPose());
   // Get multicamera3 sensor's camera 0 local pose
-  cameraNode = multicamera3->GetCamera(0)->GetSceneNode();
-  cameraPose = math::Pose(
-      rendering::Conversions::Convert(cameraNode->getPosition()),
-      rendering::Conversions::Convert(cameraNode->getOrientation()));
+  cameraNode = multicamera3->GetCamera(0)->SceneNode();
+  cameraPose = ignition::math::Pose3d(
+      rendering::Conversions::Convert(cameraNode->getPosition()).Ign(),
+      rendering::Conversions::Convert(cameraNode->getOrientation()).Ign());
 
   // Wait for the AttachToVisual request msg to be processed so that the camera
   // is attached to the parent visual.
   sleep = 0;
   maxSleep = 100;
-  while (cameraPose == multicamera3->GetCamera(0)->GetWorldPose()
+  while (cameraPose == multicamera3->GetCamera(0)->WorldPose()
       && sleep < maxSleep)
   {
     common::Time::MSleep(100);
@@ -471,45 +476,51 @@ TEST_F(MultiCameraSensor, CameraRotationWorldPoseTest)
   }
 
   // verify multicamera sensor's camera 0 world pose
-  EXPECT_EQ(cameraPose + multicamera3->GetPose() + model3->GetWorldPose(),
-    multicamera3->GetCamera(0)->GetWorldPose());
-  EXPECT_EQ(model3->GetWorldPose().rot * multicamera3->GetPose().rot
-      * cameraPose.rot, multicamera3->GetCamera(0)->GetWorldRotation());
+  EXPECT_EQ(cameraPose + multicamera3->Pose() +
+      model3->GetWorldPose().Ign(),
+      multicamera3->GetCamera(0)->WorldPose());
+  EXPECT_EQ(model3->GetWorldPose().rot.Ign() * multicamera3->Pose().Rot()
+      * cameraPose.Rot(),
+      multicamera3->GetCamera(0)->WorldRotation());
 
   // multicamera3 sensor's camera 1 has zero pose offset from the sensor
-  EXPECT_EQ(multicamera3->GetPose() + model3->GetWorldPose(),
-      multicamera3->GetCamera(1)->GetWorldPose());
-  EXPECT_EQ(model3->GetWorldPose(), multicamera3->GetCamera(1)->GetWorldPose());
+  EXPECT_EQ(multicamera3->Pose() + model3->GetWorldPose().Ign(),
+      multicamera3->GetCamera(1)->WorldPose());
+  EXPECT_EQ(model3->GetWorldPose().Ign(),
+      multicamera3->GetCamera(1)->WorldPose());
 
   gzdbg << "model3 [" << model3->GetWorldPose() << "]\n"
-        << "sensor3 [" << sensor3->GetPose() + model3->GetWorldPose() << "]\n"
-        << "multicamera3 [" << multicamera3->GetPose() + model3->GetWorldPose()
+        << "sensor3 ["
+        << sensor3->Pose() + model3->GetWorldPose().Ign() << "]\n"
+        << "multicamera3 ["
+        << multicamera3->Pose() + model3->GetWorldPose().Ign()
         << "]\n"
         << "camera left  WorldPose ["
-        << multicamera3->GetCamera(0)->GetWorldPose() << "]\n"
+        << multicamera3->GetCamera(0)->WorldPose() << "]\n"
         << "camera right WorldPose ["
-        << multicamera3->GetCamera(1)->GetWorldPose() << "]\n";
+        << multicamera3->GetCamera(1)->WorldPose() << "]\n";
 
   // model 4
   // multicamera4 sensor has zero pose offset from the model
-  EXPECT_EQ(model4->GetWorldPose(),
-    multicamera4->GetPose() + model4->GetWorldPose());
-  EXPECT_EQ(model4->GetWorldPose(),
-    sensor4->GetPose() + model4->GetWorldPose());
+  EXPECT_EQ(model4->GetWorldPose().Ign(),
+    multicamera4->Pose() + model4->GetWorldPose().Ign());
+  EXPECT_EQ(model4->GetWorldPose().Ign(),
+    sensor4->Pose() + model4->GetWorldPose().Ign());
 
   // multicamera4 sensor's camera 0 has a pose offset from the sensor
-  EXPECT_NE(model4->GetWorldPose(), multicamera4->GetCamera(0)->GetWorldPose());
+  EXPECT_NE(model4->GetWorldPose().Ign(),
+      multicamera4->GetCamera(0)->WorldPose());
   // Get multicamera4's camera 0 local pose
-  cameraNode = multicamera4->GetCamera(0)->GetSceneNode();
-  cameraPose = math::Pose(
-      rendering::Conversions::Convert(cameraNode->getPosition()),
-      rendering::Conversions::Convert(cameraNode->getOrientation()));
+  cameraNode = multicamera4->GetCamera(0)->SceneNode();
+  cameraPose = ignition::math::Pose3d(
+      rendering::Conversions::Convert(cameraNode->getPosition()).Ign(),
+      rendering::Conversions::Convert(cameraNode->getOrientation()).Ign());
 
   // Wait for the AttachToVisual request msg to be processed so that the camera
   // is attached to the parent visual.
   sleep = 0;
   maxSleep = 100;
-  while (cameraPose == multicamera4->GetCamera(0)->GetWorldPose()
+  while (cameraPose == multicamera4->GetCamera(0)->WorldPose()
       && sleep < maxSleep)
   {
     common::Time::MSleep(100);
@@ -517,24 +528,25 @@ TEST_F(MultiCameraSensor, CameraRotationWorldPoseTest)
   }
 
   // verify multicamera sensor's camera 0 world pose
-  EXPECT_EQ(cameraPose + multicamera4->GetPose() + model4->GetWorldPose(),
-    multicamera4->GetCamera(0)->GetWorldPose());
-  EXPECT_EQ(model4->GetWorldPose().rot * multicamera4->GetPose().rot
-      * cameraPose.rot, multicamera4->GetCamera(0)->GetWorldRotation());
+  EXPECT_EQ(cameraPose + multicamera4->Pose() + model4->GetWorldPose().Ign(),
+    multicamera4->GetCamera(0)->WorldPose());
+  EXPECT_EQ(model4->GetWorldPose().rot * multicamera4->Pose().Rot()
+      * cameraPose.Rot(), multicamera4->GetCamera(0)->WorldRotation());
 
   // multicamera4 sensor's camera 1 has a pose offset from the sensor
-  EXPECT_NE(model4->GetWorldPose(), multicamera4->GetCamera(1)->GetWorldPose());
+  EXPECT_NE(model4->GetWorldPose().Ign(),
+      multicamera4->GetCamera(1)->WorldPose());
   // Get multicamera4 sensor's camera 1 local pose
-  cameraNode = multicamera4->GetCamera(1)->GetSceneNode();
-  cameraPose = math::Pose(
-      rendering::Conversions::Convert(cameraNode->getPosition()),
-      rendering::Conversions::Convert(cameraNode->getOrientation()));
+  cameraNode = multicamera4->GetCamera(1)->SceneNode();
+  cameraPose = ignition::math::Pose3d(
+      rendering::Conversions::Convert(cameraNode->getPosition()).Ign(),
+      rendering::Conversions::Convert(cameraNode->getOrientation()).Ign());
 
   // Wait for the AttachToVisual request msg to be processed so that the camera
   // is attached to the parent visual.
   sleep = 0;
   maxSleep = 100;
-  while (cameraPose == multicamera4->GetCamera(1)->GetWorldPose()
+  while (cameraPose == multicamera4->GetCamera(1)->WorldPose()
       && sleep < maxSleep)
   {
     common::Time::MSleep(100);
@@ -542,18 +554,20 @@ TEST_F(MultiCameraSensor, CameraRotationWorldPoseTest)
   }
 
   // verify multicamera4 sensor's camera 1 world pose
-  EXPECT_EQ(cameraPose + multicamera4->GetPose() + model4->GetWorldPose(),
-    multicamera4->GetCamera(1)->GetWorldPose());
-  EXPECT_EQ(model4->GetWorldPose().rot * multicamera4->GetPose().rot
-      * cameraPose.rot, multicamera4->GetCamera(1)->GetWorldRotation());
+  EXPECT_EQ(cameraPose + multicamera4->Pose() + model4->GetWorldPose().Ign(),
+    multicamera4->GetCamera(1)->WorldPose());
+  EXPECT_EQ(model4->GetWorldPose().rot.Ign() * multicamera4->Pose().Rot()
+      * cameraPose.Rot(), multicamera4->GetCamera(1)->WorldRotation());
 
   gzdbg << "model4 [" << model4->GetWorldPose() << "]\n"
-        << "sensor4 [" << sensor4->GetPose() + model4->GetWorldPose() << "]\n"
-        << "multicamera4 [" << multicamera4->GetPose() + model4->GetWorldPose()
+        << "sensor4 ["
+        << sensor4->Pose() + model4->GetWorldPose().Ign() << "]\n"
+        << "multicamera4 ["
+        << multicamera4->Pose() + model4->GetWorldPose().Ign()
         << "]\n"
-        << "camera1 WorldPose [" << multicamera4->GetCamera(0)->GetWorldPose()
+        << "camera1 WorldPose [" << multicamera4->GetCamera(0)->WorldPose()
         << "]\n"
-        << "camera2 WorldPose [" << multicamera4->GetCamera(1)->GetWorldPose()
+        << "camera2 WorldPose [" << multicamera4->GetCamera(1)->WorldPose()
         << "]\n";
 }
 

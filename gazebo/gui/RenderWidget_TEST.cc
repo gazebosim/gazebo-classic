@@ -21,10 +21,10 @@
 /////////////////////////////////////////////////
 void RenderWidget_TEST::InsertWidget()
 {
-  this->Load("empty.world");
-
   // Create a new render widget
   gazebo::gui::RenderWidget *renderWidget = new gazebo::gui::RenderWidget;
+
+  this->Load("empty.world");
 
   // Get the splitter widget
   QSplitter *splitter = renderWidget->findChild<QSplitter *>();

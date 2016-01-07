@@ -25,7 +25,9 @@
 #include <iostream>
 
 #include <boost/algorithm/string/replace.hpp>
+#include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/function.hpp>
 #include <boost/iostreams/filtering_streambuf.hpp>
 #include <boost/iostreams/copy.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
@@ -292,7 +294,8 @@ void ModelDatabase::UpdateModelCache(bool _fetchImmediately)
     else
     {
       boost::mutex::scoped_lock lock2(this->dataPtr->callbacksMutex);
-
+      if (this->dataPtr->stop)
+        break;
       this->dataPtr->modelDBUpdated(this->dataPtr->modelCache);
     }
     this->dataPtr->updateCacheCompleteCondition.notify_all();

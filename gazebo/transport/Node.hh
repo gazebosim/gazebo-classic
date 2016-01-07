@@ -19,6 +19,7 @@
 #define _NODE_HH_
 
 #include <tbb/task.h>
+#include <boost/bind.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <map>
 #include <list>
@@ -35,7 +36,7 @@ namespace gazebo
   {
     /// \cond
     /// \brief Task used by Node::Publish to publish on a one-time publisher
-    class GAZEBO_VISIBLE PublishTask : public tbb::task
+    class GZ_TRANSPORT_VISIBLE PublishTask : public tbb::task
     {
       /// \brief Constructor
       /// \param[in] _pub Publisher to publish the message on.
@@ -74,7 +75,8 @@ namespace gazebo
     /// \class Node Node.hh transport/transport.hh
     /// \brief A node can advertise and subscribe topics, publish on
     ///        advertised topics and listen to subscribed topics.
-    class GAZEBO_VISIBLE Node : public boost::enable_shared_from_this<Node>
+    class GZ_TRANSPORT_VISIBLE Node :
+      public boost::enable_shared_from_this<Node>
     {
       /// \brief Constructor
       public: Node();

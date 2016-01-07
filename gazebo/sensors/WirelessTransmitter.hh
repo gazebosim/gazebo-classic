@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _WIRELESS_TRANSMITTER_HH_
-#define _WIRELESS_TRANSMITTER_HH_
+#ifndef _GAZEBO_SENSORS_WIRELESSTRANSMITTER_HH_
+#define _GAZEBO_SENSORS_WIRELESSTRANSMITTER_HH_
 
 #include <string>
 #include "gazebo/physics/physics.hh"
@@ -54,7 +53,7 @@ namespace gazebo
       public: virtual ~WirelessTransmitter();
 
       // Documentation inherited
-      protected: virtual bool UpdateImpl(bool _force);
+      protected: virtual bool UpdateImpl(const bool _force);
 
       // Documentation inherited
       public: virtual void Load(const std::string &_worldName);
@@ -71,9 +70,11 @@ namespace gazebo
       public: double GetFreq() const;
 
       /// \brief Returns the signal strength in a given world's point (dBm).
+      /// \param[in] _receiver Pose of the receiver
+      /// \param[in] _rxGain Receiver gain value
       /// \return Signal strength in a world's point (dBm).
-      public: double GetSignalStrength(const math::Pose &_receiver,
-          const double rxGain);
+      public: double SignalStrength(const ignition::math::Pose3d &_receiver,
+          const double _rxGain);
 
       /// \brief Size of the grid used for visualization.
       private: static const double Step;

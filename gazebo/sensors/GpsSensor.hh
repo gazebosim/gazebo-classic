@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GPSSENSOR_HH_
-#define _GPSSENSOR_HH_
+#ifndef _GAZEBO_SENSORS_GPSSENSOR_HH_
+#define _GAZEBO_SENSORS_GPSSENSOR_HH_
 
 #include <string>
 
@@ -57,34 +56,22 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited
-      protected: virtual bool UpdateImpl(bool _force);
+      protected: virtual bool UpdateImpl(const bool _force);
 
       // Documentation inherited
       public: virtual void Fini();
 
       /// \brief Accessor for current longitude angle
       /// \return Current longitude angle.
-      public: math::Angle GetLongitude() const;
+      public: ignition::math::Angle Longitude() const;
 
       /// \brief Accessor for current latitude angle
       /// \return Current latitude angle.
-      public: math::Angle GetLatitude() const;
+      public: ignition::math::Angle Latitude() const;
 
       /// \brief Accessor for current altitude
       /// \return Current altitude above sea level.
       public: double GetAltitude() const;
-
-      /// \brief Noise attributes for horizontal position measurement.
-      private: NoisePtr horizontalPositionNoise;
-
-      /// \brief Noise attributes for vertical position measurement.
-      private: NoisePtr verticalPositionNoise;
-
-      /// \brief Noise attributes for horizontal velocity measurement.
-      private: NoisePtr horizontalVelocityNoise;
-
-      /// \brief Noise attributes for vertical velocity measurement.
-      private: NoisePtr verticalVelocityNoise;
 
       /// \brief GPS data publisher.
       private: transport::PublisherPtr gpsPub;

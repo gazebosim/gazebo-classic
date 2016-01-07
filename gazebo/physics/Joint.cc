@@ -24,9 +24,6 @@
 #include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Publisher.hh"
 
-#include "gazebo/sensors/Sensor.hh"
-#include "gazebo/sensors/SensorsIface.hh"
-
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Events.hh"
@@ -82,11 +79,12 @@ Joint::Joint(BasePtr _parent)
 //////////////////////////////////////////////////
 Joint::~Joint()
 {
-  for (std::vector<std::string>::iterator iter = this->sensors.begin();
-      iter != this->sensors.end(); ++iter)
+  // Remove all the sensors attached to the joint
+  for (auto const &iter : this->sensors)
   {
-    sensors::remove_sensor(*iter);
+    event::Events::removeSensor(iter);
   }
+
   this->sensors.clear();
 }
 
@@ -215,6 +213,12 @@ void Joint::Load(sdf::ElementPtr _sdf)
   if (this->model)
   {
     this->childLink = this->model->GetLink(childName);
+    if (!this->childLink)
+    {
+      // need to do this if child link belongs to another model
+      this->childLink = boost::dynamic_pointer_cast<Link>(
+          this->GetWorld()->GetByName(childName));
+    }
     this->parentLink = this->model->GetLink(parentName);
   }
   else
@@ -226,11 +230,60 @@ void Joint::Load(sdf::ElementPtr _sdf)
         this->GetWorld()->GetByName(parentName));
   }
 
+  // Link might not have been found because it is on another model
+  // or because the model name has been changed, e.g. spawning the same model
+  // twice will result in some suffix appended to the model name
+  // First try to find the link with different scopes.
   if (!this->parentLink && parentName != std::string("world"))
-    gzthrow("Couldn't Find Parent Link[" + parentName + "]");
+  {
+    BasePtr parentModel = this->model;
+    while (!this->parentLink && parentModel && parentModel->HasType(MODEL))
+    {
+      std::string scopedParentName =
+          parentModel->GetScopedName() + "::" + parentName;
+
+      this->parentLink = boost::dynamic_pointer_cast<Link>(
+          this->GetWorld()->GetByName(scopedParentName));
+
+      parentModel = parentModel->GetParent();
+    }
+    if (!this->parentLink)
+    {
+      std::string parentNameThisModel =
+          parentName.substr(parentName.find("::"));
+      parentNameThisModel = parentModel->GetName() + parentNameThisModel;
+
+      this->parentLink = boost::dynamic_pointer_cast<Link>(
+          this->GetWorld()->GetByName(parentNameThisModel));
+    }
+    if (!this->parentLink)
+      gzthrow("Couldn't Find Parent Link[" + parentName + "]");
+  }
 
   if (!this->childLink && childName != std::string("world"))
-    gzthrow("Couldn't Find Child Link[" + childName  + "]");
+  {
+    BasePtr parentModel = this->model;
+
+    while (!this->childLink && parentModel && parentModel->HasType(MODEL))
+    {
+      std::string scopedChildName =
+          parentModel->GetScopedName() + "::" + childName;
+      this->childLink = boost::dynamic_pointer_cast<Link>(
+          this->GetWorld()->GetByName(scopedChildName));
+
+        parentModel = parentModel->GetParent();
+    }
+    if (!this->childLink)
+    {
+      std::string childNameThisModel = childName.substr(childName.find("::"));
+      childNameThisModel = parentModel->GetName() + childNameThisModel;
+
+      this->childLink = boost::dynamic_pointer_cast<Link>(
+          this->GetWorld()->GetByName(childNameThisModel));
+    }
+    if (!this->childLink)
+      gzthrow("Couldn't Find Child Link[" + childName  + "]");
+  }
 
   this->LoadImpl(_sdf->Get<math::Pose>("pose"));
 }
@@ -270,9 +323,14 @@ void Joint::LoadImpl(const math::Pose &_pose)
       /// other sensors. We should make this more generic.
       if (sensorElem->Get<std::string>("type") == "force_torque")
       {
-        std::string sensorName =
-          sensors::create_sensor(sensorElem, this->GetWorld()->GetName(),
-              this->GetScopedName(), this->GetId());
+        // This must match the implementation in Sensors::GetScopedName
+        std::string sensorName = this->GetScopedName(true) + "::" +
+          sensorElem->Get<std::string>("name");
+
+        // Tell the sensor library to create a sensor.
+        event::Events::createSensor(sensorElem,
+            this->GetWorld()->GetName(), this->GetScopedName(), this->GetId());
+
         this->sensors.push_back(sensorName);
       }
       else
@@ -341,10 +399,10 @@ void Joint::Init()
 //////////////////////////////////////////////////
 void Joint::Fini()
 {
-  for (std::vector<std::string>::iterator iter = this->sensors.begin();
-      iter != this->sensors.end(); ++iter)
+  // Remove all the sensors attached to the joint
+  for (auto const &iter : this->sensors)
   {
-    sensors::remove_sensor(*iter);
+    event::Events::removeSensor(iter);
   }
   this->sensors.clear();
 
@@ -427,7 +485,10 @@ void Joint::UpdateParameters(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Joint::Reset()
 {
-  this->SetVelocity(0, 0);
+  for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
+  {
+    this->SetVelocity(i, 0.0);
+  }
   this->staticAngle.SetFromRadian(0);
 }
 
@@ -515,6 +576,10 @@ msgs::Joint::Type Joint::GetMsgType() const
   {
     return msgs::Joint::UNIVERSAL;
   }
+  else if (this->HasType(Base::FIXED_JOINT))
+  {
+    return msgs::Joint::FIXED;
+  }
 
   gzerr << "No joint recognized in type ["
         << this->GetType()
@@ -529,7 +594,7 @@ void Joint::FillMsg(msgs::Joint &_msg)
   _msg.set_name(this->GetScopedName());
   _msg.set_id(this->GetId());
 
-  msgs::Set(_msg.mutable_pose(), this->anchorPose);
+  msgs::Set(_msg.mutable_pose(), this->anchorPose.Ign());
   _msg.set_type(this->GetMsgType());
 
   for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
@@ -543,7 +608,7 @@ void Joint::FillMsg(msgs::Joint &_msg)
     else
       break;
 
-    msgs::Set(axis->mutable_xyz(), this->GetLocalAxis(i));
+    msgs::Set(axis->mutable_xyz(), this->GetLocalAxis(i).Ign());
     axis->set_limit_lower(this->GetLowStop(i).Radian());
     axis->set_limit_upper(this->GetHighStop(i).Radian());
     axis->set_limit_effort(this->GetEffortLimit(i));
@@ -575,18 +640,17 @@ void Joint::FillMsg(msgs::Joint &_msg)
     _msg.set_parent_id(0);
   }
 
-  for (std::vector<std::string>::iterator iter = this->sensors.begin();
-       iter != this->sensors.end(); ++iter)
+  // Add in the sensor data.
+  if (this->sdf->HasElement("sensor"))
   {
-    sensors::SensorPtr sensor = sensors::get_sensor(*iter);
-    if (sensor)
+    sdf::ElementPtr sensorElem = this->sdf->GetElement("sensor");
+    while (sensorElem)
     {
-      msgs::Sensor *sensorMsg =_msg.add_sensor();
-      sensor->FillMsg(*sensorMsg);
-    }
-    else
-    {
-      gzlog << "Joint::FillMsg: sensor [" << *iter << "] not found.\n";
+      msgs::Sensor *msg = _msg.add_sensor();
+      msg->CopyFrom(msgs::SensorFromSDF(sensorElem));
+      msg->set_parent(this->GetScopedName());
+      msg->set_parent_id(this->GetId());
+      sensorElem = sensorElem->GetNextElement("sensor");
     }
   }
 }
@@ -616,12 +680,6 @@ bool Joint::SetLowStop(unsigned int _index, const math::Angle &_angle)
   // switch below to return this->SetLowerLimit when we implement
   // issue #1108
   return true;
-}
-
-//////////////////////////////////////////////////
-void Joint::SetAngle(unsigned int _index, math::Angle _angle)
-{
-  this->SetPosition(_index, _angle.Radian());
 }
 
 //////////////////////////////////////////////////
@@ -852,9 +910,11 @@ bool Joint::SetVelocityMaximal(unsigned int _index, double _velocity)
 //////////////////////////////////////////////////
 void Joint::SetState(const JointState &_state)
 {
-  this->SetVelocity(0, 0);
   for (unsigned int i = 0; i < _state.GetAngleCount(); ++i)
+  {
+    this->SetVelocity(i, 0.0);
     this->SetPosition(i, _state.GetAngle(i).Radian());
+  }
 }
 
 //////////////////////////////////////////////////

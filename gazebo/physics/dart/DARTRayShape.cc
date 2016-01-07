@@ -25,25 +25,25 @@
 #include "gazebo/physics/dart/DARTCollision.hh"
 #include "gazebo/physics/dart/DARTRayShape.hh"
 
+#include "gazebo/physics/dart/DARTRayShapePrivate.hh"
+
 using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
 DARTRayShape::DARTRayShape(PhysicsEnginePtr _physicsEngine)
-  : RayShape(_physicsEngine)
+  : RayShape(_physicsEngine),
+    dataPtr(new DARTRayShapePrivate())
 {
   this->SetName("DART_ray_shape");
-  this->physicsEngine =
-    boost::static_pointer_cast<DARTPhysics>(_physicsEngine);
 }
 
 //////////////////////////////////////////////////
 DARTRayShape::DARTRayShape(CollisionPtr _parent)
-    : RayShape(_parent)
+  : RayShape(_parent),
+    dataPtr(new DARTRayShapePrivate())
 {
   this->SetName("DART_ray_shape");
-  this->physicsEngine = boost::static_pointer_cast<DARTPhysics>(
-      this->collisionParent->GetWorld()->GetPhysicsEngine());
 }
 
 //////////////////////////////////////////////////
@@ -62,10 +62,6 @@ void DARTRayShape::GetIntersection(double &_dist, std::string &_entity)
 {
   _dist = 0;
   _entity = "";
-
-  if (this->physicsEngine)
-  {
-  }
 
   // Not implemented yet, please see issue #911
 }

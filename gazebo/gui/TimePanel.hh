@@ -41,7 +41,7 @@ namespace gazebo
     class TimeWidget;
     class LogPlayWidget;
 
-    class GAZEBO_VISIBLE TimePanel : public QWidget
+    class GZ_GUI_VISIBLE TimePanel : public QWidget
     {
       Q_OBJECT
 
@@ -85,6 +85,9 @@ namespace gazebo
       /// indicates the simulation is running
       public: void SetPaused(bool _paused);
 
+      /// \brief Toggle simulation paused state.
+      public slots: void TogglePause();
+
       /// \brief Qt call back when the step value in the spinbox changed
       /// \param[in] _value New step value.
       public slots: void OnStepValueChanged(int _value);
@@ -109,15 +112,11 @@ namespace gazebo
       /// \brief Called when the GUI enters/leaves full-screen mode.
       /// \param[in] _value True when entering full screen, false when
       /// leaving.
-      private: void OnFullScreen(bool &_value);
+      private: void OnFullScreen(bool _value);
 
       /// \brief Called when a world stats message is received.
       /// \param[in] _msg World statistics message.
       private: void OnStats(ConstWorldStatisticsPtr &_msg);
-
-      /// \brief Helper function to format time string.
-      /// \param[in] _msg Time message.
-      private: static std::string FormatTime(const msgs::Time &_msg);
 
       /// \internal
       /// \brief Pointer to private data.

@@ -14,14 +14,14 @@
  * limitations under the License.
  *
 */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
 
-#include "gazebo/math/Rand.hh"
+#include <ignition/math/Pose3.hh>
+
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/SensorManager.hh"
@@ -97,7 +97,7 @@ void WirelessReceiver::Load(const std::string &_worldName)
 }
 
 //////////////////////////////////////////////////
-bool WirelessReceiver::UpdateImpl(bool /*_force*/)
+bool WirelessReceiver::UpdateImpl(const bool /*_force*/)
 {
   std::string txEssid;
   msgs::WirelessNodes msg;
@@ -105,19 +105,19 @@ bool WirelessReceiver::UpdateImpl(bool /*_force*/)
   double txFreq;
 
   this->referencePose =
-      this->pose + this->parentEntity.lock()->GetWorldPose();
+      this->pose + this->parentEntity.lock()->GetWorldPose().Ign();
 
-  math::Pose myPos = this->referencePose;
+  ignition::math::Pose3d myPos = this->referencePose;
   Sensor_V sensors = SensorManager::Instance()->GetSensors();
   for (Sensor_V::iterator it = sensors.begin(); it != sensors.end(); ++it)
   {
     if ((*it)->GetType() == "wireless_transmitter")
     {
-      boost::shared_ptr<gazebo::sensors::WirelessTransmitter> transmitter =
-          boost::static_pointer_cast<WirelessTransmitter>(*it);
+      std::shared_ptr<gazebo::sensors::WirelessTransmitter> transmitter =
+          std::static_pointer_cast<WirelessTransmitter>(*it);
 
       txFreq = transmitter->GetFreq();
-      rxPower = transmitter->GetSignalStrength(myPos, this->GetGain());
+      rxPower = transmitter->SignalStrength(myPos, this->GetGain());
 
       // Discard if the frequency received is out of our frequency range,
       // or if the received signal strengh is lower than the sensivity

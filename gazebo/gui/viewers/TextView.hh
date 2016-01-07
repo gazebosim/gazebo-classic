@@ -33,7 +33,7 @@ namespace gazebo
 {
   namespace gui
   {
-    class GAZEBO_VISIBLE TextView : public TopicView
+    class GZ_GUI_VISIBLE TextView : public TopicView
     {
       Q_OBJECT
 

@@ -20,7 +20,8 @@ ssao.compositor
 ssao.material
 VPL.material
 VPL.program
+WideCameraLensMap.compositor
 )
 
-install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/media/materials/scripts/)
+install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_MAJOR_VERSION}/media/materials/scripts/)
 

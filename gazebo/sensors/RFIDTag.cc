@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: RFID Tag
- * Author: Jonas Mellin & Zakiruz Zaman
- * Date: 6th December 2011
- */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
@@ -78,7 +73,7 @@ void RFIDTag::Load(const std::string &_worldName)
   {
     if ((*iter)->GetType() == "rfid")
     {
-      boost::dynamic_pointer_cast<RFIDSensor>(*iter)->AddTag(this);
+      std::dynamic_pointer_cast<RFIDSensor>(*iter)->AddTag(this);
     }
   }
 }
@@ -97,12 +92,12 @@ void RFIDTag::Init()
 }
 
 //////////////////////////////////////////////////
-bool RFIDTag::UpdateImpl(bool /*_force*/)
+bool RFIDTag::UpdateImpl(const bool /*_force*/)
 {
   if (this->scanPub)
   {
     msgs::Pose msg;
-    msgs::Set(&msg, entity->GetWorldPose());
+    msgs::Set(&msg, entity->GetWorldPose().Ign());
 
     // msg.set_position(link->GetWorldPose().pos);
     // msg.set_orientation(link->GetWorldPose().rot);
@@ -128,4 +123,10 @@ bool RFIDTag::UpdateImpl(bool /*_force*/)
   }
 
   return true;
+}
+
+/////////////////////////////////////////////////
+ignition::math::Pose3d RFIDTag::TagPose() const
+{
+  return entity->GetWorldPose().Ign();
 }

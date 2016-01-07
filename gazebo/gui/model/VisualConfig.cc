@@ -28,24 +28,32 @@ using namespace gui;
 VisualConfig::VisualConfig()
 {
   this->setObjectName("VisualConfig");
-  QVBoxLayout *mainLayout = new QVBoxLayout;
 
-  this->visualsTreeWidget = new QTreeWidget();
-  this->visualsTreeWidget->setColumnCount(1);
-  this->visualsTreeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
-  this->visualsTreeWidget->header()->hide();
-  this->visualsTreeWidget->setIndentation(4);
+  // Layout for list
+  this->listLayout = new QVBoxLayout();
+  this->listLayout->setContentsMargins(0, 0, 0, 0);
+  this->listLayout->setAlignment(Qt::AlignTop);
 
-  this->visualsTreeWidget->setSelectionMode(QAbstractItemView::NoSelection);
-  connect(this->visualsTreeWidget, SIGNAL(itemClicked(QTreeWidgetItem *, int)),
-      this, SLOT(OnItemSelection(QTreeWidgetItem *, int)));
+  // Widget for list, which will be scrollable
+  QWidget *listWidget = new QWidget();
+  listWidget->setLayout(this->listLayout);
+  listWidget->setStyleSheet("QWidget{background-color: #808080}");
 
+  // Scroll area for list
+  QScrollArea *scrollArea = new QScrollArea;
+  scrollArea->setWidget(listWidget);
+  scrollArea->setWidgetResizable(true);
+
+  // Add Visual button
   QPushButton *addVisualButton = new QPushButton(tr("+ &Another Visual"));
   addVisualButton->setMaximumWidth(200);
   connect(addVisualButton, SIGNAL(clicked()), this, SLOT(OnAddVisual()));
 
-  mainLayout->addWidget(this->visualsTreeWidget);
+  // Main layout
+  QVBoxLayout *mainLayout = new QVBoxLayout;
+  mainLayout->addWidget(scrollArea);
   mainLayout->addWidget(addVisualButton);
+  mainLayout->setContentsMargins(0, 0, 0, 0);
   this->setLayout(mainLayout);
 
   this->counter = 0;
@@ -61,7 +69,19 @@ VisualConfig::~VisualConfig()
   while (!this->configs.empty())
   {
     auto config = this->configs.begin();
+    delete config->second;
     this->configs.erase(config);
+  }
+}
+
+/////////////////////////////////////////////////
+void VisualConfig::Init()
+{
+  // Keep original data in case user cancels
+  for (auto &it : this->configs)
+  {
+    VisualConfigData *configData = it.second;
+    configData->originalDataMsg.CopyFrom(*this->GetData(configData->name));
   }
 }
 
@@ -84,18 +104,33 @@ unsigned int VisualConfig::GetVisualCount() const
 void VisualConfig::Reset()
 {
   for (auto &it : this->configs)
+  {
+    this->listLayout->removeWidget(it.second->widget);
     delete it.second;
+  }
 
   this->configs.clear();
-  this->visualsTreeWidget->clear();
 }
 
 /////////////////////////////////////////////////
 void VisualConfig::AddVisual(const std::string &_name,
     const msgs::Visual *_visualMsg)
 {
-  // Visual name label
-  QLabel *visualLabel = new QLabel(QString(_name.c_str()));
+  // Header button
+  QRadioButton *headerButton = new QRadioButton();
+  headerButton->setChecked(false);
+  headerButton->setFocusPolicy(Qt::NoFocus);
+  headerButton->setText(QString(_name.c_str()));
+  headerButton->setStyleSheet(
+     "QRadioButton {\
+        color: #d0d0d0;\
+      }\
+      QRadioButton::indicator::unchecked {\
+        image: url(:/images/right_arrow.png);\
+      }\
+      QRadioButton::indicator::checked {\
+        image: url(:/images/down_arrow.png);\
+      }");
 
   // Remove button
   QToolButton *removeVisualButton = new QToolButton(this);
@@ -109,21 +144,15 @@ void VisualConfig::AddVisual(const std::string &_name,
       SLOT(map()));
   this->signalMapper->setMapping(removeVisualButton, this->counter);
 
-  // Item Layout
-  QHBoxLayout *visualItemLayout = new QHBoxLayout;
-  visualItemLayout->addWidget(visualLabel);
-  visualItemLayout->addWidget(removeVisualButton);
-  visualItemLayout->setContentsMargins(10, 0, 0, 0);
+  // Header Layout
+  QHBoxLayout *headerLayout = new QHBoxLayout;
+  headerLayout->setContentsMargins(0, 0, 0, 0);
+  headerLayout->addWidget(headerButton);
+  headerLayout->addWidget(removeVisualButton);
 
-  // Item widget
-  QWidget *visualItemWidget = new QWidget;
-  visualItemWidget->setLayout(visualItemLayout);
-
-  // Top-level tree item
-  QTreeWidgetItem *visualItem =
-      new QTreeWidgetItem(static_cast<QTreeWidgetItem *>(0));
-  this->visualsTreeWidget->addTopLevelItem(visualItem);
-  this->visualsTreeWidget->setItemWidget(visualItem, 0, visualItemWidget);
+  // Header widget
+  QWidget *headerWidget = new QWidget;
+  headerWidget->setLayout(headerLayout);
 
   // ConfigWidget
   msgs::Visual msgToLoad;
@@ -138,6 +167,7 @@ void VisualConfig::AddVisual(const std::string &_name,
 
   ConfigWidget *configWidget = new ConfigWidget;
   configWidget->Load(&msgToLoad);
+  configWidget->hide();
 
   configWidget->SetWidgetVisible("id", false);
   configWidget->SetWidgetVisible("name", false);
@@ -148,6 +178,7 @@ void VisualConfig::AddVisual(const std::string &_name,
   configWidget->SetWidgetVisible("visible", false);
   configWidget->SetWidgetVisible("scale", false);
   configWidget->SetWidgetVisible("plugin", false);
+  configWidget->SetWidgetVisible("type", false);
   configWidget->SetWidgetReadOnly("id", true);
   configWidget->SetWidgetReadOnly("name", true);
   configWidget->SetWidgetReadOnly("parent_name", true);
@@ -157,35 +188,52 @@ void VisualConfig::AddVisual(const std::string &_name,
   configWidget->SetWidgetReadOnly("visible", true);
   configWidget->SetWidgetReadOnly("scale", true);
   configWidget->SetWidgetReadOnly("plugin", true);
+  configWidget->SetWidgetReadOnly("type", true);
 
+  // Connect config widget signals
+  connect(configWidget, SIGNAL(PoseValueChanged(const QString &,
+      const ignition::math::Pose3d &)), this,
+      SLOT(OnPoseChanged(const QString &, const ignition::math::Pose3d &)));
+
+  connect(configWidget, SIGNAL(GeometryValueChanged(const std::string &,
+      const std::string &, const ignition::math::Vector3d &,
+      const std::string &)), this, SLOT(OnGeometryChanged(const std::string &,
+      const std::string &, const ignition::math::Vector3d &,
+      const std::string &)));
+
+  connect(configWidget, SIGNAL(ColorValueChanged(const QString &,
+      const gazebo::common::Color &)), this,
+      SLOT(OnColorChanged(const QString &, const gazebo::common::Color &)));
+
+  connect(configWidget, SIGNAL(DoubleValueChanged(const QString &,
+      const double)), this,
+      SLOT(OnDoubleChanged(const QString &, const double)));
+
+  connect(configWidget, SIGNAL(StringValueChanged(const QString &,
+      const std::string &)), this,
+      SLOT(OnStringChanged(const QString &, const std::string &)));
+
+  // Item layout
+  QVBoxLayout *itemLayout = new QVBoxLayout();
+  itemLayout->addWidget(headerWidget);
+  itemLayout->addWidget(configWidget);
+
+  // Put the layout in a widget which can be added/deleted
+  QWidget *item = new QWidget();
+  item->setLayout(itemLayout);
+
+  // Add to the list
+  this->listLayout->addWidget(item);
+
+  // Fill ConfigData
   VisualConfigData *configData = new VisualConfigData;
   configData->configWidget = configWidget;
   configData->id =  this->counter;
-  configData->treeItem = visualItem;
+  configData->widget = item;
   configData->name = _name;
+  connect(headerButton, SIGNAL(toggled(bool)), configData,
+           SLOT(OnToggleItem(bool)));
   this->configs[this->counter] = configData;
-
-  // Scroll area
-  QScrollArea *scrollArea = new QScrollArea;
-  scrollArea->setWidget(configWidget);
-  scrollArea->setWidgetResizable(true);
-
-  // Layout
-  QVBoxLayout *visualLayout = new QVBoxLayout;
-  visualLayout->setContentsMargins(0, 0, 0, 0);
-  visualLayout->addWidget(scrollArea);
-
-  // Widget
-  QWidget *visualWidget = new QWidget;
-  visualWidget->setLayout(visualLayout);
-  visualWidget->setMinimumHeight(800);
-
-  // Child item
-  QTreeWidgetItem *visualChildItem = new QTreeWidgetItem(visualItem);
-  this->visualsTreeWidget->setItemWidget(visualChildItem, 0, visualWidget);
-
-  visualItem->setExpanded(false);
-  visualChildItem->setExpanded(false);
 
   this->counter++;
 }
@@ -203,14 +251,6 @@ void VisualConfig::UpdateVisual(const std::string &_name,
       break;
     }
   }
-}
-
-/////////////////////////////////////////////////
-void VisualConfig::OnItemSelection(QTreeWidgetItem *_item,
-                                         int /*_column*/)
-{
-  if (_item && _item->childCount() > 0)
-    _item->setExpanded(!_item->isExpanded());
 }
 
 /////////////////////////////////////////////////
@@ -243,7 +283,8 @@ void VisualConfig::OnRemoveVisual(int _id)
 
   QMessageBox msgBox(QMessageBox::Warning, QString("Remove visual?"),
       QString(msg.c_str()));
-  msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
+  msgBox.setWindowFlags(Qt::Window | Qt::WindowTitleHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
 
   QPushButton *cancelButton =
       msgBox.addButton("Cancel", QMessageBox::RejectRole);
@@ -256,9 +297,8 @@ void VisualConfig::OnRemoveVisual(int _id)
     return;
 
   // Remove
-  int index = this->visualsTreeWidget->indexOfTopLevelItem(
-      configData->treeItem);
-  this->visualsTreeWidget->takeTopLevelItem(index);
+  this->listLayout->removeWidget(configData->widget);
+  delete configData->widget;
 
   emit VisualRemoved(configData->name);
   this->configs.erase(it);
@@ -270,7 +310,7 @@ msgs::Visual *VisualConfig::GetData(const std::string &_name) const
   for (auto const &it : this->configs)
   {
     if (it.second->name == _name)
-      return dynamic_cast<msgs::Visual *>(it.second->configWidget->GetMsg());
+      return dynamic_cast<msgs::Visual *>(it.second->configWidget->Msg());
   }
   return NULL;
 }
@@ -283,12 +323,26 @@ void VisualConfig::SetGeometry(const std::string &_name,
   {
     if (it.second->name == _name)
     {
-      math::Vector3 dimensions;
+      ignition::math::Vector3d dimensions;
       std::string uri;
-      std::string type = it.second->configWidget->GetGeometryWidgetValue(
+      std::string type = it.second->configWidget->GeometryWidgetValue(
           "geometry", dimensions, uri);
       it.second->configWidget->SetGeometryWidgetValue("geometry", type,
-          _size, _uri);
+          _size.Ign(), _uri);
+      break;
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void VisualConfig::Geometry(const std::string &_name,
+    ignition::math::Vector3d &_size, std::string &_uri)
+{
+  for (auto &it : this->configs)
+  {
+    if (it.second->name == _name)
+    {
+      it.second->configWidget->GeometryWidgetValue("geometry", _size, _uri);
       break;
     }
   }
@@ -317,4 +371,82 @@ void VisualConfig::SetMaterial(const std::string &_name,
       break;
     }
   }
+}
+
+/////////////////////////////////////////////////
+const std::map<int, VisualConfigData *> &VisualConfig::ConfigData() const
+{
+  return this->configs;
+}
+
+/////////////////////////////////////////////////
+void VisualConfig::OnPoseChanged(const QString &/*_name*/,
+    const ignition::math::Pose3d &/*_value*/)
+{
+  emit Applied();
+}
+
+/////////////////////////////////////////////////
+void VisualConfig::OnGeometryChanged(const std::string &/*_name*/,
+    const std::string &/*_value*/,
+    const ignition::math::Vector3d &/*dimensions*/,
+    const std::string &/*_uri*/)
+{
+  emit Applied();
+}
+
+/////////////////////////////////////////////////
+void VisualConfig::OnColorChanged(const QString &/*_name*/,
+    const gazebo::common::Color &/*_value*/)
+{
+  emit Applied();
+}
+
+/////////////////////////////////////////////////
+void VisualConfig::OnDoubleChanged(const QString &_name,
+    const double /*_value*/)
+{
+  // Only transparency affects the visualization
+  if (_name == "transparency")
+    emit Applied();
+}
+
+/////////////////////////////////////////////////
+void VisualConfig::OnStringChanged(const QString &_name,
+    const std::string &/*_value*/)
+{
+  // Only material script affects the visualization
+  if (_name == "material::script::name")
+    emit Applied();
+}
+
+/////////////////////////////////////////////////
+void VisualConfig::RestoreOriginalData()
+{
+  for (auto &it : this->configs)
+  {
+    it.second->RestoreOriginalData();
+  }
+}
+
+/////////////////////////////////////////////////
+void VisualConfigData::OnToggleItem(bool _checked)
+{
+  if (_checked)
+    this->configWidget->show();
+  else
+    this->configWidget->hide();
+}
+
+/////////////////////////////////////////////////
+void VisualConfigData::RestoreOriginalData()
+{
+  msgs::VisualPtr visualPtr;
+  visualPtr.reset(new msgs::Visual);
+  visualPtr->CopyFrom(this->originalDataMsg);
+
+  // Update default widgets
+  this->configWidget->blockSignals(true);
+  this->configWidget->UpdateFromMsg(visualPtr.get());
+  this->configWidget->blockSignals(false);
 }

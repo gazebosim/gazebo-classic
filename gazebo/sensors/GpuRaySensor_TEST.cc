@@ -14,9 +14,9 @@
  * limitations under the License.
  *
 */
-
+#include <functional>
 #include <gtest/gtest.h>
-#include "gazebo/math/Angle.hh"
+#include <ignition/math/Angle.hh>
 #include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
@@ -46,16 +46,16 @@ TEST_F(GPURaySensor_TEST, CreateLaser)
 
   // Get a pointer to the Ray sensor
   sensors::GpuRaySensorPtr sensor =
-     boost::dynamic_pointer_cast<sensors::GpuRaySensor>
+     std::dynamic_pointer_cast<sensors::GpuRaySensor>
      (mgr->GetSensor(sensorName));
 
   // Make sure the above dynamic cast worked.
   EXPECT_TRUE(sensor != NULL);
 
-  double angleRes = (sensor->GetAngleMax() - sensor->GetAngleMin()).Radian() /
+  double angleRes = (sensor->AngleMax() - sensor->AngleMin()).Radian() /
                     sensor->GetRayCount();
-  EXPECT_EQ(sensor->GetAngleMin(), math::Angle(-1.396263));
-  EXPECT_EQ(sensor->GetAngleMax(), math::Angle(1.396263));
+  EXPECT_EQ(sensor->AngleMin(), ignition::math::Angle(-1.396263));
+  EXPECT_EQ(sensor->AngleMax(), ignition::math::Angle(1.396263));
   EXPECT_NEAR(sensor->GetRangeMin(), 0.08, 1e-6);
   EXPECT_NEAR(sensor->GetRangeMax(), 10.0, 1e-6);
   EXPECT_NEAR(sensor->GetAngleResolution(), angleRes, 1e-3);
@@ -65,8 +65,8 @@ TEST_F(GPURaySensor_TEST, CreateLaser)
 
   EXPECT_EQ(sensor->GetVerticalRayCount(), 1);
   EXPECT_EQ(sensor->GetVerticalRangeCount(), 1);
-  EXPECT_EQ(sensor->GetVerticalAngleMin(), 0.0);
-  EXPECT_EQ(sensor->GetVerticalAngleMax(), 0.0);
+  EXPECT_EQ(sensor->VerticalAngleMin(), 0.0);
+  EXPECT_EQ(sensor->VerticalAngleMax(), 0.0);
 
   EXPECT_TRUE(sensor->IsActive());
   EXPECT_TRUE(sensor->IsHorizontal());
@@ -77,15 +77,16 @@ TEST_F(GPURaySensor_TEST, CreateLaser)
   int scanCount = 0;
   event::ConnectionPtr c =
     sensor->ConnectNewLaserFrame(
-        boost::bind(&::OnNewLaserFrame, &scanCount, scan,
-          _1, _2, _3, _4, _5));
+        std::bind(&::OnNewLaserFrame, &scanCount, scan,
+          std::placeholders::_1, std::placeholders::_2,
+          std::placeholders::_3, std::placeholders::_4,
+          std::placeholders::_5));
 
   // wait for a few laser scans
   int i = 0;
   while (scanCount < 10 && i < 300)
   {
     common::Time::MSleep(10);
-    mgr->Update();
     i++;
   }
   EXPECT_LT(i, 300);

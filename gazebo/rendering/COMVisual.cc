@@ -34,11 +34,34 @@ using namespace rendering;
 COMVisual::COMVisual(const std::string &_name, VisualPtr _vis)
   : Visual(*new COMVisualPrivate, _name, _vis, false)
 {
+  COMVisualPrivate *dPtr =
+      reinterpret_cast<COMVisualPrivate *>(this->dataPtr);
+  dPtr->type = VT_PHYSICS;
 }
 
 /////////////////////////////////////////////////
 COMVisual::~COMVisual()
 {
+  COMVisualPrivate *dPtr =
+      reinterpret_cast<COMVisualPrivate *>(this->dataPtr);
+  if (dPtr && dPtr->sceneNode)
+  {
+    this->DestroyAllAttachedMovableObjects(dPtr->sceneNode);
+    dPtr->sceneNode->removeAndDestroyAllChildren();
+  }
+}
+
+/////////////////////////////////////////////////
+void COMVisual::Fini()
+{
+  COMVisualPrivate *dPtr =
+      reinterpret_cast<COMVisualPrivate *>(this->dataPtr);
+  if (dPtr && dPtr->sceneNode)
+  {
+    this->DestroyAllAttachedMovableObjects(dPtr->sceneNode);
+    dPtr->sceneNode->removeAndDestroyAllChildren();
+  }
+  Visual::Fini();
 }
 
 /////////////////////////////////////////////////
@@ -123,13 +146,13 @@ void COMVisual::Load()
   this->InsertMesh("unit_sphere");
 
   Ogre::MovableObject *sphereObj =
-    (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+    (Ogre::MovableObject*)(dPtr->scene->OgreSceneManager()->createEntity(
           this->GetName()+"__SPHERE__", "unit_sphere"));
   sphereObj->setVisibilityFlags(GZ_VISIBILITY_GUI);
   sphereObj->setCastShadows(false);
 
   dPtr->sphereNode =
-      dPtr->sceneNode->createChildSceneNode(this->GetName() + "_SPHERE");
+      dPtr->sceneNode->createChildSceneNode(this->GetName() + "_SPHERE_");
 
   dPtr->sphereNode->attachObject(sphereObj);
   dPtr->sphereNode->setScale(sphereRadius*2, sphereRadius*2, sphereRadius*2);
@@ -143,18 +166,18 @@ void COMVisual::Load()
   this->SetMaterial("Gazebo/CoM");
 
   // CoM position indicator
-  math::Vector3 p1(0, 0, box.min.z - dPtr->inertiaPose.pos.z);
-  math::Vector3 p2(0, 0, box.max.z - dPtr->inertiaPose.pos.z);
-  math::Vector3 p3(0, box.min.y - dPtr->inertiaPose.pos.y, 0);
-  math::Vector3 p4(0, box.max.y - dPtr->inertiaPose.pos.y, 0);
-  math::Vector3 p5(box.min.x - dPtr->inertiaPose.pos.x, 0, 0);
-  math::Vector3 p6(box.max.x - dPtr->inertiaPose.pos.x, 0, 0);
-  p1 += dPtr->inertiaPose.pos;
-  p2 += dPtr->inertiaPose.pos;
-  p3 += dPtr->inertiaPose.pos;
-  p4 += dPtr->inertiaPose.pos;
-  p5 += dPtr->inertiaPose.pos;
-  p6 += dPtr->inertiaPose.pos;
+  ignition::math::Vector3d p1(0, 0, box.min.z - dPtr->inertiaPose.pos.z);
+  ignition::math::Vector3d p2(0, 0, box.max.z - dPtr->inertiaPose.pos.z);
+  ignition::math::Vector3d p3(0, box.min.y - dPtr->inertiaPose.pos.y, 0);
+  ignition::math::Vector3d p4(0, box.max.y - dPtr->inertiaPose.pos.y, 0);
+  ignition::math::Vector3d p5(box.min.x - dPtr->inertiaPose.pos.x, 0, 0);
+  ignition::math::Vector3d p6(box.max.x - dPtr->inertiaPose.pos.x, 0, 0);
+  p1 += dPtr->inertiaPose.pos.Ign();
+  p2 += dPtr->inertiaPose.pos.Ign();
+  p3 += dPtr->inertiaPose.pos.Ign();
+  p4 += dPtr->inertiaPose.pos.Ign();
+  p5 += dPtr->inertiaPose.pos.Ign();
+  p6 += dPtr->inertiaPose.pos.Ign();
 
   dPtr->crossLines = this->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
   dPtr->crossLines->setMaterial("Gazebo/Green");
@@ -177,3 +200,32 @@ math::Pose COMVisual::GetInertiaPose() const
   return dPtr->inertiaPose;
 }
 
+/////////////////////////////////////////////////
+void COMVisual::DestroyAllAttachedMovableObjects(Ogre::SceneNode *_sceneNode)
+{
+  if (!_sceneNode)
+    return;
+
+  // Destroy all the attached objects
+  Ogre::SceneNode::ObjectIterator itObject =
+    _sceneNode->getAttachedObjectIterator();
+
+  while (itObject.hasMoreElements())
+  {
+    Ogre::Entity *ent = static_cast<Ogre::Entity*>(itObject.getNext());
+    if (ent->getMovableType() != DynamicLines::GetMovableType())
+      this->dataPtr->scene->OgreSceneManager()->destroyEntity(ent);
+    else
+      delete ent;
+  }
+
+  // Recurse to child SceneNodes
+  Ogre::SceneNode::ChildNodeIterator itChild = _sceneNode->getChildIterator();
+
+  while (itChild.hasMoreElements())
+  {
+    Ogre::SceneNode* pChildNode =
+        static_cast<Ogre::SceneNode*>(itChild.getNext());
+    this->DestroyAllAttachedMovableObjects(pChildNode);
+  }
+}

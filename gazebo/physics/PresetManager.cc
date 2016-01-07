@@ -553,7 +553,7 @@ void PresetManager::GenerateSDFHelper(const Preset &_preset,
     if (_preset.GetParam(elem->GetName(), value) && elem->GetValue())
     {
       // cast based on type in SDF
-      if (typeid(int) == elem->GetValue()->GetType())
+      if (elem->GetValue()->IsType<int>())
       {
         int v;
         if (CastAnyValue(value, v))
@@ -561,7 +561,7 @@ void PresetManager::GenerateSDFHelper(const Preset &_preset,
         else
           gzerr << "SDF type did not give successful cast" << std::endl;
       }
-      else if (typeid(double) == elem->GetValue()->GetType())
+      else if (elem->GetValue()->IsType<double>())
       {
         double v;
         if (CastAnyValue(value, v))
@@ -569,7 +569,7 @@ void PresetManager::GenerateSDFHelper(const Preset &_preset,
         else
           gzerr << "SDF type did not give successful cast" << std::endl;
       }
-      else if (typeid(float) == elem->GetValue()->GetType())
+      else if (elem->GetValue()->IsType<float>())
       {
         float v;
         if (CastAnyValue(value, v))
@@ -577,7 +577,7 @@ void PresetManager::GenerateSDFHelper(const Preset &_preset,
         else
           gzerr << "SDF type did not give successful cast" << std::endl;
       }
-      else if (typeid(bool) == elem->GetValue()->GetType())
+      else if (elem->GetValue()->IsType<bool>())
       {
         bool v;
         if (CastAnyValue(value, v))
@@ -585,7 +585,7 @@ void PresetManager::GenerateSDFHelper(const Preset &_preset,
         else
           gzerr << "SDF type did not give successful cast" << std::endl;
       }
-      else if (typeid(std::string) == elem->GetValue()->GetType())
+      else if (elem->GetValue()->IsType<std::string>())
       {
         std::string v;
         if (CastAnyValue(value, v))
@@ -593,7 +593,22 @@ void PresetManager::GenerateSDFHelper(const Preset &_preset,
         else
           gzerr << "SDF type did not give successful cast" << std::endl;
       }
-      else if (typeid(sdf::Vector3) == elem->GetValue()->GetType())
+      else if (elem->GetValue()->IsType<ignition::math::Vector3d>())
+      {
+        ignition::math::Vector3d v;
+        if (CastAnyValue(value, v))
+        {
+          gzdbg << "Vector3: " << v << std::endl;
+          elem->Set(v);
+        }
+        else
+          gzerr << "SDF type did not give successful cast" << std::endl;
+#ifndef _WIN32
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+      }
+      else if (elem->GetValue()->IsType<sdf::Vector3>())
       {
         math::Vector3 v;
         if (CastAnyValue(value, v))
@@ -603,6 +618,9 @@ void PresetManager::GenerateSDFHelper(const Preset &_preset,
         }
         else
           gzerr << "SDF type did not give successful cast" << std::endl;
+#ifndef _WIN32
+#pragma GCC diagnostic pop
+#endif
       }
     }
     this->GenerateSDFHelper(_preset, elem);

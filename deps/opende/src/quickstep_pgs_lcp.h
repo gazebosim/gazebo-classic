@@ -25,22 +25,54 @@
 
 #include <ode/common.h>
 #include "quickstep_util.h"
- 
+
 namespace ode {
     namespace quickstep{
 
 // PGS_LCP was previously named SOR_LCP
 void PGS_LCP (dxWorldProcessContext *context,
-  const int m, const int nb, dRealMutablePtr J, dRealMutablePtr J_precon, dRealMutablePtr J_orig, dRealMutablePtr vnew, int *jb, dxBody * const *body,
-  dRealPtr invMOI, dRealPtr MOI, dRealMutablePtr lambda, dRealMutablePtr lambda_erp,
+  const int m, const int nb, dRealMutablePtr J, dRealMutablePtr J_precon,
+  dRealMutablePtr J_orig,
+#ifdef PENETRATION_JVERROR_CORRECTION
+  dRealMutablePtr vnew,
+  const dReal stepsize,
+#endif
+  int *jb, dxBody * const *body,
+  dRealPtr invMOI, dRealPtr MOI, dRealMutablePtr lambda,
+  dRealMutablePtr lambda_erp,
   dRealMutablePtr caccel, dRealMutablePtr caccel_erp, dRealMutablePtr cforce,
   dRealMutablePtr rhs, dRealMutablePtr rhs_erp, dRealMutablePtr rhs_precon,
   dRealPtr lo, dRealPtr hi, dRealPtr cfm, const int *findex,
-  dxQuickStepParameters *qs,
+  dxQuickStepParameters *qs
 #ifdef USE_TPROW
-  boost::threadpool::pool* row_threadpool,
+  , boost::threadpool::pool* row_threadpool
 #endif
-  const dReal stepsize); 
+  );
+
+/// \brief Compute the hi and lo bound for cone friction model to project onto
+/// \param[in] lo_act The low bound for cone friction model to project onto
+/// \param[in] hi_act The high bound for cone friction model to project onto
+/// \param[in] lo_act_erp The erp-version low bound for cone friction model to project onto
+/// \param[in] hi_act_erp The erp-version high bound for cone friction model to project onto
+/// \param[in] jb         The list of consecutive body pair ids that form constraints
+/// \param[in] J_orig     Unscaled Jacobian matrix J
+/// \param[in] index      Index definition of the constraint type: -1 bilateral, -2 normal, >=0 friction
+/// \param[in] startRow   Start row index
+/// \param[in] nRows      Number of rows
+/// \param[in] nb         Number of bodies
+/// \param[in] body       Body array with kinematic information
+/// \param[in] i          Current row index
+/// \param[in] order      Constraint reorder
+/// \param[in] findex     Constraint index, after reordering
+/// \param[in] lo         Low bound for pyramid friction model to project onto
+/// \param[in] hi         High bound for pyramid friction model to project onto
+/// \param[in] lambda     Constraint force
+/// \param[in] lambda_erp The erp-version of constraint force
+///
+void dxConeFrictionModel(dReal& lo_act, dReal& hi_act, dReal& lo_act_erp, dReal& hi_act_erp,
+    int *jb, dRealPtr J_orig, int index, int constraint_index, int startRow,
+    int nRows, const int nb, dxBody * const *body, int i, const IndexError *order,
+    const int *findex, dRealPtr lo, dRealPtr hi, dRealMutablePtr lambda, dRealMutablePtr lambda_erp);
 
 size_t EstimatePGS_LCPMemoryRequirements(int m,int /*nb*/);
 

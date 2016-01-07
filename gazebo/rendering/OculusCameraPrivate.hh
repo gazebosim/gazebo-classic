@@ -18,6 +18,7 @@
 #define _GAZEBO_RENDERING_OCULUS_CAMERA_PRIVATE_HH_
 
 #include <OVR_CAPI.h>
+#include "gazebo/util/system.hh"
 
 namespace Ogre
 {
@@ -31,7 +32,7 @@ namespace gazebo
   namespace rendering
   {
     /// \brief Private data for the Oculus Camera class
-    class GAZEBO_VISIBLE OculusCameraPrivate
+    class GZ_RENDERING_VISIBLE OculusCameraPrivate
     {
       /// \brief Constructor
       public: OculusCameraPrivate()

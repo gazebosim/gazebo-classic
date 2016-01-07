@@ -14,12 +14,13 @@
  * limitations under the License.
  *
 */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
+
+#include <boost/bind.hpp>
 
 #include "gazebo/transport/transport.hh"
 
@@ -74,7 +75,7 @@ void ModelSnap::Clear()
   this->dataPtr->hoverVis.reset();
 
   this->dataPtr->node.reset();
-  this->dataPtr->modelPub.reset();
+  this->dataPtr->userCmdPub.reset();
 
   if (this->dataPtr->updateMutex)
   {
@@ -126,8 +127,8 @@ void ModelSnap::Init()
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init();
-  this->dataPtr->modelPub =
-      this->dataPtr->node->Advertise<msgs::Model>("~/model/modify");
+  this->dataPtr->userCmdPub =
+      this->dataPtr->node->Advertise<msgs::UserCmd>("~/user_cmd");
 
   this->dataPtr->rayQuery.reset(
       new rendering::RayQuery(this->dataPtr->userCamera));
@@ -186,14 +187,14 @@ void ModelSnap::OnMouseMoveEvent(const common::MouseEvent &_event)
   this->dataPtr->mouseEvent = _event;
 
   rendering::VisualPtr vis = this->dataPtr->userCamera->GetVisual(
-      this->dataPtr->mouseEvent.pos);
+      this->dataPtr->mouseEvent.Pos());
   if (vis && !vis->IsPlane())
   {
     // get the triangle being hovered so that it can be highlighted
     math::Vector3 intersect;
     std::vector<math::Vector3> hoverTriangle;
-    this->dataPtr->rayQuery->SelectMeshTriangle(_event.pos.x, _event.pos.y,
-        vis->GetRootVisual(), intersect, hoverTriangle);
+    this->dataPtr->rayQuery->SelectMeshTriangle(_event.Pos().X(),
+        _event.Pos().Y(), vis->GetRootVisual(), intersect, hoverTriangle);
 
     if (!hoverTriangle.empty())
     {
@@ -227,10 +228,10 @@ void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
   this->dataPtr->mouseEvent = _event;
 
   rendering::VisualPtr vis = this->dataPtr->userCamera->GetVisual(
-      this->dataPtr->mouseEvent.pos);
+      this->dataPtr->mouseEvent.Pos());
 
   if (vis && !vis->IsPlane() &&
-      this->dataPtr->mouseEvent.button == common::MouseEvent::LEFT)
+      this->dataPtr->mouseEvent.Button() == common::MouseEvent::LEFT)
   {
     // Parent model or parent link
     rendering::VisualPtr currentParent = vis->GetRootVisual();
@@ -256,8 +257,9 @@ void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
     if (!this->dataPtr->selectedVis || (currentParent  == previousParent))
     {
       math::Vector3 intersect;
-      this->dataPtr->rayQuery->SelectMeshTriangle(_event.pos.x, _event.pos.y,
-          currentParent, intersect, this->dataPtr->selectedTriangle);
+      this->dataPtr->rayQuery->SelectMeshTriangle(_event.Pos().X(),
+          _event.Pos().Y(), currentParent, intersect,
+          this->dataPtr->selectedTriangle);
 
       if (!this->dataPtr->selectedTriangle.empty())
       {
@@ -275,8 +277,8 @@ void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
       // select triangle on the target
       math::Vector3 intersect;
       std::vector<math::Vector3> vertices;
-      this->dataPtr->rayQuery->SelectMeshTriangle(_event.pos.x, _event.pos.y,
-          currentParent, intersect, vertices);
+      this->dataPtr->rayQuery->SelectMeshTriangle(_event.Pos().X(),
+          _event.Pos().Y(), currentParent, intersect, vertices);
 
       if (!vertices.empty())
       {
@@ -349,15 +351,27 @@ void ModelSnap::PublishVisualPose(rendering::VisualPtr _vis)
   if (!_vis)
     return;
 
-  // Check to see if the visual is a model.
-  if (gui::get_entity_id(_vis->GetName()))
+  // Only publish for models
+  if (_vis->GetType() == gazebo::rendering::Visual::VT_MODEL)
   {
-    msgs::Model msg;
-    msg.set_id(gui::get_entity_id(_vis->GetName()));
-    msg.set_name(_vis->GetName());
+    // Register user command on server
+    msgs::UserCmd userCmdMsg;
+    userCmdMsg.set_description("Snap [" + _vis->GetName() + "]");
+    userCmdMsg.set_type(msgs::UserCmd::MOVING);
 
-    msgs::Set(msg.mutable_pose(), _vis->GetWorldPose());
-    this->dataPtr->modelPub->Publish(msg);
+    msgs::Model msg;
+
+    auto id = gui::get_entity_id(_vis->GetName());
+    if (id)
+      msg.set_id(id);
+
+    msg.set_name(_vis->GetName());
+    msgs::Set(msg.mutable_pose(), _vis->GetWorldPose().Ign());
+
+    auto modelMsg = userCmdMsg.add_model();
+    modelMsg->CopyFrom(msg);
+
+    this->dataPtr->userCmdPub->Publish(userCmdMsg);
   }
 }
 
@@ -389,10 +403,10 @@ void ModelSnap::Update()
             this->dataPtr->highlightVisual->CreateDynamicLine(
             rendering::RENDERING_TRIANGLE_FAN);
         this->dataPtr->snapHighlight->setMaterial("Gazebo/RedTransparent");
-        this->dataPtr->snapHighlight->AddPoint(hoverTriangle[0]);
-        this->dataPtr->snapHighlight->AddPoint(hoverTriangle[1]);
-        this->dataPtr->snapHighlight->AddPoint(hoverTriangle[2]);
-        this->dataPtr->snapHighlight->AddPoint(hoverTriangle[0]);
+        this->dataPtr->snapHighlight->AddPoint(hoverTriangle[0].Ign());
+        this->dataPtr->snapHighlight->AddPoint(hoverTriangle[1].Ign());
+        this->dataPtr->snapHighlight->AddPoint(hoverTriangle[2].Ign());
+        this->dataPtr->snapHighlight->AddPoint(hoverTriangle[0].Ign());
         this->dataPtr->highlightVisual->SetVisible(true);
         this->dataPtr->highlightVisual->GetSceneNode()->setInheritScale(false);
         this->dataPtr->highlightVisual->SetVisibilityFlags(
@@ -413,10 +427,10 @@ void ModelSnap::Update()
           }
           this->dataPtr->hoverVis->AttachVisual(this->dataPtr->highlightVisual);
         }
-        this->dataPtr->snapHighlight->SetPoint(0, hoverTriangle[0]);
-        this->dataPtr->snapHighlight->SetPoint(1, hoverTriangle[1]);
-        this->dataPtr->snapHighlight->SetPoint(2, hoverTriangle[2]);
-        this->dataPtr->snapHighlight->SetPoint(3, hoverTriangle[0]);
+        this->dataPtr->snapHighlight->SetPoint(0, hoverTriangle[0].Ign());
+        this->dataPtr->snapHighlight->SetPoint(1, hoverTriangle[1].Ign());
+        this->dataPtr->snapHighlight->SetPoint(2, hoverTriangle[2].Ign());
+        this->dataPtr->snapHighlight->SetPoint(3, hoverTriangle[0].Ign());
       }
     }
     else
@@ -453,10 +467,10 @@ void ModelSnap::Update()
           this->dataPtr->snapVisual->CreateDynamicLine(
           rendering::RENDERING_LINE_STRIP);
       this->dataPtr->snapLines->setMaterial("Gazebo/RedGlow");
-      this->dataPtr->snapLines->AddPoint(triangle[0]);
-      this->dataPtr->snapLines->AddPoint(triangle[1]);
-      this->dataPtr->snapLines->AddPoint(triangle[2]);
-      this->dataPtr->snapLines->AddPoint(triangle[0]);
+      this->dataPtr->snapLines->AddPoint(triangle[0].Ign());
+      this->dataPtr->snapLines->AddPoint(triangle[1].Ign());
+      this->dataPtr->snapLines->AddPoint(triangle[2].Ign());
+      this->dataPtr->snapLines->AddPoint(triangle[0].Ign());
       this->dataPtr->snapVisual->SetVisible(true);
       this->dataPtr->snapVisual->GetSceneNode()->setInheritScale(false);
       this->dataPtr->snapVisual->SetVisibilityFlags(
@@ -476,10 +490,10 @@ void ModelSnap::Update()
         }
         this->dataPtr->selectedVis->AttachVisual(this->dataPtr->snapVisual);
       }
-      this->dataPtr->snapLines->SetPoint(0, triangle[0]);
-      this->dataPtr->snapLines->SetPoint(1, triangle[1]);
-      this->dataPtr->snapLines->SetPoint(2, triangle[2]);
-      this->dataPtr->snapLines->SetPoint(3, triangle[0]);
+      this->dataPtr->snapLines->SetPoint(0, triangle[0].Ign());
+      this->dataPtr->snapLines->SetPoint(1, triangle[1].Ign());
+      this->dataPtr->snapLines->SetPoint(2, triangle[2].Ign());
+      this->dataPtr->snapLines->SetPoint(3, triangle[0].Ign());
     }
     this->dataPtr->selectedTriangleDirty = false;
   }

@@ -15,6 +15,8 @@
  *
 */
 
+#include <boost/bind.hpp>
+#include <boost/function.hpp>
 #include "SubscriptionTransport.hh"
 #include "Publication.hh"
 #include "Node.hh"
@@ -102,6 +104,13 @@ void Publication::SetPrevMsg(uint32_t _pubId, MessagePtr _msg)
 {
   boost::mutex::scoped_lock lock(this->callbackMutex);
   this->prevMsgs[_pubId] = _msg;
+}
+
+//////////////////////////////////////////////////
+void Publication::ClearPrevMsgs()
+{
+  boost::mutex::scoped_lock lock(this->callbackMutex);
+  this->prevMsgs.clear();
 }
 
 //////////////////////////////////////////////////
@@ -358,6 +367,13 @@ unsigned int Publication::GetCallbackCount() const
 }
 
 //////////////////////////////////////////////////
+unsigned int Publication::PublisherCount() const
+{
+  boost::mutex::scoped_lock lock(this->callbackMutex);
+  return this->publishers.size();
+}
+
+//////////////////////////////////////////////////
 unsigned int Publication::GetNodeCount() const
 {
   boost::mutex::scoped_lock lock(this->nodeMutex);
@@ -402,16 +418,28 @@ void Publication::AddPublisher(PublisherPtr _pub)
 //////////////////////////////////////////////////
 void Publication::RemovePublisher(PublisherPtr _pub)
 {
-  boost::mutex::scoped_lock lock(this->callbackMutex);
-
   GZ_ASSERT(_pub, "Received a NULL PublisherPtr");
 
-  // Find the publiser
-  std::vector<PublisherPtr>::iterator iter = std::find(
-      this->publishers.begin(), this->publishers.end(), _pub);
+  if (_pub)
+    this->RemovePublisher(_pub->Id());
+}
 
-  if (iter != this->publishers.end())
-    this->publishers.erase(iter);
+//////////////////////////////////////////////////
+bool Publication::RemovePublisher(const uint32_t _id)
+{
+  boost::mutex::scoped_lock lock(this->callbackMutex);
+
+  // Find and erase the publiser
+  for (auto pubIter = this->publishers.begin();
+       pubIter != this->publishers.end(); ++pubIter)
+  {
+    if ((*pubIter)->Id() == _id)
+    {
+      this->publishers.erase(pubIter);
+      return true;
+    }
+  }
+  return false;
 }
 
 //////////////////////////////////////////////////
@@ -487,8 +515,10 @@ void Publication::RemoveNodes()
 //////////////////////////////////////////////////
 MessagePtr Publication::GetPrevMsg(uint32_t _pubId)
 {
+  boost::mutex::scoped_lock lock(this->callbackMutex);
   if (this->prevMsgs.find(_pubId) != this->prevMsgs.end())
     return this->prevMsgs[_pubId];
   else
     return MessagePtr();
 }
+

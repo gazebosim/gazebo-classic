@@ -38,7 +38,7 @@ namespace gazebo
     class SelectionRenderListener;
     class Scene;
 
-    class GZ_SELECTION_BUFF_VISIBLE SelectionBuffer
+    class GZ_RENDERING_VISIBLE SelectionBuffer
     {
       /// \brief Constructor
       /// \param[in] _camera Name of the camera to generate a selection

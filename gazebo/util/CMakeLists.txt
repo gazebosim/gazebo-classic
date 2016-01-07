@@ -1,8 +1,12 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
+add_definitions(-DBUILDING_DLL_GZ_UTIL)
+
 if (HAVE_OPENAL)
   include_directories(${OPENAL_INCLUDE_DIR})
 endif()
+
+include_directories(${TBB_INCLUDEDIR})
 
 include_directories(${tinyxml_INCLUDE_DIRS})
 set (sources
@@ -14,7 +18,6 @@ set (sources
 
 if (NOT USE_EXTERNAL_TINYXML)
   include_directories (${CMAKE_SOURCE_DIR}/deps/win/tinyxml)
-  add_definitions(-DTIXML_USE_STL)
   set (sources ${sources}
        ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinystr.cpp
        ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxml.cpp
@@ -22,7 +25,13 @@ if (NOT USE_EXTERNAL_TINYXML)
        ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxmlparser.cpp)
 endif()
 
-set (headers 
+if (NOT USE_EXTERNAL_TINYXML2)
+  include_directories (${CMAKE_SOURCE_DIR}/deps/win/tinyxml2)
+  set (sources ${sources}
+       ${CMAKE_SOURCE_DIR}/deps/win/tinyxml2/tinyxml2.cpp)
+endif()
+
+set (headers
   Diagnostics.hh
   LogPlay.hh
   LogRecord.hh
@@ -57,13 +66,13 @@ gz_add_library(gazebo_util ${sources})
 add_dependencies(gazebo_util
   gazebo_common
   gazebo_msgs
-  gazebo_math)
+)
 
 target_link_libraries(gazebo_util
   gazebo_common
   gazebo_transport
-  gazebo_math
   gazebo_msgs
+  ${tinyxml2_LIBRARIES}
 )
 
 gz_install_library(gazebo_util)

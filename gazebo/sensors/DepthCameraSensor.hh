@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: A persepective X11 OpenGL Camera Sensor
- * Author: Nate Koenig
- * Date: 15 July 2003
- */
-
-#ifndef _DEPTHCAMERASENSOR_HH_
-#define _DEPTHCAMERASENSOR_HH_
+#ifndef _GAZEBO_SENSORS_DEPTHCAMERASENSOR_HH_
+#define _GAZEBO_SENSORS_DEPTHCAMERASENSOR_HH_
 
 #include <string>
 
@@ -63,14 +58,14 @@ namespace gazebo
       protected: virtual void Init();
 
       // Documentation inherited
-      protected: virtual bool UpdateImpl(bool _force);
+      protected: virtual bool UpdateImpl(const bool _force);
 
       /// Finalize the camera
       protected: virtual void Fini();
 
       /// \brief Set whether the sensor is active or not
       /// \param[in] _value True if active, false if not
-      public: virtual void SetActive(bool _value);
+      public: virtual void SetActive(const bool _value);
 
       /// \brief Returns a pointer to the rendering::DepthCamera
       /// \return Depth Camera pointer

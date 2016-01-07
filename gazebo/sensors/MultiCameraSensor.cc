@@ -14,14 +14,18 @@
  * limitations under the License.
  *
 */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
 
+#include <boost/algorithm/string.hpp>
+#include <functional>
+#include <ignition/math/Pose3.hh>
+
 #include "gazebo/common/Exception.hh"
+#include "gazebo/common/EnumIface.hh"
 #include "gazebo/common/Image.hh"
 
 #include "gazebo/physics/World.hh"
@@ -50,7 +54,7 @@ MultiCameraSensor::MultiCameraSensor()
   this->rendered = false;
   this->connections.push_back(
       event::Events::ConnectRender(
-        boost::bind(&MultiCameraSensor::Render, this)));
+        std::bind(&MultiCameraSensor::Render, this)));
 }
 
 //////////////////////////////////////////////////
@@ -116,6 +120,9 @@ void MultiCameraSensor::Init()
     }
   }
 
+  // Each camera has its own noise pointer
+  common::EnumIterator<SensorNoiseType> noiseIndex = SENSOR_NOISE_TYPE_BEGIN;
+
   // Create and initialize all the cameras
   sdf::ElementPtr cameraSdf = this->sdf->GetElement("camera");
   while (cameraSdf)
@@ -134,31 +141,32 @@ void MultiCameraSensor::Init()
     camera->Load(cameraSdf);
 
     // Do some sanity checks
-    if (camera->GetImageWidth() == 0 || camera->GetImageHeight() == 0)
+    if (camera->ImageWidth() == 0 || camera->ImageHeight() == 0)
       gzthrow("Image has zero size");
 
     camera->Init();
-    camera->CreateRenderTexture(camera->GetName() + "_RttTex");
+    camera->CreateRenderTexture(camera->Name() + "_RttTex");
 
-    math::Pose cameraPose = this->pose;
+    ignition::math::Pose3d cameraPose = this->pose;
     if (cameraSdf->HasElement("pose"))
-      cameraPose = cameraSdf->Get<math::Pose>("pose") + cameraPose;
+      cameraPose = cameraSdf->Get<ignition::math::Pose3d>("pose") + cameraPose;
     camera->SetWorldPose(cameraPose);
     camera->AttachToVisual(this->parentId, true);
 
-    // Handle noise model settings.
     if (cameraSdf->HasElement("noise"))
     {
-      NoisePtr noise =
-          NoiseFactory::NewNoiseModel(cameraSdf->GetElement("noise"),
-          this->GetType());
-      this->noises.push_back(noise);
-      noise->SetCamera(camera);
+      // Create a noise model and attach the camera
+      this->noises[*noiseIndex] = NoiseFactory::NewNoiseModel(
+        cameraSdf->GetElement("noise"), this->GetType());
+      this->noises[*noiseIndex]->SetCamera(camera);
     }
     else
     {
-      this->noises.push_back(NoisePtr(new Noise(Noise::NONE)));
+      this->noises[*noiseIndex] = NoisePtr(new Noise(Noise::NONE));
     }
+
+    // Increment the noise index -- one for each camera in the setup
+    ++noiseIndex;
 
     {
       boost::mutex::scoped_lock lock(this->cameraMutex);
@@ -166,11 +174,11 @@ void MultiCameraSensor::Init()
     }
 
     msgs::Image *image = this->msg.add_image();
-    image->set_width(camera->GetImageWidth());
-    image->set_height(camera->GetImageHeight());
+    image->set_width(camera->ImageWidth());
+    image->set_height(camera->ImageHeight());
     image->set_pixel_format(common::Image::ConvertPixelFormat(
-          camera->GetImageFormat()));
-    image->set_step(camera->GetImageWidth() * camera->GetImageDepth());
+          camera->ImageFormat()));
+    image->set_step(camera->ImageWidth() * camera->ImageDepth());
 
     cameraSdf = cameraSdf->GetNextElement("camera");
   }
@@ -195,7 +203,7 @@ void MultiCameraSensor::Fini()
   for (std::vector<rendering::CameraPtr>::iterator iter =
       this->cameras.begin(); iter != this->cameras.end(); ++iter)
   {
-    (*iter)->GetScene()->RemoveCamera((*iter)->GetName());
+    (*iter)->GetScene()->RemoveCamera((*iter)->Name());
   }
   this->cameras.clear();
   this->scene.reset();
@@ -227,11 +235,11 @@ void MultiCameraSensor::Render()
   }
 
   this->rendered = true;
-  this->lastMeasurementTime = this->scene->GetSimTime();
+  this->lastMeasurementTime = this->scene->SimTime();
 }
 
 //////////////////////////////////////////////////
-bool MultiCameraSensor::UpdateImpl(bool /*_force*/)
+bool MultiCameraSensor::UpdateImpl(const bool /*_force*/)
 {
   boost::mutex::scoped_lock lock(this->cameraMutex);
 
@@ -251,8 +259,8 @@ bool MultiCameraSensor::UpdateImpl(bool /*_force*/)
     if (publish)
     {
       msgs::Image *image = this->msg.mutable_image(index);
-      image->set_data((*iter)->GetImageData(0),
-          image->width() * (*iter)->GetImageDepth() * image->height());
+      image->set_data((*iter)->ImageData(0),
+          image->width() * (*iter)->ImageDepth() * image->height());
     }
   }
 
@@ -273,19 +281,19 @@ unsigned int MultiCameraSensor::GetCameraCount() const
 //////////////////////////////////////////////////
 unsigned int MultiCameraSensor::GetImageWidth(unsigned int _index) const
 {
-  return this->GetCamera(_index)->GetImageWidth();
+  return this->GetCamera(_index)->ImageWidth();
 }
 
 //////////////////////////////////////////////////
 unsigned int MultiCameraSensor::GetImageHeight(unsigned int _index) const
 {
-  return this->GetCamera(_index)->GetImageHeight();
+  return this->GetCamera(_index)->ImageHeight();
 }
 
 //////////////////////////////////////////////////
 const unsigned char *MultiCameraSensor::GetImageData(unsigned int _index)
 {
-  return this->GetCamera(_index)->GetImageData(0);
+  return this->GetCamera(_index)->ImageData(0);
 }
 
 //////////////////////////////////////////////////
@@ -314,7 +322,7 @@ bool MultiCameraSensor::SaveFrame(const std::vector<std::string> &_filenames)
 }
 
 //////////////////////////////////////////////////
-bool MultiCameraSensor::IsActive()
+bool MultiCameraSensor::IsActive() const
 {
   return Sensor::IsActive() ||
     (this->imagePub && this->imagePub->HasConnections());

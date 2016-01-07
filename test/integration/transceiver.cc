@@ -14,13 +14,14 @@
  * limitations under the License.
  *
 */
+#include <ignition/math/Rand.hh>
 
 #include <boost/foreach.hpp>
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/sensors/sensors.hh"
 #include "gazebo/common/common.hh"
-#include "test/integration/helper_physics_generator.hh"
+#include "gazebo/test/helper_physics_generator.hh"
 
 using namespace gazebo;
 
@@ -78,25 +79,26 @@ void TransceiverTest::TxRxEmptySpace(const std::string &_physicsEngine)
   Load("worlds/empty.world", true, _physicsEngine);
 
   // Generate a random number [1-10] of transmitters
-  int nTransmitters = math::Rand::GetIntUniform(1, 10);
+  int nTransmitters = ignition::math::Rand::IntUniform(1, 10);
 
   for (int i = 0; i < nTransmitters; ++i)
   {
-    double txFreq = math::Rand::GetDblUniform(this->MinFreq, this->MaxFreq);
+    double txFreq = ignition::math::Rand::DblUniform(this->MinFreq,
+        this->MaxFreq);
     std::ostringstream convert;
     convert << i;
     std::string txModelName = "tx" + convert.str();
     std::string txSensorName = "wirelessTransmitter" + convert.str();
     std::string txEssid = "osrf" + convert.str();
-    double x = math::Rand::GetDblUniform(-this->MaxPos, this->MaxPos);
-    double y = math::Rand::GetDblUniform(-this->MaxPos, this->MaxPos);
+    double x = ignition::math::Rand::DblUniform(-this->MaxPos, this->MaxPos);
+    double y = ignition::math::Rand::DblUniform(-this->MaxPos, this->MaxPos);
     math::Pose txPose(math::Vector3(x, y, 0.055), math::Quaternion(0, 0, 0));
 
     SpawnWirelessTransmitterSensor(txModelName, txSensorName, txPose.pos,
         txPose.rot.GetAsEuler(), txEssid, txFreq, this->Power, this->Gain);
 
     sensors::WirelessTransmitterPtr tx =
-        boost::static_pointer_cast<sensors::WirelessTransmitter>(
+        std::static_pointer_cast<sensors::WirelessTransmitter>(
           sensors::SensorManager::Instance()->GetSensor(txSensorName));
 
     // Store the new transmitter sensor in the map
@@ -117,7 +119,7 @@ void TransceiverTest::TxRxEmptySpace(const std::string &_physicsEngine)
       this->Gain, this->Sensitivity);
 
   sensors::WirelessReceiverPtr rx =
-    boost::static_pointer_cast<sensors::WirelessReceiver>(
+    std::static_pointer_cast<sensors::WirelessReceiver>(
         sensors::SensorManager::Instance()->GetSensor(rxSensorName));
 
   ASSERT_TRUE(rx != NULL);
@@ -178,15 +180,15 @@ void TransceiverTest::TxRxFreqOutOfBounds(const std::string &_physicsEngine)
   std::string tx2ModelName = "tx2";
   std::string tx2SensorName = "wirelessTransmitter2";
   std::string txEssid = "osrf";
-  double x = math::Rand::GetDblUniform(-this->MaxPos, this->MaxPos);
-  double y = math::Rand::GetDblUniform(-this->MaxPos, this->MaxPos);
+  double x = ignition::math::Rand::DblUniform(-this->MaxPos, this->MaxPos);
+  double y = ignition::math::Rand::DblUniform(-this->MaxPos, this->MaxPos);
   math::Pose txPose(math::Vector3(x, y, 0.055), math::Quaternion(0, 0, 0));
 
   SpawnWirelessTransmitterSensor(tx1ModelName, tx1SensorName, txPose.pos,
       txPose.rot.GetAsEuler(), txEssid, txFreq, this->Power, this->Gain);
 
   sensors::WirelessTransmitterPtr tx1 =
-      boost::static_pointer_cast<sensors::WirelessTransmitter>(
+      std::static_pointer_cast<sensors::WirelessTransmitter>(
         sensors::SensorManager::Instance()->GetSensor(tx1SensorName));
 
   ASSERT_TRUE(tx1 != NULL);
@@ -196,7 +198,7 @@ void TransceiverTest::TxRxFreqOutOfBounds(const std::string &_physicsEngine)
       txPose.rot.GetAsEuler(), txEssid, txFreq, this->Power, this->Gain);
 
   sensors::WirelessTransmitterPtr tx2 =
-      boost::static_pointer_cast<sensors::WirelessTransmitter>(
+      std::static_pointer_cast<sensors::WirelessTransmitter>(
         sensors::SensorManager::Instance()->GetSensor(tx2SensorName));
 
   ASSERT_TRUE(tx2 != NULL);
@@ -213,7 +215,7 @@ void TransceiverTest::TxRxFreqOutOfBounds(const std::string &_physicsEngine)
       this->Gain, this->Sensitivity);
 
   sensors::WirelessReceiverPtr rx =
-    boost::static_pointer_cast<sensors::WirelessReceiver>(
+    std::static_pointer_cast<sensors::WirelessReceiver>(
         sensors::SensorManager::Instance()->GetSensor(rxSensorName));
 
   ASSERT_TRUE(rx != NULL);
@@ -262,7 +264,7 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
       txPose.rot.GetAsEuler(), "osrf", 2450.0, this->Power, this->Gain);
 
   sensors::WirelessTransmitterPtr tx =
-      boost::static_pointer_cast<sensors::WirelessTransmitter>(
+      std::static_pointer_cast<sensors::WirelessTransmitter>(
         sensors::SensorManager::Instance()->GetSensor(txSensorName));
 
   ASSERT_TRUE(tx != NULL);
@@ -279,7 +281,7 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
       this->Gain, this->Sensitivity);
 
   sensors::WirelessReceiverPtr rx1 =
-      boost::static_pointer_cast<sensors::WirelessReceiver>(
+      std::static_pointer_cast<sensors::WirelessReceiver>(
         sensors::SensorManager::Instance()->GetSensor(rx1SensorName));
 
   ASSERT_TRUE(rx1 != NULL);
@@ -295,7 +297,7 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
       this->Gain, this->Sensitivity);
 
   sensors::WirelessReceiverPtr rx2 =
-      boost::static_pointer_cast<sensors::WirelessReceiver>(
+      std::static_pointer_cast<sensors::WirelessReceiver>(
         sensors::SensorManager::Instance()->GetSensor(rx2SensorName));
 
   ASSERT_TRUE(rx2 != NULL);

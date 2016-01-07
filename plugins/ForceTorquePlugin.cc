@@ -14,6 +14,11 @@
  * limitations under the License.
  *
 */
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
 
 #include "ForceTorquePlugin.hh"
 
@@ -39,7 +44,7 @@ void ForceTorquePlugin::Load(sensors::SensorPtr _parent,
     sdf::ElementPtr /*_sdf*/)
 {
   this->parentSensor =
-    boost::dynamic_pointer_cast<sensors::ForceTorqueSensor>(_parent);
+    std::dynamic_pointer_cast<sensors::ForceTorqueSensor>(_parent);
 
   if (!this->parentSensor)
     gzthrow("ForceTorquePlugin requires a force_torque sensor as its parent.");

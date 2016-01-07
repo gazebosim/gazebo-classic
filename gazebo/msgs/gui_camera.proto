@@ -15,4 +15,7 @@ message GUICamera
   optional string view_controller       = 2;
   optional Pose pose                    = 3;
   optional TrackVisual track            = 4;
+
+  /// \brief Type of projection: "perspective" or "orthographic".
+  optional string projection_type       = 5;
 }

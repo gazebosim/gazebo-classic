@@ -15,12 +15,13 @@
  *
 */
 
+#include <cmath>
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/sensors/sensors.hh"
 #include "gazebo/common/common.hh"
 #include "scans_cmp.h"
-#include "helper_physics_generator.hh"
+#include "gazebo/test/helper_physics_generator.hh"
 
 #define TOL 1e-4
 
@@ -28,6 +29,10 @@ using namespace gazebo;
 class ContactSensor : public ServerFixture,
                       public testing::WithParamInterface<const char*>
 {
+  /// \brief Test moving a model while in contact.
+  /// \param[in] _physicsEngine Physics engine to use.
+  public: void MoveTool(const std::string &_physicsEngine);
+
   /// \brief Test multiple contact sensors on a single link.
   /// \param[in] _physicsEngine Physics engine to use.
   public: void MultipleSensors(const std::string &_physicsEngine);
@@ -47,6 +52,60 @@ void ContactSensor::Callback(const ConstContactsPtr &/*_msg*/)
 }
 
 ////////////////////////////////////////////////////////////////////////
+// Test moving a model while in contact
+// addresses a failure in pull request #1610 for simbody
+////////////////////////////////////////////////////////////////////////
+void ContactSensor::MoveTool(const std::string &_physicsEngine)
+{
+  Load("worlds/contact_sensors_multiple.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world();
+  ASSERT_TRUE(world != NULL);
+
+  const std::string modelName("sphere");
+  const math::Vector3 pos(0, 0, 1.8);
+  const math::Vector3 v30;
+  const double radius = 0.5;
+  SpawnSphere(modelName, pos, v30, v30, radius);
+
+  // advertise on "~/model/modify"
+  // so that we can move the sphere
+  transport::PublisherPtr modelPub =
+    this->node->Advertise<msgs::Model>("~/model/modify");
+
+  // Step forward to allow the sphere to fall
+  world->Step(200);
+
+  // Try moving the model
+  auto model = world->GetModel(modelName);
+  ASSERT_TRUE(model != NULL);
+
+  auto pose = model->GetWorldPose();
+  pose.pos.x += 0.2;
+  pose.pos.y += 0.2;
+
+  msgs::Model msg;
+  msg.set_name(modelName);
+  msg.set_id(model->GetId());
+  msgs::Set(msg.mutable_pose(), pose.Ign());
+  modelPub->Publish(msg);
+
+  while (pose != model->GetWorldPose())
+  {
+    world->Step(1);
+    common::Time::MSleep(1);
+  }
+
+  world->Step(10);
+
+  // it just needs to exit successfully in order to pass.
+}
+
+TEST_P(ContactSensor, MoveTool)
+{
+  MoveTool(GetParam());
+}
+
+////////////////////////////////////////////////////////////////////////
 // Test having multiple contact sensors under a single link.
 // https://bitbucket.org/osrf/gazebo/issue/960
 ////////////////////////////////////////////////////////////////////////
@@ -62,14 +121,14 @@ void ContactSensor::MultipleSensors(const std::string &_physicsEngine)
   {
     sensors::SensorPtr sensor1 = sensors::get_sensor(contactSensorName1);
     sensors::ContactSensorPtr contactSensor1 =
-        boost::dynamic_pointer_cast<sensors::ContactSensor>(sensor1);
+        std::dynamic_pointer_cast<sensors::ContactSensor>(sensor1);
     ASSERT_TRUE(contactSensor1 != NULL);
   }
 
   {
     sensors::SensorPtr sensor2 = sensors::get_sensor(contactSensorName2);
     sensors::ContactSensorPtr contactSensor2 =
-        boost::dynamic_pointer_cast<sensors::ContactSensor>(sensor2);
+        std::dynamic_pointer_cast<sensors::ContactSensor>(sensor2);
     ASSERT_TRUE(contactSensor2 != NULL);
   }
 
@@ -122,12 +181,6 @@ TEST_P(ContactSensor, MultipleSensors)
 ////////////////////////////////////////////////////////////////////////
 void ContactSensor::StackTest(const std::string &_physicsEngine)
 {
-  if (_physicsEngine == "simbody")
-  {
-    gzerr << "Aborting test for Simbody, see issue #865.\n";
-    return;
-  }
-
   if (_physicsEngine == "dart")
   {
     gzerr << "Aborting test for DART, see issue #1173.\n";
@@ -170,13 +223,13 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
 
   sensors::SensorPtr sensor01 = sensors::get_sensor(contactSensorName01);
   sensors::ContactSensorPtr contactSensor01 =
-      boost::dynamic_pointer_cast<sensors::ContactSensor>(sensor01);
+      std::dynamic_pointer_cast<sensors::ContactSensor>(sensor01);
 
   ASSERT_TRUE(contactSensor01 != NULL);
 
   sensors::SensorPtr sensor02 = sensors::get_sensor(contactSensorName02);
   sensors::ContactSensorPtr contactSensor02 =
-      boost::dynamic_pointer_cast<sensors::ContactSensor>(sensor02);
+      std::dynamic_pointer_cast<sensors::ContactSensor>(sensor02);
 
   ASSERT_TRUE(contactSensor02 != NULL);
 
@@ -222,6 +275,10 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
     world->Step(1);
     contacts01 = contactSensor01->GetContacts();
     contacts02 = contactSensor02->GetContacts();
+    // gzdbg << "steps[" << steps
+    //       << "] contacts01[" << contacts01.contact_size()
+    //       << "] contacts02[" << contacts02.contact_size()
+    //       << "] to be > 0\n";
   }
   EXPECT_GT(steps, 0);
 
@@ -286,7 +343,7 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
 
         EXPECT_NEAR(contacts[k].contact(i).normal(j).x(), 0, TOL);
         EXPECT_NEAR(contacts[k].contact(i).normal(j).y(), 0, TOL);
-        EXPECT_NEAR(contacts[k].contact(i).normal(j).z(), 1, TOL);
+        EXPECT_NEAR(std::abs(contacts[k].contact(i).normal(j).z()), 1, TOL);
 
         if (body1)
         {
@@ -366,12 +423,6 @@ TEST_P(ContactSensor, StackTest)
 ////////////////////////////////////////////////////////////////////////
 void ContactSensor::TorqueTest(const std::string &_physicsEngine)
 {
-  if (_physicsEngine == "simbody")
-  {
-    gzerr << "Aborting test for Simbody, see issue #865.\n";
-    return;
-  }
-
   // Load an empty world
   Load("worlds/empty.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
@@ -396,7 +447,7 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
 
   sensors::SensorPtr sensor = sensors::get_sensor(contactSensorName);
   sensors::ContactSensorPtr contactSensor =
-      boost::dynamic_pointer_cast<sensors::ContactSensor>(sensor);
+      std::dynamic_pointer_cast<sensors::ContactSensor>(sensor);
 
   ASSERT_TRUE(contactSensor != NULL);
 

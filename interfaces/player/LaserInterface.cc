@@ -19,6 +19,7 @@
  * Date: 2 March 2006
  */
 
+#include <boost/algorithm/string.hpp>
 #include <math.h>
 #include <iostream>
 
@@ -197,8 +198,8 @@ void LaserInterface::OnScan(ConstLaserScanStampedPtr &_msg)
 
   this->data.pose.px = _msg->scan().world_pose().position().x();
   this->data.pose.py = _msg->scan().world_pose().position().y();
-  this->data.pose.pa = gazebo::msgs::Convert(
-      _msg->scan().world_pose().orientation()).GetAsEuler().z;
+  this->data.pose.pa = gazebo::msgs::ConvertIgn(
+      _msg->scan().world_pose().orientation()).Euler().Z();
 
   if (this->data.scan.ranges_count > 0)
   {

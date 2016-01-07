@@ -19,6 +19,7 @@
  * Date: 13 Feb 2006
  */
 
+#include <boost/bind.hpp>
 #include <boost/thread.hpp>
 
 #include "gazebo/common/Assert.hh"
@@ -111,8 +112,14 @@ void SimbodyLink::Init()
 //////////////////////////////////////////////////
 void SimbodyLink::Fini()
 {
+  event::Events::DisconnectWorldUpdateBegin(this->gravityModeConnection);
   event::Events::DisconnectWorldUpdateEnd(this->staticLinkConnection);
   Link::Fini();
+}
+
+/////////////////////////////////////////////////////////////////////
+void SimbodyLink::UpdateMass()
+{
 }
 
 //////////////////////////////////////////////////

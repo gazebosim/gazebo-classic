@@ -17,7 +17,7 @@
 
 #include <gtest/gtest.h>
 #include "gazebo/test/ServerFixture.hh"
-#include "test/integration/helper_physics_generator.hh"
+#include "gazebo/test/helper_physics_generator.hh"
 
 
 using namespace gazebo;
@@ -64,14 +64,14 @@ void ForceTorqueSensor_TEST::ForceTorqueTest(const std::string &_physicsEngine)
 
   // Get a pointer to the force torque sensor
   sensors::ForceTorqueSensorPtr sensor =
-    boost::dynamic_pointer_cast<sensors::ForceTorqueSensor>(
+    std::dynamic_pointer_cast<sensors::ForceTorqueSensor>(
         mgr->GetSensor(sensorName));
 
   // Make sure the above dynamic cast worked.
   EXPECT_TRUE(sensor != NULL);
 
-  EXPECT_EQ(sensor->GetTorque(), math::Vector3(0, 0, 0));
-  EXPECT_EQ(sensor->GetForce(), math::Vector3(0, 0, 0));
+  EXPECT_EQ(sensor->Torque(), ignition::math::Vector3d(0, 0, 0));
+  EXPECT_EQ(sensor->Force(), ignition::math::Vector3d(0, 0, 0));
 
   EXPECT_TRUE(sensor->IsActive());
 }

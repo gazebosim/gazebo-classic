@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: A persepective X11 OpenGL Camera Sensor
- * Author: Nate Koenig
- * Date: 15 July 2003
- */
-
-#ifndef _CAMERASENSOR_HH_
-#define _CAMERASENSOR_HH_
+#ifndef _GAZEBO_SENSORS_CAMERASENSOR_HH_
+#define _GAZEBO_SENSORS_CAMERASENSOR_HH_
 
 #include <string>
 
@@ -67,12 +62,6 @@ namespace gazebo
       /// @todo to be implemented
       public: virtual std::string GetTopic() const;
 
-      // Documentation inherited
-      protected: virtual bool UpdateImpl(bool _force);
-
-      /// \brief Finalize the camera
-      protected: virtual void Fini();
-
       /// \brief Returns a pointer to the rendering::Camera.
       /// \return The Pointer to the camera sensor.
       public: rendering::CameraPtr GetCamera() const
@@ -96,16 +85,22 @@ namespace gazebo
       public: bool SaveFrame(const std::string &_filename);
 
       // Documentation inherited
-      public: virtual bool IsActive();
+      public: virtual bool IsActive() const;
+
+      // Documentation inherited
+      protected: virtual bool UpdateImpl(const bool _force);
+
+      /// \brief Finalize the camera
+      protected: virtual void Fini();
 
       /// \brief Handle the render event.
       private: void Render();
 
       /// \brief Pointer to the camera.
-      private: rendering::CameraPtr camera;
+      protected: rendering::CameraPtr camera;
 
       /// \brief Publisher of image messages.
-      private: transport::PublisherPtr imagePub;
+      protected: transport::PublisherPtr imagePub;
 
       /// \brief True if the sensor was rendered.
       private: bool rendered;

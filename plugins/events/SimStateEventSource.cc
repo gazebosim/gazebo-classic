@@ -33,9 +33,10 @@ SimStateEventSource::~SimStateEventSource()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SimStateEventSource::Load(const sdf::ElementPtr &_sdf)
+void SimStateEventSource::Load(const sdf::ElementPtr _sdf)
 {
   EventSource::Load(_sdf);
+
   // Listen to the pause event. This event is broadcast every
   // simulation iteration.
   this->pauseConnection = event::Events::ConnectPause(
@@ -72,4 +73,5 @@ void SimStateEventSource::OnPause(const bool _pause)
     json = "{\"state\": \"running\" }";
   }
   this->Emit(json);
+  this->hasPaused = _pause;
 }

@@ -36,6 +36,7 @@ set(tests
   concave_mesh.cc
   contact_sensor.cc
   dem.cc
+  elastic_modulus.cc
   file_handling.cc
   gripper.cc
   gz_joint.cc
@@ -47,6 +48,7 @@ set(tests
   joint_controller.cc
   joint_force_torque.cc
   joint_gearbox.cc
+  joint_get_force_torque.cc
   joint_revolute.cc
   joint_screw.cc
   joint_set_position_test.cc
@@ -54,8 +56,10 @@ set(tests
   joint_test.cc
   joint_universal.cc
   laser.cc
+  logical_camera_sensor.cc
   model.cc
   model_database.cc
+  nested_model.cc
   noise.cc
   nondefault_world.cc
   physics.cc
@@ -65,24 +69,32 @@ set(tests
   physics_inertia_ratio.cc
   physics_link.cc
   physics_msgs.cc
+  physics_msgs_inertia.cc
   physics_presets.cc
+  physics_solver.cc
   physics_thread_safe.cc
+  physics_torsional_friction.cc
   pioneer2dx.cc
   plugin.cc
+  region_events.cc
   rest_web.cc
   road.cc
   sensor.cc
   server_fixture.cc
   sim_events.cc
   speed.cc
+  speed_thread_pr2.cc
   stress_spawn_models.cc
   #state_log.cc
   surface_properties.cc
+  swarm.cc
   transceiver.cc
   transport.cc
+  transporter.cc
   world.cc
   world_clone.cc
   world_entity_below_point.cc
+  world_playback.cc
   world_population.cc
   worlds_installed.cc
   )
@@ -103,7 +115,9 @@ gz_build_tests(${tests})
 
 if (ENABLE_TESTS_COMPILATION)
   # Increase timeout, to account for model download time.
+  set_tests_properties(${TEST_TYPE}_joint_revolute PROPERTIES TIMEOUT 500)
   set_tests_properties(${TEST_TYPE}_physics PROPERTIES TIMEOUT 500)
+  set_tests_properties(${TEST_TYPE}_worlds_installed PROPERTIES TIMEOUT 700)
 
   # Add plugin dependency
   add_dependencies(${TEST_TYPE}_joint_test SpringTestPlugin)
@@ -135,6 +149,8 @@ gz_build_dri_tests(${dri_tests})
 
 set(qt_tests
   insert_model.cc
+  undo.cc
+  visual_pose.cc
 )
 
 gz_build_qt_tests(${qt_tests})

@@ -14,16 +14,13 @@
  * limitations under the License.
  *
 */
-/* Desc: Ray proximity sensor
- * Author: Carle Cote
- * Date: 23 february 2004
-*/
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
+
+#include <boost/algorithm/string.hpp>
 
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/MultiRayShape.hh"
@@ -38,9 +35,6 @@
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/msgs/msgs.hh"
-
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Rand.hh"
 
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/RaySensor.hh"
@@ -110,9 +104,9 @@ void RaySensor::Load(const std::string &_worldName)
   sdf::ElementPtr rayElem = this->sdf->GetElement("ray");
   if (rayElem->HasElement("noise"))
   {
-    this->noises.push_back(
+    this->noises[RAY_NOISE] =
         NoiseFactory::NewNoiseModel(rayElem->GetElement("noise"),
-        this->GetType()));
+        this->GetType());
   }
 
   this->parentEntity = this->world->GetEntity(this->parentName);
@@ -149,19 +143,19 @@ void RaySensor::Fini()
 }
 
 //////////////////////////////////////////////////
-math::Angle RaySensor::GetAngleMin() const
+ignition::math::Angle RaySensor::AngleMin() const
 {
   if (this->laserShape)
-    return this->laserShape->GetMinAngle();
+    return this->laserShape->GetMinAngle().Ign();
   else
     return -1;
 }
 
 //////////////////////////////////////////////////
-math::Angle RaySensor::GetAngleMax() const
+ignition::math::Angle RaySensor::AngleMax() const
 {
   if (this->laserShape)
-    return this->laserShape->GetMaxAngle();
+    return ignition::math::Angle(this->laserShape->GetMaxAngle().Radian());
   else
     return -1;
 }
@@ -187,7 +181,7 @@ double RaySensor::GetRangeMax() const
 //////////////////////////////////////////////////
 double RaySensor::GetAngleResolution() const
 {
-  return (this->GetAngleMax() - this->GetAngleMin()).Radian() /
+  return (this->AngleMax() - this->AngleMin()).Radian() /
     (this->GetRangeCount()-1);
 }
 
@@ -241,19 +235,25 @@ int RaySensor::GetVerticalRangeCount() const
 }
 
 //////////////////////////////////////////////////
-math::Angle RaySensor::GetVerticalAngleMin() const
+ignition::math::Angle RaySensor::VerticalAngleMin() const
 {
   if (this->laserShape)
-    return this->laserShape->GetVerticalMinAngle();
+  {
+    return ignition::math::Angle(
+        this->laserShape->GetVerticalMinAngle().Radian());
+  }
   else
     return -1;
 }
 
 //////////////////////////////////////////////////
-math::Angle RaySensor::GetVerticalAngleMax() const
+ignition::math::Angle RaySensor::VerticalAngleMax() const
 {
   if (this->laserShape)
-    return this->laserShape->GetVerticalMaxAngle();
+  {
+    return ignition::math::Angle(
+        this->laserShape->GetVerticalMaxAngle().Radian());
+  }
   else
     return -1;
 }
@@ -261,7 +261,7 @@ math::Angle RaySensor::GetVerticalAngleMax() const
 //////////////////////////////////////////////////
 double RaySensor::GetVerticalAngleResolution() const
 {
-  return (this->GetVerticalAngleMax() - this->GetVerticalAngleMin()).Radian() /
+  return (this->VerticalAngleMax() - this->VerticalAngleMin()).Radian() /
     (this->GetVerticalRangeCount()-1);
 }
 
@@ -337,7 +337,7 @@ int RaySensor::GetFiducial(unsigned int _index)
 }
 
 //////////////////////////////////////////////////
-bool RaySensor::UpdateImpl(bool /*_force*/)
+bool RaySensor::UpdateImpl(const bool /*_force*/)
 {
   // do the collision checks
   // this eventually call OnNewScans, so move mutex lock behind it in case
@@ -355,14 +355,14 @@ bool RaySensor::UpdateImpl(bool /*_force*/)
 
   // Store the latest laser scans into laserMsg
   msgs::Set(scan->mutable_world_pose(),
-            this->pose + this->parentEntity->GetWorldPose());
-  scan->set_angle_min(this->GetAngleMin().Radian());
-  scan->set_angle_max(this->GetAngleMax().Radian());
+            this->pose + this->parentEntity->GetWorldPose().Ign());
+  scan->set_angle_min(this->AngleMin().Radian());
+  scan->set_angle_max(this->AngleMax().Radian());
   scan->set_angle_step(this->GetAngleResolution());
   scan->set_count(this->GetRangeCount());
 
-  scan->set_vertical_angle_min(this->GetVerticalAngleMin().Radian());
-  scan->set_vertical_angle_max(this->GetVerticalAngleMax().Radian());
+  scan->set_vertical_angle_min(this->VerticalAngleMin().Radian());
+  scan->set_vertical_angle_max(this->VerticalAngleMax().Radian());
   scan->set_vertical_angle_step(this->GetVerticalAngleResolution());
   scan->set_vertical_count(this->GetVerticalRangeCount());
 
@@ -478,11 +478,12 @@ bool RaySensor::UpdateImpl(bool /*_force*/)
       {
         range = -GZ_DBL_INF;
       }
-      else if (!this->noises.empty())
+      else if (this->noises.find(RAY_NOISE) != this->noises.end())
       {
         // currently supports only one noise model per laser sensor
-        range = this->noises[0]->Apply(range);
-        range = math::clamp(range, this->GetRangeMin(), this->GetRangeMax());
+        range = this->noises[RAY_NOISE]->Apply(range);
+        range = ignition::math::clamp(range,
+            this->GetRangeMin(), this->GetRangeMax());
       }
 
       scan->add_ranges(range);
@@ -497,7 +498,7 @@ bool RaySensor::UpdateImpl(bool /*_force*/)
 }
 
 //////////////////////////////////////////////////
-bool RaySensor::IsActive()
+bool RaySensor::IsActive() const
 {
   return Sensor::IsActive() ||
     (this->scanPub && this->scanPub->HasConnections());

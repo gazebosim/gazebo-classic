@@ -19,7 +19,7 @@
 #include "gazebo/physics/physics.hh"
 #include "gazebo/physics/Joint.hh"
 #include "gazebo/test/ServerFixture.hh"
-#include "test/integration/helper_physics_generator.hh"
+#include "gazebo/test/helper_physics_generator.hh"
 
 #define TOL 1e-6
 #define TOL_CONT 2.0
@@ -100,7 +100,7 @@ void JointForceTorqueTest::ForceTorque1(const std::string &_physicsEngine)
     physics::JointWrench wrench_01 = joint_01->GetForceTorque(0u);
     EXPECT_DOUBLE_EQ(wrench_01.body1Force.x,    0.0);
     EXPECT_DOUBLE_EQ(wrench_01.body1Force.y,    0.0);
-    EXPECT_DOUBLE_EQ(wrench_01.body1Force.z, 1000.0);
+    EXPECT_FLOAT_EQ(wrench_01.body1Force.z, 1000.0);
     EXPECT_DOUBLE_EQ(wrench_01.body1Torque.x,   0.0);
     EXPECT_DOUBLE_EQ(wrench_01.body1Torque.y,   0.0);
     EXPECT_DOUBLE_EQ(wrench_01.body1Torque.z,   0.0);
@@ -133,7 +133,7 @@ void JointForceTorqueTest::ForceTorque1(const std::string &_physicsEngine)
     physics::JointWrench wrench_12 = joint_12->GetForceTorque(0u);
     EXPECT_DOUBLE_EQ(wrench_12.body1Force.x,    0.0);
     EXPECT_DOUBLE_EQ(wrench_12.body1Force.y,    0.0);
-    EXPECT_DOUBLE_EQ(wrench_12.body1Force.z,  500.0);
+    EXPECT_FLOAT_EQ(wrench_12.body1Force.z,  500.0);
     EXPECT_DOUBLE_EQ(wrench_12.body1Torque.x,   0.0);
     EXPECT_DOUBLE_EQ(wrench_12.body1Torque.y,   0.0);
     EXPECT_DOUBLE_EQ(wrench_12.body1Torque.z,   0.0);
