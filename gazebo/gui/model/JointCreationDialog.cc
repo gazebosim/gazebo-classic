@@ -831,6 +831,19 @@ void JointCreationDialog::CheckLinksValid()
     }
   }
 
+  // Disable align and relative_pose widgets if parent or child link
+  // is a nested link
+  // TODO: re-enable once pose of nested model links can be updated
+  if (currentParent.find("::") != std::string::npos ||
+      currentChild.find("::") != std::string::npos)
+  {
+    this->dataPtr->configWidget->SetWidgetReadOnly("align", true);
+    this->dataPtr->configWidget->SetWidgetReadOnly("relative_pose", true);
+    gzwarn << "Pose updates for nested model links are not yet supported. "
+        << "The Align and Relative Pose widgets will be disabled for now."
+        << std::endl;
+  }
+
   this->CheckValid();
 }
 
