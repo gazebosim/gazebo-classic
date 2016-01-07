@@ -14,10 +14,11 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_RENDERING_CAMERA_PRIVATE_HH_
-#define _GAZEBO_RENDERING_CAMERA_PRIVATE_HH_
+#ifndef _GAZEBO_RENDERING_CAMERAPRIVATE_HH_
+#define _GAZEBO_RENDERING_CAMERAPRIVATE_HH_
 
 #include <deque>
+#include <mutex>
 #include <utility>
 #include <list>
 #include <ignition/math/Pose3.hh>
@@ -93,7 +94,7 @@ namespace gazebo
       public: CameraCmdMsgs_L commandMsgs;
 
       /// \brief Mutex to lock the various message buffers.
-      public: boost::mutex receiveMutex;
+      public: std::mutex receiveMutex;
     };
   }
 }
