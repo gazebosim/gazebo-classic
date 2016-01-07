@@ -83,7 +83,7 @@ SelectionBuffer::SelectionBuffer(const std::string &_cameraName,
   this->dataPtr->camera = this->dataPtr->sceneMgr->getCamera(_cameraName);
   this->dataPtr->materialSwitchListener.reset(new MaterialSwitcher());
   this->dataPtr->selectionTargetListener.reset(new SelectionRenderListener(
-      this->dataPtr->materialSwitchListener));
+      this->dataPtr->materialSwitchListener.get()));
   this->CreateRTTBuffer();
   this->CreateRTTOverlays();
 }
@@ -159,7 +159,7 @@ void SelectionBuffer::CreateRTTBuffer()
   this->dataPtr->renderTexture->getViewport(0)->setOverlaysEnabled(false);
   this->dataPtr->renderTexture->getViewport(0)->setClearEveryFrame(true);
   this->dataPtr->renderTexture->addListener(
-                                 this->dataPtr->selectionTargetListener);
+      this->dataPtr->selectionTargetListener.get());
   this->dataPtr->renderTexture->getViewport(0)->setMaterialScheme("aa");
   this->dataPtr->renderTexture->getViewport(0)->setVisibilityMask(
       GZ_VISIBILITY_SELECTABLE);
