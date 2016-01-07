@@ -255,9 +255,7 @@ namespace gazebo
           << q.z << " "
           << "</pose>"
           << "<scale>"
-          << _state.scale.X() << " "
-          << _state.scale.Y() << " "
-          << _state.scale.Z() << " "
+          << _state.scale
           << "</scale>";
 
         for (LinkState_M::const_iterator iter =

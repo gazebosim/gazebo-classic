@@ -490,11 +490,8 @@ const sdf::ElementPtr Model::UnscaledSDF()
         else if (geomElem->HasElement("sphere"))
         {
           double radius = geomElem->GetElement("sphere")->Get<double>("radius");
-          double maxScale = std::max(this->scale.Z(),
-              std::max(this->scale.X(), this->scale.Y()));
-
           geomElem->GetElement("sphere")->GetElement("radius")->Set(
-              radius/maxScale);
+              radius/this->scale.Max());
         }
         else if (geomElem->HasElement("cylinder"))
         {
@@ -537,11 +534,8 @@ const sdf::ElementPtr Model::UnscaledSDF()
         else if (geomElem->HasElement("sphere"))
         {
           double radius = geomElem->GetElement("sphere")->Get<double>("radius");
-          double maxScale = std::max(this->scale.Z(),
-              std::max(this->scale.X(), this->scale.Y()));
-
           geomElem->GetElement("sphere")->GetElement("radius")->Set(
-              radius/maxScale);
+              radius/this->scale.Max());
         }
         else if (geomElem->HasElement("cylinder"))
         {
