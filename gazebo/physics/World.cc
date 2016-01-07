@@ -1565,14 +1565,39 @@ void World::ProcessRequestMsgs()
         response.set_response("nonexistent");
       }
     }
-    else if (requestMsg.request() == "world_sdf")
+    else if (requestMsg.request().find("world_sdf") != std::string::npos)
     {
-      msgs::GzString msg;
       this->UpdateStateSDF();
+
+      sdf::ElementPtr newSdf(this->dataPtr->sdf);
+
+      if (requestMsg.request() == "world_sdf_save")
+      {
+        // Substitute all models sdf with unscaled versions
+        if (newSdf->HasElement("model"))
+        {
+          auto modelElem = newSdf->GetElement("model");
+          while (modelElem)
+          {
+            auto name = modelElem->GetAttribute("name")->GetAsString();
+            auto model = this->GetModel(name);
+            if (model)
+            {
+              auto unscaled = model->UnscaledSDF()->Clone();
+
+              modelElem->Copy(unscaled);
+            }
+
+            modelElem = modelElem->GetNextElement("model");
+          }
+        }
+      }
+
+      msgs::GzString msg;
       std::ostringstream stream;
       stream << "<?xml version='1.0'?>\n"
              << "<sdf version='" << SDF_VERSION << "'>\n"
-             << this->dataPtr->sdf->ToString("")
+             << newSdf->ToString("")
              << "</sdf>";
 
       msg.set_data(stream.str());

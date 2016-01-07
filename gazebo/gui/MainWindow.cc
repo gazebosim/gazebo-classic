@@ -478,7 +478,7 @@ void MainWindow::Save()
 {
   // Get the latest world in SDF.
   boost::shared_ptr<msgs::Response> response =
-    transport::request(get_world(), "world_sdf");
+    transport::request(get_world(), "world_sdf_save");
 
   msgs::GzString msg;
   std::string msgData;

@@ -83,6 +83,12 @@ namespace gazebo
       /// \return The SDF value for this model.
       public: virtual const sdf::ElementPtr GetSDF();
 
+      /// \brief Get the SDF element for the model, without all effects of
+      /// scaling. This is useful in cases when the scale will be applied
+      /// afterwards by, for example, states.
+      /// \return The SDF element.
+      public: virtual const sdf::ElementPtr UnscaledSDF();
+
       /// \brief Remove a child.
       /// \param[in] _child Remove a child entity.
       public: virtual void RemoveChild(EntityPtr _child);
