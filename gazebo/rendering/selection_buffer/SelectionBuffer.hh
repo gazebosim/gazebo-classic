@@ -14,20 +14,17 @@
  * limitations under the License.
  *
 */
-#ifndef _SELECTIONBUFFER_HH_
-#define _SELECTIONBUFFER_HH_
+#ifndef _GAZEBO_RENDERING_SELECTION_BUFFER_SELECTIONBUFFER_HH_
+#define _GAZEBO_RENDERING_SELECTION_BUFFER_SELECTIONBUFFER_HH_
 
+#include <memory>
 #include <string>
 #include "gazebo/util/system.hh"
 
 namespace Ogre
 {
   class SceneManager;
-  class Camera;
   class RenderTarget;
-  class RenderTexture;
-  class PixelBox;
-  class Overlay;
 }
 
 namespace gazebo
