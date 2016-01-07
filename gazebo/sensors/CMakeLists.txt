@@ -76,13 +76,13 @@ set (gtest_sources
   WirelessTransmitter_TEST.cc
 )
 
-set (TEST_DEPENDENCIES
+set (TEST_LIBRARIES
   gazebo_sensors
   gazebo_test_fixture
 )
 gz_build_tests(${gtest_sources})
 
-set (TEST_DEPENDENCIES
+set (TEST_LIBRARIES
   gazebo_sensors
   gazebo_test_fixture
 )

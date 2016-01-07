@@ -148,7 +148,7 @@ set (gtest_sources
   RenderingConversions_TEST.cc
 )
 
-set (TEST_DEPENDENCIES
+set (TEST_LIBRARIES
   gazebo_rendering
 )
 gz_build_tests(${gtest_sources})
@@ -167,7 +167,7 @@ set (gtest_sources_dri
   Visual_TEST.cc
 )
 
-set (TEST_DEPENDENCIES
+set (TEST_LIBRARIES
   gazebo_rendering
   gazebo_test_fixture
 )

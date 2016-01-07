@@ -180,7 +180,7 @@ if (HAVE_FFMPEG)
                      AudioDecoder_TEST.cc)
 endif()
 
-set (TEST_DEPENDENCIES
+set (TEST_LIBRARIES
   gazebo_common
 )
 gz_build_tests(${gtest_sources})

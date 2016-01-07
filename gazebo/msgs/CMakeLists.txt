@@ -122,7 +122,7 @@ set (msgs
   wrench_stamped.proto
 )
 
-set (TEST_DEPENDENCIES
+set (TEST_LIBRARIES
   gazebo_msgs
 )
 set (msgs_tests_sources

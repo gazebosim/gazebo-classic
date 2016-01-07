@@ -188,7 +188,7 @@ set (gtest_sources
   Road_TEST.cc
   SphereShape_TEST.cc
 )
-set (TEST_DEPENDENCIES
+set (TEST_LIBRARIES
   gazebo_physics
 )
 gz_build_tests(${gtest_sources})
@@ -203,7 +203,7 @@ set (gtest_fixture_sources
   UserCmdManager_TEST.cc
   WorldState_TEST.cc
 )
-set (TEST_DEPENDENCIES
+set (TEST_LIBRARIES
   gazebo_physics
   gazebo_test_fixture
 )

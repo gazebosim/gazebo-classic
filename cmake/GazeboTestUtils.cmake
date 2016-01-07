@@ -27,7 +27,10 @@ macro (gz_build_tests)
     )
     foreach (TEST_DEP ${TEST_DEPENDENCIES})
       add_dependencies(${BINARY_NAME} ${TEST_DEP})
-      target_link_libraries(${BINARY_NAME} ${TEST_DEP})
+    endforeach()
+    foreach (TEST_LIB ${TEST_LIBRARIES})
+      add_dependencies(${BINARY_NAME} ${TEST_LIB})
+      target_link_libraries(${BINARY_NAME} ${TEST_LIB})
     endforeach()
 
     add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME}

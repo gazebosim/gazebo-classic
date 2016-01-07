@@ -55,7 +55,7 @@ set (gtest_sources
   ODEJoint_TEST.cc
   ODEPhysics_TEST.cc
 )
-set (TEST_DEPENDENCIES
+set (TEST_LIBRARIES
   gazebo_physics
   gazebo_test_fixture
 )

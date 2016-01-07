@@ -22,21 +22,32 @@ if (UNIX AND NOT APPLE)
   set(tests
     RAMLibrary_TEST.cc
   )
-  set (TEST_DEPENDENCIES
+  set (TEST_LIBRARIES
     pthread
   )
   gz_build_tests(${tests})
 
   set(fixture_tests
     factory_stress.cc
-    gz_stress.cc
     image_convert_stress.cc
     sensor_stress.cc
     set_world_pose.cc
     transport_stress.cc
   )
-  set (TEST_DEPENDENCIES
+  set (TEST_LIBRARIES
     gazebo_test_fixture
   )
   gz_build_tests(${fixture_tests})
+
+  set(tool_tests
+    gz_stress.cc
+  )
+  set (TEST_DEPENDENCIES
+    gz
+    gzserver
+  )
+  set (TEST_LIBRARIES
+    gazebo_transport
+  )
+  gz_build_tests(${tool_tests})
 endif()
