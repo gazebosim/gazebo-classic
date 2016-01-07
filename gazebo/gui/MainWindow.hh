@@ -43,7 +43,7 @@ namespace gazebo
     {
       Q_OBJECT
 
-      /// \brief Construcor
+      /// \brief Constructor
       public: MainWindow();
 
       /// \brief Destructor
@@ -80,6 +80,7 @@ namespace gazebo
 
       /// \brief Get a pointer to the render widget.
       /// \return A pointer to the render widget.
+      /// \deprecated See RenderWidget() const.
       public: gui::RenderWidget *GetRenderWidget() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get a pointer to the render widget.
@@ -123,6 +124,7 @@ namespace gazebo
       /// \brief Get an editor by name
       /// \param[in] _name Name of the editor.
       /// \return Pointer to the editor.
+      /// \deprecated See Editor(const std::string &_name) const.
       public: gui::Editor *GetEditor(
           const std::string &_name) const GAZEBO_DEPRECATED(7.0);
 
