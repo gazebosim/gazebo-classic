@@ -152,7 +152,7 @@ void DepthCameraSensor::Render()
   this->camera->Render();
 
   this->rendered = true;
-  this->lastMeasurementTime = this->scene->GetSimTime();
+  this->lastMeasurementTime = this->scene->SimTime();
 }
 
 //////////////////////////////////////////////////

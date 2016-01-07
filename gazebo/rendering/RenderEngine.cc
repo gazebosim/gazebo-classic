@@ -221,7 +221,7 @@ void RenderEngine::RemoveScene(const std::string &_name)
   for (auto iter = this->dataPtr->scenes.begin();
       iter != this->dataPtr->scenes.end(); ++iter)
   {
-    if ((*iter)->GetName() == _name)
+    if ((*iter)->Name() == _name)
     {
       rendering::Events::removeScene(_name);
 
@@ -241,7 +241,7 @@ ScenePtr RenderEngine::GetScene(const std::string &_name)
 
   for (const auto &scene : this->dataPtr->scenes)
   {
-    if (_name.empty() || scene->GetName() == _name)
+    if (_name.empty() || scene->Name() == _name)
       return scene;
   }
 
@@ -347,7 +347,7 @@ void RenderEngine::Fini()
   // Deallocate memory for every scene
   while (!this->dataPtr->scenes.empty())
   {
-    this->RemoveScene(this->dataPtr->scenes.front()->GetName());
+    this->RemoveScene(this->dataPtr->scenes.front()->Name());
   }
 
 #if (OGRE_VERSION >= ((1 << 16) | (9 << 8) | 0))
