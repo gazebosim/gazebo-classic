@@ -1054,7 +1054,7 @@ void JointData::OnApply()
     // Get scoped name
     std::string oldName = this->parent->GetName();
     std::string scope = oldName;
-    size_t idx = oldName.rfind("::");
+    size_t idx = oldName.find("::");
     if (idx != std::string::npos)
       scope = oldName.substr(0, idx+2);
 
@@ -1073,7 +1073,7 @@ void JointData::OnApply()
     // Get scoped name
     std::string oldName = this->child->GetName();
     std::string scope = oldName;
-    size_t idx = oldName.rfind("::");
+    size_t idx = oldName.find("::");
     if (idx != std::string::npos)
       scope = oldName.substr(0, idx+2);
 
