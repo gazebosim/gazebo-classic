@@ -55,7 +55,7 @@ void ApplyWrenchVisual::Fini()
     return;
 
   // Destroy objects and nodes
-  Ogre::SceneManager *manager = dPtr->scene->GetManager();
+  Ogre::SceneManager *manager = dPtr->scene->OgreSceneManager();
   if (!manager)
     return;
 
@@ -131,7 +131,7 @@ void ApplyWrenchVisual::Load()
   this->InsertMesh("axis_shaft");
 
   Ogre::MovableObject *shaftObj =
-      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+      (Ogre::MovableObject*)(dPtr->scene->OgreSceneManager()->createEntity(
       this->GetName()+"_FORCE_SHAFT_", "axis_shaft"));
   shaftObj->getUserObjectBindings().setUserAny(
       Ogre::Any(std::string(dPtr->forceVisual->GetName())));
@@ -146,7 +146,7 @@ void ApplyWrenchVisual::Load()
   this->InsertMesh("axis_head");
 
   Ogre::MovableObject *headObj =
-      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+      (Ogre::MovableObject*)(dPtr->scene->OgreSceneManager()->createEntity(
       this->GetName()+"_FORCE_HEAD_", "axis_head"));
   headObj->getUserObjectBindings().setUserAny(
       Ogre::Any(std::string(dPtr->forceVisual->GetName())));
@@ -188,7 +188,7 @@ void ApplyWrenchVisual::Load()
   this->InsertMesh("torque_tube");
 
   Ogre::MovableObject *tubeObj =
-      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+      (Ogre::MovableObject*)(dPtr->scene->OgreSceneManager()->createEntity(
       this->GetName()+"_TORQUE_TUBE_", "torque_tube"));
   tubeObj->getUserObjectBindings().setUserAny(
       Ogre::Any(std::string(dPtr->torqueVisual->GetName())));
@@ -202,7 +202,7 @@ void ApplyWrenchVisual::Load()
   this->InsertMesh("axis_head");
 
   Ogre::MovableObject *torqueHeadObj =
-      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+      (Ogre::MovableObject*)(dPtr->scene->OgreSceneManager()->createEntity(
       this->GetName()+"_TORQUE_HEAD_", "axis_head"));
   torqueHeadObj->getUserObjectBindings().setUserAny(
       Ogre::Any(std::string(dPtr->torqueVisual->GetName())));

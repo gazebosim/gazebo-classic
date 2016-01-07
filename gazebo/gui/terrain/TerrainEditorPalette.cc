@@ -265,7 +265,7 @@ void TerrainEditorPalette::OnSave()
 
   // Get a pointer to the heightmap, if the scen is valid.
   rendering::Heightmap *heightmap = scene ? scene->GetHeightmap() : NULL;
-  common::Image img = heightmap->GetImage();
+  common::Image img = heightmap->Image();
 
   // Get a filename to save to.
   // Note that file dialog static functions seem to be broken (issue #1514)

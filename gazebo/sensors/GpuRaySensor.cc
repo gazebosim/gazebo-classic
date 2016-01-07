@@ -548,7 +548,7 @@ void GpuRaySensor::Render()
   if (!this->laserCam || !this->IsActive() || !this->NeedsUpdate())
     return;
 
-  this->lastMeasurementTime = this->scene->GetSimTime();
+  this->lastMeasurementTime = this->scene->SimTime();
 
   this->laserCam->Render();
   this->rendered = true;
