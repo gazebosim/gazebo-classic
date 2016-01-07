@@ -467,7 +467,7 @@ void Sensor::FillMsg(msgs::Sensor &_msg)
     camMsg->set_image_format(cam->ImageFormat());
     camMsg->set_near_clip(cam->NearClip());
     camMsg->set_far_clip(cam->FarClip());
-    auto distortion = cam->GetDistortion();
+    auto distortion = cam->LensDistortion();
     if (distortion)
     {
       msgs::Distortion *distortionMsg = camMsg->mutable_distortion();
