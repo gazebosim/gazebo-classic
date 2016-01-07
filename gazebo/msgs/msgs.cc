@@ -1982,6 +1982,8 @@ namespace gazebo
         linkSDF->GetElement("self_collide")->Set(_msg.self_collide());
       if (_msg.has_kinematic())
         linkSDF->GetElement("kinematic")->Set(_msg.kinematic());
+      if (_msg.has_enable_wind())
+        linkSDF->GetElement("enable_wind")->Set(_msg.enable_wind());
       if (_msg.has_pose())
         linkSDF->GetElement("pose")->Set(ConvertIgn(_msg.pose()));
       if (_msg.has_inertial())

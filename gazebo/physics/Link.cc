@@ -237,6 +237,17 @@ void Link::Load(sdf::ElementPtr _sdf)
     }
   }
 
+  if (this->sdf->HasElement("enable_wind"))
+  {
+    this->SetWindMode(this->sdf->Get<bool>("enable_wind"));
+  }
+  else
+  {
+    this->SetWindMode(this->GetModel()->GetWindMode());
+  }
+  this->sdf->GetElement("enable_wind")->GetValue()->SetUpdateFunc(
+      std::bind(&Link::GetWindMode, this));
+
   this->connections.push_back(event::Events::ConnectWorldUpdateBegin(
       boost::bind(&Link::Update, this, _1)));
 
@@ -355,16 +366,18 @@ void Link::UpdateParameters(sdf::ElementPtr _sdf)
 
   this->sdf->GetElement("gravity")->GetValue()->SetUpdateFunc(
       boost::bind(&Link::GetGravityMode, this));
-  this->sdf->GetElement("wind")->GetValue()->SetUpdateFunc(
-      boost::bind(&Link::GetWindMode, this));
+  this->sdf->GetElement("self_collide")->GetValue()->SetUpdateFunc(
+      std::bind(&Link::GetSelfCollide, this));
   this->sdf->GetElement("kinematic")->GetValue()->SetUpdateFunc(
       boost::bind(&Link::GetKinematic, this));
 
   if (this->sdf->Get<bool>("gravity") != this->GetGravityMode())
     this->SetGravityMode(this->sdf->Get<bool>("gravity"));
 
-  if (this->sdf->Get<bool>("wind") != this->GetWindMode())
-    this->SetWindMode(this->sdf->Get<bool>("wind"));
+  this->sdf->GetElement("enable_wind")->GetValue()->SetUpdateFunc(
+      std::bind(&Link::GetWindMode, this));
+
+  this->SetWindMode(this->sdf->Get<bool>("enable_wind"));
 
   // before loading child collision, we have to figure out if
   // selfCollide is true and modify parent class Entity so this
@@ -754,7 +767,7 @@ math::Box Link::GetBoundingBox() const
 //////////////////////////////////////////////////
 void Link::SetWindMode(bool _mode)
 {
-  this->sdf->GetElement("wind")->Set(_mode);
+  this->sdf->GetElement("enable_wind")->Set(_mode);
 
   if (!this->GetWindMode() && this->updateConnection)
     this->EnableWind(false);
@@ -782,7 +795,7 @@ void Link::EnableWind(bool _enable)
 //////////////////////////////////////////////////
 bool Link::GetWindMode() const
 {
-  return this->sdf->Get<bool>("wind");
+  return this->sdf->Get<bool>("enable_wind");
 }
 
 //////////////////////////////////////////////////
@@ -968,9 +981,7 @@ void Link::ProcessMsg(const msgs::Link &_msg)
     this->SetEnabled(true);
   }
   if (_msg.has_enable_wind())
-  {
     this->SetWindMode(_msg.enable_wind());
-  }
   if (_msg.has_kinematic())
   {
     this->SetKinematic(_msg.kinematic());

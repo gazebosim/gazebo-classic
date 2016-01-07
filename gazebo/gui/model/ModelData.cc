@@ -447,6 +447,12 @@ void LinkData::Load(sdf::ElementPtr _sdf)
     linkMsgPtr->set_self_collide(selfCollideSDF->Get<bool>(""));
     this->linkSDF->InsertElement(selfCollideSDF->Clone());
   }
+  if (_sdf->HasElement("enable_wind"))
+  {
+    sdf::ElementPtr enableWindSDF = _sdf->GetElement("enable_wind");
+    linkMsgPtr->set_enable_wind(enableWindSDF->Get<bool>(""));
+    this->linkSDF->InsertElement(enableWindSDF->Clone());
+  }
   if (_sdf->HasElement("kinematic"))
   {
     sdf::ElementPtr kinematicSDF = _sdf->GetElement("kinematic");

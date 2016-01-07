@@ -370,6 +370,14 @@ namespace gazebo
       /// \return true if successful, false if not.
       public: bool RemoveJoint(const std::string &_name);
 
+      /// \brief Set whether wind affects this body.
+      /// \param[in] _mode True to enable wind.
+      public: virtual void SetWindMode(bool _mode);
+
+      /// \brief Get the wind mode.
+      /// \return True if wind is enabled.
+      public: virtual bool GetWindMode() const;
+
       /// \brief Allow Model class to share itself as a boost shared_ptr
       /// \return a shared pointer to itself
       public: boost::shared_ptr<Model> shared_from_this();

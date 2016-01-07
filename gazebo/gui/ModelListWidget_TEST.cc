@@ -163,7 +163,7 @@ void ModelListWidget_TEST::SetPoseProperty(
 /////////////////////////////////////////////////
 void ModelListWidget_TEST::CheckLinkProperty(QList<QtProperty *> _properties,
     const std::string &_name, bool _selfCollide, bool _gravity, bool _kinematic,
-    bool _canonical, const gazebo::math::Pose &_pose)
+    bool _canonical, bool _enableWind, const gazebo::math::Pose &_pose)
 {
   // ignore checking link id in _properties[0]
   QtVariantProperty *property =
@@ -189,6 +189,10 @@ void ModelListWidget_TEST::CheckLinkProperty(QList<QtProperty *> _properties,
   QCOMPARE(property->value().toBool(), _canonical);
   property = static_cast<QtVariantProperty *>(_properties[6]);
   Q_ASSERT(property);
+  QCOMPARE(property->propertyName(), tr("enable_wind"));
+  QCOMPARE(property->value().toBool(), _enableWind);
+  property = static_cast<QtVariantProperty *>(_properties[7]);
+  Q_ASSERT(property);
   QCOMPARE(property->propertyName(), tr("pose"));
   CheckPoseProperty(property->subProperties(), _pose);
   // pose settings for canonical links should be disabled
@@ -201,7 +205,7 @@ void ModelListWidget_TEST::CheckLinkProperty(QList<QtProperty *> _properties,
 void ModelListWidget_TEST::SetLinkProperty(
     QtTreePropertyBrowser *propTreeBrowser, QList<QtProperty *> _properties,
     const std::string &_name, bool _selfCollide, bool _gravity, bool _kinematic,
-    bool _canonical, const gazebo::math::Pose &_pose)
+    bool _canonical, bool _enableWind, const gazebo::math::Pose &_pose)
 {
   QtVariantProperty *property =
       static_cast<QtVariantProperty *>(_properties[1]);
@@ -233,9 +237,15 @@ void ModelListWidget_TEST::SetLinkProperty(
   // only set the pose for non-canonical links
   QCOMPARE(property->propertyName(), tr("canonical"));
   QCOMPARE(property->value().toBool(), _canonical);
+  property = static_cast<QtVariantProperty *>(_properties[6]);
+  Q_ASSERT(property);
+  QCOMPARE(property->propertyName(), tr("enable_wind"));
+  QVERIFY(propTreeBrowser->items(property).size() == 1);
+  propTreeBrowser->setCurrentItem(propTreeBrowser->items(property)[0]);
+  property->setValue(_enableWind);
   if (!property->value().toBool())
   {
-    property = static_cast<QtVariantProperty *>(_properties[6]);
+    property = static_cast<QtVariantProperty *>(_properties[7]);
     Q_ASSERT(property);
     QCOMPARE(property->propertyName(), tr("pose"));
     QVERIFY(propTreeBrowser->items(property).size() == 1);

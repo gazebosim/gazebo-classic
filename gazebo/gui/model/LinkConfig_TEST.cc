@@ -1,4 +1,4 @@
-/*
+i/*
  * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -40,6 +40,7 @@ void LinkConfig_TEST::Initialization()
   QVERIFY(cw->GetBoolWidgetValue("gravity"));
   QVERIFY(!cw->GetBoolWidgetValue("self_collide"));
   QVERIFY(!cw->GetBoolWidgetValue("kinematic"));
+  QVERIFY(!cw->GetBoolWidgetValue("enable_wind"));
 }
 
 /////////////////////////////////////////////////
@@ -54,12 +55,14 @@ void LinkConfig_TEST::LinkMsgUpdate()
   linkMsgPtr->set_gravity(false);
   linkMsgPtr->set_self_collide(true);
   linkMsgPtr->set_kinematic(true);
+  linkMsgPtr->set_enable_wind(false);
 
   lc.Update(linkMsgPtr);
 
   QVERIFY(!cw->GetBoolWidgetValue("gravity"));
   QVERIFY(cw->GetBoolWidgetValue("self_collide"));
   QVERIFY(cw->GetBoolWidgetValue("kinematic"));
+  QVERIFY(cw->GetBoolWidgetValue("enable_wind"));
 }
 
 /////////////////////////////////////////////////

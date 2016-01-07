@@ -22,8 +22,8 @@
     <!-- A sphere controlled by the wind -->
     <model name="sphere">
       <pose>0 0 0 0 0 0</pose>
+      <enable_wind>true</enable_wind>
       <link name="link">
-        <wind>true</wind>
         <collision name="collision">
           <geometry>
             <sphere>

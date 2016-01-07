@@ -1710,6 +1710,14 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
   this->AddProperty(item, _parent);
   item->setEnabled(false);
 
+  // wind
+  item = this->variantManager->addProperty(QVariant::Bool, tr("enable_wind"));
+  if (_msg.has_enable_wind())
+    item->setValue(_msg.enable_wind());
+  else
+    item->setValue(true);
+  this->AddProperty(item, _parent);
+
   // pose
   topItem = this->variantManager->addProperty(
       QtVariantPropertyManager::groupTypeId(), tr("pose"));
@@ -2304,6 +2312,14 @@ void ModelListWidget::FillPropertyTree(const msgs::Model &_msg,
   item = this->variantManager->addProperty(QVariant::Bool, tr("self_collide"));
   if (_msg.has_self_collide())
     item->setValue(_msg.self_collide());
+  else
+    item->setValue(false);
+  item->setEnabled(false);
+  this->propTreeBrowser->addProperty(item);
+
+  item = this->variantManager->addProperty(QVariant::Bool, tr("enable_wind"));
+  if (_msg.has_enable_wind())
+    item->setValue(_msg.enable_wind());
   else
     item->setValue(false);
   item->setEnabled(false);
