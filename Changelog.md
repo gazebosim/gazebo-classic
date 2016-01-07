@@ -5,6 +5,10 @@
     * [Pull request #2064](https://bitbucket.org/osrf/gazebo/pull-request/2064)
     * [Pull request #2066](https://bitbucket.org/osrf/gazebo/pull-request/2066)
     * [Pull request #2069](https://bitbucket.org/osrf/gazebo/pull-request/2069)
+    * [Pull request #2074](https://bitbucket.org/osrf/gazebo/pull-request/2074)
+    * [Pull request #2076](https://bitbucket.org/osrf/gazebo/pull-request/2076)
+    * [Pull request #2070](https://bitbucket.org/osrf/gazebo/pull-request/2070)
+    * [Pull request #2071](https://bitbucket.org/osrf/gazebo/pull-request/2071)
 
 1. Use opaque pointers for the Master class.
     * [Pull request #2036](https://bitbucket.org/osrf/gazebo/pull-request/2036)

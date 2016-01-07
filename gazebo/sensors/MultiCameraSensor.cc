@@ -141,11 +141,11 @@ void MultiCameraSensor::Init()
     camera->Load(cameraSdf);
 
     // Do some sanity checks
-    if (camera->GetImageWidth() == 0 || camera->GetImageHeight() == 0)
+    if (camera->ImageWidth() == 0 || camera->ImageHeight() == 0)
       gzthrow("Image has zero size");
 
     camera->Init();
-    camera->CreateRenderTexture(camera->GetName() + "_RttTex");
+    camera->CreateRenderTexture(camera->Name() + "_RttTex");
 
     ignition::math::Pose3d cameraPose = this->pose;
     if (cameraSdf->HasElement("pose"))
@@ -174,11 +174,11 @@ void MultiCameraSensor::Init()
     }
 
     msgs::Image *image = this->msg.add_image();
-    image->set_width(camera->GetImageWidth());
-    image->set_height(camera->GetImageHeight());
+    image->set_width(camera->ImageWidth());
+    image->set_height(camera->ImageHeight());
     image->set_pixel_format(common::Image::ConvertPixelFormat(
-          camera->GetImageFormat()));
-    image->set_step(camera->GetImageWidth() * camera->GetImageDepth());
+          camera->ImageFormat()));
+    image->set_step(camera->ImageWidth() * camera->ImageDepth());
 
     cameraSdf = cameraSdf->GetNextElement("camera");
   }
@@ -203,7 +203,7 @@ void MultiCameraSensor::Fini()
   for (std::vector<rendering::CameraPtr>::iterator iter =
       this->cameras.begin(); iter != this->cameras.end(); ++iter)
   {
-    (*iter)->GetScene()->RemoveCamera((*iter)->GetName());
+    (*iter)->GetScene()->RemoveCamera((*iter)->Name());
   }
   this->cameras.clear();
   this->scene.reset();
@@ -259,8 +259,8 @@ bool MultiCameraSensor::UpdateImpl(const bool /*_force*/)
     if (publish)
     {
       msgs::Image *image = this->msg.mutable_image(index);
-      image->set_data((*iter)->GetImageData(0),
-          image->width() * (*iter)->GetImageDepth() * image->height());
+      image->set_data((*iter)->ImageData(0),
+          image->width() * (*iter)->ImageDepth() * image->height());
     }
   }
 
@@ -281,19 +281,19 @@ unsigned int MultiCameraSensor::GetCameraCount() const
 //////////////////////////////////////////////////
 unsigned int MultiCameraSensor::GetImageWidth(unsigned int _index) const
 {
-  return this->GetCamera(_index)->GetImageWidth();
+  return this->GetCamera(_index)->ImageWidth();
 }
 
 //////////////////////////////////////////////////
 unsigned int MultiCameraSensor::GetImageHeight(unsigned int _index) const
 {
-  return this->GetCamera(_index)->GetImageHeight();
+  return this->GetCamera(_index)->ImageHeight();
 }
 
 //////////////////////////////////////////////////
 const unsigned char *MultiCameraSensor::GetImageData(unsigned int _index)
 {
-  return this->GetCamera(_index)->GetImageData(0);
+  return this->GetCamera(_index)->ImageData(0);
 }
 
 //////////////////////////////////////////////////

@@ -133,7 +133,7 @@ OculusCamera::~OculusCamera()
 {
   if (this->dataPtr->externalSceneManager)
   {
-    RenderEngine::Instance()->root->destroySceneManager(
+    RenderEngine::Instance()->Root()->destroySceneManager(
         this->dataPtr->externalSceneManager);
   }
 
@@ -549,7 +549,7 @@ void OculusCamera::Oculus()
   // The distorted mesh receives the left and right camera images, and the
   // camera in the externalSceneManager renders the distorted meshes.
   this->dataPtr->externalSceneManager =
-    RenderEngine::Instance()->root->createSceneManager(Ogre::ST_GENERIC);
+    RenderEngine::Instance()->Root()->createSceneManager(Ogre::ST_GENERIC);
   this->dataPtr->externalSceneManager->setAmbientLight(
       Ogre::ColourValue(0.5, 0.5, 0.5));
 
