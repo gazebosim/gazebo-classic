@@ -23,8 +23,9 @@
 
 namespace Ogre
 {
-  class SceneManager;
+  class Entity;
   class RenderTarget;
+  class SceneManager;
 }
 
 namespace gazebo
@@ -32,9 +33,6 @@ namespace gazebo
   namespace rendering
   {
     struct SelectionBufferPrivate;
-    class MaterialSwitcher;
-    class SelectionRenderListener;
-    class Scene;
 
     class GZ_RENDERING_VISIBLE SelectionBuffer
     {
