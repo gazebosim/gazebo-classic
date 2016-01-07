@@ -600,6 +600,8 @@ release will remove the deprecated code.
     + ***Replacement:*** bool AutoRepeat() const
 
 1. **gazebo/rendering/Camera.hh**
+    + ***Deprecation:*** public: DistortionPtr GetDistortion() const;
+    + ***Replacement:*** public: DistortionPtr LensDistortion() const;
     + ***Deprecation:*** public: double GetRenderRate() const;
     + ***Replacement:*** public: double RenderRate() const;
     + ***Deprecation:*** public: bool GetInitialized() const;
