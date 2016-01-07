@@ -13,6 +13,7 @@ macro (gz_build_tests)
     add_executable(${BINARY_NAME} ${GTEST_SOURCE_file}
                    ${GZ_BUILD_TESTS_EXTRA_EXE_SRCS})
 
+
     link_directories(${PROJECT_BINARY_DIR}/test)
     add_dependencies(${BINARY_NAME}
       gtest
