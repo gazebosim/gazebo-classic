@@ -615,7 +615,7 @@ void BuildingMaker::Reset()
   this->SetModelName(this->dataPtr->buildingDefaultName);
 
   this->dataPtr->previewVisual.reset(new rendering::Visual(
-      this->dataPtr->previewName, scene->GetWorldVisual()));
+      this->dataPtr->previewName, scene->WorldVisual()));
 
   this->dataPtr->previewVisual->Load();
   this->dataPtr->previewVisual->SetPose(ignition::math::Pose3d::Zero);

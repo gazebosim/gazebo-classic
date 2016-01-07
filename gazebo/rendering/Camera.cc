@@ -82,7 +82,7 @@ Camera::Camera(const std::string &_name, ScenePtr _scene,
   this->bayerFrameBuffer = NULL;
 
   this->name = _name;
-  this->scopedName = this->scene->GetName() + "::" + _name;
+  this->scopedName = this->scene->Name() + "::" + _name;
   this->scopedUniqueName = this->scopedName + "(" +
     boost::lexical_cast<std::string>(++this->dataPtr->cameraCounter) + ")";
 
@@ -199,7 +199,7 @@ void Camera::Load()
 void Camera::Init()
 {
   this->SetSceneNode(
-      this->scene->GetManager()->getRootSceneNode()->createChildSceneNode(
+      this->scene->OgreSceneManager()->getRootSceneNode()->createChildSceneNode(
         this->scopedUniqueName + "_SceneNode"));
 
   this->CreateCamera();
@@ -233,7 +233,7 @@ void Camera::Fini()
 
   if (this->camera)
   {
-    this->scene->GetManager()->destroyCamera(this->scopedUniqueName);
+    this->scene->OgreSceneManager()->destroyCamera(this->scopedUniqueName);
     this->camera = NULL;
   }
 
@@ -326,7 +326,7 @@ void Camera::Update()
     {
       try
       {
-        this->scene->GetManager()->destroyAnimation(
+        this->scene->OgreSceneManager()->destroyAnimation(
             std::string(this->animState->getAnimationName()));
       } catch(Ogre::Exception &_e)
       {
@@ -1521,7 +1521,7 @@ ScenePtr Camera::GetScene() const
 //////////////////////////////////////////////////
 void Camera::CreateCamera()
 {
-  this->camera = this->scene->GetManager()->createCamera(
+  this->camera = this->scene->OgreSceneManager()->createCamera(
       this->scopedUniqueName);
 
   if (this->sdf->HasElement("projection_type"))
@@ -1600,7 +1600,7 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
     RTShaderSystem::AttachViewport(this->viewport, this->GetScene());
 
     this->viewport->setBackgroundColour(
-        Conversions::Convert(this->scene->GetBackgroundColor()));
+        Conversions::Convert(this->scene->BackgroundColor()));
     this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL &
         ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
 
@@ -1887,7 +1887,7 @@ bool Camera::MoveToPosition(const ignition::math::Pose3d &_pose,
 
   std::string trackName = "cameratrack";
   int i = 0;
-  while (this->scene->GetManager()->hasAnimation(trackName))
+  while (this->scene->OgreSceneManager()->hasAnimation(trackName))
   {
     trackName = std::string("cameratrack_") +
       boost::lexical_cast<std::string>(i);
@@ -1895,7 +1895,7 @@ bool Camera::MoveToPosition(const ignition::math::Pose3d &_pose,
   }
 
   Ogre::Animation *anim =
-    this->scene->GetManager()->createAnimation(trackName, _time);
+    this->scene->OgreSceneManager()->createAnimation(trackName, _time);
   anim->setInterpolationMode(Ogre::Animation::IM_SPLINE);
 
   Ogre::NodeAnimationTrack *strack = anim->createNodeTrack(0, this->sceneNode);
@@ -1910,7 +1910,7 @@ bool Camera::MoveToPosition(const ignition::math::Pose3d &_pose,
   key->setRotation(pitchYawFinal);
 
   this->animState =
-    this->scene->GetManager()->createAnimationState(trackName);
+    this->scene->OgreSceneManager()->createAnimationState(trackName);
 
   this->animState->setTimePosition(0);
   this->animState->setEnabled(true);
@@ -1947,7 +1947,7 @@ bool Camera::MoveToPositions(const std::vector<ignition::math::Pose3d> &_pts,
 
   std::string trackName = "cameratrack";
   int i = 0;
-  while (this->scene->GetManager()->hasAnimation(trackName))
+  while (this->scene->OgreSceneManager()->hasAnimation(trackName))
   {
     trackName = std::string("cameratrack_") +
       boost::lexical_cast<std::string>(i);
@@ -1955,7 +1955,7 @@ bool Camera::MoveToPositions(const std::vector<ignition::math::Pose3d> &_pts,
   }
 
   Ogre::Animation *anim =
-    this->scene->GetManager()->createAnimation(trackName, _time);
+    this->scene->OgreSceneManager()->createAnimation(trackName, _time);
   anim->setInterpolationMode(Ogre::Animation::IM_SPLINE);
 
   Ogre::NodeAnimationTrack *strack = anim->createNodeTrack(0, this->sceneNode);
@@ -1995,7 +1995,8 @@ bool Camera::MoveToPositions(const std::vector<ignition::math::Pose3d> &_pts,
     tt += dt;
   }
 
-  this->animState = this->scene->GetManager()->createAnimationState(trackName);
+  this->animState =
+      this->scene->OgreSceneManager()->createAnimationState(trackName);
 
   this->animState->setTimePosition(0);
   this->animState->setEnabled(true);
@@ -2040,7 +2041,7 @@ bool Camera::GetInitialized() const
 //////////////////////////////////////////////////
 bool Camera::Initialized() const
 {
-  return this->initialized && this->scene->GetInitialized();
+  return this->initialized && this->scene->Initialized();
 }
 
 //////////////////////////////////////////////////
