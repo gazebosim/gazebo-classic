@@ -78,19 +78,19 @@ TEST_F(MultiCameraSensor, CameraRotationTest)
 
   sensors::SensorPtr sensor = sensors::get_sensor(cameraUnrotated);
   sensors::MultiCameraSensorPtr camSensorUnrotated =
-    boost::dynamic_pointer_cast<sensors::MultiCameraSensor>(sensor);
+    std::dynamic_pointer_cast<sensors::MultiCameraSensor>(sensor);
 
   sensor = sensors::get_sensor(cameraTranslated);
   sensors::CameraSensorPtr camSensorTranslated =
-    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
 
   sensor = sensors::get_sensor(cameraRotated1);
   sensors::MultiCameraSensorPtr camSensorRotated1 =
-    boost::dynamic_pointer_cast<sensors::MultiCameraSensor>(sensor);
+    std::dynamic_pointer_cast<sensors::MultiCameraSensor>(sensor);
 
   sensor = sensors::get_sensor(cameraRotated2);
   sensors::MultiCameraSensorPtr camSensorRotated2 =
-    boost::dynamic_pointer_cast<sensors::MultiCameraSensor>(sensor);
+    std::dynamic_pointer_cast<sensors::MultiCameraSensor>(sensor);
 
   unsigned int width  = 1024;
   unsigned int height = 544;
@@ -350,22 +350,22 @@ TEST_F(MultiCameraSensor, CameraRotationWorldPoseTest)
   physics::ModelPtr model1 = world->GetModel(modelUnrotated);
   sensors::SensorPtr sensor1 = sensors::get_sensor(multicameraUnrotated);
   sensors::MultiCameraSensorPtr multicamera1 =
-    boost::dynamic_pointer_cast<sensors::MultiCameraSensor>(sensor1);
+    std::dynamic_pointer_cast<sensors::MultiCameraSensor>(sensor1);
 
   physics::ModelPtr model2 = world->GetModel(modelTranslated);
   sensors::SensorPtr sensor2 = sensors::get_sensor(cameraTranslated);
   sensors::CameraSensorPtr camera2 =
-    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor2);
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor2);
 
   physics::ModelPtr model3 = world->GetModel(modelRotated1);
   sensors::SensorPtr sensor3 = sensors::get_sensor(multicameraRotated1);
   sensors::MultiCameraSensorPtr multicamera3 =
-    boost::dynamic_pointer_cast<sensors::MultiCameraSensor>(sensor3);
+    std::dynamic_pointer_cast<sensors::MultiCameraSensor>(sensor3);
 
   physics::ModelPtr model4 = world->GetModel(modelRotated2);
   sensors::SensorPtr sensor4 = sensors::get_sensor(multicameraRotated2);
   sensors::MultiCameraSensorPtr multicamera4 =
-    boost::dynamic_pointer_cast<sensors::MultiCameraSensor>(sensor4);
+    std::dynamic_pointer_cast<sensors::MultiCameraSensor>(sensor4);
 
   ASSERT_TRUE(model1 != NULL);
   ASSERT_TRUE(model2 != NULL);
@@ -392,7 +392,7 @@ TEST_F(MultiCameraSensor, CameraRotationWorldPoseTest)
 
   // Get multicamera1's local pose. There is current no GetPose() in Camera,
   // so grab it from it's ogre scene node
-  Ogre::SceneNode *cameraNode = multicamera1->GetCamera(0)->GetSceneNode();
+  Ogre::SceneNode *cameraNode = multicamera1->GetCamera(0)->SceneNode();
   ignition::math::Pose3d cameraPose(
       rendering::Conversions::Convert(cameraNode->getPosition()).Ign(),
       rendering::Conversions::Convert(cameraNode->getOrientation()).Ign());
@@ -459,7 +459,7 @@ TEST_F(MultiCameraSensor, CameraRotationWorldPoseTest)
   EXPECT_NE(multicamera3->Pose() + model3->GetWorldPose().Ign(),
       multicamera3->GetCamera(0)->WorldPose());
   // Get multicamera3 sensor's camera 0 local pose
-  cameraNode = multicamera3->GetCamera(0)->GetSceneNode();
+  cameraNode = multicamera3->GetCamera(0)->SceneNode();
   cameraPose = ignition::math::Pose3d(
       rendering::Conversions::Convert(cameraNode->getPosition()).Ign(),
       rendering::Conversions::Convert(cameraNode->getOrientation()).Ign());
@@ -511,7 +511,7 @@ TEST_F(MultiCameraSensor, CameraRotationWorldPoseTest)
   EXPECT_NE(model4->GetWorldPose().Ign(),
       multicamera4->GetCamera(0)->WorldPose());
   // Get multicamera4's camera 0 local pose
-  cameraNode = multicamera4->GetCamera(0)->GetSceneNode();
+  cameraNode = multicamera4->GetCamera(0)->SceneNode();
   cameraPose = ignition::math::Pose3d(
       rendering::Conversions::Convert(cameraNode->getPosition()).Ign(),
       rendering::Conversions::Convert(cameraNode->getOrientation()).Ign());
@@ -537,7 +537,7 @@ TEST_F(MultiCameraSensor, CameraRotationWorldPoseTest)
   EXPECT_NE(model4->GetWorldPose().Ign(),
       multicamera4->GetCamera(1)->WorldPose());
   // Get multicamera4 sensor's camera 1 local pose
-  cameraNode = multicamera4->GetCamera(1)->GetSceneNode();
+  cameraNode = multicamera4->GetCamera(1)->SceneNode();
   cameraPose = ignition::math::Pose3d(
       rendering::Conversions::Convert(cameraNode->getPosition()).Ign(),
       rendering::Conversions::Convert(cameraNode->getOrientation()).Ign());

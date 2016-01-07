@@ -162,11 +162,11 @@ TEST_F(OpenAL, SourcePlay)
   source = util::OpenAL::Instance()->CreateSource(sdf->Root());
   EXPECT_TRUE(source != NULL);
 
-  EXPECT_TRUE(source->GetOnContact());
+  EXPECT_TRUE(source->OnContact());
 
-  EXPECT_EQ(source->GetCollisionNames().size(), 2u);
-  EXPECT_EQ(source->GetCollisionNames()[0], "name");
-  EXPECT_EQ(source->GetCollisionNames()[1], "name2");
+  EXPECT_EQ(source->CollisionNames().size(), 2u);
+  EXPECT_EQ(source->CollisionNames()[0], "name");
+  EXPECT_EQ(source->CollisionNames()[1], "name2");
   EXPECT_TRUE(source->HasCollisionName("name2"));
   EXPECT_TRUE(source->HasCollisionName("name"));
 
@@ -224,7 +224,7 @@ TEST_F(OpenAL, SourceVelPose)
   source = util::OpenAL::Instance()->CreateSource(sdf->Root());
   EXPECT_TRUE(source != NULL);
 
-  EXPECT_FALSE(source->GetOnContact());
+  EXPECT_FALSE(source->OnContact());
   EXPECT_TRUE(source->SetVelocity(ignition::math::Vector3d(1, 1, 1)));
   EXPECT_TRUE(source->SetPose(ignition::math::Pose3d(1, 1, 1, 0, 0, 0)));
 }

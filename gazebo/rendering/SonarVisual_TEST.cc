@@ -43,7 +43,7 @@ TEST_F(SonarVisual_TEST, SonarVisualTest)
   // there are no segfaults
   gazebo::rendering::VisualPtr sonarVis(
       new gazebo::rendering::SonarVisual(
-      "world_GUIONLY_sonar_vis", scene->GetWorldVisual(), ""));
+      "world_GUIONLY_sonar_vis", scene->WorldVisual(), ""));
   sonarVis->Load();
 }
 
