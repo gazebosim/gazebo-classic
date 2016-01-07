@@ -18,9 +18,16 @@ if (HAVE_BULLET)
 endif()
 
 # Per issue #802, these tests are not yet portable
-if (NOT APPLE)
+if (UNIX AND NOT APPLE)
   set(tests
     RAMLibrary_TEST.cc
+  )
+  set (TEST_DEPENDENCIES
+    pthread
+  )
+  gz_build_tests(${tests})
+
+  set(fixture_tests
     factory_stress.cc
     gz_stress.cc
     image_convert_stress.cc
@@ -28,6 +35,8 @@ if (NOT APPLE)
     set_world_pose.cc
     transport_stress.cc
   )
-
-  gz_build_tests(${tests})
+  set (TEST_DEPENDENCIES
+    gazebo_test_fixture
+  )
+  gz_build_tests(${fixture_tests})
 endif()
