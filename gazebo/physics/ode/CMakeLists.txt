@@ -55,6 +55,10 @@ set (gtest_sources
   ODEJoint_TEST.cc
   ODEPhysics_TEST.cc
 )
+set (TEST_DEPENDENCIES
+  gazebo_physics
+  gazebo_test_fixture
+)
 gz_build_tests(${gtest_sources})
 
 gz_install_includes("physics/ode" ${headers})

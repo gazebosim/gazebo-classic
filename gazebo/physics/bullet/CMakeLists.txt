@@ -58,6 +58,10 @@ set (gtest_sources
   BulletTypes_TEST.cc
   BulletPhysics_TEST.cc
 )
+set (TEST_DEPENDENCIES
+  gazebo_physics
+  gazebo_test_fixture
+)
 gz_build_tests(${gtest_sources})
 
 gz_install_includes("physics/bullet" ${headers})
