@@ -38,3 +38,15 @@ common::Color Conversions::Convert(const QColor &_color)
                        _color.alpha() / 255.0);
 }
 
+
+//////////////////////////////////////////////////
+QPointF Conversions::Convert(const ignition::math::Vector2d &_pt)
+{
+  return QPointF(_pt.X(), _pt.Y());
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector2d Conversions::Convert(const QPointF &_pt)
+{
+  return ignition::math::Vector2d(_pt.x(), _pt.y());
+}

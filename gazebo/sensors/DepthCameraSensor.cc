@@ -106,8 +106,8 @@ void DepthCameraSensor::Init()
     this->dataPtr->camera->Load(cameraSdf);
 
     // Do some sanity checks
-    if (this->dataPtr->camera->GetImageWidth() == 0 ||
-        this->dataPtr->camera->GetImageHeight() == 0)
+    if (this->dataPtr->camera->ImageWidth() == 0 ||
+        this->dataPtr->camera->ImageHeight() == 0)
     {
       gzthrow("image has zero size");
     }
@@ -134,7 +134,7 @@ void DepthCameraSensor::Init()
 void DepthCameraSensor::Fini()
 {
   Sensor::Fini();
-  this->scene->RemoveCamera(this->dataPtr->camera->GetName());
+  this->scene->RemoveCamera(this->dataPtr->camera->Name());
   this->dataPtr->camera.reset();
   this->scene.reset();
 }
@@ -154,7 +154,7 @@ void DepthCameraSensor::Render()
   this->dataPtr->camera->Render();
 
   this->dataPtr->rendered = true;
-  this->lastMeasurementTime = this->scene->GetSimTime();
+  this->lastMeasurementTime = this->scene->SimTime();
 }
 
 //////////////////////////////////////////////////

@@ -99,7 +99,7 @@ void RFIDSensor::Load(const std::string &_worldName)
     scene = rendering::create_scene(this->world->GetName(), false);
     }
 
-    manager = rendering::get_scene(this->world->GetName())->GetManager();
+    manager = rendering::get_scene(this->world->GetName())->OgreSceneManager();
 
     query = manager->createRayQuery(Ogre::Ray());
 

@@ -20,6 +20,8 @@
   #include <Winsock2.h>
 #endif
 
+#include <sdf/sdf.hh>
+
 #include "gazebo/transport/transport.hh"
 
 #include "gazebo/physics/PhysicsIface.hh"
@@ -189,7 +191,7 @@ bool Sensor::NeedsUpdate()
 
   common::Time simTime;
   if (this->dataPtr->category == IMAGE && this->scene)
-    simTime = this->scene->GetSimTime();
+    simTime = this->scene->SimTime();
   else
     simTime = this->world->GetSimTime();
 
@@ -207,7 +209,7 @@ void Sensor::Update(const bool _force)
   {
     common::Time simTime;
     if (this->dataPtr->category == IMAGE && this->scene)
-      simTime = this->scene->GetSimTime();
+      simTime = this->scene->SimTime();
     else
       simTime = this->world->GetSimTime();
 
@@ -464,9 +466,9 @@ void Sensor::FillMsg(msgs::Sensor &_msg)
     camMsg->set_horizontal_fov(cam->HFOV().Radian());
     camMsg->mutable_image_size()->set_x(camSensor->ImageWidth());
     camMsg->mutable_image_size()->set_y(camSensor->ImageHeight());
-    camMsg->set_image_format(cam->GetImageFormat());
-    camMsg->set_near_clip(cam->GetNearClip());
-    camMsg->set_far_clip(cam->GetFarClip());
+    camMsg->set_image_format(cam->ImageFormat());
+    camMsg->set_near_clip(cam->NearClip());
+    camMsg->set_far_clip(cam->FarClip());
     auto distortion = cam->GetDistortion();
     if (distortion)
     {
