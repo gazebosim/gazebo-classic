@@ -142,6 +142,29 @@ release will remove the deprecated code.
     + ***Deprecation:*** public: virtual const float *GetDepthData();
     + ***Replacement:*** public: virtual const float *DepthData() const;
 
+1. **gazebo/rendering/Heightmap.hh**
+    + ***Deprecation:*** public: double GetHeight(double _x, double _y, double _z = 1000);
+    + ***Replacement:*** public: double Height(const double _x, const double _y, const double _z = 1000) const;
+    + ***Deprecation:*** public: bool Flatten(CameraPtr _camera, math::Vector2i _mousePos, double _outsideRadius, double _insideRadius, double _weight = 0.1)
+    + ***Replacement:*** public: bool Flatten(CameraPtr _camera, const ignition::math::Vector2i &_mousePos, const double _outsideRadius, const double _insideRadius, const double _weight = 0.1);
+    + ***Deprecation:*** public: bool Smooth(CameraPtr _camera, math::Vector2i _mousePos, double _outsideRadius, double _insideRadius, double _weight = 0.1);
+    + ***Replacement:*** public: bool Smooth(CameraPtr _camera, const ignition::math::Vector2i &_mousePos, const double _outsideRadius, const double _insideRadius, const double _weight = 0.1);
+    + ***Deprecation:*** public: bool Raise(CameraPtr _camera, math::Vector2i _mousePos,
+ double _outsideRadius, double _insideRadius, double _weight = 0.1)
+    + ***Replacement:*** public: bool Raise(CameraPtr _camera, const ignition::math::Vector2i &_mousePos, const double _outsideRadius, const double _insideRadius, const double _weight = 0.1)
+    + ***Deprecation:*** public: bool Lower(CameraPtr _camera, math::Vector2i _mousePos, double _outsideRadius, double _insideRadius, double _weight = 0.1)
+    + ***Replacement:*** public: bool Lower(CameraPtr _camera, const ignition::math::Vector2i &_mousePos, const double _outsideRadius, const double _insideRadius, const double _weight = 0.1)
+    + ***Deprecation:*** public: double GetAvgHeight(Ogre::Vector3 _pos, double _brushSize);
+    + ***Replacement:*** public: double AvgHeight(const ignition::math::Vector3d &_pos, const double _brushSize) const
+    + ***Deprecation:*** public: Ogre::TerrainGroup *GetOgreTerrain() const;
+    + ***Replacement:*** public: Ogre::TerrainGroup *OgreTerrain() const;
+    + ***Deprecation:*** public: common::Image GetImage() const;
+    + ***Replacement:*** public: public: common::Image Image() const;
+    + ***Deprecation:*** public: Ogre::TerrainGroup::RayResult GetMouseHit(CameraPtr _camera, math::Vector2i _mousePos);
+    + ***Replacement:*** public: Ogre::TerrainGroup::RayResult MouseHit(CameraPtr _camera, const ignition::math::Vector2i &_mousePos) const;
+    + ***Deprecation:*** public: unsigned int GetTerrainSubdivisionCount() const;
+    + ***Replacement:*** public: unsigned int TerrainSubdivisionCount() const;
+
 1. **gazebo/rendering/RenderEngine.hh**
     + ***Deprecation:*** public: unsigned int GetSceneCount() const;
     + ***Replacement:*** public: unsigned int SceneCount() const;
