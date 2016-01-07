@@ -210,7 +210,7 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
       auto cameraBrowser = this->propTreeBrowser->addProperty(topItem);
 
       // Create and set the gui camera name
-      std::string cameraName = cam->GetName();
+      std::string cameraName = cam->Name();
       item = this->variantManager->addProperty(QVariant::String, tr("name"));
       item->setValue(cameraName.c_str());
       topItem->addSubProperty(item);
