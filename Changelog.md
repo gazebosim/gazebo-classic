@@ -1,6 +1,6 @@
 ## Gazebo 7.0
 
-1. Use opaque pointers in the rendering library
+1. Use opaque pointers and deprecate functions in the rendering library
     * [Pull request #2069](https://bitbucket.org/osrf/gazebo/pull-request/2069)
     * [Pull request #2064](https://bitbucket.org/osrf/gazebo/pull-request/2064)
     * [Pull request #2066](https://bitbucket.org/osrf/gazebo/pull-request/2066)
@@ -9,6 +9,7 @@
     * [Pull request #2076](https://bitbucket.org/osrf/gazebo/pull-request/2076)
     * [Pull request #2070](https://bitbucket.org/osrf/gazebo/pull-request/2070)
     * [Pull request #2071](https://bitbucket.org/osrf/gazebo/pull-request/2071)
+    * [Pull request #2084](https://bitbucket.org/osrf/gazebo/pull-request/2084)
 
 1. Use opaque pointers for the Master class.
     * [Pull request #2036](https://bitbucket.org/osrf/gazebo/pull-request/2036)

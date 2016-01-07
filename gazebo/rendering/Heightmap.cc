@@ -368,7 +368,7 @@ void Heightmap::Load()
   boost::filesystem::path terrainDirPath;
   boost::filesystem::path prefix;
   boost::shared_ptr<msgs::Response> response = transport::request(
-     this->dataPtr->scene->GetName(), "heightmap_data");
+     this->dataPtr->scene->Name(), "heightmap_data");
 
   if (response->response() != "error" &&
       response->type() == geomMsg.GetTypeName())
@@ -427,7 +427,7 @@ void Heightmap::Load()
   // Param 4: World size of each terrain instance, in meters.
 
   this->dataPtr->terrainGroup = new Ogre::TerrainGroup(
-      this->dataPtr->scene->GetManager(), Ogre::Terrain::ALIGN_X_Y,
+      this->dataPtr->scene->OgreSceneManager(), Ogre::Terrain::ALIGN_X_Y,
       1 + ((this->dataPtr->dataSize - 1) / sqrtN),
       this->dataPtr->terrainSize.X() / (sqrtN));
 
@@ -487,12 +487,12 @@ void Heightmap::Load()
         &this->dataPtr->dummyPageProvider);
 
     // Add cameras
-    for (unsigned int i = 0; i < this->dataPtr->scene->GetCameraCount(); ++i)
+    for (unsigned int i = 0; i < this->dataPtr->scene->CameraCount(); ++i)
     {
       this->dataPtr->pageManager->addCamera(
           this->dataPtr->scene->GetCamera(i)->OgreCamera());
     }
-    for (unsigned int i = 0; i < this->dataPtr->scene->GetUserCameraCount();
+    for (unsigned int i = 0; i < this->dataPtr->scene->UserCameraCount();
         ++i)
     {
       this->dataPtr->pageManager->addCamera(
@@ -559,7 +559,7 @@ void Heightmap::ConfigureTerrainDefaults()
 
   // Get the first directional light
   LightPtr directionalLight;
-  for (unsigned int i = 0; i < this->dataPtr->scene->GetLightCount(); ++i)
+  for (unsigned int i = 0; i < this->dataPtr->scene->LightCount(); ++i)
   {
     LightPtr light = this->dataPtr->scene->GetLight(i);
     if (light->Type() == "directional")
@@ -570,7 +570,7 @@ void Heightmap::ConfigureTerrainDefaults()
   }
 
   this->dataPtr->terrainGlobals->setCompositeMapAmbient(
-      this->dataPtr->scene->GetManager()->getAmbientLight());
+      this->dataPtr->scene->OgreSceneManager()->getAmbientLight());
 
   // Important to set these so that the terrain knows what to use for
   // derived (non-realtime) data

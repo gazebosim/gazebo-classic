@@ -14,16 +14,16 @@
  * limitations under the License.
  *
 */
-#ifndef _SCENE_PRIVATE_HH_
-#define _SCENE_PRIVATE_HH_
+#ifndef _GAZEBO_RENDERING_SCENE_PRIVATE_HH_
+#define _GAZEBO_RENDERING_SCENE_PRIVATE_HH_
 
 #include <list>
 #include <map>
 #include <string>
 #include <vector>
+#include <mutex>
 
 #include <boost/unordered/unordered_map.hpp>
-#include <boost/thread/recursive_mutex.hpp>
 
 #include <sdf/sdf.hh>
 
@@ -43,11 +43,6 @@ namespace Ogre
 {
   class SceneManager;
   class RaySceneQuery;
-}
-
-namespace boost
-{
-  class mutex;
 }
 
 namespace gazebo
@@ -207,10 +202,10 @@ namespace gazebo
       public: SkeletonPoseMsgs_L skeletonPoseMsgs;
 
       /// \brief Mutex to lock the various message buffers.
-      public: boost::mutex *receiveMutex;
+      public: std::mutex *receiveMutex;
 
       /// \brief Mutex to lock the pose message buffers.
-      public: boost::recursive_mutex poseMsgMutex;
+      public: std::recursive_mutex poseMsgMutex;
 
       /// \brief Communication Node
       public: transport::NodePtr node;
