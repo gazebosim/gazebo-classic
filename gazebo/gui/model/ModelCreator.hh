@@ -164,6 +164,11 @@ namespace gazebo
           const math::Vector3 &_scale = math::Vector3::One,
           const math::Pose &_pose = math::Pose::Zero);
 
+      /// \brief Add a nested model to the model
+      /// \param[in] _sdf SDF describing the model.
+      /// \return Nested model data.
+      public: NestedModelData *AddModel(const sdf::ElementPtr &_sdf);
+
       /// \brief Add a joint to the model.
       /// \param[in] _type Type of joint to add.
       public: void AddJoint(const std::string &_type);

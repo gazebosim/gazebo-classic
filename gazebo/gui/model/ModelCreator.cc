@@ -888,6 +888,13 @@ std::string ModelCreator::AddShape(EntityType _type,
 }
 
 /////////////////////////////////////////////////
+NestedModelData *ModelCreator::AddModel(const sdf::ElementPtr &_sdf)
+{
+  // Create a top-level nested model
+  return this->CreateModelFromSDF(_sdf, this->previewVisual, false);
+}
+
+/////////////////////////////////////////////////
 void ModelCreator::CreateLink(const rendering::VisualPtr &_visual)
 {
   LinkData *link = new LinkData();
