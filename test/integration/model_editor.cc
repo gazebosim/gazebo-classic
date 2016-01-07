@@ -62,7 +62,7 @@ void ModelEditorTest::SaveModelPose()
   // Inserting a link and it still is never saved
   modelCreator->AddShape(gazebo::gui::ModelCreator::ENTITY_CYLINDER);
   gazebo::rendering::VisualPtr cylinder =
-      scene->GetVisual("ModelPreview_0::link_0");
+      scene->GetVisual("ModelPreview_0_0::link_0");
   QVERIFY(cylinder != NULL);
 
   // Move cylinder to new pose
@@ -80,7 +80,7 @@ void ModelEditorTest::SaveModelPose()
   // Insert another link
   modelCreator->AddShape(gazebo::gui::ModelCreator::ENTITY_BOX);
   gazebo::rendering::VisualPtr box =
-      scene->GetVisual("ModelPreview_0::link_1");
+      scene->GetVisual("ModelPreview_0_0::link_1");
   QVERIFY(box != NULL);
 
   // Move box to new pose
@@ -179,7 +179,7 @@ void ModelEditorTest::JointInspectorUpdate()
   // add a cylinder link
   modelCreator->AddShape(gazebo::gui::ModelCreator::ENTITY_CYLINDER);
   gazebo::rendering::VisualPtr cylinder =
-      scene->GetVisual("ModelPreview_0::link_0");
+      scene->GetVisual("ModelPreview_0_0::link_0");
   QVERIFY(cylinder != NULL);
 
   // Move cylinder to new pose
@@ -198,7 +198,7 @@ void ModelEditorTest::JointInspectorUpdate()
   // add a sphere link
   modelCreator->AddShape(gazebo::gui::ModelCreator::ENTITY_SPHERE);
   gazebo::rendering::VisualPtr sphere =
-      scene->GetVisual("ModelPreview_0::link_1");
+      scene->GetVisual("ModelPreview_0_0::link_1");
   QVERIFY(sphere != NULL);
 
   // Move sphere to new pose
@@ -224,10 +224,10 @@ void ModelEditorTest::JointInspectorUpdate()
 
   /// Verify the box model has been added
   gazebo::rendering::VisualPtr boxModelVis =
-      scene->GetVisual("ModelPreview_0::box_model");
+      scene->GetVisual("ModelPreview_0_0::box_model");
   QVERIFY(boxModelVis != NULL);
   gazebo::rendering::VisualPtr boxModelLinkVis =
-      scene->GetVisual("ModelPreview_0::box_model::link_1");
+      scene->GetVisual("ModelPreview_0_0::box_model::link_1");
   QVERIFY(boxModelLinkVis != NULL);
 
   // Move box to new pose
@@ -264,9 +264,10 @@ void ModelEditorTest::JointInspectorUpdate()
   QVERIFY(jointInspector != NULL);
 
   // Add links to list
-  gazebo::gui::model::Events::linkInserted("ModelPreview_0::link_0");
-  gazebo::gui::model::Events::linkInserted("ModelPreview_0::link_1");
-  gazebo::gui::model::Events::linkInserted("ModelPreview_0::box_model::link_1");
+  gazebo::gui::model::Events::linkInserted("ModelPreview_0_0::link_0");
+  gazebo::gui::model::Events::linkInserted("ModelPreview_0_0::link_1");
+  gazebo::gui::model::Events::linkInserted(
+      "ModelPreview_0_0::box_model::link_1");
 
   // Get combo boxes in joint inspector
   QList<QComboBox *> comboBoxes = jointInspector->findChildren<QComboBox *>();
