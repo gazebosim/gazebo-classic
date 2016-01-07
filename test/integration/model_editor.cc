@@ -59,7 +59,7 @@ void ModelEditorTest::SaveModelPose()
   // Inserting a link and it still is never saved
   modelCreator->AddShape(gazebo::gui::ModelCreator::ENTITY_CYLINDER);
   gazebo::rendering::VisualPtr cylinder =
-      scene->GetVisual("ModelPreview_0::link_0");
+      scene->GetVisual("ModelPreview_0_0::link_0");
   QVERIFY(cylinder != NULL);
 
   // Move cylinder to new pose
@@ -77,7 +77,7 @@ void ModelEditorTest::SaveModelPose()
   // Insert another link
   modelCreator->AddShape(gazebo::gui::ModelCreator::ENTITY_BOX);
   gazebo::rendering::VisualPtr box =
-      scene->GetVisual("ModelPreview_0::link_1");
+      scene->GetVisual("ModelPreview_0_0::link_1");
   QVERIFY(box != NULL);
 
   // Move box to new pose
