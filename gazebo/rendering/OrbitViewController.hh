@@ -19,6 +19,8 @@
 
 #include <string>
 
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/ViewController.hh"
 #include "gazebo/math/Vector3.hh"
@@ -136,7 +138,7 @@ namespace gazebo
       protected: bool init;
 
       /// \brief The focal point.
-      protected: math::Vector3 focalPoint;
+      protected: ignition::math::Vector3d focalPoint;
     };
     /// \}
   }

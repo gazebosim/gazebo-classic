@@ -52,10 +52,10 @@ void LaserVisualization_TEST::Lines()
   }
 
   // Get camera data
-  const unsigned char *data = cam->GetImageData();
-  unsigned int width = cam->GetImageWidth();
-  unsigned int height = cam->GetImageHeight();
-  unsigned int depth = cam->GetImageDepth();
+  const unsigned char *data = cam->ImageData();
+  unsigned int width = cam->ImageWidth();
+  unsigned int height = cam->ImageHeight();
+  unsigned int depth = cam->ImageDepth();
 
   // Make sure there are darker lines in the laser rendering
   int lightBlueCount = 0;

@@ -43,7 +43,7 @@ TEST_F(SelectionObj_TEST, SelectionObjTest)
   // Test calling constructor and Load functions and make sure
   // there are no segfaults
   rendering::SelectionObjPtr obj;
-  obj.reset(new rendering::SelectionObj("obj", scene->GetWorldVisual()));
+  obj.reset(new rendering::SelectionObj("obj", scene->WorldVisual()));
   obj->Load();
 
   // Selection none = no handles visible
@@ -131,7 +131,7 @@ TEST_F(SelectionObj_TEST, LoadFini)
 
   // Create and load visual
   rendering::SelectionObjPtr obj;
-  obj.reset(new rendering::SelectionObj("obj", scene->GetWorldVisual()));
+  obj.reset(new rendering::SelectionObj("obj", scene->WorldVisual()));
   obj->Load();
   EXPECT_TRUE(obj != NULL);
 
@@ -150,7 +150,7 @@ TEST_F(SelectionObj_TEST, LoadFini)
 
   // Create another visual with the same name
   rendering::SelectionObjPtr obj2;
-  obj2.reset(new rendering::SelectionObj("obj", scene->GetWorldVisual()));
+  obj2.reset(new rendering::SelectionObj("obj", scene->WorldVisual()));
   obj2->Load();
   EXPECT_TRUE(obj2 != NULL);
 

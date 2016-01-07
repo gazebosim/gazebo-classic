@@ -51,37 +51,37 @@ TEST_F(GpuLaser_TEST, BasicGpuLaserAPITest)
   // The following tests all the getters and setters
   {
     laserCam->SetNearClip(0.1);
-    EXPECT_NEAR(laserCam->GetNearClip(), 0.1, 1e-6);
+    EXPECT_NEAR(laserCam->NearClip(), 0.1, 1e-6);
 
     laserCam->SetFarClip(100.0);
-    EXPECT_NEAR(laserCam->GetFarClip(), 100, 1e-6);
+    EXPECT_NEAR(laserCam->FarClip(), 100, 1e-6);
 
     laserCam->SetHorzHalfAngle(1.2);
-    EXPECT_NEAR(laserCam->GetHorzHalfAngle(), 1.2, 1e-6);
+    EXPECT_NEAR(laserCam->HorzHalfAngle(), 1.2, 1e-6);
 
     laserCam->SetVertHalfAngle(0.5);
-    EXPECT_NEAR(laserCam->GetVertHalfAngle(), 0.5, 1e-6);
+    EXPECT_NEAR(laserCam->VertHalfAngle(), 0.5, 1e-6);
 
     laserCam->SetIsHorizontal(false);
     EXPECT_FALSE(laserCam->IsHorizontal());
 
     laserCam->SetHorzFOV(2.4);
-    EXPECT_NEAR(laserCam->GetHorzFOV(), 2.4, 1e-6);
+    EXPECT_NEAR(laserCam->HorzFOV(), 2.4, 1e-6);
 
     laserCam->SetVertFOV(1.0);
-    EXPECT_NEAR(laserCam->GetVertFOV(), 1.0, 1e-6);
+    EXPECT_NEAR(laserCam->VertFOV(), 1.0, 1e-6);
 
     laserCam->SetCosHorzFOV(0.2);
-    EXPECT_NEAR(laserCam->GetCosHorzFOV(), 0.2, 1e-6);
+    EXPECT_NEAR(laserCam->CosHorzFOV(), 0.2, 1e-6);
 
     laserCam->SetCosVertFOV(0.1);
-    EXPECT_NEAR(laserCam->GetCosVertFOV(), 0.1, 1e-6);
+    EXPECT_NEAR(laserCam->CosVertFOV(), 0.1, 1e-6);
 
     laserCam->SetRayCountRatio(0.344);
-    EXPECT_NEAR(laserCam->GetRayCountRatio(), 0.344, 1e-6);
+    EXPECT_NEAR(laserCam->RayCountRatio(), 0.344, 1e-6);
 
-    laserCam->SetCameraCount(4);
-    EXPECT_EQ(static_cast<int>(laserCam->GetCameraCount()), 4);
+    laserCam->SetCameraCount(4u);
+    EXPECT_EQ(laserCam->CameraCount(), 4u);
   }
 }
 
