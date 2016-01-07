@@ -29,17 +29,17 @@
 #include "gazebo/gazebo_client.hh"
 
 #include "gazebo/common/Console.hh"
-#include "gazebo/common/Exception.hh"
 #include "gazebo/common/Events.hh"
+#include "gazebo/common/Exception.hh"
 
 #include "gazebo/msgs/msgs.hh"
 
-#include "gazebo/transport/Node.hh"
-#include "gazebo/transport/TransportIface.hh"
-
-#include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/RenderEvents.hh"
 #include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/UserCamera.hh"
+
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/TransportIface.hh"
 
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/AlignWidget.hh"
@@ -49,6 +49,7 @@
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/GuiPlugin.hh"
+#include "gazebo/gui/HotkeyDialog.hh"
 #include "gazebo/gui/InsertModelWidget.hh"
 #include "gazebo/gui/LayersWidget.hh"
 #include "gazebo/gui/ModelListWidget.hh"
@@ -805,7 +806,7 @@ void MainWindow::CaptureScreenshot()
   rendering::UserCameraPtr cam = gui::get_active_camera();
   cam->SetCaptureDataOnce();
   this->dataPtr->renderWidget->DisplayOverlayMsg(
-      "Screenshot saved in: " + cam->GetScreenshotPath(), 2000);
+      "Screenshot saved in: " + cam->ScreenshotPath(), 2000);
 }
 
 /////////////////////////////////////////////////

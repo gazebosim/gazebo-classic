@@ -14,24 +14,21 @@
  * limitations under the License.
  *
 */
-#ifndef _MAINWINDOW_PRIVATE_HH_
-#define _MAINWINDOW_PRIVATE_HH_
+#ifndef _GAZEBO_GUI_MAINWINDOW_PRIVATE_HH_
+#define _GAZEBO_GUI_MAINWINDOW_PRIVATE_HH_
 
+#include <list>
 #include <map>
 #include <string>
 #include <vector>
-#include <list>
 
 #include <boost/thread/mutex.hpp>
 
 #include "gazebo/gazebo_config.h"
-#include "gazebo/gui/qt.h"
-#include "gazebo/gui/DataLogger.hh"
-#include "gazebo/gui/HotkeyDialog.hh"
 #include "gazebo/common/Event.hh"
+#include "gazebo/gui/qt.h"
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
-#include "gazebo/util/system.hh"
 
 #ifdef HAVE_OCULUS
 #include "gazebo/gui/OculusWindow.hh"
@@ -41,12 +38,14 @@ namespace gazebo
 {
   namespace gui
   {
-    class InsertModelWidget;
-    class RenderWidget;
-    class ToolsWidget;
-    class ModelListWidget;
+    class DataLogger;
     class Editor;
+    class HotkeyDialog;
+    class InsertModelWidget;
+    class ModelListWidget;
+    class RenderWidget;
     class SpaceNav;
+    class ToolsWidget;
     class UserCmdHistory;
 
     class MainWindowPrivate
