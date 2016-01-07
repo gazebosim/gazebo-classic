@@ -21,10 +21,10 @@
   #include <Winsock2.h>
 #endif
 
-#include <boost/bind.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 #include <boost/filesystem.hpp>
 #include <sstream>
+#include <functional>
 #include <string>
 
 #include "gazebo/common/Exception.hh"
@@ -72,8 +72,6 @@ ModelCreator::ModelCreator()
   this->modelTemplateSDF.reset(new sdf::SDF);
   this->modelTemplateSDF->SetFromString(ModelData::GetTemplateSDFString());
 
-  this->updateMutex = new boost::recursive_mutex();
-
   this->manipMode = "";
   this->linkCounter = 0;
   this->modelCounter = 0;
@@ -99,87 +97,97 @@ ModelCreator::ModelCreator()
 
   this->connections.push_back(
       gui::Events::ConnectEditModel(
-      boost::bind(&ModelCreator::OnEditModel, this, _1)));
+      std::bind(&ModelCreator::OnEditModel, this, std::placeholders::_1)));
 
   this->connections.push_back(
       gui::model::Events::ConnectSaveModelEditor(
-      boost::bind(&ModelCreator::OnSave, this)));
+      std::bind(&ModelCreator::OnSave, this)));
 
   this->connections.push_back(
       gui::model::Events::ConnectSaveAsModelEditor(
-      boost::bind(&ModelCreator::OnSaveAs, this)));
+      std::bind(&ModelCreator::OnSaveAs, this)));
 
   this->connections.push_back(
       gui::model::Events::ConnectNewModelEditor(
-      boost::bind(&ModelCreator::OnNew, this)));
+      std::bind(&ModelCreator::OnNew, this)));
 
   this->connections.push_back(
       gui::model::Events::ConnectExitModelEditor(
-      boost::bind(&ModelCreator::OnExit, this)));
+      std::bind(&ModelCreator::OnExit, this)));
 
   this->connections.push_back(
     gui::model::Events::ConnectModelNameChanged(
-      boost::bind(&ModelCreator::OnNameChanged, this, _1)));
+      std::bind(&ModelCreator::OnNameChanged, this, std::placeholders::_1)));
 
   this->connections.push_back(
       gui::model::Events::ConnectModelChanged(
-      boost::bind(&ModelCreator::ModelChanged, this)));
+      std::bind(&ModelCreator::ModelChanged, this)));
 
   this->connections.push_back(
       gui::model::Events::ConnectOpenLinkInspector(
-      boost::bind(&ModelCreator::OpenInspector, this, _1)));
+      std::bind(&ModelCreator::OpenInspector, this, std::placeholders::_1)));
 
   this->connections.push_back(
       gui::model::Events::ConnectOpenModelPluginInspector(
-      boost::bind(&ModelCreator::OpenModelPluginInspector, this, _1)));
+      std::bind(&ModelCreator::OpenModelPluginInspector, this,
+        std::placeholders::_1)));
 
   this->connections.push_back(
       gui::Events::ConnectAlignMode(
-        boost::bind(&ModelCreator::OnAlignMode, this, _1, _2, _3, _4, _5)));
+        std::bind(&ModelCreator::OnAlignMode, this, std::placeholders::_1,
+          std::placeholders::_2, std::placeholders::_3, std::placeholders::_4,
+          std::placeholders::_5)));
 
   this->connections.push_back(
       gui::Events::ConnectManipMode(
-        boost::bind(&ModelCreator::OnManipMode, this, _1)));
+        std::bind(&ModelCreator::OnManipMode, this, std::placeholders::_1)));
 
   this->connections.push_back(
      event::Events::ConnectSetSelectedEntity(
-       boost::bind(&ModelCreator::OnSetSelectedEntity, this, _1, _2)));
+       std::bind(&ModelCreator::OnSetSelectedEntity, this,
+         std::placeholders::_1, std::placeholders::_2)));
 
   this->connections.push_back(
      gui::model::Events::ConnectSetSelectedLink(
-       boost::bind(&ModelCreator::OnSetSelectedLink, this, _1, _2)));
+       std::bind(&ModelCreator::OnSetSelectedLink, this,
+         std::placeholders::_1, std::placeholders::_2)));
 
   this->connections.push_back(
      gui::model::Events::ConnectSetSelectedModelPlugin(
-       boost::bind(&ModelCreator::OnSetSelectedModelPlugin, this, _1, _2)));
+       std::bind(&ModelCreator::OnSetSelectedModelPlugin, this,
+         std::placeholders::_1, std::placeholders::_2)));
 
   this->connections.push_back(
       gui::Events::ConnectScaleEntity(
-      boost::bind(&ModelCreator::OnEntityScaleChanged, this, _1, _2)));
+      std::bind(&ModelCreator::OnEntityScaleChanged, this,
+        std::placeholders::_1, std::placeholders::_2)));
 
   this->connections.push_back(
       gui::model::Events::ConnectShowLinkContextMenu(
-      boost::bind(&ModelCreator::ShowContextMenu, this, _1)));
+      std::bind(&ModelCreator::ShowContextMenu, this, std::placeholders::_1)));
 
   this->connections.push_back(
       gui::model::Events::ConnectShowModelPluginContextMenu(
-      boost::bind(&ModelCreator::ShowModelPluginContextMenu, this, _1)));
+      std::bind(&ModelCreator::ShowModelPluginContextMenu, this,
+        std::placeholders::_1)));
 
   this->connections.push_back(
       gui::model::Events::ConnectRequestLinkRemoval(
-        boost::bind(&ModelCreator::RemoveEntity, this, _1)));
+        std::bind(&ModelCreator::RemoveEntity, this, std::placeholders::_1)));
 
   this->connections.push_back(
       gui::model::Events::ConnectRequestModelPluginRemoval(
-        boost::bind(&ModelCreator::RemoveModelPlugin, this, _1)));
+        std::bind(&ModelCreator::RemoveModelPlugin, this,
+          std::placeholders::_1)));
 
   this->connections.push_back(
       event::Events::ConnectPreRender(
-        boost::bind(&ModelCreator::Update, this)));
+        std::bind(&ModelCreator::Update, this)));
 
   this->connections.push_back(
       gui::model::Events::ConnectModelPropertiesChanged(
-      boost::bind(&ModelCreator::OnPropertiesChanged, this, _1, _2)));
+      std::bind(&ModelCreator::OnPropertiesChanged, this,
+        std::placeholders::_1, std::placeholders::_2)));
 
   this->connections.push_back(
       gui::model::Events::ConnectRequestModelPluginInsertion(
@@ -222,8 +230,6 @@ ModelCreator::~ModelCreator()
   this->connections.clear();
 
   delete this->saveDialog;
-  delete this->updateMutex;
-
   delete this->jointMaker;
 }
 
@@ -234,19 +240,20 @@ void ModelCreator::OnEdit(bool _checked)
   {
     this->active = true;
     KeyEventHandler::Instance()->AddPressFilter("model_creator",
-        boost::bind(&ModelCreator::OnKeyPress, this, _1));
+        std::bind(&ModelCreator::OnKeyPress, this, std::placeholders::_1));
 
     MouseEventHandler::Instance()->AddPressFilter("model_creator",
-        boost::bind(&ModelCreator::OnMousePress, this, _1));
+        std::bind(&ModelCreator::OnMousePress, this, std::placeholders::_1));
 
     MouseEventHandler::Instance()->AddReleaseFilter("model_creator",
-        boost::bind(&ModelCreator::OnMouseRelease, this, _1));
+        std::bind(&ModelCreator::OnMouseRelease, this, std::placeholders::_1));
 
     MouseEventHandler::Instance()->AddMoveFilter("model_creator",
-        boost::bind(&ModelCreator::OnMouseMove, this, _1));
+        std::bind(&ModelCreator::OnMouseMove, this, std::placeholders::_1));
 
     MouseEventHandler::Instance()->AddDoubleClickFilter("model_creator",
-        boost::bind(&ModelCreator::OnMouseDoubleClick, this, _1));
+        std::bind(&ModelCreator::OnMouseDoubleClick, this,
+          std::placeholders::_1));
 
     this->jointMaker->EnableEventHandlers();
   }
@@ -431,7 +438,7 @@ NestedModelData *ModelCreator::CreateModelFromSDF(
   // Notify nested model insertion
   if (_parentVis)
   {
-    boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+    std::lock_guard<std::recursive_mutex> lock(this->updateMutex);
     this->allNestedModels[nestedModelName] = modelData;
 
     // fire nested inserted events only when the nested model is
@@ -948,7 +955,7 @@ LinkData *ModelCreator::CreateLink(const rendering::VisualPtr &_visual)
   link->SetName(leafName);
 
   {
-    boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+    std::lock_guard<std::recursive_mutex> lock(this->updateMutex);
     this->allLinks[linkName] = link;
     if (this->canonicalLink.empty())
       this->canonicalLink = linkName;
@@ -962,7 +969,7 @@ LinkData *ModelCreator::CreateLink(const rendering::VisualPtr &_visual)
 /////////////////////////////////////////////////
 LinkData *ModelCreator::CloneLink(const std::string &_linkName)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+  std::lock_guard<std::recursive_mutex> lock(this->updateMutex);
 
   auto it = this->allLinks.find(_linkName);
   if (it == allLinks.end())
@@ -1000,7 +1007,7 @@ LinkData *ModelCreator::CloneLink(const std::string &_linkName)
 NestedModelData *ModelCreator::CloneNestedModel(
     const std::string &_nestedModelName)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+  std::lock_guard<std::recursive_mutex> lock(this->updateMutex);
 
   auto it = this->allNestedModels.find(_nestedModelName);
   if (it == allNestedModels.end())
@@ -1179,7 +1186,7 @@ LinkData *ModelCreator::CreateLinkFromSDF(const sdf::ElementPtr &_linkElem,
     gui::model::Events::linkInserted(linkName);
 
   {
-    boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+    std::lock_guard<std::recursive_mutex> lock(this->updateMutex);
     this->allLinks[linkName] = link;
   }
 
@@ -1199,7 +1206,7 @@ void ModelCreator::RemoveNestedModelImpl(const std::string &_nestedModelName)
 
   NestedModelData *modelData = NULL;
   {
-    boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+    std::lock_guard<std::recursive_mutex> lock(this->updateMutex);
     if (this->allNestedModels.find(_nestedModelName) ==
         this->allNestedModels.end())
     {
@@ -1240,7 +1247,7 @@ void ModelCreator::RemoveNestedModelImpl(const std::string &_nestedModelName)
 
   modelData->modelVisual.reset();
   {
-    boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+    std::lock_guard<std::recursive_mutex> lock(this->updateMutex);
     this->allNestedModels.erase(_nestedModelName);
     delete modelData;
   }
@@ -1260,7 +1267,7 @@ void ModelCreator::RemoveLinkImpl(const std::string &_linkName)
 
   LinkData *link = NULL;
   {
-    boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+    std::lock_guard<std::recursive_mutex> lock(this->updateMutex);
     auto linkIt = this->allLinks.find(_linkName);
     if (linkIt == this->allLinks.end())
       return;
@@ -1293,7 +1300,7 @@ void ModelCreator::RemoveLinkImpl(const std::string &_linkName)
 
   link->linkVisual.reset();
   {
-    boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+    std::lock_guard<std::recursive_mutex> lock(this->updateMutex);
     this->allLinks.erase(linkName);
     delete link;
   }
@@ -1448,7 +1455,7 @@ void ModelCreator::CreateTheEntity()
     while (has_entity_name(modelElemName))
     {
       modelElemName = modelElem->Get<std::string>("name") + "_" +
-        boost::lexical_cast<std::string>(i++);
+        std::to_string(i++);
     }
     modelElem->GetAttribute("name")->Set(modelElemName);
   }
@@ -1528,7 +1535,7 @@ void ModelCreator::OnDelete(const std::string &_entity)
 /////////////////////////////////////////////////
 void ModelCreator::RemoveEntity(const std::string &_entity)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+  std::lock_guard<std::recursive_mutex> lock(this->updateMutex);
 
   // if it's a nestedModel
   if (this->allNestedModels.find(_entity) != this->allNestedModels.end())
@@ -1577,7 +1584,7 @@ void ModelCreator::OnRemoveModelPlugin(const QString &_name)
 /////////////////////////////////////////////////
 void ModelCreator::RemoveModelPlugin(const std::string &_name)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+  std::lock_guard<std::recursive_mutex> lock(this->updateMutex);
 
   auto it = this->allModelPlugins.find(_name);
   if (it == this->allModelPlugins.end())
@@ -1674,7 +1681,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
   if (!userCamera)
     return false;
 
-  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+  std::lock_guard<std::recursive_mutex> lock(this->updateMutex);
 
   // case when inserting an entity
   if (this->mouseVisual)
@@ -2014,7 +2021,7 @@ bool ModelCreator::OnMouseDoubleClick(const common::MouseEvent &_event)
   if (!vis)
     return false;
 
-  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+  std::lock_guard<std::recursive_mutex> lock(this->updateMutex);
 
   auto it = this->allLinks.find(vis->GetParent()->GetName());
   if (it != this->allLinks.end())
@@ -2039,7 +2046,7 @@ void ModelCreator::OnOpenInspector()
 /////////////////////////////////////////////////
 void ModelCreator::OpenInspector(const std::string &_name)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+  std::lock_guard<std::recursive_mutex> lock(this->updateMutex);
   auto it = this->allLinks.find(_name);
   if (it == this->allLinks.end())
   {
@@ -2087,7 +2094,7 @@ void ModelCreator::OnPaste()
     return;
   }
 
-  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+  std::lock_guard<std::recursive_mutex> lock(this->updateMutex);
 
   ignition::math::Pose3d clonePose;
   rendering::UserCameraPtr userCamera = gui::get_active_camera();
@@ -2177,7 +2184,7 @@ void ModelCreator::GenerateSDF()
   modelElem->ClearElements();
   modelElem->GetAttribute("name")->Set(this->folderName);
 
-  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+  std::lock_guard<std::recursive_mutex> lock(this->updateMutex);
 
   if (this->serverModelName.empty())
   {
@@ -2550,7 +2557,7 @@ void ModelCreator::ModelChanged()
 /////////////////////////////////////////////////
 void ModelCreator::Update()
 {
-  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+  std::lock_guard<std::recursive_mutex> lock(this->updateMutex);
 
   // Check if any links have been moved or resized and trigger ModelChanged
   for (auto &linksIt : this->allLinks)
@@ -2588,7 +2595,7 @@ void ModelCreator::Update()
 void ModelCreator::OnEntityScaleChanged(const std::string &_name,
   const math::Vector3 &_scale)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+  std::lock_guard<std::recursive_mutex> lock(this->updateMutex);
   for (auto linksIt : this->allLinks)
   {
     std::string linkName;
@@ -2693,7 +2700,7 @@ void ModelCreator::AddModelPlugin(const sdf::ElementPtr &_pluginElem)
 
     // Add to map
     {
-      boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+      std::lock_guard<std::recursive_mutex> lock(this->updateMutex);
       this->allModelPlugins[name] = modelPlugin;
     }
 
@@ -2720,7 +2727,7 @@ void ModelCreator::OnOpenModelPluginInspector(const QString &_name)
 /////////////////////////////////////////////////
 void ModelCreator::OpenModelPluginInspector(const std::string &_name)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+  std::lock_guard<std::recursive_mutex> lock(this->updateMutex);
 
   auto it = this->allModelPlugins.find(_name);
   if (it == this->allModelPlugins.end())

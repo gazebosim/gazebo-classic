@@ -36,7 +36,7 @@ class ModelCreator_TEST : public QTestFixture
 
   /// \brief Tests adding and removing model plugins
   private slots: void ModelPlugin();
-  
+
   /// \brief Tests selecting nested models in the model editor
   private slots: void NestedModelSelection();
 

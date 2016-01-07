@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_MODEL_CREATOR_HH_
-#define _GAZEBO_MODEL_CREATOR_HH_
+#ifndef _GAZEBO_GUI_MODEL_MODELCREATOR_HH_
+#define _GAZEBO_GUI_MODEL_MODELCREATOR_HH_
 
 #include <sdf/sdf.hh>
 
@@ -23,6 +23,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <mutex>
 
 #include "gazebo/common/KeyEvent.hh"
 #include "gazebo/common/MouseEvent.hh"
@@ -33,11 +34,6 @@
 #include "gazebo/gui/qt.h"
 
 #include "gazebo/util/system.hh"
-
-namespace boost
-{
-  class recursive_mutex;
-}
 
 namespace gazebo
 {
@@ -555,7 +551,7 @@ namespace gazebo
       private: enum SaveState currentSaveState;
 
       /// \brief Mutex to protect updates
-      private: boost::recursive_mutex *updateMutex;
+      private: std::recursive_mutex updateMutex;
 
       /// \brief A list of link names whose scale has changed externally.
       private: std::map<std::string, math::Vector3> linkScaleUpdate;
@@ -580,5 +576,4 @@ namespace gazebo
     /// \}
   }
 }
-
 #endif
