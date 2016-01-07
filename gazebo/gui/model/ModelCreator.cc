@@ -1362,7 +1362,7 @@ void ModelCreator::Reset()
   std::stringstream previewModelName;
   previewModelName << this->previewName << "_" << this->modelCounter++;
   this->previewVisual.reset(new rendering::Visual(previewModelName.str(),
-      scene->GetWorldVisual()));
+      scene->WorldVisual()));
 
   this->previewVisual->Load();
   this->modelPose = ignition::math::Pose3d::Zero;

@@ -235,7 +235,7 @@ void MultiCameraSensor::Render()
   }
 
   this->rendered = true;
-  this->lastMeasurementTime = this->scene->GetSimTime();
+  this->lastMeasurementTime = this->scene->SimTime();
 }
 
 //////////////////////////////////////////////////

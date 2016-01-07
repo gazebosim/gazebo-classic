@@ -58,3 +58,26 @@ TEST_F(GuiConversionsTest, Color)
   }
 }
 
+/////////////////////////////////////////////////
+TEST_F(GuiConversionsTest, Point2d)
+{
+  // Ignition to Qt to Ignition
+  {
+    double x = -0.5;
+    double y = 123;
+
+    ignition::math::Vector2d point(x, y);
+    EXPECT_EQ(gazebo::gui::Conversions::Convert(
+              gazebo::gui::Conversions::Convert(point)), point);
+  }
+
+  // Qt to Ignition to Qt
+  {
+    double x = -0.5;
+    double y = 123;
+
+    QPointF point(x, y);
+    EXPECT_EQ(gazebo::gui::Conversions::Convert(
+              gazebo::gui::Conversions::Convert(point)), point);
+  }
+}

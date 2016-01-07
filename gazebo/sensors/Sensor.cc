@@ -169,7 +169,7 @@ bool Sensor::NeedsUpdate()
 
   common::Time simTime;
   if (this->category == IMAGE && this->scene)
-    simTime = this->scene->GetSimTime();
+    simTime = this->scene->SimTime();
   else
     simTime = this->world->GetSimTime();
 
@@ -187,7 +187,7 @@ void Sensor::Update(const bool _force)
   {
     common::Time simTime;
     if (this->category == IMAGE && this->scene)
-      simTime = this->scene->GetSimTime();
+      simTime = this->scene->SimTime();
     else
       simTime = this->world->GetSimTime();
 
