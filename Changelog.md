@@ -1,5 +1,9 @@
 ## Gazebo 7.0
 
+1. Fix circular dependency so that physics does not call the sensors API.
+    * [Pull request #2089](https://bitbucket.org/osrf/gazebo/pull-request/2089)
+    * [Issue #1516](https://bitbucket.org/osrf/gazebo/issues/1516)
+
 1. Use opaque pointers and deprecate functions in the rendering library
     * [Pull request #2069](https://bitbucket.org/osrf/gazebo/pull-request/2069)
     * [Pull request #2064](https://bitbucket.org/osrf/gazebo/pull-request/2064)
