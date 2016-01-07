@@ -418,7 +418,8 @@ NestedModelData *ModelCreator::CreateModelFromSDF(
       nestedModelName = uniqueName;
 
     // Model Visual
-    modelVisual.reset(new rendering::Visual(nestedModelName, _parentVis));
+    modelVisual.reset(
+        new rendering::Visual(nestedModelName, _parentVis, false));
     modelVisual->Load();
     modelVisual->SetTransparency(ModelData::GetEditTransparency());
 
@@ -756,14 +757,14 @@ LinkData *ModelCreator::AddShape(EntityType _type,
   std::string linkName = linkNameStream.str();
 
   rendering::VisualPtr linkVisual(new rendering::Visual(linkName,
-      this->previewVisual));
+      this->previewVisual, false));
   linkVisual->Load();
   linkVisual->SetTransparency(ModelData::GetEditTransparency());
 
   std::ostringstream visualName;
   visualName << linkName << "::visual";
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
-      linkVisual));
+      linkVisual, false));
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->Root()
       ->GetElement("model")->GetElement("link")->GetElement("visual");
 
@@ -1065,7 +1066,8 @@ LinkData *ModelCreator::CreateLinkFromSDF(const sdf::ElementPtr &_linkElem,
   if (leafName.find("::") != std::string::npos)
     this->jointMaker->AddScopedLinkName(leafName);
 
-  rendering::VisualPtr linkVisual(new rendering::Visual(linkName, _parentVis));
+  rendering::VisualPtr linkVisual(
+      new rendering::Visual(linkName, _parentVis, false));
   linkVisual->Load();
   linkVisual->SetPose(link->Pose());
   link->linkVisual = linkVisual;
@@ -1098,7 +1100,7 @@ LinkData *ModelCreator::CreateLinkFromSDF(const sdf::ElementPtr &_linkElem,
           << std::endl;
     }
     rendering::VisualPtr visVisual(new rendering::Visual(visualName,
-        linkVisual));
+        linkVisual, false));
     visVisual->Load(visualElem);
 
     // Visual pose
@@ -1145,7 +1147,7 @@ LinkData *ModelCreator::CreateLinkFromSDF(const sdf::ElementPtr &_linkElem,
           collisionName << std::endl;
     }
     rendering::VisualPtr colVisual(new rendering::Visual(collisionName,
-        linkVisual));
+        linkVisual, false));
 
     // Collision pose
     math::Pose collisionPose;
@@ -1362,7 +1364,7 @@ void ModelCreator::Reset()
   std::stringstream previewModelName;
   previewModelName << this->previewName << "_" << this->modelCounter++;
   this->previewVisual.reset(new rendering::Visual(previewModelName.str(),
-      scene->WorldVisual()));
+      scene->WorldVisual(), false));
 
   this->previewVisual->Load();
   this->modelPose = ignition::math::Pose3d::Zero;
@@ -2221,14 +2223,15 @@ void ModelCreator::GenerateSDF()
   }
 
   // Update poses in case they changed
-  this->previewVisual->SetWorldPose(this->modelPose);
   for (auto &linksIt : this->allLinks)
   {
     LinkData *link = linksIt.second;
     if (link->nested)
       continue;
-    link->SetPose((link->linkVisual->GetWorldPose() - this->modelPose).Ign());
-    link->linkVisual->SetPose(link->Pose());
+    ignition::math::Pose3d linkPose =
+        link->linkVisual->GetWorldPose().Ign() - this->modelPose;
+    link->SetPose(linkPose);
+    link->linkVisual->SetPose(linkPose);
   }
   for (auto &nestedModelsIt : this->allNestedModels)
   {
@@ -2241,9 +2244,10 @@ void ModelCreator::GenerateSDF()
     if (modelData->Depth() != 2)
       continue;
 
-    modelData->SetPose(modelData->modelVisual->GetWorldPose().Ign() -
-        this->modelPose);
-    modelData->modelVisual->SetPose(modelData->Pose());
+    ignition::math::Pose3d nestedModelPose =
+        modelData->modelVisual->GetWorldPose().Ign() - this->modelPose;
+    modelData->SetPose(nestedModelPose);
+    modelData->modelVisual->SetPose(nestedModelPose);
   }
 
   // generate canonical link sdf first.
@@ -2319,6 +2323,9 @@ void ModelCreator::GenerateSDF()
   // Add plugin elements
   for (auto modelPlugin : this->allModelPlugins)
     modelElem->InsertElement(modelPlugin.second->modelPluginSDF->Clone());
+
+  // update root visual pose at the end after link, model, joint visuals
+  this->previewVisual->SetWorldPose(this->modelPose);
 }
 
 /////////////////////////////////////////////////
@@ -2330,8 +2337,7 @@ sdf::ElementPtr ModelCreator::GenerateLinkSDF(LinkData *_link)
   collisionNameStream.str("");
 
   sdf::ElementPtr newLinkElem = _link->linkSDF->Clone();
-  newLinkElem->GetElement("pose")->Set(_link->linkVisual->GetWorldPose()
-      - this->modelPose);
+  newLinkElem->GetElement("pose")->Set(_link->Pose());
 
   // visuals
   for (auto const &it : _link->visuals)
