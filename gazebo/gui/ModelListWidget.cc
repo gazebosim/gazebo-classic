@@ -21,17 +21,27 @@
   #include <Winsock2.h>
 #endif
 
+#include <functional>
+
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/message.h>
 
-#include <sdf/sdf.hh>
-
 #include <ignition/math/Angle.hh>
 
-#include "gazebo/common/Image.hh"
-#include "gazebo/common/SystemPaths.hh"
+#include <sdf/sdf.hh>
+
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Events.hh"
+#include "gazebo/common/Image.hh"
+#include "gazebo/common/SystemPaths.hh"
+
+#include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/gui/GuiIface.hh"
+#include "gazebo/gui/ModelListWidget.hh"
+#include "gazebo/gui/ModelListWidgetPrivate.hh"
+#include "gazebo/gui/ModelRightMenu.hh"
+#include "gazebo/gui/qtpropertybrowser/qttreepropertybrowser.h"
+#include "gazebo/gui/qtpropertybrowser/qtvariantproperty.h"
 
 #include "gazebo/rendering/Light.hh"
 #include "gazebo/rendering/RenderEvents.hh"
@@ -39,18 +49,9 @@
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Visual.hh"
-#include "gazebo/gui/GuiIface.hh"
 
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
-
-#include "gazebo/gui/GuiEvents.hh"
-#include "gazebo/gui/ModelRightMenu.hh"
-#include "gazebo/gui/qtpropertybrowser/qttreepropertybrowser.h"
-#include "gazebo/gui/qtpropertybrowser/qtvariantproperty.h"
-#include "gazebo/gui/ModelListWidget.hh"
-
-#include "ModelListWidgetPrivate.hh"
 
 // avoid collision from Mac OS X's ConditionalMacros.h
 #ifdef __MACH__
@@ -133,23 +134,28 @@ ModelListWidget::ModelListWidget(QWidget *_parent)
 
   this->dataPtr->connections.push_back(
       gui::Events::ConnectModelUpdate(
-        boost::bind(&ModelListWidget::OnModelUpdate, this, _1)));
+        std::bind(&ModelListWidget::OnModelUpdate, this,
+          std::placeholders::_1)));
 
   this->dataPtr->connections.push_back(
       gui::Events::ConnectLightUpdate(
-        boost::bind(&ModelListWidget::OnLightUpdate, this, _1)));
+        std::bind(&ModelListWidget::OnLightUpdate, this,
+          std::placeholders::_1)));
 
   this->dataPtr->connections.push_back(
       rendering::Events::ConnectCreateScene(
-        boost::bind(&ModelListWidget::OnCreateScene, this, _1)));
+        std::bind(&ModelListWidget::OnCreateScene, this,
+          std::placeholders::_1)));
 
   this->dataPtr->connections.push_back(
       rendering::Events::ConnectRemoveScene(
-        boost::bind(&ModelListWidget::OnRemoveScene, this, _1)));
+        std::bind(&ModelListWidget::OnRemoveScene, this,
+          std::placeholders::_1)));
 
   this->dataPtr->connections.push_back(
       event::Events::ConnectSetSelectedEntity(
-        boost::bind(&ModelListWidget::OnSetSelectedEntity, this, _1, _2)));
+        std::bind(&ModelListWidget::OnSetSelectedEntity, this,
+          std::placeholders::_1, std::placeholders::_2)));
 
   QTimer::singleShot(500, this, SLOT(Update()));
 }
@@ -254,10 +260,10 @@ void ModelListWidget::OnSetSelectedEntity(const std::string &_name,
   this->dataPtr->propTreeBrowser->clear();
   if (!this->dataPtr->selectedEntityName.empty())
   {
-    QTreeWidgetItem *mItem = this->GetListItem(
+    QTreeWidgetItem *mItem = this->ListItem(
       this->dataPtr->selectedEntityName,
       this->dataPtr->modelsItem);
-    QTreeWidgetItem *lItem = this->GetListItem(
+    QTreeWidgetItem *lItem = this->ListItem(
       this->dataPtr->selectedEntityName,
       this->dataPtr->lightsItem);
     if (mItem)
@@ -354,7 +360,7 @@ void ModelListWidget::ProcessModelMsgs()
   {
     std::string name = (*iter).name();
 
-    QTreeWidgetItem *listItem = this->GetListItem((*iter).name(),
+    QTreeWidgetItem *listItem = this->ListItem((*iter).name(),
                                                   this->dataPtr->modelsItem);
 
     if (!listItem)
@@ -506,7 +512,7 @@ void ModelListWidget::RemoveEntity(const std::string &_name)
 
   for (int i = 0; i < 2; ++i)
   {
-    QTreeWidgetItem *listItem = this->GetListItem(_name, items[i]);
+    QTreeWidgetItem *listItem = this->ListItem(_name, items[i]);
     if (listItem)
     {
       items[i]->takeChild(items[i]->indexOfChild(listItem));
@@ -520,7 +526,7 @@ void ModelListWidget::RemoveEntity(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-QTreeWidgetItem *ModelListWidget::GetListItem(const std::string &_name,
+QTreeWidgetItem *ModelListWidget::ListItem(const std::string &_name,
                                               QTreeWidgetItem *_parent)
 {
   QTreeWidgetItem *listItem = NULL;
@@ -659,17 +665,17 @@ void ModelListWidget::LightPropertyChanged(QtProperty * /*_item*/)
     {
       ignition::math::Pose3d pose;
       pose.Set(this->dataPtr->variantManager->value(
-                 this->GetChildItem((*iter), "x")).toDouble(),
+                 this->ChildItem((*iter), "x")).toDouble(),
                this->dataPtr->variantManager->value(
-                 this->GetChildItem((*iter), "y")).toDouble(),
+                 this->ChildItem((*iter), "y")).toDouble(),
                this->dataPtr->variantManager->value(
-                 this->GetChildItem((*iter), "z")).toDouble(),
+                 this->ChildItem((*iter), "z")).toDouble(),
                this->dataPtr->variantManager->value(
-                 this->GetChildItem((*iter), "roll")).toDouble(),
+                 this->ChildItem((*iter), "roll")).toDouble(),
                this->dataPtr->variantManager->value(
-                 this->GetChildItem((*iter), "pitch")).toDouble(),
+                 this->ChildItem((*iter), "pitch")).toDouble(),
                this->dataPtr->variantManager->value(
-                 this->GetChildItem((*iter), "yaw")).toDouble());
+                 this->ChildItem((*iter), "yaw")).toDouble());
       msgs::Set(msg.mutable_pose(), pose);
     }
     else if ((*iter)->propertyName().toStdString() == "range")
@@ -681,20 +687,20 @@ void ModelListWidget::LightPropertyChanged(QtProperty * /*_item*/)
     else if ((*iter)->propertyName().toStdString() == "attenuation")
     {
       msg.set_attenuation_constant(this->dataPtr->variantManager->value(
-            this->GetChildItem((*iter), "constant")).toDouble());
+            this->ChildItem((*iter), "constant")).toDouble());
       msg.set_attenuation_linear(this->dataPtr->variantManager->value(
-            this->GetChildItem((*iter), "linear")).toDouble());
+            this->ChildItem((*iter), "linear")).toDouble());
       msg.set_attenuation_quadratic(this->dataPtr->variantManager->value(
-            this->GetChildItem((*iter), "quadratic")).toDouble());
+            this->ChildItem((*iter), "quadratic")).toDouble());
     }
     else if ((*iter)->propertyName().toStdString() == "spot light")
     {
       msg.set_spot_inner_angle(this->dataPtr->variantManager->value(
-            this->GetChildItem((*iter), "inner angle")).toDouble());
+            this->ChildItem((*iter), "inner angle")).toDouble());
       msg.set_spot_outer_angle(this->dataPtr->variantManager->value(
-            this->GetChildItem((*iter), "outer angle")).toDouble());
+            this->ChildItem((*iter), "outer angle")).toDouble());
       msg.set_spot_falloff(this->dataPtr->variantManager->value(
-            this->GetChildItem((*iter), "falloff")).toDouble());
+            this->ChildItem((*iter), "falloff")).toDouble());
     }
   }
 
@@ -708,11 +714,11 @@ void ModelListWidget::LightPropertyChanged(QtProperty * /*_item*/)
 void ModelListWidget::GUIPropertyChanged(QtProperty *_item)
 {
   // Only camera pose editable for now
-  QtProperty *cameraProperty = this->GetChildItem("camera");
+  QtProperty *cameraProperty = this->ChildItem("camera");
   if (!cameraProperty)
     return;
 
-  QtProperty *cameraPoseProperty = this->GetChildItem(cameraProperty, "pose");
+  QtProperty *cameraPoseProperty = this->ChildItem(cameraProperty, "pose");
   if (!cameraPoseProperty)
     return;
 
@@ -754,20 +760,20 @@ void ModelListWidget::PhysicsPropertyChanged(QtProperty * /*_item*/)
     else if ((*iter)->propertyName().toStdString() == "solver")
     {
       msg.set_iters(this->dataPtr->variantManager->value(
-            this->GetChildItem((*iter), "iterations")).toInt());
+            this->ChildItem((*iter), "iterations")).toInt());
       msg.set_sor(this->dataPtr->variantManager->value(
-            this->GetChildItem((*iter), "SOR")).toDouble());
+            this->ChildItem((*iter), "SOR")).toDouble());
     }
     else if ((*iter)->propertyName().toStdString() == "constraints")
     {
       msg.set_cfm(this->dataPtr->variantManager->value(
-            this->GetChildItem((*iter), "CFM")).toDouble());
+            this->ChildItem((*iter), "CFM")).toDouble());
       msg.set_erp(this->dataPtr->variantManager->value(
-            this->GetChildItem((*iter), "ERP")).toDouble());
+            this->ChildItem((*iter), "ERP")).toDouble());
       msg.set_contact_max_correcting_vel(this->dataPtr->variantManager->value(
-            this->GetChildItem((*iter), "max velocity")).toDouble());
+            this->ChildItem((*iter), "max velocity")).toDouble());
       msg.set_contact_surface_layer(this->dataPtr->variantManager->value(
-            this->GetChildItem((*iter), "surface layer")).toDouble());
+            this->ChildItem((*iter), "surface layer")).toDouble());
     }
     else if ((*iter)->propertyName().toStdString() == "real time update rate")
     {
@@ -915,24 +921,24 @@ void ModelListWidget::FillMsgField(QtProperty *_item,
 void ModelListWidget::FillColorMsg(QtProperty *_item, msgs::Color *_msg)
 {
   _msg->set_r(this->dataPtr->variantManager->value(
-      this->GetChildItem(_item, "Red")).toDouble() / 255.0);
+      this->ChildItem(_item, "Red")).toDouble() / 255.0);
   _msg->set_g(this->dataPtr->variantManager->value(
-      this->GetChildItem(_item, "Green")).toDouble() / 255.0);
+      this->ChildItem(_item, "Green")).toDouble() / 255.0);
   _msg->set_b(this->dataPtr->variantManager->value(
-      this->GetChildItem(_item, "Blue")).toDouble() / 255.0);
+      this->ChildItem(_item, "Blue")).toDouble() / 255.0);
   _msg->set_a(this->dataPtr->variantManager->value(
-      this->GetChildItem(_item, "Alpha")).toDouble() / 255.0);
+      this->ChildItem(_item, "Alpha")).toDouble() / 255.0);
 }
 
 /////////////////////////////////////////////////
 void ModelListWidget::FillVector3Msg(QtProperty *_item, msgs::Vector3d *_msg)
 {
   _msg->set_x(this->dataPtr->variantManager->value(
-      this->GetChildItem(_item, "x")).toDouble());
+      this->ChildItem(_item, "x")).toDouble());
   _msg->set_y(this->dataPtr->variantManager->value(
-      this->GetChildItem(_item, "y")).toDouble());
+      this->ChildItem(_item, "y")).toDouble());
   _msg->set_z(this->dataPtr->variantManager->value(
-      this->GetChildItem(_item, "z")).toDouble());
+      this->ChildItem(_item, "z")).toDouble());
 }
 
 /////////////////////////////////////////////////
@@ -941,7 +947,7 @@ void ModelListWidget::FillGeometryMsg(QtProperty *_item,
     const google::protobuf::Descriptor *_descriptor,
     QtProperty * /*_changedItem*/)
 {
-  QtProperty *typeProperty = this->GetChildItem(_item, "type");
+  QtProperty *typeProperty = this->ChildItem(_item, "type");
 
   std::string type = typeProperty->valueText().toStdString();
   const google::protobuf::Reflection *reflection = _message->GetReflection();
@@ -958,14 +964,14 @@ void ModelListWidget::FillGeometryMsg(QtProperty *_item,
 
   if (type == "box")
   {
-    QtProperty *sizeProperty = this->GetChildItem(_item, "size");
+    QtProperty *sizeProperty = this->ChildItem(_item, "size");
     msgs::BoxGeom *boxMsg = (msgs::BoxGeom*)(message);
     double xValue = this->dataPtr->variantManager->value(
-        this->GetChildItem(sizeProperty, "x")).toDouble();
+        this->ChildItem(sizeProperty, "x")).toDouble();
     double yValue = this->dataPtr->variantManager->value(
-        this->GetChildItem(sizeProperty, "y")).toDouble();
+        this->ChildItem(sizeProperty, "y")).toDouble();
     double zValue = this->dataPtr->variantManager->value(
-        this->GetChildItem(sizeProperty, "z")).toDouble();
+        this->ChildItem(sizeProperty, "z")).toDouble();
 
     boxMsg->mutable_size()->set_x(xValue);
     boxMsg->mutable_size()->set_y(yValue);
@@ -973,7 +979,7 @@ void ModelListWidget::FillGeometryMsg(QtProperty *_item,
   }
   else if (type == "sphere")
   {
-    QtProperty *radiusProperty = this->GetChildItem(_item, "radius");
+    QtProperty *radiusProperty = this->ChildItem(_item, "radius");
     msgs::SphereGeom *sphereMsg = (msgs::SphereGeom*)(message);
 
     sphereMsg->set_radius(
@@ -981,8 +987,8 @@ void ModelListWidget::FillGeometryMsg(QtProperty *_item,
   }
   else if (type == "cylinder")
   {
-    QtProperty *radiusProperty = this->GetChildItem(_item, "radius");
-    QtProperty *lengthProperty = this->GetChildItem(_item, "length");
+    QtProperty *radiusProperty = this->ChildItem(_item, "radius");
+    QtProperty *lengthProperty = this->ChildItem(_item, "length");
 
     msgs::CylinderGeom *cylinderMsg = (msgs::CylinderGeom*)(message);
     cylinderMsg->set_radius(
@@ -992,15 +998,15 @@ void ModelListWidget::FillGeometryMsg(QtProperty *_item,
   }
   else if (type == "plane")
   {
-    QtProperty *normalProperty = this->GetChildItem(_item, "normal");
+    QtProperty *normalProperty = this->ChildItem(_item, "normal");
     msgs::PlaneGeom *planeMessage = (msgs::PlaneGeom*)(message);
 
     double xValue = this->dataPtr->variantManager->value(
-        this->GetChildItem(normalProperty, "x")).toDouble();
+        this->ChildItem(normalProperty, "x")).toDouble();
     double yValue = this->dataPtr->variantManager->value(
-        this->GetChildItem(normalProperty, "y")).toDouble();
+        this->ChildItem(normalProperty, "y")).toDouble();
     double zValue = this->dataPtr->variantManager->value(
-        this->GetChildItem(normalProperty, "z")).toDouble();
+        this->ChildItem(normalProperty, "z")).toDouble();
 
     planeMessage->mutable_normal()->set_x(xValue);
     planeMessage->mutable_normal()->set_y(yValue);
@@ -1008,11 +1014,11 @@ void ModelListWidget::FillGeometryMsg(QtProperty *_item,
   }
   else if (type == "image")
   {
-    QtProperty *fileProp = this->GetChildItem(_item, "filename");
-    QtProperty *scaleProp = this->GetChildItem(_item, "scale");
-    QtProperty *heightProp = this->GetChildItem(_item, "height");
-    QtProperty *thresholdProp = this->GetChildItem(_item, "threshold");
-    QtProperty *granularityProp = this->GetChildItem(_item, "granularity");
+    QtProperty *fileProp = this->ChildItem(_item, "filename");
+    QtProperty *scaleProp = this->ChildItem(_item, "scale");
+    QtProperty *heightProp = this->ChildItem(_item, "height");
+    QtProperty *thresholdProp = this->ChildItem(_item, "threshold");
+    QtProperty *granularityProp = this->ChildItem(_item, "granularity");
 
     msgs::ImageGeom *imageMessage = (msgs::ImageGeom*)(message);
     imageMessage->set_uri(
@@ -1028,9 +1034,9 @@ void ModelListWidget::FillGeometryMsg(QtProperty *_item,
   }
   else if (type == "heightmap")
   {
-    QtProperty *sizeProp = this->GetChildItem(_item, "size");
-    QtProperty *offsetProp = this->GetChildItem(_item, "offset");
-    QtProperty *fileProp = this->GetChildItem(_item, "filename");
+    QtProperty *sizeProp = this->ChildItem(_item, "size");
+    QtProperty *offsetProp = this->ChildItem(_item, "offset");
+    QtProperty *fileProp = this->ChildItem(_item, "filename");
 
     double px, py, pz;
     msgs::HeightmapGeom *heightmapMessage = (msgs::HeightmapGeom*)(message);
@@ -1040,22 +1046,22 @@ void ModelListWidget::FillGeometryMsg(QtProperty *_item,
             fileProp).toString().toStdString()));
 
     px = this->dataPtr->variantManager->value(
-         this->GetChildItem(sizeProp, "x")).toDouble();
+         this->ChildItem(sizeProp, "x")).toDouble();
     py = this->dataPtr->variantManager->value(
-         this->GetChildItem(sizeProp, "y")).toDouble();
+         this->ChildItem(sizeProp, "y")).toDouble();
     pz = this->dataPtr->variantManager->value(
-         this->GetChildItem(sizeProp, "z")).toDouble();
+         this->ChildItem(sizeProp, "z")).toDouble();
 
     heightmapMessage->mutable_size()->set_x(px);
     heightmapMessage->mutable_size()->set_y(py);
     heightmapMessage->mutable_size()->set_z(pz);
 
     px = this->dataPtr->variantManager->value(
-         this->GetChildItem(offsetProp, "x")).toDouble();
+         this->ChildItem(offsetProp, "x")).toDouble();
     py = this->dataPtr->variantManager->value(
-         this->GetChildItem(offsetProp, "y")).toDouble();
+         this->ChildItem(offsetProp, "y")).toDouble();
     pz = this->dataPtr->variantManager->value(
-         this->GetChildItem(offsetProp, "z")).toDouble();
+         this->ChildItem(offsetProp, "z")).toDouble();
 
     heightmapMessage->mutable_origin()->set_x(px);
     heightmapMessage->mutable_origin()->set_y(py);
@@ -1063,8 +1069,8 @@ void ModelListWidget::FillGeometryMsg(QtProperty *_item,
   }
   else if (type == "mesh")
   {
-    QtProperty *sizeProp = this->GetChildItem(_item, "scale");
-    QtProperty *fileProp = this->GetChildItem(_item, "filename");
+    QtProperty *sizeProp = this->ChildItem(_item, "scale");
+    QtProperty *fileProp = this->ChildItem(_item, "filename");
 
     double px, py, pz;
     msgs::MeshGeom *meshMessage = (msgs::MeshGeom*)(message);
@@ -1072,11 +1078,11 @@ void ModelListWidget::FillGeometryMsg(QtProperty *_item,
           fileProp).toString().toStdString());
 
     px = this->dataPtr->variantManager->value(
-         this->GetChildItem(sizeProp, "x")).toDouble();
+         this->ChildItem(sizeProp, "x")).toDouble();
     py = this->dataPtr->variantManager->value(
-         this->GetChildItem(sizeProp, "y")).toDouble();
+         this->ChildItem(sizeProp, "y")).toDouble();
     pz = this->dataPtr->variantManager->value(
-         this->GetChildItem(sizeProp, "z")).toDouble();
+         this->ChildItem(sizeProp, "z")).toDouble();
 
     meshMessage->mutable_scale()->set_x(px);
     meshMessage->mutable_scale()->set_y(py);
@@ -1112,20 +1118,20 @@ void ModelListWidget::FillPoseMsg(QtProperty *_item,
       _message, orientField);
   orientReflection = orientMessage->GetReflection();
 
-  this->FillMsgField(this->GetChildItem(_item, "x"), posMessage, posReflection,
+  this->FillMsgField(this->ChildItem(_item, "x"), posMessage, posReflection,
       posDescriptor->FindFieldByName("x"));
-  this->FillMsgField(this->GetChildItem(_item, "y"), posMessage, posReflection,
+  this->FillMsgField(this->ChildItem(_item, "y"), posMessage, posReflection,
       posDescriptor->FindFieldByName("y"));
-  this->FillMsgField(this->GetChildItem(_item, "z"), posMessage, posReflection,
+  this->FillMsgField(this->ChildItem(_item, "z"), posMessage, posReflection,
       posDescriptor->FindFieldByName("z"));
 
   double roll, pitch, yaw;
   roll = this->dataPtr->variantManager->value(
-      this->GetChildItem(_item, "roll")).toDouble();
+      this->ChildItem(_item, "roll")).toDouble();
   pitch = this->dataPtr->variantManager->value(
-      this->GetChildItem(_item, "pitch")).toDouble();
+      this->ChildItem(_item, "pitch")).toDouble();
   yaw = this->dataPtr->variantManager->value(
-      this->GetChildItem(_item, "yaw")).toDouble();
+      this->ChildItem(_item, "yaw")).toDouble();
   ignition::math::Quaterniond q(roll, pitch, yaw);
 
   orientReflection->SetDouble(
@@ -1157,17 +1163,17 @@ void ModelListWidget::FillMsg(QtProperty *_item,
 
   if (_item->propertyName().toStdString() == "link")
   {
-    QtProperty *nameItem = this->GetChildItem(_item, "name");
+    QtProperty *nameItem = this->ChildItem(_item, "name");
     QtVariantProperty *idItem =
-        dynamic_cast<QtVariantProperty *>(this->GetChildItem(_item, "id"));
+        dynamic_cast<QtVariantProperty *>(this->ChildItem(_item, "id"));
     ((msgs::Link*)(_message))->set_name(nameItem->valueText().toStdString());
     ((msgs::Link*)(_message))->set_id(idItem->value().toInt());
   }
   else if (_item->propertyName().toStdString() == "collision")
   {
-    QtProperty *nameItem = this->GetChildItem(_item, "name");
+    QtProperty *nameItem = this->ChildItem(_item, "name");
     QtVariantProperty *idItem =
-        dynamic_cast<QtVariantProperty *>(this->GetChildItem(_item, "id"));
+        dynamic_cast<QtVariantProperty *>(this->ChildItem(_item, "id"));
     ((msgs::Collision*)_message)->set_name(nameItem->valueText().toStdString());
     ((msgs::Collision*)(_message))->set_id(idItem->value().toInt());
   }
@@ -1245,7 +1251,7 @@ QtProperty *ModelListWidget::PopChildItem(QList<QtProperty*> &_list,
 }
 
 /////////////////////////////////////////////////
-QtProperty *ModelListWidget::GetParentItemValue(const std::string &_name)
+QtProperty *ModelListWidget::ParentItemValue(const std::string &_name)
 {
   QtProperty *result = NULL;
 
@@ -1255,7 +1261,7 @@ QtProperty *ModelListWidget::GetParentItemValue(const std::string &_name)
   {
     if ((*iter)->valueText().toStdString() == _name)
       return NULL;
-    else if ((result = this->GetParentItemValue(*iter, _name)) != NULL)
+    else if ((result = this->ParentItemValue(*iter, _name)) != NULL)
       break;
   }
 
@@ -1263,8 +1269,8 @@ QtProperty *ModelListWidget::GetParentItemValue(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-QtProperty *ModelListWidget::GetParentItemValue(QtProperty *_item,
-                                           const std::string &_name)
+QtProperty *ModelListWidget::ParentItemValue(QtProperty *_item,
+                                             const std::string &_name)
 {
   if (!_item)
     return NULL;
@@ -1280,7 +1286,7 @@ QtProperty *ModelListWidget::GetParentItemValue(QtProperty *_item,
       result = _item;
       break;
     }
-    else if ((result = this->GetParentItemValue(*iter, _name)) != NULL)
+    else if ((result = this->ParentItemValue(*iter, _name)) != NULL)
       break;
   }
 
@@ -1288,7 +1294,7 @@ QtProperty *ModelListWidget::GetParentItemValue(QtProperty *_item,
 }
 
 /////////////////////////////////////////////////
-QtProperty *ModelListWidget::GetParentItem(const std::string &_name)
+QtProperty *ModelListWidget::ParentItem(const std::string &_name)
 {
   QtProperty *result = NULL;
 
@@ -1298,7 +1304,7 @@ QtProperty *ModelListWidget::GetParentItem(const std::string &_name)
   {
     if ((*iter)->propertyName().toStdString() == _name)
       return NULL;
-    else if ((result = this->GetParentItem(*iter, _name)) != NULL)
+    else if ((result = this->ParentItem(*iter, _name)) != NULL)
       break;
   }
 
@@ -1306,8 +1312,8 @@ QtProperty *ModelListWidget::GetParentItem(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-QtProperty *ModelListWidget::GetParentItem(QtProperty *_item,
-                                           const std::string &_name)
+QtProperty *ModelListWidget::ParentItem(QtProperty *_item,
+                                        const std::string &_name)
 {
   if (!_item)
     return NULL;
@@ -1323,7 +1329,7 @@ QtProperty *ModelListWidget::GetParentItem(QtProperty *_item,
       result = _item;
       break;
     }
-    else if ((result = this->GetParentItem(*iter, _name)) != NULL)
+    else if ((result = this->ParentItem(*iter, _name)) != NULL)
       break;
   }
 
@@ -1351,7 +1357,7 @@ bool ModelListWidget::HasChildItem(QtProperty *_parent, QtProperty *_child)
 }
 
 /////////////////////////////////////////////////
-QtProperty *ModelListWidget::GetChildItemValue(const std::string &_name)
+QtProperty *ModelListWidget::ChildItemValue(const std::string &_name)
 {
   QtProperty *result = NULL;
 
@@ -1359,7 +1365,7 @@ QtProperty *ModelListWidget::GetChildItemValue(const std::string &_name)
   for (QList<QtProperty*>::iterator iter = properties.begin();
       iter != properties.end(); ++iter)
   {
-    if ((result = this->GetChildItemValue(*iter, _name)) != NULL)
+    if ((result = this->ChildItemValue(*iter, _name)) != NULL)
       break;
   }
 
@@ -1367,7 +1373,7 @@ QtProperty *ModelListWidget::GetChildItemValue(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-QtProperty *ModelListWidget::GetChildItemValue(QtProperty *_item,
+QtProperty *ModelListWidget::ChildItemValue(QtProperty *_item,
                                           const std::string &_name)
 {
   if (!_item)
@@ -1380,7 +1386,7 @@ QtProperty *ModelListWidget::GetChildItemValue(QtProperty *_item,
   for (QList<QtProperty*>::iterator iter = subProperties.begin();
       iter != subProperties.end(); ++iter)
   {
-    if ((result = this->GetChildItem(*iter, _name)) != NULL)
+    if ((result = this->ChildItem(*iter, _name)) != NULL)
       break;
   }
 
@@ -1388,7 +1394,7 @@ QtProperty *ModelListWidget::GetChildItemValue(QtProperty *_item,
 }
 
 /////////////////////////////////////////////////
-QtProperty *ModelListWidget::GetChildItem(const std::string &_name)
+QtProperty *ModelListWidget::ChildItem(const std::string &_name)
 {
   QtProperty *result = NULL;
 
@@ -1396,7 +1402,7 @@ QtProperty *ModelListWidget::GetChildItem(const std::string &_name)
   for (QList<QtProperty*>::iterator iter = properties.begin();
       iter != properties.end(); ++iter)
   {
-    if ((result = this->GetChildItem(*iter, _name)) != NULL)
+    if ((result = this->ChildItem(*iter, _name)) != NULL)
       break;
   }
 
@@ -1404,8 +1410,8 @@ QtProperty *ModelListWidget::GetChildItem(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-QtProperty *ModelListWidget::GetChildItem(QtProperty *_item,
-                                          const std::string &_name)
+QtProperty *ModelListWidget::ChildItem(QtProperty *_item,
+                                       const std::string &_name)
 {
   if (!_item)
     return NULL;
@@ -1417,7 +1423,7 @@ QtProperty *ModelListWidget::GetChildItem(QtProperty *_item,
   for (QList<QtProperty*>::iterator iter = subProperties.begin();
       iter != subProperties.end(); ++iter)
   {
-    if ((result = this->GetChildItem(*iter, _name)) != NULL)
+    if ((result = this->ChildItem(*iter, _name)) != NULL)
       break;
   }
 
@@ -2333,7 +2339,7 @@ void ModelListWidget::FillVector3dProperty(const msgs::Vector3d &_msg,
   value.Round(6);
 
   // Add X value
-  item = static_cast<QtVariantProperty*>(this->GetChildItem(_parent, "x"));
+  item = static_cast<QtVariantProperty*>(this->ChildItem(_parent, "x"));
   if (!item)
   {
     item = this->dataPtr->variantManager->addProperty(QVariant::Double, "x");
@@ -2345,7 +2351,7 @@ void ModelListWidget::FillVector3dProperty(const msgs::Vector3d &_msg,
   item->setValue(value.X());
 
   // Add Y value
-  item = static_cast<QtVariantProperty*>(this->GetChildItem(_parent, "y"));
+  item = static_cast<QtVariantProperty*>(this->ChildItem(_parent, "y"));
   if (!item)
   {
     item = this->dataPtr->variantManager->addProperty(QVariant::Double, "y");
@@ -2357,7 +2363,7 @@ void ModelListWidget::FillVector3dProperty(const msgs::Vector3d &_msg,
   item->setValue(value.Y());
 
   // Add Z value
-  item = static_cast<QtVariantProperty*>(this->GetChildItem(_parent, "z"));
+  item = static_cast<QtVariantProperty*>(this->ChildItem(_parent, "z"));
   if (!item)
   {
     item = this->dataPtr->variantManager->addProperty(QVariant::Double, "z");
@@ -2391,7 +2397,7 @@ void ModelListWidget::FillPoseProperty(const msgs::Pose &_msg,
   this->FillVector3dProperty(_msg.position(), _parent);
 
   // Add Roll value
-  item = static_cast<QtVariantProperty*>(this->GetChildItem(_parent, "roll"));
+  item = static_cast<QtVariantProperty*>(this->ChildItem(_parent, "roll"));
   if (!item)
   {
     item = this->dataPtr->variantManager->addProperty(QVariant::Double, "roll");
@@ -2406,7 +2412,7 @@ void ModelListWidget::FillPoseProperty(const msgs::Pose &_msg,
   item->setValue(rpy.X());
 
   // Add Pitch value
-  item = static_cast<QtVariantProperty*>(this->GetChildItem(_parent, "pitch"));
+  item = static_cast<QtVariantProperty*>(this->ChildItem(_parent, "pitch"));
   if (!item)
   {
     item = this->dataPtr->variantManager->addProperty(QVariant::Double,
@@ -2422,7 +2428,7 @@ void ModelListWidget::FillPoseProperty(const msgs::Pose &_msg,
   item->setValue(rpy.Y());
 
   // Add Yaw value
-  item = static_cast<QtVariantProperty*>(this->GetChildItem(_parent, "yaw"));
+  item = static_cast<QtVariantProperty*>(this->ChildItem(_parent, "yaw"));
   if (!item)
   {
     item = this->dataPtr->variantManager->addProperty(QVariant::Double, "yaw");
@@ -2931,7 +2937,7 @@ void ModelListWidget::ProcessLightMsgs()
   {
     std::string name = (*iter).name();
 
-    QTreeWidgetItem *listItem = this->GetListItem((*iter).name(),
+    QTreeWidgetItem *listItem = this->ListItem((*iter).name(),
                                                   this->dataPtr->lightsItem);
 
     if (!listItem)

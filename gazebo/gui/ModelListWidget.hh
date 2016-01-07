@@ -14,23 +14,22 @@
  * limitations under the License.
  *
  */
-#ifndef _MODEL_LIST_WIDGET_HH_
-#define _MODEL_LIST_WIDGET_HH_
+#ifndef _GAZEBO_GUI_MODEL_LIST_WIDGET_HH_
+#define _GAZEBO_GUI_MODEL_LIST_WIDGET_HH_
 
+#include <memory>
 #include <string>
-#include <list>
-#include <vector>
-#include <deque>
-#include <sdf/sdf.hh>
+#include <QItemDelegate>
+#include <QObject>
+#include <QWidget>
 
-#include "gazebo/gui/qt.h"
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/transport/TransportTypes.hh"
-#include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/util/system.hh"
 
-class QtProperty;
 class QtBrowserItem;
+class QtProperty;
+class QTreeView;
+class QTreeWidgetItem;
 
 namespace gazebo
 {
@@ -72,9 +71,9 @@ namespace gazebo
                    const google::protobuf::FieldDescriptor *_field);
 
       private: void FillMsg(QtProperty *_item,
-                   google::protobuf::Message *_message,
-                   const google::protobuf::Descriptor *_descriptor,
-                   QtProperty *_changedItem);
+                            google::protobuf::Message *_message,
+                            const google::protobuf::Descriptor *_descriptor,
+                            QtProperty *_changedItem);
 
       private: void FillGeometryMsg(QtProperty *_item,
                    google::protobuf::Message *_message,
@@ -92,28 +91,28 @@ namespace gazebo
       private: QtProperty *PopChildItem(QList<QtProperty*> &_list,
                                         const std::string &_name);
 
-      private: QtProperty *GetParentItemValue(const std::string &_name);
-      private: QtProperty *GetParentItemValue(QtProperty *_item,
+      private: QtProperty *ParentItemValue(const std::string &_name);
+      private: QtProperty *ParentItemValue(QtProperty *_item,
                                            const std::string &_name);
 
-      private: QtProperty *GetParentItem(const std::string &_name);
-      private: QtProperty *GetParentItem(QtProperty *_item,
-                                           const std::string &_name);
+      private: QtProperty *ParentItem(const std::string &_name);
+      private: QtProperty *ParentItem(QtProperty *_item,
+                                      const std::string &_name);
 
-      private: QtProperty *GetChildItemValue(const std::string &_name);
-      private: QtProperty *GetChildItemValue(QtProperty *_item,
-                                             const std::string &_name);
+      private: QtProperty *ChildItemValue(const std::string &_name);
+      private: QtProperty *ChildItemValue(QtProperty *_item,
+                                          const std::string &_name);
 
-      private: QtProperty *GetChildItem(const std::string &_name);
-      private: QtProperty *GetChildItem(QtProperty *_item,
-                                        const std::string &_name);
+      private: QtProperty *ChildItem(const std::string &_name);
+      private: QtProperty *ChildItem(QtProperty *_item,
+                                     const std::string &_name);
 
       private: bool HasChildItem(QtProperty *_parent, QtProperty *_child);
 
       private: void RemoveEntity(const std::string &_name);
 
-      private: QTreeWidgetItem *GetListItem(const std::string &_name,
-                                            QTreeWidgetItem *_parent);
+      private: QTreeWidgetItem *ListItem(const std::string &_name,
+                                         QTreeWidgetItem *_parent);
 
       private: void FillPropertyTree(const msgs::Model &_msg,
                                      QtProperty *_parent);

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  */
-#ifndef _MODEL_LIST_WIDGET_PRIVATE_HH_
-#define _MODEL_LIST_WIDGET_PRIVATE_HH_
+#ifndef _GAZEBO_GUI_MODEL_LIST_WIDGET_PRIVATE_HH_
+#define _GAZEBO_GUI_MODEL_LIST_WIDGET_PRIVATE_HH_
 
 #include <string>
 #include <list>
@@ -26,8 +26,11 @@
 #include "gazebo/gui/qt.h"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportTypes.hh"
-#include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/util/system.hh"
+
+class QtTreePropertyBrowser;
+class QtVariantEditorFactory;
+class QtVariantPropertyManager;
 
 namespace gazebo
 {
