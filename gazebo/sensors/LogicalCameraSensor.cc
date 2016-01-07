@@ -19,8 +19,7 @@
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
-
-#include <boost/algorithm/string.hpp>
+#include <regex>
 #include "gazebo/transport/transport.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/World.hh"
@@ -69,7 +68,7 @@ std::string LogicalCameraSensor::GetTopic() const
 {
   std::string topicName = "~/" + this->ParentName() + "/" + this->Name() +
     "/models";
-  boost::replace_all(topicName, "::", "/");
+  topicName = std::regex_replace(topicName, std::regex("::"), std::string("/"));
 
   return topicName;
 }

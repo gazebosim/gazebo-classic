@@ -110,6 +110,8 @@ void WirelessReceiver_TEST::TestCreateWirelessReceiver()
 }
 
 /////////////////////////////////////////////////
+/// \brief Create a sensor with an illegal value and checks that an exception
+/// is thrown
 void WirelessReceiver_TEST::CheckIllegalValue(std::string _sensorString)
 {
   sdf::readString(_sensorString, this->sdf);

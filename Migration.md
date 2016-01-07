@@ -368,9 +368,9 @@ release will remove the deprecated code.
     + ***Replacement:** public: virtual std::string Topic() const;
     + ***Deprecation:** public: rendering::GpuLaserPtr GetLaserCamera() const
     + ***Replacement:** public: rendering::GpuLaserPtr LaserCamera() const;
-    + ***Deprecation:** public: double GetAngleResolution() const
+    + ***Deprecation:** public: double GetAngleResolution() const 
     + ***Replacement:** public: double AngleResolution() const;
-    + ***Deprecation:** public: double GetRangeMin() const
+    + ***Deprecation:** public: double GetRangeMin() const 
     + ***Replacement:** public: double RangeMin() const;
     + ***Deprecation:** public: double GetRangeMax() const
     + ***Replacement:** public: double RangeMax() const;
@@ -524,7 +524,7 @@ release will remove the deprecated code.
 1. **gazebo/sensors/WirelessTransmitter.hh**
     + ***Deprecation:** public: std::string GetESSID() const
     + ***Replacement:** public: std::string ESSID() const;
-    + ***Deprecation:** public: double GetFreq() const
+    + ***Deprecation:** public: double GetFreq() const 
     + ***Replacement:** public: double Freq() const;
 
 1. **gazebo/rendering/ApplyWrenchVisual.hh**
