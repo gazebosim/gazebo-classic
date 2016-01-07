@@ -236,7 +236,7 @@ void JointMaker::RemoveJoint(const std::string &_jointId)
 
   if (joint->handles)
   {
-    scene->GetManager()->destroyBillboardSet(joint->handles);
+    scene->OgreSceneManager()->destroyBillboardSet(joint->handles);
     joint->handles = NULL;
   }
 
@@ -764,7 +764,8 @@ std::string JointMaker::CreateHotSpot(JointData *_joint)
   // create a cylinder to represent the joint
   hotspotVisual->InsertMesh("unit_cylinder");
   Ogre::MovableObject *hotspotObj =
-      (Ogre::MovableObject*)(camera->GetScene()->GetManager()->createEntity(
+      (Ogre::MovableObject*)(
+      camera->GetScene()->OgreSceneManager()->createEntity(
       _joint->visual->GetName(), "unit_cylinder"));
   hotspotObj->getUserObjectBindings().setUserAny(Ogre::Any(jointId));
   hotspotVisual->GetSceneNode()->attachObject(hotspotObj);
@@ -773,7 +774,7 @@ std::string JointMaker::CreateHotSpot(JointData *_joint)
 
   // create a handle at the parent end
   Ogre::BillboardSet *handleSet =
-      camera->GetScene()->GetManager()->createBillboardSet(1);
+      camera->GetScene()->OgreSceneManager()->createBillboardSet(1);
   handleSet->setAutoUpdate(true);
   handleSet->setMaterialName("Gazebo/PointHandle");
   Ogre::MaterialPtr mat =

@@ -92,13 +92,13 @@ void DepthCamera::Fini()
 void DepthCamera::CreateDepthTexture(const std::string &_textureName)
 {
   // Create the depth buffer
-  std::string depthMaterialName = this->GetName() + "_RttMat_Camera_Depth";
+  std::string depthMaterialName = this->Name() + "_RttMat_Camera_Depth";
 
   this->depthTexture = Ogre::TextureManager::getSingleton().createManual(
       _textureName,
       Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
       Ogre::TEX_TYPE_2D,
-      this->GetImageWidth(), this->GetImageHeight(), 0,
+      this->ImageWidth(), this->ImageHeight(), 0,
       Ogre::PF_FLOAT32_R,
       Ogre::TU_RENDERTARGET).getPointer();
 
@@ -135,7 +135,7 @@ void DepthCamera::CreateDepthTexture(const std::string &_textureName)
         _textureName + "_pcd",
         "General",
         Ogre::TEX_TYPE_2D,
-        this->GetImageWidth(), this->GetImageHeight(), 0,
+        this->ImageWidth(), this->ImageHeight(), 0,
         Ogre::PF_FLOAT32_RGBA,
         Ogre::TU_RENDERTARGET).getPointer();
 
@@ -147,7 +147,7 @@ void DepthCamera::CreateDepthTexture(const std::string &_textureName)
         this->dataPtr->pcdTarget->addViewport(this->camera);
     this->dataPtr->pcdViewport->setClearEveryFrame(true);
     this->dataPtr->pcdViewport->setBackgroundColour(
-        Conversions::Convert(this->scene->GetBackgroundColor()));
+        Conversions::Convert(this->scene->BackgroundColor()));
     this->dataPtr->pcdViewport->setOverlaysEnabled(false);
     this->dataPtr->pcdViewport->setVisibilityMask(
         GZ_VISIBILITY_ALL & ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
@@ -189,8 +189,8 @@ void DepthCamera::PostRender()
 
   if (this->newData && this->captureData)
   {
-    unsigned int width = this->GetImageWidth();
-    unsigned int height = this->GetImageHeight();
+    unsigned int width = this->ImageWidth();
+    unsigned int height = this->ImageHeight();
 
     if (!this->dataPtr->outputPoints)
     {
@@ -254,10 +254,10 @@ void DepthCamera::UpdateRenderTarget(Ogre::RenderTarget *_target,
 {
   Ogre::RenderSystem *renderSys;
   Ogre::Viewport *vp = NULL;
-  Ogre::SceneManager *sceneMgr = this->scene->GetManager();
+  Ogre::SceneManager *sceneMgr = this->scene->OgreSceneManager();
   Ogre::Pass *pass;
 
-  renderSys = this->scene->GetManager()->getDestinationRenderSystem();
+  renderSys = this->scene->OgreSceneManager()->getDestinationRenderSystem();
   // Get pointer to the material pass
   pass = _material->getBestTechnique()->getPass(0);
 
@@ -265,7 +265,7 @@ void DepthCamera::UpdateRenderTarget(Ogre::RenderTarget *_target,
   // OgreSceneManager::_render function automatically sets farClip to 0.
   // Which normally equates to infinite distance. We don't want this. So
   // we have to set the distance every time.
-  this->GetOgreCamera()->setFarClipDistance(this->GetFarClip());
+  this->OgreCamera()->setFarClipDistance(this->FarClip());
 
   Ogre::AutoParamDataSource autoParamDataSource;
 
@@ -284,15 +284,15 @@ void DepthCamera::UpdateRenderTarget(Ogre::RenderTarget *_target,
   autoParamDataSource.setCurrentViewport(vp);
   autoParamDataSource.setCurrentRenderTarget(_target);
   autoParamDataSource.setCurrentSceneManager(sceneMgr);
-  autoParamDataSource.setCurrentCamera(this->GetOgreCamera(), true);
+  autoParamDataSource.setCurrentCamera(this->OgreCamera(), true);
 
   renderSys->setLightingEnabled(false);
   renderSys->_setFog(Ogre::FOG_NONE);
 
   // These two lines don't seem to do anything useful
   renderSys->_setProjectionMatrix(
-      this->GetOgreCamera()->getProjectionMatrixRS());
-  renderSys->_setViewMatrix(this->GetOgreCamera()->getViewMatrix(true));
+      this->OgreCamera()->getProjectionMatrixRS());
+  renderSys->_setViewMatrix(this->OgreCamera()->getViewMatrix(true));
 
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR == 6
   pass->_updateAutoParamsNoLights(&autoParamDataSource);
@@ -333,7 +333,7 @@ void DepthCamera::UpdateRenderTarget(Ogre::RenderTarget *_target,
 //////////////////////////////////////////////////
 void DepthCamera::RenderImpl()
 {
-  Ogre::SceneManager *sceneMgr = this->scene->GetManager();
+  Ogre::SceneManager *sceneMgr = this->scene->OgreSceneManager();
 
   Ogre::ShadowTechnique shadowTech = sceneMgr->getShadowTechnique();
 
@@ -390,7 +390,7 @@ void DepthCamera::SetDepthTarget(Ogre::RenderTarget *_target)
     this->depthViewport = this->depthTarget->addViewport(this->camera);
     this->depthViewport->setClearEveryFrame(true);
     this->depthViewport->setBackgroundColour(
-        Conversions::Convert(this->scene->GetBackgroundColor()));
+        Conversions::Convert(this->scene->BackgroundColor()));
     this->depthViewport->setVisibilityMask(
         GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_GUI);
 
