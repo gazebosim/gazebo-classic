@@ -35,6 +35,9 @@ class WirelessReceiver_TEST : public ServerFixture
   public: void TestIllegalSensitivity();
   public: void TestUpdateImpl();
 
+  /// \brief Create a sensor with an illegal value and check that an exception
+  /// is thrown
+  /// \param[in] _sensorString Sensor SDF string
   private: void CheckIllegalValue(std::string _sensorString);
 
   private: sensors::SensorManager *mgr;
@@ -86,7 +89,7 @@ void WirelessReceiver_TEST::TestCreateWirelessReceiver()
 
   // Get a pointer to the wireless receiver sensor
   sensors::WirelessReceiverPtr sensor =
-    boost::dynamic_pointer_cast<sensors::WirelessReceiver>(
+    std::dynamic_pointer_cast<sensors::WirelessReceiver>(
         this->mgr->GetSensor(sensorName));
 
   // Make sure the above dynamic cast worked.
@@ -102,8 +105,6 @@ void WirelessReceiver_TEST::TestCreateWirelessReceiver()
 }
 
 /////////////////////////////////////////////////
-/// \brief Create a sensor with an illegal value and checks that an exception
-/// is thrown
 void WirelessReceiver_TEST::CheckIllegalValue(std::string _sensorString)
 {
   sdf::readString(_sensorString, this->sdf);
@@ -226,7 +227,7 @@ void WirelessReceiver_TEST::TestUpdateImpl()
 
   // Get a pointer to the wireless receiver sensor
   sensors::WirelessReceiverPtr sensor =
-    boost::dynamic_pointer_cast<sensors::WirelessReceiver>(
+    std::dynamic_pointer_cast<sensors::WirelessReceiver>(
         this->mgr->GetSensor(sensorName));
 
   // Make sure the above dynamic cast worked.

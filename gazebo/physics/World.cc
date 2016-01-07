@@ -674,7 +674,7 @@ void World::Step()
     else
     {
       // Flush the log record buffer, if there is data in it.
-      if (util::LogRecord::Instance()->GetBufferSize() > 0)
+      if (util::LogRecord::Instance()->BufferSize() > 0)
         util::LogRecord::Instance()->Notify();
       this->dataPtr->pauseTime += stepTime;
     }
@@ -754,7 +754,7 @@ void World::Update()
   DIAG_TIMER_LAP("World::Update", "PhysicsEngine::UpdateCollision");
 
   // Wait for logging to finish, if it's running.
-  if (util::LogRecord::Instance()->GetRunning())
+  if (util::LogRecord::Instance()->Running())
   {
     boost::mutex::scoped_lock lock(this->dataPtr->logMutex);
 
@@ -796,7 +796,7 @@ void World::Update()
   }
 
   // Only update state information if logging data.
-  if (util::LogRecord::Instance()->GetRunning())
+  if (util::LogRecord::Instance()->Running())
     this->dataPtr->logCondition.notify_one();
   DIAG_TIMER_LAP("World::Update", "LogRecordNotify");
 
@@ -2056,7 +2056,7 @@ bool World::OnLog(std::ostringstream &_stream)
 {
   int bufferIndex = this->dataPtr->currentStateBuffer;
   // Save the entire state when its the first call to OnLog.
-  if (util::LogRecord::Instance()->GetFirstUpdate())
+  if (util::LogRecord::Instance()->FirstUpdate())
   {
     this->dataPtr->sdf->Update();
     _stream << "<sdf version ='";
@@ -2083,7 +2083,7 @@ bool World::OnLog(std::ostringstream &_stream)
 
   // Logging has stopped. Wait for log worker to finish. Output last bit
   // of data, and reset states.
-  if (!util::LogRecord::Instance()->GetRunning())
+  if (!util::LogRecord::Instance()->Running())
   {
     boost::mutex::scoped_lock lock(this->dataPtr->logBufferMutex);
 
@@ -2242,9 +2242,9 @@ void World::PublishWorldStats()
   {
     msgs::LogPlaybackStatistics logStats;
     msgs::Set(logStats.mutable_start_time(),
-        util::LogPlay::Instance()->GetLogStartTime());
+        util::LogPlay::Instance()->LogStartTime());
     msgs::Set(logStats.mutable_end_time(),
-        util::LogPlay::Instance()->GetLogEndTime());
+        util::LogPlay::Instance()->LogEndTime());
 
     this->dataPtr->worldStatsMsg.mutable_log_playback_stats()->CopyFrom(
         logStats);

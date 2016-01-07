@@ -26,6 +26,7 @@ set (sources
   ApplyWrenchDialog.cc
   CloneWindow.cc
   ConfigWidget.cc
+  Conversions.cc
   DataLogger.cc
   Editor.cc
   EntityMaker.cc
@@ -44,7 +45,6 @@ set (sources
   ModelAlign.cc
   ModelManipulator.cc
   ModelSnap.cc
-  ModelEditWidget.cc
   ModelListWidget.cc
   ModelMaker.cc
   ModelRightMenu.cc
@@ -87,7 +87,6 @@ set (qt_headers
   LogPlayWidget.hh
   MainWindow.hh
   ModelListWidget.hh
-  ModelEditWidget.hh
   ModelRightMenu.hh
   RenderWidget.hh
   SaveDialog.hh
@@ -105,6 +104,7 @@ set (qt_headers
 set (headers
   qt.h
   qt_test.h
+  Conversions.hh
   EntityMaker.hh
   GuiIface.hh
   GuiEvents.hh
@@ -138,6 +138,15 @@ if (HAVE_QWT)
     IncrementalPlot.hh
   )
 endif()
+
+set (gtest_sources
+  Conversions_TEST.cc
+)
+gz_build_tests(${gtest_sources})
+foreach(gtest_file ${gtest_sources})
+  string(REGEX REPLACE ".cc" "" BINARY_NAME ${gtest_file})
+  target_link_libraries(${TEST_TYPE}_${BINARY_NAME} gazebo_gui)
+endforeach()
 
 set (qt_tests
   DataLogger_TEST.cc

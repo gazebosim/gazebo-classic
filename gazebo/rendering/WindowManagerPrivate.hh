@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,32 +14,30 @@
  * limitations under the License.
  *
 */
+#ifndef _GAZEBO_RENDERING_WINDOWMANAGER_PRIVATE_HH_
+#define _GAZEBO_RENDERING_WINDOWMANAGER_PRIVATE_HH_
 
-#ifndef _BUILDING_ITEM_HH_
-#define _BUILDING_ITEM_HH_
+#include <vector>
 
-#include "gazebo/util/system.hh"
+namespace Ogre
+{
+  class RenderWindow;
+}
 
 namespace gazebo
 {
-  namespace gui
+  namespace rendering
   {
-    /// \addtogroup gazebo_gui
-    /// \{
-
-    /// \class BuildingItem BuildingItem.hh
-    /// \brief Base class of a items that have building level properties such as
-    /// the level number and level height.
-    class GZ_GUI_VISIBLE BuildingItem
+    /// \internal
+    /// \brief Private data for the WindowManager class
+    class WindowManagerPrivate
     {
-        /// \brief Constructor
-        public: BuildingItem();
+      /// \brief All the render windows.
+      public: std::vector<Ogre::RenderWindow *> windows;
 
-        /// \brief Destructor
-        public: ~BuildingItem();
+      /// \brief Used to create unique names for the windows.
+      public: static uint32_t windowCounter;
     };
-    /// \}
   }
 }
-
 #endif

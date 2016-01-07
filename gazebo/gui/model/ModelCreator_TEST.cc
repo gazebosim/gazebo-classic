@@ -18,6 +18,7 @@
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/MainWindow.hh"
+#include "gazebo/gui/model/ModelData.hh"
 #include "gazebo/gui/model/ModelEditorEvents.hh"
 #include "gazebo/gui/model/ModelCreator.hh"
 #include "gazebo/gui/model/ModelCreator_TEST.hh"
@@ -30,7 +31,7 @@ void ModelCreator_TEST::NestedModel()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/empty.world");
+  this->Load("worlds/empty.world", false, false, false);
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
@@ -185,7 +186,7 @@ void ModelCreator_TEST::SaveState()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/empty.world");
+  this->Load("worlds/empty.world", false, false, false);
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
@@ -275,7 +276,7 @@ void ModelCreator_TEST::Selection()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/empty.world");
+  this->Load("worlds/empty.world", false, false, false);
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
@@ -348,6 +349,70 @@ void ModelCreator_TEST::Selection()
   QVERIFY(cylinder->GetHighlighted());
   QVERIFY(!box->GetHighlighted());
   QVERIFY(!sphere->GetHighlighted());
+
+  delete modelCreator;
+  modelCreator = NULL;
+  mainWindow->close();
+  delete mainWindow;
+  mainWindow = NULL;
+}
+
+/////////////////////////////////////////////////
+void ModelCreator_TEST::ModelPlugin()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/empty.world", false, false, false);
+
+  // Create the main window.
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Process some events, and draw the screen
+  for (unsigned int i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Get the user camera and scene
+  gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
+  QVERIFY(cam != NULL);
+  gazebo::rendering::ScenePtr scene = cam->GetScene();
+  QVERIFY(scene != NULL);
+
+  // Start never saved
+  gui::ModelCreator *modelCreator = new gui::ModelCreator();
+  QVERIFY(modelCreator);
+
+  // Inserting a few links
+  modelCreator->AddShape(gui::ModelCreator::ENTITY_CYLINDER);
+  gazebo::rendering::VisualPtr cylinder =
+      scene->GetVisual("ModelPreview_0::link_0");
+  QVERIFY(cylinder != NULL);
+
+  // add model plugin
+  modelCreator->OnAddModelPlugin("test_name", "test_filename",
+      "<data>test</data>");
+  gazebo::gui::ModelPluginData *modelPluginData =
+       modelCreator->ModelPlugin("test_name");
+  QVERIFY(modelPluginData != NULL);
+  sdf::ElementPtr modelPluginSDF = modelPluginData->modelPluginSDF;
+  QCOMPARE(modelPluginSDF->Get<std::string>("name"), std::string("test_name"));
+  QCOMPARE(modelPluginSDF->Get<std::string>("filename"),
+      std::string("test_filename"));
+  QVERIFY(modelPluginSDF->HasElement("data"));
+  QCOMPARE(modelPluginSDF->Get<std::string>("data"), std::string("test"));
+
+  // remove the model plugin
+  modelCreator->RemoveModelPlugin("test_name");
+  modelPluginData = modelCreator->ModelPlugin("test_name");
+  QVERIFY(modelPluginData == NULL);
 
   delete modelCreator;
   modelCreator = NULL;

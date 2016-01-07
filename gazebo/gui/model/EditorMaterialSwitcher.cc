@@ -51,24 +51,24 @@ EditorMaterialSwitcher::EditorMaterialSwitcher(
 /////////////////////////////////////////////////
 void EditorMaterialSwitcher::SetMaterialScheme(const std::string &_scheme)
 {
-  if (!this->camera || !this->camera->GetViewport())
+  if (!this->camera || !this->camera->OgreViewport())
     return;
 
   this->materialScheme = _scheme;
   if (_scheme.empty())
   {
-    this->camera->GetViewport()->setMaterialScheme(
+    this->camera->OgreViewport()->setMaterialScheme(
         this->originalMaterialScheme);
-    this->camera->GetViewport()->getTarget()->removeListener(
+    this->camera->OgreViewport()->getTarget()->removeListener(
         this->renderTargetListener.get());
   }
   else
   {
     this->originalMaterialScheme =
-        this->camera->GetViewport()->getMaterialScheme();
+        this->camera->OgreViewport()->getMaterialScheme();
 
-    this->camera->GetViewport()->setMaterialScheme(_scheme);
-    this->camera->GetViewport()->getTarget()->addListener(
+    this->camera->OgreViewport()->setMaterialScheme(_scheme);
+    this->camera->OgreViewport()->getTarget()->addListener(
         this->renderTargetListener.get());
   }
 }
@@ -146,6 +146,9 @@ Ogre::Technique *EditorMaterialListener::handleSchemeNotFound(
             << "material" << std::endl;
         return NULL;
       }
+
+      if (entity->getUserObjectBindings().getUserAny().isEmpty())
+        return NULL;
 
       std::string userAny = "";
       try

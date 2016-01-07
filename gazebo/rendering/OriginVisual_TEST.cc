@@ -22,7 +22,7 @@
 #include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
-class OriginVisual_TEST : public ServerFixture
+class OriginVisual_TEST : public RenderingFixture
 {
 };
 
