@@ -461,7 +461,7 @@ JointData *JointMaker::CreateJointLine(const std::string &_name,
     const rendering::VisualPtr &_parent)
 {
   rendering::VisualPtr jointVis(
-      new rendering::Visual(_name, _parent->GetParent()));
+      new rendering::Visual(_name, _parent->GetParent(), false));
   jointVis->Load();
   rendering::DynamicLines *jointLine =
       jointVis->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
@@ -760,6 +760,7 @@ std::string JointMaker::CreateHotSpot(JointData *_joint)
   std::string jointId = _joint->visual->GetName() + "_UNIQUE_ID_";
   rendering::VisualPtr hotspotVisual(
       new rendering::Visual(jointId, _joint->visual, false));
+  hotspotVisual->Load();
 
   // create a cylinder to represent the joint
   hotspotVisual->InsertMesh("unit_cylinder");
@@ -803,7 +804,6 @@ std::string JointMaker::CreateHotSpot(JointData *_joint)
   hotspotVisual->GetSceneNode()->setInheritScale(false);
 
   this->dataPtr->joints[jointId] = _joint;
-  camera->GetScene()->AddVisual(hotspotVisual);
 
   _joint->hotspot = hotspotVisual;
   _joint->inspector->SetJointId(_joint->hotspot->GetName());
@@ -906,6 +906,15 @@ void JointMaker::GenerateSDF()
   this->dataPtr->modelSDF.reset(new sdf::Element);
   sdf::initFile("model.sdf", this->dataPtr->modelSDF);
   this->dataPtr->modelSDF->ClearElements();
+
+  // update joint visuals as the model pose may have changed when
+  // generating model sdf
+  for (auto jointsIt : this->dataPtr->joints)
+  {
+    JointData *joint = jointsIt.second;
+    joint->dirty = true;
+    this->Update();
+  }
 
   // loop through all joints
   for (auto jointsIt : this->dataPtr->joints)
@@ -1479,7 +1488,7 @@ void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
 
   // Visuals
   rendering::VisualPtr jointVis(
-      new rendering::Visual(jointVisName, parentVis->GetParent()));
+      new rendering::Visual(jointVisName, parentVis->GetParent(), false));
   jointVis->Load();
   rendering::DynamicLines *jointLine =
       jointVis->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
