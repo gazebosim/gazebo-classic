@@ -18,11 +18,10 @@
 #include <vector>
 #include <gtest/gtest.h>
 #include "gazebo/math/Kmeans.hh"
-#include "test/util.hh"
 
 using namespace gazebo;
 
-class KmeansTest : public gazebo::testing::AutoLogFixture { };
+class KmeansTest : public ::testing::Test { };
 
 //////////////////////////////////////////////////
 TEST_F(KmeansTest, Kmeans)

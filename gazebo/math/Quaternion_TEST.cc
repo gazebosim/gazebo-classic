@@ -19,11 +19,10 @@
 
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/math/Quaternion.hh"
-#include "test/util.hh"
 
 using namespace gazebo;
 
-class QuaternionTest : public gazebo::testing::AutoLogFixture { };
+class QuaternionTest : public ::testing::Test { };
 
 //////////////////////////////////////////////////
 TEST_F(QuaternionTest, Quaternion)

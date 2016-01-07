@@ -18,11 +18,10 @@
 #include <gtest/gtest.h>
 
 #include "gazebo/math/Matrix3.hh"
-#include "test/util.hh"
 
 using namespace gazebo;
 
-class Matrix3Test : public gazebo::testing::AutoLogFixture { };
+class Matrix3Test : public ::testing::Test { };
 
 TEST_F(Matrix3Test, Matrix3)
 {

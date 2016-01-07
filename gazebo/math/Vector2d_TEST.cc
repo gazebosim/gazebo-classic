@@ -19,11 +19,10 @@
 
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/math/Vector2d.hh"
-#include "test/util.hh"
 
 using namespace gazebo;
 
-class Vector2dTest : public gazebo::testing::AutoLogFixture { };
+class Vector2dTest : public ::testing::Test { };
 
 TEST_F(Vector2dTest, Vector2d)
 {

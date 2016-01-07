@@ -18,11 +18,10 @@
 #include <gtest/gtest.h>
 
 #include "gazebo/math/SignalStats.hh"
-#include "test/util.hh"
 
 using namespace gazebo;
 
-class SignalStatsTest : public gazebo::testing::AutoLogFixture { };
+class SignalStatsTest : public ::testing::Test { };
 
 TEST_F(SignalStatsTest, SignalMean)
 {

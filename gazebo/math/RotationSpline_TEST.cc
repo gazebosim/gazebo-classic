@@ -21,11 +21,10 @@
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Quaternion.hh"
 #include "gazebo/math/RotationSpline.hh"
-#include "test/util.hh"
 
 using namespace gazebo;
 
-class RotationSplineTest : public gazebo::testing::AutoLogFixture { };
+class RotationSplineTest : public ::testing::Test { };
 
 TEST_F(RotationSplineTest, RotationSpline)
 {
