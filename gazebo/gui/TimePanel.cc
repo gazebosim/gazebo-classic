@@ -87,6 +87,11 @@ TimePanel::TimePanel(QWidget *_parent)
       boost::bind(&TimePanel::OnFullScreen, this, _1)));
 
   connect(g_playAct, SIGNAL(changed()), this, SLOT(OnPlayActionChanged()));
+
+  QShortcut *space = new QShortcut(Qt::Key_Space, this);
+  QObject::connect(space, SIGNAL(activated()), this, SLOT(TogglePause()));
+
+  this->dataPtr->paused = false;
 }
 
 /////////////////////////////////////////////////
@@ -199,6 +204,15 @@ void TimePanel::SetPaused(bool _paused)
 }
 
 /////////////////////////////////////////////////
+void TimePanel::TogglePause()
+{
+  if (this->IsPaused())
+    g_playAct->trigger();
+  else
+    g_pauseAct->trigger();
+}
+
+/////////////////////////////////////////////////
 void TimePanel::OnStats(ConstWorldStatisticsPtr &_msg)
 {
   boost::mutex::scoped_lock lock(this->dataPtr->mutex);
@@ -306,7 +320,7 @@ void TimePanel::Update()
   if (cam)
   {
     std::ostringstream avgFPS;
-    avgFPS << cam->GetAvgFPS();
+    avgFPS << cam->AvgFPS();
 
     if (this->dataPtr->timeWidget->isVisible())
     {

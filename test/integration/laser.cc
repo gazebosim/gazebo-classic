@@ -66,7 +66,7 @@ void LaserTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
       minRange, maxRange, rangeResolution, samples, 1, 1, 1);
 
   sensors::RaySensorPtr laser =
-    boost::static_pointer_cast<sensors::RaySensor>(
+    std::static_pointer_cast<sensors::RaySensor>(
         sensors::SensorManager::Instance()->GetSensor(raySensorName));
 
   ASSERT_TRUE(laser != NULL);
@@ -230,7 +230,7 @@ void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
 
   sensors::SensorPtr sensor = sensors::get_sensor(raySensorName);
   sensors::RaySensorPtr raySensor =
-    boost::dynamic_pointer_cast<sensors::RaySensor>(sensor);
+    std::dynamic_pointer_cast<sensors::RaySensor>(sensor);
 
   raySensor->Init();
   raySensor->Update(true);
@@ -321,7 +321,7 @@ void LaserTest::LaserVertical(const std::string &_physicsEngine)
 
   sensors::SensorPtr sensor = sensors::get_sensor(raySensorName);
   sensors::RaySensorPtr raySensor =
-    boost::dynamic_pointer_cast<sensors::RaySensor>(sensor);
+    std::dynamic_pointer_cast<sensors::RaySensor>(sensor);
 
   raySensor->Init();
   raySensor->Update(true);
@@ -421,7 +421,7 @@ void LaserTest::LaserScanResolution(const std::string &_physicsEngine)
 
   sensors::SensorPtr sensor = sensors::get_sensor(raySensorName);
   sensors::RaySensorPtr raySensor =
-    boost::dynamic_pointer_cast<sensors::RaySensor>(sensor);
+    std::dynamic_pointer_cast<sensors::RaySensor>(sensor);
 
   raySensor->Init();
   raySensor->Update(true);
@@ -501,7 +501,7 @@ void LaserTest::GroundPlane(const std::string &_physicsEngine)
 
   sensors::SensorPtr sensor = sensors::get_sensor(raySensorName);
   sensors::RaySensorPtr raySensor =
-    boost::dynamic_pointer_cast<sensors::RaySensor>(sensor);
+    std::dynamic_pointer_cast<sensors::RaySensor>(sensor);
 
   raySensor->Init();
   raySensor->Update(true);
@@ -571,7 +571,7 @@ void LaserTest::LaserUnitNoise(const std::string &_physicsEngine)
 
   sensors::SensorPtr sensor = sensors::get_sensor(raySensorName);
   sensors::RaySensorPtr raySensor =
-    boost::dynamic_pointer_cast<sensors::RaySensor>(sensor);
+    std::dynamic_pointer_cast<sensors::RaySensor>(sensor);
 
   EXPECT_TRUE(raySensor != NULL);
 

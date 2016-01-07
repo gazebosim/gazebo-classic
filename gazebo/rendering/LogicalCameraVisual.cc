@@ -55,61 +55,88 @@ void LogicalCameraVisual::Load(const msgs::LogicalCameraSensor &_msg)
   DynamicLines *line = this->CreateDynamicLine(RENDERING_LINE_LIST);
 
   // Draw the near clipping plane as a white rectangle
-  line->AddPoint(math::Vector3(_msg.near_clip(), nearWidth, nearHeight));
-  line->AddPoint(math::Vector3(_msg.near_clip(), nearWidth, -nearHeight));
+  line->AddPoint(ignition::math::Vector3d(
+        _msg.near_clip(), nearWidth, nearHeight));
+  line->AddPoint(ignition::math::Vector3d(
+        _msg.near_clip(), nearWidth, -nearHeight));
 
-  line->AddPoint(math::Vector3(_msg.near_clip(), nearWidth, -nearHeight));
-  line->AddPoint(math::Vector3(_msg.near_clip(), -nearWidth, -nearHeight));
+  line->AddPoint(ignition::math::Vector3d(
+        _msg.near_clip(), nearWidth, -nearHeight));
+  line->AddPoint(ignition::math::Vector3d(
+        _msg.near_clip(), -nearWidth, -nearHeight));
 
-  line->AddPoint(math::Vector3(_msg.near_clip(), -nearWidth, -nearHeight));
-  line->AddPoint(math::Vector3(_msg.near_clip(), -nearWidth, nearHeight));
+  line->AddPoint(ignition::math::Vector3d(
+        _msg.near_clip(), -nearWidth, -nearHeight));
+  line->AddPoint(ignition::math::Vector3d(
+        _msg.near_clip(), -nearWidth, nearHeight));
 
-  line->AddPoint(math::Vector3(_msg.near_clip(), -nearWidth, nearHeight));
-  line->AddPoint(math::Vector3(_msg.near_clip(), nearWidth, nearHeight));
+  line->AddPoint(ignition::math::Vector3d(
+        _msg.near_clip(), -nearWidth, nearHeight));
+  line->AddPoint(ignition::math::Vector3d(
+        _msg.near_clip(), nearWidth, nearHeight));
 
   // Draw the far clipping plane as a white rectangle
-  line->AddPoint(math::Vector3(_msg.far_clip(), farWidth, farHeight));
-  line->AddPoint(math::Vector3(_msg.far_clip(), farWidth, -farHeight));
+  line->AddPoint(ignition::math::Vector3d(
+        _msg.far_clip(), farWidth, farHeight));
+  line->AddPoint(ignition::math::Vector3d(
+        _msg.far_clip(), farWidth, -farHeight));
 
-  line->AddPoint(math::Vector3(_msg.far_clip(), farWidth, -farHeight));
-  line->AddPoint(math::Vector3(_msg.far_clip(), -farWidth, -farHeight));
+  line->AddPoint(ignition::math::Vector3d(
+        _msg.far_clip(), farWidth, -farHeight));
+  line->AddPoint(ignition::math::Vector3d(
+        _msg.far_clip(), -farWidth, -farHeight));
 
-  line->AddPoint(math::Vector3(_msg.far_clip(), -farWidth, -farHeight));
-  line->AddPoint(math::Vector3(_msg.far_clip(), -farWidth, farHeight));
+  line->AddPoint(ignition::math::Vector3d(
+        _msg.far_clip(), -farWidth, -farHeight));
+  line->AddPoint(ignition::math::Vector3d(
+        _msg.far_clip(), -farWidth, farHeight));
 
-  line->AddPoint(math::Vector3(_msg.far_clip(), -farWidth, farHeight));
-  line->AddPoint(math::Vector3(_msg.far_clip(), farWidth, farHeight));
+  line->AddPoint(ignition::math::Vector3d(
+        _msg.far_clip(), -farWidth, farHeight));
+  line->AddPoint(ignition::math::Vector3d(
+        _msg.far_clip(), farWidth, farHeight));
 
   // Connect the near and far clipping planes with lines
-  line->AddPoint(math::Vector3(_msg.near_clip(), nearWidth, nearHeight));
-  line->AddPoint(math::Vector3(_msg.far_clip(), farWidth, farHeight));
+  line->AddPoint(ignition::math::Vector3d(
+        _msg.near_clip(), nearWidth, nearHeight));
+  line->AddPoint(ignition::math::Vector3d(
+        _msg.far_clip(), farWidth, farHeight));
 
-  line->AddPoint(math::Vector3(_msg.near_clip(), -nearWidth, nearHeight));
-  line->AddPoint(math::Vector3(_msg.far_clip(), -farWidth, farHeight));
+  line->AddPoint(ignition::math::Vector3d(
+        _msg.near_clip(), -nearWidth, nearHeight));
+  line->AddPoint(ignition::math::Vector3d(
+        _msg.far_clip(), -farWidth, farHeight));
 
-  line->AddPoint(math::Vector3(_msg.near_clip(), -nearWidth, -nearHeight));
-  line->AddPoint(math::Vector3(_msg.far_clip(), -farWidth, -farHeight));
+  line->AddPoint(ignition::math::Vector3d(
+        _msg.near_clip(), -nearWidth, -nearHeight));
+  line->AddPoint(ignition::math::Vector3d(
+        _msg.far_clip(), -farWidth, -farHeight));
 
-  line->AddPoint(math::Vector3(_msg.near_clip(), nearWidth, -nearHeight));
-  line->AddPoint(math::Vector3(_msg.far_clip(), farWidth, -farHeight));
+  line->AddPoint(ignition::math::Vector3d(
+        _msg.near_clip(), nearWidth, -nearHeight));
+  line->AddPoint(ignition::math::Vector3d(
+        _msg.far_clip(), farWidth, -farHeight));
 
   line->setMaterial("Gazebo/WhiteGlow");
   line->setVisibilityFlags(GZ_VISIBILITY_GUI);
 
   // Draw green lines from the near clipping plane to the origin
   DynamicLines *sourceLine = this->CreateDynamicLine(RENDERING_LINE_LIST);
-  sourceLine->AddPoint(math::Vector3::Zero);
-  sourceLine->AddPoint(math::Vector3(_msg.near_clip(), nearWidth, nearHeight));
+  sourceLine->AddPoint(ignition::math::Vector3d::Zero);
+  sourceLine->AddPoint(ignition::math::Vector3d(
+        _msg.near_clip(), nearWidth, nearHeight));
 
-  sourceLine->AddPoint(math::Vector3::Zero);
-  sourceLine->AddPoint(math::Vector3(_msg.near_clip(), -nearWidth, nearHeight));
+  sourceLine->AddPoint(ignition::math::Vector3d::Zero);
+  sourceLine->AddPoint(ignition::math::Vector3d(
+        _msg.near_clip(), -nearWidth, nearHeight));
 
-  sourceLine->AddPoint(math::Vector3::Zero);
-  sourceLine->AddPoint(math::Vector3(
+  sourceLine->AddPoint(ignition::math::Vector3d::Zero);
+  sourceLine->AddPoint(ignition::math::Vector3d(
         _msg.near_clip(), -nearWidth, -nearHeight));
 
-  sourceLine->AddPoint(math::Vector3::Zero);
-  sourceLine->AddPoint(math::Vector3(_msg.near_clip(), nearWidth, -nearHeight));
+  sourceLine->AddPoint(ignition::math::Vector3d::Zero);
+  sourceLine->AddPoint(ignition::math::Vector3d(
+        _msg.near_clip(), nearWidth, -nearHeight));
 
   sourceLine->setMaterial("Gazebo/PurpleGlow");
   sourceLine->setVisibilityFlags(GZ_VISIBILITY_GUI);

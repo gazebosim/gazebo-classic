@@ -71,7 +71,7 @@ void JointVisual::Load(ConstJointPtr &_msg)
     // create extra joint visual for axis1
     VisualPtr parentVis;
     if (_msg->has_parent() && _msg->parent() == "world")
-      parentVis = this->GetScene()->GetWorldVisual();
+      parentVis = this->GetScene()->WorldVisual();
     else if (_msg->has_parent_id())
       parentVis = this->GetScene()->GetVisual(_msg->parent_id());
 
@@ -268,7 +268,7 @@ void JointVisual::UpdateFromMsg(ConstJointPtr &_msg)
     {
       VisualPtr parentVis;
       if (_msg->has_parent() && _msg->parent() == "world")
-        parentVis = this->GetScene()->GetWorldVisual();
+        parentVis = this->GetScene()->WorldVisual();
       else if (_msg->has_parent_id())
         parentVis = this->GetScene()->GetVisual(_msg->parent_id());
 

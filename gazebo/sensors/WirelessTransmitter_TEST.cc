@@ -71,7 +71,7 @@ WirelessTransmitter_TEST::WirelessTransmitter_TEST()
   SpawnWirelessTransmitterSensor(txModelName, txSensorName, txPose.Pos(),
       txPose.Rot().Euler(), txEssid, freq, power, gain);
 
-  this->tx = boost::static_pointer_cast<sensors::WirelessTransmitter>(
+  this->tx = std::static_pointer_cast<sensors::WirelessTransmitter>(
       sensors::SensorManager::Instance()->GetSensor(txSensorName));
 
   this->receivedMsg = false;
@@ -100,7 +100,7 @@ void WirelessTransmitter_TEST::TestCreateWirelessTransmitter()
 
   // Get a pointer to the wireless receiver sensor
   sensors::WirelessTransmitterPtr sensor =
-    boost::dynamic_pointer_cast<sensors::WirelessTransmitter>(
+    std::dynamic_pointer_cast<sensors::WirelessTransmitter>(
         mgr->GetSensor(sensorName));
 
   // Make sure the above dynamic cast worked.
@@ -213,7 +213,7 @@ void WirelessTransmitter_TEST::TestUpdateImplNoVisual()
       txNoVisualSensorName, txPose.Pos(), txPose.Rot().Euler(),
       txEssid + "NoVisual", freq, power, gain, false);
 
-  txNoVisual = boost::static_pointer_cast<sensors::WirelessTransmitter>(
+  txNoVisual = std::static_pointer_cast<sensors::WirelessTransmitter>(
       sensors::SensorManager::Instance()->GetSensor(txNoVisualSensorName));
 
   // Initialize gazebo transport layer

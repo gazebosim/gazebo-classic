@@ -119,7 +119,7 @@ void GpsSensor::Init()
 }
 
 //////////////////////////////////////////////////
-bool GpsSensor::UpdateImpl(bool /*_force*/)
+bool GpsSensor::UpdateImpl(const bool /*_force*/)
 {
   // Get latest pose information
   if (this->parentLink)
@@ -184,23 +184,11 @@ bool GpsSensor::UpdateImpl(bool /*_force*/)
 }
 
 //////////////////////////////////////////////////
-math::Angle GpsSensor::GetLongitude() const
-{
-  return this->Longitude();
-}
-
-//////////////////////////////////////////////////
 ignition::math::Angle GpsSensor::Longitude() const
 {
   ignition::math::Angle angle;
   angle.Degree(this->lastGpsMsg.longitude_deg());
   return angle;
-}
-
-//////////////////////////////////////////////////
-math::Angle GpsSensor::GetLatitude() const
-{
-  return this->Latitude();
 }
 
 //////////////////////////////////////////////////

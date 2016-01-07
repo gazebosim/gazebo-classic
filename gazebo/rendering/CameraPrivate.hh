@@ -18,9 +18,12 @@
 #define _GAZEBO_RENDERING_CAMERA_PRIVATE_HH_
 
 #include <deque>
+#include <mutex>
 #include <utility>
 #include <list>
+#include <ignition/math/Pose3.hh>
 
+#include "gazebo/common/PID.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/util/system.hh"
 
@@ -61,7 +64,8 @@ namespace gazebo
       public: DistortionPtr distortion;
 
       /// \brief Queue of move positions.
-      public: std::deque<std::pair<math::Pose, double> > moveToPositionQueue;
+      public: std::deque<std::pair<ignition::math::Pose3d, double> >
+              moveToPositionQueue;
 
       /// \brief Render period.
       public: common::Time renderPeriod;
@@ -90,7 +94,7 @@ namespace gazebo
       public: CameraCmdMsgs_L commandMsgs;
 
       /// \brief Mutex to lock the various message buffers.
-      public: boost::mutex receiveMutex;
+      public: std::mutex receiveMutex;
 
       /// \brief If set to true, the position of the camera is static.
       public: bool trackIsStatic;

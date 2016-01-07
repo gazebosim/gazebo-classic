@@ -15,6 +15,7 @@
  *
 */
 
+#include <boost/program_options.hpp>
 #include <gazebo/gazebo.hh>
 #include <gazebo/common/common.hh>
 #include <gazebo/physics/physics.hh>

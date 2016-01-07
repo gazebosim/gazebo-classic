@@ -73,7 +73,7 @@ void RFIDTag::Load(const std::string &_worldName)
   {
     if ((*iter)->GetType() == "rfid")
     {
-      boost::dynamic_pointer_cast<RFIDSensor>(*iter)->AddTag(this);
+      std::dynamic_pointer_cast<RFIDSensor>(*iter)->AddTag(this);
     }
   }
 }
@@ -92,7 +92,7 @@ void RFIDTag::Init()
 }
 
 //////////////////////////////////////////////////
-bool RFIDTag::UpdateImpl(bool /*_force*/)
+bool RFIDTag::UpdateImpl(const bool /*_force*/)
 {
   if (this->scanPub)
   {
@@ -123,12 +123,6 @@ bool RFIDTag::UpdateImpl(bool /*_force*/)
   }
 
   return true;
-}
-
-/////////////////////////////////////////////////
-math::Pose RFIDTag::GetTagPose() const
-{
-  return this->TagPose();
 }
 
 /////////////////////////////////////////////////
