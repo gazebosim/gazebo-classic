@@ -51,6 +51,16 @@ namespace gazebo
 
       /// \brief Pointer to the update event connection
       public: event::ConnectionPtr updateConnection;
+
+      /// \brief Listen to control messages
+      public: transport::SubscriberPtr controlSub;
+
+      /// \brief True if diagnostics are enabled.
+      public: bool enabled;
+
+      /// \brief Log file for variables.
+      public: std::ofstream varLog;
+
     };
 
     /// \brief Private data for the DiagnosticTimer class

@@ -125,7 +125,7 @@ Diagnostics::Diagnostics(QWidget *_parent)
 
   msgs::DiagnosticControl msg;
   msg.set_enabled(true);
-  this->node->Publish<msgs::DiagnosticControl>("~/diagnostic/control", msg);
+  this->dataPtr->node->Publish<msgs::DiagnosticControl>("~/diagnostic/control", msg);
 
   QTimer *displayTimer = new QTimer(this);
   connect(displayTimer, SIGNAL(timeout()), this, SLOT(Update()));
@@ -215,19 +215,19 @@ void Diagnostics::OnMsg(ConstDiagnosticsPtr &_msg)
     QString qstr = QString::fromStdString(_msg->variable(i).name());
 
     // Add the time label to the list if it's not already there.
-    QList<QListWidgetItem*> items = this->labelList->findItems(qstr,
+    QList<QListWidgetItem*> items = this->dataPtr->labelList->findItems(qstr,
         Qt::MatchExactly);
 
     if (items.size() == 0)
     {
       QListWidgetItem *item = new QListWidgetItem(qstr);
       item->setToolTip(tr("Drag onto graph to plot"));
-      this->labelList->addItem(item);
+      this->dataPtr->labelList->addItem(item);
     }
 
     // Check to see if the data belongs in a plot, and add it.
-    for (std::vector<IncrementalPlot*>::iterator iter = this->plots.begin();
-        iter != this->plots.end(); ++iter)
+    for (std::vector<IncrementalPlot*>::iterator iter = this->dataPtr->plots.begin();
+        iter != this->dataPtr->plots.end(); ++iter)
     {
       if ((*iter)->HasCurve(qstr))
       {
@@ -243,19 +243,19 @@ void Diagnostics::OnMsg(ConstDiagnosticsPtr &_msg)
     QString qstr = QString::fromStdString(_msg->marker(i).name());
 
     // Add the time label to the list if it's not already there.
-    QList<QListWidgetItem*> items = this->labelList->findItems(qstr,
+    QList<QListWidgetItem*> items = this->dataPtr->labelList->findItems(qstr,
         Qt::MatchExactly);
 
     if (items.size() == 0)
     {
       QListWidgetItem *item = new QListWidgetItem(qstr);
       item->setToolTip(tr("Drag onto graph to plot"));
-      this->labelList->addItem(item);
+      this->dataPtr->labelList->addItem(item);
     }
 
     // Add all marker to all plots
-    for (std::vector<IncrementalPlot*>::iterator iter = this->plots.begin();
-        iter != this->plots.end(); ++iter)
+    for (std::vector<IncrementalPlot*>::iterator iter = this->dataPtr->plots.begin();
+        iter != this->dataPtr->plots.end(); ++iter)
     {
       (*iter)->AddVLine(qstr, wallTime.Double());
     }
@@ -293,7 +293,7 @@ void Diagnostics::closeEvent(QCloseEvent *_evt)
 {
   msgs::DiagnosticControl msg;
   msg.set_enabled(false);
-  this->node->Publish<msgs::DiagnosticControl>("~/diagnostic/control", msg);
+  this->dataPtr->node->Publish<msgs::DiagnosticControl>("~/diagnostic/control", msg);
 
   QDialog::closeEvent(_evt);
 }

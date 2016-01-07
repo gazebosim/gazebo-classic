@@ -29,6 +29,10 @@
 #include "gazebo/util/UtilTypes.hh"
 #include "gazebo/util/system.hh"
 
+#include "gazebo/transport/transport.hh"
+
+#include "gazebo/msgs/MessageTypes.hh"
+
 namespace gazebo
 {
   namespace util
@@ -203,18 +207,8 @@ namespace gazebo
                    const common::Time &_wallTime,
                    const common::Time &_elapsedtime);
 
-      /// PIMPLize
       /// \brief Recive control messages.
       private: void OnControl(ConstDiagnosticControlPtr &_msg);
-
-      /// \brief Listen to control messages
-      private: transport::SubscriberPtr controlSub;
-
-      /// \brief True if diagnostics are enabled.
-      private: bool enabled;
-
-      /// \brief Log file for variables.
-      private: std::ofstream varLog;
 
       // Singleton implementation
       private: friend class SingletonT<DiagnosticManager>;

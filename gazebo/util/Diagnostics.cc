@@ -88,6 +88,10 @@ void DiagnosticManager::Init(const std::string &_worldName)
   this->dataPtr->pub =
     this->dataPtr->node->Advertise<msgs::Diagnostics>("~/diagnostics");
 
+  this->dataPtr->controlSub =
+      this->dataPtr->node->Subscribe("~/diagnostic/control",
+      &DiagnosticManager::OnControl, this, true);
+
   this->dataPtr->updateConnection = event::Events::ConnectWorldUpdateBegin(
       std::bind(&DiagnosticManager::Update, this, std::placeholders::_1));
 }
@@ -95,13 +99,13 @@ void DiagnosticManager::Init(const std::string &_worldName)
 //////////////////////////////////////////////////
 void DiagnosticManager::Fini()
 {
-  event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
+  event::Events::DisconnectWorldUpdateBegin(this->dataPtr->updateConnection);
 
-  this->varLog.close();
+  this->dataPtr->varLog.close();
 
   // Stop all the timers
-  for (TimerMap::iterator iter = this->timers.begin();
-       iter != this->timers.end(); ++iter)
+  for (TimerMap::iterator iter = this->dataPtr->timers.begin();
+       iter != this->dataPtr->timers.end(); ++iter)
   {
     iter->second->Stop();
   }
@@ -122,7 +126,7 @@ boost::filesystem::path DiagnosticManager::LogPath() const
 //////////////////////////////////////////////////
 void DiagnosticManager::Update(const common::UpdateInfo &_info)
 {
-  if (this->enabled)
+  if (this->dataPtr->enabled)
   {
     if (_info.realTime > common::Time::Zero)
     {
@@ -160,7 +164,7 @@ void DiagnosticManager::AddTime(const std::string &_name,
 //////////////////////////////////////////////////
 void DiagnosticManager::StartTimer(const std::string &_name)
 {
-  if (!this->enabled)
+  if (!this->dataPtr->enabled)
     return;
 
   TimerMap::iterator iter = this->dataPtr->timers.find(_name);
@@ -179,7 +183,7 @@ void DiagnosticManager::StartTimer(const std::string &_name)
 //////////////////////////////////////////////////
 void DiagnosticManager::StopTimer(const std::string &_name)
 {
-  if (!this->enabled)
+  if (!this->dataPtr->enabled)
     return;
 
   TimerMap::iterator iter = this->dataPtr->timers.find(_name);
@@ -199,7 +203,7 @@ void DiagnosticManager::StopTimer(const std::string &_name)
 void DiagnosticManager::Lap(const std::string &_name,
                             const std::string &_prefix)
 {
-  if (!this->enabled)
+  if (!this->dataPtr->enabled)
     return;
 
   TimerMap::iterator iter;
@@ -316,24 +320,24 @@ common::Time DiagnosticManager::Time(const std::string &_label) const
 //////////////////////////////////////////////////
 bool DiagnosticManager::GetEnabled() const
 {
-  return this->enabled;
+  return this->dataPtr->enabled;
 }
 
 //////////////////////////////////////////////////
 void DiagnosticManager::SetEnabled(bool _enabled)
 {
-  this->enabled = _enabled;
+  this->dataPtr->enabled = _enabled;
 
-  if (this->enabled)
+  if (this->dataPtr->enabled)
   {
     // Make sure the path exists.
-    if (!boost::filesystem::exists(this->logPath))
-      boost::filesystem::create_directories(this->logPath);
+    if (!boost::filesystem::exists(this->dataPtr->logPath))
+      boost::filesystem::create_directories(this->dataPtr->logPath);
 
     boost::filesystem::path varLogPath;
 
-    varLogPath = this->logPath / "variables.log";
-    this->varLog.open(varLogPath.string().c_str(),
+    varLogPath = this->dataPtr->logPath / "variables.log";
+    this->dataPtr->varLog.open(varLogPath.string().c_str(),
         std::ios::out | std::ios::app);
   }
 }
@@ -348,16 +352,17 @@ void DiagnosticManager::OnControl(ConstDiagnosticControlPtr &_msg)
 //////////////////////////////////////////////////
 void DiagnosticManager::Variable(const std::string &_name, double _value)
 {
-  if (!this->enabled)
+  if (!this->dataPtr->enabled)
     return;
 
   // Get the current elapsed time.
   common::Time currTime = common::Time::GetWallTime();
 
   // Write out the delta time
-  this->varLog << _name << " " << currTime << " " << _value << std::endl;
+  this->dataPtr->varLog << _name << " "
+                        << currTime << " " << _value << std::endl;
 
-  msgs::Diagnostics::DiagVariable *var = this->msg.add_variable();
+  msgs::Diagnostics::DiagVariable *var = this->dataPtr->msg.add_variable();
   var->set_name(_name);
   var->set_value(_value);
   msgs::Set(var->mutable_wall(), currTime);
@@ -366,16 +371,16 @@ void DiagnosticManager::Variable(const std::string &_name, double _value)
 //////////////////////////////////////////////////
 void DiagnosticManager::Marker(const std::string &_name)
 {
-  if (!this->enabled)
+  if (!this->dataPtr->enabled)
     return;
 
   // Get the current elapsed time.
   common::Time currTime = common::Time::GetWallTime();
 
   // Write out the delta time
-  this->varLog << _name << " " << currTime << std::endl;
+  this->dataPtr->varLog << _name << " " << currTime << std::endl;
 
-  msgs::Diagnostics::DiagMarker *marker = this->msg.add_marker();
+  msgs::Diagnostics::DiagMarker *marker = this->dataPtr->msg.add_marker();
   marker->set_name(_name);
   msgs::Set(marker->mutable_wall(), currTime);
 }
