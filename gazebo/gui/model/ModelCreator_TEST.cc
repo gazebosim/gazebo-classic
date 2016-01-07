@@ -491,7 +491,6 @@ void ModelCreator_TEST::NestedModelSelection()
     mainWindow->repaint();
   }
 
-
   // a more complicated a nested model loaded from from sdf
   sdf::ElementPtr modelSDF(new sdf::Element);
   sdf::initFile("model.sdf", modelSDF);
@@ -527,16 +526,6 @@ void ModelCreator_TEST::NestedModelSelection()
     QCoreApplication::processEvents();
     mainWindow->repaint();
   }
-
-
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
-
 
   // verify initial selected state
   QVERIFY(!cylinder->GetHighlighted());
