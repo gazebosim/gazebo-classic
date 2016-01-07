@@ -111,6 +111,9 @@ if (MANPAGES_SUPPORT)
 	      manpages.cc)
 endif()
 
+set (TEST_LIBRARIES
+  gazebo_test_fixture
+)
 gz_build_tests(${tests})
 
 if (ENABLE_TESTS_COMPILATION)
@@ -144,7 +147,9 @@ set(dri_tests
   speed_pr2.cc
   world_reset.cc
 )
-
+set (TEST_LIBRARIES
+  gazebo_test_fixture
+)
 gz_build_dri_tests(${dri_tests})
 
 set(qt_tests
