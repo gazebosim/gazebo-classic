@@ -14,9 +14,10 @@
  * limitations under the License.
  *
 */
-#include <string.h>
 
-#include <ignition/math/Pose3.hh>
+#include <string>
+
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/physics.hh"
@@ -24,7 +25,6 @@
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/test/helper_physics_generator.hh"
 
-#define PHYSICS_TOL 1e-2
 using namespace gazebo;
 
 //////////////////////////////////////////////////
@@ -35,8 +35,11 @@ class ScalingTest : public ServerFixture,
   /// in the state SDF instead of the initial model SDF.
   /// \param[in] _physicsEngine Physics Engine type.
   public: void SaveScaledModel(const std::string &_physicsEngine);
-};
 
+  /// \brief Test loading a world with models scaled in the world state.
+  /// \param[in] _physicsEngine Physics Engine type.
+  public: void LoadScaledModels(const std::string &_physicsEngine);
+};
 
 //////////////////////////////////////////////////
 void ScalingTest::SaveScaledModel(const std::string &_physicsEngine)
@@ -48,11 +51,10 @@ void ScalingTest::SaveScaledModel(const std::string &_physicsEngine)
 
   auto physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // Get box and check scale
   auto box = world->GetModel("box");
-  EXPECT_TRUE(box != NULL);
+  ASSERT_TRUE(box != NULL);
   EXPECT_EQ(box->Scale(), ignition::math::Vector3d::One);
 
   // Create transport
@@ -88,7 +90,7 @@ void ScalingTest::SaveScaledModel(const std::string &_physicsEngine)
 
   sdf::SDF sdf_parsed;
   sdf_parsed.SetFromString(str);
-  EXPECT_TRUE(sdf_parsed.Root()->HasElement("world"));
+  ASSERT_TRUE(sdf_parsed.Root()->HasElement("world"));
 
   auto worldElem = sdf_parsed.Root()->GetElement("world");
 
@@ -206,10 +208,45 @@ void ScalingTest::SaveScaledModel(const std::string &_physicsEngine)
   }
 }
 
+//////////////////////////////////////////////////
+void ScalingTest::LoadScaledModels(const std::string &_physicsEngine)
+{
+  // load a world which has models scaled in the state
+  this->Load("test/worlds/scaled_shapes.world", true, _physicsEngine);
+  auto world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  auto physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+
+  // Get box and check scale
+  auto box = world->GetModel("box");
+  ASSERT_TRUE(box != NULL);
+  EXPECT_EQ(box->Scale(), ignition::math::Vector3d(3.34637, 2.87999, 0.123722));
+
+  // Get sphere and check scale
+  auto sphere = world->GetModel("sphere");
+  ASSERT_TRUE(sphere != NULL);
+  EXPECT_EQ(sphere->Scale(),
+      ignition::math::Vector3d(0.402674, 0.402674, 0.402674));
+
+  // Get cylinder and check scale
+  auto cylinder = world->GetModel("cylinder");
+  ASSERT_TRUE(cylinder != NULL);
+  EXPECT_EQ(cylinder->Scale(),
+      ignition::math::Vector3d(2.2969, 2.2969, 2.09564));
+}
+
 /////////////////////////////////////////////////
 TEST_P(ScalingTest, SaveScaledModel)
 {
   this->SaveScaledModel(GetParam());
+}
+
+/////////////////////////////////////////////////
+TEST_P(ScalingTest, LoadScaledModels)
+{
+  this->LoadScaledModels(GetParam());
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, ScalingTest,
