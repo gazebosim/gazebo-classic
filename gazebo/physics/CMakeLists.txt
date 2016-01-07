@@ -181,17 +181,25 @@ gz_install_includes("physics" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/physics.hh)
 # unit tests
 set (gtest_sources
   BoxShape_TEST.cc
-  ContactManager_TEST.cc
   CylinderShape_TEST.cc
   Inertial_TEST.cc
   JointController_TEST.cc
-  Light_TEST.cc
-  LightState_TEST.cc
   ModelState_TEST.cc
-  PhysicsEngine_TEST.cc
-  PresetManager_TEST.cc
   Road_TEST.cc
   SphereShape_TEST.cc
+)
+set (TEST_DEPENDENCIES
+  gazebo_physics
+)
+gz_build_tests(${gtest_sources})
+
+# unit tests with gazebo_test_fixture
+set (gtest_fixture_sources
+  ContactManager_TEST.cc
+  Light_TEST.cc
+  LightState_TEST.cc
+  PhysicsEngine_TEST.cc
+  PresetManager_TEST.cc
   UserCmdManager_TEST.cc
   WorldState_TEST.cc
 )
@@ -199,4 +207,4 @@ set (TEST_DEPENDENCIES
   gazebo_physics
   gazebo_test_fixture
 )
-gz_build_tests(${gtest_sources})
+gz_build_tests(${gtest_fixture_sources})

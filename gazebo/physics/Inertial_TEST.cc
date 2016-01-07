@@ -17,48 +17,13 @@
 
 #include <gtest/gtest.h>
 #include "gazebo/physics/physics.hh"
-#include "gazebo/test/ServerFixture.hh"
 #include "gazebo/physics/Inertial.hh"
+#include "test/util.hh"
 
 #define TOL 1e-6
 using namespace gazebo;
 
-class Inertial_TEST : public ServerFixture
-{
-};
-
-////////////////////////////////////////////////////////////////////////
-// Test world template
-////////////////////////////////////////////////////////////////////////
-TEST_F(Inertial_TEST, InertialWorld)
-{
-  // Load our inertial test world
-  Load("worlds/inertial_test.world", true);
-
-  // Get a pointer to the world, make sure world loads
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
-
-  // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), "ode");
-
-  physics->SetGravity(math::Vector3(0, 0, -50));
-
-  // simulate 1 step
-  world->Step(1);
-  double t = world->GetSimTime().Double();
-
-  // get time step size
-  double dt = world->GetPhysicsEngine()->GetMaxStepSize();
-  EXPECT_GT(dt, 0);
-
-  // verify that time moves forward
-  EXPECT_NEAR(t, dt, TOL);
-
-  Unload();
-}
+class Inertial_TEST : public gazebo::testing::AutoLogFixture { };
 
 ////////////////////////////////////////////////////////////////////////
 // Test basic Inertial functions
