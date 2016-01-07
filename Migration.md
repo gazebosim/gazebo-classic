@@ -36,6 +36,12 @@ release will remove the deprecated code.
     + ***Removed:*** public: template<typename T> event::ConnectionPtr ConnectUpdated(T _subscriber);
     + ***Replacement:*** public: event::ConnectionPtr ConnectUpdated(std::function<void()> _subscriber);
 
+1. **gazebo/rendering/GpuLaser.hh**
+    + ***Removed:*** public: void SetCameraCount(double _cameraCount);
+    + ***Replacement:*** public: void SetCameraCount(const unsigned int _cameraCount);
+    + ***Removed:*** public: template<typename T> event::ConnectionPtr ConnectNewLaserFrame(T _subscriber);
+    + ***Replacement:*** public: event::ConnectionPtr ConnectNewLaserFrame(std::function<void (const float *_frame, unsigned int _width, unsigned int _height, unsigned int _depth, const std::string &_format)> _subscriber);
+
 1. **gazebo/rendering/DepthCamera.hh**
     + ***Removed:*** public: template<typename T> event::ConnectionPtr ConnectNewDepthFrame(T _subscriber)
     + ***Replacement:*** public: event::ConnectionPtr ConnectNewDepthFrame(std::function<void (const float *, unsigned int, unsigned int, unsigned int, const std::string &)>  _subscriber);
@@ -57,6 +63,9 @@ release will remove the deprecated code.
 1. **gazebo/rendering/Camera.hh**
     + ***Removed:*** public: void SetClipDist();
     + ***Replacement:*** public: virtual void SetClipDist();
+    + ***Removed:*** public: template<typename T> event::ConnectionPtr ConnectNewImageFrame(T _subscriber);
+    + ***Replacement:*** public: event::ConnectionPtr ConnectNewImageFrame(std::function<void (const unsigned char *, unsigned int, unsigned int, unsigned int, const std::string &)> _subscriber);
+
 
 1. **gazebo/msgs/logical_camera_sensors.proto**
     + The `near` and `far` members have been replaced with `near_clip` and `far_clip`
@@ -133,9 +142,114 @@ release will remove the deprecated code.
     + ***Deprecation:*** public: unsigned int GetBufferSize() const;
     + ***Replacement:*** public: unsigned int BufferSize() const;
 
+1. **gazebo/rendering/Scene.hh**
+    + ***Deprecation:*** public: Ogre::SceneManager *GetManager() const;
+    + ***Replacement:*** public: Ogre::SceneManager *OgreSceneManager() const;
+    + ***Deprecation:*** public: std::string GetName() const;
+    + ***Replacement:*** public: std::string Name() const;
+    + ***Deprecation:*** public: common::Color GetAmbientColor() const;
+    + ***Replacement:*** public: common::Color AmbientColor() const;
+    + ***Deprecation:*** public: common::Color GetBackgroundColor();
+    + ***Replacement:*** public: common::Color BackgroundColor() const;
+    + ***Deprecation:*** public: uint32_t GetGridCount();
+    + ***Replacement:*** public: uint32_t GridCount() const;
+    + ***Deprecation:*** public: uint32_t GetOculusCameraCount() const;
+    + ***Replacement:*** public: uint32_t OculusCameraCount() const;
+    + ***Deprecation:*** public: uint32_t GetCameraCount() const;
+    + ***Replacement:*** public: uint32_t CameraCount() const;
+    + ***Deprecation:*** public: uint32_t GetUserCameraCount() const;
+    + ***Replacement:*** public: uint32_t UserCameraCount() const;
+    + ***Deprecation:*** public: uint32_t GetLightCount() const;
+    + ***Replacement:*** public: uint32_t LightCount() const;
+    + ***Deprecation:*** public: VisualPtr GetVisualAt(CameraPtr _camera, const math::Vector2i &_mousePos, std::string &_mod)
+    + ***Replacement:*** public: VisualPtr VisualAt(CameraPtr _camera, const ignition::math::Vector2i &_mousePos, std::string &_mod);
+    + ***Deprecation:*** public: VisualPtr GetVisualAt(CameraPtr _camera, const math::Vector2i &_mousePos)
+    + ***Replacement:*** public: VisualPtr VisualAt(CameraPtr _camera, const ignition::math::Vector2i &_mousePos);
+    + ***Deprecation:*** public: VisualPtr GetVisualBelow(const std::string &_visualName);
+    + ***Replacement:*** public: VisualPtr VisualBelow(const std::string &_visualName);
+    + ***Deprecation:*** public: void GetVisualsBelowPoint(const math::Vector3 &_pt, std::vector<VisualPtr> &_visuals);
+    + ***Replacement:*** public: void VisualsBelowPoint(const ignition::math::Vector3d &_pt, std::vector<VisualPtr> &_visuals);
+    + ***Deprecation:*** public: double GetHeightBelowPoint(const math::Vector3 &_pt);
+    + ***Replacement:*** public: double HeightBelowPoint(const ignition::math::Vector3d &_pt);
+    + ***Deprecation:*** public: bool GetFirstContact(CameraPtr _camera, const math::Vector2i &_mousePos, math::Vector3 &_position)
+    + ***Replacement:*** public: bool FirstContact(CameraPtr _camera, const ignition::math::Vector2i &_mousePos, ignition::math::Vector3d &_position);
+    + ***Deprecation:*** public: void DrawLine(const math::Vector3 &_start, const math::Vector3 &_end, const std::string &_name)
+    + ***Replacement:*** public: void DrawLine(const ignition::math::Vector3d &_start, const ignition::math::Vector3d &_end, const std::string &_name);
+    + ***Deprecation:*** public: uint32_t GetId() const;
+    + ***Replacement:*** public: uint32_t Id() const;
+    + ***Deprecation:*** public: std::string GetIdString() const;
+    + ***Replacement:*** public: std::string IdString() const;
+    + ***Deprecation:*** public: bool GetShadowsEnabled() const;
+    + ***Replacement:*** public: bool ShadowsEnabled() const;
+    + ***Deprecation:*** public: VisualPtr GetWorldVisual() const;
+    + ***Replacement:*** public: VisualPtr WorldVisual() const;
+    + ***Deprecation:*** public: VisualPtr GetSelectedVisual() const;
+    + ***Replacement:*** public: VisualPtr SelectedVisual() const;
+    + ***Deprecation:*** public: bool GetShowClouds() const;
+    + ***Replacement:*** public: bool ShowClouds() const;
+    + ***Deprecation:*** public: bool GetInitialized() const;
+    + ***Replacement:*** public: bool Initialized() const;
+    + ***Deprecation:*** public: common::Time GetSimTime() const;
+    + ***Replacement:*** public: common::Time SimTime() const;
+    + ***Deprecation:*** public: uint32_t GetVisualCount() const
+    + ***Replacement:*** public: uint32_t VisualCount() const;
+
 1. **gazebo/rendering/DepthCamera.hh**
     + ***Deprecation:*** public: virtual const float *GetDepthData();
     + ***Replacement:*** public: virtual const float *DepthData() const;
+
+1. **gazebo/rendering/Heightmap.hh**
+    + ***Deprecation:*** public: double GetHeight(double _x, double _y, double _z = 1000);
+    + ***Replacement:*** public: double Height(const double _x, const double _y, const double _z = 1000) const;
+    + ***Deprecation:*** public: bool Flatten(CameraPtr _camera, math::Vector2i _mousePos, double _outsideRadius, double _insideRadius, double _weight = 0.1)
+    + ***Replacement:*** public: bool Flatten(CameraPtr _camera, const ignition::math::Vector2i &_mousePos, const double _outsideRadius, const double _insideRadius, const double _weight = 0.1);
+    + ***Deprecation:*** public: bool Smooth(CameraPtr _camera, math::Vector2i _mousePos, double _outsideRadius, double _insideRadius, double _weight = 0.1);
+    + ***Replacement:*** public: bool Smooth(CameraPtr _camera, const ignition::math::Vector2i &_mousePos, const double _outsideRadius, const double _insideRadius, const double _weight = 0.1);
+    + ***Deprecation:*** public: bool Raise(CameraPtr _camera, math::Vector2i _mousePos,
+ double _outsideRadius, double _insideRadius, double _weight = 0.1)
+    + ***Replacement:*** public: bool Raise(CameraPtr _camera, const ignition::math::Vector2i &_mousePos, const double _outsideRadius, const double _insideRadius, const double _weight = 0.1)
+    + ***Deprecation:*** public: bool Lower(CameraPtr _camera, math::Vector2i _mousePos, double _outsideRadius, double _insideRadius, double _weight = 0.1)
+    + ***Replacement:*** public: bool Lower(CameraPtr _camera, const ignition::math::Vector2i &_mousePos, const double _outsideRadius, const double _insideRadius, const double _weight = 0.1)
+    + ***Deprecation:*** public: double GetAvgHeight(Ogre::Vector3 _pos, double _brushSize);
+    + ***Replacement:*** public: double AvgHeight(const ignition::math::Vector3d &_pos, const double _brushSize) const
+    + ***Deprecation:*** public: Ogre::TerrainGroup *GetOgreTerrain() const;
+    + ***Replacement:*** public: Ogre::TerrainGroup *OgreTerrain() const;
+    + ***Deprecation:*** public: common::Image GetImage() const;
+    + ***Replacement:*** public: public: common::Image Image() const;
+    + ***Deprecation:*** public: Ogre::TerrainGroup::RayResult GetMouseHit(CameraPtr _camera, math::Vector2i _mousePos);
+    + ***Replacement:*** public: Ogre::TerrainGroup::RayResult MouseHit(CameraPtr _camera, const ignition::math::Vector2i &_mousePos) const;
+    + ***Deprecation:*** public: unsigned int GetTerrainSubdivisionCount() const;
+    + ***Replacement:*** public: unsigned int TerrainSubdivisionCount() const;
+
+1. **gazebo/rendering/RenderEngine.hh**
+    + ***Deprecation:*** public: unsigned int GetSceneCount() const;
+    + ***Replacement:*** public: unsigned int SceneCount() const;
+    + ***Deprecation:*** public: Ogre::OverlaySystem *GetOverlaySystem() const;
+    + ***Replacement:*** public: Ogre::OverlaySystem *OverlaySystem() const;
+
+1. **gazebo/rendering/GpuLaser.hh**
+    + ***Deprecation:*** public: const float *GetLaserData();
+    + ***Replacement:*** public: const float *LaserData() const;
+    + ***Deprecation:*** public: double GetHorzHalfAngle() const;
+    + ***Replacement:*** public: double HorzHalfAngle() const;
+    + ***Deprecation:*** public: double GetVertHalfAngle() const;
+    + ***Replacement:*** public: double VertHalfAngle() const;
+    + ***Deprecation:*** public: double GetHorzFOV() const;
+    + ***Replacement:*** public: double HorzFOV() const;
+    + ***Deprecation:*** public: double GetCosHorzFOV() const;
+    + ***Replacement:*** public: double CosHorzFOV() const;
+    + ***Deprecation:*** public: double GetVertFOV() const;
+    + ***Replacement:*** public: double VertFOV() const;
+    + ***Deprecation:*** public: double GetCosVertFOV() const;
+    + ***Replacement:*** public: double CosVertFOV() const;
+    + ***Deprecation:*** public: double GetNearClip() const;
+    + ***Replacement:*** public: double NearClip() const;
+    + ***Deprecation:*** public: double GetFarClip() const;
+    + ***Replacement:*** public: double FarClip() const;
+    + ***Deprecation:*** public: double CameraCount() const;
+    + ***Replacement:*** public: unsigned int CameraCount() const;
+    + ***Deprecation:*** public: double GetRayCountRatio() const;
+    + ***Replacement:*** public: double RayCountRatio() const;
 
 1. **gazebo/rendering/DynamicLines.hh**
     + ***Deprecation:*** public: void AddPoint(const math::Vector3 &_pt,const common::Color &_color = common::Color::White)
@@ -486,6 +600,12 @@ release will remove the deprecated code.
     + ***Replacement:*** bool AutoRepeat() const
 
 1. **gazebo/rendering/Camera.hh**
+    + ***Deprecation:*** public: double GetRenderRate() const;
+    + ***Replacement:*** public: double RenderRate() const;
+    + ***Deprecation:*** public: bool GetInitialized() const;
+    + ***Replacement:*** public: bool Initialized() const;
+    + ***Deprecation:*** public: unsigned int GetWindowId() const;
+    + ***Replacement:*** public: unsigned int WindowId() const;
     + ***Deprecation:*** public: math::Vector3 GetWorldPosition() const
     + ***Replacement:*** public: ignition::math::Vector3d WorldPosition() const;
     + ***Deprecation:*** public: math::Quaternion GetWorldRotation() const
@@ -500,32 +620,86 @@ release will remove the deprecated code.
     + ***Replacement:*** public: void SetWorldRotation(const ignition::math::Quaterniond &_quat);
     + ***Deprecation:*** public: void Translate(const math::Vector3 &_direction)
     + ***Replacement:*** public: void Translate(const ignition::math::Vector3d &_direction);
-    + ***Deprecation:***  public: void Roll(const math::Angle &_angle,Ogre::Node::TransformSpace _relativeTo =Ogre::Node::TS_LOCAL);
-    + ***Replacement:*** public: void Roll(const ignition::math::Angle &_angle,Ogre::Node::TransformSpace _relativeTo =Ogre::Node::TS_LOCAL);
-    + ***Deprecation:***  public: void Pitch(const math::Angle &_angle,Ogre::Node::TransformSpace _relativeTo =Ogre::Node::TS_LOCAL);
-    + ***Replacement:*** public: void Pitch(const ignition::math::Angle &_angle,Ogre::Node::TransformSpace _relativeTo =Ogre::Node::TS_LOCAL);
-    + ***Deprecation:***  public: void Yaw(const math::Angle &_angle,Ogre::Node::TransformSpace _relativeTo =Ogre::Node::TS_LOCAL);
-    + ***Replacement:*** public: void Yaw(const ignition::math::Angle &_angle,Ogre::Node::TransformSpace _relativeTo =Ogre::Node::TS_LOCAL);
+    + ***Deprecation:***  public: void Roll(const math::Angle &_angle, Ogre::Node::TransformSpace _relativeTo =Ogre::Node::TS_LOCAL);
+    + ***Replacement:*** public: void Roll(const ignition::math::Angle &_angle, ReferenceFrame _relativeTo = RF_LOCAL);
+    + ***Deprecation:***  public: void Pitch(const math::Angle &_angle, Ogre::Node::TransformSpace _relativeTo =Ogre::Node::TS_LOCAL);
+    + ***Replacement:*** public: void Pitch(const ignition::math::Angle &_angle, ReferenceFrame _relativeTo = RF_LOCAL);
+    + ***Deprecation:***  public: void Yaw(const math::Angle &_angle, Ogre::Node::TransformSpace _relativeTo =Ogre::Node::TS_WORLD);
+    + ***Replacement:*** public: void Yaw(const ignition::math::Angle &_angle, ReferenceFrame _relativeTo = RF_WORLD);
     + ***Deprecation:*** public: void SetHFOV(math::Angle _angle);
     + ***Replacement:*** public: void SetHFOV(const ignition::math::Angle &_angle);
     + ***Deprecation:*** public: math::Angle GetHFOV() const
     + ***Replacement:*** public: ignition::math::Angle HFOV() const;
     + ***Deprecation:*** public: math::Angle GetVFOV() const;
     + ***Replacement:*** public: ignition::math::Angle VFOV() const;
+    + ***Deprecation:*** public: virtual unsigned int GetImageWidth() const;
+    + ***Replacement:*** public: virtual unsigned int ImageWidth() const;
+    + ***Deprecation:*** public: unsigned int GetTextureWidth() const;
+    + ***Replacement:*** public: unsigned int TextureWidth() const;
+    + ***Deprecation:*** public: virtual unsigned int GetImageHeight() const;
+    + ***Replacement:*** public: virtual unsigned int ImageHeight() const;
+    + ***Deprecation:*** public: unsigned int GetImageDepth() const;
+    + ***Replacement:*** public: unsigned int ImageDepth() const;
+    + ***Deprecation:*** public: std::string GetImageFormat() const;
+    + ***Replacement:*** public: std::string ImageFormat() const;
+    + ***Deprecation:*** public: unsigned int GetTextureHeight() const;
+    + ***Replacement:*** public: unsigned int TextureHeight() const;
+    + ***Deprecation:*** public: size_t GetImageByteSize() const;
+    + ***Replacement:*** public: size_t ImageByteSize() const;
+    + ***Deprecation:*** public: static size_t GetImageByteSize(unsigned int _width, unsigned int _height, const std::string &_format);
+    + ***Replacement:*** static size_t ImageByteSize(const unsigned int _width, const unsigned int _height, const std::string &_format);
+    + ***Deprecation:*** public: double GetZValue(int _x, int _y);
+    + ***Replacement:*** public: double ZValue(const int _x, const int _y);
+    + ***Deprecation:*** public: double GetNearClip();
+    + ***Replacement:*** public: double NearClip() const;
+    + ***Deprecation:*** public: double GetFarClip();
+    + ***Replacement:*** public: double FarClip() const;
+    + ***Deprecation:*** public: bool GetCaptureData() const;
+    + ***Replacement:*** public: bool CaptureData() const;
+    + ***Deprecation:*** public: Ogre::Camera *GetOgreCamera() const;
+    + ***Replacement:*** public: Ogre::Camera *OgreCamera() const;
+    + ***Deprecation:*** public: Ogre::Viewport *GetViewport() const;
+    + ***Replacement:*** public: Ogre::Viewport *OgreViewport() const;
+    + ***Deprecation:*** public: unsigned int GetViewportWidth() const;
+    + ***Replacement:*** public: unsigned int ViewportWidth() const;
+    + ***Deprecation:*** public: unsigned int GetViewportHeight() const;
+    + ***Replacement:*** public: unsigned int ViewportHeight() const;
     + ***Deprecation:*** public: math::Vector3 GetUp();
     + ***Replacement:*** public: ignition::math::Vector3d Up() const;
     + ***Deprecation:*** public: math::Vector3 GetRight();
     + ***Replacement:*** public: ignition::math::Vector3d Right() const;
+    + ***Deprecation:*** public: virtual float GetAvgFPS() const;
+    + ***Replacement:*** public: virtual float AvgFPS() const;
+    + ***Deprecation:*** public: virtual unsigned int GetTriangleCount() const;
+    + ***Replacement:*** public: virtual unsigned int TriangleCount() const;
+    + ***Deprecation:*** public: float GetAspectRatio() const;
+    + ***Replacement:*** public: float AspectRatio() const;
+    + ***Deprecation:*** public: Ogre::SceneNode *GetSceneNode() const;
+    + ***Replacement:*** public: Ogre::SceneNode *SceneNode() const;
+    + ***Deprecation:*** public: virtual const unsigned char *GetImageData(unsigned int i = 0);
+    + ***Replacement:*** public: virtual const unsigned char *ImageData(unsigned int i = 0) const;
+    + ***Deprecation:*** public: std::string GetName() const;
+    + ***Replacement:*** public: std::string Name() const;
+    + ***Deprecation:*** public: std::string GetScopedName() const;
+    + ***Replacement:*** public: std::string ScopedName() const;
     + ***Deprecation:*** public: void GetCameraToViewportRay(int _screenx, int _screeny,math::Vector3 &_origin, math::Vector3 &_dir);
-    + ***Replacement:*** public: void CameraToViewportRay(int _screenx, int _screeny,ignition::math::Vector3d &_origin,ignition::math::Vector3d &_dir) const;
+    + ***Replacement:*** public: void CameraToViewportRay(const int _screenx, const int _screeny,ignition::math::Vector3d &_origin,ignition::math::Vector3d &_dir) const;
     + ***Deprecation:*** public: bool GetWorldPointOnPlane(int _x, int _y,const math::Plane &_plane, math::Vector3 &_result);
-    + ***Replacement:*** public: bool WorldPointOnPlane(int _x, int _y,const ignition::math::Planed &_plane,ignition::math::Vector3d &_result);
+    + ***Replacement:*** public: bool WorldPointOnPlane(const int _x, const int _y, const ignition::math::Planed &_plane,ignition::math::Vector3d &_result);
+    + ***Deprecation:*** public: Ogre::Texture *GetRenderTexture() const;
+    + ***Replacement:*** public: Ogre::Texture *RenderTexture() const;
     + ***Deprecation:*** public: math::Vector3 GetDirection();
     + ***Replacement:*** public: ignition::math::Vector3d Direction() const;
+    + ***Deprecation:*** public: common::Time GetLastRenderWallTime();
+    + ***Replacement:*** public: common::Time LastRenderWallTime() const;
     + ***Deprecation:*** public: virtual bool MoveToPosition(const math::Pose &_pose,double _time);
     + ***Replacement:***  public: virtual bool MoveToPosition(const ignition::math::Pose3d &_pose,double _time);
     + ***Deprecation:*** public: bool MoveToPositions(const std::vector<math::Pose> &_pts,double _time,boost::function<void()> _onComplete = NULL);
     + ***Replacement:*** public: bool MoveToPositions(const std::vector<ignition::math::Pose3d> &_pts,double _time,boost::function<void()> _onComplete = NULL);
+    + ***Deprecation:*** public: std::string GetScreenshotPath() const;
+    + ***Replacement:*** public: std::string ScreenshotPath() const;
+    + ***Deprecation:*** public: std::string GetProjectionType() const;
+    + ***Replacement:*** public: std::string ProjectionType() const;
 
 1. **gazebo/gui/RTShaderSystem.hh**
     + ***Deprecation:*** void AttachEntity(Visual *vis)

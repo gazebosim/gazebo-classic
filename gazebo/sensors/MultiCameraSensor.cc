@@ -144,11 +144,11 @@ void MultiCameraSensor::Init()
     camera->Load(cameraSdf);
 
     // Do some sanity checks
-    if (camera->GetImageWidth() == 0 || camera->GetImageHeight() == 0)
+    if (camera->ImageWidth() == 0 || camera->ImageHeight() == 0)
       gzthrow("Image has zero size");
 
     camera->Init();
-    camera->CreateRenderTexture(camera->GetName() + "_RttTex");
+    camera->CreateRenderTexture(camera->Name() + "_RttTex");
 
     ignition::math::Pose3d cameraPose = this->pose;
     if (cameraSdf->HasElement("pose"))
@@ -178,11 +178,11 @@ void MultiCameraSensor::Init()
     }
 
     msgs::Image *image = this->dataPtr->msg.add_image();
-    image->set_width(camera->GetImageWidth());
-    image->set_height(camera->GetImageHeight());
+    image->set_width(camera->ImageWidth());
+    image->set_height(camera->ImageHeight());
     image->set_pixel_format(common::Image::ConvertPixelFormat(
-          camera->GetImageFormat()));
-    image->set_step(camera->GetImageWidth() * camera->GetImageDepth());
+          camera->ImageFormat()));
+    image->set_step(camera->ImageWidth() * camera->ImageDepth());
 
     cameraSdf = cameraSdf->GetNextElement("camera");
   }
@@ -208,7 +208,7 @@ void MultiCameraSensor::Fini()
       this->dataPtr->cameras.begin();
       iter != this->dataPtr->cameras.end(); ++iter)
   {
-    (*iter)->GetScene()->RemoveCamera((*iter)->GetName());
+    (*iter)->GetScene()->RemoveCamera((*iter)->Name());
   }
   this->dataPtr->cameras.clear();
   this->scene.reset();
@@ -252,7 +252,7 @@ void MultiCameraSensor::Render()
   }
 
   this->dataPtr->rendered = true;
-  this->lastMeasurementTime = this->scene->GetSimTime();
+  this->lastMeasurementTime = this->scene->SimTime();
 }
 
 //////////////////////////////////////////////////
@@ -277,8 +277,8 @@ bool MultiCameraSensor::UpdateImpl(const bool /*_force*/)
     if (publish)
     {
       msgs::Image *image = this->dataPtr->msg.mutable_image(index);
-      image->set_data((*iter)->GetImageData(0),
-          image->width() * (*iter)->GetImageDepth() * image->height());
+      image->set_data((*iter)->ImageData(0),
+          image->width() * (*iter)->ImageDepth() * image->height());
     }
   }
 
@@ -311,7 +311,7 @@ unsigned int MultiCameraSensor::GetImageWidth(unsigned int _index) const
 //////////////////////////////////////////////////
 unsigned int MultiCameraSensor::ImageWidth(const unsigned int _index) const
 {
-  return this->Camera(_index)->GetImageWidth();
+  return this->Camera(_index)->ImageWidth();
 }
 
 //////////////////////////////////////////////////
@@ -323,7 +323,7 @@ unsigned int MultiCameraSensor::GetImageHeight(unsigned int _index) const
 //////////////////////////////////////////////////
 unsigned int MultiCameraSensor::ImageHeight(const unsigned int _index) const
 {
-  return this->Camera(_index)->GetImageHeight();
+  return this->Camera(_index)->ImageHeight();
 }
 
 //////////////////////////////////////////////////
@@ -335,7 +335,7 @@ const unsigned char *MultiCameraSensor::GetImageData(unsigned int _index)
 //////////////////////////////////////////////////
 const unsigned char *MultiCameraSensor::ImageData(const unsigned int _index)
 {
-  return this->Camera(_index)->GetImageData(0);
+  return this->Camera(_index)->ImageData(0);
 }
 
 //////////////////////////////////////////////////

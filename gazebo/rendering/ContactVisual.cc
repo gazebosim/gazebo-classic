@@ -53,7 +53,7 @@ ContactVisual::ContactVisual(const std::string &_name, VisualPtr _vis,
   dPtr->receivedMsg = false;
 
   dPtr->node = transport::NodePtr(new transport::Node());
-  dPtr->node->Init(dPtr->scene->GetName());
+  dPtr->node->Init(dPtr->scene->Name());
 
   dPtr->topicName = _topicName;
   dPtr->contactsSub = dPtr->node->Subscribe(dPtr->topicName,
@@ -193,7 +193,7 @@ void ContactVisual::CreateNewPoint()
     "_contactpoint_" + boost::lexical_cast<std::string>(dPtr->points.size());
 
   /// \todo We can improve this by using instanced geometry.
-  Ogre::Entity *obj = dPtr->scene->GetManager()->createEntity(
+  Ogre::Entity *obj = dPtr->scene->OgreSceneManager()->createEntity(
                       objName, "contact_sphere");
   obj->setMaterialName("Gazebo/BlueLaser");
 
