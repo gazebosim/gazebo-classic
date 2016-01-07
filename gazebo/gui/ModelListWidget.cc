@@ -603,49 +603,34 @@ void ModelListWidget::OnCurrentPropertyChanged(QtBrowserItem *_item)
 /////////////////////////////////////////////////
 void ModelListWidget::OnPropertyChanged(QtProperty *_item)
 {
-  bool locked = false;
-  try
+  std::unique_lock<std::mutex> lock(*this->dataPtr->propMutex, std::defer_lock);
+
+  if (!lock.try_lock())
+    return;
+
+  if (this->dataPtr->selectedProperty != _item ||
+      this->dataPtr->fillingPropertyTree)
   {
-    locked = this->dataPtr->propMutex->try_lock();
-    // -1 means success
-    if (!locked)
-      return;
-
-    if (this->dataPtr->selectedProperty != _item ||
-        this->dataPtr->fillingPropertyTree)
-    {
-      this->dataPtr->propMutex->unlock();
-      return;
-    }
-
-    QTreeWidgetItem *currentItem =
-        this->dataPtr->modelTreeWidget->currentItem();
-
-    if (!currentItem)
-    {
-      this->dataPtr->propMutex->unlock();
-      return;
-    }
-
-    if (this->dataPtr->modelsItem->indexOfChild(currentItem) != -1 ||
-        this->dataPtr->modelsItem->indexOfChild(currentItem->parent()) != -1)
-      this->ModelPropertyChanged(_item);
-    else if (this->dataPtr->lightsItem->indexOfChild(currentItem) != -1)
-      this->LightPropertyChanged(_item);
-    else if (currentItem == this->dataPtr->sceneItem)
-      this->ScenePropertyChanged(_item);
-    else if (currentItem == this->dataPtr->physicsItem)
-      this->PhysicsPropertyChanged(_item);
-    else if (currentItem == this->dataPtr->guiItem)
-      this->GUIPropertyChanged(_item);
+    return;
   }
-  catch(...)
-  {
-    // release lock if we have it
-    if (locked)
-      this->dataPtr->propMutex->unlock();
-    throw;
-  }
+
+  QTreeWidgetItem *currentItem =
+    this->dataPtr->modelTreeWidget->currentItem();
+
+  if (!currentItem)
+    return;
+
+  if (this->dataPtr->modelsItem->indexOfChild(currentItem) != -1 ||
+      this->dataPtr->modelsItem->indexOfChild(currentItem->parent()) != -1)
+    this->ModelPropertyChanged(_item);
+  else if (this->dataPtr->lightsItem->indexOfChild(currentItem) != -1)
+    this->LightPropertyChanged(_item);
+  else if (currentItem == this->dataPtr->sceneItem)
+    this->ScenePropertyChanged(_item);
+  else if (currentItem == this->dataPtr->physicsItem)
+    this->PhysicsPropertyChanged(_item);
+  else if (currentItem == this->dataPtr->guiItem)
+    this->GUIPropertyChanged(_item);
 }
 
 
@@ -2582,53 +2567,6 @@ void ModelListWidget::ResetTree()
 
   this->dataPtr->fillingPropertyTree = false;
   this->dataPtr->selectedProperty = NULL;
-}
-
-/////////////////////////////////////////////////
-ModelListSheetDelegate::ModelListSheetDelegate(QTreeView *view, QWidget *parent)
-    : QItemDelegate(parent), m_view(view)
-{
-}
-
-/////////////////////////////////////////////////
-void ModelListSheetDelegate::paint(QPainter *painter,
-    const QStyleOptionViewItem &option, const QModelIndex &index) const
-{
-  const QAbstractItemModel *model = index.model();
-  Q_ASSERT(model);
-
-  if (!model->parent(index).isValid())
-  {
-    QRect r = option.rect;
-    static const int i = 9;
-
-    // draw text
-    QRect textrect = QRect(r.left()+4, r.top(),
-        r.width() - ((5*i)/2), r.height());
-    QString text = elidedText(option.fontMetrics,
-        textrect.width(),
-        Qt::ElideMiddle,
-        model->data(index, Qt::DisplayRole).toString());
-
-    if (option.state & QStyle::State_Selected)
-      painter->setPen(QPen(QColor(245, 129, 19), 1));
-
-    m_view->style()->drawItemText(painter, textrect, Qt::AlignLeft,
-        option.palette, m_view->isEnabled(), text);
-  }
-  else
-  {
-    QItemDelegate::paint(painter, option, index);
-  }
-}
-
-/////////////////////////////////////////////////
-QSize ModelListSheetDelegate::sizeHint(const QStyleOptionViewItem &opt,
-                                               const QModelIndex &index) const
-{
-  QStyleOptionViewItem option = opt;
-  QSize sz = QItemDelegate::sizeHint(opt, index) + QSize(2, 2);
-  return sz;
 }
 
 /////////////////////////////////////////////////

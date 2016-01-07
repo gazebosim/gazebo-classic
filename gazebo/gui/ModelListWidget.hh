@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  */
-#ifndef _GAZEBO_GUI_MODEL_LIST_WIDGET_HH_
-#define _GAZEBO_GUI_MODEL_LIST_WIDGET_HH_
+#ifndef _GAZEBO_GUI_MODELLISTWIDGET_HH_
+#define _GAZEBO_GUI_MODELLISTWIDGET_HH_
 
 #include <memory>
 #include <string>
@@ -191,21 +191,6 @@ namespace gazebo
       /// \internal
       /// \brief Pointer to private data.
       private: std::unique_ptr<ModelListWidgetPrivate> dataPtr;
-    };
-
-    class GZ_GUI_VISIBLE ModelListSheetDelegate: public QItemDelegate
-    {
-      Q_OBJECT
-      public: ModelListSheetDelegate(QTreeView *view, QWidget *parent);
-
-      public: virtual void paint(QPainter *painter,
-                  const QStyleOptionViewItem &option,
-                  const QModelIndex &index) const;
-
-      public: virtual QSize sizeHint(const QStyleOptionViewItem &opt,
-                  const QModelIndex &index) const;
-
-      private: QTreeView *m_view;
     };
   }
 }
