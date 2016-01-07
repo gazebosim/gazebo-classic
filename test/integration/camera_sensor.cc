@@ -78,7 +78,7 @@ TEST_F(CameraSensor, CheckThrottle)
       setPose.rot.GetAsEuler(), width, height, updateRate);
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
   sensors::CameraSensorPtr camSensor =
-    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
   imageCount = 0;
   img = new unsigned char[width * height*3];
   event::ConnectionPtr c =
@@ -129,7 +129,7 @@ TEST_F(CameraSensor, FillMsg)
       setPose.rot.GetAsEuler(), width, height, updateRate);
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
   sensors::CameraSensorPtr camSensor =
-    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
 
   msgs::Sensor msg;
   sensor->FillMsg(msg);
@@ -163,9 +163,9 @@ TEST_F(CameraSensor, FillMsg)
   EXPECT_EQ(cameraMsg.horizontal_fov(), cam->HFOV().Radian());
   EXPECT_EQ(cameraMsg.image_size().x(), camSensor->GetImageWidth());
   EXPECT_EQ(cameraMsg.image_size().y(), camSensor->GetImageHeight());
-  EXPECT_EQ(cameraMsg.image_format(), cam->GetImageFormat());
-  EXPECT_EQ(cameraMsg.near_clip(), cam->GetNearClip());
-  EXPECT_EQ(cameraMsg.far_clip(), cam->GetFarClip());
+  EXPECT_EQ(cameraMsg.image_format(), cam->ImageFormat());
+  EXPECT_EQ(cameraMsg.near_clip(), cam->NearClip());
+  EXPECT_EQ(cameraMsg.far_clip(), cam->FarClip());
 }
 
 /////////////////////////////////////////////////
@@ -195,7 +195,7 @@ TEST_F(CameraSensor, UnlimitedTest)
       setPose.rot.GetAsEuler(), width, height, updateRate);
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
   sensors::CameraSensorPtr camSensor =
-    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
   imageCount = 0;
   img = new unsigned char[width * height*3];
   event::ConnectionPtr c =
@@ -248,7 +248,7 @@ TEST_F(CameraSensor, MultiSenseHigh)
       setPose.rot.GetAsEuler(), width, height, updateRate);
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
   sensors::CameraSensorPtr camSensor =
-    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
   imageCount = 0;
   img = new unsigned char[width * height*3];
   event::ConnectionPtr c =
@@ -303,7 +303,7 @@ TEST_F(CameraSensor, MultiSenseLow)
       setPose.rot.GetAsEuler(), width, height, updateRate);
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
   sensors::CameraSensorPtr camSensor =
-    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
   imageCount = 0;
   img = new unsigned char[width * height*3];
   event::ConnectionPtr c =
@@ -360,10 +360,10 @@ TEST_F(CameraSensor, CheckNoise)
       "gaussian", noiseMean, noiseStdDev);
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
   sensors::CameraSensorPtr camSensor =
-    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
   sensor = sensors::get_sensor(cameraNameNoisy);
   sensors::CameraSensorPtr camSensorNoisy =
-    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
 
   imageCount = 0;
   imageCount2 = 0;
@@ -428,10 +428,10 @@ TEST_F(CameraSensor, CheckDistortion)
       "", 0, 0, true, -0.25349, 0.11868, 0.0, -0.00028, 0.00005, 0.5, 0.5);
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
   sensors::CameraSensorPtr camSensor =
-    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
   sensor = sensors::get_sensor(cameraNameDistorted);
   sensors::CameraSensorPtr camSensorDistorted =
-    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
 
   imageCount = 0;
   imageCount2 = 0;
@@ -534,10 +534,10 @@ TEST_F(CameraSensor, CompareSideBySideCamera)
 
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
   sensors::CameraSensorPtr camSensor =
-    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
   sensor = sensors::get_sensor(cameraName2);
   sensors::CameraSensorPtr camSensor2 =
-    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
 
   imageCount = 0;
   imageCount2 = 0;

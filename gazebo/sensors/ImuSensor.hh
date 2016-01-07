@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_IMUSENSOR_HH_
-#define _GAZEBO_IMUSENSOR_HH_
+#ifndef _GAZEBO_SENSORS_IMUSENSOR_HH_
+#define _GAZEBO_SENSORS_IMUSENSOR_HH_
 
 #include <vector>
 #include <string>

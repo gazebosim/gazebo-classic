@@ -37,14 +37,14 @@ GZ_REGISTER_STATIC_SENSOR("logical_camera", LogicalCameraSensor)
 
 //////////////////////////////////////////////////
 LogicalCameraSensor::LogicalCameraSensor()
-  : Sensor(sensors::OTHER), dataPtr(new LogicalCameraSensorPrivate())
+: Sensor(sensors::OTHER),
+  dataPtr(new LogicalCameraSensorPrivate)
 {
 }
 
 //////////////////////////////////////////////////
 LogicalCameraSensor::~LogicalCameraSensor()
 {
-  delete this->dataPtr;
 }
 
 //////////////////////////////////////////////////
