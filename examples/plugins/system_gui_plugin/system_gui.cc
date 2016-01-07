@@ -71,7 +71,7 @@ namespace gazebo
       rendering::ScenePtr scene = rendering::get_scene();
 
       // Wait until the scene is initialized.
-      if (!scene || !scene->GetInitialized())
+      if (!scene || !scene->Initialized())
         return;
 
       // Look for a specific visual by name.

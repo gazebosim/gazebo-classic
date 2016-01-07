@@ -88,7 +88,7 @@ bool ModelMaker::InitFromModel(const std::string &_modelName)
   }
 
   dPtr->modelVisual = vis->Clone(
-      _modelName + "_clone_tmp", scene->GetWorldVisual());
+      _modelName + "_clone_tmp", scene->WorldVisual());
 
   if (!dPtr->modelVisual)
   {
@@ -219,7 +219,7 @@ bool ModelMaker::Init()
 
   dPtr->modelVisual.reset(new rendering::Visual(
       dPtr->node->GetTopicNamespace() + "::" + modelName,
-      scene->GetWorldVisual()));
+      scene->WorldVisual()));
   dPtr->modelVisual->Load();
   dPtr->modelVisual->SetPose(modelPose);
 

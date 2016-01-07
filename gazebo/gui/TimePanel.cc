@@ -320,7 +320,7 @@ void TimePanel::Update()
   if (cam)
   {
     std::ostringstream avgFPS;
-    avgFPS << cam->GetAvgFPS();
+    avgFPS << cam->AvgFPS();
 
     if (this->dataPtr->timeWidget->isVisible())
     {
