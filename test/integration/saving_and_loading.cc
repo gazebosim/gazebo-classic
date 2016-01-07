@@ -28,7 +28,7 @@
 using namespace gazebo;
 
 //////////////////////////////////////////////////
-class ScalingTest : public ServerFixture,
+class SavingLoadingTest : public ServerFixture,
                     public testing::WithParamInterface<const char*>
 {
   /// \brief Test scaling a model and then saving it. The scale should show up
@@ -42,7 +42,7 @@ class ScalingTest : public ServerFixture,
 };
 
 //////////////////////////////////////////////////
-void ScalingTest::SaveScaledModel(const std::string &_physicsEngine)
+void SavingLoadingTest::SaveScaledModel(const std::string &_physicsEngine)
 {
   // load a world with simple shapes
   this->Load("worlds/shapes.world", true, _physicsEngine);
@@ -209,7 +209,7 @@ void ScalingTest::SaveScaledModel(const std::string &_physicsEngine)
 }
 
 //////////////////////////////////////////////////
-void ScalingTest::LoadScaledModels(const std::string &_physicsEngine)
+void SavingLoadingTest::LoadScaledModels(const std::string &_physicsEngine)
 {
   // load a world which has models scaled in the state
   this->Load("test/worlds/scaled_shapes.world", true, _physicsEngine);
@@ -238,18 +238,18 @@ void ScalingTest::LoadScaledModels(const std::string &_physicsEngine)
 }
 
 /////////////////////////////////////////////////
-TEST_P(ScalingTest, SaveScaledModel)
+TEST_P(SavingLoadingTest, SaveScaledModel)
 {
   this->SaveScaledModel(GetParam());
 }
 
 /////////////////////////////////////////////////
-TEST_P(ScalingTest, LoadScaledModels)
+TEST_P(SavingLoadingTest, LoadScaledModels)
 {
   this->LoadScaledModels(GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, ScalingTest,
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, SavingLoadingTest,
                         PHYSICS_ENGINE_VALUES);
 
 /////////////////////////////////////////////////

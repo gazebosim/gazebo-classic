@@ -79,9 +79,9 @@ set(tests
   region_events.cc
   rest_web.cc
   road.cc
+  saving_and_loading.cc
   sensor.cc
   server_fixture.cc
-  scaling.cc
   sim_events.cc
   speed.cc
   speed_thread_pr2.cc
