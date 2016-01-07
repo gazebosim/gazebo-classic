@@ -2089,14 +2089,15 @@ void ModelCreator::OnPaste()
 
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
 
-  math::Pose clonePose;
+  ignition::math::Pose3d clonePose;
   rendering::UserCameraPtr userCamera = gui::get_active_camera();
   if (userCamera)
   {
-    math::Vector3 mousePosition = ModelManipulator::GetMousePositionOnPlane(
-        userCamera, this->lastMouseEvent);
-    clonePose.pos.x = mousePosition.x;
-    clonePose.pos.y = mousePosition.y;
+    ignition::math::Vector3d mousePosition =
+        ModelManipulator::GetMousePositionOnPlane(
+        userCamera, this->lastMouseEvent).Ign();
+    clonePose.Pos().X() = mousePosition.X();
+    clonePose.Pos().Y() = mousePosition.Y();
   }
 
   // For now, only copy the last selected (nested models come after)
@@ -2117,9 +2118,9 @@ void ModelCreator::OnPaste()
     }
 
     // Propagate copied entity's Z position and rotation
-    math::Pose copiedPose = copiedLink->Pose();
-    clonePose.pos.z = this->modelPose.Pos().Z() + copiedPose.pos.z;
-    clonePose.rot = copiedPose.rot;
+    ignition::math::Pose3d copiedPose = copiedLink->Pose();
+    clonePose.Pos().Z() = this->modelPose.Pos().Z() + copiedPose.Pos().Z();
+    clonePose.Rot() = copiedPose.Rot();
 
     LinkData *clonedLink = this->CloneLink(it->first);
     clonedLink->linkVisual->SetWorldPose(clonePose);
@@ -2145,9 +2146,9 @@ void ModelCreator::OnPaste()
       }
 
       // Propagate copied entity's Z position and rotation
-      math::Pose copiedPose = copiedNestedModel->Pose();
-      clonePose.pos.z = this->modelPose.Pos().Z() + copiedPose.pos.z;
-      clonePose.rot = copiedPose.rot;
+      ignition::math::Pose3d copiedPose = copiedNestedModel->Pose();
+      clonePose.Pos().Z() = this->modelPose.Pos().Z() + copiedPose.Pos().Z();
+      clonePose.Rot() = copiedPose.Rot();
 
       NestedModelData *clonedNestedModel = this->CloneNestedModel(it2->first);
       clonedNestedModel->modelVisual->SetWorldPose(clonePose);

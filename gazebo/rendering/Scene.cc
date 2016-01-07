@@ -911,7 +911,7 @@ double Scene::GetHeightBelowPoint(const math::Vector3 &_pt)
   if (this->dataPtr->terrain)
   {
     double terrainHeight =
-        this->dataPtr->terrain->GetHeight(_pt.x, _pt.y, _pt.z);
+        this->dataPtr->terrain->Height(_pt.x, _pt.y, _pt.z);
     if (terrainHeight <= _pt.z)
       height = std::max(height, terrainHeight);
   }
@@ -1170,7 +1170,7 @@ bool Scene::GetFirstContact(CameraPtr _camera,
   {
     // The terrain uses a special ray intersection test.
     Ogre::TerrainGroup::RayResult terrainResult =
-      this->dataPtr->terrain->GetOgreTerrain()->rayIntersects(mouseRay);
+      this->dataPtr->terrain->OgreTerrain()->rayIntersects(mouseRay);
 
     if (terrainResult.hit)
     {
