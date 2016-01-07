@@ -24,14 +24,10 @@
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/message.h>
 
-#include <boost/algorithm/string.hpp>
-#include <boost/bind.hpp>
-#include <boost/filesystem.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/thread/recursive_mutex.hpp>
-#include <boost/thread/mutex.hpp>
-
 #include <sdf/sdf.hh>
+
+#include <ignition/math/Angle.hh>
+
 #include "gazebo/common/Image.hh"
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/common/Console.hh"
@@ -47,9 +43,6 @@
 
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
-
-#include "gazebo/math/Angle.hh"
-#include "gazebo/math/Helpers.hh"
 
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/ModelRightMenu.hh"
@@ -76,8 +69,8 @@ ModelListWidget::ModelListWidget(QWidget *_parent)
   this->setObjectName("modelList");
 
   this->dataPtr->requestMsg = NULL;
-  this->dataPtr->propMutex = new boost::mutex();
-  this->dataPtr->receiveMutex = new boost::mutex();
+  this->dataPtr->propMutex = new std::mutex();
+  this->dataPtr->receiveMutex = new std::mutex();
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
   this->dataPtr->modelTreeWidget = new QTreeWidget();
@@ -219,7 +212,7 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
       auto cameraBrowser = this->dataPtr->propTreeBrowser->addProperty(topItem);
 
       // Create and set the gui camera name
-      std::string cameraName = cam->GetName();
+      std::string cameraName = cam->Name();
       item = this->dataPtr->variantManager->addProperty(QVariant::String,
           tr("name"));
       item->setValue(cameraName.c_str());
@@ -299,7 +292,7 @@ void ModelListWidget::Update()
 {
   if (!this->dataPtr->fillTypes.empty())
   {
-    boost::mutex::scoped_lock lock(*this->dataPtr->propMutex);
+    std::lock_guard<std::mutex> lock(*this->dataPtr->propMutex);
     this->dataPtr->fillingPropertyTree = true;
     this->dataPtr->propTreeBrowser->clear();
 
@@ -323,7 +316,7 @@ void ModelListWidget::Update()
 
   if (!this->dataPtr->modelTreeWidget->currentItem())
   {
-    boost::mutex::scoped_lock lock(*this->dataPtr->propMutex);
+    std::lock_guard<std::mutex> lock(*this->dataPtr->propMutex);
     this->dataPtr->propTreeBrowser->clear();
   }
 
@@ -336,7 +329,7 @@ void ModelListWidget::Update()
 /////////////////////////////////////////////////
 void ModelListWidget::OnModelUpdate(const msgs::Model &_msg)
 {
-  boost::mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
+  std::lock_guard<std::mutex> lock(*this->dataPtr->receiveMutex);
   msgs::Model msg;
   msg.CopyFrom(_msg);
   this->dataPtr->modelMsgs.push_back(msg);
@@ -345,7 +338,7 @@ void ModelListWidget::OnModelUpdate(const msgs::Model &_msg)
 /////////////////////////////////////////////////
 void ModelListWidget::OnLightUpdate(const msgs::Light &_msg)
 {
-  boost::mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
+  std::lock_guard<std::mutex> lock(*this->dataPtr->receiveMutex);
   msgs::Light msg;
   msg.CopyFrom(_msg);
   this->dataPtr->lightMsgs.push_back(msg);
@@ -354,7 +347,7 @@ void ModelListWidget::OnLightUpdate(const msgs::Light &_msg)
 /////////////////////////////////////////////////
 void ModelListWidget::ProcessModelMsgs()
 {
-  boost::mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
+  std::lock_guard<std::mutex> lock(*this->dataPtr->receiveMutex);
 
   for (auto iter = this->dataPtr->modelMsgs.begin();
        iter != this->dataPtr->modelMsgs.end(); ++iter)
@@ -604,31 +597,51 @@ void ModelListWidget::OnCurrentPropertyChanged(QtBrowserItem *_item)
 /////////////////////////////////////////////////
 void ModelListWidget::OnPropertyChanged(QtProperty *_item)
 {
-  boost::mutex::scoped_try_lock lock(*this->dataPtr->propMutex);
-  if (!lock)
-    return;
+  bool locked = false;
+  try
+  {
+    locked = this->dataPtr->propMutex->try_lock();
+    // -1 means success
+    if (!locked)
+      return;
 
-  if (this->dataPtr->selectedProperty != _item ||
-      this->dataPtr->fillingPropertyTree)
-    return;
+    if (this->dataPtr->selectedProperty != _item ||
+        this->dataPtr->fillingPropertyTree)
+    {
+      this->dataPtr->propMutex->unlock();
+      return;
+    }
 
-  QTreeWidgetItem *currentItem = this->dataPtr->modelTreeWidget->currentItem();
+    QTreeWidgetItem *currentItem =
+        this->dataPtr->modelTreeWidget->currentItem();
 
-  if (!currentItem)
-    return;
+    if (!currentItem)
+    {
+      this->dataPtr->propMutex->unlock();
+      return;
+    }
 
-  if (this->dataPtr->modelsItem->indexOfChild(currentItem) != -1 ||
-      this->dataPtr->modelsItem->indexOfChild(currentItem->parent()) != -1)
-    this->ModelPropertyChanged(_item);
-  else if (this->dataPtr->lightsItem->indexOfChild(currentItem) != -1)
-    this->LightPropertyChanged(_item);
-  else if (currentItem == this->dataPtr->sceneItem)
-    this->ScenePropertyChanged(_item);
-  else if (currentItem == this->dataPtr->physicsItem)
-    this->PhysicsPropertyChanged(_item);
-  else if (currentItem == this->dataPtr->guiItem)
-    this->GUIPropertyChanged(_item);
+    if (this->dataPtr->modelsItem->indexOfChild(currentItem) != -1 ||
+        this->dataPtr->modelsItem->indexOfChild(currentItem->parent()) != -1)
+      this->ModelPropertyChanged(_item);
+    else if (this->dataPtr->lightsItem->indexOfChild(currentItem) != -1)
+      this->LightPropertyChanged(_item);
+    else if (currentItem == this->dataPtr->sceneItem)
+      this->ScenePropertyChanged(_item);
+    else if (currentItem == this->dataPtr->physicsItem)
+      this->PhysicsPropertyChanged(_item);
+    else if (currentItem == this->dataPtr->guiItem)
+      this->GUIPropertyChanged(_item);
+  }
+  catch(...)
+  {
+    // release lock if we have it
+    if (locked)
+      this->dataPtr->propMutex->unlock();
+    throw;
+  }
 }
+
 
 /////////////////////////////////////////////////
 void ModelListWidget::LightPropertyChanged(QtProperty * /*_item*/)
@@ -935,7 +948,9 @@ void ModelListWidget::FillGeometryMsg(QtProperty *_item,
   reflection->SetEnum(_message, _descriptor->FindFieldByName("type"),
       _descriptor->FindEnumValueByName(type));
 
-  boost::to_lower(type);
+  // make sure type content is lowercase
+  std::transform(type.begin(), type.end(), type.begin(), ::tolower);
+
   const google::protobuf::FieldDescriptor *field =
     _descriptor->FindFieldByName(type);
   google::protobuf::Message *message =
@@ -1111,24 +1126,24 @@ void ModelListWidget::FillPoseMsg(QtProperty *_item,
       this->GetChildItem(_item, "pitch")).toDouble();
   yaw = this->dataPtr->variantManager->value(
       this->GetChildItem(_item, "yaw")).toDouble();
-  math::Quaternion q(roll, pitch, yaw);
+  ignition::math::Quaterniond q(roll, pitch, yaw);
 
   orientReflection->SetDouble(
       orientMessage,
       orientDescriptor->FindFieldByName("x"),
-      q.x);
+      q.X());
   orientReflection->SetDouble(
       orientMessage,
       orientDescriptor->FindFieldByName("y"),
-      q.y);
+      q.Y());
   orientReflection->SetDouble(
       orientMessage,
       orientDescriptor->FindFieldByName("z"),
-      q.z);
+      q.Z());
   orientReflection->SetDouble(
       orientMessage,
       orientDescriptor->FindFieldByName("w"),
-      q.w);
+      q.W());
 }
 
 /////////////////////////////////////////////////
@@ -1521,7 +1536,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Joint &_msg,
   // Angle
   for (int i = 0; i < _msg.angle_size(); ++i)
   {
-    std::string angleName = "angle_" + boost::lexical_cast<std::string>(i);
+    std::string angleName = "angle_" + std::to_string(i);
     item = this->dataPtr->variantManager->addProperty(QVariant::String,
                                              QString::fromStdString(angleName));
     item->setValue(_msg.angle(i));
@@ -2909,7 +2924,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Light &_msg,
 /////////////////////////////////////////////////
 void ModelListWidget::ProcessLightMsgs()
 {
-  boost::mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
+  std::lock_guard<std::mutex> lock(*this->dataPtr->receiveMutex);
 
   for (auto iter = this->dataPtr->lightMsgs.begin();
        iter != this->dataPtr->lightMsgs.end(); ++iter)

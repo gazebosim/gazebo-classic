@@ -28,23 +28,7 @@
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/util/system.hh"
-/*
-class QTreeWidget;
-class QTreeWidgetItem;
-class QPushButton;
-class QtTreePropertyBrowser;
-class QtVariantPropertyManager;
-class QtProperty;
-class QtTreePropertyItem;
-class QtBrowserItem;
-class QtVariantEditorFactory;
 
-namespace boost
-{
-  class recursive_mutex;
-  class mutex;
-}
-*/
 namespace gazebo
 {
   namespace gui
@@ -84,7 +68,7 @@ namespace gazebo
 
       public: QtVariantPropertyManager *variantManager;
       public: QtVariantEditorFactory *variantFactory;
-      public: boost::mutex *propMutex, *receiveMutex;
+      public: std::mutex *propMutex, *receiveMutex;
       public: sdf::ElementPtr sdfElement;
       public: std::string selectedEntityName;
       public: bool fillingPropertyTree;
