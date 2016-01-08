@@ -228,7 +228,7 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
 
       // Create and set the gui camera position relative to a tracked model
       item = this->variantManager->addProperty(
-          QtVariantPropertyManager::groupTypeId(), tr("follow"));
+          QtVariantPropertyManager::groupTypeId(), tr("track_visual"));
       {
         topItem->addSubProperty(item);
 
@@ -747,7 +747,7 @@ void ModelListWidget::GUIPropertyChanged(QtProperty *_item)
   }
 
   QtProperty *cameraFollowProperty = this->GetChildItem(cameraProperty,
-                                                        "follow");
+                                                        "track_visual");
   if (cameraFollowProperty)
   {
     rendering::UserCameraPtr cam = gui::get_active_camera();
