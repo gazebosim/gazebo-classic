@@ -45,6 +45,9 @@ class JointMaker_TEST : public QTestFixture
 
   /// \brief Test managing the link list
   private slots: void LinkList();
+
+  /// \brief Test updating joint message
+  private slots: void UpdateMsg();
 };
 
 #endif

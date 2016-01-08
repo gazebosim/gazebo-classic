@@ -23,7 +23,7 @@
 #include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
-class TransmitterVisual_TEST : public ServerFixture
+class TransmitterVisual_TEST : public RenderingFixture
 {
 };
 
@@ -43,7 +43,7 @@ TEST_F(TransmitterVisual_TEST, TransmitterVisualTest)
   // there are no segfaults
   gazebo::rendering::VisualPtr transmitterVis(
       new gazebo::rendering::TransmitterVisual(
-      "world_GUIONLY_transmitter_vis", scene->GetWorldVisual(), ""));
+      "world_GUIONLY_transmitter_vis", scene->WorldVisual(), ""));
   transmitterVis->Load();
 }
 

@@ -46,12 +46,12 @@ void CameraPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr /*_sdf*/)
     gzerr << "Invalid sensor pointer.\n";
 
   this->parentSensor =
-    boost::dynamic_pointer_cast<sensors::CameraSensor>(_sensor);
+    std::dynamic_pointer_cast<sensors::CameraSensor>(_sensor);
 
   if (!this->parentSensor)
   {
     gzerr << "CameraPlugin requires a CameraSensor.\n";
-    if (boost::dynamic_pointer_cast<sensors::DepthCameraSensor>(_sensor))
+    if (std::dynamic_pointer_cast<sensors::DepthCameraSensor>(_sensor))
       gzmsg << "It is a depth camera sensor\n";
   }
 
@@ -63,10 +63,10 @@ void CameraPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr /*_sdf*/)
     return;
   }
 
-  this->width = this->camera->GetImageWidth();
-  this->height = this->camera->GetImageHeight();
-  this->depth = this->camera->GetImageDepth();
-  this->format = this->camera->GetImageFormat();
+  this->width = this->camera->ImageWidth();
+  this->height = this->camera->ImageHeight();
+  this->depth = this->camera->ImageDepth();
+  this->format = this->camera->ImageFormat();
 
   this->newFrameConnection = this->camera->ConnectNewImageFrame(
       boost::bind(&CameraPlugin::OnNewFrame, this, _1, _2, _3, _4, _5));
