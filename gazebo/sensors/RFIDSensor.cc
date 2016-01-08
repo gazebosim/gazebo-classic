@@ -107,7 +107,7 @@ void RFIDSensor::Load(const std::string &_worldName)
     scene = rendering::create_scene(this->world->GetName(), false);
     }
 
-    manager = rendering::get_scene(this->world->GetName())->GetManager();
+    manager = rendering::get_scene(this->world->GetName())->OgreSceneManager();
 
     query = manager->createRayQuery(Ogre::Ray());
 
@@ -127,7 +127,7 @@ void RFIDSensor::Init()
 }
 
 //////////////////////////////////////////////////
-bool RFIDSensor::UpdateImpl(bool /*_force*/)
+bool RFIDSensor::UpdateImpl(const bool /*_force*/)
 {
   this->EvaluateTags();
   this->lastMeasurementTime = this->world->GetSimTime();

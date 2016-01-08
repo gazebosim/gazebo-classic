@@ -80,7 +80,7 @@ Entity::Entity(BasePtr _parent)
 
   this->setWorldPoseFunc = &Entity::SetWorldPoseDefault;
 
-  this->scale = math::Vector3::One;
+  this->scale = ignition::math::Vector3d::One;
 }
 
 //////////////////////////////////////////////////

@@ -186,7 +186,7 @@ void ModelAlign::GetMinMax(std::vector<math::Vector3> _vertices,
 /////////////////////////////////////////////////
 void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
     const std::string &_axis, const std::string &_config,
-    const std::string &_target, bool _publish)
+    const std::string &_target, const bool _publish, const bool _inverted)
 {
   if (_config == "reset" || _publish)
   {
@@ -239,7 +239,7 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
   math::Vector3 targetMax;
   this->GetMinMax(targetVertices, targetMin, targetMax);
 
-  std::vector<rendering::VisualPtr> visToPub;
+  std::vector<rendering::VisualPtr> visualsToPublish;
   for (unsigned i = start; i < end; ++i)
   {
     rendering::VisualPtr vis = this->dataPtr->selectedVisuals[i];
@@ -257,12 +257,27 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
     this->GetMinMax(vertices, min, max);
 
     math::Vector3 trans;
-    if (_config == "min")
-      trans = targetMin - min;
-    else if (_config == "center")
+    if (_config == "center")
+    {
       trans = (targetMin + (targetMax-targetMin)/2) - (min + (max-min)/2);
-    else if (_config == "max")
-      trans = targetMax - max;
+    }
+    else
+    {
+      if (!_inverted)
+      {
+        if (_config == "min")
+          trans = targetMin - min;
+        else if (_config == "max")
+          trans = targetMax - max;
+      }
+      else
+      {
+        if (_config == "min")
+          trans = targetMin - max;
+        else if (_config == "max")
+          trans = targetMax - min;
+      }
+    }
 
     if (!_publish)
     {
@@ -294,7 +309,7 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
     }
 
     if (_publish)
-      visToPub.push_back(vis);
+      visualsToPublish.push_back(vis);
   }
   // Register user command on server
   if (_publish)
@@ -304,7 +319,7 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
         "Align to [" + this->dataPtr->targetVis->GetName() + "]");
     userCmdMsg.set_type(msgs::UserCmd::MOVING);
 
-    for (auto vis : visToPub)
+    for (const auto &vis : visualsToPublish)
     {
       // Only publish for models
       if (vis->GetType() == gazebo::rendering::Visual::VT_MODEL)

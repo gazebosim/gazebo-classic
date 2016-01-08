@@ -27,6 +27,9 @@ class TimePanel_TEST : public QTestFixture
 
   /// \brief Test setting the play/pause state.
   private slots: void SetPaused();
+
+  /// \brief Test pressing the space bar.
+  private slots: void SpaceBar();
 };
 
 #endif

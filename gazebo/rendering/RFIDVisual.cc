@@ -47,7 +47,7 @@ RFIDVisual::RFIDVisual(const std::string &_name, VisualPtr _vis,
   dPtr->type = VT_SENSOR;
 
   dPtr->node = transport::NodePtr(new transport::Node());
-  dPtr->node->Init(dPtr->scene->GetName());
+  dPtr->node->Init(dPtr->scene->Name());
 
   dPtr->rfidSub = dPtr->node->Subscribe(_topicName, &RFIDVisual::OnScan, this);
 

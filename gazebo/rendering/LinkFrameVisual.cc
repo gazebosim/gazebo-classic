@@ -60,6 +60,7 @@ void LinkFrameVisual::Load()
   this->ShowAxisHead(0, false);
   this->ShowAxisHead(1, false);
   this->ShowAxisHead(2, false);
+  this->SetInheritTransparency(false);
   this->SetTransparency(dPtr->nonHighlightedTransp);
   this->SetCastShadows(false);
 }
@@ -88,4 +89,3 @@ bool LinkFrameVisual::GetHighlighted()
 
   return math::equal(this->GetTransparency(), dPtr->highlightedTransp);
 }
-

@@ -83,6 +83,12 @@ namespace gazebo
       /// \return The SDF value for this model.
       public: virtual const sdf::ElementPtr GetSDF();
 
+      /// \brief Get the SDF element for the model, without all effects of
+      /// scaling. This is useful in cases when the scale will be applied
+      /// afterwards by, for example, states.
+      /// \return The SDF element.
+      public: virtual const sdf::ElementPtr UnscaledSDF();
+
       /// \brief Remove a child.
       /// \param[in] _child Remove a child entity.
       public: virtual void RemoveChild(EntityPtr _child);
@@ -275,8 +281,6 @@ namespace gazebo
 
       /// \brief Set the scale of model.
       /// \param[in] _scale Scale to set the model to.
-      /// \param[in] _publish True to publish a message for the client with the
-      /// new scale.
       /// \deprecated See function that accepts ignition::math parameters
       public: void SetScale(const math::Vector3 &_scale)
           GAZEBO_DEPRECATED(7.0);

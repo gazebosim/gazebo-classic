@@ -17,8 +17,11 @@
 #include <boost/bind.hpp>
 
 #include "gazebo/math/Angle.hh"
+
+#include "gazebo/common/Color.hh"
+
+#include "gazebo/gui/Conversions.hh"
 #include "gazebo/gui/building/ImportImageDialog.hh"
-#include "gazebo/gui/building/BuildingItem.hh"
 #include "gazebo/gui/building/GridLines.hh"
 #include "gazebo/gui/building/EditorItem.hh"
 #include "gazebo/gui/building/RectItem.hh"
@@ -455,8 +458,8 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
           wallSegmentItem->setZValue(wallSegmentItem->zValueIdle);
           editorItem->SetPositionOnWall(0);
           editorItem->SetAngleOnWall(0);
-          this->buildingMaker->DetachManip(this->itemToVisualMap[editorItem],
-                this->itemToVisualMap[wallSegmentItem]);
+          this->buildingMaker->DetachFromParent(
+              this->itemToVisualMap[editorItem]);
           editorItem->SetRotation(editorItem->GetRotation()
             - this->mousePressRotation);
           editorItem->SetPosition(mousePoint);
@@ -1105,14 +1108,13 @@ void EditorView::OnAddLevel()
     // start / end
     for (int g = 0; g < 2; ++g)
     {
-      for (unsigned int i = 0; i < oldWall->grabbers[g]->linkedGrabbers.size();
-          ++i)
+      for (auto oldGrabber : oldWall->grabbers[g]->LinkedGrabbers())
       {
         WallSegmentItem *parentItem = dynamic_cast<WallSegmentItem*>(
-            oldWall->grabbers[g]->linkedGrabbers[i]->parentItem());
-        int index = oldWall->grabbers[g]->linkedGrabbers[i]->GetIndex();
+            oldGrabber->parentItem());
+        int index = oldGrabber->Index();
 
-        newWall->grabbers[g]->linkedGrabbers.push_back(
+        newWall->grabbers[g]->PushLinkedGrabber(
             clonedWallMap[parentItem]->grabbers[index]);
       }
     }
@@ -1283,13 +1285,14 @@ void EditorView::OnOpenLevelInspector()
   FloorItem *floorItem = this->levels[this->currentLevel]->floorItem;
   if (floorItem)
   {
-    this->levelInspector->floorWidget->show();
-    this->levelInspector->SetColor(floorItem->Get3dColor());
-    this->levelInspector->SetTexture(floorItem->Get3dTexture());
+    this->levelInspector->ShowFloorWidget(true);
+    this->levelInspector->SetColor(Conversions::Convert(
+        floorItem->Get3dColor()));
+    this->levelInspector->SetTexture(floorItem->Get3dTexture().toStdString());
   }
   else
   {
-    this->levelInspector->floorWidget->hide();
+    this->levelInspector->ShowFloorWidget(false);
   }
   this->levelInspector->move(QCursor::pos());
   this->levelInspector->show();
@@ -1301,13 +1304,13 @@ void EditorView::OnLevelApply()
   LevelInspectorDialog *dialog =
       qobject_cast<LevelInspectorDialog *>(QObject::sender());
 
-  std::string newLevelName = dialog->GetLevelName();
+  std::string newLevelName = dialog->LevelName();
   this->levels[this->currentLevel]->name = newLevelName;
   FloorItem *floorItem = this->levels[this->currentLevel]->floorItem;
   if (floorItem)
   {
-    floorItem->Set3dTexture(dialog->GetTexture());
-    floorItem->Set3dColor(dialog->GetColor());
+    floorItem->Set3dTexture(QString::fromStdString(dialog->Texture()));
+    floorItem->Set3dColor(Conversions::Convert(dialog->Color()));
     floorItem->Set3dTransparency(0.4);
     floorItem->FloorChanged();
   }
@@ -1414,29 +1417,27 @@ void EditorView::LinkGrabbers(GrabberHandle *_grabber1,
   if (_grabber1 && _grabber2 && _grabber1 != _grabber2)
   {
     // if _grabber2 is not yet linked to _grabber1
-    if (std::find(_grabber1->linkedGrabbers.begin(),
-                  _grabber1->linkedGrabbers.end(), _grabber2) ==
-                  _grabber1->linkedGrabbers.end())
+    auto linked1 = _grabber1->LinkedGrabbers();
+    auto linked2 = _grabber2->LinkedGrabbers();
+    if (std::find(linked1.begin(), linked1.end(), _grabber2) == linked1.end())
     {
       // Add _grabber2 so it moves when _grabber1 is moved
-      _grabber1->linkedGrabbers.push_back(_grabber2);
+      _grabber1->PushLinkedGrabber(_grabber2);
       // also link _grabber1 to all grabbers already linked to _grabber2
-      for (unsigned int i2 = 0; i2 < _grabber2->linkedGrabbers.size(); ++i2)
+      for (auto it : linked2)
       {
-        this->LinkGrabbers(_grabber1, _grabber2->linkedGrabbers[i2]);
+        this->LinkGrabbers(_grabber1, it);
       }
     }
     // if _grabber1 is not yet linked to _grabber2
-    if (std::find(_grabber2->linkedGrabbers.begin(),
-                  _grabber2->linkedGrabbers.end(), _grabber1) ==
-                  _grabber2->linkedGrabbers.end())
+    if (std::find(linked2.begin(), linked2.end(), _grabber1) == linked2.end())
     {
       // Add _grabber1 so it moves when _grabber2 is moved
-      _grabber2->linkedGrabbers.push_back(_grabber1);
+      _grabber2->PushLinkedGrabber(_grabber1);
       // also link _grabber2 to all grabbers already linked to _grabber1
-      for (unsigned int i1 = 0; i1 < _grabber1->linkedGrabbers.size(); ++i1)
+      for (auto it : linked1)
       {
-        this->LinkGrabbers(_grabber2, _grabber1->linkedGrabbers[i1]);
+        this->LinkGrabbers(_grabber2, it);
       }
     }
   }
@@ -1449,12 +1450,9 @@ void EditorView::UnlinkGrabbers(GrabberHandle *_grabber1,
   // If only one grabber, erase it from all grabbers it is linked
   if (!_grabber2)
   {
-    for (unsigned int i = 0; i < _grabber1->linkedGrabbers.size(); ++i)
+    for (auto linked : _grabber1->LinkedGrabbers())
     {
-      _grabber1->linkedGrabbers[i]->linkedGrabbers.erase(
-          std::remove(_grabber1->linkedGrabbers[i]->linkedGrabbers.begin(),
-          _grabber1->linkedGrabbers[i]->linkedGrabbers.end(), _grabber1),
-          _grabber1->linkedGrabbers[i]->linkedGrabbers.end());
+      linked->EraseLinkedGrabber(_grabber1);
     }
   }
 
