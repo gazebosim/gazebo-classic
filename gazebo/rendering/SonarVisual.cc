@@ -47,7 +47,7 @@ SonarVisual::SonarVisual(const std::string &_name, VisualPtr _vis,
   dPtr->receivedMsg = false;
 
   dPtr->node = transport::NodePtr(new transport::Node());
-  dPtr->node->Init(dPtr->scene->GetName());
+  dPtr->node->Init(dPtr->scene->Name());
 
   dPtr->sonarSub = dPtr->node->Subscribe(_topicName,
       &SonarVisual::OnMsg, this, true);
@@ -85,7 +85,7 @@ void SonarVisual::Load()
   // Make sure the meshes are in Ogre
   this->InsertMesh("unit_cone");
   Ogre::MovableObject *coneObj =
-    (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+    (Ogre::MovableObject*)(dPtr->scene->OgreSceneManager()->createEntity(
           this->GetName()+"__SONAR_CONE__", "unit_cone"));
   ((Ogre::Entity*)coneObj)->setMaterialName("Gazebo/BlueLaser");
 
@@ -121,9 +121,9 @@ void SonarVisual::Update()
     return;
 
   // Skip the update if the user is moving the sonar.
-  if (this->GetScene()->GetSelectedVisual() &&
+  if (this->GetScene()->SelectedVisual() &&
       this->GetRootVisual()->GetName() ==
-      this->GetScene()->GetSelectedVisual()->GetName())
+      this->GetScene()->SelectedVisual()->GetName())
   {
     return;
   }

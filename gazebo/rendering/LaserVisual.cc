@@ -48,7 +48,7 @@ LaserVisual::LaserVisual(const std::string &_name, VisualPtr _vis,
   dPtr->receivedMsg = false;
 
   dPtr->node = transport::NodePtr(new transport::Node());
-  dPtr->node->Init(dPtr->scene->GetName());
+  dPtr->node->Init(dPtr->scene->Name());
 
   dPtr->laserScanSub = dPtr->node->Subscribe(_topicName,
       &LaserVisual::OnScan, this);
@@ -97,9 +97,9 @@ void LaserVisual::Update()
   boost::mutex::scoped_lock lock(dPtr->mutex);
 
   // Skip the update if the user is moving the laser.
-  if ((this->GetScene()->GetSelectedVisual() &&
+  if ((this->GetScene()->SelectedVisual() &&
       this->GetRootVisual()->GetName() ==
-      this->GetScene()->GetSelectedVisual()->GetName()))
+      this->GetScene()->SelectedVisual()->GetName()))
   {
     return;
   }

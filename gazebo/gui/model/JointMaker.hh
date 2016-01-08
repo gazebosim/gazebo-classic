@@ -262,7 +262,7 @@ namespace gazebo
 
       /// \brief A new relative pose for the child link of the joint being
       /// created hass been chosen. The pose is expressed in the parent link
-      /// frame.
+      /// frame. This has no effect if triggered before both links are chosen.
       /// \param[in] _pose New pose.
       /// \param[in] _reset Set to true to reset the relative pose to the
       /// original one.
@@ -274,9 +274,10 @@ namespace gazebo
       /// false to align the parent to the child.
       /// \param[in] _axis Axis of alignment (x/y/z)
       /// \param[in] _mode Alignment mode (min/center/max)
-      public: void AlignLinks(
-          const bool _childToParent, const std::string &_axis,
-          const std::string &_mode);
+      /// \param[in] _reverse True to reverse alignment.
+      public: void AlignLinks(const bool _childToParent,
+          const std::string &_axis, const std::string &_mode,
+          const bool _reverse);
 
       /// \brief Finalize joint creation.
       public: void FinalizeCreation();

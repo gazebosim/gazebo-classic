@@ -1004,7 +1004,7 @@ void MainWindow::ViewOculus()
 {
 #ifdef HAVE_OCULUS
   rendering::ScenePtr scene = rendering::get_scene();
-  if (scene->GetOculusCameraCount() != 0)
+  if (scene->OculusCameraCount() != 0)
   {
     gzlog << "Oculus camera already exists." << std::endl;
     return;

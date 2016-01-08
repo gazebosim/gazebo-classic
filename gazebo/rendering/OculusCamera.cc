@@ -178,7 +178,7 @@ void OculusCamera::Init()
 
   // Oculus
   {
-    this->dataPtr->rightCamera = this->scene->GetManager()->createCamera(
+    this->dataPtr->rightCamera = this->scene->OgreSceneManager()->createCamera(
       "OculusUserRight");
     this->dataPtr->rightCamera->pitch(Ogre::Degree(90));
 
@@ -384,9 +384,9 @@ void OculusCamera::MoveToVisual(VisualPtr _visual)
   if (!_visual)
     return;
 
-  if (this->scene->GetManager()->hasAnimation("cameratrack"))
+  if (this->scene->OgreSceneManager()->hasAnimation("cameratrack"))
   {
-    this->scene->GetManager()->destroyAnimation("cameratrack");
+    this->scene->OgreSceneManager()->destroyAnimation("cameratrack");
   }
 
   math::Box box = _visual->GetBoundingBox();
@@ -427,7 +427,7 @@ void OculusCamera::MoveToVisual(VisualPtr _visual)
   double time = 0.5;  // dist / vel;
 
   Ogre::Animation *anim =
-    this->scene->GetManager()->createAnimation("cameratrack", time);
+    this->scene->OgreSceneManager()->createAnimation("cameratrack", time);
   anim->setInterpolationMode(Ogre::Animation::IM_SPLINE);
 
   Ogre::NodeAnimationTrack *strack = anim->createNodeTrack(0, this->sceneNode);
@@ -443,7 +443,7 @@ void OculusCamera::MoveToVisual(VisualPtr _visual)
   key->setRotation(yawFinal);
 
   this->animState =
-    this->scene->GetManager()->createAnimationState("cameratrack");
+    this->scene->OgreSceneManager()->createAnimationState("cameratrack");
 
   this->animState->setTimePosition(0);
   this->animState->setEnabled(true);
@@ -465,7 +465,7 @@ void OculusCamera::SetRenderTarget(Ogre::RenderTarget *_target)
   rt->getViewport(0)->setOverlaysEnabled(false);
   rt->getViewport(0)->setShadowsEnabled(true);
   rt->getViewport(0)->setBackgroundColour(
-        Conversions::Convert(this->scene->GetBackgroundColor()));
+        Conversions::Convert(this->scene->BackgroundColor()));
   rt->getViewport(0)->setVisibilityMask(GZ_VISIBILITY_ALL &
         ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
   RTShaderSystem::AttachViewport(rt->getViewport(0), this->GetScene());
@@ -479,7 +479,7 @@ void OculusCamera::SetRenderTarget(Ogre::RenderTarget *_target)
   rt->getViewport(0)->setShadowsEnabled(true);
   rt->getViewport(0)->setOverlaysEnabled(false);
   rt->getViewport(0)->setBackgroundColour(
-        Conversions::Convert(this->scene->GetBackgroundColor()));
+        Conversions::Convert(this->scene->BackgroundColor()));
   rt->getViewport(0)->setVisibilityMask(GZ_VISIBILITY_ALL &
         ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
   RTShaderSystem::AttachViewport(rt->getViewport(0), this->GetScene());

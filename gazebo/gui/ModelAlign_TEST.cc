@@ -47,7 +47,7 @@ void ModelAlign_TEST::AlignXMin()
 
   int sleep  = 0;
   int maxSleep = 200;
-  while (!scene->GetInitialized() && sleep < maxSleep)
+  while (!scene->Initialized() && sleep < maxSleep)
   {
     gazebo::event::Events::preRender();
     gazebo::common::Time::MSleep(30);
@@ -116,7 +116,7 @@ void ModelAlign_TEST::AlignXMinReverse()
 
   int sleep  = 0;
   int maxSleep = 200;
-  while (!scene->GetInitialized() && sleep < maxSleep)
+  while (!scene->Initialized() && sleep < maxSleep)
   {
     gazebo::event::Events::preRender();
     gazebo::common::Time::MSleep(30);
@@ -201,7 +201,7 @@ void ModelAlign_TEST::AlignXCenter()
 
   int sleep  = 0;
   int maxSleep = 200;
-  while (!scene->GetInitialized() && sleep < maxSleep)
+  while (!scene->Initialized() && sleep < maxSleep)
   {
     gazebo::event::Events::preRender();
     gazebo::common::Time::MSleep(30);
@@ -275,7 +275,7 @@ void ModelAlign_TEST::AlignXMax()
 
   int sleep  = 0;
   int maxSleep = 200;
-  while (!scene->GetInitialized() && sleep < maxSleep)
+  while (!scene->Initialized() && sleep < maxSleep)
   {
     gazebo::event::Events::preRender();
     gazebo::common::Time::MSleep(30);
@@ -345,7 +345,7 @@ void ModelAlign_TEST::AlignXMaxReverse()
 
   int sleep  = 0;
   int maxSleep = 200;
-  while (!scene->GetInitialized() && sleep < maxSleep)
+  while (!scene->Initialized() && sleep < maxSleep)
   {
     gazebo::event::Events::preRender();
     gazebo::common::Time::MSleep(30);
@@ -430,7 +430,7 @@ void ModelAlign_TEST::AlignYMin()
 
   int sleep  = 0;
   int maxSleep = 200;
-  while (!scene->GetInitialized() && sleep < maxSleep)
+  while (!scene->Initialized() && sleep < maxSleep)
   {
     gazebo::event::Events::preRender();
     gazebo::common::Time::MSleep(30);
@@ -499,7 +499,7 @@ void ModelAlign_TEST::AlignYMinReverse()
 
   int sleep  = 0;
   int maxSleep = 200;
-  while (!scene->GetInitialized() && sleep < maxSleep)
+  while (!scene->Initialized() && sleep < maxSleep)
   {
     gazebo::event::Events::preRender();
     gazebo::common::Time::MSleep(30);
@@ -584,7 +584,7 @@ void ModelAlign_TEST::AlignYCenter()
 
   int sleep  = 0;
   int maxSleep = 200;
-  while (!scene->GetInitialized() && sleep < maxSleep)
+  while (!scene->Initialized() && sleep < maxSleep)
   {
     gazebo::event::Events::preRender();
     gazebo::common::Time::MSleep(30);
@@ -659,7 +659,7 @@ void ModelAlign_TEST::AlignYMax()
 
   int sleep  = 0;
   int maxSleep = 200;
-  while (!scene->GetInitialized() && sleep < maxSleep)
+  while (!scene->Initialized() && sleep < maxSleep)
   {
     gazebo::event::Events::preRender();
     gazebo::common::Time::MSleep(30);
@@ -729,7 +729,7 @@ void ModelAlign_TEST::AlignYMaxReverse()
 
   int sleep  = 0;
   int maxSleep = 200;
-  while (!scene->GetInitialized() && sleep < maxSleep)
+  while (!scene->Initialized() && sleep < maxSleep)
   {
     gazebo::event::Events::preRender();
     gazebo::common::Time::MSleep(30);
@@ -814,7 +814,7 @@ void ModelAlign_TEST::AlignZMin()
 
   int sleep  = 0;
   int maxSleep = 200;
-  while (!scene->GetInitialized() && sleep < maxSleep)
+  while (!scene->Initialized() && sleep < maxSleep)
   {
     gazebo::event::Events::preRender();
     gazebo::common::Time::MSleep(30);
@@ -883,7 +883,7 @@ void ModelAlign_TEST::AlignZMinReverse()
 
   int sleep  = 0;
   int maxSleep = 200;
-  while (!scene->GetInitialized() && sleep < maxSleep)
+  while (!scene->Initialized() && sleep < maxSleep)
   {
     gazebo::event::Events::preRender();
     gazebo::common::Time::MSleep(30);
@@ -968,7 +968,7 @@ void ModelAlign_TEST::AlignZCenter()
 
   int sleep  = 0;
   int maxSleep = 200;
-  while (!scene->GetInitialized() && sleep < maxSleep)
+  while (!scene->Initialized() && sleep < maxSleep)
   {
     gazebo::event::Events::preRender();
     gazebo::common::Time::MSleep(30);
@@ -1042,7 +1042,7 @@ void ModelAlign_TEST::AlignZMax()
 
   int sleep  = 0;
   int maxSleep = 200;
-  while (!scene->GetInitialized() && sleep < maxSleep)
+  while (!scene->Initialized() && sleep < maxSleep)
   {
     gazebo::event::Events::preRender();
     gazebo::common::Time::MSleep(30);
@@ -1112,7 +1112,7 @@ void ModelAlign_TEST::AlignZMaxReverse()
 
   int sleep  = 0;
   int maxSleep = 200;
-  while (!scene->GetInitialized() && sleep < maxSleep)
+  while (!scene->Initialized() && sleep < maxSleep)
   {
     gazebo::event::Events::preRender();
     gazebo::common::Time::MSleep(30);
@@ -1196,7 +1196,7 @@ void ModelAlign_TEST::AlignScale()
 
   int sleep  = 0;
   int maxSleep = 200;
-  while (!scene->GetInitialized() && sleep < maxSleep)
+  while (!scene->Initialized() && sleep < maxSleep)
   {
     gazebo::event::Events::preRender();
     gazebo::common::Time::MSleep(30);
@@ -1270,7 +1270,7 @@ void ModelAlign_TEST::SetHighlighted()
 
   // Create a deeply nested visual where each level has a different transparency
   gazebo::rendering::VisualPtr vis1;
-  vis1.reset(new gazebo::rendering::Visual("vis1", scene->GetWorldVisual()));
+  vis1.reset(new gazebo::rendering::Visual("vis1", scene->WorldVisual()));
   vis1->Load();
   double vis1Transp = 0.0;
   QVERIFY(ignition::math::equal(
@@ -1311,7 +1311,7 @@ void ModelAlign_TEST::SetHighlighted()
   // Create another model just to align them
   gazebo::rendering::VisualPtr otherVis;
   otherVis.reset(
-      new gazebo::rendering::Visual("otherVis", scene->GetWorldVisual()));
+      new gazebo::rendering::Visual("otherVis", scene->WorldVisual()));
   otherVis->Load();
 
   // Align preview
