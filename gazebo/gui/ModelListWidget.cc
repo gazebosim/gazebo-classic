@@ -651,6 +651,7 @@ void ModelListWidget::OnPropertyChanged(QtProperty *_item)
     this->GUIPropertyChanged(_item);
 }
 
+
 /////////////////////////////////////////////////
 void ModelListWidget::LightPropertyChanged(QtProperty * /*_item*/)
 {
