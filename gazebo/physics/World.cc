@@ -881,6 +881,27 @@ common::SphericalCoordinatesPtr World::GetSphericalCoordinates() const
 }
 
 //////////////////////////////////////////////////
+ignition::math::Vector3d World::Gravity() const
+{
+  return this->dataPtr->sdf->Get<ignition::math::Vector3d>("gravity");
+}
+
+//////////////////////////////////////////////////
+void World::SetGravitySDF(const ignition::math::Vector3d &_gravity)
+{
+  this->dataPtr->sdf->GetElement("gravity")->Set(_gravity);
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d World::MagneticField() const
+{
+  if (this->dataPtr->sdf->HasElement("magnetic_field"))
+    return this->dataPtr->sdf->Get<ignition::math::Vector3d>("magnetic_field");
+  else
+    return ignition::math::Vector3d::Zero;
+}
+
+//////////////////////////////////////////////////
 BasePtr World::GetByName(const std::string &_name)
 {
   if (this->dataPtr->rootElement)

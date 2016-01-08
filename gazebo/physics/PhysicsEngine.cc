@@ -109,16 +109,13 @@ PhysicsEngine::~PhysicsEngine()
 //////////////////////////////////////////////////
 math::Vector3 PhysicsEngine::GetGravity() const
 {
-  return this->sdf->Get<math::Vector3>("gravity");
+  return this->world->Gravity();
 }
 
 //////////////////////////////////////////////////
 ignition::math::Vector3d PhysicsEngine::MagneticField() const
 {
-  if (this->sdf->HasElement("magnetic_field"))
-    return this->sdf->Get<ignition::math::Vector3d>("magnetic_field");
-  else
-    return ignition::math::Vector3d::Zero;
+  return this->world->MagneticField();
 }
 
 //////////////////////////////////////////////////
