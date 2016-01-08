@@ -23,17 +23,17 @@
 #include <functional>
 #include <sstream>
 
-#include "gazebo/physics/World.hh"
-
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Exception.hh"
 
-#include "gazebo/transport/transport.hh"
+#include "gazebo/physics/World.hh"
 
 #include "gazebo/rendering/DepthCamera.hh"
-#include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/RenderEngine.hh"
+#include "gazebo/rendering/Scene.hh"
+
+#include "gazebo/transport/transport.hh"
 
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/DepthCameraSensorPrivate.hh"

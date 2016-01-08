@@ -17,6 +17,7 @@
 #ifndef _GAZEBO_SENSORS_SONARSENSOR_HH_
 #define _GAZEBO_SENSORS_SONARSENSOR_HH_
 
+#include <memory>
 #include <string>
 
 #include "gazebo/sensors/Sensor.hh"
@@ -79,7 +80,7 @@ namespace gazebo
       public: double GetRadius() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the radius of the sonar cone at maximum range.
-      /// \return The radisu of the sonar cone at max range.
+      /// \return The radius of the sonar cone at max range.
       public: double Radius() const;
 
       /// \brief Get detected range for a sonar.

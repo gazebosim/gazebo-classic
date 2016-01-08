@@ -17,12 +17,14 @@
 #ifndef _GAZEBO_SENSORS_GPSSENSOR_HH_
 #define _GAZEBO_SENSORS_GPSSENSOR_HH_
 
+#include <memory>
 #include <string>
 
+#include <ignition/math/Angle.hh>
 #include <sdf/sdf.hh>
 
-#include "gazebo/sensors/Sensor.hh"
 #include "gazebo/common/CommonTypes.hh"
+#include "gazebo/sensors/Sensor.hh"
 #include "gazebo/sensors/SensorTypes.hh"
 #include "gazebo/util/system.hh"
 

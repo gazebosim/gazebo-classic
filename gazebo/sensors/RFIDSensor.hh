@@ -17,6 +17,7 @@
 #ifndef _GAZEBO_SENSORS_RFIDSENSOR_HH_
 #define _GAZEBO_SENSORS_RFIDSENSOR_HH_
 
+#include <memory>
 #include <string>
 
 #include "gazebo/sensors/Sensor.hh"

@@ -17,6 +17,8 @@
 #ifndef _GAZEBO_SENSORS_IMUSENSOR_PRIVATE_HH_
 #define _GAZEBO_SENSORS_IMUSENSOR_PRIVATE_HH_
 
+#include <array>
+#include <mutex>
 #include <ignition/math/Vector3.hh>
 #include <ignition/math/Pose3.hh>
 

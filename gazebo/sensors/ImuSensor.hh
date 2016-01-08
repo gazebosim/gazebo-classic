@@ -17,8 +17,10 @@
 #ifndef _GAZEBO_SENSORS_IMUSENSOR_HH_
 #define _GAZEBO_SENSORS_IMUSENSOR_HH_
 
+#include <memory>
 #include <string>
 #include <ignition/math/Quaternion.hh>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/util/system.hh"

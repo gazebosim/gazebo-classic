@@ -26,18 +26,19 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Image.hh"
 
-#include "gazebo/transport/transport.hh"
 #include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/physics/World.hh"
 
-#include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/Camera.hh"
-#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/RenderingIface.hh"
+#include "gazebo/rendering/Scene.hh"
 
-#include "gazebo/sensors/SensorFactory.hh"
+#include "gazebo/transport/transport.hh"
+
 #include "gazebo/sensors/Noise.hh"
+#include "gazebo/sensors/SensorFactory.hh"
 
 #include "gazebo/sensors/CameraSensorPrivate.hh"
 #include "gazebo/sensors/CameraSensor.hh"

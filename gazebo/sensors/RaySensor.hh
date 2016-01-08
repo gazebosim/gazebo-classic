@@ -17,8 +17,9 @@
 #ifndef _GAZEBO_SENSORS_RAYSENSOR_HH_
 #define _GAZEBO_SENSORS_RAYSENSOR_HH_
 
-#include <vector>
+#include <memory>
 #include <string>
+#include <vector>
 
 #include <ignition/math/Angle.hh>
 

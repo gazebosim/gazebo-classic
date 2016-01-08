@@ -17,13 +17,14 @@
 #ifndef _GAZEBO_SENSORS_MULTICAMERASENSOR_HH_
 #define _GAZEBO_SENSORS_MULTICAMERASENSOR_HH_
 
+#include <memory>
 #include <string>
 #include <vector>
 
-#include "gazebo/sensors/Sensor.hh"
 #include "gazebo/msgs/MessageTypes.hh"
-#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/sensors/Sensor.hh"
+#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo

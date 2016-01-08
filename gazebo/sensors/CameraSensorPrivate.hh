@@ -17,9 +17,6 @@
 #ifndef _GAZEBO_SENSORS_CAMERASENSOR_PRIVATE_HH_
 #define _GAZEBO_SENSORS_CAMERASENSOR_PRIVATE_HH_
 
-#include "gazebo/rendering/RenderTypes.hh"
-#include "gazebo/transport/TransportTypes.hh"
-
 namespace gazebo
 {
   namespace sensors

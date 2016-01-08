@@ -17,11 +17,12 @@
 #ifndef _GAZEBO_SENSORS_DEPTHCAMERASENSOR_HH_
 #define _GAZEBO_SENSORS_DEPTHCAMERASENSOR_HH_
 
+#include <memory>
 #include <string>
 
-#include "gazebo/sensors/Sensor.hh"
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/sensors/Sensor.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo

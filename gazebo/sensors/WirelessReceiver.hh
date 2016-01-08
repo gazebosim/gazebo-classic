@@ -17,6 +17,7 @@
 #ifndef _GAZEBO_SENSORS_WIRELESSRECEIVER_HH_
 #define _GAZEBO_SENSORS_WIRELESSRECEIVER_HH_
 
+#include <memory>
 #include <string>
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/sensors/WirelessTransceiver.hh"
@@ -40,7 +41,7 @@ namespace gazebo
       /// \brief Constructor
       public: WirelessReceiver();
 
-      /// \brief Constructor
+      /// \brief Destructor
       public: virtual ~WirelessReceiver();
 
       // Documentation inherited

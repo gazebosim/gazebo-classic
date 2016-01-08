@@ -18,13 +18,12 @@
 #define _GAZEBO_SENSORS_SONARSENSOR_PRIVATE_HH_
 
 #include <list>
-#include <memory>
 #include <mutex>
 #include <ignition/math/Pose3.hh>
 
+#include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
-#include "gazebo/msgs/msgs.hh"
 
 namespace gazebo
 {
@@ -52,7 +51,7 @@ namespace gazebo
       /// \brief Subscription to contact messages from the physics engine
       public: transport::SubscriberPtr contactSub;
 
-      /// \brief Publishes the sonsarMsg.
+      /// \brief Publishes the sonarMsg.
       public: transport::PublisherPtr sonarPub;
 
       /// \brief Store current sonar info

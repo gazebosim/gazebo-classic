@@ -17,10 +17,14 @@
 #ifndef _GAZEBO_SENSORS_FORCETORQUESENSOR_HH_
 #define _GAZEBO_SENSORS_FORCETORQUESENSOR_HH_
 
+#include <functional>
+#include <memory>
 #include <string>
 
-#include "gazebo/transport/TransportTypes.hh"
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/sensors/Sensor.hh"
+#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
