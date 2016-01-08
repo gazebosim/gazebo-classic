@@ -97,7 +97,7 @@ void WirelessReceiver::Load(const std::string &_worldName)
 }
 
 //////////////////////////////////////////////////
-bool WirelessReceiver::UpdateImpl(bool /*_force*/)
+bool WirelessReceiver::UpdateImpl(const bool /*_force*/)
 {
   std::string txEssid;
   msgs::WirelessNodes msg;
@@ -113,8 +113,8 @@ bool WirelessReceiver::UpdateImpl(bool /*_force*/)
   {
     if ((*it)->GetType() == "wireless_transmitter")
     {
-      boost::shared_ptr<gazebo::sensors::WirelessTransmitter> transmitter =
-          boost::static_pointer_cast<WirelessTransmitter>(*it);
+      std::shared_ptr<gazebo::sensors::WirelessTransmitter> transmitter =
+          std::static_pointer_cast<WirelessTransmitter>(*it);
 
       txFreq = transmitter->GetFreq();
       rxPower = transmitter->SignalStrength(myPos, this->GetGain());

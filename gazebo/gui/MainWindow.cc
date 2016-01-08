@@ -243,9 +243,11 @@ MainWindow::MainWindow()
 /////////////////////////////////////////////////
 MainWindow::~MainWindow()
 {
+  // Cleanup user command history
   delete this->userCmdHistory;
   this->userCmdHistory = NULL;
 
+  // Cleanup global actions
   this->DeleteActions();
 }
 
@@ -299,12 +301,27 @@ void MainWindow::Init()
 
   this->setGeometry(winXPos, winYPos, winWidth, winHeight);
 
+  if (this->width() > winWidth)
+  {
+    gzwarn << "Requested geometry.width of " << winWidth
+           << " but the minimum width of the window is "
+           << this->width() << "." << std::endl;
+  }
+
+  if (this->height() > winHeight)
+  {
+    gzwarn << "Requested geometry.height of " << winHeight
+           << " but the minimum height of the window is "
+           << this->height() << "." << std::endl;
+  }
+
   this->worldControlPub =
     this->node->Advertise<msgs::WorldControl>("~/world_control");
   this->serverControlPub =
     this->node->Advertise<msgs::ServerControl>("/gazebo/server/control");
   this->scenePub =
     this->node->Advertise<msgs::Scene>("~/scene");
+  this->userCmdPub = this->node->Advertise<msgs::UserCmd>("~/user_cmd");
 
   this->newEntitySub = this->node->Subscribe("~/model/info",
       &MainWindow::OnModel, this, true);
@@ -487,11 +504,11 @@ void MainWindow::Save()
       sdf::ElementPtr cameraElem = guiElem->GetElement("camera");
       rendering::UserCameraPtr cam = gui::get_active_camera();
 
-      cameraElem->GetElement("pose")->Set(cam->GetWorldPose());
+      cameraElem->GetElement("pose")->Set(cam->WorldPose());
       cameraElem->GetElement("view_controller")->Set(
           cam->GetViewControllerTypeString());
 
-      cameraElem->GetElement("projection_type")->Set(cam->GetProjectionType());
+      cameraElem->GetElement("projection_type")->Set(cam->ProjectionType());
 
       // TODO: export track_visual properties as well.
       msgData = sdf_parsed.Root()->ToString("");
@@ -537,7 +554,7 @@ void MainWindow::Clone()
     msgs::ServerControl msg;
     msg.set_save_world_name("");
     msg.set_clone(true);
-    msg.set_new_port(cloneWindow->GetPort());
+    msg.set_new_port(cloneWindow->Port());
     this->serverControlPub->Publish(msg);
   }
 }
@@ -660,7 +677,13 @@ void MainWindow::OnResetModelOnly()
   msg.mutable_reset()->set_all(false);
   msg.mutable_reset()->set_time_only(false);
   msg.mutable_reset()->set_model_only(true);
-  this->worldControlPub->Publish(msg);
+
+  // Register user command on server
+  msgs::UserCmd userCmdMsg;
+  userCmdMsg.set_description("Reset models");
+  userCmdMsg.set_type(msgs::UserCmd::WORLD_CONTROL);
+  userCmdMsg.mutable_world_control()->CopyFrom(msg);
+  this->userCmdPub->Publish(userCmdMsg);
 }
 
 /////////////////////////////////////////////////
@@ -668,7 +691,13 @@ void MainWindow::OnResetWorld()
 {
   msgs::WorldControl msg;
   msg.mutable_reset()->set_all(true);
-  this->worldControlPub->Publish(msg);
+
+  // Register user command on server
+  msgs::UserCmd userCmdMsg;
+  userCmdMsg.set_description("Reset world");
+  userCmdMsg.set_type(msgs::UserCmd::WORLD_CONTROL);
+  userCmdMsg.mutable_world_control()->CopyFrom(msg);
+  this->userCmdPub->Publish(userCmdMsg);
 }
 
 /////////////////////////////////////////////////
@@ -768,7 +797,7 @@ void MainWindow::CaptureScreenshot()
   rendering::UserCameraPtr cam = gui::get_active_camera();
   cam->SetCaptureDataOnce();
   this->renderWidget->DisplayOverlayMsg(
-      "Screenshot saved in: " + cam->GetScreenshotPath(), 2000);
+      "Screenshot saved in: " + cam->ScreenshotPath(), 2000);
 }
 
 /////////////////////////////////////////////////
@@ -961,7 +990,7 @@ void MainWindow::ViewOculus()
 {
 #ifdef HAVE_OCULUS
   rendering::ScenePtr scene = rendering::get_scene();
-  if (scene->GetOculusCameraCount() != 0)
+  if (scene->OculusCameraCount() != 0)
   {
     gzlog << "Oculus camera already exists." << std::endl;
     return;

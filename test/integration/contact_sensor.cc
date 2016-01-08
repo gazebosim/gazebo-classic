@@ -15,6 +15,7 @@
  *
 */
 
+#include <cmath>
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/sensors/sensors.hh"
@@ -120,14 +121,14 @@ void ContactSensor::MultipleSensors(const std::string &_physicsEngine)
   {
     sensors::SensorPtr sensor1 = sensors::get_sensor(contactSensorName1);
     sensors::ContactSensorPtr contactSensor1 =
-        boost::dynamic_pointer_cast<sensors::ContactSensor>(sensor1);
+        std::dynamic_pointer_cast<sensors::ContactSensor>(sensor1);
     ASSERT_TRUE(contactSensor1 != NULL);
   }
 
   {
     sensors::SensorPtr sensor2 = sensors::get_sensor(contactSensorName2);
     sensors::ContactSensorPtr contactSensor2 =
-        boost::dynamic_pointer_cast<sensors::ContactSensor>(sensor2);
+        std::dynamic_pointer_cast<sensors::ContactSensor>(sensor2);
     ASSERT_TRUE(contactSensor2 != NULL);
   }
 
@@ -222,13 +223,13 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
 
   sensors::SensorPtr sensor01 = sensors::get_sensor(contactSensorName01);
   sensors::ContactSensorPtr contactSensor01 =
-      boost::dynamic_pointer_cast<sensors::ContactSensor>(sensor01);
+      std::dynamic_pointer_cast<sensors::ContactSensor>(sensor01);
 
   ASSERT_TRUE(contactSensor01 != NULL);
 
   sensors::SensorPtr sensor02 = sensors::get_sensor(contactSensorName02);
   sensors::ContactSensorPtr contactSensor02 =
-      boost::dynamic_pointer_cast<sensors::ContactSensor>(sensor02);
+      std::dynamic_pointer_cast<sensors::ContactSensor>(sensor02);
 
   ASSERT_TRUE(contactSensor02 != NULL);
 
@@ -342,7 +343,7 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
 
         EXPECT_NEAR(contacts[k].contact(i).normal(j).x(), 0, TOL);
         EXPECT_NEAR(contacts[k].contact(i).normal(j).y(), 0, TOL);
-        EXPECT_NEAR(contacts[k].contact(i).normal(j).z(), 1, TOL);
+        EXPECT_NEAR(std::abs(contacts[k].contact(i).normal(j).z()), 1, TOL);
 
         if (body1)
         {
@@ -446,7 +447,7 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
 
   sensors::SensorPtr sensor = sensors::get_sensor(contactSensorName);
   sensors::ContactSensorPtr contactSensor =
-      boost::dynamic_pointer_cast<sensors::ContactSensor>(sensor);
+      std::dynamic_pointer_cast<sensors::ContactSensor>(sensor);
 
   ASSERT_TRUE(contactSensor != NULL);
 

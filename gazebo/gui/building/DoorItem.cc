@@ -15,8 +15,8 @@
  *
 */
 
+#include "gazebo/gui/Conversions.hh"
 #include "gazebo/gui/building/EditorView.hh"
-#include "gazebo/gui/building/BuildingItem.hh"
 #include "gazebo/gui/building/EditorItem.hh"
 #include "gazebo/gui/building/RectItem.hh"
 #include "gazebo/gui/building/WindowDoorInspectorDialog.hh"
@@ -27,7 +27,7 @@ using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-DoorItem::DoorItem(): RectItem(), BuildingItem()
+DoorItem::DoorItem(): RectItem()
 {
   this->editorType = "Door";
   this->itemScale = BuildingMaker::conversionScale;
@@ -157,16 +157,16 @@ void DoorItem::OnApply()
 
   QPointF itemPos = this->doorPos * this->itemScale;
   itemPos.setY(-itemPos.y());
-  this->SetSize(QSize(dialog->GetWidth() / this->itemScale,
-      (dialog->GetDepth() / this->itemScale)));
-  this->doorWidth = dialog->GetWidth() / this->itemScale;
-  this->doorHeight = dialog->GetHeight() / this->itemScale;
-  this->doorDepth = dialog->GetDepth() / this->itemScale;
-  this->doorElevation = dialog->GetElevation() / this->itemScale;
-  if ((fabs(dialog->GetPosition().x() - itemPos.x()) >= 0.01)
-      || (fabs(dialog->GetPosition().y() - itemPos.y()) >= 0.01))
+  this->SetSize(QSize(dialog->Width() / this->itemScale,
+      (dialog->Depth() / this->itemScale)));
+  this->doorWidth = dialog->Width() / this->itemScale;
+  this->doorHeight = dialog->Height() / this->itemScale;
+  this->doorDepth = dialog->Depth() / this->itemScale;
+  this->doorElevation = dialog->Elevation() / this->itemScale;
+  if ((fabs(dialog->Position().X() - itemPos.x()) >= 0.01)
+      || (fabs(dialog->Position().Y() - itemPos.y()) >= 0.01))
   {
-    itemPos = dialog->GetPosition() / this->itemScale;
+    itemPos = Conversions::Convert(dialog->Position()) / this->itemScale;
     itemPos.setY(-itemPos.y());
     this->doorPos = itemPos;
     this->setPos(this->doorPos);
@@ -185,7 +185,7 @@ void DoorItem::OnOpenInspector()
   this->inspector->SetElevation(this->doorElevation * this->itemScale);
   QPointF itemPos = this->doorPos * this->itemScale;
   itemPos.setY(-itemPos.y());
-  this->inspector->SetPosition(itemPos);
+  this->inspector->SetPosition(Conversions::Convert(itemPos));
   this->inspector->move(QCursor::pos());
   this->inspector->show();
 }

@@ -16,17 +16,19 @@
 */
 #include "gazebo/gui/building/EditorView.hh"
 #include "gazebo/gui/building/ImportImageView.hh"
+#include "gazebo/gui/building/ImportImageViewPrivate.hh"
 #include "gazebo/gui/building/BuildingEditorEvents.hh"
 #include "gazebo/gui/building/ImportImageDialog.hh"
+#include "gazebo/gui/building/ImportImageDialogPrivate.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
 ImportImageDialog::ImportImageDialog(QWidget *_parent)
-  : QDialog(_parent)
+  : QDialog(_parent), dataPtr(new ImportImageDialogPrivate)
 {
-  this->view = static_cast<EditorView*>(_parent);
+  this->dataPtr->view = static_cast<EditorView *>(_parent);
 
   this->setWindowTitle(tr("Import Image"));
   this->setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
@@ -44,28 +46,29 @@ ImportImageDialog::ImportImageDialog(QWidget *_parent)
   QLabel *step1Supports = new QLabel(tr(
        "<font size=1 color='grey'>Supported formats: .png, .jpg</font><br>"));
 
-  this->fileLineEdit = new QLineEdit();
-  this->fileLineEdit->setPlaceholderText(tr("Image file name"));
+  this->dataPtr->fileLineEdit = new QLineEdit();
+  this->dataPtr->fileLineEdit->setPlaceholderText(tr("Image file name"));
   connect(this, SIGNAL(SetFileName(QString)),
-      this->fileLineEdit, SLOT(setText(QString)), Qt::QueuedConnection);
+      this->dataPtr->fileLineEdit, SLOT(setText(QString)),
+      Qt::QueuedConnection);
 
   QPushButton *fileButton = new QPushButton(tr("..."));
   connect(fileButton, SIGNAL(clicked()), this, SLOT(OnSelectFile()));
 
   QHBoxLayout *fileLayout = new QHBoxLayout;
   fileLayout->addWidget(new QLabel(tr("File: ")));
-  fileLayout->addWidget(this->fileLineEdit);
+  fileLayout->addWidget(this->dataPtr->fileLineEdit);
   fileLayout->addWidget(fileButton);
 
   QPushButton *cancelButton1 = new QPushButton(tr("Cancel"));
-  this->nextButton = new QPushButton(tr("Next"));
-  this->nextButton->setEnabled(false);
+  this->dataPtr->nextButton = new QPushButton(tr("Next"));
+  this->dataPtr->nextButton->setEnabled(false);
   connect(cancelButton1, SIGNAL(clicked()), this, SLOT(OnReject()));
-  connect(this->nextButton, SIGNAL(clicked()), this, SLOT(OnNext()));
+  connect(this->dataPtr->nextButton, SIGNAL(clicked()), this, SLOT(OnNext()));
 
   QHBoxLayout *step1Buttons = new QHBoxLayout;
   step1Buttons->addWidget(cancelButton1);
-  step1Buttons->addWidget(this->nextButton);
+  step1Buttons->addWidget(this->dataPtr->nextButton);
 
   QVBoxLayout *step1Layout = new QVBoxLayout;
   step1Layout->setSpacing(0);
@@ -84,49 +87,49 @@ ImportImageDialog::ImportImageDialog(QWidget *_parent)
       "the real world distance between<br>"
       "the two end points."));
 
-  this->distanceSpin = new QDoubleSpinBox;
-  this->distanceSpin->setRange(0.001, 1000);
-  this->distanceSpin->setSingleStep(0.1);
-  this->distanceSpin->setDecimals(4);
-  this->distanceSpin->setValue(1);
-  this->distanceSpin->setButtonSymbols(QAbstractSpinBox::NoButtons);
-  this->distanceSpin->setReadOnly(true);
-  connect(this->distanceSpin, SIGNAL(valueChanged(double)), this,
+  this->dataPtr->distanceSpin = new QDoubleSpinBox;
+  this->dataPtr->distanceSpin->setRange(0.001, 1000);
+  this->dataPtr->distanceSpin->setSingleStep(0.1);
+  this->dataPtr->distanceSpin->setDecimals(4);
+  this->dataPtr->distanceSpin->setValue(1);
+  this->dataPtr->distanceSpin->setButtonSymbols(QAbstractSpinBox::NoButtons);
+  this->dataPtr->distanceSpin->setReadOnly(true);
+  connect(this->dataPtr->distanceSpin, SIGNAL(valueChanged(double)), this,
       SLOT(OnChangeDistance(double)));
 
   QHBoxLayout *distanceLayout = new QHBoxLayout;
   distanceLayout->addWidget(new QLabel("Distance (m):"));
   distanceLayout->addStretch(1);
-  distanceLayout->addWidget(this->distanceSpin);
+  distanceLayout->addWidget(this->dataPtr->distanceSpin);
 
-  this->resolutionSpin = new QDoubleSpinBox;
-  this->resolutionSpin->setRange(0, 10000);
-  this->resolutionSpin->setSingleStep(10);
-  this->resolutionSpin->setDecimals(3);
-  this->resolutionSpin->setValue(100);
-  this->resolutionSpin->setButtonSymbols(QAbstractSpinBox::NoButtons);
-  this->resolutionSpin->setReadOnly(true);
-  connect(this->resolutionSpin, SIGNAL(valueChanged(double)), this,
+  this->dataPtr->resolutionSpin = new QDoubleSpinBox;
+  this->dataPtr->resolutionSpin->setRange(0, 10000);
+  this->dataPtr->resolutionSpin->setSingleStep(10);
+  this->dataPtr->resolutionSpin->setDecimals(3);
+  this->dataPtr->resolutionSpin->setValue(100);
+  this->dataPtr->resolutionSpin->setButtonSymbols(QAbstractSpinBox::NoButtons);
+  this->dataPtr->resolutionSpin->setReadOnly(true);
+  connect(this->dataPtr->resolutionSpin, SIGNAL(valueChanged(double)), this,
       SLOT(OnChangeResolution(double)));
 
   QHBoxLayout *resolutionLayout = new QHBoxLayout;
   resolutionLayout->addWidget(new QLabel("Resolution (px/m):"));
   resolutionLayout->addStretch(1);
-  resolutionLayout->addWidget(this->resolutionSpin);
+  resolutionLayout->addWidget(this->dataPtr->resolutionSpin);
 
-  this->okButton = new QPushButton(tr("Ok"));
-  this->okButton->setEnabled(false);
+  this->dataPtr->okButton = new QPushButton(tr("Ok"));
+  this->dataPtr->okButton->setEnabled(false);
   QPushButton *backButton = new QPushButton(tr("Back"));
   QPushButton *cancelButton2 = new QPushButton(tr("Cancel"));
 
-  connect(this->okButton, SIGNAL(clicked()), this, SLOT(OnAccept()));
+  connect(this->dataPtr->okButton, SIGNAL(clicked()), this, SLOT(OnAccept()));
   connect(backButton, SIGNAL(clicked()), this, SLOT(OnBack()));
   connect(cancelButton2, SIGNAL(clicked()), this, SLOT(OnReject()));
 
   QHBoxLayout *step2Buttons = new QHBoxLayout;
   step2Buttons->addWidget(backButton);
   step2Buttons->addWidget(cancelButton2);
-  step2Buttons->addWidget(this->okButton);
+  step2Buttons->addWidget(this->dataPtr->okButton);
 
   QVBoxLayout *step2Layout = new QVBoxLayout;
   step2Layout->addWidget(step2Label);
@@ -140,9 +143,9 @@ ImportImageDialog::ImportImageDialog(QWidget *_parent)
   step2Widget->setLayout(step2Layout);
 
   // Left column
-  this->stackedStepLayout = new QStackedLayout;
-  this->stackedStepLayout->addWidget(step1Widget);
-  this->stackedStepLayout->addWidget(step2Widget);
+  this->dataPtr->stackedStepLayout = new QStackedLayout;
+  this->dataPtr->stackedStepLayout->addWidget(step1Widget);
+  this->dataPtr->stackedStepLayout->addWidget(step2Widget);
 
   QWidget *leftColumn = new QWidget();
   leftColumn->setSizePolicy(QSizePolicy::Fixed,
@@ -150,33 +153,33 @@ ImportImageDialog::ImportImageDialog(QWidget *_parent)
   QVBoxLayout *leftColumnLayout = new QVBoxLayout();
   leftColumn->setLayout(leftColumnLayout);
   leftColumnLayout->addWidget(titleLabel);
-  leftColumnLayout->addLayout(this->stackedStepLayout);
+  leftColumnLayout->addLayout(this->dataPtr->stackedStepLayout);
 
   // Image view
-  this->importImageView = new ImportImageView(this);
+  this->dataPtr->importImageView = new ImportImageView(this);
   QGraphicsScene *scene = new QGraphicsScene();
   scene->setBackgroundBrush(Qt::white);
 
-  this->imageDisplayWidth = 700;
-  this->imageDisplayHeight = 500;
-  scene->setSceneRect(0, 0, this->imageDisplayWidth,
-                            this->imageDisplayHeight);
+  this->dataPtr->imageDisplayWidth = 700;
+  this->dataPtr->imageDisplayHeight = 500;
+  scene->setSceneRect(0, 0, this->dataPtr->imageDisplayWidth,
+                            this->dataPtr->imageDisplayHeight);
 
-  this->importImageView->setSizePolicy(QSizePolicy::Expanding,
+  this->dataPtr->importImageView->setSizePolicy(QSizePolicy::Expanding,
                                        QSizePolicy::Expanding);
-  this->importImageView->setScene(scene);
-  this->importImageView->centerOn(QPointF(0, 0));
-  this->importImageView->setViewportUpdateMode(
+  this->dataPtr->importImageView->setScene(scene);
+  this->dataPtr->importImageView->centerOn(QPointF(0, 0));
+  this->dataPtr->importImageView->setViewportUpdateMode(
       QGraphicsView::FullViewportUpdate);
-  this->importImageView->setDragMode(QGraphicsView::ScrollHandDrag);
+  this->dataPtr->importImageView->setDragMode(QGraphicsView::ScrollHandDrag);
 
   // Main layout
   QHBoxLayout *mainLayout = new QHBoxLayout;
   mainLayout->addWidget(leftColumn, 0, Qt::AlignTop);
-  mainLayout->addWidget(this->importImageView);
+  mainLayout->addWidget(this->dataPtr->importImageView);
   this->setLayout(mainLayout);
 
-  this->drawingLine = false;
+  this->dataPtr->drawingLine = false;
 }
 
 /////////////////////////////////////////////////
@@ -187,10 +190,11 @@ ImportImageDialog::~ImportImageDialog()
 /////////////////////////////////////////////////
 void ImportImageDialog::OnAccept()
 {
-  std::string filename = this->fileLineEdit->text().toStdString();
+  std::string filename = this->dataPtr->fileLineEdit->text().toStdString();
   if (!filename.empty())
   {
-    this->view->SetBackgroundImage(filename, this->resolutionSpin->value());
+    this->dataPtr->view->SetBackgroundImage(filename,
+        this->dataPtr->resolutionSpin->value());
   }
   this->accept();
 }
@@ -205,15 +209,15 @@ void ImportImageDialog::OnReject()
 /////////////////////////////////////////////////
 void ImportImageDialog::OnNext()
 {
-  this->stackedStepLayout->setCurrentIndex(1);
-  this->importImageView->EnableDrawDistance(true);
+  this->dataPtr->stackedStepLayout->setCurrentIndex(1);
+  this->dataPtr->importImageView->EnableDrawDistance(true);
 }
 
 /////////////////////////////////////////////////
 void ImportImageDialog::OnBack()
 {
-  this->stackedStepLayout->setCurrentIndex(0);
-  this->importImageView->EnableDrawDistance(false);
+  this->dataPtr->stackedStepLayout->setCurrentIndex(0);
+  this->dataPtr->importImageView->EnableDrawDistance(false);
 }
 
 /////////////////////////////////////////////////
@@ -233,28 +237,28 @@ void ImportImageDialog::OnSelectFile()
     std::string filename = selected[0].toStdString();
 
     this->SetFileName(QString::fromStdString(filename));
-    this->importImageView->SetImage(filename);
+    this->dataPtr->importImageView->SetImage(filename);
 
-    this->nextButton->setEnabled(true);
+    this->dataPtr->nextButton->setEnabled(true);
   }
 }
 
 /////////////////////////////////////////////////
 void ImportImageDialog::OnChangeDistance(double _distance)
 {
-  double distanceImage = this->importImageView->measureScenePx *
-                         this->importImageView->imageWidthPx /
-                         this->importImageView->pixmapWidthPx;
-  this->resolutionSpin->setValue(distanceImage / _distance);
-  this->importImageView->RefreshDistance(_distance);
+  double distanceImage =
+      this->dataPtr->importImageView->dataPtr->measureScenePx *
+      this->dataPtr->importImageView->dataPtr->imageWidthPx /
+      this->dataPtr->importImageView->dataPtr->pixmapWidthPx;
+  this->dataPtr->resolutionSpin->setValue(distanceImage / _distance);
+  this->dataPtr->importImageView->RefreshDistance(_distance);
 
-  this->okButton->setEnabled(true);
+  this->dataPtr->okButton->setEnabled(true);
 }
 
 /////////////////////////////////////////////////
 void ImportImageDialog::OnChangeResolution(double /*_resolution*/)
 {
   // change distance without re-changing resolution
-
-  this->okButton->setEnabled(true);
+  this->dataPtr->okButton->setEnabled(true);
 }
