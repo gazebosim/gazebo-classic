@@ -218,7 +218,7 @@ void Camera::Init()
   this->dataPtr->trackMinDistance = 8.0;
   this->dataPtr->trackMaxDistance = 8.0;
   this->dataPtr->trackPos = ignition::math::Vector3d(-5.0, 0.0, 3.0);
-  this->dataPtr->trackInheritYaw = true;
+  this->dataPtr->trackInheritYaw = false;
 }
 
 //////////////////////////////////////////////////
