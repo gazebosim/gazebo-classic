@@ -15,6 +15,7 @@
     * [Pull request #2036](https://bitbucket.org/osrf/gazebo/pull-request/2036)
 
 1. Use opaque pointers in the gui library
+    * [Pull request #2057](https://bitbucket.org/osrf/gazebo/pull-request/2057)
     * [Pull request #2037](https://bitbucket.org/osrf/gazebo/pull-request/2037)
     * [Pull request #2052](https://bitbucket.org/osrf/gazebo/pull-request/2052)
     * [Pull request #2053](https://bitbucket.org/osrf/gazebo/pull-request/2053)
@@ -230,6 +231,9 @@ using the same arguments used in the command line.
     1. Support adding model plugins in model editor
         * [Pull request #2060](https://bitbucket.org/osrf/gazebo/pull-request/2060)
 
+    1. Added support for copying and pasting top level nested models
+        * [Pull request #2006](https://bitbucket.org/osrf/gazebo/pull-request/2006)
+
     1. Make non-editable background models white in model editor
         * [Pull request #1950](https://bitbucket.org/osrf/gazebo/pull-request/1950)
 
@@ -284,6 +288,9 @@ using the same arguments used in the command line.
 
     1. Added joint creation dialog
         * [Pull request #2021](https://bitbucket.org/osrf/gazebo/pull-request/2021)
+
+    1. Added reverse checkboxes to joint creation dialog
+        * [Pull request #2086](https://bitbucket.org/osrf/gazebo/pull-request/2086)
 
     1. Use opaque pointers in the model editor
         * [Pull request #2056](https://bitbucket.org/osrf/gazebo/pull-request/2056)

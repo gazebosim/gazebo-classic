@@ -461,7 +461,7 @@ JointData *JointMaker::CreateJointLine(const std::string &_name,
     const rendering::VisualPtr &_parent)
 {
   rendering::VisualPtr jointVis(
-      new rendering::Visual(_name, _parent->GetParent()));
+      new rendering::Visual(_name, _parent->GetParent(), false));
   jointVis->Load();
   rendering::DynamicLines *jointLine =
       jointVis->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
@@ -760,6 +760,7 @@ std::string JointMaker::CreateHotSpot(JointData *_joint)
   std::string jointId = _joint->visual->GetName() + "_UNIQUE_ID_";
   rendering::VisualPtr hotspotVisual(
       new rendering::Visual(jointId, _joint->visual, false));
+  hotspotVisual->Load();
 
   // create a cylinder to represent the joint
   hotspotVisual->InsertMesh("unit_cylinder");
@@ -803,7 +804,6 @@ std::string JointMaker::CreateHotSpot(JointData *_joint)
   hotspotVisual->GetSceneNode()->setInheritScale(false);
 
   this->dataPtr->joints[jointId] = _joint;
-  camera->GetScene()->AddVisual(hotspotVisual);
 
   _joint->hotspot = hotspotVisual;
   _joint->inspector->SetJointId(_joint->hotspot->GetName());
@@ -906,6 +906,15 @@ void JointMaker::GenerateSDF()
   this->dataPtr->modelSDF.reset(new sdf::Element);
   sdf::initFile("model.sdf", this->dataPtr->modelSDF);
   this->dataPtr->modelSDF->ClearElements();
+
+  // update joint visuals as the model pose may have changed when
+  // generating model sdf
+  for (auto jointsIt : this->dataPtr->joints)
+  {
+    JointData *joint = jointsIt.second;
+    joint->dirty = true;
+    this->Update();
+  }
 
   // loop through all joints
   for (auto jointsIt : this->dataPtr->joints)
@@ -1479,7 +1488,7 @@ void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
 
   // Visuals
   rendering::VisualPtr jointVis(
-      new rendering::Visual(jointVisName, parentVis->GetParent()));
+      new rendering::Visual(jointVisName, parentVis->GetParent(), false));
   jointVis->Load();
   rendering::DynamicLines *jointLine =
       jointVis->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
@@ -1739,8 +1748,6 @@ void JointMaker::SetLinksRelativePose(const ignition::math::Pose3d &_pose,
   if (!this->dataPtr->newJoint || !this->dataPtr->newJoint->parent ||
       !this->dataPtr->newJoint->child)
   {
-    gzerr << "Can't set relative pose without new joint's parent and child "
-        << "links." << std::endl;
     return;
   }
 
@@ -1771,7 +1778,7 @@ void JointMaker::SetLinksRelativePose(const ignition::math::Pose3d &_pose,
 
 /////////////////////////////////////////////////
 void JointMaker::AlignLinks(const bool _childToParent,
-    const std::string &_axis, const std::string &_config)
+    const std::string &_axis, const std::string &_config, const bool _reverse)
 {
   if (!this->dataPtr->newJoint || !this->dataPtr->newJoint->parent ||
       !this->dataPtr->newJoint->child)
@@ -1788,7 +1795,7 @@ void JointMaker::AlignLinks(const bool _childToParent,
   std::string target = _childToParent ? "first" : "last";
 
   ModelAlign::Instance()->AlignVisuals(links, _axis, _config,
-      target, true);
+      target, true, _reverse);
 }
 
 /////////////////////////////////////////////////
