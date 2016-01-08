@@ -22,8 +22,6 @@
 #include <string>
 #include <vector>
 
-#include <boost/thread/mutex.hpp>
-
 #include "gazebo/gazebo_config.h"
 #include "gazebo/gui/qt.h"
 #include "gazebo/msgs/MessageTypes.hh"
@@ -140,23 +138,23 @@ namespace gazebo
 
 #ifdef HAVE_OCULUS
       /// \brief Window for Oculus VR set.
-      public: gui::OculusWindow *oculusWindow;
+      public: OculusWindow *oculusWindow;
 #endif
 
       /// \brief Buffer of plugin messages to process.
       public: std::vector<std::shared_ptr<msgs::Plugin const> > pluginMsgs;
 
       /// \brief Mutex to protect plugin loading.
-      public: boost::mutex pluginLoadMutex;
+      public: std::mutex pluginLoadMutex;
 
       /// \brief Splitter for the main window.
       public: QSplitter *splitter;
 
       /// \brief Data logger dialog.
-      public: gui::DataLogger *dataLogger;
+      public: DataLogger *dataLogger;
 
       /// \brief Hotkey chart dialog.
-      public: gui::HotkeyDialog *hotkeyDialog;
+      public: HotkeyDialog *hotkeyDialog;
 
       /// \brief Tab to insert models.
       public: InsertModelWidget *insertModel;

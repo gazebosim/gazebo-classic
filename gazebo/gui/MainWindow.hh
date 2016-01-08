@@ -311,6 +311,8 @@ namespace gazebo
       /// \param[in] _mode Window mode, such as "Simulation", "LogPlayback"...
       private: void OnWindowMode(const std::string &_mode);
 
+      /// \internal
+      /// \brief Private data pointer
       private: std::unique_ptr<MainWindowPrivate> dataPtr;
     };
   }

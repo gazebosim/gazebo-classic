@@ -1964,7 +1964,7 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
 
   // Store all the plugins for processing
   {
-    boost::mutex::scoped_lock lock(this->dataPtr->pluginLoadMutex);
+    std::lock_guard<std::mutex> lock(this->dataPtr->pluginLoadMutex);
     for (int i = 0; i < _msg->plugin_size(); ++i)
     {
       std::shared_ptr<msgs::Plugin> pm(new msgs::Plugin(_msg->plugin(i)));
@@ -1979,7 +1979,7 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
 /////////////////////////////////////////////////
 void MainWindow::OnAddPlugins()
 {
-  boost::mutex::scoped_lock lock(this->dataPtr->pluginLoadMutex);
+  std::lock_guard<std::mutex> lock(this->dataPtr->pluginLoadMutex);
 
   // Load all plugins.
   for (auto iter = this->dataPtr->pluginMsgs.begin();
