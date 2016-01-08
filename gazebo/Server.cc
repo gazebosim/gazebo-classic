@@ -773,7 +773,7 @@ bool Server::OpenWorld(const std::string &_filename)
     return false;
   }
 
-  auto world = physics::create_world();
+  auto world = physics::create_world("default");
   if (!world)
     return false;
 

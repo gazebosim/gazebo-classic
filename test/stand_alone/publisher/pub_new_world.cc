@@ -32,7 +32,8 @@ int main(int _argc, char **_argv)
   node->Init();
 
   // Publish to a Gazebo topic
-  auto pub = node->Advertise<gazebo::msgs::ServerControl>("/gazebo/server/control");
+  auto pub = node->Advertise<gazebo::msgs::ServerControl>(
+      "/gazebo/server/control");
 
   // Wait for a subscriber to connect
   pub->WaitForConnection();
