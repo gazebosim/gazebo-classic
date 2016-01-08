@@ -129,7 +129,7 @@ namespace gazebo
       /// \brief Return the wind.
       /// Get a pointer to the wind used by the world.
       /// \return Pointer to the wind.
-      public: WindPtr GetWind() const;
+      public: WindPtr Wind() const;
 
       /// \brief Return the spherical coordinates converter.
       /// \return Pointer to the spherical coordinates converter.
@@ -307,11 +307,11 @@ namespace gazebo
 
       /// \brief check if wind is enabled/disabled.
       /// \param True if the wind is enabled.
-      public: bool GetEnableWind();
+      public: bool EnableWind();
 
       /// \brief enable/disable wind.
       /// \param[in] _enable True to enable the wind.
-      public: void EnableWind(bool _enable);
+      public: void EnableWind(const bool _enable);
 
       /// \brief Update the state SDF value from the current state.
       public: void UpdateStateSDF();

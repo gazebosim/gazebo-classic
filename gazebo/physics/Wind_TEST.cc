@@ -95,7 +95,7 @@ void WindTest::WindParam()
 
   // Test Wind::[GS]etParam()
   {
-    physics::WindPtr wind = world->GetWind();
+    physics::WindPtr wind = world->Wind();
     ignition::math::Vector3d vel = boost::any_cast<ignition::math::Vector3d>(
       wind->Param("linear_velocity"));
     EXPECT_EQ(vel, msgs::ConvertIgn(windPubMsg.linear_velocity()));
@@ -109,7 +109,7 @@ void WindTest::WindParam()
 
   {
     // Test SetParam for non-implementation-specific parameters
-    physics::WindPtr wind = world->GetWind();
+    physics::WindPtr wind = world->Wind();
     try
     {
       boost::any value;
@@ -142,7 +142,7 @@ void WindTest::WindParamBool()
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::WindPtr wind = world->GetWind();
+  physics::WindPtr wind = world->Wind();
 
   // Initialize to failure conditions
   boost::any value;
@@ -175,7 +175,7 @@ void WindTest::WindSetLinearVelFunc()
   physics::ModelPtr model(new physics::Model(physics::BasePtr()));
   EXPECT_TRUE(model != NULL);
 
-  physics::WindPtr wind = world->GetWind();
+  physics::WindPtr wind = world->Wind();
 
   // Double the speed
   this->windFactor = 2.0;

@@ -1,4 +1,4 @@
-i/*
+/*
  * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -55,7 +55,7 @@ void LinkConfig_TEST::LinkMsgUpdate()
   linkMsgPtr->set_gravity(false);
   linkMsgPtr->set_self_collide(true);
   linkMsgPtr->set_kinematic(true);
-  linkMsgPtr->set_enable_wind(false);
+  linkMsgPtr->set_enable_wind(true);
 
   lc.Update(linkMsgPtr);
 

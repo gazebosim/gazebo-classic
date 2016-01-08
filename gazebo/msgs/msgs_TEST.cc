@@ -1887,6 +1887,7 @@ TEST_F(MsgsTest, LinkToSDF)
 
   sdf::ElementPtr linkSDF = msgs::LinkToSDF(linkMsg);
   EXPECT_EQ(linkSDF->Get<std::string>("name"), name);
+  EXPECT_FALSE(linkSDF->Get<bool>("self_collide"));
   EXPECT_TRUE(linkSDF->Get<bool>("gravity"));
   EXPECT_FALSE(linkSDF->Get<bool>("kinematic"));
   EXPECT_FALSE(linkSDF->Get<bool>("enable_wind"));

@@ -196,7 +196,7 @@ void Wind::OnRequest(ConstRequestPtr &_msg)
     msgs::Wind windMsg;
     windMsg.mutable_linear_velocity()->CopyFrom(
       msgs::Convert(this->dataPtr->linearVel));
-    windMsg.set_enable_wind(this->dataPtr->world->GetEnableWind());
+    windMsg.set_enable_wind(this->dataPtr->world->EnableWind());
 
     response.set_type(windMsg.GetTypeName());
     windMsg.SerializeToString(serializedData);

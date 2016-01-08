@@ -982,7 +982,7 @@ void Model::FillMsg(msgs::Model &_msg)
   _msg.set_name(this->GetScopedName());
   _msg.set_is_static(this->IsStatic());
   _msg.set_self_collide(this->GetSelfCollide());
-  _msg.set_enable_wind(this->GetWindMode());
+  _msg.set_enable_wind(this->WindMode());
   msgs::Set(_msg.mutable_pose(), relPose);
   _msg.set_id(this->GetId());
   msgs::Set(_msg.mutable_scale(), this->scale.Ign());
@@ -1342,13 +1342,13 @@ bool Model::RemoveJoint(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-void Model::SetWindMode(bool _enable)
+void Model::SetWindMode(const bool _enable)
 {
   this->sdf->GetElement("enable_wind")->Set(_enable);
 }
 
 /////////////////////////////////////////////////
-bool Model::GetWindMode() const
+bool Model::WindMode() const
 {
   return this->sdf->Get<bool>("enable_wind");
 }

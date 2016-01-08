@@ -243,10 +243,10 @@ void Link::Load(sdf::ElementPtr _sdf)
   }
   else
   {
-    this->SetWindMode(this->GetModel()->GetWindMode());
+    this->SetWindMode(this->GetModel()->WindMode());
   }
   this->sdf->GetElement("enable_wind")->GetValue()->SetUpdateFunc(
-      std::bind(&Link::GetWindMode, this));
+      std::bind(&Link::WindMode, this));
 
   this->connections.push_back(event::Events::ConnectWorldUpdateBegin(
       boost::bind(&Link::Update, this, _1)));
@@ -286,7 +286,7 @@ void Link::Init()
     battery->Init();
   }
 
-  if (this->GetWindMode() && this->world->GetEnableWind())
+  if (this->WindMode() && this->world->EnableWind())
     this->EnableWind(true);
 
   this->initialized = true;
@@ -366,16 +366,13 @@ void Link::UpdateParameters(sdf::ElementPtr _sdf)
 
   this->sdf->GetElement("gravity")->GetValue()->SetUpdateFunc(
       boost::bind(&Link::GetGravityMode, this));
-  this->sdf->GetElement("self_collide")->GetValue()->SetUpdateFunc(
-      std::bind(&Link::GetSelfCollide, this));
+  this->sdf->GetElement("enable_wind")->GetValue()->SetUpdateFunc(
+      std::bind(&Link::WindMode, this));
   this->sdf->GetElement("kinematic")->GetValue()->SetUpdateFunc(
       boost::bind(&Link::GetKinematic, this));
 
   if (this->sdf->Get<bool>("gravity") != this->GetGravityMode())
     this->SetGravityMode(this->sdf->Get<bool>("gravity"));
-
-  this->sdf->GetElement("enable_wind")->GetValue()->SetUpdateFunc(
-      std::bind(&Link::GetWindMode, this));
 
   this->SetWindMode(this->sdf->Get<bool>("enable_wind"));
 
@@ -553,7 +550,7 @@ void Link::Update(const common::UpdateInfo & /*_info*/)
 //////////////////////////////////////////////////
 void Link::UpdateWind(const common::UpdateInfo & /*_info*/)
 {
-  this->windLinearVel = this->world->GetWind()->WorldLinearVel(this);
+  this->windLinearVel = this->world->Wind()->WorldLinearVel(this);
 }
 
 /////////////////////////////////////////////////
@@ -765,18 +762,18 @@ math::Box Link::GetBoundingBox() const
 }
 
 //////////////////////////////////////////////////
-void Link::SetWindMode(bool _mode)
+void Link::SetWindMode(const bool _mode)
 {
   this->sdf->GetElement("enable_wind")->Set(_mode);
 
-  if (!this->GetWindMode() && this->updateConnection)
+  if (!this->WindMode() && this->updateConnection)
     this->EnableWind(false);
-  else if (this->GetWindMode() && !this->updateConnection)
+  else if (this->WindMode() && !this->updateConnection)
     this->EnableWind(true);
 }
 
 /////////////////////////////////////////////////
-void Link::EnableWind(bool _enable)
+void Link::EnableWind(const bool _enable)
 {
   if (_enable)
   {
@@ -793,7 +790,7 @@ void Link::EnableWind(bool _enable)
 }
 
 //////////////////////////////////////////////////
-bool Link::GetWindMode() const
+bool Link::WindMode() const
 {
   return this->sdf->Get<bool>("enable_wind");
 }
@@ -890,7 +887,7 @@ void Link::FillMsg(msgs::Link &_msg)
   _msg.set_name(this->GetScopedName());
   _msg.set_self_collide(this->GetSelfCollide());
   _msg.set_gravity(this->GetGravityMode());
-  _msg.set_enable_wind(this->GetWindMode());
+  _msg.set_enable_wind(this->WindMode());
   _msg.set_kinematic(this->GetKinematic());
   _msg.set_enabled(this->GetEnabled());
   msgs::Set(_msg.mutable_pose(), relPose.Ign());

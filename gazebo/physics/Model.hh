@@ -372,11 +372,11 @@ namespace gazebo
 
       /// \brief Set whether wind affects this body.
       /// \param[in] _mode True to enable wind.
-      public: virtual void SetWindMode(bool _mode);
+      public: virtual void SetWindMode(const bool _mode);
 
       /// \brief Get the wind mode.
       /// \return True if wind is enabled.
-      public: virtual bool GetWindMode() const;
+      public: virtual bool WindMode() const;
 
       /// \brief Allow Model class to share itself as a boost shared_ptr
       /// \return a shared pointer to itself

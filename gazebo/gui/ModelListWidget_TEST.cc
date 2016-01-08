@@ -477,7 +477,7 @@ void ModelListWidget_TEST::ModelProperties()
           find("box_link") != std::string::npos)
       {
         this->CheckLinkProperty(property->subProperties(),
-          modelName + "::box_link", false, true, false, true,
+          modelName + "::box_link", false, true, false, true, false,
           gazebo::math::Pose(1.0, 0, 0, 0, 0, 0));
         numLinks++;
       }
@@ -485,7 +485,7 @@ void ModelListWidget_TEST::ModelProperties()
         find("sphere_link") != std::string::npos)
       {
         this->CheckLinkProperty(property->subProperties(),
-            modelName + "::sphere_link", false, true, false, false,
+            modelName + "::sphere_link", false, true, false, false, false,
             gazebo::math::Pose(-1.5, 0, 0, 0, 0, 1.57));
         numLinks++;
       }
@@ -527,7 +527,7 @@ void ModelListWidget_TEST::ModelProperties()
           find("box_link") != std::string::npos)
       {
         this->SetLinkProperty(propTreeBrowser, property->subProperties(),
-            modelName + "::box_link", true, false, true, true,
+            modelName + "::box_link", true, false, true, true, false,
             gazebo::math::Pose(1.5, 2.0, 3.2, 0.6, 0.7, 0.8));
         numLinks++;
       }
@@ -535,7 +535,7 @@ void ModelListWidget_TEST::ModelProperties()
         find("sphere_link") != std::string::npos)
       {
         this->SetLinkProperty(propTreeBrowser, property->subProperties(),
-            modelName + "::sphere_link", true, false, true, false,
+            modelName + "::sphere_link", true, false, true, false, false,
             gazebo::math::Pose(-2.0, 0.5, 1.0, 3.14, 0, 0));
         numLinks++;
       }
@@ -592,7 +592,7 @@ void ModelListWidget_TEST::ModelProperties()
         // as this is the canonical link, the pose properties should remain
         // unchanged
         this->CheckLinkProperty(property->subProperties(),
-            modelName + "::box_link", true, false, true, true,
+            modelName + "::box_link", true, false, true, true, false,
             gazebo::math::Pose(1.0, 0, 0, 0, 0, 0));
         numLinks++;
       }
@@ -600,7 +600,7 @@ void ModelListWidget_TEST::ModelProperties()
         find("sphere_link") != std::string::npos)
       {
         this->CheckLinkProperty(property->subProperties(),
-            modelName + "::sphere_link", true, false, true, false,
+            modelName + "::sphere_link", true, false, true, false, false,
             gazebo::math::Pose(-2.0, 0.5, 1.0, 3.14, 0, 0));
         numLinks++;
       }
@@ -748,13 +748,13 @@ void ModelListWidget_TEST::LinkProperties()
 
   // check the box link properties
   this->CheckLinkProperty(propTreeBrowser->properties(),
-      modelName + "::" + boxLinkName, false, true, false, true,
+      modelName + "::" + boxLinkName, false, true, false, true, false,
       gazebo::math::Pose(1.0, 0, 0, 0, 0, 0));
 
   // change box link properties
   // TODO changing link name currently fails.
   this->SetLinkProperty(propTreeBrowser, propTreeBrowser->properties(),
-      modelName + "::" + boxLinkName, true, false, true, true,
+      modelName + "::" + boxLinkName, true, false, true, true, false,
       gazebo::math::Pose(2.5, 1.0, 4.2, 0.8, 0.5, 0.1));
 
   // select the box link again to refresh the property browser
@@ -786,7 +786,7 @@ void ModelListWidget_TEST::LinkProperties()
   // verify the link properties are sucessfully set
   // the link is canonical so the pose should remain the same
   this->CheckLinkProperty(propTreeBrowser->properties(),
-      modelName + "::" + boxLinkName, true, false, true, true,
+      modelName + "::" + boxLinkName, true, false, true, true, false,
       gazebo::math::Pose(1.0, 0, 0, 0, 0, 0));
 
   // select the sphere link
@@ -823,13 +823,13 @@ void ModelListWidget_TEST::LinkProperties()
 
   // check the sphere link properties
   this->CheckLinkProperty(propTreeBrowser->properties(),
-      modelName + "::" + sphereLinkName, false, true, false, false,
+      modelName + "::" + sphereLinkName, false, true, false, false, false,
       gazebo::math::Pose(-1.5, 0, 0, 0, 0, 1.57));
 
   // change sphere link properties
   // TODO changing link name currently fails.
   this->SetLinkProperty(propTreeBrowser, propTreeBrowser->properties(),
-      modelName + "::" + sphereLinkName, true, false, true, false,
+      modelName + "::" + sphereLinkName, true, false, true, false, false,
       gazebo::math::Pose(-2.0, 0.1, -1.2, 0, 1.57, 0));
 
   // select the sphere link again to refresh the property browser
@@ -858,7 +858,7 @@ void ModelListWidget_TEST::LinkProperties()
 
   // verify the link properties are sucessfully set
   this->CheckLinkProperty(propTreeBrowser->properties(),
-      modelName + "::" + sphereLinkName, true, false, true, false,
+      modelName + "::" + sphereLinkName, true, false, true, false, false,
       gazebo::math::Pose(-2.0, 0.1, -1.2, 0, 1.57, 0));
 
   modelListWidget->hide();

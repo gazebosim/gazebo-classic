@@ -34,7 +34,7 @@ void WindPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr /*_sdf*/)
   GZ_ASSERT(_world, "WindPlugin world pointer is NULL");
   this->world = _world;
 
-  physics::WindPtr wind = this->world->GetWind();
+  physics::WindPtr wind = this->world->Wind();
 
   wind->SetLinearVelFunc(std::bind(&WindPlugin::LinearVel, this,
         std::placeholders::_1, std::placeholders::_2));
@@ -76,7 +76,7 @@ void WindPlugin::OnUpdate()
     for (auto const &link : links)
     {
       // Skip links for which the wind is disabled
-      if (!link->GetWindMode())
+      if (!link->WindMode())
         continue;
 
       // Add wind velocity as a force to the body

@@ -126,11 +126,11 @@ namespace gazebo
 
       /// \brief Set whether wind affects this body.
       /// \param[in] _mode True to enable wind.
-      public: virtual void SetWindMode(bool _mode);
+      public: virtual void SetWindMode(const bool _mode);
 
       /// \brief Get the wind mode.
       /// \return True if wind is enabled.
-      public: virtual bool GetWindMode() const;
+      public: virtual bool WindMode() const;
 
       /// \brief Set whether this body will collide with others in the
       /// model.
@@ -565,7 +565,7 @@ namespace gazebo
 
       /// \brief Enable/disable wind for this link.
       /// \param[in] _enable True to enable the wind.
-      public: void EnableWind(bool _enable);
+      public: void EnableWind(const bool _enable);
 
       /// \brief Returns this link's wind velocity in the world coordinate
       /// frame.

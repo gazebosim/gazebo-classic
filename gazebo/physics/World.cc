@@ -280,7 +280,7 @@ void World::Load(sdf::ElementPtr _sdf)
   // This should come before loading of entities
   sdf::ElementPtr windElem = this->dataPtr->sdf->GetElement("wind");
 
-  this->dataPtr->wind.reset(new Wind(shared_from_this()));
+  this->dataPtr->wind.reset(new physics::Wind(shared_from_this()));
 
   if (this->dataPtr->wind == NULL)
     gzthrow("Unable to create wind\n");
@@ -887,7 +887,7 @@ PresetManagerPtr World::GetPresetManager() const
 }
 
 //////////////////////////////////////////////////
-WindPtr World::GetWind() const
+WindPtr World::Wind() const
 {
   return this->dataPtr->wind;
 }
@@ -2489,13 +2489,13 @@ void World::EnablePhysicsEngine(bool _enable)
 }
 
 /////////////////////////////////////////////////
-bool World::GetEnableWind()
+bool World::EnableWind()
 {
   return this->dataPtr->enableWind;
 }
 
 /////////////////////////////////////////////////
-void World::EnableWind(bool _enable)
+void World::EnableWind(const bool _enable)
 {
   if (this->dataPtr->enableWind == _enable)
     return;
@@ -2507,7 +2507,7 @@ void World::EnableWind(bool _enable)
     Link_V links = model->GetLinks();
     for (auto const &link : links)
     {
-      if (link->GetWindMode())
+      if (link->WindMode())
         link->EnableWind(this->dataPtr->enableWind);
     }
   }
