@@ -126,7 +126,7 @@ namespace gazebo
 #endif
 
       /// \brief Buffer of plugin messages to process.
-      public: std::vector<boost::shared_ptr<msgs::Plugin const> > pluginMsgs;
+      public: std::vector<std::shared_ptr<msgs::Plugin const> > pluginMsgs;
 
       /// \brief Mutext to protect plugin loading.
       public: boost::mutex pluginLoadMutex;

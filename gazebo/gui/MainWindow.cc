@@ -1967,7 +1967,7 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
     boost::mutex::scoped_lock lock(this->dataPtr->pluginLoadMutex);
     for (int i = 0; i < _msg->plugin_size(); ++i)
     {
-      boost::shared_ptr<msgs::Plugin> pm(new msgs::Plugin(_msg->plugin(i)));
+      std::shared_ptr<msgs::Plugin> pm(new msgs::Plugin(_msg->plugin(i)));
       this->dataPtr->pluginMsgs.push_back(pm);
     }
   }
@@ -1982,8 +1982,7 @@ void MainWindow::OnAddPlugins()
   boost::mutex::scoped_lock lock(this->dataPtr->pluginLoadMutex);
 
   // Load all plugins.
-  for (std::vector<boost::shared_ptr<msgs::Plugin const> >::iterator iter =
-      this->dataPtr->pluginMsgs.begin();
+  for (auto iter = this->dataPtr->pluginMsgs.begin();
       iter != this->dataPtr->pluginMsgs.end(); ++iter)
   {
     // Make sure the filename string is not empty
