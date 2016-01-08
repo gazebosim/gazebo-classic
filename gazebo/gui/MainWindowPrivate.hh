@@ -25,7 +25,6 @@
 #include <boost/thread/mutex.hpp>
 
 #include "gazebo/gazebo_config.h"
-#include "gazebo/common/Event.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
