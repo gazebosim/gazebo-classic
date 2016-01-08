@@ -1209,7 +1209,7 @@ void Model::OnPoseChange()
 void Model::SetState(const ModelState &_state)
 {
   this->SetWorldPose(_state.GetPose(), true);
-  this->SetScale(_state.Scale(), true);
+  this->_SetScale(_state.Scale());
 
   LinkState_M linkStates = _state.GetLinkStates();
   for (LinkState_M::iterator iter = linkStates.begin();
@@ -1239,6 +1239,12 @@ void Model::SetState(const ModelState &_state)
   //   this->SetJointPosition(this->GetName() + "::" + jointState.GetName(),
   //                          jointState.GetAngle(0).Radian());
   // }
+}
+
+//////////////////////////////////////////////////
+void Model::_SetScale(const ignition::math::Vector3d &_scale)
+{
+  this->scale = _scale;
 }
 
 /////////////////////////////////////////////////

@@ -422,6 +422,11 @@ namespace gazebo
       /// \param[in] _name Name of the link to remove.
       private: void RemoveLink(const std::string &_name);
 
+      /// \internal
+      /// \brief Set the scale variable only
+      /// \param[in] _scale Scale to set the variable.
+      private: void _SetScale(const ignition::math::Vector3d &_scale);
+
       /// \brief Publish the scale.
       private: virtual void PublishScale();
 

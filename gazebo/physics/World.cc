@@ -1567,7 +1567,7 @@ void World::ProcessRequestMsgs()
     }
     else if (requestMsg.request().find("world_sdf") != std::string::npos)
     {
-      this->UpdateStateSDF();
+/*      this->UpdateStateSDF();
 
       sdf::ElementPtr newSdf(this->dataPtr->sdf);
 
@@ -1598,6 +1598,14 @@ void World::ProcessRequestMsgs()
       stream << "<?xml version='1.0'?>\n"
              << "<sdf version='" << SDF_VERSION << "'>\n"
              << newSdf->ToString("")
+             << "</sdf>";*/
+
+      msgs::GzString msg;
+      this->UpdateStateSDF();
+      std::ostringstream stream;
+      stream << "<?xml version='1.0'?>\n"
+             << "<sdf version='" << SDF_VERSION << "'>\n"
+             << this->dataPtr->sdf->ToString("")
              << "</sdf>";
 
       msg.set_data(stream.str());
