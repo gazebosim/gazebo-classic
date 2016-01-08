@@ -488,7 +488,7 @@ void WideAngleCamera::Fini()
     this->dataPtr->envRenderTargets[i]->removeAllViewports();
     this->dataPtr->envRenderTargets[i] = NULL;
 
-    this->GetScene()->GetManager()->destroyCamera(
+    this->GetScene()->OgreSceneManager()->destroyCamera(
         this->dataPtr->envCameras[i]->getName());
     this->dataPtr->envCameras[i] = NULL;
   }
@@ -568,7 +568,7 @@ void WideAngleCamera::CreateEnvCameras()
     name_str << this->scopedUniqueName << "_env_" << i;
 
     this->dataPtr->envCameras[i] =
-        this->GetScene()->GetManager()->createCamera(name_str.str());
+        this->GetScene()->OgreSceneManager()->createCamera(name_str.str());
 
     this->dataPtr->envCameras[i]->setFixedYawAxis(false);
     this->dataPtr->envCameras[i]->setFOVy(Ogre::Degree(90));
@@ -647,7 +647,7 @@ void WideAngleCamera::CreateEnvRenderTexture(const std::string &_textureName)
     RTShaderSystem::AttachViewport(vp, this->GetScene());
 
     vp->setBackgroundColour(
-      Conversions::Convert(this->scene->GetBackgroundColor()));
+      Conversions::Convert(this->scene->BackgroundColor()));
     vp->setVisibilityMask(GZ_VISIBILITY_ALL &
         ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
 
@@ -696,7 +696,7 @@ void WideAngleCamera::notifyMaterialRender(Ogre::uint32 /*_pass_id*/,
   }
 
   this->Lens()->SetUniformVariables(pPass,
-    this->GetAspectRatio(),
+    this->AspectRatio(),
     this->HFOV().Radian());
 
 #if defined(HAVE_OPENGL)

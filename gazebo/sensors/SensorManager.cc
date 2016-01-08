@@ -103,6 +103,13 @@ void SensorManager::Update(bool _force)
   {
     boost::recursive_mutex::scoped_lock lock(this->mutex);
 
+    if (this->worlds.empty() && physics::worlds_running() && this->initialized)
+    {
+      auto world = physics::get_world();
+      this->worlds[world->GetName()] = world;
+      world->_SetSensorsInitialized(true);
+    }
+
     if (!this->initSensors.empty())
     {
       // in case things are spawned, sensors length changes
@@ -154,8 +161,6 @@ void SensorManager::Update(bool _force)
         (*iter2)->RemoveSensors();
       }
       this->initSensors.clear();
-      for (auto &iter : this->worlds)
-        iter.second->_SetSensorsInitialized(false);
       this->removeAllSensors = false;
     }
   }
@@ -215,9 +220,6 @@ void SensorManager::Init()
         std::placeholders::_3, std::placeholders::_4));
 
   this->initialized = true;
-
-  for (auto &iter : this->worlds)
-    iter.second->_SetSensorsInitialized(true);
 }
 
 //////////////////////////////////////////////////
@@ -236,6 +238,7 @@ void SensorManager::Fini()
 
   this->removeSensors.clear();
   this->initSensors.clear();
+  this->worlds.clear();
 
   delete this->simTimeEventHandler;
   this->simTimeEventHandler = NULL;
@@ -291,8 +294,8 @@ std::string SensorManager::CreateSensor(sdf::ElementPtr _elem,
   // initialized during the next SensorManager::Update call.
   else
   {
-    this->worlds[_worldName]->_SetSensorsInitialized(false);
     boost::recursive_mutex::scoped_lock lock(this->mutex);
+    this->worlds[_worldName]->_SetSensorsInitialized(false);
     this->initSensors.push_back(sensor);
   }
 
