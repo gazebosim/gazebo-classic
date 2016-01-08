@@ -96,21 +96,21 @@ namespace gazebo
 
       /// \brief Set the sea level temperature.
       /// \param[in] _t Temperature value in kelvins.
-      public: virtual void SetTemperatureSL(double _t) = 0;
+      public: virtual void SetTemperatureSL(const double _t) = 0;
 
       /// \brief Set the sea level pressure.
       /// \param[in] _pressure Pressure in pascals.
-      public: virtual void SetPressureSL(double _pressure) = 0;
+      public: virtual void SetPressureSL(const double _pressure) = 0;
 
       /// \brief Set the mass density of the air at sea level
-      public: virtual void SetMassDensitySL(double _massDensity) = 0;
+      public: virtual void SetMassDensitySL(const double _massDensity) = 0;
 
       /// \brief Get the actual modeled temperature in kelvins at a given
       /// altitude.
       /// \param[in] _altitude Altitude above sea level in meters.
       /// \return Modeled temperature in kelvin at the specified
       /// altitude.
-      public: virtual double Temperature(double _altitude) const = 0;
+      public: virtual double Temperature(const double _altitude) const = 0;
 
       /// \brief Get the actual modeled sea level temperature in kelvins.
       /// \return Modeled temperature in kelvin at sea level.
@@ -120,7 +120,7 @@ namespace gazebo
       /// \brief Get the pressure at a specified altitude in pascals.
       /// \param[in] _altitude Altitude above sea level in meters.
       /// \return Pressure in pascals at the specified altitude.
-      public: virtual double Pressure(double _altitude) const = 0;
+      public: virtual double Pressure(const double _altitude) const = 0;
 
       /// \brief Get the sea level pressure in pascals.
       /// \return Pressure in pascals at sea level.
@@ -129,7 +129,7 @@ namespace gazebo
       /// \brief Get the density in kg/m^3 at a given altitude in meters.
       /// \param[in] _altitude Altitude above sea level in meters.
       /// \return Density in kg/m^3 at the specified altitude.
-      public: virtual double MassDensity(double _altitude) const = 0;
+      public: virtual double MassDensity(const double _altitude) const = 0;
 
       /// \brief Get the sea level density in kg/m^3
       /// \return Density in kg/m^3 at sea level.
@@ -139,7 +139,7 @@ namespace gazebo
       /// \brief Set the temperature gradient dT/dZ around sea level
       /// \param[in] _gradient Value of the temperature gradient dT/dZ around
       /// sea level [K/m]
-      public: virtual void SetTemperatureGradientSL(double _gradient) = 0;
+      public: virtual void SetTemperatureGradientSL(const double _gradient) = 0;
 
       /// \brief Get the sea level temperature gradient.
       /// \return Temperature gradient at sea level.

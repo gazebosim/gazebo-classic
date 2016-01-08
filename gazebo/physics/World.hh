@@ -125,7 +125,7 @@ namespace gazebo
       /// \brief Return the atmosphere model.
       /// Get a pointer to the atmosphere model used by the world.
       /// \return Pointer to the atmosphere model.
-      public: AtmospherePtr GetAtmosphere() const;
+      public: AtmospherePtr Atmosphere() const;
 
       /// \brief Return the preset manager.
       /// \return Pointer to the preset manager.
@@ -307,7 +307,7 @@ namespace gazebo
 
       /// \brief check if atmosphere model is enabled/disabled.
       /// \param True if the atmosphere model is enabled.
-      public: bool GetEnableAtmosphere();
+      public: bool EnableAtmosphere();
 
       /// \brief enable/disable atmosphere model.
       /// \param[in] _enable True to enable the atmosphere model.

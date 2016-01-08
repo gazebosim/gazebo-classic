@@ -85,7 +85,7 @@ void AdiabaticAtmosphere::OnRequest(ConstRequestPtr &_msg)
     msgs::Atmosphere atmosphereMsg;
     atmosphereMsg.set_type(msgs::Atmosphere::ADIABATIC);
     atmosphereMsg.set_enable_atmosphere(
-            this->world->GetEnableAtmosphere());
+            this->world->EnableAtmosphere());
     atmosphereMsg.set_temperature(this->TemperatureSL());
     atmosphereMsg.set_pressure(this->PressureSL());
     atmosphereMsg.set_mass_density(this->massDensitySL);
@@ -140,32 +140,32 @@ bool AdiabaticAtmosphere::Param(const std::string &_key,
 }
 
 //////////////////////////////////////////////////
-void AdiabaticAtmosphere::SetTemperatureSL(double _temperature)
+void AdiabaticAtmosphere::SetTemperatureSL(const double _temperature)
 {
   this->temperatureSL = _temperature;
 }
 
 //////////////////////////////////////////////////
-void AdiabaticAtmosphere::SetTemperatureGradientSL(double _gradient)
+void AdiabaticAtmosphere::SetTemperatureGradientSL(const double _gradient)
 {
   this->temperatureGradientSL = _gradient;
   this->Init();
 }
 
 //////////////////////////////////////////////////
-void AdiabaticAtmosphere::SetPressureSL(double _pressure)
+void AdiabaticAtmosphere::SetPressureSL(const double _pressure)
 {
   this->pressureSL = _pressure;
 }
 
 //////////////////////////////////////////////////
-void AdiabaticAtmosphere::SetMassDensitySL(double _massDensity)
+void AdiabaticAtmosphere::SetMassDensitySL(const double _massDensity)
 {
   this->massDensitySL = _massDensity;
 }
 
 //////////////////////////////////////////////////
-double AdiabaticAtmosphere::Temperature(double _altitude) const
+double AdiabaticAtmosphere::Temperature(const double _altitude) const
 {
   double temperature = this->temperatureSL +
       this->temperatureGradientSL * _altitude;
@@ -173,7 +173,7 @@ double AdiabaticAtmosphere::Temperature(double _altitude) const
 }
 
 //////////////////////////////////////////////////
-double AdiabaticAtmosphere::Pressure(double _altitude) const
+double AdiabaticAtmosphere::Pressure(const double _altitude) const
 {
   double pressure = this->pressureSL *
       pow(1 - (this->temperatureGradientSL * _altitude) / this->temperatureSL,
@@ -182,7 +182,7 @@ double AdiabaticAtmosphere::Pressure(double _altitude) const
 }
 
 //////////////////////////////////////////////////
-double AdiabaticAtmosphere::MassDensity(double _altitude) const
+double AdiabaticAtmosphere::MassDensity(const double _altitude) const
 {
   double massDensity = this->massDensitySL *
       pow(1 + (this->temperatureGradientSL * _altitude) / this->temperatureSL,

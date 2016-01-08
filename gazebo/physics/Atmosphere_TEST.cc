@@ -91,7 +91,7 @@ void AtmosphereTest::AtmosphereParam(const std::string &_atmosphere)
 
   // Test Atmosphere::[GS]etParam()
   {
-    physics::AtmospherePtr atmosphere = world->GetAtmosphere();
+    physics::AtmospherePtr atmosphere = world->Atmosphere();
     boost::any temperature = atmosphere->Param("temperature");
     EXPECT_DOUBLE_EQ(boost::any_cast<double>(temperature),
       atmospherePubMsg.temperature());
@@ -105,7 +105,7 @@ void AtmosphereTest::AtmosphereParam(const std::string &_atmosphere)
 
   {
     // Test SetParam for non-implementation-specific parameters
-    physics::AtmospherePtr atmosphere = world->GetAtmosphere();
+    physics::AtmospherePtr atmosphere = world->Atmosphere();
     try
     {
       boost::any value;
@@ -152,7 +152,7 @@ void AtmosphereTest::AtmosphereParamBool
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::AtmospherePtr atmosphere = world->GetAtmosphere();
+  physics::AtmospherePtr atmosphere = world->Atmosphere();
 
   // Initialize to failure conditions
   boost::any value;

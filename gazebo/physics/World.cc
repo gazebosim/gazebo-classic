@@ -884,7 +884,7 @@ PhysicsEnginePtr World::GetPhysicsEngine() const
 }
 
 //////////////////////////////////////////////////
-AtmospherePtr World::GetAtmosphere() const
+AtmospherePtr World::Atmosphere() const
 {
   return this->dataPtr->atmosphere;
 }
@@ -2492,7 +2492,7 @@ void World::EnablePhysicsEngine(bool _enable)
 }
 
 /////////////////////////////////////////////////
-bool World::GetEnableAtmosphere()
+bool World::EnableAtmosphere()
 {
   return this->dataPtr->enableAtmosphere;
 }
