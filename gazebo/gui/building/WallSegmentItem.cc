@@ -16,6 +16,10 @@
 */
 
 #include "gazebo/math/Angle.hh"
+
+#include "gazebo/common/Color.hh"
+
+#include "gazebo/gui/Conversions.hh"
 #include "gazebo/gui/building/EditorView.hh"
 #include "gazebo/gui/building/EditorItem.hh"
 #include "gazebo/gui/building/RectItem.hh"
@@ -27,7 +31,7 @@ using namespace gui;
 
 /////////////////////////////////////////////////
 WallSegmentItem::WallSegmentItem(const QPointF &_start, const QPointF &_end,
-    const double _height) : SegmentItem(), BuildingItem()
+    const double _height) : SegmentItem()
 {
   this->editorType = "WallSegment";
 
@@ -124,12 +128,12 @@ void WallSegmentItem::UpdateInspector()
   this->inspector->SetLength(segmentLength * this->itemScale);
   QPointF startPos = segmentStartPoint * this->itemScale;
   startPos.setY(-startPos.y());
-  this->inspector->SetStartPosition(startPos);
+  this->inspector->SetStartPosition(Conversions::Convert(startPos));
   QPointF endPos = segmentEndPoint * this->itemScale;
   endPos.setY(-endPos.y());
-  this->inspector->SetEndPosition(endPos);
-  this->inspector->SetColor(this->visual3dColor);
-  this->inspector->SetTexture(this->visual3dTexture);
+  this->inspector->SetEndPosition(Conversions::Convert(endPos));
+  this->inspector->SetColor(Conversions::Convert(this->visual3dColor));
+  this->inspector->SetTexture(this->visual3dTexture.toStdString());
 }
 
 /////////////////////////////////////////////////
@@ -232,14 +236,14 @@ void WallSegmentItem::OnApply()
       qobject_cast<WallInspectorDialog *>(QObject::sender());
 
   double segmentLength = this->line().length() + this->wallThickness;
-  this->wallThickness = dialog->GetThickness() / this->itemScale;
+  this->wallThickness = dialog->Thickness() / this->itemScale;
   this->SetThickness(this->wallThickness);
-  this->wallHeight = dialog->GetHeight() / this->itemScale;
-  this->Set3dTexture(dialog->GetTexture());
-  this->Set3dColor(dialog->GetColor());
+  this->wallHeight = dialog->Height() / this->itemScale;
+  this->Set3dTexture(QString::fromStdString(dialog->Texture()));
+  this->Set3dColor(Conversions::Convert(dialog->Color()));
   this->WallSegmentChanged();
 
-  double newLength = dialog->GetLength() / this->itemScale;
+  double newLength = dialog->Length() / this->itemScale;
 
   // The if statement below limits the change to either the length of
   // the wall segment or its start/end pos.
@@ -253,9 +257,12 @@ void WallSegmentItem::OnApply()
   }
   else
   {
-    QPointF newStartPoint = dialog->GetStartPosition() / this->itemScale;
+    QPointF newStartPoint =
+        Conversions::Convert(dialog->StartPosition()) / this->itemScale;
     newStartPoint.setY(-newStartPoint.y());
-    QPointF newEndPoint = dialog->GetEndPosition() / this->itemScale;
+
+    QPointF newEndPoint =
+        Conversions::Convert(dialog->EndPosition() / this->itemScale);
     newEndPoint.setY(-newEndPoint.y());
 
     this->SetStartPoint(newStartPoint);

@@ -165,7 +165,7 @@ void AtmosphereTest::AtmosphereParamBool
   EXPECT_TRUE(atmosphere->Param("pressure", value));
   EXPECT_NEAR(boost::any_cast<double>(value), 101325, 1e-6);
   EXPECT_TRUE(atmosphere->Param("temperature_gradient", value));
-  EXPECT_NEAR(boost::any_cast<double>(value), 0.0065, 1e-6);
+  EXPECT_NEAR(boost::any_cast<double>(value), -0.0065, 1e-6);
   EXPECT_TRUE(atmosphere->Param("type", value));
   EXPECT_EQ(boost::any_cast<std::string>(value), _atmosphere);
 

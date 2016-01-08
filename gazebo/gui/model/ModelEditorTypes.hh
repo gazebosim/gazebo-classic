@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,30 +15,21 @@
  *
 */
 
-#ifndef _BUILDING_ITEM_HH_
-#define _BUILDING_ITEM_HH_
+#ifndef _GAZEBO_MODEL_EDITOR_TYPES_HH_
+#define _GAZEBO_MODEL_EDITOR_TYPES_HH_
 
-#include "gazebo/util/system.hh"
+#include <memory>
 
 namespace gazebo
 {
+  /// \brief GUI model editor forward declarations and type defines
   namespace gui
   {
-    /// \addtogroup gazebo_gui
-    /// \{
+    class EditorMaterialSwitcher;
 
-    /// \class BuildingItem BuildingItem.hh
-    /// \brief Base class of a items that have building level properties such as
-    /// the level number and level height.
-    class GZ_GUI_VISIBLE BuildingItem
-    {
-        /// \brief Constructor
-        public: BuildingItem();
-
-        /// \brief Destructor
-        public: ~BuildingItem();
-    };
-    /// \}
+    /// \def EditorMaterialSwitcherPtr
+    /// \brief Shared pointer to a EditorMaterialSwitcherPtr object
+    using EditorMaterialSwitcherPtr = std::shared_ptr<EditorMaterialSwitcher>;
   }
 }
 

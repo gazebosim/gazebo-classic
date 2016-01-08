@@ -588,7 +588,7 @@ void LinkData::AddCollision(rendering::VisualPtr _collisionVis,
 }
 
 /////////////////////////////////////////////////
-LinkData* LinkData::Clone(const std::string &_newName)
+LinkData *LinkData::Clone(const std::string &_newName)
 {
   LinkData *cloneLink = new LinkData();
 

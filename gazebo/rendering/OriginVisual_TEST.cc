@@ -22,7 +22,7 @@
 #include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
-class OriginVisual_TEST : public ServerFixture
+class OriginVisual_TEST : public RenderingFixture
 {
 };
 
@@ -39,7 +39,7 @@ TEST_F(OriginVisual_TEST, Load)
 
   // Create and load visual
   rendering::OriginVisualPtr origin;
-  origin.reset(new rendering::OriginVisual("origin", scene->GetWorldVisual()));
+  origin.reset(new rendering::OriginVisual("origin", scene->WorldVisual()));
   origin->Load();
   EXPECT_TRUE(origin != NULL);
 

@@ -14,8 +14,7 @@
  * limitations under the License.
  *
 */
-
-#include <boost/bind.hpp>
+#include <functional>
 #include <gtest/gtest.h>
 #include <ignition/math/Angle.hh>
 #include "gazebo/test/ServerFixture.hh"
@@ -47,7 +46,7 @@ TEST_F(GPURaySensor_TEST, CreateLaser)
 
   // Get a pointer to the Ray sensor
   sensors::GpuRaySensorPtr sensor =
-     boost::dynamic_pointer_cast<sensors::GpuRaySensor>
+     std::dynamic_pointer_cast<sensors::GpuRaySensor>
      (mgr->GetSensor(sensorName));
 
   // Make sure the above dynamic cast worked.
@@ -78,15 +77,16 @@ TEST_F(GPURaySensor_TEST, CreateLaser)
   int scanCount = 0;
   event::ConnectionPtr c =
     sensor->ConnectNewLaserFrame(
-        boost::bind(&::OnNewLaserFrame, &scanCount, scan,
-          _1, _2, _3, _4, _5));
+        std::bind(&::OnNewLaserFrame, &scanCount, scan,
+          std::placeholders::_1, std::placeholders::_2,
+          std::placeholders::_3, std::placeholders::_4,
+          std::placeholders::_5));
 
   // wait for a few laser scans
   int i = 0;
   while (scanCount < 10 && i < 300)
   {
     common::Time::MSleep(10);
-    mgr->Update();
     i++;
   }
   EXPECT_LT(i, 300);

@@ -137,7 +137,7 @@ void Sensor::Init()
 }
 
 //////////////////////////////////////////////////
-void Sensor::SetParent(const std::string &_name, uint32_t _id)
+void Sensor::SetParent(const std::string &_name, const uint32_t _id)
 {
   this->parentName = _name;
   this->parentId = _id;
@@ -169,7 +169,7 @@ bool Sensor::NeedsUpdate()
 
   common::Time simTime;
   if (this->category == IMAGE && this->scene)
-    simTime = this->scene->GetSimTime();
+    simTime = this->scene->SimTime();
   else
     simTime = this->world->GetSimTime();
 
@@ -181,13 +181,13 @@ bool Sensor::NeedsUpdate()
 }
 
 //////////////////////////////////////////////////
-void Sensor::Update(bool _force)
+void Sensor::Update(const bool _force)
 {
   if (this->IsActive() || _force)
   {
     common::Time simTime;
     if (this->category == IMAGE && this->scene)
-      simTime = this->scene->GetSimTime();
+      simTime = this->scene->SimTime();
     else
       simTime = this->world->GetSimTime();
 
@@ -275,21 +275,15 @@ void Sensor::LoadPlugin(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void Sensor::SetActive(bool _value)
+void Sensor::SetActive(const bool _value)
 {
   this->active = _value;
 }
 
 //////////////////////////////////////////////////
-bool Sensor::IsActive()
+bool Sensor::IsActive() const
 {
   return this->active;
-}
-
-//////////////////////////////////////////////////
-math::Pose Sensor::GetPose() const
-{
-  return this->Pose();
 }
 
 //////////////////////////////////////////////////
@@ -328,7 +322,7 @@ double Sensor::GetUpdateRate()
 }
 
 //////////////////////////////////////////////////
-void Sensor::SetUpdateRate(double _hz)
+void Sensor::SetUpdateRate(const double _hz)
 {
   if (_hz > 0.0)
     this->updatePeriod = 1.0/_hz;
@@ -399,12 +393,12 @@ void Sensor::FillMsg(msgs::Sensor &_msg)
     CameraSensor *camSensor = static_cast<CameraSensor*>(this);
     msgs::CameraSensor *camMsg = _msg.mutable_camera();
     auto cam = camSensor->GetCamera();
-    camMsg->set_horizontal_fov(cam->GetHFOV().Radian());
+    camMsg->set_horizontal_fov(cam->HFOV().Radian());
     camMsg->mutable_image_size()->set_x(camSensor->GetImageWidth());
     camMsg->mutable_image_size()->set_y(camSensor->GetImageHeight());
-    camMsg->set_image_format(cam->GetImageFormat());
-    camMsg->set_near_clip(cam->GetNearClip());
-    camMsg->set_far_clip(cam->GetFarClip());
+    camMsg->set_image_format(cam->ImageFormat());
+    camMsg->set_near_clip(cam->NearClip());
+    camMsg->set_far_clip(cam->FarClip());
     auto distortion = cam->GetDistortion();
     if (distortion)
     {
@@ -433,66 +427,6 @@ SensorCategory Sensor::GetCategory() const
 }
 
 //////////////////////////////////////////////////
-NoisePtr Sensor::GetNoise(unsigned int _index) const
-{
-  // By default, there is no noise
-  SensorNoiseType noiseType = NO_NOISE;
-
-  // Camera mapping
-  if (this->GetType().compare("camera") == 0 ||
-      this->GetType().compare("wideanglecamera") == 0)
-  {
-    noiseType = CAMERA_NOISE;
-  }
-  // GpuRay mapping
-  else if (this->GetType().compare("gpu_ray") == 0)
-  {
-    noiseType = GPU_RAY_NOISE;
-  }
-  // RaySensor mapping
-  else if (this->GetType().compare("ray") == 0)
-  {
-    noiseType = RAY_NOISE;
-  }
-  // GpsSensor mapping
-  else if (this->GetType().compare("gps") == 0)
-  {
-    switch (_index)
-    {
-      case 0:
-        noiseType = GPS_POSITION_LATITUDE_NOISE_METERS;
-        break;
-      case 1:
-        noiseType = GPS_POSITION_LONGITUDE_NOISE_METERS;
-        break;
-      case 2:
-        noiseType = GPS_POSITION_ALTITUDE_NOISE_METERS;
-        break;
-      case 3:
-        noiseType = GPS_VELOCITY_LATITUDE_NOISE_METERS;
-        break;
-      case 4:
-        noiseType = GPS_VELOCITY_LONGITUDE_NOISE_METERS;
-        break;
-      case 5:
-        noiseType = GPS_VELOCITY_ALTITUDE_NOISE_METERS;
-        break;
-      default:
-        noiseType = NO_NOISE;
-        break;
-    }
-  }
-  // Special case: unlimited number of multi-camera noise streams
-  else if (this->GetType().compare("multicamera") == 0)
-  {
-    if (this->noises.find(_index) != this->noises.end())
-      return this->noises.at(_index);
-  }
-
-  return this->GetNoise(noiseType);
-}
-
-//////////////////////////////////////////////////
 NoisePtr Sensor::GetNoise(const SensorNoiseType _type) const
 {
   if (this->noises.find(_type) == this->noises.end())
@@ -508,4 +442,10 @@ void Sensor::ResetLastUpdateTime()
 {
   boost::mutex::scoped_lock lock(this->mutexLastUpdateTime);
   this->lastUpdateTime = 0.0;
+}
+
+//////////////////////////////////////////////////
+void Sensor::DisconnectUpdated(event::ConnectionPtr &_c)
+{
+  this->updated.Disconnect(_c);
 }
