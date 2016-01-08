@@ -1863,6 +1863,21 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
     this->FillVector3dProperty(xyz, windItem);
   }
 
+  for (int i = 0; i < _msg.collision_size(); i++)
+  {
+    QtVariantProperty *prop;
+    prop = this->dataPtr->variantManager->addProperty(
+        QtVariantPropertyManager::groupTypeId(), tr("collision"));
+    prop->setToolTip(tr(_msg.collision(i).name().c_str()));
+    this->AddProperty(prop, _parent);
+
+    this->FillPropertyTree(_msg.collision(i), prop);
+
+    // TODO: disable setting collision properties until there are tests
+    // in place to verify the functionality
+    prop->setEnabled(false);
+  }
+
   for (int i = 0; i < _msg.visual_size(); i++)
   {
     QtVariantProperty *prop;
