@@ -76,7 +76,6 @@ namespace gazebo
 
       /// \brief Get Parent Joint
       /// \return Pointer to the joint containing this sensor
-      /// \deprecated See Joint()
       public: physics::JointPtr Joint() const;
 
       // Documentation inherited.
