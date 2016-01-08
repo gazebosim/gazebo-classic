@@ -15,6 +15,7 @@
     * [Pull request #2036](https://bitbucket.org/osrf/gazebo/pull-request/2036)
 
 1. Use opaque pointers in the gui library
+    * [Pull request #2057](https://bitbucket.org/osrf/gazebo/pull-request/2057)
     * [Pull request #2037](https://bitbucket.org/osrf/gazebo/pull-request/2037)
     * [Pull request #2052](https://bitbucket.org/osrf/gazebo/pull-request/2052)
     * [Pull request #2053](https://bitbucket.org/osrf/gazebo/pull-request/2053)
