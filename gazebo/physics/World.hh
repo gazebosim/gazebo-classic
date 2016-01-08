@@ -136,6 +136,10 @@ namespace gazebo
 
       /// \brief Set the gravity vector.
       /// \param[in] _gravity New gravity vector.
+      public: void SetGravity(const ignition::math::Vector3d &_gravity);
+
+      /// \brief Set the gravity sdf value.
+      /// \param[in] _gravity New gravity vector.
       public: void SetGravitySDF(const ignition::math::Vector3d &_gravity);
 
       /// \brief Return the magnetic field vector.

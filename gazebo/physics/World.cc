@@ -887,6 +887,12 @@ ignition::math::Vector3d World::Gravity() const
 }
 
 //////////////////////////////////////////////////
+void World::SetGravity(const ignition::math::Vector3d &_gravity)
+{
+  this->dataPtr->physicsEngine->SetGravity(_gravity);
+}
+
+//////////////////////////////////////////////////
 void World::SetGravitySDF(const ignition::math::Vector3d &_gravity)
 {
   this->dataPtr->sdf->GetElement("gravity")->Set(_gravity);
