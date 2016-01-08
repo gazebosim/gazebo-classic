@@ -17,7 +17,6 @@
 #ifndef _GAZEBO_GUI_MAINWINDOW_PRIVATE_HH_
 #define _GAZEBO_GUI_MAINWINDOW_PRIVATE_HH_
 
-#include <list>
 #include <map>
 #include <string>
 #include <vector>

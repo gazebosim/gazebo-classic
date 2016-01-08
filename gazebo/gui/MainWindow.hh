@@ -17,6 +17,7 @@
 #ifndef _GAZEBO_GUI_MAINWINDOW_HH_
 #define _GAZEBO_GUI_MAINWINDOW_HH_
 
+#include <memory>
 #include <string>
 
 #include "gazebo/gazebo_config.h"
