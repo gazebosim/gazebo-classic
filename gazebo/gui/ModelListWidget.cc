@@ -234,13 +234,13 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
 
         bool isStatic = cam->TrackIsStatic();
         QtVariantProperty *item2 = this->variantManager->addProperty(
-            QVariant::Bool, tr("is_static"));
+            QVariant::Bool, tr("static"));
         item2->setValue(isStatic);
         item->addSubProperty(item2);
 
         bool isRelative = cam->TrackIsRelative();
         item2 = this->variantManager->addProperty(
-            QVariant::Bool, tr("is_relative"));
+            QVariant::Bool, tr("relative"));
         item2->setValue(isRelative);
         item->addSubProperty(item2);
 
@@ -754,15 +754,15 @@ void ModelListWidget::GUIPropertyChanged(QtProperty *_item)
     if (!cam)
       return;
     std::string changedProperty = _item->propertyName().toStdString();
-    if (changedProperty == "is_static")
+    if (changedProperty == "static")
     {
       cam->SetTrackIsStatic(this->variantManager->value(
-             this->GetChildItem(cameraFollowProperty, "is_static")).toBool());
+             this->GetChildItem(cameraFollowProperty, "static")).toBool());
     }
-    else if (changedProperty == "is_relative")
+    else if (changedProperty == "relative")
     {
       cam->SetTrackIsRelative(this->variantManager->value(
-             this->GetChildItem(cameraFollowProperty, "is_relative")).toBool());
+             this->GetChildItem(cameraFollowProperty, "relative")).toBool());
     }
     else if (changedProperty == "inherit_yaw")
     {

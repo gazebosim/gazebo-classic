@@ -1950,11 +1950,11 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
 
     if (_msg->camera().has_track())
     {
-      if (_msg->camera().track().has_is_static())
-        cam->SetTrackIsStatic(_msg->camera().track().is_static());
+      if (_msg->camera().track().has_static_())
+        cam->SetTrackIsStatic(_msg->camera().track().static_());
 
-      if (_msg->camera().track().has_is_relative())
-        cam->SetTrackIsRelative(_msg->camera().track().is_relative());
+      if (_msg->camera().track().has_relative())
+        cam->SetTrackIsRelative(_msg->camera().track().relative());
 
       if (_msg->camera().track().has_xyz())
         cam->SetTrackPosition(msgs::ConvertIgn(_msg->camera().track().xyz()));

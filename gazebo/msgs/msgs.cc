@@ -639,10 +639,10 @@ namespace gazebo
         result.set_max_dist(_sdf->GetElement("max_dist")->Get<double>());
 
       if (_sdf->HasElement("static"))
-        result.set_is_static(_sdf->Get<bool>("static"));
+        result.set_static_(_sdf->Get<bool>("static"));
 
       if (_sdf->HasElement("relative"))
-        result.set_is_relative(_sdf->Get<bool>("relative"));
+        result.set_relative(_sdf->Get<bool>("relative"));
 
       if (_sdf->HasElement("inherit_yaw"))
         result.set_inherit_yaw(_sdf->Get<bool>("inherit_yaw"));
