@@ -20,10 +20,10 @@
   #include <Winsock2.h>
 #endif
 
+#include <functional>
+
 #include <sdf/sdf.hh>
 #include <boost/algorithm/string.hpp>
-#include <boost/bind.hpp>
-#include <boost/scoped_ptr.hpp>
 
 #include "gazebo/gazebo_config.h"
 #include "gazebo/gazebo_client.hh"
@@ -184,39 +184,44 @@ MainWindow::MainWindow()
 
   this->dataPtr->connections.push_back(
       gui::Events::ConnectLeftPaneVisibility(
-        boost::bind(&MainWindow::SetLeftPaneVisibility, this, _1)));
+        std::bind(&MainWindow::SetLeftPaneVisibility, this,
+        std::placeholders::_1)));
 
   this->dataPtr->connections.push_back(
       gui::Events::ConnectFullScreen(
-        boost::bind(&MainWindow::OnFullScreen, this, _1)));
+        std::bind(&MainWindow::OnFullScreen, this, std::placeholders::_1)));
 
   this->dataPtr->connections.push_back(
       gui::Events::ConnectShowToolbars(
-        boost::bind(&MainWindow::OnShowToolbars, this, _1)));
+        std::bind(&MainWindow::OnShowToolbars, this, std::placeholders::_1)));
 
   this->dataPtr->connections.push_back(
       gui::Events::ConnectMoveMode(
-        boost::bind(&MainWindow::OnMoveMode, this, _1)));
+        std::bind(&MainWindow::OnMoveMode, this, std::placeholders::_1)));
 
   this->dataPtr->connections.push_back(
       gui::Events::ConnectManipMode(
-        boost::bind(&MainWindow::OnManipMode, this, _1)));
+        std::bind(&MainWindow::OnManipMode, this, std::placeholders::_1)));
 
   this->dataPtr->connections.push_back(
      event::Events::ConnectSetSelectedEntity(
-       boost::bind(&MainWindow::OnSetSelectedEntity, this, _1, _2)));
+       std::bind(&MainWindow::OnSetSelectedEntity, this,
+       std::placeholders::_1, std::placeholders::_2)));
 
   this->dataPtr->connections.push_back(
       gui::Events::ConnectInputStepSize(
-      boost::bind(&MainWindow::OnInputStepSizeChanged, this, _1)));
+      std::bind(&MainWindow::OnInputStepSizeChanged, this,
+      std::placeholders::_1)));
 
   this->dataPtr->connections.push_back(
       gui::Events::ConnectFollow(
-        boost::bind(&MainWindow::OnFollow, this, _1)));
+        std::bind(&MainWindow::OnFollow, this,
+        std::placeholders::_1)));
 
   this->dataPtr->connections.push_back(
       gui::Events::ConnectWindowMode(
-      boost::bind(&MainWindow::OnWindowMode, this, _1)));
+      std::bind(&MainWindow::OnWindowMode, this,
+      std::placeholders::_1)));
 
   gui::ViewFactory::RegisterAll();
 
@@ -556,7 +561,7 @@ void MainWindow::Save()
 /////////////////////////////////////////////////
 void MainWindow::Clone()
 {
-  boost::scoped_ptr<CloneWindow> cloneWindow(new CloneWindow(this));
+  std::unique_ptr<CloneWindow> cloneWindow(new CloneWindow(this));
   if (cloneWindow->exec() == QDialog::Accepted && cloneWindow->IsValidPort())
   {
     // Create a gzserver clone in the server side.
