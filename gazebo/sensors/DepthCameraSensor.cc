@@ -20,7 +20,7 @@
   #include <Winsock2.h>
 #endif
 
-#include <boost/bind.hpp>
+#include <functional>
 #include <sstream>
 
 #include "gazebo/physics/World.hh"
@@ -50,7 +50,7 @@ DepthCameraSensor::DepthCameraSensor()
   this->rendered = false;
   this->connections.push_back(
       event::Events::ConnectRender(
-        boost::bind(&DepthCameraSensor::Render, this)));
+        std::bind(&DepthCameraSensor::Render, this)));
 }
 
 //////////////////////////////////////////////////
@@ -104,8 +104,8 @@ void DepthCameraSensor::Init()
     this->camera->Load(cameraSdf);
 
     // Do some sanity checks
-    if (this->camera->GetImageWidth() == 0 ||
-        this->camera->GetImageHeight() == 0)
+    if (this->camera->ImageWidth() == 0 ||
+        this->camera->ImageHeight() == 0)
     {
       gzthrow("image has zero size");
     }
@@ -132,7 +132,7 @@ void DepthCameraSensor::Init()
 void DepthCameraSensor::Fini()
 {
   Sensor::Fini();
-  this->scene->RemoveCamera(this->camera->GetName());
+  this->scene->RemoveCamera(this->camera->Name());
   this->camera.reset();
   this->scene.reset();
 }
@@ -152,7 +152,7 @@ void DepthCameraSensor::Render()
   this->camera->Render();
 
   this->rendered = true;
-  this->lastMeasurementTime = this->scene->GetSimTime();
+  this->lastMeasurementTime = this->scene->SimTime();
 }
 
 //////////////////////////////////////////////////

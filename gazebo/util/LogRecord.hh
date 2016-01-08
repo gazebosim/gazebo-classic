@@ -14,29 +14,13 @@
  * limitations under the License.
  *
 */
-/* Desc: A class to log data
- * Author: Nate Koenig
- * Date: 1 Jun 2010
- */
-
-#ifndef _LOGRECORD_HH_
-#define _LOGRECORD_HH_
+#ifndef _GAZEBO_UTIL_LOGRECORD_HH_
+#define _GAZEBO_UTIL_LOGRECORD_HH_
 
 #include <fstream>
 #include <string>
-#include <map>
-#include <boost/thread.hpp>
-#include <boost/archive/iterators/base64_from_binary.hpp>
-#include <boost/archive/iterators/insert_linebreaks.hpp>
-#include <boost/archive/iterators/transform_width.hpp>
-#include <boost/archive/iterators/ostream_iterator.hpp>
-#include <boost/filesystem.hpp>
-#include <boost/function.hpp>
 
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/transport/TransportTypes.hh"
-#include "gazebo/common/UpdateInfo.hh"
-#include "gazebo/common/Event.hh"
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/util/system.hh"
 
@@ -46,6 +30,9 @@ namespace gazebo
 {
   namespace util
   {
+    // Forward declare private data class
+    class LogRecordPrivate;
+
     /// addtogroup gazebo_util
     /// \{
 
@@ -95,7 +82,7 @@ namespace gazebo
       /// the provided ofstream.
       /// \throws Exception
       public: void Add(const std::string &_name, const std::string &_filename,
-                    boost::function<bool (std::ostringstream &)> _logCallback);
+                    std::function<bool (std::ostringstream &)> _logCallback);
 
       /// \brief Remove an entity from a log
       ///
@@ -117,12 +104,18 @@ namespace gazebo
       /// log file is still open, but data is not written to it.
       /// \param[in] _paused True to pause data logging.
       /// \sa LogRecord::GetPaused
-      public: void SetPaused(bool _paused);
+      public: void SetPaused(const bool _paused);
 
       /// \brief Get whether logging is paused.
       /// \return True if logging is paused.
       /// \sa LogRecord::SetPaused
-      public: bool GetPaused() const;
+      /// \deprecated See Paused() const
+      public: bool GetPaused() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get whether logging is paused.
+      /// \return True if logging is paused.
+      /// \sa LogRecord::SetPaused
+      public: bool Paused() const;
 
       /// \brief Get whether the logger is ready to start, which implies
       /// that any previous runs have finished.
@@ -131,28 +124,53 @@ namespace gazebo
 
       /// \brief Get whether logging is running.
       /// \return True if logging has been started.
-      public: bool GetRunning() const;
+      /// \deprecated See Running() const
+      public: bool GetRunning() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get whether logging is running.
+      /// \return True if logging has been started.
+      public: bool Running() const;
 
       /// \brief Start the logger.
       /// \param[in] _encoding The type of encoding (txt, zlib, or bz2).
       /// \param[in] _path Path in which to store log files.
       public: bool Start(const std::string &_encoding="zlib",
-                  const std::string &_path="");
+                         const std::string &_path="");
 
       /// \brief Get the encoding used.
       /// \return Either [txt, zlib, or bz2], where txt is plain txt and bz2
       /// and zlib are compressed data with Base64 encoding.
-      public: const std::string &GetEncoding() const;
+      /// \deprecated See Encoding() const
+      public: const std::string &GetEncoding() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the encoding used.
+      /// \return Either [txt, zlib, or bz2], where txt is plain txt and bz2
+      /// and zlib are compressed data with Base64 encoding.
+      public: const std::string &Encoding() const;
 
       /// \brief Get the filename for a log object.
       /// \param[in] _name Name of the log object.
       /// \return Filename, empty string if not found.
-      public: std::string GetFilename(const std::string &_name = "") const;
+      /// \deprecated See Filename(const std::string &) const
+      public: std::string GetFilename(const std::string &_name = "") const
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the filename for a log object.
+      /// \param[in] _name Name of the log object.
+      /// \return Filename, empty string if not found.
+      public: std::string Filename(const std::string &_name = "") const;
 
       /// \brief Get the file size for a log object.
       /// \param[in] _name Name of the log object.
       /// \return Size in bytes.
-      public: unsigned int GetFileSize(const std::string &_name = "") const;
+      /// \deprecated See FileSize(const std::string) const
+      public: unsigned int GetFileSize(const std::string &_name = "") const
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the file size for a log object.
+      /// \param[in] _name Name of the log object.
+      /// \return Size in bytes.
+      public: unsigned int FileSize(const std::string &_name = "") const;
 
       /// \brief Set the base path.
       /// \param[in] _path Path to the new logging location.
@@ -160,32 +178,51 @@ namespace gazebo
 
       /// \brief Get the base path for a log recording.
       /// \return Path for log recording.
-      public: std::string GetBasePath() const;
+      /// \deprecated See BasePath() const
+      public: std::string GetBasePath() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the base path for a log recording.
+      /// \return Path for log recording.
+      public: std::string BasePath() const;
 
       /// \brief Get the run time in sim time.
       /// \return Run sim time.
-      public: common::Time GetRunTime() const;
+      /// \deprecated See RunTime() const
+      public: common::Time GetRunTime() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the run time in sim time.
+      /// \return Run sim time.
+      public: common::Time RunTime() const;
 
       /// \brief Finialize, and shutdown.
       public: void Fini();
 
       /// \brief Return true if an Update has not yet been completed.
       /// \return True if an Update has not yet been completed.
-      public: bool GetFirstUpdate() const;
+      /// \deprecated See FirstUpdate()
+      public: bool GetFirstUpdate() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Return true if an Update has not yet been completed.
+      /// \return True if an Update has not yet been completed.
+      public: bool FirstUpdate() const;
 
       /// \brief Write all logs.
       /// \param[in] _force True to skip waiting on dataAvailableCondition.
-      public: void Write(bool _force = false);
+      public: void Write(const bool _force = false);
 
       /// \brief Get the size of the buffer.
       /// \return Size of the buffer, in bytes.
-      public: unsigned int GetBufferSize() const;
+      /// \deprecated See BufferSize() const
+      public: unsigned int GetBufferSize() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the size of the buffer.
+      /// \return Size of the buffer, in bytes.
+      public: unsigned int BufferSize() const;
 
       /// \brief Update the log files
       ///
       /// Captures the current state of all registered entities, and outputs
       /// the data to their respective log files.
-      // private: void Update(const common::UpdateInfo &_info);
       private: void Update();
 
       /// \brief Function used by the update thread.
@@ -210,175 +247,14 @@ namespace gazebo
       private: void Cleanup();
 
       /// \brief Used to get the simulation pause state.
-      private: void OnPause(bool _pause);
-
-      /// \cond
-      private: class Log
-      {
-        /// \brief Constructor
-        /// \param[in] _parent Pointer to the LogRecord parent.
-        /// \param[in] _relativeFilename The name of the log file to
-        /// generate, sans the complete path.
-        /// \param[in] _logCB Callback function, which is used to get log
-        /// data.
-        public: Log(LogRecord *_parent, const std::string &_relativeFilename,
-                    boost::function<bool (std::ostringstream &)> _logCB);
-
-        /// \brief Destructor
-        public: virtual ~Log();
-
-        /// \brief Start the log.
-        /// \param[in] _path The complete path in which to put the log file.
-        public: void Start(const boost::filesystem::path &_path);
-
-        /// \brief Stop logging.
-        public: void Stop();
-
-        /// \brief Write data to disk.
-        public: void Write();
-
-        /// \brief Update the data buffer.
-        /// \return The size of the data buffer.
-        public: unsigned int Update();
-
-        /// \brief Clear the data buffer.
-        public: void ClearBuffer();
-
-        /// \brief Get the byte size of the buffer.
-        /// \return Buffer byte size.
-        public: unsigned int GetBufferSize();
-
-        /// \brief Get the relative filename. This is the filename passed
-        /// to the constructor.
-        /// \return The relative filename.
-        public: std::string GetRelativeFilename() const;
-
-        /// \brief Get the complete filename.
-        /// \return The complete filename.
-        public: std::string GetCompleteFilename() const;
-
-        /// \brief Pointer to the log record parent.
-        public: LogRecord *parent;
-
-        /// \brief Callback from which to get data.
-        public: boost::function<bool (std::ostringstream &)> logCB;
-
-        /// \brief Data buffer.
-        public: std::string buffer;
-
-        /// \brief The log file.
-        public: std::ofstream logFile;
-
-        /// \brief Relative log filename.
-        public: std::string relativeFilename;
-
-        /// \brief Complete file path.
-        private: boost::filesystem::path completePath;
-      };
-      /// \endcond
-
-      /// \def Log_M
-      /// \brief Map of names to logs.
-      private: typedef std::map<std::string, Log*> Log_M;
-
-      /// \brief All the log objects.
-      private: Log_M logs;
-
-      /// \brief Iterator used to update the log objects.
-      private: Log_M::iterator updateIter;
-
-      /// \brief Convenience iterator to the end of the log objects map.
-      private: Log_M::iterator logsEnd;
-
-      /// \brief Condition used to start threads
-      private: boost::condition_variable startThreadCondition;
-
-      /// \brief Condition used to trigger an update
-      private: boost::condition_variable updateCondition;
-
-      /// \brief Used by the cleanupThread to wait for a cleanup signal.
-      private: boost::condition_variable cleanupCondition;
-
-      /// \brief True if logging is running.
-      private: bool running;
-
-      /// \brief Thread used to write data to disk.
-      private: boost::thread *writeThread;
-
-      /// \brief Thread used to update data.
-      private: boost::thread *updateThread;
-
-      /// \brief Thread to cleanup log recording.
-      private: boost::thread cleanupThread;
-
-      /// \brief Mutex to protect against parallel calls to Write()
-      private: mutable boost::mutex writeMutex;
-
-      /// \brief Mutex to synchronize with RunWrite()
-      private: mutable boost::mutex runWriteMutex;
-
-      /// \brief Mutex to synchronize with RunUpdate()
-      private: mutable boost::mutex updateMutex;
-
-      /// \brief Mutex to protect logging control.
-      private: boost::mutex controlMutex;
-
-      /// \brief Used by the write thread to know when data needs to be
-      /// written to disk
-      private: boost::condition_variable dataAvailableCondition;
-
-      /// \brief The base pathname for all the logs.
-      private: boost::filesystem::path logBasePath;
-
-      /// \brief The complete pathname for all the logs.
-      private: boost::filesystem::path logCompletePath;
-
-      /// \brief Subdirectory for log files. This is appended to
-      /// logBasePath.
-      private: std::string logSubDir;
-
-      /// \brief Encoding format for each chunk.
-      private: std::string encoding;
-
-      /// \brief True if initialized.
-      private: bool initialized;
-
-      /// \brief True to pause recording.
-      private: bool paused;
-
-      /// \brief Used to indicate the first update callback.
-      private: bool firstUpdate;
-
-      /// \brief Flag used to stop the write thread.
-      private: bool stopThread;
-
-      /// \brief Start simulation time.
-      private: common::Time startTime;
-
-      /// \brief Current simulation time.
-      private: common::Time currTime;
-
-      /// \brief Transportation node.
-      private: transport::NodePtr node;
-
-      /// \brief Subscriber to log control messages.
-      private: transport::SubscriberPtr logControlSub;
-
-      /// \brief Publisher of log status messages.
-      private: transport::PublisherPtr logStatusPub;
-
-      /// \brief All the event connections.
-      private: event::Connection_V connections;
-
-      /// \brief Simulation pause state.
-      private: bool pauseState;
+      private: void OnPause(const bool _pause);
 
       /// \brief This is a singleton
       private: friend class SingletonT<LogRecord>;
 
-      /// \brief True if the logger is ready to start, and the previous run
-      /// has finished.
-      private: bool readyToStart;
+      /// \internal
+      /// \brief Private data pointer.
+      private: std::unique_ptr<LogRecordPrivate> dataPtr;
     };
     /// \}
   }

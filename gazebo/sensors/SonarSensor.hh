@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_SONARSENSOR_HH_
-#define _GAZEBO_SONARSENSOR_HH_
+#ifndef _GAZEBO_SENSORS_SONARSENSOR_HH_
+#define _GAZEBO_SENSORS_SONARSENSOR_HH_
 
 #include <string>
 #include <list>

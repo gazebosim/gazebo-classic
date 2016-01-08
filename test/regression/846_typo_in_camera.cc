@@ -34,11 +34,11 @@ TEST_F(Issue846Test, CaptureData)
   gazebo::rendering::CameraPtr camera(new gazebo::rendering::Camera("",
         this->GetScene(), false));
 
-  EXPECT_FALSE(camera->GetCaptureData());
+  EXPECT_FALSE(camera->CaptureData());
   camera->EnableSaveFrame(true);
-  EXPECT_TRUE(camera->GetCaptureData());
+  EXPECT_TRUE(camera->CaptureData());
   camera->EnableSaveFrame(false);
-  EXPECT_FALSE(camera->GetCaptureData());
+  EXPECT_FALSE(camera->CaptureData());
 }
 
 /////////////////////////////////////////////////

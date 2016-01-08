@@ -19,6 +19,7 @@
 
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/model/ModelEditorEvents.hh"
+#include "gazebo/gui/model/ModelPluginInspector.hh"
 #include "gazebo/gui/model/ModelTreeWidget.hh"
 
 using namespace gazebo;
@@ -89,6 +90,12 @@ ModelTreeWidget::ModelTreeWidget(QWidget *_parent)
   headerFont.setPointSize(1.0 * headerFont.pointSize());
   this->modelPluginsItem->setFont(0, headerFont);
   this->modelTreeWidget->addTopLevelItem(this->modelPluginsItem);
+
+  this->modelPluginInspector = new ModelPluginInspector(_parent);
+  this->modelPluginInspector->SetReadOnly(false);
+  this->modelPluginInspector->hide();
+  connect(this->modelPluginInspector,
+      SIGNAL(Applied()), this, SLOT(OnModelPluginApply()));
 
   // Nested models
   this->nestedModelsItem = new QTreeWidgetItem(
@@ -221,6 +228,8 @@ ModelTreeWidget::ModelTreeWidget(QWidget *_parent)
   this->connections.push_back(
      gui::model::Events::ConnectSetSelectedModelPlugin(
      boost::bind(&ModelTreeWidget::OnSetSelectedModelPlugin, this, _1, _2)));
+
+  this->ClearModelTree();
 }
 
 /////////////////////////////////////////////////
@@ -523,6 +532,19 @@ void ModelTreeWidget::ClearModelTree()
   this->jointsItem->takeChildren();
   // Remove all model plugins
   this->modelPluginsItem->takeChildren();
+
+  // add Model Plugins button
+  QTreeWidgetItem *addModelPluginItem =
+      new QTreeWidgetItem(this->modelPluginsItem);
+  this->modelPluginsItem->setExpanded(true);
+  QPushButton *addPluginButton = new QPushButton(tr("Add"));
+  addPluginButton->setMaximumWidth(60);
+  addPluginButton->setFlat(true);
+  this->modelTreeWidget->setItemWidget(addModelPluginItem, 0,
+      addPluginButton);
+
+  connect(addPluginButton,
+      SIGNAL(clicked()), this, SLOT(OnAddModelPlugin()));
 }
 
 /////////////////////////////////////////////////
@@ -622,8 +644,11 @@ void ModelTreeWidget::OnNestedModelInserted(const std::string &_nestedModelId)
   // check if nested model already exists
   auto treeItems = this->modelTreeWidget->findItems(tr(leafName.c_str()),
       Qt::MatchExactly | Qt::MatchRecursive);
-  if (!treeItems.empty())
-    return;
+  for (auto const &it : treeItems)
+  {
+    if (it->data(0, Qt::UserRole).toString().toStdString() == _nestedModelId)
+      return;
+  }
 
   QTreeWidgetItem *newNestedModelItem =
       new QTreeWidgetItem(parentItem,
@@ -653,4 +678,19 @@ void ModelTreeWidget::OnNestedModelRemoved(const std::string &_nestedModelId)
       break;
     }
   }
+}
+
+/////////////////////////////////////////////////
+void ModelTreeWidget::OnAddModelPlugin()
+{
+  this->modelPluginInspector->show();
+  this->modelPluginInspector->setFocus();
+}
+
+/////////////////////////////////////////////////
+void ModelTreeWidget::OnModelPluginApply()
+{
+  msgs::Plugin *msg = this->modelPluginInspector->Data();
+  model::Events::requestModelPluginInsertion(msg->name(), msg->filename(),
+      msg->innerxml());
 }

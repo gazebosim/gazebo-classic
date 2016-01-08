@@ -196,7 +196,7 @@ void Link::Load(sdf::ElementPtr _sdf)
       util::OpenALSourcePtr source = util::OpenAL::Instance()->CreateSource(
           audioElem);
 
-      std::vector<std::string> names = source->GetCollisionNames();
+      std::vector<std::string> names = source->CollisionNames();
       std::copy(names.begin(), names.end(), std::back_inserter(collisionNames));
 
       audioElem = audioElem->GetNextElement("audio_source");
