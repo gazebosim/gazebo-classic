@@ -34,7 +34,13 @@ set (test_sources
   gz_log_TEST.cc
   gz_TEST.cc
 )
-
+set (TEST_DEPENDENCIES
+  gz
+  gzserver
+)
+set (TEST_LIBRARIES
+  gazebo_transport
+)
 gz_build_tests(${test_sources})
 
 add_executable(gz gz.cc gz_topic.cc gz_log.cc)
