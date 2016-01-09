@@ -743,6 +743,12 @@ void MainWindow::Snap()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::TapeMeasure()
+{
+  gui::Events::manipMode("tape_measure");
+}
+
+/////////////////////////////////////////////////
 void MainWindow::CreateBox()
 {
   g_arrowAct->setChecked(true);
@@ -1398,6 +1404,13 @@ void MainWindow::CreateActions()
   g_snapAct->setToolTip(tr("Snap Mode"));
   connect(g_snapAct, SIGNAL(triggered()), this, SLOT(Snap()));
 
+  g_tapeMeasureAct = new QAction(QIcon(":/images/rulers.png"),
+      tr("Tape Measure (M)"), this);
+  g_tapeMeasureAct->setStatusTip(tr("Measure distances"));
+  g_tapeMeasureAct->setCheckable(true);
+  g_tapeMeasureAct->setToolTip(tr("Tape Measure"));
+  connect(g_tapeMeasureAct, SIGNAL(triggered()), this, SLOT(TapeMeasure()));
+
   // set up align actions and widget
   QAction *xAlignMin = new QAction(QIcon(":/images/x_min.png"),
       tr("X Align Min"), this);
@@ -1741,6 +1754,9 @@ void MainWindow::DeleteActions()
 
   delete g_snapAct;
   g_snapAct = 0;
+
+  delete g_tapeMeasureAct;
+  g_tapeMeasureAct = 0;
 
   delete g_alignAct;
   g_alignAct = 0;

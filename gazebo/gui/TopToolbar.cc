@@ -128,6 +128,13 @@ TopToolbar::TopToolbar(QWidget *_parent)
 
   this->dataPtr->toolbar->addSeparator();
 
+  // Tape Measure
+  if (g_tapeMeasureAct)
+  {
+    actionGroup->addAction(g_tapeMeasureAct);
+    this->dataPtr->toolbar->addAction(g_tapeMeasureAct);
+  }
+
   // View angle
   if (g_viewAngleAct)
   {

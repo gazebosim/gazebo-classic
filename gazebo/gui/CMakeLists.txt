@@ -51,6 +51,7 @@ set (sources
   SaveDialog.cc
   SpaceNav.cc
   SplashScreen.cc
+  TapeMeasure.cc
   TimePanel.cc
   TimeWidget.cc
   ToolsWidget.cc
@@ -89,6 +90,7 @@ set (qt_headers
   RenderWidget.hh
   SaveDialog.hh
   SplashScreen.hh
+  TapeMeasure.hh
   TimePanel.hh
   TimeWidget.hh
   ToolsWidget.hh

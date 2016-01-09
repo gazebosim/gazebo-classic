@@ -114,7 +114,12 @@ namespace gazebo
 
     extern GZ_GUI_VISIBLE QWidgetAction *g_alignAct;
     extern GZ_GUI_VISIBLE QAction *g_alignButtonAct;
+
+    /// \brief Action to trigger snap mode.
     extern GZ_GUI_VISIBLE QAction *g_snapAct;
+
+    /// \brief Action to trigger the tape measure.
+    extern GZ_GUI_VISIBLE QAction *g_tapeMeasureAct;
 
     /// \brief Action to open the view angle widget.
     extern GZ_GUI_VISIBLE QWidgetAction *g_viewAngleAct;

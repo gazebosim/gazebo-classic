@@ -819,6 +819,8 @@ void MainWindow_TEST::ActionCreationDestruction()
 
   QVERIFY(gazebo::gui::g_snapAct);
 
+  QVERIFY(gazebo::gui::g_tapeMeasureAct);
+
   QVERIFY(gazebo::gui::g_alignAct);
 
   QVERIFY(gazebo::gui::g_viewAngleAct);
@@ -935,6 +937,8 @@ void MainWindow_TEST::ActionCreationDestruction()
   QVERIFY(!gazebo::gui::g_pasteAct);
 
   QVERIFY(!gazebo::gui::g_snapAct);
+
+  QVERIFY(!gazebo::gui::g_tapeMeasureAct);
 
   QVERIFY(!gazebo::gui::g_alignAct);
 

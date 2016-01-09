@@ -49,6 +49,7 @@
 #include "gazebo/gui/ModelRightMenu.hh"
 #include "gazebo/gui/ModelSnap.hh"
 #include "gazebo/gui/MouseEventHandler.hh"
+#include "gazebo/gui/TapeMeasure.hh"
 #include "gazebo/transport/transport.hh"
 
 using namespace gazebo;
@@ -202,6 +203,7 @@ GLWidget::~GLWidget()
   ModelManipulator::Instance()->Clear();
   ModelSnap::Instance()->Clear();
   ModelAlign::Instance()->Clear();
+  TapeMeasure::Instance()->Clear();
 
   if (this->dataPtr->userCamera)
     this->dataPtr->userCamera->Fini();
@@ -426,6 +428,13 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
       g_scaleAct->trigger();
     else if (_event->key() == Qt::Key_N && g_snapAct->isEnabled())
       g_snapAct->trigger();
+    else if (_event->key() == Qt::Key_M && g_tapeMeasureAct->isEnabled())
+    {
+      if (g_tapeMeasureAct->isChecked())
+        g_arrowAct->trigger();
+      else
+        g_tapeMeasureAct->trigger();
+    }
     else if (_event->key() == Qt::Key_Escape && g_arrowAct->isEnabled())
       g_arrowAct->trigger();
   }
@@ -512,6 +521,8 @@ bool GLWidget::OnMousePress(const common::MouseEvent & /*_event*/)
   }
   else if (this->dataPtr->state == "snap")
     ModelSnap::Instance()->OnMousePressEvent(this->dataPtr->mouseEvent);
+  else if (this->dataPtr->state == "tape_measure")
+    TapeMeasure::Instance()->OnMousePressEvent(this->dataPtr->mouseEvent);
 
   return true;
 }
@@ -532,6 +543,8 @@ bool GLWidget::OnMouseRelease(const common::MouseEvent & /*_event*/)
   }
   else if (this->dataPtr->state == "snap")
     ModelSnap::Instance()->OnMouseReleaseEvent(this->dataPtr->mouseEvent);
+  else if (this->dataPtr->state == "tape_measure")
+    TapeMeasure::Instance()->OnMouseReleaseEvent(this->dataPtr->mouseEvent);
 
   return true;
 }
@@ -552,6 +565,8 @@ bool GLWidget::OnMouseMove(const common::MouseEvent & /*_event*/)
   }
   else if (this->dataPtr->state == "snap")
     ModelSnap::Instance()->OnMouseMoveEvent(this->dataPtr->mouseEvent);
+  else if (this->dataPtr->state == "tape_measure")
+    TapeMeasure::Instance()->OnMouseMoveEvent(this->dataPtr->mouseEvent);
 
   return true;
 }
@@ -951,6 +966,7 @@ void GLWidget::OnCreateScene(const std::string &_name)
   ModelManipulator::Instance()->Init();
   ModelSnap::Instance()->Init();
   ModelAlign::Instance()->Init();
+  TapeMeasure::Instance()->Init();
 }
 
 /////////////////////////////////////////////////
@@ -1131,6 +1147,7 @@ void GLWidget::OnManipMode(const std::string &_mode)
 
   ModelManipulator::Instance()->SetManipulationMode(_mode);
   ModelSnap::Instance()->Reset();
+  TapeMeasure::Instance()->Reset();
 
   if (this->dataPtr->state != "select")
   {

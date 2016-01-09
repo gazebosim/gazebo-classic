@@ -139,6 +139,9 @@ GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_snapAct = 0;
 
 GZ_GUI_VISIBLE
+QAction *gazebo::gui::g_tapeMeasureAct = 0;
+
+GZ_GUI_VISIBLE
 QWidgetAction *gazebo::gui::g_alignAct = 0;
 
 GZ_GUI_VISIBLE

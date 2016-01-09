@@ -166,6 +166,9 @@ namespace gazebo
       /// \brief Qt callback when the snap mode is triggered.
       private slots: void Snap();
 
+      /// \brief Qt callback when the tape measure is triggered.
+      private slots: void TapeMeasure();
+
       private slots: void CreateBox();
       private slots: void CreateSphere();
       private slots: void CreateCylinder();
