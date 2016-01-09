@@ -197,46 +197,50 @@ void Camera::Load()
 //////////////////////////////////////////////////
 void Camera::LoadCameraIntrinsics()
 {
-  if (this->sdf->HasElement("intrinsics"))
+  if (this->sdf->HasElement("lens"))
   {
-    sdf::ElementPtr sdf_intrinsics = this->sdf->GetElement("intrinsics");
-    double intrinsicsFx = sdf_intrinsics->Get<double>("fx");
-    double intrinsicsFy = sdf_intrinsics->Get<double>("fy");
-    double intrinsicsCx = sdf_intrinsics->Get<double>("cx");
-    double intrinsicsCy = sdf_intrinsics->Get<double>("cy");
-    double intrinsicsS = sdf_intrinsics->Get<double>("s");
-    double clipNear = 0.5;
-    double clipFar = 2.5;
-
-    sdf::ElementPtr clipElem = this->sdf->GetElement("clip");
-    if (clipElem)
+    sdf::ElementPtr sdfLens = this->sdf->GetElement("lens");
+    if (sdfLens->HasElement("intrinsics"))
     {
-      clipNear = clipElem->Get<double>("near");
-      clipFar = clipElem->Get<double>("far");
-    }
+      sdf::ElementPtr sdfIntrinsics = sdfLens->GetElement("intrinsics");
+      double intrinsicsFx = sdfIntrinsics->Get<double>("fx");
+      double intrinsicsFy = sdfIntrinsics->Get<double>("fy");
+      double intrinsicsCx = sdfIntrinsics->Get<double>("cx");
+      double intrinsicsCy = sdfIntrinsics->Get<double>("cy");
+      double intrinsicsS = sdfIntrinsics->Get<double>("s");
+      double clipNear = 0.5;
+      double clipFar = 2.5;
 
-    this->cameraProjectiveMatrix = BuildProjectiveMatrix(this->imageWidth, this->imageHeight, intrinsicsFx, intrinsicsFy, intrinsicsCx, intrinsicsCy, intrinsicsS, clipNear, clipFar);
-    this->cameraUsingIntrinsics = true;
+      sdf::ElementPtr clipElem = this->sdf->GetElement("clip");
+      if (clipElem)
+      {
+        clipNear = clipElem->Get<double>("near");
+        clipFar = clipElem->Get<double>("far");
+      }
+
+      this->cameraProjectiveMatrix = BuildProjectiveMatrix(this->imageWidth, this->imageHeight, intrinsicsFx, intrinsicsFy, intrinsicsCx, intrinsicsCy, intrinsicsS, clipNear, clipFar);
+      this->cameraUsingIntrinsics = true;
+    }
   }
 }
 
 //////////////////////////////////////////////////
 Ogre::Matrix4 Camera::BuildNormalizedDeviceCoordinatesMatrix(
-    double _left, double _right,
-    double _bottom, double _top,
-    double _near, double _far)
+    const double _left, const double _right,
+    const double _bottom, const double _top,
+    const double _near, const double _far) const
 {
-  double invw = 1.0 / (_right - _left);
-  double invh = 1.0 / (_top - _bottom);
-  double invd = 1.0 / (_far - _near);
+  double inverseWidth = 1.0 / (_right - _left);
+  double inverseHeight = 1.0 / (_top - _bottom);
+  double inverseDistance = 1.0 / (_far - _near);
 
   Ogre::Matrix4 ndc = Ogre::Matrix4::ZERO;
-  ndc[0][0] = 2.0 * invw;
-  ndc[0][3] = -(_right + _left) * invw;
-  ndc[1][1] = 2.0 * invh;
-  ndc[1][3] = -(_top + _bottom) * invh;
-  ndc[2][2] = -2.0 * invd;
-  ndc[2][3] = -(_far + _near) * invd;
+  ndc[0][0] = 2.0 * inverseWidth;
+  ndc[0][3] = -(_right + _left) * inverseWidth;
+  ndc[1][1] = 2.0 * inverseHeight;
+  ndc[1][3] = -(_top + _bottom) * inverseHeight;
+  ndc[2][2] = -2.0 * inverseDistance;
+  ndc[2][3] = -(_far + _near) * inverseDistance;
   ndc[3][3] = 1.0;
 
   return ndc;
@@ -244,49 +248,54 @@ Ogre::Matrix4 Camera::BuildNormalizedDeviceCoordinatesMatrix(
 
 //////////////////////////////////////////////////
 Ogre::Matrix4 Camera::BuildPerspectiveMatrix(
-    double _intrinsicsFx, double _intrinsicsFy,
-    double _intrinsicsCx, double _intrinsicsCy,
-    double _intrinsicsS,
-    double _clipNear, double _clipFar)
+    const double _intrinsicsFx, const double _intrinsicsFy,
+    const double _intrinsicsCx, const double _intrinsicsCy,
+    const double _intrinsicsS,
+    const double _clipNear, const double _clipFar) const
 {
-  Ogre::Matrix4 intrinsic_matrix = Ogre::Matrix4::ZERO;
-  intrinsic_matrix[0][0] = _intrinsicsFx;
-  intrinsic_matrix[1][1] = _intrinsicsFy;
-  intrinsic_matrix[0][2] = -_intrinsicsCx;
-  intrinsic_matrix[1][2] = -_intrinsicsCy;
-  intrinsic_matrix[0][1] = _intrinsicsS;
-  intrinsic_matrix[2][2] = _clipNear + _clipFar;
-  intrinsic_matrix[2][3] = _clipNear * _clipFar;
-  intrinsic_matrix[3][2] = -1.0f;
+  Ogre::Matrix4 intrinsicMatrix = Ogre::Matrix4::ZERO;
+  intrinsicMatrix[0][0] = _intrinsicsFx;
+  intrinsicMatrix[1][1] = _intrinsicsFy;
+  intrinsicMatrix[0][2] = -_intrinsicsCx;
+  intrinsicMatrix[1][2] = -_intrinsicsCy;
+  intrinsicMatrix[0][1] = _intrinsicsS;
+  intrinsicMatrix[2][2] = _clipNear + _clipFar;
+  intrinsicMatrix[2][3] = _clipNear * _clipFar;
+  intrinsicMatrix[3][2] = -1.0f;
 
-  return intrinsic_matrix;
+  return intrinsicMatrix;
 }
 
-
-Ogre::Matrix4 Camera::BuildProjectiveMatrix(double _imageWidth, double _imageHeight, double _intrinsicsFx, double _intrinsicsFy, double _intrinsicsCx, double _intrinsicsCy, double _intrinsicsS, double _clipNear, double _clipFar)
+//////////////////////////////////////////////////
+Ogre::Matrix4 Camera::BuildProjectiveMatrix(
+    const double _imageWidth, const double _imageHeight,
+    const double _intrinsicsFx, const double _intrinsicsFy,
+    const double _intrinsicsCx, double _intrinsicsCy,
+    const double _intrinsicsS,
+    const double _clipNear, const double _clipFar) const
 {
 // return  BuildNormalizedDeviceCoordinatesMatrix(0, _imageWidth, 0, _imageHeight, _clipNear, _clipFar) * BuildPerspectiveMatrix(_intrinsicsFx, _intrinsicsFy, _intrinsicsCx, _intrinsicsCy, _intrinsicsS, _clipNear, _clipFar);
 
 // Same as the matrix multiplication above but more efficient
-  Ogre::Matrix4 projective_matrix = Ogre::Matrix4::ZERO;
-  projective_matrix[0][0] = 2.0*_intrinsicsFx/_imageWidth;
-  projective_matrix[0][1] = 2.0*_intrinsicsS/_imageWidth;
-  projective_matrix[0][2] = 1.0-(2.0*_intrinsicsCx)/_imageWidth;
-  projective_matrix[0][3] = 0;
-  projective_matrix[1][0] = 0;
-  projective_matrix[1][1] = 2.0*_intrinsicsFy/_imageHeight;
-  projective_matrix[1][2] = 1.0-(2.0*_intrinsicsCy/_imageHeight);
-  projective_matrix[1][3] = 0;
-  projective_matrix[2][0] = 0;
-  projective_matrix[2][1] = 0;
-  projective_matrix[2][2] = -(_clipFar + _clipNear)/(_clipFar - _clipNear);
-  projective_matrix[2][3] = -2.0*(_clipFar * _clipNear)/(_clipFar - _clipNear);
-  projective_matrix[3][0] = 0;
-  projective_matrix[3][1] = 0;
-  projective_matrix[3][2] = -1.0;
-  projective_matrix[3][3] = 0;
+  Ogre::Matrix4 projectiveMatrix = Ogre::Matrix4::ZERO;
+  projectiveMatrix[0][0] = 2.0*_intrinsicsFx/_imageWidth;
+  projectiveMatrix[0][1] = 2.0*_intrinsicsS/_imageWidth;
+  projectiveMatrix[0][2] = 1.0-(2.0*_intrinsicsCx)/_imageWidth;
+  projectiveMatrix[0][3] = 0;
+  projectiveMatrix[1][0] = 0;
+  projectiveMatrix[1][1] = 2.0*_intrinsicsFy/_imageHeight;
+  projectiveMatrix[1][2] = 1.0-(2.0*_intrinsicsCy/_imageHeight);
+  projectiveMatrix[1][3] = 0;
+  projectiveMatrix[2][0] = 0;
+  projectiveMatrix[2][1] = 0;
+  projectiveMatrix[2][2] = -(_clipFar + _clipNear)/(_clipFar - _clipNear);
+  projectiveMatrix[2][3] = -2.0*(_clipFar * _clipNear)/(_clipFar - _clipNear);
+  projectiveMatrix[3][0] = 0;
+  projectiveMatrix[3][1] = 0;
+  projectiveMatrix[3][2] = -1.0;
+  projectiveMatrix[3][3] = 0;
 
-  return projective_matrix;
+  return projectiveMatrix;
 }
 
 //////////////////////////////////////////////////
