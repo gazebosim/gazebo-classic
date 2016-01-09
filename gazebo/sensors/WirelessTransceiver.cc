@@ -38,8 +38,6 @@ WirelessTransceiver::WirelessTransceiver()
   : Sensor(sensors::OTHER)
 {
   this->active = false;
-  this->gain = 2.5;
-  this->power = 14.5;
 }
 
 /////////////////////////////////////////////////

@@ -1,6 +1,9 @@
 package gazebo.msgs;
 
+import "light.proto";
+import "model.proto";
 import "world_control.proto";
+import "wrench.proto";
 
 /// \ingroup gazebo_msgs
 /// \interface UserCmd
@@ -17,8 +20,11 @@ message UserCmd
     /// \brief Controlling the world.
     WORLD_CONTROL = 2;
 
-    INSERTING = 3;
-    DELETING = 4;
+    /// \brief Applying wrench.
+    WRENCH = 3;
+
+    INSERTING = 4;
+    DELETING = 5;
   }
 
   /// \brief Unique id for user command.
@@ -30,6 +36,18 @@ message UserCmd
   /// \brief Type of command.
   required Type type = 3;
 
+  /// \brief For model modify commands.
+  repeated Model model = 4;
+
+  /// \brief For light modify commands.
+  repeated Light light = 5;
+
+  /// \brief Name of entity targeted by command
+  optional string entity_name = 6;
+
   /// \brief For World Control commands.
-  optional WorldControl world_control = 6;
+  optional WorldControl world_control = 7;
+
+  /// \brief Wrench for apply wrench commands.
+  optional Wrench wrench = 8;
 }

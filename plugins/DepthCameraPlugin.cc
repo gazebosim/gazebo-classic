@@ -14,6 +14,9 @@
  * limitations under the License.
  *
 */
+
+#include <functional>
+
 #include "plugins/DepthCameraPlugin.hh"
 
 using namespace gazebo;
@@ -37,7 +40,7 @@ void DepthCameraPlugin::Load(sensors::SensorPtr _sensor,
                               sdf::ElementPtr /*_sdf*/)
 {
   this->parentSensor =
-    boost::dynamic_pointer_cast<sensors::DepthCameraSensor>(_sensor);
+    std::dynamic_pointer_cast<sensors::DepthCameraSensor>(_sensor);
   this->depthCamera = this->parentSensor->GetDepthCamera();
 
   if (!this->parentSensor)
@@ -46,18 +49,20 @@ void DepthCameraPlugin::Load(sensors::SensorPtr _sensor,
     return;
   }
 
-  this->width = this->depthCamera->GetImageWidth();
-  this->height = this->depthCamera->GetImageHeight();
-  this->depth = this->depthCamera->GetImageDepth();
-  this->format = this->depthCamera->GetImageFormat();
+  this->width = this->depthCamera->ImageWidth();
+  this->height = this->depthCamera->ImageHeight();
+  this->depth = this->depthCamera->ImageDepth();
+  this->format = this->depthCamera->ImageFormat();
 
   this->newDepthFrameConnection = this->depthCamera->ConnectNewDepthFrame(
-      boost::bind(&DepthCameraPlugin::OnNewDepthFrame,
-        this, _1, _2, _3, _4, _5));
+      std::bind(&DepthCameraPlugin::OnNewDepthFrame,
+        this, std::placeholders::_1, std::placeholders::_2,
+        std::placeholders::_3, std::placeholders::_4, std::placeholders::_5));
 
   this->newRGBPointCloudConnection = this->depthCamera->ConnectNewRGBPointCloud(
-      boost::bind(&DepthCameraPlugin::OnNewRGBPointCloud,
-        this, _1, _2, _3, _4, _5));
+      std::bind(&DepthCameraPlugin::OnNewRGBPointCloud,
+        this, std::placeholders::_1, std::placeholders::_2,
+        std::placeholders::_3, std::placeholders::_4, std::placeholders::_5));
 
   this->newImageFrameConnection = this->depthCamera->ConnectNewImageFrame(
       boost::bind(&DepthCameraPlugin::OnNewImageFrame,

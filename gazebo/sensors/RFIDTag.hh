@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_RFIDTAG_HH_
-#define _GAZEBO_RFIDTAG_HH_
+#ifndef _GAZEBO_SENSORS_RFIDTAG_HH_
+#define _GAZEBO_SENSORS_RFIDTAG_HH_
 
 #include <vector>
 #include <string>
@@ -24,7 +24,6 @@
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/sensors/Sensor.hh"
-#include "gazebo/math/Pose.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/util/system.hh"
 
@@ -56,16 +55,10 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited
-      protected: virtual bool UpdateImpl(bool _force);
+      protected: virtual bool UpdateImpl(const bool _force);
 
       // Documentation inherited
       public: virtual void Fini();
-
-      /// \brief Returns pose of tag in world coordinate.
-      /// \return Pose of object.
-      /// \deprecated See TagPose() function that returns an
-      /// ignition::math::Pose3d object.
-      public: math::Pose GetTagPose() const GAZEBO_DEPRECATED(6.0);
 
       /// \brief Returns pose of tag in world coordinate.
       /// \return Pose of object.

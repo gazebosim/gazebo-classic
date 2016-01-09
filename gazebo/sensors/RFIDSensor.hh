@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_RFIDSENSOR_HH_
-#define _GAZEBO_RFIDSENSOR_HH_
+#ifndef _GAZEBO_SENSORS_RFIDSENSOR_HH_
+#define _GAZEBO_SENSORS_RFIDSENSOR_HH_
 
 #include <vector>
 #include <string>
@@ -23,8 +23,6 @@
 #include "gazebo/physics/PhysicsTypes.hh"
 
 #include "gazebo/transport/TransportTypes.hh"
-
-#include "gazebo/math/Pose.hh"
 
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/util/system.hh"
@@ -64,7 +62,7 @@ namespace gazebo
       public: void AddTag(RFIDTag *_tag);
 
       // Documentation inherited.
-      protected: virtual bool UpdateImpl(bool _force);
+      protected: virtual bool UpdateImpl(const bool _force);
 
       // Documentation inherited
       public: virtual void Fini();
@@ -72,14 +70,6 @@ namespace gazebo
       /// \brief Iterates through all the RFID tags, and finds the ones which
       /// are in range of the sensor.
       private: void EvaluateTags();
-
-      /// \brief Check the range for one RFID tag.
-      /// \param[in] _pose Pose of a tag.
-      /// \return Checks if tag is in range
-      /// \deprecated See CheckTagRange() that accepts an
-      /// ignition::math::Pose3d object.
-      private: bool CheckTagRange(const math::Pose &_pose)
-               GAZEBO_DEPRECATED(6.0);
 
       /// \brief Check the range for one RFID tag.
       /// \param[in] _pose Pose of a tag.

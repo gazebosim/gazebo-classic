@@ -170,6 +170,7 @@ void UserCmdHistory::OnRedoHovered(QAction *_action)
 /////////////////////////////////////////////////
 void UserCmdHistory::OnUserCmdStatsMsg(ConstUserCmdStatsPtr &_msg)
 {
+  this->dataPtr->msg.Clear();
   this->dataPtr->msg.CopyFrom(*_msg);
 
   this->StatsSignal();

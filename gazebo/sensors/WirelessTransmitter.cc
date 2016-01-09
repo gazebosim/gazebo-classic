@@ -93,7 +93,7 @@ void WirelessTransmitter::Init()
 }
 
 //////////////////////////////////////////////////
-bool WirelessTransmitter::UpdateImpl(bool /*_force*/)
+bool WirelessTransmitter::UpdateImpl(const bool /*_force*/)
 {
   this->referencePose =
       this->pose + this->parentEntity.lock()->GetWorldPose().Ign();
@@ -147,14 +147,6 @@ std::string WirelessTransmitter::GetESSID() const
 double WirelessTransmitter::GetFreq() const
 {
   return this->freq;
-}
-
-/////////////////////////////////////////////////
-double WirelessTransmitter::GetSignalStrength(
-    const math::Pose &_receiver,
-    const double _rxGain)
-{
-  return this->SignalStrength(_receiver.Ign(), _rxGain);
 }
 
 /////////////////////////////////////////////////

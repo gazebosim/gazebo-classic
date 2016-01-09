@@ -63,6 +63,13 @@ std::string gazebo::custom_exec(std::string _cmd)
 }
 
 /////////////////////////////////////////////////
+void RenderingFixture::SetUp()
+{
+  // start rendering in test thread
+  rendering::load();
+}
+
+/////////////////////////////////////////////////
 ServerFixture::ServerFixture()
 {
   this->server = NULL;
@@ -500,7 +507,7 @@ void ServerFixture::GetFrame(const std::string &_cameraName,
   sensors::SensorPtr sensor = sensors::get_sensor(_cameraName);
   EXPECT_TRUE(sensor != NULL);
   sensors::CameraSensorPtr camSensor =
-    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
 
   _width = camSensor->GetImageWidth();
   _height = camSensor->GetImageHeight();
@@ -724,7 +731,7 @@ sensors::SonarSensorPtr ServerFixture::SpawnSonar(const std::string &_modelName,
 
   WaitUntilEntitySpawn(_modelName, 100, 100);
   WaitUntilSensorSpawn(_sonarName, 100, 100);
-  return boost::dynamic_pointer_cast<sensors::SonarSensor>(
+  return std::dynamic_pointer_cast<sensors::SonarSensor>(
       sensors::get_sensor(_sonarName));
 }
 
@@ -829,29 +836,53 @@ void ServerFixture::SpawnImuSensor(const std::string &_modelName,
 
   if (_noiseType.size() > 0)
   {
-    newModelStr << "      <noise>" << std::endl
-    << "        <type>" << _noiseType << "</type>" << std::endl
-    << "        <rate>" << std::endl
-    << "          <mean>" << _rateNoiseMean
-    << "</mean>" << std::endl
-    << "          <stddev>" << _rateNoiseStdDev
-    << "</stddev>" << std::endl
-    << "          <bias_mean>" << _rateBiasMean
-    << "</bias_mean>" << std::endl
-    << "          <bias_stddev>" << _rateBiasStdDev
-    << "</bias_stddev>" << std::endl
-    << "        </rate>" << std::endl
-    << "        <accel>" << std::endl
-    << "          <mean>" << _accelNoiseMean << "</mean>"
-    << std::endl
-    << "          <stddev>" << _accelNoiseStdDev << "</stddev>"
-    << std::endl
-    << "          <bias_mean>" << _accelBiasMean
-    << "</bias_mean>" << std::endl
-    << "          <bias_stddev>" << _accelBiasStdDev
-    << "</bias_stddev>" << std::endl
-    << "        </accel>" << std::endl
-    << "      </noise>" << std::endl;
+    newModelStr
+      << "<angular_velocity>\n"
+      << "<x><noise type='" << _noiseType << "'>\n"
+      << "<mean>" << _rateNoiseMean << "</mean>\n"
+      << "<stddev>" << _rateNoiseStdDev << "</stddev>\n"
+      << "<bias_mean>" << _rateBiasMean << "</bias_mean>\n"
+      << "<bias_stddev>" << _rateBiasStdDev << "</bias_stddev>\n"
+      << "</noise></x>\n"
+
+      << "<y><noise type='" << _noiseType << "'>\n"
+      << "<mean>" << _rateNoiseMean << "</mean>\n"
+      << "<stddev>" << _rateNoiseStdDev << "</stddev>\n"
+      << "<bias_mean>" << _rateBiasMean << "</bias_mean>\n"
+      << "<bias_stddev>" << _rateBiasStdDev << "</bias_stddev>\n"
+      << "</noise></y>\n"
+
+      << "<z><noise type='" << _noiseType << "'>\n"
+      << "<mean>" << _rateNoiseMean << "</mean>\n"
+      << "<stddev>" << _rateNoiseStdDev << "</stddev>\n"
+      << "<bias_mean>" << _rateBiasMean << "</bias_mean>\n"
+      << "<bias_stddev>" << _rateBiasStdDev << "</bias_stddev>\n"
+      << "</noise></z>\n"
+      << "</angular_velocity>\n"
+
+
+      << "<linear_acceleration>\n"
+      << "<x><noise type='" << _noiseType << "'>\n"
+      << "<mean>" << _accelNoiseMean << "</mean>\n"
+      << "<stddev>" << _accelNoiseStdDev << "</stddev>\n"
+      << "<bias_mean>" << _accelBiasMean << "</bias_mean>\n"
+      << "<bias_stddev>" << _accelBiasStdDev << "</bias_stddev>\n"
+      << "</noise></x>\n"
+
+      << "<y><noise type='" << _noiseType << "'>\n"
+      << "<mean>" << _accelNoiseMean << "</mean>\n"
+      << "<stddev>" << _accelNoiseStdDev << "</stddev>\n"
+      << "<bias_mean>" << _accelBiasMean << "</bias_mean>\n"
+      << "<bias_stddev>" << _accelBiasStdDev << "</bias_stddev>\n"
+      << "</noise></y>\n"
+
+      << "<z><noise type='" << _noiseType << "'>\n"
+      << "<mean>" << _accelNoiseMean << "</mean>\n"
+      << "<stddev>" << _accelNoiseStdDev << "</stddev>\n"
+      << "<bias_mean>" << _accelBiasMean << "</bias_mean>\n"
+      << "<bias_stddev>" << _accelBiasStdDev << "</bias_stddev>\n"
+      << "</noise></z>\n"
+      << "</linear_acceleration>\n";
   }
 
   newModelStr << "    </imu>" << std::endl
