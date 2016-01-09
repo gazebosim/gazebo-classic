@@ -166,7 +166,7 @@ void BuoyancyPlugin::OnUpdate()
     // object_density = mass/volume, so the mass term cancels.
     // Therefore,
     math::Vector3 buoyancy =
-        -this->fluidDensity * volume * this->physicsEngine->GetGravity();
+        -this->fluidDensity * volume * this->model->GetWorld()->Gravity();
 
     math::Pose linkFrame = link->GetWorldPose();
     // rotate buoyancy into the link frame before applying the force.

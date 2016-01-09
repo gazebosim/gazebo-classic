@@ -131,7 +131,7 @@ void PhysicsTest::ElasticModulusContact(const std::string &_physicsEngine)
   double eStar = 1.0 / ((1.0 - nu1*nu1)/e1 + (1.0 - nu2*nu2)/e2);
   double rStar = 1.0 / (1.0/r1 + 1.0/r2);
   // contact force
-  double f1 = -physics->GetGravity().x * m1;
+  double f1 = -world->Gravity().X() * m1;
 
   for (int n = 0; n < 10; ++n)
   {

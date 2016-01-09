@@ -138,7 +138,7 @@ namespace gazebo
 
       /// \brief Return the gravity vector.
       /// \return The gravity vector.
-      public: virtual math::Vector3 GetGravity() const;
+      public: virtual math::Vector3 GetGravity() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Set the gravity vector.
       /// \param[in] _gravity New gravity vector.
@@ -147,7 +147,8 @@ namespace gazebo
 
       /// \brief Return the magnetic field vector.
       /// \return The magnetic field vector.
-      public: virtual ignition::math::Vector3d MagneticField() const;
+      public: virtual ignition::math::Vector3d MagneticField() const
+              GAZEBO_DEPRECATED(7.0);
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map

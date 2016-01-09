@@ -138,6 +138,14 @@ release will remove the deprecated code.
     + ***Deprecation:*** public: unsigned int GetBufferSize() const;
     + ***Replacement:*** public: unsigned int BufferSize() const;
 
+1. **gazebo/physics/PhysicsEngine.hh**
+    + ***Deprecation:*** public: math::Vector3 GetGravity const
+    + ***Deprecation:*** public: ignition::math::Vector3d MagneticField const
+
+1. **gazebo/physics/World.hh**
+    + ***Replacement:*** public: ignition::math::Vector3 Gravity const
+    + ***Replacement:*** public: ignition::math::Vector3d MagneticField const
+
 1. **gazebo/rendering/Scene.hh**
     + ***Deprecation:*** public: Ogre::SceneManager *GetManager() const;
     + ***Replacement:*** public: Ogre::SceneManager *OgreSceneManager() const;

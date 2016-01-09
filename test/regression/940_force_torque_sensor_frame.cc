@@ -70,7 +70,7 @@ void Issue940Test::ForceTorqueSensorFrameTest(const std::string &_physicsEngine)
   world->Step(20);
 
   // Assume gravity on z axis
-  Vector3 grav = physics->GetGravity();
+  auto grav = world->Gravity();
   EXPECT_NEAR(grav[0], 0, TOL_GRAVITY);
   EXPECT_NEAR(grav[1], 0, TOL_GRAVITY);
 

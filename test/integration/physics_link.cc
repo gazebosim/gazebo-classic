@@ -171,7 +171,7 @@ void PhysicsLinkTest::AddForce(const std::string &_physicsEngine)
   EXPECT_GT(dt, 0);
 
   // disable gravity
-  world->SetGravity(math::Vector3::Zero);
+  world->SetGravity(ignition::math::Vector3d::Zero);
 
   // Spawn a box
   math::Vector3 size(1, 1, 1);
@@ -256,7 +256,7 @@ void PhysicsLinkTest::GetWorldAngularMomentum(const std::string &_physicsEngine)
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // disable gravity
-  world->SetGravity(math::Vector3::Zero);
+  world->SetGravity(ignition::math::Vector3d::Zero);
 
   physics::ModelPtr model;
   {
@@ -339,7 +339,7 @@ void PhysicsLinkTest::GetWorldEnergy(const std::string &_physicsEngine)
   EXPECT_GT(dt, 0);
 
   // Get gravity magnitude
-  double g = physics->GetGravity().GetLength();
+  double g = world->Gravity().Length();
 
   // Spawn a box
   double z0 = 10.0;
@@ -382,7 +382,7 @@ void PhysicsLinkTest::GetWorldInertia(const std::string &_physicsEngine)
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // disable gravity
-  world->SetGravity(math::Vector3::Zero);
+  world->SetGravity(ignition::math::Vector3d::Zero);
 
   // Box size
   const double dx = 1.0;
@@ -549,7 +549,7 @@ void PhysicsLinkTest::OnWrenchMsg(const std::string &_physicsEngine)
   EXPECT_GT(dt, 0);
 
   // disable gravity
-  world->SetGravity(math::Vector3::Zero);
+  world->SetGravity(ignition::math::Vector3d::Zero);
 
   // Spawn a box
   math::Vector3 size(1, 1, 1);
@@ -666,7 +666,7 @@ void PhysicsLinkTest::SetVelocity(const std::string &_physicsEngine)
   EXPECT_GT(dt, 0);
 
   // disable gravity
-  world->SetGravity(math::Vector3::Zero);
+  world->SetGravity(ignition::math::Vector3d::Zero);
 
   // Spawn a box
   math::Vector3 size(1, 1, 1);
