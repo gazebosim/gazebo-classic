@@ -146,6 +146,10 @@ namespace gazebo
       /// \return The magnetic field vector.
       public: virtual ignition::math::Vector3d MagneticField() const;
 
+      /// \brief Set the magnetic field vector.
+      /// \param[in] _mag New magnetic field vector.
+      public: void SetMagneticField(const ignition::math::Vector3d &_mag);
+
       /// \brief Get the number of models.
       /// \return The number of models in the World.
       public: unsigned int GetModelCount() const;

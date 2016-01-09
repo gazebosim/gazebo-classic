@@ -263,8 +263,8 @@ bool PhysicsEngine::SetParam(const std::string &_key,
 #ifndef _WIN32
 #pragma GCC diagnostic pop
 #endif
-      this->sdf->GetElement("magnetic_field")->
-          Set(boost::any_cast<ignition::math::Vector3d>(copy));
+      this->world->SetMagneticField(
+          boost::any_cast<ignition::math::Vector3d>(copy));
     }
     else
     {
@@ -311,7 +311,7 @@ bool PhysicsEngine::GetParam(const std::string &_key,
   else if (_key == "gravity")
     _value = this->GetGravity();
   else if (_key == "magnetic_field")
-    _value = this->sdf->Get<math::Vector3>("magnetic_field");
+    _value = this->world->MagneticField();
   else
   {
     gzwarn << "GetParam failed for [" << _key << "] in physics engine "
