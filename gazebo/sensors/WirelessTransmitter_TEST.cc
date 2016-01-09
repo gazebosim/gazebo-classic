@@ -124,6 +124,7 @@ void WirelessTransmitter_TEST::TestInvalidFreq()
   sdf::initFile("sensor.sdf", sdf);
 
   // Replace the essid by an empty value
+  boost::regex re("<frequency>.*<\\/frequency>");
   std::string transmitterSensorStringCopy =
       boost::regex_replace(transmitterSensorString, re,
         "<frequency>-1.0</frequency>");
@@ -138,7 +139,6 @@ void WirelessTransmitter_TEST::TestInvalidFreq()
 /// \brief Test the signal strength function
 void WirelessTransmitter_TEST::TestSignalStrength()
 {
-  printf("1\n");
   int samples = 100;
   double signStrengthAvg = 0.0;
   ignition::math::Pose3d txPose(
