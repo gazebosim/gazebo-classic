@@ -1571,6 +1571,8 @@ void World::ProcessRequestMsgs()
 
       sdf::ElementPtr newSdf(this->dataPtr->sdf);
 
+      // FIXME: Handle scale better on the server so we don't need to unscale
+      // SDF here. Issue #1825
       if (requestMsg.request() == "world_sdf_save")
       {
         // Substitute all models sdf with unscaled versions
