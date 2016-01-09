@@ -107,9 +107,13 @@ namespace gazebo
       /// \param[in] _right Right vertical clipping plane
       /// \param[in] _bottom Bottom horizontal clipping plane
       /// \param[in] _top Top horizontal clipping plane
-      /// \param[in] _near Distance to the nearer depth clipping plane (this value is negative if the plane is to be behind the camera)
-      /// \param[in] _far Distance to the farther depth clipping plane (this value is negative if the plane is to be behind the camera)
-      /// \return Ogre NDC (Normalized Device Coordinates) 4x4 homogeneous matrix
+      /// \param[in] _near Distance to the nearer depth clipping plane
+      ///            This value is negative if the plane is to be behind
+      ///            the camera
+      /// \param[in] _far Distance to the farther depth clipping plane
+      ///            This value is negative if the plane is to be behind
+      ///            the camera
+      /// \return OpenGL NDC (Normalized Device Coordinates) matrix
       public: Ogre::Matrix4 BuildNormalizedDeviceCoordinatesMatrix(
               const double _left, const double _right,
               const double _bottom, const double _top,
@@ -118,11 +122,16 @@ namespace gazebo
       /// \brief Computes the OpenGL perspective matrix
       /// \param[in] _intrinsicsFx Horizontal focal length (in pixels)
       /// \param[in] _intrinsicsFy Vertical focal length (in pixels)
-      /// \param[in] _intrinsicsCx X coordinate of the principal point (in pixels)
-      /// \param[in] _intrinsicsCy Y coordinate of the principal point (in pixels)
-      /// \param[in] _intrinsicsS Skew coefficient defining the angle between the x and y pixel axes
-      /// \param[in] _clipNear Distance to the nearer depth clipping plane (this value is negative if the plane is to be behind the camera)
-      /// \param[in] _clipFar Distance to the farther depth clipping plane (this value is negative if the plane is to be behind the camera)
+      /// \param[in] _intrinsicsCx X coordinate of principal point in pixels
+      /// \param[in] _intrinsicsCy Y coordinate of principal point in pixels
+      /// \param[in] _intrinsicsS Skew coefficient defining the angle between
+      ///            the x and y pixel axes
+      /// \param[in] _clipNear Distance to the nearer depth clipping plane
+      ///            This value is negative if the plane is to be behind
+      ///            the camera
+      /// \param[in] _clipFar Distance to the farther depth clipping plane
+      ///            This value is negative if the plane is to be behind
+      ///            the camera
       /// \return Ogre 4x4 homogeneous perspective matrix
       public: Ogre::Matrix4 BuildPerspectiveMatrix(
               const double _intrinsicsFx, const double _intrinsicsFy,
@@ -135,11 +144,16 @@ namespace gazebo
       /// \param[in] _imageHeight Image height (in pixels)
       /// \param[in] _intrinsicsFx Horizontal focal length (in pixels)
       /// \param[in] _intrinsicsFy Vertical focal length (in pixels)
-      /// \param[in] _intrinsicsCx X coordinate of the principal point (in pixels)
-      /// \param[in] _intrinsicsCy Y coordinate of the principal point (in pixels)
-      /// \param[in] _intrinsicsS Skew coefficient defining the angle between the x and y pixel axes
-      /// \param[in] _clipNear Distance to the nearer depth clipping plane (this value is negative if the plane is to be behind the camera)
-      /// \param[in] _clipFar Distance to the farther depth clipping plane (this value is negative if the plane is to be behind the camera)
+      /// \param[in] _intrinsicsCx X coordinate of principal point in pixels
+      /// \param[in] _intrinsicsCy Y coordinate of principal point in pixels
+      /// \param[in] _intrinsicsS Skew coefficient defining the angle between
+      ///             the x and y pixel axes
+      /// \param[in] _clipNear Distance to the nearer depth clipping plane
+      ///            This value is negative if the plane is to be behind
+      ///            the camera
+      /// \param[in] _clipFar Distance to the farther depth clipping plane
+      ///            This value is negative if the plane is to be behind
+      ///            the camera
       /// \return Ogre 4x4 homogeneous projective matrix
       public: Ogre::Matrix4 BuildProjectiveMatrix(
               const double _imageWidth, const double _imageHeight,

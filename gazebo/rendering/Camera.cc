@@ -218,7 +218,9 @@ void Camera::LoadCameraIntrinsics()
         clipFar = clipElem->Get<double>("far");
       }
 
-      this->cameraProjectiveMatrix = BuildProjectiveMatrix(this->imageWidth, this->imageHeight, intrinsicsFx, intrinsicsFy, intrinsicsCx, intrinsicsCy, intrinsicsS, clipNear, clipFar);
+      this->cameraProjectiveMatrix = BuildProjectiveMatrix(
+        this->imageWidth, this->imageHeight, intrinsicsFx, intrinsicsFy,
+        intrinsicsCx, intrinsicsCy, intrinsicsS, clipNear, clipFar);
       this->cameraUsingIntrinsics = true;
     }
   }
@@ -274,7 +276,11 @@ Ogre::Matrix4 Camera::BuildProjectiveMatrix(
     const double _intrinsicsS,
     const double _clipNear, const double _clipFar) const
 {
-// return  BuildNormalizedDeviceCoordinatesMatrix(0, _imageWidth, 0, _imageHeight, _clipNear, _clipFar) * BuildPerspectiveMatrix(_intrinsicsFx, _intrinsicsFy, _intrinsicsCx, _intrinsicsCy, _intrinsicsS, _clipNear, _clipFar);
+  return BuildNormalizedDeviceCoordinatesMatrix(
+           0, _imageWidth, 0, _imageHeight, _clipNear, _clipFar) *
+         BuildPerspectiveMatrix(
+           _intrinsicsFx, _intrinsicsFy, _intrinsicsCx, _intrinsicsCy,
+           _intrinsicsS, _clipNear, _clipFar);
 
 // Same as the matrix multiplication above but more efficient
   Ogre::Matrix4 projectiveMatrix = Ogre::Matrix4::ZERO;
@@ -1486,7 +1492,7 @@ void Camera::CreateCamera()
   this->SetFixedYawAxis(false);
   this->cameraNode->yaw(Ogre::Degree(-90.0));
   this->cameraNode->roll(Ogre::Degree(-90.0));
-  
+
   if (cameraUsingIntrinsics)
     this->camera->setCustomProjectionMatrix(true, cameraProjectiveMatrix);
 }
