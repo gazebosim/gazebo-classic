@@ -910,7 +910,7 @@ ignition::math::Vector3d World::MagneticField() const
 //////////////////////////////////////////////////
 void World::SetMagneticField(const ignition::math::Vector3d &_mag)
 {
-  this->sdf->GetElement("magnetic_field")->Set(_mag);
+  this->dataPtr->sdf->GetElement("magnetic_field")->Set(_mag);
 }
 
 //////////////////////////////////////////////////
