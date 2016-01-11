@@ -80,9 +80,9 @@ Joint::Joint(BasePtr _parent)
 Joint::~Joint()
 {
   // Remove all the sensors attached to the joint
-  for (auto const &iter : this->sensors)
+  for (auto const &sensor : this->sensors)
   {
-    event::Events::removeSensor(iter);
+    event::Events::removeSensor(sensor);
   }
 
   this->sensors.clear();
@@ -400,9 +400,9 @@ void Joint::Init()
 void Joint::Fini()
 {
   // Remove all the sensors attached to the joint
-  for (auto const &iter : this->sensors)
+  for (auto const &sensor : this->sensors)
   {
-    event::Events::removeSensor(iter);
+    event::Events::removeSensor(sensor);
   }
   this->sensors.clear();
 
