@@ -30,13 +30,13 @@ gazebo::math::Vector2i GetScreenSpaceCoords(gazebo::math::Vector3 _pt,
     gazebo::rendering::CameraPtr _cam)
 {
   // Convert from 3D world pos to 2D screen pos
-  Ogre::Vector3 pos = _cam->GetOgreCamera()->getProjectionMatrix() *
-      _cam->GetOgreCamera()->getViewMatrix() *
+  Ogre::Vector3 pos = _cam->OgreCamera()->getProjectionMatrix() *
+      _cam->OgreCamera()->getViewMatrix() *
       gazebo::rendering::Conversions::Convert(_pt);
 
   gazebo::math::Vector2i screenPos;
-  screenPos.x = ((pos.x / 2.0) + 0.5) * _cam->GetViewportWidth();
-  screenPos.y = (1 - ((pos.y / 2.0) + 0.5)) * _cam->GetViewportHeight();
+  screenPos.x = ((pos.x / 2.0) + 0.5) * _cam->ViewportWidth();
+  screenPos.y = (1 - ((pos.y / 2.0) + 0.5)) * _cam->ViewportHeight();
 
   return screenPos;
 }

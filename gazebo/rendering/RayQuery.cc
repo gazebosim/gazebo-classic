@@ -47,9 +47,9 @@ bool RayQuery::SelectMeshTriangle(int _x, int _y, VisualPtr _visual,
 {
   // create the ray to test
   Ogre::Ray ray =
-      this->dataPtr->camera->GetOgreCamera()->getCameraToViewportRay(
-      static_cast<float>(_x) / this->dataPtr->camera->GetViewportWidth(),
-      static_cast<float>(_y) / this->dataPtr->camera->GetViewportHeight());
+      this->dataPtr->camera->OgreCamera()->getCameraToViewportRay(
+      static_cast<float>(_x) / this->dataPtr->camera->ViewportWidth(),
+      static_cast<float>(_y) / this->dataPtr->camera->ViewportHeight());
 
   std::vector<rendering::VisualPtr> visuals;
   this->GetMeshVisuals(_visual, visuals);

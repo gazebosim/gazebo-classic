@@ -19,9 +19,8 @@
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
-
 #include <boost/algorithm/string.hpp>
-#include <boost/bind.hpp>
+#include <functional>
 
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Exception.hh"
@@ -54,7 +53,7 @@ CameraSensor::CameraSensor()
   this->rendered = false;
   this->connections.push_back(
       event::Events::ConnectRender(
-        boost::bind(&CameraSensor::Render, this)));
+        std::bind(&CameraSensor::Render, this)));
 }
 
 //////////////////////////////////////////////////
@@ -127,8 +126,8 @@ void CameraSensor::Init()
     this->camera->Load(cameraSdf);
 
     // Do some sanity checks
-    if (this->camera->GetImageWidth() == 0 ||
-        this->camera->GetImageHeight() == 0)
+    if (this->camera->ImageWidth() == 0 ||
+        this->camera->ImageHeight() == 0)
     {
       gzthrow("image has zero size");
     }
@@ -170,7 +169,7 @@ void CameraSensor::Fini()
 
   if (this->camera)
   {
-    this->scene->RemoveCamera(this->camera->GetName());
+    this->scene->RemoveCamera(this->camera->Name());
   }
 
   this->camera.reset();
@@ -191,7 +190,7 @@ void CameraSensor::Render()
 }
 
 //////////////////////////////////////////////////
-bool CameraSensor::UpdateImpl(bool /*_force*/)
+bool CameraSensor::UpdateImpl(const bool /*_force*/)
 {
   if (!this->rendered)
     return false;
@@ -202,15 +201,15 @@ bool CameraSensor::UpdateImpl(bool /*_force*/)
   {
     msgs::ImageStamped msg;
     msgs::Set(msg.mutable_time(), this->scene->GetSimTime());
-    msg.mutable_image()->set_width(this->camera->GetImageWidth());
-    msg.mutable_image()->set_height(this->camera->GetImageHeight());
+    msg.mutable_image()->set_width(this->camera->ImageWidth());
+    msg.mutable_image()->set_height(this->camera->ImageHeight());
     msg.mutable_image()->set_pixel_format(common::Image::ConvertPixelFormat(
-          this->camera->GetImageFormat()));
+          this->camera->ImageFormat()));
 
-    msg.mutable_image()->set_step(this->camera->GetImageWidth() *
-        this->camera->GetImageDepth());
-    msg.mutable_image()->set_data(this->camera->GetImageData(),
-        msg.image().width() * this->camera->GetImageDepth() *
+    msg.mutable_image()->set_step(this->camera->ImageWidth() *
+        this->camera->ImageDepth());
+    msg.mutable_image()->set_data(this->camera->ImageData(),
+        msg.image().width() * this->camera->ImageDepth() *
         msg.image().height());
 
     this->imagePub->Publish(msg);
@@ -224,7 +223,7 @@ bool CameraSensor::UpdateImpl(bool /*_force*/)
 unsigned int CameraSensor::GetImageWidth() const
 {
   if (this->camera)
-    return this->camera->GetImageWidth();
+    return this->camera->ImageWidth();
 
   sdf::ElementPtr cameraSdf = this->sdf->GetElement("camera");
   sdf::ElementPtr elem = cameraSdf->GetElement("image");
@@ -235,7 +234,7 @@ unsigned int CameraSensor::GetImageWidth() const
 unsigned int CameraSensor::GetImageHeight() const
 {
   if (this->camera)
-    return this->camera->GetImageHeight();
+    return this->camera->ImageHeight();
 
   sdf::ElementPtr cameraSdf = this->sdf->GetElement("camera");
   sdf::ElementPtr elem = cameraSdf->GetElement("image");
@@ -246,7 +245,7 @@ unsigned int CameraSensor::GetImageHeight() const
 const unsigned char *CameraSensor::GetImageData()
 {
   if (this->camera)
-    return this->camera->GetImageData(0);
+    return this->camera->ImageData(0);
   else
     return NULL;
 }
@@ -263,7 +262,7 @@ bool CameraSensor::SaveFrame(const std::string &_filename)
 }
 
 //////////////////////////////////////////////////
-bool CameraSensor::IsActive()
+bool CameraSensor::IsActive() const
 {
   return Sensor::IsActive() ||
     (this->imagePub && this->imagePub->HasConnections());

@@ -145,9 +145,9 @@ namespace gazebo
       /// \brief Computes mass moment of inertia for a link.
       /// \param[in] _collision A collision message.
       /// \param[in] _mass The mass of the link.
-      /// \return The computed moment of inertia.
+      /// \return Vector of principal moments of inertia.
       public: static ignition::math::Vector3d ComputeMomentOfInertia(
-          const msgs::Collision &_collision, double _mass);
+          const msgs::Collision &_collision, const double _mass);
 
       /// \brief Computes the volume of the link.
       /// \return The volume.

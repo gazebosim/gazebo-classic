@@ -218,8 +218,20 @@ namespace gazebo
       public: void AddLink(EntityType _type);
 
       /// \brief Add a model plugin to the model
+      /// \param[in] _name Name of plugin
+      /// \param[in] _filename Plugin filename
+      /// \param[in] _innerxml Plugin SDF elements in string
+      public: void OnAddModelPlugin(const std::string &_name,
+          const std::string &_filename, const std::string &_innerxml);
+
+      /// \brief Add a model plugin to the model
       /// \param[in] _pluginElem Pointer to plugin SDF element
       public: void AddModelPlugin(const sdf::ElementPtr _pluginElem);
+
+      /// \brief Get a model plugin data by its name
+      /// \param[in] _name Name of model plugin
+      /// \return Model plugin data.
+      public: ModelPluginData *ModelPlugin(const std::string &_name);
 
       /// \brief Generate the SDF from model link and joint visuals.
       public: void GenerateSDF();
@@ -384,11 +396,12 @@ namespace gazebo
       /// \param[in] _axis Axis of alignment: x, y, or z.
       /// \param[in] _config Configuration: min, center, or max.
       /// \param[in] _target Target of alignment: first or last.
-      /// \param[in] _bool True to preview alignment without publishing
+      /// \param[in] _preview True to preview alignment without publishing
       /// to server.
+      /// \param[in] _inverted True to invert alignment direction.
       private: void OnAlignMode(const std::string &_axis,
           const std::string &_config, const std::string &_target,
-          bool _preview);
+          const bool _preview, const bool _inverted = false);
 
       /// \brief Callback when an entity's scale has changed.
       /// \param[in] _name Name of entity.
