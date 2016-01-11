@@ -120,11 +120,6 @@ std::string SchematicViewWidget::GetUnscopedName(const std::string &_scopedName)
   if (idx != std::string::npos)
     unscopedName = _scopedName.substr(idx+2);
 
-  // TODO support nested model links
-  // if the name is still scoped then it could be a nested link.
-  if (unscopedName.find("::") != std::string::npos)
-    return "";
-
   return unscopedName;
 }
 
@@ -143,7 +138,6 @@ void SchematicViewWidget::AddNode(const std::string &_node)
   node->setData(0, tr(_node.c_str()));
   node->setData(1, tr("Link"));
   this->nodes[_node] = node;
-
   this->scene->applyLayout();
 
   this->FitInView();
