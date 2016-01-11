@@ -237,8 +237,8 @@ void FollowerPlugin::OnUpdate()
 
 /////////////////////////////////////////////////
 void FollowerPlugin::OnNewDepthFrame(const float *_image,
-    unsigned int _width, unsigned int _height, unsigned int /*_depth*/,
-    const std::string &/*_format*/)
+    const unsigned int _width, const unsigned int _height,
+    const unsigned int /*_depth*/, const std::string &/*_format*/)
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
   this->dataPtr->imageMsg.set_width(_width);

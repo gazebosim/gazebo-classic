@@ -32,7 +32,7 @@
 namespace gazebo
 {
   // Forward declare private class
-  class FollowerPluginPrivate;
+  struct FollowerPluginPrivate;
 
   /// \brief A simple object follower that finds the closest object in a
   /// depth image and commands a differential drive vehicle to move towards the
@@ -59,8 +59,8 @@ namespace gazebo
     /// \param[in] _depth Image depth
     /// \param[in] _format Image format
     private: void OnNewDepthFrame(const float *_image,
-                unsigned int _width, unsigned int _height,
-                unsigned int _depth, const std::string &_format);
+                const unsigned int _width, const unsigned int _height,
+                const unsigned int _depth, const std::string &_format);
 
     /// \brief Update the follower.
     private: void OnUpdate();
