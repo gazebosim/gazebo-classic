@@ -130,6 +130,26 @@ namespace gazebo
       /// \return Pointer to the spherical coordinates converter.
       public: common::SphericalCoordinatesPtr GetSphericalCoordinates() const;
 
+      /// \brief Return the gravity vector.
+      /// \return The gravity vector.
+      public: ignition::math::Vector3d Gravity() const;
+
+      /// \brief Set the gravity vector.
+      /// \param[in] _gravity New gravity vector.
+      public: void SetGravity(const ignition::math::Vector3d &_gravity);
+
+      /// \brief Set the gravity sdf value.
+      /// \param[in] _gravity New gravity vector.
+      public: void SetGravitySDF(const ignition::math::Vector3d &_gravity);
+
+      /// \brief Return the magnetic field vector.
+      /// \return The magnetic field vector.
+      public: virtual ignition::math::Vector3d MagneticField() const;
+
+      /// \brief Set the magnetic field vector.
+      /// \param[in] _mag New magnetic field vector.
+      public: void SetMagneticField(const ignition::math::Vector3d &_mag);
+
       /// \brief Get the number of models.
       /// \return The number of models in the World.
       public: unsigned int GetModelCount() const;
