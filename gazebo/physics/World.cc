@@ -889,6 +889,8 @@ ignition::math::Vector3d World::Gravity() const
 //////////////////////////////////////////////////
 void World::SetGravity(const ignition::math::Vector3d &_gravity)
 {
+  // This function calls `PhysicsEngine::SetGravity`,
+  // which in turn should call `World::SetGravitySDF`.
   this->dataPtr->physicsEngine->SetGravity(_gravity);
 }
 
@@ -901,10 +903,7 @@ void World::SetGravitySDF(const ignition::math::Vector3d &_gravity)
 //////////////////////////////////////////////////
 ignition::math::Vector3d World::MagneticField() const
 {
-  if (this->dataPtr->sdf->HasElement("magnetic_field"))
-    return this->dataPtr->sdf->Get<ignition::math::Vector3d>("magnetic_field");
-  else
-    return ignition::math::Vector3d::Zero;
+  return this->dataPtr->sdf->Get<ignition::math::Vector3d>("magnetic_field");
 }
 
 //////////////////////////////////////////////////
