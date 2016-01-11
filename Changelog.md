@@ -3,6 +3,7 @@
 1. Add Gravity and MagneticField API to World class to match sdformat change.
     * [SDFormat pull request 247](https://bitbucket.org/osrf/sdformat/pull-requests/247)
     * [Issue #1823](https://bitbucket.org/osrf/gazebo/issues/1823)
+    * [Pull request #2090](https://bitbucket.org/osrf/gazebo/pull-request/2090)
 
 1. Use opaque pointers and deprecate functions in the rendering library
     * [Pull request #2069](https://bitbucket.org/osrf/gazebo/pull-request/2069)

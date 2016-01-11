@@ -263,8 +263,8 @@ bool PhysicsEngine::SetParam(const std::string &_key,
 #ifndef _WIN32
 #pragma GCC diagnostic pop
 #endif
-      this->sdf->GetElement("magnetic_field")->
-          Set(boost::any_cast<ignition::math::Vector3d>(copy));
+      this->world->SetMagneticField(
+          boost::any_cast<ignition::math::Vector3d>(copy));
     }
     else
     {
