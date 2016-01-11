@@ -2865,7 +2865,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Wind &_msg,
   this->dataPtr->propTreeBrowser->addProperty(item);
 
   QtProperty *linearVelocityItem = this->dataPtr->variantManager->addProperty(
-      QtVariantPropertyManager::groupTypeId(), tr("linear velocity"));
+      QtVariantPropertyManager::groupTypeId(), tr("linear_velocity"));
   this->dataPtr->propTreeBrowser->addProperty(linearVelocityItem);
   if (_msg.has_linear_velocity())
     this->FillVector3dProperty(_msg.linear_velocity(), linearVelocityItem);
