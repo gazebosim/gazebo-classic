@@ -186,7 +186,7 @@ void CameraSensor::Render()
   this->camera->Render();
 
   this->rendered = true;
-  this->lastMeasurementTime = this->scene->GetSimTime();
+  this->lastMeasurementTime = this->scene->SimTime();
 }
 
 //////////////////////////////////////////////////
@@ -200,7 +200,7 @@ bool CameraSensor::UpdateImpl(const bool /*_force*/)
   if (this->imagePub && this->imagePub->HasConnections())
   {
     msgs::ImageStamped msg;
-    msgs::Set(msg.mutable_time(), this->scene->GetSimTime());
+    msgs::Set(msg.mutable_time(), this->scene->SimTime());
     msg.mutable_image()->set_width(this->camera->ImageWidth());
     msg.mutable_image()->set_height(this->camera->ImageHeight());
     msg.mutable_image()->set_pixel_format(common::Image::ConvertPixelFormat(

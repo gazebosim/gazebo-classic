@@ -592,7 +592,7 @@ void LinkData::AddCollision(rendering::VisualPtr _collisionVis,
 }
 
 /////////////////////////////////////////////////
-LinkData* LinkData::Clone(const std::string &_newName)
+LinkData *LinkData::Clone(const std::string &_newName)
 {
   GZ_ASSERT(this->linkVisual, "LinkVisual is NULL");
   LinkData *cloneLink = new LinkData();

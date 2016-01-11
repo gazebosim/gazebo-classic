@@ -1,7 +1,14 @@
 #################################################
+# VAR: GZ_BUILD_TESTS_EXTRA_EXE_SRCS
 # Hack: extra sources to build binaries can be supplied to gz_build_tests in
 # the variable GZ_BUILD_TESTS_EXTRA_EXE_SRCS. This variable will be clean up
 # at the end of the function
+#
+# VAR: GZ_BUILD_TESTS_EXTRA_LIBS
+# Hack: extra libs to build binaries can be supplied to gz_build_tests in
+# the variable GZ_BUILD_TESTS_EXTRA_LIBS. This variable will be clean up
+# at the end of the function
+#
 macro (gz_build_tests)
   # Build all the tests
   foreach(GTEST_SOURCE_file ${ARGN})
@@ -39,6 +46,7 @@ macro (gz_build_tests)
       gazebo_test_fixture
       gtest
       gtest_main
+      ${GZ_BUILD_TESTS_EXTRA_LIBS}
       )
 
     add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME}
@@ -61,6 +69,7 @@ macro (gz_build_tests)
   endforeach()
 
   set(GZ_BUILD_TESTS_EXTRA_EXE_SRCS "")
+  set(GZ_BUILD_TESTS_EXTRA_LIBS "")
 endmacro()
 
 if (VALID_DISPLAY)

@@ -138,9 +138,84 @@ release will remove the deprecated code.
     + ***Deprecation:*** public: unsigned int GetBufferSize() const;
     + ***Replacement:*** public: unsigned int BufferSize() const;
 
+1. **gazebo/rendering/Scene.hh**
+    + ***Deprecation:*** public: Ogre::SceneManager *GetManager() const;
+    + ***Replacement:*** public: Ogre::SceneManager *OgreSceneManager() const;
+    + ***Deprecation:*** public: std::string GetName() const;
+    + ***Replacement:*** public: std::string Name() const;
+    + ***Deprecation:*** public: common::Color GetAmbientColor() const;
+    + ***Replacement:*** public: common::Color AmbientColor() const;
+    + ***Deprecation:*** public: common::Color GetBackgroundColor();
+    + ***Replacement:*** public: common::Color BackgroundColor() const;
+    + ***Deprecation:*** public: uint32_t GetGridCount();
+    + ***Replacement:*** public: uint32_t GridCount() const;
+    + ***Deprecation:*** public: uint32_t GetOculusCameraCount() const;
+    + ***Replacement:*** public: uint32_t OculusCameraCount() const;
+    + ***Deprecation:*** public: uint32_t GetCameraCount() const;
+    + ***Replacement:*** public: uint32_t CameraCount() const;
+    + ***Deprecation:*** public: uint32_t GetUserCameraCount() const;
+    + ***Replacement:*** public: uint32_t UserCameraCount() const;
+    + ***Deprecation:*** public: uint32_t GetLightCount() const;
+    + ***Replacement:*** public: uint32_t LightCount() const;
+    + ***Deprecation:*** public: VisualPtr GetVisualAt(CameraPtr _camera, const math::Vector2i &_mousePos, std::string &_mod)
+    + ***Replacement:*** public: VisualPtr VisualAt(CameraPtr _camera, const ignition::math::Vector2i &_mousePos, std::string &_mod);
+    + ***Deprecation:*** public: VisualPtr GetVisualAt(CameraPtr _camera, const math::Vector2i &_mousePos)
+    + ***Replacement:*** public: VisualPtr VisualAt(CameraPtr _camera, const ignition::math::Vector2i &_mousePos);
+    + ***Deprecation:*** public: VisualPtr GetVisualBelow(const std::string &_visualName);
+    + ***Replacement:*** public: VisualPtr VisualBelow(const std::string &_visualName);
+    + ***Deprecation:*** public: void GetVisualsBelowPoint(const math::Vector3 &_pt, std::vector<VisualPtr> &_visuals);
+    + ***Replacement:*** public: void VisualsBelowPoint(const ignition::math::Vector3d &_pt, std::vector<VisualPtr> &_visuals);
+    + ***Deprecation:*** public: double GetHeightBelowPoint(const math::Vector3 &_pt);
+    + ***Replacement:*** public: double HeightBelowPoint(const ignition::math::Vector3d &_pt);
+    + ***Deprecation:*** public: bool GetFirstContact(CameraPtr _camera, const math::Vector2i &_mousePos, math::Vector3 &_position)
+    + ***Replacement:*** public: bool FirstContact(CameraPtr _camera, const ignition::math::Vector2i &_mousePos, ignition::math::Vector3d &_position);
+    + ***Deprecation:*** public: void DrawLine(const math::Vector3 &_start, const math::Vector3 &_end, const std::string &_name)
+    + ***Replacement:*** public: void DrawLine(const ignition::math::Vector3d &_start, const ignition::math::Vector3d &_end, const std::string &_name);
+    + ***Deprecation:*** public: uint32_t GetId() const;
+    + ***Replacement:*** public: uint32_t Id() const;
+    + ***Deprecation:*** public: std::string GetIdString() const;
+    + ***Replacement:*** public: std::string IdString() const;
+    + ***Deprecation:*** public: bool GetShadowsEnabled() const;
+    + ***Replacement:*** public: bool ShadowsEnabled() const;
+    + ***Deprecation:*** public: VisualPtr GetWorldVisual() const;
+    + ***Replacement:*** public: VisualPtr WorldVisual() const;
+    + ***Deprecation:*** public: VisualPtr GetSelectedVisual() const;
+    + ***Replacement:*** public: VisualPtr SelectedVisual() const;
+    + ***Deprecation:*** public: bool GetShowClouds() const;
+    + ***Replacement:*** public: bool ShowClouds() const;
+    + ***Deprecation:*** public: bool GetInitialized() const;
+    + ***Replacement:*** public: bool Initialized() const;
+    + ***Deprecation:*** public: common::Time GetSimTime() const;
+    + ***Replacement:*** public: common::Time SimTime() const;
+    + ***Deprecation:*** public: uint32_t GetVisualCount() const
+    + ***Replacement:*** public: uint32_t VisualCount() const;
+
 1. **gazebo/rendering/DepthCamera.hh**
     + ***Deprecation:*** public: virtual const float *GetDepthData();
     + ***Replacement:*** public: virtual const float *DepthData() const;
+
+1. **gazebo/rendering/Heightmap.hh**
+    + ***Deprecation:*** public: double GetHeight(double _x, double _y, double _z = 1000);
+    + ***Replacement:*** public: double Height(const double _x, const double _y, const double _z = 1000) const;
+    + ***Deprecation:*** public: bool Flatten(CameraPtr _camera, math::Vector2i _mousePos, double _outsideRadius, double _insideRadius, double _weight = 0.1)
+    + ***Replacement:*** public: bool Flatten(CameraPtr _camera, const ignition::math::Vector2i &_mousePos, const double _outsideRadius, const double _insideRadius, const double _weight = 0.1);
+    + ***Deprecation:*** public: bool Smooth(CameraPtr _camera, math::Vector2i _mousePos, double _outsideRadius, double _insideRadius, double _weight = 0.1);
+    + ***Replacement:*** public: bool Smooth(CameraPtr _camera, const ignition::math::Vector2i &_mousePos, const double _outsideRadius, const double _insideRadius, const double _weight = 0.1);
+    + ***Deprecation:*** public: bool Raise(CameraPtr _camera, math::Vector2i _mousePos,
+ double _outsideRadius, double _insideRadius, double _weight = 0.1)
+    + ***Replacement:*** public: bool Raise(CameraPtr _camera, const ignition::math::Vector2i &_mousePos, const double _outsideRadius, const double _insideRadius, const double _weight = 0.1)
+    + ***Deprecation:*** public: bool Lower(CameraPtr _camera, math::Vector2i _mousePos, double _outsideRadius, double _insideRadius, double _weight = 0.1)
+    + ***Replacement:*** public: bool Lower(CameraPtr _camera, const ignition::math::Vector2i &_mousePos, const double _outsideRadius, const double _insideRadius, const double _weight = 0.1)
+    + ***Deprecation:*** public: double GetAvgHeight(Ogre::Vector3 _pos, double _brushSize);
+    + ***Replacement:*** public: double AvgHeight(const ignition::math::Vector3d &_pos, const double _brushSize) const
+    + ***Deprecation:*** public: Ogre::TerrainGroup *GetOgreTerrain() const;
+    + ***Replacement:*** public: Ogre::TerrainGroup *OgreTerrain() const;
+    + ***Deprecation:*** public: common::Image GetImage() const;
+    + ***Replacement:*** public: public: common::Image Image() const;
+    + ***Deprecation:*** public: Ogre::TerrainGroup::RayResult GetMouseHit(CameraPtr _camera, math::Vector2i _mousePos);
+    + ***Replacement:*** public: Ogre::TerrainGroup::RayResult MouseHit(CameraPtr _camera, const ignition::math::Vector2i &_mousePos) const;
+    + ***Deprecation:*** public: unsigned int GetTerrainSubdivisionCount() const;
+    + ***Replacement:*** public: unsigned int TerrainSubdivisionCount() const;
 
 1. **gazebo/rendering/RenderEngine.hh**
     + ***Deprecation:*** public: unsigned int GetSceneCount() const;
@@ -323,6 +398,12 @@ release will remove the deprecated code.
 1. **gazebo/gui/KeyEventHandler.hh**
     + ***Deprecation:*** bool GetAutoRepeat() const
     + ***Replacement:*** bool AutoRepeat() const
+
+1. **gazebo/gui/MainWindow.hh**
+    + ***Deprecation:*** gui::RenderWidget *GetRenderWidget() const
+    + ***Replacement:*** gui::RenderWidget *RenderWidget() const
+    + ***Deprecation:*** gui::Editor *GetEditor(const std::string &_name) const
+    + ***Replacement:*** gui::Editor *Editor(const std::string &_name) const
 
 1. **gazebo/rendering/Camera.hh**
     + ***Deprecation:*** public: double GetRenderRate() const;

@@ -61,7 +61,7 @@ void ModelData_TEST::Clone()
   msgs::AddBoxLink(model, mass, size);
   link->Load(msgs::LinkToSDF(model.link(0)));
   rendering::VisualPtr linkVis(new rendering::Visual("model::box_link",
-      scene->GetWorldVisual()));
+      scene->WorldVisual()));
   link->linkVisual = linkVis;
 
   // add a visual
