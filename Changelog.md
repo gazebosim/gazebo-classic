@@ -25,6 +25,7 @@
     * [Pull request #2027](https://bitbucket.org/osrf/gazebo/pull-request/2027)
     * [Pull request #2026](https://bitbucket.org/osrf/gazebo/pull-request/2026)
     * [Pull request #2029](https://bitbucket.org/osrf/gazebo/pull-request/2029)
+    * [Pull request #2042](https://bitbucket.org/osrf/gazebo/pull-request/2042)
 
 1. Use more opaque pointers.
     * [Pull request #2025](https://bitbucket.org/osrf/gazebo/pull-request/2025)
