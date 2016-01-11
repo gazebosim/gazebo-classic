@@ -48,7 +48,7 @@ void ModelEditor_TEST::AddItemToPalette()
 
   // verify we have a model editor widget
   gui::ModelEditor *modelEditor =
-      dynamic_cast<gui::ModelEditor *>(mainWindow->GetEditor("model"));
+      dynamic_cast<gui::ModelEditor *>(mainWindow->Editor("model"));
   QVERIFY(modelEditor);
 
   // add a custom push button to the model editor palette
@@ -93,7 +93,7 @@ void ModelEditor_TEST::OnEdit()
 
   // verify we have a model editor widget
   gui::ModelEditor *modelEditor =
-      dynamic_cast<gui::ModelEditor *>(mainWindow->GetEditor("model"));
+      dynamic_cast<gui::ModelEditor *>(mainWindow->Editor("model"));
   QVERIFY(modelEditor);
 
   QVERIFY(gui::g_editModelAct != NULL);

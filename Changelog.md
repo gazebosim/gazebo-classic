@@ -13,6 +13,7 @@
     * [Pull request #2070](https://bitbucket.org/osrf/gazebo/pull-request/2070)
     * [Pull request #2071](https://bitbucket.org/osrf/gazebo/pull-request/2071)
     * [Pull request #2084](https://bitbucket.org/osrf/gazebo/pull-request/2084)
+    * [Pull request #2073](https://bitbucket.org/osrf/gazebo/pull-request/2073)
 
 1. Use opaque pointers for the Master class.
     * [Pull request #2036](https://bitbucket.org/osrf/gazebo/pull-request/2036)
@@ -27,6 +28,7 @@
     * [Pull request #2027](https://bitbucket.org/osrf/gazebo/pull-request/2027)
     * [Pull request #2026](https://bitbucket.org/osrf/gazebo/pull-request/2026)
     * [Pull request #2029](https://bitbucket.org/osrf/gazebo/pull-request/2029)
+    * [Pull request #2042](https://bitbucket.org/osrf/gazebo/pull-request/2042)
 
 1. Use more opaque pointers.
     * [Pull request #2025](https://bitbucket.org/osrf/gazebo/pull-request/2025)
