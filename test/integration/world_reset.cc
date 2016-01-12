@@ -212,19 +212,19 @@ void WorldResetTest::NestedModelPose(const std::string &_physicsEngine,
     simTime = world->GetSimTime().Double();
     EXPECT_NEAR(simTime, dt*steps, dt);
 
-  // verify all nested models have moved back to initial pose
-  models.clear();
-  models.push_back(model);
-  auto modelPosesCopy = modelPoses;
-  while (!models.empty())
-  {
-    physics::ModelPtr m = models.front();
-    EXPECT_EQ(m->GetWorldPose(), modelPosesCopy.front());
-    models.pop_front();
-    modelPosesCopy.pop_front();
-    for (const auto &nested : m->NestedModels())
-      models.push_back(nested);
-  }
+    // verify all nested models have moved back to initial pose
+    models.clear();
+    models.push_back(model);
+    auto modelPosesCopy = modelPoses;
+    while (!models.empty())
+    {
+      physics::ModelPtr m = models.front();
+      EXPECT_EQ(m->GetWorldPose(), modelPosesCopy.front());
+      models.pop_front();
+      modelPosesCopy.pop_front();
+      for (const auto &nested : m->NestedModels())
+        models.push_back(nested);
+    }
   }
 }
 

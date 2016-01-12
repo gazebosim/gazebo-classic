@@ -272,10 +272,10 @@ void FollowerPlugin::OnNewDepthFrame(const float *_image,
     if (this->dataPtr->depthBuffer != NULL)
       delete [] this->dataPtr->depthBuffer;
     this->dataPtr->depthBuffer = new float[depthBufferSize];
+    this->dataPtr->imageMsg.set_width(_width);
+    this->dataPtr->imageMsg.set_height(_height);
   }
 
-  this->dataPtr->imageMsg.set_width(_width);
-  this->dataPtr->imageMsg.set_height(_height);
   memcpy(this->dataPtr->depthBuffer, _image, depthBufferSize);
 }
 

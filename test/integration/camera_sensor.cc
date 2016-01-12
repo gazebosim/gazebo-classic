@@ -122,7 +122,7 @@ TEST_F(CameraSensor, WorldReset)
   EXPECT_LT(dt.Double(), 3.0);
 
   camSensor->GetCamera()->DisconnectNewImageFrame(c);
-  delete img;
+  delete [] img;
 }
 
 /////////////////////////////////////////////////
@@ -171,7 +171,7 @@ TEST_F(CameraSensor, CheckThrottle)
   EXPECT_GT(rate, 7.0);
   EXPECT_LT(rate, 11.0);
   camSensor->GetCamera()->DisconnectNewImageFrame(c);
-  delete img;
+  delete [] img;
 }
 
 /////////////////////////////////////////////////
@@ -286,7 +286,7 @@ TEST_F(CameraSensor, UnlimitedTest)
   camSensor->GetCamera()->DisconnectNewImageFrame(c);
   EXPECT_GT(rate, 30.0);
 
-  delete img;
+  delete [] img;
 }
 
 /////////////////////////////////////////////////
