@@ -100,7 +100,7 @@ void SchematicViewWidget_TEST::AddRemove()
   QCOMPARE(svWidget->GetEdgeCount(), 2u);
 
   // remove nested node and edge
-  svWidget->RemoveNode("nested::node_b");
+  svWidget->RemoveNode("model::nested::node_b");
   QCOMPARE(svWidget->GetNodeCount(), 4u);
   QCOMPARE(svWidget->GetEdgeCount(), 1u);
 
