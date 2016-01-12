@@ -62,7 +62,8 @@ Diagnostics::Diagnostics(QWidget *_parent)
   this->setWindowTitle("Gazebo: Diagnostics");
   this->setObjectName("diagnosticsPlot");
   this->setWindowFlags(Qt::Window | Qt::WindowTitleHint |
-      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
+      Qt::WindowCloseButtonHint | Qt::WindowStaysOnTopHint |
+      Qt::CustomizeWindowHint);
 
   this->dataPtr->plotLayout = new QVBoxLayout;
 
@@ -122,6 +123,11 @@ Diagnostics::Diagnostics(QWidget *_parent)
   this->dataPtr->node->Init();
   this->dataPtr->sub = this->dataPtr->node->Subscribe("~/diagnostics",
       &Diagnostics::OnMsg, this);
+
+  msgs::DiagnosticControl msg;
+  msg.set_enabled(true);
+  this->dataPtr->node->Publish<msgs::DiagnosticControl>(
+      "~/diagnostic/control", msg);
 
   QTimer *displayTimer = new QTimer(this);
   connect(displayTimer, SIGNAL(timeout()), this, SLOT(Update()));
@@ -204,6 +210,58 @@ void Diagnostics::OnMsg(ConstDiagnosticsPtr &_msg)
       }
     }
   }
+
+  // Process each variable
+  for (int i = 0; i < _msg->variable_size(); ++i)
+  {
+    QString qstr = QString::fromStdString(_msg->variable(i).name());
+
+    // Add the time label to the list if it's not already there.
+    QList<QListWidgetItem*> items = this->dataPtr->labelList->findItems(qstr,
+        Qt::MatchExactly);
+
+    if (items.size() == 0)
+    {
+      QListWidgetItem *item = new QListWidgetItem(qstr);
+      item->setToolTip(tr("Drag onto graph to plot"));
+      this->dataPtr->labelList->addItem(item);
+    }
+
+    // Check to see if the data belongs in a plot, and add it.
+    for (auto iter = this->dataPtr->plots.begin();
+        iter != this->dataPtr->plots.end(); ++iter)
+    {
+      if ((*iter)->HasCurve(qstr))
+      {
+        QPointF pt(wallTime.Double(), _msg->variable(i).value());
+        (*iter)->Add(qstr, pt);
+      }
+    }
+  }
+
+  // Process each marker
+  for (int i = 0; i < _msg->marker_size(); ++i)
+  {
+    QString qstr = QString::fromStdString(_msg->marker(i).name());
+
+    // Add the time label to the list if it's not already there.
+    QList<QListWidgetItem*> items = this->dataPtr->labelList->findItems(qstr,
+        Qt::MatchExactly);
+
+    if (items.size() == 0)
+    {
+      QListWidgetItem *item = new QListWidgetItem(qstr);
+      item->setToolTip(tr("Drag onto graph to plot"));
+      this->dataPtr->labelList->addItem(item);
+    }
+
+    // Add all marker to all plots
+    for (auto iter = this->dataPtr->plots.begin();
+        iter != this->dataPtr->plots.end(); ++iter)
+    {
+      (*iter)->AddVLine(qstr, wallTime.Double());
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -230,4 +288,15 @@ bool Diagnostics::eventFilter(QObject *o, QEvent *e)
   }
 
   return QWidget::eventFilter(o, e);
+}
+
+/////////////////////////////////////////////////
+void Diagnostics::closeEvent(QCloseEvent *_evt)
+{
+  msgs::DiagnosticControl msg;
+  msg.set_enabled(false);
+  this->dataPtr->node->Publish<msgs::DiagnosticControl>(
+      "~/diagnostic/control", msg);
+
+  QDialog::closeEvent(_evt);
 }
