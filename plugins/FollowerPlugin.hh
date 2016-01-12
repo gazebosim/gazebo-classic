@@ -19,13 +19,11 @@
 #define _GAZEBO_FOLLOWER_PLUGIN_HH_
 
 #include <memory>
-#include <mutex>
 #include <string>
 
 #include <sdf/sdf.hh>
 
 #include <gazebo/common/Plugin.hh>
-#include <gazebo/common/UpdateInfo.hh>
 #include <gazebo/msgs/msgs.hh>
 #include <gazebo/physics/PhysicsTypes.hh>
 

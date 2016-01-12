@@ -108,7 +108,11 @@ void FollowerPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   this->dataPtr->model = _model;
 
   // find depth camera sensor
-  this->FindSensor(this->dataPtr->model);
+  if (!this->FindSensor(this->dataPtr->model))
+  {
+    gzerr << "depth sensor not found!" << std::endl;
+    return;
+  }
 
   // diff drive params
   if (_sdf->HasElement("left_joint"))
