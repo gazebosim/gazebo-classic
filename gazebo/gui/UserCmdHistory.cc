@@ -39,11 +39,11 @@ UserCmdHistory::UserCmdHistory()
   this->dataPtr->active = true;
 
   // Action groups
-  this->dataPtr->undoActions = new QActionGroup(this);
-  this->dataPtr->undoActions->setExclusive(false);
+  this->undoActions = new QActionGroup(this);
+  this->undoActions->setExclusive(false);
 
-  this->dataPtr->redoActions = new QActionGroup(this);
-  this->dataPtr->redoActions->setExclusive(false);
+  this->redoActions = new QActionGroup(this);
+  this->redoActions->setExclusive(false);
 
   // Pub / sub
   this->dataPtr->node = transport::NodePtr(new transport::Node());
@@ -65,22 +65,20 @@ UserCmdHistory::UserCmdHistory()
   connect(g_redoHistoryAct, SIGNAL(triggered()), this,
       SLOT(OnRedoCmdHistory()));
 
-  connect(this->dataPtr->undoActions, SIGNAL(triggered(QAction *)), this,
+  connect(this->undoActions, SIGNAL(triggered(QAction *)), this,
       SLOT(OnUndoCommand(QAction *)));
-  connect(this->dataPtr->undoActions, SIGNAL(hovered(QAction *)), this,
+  connect(this->undoActions, SIGNAL(hovered(QAction *)), this,
       SLOT(OnUndoHovered(QAction *)));
 
-  connect(this->dataPtr->redoActions, SIGNAL(triggered(QAction *)), this,
+  connect(this->redoActions, SIGNAL(triggered(QAction *)), this,
       SLOT(OnRedoCommand(QAction *)));
-  connect(this->dataPtr->redoActions, SIGNAL(hovered(QAction *)), this,
+  connect(this->redoActions, SIGNAL(hovered(QAction *)), this,
       SLOT(OnRedoHovered(QAction *)));
 }
 
 /////////////////////////////////////////////////
 UserCmdHistory::~UserCmdHistory()
 {
-  delete this->dataPtr;
-  this->dataPtr = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -112,11 +110,9 @@ void UserCmdHistory::OnUndoCommand(QAction *_action)
 /////////////////////////////////////////////////
 void UserCmdHistory::OnUndoHovered(QAction *_action)
 {
-gzdbg << "OnUndoHovered" << std::endl;
   bool beforeThis = true;
-  for (auto action : this->dataPtr->undoActions->actions())
+  for (auto action : this->undoActions->actions())
   {
-gzdbg << "OnUndoHovered A" << std::endl;
     action->blockSignals(true);
     action->setChecked(beforeThis);
     action->blockSignals(false);
@@ -156,7 +152,7 @@ void UserCmdHistory::OnRedoCommand(QAction *_action)
 void UserCmdHistory::OnRedoHovered(QAction *_action)
 {
   bool beforeThis = true;
-  for (auto action : this->dataPtr->redoActions->actions())
+  for (auto action : this->redoActions->actions())
   {
     action->blockSignals(true);
     action->setChecked(beforeThis);
@@ -188,15 +184,13 @@ void UserCmdHistory::OnStatsSlot()
 /////////////////////////////////////////////////
 void UserCmdHistory::OnUndoCmdHistory()
 {
-gzdbg << "UserCmdHistory::OnUndoCmdHistory" << std::endl;
   if (!this->dataPtr->active)
     return;
-gzdbg << "UserCmdHistory::OnUndoCmdHistory    BAD" << std::endl;
 
   // Clear undo action group
-  for (auto action : this->dataPtr->undoActions->actions())
+  for (auto action : this->undoActions->actions())
   {
-    this->dataPtr->undoActions->removeAction(action);
+    this->undoActions->removeAction(action);
   }
 
   // Create new menu
@@ -208,7 +202,7 @@ gzdbg << "UserCmdHistory::OnUndoCmdHistory    BAD" << std::endl;
     action->setData(QVariant(cmd.id()));
     action->setCheckable(true);
     menu.addAction(action);
-    this->dataPtr->undoActions->addAction(action);
+    this->undoActions->addAction(action);
   }
 
   menu.exec(QCursor::pos());
@@ -221,9 +215,9 @@ void UserCmdHistory::OnRedoCmdHistory()
     return;
 
   // Clear redo action group
-  for (auto action : this->dataPtr->redoActions->actions())
+  for (auto action : this->redoActions->actions())
   {
-    this->dataPtr->redoActions->removeAction(action);
+    this->redoActions->removeAction(action);
   }
 
   // Create new menu
@@ -235,14 +229,14 @@ void UserCmdHistory::OnRedoCmdHistory()
     action->setData(QVariant(cmd.id()));
     action->setCheckable(true);
     menu.addAction(action);
-    this->dataPtr->redoActions->addAction(action);
+    this->redoActions->addAction(action);
   }
 
   menu.exec(QCursor::pos());
 }
 
 /////////////////////////////////////////////////
-void UserCmdHistory::SetActive(bool _active)
+void UserCmdHistory::SetActive(const bool _active)
 {
   this->dataPtr->active = _active;
 }

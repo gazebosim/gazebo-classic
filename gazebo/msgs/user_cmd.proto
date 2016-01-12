@@ -25,6 +25,7 @@ message UserCmd
 
     INSERTING = 4;
     DELETING = 5;
+    SCALING = 6;
   }
 
   /// \brief Unique id for user command.

@@ -2369,5 +2369,5 @@ void MainWindow::OnWindowMode(const std::string &_mode)
       "Insert");
 
   // User commands
-  this->userCmdHistory->SetActive(simulation);
+  this->dataPtr->userCmdHistory->SetActive(simulation);
 }

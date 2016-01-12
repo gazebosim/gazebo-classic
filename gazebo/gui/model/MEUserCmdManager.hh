@@ -15,9 +15,10 @@
  *
 */
 
-#ifndef _GAZEBO_MODEL_EDITOR_USER_COMMAND_HH_
-#define _GAZEBO_MODEL_EDITOR_USER_COMMAND_HH_
+#ifndef _GAZEBO_GUI_MODEL_MEUSERCMDHISTORY_HH_
+#define _GAZEBO_GUI_MODEL_MEUSERCMDHISTORY_HH_
 
+#include <memory>
 #include <string>
 
 #include "gazebo/util/system.hh"
@@ -73,7 +74,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Pointer to private data.
-      protected: MEUserCmdPrivate *dataPtr;
+      protected: std::unique_ptr<MEUserCmdPrivate> dataPtr;
     };
 
     /// \brief Class which manages user commands in the model editor.
@@ -128,7 +129,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Pointer to private data.
-      private: MEUserCmdManagerPrivate *dataPtr;
+      private: std::unique_ptr<MEUserCmdManagerPrivate> dataPtr;
     };
   }
 }

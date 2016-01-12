@@ -15,9 +15,10 @@
  *
 */
 
-#ifndef _GAZEBO_USER_COMMAND_WIDGET_HH_
-#define _GAZEBO_USER_COMMAND_WIDGET_HH_
+#ifndef _GAZEBO_GUI_USERCMDHISTORY_HH_
+#define _GAZEBO_GUI_USERCMDHISTORY_HH_
 
+#include <memory>
 #include <string>
 
 #include "gazebo/msgs/MessageTypes.hh"
@@ -42,7 +43,12 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~UserCmdHistory();
 
-      public: void SetActive(bool _active);
+      /// \brief Set whether the widget is active or not.
+      /// \param[in] _active True to make it active.
+      public: void SetActive(const bool _active);
+
+      /// \brief Set the widget to be active.
+      /// \return True if it is active.
       public: bool Active() const;
 
       /// \internal
@@ -90,9 +96,15 @@ namespace gazebo
       /// stored in the server.
       private: void OnUserCmdStatsMsg(ConstUserCmdStatsPtr &_msg);
 
+      /// \brief Group of actions in undo history menu.
+      protected: QActionGroup *undoActions;
+
+      /// \brief Group of actions in redo history menu.
+      protected: QActionGroup *redoActions;
+
       /// \internal
       /// \brief Pointer to private data.
-      private: UserCmdHistoryPrivate *dataPtr;
+      private: std::unique_ptr<UserCmdHistoryPrivate> dataPtr;
     };
   }
 }

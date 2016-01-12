@@ -50,12 +50,6 @@ namespace gazebo
       /// \brief Counter to give commands unique ids.
       public: unsigned int idCounter;
 
-      /// \brief Group of actions in undo history menu.
-      public: QActionGroup *undoActions;
-
-      /// \brief Group of actions in redo history menu.
-      public: QActionGroup *redoActions;
-
       /// \brief list of commands which can be undone.
       public: std::vector<MEUserCmd *> undoCmds;
 

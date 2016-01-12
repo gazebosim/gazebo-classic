@@ -274,6 +274,7 @@ void ModelCreator::OnEdit(bool _checked)
 
     this->DeselectAll();
   }
+  MEUserCmdManager::Instance()->SetActive(this->active);
 }
 
 /////////////////////////////////////////////////
@@ -1588,6 +1589,9 @@ void ModelCreator::RemoveEntity(const std::string &_entity)
 void ModelCreator::OnRemoveModelPlugin(const QString &_name)
 {
   this->RemoveModelPlugin(_name.toStdString());
+
+  MEUserCmdManager::Instance()->NewCmd(
+      "Added plugin: " + _name.toStdString(), msgs::UserCmd::INSERTING);
 }
 
 /////////////////////////////////////////////////
@@ -2586,11 +2590,19 @@ void ModelCreator::Update()
     {
       link->SetPose((link->linkVisual->GetWorldPose() - this->modelPose).Ign());
       this->ModelChanged();
+
+//      MEUserCmdManager::Instance()->NewCmd(
+//          "Move " + link->GetName(), msgs::UserCmd::MOVING);
     }
     for (auto &scaleIt : this->linkScaleUpdate)
     {
       if (link->linkVisual->GetName() == scaleIt.first)
+      {
         link->SetScale(scaleIt.second.Ign());
+
+//        MEUserCmdManager::Instance()->NewCmd(
+//            "Scale " + link->GetName(), msgs::UserCmd::SCALING);
+      }
     }
   }
   if (!this->linkScaleUpdate.empty())
@@ -2698,6 +2710,9 @@ void ModelCreator::OnAddModelPlugin(const std::string &_name,
   {
     this->AddModelPlugin(modelPluginSDF);
     this->ModelChanged();
+
+    MEUserCmdManager::Instance()->NewCmd(
+        "Added plugin: " + _name, msgs::UserCmd::INSERTING);
   }
   else
   {
