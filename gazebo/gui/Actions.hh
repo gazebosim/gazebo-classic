@@ -26,10 +26,18 @@ namespace gazebo
 {
   namespace gui
   {
+    /// \brief Action to start a new empty world.
     extern GZ_GUI_VISIBLE QAction *g_newAct;
+
+    /// \brief Action to open a world file.
     extern GZ_GUI_VISIBLE QAction *g_openAct;
+
+    /// \brief Action to save a file of the current world.
     extern GZ_GUI_VISIBLE QAction *g_saveAct;
+
+    /// \brief Action to save a file of the current world, specifying the name.
     extern GZ_GUI_VISIBLE QAction *g_saveAsAct;
+
     extern GZ_GUI_VISIBLE QAction *g_saveCfgAct;
     extern GZ_GUI_VISIBLE QAction *g_cloneAct;
     extern GZ_GUI_VISIBLE QAction *g_hotkeyChartAct;

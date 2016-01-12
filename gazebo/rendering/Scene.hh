@@ -721,6 +721,10 @@ namespace gazebo
       /// \param[in] _msg The message data.
       private: void OnJointMsg(ConstJointPtr &_msg);
 
+      /// \brief Callback to handle world modify messages.
+      /// \param[in] _msg World modify message.
+      private: void OnWorldModify(ConstWorldModifyPtr &_msg);
+
       /// \brief Sensor message callback.
       /// \param[in] _msg The message data.
       private: bool ProcessSensorMsg(ConstSensorPtr &_msg);

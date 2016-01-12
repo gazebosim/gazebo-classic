@@ -246,6 +246,9 @@ namespace gazebo
       /// \brief Subscribe to model info updates
       public: transport::SubscriberPtr modelInfoSub;
 
+      /// \brief Subscribe to world modify messages.
+      public: transport::SubscriberPtr worldModSub;
+
       /// \brief Respond to requests.
       public: transport::PublisherPtr responsePub;
 

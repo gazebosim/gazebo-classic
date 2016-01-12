@@ -175,6 +175,9 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
   this->dataPtr->requestSub = this->dataPtr->node->Subscribe("~/request",
       &Scene::OnRequest, this);
 
+  this->dataPtr->worldModSub = this->dataPtr->node->Subscribe(
+      "/gazebo/world/modify", &Scene::OnWorldModify, this);
+
   this->dataPtr->responseSub = this->dataPtr->node->Subscribe("~/response",
       &Scene::OnResponse, this, true);
   this->dataPtr->sceneSub =
@@ -2507,7 +2510,7 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
     // Check to see if the deleted entity is a light.
     if (lightIter != this->dataPtr->lights.end())
     {
-      this->dataPtr->lights.erase(lightIter);
+      this->RemoveLight(lightIter->second);
     }
     // Otherwise delete a visual
     else
@@ -3546,5 +3549,15 @@ void Scene::ToggleLayer(const int32_t _layer)
   for (auto visual : this->dataPtr->visuals)
   {
     visual.second->ToggleLayer(_layer);
+  }
+}
+
+/////////////////////////////////////////////////
+void Scene::OnWorldModify(ConstWorldModifyPtr &_msg)
+{
+  if (_msg->has_create() && _msg->create())
+  {
+    this->dataPtr->requestMsg = msgs::CreateRequest("scene_info");
+    this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
   }
 }

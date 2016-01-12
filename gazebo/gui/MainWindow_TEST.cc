@@ -721,6 +721,8 @@ void MainWindow_TEST::ActionCreationDestruction()
   mainWindow->Load();
   mainWindow->Init();
 
+  QVERIFY(gazebo::gui::g_newAct);
+
   QVERIFY(gazebo::gui::g_topicVisAct);
 
   QVERIFY(gazebo::gui::g_openAct);
@@ -837,6 +839,8 @@ void MainWindow_TEST::ActionCreationDestruction()
 
   mainWindow->close();
   delete mainWindow;
+
+  QVERIFY(!gazebo::gui::g_newAct);
 
   QVERIFY(!gazebo::gui::g_topicVisAct);
 

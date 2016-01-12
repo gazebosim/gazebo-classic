@@ -340,6 +340,7 @@ void MainWindow::Init()
   this->worldModSub = this->node->Subscribe("/gazebo/world/modify",
                                             &MainWindow::OnWorldModify, this);
 
+  // Request scene info
   this->requestMsg = msgs::CreateRequest("scene_info");
   this->requestPub->Publish(*this->requestMsg);
 
@@ -376,6 +377,7 @@ void MainWindow::closeEvent(QCloseEvent * /*_event*/)
 /////////////////////////////////////////////////
 void MainWindow::New()
 {
+  // TODO: Ask if want to save?
   msgs::ServerControl msg;
   msg.set_new_world(true);
   this->serverControlPub->Publish(msg);
@@ -412,6 +414,8 @@ void MainWindow::SelectTopic()
 /////////////////////////////////////////////////
 void MainWindow::Open()
 {
+  // TODO: Ask if want to save?
+
   // Note that file dialog static functions seem to be broken (issue #1514)
   std::string filename = QFileDialog::getOpenFileName(this,
       tr("Open World"), "",
@@ -1039,11 +1043,10 @@ void MainWindow::OnDataLoggerClosed()
 /////////////////////////////////////////////////
 void MainWindow::CreateActions()
 {
-  /*g_newAct = new QAction(tr("&New World"), this);
+  g_newAct = new QAction(tr("&New World"), this);
   g_newAct->setShortcut(tr("Ctrl+N"));
   g_newAct->setStatusTip(tr("Create a new world"));
   connect(g_newAct, SIGNAL(triggered()), this, SLOT(New()));
-  */
 
   g_topicVisAct = new QAction(tr("Topic Visualization"), this);
   g_topicVisAct->setShortcut(tr("Ctrl+T"));
@@ -1595,6 +1598,9 @@ void MainWindow::ShowMenuBar(QMenuBar *_bar)
 /////////////////////////////////////////////////
 void MainWindow::DeleteActions()
 {
+  delete g_newAct;
+  g_newAct = 0;
+
   delete g_topicVisAct;
   g_topicVisAct = 0;
 
@@ -1775,8 +1781,8 @@ void MainWindow::CreateMenuBar()
   QMenuBar *bar = QMainWindow::menuBar();
 
   QMenu *fileMenu = bar->addMenu(tr("&File"));
-  // fileMenu->addAction(g_openAct);
-  // fileMenu->addAction(g_newAct);
+  fileMenu->addAction(g_newAct);
+  fileMenu->addAction(g_openAct);
   fileMenu->addAction(g_saveAct);
   fileMenu->addAction(g_saveAsAct);
   fileMenu->addSeparator();
@@ -2104,7 +2110,7 @@ void MainWindow::OnWorldModify(ConstWorldModifyPtr &_msg)
 {
   if (_msg->has_create() && _msg->create())
   {
-    this->renderWidget->CreateScene(_msg->world_name());
+    // this->renderWidget->CreateScene(_msg->world_name());
     this->requestMsg = msgs::CreateRequest("scene_info");
     this->requestPub->Publish(*this->requestMsg);
   }
