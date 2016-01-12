@@ -15,10 +15,12 @@
  *
 */
 
-#include "gazebo/math/Angle.hh"
+#include <ignition/math/Angle.hh>
+
 #include "gazebo/gui/building/BuildingMaker.hh"
 #include "gazebo/gui/building/GrabberHandle.hh"
 #include "gazebo/gui/building/SegmentItem.hh"
+#include "gazebo/gui/building/SegmentItemPrivate.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -28,32 +30,31 @@ const double SegmentItem::SnapLength = 0.25;
 
 /////////////////////////////////////////////////
 SegmentItem::SegmentItem(QGraphicsItem *_parent)
-    : EditorItem(), QGraphicsLineItem(_parent), start(0, 0),
-      end(0, 0)
+  : EditorItem(), QGraphicsLineItem(_parent), dataPtr(new SegmentItemPrivate())
 {
-  this->editorType = "Segment";
-  this->itemScale = BuildingMaker::conversionScale;
-
   if (_parent)
     this->setParentItem(_parent);
+
+  this->editorType = "Segment";
+  this->itemScale = BuildingMaker::conversionScale;
 
   this->setFlag(QGraphicsItem::ItemIsSelectable, true);
   this->setAcceptHoverEvents(true);
   this->setZValue(0);
 
   GrabberHandle *grabber = new GrabberHandle(this, 0);
-  this->grabberWidth = grabber->boundingRect().width();
-  this->grabberHeight = grabber->boundingRect().height();
+  this->dataPtr->grabberWidth = grabber->boundingRect().width();
+  this->dataPtr->grabberHeight = grabber->boundingRect().height();
   this->grabbers.push_back(grabber);
   grabber->setPos(
-      this->start.x() - this->grabberWidth/2.0,
-      this->start.y() - this->grabberHeight/2.0);
+      this->dataPtr->start.x() - this->dataPtr->grabberWidth/2.0,
+      this->dataPtr->start.y() - this->dataPtr->grabberHeight/2.0);
 
   grabber = new GrabberHandle(this, 1);
   this->grabbers.push_back(grabber);
   grabber->setPos(
-      this->end.x() - grabber->boundingRect().width()/2.0,
-      this->end.y() - grabber->boundingRect().height()/2.0);
+      this->dataPtr->end.x() - grabber->boundingRect().width()/2.0,
+      this->dataPtr->end.y() - grabber->boundingRect().height()/2.0);
 }
 
 /////////////////////////////////////////////////
@@ -64,17 +65,18 @@ SegmentItem::~SegmentItem()
 /////////////////////////////////////////////////
 void SegmentItem::SetLine(const QPointF &_start, const QPointF &_end)
 {
-  this->start = _start;
+  this->dataPtr->start = _start;
   this->grabbers[0]->setPos(
-      this->start.x() - this->grabberWidth/2.0,
-      this->start.y() - this->grabberHeight/2.0);
+      this->dataPtr->start.x() - this->dataPtr->grabberWidth/2.0,
+      this->dataPtr->start.y() - this->dataPtr->grabberHeight/2.0);
 
-  this->end = _end;
+  this->dataPtr->end = _end;
   this->grabbers[1]->setPos(
-      this->end.x() - this->grabberWidth/2.0,
-      this->end.y() - this->grabberHeight/2.0);
+      this->dataPtr->end.x() - this->dataPtr->grabberWidth/2.0,
+      this->dataPtr->end.y() - this->dataPtr->grabberHeight/2.0);
 
-  this->setLine(this->start.x(), this->start.y(), this->end.x(), this->end.y());
+  this->setLine(this->dataPtr->start.x(), this->dataPtr->start.y(),
+      this->dataPtr->end.x(), this->dataPtr->end.y());
 
   this->SegmentChanged();
 }
@@ -82,12 +84,13 @@ void SegmentItem::SetLine(const QPointF &_start, const QPointF &_end)
 /////////////////////////////////////////////////
 void SegmentItem::SetStartPoint(const QPointF &_start)
 {
-  this->start = _start;
+  this->dataPtr->start = _start;
   this->grabbers[0]->setPos(
-      this->start.x() - this->grabberWidth/2.0,
-      this->start.y() - this->grabberHeight/2.0);
+      this->dataPtr->start.x() - this->dataPtr->grabberWidth/2.0,
+      this->dataPtr->start.y() - this->dataPtr->grabberHeight/2.0);
 
-  this->setLine(this->start.x(), this->start.y(), this->end.x(), this->end.y());
+  this->setLine(this->dataPtr->start.x(), this->dataPtr->start.y(),
+      this->dataPtr->end.x(), this->dataPtr->end.y());
 
   this->SegmentChanged();
 }
@@ -95,18 +98,19 @@ void SegmentItem::SetStartPoint(const QPointF &_start)
 /////////////////////////////////////////////////
 QPointF SegmentItem::GetStartPoint() const
 {
-  return this->start;
+  return this->dataPtr->start;
 }
 
 /////////////////////////////////////////////////
 void SegmentItem::SetEndPoint(const QPointF &_end)
 {
-  this->end = _end;
+  this->dataPtr->end = _end;
   this->grabbers[1]->setPos(
-      this->end.x() - this->grabberWidth/2.0,
-      this->end.y() - this->grabberHeight/2.0);
+      this->dataPtr->end.x() - this->dataPtr->grabberWidth/2.0,
+      this->dataPtr->end.y() - this->dataPtr->grabberHeight/2.0);
 
-  this->setLine(this->start.x(), this->start.y(), this->end.x(), this->end.y());
+  this->setLine(this->dataPtr->start.x(), this->dataPtr->start.y(),
+      this->dataPtr->end.x(), this->dataPtr->end.y());
 
   this->SegmentChanged();
 }
@@ -114,13 +118,13 @@ void SegmentItem::SetEndPoint(const QPointF &_end)
 /////////////////////////////////////////////////
 QPointF SegmentItem::GetEndPoint() const
 {
-  return this->end;
+  return this->dataPtr->end;
 }
 
 /////////////////////////////////////////////////
 void SegmentItem::SetThickness(double _thickness)
 {
-  this->thickness = _thickness;
+  this->dataPtr->thickness = _thickness;
 
   QPen segPen = this->pen();
   segPen.setWidth(_thickness);
@@ -130,7 +134,7 @@ void SegmentItem::SetThickness(double _thickness)
 /////////////////////////////////////////////////
 double SegmentItem::GetThickness() const
 {
-  return this->thickness;
+  return this->dataPtr->thickness;
 }
 
 /////////////////////////////////////////////////
@@ -156,8 +160,10 @@ void SegmentItem::SetColor(QColor _color)
 /////////////////////////////////////////////////
 void SegmentItem::ShowHandles(bool _show)
 {
-  this->grabbers[0]->setVisible(_show && this->grabbers[0]->isEnabled());
-  this->grabbers[1]->setVisible(_show && this->grabbers[1]->isEnabled());
+  this->grabbers[0]->setVisible(_show &&
+      this->grabbers[0]->isEnabled());
+  this->grabbers[1]->setVisible(_show &&
+      this->grabbers[1]->isEnabled());
 }
 
 /////////////////////////////////////////////////
@@ -166,8 +172,8 @@ void SegmentItem::SegmentChanged()
   emit WidthChanged(this->line().length() + this->pen().width());
   emit DepthChanged(this->pen().width());
 
-  QPointF centerPos = this->mapToScene(this->start
-      + (this->end - this->start)/2.0);
+  QPointF centerPos = this->mapToScene(this->dataPtr->start
+      + (this->dataPtr->end - this->dataPtr->start)/2.0);
   emit PosXChanged(centerPos.x());
   emit PosYChanged(centerPos.y());
   emit RotationChanged(0, 0, -this->line().angle());
@@ -185,8 +191,8 @@ QVector3D SegmentItem::GetSize() const
 /////////////////////////////////////////////////
 QVector3D SegmentItem::GetScenePosition() const
 {
-  QPointF centerPos = this->mapToScene(this->start
-      + (this->end - this->start)/2.0);
+  QPointF centerPos = this->mapToScene(this->dataPtr->start
+      + (this->dataPtr->end - this->dataPtr->start)/2.0);
   return QVector3D(centerPos.x(), centerPos.y(), 0);
 }
 
@@ -278,8 +284,8 @@ bool SegmentItem::GrabberEventFilter(GrabberHandle *_grabber, QEvent *_event)
     {
       // Snap to angular increments
       QLineF newLine(p1, p2);
-      double angle = GZ_DTOR(QLineF(p1, p2).angle());
-      double range = GZ_DTOR(SegmentItem::SnapAngle);
+      double angle = IGN_DTOR(QLineF(p1, p2).angle());
+      double range = IGN_DTOR(SegmentItem::SnapAngle);
       int angleIncrement = angle / range;
 
       if ((angle - range*angleIncrement) > range/2)
@@ -331,6 +337,7 @@ void SegmentItem::hoverEnterEvent(QGraphicsSceneHoverEvent *_event)
     _event->ignore();
     return;
   }
+
   this->grabbers[0]->installSceneEventFilter(this);
   this->grabbers[1]->installSceneEventFilter(this);
   QApplication::setOverrideCursor(QCursor(Qt::SizeAllCursor));
@@ -344,6 +351,7 @@ void SegmentItem::hoverMoveEvent(QGraphicsSceneHoverEvent *_event)
     _event->ignore();
     return;
   }
+
   this->grabbers[0]->installSceneEventFilter(this);
   this->grabbers[1]->installSceneEventFilter(this);
   QApplication::setOverrideCursor(QCursor(Qt::SizeAllCursor));
@@ -357,6 +365,7 @@ void SegmentItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *_event)
     _event->ignore();
     return;
   }
+
   this->grabbers[0]->removeSceneEventFilter(this);
   this->grabbers[1]->removeSceneEventFilter(this);
   QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
@@ -366,15 +375,17 @@ void SegmentItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *_event)
 void SegmentItem::mouseMoveEvent(QGraphicsSceneMouseEvent *_event)
 {
   QPointF scenePosition =  _event->scenePos();
-  QPointF trans = scenePosition - this->segmentMouseMove;
+  QPointF trans = scenePosition - this->dataPtr->segmentMouseMove;
 
-  this->SetStartPoint(this->start + trans);
-  this->SetEndPoint(this->end + trans);
+  this->SetStartPoint(this->dataPtr->start + trans);
+  this->SetEndPoint(this->dataPtr->end + trans);
 
-  this->UpdateLinkedGrabbers(this->grabbers[0], this->start + trans);
-  this->UpdateLinkedGrabbers(this->grabbers[1], this->end + trans);
+  this->UpdateLinkedGrabbers(this->grabbers[0],
+      this->dataPtr->start + trans);
+  this->UpdateLinkedGrabbers(this->grabbers[1],
+      this->dataPtr->end + trans);
 
-  this->segmentMouseMove = scenePosition;
+  this->dataPtr->segmentMouseMove = scenePosition;
 
   this->update();
   _event->setAccepted(true);
@@ -384,7 +395,7 @@ void SegmentItem::mouseMoveEvent(QGraphicsSceneMouseEvent *_event)
 void SegmentItem::mousePressEvent(QGraphicsSceneMouseEvent *_event)
 {
   QPointF scenePosition =  _event->scenePos();
-  this->segmentMouseMove = scenePosition;
+  this->dataPtr->segmentMouseMove = scenePosition;
 
   _event->setAccepted(true);
 }
@@ -404,4 +415,10 @@ void SegmentItem::paint(QPainter *_painter,
   _painter->setPen(this->pen());
   _painter->drawLine(this->line());
   _painter->restore();
+}
+
+///////////////////////////////////////////////////
+std::vector<GrabberHandle *> SegmentItem::Grabbers() const
+{
+  return this->grabbers;
 }

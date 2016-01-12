@@ -881,6 +881,38 @@ common::SphericalCoordinatesPtr World::GetSphericalCoordinates() const
 }
 
 //////////////////////////////////////////////////
+ignition::math::Vector3d World::Gravity() const
+{
+  return this->dataPtr->sdf->Get<ignition::math::Vector3d>("gravity");
+}
+
+//////////////////////////////////////////////////
+void World::SetGravity(const ignition::math::Vector3d &_gravity)
+{
+  // This function calls `PhysicsEngine::SetGravity`,
+  // which in turn should call `World::SetGravitySDF`.
+  this->dataPtr->physicsEngine->SetGravity(_gravity);
+}
+
+//////////////////////////////////////////////////
+void World::SetGravitySDF(const ignition::math::Vector3d &_gravity)
+{
+  this->dataPtr->sdf->GetElement("gravity")->Set(_gravity);
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d World::MagneticField() const
+{
+  return this->dataPtr->sdf->Get<ignition::math::Vector3d>("magnetic_field");
+}
+
+//////////////////////////////////////////////////
+void World::SetMagneticField(const ignition::math::Vector3d &_mag)
+{
+  this->dataPtr->sdf->GetElement("magnetic_field")->Set(_mag);
+}
+
+//////////////////////////////////////////////////
 BasePtr World::GetByName(const std::string &_name)
 {
   if (this->dataPtr->rootElement)

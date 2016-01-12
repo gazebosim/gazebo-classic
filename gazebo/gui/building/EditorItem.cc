@@ -16,12 +16,13 @@
 */
 
 #include "gazebo/gui/building/EditorItem.hh"
+#include "gazebo/gui/building/EditorItemPrivate.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-EditorItem::EditorItem()
+EditorItem::EditorItem() : dataPtr(new EditorItemPrivate)
 {
   this->editorType = "base";
   this->name = "";
@@ -145,4 +146,16 @@ void EditorItem::SetLevelBaseHeight(double _height)
 /////////////////////////////////////////////////
 void EditorItem::SetHighlighted(bool /*_highlighted*/)
 {
+}
+
+/////////////////////////////////////////////////
+int EditorItem::ZValueIdle() const
+{
+  return this->zValueIdle;
+}
+
+/////////////////////////////////////////////////
+int EditorItem::ZValueSelected() const
+{
+  return this->zValueSelected;
 }
