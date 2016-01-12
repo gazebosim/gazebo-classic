@@ -377,10 +377,29 @@ void MainWindow::closeEvent(QCloseEvent * /*_event*/)
 /////////////////////////////////////////////////
 void MainWindow::New()
 {
-  // TODO: Ask if want to save?
-  msgs::ServerControl msg;
-  msg.set_new_world(true);
-  this->serverControlPub->Publish(msg);
+  QMessageBox msgBox(QMessageBox::Warning, QString("New World"), "");
+
+  auto cancelButton = msgBox.addButton("Cancel", QMessageBox::RejectRole);
+  auto dontSaveButton = msgBox.addButton("Don't Save",
+      QMessageBox::DestructiveRole);
+  auto saveButton = msgBox.addButton("Save", QMessageBox::AcceptRole);
+  msgBox.setEscapeButton(cancelButton);
+  msgBox.setDefaultButton(saveButton);
+
+  msgBox.setText("Are you sure you want to close this world and open an empty "
+      "world? All your changes will be lost.\n\n");
+
+  msgBox.exec();
+  if (msgBox.clickedButton() == cancelButton)
+    return;
+  else if (msgBox.clickedButton() == saveButton)
+    this->SaveAs();
+  else if (msgBox.clickedButton() == dontSaveButton)
+  {
+    msgs::ServerControl msg;
+    msg.set_new_world(true);
+    this->serverControlPub->Publish(msg);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -414,18 +433,42 @@ void MainWindow::SelectTopic()
 /////////////////////////////////////////////////
 void MainWindow::Open()
 {
-  // TODO: Ask if want to save?
+  QMessageBox msgBox(QMessageBox::Warning, QString("Open World"), "");
 
-  // Note that file dialog static functions seem to be broken (issue #1514)
-  std::string filename = QFileDialog::getOpenFileName(this,
-      tr("Open World"), "",
-      tr("SDF Files (*.xml *.sdf *.world)")).toStdString();
+  auto cancelButton = msgBox.addButton("Cancel", QMessageBox::RejectRole);
+  auto dontSaveButton = msgBox.addButton("Don't Save",
+      QMessageBox::DestructiveRole);
+  auto saveButton = msgBox.addButton("Save", QMessageBox::AcceptRole);
+  msgBox.setEscapeButton(cancelButton);
+  msgBox.setDefaultButton(saveButton);
 
-  if (!filename.empty())
+  msgBox.setText("Are you sure you want to close this world? "
+      "All your changes will be lost.\n\n");
+
+  msgBox.exec();
+  if (msgBox.clickedButton() == cancelButton)
+    return;
+  else if (msgBox.clickedButton() == saveButton)
+    this->SaveAs();
+  else if (msgBox.clickedButton() == dontSaveButton)
   {
-    msgs::ServerControl msg;
-    msg.set_open_filename(filename);
-    this->serverControlPub->Publish(msg);
+    QFileDialog fileDialog(this, tr("Open World"), QDir::homePath(),
+        tr("SDF Files (*.world)"));
+    fileDialog.setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
+        Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
+
+    if (fileDialog.exec() == QDialog::Accepted)
+    {
+      QStringList selected = fileDialog.selectedFiles();
+      if (selected.empty())
+        return;
+
+      std::string filename = selected[0].toStdString();
+
+      msgs::ServerControl msg;
+      msg.set_open_filename(filename);
+      this->serverControlPub->Publish(msg);
+    }
   }
 }
 

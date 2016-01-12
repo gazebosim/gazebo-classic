@@ -770,10 +770,12 @@ namespace gazebo
 
       /// \brief Process a light factory message.
       /// \param[in] _msg The message data.
+      /// \return False if a light already exists with that name.
       private: bool ProcessLightFactoryMsg(ConstLightPtr &_msg);
 
       /// \brief Process a light modify message.
       /// \param[in] _msg The message data.
+      /// \return False if the light doesn't exist.
       private: bool ProcessLightModifyMsg(ConstLightPtr &_msg);
 
       /// \brief Process a request message.
