@@ -69,7 +69,7 @@ TEST_F(CameraSensor, WorldReset)
     return;
   }
 
-  // spawn sensors of various sizes to test speed
+  // spawn camera sensor
   std::string modelName = "camera_model";
   std::string cameraName = "camera_sensor";
   unsigned int width  = 320;
