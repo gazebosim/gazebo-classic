@@ -73,7 +73,6 @@ class CurveData: public QwtArraySeriesData<QPointF>
   public: inline void Add(const QPointF &_point)
           {
             this->d_samples += _point;
-//            if (this->d_samples.size() > 6000)
             if (this->d_samples.size() > 11000)
               this->d_samples.remove(0, 1000);
           }
@@ -248,9 +247,6 @@ void IncrementalPlot::AdjustCurve(QwtPlotCurve *_curve)
 
   this->setAxisScale(this->xBottom,
       std::max(0.0, static_cast<double>(lastPoint.x() - this->period)),
-//      std::max(0.0, static_cast<double>(lastPoint.x() -
-//          5.0 * this->magnifier->wheelFactor())),
-
       std::max(1.0, static_cast<double>(lastPoint.x())));
 
   // this->setAxisScale(_curve->yAxis(), 0.0, _curve->maxYValue() * 2.0);
