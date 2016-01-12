@@ -1,5 +1,9 @@
 ## Gazebo 7.0
 
+1. Fix circular dependency so that physics does not call the sensors API.
+    * [Pull request #2089](https://bitbucket.org/osrf/gazebo/pull-request/2089)
+    * [Issue #1516](https://bitbucket.org/osrf/gazebo/issues/1516)
+
 1. Add Gravity and MagneticField API to World class to match sdformat change.
     * [SDFormat pull request 247](https://bitbucket.org/osrf/sdformat/pull-requests/247)
     * [Issue #1823](https://bitbucket.org/osrf/gazebo/issues/1823)
