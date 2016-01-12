@@ -1,5 +1,10 @@
 ## Gazebo 7.0
 
+1. Add Gravity and MagneticField API to World class to match sdformat change.
+    * [SDFormat pull request 247](https://bitbucket.org/osrf/sdformat/pull-requests/247)
+    * [Issue #1823](https://bitbucket.org/osrf/gazebo/issues/1823)
+    * [Pull request #2090](https://bitbucket.org/osrf/gazebo/pull-request/2090)
+
 1. Use opaque pointers and deprecate functions in the rendering library
     * [Pull request #2069](https://bitbucket.org/osrf/gazebo/pull-request/2069)
     * [Pull request #2064](https://bitbucket.org/osrf/gazebo/pull-request/2064)
@@ -308,6 +313,7 @@ using the same arguments used in the command line.
         * [Pull request #2032](https://bitbucket.org/osrf/gazebo/pull-request/2032)
         * [Pull request #2082](https://bitbucket.org/osrf/gazebo/pull-request/2082)
         * [Pull request #2038](https://bitbucket.org/osrf/gazebo/pull-request/2038)
+        * [Pull request #2033](https://bitbucket.org/osrf/gazebo/pull-request/2033)
 
     1. Use opaque pointers for GrabberHandle, add *LinkedGrabbers functions
         * [Pull request #2034](https://bitbucket.org/osrf/gazebo/pull-request/2034)
