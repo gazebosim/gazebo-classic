@@ -175,6 +175,7 @@ void FollowerPlugin::Init()
 /////////////////////////////////////////////////
 void FollowerPlugin::Reset()
 {
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
   this->dataPtr->imageMsg.Clear();
 }
 
