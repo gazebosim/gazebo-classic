@@ -144,7 +144,7 @@ namespace gazebo
 
       /// \brief Signal emitted when density has changed.
       /// \param[in] _value Density value.
-      Q_SIGNALS: void DensityValueChanged(const double &_value);
+      Q_SIGNALS: void DensityValueChanged(const double _value);
 
       /// \brief A combo box for selecting a material density.
       public: QComboBox *comboBox;
@@ -982,11 +982,11 @@ namespace gazebo
 
       /// \brief Signal emitted when density value changes.
       /// \param[in] _value Density value.
-      Q_SIGNALS: void DensityValueChanged(const double &_value);
+      Q_SIGNALS: void DensityValueChanged(const double _value);
 
       /// \brief Signal emitted when mass value changes.
       /// \param[in] _value Mass value.
-      Q_SIGNALS: void MassValueChanged(const double &_value);
+      Q_SIGNALS: void MassValueChanged(const double _value);
 
       /// \brief Callback when density value changes in child widget.
       /// \param[in] _value Density value.

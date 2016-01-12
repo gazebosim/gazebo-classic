@@ -94,11 +94,11 @@ namespace gazebo
 
       /// \brief Signal emitted when density changes.
       /// \param[in] _value The new density.
-      Q_SIGNALS: void DensityValueChanged(const double &_value);
+      Q_SIGNALS: void DensityValueChanged(const double _value);
 
       /// \brief Signal emitted when mass changes.
       /// \param[in] _value The new mass.
-      Q_SIGNALS: void MassValueChanged(const double &_value);
+      Q_SIGNALS: void MassValueChanged(const double _value);
 
       /// \brief Callback for density changes in config widget.
       /// \param[in] _value The new density value.
