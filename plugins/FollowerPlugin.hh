@@ -24,7 +24,6 @@
 #include <sdf/sdf.hh>
 
 #include <gazebo/common/Plugin.hh>
-#include <gazebo/msgs/msgs.hh>
 #include <gazebo/physics/PhysicsTypes.hh>
 
 namespace gazebo
