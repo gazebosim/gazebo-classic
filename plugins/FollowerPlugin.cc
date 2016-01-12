@@ -157,6 +157,12 @@ void FollowerPlugin::Init()
 }
 
 /////////////////////////////////////////////////
+void FollowerPlugin::Reset()
+{
+  this->dataPtr->imageMsg.Clear();
+}
+
+/////////////////////////////////////////////////
 void FollowerPlugin::FindJoints()
 {
   // assumes the first two revolute joints are the ones connecting the
@@ -250,6 +256,12 @@ void FollowerPlugin::OnNewDepthFrame(const float *_image,
 /////////////////////////////////////////////////
 void FollowerPlugin::UpdateFollower()
 {
+  if (this->dataPtr->imageMsg.width() == 0u ||
+      this->dataPtr->imageMsg.height() == 0u)
+  {
+    return;
+  }
+
   double minRange = 0.1;
   double maxRange = 5;
 

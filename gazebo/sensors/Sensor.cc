@@ -173,8 +173,17 @@ bool Sensor::NeedsUpdate()
   else
     simTime = this->world->GetSimTime();
 
+  // case when last update occurred in the future probably due to
+  // world reset
   if (simTime <= this->lastMeasurementTime)
+  {
+    // Rendering sensors also set the lastMeasurementTime variable in Render()
+    // and lastUpdateTime in Sensor::Update based on Scene::SimTime() which
+    // could be outdated when the world is reset. In this case reset
+    // the variables back to 0.
+    this->ResetLastUpdateTime();
     return false;
+  }
 
   return (simTime - this->lastMeasurementTime +
       this->updateDelay) >= this->updatePeriod;
@@ -442,6 +451,8 @@ void Sensor::ResetLastUpdateTime()
 {
   boost::mutex::scoped_lock lock(this->mutexLastUpdateTime);
   this->lastUpdateTime = 0.0;
+  this->lastMeasurementTime = 0.0;
+  this->updateDelay = 0.0;
 }
 
 //////////////////////////////////////////////////

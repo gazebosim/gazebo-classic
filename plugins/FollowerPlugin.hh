@@ -52,6 +52,9 @@ namespace gazebo
     // Documentation Inherited.
     public: virtual void Init();
 
+    // Documentation Unherited.
+    public: virtual void Reset();
+
     /// \brief Callback when a new depth camera frame is received.
     /// \param[in] _image Depth image data buffer
     /// \param[in] _width Image width
