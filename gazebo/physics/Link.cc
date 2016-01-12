@@ -289,9 +289,9 @@ void Link::Fini()
   this->batteries.clear();
 
   // Remove all the sensors attached to the link
-  for (auto const &iter : this->sensors)
+  for (auto const &sensor : this->sensors)
   {
-    event::Events::removeSensor(iter);
+    event::Events::removeSensor(sensor);
   }
 
   this->sensors.clear();
