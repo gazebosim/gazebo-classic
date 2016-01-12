@@ -74,6 +74,9 @@ namespace gazebo
 
     /// \brief Pointer to the depth camera
     public: rendering::DepthCameraPtr depthCamera;
+
+    /// \brief Depth image data buffer
+    public: float *depthBuffer = NULL;
   };
 }
 
@@ -98,6 +101,8 @@ FollowerPlugin::~FollowerPlugin()
         this->dataPtr->newDepthFrameConnection);
   }
   event::Events::DisconnectWorldUpdateBegin(this->dataPtr->updateConnection);
+  if (this->dataPtr->depthBuffer != NULL)
+    delete [] this->dataPtr->depthBuffer;
 }
 
 /////////////////////////////////////////////////
@@ -105,6 +110,13 @@ void FollowerPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 {
   GZ_ASSERT(_model, "FollowerPlugin _model pointer is NULL");
   GZ_ASSERT(_sdf, "FollowerPlugin _sdf pointer is NULL");
+
+  if (_model == NULL || _sdf == NULL)
+  {
+    gzerr << "Failed to load FollowerPlugin. NULL model or sdf" << std::endl;
+    return;
+  }
+
   this->dataPtr->model = _model;
 
   // find depth camera sensor
@@ -251,10 +263,20 @@ void FollowerPlugin::OnNewDepthFrame(const float *_image,
     const unsigned int /*_depth*/, const std::string &/*_format*/)
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+
+  float f;
+  unsigned int depthBufferSize = _width*_height*sizeof(f);
+  if (_width != this->dataPtr->imageMsg.width() ||
+      _height != this->dataPtr->imageMsg.height())
+  {
+    if (this->dataPtr->depthBuffer != NULL)
+      delete [] this->dataPtr->depthBuffer;
+    this->dataPtr->depthBuffer = new float[depthBufferSize];
+  }
+
   this->dataPtr->imageMsg.set_width(_width);
   this->dataPtr->imageMsg.set_height(_height);
-  float f;
-  this->dataPtr->imageMsg.set_data(_image, _width*_height*sizeof(f));
+  memcpy(this->dataPtr->depthBuffer, _image, depthBufferSize);
 }
 
 /////////////////////////////////////////////////
@@ -271,19 +293,12 @@ void FollowerPlugin::UpdateFollower()
 
   // Find closest point.
   int mid = this->dataPtr->imageMsg.height() * 0.5;
-  unsigned int depthSamples =
-      this->dataPtr->imageMsg.width() * this->dataPtr->imageMsg.height();
-  float f;
-  // cppchecker recommends using sizeof(varname)
-  unsigned int depthBufferSize = depthSamples * sizeof(f);
-  float *depthBuffer = new float[depthSamples];
-  memcpy(depthBuffer, this->dataPtr->imageMsg.data().c_str(), depthBufferSize);
-
   float minDepth = maxRange + 1;
   int idx = -1;
   for (unsigned int i = 0; i < this->dataPtr->imageMsg.width(); ++i)
   {
-    float d = depthBuffer[mid * this->dataPtr->imageMsg.width() + i];
+    float d =
+        this->dataPtr->depthBuffer[mid * this->dataPtr->imageMsg.width() + i];
     if (d > minRange && d < maxRange && d < minDepth)
     {
       // Update minimum depth.
@@ -292,7 +307,6 @@ void FollowerPlugin::UpdateFollower()
       idx = i;
     }
   }
-  delete [] depthBuffer;
 
   // brake if too close
   if (idx < 0 || minDepth < 0.4)
