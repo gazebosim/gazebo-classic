@@ -63,7 +63,7 @@ set (gtest_sources
   Vector3Stats_TEST.cc
   Vector4_TEST.cc
 )
-set (TEST_LIBRARIES
+set (GZ_BUILD_TESTS_EXTRA_LIBS
   gazebo_math
 )
 gz_build_tests(${gtest_sources})

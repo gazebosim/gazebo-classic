@@ -22,7 +22,7 @@ if (UNIX AND NOT APPLE)
   set(tests
     RAMLibrary_TEST.cc
   )
-  set (TEST_LIBRARIES
+  set (GZ_BUILD_TESTS_EXTRA_LIBS
     pthread
   )
   gz_build_tests(${tests})
@@ -34,7 +34,7 @@ if (UNIX AND NOT APPLE)
     set_world_pose.cc
     transport_stress.cc
   )
-  set (TEST_LIBRARIES
+  set (GZ_BUILD_TESTS_EXTRA_LIBS
     gazebo_test_fixture
   )
   gz_build_tests(${fixture_tests})
@@ -46,7 +46,7 @@ if (UNIX AND NOT APPLE)
     gz
     gzserver
   )
-  set (TEST_LIBRARIES
+  set (GZ_BUILD_TESTS_EXTRA_LIBS
     gazebo_transport
   )
   gz_build_tests(${tool_tests})

@@ -38,7 +38,7 @@ set (TEST_DEPENDENCIES
   gz
   gzserver
 )
-set (TEST_LIBRARIES
+set (GZ_BUILD_TESTS_EXTRA_LIBS
   gazebo_transport
 )
 gz_build_tests(${test_sources})

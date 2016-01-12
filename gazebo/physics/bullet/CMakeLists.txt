@@ -58,7 +58,7 @@ set (gtest_sources
   BulletTypes_TEST.cc
   BulletPhysics_TEST.cc
 )
-set (TEST_LIBRARIES
+set (GZ_BUILD_TESTS_EXTRA_LIBS
   gazebo_physics
   gazebo_test_fixture
 )

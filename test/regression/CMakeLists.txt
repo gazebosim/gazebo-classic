@@ -39,7 +39,7 @@ set(tests
   1694_world_accel.cc
   1782_unadvertise.cc
 )
-set (TEST_LIBRARIES
+set (GZ_BUILD_TESTS_EXTRA_LIBS
   gazebo_test_fixture
 )
 gz_build_tests(${tests})
@@ -55,7 +55,7 @@ set(dri_tests
   846_typo_in_camera.cc
   1702_remove_model_scene_nodes.cc
 )
-set (TEST_LIBRARIES
+set (GZ_BUILD_TESTS_EXTRA_LIBS
   gazebo_test_fixture
 )
 gz_build_dri_tests(${dri_tests})

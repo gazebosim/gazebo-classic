@@ -47,7 +47,7 @@ set (gtest_sources
   OpenAL_TEST.cc
 )
 
-set (TEST_LIBRARIES
+set (GZ_BUILD_TESTS_EXTRA_LIBS
   gazebo_util
 )
 gz_build_tests(${gtest_sources})

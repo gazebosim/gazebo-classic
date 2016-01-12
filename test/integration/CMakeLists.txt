@@ -111,7 +111,7 @@ if (MANPAGES_SUPPORT)
 	      manpages.cc)
 endif()
 
-set (TEST_LIBRARIES
+set (GZ_BUILD_TESTS_EXTRA_LIBS
   gazebo_test_fixture
 )
 gz_build_tests(${tests})
@@ -147,13 +147,14 @@ set(dri_tests
   speed_pr2.cc
   world_reset.cc
 )
-set (TEST_LIBRARIES
+set (GZ_BUILD_TESTS_EXTRA_LIBS
   gazebo_test_fixture
 )
 gz_build_dri_tests(${dri_tests})
 
 set(qt_tests
   insert_model.cc
+  model_editor.cc
   undo.cc
   visual_pose.cc
 )

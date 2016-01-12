@@ -20,6 +20,7 @@
   #include <Winsock2.h>
 #endif
 
+#include <functional>
 #include <boost/bind.hpp>
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Time.hh"
@@ -113,20 +114,20 @@ void SensorManager::Update(bool _force)
     if (!this->initSensors.empty())
     {
       // in case things are spawned, sensors length changes
-      for (auto &iter : this->initSensors)
+      for (auto &sensor : this->initSensors)
       {
-        GZ_ASSERT(iter != NULL, "Sensor pointer is NULL");
-        GZ_ASSERT(iter->GetCategory() < 0 ||
-            iter->GetCategory() < CATEGORY_COUNT, "Sensor category is empty");
-        GZ_ASSERT(this->sensorContainers[iter->GetCategory()] != NULL,
+        GZ_ASSERT(sensor != NULL, "Sensor pointer is NULL");
+        GZ_ASSERT(sensor->GetCategory() < 0 ||
+            sensor->GetCategory() < CATEGORY_COUNT, "Sensor category is empty");
+        GZ_ASSERT(this->sensorContainers[sensor->GetCategory()] != NULL,
             "Sensor container is NULL");
 
-        iter->Init();
-        this->sensorContainers[iter->GetCategory()]->AddSensor(iter);
+        sensor->Init();
+        this->sensorContainers[sensor->GetCategory()]->AddSensor(sensor);
       }
       this->initSensors.clear();
-      for (auto &iter : this->worlds)
-        iter.second->_SetSensorsInitialized(true);
+      for (auto &worldName_worldPtr : this->worlds)
+        worldName_worldPtr.second->_SetSensorsInitialized(true);
     }
 
     for (std::vector<std::string>::iterator iter = this->removeSensors.begin();
@@ -416,10 +417,10 @@ void SensorManager::SensorContainer::Init()
 {
   boost::recursive_mutex::scoped_lock lock(this->mutex);
 
-  for (auto &iter : this->sensors)
+  for (auto &sensor : this->sensors)
   {
-    GZ_ASSERT(iter != NULL, "Sensor is NULL");
-    iter->Init();
+    GZ_ASSERT(sensor != NULL, "Sensor is NULL");
+    sensor->Init();
   }
 
   this->initialized = true;
