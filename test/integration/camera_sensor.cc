@@ -73,7 +73,7 @@ TEST_F(CameraSensor, WorldReset)
   std::string modelName = "camera_model";
   std::string cameraName = "camera_sensor";
   unsigned int width  = 320;
-  unsigned int height = 240;  // 106 fps
+  unsigned int height = 240;
   double updateRate = 10;
   math::Pose setPose, testPose(
       math::Vector3(-5, 0, 5), math::Quaternion(0, GZ_DTOR(15), 0));
@@ -106,7 +106,6 @@ TEST_F(CameraSensor, WorldReset)
   ASSERT_TRUE(world != NULL);
   common::Time simTime = world->GetSimTime().Double();
   world->Reset();
-  simTime = world->GetSimTime().Double();
   EXPECT_TRUE(world->GetSimTime() == common::Time(0.0) ||
       world->GetSimTime() < simTime);
 
