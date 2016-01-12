@@ -111,7 +111,7 @@ namespace gazebo
       /// \brief Helper function to get the unscoped name from a scoped name.
       /// \param[in] _scopedName Scoped name.
       /// \return Unscoped name.
-      private: std::string GetUnscopedName(const std::string &_scopedName);
+      private: std::string UnscopedName(const std::string &_scopedName);
 
       /// \brief Callback when a link is selected.
       /// \param[in] _name Name of link.
