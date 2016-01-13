@@ -18,12 +18,9 @@ if (HAVE_BULLET)
 endif()
 
 # Per issue #802, these tests are not yet portable
-if (UNIX AND NOT APPLE)
+if (NOT APPLE)
   set(tests
     RAMLibrary_TEST.cc
-  )
-  set (GZ_BUILD_TESTS_EXTRA_LIBS
-    pthread
   )
   gz_build_tests(${tests})
 
