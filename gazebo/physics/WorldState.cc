@@ -395,7 +395,7 @@ WorldState WorldState::operator-(const WorldState &_state) const
     if (!_state.HasModelState(iter->second.GetName()) && this->world)
     {
       ModelPtr model = this->world->GetModel(iter->second.GetName());
-      result.insertions.push_back(model->GetSDF()->ToString(""));
+      result.insertions.push_back(model->UnscaledSDF()->ToString(""));
     }
   }
 

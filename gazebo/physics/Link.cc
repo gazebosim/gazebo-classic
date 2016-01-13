@@ -1302,7 +1302,7 @@ void Link::SetScale(const math::Vector3 &_scale)
   // update the visual sdf to ensure cloning and saving has the correct values.
   this->UpdateVisualGeomSDF(_scale);
 
-  this->scale = _scale;
+  this->scale = _scale.Ign();
 }
 
 //////////////////////////////////////////////////
@@ -1328,8 +1328,8 @@ void Link::UpdateVisualGeomSDF(const math::Vector3 &_scale)
         // update radius the same way as collision shapes
         double radius = geomElem->GetElement("sphere")->Get<double>("radius");
         double newRadius = std::max(_scale.z, std::max(_scale.x, _scale.y));
-        double oldRadius = std::max(this->scale.z,
-            std::max(this->scale.x, this->scale.y));
+        double oldRadius = std::max(this->scale.Z(),
+            std::max(this->scale.X(), this->scale.Y()));
         geomElem->GetElement("sphere")->GetElement("radius")->Set(
             newRadius/oldRadius*radius);
       }
@@ -1338,13 +1338,13 @@ void Link::UpdateVisualGeomSDF(const math::Vector3 &_scale)
         // update radius the same way as collision shapes
         double radius = geomElem->GetElement("cylinder")->Get<double>("radius");
         double newRadius = std::max(_scale.x, _scale.y);
-        double oldRadius = std::max(this->scale.x, this->scale.y);
+        double oldRadius = std::max(this->scale.X(), this->scale.Y());
 
         double length = geomElem->GetElement("cylinder")->Get<double>("length");
         geomElem->GetElement("cylinder")->GetElement("radius")->Set(
             newRadius/oldRadius*radius);
         geomElem->GetElement("cylinder")->GetElement("length")->Set(
-            _scale.z/this->scale.z*length);
+            _scale.z/this->scale.Z()*length);
       }
       else if (geomElem->HasElement("mesh"))
         geomElem->GetElement("mesh")->GetElement("scale")->Set(_scale);
