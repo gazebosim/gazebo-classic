@@ -15,7 +15,8 @@
  *
 */
 
-#include <boost/bind.hpp>
+#include <functional>
+
 #include <gtest/gtest.h>
 
 #include "gazebo/test/ServerFixture.hh"
@@ -55,7 +56,7 @@ TEST_F(DepthCameraSensor_TEST, CreateDepthCamera)
 
   // Get a pointer to the depth camera sensor
   sensors::DepthCameraSensorPtr sensor =
-     boost::dynamic_pointer_cast<sensors::DepthCameraSensor>
+     std::dynamic_pointer_cast<sensors::DepthCameraSensor>
      (mgr->GetSensor(sensorName));
 
   // Make sure the above dynamic cast worked.
@@ -65,11 +66,13 @@ TEST_F(DepthCameraSensor_TEST, CreateDepthCamera)
   EXPECT_EQ(sensor->GetImageHeight(), 480);
   EXPECT_TRUE(sensor->IsActive());
 
-  rendering::DepthCameraPtr depthCamera = sensor->GetDepthCamera();
+  rendering::DepthCameraPtr depthCamera = sensor->DepthCamera();
   EXPECT_TRUE(depthCamera != NULL);
 
   event::ConnectionPtr c = depthCamera->ConnectNewDepthFrame(
-      boost::bind(&::OnNewDepthFrame, _1, _2, _3, _4, _5));
+      std::bind(&::OnNewDepthFrame, std::placeholders::_1,
+      std::placeholders::_2, std::placeholders::_3, std::placeholders::_4,
+      std::placeholders::_5));
 
   // wait for a few depth camera frames
   int i = 0;
@@ -87,8 +90,8 @@ TEST_F(DepthCameraSensor_TEST, CreateDepthCamera)
   // Check that the depth values are valid
   for (unsigned int i = 0; i < imageSize; ++i)
   {
-    EXPECT_TRUE(g_depthBuffer[i] <= depthCamera->GetFarClip());
-    EXPECT_TRUE(g_depthBuffer[i] >= depthCamera->GetNearClip());
+    EXPECT_TRUE(g_depthBuffer[i] <= depthCamera->FarClip());
+    EXPECT_TRUE(g_depthBuffer[i] >= depthCamera->NearClip());
     EXPECT_TRUE(!ignition::math::equal(g_depthBuffer[i], 0.0f));
   }
 

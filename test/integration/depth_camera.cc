@@ -91,7 +91,7 @@ void DepthCameraSensorTest::DepthUnitBox()
 
   sensors::SensorPtr sensor = sensors::get_sensor(depthSensorName);
   sensors::DepthCameraSensorPtr depthSensor =
-    boost::dynamic_pointer_cast<sensors::DepthCameraSensor>(sensor);
+    std::dynamic_pointer_cast<sensors::DepthCameraSensor>(sensor);
 
   // Make sure the above dynamic cast worked.
   EXPECT_TRUE(depthSensor != NULL);

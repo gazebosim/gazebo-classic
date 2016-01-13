@@ -40,8 +40,6 @@
 #include <vector>
 
 #include <ignition/math/Rand.hh>
-
-#include "gazebo/sensors/SensorManager.hh"
 #include "gazebo/math/Rand.hh"
 
 #include "gazebo/transport/Node.hh"
@@ -598,6 +596,18 @@ void World::LogStep()
 }
 
 //////////////////////////////////////////////////
+void World::_SetSensorsInitialized(const bool _init)
+{
+  this->dataPtr->sensorsInitialized = _init;
+}
+
+//////////////////////////////////////////////////
+bool World::SensorsInitialized() const
+{
+  return this->dataPtr->sensorsInitialized;
+}
+
+//////////////////////////////////////////////////
 void World::Step()
 {
   DIAG_TIMER_START("World::Step");
@@ -606,8 +616,7 @@ void World::Step()
   /// until dWorld.*Step
   /// Plugins that manipulate joints (and probably other properties) require
   /// one iteration of the physics engine. Do not remove this.
-  if (!this->dataPtr->pluginsLoaded &&
-      sensors::SensorManager::Instance()->SensorsInitialized())
+  if (!this->dataPtr->pluginsLoaded && this->SensorsInitialized())
   {
     this->LoadPlugins();
     this->dataPtr->pluginsLoaded = true;
@@ -670,7 +679,7 @@ void World::Step()
     else
     {
       // Flush the log record buffer, if there is data in it.
-      if (util::LogRecord::Instance()->GetBufferSize() > 0)
+      if (util::LogRecord::Instance()->BufferSize() > 0)
         util::LogRecord::Instance()->Notify();
       this->dataPtr->pauseTime += stepTime;
     }
@@ -743,7 +752,7 @@ void World::Update()
   DIAG_TIMER_LAP("World::Update", "PhysicsEngine::UpdateCollision");
 
   // Wait for logging to finish, if it's running.
-  if (util::LogRecord::Instance()->GetRunning())
+  if (util::LogRecord::Instance()->Running())
   {
     boost::mutex::scoped_lock lock(this->dataPtr->logMutex);
 
@@ -785,7 +794,7 @@ void World::Update()
   }
 
   // Only update state information if logging data.
-  if (util::LogRecord::Instance()->GetRunning())
+  if (util::LogRecord::Instance()->Running())
     this->dataPtr->logCondition.notify_one();
   DIAG_TIMER_LAP("World::Update", "LogRecordNotify");
 
@@ -878,6 +887,38 @@ PresetManagerPtr World::GetPresetManager() const
 common::SphericalCoordinatesPtr World::GetSphericalCoordinates() const
 {
   return this->dataPtr->sphericalCoordinates;
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d World::Gravity() const
+{
+  return this->dataPtr->sdf->Get<ignition::math::Vector3d>("gravity");
+}
+
+//////////////////////////////////////////////////
+void World::SetGravity(const ignition::math::Vector3d &_gravity)
+{
+  // This function calls `PhysicsEngine::SetGravity`,
+  // which in turn should call `World::SetGravitySDF`.
+  this->dataPtr->physicsEngine->SetGravity(_gravity);
+}
+
+//////////////////////////////////////////////////
+void World::SetGravitySDF(const ignition::math::Vector3d &_gravity)
+{
+  this->dataPtr->sdf->GetElement("gravity")->Set(_gravity);
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d World::MagneticField() const
+{
+  return this->dataPtr->sdf->Get<ignition::math::Vector3d>("magnetic_field");
+}
+
+//////////////////////////////////////////////////
+void World::SetMagneticField(const ignition::math::Vector3d &_mag)
+{
+  this->dataPtr->sdf->GetElement("magnetic_field")->Set(_mag);
 }
 
 //////////////////////////////////////////////////
@@ -1090,7 +1131,9 @@ void World::ResetTime()
   if (this->IsPaused())
     this->dataPtr->pauseStartTime = this->dataPtr->startTime;
 
-  sensors::SensorManager::Instance()->ResetLastUpdateTimes();
+  // Signal a reset has occurred. The SensorManager listens to this event
+  // to reset each sensor's last update time.
+  event::Events::timeReset();
 }
 
 //////////////////////////////////////////////////
@@ -2040,7 +2083,7 @@ bool World::OnLog(std::ostringstream &_stream)
 {
   int bufferIndex = this->dataPtr->currentStateBuffer;
   // Save the entire state when its the first call to OnLog.
-  if (util::LogRecord::Instance()->GetFirstUpdate())
+  if (util::LogRecord::Instance()->FirstUpdate())
   {
     this->dataPtr->sdf->Update();
     _stream << "<sdf version ='";
@@ -2067,7 +2110,7 @@ bool World::OnLog(std::ostringstream &_stream)
 
   // Logging has stopped. Wait for log worker to finish. Output last bit
   // of data, and reset states.
-  if (!util::LogRecord::Instance()->GetRunning())
+  if (!util::LogRecord::Instance()->Running())
   {
     boost::mutex::scoped_lock lock(this->dataPtr->logBufferMutex);
 

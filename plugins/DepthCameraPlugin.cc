@@ -40,8 +40,8 @@ void DepthCameraPlugin::Load(sensors::SensorPtr _sensor,
                               sdf::ElementPtr /*_sdf*/)
 {
   this->parentSensor =
-    boost::dynamic_pointer_cast<sensors::DepthCameraSensor>(_sensor);
-  this->depthCamera = this->parentSensor->GetDepthCamera();
+    std::dynamic_pointer_cast<sensors::DepthCameraSensor>(_sensor);
+  this->depthCamera = this->parentSensor->DepthCamera();
 
   if (!this->parentSensor)
   {
@@ -49,10 +49,10 @@ void DepthCameraPlugin::Load(sensors::SensorPtr _sensor,
     return;
   }
 
-  this->width = this->depthCamera->GetImageWidth();
-  this->height = this->depthCamera->GetImageHeight();
-  this->depth = this->depthCamera->GetImageDepth();
-  this->format = this->depthCamera->GetImageFormat();
+  this->width = this->depthCamera->ImageWidth();
+  this->height = this->depthCamera->ImageHeight();
+  this->depth = this->depthCamera->ImageDepth();
+  this->format = this->depthCamera->ImageFormat();
 
   this->newDepthFrameConnection = this->depthCamera->ConnectNewDepthFrame(
       std::bind(&DepthCameraPlugin::OnNewDepthFrame,

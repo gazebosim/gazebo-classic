@@ -19,9 +19,7 @@
 
 #include <string>
 
-#include "gazebo/sensors/Sensor.hh"
 #include "gazebo/sensors/CameraSensor.hh"
-#include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/util/system.hh"
 
@@ -47,11 +45,11 @@ namespace gazebo
 
       /// \brief Returns a pointer to the rendering::DepthCamera
       /// \return Depth Camera pointer
-      public: virtual rendering::DepthCameraPtr GetDepthCamera() const;
+      public: virtual rendering::DepthCameraPtr DepthCamera() const;
 
       /// \brief Gets the raw depth data from the sensor.
       /// \return The pointer to the depth data array.
-      public: virtual const float *GetDepthData() const;
+      public: virtual const float *DepthData() const;
 
       /// \brief Initialize the camera
       public: virtual void Init();

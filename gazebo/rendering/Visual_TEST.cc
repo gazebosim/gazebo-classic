@@ -386,7 +386,7 @@ TEST_F(Visual_TEST, ChildTransparency)
 
   // Create a visual as child of the world visual
   gazebo::rendering::VisualPtr vis1;
-  vis1.reset(new gazebo::rendering::Visual("vis1", scene->GetWorldVisual()));
+  vis1.reset(new gazebo::rendering::Visual("vis1", scene->WorldVisual()));
   vis1->Load();
 
   // Create a visual as child of vis1
@@ -813,7 +813,7 @@ TEST_F(Visual_TEST, ChildMaterial)
 
   // Create a visual as child of the world visual
   gazebo::rendering::VisualPtr vis1;
-  vis1.reset(new gazebo::rendering::Visual("vis1", scene->GetWorldVisual()));
+  vis1.reset(new gazebo::rendering::Visual("vis1", scene->WorldVisual()));
   vis1->Load();
 
   // Create a visual as child of vis1
@@ -986,7 +986,7 @@ TEST_F(Visual_TEST, ChildColor)
 
   // Create a visual as child of the world visual
   gazebo::rendering::VisualPtr vis1;
-  vis1.reset(new gazebo::rendering::Visual("vis1", scene->GetWorldVisual()));
+  vis1.reset(new gazebo::rendering::Visual("vis1", scene->WorldVisual()));
   vis1->Load();
 
   // Create a visual as child of vis1
@@ -1239,12 +1239,12 @@ TEST_F(Visual_TEST, GetAncestors)
   ASSERT_TRUE(scene != NULL);
 
   // Get world visual
-  gazebo::rendering::VisualPtr world = scene->GetWorldVisual();
+  gazebo::rendering::VisualPtr world = scene->WorldVisual();
   ASSERT_TRUE(world != NULL);
 
   // Create a visual as child of the world visual
   gazebo::rendering::VisualPtr vis1;
-  vis1.reset(new gazebo::rendering::Visual("vis1", scene->GetWorldVisual()));
+  vis1.reset(new gazebo::rendering::Visual("vis1", scene->WorldVisual()));
   vis1->Load();
 
   // Create a visual as child of vis1
@@ -1729,12 +1729,12 @@ TEST_F(Visual_TEST, Clone)
   ASSERT_TRUE(scene != NULL);
 
   // Get world visual
-  gazebo::rendering::VisualPtr world = scene->GetWorldVisual();
+  gazebo::rendering::VisualPtr world = scene->WorldVisual();
   ASSERT_TRUE(world != NULL);
 
   // Create a visual as child of the world visual
   gazebo::rendering::VisualPtr vis1;
-  vis1.reset(new gazebo::rendering::Visual("vis1", scene->GetWorldVisual()));
+  vis1.reset(new gazebo::rendering::Visual("vis1", scene->WorldVisual()));
   vis1->Load();
 
   // Create a visual as child of vis1

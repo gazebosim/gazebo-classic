@@ -21,12 +21,8 @@
 #endif
 
 #include <functional>
-#include <sstream>
 
 #include "gazebo/physics/World.hh"
-
-#include "gazebo/common/Events.hh"
-#include "gazebo/common/Exception.hh"
 
 #include "gazebo/transport/transport.hh"
 
@@ -97,10 +93,10 @@ void DepthCameraSensor::Init()
     depthCamera->Load(cameraSdf);
 
     // Do some sanity checks
-    if (depthCamera->GetImageWidth() == 0 ||
-        depthCamera->GetImageHeight() == 0)
+    if (depthCamera->ImageWidth() == 0u ||
+        depthCamera->ImageHeight() == 0u)
     {
-      gzthrow("image has zero size");
+      gzerr << "image has zero size" << std::endl;
     }
 
     depthCamera->Init();
@@ -130,13 +126,13 @@ void DepthCameraSensor::Init()
 }
 
 //////////////////////////////////////////////////
-rendering::DepthCameraPtr DepthCameraSensor::GetDepthCamera() const
+rendering::DepthCameraPtr DepthCameraSensor::DepthCamera() const
 {
   return boost::dynamic_pointer_cast<rendering::DepthCamera>(this->camera);
 }
 
 //////////////////////////////////////////////////
-const float *DepthCameraSensor::GetDepthData() const
+const float *DepthCameraSensor::DepthData() const
 {
   return this->depthBuffer;
 }
@@ -152,14 +148,14 @@ bool DepthCameraSensor::UpdateImpl(const bool /*_force*/)
   if (this->imagePub && this->imagePub->HasConnections())
   {
     msgs::ImageStamped msg;
-    msgs::Set(msg.mutable_time(), this->scene->GetSimTime());
-    msg.mutable_image()->set_width(this->camera->GetImageWidth());
-    msg.mutable_image()->set_height(this->camera->GetImageHeight());
+    msgs::Set(msg.mutable_time(), this->scene->SimTime());
+    msg.mutable_image()->set_width(this->camera->ImageWidth());
+    msg.mutable_image()->set_height(this->camera->ImageHeight());
     msg.mutable_image()->set_pixel_format(common::Image::R_FLOAT32);
 
 
-    msg.mutable_image()->set_step(this->camera->GetImageWidth() *
-        this->camera->GetImageDepth());
+    msg.mutable_image()->set_step(this->camera->ImageWidth() *
+        this->camera->ImageDepth());
 
     rendering::DepthCameraPtr depthCamera =
         boost::dynamic_pointer_cast<rendering::DepthCamera>(this->camera);
@@ -177,11 +173,11 @@ bool DepthCameraSensor::UpdateImpl(const bool /*_force*/)
     for (unsigned int i = 0; i < depthSamples; ++i)
     {
       // Mask ranges outside of min/max to +/- inf, as per REP 117
-      if (this->depthBuffer[i] >= this->camera->GetFarClip())
+      if (this->depthBuffer[i] >= this->camera->FarClip())
       {
         this->depthBuffer[i] = IGN_DBL_INF;
       }
-      else if (this->depthBuffer[i] <= this->camera->GetNearClip())
+      else if (this->depthBuffer[i] <= this->camera->NearClip())
       {
         this->depthBuffer[i] = -IGN_DBL_INF;
       }

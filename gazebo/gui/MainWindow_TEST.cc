@@ -256,10 +256,10 @@ void MainWindow_TEST::UserCameraFPS()
     QCoreApplication::processEvents();
   }
 
-  std::cerr << "\nFPS[" << cam->GetAvgFPS() << "]\n" << std::endl;
+  std::cerr << "\nFPS[" << cam->AvgFPS() << "]\n" << std::endl;
 
-  QVERIFY(cam->GetAvgFPS() > 55.0);
-  QVERIFY(cam->GetAvgFPS() < 75.0);
+  QVERIFY(cam->AvgFPS() > 55.0);
+  QVERIFY(cam->AvgFPS() < 75.0);
 
   cam->Fini();
   mainWindow->close();
@@ -466,9 +466,9 @@ void MainWindow_TEST::Wireframe()
   }
 
   // Get the image data
-  const unsigned char *image = cam->GetImageData();
-  unsigned int height = cam->GetImageHeight();
-  unsigned int width = cam->GetImageWidth();
+  const unsigned char *image = cam->ImageData();
+  unsigned int height = cam->ImageHeight();
+  unsigned int width = cam->ImageWidth();
   unsigned int depth = 3;
 
   // Calculate the average color.
@@ -497,7 +497,7 @@ void MainWindow_TEST::Wireframe()
     mainWindow->repaint();
 
     // Get the new image data, and calculate the new average color
-    image = cam->GetImageData();
+    image = cam->ImageData();
     sum = 0;
     for (unsigned int y = 0; y < height; ++y)
     {
@@ -566,9 +566,9 @@ void MainWindow_TEST::NonDefaultWorld()
   }
 
   // Get the image data
-  const unsigned char *image = cam->GetImageData();
-  unsigned int height = cam->GetImageHeight();
-  unsigned int width = cam->GetImageWidth();
+  const unsigned char *image = cam->ImageData();
+  unsigned int height = cam->ImageHeight();
+  unsigned int width = cam->ImageWidth();
   unsigned int depth = 3;
 
   unsigned int sum = 0;
@@ -983,10 +983,10 @@ void MainWindow_TEST::SetUserCameraPoseSDF()
     mainWindow->repaint();
   }
 
-  const unsigned char *data = cam->GetImageData();
-  unsigned int width = cam->GetImageWidth();
-  unsigned int height = cam->GetImageHeight();
-  unsigned int depth = cam->GetImageDepth();
+  const unsigned char *data = cam->ImageData();
+  unsigned int width = cam->ImageWidth();
+  unsigned int height = cam->ImageHeight();
+  unsigned int depth = cam->ImageDepth();
 
   // Part 1 : The user camera should be positioned so that it sees only
   // a white box

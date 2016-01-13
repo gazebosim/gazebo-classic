@@ -389,7 +389,7 @@ void JointInspector::OnJointTypeChanged(const QString &_value)
 {
   std::string valueStr = _value.toLower().toStdString();
   auto type = JointMaker::ConvertJointType(valueStr);
-  unsigned int axisCount = JointMaker::GetJointAxisCount(type);
+  unsigned int axisCount = JointMaker::JointAxisCount(type);
 
   for (unsigned int i = 0; i < axisCount; ++i)
   {
