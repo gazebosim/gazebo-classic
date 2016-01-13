@@ -124,7 +124,6 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
   this->dataPtr->name = _name;
   this->dataPtr->manager = NULL;
   this->dataPtr->raySceneQuery = NULL;
-  this->dataPtr->skyx = NULL;
 
   this->dataPtr->receiveMutex = new std::mutex();
 
@@ -261,9 +260,6 @@ void Scene::Clear()
     this->dataPtr->userCameras[i]->Fini();
   this->dataPtr->userCameras.clear();
 
-  delete this->dataPtr->skyx;
-  this->dataPtr->skyx = NULL;
-
   RTShaderSystem::Instance()->RemoveScene(this->Name());
 
   this->dataPtr->connections.clear();
@@ -348,7 +344,7 @@ void Scene::Init()
   // message must be received (via a scene message or on the ~/sky topic).
   try
   {
-    this->SetSky();
+//    this->SetSky();
   }
   catch(...)
   {
@@ -2951,7 +2947,7 @@ void Scene::OnSkyMsg(ConstSkyPtr &_msg)
   if (!this->dataPtr->skyx)
     return;
 
-  Ogre::Root::getSingletonPtr()->addFrameListener(this->dataPtr->skyx);
+  Ogre::Root::getSingletonPtr()->addFrameListener(this->dataPtr->skyx.get());
   this->dataPtr->skyx->update(0);
 
   this->dataPtr->skyx->setVisible(true);
@@ -3016,9 +3012,9 @@ void Scene::OnSkyMsg(ConstSkyPtr &_msg)
 void Scene::SetSky()
 {
   // Create SkyX
-  this->dataPtr->skyxController = new SkyX::BasicController();
-  this->dataPtr->skyx = new SkyX::SkyX(this->dataPtr->manager,
-      this->dataPtr->skyxController);
+  this->dataPtr->skyxController.reset(new SkyX::BasicController());
+  this->dataPtr->skyx.reset(new SkyX::SkyX(this->dataPtr->manager,
+      this->dataPtr->skyxController.get()));
   this->dataPtr->skyx->create();
 
   this->dataPtr->skyx->setTimeMultiplier(0);
@@ -3526,7 +3522,7 @@ void Scene::SetSkyXMode(const unsigned int _mode)
 /////////////////////////////////////////////////
 SkyX::SkyX *Scene::GetSkyX() const
 {
-  return this->dataPtr->skyx;
+  return this->dataPtr->skyx.get();
 }
 
 /////////////////////////////////////////////////

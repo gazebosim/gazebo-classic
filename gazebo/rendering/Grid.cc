@@ -50,9 +50,11 @@ Grid::Grid(Scene *_scene, unsigned int _cellCount, float _cellLength,
 //////////////////////////////////////////////////
 Grid::~Grid()
 {
+/*
   this->scene->OgreSceneManager()->destroySceneNode(this->sceneNode->getName());
   this->scene->OgreSceneManager()->destroyManualObject(this->manualObject);
   this->material->unload();
+*/
 }
 
 //////////////////////////////////////////////////

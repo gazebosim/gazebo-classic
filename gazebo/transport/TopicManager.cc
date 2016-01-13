@@ -155,11 +155,10 @@ void TopicManager::ProcessNodes(bool _onlyOut)
 {
   {
     boost::mutex::scoped_lock lock(this->processNodesMutex);
-    for (boost::unordered_set<NodePtr>::iterator iter =
-        this->nodesToProcess.begin();
-        iter != this->nodesToProcess.end(); ++iter)
+    for (auto node : this->nodesToProcess)
     {
-      (*iter)->ProcessPublishers();
+      if (node)
+        node->ProcessPublishers();
     }
     this->nodesToProcess.clear();
   }
@@ -194,6 +193,9 @@ void TopicManager::ProcessNodes(bool _onlyOut)
 
       for (int i = 0; i < s; ++i)
       {
+        if (!this->nodes[i])
+          continue;
+
         this->nodes[i]->ProcessIncoming();
         if (this->pauseIncoming)
           break;

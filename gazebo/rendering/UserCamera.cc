@@ -702,6 +702,9 @@ VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos) const
 {
   VisualPtr result;
 
+  if (!this->dataPtr->selectionBuffer || !this->scene)
+    return result;
+
   Ogre::Entity *entity =
     this->dataPtr->selectionBuffer->OnSelectionClick(_mousePos.x, _mousePos.y);
 

@@ -2171,7 +2171,7 @@ void MainWindow::OnWorldModify(ConstWorldModifyPtr &_msg)
 {
   if (_msg->has_create() && _msg->create())
   {
-    // this->dataPtr->renderWidget->CreateScene(_msg->world_name());
+    this->dataPtr->renderWidget->CreateScene(_msg->world_name());
     this->dataPtr->requestMsg = msgs::CreateRequest("scene_info");
     this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
   }

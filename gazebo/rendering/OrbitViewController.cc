@@ -147,7 +147,7 @@ void OrbitViewController::HandleKeyReleaseEvent(const std::string &_key)
 //////////////////////////////////////////////////
 void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
 {
-  if (!this->enabled)
+  if (!this->enabled || !this->camera || !this->camera->GetScene())
     return;
 
   ignition::math::Vector2i drag = _event.Pos() - _event.PrevPos();

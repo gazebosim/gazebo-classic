@@ -19,6 +19,7 @@
 
 #include <list>
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 #include <mutex>
@@ -287,10 +288,10 @@ namespace gazebo
       public: std::map<std::string, Projector *> projectors;
 
       /// \brief Pointer to the sky.
-      public: SkyX::SkyX *skyx;
+      public: std::unique_ptr<SkyX::SkyX> skyx;
 
       /// \brief Controls the sky.
-      public: SkyX::BasicController *skyxController;
+      public: std::unique_ptr<SkyX::BasicController> skyxController;
 
       /// \brief True when all COMs should be visualized.
       public: bool showCOMs;

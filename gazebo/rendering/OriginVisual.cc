@@ -36,12 +36,13 @@ OriginVisual::OriginVisual(const std::string &_name, VisualPtr _vis)
 /////////////////////////////////////////////////
 OriginVisual::~OriginVisual()
 {
-  OriginVisualPrivate *dPtr =
+/*  OriginVisualPrivate *dPtr =
       reinterpret_cast<OriginVisualPrivate *>(this->dataPtr);
 
   this->DeleteDynamicLine(dPtr->xLine);
   this->DeleteDynamicLine(dPtr->yLine);
   this->DeleteDynamicLine(dPtr->zLine);
+*/
 }
 
 /////////////////////////////////////////////////

@@ -156,6 +156,7 @@ namespace gazebo
       /// \brief Attach a renerable object to the visual.
       /// \param[in] _obj A movable object to attach to the visual.
       public: void AttachObject(Ogre::MovableObject *_obj);
+      public: void DetachObject(Ogre::MovableObject *_obj);
 
       /// \brief Returns true if an object with _name is attached
       /// \param[in] _name Name of an object to find.

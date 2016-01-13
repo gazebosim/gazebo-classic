@@ -155,8 +155,8 @@ void RTShaderSystem::RemoveScene(ScenePtr _scene)
         Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
     this->dataPtr->shaderGenerator->removeSceneManager(
         _scene->OgreSceneManager());
-    this->dataPtr->shaderGenerator->removeAllShaderBasedTechniques();
-    this->dataPtr->shaderGenerator->flushShaderCache();
+    // this->dataPtr->shaderGenerator->removeAllShaderBasedTechniques();
+    // this->dataPtr->shaderGenerator->flushShaderCache();
   }
 }
 

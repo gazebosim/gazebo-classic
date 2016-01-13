@@ -223,7 +223,7 @@ void RenderEngine::RemoveScene(const std::string &_name)
   {
     if ((*iter)->Name() == _name)
     {
-      rendering::Events::removeScene(_name);
+    //  rendering::Events::removeScene(_name);
 
       (*iter)->Clear();
       (*iter).reset();

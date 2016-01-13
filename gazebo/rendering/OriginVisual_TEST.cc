@@ -53,6 +53,7 @@ TEST_F(OriginVisual_TEST, Load)
   EXPECT_TRUE(scene->GetVisual("origin") == NULL);
 
   // Reset pointer
+  origin->Fini();
   origin.reset();
   EXPECT_TRUE(origin == NULL);
 }

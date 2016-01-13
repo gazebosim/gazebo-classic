@@ -640,8 +640,20 @@ void Visual::AttachObject(Ogre::MovableObject *_obj)
 }
 
 //////////////////////////////////////////////////
+void Visual::DetachObject(Ogre::MovableObject *_obj)
+{
+  if (!this->HasAttachedObject(_obj->getName()))
+    return;
+
+  this->dataPtr->sceneNode->detachObject(_obj);
+}
+
+//////////////////////////////////////////////////
 bool Visual::HasAttachedObject(const std::string &_name)
 {
+  if (!this->dataPtr->sceneNode)
+    return false;
+
   for (unsigned int i = 0; i < this->dataPtr->sceneNode->numAttachedObjects();
       ++i)
   {
@@ -1909,13 +1921,16 @@ DynamicLines *Visual::CreateDynamicLine(RenderOpType _type)
 void Visual::DeleteDynamicLine(DynamicLines *_line)
 {
   // delete instance from lines vector
-  for (std::list<DynamicLines*>::iterator iter = this->dataPtr->lines.begin();
+  for (std::list<DynamicLines *>::iterator iter = this->dataPtr->lines.begin();
        iter != this->dataPtr->lines.end(); ++iter)
   {
     if (*iter == _line)
     {
-      delete *iter;
+      this->DetachObject(_line);
+
+//      delete _line;
       this->dataPtr->lines.erase(iter);
+
       break;
     }
   }
