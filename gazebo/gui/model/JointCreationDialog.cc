@@ -245,8 +245,11 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
 
   // Align widgets
   QLabel *xAlignLabel = new QLabel(tr("X: "));
+  xAlignLabel->setMaximumWidth(20);
   QLabel *yAlignLabel = new QLabel(tr("Y: "));
+  yAlignLabel->setMaximumWidth(20);
   QLabel *zAlignLabel = new QLabel(tr("Z: "));
+  zAlignLabel->setMaximumWidth(20);
 
   auto xAlignMin = new QToolButton();
   xAlignMin->setToolButtonStyle(Qt::ToolButtonIconOnly);
@@ -329,7 +332,20 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
       this, SLOT(OnAlign(const int)));
   this->dataPtr->alignGroups.push_back(alignZButtonGroup);
 
-  // Align dropdown
+  // Reverse checkboxes
+  this->dataPtr->reverseXBox = new QCheckBox("Reverse");
+  connect(this->dataPtr->reverseXBox, SIGNAL(stateChanged(const int)), this,
+      SLOT(OnAlign(const int)));
+
+  this->dataPtr->reverseYBox = new QCheckBox("Reverse");
+  connect(this->dataPtr->reverseYBox, SIGNAL(stateChanged(const int)), this,
+      SLOT(OnAlign(const int)));
+
+  this->dataPtr->reverseZBox = new QCheckBox("Reverse");
+  connect(this->dataPtr->reverseZBox, SIGNAL(stateChanged(const int)), this,
+      SLOT(OnAlign(const int)));
+
+  // Target dropdown
   this->dataPtr->alignCombo = new QComboBox();
   this->dataPtr->alignCombo->addItem("Child to Parent", 0);
   this->dataPtr->alignCombo->addItem("Parent to Child", 1);
@@ -351,7 +367,10 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   alignLayout->addWidget(zAlignMin, 2, 1);
   alignLayout->addWidget(zAlignCenter, 2, 2);
   alignLayout->addWidget(zAlignMax, 2, 3);
-  alignLayout->addWidget(this->dataPtr->alignCombo, 0, 4, 1, 3);
+  alignLayout->addWidget(this->dataPtr->reverseXBox, 0, 4, 1, 3);
+  alignLayout->addWidget(this->dataPtr->reverseYBox, 1, 4, 1, 3);
+  alignLayout->addWidget(this->dataPtr->reverseZBox, 2, 4, 1, 3);
+  alignLayout->addWidget(this->dataPtr->alignCombo, 3, 0, 1, 5);
   alignLayout->setAlignment(xAlignLabel, Qt::AlignRight);
   alignLayout->setAlignment(yAlignLabel, Qt::AlignRight);
   alignLayout->setAlignment(zAlignLabel, Qt::AlignRight);
@@ -504,15 +523,7 @@ void JointCreationDialog::Open(const JointMaker::JointType _type)
   }
 
   // Reset fields
-  this->dataPtr->configWidget->SetVector3dWidgetValue("axis1",
-      ignition::math::Vector3d::UnitX);
-  this->dataPtr->configWidget->SetVector3dWidgetValue("axis2",
-      ignition::math::Vector3d::UnitY);
-  this->dataPtr->configWidget->SetPoseWidgetValue("joint_pose",
-      ignition::math::Pose3d());
-  this->dataPtr->configWidget->SetPoseWidgetValue("relative_pose",
-      ignition::math::Pose3d());
-  this->UncheckAllAlign();
+  this->OnResetAll();
 
   // Reset enabled states
   this->dataPtr->createButton->setEnabled(false);
@@ -611,7 +622,7 @@ void JointCreationDialog::OnVector3dFromDialog(const QString &_name,
   }
 
   if (this->CheckValid())
-    this->dataPtr->jointMaker->SetAxis(_name, _value);
+    this->dataPtr->jointMaker->SetAxis(_name.toStdString(), _value);
 }
 
 /////////////////////////////////////////////////
@@ -778,6 +789,8 @@ void JointCreationDialog::OnResetAll()
   this->dataPtr->configWidget->SetPoseWidgetValue("joint_pose",
       ignition::math::Pose3d::Zero);
   this->OnPoseFromDialog("joint_pose", ignition::math::Pose3d::Zero);
+
+  this->UncheckAllAlign();
 }
 
 /////////////////////////////////////////////////
@@ -842,6 +855,12 @@ void JointCreationDialog::OnAlign(const int _int)
   // Reference link
   bool childToParent = this->dataPtr->alignCombo->currentIndex() == 0;
 
+  // Direction
+  std::vector<bool> reverse;
+  reverse.push_back(this->dataPtr->reverseXBox->isChecked());
+  reverse.push_back(this->dataPtr->reverseYBox->isChecked());
+  reverse.push_back(this->dataPtr->reverseZBox->isChecked());
+
   // Button groups
   std::vector<std::string> axes = {"x", "y", "z"};
   std::vector<std::string> configs = {"min", "center", "max"};
@@ -866,7 +885,7 @@ void JointCreationDialog::OnAlign(const int _int)
     if (checked >= 0 && checked <=2)
     {
       this->dataPtr->jointMaker->AlignLinks(childToParent, axes[g],
-          configs[checked]);
+          configs[checked], reverse[g]);
     }
   }
 
@@ -881,13 +900,17 @@ void JointCreationDialog::UncheckAllAlign()
     for (auto button : group->buttons())
       button->setChecked(false);
   }
+
+  this->dataPtr->reverseXBox->setChecked(false);
+  this->dataPtr->reverseYBox->setChecked(false);
+  this->dataPtr->reverseZBox->setChecked(false);
 }
 
 /////////////////////////////////////////////////
 void JointCreationDialog::OnType(const int _typeInt)
 {
   auto type = static_cast<JointMaker::JointType>(_typeInt);
-  unsigned int axisCount = JointMaker::GetJointAxisCount(type);
+  unsigned int axisCount = JointMaker::JointAxisCount(type);
 
   // Display correct number of axes for this type
   this->dataPtr->axis0Widget->setVisible(axisCount == 0);

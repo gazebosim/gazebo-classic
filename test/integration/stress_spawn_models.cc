@@ -53,7 +53,7 @@ TEST_P(SpawnModels, WirelessTransmitters)
           "osrf", 2450.0, power, gain);
 
       sensors::WirelessTransmitterPtr tx =
-        boost::static_pointer_cast<sensors::WirelessTransmitter>(
+        std::static_pointer_cast<sensors::WirelessTransmitter>(
           sensors::SensorManager::Instance()->GetSensor(sensorName));
 
       EXPECT_TRUE(this->HasEntity(modelName));

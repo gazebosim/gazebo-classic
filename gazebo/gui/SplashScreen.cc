@@ -79,7 +79,7 @@ SplashScreen::~SplashScreen()
 void SplashScreen::Update()
 {
   rendering::UserCameraPtr cam = get_active_camera();
-  if (cam && cam->GetScene() && cam->GetScene()->GetInitialized())
+  if (cam && cam->GetScene() && cam->GetScene()->Initialized())
   {
     this->dataPtr->splashScreen->hide();
     return;

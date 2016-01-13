@@ -183,7 +183,7 @@ GLWidget::GLWidget(QWidget *_parent)
     //
     // All of this means that we must have a GL Context by this point. So,
     // we have to create a dummy 1x1 window in RenderEngine::Load.
-    this->OnCreateScene(this->dataPtr->scene->GetName());
+    this->OnCreateScene(this->dataPtr->scene->Name());
   }
 }
 
@@ -269,7 +269,7 @@ void GLWidget::moveEvent(QMoveEvent *_e)
 void GLWidget::paintEvent(QPaintEvent *_e)
 {
   rendering::UserCameraPtr cam = gui::get_active_camera();
-  if (cam && cam->GetInitialized())
+  if (cam && cam->Initialized())
   {
     event::Events::preRender();
 
@@ -567,17 +567,17 @@ bool GLWidget::OnMouseDoubleClick(const common::MouseEvent & /*_event*/)
   {
     if (vis->IsPlane())
     {
-      math::Pose pose;
+      ignition::math::Pose3d pose;
       ignition::math::Pose3d camPose;
       camPose = this->dataPtr->userCamera->WorldPose();
-      if (this->dataPtr->scene->GetFirstContact(this->dataPtr->userCamera,
-            this->dataPtr->mouseEvent.Pos(), pose.pos))
+      if (this->dataPtr->scene->FirstContact(this->dataPtr->userCamera,
+            this->dataPtr->mouseEvent.Pos(), pose.Pos()))
       {
-        this->dataPtr->userCamera->SetFocalPoint(pose.pos);
-        ignition::math::Vector3d dir = pose.pos.Ign() - camPose.Pos();
-        pose.pos = camPose.Pos() + (dir * 0.8);
-        pose.rot = this->dataPtr->userCamera->WorldRotation();
-        this->dataPtr->userCamera->MoveToPosition(pose.Ign(), 0.5);
+        this->dataPtr->userCamera->SetFocalPoint(pose.Pos());
+        ignition::math::Vector3d dir = pose.Pos() - camPose.Pos();
+        pose.Pos() = camPose.Pos() + (dir * 0.8);
+        pose.Rot() = this->dataPtr->userCamera->WorldRotation();
+        this->dataPtr->userCamera->MoveToPosition(pose, 0.5);
       }
     }
     else
@@ -851,7 +851,7 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
   else
     gzerr << "Unable to connect to a running Gazebo master.\n";
 
-  if (_scene->GetUserCameraCount() == 0)
+  if (_scene->UserCameraCount() == 0)
   {
     this->dataPtr->userCamera = _scene->CreateUserCamera(cameraName,
         gazebo::gui::getINIProperty<int>("rendering.stereo", 0));
@@ -936,7 +936,7 @@ std::string GLWidget::OgreHandle() const
 /////////////////////////////////////////////////
 void GLWidget::OnRemoveScene(const std::string &_name)
 {
-  if (this->dataPtr->scene && this->dataPtr->scene->GetName() == _name)
+  if (this->dataPtr->scene && this->dataPtr->scene->Name() == _name)
   {
     this->Clear();
   }

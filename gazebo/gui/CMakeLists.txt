@@ -25,6 +25,7 @@ set (sources
   ApplyWrenchDialog.cc
   CloneWindow.cc
   ConfigWidget.cc
+  Conversions.cc
   DataLogger.cc
   Editor.cc
   EntityMaker.cc
@@ -100,6 +101,7 @@ set (qt_headers
 set (headers
   qt.h
   qt_test.h
+  Conversions.hh
   EntityMaker.hh
   GuiIface.hh
   GuiEvents.hh
@@ -231,6 +233,13 @@ if (SPNAV_LIBRARY)
   target_link_libraries(gazebo_gui ${SPNAV_LIBRARY})
   target_link_libraries(gzclient ${SPNAV_LIBRARY})
 endif()
+
+set (gtest_sources
+  Conversions_TEST.cc
+)
+
+set (GZ_BUILD_TESTS_EXTRA_LIBS gazebo_gui)
+gz_build_tests(${gtest_sources})
 
 add_definitions(${QT_DEFINITIONS})
 
