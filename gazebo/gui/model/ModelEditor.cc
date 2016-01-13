@@ -538,7 +538,7 @@ void ModelEditor::OnCreateEntity(const std::string &_type,
 ////////////////////////////////////////////////
 void ModelEditor::AddEntity(sdf::ElementPtr _sdf)
 {
-//  event::Events::setSelectedEntity("", "normal");
+  event::Events::setSelectedEntity("", "normal");
   g_arrowAct->trigger();
   this->dataPtr->modelPalette->GetModelCreator()->AddEntity(_sdf);
 }

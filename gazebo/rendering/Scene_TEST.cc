@@ -130,9 +130,7 @@ TEST_F(Scene_TEST, RemoveModelVisual)
   // Send request to delete the box model
   transport::NodePtr node = transport::NodePtr(new transport::Node());
   node->Init();
-  std::cerr << " request no reply " << std::endl;
   transport::requestNoReply(node, "entity_delete", "box");
-  std::cerr << " request no reply done " << std::endl;
 
   sleep = 0;
   while (box && sleep < maxSleep)
@@ -148,8 +146,6 @@ TEST_F(Scene_TEST, RemoveModelVisual)
     EXPECT_TRUE(scene->GetVisual("box" + suffix) == NULL)
         << "check visual does not exist: " << "box" + suffix;
   }
-
-  std::cerr << " done!!!" << std::endl;
 }
 
 /////////////////////////////////////////////////
