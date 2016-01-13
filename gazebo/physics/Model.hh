@@ -83,6 +83,7 @@ namespace gazebo
       /// \return The SDF value for this model.
       public: virtual const sdf::ElementPtr GetSDF();
 
+      /// \internal
       /// \brief Get the SDF element for the model, without all effects of
       /// scaling. This is useful in cases when the scale will be applied
       /// afterwards by, for example, states.
