@@ -48,6 +48,7 @@ set (plugins
   DepthCameraPlugin
   DiffDrivePlugin
   ElevatorPlugin
+  FollowerPlugin
   ForceTorquePlugin
   GpuRayPlugin
   ImuSensorPlugin

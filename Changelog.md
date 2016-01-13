@@ -1,5 +1,8 @@
 ## Gazebo 7.0
 
+1. Add FollowerPlugin
+    * [Pull request #2085](https://bitbucket.org/osrf/gazebo/pull-request/2085)
+
 1. Fix circular dependency so that physics does not call the sensors API.
     * [Pull request #2089](https://bitbucket.org/osrf/gazebo/pull-request/2089)
     * [Issue #1516](https://bitbucket.org/osrf/gazebo/issues/1516)
