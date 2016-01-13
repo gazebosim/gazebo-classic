@@ -47,9 +47,23 @@ namespace gazebo
       /// \param[in] _pluginMsg Plugin message.
       public: void Update(ConstPluginPtr _pluginMsg);
 
+      /// \brief Set read-only mode.
+      /// \param[in] _readOnly True to make this inspector read-only.
+      public: void SetReadOnly(const bool _readOnly);
+
+      /// \brief Clear the inspector.
+      public: void Clear();
+
+      /// \brief Get the message containing plugin data.
+      /// \return Plugin message
+      msgs::Plugin *Data() const;
+
       /// \brief Qt event emiited when the mouse enters this widget.
       /// \param[in] _event Qt event.
       protected: virtual void enterEvent(QEvent *_event);
+
+     /// \brief Qt signal emitted to indicate that changes should be applied.
+      Q_SIGNALS: void Applied();
 
       /// \brief Qt callback when the Remove button is pressed.
       private slots: void OnRemove();

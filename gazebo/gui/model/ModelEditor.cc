@@ -153,15 +153,6 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   this->dataPtr->jointAct->setCheckable(true);
   this->dataPtr->jointAct->setObjectName("modelEditorJointAct");
 
-  // set up the action group so that only one action is active at one time.
-  QActionGroup *actionGroup = g_arrowAct->actionGroup();
-  if (actionGroup)
-  {
-    this->dataPtr->jointAct->setActionGroup(actionGroup);
-    connect(actionGroup, SIGNAL(triggered(QAction *)),
-        this, SLOT(OnAction(QAction *)));
-  }
-
   QToolButton *jointButton = new QToolButton();
   jointButton->setObjectName("jointToolButton");
   jointButton->setCheckable(false);
@@ -285,8 +276,6 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
 /////////////////////////////////////////////////
 ModelEditor::~ModelEditor()
 {
-  delete this->dataPtr;
-  this->dataPtr = NULL;
 }
 
 ////////////////////////////////////////////////
@@ -379,6 +368,7 @@ void ModelEditor::CreateMenus()
 /////////////////////////////////////////////////
 void ModelEditor::OnAddSelectedJoint()
 {
+  g_arrowAct->trigger();
   this->OnAddJoint(tr(this->dataPtr->selectedJointType.c_str()));
 }
 
@@ -395,7 +385,8 @@ void ModelEditor::OnAddJoint(const QString &_type)
 /////////////////////////////////////////////////
 void ModelEditor::OnJointAdded()
 {
-  if (this->dataPtr->jointAct->isChecked())
+  if (this->dataPtr && this->dataPtr->jointAct &&
+      this->dataPtr->jointAct->isChecked())
   {
     this->dataPtr->jointAct->setChecked(false);
     g_arrowAct->trigger();
@@ -494,16 +485,6 @@ void ModelEditor::OnFinish()
 {
 //  this->OnEdit(g_editModelAct->isChecked());
   g_editModelAct->trigger();
-}
-
-/////////////////////////////////////////////////
-void ModelEditor::OnAction(QAction *_action)
-{
-  if (!this->dataPtr->active)
-    return;
-
-  if (_action != this->dataPtr->jointAct)
-    this->dataPtr->modelPalette->CreateJoint("none");
 }
 
 /////////////////////////////////////////////////
