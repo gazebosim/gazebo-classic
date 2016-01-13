@@ -49,10 +49,9 @@ using namespace gui;
 TapeMeasure::TapeMeasure() : dataPtr(new TapeMeasurePrivate)
 {
   this->dataPtr->initialized = false;
-  this->dataPtr->selectedVertexDirty = false;
-  this->dataPtr->hoverVertexDirty = false;
-  this->dataPtr->dynamicLines = NULL;
-  this->dataPtr->updateMutex = NULL;
+  this->dataPtr->selectedPtDirty = false;
+  this->dataPtr->hoverPtDirty = false;
+  this->dataPtr->lines = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -64,35 +63,29 @@ TapeMeasure::~TapeMeasure()
 /////////////////////////////////////////////////
 void TapeMeasure::Clear()
 {
-gzdbg << "Clear" << std::endl;
-  this->dataPtr->selectedVertexDirty = false;
-  this->dataPtr->hoverVertexDirty = false;
+  this->dataPtr->selectedPtDirty = false;
+  this->dataPtr->hoverPtDirty = false;
   this->dataPtr->selectedVis.reset();
   this->dataPtr->hoverVis.reset();
 /*
-  if (this->dataPtr->updateMutex)
   {
-    boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
-    delete this->dataPtr->snapLines;
-    this->dataPtr->snapLines = NULL;
-    this->dataPtr->snapVisual.reset();
+    std::unique_lock<std::recursive_mutex> lock(this->dataPtr->updateMutex);
 
-    if (this->dataPtr->snapHighlight != NULL &&
-        this->dataPtr->highlightVisual != NULL)
+    delete this->dataPtr->lines;
+    this->dataPtr->lines = NULL;
+    this->dataPtr->lineVisual.reset();
+
+    if (this->dataPtr->highlightVis != NULL)
     {
-      this->dataPtr->highlightVisual->
+      this->dataPtr->highlightVis->
           DeleteDynamicLine(this->dataPtr->snapHighlight);
     }
-    this->dataPtr->highlightVisual.reset();
+    this->dataPtr->highlightVis.reset();
   }
 */
-
   if (this->dataPtr->renderConnection)
     event::Events::DisconnectRender(this->dataPtr->renderConnection);
   this->dataPtr->renderConnection.reset();
-
-  delete this->dataPtr->updateMutex;
-  this->dataPtr->updateMutex = NULL;
 
   this->dataPtr->scene.reset();
   this->dataPtr->userCamera.reset();
@@ -107,6 +100,7 @@ void TapeMeasure::Init()
   if (this->dataPtr->initialized)
     return;
 
+  // Get user camera and scene
   auto cam = gui::get_active_camera();
   if (!cam)
     return;
@@ -117,8 +111,7 @@ void TapeMeasure::Init()
   this->dataPtr->userCamera = cam;
   this->dataPtr->scene = cam->GetScene();
 
-  this->dataPtr->updateMutex = new boost::recursive_mutex();
-
+  // Ray query to find mesh triangles
   this->dataPtr->rayQuery.reset(
       new rendering::RayQuery(this->dataPtr->userCamera));
 
@@ -155,19 +148,35 @@ void TapeMeasure::Init()
   }
 
   // Line
-  std::string name = "_TAPEMEASURE_LINE_";
   this->dataPtr->lineVisual.reset(new rendering::Visual(
-      name, this->dataPtr->scene, false));
+      "_TAPEMEASURE_LINE_", this->dataPtr->scene, false));
   this->dataPtr->lineVisual->SetVisible(false);
   this->dataPtr->lineVisual->GetSceneNode()->setInheritScale(false);
   this->dataPtr->lineVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
 
-  this->dataPtr->dynamicLines =
+  this->dataPtr->lines =
       this->dataPtr->lineVisual->CreateDynamicLine(
       rendering::RENDERING_LINE_LIST);
-  this->dataPtr->dynamicLines->AddPoint(ignition::math::Vector3d::Zero);
-  this->dataPtr->dynamicLines->AddPoint(ignition::math::Vector3d::Zero);
-  this->dataPtr->dynamicLines->setMaterial("Gazebo/Blue");
+  this->dataPtr->lines->AddPoint(ignition::math::Vector3d::Zero);
+  this->dataPtr->lines->AddPoint(ignition::math::Vector3d::Zero);
+  this->dataPtr->lines->setMaterial("Gazebo/Blue");
+
+  // Text
+  this->dataPtr->textVisual.reset(new rendering::Visual(
+      "_TAPEMEASURE_TEXT_", this->dataPtr->scene, false));
+  this->dataPtr->textVisual->GetSceneNode()->setInheritScale(false);
+  this->dataPtr->textVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+
+  this->dataPtr->text.Load("_TAPEMEASURE_TEXT_",
+      "0m", "Arial", 0.1, common::Color::Blue);
+  this->dataPtr->text.SetShowOnTop(true);
+
+  auto textNode =
+      this->dataPtr->textVisual->GetSceneNode()->createChildSceneNode(
+      "_TAPEMEASURE_TEXT_NODE_");
+  textNode->attachObject(&(this->dataPtr->text));
+  textNode->setInheritScale(false);
+  this->dataPtr->textVisual->SetVisible(false);
 
   this->dataPtr->initialized = true;
 }
@@ -175,65 +184,69 @@ void TapeMeasure::Init()
 /////////////////////////////////////////////////
 void TapeMeasure::Reset()
 {
-gzdbg << "Reset" << std::endl;
-  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
+  std::unique_lock<std::recursive_mutex> lock(this->dataPtr->updateMutex);
+
   this->dataPtr->selectedVis.reset();
-  this->dataPtr->selectedVertex = ignition::math::Vector3d::Zero;
+  this->dataPtr->selectedPt = ignition::math::Vector3d::Zero;
 
   this->dataPtr->hoverVis.reset();
-  this->dataPtr->hoverVertex = ignition::math::Vector3d::Zero;
+  this->dataPtr->hoverPt = ignition::math::Vector3d::Zero;
 
-  this->dataPtr->hoverVertexDirty = false;
-  this->dataPtr->selectedVertexDirty = false;
-/*
-  if (this->dataPtr->snapVisual)
+  this->dataPtr->hoverPtDirty = false;
+  this->dataPtr->selectedPtDirty = false;
+
+  for (auto &vis : this->dataPtr->pointVisuals)
   {
-    if (this->dataPtr->snapVisual->GetVisible())
-      this->dataPtr->snapVisual->SetVisible(false);
-    if (this->dataPtr->snapVisual->GetParent())
+    if (vis->GetVisible())
+      vis->SetVisible(false);
+
+    if (vis->GetParent())
     {
-      this->dataPtr->snapVisual->GetParent()->DetachVisual(
-          this->dataPtr->snapVisual);
+      vis->GetParent()->DetachVisual(vis);
+      this->dataPtr->scene->WorldVisual()->AttachVisual(vis);
     }
   }
 
-  if (this->dataPtr->highlightVisual)
+  if (this->dataPtr->highlightVis)
   {
-    this->dataPtr->highlightVisual->SetVisible(false);
-    if (this->dataPtr->highlightVisual->GetParent())
+    this->dataPtr->highlightVis->SetVisible(false);
+    if (this->dataPtr->highlightVis->GetParent())
     {
-      this->dataPtr->highlightVisual->GetParent()->DetachVisual(
-          this->dataPtr->highlightVisual);
+      this->dataPtr->highlightVis->GetParent()->DetachVisual(
+          this->dataPtr->highlightVis);
     }
   }
+
+  if (this->dataPtr->lineVisual->GetVisible())
+    this->dataPtr->lineVisual->SetVisible(false);
+
+  if (this->dataPtr->textVisual->GetVisible())
+    this->dataPtr->textVisual->SetVisible(false);
 
   event::Events::DisconnectRender(this->dataPtr->renderConnection);
   this->dataPtr->renderConnection.reset();
-*/
 }
 
 /////////////////////////////////////////////////
 void TapeMeasure::OnMousePressEvent(const common::MouseEvent &_event)
 {
-  this->dataPtr->mouseEvent = _event;
-  this->dataPtr->userCamera->HandleMouseEvent(this->dataPtr->mouseEvent);
+  this->dataPtr->userCamera->HandleMouseEvent(_event);
 }
 
 /////////////////////////////////////////////////
 void TapeMeasure::OnMouseMoveEvent(const common::MouseEvent &_event)
 {
-  this->dataPtr->mouseEvent = _event;
-
   // \todo If holding shift, snap to a vertex on a mesh
-  auto vis = this->dataPtr->userCamera->GetVisual(
-      this->dataPtr->mouseEvent.Pos());
+
+  auto vis = this->dataPtr->userCamera->GetVisual(_event.Pos());
+
   // Get the first contact point
-  ignition::math::Pose3d pose;
+  ignition::math::Vector3d pos;
   if (this->dataPtr->scene->FirstContact(this->dataPtr->userCamera,
-        this->dataPtr->mouseEvent.Pos(), pose.Pos()) && vis)
+      _event.Pos(), pos))
   {
-    this->dataPtr->hoverVertex = pose.Pos();
-    this->dataPtr->hoverVertexDirty = true;
+    this->dataPtr->hoverPt = pos;
+    this->dataPtr->hoverPtDirty = true;
     this->dataPtr->hoverVis = vis;
 
     if (!this->dataPtr->renderConnection)
@@ -244,119 +257,69 @@ void TapeMeasure::OnMouseMoveEvent(const common::MouseEvent &_event)
   }
   else
   {
-    boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
+    std::unique_lock<std::recursive_mutex> lock(this->dataPtr->updateMutex);
+
     this->dataPtr->hoverVis.reset();
-    this->dataPtr->hoverVertex = ignition::math::Vector3d::Zero;
-    this->dataPtr->hoverVertexDirty = true;
+    this->dataPtr->hoverPt = ignition::math::Vector3d::Zero;
+    this->dataPtr->hoverPtDirty = true;
   }
 
-  // Line
-  if (this->dataPtr->pointVisuals[0]->GetDepth() != 0 &&
-      this->dataPtr->pointVisuals[1]->GetDepth() == 0)
+  // While extending line
+  if (this->dataPtr->pointVisuals[0]->GetDepth() > 1 &&
+      this->dataPtr->pointVisuals[1]->GetDepth() < 2)
   {
-    this->dataPtr->dynamicLines->SetPoint(1, this->dataPtr->hoverVertex);
+    // Line
+    if (!this->dataPtr->lineVisual->GetVisible())
+      this->dataPtr->lineVisual->SetVisible(true);
+
+    this->dataPtr->lines->SetPoint(1, this->dataPtr->hoverPt);
+
+    // Text
+    if (!this->dataPtr->textVisual->GetVisible())
+      this->dataPtr->textVisual->SetVisible(true);
+
+    this->dataPtr->textVisual->SetPosition(
+        (this->dataPtr->lines->Point(0) +
+         this->dataPtr->lines->Point(1)) / 2.0);
+
+    auto length = (this->dataPtr->lines->Point(0) -
+        this->dataPtr->lines->Point(1)).Length();
+
+    std::ostringstream lengthStr;
+    lengthStr << std::fixed << std::setprecision(3) << length;
+
+    this->dataPtr->text.SetText(lengthStr.str() + "m");
   }
 
-
-/*
-
-
-
-  auto vis = this->dataPtr->userCamera->GetVisual(
-      this->dataPtr->mouseEvent.Pos());
-  if (vis)
-  {
-    // get the triangle being hovered so that it can be highlighted
-    math::Vector3 intersect;
-    std::vector<math::Vector3> hoverVertex;
-    this->dataPtr->rayQuery->SelectMeshTriangle(_event.Pos().X(),
-        _event.Pos().Y(), vis->GetRootVisual(), intersect, hoverVertex);
-
-    if (!hoverVertex.empty())
-    {
-      boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
-      this->dataPtr->hoverVis = vis;
-      this->dataPtr->hoverVertex = hoverVertex;
-      this->dataPtr->hoverVertexDirty = true;
-    }
-  }
-  else
-  {
-    boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
-    this->dataPtr->hoverVis.reset();
-    this->dataPtr->hoverVertex.clear();
-    this->dataPtr->hoverVertexDirty = true;
-  }
-
-
-  this->dataPtr->mouseEvent = _event;
-  this->dataPtr->userCamera->HandleMouseEvent(this->dataPtr->mouseEvent);
-*/
+  this->dataPtr->userCamera->HandleMouseEvent(_event);
 }
 
 //////////////////////////////////////////////////
 void TapeMeasure::OnMouseReleaseEvent(const common::MouseEvent &_event)
 {
-  this->dataPtr->mouseEvent = _event;
-
-  if (this->dataPtr->mouseEvent.Button() == common::MouseEvent::LEFT)
+  if (_event.Button() == common::MouseEvent::LEFT)
   {
-    this->dataPtr->selectedVertex = this->dataPtr->hoverVertex;
+    this->dataPtr->selectedPt = this->dataPtr->hoverPt;
     this->dataPtr->selectedVis = this->dataPtr->hoverVis;
-    this->dataPtr->selectedVertexDirty = true;
-/*
-    // Select first triangle on any mesh
-    // Update triangle if the new triangle is on the same model/link
-    if (!this->dataPtr->selectedVis || (currentParent  == previousParent))
-    {
-      math::Vector3 intersect;
-      this->dataPtr->rayQuery->SelectMeshTriangle(_event.Pos().X(),
-          _event.Pos().Y(), currentParent, intersect,
-          this->dataPtr->selectedVertex);
-
-      if (!this->dataPtr->selectedVertex.empty())
-      {
-        this->dataPtr->selectedVertexDirty = true;
-      }
-      if (!this->dataPtr->renderConnection)
-      {
-        this->dataPtr->renderConnection = event::Events::ConnectRender(
-            boost::bind(&TapeMeasure::Update, this));
-      }
-    }
-    else
-    {
-      // select triangle on the target
-      math::Vector3 intersect;
-      std::vector<math::Vector3> vertices;
-      this->dataPtr->rayQuery->SelectMeshTriangle(_event.Pos().X(),
-          _event.Pos().Y(), currentParent, intersect, vertices);
-
-      if (!vertices.empty())
-      {
-        this->Snap(this->dataPtr->selectedVertex, vertices, previousParent);
-
-        this->Reset();
-        gui::Events::manipMode("select");
-      }
-    }
-*/
+    this->dataPtr->selectedPtDirty = true;
   }
-/*
   else
-    this->dataPtr->userCamera->HandleMouseEvent(this->dataPtr->mouseEvent);
-*/
+    this->dataPtr->userCamera->HandleMouseEvent(_event);
 }
 
 /////////////////////////////////////////////////
 void TapeMeasure::Update()
 {
-  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
+  std::unique_lock<std::recursive_mutex> lock(this->dataPtr->updateMutex);
+
+  bool pt0Chosen = this->dataPtr->pointVisuals[0]->GetDepth() > 1;
+  bool pt1Chosen = this->dataPtr->pointVisuals[1]->GetDepth() > 1;
 
   // Highlight visual
-  if (this->dataPtr->hoverVertexDirty)
+  if (this->dataPtr->hoverPtDirty)
   {
-    if (this->dataPtr->hoverVertex != ignition::math::Vector3d::Zero)
+    if (this->dataPtr->hoverPt != ignition::math::Vector3d::Zero &&
+        this->dataPtr->hoverVis && !pt1Chosen)
     {
       // Set new point position
       if (!this->dataPtr->highlightVis->GetVisible())
@@ -374,32 +337,32 @@ void TapeMeasure::Update()
       }
 
       // convert triangle to local coordinates relative to parent visual
-      auto hoverVertex =
+      auto hoverPt =
             this->dataPtr->hoverVis->GetWorldPose().Ign().Rot().Inverse() *
-            (this->dataPtr->hoverVertex -
+            (this->dataPtr->hoverPt -
             this->dataPtr->hoverVis->GetWorldPose().Ign().Pos());
 
-      this->dataPtr->highlightVis->SetPosition(hoverVertex);
+      this->dataPtr->highlightVis->SetPosition(hoverPt);
     }
     else
     {
       // turn off visualization if no visuals are hovered
       this->dataPtr->highlightVis->SetVisible(false);
     }
-    this->dataPtr->hoverVertexDirty = false;
+    this->dataPtr->hoverPtDirty = false;
   }
 
   // Point visuals
-  if (this->dataPtr->selectedVertexDirty &&
-      this->dataPtr->selectedVertex != ignition::math::Vector3d::Zero)
+  if (this->dataPtr->selectedPtDirty && this->dataPtr->selectedVis &&
+      this->dataPtr->selectedPt != ignition::math::Vector3d::Zero)
   {
     // convert triangle to local coordinates relative to parent visual
-    auto selectedVertex =
+    auto selectedPt =
           this->dataPtr->selectedVis->GetWorldPose().Ign().Rot().Inverse() *
-          (this->dataPtr->selectedVertex -
+          (this->dataPtr->selectedPt -
           this->dataPtr->selectedVis->GetWorldPose().Ign().Pos());
 
-    if (this->dataPtr->pointVisuals[0]->GetDepth() == 0)
+    if (!pt0Chosen)
     {
       if (this->dataPtr->selectedVis !=
           this->dataPtr->pointVisuals[0]->GetParent())
@@ -409,16 +372,16 @@ void TapeMeasure::Update()
           this->dataPtr->pointVisuals[0]->GetParent()->DetachVisual(
               this->dataPtr->pointVisuals[0]);
         }
-        this->dataPtr->selectedVis->AttachVisual(this->dataPtr->pointVisuals[0]);
+        this->dataPtr->selectedVis->AttachVisual(
+            this->dataPtr->pointVisuals[0]);
       }
 
       this->dataPtr->pointVisuals[0]->SetVisible(true);
-      this->dataPtr->pointVisuals[0]->SetPosition(selectedVertex);
+      this->dataPtr->pointVisuals[0]->SetPosition(selectedPt);
 
-      this->dataPtr->dynamicLines->SetPoint(0, this->dataPtr->selectedVertex);
-      this->dataPtr->lineVisual->SetVisible(true);
+      this->dataPtr->lines->SetPoint(0, this->dataPtr->selectedPt);
     }
-    else
+    else if (!pt1Chosen)
     {
       if (this->dataPtr->selectedVis !=
           this->dataPtr->pointVisuals[1]->GetParent())
@@ -428,57 +391,16 @@ void TapeMeasure::Update()
           this->dataPtr->pointVisuals[1]->GetParent()->DetachVisual(
               this->dataPtr->pointVisuals[1]);
         }
-        this->dataPtr->selectedVis->AttachVisual(this->dataPtr->pointVisuals[1]);
+        this->dataPtr->selectedVis->AttachVisual(
+            this->dataPtr->pointVisuals[1]);
       }
 
       this->dataPtr->pointVisuals[1]->SetVisible(true);
-      this->dataPtr->pointVisuals[1]->SetPosition(selectedVertex);
+      this->dataPtr->pointVisuals[1]->SetPosition(selectedPt);
 
-      this->dataPtr->dynamicLines->SetPoint(1, this->dataPtr->selectedVertex);
+      this->dataPtr->lines->SetPoint(1, this->dataPtr->selectedPt);
     }
-/*
-    if (!this->dataPtr->snapVisual)
-    {
-      // draw a border around selected triangle
-      rendering::UserCameraPtr camera = gui::get_active_camera();
 
-      std::string snapVisName = "_SNAP_";
-      this->dataPtr->snapVisual.reset(new rendering::Visual(
-          snapVisName, this->dataPtr->selectedVis, false));
-
-      this->dataPtr->snapLines =
-          this->dataPtr->snapVisual->CreateDynamicLine(
-          rendering::RENDERING_LINE_STRIP);
-      this->dataPtr->snapLines->setMaterial("Gazebo/RedGlow");
-      this->dataPtr->snapLines->AddPoint(triangle[0].Ign());
-      this->dataPtr->snapLines->AddPoint(triangle[1].Ign());
-      this->dataPtr->snapLines->AddPoint(triangle[2].Ign());
-      this->dataPtr->snapLines->AddPoint(triangle[0].Ign());
-      this->dataPtr->snapVisual->SetVisible(true);
-      this->dataPtr->snapVisual->GetSceneNode()->setInheritScale(false);
-      this->dataPtr->snapVisual->SetVisibilityFlags(
-          GZ_VISIBILITY_GUI & ~GZ_VISIBILITY_SELECTABLE);
-    }
-    else
-    {
-      // update border if the selected triangle changes
-      if (!this->dataPtr->snapVisual->GetVisible())
-        this->dataPtr->snapVisual->SetVisible(true);
-      if (this->dataPtr->selectedVis != this->dataPtr->snapVisual->GetParent())
-      {
-        if (this->dataPtr->snapVisual->GetParent())
-        {
-          this->dataPtr->snapVisual->GetParent()->DetachVisual(
-              this->dataPtr->snapVisual);
-        }
-        this->dataPtr->selectedVis->AttachVisual(this->dataPtr->snapVisual);
-      }
-      this->dataPtr->snapLines->SetPoint(0, triangle[0].Ign());
-      this->dataPtr->snapLines->SetPoint(1, triangle[1].Ign());
-      this->dataPtr->snapLines->SetPoint(2, triangle[2].Ign());
-      this->dataPtr->snapLines->SetPoint(3, triangle[0].Ign());
-    }
-*/
-    this->dataPtr->selectedVertexDirty = false;
+    this->dataPtr->selectedPtDirty = false;
   }
 }

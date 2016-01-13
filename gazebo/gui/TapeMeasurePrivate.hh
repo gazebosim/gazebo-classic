@@ -21,9 +21,9 @@
 #include <vector>
 #include <ignition/math/Vector3.hh>
 
-#include "gazebo/common/MouseEvent.hh"
 #include "gazebo/common/KeyEvent.hh"
 
+#include "gazebo/rendering/MovableText.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 
 namespace gazebo
@@ -43,17 +43,14 @@ namespace gazebo
       /// \brief Ray query for selecting a surface of an entity.
       public: rendering::RayQueryPtr rayQuery;
 
-      /// \brief Current mouse event.
-      public: common::MouseEvent mouseEvent;
-
       /// \brief True if the model align tool is initialized.
       public: bool initialized;
 
       /// \brief Vertices of a mesh triangle used as the basis for alignment.
-      public: ignition::math::Vector3d selectedVertex;
+      public: ignition::math::Vector3d selectedPt;
 
       /// \brief Vertices of a mesh triangle being hovered.
-      public: ignition::math::Vector3d hoverVertex;
+      public: ignition::math::Vector3d hoverPt;
 
       /// \brief Currently selected visual.
       public: rendering::VisualPtr selectedVis;
@@ -68,22 +65,28 @@ namespace gazebo
       public: event::ConnectionPtr renderConnection;
 
       /// \brief Mutex to protect the selected triangle vertices.
-      public: boost::recursive_mutex *updateMutex;
+      public: std::recursive_mutex updateMutex;
 
       /// \brief A visual to represent the snap spot.
       public: rendering::VisualPtr lineVisual;
 
+      /// \brief A visual to represent the snap spot.
+      public: rendering::VisualPtr textVisual;
+
       /// \brief Lines to highlight the selected triangle.
-      public: rendering::DynamicLines *dynamicLines;
+      public: rendering::DynamicLines *lines;
+
+      /// \brief Lines to highlight the selected triangle.
+      public: rendering::MovableText text;
 
       /// \brief A visual to represent the hovered area.
       public: std::vector<rendering::VisualPtr> pointVisuals;
 
       /// \brief A variable to indicate the selected triangle has changed.
-      public: bool selectedVertexDirty;
+      public: bool selectedPtDirty;
 
       /// \brief A variable to indicate the hovered triangle has changed.
-      public: bool hoverVertexDirty;
+      public: bool hoverPtDirty;
     };
   }
 }
