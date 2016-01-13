@@ -2219,6 +2219,12 @@ void Camera::DisconnectNewImageFrame(event::ConnectionPtr &_c)
 }
 
 /////////////////////////////////////////////////
+VisualPtr Camera::TrackedVisual() const
+{
+  return this->dataPtr->trackedVisual;
+}
+
+/////////////////////////////////////////////////
 bool Camera::TrackIsStatic() const
 {
   return this->dataPtr->trackIsStatic;

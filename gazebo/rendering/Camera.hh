@@ -872,6 +872,10 @@ namespace gazebo
       /// \sa SetProjectionType(const std::string &_type)
       public: std::string ProjectionType() const;
 
+      /// \brief Get the visual tracked by this camera.
+      /// \return Tracked visual.
+      public: VisualPtr TrackedVisual() const;
+
       /// \brief Get whether this camera is static when tracking a model.
       /// \return True if camera is static when tracking a model.
       /// \sa SetTrackIsStatic(bool _isStatic)

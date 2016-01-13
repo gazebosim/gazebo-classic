@@ -241,8 +241,18 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
       {
         topItem->addSubProperty(item);
 
-        bool isStatic = cam->TrackIsStatic();
+        rendering::VisualPtr trackedVisual = cam->TrackedVisual();
         QtVariantProperty *item2 = this->dataPtr->variantManager->addProperty(
+            QVariant::String, tr("name"));
+        if (trackedVisual)
+            item2->setValue(trackedVisual->GetName().c_str());
+        else
+            item2->setValue("");
+        item2->setEnabled(false);
+        item->addSubProperty(item2);
+
+        bool isStatic = cam->TrackIsStatic();
+        item2 = this->dataPtr->variantManager->addProperty(
             QVariant::Bool, tr("static"));
         item2->setValue(isStatic);
         item->addSubProperty(item2);
