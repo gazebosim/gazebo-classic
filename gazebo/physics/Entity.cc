@@ -80,7 +80,7 @@ Entity::Entity(BasePtr _parent)
 
   this->setWorldPoseFunc = &Entity::SetWorldPoseDefault;
 
-  this->scale = math::Vector3::One;
+  this->scale = ignition::math::Vector3d::One;
 }
 
 //////////////////////////////////////////////////
@@ -601,10 +601,7 @@ void Entity::Fini()
 //////////////////////////////////////////////////
 void Entity::Reset()
 {
-  if (this->HasType(Base::MODEL))
-    this->SetWorldPose(this->initialRelativePose);
-  else
-    this->SetRelativePose(this->initialRelativePose);
+  this->SetRelativePose(this->initialRelativePose);
 }
 
 //////////////////////////////////////////////////
