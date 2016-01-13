@@ -24,6 +24,7 @@
 
 #include <string>
 #include <vector>
+#include <ignition/math/Vector3.hh>
 
 #include <boost/function.hpp>
 #include "gazebo/msgs/msgs.hh"
@@ -323,7 +324,7 @@ namespace gazebo
       protected: math::Pose dirtyPose;
 
       /// \brief Scale of the entity
-      protected: math::Vector3 scale;
+      protected: ignition::math::Vector3d scale;
 
       /// \brief True if the object is static.
       private: bool isStatic;
