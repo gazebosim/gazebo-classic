@@ -34,10 +34,6 @@ set (test_sources
   gz_log_TEST.cc
   gz_TEST.cc
 )
-set (TEST_DEPENDENCIES
-  gz
-  gzserver
-)
 set (GZ_BUILD_TESTS_EXTRA_LIBS
   gazebo_transport
 )

@@ -38,9 +38,6 @@ macro (gz_build_tests)
       # gtest uses pthread on UNIX
       target_link_libraries(${BINARY_NAME} pthread)
     endif()
-    foreach (TEST_DEP ${TEST_DEPENDENCIES})
-      add_dependencies(${BINARY_NAME} ${TEST_DEP})
-    endforeach()
 
     add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME}
 	--gtest_output=xml:${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)

@@ -39,10 +39,6 @@ if (NOT APPLE)
   set(tool_tests
     gz_stress.cc
   )
-  set (TEST_DEPENDENCIES
-    gz
-    gzserver
-  )
   set (GZ_BUILD_TESTS_EXTRA_LIBS
     gazebo_transport
   )
