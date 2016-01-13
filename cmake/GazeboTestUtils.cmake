@@ -35,6 +35,7 @@ macro (gz_build_tests)
       ${GZ_BUILD_TESTS_EXTRA_LIBS}
     )
     if (UNIX)
+      # gtest uses pthread on UNIX
       target_link_libraries(${BINARY_NAME} pthread)
     endif()
     foreach (TEST_DEP ${TEST_DEPENDENCIES})
