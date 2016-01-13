@@ -36,6 +36,7 @@ ModelState::ModelState(const ModelPtr _model, const common::Time &_realTime,
 : State(_model->GetName(), _realTime, _simTime, _iterations)
 {
   this->pose = _model->GetWorldPose();
+  this->scale = _model->Scale();
 
   // Copy all the links
   const Link_V links = _model->GetLinks();
@@ -68,6 +69,7 @@ ModelState::ModelState(const ModelPtr _model)
         _model->GetWorld()->GetSimTime(), _model->GetWorld()->GetIterations())
 {
   this->pose = _model->GetWorldPose();
+  this->scale = _model->Scale();
 
   // Copy all the links
   const Link_V links = _model->GetLinks();
@@ -116,6 +118,7 @@ void ModelState::Load(const ModelPtr _model, const common::Time &_realTime,
   this->simTime = _simTime;
   this->iterations = _iterations;
   this->pose = _model->GetWorldPose();
+  this->scale = _model->Scale();
 
   // Load all the links
   this->linkStates.clear();
@@ -165,6 +168,12 @@ void ModelState::Load(const sdf::ElementPtr _elem)
     this->pose = _elem->Get<math::Pose>("pose");
   else
     this->pose.Set(0, 0, 0, 0, 0, 0);
+
+  // Set the model scale
+  if (_elem->HasElement("scale"))
+    this->scale = _elem->Get<ignition::math::Vector3d>("scale");
+  else
+    this->scale.Set(1, 1, 1);
 
   // Set all the links
   this->linkStates.clear();
@@ -216,6 +225,12 @@ const math::Pose &ModelState::GetPose() const
 }
 
 /////////////////////////////////////////////////
+const ignition::math::Vector3d &ModelState::Scale() const
+{
+  return this->scale;
+}
+
+/////////////////////////////////////////////////
 bool ModelState::IsZero() const
 {
   bool result = true;
@@ -237,7 +252,8 @@ bool ModelState::IsZero() const
     result = result && iter->second.IsZero();
   }*/
 
-  return result && this->pose == math::Pose::Zero;
+  return result && this->pose == math::Pose::Zero &&
+      this->scale == ignition::math::Vector3d::Zero;
 }
 
 /////////////////////////////////////////////////
@@ -387,6 +403,7 @@ ModelState &ModelState::operator=(const ModelState &_state)
 
   // Copy the pose
   this->pose = _state.pose;
+  this->scale = _state.scale;
 
   // Clear the link, joint, and model states.
   this->linkStates.clear();
@@ -424,6 +441,7 @@ ModelState ModelState::operator-(const ModelState &_state) const
   result.name = this->name;
   result.pose.pos = this->pose.pos - _state.pose.pos;
   result.pose.rot = _state.pose.rot.GetInverse() * this->pose.rot;
+  result.scale = this->scale - _state.scale;
 
   // Insert the link state diffs.
   for (LinkState_M::const_iterator iter =
@@ -498,6 +516,7 @@ ModelState ModelState::operator+(const ModelState &_state) const
   result.name = this->name;
   result.pose.pos = this->pose.pos + _state.pose.pos;
   result.pose.rot = _state.pose.rot * this->pose.rot;
+  result.scale = this->scale - _state.scale;
 
   // Insert the link state diffs.
   for (LinkState_M::const_iterator iter =
@@ -568,6 +587,7 @@ void ModelState::FillSDF(sdf::ElementPtr _sdf)
 
   _sdf->GetAttribute("name")->Set(this->name);
   _sdf->GetElement("pose")->Set(this->pose);
+  _sdf->GetElement("scale")->Set(this->scale);
 
   for (LinkState_M::iterator iter = this->linkStates.begin();
        iter != this->linkStates.end(); ++iter)
