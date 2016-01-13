@@ -538,7 +538,7 @@ void Sensor::ResetLastUpdateTime()
   std::lock_guard<std::mutex> lock(this->dataPtr->mutexLastUpdateTime);
   this->lastUpdateTime = 0.0;
   this->lastMeasurementTime = 0.0;
-  this->updateDelay = 0.0;
+  this->dataPtr->updateDelay = 0.0;
 }
 
 //////////////////////////////////////////////////
@@ -552,4 +552,3 @@ void Sensor::DisconnectUpdated(event::ConnectionPtr &_c)
 {
   this->dataPtr->updated.Disconnect(_c);
 }
-
