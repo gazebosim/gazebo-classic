@@ -121,7 +121,7 @@ TEST_F(CameraSensor, WorldReset)
   EXPECT_GT(dt.Double(), 1.0);
   EXPECT_LT(dt.Double(), 3.0);
 
-  camSensor->GetCamera()->DisconnectNewImageFrame(c);
+  camSensor->Camera()->DisconnectNewImageFrame(c);
   delete [] img;
 }
 
