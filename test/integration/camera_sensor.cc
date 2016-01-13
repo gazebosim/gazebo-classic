@@ -85,7 +85,7 @@ TEST_F(CameraSensor, WorldReset)
   imageCount = 0;
   img = new unsigned char[width * height*3];
   event::ConnectionPtr c =
-      camSensor->GetCamera()->ConnectNewImageFrame(
+      camSensor->Camera()->ConnectNewImageFrame(
       std::bind(&::OnNewCameraFrame, &imageCount, img,
       std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
       std::placeholders::_4, std::placeholders::_5));
