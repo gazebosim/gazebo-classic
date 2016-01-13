@@ -988,6 +988,9 @@ namespace gazebo
       /// \param[in] _value Mass value.
       Q_SIGNALS: void MassValueChanged(const double _value);
 
+      /// \brief Signal emitted when geometry changes.
+      Q_SIGNALS: void GeometryChanged();
+
       /// \brief Callback when density value changes in child widget.
       /// \param[in] _value Density value.
       private slots: void OnDensityValueChanged(const double &_value);
@@ -998,9 +1001,6 @@ namespace gazebo
 
       /// \brief Callback when geometry changes.
       private slots: void OnGeometryChanged();
-
-      /// \brief Signal emitted when geometry changes.
-      Q_SIGNALS: void GeometryChanged();
 
       /// \brief Qt event filter currently used to filter mouse wheel events.
       /// \param[in] _obj Object that is watched by the event filter.
