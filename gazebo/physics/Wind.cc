@@ -33,13 +33,12 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-Wind::Wind(WorldPtr _world)
+Wind::Wind(WorldPtr _world, sdf::ElementPtr _sdf)
   : dataPtr(new WindPrivate)
 {
   this->dataPtr->world = _world;
 
-  this->dataPtr->sdf.reset(new sdf::Element);
-  sdf::initFile("wind.sdf", this->dataPtr->sdf);
+  this->Load(_sdf);
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init(this->dataPtr->world->GetName());
@@ -59,8 +58,6 @@ Wind::Wind(WorldPtr _world)
 //////////////////////////////////////////////////
 Wind::~Wind()
 {
-  this->dataPtr->sdf->Reset();
-  this->dataPtr->sdf.reset();
   this->dataPtr->responsePub.reset();
   this->dataPtr->requestSub.reset();
   this->dataPtr->node.reset();
@@ -116,7 +113,6 @@ bool Wind::SetParam(const std::string &_key,
     {
       ignition::math::Vector3d vel =
           boost::any_cast<ignition::math::Vector3d>(_value);
-      this->dataPtr->sdf->GetElement("linear_velocity")->Set(vel);
       this->SetLinearVel(vel);
     }
     else
@@ -173,13 +169,8 @@ void Wind::Fini()
 //////////////////////////////////////////////////
 void Wind::Load(sdf::ElementPtr _sdf)
 {
-  this->dataPtr->sdf->Copy(_sdf);
-
-  if (this->dataPtr->sdf->HasElement("linear_velocity"))
-  {
-    this->SetLinearVel(
-        this->dataPtr->sdf->Get<ignition::math::Vector3d>("linear_velocity"));
-  }
+  if (_sdf && _sdf->HasElement("linear_velocity"))
+    this->SetLinearVel(_sdf->Get<ignition::math::Vector3d>("linear_velocity"));
 }
 
 /////////////////////////////////////////////////
@@ -212,12 +203,6 @@ void Wind::OnWindMsg(ConstWindPtr &_msg)
 
   if (_msg->has_enable_wind())
     this->dataPtr->world->EnableWind(_msg->enable_wind());
-}
-
-//////////////////////////////////////////////////
-sdf::ElementPtr Wind::SDF() const
-{
-  return this->dataPtr->sdf;
 }
 
 /////////////////////////////////////////////////

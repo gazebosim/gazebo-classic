@@ -31,9 +31,6 @@ namespace gazebo
       /// \brief Pointer to the world.
       public: WorldPtr world;
 
-      /// \brief Our SDF values.
-      public: sdf::ElementPtr sdf;
-
       /// \brief Node for communication.
       public: transport::NodePtr node;
 

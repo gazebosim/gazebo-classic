@@ -280,7 +280,8 @@ void World::Load(sdf::ElementPtr _sdf)
   // This should come before loading of entities
   sdf::ElementPtr windElem = this->dataPtr->sdf->GetElement("wind");
 
-  this->dataPtr->wind.reset(new physics::Wind(shared_from_this()));
+  this->dataPtr->wind.reset(new physics::Wind(shared_from_this(),
+                            this->dataPtr->sdf->GetElement("wind")));
 
   if (this->dataPtr->wind == NULL)
     gzthrow("Unable to create wind\n");

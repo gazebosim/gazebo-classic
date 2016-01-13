@@ -43,7 +43,8 @@ namespace gazebo
     {
       /// \brief Default constructor.
       /// \param[in] _world Pointer to the world.
-      public: explicit Wind(WorldPtr _world);
+      /// \param[in] _sdf SDF element parameters for the wind.
+      public: explicit Wind(WorldPtr _world, sdf::ElementPtr _sdf);
 
       /// \brief Destructor.
       public: virtual ~Wind();
@@ -81,10 +82,6 @@ namespace gazebo
       /// \param[out] _value Value of the accessed param
       /// \return True if the parameter was successfully retrieved
       public: bool Param(const std::string &_key, boost::any &_value) const;
-
-      /// \brief Get a pointer to the SDF element for the wind.
-      /// \return Pointer to the wind SDF element.
-      public: sdf::ElementPtr SDF() const;
 
       /// \brief virtual callback for gztopic "~/wind".
       /// \param[in] _msg Wind message.
