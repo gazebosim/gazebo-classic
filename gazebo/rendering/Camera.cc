@@ -214,7 +214,7 @@ void Camera::Init()
   this->SetClipDist();
 
   this->dataPtr->trackIsStatic = false;
-  this->dataPtr->trackIsRelative = true;
+  this->dataPtr->trackUseModelFrame = true;
   this->dataPtr->trackMinDistance = 8.0;
   this->dataPtr->trackMaxDistance = 8.0;
   this->dataPtr->trackPos = ignition::math::Vector3d(-5.0, 0.0, 3.0);
@@ -396,7 +396,7 @@ void Camera::Update()
     }
     else
     {
-      if (this->dataPtr->trackIsRelative)
+      if (this->dataPtr->trackUseModelFrame)
       {
         if (this->dataPtr->trackInheritYaw)
         {
@@ -2231,15 +2231,15 @@ void Camera::SetTrackIsStatic(const bool _isStatic)
 }
 
 /////////////////////////////////////////////////
-bool Camera::TrackIsRelative() const
+bool Camera::TrackUseModelFrame() const
 {
-  return this->dataPtr->trackIsRelative;
+  return this->dataPtr->trackUseModelFrame;
 }
 
 /////////////////////////////////////////////////
-void Camera::SetTrackIsRelative(const bool _isRelative)
+void Camera::SetTrackUseModelFrame(const bool _useModelFrame)
 {
-  this->dataPtr->trackIsRelative = _isRelative;
+  this->dataPtr->trackUseModelFrame = _useModelFrame;
 }
 
 /////////////////////////////////////////////////

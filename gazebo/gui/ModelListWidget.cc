@@ -247,10 +247,10 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
         item2->setValue(isStatic);
         item->addSubProperty(item2);
 
-        bool isRelative = cam->TrackIsRelative();
+        bool useModelFrame = cam->TrackUseModelFrame();
         item2 = this->dataPtr->variantManager->addProperty(
-            QVariant::Bool, tr("relative"));
-        item2->setValue(isRelative);
+            QVariant::Bool, tr("use_model_frame"));
+        item2->setValue(useModelFrame);
         item->addSubProperty(item2);
 
         bool inheritYaw = cam->TrackInheritYaw();
@@ -782,10 +782,11 @@ void ModelListWidget::GUIPropertyChanged(QtProperty *_item)
       cam->SetTrackIsStatic(this->dataPtr->variantManager->value(
              this->ChildItem(cameraFollowProperty, "static")).toBool());
     }
-    else if (changedProperty == "relative")
+    else if (changedProperty == "use_model_frame")
     {
-      cam->SetTrackIsRelative(this->dataPtr->variantManager->value(
-             this->ChildItem(cameraFollowProperty, "relative")).toBool());
+      cam->SetTrackUseModelFrame(this->dataPtr->variantManager->value(
+             this->ChildItem(cameraFollowProperty,
+                             "use_model_frame")).toBool());
     }
     else if (changedProperty == "inherit_yaw")
     {

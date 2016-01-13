@@ -105,7 +105,7 @@ namespace gazebo
 
       /// \brief If set to true, the position of the camera is relative to
       /// the tracked model, otherwise it represents world coordinates.
-      public: bool trackIsRelative;
+      public: bool trackUseModelFrame;
 
       /// \brief Position of the camera when tracking a model.
       public: ignition::math::Vector3d trackPos;

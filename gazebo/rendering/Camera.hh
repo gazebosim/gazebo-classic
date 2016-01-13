@@ -886,15 +886,15 @@ namespace gazebo
       /// \brief Get whether this camera's position is relative to tracked
       /// models.
       /// \return True if camera's position is relative to tracked models.
-      /// \sa SetTrackIsRelative(bool _isRelative)
-      public: virtual bool TrackIsRelative() const;
+      /// \sa SetTrackUseModelFrame(bool _useModelFrame)
+      public: virtual bool TrackUseModelFrame() const;
 
       /// \brief Set whether this camera's position is relative to tracked
       /// models.
-      /// \param[in] _isRelative True means camera's position is relative to
+      /// \param[in] _useModelFrame True means camera's position is relative to
       /// tracked models.
-      /// \sa TrackIsRelative()
-      public: virtual void SetTrackIsRelative(const bool _isRelative);
+      /// \sa TrackUseModelFrame()
+      public: virtual void SetTrackUseModelFrame(const bool _useModelFrame);
 
       /// \brief Return the position of the camera when tracking a model.
       /// \return Position of the camera.

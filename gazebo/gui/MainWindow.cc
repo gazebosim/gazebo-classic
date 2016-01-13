@@ -1953,8 +1953,8 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
       if (_msg->camera().track().has_static_())
         cam->SetTrackIsStatic(_msg->camera().track().static_());
 
-      if (_msg->camera().track().has_relative())
-        cam->SetTrackIsRelative(_msg->camera().track().relative());
+      if (_msg->camera().track().has_use_model_frame())
+        cam->SetTrackUseModelFrame(_msg->camera().track().use_model_frame());
 
       if (_msg->camera().track().has_xyz())
         cam->SetTrackPosition(msgs::ConvertIgn(_msg->camera().track().xyz()));
