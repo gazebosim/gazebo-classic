@@ -44,6 +44,10 @@ namespace gazebo
       /// \param[in] _parent Parent collision shape.
       public: explicit MultiRayShape(CollisionPtr _parent);
 
+      /// \brief Constructor for a global multiray shape.
+      /// \param[in] _physicsEngine Pointer to the physics engine.
+      public: explicit MultiRayShape(PhysicsEnginePtr _physicsEngine);
+
       /// \brief Destructor.
       public: virtual ~MultiRayShape();
 
@@ -142,13 +146,27 @@ namespace gazebo
               {this->newLaserScans.Disconnect(_conn);}
 
       /// \brief Physics engine specific method for updating the rays.
-      protected: virtual void UpdateRays() = 0;
+      public: virtual void UpdateRays() = 0;
 
       /// \brief Add a ray to the collision.
       /// \param[in] _start Start of the ray.
       /// \param[in] _end End of the ray.
-      protected: virtual void AddRay(const math::Vector3 &_start,
-                                     const math::Vector3 &_end);
+      public: virtual void AddRay(const math::Vector3 &_start,
+                                  const math::Vector3 &_end);
+
+      /// \brief Set the points of a ray.
+      /// \param[in] _rayIndex Index of the ray to set.
+      /// \param[in] _start Start of the ray.
+      /// \param[in] _end End of the ray.
+      /// \return True if the ray was set. False can be returned if the
+      /// _rayIndex is invalid.
+      public: bool SetRay(const unsigned int _rayIndex,
+                  const math::Vector3 &_start,
+                  const math::Vector3 &_end);
+
+      /// \brief Get the number of rays.
+      /// \return Number of rays in this shape.
+      public: unsigned int RayCount() const;
 
       /// \brief Ray data
       protected: std::vector<RayShapePtr> rays;
@@ -173,6 +191,9 @@ namespace gazebo
 
       /// \brief New laser scans event.
       protected: event::EventT<void()> newLaserScans;
+
+      private: double minRange = 0;
+      private: double maxRange = 1000;
     };
     /// \}
   }

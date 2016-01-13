@@ -272,6 +272,8 @@ namespace gazebo
 
       /// \brief Real time update rate.
       protected: double maxStepSize;
+
+      protected: math::Vector3 gravity;
     };
     /// \}
   }

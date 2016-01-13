@@ -31,6 +31,8 @@ namespace gazebo
       /// \param[in] _parent Parent Collision.
       public: explicit ODEMultiRayShape(CollisionPtr _parent);
 
+      public: explicit ODEMultiRayShape(PhysicsEnginePtr _physicsEngine);
+
       /// \brief Destructor.
       public: virtual ~ODEMultiRayShape();
 

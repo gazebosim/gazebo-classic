@@ -109,7 +109,7 @@ PhysicsEngine::~PhysicsEngine()
 //////////////////////////////////////////////////
 math::Vector3 PhysicsEngine::GetGravity() const
 {
-  return this->sdf->Get<math::Vector3>("gravity");
+  return this->gravity;
 }
 
 //////////////////////////////////////////////////
