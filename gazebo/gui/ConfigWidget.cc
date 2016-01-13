@@ -2000,8 +2000,6 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
 
   connect(geomFilenameButton, SIGNAL(clicked()), widget, SLOT(OnSelectFile()));
 
-  connect(geomFilenameButton, SIGNAL(clicked()), widget, SLOT(OnSelectFile()));
-
   connect(widget, SIGNAL(GeometryChanged()), this, SLOT(OnGeometryChanged()));
 
   connect(geomSizeXSpinBox, SIGNAL(valueChanged(double)),
