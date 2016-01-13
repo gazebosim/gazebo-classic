@@ -37,6 +37,7 @@
 #include <OGRE/OgreSceneManager.h>
 #include <OGRE/OgreSceneNode.h>
 #include <OGRE/OgreVector3.h>
+#include <OGRE/OgreMatrix4.h>
 #include <OGRE/OgreManualObject.h>
 #include <OGRE/OgreMaterialManager.h>
 #include <OGRE/OgreColourValue.h>

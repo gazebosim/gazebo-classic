@@ -66,7 +66,7 @@ Camera::Camera(const std::string &_name, ScenePtr _scene,
   : dataPtr(new CameraPrivate)
 {
   this->initialized = false;
-  this->cameraProjectiveMatrix = Ogre::Matrix4::IDENTITY;
+  this->cameraProjectiveMatrix = ignition::math::Matrix4d::Identity;
   this->cameraUsingIntrinsics = false;
   this->sdf.reset(new sdf::Element);
   sdf::initFile("camera.sdf", this->sdf);
@@ -227,81 +227,73 @@ void Camera::LoadCameraIntrinsics()
 }
 
 //////////////////////////////////////////////////
-Ogre::Matrix4 Camera::BuildNormalizedDeviceCoordinatesMatrix(
+ignition::math::Matrix4d Camera::BuildNDCMatrix(
     const double _left, const double _right,
     const double _bottom, const double _top,
-    const double _near, const double _far) const
+    const double _near, const double _far)
 {
   double inverseWidth = 1.0 / (_right - _left);
   double inverseHeight = 1.0 / (_top - _bottom);
   double inverseDistance = 1.0 / (_far - _near);
 
-  Ogre::Matrix4 ndc = Ogre::Matrix4::ZERO;
-  ndc[0][0] = 2.0 * inverseWidth;
-  ndc[0][3] = -(_right + _left) * inverseWidth;
-  ndc[1][1] = 2.0 * inverseHeight;
-  ndc[1][3] = -(_top + _bottom) * inverseHeight;
-  ndc[2][2] = -2.0 * inverseDistance;
-  ndc[2][3] = -(_far + _near) * inverseDistance;
-  ndc[3][3] = 1.0;
-
-  return ndc;
+  return ignition::math::Matrix4d(
+           2.0 * inverseWidth,
+           0.0,
+           0.0,
+           -(_right + _left) * inverseWidth,
+           0.0,
+           2.0 * inverseHeight,
+           0.0,
+           -(_top + _bottom) * inverseHeight,
+           0.0,
+           0.0,
+           -2.0 * inverseDistance,
+           -(_far + _near) * inverseDistance,
+           0.0,
+           0.0,
+           0.0,
+           1.0);
 }
 
 //////////////////////////////////////////////////
-Ogre::Matrix4 Camera::BuildPerspectiveMatrix(
+ignition::math::Matrix4d Camera::BuildPerspectiveMatrix(
     const double _intrinsicsFx, const double _intrinsicsFy,
     const double _intrinsicsCx, const double _intrinsicsCy,
     const double _intrinsicsS,
-    const double _clipNear, const double _clipFar) const
+    const double _clipNear, const double _clipFar)
 {
-  Ogre::Matrix4 intrinsicMatrix = Ogre::Matrix4::ZERO;
-  intrinsicMatrix[0][0] = _intrinsicsFx;
-  intrinsicMatrix[1][1] = _intrinsicsFy;
-  intrinsicMatrix[0][2] = -_intrinsicsCx;
-  intrinsicMatrix[1][2] = -_intrinsicsCy;
-  intrinsicMatrix[0][1] = _intrinsicsS;
-  intrinsicMatrix[2][2] = _clipNear + _clipFar;
-  intrinsicMatrix[2][3] = _clipNear * _clipFar;
-  intrinsicMatrix[3][2] = -1.0f;
-
-  return intrinsicMatrix;
+  return ignition::math::Matrix4d(
+           _intrinsicsFx,
+           _intrinsicsS,
+           -_intrinsicsCx,
+           0.0,
+           0.0,
+           _intrinsicsFy,
+           -_intrinsicsCy,
+           0.0,
+           0.0,
+           0.0,
+           _clipNear + _clipFar,
+           _clipNear * _clipFar,
+           0.0,
+           0.0,
+           -1.0,
+           0.0);
 }
 
 //////////////////////////////////////////////////
-Ogre::Matrix4 Camera::BuildProjectiveMatrix(
+ignition::math::Matrix4d Camera::BuildProjectiveMatrix(
     const double _imageWidth, const double _imageHeight,
     const double _intrinsicsFx, const double _intrinsicsFy,
     const double _intrinsicsCx, double _intrinsicsCy,
     const double _intrinsicsS,
-    const double _clipNear, const double _clipFar) const
+    const double _clipNear, const double _clipFar)
 {
-  return BuildNormalizedDeviceCoordinatesMatrix(
+  return BuildNDCMatrix(
            0, _imageWidth, 0, _imageHeight, _clipNear, _clipFar) *
          BuildPerspectiveMatrix(
            _intrinsicsFx, _intrinsicsFy, _intrinsicsCx, _intrinsicsCy,
            _intrinsicsS, _clipNear, _clipFar);
-
-// Same as the matrix multiplication above but more efficient
-  Ogre::Matrix4 projectiveMatrix = Ogre::Matrix4::ZERO;
-  projectiveMatrix[0][0] = 2.0*_intrinsicsFx/_imageWidth;
-  projectiveMatrix[0][1] = 2.0*_intrinsicsS/_imageWidth;
-  projectiveMatrix[0][2] = 1.0-(2.0*_intrinsicsCx)/_imageWidth;
-  projectiveMatrix[0][3] = 0;
-  projectiveMatrix[1][0] = 0;
-  projectiveMatrix[1][1] = 2.0*_intrinsicsFy/_imageHeight;
-  projectiveMatrix[1][2] = 1.0-(2.0*_intrinsicsCy/_imageHeight);
-  projectiveMatrix[1][3] = 0;
-  projectiveMatrix[2][0] = 0;
-  projectiveMatrix[2][1] = 0;
-  projectiveMatrix[2][2] = -(_clipFar + _clipNear)/(_clipFar - _clipNear);
-  projectiveMatrix[2][3] = -2.0*(_clipFar * _clipNear)/(_clipFar - _clipNear);
-  projectiveMatrix[3][0] = 0;
-  projectiveMatrix[3][1] = 0;
-  projectiveMatrix[3][2] = -1.0;
-  projectiveMatrix[3][3] = 0;
-
-  return projectiveMatrix;
 }
 
 //////////////////////////////////////////////////
@@ -1494,7 +1486,8 @@ void Camera::CreateCamera()
   this->cameraNode->roll(Ogre::Degree(-90.0));
 
   if (cameraUsingIntrinsics)
-    this->camera->setCustomProjectionMatrix(true, cameraProjectiveMatrix);
+    this->camera->setCustomProjectionMatrix(true,
+      Conversions::Convert(cameraProjectiveMatrix));
 }
 
 //////////////////////////////////////////////////
@@ -1977,7 +1970,8 @@ void Camera::UpdateFOV()
     double hfov = this->HFOV().Radian();
     double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
     if (this->cameraUsingIntrinsics)
-        this->camera->setCustomProjectionMatrix(true, cameraProjectiveMatrix);
+        this->camera->setCustomProjectionMatrix(true,
+          Conversions::Convert(cameraProjectiveMatrix));
     else
     {
       this->camera->setAspectRatio(ratio);

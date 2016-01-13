@@ -22,6 +22,8 @@
 #include <ignition/math/Quaternion.hh>
 #include <ignition/math/Vector3.hh>
 
+#include <ignition/math/Matrix4.hh>
+
 #include "gazebo/rendering/ogre_gazebo.h"
 
 #include "gazebo/rendering/RenderTypes.hh"

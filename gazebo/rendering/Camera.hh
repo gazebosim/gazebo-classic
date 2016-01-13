@@ -34,6 +34,8 @@
 #include <ignition/math/Vector2.hh>
 #include <ignition/math/Vector3.hh>
 
+#include <ignition/math/Matrix4.hh>
+
 #include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/transport/Node.hh"
@@ -44,6 +46,7 @@
 #include "gazebo/common/Time.hh"
 
 #include "gazebo/rendering/ogre_gazebo.h"
+#include "gazebo/rendering/Conversions.hh"
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/util/system.hh"
@@ -57,7 +60,6 @@ namespace Ogre
   class Viewport;
   class SceneNode;
   class AnimationState;
-  class Matrix4;
 }
 
 namespace gazebo
@@ -114,10 +116,10 @@ namespace gazebo
       ///            This value is negative if the plane is to be behind
       ///            the camera
       /// \return OpenGL NDC (Normalized Device Coordinates) matrix
-      public: Ogre::Matrix4 BuildNormalizedDeviceCoordinatesMatrix(
+      public: static ignition::math::Matrix4d BuildNDCMatrix(
               const double _left, const double _right,
               const double _bottom, const double _top,
-              const double _near, const double _far) const;
+              const double _near, const double _far);
 
       /// \brief Computes the OpenGL perspective matrix
       /// \param[in] _intrinsicsFx Horizontal focal length (in pixels)
@@ -132,14 +134,17 @@ namespace gazebo
       /// \param[in] _clipFar Distance to the farther depth clipping plane
       ///            This value is negative if the plane is to be behind
       ///            the camera
-      /// \return Ogre 4x4 homogeneous perspective matrix
-      public: Ogre::Matrix4 BuildPerspectiveMatrix(
+      /// \return OpenGL perspective matrix
+      public: static ignition::math::Matrix4d BuildPerspectiveMatrix(
               const double _intrinsicsFx, const double _intrinsicsFy,
               const double _intrinsicsCx, const double _intrinsicsCy,
               const double _intrinsicsS,
-              const double _clipNear, const double _clipFar) const;
+              const double _clipNear, const double _clipFar);
 
-      /// \brief Computes the OpenGL projective matrix
+      /// \brief Computes the OpenGL projective matrix by multiplying
+      ///        the OpenGL Normalized Device Coordinates matrix (NDC) with
+      ///        the OpenGL perspective matrix
+      ///        openglProjectiveMatrix = ndcMatrix * perspectiveMatrix
       /// \param[in] _imageWidth Image width (in pixels)
       /// \param[in] _imageHeight Image height (in pixels)
       /// \param[in] _intrinsicsFx Horizontal focal length (in pixels)
@@ -154,13 +159,13 @@ namespace gazebo
       /// \param[in] _clipFar Distance to the farther depth clipping plane
       ///            This value is negative if the plane is to be behind
       ///            the camera
-      /// \return Ogre 4x4 homogeneous projective matrix
-      public: Ogre::Matrix4 BuildProjectiveMatrix(
+      /// \return OpenGL projective matrix
+      public: static ignition::math::Matrix4d BuildProjectiveMatrix(
               const double _imageWidth, const double _imageHeight,
               const double _intrinsicsFx, const double _intrinsicsFy,
               const double _intrinsicsCx, const double _intrinsicsCy,
               const double _intrinsicsS,
-              const double _clipNear, const double _clipFar) const;
+              const double _clipNear, const double _clipFar);
 
       /// \brief Initialize the camera
       public: virtual void Init();
@@ -857,7 +862,7 @@ namespace gazebo
       protected: Ogre::Camera *camera;
 
       /// \brief Camera projective matrix
-      protected: Ogre::Matrix4 cameraProjectiveMatrix;
+      protected: ignition::math::Matrix4d cameraProjectiveMatrix;
 
       /// \brief Flag for signaling the usage of camera intrinsics within OGRE
       protected: bool cameraUsingIntrinsics;
