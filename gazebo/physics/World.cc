@@ -40,8 +40,6 @@
 #include <vector>
 
 #include <ignition/math/Rand.hh>
-
-#include "gazebo/sensors/SensorManager.hh"
 #include "gazebo/math/Rand.hh"
 
 #include "gazebo/transport/Node.hh"
@@ -598,6 +596,18 @@ void World::LogStep()
 }
 
 //////////////////////////////////////////////////
+void World::_SetSensorsInitialized(const bool _init)
+{
+  this->dataPtr->sensorsInitialized = _init;
+}
+
+//////////////////////////////////////////////////
+bool World::SensorsInitialized() const
+{
+  return this->dataPtr->sensorsInitialized;
+}
+
+//////////////////////////////////////////////////
 void World::Step()
 {
   DIAG_TIMER_START("World::Step");
@@ -606,8 +616,7 @@ void World::Step()
   /// until dWorld.*Step
   /// Plugins that manipulate joints (and probably other properties) require
   /// one iteration of the physics engine. Do not remove this.
-  if (!this->dataPtr->pluginsLoaded &&
-      sensors::SensorManager::Instance()->SensorsInitialized())
+  if (!this->dataPtr->pluginsLoaded && this->SensorsInitialized())
   {
     this->LoadPlugins();
     this->dataPtr->pluginsLoaded = true;
@@ -806,6 +815,7 @@ void World::Fini()
   this->dataPtr->plugins.clear();
 
   this->dataPtr->publishModelPoses.clear();
+  this->dataPtr->publishModelScales.clear();
   this->dataPtr->publishLightPoses.clear();
 
   this->dataPtr->node->Fini();
@@ -845,6 +855,7 @@ void World::ClearModels()
   this->SetPaused(true);
 
   this->dataPtr->publishModelPoses.clear();
+  this->dataPtr->publishModelScales.clear();
 
   // Remove all models
   for (auto &model : this->dataPtr->models)
@@ -1122,7 +1133,9 @@ void World::ResetTime()
   if (this->IsPaused())
     this->dataPtr->pauseStartTime = this->dataPtr->startTime;
 
-  sensors::SensorManager::Instance()->ResetLastUpdateTimes();
+  // Signal a reset has occurred. The SensorManager listens to this event
+  // to reset each sensor's last update time.
+  event::Events::timeReset();
 }
 
 //////////////////////////////////////////////////
@@ -1595,14 +1608,41 @@ void World::ProcessRequestMsgs()
         response.set_response("nonexistent");
       }
     }
-    else if (requestMsg.request() == "world_sdf")
+    else if (requestMsg.request().find("world_sdf") != std::string::npos)
     {
-      msgs::GzString msg;
       this->UpdateStateSDF();
+
+      sdf::ElementPtr newSdf(this->dataPtr->sdf);
+
+      // FIXME: Handle scale better on the server so we don't need to unscale
+      // SDF here. Issue #1825
+      if (requestMsg.request() == "world_sdf_save")
+      {
+        // Substitute all models sdf with unscaled versions
+        if (newSdf->HasElement("model"))
+        {
+          auto modelElem = newSdf->GetElement("model");
+          while (modelElem)
+          {
+            auto name = modelElem->GetAttribute("name")->GetAsString();
+            auto model = this->GetModel(name);
+            if (model)
+            {
+              auto unscaled = model->UnscaledSDF()->Clone();
+
+              modelElem->Copy(unscaled);
+            }
+
+            modelElem = modelElem->GetNextElement("model");
+          }
+        }
+      }
+
+      msgs::GzString msg;
       std::ostringstream stream;
       stream << "<?xml version='1.0'?>\n"
              << "<sdf version='" << SDF_VERSION << "'>\n"
-             << this->dataPtr->sdf->ToString("")
+             << newSdf->ToString("")
              << "</sdf>";
 
       msg.set_data(stream.str());
@@ -2197,6 +2237,43 @@ void World::ProcessMessages()
     this->dataPtr->publishModelPoses.clear();
   }
 
+  {
+    boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
+
+    if (this->dataPtr->modelPub && this->dataPtr->modelPub->HasConnections())
+    {
+      if (!this->dataPtr->publishModelScales.empty())
+      {
+        for (auto const &model : this->dataPtr->publishModelScales)
+        {
+          std::list<ModelPtr> modelList;
+          modelList.push_back(model);
+          while (!modelList.empty())
+          {
+            ModelPtr m = modelList.front();
+            modelList.pop_front();
+
+            // Publish the model's scale
+            msgs::Model msg;
+            msg.set_name(m->GetScopedName());
+            msg.set_id(m->GetId());
+            msgs::Set(msg.mutable_scale(), m->Scale());
+
+            // Not publishing for links for now
+
+            // add all nested models to the queue
+            Model_V models = m->NestedModels();
+            for (auto const &n : models)
+              modelList.push_back(n);
+
+            this->dataPtr->modelPub->Publish(msg);
+          }
+        }
+      }
+    }
+    this->dataPtr->publishModelScales.clear();
+  }
+
   if (common::Time::GetWallTime() - this->dataPtr->prevProcessMsgsTime >
       this->dataPtr->processMsgsPeriod)
   {
@@ -2275,6 +2352,15 @@ void World::PublishModelPose(physics::ModelPtr _model)
 
   // Only add if the model name is not in the list
   this->dataPtr->publishModelPoses.insert(_model);
+}
+
+//////////////////////////////////////////////////
+void World::PublishModelScale(physics::ModelPtr _model)
+{
+  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
+
+  // Only add if the model name is not in the list
+  this->dataPtr->publishModelScales.insert(_model);
 }
 
 //////////////////////////////////////////////////
