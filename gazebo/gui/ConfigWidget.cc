@@ -20,7 +20,6 @@
 
 #include "gazebo/common/Console.hh"
 #include "gazebo/gui/model/DensityModel.hh"
-#include "gazebo/gui/model/CollisionConfig.hh"
 #include "gazebo/gui/ConfigWidget.hh"
 #include "gazebo/gui/ConfigWidgetPrivate.hh"
 
