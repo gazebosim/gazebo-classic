@@ -15,6 +15,8 @@
  *
 */
 
+#include <functional>
+
 #include <ignition/math/Rand.hh>
 
 #include "gazebo/physics/physics.hh"
@@ -51,6 +53,76 @@ void OnNewCameraFrame(int* _imageCounter, unsigned char* _imageDest,
   pixelFormat = _format;
   memcpy(_imageDest, _image, _width * _height * _depth);
   *_imageCounter += 1;
+}
+
+
+/////////////////////////////////////////////////
+TEST_F(CameraSensor, WorldReset)
+{
+  Load("worlds/empty_test.world");
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run camera test\n";
+    return;
+  }
+
+  // spawn camera sensor
+  std::string modelName = "camera_model";
+  std::string cameraName = "camera_sensor";
+  unsigned int width  = 320;
+  unsigned int height = 240;
+  double updateRate = 10;
+  math::Pose setPose, testPose(
+      math::Vector3(-5, 0, 5), math::Quaternion(0, GZ_DTOR(15), 0));
+  SpawnCamera(modelName, cameraName, setPose.pos,
+      setPose.rot.GetAsEuler(), width, height, updateRate);
+  sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
+  sensors::CameraSensorPtr camSensor =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+  imageCount = 0;
+  img = new unsigned char[width * height*3];
+  event::ConnectionPtr c =
+      camSensor->GetCamera()->ConnectNewImageFrame(
+      std::bind(&::OnNewCameraFrame, &imageCount, img,
+      std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+      std::placeholders::_4, std::placeholders::_5));
+  common::Timer timer;
+  timer.Start();
+
+  // let the camera render for 2 seconds at 10 Hz
+  int total_images = 20;
+  while (imageCount < total_images && timer.GetElapsed().Double() < 4)
+    common::Time::MSleep(10);
+  EXPECT_GE(imageCount, total_images);
+  common::Time dt = timer.GetElapsed();
+  EXPECT_GT(dt.Double(), 1.0);
+  EXPECT_LT(dt.Double(), 3.0);
+
+  // reset the world and verify
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+  common::Time simTime = world->GetSimTime().Double();
+  world->Reset();
+  EXPECT_TRUE(world->GetSimTime() == common::Time(0.0) ||
+      world->GetSimTime() < simTime);
+
+  // verify that the camera can continue to render and generate images at
+  // the specified rate
+  imageCount = 0;
+  timer.Reset();
+  timer.Start();
+  while (imageCount < total_images && timer.GetElapsed().Double() < 4)
+    common::Time::MSleep(10);
+  dt = timer.GetElapsed();
+  EXPECT_GE(imageCount, total_images);
+  EXPECT_GT(dt.Double(), 1.0);
+  EXPECT_LT(dt.Double(), 3.0);
+
+  camSensor->GetCamera()->DisconnectNewImageFrame(c);
+  delete [] img;
 }
 
 /////////////////////////////////////////////////
@@ -99,7 +171,7 @@ TEST_F(CameraSensor, CheckThrottle)
   EXPECT_GT(rate, 7.0);
   EXPECT_LT(rate, 11.0);
   camSensor->GetCamera()->DisconnectNewImageFrame(c);
-  delete img;
+  delete [] img;
 }
 
 /////////////////////////////////////////////////
@@ -214,7 +286,7 @@ TEST_F(CameraSensor, UnlimitedTest)
   camSensor->GetCamera()->DisconnectNewImageFrame(c);
   EXPECT_GT(rate, 30.0);
 
-  delete img;
+  delete [] img;
 }
 
 /////////////////////////////////////////////////

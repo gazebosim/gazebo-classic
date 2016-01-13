@@ -34,6 +34,7 @@ EventT<void (const common::UpdateInfo &)> Events::worldUpdateBegin;
 
 EventT<void ()> Events::worldUpdateEnd;
 EventT<void ()> Events::worldReset;
+EventT<void ()> Events::timeReset;
 
 EventT<void ()> Events::preRender;
 EventT<void ()> Events::render;
@@ -41,6 +42,11 @@ EventT<void ()> Events::postRender;
 
 EventT<void (std::string)> Events::diagTimerStart;
 EventT<void (std::string)> Events::diagTimerStop;
+
+EventT<void (std::string)> Events::removeSensor;
+
+EventT<void (sdf::ElementPtr, const std::string &,
+    const std::string &, const uint32_t)> Events::createSensor;
 
 /////////////////////////////////////////////////
 void Events::DisconnectWorldUpdateBegin(ConnectionPtr _subscriber)
