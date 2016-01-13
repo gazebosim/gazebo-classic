@@ -15,12 +15,14 @@
  *
 */
 
-#ifndef _FLOOR_ITEM_HH_
-#define _FLOOR_ITEM_HH_
+#ifndef _GAZEBO_GUI_BUILDING_FLOORITEM_HH_
+#define _GAZEBO_GUI_BUILDING_FLOORITEM_HH_
 
-#include <vector>
+#include <memory>
+
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/building/RectItem.hh"
+
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -28,6 +30,9 @@ namespace gazebo
   namespace gui
   {
     class WallSegmentItem;
+
+    // Forward declare private data.
+    class FloorItemPrivate;
 
     /// \addtogroup gazebo_gui
     /// \{
@@ -87,27 +92,9 @@ namespace gazebo
       /// \brief Emit size changed Qt signals.
       private: void SizeChanged();
 
-      /// \brief Depth of floor item in pixels.
-      private: double floorDepth;
-
-      /// \brief Height of floor item in pixels.
-      private: double floorHeight;
-
-      /// \brief Width of floor item in pixels.
-      private: double floorWidth;
-
-      /// \brief Scene position of floor item in pixel coordinates.
-      private: QPointF floorPos;
-
-      /// \brief A flag to indicate whether or not there have been changes to
-      /// the wall items.
-      private: bool dirty;
-
-      /// \brief A list of wall items that the floor item holds.
-      private: std::vector<WallSegmentItem *> wallSegments;
-
-      /// \brief Bounding box of the floor item.
-      private: QPolygonF floorBoundingRect;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<FloorItemPrivate> dataPtr;
     };
     /// \}
   }

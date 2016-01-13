@@ -1,5 +1,14 @@
 ## Gazebo 7.0
 
+1. Fix circular dependency so that physics does not call the sensors API.
+    * [Pull request #2089](https://bitbucket.org/osrf/gazebo/pull-request/2089)
+    * [Issue #1516](https://bitbucket.org/osrf/gazebo/issues/1516)
+
+1. Add Gravity and MagneticField API to World class to match sdformat change.
+    * [SDFormat pull request 247](https://bitbucket.org/osrf/sdformat/pull-requests/247)
+    * [Issue #1823](https://bitbucket.org/osrf/gazebo/issues/1823)
+    * [Pull request #2090](https://bitbucket.org/osrf/gazebo/pull-request/2090)
+
 1. Use opaque pointers and deprecate functions in the rendering library
     * [Pull request #2069](https://bitbucket.org/osrf/gazebo/pull-request/2069)
     * [Pull request #2064](https://bitbucket.org/osrf/gazebo/pull-request/2064)
@@ -10,11 +19,13 @@
     * [Pull request #2070](https://bitbucket.org/osrf/gazebo/pull-request/2070)
     * [Pull request #2071](https://bitbucket.org/osrf/gazebo/pull-request/2071)
     * [Pull request #2084](https://bitbucket.org/osrf/gazebo/pull-request/2084)
+    * [Pull request #2073](https://bitbucket.org/osrf/gazebo/pull-request/2073)
 
 1. Use opaque pointers for the Master class.
     * [Pull request #2036](https://bitbucket.org/osrf/gazebo/pull-request/2036)
 
 1. Use opaque pointers in the gui library
+    * [Pull request #2057](https://bitbucket.org/osrf/gazebo/pull-request/2057)
     * [Pull request #2037](https://bitbucket.org/osrf/gazebo/pull-request/2037)
     * [Pull request #2052](https://bitbucket.org/osrf/gazebo/pull-request/2052)
     * [Pull request #2053](https://bitbucket.org/osrf/gazebo/pull-request/2053)
@@ -23,6 +34,7 @@
     * [Pull request #2027](https://bitbucket.org/osrf/gazebo/pull-request/2027)
     * [Pull request #2026](https://bitbucket.org/osrf/gazebo/pull-request/2026)
     * [Pull request #2029](https://bitbucket.org/osrf/gazebo/pull-request/2029)
+    * [Pull request #2042](https://bitbucket.org/osrf/gazebo/pull-request/2042)
 
 1. Use more opaque pointers.
     * [Pull request #2022](https://bitbucket.org/osrf/gazebo/pull-request/2022)
@@ -303,6 +315,7 @@ using the same arguments used in the command line.
         * [Pull request #2032](https://bitbucket.org/osrf/gazebo/pull-request/2032)
         * [Pull request #2082](https://bitbucket.org/osrf/gazebo/pull-request/2082)
         * [Pull request #2038](https://bitbucket.org/osrf/gazebo/pull-request/2038)
+        * [Pull request #2033](https://bitbucket.org/osrf/gazebo/pull-request/2033)
 
     1. Use opaque pointers for GrabberHandle, add *LinkedGrabbers functions
         * [Pull request #2034](https://bitbucket.org/osrf/gazebo/pull-request/2034)
