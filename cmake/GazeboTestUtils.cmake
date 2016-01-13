@@ -34,6 +34,9 @@ macro (gz_build_tests)
       gtest_main
       ${GZ_BUILD_TESTS_EXTRA_LIBS}
     )
+    if (UNIX)
+      target_link_libraries(${BINARY_NAME} pthread)
+    endif()
     foreach (TEST_DEP ${TEST_DEPENDENCIES})
       add_dependencies(${BINARY_NAME} ${TEST_DEP})
     endforeach()
