@@ -102,11 +102,11 @@ namespace gazebo
 
       /// \brief Callback for density changes in config widget.
       /// \param[in] _value The new density value.
-      private slots: void OnDensityValueChanged(const double &_value);
+      private slots: void OnDensityValueChanged(const double _value);
 
       /// \brief Callback for mass changes in config widget.
       /// \param[in] _value The new mass value.
-      private slots: void OnMassValueChanged(const double &_value);
+      private slots: void OnMassValueChanged(const double _value);
 
       /// \brief Initialize widget.
       public: void Init();
