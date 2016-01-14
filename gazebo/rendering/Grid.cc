@@ -50,8 +50,7 @@ Grid::Grid(Scene *_scene, unsigned int _cellCount, float _cellLength,
 //////////////////////////////////////////////////
 Grid::~Grid()
 {
-  this->scene->OgreSceneManager()->destroySceneNode(this->sceneNode->getName());
-  this->scene->OgreSceneManager()->destroyManualObject(this->manualObject);
+  this->gridVis->Fini();
   this->material->unload();
 }
 
@@ -119,11 +118,10 @@ void Grid::Init()
   //    Ogre::RENDER_QUEUE_SKIES_EARLY+3);
   //    Ogre::RENDER_QUEUE_WORLD_GEOMETRY_1 - 1);
 
-  Ogre::SceneNode *parent_node =
-      this->scene->OgreSceneManager()->getRootSceneNode();
-
-  this->sceneNode = parent_node->createChildSceneNode(this->name);
-  this->sceneNode->attachObject(this->manualObject);
+  this->gridVis.reset(
+      new Visual(this->name, this->scene->WorldVisual(), false));
+  this->gridVis->Load();
+  this->gridVis->GetSceneNode()->attachObject(this->manualObject);
 
   std::stringstream ss;
   ss << this->name << "Material";
@@ -210,5 +208,11 @@ void Grid::SetUserData(const Ogre::Any &_data)
 //////////////////////////////////////////////////
 void Grid::Enable(bool _enable)
 {
-  this->sceneNode->setVisible(_enable);
+  this->gridVis->SetVisible(_enable);
+}
+
+//////////////////////////////////////////////////
+Ogre::SceneNode *Grid::GetSceneNode()
+{
+  return this->gridVis->GetSceneNode();
 }

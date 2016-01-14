@@ -137,12 +137,12 @@ void SelectionObj::UpdateSize()
     this->SetHandleMaterial(ROT_Y, dPtr->yAxisMat, false);
     this->SetHandleMaterial(ROT_Z, dPtr->zAxisMat, false);
   }
-  // FIXME cascade transparency does not seem to work work properly
+  // FIXME cascade transparency does not seem to work properly
   //  so need to set child transparency directly
   // dPtr->rotVisual->SetTransparency(0.5);
-  dPtr->rotXVisual->GetChild(0)->SetTransparency(0.5);
+/*  dPtr->rotXVisual->GetChild(0)->SetTransparency(0.5);
   dPtr->rotYVisual->GetChild(0)->SetTransparency(0.5);
-  dPtr->rotZVisual->GetChild(0)->SetTransparency(0.5);
+  dPtr->rotZVisual->GetChild(0)->SetTransparency(0.5);*/
   this->SetScale(math::Vector3(max, max, max));
 }
 
@@ -318,13 +318,13 @@ void SelectionObj::CreateTranslateVisual()
 
   dPtr->transXVisual.reset(
       new rendering::Visual(
-      "__SELECTION_OBJ_TRANS_X__" + this->GetName(), dPtr->transVisual));
+      "__SELECTION_OBJ_TRANS_X__" + this->GetName(), dPtr->transVisual, false));
   dPtr->transYVisual.reset(
       new rendering::Visual(
-      "__SELECTION_OBJ_TRANS_Y__" + this->GetName(), dPtr->transVisual));
+      "__SELECTION_OBJ_TRANS_Y__" + this->GetName(), dPtr->transVisual, false));
   dPtr->transZVisual.reset(
       new rendering::Visual(
-      "__SELECTION_OBJ_TRANS_Z__" + this->GetName(), dPtr->transVisual));
+      "__SELECTION_OBJ_TRANS_Z__" + this->GetName(), dPtr->transVisual, false));
 
   dPtr->transXVisual->Load();
   dPtr->transYVisual->Load();
@@ -445,13 +445,13 @@ void SelectionObj::CreateRotateVisual()
 
   dPtr->rotXVisual.reset(
       new rendering::Visual(
-      this->GetName() + "__SELECTION_OBJ_ROT_X__", dPtr->rotVisual));
+      this->GetName() + "__SELECTION_OBJ_ROT_X__", dPtr->rotVisual, false));
   dPtr->rotYVisual.reset(
       new rendering::Visual(
-      this->GetName() + "__SELECTION_OBJ_ROT_Y__", dPtr->rotVisual));
+      this->GetName() + "__SELECTION_OBJ_ROT_Y__", dPtr->rotVisual, false));
   dPtr->rotZVisual.reset(
       new rendering::Visual(
-      this->GetName() + "__SELECTION_OBJ_ROT_Z__", dPtr->rotVisual));
+      this->GetName() + "__SELECTION_OBJ_ROT_Z__", dPtr->rotVisual, false));
 
   dPtr->rotVisual->InsertMesh("selection_tube");
 
@@ -529,13 +529,13 @@ void SelectionObj::CreateScaleVisual()
 
   dPtr->scaleXVisual.reset(
       new rendering::Visual(
-      "__SELECTION_OBJ_SCALE_X__" + this->GetName(), dPtr->scaleVisual));
+      "__SELECTION_OBJ_SCALE_X__" + this->GetName(), dPtr->scaleVisual, false));
   dPtr->scaleYVisual.reset(
       new rendering::Visual(
-      "__SELECTION_OBJ_SCALE_Y__" + this->GetName(), dPtr->scaleVisual));
+      "__SELECTION_OBJ_SCALE_Y__" + this->GetName(), dPtr->scaleVisual, false));
   dPtr->scaleZVisual.reset(
       new rendering::Visual(
-      "__SELECTION_OBJ_SCALE_Z__" + this->GetName(), dPtr->scaleVisual));
+      "__SELECTION_OBJ_SCALE_Z__" + this->GetName(), dPtr->scaleVisual, false));
 
   dPtr->scaleXVisual->Load();
   dPtr->scaleYVisual->Load();

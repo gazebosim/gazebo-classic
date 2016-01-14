@@ -154,6 +154,7 @@ set (gtest_sources_dri
   COMVisual_TEST.cc
   GpuLaser_TEST.cc
   Heightmap_TEST.cc
+  InertiaVisual_TEST.cc
   JointVisual_TEST.cc
   Light_Rendering_TEST.cc
   LinkFrameVisual_TEST.cc
@@ -163,6 +164,7 @@ set (gtest_sources_dri
   SonarVisual_TEST.cc
   TransmitterVisual_TEST.cc
   Visual_TEST.cc
+  WrenchVisual_TEST.cc
 )
 
 gz_build_dri_tests(${gtest_sources_dri})

@@ -88,9 +88,9 @@ void SonarVisual::Load()
   dPtr->coneVis->InsertMesh("unit_cone");
   dPtr->coneVis->AttachMesh("unit_cone");
   dPtr->coneVis->SetMaterial("Gazebo/BlueLaser");
+  dPtr->coneVis->SetCastShadows(false);
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
-  this->SetCastShadows(false);
 }
 
 /////////////////////////////////////////////////

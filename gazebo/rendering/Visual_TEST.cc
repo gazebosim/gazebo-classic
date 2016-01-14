@@ -673,7 +673,7 @@ TEST_F(Visual_TEST, DerivedTransparency)
     auto visualPair = cloneVisuals.front();
     cloneVisuals.pop();
     EXPECT_FLOAT_EQ(visualPair.first->GetTransparency(),
-        visualPair.second->GetTransparency());
+        visualPair.second->GetTransparency()) << " oh " << visualPair.first->GetName() << std::endl;
     EXPECT_FLOAT_EQ(visualPair.first->DerivedTransparency(),
         visualPair.second->DerivedTransparency());
 
@@ -681,8 +681,18 @@ TEST_F(Visual_TEST, DerivedTransparency)
         visualPair.second->GetChildCount());
     for (unsigned int i  = 0; i < visualPair.first->GetChildCount(); ++i)
     {
-      cloneVisuals.push(std::make_pair(
-          visualPair.first->GetChild(i), visualPair.second->GetChild(i)));
+      // check transparency for model, link, and visual types. Other visuals
+      // such as gui only visualizations have their own preset transparency
+      // value
+      rendering::Visual::VisualType type =
+          visualPair.first->GetChild(i)->GetType();
+      if (type == rendering::Visual::VT_MODEL ||
+          type == rendering::Visual::VT_LINK ||
+          type == rendering::Visual::VT_VISUAL)
+      {
+        cloneVisuals.push(std::make_pair(
+            visualPair.first->GetChild(i), visualPair.second->GetChild(i)));
+      }
     }
   }
 

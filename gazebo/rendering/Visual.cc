@@ -1002,6 +1002,18 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique,
     this->dataPtr->myMaterialName = _materialName;
   }
 
+  // check if material has color components, if so, set them.
+  if (matColor)
+  {
+    this->SetAmbient(matAmbient, false);
+    this->SetDiffuse(matDiffuse, false);
+    this->SetSpecular(matSpecular, false);
+    this->SetEmissive(matEmissive, false);
+  }
+
+  // Re-apply the transparency filter for the last known transparency value
+  this->SetTransparencyInnerLoop(this->dataPtr->sceneNode);
+
   try
   {
     for (unsigned int i = 0;
@@ -1020,7 +1032,7 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique,
       }
     }
 
-    // Apply material to all child scene nodes
+    /*// Apply material to all child scene nodes
     for (unsigned int i = 0; i < this->dataPtr->sceneNode->numChildren(); ++i)
     {
       Ogre::SceneNode *sn = dynamic_cast<Ogre::SceneNode *>(
@@ -1050,7 +1062,7 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique,
               this->dataPtr->myMaterialName);
         }
       }
-    }
+    }*/
   }
   catch(Ogre::Exception &e)
   {
@@ -1059,18 +1071,6 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique,
            << this->dataPtr->sceneNode->getName()
            << ". Object will appear white.\n";
   }
-
-  // check if material has color components, if so, set them.
-  if (matColor)
-  {
-    this->SetAmbient(matAmbient, false);
-    this->SetDiffuse(matDiffuse, false);
-    this->SetSpecular(matSpecular, false);
-    this->SetEmissive(matEmissive, false);
-  }
-
-  // Re-apply the transparency filter for the last known transparency value
-  this->SetTransparencyInnerLoop(this->dataPtr->sceneNode);
 
   // Apply material to all child visuals
   if (_cascade)

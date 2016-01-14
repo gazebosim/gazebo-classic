@@ -76,7 +76,7 @@ namespace gazebo
 
       /// \brief Get the Ogre scene node associated with this grid
       /// \return The Ogre scene node associated with this grid
-      public: Ogre::SceneNode *GetSceneNode() { return this->sceneNode; }
+      public: Ogre::SceneNode *GetSceneNode();
 
       /// \brief Sets user data on all ogre objects we own
       /// \param[in] _data The user data
@@ -123,7 +123,10 @@ namespace gazebo
 
       private: void Create();
 
-      private: Ogre::SceneNode *sceneNode;
+      //private: Ogre::SceneNode *sceneNode;
+
+      private: VisualPtr gridVis;
+
       private: Ogre::ManualObject *manualObject;
 
       private: Ogre::MaterialPtr material;

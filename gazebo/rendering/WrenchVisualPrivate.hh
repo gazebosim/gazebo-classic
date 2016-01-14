@@ -22,6 +22,7 @@
 
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/rendering/VisualPrivate.hh"
 
 namespace gazebo
@@ -39,17 +40,14 @@ namespace gazebo
       /// \brief Subscription to the sonar data.
       public: transport::SubscriberPtr wrenchSub;
 
-      /// \brief Scene node for X torque visualization.
-      public: Ogre::SceneNode *coneXNode;
+      /// \brief Torque X visual.
+      public: VisualPtr coneXVis;
 
-      /// \brief Scene node for Y torque visualization.
-      public: Ogre::SceneNode *coneYNode;
+      /// \brief Torque Y visual.
+      public: VisualPtr coneYVis;
 
-      /// \brief Scene node for Z torque visualization.
-      public: Ogre::SceneNode *coneZNode;
-
-      /// \brief Scene node for force visualization.
-      public: Ogre::SceneNode *forceNode;
+      /// \brief Torque Z visual.
+      public: VisualPtr coneZVis;
 
       /// \brief Line to visualize force
       public: DynamicLines *forceLine;
