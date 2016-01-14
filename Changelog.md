@@ -312,6 +312,9 @@ using the same arguments used in the command line.
         * [Pull request #2059](https://bitbucket.org/osrf/gazebo/pull-request/2059)
         * [Pull request #2087](https://bitbucket.org/osrf/gazebo/pull-request/2087)
 
+    1. Support joint creation between links in nested model.
+        * [Pull request #2080](https://bitbucket.org/osrf/gazebo/pull-request/2080)
+
 1. Building editor updates
 
     1. Use opaque pointers in the building editor
