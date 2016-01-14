@@ -63,32 +63,6 @@ SelectionObj::~SelectionObj()
 {
   SelectionObjPrivate *dPtr =
       reinterpret_cast<SelectionObjPrivate *>(this->dataPtr);
-  dPtr->parent.reset();
-}
-
-/////////////////////////////////////////////////
-void SelectionObj::Load()
-{
-  Visual::Load();
-
-  this->CreateRotateVisual();
-  this->CreateTranslateVisual();
-  this->CreateScaleVisual();
-
-  this->SetVisibilityFlags(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
-
-  this->SetHandleVisible(TRANS, false);
-  this->SetHandleVisible(ROT, false);
-  this->SetHandleVisible(SCALE, false);
-
-  this->GetSceneNode()->setInheritScale(false);
-}
-
-/////////////////////////////////////////////////
-void SelectionObj::Fini()
-{
-  SelectionObjPrivate *dPtr =
-      reinterpret_cast<SelectionObjPrivate *>(this->dataPtr);
 
   // Destroy objects and nodes created by this visual
   if (!dPtr->scene)
@@ -129,7 +103,32 @@ void SelectionObj::Fini()
     }
   }
 
-  Visual::Fini();
+  dPtr->parent.reset();
+}
+
+/////////////////////////////////////////////////
+void SelectionObj::Load()
+{
+  Visual::Load();
+
+  this->CreateRotateVisual();
+  this->CreateTranslateVisual();
+  this->CreateScaleVisual();
+
+  this->SetVisibilityFlags(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
+
+  this->SetHandleVisible(TRANS, false);
+  this->SetHandleVisible(ROT, false);
+  this->SetHandleVisible(SCALE, false);
+
+  this->GetSceneNode()->setInheritScale(false);
+}
+
+/////////////////////////////////////////////////
+void SelectionObj::Fini()
+{
+  // empty as we don't want SelectionObj to be deleted
+  // when parent visual is removed from the scene
 }
 
 /////////////////////////////////////////////////

@@ -3354,7 +3354,8 @@ void Scene::RemoveVisualizations(rendering::VisualPtr _vis)
   {
     rendering::VisualPtr childVis = _vis->GetChild(i);
     Visual::VisualType visType = childVis->GetType();
-    if (visType == Visual::VT_PHYSICS || visType == Visual::VT_SENSOR)
+    if (visType == Visual::VT_PHYSICS || visType == Visual::VT_SENSOR
+        || visType == Visual::VT_GUI)
     {
       toRemove.push_back(childVis);
     }
