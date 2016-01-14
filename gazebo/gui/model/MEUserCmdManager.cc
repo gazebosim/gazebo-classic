@@ -22,7 +22,6 @@
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/model/MEUserCmdManagerPrivate.hh"
 #include "gazebo/gui/model/MEUserCmdManager.hh"
-#include "gazebo/gui/model/ModelData.hh"
 #include "gazebo/gui/model/ModelEditorEvents.hh"
 
 using namespace gazebo;
@@ -37,6 +36,8 @@ MEUserCmd::MEUserCmd(unsigned int _id,
   this->dataPtr->id = _id;
   this->dataPtr->description = _description;
   this->dataPtr->type = _type;
+  this->dataPtr->sdf = NULL;
+  this->dataPtr->scopedName = "";
 }
 
 /////////////////////////////////////////////////
@@ -47,11 +48,22 @@ MEUserCmd::~MEUserCmd()
 /////////////////////////////////////////////////
 void MEUserCmd::Undo()
 {
+  // Inserting
   if (this->dataPtr->type == msgs::UserCmd::INSERTING)
   {
-    if (this->dataPtr->linkData)
+    // Link
+    if (!this->dataPtr->scopedName.empty())
     {
       model::Events::requestLinkRemoval(this->dataPtr->scopedName);
+    }
+  }
+  // Deleting
+  else if (this->dataPtr->type == msgs::UserCmd::DELETING)
+  {
+    // Link
+    if (this->dataPtr->sdf)
+    {
+      model::Events::requestLinkInsertion(this->dataPtr->sdf);
     }
   }
 }
@@ -59,11 +71,22 @@ void MEUserCmd::Undo()
 /////////////////////////////////////////////////
 void MEUserCmd::Redo()
 {
+  // Inserting
   if (this->dataPtr->type == msgs::UserCmd::INSERTING)
   {
+    // Link
     if (this->dataPtr->sdf)
     {
       model::Events::requestLinkInsertion(this->dataPtr->sdf);
+    }
+  }
+  // Deleting
+  else if (this->dataPtr->type == msgs::UserCmd::DELETING)
+  {
+    // Link
+    if (!this->dataPtr->scopedName.empty())
+    {
+      model::Events::requestLinkRemoval(this->dataPtr->scopedName);
     }
   }
 }
@@ -84,12 +107,6 @@ std::string MEUserCmd::Description() const
 msgs::UserCmd::Type MEUserCmd::Type() const
 {
   return this->dataPtr->type;
-}
-
-/////////////////////////////////////////////////
-void MEUserCmd::SetLinkData(LinkData *_data)
-{
-  this->dataPtr->linkData = _data;
 }
 
 /////////////////////////////////////////////////

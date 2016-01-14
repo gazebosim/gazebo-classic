@@ -1556,10 +1556,29 @@ void ModelCreator::OnDelete()
 /////////////////////////////////////////////////
 void ModelCreator::OnDelete(const std::string &_entity)
 {
-  MEUserCmdManager::Instance()->NewCmd(
-      "Deleted " + _entity, msgs::UserCmd::DELETING);
+//  this->RemoveEntity(_entity);
 
-  this->RemoveEntity(_entity);
+  // if it's a nestedModel
+  if (this->allNestedModels.find(_entity) != this->allNestedModels.end())
+  {
+    this->RemoveNestedModelImpl(_entity);
+    return;
+  }
+
+  // if it's a link
+  auto link = this->allLinks.find(_entity);
+  if (link != this->allLinks.end())
+  {
+    auto cmd = MEUserCmdManager::Instance()->NewCmd(
+        "Deleted " + _entity, msgs::UserCmd::DELETING);
+    cmd->SetSDF(link->second->linkSDF);
+    cmd->SetScopedName(link->second->linkVisual->GetName());
+
+    if (this->jointMaker)
+      this->jointMaker->RemoveJointsByLink(_entity);
+    this->RemoveLinkImpl(_entity);
+    return;
+  }
 }
 
 /////////////////////////////////////////////////
@@ -1575,7 +1594,8 @@ void ModelCreator::RemoveEntity(const std::string &_entity)
   }
 
   // if it's a link
-  if (this->allLinks.find(_entity) != this->allLinks.end())
+  auto link = this->allLinks.find(_entity);
+  if (link != this->allLinks.end())
   {
     if (this->jointMaker)
       this->jointMaker->RemoveJointsByLink(_entity);
@@ -1732,7 +1752,6 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
 
       auto cmd = MEUserCmdManager::Instance()->NewCmd(
           "Inserted " + this->mouseVisual->GetName(), msgs::UserCmd::INSERTING);
-      cmd->SetLinkData(link);
       cmd->SetSDF(link->linkSDF);
       cmd->SetScopedName(link->linkVisual->GetName());
     }

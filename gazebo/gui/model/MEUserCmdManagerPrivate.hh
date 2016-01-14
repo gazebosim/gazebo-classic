@@ -29,8 +29,6 @@ namespace gazebo
 {
   namespace gui
   {
-    class LinkData;
-
     /// \internal
     /// \brief Private data for the MEUserCmdManager class
     class MEUserCmdPrivate
@@ -46,7 +44,6 @@ namespace gazebo
 
       /// \brief
       public: sdf::ElementPtr sdf;
-      public: LinkData *linkData;
       public: std::string scopedName;
     };
 

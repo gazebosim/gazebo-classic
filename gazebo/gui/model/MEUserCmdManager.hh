@@ -36,7 +36,6 @@ namespace gazebo
   namespace gui
   {
     class UserCmdHistory;
-    class LinkData;
     class MEUserCmdPrivate;
     class MEUserCmdManagerPrivate;
 
@@ -73,10 +72,6 @@ namespace gazebo
       /// \brief Return this command's type.
       /// \return Command type
       public: msgs::UserCmd::Type Type() const;
-
-      /// \brief Return this command's type.
-      /// \return Command type
-      public: void SetLinkData(LinkData *_data);
 
       /// \brief Return this command's type.
       /// \return Command type
