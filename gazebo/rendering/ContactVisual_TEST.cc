@@ -19,16 +19,16 @@
 #include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/rendering/Scene.hh"
-#include "gazebo/rendering/WrenchVisual.hh"
+#include "gazebo/rendering/ContactVisual.hh"
 #include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
-class WrenchVisual_TEST : public RenderingFixture
+class ContactVisual_TEST : public RenderingFixture
 {
 };
 
 /////////////////////////////////////////////////
-TEST_F(WrenchVisual_TEST, WrenchVisualTest)
+TEST_F(ContactVisual_TEST, ContactVisualTest)
 {
   Load("worlds/empty.world");
 
@@ -44,14 +44,14 @@ TEST_F(WrenchVisual_TEST, WrenchVisualTest)
 
   // test calling constructor and Load functions and make sure
   // there are no segfaults
-  gazebo::rendering::VisualPtr wrenchVis(
-      new gazebo::rendering::WrenchVisual(
-      "wrench_vis", scene->WorldVisual(), ""));
-  wrenchVis->Load();
+  gazebo::rendering::VisualPtr contactVis(
+      new gazebo::rendering::ContactVisual(
+      "contact_vis", scene->WorldVisual(), ""));
+  contactVis->Load();
 
-  EXPECT_EQ(wrenchVis->GetName(), "wrench_vis");
+  EXPECT_EQ(contactVis->GetName(), "contact_vis");
   EXPECT_GT(scene->WorldVisual()->GetChildCount(), count);
-  EXPECT_TRUE(scene->GetVisual(wrenchVis->GetName()) != NULL);
+  EXPECT_TRUE(scene->GetVisual(contactVis->GetName()) != NULL);
 }
 
 /////////////////////////////////////////////////

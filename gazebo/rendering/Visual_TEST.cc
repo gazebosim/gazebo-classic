@@ -673,7 +673,7 @@ TEST_F(Visual_TEST, DerivedTransparency)
     auto visualPair = cloneVisuals.front();
     cloneVisuals.pop();
     EXPECT_FLOAT_EQ(visualPair.first->GetTransparency(),
-        visualPair.second->GetTransparency()) << " oh " << visualPair.first->GetName() << std::endl;
+        visualPair.second->GetTransparency());
     EXPECT_FLOAT_EQ(visualPair.first->DerivedTransparency(),
         visualPair.second->DerivedTransparency());
 

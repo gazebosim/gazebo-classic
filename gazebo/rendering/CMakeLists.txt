@@ -152,11 +152,12 @@ gz_build_tests(${gtest_sources})
 
 set (gtest_sources_dri
   COMVisual_TEST.cc
+  ContactVisual_TEST.cc
   GpuLaser_TEST.cc
   Heightmap_TEST.cc
   InertiaVisual_TEST.cc
   JointVisual_TEST.cc
-  Light_Rendering_TEST.cc
+  RenderingLight_TEST.cc
   LinkFrameVisual_TEST.cc
   OriginVisual_TEST.cc
   Scene_TEST.cc

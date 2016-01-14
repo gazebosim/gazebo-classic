@@ -47,68 +47,12 @@ void ApplyWrenchVisual::Fini()
   ApplyWrenchVisualPrivate *dPtr =
       reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
 
-  // ogre doesn't know how to remove MovableText so detach first.
-  // allocated on the stack so no need to delete
+  // ogre will not be able to remove object of type MovableText so detach first.
+  // objects are allocated on the stack so no need to delete
   if (dPtr->forceText.getParentNode())
     dPtr->forceText.detachFromParent();
   if (dPtr->torqueText.getParentNode())
     dPtr->torqueText.detachFromParent();
-
-
-/*
-  if (dPtr->torqueVisual && dPtr->torqueLine)
-    dPtr->torqueVisual->DeleteDynamicLine(dPtr->torqueLine);
-
-  if (!dPtr->scene)
-    return;
-
-  // Destroy objects and nodes
-  Ogre::SceneManager *manager = dPtr->scene->OgreSceneManager();
-  if (!manager)
-    return;
-
-  std::vector<std::string> suffixes = {
-      "_FORCE_SHAFT_",
-      "_FORCE_HEAD_",
-      "_FORCE_TEXT_",
-      "_TORQUE_TUBE_",
-      "_TORQUE_HEAD_",
-      "_TORQUE_TEXT_"};
-
-  for (auto suffix : suffixes)
-  {
-    std::string name = this->GetName() + suffix;
-    if (manager->hasEntity(name))
-      manager->destroyMovableObject(manager->getEntity(name));
-
-    name += "NODE_";
-    if (manager->hasSceneNode(name))
-      manager->destroySceneNode(manager->getSceneNode(name));
-  }
-
-  // Remove visuals
-  if (dPtr->forceVisual &&
-      dPtr->scene->GetVisual(dPtr->forceVisual->GetName()))
-  {
-    dPtr->scene->RemoveVisual(dPtr->forceVisual);
-  }
-
-  if (dPtr->torqueVisual &&
-      dPtr->scene->GetVisual(dPtr->torqueVisual->GetName()))
-  {
-    dPtr->scene->RemoveVisual(dPtr->torqueVisual);
-  }
-
-  if (dPtr->rotTool &&
-      dPtr->scene->GetVisual(dPtr->rotTool->GetName()))
-  {
-    dPtr->rotTool->Fini();
-    dPtr->scene->RemoveVisual(dPtr->rotTool);
-  }
-
-  dPtr->forceVisual.reset();
-  dPtr->torqueVisual.reset();
-  dPtr->rotTool.reset();*/
 
   Visual::Fini();
 }

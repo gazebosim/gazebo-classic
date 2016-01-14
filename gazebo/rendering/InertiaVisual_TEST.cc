@@ -17,6 +17,7 @@
 
 #include <gtest/gtest.h>
 #include "gazebo/rendering/RenderingIface.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/InertiaVisual.hh"
 #include "gazebo/test/ServerFixture.hh"
@@ -43,12 +44,13 @@ TEST_F(InertiaVisual_TEST, InertiaVisualTest)
 
   // test calling constructor and Load functions and make sure
   // there are no segfaults
-  gazebo::rendering::VisualPtr wrenchVis(new gazebo::rendering::InertiaVisual(
+  gazebo::rendering::VisualPtr inertiaVis(new gazebo::rendering::InertiaVisual(
       "inertia_vis", scene->WorldVisual()));
-  wrenchVis->Load();
+  inertiaVis->Load();
 
-  EXPECT_EQ(wrenchVis->GetName(), "inertia_vis");
+  EXPECT_EQ(inertiaVis->GetName(), "inertia_vis");
   EXPECT_GT(scene->WorldVisual()->GetChildCount(), count);
+  EXPECT_TRUE(scene->GetVisual(inertiaVis->GetName()) != NULL);
 }
 
 /////////////////////////////////////////////////

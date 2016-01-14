@@ -137,12 +137,7 @@ void SelectionObj::UpdateSize()
     this->SetHandleMaterial(ROT_Y, dPtr->yAxisMat, false);
     this->SetHandleMaterial(ROT_Z, dPtr->zAxisMat, false);
   }
-  // FIXME cascade transparency does not seem to work properly
-  //  so need to set child transparency directly
-  // dPtr->rotVisual->SetTransparency(0.5);
-/*  dPtr->rotXVisual->GetChild(0)->SetTransparency(0.5);
-  dPtr->rotYVisual->GetChild(0)->SetTransparency(0.5);
-  dPtr->rotZVisual->GetChild(0)->SetTransparency(0.5);*/
+
   this->SetScale(math::Vector3(max, max, max));
 }
 
