@@ -99,6 +99,7 @@ namespace gazebo
       /// \return Command type
       public: void SetSDF(sdf::ElementPtr _sdf);
       public: void SetScopedName(const std::string &_name);
+      public: void SetJointId(const std::string &_id);
 
       /// \internal
       /// \brief Pointer to private data.

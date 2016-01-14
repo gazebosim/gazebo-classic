@@ -45,6 +45,7 @@ namespace gazebo
       /// \brief
       public: sdf::ElementPtr sdf;
       public: std::string scopedName;
+      public: std::string jointId;
     };
 
     /// \internal

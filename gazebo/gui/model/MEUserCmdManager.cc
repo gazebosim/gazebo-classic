@@ -38,6 +38,7 @@ MEUserCmd::MEUserCmd(unsigned int _id,
   this->dataPtr->type = _type;
   this->dataPtr->sdf = NULL;
   this->dataPtr->scopedName = "";
+  this->dataPtr->jointId = "";
 }
 
 /////////////////////////////////////////////////
@@ -72,6 +73,23 @@ void MEUserCmd::Undo()
   {
     model::Events::requestNestedModelInsertion(this->dataPtr->sdf);
   }
+  // Inserting joint
+  if (this->dataPtr->type == MEUserCmd::INSERTING_JOINT &&
+     !this->dataPtr->jointId.empty())
+  {
+    model::Events::requestJointRemoval(this->dataPtr->jointId);
+  }
+  // Deleting joint
+  else if (this->dataPtr->type == MEUserCmd::DELETING_JOINT &&
+      this->dataPtr->sdf)
+  {
+    auto modelName = this->dataPtr->scopedName;
+    size_t pIdx = modelName.find("::");
+    if (pIdx != std::string::npos)
+      modelName = modelName.substr(0, pIdx);
+
+    model::Events::requestJointInsertion(this->dataPtr->sdf, modelName);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -100,6 +118,23 @@ void MEUserCmd::Redo()
      !this->dataPtr->scopedName.empty())
   {
     model::Events::requestNestedModelRemoval(this->dataPtr->scopedName);
+  }
+  // Inserting joint
+  if (this->dataPtr->type == MEUserCmd::INSERTING_JOINT &&
+     this->dataPtr->sdf)
+  {
+    auto modelName = this->dataPtr->scopedName;
+    size_t pIdx = modelName.find("::");
+    if (pIdx != std::string::npos)
+      modelName = modelName.substr(0, pIdx);
+
+    model::Events::requestJointInsertion(this->dataPtr->sdf, modelName);
+  }
+  // Deleting joint
+  else if (this->dataPtr->type == MEUserCmd::DELETING_JOINT &&
+     !this->dataPtr->jointId.empty())
+  {
+    model::Events::requestJointRemoval(this->dataPtr->jointId);
   }
 }
 
@@ -131,6 +166,12 @@ void MEUserCmd::SetSDF(sdf::ElementPtr _sdf)
 void MEUserCmd::SetScopedName(const std::string &_name)
 {
   this->dataPtr->scopedName = _name;
+}
+
+/////////////////////////////////////////////////
+void MEUserCmd::SetJointId(const std::string &_id)
+{
+  this->dataPtr->jointId = _id;
 }
 
 /////////////////////////////////////////////////
