@@ -746,7 +746,7 @@ void JointMaker::OnDelete()
     return;
 
   MEUserCmdManager::Instance()->NewCmd(
-      "Deleted " + this->dataPtr->inspectName, msgs::UserCmd::DELETING);
+      "Deleted " + this->dataPtr->inspectName, MEUserCmd::DELETING_JOINT);
 
   this->RemoveJoint(this->dataPtr->inspectName);
   this->dataPtr->inspectName = "";
@@ -1634,7 +1634,7 @@ bool JointMaker::SetChildLink(const rendering::VisualPtr &_childLink)
     this->CreateHotSpot(this->dataPtr->newJoint);
 
     MEUserCmdManager::Instance()->NewCmd(
-        "Inserted " + joint->name, msgs::UserCmd::INSERTING);
+        "Inserted " + joint->name, MEUserCmd::INSERTING_JOINT);
   }
   // Update child
   else

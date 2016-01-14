@@ -30,7 +30,7 @@ using namespace gui;
 /////////////////////////////////////////////////
 MEUserCmd::MEUserCmd(unsigned int _id,
     const std::string &_description,
-    msgs::UserCmd::Type _type)
+    MEUserCmd::CmdType _type)
   : dataPtr(new MEUserCmdPrivate())
 {
   this->dataPtr->id = _id;
@@ -48,46 +48,58 @@ MEUserCmd::~MEUserCmd()
 /////////////////////////////////////////////////
 void MEUserCmd::Undo()
 {
-  // Inserting
-  if (this->dataPtr->type == msgs::UserCmd::INSERTING)
+  // Inserting link
+  if (this->dataPtr->type == MEUserCmd::INSERTING_LINK &&
+     !this->dataPtr->scopedName.empty())
   {
-    // Link
-    if (!this->dataPtr->scopedName.empty())
-    {
-      model::Events::requestLinkRemoval(this->dataPtr->scopedName);
-    }
+    model::Events::requestLinkRemoval(this->dataPtr->scopedName);
   }
-  // Deleting
-  else if (this->dataPtr->type == msgs::UserCmd::DELETING)
+  // Deleting link
+  else if (this->dataPtr->type == MEUserCmd::DELETING_LINK &&
+      this->dataPtr->sdf)
   {
-    // Link
-    if (this->dataPtr->sdf)
-    {
-      model::Events::requestLinkInsertion(this->dataPtr->sdf);
-    }
+    model::Events::requestLinkInsertion(this->dataPtr->sdf);
+  }
+  // Inserting nested model
+  if (this->dataPtr->type == MEUserCmd::INSERTING_NESTED_MODEL &&
+     !this->dataPtr->scopedName.empty())
+  {
+    model::Events::requestNestedModelRemoval(this->dataPtr->scopedName);
+  }
+  // Deleting nested model
+  else if (this->dataPtr->type == MEUserCmd::DELETING_NESTED_MODEL &&
+      this->dataPtr->sdf)
+  {
+    model::Events::requestNestedModelInsertion(this->dataPtr->sdf);
   }
 }
 
 /////////////////////////////////////////////////
 void MEUserCmd::Redo()
 {
-  // Inserting
-  if (this->dataPtr->type == msgs::UserCmd::INSERTING)
+  // Inserting link
+  if (this->dataPtr->type == MEUserCmd::INSERTING_LINK &&
+     this->dataPtr->sdf)
   {
-    // Link
-    if (this->dataPtr->sdf)
-    {
-      model::Events::requestLinkInsertion(this->dataPtr->sdf);
-    }
+    model::Events::requestLinkInsertion(this->dataPtr->sdf);
   }
-  // Deleting
-  else if (this->dataPtr->type == msgs::UserCmd::DELETING)
+  // Deleting link
+  else if (this->dataPtr->type == MEUserCmd::DELETING_LINK &&
+     !this->dataPtr->scopedName.empty())
   {
-    // Link
-    if (!this->dataPtr->scopedName.empty())
-    {
-      model::Events::requestLinkRemoval(this->dataPtr->scopedName);
-    }
+    model::Events::requestLinkRemoval(this->dataPtr->scopedName);
+  }
+  // Inserting nested model
+  if (this->dataPtr->type == MEUserCmd::INSERTING_NESTED_MODEL &&
+     this->dataPtr->sdf)
+  {
+    model::Events::requestNestedModelInsertion(this->dataPtr->sdf);
+  }
+  // Deleting nested model
+  else if (this->dataPtr->type == MEUserCmd::DELETING_NESTED_MODEL &&
+     !this->dataPtr->scopedName.empty())
+  {
+    model::Events::requestNestedModelRemoval(this->dataPtr->scopedName);
   }
 }
 
@@ -104,7 +116,7 @@ std::string MEUserCmd::Description() const
 }
 
 /////////////////////////////////////////////////
-msgs::UserCmd::Type MEUserCmd::Type() const
+MEUserCmd::CmdType MEUserCmd::Type() const
 {
   return this->dataPtr->type;
 }
@@ -280,7 +292,7 @@ void MEUserCmdManager::OnRedoCommand(QAction *_action)
 
 /////////////////////////////////////////////////
 MEUserCmd *MEUserCmdManager::NewCmd(const std::string &_description,
-    const msgs::UserCmd::Type _type)
+    const MEUserCmd::CmdType _type)
 {
   // Create command
   MEUserCmd *cmd = new MEUserCmd(

@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_GUI_MODEL_MEUSERCMDHISTORY_HH_
-#define _GAZEBO_GUI_MODEL_MEUSERCMDHISTORY_HH_
+#ifndef _GAZEBO_GUI_MODEL_MEUSERCMDMANAGER_HH_
+#define _GAZEBO_GUI_MODEL_MEUSERCMDMANAGER_HH_
 
 #include <memory>
 #include <string>
@@ -43,6 +43,28 @@ namespace gazebo
     /// and "redone".
     class GZ_GUI_VISIBLE MEUserCmd
     {
+      /// \enum
+      /// \brief
+      public: enum CmdType
+      {
+        /// \brief
+        INSERTING_LINK,
+        /// \brief Box
+        DELETING_LINK,
+        /// \brief Sphere
+        INSERTING_NESTED_MODEL,
+        /// \brief Cylinder
+        DELETING_NESTED_MODEL,
+        /// \brief Sphere
+        INSERTING_JOINT,
+        /// \brief Cylinder
+        DELETING_JOINT,
+        /// \brief Sphere
+        INSERTING_MODEL_PLUGIN,
+        /// \brief Cylinder
+        DELETING_MODEL_PLUGIN
+      };
+
       /// \brief Constructor
       /// \param[in] _id Unique ID for this command
       /// \param[in] _description Description for the command, such as
@@ -50,7 +72,7 @@ namespace gazebo
       /// \param[in] _type Type of command, such as MOVING, DELETING, etc.
       public: MEUserCmd(unsigned int _id,
                       const std::string &_description,
-                      msgs::UserCmd::Type _type);
+                      MEUserCmd::CmdType _type);
 
       /// \brief Destructor
       public: virtual ~MEUserCmd();
@@ -71,7 +93,7 @@ namespace gazebo
 
       /// \brief Return this command's type.
       /// \return Command type
-      public: msgs::UserCmd::Type Type() const;
+      public: MEUserCmd::CmdType Type() const;
 
       /// \brief Return this command's type.
       /// \return Command type
@@ -103,8 +125,9 @@ namespace gazebo
       /// internal state of the singleton and prepares it for exit.
       public: void Clear();
 
+      /// \brief Register that a new command has been executed by the user.
       public: MEUserCmd *NewCmd(const std::string &_description,
-                 const msgs::UserCmd::Type _type);
+                 const MEUserCmd::CmdType _type);
 
       /// \brief Qt call back when an undo history action is triggered.
       /// It publishes an undo request message.
@@ -125,11 +148,6 @@ namespace gazebo
       /// \brief Updates the widgets according to the user command stats
       /// message.
       private slots: void UpdateStats();
-
-      /// \brief User command statistics message callback.
-      /// \param[in] _msg Message containing statistics about user commands
-      /// stored in the server.
-      private: void OnUserCmdStatsMsg(ConstUserCmdStatsPtr &_msg);
 
       /// \brief This is a singleton class.
       private: friend class SingletonT<MEUserCmdManager>;

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_MODEL_EDITOR_USER_COMMAND_PRIVATE_HH_
-#define _GAZEBO_MODEL_EDITOR_USER_COMMAND_PRIVATE_HH_
+#ifndef _GAZEBO_GUI_MODEL_MEUSERCMD_PRIVATE_HH_
+#define _GAZEBO_GUI_MODEL_MEUSERCMD_PRIVATE_HH_
 
 #include <sdf/sdf.hh>
 
@@ -23,7 +23,7 @@
 #include "gazebo/transport/TransportTypes.hh"
 
 #include "gazebo/gui/qt.h"
-#include "gazebo/gui/UserCmdHistoryPrivate.hh"
+#include "gazebo/gui/model/MEUserCmdManager.hh"
 
 namespace gazebo
 {
@@ -40,18 +40,16 @@ namespace gazebo
       public: std::string description;
 
       /// \brief Type of command, such as MOVING or DELETING.
-      public: msgs::UserCmd::Type type;
+      public: MEUserCmd::CmdType type;
 
       /// \brief
       public: sdf::ElementPtr sdf;
       public: std::string scopedName;
     };
 
-    class MEUserCmd;
-
     /// \internal
     /// \brief Private data for the MEUserCmdManager class
-    class MEUserCmdManagerPrivate : public UserCmdHistoryPrivate
+    class MEUserCmdManagerPrivate
     {
       /// \brief Counter to give commands unique ids.
       public: unsigned int idCounter;

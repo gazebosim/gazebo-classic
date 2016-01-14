@@ -320,6 +320,7 @@ namespace gazebo
       /// \return Link data.
       private: LinkData *CreateLink(const rendering::VisualPtr &_visual);
       private: void InsertLinkFromSDF(sdf::ElementPtr _sdf);
+      private: void InsertNestedModelFromSDF(sdf::ElementPtr _sdf);
 
       /// \brief Clone an existing nested model.
       /// \param[in] _modelName Name of nested model to be cloned.
