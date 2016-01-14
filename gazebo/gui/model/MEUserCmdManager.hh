@@ -20,6 +20,7 @@
 
 #include <memory>
 #include <string>
+#include <sdf/sdf.hh>
 
 #include "gazebo/util/system.hh"
 
@@ -35,6 +36,7 @@ namespace gazebo
   namespace gui
   {
     class UserCmdHistory;
+    class LinkData;
     class MEUserCmdPrivate;
     class MEUserCmdManagerPrivate;
 
@@ -72,12 +74,22 @@ namespace gazebo
       /// \return Command type
       public: msgs::UserCmd::Type Type() const;
 
+      /// \brief Return this command's type.
+      /// \return Command type
+      public: void SetLinkData(LinkData *_data);
+
+      /// \brief Return this command's type.
+      /// \return Command type
+      public: void SetSDF(sdf::ElementPtr _sdf);
+      public: void SetScopedName(const std::string &_name);
+
       /// \internal
       /// \brief Pointer to private data.
       protected: std::unique_ptr<MEUserCmdPrivate> dataPtr;
     };
 
-    /// \brief Class which manages user commands in the model editor.
+    /// \brief Class which manages user commands in the model editor. It
+    /// combines features of gui::UserCmdHistory and physics::UserCmdManager.
     class GZ_GUI_VISIBLE MEUserCmdManager : public UserCmdHistory,
         public SingletonT<MEUserCmdManager>
     {
@@ -96,7 +108,7 @@ namespace gazebo
       /// internal state of the singleton and prepares it for exit.
       public: void Clear();
 
-      public: void NewCmd(const std::string &_description,
+      public: MEUserCmd *NewCmd(const std::string &_description,
                  const msgs::UserCmd::Type _type);
 
       /// \brief Qt call back when an undo history action is triggered.

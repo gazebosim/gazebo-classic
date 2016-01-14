@@ -22,6 +22,8 @@
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/model/MEUserCmdManagerPrivate.hh"
 #include "gazebo/gui/model/MEUserCmdManager.hh"
+#include "gazebo/gui/model/ModelData.hh"
+#include "gazebo/gui/model/ModelEditorEvents.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -47,7 +49,10 @@ void MEUserCmd::Undo()
 {
   if (this->dataPtr->type == msgs::UserCmd::INSERTING)
   {
-    gzdbg << "Undo insert command: " << this->Description() << std::endl;
+    if (this->dataPtr->linkData)
+    {
+      model::Events::requestLinkRemoval(this->dataPtr->scopedName);
+    }
   }
 }
 
@@ -56,7 +61,10 @@ void MEUserCmd::Redo()
 {
   if (this->dataPtr->type == msgs::UserCmd::INSERTING)
   {
-    gzdbg << "Redo insert command: " << this->Description() << std::endl;
+    if (this->dataPtr->sdf)
+    {
+      model::Events::requestLinkInsertion(this->dataPtr->sdf);
+    }
   }
 }
 
@@ -76,6 +84,24 @@ std::string MEUserCmd::Description() const
 msgs::UserCmd::Type MEUserCmd::Type() const
 {
   return this->dataPtr->type;
+}
+
+/////////////////////////////////////////////////
+void MEUserCmd::SetLinkData(LinkData *_data)
+{
+  this->dataPtr->linkData = _data;
+}
+
+/////////////////////////////////////////////////
+void MEUserCmd::SetSDF(sdf::ElementPtr _sdf)
+{
+  this->dataPtr->sdf = _sdf;
+}
+
+/////////////////////////////////////////////////
+void MEUserCmd::SetScopedName(const std::string &_name)
+{
+  this->dataPtr->scopedName = _name;
 }
 
 /////////////////////////////////////////////////
@@ -236,7 +262,7 @@ void MEUserCmdManager::OnRedoCommand(QAction *_action)
 }
 
 /////////////////////////////////////////////////
-void MEUserCmdManager::NewCmd(const std::string &_description,
+MEUserCmd *MEUserCmdManager::NewCmd(const std::string &_description,
     const msgs::UserCmd::Type _type)
 {
   // Create command
@@ -253,6 +279,8 @@ void MEUserCmdManager::NewCmd(const std::string &_description,
 
   // Update buttons
   this->UpdateStats();
+
+  return cmd;
 }
 
 /////////////////////////////////////////////////

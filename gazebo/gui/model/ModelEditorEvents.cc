@@ -37,6 +37,7 @@ event::EventT<void (std::string)> model::Events::linkInserted;
 event::EventT<void (std::string)> model::Events::nestedModelRemoved;
 event::EventT<void (std::string)> model::Events::linkRemoved;
 event::EventT<void (std::string)> model::Events::requestLinkRemoval;
+event::EventT<void (sdf::ElementPtr)> model::Events::requestLinkInsertion;
 event::EventT<void (std::string, std::string, std::string, std::string,
     std::string)> model::Events::jointInserted;
 event::EventT<void (std::string)> model::Events::jointRemoved;

@@ -177,6 +177,11 @@ ModelCreator::ModelCreator()
         std::bind(&ModelCreator::RemoveEntity, this, std::placeholders::_1)));
 
   this->connections.push_back(
+      gui::model::Events::ConnectRequestLinkInsertion(
+      std::bind(&ModelCreator::InsertLinkFromSDF, this,
+      std::placeholders::_1)));
+
+  this->connections.push_back(
       gui::model::Events::ConnectRequestModelPluginRemoval(
         std::bind(&ModelCreator::RemoveModelPlugin, this,
           std::placeholders::_1)));
@@ -973,6 +978,15 @@ LinkData *ModelCreator::CreateLink(const rendering::VisualPtr &_visual)
 }
 
 /////////////////////////////////////////////////
+void ModelCreator::InsertLinkFromSDF(sdf::ElementPtr _sdf)
+{
+  if (!_sdf)
+    return;
+
+  this->CreateLinkFromSDF(_sdf, this->previewVisual);
+}
+
+/////////////////////////////////////////////////
 LinkData *ModelCreator::CloneLink(const std::string &_linkName)
 {
   std::lock_guard<std::recursive_mutex> lock(this->updateMutex);
@@ -1043,6 +1057,12 @@ NestedModelData *ModelCreator::CloneNestedModel(
 LinkData *ModelCreator::CreateLinkFromSDF(const sdf::ElementPtr &_linkElem,
     const rendering::VisualPtr &_parentVis)
 {
+  if (_linkElem == NULL)
+  {
+    gzwarn << "NULL SDF pointer, not creating link." << std::endl;
+    return NULL;
+  }
+
   LinkData *link = new LinkData();
   MainWindow *mainWindow = gui::get_main_window();
   if (mainWindow)
@@ -1591,7 +1611,7 @@ void ModelCreator::OnRemoveModelPlugin(const QString &_name)
   this->RemoveModelPlugin(_name.toStdString());
 
   MEUserCmdManager::Instance()->NewCmd(
-      "Added plugin: " + _name.toStdString(), msgs::UserCmd::INSERTING);
+      "Removed plugin: " + _name.toStdString(), msgs::UserCmd::DELETING);
 }
 
 /////////////////////////////////////////////////
@@ -1710,8 +1730,11 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
       link->SetPose((this->mouseVisual->GetWorldPose()-this->modelPose).Ign());
       gui::model::Events::linkInserted(this->mouseVisual->GetName());
 
-      MEUserCmdManager::Instance()->NewCmd(
+      auto cmd = MEUserCmdManager::Instance()->NewCmd(
           "Inserted " + this->mouseVisual->GetName(), msgs::UserCmd::INSERTING);
+      cmd->SetLinkData(link);
+      cmd->SetSDF(link->linkSDF);
+      cmd->SetScopedName(link->linkVisual->GetName());
     }
     else
     {
@@ -1724,8 +1747,9 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
 
         this->EmitNestedModelInsertedEvent(this->mouseVisual);
 
-      MEUserCmdManager::Instance()->NewCmd(
-          "Inserted " + this->mouseVisual->GetName(), msgs::UserCmd::INSERTING);
+        MEUserCmdManager::Instance()->NewCmd(
+            "Inserted " + this->mouseVisual->GetName(),
+            msgs::UserCmd::INSERTING);
       }
     }
 

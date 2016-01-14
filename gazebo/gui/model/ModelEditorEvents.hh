@@ -14,10 +14,11 @@
  * limitations under the License.
  *
 */
-#ifndef _MODEL_EDITOR_EVENTS_HH_
-#define _MODEL_EDITOR_EVENTS_HH_
+#ifndef _GAZEBO_GUI_MODEL_MODELEDITOREVENTS_HH_
+#define _GAZEBO_GUI_MODEL_MODELEDITOREVENTS_HH_
 
 #include <string>
+#include <sdf/sdf.hh>
 #include "gazebo/math/Pose.hh"
 #include "gazebo/common/Event.hh"
 #include "gazebo/util/system.hh"
@@ -245,6 +246,21 @@ namespace gazebo
         public: static void DisconnectRequestLinkRemoval(
             event::ConnectionPtr _subscriber)
           { requestLinkRemoval.Disconnect(_subscriber); }
+
+        /// \brief Connect a Gazebo event to the request link removal signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectRequestLinkInsertion(
+            T _subscriber)
+          { return requestLinkInsertion.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the request link removal
+        /// signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectRequestLinkInsertion(
+            event::ConnectionPtr _subscriber)
+          { requestLinkInsertion.Disconnect(_subscriber); }
 
         /// \brief Connect a Gazebo event to the link removed signal.
         /// \param[in] _subscriber the subscriber to this event
@@ -521,6 +537,10 @@ namespace gazebo
 
         /// \brief Request to remove a link.
         public: static event::EventT<void (std::string)> requestLinkRemoval;
+
+        /// \brief Request to insert a link.
+        public: static event::EventT<void (sdf::ElementPtr)>
+            requestLinkInsertion;
 
         /// \brief Notify that a joint has been inserted. The parameters are:
         /// joint's unique id, joint name, joint type, parent link's name, and

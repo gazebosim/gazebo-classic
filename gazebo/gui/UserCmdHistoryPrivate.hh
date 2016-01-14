@@ -42,7 +42,7 @@ namespace gazebo
       /// \brief Copy of last received user command stats message.
       public: msgs::UserCmdStats msg;
 
-      /// \brief Group of actions in redo history menu.
+      /// \brief Whether this is currently active or not.
       public: bool active;
     };
   }

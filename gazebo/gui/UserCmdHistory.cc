@@ -239,6 +239,9 @@ void UserCmdHistory::OnRedoCmdHistory()
 void UserCmdHistory::SetActive(const bool _active)
 {
   this->dataPtr->active = _active;
+
+  if (_active)
+    this->StatsSignal();
 }
 
 /////////////////////////////////////////////////

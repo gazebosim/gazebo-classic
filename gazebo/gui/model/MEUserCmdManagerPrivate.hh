@@ -17,6 +17,8 @@
 #ifndef _GAZEBO_MODEL_EDITOR_USER_COMMAND_PRIVATE_HH_
 #define _GAZEBO_MODEL_EDITOR_USER_COMMAND_PRIVATE_HH_
 
+#include <sdf/sdf.hh>
+
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportTypes.hh"
 
@@ -27,6 +29,8 @@ namespace gazebo
 {
   namespace gui
   {
+    class LinkData;
+
     /// \internal
     /// \brief Private data for the MEUserCmdManager class
     class MEUserCmdPrivate
@@ -39,6 +43,11 @@ namespace gazebo
 
       /// \brief Type of command, such as MOVING or DELETING.
       public: msgs::UserCmd::Type type;
+
+      /// \brief
+      public: sdf::ElementPtr sdf;
+      public: LinkData *linkData;
+      public: std::string scopedName;
     };
 
     class MEUserCmd;
