@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _ATMOSPHERE_HH_
-#define _ATMOSPHERE_HH_
+#ifndef _GAZEBO_PHYSICS_ATMOSPHERE_HH_
+#define _GAZEBO_PHYSICS_ATMOSPHERE_HH_
 
 #include <string>
 
@@ -32,13 +32,17 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
+    /// Forward declare private data class.
+    class AtmospherePrivate;
+
     /// \class Atmosphere Atmosphere.hh physics/physics.hh
     /// \brief Base class for a atmosphere model.
     class GZ_PHYSICS_VISIBLE Atmosphere
     {
       /// \brief Default constructor.
       /// \param[in] _world Pointer to the world.
-      public: explicit Atmosphere(WorldPtr _world);
+      /// \param[in] _dataPtr Pointer to private data.
+      public: explicit Atmosphere(WorldPtr _world, AtmospherePrivate &_dataPtr);
 
       /// \brief Destructor.
       public: virtual ~Atmosphere();
@@ -114,8 +118,7 @@ namespace gazebo
 
       /// \brief Get the actual modeled sea level temperature in kelvins.
       /// \return Modeled temperature in kelvin at sea level.
-      public: virtual double TemperatureSL() const
-              { return Temperature(0.0); }
+      public: virtual double TemperatureSL() const;
 
       /// \brief Get the pressure at a specified altitude in pascals.
       /// \param[in] _altitude Altitude above sea level in meters.
@@ -124,7 +127,7 @@ namespace gazebo
 
       /// \brief Get the sea level pressure in pascals.
       /// \return Pressure in pascals at sea level.
-      public: virtual double PressureSL() const { return Pressure(0.0); }
+      public: virtual double PressureSL() const;
 
       /// \brief Get the density in kg/m^3 at a given altitude in meters.
       /// \param[in] _altitude Altitude above sea level in meters.
@@ -133,8 +136,7 @@ namespace gazebo
 
       /// \brief Get the sea level density in kg/m^3
       /// \return Density in kg/m^3 at sea level.
-      public: virtual double MassDensitySL(void) const
-              { return MassDensity(0.0); }
+      public: virtual double MassDensitySL(void) const;
 
       /// \brief Set the temperature gradient dT/dZ around sea level
       /// \param[in] _gradient Value of the temperature gradient dT/dZ around
@@ -143,38 +145,11 @@ namespace gazebo
 
       /// \brief Get the sea level temperature gradient.
       /// \return Temperature gradient at sea level.
-      public: virtual double TemperatureGradientSL() const
-              { return this->temperatureGradientSL; }
+      public: virtual double TemperatureGradientSL() const;
 
-      /// \brief Pointer to the world.
-      protected: WorldPtr world;
-
-      /// \brief Our SDF values.
-      protected: sdf::ElementPtr sdf;
-
-      /// \brief Node for communication.
-      protected: transport::NodePtr node;
-
-      /// \brief Response publisher.
-      protected: transport::PublisherPtr responsePub;
-
-      /// \brief Subscribe to the atmosphere topic.
-      protected: transport::SubscriberPtr atmosphereSub;
-
-      /// \brief Subscribe to the request topic.
-      protected: transport::SubscriberPtr requestSub;
-
-      /// \brief Temperature at sea level in kelvins.
-      protected: double temperatureSL;
-
-      /// \brief Temperature gradient at sea level in K/m.
-      protected: double temperatureGradientSL;
-
-      /// \brief Pressure of the air at sea level in pascals.
-      protected: double pressureSL;
-
-      /// \brief Mass density of the air at sea level in kg/m^3.
-      protected: double massDensitySL;
+      /// \internal
+      /// \brief Private data pointer.
+      protected: std::unique_ptr<AtmospherePrivate> dataPtr;
     };
     /// \}
   }

@@ -15,14 +15,16 @@
  *
 */
 
-#ifndef _ADIABATICATMOSPHERE_PRIVATE_HH_
-#define _ADIABATICATMOSPHERE_PRIVATE_HH_
+#ifndef _GAZEBO_PHYSICCS_ADIABATICATMOSPHEREPRIVATE_HH_
+#define _GAZEBO_PHYSICCS_ADIABATICATMOSPHEREPRIVATE_HH_
+
+#include "gazebo/physics/AtmospherePrivate.hh"
 
 namespace gazebo
 {
   namespace physics
   {
-    class AdiabaticAtmospherePrivate
+    class AdiabaticAtmospherePrivate : public AtmospherePrivate
     {
       /// \brief Adiabatic atmosphere power parameter.
       public: double adiabaticPower;

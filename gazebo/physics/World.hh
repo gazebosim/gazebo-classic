@@ -311,7 +311,7 @@ namespace gazebo
 
       /// \brief enable/disable atmosphere model.
       /// \param[in] _enable True to enable the atmosphere model.
-      public: void EnableAtmosphere(bool _enable);
+      public: void EnableAtmosphere(const bool _enable);
 
       /// \brief Update the state SDF value from the current state.
       public: void UpdateStateSDF();

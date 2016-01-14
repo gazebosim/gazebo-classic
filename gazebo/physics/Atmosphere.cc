@@ -33,6 +33,7 @@
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Atmosphere.hh"
 #include "gazebo/physics/PresetManager.hh"
+#include "gazebo/physics/AtmospherePrivate.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -41,67 +42,69 @@ using namespace physics;
 /// interface to any derived atmosphere models.
 
 //////////////////////////////////////////////////
-Atmosphere::Atmosphere(WorldPtr _world)
-  : world(_world)
-  , temperatureSL(0)
-  , temperatureGradientSL(0)
-  , pressureSL(0)
-  , massDensitySL(0)
+Atmosphere::Atmosphere(WorldPtr _world, AtmospherePrivate &_dataPtr)
+  : dataPtr(&_dataPtr)
 {
-  this->sdf.reset(new sdf::Element);
-  sdf::initFile("atmosphere.sdf", this->sdf);
+  this->dataPtr->world = _world;
+  this->dataPtr->temperatureSL = 0;
+  this->dataPtr->temperatureGradientSL = 0;
+  this->dataPtr->pressureSL = 0;
+  this->dataPtr->massDensitySL = 0;
 
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(this->world->GetName());
-  this->atmosphereSub = this->node->Subscribe("~/atmosphere",
+  this->dataPtr->sdf.reset(new sdf::Element);
+  sdf::initFile("atmosphere.sdf", this->dataPtr->sdf);
+
+  this->dataPtr->node = transport::NodePtr(new transport::Node());
+  this->dataPtr->node->Init(this->dataPtr->world->GetName());
+  this->dataPtr->atmosphereSub = this->dataPtr->node->Subscribe("~/atmosphere",
       &Atmosphere::OnAtmosphereMsg, this);
 
-  this->responsePub =
-    this->node->Advertise<msgs::Response>("~/response");
+  this->dataPtr->responsePub =
+    this->dataPtr->node->Advertise<msgs::Response>("~/response");
 
-  this->requestSub = this->node->Subscribe("~/request",
-                                           &Atmosphere::OnRequest, this);
+  this->dataPtr->requestSub = this->dataPtr->node->Subscribe("~/request",
+      &Atmosphere::OnRequest, this);
 }
 
 //////////////////////////////////////////////////
 Atmosphere::~Atmosphere()
 {
-  this->sdf->Reset();
-  this->sdf.reset();
-  this->responsePub.reset();
-  this->requestSub.reset();
-  this->node.reset();
+  this->dataPtr->sdf->Reset();
+  this->dataPtr->sdf.reset();
+  this->dataPtr->responsePub.reset();
+  this->dataPtr->requestSub.reset();
+  this->dataPtr->node.reset();
 }
 
 //////////////////////////////////////////////////
 void Atmosphere::Load(sdf::ElementPtr _sdf)
 {
-  this->sdf->Copy(_sdf);
+  this->dataPtr->sdf->Copy(_sdf);
 
-  this->temperatureSL =
-      this->sdf->GetElement("temperature")->Get<double>();
+  this->dataPtr->temperatureSL =
+      this->dataPtr->sdf->GetElement("temperature")->Get<double>();
 
-  this->temperatureGradientSL =
-      this->sdf->GetElement("temperature_gradient")->Get<double>();
+  this->dataPtr->temperatureGradientSL =
+      this->dataPtr->sdf->GetElement("temperature_gradient")->Get<double>();
 
-  this->pressureSL =
-      this->sdf->GetElement("pressure")->Get<double>();
+  this->dataPtr->pressureSL =
+      this->dataPtr->sdf->GetElement("pressure")->Get<double>();
 
-  this->massDensitySL =
-      this->sdf->GetElement("mass_density")->Get<double>();
+  this->dataPtr->massDensitySL =
+      this->dataPtr->sdf->GetElement("mass_density")->Get<double>();
 }
 
 //////////////////////////////////////////////////
 void Atmosphere::Fini()
 {
-  this->world.reset();
-  this->node->Fini();
+  this->dataPtr->world.reset();
+  this->dataPtr->node->Fini();
 }
 
 //////////////////////////////////////////////////
 sdf::ElementPtr Atmosphere::SDF() const
 {
-  return this->sdf;
+  return this->dataPtr->sdf;
 }
 
 //////////////////////////////////////////////////
@@ -183,4 +186,28 @@ bool Atmosphere::Param(const std::string &_key,
   }
 
   return true;
+}
+
+//////////////////////////////////////////////////
+double Atmosphere::TemperatureSL() const
+{
+  return this->Temperature(0.0);
+}
+
+//////////////////////////////////////////////////
+double Atmosphere::PressureSL() const
+{
+  return this->Pressure(0.0);
+}
+
+//////////////////////////////////////////////////
+double Atmosphere::MassDensitySL(void) const
+{
+  return this->MassDensity(0.0);
+}
+
+//////////////////////////////////////////////////
+double Atmosphere::TemperatureGradientSL() const
+{
+  return this->dataPtr->temperatureGradientSL;
 }

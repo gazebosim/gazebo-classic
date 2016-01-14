@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _ADIABATICATMOSPHERE_HH_
-#define _ADIABATICATMOSPHERE_HH_
+#ifndef _GAZEBO_PHYSICS_ADIABATICATMOSPHERE_HH_
+#define _GAZEBO_PHYSICS_ADIABATICATMOSPHERE_HH_
 
 #include <string>
 
@@ -25,9 +25,6 @@ namespace gazebo
 {
   namespace physics
   {
-    /// Forward declare private data class.
-    class AdiabaticAtmospherePrivate;
-
     /// \brief Adiabatic atmosphere model.
     /// Models the adiabatic atmosphere.
     class GZ_PHYSICS_VISIBLE AdiabaticAtmosphere : public Atmosphere
@@ -46,7 +43,7 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited
-      public: virtual std::string Type() const { return "adiabatic"; }
+      public: virtual std::string Type() const;
 
       // Documentation inherited
       public: virtual bool SetParam(const std::string &_key,
@@ -91,10 +88,6 @@ namespace gazebo
 
       /// \brief Universal ideal gas constant in J/(mol.K)
       public: static const double IDEAL_GAS_CONSTANT_R;
-
-      /// \internal
-      /// \brief Private data pointer.
-      private: AdiabaticAtmospherePrivate *dataPtr;
     };
   }
 }

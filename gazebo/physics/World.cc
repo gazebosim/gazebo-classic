@@ -286,7 +286,7 @@ void World::Load(sdf::ElementPtr _sdf)
       shared_from_this());
 
   if (this->dataPtr->atmosphere == NULL)
-    gzthrow("Unable to create atmosphere model\n");
+    gzerr << "Unable to create atmosphere model\n";
 
   this->dataPtr->atmosphere->Load(atmosphereElem);
 
@@ -2498,7 +2498,7 @@ bool World::EnableAtmosphere()
 }
 
 /////////////////////////////////////////////////
-void World::EnableAtmosphere(bool _enable)
+void World::EnableAtmosphere(const bool _enable)
 {
   this->dataPtr->enableAtmosphere = _enable;
 }

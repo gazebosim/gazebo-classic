@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _ATMOSPHEREFACTORY_HH_
-#define _ATMOSPHEREFACTORY_HH_
+#ifndef _GAZEBO_PHYSICS_ATMOSPHEREFACTORY_HH_
+#define _GAZEBO_PHYSICS_ATMOSPHEREFACTORY_HH_
 
 #include <string>
 #include <map>

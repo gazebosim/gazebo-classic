@@ -45,16 +45,13 @@ const double AdiabaticAtmosphere::IDEAL_GAS_CONSTANT_R = 8.3144621;
 
 //////////////////////////////////////////////////
 AdiabaticAtmosphere::AdiabaticAtmosphere(WorldPtr _world)
-  : Atmosphere(_world)
-  , dataPtr(new AdiabaticAtmospherePrivate)
+  : Atmosphere(_world, *new AdiabaticAtmospherePrivate)
 {
 }
 
 //////////////////////////////////////////////////
 AdiabaticAtmosphere::~AdiabaticAtmosphere()
 {
-  delete this->dataPtr;
-  this->dataPtr = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -66,9 +63,18 @@ void AdiabaticAtmosphere::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void AdiabaticAtmosphere::Init(void)
 {
-  this->dataPtr->adiabaticPower = MOLAR_MASS *
-      -this->world->GetPhysicsEngine()->GetGravity().z /
-      (temperatureGradientSL * IDEAL_GAS_CONSTANT_R);
+  AdiabaticAtmospherePrivate *dPtr =
+      reinterpret_cast<AdiabaticAtmospherePrivate *>(this->dataPtr.get());
+
+  dPtr->adiabaticPower = MOLAR_MASS *
+      -this->dataPtr->world->GetPhysicsEngine()->GetGravity().z /
+      (this->dataPtr->temperatureGradientSL * IDEAL_GAS_CONSTANT_R);
+}
+
+//////////////////////////////////////////////////
+std::string AdiabaticAtmosphere::Type() const
+{
+  return "adiabatic";
 }
 
 /////////////////////////////////////////////////
@@ -85,14 +91,14 @@ void AdiabaticAtmosphere::OnRequest(ConstRequestPtr &_msg)
     msgs::Atmosphere atmosphereMsg;
     atmosphereMsg.set_type(msgs::Atmosphere::ADIABATIC);
     atmosphereMsg.set_enable_atmosphere(
-            this->world->EnableAtmosphere());
+            this->dataPtr->world->EnableAtmosphere());
     atmosphereMsg.set_temperature(this->TemperatureSL());
     atmosphereMsg.set_pressure(this->PressureSL());
-    atmosphereMsg.set_mass_density(this->massDensitySL);
+    atmosphereMsg.set_mass_density(this->dataPtr->massDensitySL);
 
     response.set_type(atmosphereMsg.GetTypeName());
     atmosphereMsg.SerializeToString(serializedData);
-    this->responsePub->Publish(response);
+    this->dataPtr->responsePub->Publish(response);
   }
 }
 
@@ -105,7 +111,7 @@ void AdiabaticAtmosphere::OnAtmosphereMsg(ConstAtmospherePtr &_msg)
   Atmosphere::OnAtmosphereMsg(_msg);
 
   if (_msg->has_enable_atmosphere())
-    this->world->EnableAtmosphere(_msg->enable_atmosphere());
+    this->dataPtr->world->EnableAtmosphere(_msg->enable_atmosphere());
 
   if (_msg->has_temperature())
     this->SetTemperatureSL(_msg->temperature());
@@ -142,50 +148,56 @@ bool AdiabaticAtmosphere::Param(const std::string &_key,
 //////////////////////////////////////////////////
 void AdiabaticAtmosphere::SetTemperatureSL(const double _temperature)
 {
-  this->temperatureSL = _temperature;
+  this->dataPtr->temperatureSL = _temperature;
 }
 
 //////////////////////////////////////////////////
 void AdiabaticAtmosphere::SetTemperatureGradientSL(const double _gradient)
 {
-  this->temperatureGradientSL = _gradient;
+  this->dataPtr->temperatureGradientSL = _gradient;
   this->Init();
 }
 
 //////////////////////////////////////////////////
 void AdiabaticAtmosphere::SetPressureSL(const double _pressure)
 {
-  this->pressureSL = _pressure;
+  this->dataPtr->pressureSL = _pressure;
 }
 
 //////////////////////////////////////////////////
 void AdiabaticAtmosphere::SetMassDensitySL(const double _massDensity)
 {
-  this->massDensitySL = _massDensity;
+  this->dataPtr->massDensitySL = _massDensity;
 }
 
 //////////////////////////////////////////////////
 double AdiabaticAtmosphere::Temperature(const double _altitude) const
 {
-  double temperature = this->temperatureSL +
-      this->temperatureGradientSL * _altitude;
+  double temperature = this->dataPtr->temperatureSL +
+      this->dataPtr->temperatureGradientSL * _altitude;
   return temperature;
 }
 
 //////////////////////////////////////////////////
 double AdiabaticAtmosphere::Pressure(const double _altitude) const
 {
-  double pressure = this->pressureSL *
-      pow(1 - (this->temperatureGradientSL * _altitude) / this->temperatureSL,
-          this->dataPtr->adiabaticPower);
+  AdiabaticAtmospherePrivate *dPtr =
+      reinterpret_cast<AdiabaticAtmospherePrivate *>(this->dataPtr.get());
+
+  double pressure = this->dataPtr->pressureSL *
+      pow(1 - (this->dataPtr->temperatureGradientSL * _altitude) /
+          this->dataPtr->temperatureSL, dPtr->adiabaticPower);
   return pressure;
 }
 
 //////////////////////////////////////////////////
 double AdiabaticAtmosphere::MassDensity(const double _altitude) const
 {
-  double massDensity = this->massDensitySL *
-      pow(1 + (this->temperatureGradientSL * _altitude) / this->temperatureSL,
-          this->dataPtr->adiabaticPower - 1);
+  AdiabaticAtmospherePrivate *dPtr =
+      reinterpret_cast<AdiabaticAtmospherePrivate *>(this->dataPtr.get());
+
+  double massDensity = this->dataPtr->massDensitySL *
+      pow(1 + (this->dataPtr->temperatureGradientSL * _altitude) /
+          this->dataPtr->temperatureSL, dPtr->adiabaticPower - 1);
   return massDensity;
 }
