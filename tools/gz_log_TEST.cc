@@ -320,7 +320,7 @@ TEST(gz_log, Step)
   else if (std::string("1.5").compare(SDF_VERSION) == 0)
     EXPECT_EQ(shasum, "37934b37eb4e2e7d88ed764c296232124c8a38ab");
   else if (std::string("1.6").compare(SDF_VERSION) == 0)
-    EXPECT_EQ(shasum, "f32c210fba260cd24902c60fba1542fc7b1cd97d");
+    EXPECT_EQ(shasum, "e4a90a629b65ff0eede877f75bcf203cfa2f7891");
   else
     FAIL() << "Please add support for sdf version: " << SDF_VERSION;
 }
