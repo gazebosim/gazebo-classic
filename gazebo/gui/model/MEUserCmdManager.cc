@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -148,12 +148,6 @@ unsigned int MEUserCmd::Id() const
 std::string MEUserCmd::Description() const
 {
   return this->dataPtr->description;
-}
-
-/////////////////////////////////////////////////
-MEUserCmd::CmdType MEUserCmd::Type() const
-{
-  return this->dataPtr->type;
 }
 
 /////////////////////////////////////////////////
@@ -339,14 +333,13 @@ void MEUserCmdManager::OnRedoCommand(QAction *_action)
 }
 
 /////////////////////////////////////////////////
-MEUserCmd *MEUserCmdManager::NewCmd(const std::string &_description,
-    const MEUserCmd::CmdType _type)
+MEUserCmdPtr MEUserCmdManager::NewCmd(
+    const std::string &_description, const MEUserCmd::CmdType _type)
 {
   // Create command
-  MEUserCmd *cmd = new MEUserCmd(
-      this->dataPtr->idCounter++,
-      _description,
-      _type);
+  MEUserCmdPtr cmd;
+  cmd.reset(new MEUserCmd(this->dataPtr->idCounter++,
+      _description, _type));
 
   // Add it to undo list
   this->dataPtr->undoCmds.push_back(cmd);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,21 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_GUI_MODEL_MEUSERCMD_PRIVATE_HH_
-#define _GAZEBO_GUI_MODEL_MEUSERCMD_PRIVATE_HH_
+#ifndef _GAZEBO_GUI_MODEL_MEUSERCMDMANAGER_PRIVATE_HH_
+#define _GAZEBO_GUI_MODEL_MEUSERCMDMANAGER_PRIVATE_HH_
 
+#include <memory>
 #include <sdf/sdf.hh>
 
-#include "gazebo/msgs/msgs.hh"
-#include "gazebo/transport/TransportTypes.hh"
-
-#include "gazebo/gui/qt.h"
 #include "gazebo/gui/model/MEUserCmdManager.hh"
+#include "gazebo/gui/model/ModelEditorTypes.hh"
 
 namespace gazebo
 {
   namespace gui
   {
     /// \internal
-    /// \brief Private data for the MEUserCmdManager class
+    /// \brief Private data for the MEUserCmd class
     class MEUserCmdPrivate
     {
       /// \brief Unique ID identifying this command in the server.
@@ -42,9 +40,14 @@ namespace gazebo
       /// \brief Type of command, such as MOVING or DELETING.
       public: MEUserCmd::CmdType type;
 
-      /// \brief
+      /// \brief SDF element with information about the entity.
       public: sdf::ElementPtr sdf;
+
+      /// \brief Fully scoped name of the entity involved in the command.
       public: std::string scopedName;
+
+      /// \brief If the command is related to a joint, this is its unique Id.
+      /// It's different from the scopedName and we need both.
       public: std::string jointId;
     };
 
@@ -55,11 +58,11 @@ namespace gazebo
       /// \brief Counter to give commands unique ids.
       public: unsigned int idCounter;
 
-      /// \brief list of commands which can be undone.
-      public: std::vector<MEUserCmd *> undoCmds;
+      /// \brief List of commands which can be undone.
+      public: std::vector<MEUserCmdPtr> undoCmds;
 
-      /// \brief list of commands which can be redone.
-      public: std::vector<MEUserCmd *> redoCmds;
+      /// \brief List of commands which can be redone.
+      public: std::vector<MEUserCmdPtr> redoCmds;
     };
   }
 }

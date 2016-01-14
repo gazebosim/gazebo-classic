@@ -1595,13 +1595,17 @@ void ModelCreator::OnDelete(const std::string &_entity)
   auto link = this->allLinks.find(_entity);
   if (link != this->allLinks.end())
   {
+    // First delete joints
+    if (this->jointMaker)
+      this->jointMaker->RemoveJointsByLink(_entity);
+
+    // Then register command
     auto cmd = MEUserCmdManager::Instance()->NewCmd(
         "Deleted " + link->second->Name(), MEUserCmd::DELETING_LINK);
     cmd->SetSDF(link->second->linkSDF);
     cmd->SetScopedName(link->second->linkVisual->GetName());
 
-    if (this->jointMaker)
-      this->jointMaker->RemoveJointsByLink(_entity);
+    // Then delete link
     this->RemoveLinkImpl(_entity);
     return;
   }

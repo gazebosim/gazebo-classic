@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,20 +22,21 @@
 #include <string>
 #include <sdf/sdf.hh>
 
-#include "gazebo/util/system.hh"
-
 #include "gazebo/common/SingletonT.hh"
-
-#include "gazebo/msgs/MessageTypes.hh"
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/UserCmdHistory.hh"
+#include "gazebo/gui/model/ModelEditorTypes.hh"
+
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
     class UserCmdHistory;
+
+    // Forward declare private data.
     class MEUserCmdPrivate;
     class MEUserCmdManagerPrivate;
 
@@ -43,25 +44,32 @@ namespace gazebo
     /// and "redone".
     class GZ_GUI_VISIBLE MEUserCmd
     {
-      /// \enum
-      /// \brief
+      /// \enum CmdType
+      /// \brief Types of user commands.
       public: enum CmdType
       {
-        /// \brief
+        /// \brief Insert a link.
         INSERTING_LINK,
-        /// \brief Box
+
+        /// \brief Delete a link.
         DELETING_LINK,
-        /// \brief Sphere
+
+        /// \brief Insert a nested model.
         INSERTING_NESTED_MODEL,
-        /// \brief Cylinder
+
+        /// \brief Delete a nested model.
         DELETING_NESTED_MODEL,
-        /// \brief Sphere
+
+        /// \brief Insert a joint.
         INSERTING_JOINT,
-        /// \brief Cylinder
+
+        /// \brief Delete a joint.
         DELETING_JOINT,
-        /// \brief Sphere
+
+        /// \brief Insert a model plugin.
         INSERTING_MODEL_PLUGIN,
-        /// \brief Cylinder
+
+        /// \brief Delete a model plugin.
         DELETING_MODEL_PLUGIN
       };
 
@@ -70,9 +78,8 @@ namespace gazebo
       /// \param[in] _description Description for the command, such as
       /// "Rotate box", "Delete sphere", etc.
       /// \param[in] _type Type of command, such as MOVING, DELETING, etc.
-      public: MEUserCmd(unsigned int _id,
-                      const std::string &_description,
-                      MEUserCmd::CmdType _type);
+      public: MEUserCmd(unsigned int _id, const std::string &_description,
+          MEUserCmd::CmdType _type);
 
       /// \brief Destructor
       public: virtual ~MEUserCmd();
@@ -93,17 +100,13 @@ namespace gazebo
 
       /// \brief Return this command's type.
       /// \return Command type
-      public: MEUserCmd::CmdType Type() const;
-
-      /// \brief Return this command's type.
-      /// \return Command type
       public: void SetSDF(sdf::ElementPtr _sdf);
       public: void SetScopedName(const std::string &_name);
       public: void SetJointId(const std::string &_id);
 
       /// \internal
       /// \brief Pointer to private data.
-      protected: std::unique_ptr<MEUserCmdPrivate> dataPtr;
+      protected: std::shared_ptr<MEUserCmdPrivate> dataPtr;
     };
 
     /// \brief Class which manages user commands in the model editor. It
@@ -130,7 +133,7 @@ namespace gazebo
       public: void Reset();
 
       /// \brief Register that a new command has been executed by the user.
-      public: MEUserCmd *NewCmd(const std::string &_description,
+      public: MEUserCmdPtr NewCmd(const std::string &_description,
                  const MEUserCmd::CmdType _type);
 
       /// \brief Qt call back when an undo history action is triggered.
@@ -158,7 +161,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Pointer to private data.
-      private: std::unique_ptr<MEUserCmdManagerPrivate> dataPtr;
+      private: std::shared_ptr<MEUserCmdManagerPrivate> dataPtr;
     };
   }
 }

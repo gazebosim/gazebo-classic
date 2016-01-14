@@ -317,7 +317,7 @@ void JointMaker::RemoveJointsByLink(const std::string &_linkName)
   }
 
   for (unsigned i = 0; i < toDelete.size(); ++i)
-    this->RemoveJoint(toDelete[i]);
+    this->RemoveJointByUser(toDelete[i]);
 
   toDelete.clear();
 }
@@ -762,7 +762,15 @@ void JointMaker::OnDelete()
   if (this->dataPtr->inspectName.empty())
     return;
 
-  auto jointIt = this->dataPtr->joints.find(this->dataPtr->inspectName);
+  this->RemoveJointByUser(this->dataPtr->inspectName);
+  this->dataPtr->inspectName = "";
+}
+
+/////////////////////////////////////////////////
+void JointMaker::RemoveJointByUser(const std::string &_name)
+{
+  // Register user cmd
+  auto jointIt = this->dataPtr->joints.find(_name);
   if (jointIt != this->dataPtr->joints.end())
   {
     auto joint = jointIt->second;
@@ -773,8 +781,7 @@ void JointMaker::OnDelete()
     cmd->SetJointId(joint->hotspot->GetName());
   }
 
-  this->RemoveJoint(this->dataPtr->inspectName);
-  this->dataPtr->inspectName = "";
+  this->RemoveJoint(_name);
 }
 
 /////////////////////////////////////////////////
