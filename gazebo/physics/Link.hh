@@ -570,8 +570,7 @@ namespace gazebo
       /// \brief Returns this link's wind velocity in the world coordinate
       /// frame.
       /// \return this link's wind velocity.
-      public: inline const ignition::math::Vector3d WorldWindLinearVel() const
-              {return this->windLinearVel;}
+      public: const ignition::math::Vector3d WorldWindLinearVel() const;
 
       /// \brief Returns this link's wind velocity.
       /// \return this link's wind velocity.

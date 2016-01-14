@@ -778,7 +778,7 @@ void Link::EnableWind(const bool _enable)
   if (_enable)
   {
     this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-        boost::bind(&Link::UpdateWind, this, _1));
+        std::bind(&Link::UpdateWind, this, std::placeholders::_1));
   }
   else
   {
@@ -787,6 +787,12 @@ void Link::EnableWind(const bool _enable)
     // Make sure wind velocity is null
     this->windLinearVel.Set(0, 0, 0);
   }
+}
+
+//////////////////////////////////////////////////
+const ignition::math::Vector3d Link::WorldWindLinearVel() const
+{
+  return this->windLinearVel;
 }
 
 //////////////////////////////////////////////////

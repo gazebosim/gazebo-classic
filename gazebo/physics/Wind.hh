@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _WIND_HH_
-#define _WIND_HH_
+#ifndef _GAZEBO_PHYSICS_WIND_HH_
+#define _GAZEBO_PHYSICS_WIND_HH_
 
 #include <string>
 #include <functional>

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_WIND_PRIVATE_HH_
-#define _GAZEBO_WIND_PRIVATE_HH_
+#ifndef _GAZEBO_PHYSICS_WINDPRIVATE_HH_
+#define _GAZEBO_PHYSICS_WINDPRIVATE_HH_
 
 #include <functional>
 #include "gazebo/physics/PhysicsTypes.hh"

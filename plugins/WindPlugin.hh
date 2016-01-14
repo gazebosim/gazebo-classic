@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_WIND_PLUGIN_HH_
-#define _GAZEBO_WIND_PLUGIN_HH_
+#ifndef _GAZEBO_PLUGINS_WINDPLUGIN_HH_
+#define _GAZEBO_PLUGINS_WINDPLUGIN_HH_
 
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/Plugin.hh"

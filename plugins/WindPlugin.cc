@@ -40,7 +40,7 @@ void WindPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr /*_sdf*/)
         std::placeholders::_1, std::placeholders::_2));
 
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-          boost::bind(&WindPlugin::OnUpdate, this));
+          std::bind(&WindPlugin::OnUpdate, this));
 }
 
 /////////////////////////////////////////////////
