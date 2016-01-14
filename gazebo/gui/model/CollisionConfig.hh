@@ -21,8 +21,6 @@
 #include <map>
 #include <string>
 
-#include "gazebo/math/Pose.hh"
-
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/model/ModelData.hh"
 
