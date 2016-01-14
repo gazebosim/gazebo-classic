@@ -25,11 +25,11 @@ class WorldTest : public ServerFixture,
 {
   /// \brief Test Gravity, SetGravity
   /// \param[in] _physicsEngine Physics engine to use.
-  public: void Gravity(const std::string _physicsEngine);
+  public: void Gravity(const std::string &_physicsEngine);
 
   /// \brief Test MagneticField, SetMagneticField
   /// \param[in] _physicsEngine Physics engine to use.
-  public: void MagneticField(const std::string _physicsEngine);
+  public: void MagneticField(const std::string &_physicsEngine);
 };
 
 /////////////////////////////////////////////////
@@ -75,7 +75,7 @@ TEST_F(WorldTest, Clear)
 }
 
 /////////////////////////////////////////////////
-void WorldTest::Gravity(const std::string _physicsEngine)
+void WorldTest::Gravity(const std::string &_physicsEngine)
 {
   this->Load("worlds/friction_demo.world", true, _physicsEngine);
   auto world = physics::get_world("default");
@@ -125,7 +125,7 @@ TEST_P(WorldTest, Gravity)
 }
 
 /////////////////////////////////////////////////
-void WorldTest::MagneticField(const std::string _physicsEngine)
+void WorldTest::MagneticField(const std::string &_physicsEngine)
 {
   this->Load("worlds/magnetometer.world", true, _physicsEngine);
   auto world = physics::get_world("default");
