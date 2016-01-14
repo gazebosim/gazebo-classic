@@ -56,6 +56,7 @@
 #include "gazebo/rendering/RFIDTagVisual.hh"
 #include "gazebo/rendering/VideoVisual.hh"
 #include "gazebo/rendering/TransmitterVisual.hh"
+#include "gazebo/rendering/SelectionObj.hh"
 
 #if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= 8
 #include "gazebo/rendering/deferred_shading/SSAOLogic.hh"
@@ -3358,7 +3359,7 @@ void Scene::RemoveVisualizations(rendering::VisualPtr _vis)
     {
       // do not remove ModelManipulator's SelectionObj
       // FIXME remove this hardcoded check
-      if (childVis->GetName() == "__GL_MANIP__")
+      if (std::dynamic_pointer_cast<SelectionObj>(childVis) != NULL)
         continue;
 
       toRemove.push_back(childVis);
