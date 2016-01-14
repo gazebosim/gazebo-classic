@@ -3358,7 +3358,7 @@ void Scene::RemoveVisualizations(rendering::VisualPtr _vis)
         || visType == Visual::VT_GUI)
     {
       // do not remove ModelManipulator's SelectionObj
-      // FIXME remove this hardcoded check
+      // FIXME remove this hardcoded check, issue #1832
       if (std::dynamic_pointer_cast<SelectionObj>(childVis) != NULL)
         continue;
 
