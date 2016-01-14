@@ -3198,7 +3198,6 @@ void Scene::RemoveVisual(uint32_t _id)
       else
         ++piter;
     }
-
     this->RemoveVisualizations(vis);
 
     vis->Fini();
@@ -3357,6 +3356,11 @@ void Scene::RemoveVisualizations(rendering::VisualPtr _vis)
     if (visType == Visual::VT_PHYSICS || visType == Visual::VT_SENSOR
         || visType == Visual::VT_GUI)
     {
+      // do not remove ModelManipulator's SelectionObj
+      // FIXME remove this hardcoded check
+      if (childVis->GetName() == "__GL_MANIP__")
+        continue;
+
       toRemove.push_back(childVis);
     }
   }
