@@ -222,6 +222,13 @@ gzdbg << "Clear" << std::endl;
 }
 
 /////////////////////////////////////////////////
+void MEUserCmdManager::Reset()
+{
+  this->dataPtr->undoCmds.clear();
+  this->dataPtr->redoCmds.clear();
+}
+
+/////////////////////////////////////////////////
 void MEUserCmdManager::OnUndoCommand(QAction *_action)
 {
   if (!this->Active())

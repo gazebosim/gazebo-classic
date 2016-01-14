@@ -219,12 +219,6 @@ void JointMaker::RemoveJoint(const std::string &_jointId)
   if (jointIt != this->dataPtr->joints.end())
   {
     joint = jointIt->second;
-
-    auto cmd = MEUserCmdManager::Instance()->NewCmd(
-        "Deleted " + joint->name, MEUserCmd::DELETING_JOINT);
-    cmd->SetSDF(msgs::JointToSDF(*joint->jointMsg));
-    cmd->SetScopedName(joint->visual->GetName());
-    cmd->SetJointId(joint->hotspot->GetName());
   }
   // Joint being created
   else if (this->dataPtr->newJoint)
@@ -767,6 +761,17 @@ void JointMaker::OnDelete()
 {
   if (this->dataPtr->inspectName.empty())
     return;
+
+  auto jointIt = this->dataPtr->joints.find(this->dataPtr->inspectName);
+  if (jointIt != this->dataPtr->joints.end())
+  {
+    auto joint = jointIt->second;
+    auto cmd = MEUserCmdManager::Instance()->NewCmd(
+        "Deleted " + joint->name, MEUserCmd::DELETING_JOINT);
+    cmd->SetSDF(msgs::JointToSDF(*joint->jointMsg));
+    cmd->SetScopedName(joint->visual->GetName());
+    cmd->SetJointId(joint->hotspot->GetName());
+  }
 
   this->RemoveJoint(this->dataPtr->inspectName);
   this->dataPtr->inspectName = "";

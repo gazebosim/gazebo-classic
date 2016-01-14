@@ -126,6 +126,9 @@ namespace gazebo
       /// internal state of the singleton and prepares it for exit.
       public: void Clear();
 
+      /// \brief Reset commands.
+      public: void Reset();
+
       /// \brief Register that a new command has been executed by the user.
       public: MEUserCmd *NewCmd(const std::string &_description,
                  const MEUserCmd::CmdType _type);

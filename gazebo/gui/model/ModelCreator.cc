@@ -288,6 +288,7 @@ void ModelCreator::OnEdit(bool _checked)
 
     this->DeselectAll();
   }
+  MEUserCmdManager::Instance()->Reset();
   MEUserCmdManager::Instance()->SetActive(this->active);
 }
 
@@ -1093,7 +1094,7 @@ LinkData *ModelCreator::CreateLinkFromSDF(const sdf::ElementPtr &_linkElem,
 
   // Link
   std::stringstream linkNameStream;
-  std::string leafName = link->GetName();
+  std::string leafName = link->Name();
   linkNameStream << _parentVis->GetName() << "::";
   linkNameStream << leafName;
   std::string linkName = linkNameStream.str();
@@ -1581,7 +1582,8 @@ void ModelCreator::OnDelete(const std::string &_entity)
   if (nestedModel != this->allNestedModels.end())
   {
     auto cmd = MEUserCmdManager::Instance()->NewCmd(
-        "Deleted " + _entity, MEUserCmd::DELETING_NESTED_MODEL);
+        "Deleted " + nestedModel->second->Name(),
+        MEUserCmd::DELETING_NESTED_MODEL);
     cmd->SetSDF(nestedModel->second->modelSDF);
     cmd->SetScopedName(nestedModel->second->modelVisual->GetName());
 
@@ -1594,7 +1596,7 @@ void ModelCreator::OnDelete(const std::string &_entity)
   if (link != this->allLinks.end())
   {
     auto cmd = MEUserCmdManager::Instance()->NewCmd(
-        "Deleted " + _entity, MEUserCmd::DELETING_LINK);
+        "Deleted " + link->second->Name(), MEUserCmd::DELETING_LINK);
     cmd->SetSDF(link->second->linkSDF);
     cmd->SetScopedName(link->second->linkVisual->GetName());
 
@@ -1776,7 +1778,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
       gui::model::Events::linkInserted(this->mouseVisual->GetName());
 
       auto cmd = MEUserCmdManager::Instance()->NewCmd(
-          "Inserted " + this->mouseVisual->GetName(),
+          "Inserted " + link->Name(),
           MEUserCmd::INSERTING_LINK);
       cmd->SetSDF(link->linkSDF);
       cmd->SetScopedName(link->linkVisual->GetName());
@@ -1793,7 +1795,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
         this->EmitNestedModelInsertedEvent(this->mouseVisual);
 
         auto cmd = MEUserCmdManager::Instance()->NewCmd(
-            "Inserted " + this->mouseVisual->GetName(),
+            "Inserted " + modelData->Name(),
             MEUserCmd::INSERTING_NESTED_MODEL);
         cmd->SetSDF(modelData->modelSDF);
         cmd->SetScopedName(modelData->modelVisual->GetName());
@@ -2663,7 +2665,7 @@ void ModelCreator::Update()
       this->ModelChanged();
 
 //      MEUserCmdManager::Instance()->NewCmd(
-//          "Move " + link->GetName(), MEUserCmd::MOVING);
+//          "Move " + link->Name(), MEUserCmd::MOVING);
     }
     for (auto &scaleIt : this->linkScaleUpdate)
     {
@@ -2672,7 +2674,7 @@ void ModelCreator::Update()
         link->SetScale(scaleIt.second.Ign());
 
 //        MEUserCmdManager::Instance()->NewCmd(
-//            "Scale " + link->GetName(), MEUserCmd::SCALING);
+//            "Scale " + link->Name(), MEUserCmd::SCALING);
       }
     }
   }

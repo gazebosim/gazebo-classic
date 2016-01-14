@@ -77,6 +77,12 @@ double ModelData::GetEditTransparency()
 }
 
 /////////////////////////////////////////////////
+std::string NestedModelData::Name() const
+{
+  return this->modelSDF->Get<std::string>("name");
+}
+
+/////////////////////////////////////////////////
 void NestedModelData::SetName(const std::string &_name)
 {
   this->modelSDF->GetAttribute("name")->Set(_name);
@@ -153,7 +159,7 @@ LinkData::~LinkData()
 }
 
 /////////////////////////////////////////////////
-std::string LinkData::GetName() const
+std::string LinkData::Name() const
 {
   return this->linkSDF->Get<std::string>("name");
 }
