@@ -177,7 +177,7 @@ const ConfigWidget *LinkConfig::LinkConfigWidget() const
 /////////////////////////////////////////////////
 double LinkConfig::Mass() const
 {
-  return this->configWidget->GetDoubleWidgetValue("inertial::mass");
+  return this->configWidget->DoubleWidgetValue("inertial::mass");
 }
 
 /////////////////////////////////////////////////

@@ -251,7 +251,7 @@ ignition::math::Vector3d LinkInspector::ComputeInertia(const double _mass) const
 /////////////////////////////////////////////////
 void LinkInspector::OnDensityValueChanged(const double _value)
 {
-  double volume = ComputeVolume();
+  double volume = this->ComputeVolume();
   double mass = volume * _value;
 
   if (!ignition::math::equal(this->dataPtr->linkConfig->Mass(), mass))
@@ -265,12 +265,12 @@ void LinkInspector::OnDensityValueChanged(const double _value)
 /////////////////////////////////////////////////
 void LinkInspector::OnMassValueChanged(const double _value)
 {
-  double volume = ComputeVolume();
+  double volume = this->ComputeVolume();
 
-  if (!ignition::math::equal(volume, 0.0))
+  if (volume > 0.0)
   {
     double density = _value / volume;
-    if (!ignition::math::equal(this->dataPtr->linkConfig->Density(), density))
+    if (!math::equal(this->dataPtr->linkConfig->Density(), density))
     {
       ignition::math::Vector3d I = ComputeInertia(_value);
       this->dataPtr->linkConfig->SetDensity(density);
@@ -285,9 +285,9 @@ void LinkInspector::OnCollisionChanged(const std::string &/*_name*/,
 {
   if (_type == "geometry")
   {
-    double volume = ComputeVolume();
+    double volume = this->ComputeVolume();
 
-    if (!math::equal(volume, 0.0))
+    if (volume > 0.0)
     {
       double mass = this->dataPtr->linkConfig->Mass();
       double density = mass / volume;

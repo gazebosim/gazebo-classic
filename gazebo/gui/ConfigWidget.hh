@@ -126,6 +126,9 @@ namespace gazebo
     {
       Q_OBJECT
 
+      /// \brief Constructor
+      public: DensityConfigWidget();
+
       /// \brief Updates the widget's density value.
       /// \param[in] _density New density value.
       public: void SetDensity(const double _density);
@@ -144,7 +147,7 @@ namespace gazebo
 
       /// \brief Signal emitted when density has changed.
       /// \param[in] _value Density value.
-      Q_SIGNALS: void DensityValueChanged(const double _value);
+      Q_SIGNALS: void DensityValueChanged(const double &_value);
 
       /// \brief A combo box for selecting a material density.
       public: QComboBox *comboBox;
@@ -982,14 +985,11 @@ namespace gazebo
 
       /// \brief Signal emitted when density value changes.
       /// \param[in] _value Density value.
-      Q_SIGNALS: void DensityValueChanged(const double _value);
+      Q_SIGNALS: void DensityValueChanged(const double &_value);
 
       /// \brief Signal emitted when mass value changes.
       /// \param[in] _value Mass value.
-      Q_SIGNALS: void MassValueChanged(const double _value);
-
-      /// \brief Signal emitted when geometry changes.
-      Q_SIGNALS: void GeometryChanged();
+      Q_SIGNALS: void MassValueChanged(const double &_value);
 
       /// \brief Callback when density value changes in child widget.
       /// \param[in] _value Density value.
@@ -1001,6 +1001,9 @@ namespace gazebo
 
       /// \brief Callback when geometry changes.
       private slots: void OnGeometryChanged();
+
+      /// \brief Signal emitted when geometry changes.
+      Q_SIGNALS: void GeometryChanged();
 
       /// \brief Qt event filter currently used to filter mouse wheel events.
       /// \param[in] _obj Object that is watched by the event filter.

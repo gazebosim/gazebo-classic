@@ -19,7 +19,9 @@
 #include <google/protobuf/message.h>
 
 #include "gazebo/common/Console.hh"
-#include "gazebo/gui/model/DensityModel.hh"
+#include "gazebo/common/EnumIface.hh"
+#include "gazebo/common/MaterialDensity.hh"
+#include "gazebo/gui/model/CollisionConfig.hh"
 #include "gazebo/gui/ConfigWidget.hh"
 #include "gazebo/gui/ConfigWidgetPrivate.hh"
 
@@ -1999,6 +2001,8 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
 
   connect(geomFilenameButton, SIGNAL(clicked()), widget, SLOT(OnSelectFile()));
 
+  connect(geomFilenameButton, SIGNAL(clicked()), widget, SLOT(OnSelectFile()));
+
   connect(widget, SIGNAL(GeometryChanged()), this, SLOT(OnGeometryChanged()));
 
   connect(geomSizeXSpinBox, SIGNAL(valueChanged(double)),
@@ -2082,11 +2086,16 @@ ConfigChildWidget *ConfigWidget::CreateDensityWidget(
   QComboBox *comboBox = new QComboBox;
   size_t minLen = 0;
 
-  for (const auto &it : DensityModel::Instance()->Entries())
+  for (const auto &it : common::MaterialDensity::Materials())
   {
-    minLen = std::max(minLen, it->desc.length());
-    comboBox->addItem(tr(it->desc.c_str()), QVariant::fromValue(it->value));
+    minLen = std::max(minLen,
+        common::EnumIface<common::MaterialType>::Str(it.first).length());
+
+    comboBox->addItem(tr(
+          common::EnumIface<common::MaterialType>::Str(it.first).c_str()),
+        QVariant::fromValue(it.second));
   }
+
   comboBox->addItem(tr("Custom..."));
   // Longest entry plus check box and space
   comboBox->setMinimumContentsLength(minLen+2);
@@ -3469,15 +3478,23 @@ void DensityConfigWidget::SetDensity(const double _density)
   bool comboSigState = this->comboBox->blockSignals(true);
   bool spinSigState = this->spinBox->blockSignals(true);
   {
-    const DensityEntry *entry =
-        DensityModel::Instance()->EntryByValue(_density);
+    common::MaterialType type;
+    double matDensity;
 
-    if (entry)
+    // Get the material closest to _density
+    std::tie(type, matDensity) = common::MaterialDensity::Nearest(_density);
+
+    if (matDensity >= 0)
+    {
       this->comboBox->setCurrentIndex(
-          this->comboBox->findText(tr(entry->desc.c_str())));
+          this->comboBox->findText(tr(
+              common::EnumIface<common::MaterialType>::Str(type).c_str())));
+    }
     else
+    {
       this->comboBox->setCurrentIndex(
           this->comboBox->count()-1);
+    }
 
     this->spinBox->setValue(_density);
     this->density = _density;
@@ -3674,4 +3691,9 @@ QString ConfigWidget::StyleSheet(const std::string &_type, const int _level)
   }
   gzwarn << "Requested unknown style sheet type [" << _type << "]" << std::endl;
   return "";
+}
+
+/////////////////////////////////////////////////
+DensityConfigWidget::DensityConfigWidget()
+{
 }

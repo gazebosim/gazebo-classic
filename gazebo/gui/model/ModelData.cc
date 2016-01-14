@@ -242,29 +242,21 @@ void LinkData::SetScale(const ignition::math::Vector3d &_scale)
     std::string geomStr = it.first->GetGeometryType();
     if (geomStr == "sphere")
     {
-      double r = oldSize.X() * 0.5;
-      double r3 = r*r*r;
-      double newR = newSize.X() * 0.5;
-      double newR3 = newR*newR*newR;
       // sphere volume: 4/3 * PI * r^3
-      oldVol += 4.0 / 3.0 * IGN_PI * r3;
-      newVol += 4.0 / 3.0 * IGN_PI * newR3;
+      oldVol += IGN_SPHERE_VOLUME(oldSize.X() * 0.5);
+      newVol += IGN_SPHERE_VOLUME(newSize.X() * 0.5);
     }
     else if (geomStr == "cylinder")
     {
-      double r = oldSize.X() * 0.5;
-      double r2 = r*r;
-      double newR = newSize.X() * 0.5;
-      double newR2 = newR*newR;
       // cylinder volume: PI * r^2 * height
-      oldVol += IGN_PI * r2 * oldSize.Z();
-      newVol += IGN_PI * newR2 * newSize.Z();
+      oldVol += IGN_CYLINDER_VOLUME(oldSize.X() * 0.5, oldSize.Z());
+      newVol += IGN_CYLINDER_VOLUME(newSize.X() * 0.5, newSize.Z());
     }
     else
     {
       // box, mesh, and other geometry types - use bounding box
-      oldVol += oldSize.X() * oldSize.Y() * oldSize.Z();
-      newVol += newSize.X() * newSize.Y() * newSize.Z();
+      oldVol += IGN_BOX_VOLUME_V(oldSize);
+      newVol += IGN_BOX_VOLUME_V(newSize);
     }
   }
 
@@ -684,7 +676,7 @@ double LinkData::ComputeVolume(const msgs::Collision &_collision)
           if (box.has_size())
           {
             const msgs::Vector3d &size = box.size();
-            volume = size.x() * size.y() * size.z();
+            volume = IGN_BOX_VOLUME(size.x(), size.y(), size.z());
           }
         }
         break;
@@ -695,10 +687,8 @@ double LinkData::ComputeVolume(const msgs::Collision &_collision)
           const msgs::CylinderGeom &cylinder = geometry.cylinder();
           if (cylinder.has_radius() && cylinder.has_length())
           {
-            double r = cylinder.radius();
-            double r2 = r*r;
             // Cylinder volume: PI * r^2 * height
-            volume = IGN_PI * r2 * cylinder.length();
+            volume = IGN_CYLINDER_VOLUME(cylinder.radius(), cylinder.length());
           }
         }
         break;
@@ -709,10 +699,8 @@ double LinkData::ComputeVolume(const msgs::Collision &_collision)
           const msgs::SphereGeom &sphere = geometry.sphere();
           if (sphere.has_radius())
           {
-            double r = sphere.radius();
-            double r3 = r*r*r;
             // Sphere volume: 4/3 * PI * r^3
-            volume = 4.0 / 3.0 * IGN_PI * r3;
+            volume = IGN_SPHERE_VOLUME(sphere.radius());
           }
         }
         break;
@@ -834,22 +822,18 @@ double LinkData::ComputeVolume() const
 
     if (shape == "sphere")
     {
-      double r = size.X() * 0.5;
-      double r3 = r*r*r;
       // Sphere volume: 4/3 * PI * r^3
-      volume += 4.0 / 3.0 * IGN_PI * r3;
+      volume += IGN_SPHERE_VOLUME(size.X());
     }
     else if (shape == "cylinder")
     {
-      double r = size.X() * 0.5;
-      double r2 = r*r;
       // Cylinder volume: PI * r^2 * height
-      volume += IGN_PI * r2 * size.Z();
+      volume += IGN_CYLINDER_VOLUME(size.X(), size.Z());
     }
     else
     {
       // Box, mesh, and other geometry types - use bounding box
-      volume += size.X() * size.Y() * size.Z();
+      volume += IGN_BOX_VOLUME_V(size);
     }
   }
   return volume;
