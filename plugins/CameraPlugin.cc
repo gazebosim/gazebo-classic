@@ -55,7 +55,7 @@ void CameraPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr /*_sdf*/)
       gzmsg << "It is a depth camera sensor\n";
   }
 
-  this->camera = this->parentSensor->GetCamera();
+  this->camera = this->parentSensor->Camera();
 
   if (!this->parentSensor)
   {
@@ -69,7 +69,9 @@ void CameraPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr /*_sdf*/)
   this->format = this->camera->ImageFormat();
 
   this->newFrameConnection = this->camera->ConnectNewImageFrame(
-      boost::bind(&CameraPlugin::OnNewFrame, this, _1, _2, _3, _4, _5));
+      std::bind(&CameraPlugin::OnNewFrame, this,
+        std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+        std::placeholders::_4, std::placeholders::_5));
 
   this->parentSensor->SetActive(true);
 }

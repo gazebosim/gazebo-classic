@@ -2058,6 +2058,12 @@ DistortionPtr Camera::GetDistortion() const
 }
 
 //////////////////////////////////////////////////
+DistortionPtr Camera::LensDistortion() const
+{
+  return this->dataPtr->distortion;
+}
+
+//////////////////////////////////////////////////
 void Camera::UpdateFOV()
 {
   if (this->viewport)

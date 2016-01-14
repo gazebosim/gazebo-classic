@@ -117,13 +117,13 @@ void SensorManager::Update(bool _force)
       for (auto &sensor : this->initSensors)
       {
         GZ_ASSERT(sensor != NULL, "Sensor pointer is NULL");
-        GZ_ASSERT(sensor->GetCategory() < 0 ||
-            sensor->GetCategory() < CATEGORY_COUNT, "Sensor category is empty");
-        GZ_ASSERT(this->sensorContainers[sensor->GetCategory()] != NULL,
+        GZ_ASSERT(sensor->Category() < 0 ||
+            sensor->Category() < CATEGORY_COUNT, "Sensor category is empty");
+        GZ_ASSERT(this->sensorContainers[sensor->Category()] != NULL,
             "Sensor container is NULL");
 
         sensor->Init();
-        this->sensorContainers[sensor->GetCategory()]->AddSensor(sensor);
+        this->sensorContainers[sensor->Category()]->AddSensor(sensor);
       }
       this->initSensors.clear();
       for (auto &worldName_worldPtr : this->worlds)
@@ -289,7 +289,7 @@ std::string SensorManager::CreateSensor(sdf::ElementPtr _elem,
   // initialized in SensorManager::Init
   if (!this->initialized)
   {
-    this->sensorContainers[sensor->GetCategory()]->AddSensor(sensor);
+    this->sensorContainers[sensor->Category()]->AddSensor(sensor);
   }
   // Otherwise the SensorManager is already running, and the sensor will get
   // initialized during the next SensorManager::Update call.
@@ -300,7 +300,7 @@ std::string SensorManager::CreateSensor(sdf::ElementPtr _elem,
     this->initSensors.push_back(sensor);
   }
 
-  return sensor->GetScopedName();
+  return sensor->ScopedName();
 }
 
 //////////////////////////////////////////////////
@@ -387,7 +387,7 @@ void SensorManager::RemoveSensor(const std::string &_name)
   {
     // Push it on the list, to be removed by the main sensor thread,
     // to ensure correct access to rendering resources.
-    this->removeSensors.push_back(sensor->GetScopedName());
+    this->removeSensors.push_back(sensor->ScopedName());
   }
 }
 
@@ -507,7 +507,7 @@ void SensorManager::SensorContainer::RunLoop()
         iter != this->sensors.end() && !this->stop; ++iter)
     {
       GZ_ASSERT((*iter) != NULL, "Sensor is NULL");
-      maxUpdateRate = std::max((*iter)->GetUpdateRate(), maxUpdateRate);
+      maxUpdateRate = std::max((*iter)->UpdateRate(), maxUpdateRate);
     }
   }
 
@@ -596,8 +596,8 @@ SensorPtr SensorManager::SensorContainer::GetSensor(const std::string &_name,
 
     // We match on the scoped name (model::link::sensor) because multiple
     // sensors with the name leaf name make exists in a world.
-    if ((_useLeafName && (*iter)->GetName() == _name) ||
-        (!_useLeafName && (*iter)->GetScopedName() == _name))
+    if ((_useLeafName && (*iter)->Name() == _name) ||
+        (!_useLeafName && (*iter)->ScopedName() == _name))
     {
       result = (*iter);
       break;
@@ -635,7 +635,7 @@ bool SensorManager::SensorContainer::RemoveSensor(const std::string &_name)
   {
     GZ_ASSERT((*iter) != NULL, "Sensor is NULL");
 
-    if ((*iter)->GetScopedName() == _name)
+    if ((*iter)->ScopedName() == _name)
     {
       (*iter)->Fini();
       this->sensors.erase(iter);

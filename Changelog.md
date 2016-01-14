@@ -40,6 +40,7 @@
     * [Pull request #2042](https://bitbucket.org/osrf/gazebo/pull-request/2042)
 
 1. Use more opaque pointers.
+    * [Pull request #2022](https://bitbucket.org/osrf/gazebo/pull-request/2022)
     * [Pull request #2025](https://bitbucket.org/osrf/gazebo/pull-request/2025)
     * [Pull request #2043](https://bitbucket.org/osrf/gazebo/pull-request/2043)
     * [Pull request #2044](https://bitbucket.org/osrf/gazebo/pull-request/2044)
@@ -313,6 +314,9 @@ using the same arguments used in the command line.
         * [Pull request #2056](https://bitbucket.org/osrf/gazebo/pull-request/2056)
         * [Pull request #2059](https://bitbucket.org/osrf/gazebo/pull-request/2059)
         * [Pull request #2087](https://bitbucket.org/osrf/gazebo/pull-request/2087)
+
+    1. Support joint creation between links in nested model.
+        * [Pull request #2080](https://bitbucket.org/osrf/gazebo/pull-request/2080)
 
 1. Building editor updates
 
