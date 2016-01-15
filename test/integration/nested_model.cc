@@ -47,9 +47,9 @@ void PhysicsMsgsTest::LoadNestedModel(const std::string &_physicsEngine)
   if (_physicsEngine == "simbody")
     return;
 
-  // Nested models are not working in simbody yet, issue #1833
+  // Nested models are not working in dart yet, issue #1833
   if (_physicsEngine == "dart")
-    return
+    return;
 
   // load a world with a nested model
   Load("worlds/nested_model.world", true, _physicsEngine);
@@ -136,6 +136,10 @@ void PhysicsMsgsTest::SpawnNestedModel(const std::string &_physicsEngine)
 {
   // Nested models are not working in simbody yet, issue #1718
   if (_physicsEngine == "simbody")
+    return;
+
+  // Nested models are not working in dart yet, issue #1833
+  if (_physicsEngine == "dart")
     return;
 
   // load an empty world
