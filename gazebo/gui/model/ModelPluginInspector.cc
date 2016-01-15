@@ -122,11 +122,14 @@ void ModelPluginInspector::OnRemove()
       dynamic_cast<msgs::Plugin *>(this->dataPtr->configWidget->Msg());
 
   // User request from inspector
-  auto cmd = MEUserCmdManager::Instance()->NewCmd(
-      "Deleted plugin [" + pluginName + "]",
-      MEUserCmd::DELETING_MODEL_PLUGIN);
-  cmd->SetSDF(msgs::PluginToSDF(*pluginMsg));
-  cmd->SetScopedName(pluginName);
+  if (MEUserCmdManager::Instance()->Active())
+  {
+    auto cmd = MEUserCmdManager::Instance()->NewCmd(
+        "Deleted plugin [" + pluginName + "]",
+        MEUserCmd::DELETING_MODEL_PLUGIN);
+    cmd->SetSDF(msgs::PluginToSDF(*pluginMsg));
+    cmd->SetScopedName(pluginName);
+  }
 
   this->OnCancel();
   model::Events::requestModelPluginRemoval(pluginName);

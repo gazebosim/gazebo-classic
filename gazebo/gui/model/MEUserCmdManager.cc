@@ -205,6 +205,7 @@ MEUserCmdManager::MEUserCmdManager()
   if (!g_undoAct || !g_redoAct || !g_undoHistoryAct || !g_redoHistoryAct)
   {
     gzerr << "Action missing, not initializing MEUserCmdManager" << std::endl;
+    this->SetActive(false);
     return;
   }
 
