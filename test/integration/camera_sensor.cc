@@ -126,6 +126,100 @@ TEST_F(CameraSensor, WorldReset)
 }
 
 /////////////////////////////////////////////////
+TEST_F(CameraSensor, MultipleCameraSameName)
+{
+  Load("worlds/empty_test.world");
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run camera test\n";
+    return;
+  }
+
+  // spawn first camera sensor
+  std::string modelName = "camera_model";
+  std::string cameraName = "camera_sensor";
+  unsigned int width  = 320;
+  unsigned int height = 240;  // 106 fps
+  double updateRate = 10;
+  ignition::math::Pose3d setPose, testPose(
+      ignition::math::Vector3d(-5, 0, 5),
+      ignition::math::Quaterniond(0, GZ_DTOR(15), 0));
+  SpawnCamera(modelName, cameraName, setPose.Pos(),
+      setPose.Rot().Euler(), width, height, updateRate);
+  std::string sensorScopedName =
+      "default::" + modelName + "::body::" + cameraName;
+  sensors::SensorPtr sensor = sensors::get_sensor(sensorScopedName);
+  EXPECT_TRUE(sensor != NULL);
+  sensors::CameraSensorPtr camSensor =
+    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+  EXPECT_TRUE(camSensor != NULL);
+  rendering::CameraPtr camera = camSensor->GetCamera();
+  EXPECT_TRUE(camera != NULL);
+
+  // spawn second camera sensor with same name but attached to a different model
+  std::string modelName2 = modelName + "_2";
+  SpawnCamera(modelName2, cameraName, setPose.Pos(),
+      setPose.Rot().Euler(), width, height, updateRate);
+  std::string sensorScopedName2 =
+      "default::" + modelName2 + "::body::" + cameraName;
+  sensors::SensorPtr sensor2 = sensors::get_sensor(sensorScopedName2);
+  EXPECT_TRUE(sensor2 != NULL);
+  sensors::CameraSensorPtr camSensor2 =
+    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor2);
+  EXPECT_TRUE(camSensor2 != NULL);
+  rendering::CameraPtr camera2 = camSensor2->GetCamera();
+  EXPECT_TRUE(camera2 != NULL);
+
+  // verify that the sensors and cameras are not the same
+  EXPECT_TRUE(camSensor != camSensor2);
+  EXPECT_TRUE(camera != camera2);
+
+  // get camera scene and verify camera count
+  rendering::ScenePtr scene = camera->GetScene();
+  EXPECT_TRUE(scene != NULL);
+  EXPECT_EQ(scene->GetCameraCount(), 2u);
+
+  // remove the second camera sensor first and check that it does not remove
+  // the first one with the same name
+  sensors::remove_sensor(sensorScopedName2);
+  int sleep = 0;
+  int maxSleep = 10;
+  while (sensors::get_sensor(sensorScopedName2) != NULL && sleep < maxSleep)
+  {
+    common::Time::MSleep(100);
+    sleep++;
+  }
+  sensor2 = sensors::get_sensor(sensorScopedName2);
+  EXPECT_TRUE(sensor2 == NULL);
+  sensor = sensors::get_sensor(sensorScopedName);
+  EXPECT_TRUE(sensor != NULL);
+
+  // verify the first camera is still there
+  EXPECT_EQ(scene->GetCameraCount(), 1u);
+  EXPECT_TRUE(camera == scene->GetCamera(0));
+
+  std::string renderingCameraName = camera->GetName();
+
+  // remove the first camera sensor and there should be no sensors or cameras
+  // left
+  sensors::remove_sensor(sensorScopedName);
+  sleep = 0;
+  while (sensors::get_sensor(sensorScopedName) != NULL && sleep < maxSleep)
+  {
+    common::Time::MSleep(100);
+    sleep++;
+  }
+  sensor = sensors::get_sensor(sensorScopedName);
+  EXPECT_TRUE(sensor == NULL);
+  camera = scene->GetCamera(renderingCameraName);
+  EXPECT_TRUE(camera == NULL);
+  EXPECT_EQ(scene->GetCameraCount(), 0u);
+}
+
+/////////////////////////////////////////////////
 TEST_F(CameraSensor, CheckThrottle)
 {
   Load("worlds/empty_test.world");
