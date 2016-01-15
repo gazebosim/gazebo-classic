@@ -42,12 +42,13 @@ GZ_ENUM(MaterialType,
   "Tungsten",
   "end"
 )
+
 // Initialize the materials
 std::map<MaterialType, double> MaterialDensity::materials =
 {
   {MaterialType::STYROFOAM, 75.0},
   {MaterialType::PINE, 373.0},
-  {MaterialType::WOOD, 700.0}
+  {MaterialType::WOOD, 700.0},
   {MaterialType::OAK, 710.0},
   {MaterialType::ICE, 916.0},
   {MaterialType::WATER, 1000.0},
@@ -98,9 +99,10 @@ std::tuple<MaterialType, double> MaterialDensity::Nearest(
 
   for (auto const &mat : materials)
   {
-    if (std::fabs(mat.second - _value) < min)
+    double diff = mat.second - _value;
+    if (diff >= 0 && diff < min)
     {
-      min = std::fabs(mat.second - _value);
+      min = diff;
       result = mat;
     }
   }
