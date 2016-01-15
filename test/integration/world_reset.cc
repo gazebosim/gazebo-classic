@@ -75,6 +75,14 @@ void WorldResetTest::ModelPose(const std::string &_physicsEngine,
     return;
   }
 
+  if (_physicsEngine == "dart" &&
+      _world.find("nested_model") != std::string::npos)
+  {
+    gzerr << "dart fails this test with nested models due to issue #1833"
+          << std::endl;
+    return;
+  }
+
   Load(_world, true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
