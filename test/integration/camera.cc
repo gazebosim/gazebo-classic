@@ -46,7 +46,7 @@ TEST_F(CameraTest, Follow)
   sensors::SensorPtr sensor = sensors::get_sensor("test_camera");
   EXPECT_TRUE(sensor != NULL);
   sensors::CameraSensorPtr camSensor =
-    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
   EXPECT_TRUE(camSensor != NULL);
   rendering::CameraPtr camera = camSensor->GetCamera();
   ASSERT_TRUE(camera != NULL);
@@ -103,7 +103,7 @@ TEST_F(CameraTest, Visible)
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
   ASSERT_TRUE(sensor != NULL);
   sensors::CameraSensorPtr camSensor =
-    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
   EXPECT_TRUE(camSensor != NULL);
   rendering::CameraPtr camera = camSensor->GetCamera();
   ASSERT_TRUE(camera != NULL);

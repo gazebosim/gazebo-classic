@@ -154,7 +154,7 @@ TEST_F(CameraSensor, MultipleCameraSameName)
   sensors::SensorPtr sensor = sensors::get_sensor(sensorScopedName);
   EXPECT_TRUE(sensor != NULL);
   sensors::CameraSensorPtr camSensor =
-    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
   EXPECT_TRUE(camSensor != NULL);
   rendering::CameraPtr camera = camSensor->GetCamera();
   EXPECT_TRUE(camera != NULL);
@@ -168,7 +168,7 @@ TEST_F(CameraSensor, MultipleCameraSameName)
   sensors::SensorPtr sensor2 = sensors::get_sensor(sensorScopedName2);
   EXPECT_TRUE(sensor2 != NULL);
   sensors::CameraSensorPtr camSensor2 =
-    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor2);
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor2);
   EXPECT_TRUE(camSensor2 != NULL);
   rendering::CameraPtr camera2 = camSensor2->GetCamera();
   EXPECT_TRUE(camera2 != NULL);
