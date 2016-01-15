@@ -40,6 +40,7 @@
     * [Pull request #2042](https://bitbucket.org/osrf/gazebo/pull-request/2042)
 
 1. Use more opaque pointers.
+    * [Pull request #2022](https://bitbucket.org/osrf/gazebo/pull-request/2022)
     * [Pull request #2025](https://bitbucket.org/osrf/gazebo/pull-request/2025)
     * [Pull request #2043](https://bitbucket.org/osrf/gazebo/pull-request/2043)
     * [Pull request #2044](https://bitbucket.org/osrf/gazebo/pull-request/2044)
@@ -311,6 +312,9 @@ using the same arguments used in the command line.
         * [Pull request #2059](https://bitbucket.org/osrf/gazebo/pull-request/2059)
         * [Pull request #2087](https://bitbucket.org/osrf/gazebo/pull-request/2087)
 
+    1. Support joint creation between links in nested model.
+        * [Pull request #2080](https://bitbucket.org/osrf/gazebo/pull-request/2080)
+
 1. Building editor updates
 
     1. Use opaque pointers in the building editor
@@ -337,6 +341,10 @@ using the same arguments used in the command line.
 ## Gazebo 6.0
 
 ### Gazebo 6.X.X (201X-XX-XX)
+
+1. Fix removing multiple camera sensors that have the same camera name
+    * [Pull request #2081](https://bitbucket.org/osrf/gazebo/pull-request/2081)
+    * [Issue #1811](https://bitbucket.org/osrf/gazebo/issues/1811)
 
 1. Backport model editor toolbar fixed joint option from [pull request #1794](https://bitbucket.org/osrf/gazebo/pull-request/1794)
     * [Pull request #1957](https://bitbucket.org/osrf/gazebo/pull-request/1957)

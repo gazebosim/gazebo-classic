@@ -634,16 +634,16 @@ void JointCreationDialog::SetParent(const std::string &_linkName)
     return;
   }
 
-  std::string leafName = _linkName;
-  size_t idx = _linkName.find_last_of("::");
+  std::string unscopedName = _linkName;
+  size_t idx = _linkName.find("::");
   if (idx != std::string::npos)
-    leafName = _linkName.substr(idx+1);
+    unscopedName = _linkName.substr(idx+2);
 
   this->dataPtr->configWidget->blockSignals(true);
   if (!this->dataPtr->configWidget->SetEnumWidgetValue("parentCombo",
-      leafName))
+      unscopedName))
   {
-    gzerr << "Requested link [" << leafName << "] not found" << std::endl;
+    gzerr << "Requested link [" << unscopedName << "] not found" << std::endl;
     return;
   }
   this->dataPtr->configWidget->blockSignals(false);
@@ -667,15 +667,16 @@ void JointCreationDialog::SetChild(const std::string &_linkName)
   }
 
   // Update child combo box
-  std::string leafName = _linkName;
-  size_t idx = _linkName.find_last_of("::");
+  std::string unscopedName = _linkName;
+  size_t idx = _linkName.find("::");
   if (idx != std::string::npos)
-    leafName = _linkName.substr(idx+1);
+    unscopedName = _linkName.substr(idx+2);
 
   this->dataPtr->configWidget->blockSignals(true);
-  if (!this->dataPtr->configWidget->SetEnumWidgetValue("childCombo", leafName))
+  if (!this->dataPtr->configWidget->SetEnumWidgetValue("childCombo",
+      unscopedName))
   {
-    gzerr << "Requested link [" << leafName << "] not found" << std::endl;
+    gzerr << "Requested link [" << unscopedName << "] not found" << std::endl;
     return;
   }
   this->dataPtr->configWidget->blockSignals(false);
@@ -721,8 +722,8 @@ void JointCreationDialog::OnChildImpl(const std::string &_linkName)
   this->dataPtr->swapButton->setEnabled(true);
   this->dataPtr->configWidget->SetWidgetReadOnly("axis1", false);
   this->dataPtr->configWidget->SetWidgetReadOnly("axis2", false);
-  this->dataPtr->configWidget->SetWidgetReadOnly("align", false);
   this->dataPtr->configWidget->SetWidgetReadOnly("joint_pose", false);
+  this->dataPtr->configWidget->SetWidgetReadOnly("align", false);
   this->dataPtr->configWidget->SetWidgetReadOnly("relative_pose", false);
 
   // Remove empty option
@@ -828,6 +829,19 @@ void JointCreationDialog::CheckLinksValid()
           ConfigWidget::StyleSheet("normal", 1));
       this->dataPtr->validLinks = true;
     }
+  }
+
+  // Disable align and relative_pose widgets if parent or child link
+  // is a nested link
+  // TODO: re-enable once pose of nested model links can be updated
+  if (currentParent.find("::") != std::string::npos ||
+      currentChild.find("::") != std::string::npos)
+  {
+    this->dataPtr->configWidget->SetWidgetReadOnly("align", true);
+    this->dataPtr->configWidget->SetWidgetReadOnly("relative_pose", true);
+    gzwarn << "Pose updates for nested model links are not yet supported. "
+        << "The Align and Relative Pose widgets will be disabled for now."
+        << std::endl;
   }
 
   this->CheckValid();

@@ -47,7 +47,7 @@ void SonarPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr /*_sdf*/)
 
   this->connection =
     this->parentSensor->ConnectUpdate(
-      boost::bind(&SonarPlugin::OnUpdate, this, _1));
+      std::bind(&SonarPlugin::OnUpdate, this, std::placeholders::_1));
 }
 
 /////////////////////////////////////////////////
