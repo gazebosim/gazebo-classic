@@ -812,6 +812,8 @@ bool CameraCommand::RunImpl()
   transport::NodePtr node(new transport::Node());
   node->Init(worldName);
 
+  boost::replace_all(cameraName, "::", "/");
+
   transport::PublisherPtr pub =
     node->Advertise<msgs::CameraCmd>(
         std::string("~/") + cameraName + "/cmd");

@@ -401,7 +401,7 @@ void BulletPhysics::OnRequest(ConstRequestPtr &_msg)
       boost::any_cast<double>(this->GetParam("contact_surface_layer")));
 
     physicsMsg.mutable_gravity()->CopyFrom(
-      msgs::Convert(this->GetGravity().Ign()));
+      msgs::Convert(this->world->Gravity()));
     physicsMsg.mutable_magnetic_field()->CopyFrom(
         msgs::Convert(this->MagneticField()));
     physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
@@ -422,34 +422,16 @@ void BulletPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
   // can be over-ridden by other message parameters.
   PhysicsEngine::OnPhysicsMsg(_msg);
 
-  if (_msg->has_solver_type())
-  {
-    this->SetRealTimeUpdateRate(_msg->real_time_update_rate());
-  }
-
   // Check if below is already in PhysicsEngine::OnPhysicsMsg(_msg)
   if (_msg->has_min_step_size())
   {
     this->SetParam("min_step_size", _msg->min_step_size());
   }
 
-  /* Check if below is already in PhysicsEngine::OnPhysicsMsg(_msg)
-  if (_msg->has_gravity())
-    this->SetGravity(msgs::ConvertIgn(_msg->gravity()));
-
-  if (_msg->has_real_time_factor())
-    this->SetTargetRealTimeFactor(_msg->real_time_factor());
-
-  if (_msg->has_real_time_update_rate())
+  if (_msg->has_solver_type())
   {
-    this->SetRealTimeUpdateRate(_msg->real_time_update_rate());
+    this->SetParam("solver_type", _msg->solver_type());
   }
-
-  if (_msg->has_max_step_size())
-  {
-    this->SetMaxStepSize(_msg->max_step_size());
-  }
-  */
 
   if (_msg->has_bullet())
   {
@@ -808,7 +790,7 @@ void BulletPhysics::SetWorldCFM(double _cfm)
 //////////////////////////////////////////////////
 void BulletPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
 {
-  this->world->SetGravitySDF(_gravity);
+  this->world->SetGravitySDF(_gravity.Ign());
   this->dynamicsWorld->setGravity(
     BulletTypes::ConvertVector3(_gravity));
 }

@@ -14,10 +14,14 @@
  * limitations under the License.
  *
 */
-#ifndef _MODEL_MANIPULATOR_HH_
-#define _MODEL_MANIPULATOR_HH_
+#ifndef _GAZEBO_GUI_MODEL_MANIPULATOR_HH_
+#define _GAZEBO_GUI_MODEL_MANIPULATOR_HH_
 
 #include <string>
+
+#include "gazebo/math/Vector2i.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Pose.hh"
 
 #include "gazebo/common/MouseEvent.hh"
 #include "gazebo/common/KeyEvent.hh"

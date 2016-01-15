@@ -236,7 +236,7 @@ void JointMaker::RemoveJoint(const std::string &_jointId)
 
   if (joint->handles)
   {
-    scene->GetManager()->destroyBillboardSet(joint->handles);
+    scene->OgreSceneManager()->destroyBillboardSet(joint->handles);
     joint->handles = NULL;
   }
 
@@ -461,7 +461,7 @@ JointData *JointMaker::CreateJointLine(const std::string &_name,
     const rendering::VisualPtr &_parent)
 {
   rendering::VisualPtr jointVis(
-      new rendering::Visual(_name, _parent->GetParent()));
+      new rendering::Visual(_name, _parent->GetParent(), false));
   jointVis->Load();
   rendering::DynamicLines *jointLine =
       jointVis->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
@@ -760,11 +760,13 @@ std::string JointMaker::CreateHotSpot(JointData *_joint)
   std::string jointId = _joint->visual->GetName() + "_UNIQUE_ID_";
   rendering::VisualPtr hotspotVisual(
       new rendering::Visual(jointId, _joint->visual, false));
+  hotspotVisual->Load();
 
   // create a cylinder to represent the joint
   hotspotVisual->InsertMesh("unit_cylinder");
   Ogre::MovableObject *hotspotObj =
-      (Ogre::MovableObject*)(camera->GetScene()->GetManager()->createEntity(
+      (Ogre::MovableObject*)(
+      camera->GetScene()->OgreSceneManager()->createEntity(
       _joint->visual->GetName(), "unit_cylinder"));
   hotspotObj->getUserObjectBindings().setUserAny(Ogre::Any(jointId));
   hotspotVisual->GetSceneNode()->attachObject(hotspotObj);
@@ -773,7 +775,7 @@ std::string JointMaker::CreateHotSpot(JointData *_joint)
 
   // create a handle at the parent end
   Ogre::BillboardSet *handleSet =
-      camera->GetScene()->GetManager()->createBillboardSet(1);
+      camera->GetScene()->OgreSceneManager()->createBillboardSet(1);
   handleSet->setAutoUpdate(true);
   handleSet->setMaterialName("Gazebo/PointHandle");
   Ogre::MaterialPtr mat =
@@ -802,7 +804,6 @@ std::string JointMaker::CreateHotSpot(JointData *_joint)
   hotspotVisual->GetSceneNode()->setInheritScale(false);
 
   this->dataPtr->joints[jointId] = _joint;
-  camera->GetScene()->AddVisual(hotspotVisual);
 
   _joint->hotspot = hotspotVisual;
   _joint->inspector->SetJointId(_joint->hotspot->GetName());
@@ -905,6 +906,15 @@ void JointMaker::GenerateSDF()
   this->dataPtr->modelSDF.reset(new sdf::Element);
   sdf::initFile("model.sdf", this->dataPtr->modelSDF);
   this->dataPtr->modelSDF->ClearElements();
+
+  // update joint visuals as the model pose may have changed when
+  // generating model sdf
+  for (auto jointsIt : this->dataPtr->joints)
+  {
+    JointData *joint = jointsIt.second;
+    joint->dirty = true;
+    this->Update();
+  }
 
   // loop through all joints
   for (auto jointsIt : this->dataPtr->joints)
@@ -1047,19 +1057,26 @@ void JointData::OnApply()
   this->type = JointMaker::ConvertJointType(
       msgs::ConvertJointType(this->jointMsg->type()));
 
-  // Parent
-  if (this->parent->GetName().find(this->jointMsg->parent()) ==
-      std::string::npos)
-  {
-    // Get scoped name
-    std::string oldName = this->parent->GetName();
-    std::string scope = oldName;
-    size_t idx = oldName.rfind("::");
-    if (idx != std::string::npos)
-      scope = oldName.substr(0, idx+2);
+  // Get scoped names
+  std::string parentOldName = this->parent->GetName();
+  std::string parentScope = parentOldName;
+  size_t parentIdx = parentOldName.find("::");
+  if (parentIdx != std::string::npos)
+    parentScope = parentOldName.substr(0, parentIdx+2);
+  std::string childOldName = this->child->GetName();
+  std::string childScope = childOldName;
+  size_t childIdx = childOldName.find("::");
+  if (childIdx != std::string::npos)
+    childScope = childOldName.substr(0, childIdx+2);
 
+  std::string parentName = parentScope + this->jointMsg->parent();
+  std::string childName = childScope + this->jointMsg->child();
+
+  // Parent
+  if (parentName != this->jointMsg->parent())
+  {
     rendering::VisualPtr parentVis = gui::get_active_camera()->GetScene()
-        ->GetVisual(scope + this->jointMsg->parent());
+        ->GetVisual(parentName);
     if (parentVis)
       this->parent = parentVis;
     else
@@ -1067,18 +1084,10 @@ void JointData::OnApply()
   }
 
   // Child
-  if (this->child->GetName().find(this->jointMsg->child()) ==
-      std::string::npos)
+  if (childName != this->jointMsg->child())
   {
-    // Get scoped name
-    std::string oldName = this->child->GetName();
-    std::string scope = oldName;
-    size_t idx = oldName.rfind("::");
-    if (idx != std::string::npos)
-      scope = oldName.substr(0, idx+2);
-
     rendering::VisualPtr childVis = gui::get_active_camera()->GetScene()
-        ->GetVisual(scope + this->jointMsg->child());
+        ->GetVisual(childName);
     if (childVis)
     {
       this->child = childVis;
@@ -1241,12 +1250,12 @@ void JointData::UpdateMsg()
   if (this->parent)
   {
     std::string jointParentName = this->parent->GetName();
-    std::string leafName = jointParentName;
-    size_t pIdx = jointParentName.rfind("::");
+    std::string unscopedName = jointParentName;
+    size_t pIdx = jointParentName.find("::");
     if (pIdx != std::string::npos)
-      leafName = jointParentName.substr(pIdx+2);
+      unscopedName = jointParentName.substr(pIdx+2);
 
-    this->jointMsg->set_parent(leafName);
+    this->jointMsg->set_parent(unscopedName);
     this->jointMsg->set_parent_id(this->parent->GetId());
   }
 
@@ -1254,12 +1263,12 @@ void JointData::UpdateMsg()
   if (this->child)
   {
     std::string jointChildName = this->child->GetName();
-    std::string leafName = jointChildName;
-    size_t pIdx = jointChildName.rfind("::");
+    std::string unscopedName = jointChildName;
+    size_t pIdx = jointChildName.find("::");
     if (pIdx != std::string::npos)
-      leafName = jointChildName.substr(pIdx+2);
+      unscopedName = jointChildName.substr(pIdx+2);
 
-    this->jointMsg->set_child(leafName);
+    this->jointMsg->set_child(unscopedName);
     this->jointMsg->set_child_id(this->child->GetId());
   }
 
@@ -1478,7 +1487,7 @@ void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
 
   // Visuals
   rendering::VisualPtr jointVis(
-      new rendering::Visual(jointVisName, parentVis->GetParent()));
+      new rendering::Visual(jointVisName, parentVis->GetParent(), false));
   jointVis->Load();
   rendering::DynamicLines *jointLine =
       jointVis->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
@@ -1508,12 +1517,12 @@ void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
 /////////////////////////////////////////////////
 void JointMaker::OnLinkInserted(const std::string &_linkName)
 {
-  std::string leafName = _linkName;
-  size_t idx = _linkName.rfind("::");
+  std::string unscopedName = _linkName;
+  size_t idx = unscopedName.find("::");
   if (idx != std::string::npos)
-    leafName = _linkName.substr(idx+2);
+    unscopedName = _linkName.substr(idx+2);
 
-  this->dataPtr->linkList[_linkName] = leafName;
+  this->dataPtr->linkList[_linkName] = unscopedName;
 
   this->EmitLinkInserted(_linkName);
 }
@@ -1738,8 +1747,6 @@ void JointMaker::SetLinksRelativePose(const ignition::math::Pose3d &_pose,
   if (!this->dataPtr->newJoint || !this->dataPtr->newJoint->parent ||
       !this->dataPtr->newJoint->child)
   {
-    gzerr << "Can't set relative pose without new joint's parent and child "
-        << "links." << std::endl;
     return;
   }
 
@@ -1770,7 +1777,7 @@ void JointMaker::SetLinksRelativePose(const ignition::math::Pose3d &_pose,
 
 /////////////////////////////////////////////////
 void JointMaker::AlignLinks(const bool _childToParent,
-    const std::string &_axis, const std::string &_config)
+    const std::string &_axis, const std::string &_config, const bool _reverse)
 {
   if (!this->dataPtr->newJoint || !this->dataPtr->newJoint->parent ||
       !this->dataPtr->newJoint->child)
@@ -1787,7 +1794,7 @@ void JointMaker::AlignLinks(const bool _childToParent,
   std::string target = _childToParent ? "first" : "last";
 
   ModelAlign::Instance()->AlignVisuals(links, _axis, _config,
-      target, true);
+      target, true, _reverse);
 }
 
 /////////////////////////////////////////////////

@@ -838,7 +838,12 @@ namespace gazebo
 
       /// \brief Get the distortion model of this camera.
       /// \return Distortion model.
-      public: DistortionPtr GetDistortion() const;
+      /// \deprecated See LensDistortion() const;
+      public: DistortionPtr GetDistortion() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the distortion model of this camera.
+      /// \return Distortion model.
+      public: DistortionPtr LensDistortion() const;
 
       /// \brief Set the type of projection used by the camera.
       /// \param[in] _type The type of projection: "perspective" or

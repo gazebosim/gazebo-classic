@@ -197,7 +197,7 @@ void SimbodyPhysics::OnRequest(ConstRequestPtr &_msg)
       static_cast<double>(this->contact.getTransitionVelocity()));
 
     physicsMsg.mutable_gravity()->CopyFrom(
-      msgs::Convert(this->GetGravity().Ign()));
+      msgs::Convert(this->world->Gravity()));
     physicsMsg.mutable_magnetic_field()->CopyFrom(
       msgs::Convert(this->MagneticField()));
     physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
@@ -246,7 +246,7 @@ void SimbodyPhysics::Reset()
   this->integ->initialize(this->system.getDefaultState());
 
   // restore potentially user run-time modified gravity
-  this->SetGravity(this->GetGravity());
+  this->SetGravity(this->world->Gravity());
 }
 
 //////////////////////////////////////////////////
@@ -881,9 +881,9 @@ void SimbodyPhysics::InitSimbodySystem()
   // this->contact.setTransitionVelocity(0.01);  // now done in Load using sdf
 
   // Specify gravity (read in above from world).
-  if (!math::equal(this->GetGravity().GetLength(), 0.0))
+  if (!math::equal(this->world->Gravity().Length(), 0.0))
     this->gravity.setDefaultGravityVector(
-      SimbodyPhysics::Vector3ToVec3(this->GetGravity()));
+      SimbodyPhysics::Vector3ToVec3(this->world->Gravity()));
   else
     this->gravity.setDefaultMagnitude(0.0);
 }

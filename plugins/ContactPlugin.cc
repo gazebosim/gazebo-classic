@@ -12,10 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * */ /*
- * Desc: Contact plugin
- * Author: Nate Koenig mod by John Hsu
- */
+ *
+*/
 #include "ContactPlugin.hh"
 
 using namespace gazebo;
@@ -47,7 +45,7 @@ void ContactPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr /*_sdf*/)
 
   // Connect to the sensor update event.
   this->updateConnection = this->parentSensor->ConnectUpdated(
-      boost::bind(&ContactPlugin::OnUpdate, this));
+      std::bind(&ContactPlugin::OnUpdate, this));
 
   // Make sure the parent sensor is active.
   this->parentSensor->SetActive(true);
