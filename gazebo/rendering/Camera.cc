@@ -184,8 +184,11 @@ void Camera::Load()
   // created for visualization purposes.
   if (this->name.find("_GUIONLY_") == std::string::npos)
   {
+    std::string topicName = this->Name();
+    boost::replace_all(topicName, "::", "/");
+
     this->dataPtr->cmdSub = this->dataPtr->node->Subscribe(
-        "~/" + this->Name() + "/cmd", &Camera::OnCmdMsg, this, true);
+        "~/" + topicName + "/cmd", &Camera::OnCmdMsg, this, true);
   }
 
   if (this->sdf->HasElement("distortion"))

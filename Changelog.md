@@ -345,6 +345,10 @@ using the same arguments used in the command line.
 
 ### Gazebo 6.X.X (201X-XX-XX)
 
+1. Fix removing multiple camera sensors that have the same camera name
+    * [Pull request #2081](https://bitbucket.org/osrf/gazebo/pull-request/2081)
+    * [Issue #1811](https://bitbucket.org/osrf/gazebo/issues/1811)
+
 1. Backport model editor toolbar fixed joint option from [pull request #1794](https://bitbucket.org/osrf/gazebo/pull-request/1794)
     * [Pull request #1957](https://bitbucket.org/osrf/gazebo/pull-request/1957)
 
