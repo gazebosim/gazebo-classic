@@ -68,8 +68,8 @@ namespace gazebo
       /// set.
       static std::string Str(T const &_e)
       {
-        if (static_cast<int>(_e) < names.size())
-          return names[static_cast<int>(_e)];
+        if (static_cast<unsigned int>(_e) < names.size())
+          return names[static_cast<unsigned int>(_e)];
         else
           return "";
       }
