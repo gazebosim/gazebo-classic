@@ -58,12 +58,6 @@ Wind::Wind(WorldPtr _world, sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 Wind::~Wind()
 {
-  this->dataPtr->responsePub.reset();
-  this->dataPtr->requestSub.reset();
-  this->dataPtr->node.reset();
-
-  delete this->dataPtr;
-  this->dataPtr = NULL;
 }
 
 //////////////////////////////////////////////////

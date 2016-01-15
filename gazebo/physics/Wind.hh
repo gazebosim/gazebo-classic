@@ -130,7 +130,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Private data pointer.
-      private: WindPrivate *dataPtr;
+      private: std::unique_ptr<WindPrivate> dataPtr;
     };
     /// \}
   }
