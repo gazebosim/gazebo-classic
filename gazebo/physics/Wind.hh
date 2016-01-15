@@ -95,12 +95,14 @@ namespace gazebo
       /// world coordinate frame.
       /// \param[in] _entity Entity at which location the wind is applied.
       /// \return Linear velocity of the wind.
-      public: ignition::math::Vector3d WorldLinearVel(const Entity *_entity);
+      public: ignition::math::Vector3d WorldLinearVel(const Entity *_entity)
+          const;
 
       /// \brief Get the wind velocity at an entity location.
       /// \param[in] _entity Entity at which location the wind is applied.
       /// \return Linear velocity of the wind.
-      public: ignition::math::Vector3d RelativeLinearVel(const Entity *_entity);
+      public: ignition::math::Vector3d RelativeLinearVel(const Entity *_entity)
+          const;
 
       /// \brief Get the global wind velocity.
       /// \return Linear velocity of the wind.
@@ -117,7 +119,8 @@ namespace gazebo
       /// Wind and a pointer to an entity in the scene. The function must
       /// return the new wind velocity as a vector.
       public: void SetLinearVelFunc(
-                  std::function<ignition::math::Vector3d (const WindPtr &,
+                  std::function<ignition::math::Vector3d (
+                      std::shared_ptr<const Wind> &,
                       const Entity *_entity)> _linearVelFunc);
 
       /// \brief Get the global wind velocity, ignoring the entity.
@@ -125,7 +128,8 @@ namespace gazebo
       /// \param[in] _wind Pointer to an entity at which location the wind
       /// velocity is to be calculated.
       /// \return Wind's velocity at entity's location.
-      private: ignition::math::Vector3d LinearVelDefault(const WindPtr &_wind,
+      private: ignition::math::Vector3d LinearVelDefault(
+                  std::shared_ptr<const Wind> &_wind,
                   const Entity *_entity);
 
       /// \internal

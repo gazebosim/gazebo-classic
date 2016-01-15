@@ -39,8 +39,9 @@ namespace gazebo
     /// \param[in] _wind Pointer to an entity at which location the wind
     /// velocity is to be calculated.
     /// \return Wind's velocity at entity's location.
-    public: ignition::math::Vector3d LinearVel(const physics::WindPtr &_wind,
-                                               const physics::Entity *_entity);
+    public: ignition::math::Vector3d LinearVel(
+            std::shared_ptr<const physics::Wind> &_wind,
+            const physics::Entity *_entity);
 
     /// \brief Callback for World Update events.
     private: void OnUpdate();

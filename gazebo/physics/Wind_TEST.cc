@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <memory>
 
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/msgs/msgs.hh"
@@ -24,7 +25,7 @@ class WindTest : public ServerFixture
 {
   public: void OnWindMsgResponse(ConstResponsePtr &_msg);
   public: ignition::math::Vector3d LinearVel(
-                  const physics::WindPtr &_wind,
+                  std::shared_ptr<const physics::Wind> &_wind,
                   const physics::Entity *_entity);
   public: void WindParam();
   public: void WindParamBool();
@@ -39,7 +40,7 @@ msgs::Wind WindTest::windResponseMsg;
 
 /////////////////////////////////////////////////
 ignition::math::Vector3d WindTest::LinearVel(
-                  const physics::WindPtr &_wind,
+                  std::shared_ptr<const physics::Wind> &_wind,
                   const physics::Entity * /*_entity*/)
 {
   return _wind->LinearVel() * this->windFactor;
@@ -183,8 +184,10 @@ void WindTest::WindSetLinearVelFunc()
   wind->SetLinearVelFunc(std::bind(&WindTest::LinearVel, this,
         std::placeholders::_1, std::placeholders::_2));
 
+  std::shared_ptr<const physics::Wind> w =
+    std::static_pointer_cast<const physics::Wind>(wind);
   EXPECT_EQ(wind->WorldLinearVel(model.get()),
-            this->LinearVel(wind, model.get()));
+            this->LinearVel(w, model.get()));
 }
 
 /////////////////////////////////////////////////

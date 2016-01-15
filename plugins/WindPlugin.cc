@@ -44,8 +44,9 @@ void WindPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr /*_sdf*/)
 }
 
 /////////////////////////////////////////////////
-ignition::math::Vector3d WindPlugin::LinearVel(const physics::WindPtr &_wind,
-                                               const physics::Entity *_entity)
+ignition::math::Vector3d WindPlugin::LinearVel(
+    std::shared_ptr<const physics::Wind> &_wind,
+    const physics::Entity *_entity)
 {
   // Get wind linear velocity
   ignition::math::Vector3d wind = _wind->LinearVel();

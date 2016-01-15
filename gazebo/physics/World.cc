@@ -2490,7 +2490,7 @@ void World::EnablePhysicsEngine(bool _enable)
 }
 
 /////////////////////////////////////////////////
-bool World::EnableWind()
+bool World::EnableWind() const
 {
   return this->dataPtr->enableWind;
 }

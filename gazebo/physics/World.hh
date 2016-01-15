@@ -307,7 +307,7 @@ namespace gazebo
 
       /// \brief check if wind is enabled/disabled.
       /// \param True if the wind is enabled.
-      public: bool EnableWind();
+      public: bool EnableWind() const;
 
       /// \brief enable/disable wind.
       /// \param[in] _enable True to enable the wind.

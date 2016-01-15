@@ -66,20 +66,21 @@ void Wind::Init(void)
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d Wind::LinearVelDefault(const WindPtr &_wind,
-                                                const Entity * /*_entity*/)
+ignition::math::Vector3d Wind::LinearVelDefault(
+    std::shared_ptr<const Wind> &_wind, const Entity * /*_entity*/)
 {
   return _wind->LinearVel();
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d Wind::WorldLinearVel(const Entity *_entity)
+ignition::math::Vector3d Wind::WorldLinearVel(const Entity *_entity) const
 {
-  return this->dataPtr->linearVelFunc(shared_from_this(), _entity);
+  std::shared_ptr<const Wind> w = shared_from_this();
+  return this->dataPtr->linearVelFunc(w, _entity);
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d Wind::RelativeLinearVel(const Entity *_entity)
+ignition::math::Vector3d Wind::RelativeLinearVel(const Entity *_entity) const
 {
   return _entity->GetWorldPose().Ign().Rot().Inverse().RotateVector(
       this->WorldLinearVel(_entity));
@@ -201,7 +202,7 @@ void Wind::OnWindMsg(ConstWindPtr &_msg)
 
 /////////////////////////////////////////////////
 void Wind::SetLinearVelFunc(
-  std::function<ignition::math::Vector3d (const WindPtr &,
+  std::function<ignition::math::Vector3d (std::shared_ptr<const Wind> &,
     const Entity *_entity)> _linearVelFunc)
 {
   this->dataPtr->linearVelFunc = _linearVelFunc;
