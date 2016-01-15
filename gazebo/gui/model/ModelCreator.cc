@@ -1582,7 +1582,7 @@ void ModelCreator::OnDelete(const std::string &_entity)
   if (nestedModel != this->allNestedModels.end())
   {
     auto cmd = MEUserCmdManager::Instance()->NewCmd(
-        "Deleted " + nestedModel->second->Name(),
+        "Deleted [" + nestedModel->second->Name() + "]",
         MEUserCmd::DELETING_NESTED_MODEL);
     cmd->SetSDF(nestedModel->second->modelSDF);
     cmd->SetScopedName(nestedModel->second->modelVisual->GetName());
@@ -1601,7 +1601,7 @@ void ModelCreator::OnDelete(const std::string &_entity)
 
     // Then register command
     auto cmd = MEUserCmdManager::Instance()->NewCmd(
-        "Deleted " + link->second->Name(), MEUserCmd::DELETING_LINK);
+        "Deleted [" + link->second->Name() + "]", MEUserCmd::DELETING_LINK);
     cmd->SetSDF(link->second->linkSDF);
     cmd->SetScopedName(link->second->linkVisual->GetName());
 
@@ -1658,11 +1658,18 @@ void ModelCreator::RemoveEntity(const std::string &_entity)
 /////////////////////////////////////////////////
 void ModelCreator::OnRemoveModelPlugin(const QString &_name)
 {
-  this->RemoveModelPlugin(_name.toStdString());
+  // User request from right-click menu
+  auto it = this->allModelPlugins.find(_name.toStdString());
+  if (it != this->allModelPlugins.end())
+  {
+    auto cmd = MEUserCmdManager::Instance()->NewCmd(
+        "Deleted plugin [" + _name.toStdString() + "]",
+        MEUserCmd::DELETING_MODEL_PLUGIN);
+    cmd->SetSDF(it->second->modelPluginSDF);
+    cmd->SetScopedName(_name.toStdString());
+  }
 
-  MEUserCmdManager::Instance()->NewCmd(
-      "Removed plugin: " + _name.toStdString(),
-      MEUserCmd::DELETING_MODEL_PLUGIN);
+  this->RemoveModelPlugin(_name.toStdString());
 }
 
 /////////////////////////////////////////////////
@@ -1782,7 +1789,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
       gui::model::Events::linkInserted(this->mouseVisual->GetName());
 
       auto cmd = MEUserCmdManager::Instance()->NewCmd(
-          "Inserted " + link->Name(),
+          "Inserted [" + link->Name() + "]",
           MEUserCmd::INSERTING_LINK);
       cmd->SetSDF(link->linkSDF);
       cmd->SetScopedName(link->linkVisual->GetName());
@@ -1799,7 +1806,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
         this->EmitNestedModelInsertedEvent(this->mouseVisual);
 
         auto cmd = MEUserCmdManager::Instance()->NewCmd(
-            "Inserted " + modelData->Name(),
+            "Inserted [" + modelData->Name() + "]",
             MEUserCmd::INSERTING_NESTED_MODEL);
         cmd->SetSDF(modelData->modelSDF);
         cmd->SetScopedName(modelData->modelVisual->GetName());
@@ -2787,9 +2794,6 @@ void ModelCreator::OnAddModelPlugin(const std::string &_name,
   {
     this->AddModelPlugin(modelPluginSDF);
     this->ModelChanged();
-
-    MEUserCmdManager::Instance()->NewCmd(
-        "Added plugin: " + _name, MEUserCmd::INSERTING_MODEL_PLUGIN);
   }
   else
   {

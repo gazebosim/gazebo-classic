@@ -775,7 +775,7 @@ void JointMaker::RemoveJointByUser(const std::string &_name)
   {
     auto joint = jointIt->second;
     auto cmd = MEUserCmdManager::Instance()->NewCmd(
-        "Deleted " + joint->name, MEUserCmd::DELETING_JOINT);
+        "Deleted [" + joint->name + "]", MEUserCmd::DELETING_JOINT);
     cmd->SetSDF(msgs::JointToSDF(*joint->jointMsg));
     cmd->SetScopedName(joint->visual->GetName());
     cmd->SetJointId(joint->hotspot->GetName());
@@ -1666,7 +1666,7 @@ bool JointMaker::SetChildLink(const rendering::VisualPtr &_childLink)
     this->CreateHotSpot(this->dataPtr->newJoint);
 
     auto cmd = MEUserCmdManager::Instance()->NewCmd(
-        "Inserted " + joint->name, MEUserCmd::INSERTING_JOINT);
+        "Inserted [" + joint->name + "]", MEUserCmd::INSERTING_JOINT);
     cmd->SetSDF(msgs::JointToSDF(*joint->jointMsg));
     cmd->SetScopedName(joint->visual->GetName());
     cmd->SetJointId(joint->hotspot->GetName());

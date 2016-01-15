@@ -62,7 +62,7 @@ void MEUserCmd::Undo()
     model::Events::requestLinkInsertion(this->dataPtr->sdf);
   }
   // Inserting nested model
-  if (this->dataPtr->type == MEUserCmd::INSERTING_NESTED_MODEL &&
+  else if (this->dataPtr->type == MEUserCmd::INSERTING_NESTED_MODEL &&
      !this->dataPtr->scopedName.empty())
   {
     model::Events::requestNestedModelRemoval(this->dataPtr->scopedName);
@@ -74,7 +74,7 @@ void MEUserCmd::Undo()
     model::Events::requestNestedModelInsertion(this->dataPtr->sdf);
   }
   // Inserting joint
-  if (this->dataPtr->type == MEUserCmd::INSERTING_JOINT &&
+  else if (this->dataPtr->type == MEUserCmd::INSERTING_JOINT &&
      !this->dataPtr->jointId.empty())
   {
     model::Events::requestJointRemoval(this->dataPtr->jointId);
@@ -89,6 +89,21 @@ void MEUserCmd::Undo()
       modelName = modelName.substr(0, pIdx);
 
     model::Events::requestJointInsertion(this->dataPtr->sdf, modelName);
+  }
+  // Inserting model plugin
+  else if (this->dataPtr->type == MEUserCmd::INSERTING_MODEL_PLUGIN &&
+     !this->dataPtr->scopedName.empty())
+  {
+    model::Events::requestModelPluginRemoval(this->dataPtr->scopedName);
+  }
+  // Deleting model plugin
+  else if (this->dataPtr->type == MEUserCmd::DELETING_MODEL_PLUGIN &&
+      this->dataPtr->sdf)
+  {
+    auto pluginMsg = msgs::PluginFromSDF(this->dataPtr->sdf);
+
+    model::Events::requestModelPluginInsertion(pluginMsg.name(),
+        pluginMsg.filename(), pluginMsg.innerxml());
   }
 }
 
@@ -108,7 +123,7 @@ void MEUserCmd::Redo()
     model::Events::requestLinkRemoval(this->dataPtr->scopedName);
   }
   // Inserting nested model
-  if (this->dataPtr->type == MEUserCmd::INSERTING_NESTED_MODEL &&
+  else if (this->dataPtr->type == MEUserCmd::INSERTING_NESTED_MODEL &&
      this->dataPtr->sdf)
   {
     model::Events::requestNestedModelInsertion(this->dataPtr->sdf);
@@ -120,7 +135,7 @@ void MEUserCmd::Redo()
     model::Events::requestNestedModelRemoval(this->dataPtr->scopedName);
   }
   // Inserting joint
-  if (this->dataPtr->type == MEUserCmd::INSERTING_JOINT &&
+  else if (this->dataPtr->type == MEUserCmd::INSERTING_JOINT &&
      this->dataPtr->sdf)
   {
     auto modelName = this->dataPtr->scopedName;
@@ -135,6 +150,21 @@ void MEUserCmd::Redo()
      !this->dataPtr->jointId.empty())
   {
     model::Events::requestJointRemoval(this->dataPtr->jointId);
+  }
+  // Inserting model plugin
+  else if (this->dataPtr->type == MEUserCmd::INSERTING_MODEL_PLUGIN &&
+     !this->dataPtr->scopedName.empty())
+  {
+    auto pluginMsg = msgs::PluginFromSDF(this->dataPtr->sdf);
+
+    model::Events::requestModelPluginInsertion(pluginMsg.name(),
+        pluginMsg.filename(), pluginMsg.innerxml());
+  }
+  // Deleting model plugin
+  else if (this->dataPtr->type == MEUserCmd::DELETING_MODEL_PLUGIN &&
+      this->dataPtr->sdf)
+  {
+    model::Events::requestModelPluginRemoval(this->dataPtr->scopedName);
   }
 }
 
