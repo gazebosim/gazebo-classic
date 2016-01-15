@@ -25,41 +25,41 @@ using namespace common;
 GZ_ENUM(MaterialType,
   MaterialType::BEGIN,
   MaterialType::END,
-  "Aluminum",
-  "Brass",
-  "Copper",
-  "Concrete",
-  "Ice",
-  "Iron",
-  "Oak",
+  "Styrofoam",
   "Pine",
+  "Wood",
+  "Oak",
+  "Ice",
+  "Water",
   "Plastic",
+  "Concrete",
+  "Aluminum",
   "Steel, Alloy",
   "Steel, Stainless",
-  "Styrofoam",
+  "Iron",
+  "Brass",
+  "Copper",
   "Tungsten",
-  "Water",
-  "Wood",
   "end"
 )
 // Initialize the materials
 std::map<MaterialType, double> MaterialDensity::materials =
 {
-  {MaterialType::ALUMINUM, 2700.0},
-  {MaterialType::BRASS, 8600.0},
-  {MaterialType::COPPER, 8940.0},
-  {MaterialType::CONCRETE, 2000.0},
-  {MaterialType::ICE, 916.0},
-  {MaterialType::IRON, 7870.0},
-  {MaterialType::OAK, 710.0},
+  {MaterialType::STYROFOAM, 75.0},
   {MaterialType::PINE, 373.0},
+  {MaterialType::WOOD, 700.0}
+  {MaterialType::OAK, 710.0},
+  {MaterialType::ICE, 916.0},
+  {MaterialType::WATER, 1000.0},
   {MaterialType::PLASTIC, 1175.0},
+  {MaterialType::CONCRETE, 2000.0},
+  {MaterialType::ALUMINUM, 2700.0},
   {MaterialType::STEEL_ALLOY, 7600.0},
   {MaterialType::STEEL_STAINLESS, 7800.0},
-  {MaterialType::STYROFOAM, 75.0},
-  {MaterialType::TUNGSTEN, 19300.0},
-  {MaterialType::WATER, 1000.0},
-  {MaterialType::WOOD, 700.0}
+  {MaterialType::IRON, 7870.0},
+  {MaterialType::BRASS, 8600.0},
+  {MaterialType::COPPER, 8940.0},
+  {MaterialType::TUNGSTEN, 19300.0}
 };
 
 /////////////////////////////////////////////////
