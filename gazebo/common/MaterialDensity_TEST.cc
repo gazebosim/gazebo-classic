@@ -37,7 +37,7 @@ TEST_F(MaterialDensityTest, Accessors)
     double density = MaterialDensity::Density("Aluminum");
     double density2 = MaterialDensity::Density(MaterialType::ALUMINUM);
 
-    EXPECT_DOUBLE_EQ(density, 2700.0);
+    EXPECT_DOUBLE_EQ(density, 2700);
     EXPECT_DOUBLE_EQ(density, density2);
   }
   {
