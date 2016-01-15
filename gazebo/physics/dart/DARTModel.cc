@@ -46,7 +46,7 @@ void DARTModel::Load(sdf::ElementPtr _sdf)
   if (_sdf->HasElement("model"))
   {
     gzerr << "Nested models are not currently supported in DART. ["
-      << this->sdf->Get<std::string>("name") << "] will not be loaded. "
+      << _sdf->Get<std::string>("name") << "] will not be loaded. "
       << std::endl;
     this->sdf = _sdf;
     return;
