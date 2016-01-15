@@ -438,13 +438,18 @@ void ModelTreeWidget::OnCustomContextMenu(const QPoint &_pt)
 /////////////////////////////////////////////////
 void ModelTreeWidget::OnLinkInserted(const std::string &_linkName)
 {
-  std::string leafName = _linkName;
-  size_t idx = _linkName.find_last_of("::");
+  std::string unscopedName = _linkName;
+  size_t idx = _linkName.find("::");
   if (idx != std::string::npos)
-    leafName = _linkName.substr(idx+1);
+    unscopedName = _linkName.substr(idx+2);
+
+  // TODO support nested model links
+  // if the name is still scoped then it could be a nested link.
+  if (unscopedName.find("::") != std::string::npos)
+    return;
 
   QTreeWidgetItem *newLinkItem = new QTreeWidgetItem(this->linksItem,
-      QStringList(QString("%1").arg(QString::fromStdString(leafName))));
+      QStringList(QString("%1").arg(QString::fromStdString(unscopedName))));
 
   newLinkItem->setData(0, Qt::UserRole, _linkName.c_str());
   newLinkItem->setData(1, Qt::UserRole, "Link");
