@@ -308,11 +308,11 @@ void BulletPhysics::Load(sdf::ElementPtr _sdf)
 
   sdf::ElementPtr bulletElem = this->sdf->GetElement("bullet");
 
-  math::Vector3 g = this->sdf->Get<math::Vector3>("gravity");
+  auto g = this->world->Gravity();
   // ODEPhysics checks this, so we will too.
-  if (g == math::Vector3(0, 0, 0))
+  if (g == ignition::math::Vector3d::Zero)
     gzwarn << "Gravity vector is (0, 0, 0). Objects will float.\n";
-  this->dynamicsWorld->setGravity(btVector3(g.x, g.y, g.z));
+  this->dynamicsWorld->setGravity(btVector3(g.X(), g.Y(), g.Z()));
 
   btContactSolverInfo& info = this->dynamicsWorld->getSolverInfo();
 
@@ -808,7 +808,7 @@ void BulletPhysics::SetWorldCFM(double _cfm)
 //////////////////////////////////////////////////
 void BulletPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
 {
-  this->sdf->GetElement("gravity")->Set(_gravity);
+  this->world->SetGravitySDF(_gravity);
   this->dynamicsWorld->setGravity(
     BulletTypes::ConvertVector3(_gravity));
 }

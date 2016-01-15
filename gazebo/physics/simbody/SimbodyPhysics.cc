@@ -786,7 +786,7 @@ JointPtr SimbodyPhysics::CreateJoint(const std::string &_type,
 //////////////////////////////////////////////////
 void SimbodyPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
 {
-  this->sdf->GetElement("gravity")->Set(_gravity);
+  this->world->SetGravitySDF(_gravity.Ign());
 
   {
     boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
