@@ -17,11 +17,12 @@
 #ifndef _GAZEBO_SENSORS_DEPTHCAMERASENSOR_HH_
 #define _GAZEBO_SENSORS_DEPTHCAMERASENSOR_HH_
 
+#include <memory>
 #include <string>
 
-#include "gazebo/sensors/Sensor.hh"
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/sensors/Sensor.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -30,6 +31,9 @@ namespace gazebo
   /// \brief Sensors namespace
   namespace sensors
   {
+    // Forward declare private data class
+    class DepthCameraSensorPrivate;
+
     /// \class DepthCameraSensor DepthCameraSensor.hh sensors/sensors.hh
     /// \addtogroup gazebo_sensors Sensors
     /// \brief A set of sensor classes, functions, and definitions
@@ -69,8 +73,13 @@ namespace gazebo
 
       /// \brief Returns a pointer to the rendering::DepthCamera
       /// \return Depth Camera pointer
+      /// \deprecated See DepthCamera()
       public: rendering::DepthCameraPtr GetDepthCamera() const
-              {return this->camera;}
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Returns a pointer to the rendering::DepthCamera
+      /// \return Depth Camera pointer
+      public: rendering::DepthCameraPtr DepthCamera() const;
 
       /// \brief Saves an image frame of depth camera sensor to file
       /// \param[in] Name of file to save as
@@ -80,11 +89,9 @@ namespace gazebo
       /// \brief Handle the render event.
       private: void Render();
 
-      /// \brief Pointer to the camera.
-      private: rendering::DepthCameraPtr camera;
-
-      /// \brief True if the sensor was rendered.
-      private: bool rendered;
+      /// \internal
+      /// \brief Private data pointer
+      private: std::unique_ptr<DepthCameraSensorPrivate> dataPtr;
     };
     /// \}
   }

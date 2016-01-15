@@ -198,6 +198,7 @@ set (gtest_fixture_sources
   ContactManager_TEST.cc
   Light_TEST.cc
   LightState_TEST.cc
+  Model_TEST.cc
   PhysicsEngine_TEST.cc
   PresetManager_TEST.cc
   UserCmdManager_TEST.cc
