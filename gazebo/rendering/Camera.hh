@@ -878,7 +878,7 @@ namespace gazebo
 
       /// \brief Get whether this camera is static when tracking a model.
       /// \return True if camera is static when tracking a model.
-      /// \sa SetTrackIsStatic(bool _isStatic)
+      /// \sa SetTrackIsStatic(const bool _isStatic)
       public: virtual bool TrackIsStatic() const;
 
       /// \brief Set whether this camera is static when tracking a model.
@@ -890,7 +890,7 @@ namespace gazebo
       /// \brief Get whether this camera's position is relative to tracked
       /// models.
       /// \return True if camera's position is relative to tracked models.
-      /// \sa SetTrackUseModelFrame(bool _useModelFrame)
+      /// \sa SetTrackUseModelFrame(const bool _useModelFrame)
       public: virtual bool TrackUseModelFrame() const;
 
       /// \brief Set whether this camera's position is relative to tracked
@@ -924,20 +924,20 @@ namespace gazebo
       /// \brief Set the minimum distance between the camera and tracked
       /// visual.
       /// \param[in] _dist Minimum distance between camera and visual.
-      /// \sa TrackMaxDistance()
+      /// \sa TrackMinDistance()
       public: virtual void SetTrackMinDistance(const double _dist);
 
       /// \brief Set the maximum distance between the camera and tracked
       /// visual.
       /// \param[in] _dist Maximum distance between camera and visual.
-      /// \sa TrackMinDistance()
+      /// \sa TrackMaxDistance()
       public: virtual void SetTrackMaxDistance(const double _dist);
 
       /// \brief Get whether this camera inherits the yaw rotation of the
       /// tracked model.
       /// \return True if the camera inherits the yaw rotation of the tracked
       /// model.
-      /// \sa SetTrackInheritYaw(bool _inheritYaw)
+      /// \sa SetTrackInheritYaw(const bool _inheritYaw)
       public: virtual bool TrackInheritYaw() const;
 
       /// \brief Set whether this camera inherits the yaw rotation of the
@@ -945,7 +945,7 @@ namespace gazebo
       /// \param[in] _inheritYaw True means camera inherits the yaw rotation of
       /// the tracked model.
       /// \sa TrackInheritYaw()
-      public: virtual void SetTrackInheritYaw(bool _inheritYaw);
+      public: virtual void SetTrackInheritYaw(const bool _inheritYaw);
 
       /// \brief Implementation of the render call
       protected: virtual void RenderImpl();
