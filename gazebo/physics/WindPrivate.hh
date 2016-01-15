@@ -18,7 +18,12 @@
 #define _GAZEBO_PHYSICS_WINDPRIVATE_HH_
 
 #include <functional>
+#include <boost/shared_ptr.hpp>
+
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/transport/TransportTypes.hh"
 
 namespace gazebo
 {
