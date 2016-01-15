@@ -126,7 +126,7 @@ namespace gazebo
 
       /// \brief Implementation DynamicRenderable,
       /// creates a simple vertex-only decl
-      private: virtual void  CreateVertexDeclaration();
+      private: virtual void CreateVertexDeclaration();
 
       /// \brief Implementation DynamicRenderable, pushes point
       /// list out to hardware memory

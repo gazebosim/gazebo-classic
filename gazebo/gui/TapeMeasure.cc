@@ -14,13 +14,6 @@
  * limitations under the License.
  *
 */
-#ifdef _WIN32
-  // Ensure that Winsock2.h is included before Windows.h, which can get
-  // pulled in by anybody (e.g., Boost).
-  #include <Winsock2.h>
-#endif
-
-#include <boost/bind.hpp>
 
 #include "gazebo/transport/transport.hh"
 
@@ -325,24 +318,7 @@ void TapeMeasure::Update()
       if (!this->dataPtr->highlightVis->GetVisible())
         this->dataPtr->highlightVis->SetVisible(true);
 
-      if (this->dataPtr->hoverVis !=
-          this->dataPtr->highlightVis->GetParent())
-      {
-        if (this->dataPtr->highlightVis->GetParent())
-        {
-          this->dataPtr->highlightVis->GetParent()->DetachVisual(
-              this->dataPtr->highlightVis);
-        }
-        this->dataPtr->hoverVis->AttachVisual(this->dataPtr->highlightVis);
-      }
-
-      // convert triangle to local coordinates relative to parent visual
-      auto hoverPt =
-            this->dataPtr->hoverVis->GetWorldPose().Ign().Rot().Inverse() *
-            (this->dataPtr->hoverPt -
-            this->dataPtr->hoverVis->GetWorldPose().Ign().Pos());
-
-      this->dataPtr->highlightVis->SetPosition(hoverPt);
+      this->dataPtr->highlightVis->SetWorldPosition(this->dataPtr->hoverPt);
     }
     else
     {
@@ -356,7 +332,7 @@ void TapeMeasure::Update()
   if (this->dataPtr->selectedPtDirty && this->dataPtr->selectedVis &&
       this->dataPtr->selectedPt != ignition::math::Vector3d::Zero)
   {
-    // convert triangle to local coordinates relative to parent visual
+    // convert to local coordinates relative to parent visual
     auto selectedPt =
           this->dataPtr->selectedVis->GetWorldPose().Ign().Rot().Inverse() *
           (this->dataPtr->selectedPt -
@@ -377,7 +353,8 @@ void TapeMeasure::Update()
       }
 
       this->dataPtr->pointVisuals[0]->SetVisible(true);
-      this->dataPtr->pointVisuals[0]->SetPosition(selectedPt);
+      this->dataPtr->pointVisuals[0]->SetPosition(selectedPt /
+          this->dataPtr->hoverVis->GetScale().Ign());
 
       this->dataPtr->lines->SetPoint(0, this->dataPtr->selectedPt);
     }
@@ -396,11 +373,36 @@ void TapeMeasure::Update()
       }
 
       this->dataPtr->pointVisuals[1]->SetVisible(true);
-      this->dataPtr->pointVisuals[1]->SetPosition(selectedPt);
+      this->dataPtr->pointVisuals[1]->SetPosition(selectedPt /
+          this->dataPtr->hoverVis->GetScale().Ign());
 
       this->dataPtr->lines->SetPoint(1, this->dataPtr->selectedPt);
     }
 
     this->dataPtr->selectedPtDirty = false;
+  }
+
+  if (pt0Chosen && pt1Chosen)
+  {
+    this->dataPtr->lines->SetPoint(0,
+        this->dataPtr->pointVisuals[0]->GetWorldPose().Ign().Pos());
+    this->dataPtr->lines->SetPoint(1,
+        this->dataPtr->pointVisuals[1]->GetWorldPose().Ign().Pos());
+
+    // Text
+    if (!this->dataPtr->textVisual->GetVisible())
+      this->dataPtr->textVisual->SetVisible(true);
+
+    this->dataPtr->textVisual->SetPosition(
+        (this->dataPtr->lines->Point(0) +
+         this->dataPtr->lines->Point(1)) / 2.0);
+
+    auto length = (this->dataPtr->lines->Point(0) -
+        this->dataPtr->lines->Point(1)).Length();
+
+    std::ostringstream lengthStr;
+    lengthStr << std::fixed << std::setprecision(3) << length;
+
+    this->dataPtr->text.SetText(lengthStr.str() + "m");
   }
 }
