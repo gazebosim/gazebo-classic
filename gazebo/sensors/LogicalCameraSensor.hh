@@ -17,6 +17,7 @@
 #ifndef _GAZEBO_LOGICAL_CAMERASENSOR_HH_
 #define _GAZEBO_LOGICAL_CAMERASENSOR_HH_
 
+#include <memory>
 #include <string>
 #include <sdf/sdf.hh>
 

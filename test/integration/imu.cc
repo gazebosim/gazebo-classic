@@ -91,7 +91,7 @@ void ImuTest::GetImuData(sensors::ImuSensorPtr _imu,
     world->Step(1);
 
     int j = 0;
-    while (_imu->GetLastMeasurementTime() == gazebo::common::Time::Zero &&
+    while (_imu->LastMeasurementTime() == gazebo::common::Time::Zero &&
         j < 100)
     {
       _imu->Update(true);

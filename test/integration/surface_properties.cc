@@ -95,7 +95,7 @@ void SurfaceTest::CollideWithoutContact(const std::string &_physicsEngine)
     while (contacts.contact_size() == 0 && --steps > 0)
     {
       world->Step(1);
-      contacts = contactSensor->GetContacts();
+      contacts = contactSensor->Contacts();
     }
 
     // Verify that both objects are recognized by contact sensor
@@ -137,7 +137,7 @@ void SurfaceTest::CollideWithoutContact(const std::string &_physicsEngine)
     while (contacts.contact_size() == 0 && --steps > 0)
     {
       world->Step(1);
-      contacts = contactSensor->GetContacts();
+      contacts = contactSensor->Contacts();
     }
 
     // Verify that only contactBox is recognized by contact sensor
