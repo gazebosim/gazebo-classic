@@ -240,7 +240,7 @@ MainWindow::MainWindow()
 
   // Use a signal/slot to track a visual. This makes the process thread safe.
   connect(this, SIGNAL(TrackVisual(const std::string &)),
-          this, SLOT(OnTrackVisual(const std::string &)));
+          this, SLOT(OnTrackVisual(const std::string &)), Qt::QueuedConnection);
 
   // Create data logger dialog
   this->dataLogger = new gui::DataLogger(this);
