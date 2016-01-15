@@ -63,6 +63,7 @@ SelectionObj::~SelectionObj()
 {
   SelectionObjPrivate *dPtr =
       reinterpret_cast<SelectionObjPrivate *>(this->dataPtr);
+
   dPtr->parent.reset();
 }
 
@@ -128,7 +129,6 @@ void SelectionObj::Fini()
       }
     }
   }
-
   Visual::Fini();
 }
 
