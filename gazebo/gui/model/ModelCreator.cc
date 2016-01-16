@@ -1950,6 +1950,7 @@ void ModelCreator::EmitNestedModelInsertedEvent(
 void ModelCreator::ShowContextMenu(const std::string &_entity)
 {
   QMenu menu;
+  menu.setObjectName("ModelEditorContextMenu");
   auto linkIt = this->allLinks.find(_entity);
   bool isLink = linkIt != this->allLinks.end();
   bool isNestedModel = false;
