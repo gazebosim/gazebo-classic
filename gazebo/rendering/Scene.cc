@@ -732,8 +732,7 @@ UserCameraPtr Scene::GetUserCamera(const uint32_t index) const
 //////////////////////////////////////////////////
 void Scene::RemoveCamera(const std::string &_name)
 {
-  std::vector<CameraPtr>::iterator iter;
-  for (iter = this->dataPtr->cameras.begin();
+  for (auto iter = this->dataPtr->cameras.begin();
       iter != this->dataPtr->cameras.end(); ++iter)
   {
     if ((*iter)->Name() == _name)

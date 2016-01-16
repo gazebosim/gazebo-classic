@@ -115,8 +115,8 @@ void CameraSensor::Init()
       }
     }
 
-    this->camera = this->scene->CreateCamera(
-        this->sdf->Get<std::string>("name"), false);
+    std::string scopedName = this->parentName + "::" + this->Name();
+    this->camera = this->scene->CreateCamera(scopedName, false);
 
     if (!this->camera)
     {
@@ -136,7 +136,7 @@ void CameraSensor::Init()
     }
 
     this->camera->Init();
-    this->camera->CreateRenderTexture(this->Name() + "_RttTex");
+    this->camera->CreateRenderTexture(scopedName + "_RttTex");
     ignition::math::Pose3d cameraPose = this->pose;
     if (cameraSdf->HasElement("pose"))
       cameraPose = cameraSdf->Get<ignition::math::Pose3d>("pose") + cameraPose;
@@ -172,7 +172,8 @@ void CameraSensor::Fini()
 
   if (this->camera)
   {
-    this->scene->RemoveCamera(this->camera->Name());
+    std::string scopedName = this->parentName + "::" + this->Name();
+    this->scene->RemoveCamera(scopedName);
   }
 
   this->camera.reset();
