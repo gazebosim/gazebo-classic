@@ -744,90 +744,90 @@ void ModelListWidget::PhysicsPropertyChanged(QtProperty * /*_item*/)
           this->dataPtr->variantManager->value((*iter)).toBool());
     else if ((*iter)->propertyName().toStdString() == "solver")
     {
-      if (this->physicsType == msgs::Physics::ODE)
+      if (this->dataPtr->physicsType == msgs::Physics::ODE)
       {
         msg.mutable_ode()->set_inertia_ratio_reduction(
           this->dataPtr->variantManager->value(
-              this->GetChildItem((*iter), "inertia ratio reduction")).toBool());
+              this->ChildItem((*iter), "inertia ratio reduction")).toBool());
         msg.mutable_ode()->set_friction_iters(this->dataPtr->variantManager->value(
-              this->GetChildItem((*iter), "extra friction iters")).toInt());
+              this->ChildItem((*iter), "extra friction iters")).toInt());
         msg.mutable_ode()->set_warm_start_factor(this->dataPtr->variantManager->value(
-              this->GetChildItem((*iter), "warm start factor")).toDouble());
+              this->ChildItem((*iter), "warm start factor")).toDouble());
         msg.mutable_ode()->set_reorder(this->dataPtr->variantManager->value(
-              this->GetChildItem((*iter), "pgs row reorder")).toBool());
+              this->ChildItem((*iter), "pgs row reorder")).toBool());
         msg.mutable_ode()->set_contact_residual_smoothing(
               this->dataPtr->variantManager->value(
-              this->GetChildItem((*iter), "contact smoothing")).toDouble());
+              this->ChildItem((*iter), "contact smoothing")).toDouble());
         msg.mutable_ode()->set_iters(this->dataPtr->variantManager->value(
-              this->GetChildItem((*iter), "iterations")).toInt());
+              this->ChildItem((*iter), "iterations")).toInt());
         msg.mutable_ode()->set_sor(this->dataPtr->variantManager->value(
-              this->GetChildItem((*iter), "SOR")).toDouble());
+              this->ChildItem((*iter), "SOR")).toDouble());
         msg.mutable_ode()->set_sor_lcp_tolerance(this->dataPtr->variantManager->value(
-              this->GetChildItem((*iter), "SOR LCP Tolerance")).toDouble());
+              this->ChildItem((*iter), "SOR LCP Tolerance")).toDouble());
       }
-      else if (this->physicsType == msgs::Physics::BULLET)
+      else if (this->dataPtr->physicsType == msgs::Physics::BULLET)
       {
         msg.mutable_bullet()->set_iters(this->dataPtr->variantManager->value(
-              this->GetChildItem((*iter), "iterations")).toInt());
+              this->ChildItem((*iter), "iterations")).toInt());
         msg.mutable_bullet()->set_sor(this->dataPtr->variantManager->value(
-              this->GetChildItem((*iter), "SOR")).toDouble());
+              this->ChildItem((*iter), "SOR")).toDouble());
       }
-      else if (this->physicsType == msgs::Physics::DART)
+      else if (this->dataPtr->physicsType == msgs::Physics::DART)
       {
         /// \TODO
       }
-      else if (this->physicsType == msgs::Physics::SIMBODY)
+      else if (this->dataPtr->physicsType == msgs::Physics::SIMBODY)
       {
         msg.mutable_simbody()->set_accuracy(
           this->dataPtr->variantManager->value(
-          this->GetChildItem((*iter), "accuracy")).toDouble());
+          this->ChildItem((*iter), "accuracy")).toDouble());
         msg.mutable_simbody()->set_max_transient_velocity(
           this->dataPtr->variantManager->value(
-          this->GetChildItem((*iter), "max transient velocity")).toDouble());
+          this->ChildItem((*iter), "max transient velocity")).toDouble());
       }
       else
       {
         // custom physics engine?
-        gzwarn << "Physics type [" << this->physicsType << "] unhandled.\n";
+        gzwarn << "Physics type [" << this->dataPtr->physicsType << "] unhandled.\n";
       }
     }
     else if ((*iter)->propertyName().toStdString() == "constraints")
     {
-      if (this->physicsType == msgs::Physics::ODE)
+      if (this->dataPtr->physicsType == msgs::Physics::ODE)
       {
         msg.mutable_ode()->set_cfm(this->dataPtr->variantManager->value(
-              this->GetChildItem((*iter), "CFM")).toDouble());
+              this->ChildItem((*iter), "CFM")).toDouble());
         msg.mutable_ode()->set_erp(this->dataPtr->variantManager->value(
-              this->GetChildItem((*iter), "ERP")).toDouble());
+              this->ChildItem((*iter), "ERP")).toDouble());
         msg.mutable_ode()->set_contact_max_correcting_vel(
               this->dataPtr->variantManager->value(
-              this->GetChildItem((*iter), "max velocity")).toDouble());
+              this->ChildItem((*iter), "max velocity")).toDouble());
         msg.mutable_ode()->set_contact_surface_layer(
               this->dataPtr->variantManager->value(
-              this->GetChildItem((*iter), "surface layer")).toDouble());
+              this->ChildItem((*iter), "surface layer")).toDouble());
       }
-      else if (this->physicsType == msgs::Physics::BULLET)
+      else if (this->dataPtr->physicsType == msgs::Physics::BULLET)
       {
         msg.mutable_bullet()->set_cfm(this->dataPtr->variantManager->value(
-              this->GetChildItem((*iter), "CFM")).toDouble());
+              this->ChildItem((*iter), "CFM")).toDouble());
         msg.mutable_bullet()->set_erp(this->dataPtr->variantManager->value(
-              this->GetChildItem((*iter), "ERP")).toDouble());
+              this->ChildItem((*iter), "ERP")).toDouble());
         msg.mutable_bullet()->set_contact_surface_layer(
               this->dataPtr->variantManager->value(
-              this->GetChildItem((*iter), "surface layer")).toDouble());
+              this->ChildItem((*iter), "surface layer")).toDouble());
         msg.mutable_bullet()->set_split_impulse(
               this->dataPtr->variantManager->value(
-              this->GetChildItem((*iter), "split impulse")).toBool());
+              this->ChildItem((*iter), "split impulse")).toBool());
         msg.mutable_bullet()->set_split_impulse_penetration_threshold(
               this->dataPtr->variantManager->value(
-              this->GetChildItem((*iter),
+              this->ChildItem((*iter),
               "split impulse penetration threshold")).toDouble());
       }
       // \TODO: fill this in for DART and SIMBODY
-      // else if (this->physicsType == msgs::Physics::DART)
+      // else if (this->dataPtr->physicsType == msgs::Physics::DART)
       // {
       // }
-      // else if (this->physicsType == msgs::Physics::SIMBODY)
+      // else if (this->dataPtr->physicsType == msgs::Physics::SIMBODY)
       // {
       // }
       // else
@@ -2663,6 +2663,7 @@ void ModelListWidget::ResetTree()
   this->dataPtr->selectedProperty = NULL;
 }
 
+/*
 /////////////////////////////////////////////////
 ModelListSheetDelegate::ModelListSheetDelegate(QTreeView *view, QWidget *parent)
     : QItemDelegate(parent), m_view(view)
@@ -2709,6 +2710,7 @@ QSize ModelListSheetDelegate::sizeHint(const QStyleOptionViewItem &opt,
   QSize sz = QItemDelegate::sizeHint(opt, index) + QSize(2, 2);
   return sz;
 }
+*/
 
 /////////////////////////////////////////////////
 void ModelListWidget::ResetScene()
@@ -2757,30 +2759,30 @@ void ModelListWidget::FillPropertyTree(const msgs::Scene &_msg,
   this->dataPtr->propTreeBrowser->addProperty(item);
 
   /// \TODO: Put fog back in
-  /*topItem = this->variantManager->addProperty(
+  /*topItem = this->dataPtr->variantManager->addProperty(
       QtVariantPropertyManager::groupTypeId(), tr("fog"));
-  QtBrowserItem *bItem = this->propTreeBrowser->addProperty(topItem);
-  this->propTreeBrowser->setExpanded(bItem, false);
+  QtBrowserItem *bItem = this->dataPtr->propTreeBrowser->addProperty(topItem);
+  this->dataPtr->propTreeBrowser->setExpanded(bItem, false);
 
-  item = this->variantManager->addProperty(QVariant::Color, tr("color"));
+  item = this->dataPtr->variantManager->addProperty(QVariant::Color, tr("color"));
   topItem->addSubProperty(item);
 
-  item = this->variantManager->addProperty(QVariant::Double, tr("start"));
+  item = this->dataPtr->variantManager->addProperty(QVariant::Double, tr("start"));
   topItem->addSubProperty(item);
 
-  item = this->variantManager->addProperty(QVariant::Double, tr("end"));
+  item = this->dataPtr->variantManager->addProperty(QVariant::Double, tr("end"));
   topItem->addSubProperty(item);
 
-  item = this->variantManager->addProperty(QVariant::Double, tr("density"));
+  item = this->dataPtr->variantManager->addProperty(QVariant::Double, tr("density"));
   topItem->addSubProperty(item);
   */
 
   /// \TODO: Put sky modification back in GUI
   /*
-  topItem = this->variantManager->addProperty(
+  topItem = this->dataPtr->variantManager->addProperty(
       QtVariantPropertyManager::groupTypeId(), tr("sky"));
-  bItem = this->propTreeBrowser->addProperty(topItem);
-  this->propTreeBrowser->setExpanded(bItem, false);
+  bItem = this->dataPtr->propTreeBrowser->addProperty(topItem);
+  this->dataPtr->propTreeBrowser->setExpanded(bItem, false);
   */
 }
 
@@ -2850,7 +2852,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
   this->dataPtr->propTreeBrowser->addProperty(solverItem);
 
   /// switch options below based on physics engine type.
-  if (this->physicsType == msgs::Physics::ODE)
+  if (this->dataPtr->physicsType == msgs::Physics::ODE)
   {
     item = this->dataPtr->variantManager->addProperty(QVariant::Bool,
       tr("inertia ratio reduction"));
@@ -2867,7 +2869,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
     item = this->dataPtr->variantManager->addProperty(QVariant::Double,
       tr("warm start factor"));
     static_cast<QtVariantPropertyManager*>
-      (this->variantFactory->propertyManager(item))->setAttribute(
+      (this->dataPtr->variantFactory->propertyManager(item))->setAttribute(
           item, "decimals", 6);
     if (_msg.has_ode() && _msg.ode().has_warm_start_factor())
       item->setValue(_msg.ode().warm_start_factor());
@@ -2882,7 +2884,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
     item = this->dataPtr->variantManager->addProperty(QVariant::Double,
       tr("contact smoothing"));
     static_cast<QtVariantPropertyManager*>
-      (this->variantFactory->propertyManager(item))->setAttribute(
+      (this->dataPtr->variantFactory->propertyManager(item))->setAttribute(
           item, "decimals", 6);
     if (_msg.has_ode() && _msg.ode().has_contact_residual_smoothing())
       item->setValue(_msg.ode().contact_residual_smoothing());
@@ -2895,7 +2897,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
 
     item = this->dataPtr->variantManager->addProperty(QVariant::Double, tr("SOR"));
     static_cast<QtVariantPropertyManager*>
-      (this->variantFactory->propertyManager(item))->setAttribute(
+      (this->dataPtr->variantFactory->propertyManager(item))->setAttribute(
           item, "decimals", 6);
     if (_msg.has_ode() && _msg.ode().has_sor())
       item->setValue(_msg.ode().sor());
@@ -2904,7 +2906,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
     item = this->dataPtr->variantManager->addProperty(QVariant::Double,
       tr("SOR LCP Tolerance"));
     static_cast<QtVariantPropertyManager*>
-      (this->variantFactory->propertyManager(item))->setAttribute(
+      (this->dataPtr->variantFactory->propertyManager(item))->setAttribute(
           item, "decimals", 6);
     if (_msg.has_ode() && _msg.ode().has_sor_lcp_tolerance())
       item->setValue(_msg.ode().sor_lcp_tolerance());
@@ -2913,11 +2915,11 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
 
     QtProperty *constraintsItem = this->dataPtr->variantManager->addProperty(
         QtVariantPropertyManager::groupTypeId(), tr("constraints"));
-    this->propTreeBrowser->addProperty(constraintsItem);
+    this->dataPtr->propTreeBrowser->addProperty(constraintsItem);
 
     item = this->dataPtr->variantManager->addProperty(QVariant::Double, tr("CFM"));
     static_cast<QtVariantPropertyManager*>
-      (this->variantFactory->propertyManager(item))->setAttribute(
+      (this->dataPtr->variantFactory->propertyManager(item))->setAttribute(
           item, "decimals", 6);
     if (_msg.has_ode() && _msg.ode().has_cfm())
       item->setValue(_msg.ode().cfm());
@@ -2925,7 +2927,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
 
     item = this->dataPtr->variantManager->addProperty(QVariant::Double, tr("ERP"));
     static_cast<QtVariantPropertyManager*>
-      (this->variantFactory->propertyManager(item))->setAttribute(
+      (this->dataPtr->variantFactory->propertyManager(item))->setAttribute(
           item, "decimals", 6);
     if (_msg.has_ode() && _msg.ode().has_erp())
       item->setValue(_msg.ode().erp());
@@ -2934,7 +2936,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
     item = this->dataPtr->variantManager->addProperty(QVariant::Double,
                                              tr("max velocity"));
     static_cast<QtVariantPropertyManager*>
-      (this->variantFactory->propertyManager(item))->setAttribute(
+      (this->dataPtr->variantFactory->propertyManager(item))->setAttribute(
           item, "decimals", 6);
     if (_msg.has_ode() && _msg.ode().has_contact_max_correcting_vel())
       item->setValue(_msg.ode().contact_max_correcting_vel());
@@ -2943,13 +2945,13 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
     item = this->dataPtr->variantManager->addProperty(QVariant::Double,
                                              tr("surface layer"));
     static_cast<QtVariantPropertyManager*>
-      (this->variantFactory->propertyManager(item))->setAttribute(
+      (this->dataPtr->variantFactory->propertyManager(item))->setAttribute(
           item, "decimals", 6);
     if (_msg.has_ode() && _msg.ode().has_contact_surface_layer())
       item->setValue(_msg.ode().contact_surface_layer());
     constraintsItem->addSubProperty(item);
   }
-  else if (this->physicsType == msgs::Physics::BULLET)
+  else if (this->dataPtr->physicsType == msgs::Physics::BULLET)
   {
     item = this->dataPtr->variantManager->addProperty(QVariant::Int, tr("iterations"));
     if (_msg.has_bullet() && _msg.bullet().has_iters())
@@ -2958,7 +2960,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
 
     item = this->dataPtr->variantManager->addProperty(QVariant::Double, tr("SOR"));
     static_cast<QtVariantPropertyManager*>
-      (this->variantFactory->propertyManager(item))->setAttribute(
+      (this->dataPtr->variantFactory->propertyManager(item))->setAttribute(
           item, "decimals", 6);
     if (_msg.has_bullet() && _msg.bullet().has_sor())
       item->setValue(_msg.bullet().sor());
@@ -2967,11 +2969,11 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
 
     QtProperty *constraintsItem = this->dataPtr->variantManager->addProperty(
         QtVariantPropertyManager::groupTypeId(), tr("constraints"));
-    this->propTreeBrowser->addProperty(constraintsItem);
+    this->dataPtr->propTreeBrowser->addProperty(constraintsItem);
 
     item = this->dataPtr->variantManager->addProperty(QVariant::Double, tr("CFM"));
     static_cast<QtVariantPropertyManager*>
-      (this->variantFactory->propertyManager(item))->setAttribute(
+      (this->dataPtr->variantFactory->propertyManager(item))->setAttribute(
           item, "decimals", 6);
     if (_msg.has_bullet() && _msg.bullet().has_cfm())
       item->setValue(_msg.bullet().cfm());
@@ -2979,7 +2981,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
 
     item = this->dataPtr->variantManager->addProperty(QVariant::Double, tr("ERP"));
     static_cast<QtVariantPropertyManager*>
-      (this->variantFactory->propertyManager(item))->setAttribute(
+      (this->dataPtr->variantFactory->propertyManager(item))->setAttribute(
           item, "decimals", 6);
     if (_msg.has_bullet() && _msg.bullet().has_erp())
       item->setValue(_msg.bullet().erp());
@@ -2988,7 +2990,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
     item = this->dataPtr->variantManager->addProperty(QVariant::Double,
       tr("surface layer"));
     static_cast<QtVariantPropertyManager*>
-      (this->variantFactory->propertyManager(item))->setAttribute(
+      (this->dataPtr->variantFactory->propertyManager(item))->setAttribute(
           item, "decimals", 6);
     if (_msg.has_bullet() && _msg.bullet().has_contact_surface_layer())
       item->setValue(_msg.bullet().contact_surface_layer());
@@ -3003,23 +3005,23 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
     item = this->dataPtr->variantManager->addProperty(QVariant::Double,
       tr("split impulse penetration threshold"));
     static_cast<QtVariantPropertyManager*>
-      (this->variantFactory->propertyManager(item))->setAttribute(
+      (this->dataPtr->variantFactory->propertyManager(item))->setAttribute(
           item, "decimals", 6);
     if (_msg.has_bullet() &&
       _msg.bullet().has_split_impulse_penetration_threshold())
       item->setValue(_msg.bullet().split_impulse_penetration_threshold());
     constraintsItem->addSubProperty(item);
   }
-  else if (this->physicsType == msgs::Physics::DART)
+  else if (this->dataPtr->physicsType == msgs::Physics::DART)
   {
     /// \TODO
   }
-  else if (this->physicsType == msgs::Physics::SIMBODY)
+  else if (this->dataPtr->physicsType == msgs::Physics::SIMBODY)
   {
     item = this->dataPtr->variantManager->addProperty(QVariant::Double,
       tr("accuracy"));
     static_cast<QtVariantPropertyManager*>
-      (this->variantFactory->propertyManager(item))->setAttribute(
+      (this->dataPtr->variantFactory->propertyManager(item))->setAttribute(
           item, "decimals", 6);
     if (_msg.has_simbody() && _msg.simbody().has_accuracy())
       item->setValue(_msg.simbody().accuracy());
@@ -3028,7 +3030,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
     item = this->dataPtr->variantManager->addProperty(QVariant::Double,
       tr("max transient velocity"));
     static_cast<QtVariantPropertyManager*>
-      (this->variantFactory->propertyManager(item))->setAttribute(
+      (this->dataPtr->variantFactory->propertyManager(item))->setAttribute(
           item, "decimals", 6);
     if (_msg.has_simbody() && _msg.simbody().has_max_transient_velocity())
       item->setValue(_msg.simbody().max_transient_velocity());
@@ -3037,7 +3039,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
   else
   {
     // custom physics engine?
-    gzwarn << "Physics type [" << this->physicsType << "] unhandled.\n";
+    gzwarn << "Physics type [" << this->dataPtr->physicsType << "] unhandled.\n";
   }
 }
 
