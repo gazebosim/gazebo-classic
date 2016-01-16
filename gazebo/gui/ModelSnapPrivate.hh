@@ -19,6 +19,7 @@
 
 #include <string>
 #include <vector>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/common/MouseEvent.hh"
 #include "gazebo/common/KeyEvent.hh"
@@ -58,10 +59,10 @@ namespace gazebo
       public: bool initialized;
 
       /// \brief Vertices of a mesh triangle used as the basis for alignment.
-      public: std::vector<math::Vector3> selectedTriangle;
+      public: std::vector<ignition::math::Vector3d> selectedTriangle;
 
       /// \brief Vertices of a mesh triangle being hovered.
-      public: std::vector<math::Vector3> hoverTriangle;
+      public: std::vector<ignition::math::Vector3d> hoverTriangle;
 
       /// \brief Currently selected visual.
       public: rendering::VisualPtr selectedVis;

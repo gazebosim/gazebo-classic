@@ -20,6 +20,7 @@
 
 #include <vector>
 
+#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/rendering/ogre_gazebo.h"
@@ -54,8 +55,20 @@ namespace gazebo
       /// \param[in] _visual Visual containing the mesh to be selected.
       /// \param[out] _intersect Intersection point.
       /// \param[out] _vertices Vertices of the selected triangle on the mesh.
+      /// \deprecated See function that accepts ignition math params.
       public: bool SelectMeshTriangle(int _x, int _y, VisualPtr _visual,
-          math::Vector3 &_intersect, std::vector<math::Vector3> &_vertices);
+          math::Vector3 &_intersect, std::vector<math::Vector3> &_vertices)
+          GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Select a triangle on mesh given screen coordinates
+      /// \param[in] _x X position on screen in pixels.
+      /// \param[in] _y Y position on screen in pixels.
+      /// \param[in] _visual Visual containing the mesh to be selected.
+      /// \param[out] _intersect Intersection point.
+      /// \param[out] _vertices Vertices of the selected triangle on the mesh.
+      public: bool SelectMeshTriangle(int _x, int _y, VisualPtr _visual,
+          ignition::math::Vector3d &_intersect,
+          std::vector<ignition::math::Vector3d> &_vertices);
 
       /// \brief Helper method to recursively find all visuals that have a mesh.
       /// \param[in] _visual Parent visual to be traversed.

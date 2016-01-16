@@ -21,6 +21,7 @@
 #include <string>
 #include <vector>
 
+#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/common/MouseEvent.hh"
 #include "gazebo/common/KeyEvent.hh"
 

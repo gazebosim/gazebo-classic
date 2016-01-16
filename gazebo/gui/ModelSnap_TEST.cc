@@ -91,15 +91,15 @@ void ModelSnap_TEST::Snap()
   // select any triangle on the sphere
   gazebo::math::Vector2i srcPt = GetScreenSpaceCoords(
       model03Vis->GetWorldPose().pos + gazebo::math::Vector3(0.5, 0, 0), cam);
-  gazebo::math::Vector3 intersect;
-  std::vector<gazebo::math::Vector3> verticesSrc;
+  ignition::math::Vector3d intersect;
+  std::vector<ignition::math::Vector3d> verticesSrc;
   rayQuery.SelectMeshTriangle(srcPt.x, srcPt.y, model03Vis, intersect,
       verticesSrc);
 
   // select the front face of the box
   gazebo::math::Vector2i destPt = GetScreenSpaceCoords(
       model02Vis->GetWorldPose().pos + gazebo::math::Vector3(0.5, 0, 0), cam);
-  std::vector<gazebo::math::Vector3> verticesDest;
+  std::vector<ignition::math::Vector3d> verticesDest;
   rayQuery.SelectMeshTriangle(destPt.x, destPt.y, model02Vis, intersect,
       verticesDest);
 

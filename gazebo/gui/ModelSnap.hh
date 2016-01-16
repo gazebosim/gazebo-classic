@@ -72,6 +72,18 @@ namespace gazebo
       /// \param[in] _triangleSrc vertices of target triangle being snapped to.
       /// \param[in] _triangleDest vertices of the other triangle that will be
       /// moved.
+      /// \param[in] _visualSrc Visual being moved by the snap action.
+      public: void Snap(
+          const std::vector<ignition::math::Vector3d> &_triangleSrc,
+          const std::vector<ignition::math::Vector3d> &_triangleDest,
+          rendering::VisualPtr _visualSrc);
+
+      /// \brief Calculate the translation and rotation needed to snap the
+      /// centroid of a mesh triangle of a visual to another, taking into
+      /// account any pose offsets.
+      /// \param[in] _triangleSrc vertices of target triangle being snapped to.
+      /// \param[in] _triangleDest vertices of the other triangle that will be
+      /// moved.
       /// \param[in] _poseSrc Pose offset of triangleB relative to its model
       /// visual.
       /// \param[out] _trans Translation output.
@@ -81,6 +93,22 @@ namespace gazebo
           const std::vector<math::Vector3> &_triangleDest,
           const math::Pose &_poseSrc, math::Vector3 &_trans,
           math::Quaternion &_rot);
+
+      /// \brief Calculate the translation and rotation needed to snap the
+      /// centroid of a mesh triangle of a visual to another, taking into
+      /// account any pose offsets.
+      /// \param[in] _triangleSrc vertices of target triangle being snapped to.
+      /// \param[in] _triangleDest vertices of the other triangle that will be
+      /// moved.
+      /// \param[in] _poseSrc Pose offset of triangleB relative to its model
+      /// visual.
+      /// \param[out] _trans Translation output.
+      /// \param[out] _rotation Rotation output.
+      public: void SnapTransform(
+          const std::vector<ignition::math::Vector3d> &_triangleSrc,
+          const std::vector<ignition::math::Vector3d> &_triangleDest,
+          const ignition::math::Pose3d &_poseSrc, ignition::math::Vector3d &_trans,
+          ignition::math::Quaterniond &_rot);
 
       /// \brief Process an object translate mouse press event.
       /// \param[in] _event Mouse event.

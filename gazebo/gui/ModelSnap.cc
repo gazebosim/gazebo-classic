@@ -191,8 +191,8 @@ void ModelSnap::OnMouseMoveEvent(const common::MouseEvent &_event)
   if (vis && !vis->IsPlane())
   {
     // get the triangle being hovered so that it can be highlighted
-    math::Vector3 intersect;
-    std::vector<math::Vector3> hoverTriangle;
+    ignition::math::Vector3d intersect;
+    std::vector<ignition::math::Vector3d> hoverTriangle;
     this->dataPtr->rayQuery->SelectMeshTriangle(_event.Pos().X(),
         _event.Pos().Y(), vis->GetRootVisual(), intersect, hoverTriangle);
 
@@ -256,7 +256,7 @@ void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
     // Update triangle if the new triangle is on the same model/link
     if (!this->dataPtr->selectedVis || (currentParent  == previousParent))
     {
-      math::Vector3 intersect;
+      ignition::math::Vector3d intersect;
       this->dataPtr->rayQuery->SelectMeshTriangle(_event.Pos().X(),
           _event.Pos().Y(), currentParent, intersect,
           this->dataPtr->selectedTriangle);
@@ -275,8 +275,8 @@ void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
     else
     {
       // select triangle on the target
-      math::Vector3 intersect;
-      std::vector<math::Vector3> vertices;
+      ignition::math::Vector3d intersect;
+      std::vector<ignition::math::Vector3d> vertices;
       this->dataPtr->rayQuery->SelectMeshTriangle(_event.Pos().X(),
           _event.Pos().Y(), currentParent, intersect, vertices);
 
@@ -307,6 +307,24 @@ void ModelSnap::Snap(const std::vector<math::Vector3> &_triangleSrc,
   _visualSrc->SetWorldPose(
       math::Pose(_visualSrc->GetWorldPose().pos + translation,
       rotation * _visualSrc->GetWorldPose().rot));
+
+  this->PublishVisualPose(_visualSrc);
+}
+
+//////////////////////////////////////////////////
+void ModelSnap::Snap(const std::vector<ignition::math::Vector3d> &_triangleSrc,
+    const std::vector<ignition::math::Vector3d> &_triangleDest,
+    rendering::VisualPtr _visualSrc)
+{
+  ignition::math::Vector3d translation;
+  ignition::math::Quaterniond rotation;
+
+  this->SnapTransform(_triangleSrc, _triangleDest,
+      _visualSrc->GetWorldPose().Ign(), translation, rotation);
+
+  _visualSrc->SetWorldPose(
+      ignition::math::Pose3d(_visualSrc->GetWorldPose().Ign().Pos() +
+      translation, rotation * _visualSrc->GetWorldPose().Ign().Rot()));
 
   this->PublishVisualPose(_visualSrc);
 }
@@ -343,6 +361,42 @@ void ModelSnap::GetSnapTransform(const std::vector<math::Vector3> &_triangleSrc,
   // Get translation needed for alignment
   // taking into account the rotated position of the mesh
   _trans = centroidDest - (_rot * (centroidSrc - _poseSrc.pos) + _poseSrc.pos);
+}
+
+//////////////////////////////////////////////////
+void ModelSnap::SnapTransform(
+    const std::vector<ignition::math::Vector3d> &_triangleSrc,
+    const std::vector<ignition::math::Vector3d> &_triangleDest,
+    const ignition::math::Pose3d &_poseSrc, ignition::math::Vector3d &_trans,
+    ignition::math::Quaterniond &_rot)
+{
+  // snap the centroid of one triangle to another
+  auto centroidSrc = (_triangleSrc[0] + _triangleSrc[1] +
+      _triangleSrc[2]) / 3.0;
+
+  auto centroidDest =
+      (_triangleDest[0] + _triangleDest[1] + _triangleDest[2]) / 3.0;
+
+  auto normalSrc = ignition::math::Vector3d::Normal(
+      _triangleSrc[0], _triangleSrc[1], _triangleSrc[2]);
+
+  auto normalDest = ignition::math::Vector3d::Normal(
+      _triangleDest[0], _triangleDest[1], _triangleDest[2]);
+
+  auto u = normalDest.Normalize() * -1;
+  auto v = normalSrc.Normalize();
+  double cosTheta = v.Dot(u);
+  double angle = acos(cosTheta);
+  // check the parallel case
+  if (ignition::math::equal(angle, M_PI))
+    _rot.Axis(u.Perpendicular(), angle);
+  else
+    _rot.Axis((v.Cross(u)).Normalize(), angle);
+
+  // Get translation needed for alignment
+  // taking into account the rotated position of the mesh
+  _trans = centroidDest - (_rot * (centroidSrc - _poseSrc.Pos()) +
+      _poseSrc.Pos());
 }
 
 /////////////////////////////////////////////////
@@ -384,13 +438,13 @@ void ModelSnap::Update()
     if (!this->dataPtr->hoverTriangle.empty())
     {
       // convert triangle to local coordinates relative to parent visual
-      std::vector<math::Vector3> hoverTriangle;
+      std::vector<ignition::math::Vector3d> hoverTriangle;
       for (unsigned int i = 0; i < this->dataPtr->hoverTriangle.size(); ++i)
       {
         hoverTriangle.push_back(
-            this->dataPtr->hoverVis->GetWorldPose().rot.GetInverse() *
+            this->dataPtr->hoverVis->GetWorldPose().Ign().Rot().Inverse() *
             (this->dataPtr->hoverTriangle[i] -
-            this->dataPtr->hoverVis->GetWorldPose().pos));
+            this->dataPtr->hoverVis->GetWorldPose().Ign().Pos()));
       }
 
       if (!this->dataPtr->highlightVisual)
@@ -403,10 +457,10 @@ void ModelSnap::Update()
             this->dataPtr->highlightVisual->CreateDynamicLine(
             rendering::RENDERING_TRIANGLE_FAN);
         this->dataPtr->snapHighlight->setMaterial("Gazebo/RedTransparent");
-        this->dataPtr->snapHighlight->AddPoint(hoverTriangle[0].Ign());
-        this->dataPtr->snapHighlight->AddPoint(hoverTriangle[1].Ign());
-        this->dataPtr->snapHighlight->AddPoint(hoverTriangle[2].Ign());
-        this->dataPtr->snapHighlight->AddPoint(hoverTriangle[0].Ign());
+        this->dataPtr->snapHighlight->AddPoint(hoverTriangle[0]);
+        this->dataPtr->snapHighlight->AddPoint(hoverTriangle[1]);
+        this->dataPtr->snapHighlight->AddPoint(hoverTriangle[2]);
+        this->dataPtr->snapHighlight->AddPoint(hoverTriangle[0]);
         this->dataPtr->highlightVisual->SetVisible(true);
         this->dataPtr->highlightVisual->GetSceneNode()->setInheritScale(false);
         this->dataPtr->highlightVisual->SetVisibilityFlags(
@@ -427,10 +481,10 @@ void ModelSnap::Update()
           }
           this->dataPtr->hoverVis->AttachVisual(this->dataPtr->highlightVisual);
         }
-        this->dataPtr->snapHighlight->SetPoint(0, hoverTriangle[0].Ign());
-        this->dataPtr->snapHighlight->SetPoint(1, hoverTriangle[1].Ign());
-        this->dataPtr->snapHighlight->SetPoint(2, hoverTriangle[2].Ign());
-        this->dataPtr->snapHighlight->SetPoint(3, hoverTriangle[0].Ign());
+        this->dataPtr->snapHighlight->SetPoint(0, hoverTriangle[0]);
+        this->dataPtr->snapHighlight->SetPoint(1, hoverTriangle[1]);
+        this->dataPtr->snapHighlight->SetPoint(2, hoverTriangle[2]);
+        this->dataPtr->snapHighlight->SetPoint(3, hoverTriangle[0]);
       }
     }
     else
@@ -449,9 +503,9 @@ void ModelSnap::Update()
     for (unsigned int i = 0; i < this->dataPtr->selectedTriangle.size(); ++i)
     {
       triangle.push_back(
-          this->dataPtr->selectedVis->GetWorldPose().rot.GetInverse() *
+          this->dataPtr->selectedVis->GetWorldPose().Ign().Rot().Inverse() *
           (this->dataPtr->selectedTriangle[i] -
-          this->dataPtr->selectedVis->GetWorldPose().pos));
+          this->dataPtr->selectedVis->GetWorldPose().Ign().Pos()));
     }
 
     if (!this->dataPtr->snapVisual)

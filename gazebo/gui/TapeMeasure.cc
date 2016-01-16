@@ -229,16 +229,43 @@ void TapeMeasure::OnMousePressEvent(const common::MouseEvent &_event)
 /////////////////////////////////////////////////
 void TapeMeasure::OnMouseMoveEvent(const common::MouseEvent &_event)
 {
-  // \todo If holding shift, snap to a vertex on a mesh
-
+  // Get the first visual
   auto vis = this->dataPtr->userCamera->GetVisual(_event.Pos());
 
   // Get the first contact point
-  ignition::math::Vector3d pos;
-  if (this->dataPtr->scene->FirstContact(this->dataPtr->userCamera,
-      _event.Pos(), pos))
+//  ignition::math::Vector3d pos;
+//  bool hasContact = this->dataPtr->scene->FirstContact(this->dataPtr->userCamera,
+  //    _event.Pos(), pos);
+
+  // Get the first triangle intercepted
+  ignition::math::Vector3d pt;
+  std::vector<ignition::math::Vector3d> triangle;
+  if (vis)
   {
-    this->dataPtr->hoverPt = pos;
+    this->dataPtr->rayQuery->SelectMeshTriangle(_event.Pos().X(),
+        _event.Pos().Y(), vis->GetRootVisual(), pt, triangle);
+  }
+
+  // If holding Shift, get the closest triangle vertex
+  if (!triangle.empty() &&
+      QApplication::keyboardModifiers() & Qt::ShiftModifier)
+  {
+    ignition::math::Vector3d diff;
+    diff.X() = (triangle[0] - pt).Length();
+    diff.Y() = (triangle[1] - pt).Length();
+    diff.Z() = (triangle[2] - pt).Length();
+
+    if (diff[0] <= diff[1] && diff[0] <= diff[1])
+      pt = triangle[0];
+    else if (diff[1] <= diff[2])
+      pt = triangle[1];
+    else
+      pt = triangle[2];
+  }
+
+  if (pt != ignition::math::Vector3d::Zero)
+  {
+    this->dataPtr->hoverPt = pt;
     this->dataPtr->hoverPtDirty = true;
     this->dataPtr->hoverVis = vis;
 
@@ -382,13 +409,21 @@ void TapeMeasure::Update()
     this->dataPtr->selectedPtDirty = false;
   }
 
-  if (pt0Chosen && pt1Chosen)
+  if (pt0Chosen)
   {
     this->dataPtr->lines->SetPoint(0,
         this->dataPtr->pointVisuals[0]->GetWorldPose().Ign().Pos());
+  }
+
+  if (pt1Chosen)
+  {
     this->dataPtr->lines->SetPoint(1,
         this->dataPtr->pointVisuals[1]->GetWorldPose().Ign().Pos());
+  }
 
+
+  if (pt0Chosen && pt1Chosen)
+  {
     // Text
     if (!this->dataPtr->textVisual->GetVisible())
       this->dataPtr->textVisual->SetVisible(true);
