@@ -337,6 +337,12 @@ namespace gazebo
       /// \param[in] _model Pointer to the model to publish.
       public: void PublishModelPose(physics::ModelPtr _model);
 
+      /// \brief Publish scale updates for a model.
+      /// This list of models to publish is processed and cleared once every
+      /// iteration.
+      /// \param[in] _model Pointer to the model to publish.
+      public: void PublishModelScale(physics::ModelPtr _model);
+
       /// \brief Publish pose updates for a light.
       /// Adds light to a list of lights to publish, which is processed and
       /// cleared once every iteration.
@@ -380,6 +386,16 @@ namespace gazebo
       /// If you are unsure whether you should use this function, do not.
       /// \param[in] _entity Entity that has moved.
       public: void _AddDirty(Entity *_entity);
+
+      /// \brief Get whether sensors have been initialized.
+      /// \return True if sensors have been initialized.
+      public: bool SensorsInitialized() const;
+
+      /// \internal
+      /// \brief Set whether sensors have been initialized. This should only
+      /// be called by SensorManager.
+      /// \param[in] _init True if sensors have been initialized.
+      public: void _SetSensorsInitialized(const bool _init);
 
       /// \cond
       /// This is an internal function.

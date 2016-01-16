@@ -31,7 +31,7 @@ TEST_F(SensorTest, GetScopedName)
   sensors::SensorPtr sensor = sensors::get_sensor("cam1");
   ASSERT_TRUE(sensor != NULL);
 
-  std::string sensorName = sensor->GetScopedName();
+  std::string sensorName = sensor->ScopedName();
   EXPECT_EQ(sensorName, std::string("default::rotated_box::link::cam1"));
 }
 
