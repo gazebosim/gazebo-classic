@@ -82,6 +82,12 @@ namespace gazebo
       /// \brief A visual to represent the hovered area.
       public: std::vector<rendering::VisualPtr> pointVisuals;
 
+      /// \brief A visual to represent the hovered area.
+      public: std::vector<rendering::VisualPtr> snapVisuals;
+
+      /// \brief A visual to represent the hovered area.
+      public: std::vector<ignition::math::Vector3d> snapPts;
+
       /// \brief A variable to indicate the selected triangle has changed.
       public: bool selectedPtDirty;
 

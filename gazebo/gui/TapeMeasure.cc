@@ -122,6 +122,25 @@ void TapeMeasure::Init()
   this->dataPtr->highlightVis->SetVisibilityFlags(GZ_VISIBILITY_GUI);
   this->dataPtr->highlightVis->GetSceneNode()->setInheritScale(false);
 
+  // Snap highlight visual
+  for (int i = 0; i < 6; ++i)
+  {
+    std::string name = "_TAPEMEASURE_SNAP_" + std::to_string(i) + "_";
+    rendering::VisualPtr pointVis;
+    pointVis.reset(new rendering::Visual(name, this->dataPtr->scene, false));
+
+    pointVis->Load();
+    pointVis->AttachMesh("unit_sphere");
+    pointVis->SetScale(ignition::math::Vector3d(0.05, 0.05, 0.05));
+    pointVis->SetCastShadows(false);
+    pointVis->SetMaterial("Gazebo/YellowTransparent");
+    pointVis->SetVisible(false);
+    pointVis->SetTransparency(0.5);
+    pointVis->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+    pointVis->GetSceneNode()->setInheritScale(false);
+    this->dataPtr->snapVisuals.push_back(pointVis);
+  }
+
   // Point visuals
   for (int i = 0; i < 2; ++i)
   {
@@ -210,6 +229,11 @@ void TapeMeasure::Reset()
     }
   }
 
+  for (auto &vis : this->dataPtr->snapVisuals)
+  {
+    vis->SetVisible(false);
+  }
+
   if (this->dataPtr->lineVisual->GetVisible())
     this->dataPtr->lineVisual->SetVisible(false);
 
@@ -232,11 +256,6 @@ void TapeMeasure::OnMouseMoveEvent(const common::MouseEvent &_event)
   // Get the first visual
   auto vis = this->dataPtr->userCamera->GetVisual(_event.Pos());
 
-  // Get the first contact point
-//  ignition::math::Vector3d pos;
-//  bool hasContact = this->dataPtr->scene->FirstContact(this->dataPtr->userCamera,
-  //    _event.Pos(), pos);
-
   // Get the first triangle intercepted
   ignition::math::Vector3d pt;
   std::vector<ignition::math::Vector3d> triangle;
@@ -250,23 +269,33 @@ void TapeMeasure::OnMouseMoveEvent(const common::MouseEvent &_event)
   if (!triangle.empty() &&
       QApplication::keyboardModifiers() & Qt::ShiftModifier)
   {
-    ignition::math::Vector3d diff;
-    diff.X() = (triangle[0] - pt).Length();
-    diff.Y() = (triangle[1] - pt).Length();
-    diff.Z() = (triangle[2] - pt).Length();
+    this->dataPtr->snapPts.clear();
+    this->dataPtr->snapPts.push_back(triangle[0]);
+    this->dataPtr->snapPts.push_back(triangle[1]);
+    this->dataPtr->snapPts.push_back(triangle[2]);
+    this->dataPtr->snapPts.push_back((triangle[0] + triangle[1])/2.0);
+    this->dataPtr->snapPts.push_back((triangle[0] + triangle[2])/2.0);
+    this->dataPtr->snapPts.push_back((triangle[1] + triangle[2])/2.0);
 
-    if (diff[0] <= diff[1] && diff[0] <= diff[1])
-      pt = triangle[0];
-    else if (diff[1] <= diff[2])
-      pt = triangle[1];
-    else
-      pt = triangle[2];
+    std::vector<double> diff;
+    for (unsigned int i = 0; i < 6; ++i)
+    {
+      diff.push_back((this->dataPtr->snapPts[i] - pt).Length());
+    }
+
+    auto closestIdx = std::min_element(std::begin(diff), std::end(diff)) -
+        diff.begin();
+
+    pt = this->dataPtr->snapPts[closestIdx];
+  }
+  else
+  {
+    this->dataPtr->snapPts.clear();
   }
 
   if (pt != ignition::math::Vector3d::Zero)
   {
     this->dataPtr->hoverPt = pt;
-    this->dataPtr->hoverPtDirty = true;
     this->dataPtr->hoverVis = vis;
 
     if (!this->dataPtr->renderConnection)
@@ -281,35 +310,8 @@ void TapeMeasure::OnMouseMoveEvent(const common::MouseEvent &_event)
 
     this->dataPtr->hoverVis.reset();
     this->dataPtr->hoverPt = ignition::math::Vector3d::Zero;
-    this->dataPtr->hoverPtDirty = true;
   }
-
-  // While extending line
-  if (this->dataPtr->pointVisuals[0]->GetDepth() > 1 &&
-      this->dataPtr->pointVisuals[1]->GetDepth() < 2)
-  {
-    // Line
-    if (!this->dataPtr->lineVisual->GetVisible())
-      this->dataPtr->lineVisual->SetVisible(true);
-
-    this->dataPtr->lines->SetPoint(1, this->dataPtr->hoverPt);
-
-    // Text
-    if (!this->dataPtr->textVisual->GetVisible())
-      this->dataPtr->textVisual->SetVisible(true);
-
-    this->dataPtr->textVisual->SetPosition(
-        (this->dataPtr->lines->Point(0) +
-         this->dataPtr->lines->Point(1)) / 2.0);
-
-    auto length = (this->dataPtr->lines->Point(0) -
-        this->dataPtr->lines->Point(1)).Length();
-
-    std::ostringstream lengthStr;
-    lengthStr << std::fixed << std::setprecision(3) << length;
-
-    this->dataPtr->text.SetText(lengthStr.str() + "m");
-  }
+  this->dataPtr->hoverPtDirty = true;
 
   this->dataPtr->userCamera->HandleMouseEvent(_event);
 }
@@ -335,23 +337,73 @@ void TapeMeasure::Update()
   bool pt0Chosen = this->dataPtr->pointVisuals[0]->GetDepth() > 1;
   bool pt1Chosen = this->dataPtr->pointVisuals[1]->GetDepth() > 1;
 
-  // Highlight visual
+  // Highlight visuals
   if (this->dataPtr->hoverPtDirty)
   {
     if (this->dataPtr->hoverPt != ignition::math::Vector3d::Zero &&
         this->dataPtr->hoverVis && !pt1Chosen)
     {
-      // Set new point position
-      if (!this->dataPtr->highlightVis->GetVisible())
-        this->dataPtr->highlightVis->SetVisible(true);
+      // Highlight vis
+      auto pt =
+          this->dataPtr->hoverVis->GetWorldPose().Ign().Rot().Inverse() *
+          (this->dataPtr->hoverPt -
+          this->dataPtr->hoverVis->GetWorldPose().Ign().Pos());
 
-      this->dataPtr->highlightVis->SetWorldPosition(this->dataPtr->hoverPt);
+      if (this->dataPtr->highlightVis->GetParent())
+      {
+        this->dataPtr->highlightVis->GetParent()->DetachVisual(
+            this->dataPtr->highlightVis);
+      }
+      this->dataPtr->hoverVis->AttachVisual(
+          this->dataPtr->highlightVis);
+
+      this->dataPtr->highlightVis->SetPosition(
+          pt / this->dataPtr->hoverVis->GetScale().Ign());
+      this->dataPtr->lines->SetPoint(1, pt);
+      this->dataPtr->highlightVis->SetVisible(true);
+
+      // Snap visuals
+      if (!this->dataPtr->snapPts.empty())
+      {
+        for (unsigned int i = 0; i < 6; ++i)
+        {
+          if (this->dataPtr->snapPts[i] != this->dataPtr->hoverPt)
+          {
+            auto snapPt =
+                this->dataPtr->hoverVis->GetWorldPose().Ign().Rot().Inverse() *
+                (this->dataPtr->snapPts[i] -
+                this->dataPtr->hoverVis->GetWorldPose().Ign().Pos());
+
+            if (this->dataPtr->snapVisuals[i]->GetParent())
+            {
+              this->dataPtr->snapVisuals[i]->GetParent()->DetachVisual(
+                  this->dataPtr->snapVisuals[i]);
+            }
+            this->dataPtr->hoverVis->AttachVisual(
+                this->dataPtr->snapVisuals[i]);
+
+            this->dataPtr->snapVisuals[i]->SetPosition(
+                snapPt / this->dataPtr->hoverVis->GetScale().Ign());
+            this->dataPtr->snapVisuals[i]->SetVisible(true);
+          }
+          else
+            this->dataPtr->snapVisuals[i]->SetVisible(false);
+        }
+      }
+      else
+      {
+        for (unsigned int i = 0; i < 6; ++i)
+          this->dataPtr->snapVisuals[i]->SetVisible(false);
+      }
     }
     else
     {
       // turn off visualization if no visuals are hovered
       this->dataPtr->highlightVis->SetVisible(false);
+      for (unsigned int i = 0; i < 6; ++i)
+        this->dataPtr->snapVisuals[i]->SetVisible(false);
     }
+
     this->dataPtr->hoverPtDirty = false;
   }
 
@@ -361,9 +413,9 @@ void TapeMeasure::Update()
   {
     // convert to local coordinates relative to parent visual
     auto selectedPt =
-          this->dataPtr->selectedVis->GetWorldPose().Ign().Rot().Inverse() *
-          (this->dataPtr->selectedPt -
-          this->dataPtr->selectedVis->GetWorldPose().Ign().Pos());
+        this->dataPtr->selectedVis->GetWorldPose().Ign().Rot().Inverse() *
+        (this->dataPtr->selectedPt -
+        this->dataPtr->selectedVis->GetWorldPose().Ign().Pos());
 
     if (!pt0Chosen)
     {
@@ -381,7 +433,7 @@ void TapeMeasure::Update()
 
       this->dataPtr->pointVisuals[0]->SetVisible(true);
       this->dataPtr->pointVisuals[0]->SetPosition(selectedPt /
-          this->dataPtr->hoverVis->GetScale().Ign());
+          this->dataPtr->selectedVis->GetScale().Ign());
 
       this->dataPtr->lines->SetPoint(0, this->dataPtr->selectedPt);
     }
@@ -401,7 +453,7 @@ void TapeMeasure::Update()
 
       this->dataPtr->pointVisuals[1]->SetVisible(true);
       this->dataPtr->pointVisuals[1]->SetPosition(selectedPt /
-          this->dataPtr->hoverVis->GetScale().Ign());
+          this->dataPtr->selectedVis->GetScale().Ign());
 
       this->dataPtr->lines->SetPoint(1, this->dataPtr->selectedPt);
     }
@@ -419,6 +471,31 @@ void TapeMeasure::Update()
   {
     this->dataPtr->lines->SetPoint(1,
         this->dataPtr->pointVisuals[1]->GetWorldPose().Ign().Pos());
+  }
+
+  if (pt0Chosen && !pt1Chosen)
+  {
+    // Line
+    if (!this->dataPtr->lineVisual->GetVisible())
+      this->dataPtr->lineVisual->SetVisible(true);
+
+    this->dataPtr->lines->SetPoint(1, this->dataPtr->hoverPt);
+
+    // Text
+    if (!this->dataPtr->textVisual->GetVisible())
+      this->dataPtr->textVisual->SetVisible(true);
+
+    this->dataPtr->textVisual->SetPosition(
+        (this->dataPtr->lines->Point(0) +
+         this->dataPtr->lines->Point(1)) / 2.0);
+
+    auto length = (this->dataPtr->lines->Point(0) -
+        this->dataPtr->lines->Point(1)).Length();
+
+    std::ostringstream lengthStr;
+    lengthStr << std::fixed << std::setprecision(3) << length;
+
+    this->dataPtr->text.SetText(lengthStr.str() + "m");
   }
 
 
