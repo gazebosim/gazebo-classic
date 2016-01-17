@@ -58,6 +58,7 @@ namespace gazebo
     class JointVisual;
     class AxisVisual;
     class ArrowVisual;
+    class PointVisual;
     class ContactVisual;
     class COMVisual;
     class InertiaVisual;
@@ -146,6 +147,10 @@ namespace gazebo
     /// \def ArrowVisualPtr
     /// \brief Shared pointer to ArrowVisual
     typedef std::shared_ptr<ArrowVisual> ArrowVisualPtr;
+
+    /// \def PointVisualPtr
+    /// \brief Shared pointer to PointVisual
+    typedef std::shared_ptr<PointVisual> PointVisualPtr;
 
     /// \def AxisVisualPtr
     /// \brief Shared pointer to AxisVisual

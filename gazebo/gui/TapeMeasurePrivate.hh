@@ -59,7 +59,7 @@ namespace gazebo
       public: rendering::VisualPtr hoverVis;
 
       /// \brief Currently hovered visual.
-      public: rendering::VisualPtr highlightVis;
+      public: rendering::PointVisualPtr highlightVis;
 
       /// \brief Connection for the render event.
       public: event::ConnectionPtr renderConnection;
@@ -80,10 +80,10 @@ namespace gazebo
       public: rendering::MovableText text;
 
       /// \brief A visual to represent the hovered area.
-      public: std::vector<rendering::VisualPtr> pointVisuals;
+      public: std::vector<rendering::PointVisualPtr> pointVisuals;
 
       /// \brief A visual to represent the hovered area.
-      public: std::vector<rendering::VisualPtr> snapVisuals;
+      public: std::vector<rendering::PointVisualPtr> snapVisuals;
 
       /// \brief A visual to represent the hovered area.
       public: std::vector<ignition::math::Vector3d> snapPts;

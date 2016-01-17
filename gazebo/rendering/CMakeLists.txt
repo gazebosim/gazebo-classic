@@ -44,6 +44,7 @@ set (sources
   OrbitViewController.cc
   OriginVisual.cc
   OrthoViewController.cc
+  PointVisual.cc
   Projector.cc
   RayQuery.cc
   RenderEngine.cc
@@ -104,6 +105,7 @@ set (headers
   OrbitViewController.hh
   OriginVisual.hh
   OrthoViewController.hh
+  PointVisual.hh
   Projector.hh
   RayQuery.hh
   RenderEngine.hh

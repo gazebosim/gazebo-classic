@@ -21,7 +21,7 @@
 #include "gazebo/rendering/RenderEvents.hh"
 #include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/DynamicLines.hh"
-#include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/PointVisual.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Conversions.hh"
@@ -103,22 +103,23 @@ void TapeMeasure::Init()
 
   this->dataPtr->userCamera = cam;
   this->dataPtr->scene = cam->GetScene();
+  auto worldVis = this->dataPtr->scene->WorldVisual();;
 
   // Ray query to find mesh triangles
   this->dataPtr->rayQuery.reset(
       new rendering::RayQuery(this->dataPtr->userCamera));
 
+  ignition::math::Vector3d scale(0.5, 0.5, 0.5);
+
   // Highlight visual
-  this->dataPtr->highlightVis.reset(new rendering::Visual(
-      "_TAPEMEASURE_POINT_0_", this->dataPtr->scene, false));
+  this->dataPtr->highlightVis.reset(new rendering::PointVisual(
+      "_TAPEMEASURE_HIGHLIGHT_", worldVis));
 
   this->dataPtr->highlightVis->Load();
-  this->dataPtr->highlightVis->AttachMesh("unit_sphere");
-  this->dataPtr->highlightVis->SetScale(
-      ignition::math::Vector3d(0.05, 0.05, 0.05));
-  this->dataPtr->highlightVis->SetCastShadows(false);
+  this->dataPtr->highlightVis->SetScale(scale);
   this->dataPtr->highlightVis->SetMaterial("Gazebo/RedTransparent");
   this->dataPtr->highlightVis->SetVisible(false);
+  this->dataPtr->highlightVis->SetTransparency(0.5);
   this->dataPtr->highlightVis->SetVisibilityFlags(GZ_VISIBILITY_GUI);
   this->dataPtr->highlightVis->GetSceneNode()->setInheritScale(false);
 
@@ -126,16 +127,14 @@ void TapeMeasure::Init()
   for (int i = 0; i < 6; ++i)
   {
     std::string name = "_TAPEMEASURE_SNAP_" + std::to_string(i) + "_";
-    rendering::VisualPtr pointVis;
-    pointVis.reset(new rendering::Visual(name, this->dataPtr->scene, false));
+    rendering::PointVisualPtr pointVis;
+    pointVis.reset(new rendering::PointVisual(name, worldVis));
 
     pointVis->Load();
-    pointVis->AttachMesh("unit_sphere");
-    pointVis->SetScale(ignition::math::Vector3d(0.05, 0.05, 0.05));
-    pointVis->SetCastShadows(false);
+    pointVis->SetScale(scale);
     pointVis->SetMaterial("Gazebo/YellowTransparent");
     pointVis->SetVisible(false);
-    pointVis->SetTransparency(0.5);
+    pointVis->SetTransparency(0.8);
     pointVis->SetVisibilityFlags(GZ_VISIBILITY_GUI);
     pointVis->GetSceneNode()->setInheritScale(false);
     this->dataPtr->snapVisuals.push_back(pointVis);
@@ -145,15 +144,14 @@ void TapeMeasure::Init()
   for (int i = 0; i < 2; ++i)
   {
     std::string name = "_TAPEMEASURE_POINT_" + std::to_string(i) + "_";
-    rendering::VisualPtr pointVis;
-    pointVis.reset(new rendering::Visual(name, this->dataPtr->scene, false));
+    rendering::PointVisualPtr pointVis;
+    pointVis.reset(new rendering::PointVisual(name, worldVis));
 
     pointVis->Load();
-    pointVis->AttachMesh("unit_sphere");
-    pointVis->SetScale(ignition::math::Vector3d(0.05, 0.05, 0.05));
-    pointVis->SetCastShadows(false);
+    pointVis->SetScale(scale);
     pointVis->SetMaterial("Gazebo/BlueTransparent");
     pointVis->SetVisible(false);
+    pointVis->SetTransparency(0.5);
     pointVis->SetVisibilityFlags(GZ_VISIBILITY_GUI);
     pointVis->GetSceneNode()->setInheritScale(false);
     this->dataPtr->pointVisuals.push_back(pointVis);
