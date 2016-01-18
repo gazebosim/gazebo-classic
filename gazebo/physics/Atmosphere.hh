@@ -76,29 +76,6 @@ namespace gazebo
       /// \param[in] _msg Atmosphere message.
       protected: virtual void OnAtmosphereMsg(ConstAtmospherePtr &_msg);
 
-      /// \brief Set a parameter of the atmosphere model.
-      /// See SetParam documentation for descriptions of duplicate parameters.
-      /// \param[in] _key String key
-      /// \param[in] _value The value to set to
-      /// \return true if SetParam is successful, false if operation fails.
-      public: virtual bool SetParam(const std::string &_key,
-                  const boost::any &_value);
-
-      /// \brief Get an parameter of the physics model
-      /// \param[in] _key String key
-      /// \return The value of the parameter
-      /// \sa SetParam
-      public: virtual boost::any Param(const std::string &_key) const;
-
-      /// \brief Get a parameter from the physics model with a boolean to
-      /// indicate success or failure
-      /// \param[in] _key Key of the accessed param
-      /// \param[out] _value Value of the accessed param
-      /// \return True if the parameter was successfully retrieved
-      /// \sa SetParam
-      public: virtual bool Param(const std::string &_key,
-                  boost::any &_value) const;
-
       /// \brief Set the sea level temperature.
       /// \param[in] _t Temperature value in kelvins.
       public: virtual void SetTemperatureSL(const double _t);

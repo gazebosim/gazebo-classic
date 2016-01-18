@@ -49,17 +49,6 @@ namespace gazebo
       public: virtual std::string Type() const;
 
       // Documentation inherited
-      public: virtual bool SetParam(const std::string &_key,
-                            const boost::any &_value);
-
-      // Documentation inherited
-      public: virtual boost::any Param(const std::string &_key) const;
-
-      // Documentation inherited
-      public: virtual bool Param(const std::string &_key,
-                  boost::any &_value) const;
-
-      // Documentation inherited
       protected: virtual void OnRequest(ConstRequestPtr &_msg);
 
       // Documentation inherited

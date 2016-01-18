@@ -125,28 +125,6 @@ void AdiabaticAtmosphere::OnAtmosphereMsg(ConstAtmospherePtr &_msg)
 }
 
 //////////////////////////////////////////////////
-bool AdiabaticAtmosphere::SetParam(const std::string &_key,
-                                   const boost::any &_value)
-{
-  return Atmosphere::SetParam(_key, _value);
-}
-
-//////////////////////////////////////////////////
-boost::any AdiabaticAtmosphere::Param(const std::string &_key) const
-{
-  boost::any value;
-  this->Param(_key, value);
-  return value;
-}
-
-//////////////////////////////////////////////////
-bool AdiabaticAtmosphere::Param(const std::string &_key,
-                                   boost::any &_value) const
-{
-  return Atmosphere::Param(_key, _value);
-}
-
-//////////////////////////////////////////////////
 void AdiabaticAtmosphere::SetTemperatureSL(const double _temperature)
 {
   Atmosphere::SetTemperatureSL(_temperature);

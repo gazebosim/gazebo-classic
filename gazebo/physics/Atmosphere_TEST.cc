@@ -92,48 +92,24 @@ void AtmosphereTest::AtmosphereParam(const std::string &_atmosphere)
   // Test Atmosphere::[GS]etParam()
   {
     physics::AtmospherePtr atmosphere = world->Atmosphere();
-    boost::any temperature = atmosphere->Param("temperature");
-    EXPECT_DOUBLE_EQ(boost::any_cast<double>(temperature),
-      atmospherePubMsg.temperature());
-
-    EXPECT_NO_THROW(atmosphere->Param("fake_param_name"));
-    EXPECT_NO_THROW(atmosphere->SetParam("fake_param_name", 0));
-
-    // Try SetParam with wrong type
-    EXPECT_NO_THROW(atmosphere->SetParam("temperature", std::string("wrong")));
+    double temperature = atmosphere->TemperatureSL();
+    EXPECT_DOUBLE_EQ(temperature, atmospherePubMsg.temperature());
   }
 
-  {
-    // Test SetParam for non-implementation-specific parameters
-    physics::AtmospherePtr atmosphere = world->Atmosphere();
-    try
-    {
-      boost::any value;
-      double temperature = 0.02;
-      double pressure = 0.03;
-      double massDensity = 0.04;
-      double temperatureGradient = 0.05;
-      EXPECT_TRUE(atmosphere->SetParam("temperature", temperature));
-      EXPECT_TRUE(atmosphere->Param("temperature", value));
-      EXPECT_NEAR(boost::any_cast<double>(value), temperature, 1e-6);
-      EXPECT_TRUE(atmosphere->SetParam("pressure", pressure));
-      EXPECT_TRUE(atmosphere->Param("pressure", value));
-      EXPECT_NEAR(boost::any_cast<double>(value), pressure, 1e-6);
-      EXPECT_TRUE(atmosphere->SetParam("mass_density", massDensity));
-      EXPECT_TRUE(atmosphere->Param("mass_density", value));
-      EXPECT_NEAR(boost::any_cast<double>(value), massDensity, 1e-6);
-      EXPECT_TRUE(atmosphere->SetParam("temperature_gradient",
-                  temperatureGradient));
-      EXPECT_TRUE(atmosphere->Param("temperature_gradient", value));
-      EXPECT_NEAR(boost::any_cast<double>(value), temperatureGradient, 1e-6);
-    }
-    catch(boost::bad_any_cast &_e)
-    {
-      std::cout << "Bad any_cast in Atmosphere::SetParam test: " << _e.what()
-                << std::endl;
-      FAIL();
-    }
-  }
+  // Test SetParam for non-implementation-specific parameters
+  physics::AtmospherePtr atmosphere = world->Atmosphere();
+  double temperature = 0.02;
+  double pressure = 0.03;
+  double massDensity = 0.04;
+  double temperatureGradient = 0.05;
+  atmosphere->SetTemperatureSL(temperature);
+  EXPECT_NEAR(atmosphere->TemperatureSL(), temperature, 1e-6);
+  atmosphere->SetPressureSL(pressure);
+  EXPECT_NEAR(atmosphere->PressureSL(), pressure, 1e-6);
+  atmosphere->SetMassDensitySL(massDensity);
+  EXPECT_NEAR(atmosphere->MassDensitySL(), massDensity, 1e-6);
+  atmosphere->SetTemperatureGradientSL(temperatureGradient);
+  EXPECT_NEAR(atmosphere->TemperatureGradientSL(), temperatureGradient, 1e-6);
 
   atmosphereNode->Fini();
 }
@@ -154,22 +130,12 @@ void AtmosphereTest::AtmosphereParamBool
 
   physics::AtmospherePtr atmosphere = world->Atmosphere();
 
-  // Initialize to failure conditions
-  boost::any value;
-
   // Test shared atmosphere model parameter(s)
-  EXPECT_TRUE(atmosphere->Param("temperature", value));
-  EXPECT_NEAR(boost::any_cast<double>(value), 288.15, 1e-6);
-  EXPECT_TRUE(atmosphere->Param("mass_density", value));
-  EXPECT_NEAR(boost::any_cast<double>(value), 1.225, 1e-6);
-  EXPECT_TRUE(atmosphere->Param("pressure", value));
-  EXPECT_NEAR(boost::any_cast<double>(value), 101325, 1e-6);
-  EXPECT_TRUE(atmosphere->Param("temperature_gradient", value));
-  EXPECT_NEAR(boost::any_cast<double>(value), -0.0065, 1e-6);
-  EXPECT_TRUE(atmosphere->Param("type", value));
-  EXPECT_EQ(boost::any_cast<std::string>(value), _atmosphere);
-
-  EXPECT_FALSE(atmosphere->Param("param_does_not_exist", value));
+  EXPECT_NEAR(atmosphere->TemperatureSL(), 288.15, 1e-6);
+  EXPECT_NEAR(atmosphere->MassDensitySL(), 1.225, 1e-6);
+  EXPECT_NEAR(atmosphere->PressureSL(), 101325, 1e-6);
+  EXPECT_NEAR(atmosphere->TemperatureGradientSL(), -0.0065, 1e-6);
+  EXPECT_EQ(atmosphere->Type(), _atmosphere);
 }
 
 /////////////////////////////////////////////////

@@ -46,10 +46,10 @@ Atmosphere::Atmosphere(WorldPtr _world)
   : dataPtr(new AtmospherePrivate)
 {
   this->dataPtr->world = _world;
-  this->dataPtr->temperatureSL = 0;
-  this->dataPtr->temperatureGradientSL = 0;
-  this->dataPtr->pressureSL = 0;
-  this->dataPtr->massDensitySL = 0;
+  this->dataPtr->temperatureSL = 288.15;
+  this->dataPtr->temperatureGradientSL = -0.0065;
+  this->dataPtr->pressureSL = 101325;
+  this->dataPtr->massDensitySL = 1.225;
 
   this->dataPtr->sdf.reset(new sdf::Element);
   sdf::initFile("atmosphere.sdf", this->dataPtr->sdf);
@@ -117,77 +117,6 @@ void Atmosphere::OnAtmosphereMsg(ConstAtmospherePtr &/*_msg*/)
 }
 
 //////////////////////////////////////////////////
-bool Atmosphere::SetParam(const std::string &_key,
-    const boost::any &_value)
-{
-  try
-  {
-    if (_key == "type")
-    {
-      // Cannot set atmosphere model type from SetParam
-      return false;
-    }
-    if (_key == "temperature")
-      this->SetTemperatureSL(boost::any_cast<double>(_value));
-    else if (_key == "pressure")
-      this->SetPressureSL(boost::any_cast<double>(_value));
-    else if (_key == "mass_density")
-      this->SetMassDensitySL(boost::any_cast<double>(_value));
-    else if (_key == "temperature_gradient")
-      this->SetTemperatureGradientSL(boost::any_cast<double>(_value));
-    else
-    {
-      gzwarn << "SetParam failed for [" << _key << "] in atmosphere model "
-             << this->Type() << std::endl;
-      return false;
-    }
-  }
-  catch(boost::bad_any_cast &_e)
-  {
-    gzerr << "Caught bad any_cast in Atmosphere::SetParam: " << _e.what()
-          << std::endl;
-    return false;
-  }
-  catch(boost::bad_lexical_cast &_e)
-  {
-    gzerr << "Caught bad lexical_cast in Atmosphere::SetParam: "
-          << _e.what() << std::endl;
-    return false;
-  }
-  return true;
-}
-
-//////////////////////////////////////////////////
-boost::any Atmosphere::Param(const std::string &/*_key*/) const
-{
-  return 0;
-}
-
-//////////////////////////////////////////////////
-bool Atmosphere::Param(const std::string &_key,
-    boost::any &_value) const
-{
-  if (_key == "type")
-    _value = this->Type();
-  else if (_key == "temperature")
-    _value = this->TemperatureSL();
-  else if (_key == "pressure")
-    _value = this->PressureSL();
-  else if (_key == "mass_density")
-    _value = this->MassDensitySL();
-  else if (_key == "temperature_gradient")
-    _value = this->TemperatureGradientSL();
-  else
-  {
-    gzwarn << "Param failed for [" << _key << "] in atmosphere model "
-           << this->Type() << std::endl;
-    return false;
-  }
-
-  return true;
-}
-
-//////////////////////////////////////////////////
 void Atmosphere::SetTemperatureSL(const double _temperature)
 {
   this->dataPtr->temperatureSL = _temperature;
@@ -208,7 +137,7 @@ void Atmosphere::SetPressureSL(const double _pressure)
 //////////////////////////////////////////////////
 double Atmosphere::TemperatureSL() const
 {
-  return this->Temperature(0.0);
+  return this->dataPtr->temperatureSL;
 }
 
 //////////////////////////////////////////////////
@@ -220,13 +149,13 @@ void Atmosphere::SetMassDensitySL(const double _massDensity)
 //////////////////////////////////////////////////
 double Atmosphere::PressureSL() const
 {
-  return this->Pressure(0.0);
+  return this->dataPtr->pressureSL;
 }
 
 //////////////////////////////////////////////////
 double Atmosphere::MassDensitySL() const
 {
-  return this->MassDensity(0.0);
+  return this->dataPtr->massDensitySL;
 }
 
 //////////////////////////////////////////////////
