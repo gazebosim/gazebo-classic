@@ -58,7 +58,7 @@ namespace gazebo
       /// \brief Finilize the atmosphere model.
       public: virtual void Fini();
 
-      /// \brief Rest the atmosphere model.
+      /// \brief Reset the atmosphere model.
       public: virtual void Reset() {}
 
       /// \brief Return the atmosphere model type (adiabatic).
@@ -86,9 +86,9 @@ namespace gazebo
                   const boost::any &_value);
 
       /// \brief Get an parameter of the physics model
-      /// \param[in] _attr String key
-      /// \sa SetParam
+      /// \param[in] _key String key
       /// \return The value of the parameter
+      /// \sa SetParam
       public: virtual boost::any Param(const std::string &_key) const;
 
       /// \brief Get a parameter from the physics model with a boolean to
@@ -96,6 +96,7 @@ namespace gazebo
       /// \param[in] _key Key of the accessed param
       /// \param[out] _value Value of the accessed param
       /// \return True if the parameter was successfully retrieved
+      /// \sa SetParam
       public: virtual bool Param(const std::string &_key,
                   boost::any &_value) const;
 
@@ -108,6 +109,7 @@ namespace gazebo
       public: virtual void SetPressureSL(const double _pressure) = 0;
 
       /// \brief Set the mass density of the air at sea level
+      /// \param[in] _massDensity Mass density of the air in kg/m^3.
       public: virtual void SetMassDensitySL(const double _massDensity) = 0;
 
       /// \brief Get the actual modeled temperature in kelvins at a given
