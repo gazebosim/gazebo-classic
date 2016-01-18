@@ -84,10 +84,6 @@ using namespace gui;
 
 extern bool g_fullscreen;
 
-// This makes it possible to use std::string in QT signals and slots.
-// qRegisterMetaType is also required, see below.
-Q_DECLARE_METATYPE(std::string)
-
 /////////////////////////////////////////////////
 MainWindow::MainWindow()
   : renderWidget(0)
@@ -229,10 +225,6 @@ MainWindow::MainWindow()
 
   // Create a pointer to the space navigator interface
   this->spacenav = new SpaceNav();
-
-  // Register std::string as a type that can be used in signals and slots.
-  // Q_DECLARE_METATYPE is also required, see above.
-  qRegisterMetaType<std::string>();
 
   // Use a signal/slot to load plugins. This makes the process thread safe.
   connect(this, SIGNAL(AddPlugins()),
