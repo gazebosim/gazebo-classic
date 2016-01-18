@@ -69,11 +69,6 @@ Atmosphere::Atmosphere(WorldPtr _world, AtmospherePrivate &_dataPtr)
 //////////////////////////////////////////////////
 Atmosphere::~Atmosphere()
 {
-  this->dataPtr->sdf->Reset();
-  this->dataPtr->sdf.reset();
-  this->dataPtr->responsePub.reset();
-  this->dataPtr->requestSub.reset();
-  this->dataPtr->node.reset();
 }
 
 //////////////////////////////////////////////////
