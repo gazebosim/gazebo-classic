@@ -139,7 +139,7 @@ namespace gazebo
 
       /// \brief Get the sea level density in kg/m^3
       /// \return Density in kg/m^3 at sea level.
-      public: virtual double MassDensitySL(void) const;
+      public: virtual double MassDensitySL() const;
 
       /// \brief Set the temperature gradient dT/dZ around sea level
       /// \param[in] _gradient Value of the temperature gradient dT/dZ around

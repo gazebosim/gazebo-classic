@@ -201,7 +201,7 @@ double Atmosphere::PressureSL() const
 }
 
 //////////////////////////////////////////////////
-double Atmosphere::MassDensitySL(void) const
+double Atmosphere::MassDensitySL() const
 {
   return this->MassDensity(0.0);
 }

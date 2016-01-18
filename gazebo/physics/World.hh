@@ -307,7 +307,7 @@ namespace gazebo
 
       /// \brief check if atmosphere model is enabled/disabled.
       /// \param True if the atmosphere model is enabled.
-      public: bool EnableAtmosphere();
+      public: bool EnableAtmosphere() const;
 
       /// \brief enable/disable atmosphere model.
       /// \param[in] _enable True to enable the atmosphere model.
