@@ -15,8 +15,13 @@
  *
 */
 
-#ifndef _GAZEBO_PHYSICCS_ATMOSPHEREPRIVATE_HH_
-#define _GAZEBO_PHYSICCS_ATMOSPHEREPRIVATE_HH_
+#ifndef _GAZEBO_PHYSICS_ATMOSPHEREPRIVATE_HH_
+#define _GAZEBO_PHYSICS_ATMOSPHEREPRIVATE_HH_
+
+#include <sdf/sdf.hh>
+
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/transport/TransportTypes.hh"
 
 namespace gazebo
 {

@@ -17,9 +17,10 @@
 #ifndef _GAZEBO_PHYSICS_ATMOSPHERE_HH_
 #define _GAZEBO_PHYSICS_ATMOSPHERE_HH_
 
+#include <boost/any.hpp>
 #include <string>
+#include <memory>
 
-#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/physics/PhysicsTypes.hh"
