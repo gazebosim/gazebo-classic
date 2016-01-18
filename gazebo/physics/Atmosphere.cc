@@ -42,8 +42,8 @@ using namespace physics;
 /// interface to any derived atmosphere models.
 
 //////////////////////////////////////////////////
-Atmosphere::Atmosphere(WorldPtr _world, AtmospherePrivate &_dataPtr)
-  : dataPtr(&_dataPtr)
+Atmosphere::Atmosphere(WorldPtr _world)
+  : dataPtr(new AtmospherePrivate)
 {
   this->dataPtr->world = _world;
   this->dataPtr->temperatureSL = 0;
@@ -76,17 +76,21 @@ void Atmosphere::Load(sdf::ElementPtr _sdf)
 {
   this->dataPtr->sdf->Copy(_sdf);
 
-  this->dataPtr->temperatureSL =
-      this->dataPtr->sdf->GetElement("temperature")->Get<double>();
+  if (this->dataPtr->sdf->HasElement("temperature"))
+    this->dataPtr->temperatureSL =
+        this->dataPtr->sdf->GetElement("temperature")->Get<double>();
 
-  this->dataPtr->temperatureGradientSL =
-      this->dataPtr->sdf->GetElement("temperature_gradient")->Get<double>();
+  if (this->dataPtr->sdf->HasElement("temperature_gradient"))
+    this->dataPtr->temperatureGradientSL =
+        this->dataPtr->sdf->GetElement("temperature_gradient")->Get<double>();
 
-  this->dataPtr->pressureSL =
-      this->dataPtr->sdf->GetElement("pressure")->Get<double>();
+  if (this->dataPtr->sdf->HasElement("pressure"))
+    this->dataPtr->pressureSL =
+        this->dataPtr->sdf->GetElement("pressure")->Get<double>();
 
-  this->dataPtr->massDensitySL =
-      this->dataPtr->sdf->GetElement("mass_density")->Get<double>();
+  if (this->dataPtr->sdf->HasElement("mass_density"))
+    this->dataPtr->massDensitySL =
+        this->dataPtr->sdf->GetElement("mass_density")->Get<double>();
 }
 
 //////////////////////////////////////////////////
@@ -184,9 +188,33 @@ bool Atmosphere::Param(const std::string &_key,
 }
 
 //////////////////////////////////////////////////
+void Atmosphere::SetTemperatureSL(const double _temperature)
+{
+  this->dataPtr->temperatureSL = _temperature;
+}
+
+//////////////////////////////////////////////////
+void Atmosphere::SetTemperatureGradientSL(const double _gradient)
+{
+  this->dataPtr->temperatureGradientSL = _gradient;
+}
+
+//////////////////////////////////////////////////
+void Atmosphere::SetPressureSL(const double _pressure)
+{
+  this->dataPtr->pressureSL = _pressure;
+}
+
+//////////////////////////////////////////////////
 double Atmosphere::TemperatureSL() const
 {
   return this->Temperature(0.0);
+}
+
+//////////////////////////////////////////////////
+void Atmosphere::SetMassDensitySL(const double _massDensity)
+{
+  this->dataPtr->massDensitySL = _massDensity;
 }
 
 //////////////////////////////////////////////////
@@ -205,4 +233,16 @@ double Atmosphere::MassDensitySL() const
 double Atmosphere::TemperatureGradientSL() const
 {
   return this->dataPtr->temperatureGradientSL;
+}
+
+//////////////////////////////////////////////////
+WorldPtr Atmosphere::World() const
+{
+  return this->dataPtr->world;
+}
+
+//////////////////////////////////////////////////
+void Atmosphere::Publish(const msgs::Response &_msg) const
+{
+  this->dataPtr->responsePub->Publish(_msg);
 }

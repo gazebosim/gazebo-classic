@@ -42,8 +42,7 @@ namespace gazebo
     {
       /// \brief Default constructor.
       /// \param[in] _world Pointer to the world.
-      /// \param[in] _dataPtr Pointer to private data.
-      public: explicit Atmosphere(WorldPtr _world, AtmospherePrivate &_dataPtr);
+      public: explicit Atmosphere(WorldPtr _world);
 
       /// \brief Destructor.
       public: virtual ~Atmosphere();
@@ -102,15 +101,15 @@ namespace gazebo
 
       /// \brief Set the sea level temperature.
       /// \param[in] _t Temperature value in kelvins.
-      public: virtual void SetTemperatureSL(const double _t) = 0;
+      public: virtual void SetTemperatureSL(const double _t);
 
       /// \brief Set the sea level pressure.
       /// \param[in] _pressure Pressure in pascals.
-      public: virtual void SetPressureSL(const double _pressure) = 0;
+      public: virtual void SetPressureSL(const double _pressure);
 
       /// \brief Set the mass density of the air at sea level
       /// \param[in] _massDensity Mass density of the air in kg/m^3.
-      public: virtual void SetMassDensitySL(const double _massDensity) = 0;
+      public: virtual void SetMassDensitySL(const double _massDensity);
 
       /// \brief Get the actual modeled temperature in kelvins at a given
       /// altitude.
@@ -150,9 +149,18 @@ namespace gazebo
       /// \return Temperature gradient at sea level.
       public: virtual double TemperatureGradientSL() const;
 
+      /// \brief Return the world.
+      /// Get a pointer to the world.
+      /// \return Pointer to the world.
+      protected: WorldPtr World() const;
+
+      /// \brief Publish response.
+      /// Publish response to a request.
+      protected: void Publish(const msgs::Response &_msg) const;
+
       /// \internal
       /// \brief Private data pointer.
-      protected: std::unique_ptr<AtmospherePrivate> dataPtr;
+      private: std::unique_ptr<AtmospherePrivate> dataPtr;
     };
     /// \}
   }

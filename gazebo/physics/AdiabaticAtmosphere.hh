@@ -25,6 +25,9 @@ namespace gazebo
 {
   namespace physics
   {
+    /// Forward declare private data class.
+    class AdiabaticAtmospherePrivate;
+
     /// \brief Adiabatic atmosphere model.
     /// Models the adiabatic atmosphere.
     class GZ_PHYSICS_VISIBLE AdiabaticAtmosphere : public Atmosphere
@@ -88,6 +91,10 @@ namespace gazebo
 
       /// \brief Universal ideal gas constant in J/(mol.K)
       public: static const double IDEAL_GAS_CONSTANT_R;
+
+      /// \internal
+      /// \brief Private data pointer.
+      protected: std::unique_ptr<AdiabaticAtmospherePrivate> dataPtr;
     };
   }
 }

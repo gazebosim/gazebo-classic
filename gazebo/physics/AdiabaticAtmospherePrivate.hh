@@ -24,7 +24,7 @@ namespace gazebo
 {
   namespace physics
   {
-    class AdiabaticAtmospherePrivate : public AtmospherePrivate
+    class AdiabaticAtmospherePrivate
     {
       /// \brief Adiabatic atmosphere power parameter.
       public: double adiabaticPower;
