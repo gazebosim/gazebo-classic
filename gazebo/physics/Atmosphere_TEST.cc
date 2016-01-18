@@ -92,7 +92,7 @@ void AtmosphereTest::AtmosphereParam(const std::string &_atmosphere)
   // Test Atmosphere::[GS]etParam()
   {
     physics::AtmospherePtr atmosphere = world->Atmosphere();
-    double temperature = atmosphere->TemperatureSL();
+    double temperature = atmosphere->Temperature();
     EXPECT_DOUBLE_EQ(temperature, atmospherePubMsg.temperature());
   }
 
@@ -102,14 +102,14 @@ void AtmosphereTest::AtmosphereParam(const std::string &_atmosphere)
   double pressure = 0.03;
   double massDensity = 0.04;
   double temperatureGradient = 0.05;
-  atmosphere->SetTemperatureSL(temperature);
-  EXPECT_NEAR(atmosphere->TemperatureSL(), temperature, 1e-6);
-  atmosphere->SetPressureSL(pressure);
-  EXPECT_NEAR(atmosphere->PressureSL(), pressure, 1e-6);
-  atmosphere->SetMassDensitySL(massDensity);
-  EXPECT_NEAR(atmosphere->MassDensitySL(), massDensity, 1e-6);
-  atmosphere->SetTemperatureGradientSL(temperatureGradient);
-  EXPECT_NEAR(atmosphere->TemperatureGradientSL(), temperatureGradient, 1e-6);
+  atmosphere->SetTemperature(temperature);
+  EXPECT_NEAR(atmosphere->Temperature(), temperature, 1e-6);
+  atmosphere->SetPressure(pressure);
+  EXPECT_NEAR(atmosphere->Pressure(), pressure, 1e-6);
+  atmosphere->SetMassDensity(massDensity);
+  EXPECT_NEAR(atmosphere->MassDensity(), massDensity, 1e-6);
+  atmosphere->SetTemperatureGradient(temperatureGradient);
+  EXPECT_NEAR(atmosphere->TemperatureGradient(), temperatureGradient, 1e-6);
 
   atmosphereNode->Fini();
 }
@@ -131,10 +131,10 @@ void AtmosphereTest::AtmosphereParamBool
   physics::AtmospherePtr atmosphere = world->Atmosphere();
 
   // Test shared atmosphere model parameter(s)
-  EXPECT_NEAR(atmosphere->TemperatureSL(), 288.15, 1e-6);
-  EXPECT_NEAR(atmosphere->MassDensitySL(), 1.225, 1e-6);
-  EXPECT_NEAR(atmosphere->PressureSL(), 101325, 1e-6);
-  EXPECT_NEAR(atmosphere->TemperatureGradientSL(), -0.0065, 1e-6);
+  EXPECT_NEAR(atmosphere->Temperature(), 288.15, 1e-6);
+  EXPECT_NEAR(atmosphere->MassDensity(), 1.225, 1e-6);
+  EXPECT_NEAR(atmosphere->Pressure(), 101325, 1e-6);
+  EXPECT_NEAR(atmosphere->TemperatureGradient(), -0.0065, 1e-6);
   EXPECT_EQ(atmosphere->Type(), _atmosphere);
 }
 

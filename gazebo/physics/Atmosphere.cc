@@ -46,10 +46,10 @@ Atmosphere::Atmosphere(WorldPtr _world)
   : dataPtr(new AtmospherePrivate)
 {
   this->dataPtr->world = _world;
-  this->dataPtr->temperatureSL = 288.15;
-  this->dataPtr->temperatureGradientSL = -0.0065;
-  this->dataPtr->pressureSL = 101325;
-  this->dataPtr->massDensitySL = 1.225;
+  this->dataPtr->temperature = 288.15;
+  this->dataPtr->temperatureGradient = -0.0065;
+  this->dataPtr->pressure = 101325;
+  this->dataPtr->massDensity = 1.225;
 
   this->dataPtr->sdf.reset(new sdf::Element);
   sdf::initFile("atmosphere.sdf", this->dataPtr->sdf);
@@ -77,19 +77,19 @@ void Atmosphere::Load(sdf::ElementPtr _sdf)
   this->dataPtr->sdf->Copy(_sdf);
 
   if (this->dataPtr->sdf->HasElement("temperature"))
-    this->dataPtr->temperatureSL =
+    this->dataPtr->temperature =
         this->dataPtr->sdf->GetElement("temperature")->Get<double>();
 
   if (this->dataPtr->sdf->HasElement("temperature_gradient"))
-    this->dataPtr->temperatureGradientSL =
+    this->dataPtr->temperatureGradient =
         this->dataPtr->sdf->GetElement("temperature_gradient")->Get<double>();
 
   if (this->dataPtr->sdf->HasElement("pressure"))
-    this->dataPtr->pressureSL =
+    this->dataPtr->pressure =
         this->dataPtr->sdf->GetElement("pressure")->Get<double>();
 
   if (this->dataPtr->sdf->HasElement("mass_density"))
-    this->dataPtr->massDensitySL =
+    this->dataPtr->massDensity =
         this->dataPtr->sdf->GetElement("mass_density")->Get<double>();
 }
 
@@ -117,51 +117,51 @@ void Atmosphere::OnAtmosphereMsg(ConstAtmospherePtr &/*_msg*/)
 }
 
 //////////////////////////////////////////////////
-void Atmosphere::SetTemperatureSL(const double _temperature)
+void Atmosphere::SetTemperature(const double _temperature)
 {
-  this->dataPtr->temperatureSL = _temperature;
+  this->dataPtr->temperature = _temperature;
 }
 
 //////////////////////////////////////////////////
-void Atmosphere::SetTemperatureGradientSL(const double _gradient)
+void Atmosphere::SetTemperatureGradient(const double _gradient)
 {
-  this->dataPtr->temperatureGradientSL = _gradient;
+  this->dataPtr->temperatureGradient = _gradient;
 }
 
 //////////////////////////////////////////////////
-void Atmosphere::SetPressureSL(const double _pressure)
+void Atmosphere::SetPressure(const double _pressure)
 {
-  this->dataPtr->pressureSL = _pressure;
+  this->dataPtr->pressure = _pressure;
 }
 
 //////////////////////////////////////////////////
-double Atmosphere::TemperatureSL() const
+double Atmosphere::Temperature() const
 {
-  return this->dataPtr->temperatureSL;
+  return this->dataPtr->temperature;
 }
 
 //////////////////////////////////////////////////
-void Atmosphere::SetMassDensitySL(const double _massDensity)
+void Atmosphere::SetMassDensity(const double _massDensity)
 {
-  this->dataPtr->massDensitySL = _massDensity;
+  this->dataPtr->massDensity = _massDensity;
 }
 
 //////////////////////////////////////////////////
-double Atmosphere::PressureSL() const
+double Atmosphere::Pressure() const
 {
-  return this->dataPtr->pressureSL;
+  return this->dataPtr->pressure;
 }
 
 //////////////////////////////////////////////////
-double Atmosphere::MassDensitySL() const
+double Atmosphere::MassDensity() const
 {
-  return this->dataPtr->massDensitySL;
+  return this->dataPtr->massDensity;
 }
 
 //////////////////////////////////////////////////
-double Atmosphere::TemperatureGradientSL() const
+double Atmosphere::TemperatureGradient() const
 {
-  return this->dataPtr->temperatureGradientSL;
+  return this->dataPtr->temperatureGradient;
 }
 
 //////////////////////////////////////////////////

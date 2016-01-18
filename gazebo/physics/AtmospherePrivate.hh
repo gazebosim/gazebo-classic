@@ -48,16 +48,16 @@ namespace gazebo
       public: transport::SubscriberPtr requestSub;
 
       /// \brief Temperature at sea level in kelvins.
-      public: double temperatureSL;
+      public: double temperature;
 
       /// \brief Temperature gradient at sea level in K/m.
-      public: double temperatureGradientSL;
+      public: double temperatureGradient;
 
       /// \brief Pressure of the air at sea level in pascals.
-      public: double pressureSL;
+      public: double pressure;
 
       /// \brief Mass density of the air at sea level in kg/m^3.
-      public: double massDensitySL;
+      public: double massDensity;
     };
   }
 }

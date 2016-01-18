@@ -69,7 +69,7 @@ void AdiabaticAtmosphere::Init(void)
 
   dPtr->adiabaticPower = MOLAR_MASS *
       -this->World()->GetPhysicsEngine()->GetGravity().z /
-      (this->TemperatureGradientSL() * IDEAL_GAS_CONSTANT_R);
+      (Atmosphere::TemperatureGradient() * IDEAL_GAS_CONSTANT_R);
 }
 
 //////////////////////////////////////////////////
@@ -93,9 +93,9 @@ void AdiabaticAtmosphere::OnRequest(ConstRequestPtr &_msg)
     atmosphereMsg.set_type(msgs::Atmosphere::ADIABATIC);
     atmosphereMsg.set_enable_atmosphere(
             this->World()->EnableAtmosphere());
-    atmosphereMsg.set_temperature(this->TemperatureSL());
-    atmosphereMsg.set_pressure(this->PressureSL());
-    atmosphereMsg.set_mass_density(this->MassDensitySL());
+    atmosphereMsg.set_temperature(Atmosphere::Temperature());
+    atmosphereMsg.set_pressure(Atmosphere::Pressure());
+    atmosphereMsg.set_mass_density(Atmosphere::MassDensity());
 
     response.set_type(atmosphereMsg.GetTypeName());
     atmosphereMsg.SerializeToString(serializedData);
@@ -115,62 +115,62 @@ void AdiabaticAtmosphere::OnAtmosphereMsg(ConstAtmospherePtr &_msg)
     this->World()->EnableAtmosphere(_msg->enable_atmosphere());
 
   if (_msg->has_temperature())
-    this->SetTemperatureSL(_msg->temperature());
+    this->SetTemperature(_msg->temperature());
 
   if (_msg->has_pressure())
-    this->SetPressureSL(_msg->pressure());
+    this->SetPressure(_msg->pressure());
 
   if (_msg->has_mass_density())
-    this->SetMassDensitySL(_msg->mass_density());
+    this->SetMassDensity(_msg->mass_density());
 }
 
 //////////////////////////////////////////////////
-void AdiabaticAtmosphere::SetTemperatureSL(const double _temperature)
+void AdiabaticAtmosphere::SetTemperature(const double _temperature)
 {
-  Atmosphere::SetTemperatureSL(_temperature);
+  Atmosphere::SetTemperature(_temperature);
 }
 
 //////////////////////////////////////////////////
-void AdiabaticAtmosphere::SetTemperatureGradientSL(const double _gradient)
+void AdiabaticAtmosphere::SetTemperatureGradient(const double _gradient)
 {
-  Atmosphere::SetTemperatureGradientSL(_gradient);
+  Atmosphere::SetTemperatureGradient(_gradient);
   this->Init();
 }
 
 //////////////////////////////////////////////////
-void AdiabaticAtmosphere::SetPressureSL(const double _pressure)
+void AdiabaticAtmosphere::SetPressure(const double _pressure)
 {
-  Atmosphere::SetPressureSL(_pressure);
+  Atmosphere::SetPressure(_pressure);
 }
 
 //////////////////////////////////////////////////
-void AdiabaticAtmosphere::SetMassDensitySL(const double _massDensity)
+void AdiabaticAtmosphere::SetMassDensity(const double _massDensity)
 {
-  Atmosphere::SetMassDensitySL(_massDensity);
+  Atmosphere::SetMassDensity(_massDensity);
 }
 
 //////////////////////////////////////////////////
 double AdiabaticAtmosphere::Temperature(const double _altitude) const
 {
-  double temperature = this->TemperatureSL() +
-      this->TemperatureGradientSL() * _altitude;
+  double temperature = Atmosphere::Temperature() +
+      Atmosphere::TemperatureGradient() * _altitude;
   return temperature;
 }
 
 //////////////////////////////////////////////////
 double AdiabaticAtmosphere::Pressure(const double _altitude) const
 {
-  double pressure = this->PressureSL() *
-      pow(1 - (this->TemperatureGradientSL() * _altitude) /
-          this->TemperatureSL(), this->dataPtr->adiabaticPower);
+  double pressure = Atmosphere::Pressure() *
+      pow(1 - (Atmosphere::TemperatureGradient() * _altitude) /
+          Atmosphere::Temperature(), this->dataPtr->adiabaticPower);
   return pressure;
 }
 
 //////////////////////////////////////////////////
 double AdiabaticAtmosphere::MassDensity(const double _altitude) const
 {
-  double massDensity = this->MassDensitySL() *
-      pow(1 + (this->TemperatureGradientSL() * _altitude) /
-          this->TemperatureSL(), this->dataPtr->adiabaticPower - 1);
+  double massDensity = Atmosphere::MassDensity() *
+      pow(1 + (Atmosphere::TemperatureGradient() * _altitude) /
+          Atmosphere::Temperature(), this->dataPtr->adiabaticPower - 1);
   return massDensity;
 }
