@@ -325,3 +325,12 @@ unsigned int MultiRayShape::RayCount() const
 {
   return this->rays.size();
 }
+
+//////////////////////////////////////////////////
+RayShapePtr MultiRayShape::Ray(const unsigned int _rayIndex) const
+{
+  if (_rayIndex < this->rays.size())
+    return this->rays[_rayIndex];
+  else
+    return RayShapePtr();
+}

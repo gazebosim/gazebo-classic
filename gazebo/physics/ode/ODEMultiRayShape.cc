@@ -197,6 +197,7 @@ void ODEMultiRayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
         //      << "\n";
         shape->SetLength(contact.depth);
         shape->SetRetro(hitCollision->GetLaserRetro());
+        shape->SetCollisionName(hitCollision->GetScopedName());
       }
     }
   }

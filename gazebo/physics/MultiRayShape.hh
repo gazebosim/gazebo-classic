@@ -168,6 +168,12 @@ namespace gazebo
       /// \return Number of rays in this shape.
       public: unsigned int RayCount() const;
 
+      /// \brief Get a pointer to a ray
+      /// \param[in] _rayIndex index to the ray
+      /// \return Pointer to the ray, or NULL on error
+      /// \sa RayCount()
+      public: RayShapePtr Ray(const unsigned int _rayIndex) const;
+
       /// \brief Ray data
       protected: std::vector<RayShapePtr> rays;
 
