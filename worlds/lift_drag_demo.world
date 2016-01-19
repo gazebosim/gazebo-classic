@@ -33,18 +33,26 @@
     <!-- Load the plugin for the wind -->
     <plugin name="wind" filename="libWindPlugin.so">
       <magnitude>
-        <time_for_rise>1</time_for_rise>
+        <time_for_rise>10</time_for_rise>
         <sin>
-          <amplitude_percent>0</amplitude_percent>
-          <period>1</period>
+          <amplitude_percent>0.05</amplitude_percent>
+          <period>60</period>
         </sin>
+        <noise type="gaussian">
+         <mean>0</mean>
+         <stddev>0.0002</stddev>
+        </noise>
       </magnitude>
       <direction>
-        <time_for_rise>1</time_for_rise>
+        <time_for_rise>30</time_for_rise>
         <sin>
-          <amplitude>0</amplitude>
-          <period>0</period>
+          <amplitude>5</amplitude>
+          <period>20</period>
         </sin>
+        <noise type="gaussian">
+         <mean>0</mean>
+         <stddev>0.03</stddev>
+        </noise>
       </direction>
     </plugin>
     <model name="lift_drag_demo_model">
