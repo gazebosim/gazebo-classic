@@ -70,7 +70,10 @@ namespace gazebo
         INSERTING_MODEL_PLUGIN,
 
         /// \brief Delete a model plugin.
-        DELETING_MODEL_PLUGIN
+        DELETING_MODEL_PLUGIN,
+
+        /// \brief Move a link.
+        MOVING_LINK
       };
 
       /// \brief Constructor
@@ -102,6 +105,8 @@ namespace gazebo
       /// \return Command type
       public: void SetSDF(sdf::ElementPtr _sdf);
       public: void SetScopedName(const std::string &_name);
+      public: void SetPoseChange(const ignition::math::Pose3d &_before,
+          const ignition::math::Pose3d &_after);
       public: void SetJointId(const std::string &_id);
 
       /// \internal

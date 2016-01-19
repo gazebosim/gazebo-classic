@@ -400,6 +400,10 @@ namespace gazebo
       /// \brief Deselect all currently selected model plugins.
       private: void DeselectAllModelPlugins();
 
+      /// \brief
+      private: void OnRequestLinkMove(const std::string &_name,
+          const ignition::math::Pose3d &_pose);
+
       /// \brief Set visibilty of a visual recursively while storing their
       /// original values
       /// \param[in] _name Name of visual.

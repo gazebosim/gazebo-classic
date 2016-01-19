@@ -187,6 +187,18 @@ void LinkData::SetPose(const ignition::math::Pose3d &_pose)
 }
 
 /////////////////////////////////////////////////
+void LinkData::SetIsPreview(const bool _preview)
+{
+  this->isPreview = _preview;
+}
+
+/////////////////////////////////////////////////
+bool LinkData::IsPreview() const
+{
+  return this->isPreview;
+}
+
+/////////////////////////////////////////////////
 void LinkData::SetScale(const ignition::math::Vector3d &_scale)
 {
   VisualConfig *visualConfig = this->inspector->GetVisualConfig();

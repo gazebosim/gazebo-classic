@@ -209,6 +209,11 @@ ModelCreator::ModelCreator()
       std::bind(&ModelCreator::OnAddModelPlugin, this,
       std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
 
+  this->connections.push_back(
+      gui::model::Events::ConnectRequestLinkMove(
+      std::bind(&ModelCreator::OnRequestLinkMove, this, std::placeholders::_1,
+      std::placeholders::_2)));
+
   if (g_copyAct)
   {
     g_copyAct->setEnabled(false);
@@ -1543,6 +1548,7 @@ void ModelCreator::AddLink(EntityType _type)
   if (_type != ENTITY_NONE)
   {
     LinkData *linkData = this->AddShape(_type);
+    linkData->SetIsPreview(true);
     if (linkData)
       this->mouseVisual = linkData->linkVisual;
   }
@@ -1785,6 +1791,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
     {
       LinkData *link = linkIt->second;
       link->SetPose((this->mouseVisual->GetWorldPose()-this->modelPose).Ign());
+      link->SetIsPreview(false);
       gui::model::Events::linkInserted(this->mouseVisual->GetName());
 
       auto cmd = MEUserCmdManager::Instance()->NewCmd(
@@ -1818,6 +1825,10 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
     this->AddLink(ENTITY_NONE);
     return true;
   }
+
+  // Set all links as not preview
+  for (auto &link : this->allLinks)
+    link.second->SetIsPreview(false);
 
   // mouse selection and context menu events
   rendering::VisualPtr vis = userCamera->GetVisual(_event.Pos());
@@ -2076,11 +2087,11 @@ bool ModelCreator::OnMouseMove(const common::MouseEvent &_event)
       if (!topLevelVis)
         return false;
 
+      auto link = this->allLinks.find(topLevelVis->GetName());
+      auto nestedModel = this->allNestedModels.find(topLevelVis->GetName());
       // Main window models always handled here
-      if (this->allLinks.find(topLevelVis->GetName()) ==
-          this->allLinks.end() &&
-          this->allNestedModels.find(topLevelVis->GetName()) ==
-          this->allNestedModels.end())
+      if (link == this->allLinks.end() &&
+          nestedModel == this->allNestedModels.end())
       {
         // Prevent highlighting for snapping
         if (this->manipMode == "snap" || this->manipMode == "select" ||
@@ -2096,6 +2107,11 @@ bool ModelCreator::OnMouseMove(const common::MouseEvent &_event)
           ModelManipulator::Instance()->OnMouseMoveEvent(_event);
         }
         return true;
+      }
+      else
+      {
+        if (link != this->allLinks.end())
+          link->second->SetIsPreview(true);
       }
     }
     return false;
@@ -2234,6 +2250,7 @@ void ModelCreator::OnPaste()
 
     LinkData *clonedLink = this->CloneLink(it->first);
     clonedLink->linkVisual->SetWorldPose(clonePose);
+    clonedLink->SetIsPreview(true);
 
     this->addEntityType = ENTITY_MESH;
     this->mouseVisual = clonedLink->linkVisual;
@@ -2466,6 +2483,12 @@ void ModelCreator::OnAlignMode(const std::string &_axis,
     const std::string &_config, const std::string &_target, const bool _preview,
     const bool _inverted)
 {
+  for (auto selected : this->selectedLinks)
+  {
+    auto link = this->allLinks.find(selected->GetName());
+    if (link != this->allLinks.end())
+      link->second->SetIsPreview(_preview);
+  }
   ModelAlign::Instance()->AlignVisuals(this->selectedLinks, _axis, _config,
       _target, !_preview, _inverted);
 }
@@ -2670,13 +2693,18 @@ void ModelCreator::Update()
   for (auto &linksIt : this->allLinks)
   {
     LinkData *link = linksIt.second;
+    if (link->IsPreview())
+      continue;
+
     if (link->Pose() != link->linkVisual->GetPose().Ign())
     {
+      auto cmd = MEUserCmdManager::Instance()->NewCmd(
+          "Move " + link->Name(), MEUserCmd::MOVING_LINK);
+      cmd->SetScopedName(link->linkVisual->GetName());
+      cmd->SetPoseChange(link->Pose(), link->linkVisual->GetPose().Ign());
+
       link->SetPose((link->linkVisual->GetWorldPose() - this->modelPose).Ign());
       this->ModelChanged();
-
-//      MEUserCmdManager::Instance()->NewCmd(
-//          "Move " + link->Name(), MEUserCmd::MOVING);
     }
     for (auto &scaleIt : this->linkScaleUpdate)
     {
@@ -2854,4 +2882,16 @@ void ModelCreator::OpenModelPluginInspector(const std::string &_name)
   ModelPluginData *modelPlugin = it->second;
   modelPlugin->inspector->move(QCursor::pos());
   modelPlugin->inspector->show();
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::OnRequestLinkMove(const std::string &_name,
+    const ignition::math::Pose3d &_pose)
+{
+  auto link = this->allLinks.find(_name);
+  if (link == this->allLinks.end())
+    return;
+
+  link->second->linkVisual->SetPose(_pose);
+  link->second->SetPose(_pose);
 }

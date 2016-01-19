@@ -105,6 +105,13 @@ void MEUserCmd::Undo()
     model::Events::requestModelPluginInsertion(pluginMsg.name(),
         pluginMsg.filename(), pluginMsg.innerxml());
   }
+  // Moving a link
+  else if (this->dataPtr->type == MEUserCmd::MOVING_LINK &&
+      !this->dataPtr->scopedName.empty())
+  {
+    model::Events::requestLinkMove(this->dataPtr->scopedName,
+        this->dataPtr->poseBefore);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -166,6 +173,13 @@ void MEUserCmd::Redo()
   {
     model::Events::requestModelPluginRemoval(this->dataPtr->scopedName);
   }
+  // Moving a link
+  else if (this->dataPtr->type == MEUserCmd::MOVING_LINK &&
+      !this->dataPtr->scopedName.empty())
+  {
+    model::Events::requestLinkMove(this->dataPtr->scopedName,
+        this->dataPtr->poseAfter);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -190,6 +204,14 @@ void MEUserCmd::SetSDF(sdf::ElementPtr _sdf)
 void MEUserCmd::SetScopedName(const std::string &_name)
 {
   this->dataPtr->scopedName = _name;
+}
+
+/////////////////////////////////////////////////
+void MEUserCmd::SetPoseChange(const ignition::math::Pose3d &_before,
+    const ignition::math::Pose3d &_after)
+{
+  this->dataPtr->poseBefore = _before;
+  this->dataPtr->poseAfter = _after;
 }
 
 /////////////////////////////////////////////////

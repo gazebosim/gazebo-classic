@@ -555,6 +555,20 @@ namespace gazebo
             event::ConnectionPtr _subscriber)
           { requestModelPluginInsertion.Disconnect(_subscriber); }
 
+        /// \brief Connect a Gazebo event to the request link move signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectRequestLinkMove(
+            T _subscriber)
+          { return requestLinkMove.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the request link move signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectRequestLinkMove(
+            event::ConnectionPtr _subscriber)
+          { requestLinkMove.Disconnect(_subscriber); }
+
         /// \brief A model has been completed and uploaded onto the server.
         public: static event::EventT<void ()> finishModel;
 
@@ -684,6 +698,10 @@ namespace gazebo
         /// \brief Request to insert a model plugin.
         public: static event::EventT<void (std::string, std::string,
             std::string)> requestModelPluginInsertion;
+
+        /// \brief Request to move a link.
+        public: static event::EventT<void (std::string, ignition::math::Pose3d)>
+            requestLinkMove;
       };
     }
   }
