@@ -26,9 +26,31 @@
       <uri>model://ground_plane</uri>
     </include>
 
+    <wind>
+      <linear_velocity>0 0 0</linear_velocity>
+    </wind>
+
+    <!-- Load the plugin for the wind -->
+    <plugin name="wind" filename="libWindPlugin.so">
+      <magnitude>
+        <time_for_rise>1</time_for_rise>
+        <sin>
+          <amplitude_percent>0</amplitude_percent>
+          <period>1</period>
+        </sin>
+      </magnitude>
+      <direction>
+        <time_for_rise>1</time_for_rise>
+        <sin>
+          <amplitude>0</amplitude>
+          <period>0</period>
+        </sin>
+      </direction>
+    </plugin>
     <model name="lift_drag_demo_model">
       <pose>0 0 0 0 0 0</pose>
       <static>false</static>
+      <enable_wind>true</enable_wind>
       <link name="body">
         <pose>0 0 0.5 0 0 0</pose>
         <inertial>

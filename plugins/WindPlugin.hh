@@ -22,10 +22,22 @@
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/physics.hh"
+#include "gazebo/sensors/Noise.hh"
 
 namespace gazebo
 {
   /// \brief A plugin that simulates a sine wind.
+  // Wind is described with a uniform worldwide model. So it is independant
+  // from drone position for simple computations. It is computed from 2 parts:
+  // - Amplitude:
+  //      Low pass filtering on user input (complementary gain)
+  //      + small local fluctuations
+  //      + noise on value (noise amplitude is a factor of wind magnitude)
+  //
+  // - Direction:
+  //      Low pass filtering on user input (complementary gain)
+  //      + small local fluctuations
+  //      + noise on value
   class GAZEBO_VISIBLE WindPlugin : public WorldPlugin
   {
     /// \brief Constructor.
@@ -51,6 +63,26 @@ namespace gazebo
 
     /// \brief Connection to World Update events.
     private: event::ConnectionPtr updateConnection;
+
+    private: double characteristicTimeForWindRise;
+    private: double magnitudeSinAmplitudePercent;
+    private: double magnitudeSinPeriod;
+    private: double magnitudeNoiseAmplitudePercent;
+    private: double characteristicTimeForWindOrientationChange;
+    private: double orientationSinAmplitude;
+    private: double orientationSinPeriod;
+    private: double verticalNoiseAmplitudePercent;
+
+    private: double KMag;
+    private: double KDir;
+    private: double magnitudeMean;
+    private: ignition::math::Vector3d directionMean;
+
+    /// \brief Noise added to magnitude
+    protected: sensors::NoisePtr noiseMagnitude;
+
+    /// \brief Noise added to direction
+    protected: sensors::NoisePtr noiseDirection;
   };
 }
 
