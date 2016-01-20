@@ -681,6 +681,9 @@ void ModelManipulator::OnMouseMoveEvent(const common::MouseEvent &_event)
     if (this->dataPtr->mouseMoveVis &&
         this->dataPtr->mouseEvent.Button() == common::MouseEvent::LEFT)
     {
+      this->dataPtr->mouseMoveVis->SetTransparency(
+          (1.0 - this->dataPtr->mouseMoveVis->GetTransparency()) * 0.5);
+
       math::Vector3 axis = math::Vector3::Zero;
       if (this->dataPtr->keyEvent.key == Qt::Key_X)
         axis.x = 1;
@@ -815,6 +818,7 @@ void ModelManipulator::OnMouseReleaseEvent(const common::MouseEvent &_event)
     // server
     if (this->dataPtr->mouseMoveVis)
     {
+      this->dataPtr->mouseMoveVis->SetTransparency(0);
       if (this->dataPtr->manipMode == "scale")
       {
         this->dataPtr->selectionObj->UpdateSize();
@@ -848,6 +852,11 @@ void ModelManipulator::OnMouseReleaseEvent(const common::MouseEvent &_event)
 void ModelManipulator::SetManipulationMode(const std::string &_mode)
 {
   this->dataPtr->manipMode = _mode;
+  if (this->dataPtr->manipMode != "translate"
+      && this->dataPtr->manipMode != "rotate"
+      && this->dataPtr->manipMode != "scale"
+      && this->dataPtr->mouseMoveVis)
+    this->dataPtr->mouseMoveVis->SetTransparency(0);
   if (this->dataPtr->selectionObj->GetMode() !=
       rendering::SelectionObj::SELECTION_NONE ||  this->dataPtr->mouseMoveVis)
   {
@@ -872,7 +881,12 @@ void ModelManipulator::SetAttachedVisual(rendering::VisualPtr _vis)
   this->SetMouseMoveVisual(vis);
 
   if (this->dataPtr->mouseMoveVis && !this->dataPtr->mouseMoveVis->IsPlane())
+  {
     this->dataPtr->selectionObj->Attach(this->dataPtr->mouseMoveVis);
+    this->dataPtr->mouseMoveVis->SetTransparency(
+        (1.0 - this->dataPtr->mouseMoveVis->GetTransparency()) * 0.5);
+  }
+
 }
 
 /////////////////////////////////////////////////
