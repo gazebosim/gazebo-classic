@@ -236,9 +236,6 @@ namespace gazebo
       /// \brief Callback received when exiting the editor mode.
       private: void OnExit();
 
-      /// \brief Update callback on PreRender.
-      private: void Update();
-
       /// \brief Internal helper function to remove a nestedModel without
       /// removing the joints.
       /// \param[in] _nestedModelName Name of the nestedModel to remove
@@ -411,6 +408,10 @@ namespace gazebo
           const ignition::math::Pose3d &_pose);
 
       /// \brief
+      private: void OnRequestNestedModelMove(const std::string &_name,
+          const ignition::math::Pose3d &_pose);
+
+      /// \brief
       private: void OnRequestLinkScale(const std::string &_name,
           const ignition::math::Vector3d &_scale);
 
@@ -573,8 +574,12 @@ namespace gazebo
       /// \brief A list of link data whose scale has changed externally.
       private: std::map<LinkData *, ignition::math::Vector3d> linkScaleUpdate;
 
-      /// \brief A list of link data whose scale has changed externally.
+      /// \brief A list of link data whose pose has changed externally.
       private: std::map<LinkData *, ignition::math::Pose3d> linkPoseUpdate;
+
+      /// \brief A list of nested model data whose pose has changed externally.
+      private: std::map<NestedModelData *, ignition::math::Pose3d>
+          nestedModelPoseUpdate;
 
       /// \brief Name of model on the server that is being edited here in the
       /// model editor.

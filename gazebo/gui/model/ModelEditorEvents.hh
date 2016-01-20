@@ -583,6 +583,22 @@ namespace gazebo
             event::ConnectionPtr _subscriber)
           { requestLinkScale.Disconnect(_subscriber); }
 
+        /// \brief Connect a Gazebo event to the request nested model move
+        /// signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectRequestNestedModelMove(
+            T _subscriber)
+          { return requestNestedModelMove.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the request nested model move
+        /// signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectRequestNestedModelMove(
+            event::ConnectionPtr _subscriber)
+          { requestNestedModelMove.Disconnect(_subscriber); }
+
         /// \brief A model has been completed and uploaded onto the server.
         public: static event::EventT<void ()> finishModel;
 
@@ -718,8 +734,12 @@ namespace gazebo
             requestLinkMove;
 
         /// \brief Request to scale a link.
-        public: static event::EventT<void (std::string, ignition::math::Vector3d)>
-            requestLinkScale;
+        public: static event::EventT<void (std::string,
+            ignition::math::Vector3d)> requestLinkScale;
+
+        /// \brief Request to move a nestedModel.
+        public: static event::EventT<void (std::string, ignition::math::Pose3d)>
+            requestNestedModelMove;
       };
     }
   }

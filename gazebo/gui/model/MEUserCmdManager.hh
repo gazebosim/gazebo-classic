@@ -76,7 +76,10 @@ namespace gazebo
         MOVING_LINK,
 
         /// \brief Scale a link.
-        SCALING_LINK
+        SCALING_LINK,
+
+        /// \brief Move a nested model.
+        MOVING_NESTED_MODEL
       };
 
       /// \brief Constructor

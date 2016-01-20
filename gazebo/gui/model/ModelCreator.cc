@@ -201,10 +201,6 @@ ModelCreator::ModelCreator()
           std::placeholders::_1)));
 
   this->connections.push_back(
-      event::Events::ConnectPreRender(
-        std::bind(&ModelCreator::Update, this)));
-
-  this->connections.push_back(
       gui::model::Events::ConnectModelPropertiesChanged(
       std::bind(&ModelCreator::OnPropertiesChanged, this,
         std::placeholders::_1, std::placeholders::_2)));
@@ -223,6 +219,11 @@ ModelCreator::ModelCreator()
       gui::model::Events::ConnectRequestLinkScale(
       std::bind(&ModelCreator::OnRequestLinkScale, this, std::placeholders::_1,
       std::placeholders::_2)));
+
+  this->connections.push_back(
+      gui::model::Events::ConnectRequestNestedModelMove(
+      std::bind(&ModelCreator::OnRequestNestedModelMove, this,
+      std::placeholders::_1, std::placeholders::_2)));
 
   if (g_copyAct)
   {
@@ -1840,7 +1841,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
   for (auto &link : this->allLinks)
     link.second->SetIsPreview(false);
 
-  // End moving
+  // End moving links
   for (auto link : this->linkPoseUpdate)
   {
     auto cmd = MEUserCmdManager::Instance()->NewCmd(
@@ -1854,7 +1855,21 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
     this->ModelChanged();
   this->linkPoseUpdate.clear();
 
-  // End scaling
+  // End moving nested models
+  for (auto nestedModel : this->nestedModelPoseUpdate)
+  {
+    auto cmd = MEUserCmdManager::Instance()->NewCmd(
+        "Move " + nestedModel.first->Name(), MEUserCmd::MOVING_NESTED_MODEL);
+    cmd->SetScopedName(nestedModel.first->modelVisual->GetName());
+    cmd->SetPoseChange(nestedModel.first->Pose(), nestedModel.second);
+
+    nestedModel.first->SetPose(nestedModel.second);
+  }
+  if (!this->nestedModelPoseUpdate.empty())
+    this->ModelChanged();
+  this->nestedModelPoseUpdate.clear();
+
+  // End scaling links
   for (auto link : this->linkScaleUpdate)
   {
     auto cmd = MEUserCmdManager::Instance()->NewCmd(
@@ -2724,24 +2739,6 @@ void ModelCreator::ModelChanged()
 }
 
 /////////////////////////////////////////////////
-void ModelCreator::Update()
-{
-  std::lock_guard<std::recursive_mutex> lock(this->updateMutex);
-
-  // check nested model
-  for (auto &nestedModelIt : this->allNestedModels)
-  {
-    NestedModelData *nestedModel = nestedModelIt.second;
-    if (nestedModel->Pose() != nestedModel->modelVisual->GetPose().Ign())
-    {
-      nestedModel->SetPose(
-            (nestedModel->modelVisual->GetWorldPose() - this->modelPose).Ign());
-      this->ModelChanged();
-    }
-  }
-}
-
-/////////////////////////////////////////////////
 void ModelCreator::OnEntityScaleChanged(const std::string &_name,
   const math::Vector3 &_scale)
 {
@@ -2774,6 +2771,19 @@ void ModelCreator::OnEntityMoved(const std::string &_name,
     if (_name == linksIt.first || linkName == linksIt.first)
     {
       this->linkPoseUpdate[linksIt.second] = _pose;
+      break;
+    }
+  }
+  for (auto nestedModelsIt : this->allNestedModels)
+  {
+    std::string nestedModelName;
+    size_t pos = _name.rfind("::");
+    if (pos != std::string::npos)
+      nestedModelName = _name.substr(0, pos);
+    if (_name == nestedModelsIt.first ||
+        nestedModelName == nestedModelsIt.first)
+    {
+      this->nestedModelPoseUpdate[nestedModelsIt.second] = _pose;
       break;
     }
   }
@@ -2920,6 +2930,18 @@ void ModelCreator::OnRequestLinkMove(const std::string &_name,
 
   link->second->linkVisual->SetPose(_pose);
   link->second->SetPose(_pose);
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::OnRequestNestedModelMove(const std::string &_name,
+    const ignition::math::Pose3d &_pose)
+{
+  auto nestedModel = this->allNestedModels.find(_name);
+  if (nestedModel == this->allNestedModels.end())
+    return;
+
+  nestedModel->second->modelVisual->SetPose(_pose);
+  nestedModel->second->SetPose(_pose);
 }
 
 /////////////////////////////////////////////////

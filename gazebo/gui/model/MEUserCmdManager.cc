@@ -119,6 +119,13 @@ void MEUserCmd::Undo()
     model::Events::requestLinkScale(this->dataPtr->scopedName,
         this->dataPtr->scaleBefore);
   }
+  // Moving a nested model
+  else if (this->dataPtr->type == MEUserCmd::MOVING_NESTED_MODEL &&
+      !this->dataPtr->scopedName.empty())
+  {
+    model::Events::requestNestedModelMove(this->dataPtr->scopedName,
+        this->dataPtr->poseBefore);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -193,6 +200,13 @@ void MEUserCmd::Redo()
   {
     model::Events::requestLinkScale(this->dataPtr->scopedName,
         this->dataPtr->scaleAfter);
+  }
+  // Moving a nested model
+  else if (this->dataPtr->type == MEUserCmd::MOVING_NESTED_MODEL &&
+      !this->dataPtr->scopedName.empty())
+  {
+    model::Events::requestNestedModelMove(this->dataPtr->scopedName,
+        this->dataPtr->poseAfter);
   }
 }
 
