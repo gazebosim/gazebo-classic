@@ -66,7 +66,6 @@ TEST_F(MaterialDensityTest, Accessors)
     EXPECT_EQ(material, MaterialType::TUNGSTEN);
     EXPECT_DOUBLE_EQ(density, 19300);
   }
-
 }
 
 /////////////////////////////////////////////////
