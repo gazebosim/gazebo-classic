@@ -387,6 +387,12 @@ namespace gazebo
       private: void OnEntityScaleChanged(const std::string &_name,
           const math::Vector3 &_scale);
 
+      /// \brief Callback when an entity's pose has changed.
+      /// \param[in] _name Name of entity.
+      /// \param[in] _scale New pose.
+      private: void OnEntityMoved(const std::string &_name,
+          const ignition::math::Pose3d &_pose);
+
       /// \brief Deselect anything whose selection is handled here, such as
       /// links and model plugins.
       private: void DeselectAll();
@@ -566,6 +572,9 @@ namespace gazebo
 
       /// \brief A list of link data whose scale has changed externally.
       private: std::map<LinkData *, ignition::math::Vector3d> linkScaleUpdate;
+
+      /// \brief A list of link data whose scale has changed externally.
+      private: std::map<LinkData *, ignition::math::Pose3d> linkPoseUpdate;
 
       /// \brief Name of model on the server that is being edited here in the
       /// model editor.

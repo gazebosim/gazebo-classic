@@ -164,6 +164,11 @@ ModelCreator::ModelCreator()
         std::placeholders::_1, std::placeholders::_2)));
 
   this->connections.push_back(
+      gui::Events::ConnectMoveEntity(
+      std::bind(&ModelCreator::OnEntityMoved, this,
+      std::placeholders::_1, std::placeholders::_2)));
+
+  this->connections.push_back(
       gui::model::Events::ConnectShowLinkContextMenu(
       std::bind(&ModelCreator::ShowContextMenu, this, std::placeholders::_1)));
 
@@ -1835,6 +1840,20 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
   for (auto &link : this->allLinks)
     link.second->SetIsPreview(false);
 
+  // End moving
+  for (auto link : this->linkPoseUpdate)
+  {
+    auto cmd = MEUserCmdManager::Instance()->NewCmd(
+        "Move " + link.first->Name(), MEUserCmd::MOVING_LINK);
+    cmd->SetScopedName(link.first->linkVisual->GetName());
+    cmd->SetPoseChange(link.first->Pose(), link.second);
+
+    link.first->SetPose(link.second);
+  }
+  if (!this->linkPoseUpdate.empty())
+    this->ModelChanged();
+  this->linkPoseUpdate.clear();
+
   // End scaling
   for (auto link : this->linkScaleUpdate)
   {
@@ -2709,25 +2728,6 @@ void ModelCreator::Update()
 {
   std::lock_guard<std::recursive_mutex> lock(this->updateMutex);
 
-  // Check if any links have been moved or resized and trigger ModelChanged
-  for (auto &linksIt : this->allLinks)
-  {
-    LinkData *link = linksIt.second;
-    if (link->IsPreview())
-      continue;
-
-    if (link->Pose() != link->linkVisual->GetPose().Ign())
-    {
-      auto cmd = MEUserCmdManager::Instance()->NewCmd(
-          "Move " + link->Name(), MEUserCmd::MOVING_LINK);
-      cmd->SetScopedName(link->linkVisual->GetName());
-      cmd->SetPoseChange(link->Pose(), link->linkVisual->GetPose().Ign());
-
-      link->SetPose((link->linkVisual->GetWorldPose() - this->modelPose).Ign());
-      this->ModelChanged();
-    }
-  }
-
   // check nested model
   for (auto &nestedModelIt : this->allNestedModels)
   {
@@ -2755,7 +2755,25 @@ void ModelCreator::OnEntityScaleChanged(const std::string &_name,
     if (_name == linksIt.first || linkName == linksIt.first)
     {
       this->linkScaleUpdate[linksIt.second] = _scale.Ign();
+      break;
+    }
+  }
+}
 
+/////////////////////////////////////////////////
+void ModelCreator::OnEntityMoved(const std::string &_name,
+  const ignition::math::Pose3d &_pose)
+{
+  std::lock_guard<std::recursive_mutex> lock(this->updateMutex);
+  for (auto linksIt : this->allLinks)
+  {
+    std::string linkName;
+    size_t pos = _name.rfind("::");
+    if (pos != std::string::npos)
+      linkName = _name.substr(0, pos);
+    if (_name == linksIt.first || linkName == linksIt.first)
+    {
+      this->linkPoseUpdate[linksIt.second] = _pose;
       break;
     }
   }
