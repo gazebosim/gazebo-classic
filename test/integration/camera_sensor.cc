@@ -156,7 +156,7 @@ TEST_F(CameraSensor, MultipleCameraSameName)
   sensors::CameraSensorPtr camSensor =
     std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
   EXPECT_TRUE(camSensor != NULL);
-  rendering::CameraPtr camera = camSensor->GetCamera();
+  rendering::CameraPtr camera = camSensor->Camera();
   EXPECT_TRUE(camera != NULL);
 
   // spawn second camera sensor with same name but attached to a different model
@@ -170,7 +170,7 @@ TEST_F(CameraSensor, MultipleCameraSameName)
   sensors::CameraSensorPtr camSensor2 =
     std::dynamic_pointer_cast<sensors::CameraSensor>(sensor2);
   EXPECT_TRUE(camSensor2 != NULL);
-  rendering::CameraPtr camera2 = camSensor2->GetCamera();
+  rendering::CameraPtr camera2 = camSensor2->Camera();
   EXPECT_TRUE(camera2 != NULL);
 
   // verify that the sensors and cameras are not the same
@@ -180,7 +180,7 @@ TEST_F(CameraSensor, MultipleCameraSameName)
   // get camera scene and verify camera count
   rendering::ScenePtr scene = camera->GetScene();
   EXPECT_TRUE(scene != NULL);
-  EXPECT_EQ(scene->GetCameraCount(), 2u);
+  EXPECT_EQ(scene->CameraCount(), 2u);
 
   // remove the second camera sensor first and check that it does not remove
   // the first one with the same name
@@ -198,10 +198,10 @@ TEST_F(CameraSensor, MultipleCameraSameName)
   EXPECT_TRUE(sensor != NULL);
 
   // verify the first camera is still there
-  EXPECT_EQ(scene->GetCameraCount(), 1u);
+  EXPECT_EQ(scene->CameraCount(), 1u);
   EXPECT_TRUE(camera == scene->GetCamera(0));
 
-  std::string renderingCameraName = camera->GetName();
+  std::string renderingCameraName = camera->Name();
 
   // remove the first camera sensor and there should be no sensors or cameras
   // left
@@ -216,7 +216,7 @@ TEST_F(CameraSensor, MultipleCameraSameName)
   EXPECT_TRUE(sensor == NULL);
   camera = scene->GetCamera(renderingCameraName);
   EXPECT_TRUE(camera == NULL);
-  EXPECT_EQ(scene->GetCameraCount(), 0u);
+  EXPECT_EQ(scene->CameraCount(), 0u);
 }
 
 /////////////////////////////////////////////////
