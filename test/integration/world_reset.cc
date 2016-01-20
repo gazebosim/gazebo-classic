@@ -151,11 +151,10 @@ void WorldResetTest::NestedModelPose(const std::string &_physicsEngine,
     return;
   }
 
-  if (_physicsEngine == "dart" &&
-      _world.find("pr2") != std::string::npos)
+  if (_physicsEngine == "dart")
   {
-    gzerr << "Abort test since dart does not support ray sensor in PR2, "
-          << "Please see issue #911.\n";
+    gzerr  << "Nested models are not working in dart yet, issue #1833"
+        << std::endl;
     return;
   }
 
