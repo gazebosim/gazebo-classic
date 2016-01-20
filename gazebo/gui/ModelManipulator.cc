@@ -683,7 +683,6 @@ void ModelManipulator::OnMouseMoveEvent(const common::MouseEvent &_event)
     {
       this->dataPtr->mouseMoveVis->SetTransparency(
           (1.0 - this->dataPtr->mouseMoveVis->GetTransparency()) * 0.5);
-
       math::Vector3 axis = math::Vector3::Zero;
       if (this->dataPtr->keyEvent.key == Qt::Key_X)
         axis.x = 1;
@@ -886,7 +885,6 @@ void ModelManipulator::SetAttachedVisual(rendering::VisualPtr _vis)
     this->dataPtr->mouseMoveVis->SetTransparency(
         (1.0 - this->dataPtr->mouseMoveVis->GetTransparency()) * 0.5);
   }
-
 }
 
 /////////////////////////////////////////////////
