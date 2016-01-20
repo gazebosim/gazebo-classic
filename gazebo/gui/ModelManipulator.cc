@@ -817,7 +817,8 @@ void ModelManipulator::OnMouseReleaseEvent(const common::MouseEvent &_event)
     // server
     if (this->dataPtr->mouseMoveVis)
     {
-      this->dataPtr->mouseMoveVis->SetTransparency(0);
+      this->dataPtr->mouseMoveVis->SetTransparency(
+          std::abs(this->dataPtr->mouseMoveVis->GetTransparency()*2.0-1.0));
       if (this->dataPtr->manipMode == "scale")
       {
         this->dataPtr->selectionObj->UpdateSize();
@@ -855,7 +856,8 @@ void ModelManipulator::SetManipulationMode(const std::string &_mode)
       && this->dataPtr->manipMode != "rotate"
       && this->dataPtr->manipMode != "scale"
       && this->dataPtr->mouseMoveVis)
-    this->dataPtr->mouseMoveVis->SetTransparency(0);
+    this->dataPtr->mouseMoveVis->SetTransparency(
+        std::abs(this->dataPtr->mouseMoveVis->GetTransparency()*2.0-1.0));
   if (this->dataPtr->selectionObj->GetMode() !=
       rendering::SelectionObj::SELECTION_NONE ||  this->dataPtr->mouseMoveVis)
   {
