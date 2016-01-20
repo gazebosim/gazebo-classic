@@ -98,12 +98,12 @@ namespace gazebo
       /// \brief Return the density of the given material name, or -1
       /// if the material is not found.
       /// \param[in] _material Name of the material, See MaterialType.
-      /// \return Matching DensityEntry if found else null.
+      /// \return Matching density if found, otherwise -1.
       public: static double Density(const std::string &_material);
 
       /// \brief Return the density of a material.
       /// \param[in] _material Type of the material, See MaterialType.
-      /// \return Matching DensityEntry if found else null.
+      /// \return Matching density if found, otherwise -1.
       public: static double Density(const MaterialType _material);
 
       /// \brief Return the material with the closest density value within
