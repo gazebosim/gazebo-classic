@@ -564,8 +564,8 @@ namespace gazebo
       /// \brief Mutex to protect updates
       private: std::recursive_mutex updateMutex;
 
-      /// \brief A list of link names whose scale has changed externally.
-      private: std::map<std::string, math::Vector3> linkScaleUpdate;
+      /// \brief A list of link data whose scale has changed externally.
+      private: std::map<LinkData *, ignition::math::Vector3d> linkScaleUpdate;
 
       /// \brief Name of model on the server that is being edited here in the
       /// model editor.

@@ -1835,6 +1835,20 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
   for (auto &link : this->allLinks)
     link.second->SetIsPreview(false);
 
+  // End scaling
+  for (auto link : this->linkScaleUpdate)
+  {
+    auto cmd = MEUserCmdManager::Instance()->NewCmd(
+        "Scale " + link.first->Name(), MEUserCmd::SCALING_LINK);
+    cmd->SetScopedName(link.first->linkVisual->GetName());
+    cmd->SetScaleChange(link.first->Scale(), link.second);
+
+    link.first->SetScale(link.second);
+  }
+  if (!this->linkScaleUpdate.empty())
+    this->ModelChanged();
+  this->linkScaleUpdate.clear();
+
   // mouse selection and context menu events
   rendering::VisualPtr vis = userCamera->GetVisual(_event.Pos());
   if (vis)
@@ -2712,22 +2726,7 @@ void ModelCreator::Update()
       link->SetPose((link->linkVisual->GetWorldPose() - this->modelPose).Ign());
       this->ModelChanged();
     }
-    for (auto &scaleIt : this->linkScaleUpdate)
-    {
-      if (link->linkVisual->GetName() == scaleIt.first)
-      {
-        link->SetScale(scaleIt.second.Ign());
-
-        auto cmd = MEUserCmdManager::Instance()->NewCmd(
-            "Scale " + link->Name(), MEUserCmd::SCALING_LINK);
-        cmd->SetScopedName(link->linkVisual->GetName());
-        cmd->SetScaleChange(link->Scale(), scaleIt.second.Ign());
-      }
-    }
   }
-  if (!this->linkScaleUpdate.empty())
-    this->ModelChanged();
-  this->linkScaleUpdate.clear();
 
   // check nested model
   for (auto &nestedModelIt : this->allNestedModels)
@@ -2755,7 +2754,8 @@ void ModelCreator::OnEntityScaleChanged(const std::string &_name,
       linkName = _name.substr(0, pos);
     if (_name == linksIt.first || linkName == linksIt.first)
     {
-      this->linkScaleUpdate[linksIt.first] = _scale;
+      this->linkScaleUpdate[linksIt.second] = _scale.Ign();
+
       break;
     }
   }
@@ -2912,6 +2912,17 @@ void ModelCreator::OnRequestLinkScale(const std::string &_name,
   if (link == this->allLinks.end())
     return;
 
-  link->second->linkVisual->SetScale(_scale);
+  auto vis = link->second->linkVisual;
+  for (unsigned int i = 0; i < vis->GetChildCount(); ++i)
+  {
+    auto childVis = vis->GetChild(i);
+    auto geomType = childVis->GetGeometryType();
+    if (geomType != "" && geomType != "mesh")
+    {
+      /// \todo Different geoms might be scaled differently
+      childVis->SetScale(_scale);
+    }
+  }
+
   link->second->SetScale(_scale);
 }
