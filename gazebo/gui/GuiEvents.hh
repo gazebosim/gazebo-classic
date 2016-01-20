@@ -293,7 +293,7 @@ namespace gazebo
 
       /// \brief Move entity event.
       public: static event::EventT<void (const std::string &,
-          const ignition::math::Pose3d &)> moveEntity;
+          const ignition::math::Pose3d &, const bool)> moveEntity;
     };
   }
 }

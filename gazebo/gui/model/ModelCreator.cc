@@ -166,7 +166,7 @@ ModelCreator::ModelCreator()
   this->connections.push_back(
       gui::Events::ConnectMoveEntity(
       std::bind(&ModelCreator::OnEntityMoved, this,
-      std::placeholders::_1, std::placeholders::_2)));
+      std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
 
   this->connections.push_back(
       gui::model::Events::ConnectShowLinkContextMenu(
@@ -2784,7 +2784,7 @@ void ModelCreator::OnEntityScaleChanged(const std::string &_name,
 
 /////////////////////////////////////////////////
 void ModelCreator::OnEntityMoved(const std::string &_name,
-  const ignition::math::Pose3d &_pose)
+  const ignition::math::Pose3d &_pose, const bool _finalPoseForSure)
 {
   std::lock_guard<std::recursive_mutex> lock(this->updateMutex);
   for (auto linksIt : this->allLinks)
@@ -2795,7 +2795,23 @@ void ModelCreator::OnEntityMoved(const std::string &_name,
       linkName = _name.substr(0, pos);
     if (_name == linksIt.first || linkName == linksIt.first)
     {
-      this->linkPoseUpdate[linksIt.second] = _pose;
+      // Register user command
+      if (_finalPoseForSure)
+      {
+        auto cmd = MEUserCmdManager::Instance()->NewCmd(
+            "Move " + linksIt.second->Name(), MEUserCmd::MOVING_LINK);
+        cmd->SetScopedName(linksIt.second->linkVisual->GetName());
+        cmd->SetPoseChange(linksIt.second->Pose(), _pose);
+
+        linksIt.second->SetPose(_pose);
+        this->ModelChanged();
+      }
+      // Only register command on MouseRelease
+      else
+      {
+        this->linkPoseUpdate[linksIt.second] = _pose;
+      }
+
       break;
     }
   }

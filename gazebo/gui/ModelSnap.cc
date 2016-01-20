@@ -308,6 +308,9 @@ void ModelSnap::Snap(const std::vector<math::Vector3> &_triangleSrc,
       math::Pose(_visualSrc->GetWorldPose().pos + translation,
       rotation * _visualSrc->GetWorldPose().rot));
 
+  Events::moveEntity(_visualSrc->GetName(), _visualSrc->GetWorldPose().Ign(),
+      true);
+
   this->PublishVisualPose(_visualSrc);
 }
 

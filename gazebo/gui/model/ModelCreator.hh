@@ -388,7 +388,7 @@ namespace gazebo
       /// \param[in] _name Name of entity.
       /// \param[in] _scale New pose.
       private: void OnEntityMoved(const std::string &_name,
-          const ignition::math::Pose3d &_pose);
+          const ignition::math::Pose3d &_pose, const bool _finalPoseForSure);
 
       /// \brief Deselect anything whose selection is handled here, such as
       /// links and model plugins.

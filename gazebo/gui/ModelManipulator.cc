@@ -170,7 +170,7 @@ void ModelManipulator::RotateEntity(rendering::VisualPtr &_vis,
     rot = rot * this->dataPtr->mouseMoveVisStartPose.rot;
 
   _vis->SetWorldRotation(rot);
-  Events::moveEntity(_vis->GetName(), _vis->GetWorldPose().Ign());
+  Events::moveEntity(_vis->GetName(), _vis->GetWorldPose().Ign(), false);
 }
 
 /////////////////////////////////////////////////
@@ -514,7 +514,7 @@ void ModelManipulator::TranslateEntity(rendering::VisualPtr &_vis,
     pose.pos.z = _vis->GetWorldPose().pos.z;
 
   _vis->SetWorldPose(pose);
-  Events::moveEntity(_vis->GetName(), pose.Ign());
+  Events::moveEntity(_vis->GetName(), pose.Ign(), false);
 }
 
 /////////////////////////////////////////////////
