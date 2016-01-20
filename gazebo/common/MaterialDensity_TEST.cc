@@ -55,10 +55,18 @@ TEST_F(MaterialDensityTest, Accessors)
   {
     MaterialType material;
     double density;
-    std::tie(material, density) = MaterialDensity::Nearest(1001001.001);
+    std::tie(material, density) = MaterialDensity::Nearest(1001001.001, 1e-3);
     EXPECT_EQ(material, MaterialType::END);
     EXPECT_DOUBLE_EQ(density, -1.0);
   }
+  {
+    MaterialType material;
+    double density;
+    std::tie(material, density) = MaterialDensity::Nearest(1001001.001);
+    EXPECT_EQ(material, MaterialType::TUNGSTEN);
+    EXPECT_DOUBLE_EQ(density, 19300);
+  }
+
 }
 
 /////////////////////////////////////////////////

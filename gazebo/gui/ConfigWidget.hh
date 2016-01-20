@@ -993,7 +993,7 @@ namespace gazebo
 
       /// \brief Callback when density value changes in child widget.
       /// \param[in] _value Density value.
-      private slots: void OnDensityValueChanged(const double &_value);
+      private slots: void OnDensityValueChanged(const double _value);
 
       /// \brief Callback when mass value changes in child widget.
       /// \param[in] _value Mass value.
