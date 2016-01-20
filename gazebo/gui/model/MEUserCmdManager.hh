@@ -73,7 +73,10 @@ namespace gazebo
         DELETING_MODEL_PLUGIN,
 
         /// \brief Move a link.
-        MOVING_LINK
+        MOVING_LINK,
+
+        /// \brief Scale a link.
+        SCALING_LINK
       };
 
       /// \brief Constructor
@@ -107,6 +110,8 @@ namespace gazebo
       public: void SetScopedName(const std::string &_name);
       public: void SetPoseChange(const ignition::math::Pose3d &_before,
           const ignition::math::Pose3d &_after);
+      public: void SetScaleChange(const ignition::math::Vector3d &_before,
+          const ignition::math::Vector3d &_after);
       public: void SetJointId(const std::string &_id);
 
       /// \internal

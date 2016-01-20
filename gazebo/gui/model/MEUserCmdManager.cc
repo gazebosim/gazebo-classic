@@ -112,6 +112,13 @@ void MEUserCmd::Undo()
     model::Events::requestLinkMove(this->dataPtr->scopedName,
         this->dataPtr->poseBefore);
   }
+  // Scaling a link
+  else if (this->dataPtr->type == MEUserCmd::SCALING_LINK &&
+      !this->dataPtr->scopedName.empty())
+  {
+    model::Events::requestLinkScale(this->dataPtr->scopedName,
+        this->dataPtr->scaleBefore);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -180,6 +187,13 @@ void MEUserCmd::Redo()
     model::Events::requestLinkMove(this->dataPtr->scopedName,
         this->dataPtr->poseAfter);
   }
+  // Scaling a link
+  else if (this->dataPtr->type == MEUserCmd::SCALING_LINK &&
+      !this->dataPtr->scopedName.empty())
+  {
+    model::Events::requestLinkScale(this->dataPtr->scopedName,
+        this->dataPtr->scaleAfter);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -212,6 +226,14 @@ void MEUserCmd::SetPoseChange(const ignition::math::Pose3d &_before,
 {
   this->dataPtr->poseBefore = _before;
   this->dataPtr->poseAfter = _after;
+}
+
+/////////////////////////////////////////////////
+void MEUserCmd::SetScaleChange(const ignition::math::Vector3d &_before,
+    const ignition::math::Vector3d &_after)
+{
+  this->dataPtr->scaleBefore = _before;
+  this->dataPtr->scaleAfter = _after;
 }
 
 /////////////////////////////////////////////////

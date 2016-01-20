@@ -214,6 +214,11 @@ ModelCreator::ModelCreator()
       std::bind(&ModelCreator::OnRequestLinkMove, this, std::placeholders::_1,
       std::placeholders::_2)));
 
+  this->connections.push_back(
+      gui::model::Events::ConnectRequestLinkScale(
+      std::bind(&ModelCreator::OnRequestLinkScale, this, std::placeholders::_1,
+      std::placeholders::_2)));
+
   if (g_copyAct)
   {
     g_copyAct->setEnabled(false);
@@ -1587,7 +1592,7 @@ void ModelCreator::OnDelete(const std::string &_entity)
   if (nestedModel != this->allNestedModels.end())
   {
     auto cmd = MEUserCmdManager::Instance()->NewCmd(
-        "Deleted [" + nestedModel->second->Name() + "]",
+        "Delete [" + nestedModel->second->Name() + "]",
         MEUserCmd::DELETING_NESTED_MODEL);
     cmd->SetSDF(nestedModel->second->modelSDF);
     cmd->SetScopedName(nestedModel->second->modelVisual->GetName());
@@ -1606,7 +1611,7 @@ void ModelCreator::OnDelete(const std::string &_entity)
 
     // Then register command
     auto cmd = MEUserCmdManager::Instance()->NewCmd(
-        "Deleted [" + link->second->Name() + "]", MEUserCmd::DELETING_LINK);
+        "Delete [" + link->second->Name() + "]", MEUserCmd::DELETING_LINK);
     cmd->SetSDF(link->second->linkSDF);
     cmd->SetScopedName(link->second->linkVisual->GetName());
 
@@ -1668,7 +1673,7 @@ void ModelCreator::OnRemoveModelPlugin(const QString &_name)
   if (it != this->allModelPlugins.end())
   {
     auto cmd = MEUserCmdManager::Instance()->NewCmd(
-        "Deleted plugin [" + _name.toStdString() + "]",
+        "Delete plugin [" + _name.toStdString() + "]",
         MEUserCmd::DELETING_MODEL_PLUGIN);
     cmd->SetSDF(it->second->modelPluginSDF);
     cmd->SetScopedName(_name.toStdString());
@@ -1795,7 +1800,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
       gui::model::Events::linkInserted(this->mouseVisual->GetName());
 
       auto cmd = MEUserCmdManager::Instance()->NewCmd(
-          "Inserted [" + link->Name() + "]",
+          "Insert [" + link->Name() + "]",
           MEUserCmd::INSERTING_LINK);
       cmd->SetSDF(link->linkSDF);
       cmd->SetScopedName(link->linkVisual->GetName());
@@ -1812,7 +1817,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
         this->EmitNestedModelInsertedEvent(this->mouseVisual);
 
         auto cmd = MEUserCmdManager::Instance()->NewCmd(
-            "Inserted [" + modelData->Name() + "]",
+            "Insert [" + modelData->Name() + "]",
             MEUserCmd::INSERTING_NESTED_MODEL);
         cmd->SetSDF(modelData->modelSDF);
         cmd->SetScopedName(modelData->modelVisual->GetName());
@@ -2108,7 +2113,8 @@ bool ModelCreator::OnMouseMove(const common::MouseEvent &_event)
         }
         return true;
       }
-      else
+      // During RTS manipulation
+      else if (_event.Dragging())
       {
         if (link != this->allLinks.end())
           link->second->SetIsPreview(true);
@@ -2712,8 +2718,10 @@ void ModelCreator::Update()
       {
         link->SetScale(scaleIt.second.Ign());
 
-//        MEUserCmdManager::Instance()->NewCmd(
-//            "Scale " + link->Name(), MEUserCmd::SCALING);
+        auto cmd = MEUserCmdManager::Instance()->NewCmd(
+            "Scale " + link->Name(), MEUserCmd::SCALING_LINK);
+        cmd->SetScopedName(link->linkVisual->GetName());
+        cmd->SetScaleChange(link->Scale(), scaleIt.second.Ign());
       }
     }
   }
@@ -2894,4 +2902,16 @@ void ModelCreator::OnRequestLinkMove(const std::string &_name,
 
   link->second->linkVisual->SetPose(_pose);
   link->second->SetPose(_pose);
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::OnRequestLinkScale(const std::string &_name,
+    const ignition::math::Vector3d &_scale)
+{
+  auto link = this->allLinks.find(_name);
+  if (link == this->allLinks.end())
+    return;
+
+  link->second->linkVisual->SetScale(_scale);
+  link->second->SetScale(_scale);
 }

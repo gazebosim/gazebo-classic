@@ -52,6 +52,12 @@ namespace gazebo
       /// \brief Pose after the command (to be used by redo).
       public: ignition::math::Pose3d poseAfter;
 
+      /// \brief Scale before the command (to be used by undo).
+      public: ignition::math::Vector3d scaleBefore;
+
+      /// \brief Scale after the command (to be used by redo).
+      public: ignition::math::Vector3d scaleAfter;
+
       /// \brief If the command is related to a joint, this is its unique Id.
       /// It's different from the scopedName and we need both.
       public: std::string jointId;

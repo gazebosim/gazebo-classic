@@ -52,6 +52,8 @@ event::EventT<void (std::string)> model::Events::showLinkContextMenu;
 event::EventT<void (std::string, bool)> model::Events::setSelectedLink;
 event::EventT<void (std::string, ignition::math::Pose3d)>
     model::Events::requestLinkMove;
+event::EventT<void (std::string, ignition::math::Vector3d)>
+    model::Events::requestLinkScale;
 
 // Joints
 event::EventT<void (std::string, std::string, std::string, std::string,
