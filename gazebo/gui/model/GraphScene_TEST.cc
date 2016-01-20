@@ -15,11 +15,10 @@
  *
 */
 
-#include <QColor>
-
 #include "gazebo/gui/qgv/QGVNode.h"
 #include "gazebo/gui/qgv/QGVEdge.h"
 
+#include "gazebo/gui/qt.h"
 #include "gazebo/gui/model/GraphScene.hh"
 #include "gazebo/gui/model/GraphScene_TEST.hh"
 
@@ -40,6 +39,9 @@ void GraphScene_TEST::Initialization()
 void GraphScene_TEST::NodeUpdates()
 {
   GraphScene gs;
+  QVERIFY(!gs.HasNode("node1"));
+  QVERIFY(gs.GetNode("node1") == NULL);
+
   QGVNode *node1 = gs.AddNode("node1");
 
   QVERIFY(node1 != NULL);
@@ -56,8 +58,13 @@ void GraphScene_TEST::NodeUpdates()
 void GraphScene_TEST::EdgeUpdates()
 {
   GraphScene gs;
-  QGVNode *node1, *node2;
-  QGVEdge *edge1;
+  QGVNode *node1 = NULL;
+  QGVNode *node2 = NULL;
+  QGVEdge *edge1 = NULL;
+  QGVEdge *edgeBad = NULL;
+
+  edgeBad = gs.AddEdge("edgeBad", "nodeBad", "nodeBad2");
+  QVERIFY(edgeBad == NULL);
 
   node1 = gs.AddNode("node1");
   QVERIFY(node1 != NULL);
@@ -73,16 +80,18 @@ void GraphScene_TEST::EdgeUpdates()
   gs.RemoveEdge("edge1");
 
   QVERIFY(!gs.hasEdge(tr("edge1")));
+  QVERIFY(gs.HasNode("node1"));
+  QVERIFY(gs.HasNode("node2"));
 }
 
 /////////////////////////////////////////////////
 void GraphScene_TEST::EdgeColor()
 {
   GraphScene gs;
-  QGVEdge *edge1;
+  QGVEdge *edge1 = NULL;
 
-  (void)gs.AddNode("node1");
-  (void)gs.AddNode("node2");
+  gs.AddNode("node1");
+  gs.AddNode("node2");
 
   edge1 = gs.AddEdge("edge1", "node1", "node2");
 

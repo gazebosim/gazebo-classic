@@ -212,6 +212,12 @@ unsigned int WorldState::GetModelStateCount() const
 }
 
 /////////////////////////////////////////////////
+unsigned int WorldState::LightStateCount() const
+{
+  return this->lightStates.size();
+}
+
+/////////////////////////////////////////////////
 ModelState WorldState::GetModelState(const std::string &_modelName) const
 {
   // Search for the model name
@@ -247,6 +253,30 @@ bool WorldState::HasModelState(const std::string &_modelName) const
 bool WorldState::HasLightState(const std::string &_lightName) const
 {
   return this->lightStates.find(_lightName) != this->lightStates.end();
+}
+
+/////////////////////////////////////////////////
+const std::vector<std::string> &WorldState::Insertions() const
+{
+  return this->insertions;
+}
+
+/////////////////////////////////////////////////
+void WorldState::SetInsertions(const std::vector<std::string> &_insertions)
+{
+  this->insertions = _insertions;
+}
+
+/////////////////////////////////////////////////
+const std::vector<std::string> &WorldState::Deletions() const
+{
+  return this->deletions;
+}
+
+/////////////////////////////////////////////////
+void WorldState::SetDeletions(const std::vector<std::string> &_deletions)
+{
+  this->deletions = _deletions;
 }
 
 /////////////////////////////////////////////////
@@ -291,7 +321,7 @@ WorldState &WorldState::operator=(const WorldState &_state)
   }
 
   // Copy the light states.
-  for (const auto &light : this->lightStates)
+  for (const auto &light : _state.lightStates)
   {
     this->lightStates.insert(std::make_pair(light.first,
           LightState(light.second)));
@@ -340,7 +370,7 @@ WorldState WorldState::operator-(const WorldState &_state) const
   }
 
   // Subtract the light states.
-  for (const auto &light : this->lightStates)
+  for (const auto &light : _state.lightStates)
   {
     if (this->HasLightState(light.second.GetName()))
     {
@@ -403,7 +433,7 @@ WorldState WorldState::operator+(const WorldState &_state) const
   }
 
   // Add the light states.
-  for (const auto &light : this->lightStates)
+  for (const auto &light : _state.lightStates)
   {
     LightState state = this->GetLightState(light.second.GetName()) +
         light.second;
