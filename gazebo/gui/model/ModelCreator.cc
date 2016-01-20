@@ -2537,14 +2537,34 @@ void ModelCreator::OnAlignMode(const std::string &_axis,
     const std::string &_config, const std::string &_target, const bool _preview,
     const bool _inverted)
 {
-  for (auto selected : this->selectedLinks)
-  {
-    auto link = this->allLinks.find(selected->GetName());
-    if (link != this->allLinks.end())
-      link->second->SetIsPreview(_preview);
-  }
   ModelAlign::Instance()->AlignVisuals(this->selectedLinks, _axis, _config,
       _target, !_preview, _inverted);
+
+  if (_preview)
+    return;
+
+  // Register user commands
+  auto count = this->selectedLinks.size();
+  for (unsigned int i = 0; i < count; ++i)
+  {
+    // Target didn't move
+    if ((_target == "first" && i == 0) || (_target == "last" && i == count - 1))
+      continue;
+
+    auto link = this->allLinks.find(this->selectedLinks[i]->GetName());
+    if (link != this->allLinks.end())
+    {
+      auto newPose = link->second->linkVisual->GetPose().Ign();
+
+      auto cmd = MEUserCmdManager::Instance()->NewCmd(
+          "Move " + link->second->Name(), MEUserCmd::MOVING_LINK);
+      cmd->SetScopedName(link->second->linkVisual->GetName());
+      cmd->SetPoseChange(link->second->Pose(), newPose);
+
+      link->second->SetPose(newPose);
+      this->ModelChanged();
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -2675,6 +2695,11 @@ void ModelCreator::OnManipMode(const std::string &_mode)
   {
     ModelManipulator::Instance()->SetAttachedVisual(
         this->selectedLinks.back());
+  }
+  else if (!this->selectedNestedModels.empty())
+  {
+    ModelManipulator::Instance()->SetAttachedVisual(
+        this->selectedNestedModels.back());
   }
 
   ModelManipulator::Instance()->SetManipulationMode(_mode);
