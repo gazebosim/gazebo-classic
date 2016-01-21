@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -595,7 +595,7 @@ SensorPtr SensorManager::SensorContainer::GetSensor(const std::string &_name,
     GZ_ASSERT((*iter) != NULL, "Sensor is NULL");
 
     // We match on the scoped name (model::link::sensor) because multiple
-    // sensors with the name leaf name make exists in a world.
+    // sensors with the same leaf name may exist in a world.
     if ((_useLeafName && (*iter)->Name() == _name) ||
         (!_useLeafName && (*iter)->ScopedName() == _name))
     {
