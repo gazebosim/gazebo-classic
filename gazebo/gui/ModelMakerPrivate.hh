@@ -32,7 +32,7 @@ namespace gazebo
       public: rendering::VisualPtr modelVisual;
 
       /// \brief A list of model visuals created by the model maker.
-      public: std::list<rendering::VisualPtr> visuals;
+      public: std::list<rendering::VisualWeakPtr> visuals;
 
       /// \brief The SDF representation of the model.
       public: sdf::SDFPtr modelSDF;

@@ -83,6 +83,13 @@ namespace gazebo
       /// \return The SDF value for this model.
       public: virtual const sdf::ElementPtr GetSDF();
 
+      /// \internal
+      /// \brief Get the SDF element for the model, without all effects of
+      /// scaling. This is useful in cases when the scale will be applied
+      /// afterwards by, for example, states.
+      /// \return The SDF element.
+      public: virtual const sdf::ElementPtr UnscaledSDF();
+
       /// \brief Remove a child.
       /// \param[in] _child Remove a child entity.
       public: virtual void RemoveChild(EntityPtr _child);
@@ -275,7 +282,23 @@ namespace gazebo
 
       /// \brief Set the scale of model.
       /// \param[in] _scale Scale to set the model to.
-      public: void SetScale(const math::Vector3 &_scale);
+      /// \deprecated See function that accepts ignition::math parameters
+      public: void SetScale(const math::Vector3 &_scale)
+          GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Set the scale of model.
+      /// \param[in] _scale Scale to set the model to.
+      /// \param[in] _publish True to publish a message for the client with the
+      /// new scale.
+      /// \sa ignition::math::Vector3d Scale() const
+      public: void SetScale(const ignition::math::Vector3d &_scale,
+          const bool _publish = false);
+
+      /// \brief Get the scale of model.
+      /// \return Scale of the model.
+      /// \sa void SetScale(const ignition::math::Vector3d &_scale,
+      ///    const bool _publish = false)
+      public: ignition::math::Vector3d Scale() const;
 
       /// \brief Enable all the links in all the models.
       /// \param[in] _enabled True to enable all the links.
@@ -399,6 +422,9 @@ namespace gazebo
       /// This does not delete the link.
       /// \param[in] _name Name of the link to remove.
       private: void RemoveLink(const std::string &_name);
+
+      /// \brief Publish the scale.
+      private: virtual void PublishScale();
 
       /// used by Model::AttachStaticModel
       protected: std::vector<ModelPtr> attachedModels;

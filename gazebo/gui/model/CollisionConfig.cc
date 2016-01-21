@@ -313,7 +313,7 @@ msgs::Collision *CollisionConfig::GetData(const std::string &_name) const
     std::string name = it.second->name;
     if (name == _name)
     {
-      return dynamic_cast<msgs::Collision *>(it.second->configWidget->GetMsg());
+      return dynamic_cast<msgs::Collision *>(it.second->configWidget->Msg());
     }
   }
   return NULL;

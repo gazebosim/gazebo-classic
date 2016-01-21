@@ -17,6 +17,7 @@
 #ifndef _GAZEBO_LOGICAL_CAMERASENSOR_HH_
 #define _GAZEBO_LOGICAL_CAMERASENSOR_HH_
 
+#include <memory>
 #include <string>
 #include <sdf/sdf.hh>
 
@@ -86,17 +87,17 @@ namespace gazebo
       public: msgs::LogicalCameraImage Image() const;
 
       // Documentation inherited
-      protected: virtual bool UpdateImpl(bool _force);
+      protected: virtual bool UpdateImpl(const bool _force);
 
       // \brief Finalize the logical camera
       protected: virtual void Fini();
 
       // Documentation inherited
-      public: virtual bool IsActive();
+      public: virtual bool IsActive() const;
 
       // \internal
       // \brief Private data pointer
-      private: LogicalCameraSensorPrivate *dataPtr;
+      private: std::unique_ptr<LogicalCameraSensorPrivate> dataPtr;
     };
     /// \}
   }

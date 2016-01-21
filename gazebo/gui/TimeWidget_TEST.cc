@@ -47,7 +47,7 @@ void TimeWidget_TEST::Reset()
   }
 
   // Get the time panel
-  gazebo::gui::TimePanel *timePanel = mainWindow->GetRenderWidget()->
+  gazebo::gui::TimePanel *timePanel = mainWindow->RenderWidget()->
       GetTimePanel();
   QVERIFY(timePanel != NULL);
 
@@ -201,7 +201,7 @@ void TimeWidget_TEST::ValidTimes()
     QVERIFY(cam != NULL);
 
     // Get the time panel
-    gazebo::gui::TimePanel *timePanel = mainWindow->GetRenderWidget()->
+    gazebo::gui::TimePanel *timePanel = mainWindow->RenderWidget()->
         GetTimePanel();
     QVERIFY(timePanel != NULL);
 

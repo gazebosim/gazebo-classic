@@ -30,6 +30,9 @@ namespace gazebo
     {
       /// \brief Config widget for configuring properties.
       public: ConfigWidget *configWidget;
+
+      /// \brief True if the inspector is in read-only mode.
+      public: bool readOnly;
     };
   }
 }

@@ -68,7 +68,7 @@ void SurfaceTest::CollideWithoutContact(const std::string &_physicsEngine)
   // get the contact sensor
   sensors::SensorPtr sensor = sensors::get_sensor("box_contact");
   sensors::ContactSensorPtr contactSensor =
-      boost::dynamic_pointer_cast<sensors::ContactSensor>(sensor);
+      std::dynamic_pointer_cast<sensors::ContactSensor>(sensor);
   ASSERT_TRUE(contactSensor != NULL);
 
   // Step forward 0.2 s
@@ -95,7 +95,7 @@ void SurfaceTest::CollideWithoutContact(const std::string &_physicsEngine)
     while (contacts.contact_size() == 0 && --steps > 0)
     {
       world->Step(1);
-      contacts = contactSensor->GetContacts();
+      contacts = contactSensor->Contacts();
     }
 
     // Verify that both objects are recognized by contact sensor
@@ -137,7 +137,7 @@ void SurfaceTest::CollideWithoutContact(const std::string &_physicsEngine)
     while (contacts.contact_size() == 0 && --steps > 0)
     {
       world->Step(1);
-      contacts = contactSensor->GetContacts();
+      contacts = contactSensor->Contacts();
     }
 
     // Verify that only contactBox is recognized by contact sensor

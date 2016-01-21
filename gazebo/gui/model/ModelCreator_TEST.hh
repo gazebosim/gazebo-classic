@@ -37,8 +37,17 @@ class ModelCreator_TEST : public QTestFixture
   /// \brief Tests addition of plugin elements.
   private slots: void AddPluginElement();
 
-  /// \brief Tests removal of plugin elements.
+    /// \brief Tests removal of plugin elements.
   private slots: void RemovePluginElement();
+    
+  /// \brief Tests adding and removing model plugins
+  private slots: void ModelPlugin();
+
+  /// \brief Tests selecting nested models in the model editor
+  private slots: void NestedModelSelection();
+
+  // \brief Test copy and pasting entites in the model editor.
+  private slots: void CopyPaste();
 };
 
 #endif

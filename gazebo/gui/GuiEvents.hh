@@ -228,7 +228,7 @@ namespace gazebo
 
       /// \brief indicates the user is aligning objects
       public: static event::EventT<void (std::string,
-                  std::string, std::string, bool)> alignMode;
+                  std::string, std::string, bool, bool)> alignMode;
 
       /// \brief indicates an entity has been created
       public: static event::EventT<void (std::string,

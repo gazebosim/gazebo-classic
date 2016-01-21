@@ -36,6 +36,30 @@ class UndoTest : public QTestFixture
   /// physics::UserCmdManager.
   private slots: void MsgPassing();
 
+  /// \brief Test undoing translate model command.
+  private slots: void UndoTranslateModel();
+
+  /// \brief Test undoing rotate light command.
+  private slots: void UndoRotateLight();
+
+  /// \brief Test undoing snap commands.
+  private slots: void UndoSnap();
+
+  /// \brief Test undoing align commands.
+  private slots: void UndoAlign();
+
+  /// \brief Test undoing reset time commands.
+  private slots: void UndoResetTime();
+
+  /// \brief Test undoing reset world commands.
+  private slots: void UndoResetWorld();
+
+  /// \brief Test undoing reset model poses commands.
+  private slots: void UndoResetModelPoses();
+
+  /// \brief Test undoing wrench commands.
+  private slots: void UndoWrench();
+
   /// \brief UndoRedo message received
   /// \param[in] _msg Message containing an undo/redo request.
   private: void OnUndoRedo(ConstUndoRedoPtr &_msg);

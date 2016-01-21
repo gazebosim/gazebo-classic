@@ -51,7 +51,7 @@ using namespace gui;
 ModelMaker::ModelMaker() : EntityMaker(*new ModelMakerPrivate)
 {
   ModelMakerPrivate *dPtr =
-      reinterpret_cast<ModelMakerPrivate *>(this->dataPtr);
+      static_cast<ModelMakerPrivate *>(this->dataPtr);
 
   dPtr->clone = false;
   dPtr->makerPub = dPtr->node->Advertise<msgs::Factory>("~/factory");
@@ -61,7 +61,7 @@ ModelMaker::ModelMaker() : EntityMaker(*new ModelMakerPrivate)
 ModelMaker::~ModelMaker()
 {
   ModelMakerPrivate *dPtr =
-      reinterpret_cast<ModelMakerPrivate *>(this->dataPtr);
+      static_cast<ModelMakerPrivate *>(this->dataPtr);
 
   dPtr->makerPub.reset();
 }
@@ -70,7 +70,7 @@ ModelMaker::~ModelMaker()
 bool ModelMaker::InitFromModel(const std::string &_modelName)
 {
   ModelMakerPrivate *dPtr =
-      reinterpret_cast<ModelMakerPrivate *>(this->dataPtr);
+      static_cast<ModelMakerPrivate *>(this->dataPtr);
 
   rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
   if (!scene)
@@ -91,7 +91,7 @@ bool ModelMaker::InitFromModel(const std::string &_modelName)
   }
 
   dPtr->modelVisual = vis->Clone(
-      _modelName + "_clone_tmp", scene->GetWorldVisual());
+      _modelName + "_clone_tmp", scene->WorldVisual());
 
   if (!dPtr->modelVisual)
   {
@@ -106,7 +106,7 @@ bool ModelMaker::InitFromModel(const std::string &_modelName)
 bool ModelMaker::InitFromFile(const std::string &_filename)
 {
   ModelMakerPrivate *dPtr =
-      reinterpret_cast<ModelMakerPrivate *>(this->dataPtr);
+      static_cast<ModelMakerPrivate *>(this->dataPtr);
 
   dPtr->clone = false;
   rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
@@ -134,7 +134,7 @@ bool ModelMaker::InitFromFile(const std::string &_filename)
 bool ModelMaker::InitSimpleShape(SimpleShapes _shape)
 {
   ModelMakerPrivate *dPtr =
-      reinterpret_cast<ModelMakerPrivate *>(this->dataPtr);
+      static_cast<ModelMakerPrivate *>(this->dataPtr);
 
   dPtr->clone = false;
   rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
@@ -195,7 +195,7 @@ bool ModelMaker::InitSimpleShape(SimpleShapes _shape)
 bool ModelMaker::Init()
 {
   ModelMakerPrivate *dPtr =
-      reinterpret_cast<ModelMakerPrivate *>(this->dataPtr);
+      static_cast<ModelMakerPrivate *>(this->dataPtr);
 
   rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
   if (!scene)
@@ -223,7 +223,7 @@ bool ModelMaker::Init()
 
   dPtr->modelVisual.reset(new rendering::Visual(
       dPtr->node->GetTopicNamespace() + "::" + modelName,
-      scene->GetWorldVisual()));
+      scene->WorldVisual()));
   dPtr->modelVisual->Load();
   dPtr->modelVisual->SetPose(modelPose);
 
@@ -250,9 +250,9 @@ bool ModelMaker::Init()
 void ModelMaker::CreateModelFromSDF(sdf::ElementPtr _modelElem)
 {
   ModelMakerPrivate *dPtr =
-      reinterpret_cast<ModelMakerPrivate *>(this->dataPtr);
+      static_cast<ModelMakerPrivate *>(this->dataPtr);
 
-  math::Pose linkPose, visualPose;
+  ignition::math::Pose3d linkPose, visualPose;
   std::list<std::pair<sdf::ElementPtr, rendering::VisualPtr> > modelElemList;
 
   std::pair<sdf::ElementPtr, rendering::VisualPtr> pair(
@@ -278,7 +278,7 @@ void ModelMaker::CreateModelFromSDF(sdf::ElementPtr _modelElem)
       {
         std::string linkName = linkElem->Get<std::string>("name");
         if (linkElem->HasElement("pose"))
-          linkPose = linkElem->Get<math::Pose>("pose");
+          linkPose = linkElem->Get<ignition::math::Pose3d>("pose");
         else
           linkPose.Set(0, 0, 0, 0, 0, 0);
 
@@ -297,7 +297,7 @@ void ModelMaker::CreateModelFromSDF(sdf::ElementPtr _modelElem)
         while (visualElem)
         {
           if (visualElem->HasElement("pose"))
-            visualPose = visualElem->Get<math::Pose>("pose");
+            visualPose = visualElem->Get<ignition::math::Pose3d>("pose");
           else
             visualPose.Set(0, 0, 0, 0, 0, 0);
 
@@ -340,10 +340,6 @@ void ModelMaker::CreateModelFromSDF(sdf::ElementPtr _modelElem)
           childPose = childElem->Get<math::Pose>("pose");
         childVis->SetPose(childPose);
 
-//        std::string childName = modelVis->GetName() + "::" +
-//            childElem->Get<std::string>("name");
-//        childElem->GetAttribute("name")->Set(childName);
-
         std::pair<sdf::ElementPtr, rendering::VisualPtr> childPair(
             childElem, childVis);
         modelElemList.push_back(childPair);
@@ -358,14 +354,20 @@ void ModelMaker::CreateModelFromSDF(sdf::ElementPtr _modelElem)
 void ModelMaker::Stop()
 {
   ModelMakerPrivate *dPtr =
-      reinterpret_cast<ModelMakerPrivate *>(this->dataPtr);
+      static_cast<ModelMakerPrivate *>(this->dataPtr);
 
   // Remove the temporary visual from the scene
   rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
   if (scene)
+  {
+    for (auto vis : dPtr->visuals)
+    {
+      auto v = vis.lock();
+      if (v)
+        scene->RemoveVisual(v);
+    }
     scene->RemoveVisual(dPtr->modelVisual);
-  for (auto vis : dPtr->visuals)
-    scene->RemoveVisual(vis);
+  }
   dPtr->modelVisual.reset();
   dPtr->modelSDF.reset();
 
@@ -376,7 +378,7 @@ void ModelMaker::Stop()
 void ModelMaker::CreateTheEntity()
 {
   ModelMakerPrivate *dPtr =
-      reinterpret_cast<ModelMakerPrivate *>(this->dataPtr);
+      static_cast<ModelMakerPrivate *>(this->dataPtr);
 
   msgs::Factory msg;
   if (!dPtr->clone)
@@ -437,7 +439,7 @@ void ModelMaker::CreateTheEntity()
 ignition::math::Vector3d ModelMaker::EntityPosition() const
 {
   ModelMakerPrivate *dPtr =
-      reinterpret_cast<ModelMakerPrivate *>(this->dataPtr);
+      static_cast<ModelMakerPrivate *>(this->dataPtr);
 
   return dPtr->modelVisual->GetWorldPose().pos.Ign();
 }
@@ -446,7 +448,7 @@ ignition::math::Vector3d ModelMaker::EntityPosition() const
 void ModelMaker::SetEntityPosition(const ignition::math::Vector3d &_pos)
 {
   ModelMakerPrivate *dPtr =
-      reinterpret_cast<ModelMakerPrivate *>(this->dataPtr);
+      static_cast<ModelMakerPrivate *>(this->dataPtr);
 
   dPtr->modelVisual->SetWorldPosition(_pos);
 }
