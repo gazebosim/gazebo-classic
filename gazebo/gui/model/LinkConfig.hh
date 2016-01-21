@@ -92,6 +92,15 @@ namespace gazebo
       /// \return Config widget for the link.
       public: const ConfigWidget *LinkConfigWidget() const;
 
+      /// \brief Initialize widget.
+      public: void Init();
+
+      /// \brief Restore the widget's data to how it was when first opened.
+      public slots: void RestoreOriginalData();
+
+      /// \brief Qt signal emitted to indicate that changes should be applied.
+      Q_SIGNALS: void Applied();
+
       /// \brief Signal emitted when density changes.
       /// \param[in] _value The new density.
       Q_SIGNALS: void DensityValueChanged(const double _value);
@@ -107,15 +116,6 @@ namespace gazebo
       /// \brief Callback for mass changes in config widget.
       /// \param[in] _value The new mass value.
       private slots: void OnMassValueChanged(const double _value);
-
-      /// \brief Initialize widget.
-      public: void Init();
-
-      /// \brief Restore the widget's data to how it was when first opened.
-      public slots: void RestoreOriginalData();
-
-      /// \brief Qt signal emitted to indicate that changes should be applied.
-      Q_SIGNALS: void Applied();
 
       /// \brief Qt callback when a pose value has changed.
       /// \param[in] _name of widget in the config widget that emitted the

@@ -396,7 +396,6 @@ void CollisionConfig::RestoreOriginalData()
 void CollisionConfig::OnCollisionChanged(const std::string &_name,
     const std::string &_type)
 {
-  // emit Applied();
   emit CollisionChanged(_name, _type);
 }
 
@@ -427,4 +426,3 @@ void CollisionConfigData::RestoreOriginalData()
   this->configWidget->UpdateFromMsg(collisionPtr.get());
   this->configWidget->blockSignals(false);
 }
-

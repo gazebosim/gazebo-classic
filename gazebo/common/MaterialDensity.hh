@@ -20,6 +20,7 @@
 #include <string>
 #include <map>
 #include <tuple>
+#include <ignition/math/Helpers.hh>
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -27,7 +28,8 @@ namespace gazebo
   namespace common
   {
     /// \enum MaterialType
-    /// \brief Types of materials
+    /// \brief Types of materials.
+    /// Source: https://en.wikipedia.org/wiki/Density
     enum class MaterialType
     {
       /// \internal
@@ -96,26 +98,34 @@ namespace gazebo
       /// \brief Return the density of the given material name, or -1
       /// if the material is not found.
       /// \param[in] _material Name of the material, See MaterialType.
-      /// \return Matching DensityEntry if found else null.
+      /// \return Matching density if found, otherwise -1.
       public: static double Density(const std::string &_material);
 
       /// \brief Return the density of a material.
       /// \param[in] _material Type of the material, See MaterialType.
-      /// \return Matching DensityEntry if found else null.
+      /// \return Matching density if found, otherwise -1.
       public: static double Density(const MaterialType _material);
 
-      /// \brief Return first material and density with matching value.
+      /// \brief Return the material with the closest density value within
+      /// _epsilon, or MATERIAL_TYPE_END if not found.
       /// \param[in] _value Density value of entry to match.
+      /// \param[in] _epsilon Allowable range of difference between _value,
+      /// and a material's density.
       /// \return A tuple where the first element is the MaterialType, and
       /// the second the density. A value of {MATERIAL_TYPE_END, -1} is
       /// returned on error.
       public: static std::tuple<MaterialType, double> Nearest(
-                  const double _value);
+                  const double _value,
+                  const double _epsilon = IGN_DBL_MAX);
 
-      /// \brief Return first material with matching value or null if not found.
+      /// \brief Return the material with the closest density value within
+      /// _epsilon, or MATERIAL_TYPE_END if not found.
       /// \param[in] _value Density value of entry to match.
+      /// \param[in] _epsilon Allowable range of difference between _value,
+      /// and a material's density.
       /// \return The nearest material type. MATERIAL_TYPE_END on error.
-      public: static MaterialType NearestMaterial(const double _value);
+      public: static MaterialType NearestMaterial(const double _value,
+                  const double _epsilon = IGN_DBL_MAX);
 
       /// \brief List of density entries
       private: static std::map<MaterialType, double> materials;

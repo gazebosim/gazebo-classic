@@ -89,7 +89,7 @@ double MaterialDensity::Density(const MaterialType _material)
 
 /////////////////////////////////////////////////
 std::tuple<MaterialType, double> MaterialDensity::Nearest(
-    const double _value)
+    const double _value, const double _epsilon)
 {
   double min = IGN_DBL_MAX;
   std::tuple<MaterialType, double> result
@@ -99,8 +99,8 @@ std::tuple<MaterialType, double> MaterialDensity::Nearest(
 
   for (auto const &mat : materials)
   {
-    double diff = mat.second - _value;
-    if (diff >= 0 && diff < min)
+    double diff = std::fabs(mat.second - _value);
+    if (diff < min && diff < _epsilon)
     {
       min = diff;
       result = mat;
@@ -111,7 +111,8 @@ std::tuple<MaterialType, double> MaterialDensity::Nearest(
 }
 
 /////////////////////////////////////////////////
-MaterialType MaterialDensity::NearestMaterial(const double _value)
+MaterialType MaterialDensity::NearestMaterial(const double _value,
+    const double _epsilon)
 {
-  return std::get<0>(Nearest(_value));
+  return std::get<0>(Nearest(_value, _epsilon));
 }

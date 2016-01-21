@@ -22,6 +22,7 @@
 #endif
 
 #include <boost/thread/recursive_mutex.hpp>
+#include <ignition/math/Helpers.hh>
 
 #include "gazebo/common/Assert.hh"
 
@@ -667,46 +668,47 @@ double LinkData::ComputeVolume(const msgs::Collision &_collision)
     {
       switch (geometry.type())
       {
-      case msgs::Geometry_Type_BOX:
-      case msgs::Geometry_Type_MESH:
-      case msgs::Geometry_Type_POLYLINE:
-        if (geometry.has_box())
-        {
-          const msgs::BoxGeom &box = geometry.box();
-          if (box.has_size())
+        case msgs::Geometry_Type_BOX:
+        case msgs::Geometry_Type_MESH:
+        case msgs::Geometry_Type_POLYLINE:
+          if (geometry.has_box())
           {
-            const msgs::Vector3d &size = box.size();
-            volume = IGN_BOX_VOLUME(size.x(), size.y(), size.z());
+            const msgs::BoxGeom &box = geometry.box();
+            if (box.has_size())
+            {
+              const msgs::Vector3d &size = box.size();
+              volume = IGN_BOX_VOLUME(size.x(), size.y(), size.z());
+            }
           }
-        }
-        break;
+          break;
 
-      case msgs::Geometry_Type_CYLINDER:
-        if (geometry.has_cylinder())
-        {
-          const msgs::CylinderGeom &cylinder = geometry.cylinder();
-          if (cylinder.has_radius() && cylinder.has_length())
+        case msgs::Geometry_Type_CYLINDER:
+          if (geometry.has_cylinder())
           {
-            // Cylinder volume: PI * r^2 * height
-            volume = IGN_CYLINDER_VOLUME(cylinder.radius(), cylinder.length());
+            const msgs::CylinderGeom &cylinder = geometry.cylinder();
+            if (cylinder.has_radius() && cylinder.has_length())
+            {
+              // Cylinder volume: PI * r^2 * height
+              volume = IGN_CYLINDER_VOLUME(cylinder.radius(),
+                                           cylinder.length());
+            }
           }
-        }
-        break;
+          break;
 
-      case msgs::Geometry_Type_SPHERE:
-        if (geometry.has_sphere())
-        {
-          const msgs::SphereGeom &sphere = geometry.sphere();
-          if (sphere.has_radius())
+        case msgs::Geometry_Type_SPHERE:
+          if (geometry.has_sphere())
           {
-            // Sphere volume: 4/3 * PI * r^3
-            volume = IGN_SPHERE_VOLUME(sphere.radius());
+            const msgs::SphereGeom &sphere = geometry.sphere();
+            if (sphere.has_radius())
+            {
+              // Sphere volume: 4/3 * PI * r^3
+              volume = IGN_SPHERE_VOLUME(sphere.radius());
+            }
           }
-        }
-        break;
+          break;
 
-      default:
-        break;
+        default:
+          break;
       }
     }
   }
@@ -727,72 +729,72 @@ ignition::math::Vector3d LinkData::ComputeMomentOfInertia(
     {
       switch (geometry.type())
       {
-      case msgs::Geometry_Type_BOX:
-      case msgs::Geometry_Type_MESH:
-      case msgs::Geometry_Type_POLYLINE:
-        if (geometry.has_box())
-        {
-          const msgs::BoxGeom &box = geometry.box();
-          if (box.has_size())
+        case msgs::Geometry_Type_BOX:
+        case msgs::Geometry_Type_MESH:
+        case msgs::Geometry_Type_POLYLINE:
+          if (geometry.has_box())
           {
-            // Box:
-            //    Ih = 1/12 * M * (w^2 + d^2)
-            //    Iw = 1/12 * M * (h^2 + d^2)
-            //    Id = 1/12 * M * (h^2 + w^2)
-            double h = box.size().x();
-            double h2 = h*h;
-            double w = box.size().y();
-            double w2 = w*w;
-            double d = box.size().z();
-            double d2 = d*d;
+            const msgs::BoxGeom &box = geometry.box();
+            if (box.has_size())
+            {
+              // Box:
+              //    Ih = 1/12 * M * (w^2 + d^2)
+              //    Iw = 1/12 * M * (h^2 + d^2)
+              //    Id = 1/12 * M * (h^2 + w^2)
+              double h = box.size().x();
+              double h2 = h*h;
+              double w = box.size().y();
+              double w2 = w*w;
+              double d = box.size().z();
+              double d2 = d*d;
 
-            double Ih = 1.0 / 12.0 * _mass * (w2 + d2);
-            double Iw = 1.0 / 12.0 * _mass * (h2 + d2);
-            double Id = 1.0 / 12.0 * _mass * (h2 + w2);
+              double Ih = 1.0 / 12.0 * _mass * (w2 + d2);
+              double Iw = 1.0 / 12.0 * _mass * (h2 + d2);
+              double Id = 1.0 / 12.0 * _mass * (h2 + w2);
 
-            result.Set(Ih, Iw, Id);
+              result.Set(Ih, Iw, Id);
+            }
           }
-        }
-        break;
+          break;
 
-      case msgs::Geometry_Type_CYLINDER:
-        if (geometry.has_cylinder())
-        {
-          const msgs::CylinderGeom &cylinder = geometry.cylinder();
-          if (cylinder.has_radius() && cylinder.has_length())
+        case msgs::Geometry_Type_CYLINDER:
+          if (geometry.has_cylinder())
           {
-            // Cylinder:
-            //    central axis: I = 1/2 * M * R^2
-            //    other axes:   I = 1/4 * M * R^2 + 1/12 * M * L^2
-            double r = cylinder.radius();
-            double r2 = r*r;
-            double l = cylinder.length();
-            double l2 = l*l;
-            double Icentral = 1.0 / 2.0 * _mass * r2;
-            double Iother = (1.0 / 4.0 * _mass * r2) +
-                (1.0 / 12.0 * _mass * l2);
-            result.Set(Iother, Iother, Icentral);
+            const msgs::CylinderGeom &cylinder = geometry.cylinder();
+            if (cylinder.has_radius() && cylinder.has_length())
+            {
+              // Cylinder:
+              //    central axis: I = 1/2 * M * R^2
+              //    other axes:   I = 1/4 * M * R^2 + 1/12 * M * L^2
+              double r = cylinder.radius();
+              double r2 = r*r;
+              double l = cylinder.length();
+              double l2 = l*l;
+              double Icentral = 1.0 / 2.0 * _mass * r2;
+              double Iother = (1.0 / 4.0 * _mass * r2) +
+                  (1.0 / 12.0 * _mass * l2);
+              result.Set(Iother, Iother, Icentral);
+            }
           }
-        }
-        break;
+          break;
 
-      case msgs::Geometry_Type_SPHERE:
-        if (geometry.has_sphere())
-        {
-          const msgs::SphereGeom &sphere = geometry.sphere();
-          if (sphere.has_radius())
+        case msgs::Geometry_Type_SPHERE:
+          if (geometry.has_sphere())
           {
-            // Sphere: I = 2/5 * M * R^2
-            double r = sphere.radius();
-            double r2 = r*r;
-            double I = 2.0 / 5.0 * _mass * r2;
-            result.Set(I, I, I);
+            const msgs::SphereGeom &sphere = geometry.sphere();
+            if (sphere.has_radius())
+            {
+              // Sphere: I = 2/5 * M * R^2
+              double r = sphere.radius();
+              double r2 = r*r;
+              double I = 2.0 / 5.0 * _mass * r2;
+              result.Set(I, I, I);
+            }
           }
-        }
-        break;
+          break;
 
-      default:
-        break;
+        default:
+          break;
       }
     }
   }
@@ -823,12 +825,12 @@ double LinkData::ComputeVolume() const
     if (shape == "sphere")
     {
       // Sphere volume: 4/3 * PI * r^3
-      volume += IGN_SPHERE_VOLUME(size.X());
+      volume += IGN_SPHERE_VOLUME(size.X() * 0.5);
     }
     else if (shape == "cylinder")
     {
       // Cylinder volume: PI * r^2 * height
-      volume += IGN_CYLINDER_VOLUME(size.X(), size.Z());
+      volume += IGN_CYLINDER_VOLUME(size.X() * 0.5, size.Z());
     }
     else
     {

@@ -96,16 +96,17 @@ LinkInspector::LinkInspector(QWidget *_parent) : QDialog(_parent),
   this->setLayout(mainLayout);
 
   // Conections
-  connect(this, SIGNAL(rejected()), this, SLOT(RestoreOriginalData()));
+  this->connect(this, SIGNAL(rejected()), this, SLOT(RestoreOriginalData()));
 
-  connect(this->dataPtr->linkConfig,
+  this->connect(this->dataPtr->linkConfig,
       SIGNAL(DensityValueChanged(const double &)),
       this, SLOT(OnDensityValueChanged(const double &)));
 
-  connect(this->dataPtr->linkConfig, SIGNAL(MassValueChanged(const double &)),
+  this->connect(this->dataPtr->linkConfig,
+      SIGNAL(MassValueChanged(const double &)),
       this, SLOT(OnMassValueChanged(const double &)));
 
-  connect(this->dataPtr->collisionConfig,
+  this->connect(this->dataPtr->collisionConfig,
       SIGNAL(CollisionChanged(const std::string &, const std::string &)),
       this,
       SLOT(OnCollisionChanged(const std::string &, const std::string &)));
@@ -256,7 +257,7 @@ void LinkInspector::OnDensityValueChanged(const double _value)
 
   if (!ignition::math::equal(this->dataPtr->linkConfig->Mass(), mass))
   {
-    ignition::math::Vector3d I = ComputeInertia(mass);
+    ignition::math::Vector3d I = this->ComputeInertia(mass);
     this->dataPtr->linkConfig->SetMass(mass);
     this->dataPtr->linkConfig->SetInertiaMatrix(I.X(), I.Y(), I.Z(), 0, 0, 0);
   }
