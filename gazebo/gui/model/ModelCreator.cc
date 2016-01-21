@@ -1591,19 +1591,23 @@ void ModelCreator::OnDelete()
 /////////////////////////////////////////////////
 void ModelCreator::OnDelete(const std::string &_entity)
 {
-//  this->RemoveEntity(_entity);
-
   // if it's a nestedModel
   auto nestedModel = this->allNestedModels.find(_entity);
   if (nestedModel != this->allNestedModels.end())
   {
-    auto cmd = MEUserCmdManager::Instance()->NewCmd(
-        "Delete [" + nestedModel->second->Name() + "]",
-        MEUserCmd::DELETING_NESTED_MODEL);
-    cmd->SetSDF(nestedModel->second->modelSDF);
-    cmd->SetScopedName(nestedModel->second->modelVisual->GetName());
+    // Get data to use after the model has been deleted
+    auto name = nestedModel->second->Name();
+    auto sdf = nestedModel->second->modelSDF;
+    auto scopedName = nestedModel->second->modelVisual->GetName();
 
     this->RemoveNestedModelImpl(_entity);
+
+    auto cmd = MEUserCmdManager::Instance()->NewCmd(
+        "Delete [" + name + "]",
+        MEUserCmd::DELETING_NESTED_MODEL);
+    cmd->SetSDF(sdf);
+    cmd->SetScopedName(scopedName);
+
     return;
   }
 

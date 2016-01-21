@@ -31,6 +31,12 @@ class ModelEditorUndoTest : public QTestFixture
   /// \brief Test undo/redo link insertion using the mouse.
   private slots: void LinkInsertionByMouse();
 
+  /// \brief Test undo/redo link insertion via the right-click context menu.
+  private slots: void NestedModelDeletionByContextMenu();
+
+  /// \brief Test undo/redo link insertion using the mouse.
+  private slots: void NestedModelInsertionByMouse();
+
   /// \brief Helper callback to trigger the delete action on the context
   /// menu after the menu, which is modal, has been opened.
   private slots: void TriggerDelete();
