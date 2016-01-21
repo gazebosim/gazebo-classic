@@ -42,13 +42,13 @@ TEST_F(JointVisual_TEST, JointVisualTest)
   // create a fake child visual where the joint visual will be attached to
   gazebo::rendering::VisualPtr childVis;
   childVis.reset(
-      new gazebo::rendering::Visual("child", scene->GetWorldVisual()));
+      new gazebo::rendering::Visual("child", scene->WorldVisual()));
 
   // create a joint message for testing
   gazebo::msgs::JointPtr jointMsg;
   jointMsg.reset(new gazebo::msgs::Joint);
-  jointMsg->set_parent(scene->GetWorldVisual()->GetName());
-  jointMsg->set_parent_id(scene->GetWorldVisual()->GetId());
+  jointMsg->set_parent(scene->WorldVisual()->GetName());
+  jointMsg->set_parent_id(scene->WorldVisual()->GetId());
   jointMsg->set_child(childVis->GetName());
   jointMsg->set_child_id(childVis->GetId());
   jointMsg->set_name("test_joint");

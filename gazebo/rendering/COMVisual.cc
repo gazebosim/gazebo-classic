@@ -146,7 +146,7 @@ void COMVisual::Load()
   this->InsertMesh("unit_sphere");
 
   Ogre::MovableObject *sphereObj =
-    (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+    (Ogre::MovableObject*)(dPtr->scene->OgreSceneManager()->createEntity(
           this->GetName()+"__SPHERE__", "unit_sphere"));
   sphereObj->setVisibilityFlags(GZ_VISIBILITY_GUI);
   sphereObj->setCastShadows(false);
@@ -214,7 +214,7 @@ void COMVisual::DestroyAllAttachedMovableObjects(Ogre::SceneNode *_sceneNode)
   {
     Ogre::Entity *ent = static_cast<Ogre::Entity*>(itObject.getNext());
     if (ent->getMovableType() != DynamicLines::GetMovableType())
-      this->dataPtr->scene->GetManager()->destroyEntity(ent);
+      this->dataPtr->scene->OgreSceneManager()->destroyEntity(ent);
     else
       delete ent;
   }

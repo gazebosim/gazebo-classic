@@ -1,7 +1,14 @@
 #################################################
+# VAR: GZ_BUILD_TESTS_EXTRA_EXE_SRCS
 # Hack: extra sources to build binaries can be supplied to gz_build_tests in
 # the variable GZ_BUILD_TESTS_EXTRA_EXE_SRCS. This variable will be clean up
 # at the end of the function
+#
+# VAR: GZ_BUILD_TESTS_EXTRA_LIBS
+# Hack: extra libs to build binaries can be supplied to gz_build_tests in
+# the variable GZ_BUILD_TESTS_EXTRA_LIBS. This variable will be clean up
+# at the end of the function
+#
 macro (gz_build_tests)
   # Build all the tests
   foreach(GTEST_SOURCE_file ${ARGN})
@@ -30,15 +37,12 @@ macro (gz_build_tests)
 
 
     target_link_libraries(${BINARY_NAME}
-      # This two libraries are need to workaround on bug
-      # https://bitbucket.org/osrf/gazebo/issue/1516
-      gazebo_physics
-      gazebo_sensors
       # libgazebo will bring all most of gazebo libraries as dependencies
       libgazebo
       gazebo_test_fixture
       gtest
       gtest_main
+      ${GZ_BUILD_TESTS_EXTRA_LIBS}
       )
 
     add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME}
@@ -57,15 +61,11 @@ macro (gz_build_tests)
     # Check that the test produced a result and create a failure if it didn't.
     # Guards against crashed and timed out tests.
     add_test(check_${BINARY_NAME} ${PROJECT_SOURCE_DIR}/tools/check_test_ran.py
-    ${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
-
-    if(GAZEBO_RUN_VALGRIND_TESTS AND VALGRIND_PROGRAM)
-      add_test(memcheck_${BINARY_NAME} ${VALGRIND_PROGRAM} --leak-check=full
-        --error-exitcode=1 --show-leak-kinds=all ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME})
-    endif()
+	${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
   endforeach()
 
   set(GZ_BUILD_TESTS_EXTRA_EXE_SRCS "")
+  set(GZ_BUILD_TESTS_EXTRA_LIBS "")
 endmacro()
 
 if (VALID_DISPLAY)
@@ -98,11 +98,8 @@ if (VALID_DISPLAY)
       )
 
     target_link_libraries(${BINARY_NAME}
-      # This two libraries are need to workaround on bug
-      # https://bitbucket.org/osrf/gazebo/issue/1516
-      gazebo_physics
-      gazebo_sensors
-      # gazebo_gui and libgazebo will bring all most of gazebo libraries as dependencies
+      # gazebo_gui and libgazebo will bring all most of gazebo
+      # libraries as dependencies
       libgazebo
       gazebo_gui
       ${QT_QTTEST_LIBRARY}
