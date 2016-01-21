@@ -17,20 +17,20 @@
 #ifndef _GAZEBO_SENSORS_RFIDTAG_HH_
 #define _GAZEBO_SENSORS_RFIDTAG_HH_
 
-#include <vector>
+#include <sdf/sdf.hh>
 #include <string>
 #include <ignition/math/Pose3.hh>
 
-#include "gazebo/common/CommonTypes.hh"
-#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/sensors/Sensor.hh"
-#include "gazebo/physics/physics.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace sensors
   {
+    // Forward declare private data class.
+    class RFIDTagPrivate;
+
     /// \addtogroup gazebo_sensors
     /// \{
 
@@ -64,11 +64,9 @@ namespace gazebo
       /// \return Pose of object.
       public: ignition::math::Pose3d TagPose() const;
 
-      /// \brief Pointer the entity that has the RFID tag.
-      private: physics::EntityPtr entity;
-
-      /// \brief Publisher for tag pose messages.
-      private: transport::PublisherPtr scanPub;
+      /// \internal
+      /// \brief Private data pointer.
+      private: std::unique_ptr<RFIDTagPrivate> dataPtr;
     };
     /// \}
   }
