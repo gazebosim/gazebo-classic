@@ -136,15 +136,6 @@ endif ()
 #  )
 #endif()
 
-set (gtest_sources
-  Conversions_TEST.cc
-)
-gz_build_tests(${gtest_sources})
-foreach(gtest_file ${gtest_sources})
-  string(REGEX REPLACE ".cc" "" BINARY_NAME ${gtest_file})
-  target_link_libraries(${TEST_TYPE}_${BINARY_NAME} gazebo_gui)
-endforeach()
-
 set (qt_tests
   DataLogger_TEST.cc
   GuiIface_TEST.cc
@@ -152,6 +143,7 @@ set (qt_tests
   LightMaker_TEST.cc
   ModelAlign_TEST.cc
   ModelMaker_TEST.cc
+  ModelManipulator_TEST.cc
   RenderWidget_TEST.cc
   SaveDialog_TEST.cc
   SplashScreen_TEST.cc
@@ -242,6 +234,13 @@ if (SPNAV_LIBRARY)
   target_link_libraries(gazebo_gui ${SPNAV_LIBRARY})
   target_link_libraries(gzclient ${SPNAV_LIBRARY})
 endif()
+
+set (gtest_sources
+  Conversions_TEST.cc
+)
+
+set (GZ_BUILD_TESTS_EXTRA_LIBS gazebo_gui)
+gz_build_tests(${gtest_sources})
 
 add_definitions(${QT_DEFINITIONS})
 

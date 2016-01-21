@@ -554,7 +554,7 @@ std::string Visual::GetName() const
 void Visual::AttachVisual(VisualPtr _vis)
 {
   if (!_vis)
-    gzerr << "Visual is null\n";
+    gzerr << "Visual is null" << std::endl;
   else
   {
     if (_vis->GetSceneNode()->getParentSceneNode())
