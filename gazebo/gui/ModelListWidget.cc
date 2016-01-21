@@ -268,9 +268,12 @@ void ModelListWidget::OnSetSelectedEntity(const std::string &_name,
       this->dataPtr->lightsItem);
     if (mItem)
     {
-      this->dataPtr->requestMsg = msgs::CreateRequest("entity_info",
-          this->dataPtr->selectedEntityName);
-      this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
+      if (this->dataPtr->requestPub)
+      {
+        this->dataPtr->requestMsg = msgs::CreateRequest("entity_info",
+            this->dataPtr->selectedEntityName);
+        this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
+      }
       this->dataPtr->modelTreeWidget->setCurrentItem(mItem);
       mItem->setExpanded(!mItem->isExpanded());
     }

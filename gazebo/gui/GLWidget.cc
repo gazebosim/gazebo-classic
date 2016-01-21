@@ -1127,8 +1127,12 @@ void GLWidget::OnManipMode(const std::string &_mode)
     std::lock_guard<std::mutex> lock(this->dataPtr->selectedVisMutex);
     ModelManipulator::Instance()->SetAttachedVisual(
         this->dataPtr->selectedVisuals.back());
-    if (_mode == "translate" || _mode == "rotate" || _mode == "scale" ||
-        _mode == "snap")
+
+    if (_mode == "select")
+    {
+      this->dataPtr->scene->SelectVisual("", "select");
+    }
+    else
     {
       this->dataPtr->scene->SelectVisual(
           this->dataPtr->selectedVisuals.back()->GetName(), "move");
