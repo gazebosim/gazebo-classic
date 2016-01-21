@@ -30,7 +30,7 @@ void ModelManipulationTest::StopProcessingPoseMsgs()
   this->shareMaxPercentChange = 2.0;
 
   // Load a world which has moving models
-  this->Load("test/worlds/revolute_joint_test.world", false, false, true);
+  this->Load("test/worlds/revolute_joint_test.world", false, false, false);
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
