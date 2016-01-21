@@ -1134,6 +1134,7 @@ void GLWidget::OnManipMode(const std::string &_mode)
     }
     else
     {
+      // Make sure model is not updated by server during manipulation
       this->dataPtr->scene->SelectVisual(
           this->dataPtr->selectedVisuals.back()->GetName(), "move");
     }
