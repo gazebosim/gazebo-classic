@@ -52,6 +52,13 @@ class QTestFixture : public QObject
   /// \param[in] _pause True to pause the world
   protected: void SetPause(bool _pause);
 
+  /// \brief Give the GUI time to process events and trigger main window repaint
+  /// \param[in] _mainWindow Pointer to the main window.
+  /// \param[in] _repeat How many times to repeat the loop.
+  /// \param[in] _ms Time to sleep in milliseconds.
+  protected: void ProcessEventsAndDraw(QMainWindow *_mainWindow,
+      const unsigned int _repeat = 10, const unsigned int _ms = 30);
+
   /// \brief Get memory information about the current process.
   /// \param[out] _resident Resident size, in Kb.
   /// \param[out] _share Shared memory, in Kb.
