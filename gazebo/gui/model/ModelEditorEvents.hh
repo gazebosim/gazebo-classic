@@ -446,6 +446,9 @@ namespace gazebo
             event::ConnectionPtr _subscriber)
           { setSelectedModelPlugin.Disconnect(_subscriber); }
 
+        /// \brief Connect a Gazebo event to the model plugin inserted signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
         public: template<typename T>
             static event::ConnectionPtr ConnectModelPluginInserted(
             T _subscriber)
@@ -613,7 +616,7 @@ namespace gazebo
         public: static event::EventT<void (std::string)>
             showModelPluginContextMenu;
 
-        /// \brief Request to select or deselect an link.
+        /// \brief Request to select or deselect a link.
         public: static event::EventT<void (std::string, bool)> setSelectedLink;
 
         /// \brief Request to select or deselect a joint.

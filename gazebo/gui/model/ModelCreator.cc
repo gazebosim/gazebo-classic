@@ -222,9 +222,9 @@ ModelCreator::~ModelCreator()
   while (!this->allNestedModels.empty())
     this->RemoveNestedModelImpl(this->allNestedModels.begin()->first);
 
+  this->allNestedModels.clear();
   this->allLinks.clear();
   this->allModelPlugins.clear();
-  this->allNestedModels.clear();
   this->node->Fini();
   this->node.reset();
   this->modelTemplateSDF.reset();
@@ -473,7 +473,6 @@ NestedModelData *ModelCreator::CreateModelFromSDF(
         this->CreateModelFromSDF(nestedModelElem, modelVisual, _emit);
     rendering::VisualPtr nestedModelVis = nestedModelData->modelVisual;
     modelData->models[nestedModelVis->GetName()] = nestedModelVis;
-
     nestedModelElem = nestedModelElem->GetNextElement("model");
   }
 
@@ -1042,12 +1041,14 @@ NestedModelData *ModelCreator::CloneNestedModel(
   }
 
   std::string leafName = newName;
-  size_t idx = newName.find_last_of("::");
+  size_t idx = newName.rfind("::");
   if (idx != std::string::npos)
-    leafName = newName.substr(idx+1);
-  NestedModelData *modelData = it->second->Clone(leafName);
+    leafName = newName.substr(idx+2);
+  sdf::ElementPtr cloneSDF = it->second->modelSDF->Clone();
+  cloneSDF->GetAttribute("name")->Set(leafName);
 
-  this->allNestedModels[newName] = modelData;
+  NestedModelData *modelData = this->CreateModelFromSDF(cloneSDF,
+    it->second->modelVisual->GetParent(), false);
 
   this->ModelChanged();
 
@@ -1501,7 +1502,6 @@ void ModelCreator::AddEntity(const sdf::ElementPtr &_sdf)
 
   if (_sdf->GetName() == "model")
   {
-
     this->addEntityType = ENTITY_MODEL;
     NestedModelData *modelData = this->AddModel(_sdf);
     if (modelData)
@@ -2309,16 +2309,11 @@ void ModelCreator::GenerateSDF()
       mid += modelData->Pose().Pos();
       entityCount++;
     }
-    if (!(this->allLinks.empty() && this->allNestedModels.empty()))
-    {
-      mid /= entityCount;
-    }
 
     // Put the origin in the ground so when the model is inserted it is fully
     // above ground.
     // TODO set a better origin other than the centroid
     mid.Z(0);
-
 
     if (!(this->allLinks.empty() && this->allNestedModels.empty()))
     {
@@ -2395,7 +2390,7 @@ void ModelCreator::GenerateSDF()
     {
       NestedModelData *nestedModelData = canonical->second;
       // TODO do we need this update call below?
-      this->UpdateNestedModelSDF(nestedModelData->modelSDF);
+      // this->UpdateNestedModelSDF(nestedModelData->modelSDF);
       modelElem->InsertElement(nestedModelData->modelSDF);
     }
   }
@@ -2403,14 +2398,12 @@ void ModelCreator::GenerateSDF()
   // loop through rest of all nested models and add sdf
   for (auto &nestedModelsIt : this->allNestedModels)
   {
-    if (nestedModelsIt.first == this->canonicalModel ||
-        (nestedModelsIt.second->modelVisual &&
-        nestedModelsIt.second->modelVisual->GetParent()
-        != this->previewVisual))
-      continue;
-
     NestedModelData *nestedModelData = nestedModelsIt.second;
-    this->UpdateNestedModelSDF(nestedModelData->modelSDF);
+    if (nestedModelsIt.first == this->canonicalModel ||
+        nestedModelData->Depth() != 2)
+      continue;
+    // TODO do we need this update call below?
+    // this->UpdateNestedModelSDF(nestedModelData->modelSDF);
     modelElem->InsertElement(nestedModelData->modelSDF);
   }
 
@@ -2431,7 +2424,7 @@ void ModelCreator::GenerateSDF()
   modelElem->GetElement("static")->Set(this->isStatic);
   modelElem->GetElement("allow_auto_disable")->Set(this->autoDisable);
 
-    // Add plugin elements
+  // Add plugin elements
   for (auto modelPlugin : this->allModelPlugins)
     modelElem->InsertElement(modelPlugin.second->modelPluginSDF->Clone());
 

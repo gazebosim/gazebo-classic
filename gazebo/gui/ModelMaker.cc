@@ -23,14 +23,11 @@
 
 #include <sstream>
 
-#include <sdf/sdf.hh>
-
 #include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 
-#include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/Scene.hh"

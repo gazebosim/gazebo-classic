@@ -77,9 +77,6 @@ namespace gazebo
       /// \param[in] _pose Inertial pose to set the link to.
       public: void SetInertialPose(const ignition::math::Pose3d &_pose);
 
-      /// \brief Get the configuration widget for the link
-      public: const ConfigWidget *GetConfigWidget() const;
-
       /// \brief Get the config widget for the link
       /// \return Config widget for the link.
       public: const ConfigWidget *LinkConfigWidget() const;

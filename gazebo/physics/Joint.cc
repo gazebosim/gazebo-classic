@@ -210,7 +210,6 @@ void Joint::Load(sdf::ElementPtr _sdf)
   std::string parentName = parentElem->Get<std::string>();
   std::string childName = childElem->Get<std::string>();
 
-  // Try to get links in this model, with scoped or unscoped name
   if (this->model)
   {
     this->childLink = this->model->GetLink(childName);
@@ -248,7 +247,6 @@ void Joint::Load(sdf::ElementPtr _sdf)
 
       parentModel = parentModel->GetParent();
     }
-
     if (!this->parentLink)
     {
       std::string parentNameThisModel =

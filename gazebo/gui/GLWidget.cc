@@ -292,11 +292,10 @@ void GLWidget::paintEvent(QPaintEvent *_e)
 void GLWidget::resizeEvent(QResizeEvent *_e)
 {
   if (this->dataPtr->windowId >= 0)
-    return;
-
   {
     rendering::RenderEngine::Instance()->GetWindowManager()->Resize(
         this->dataPtr->windowId, _e->size().width(), _e->size().height());
+
     if (this->dataPtr->userCamera)
     {
       this->dataPtr->userCamera->Resize(

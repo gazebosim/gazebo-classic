@@ -168,8 +168,7 @@ namespace gazebo
       /// \brief Set the select state of an entity.
       /// \param[in] _name Name of the link.
       /// \param[in] _selected True to select the entity.
-      public: void SetSelected(const std::string &_name,
-          const bool selected);
+      public: void SetSelected(const std::string &_name, const bool selected);
 
       /// \brief Set the select state of a entity visual.
       /// \param[in] _linkVis Pointer to the entity visual.

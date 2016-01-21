@@ -667,12 +667,6 @@ void ModelState::SetSimTime(const common::Time &_time)
     iter->second.SetSimTime(_time);
   }
 
-  for (ModelState_M::iterator iter = this->modelStates.begin();
-       iter != this->modelStates.end(); ++iter)
-  {
-    iter->second.SetSimTime(_time);
-  }
-
   for (auto &ms : this->modelStates)
   {
     ms.second.SetSimTime(_time);

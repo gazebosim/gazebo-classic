@@ -290,7 +290,6 @@ void JointMaker::RemoveJoint(const std::string &_jointId)
   joint->child.reset();
   delete joint->inspector;
   delete joint;
-
   gui::model::Events::modelChanged();
 }
 

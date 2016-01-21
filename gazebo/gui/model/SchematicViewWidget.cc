@@ -130,19 +130,6 @@ std::string SchematicViewWidget::UnscopedName(const std::string &_scopedName)
 }
 
 /////////////////////////////////////////////////
-std::string SchematicViewWidget::GetScopedName(const std::string &_scopedName)
-{
-  if (_scopedName.empty())
-    return "";
-
-  std::string name = _scopedName;
-  size_t idx = _scopedName.find("::");
-  if (idx != std::string::npos)
-    name = _scopedName.substr(idx+2);
-  return name;
-}
-
-/////////////////////////////////////////////////
 void SchematicViewWidget::AddNode(const std::string &_node)
 {
   std::string name = this->UnscopedName(_node);
@@ -285,7 +272,7 @@ unsigned int SchematicViewWidget::GetEdgeCount() const
 /////////////////////////////////////////////////
 bool SchematicViewWidget::HasEdge(const std::string &_id) const
 {
-  return (this->edges.find(_id) != this->edges.end());
+  return this->edges.find(_id) != this->edges.end();
 }
 
 /////////////////////////////////////////////////

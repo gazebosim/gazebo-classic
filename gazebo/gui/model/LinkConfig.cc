@@ -149,9 +149,3 @@ const ConfigWidget *LinkConfig::LinkConfigWidget() const
 {
   return this->configWidget;
 }
-
-/////////////////////////////////////////////////
-const ConfigWidget *LinkConfig::GetConfigWidget() const
-{
-  return const_cast<ConfigWidget *>(this->configWidget);
-}

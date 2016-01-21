@@ -394,8 +394,6 @@ void UserCamera::SetViewController(const std::string &_type)
     this->dataPtr->viewController->Init();
 
     this->dataPtr->prevViewControllerName = vc;
-
-  this->dataPtr->prevViewControllerName = vc;
   }
   else
   {

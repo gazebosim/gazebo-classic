@@ -404,4 +404,3 @@ void CollisionConfigData::RestoreOriginalData()
   this->configWidget->UpdateFromMsg(collisionPtr.get());
   this->configWidget->blockSignals(false);
 }
-

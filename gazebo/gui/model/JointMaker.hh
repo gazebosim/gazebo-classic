@@ -156,10 +156,6 @@ namespace gazebo
       public: std::vector<JointData *> JointDataByLink(
           const std::string &_linkName) const;
 
-      /// \brief Set the model name this joint will be attached to.
-      /// \param[in] _modelName Model name.
-      public: void SetModelName(const std::string &_modelName);
-
       /// \brief Generate SDF for all joints.
       public: void GenerateSDF();
 
