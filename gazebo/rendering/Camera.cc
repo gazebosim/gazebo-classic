@@ -2291,7 +2291,7 @@ bool Camera::TrackInheritYaw() const
 }
 
 /////////////////////////////////////////////////
-void Camera::SetTrackInheritYaw(bool _inheritYaw)
+void Camera::SetTrackInheritYaw(const bool _inheritYaw)
 {
   this->dataPtr->trackInheritYaw = _inheritYaw;
 }
