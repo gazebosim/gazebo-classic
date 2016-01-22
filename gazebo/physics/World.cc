@@ -2496,7 +2496,7 @@ bool World::WindEnabled() const
 }
 
 /////////////////////////////////////////////////
-void World::WindEnabled(const bool _enable)
+void World::SetWindEnabled(const bool _enable)
 {
   if (this->dataPtr->enableWind == _enable)
     return;
@@ -2509,7 +2509,7 @@ void World::WindEnabled(const bool _enable)
     for (auto const &link : links)
     {
       if (link->WindMode())
-        link->WindEnabled(this->dataPtr->enableWind);
+        link->SetWindEnabled(this->dataPtr->enableWind);
     }
   }
 }
