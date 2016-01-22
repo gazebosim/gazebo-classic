@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,31 +15,19 @@
  *
 */
 
-#ifndef _BUILDING_ITEM_HH_
-#define _BUILDING_ITEM_HH_
-
-#include "gazebo/util/system.hh"
+#ifndef _GAZEBO_GUI_BUILDING_MEASUREITEM_PRIVATE_HH_
+#define _GAZEBO_GUI_BUILDING_MEASUREITEM_PRIVATE_HH_
 
 namespace gazebo
 {
   namespace gui
   {
-    /// \addtogroup gazebo_gui
-    /// \{
-
-    /// \class BuildingItem BuildingItem.hh
-    /// \brief Base class of a items that have building level properties such as
-    /// the level number and level height.
-    class GZ_GUI_VISIBLE BuildingItem
+    /// \brief Private data for the MeasureItem class
+    class MeasureItemPrivate
     {
-        /// \brief Constructor
-        public: BuildingItem();
-
-        /// \brief Destructor
-        public: ~BuildingItem();
+      /// \brief Value measured in meters.
+      public: double value;
     };
-    /// \}
   }
 }
-
 #endif

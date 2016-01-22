@@ -121,9 +121,6 @@ namespace gazebo
       public: void Geometry(const std::string &_name,
           ignition::math::Vector3d &_size, std::string &_uri) const;
 
-      /// \brief Get collision configuration data
-      public: std::map<int, const CollisionConfigData *> GetConfigData() const;
-
       /// \brief Get collision config data
       /// \return Config data for the collisions.
       public: const std::map<int, CollisionConfigData *> &ConfigData() const;

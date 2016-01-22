@@ -31,6 +31,9 @@ class JointMaker_TEST : public QTestFixture
   /// \brief Test creating and removing joints
   private slots: void CreateRemoveJoint();
 
+  /// \brief Test creating and removing joints between nested model links
+  private slots: void CreateRemoveNestedJoint();
+
   /// \brief Test values of joint default properties.
   private slots: void JointDefaultProperties();
 
@@ -45,6 +48,9 @@ class JointMaker_TEST : public QTestFixture
 
   /// \brief Test managing the link list
   private slots: void LinkList();
+
+  /// \brief Test updating joint message
+  private slots: void UpdateMsg();
 };
 
 #endif

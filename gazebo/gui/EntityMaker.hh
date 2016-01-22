@@ -20,8 +20,6 @@
 #include <boost/function.hpp>
 #include <ignition/math/Vector3.hh>
 
-#include <boost/function.hpp>
-
 #include "gazebo/transport/TransportTypes.hh"
 
 namespace gazebo

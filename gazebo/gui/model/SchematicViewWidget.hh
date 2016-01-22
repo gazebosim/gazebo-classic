@@ -108,16 +108,10 @@ namespace gazebo
       /// \brief Scales the view to ensure the items of the scene are visible.
       public: void FitInView();
 
-      /// \brief Helper function to get the leaf name from a scoped name.
+      /// \brief Helper function to get the unscoped name from a scoped name.
       /// \param[in] _scopedName Scoped name.
-      /// \return Leaf name.
-      private: std::string GetLeafName(const std::string &_scopedName);
-
-      /// \brief Helper function to get the entity scopd name without the
-      /// model name prefix.
-      /// \param[in] _scopedName Scoped name.
-      /// \return Scopd name without model prefix.
-      private: std::string GetScopedName(const std::string &_scopedName);
+      /// \return Unscoped name.
+      private: std::string UnscopedName(const std::string &_scopedName);
 
       /// \brief Callback when a link is selected.
       /// \param[in] _name Name of link.

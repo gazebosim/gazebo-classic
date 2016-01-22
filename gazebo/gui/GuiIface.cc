@@ -272,7 +272,7 @@ bool gui::load()
 unsigned int gui::get_entity_id(const std::string &_name)
 {
   if (g_main_win)
-    return g_main_win->GetEntityId(_name);
+    return g_main_win->EntityId(_name);
   else
     return 0;
 }
@@ -386,10 +386,4 @@ bool gui::saveINI(const boost::filesystem::path &_file)
 gui::MainWindow *gui::get_main_window()
 {
   return g_main_win;
-}
-
-/////////////////////////////////////////////////
-gui::ModelRightMenu *gui::get_context_menu()
-{
-  return g_modelRightMenu;
 }

@@ -108,7 +108,7 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   this->linkButtonGroup->addButton(customButton);
 
   this->modelCreator = new ModelCreator();
-  connect(modelCreator, SIGNAL(LinkAdded()), this, SLOT(OnLinkAdded()));
+  connect(this->modelCreator, SIGNAL(LinkAdded()), this, SLOT(OnLinkAdded()));
 
   this->otherItemsLayout = new QVBoxLayout();
   this->otherItemsLayout->setContentsMargins(0, 0, 0, 0);
@@ -132,7 +132,7 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
 
   this->splitter = new QSplitter(Qt::Vertical, this);
   this->splitter->addWidget(paletteWidget);
-  splitter->setCollapsible(0, false);
+  this->splitter->setCollapsible(0, false);
 
   frameLayout->addWidget(this->splitter);
   frameLayout->setContentsMargins(0, 0, 0, 0);
@@ -235,10 +235,10 @@ void ModelEditorPalette::AddItem(QWidget *_item,
     category = "Other";
 
   auto iter = this->categories.find(category);
-  QGridLayout *catLayout = NULL;
+  QVBoxLayout *catLayout = NULL;
   if (iter == this->categories.end())
   {
-    catLayout = new QGridLayout();
+    catLayout = new QVBoxLayout();
     this->categories[category] = catLayout;
 
     std::string catStr =
@@ -250,10 +250,11 @@ void ModelEditorPalette::AddItem(QWidget *_item,
   else
     catLayout = iter->second;
 
-  int rowWidth = 3;
-  int row = catLayout->count() / rowWidth;
-  int col = catLayout->count() % rowWidth;
-  catLayout->addWidget(_item, row, col);
+//  int rowWidth = 3;
+//  int row = catLayout->count() / rowWidth;
+//  int col = catLayout->count() % rowWidth;
+//  catLayout->addWidget(_item, row, col);
+  catLayout->addWidget(_item);
 }
 
 /////////////////////////////////////////////////

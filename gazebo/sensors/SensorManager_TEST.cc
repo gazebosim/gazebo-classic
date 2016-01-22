@@ -80,19 +80,19 @@ TEST_F(SensorManager_TEST, Data)
   {
     sensor = mgr->GetSensor("default::camera_1::link::camera");
     ASSERT_TRUE(sensor != NULL);
-    EXPECT_TRUE(sensor->GetLastMeasurementTime() > time);
+    EXPECT_TRUE(sensor->LastMeasurementTime() > time);
 
     sensor = mgr->GetSensor("default::camera_2::link::camera");
     ASSERT_TRUE(sensor != NULL);
-    EXPECT_TRUE(sensor->GetLastMeasurementTime() > time);
+    EXPECT_TRUE(sensor->LastMeasurementTime() > time);
 
     sensor = mgr->GetSensor("default::laser_1::link::laser");
     ASSERT_TRUE(sensor != NULL);
-    EXPECT_TRUE(sensor->GetLastMeasurementTime() > time);
+    EXPECT_TRUE(sensor->LastMeasurementTime() > time);
 
     sensor = mgr->GetSensor("default::laser_2::link::laser");
     ASSERT_TRUE(sensor != NULL);
-    EXPECT_TRUE(sensor->GetLastMeasurementTime() > time);
+    EXPECT_TRUE(sensor->LastMeasurementTime() > time);
   }
 }
 
@@ -115,7 +115,7 @@ TEST_F(SensorManager_TEST, InitRemove)
   for (sensors::Sensor_V::iterator iter = sensors.begin();
        iter != sensors.end(); ++iter)
   {
-    sensorNames.push_back((*iter)->GetName());
+    sensorNames.push_back((*iter)->Name());
   }
 
   // Try removing a few senors.

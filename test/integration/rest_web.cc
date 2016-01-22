@@ -38,7 +38,7 @@ class RestWebTest : public ServerFixture,
 // globals to exchange data between threads
 boost::mutex g_mutex;
 unsigned int g_count;
-int g_restID;
+unsigned int g_restID;
 
 // RestLogin: string url, username, password
 // RestResponse: string type, msg

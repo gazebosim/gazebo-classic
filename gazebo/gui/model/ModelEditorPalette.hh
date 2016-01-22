@@ -107,7 +107,7 @@ namespace gazebo
       private: QVBoxLayout *otherItemsLayout;
 
       /// \brief Map of categories to their layout
-      private: std::map<std::string, QGridLayout *> categories;
+      private: std::map<std::string, QVBoxLayout *> categories;
 
       /// \brief Vertical splitter between widgets.
       private: QSplitter *splitter;

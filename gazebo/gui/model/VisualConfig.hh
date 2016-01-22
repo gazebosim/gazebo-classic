@@ -132,9 +132,6 @@ namespace gazebo
           const common::Color &_ambient, const common::Color &_diffuse,
           const common::Color &_specular, const common::Color &_emissive);
 
-      /// \brief Get visual configuration data
-      public: std::map<int, const VisualConfigData *> GetConfigData() const;
-
       /// \brief Get visual config data
       /// \return Config data for the visuals
       public: const std::map<int, VisualConfigData *> &ConfigData() const;
