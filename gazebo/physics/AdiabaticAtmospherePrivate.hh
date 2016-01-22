@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,6 @@
 
 #ifndef _GAZEBO_PHYSICS_ADIABATICATMOSPHEREPRIVATE_HH_
 #define _GAZEBO_PHYSICS_ADIABATICATMOSPHEREPRIVATE_HH_
-
-#include "gazebo/physics/AtmospherePrivate.hh"
 
 namespace gazebo
 {

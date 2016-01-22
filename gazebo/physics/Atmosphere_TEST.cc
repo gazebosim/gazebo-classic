@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ void AtmosphereTest::AtmosphereParam(const std::string &_atmosphere)
   atmospherePubMsg.Clear();
   atmosphereResponseMsg.Clear();
 
-  Load("worlds/empty.world", false);
+  this->Load("worlds/empty.world", false);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
@@ -117,7 +117,7 @@ void AtmosphereTest::AtmosphereParam(const std::string &_atmosphere)
 /////////////////////////////////////////////////
 TEST_P(AtmosphereTest, AtmosphereParam)
 {
-  AtmosphereParam(GetParam());
+  AtmosphereParam(this->GetParam());
 }
 
 /////////////////////////////////////////////////
@@ -141,7 +141,7 @@ void AtmosphereTest::AtmosphereParamBool
 /////////////////////////////////////////////////
 TEST_P(AtmosphereTest, AtmosphereParamBool)
 {
-  AtmosphereParamBool(GetParam());
+  AtmosphereParamBool(this->GetParam());
 }
 
 INSTANTIATE_TEST_CASE_P(Atmospheres, AtmosphereTest,

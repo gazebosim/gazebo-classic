@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,17 +23,13 @@
 
 #include <sdf/sdf.hh>
 
-#include "gazebo/util/Diagnostics.hh"
-#include "gazebo/common/Assert.hh"
-
 #include "gazebo/transport/Publisher.hh"
-
-#include "gazebo/physics/AtmosphereFactory.hh"
-#include "gazebo/physics/World.hh"
-#include "gazebo/physics/PhysicsEngine.hh"
 
 #include "gazebo/physics/AdiabaticAtmosphere.hh"
 #include "gazebo/physics/AdiabaticAtmospherePrivate.hh"
+#include "gazebo/physics/AtmosphereFactory.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/physics/World.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -45,8 +41,7 @@ const double AdiabaticAtmosphere::IDEAL_GAS_CONSTANT_R = 8.3144621;
 
 //////////////////////////////////////////////////
 AdiabaticAtmosphere::AdiabaticAtmosphere(WorldPtr _world)
-  : Atmosphere(_world)
-  , dataPtr(new AdiabaticAtmospherePrivate)
+  : Atmosphere(_world), dataPtr(new AdiabaticAtmospherePrivate)
 {
 }
 
@@ -64,10 +59,7 @@ void AdiabaticAtmosphere::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void AdiabaticAtmosphere::Init(void)
 {
-  AdiabaticAtmospherePrivate *dPtr =
-      reinterpret_cast<AdiabaticAtmospherePrivate *>(this->dataPtr.get());
-
-  dPtr->adiabaticPower = MOLAR_MASS *
+  this->dataPtr->adiabaticPower = MOLAR_MASS *
       -this->World()->GetPhysicsEngine()->GetGravity().z /
       (Atmosphere::TemperatureGradient() * IDEAL_GAS_CONSTANT_R);
 }
@@ -92,7 +84,7 @@ void AdiabaticAtmosphere::OnRequest(ConstRequestPtr &_msg)
     msgs::Atmosphere atmosphereMsg;
     atmosphereMsg.set_type(msgs::Atmosphere::ADIABATIC);
     atmosphereMsg.set_enable_atmosphere(
-            this->World()->EnableAtmosphere());
+            this->World()->AtmosphereEnabled());
     atmosphereMsg.set_temperature(Atmosphere::Temperature());
     atmosphereMsg.set_pressure(Atmosphere::Pressure());
     atmosphereMsg.set_mass_density(Atmosphere::MassDensity());
@@ -112,7 +104,7 @@ void AdiabaticAtmosphere::OnAtmosphereMsg(ConstAtmospherePtr &_msg)
   Atmosphere::OnAtmosphereMsg(_msg);
 
   if (_msg->has_enable_atmosphere())
-    this->World()->EnableAtmosphere(_msg->enable_atmosphere());
+    this->World()->SetAtmosphereEnabled(_msg->enable_atmosphere());
 
   if (_msg->has_temperature())
     this->SetTemperature(_msg->temperature());

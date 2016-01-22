@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,15 +48,19 @@ namespace gazebo
       public: transport::SubscriberPtr requestSub;
 
       /// \brief Temperature at sea level in kelvins.
+      /// Default value is 288.15 K.
       public: double temperature;
 
       /// \brief Temperature gradient at sea level in K/m.
+      /// Default value is -0.0065 K/m.
       public: double temperatureGradient;
 
       /// \brief Pressure of the air at sea level in pascals.
+      /// Default value is 101325 pascals.
       public: double pressure;
 
       /// \brief Mass density of the air at sea level in kg/m^3.
+      /// Default value is 1.225 kg/m^3.
       public: double massDensity;
     };
   }

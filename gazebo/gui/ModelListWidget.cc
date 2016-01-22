@@ -2848,7 +2848,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Atmosphere &_msg,
 
   item = this->dataPtr->variantManager->addProperty(QVariant::Double,
       tr("temperature"));
-  static_cast<QtVariantPropertyManager*>
+  static_cast<QtVariantPropertyManager *>
     (this->dataPtr->variantFactory->propertyManager(item))->setAttribute(
         item, "decimals", 6);
   if (_msg.has_temperature())
@@ -2857,7 +2857,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Atmosphere &_msg,
 
   item = this->dataPtr->variantManager->addProperty(QVariant::Double,
       tr("pressure"));
-  static_cast<QtVariantPropertyManager*>
+  static_cast<QtVariantPropertyManager *>
     (this->dataPtr->variantFactory->propertyManager(item))->setAttribute(
         item, "decimals", 6);
   if (_msg.has_pressure())
@@ -2866,7 +2866,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Atmosphere &_msg,
 
   item = this->dataPtr->variantManager->addProperty(QVariant::Double,
       tr("mass_density"));
-  static_cast<QtVariantPropertyManager*>
+  static_cast<QtVariantPropertyManager *>
     (this->dataPtr->variantFactory->propertyManager(item))->setAttribute(
         item, "decimals", 6);
   if (_msg.has_mass_density())

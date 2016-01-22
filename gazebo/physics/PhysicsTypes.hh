@@ -116,7 +116,7 @@ namespace gazebo
     /// \brief Boost shared pointer to a PhysicsEngine object
     typedef boost::shared_ptr<PhysicsEngine> PhysicsEnginePtr;
 
-    /// \def  AtmospherePtr
+    /// \def AtmospherePtr
     /// \brief Standard shared pointer to an Atmosphere object
     typedef std::shared_ptr<Atmosphere> AtmospherePtr;
 

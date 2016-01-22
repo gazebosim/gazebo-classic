@@ -48,7 +48,7 @@ namespace gazebo
       /// \brief Pointer the physics engine.
       public: PhysicsEnginePtr physicsEngine;
 
-      /// \brief Pointer the atmosphere model.
+      /// \brief Pointer to the atmosphere model.
       public: AtmospherePtr atmosphere;
 
       /// \brief Pointer the spherical coordinates data.

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,8 @@
 #ifndef _GAZEBO_PHYSICS_ATMOSPHERE_HH_
 #define _GAZEBO_PHYSICS_ATMOSPHERE_HH_
 
-#include <boost/any.hpp>
-#include <string>
 #include <memory>
+#include <string>
 
 #include "gazebo/msgs/msgs.hh"
 
@@ -37,7 +36,8 @@ namespace gazebo
     class AtmospherePrivate;
 
     /// \class Atmosphere Atmosphere.hh physics/physics.hh
-    /// \brief Base class for a atmosphere model.
+    /// \brief This models a base atmosphere class to serve as a common
+    /// interface to any derived atmosphere models.
     class GZ_PHYSICS_VISIBLE Atmosphere
     {
       /// \brief Default constructor.
@@ -54,13 +54,13 @@ namespace gazebo
       /// \brief Initialize the atmosphere model.
       public: virtual void Init() = 0;
 
-      /// \brief Finilize the atmosphere model.
+      /// \brief Finalize the atmosphere model.
       public: virtual void Fini();
 
       /// \brief Reset the atmosphere model.
-      public: virtual void Reset() {}
+      public: virtual void Reset();
 
-      /// \brief Return the atmosphere model type (adiabatic).
+      /// \brief Return the atmosphere model type (such as "adiabatic").
       /// \return Type of the atmosphere model.
       public: virtual std::string Type() const = 0;
 
@@ -68,11 +68,11 @@ namespace gazebo
       /// \return Pointer to the atmosphere SDF element.
       public: sdf::ElementPtr SDF() const;
 
-      /// \brief virtual callback for gztopic "~/request".
+      /// \brief Virtual callback for gztopic "~/request".
       /// \param[in] _msg Request message.
       protected: virtual void OnRequest(ConstRequestPtr &_msg);
 
-      /// \brief virtual callback for gztopic "~/atmosphere".
+      /// \brief Virtual callback for gztopic "~/atmosphere".
       /// \param[in] _msg Atmosphere message.
       protected: virtual void OnAtmosphereMsg(ConstAtmospherePtr &_msg);
 
@@ -84,15 +84,14 @@ namespace gazebo
       /// \param[in] _pressure Pressure in pascals.
       public: virtual void SetPressure(const double _pressure);
 
-      /// \brief Set the mass density of the air at sea level
+      /// \brief Set the mass density of the air at sea level.
       /// \param[in] _massDensity Mass density of the air in kg/m^3.
       public: virtual void SetMassDensity(const double _massDensity);
 
       /// \brief Get the actual modeled temperature in kelvins at a given
       /// altitude.
       /// \param[in] _altitude Altitude above sea level in meters.
-      /// \return Modeled temperature in kelvin at the specified
-      /// altitude.
+      /// \return Modeled temperature in kelvin at the specified altitude.
       public: virtual double Temperature(const double _altitude) const = 0;
 
       /// \brief Get the actual modeled sea level temperature in kelvins.

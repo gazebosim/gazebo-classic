@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,22 +24,16 @@
 #include <sdf/sdf.hh>
 
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/common/Exception.hh"
-#include "gazebo/common/Console.hh"
 
-#include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Node.hh"
+#include "gazebo/transport/TransportIface.hh"
 
-#include "gazebo/physics/World.hh"
 #include "gazebo/physics/Atmosphere.hh"
-#include "gazebo/physics/PresetManager.hh"
 #include "gazebo/physics/AtmospherePrivate.hh"
+#include "gazebo/physics/World.hh"
 
 using namespace gazebo;
 using namespace physics;
-
-/// This models a base atmosphere class to serve as a common
-/// interface to any derived atmosphere models.
 
 //////////////////////////////////////////////////
 Atmosphere::Atmosphere(WorldPtr _world)
@@ -77,20 +71,28 @@ void Atmosphere::Load(sdf::ElementPtr _sdf)
   this->dataPtr->sdf->Copy(_sdf);
 
   if (this->dataPtr->sdf->HasElement("temperature"))
+  {
     this->dataPtr->temperature =
         this->dataPtr->sdf->GetElement("temperature")->Get<double>();
+  }
 
   if (this->dataPtr->sdf->HasElement("temperature_gradient"))
+  {
     this->dataPtr->temperatureGradient =
         this->dataPtr->sdf->GetElement("temperature_gradient")->Get<double>();
+  }
 
   if (this->dataPtr->sdf->HasElement("pressure"))
+  {
     this->dataPtr->pressure =
         this->dataPtr->sdf->GetElement("pressure")->Get<double>();
+  }
 
   if (this->dataPtr->sdf->HasElement("mass_density"))
+  {
     this->dataPtr->massDensity =
         this->dataPtr->sdf->GetElement("mass_density")->Get<double>();
+  }
 }
 
 //////////////////////////////////////////////////
@@ -98,6 +100,11 @@ void Atmosphere::Fini()
 {
   this->dataPtr->world.reset();
   this->dataPtr->node->Fini();
+}
+
+//////////////////////////////////////////////////
+void Atmosphere::Reset()
+{
 }
 
 //////////////////////////////////////////////////
