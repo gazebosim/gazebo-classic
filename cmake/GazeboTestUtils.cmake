@@ -13,6 +13,7 @@ macro (gz_build_tests)
     add_executable(${BINARY_NAME} ${GTEST_SOURCE_file}
                    ${GZ_BUILD_TESTS_EXTRA_EXE_SRCS})
 
+    set_target_properties(${BINARY_NAME} PROPERTIES LINK_FLAGS "-Wl,--no-as-needed")
 
     link_directories(${PROJECT_BINARY_DIR}/test)
     add_dependencies(${BINARY_NAME}
@@ -30,7 +31,7 @@ macro (gz_build_tests)
 
 
     target_link_libraries(${BINARY_NAME}
-      # This two libraries are need to workaround on bug 
+      # This two libraries are need to workaround on bug
       # https://bitbucket.org/osrf/gazebo/issue/1516
       gazebo_physics
       gazebo_sensors
@@ -93,7 +94,7 @@ if (VALID_DISPLAY)
       )
 
     target_link_libraries(${BINARY_NAME}
-      # This two libraries are need to workaround on bug 
+      # This two libraries are need to workaround on bug
       # https://bitbucket.org/osrf/gazebo/issue/1516
       gazebo_physics
       gazebo_sensors

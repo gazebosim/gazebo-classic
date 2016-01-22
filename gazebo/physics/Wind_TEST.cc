@@ -52,18 +52,6 @@ class WindTest : public ServerFixture
 
   /// \brief Factor by which we multiply wind velocity.
   public: double windFactor;
-
-  public: void AtmosphereParam(const std::string &_atmosphere);
-
-  /// \brief Test default atmosphere model parameters
-  public: void AtmosphereParamBool(const std::string &_atmosphere);
-
-  /// \brief Incoming atmosphere message.
-  public: static msgs::Atmosphere atmospherePubMsg;
-
-  /// \brief Received atmosphere message.
-  public: static msgs::Atmosphere atmosphereResponseMsg;
-
 };
 
 msgs::Wind WindTest::windPubMsg;
