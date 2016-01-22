@@ -204,16 +204,6 @@ void JointMaker::RemoveJoint(const std::string &_jointId)
 
   auto jointIt = this->dataPtr->joints.find(_jointId);
 
-  // TODO needed?
-/*    std::string jointParentName = joint->parent->GetName();
-    size_t pIdx = jointParentName.find_last_of("::");
-    if (pIdx != std::string::npos)
-      jointParentName = jointParentName.substr(pIdx+1);
-    std::string jointChildName = joint->child->GetName();
-    size_t cIdx = jointChildName.find_last_of("::");
-    if (cIdx != std::string::npos)
-      jointChildName = jointChildName.substr(cIdx+1);*/
-
   // Existing joint
   if (jointIt != this->dataPtr->joints.end())
   {
@@ -818,8 +808,7 @@ std::string JointMaker::CreateHotSpot(JointData *_joint)
   _joint->hotspot = hotspotVisual;
   _joint->inspector->SetJointId(_joint->hotspot->GetName());
 
-   //  needed?
-   // _joint->dirty = true;
+  _joint->dirty = true;
 
   // TODO do we need this?
   // notify others of joints between top level links
@@ -871,6 +860,7 @@ void JointMaker::Update()
                  this->dataPtr->childLinkOriginalPose);
            }
          }
+
         // Create / update joint visual
         if (joint->dirty || poseUpdate)
         {
