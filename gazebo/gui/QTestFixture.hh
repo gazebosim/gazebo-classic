@@ -56,7 +56,7 @@ class QTestFixture : public QObject
   /// \param[in] _mainWindow Pointer to the main window.
   /// \param[in] _repeat How many times to repeat the loop.
   /// \param[in] _ms Time to sleep in milliseconds.
-  protected: void ProcessEventsAndDraw(QMainWindow *_mainWindow,
+  protected: void ProcessEventsAndDraw(QMainWindow *_mainWindow = NULL,
       const unsigned int _repeat = 10, const unsigned int _ms = 30);
 
   /// \brief Get memory information about the current process.

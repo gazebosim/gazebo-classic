@@ -66,13 +66,7 @@ void UndoTest::MsgPassing()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Check actions
   QVERIFY(gazebo::gui::g_undoAct != NULL);
@@ -116,13 +110,7 @@ void UndoTest::MsgPassing()
 
     userCmdPub->Publish(msg);
 
-    // Process some events and draw the screen
-    for (size_t i = 0; i < 10; ++i)
-    {
-      gazebo::common::Time::MSleep(30);
-      QCoreApplication::processEvents();
-      mainWindow->repaint();
-    }
+    this->ProcessEventsAndDraw(mainWindow);
 
     // Save sim times
     cmdTimes.push_back(world->GetSimTime());
@@ -152,13 +140,7 @@ void UndoTest::MsgPassing()
   QVERIFY(this->g_undoMsgReceived == false);
   gazebo::gui::g_undoAct->trigger();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Check undo msg was published
   QVERIFY(this->g_undoMsgReceived == true);
@@ -181,13 +163,7 @@ void UndoTest::MsgPassing()
   QVERIFY(this->g_redoMsgReceived == false);
   gazebo::gui::g_redoAct->trigger();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Check undo msg was published
   QVERIFY(this->g_redoMsgReceived == true);
@@ -215,13 +191,7 @@ void UndoTest::MsgPassing()
     undoRedoPub->Publish(msg);
   }
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Check we went back to the first cmd time
   currentTime = world->GetSimTime();
@@ -246,13 +216,7 @@ void UndoTest::MsgPassing()
     undoRedoPub->Publish(msg);
   }
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Check we moved forward to the moment undo was triggered
   currentTime = world->GetSimTime();
@@ -294,13 +258,7 @@ void UndoTest::UndoTranslateModel()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get scene
   auto scene = gazebo::gui::get_active_camera()->GetScene();
@@ -391,13 +349,7 @@ void UndoTest::UndoRotateLight()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get scene
   auto scene = gazebo::gui::get_active_camera()->GetScene();
@@ -488,13 +440,7 @@ void UndoTest::UndoSnap()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get scene
   auto scene = gazebo::gui::get_active_camera()->GetScene();
@@ -586,13 +532,7 @@ void UndoTest::UndoAlign()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get scene
   auto scene = gazebo::gui::get_active_camera()->GetScene();
@@ -707,13 +647,7 @@ void UndoTest::UndoResetTime()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get box and move it
   auto box = world->GetModel("box");
@@ -798,13 +732,7 @@ void UndoTest::UndoResetWorld()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get box and move it
   auto box = world->GetModel("box");
@@ -894,13 +822,7 @@ void UndoTest::UndoResetModelPoses()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get box and move it
   auto box = world->GetModel("box");
@@ -989,13 +911,7 @@ void UndoTest::UndoWrench()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Transport
   gazebo::transport::NodePtr node;
