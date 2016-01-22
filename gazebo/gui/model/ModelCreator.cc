@@ -2590,7 +2590,7 @@ void ModelCreator::SetSelected(const std::string &_name, const bool _selected)
 
 /////////////////////////////////////////////////
 void ModelCreator::SetSelected(rendering::VisualPtr _entityVis,
-    bool _selected)
+    const bool _selected)
 {
   if (!_entityVis)
     return;
@@ -2709,6 +2709,7 @@ void ModelCreator::OnSetSelectedModelPlugin(const std::string &_name,
     this->selectedModelPlugins.erase(it);
   }
 }
+
 /////////////////////////////////////////////////
 void ModelCreator::ModelChanged()
 {
