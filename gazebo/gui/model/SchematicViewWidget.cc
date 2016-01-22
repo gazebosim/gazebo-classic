@@ -134,7 +134,7 @@ void SchematicViewWidget::AddNode(const std::string &_node)
 {
   std::string name = this->UnscopedName(_node);
 
-  std::cerr << " add node " << name << std::endl;
+  std::cerr << "          add node " << name << std::endl;
 
   if (name.empty() || this->scene->HasNode(name))
     return;

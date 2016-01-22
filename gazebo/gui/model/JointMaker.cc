@@ -810,16 +810,6 @@ std::string JointMaker::CreateHotSpot(JointData *_joint)
 
   _joint->dirty = true;
 
-  // TODO do we need this?
-  // notify others of joints between top level links
-  rendering::VisualPtr parentTopLevelLink = _joint->parent->GetNthAncestor(2);
-  rendering::VisualPtr childTopLevelLink  = _joint->child->GetNthAncestor(2);
-  if (parentTopLevelLink && childTopLevelLink)
-  {
-    gui::model::Events::jointInserted(jointId, _joint->name,
-        jointTypes[_joint->type], parentTopLevelLink->GetName(),
-        childTopLevelLink->GetName());
-  }
   return jointId;
 }
 
@@ -1545,11 +1535,21 @@ void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
   auto jointId = this->CreateHotSpot(joint);
 
   // Notify other widgets
-  if (!jointId.empty())
+/*  if (!jointId.empty())
   {
     gui::model::Events::jointInserted(jointId, joint->name,
         jointTypes[joint->type], joint->parent->GetName(),
         joint->child->GetName());
+  }*/
+  // FIXME for mentor2
+  // notify others of joints between top level links
+  rendering::VisualPtr parentTopLevelLink = joint->parent->GetNthAncestor(2);
+  rendering::VisualPtr childTopLevelLink  = joint->child->GetNthAncestor(2);
+  if (parentTopLevelLink && childTopLevelLink)
+  {
+    gui::model::Events::jointInserted(jointId, joint->name,
+        jointTypes[joint->type], parentTopLevelLink->GetName(),
+        childTopLevelLink->GetName());
   }
 }
 
