@@ -308,6 +308,10 @@ namespace gazebo
       /// \param[in] _name The unique name of the plugin to remove.
       public: void RemovePlugin(const std::string &_name);
 
+      /// \brief Get the number of world plugins.
+      /// \return The number of world plugins in this world.
+      public: unsigned int PluginCount() const;
+
       /// \brief Get the set world pose mutex.
       /// \return Pointer to the mutex.
       public: boost::mutex *GetSetWorldPoseMutex() const;

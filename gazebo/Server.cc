@@ -742,6 +742,14 @@ bool Server::OpenWorld(const std::string &_filename)
   // Keep transport system but clear all previous messages
   gazebo::transport::clear_buffers();
 
+  // TODO: Notify clients that world has been removed
+/*
+  msgs::WorldModify worldMsg;
+  worldMsg.set_world_name("default");
+  worldMsg.set_remove(true);
+  this->worldModPub->Publish(worldMsg);
+*/
+
   // Load new world
   FILE *test = fopen(common::find_file(_filename).c_str(), "r");
   if (!test)
@@ -781,5 +789,12 @@ bool Server::OpenWorld(const std::string &_filename)
   physics::init_world(world);
   physics::run_world(world);
 
+  // TODO: Notify clients that a new world is available
+/*
+  msgs::WorldModify worldMsg;
+  worldMsg.set_world_name("default");
+  worldMsg.set_create(true);
+  this->dataPtr->worldModPub->Publish(worldMsg);
+*/
   return true;
 }

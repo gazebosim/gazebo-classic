@@ -1505,6 +1505,12 @@ void World::RemovePlugin(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
+unsigned int World::PluginCount() const
+{
+  return this->dataPtr->plugins.size();
+}
+
+//////////////////////////////////////////////////
 void World::LoadPlugin(sdf::ElementPtr _sdf)
 {
   std::string pluginName = _sdf->Get<std::string>("name");
