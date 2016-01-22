@@ -142,7 +142,7 @@ void Atmosphere::SetPressure(const double _pressure)
 }
 
 //////////////////////////////////////////////////
-double Atmosphere::Temperature() const
+double Atmosphere::Temperature(const double /*_altitude*/) const
 {
   return this->dataPtr->temperature;
 }
@@ -154,13 +154,13 @@ void Atmosphere::SetMassDensity(const double _massDensity)
 }
 
 //////////////////////////////////////////////////
-double Atmosphere::Pressure() const
+double Atmosphere::Pressure(const double /*_altitude*/) const
 {
   return this->dataPtr->pressure;
 }
 
 //////////////////////////////////////////////////
-double Atmosphere::MassDensity() const
+double Atmosphere::MassDensity(const double /*_altitude*/) const
 {
   return this->dataPtr->massDensity;
 }

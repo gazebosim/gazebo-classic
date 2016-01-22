@@ -70,13 +70,13 @@ namespace gazebo
       public: virtual void SetMassDensity(const double _massDensity);
 
       // Documentation inherited
-      public: virtual double Temperature(const double _altitude) const;
+      public: virtual double Temperature(const double _altitude = 0.0) const;
 
       // Documentation inherited
-      virtual double Pressure(const double _altitude) const;
+      virtual double Pressure(const double _altitude = 0.0) const;
 
       // Documentation inherited
-      public: double MassDensity(const double _altitude) const;
+      public: double MassDensity(const double _altitude = 0.0) const;
 
       /// \brief Molar mass of the air in kg/mol
       public: static const double MOLAR_MASS;
