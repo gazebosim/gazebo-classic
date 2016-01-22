@@ -2490,13 +2490,13 @@ void World::EnablePhysicsEngine(bool _enable)
 }
 
 /////////////////////////////////////////////////
-bool World::EnableWind() const
+bool World::WindEnabled() const
 {
   return this->dataPtr->enableWind;
 }
 
 /////////////////////////////////////////////////
-void World::EnableWind(const bool _enable)
+void World::WindEnabled(const bool _enable)
 {
   if (this->dataPtr->enableWind == _enable)
     return;
@@ -2509,7 +2509,7 @@ void World::EnableWind(const bool _enable)
     for (auto const &link : links)
     {
       if (link->WindMode())
-        link->EnableWind(this->dataPtr->enableWind);
+        link->WindEnabled(this->dataPtr->enableWind);
     }
   }
 }

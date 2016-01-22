@@ -565,7 +565,7 @@ namespace gazebo
 
       /// \brief Enable/disable wind for this link.
       /// \param[in] _enable True to enable the wind.
-      public: void EnableWind(const bool _enable);
+      public: void SetWindEnabled(const bool _enable);
 
       /// \brief Returns this link's wind velocity in the world coordinate
       /// frame.

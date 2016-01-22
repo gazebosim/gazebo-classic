@@ -286,8 +286,8 @@ void Link::Init()
     battery->Init();
   }
 
-  if (this->WindMode() && this->world->EnableWind())
-    this->EnableWind(true);
+  if (this->WindMode() && this->world->WindEnabled())
+    this->SetWindEnabled(true);
 
   this->initialized = true;
 }
@@ -767,13 +767,13 @@ void Link::SetWindMode(const bool _mode)
   this->sdf->GetElement("enable_wind")->Set(_mode);
 
   if (!this->WindMode() && this->updateConnection)
-    this->EnableWind(false);
+    this->SetWindEnabled(false);
   else if (this->WindMode() && !this->updateConnection)
-    this->EnableWind(true);
+    this->SetWindEnabled(true);
 }
 
 /////////////////////////////////////////////////
-void Link::EnableWind(const bool _enable)
+void Link::SetWindEnabled(const bool _enable)
 {
   if (_enable)
   {
