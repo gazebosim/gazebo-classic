@@ -103,8 +103,9 @@ namespace gazebo
       /// tracked model.
       public: bool trackInheritYaw;
 
-      /// \brief If set to true, the position of the camera is relative to
-      /// the tracked model, otherwise it represents world coordinates.
+      /// \brief If set to true, the position of the camera is relative to the
+      /// tracked model, otherwise it's relative to the world origin. In either
+      /// case, the track position is expressed in the world frame.
       public: bool trackUseModelFrame;
 
       /// \brief Position of the camera when tracking a model.
