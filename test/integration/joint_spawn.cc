@@ -395,16 +395,6 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
     // Expect motion
     EXPECT_GT(_joint->GetVelocity(_index), 0.2 * friction);
     EXPECT_GT(_joint->GetAngle(_index).Radian(), 0.05 * friction);
-
-    // DART has problem with joint friction and joint limits
-    // https://github.com/dartsim/dart/issues/317
-    // Set friction back to zero to not interfere with other tests
-    // until this issue is resolved.
-    if (isDart)
-    {
-      EXPECT_TRUE(_joint->SetParam("friction", _index, 0.0));
-      EXPECT_NEAR(_joint->GetParam("friction", _index), 0.0, g_tolerance);
-    }
   }
 
   // SetHighStop
@@ -420,7 +410,12 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
     _joint->SetHighStop(_index, limit);
     _joint->SetVelocity(_index, vel);
     world->Step(steps);
-    EXPECT_LT(_joint->GetAngle(_index).Radian(), limit.Radian() + g_tolerance);
+    double tolerance = g_tolerance;
+    if (isDart)
+    {
+      tolerance *= 10;
+    }
+    EXPECT_LT(_joint->GetAngle(_index).Radian(), limit.Radian() + tolerance);
     EXPECT_EQ(_joint->GetHighStop(_index), limit);
     {
       boost::any value = _joint->GetParam("hi_stop", _index);
@@ -441,7 +436,12 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
     _joint->SetLowStop(_index, limit);
     _joint->SetVelocity(_index, vel);
     world->Step(steps);
-    EXPECT_GT(_joint->GetAngle(_index).Radian(), limit.Radian() - g_tolerance);
+    double tolerance = g_tolerance;
+    if (isDart)
+    {
+      tolerance *= 10;
+    }
+    EXPECT_GT(_joint->GetAngle(_index).Radian(), limit.Radian() - tolerance);
     EXPECT_EQ(_joint->GetLowStop(_index), limit);
     {
       boost::any value = _joint->GetParam("lo_stop", _index);
