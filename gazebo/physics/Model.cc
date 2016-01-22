@@ -455,6 +455,116 @@ const sdf::ElementPtr Model::GetSDF()
 }
 
 //////////////////////////////////////////////////
+const sdf::ElementPtr Model::UnscaledSDF()
+{
+  GZ_ASSERT(this->sdf != NULL, "Model sdf member is NULL");
+  this->sdf->Update();
+
+  sdf::ElementPtr unscaledSdf(this->sdf);
+
+  // Go through all collisions and visuals and divide size by scale
+  // See Link::UpdateVisualGeomSDF
+  if (!this->sdf->HasElement("link"))
+    return unscaledSdf;
+
+  auto linkElem = this->sdf->GetElement("link");
+  while (linkElem)
+  {
+    // Visuals
+    if (linkElem->HasElement("visual"))
+    {
+      auto visualElem = linkElem->GetElement("visual");
+      while (visualElem)
+      {
+        auto geomElem = visualElem->GetElement("geometry");
+
+        if (geomElem->HasElement("box"))
+        {
+          auto size = geomElem->GetElement("box")->
+              Get<ignition::math::Vector3d>("size");
+          geomElem->GetElement("box")->GetElement("size")->Set(
+              size / this->scale);
+        }
+        else if (geomElem->HasElement("sphere"))
+        {
+          double radius = geomElem->GetElement("sphere")->Get<double>("radius");
+          geomElem->GetElement("sphere")->GetElement("radius")->Set(
+              radius/this->scale.Max());
+        }
+        else if (geomElem->HasElement("cylinder"))
+        {
+          double radius =
+              geomElem->GetElement("cylinder")->Get<double>("radius");
+          double length =
+              geomElem->GetElement("cylinder")->Get<double>("length");
+          double radiusScale = std::max(this->scale.X(), this->scale.Y());
+
+          geomElem->GetElement("cylinder")->GetElement("radius")->Set(
+              radius/radiusScale);
+          geomElem->GetElement("cylinder")->GetElement("length")->Set(
+              length/this->scale.Z());
+        }
+        else if (geomElem->HasElement("mesh"))
+        {
+          geomElem->GetElement("mesh")->GetElement("scale")->Set(
+              ignition::math::Vector3d::One);
+        }
+
+        visualElem = visualElem->GetNextElement("visual");
+      }
+    }
+
+    // Collisions
+    if (linkElem->HasElement("collision"))
+    {
+      auto collisionElem = linkElem->GetElement("collision");
+      while (collisionElem)
+      {
+        auto geomElem = collisionElem->GetElement("geometry");
+
+        if (geomElem->HasElement("box"))
+        {
+          auto size = geomElem->GetElement("box")->
+              Get<ignition::math::Vector3d>("size");
+          geomElem->GetElement("box")->GetElement("size")->Set(
+              size / this->scale);
+        }
+        else if (geomElem->HasElement("sphere"))
+        {
+          double radius = geomElem->GetElement("sphere")->Get<double>("radius");
+          geomElem->GetElement("sphere")->GetElement("radius")->Set(
+              radius/this->scale.Max());
+        }
+        else if (geomElem->HasElement("cylinder"))
+        {
+          double radius =
+              geomElem->GetElement("cylinder")->Get<double>("radius");
+          double length =
+              geomElem->GetElement("cylinder")->Get<double>("length");
+          double radiusScale = std::max(this->scale.X(), this->scale.Y());
+
+          geomElem->GetElement("cylinder")->GetElement("radius")->Set(
+              radius/radiusScale);
+          geomElem->GetElement("cylinder")->GetElement("length")->Set(
+              length/this->scale.Z());
+        }
+        else if (geomElem->HasElement("mesh"))
+        {
+          geomElem->GetElement("mesh")->GetElement("scale")->Set(
+              ignition::math::Vector3d::One);
+        }
+
+        collisionElem = collisionElem->GetNextElement("collision");
+      }
+    }
+
+    linkElem = linkElem->GetNextElement("link");
+  }
+
+  return unscaledSdf;
+}
+
+//////////////////////////////////////////////////
 void Model::Reset()
 {
   Entity::Reset();
@@ -485,6 +595,10 @@ void Model::ResetPhysicsStates()
   {
     (*liter)->ResetPhysicsStates();
   }
+
+  // reset nested model physics states
+  for (auto &m : this->models)
+    m->ResetPhysicsStates();
 }
 
 //////////////////////////////////////////////////
@@ -976,7 +1090,7 @@ void Model::FillMsg(msgs::Model &_msg)
   _msg.set_self_collide(this->GetSelfCollide());
   msgs::Set(_msg.mutable_pose(), relPose);
   _msg.set_id(this->GetId());
-  msgs::Set(_msg.mutable_scale(), this->scale.Ign());
+  msgs::Set(_msg.mutable_scale(), this->scale);
 
   msgs::Set(this->visualMsg->mutable_pose(), relPose);
   _msg.add_visual()->CopyFrom(*this->visualMsg);
@@ -1096,6 +1210,7 @@ void Model::OnPoseChange()
 void Model::SetState(const ModelState &_state)
 {
   this->SetWorldPose(_state.GetPose(), true);
+  this->SetScale(_state.Scale(), true);
 
   LinkState_M linkStates = _state.GetLinkStates();
   for (LinkState_M::iterator iter = linkStates.begin();
@@ -1130,6 +1245,13 @@ void Model::SetState(const ModelState &_state)
 /////////////////////////////////////////////////
 void Model::SetScale(const math::Vector3 &_scale)
 {
+  this->SetScale(_scale.Ign());
+}
+
+/////////////////////////////////////////////////
+void Model::SetScale(const ignition::math::Vector3d &_scale,
+      const bool _publish)
+{
   if (this->scale == _scale)
     return;
 
@@ -1143,6 +1265,24 @@ void Model::SetScale(const math::Vector3 &_scale)
       boost::static_pointer_cast<Link>(*iter)->SetScale(_scale);
     }
   }
+
+  if (_publish)
+    this->PublishScale();
+}
+
+/////////////////////////////////////////////////
+ignition::math::Vector3d Model::Scale() const
+{
+  return this->scale;
+}
+
+//////////////////////////////////////////////////
+void Model::PublishScale()
+{
+  GZ_ASSERT(this->GetParentModel() != NULL,
+      "A model without a parent model should not happen");
+
+  this->world->PublishModelScale(this->GetParentModel());
 }
 
 /////////////////////////////////////////////////

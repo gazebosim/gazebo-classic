@@ -17,10 +17,12 @@
 #ifndef _GAZEBO_SENSORS_DEPTHCAMERASENSOR_HH_
 #define _GAZEBO_SENSORS_DEPTHCAMERASENSOR_HH_
 
+#include <memory>
 #include <string>
 
 #include "gazebo/sensors/CameraSensor.hh"
 #include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/sensors/Sensor.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -29,6 +31,9 @@ namespace gazebo
   /// \brief Sensors namespace
   namespace sensors
   {
+    // Forward declare private data class
+    class DepthCameraSensorPrivate;
+
     /// \class DepthCameraSensor DepthCameraSensor.hh sensors/sensors.hh
     /// \addtogroup gazebo_sensors Sensors
     /// \brief A set of sensor classes, functions, and definitions
@@ -61,8 +66,8 @@ namespace gazebo
       // Documentation inherited
       protected: virtual bool UpdateImpl(const bool _force);
 
-      /// \brief Depth data buffer.
-      protected: float *depthBuffer;
+      /// \brief Private data pointer
+      private: std::unique_ptr<DepthCameraSensorPrivate> dataPtr;
     };
     /// \}
   }

@@ -107,7 +107,7 @@ void DepthCameraSensorTest::DepthUnitBox()
   transport::NodePtr node(new transport::Node());
   node->Init();
 
-  std::string depthCameraTopic = depthSensor->GetTopic();
+  std::string depthCameraTopic = depthSensor->Topic();
   EXPECT_TRUE(!depthCameraTopic.empty());
 
   transport::SubscriberPtr sub = node->Subscribe(depthCameraTopic,
@@ -122,9 +122,9 @@ void DepthCameraSensorTest::DepthUnitBox()
   }
   EXPECT_LT(i, 300);
 
-  int midWidth = depthSensor->GetImageWidth() * 0.5;
-  int midHeight = depthSensor->GetImageHeight() * 0.5;
-  int mid = midHeight * depthSensor->GetImageWidth() + midWidth -1;
+  int midWidth = depthSensor->ImageWidth() * 0.5;
+  int midHeight = depthSensor->ImageHeight() * 0.5;
+  int mid = midHeight * depthSensor->ImageWidth() + midWidth -1;
   double unitBoxSize = 1.0;
   double expectedRangeAtMidPoint = box01Pose.Pos().X() - unitBoxSize * 0.5;
 
@@ -132,9 +132,9 @@ void DepthCameraSensorTest::DepthUnitBox()
   EXPECT_NEAR(this->depthBuffer[mid], expectedRangeAtMidPoint, DEPTH_TOL);
 
   // the left and right side of the depth frame should be inf
-  int left = midHeight * depthSensor->GetImageWidth();
+  int left = midHeight * depthSensor->ImageWidth();
   EXPECT_DOUBLE_EQ(this->depthBuffer[left], IGN_DBL_INF);
-  int right = (midHeight+1) * depthSensor->GetImageWidth() - 1;
+  int right = (midHeight+1) * depthSensor->ImageWidth() - 1;
   EXPECT_DOUBLE_EQ(this->depthBuffer[right], IGN_DBL_INF);
 
   // move the box out of the range

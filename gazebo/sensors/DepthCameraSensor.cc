@@ -24,15 +24,16 @@
 
 #include "gazebo/physics/World.hh"
 
-#include "gazebo/transport/transport.hh"
-
 #include "gazebo/rendering/DepthCamera.hh"
-#include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/RenderEngine.hh"
+#include "gazebo/rendering/Scene.hh"
+
+#include "gazebo/transport/transport.hh"
 
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/CameraSensor.hh"
+#include "gazebo/sensors/DepthCameraSensorPrivate.hh"
 #include "gazebo/sensors/DepthCameraSensor.hh"
 
 using namespace gazebo;
@@ -42,16 +43,16 @@ GZ_REGISTER_STATIC_SENSOR("depth", DepthCameraSensor)
 
 //////////////////////////////////////////////////
 DepthCameraSensor::DepthCameraSensor()
-    : CameraSensor()
+    : CameraSensor(),
+      dataPtr(new DepthCameraSensorPrivate)
 {
-  this->depthBuffer = NULL;
 }
 
 //////////////////////////////////////////////////
 DepthCameraSensor::~DepthCameraSensor()
 {
-  if (this->depthBuffer)
-    delete [] this->depthBuffer;
+  if (this->dataPtr->depthBuffer)
+    delete [] this->dataPtr->depthBuffer;
 }
 
 //////////////////////////////////////////////////
@@ -66,7 +67,8 @@ void DepthCameraSensor::Init()
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
       rendering::RenderEngine::NONE)
   {
-    gzerr << "Unable to create DepthCameraSensor. Rendering is disabled.\n";
+    gzerr << "Unable to create DepthCameraSensor. Rendering is disabled."
+        << std::endl;
     return;
   }
 
@@ -84,7 +86,7 @@ void DepthCameraSensor::Init()
 
     if (!depthCamera)
     {
-      gzerr << "Unable to create depth camera sensor\n";
+      gzerr << "Unable to create depth camera sensor" << std::endl;
       return;
     }
     depthCamera->SetCaptureData(true);
@@ -100,8 +102,8 @@ void DepthCameraSensor::Init()
     }
 
     depthCamera->Init();
-    depthCamera->CreateRenderTexture(this->GetName() + "_RttTex_Image");
-    depthCamera->CreateDepthTexture(this->GetName() + "_RttTex_Depth");
+    depthCamera->CreateRenderTexture(this->Name() + "_RttTex_Image");
+    depthCamera->CreateDepthTexture(this->Name() + "_RttTex_Depth");
     ignition::math::Pose3d cameraPose = this->pose;
     if (cameraSdf->HasElement("pose"))
       cameraPose = cameraSdf->Get<ignition::math::Pose3d>("pose") + cameraPose;
@@ -114,7 +116,7 @@ void DepthCameraSensor::Init()
     GZ_ASSERT(this->camera, "Unable to cast depth camera to camera");
   }
   else
-    gzerr << "No world name\n";
+    gzerr << "No world name" << std::endl;
 
   // Disable clouds and moon on server side until fixed and also to improve
   // performance
@@ -134,7 +136,7 @@ rendering::DepthCameraPtr DepthCameraSensor::DepthCamera() const
 //////////////////////////////////////////////////
 const float *DepthCameraSensor::DepthData() const
 {
-  return this->depthBuffer;
+  return this->dataPtr->depthBuffer;
 }
 
 //////////////////////////////////////////////////
@@ -165,24 +167,25 @@ bool DepthCameraSensor::UpdateImpl(const bool /*_force*/)
     // cppchecker recommends using sizeof(varname)
     unsigned int depthBufferSize = depthSamples * sizeof(f);
 
-    if (!this->depthBuffer)
-      this->depthBuffer = new float[depthSamples];
+    if (!this->dataPtr->depthBuffer)
+      this->dataPtr->depthBuffer = new float[depthSamples];
 
-    memcpy(this->depthBuffer, depthCamera->DepthData(), depthBufferSize);
+    memcpy(this->dataPtr->depthBuffer, depthCamera->DepthData(),
+        depthBufferSize);
 
     for (unsigned int i = 0; i < depthSamples; ++i)
     {
       // Mask ranges outside of min/max to +/- inf, as per REP 117
-      if (this->depthBuffer[i] >= this->camera->FarClip())
+      if (this->dataPtr->depthBuffer[i] >= this->camera->FarClip())
       {
-        this->depthBuffer[i] = IGN_DBL_INF;
+        this->dataPtr->depthBuffer[i] = IGN_DBL_INF;
       }
-      else if (this->depthBuffer[i] <= this->camera->NearClip())
+      else if (this->dataPtr->depthBuffer[i] <= this->camera->NearClip())
       {
-        this->depthBuffer[i] = -IGN_DBL_INF;
+        this->dataPtr->depthBuffer[i] = -IGN_DBL_INF;
       }
     }
-    msg.mutable_image()->set_data(this->depthBuffer, depthBufferSize);
+    msg.mutable_image()->set_data(this->dataPtr->depthBuffer, depthBufferSize);
     this->imagePub->Publish(msg);
   }
 
