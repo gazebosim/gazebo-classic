@@ -23,10 +23,19 @@ using namespace gazebo;
 class AtmosphereTest : public ServerFixture,
                        public testing::WithParamInterface<const char*>
 {
+  /// \brief Callback for gztopic "~/response".
   public: void OnAtmosphereMsgResponse(ConstResponsePtr &_msg);
+
+  /// \brief Test getting/setting atmosphere model parameters.
   public: void AtmosphereParam(const std::string &_atmosphere);
+
+  /// \brief Test default atmosphere model parameters
   public: void AtmosphereParamBool(const std::string &_atmosphere);
+
+  /// \brief Incoming atmosphere message.
   public: static msgs::Atmosphere atmospherePubMsg;
+
+  /// \brief Received atmosphere message.
   public: static msgs::Atmosphere atmosphereResponseMsg;
 };
 
