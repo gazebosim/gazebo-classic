@@ -54,6 +54,7 @@ set (files
   robocup_3Dsim.world
   rubble.world
   shapes.world
+  shapes_bitmask.world
   shapes_layers.world
   sim_events.world
   simple_arm.world
