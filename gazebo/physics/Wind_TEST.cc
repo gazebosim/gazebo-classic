@@ -23,16 +23,47 @@ using namespace gazebo;
 
 class WindTest : public ServerFixture
 {
+  /// \brief Callback for gztopic "~/response".
   public: void OnWindMsgResponse(ConstResponsePtr &_msg);
+
+  /// \brief Get the global wind velocity, ignoring the entity.
+  /// \param[in] _wind Reference to the wind.
+  /// \param[in] _wind Pointer to an entity at which location the wind
+  /// velocity is to be calculated.
+  /// \return Wind's velocity at entity's location.
   public: ignition::math::Vector3d LinearVel(
                   std::shared_ptr<const physics::Wind> &_wind,
                   const physics::Entity *_entity);
+
+  /// \brief Test getting/setting wind parameters.
   public: void WindParam();
+
+  /// \brief Test default wind parameters.
   public: void WindParamBool();
+
+  /// \brief Test setting up function to compute the wind.
   public: void WindSetLinearVelFunc();
+
+  /// \brief Incoming wind message.
   public: static msgs::Wind windPubMsg;
+
+  /// \brief Received wind message.
   public: static msgs::Wind windResponseMsg;
+
+  /// \brief Factor by which we multiply wind velocity.
   public: double windFactor;
+
+  public: void AtmosphereParam(const std::string &_atmosphere);
+
+  /// \brief Test default atmosphere model parameters
+  public: void AtmosphereParamBool(const std::string &_atmosphere);
+
+  /// \brief Incoming atmosphere message.
+  public: static msgs::Atmosphere atmospherePubMsg;
+
+  /// \brief Received atmosphere message.
+  public: static msgs::Atmosphere atmosphereResponseMsg;
+
 };
 
 msgs::Wind WindTest::windPubMsg;
