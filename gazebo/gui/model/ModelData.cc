@@ -77,6 +77,18 @@ double ModelData::GetEditTransparency()
 }
 
 /////////////////////////////////////////////////
+void ModelData::UpdateRenderGroup(rendering::VisualPtr _visual)
+{
+  // fix for transparency alpha compositing
+  if (_visual->GetSceneNode()->numAttachedObjects() <= 0)
+    return;
+
+  Ogre::MovableObject *obj = _visual->GetSceneNode()->
+      getAttachedObject(0);
+  obj->setRenderQueueGroup(obj->getRenderQueueGroup()+1);
+}
+
+/////////////////////////////////////////////////
 void NestedModelData::SetName(const std::string &_name)
 {
   this->modelSDF->GetAttribute("name")->Set(_name);
@@ -649,10 +661,7 @@ LinkData *LinkData::Clone(const std::string &_newName)
 
     collisionVis->SetTransparency(
        ignition::math::clamp(ModelData::GetEditTransparency() * 2.0, 0.0, 0.8));
-    // fix for transparency alpha compositing
-    Ogre::MovableObject *colObj = collisionVis->GetSceneNode()->
-        getAttachedObject(0);
-    colObj->setRenderQueueGroup(colObj->getRenderQueueGroup()+1);
+    ModelData::UpdateRenderGroup(collisionVis);
     cloneLink->AddCollision(collisionVis);
   }
   return cloneLink;
@@ -1016,11 +1025,7 @@ void LinkData::OnAddCollision(const std::string &_name)
 
   collisionVis->SetTransparency(
       ignition::math::clamp(ModelData::GetEditTransparency() * 2.0, 0.0, 0.8));
-
-  // fix for transparency alpha compositing
-  Ogre::MovableObject *colObj = collisionVis->GetSceneNode()->
-      getAttachedObject(0);
-  colObj->setRenderQueueGroup(colObj->getRenderQueueGroup()+1);
+  ModelData::UpdateRenderGroup(collisionVis);
 }
 
 /////////////////////////////////////////////////
