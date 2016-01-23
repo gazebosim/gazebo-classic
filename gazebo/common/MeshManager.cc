@@ -547,7 +547,6 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
     return;
   }
   #endif
-  std::cerr << " extrusion success " << std::endl;
 
   std::vector<ignition::math::Vector3d> normals;
   for (unsigned int i  = 0; i < edges.size(); ++i)
