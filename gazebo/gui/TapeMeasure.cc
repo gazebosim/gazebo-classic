@@ -27,10 +27,11 @@
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/RayQuery.hh"
 
-#include "gazebo/gui/qt.h"
-#include "gazebo/gui/MouseEventHandler.hh"
-#include "gazebo/gui/GuiIface.hh"
+#include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/gui/GuiIface.hh"
+#include "gazebo/gui/MouseEventHandler.hh"
+#include "gazebo/gui/qt.h"
 
 #include "gazebo/gui/TapeMeasurePrivate.hh"
 #include "gazebo/gui/TapeMeasure.hh"
@@ -51,6 +52,27 @@ TapeMeasure::TapeMeasure() : dataPtr(new TapeMeasurePrivate)
 TapeMeasure::~TapeMeasure()
 {
   this->Clear();
+}
+
+/////////////////////////////////////////////////
+void TapeMeasure::Enable()
+{
+  MouseEventHandler::Instance()->AddReleaseFilter("tape_measure",
+      std::bind(&TapeMeasure::OnMouseRelease, this, std::placeholders::_1));
+
+  MouseEventHandler::Instance()->AddPressFilter("tape_measure",
+      std::bind(&TapeMeasure::OnMousePress, this, std::placeholders::_1));
+
+  MouseEventHandler::Instance()->AddMoveFilter("tape_measure",
+      std::bind(&TapeMeasure::OnMouseMove, this, std::placeholders::_1));
+}
+
+/////////////////////////////////////////////////
+void TapeMeasure::Disable()
+{
+  MouseEventHandler::Instance()->RemoveReleaseFilter("tape_measure");
+  MouseEventHandler::Instance()->RemovePressFilter("tape_measure");
+  MouseEventHandler::Instance()->RemoveMoveFilter("tape_measure");
 }
 
 /////////////////////////////////////////////////
@@ -243,13 +265,13 @@ void TapeMeasure::Reset()
 }
 
 /////////////////////////////////////////////////
-void TapeMeasure::OnMousePressEvent(const common::MouseEvent &_event)
+bool TapeMeasure::OnMousePress(const common::MouseEvent &/*_event*/)
 {
-  this->dataPtr->userCamera->HandleMouseEvent(_event);
+  return false;
 }
 
 /////////////////////////////////////////////////
-void TapeMeasure::OnMouseMoveEvent(const common::MouseEvent &_event)
+bool TapeMeasure::OnMouseMove(const common::MouseEvent &_event)
 {
   // Get the first visual
   auto vis = this->dataPtr->userCamera->GetVisual(_event.Pos());
@@ -311,11 +333,11 @@ void TapeMeasure::OnMouseMoveEvent(const common::MouseEvent &_event)
   }
   this->dataPtr->hoverPtDirty = true;
 
-  this->dataPtr->userCamera->HandleMouseEvent(_event);
+  return false;
 }
 
 //////////////////////////////////////////////////
-void TapeMeasure::OnMouseReleaseEvent(const common::MouseEvent &_event)
+bool TapeMeasure::OnMouseRelease(const common::MouseEvent &_event)
 {
   if (_event.Button() == common::MouseEvent::LEFT)
   {
@@ -323,8 +345,8 @@ void TapeMeasure::OnMouseReleaseEvent(const common::MouseEvent &_event)
     this->dataPtr->selectedVis = this->dataPtr->hoverVis;
     this->dataPtr->selectedPtDirty = true;
   }
-  else
-    this->dataPtr->userCamera->HandleMouseEvent(_event);
+
+  return false;
 }
 
 /////////////////////////////////////////////////
@@ -516,3 +538,34 @@ void TapeMeasure::Update()
     this->dataPtr->text.SetText(lengthStr.str() + "m");
   }
 }
+
+/////////////////////////////////////////////////
+TapeMeasureWidget::TapeMeasureWidget(QWidget *_parent)
+  : QMenu(_parent), dataPtr(new TapeMeasureWidgetPrivate)
+{
+  auto newMeasure = new QAction(tr("New Measure"), this);
+  this->addAction(newMeasure);
+  this->connect(newMeasure, SIGNAL(triggered()), this, SLOT(OnNewMeasure()));
+
+  auto clearAll = new QAction(tr("Clear All"), this);
+  this->addAction(clearAll);
+  this->connect(clearAll, SIGNAL(triggered()), this, SLOT(OnClearAll()));
+}
+
+/////////////////////////////////////////////////
+TapeMeasureWidget::~TapeMeasureWidget()
+{
+}
+
+/////////////////////////////////////////////////
+void TapeMeasureWidget::OnNewMeasure()
+{
+  TapeMeasure::Instance()->Enable();
+}
+
+/////////////////////////////////////////////////
+void TapeMeasureWidget::OnClearAll()
+{
+  TapeMeasure::Instance()->Reset();
+}
+

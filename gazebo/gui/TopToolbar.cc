@@ -24,6 +24,7 @@
 
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/gui/TapeMeasure.hh"
 #include "gazebo/gui/TopToolbarPrivate.hh"
 #include "gazebo/gui/TopToolbar.hh"
 
@@ -129,10 +130,20 @@ TopToolbar::TopToolbar(QWidget *_parent)
   this->dataPtr->toolbar->addSeparator();
 
   // Tape Measure
-  if (g_tapeMeasureAct)
   {
-    actionGroup->addAction(g_tapeMeasureAct);
-    this->dataPtr->toolbar->addAction(g_tapeMeasureAct);
+    auto tapeMeasureButton = new QToolButton();
+    tapeMeasureButton->setObjectName("tapeMeasureToolBarButton");
+    tapeMeasureButton->setStyleSheet(
+        "#tapeMeasureToolBarButton{padding-right:10px}");
+    tapeMeasureButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+    tapeMeasureButton->setIcon(QIcon(":/images/ruler.png"));
+    tapeMeasureButton->setToolTip(tr(
+        "Measure distances. Press shift to turn off snapping."));
+
+    auto tapeMeasureMenu = new TapeMeasureWidget(tapeMeasureButton);
+    tapeMeasureButton->setMenu(tapeMeasureMenu);
+    tapeMeasureButton->setPopupMode(QToolButton::InstantPopup);
+    g_tapeMeasureAct = this->dataPtr->toolbar->addWidget(tapeMeasureButton);
   }
 
   // View angle

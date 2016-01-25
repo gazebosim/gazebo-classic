@@ -23,7 +23,9 @@
 
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/common/MouseEvent.hh"
-#include "gazebo/common/KeyEvent.hh"
+#include "gazebo/common/MouseEvent.hh"
+
+#include "gazebo/gui/qt.h"
 
 #include "gazebo/math/Pose.hh"
 #include "gazebo/rendering/RenderTypes.hh"
@@ -35,7 +37,9 @@ namespace gazebo
 {
   namespace gui
   {
+    // Forward declare private data.
     class TapeMeasurePrivate;
+    class TapeMeasureWidgetPrivate;
 
     /// \class TapeMeasure TapeMeasure.hh gui/Gui.hh
     /// \brief A gui tool for snapping one model to another.
@@ -50,6 +54,10 @@ namespace gazebo
       /// \brief Initialize the model snapping tool.
       public: void Init();
 
+      /// \brief Initialize the model snapping tool.
+      public: void Enable();
+      public: void Disable();
+
       /// \brief Clear the model snapping tool. This explicity cleans up the
       /// internal state of the singleton and prepares it for exit.
       public: void Clear();
@@ -57,17 +65,20 @@ namespace gazebo
       /// \brief Reset the model snapping tool.
       public: void Reset();
 
-      /// \brief Process an object translate mouse press event.
-      /// \param[in] _event Mouse event.
-      public: void OnMousePressEvent(const common::MouseEvent &_event);
+      /// \brief Mouse event filter callback when mouse button is pressed.
+      /// \param[in] _event The mouse event.
+      /// \return True if the event was handled
+      private: bool OnMousePress(const common::MouseEvent &_event);
 
-      /// \brief Process an object translate mouse move event.
-      /// \param[in] _event Mouse event.
-      public: void OnMouseMoveEvent(const common::MouseEvent &_event);
+      /// \brief Mouse event filter callback when mouse button is released.
+      /// \param[in] _event The mouse event.
+      /// \return True if the event was handled
+      private: bool OnMouseRelease(const common::MouseEvent &_event);
 
-      /// \brief Process an object translate mouse release event.
-      /// \param[in] _event Mouse event.
-      public: void OnMouseReleaseEvent(const common::MouseEvent &_event);
+      /// \brief Mouse event filter callback when mouse is moved.
+      /// \param[in] _event The mouse event.
+      /// \return True if the event was handled
+      private: bool OnMouseMove(const common::MouseEvent &_event);
 
       /// \brief Update the visual representation of the snap spot.
       private: void Update();
@@ -78,6 +89,27 @@ namespace gazebo
       /// \internal
       /// \brief Pointer to private data.
       private: std::unique_ptr<TapeMeasurePrivate> dataPtr;
+    };
+
+    /// \class TapeMeasureWidget TapeMeasureWidget.hh gui/Gui.hh
+    /// \brief A gui tool for snapping one model to another.
+    class GZ_GUI_VISIBLE TapeMeasureWidget : public QMenu
+    {
+      Q_OBJECT
+
+      /// \brief Constructor
+      public: TapeMeasureWidget(QWidget *_widget);
+
+      /// \brief Destructor
+      public: virtual ~TapeMeasureWidget();
+
+      /// \brief Add action.
+      public slots: void OnNewMeasure();
+      public slots: void OnClearAll();
+
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<TapeMeasureWidgetPrivate> dataPtr;
     };
   }
 }

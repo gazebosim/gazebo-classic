@@ -94,6 +94,12 @@ namespace gazebo
       /// \brief A variable to indicate the hovered triangle has changed.
       public: bool hoverPtDirty;
     };
+
+    /// \class TapeMeasure TapeMeasure.hh
+    /// \brief Private data for the TapeMeasure class
+    class TapeMeasureWidgetPrivate
+    {
+    };
   }
 }
 #endif

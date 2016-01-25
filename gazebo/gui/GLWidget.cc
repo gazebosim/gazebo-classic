@@ -521,8 +521,6 @@ bool GLWidget::OnMousePress(const common::MouseEvent & /*_event*/)
   }
   else if (this->dataPtr->state == "snap")
     ModelSnap::Instance()->OnMousePressEvent(this->dataPtr->mouseEvent);
-  else if (this->dataPtr->state == "tape_measure")
-    TapeMeasure::Instance()->OnMousePressEvent(this->dataPtr->mouseEvent);
 
   return true;
 }
@@ -543,8 +541,6 @@ bool GLWidget::OnMouseRelease(const common::MouseEvent & /*_event*/)
   }
   else if (this->dataPtr->state == "snap")
     ModelSnap::Instance()->OnMouseReleaseEvent(this->dataPtr->mouseEvent);
-  else if (this->dataPtr->state == "tape_measure")
-    TapeMeasure::Instance()->OnMouseReleaseEvent(this->dataPtr->mouseEvent);
 
   return true;
 }
@@ -565,8 +561,6 @@ bool GLWidget::OnMouseMove(const common::MouseEvent & /*_event*/)
   }
   else if (this->dataPtr->state == "snap")
     ModelSnap::Instance()->OnMouseMoveEvent(this->dataPtr->mouseEvent);
-  else if (this->dataPtr->state == "tape_measure")
-    TapeMeasure::Instance()->OnMouseMoveEvent(this->dataPtr->mouseEvent);
 
   return true;
 }
@@ -1147,7 +1141,6 @@ void GLWidget::OnManipMode(const std::string &_mode)
 
   ModelManipulator::Instance()->SetManipulationMode(_mode);
   ModelSnap::Instance()->Reset();
-  TapeMeasure::Instance()->Reset();
 
   if (this->dataPtr->state != "select")
   {
