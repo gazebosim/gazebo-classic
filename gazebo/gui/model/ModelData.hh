@@ -45,6 +45,12 @@ namespace gazebo
       /// \brief Get the default transparency setting for entities in model
       /// editor.
       public: static double GetEditTransparency();
+
+      /// \internal
+      /// \brief Update visual's render group. This is needed to fix an
+      /// alpha compositing issue in ogre when transparent objects overlap.
+      /// \param[in] _visual Visual to update
+      public: static void UpdateRenderGroup(rendering::VisualPtr _visual);
     };
 
     /// \brief Helper class to store nested models data.
