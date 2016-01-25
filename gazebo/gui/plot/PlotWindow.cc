@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,14 @@
  *
 */
 
-#include "gazebo/gui/Diagnostics.hh"
-#include "gazebo/gui/DiagnosticsPrivate.hh"
-#include "gazebo/gui/plot/IncrementalPlot.hh"
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/TransportIface.hh"
+
+#include "gazebo/gui/plot/VariablePillContainer.hh"
+#include "gazebo/gui/plot/PlotCanvas.hh"
+#include "gazebo/gui/plot/PlotWindow.hh"
+#include "gazebo/gui/plot/PlotWindowPrivate.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -53,106 +55,204 @@ class DragableListWidget : public QListWidget
 };
 
 /////////////////////////////////////////////////
-Diagnostics::Diagnostics(QWidget *_parent)
+PlotWindow::PlotWindow(QWidget *_parent)
   : QDialog(_parent),
-    dataPtr(new DiagnosticsPrivate())
+    dataPtr(new PlotWindowPrivate())
 {
   this->dataPtr->paused = false;
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));
-  this->setWindowTitle("Gazebo: Diagnostics");
-  this->setObjectName("diagnosticsPlot");
+  this->setWindowTitle("Gazebo: Plotting Utility");
+  this->setObjectName("PlotWindow");
   this->setWindowFlags(Qt::Window | Qt::WindowTitleHint |
       Qt::WindowCloseButtonHint | Qt::WindowStaysOnTopHint |
       Qt::CustomizeWindowHint);
 
-  this->dataPtr->plotLayout = new QVBoxLayout;
+  // new empty canvas
+  this->dataPtr->canvasLayout = new QVBoxLayout;
+  this->AddCanvas();
 
-  QScrollArea *plotScrollArea = new QScrollArea(this);
-  plotScrollArea->setLineWidth(0);
-  plotScrollArea->setFrameShape(QFrame::NoFrame);
-  plotScrollArea->setFrameShadow(QFrame::Plain);
-  plotScrollArea->setSizePolicy(QSizePolicy::Minimum,
-                                QSizePolicy::Minimum);
+  // add button
+  QPushButton *addCanvasButton = new QPushButton("+");
+  connect(addCanvasButton, SIGNAL(clicked()), this, SLOT(AddCanvas()));
+  QVBoxLayout *addButtonLayout = new QVBoxLayout;
+  addButtonLayout->addWidget(addCanvasButton);
+  addButtonLayout->setAlignment(Qt::AlignRight | Qt::AlignBottom);
+  addButtonLayout->setContentsMargins(0, 0, 0, 0);
+  addCanvasButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
 
-  plotScrollArea->setWidgetResizable(true);
-  plotScrollArea->viewport()->installEventFilter(this);
+  // Bottom toolbar
+  QFrame *bottomFrame = new QFrame;
+  bottomFrame->setObjectName("plotBottomFrame");
+  bottomFrame->setSizePolicy(QSizePolicy::Expanding,
+      QSizePolicy::Minimum);
 
-  QFrame *plotFrame = new QFrame(plotScrollArea);
-  plotFrame->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-  plotFrame->setLayout(this->dataPtr->plotLayout);
+  this->dataPtr->plotPlayAct = new QAction(QIcon(":/images/play.png"),
+      tr("Play"), this);
+  this->dataPtr->plotPlayAct->setStatusTip(tr("Continue Plotting"));
+  this->dataPtr->plotPlayAct->setVisible(true);
+  connect(this->dataPtr->plotPlayAct, SIGNAL(triggered()),
+      this, SLOT(OnPlay()));
 
-  plotScrollArea->setWidget(plotFrame);
+  this->dataPtr->plotPauseAct = new QAction(QIcon(":/images/pause.png"),
+      tr("Pause"), this);
+  this->dataPtr->plotPauseAct->setStatusTip(tr("Pause Plotting"));
+  this->dataPtr->plotPauseAct->setVisible(false);
+  connect(this->dataPtr->plotPauseAct, SIGNAL(triggered()),
+      this, SLOT(OnPause()));
 
+  QHBoxLayout *bottomPanelLayout = new QHBoxLayout;
+  QToolBar *playToolbar = new QToolBar;
+  playToolbar->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+  playToolbar->addAction(this->dataPtr->plotPlayAct);
+  playToolbar->addAction(this->dataPtr->plotPauseAct);
+  bottomPanelLayout->addStretch();
+  bottomPanelLayout->addWidget(playToolbar);
+  bottomPanelLayout->addStretch();
+  bottomPanelLayout->setContentsMargins(0, 0, 0, 0);
+  bottomFrame->setLayout(bottomPanelLayout);
 
-  IncrementalPlot *plot = new IncrementalPlot(this);
-  this->dataPtr->plots.push_back(plot);
-  this->dataPtr->plotLayout->addWidget(plot);
+  // main layout
+  QVBoxLayout *plotLayout = new QVBoxLayout;
+  plotLayout->addLayout(this->dataPtr->canvasLayout);
+  plotLayout->addLayout(addButtonLayout);
+  plotLayout->addWidget(bottomFrame);
+  plotLayout->setStretchFactor(this->dataPtr->canvasLayout, 1);
+  plotLayout->setStretchFactor(addButtonLayout, 0);
+  plotLayout->setStretchFactor(bottomFrame, 0);
 
+  // left panel
   this->dataPtr->labelList = new DragableListWidget(this);
   this->dataPtr->labelList->setDragEnabled(true);
   this->dataPtr->labelList->setDragDropMode(QAbstractItemView::DragOnly);
+  this->dataPtr->labelList->setSizePolicy(
+      QSizePolicy::Minimum, QSizePolicy::Minimum);
   QListWidgetItem *item = new QListWidgetItem("Real Time Factor");
   item->setToolTip(tr("Drag onto graph to plot"));
   this->dataPtr->labelList->addItem(item);
 
-  QPushButton *addPlotButton = new QPushButton("Add");
-  connect(addPlotButton, SIGNAL(clicked()), this, SLOT(OnAddPlot()));
+  //=================
+  // TODO for testing - remove later
+  QListWidgetItem *itema = new QListWidgetItem("Dog");
+  itema->setToolTip(tr("Drag onto graph to plot"));
+  this->dataPtr->labelList->addItem(itema);
+  QListWidgetItem *itemb = new QListWidgetItem("Cat");
+  itemb->setToolTip(tr("Drag onto graph to plot"));
+  this->dataPtr->labelList->addItem(itemb);
+  QListWidgetItem *itemc = new QListWidgetItem("Turtle");
+  itemc->setToolTip(tr("Drag onto graph to plot"));
+  this->dataPtr->labelList->addItem(itemc);
 
-  QCheckBox *pauseCheck = new QCheckBox;
-  pauseCheck->setChecked(this->dataPtr->paused);
-  connect(pauseCheck, SIGNAL(clicked(bool)), this, SLOT(OnPause(bool)));
-
-  QHBoxLayout *pauseLayout = new QHBoxLayout;
-  pauseLayout->addWidget(pauseCheck);
-  pauseLayout->addWidget(new QLabel("Pause"));
-  pauseLayout->addWidget(addPlotButton);
-  pauseLayout->addStretch(1);
+  //=================
 
   QVBoxLayout *leftLayout = new QVBoxLayout;
   leftLayout->addWidget(this->dataPtr->labelList);
-  leftLayout->addLayout(pauseLayout);
+  //leftLayout->addLayout(pauseLayout);
 
   QHBoxLayout *mainLayout = new QHBoxLayout;
   mainLayout->addLayout(leftLayout);
-  mainLayout->addWidget(plotScrollArea, 2);
+//  mainLayout->addWidget(plotScrollArea, 2);
+  mainLayout->addLayout(plotLayout);
 
   this->setLayout(mainLayout);
   this->setSizeGripEnabled(true);
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init();
-  this->dataPtr->sub = this->dataPtr->node->Subscribe("~/diagnostics",
-      &Diagnostics::OnMsg, this);
+//  this->dataPtr->sub = this->dataPtr->node->Subscribe("~/PlotWindow",
+//      &PlotWindow::OnMsg, this);
 
   msgs::DiagnosticControl msg;
   msg.set_enabled(true);
   this->dataPtr->node->Publish<msgs::DiagnosticControl>(
       "~/diagnostic/control", msg);
-
-  QTimer *displayTimer = new QTimer(this);
-  connect(displayTimer, SIGNAL(timeout()), this, SLOT(Update()));
-  displayTimer->start(60);
 }
 
 /////////////////////////////////////////////////
-Diagnostics::~Diagnostics()
+PlotWindow::~PlotWindow()
 {
 }
 
 /////////////////////////////////////////////////
-void Diagnostics::Update()
+void PlotWindow::OnPlay()
 {
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  this->dataPtr->paused = false;
+  this->dataPtr->plotPauseAct->setVisible(true);
+  this->dataPtr->plotPlayAct->setVisible(false);
+}
 
-  // Update all the plots
-  for (auto &plot : this->dataPtr->plots)
+/////////////////////////////////////////////////
+void PlotWindow::OnPause()
+{
+  this->dataPtr->paused = true;
+  this->dataPtr->plotPauseAct->setVisible(false);
+  this->dataPtr->plotPlayAct->setVisible(true);
+}
+
+/////////////////////////////////////////////////
+PlotCanvas *PlotWindow::AddCanvas()
+{
+  PlotCanvas *canvas = new PlotCanvas(this);
+  this->dataPtr->canvasLayout->addWidget(canvas);
+  return canvas;
+}
+
+/////////////////////////////////////////////////
+void PlotWindow::RemoveCanvas(PlotCanvas *canvas)
+{
+  int idx = this->dataPtr->canvasLayout->indexOf(canvas);
+  if (idx < 0)
+    return;
+
+  canvas->hide();
+  this->dataPtr->canvasLayout->takeAt(idx);
+  delete canvas;
+}
+
+/////////////////////////////////////////////////
+void PlotWindow::OnAddCanvas()
+{
+  this->AddCanvas();
+}
+
+/////////////////////////////////////////////////
+void PlotWindow::OnRemoveCanvas()
+{
+  PlotCanvas *canvas =
+    qobject_cast<PlotCanvas *>(QObject::sender());
+
+  if (!canvas)
+    return;
+
+  this->RemoveCanvas(canvas);
+}
+
+/////////////////////////////////////////////////
+bool PlotWindow::eventFilter(QObject *o, QEvent *e)
+{
+  if (e->type() == QEvent::Wheel)
   {
-    plot->Update();
+    e->ignore();
+    return true;
   }
+
+  return QWidget::eventFilter(o, e);
 }
 
 /////////////////////////////////////////////////
-void Diagnostics::OnMsg(ConstDiagnosticsPtr &_msg)
+void PlotWindow::closeEvent(QCloseEvent *_evt)
+{
+  msgs::DiagnosticControl msg;
+  msg.set_enabled(false);
+  this->dataPtr->node->Publish<msgs::DiagnosticControl>(
+      "~/diagnostic/control", msg);
+
+  QDialog::closeEvent(_evt);
+}
+
+
+
+/*/////////////////////////////////////////////////
+void PlotWindow::OnMsg(ConstPlotWindowPtr &_msg)
 {
   // Make sure plotting is not paused.
   if (this->dataPtr->paused)
@@ -262,41 +362,4 @@ void Diagnostics::OnMsg(ConstDiagnosticsPtr &_msg)
       (*iter)->AddVLine(qstr, wallTime.Double());
     }
   }
-}
-
-/////////////////////////////////////////////////
-void Diagnostics::OnPause(bool _value)
-{
-  this->dataPtr->paused = _value;
-}
-
-/////////////////////////////////////////////////
-void Diagnostics::OnAddPlot()
-{
-  IncrementalPlot *plot = new IncrementalPlot(this);
-  this->dataPtr->plotLayout->addWidget(plot);
-  this->dataPtr->plots.push_back(plot);
-}
-
-/////////////////////////////////////////////////
-bool Diagnostics::eventFilter(QObject *o, QEvent *e)
-{
-  if (e->type() == QEvent::Wheel)
-  {
-    e->ignore();
-    return true;
-  }
-
-  return QWidget::eventFilter(o, e);
-}
-
-/////////////////////////////////////////////////
-void Diagnostics::closeEvent(QCloseEvent *_evt)
-{
-  msgs::DiagnosticControl msg;
-  msg.set_enabled(false);
-  this->dataPtr->node->Publish<msgs::DiagnosticControl>(
-      "~/diagnostic/control", msg);
-
-  QDialog::closeEvent(_evt);
-}
+}*/

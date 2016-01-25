@@ -129,11 +129,10 @@ endif ()
 if (HAVE_QWT)
   set (sources ${sources}
     Diagnostics.cc
-    IncrementalPlot.cc
+
   )
   set (qt_headers ${qt_headers}
     Diagnostics.hh
-    IncrementalPlot.hh
   )
 endif()
 
@@ -157,6 +156,10 @@ add_subdirectory(viewers)
 add_subdirectory(terrain)
 add_subdirectory(building)
 add_subdirectory(model)
+
+if (HAVE_QWT)
+add_subdirectory(plot)
+endif()
 
 if (HAVE_GRAPHVIZ)
   add_definitions(-DWITH_CGRAPH)

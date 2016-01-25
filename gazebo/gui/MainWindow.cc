@@ -72,6 +72,7 @@
 
 #ifdef HAVE_QWT
 #include "gazebo/gui/Diagnostics.hh"
+#include "gazebo/gui/plot/PlotWindow.hh"
 #endif
 
 #ifdef HAVE_OCULUS
@@ -401,6 +402,15 @@ void MainWindow::Diagnostics()
 #ifdef HAVE_QWT
   gui::Diagnostics *diag = new gui::Diagnostics(this);
   diag->show();
+#endif
+}
+
+/////////////////////////////////////////////////
+void MainWindow::Plot()
+{
+#ifdef HAVE_QWT
+  gui::PlotWindow *plot = new gui::PlotWindow(this);
+  plot->show();
 #endif
 }
 
@@ -1069,6 +1079,11 @@ void MainWindow::CreateActions()
   g_diagnosticsAct->setShortcut(tr("Ctrl+U"));
   g_diagnosticsAct->setStatusTip(tr("Plot diagnostic information"));
   connect(g_diagnosticsAct, SIGNAL(triggered()), this, SLOT(Diagnostics()));
+
+  g_plotAct = new QAction(tr("Plot"), this);
+  g_plotAct->setShortcut(tr("Ctrl+P"));
+  g_plotAct->setStatusTip(tr("Create a Plot"));
+  connect(g_plotAct, SIGNAL(triggered()), this, SLOT(Plot()));
 #endif
 
   g_openAct = new QAction(tr("&Open World"), this);
@@ -1779,6 +1794,14 @@ void MainWindow::DeleteActions()
 
   delete g_redoHistoryAct;
   g_redoHistoryAct = 0;
+
+#ifdef HAVE_QWT
+  delete g_diagnosticsAct;
+  g_diagnosticsAct = 0;
+
+  delete g_plotAct;
+  g_plotAct = 0;
+#endif
 }
 
 
@@ -1844,6 +1867,7 @@ void MainWindow::CreateMenuBar()
 
 #ifdef HAVE_QWT
   windowMenu->addAction(g_diagnosticsAct);
+  windowMenu->addAction(g_plotAct);
 #endif
 
   bar->addSeparator();
