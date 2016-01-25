@@ -143,6 +143,7 @@ set (qt_tests
   LightMaker_TEST.cc
   ModelAlign_TEST.cc
   ModelMaker_TEST.cc
+  ModelManipulator_TEST.cc
   RenderWidget_TEST.cc
   SaveDialog_TEST.cc
   SplashScreen_TEST.cc

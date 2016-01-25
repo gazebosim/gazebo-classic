@@ -26,6 +26,47 @@ class Scene_TEST : public RenderingFixture
 };
 
 /////////////////////////////////////////////////
+TEST_F(Scene_TEST, AddRemoveCameras)
+{
+  Load("worlds/empty.world");
+
+  // Get the scene
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
+  ASSERT_TRUE(scene != NULL);
+
+  // verify no cameras are currently in the scene
+  EXPECT_EQ(scene->CameraCount(), 0u);
+
+  // create a camera and verify count
+  rendering::CameraPtr camera = scene->CreateCamera("test_camera", false);
+  EXPECT_EQ(scene->CameraCount(), 1u);
+  EXPECT_TRUE(scene->GetCamera("test_camera") == camera);
+
+  // create another camera and verify count
+  rendering::CameraPtr camera2 = scene->CreateCamera("test_camera2", false);
+  EXPECT_EQ(scene->CameraCount(), 2u);
+  EXPECT_TRUE(scene->GetCamera("test_camera2") == camera2);
+
+  // Remove a camera and check that it has been removed
+  scene->RemoveCamera(camera->Name());
+  EXPECT_EQ(scene->CameraCount(), 1u);
+  EXPECT_TRUE(scene->GetCamera("test_camera") == NULL);
+  EXPECT_TRUE(scene->GetCamera("test_camera2") != NULL);
+
+  // remove non-existent camera
+  scene->RemoveCamera("no_such_camera");
+  EXPECT_EQ(scene->CameraCount(), 1u);
+  EXPECT_TRUE(scene->GetCamera("test_camera") == NULL);
+  EXPECT_TRUE(scene->GetCamera("test_camera2") != NULL);
+
+  // Remove the remaining camera and check that it has been removed
+  scene->RemoveCamera(camera2->Name());
+  EXPECT_EQ(scene->CameraCount(), 0u);
+  EXPECT_TRUE(scene->GetCamera("test_camera") == NULL);
+  EXPECT_TRUE(scene->GetCamera("test_camera2") == NULL);
+}
+
+/////////////////////////////////////////////////
 TEST_F(Scene_TEST, AddRemoveVisuals)
 {
   Load("worlds/empty.world");
