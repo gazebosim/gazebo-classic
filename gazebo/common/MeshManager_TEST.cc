@@ -246,6 +246,27 @@ TEST_F(MeshManager, CreateExtrudedPolylineClosedPath)
 #endif
 
 /////////////////////////////////////////////////
+TEST_F(MeshManager, CreateExtrudedPolylineInvalid)
+{
+  // test extruding invalid polyline
+  std::vector<std::vector<ignition::math::Vector2d> > path;
+  std::vector<ignition::math::Vector2d> subpath01;
+  subpath01.push_back(ignition::math::Vector2d(0, 0));
+  subpath01.push_back(ignition::math::Vector2d(0, 1));
+  subpath01.push_back(ignition::math::Vector2d(0, 2));
+
+  path.push_back(subpath01);
+
+  std::string meshName = "extruded_path_invalid";
+  double height = 10.0;
+  common::MeshManager::Instance()->CreateExtrudedPolyline(
+      meshName, path, height);
+
+  // check mesh does not exist due to extrusion failure
+  EXPECT_TRUE(!common::MeshManager::Instance()->HasMesh(meshName));
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
