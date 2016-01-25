@@ -73,7 +73,7 @@ PlotWindow::PlotWindow(QWidget *_parent)
 
   // add button
   QPushButton *addCanvasButton = new QPushButton("+");
-  connect(addCanvasButton, SIGNAL(clicked()), this, SLOT(AddCanvas()));
+  connect(addCanvasButton, SIGNAL(clicked()), this, SLOT(OnAddCanvas()));
   QVBoxLayout *addButtonLayout = new QVBoxLayout;
   addButtonLayout->addWidget(addCanvasButton);
   addButtonLayout->setAlignment(Qt::AlignRight | Qt::AlignBottom);
