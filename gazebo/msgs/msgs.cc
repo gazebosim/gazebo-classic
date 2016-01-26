@@ -2530,6 +2530,8 @@ namespace gazebo
       // ignore the id field, since it's not used in sdformat
       if (_msg.has_is_static())
         modelSDF->GetElement("static")->Set(_msg.is_static());
+      if (_msg.has_enable_wind())
+        modelSDF->GetElement("enable_wind")->Set(_msg.enable_wind());
       if (_msg.has_pose())
         modelSDF->GetElement("pose")->Set(msgs::ConvertIgn(_msg.pose()));
 
