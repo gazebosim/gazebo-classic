@@ -230,12 +230,12 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
   dWorldSetAutoDisableAngularThreshold(this->dataPtr->worldId, 0.1);
   dWorldSetAutoDisableSteps(this->dataPtr->worldId, 5);
 
-  math::Vector3 g = this->sdf->Get<math::Vector3>("gravity");
+  auto g = this->world->Gravity();
 
-  if (g == math::Vector3(0, 0, 0))
+  if (g == ignition::math::Vector3d::Zero)
     gzwarn << "Gravity vector is (0, 0, 0). Objects will float.\n";
 
-  dWorldSetGravity(this->dataPtr->worldId, g.x, g.y, g.z);
+  dWorldSetGravity(this->dataPtr->worldId, g.X(), g.Y(), g.Z());
 
   if (odeElem->HasElement("constraints"))
   {
@@ -917,7 +917,7 @@ void ODEPhysics::SetStepType(const std::string &_type)
 //////////////////////////////////////////////////
 void ODEPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
 {
-  this->sdf->GetElement("gravity")->Set(_gravity);
+  this->world->SetGravitySDF(_gravity.Ign());
   dWorldSetGravity(this->dataPtr->worldId, _gravity.x, _gravity.y, _gravity.z);
 }
 

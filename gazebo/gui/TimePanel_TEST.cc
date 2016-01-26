@@ -65,7 +65,7 @@ void TimePanel_TEST::SpaceBar()
   }
 
   // Get the time panel
-  auto timePanel = mainWindow->GetRenderWidget()->GetTimePanel();
+  auto timePanel = mainWindow->RenderWidget()->GetTimePanel();
   QVERIFY(timePanel != NULL);
 
   // verify initial state
