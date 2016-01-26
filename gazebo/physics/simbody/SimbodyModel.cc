@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,12 +40,25 @@ SimbodyModel::~SimbodyModel()
 //////////////////////////////////////////////////
 void SimbodyModel::Load(sdf::ElementPtr _sdf)
 {
+  if (_sdf->HasElement("model"))
+  {
+    gzerr << "Nested models are not currently supported in Simbody. ["
+      << _sdf->Get<std::string>("name") << "] will not be loaded. "
+      << std::endl;
+    this->sdf = _sdf;
+    return;
+  }
+
   Model::Load(_sdf);
 }
 
 //////////////////////////////////////////////////
 void SimbodyModel::Init()
 {
+  // nested models are not supported for now, issue #1718
+  if (this->sdf->HasElement("model"))
+    return;
+
   // Record the model's initial pose (for reseting)
   this->SetInitialRelativePose(this->GetWorldPose());
 
