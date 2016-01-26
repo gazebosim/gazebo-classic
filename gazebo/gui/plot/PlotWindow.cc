@@ -21,38 +21,12 @@
 
 #include "gazebo/gui/plot/VariablePillContainer.hh"
 #include "gazebo/gui/plot/PlotCanvas.hh"
+#include "gazebo/gui/plot/PlotPalette.hh"
 #include "gazebo/gui/plot/PlotWindow.hh"
 #include "gazebo/gui/plot/PlotWindowPrivate.hh"
 
 using namespace gazebo;
 using namespace gui;
-
-// A special list widget that allows dragging of items from it to a
-// plot
-class DragableListWidget : public QListWidget
-{
-  public: DragableListWidget(QWidget *_parent)
-          : QListWidget(_parent)
-          {
-          }
-
-  protected: virtual void startDrag(Qt::DropActions /*_supportedActions*/)
-             {
-               QListWidgetItem *currItem = this->currentItem();
-               QMimeData *currMimeData = new QMimeData;
-               QByteArray ba;
-               ba = currItem->text().toLatin1().data();
-               currMimeData->setData("application/x-item", ba);
-               QDrag *drag = new QDrag(this);
-               drag->setMimeData(currMimeData);
-               drag->exec(Qt::LinkAction);
-             }
-
-  protected: virtual Qt::DropActions supportedDropActions()
-             {
-               return Qt::LinkAction;
-             }
-};
 
 /////////////////////////////////////////////////
 PlotWindow::PlotWindow(QWidget *_parent)
@@ -121,31 +95,10 @@ PlotWindow::PlotWindow(QWidget *_parent)
   plotLayout->setStretchFactor(bottomFrame, 0);
 
   // left panel
-  this->dataPtr->labelList = new DragableListWidget(this);
-  this->dataPtr->labelList->setDragEnabled(true);
-  this->dataPtr->labelList->setDragDropMode(QAbstractItemView::DragOnly);
-  this->dataPtr->labelList->setSizePolicy(
-      QSizePolicy::Minimum, QSizePolicy::Minimum);
-  QListWidgetItem *item = new QListWidgetItem("Real Time Factor");
-  item->setToolTip(tr("Drag onto graph to plot"));
-  this->dataPtr->labelList->addItem(item);
-
-  //=================
-  // TODO for testing - remove later
-  QListWidgetItem *itema = new QListWidgetItem("Dog");
-  itema->setToolTip(tr("Drag onto graph to plot"));
-  this->dataPtr->labelList->addItem(itema);
-  QListWidgetItem *itemb = new QListWidgetItem("Cat");
-  itemb->setToolTip(tr("Drag onto graph to plot"));
-  this->dataPtr->labelList->addItem(itemb);
-  QListWidgetItem *itemc = new QListWidgetItem("Turtle");
-  itemc->setToolTip(tr("Drag onto graph to plot"));
-  this->dataPtr->labelList->addItem(itemc);
-
-  //=================
+  auto plotPalette = new PlotPalette(this);
 
   QVBoxLayout *leftLayout = new QVBoxLayout;
-  leftLayout->addWidget(this->dataPtr->labelList);
+  leftLayout->addWidget(plotPalette);
   //leftLayout->addLayout(pauseLayout);
 
   QHBoxLayout *mainLayout = new QHBoxLayout;
