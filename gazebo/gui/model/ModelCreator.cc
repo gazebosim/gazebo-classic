@@ -976,10 +976,7 @@ LinkData *ModelCreator::CreateLink(const rendering::VisualPtr &_visual)
   collisionVis->SetMaterial("Gazebo/Orange");
   collisionVis->SetTransparency(
       math::clamp(ModelData::GetEditTransparency() * 2.0, 0.0, 0.8));
-  // fix for transparency alpha compositing
-  Ogre::MovableObject *colObj = collisionVis->GetSceneNode()->
-      getAttachedObject(0);
-  colObj->setRenderQueueGroup(colObj->getRenderQueueGroup()+1);
+  ModelData::UpdateRenderGroup(collisionVis);
   link->AddCollision(collisionVis);
 
   std::string linkName = link->linkVisual->GetName();
@@ -1229,10 +1226,7 @@ LinkData *ModelCreator::CreateLinkFromSDF(const sdf::ElementPtr &_linkElem,
     colVisual->SetMaterial("Gazebo/Orange");
     colVisual->SetTransparency(
         math::clamp(ModelData::GetEditTransparency() * 2.0, 0.0, 0.8));
-    // fix for transparency alpha compositing
-    Ogre::MovableObject *colObj = colVisual->GetSceneNode()->
-        getAttachedObject(0);
-    colObj->setRenderQueueGroup(colObj->getRenderQueueGroup()+1);
+    ModelData::UpdateRenderGroup(colVisual);
 
     // Add to link
     msgs::Collision colMsg = msgs::CollisionFromSDF(collisionElem);
