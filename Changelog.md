@@ -1,4 +1,11 @@
-## Gazebo 7.0
+## Gazebo 7
+
+## Gazebo 7.X.X
+
+1. Added static camera when following a model.
+    * [Pull request #1980](https://bitbucket.org/osrf/gazebo/pull-request/1980)
+
+## Gazebo 7.0.0 (2016-01-25)
 
 1. Add FollowerPlugin
     * [Pull request #2085](https://bitbucket.org/osrf/gazebo/pull-request/2085)
@@ -82,9 +89,6 @@
 
 1. Update rest web plugin to publish response messages and display login user name in toolbar.
     * [Pull request #1956](https://bitbucket.org/osrf/gazebo/pull-request/1956)
-
-1. Added static camera when following a model.
-    * [Pull request #1980](https://bitbucket.org/osrf/gazebo/pull-request/1980)
 
 1. Improve overall speed of log playback. Added new functions to LogPlay.
    Use tinyxml2 for playback.
