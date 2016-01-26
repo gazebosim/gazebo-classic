@@ -15,7 +15,7 @@
         <track_visual>
           <name>box</name>
           <static>true</static>
-          <relative>true</relative>
+          <use_model_frame>true</use_model_frame>
           <xyz>-1 -1 -1</xyz>
           <inherit_yaw>true</inherit_yaw>
         </track_visual>
