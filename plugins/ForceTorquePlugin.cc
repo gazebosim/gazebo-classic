@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
+
+#include <functional>
 
 #include "ForceTorquePlugin.hh"
 
@@ -50,7 +52,7 @@ void ForceTorquePlugin::Load(sensors::SensorPtr _parent,
     gzthrow("ForceTorquePlugin requires a force_torque sensor as its parent.");
 
   this->connection = this->parentSensor->ConnectUpdate(
-        boost::bind(&ForceTorquePlugin::OnUpdate, this, _1));
+        std::bind(&ForceTorquePlugin::OnUpdate, this, std::placeholders::_1));
 }
 
 /////////////////////////////////////////////////
