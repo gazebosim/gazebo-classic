@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-
+#include <mutex>
 #include <functional>
 
 #include <ignition/math/Rand.hh>
@@ -34,7 +34,7 @@ class CameraSensor : public ServerFixture
 {
 };
 
-boost::mutex mutex;
+std::mutex mutex;
 
 unsigned char* img = NULL;
 unsigned char* img2 = NULL;
@@ -49,7 +49,7 @@ void OnNewCameraFrame(int* _imageCounter, unsigned char* _imageDest,
                   unsigned int _depth,
                   const std::string &_format)
 {
-  boost::mutex::scoped_lock lock(mutex);
+  std::lock_guard<std::mutex> lock(mutex);
   pixelFormat = _format;
   memcpy(_imageDest, _image, _width * _height * _depth);
   *_imageCounter += 1;
@@ -85,7 +85,7 @@ TEST_F(CameraSensor, WorldReset)
   imageCount = 0;
   img = new unsigned char[width * height*3];
   event::ConnectionPtr c =
-      camSensor->GetCamera()->ConnectNewImageFrame(
+      camSensor->Camera()->ConnectNewImageFrame(
       std::bind(&::OnNewCameraFrame, &imageCount, img,
       std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
       std::placeholders::_4, std::placeholders::_5));
@@ -121,8 +121,102 @@ TEST_F(CameraSensor, WorldReset)
   EXPECT_GT(dt.Double(), 1.0);
   EXPECT_LT(dt.Double(), 3.0);
 
-  camSensor->GetCamera()->DisconnectNewImageFrame(c);
+  camSensor->Camera()->DisconnectNewImageFrame(c);
   delete [] img;
+}
+
+/////////////////////////////////////////////////
+TEST_F(CameraSensor, MultipleCameraSameName)
+{
+  Load("worlds/empty_test.world");
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run camera test\n";
+    return;
+  }
+
+  // spawn first camera sensor
+  std::string modelName = "camera_model";
+  std::string cameraName = "camera_sensor";
+  unsigned int width  = 320;
+  unsigned int height = 240;  // 106 fps
+  double updateRate = 10;
+  ignition::math::Pose3d setPose, testPose(
+      ignition::math::Vector3d(-5, 0, 5),
+      ignition::math::Quaterniond(0, GZ_DTOR(15), 0));
+  SpawnCamera(modelName, cameraName, setPose.Pos(),
+      setPose.Rot().Euler(), width, height, updateRate);
+  std::string sensorScopedName =
+      "default::" + modelName + "::body::" + cameraName;
+  sensors::SensorPtr sensor = sensors::get_sensor(sensorScopedName);
+  EXPECT_TRUE(sensor != NULL);
+  sensors::CameraSensorPtr camSensor =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+  EXPECT_TRUE(camSensor != NULL);
+  rendering::CameraPtr camera = camSensor->Camera();
+  EXPECT_TRUE(camera != NULL);
+
+  // spawn second camera sensor with same name but attached to a different model
+  std::string modelName2 = modelName + "_2";
+  SpawnCamera(modelName2, cameraName, setPose.Pos(),
+      setPose.Rot().Euler(), width, height, updateRate);
+  std::string sensorScopedName2 =
+      "default::" + modelName2 + "::body::" + cameraName;
+  sensors::SensorPtr sensor2 = sensors::get_sensor(sensorScopedName2);
+  EXPECT_TRUE(sensor2 != NULL);
+  sensors::CameraSensorPtr camSensor2 =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor2);
+  EXPECT_TRUE(camSensor2 != NULL);
+  rendering::CameraPtr camera2 = camSensor2->Camera();
+  EXPECT_TRUE(camera2 != NULL);
+
+  // verify that the sensors and cameras are not the same
+  EXPECT_TRUE(camSensor != camSensor2);
+  EXPECT_TRUE(camera != camera2);
+
+  // get camera scene and verify camera count
+  rendering::ScenePtr scene = camera->GetScene();
+  EXPECT_TRUE(scene != NULL);
+  EXPECT_EQ(scene->CameraCount(), 2u);
+
+  // remove the second camera sensor first and check that it does not remove
+  // the first one with the same name
+  sensors::remove_sensor(sensorScopedName2);
+  int sleep = 0;
+  int maxSleep = 10;
+  while (sensors::get_sensor(sensorScopedName2) != NULL && sleep < maxSleep)
+  {
+    common::Time::MSleep(100);
+    sleep++;
+  }
+  sensor2 = sensors::get_sensor(sensorScopedName2);
+  EXPECT_TRUE(sensor2 == NULL);
+  sensor = sensors::get_sensor(sensorScopedName);
+  EXPECT_TRUE(sensor != NULL);
+
+  // verify the first camera is still there
+  EXPECT_EQ(scene->CameraCount(), 1u);
+  EXPECT_TRUE(camera == scene->GetCamera(0));
+
+  std::string renderingCameraName = camera->Name();
+
+  // remove the first camera sensor and there should be no sensors or cameras
+  // left
+  sensors::remove_sensor(sensorScopedName);
+  sleep = 0;
+  while (sensors::get_sensor(sensorScopedName) != NULL && sleep < maxSleep)
+  {
+    common::Time::MSleep(100);
+    sleep++;
+  }
+  sensor = sensors::get_sensor(sensorScopedName);
+  EXPECT_TRUE(sensor == NULL);
+  camera = scene->GetCamera(renderingCameraName);
+  EXPECT_TRUE(camera == NULL);
+  EXPECT_EQ(scene->CameraCount(), 0u);
 }
 
 /////////////////////////////////////////////////
@@ -153,10 +247,10 @@ TEST_F(CameraSensor, CheckThrottle)
     std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
   imageCount = 0;
   img = new unsigned char[width * height*3];
-  event::ConnectionPtr c =
-    camSensor->GetCamera()->ConnectNewImageFrame(
-        boost::bind(&::OnNewCameraFrame, &imageCount, img,
-          _1, _2, _3, _4, _5));
+  event::ConnectionPtr c = camSensor->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNewCameraFrame, &imageCount, img,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
   common::Timer timer;
   timer.Start();
 
@@ -170,7 +264,7 @@ TEST_F(CameraSensor, CheckThrottle)
   gzdbg << "timer [" << dt.Double() << "] seconds rate [" << rate << "] fps\n";
   EXPECT_GT(rate, 7.0);
   EXPECT_LT(rate, 11.0);
-  camSensor->GetCamera()->DisconnectNewImageFrame(c);
+  camSensor->Camera()->DisconnectNewImageFrame(c);
   delete [] img;
 }
 
@@ -208,7 +302,7 @@ TEST_F(CameraSensor, FillMsg)
 
   // Required fields
   EXPECT_EQ(msg.name(), cameraName);
-  EXPECT_EQ(msg.parent(), sensor->GetParentName());
+  EXPECT_EQ(msg.parent(), sensor->ParentName());
   EXPECT_EQ(msg.type(), "camera");
 
   // Optional fields
@@ -219,22 +313,22 @@ TEST_F(CameraSensor, FillMsg)
   EXPECT_EQ(msgs::ConvertIgn(msg.pose()), sensor->Pose());
 
   ASSERT_TRUE(msg.has_topic());
-  EXPECT_EQ(msg.topic(), sensor->GetTopic());
+  EXPECT_EQ(msg.topic(), sensor->Topic());
 
   ASSERT_TRUE(msg.has_update_rate());
-  EXPECT_EQ(msg.update_rate(), sensor->GetUpdateRate());
+  EXPECT_EQ(msg.update_rate(), sensor->UpdateRate());
 
   ASSERT_TRUE(msg.has_visualize());
-  EXPECT_EQ(msg.visualize(), sensor->GetVisualize());
+  EXPECT_EQ(msg.visualize(), sensor->Visualize());
 
   ASSERT_FALSE(msg.has_contact());
   ASSERT_FALSE(msg.has_ray());
   ASSERT_TRUE(msg.has_camera());
   auto cameraMsg = msg.camera();
-  auto cam = camSensor->GetCamera();
+  auto cam = camSensor->Camera();
   EXPECT_EQ(cameraMsg.horizontal_fov(), cam->HFOV().Radian());
-  EXPECT_EQ(cameraMsg.image_size().x(), camSensor->GetImageWidth());
-  EXPECT_EQ(cameraMsg.image_size().y(), camSensor->GetImageHeight());
+  EXPECT_EQ(cameraMsg.image_size().x(), camSensor->ImageWidth());
+  EXPECT_EQ(cameraMsg.image_size().y(), camSensor->ImageHeight());
   EXPECT_EQ(cameraMsg.image_format(), cam->ImageFormat());
   EXPECT_EQ(cameraMsg.near_clip(), cam->NearClip());
   EXPECT_EQ(cameraMsg.far_clip(), cam->FarClip());
@@ -271,9 +365,10 @@ TEST_F(CameraSensor, UnlimitedTest)
   imageCount = 0;
   img = new unsigned char[width * height*3];
   event::ConnectionPtr c =
-    camSensor->GetCamera()->ConnectNewImageFrame(
-        boost::bind(&::OnNewCameraFrame, &imageCount, img,
-          _1, _2, _3, _4, _5));
+    camSensor->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNewCameraFrame, &imageCount, img,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
   common::Timer timer;
   timer.Start();
   // time how long it takes to get N images
@@ -283,7 +378,7 @@ TEST_F(CameraSensor, UnlimitedTest)
   common::Time dt = timer.GetElapsed();
   double rate = static_cast<double>(total_images)/dt.Double();
   gzdbg << "timer [" << dt.Double() << "] seconds rate [" << rate << "] fps\n";
-  camSensor->GetCamera()->DisconnectNewImageFrame(c);
+  camSensor->Camera()->DisconnectNewImageFrame(c);
   EXPECT_GT(rate, 30.0);
 
   delete [] img;
@@ -324,8 +419,8 @@ TEST_F(CameraSensor, MultiSenseHigh)
   imageCount = 0;
   img = new unsigned char[width * height*3];
   event::ConnectionPtr c =
-    camSensor->GetCamera()->ConnectNewImageFrame(
-        boost::bind(&::OnNewCameraFrame, &imageCount, img,
+    camSensor->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNewCameraFrame, &imageCount, img,
           _1, _2, _3, _4, _5));
   common::Timer timer;
   timer.Start();
@@ -336,7 +431,7 @@ TEST_F(CameraSensor, MultiSenseHigh)
   common::Time dt = timer.GetElapsed();
   double rate = static_cast<double>(total_images)/dt.Double();
   gzdbg << "timer [" << dt.Double() << "] seconds rate [" << rate << "] fps\n";
-  camSensor->GetCamera()->DisconnectNewImageFrame(c);
+  camSensor->Camera()->DisconnectNewImageFrame(c);
   EXPECT_GT(rate, 24.0);
   EXPECT_LT(rate, 25.0);
 
@@ -379,8 +474,8 @@ TEST_F(CameraSensor, MultiSenseLow)
   imageCount = 0;
   img = new unsigned char[width * height*3];
   event::ConnectionPtr c =
-    camSensor->GetCamera()->ConnectNewImageFrame(
-        boost::bind(&::OnNewCameraFrame, &imageCount, img,
+    camSensor->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNewCameraFrame, &imageCount, img,
           _1, _2, _3, _4, _5));
   common::Timer timer;
   timer.Start();
@@ -391,7 +486,7 @@ TEST_F(CameraSensor, MultiSenseLow)
   common::Time dt = timer.GetElapsed();
   double rate = static_cast<double>(total_images)/dt.Double();
   gzdbg << "timer [" << dt.Double() << "] seconds rate [" << rate << "] fps\n";
-  camSensor->GetCamera()->DisconnectNewImageFrame(c);
+  camSensor->Camera()->DisconnectNewImageFrame(c);
   EXPECT_GT(rate, 24.0);
   EXPECT_LT(rate, 25.0);
 
@@ -442,13 +537,15 @@ TEST_F(CameraSensor, CheckNoise)
   img = new unsigned char[width * height*3];
   img2 = new unsigned char[width * height*3];
   event::ConnectionPtr c =
-    camSensor->GetCamera()->ConnectNewImageFrame(
-        boost::bind(&::OnNewCameraFrame, &imageCount, img,
-          _1, _2, _3, _4, _5));
+    camSensor->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNewCameraFrame, &imageCount, img,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
   event::ConnectionPtr c2 =
-    camSensorNoisy->GetCamera()->ConnectNewImageFrame(
-        boost::bind(&::OnNewCameraFrame, &imageCount2, img2,
-          _1, _2, _3, _4, _5));
+    camSensorNoisy->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNewCameraFrame, &imageCount2, img2,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
 
   // Get some images
   while (imageCount < 10 || imageCount2 < 10)
@@ -510,13 +607,15 @@ TEST_F(CameraSensor, CheckDistortion)
   img = new unsigned char[width * height*3];
   img2 = new unsigned char[width * height*3];
   event::ConnectionPtr c =
-    camSensor->GetCamera()->ConnectNewImageFrame(
-        boost::bind(&::OnNewCameraFrame, &imageCount, img,
-          _1, _2, _3, _4, _5));
+    camSensor->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNewCameraFrame, &imageCount, img,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
   event::ConnectionPtr c2 =
-    camSensorDistorted->GetCamera()->ConnectNewImageFrame(
-        boost::bind(&::OnNewCameraFrame, &imageCount2, img2,
-          _1, _2, _3, _4, _5));
+    camSensorDistorted->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNewCameraFrame, &imageCount2, img2,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
 
   // Get some images
   while (imageCount < 10 || imageCount2 < 10)
@@ -618,13 +717,15 @@ TEST_F(CameraSensor, CompareSideBySideCamera)
   img2 = new unsigned char[width * height*3];
   unsigned char *prevImg2 = new unsigned char[width * height*3];
   event::ConnectionPtr c =
-    camSensor->GetCamera()->ConnectNewImageFrame(
-        boost::bind(&::OnNewCameraFrame, &imageCount, img,
-          _1, _2, _3, _4, _5));
+    camSensor->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNewCameraFrame, &imageCount, img,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
   event::ConnectionPtr c2 =
-    camSensor2->GetCamera()->ConnectNewImageFrame(
-        boost::bind(&::OnNewCameraFrame, &imageCount2, img2,
-          _1, _2, _3, _4, _5));
+    camSensor2->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNewCameraFrame, &imageCount2, img2,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
 
   while (imageCount < 10 || imageCount2 < 10)
     common::Time::MSleep(10);
@@ -652,7 +753,7 @@ TEST_F(CameraSensor, CompareSideBySideCamera)
       unsigned int diffMax2 = 0;
       double diffAvg2 = 0.0;
 
-      boost::mutex::scoped_lock lock(mutex);
+      std::lock_guard<std::mutex> lock(mutex);
       this->ImageCompare(img, prevImg, width, height, 3,
                          diffMax, diffSum, diffAvg);
       this->ImageCompare(prevImg2, prevImg2, width, height, 3,
