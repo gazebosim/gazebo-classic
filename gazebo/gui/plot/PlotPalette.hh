@@ -19,6 +19,7 @@
 
 #include <memory>
 
+#include "gazebo/gui/ConfigWidget.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/util/system.hh"
@@ -34,9 +35,12 @@ namespace gazebo
     /// plot
     class GZ_GUI_VISIBLE PlotPalette : public QWidget
     {
-     // Q_OBJECT
+      Q_OBJECT
 
       public: PlotPalette(QWidget *_parent);
+      public: ~PlotPalette();
+
+      private slots: void OnModelClicked();
 
       /// \internal
       /// \brief Pointer to private data.
@@ -50,17 +54,27 @@ namespace gazebo
     /// plot
     class GZ_GUI_VISIBLE DragableListWidget : public QListWidget
     {
-     // Q_OBJECT
+      // Q_OBJECT
 
       public: DragableListWidget(QWidget *_parent);
 
-      protected: virtual void startDrag(Qt::DropActions /*_supportedActions*/);
+      protected: virtual void startDrag(Qt::DropActions _supportedActions);
 
       protected: virtual Qt::DropActions supportedDropActions();
 
       /// \internal
       /// \brief Pointer to private data.
 //      private: std::unique_ptr<DragableListWidgetPrivate> dataPtr;
+    };
+
+    class GZ_GUI_VISIBLE ItemConfigWidget : public ConfigChildWidget
+    {
+      Q_OBJECT
+
+      public: ItemConfigWidget(const std::string &_text);
+      public: ~ItemConfigWidget();
+      signals: void Clicked();
+      protected: virtual void mouseReleaseEvent(QMouseEvent *_event);
     };
   }
 }

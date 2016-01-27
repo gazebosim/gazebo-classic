@@ -12,6 +12,7 @@ set (sources_local
 set (qt_headers_local
   plot/IncrementalPlot.hh
   plot/PlotCanvas.hh
+  plot/PlotPalette.hh
   plot/PlotWindow.hh
   plot/VariablePill.hh
   plot/VariablePillContainer.hh

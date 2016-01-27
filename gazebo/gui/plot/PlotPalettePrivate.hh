@@ -24,11 +24,18 @@ namespace gazebo
 {
   namespace gui
   {
+    class ConfigWidget;
+
     /// \brief Private data for the PlotPalette class
     class PlotPalettePrivate
     {
+      public: ConfigWidget *topicsTop;
+      public: QWidget *modelsTop;
+
       /// \brief The list of diagnostic labels.
-      public: QListWidget *labelList;
+      public: QListWidget *topicsBottom;
+      public: QListWidget *modelsBottom;
+      public: QListWidget *simBottom;
     };
   }
 }
