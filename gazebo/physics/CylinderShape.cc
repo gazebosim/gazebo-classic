@@ -115,5 +115,5 @@ void CylinderShape::ProcessMsg(const msgs::Geometry &_msg)
 /////////////////////////////////////////////////
 double CylinderShape::ComputeVolume() const
 {
-  return IGN_CYLINDER_VOLUME(this->GetLength(), this->GetRadius());
+  return IGN_CYLINDER_VOLUME(this->GetRadius(), this->GetLength());
 }
