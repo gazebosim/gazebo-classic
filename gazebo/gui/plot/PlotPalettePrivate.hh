@@ -30,7 +30,7 @@ namespace gazebo
     class PlotPalettePrivate
     {
       public: ConfigWidget *topicsTop;
-      public: QWidget *modelsTop;
+      public: ConfigWidget *modelsTop;
 
       /// \brief The list of diagnostic labels.
       public: QListWidget *topicsBottom;

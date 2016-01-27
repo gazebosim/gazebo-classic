@@ -19,6 +19,8 @@
 #include "gazebo/gui/plot/PlotPalette.hh"
 #include "gazebo/gui/plot/PlotPalettePrivate.hh"
 
+#include "gazebo/transport/TransportIface.hh"
+
 using namespace gazebo;
 using namespace gui;
 
@@ -28,6 +30,18 @@ PlotPalette::PlotPalette(QWidget *_parent) : QWidget(_parent),
 {
   // Topics
   this->dataPtr->topicsTop = new ConfigWidget();
+  this->FillTopicsTop();
+
+  auto topicsScroll = new QScrollArea;
+  topicsScroll->setWidget(this->dataPtr->topicsTop);
+  topicsScroll->setWidgetResizable(true);
+
+  auto topicsLayout = new QVBoxLayout;
+  topicsLayout->setContentsMargins(0, 0, 0, 0);
+  topicsLayout->addWidget(topicsScroll);
+
+  auto topicsTopWidget = new QWidget;
+  topicsTopWidget->setLayout(topicsLayout);
 
   this->dataPtr->topicsBottom = new DragableListWidget(this);
   this->dataPtr->topicsBottom->setDragEnabled(true);
@@ -36,7 +50,7 @@ PlotPalette::PlotPalette(QWidget *_parent) : QWidget(_parent),
       QSizePolicy::Minimum, QSizePolicy::Minimum);
 
   auto topicsSplitter = new QSplitter(Qt::Vertical, this);
-  topicsSplitter->addWidget(this->dataPtr->topicsTop);
+  topicsSplitter->addWidget(topicsTopWidget);
   topicsSplitter->addWidget(this->dataPtr->topicsBottom);
   topicsSplitter->setStretchFactor(0, 1);
   topicsSplitter->setStretchFactor(1, 2);
@@ -44,31 +58,19 @@ PlotPalette::PlotPalette(QWidget *_parent) : QWidget(_parent),
   topicsSplitter->setCollapsible(1, false);
 
   // Models top
-  auto modelsConfigWidget = new ConfigWidget();
-  auto configLayout = new QVBoxLayout();
-  configLayout->setContentsMargins(0, 0, 0, 0);
-  configLayout->setSpacing(0);
-  for (int i = 0; i < 10; ++i)
-  {
-    auto childWidget = new ItemConfigWidget("Model " + std::to_string(i));
-    connect(childWidget, SIGNAL(Clicked()), this, SLOT(OnModelClicked()));
-
-    modelsConfigWidget->AddConfigChildWidget("Model " + i, childWidget);
-
-    configLayout->addWidget(childWidget);
-  }
-  modelsConfigWidget->setLayout(configLayout);
+  this->dataPtr->modelsTop = new ConfigWidget();
+  this->FillModelsTop();
 
   auto modelsScroll = new QScrollArea;
-  modelsScroll->setWidget(modelsConfigWidget);
+  modelsScroll->setWidget(this->dataPtr->modelsTop);
   modelsScroll->setWidgetResizable(true);
 
   auto modelsLayout = new QVBoxLayout;
   modelsLayout->setContentsMargins(0, 0, 0, 0);
   modelsLayout->addWidget(modelsScroll);
 
-  this->dataPtr->modelsTop = new QWidget;
-  this->dataPtr->modelsTop->setLayout(modelsLayout);
+  auto modelsTopWidget = new QWidget;
+  modelsTopWidget->setLayout(modelsLayout);
 
   // Models bottom
   this->dataPtr->modelsBottom = new DragableListWidget(this);
@@ -78,7 +80,7 @@ PlotPalette::PlotPalette(QWidget *_parent) : QWidget(_parent),
       QSizePolicy::Minimum, QSizePolicy::Minimum);
 
   auto modelsSplitter = new QSplitter(Qt::Vertical, this);
-  modelsSplitter->addWidget(this->dataPtr->modelsTop);
+  modelsSplitter->addWidget(modelsTopWidget);
   modelsSplitter->addWidget(this->dataPtr->modelsBottom);
   modelsSplitter->setStretchFactor(0, 1);
   modelsSplitter->setStretchFactor(1, 2);
@@ -153,6 +155,58 @@ PlotPalette::PlotPalette(QWidget *_parent) : QWidget(_parent),
 /////////////////////////////////////////////////
 PlotPalette::~PlotPalette()
 {
+}
+
+/////////////////////////////////////////////////
+void PlotPalette::FillTopicsTop()
+{
+  auto configLayout = new QVBoxLayout();
+  configLayout->setContentsMargins(0, 0, 0, 0);
+  configLayout->setSpacing(0);
+
+  // Get all topics, independently of message type
+  std::vector<std::string> topics;
+  auto msgTypes = transport::getAdvertisedTopics();
+  for (auto msgType : msgTypes)
+  {
+    for (auto topic : msgType.second)
+    {
+      topics.push_back(topic);
+    }
+  }
+
+  // Sort alphabetically
+  std::sort(topics.begin(), topics.end());
+
+  // Populate widget
+  for (auto topic : topics)
+  {
+    auto childWidget = new ItemConfigWidget(topic);
+   // connect(childWidget, SIGNAL(Clicked()), this, SLOT(OnTopicClicked()));
+
+    this->dataPtr->topicsTop->AddConfigChildWidget(topic, childWidget);
+    configLayout->addWidget(childWidget);
+  }
+
+  this->dataPtr->topicsTop->setLayout(configLayout);
+}
+
+/////////////////////////////////////////////////
+void PlotPalette::FillModelsTop()
+{
+  auto configLayout = new QVBoxLayout();
+  configLayout->setContentsMargins(0, 0, 0, 0);
+  configLayout->setSpacing(0);
+  for (int i = 0; i < 10; ++i)
+  {
+    auto childWidget = new ItemConfigWidget("Model " + std::to_string(i));
+    connect(childWidget, SIGNAL(Clicked()), this, SLOT(OnModelClicked()));
+
+    this->dataPtr->modelsTop->AddConfigChildWidget("Model " + i, childWidget);
+
+    configLayout->addWidget(childWidget);
+  }
+  this->dataPtr->modelsTop->setLayout(configLayout);
 }
 
 /////////////////////////////////////////////////

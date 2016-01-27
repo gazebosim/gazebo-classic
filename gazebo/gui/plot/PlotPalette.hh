@@ -40,6 +40,9 @@ namespace gazebo
       public: PlotPalette(QWidget *_parent);
       public: ~PlotPalette();
 
+      private: void FillTopicsTop();
+      private: void FillModelsTop();
+
       private slots: void OnModelClicked();
 
       /// \internal
