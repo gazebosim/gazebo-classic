@@ -59,7 +59,10 @@ PlotPalette::PlotPalette(QWidget *_parent) : QWidget(_parent),
 
   // Models top
   this->dataPtr->modelsTop = new ConfigWidget();
-  this->FillModelsTop();
+  auto configLayout = new QVBoxLayout();
+  configLayout->setContentsMargins(0, 0, 0, 0);
+  configLayout->setSpacing(0);
+  this->dataPtr->modelsTop->setLayout(configLayout);
 
   auto modelsScroll = new QScrollArea;
   modelsScroll->setWidget(this->dataPtr->modelsTop);
@@ -71,6 +74,11 @@ PlotPalette::PlotPalette(QWidget *_parent) : QWidget(_parent),
 
   auto modelsTopWidget = new QWidget;
   modelsTopWidget->setLayout(modelsLayout);
+
+  this->connect(this, SIGNAL(InsertModelSignal(const std::string &)), this,
+      SLOT(OnInsertModelSignal(const std::string &)));
+  this->connect(this, SIGNAL(RemoveModelSignal(const std::string &)), this,
+      SLOT(OnRemoveModelSignal(const std::string &)));
 
   // Models bottom
   this->dataPtr->modelsBottom = new DragableListWidget(this);
@@ -140,16 +148,35 @@ PlotPalette::PlotPalette(QWidget *_parent) : QWidget(_parent),
   // Tabs
   auto tabWidget = new QTabWidget;
   tabWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-  tabWidget->setMinimumWidth(250);
+  tabWidget->setMinimumWidth(300);
 
   tabWidget->addTab(topicsSplitter, "Topics");
   tabWidget->addTab(modelsSplitter, "Models");
   tabWidget->addTab(simSplitter, "Sim");
+  tabWidget->addTab(new QWidget(), "Search");
 
   auto mainLayout = new QVBoxLayout;
   mainLayout->addWidget(tabWidget);
 
   this->setLayout(mainLayout);
+
+  // Transport
+  this->dataPtr->node = transport::NodePtr(new transport::Node());
+  this->dataPtr->node->Init();
+
+  this->dataPtr->newModelSub = this->dataPtr->node->Subscribe("~/model/info",
+      &PlotPalette::OnModel, this, true);
+
+  this->dataPtr->requestPub =
+      this->dataPtr->node->Advertise<msgs::Request>("~/request");
+  this->dataPtr->responseSub = this->dataPtr->node->Subscribe("~/response",
+      &PlotPalette::OnResponse, this);
+
+  this->dataPtr->requestMsg = msgs::CreateRequest("scene_info");
+  this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
+
+  this->dataPtr->requestSub = this->dataPtr->node->Subscribe("~/request",
+      &PlotPalette::OnRequest, this, false);
 }
 
 /////////////////////////////////////////////////
@@ -192,21 +219,70 @@ void PlotPalette::FillTopicsTop()
 }
 
 /////////////////////////////////////////////////
-void PlotPalette::FillModelsTop()
+void PlotPalette::OnRequest(ConstRequestPtr &_msg)
 {
-  auto configLayout = new QVBoxLayout();
-  configLayout->setContentsMargins(0, 0, 0, 0);
-  configLayout->setSpacing(0);
-  for (int i = 0; i < 10; ++i)
+  if (_msg->request() == "entity_delete")
   {
-    auto childWidget = new ItemConfigWidget("Model " + std::to_string(i));
-    connect(childWidget, SIGNAL(Clicked()), this, SLOT(OnModelClicked()));
-
-    this->dataPtr->modelsTop->AddConfigChildWidget("Model " + i, childWidget);
-
-    configLayout->addWidget(childWidget);
+    this->RemoveModelSignal(_msg->data());
   }
-  this->dataPtr->modelsTop->setLayout(configLayout);
+}
+
+/////////////////////////////////////////////////
+void PlotPalette::OnResponse(ConstResponsePtr &_msg)
+{
+  if (!this->dataPtr->requestMsg || _msg->id() !=
+      this->dataPtr->requestMsg->id())
+  {
+    return;
+  }
+
+  msgs::Scene sceneMsg;
+
+  if (_msg->has_type() && _msg->type() == sceneMsg.GetTypeName())
+  {
+    sceneMsg.ParseFromString(_msg->serialized_data());
+
+    for (int i = 0; i < sceneMsg.model_size(); ++i)
+    {
+      this->InsertModelSignal(sceneMsg.model(i).name());
+    }
+  }
+
+  delete this->dataPtr->requestMsg;
+  this->dataPtr->requestMsg = NULL;
+}
+
+/////////////////////////////////////////////////
+void PlotPalette::OnModel(ConstModelPtr &_msg)
+{
+  this->InsertModelSignal(_msg->name());
+}
+
+/////////////////////////////////////////////////
+void PlotPalette::OnInsertModelSignal(const std::string &_name)
+{
+  auto childWidget = new ItemConfigWidget(_name);
+  connect(childWidget, SIGNAL(Clicked()), this, SLOT(OnModelClicked()));
+
+  this->dataPtr->modelsTop->AddConfigChildWidget(_name, childWidget);
+
+  this->dataPtr->modelsTop->layout()->addWidget(childWidget);
+}
+
+/////////////////////////////////////////////////
+void PlotPalette::OnRemoveModelSignal(const std::string &_name)
+{
+  auto models = this->dataPtr->modelsTop->findChildren<ItemConfigWidget *>();
+
+  for (auto model : models)
+  {
+    if (model->Text() == _name)
+    {
+      this->dataPtr->modelsTop->layout()->removeWidget(model);
+      delete model;
+      return;
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -241,9 +317,10 @@ Qt::DropActions DragableListWidget::supportedDropActions()
 
 /////////////////////////////////////////////////
 ItemConfigWidget::ItemConfigWidget(const std::string &_text)
-  : ConfigChildWidget()
+  : ConfigChildWidget(), dataPtr(new ItemConfigWidgetPrivate)
 {
   auto label = new QLabel(QString::fromStdString(_text));
+  this->dataPtr->text = _text;
 
   auto mainLayout = new QHBoxLayout;
   mainLayout->setContentsMargins(0, 0, 0, 0);
@@ -267,6 +344,12 @@ ItemConfigWidget::ItemConfigWidget(const std::string &_text)
 /////////////////////////////////////////////////
 ItemConfigWidget::~ItemConfigWidget()
 {
+}
+
+/////////////////////////////////////////////////
+std::string ItemConfigWidget::Text() const
+{
+  return this->dataPtr->text;
 }
 
 /////////////////////////////////////////////////

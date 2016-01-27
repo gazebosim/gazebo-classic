@@ -40,10 +40,18 @@ namespace gazebo
       public: PlotPalette(QWidget *_parent);
       public: ~PlotPalette();
 
+      signals: void InsertModelSignal(const std::string &_name);
+      signals: void RemoveModelSignal(const std::string &_name);
+
       private: void FillTopicsTop();
-      private: void FillModelsTop();
 
       private slots: void OnModelClicked();
+      private slots: void OnInsertModelSignal(const std::string &_name);
+      private slots: void OnRemoveModelSignal(const std::string &_name);
+
+      private: void OnModel(ConstModelPtr &_msg);
+      private: void OnResponse(ConstResponsePtr &_msg);
+      private: void OnRequest(ConstRequestPtr &_msg);
 
       /// \internal
       /// \brief Pointer to private data.
@@ -70,14 +78,22 @@ namespace gazebo
 //      private: std::unique_ptr<DragableListWidgetPrivate> dataPtr;
     };
 
+    // Forward declare private data class
+    class ItemConfigWidgetPrivate;
+
     class GZ_GUI_VISIBLE ItemConfigWidget : public ConfigChildWidget
     {
       Q_OBJECT
 
       public: ItemConfigWidget(const std::string &_text);
       public: ~ItemConfigWidget();
+      public: std::string Text() const;
       signals: void Clicked();
       protected: virtual void mouseReleaseEvent(QMouseEvent *_event);
+
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<ItemConfigWidgetPrivate> dataPtr;
     };
   }
 }

@@ -67,9 +67,10 @@ gui::MainWindow *g_main_win = NULL;
 rendering::UserCameraPtr g_active_camera;
 bool g_fullscreen = false;
 
-// This makes it possible to use common::Time in QT signals and slots.
+// This makes it possible to use non Qt types in QT signals and slots.
 // qRegisterMetaType is also required, see below.
 Q_DECLARE_METATYPE(common::Time)
+Q_DECLARE_METATYPE(std::string)
 
 //////////////////////////////////////////////////
 void print_usage()
@@ -255,9 +256,10 @@ bool gui::load()
   g_app = new QApplication(g_argc, g_argv);
   set_style();
 
-  // Register common::Time as a type that can be used in signals and slots.
+  // Register non Qt types so that they can be used in signals and slots.
   // Q_DECLARE_METATYPE is also required, see above.
   qRegisterMetaType<common::Time>();
+  qRegisterMetaType<std::string>();
 
   g_splashScreen = new gui::SplashScreen();
 

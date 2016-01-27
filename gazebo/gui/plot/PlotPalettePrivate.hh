@@ -19,6 +19,7 @@
 #define _GAZEBO_GUI_PLOT_PLOTPALETTE_PRIVATE_HH_
 
 #include "gazebo/gui/qt.h"
+#include "gazebo/transport/TransportIface.hh"
 
 namespace gazebo
 {
@@ -36,6 +37,28 @@ namespace gazebo
       public: QListWidget *topicsBottom;
       public: QListWidget *modelsBottom;
       public: QListWidget *simBottom;
+
+      /// \brief Transport node used for communication.
+      public: transport::NodePtr node;
+
+      /// \brief Subscribe to model info messages.
+      public: transport::SubscriberPtr newModelSub;
+
+      /// \brief Publish request messages.
+      public: transport::PublisherPtr requestPub;
+      public: transport::SubscriberPtr requestSub;
+
+      /// \brief Subscribe to response messages.
+      public: transport::SubscriberPtr responseSub;
+
+      /// \brief Message used to field requests.
+      public: msgs::Request *requestMsg;
+    };
+
+    /// \brief Private data for the ItemConfigWidget class
+    class ItemConfigWidgetPrivate
+    {
+      public: std::string text;
     };
   }
 }
