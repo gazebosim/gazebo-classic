@@ -34,7 +34,7 @@ namespace gazebo
       public: ConfigWidget *modelsTop;
 
       /// \brief The list of diagnostic labels.
-      public: QListWidget *topicsBottom;
+      public: ConfigWidget *topicsBottom;
       public: QListWidget *modelsBottom;
       public: QListWidget *simBottom;
 

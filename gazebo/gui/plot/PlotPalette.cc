@@ -28,32 +28,46 @@ using namespace gui;
 PlotPalette::PlotPalette(QWidget *_parent) : QWidget(_parent),
     dataPtr(new PlotPalettePrivate)
 {
-  // Topics
+  // Topics top
   this->dataPtr->topicsTop = new ConfigWidget();
   this->FillTopicsTop();
 
-  auto topicsScroll = new QScrollArea;
-  topicsScroll->setWidget(this->dataPtr->topicsTop);
-  topicsScroll->setWidgetResizable(true);
+  auto topicsTopScroll = new QScrollArea;
+  topicsTopScroll->setWidget(this->dataPtr->topicsTop);
+  topicsTopScroll->setWidgetResizable(true);
 
-  auto topicsLayout = new QVBoxLayout;
-  topicsLayout->setContentsMargins(0, 0, 0, 0);
-  topicsLayout->addWidget(topicsScroll);
+  auto topicsTopLayout = new QVBoxLayout;
+  topicsTopLayout->setContentsMargins(0, 0, 0, 0);
+  topicsTopLayout->addWidget(topicsTopScroll);
 
   auto topicsTopWidget = new QWidget;
-  topicsTopWidget->setLayout(topicsLayout);
+  topicsTopWidget->setLayout(topicsTopLayout);
 
-  this->dataPtr->topicsBottom = new DragableListWidget(this);
-  this->dataPtr->topicsBottom->setDragEnabled(true);
-  this->dataPtr->topicsBottom->setDragDropMode(QAbstractItemView::DragOnly);
-  this->dataPtr->topicsBottom->setSizePolicy(
-      QSizePolicy::Minimum, QSizePolicy::Minimum);
+  // Topics bottom
+  this->dataPtr->topicsBottom = new ConfigWidget();
+
+  auto topicsBottomScroll = new QScrollArea;
+  topicsBottomScroll->setWidget(this->dataPtr->topicsBottom);
+  topicsBottomScroll->setWidgetResizable(true);
+
+  auto topicsBottomLayout = new QVBoxLayout;
+  topicsBottomLayout->setContentsMargins(0, 0, 0, 0);
+  topicsBottomLayout->addWidget(topicsBottomScroll);
+
+  auto topicsBottomWidget = new QWidget;
+  topicsBottomWidget->setLayout(topicsBottomLayout);
+
+//  this->dataPtr->topicsBottom = new DragableListWidget(this);
+//  this->dataPtr->topicsBottom->setDragEnabled(true);
+//  this->dataPtr->topicsBottom->setDragDropMode(QAbstractItemView::DragOnly);
+//  this->dataPtr->topicsBottom->setSizePolicy(
+//      QSizePolicy::Minimum, QSizePolicy::Minimum);
 
   auto topicsSplitter = new QSplitter(Qt::Vertical, this);
   topicsSplitter->addWidget(topicsTopWidget);
-  topicsSplitter->addWidget(this->dataPtr->topicsBottom);
+  topicsSplitter->addWidget(topicsBottomWidget);
   topicsSplitter->setStretchFactor(0, 1);
-  topicsSplitter->setStretchFactor(1, 2);
+  topicsSplitter->setStretchFactor(1, 1);
   topicsSplitter->setCollapsible(0, false);
   topicsSplitter->setCollapsible(1, false);
 
@@ -114,11 +128,11 @@ PlotPalette::PlotPalette(QWidget *_parent) : QWidget(_parent),
 
   //=================
   // TODO for testing - remove later
-  for (int i = 0; i < 10; ++i)
-  {
-    auto item = new QListWidgetItem("Topic prop " + QString::number(i));
-    this->dataPtr->topicsBottom->addItem(item);
-  }
+//  for (int i = 0; i < 10; ++i)
+//  {
+//    auto item = new QListWidgetItem("Topic prop " + QString::number(i));
+//    this->dataPtr->topicsBottom->addItem(item);
+//  }
 
   for (int i = 0; i < 10; ++i)
   {
@@ -209,7 +223,8 @@ void PlotPalette::FillTopicsTop()
   for (auto topic : topics)
   {
     auto childWidget = new ItemConfigWidget(topic);
-   // connect(childWidget, SIGNAL(Clicked()), this, SLOT(OnTopicClicked()));
+    this->connect(childWidget, SIGNAL(Clicked(const std::string &)), this,
+        SLOT(OnTopicClicked(const std::string &)));
 
     this->dataPtr->topicsTop->AddConfigChildWidget(topic, childWidget);
     configLayout->addWidget(childWidget);
@@ -262,7 +277,8 @@ void PlotPalette::OnModel(ConstModelPtr &_msg)
 void PlotPalette::OnInsertModelSignal(const std::string &_name)
 {
   auto childWidget = new ItemConfigWidget(_name);
-  connect(childWidget, SIGNAL(Clicked()), this, SLOT(OnModelClicked()));
+  this->connect(childWidget, SIGNAL(Clicked(const std::string &)), this,
+      SLOT(OnModelClicked(const std::string &)));
 
   this->dataPtr->modelsTop->AddConfigChildWidget(_name, childWidget);
 
@@ -286,9 +302,94 @@ void PlotPalette::OnRemoveModelSignal(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-void PlotPalette::OnModelClicked()
+void PlotPalette::OnTopicClicked(const std::string &_topic)
 {
-  // Fill modelBottom with properties of clicked model
+  // Create a message from this topic
+  auto msgType = transport::getTopicMsgType(_topic);
+  if (msgType == "")
+    return;
+
+  auto msg = msgs::MsgFactory::NewMsg(msgType);
+
+  // Create a new layout and fill it
+  auto newLayout = new QVBoxLayout();
+  this->FillTopicFromMsg(msg.get(), newLayout);
+
+  // Clear previous layout and use new one
+  auto oldLayout = this->dataPtr->topicsBottom->layout();
+  if (oldLayout)
+  {
+    // Give ownership of all widgets to an object which will be out of scope
+    QWidget().setLayout(oldLayout);
+  }
+
+  this->dataPtr->topicsBottom->setLayout(newLayout);
+}
+
+/////////////////////////////////////////////////
+void PlotPalette::FillTopicFromMsg(google::protobuf::Message *_msg,
+    QVBoxLayout *_parentLayout)
+{
+  if (!_parentLayout)
+    return;
+
+  auto ref = _msg->GetReflection();
+  if (!ref)
+    return;
+
+  auto descriptor = _msg->GetDescriptor();
+  if (!descriptor)
+    return;
+
+  auto count = descriptor->field_count();
+
+  // Go through all fields in this message
+  for (int i = 0; i < count; ++i)
+  {
+    auto field = descriptor->field(i);
+    if (!field)
+      return;
+
+    auto name = field->name();
+
+    switch (field->type())
+    {
+      case google::protobuf::FieldDescriptor::TYPE_DOUBLE:
+      {
+        auto childWidget = new ItemConfigWidget(name);
+        _parentLayout->addWidget(childWidget);
+
+        break;
+      }
+      // Message within a message
+      case google::protobuf::FieldDescriptor::TYPE_MESSAGE:
+      {
+        if (field->is_repeated())
+          continue;
+
+        auto fieldMsg = (ref->MutableMessage(_msg, field));
+
+        // Create a collapsible list for submessages
+        _parentLayout->addWidget(new QLabel(QString::fromStdString(name)));
+
+        auto innerLayout = new QVBoxLayout();
+        _parentLayout->addLayout(innerLayout);
+        this->FillTopicFromMsg(fieldMsg, innerLayout);
+
+        break;
+      }
+      default:
+      {
+        continue;
+      }
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void PlotPalette::OnModelClicked(const std::string &_model)
+{
+  gzdbg << "Fill bottom with props for [" << _model << "]" << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -355,13 +456,13 @@ std::string ItemConfigWidget::Text() const
 /////////////////////////////////////////////////
 void ItemConfigWidget::mouseReleaseEvent(QMouseEvent */*_event*/)
 {
-  auto ss = ConfigWidget::StyleSheet("normal");
+/*  auto ss = ConfigWidget::StyleSheet("normal");
   ss = ss + "QWidget \
     {\
       color: " + ConfigWidget::blueColor + ";\
     }";
   this->setStyleSheet(ss);
-
-  this->Clicked();
+*/
+  this->Clicked(this->Text());
 }
 

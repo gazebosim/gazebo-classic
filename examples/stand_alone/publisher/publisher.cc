@@ -40,19 +40,24 @@ int main(int _argc, char **_argv)
   pub->WaitForConnection();
 
   // Publisher loop...replace with your own code.
+  int count = 0;
   while (true)
   {
     // Throttle Publication
     gazebo::common::Time::MSleep(100);
 
     // Generate a pose
-    ignition::math::Pose3d pose(1, 2, 3, 4, 5, 6);
+    ignition::math::Pose3d pose(count, 2, 3, 4, 5, 6);
 
     // Convert to a pose message
     gazebo::msgs::Pose msg;
     gazebo::msgs::Set(&msg, pose);
 
     pub->Publish(msg);
+    if (count > 1000)
+      count ++;
+    else
+      count = 0;
   }
 
   // Make sure to shut everything down.

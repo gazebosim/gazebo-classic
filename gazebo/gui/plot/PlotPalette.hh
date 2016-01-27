@@ -44,8 +44,11 @@ namespace gazebo
       signals: void RemoveModelSignal(const std::string &_name);
 
       private: void FillTopicsTop();
+      private: void FillTopicFromMsg(google::protobuf::Message *_msg,
+          QVBoxLayout *_parentLayout);
 
-      private slots: void OnModelClicked();
+      private slots: void OnModelClicked(const std::string &_model);
+      private slots: void OnTopicClicked(const std::string &_topic);
       private slots: void OnInsertModelSignal(const std::string &_name);
       private slots: void OnRemoveModelSignal(const std::string &_name);
 
@@ -88,7 +91,7 @@ namespace gazebo
       public: ItemConfigWidget(const std::string &_text);
       public: ~ItemConfigWidget();
       public: std::string Text() const;
-      signals: void Clicked();
+      signals: void Clicked(const std::string &);
       protected: virtual void mouseReleaseEvent(QMouseEvent *_event);
 
       /// \internal
