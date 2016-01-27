@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2015 Open Source Robotics Foundation
+ * Copyright (C) 2013-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,12 @@ namespace gazebo
       /// \brief Get the default transparency setting for entities in model
       /// editor.
       public: static double GetEditTransparency();
+
+      /// \internal
+      /// \brief Update visual's render group. This is needed to fix an
+      /// alpha compositing issue in ogre when transparent objects overlap.
+      /// \param[in] _visual Visual to update
+      public: static void UpdateRenderGroup(rendering::VisualPtr _visual);
     };
 
     /// \brief Helper class to store nested models data.
