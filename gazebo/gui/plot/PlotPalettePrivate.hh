@@ -59,6 +59,8 @@ namespace gazebo
     class ItemConfigWidgetPrivate
     {
       public: std::string text;
+      public: std::string plotInfo;
+      public: bool draggable;
     };
   }
 }

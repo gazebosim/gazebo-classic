@@ -313,7 +313,7 @@ void PlotPalette::OnTopicClicked(const std::string &_topic)
 
   // Create a new layout and fill it
   auto newLayout = new QVBoxLayout();
-  this->FillTopicFromMsg(msg.get(), newLayout);
+  this->FillTopicFromMsg(msg.get(), _topic, newLayout);
 
   // Clear previous layout and use new one
   auto oldLayout = this->dataPtr->topicsBottom->layout();
@@ -328,7 +328,7 @@ void PlotPalette::OnTopicClicked(const std::string &_topic)
 
 /////////////////////////////////////////////////
 void PlotPalette::FillTopicFromMsg(google::protobuf::Message *_msg,
-    QVBoxLayout *_parentLayout)
+    const std::string &_scope, QVBoxLayout *_parentLayout)
 {
   if (!_parentLayout)
     return;
@@ -357,6 +357,8 @@ void PlotPalette::FillTopicFromMsg(google::protobuf::Message *_msg,
       case google::protobuf::FieldDescriptor::TYPE_DOUBLE:
       {
         auto childWidget = new ItemConfigWidget(name);
+        childWidget->SetDraggable(true);
+        childWidget->SetPlotInfo(_scope + ":" + name);
         _parentLayout->addWidget(childWidget);
 
         break;
@@ -371,10 +373,11 @@ void PlotPalette::FillTopicFromMsg(google::protobuf::Message *_msg,
 
         // Create a collapsible list for submessages
         _parentLayout->addWidget(new QLabel(QString::fromStdString(name)));
+        auto scope = _scope + ":" + name;
 
         auto innerLayout = new QVBoxLayout();
         _parentLayout->addLayout(innerLayout);
-        this->FillTopicFromMsg(fieldMsg, innerLayout);
+        this->FillTopicFromMsg(fieldMsg, scope, innerLayout);
 
         break;
       }
@@ -422,6 +425,7 @@ ItemConfigWidget::ItemConfigWidget(const std::string &_text)
 {
   auto label = new QLabel(QString::fromStdString(_text));
   this->dataPtr->text = _text;
+  this->dataPtr->draggable = false;
 
   auto mainLayout = new QHBoxLayout;
   mainLayout->setContentsMargins(0, 0, 0, 0);
@@ -454,6 +458,18 @@ std::string ItemConfigWidget::Text() const
 }
 
 /////////////////////////////////////////////////
+void ItemConfigWidget::SetDraggable(const bool _draggable)
+{
+  this->dataPtr->draggable = _draggable;
+}
+
+/////////////////////////////////////////////////
+void ItemConfigWidget::SetPlotInfo(const std::string &_info)
+{
+  this->dataPtr->plotInfo = _info;
+}
+
+/////////////////////////////////////////////////
 void ItemConfigWidget::mouseReleaseEvent(QMouseEvent */*_event*/)
 {
 /*  auto ss = ConfigWidget::StyleSheet("normal");
@@ -464,5 +480,22 @@ void ItemConfigWidget::mouseReleaseEvent(QMouseEvent */*_event*/)
   this->setStyleSheet(ss);
 */
   this->Clicked(this->Text());
+}
+
+/////////////////////////////////////////////////
+void ItemConfigWidget::mousePressEvent(QMouseEvent *_event)
+{
+  if (_event->button() == Qt::LeftButton &&
+      this->dataPtr->draggable)
+  {
+    auto currMimeData = new QMimeData;
+    QByteArray ba;
+    ba = QString::fromStdString(this->dataPtr->plotInfo).toLatin1().data();
+    currMimeData->setData("application/x-item", ba);
+    auto drag = new QDrag(this);
+    drag->setMimeData(currMimeData);
+    drag->exec(Qt::LinkAction);
+  }
+  QWidget::mousePressEvent(_event);
 }
 
