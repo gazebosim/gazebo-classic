@@ -114,7 +114,6 @@ namespace gazebo
       public: double TemperatureGradient() const;
 
       /// \brief Return the world.
-      /// Get a pointer to the world.
       /// \return Pointer to the world.
       protected: WorldPtr World() const;
 
