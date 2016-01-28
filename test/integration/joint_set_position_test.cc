@@ -396,10 +396,14 @@ void JointKinematicTest::SetJointPositionThreadedTest(
     << "]\n";
 }
 
+// This test fails on OSX (see issue #1219)
+// https://bitbucket.org/osrf/gazebo/issues/1219
+#ifndef __APPLE__
 TEST_P(JointKinematicTest, SetJointPositionThreadedTest)
 {
   SetJointPositionThreadedTest(GetParam());
 }
+#endif
 
 //////////////////////////////////////////////////
 void JointKinematicTest::SetJointPositionLoopJointTest(
