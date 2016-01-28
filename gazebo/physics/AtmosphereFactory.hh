@@ -51,6 +51,7 @@ namespace gazebo
       /// \brief Create a new instance of an atmosphere model.
       /// \param[in] _className Name of the atmosphere class.
       /// \param[in] _world World to pass to the created atmosphere model.
+      /// \return Pointer to the atmosphere model
       public: static AtmospherePtr NewAtmosphere(
                   const std::string &_className, WorldPtr _world);
 
