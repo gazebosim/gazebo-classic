@@ -11,6 +11,7 @@ include_directories(${TBB_INCLUDEDIR})
 include_directories(${tinyxml_INCLUDE_DIRS})
 set (sources
   Diagnostics.cc
+  IntrospectionManager.cc
   LogPlay.cc
   LogRecord.cc
   OpenAL.cc
