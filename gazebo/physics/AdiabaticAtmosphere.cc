@@ -135,7 +135,7 @@ double AdiabaticAtmosphere::Temperature(const double _altitude) const
 double AdiabaticAtmosphere::Pressure(const double _altitude) const
 {
   double pressure = Atmosphere::Pressure() *
-      pow(1 - (Atmosphere::TemperatureGradient() * _altitude) /
+      pow(1 + (Atmosphere::TemperatureGradient() * _altitude) /
           Atmosphere::Temperature(), this->dataPtr->adiabaticPower);
   return pressure;
 }
@@ -144,7 +144,7 @@ double AdiabaticAtmosphere::Pressure(const double _altitude) const
 double AdiabaticAtmosphere::MassDensity(const double _altitude) const
 {
   double massDensity = Atmosphere::MassDensity() *
-      pow(1 + (Atmosphere::TemperatureGradient() * _altitude) /
-          Atmosphere::Temperature(), this->dataPtr->adiabaticPower - 1);
+    pow(1 - (Atmosphere::TemperatureGradient() * _altitude) /
+        Atmosphere::Temperature(), this->dataPtr->adiabaticPower - 1);
   return massDensity;
 }
