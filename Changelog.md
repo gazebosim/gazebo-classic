@@ -1,4 +1,11 @@
-## Gazebo 7.0
+## Gazebo 7
+
+## Gazebo 7.X.X
+
+1. Undo scaling during simulation
+    * [Pull request #2108](https://bitbucket.org/osrf/gazebo/pull-request/2108)
+
+## Gazebo 7.0.0 (2016-01-25)
 
 1. Add FollowerPlugin
     * [Pull request #2085](https://bitbucket.org/osrf/gazebo/pull-request/2085)
