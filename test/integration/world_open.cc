@@ -86,7 +86,7 @@ void WorldOpenTest::NewWorldMsg(const std::string &_physicsEngine)
       if (world && worldHasBeenDeleted)
         newWorldHasBeenCreated = true;
     }
-    catch (...)
+    catch(...)
     {
       worldHasBeenDeleted = true;
     }
