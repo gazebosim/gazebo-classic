@@ -1,4 +1,11 @@
-## Gazebo 7.0
+## Gazebo 7
+
+## Gazebo 7.X.X
+
+1. Atmosphere model
+    * [Pull request #1989](https://bitbucket.org/osrf/gazebo/pull-request/1989)
+
+## Gazebo 7.0.0 (2016-01-25)
 
 1. Use opaque pointers and deprecate functions in the rendering library
     * [Pull request #2069](https://bitbucket.org/osrf/gazebo/pull-request/2069)

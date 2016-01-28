@@ -141,6 +141,10 @@ namespace gazebo
       private: void FillPropertyTree(const msgs::Physics &_msg,
                                      QtProperty *_parent);
 
+      /// \brief Fill the property tree with atmosphere info.
+      /// \param[in] _msg The atmosphere message.
+      /// \param[in] _parent Pointer to the qtproperty which will receive
+      /// the message data.
       private: void FillPropertyTree(const msgs::Atmosphere &_msg,
                                      QtProperty *_parent);
 

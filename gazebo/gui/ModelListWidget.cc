@@ -795,7 +795,7 @@ void ModelListWidget::PhysicsPropertyChanged(QtProperty * /*_item*/)
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::AtmospherePropertyChanged(QtProperty * /*_item*/)
+void ModelListWidget::AtmospherePropertyChanged(QtProperty */*_item*/)
 {
   msgs::Atmosphere msg;
 
@@ -2609,7 +2609,7 @@ void ModelListWidget::ResetTree()
 
     // Atmosphere item
     this->dataPtr->atmosphereItem = new QTreeWidgetItem(
-        static_cast<QTreeWidgetItem*>(0),
+        static_cast<QTreeWidgetItem *>(0),
         QStringList(QString("%1").arg(tr("Atmosphere"))));
     this->dataPtr->atmosphereItem->setData(0, Qt::UserRole,
         QVariant(tr("Atmosphere")));
@@ -2833,7 +2833,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
 
 /////////////////////////////////////////////////
 void ModelListWidget::FillPropertyTree(const msgs::Atmosphere &_msg,
-                                       QtProperty * /*_parent*/)
+                                       QtProperty */*_parent*/)
 {
   QtVariantProperty *item = NULL;
 
