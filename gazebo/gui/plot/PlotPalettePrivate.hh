@@ -35,7 +35,7 @@ namespace gazebo
 
       /// \brief The list of diagnostic labels.
       public: ConfigWidget *topicsBottom;
-      public: QListWidget *modelsBottom;
+      public: ConfigWidget *modelsBottom;
       public: QListWidget *simBottom;
 
       /// \brief Transport node used for communication.

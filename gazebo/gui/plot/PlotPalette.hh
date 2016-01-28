@@ -44,8 +44,10 @@ namespace gazebo
       signals: void RemoveModelSignal(const std::string &_name);
 
       private: void FillTopicsTop();
+      private: void FillModel(const std::string &_model);
       private: void FillTopicFromMsg(google::protobuf::Message *_msg,
-          const std::string &_scope, QVBoxLayout *_parentLayout);
+          const std::string &_scope, const unsigned int _level,
+          QVBoxLayout *_parentLayout);
 
       private slots: void OnModelClicked(const std::string &_model);
       private slots: void OnTopicClicked(const std::string &_topic);
@@ -55,6 +57,8 @@ namespace gazebo
       private: void OnModel(ConstModelPtr &_msg);
       private: void OnResponse(ConstResponsePtr &_msg);
       private: void OnRequest(ConstRequestPtr &_msg);
+
+      public: static const std::vector<std::string> ModelProperties;
 
       /// \internal
       /// \brief Pointer to private data.
@@ -88,7 +92,8 @@ namespace gazebo
     {
       Q_OBJECT
 
-      public: ItemConfigWidget(const std::string &_text);
+      public: ItemConfigWidget(const std::string &_text,
+          const unsigned int _level = 0);
       public: ~ItemConfigWidget();
       public: std::string Text() const;
       public: void SetDraggable(const bool _draggable);
@@ -96,6 +101,8 @@ namespace gazebo
       signals: void Clicked(const std::string &);
       protected: virtual void mouseReleaseEvent(QMouseEvent *_event);
       protected: virtual void mousePressEvent(QMouseEvent *_event);
+      protected: virtual void enterEvent(QEvent *_event);
+      protected: virtual void leaveEvent(QEvent *_event);
 
       /// \internal
       /// \brief Pointer to private data.
