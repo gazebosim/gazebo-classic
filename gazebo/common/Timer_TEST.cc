@@ -35,32 +35,51 @@ TEST_F(TimerTest, Timer)
   EXPECT_EQ(timer.GetElapsed().nsec, 0);
   EXPECT_FALSE(timer.GetRunning());
 
+  // Run for 200 ms then check elapsed time
+  // Save expectations until after timer is stopped
   timer.Start();
   common::Time::MSleep(200);
   EXPECT_TRUE(timer.GetRunning());
-  common::Time elapsed = timer.GetElapsed();
-  EXPECT_GE(elapsed.nsec, 200000000);
-  EXPECT_LE(elapsed.nsec, 200200000);
-  EXPECT_EQ(elapsed.sec, 0);
+  common::Time elapsed200ms = timer.GetElapsed();
 
   // Check that the time after stopping and sleeping matches the time right
   // before pausing
   timer.Stop();
   common::Time::MSleep(100);
-  EXPECT_GE(elapsed.nsec, timer.GetElapsed().nsec - 100000);
-  EXPECT_LE(elapsed.nsec, timer.GetElapsed().nsec + 100000);
-  EXPECT_EQ(elapsed.sec, timer.GetElapsed().sec);
+
+  // Do expectations now that timer is stopped.
+  EXPECT_GE(elapsed200ms.nsec, 199950000);
+#ifdef __APPLE__
+  EXPECT_LE(elapsed200ms.nsec, 206000000);
+#else
+  EXPECT_LE(elapsed200ms.nsec, 200200000);
+#endif
+  EXPECT_EQ(elapsed200ms.sec, 0);
+
+#ifdef __APPLE__
+  EXPECT_GE(elapsed200ms.nsec, timer.GetElapsed().nsec - 300000);
+#else
+  EXPECT_GE(elapsed200ms.nsec, timer.GetElapsed().nsec - 100000);
+#endif
+  EXPECT_LE(elapsed200ms.nsec, timer.GetElapsed().nsec + 100000);
+  EXPECT_EQ(elapsed200ms.sec, timer.GetElapsed().sec);
   EXPECT_FALSE(timer.GetRunning());
 
   // Expect that we start from where we left off
   timer.Start();
   common::Time::MSleep(100);
-  EXPECT_GE(timer.GetElapsed().nsec, 300000000);
-  EXPECT_LE(timer.GetElapsed().nsec, 301000000);
-  EXPECT_EQ(timer.GetElapsed().sec, 0);
+  common::Time elapsed300ms = timer.GetElapsed();
+  EXPECT_GE(elapsed300ms.nsec, 300000000);
+#ifdef __APPLE__
+  EXPECT_LE(elapsed300ms.nsec, 311000000);
+#else
+  EXPECT_LE(elapsed300ms.nsec, 301000000);
+#endif
+  EXPECT_EQ(elapsed300ms.sec, 0);
 
   // Expect reset to reset the current time and stop the timer
   timer.Reset();
+  common::Time::MSleep(1);
   EXPECT_EQ(timer.GetElapsed().sec, 0);
   EXPECT_EQ(timer.GetElapsed().nsec, 0);
   EXPECT_FALSE(timer.GetRunning());
@@ -76,27 +95,40 @@ TEST_F(TimerTest, CountdownTimer)
   EXPECT_EQ(timer.GetElapsed().nsec, 0);
   EXPECT_FALSE(timer.GetRunning());
 
+  // Run for 200 ms then check elapsed time
+  // Save expectations until after timer is stopped
   timer.Start();
   common::Time::MSleep(200);
   EXPECT_TRUE(timer.GetRunning());
-  common::Time elapsed = timer.GetElapsed();
-  EXPECT_GE(elapsed.nsec, 799800000);
-  EXPECT_LE(elapsed.nsec, 800100000);
-  EXPECT_EQ(elapsed.sec, 0);
+  common::Time elapsed200ms = timer.GetElapsed();
 
   // Check that the time after stopping and sleeping matches the time right
   // before pausing
   timer.Stop();
   common::Time::MSleep(100);
-  EXPECT_GE(elapsed.nsec, timer.GetElapsed().nsec - 100000);
-  EXPECT_LE(elapsed.nsec, timer.GetElapsed().nsec + 100000);
-  EXPECT_EQ(elapsed.sec, timer.GetElapsed().sec);
+
+  // Do expectations now that timer is stopped.
+#ifdef __APPLE__
+  EXPECT_GE(elapsed200ms.nsec, 793000000);
+#else
+  EXPECT_GE(elapsed200ms.nsec, 799800000);
+#endif
+  EXPECT_LE(elapsed200ms.nsec, 800100000);
+  EXPECT_EQ(elapsed200ms.sec, 0);
+
+  EXPECT_GE(elapsed200ms.nsec, timer.GetElapsed().nsec - 100000);
+  EXPECT_LE(elapsed200ms.nsec, timer.GetElapsed().nsec + 100000);
+  EXPECT_EQ(elapsed200ms.sec, timer.GetElapsed().sec);
   EXPECT_FALSE(timer.GetRunning());
 
   // Expect that we start from where we left off
   timer.Start();
   common::Time::MSleep(100);
+#ifdef __APPLE__
+  EXPECT_GE(timer.GetElapsed().nsec, 688000000);
+#else
   EXPECT_GE(timer.GetElapsed().nsec, 699000000);
+#endif
   EXPECT_LE(timer.GetElapsed().nsec, 701000000);
   EXPECT_EQ(timer.GetElapsed().sec, 0);
 
