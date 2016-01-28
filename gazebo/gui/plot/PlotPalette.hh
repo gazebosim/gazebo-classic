@@ -44,6 +44,7 @@ namespace gazebo
       signals: void RemoveModelSignal(const std::string &_name);
 
       private: void FillTopicsTop();
+      private: void FillSimBottom();
       private: void FillModel(const std::string &_model);
       private: void FillTopicFromMsg(google::protobuf::Message *_msg,
           const std::string &_scope, const unsigned int _level,
@@ -63,26 +64,6 @@ namespace gazebo
       /// \internal
       /// \brief Pointer to private data.
       private: std::unique_ptr<PlotPalettePrivate> dataPtr;
-    };
-
-    // Forward declare private data class
-//    class DragableListWidgetPrivate;
-
-    /// \brief A special list widget that allows dragging of items from it to a
-    /// plot
-    class GZ_GUI_VISIBLE DragableListWidget : public QListWidget
-    {
-      // Q_OBJECT
-
-      public: DragableListWidget(QWidget *_parent);
-
-      protected: virtual void startDrag(Qt::DropActions _supportedActions);
-
-      protected: virtual Qt::DropActions supportedDropActions();
-
-      /// \internal
-      /// \brief Pointer to private data.
-//      private: std::unique_ptr<DragableListWidgetPrivate> dataPtr;
     };
 
     // Forward declare private data class

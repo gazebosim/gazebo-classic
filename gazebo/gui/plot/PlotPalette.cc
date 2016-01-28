@@ -60,12 +60,6 @@ PlotPalette::PlotPalette(QWidget *_parent) : QWidget(_parent),
   auto topicsBottomWidget = new QWidget;
   topicsBottomWidget->setLayout(topicsBottomLayout);
 
-//  this->dataPtr->topicsBottom = new DragableListWidget(this);
-//  this->dataPtr->topicsBottom->setDragEnabled(true);
-//  this->dataPtr->topicsBottom->setDragDropMode(QAbstractItemView::DragOnly);
-//  this->dataPtr->topicsBottom->setSizePolicy(
-//      QSizePolicy::Minimum, QSizePolicy::Minimum);
-
   auto topicsSplitter = new QSplitter(Qt::Vertical, this);
   topicsSplitter->addWidget(topicsTopWidget);
   topicsSplitter->addWidget(topicsBottomWidget);
@@ -75,10 +69,14 @@ PlotPalette::PlotPalette(QWidget *_parent) : QWidget(_parent),
   topicsSplitter->setCollapsible(1, false);
 
   // Models top
-  this->dataPtr->modelsTop = new ConfigWidget();
+  auto spacer = new QWidget();
+  spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
   auto configLayout = new QVBoxLayout();
-  configLayout->setContentsMargins(0, 0, 0, 0);
+  configLayout->addWidget(spacer);
   configLayout->setSpacing(0);
+
+  this->dataPtr->modelsTop = new ConfigWidget();
   this->dataPtr->modelsTop->setLayout(configLayout);
 
   auto modelsScroll = new QScrollArea;
@@ -98,11 +96,6 @@ PlotPalette::PlotPalette(QWidget *_parent) : QWidget(_parent),
       SLOT(OnRemoveModelSignal(const std::string &)));
 
   // Models bottom
-//  this->dataPtr->modelsBottom = new DragableListWidget(this);
-//  this->dataPtr->modelsBottom->setDragEnabled(true);
-//  this->dataPtr->modelsBottom->setDragDropMode(QAbstractItemView::DragOnly);
-//  this->dataPtr->modelsBottom->setSizePolicy(
-//      QSizePolicy::Minimum, QSizePolicy::Minimum);
   this->dataPtr->modelsBottom = new ConfigWidget();
 
   auto modelsBottomScroll = new QScrollArea;
@@ -124,38 +117,31 @@ PlotPalette::PlotPalette(QWidget *_parent) : QWidget(_parent),
   modelsSplitter->setCollapsible(0, false);
   modelsSplitter->setCollapsible(1, false);
 
-  // Sim
+  // Sim top
   auto simTop = new ConfigWidget();
 
-  this->dataPtr->simBottom = new DragableListWidget(this);
-  this->dataPtr->simBottom->setDragEnabled(true);
-  this->dataPtr->simBottom->setDragDropMode(QAbstractItemView::DragOnly);
-  this->dataPtr->simBottom->setSizePolicy(
-      QSizePolicy::Minimum, QSizePolicy::Minimum);
+  // Sim bottom
+  this->dataPtr->simBottom = new ConfigWidget();
+  this->FillSimBottom();
+
+  auto simBottomScroll = new QScrollArea;
+  simBottomScroll->setWidget(this->dataPtr->simBottom);
+  simBottomScroll->setWidgetResizable(true);
+
+  auto simBottomLayout = new QVBoxLayout;
+  simBottomLayout->setContentsMargins(0, 0, 0, 0);
+  simBottomLayout->addWidget(simBottomScroll);
+
+  auto simBottomWidget = new QWidget;
+  simBottomWidget->setLayout(simBottomLayout);
 
   auto simSplitter = new QSplitter(Qt::Vertical, this);
   simSplitter->addWidget(simTop);
-  simSplitter->addWidget(this->dataPtr->simBottom);
+  simSplitter->addWidget(simBottomWidget);
   simSplitter->setStretchFactor(0, 1);
   simSplitter->setStretchFactor(1, 2);
   simSplitter->setCollapsible(0, false);
   simSplitter->setCollapsible(1, false);
-
-  QListWidgetItem *item = new QListWidgetItem("Real Time Factor");
-  item->setToolTip(tr("Drag onto graph to plot"));
-  this->dataPtr->simBottom->addItem(item);
-
-  QListWidgetItem *itema = new QListWidgetItem("Dog");
-  itema->setToolTip(tr("Drag onto graph to plot"));
-  this->dataPtr->simBottom->addItem(itema);
-
-  QListWidgetItem *itemb = new QListWidgetItem("Cat");
-  itemb->setToolTip(tr("Drag onto graph to plot"));
-  this->dataPtr->simBottom->addItem(itemb);
-
-  QListWidgetItem *itemc = new QListWidgetItem("Turtle");
-  itemc->setToolTip(tr("Drag onto graph to plot"));
-  this->dataPtr->simBottom->addItem(itemc);
 
   // Tabs
   auto tabWidget = new QTabWidget;
@@ -222,7 +208,14 @@ void PlotPalette::FillTopicsTop()
   // Populate widget
   for (auto topic : topics)
   {
-    auto childWidget = new ItemConfigWidget(topic);
+    // Shorten topic name
+    auto shortName = topic;
+    auto idX = shortName.find("/gazebo/default");
+    if (idX != std::string::npos)
+      shortName.replace(0, 15, "~");
+
+    auto childWidget = new ItemConfigWidget(shortName);
+    childWidget->SetPlotInfo(topic);
     this->connect(childWidget, SIGNAL(Clicked(const std::string &)), this,
         SLOT(OnTopicClicked(const std::string &)));
 
@@ -230,8 +223,42 @@ void PlotPalette::FillTopicsTop()
     configLayout->addWidget(childWidget);
   }
 
+  // Spacer
+  auto spacer = new QWidget();
+  spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+  configLayout->addWidget(spacer);
+
   this->dataPtr->topicsTop->setLayout(configLayout);
 }
+
+/////////////////////////////////////////////////
+void PlotPalette::FillSimBottom()
+{
+  auto configLayout = new QVBoxLayout();
+  configLayout->setSpacing(0);
+
+  std::multimap<std::string, std::string> simFields = {
+      {"~/world_stats", "sim_time"},
+      {"~/world_stats", "real_time"},
+      {"~/world_stats", "iterations"}};
+
+  for (auto field : simFields)
+  {
+    auto humanName = ConfigWidget::HumanReadableKey(field.second);
+    auto childWidget = new ItemConfigWidget(humanName);
+    childWidget->SetDraggable(true);
+    childWidget->SetPlotInfo(field.first + "::" + field.second);
+    configLayout->addWidget(childWidget);
+  }
+
+  // Spacer
+  auto spacer = new QWidget();
+  spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+  configLayout->addWidget(spacer);
+
+  this->dataPtr->simBottom->setLayout(configLayout);
+}
+
 
 /////////////////////////////////////////////////
 void PlotPalette::OnRequest(ConstRequestPtr &_msg)
@@ -282,7 +309,10 @@ void PlotPalette::OnInsertModelSignal(const std::string &_name)
 
   this->dataPtr->modelsTop->AddConfigChildWidget(_name, childWidget);
 
-  this->dataPtr->modelsTop->layout()->addWidget(childWidget);
+  // Insert it on top
+  auto vBoxLayout = qobject_cast<QVBoxLayout *>(
+      this->dataPtr->modelsTop->layout());
+  vBoxLayout->insertWidget(0, childWidget);
 }
 
 /////////////////////////////////////////////////
@@ -304,6 +334,14 @@ void PlotPalette::OnRemoveModelSignal(const std::string &_name)
 /////////////////////////////////////////////////
 void PlotPalette::OnTopicClicked(const std::string &_topic)
 {
+  // Clear previous layout
+  auto oldLayout = this->dataPtr->topicsBottom->layout();
+  if (oldLayout)
+  {
+    // Give ownership of all widgets to an object which will be out of scope
+    QWidget().setLayout(oldLayout);
+  }
+
   // Create a message from this topic
   auto msgType = transport::getTopicMsgType(_topic);
   if (msgType == "")
@@ -316,13 +354,10 @@ void PlotPalette::OnTopicClicked(const std::string &_topic)
   newLayout->setSpacing(0);
   this->FillTopicFromMsg(msg.get(), _topic, 0, newLayout);
 
-  // Clear previous layout and use new one
-  auto oldLayout = this->dataPtr->topicsBottom->layout();
-  if (oldLayout)
-  {
-    // Give ownership of all widgets to an object which will be out of scope
-    QWidget().setLayout(oldLayout);
-  }
+  // Spacer
+  auto spacer = new QWidget();
+  spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+  newLayout->addWidget(spacer);
 
   this->dataPtr->topicsBottom->setLayout(newLayout);
 }
@@ -356,12 +391,18 @@ void PlotPalette::FillTopicFromMsg(google::protobuf::Message *_msg,
 
     switch (field->type())
     {
-      // TODO: Add other plottable types too, like int
       case google::protobuf::FieldDescriptor::TYPE_DOUBLE:
+      case google::protobuf::FieldDescriptor::TYPE_FLOAT:
+      case google::protobuf::FieldDescriptor::TYPE_INT64:
+      case google::protobuf::FieldDescriptor::TYPE_UINT64:
+      case google::protobuf::FieldDescriptor::TYPE_INT32:
+      case google::protobuf::FieldDescriptor::TYPE_UINT32:
+      case google::protobuf::FieldDescriptor::TYPE_BOOL:
       {
-        auto childWidget = new ItemConfigWidget(name, _level);
+        auto humanName = ConfigWidget::HumanReadableKey(name);
+        auto childWidget = new ItemConfigWidget(humanName, _level);
         childWidget->SetDraggable(true);
-        childWidget->SetPlotInfo(_scope + ":" + name);
+        childWidget->SetPlotInfo(_scope + "::" + name);
         _parentLayout->addWidget(childWidget);
 
         break;
@@ -374,21 +415,34 @@ void PlotPalette::FillTopicFromMsg(google::protobuf::Message *_msg,
 
         auto fieldMsg = (ref->MutableMessage(_msg, field));
 
-        // Create a collapsible list for submessages
-        auto collapsibleLayout = new QVBoxLayout();
-        collapsibleLayout->setContentsMargins(0, 0, 0, 0);
-        collapsibleLayout->setSpacing(0);
+        if (field->message_type()->name() == "Time")
+        {
+          auto humanName = ConfigWidget::HumanReadableKey(name);
+          auto childWidget = new ItemConfigWidget(humanName, _level);
+          childWidget->SetDraggable(true);
+          childWidget->SetPlotInfo(_scope + "::" + name);
+          _parentLayout->addWidget(childWidget);
+        }
+        else
+        {
+          // Create a collapsible list for submessages
+          auto collapsibleLayout = new QVBoxLayout();
+          collapsibleLayout->setContentsMargins(0, 0, 0, 0);
+          collapsibleLayout->setSpacing(0);
 
-        auto collapsibleWidget = new ConfigChildWidget();
-        collapsibleWidget->setLayout(collapsibleLayout);
+          auto collapsibleWidget = new ConfigChildWidget();
+          collapsibleWidget->setLayout(collapsibleLayout);
 
-        auto groupWidget = this->dataPtr->topicsBottom->CreateGroupWidget(name,
-            collapsibleWidget, _level);
+          auto groupWidget =
+              this->dataPtr->topicsBottom->CreateGroupWidget(name,
+              collapsibleWidget, _level);
 
-        _parentLayout->addWidget(groupWidget);
-        auto scope = _scope + ":" + name;
+          _parentLayout->addWidget(groupWidget);
+          auto scope = _scope + "::" + name;
 
-        this->FillTopicFromMsg(fieldMsg, scope, _level + 1, collapsibleLayout);
+          this->FillTopicFromMsg(fieldMsg, scope, _level + 1,
+              collapsibleLayout);
+        }
 
         break;
       }
@@ -419,38 +473,20 @@ void PlotPalette::FillModel(const std::string &_model)
 
   // Fill new layout
   this->dataPtr->modelsBottom->setLayout(new QVBoxLayout());
+  this->dataPtr->modelsBottom->layout()->setSpacing(0);
 
   for (auto prop : PlotPalette::ModelProperties)
   {
     auto childWidget = new ItemConfigWidget(prop);
     childWidget->SetDraggable(true);
-    childWidget->SetPlotInfo(_model + ":" + prop);
+    childWidget->SetPlotInfo(_model + "::" + prop);
     this->dataPtr->modelsBottom->layout()->addWidget(childWidget);
   }
-}
 
-/////////////////////////////////////////////////
-DragableListWidget::DragableListWidget(QWidget *_parent) : QListWidget(_parent)
-{
-}
-
-/////////////////////////////////////////////////
-void DragableListWidget::startDrag(Qt::DropActions /*_supportedActions*/)
-{
-  QListWidgetItem *currItem = this->currentItem();
-  QMimeData *currMimeData = new QMimeData;
-  QByteArray ba;
-  ba = currItem->text().toLatin1().data();
-  currMimeData->setData("application/x-item", ba);
-  QDrag *drag = new QDrag(this);
-  drag->setMimeData(currMimeData);
-  drag->exec(Qt::LinkAction);
-}
-
-/////////////////////////////////////////////////
-Qt::DropActions DragableListWidget::supportedDropActions()
-{
-  return Qt::LinkAction;
+  // Spacer
+  auto spacer = new QWidget();
+  spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+  this->dataPtr->modelsBottom->layout()->addWidget(spacer);
 }
 
 /////////////////////////////////////////////////
@@ -516,7 +552,10 @@ void ItemConfigWidget::mouseReleaseEvent(QMouseEvent */*_event*/)
     }";
   this->setStyleSheet(ss);
 */
-  this->Clicked(this->Text());
+  if (this->dataPtr->plotInfo == "")
+    this->Clicked(this->Text());
+  else
+    this->Clicked(this->dataPtr->plotInfo);
 }
 
 /////////////////////////////////////////////////

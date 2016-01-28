@@ -107,7 +107,7 @@ std::string ConfigWidget::GetHumanReadableKey(const std::string &_key)
 }
 
 /////////////////////////////////////////////////
-std::string ConfigWidget::HumanReadableKey(const std::string &_key) const
+std::string ConfigWidget::HumanReadableKey(const std::string &_key)
 {
   std::string humanKey = _key;
   humanKey[0] = std::toupper(humanKey[0]);

@@ -179,7 +179,7 @@ namespace gazebo
       /// and removing characters like "_".
       /// \param[in] _key Non-human-readable key.
       /// \return Human-readable key.
-      public: std::string HumanReadableKey(const std::string &_key) const;
+      public: static std::string HumanReadableKey(const std::string &_key);
 
       /// \brief Returns the unit for a given key. For example, the key "mass"
       /// returns "kg".
