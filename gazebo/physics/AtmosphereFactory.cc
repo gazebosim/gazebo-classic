@@ -38,8 +38,8 @@ void AtmosphereFactory::RegisterAll()
 }
 
 //////////////////////////////////////////////////
-void AtmosphereFactory::RegisterAtmosphere(std::string classname,
-                                           AtmosphereFactoryFn factoryfn)
+void AtmosphereFactory::RegisterAtmosphere(const std::string &_classname,
+                                           AtmosphereFactoryFn _factoryfn)
 {
   models[classname] = factoryfn;
 }

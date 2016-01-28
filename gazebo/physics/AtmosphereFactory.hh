@@ -45,7 +45,7 @@ namespace gazebo
       /// \param[in] _className Name of the atmosphere class.
       /// \param[in] _factoryfn Function pointer used to create an atmosphere
       /// model.
-      public: static void RegisterAtmosphere(std::string _className,
+      public: static void RegisterAtmosphere(const std::string &_className,
                   AtmosphereFactoryFn _factoryfn);
 
       /// \brief Create a new instance of an atmosphere model.
