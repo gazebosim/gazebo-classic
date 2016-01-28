@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -272,7 +272,7 @@ bool gui::load()
 unsigned int gui::get_entity_id(const std::string &_name)
 {
   if (g_main_win)
-    return g_main_win->GetEntityId(_name);
+    return g_main_win->EntityId(_name);
   else
     return 0;
 }

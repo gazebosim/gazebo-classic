@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -184,8 +184,11 @@ void Camera::Load()
   // created for visualization purposes.
   if (this->name.find("_GUIONLY_") == std::string::npos)
   {
+    std::string topicName = this->Name();
+    boost::replace_all(topicName, "::", "/");
+
     this->dataPtr->cmdSub = this->dataPtr->node->Subscribe(
-        "~/" + this->Name() + "/cmd", &Camera::OnCmdMsg, this, true);
+        "~/" + topicName + "/cmd", &Camera::OnCmdMsg, this, true);
   }
 
   if (this->sdf->HasElement("distortion"))
@@ -2053,6 +2056,12 @@ void Camera::OnCmdMsg(ConstCameraCmdPtr &_msg)
 
 //////////////////////////////////////////////////
 DistortionPtr Camera::GetDistortion() const
+{
+  return this->dataPtr->distortion;
+}
+
+//////////////////////////////////////////////////
+DistortionPtr Camera::LensDistortion() const
 {
   return this->dataPtr->distortion;
 }

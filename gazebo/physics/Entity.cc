@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,7 +80,7 @@ Entity::Entity(BasePtr _parent)
 
   this->setWorldPoseFunc = &Entity::SetWorldPoseDefault;
 
-  this->scale = math::Vector3::One;
+  this->scale = ignition::math::Vector3d::One;
 }
 
 //////////////////////////////////////////////////
@@ -601,10 +601,7 @@ void Entity::Fini()
 //////////////////////////////////////////////////
 void Entity::Reset()
 {
-  if (this->HasType(Base::MODEL))
-    this->SetWorldPose(this->initialRelativePose);
-  else
-    this->SetRelativePose(this->initialRelativePose);
+  this->SetRelativePose(this->initialRelativePose);
 }
 
 //////////////////////////////////////////////////

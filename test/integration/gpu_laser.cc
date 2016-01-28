@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -122,13 +122,14 @@ TEST_F(GPURaySensorTest, LaserUnitBox)
 
   // Verify ray sensor 1 range readings
   // listen to new laser frames
-  float *scan = new float[raySensor->GetRayCount()
-      * raySensor->GetVerticalRayCount() * 3];
+  float *scan = new float[raySensor->RayCount()
+      * raySensor->VerticalRayCount() * 3];
   int scanCount = 0;
   event::ConnectionPtr c =
     raySensor->ConnectNewLaserFrame(
-        boost::bind(&::OnNewLaserFrame, &scanCount, scan,
-          _1, _2, _3, _4, _5));
+        std::bind(&::OnNewLaserFrame, &scanCount, scan,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
 
   // wait for a few laser scans
   int i = 0;
@@ -144,20 +145,21 @@ TEST_F(GPURaySensorTest, LaserUnitBox)
   double expectedRangeAtMidPoint = box01Pose.pos.x - unitBoxSize/2;
 
   // ray sensor 1 should see box01 and box02
-  EXPECT_NEAR(raySensor->GetRange(mid), expectedRangeAtMidPoint, LASER_TOL);
-  EXPECT_NEAR(raySensor->GetRange(0), expectedRangeAtMidPoint, LASER_TOL);
+  EXPECT_NEAR(raySensor->Range(mid), expectedRangeAtMidPoint, LASER_TOL);
+  EXPECT_NEAR(raySensor->Range(0), expectedRangeAtMidPoint, LASER_TOL);
 
-  EXPECT_DOUBLE_EQ(raySensor->GetRange(samples-1), GZ_DBL_INF);
+  EXPECT_DOUBLE_EQ(raySensor->Range(samples-1), GZ_DBL_INF);
 
   // Verify ray sensor 2 range readings
   // listen to new laser frames
-  float *scan2 = new float[raySensor2->GetRayCount()
-      * raySensor2->GetVerticalRayCount() * 3];
+  float *scan2 = new float[raySensor2->RayCount()
+      * raySensor2->VerticalRayCount() * 3];
   int scanCount2 = 0;
   event::ConnectionPtr c2 =
     raySensor->ConnectNewLaserFrame(
-        boost::bind(&::OnNewLaserFrame, &scanCount2, scan2,
-          _1, _2, _3, _4, _5));
+        std::bind(&::OnNewLaserFrame, &scanCount2, scan2,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
 
   // wait for a few laser scans
   i = 0;
@@ -170,9 +172,9 @@ TEST_F(GPURaySensorTest, LaserUnitBox)
   EXPECT_LT(i, 300);
 
   // Only box01 should be visible to ray sensor 2
-  EXPECT_NEAR(raySensor2->GetRange(mid), expectedRangeAtMidPoint, LASER_TOL);
-  EXPECT_DOUBLE_EQ(raySensor2->GetRange(0), GZ_DBL_INF);
-  EXPECT_DOUBLE_EQ(raySensor->GetRange(samples-1), GZ_DBL_INF);
+  EXPECT_NEAR(raySensor2->Range(mid), expectedRangeAtMidPoint, LASER_TOL);
+  EXPECT_DOUBLE_EQ(raySensor2->Range(0), GZ_DBL_INF);
+  EXPECT_DOUBLE_EQ(raySensor->Range(samples-1), GZ_DBL_INF);
 
   // Move all boxes out of range
   world->GetModel(box01)->SetWorldPose(
@@ -192,11 +194,11 @@ TEST_F(GPURaySensorTest, LaserUnitBox)
   }
   EXPECT_LT(i, 300);
 
-  for (int i = 0; i < raySensor->GetRayCount(); ++i)
-    EXPECT_DOUBLE_EQ(raySensor->GetRange(i), GZ_DBL_INF);
+  for (int i = 0; i < raySensor->RayCount(); ++i)
+    EXPECT_DOUBLE_EQ(raySensor->Range(i), GZ_DBL_INF);
 
-  for (int i = 0; i < raySensor->GetRayCount(); ++i)
-    EXPECT_DOUBLE_EQ(raySensor2->GetRange(i), GZ_DBL_INF);
+  for (int i = 0; i < raySensor->RayCount(); ++i)
+    EXPECT_DOUBLE_EQ(raySensor2->Range(i), GZ_DBL_INF);
 
   raySensor->DisconnectNewLaserFrame(c);
   raySensor2->DisconnectNewLaserFrame(c2);
@@ -317,13 +319,14 @@ TEST_F(GPURaySensorTest, Heightmap)
   EXPECT_TRUE(raySensor != NULL);
 
   // listen to new laser frames
-  float *scan = new float[raySensor->GetRayCount()
-      * raySensor->GetVerticalRayCount() * 3];
+  float *scan = new float[raySensor->RayCount()
+      * raySensor->VerticalRayCount() * 3];
   int scanCount = 0;
   event::ConnectionPtr c =
     raySensor->ConnectNewLaserFrame(
-        boost::bind(&::OnNewLaserFrame, &scanCount, scan,
-          _1, _2, _3, _4, _5));
+        std::bind(&::OnNewLaserFrame, &scanCount, scan,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
 
   // wait for a few laser scans
   int i = 0;
@@ -336,10 +339,10 @@ TEST_F(GPURaySensorTest, Heightmap)
 
   // Verify initial laser range readings. Nothing should be intersecting
   double maxRange = 10;
-  EXPECT_NEAR(raySensor->GetRangeMax(), maxRange, LASER_TOL);
+  EXPECT_NEAR(raySensor->RangeMax(), maxRange, LASER_TOL);
 
-  for (int i = 0; i < raySensor->GetRayCount(); ++i)
-    EXPECT_DOUBLE_EQ(raySensor->GetRange(i), GZ_DBL_INF);
+  for (int i = 0; i < raySensor->RayCount(); ++i)
+    EXPECT_DOUBLE_EQ(raySensor->Range(i), GZ_DBL_INF);
 
   // Move laser model very close to terrain, it should now returns range values
   // that are less than half the max range
@@ -359,8 +362,8 @@ TEST_F(GPURaySensorTest, Heightmap)
   }
   EXPECT_LT(i, 300);
 
-  for (int i = 0; i < raySensor->GetRayCount(); ++i)
-    EXPECT_TRUE(raySensor->GetRange(i) < maxRange / 2.0);
+  for (int i = 0; i < raySensor->RayCount(); ++i)
+    EXPECT_TRUE(raySensor->Range(i) < maxRange / 2.0);
 }
 
 int main(int argc, char **argv)

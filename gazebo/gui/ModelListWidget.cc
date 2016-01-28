@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -274,9 +274,12 @@ void ModelListWidget::OnSetSelectedEntity(const std::string &_name,
       this->dataPtr->lightsItem);
     if (mItem)
     {
-      this->dataPtr->requestMsg = msgs::CreateRequest("entity_info",
-          this->dataPtr->selectedEntityName);
-      this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
+      if (this->dataPtr->requestPub)
+      {
+        this->dataPtr->requestMsg = msgs::CreateRequest("entity_info",
+            this->dataPtr->selectedEntityName);
+        this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
+      }
       this->dataPtr->modelTreeWidget->setCurrentItem(mItem);
       mItem->setExpanded(!mItem->isExpanded());
     }

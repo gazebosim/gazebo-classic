@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -110,24 +110,25 @@ void SchematicViewWidget::Init()
 }
 
 /////////////////////////////////////////////////
-std::string SchematicViewWidget::GetLeafName(const std::string &_scopedName)
+std::string SchematicViewWidget::UnscopedName(const std::string &_scopedName)
 {
   if (_scopedName.empty())
     return "";
 
-  std::string leafName = _scopedName;
-  size_t idx = _scopedName.rfind("::");
+  std::string unscopedName = _scopedName;
+  size_t idx = _scopedName.find("::");
   if (idx != std::string::npos)
-    leafName = _scopedName.substr(idx+2);
-  return leafName;
+    unscopedName = _scopedName.substr(idx+2);
+
+  return unscopedName;
 }
 
 /////////////////////////////////////////////////
 void SchematicViewWidget::AddNode(const std::string &_node)
 {
-  std::string name = this->GetLeafName(_node);
+  std::string name = this->UnscopedName(_node);
 
-  if (this->scene->HasNode(name))
+  if (name.empty() || this->scene->HasNode(name))
     return;
 
   // this must be called before making changes to the graph
@@ -137,7 +138,6 @@ void SchematicViewWidget::AddNode(const std::string &_node)
   node->setData(0, tr(_node.c_str()));
   node->setData(1, tr("Link"));
   this->nodes[_node] = node;
-
   this->scene->applyLayout();
 
   this->FitInView();
@@ -155,9 +155,9 @@ void SchematicViewWidget::RemoveNode(const std::string &_node)
   auto it = this->nodes.find(_node);
   if (it != this->nodes.end())
   {
-    std::string node = this->GetLeafName(_node);
+    std::string node = this->UnscopedName(_node);
 
-    if (!this->scene->HasNode(node))
+    if (node.empty() || !this->scene->HasNode(node))
       return;
 
     // this must be called before making changes to the graph
@@ -182,8 +182,11 @@ void SchematicViewWidget::AddEdge(const std::string &_id,
     const std::string &/*_name*/, const std::string &_type,
     const std::string &_parent, const std::string &_child)
 {
-  std::string parentNode = this->GetLeafName(_parent);
-  std::string childNode = this->GetLeafName(_child);
+  std::string parentNode = this->UnscopedName(_parent);
+  std::string childNode = this->UnscopedName(_child);
+
+  if (parentNode.empty() || childNode.empty())
+    return;
 
   // this must be called before making changes to the graph
   this->scene->clearLayout();
@@ -300,7 +303,7 @@ void SchematicViewWidget::OnCustomContextMenu(const QString &_id)
   std::string itemId = _id.toStdString();
   if (this->edges.find(itemId) != this->edges.end())
     gui::model::Events::showJointContextMenu(itemId);
-  else if (this->scene->HasNode(this->GetLeafName(itemId)))
+  else if (this->scene->HasNode(this->UnscopedName(itemId)))
     gui::model::Events::showLinkContextMenu(itemId);
 }
 

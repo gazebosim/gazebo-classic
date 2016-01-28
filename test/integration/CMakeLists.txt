@@ -79,6 +79,7 @@ set(tests
   region_events.cc
   rest_web.cc
   road.cc
+  saving_and_loading.cc
   sensor.cc
   server_fixture.cc
   sim_events.cc
@@ -150,6 +151,7 @@ gz_build_dri_tests(${dri_tests})
 set(qt_tests
   insert_model.cc
   model_editor.cc
+  model_manipulation.cc
   undo.cc
   visual_pose.cc
 )

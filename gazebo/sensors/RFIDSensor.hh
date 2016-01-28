@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,8 @@
 #ifndef _GAZEBO_SENSORS_RFIDSENSOR_HH_
 #define _GAZEBO_SENSORS_RFIDSENSOR_HH_
 
-#include <vector>
+#include <memory>
 #include <string>
-
-#include "gazebo/physics/PhysicsTypes.hh"
-
-#include "gazebo/transport/TransportTypes.hh"
 
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/util/system.hh"
@@ -34,6 +30,9 @@ namespace gazebo
   namespace sensors
   {
     class RFIDTag;
+
+    // Forward declare private data class.
+    class RFIDSensorPrivate;
 
     /// \addtogroup gazebo_sensors
     /// \{
@@ -76,14 +75,9 @@ namespace gazebo
       /// \return Checks if tag is in range
       private: bool CheckTagRange(const ignition::math::Pose3d &_pose);
 
-      /// \brief Parent entity
-      private: physics::EntityPtr entity;
-
-      /// \brief Publisher for RFID pose messages.
-      private: transport::PublisherPtr scanPub;
-
-      /// \brief All the RFID tags.
-      private: std::vector<RFIDTag*> tags;
+      /// \internal
+      /// \brief Private data pointer
+      private: std::unique_ptr<RFIDSensorPrivate> dataPtr;
     };
     /// \}
   }
