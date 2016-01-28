@@ -86,7 +86,7 @@ void WorldOpenTest::NewWorldMsg(const std::string &_physicsEngine)
       if (world && worldHasBeenDeleted)
         newWorldHasBeenCreated = true;
     }
-    catch (...)
+    catch(...)
     {
       worldHasBeenDeleted = true;
     }
@@ -142,8 +142,12 @@ void WorldOpenTest::OpenWorldMsg(const std::string &_physicsEngine)
   worlds[2][2][0][0] = "model_00";
   worlds[2][0][1][0] = "sun";
 
-  worlds[3][0][0][0] = "worlds/heightmap_dem.world";
-  worlds[3][1][0][0] = "heightmap";
+  worlds[3][0][0][0] = "worlds/heightmap.world";
+  worlds[3][1][0][0] = "box1";
+  worlds[3][2][0][0] = "box2";
+  worlds[3][3][0][0] = "box3";
+  worlds[3][4][0][0] = "box4";
+  worlds[3][5][0][0] = "heightmap";
   worlds[3][0][1][0] = "sun";
 
   worlds[4][0][0][0] = "worlds/transporter.world";
@@ -177,7 +181,7 @@ void WorldOpenTest::OpenWorldMsg(const std::string &_physicsEngine)
     ASSERT_TRUE(world != NULL);
 
     // Check models
-    int count = 0;
+    size_t count = 0;
     for (unsigned int j = 1; j < 10; ++j)
     {
       if (worlds[i][j][0][0] == "")
