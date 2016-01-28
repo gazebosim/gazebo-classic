@@ -117,28 +117,10 @@ void AdiabaticAtmosphere::OnAtmosphereMsg(ConstAtmospherePtr &_msg)
 }
 
 //////////////////////////////////////////////////
-void AdiabaticAtmosphere::SetTemperature(const double _temperature)
-{
-  Atmosphere::SetTemperature(_temperature);
-}
-
-//////////////////////////////////////////////////
 void AdiabaticAtmosphere::SetTemperatureGradient(const double _gradient)
 {
   Atmosphere::SetTemperatureGradient(_gradient);
   this->Init();
-}
-
-//////////////////////////////////////////////////
-void AdiabaticAtmosphere::SetPressure(const double _pressure)
-{
-  Atmosphere::SetPressure(_pressure);
-}
-
-//////////////////////////////////////////////////
-void AdiabaticAtmosphere::SetMassDensity(const double _massDensity)
-{
-  Atmosphere::SetMassDensity(_massDensity);
 }
 
 //////////////////////////////////////////////////

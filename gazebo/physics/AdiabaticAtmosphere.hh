@@ -58,16 +58,7 @@ namespace gazebo
       protected: virtual void OnAtmosphereMsg(ConstAtmospherePtr &_msg);
 
       // Documentation inherited
-      public: virtual void SetTemperature(const double _t);
-
-      // Documentation inherited
       public: virtual void SetTemperatureGradient(const double _gradient);
-
-      // Documentation inherited
-      public: virtual void SetPressure(const double _gradient);
-
-      // Documentation inherited
-      public: virtual void SetMassDensity(const double _massDensity);
 
       // Documentation inherited
       public: virtual double Temperature(const double _altitude = 0.0) const;
