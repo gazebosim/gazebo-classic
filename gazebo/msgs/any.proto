@@ -1,0 +1,22 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Any
+/// \brief Any message
+
+import "color.proto";
+import "pose.proto";
+import "quaternion.proto";
+import "vector3d.proto";
+
+message Any
+{
+  optional double double_value         = 1;
+  optional int32 int_value             = 2;
+  optional string string_value         = 3;
+  optional Vector3d vector3_value      = 4;
+  optional Color color_value           = 5;
+  optional Pose pose_value             = 6;
+  optional Quaternion quaternion_value = 7;
+  optional bool bool_value             = 8;
+}

@@ -17,14 +17,65 @@
 #ifndef _GAZEBO_UTILS_INTROSPECTION_MANAGER_PRIVATE_HH_
 #define _GAZEBO_UTILS_INTROSPECTION_MANAGER_PRIVATE_HH_
 
+#include <map>
+#include <memory>
+#include <mutex>
+#include <string>
+#include <vector>
+#include "gazebo/msgs/param_v.pb.h"
+#include "gazebo/util/IntrospectionManager.hh"
+
 namespace gazebo
 {
   namespace util
   {
+    /// \brief Private data for the IntrospectionFilter class.
+    class IntrospectionFilterPrivate
+    {
+      /// \brief Items observed by this filter.
+      public: std::vector<std::string> items;
+
+      /// \brief Message containing the next update. A message is a collection
+      /// of items and values.
+      public: msgs::Param_V msg;
+
+      /// \brief ToDo.
+      //public: std::string topic;
+    };
+
+    /// \brief Todo.
+    struct ObservedItem
+    {
+      /// \brief ToDo.
+      gazebo::msgs::Any lastValue;
+
+      /// \brief ToDo.
+      std::vector<std::string> filters;
+    };
+
     /// \brief Private data for the IntrospectionManager class.
     class IntrospectionManagerPrivate
     {
+      /// \brief List of active filters.
+      /// The key is the topic where the filter publishes updates.
+      /// The value is the associated introspection filter.
+      public: std::map<std::string, IntrospectionFilter> filters;
 
+      /// \brief List of all registered items.
+      /// The key contains the item name.
+      /// The value contains the string representation of the protobuf type
+      /// that stores the value.
+      /// E.g.: allItems["model1::pose"] = "gazebo::msgs::Pose"
+      public: std::map<std::string, std::string> allItems;
+
+      /// \brief List of items that have at least one active observer.
+      /// The key contains the item name.
+      /// The value contains the last value stored for this item, as well as a
+      /// list of all the filters that contain the item.
+      public: std::map<std::string, ObservedItem> observedItems;
+
+      /// \brief Mutex to make this class thread-safe.
+      public: std::mutex mutex;
     };
   }
 }

@@ -3,6 +3,7 @@ include_directories(${IGNITION-MATH_INCLUDE_DIRS})
 
 set (msgs
   altimeter.proto
+  any.proto
   axis.proto
   battery.proto
   boxgeom.proto
@@ -63,6 +64,8 @@ set (msgs
   model_v.proto
   packet.proto
   physics.proto
+  param.proto
+  param_v.proto
   planegeom.proto
   pid.proto
   plugin.proto
