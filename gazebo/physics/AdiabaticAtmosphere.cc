@@ -136,6 +136,7 @@ double AdiabaticAtmosphere::Pressure(const double _altitude) const
 {
   if (!ignition::math::equal(Atmosphere::Temperature(), 0.0, 1e-6))
   {
+    // See https://en.wikipedia.org/wiki/Density_of_air#Altitude
     return Atmosphere::Pressure() *
         pow(1 + (Atmosphere::TemperatureGradient() * _altitude) /
             Atmosphere::Temperature(), this->dataPtr->adiabaticPower);
@@ -151,6 +152,7 @@ double AdiabaticAtmosphere::MassDensity(const double _altitude) const
 {
   if (!ignition::math::equal(Atmosphere::Temperature(), 0.0, 1e-6))
   {
+    // See https://en.wikipedia.org/wiki/Density_of_air#Altitude
     return Atmosphere::MassDensity() *
       pow(1 - (Atmosphere::TemperatureGradient() * _altitude) /
           Atmosphere::Temperature(), this->dataPtr->adiabaticPower - 1);
