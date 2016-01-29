@@ -198,8 +198,8 @@ namespace gazebo
       /// \param[in] _jointType In case the field belongs to a joint, the
       /// joint's type.
       /// \return The unit.
-      public: std::string UnitFromKey(const std::string &_key,
-          const std::string &_jointType = "") const;
+      public: static std::string UnitFromKey(const std::string &_key,
+          const std::string &_jointType = "");
 
       /// \brief Returns the range for a given key. For example, the key
       /// "transparency" returns min == 0, max == 1.

@@ -124,7 +124,7 @@ std::string ConfigWidget::GetUnitFromKey(const std::string &_key,
 
 /////////////////////////////////////////////////
 std::string ConfigWidget::UnitFromKey(const std::string &_key,
-    const std::string &_jointType) const
+    const std::string &_jointType)
 {
   if (_key == "pos" || _key == "length" || _key == "min_depth")
   {

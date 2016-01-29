@@ -63,10 +63,12 @@ PlotPalette::PlotPalette(QWidget *_parent) : QWidget(_parent),
   auto topicsSplitter = new QSplitter(Qt::Vertical, this);
   topicsSplitter->addWidget(topicsTopWidget);
   topicsSplitter->addWidget(topicsBottomWidget);
-  topicsSplitter->setStretchFactor(0, 1);
-  topicsSplitter->setStretchFactor(1, 1);
   topicsSplitter->setCollapsible(0, false);
   topicsSplitter->setCollapsible(1, false);
+
+  QList<int> sizes;
+  sizes << 50 << 50;
+  topicsSplitter->setSizes(sizes);
 
   // Models top
   auto spacer = new QWidget();
@@ -352,6 +354,15 @@ void PlotPalette::OnTopicClicked(const std::string &_topic)
   // Create a new layout and fill it
   auto newLayout = new QVBoxLayout();
   newLayout->setSpacing(0);
+
+  // Title
+  auto title = new QLabel(QString::fromStdString(_topic));
+  title->setMinimumHeight(40);
+  title->setToolTip(tr((
+      "<font size=3><p><b>Message type: </b>" + msgType + "</p></font>"
+      ).c_str()));
+  newLayout->addWidget(title);
+
   this->FillTopicFromMsg(msg.get(), _topic, 0, newLayout);
 
   // Spacer
@@ -403,6 +414,12 @@ void PlotPalette::FillTopicFromMsg(google::protobuf::Message *_msg,
         auto childWidget = new ItemConfigWidget(humanName, _level);
         childWidget->SetDraggable(true);
         childWidget->SetPlotInfo(_scope + "::" + name);
+
+        std::string typeName = field->type_name();
+        childWidget->setToolTip(tr((
+            "<font size=3><p><b>Type: </b>" + typeName + "</p></font>"
+            ).c_str()));
+
         _parentLayout->addWidget(childWidget);
 
         break;
@@ -417,10 +434,15 @@ void PlotPalette::FillTopicFromMsg(google::protobuf::Message *_msg,
 
         if (field->message_type()->name() == "Time")
         {
+          // We treat a full time message as double
           auto humanName = ConfigWidget::HumanReadableKey(name);
           auto childWidget = new ItemConfigWidget(humanName, _level);
           childWidget->SetDraggable(true);
           childWidget->SetPlotInfo(_scope + "::" + name);
+
+          childWidget->setToolTip(tr(
+              "<font size=3><p><b>Type:</b> double </p></font>"));
+
           _parentLayout->addWidget(childWidget);
         }
         else
