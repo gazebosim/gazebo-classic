@@ -26,18 +26,22 @@
 
 namespace gazebo
 {
-  /// \brief A plugin that simulates a sine wind.
-  // Wind is described with a uniform worldwide model. So it is independant
-  // from drone position for simple computations. It is computed from 2 parts:
-  // - Amplitude:
+  /// \brief A plugin that simulates a simple wind model.
+  // The wind is described as a uniform worldwide model. So it is independant
+  // from model position for simple computations. Its components are computed
+  // separately:
+  // - Horizontal amplitude:
   //      Low pass filtering on user input (complementary gain)
   //      + small local fluctuations
   //      + noise on value (noise amplitude is a factor of wind magnitude)
   //
-  // - Direction:
+  // - Horizontal direction:
   //      Low pass filtering on user input (complementary gain)
   //      + small local fluctuations
   //      + noise on value
+  //
+  // - Vertical amplitude:
+  //      Noise proportionnal to wind magnitude.
   class GAZEBO_VISIBLE WindPlugin : public WorldPlugin
   {
     /// \brief Constructor.
