@@ -159,8 +159,7 @@ void LiftDragPlugin::OnUpdate()
 {
   GZ_ASSERT(this->link, "Link was NULL");
   // get linear velocity at cp in inertial frame
-  math::Vector3 velI = this->link->GetWorldLinearVel(this->cp)
-    - this->link->WorldWindLinearVel();
+  math::Vector3 velI = this->link->GetWorldLinearVel(this->cp);
 
   // smoothing
   // double e = 0.8;

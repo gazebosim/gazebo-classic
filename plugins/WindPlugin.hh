@@ -67,7 +67,6 @@ namespace gazebo
     private: double characteristicTimeForWindRise;
     private: double magnitudeSinAmplitudePercent;
     private: double magnitudeSinPeriod;
-    private: double magnitudeNoiseAmplitudePercent;
     private: double characteristicTimeForWindOrientationChange;
     private: double orientationSinAmplitude;
     private: double orientationSinPeriod;
@@ -76,13 +75,16 @@ namespace gazebo
     private: double KMag;
     private: double KDir;
     private: double magnitudeMean;
-    private: ignition::math::Vector3d directionMean;
+    private: double directionMean;
 
     /// \brief Noise added to magnitude
     protected: sensors::NoisePtr noiseMagnitude;
 
     /// \brief Noise added to direction
     protected: sensors::NoisePtr noiseDirection;
+
+    /// \brief Noise added to Z axis
+    protected: sensors::NoisePtr noiseVertical;
   };
 }
 

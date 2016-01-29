@@ -28,7 +28,6 @@ WindPlugin::WindPlugin()
   : characteristicTimeForWindRise(1)
   , magnitudeSinAmplitudePercent(0)
   , magnitudeSinPeriod(1)
-  , magnitudeNoiseAmplitudePercent(0)
   , characteristicTimeForWindOrientationChange(1)
   , orientationSinAmplitude(0)
   , orientationSinPeriod(1)
@@ -36,7 +35,7 @@ WindPlugin::WindPlugin()
   , KMag(0)
   , KDir(0)
   , magnitudeMean(0)
-  , directionMean(ignition::math::Vector3d::Zero)
+  , directionMean(0)
 {
 }
 
@@ -48,70 +47,90 @@ void WindPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 
   physics::WindPtr wind = this->world->Wind();
 
-  if(_sdf->HasElement("magnitude"))
+  if(_sdf->HasElement("horizontal"))
   {
-    sdf::ElementPtr sdfMag = _sdf->GetElement("magnitude");
+    sdf::ElementPtr sdfHoriz = _sdf->GetElement("horizontal");
 
-    if(sdfMag->HasElement("time_for_rise"))
-      this->characteristicTimeForWindRise =
-        sdfMag->Get<double>("time_for_rise");
-
-    if(sdfMag->HasElement("sin"))
+    if(sdfHoriz->HasElement("magnitude"))
     {
-      sdf::ElementPtr sdfMagSin = sdfMag->GetElement("sin");
+      sdf::ElementPtr sdfMag = sdfHoriz->GetElement("magnitude");
 
-      if(sdfMagSin->HasElement("amplitude_percent"))
-        this->magnitudeSinAmplitudePercent =
-          sdfMagSin->Get<double>("amplitude_percent");
+      if(sdfMag->HasElement("time_for_rise"))
+        this->characteristicTimeForWindRise =
+          sdfMag->Get<double>("time_for_rise");
 
-      if(sdfMagSin->HasElement("period"))
-        this->magnitudeSinPeriod = sdfMagSin->Get<double>("period");
+      if(sdfMag->HasElement("sin"))
+      {
+        sdf::ElementPtr sdfMagSin = sdfMag->GetElement("sin");
+
+        if(sdfMagSin->HasElement("amplitude_percent"))
+          this->magnitudeSinAmplitudePercent =
+            sdfMagSin->Get<double>("amplitude_percent");
+
+        if(sdfMagSin->HasElement("period"))
+          this->magnitudeSinPeriod = sdfMagSin->Get<double>("period");
+      }
+
+      if(sdfMag->HasElement("noise"))
+      {
+        this->noiseMagnitude =
+          sensors::NoiseFactory::NewNoiseModel(
+              sdfMag->GetElement("noise"));
+      }
     }
 
-    if(sdfMag->HasElement("noise"))
+    if(sdfHoriz->HasElement("direction"))
     {
-      this->noiseMagnitude =
-        sensors::NoiseFactory::NewNoiseModel(
-            sdfMag->GetElement("noise"));
+      sdf::ElementPtr sdfDir = sdfHoriz->GetElement("direction");
+
+      if(sdfDir->HasElement("time_for_rise"))
+        this->characteristicTimeForWindOrientationChange =
+          sdfDir->Get<double>("time_for_rise");
+
+      if(sdfDir->HasElement("sin"))
+      {
+        sdf::ElementPtr sdfDirSin = sdfDir->GetElement("sin");
+
+        if(sdfDirSin->HasElement("amplitude"))
+          this->orientationSinAmplitude =
+            sdfDirSin->Get<double>("amplitude");
+
+        if(sdfDirSin->HasElement("period"))
+          this->orientationSinPeriod =
+            sdfDirSin->Get<double>("period");
+      }
+
+      if(sdfDir->HasElement("noise"))
+      {
+        this->noiseDirection =
+          sensors::NoiseFactory::NewNoiseModel(
+              sdfDir->GetElement("noise"));
+      }
     }
   }
 
-  if(_sdf->HasElement("direction"))
+  if(_sdf->HasElement("vertical"))
   {
-    sdf::ElementPtr sdfDir = _sdf->GetElement("direction");
+    sdf::ElementPtr sdfVert = _sdf->GetElement("vertical");
 
-    if(sdfDir->HasElement("time_for_rise"))
-      this->characteristicTimeForWindOrientationChange =
-        sdfDir->Get<double>("time_for_rise");
-
-    if(sdfDir->HasElement("sin"))
+    if(sdfVert->HasElement("noise"))
     {
-      sdf::ElementPtr sdfDirSin = sdfDir->GetElement("sin");
-
-      if(sdfDirSin->HasElement("amplitude"))
-        this->orientationSinAmplitude =
-          sdfDirSin->Get<double>("amplitude");
-
-      if(sdfDirSin->HasElement("period"))
-        this->orientationSinPeriod =
-          sdfDirSin->Get<double>("period");
-    }
-
-    if(sdfDir->HasElement("noise"))
-    {
-      this->noiseDirection =
+      this->noiseVertical =
         sensors::NoiseFactory::NewNoiseModel(
-            sdfDir->GetElement("noise"));
+            sdfVert->GetElement("noise"));
     }
   }
 
-  double period = this->world->GetPhysicsEngine()->GetUpdatePeriod();
+  double period = this->world->GetPhysicsEngine()->GetMaxStepSize();
 
   this->KMag = period / this->characteristicTimeForWindRise;
   this->KDir = period / this->characteristicTimeForWindOrientationChange;
 
   wind->SetLinearVelFunc(std::bind(&WindPlugin::LinearVel, this,
         std::placeholders::_1, std::placeholders::_2));
+
+  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+          std::bind(&WindPlugin::OnUpdate, this));
 }
 
 /////////////////////////////////////////////////
@@ -127,24 +146,53 @@ ignition::math::Vector3d WindPlugin::LinearVel(
     sin(2 * M_PI * this->world->GetSimTime().Double() /
         this->magnitudeSinPeriod);
   if (this->noiseMagnitude)
-    magnitude += this->noiseMagnitude->Apply(
-      this->magnitudeNoiseAmplitudePercent * this->magnitudeMean);
-  else
-    magnitude += this->magnitudeNoiseAmplitudePercent * this->magnitudeMean;
+    magnitude = this->noiseMagnitude->Apply(magnitude);
 
-  // Compute direction
-  ignition::math::Vector3d direction = _wind->LinearVel();
-  direction.Normalize();
+  // Compute horizontal direction
+  double direction = atan2(_wind->LinearVel().Y(), _wind->LinearVel().X());
   this->directionMean = (1. - this->KDir) * this->directionMean +
     this->KDir * direction;
   direction = this->directionMean;
-  direction += ignition::math::Vector3d::One *
-    this->orientationSinAmplitude *
+  direction += this->orientationSinAmplitude *
     sin(2 * M_PI * this->world->GetSimTime().Double() /
         this->orientationSinPeriod);
   if (this->noiseDirection)
-    direction += ignition::math::Vector3d::One * this->noiseDirection->Apply(1);
+    direction = this->noiseDirection->Apply(direction);
 
   // Apply wind velocity
-  return direction * magnitude;
+  ignition::math::Vector3d windVel;
+  windVel.X(magnitude * cos(direction * M_PI / 180.));
+  windVel.Y(magnitude * sin(direction * M_PI / 180.));
+  if (this->noiseVertical)
+    windVel.Z(noiseVertical->Apply(this->magnitudeMean));
+  else
+    windVel.Z(this->magnitudeMean);
+
+  return windVel;
+}
+
+/////////////////////////////////////////////////
+void WindPlugin::OnUpdate()
+{
+  // Get all the models
+  physics::Model_V models = this->world->GetModels();
+
+  // Process each model.
+  for (auto const &model : models)
+  {
+    // Get all the links
+    physics::Link_V links = model->GetLinks();
+
+    // Process each link.
+    for (auto const &link : links)
+    {
+      // Skip links for which the wind is disabled
+      if (!link->WindMode())
+        continue;
+
+      // Add wind velocity as a force to the body
+      link->AddRelativeForce(link->GetInertial()->GetMass() *
+          (link->RelativeWindLinearVel() - link->GetRelativeLinearVel().Ign()));
+    }
+  }
 }
