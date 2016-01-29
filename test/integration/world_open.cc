@@ -142,20 +142,26 @@ void WorldOpenTest::OpenWorldMsg(const std::string &_physicsEngine)
   worlds[2][2][0][0] = "model_00";
   worlds[2][0][1][0] = "sun";
 
-  worlds[3][0][0][0] = "worlds/heightmap.world";
-  worlds[3][1][0][0] = "box1";
-  worlds[3][2][0][0] = "box2";
-  worlds[3][3][0][0] = "box3";
-  worlds[3][4][0][0] = "box4";
-  worlds[3][5][0][0] = "heightmap";
+  // Invalid world keeps previous world
+  worlds[3][0][0][0] = "invalid_world";
+  worlds[3][1][0][0] = "ground_plane";
+  worlds[3][2][0][0] = "model_00";
   worlds[3][0][1][0] = "sun";
 
-  worlds[4][0][0][0] = "worlds/transporter.world";
-  worlds[4][1][0][0] = "ground_plane";
-  worlds[4][0][0][1] = "transporter";
+  worlds[4][0][0][0] = "worlds/heightmap.world";
+  worlds[4][1][0][0] = "box1";
+  worlds[4][2][0][0] = "box2";
+  worlds[4][3][0][0] = "box3";
+  worlds[4][4][0][0] = "box4";
+  worlds[4][5][0][0] = "heightmap";
   worlds[4][0][1][0] = "sun";
 
-  worlds[5][0][0][0] = "worlds/blank.world";
+  worlds[5][0][0][0] = "worlds/transporter.world";
+  worlds[5][1][0][0] = "ground_plane";
+  worlds[5][0][0][1] = "transporter";
+  worlds[5][0][1][0] = "sun";
+
+  worlds[6][0][0][0] = "worlds/blank.world";
 
   for (unsigned int i = 0; i < 10; ++i)
   {

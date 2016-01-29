@@ -735,22 +735,7 @@ bool Server::OpenWorld(const std::string &_filename)
 {
   gzmsg << "Opening world file [" << _filename << "]" << std::endl;
 
-  // Stop and remove current worlds
-  physics::remove_worlds();
-  sensors::remove_sensors();
-
-  // Keep transport system but clear all previous messages
-  gazebo::transport::clear_buffers();
-
-  // TODO: Notify clients that world has been removed
-/*
-  msgs::WorldModify worldMsg;
-  worldMsg.set_world_name("default");
-  worldMsg.set_remove(true);
-  this->worldModPub->Publish(worldMsg);
-*/
-
-  // Load new world
+  // Before removing old world, make sure new world is valid
   FILE *test = fopen(common::find_file(_filename).c_str(), "r");
   if (!test)
   {
@@ -759,7 +744,6 @@ bool Server::OpenWorld(const std::string &_filename)
   }
   fclose(test);
 
-  // Load the world file
   sdf::SDFPtr sdf(new sdf::SDF);
   if (!sdf::init(sdf))
   {
@@ -780,6 +764,21 @@ bool Server::OpenWorld(const std::string &_filename)
         << std::endl;
     return false;
   }
+
+  // Stop and remove current worlds
+  physics::remove_worlds();
+  sensors::remove_sensors();
+
+  // Keep transport system but clear all previous messages
+  gazebo::transport::clear_buffers();
+
+  // TODO: Notify clients that world has been removed
+/*
+  msgs::WorldModify worldMsg;
+  worldMsg.set_world_name("default");
+  worldMsg.set_remove(true);
+  this->worldModPub->Publish(worldMsg);
+*/
 
   auto world = physics::create_world("default");
   if (!world)
