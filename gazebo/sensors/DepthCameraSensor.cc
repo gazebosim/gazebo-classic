@@ -128,18 +128,6 @@ void DepthCameraSensor::Init()
 }
 
 //////////////////////////////////////////////////
-rendering::DepthCameraPtr DepthCameraSensor::DepthCamera() const
-{
-  return boost::dynamic_pointer_cast<rendering::DepthCamera>(this->camera);
-}
-
-//////////////////////////////////////////////////
-const float *DepthCameraSensor::DepthData() const
-{
-  return this->dataPtr->depthBuffer;
-}
-
-//////////////////////////////////////////////////
 bool DepthCameraSensor::UpdateImpl(const bool /*_force*/)
 {
   if (!this->rendered)
@@ -191,4 +179,22 @@ bool DepthCameraSensor::UpdateImpl(const bool /*_force*/)
 
   this->rendered = false;
   return true;
+}
+
+//////////////////////////////////////////////////
+const float *DepthCameraSensor::DepthData() const
+{
+  return this->dataPtr->depthBuffer;
+}
+
+//////////////////////////////////////////////////
+rendering::DepthCameraPtr DepthCameraSensor::GetDepthCamera() const
+{
+  return this->DepthCamera();
+}
+
+//////////////////////////////////////////////////
+rendering::DepthCameraPtr DepthCameraSensor::DepthCamera() const
+{
+  return boost::dynamic_pointer_cast<rendering::DepthCamera>(this->camera);
 }

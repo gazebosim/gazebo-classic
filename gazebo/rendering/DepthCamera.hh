@@ -114,6 +114,7 @@ namespace gazebo
       /// \brief Disconnect from an rgb point cloud singal
       /// \param[in] _c The connection to disconnect
       public: void DisconnectNewRGBPointCloud(event::ConnectionPtr &_c);
+
       /// \brief Implementation of the render call
       private: virtual void RenderImpl();
 

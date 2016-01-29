@@ -48,16 +48,22 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~DepthCameraSensor();
 
-      /// \brief Returns a pointer to the rendering::DepthCamera
-      /// \return Depth Camera pointer
-      public: virtual rendering::DepthCameraPtr DepthCamera() const;
+      /// \brief Initialize the camera
+      public: virtual void Init();
 
       /// \brief Gets the raw depth data from the sensor.
       /// \return The pointer to the depth data array.
       public: virtual const float *DepthData() const;
 
-      /// \brief Initialize the camera
-      public: virtual void Init();
+      /// \brief Returns a pointer to the rendering::DepthCamera
+      /// \return Depth Camera pointer
+      /// \deprecated See DepthCamera()
+      public: rendering::DepthCameraPtr GetDepthCamera() const
+              GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Returns a pointer to the rendering::DepthCamera
+      /// \return Depth Camera pointer
+      public: virtual rendering::DepthCameraPtr DepthCamera() const;
 
       /// \brief Load the sensor with default parameters
       /// \param[in] _worldName Name of world to load from

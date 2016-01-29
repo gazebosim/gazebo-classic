@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_IMAGEFRAME_HH_
-#define _GAZEBO_IMAGEFRAME_HH_
+#ifndef _GAZEBO_GUI_IMAGEFRAME_HH_
+#define _GAZEBO_GUI_IMAGEFRAME_HH_
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/msgs/msgs.hh"
