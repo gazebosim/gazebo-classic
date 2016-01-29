@@ -70,7 +70,7 @@ void AtmosphereTest::AtmosphereParam(const std::string &_atmosphere)
   transport::SubscriberPtr responsePub = atmosphereNode->Subscribe("~/response",
       &AtmosphereTest::OnAtmosphereMsgResponse, this);
 
-  ASSERT_TRUE(_atmosphere == "adiabatic");
+  ASSERT_EQ(_atmosphere, "adiabatic");
   atmospherePubMsg.set_type(msgs::Atmosphere::ADIABATIC);
   atmospherePubMsg.set_temperature(0.01);
   atmospherePubMsg.set_pressure(500);
