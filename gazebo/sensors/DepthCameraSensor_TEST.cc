@@ -62,8 +62,8 @@ TEST_F(DepthCameraSensor_TEST, CreateDepthCamera)
   // Make sure the above dynamic cast worked.
   EXPECT_TRUE(sensor != NULL);
 
-  EXPECT_EQ(sensor->GetImageWidth(), 640);
-  EXPECT_EQ(sensor->GetImageHeight(), 480);
+  EXPECT_EQ(sensor->ImageWidth(), 640);
+  EXPECT_EQ(sensor->ImageHeight(), 480);
   EXPECT_TRUE(sensor->IsActive());
 
   rendering::DepthCameraPtr depthCamera = sensor->DepthCamera();
@@ -84,7 +84,7 @@ TEST_F(DepthCameraSensor_TEST, CreateDepthCamera)
   EXPECT_LT(i, 300);
 
   unsigned int imageSize =
-      sensor->GetImageWidth() * sensor->GetImageHeight();
+      sensor->ImageWidth() * sensor->ImageHeight();
 
   std::lock_guard<std::mutex> lock(g_depthMutex);
   // Check that the depth values are valid
