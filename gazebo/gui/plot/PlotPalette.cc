@@ -31,6 +31,25 @@ const std::vector<std::string> PlotPalette::ModelProperties(
 PlotPalette::PlotPalette(QWidget *_parent) : QWidget(_parent),
     dataPtr(new PlotPalettePrivate)
 {
+  // Search
+  auto searchEdit = new QLineEdit();
+  this->connect(searchEdit, SIGNAL(textChanged(QString)), this,
+      SLOT(UpdateSearch(QString)));
+
+  this->dataPtr->searchModel = new QStandardItemModel();
+
+  auto completer = new QCompleter(this->dataPtr->searchModel, this);
+  completer->setCaseSensitivity(Qt::CaseInsensitive);
+  searchEdit->setCompleter(completer);
+
+  this->dataPtr->searchArea = new ConfigWidget();
+
+  auto searchLayout = new QVBoxLayout();
+  searchLayout->addWidget(searchEdit);
+
+  auto searchWidget = new QWidget();
+  searchWidget->setLayout(searchLayout);
+
   // Topics top
   this->dataPtr->topicsTop = new ConfigWidget();
   this->FillTopicsTop();
@@ -156,7 +175,7 @@ PlotPalette::PlotPalette(QWidget *_parent) : QWidget(_parent),
   tabWidget->addTab(topicsSplitter, "Topics");
   tabWidget->addTab(modelsSplitter, "Models");
   tabWidget->addTab(simSplitter, "Sim");
-  tabWidget->addTab(new QWidget(), "Search");
+  tabWidget->addTab(searchWidget, "Search");
 
   auto mainLayout = new QVBoxLayout;
   mainLayout->addWidget(tabWidget);
@@ -201,6 +220,8 @@ void PlotPalette::FillTopicsTop()
     for (auto topic : msgType.second)
     {
       topics.push_back(topic);
+      this->dataPtr->searchModel->appendRow(new
+          QStandardItem(QString::fromStdString(topic)));
     }
   }
 
@@ -509,6 +530,13 @@ void PlotPalette::FillModel(const std::string &_model)
   auto spacer = new QWidget();
   spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   this->dataPtr->modelsBottom->layout()->addWidget(spacer);
+}
+
+/////////////////////////////////////////////////
+void PlotPalette::UpdateSearch(const QString &/*_search*/)
+{
+  // To be able to search all fields, we need to generate them all at first
+  // and keep them in a list
 }
 
 /////////////////////////////////////////////////

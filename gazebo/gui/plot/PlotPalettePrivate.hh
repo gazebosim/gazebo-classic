@@ -37,6 +37,7 @@ namespace gazebo
       public: ConfigWidget *topicsBottom;
       public: ConfigWidget *modelsBottom;
       public: ConfigWidget *simBottom;
+      public: ConfigWidget *searchArea;
 
       /// \brief Transport node used for communication.
       public: transport::NodePtr node;
@@ -53,6 +54,10 @@ namespace gazebo
 
       /// \brief Message used to field requests.
       public: msgs::Request *requestMsg;
+
+
+
+      public: QStandardItemModel *searchModel;
     };
 
     /// \brief Private data for the ItemConfigWidget class

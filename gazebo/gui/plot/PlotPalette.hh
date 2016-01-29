@@ -54,6 +54,7 @@ namespace gazebo
       private slots: void OnTopicClicked(const std::string &_topic);
       private slots: void OnInsertModelSignal(const std::string &_name);
       private slots: void OnRemoveModelSignal(const std::string &_name);
+      private slots: void UpdateSearch(const QString &_search);
 
       private: void OnModel(ConstModelPtr &_msg);
       private: void OnResponse(ConstResponsePtr &_msg);
