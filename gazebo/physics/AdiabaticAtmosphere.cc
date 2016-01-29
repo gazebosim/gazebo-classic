@@ -61,7 +61,7 @@ void AdiabaticAtmosphere::Init(void)
 {
   this->dataPtr->adiabaticPower = MOLAR_MASS *
       -this->World()->GetPhysicsEngine()->GetGravity().z /
-      (Atmosphere::TemperatureGradient() * IDEAL_GAS_CONSTANT_R);
+      (-Atmosphere::TemperatureGradient() * IDEAL_GAS_CONSTANT_R);
 }
 
 //////////////////////////////////////////////////
