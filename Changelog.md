@@ -1,8 +1,8 @@
 ## Gazebo 7.0
 
-1. Update depth camera sensor to publish depth values over a topic.
-    * [Pull request #](https://bitbucket.org/osrf/gazebo/pull-request/)
-    
+1. Update depth camera sensor to publish depth data over a topic.
+    * [Pull request #2112](https://bitbucket.org/osrf/gazebo/pull-request/2112)
+
 1. Add FollowerPlugin
     * [Pull request #2085](https://bitbucket.org/osrf/gazebo/pull-request/2085)
 
