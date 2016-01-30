@@ -17,11 +17,13 @@
 #ifndef _GAZEBO_UTILS_INTROSPECTION_MANAGER_PRIVATE_HH_
 #define _GAZEBO_UTILS_INTROSPECTION_MANAGER_PRIVATE_HH_
 
+#include <functional>
 #include <map>
 #include <memory>
 #include <mutex>
 #include <string>
 #include <vector>
+#include "gazebo/msgs/any.pb.h"
 #include "gazebo/msgs/param_v.pb.h"
 #include "gazebo/util/IntrospectionManager.hh"
 
@@ -30,17 +32,14 @@ namespace gazebo
   namespace util
   {
     /// \brief Private data for the IntrospectionFilter class.
-    class IntrospectionFilterPrivate
+    struct IntrospectionFilter
     {
       /// \brief Items observed by this filter.
-      public: std::vector<std::string> items;
+      std::vector<std::string> items;
 
       /// \brief Message containing the next update. A message is a collection
       /// of items and values.
-      public: msgs::Param_V msg;
-
-      /// \brief ToDo.
-      //public: std::string topic;
+      msgs::Param_V msg;
     };
 
     /// \brief Todo.
@@ -51,6 +50,16 @@ namespace gazebo
 
       /// \brief ToDo.
       std::vector<std::string> filters;
+    };
+
+    /// \brief Todo.
+    struct RegisteredItem
+    {
+      /// \brief ToDo.
+      std::string type;
+
+      /// \brief ToDo.
+      std::function <bool(gazebo::msgs::Any &_msg)> cb;
     };
 
     /// \brief Private data for the IntrospectionManager class.
@@ -66,7 +75,7 @@ namespace gazebo
       /// The value contains the string representation of the protobuf type
       /// that stores the value.
       /// E.g.: allItems["model1::pose"] = "gazebo::msgs::Pose"
-      public: std::map<std::string, std::string> allItems;
+      public: std::map<std::string, RegisteredItem> allItems;
 
       /// \brief List of items that have at least one active observer.
       /// The key contains the item name.

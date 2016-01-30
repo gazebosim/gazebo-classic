@@ -2,7 +2,7 @@ package gazebo.msgs;
 
 /// \ingroup gazebo_msgs
 /// \interface Param_V
-/// \brief Message for a vector of params
+/// \brief Message for a vector of params.
 
 import "param.proto";
 

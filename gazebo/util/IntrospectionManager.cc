@@ -24,58 +24,14 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
-#include "gazebo/msgs/gz_string.pb.h"
+#include "gazebo/msgs/any.pb.h"
 #include "gazebo/util/IntrospectionManagerPrivate.hh"
 #include "gazebo/util/IntrospectionManager.hh"
 
 using namespace gazebo;
 using namespace util;
-
-//////////////////////////////////////////////////
-IntrospectionFilter::IntrospectionFilter()
-  : dataPtr(new IntrospectionFilterPrivate)
-{
-}
-
-//////////////////////////////////////////////////
-IntrospectionFilter &IntrospectionFilter::operator=(
-    const IntrospectionFilter &_other)
-{
-  this->dataPtr->items = _other.Items();
-  this->dataPtr->msg = _other.Msg();
-  return *this;
-}
-
-//////////////////////////////////////////////////
-std::vector<std::string> IntrospectionFilter::Items() const
-{
-  return this->dataPtr->items;
-}
-
-//////////////////////////////////////////////////
-//std::string IntrospectionFilter::Topic() const
-//{
-//  return this->dataPtr->topic;
-//}
-
-//////////////////////////////////////////////////
-std::vector<std::string> &IntrospectionFilter::MutableItems()
-{
-  return this->dataPtr->items;
-}
-
-//////////////////////////////////////////////////
-const msgs::Param_V &IntrospectionFilter::Msg() const
-{
-  return this->dataPtr->msg;
-}
-
-//////////////////////////////////////////////////
-msgs::Param_V &IntrospectionFilter::MutableMsg()
-{
-  return this->dataPtr->msg;
-}
 
 //////////////////////////////////////////////////
 IntrospectionManager::IntrospectionManager()
@@ -84,28 +40,35 @@ IntrospectionManager::IntrospectionManager()
 }
 
 //////////////////////////////////////////////////
-void IntrospectionManager::SetFilter(const std::string &_topic,
-    const std::vector<std::string> _items)
+IntrospectionManager::~IntrospectionManager()
+{
+}
+
+//////////////////////////////////////////////////
+void IntrospectionManager::SetFilter(const std::string &_filterId,
+    const std::vector<std::string> &_items)
 {
   std::vector<std::string> oldItems;
 
-  if (this->dataPtr->filters.find(_topic) == this->dataPtr->filters.end())
+  if (this->dataPtr->filters.find(_filterId) == this->dataPtr->filters.end())
   {
     // Advertise the topic.
   }
   else
-    oldItems = this->dataPtr->filters.at(_topic).Items();
+    oldItems = this->dataPtr->filters.at(_filterId).items;
 
-  this->dataPtr->filters[_topic].MutableItems() = _items;
+  this->dataPtr->filters[_filterId].items = _items;
 
-  // Remove the filter ID from the old items.
+  // This call might be an update through an existing filter. We have to make
+  // sure that the items that were part of the old filter but are not in the
+  // new filter are removed.
   for (auto const &oldItem : oldItems)
   {
     if (std::find(_items.begin(), _items.end(), oldItem) == _items.end())
     {
       auto &filters = this->dataPtr->observedItems[oldItem].filters;
       filters.erase(std::remove(
-          filters.begin(), filters.end(), _topic), filters.end());
+          filters.begin(), filters.end(), _filterId), filters.end());
 
       // If there is nobody interested in this item, remove it.
       if (filters.empty())
@@ -113,33 +76,36 @@ void IntrospectionManager::SetFilter(const std::string &_topic,
     }
   }
 
-  // Add the filter ID to the new items.
+  // We have to add the new items that were not part of the old filter.
   for (auto const &newItem : _items)
   {
     if (std::find(oldItems.begin(), oldItems.end(), newItem) == oldItems.end())
     {
-      this->dataPtr->observedItems[newItem].filters.push_back(_topic);
+      this->dataPtr->observedItems[newItem].filters.push_back(_filterId);
     }
   }
 }
 
 //////////////////////////////////////////////////
-void IntrospectionManager::RemoveFilter(const std::string &_topic)
+bool IntrospectionManager::RemoveFilter(const std::string &_filterId)
 {
-  if (this->dataPtr->filters.find(_topic) == this->dataPtr->filters.end())
-    return;
+  if (this->dataPtr->filters.find(_filterId) == this->dataPtr->filters.end())
+  {
+    gzerr << "Unable to remove filter [" << _filterId << "]" << std::endl;
+    return false;
+  }
 
-  std::vector<std::string> oldItems = this->dataPtr->filters.at(_topic).Items();
+  auto oldItems = this->dataPtr->filters.at(_filterId).items;
 
   // Let's remove the filter.
-  this->dataPtr->filters.erase(_topic);
+  this->dataPtr->filters.erase(_filterId);
 
   // Remove any reference to this filter inside observedItems.
   for (auto const &oldItem : oldItems)
   {
     auto &filters = this->dataPtr->observedItems[oldItem].filters;
     filters.erase(std::remove(
-        filters.begin(), filters.end(), _topic), filters.end());
+        filters.begin(), filters.end(), _filterId), filters.end());
 
     // If there is nobody interested in this item, remove it.
     if (filters.empty())
@@ -147,32 +113,35 @@ void IntrospectionManager::RemoveFilter(const std::string &_topic)
   }
 
   // Unadvertise topic.
+
+  return true;
 }
 
 //////////////////////////////////////////////////
-bool IntrospectionManager::Filter(const std::string &_topic,
-    IntrospectionFilter &_filter) const
+bool IntrospectionManager::Filter(const std::string &_filterId,
+    std::vector<std::string> &_items) const
 {
-  if (this->dataPtr->filters.find(_topic) == this->dataPtr->filters.end())
+  if (this->dataPtr->filters.find(_filterId) == this->dataPtr->filters.end())
     return false;
 
-  _filter = this->dataPtr->filters.at(_topic);
+  _items = this->dataPtr->filters.at(_filterId).items;
   return true;
 }
 
 //////////////////////////////////////////////////
 bool IntrospectionManager::Register(const std::string &_item,
     const std::string &_type,
-    const std::function <bool (gazebo::msgs::GzString &_msg)> &/*_cb*/)
+    const std::function <bool (gazebo::msgs::Any &_msg)> &_cb)
 {
-  // Sanity check: Make sure that nobody has register the same item before.
+  // Sanity check: Make sure that nobody has registered the same item before.
   if (this->dataPtr->allItems.find(_item) != this->dataPtr->allItems.end())
   {
     gzwarn << "Item [" << _item << "] already registered" << std::endl;
     return false;
   }
 
-  this->dataPtr->allItems[_item] = _type;
+  this->dataPtr->allItems[_item].type = _type;
+  this->dataPtr->allItems[_item].cb = _cb;
   return true;
 }
 
@@ -190,4 +159,45 @@ bool IntrospectionManager::Unregister(const std::string &_item)
   this->dataPtr->allItems.erase(_item);
 
   return true;
+}
+
+//////////////////////////////////////////////////
+void IntrospectionManager::Update()
+{
+  for (auto &observedItem : this->dataPtr->observedItems)
+  {
+    auto &item = observedItem.first;
+    auto &lastValue = observedItem.second.lastValue;
+    auto &filters = observedItem.second.filters;
+
+    // Update the values of the items under observation.
+    auto &callback = this->dataPtr->allItems[item].cb;
+    gazebo::msgs::Any value;
+    if (!callback(value))
+    {
+      gzerr << "Something went wrong updating the value for item [" << item
+            << "]" << std::endl;
+      continue;
+    }
+    lastValue.CopyFrom(value);
+
+
+    // We should have at least one filter, otherwise this entry should have been
+    // previously recycled.
+    //GZ_ASSERT(!filters.empty(), "No filters on item [" + item + "]");
+  }
+
+  // Prepare the next message to be sent in each filter.
+  for (auto &filter : this->dataPtr->filters)
+  {
+    // First of all, clear the old message.
+    auto &nextMsg = filter.second.msg;
+    nextMsg.Clear();
+
+    // Insert the last value of each item under observation for this filter.
+    for (auto const &item : filter.second.items)
+    {
+      auto nextValue = this->dataPtr->observedItems[item].lastValue;
+    }
+  }
 }

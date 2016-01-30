@@ -2,7 +2,7 @@ package gazebo.msgs;
 
 /// \ingroup gazebo_msgs
 /// \interface Param
-/// \brief Param message
+/// \brief Param message.
 
 import "any.proto";
 
