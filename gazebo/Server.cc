@@ -767,10 +767,23 @@ bool Server::OpenWorld(const std::string &_filename)
 
   // Stop and remove current worlds
   physics::remove_worlds();
+
+  // Sleep for a long time to make sure all the messages were properly sent back
+  // and forth. For example, to unadvertise a topic, it goes
+  // transport::ConnectionManager -> Master -> transport::ConnectionManager
+  common::Time::MSleep(1000);
+
+  // Keep sensor manager but make sure it is clear.
+  // (All sensors should be removed when the links containing them are removed,
+  // but we do this here just to make sure.)
   sensors::remove_sensors();
+  sensors::run_once(true);
 
   // Keep transport system but clear all previous messages
   gazebo::transport::clear_buffers();
+
+  // Sleep for a long time to make sure sensors and transport are clear.
+  common::Time::MSleep(1000);
 
   // TODO: Notify clients that world has been removed
 /*
@@ -787,6 +800,7 @@ bool Server::OpenWorld(const std::string &_filename)
   physics::load_world(world, worldElem);
   physics::init_world(world);
   physics::run_world(world);
+  sensors::run_once(true);
 
   // TODO: Notify clients that a new world is available
 /*
@@ -795,5 +809,7 @@ bool Server::OpenWorld(const std::string &_filename)
   worldMsg.set_create(true);
   this->dataPtr->worldModPub->Publish(worldMsg);
 */
+
+  gzmsg << "- Opened world file [" << _filename << "]" << std::endl;
   return true;
 }

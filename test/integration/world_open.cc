@@ -37,6 +37,10 @@ class WorldOpenTest : public ServerFixture,
   /// is opened.
   /// \param[in] _physicsEngine Physics Engine type.
   public: void OpenWorldMsg(const std::string &_physicsEngine);
+
+  /// \brief Test opening and closing worlds with sensors.
+  /// \param[in] _physicsEngine Physics Engine type.
+  public: void OpenWorldSensors(const std::string &_physicsEngine);
 };
 
 //////////////////////////////////////////////////
@@ -90,7 +94,7 @@ void WorldOpenTest::NewWorldMsg(const std::string &_physicsEngine)
     {
       worldHasBeenDeleted = true;
     }
-    gazebo::common::Time::MSleep(100);
+    gazebo::common::Time::MSleep(300);
     sleep++;
   }
   EXPECT_TRUE(worldHasBeenDeleted);
@@ -173,17 +177,30 @@ void WorldOpenTest::OpenWorldMsg(const std::string &_physicsEngine)
     msg.set_open_filename(worlds[i][0][0][0]);
     pub->Publish(msg);
 
-    // Wait for message to be received
+    // Wait for world to be created
     int sleep = 0;
     int maxSleep = 10;
-    while (sleep < maxSleep)
+    bool worldHasBeenDeleted = false;
+    bool newWorldHasBeenCreated = false;
+    while (sleep < maxSleep && !newWorldHasBeenCreated)
     {
-      gazebo::common::Time::MSleep(100);
+      try
+      {
+        world = physics::get_world("default");
+        if (world && worldHasBeenDeleted)
+          newWorldHasBeenCreated = true;
+      }
+      catch(...)
+      {
+        worldHasBeenDeleted = true;
+      }
+      gazebo::common::Time::MSleep(1000);
       sleep++;
     }
-
-    // Get the new world
-    world = physics::get_world("default");
+    // Check that old world was deleted and new world was created, unless the
+    // world is invalid
+    EXPECT_EQ(worldHasBeenDeleted, worlds[i][0][0][0] != "invalid_world");
+    EXPECT_EQ(newWorldHasBeenCreated, worlds[i][0][0][0] != "invalid_world");
     ASSERT_TRUE(world != NULL);
 
     // Check models
@@ -226,6 +243,240 @@ void WorldOpenTest::OpenWorldMsg(const std::string &_physicsEngine)
   }
 }
 
+//////////////////////////////////////////////////
+void WorldOpenTest::OpenWorldSensors(const std::string &_physicsEngine)
+{
+  // Load a world with cameras
+  this->Load("worlds/camera.world", true, _physicsEngine);
+  auto world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // Sleep to ensure transport topics are all advertised
+  world->Step(100);
+  common::Time::MSleep(100);
+
+  // Check the sensors are there
+  {
+    EXPECT_TRUE(world->SensorsInitialized());
+    EXPECT_TRUE(sensors::SensorManager::Instance()->SensorsInitialized());
+    EXPECT_EQ(sensors::SensorManager::Instance()->GetSensors().size(), 2u);
+
+    auto camera = world->GetModel("camera");
+    EXPECT_TRUE(camera != NULL);
+    auto camera2 = world->GetModel("camera 2");
+    EXPECT_TRUE(camera2 != NULL);
+
+    auto cameraLink = camera->GetLink("link");
+    EXPECT_TRUE(cameraLink != NULL);
+    auto camera2Link = camera2->GetLink("link");
+    EXPECT_TRUE(camera2Link != NULL);
+
+    // Check they have sensors
+    EXPECT_EQ(cameraLink->GetSensorCount(), 1u);
+    EXPECT_EQ(camera2Link->GetSensorCount(), 1u);
+  }
+
+  // Check advertised topics
+  auto msgTypes = gazebo::transport::getAdvertisedTopics();
+  EXPECT_FALSE(msgTypes.empty());
+
+  // Check there are camera topics being advertised
+  int count1 = 0;
+  for (auto msgType : msgTypes)
+  {
+    for (auto topic : msgType.second)
+    {
+      if (topic.find("camera") != std::string::npos)
+      {
+        gzdbg << "Found camera topic [" << topic << "]" << std::endl;
+        count1++;
+      }
+    }
+  }
+  EXPECT_GT(count1, 0);
+
+  // Create transport
+  auto node = transport::NodePtr(new transport::Node());
+  node->Init();
+  auto pub = node->Advertise<gazebo::msgs::ServerControl>(
+      "/gazebo/server/control");
+
+  // Publish new world message
+  {
+    gazebo::msgs::ServerControl msg;
+    msg.set_new_world(true);
+    pub->Publish(msg);
+  }
+
+  // Wait for old world to be removed and new world opened.
+  int sleep = 0;
+  int maxSleep = 30;
+  while (sleep < maxSleep)
+  {
+    gazebo::common::Time::MSleep(100);
+    sleep++;
+  }
+
+  // Get the new world
+  world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+  world->SetPaused(true);
+  world->Step(100);
+  common::Time::MSleep(100);
+
+  // Check there are no sensors
+  {
+    EXPECT_TRUE(world->SensorsInitialized());
+    EXPECT_TRUE(sensors::SensorManager::Instance()->SensorsInitialized());
+    EXPECT_EQ(sensors::SensorManager::Instance()->GetSensors().size(), 0u);
+
+    auto camera = world->GetModel("camera");
+    EXPECT_TRUE(camera == NULL);
+    auto camera2 = world->GetModel("camera 2");
+    EXPECT_TRUE(camera2 == NULL);
+  }
+
+  // Check advertised topics
+  msgTypes = gazebo::transport::getAdvertisedTopics();
+  EXPECT_FALSE(msgTypes.empty());
+
+  // Check there are no camera topics being advertised
+  int count2 = 0;
+  for (auto msgType : msgTypes)
+  {
+    for (auto topic : msgType.second)
+    {
+      if (topic.find("camera") != std::string::npos)
+      {
+        gzdbg << "Found camera topic [" << topic << "]" << std::endl;
+        count2++;
+      }
+    }
+  }
+  EXPECT_EQ(count2, 0);
+
+  // Publish open world message
+  {
+    gazebo::msgs::ServerControl msg;
+    msg.set_open_filename("worlds/magnetometer.world");
+    pub->Publish(msg);
+  }
+
+  // Wait for message to be received
+  sleep = 0;
+  while (sleep < maxSleep)
+  {
+    gazebo::common::Time::MSleep(100);
+    sleep++;
+  }
+
+  // Get the new world
+  world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+  world->SetPaused(true);
+  world->Step(100);
+  common::Time::MSleep(100);
+
+  // Check sensor
+  {
+    EXPECT_TRUE(world->SensorsInitialized());
+    EXPECT_TRUE(sensors::SensorManager::Instance()->SensorsInitialized());
+    EXPECT_EQ(sensors::SensorManager::Instance()->GetSensors().size(), 1u);
+
+    auto model = world->GetModel("magnetometerModel");
+    EXPECT_TRUE(model != NULL);
+
+    auto link = model->GetLink("link");
+    EXPECT_TRUE(link != NULL);
+
+    EXPECT_EQ(link->GetSensorCount(), 1u);
+  }
+
+  // Check advertised topics
+  msgTypes = gazebo::transport::getAdvertisedTopics();
+  EXPECT_FALSE(msgTypes.empty());
+
+  // Check there are magnetometer topics
+  int count3 = 0;
+  for (auto msgType : msgTypes)
+  {
+    for (auto topic : msgType.second)
+    {
+      if (topic.find("magnetometer") != std::string::npos)
+      {
+        gzdbg << "Found magnetometer topic [" << topic << "]" << std::endl;
+        count3++;
+      }
+    }
+  }
+  EXPECT_EQ(count3, 1);
+
+  // Publish open world message
+  {
+    gazebo::msgs::ServerControl msg;
+    msg.set_open_filename("worlds/camera.world");
+    pub->Publish(msg);
+  }
+
+  // Wait for message to be received
+  sleep = 0;
+  while (sleep < maxSleep)
+  {
+    gazebo::common::Time::MSleep(100);
+    sleep++;
+  }
+
+  // Get the new world
+  world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+  world->SetPaused(true);
+  world->Step(100);
+  common::Time::MSleep(100);
+
+  // Check the sensors are there
+  {
+    EXPECT_TRUE(world->SensorsInitialized());
+    EXPECT_TRUE(sensors::SensorManager::Instance()->SensorsInitialized());
+    EXPECT_EQ(sensors::SensorManager::Instance()->GetSensors().size(), 2u);
+
+    auto camera = world->GetModel("camera");
+    EXPECT_TRUE(camera != NULL);
+    auto camera2 = world->GetModel("camera 2");
+    EXPECT_TRUE(camera2 != NULL);
+
+    auto cameraLink = camera->GetLink("link");
+    EXPECT_TRUE(cameraLink != NULL);
+    auto camera2Link = camera2->GetLink("link");
+    EXPECT_TRUE(camera2Link != NULL);
+
+    // Check they have sensors
+    EXPECT_EQ(cameraLink->GetSensorCount(), 1u);
+    EXPECT_EQ(camera2Link->GetSensorCount(), 1u);
+  }
+
+  // Check advertised topics
+  msgTypes = gazebo::transport::getAdvertisedTopics();
+  EXPECT_FALSE(msgTypes.empty());
+
+  // Check there are camera topics being advertised
+  int count4 = 0;
+  for (auto msgType : msgTypes)
+  {
+    for (auto topic : msgType.second)
+    {
+      if (topic.find("camera") != std::string::npos)
+      {
+        gzdbg << "Found camera topic [" << topic << "]" << std::endl;
+        count4++;
+      }
+    }
+  }
+  EXPECT_GT(count4, 0);
+
+  // Check there are as many topics as the previous camera world
+  EXPECT_EQ(count4, count1);
+}
+
 /////////////////////////////////////////////////
 TEST_P(WorldOpenTest, NewWorldMsg)
 {
@@ -236,6 +487,12 @@ TEST_P(WorldOpenTest, NewWorldMsg)
 TEST_P(WorldOpenTest, OpenWorldMsg)
 {
   this->OpenWorldMsg(this->GetParam());
+}
+
+/////////////////////////////////////////////////
+TEST_P(WorldOpenTest, OpenWorldSensors)
+{
+  this->OpenWorldSensors(this->GetParam());
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, WorldOpenTest,
