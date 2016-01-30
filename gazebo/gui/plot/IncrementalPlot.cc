@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@
   #include <Winsock2.h>
 #endif
 
+#include <map>
+
 #include <qwt/qwt_plot.h>
 #include <qwt/qwt_scale_widget.h>
 #include <qwt/qwt_plot_panner.h>
@@ -34,6 +36,7 @@
 #include <qwt/qwt_legend.h>
 #include <qwt/qwt_legend_item.h>
 #include <qwt/qwt_plot_directpainter.h>
+#include <qwt/qwt_plot_magnifier.h>
 
 #include "gazebo/common/Assert.hh"
 
@@ -85,18 +88,54 @@ class CurveData: public QwtArraySeriesData<QPointF>
           }
 };
 
+namespace gazebo
+{
+  namespace gui
+  {
+    /// \internal
+    /// \brief IncrementalPlot private data
+    struct IncrementalPlotPrivate
+    {
+      /// \brief A map of strings to qwt plot curves.
+      // public: typedef std::map<QString, QwtPlotCurve *> CurveMap;
+
+      /// \brief A map of unique ids to plot curves.
+      public: typedef std::map<unsigned int, PlotCurve *> CurveMap;
+
+      /// \brief The curve to draw.
+      public: CurveMap curves;
+
+      /// \brief Drawing utility
+      public: QwtPlotDirectPainter *directPainter;
+
+      /// \brief Pointer to the plot maginfier
+      public: QwtPlotMagnifier *magnifier;
+
+      /// \brief Period duration in seconds.
+      public: unsigned int period;
+
+      /// \brief Global id incremented on every new curve
+      public: static unsigned int globalCurveId;
+    };
+  }
+}
+
+// global variable id counter
+unsigned int IncrementalPlotPrivate::globalCurveId = 0;
+
 /////////////////////////////////////////////////
 IncrementalPlot::IncrementalPlot(QWidget *_parent)
-  : QwtPlot(_parent)
+  : QwtPlot(_parent),
+    dataPtr(new IncrementalPlotPrivate)
 {
-  this->period = 10;
-  this->directPainter = new QwtPlotDirectPainter(this);
+  this->dataPtr->period = 10;
+  this->dataPtr->directPainter = new QwtPlotDirectPainter(this);
 
   // panning with the left mouse button
   (void) new QwtPlotPanner(this->canvas());
 
   // zoom in/out with the wheel
-  this->magnifier = new QwtPlotMagnifier(this->canvas());
+  this->dataPtr->magnifier = new QwtPlotMagnifier(this->canvas());
 
 #if defined(Q_WS_X11)
   this->canvas()->setAttribute(Qt::WA_PaintOutsidePaintEvent, true);
@@ -135,42 +174,70 @@ IncrementalPlot::IncrementalPlot(QWidget *_parent)
 /////////////////////////////////////////////////
 IncrementalPlot::~IncrementalPlot()
 {
-  for (CurveMap::iterator iter = this->curves.begin();
-       iter != this->curves.end(); ++iter)
+  for (auto iter : this->dataPtr->curves)
   {
-    delete iter->second;
+    delete iter.second->curve;
+    delete iter.second;
   }
 
-  this->curves.clear();
+  this->dataPtr->curves.clear();
 }
 
 /////////////////////////////////////////////////
-void IncrementalPlot::Add(const QString &_label,
-                          const std::list<QPointF> &_pts)
+PlotCurve *IncrementalPlot::FindCurve(const std::string &_label) const
 {
-  if (_label.isEmpty())
+  for (const auto &it : this->dataPtr->curves)
+  {
+    if (it.second->label == _label)
+      return it.second;
+  }
+
+  return NULL;
+}
+
+/////////////////////////////////////////////////
+PlotCurve *IncrementalPlot::FindCurve(const unsigned int _id) const
+{
+  auto it = this->dataPtr->curves.find(_id);
+  if (it != this->dataPtr->curves.end())
+    return it->second;
+  else
+    return NULL;
+}
+
+/////////////////////////////////////////////////
+void IncrementalPlot::Add(const std::string &_label,
+    const std::list<ignition::math::Vector2d> &_pts)
+{
+  if (_label.empty())
     return;
 
-  QwtPlotCurve *curve = NULL;
+/*  QwtPlotCurve *curve = NULL;
 
-  CurveMap::iterator iter = this->curves.find(_label);
-  if (iter == this->curves.end())
+  CurveMap::iterator iter = this->dataPtr->curves.find(_label);
+  if (iter == this->dataPtr->curves.end())
     curve = this->AddCurve(_label);
   else
-    curve = iter->second;
+    curve = iter->second;*/
 
-  GZ_ASSERT(curve != NULL, "Curve is NULL");
+  PlotCurve *plotCurve = NULL;
+  PlotCurve *curve = this->FindCurve(_label);
+  if (curve == NULL)
+    this->AddCurve(_label);
+  else
+    plotCurve = curve;
+
+  GZ_ASSERT(plotCurve != NULL, "Curve is NULL");
 
   // Get the  curve data
-  CurveData *curveData = static_cast<CurveData *>(curve->data());
+  CurveData *curveData = static_cast<CurveData *>(plotCurve->curve->data());
 
   GZ_ASSERT(curveData != NULL, "Curve data is NULL");
 
   // Add all the points
-  for (std::list<QPointF>::const_iterator ptIter = _pts.begin();
-       ptIter != _pts.end(); ++ptIter)
+  for (const auto &pt : _pts)
   {
-    curveData->Add(*ptIter);
+    curveData->Add(QPointF(pt.X(), pt.Y()));
   }
 
   // Adjust the curve
@@ -178,32 +245,40 @@ void IncrementalPlot::Add(const QString &_label,
 }
 
 /////////////////////////////////////////////////
-void IncrementalPlot::Add(const QString &_label, const QPointF &_pt)
+void IncrementalPlot::Add(const std::string &_label,
+    const ignition::math::Vector2d &_pt)
 {
-  if (_label.isEmpty())
+  if (_label.empty())
     return;
 
-  QwtPlotCurve *curve = NULL;
+/*  QwtPlotCurve *curve = NULL;
 
-  CurveMap::iterator iter = this->curves.find(_label);
-  if (iter == this->curves.end())
+  CurveMap::iterator iter = this->dataPtr->curves.find(_label);
+  if (iter == this->dataPtr->curves.end())
     curve = this->AddCurve(_label);
   else
-    curve = iter->second;
+    curve = iter->second;*/
 
-  GZ_ASSERT(curve != NULL, "Curve is NULL");
+  PlotCurve *plotCurve = NULL;
+  PlotCurve *curve = this->FindCurve(_label);
+  if (curve == NULL)
+    this->AddCurve(_label);
+  else
+    plotCurve = curve;
+
+  GZ_ASSERT(plotCurve != NULL, "Curve is NULL");
 
   // Get the curve data
-  CurveData *curveData = static_cast<CurveData *>(curve->data());
+  CurveData *curveData = static_cast<CurveData *>(plotCurve->curve->data());
 
   GZ_ASSERT(curveData != NULL, "Curve data is NULL");
 
   // Add a point
-  curveData->Add(_pt);
+  curveData->Add(QPointF(_pt.X(), _pt.Y()));
 }
 
 /////////////////////////////////////////////////
-void IncrementalPlot::AddVLine(const QString &_label, double _x)
+void IncrementalPlot::AddVLine(const std::string &_label, const double _x)
 {
   QwtPlotMarker *marker = new QwtPlotMarker();
   marker->setValue(_x, 0.0);
@@ -211,15 +286,18 @@ void IncrementalPlot::AddVLine(const QString &_label, double _x)
   marker->setLabelAlignment(Qt::AlignRight | Qt::AlignBottom);
   marker->setLinePen(QPen(Qt::green, 0, Qt::DashDotLine));
   marker->attach(this);
-  marker->setLabel(_label);
+  marker->setLabel(QString::fromStdString(_label));
 }
 
 /////////////////////////////////////////////////
-void IncrementalPlot::AdjustCurve(QwtPlotCurve *_curve)
+void IncrementalPlot::AdjustCurve(PlotCurve *_plotCurve)
 {
-  GZ_ASSERT(_curve != NULL, "Curve is NULL");
+  GZ_ASSERT(_plotCurve != NULL, "Plot curve is NULL");
 
-  CurveData *curveData = static_cast<CurveData *>(_curve->data());
+  QwtPlotCurve *curve = _plotCurve->curve;
+  GZ_ASSERT(curve != NULL, "Qwt curve is NULL");
+
+  CurveData *curveData = static_cast<CurveData *>(curve->data());
   const QPointF &lastPoint = curveData->samples().back();
 
   const bool doClip = !this->canvas()->testAttribute(Qt::WA_PaintOnScreen);
@@ -230,56 +308,66 @@ void IncrementalPlot::AdjustCurve(QwtPlotCurve *_curve)
     // performance issue. F.e. for Qt Embedded this reduces the
     // part of the backing store that has to be copied out - maybe
     // to an unaccelerated frame buffer device.
-    const QwtScaleMap xMap = this->canvasMap(_curve->xAxis());
-    const QwtScaleMap yMap = this->canvasMap(_curve->yAxis());
+    const QwtScaleMap xMap = this->canvasMap(curve->xAxis());
+    const QwtScaleMap yMap = this->canvasMap(curve->yAxis());
 
     QRegion clipRegion;
 
-    const QSize symbolSize = _curve->symbol()->size();
+    const QSize symbolSize = curve->symbol()->size();
     QRect r(0, 0, symbolSize.width() + 2, symbolSize.height() + 2);
 
     const QPointF center = QwtScaleMap::transform(xMap, yMap, lastPoint);
     r.moveCenter(center.toPoint());
     clipRegion += r;
 
-    this->directPainter->setClipRegion(clipRegion);
+    this->dataPtr->directPainter->setClipRegion(clipRegion);
   }
 
   this->setAxisScale(this->xBottom,
-      std::max(0.0, static_cast<double>(lastPoint.x() - this->period)),
+      std::max(0.0, static_cast<double>(lastPoint.x() - this->dataPtr->period)),
       std::max(1.0, static_cast<double>(lastPoint.x())));
 
-  // this->setAxisScale(_curve->yAxis(), 0.0, _curve->maxYValue() * 2.0);
+  // this->setAxisScale(curve->yAxis(), 0.0, curve->maxYValue() * 2.0);
 
   // this->setAxisAutoScale(this->yRight, true);
   // this->setAxisAutoScale(this->yLeft, true);
 
-  this->directPainter->drawSeries(_curve,
+  this->dataPtr->directPainter->drawSeries(curve,
       curveData->size() - 1, curveData->size() - 1);
 
   this->replot();
 }
 
 /////////////////////////////////////////////////
-QwtPlotCurve *IncrementalPlot::AddCurve(const QString &_label)
+PlotCurve *IncrementalPlot::AddCurve(const std::string &_label)
 {
-  QwtPlotCurve *curve = new QwtPlotCurve(_label);
+  QwtPlotCurve *curve = new QwtPlotCurve(QString::fromStdString(_label));
 
   curve->setStyle(QwtPlotCurve::Lines);
   curve->setData(new CurveData());
 
-  // Delete an old curve if it exists.
-  if (this->curves.find(_label) != this->curves.end())
+  PlotCurve *plotCurve = this->FindCurve(_label);
+  if (plotCurve != NULL)
   {
-    CurveData *curveData = static_cast<CurveData*>(
-        this->curves[_label]->data());
+    return plotCurve;
+    /*CurveData *curveData = static_cast<CurveData*>(plotCurve->curve->data());
     curveData->Clear();
-    delete this->curves[_label];
+    delete plotCurve->curve;
+    delete plotCurve;*/
   }
 
-  this->curves[_label] = curve;
+  // Delete an old curve if it exists.
+/*  if (this->dataPtr->curves.find(_label) != this->dataPtr->curves.end())
+  {
+    CurveData *curveData = static_cast<CurveData*>(
+        this->dataPtr->curves[_label]->data());
+    curveData->Clear();
+    delete this->dataPtr->curves[_label];
+  }
 
-  QColor penColor = Colors[(this->curves.size()-1) % ColorCount];
+  this->dataPtr->curves[_label] = curve;*/
+
+  QColor penColor = Colors[(this->dataPtr->curves.size()-1) % ColorCount];
 
   /// \todo The following will add the curve to the right hand axis. Need
   /// a better way to do this based on user input.
@@ -297,22 +385,34 @@ QwtPlotCurve *IncrementalPlot::AddCurve(const QString &_label)
 
   curve->attach(this);
 
-  return curve;
+  plotCurve = new PlotCurve;
+  plotCurve->id = IncrementalPlotPrivate::globalCurveId++;
+  plotCurve->label = _label;
+  plotCurve->curve = curve;
+
+  this->dataPtr->curves[plotCurve->id] = plotCurve;
+
+  return plotCurve;
 }
 
 /////////////////////////////////////////////////
-void IncrementalPlot::Clear(const QString &_label)
+void IncrementalPlot::Clear(const std::string &_label)
 {
-  CurveMap::iterator iter = this->curves.find(_label);
+/*  CurveMap::iterator iter = this->dataPtr->curves.find(_label);
 
-  if (iter == this->curves.end())
+  if (iter == this->dataPtr->curves.end())
+    return;*/
+
+  PlotCurve *plotCurve = this->FindCurve(_label);
+  if (!plotCurve)
     return;
 
-  CurveData *curveData = static_cast<CurveData *>(iter->second->data());
+  CurveData *curveData = static_cast<CurveData *>(plotCurve->curve->data());
   curveData->Clear();
 
-  delete iter->second;
-  this->curves.erase(iter);
+  this->dataPtr->curves.erase(plotCurve->id);
+  delete plotCurve->curve;
+  delete plotCurve;
 
   this->replot();
 }
@@ -320,15 +420,23 @@ void IncrementalPlot::Clear(const QString &_label)
 /////////////////////////////////////////////////
 void IncrementalPlot::Clear()
 {
-  for (CurveMap::iterator iter = this->curves.begin();
-       iter != this->curves.end(); ++iter)
+/*  for (CurveMap::iterator iter = this->dataPtr->curves.begin();
+       iter != this->dataPtr->curves.end(); ++iter)
   {
     CurveData *curveData = static_cast<CurveData *>(iter->second->data());
     curveData->Clear();
     delete iter->second;
+  }*/
+
+  for (auto &c : this->dataPtr->curves)
+  {
+    CurveData *curveData = static_cast<CurveData *>(c.second->curve->data());
+    curveData->Clear();
+    delete c.second->curve;
+    delete c.second;
   }
 
-  this->curves.clear();
+  this->dataPtr->curves.clear();
 
   this->replot();
 }
@@ -353,36 +461,85 @@ void IncrementalPlot::dragEnterEvent(QDragEnterEvent *_evt)
 }
 
 /////////////////////////////////////////////////
-bool IncrementalPlot::HasCurve(const QString &_label)
-{
-  return this->curves.find(_label) != this->curves.end();
-}
-
-/////////////////////////////////////////////////
 void IncrementalPlot::dropEvent(QDropEvent *_evt)
 {
   QString name = _evt->mimeData()->data("application/x-item");
-  this->AddCurve(name);
+  this->AddCurve(name.toStdString());
+}
+
+/////////////////////////////////////////////////
+bool IncrementalPlot::HasCurve(const std::string &_label)
+{
+  return this->FindCurve(_label) != NULL;
 }
 
 /////////////////////////////////////////////////
 void IncrementalPlot::Update()
 {
-  for (CurveMap::iterator iter = this->curves.begin();
-       iter != this->curves.end(); ++iter)
+/*  for (CurveMap::iterator iter = this->dataPtr->curves.begin();
+       iter != this->dataPtr->curves.end(); ++iter)
   {
     this->AdjustCurve(iter->second);
+  }*/
+  for (auto &c : this->dataPtr->curves)
+  {
+    this->AdjustCurve(c.second);
   }
 }
 
 /////////////////////////////////////////////////
-void IncrementalPlot::SetPeriod(unsigned int _seconds)
+void IncrementalPlot::SetPeriod(const unsigned int _seconds)
 {
-  this->period = _seconds;
+  this->dataPtr->period = _seconds;
 }
 
 /////////////////////////////////////////////////
-void IncrementalPlot::Attach(QwtPlotCurve *_curve)
+void IncrementalPlot::AttachCurve(PlotCurve *_plotCurve)
 {
-  _curve->attach(this);
+  std::cerr << " attach curve? " << std::endl;
+  if (!_plotCurve || !_plotCurve->curve)
+    return;
+
+  std::cerr << " attach curve done !!" << _plotCurve->label << std::endl;
+  _plotCurve->curve->attach(this);
+  this->dataPtr->curves[_plotCurve->id] = _plotCurve;
+}
+
+/////////////////////////////////////////////////
+PlotCurve *IncrementalPlot::DetachCurve(const unsigned int _id)
+{
+
+  std::cerr << " detaching " << _id << std::endl;
+  for (auto &c : this->dataPtr->curves)
+  {
+    std::cerr << " << " << c.first << std::endl;
+  }
+
+  PlotCurve *plotCurve =  this->FindCurve(_id);
+
+  if (!plotCurve || !plotCurve->curve)
+  {
+    std::cerr << " detach curve id not found " << _id << std::endl;
+    return NULL;
+  }
+
+  plotCurve->curve->detach();
+  this->dataPtr->curves.erase(_id);
+  return plotCurve;
+}
+
+/////////////////////////////////////////////////
+void IncrementalPlot::RemoveCurve(unsigned int _id)
+{
+  auto it = this->dataPtr->curves.find(_id);
+
+  if (!it->second || !it->second->curve)
+    return;
+
+  it->second->curve->detach();
+
+  delete it->second->curve;
+  delete it->second;
+
+  this->dataPtr->curves.erase(it);
 }

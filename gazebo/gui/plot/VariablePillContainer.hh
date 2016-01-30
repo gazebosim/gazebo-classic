@@ -44,6 +44,10 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~VariablePillContainer();
 
+      /// \brief Get the unique id of this variable pill container.
+      /// \return Unique id;
+      public: unsigned int Id() const;
+
       /// \brief Set the label text for this variable pill container.
       /// \param[in] _text Text to set the label to.
       public: void SetText(const std::string &_text);
@@ -70,6 +74,10 @@ namespace gazebo
       /// \return Number of child variable pills.
       public: unsigned int VariablePillCount() const;
 
+      /// \brief Set the selected state of a variable pill
+      /// \param[in] _variable Variable pill to set the selected state.
+      public: void SetSelected(VariablePill *_variable);
+
       /// \brief Used to accept drag enter events.
       /// \param[in] _evt The drag event.
       protected: void dragEnterEvent(QDragEnterEvent *_evt);
@@ -78,15 +86,52 @@ namespace gazebo
       /// \param[in] _evt The drop event.
       protected: void dropEvent(QDropEvent *_evt);
 
+      /// \brief Qt callback when a key is pressed.
+      /// \param[in] _event Qt key event.
+      protected: virtual void keyPressEvent(QKeyEvent *_event);
+
+      /// \brief Qt callback when the mouse is released.
+      /// \param[in] _event Qt mouse event.
+      protected: void mouseReleaseEvent(QMouseEvent *_event);
+
       /// \brief Qt signal emitted when a variable is added to the container
-      /// \param[in] Unique id of the variable pill.
+      /// \param[in] _id Unique id of the variable pill.
+      /// \param[in] _targetId Unique id of the target variable pill that this
+      /// variable is added to. VariablePill::EMPTY_ID if it is added to a
+      /// container and not a variable pill.
       /// \param[in] Name of variable pill added.
-      Q_SIGNALS: void VariableAdded(const unsigned int ,
-          const std::string &_name);
+      Q_SIGNALS: void VariableAdded(const unsigned int _id,
+          const unsigned int _targetId, const std::string &_name);
 
       /// \brief Qt signal emitted when a variable is removed from the container
-      /// \param[in] Name of variable pill removed.
-      Q_SIGNALS: void VariableRemoved(const unsigned int);
+      /// \param[in] _id Unique id of the variable pill.
+      /// \param[in] _targetId Unique id of the target variable pill that this
+      /// variable is removed from. VariablePill::EMPTY_ID if it is removed
+      /// from a container and not a variable pill.
+      Q_SIGNALS: void VariableRemoved(const unsigned int _id,
+          const unsigned int _targetId);
+
+      /// \brief Qt signal emitted when a variable is moved into the container.
+      /// \param[in] _id Unique id of the variable pill.
+      /// \param[in] _targetId Unique id of the target variable pill that this
+      /// variable has moved to. VariablePill::EMPTY_ID if it moved to a
+      /// container and not a variable pill.
+      Q_SIGNALS: void VariableMoved(const unsigned int _id,
+          const unsigned int _targetId);
+
+      /// \brief Qt Callback when a variable has been added to another variable.
+      /// \param[in] _id Unique id of the added variable.
+      /// \param[in] _label Name of the added variable.
+      private slots: void OnAddVariable(const unsigned int _id,
+          const std::string &_label);
+
+      /// \brief Qt Callback when a variable has been removed.
+      /// \param[_id] _id Unique id of the removed variable.
+      private slots: void OnRemoveVariable(const unsigned int _id);
+
+      /// \brief Qt Callback when a variable has moved into another variable.
+      /// \param[_id] _id Unique id of the variable that has moved.
+      private slots: void OnMoveVariable(const unsigned int _id);
 
       /// \internal
       /// \brief Private data pointer

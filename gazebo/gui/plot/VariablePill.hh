@@ -21,6 +21,8 @@
 #include <memory>
 #include <string>
 
+#include <ignition/math/Helpers.hh>
+
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
 
@@ -85,6 +87,10 @@ namespace gazebo
       /// \return Number of child variable pills.
       public: unsigned int VariablePillCount() const;
 
+      /// \brief Set the selected state of this variable pill
+      /// \param[in] _selected True to set the state to be selected.
+      public: void SetSelected(const bool _selected);
+
       /// \brief Used to accept drag enter events.
       /// \param[in] _evt The drag event.
       protected: void dragEnterEvent(QDragEnterEvent *_evt);
@@ -108,12 +114,20 @@ namespace gazebo
       /// \brief Qt signal emitted when a child variable pill is added
       /// \param[in] Unique id of the child variable pill.
       /// \param[in] Name of variable pill added.
-      Q_SIGNALS: void VariableAdded(const unsigned int ,
+      Q_SIGNALS: void VariableAdded(const unsigned int _id,
           const std::string &_name);
 
       /// \brief Qt signal emitted when a child variable pill is removed.
       /// \param[in] Name of child variable pill removed.
-      Q_SIGNALS: void VariableRemoved(const unsigned int);
+      Q_SIGNALS: void VariableRemoved(const unsigned int _id);
+
+      /// \brief Qt signal emitted when an existing variable pill is added
+      /// as a child of this variable pill
+      /// \param[in] Unique id of the existing variable pill that is added.
+      Q_SIGNALS: void VariableMoved(const unsigned int _id);
+
+      /// \brief Destructor
+      public: const static unsigned int EMPTY_ID = IGN_UINT32_MAX;
 
       /// \internal
       /// \brief Private data pointer

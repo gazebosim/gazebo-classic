@@ -62,20 +62,20 @@ namespace gazebo
       public: unsigned int id;
 
       /// \brief Global id incremented on every new variable pill
-      public: static unsigned int globalId;
+      public: static unsigned int globalVariableId;
     };
   }
 }
 
-// global unique id
-unsigned int VariablePillPrivate::globalId = 0;
+// global variable id counter
+unsigned int VariablePillPrivate::globalVariableId = 0;
 
 /////////////////////////////////////////////////
 VariablePill::VariablePill(QWidget *_parent)
   : QWidget(_parent),
     dataPtr(new VariablePillPrivate)
 {
-  this->dataPtr->id = VariablePillPrivate::globalId++;
+  this->dataPtr->id = VariablePillPrivate::globalVariableId++;
 
   // label
   this->dataPtr->label = new QLabel;
@@ -100,13 +100,12 @@ VariablePill::VariablePill(QWidget *_parent)
   this->dataPtr->multiLayout->addWidget(this->dataPtr->multiLabel);
   this->dataPtr->multiLayout->addLayout(this->dataPtr->singleLayout);
 
+  this->SetSelected(false);
+
   QHBoxLayout *mainLayout = new QHBoxLayout;
   mainLayout->addLayout(this->dataPtr->multiLayout);
-//  mainLayout->addLayout(this->dataPtr->variableLayout);
   this->setLayout(mainLayout);
 
-  this->setAutoFillBackground(true);
-//  this->setFrameShape(QFrame::Panel);
   this->setAcceptDrops(true);
 }
 
@@ -184,21 +183,20 @@ void VariablePill::AddVariablePill(VariablePill *_variable)
     // becomes multi-variable pill
     this->SetParent(this);
     // enable multi-variable mode
-    // this->dataPtr->multiLabel->setVisible(true);
     this->SetMultiVariableMode(true);
   }
 
   _variable->SetParent(this);
+  _variable->setVisible(true);
   _variable->SetContainer(this->dataPtr->container);
   this->dataPtr->variables[_variable->Id()] = _variable;
   this->dataPtr->variableLayout->addWidget(_variable);
 
-  std::cerr << " -- add " << _variable->Text() <<
-    " to variable " << this->dataPtr->label->text().toStdString() << std::endl;
+  std::cerr << " -- add " << _variable->Text()
+      << " to variable " << this->dataPtr->label->text().toStdString()
+      << std::endl;
 
   emit VariableAdded(_variable->Id(), _variable->Text());
-
-  // this->variables.push_back();
 }
 
 /////////////////////////////////////////////////
@@ -214,24 +212,31 @@ void VariablePill::RemoveVariablePill(VariablePill *_variable)
       VariablePill *newMultiVariable =
           qobject_cast<VariablePill *>(item->widget());
       newMultiVariable->SetParent(NULL);
+      newMultiVariable->blockSignals(true);
       while (this->dataPtr->variableLayout->count() > 0)
       {
         QLayoutItem *it = this->dataPtr->variableLayout->takeAt(0);
         VariablePill *var = qobject_cast<VariablePill *>(it->widget());
 
-//        this->RemoveVariablePill(var);
         newMultiVariable->AddVariablePill(var);
       }
+      newMultiVariable->blockSignals(false);
+      this->dataPtr->container->blockSignals(true);
       this->dataPtr->container->AddVariablePill(newMultiVariable);
+      this->dataPtr->container->blockSignals(false);
     }
-    this->dataPtr->container->RemoveVariablePill(this);
+    VariablePillContainer *tmpContainer =  this->dataPtr->container;
+    tmpContainer->blockSignals(true);
+    tmpContainer->RemoveVariablePill(this);
+    tmpContainer->blockSignals(false);
     this->dataPtr->parent = NULL;
     this->dataPtr->container = NULL;
     this->dataPtr->variables.clear();
     this->SetMultiVariableMode(false);
 
-      std::cerr << " -- remove!! " << _variable->Text() <<
-    " from variable " << this->dataPtr->label->text().toStdString() << std::endl;
+      std::cerr << " -- remove self " << _variable->Text()
+          << " from variable " << this->dataPtr->label->text().toStdString()
+          << std::endl;
 
     emit VariableRemoved(_variable->Id());
 
@@ -243,6 +248,7 @@ void VariablePill::RemoveVariablePill(VariablePill *_variable)
   if (idx == -1)
     return;
 
+  _variable->setVisible(false);
   _variable->SetParent(NULL);
   _variable->SetContainer(NULL);
   this->dataPtr->variableLayout->takeAt(idx);
@@ -253,14 +259,13 @@ void VariablePill::RemoveVariablePill(VariablePill *_variable)
   {
     this->SetParent(NULL);
     this->SetMultiVariableMode(false);
-    std::cerr << this->dataPtr->label->text().toStdString() << " bb SetMultiVariableMode(false) " << std::endl;
   }
 
   emit VariableRemoved(_variable->Id());
 
-      std::cerr << " -- remove " << _variable->Text() <<
-    " from variable " << this->dataPtr->label->text().toStdString() << std::endl;
-
+  std::cerr << " -- remove " << _variable->Text()
+      << " from variable " << this->dataPtr->label->text().toStdString()
+      << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -316,12 +321,18 @@ void VariablePill::dropEvent(QDropEvent *_evt)
     QString dataStr = _evt->mimeData()->data("application/x-item");
     VariablePill *variable = new VariablePill;
     variable->SetText(dataStr.toStdString());
+
+    connect(variable, SIGNAL(VariableMoved(unsigned int)),
+        this->Container(), SLOT(OnMoveVariable(unsigned int)));
+    connect(variable, SIGNAL(VariableAdded(unsigned int, std::string)),
+        this->Container(), SLOT(OnAddVariable(unsigned int, std::string)));
+    connect(variable, SIGNAL(VariableRemoved(unsigned int)),
+        this->Container(), SLOT(OnRemoveVariable(unsigned int)));
+
     this->AddVariablePill(variable);
   }
   else   if (_evt->mimeData()->hasFormat("application/x-pill-item"))
   {
-    QString dataStr = _evt->mimeData()->data("application/x--pill-item");
-
     VariablePill *variable = qobject_cast<VariablePill *>(_evt->source());
     if (!variable)
     {
@@ -329,15 +340,30 @@ void VariablePill::dropEvent(QDropEvent *_evt)
       return;
     }
 
-    std::cerr << " pill name is " << variable->Text() << std::endl;
+    VariablePill *parentVariable = variable->Parent();
+    if (parentVariable)
+    {
+      parentVariable->blockSignals(true);
+      parentVariable->RemoveVariablePill(variable);
+      parentVariable->blockSignals(false);
+    }
 
-    if (variable->Parent())
-      variable->Parent()->RemoveVariablePill(variable);
+    VariablePillContainer *container = variable->Container();
+    if (container)
+    {
+      container->blockSignals(true);
+      container->RemoveVariablePill(variable);
+      container->blockSignals(false);
+    }
 
-    if (variable->Container())
-      variable->Container()->RemoveVariablePill(variable);
-
+    this->blockSignals(true);
     this->AddVariablePill(variable);
+    this->blockSignals(false);
+
+    std::cerr << "VariablePill::VariableMoved " << variable->Text() << " " <<
+        variable->Id() << std::endl;
+
+    emit VariableMoved(variable->Id());
   }
 }
 
@@ -358,14 +384,12 @@ void VariablePill::mouseMoveEvent(QMouseEvent *_event)
        < QApplication::startDragDistance())
       return;
 
-
   QLabel *child = static_cast<QLabel *>(
       this->childAt(this->dataPtr->dragStartPosition));
+
+  // prevent dragging by the multi-variable label
   if (child == this->dataPtr->multiLabel)
-  {
-    std::cerr << " is multi label " << std::endl;
     return;
-  }
 
   QDrag *drag = new QDrag(this);
   QMimeData *mimeData = new QMimeData;
@@ -381,4 +405,13 @@ void VariablePill::mouseMoveEvent(QMouseEvent *_event)
 unsigned int VariablePill::VariablePillCount() const
 {
   return this->dataPtr->variables.size();
+}
+
+/////////////////////////////////////////////////
+void VariablePill::SetSelected(const bool _selected)
+{
+  if (_selected)
+    this->setStyleSheet("background-color: #005fab; border: 1px solid blue");
+  else
+    this->setStyleSheet("background-color: #005fab; border: 0px");
 }
