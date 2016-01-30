@@ -31,6 +31,9 @@ namespace gazebo
 
       /// \brief Mutex for protecting the image.
       public: std::mutex mutex;
+
+      /// \brief Depth camera image data buffer.
+      public: float *depthBuffer = NULL;
     };
   }
 }

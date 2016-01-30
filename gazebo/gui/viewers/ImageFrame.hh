@@ -17,6 +17,8 @@
 #ifndef _GAZEBO_GUI_IMAGEFRAME_HH_
 #define _GAZEBO_GUI_IMAGEFRAME_HH_
 
+#include <memory>
+
 #include "gazebo/gui/qt.h"
 #include "gazebo/msgs/msgs.hh"
 
@@ -47,7 +49,7 @@ namespace gazebo
       protected: void paintEvent(QPaintEvent *_event);
 
       /// \brief Pointer to private data
-      private: ImageFramePrivate *dataPtr;
+      private: std::unique_ptr<ImageFramePrivate> dataPtr;
     };
   }
 }

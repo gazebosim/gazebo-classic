@@ -31,8 +31,8 @@ ImageFrame::ImageFrame(QWidget *_parent)
 /////////////////////////////////////////////////
 ImageFrame::~ImageFrame()
 {
-  delete this->dataPtr;
-  this->dataPtr = NULL;
+  if (this->dataPtr->depthBuffer)
+    delete [] this->dataPtr->depthBuffer;
 }
 
 /////////////////////////////////////////////////
@@ -108,14 +108,19 @@ void ImageFrame::OnImage(const msgs::Image &_msg)
     float f;
     // cppchecker recommends using sizeof(varname)
     unsigned int depthBufferSize = depthSamples * sizeof(f);
-    float *depthBuffer = new float[depthSamples];
-    memcpy(depthBuffer, _msg.data().c_str(), depthBufferSize);
+
+    if (!this->dataPtr->depthBuffer)
+      this->dataPtr->depthBuffer = new float[depthSamples];
+    memcpy(this->dataPtr->depthBuffer, _msg.data().c_str(), depthBufferSize);
 
     float maxDepth = 0;
     for (unsigned int i = 0; i < _msg.height() * _msg.width(); ++i)
     {
-      if (depthBuffer[i] > maxDepth && !std::isinf(depthBuffer[i]))
-        maxDepth = depthBuffer[i];
+      if (this->dataPtr->depthBuffer[i] > maxDepth &&
+          !std::isinf(this->dataPtr->depthBuffer[i]))
+      {
+        maxDepth = this->dataPtr->depthBuffer[i];
+      }
     }
     unsigned int idx = 0;
     double factor = 255 / maxDepth;
@@ -123,14 +128,12 @@ void ImageFrame::OnImage(const msgs::Image &_msg)
     {
       for (unsigned int i = 0; i < _msg.width(); i++)
       {
-        float d = depthBuffer[idx++];
+        float d = this->dataPtr->depthBuffer[idx++];
         d = 255 - (d * factor);
         QRgb value = qRgb(d, d, d);
         this->dataPtr->image.setPixel(i, j, value);
       }
     }
-
-    delete [] depthBuffer;
   }
   else
   {
