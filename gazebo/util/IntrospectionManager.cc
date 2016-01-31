@@ -168,7 +168,6 @@ void IntrospectionManager::Update()
   {
     auto &item = observedItem.first;
     auto &lastValue = observedItem.second.lastValue;
-    auto &filters = observedItem.second.filters;
 
     // Update the values of the items under observation.
     auto &callback = this->dataPtr->allItems[item].cb;
@@ -197,7 +196,8 @@ void IntrospectionManager::Update()
     // Insert the last value of each item under observation for this filter.
     for (auto const &item : filter.second.items)
     {
-      auto nextValue = this->dataPtr->observedItems[item].lastValue;
+      auto nextParam = filter.second.msg.add_param();
+      nextParam->CopyFrom(this->dataPtr->observedItems[item].lastValue);
     }
   }
 }

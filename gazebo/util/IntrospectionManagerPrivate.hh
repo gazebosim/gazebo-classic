@@ -23,6 +23,7 @@
 #include <mutex>
 #include <string>
 #include <vector>
+#include <ignition/transport.hh>
 #include "gazebo/msgs/any.pb.h"
 #include "gazebo/msgs/param_v.pb.h"
 #include "gazebo/util/IntrospectionManager.hh"
@@ -85,6 +86,9 @@ namespace gazebo
 
       /// \brief Mutex to make this class thread-safe.
       public: std::mutex mutex;
+
+      /// \brief Node used for communications.
+      public: ignition::transport::Node node;
     };
   }
 }
