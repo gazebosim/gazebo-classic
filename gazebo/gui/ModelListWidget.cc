@@ -821,11 +821,6 @@ void ModelListWidget::AtmospherePropertyChanged(QtProperty */*_item*/)
       msg.set_pressure(this->dataPtr->variantManager->value(
             (*iter)).toDouble());
     }
-    else if ((*iter)->propertyName().toStdString() == "mass_density")
-    {
-      msg.set_mass_density(this->dataPtr->variantManager->value(
-            (*iter)).toDouble());
-    }
   }
 
   msg.set_type(this->dataPtr->atmosphereType);
@@ -2874,6 +2869,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Atmosphere &_msg,
         item, "decimals", 6);
   if (_msg.has_mass_density())
     item->setValue(_msg.mass_density());
+  item->setEnabled(false);
   this->dataPtr->propTreeBrowser->addProperty(item);
 }
 

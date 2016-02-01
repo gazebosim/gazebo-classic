@@ -84,10 +84,6 @@ namespace gazebo
       /// \param[in] _pressure Pressure in pascals.
       public: virtual void SetPressure(const double _pressure);
 
-      /// \brief Set the mass density of the air at sea level.
-      /// \param[in] _massDensity Mass density of the air in kg/m^3.
-      public: virtual void SetMassDensity(const double _massDensity);
-
       /// \brief Get the actual modeled temperature in kelvins at a given
       /// altitude.
       /// \param[in] _altitude Altitude above sea level in meters.
@@ -115,6 +111,11 @@ namespace gazebo
       /// \return Temperature gradient at sea level in K/m.
       public: double TemperatureGradient() const;
 
+      /// \brief Update the mass density of the air at sea level using the
+      /// ideal gas law.
+      /// See https://en.wikipedia.org/wiki/Ideal_gas_law
+      protected: void UpdateMassDensity();
+
       /// \brief Return the world.
       /// \return Pointer to the world.
       protected: WorldPtr World() const;
@@ -122,6 +123,12 @@ namespace gazebo
       /// \brief Publish response.
       /// Publish response to a request.
       protected: void Publish(const msgs::Response &_msg) const;
+
+      /// \brief Molar mass of the air in kg/mol
+      public: static const double MOLAR_MASS;
+
+      /// \brief Universal ideal gas constant in J/(mol.K)
+      public: static const double IDEAL_GAS_CONSTANT_R;
 
       /// \internal
       /// \brief Private data pointer.

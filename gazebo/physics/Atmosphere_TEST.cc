@@ -105,14 +105,11 @@ void AtmosphereTest::AtmosphereParam(const std::string &_atmosphere)
   physics::AtmospherePtr atmosphere = world->Atmosphere();
   double temperature = 0.02;
   double pressure = 0.03;
-  double massDensity = 0.04;
   double temperatureGradient = 0.05;
   atmosphere->SetTemperature(temperature);
   EXPECT_NEAR(atmosphere->Temperature(), temperature, 1e-6);
   atmosphere->SetPressure(pressure);
   EXPECT_NEAR(atmosphere->Pressure(), pressure, 1e-6);
-  atmosphere->SetMassDensity(massDensity);
-  EXPECT_NEAR(atmosphere->MassDensity(), massDensity, 1e-6);
   atmosphere->SetTemperatureGradient(temperatureGradient);
   EXPECT_NEAR(atmosphere->TemperatureGradient(), temperatureGradient, 1e-6);
 

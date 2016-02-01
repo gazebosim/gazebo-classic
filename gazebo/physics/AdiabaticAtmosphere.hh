@@ -64,16 +64,10 @@ namespace gazebo
       public: virtual double Temperature(const double _altitude = 0.0) const;
 
       // Documentation inherited
-      virtual double Pressure(const double _altitude = 0.0) const;
+      public: virtual double Pressure(const double _altitude = 0.0) const;
 
       // Documentation inherited
       public: double MassDensity(const double _altitude = 0.0) const;
-
-      /// \brief Molar mass of the air in kg/mol
-      public: static const double MOLAR_MASS;
-
-      /// \brief Universal ideal gas constant in J/(mol.K)
-      public: static const double IDEAL_GAS_CONSTANT_R;
 
       /// \internal
       /// \brief Private data pointer.

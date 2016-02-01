@@ -36,9 +36,6 @@ using namespace physics;
 
 GZ_REGISTER_ATMOSPHERE_MODEL("adiabatic", AdiabaticAtmosphere)
 
-const double AdiabaticAtmosphere::MOLAR_MASS = 0.0289644;
-const double AdiabaticAtmosphere::IDEAL_GAS_CONSTANT_R = 8.3144621;
-
 //////////////////////////////////////////////////
 AdiabaticAtmosphere::AdiabaticAtmosphere(WorldPtr _world)
   : Atmosphere(_world), dataPtr(new AdiabaticAtmospherePrivate)
@@ -59,9 +56,9 @@ void AdiabaticAtmosphere::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void AdiabaticAtmosphere::Init(void)
 {
-  this->dataPtr->adiabaticPower = MOLAR_MASS *
+  this->dataPtr->adiabaticPower = Atmosphere::MOLAR_MASS *
       this->World()->GetPhysicsEngine()->GetGravity().GetLength() /
-      (-Atmosphere::TemperatureGradient() * IDEAL_GAS_CONSTANT_R);
+      (-Atmosphere::TemperatureGradient() * Atmosphere::IDEAL_GAS_CONSTANT_R);
 }
 
 //////////////////////////////////////////////////
@@ -111,9 +108,6 @@ void AdiabaticAtmosphere::OnAtmosphereMsg(ConstAtmospherePtr &_msg)
 
   if (_msg->has_pressure())
     this->SetPressure(_msg->pressure());
-
-  if (_msg->has_mass_density())
-    this->SetMassDensity(_msg->mass_density());
 }
 
 //////////////////////////////////////////////////

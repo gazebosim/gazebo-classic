@@ -35,15 +35,14 @@
 using namespace gazebo;
 using namespace physics;
 
+const double Atmosphere::MOLAR_MASS = 0.0289644;
+const double Atmosphere::IDEAL_GAS_CONSTANT_R = 8.3144621;
+
 //////////////////////////////////////////////////
 Atmosphere::Atmosphere(WorldPtr _world)
   : dataPtr(new AtmospherePrivate)
 {
   this->dataPtr->world = _world;
-  this->dataPtr->temperature = 288.15;
-  this->dataPtr->temperatureGradient = -0.0065;
-  this->dataPtr->pressure = 101325;
-  this->dataPtr->massDensity = 1.225;
 
   this->dataPtr->sdf.reset(new sdf::Element);
   sdf::initFile("atmosphere.sdf", this->dataPtr->sdf);
@@ -87,12 +86,6 @@ void Atmosphere::Load(sdf::ElementPtr _sdf)
     this->dataPtr->pressure =
         this->dataPtr->sdf->GetElement("pressure")->Get<double>();
   }
-
-  if (this->dataPtr->sdf->HasElement("mass_density"))
-  {
-    this->dataPtr->massDensity =
-        this->dataPtr->sdf->GetElement("mass_density")->Get<double>();
-  }
 }
 
 //////////////////////////////////////////////////
@@ -127,6 +120,7 @@ void Atmosphere::OnAtmosphereMsg(ConstAtmospherePtr &/*_msg*/)
 void Atmosphere::SetTemperature(const double _temperature)
 {
   this->dataPtr->temperature = _temperature;
+  this->UpdateMassDensity();
 }
 
 //////////////////////////////////////////////////
@@ -139,18 +133,13 @@ void Atmosphere::SetTemperatureGradient(const double _gradient)
 void Atmosphere::SetPressure(const double _pressure)
 {
   this->dataPtr->pressure = _pressure;
+  this->UpdateMassDensity();
 }
 
 //////////////////////////////////////////////////
 double Atmosphere::Temperature(const double /*_altitude*/) const
 {
   return this->dataPtr->temperature;
-}
-
-//////////////////////////////////////////////////
-void Atmosphere::SetMassDensity(const double _massDensity)
-{
-  this->dataPtr->massDensity = _massDensity;
 }
 
 //////////////////////////////////////////////////
@@ -181,4 +170,12 @@ WorldPtr Atmosphere::World() const
 void Atmosphere::Publish(const msgs::Response &_msg) const
 {
   this->dataPtr->responsePub->Publish(_msg);
+}
+
+//////////////////////////////////////////////////
+void Atmosphere::UpdateMassDensity()
+{
+  this->dataPtr->massDensity = Atmosphere::Pressure() *
+    Atmosphere::MOLAR_MASS /
+    (Atmosphere::IDEAL_GAS_CONSTANT_R * Atmosphere::Temperature());
 }
