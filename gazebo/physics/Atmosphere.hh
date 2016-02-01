@@ -99,18 +99,20 @@ namespace gazebo
       /// \return Pressure in pascals at the specified altitude.
       public: virtual double Pressure(const double _altitude = 0.0) const;
 
-      /// \brief Get the density in kg/m^3 at a given altitude in meters.
+      /// \brief Get the density in kg/m^3 at a given altitude.
       /// \param[in] _altitude Altitude above sea level in meters.
       /// \return Density in kg/m^3 at the specified altitude.
       public: virtual double MassDensity(const double _altitude = 0.0) const;
 
-      /// \brief Set the temperature gradient dT/dZ around sea level
+      /// \brief Set the temperature gradient dT/dZ with respect to increasing
+      /// altitude around sea level.
       /// \param[in] _gradient Value of the temperature gradient dT/dZ around
-      /// sea level [K/m]
+      /// sea level in K/m.
       public: virtual void SetTemperatureGradient(const double _gradient) = 0;
 
-      /// \brief Get the sea level temperature gradient.
-      /// \return Temperature gradient at sea level.
+      /// \brief Get the sea level temperature gradient with respect to
+      /// increasing altitude.
+      /// \return Temperature gradient at sea level in K/m.
       public: double TemperatureGradient() const;
 
       /// \brief Return the world.
