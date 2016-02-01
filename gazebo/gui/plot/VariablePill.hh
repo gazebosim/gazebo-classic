@@ -22,6 +22,7 @@
 #include <string>
 
 #include <ignition/math/Helpers.hh>
+#include <ignition/math/Vector2.hh>
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
@@ -87,9 +88,22 @@ namespace gazebo
       /// \return Number of child variable pills.
       public: unsigned int VariablePillCount() const;
 
+      /// \brief Get the a child variable pill
+      /// \param[in] _index Index of the child variable pill.
+      public: std::map<unsigned int, VariablePill *> &VariablePills() const;
+
       /// \brief Set the selected state of this variable pill
       /// \param[in] _selected True to set the state to be selected.
       public: void SetSelected(const bool _selected);
+
+      /// \brief Return the selected state of this variable pill
+      /// \return Selected state.
+      public: bool IsSelected() const;
+
+      /// \brief Check if a point is inside the widget.
+      /// \param[in] _pt Point to check.
+      /// \return True if the point is inside the widget.
+      public: bool ContainsPoint(const ignition::math::Vector2i &_pt) const;
 
       /// \brief Used to accept drag enter events.
       /// \param[in] _evt The drag event.
@@ -101,11 +115,15 @@ namespace gazebo
 
       /// \brief Qt mouse press event.
       /// \param[in] _event Qt mouse event.
-      private: void mouseMoveEvent(QMouseEvent *_event);
+      protected: void mouseMoveEvent(QMouseEvent *_event);
 
       /// \brief Qt mouse move event.
       /// \param[in] _event Qt mouse event.
-      private: void mousePressEvent(QMouseEvent *_event);
+      protected: void mousePressEvent(QMouseEvent *_event);
+
+      /// \brief Qt callback when the mouse is released.
+      /// \param[in] _event Qt mouse event.
+      // protected: void mouseReleaseEvent(QMouseEvent *_event);
 
       /// \brief Set whether to enable multi-variable mode
       /// \param[in] _enable True to enable multi-variable mode.

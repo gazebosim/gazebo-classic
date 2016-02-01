@@ -286,18 +286,61 @@ void VariablePillContainer::keyPressEvent(QKeyEvent *_event)
 }
 
 /////////////////////////////////////////////////
-void VariablePillContainer::mouseReleaseEvent(QMouseEvent */*_event*/)
+void VariablePillContainer::mouseReleaseEvent(QMouseEvent *_event)
 {
+  this->SetSelected(NULL);
+
+  bool selected = false;
   for (const auto v : this->dataPtr->variables)
   {
-    if (v.second->underMouse())
+    // look for the selected variable widget if not already found
+    QPoint point = v.second->mapFromParent(_event->pos());
+    if (!selected)
     {
-      this->SetSelected(v.second);
-      this->setFocus();
-    std::cerr << " ==== receivers " << receivers(SIGNAL(VariableMoved(unsigned int)))
-        << std::endl;
-      break;
+      ignition::math::Vector2i pt(point.x(), point.y());
+      if (v.second->ContainsPoint(pt))
+      {
+        this->SetSelected(v.second);
+        this->setFocus();
+        selected = true;
+      }
+      else
+      {
+        v.second->SetSelected(false);
+      }
     }
+    else
+    {
+      v.second->SetSelected(false);
+    }
+
+
+    // loop through children of multi-variable pills
+    for (const auto cv : v.second->VariablePills())
+    {
+      VariablePill *child = cv.second;
+
+      if (!selected)
+      {
+        QPoint childPoint = child->mapFromParent(point);
+        ignition::math::Vector2i childPt(childPoint.x(), childPoint.y());
+        if (child->ContainsPoint(childPt))
+        {
+          this->SetSelected(child);
+          this->setFocus();
+          selected = true;
+        }
+        else
+        {
+          child->SetSelected(false);
+        }
+      }
+      else
+      {
+        child->SetSelected(false);
+      }
+    }
+
   }
 }
 

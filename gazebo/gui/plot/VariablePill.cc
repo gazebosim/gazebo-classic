@@ -58,6 +58,9 @@ namespace gazebo
       /// \brief Starting position of the drag action.
       public: QPoint dragStartPosition;
 
+      /// \brief Selected state.
+      public: bool isSelected = false;
+
       /// \brief Unique id;
       public: unsigned int id;
 
@@ -84,6 +87,8 @@ VariablePill::VariablePill(QWidget *_parent)
 
   // child variable pills
   this->dataPtr->variableLayout = new QHBoxLayout;
+  this->dataPtr->variableLayout->setAlignment(Qt::AlignLeft);
+  this->dataPtr->variableLayout->setContentsMargins(0, 0, 0, 0);
 
   this->dataPtr->multiLayout = new QHBoxLayout;
   this->dataPtr->multiLayout->setAlignment(Qt::AlignLeft);
@@ -97,15 +102,23 @@ VariablePill::VariablePill(QWidget *_parent)
   this->dataPtr->singleLayout->setAlignment(Qt::AlignLeft);
   this->dataPtr->singleLayout->addLayout(labelLayout);
   this->dataPtr->singleLayout->addLayout(this->dataPtr->variableLayout);
-  this->dataPtr->multiLayout->addWidget(this->dataPtr->multiLabel);
+  this->dataPtr->singleLayout->setContentsMargins(0, 0, 0, 0);
   this->dataPtr->multiLayout->addLayout(this->dataPtr->singleLayout);
 
-  this->SetSelected(false);
-
   QHBoxLayout *mainLayout = new QHBoxLayout;
-  mainLayout->addLayout(this->dataPtr->multiLayout);
+  mainLayout->setContentsMargins(0, 0, 0, 0);
+  mainLayout->setAlignment(Qt::AlignLeft);
+
+  QFrame *mainFrame = new QFrame(this);
+  mainFrame->setLayout(this->dataPtr->multiLayout);
+
+//  mainFrame->setAutoFillBackground(true);
+  mainFrame->setStyleSheet("background-color: #1965b0; border-radius: 4px");
+
+  mainLayout->addWidget(mainFrame);
   this->setLayout(mainLayout);
 
+  this->SetSelected(false);
   this->setAcceptDrops(true);
 }
 
@@ -160,6 +173,10 @@ VariablePillContainer *VariablePill::Container() const
 void VariablePill::SetMultiVariableMode(const bool _enable)
 {
   this->dataPtr->multiLabel->setVisible(_enable);
+
+  int margin = _enable ? 2 : 0;
+  this->dataPtr->multiLayout->setContentsMargins(
+      margin, margin, margin, margin);
 }
 
 /////////////////////////////////////////////////
@@ -401,6 +418,38 @@ void VariablePill::mouseMoveEvent(QMouseEvent *_event)
   drag->exec(Qt::MoveAction);
 }
 
+/*/////////////////////////////////////////////////
+void VariablePill::mouseReleaseEvent(QMouseEvent *_event)
+{
+  if (_event->button() != Qt::LeftButton)
+    return;
+
+  QLabel *child = static_cast<QLabel *>(
+      this->childAt(_event->pos()));
+
+  // prevent clicking on the multi-variable label
+  if (child == this->dataPtr->multiLabel)
+    return;
+
+  this->SetSelected(true);
+  std::cerr << " variable pill selected " << this->Text() <<  std::endl;
+
+  // ignore so that the container also gets the event.
+  _event->ignore();
+}*/
+
+/////////////////////////////////////////////////
+bool VariablePill::ContainsPoint(const ignition::math::Vector2i &_pt) const
+{
+  QLabel *child = static_cast<QLabel *>(
+    this->childAt(_pt.X(), _pt.Y()));
+
+  if (child && child == this->dataPtr->label)
+    return true;
+
+  return false;
+}
+
 /////////////////////////////////////////////////
 unsigned int VariablePill::VariablePillCount() const
 {
@@ -408,10 +457,24 @@ unsigned int VariablePill::VariablePillCount() const
 }
 
 /////////////////////////////////////////////////
+std::map<unsigned int, VariablePill *> &VariablePill::VariablePills() const
+{
+  return this->dataPtr->variables;
+}
+
+/////////////////////////////////////////////////
 void VariablePill::SetSelected(const bool _selected)
 {
+  this->dataPtr->isSelected = _selected;
+
   if (_selected)
-    this->setStyleSheet("background-color: #005fab; border: 1px solid blue");
+    this->dataPtr->label->setStyleSheet("background-color: #5289c7; border: 2px solid black");
   else
-    this->setStyleSheet("background-color: #005fab; border: 0px");
+    this->dataPtr->label->setStyleSheet("background-color: #5289c7; border: 0px");
+}
+
+/////////////////////////////////////////////////
+bool VariablePill::IsSelected() const
+{
+  return this->dataPtr->isSelected;
 }
