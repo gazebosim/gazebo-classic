@@ -24,7 +24,9 @@ namespace gazebo
   {
     class AdiabaticAtmospherePrivate
     {
-      /// \brief Adiabatic atmosphere power parameter.
+      /// \brief Adiabatic atmosphere power parameter used to calculate
+      /// pressure and density of air.
+      /// See https://en.wikipedia.org/wiki/Density_of_air#Altitude
       public: double adiabaticPower;
     };
   }
