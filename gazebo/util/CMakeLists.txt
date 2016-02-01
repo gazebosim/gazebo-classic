@@ -72,6 +72,7 @@ target_link_libraries(gazebo_util
   gazebo_transport
   gazebo_msgs
   ${tinyxml2_LIBRARIES}
+  ${IGNITION-TRANSPORT_LIBRARIES}
 )
 
 gz_install_library(gazebo_util)

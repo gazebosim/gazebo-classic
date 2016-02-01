@@ -36,8 +36,24 @@ TEST(IntrospectionManagerTest, Registration)
 
   EXPECT_FALSE(intr->Unregister("item1"));
   EXPECT_TRUE(intr->Register("item1", "type1", func));
+  EXPECT_EQ(intr->RegisteredItems().size(), 1u);
+  intr->Show();
   EXPECT_FALSE(intr->Register("item1", "type1", func));
   EXPECT_TRUE(intr->Unregister("item1"));
+  intr->Show();
+  EXPECT_TRUE(intr->RegisteredItems().empty());
+
+  EXPECT_TRUE(intr->Register("item1", "type1", func));
+  intr->Show();
+  EXPECT_TRUE(intr->Register("item2", "type2", func));
+  intr->Show();
+  EXPECT_TRUE(intr->Register("item3", "type3", func));
+  intr->Show();
+  EXPECT_EQ(intr->RegisteredItems().size(), 3u);
+
+  intr->Unregister("item1");
+  intr->Unregister("item2");
+  intr->Unregister("item3");
 }
 
 /////////////////////////////////////////////////
@@ -49,8 +65,19 @@ TEST(IntrospectionManagerTest, FilterManagement)
   EXPECT_FALSE(intr->RemoveFilter("filter_#1"));
   EXPECT_FALSE(intr->Filter("filter_#1", items));
   intr->SetFilter("filter_#1", {"item1", "item2"});
+  intr->Show();
   EXPECT_TRUE(intr->Filter("filter_#1", items));
   EXPECT_TRUE(intr->RemoveFilter("filter_#1"));
+  intr->Show();
+
+  intr->SetFilter("filter_#1", {"item1", "item2"});
+  intr->Show();
+  intr->SetFilter("filter_#2", {"item2", "item3"});
+  intr->Show();
+  intr->SetFilter("filter_#3", {"item1", "item4"});
+  intr->Show();
+  intr->SetFilter("filter_#1", {"item1", "item5"});
+  intr->Show();
 }
 
 /////////////////////////////////////////////////

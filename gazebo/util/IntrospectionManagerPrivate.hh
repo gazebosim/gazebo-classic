@@ -89,6 +89,9 @@ namespace gazebo
 
       /// \brief Node used for communications.
       public: ignition::transport::Node node;
+
+      /// \brief ID of this manager.
+      public: std::string managerId;
     };
   }
 }

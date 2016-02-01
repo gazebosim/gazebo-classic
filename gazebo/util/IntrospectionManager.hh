@@ -62,6 +62,10 @@ namespace gazebo
       /// \brief ToDo.
       public: void Update();
 
+      public: void Show();
+
+      public: std::vector<std::string> RegisteredItems() const;
+
       /// \brief Constructor.
       private: IntrospectionManager();
 

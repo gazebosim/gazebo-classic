@@ -201,3 +201,32 @@ void IntrospectionManager::Update()
     }
   }
 }
+
+std::vector<std::string> IntrospectionManager::RegisteredItems() const
+{
+  std::vector<std::string> items;
+  for (auto item : this->dataPtr->allItems)
+    items.push_back(item.first);
+
+  return items;
+}
+
+void IntrospectionManager::Show()
+{
+  std::cout << "***" << std::endl;
+  std::cout << "Registered items" << std::endl;
+  for (auto const &item : this->dataPtr->allItems)
+    std::cout << "  " << item.first << " [" << item.second.type << "]" << std::endl;
+
+  std::cout << std::endl << "Filters" << std::endl;
+  for (auto const &filter : this->dataPtr->filters)
+  {
+    std::cout << "Id: " << filter.first << std::endl;
+    std::cout << "Items: ";
+    for (auto const &item : filter.second.items)
+      std::cout << "[" << item << "] ";
+    std::cout << std::endl;
+  }
+
+  //std::cout << std::endl << "Observed items";
+}
