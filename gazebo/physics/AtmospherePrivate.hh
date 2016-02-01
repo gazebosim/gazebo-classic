@@ -48,20 +48,16 @@ namespace gazebo
       public: transport::SubscriberPtr requestSub;
 
       /// \brief Temperature at sea level in kelvins.
-      /// Default value is 288.15 K.
-      public: double temperature;
+      public: double temperature = 288.15;
 
       /// \brief Temperature gradient at sea level in K/m.
-      /// Default value is -0.0065 K/m.
-      public: double temperatureGradient;
+      public: double temperatureGradient = -0.0065;
 
       /// \brief Pressure of the air at sea level in pascals.
-      /// Default value is 101325 pascals.
-      public: double pressure;
+      public: double pressure = 101325;
 
       /// \brief Mass density of the air at sea level in kg/m^3.
-      /// Default value is 1.225 kg/m^3.
-      public: double massDensity;
+      public: double massDensity = 1.225;
     };
   }
 }
