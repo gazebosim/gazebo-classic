@@ -60,7 +60,7 @@ void AdiabaticAtmosphere::Load(sdf::ElementPtr _sdf)
 void AdiabaticAtmosphere::Init(void)
 {
   this->dataPtr->adiabaticPower = MOLAR_MASS *
-      -this->World()->GetPhysicsEngine()->GetGravity().z /
+      this->World()->GetPhysicsEngine()->GetGravity().GetLength() /
       (-Atmosphere::TemperatureGradient() * IDEAL_GAS_CONSTANT_R);
 }
 
