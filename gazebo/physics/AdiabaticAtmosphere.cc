@@ -154,7 +154,7 @@ double AdiabaticAtmosphere::MassDensity(const double _altitude) const
   {
     // See https://en.wikipedia.org/wiki/Density_of_air#Altitude
     return Atmosphere::MassDensity() *
-      pow(1 - (Atmosphere::TemperatureGradient() * _altitude) /
+      pow(1 + (Atmosphere::TemperatureGradient() * _altitude) /
           Atmosphere::Temperature(), this->dataPtr->adiabaticPower - 1);
   }
   else
