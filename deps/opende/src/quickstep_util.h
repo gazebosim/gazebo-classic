@@ -24,15 +24,16 @@
 #define _ODE_QUICK_STEP_UTIL_H_
 
 #include <ode/common.h>
+#include "gazebo/gazebo_config.h"
 
-#ifdef SSE
+#ifdef ODE_SSE
 #include <xmmintrin.h>
 #define Kf(x) _mm_set_pd((x),(x))
 #endif
 
 
 #undef REPORT_THREAD_TIMING
-#define USE_TPROW
+#undef USE_TPROW
 #undef TIMING
 #undef DEBUG_CONVERGENCE_TOLERANCE
 #undef SHOW_CONVERGENCE
@@ -45,6 +46,13 @@
 
 #undef CHECK_VELOCITY_OBEYS_CONSTRAINT
 
+#ifndef TIMING
+#ifdef HDF5_INSTRUMENT
+#define DUMP
+#include <ode/h5dump.h>
+#define DATA_FILE  "ode_frames.hdf5"
+#endif  // instrument
+#endif  // timing
 
 #ifdef USE_TPROW
 // added for threading per constraint rows
@@ -59,13 +67,13 @@ typedef dReal *dRealMutablePtr;
 //***************************************************************************
 // configuration
 
-// for the SOR and CG methods:
+// for the PGS and CG methods:
 // warm starting:
 // this definitely help for motor-driven joints.
 // unfortunately it appears to hurt with high-friction contacts
-// using the SOR method. use with care
+// using the PGS method. use with care
 
-// for the SOR method:
+// for the PGS method:
 // uncomment the following line to determine a new constraint-solving
 // order for each iteration. however, the qsort per iteration is expensive,
 // and the optimal order is somewhat problem dependent.
@@ -73,17 +81,13 @@ typedef dReal *dRealMutablePtr;
 
 // #define REORDER_CONSTRAINTS 1
 
-// for the SOR method:
+// for the PGS method:
 // uncomment the following line to randomly reorder constraint rows
 // during the solution. depending on the situation, this can help a lot
 // or hardly at all, but it doesn't seem to hurt.
 
 // #define RANDOMLY_REORDER_CONSTRAINTS 1
 #undef LOCK_WHILE_RANDOMLY_REORDER_CONSTRAINTS
-
-/// scale SOR for contact to reduce overshoot in solution for contacts
-/// \TODO: make this a parameter
-#define CONTACT_SOR_SCALE 0.25
 
 //***************************************************************************
 // testing stuff
@@ -94,6 +98,11 @@ typedef dReal *dRealMutablePtr;
 #define IFTIMING(x) ((void)0)
 #endif
 
+#ifdef DUMP
+#define IFDUMP(x) x
+#else
+#define IFDUMP(x) ((void)0)
+#endif
 // ****************************************************************
 // ******************* Struct Definition **************************
 // ****************************************************************
@@ -111,16 +120,26 @@ struct IndexError {
   int index;    // row index
 };
 
-// structure for passing variable pointers in SOR_LCP
-struct dxSORLCPParameters {
+// structure for passing variable pointers in PGS_LCP
+struct dxPGSLCPParameters {
+    int thread_id;
+    IndexError* order;
+    dxBody* const* body;
+    boost::recursive_mutex* mutex;
+    bool inline_position_correction;
+    bool position_correction_thread;
     dxQuickStepParameters *qs;
     int nStart;   // 0
     int nChunkSize;
     int m; // m
     int nb;
+#ifdef PENETRATION_JVERROR_CORRECTION
     dReal stepsize;
+    dRealMutablePtr vnew;
+#endif
     int* jb;
     const int* findex;
+    bool skip_friction;
     dRealPtr hi;
     dRealPtr lo;
     dRealPtr invMOI;
@@ -128,22 +147,27 @@ struct dxSORLCPParameters {
     dRealPtr Ad;
     dRealPtr Adcfm;
     dRealPtr Adcfm_precon;
-    dRealMutablePtr rhs;
-    dRealMutablePtr rhs_erp;
-    dRealMutablePtr J;
-    dRealMutablePtr caccel;
-    dRealMutablePtr caccel_erp;
-    dRealMutablePtr lambda;
-    dRealMutablePtr lambda_erp;
-    dRealMutablePtr iMJ;
-    dRealMutablePtr rhs_precon ;
-    dRealMutablePtr J_precon ;
-    dRealMutablePtr J_orig ;
+    dRealPtr J;
+    dRealPtr iMJ;
+    dRealPtr rhs_precon ;
+    dRealPtr J_precon ;
+    dRealPtr J_orig ;
     dRealMutablePtr cforce ;
-    dRealMutablePtr vnew ;
+
+    dRealPtr rhs;
+    dRealMutablePtr caccel;
+    dRealMutablePtr lambda;
+
+    /// Only used if THREAD_POSITION_CORRECTION is not active,
+    /// in that case, compute both updates in the same
+    /// ComputeRows update.
+    dRealPtr rhs_erp;
+    dRealMutablePtr caccel_erp;
+    dRealMutablePtr lambda_erp;
+
 #ifdef REORDER_CONSTRAINTS
     dRealMutablePtr last_lambda ;
-    dRealMutablePtr last_lambda_erp ;
+    dRealMutablePtr last_lambda_erp;
 #endif
 };
 // ****************************************************************
@@ -192,9 +216,12 @@ inline void scaled_add (int n, dRealMutablePtr x, dRealPtr y, dRealPtr z, dReal 
 }
 
 // dot product of two vector a and b with length 6
+// define ODE_SSE to enable SSE, which is used to speed up
+// vector math operations with gcc compiler
+// macro SSE is renamed to ODE_SSE due to conflict with Eigen3 in DART
 inline dReal dot6(dRealPtr a, dRealPtr b)
 {
-#ifdef SSE
+#ifdef ODE_SSE
   __m128d d = _mm_load_pd(a+0) * _mm_load_pd(b+0) + _mm_load_pd(a+2) * _mm_load_pd(b+2) + _mm_load_pd(a+4) * _mm_load_pd(b+4);
   double r[2];
   _mm_store_pd(r, d);
@@ -212,7 +239,7 @@ inline dReal dot6(dRealPtr a, dRealPtr b)
 // a = a + delta * b, vector a and b with length 6
 inline void sum6(dRealMutablePtr a, dReal delta, dRealPtr b)
 {
-#ifdef SSE
+#ifdef ODE_SSE
   __m128d __delta = Kf(delta);
   _mm_store_pd(a + 0, _mm_load_pd(a + 0) + __delta * _mm_load_pd(b + 0));
   _mm_store_pd(a + 2, _mm_load_pd(a + 2) + __delta * _mm_load_pd(b + 2));

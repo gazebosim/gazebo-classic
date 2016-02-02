@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,16 @@
  *
  */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <fstream>
+
+#include <boost/bind.hpp>
+#include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <sdf/sdf.hh>
 
@@ -164,6 +173,7 @@ void InsertModelWidget::Update()
     }
 
     this->dataPtr->modelBuffer.clear();
+    this->dataPtr->getModelsConnection.reset();
   }
   else
     QTimer::singleShot(1000, this, SLOT(Update()));
@@ -177,7 +187,6 @@ void InsertModelWidget::OnModels(
 {
   boost::mutex::scoped_lock lock(this->dataPtr->mutex);
   this->dataPtr->modelBuffer = _models;
-  this->dataPtr->getModelsConnection.reset();
 }
 
 /////////////////////////////////////////////////

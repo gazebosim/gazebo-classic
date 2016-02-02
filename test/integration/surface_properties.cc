@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,10 @@
  *
 */
 
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/msgs/msgs.hh"
-#include "helper_physics_generator.hh"
+#include "gazebo/test/helper_physics_generator.hh"
 
 const double g_physics_tol = 1e-2;
 
@@ -68,7 +68,7 @@ void SurfaceTest::CollideWithoutContact(const std::string &_physicsEngine)
   // get the contact sensor
   sensors::SensorPtr sensor = sensors::get_sensor("box_contact");
   sensors::ContactSensorPtr contactSensor =
-      boost::dynamic_pointer_cast<sensors::ContactSensor>(sensor);
+      std::dynamic_pointer_cast<sensors::ContactSensor>(sensor);
   ASSERT_TRUE(contactSensor != NULL);
 
   // Step forward 0.2 s
@@ -95,7 +95,7 @@ void SurfaceTest::CollideWithoutContact(const std::string &_physicsEngine)
     while (contacts.contact_size() == 0 && --steps > 0)
     {
       world->Step(1);
-      contacts = contactSensor->GetContacts();
+      contacts = contactSensor->Contacts();
     }
 
     // Verify that both objects are recognized by contact sensor
@@ -137,7 +137,7 @@ void SurfaceTest::CollideWithoutContact(const std::string &_physicsEngine)
     while (contacts.contact_size() == 0 && --steps > 0)
     {
       world->Step(1);
-      contacts = contactSensor->GetContacts();
+      contacts = contactSensor->Contacts();
     }
 
     // Verify that only contactBox is recognized by contact sensor

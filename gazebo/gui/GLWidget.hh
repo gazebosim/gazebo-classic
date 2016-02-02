@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,40 +14,30 @@
  * limitations under the License.
  *
 */
-#ifndef _GL_WIDGET_HH_
-#define _GL_WIDGET_HH_
+#ifndef _GAZEBO_GUI_GLWIDGET_HH_
+#define _GAZEBO_GUI_GLWIDGET_HH_
 
+#include <memory>
 #include <string>
 #include <vector>
-#include <utility>
-#include <list>
 
 #include "gazebo/gui/qt.h"
-#include "gazebo/rendering/RenderTypes.hh"
-
-#include "gazebo/transport/TransportTypes.hh"
-
-#include "gazebo/common/MouseEvent.hh"
-#include "gazebo/common/KeyEvent.hh"
-#include "gazebo/common/Event.hh"
-
-#include "gazebo/math/Pose.hh"
-
 #include "gazebo/msgs/msgs.hh"
-
-#include "gazebo/gui/BoxMaker.hh"
-#include "gazebo/gui/SphereMaker.hh"
-#include "gazebo/gui/CylinderMaker.hh"
-#include "gazebo/gui/MeshMaker.hh"
-#include "gazebo/gui/ModelMaker.hh"
-#include "gazebo/gui/LightMaker.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
+  namespace common
+  {
+    class MouseEvent;
+  }
+
   namespace gui
   {
-    class GAZEBO_VISIBLE GLWidget : public QWidget
+    class GLWidgetPrivate;
+
+    class GZ_GUI_VISIBLE GLWidget : public QWidget
     {
       Q_OBJECT
 
@@ -69,19 +59,48 @@ namespace gazebo
       /// name "gzclient_camera".
       /// \param[in] _scene Pointer to the scene to visualize.
       public: void ViewScene(rendering::ScenePtr _scene);
-      public: rendering::UserCameraPtr GetCamera() const;
-      public: rendering::ScenePtr GetScene() const;
+
+      /// \brief Return the user camera.
+      /// \return User camera.
+      /// \deprecated See rendering::UserCameraPtr Camera() const.
+      public: rendering::UserCameraPtr GetCamera() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Return the user camera.
+      /// \return User camera.
+      public: rendering::UserCameraPtr Camera() const;
+
+      /// \brief Return the scene.
+      /// \return Scene.
+      /// \deprecated See rendering::ScenePtr Scene() const.
+      public: rendering::ScenePtr GetScene() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Return the scene.
+      /// \return Scene.
+      public: rendering::ScenePtr Scene() const;
 
       public: void Clear();
 
+      /// \brief Returns the list of selected visuals.
+      /// \return List with pointers to selected visuals.
+      public: std::vector<rendering::VisualPtr> SelectedVisuals() const;
+
       signals: void clicked();
 
+      /// \brief QT signal to notify when we received a selection msg.
+      /// \param[in] _name Name of the selected entity.
+      signals: void selectionMsgReceived(const QString &_name);
 
       protected: virtual void moveEvent(QMoveEvent *_e);
       protected: virtual void paintEvent(QPaintEvent *_e);
       protected: virtual void resizeEvent(QResizeEvent *_e);
+
+      /// \brief Custom processing for the QT showEvent. Based on empirical
+      /// evidence, we believe Mac needs to create the render window in this
+      /// function.
+      /// \param[in] _e The QT show event information.
       protected: virtual void showEvent(QShowEvent *_e);
-      protected: virtual void enterEvent(QEvent * event);
+
+      protected: virtual void enterEvent(QEvent *_event);
 
 
       protected: void keyPressEvent(QKeyEvent *_event);
@@ -92,7 +111,12 @@ namespace gazebo
       protected: void mouseMoveEvent(QMouseEvent *_event);
       protected: void mouseReleaseEvent(QMouseEvent *_event);
 
-      private: std::string GetOgreHandle() const;
+      /// \brief Override paintEngine to stop Qt From trying to draw on top of
+      /// OGRE.
+      /// \return NULL.
+      protected: virtual QPaintEngine *paintEngine() const;
+
+      private: std::string OgreHandle() const;
 
       /// \brief Callback for a mouse move event.
       /// \param[in] _event The mouse move event
@@ -146,15 +170,9 @@ namespace gazebo
       private: void OnSetSelectedEntity(const std::string &_name,
                                         const std::string &_mode);
 
-      private: void OnSelectionMsg(ConstSelectionPtr &_msg);
-
       private: bool eventFilter(QObject *_obj, QEvent *_event);
 
       private: void ClearSelection();
-
-      private: void PushHistory(const std::string &_visName,
-                                const math::Pose &_pose);
-      private: void PopHistory();
 
       /// \brief Set the selected visual, which will highlight the
       /// visual
@@ -167,11 +185,12 @@ namespace gazebo
       /// \param[in] _axis Axis of alignment: x, y, or z.
       /// \param[in] _config Configuration: min, center, or max.
       /// \param[in] _target Target of alignment: first or last.
-      /// \param[in] _bool True to preview alignment without publishing
+      /// \param[in] _preview True to preview alignment without publishing
       /// to server.
+      /// \param[in] _inverted True to invert the alignment direction.
       private: void OnAlignMode(const std::string &_axis,
           const std::string &_config, const std::string &_target,
-          bool _preview);
+          const bool _preview, const bool _inverted = false);
 
       /// \brief Copy an entity by name
       /// \param[in] _name Name of entity to be copied.
@@ -191,69 +210,29 @@ namespace gazebo
       /// \param[in] _checked True if the model editor was checked.
       private slots: void OnModelEditor(bool _checked);
 
-      private: int windowId;
+      /// \brief QT Callback that turns on orthographic projection
+      private slots: void OnOrtho();
 
-      private: rendering::UserCameraPtr userCamera;
-      private: rendering::ScenePtr scene;
-      private: QFrame *renderFrame;
-      private: common::MouseEvent mouseEvent;
+      /// \brief QT Callback that turns on perspective projection
+      private slots: void OnPerspective();
 
-      /// \brief The most recent keyboard event.
-      private: common::KeyEvent keyEvent;
+      /// \brief Set this->mouseEvent's Buttons property to the value of
+      /// _event->buttons(). Note that this is different from the
+      /// SetMouseEventButtons, plural, function.
+      /// \sa SetMouseEventButtons
+      /// \param[in] _button The QT mouse button
+      private: void SetMouseEventButton(const Qt::MouseButton &_button);
 
-      private: std::vector<event::ConnectionPtr> connections;
+      /// \brief Set this->mouseEvent's Button property to the value of
+      /// _event->button(). Note that this is different from the
+      /// SetMouseEventButton, singular, function.
+      /// \sa SetMouseEventButton
+      /// \param[in] _button The QT mouse buttons
+      private: void SetMouseEventButtons(const Qt::MouseButtons &_buttons);
 
-      private: EntityMaker *entityMaker;
-      private: BoxMaker boxMaker;
-      private: SphereMaker sphereMaker;
-      private: CylinderMaker cylinderMaker;
-      private: MeshMaker meshMaker;
-      private: ModelMaker modelMaker;
-      private: PointLightMaker pointLightMaker;
-      private: SpotLightMaker spotLightMaker;
-      private: DirectionalLightMaker directionalLightMaker;
-
-      /// \brief Light maker
-      private: LightMaker lightMaker;
-
-      private: rendering::VisualPtr hoverVis;
-
-      /// \brief A list of selected visuals.
-      private: std::vector<rendering::VisualPtr> selectedVisuals;
-
-      /// \brief Indicates how deep into the model to select.
-      private: SelectionLevels selectionLevel;
-
-      private: transport::NodePtr node;
-      private: transport::PublisherPtr modelPub, factoryPub;
-
-      /// \brief Publishes information about user selections.
-      private: transport::PublisherPtr selectionPub;
-
-      private: transport::SubscriberPtr selectionSub, requestSub;
-
-      private: std::string keyText;
-      private: Qt::KeyboardModifiers keyModifiers;
-      private: QPoint onShiftMousePos;
-
-      private: std::string copiedObject;
-
-      private: std::string state;
-
-      private: std::list<std::pair<std::string, math::Pose> > moveHistory;
-
-      /// \brief Name of entity that is being copied.
-      private: std::string copyEntityName;
-
-      /// \brief Flag that is set to true when GLWidget has responded to
-      ///  OnCreateScene
-      private: bool sceneCreated;
-
-      /// \brief True if the model editor is up, false otherwise
-      private: bool modelEditorEnabled;
-
-      /// \brief Mutext to protect selectedVisuals array.
-      private: boost::mutex selectedVisMutex;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<GLWidgetPrivate> dataPtr;
     };
   }
 }

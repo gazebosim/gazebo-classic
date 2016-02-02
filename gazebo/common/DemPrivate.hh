@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ namespace gazebo
 
     /// \class DemPrivate DemPrivate.hh common/common.hh
     /// \brief Private data for the Dem class.
-    class GAZEBO_VISIBLE DemPrivate
+    class GZ_COMMON_VISIBLE DemPrivate
     {
       /// \brief A set of associated raster bands.
       public: GDALDataset *dataSet;

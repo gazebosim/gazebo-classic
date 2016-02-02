@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ namespace gazebo
 
     /// \class JointVisual JointVisual.hh rendering/rendering.hh
     /// \brief Visualization for joints
-    class GAZEBO_VISIBLE JointVisual : public Visual
+    class GZ_RENDERING_VISIBLE JointVisual : public Visual
     {
       /// \brief Constructor
       /// \param[in] _name Name of the visual
@@ -66,7 +66,7 @@ namespace gazebo
           bool _useParentFrame, msgs::Joint::Type _type);
 
       // Documentation Inherited.
-      public: void SetVisible(bool _visible, bool _cascade = true);
+      public: virtual void SetVisible(bool _visible, bool _cascade = true);
 
       /// \brief Update the joint visual based on a message.
       /// \param[in] _msg Joint message

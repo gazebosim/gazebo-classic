@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,14 @@
  * limitations under the License.
  *
 */
-#ifndef _MODEL_MANIPULATOR_HH_
-#define _MODEL_MANIPULATOR_HH_
+#ifndef _GAZEBO_GUI_MODEL_MANIPULATOR_HH_
+#define _GAZEBO_GUI_MODEL_MANIPULATOR_HH_
 
 #include <string>
+
+#include "gazebo/math/Vector2i.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Pose.hh"
 
 #include "gazebo/common/MouseEvent.hh"
 #include "gazebo/common/KeyEvent.hh"
@@ -36,7 +40,7 @@ namespace gazebo
     /// \class ModelManipulator ModelManipulator.hh gui/Gui.hh
     /// \brief Manipulator tool for translating/rotating/scaling models and
     /// links
-    class GAZEBO_VISIBLE ModelManipulator : public SingletonT<ModelManipulator>
+    class GZ_GUI_VISIBLE ModelManipulator : public SingletonT<ModelManipulator>
     {
       /// \brief Constructor
       private: ModelManipulator();
@@ -46,6 +50,10 @@ namespace gazebo
 
       /// \brief Initialize the model manipulator.
       public: void Init();
+
+      /// \brief Clear the model manipulator. This explicity cleans up the
+      /// internal state of the singleton and prepares it for exit.
+      public: void Clear();
 
       /// \brief Detach the manipulator from an entity
       public: void Detach();

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,121 +15,87 @@
  *
 */
 
+#include "gazebo/gui/MainWindow.hh"
+#include "gazebo/gui/RenderWidget.hh"
 #include "gazebo/gui/TimePanel.hh"
 #include "gazebo/gui/TimePanel_TEST.hh"
 
 /////////////////////////////////////////////////
-void TimePanel_TEST::ValidTimes()
-{
-  QBENCHMARK
-  {
-    this->Load("empty.world");
-
-    // Create a new time panel widget
-    gazebo::gui::TimePanel *timePanel = new gazebo::gui::TimePanel;
-
-    // Get the percent real time line
-    QLineEdit *percentEdit = timePanel->findChild<QLineEdit*>(
-        "timePanelPercentRealTime");
-
-    // Get the sim time line
-    QLineEdit *simTimeEdit = timePanel->findChild<QLineEdit*>(
-        "timePanelSimTime");
-
-    // Get the real time line
-    QLineEdit *realTimeEdit = timePanel->findChild<QLineEdit*>(
-        "timePanelRealTime");
-
-    QVERIFY(percentEdit != NULL);
-    QVERIFY(simTimeEdit != NULL);
-    QVERIFY(realTimeEdit != NULL);
-
-    // Wait a little bit so that time increases.
-    for (unsigned int i = 0; i < 10; ++i)
-    {
-      gazebo::common::Time::MSleep(100);
-      QCoreApplication::processEvents();
-    }
-
-    std::string txt;
-    double value;
-
-    // Make sure real time is greater than zero
-    txt = realTimeEdit->text().toStdString();
-    value = boost::lexical_cast<double>(txt.substr(txt.find(".")));
-    QVERIFY(value > 0.0);
-
-    // Make sure sim time is greater than zero
-    txt = simTimeEdit->text().toStdString();
-    value = boost::lexical_cast<double>(txt.substr(txt.find(".")));
-    QVERIFY(value > 0.0);
-
-    // Make sure the percent real time is greater than zero
-    txt = percentEdit->text().toStdString();
-    value = boost::lexical_cast<double>(txt.substr(0, txt.find(" ")));
-    QVERIFY(value > 0.0);
-  }
-}
-
-/////////////////////////////////////////////////
-void TimePanel_TEST::Visibility()
+void TimePanel_TEST::SetPaused()
 {
   this->Load("empty.world");
 
   // Create a new time panel widget
   gazebo::gui::TimePanel *timePanel = new gazebo::gui::TimePanel;
+  QVERIFY(timePanel != NULL);
 
-  // Get the percent real time line
-  QLineEdit *percentEdit = timePanel->findChild<QLineEdit *>(
-      "timePanelPercentRealTime");
+  // verify initial state
+  QVERIFY(!timePanel->IsPaused());
 
-  // Get the sim time line
-  QLineEdit *simTimeEdit = timePanel->findChild<QLineEdit *>(
-      "timePanelSimTime");
+  // set paused state and verify
+  timePanel->SetPaused(true);
+  QVERIFY(timePanel->IsPaused());
 
-  // Get the real time line
-  QLineEdit *realTimeEdit = timePanel->findChild<QLineEdit *>(
-      "timePanelRealTime");
+  timePanel->SetPaused(false);
+  QVERIFY(!timePanel->IsPaused());
+  delete timePanel;
+}
 
-  // Get the step button
-  QAction *stepButton = timePanel->findChild<QAction *>(
-      "timePanelStepAction");
+/////////////////////////////////////////////////
+void TimePanel_TEST::SpaceBar()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
 
-  QLineEdit *iterationsEdit = timePanel->findChild<QLineEdit *>(
-      "timePanelIterations");
+  this->Load("empty.world");
 
-  // visible by default
-  QVERIFY(percentEdit->isVisible());
-  QVERIFY(simTimeEdit->isVisible());
-  QVERIFY(realTimeEdit->isVisible());
-  QVERIFY(stepButton->isVisible());
-  QVERIFY(iterationsEdit->isVisible());
+  // Create the main window.
+  auto mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
 
-  // hide the widgets
-  timePanel->ShowRealTimeFactor(false);
-  timePanel->ShowSimTime(false);
-  timePanel->ShowRealTime(false);
-  timePanel->ShowStepWidget(false);
-  timePanel->ShowIterations(false);
+  // Process some events, and draw the screen
+  for (unsigned int i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
 
-  QVERIFY(!percentEdit->isVisible());
-  QVERIFY(!simTimeEdit->isVisible());
-  QVERIFY(!realTimeEdit->isVisible());
-  QVERIFY(!stepButton->isVisible());
-  QVERIFY(!iterationsEdit->isVisible());
+  // Get the time panel
+  auto timePanel = mainWindow->RenderWidget()->GetTimePanel();
+  QVERIFY(timePanel != NULL);
 
-  // show the widgets again
-  timePanel->ShowRealTimeFactor(true);
-  timePanel->ShowSimTime(true);
-  timePanel->ShowRealTime(true);
-  timePanel->ShowStepWidget(true);
-  timePanel->ShowIterations(true);
+  // verify initial state
+  QVERIFY(!timePanel->IsPaused());
 
-  QVERIFY(percentEdit->isVisible());
-  QVERIFY(simTimeEdit->isVisible());
-  QVERIFY(realTimeEdit->isVisible());
-  QVERIFY(stepButton->isVisible());
-  QVERIFY(iterationsEdit->isVisible());
+  // Press space bar
+  QTest::keyClick(timePanel, Qt::Key_Space);
+
+  // Process some events until it gets paused
+  for (unsigned int i = 0; i < 10 && !timePanel->IsPaused(); ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+  QVERIFY(timePanel->IsPaused());
+
+  // Press space bar
+  QTest::keyClick(timePanel, Qt::Key_Space);
+
+  // Process some events until it gets unpaused
+  for (unsigned int i = 0; i < 10 && timePanel->IsPaused(); ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+  QVERIFY(!timePanel->IsPaused());
+
+  delete timePanel;
 }
 
 // Generate a main function for the test

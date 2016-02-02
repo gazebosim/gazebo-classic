@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,13 @@
  *
 */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
+#include <boost/thread/recursive_mutex.hpp>
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/MeshManager.hh"
@@ -89,7 +96,7 @@ void MeshShape::Init()
         if (submeshElem->HasElement("center") &&
             submeshElem->Get<bool>("center"))
         {
-          this->submesh->Center();
+          this->submesh->Center(ignition::math::Vector3d::Zero);
         }
       }
     }
@@ -140,7 +147,7 @@ void MeshShape::FillMsg(msgs::Geometry &_msg)
 //////////////////////////////////////////////////
 void MeshShape::ProcessMsg(const msgs::Geometry &_msg)
 {
-  this->SetScale(msgs::Convert(_msg.mesh().scale()));
+  this->SetScale(msgs::ConvertIgn(_msg.mesh().scale()));
   this->SetMesh(_msg.mesh().filename(),
       _msg.mesh().has_submesh() ? _msg.mesh().submesh() : std::string(),
       _msg.mesh().has_center_submesh() ? _msg.mesh().center_submesh() :  false);

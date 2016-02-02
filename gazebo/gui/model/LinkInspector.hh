@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,22 +15,27 @@
  *
 */
 
-#ifndef _LINK_INSPECTOR_HH_
-#define _LINK_INSPECTOR_HH_
+#ifndef _GAZEBO_GUI_LINK_INSPECTOR_HH_
+#define _GAZEBO_GUI_LINK_INSPECTOR_HH_
 
+#include <memory>
 #include <string>
 
 #include "gazebo/gui/qt.h"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
+    class CollisionConfig;
     class LinkConfig;
     class VisualConfig;
-    class CollisionConfig;
 
-    class LinkInspector : public QDialog
+    // Forward declare private data.
+    class LinkInspectorPrivate;
+
+    class GZ_GUI_VISIBLE LinkInspector : public QDialog
     {
       Q_OBJECT
 
@@ -47,7 +52,7 @@ namespace gazebo
 
       /// \brief Get the name of the link.
       /// \return Name of the link.
-      public: std::string GetName() const;
+      public: std::string Name() const;
 
       /// \brief Get configurations of the link.
       /// \return Tab widget with link configurations.
@@ -60,6 +65,13 @@ namespace gazebo
       /// \brief Get collision configurations of the link.
       /// \return Tab widget with visual configurations.
       public: CollisionConfig *GetCollisionConfig() const;
+
+      /// \brief Set the id for this link
+      /// \param[in] New link id.
+      public: void SetLinkId(const std::string &_id);
+
+      /// \brief Open the inspector.
+      public: void Open();
 
       /// \brief Qt event emiited when the mouse enters this widget.
       /// \param[in] _event Qt event.
@@ -76,29 +88,28 @@ namespace gazebo
       /// and the inspector closed.
       Q_SIGNALS: void Accepted();
 
+      /// \brief Qt callback when the Remove button is pressed.
+      private slots: void OnRemove();
+
       /// \brief Qt callback when the Cancel button is pressed.
       private slots: void OnCancel();
-
-      /// \brief Qt callback when the Apply button is pressed.
-      private slots: void OnApply();
 
       /// \brief Qt callback when the Ok button is pressed.
       private slots: void OnOK();
 
-      /// \brief Main tab widget within the link inspector.
-      private: QTabWidget *tabWidget;
+      /// \brief Qt callback when one of the child configs has been applied.
+      private slots: void OnConfigApplied();
 
-      /// \brief Label that displays the name of the link.
-      private: QLabel* linkNameLabel;
+      /// \brief Restore the widget's data to how it was when first opened.
+      private slots: void RestoreOriginalData();
 
-      /// \brief Widget with configurable link properties.
-      private: LinkConfig *linkConfig;
+      /// \brief Qt key press event.
+      /// \param[in] _event Qt key event.
+      private: void keyPressEvent(QKeyEvent *_event);
 
-      /// \brief Widget with configurable visual properties.
-      private: VisualConfig *visualConfig;
-
-      /// \brief Widget with configurable collision properties.
-      private: CollisionConfig *collisionConfig;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<LinkInspectorPrivate> dataPtr;
     };
     /// \}
   }

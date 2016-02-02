@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 
 #include <gtest/gtest.h>
 #include <gazebo/rendering/rendering.hh>
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
 class Issue846Test : public ServerFixture
@@ -34,11 +34,11 @@ TEST_F(Issue846Test, CaptureData)
   gazebo::rendering::CameraPtr camera(new gazebo::rendering::Camera("",
         this->GetScene(), false));
 
-  EXPECT_FALSE(camera->GetCaptureData());
+  EXPECT_FALSE(camera->CaptureData());
   camera->EnableSaveFrame(true);
-  EXPECT_TRUE(camera->GetCaptureData());
+  EXPECT_TRUE(camera->CaptureData());
   camera->EnableSaveFrame(false);
-  EXPECT_FALSE(camera->GetCaptureData());
+  EXPECT_FALSE(camera->CaptureData());
 }
 
 /////////////////////////////////////////////////

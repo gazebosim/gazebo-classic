@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _KEYEVENT_HH_
-#define _KEYEVENT_HH_
+#ifndef _GAZEBO_KEYEVENT_HH_
+#define _GAZEBO_KEYEVENT_HH_
 
 #include <string>
 #include "gazebo/util/system.hh"
@@ -29,11 +29,10 @@ namespace gazebo
 
     /// \class KeyEvent KeyEvent.hh common/common.hh
     /// \brief Generic description of a keyboard event.
-    class GAZEBO_VISIBLE KeyEvent
+    class GZ_COMMON_VISIBLE KeyEvent
     {
       /// \brief Constructor.
-      public: KeyEvent() : type(NO_EVENT), key(0), text(""), control(false),
-                       shift(false), alt(false) {}
+      public: KeyEvent();
 
       /// \brief Key event types enumeration.
       public: enum EventType {NO_EVENT, PRESS, RELEASE};

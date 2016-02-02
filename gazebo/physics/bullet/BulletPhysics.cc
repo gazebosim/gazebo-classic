@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@
 #include "gazebo/physics/bullet/BulletSliderJoint.hh"
 #include "gazebo/physics/bullet/BulletHinge2Joint.hh"
 #include "gazebo/physics/bullet/BulletScrewJoint.hh"
+#include "gazebo/physics/bullet/BulletFixedJoint.hh"
 
 #include "gazebo/transport/Publisher.hh"
 
@@ -307,11 +308,11 @@ void BulletPhysics::Load(sdf::ElementPtr _sdf)
 
   sdf::ElementPtr bulletElem = this->sdf->GetElement("bullet");
 
-  math::Vector3 g = this->sdf->Get<math::Vector3>("gravity");
+  auto g = this->world->Gravity();
   // ODEPhysics checks this, so we will too.
-  if (g == math::Vector3(0, 0, 0))
+  if (g == ignition::math::Vector3d::Zero)
     gzwarn << "Gravity vector is (0, 0, 0). Objects will float.\n";
-  this->dynamicsWorld->setGravity(btVector3(g.x, g.y, g.z));
+  this->dynamicsWorld->setGravity(btVector3(g.X(), g.Y(), g.Z()));
 
   btContactSolverInfo& info = this->dynamicsWorld->getSolverInfo();
 
@@ -399,7 +400,10 @@ void BulletPhysics::OnRequest(ConstRequestPtr &_msg)
     physicsMsg.set_contact_surface_layer(
       boost::any_cast<double>(this->GetParam("contact_surface_layer")));
 
-    physicsMsg.mutable_gravity()->CopyFrom(msgs::Convert(this->GetGravity()));
+    physicsMsg.mutable_gravity()->CopyFrom(
+      msgs::Convert(this->world->Gravity()));
+    physicsMsg.mutable_magnetic_field()->CopyFrom(
+        msgs::Convert(this->MagneticField()));
     physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
     physicsMsg.set_real_time_factor(this->targetRealTimeFactor);
     physicsMsg.set_max_step_size(this->maxStepSize);
@@ -413,6 +417,11 @@ void BulletPhysics::OnRequest(ConstRequestPtr &_msg)
 /////////////////////////////////////////////////
 void BulletPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 {
+  // Parent class handles many generic parameters
+  // This should be done first so that the profile settings
+  // can be over-ridden by other message parameters.
+  PhysicsEngine::OnPhysicsMsg(_msg);
+
   if (_msg->has_min_step_size())
     this->SetParam("min_step_size", _msg->min_step_size());
 
@@ -438,7 +447,7 @@ void BulletPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
     this->SetParam("contact_surface_layer", _msg->contact_surface_layer());
 
   if (_msg->has_gravity())
-    this->SetGravity(msgs::Convert(_msg->gravity()));
+    this->SetGravity(msgs::ConvertIgn(_msg->gravity()));
 
   if (_msg->has_real_time_factor())
     this->SetTargetRealTimeFactor(_msg->real_time_factor());
@@ -455,9 +464,6 @@ void BulletPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 
   /// Make sure all models get at least one update cycle.
   this->world->EnableAllModels();
-
-  // Parent class handles many generic parameters
-  PhysicsEngine::OnPhysicsMsg(_msg);
 }
 
 //////////////////////////////////////////////////
@@ -584,14 +590,9 @@ bool BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
       double value = boost::any_cast<double>(_value);
       bulletElem->GetElement("solver")->GetElement("min_step_size")->Set(value);
     }
-    else if (_key == "max_step_size")
-    {
-      this->SetMaxStepSize(boost::any_cast<double>(_value));
-    }
     else
     {
-      gzwarn << _key << " is not supported in Bullet" << std::endl;
-      return false;
+      return PhysicsEngine::SetParam(_key, _value);
     }
   }
   catch(boost::bad_any_cast &e)
@@ -607,43 +608,49 @@ bool BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
 //////////////////////////////////////////////////
 boost::any BulletPhysics::GetParam(const std::string &_key) const
 {
+  boost::any value;
+  this->GetParam(_key, value);
+  return value;
+}
+
+//////////////////////////////////////////////////
+bool BulletPhysics::GetParam(const std::string &_key, boost::any &_value) const
+{
   sdf::ElementPtr bulletElem = this->sdf->GetElement("bullet");
   GZ_ASSERT(bulletElem != NULL, "Bullet SDF element does not exist");
 
   if (_key == "solver_type")
-    return bulletElem->GetElement("solver")->Get<std::string>("type");
+    _value = bulletElem->GetElement("solver")->Get<std::string>("type");
   else if (_key == "cfm")
-    return bulletElem->GetElement("constraints")->Get<double>("cfm");
+    _value = bulletElem->GetElement("constraints")->Get<double>("cfm");
   else if (_key == "erp")
-    return bulletElem->GetElement("constraints")->Get<double>("erp");
+    _value = bulletElem->GetElement("constraints")->Get<double>("erp");
   else if (_key == "iters")
-    return bulletElem->GetElement("solver")->Get<int>("iters");
+    _value = bulletElem->GetElement("solver")->Get<int>("iters");
   else if (_key == "sor")
-    return bulletElem->GetElement("solver")->Get<double>("sor");
+    _value = bulletElem->GetElement("solver")->Get<double>("sor");
   else if (_key == "contact_surface_layer")
-    return bulletElem->GetElement("constraints")->Get<double>(
+    _value = bulletElem->GetElement("constraints")->Get<double>(
         "contact_surface_layer");
   else if (_key == "split_impulse")
   {
-    return bulletElem->GetElement("constraints")->Get<bool>(
+    _value = bulletElem->GetElement("constraints")->Get<bool>(
       "split_impulse");
   }
   else if (_key == "split_impulse_penetration_threshold")
   {
-    return bulletElem->GetElement("constraints")->Get<double>(
+    _value = bulletElem->GetElement("constraints")->Get<double>(
       "split_impulse_penetration_threshold");
   }
   else if (_key == "max_contacts")
-    return this->sdf->GetElement("max_contacts")->Get<int>();
+    _value = this->sdf->GetElement("max_contacts")->Get<int>();
   else if (_key == "min_step_size")
-    return bulletElem->GetElement("solver")->Get<double>("min_step_size");
-  else if (_key == "max_step_size")
-    return this->GetMaxStepSize();
+    _value = bulletElem->GetElement("solver")->Get<double>("min_step_size");
   else
   {
-    gzwarn << _key << " is not supported in bullet" << std::endl;
-    return 0;
+    return PhysicsEngine::GetParam(_key, _value);
   }
+  return true;
 }
 
 //////////////////////////////////////////////////
@@ -725,6 +732,8 @@ JointPtr BulletPhysics::CreateJoint(const std::string &_type, ModelPtr _parent)
     joint.reset(new BulletHinge2Joint(this->dynamicsWorld, _parent));
   else if (_type == "screw")
     joint.reset(new BulletScrewJoint(this->dynamicsWorld, _parent));
+  else if (_type == "fixed")
+    joint.reset(new BulletFixedJoint(this->dynamicsWorld, _parent));
   else
     gzthrow("Unable to create joint of type[" << _type << "]");
 
@@ -765,7 +774,7 @@ void BulletPhysics::SetWorldCFM(double _cfm)
 //////////////////////////////////////////////////
 void BulletPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
 {
-  this->sdf->GetElement("gravity")->Set(_gravity);
+  this->world->SetGravitySDF(_gravity.Ign());
   this->dynamicsWorld->setGravity(
     BulletTypes::ConvertVector3(_gravity));
 }

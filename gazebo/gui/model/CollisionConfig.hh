@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,11 @@
  *
 */
 
-#ifndef _COLLISION_CONFIG_HH_
-#define _COLLISION_CONFIG_HH_
+#ifndef _GAZEBO_COLLISION_CONFIG_HH_
+#define _GAZEBO_COLLISION_CONFIG_HH_
 
 #include <map>
 #include <string>
-
-#include "gazebo/math/Pose.hh"
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/model/ModelData.hh"
@@ -37,24 +35,37 @@ namespace gazebo
 
     /// \class CollisionConfigData CollisionConfig.hh
     /// \brief A class of widgets used for configuring collision properties.
-    class CollisionConfigData
+    class CollisionConfigData : public QWidget
     {
+      Q_OBJECT
+
+      /// \brief Restore the widget's data to how it was when first opened.
+      public slots: void RestoreOriginalData();
+
+      /// \brief Qt callback when this item's button has been pressed.
+      /// \param[in] _checked Whether it was checked or unchecked.
+      private slots: void OnToggleItem(bool _checked);
+
       /// \brief Unique ID of this collision config.
       public: int id;
 
       /// \brief Name of the collision.
       public: std::string name;
 
-      /// \brief config widget for configuring collision properties.
+      /// \brief Config widget for configuring collision properties.
       public: ConfigWidget *configWidget;
 
-      /// \brief Tree item associated with the configWidget.
-      public: QTreeWidgetItem *treeItem;
+      /// \brief Widget associated with this data.
+      public: QWidget *widget;
+
+      /// \brief Message containing the data which was in the widget when first
+      /// open.
+      public: msgs::Collision originalDataMsg;
     };
 
     /// \class CollisionConfig CollisionConfig.hh
     /// \brief A tab for configuring collision properties of a link.
-    class CollisionConfig : public QWidget
+    class GZ_GUI_VISIBLE CollisionConfig : public QWidget
     {
       Q_OBJECT
 
@@ -63,6 +74,12 @@ namespace gazebo
 
       /// \brief Destructor
       public: ~CollisionConfig();
+
+      /// \brief Initialize widget.
+      public: void Init();
+
+      /// \brief Restore the widget's data to how it was when first opened.
+      public slots: void RestoreOriginalData();
 
       /// \brief Add a collision widget to the tab.
       /// \param[in] _name Name of collision added.
@@ -95,7 +112,18 @@ namespace gazebo
       /// \param[in] _size Size to set the geometry to.
       /// \param[in] _uri URI of the geometry.
       public: void SetGeometry(const std::string &_name,
-          const math::Vector3 &_size, const std::string &_uri = "");
+          const ignition::math::Vector3d &_size, const std::string &_uri = "");
+
+      /// \brief Get the geometry data of a collision
+      /// \param[in] _name Name of collision.
+      /// \param[in] _size Size of the geometry.
+      /// \param[in] _uri URI of the geometry.
+      public: void Geometry(const std::string &_name,
+          ignition::math::Vector3d &_size, std::string &_uri) const;
+
+      /// \brief Get collision config data
+      /// \return Config data for the collisions.
+      public: const std::map<int, CollisionConfigData *> &ConfigData() const;
 
       /// \brief Qt signal emitted when a collision is removed.
       /// \param[in] _name Name of collision removed.
@@ -105,6 +133,9 @@ namespace gazebo
       /// \param[in] _name Name of collision added.
       Q_SIGNALS: void CollisionAdded(const std::string &_name);
 
+      /// \brief Qt signal emitted to indicate that changes should be applied.
+      Q_SIGNALS: void Applied();
+
       /// \brief Qt callback when a collision is to be added.
       private slots: void OnAddCollision();
 
@@ -112,16 +143,26 @@ namespace gazebo
       /// \param[in] _id Id of item to be removed.
       private slots: void OnRemoveCollision(int _id);
 
-      /// \brief Received item selection user input.
-      /// \param[in] _item Item selected.
-      /// \param[in] _column Column index.
-      private slots: void OnItemSelection(QTreeWidgetItem *_item, int _column);
+      /// \brief Qt callback when a pose value has changed.
+      /// \param[in] _name of widget in the config widget that emitted the
+      /// signal.
+      /// \param[in] _value New value.
+      private slots: void OnPoseChanged(const QString &_name,
+          const ignition::math::Pose3d &_value);
+
+      /// \brief Qt callback when a geometry value has changed.
+      /// \param[in] _name of widget in the config widget that emitted the
+      /// signal.
+      /// \param[in] _value New geometry value.
+      /// \param[in] _dimensions New dimensions.
+      /// \param[in] _uri New uri, for meshes.
+      private slots: void OnGeometryChanged(const std::string &_name,
+          const std::string &_value,
+          const ignition::math::Vector3d &_dimensions,
+          const std::string &_uri);
 
       /// \brief Map of id to collision config widget.
       private: std::map<int, CollisionConfigData *> configs;
-
-      /// \brief Widget that display collisions' properties.
-      private: QTreeWidget *collisionsTreeWidget;
 
       /// \brief Counter for the number of collisions.
       private: int counter;
@@ -131,6 +172,9 @@ namespace gazebo
 
       /// \brief A map of collision items to their id.
       private: std::map<int, QTreeWidgetItem *> collisionItems;
+
+      /// \brief Layout which holds all collision items.
+      private: QVBoxLayout *listLayout;
     };
     /// \}
   }

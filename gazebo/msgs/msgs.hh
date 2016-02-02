@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,18 @@
  * limitations under the License.
  *
 */
-#ifndef MESSAGES_UTILITY_H
-#define MESSAGES_UTILITY_H
+#ifndef _GAZEBO_MESSAGES_UTILITY_HH_
+#define _GAZEBO_MESSAGES_UTILITY_HH_
 
 #include <string>
 
 #include <sdf/sdf.hh>
+
+#include <ignition/math/Vector3.hh>
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Plane.hh>
+
+#include "gazebo/math/Quaternion.hh"
 
 #include "gazebo/msgs/MessageTypes.hh"
 
@@ -27,7 +33,6 @@
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Pose.hh"
 #include "gazebo/math/Plane.hh"
-#include "gazebo/math/Box.hh"
 
 #include "gazebo/common/SphericalCoordinates.hh"
 #include "gazebo/common/Color.hh"
@@ -74,47 +79,47 @@ namespace gazebo
         const google::protobuf::Message &message);
     /// \endcond
 
-    /// \brief Convert a math::Vector3 to a msgs::Vector3d
+    /// \brief Convert a ignition::math::Vector3 to a msgs::Vector3d
     /// \param[in] _v The vector to convert
     /// \return A msgs::Vector3d object
     GAZEBO_VISIBLE
-    msgs::Vector3d      Convert(const math::Vector3 &_v);
+    msgs::Vector3d Convert(const ignition::math::Vector3d &_v);
 
-    /// \brief Convert a math::Vector2d to a msgs::Vector2d
+    /// \brief Convert a ignition::math::Vector2d to a msgs::Vector2d
     /// \param[in] _v The vector to convert
     /// \return A msgs::Vector2d object
     GAZEBO_VISIBLE
-    msgs::Vector2d Convert(const math::Vector2d &_v);
+    msgs::Vector2d Convert(const ignition::math::Vector2d &_v);
 
-    /// \brief Convert a math::Quaternion to a msgs::Quaternion
+    /// \brief Convert a ignition::math::Quaternion to a msgs::Quaternion
     /// \param[in] _q The quaternion to convert
     /// \return A msgs::Quaternion object
     GAZEBO_VISIBLE
-    msgs::Quaternion Convert(const math::Quaternion &_q);
+    msgs::Quaternion Convert(const ignition::math::Quaterniond &_q);
 
-    /// \brief Convert a math::Pose to a msgs::Pose
+    /// \brief Convert a ignition::math::Pose to a msgs::Pose
     /// \param[in] _p The pose to convert
     /// \return A msgs::Pose object
     GAZEBO_VISIBLE
-    msgs::Pose       Convert(const math::Pose &_p);
+    msgs::Pose Convert(const ignition::math::Pose3d &_p);
 
     /// \brief Convert a common::Color to a msgs::Color
     /// \param[in] _c The color to convert
     /// \return A msgs::Color object
     GAZEBO_VISIBLE
-    msgs::Color      Convert(const common::Color &_c);
+    msgs::Color Convert(const common::Color &_c);
 
     /// \brief Convert a common::Time to a msgs::Time
     /// \param[in] _t The time to convert
     /// \return A msgs::Time object
     GAZEBO_VISIBLE
-    msgs::Time       Convert(const common::Time &_t);
+    msgs::Time Convert(const common::Time &_t);
 
-    /// \brief Convert a math::Plane to a msgs::PlaneGeom
+    /// \brief Convert a ignition::math::Planed to a msgs::PlaneGeom
     /// \param[in] _p The plane to convert
     /// \return A msgs::PlaneGeom object
     GAZEBO_VISIBLE
-    msgs::PlaneGeom Convert(const math::Plane &_p);
+    msgs::PlaneGeom Convert(const ignition::math::Planed &_p);
 
     /// \brief Convert a string to a msgs::Joint::Type enum.
     /// \param[in] _str Joint type string.
@@ -128,7 +133,7 @@ namespace gazebo
     /// \return Joint type string. Returns "unknown" if
     /// _type is unrecognized.
     GAZEBO_VISIBLE
-    std::string ConvertJointType(const msgs::Joint::Type _type);
+    std::string ConvertJointType(const msgs::Joint::Type &_type);
 
     /// \brief Convert a string to a msgs::Geometry::Type enum.
     /// \param[in] _str Geometry type string.
@@ -142,29 +147,29 @@ namespace gazebo
     GAZEBO_VISIBLE
     std::string ConvertGeometryType(const msgs::Geometry::Type _type);
 
-    /// \brief Convert a msgs::Vector3d to a math::Vector
+    /// \brief Convert a msgs::Vector3d to an ignition::math::Vector
     /// \param[in] _v The plane to convert
-    /// \return A math::Vector3 object
+    /// \return An ignition::math::Vector3 object
     GAZEBO_VISIBLE
-    math::Vector3    Convert(const msgs::Vector3d &_v);
+    ignition::math::Vector3d ConvertIgn(const msgs::Vector3d &_v);
 
-    /// \brief Convert a msgs::Vector2d to a math::Vector2d
+    /// \brief Convert a msgs::Vector2d to an ignition::math::Vector2d
     /// \param[in] _v The vector2 to convert
-    /// \return A math::Vector2d object
+    /// \return An ignition::math::Vector2d object
     GAZEBO_VISIBLE
-    math::Vector2d    Convert(const msgs::Vector2d &_v);
+    ignition::math::Vector2d ConvertIgn(const msgs::Vector2d &_v);
 
-    /// \brief Convert a msgs::Quaternion to a math::Quaternion
+    /// \brief Convert a msgs::Quaternion to an ignition::math::Quaternion
     /// \param[in] _q The quaternion to convert
-    /// \return A math::Quaternion object
+    /// \return An ignition::math::Quaternion object
     GAZEBO_VISIBLE
-    math::Quaternion Convert(const msgs::Quaternion &_q);
+    ignition::math::Quaterniond ConvertIgn(const msgs::Quaternion &_q);
 
-    /// \brief Convert a msgs::Pose to a math::Pose
+    /// \brief Convert a msgs::Pose to an ignition::math::Pose
     /// \param[in] _q The pose to convert
-    /// \return A math::Pose object
+    /// \return An ignition::math::Pose object
     GAZEBO_VISIBLE
-    math::Pose       Convert(const msgs::Pose &_p);
+    ignition::math::Pose3d ConvertIgn(const msgs::Pose &_p);
 
     /// \brief Convert a msgs::Image to a common::Image
     /// \param[out] _img The common::Image container
@@ -176,19 +181,19 @@ namespace gazebo
     /// \param[in] _c The color to convert
     /// \return A common::Color object
     GAZEBO_VISIBLE
-    common::Color    Convert(const msgs::Color &_c);
+    common::Color Convert(const msgs::Color &_c);
 
     /// \brief Convert a msgs::Time to a common::Time
     /// \param[in] _t The time to convert
     /// \return A common::Time object
     GAZEBO_VISIBLE
-    common::Time     Convert(const msgs::Time &_t);
+    common::Time Convert(const msgs::Time &_t);
 
-    /// \brief Convert a msgs::PlaneGeom to a common::Plane
+    /// \brief Convert a msgs::PlaneGeom to an ignition::math::Planed
     /// \param[in] _p The plane to convert
-    /// \return A common::Plane object
+    /// \return An ignition::math::Planed object
     GAZEBO_VISIBLE
-    math::Plane      Convert(const msgs::PlaneGeom &_p);
+    ignition::math::Planed ConvertIgn(const msgs::PlaneGeom &_p);
 
     /// \brief Set a msgs::Image from a common::Image
     /// \param[out] _msg A msgs::Image pointer
@@ -196,29 +201,29 @@ namespace gazebo
     GAZEBO_VISIBLE
     void Set(msgs::Image *_msg, const common::Image &_i);
 
-    /// \brief Set a msgs::Vector3d from a math::Vector3
+    /// \brief Set a msgs::Vector3d from an ignition::math::Vector3d
     /// \param[out] _pt A msgs::Vector3d pointer
-    /// \param[in] _v A math::Vector3 reference
+    /// \param[in] _v An ignition::math::Vector3d reference
     GAZEBO_VISIBLE
-    void Set(msgs::Vector3d *_pt, const math::Vector3 &_v);
+    void Set(msgs::Vector3d *_pt, const ignition::math::Vector3d &_v);
 
-    /// \brief Set a msgs::Vector2d from a math::Vector3
+    /// \brief Set a msgs::Vector2d from an ignition::math::Vector2d
     /// \param[out] _pt A msgs::Vector2d pointer
-    /// \param[in] _v A math::Vector2d reference
+    /// \param[in] _v An ignition::math::Vector2d reference
     GAZEBO_VISIBLE
-    void Set(msgs::Vector2d *_pt, const math::Vector2d &_v);
+    void Set(msgs::Vector2d *_pt, const ignition::math::Vector2d &_v);
 
-    /// \brief Set a msgs::Quaternion from a math::Quaternion
+    /// \brief Set a msgs::Quaternion from an ignition::math::Quaterniond
     /// \param[out] _q A msgs::Quaternion pointer
-    /// \param[in] _v A math::Quaternion reference
+    /// \param[in] _v An ignition::math::Quaterniond reference
     GAZEBO_VISIBLE
-    void Set(msgs::Quaternion *_q, const math::Quaternion &_v);
+    void Set(msgs::Quaternion *_q, const ignition::math::Quaterniond &_v);
 
-    /// \brief Set a msgs::Pose from a math::Pose
+    /// \brief Set a msgs::Pose from an ignition::math::Pose3d
     /// \param[out] _p A msgs::Pose pointer
-    /// \param[in] _v A math::Pose reference
+    /// \param[in] _v An ignition::math::Pose3d reference
     GAZEBO_VISIBLE
-    void Set(msgs::Pose *_p, const math::Pose &_v);
+    void Set(msgs::Pose *_p, const ignition::math::Pose3d &_v);
 
     /// \brief Set a msgs::Color from a common::Color
     /// \param[out] _p A msgs::Color pointer
@@ -240,11 +245,11 @@ namespace gazebo
     void Set(msgs::SphericalCoordinates *_s,
              const common::SphericalCoordinates &_v);
 
-    /// \brief Set a msgs::Plane from a math::Plane
+    /// \brief Set a msgs::Plane from an ignition::math::Planed
     /// \param[out] _p A msgs::Plane pointer
-    /// \param[in] _v A math::Plane reference
+    /// \param[in] _v An ignition::math::Planed reference
     GAZEBO_VISIBLE
-    void Set(msgs::PlaneGeom *_p, const math::Plane &_v);
+    void Set(msgs::PlaneGeom *_p, const ignition::math::Planed &_v);
 
     /// \brief Create a msgs::TrackVisual from a track visual SDF element
     /// \param[in] _sdf The sdf element
@@ -282,6 +287,42 @@ namespace gazebo
     GAZEBO_VISIBLE
     msgs::Visual VisualFromSDF(sdf::ElementPtr _sdf);
 
+    /// \brief Create a msgs::Collision from a collision SDF element
+    /// \param[in] _sdf The sdf element
+    /// \return The new msgs::Collision object
+    GAZEBO_VISIBLE
+    msgs::Collision CollisionFromSDF(sdf::ElementPtr _sdf);
+
+    /// \brief Create a msgs::Surface from a surface SDF element
+    /// \param[in] _sdf The sdf element
+    /// \return The new msgs::Surface object
+    GAZEBO_VISIBLE
+    msgs::Surface SurfaceFromSDF(sdf::ElementPtr _sdf);
+
+    /// \brief Create a msgs::Friction from a friction SDF element
+    /// \param[in] _sdf The sdf element
+    /// \return The new msgs::Friction object
+    GAZEBO_VISIBLE
+    msgs::Friction FrictionFromSDF(sdf::ElementPtr _sdf);
+
+    /// \brief Create a msgs::Axis from an axis SDF element
+    /// \param[in] _sdf The sdf element
+    /// \return The new msgs::Axis object
+    GAZEBO_VISIBLE
+    msgs::Axis AxisFromSDF(sdf::ElementPtr _sdf);
+
+    /// \brief Create a msgs::Joint from a joint SDF element
+    /// \param[in] _sdf The sdf element
+    /// \return The new msgs::Joint object
+    GAZEBO_VISIBLE
+    msgs::Joint JointFromSDF(sdf::ElementPtr _sdf);
+
+    /// \brief Create a msgs::Plugin from a plugin SDF element
+    /// \param[in] _sdf The sdf element
+    /// \return The new msgs::Plugin object
+    GAZEBO_VISIBLE
+    msgs::Plugin PluginFromSDF(const sdf::ElementPtr _sdf);
+
     /// \brief Create or update an SDF element from a msgs::Visual
     /// \param[in] _msg Visual messsage
     /// \param[in] _sdf if supplied, performs an update from _msg instead of
@@ -314,7 +355,7 @@ namespace gazebo
     /// \return Shader type string. Returns "unknown" if
     /// _type is unrecognized.
     GAZEBO_VISIBLE
-    std::string ConvertShaderType(const msgs::Material::ShaderType _type);
+    std::string ConvertShaderType(const msgs::Material::ShaderType &_type);
 
     /// \brief Create a msgs::Fog from a fog SDF element
     /// \param[in] _sdf The sdf element
@@ -327,6 +368,36 @@ namespace gazebo
     /// \return The new msgs::Scene object
     GAZEBO_VISIBLE
     msgs::Scene SceneFromSDF(sdf::ElementPtr _sdf);
+
+    /// \brief Create a msgs::Sensor from a sensor SDF element
+    /// \param[in] _sdf The sensor sdf element
+    /// \return The new msgs::Sensor object
+    /// \sa CameraSensorFromSDF
+    /// \sa RaySensorFromSDF
+    /// \sa ContactSensorFromSDF
+    GAZEBO_VISIBLE
+    msgs::Sensor SensorFromSDF(sdf::ElementPtr _sdf);
+
+    /// \brief Create a msgs::CameraSensor from a camera sensor SDF element
+    /// \param[in] _sdf The camera sensor sdf element
+    /// \return The new msgs::CameraSensor object
+    /// \sa SensorFromSDF
+    GAZEBO_VISIBLE
+    msgs::CameraSensor CameraSensorFromSDF(sdf::ElementPtr _sdf);
+
+    /// \brief Create a msgs::RaySensor from a ray sensor SDF element
+    /// \param[in] _sdf The ray sensor sdf element
+    /// \return The new msgs::RaySensor object
+    /// \sa SensorFromSDF
+    GAZEBO_VISIBLE
+    msgs::RaySensor RaySensorFromSDF(sdf::ElementPtr _sdf);
+
+    /// \brief Create a msgs::ContactSensor from a contact sensor SDF element
+    /// \param[in] _sdf The contact sensor sdf element
+    /// \return The new msgs::ContactSensor object
+    /// \sa SensorFromSDF
+    GAZEBO_VISIBLE
+    msgs::ContactSensor ContactSensorFromSDF(sdf::ElementPtr _sdf);
 
     /// \brief Create or update an SDF element from a msgs::Light
     /// \param[in] _msg Light messsage
@@ -423,7 +494,7 @@ namespace gazebo
     /// \param[in] _size Size of the box.
     GAZEBO_VISIBLE
     void AddBoxLink(msgs::Model &_model, const double _mass,
-                    const math::Vector3 &_size);
+                    const ignition::math::Vector3d &_size);
 
     /// \brief Add a simple cylinder link to a Model message.
     /// The radius, length, and mass of the cylinder are specified, and a

@@ -552,6 +552,11 @@ QWidget#toolsWidget > QFrame
   background-color: #808080;
 }
 
+QWidget#buildingEditorPaletteScroll
+{
+  background-color: #808080;
+}
+
 QWidget#renderWidget > QWidget
 {
   padding: 0px;
@@ -576,7 +581,7 @@ QWidget#terrainEditorWidget > QWidget
   border-top-right-radius: 10px;
 }
 
-QWidget#toolFrame
+QWidget#topToolbar
 {
   border-bottom: 1px solid #101010;
   background-color: #808080;
@@ -591,19 +596,6 @@ QWidget#renderBottomFrame
   border-bottom-right-radius: 10px;
   background-color: #808080;
   border-bottom-left-radius: 10px;
-  border-bottom-right-radius: 10px;
-}
-
-QWidget#timePanel
-{
-  max-height: 40px;
-  background-color: #808080;
-  border-bottom-right-radius: 10px;
-}
-
-QWidget#timePanel > QFrame
-{
-  background-color: #808080;
   border-bottom-right-radius: 10px;
 }
 
@@ -760,4 +752,10 @@ QAbstractSpinBox::down-arrow:hover
   image: url(:/images/down_spin_arrow.png);
   width: 10px;
   height: 10px;
+}
+
+QTextEdit#splashVersionTextEdit
+{
+  color: #f58113;
+  font-size: 10px;
 }

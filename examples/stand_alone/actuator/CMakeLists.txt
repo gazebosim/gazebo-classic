@@ -1,19 +1,18 @@
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 
-include (FindPkgConfig)
-if (PKG_CONFIG_FOUND)
-  pkg_check_modules(GAZEBO gazebo)
-endif()
+find_package(gazebo REQUIRED)
 
-include(FindBoost)
-find_package(Boost ${MIN_BOOST_VERSION} REQUIRED system filesystem regex)
+list(APPEND CMAKE_CXX_FLAGS "${GAZEBO_CXX_FLAGS}")
 
-find_package(Protobuf REQUIRED)
-
-find_package(SDFormat REQUIRED)
-
-include_directories(${SDFormat_INCLUDE_DIRS} ${GAZEBO_INCLUDE_DIRS})
-link_directories(${SDFormat_LIBRARY_DIRS} ${GAZEBO_LIBRARY_DIRS})
+include_directories(
+  ${GAZEBO_INCLUDE_DIRS}
+)
+link_directories(
+  ${GAZEBO_LIBRARY_DIRS}
+)
 
 add_executable(actuator main.cc)
-target_link_libraries(actuator ${SDFormat_LIBRARIES} ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${PROTOBUF_LIBRARIES} pthread)
+target_link_libraries(actuator
+  ${GAZEBO_LIBRARIES}
+  pthread
+)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,10 @@
  * limitations under the License.
  *
 */
+#include <boost/bind.hpp>
 #include "gazebo/rendering/ogre_gazebo.h"
+
+#include "gazebo/math/Pose.hh"
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
@@ -25,6 +28,7 @@
 #include "gazebo/rendering/WindowManager.hh"
 #include "gazebo/rendering/FPSViewController.hh"
 #include "gazebo/rendering/OrbitViewController.hh"
+#include "gazebo/rendering/OrthoViewController.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/UserCameraPrivate.hh"
@@ -41,6 +45,7 @@ UserCamera::UserCamera(const std::string &_name, ScenePtr _scene,
     dataPtr(new UserCameraPrivate)
 {
   this->dataPtr->orbitViewController = NULL;
+  this->dataPtr->orthoViewController = NULL;
   this->dataPtr->fpsViewController = NULL;
   this->dataPtr->viewController = NULL;
   this->dataPtr->selectionBuffer = NULL;
@@ -53,7 +58,8 @@ UserCamera::UserCamera(const std::string &_name, ScenePtr _scene,
 
   // Set default UserCamera render rate to 120Hz when stereo rendering is
   // enabled. Otherwise use 60Hz.
-  this->SetRenderRate(_stereoEnabled ? 120.0 : 60.0);
+  // Some padding is added for safety.
+  this->SetRenderRate(_stereoEnabled ? 130.0 : 70.0);
 
   this->SetUseSDFPose(false);
 }
@@ -62,6 +68,7 @@ UserCamera::UserCamera(const std::string &_name, ScenePtr _scene,
 UserCamera::~UserCamera()
 {
   delete this->dataPtr->orbitViewController;
+  delete this->dataPtr->orthoViewController;
   delete this->dataPtr->fpsViewController;
 
   this->connections.clear();
@@ -100,6 +107,8 @@ void UserCamera::Init()
 {
   this->dataPtr->orbitViewController = new OrbitViewController(
       boost::dynamic_pointer_cast<UserCamera>(shared_from_this()));
+  this->dataPtr->orthoViewController = new OrthoViewController(
+      boost::dynamic_pointer_cast<UserCamera>(shared_from_this()));
   this->dataPtr->fpsViewController = new FPSViewController(
       boost::dynamic_pointer_cast<UserCamera>(shared_from_this()));
   this->dataPtr->viewController = this->dataPtr->orbitViewController;
@@ -114,7 +123,7 @@ void UserCamera::Init()
   // Right camera
   if (this->dataPtr->stereoEnabled)
   {
-    this->dataPtr->rightCamera = this->scene->GetManager()->createCamera(
+    this->dataPtr->rightCamera = this->scene->OgreSceneManager()->createCamera(
         "StereoUserRight");
     this->dataPtr->rightCamera->pitch(Ogre::Degree(90));
 
@@ -127,7 +136,7 @@ void UserCamera::Init()
     this->sceneNode->attachObject(this->dataPtr->rightCamera);
   }
 
-  this->SetHFOV(GZ_DTOR(60));
+  this->SetHFOV(static_cast<ignition::math::Angle>(IGN_DTOR(60)));
 
   // Careful when setting this value.
   // A far clip that is too close will have bad side effects on the
@@ -168,7 +177,7 @@ void UserCamera::Init()
   axisNode->setInheritOrientation(false);
 
   Ogre::ManualObject *x =
-    this->scene->GetManager()->createManualObject("MyXAxis");
+    this->scene->OgreSceneManager()->createManualObject("MyXAxis");
   x->begin("Gazebo/Red", Ogre::RenderOperation::OT_LINE_LIST);
   x->position(0, 0, 0);
   x->position(1, 0, 0);
@@ -176,7 +185,7 @@ void UserCamera::Init()
   x->setVisibilityFlags(GZ_VISIBILITY_GUI);
 
   Ogre::ManualObject *y =
-    this->scene->GetManager()->createManualObject("MyYAxis");
+    this->scene->OgreSceneManager()->createManualObject("MyYAxis");
   y->begin("Gazebo/Green", Ogre::RenderOperation::OT_LINE_LIST);
   y->position(0, 0, 0);
   y->position(0, 1, 0);
@@ -184,7 +193,7 @@ void UserCamera::Init()
   y->setVisibilityFlags(GZ_VISIBILITY_GUI);
 
   Ogre::ManualObject *z =
-    this->scene->GetManager()->createManualObject("MyZAxis");
+    this->scene->OgreSceneManager()->createManualObject("MyZAxis");
   z->begin("Gazebo/Blue", Ogre::RenderOperation::OT_LINE_LIST);
   z->position(0, 0, 0);
   z->position(0, 0, 1);
@@ -198,9 +207,22 @@ void UserCamera::Init()
 }
 
 //////////////////////////////////////////////////
+void UserCamera::SetDefaultPose(const math::Pose &_pose)
+{
+  this->dataPtr->defaultPose = _pose;
+  this->SetWorldPose(_pose);
+}
+
+//////////////////////////////////////////////////
+math::Pose UserCamera::DefaultPose() const
+{
+  return this->dataPtr->defaultPose;
+}
+
+//////////////////////////////////////////////////
 void UserCamera::SetWorldPose(const math::Pose &_pose)
 {
-  Camera::SetWorldPose(_pose);
+  Camera::SetWorldPose(_pose.Ign());
   this->dataPtr->viewController->Init();
 }
 
@@ -213,7 +235,7 @@ void UserCamera::Update()
     this->dataPtr->viewController->Update();
 
   // publish camera pose
-  this->dataPtr->posePub->Publish(msgs::Convert(this->GetWorldPose()));
+  this->dataPtr->posePub->Publish(msgs::Convert(this->WorldPose()));
 }
 
 //////////////////////////////////////////////////
@@ -237,9 +259,6 @@ void UserCamera::Fini()
 //////////////////////////////////////////////////
 void UserCamera::HandleMouseEvent(const common::MouseEvent &_evt)
 {
-  if (this->dataPtr->selectionBuffer)
-    this->dataPtr->selectionBuffer->Update();
-
   // DEBUG: this->dataPtr->selectionBuffer->ShowOverlay(true);
 
   // Don't update the camera if it's being animated.
@@ -295,16 +314,16 @@ bool UserCamera::AttachToVisualImpl(VisualPtr _visual, bool _inheritOrientation,
   Camera::AttachToVisualImpl(_visual, _inheritOrientation);
   if (_visual)
   {
-    math::Pose origPose = this->GetWorldPose();
-    double yaw = _visual->GetWorldPose().rot.GetAsEuler().z;
+    ignition::math::Pose3d origPose = this->WorldPose();
+    ignition::math::Angle yaw = _visual->GetWorldPose().rot.GetAsEuler().z;
 
-    double zDiff = origPose.pos.z - _visual->GetWorldPose().pos.z;
-    double pitch = 0;
+    double zDiff = origPose.Pos().Z() - _visual->GetWorldPose().pos.z;
+    ignition::math::Angle pitch = 0;
 
     if (fabs(zDiff) > 1e-3)
     {
-      double dist = _visual->GetWorldPose().pos.Distance(
-          this->GetWorldPose().pos);
+      double dist = _visual->GetWorldPose().pos.Ign().Distance(
+          this->WorldPose().Pos());
       pitch = acos(zDiff/dist);
     }
 
@@ -337,34 +356,74 @@ bool UserCamera::TrackVisualImpl(VisualPtr _visual)
 }
 
 //////////////////////////////////////////////////
-void UserCamera::SetViewController(const std::string &type)
+void UserCamera::SetViewController(const std::string &_type)
 {
-  if (this->dataPtr->viewController->GetTypeString() == type)
+  if (_type.empty() ||
+      this->dataPtr->viewController->GetTypeString() == _type)
+  {
     return;
+  }
 
-  if (type == OrbitViewController::GetTypeString())
+  std::string vc = this->dataPtr->viewController->GetTypeString();
+
+  if (_type == OrbitViewController::GetTypeString())
+  {
     this->dataPtr->viewController = this->dataPtr->orbitViewController;
-  else if (type == FPSViewController::GetTypeString())
-    this->dataPtr->viewController = this->dataPtr->fpsViewController;
-  else
-    gzthrow("Invalid view controller type: " + type);
+    this->dataPtr->viewController->Init();
 
-  this->dataPtr->viewController->Init();
+    this->dataPtr->prevViewControllerName = vc;
+  }
+  else if (_type == OrthoViewController::GetTypeString())
+  {
+    this->dataPtr->viewController = this->dataPtr->orthoViewController;
+    if (vc == "orbit")
+    {
+      this->dataPtr->viewController->Init(
+          this->dataPtr->orbitViewController->GetFocalPoint(),
+          this->dataPtr->orbitViewController->Yaw(),
+          this->dataPtr->orbitViewController->Pitch());
+    }
+    else
+      this->dataPtr->viewController->Init();
+
+    this->dataPtr->prevViewControllerName = vc;
+  }
+  else if (_type == FPSViewController::GetTypeString())
+  {
+    this->dataPtr->viewController = this->dataPtr->fpsViewController;
+    this->dataPtr->viewController->Init();
+
+    this->dataPtr->prevViewControllerName = vc;
+  }
+  else
+  {
+    gzerr << "Invalid view controller type[" << _type << "]. "
+      << "The view controller is not changed.\n";
+  }
 }
 
 //////////////////////////////////////////////////
-void UserCamera::SetViewController(const std::string &type,
-                                    const math::Vector3 &_pos)
+void UserCamera::SetViewController(const std::string &_type,
+                                   const math::Vector3 &_pos)
 {
-  if (this->dataPtr->viewController->GetTypeString() == type)
+  if (_type.empty() ||
+      this->dataPtr->viewController->GetTypeString() == _type)
+  {
     return;
+  }
 
-  if (type == OrbitViewController::GetTypeString())
+  std::string vc = this->dataPtr->viewController->GetTypeString();
+
+  if (_type == OrbitViewController::GetTypeString())
     this->dataPtr->viewController = this->dataPtr->orbitViewController;
-  else if (type == FPSViewController::GetTypeString())
+  else if (_type == OrthoViewController::GetTypeString())
+    this->dataPtr->viewController = this->dataPtr->orthoViewController;
+  else if (_type == FPSViewController::GetTypeString())
     this->dataPtr->viewController = this->dataPtr->fpsViewController;
   else
-    gzthrow("Invalid view controller type: " + type);
+    gzthrow("Invalid view controller type: " + _type);
+
+  this->dataPtr->prevViewControllerName = vc;
 
   this->dataPtr->viewController->Init(_pos);
 }
@@ -382,9 +441,10 @@ unsigned int UserCamera::GetImageHeight() const
 }
 
 //////////////////////////////////////////////////
-void UserCamera::Resize(unsigned int /*_w*/, unsigned int /*_h*/)
+void UserCamera::Resize(unsigned int _w, unsigned int _h)
 {
   this->UpdateFOV();
+  this->dataPtr->viewController->Resize(_w, _h);
 }
 
 //////////////////////////////////////////////////
@@ -414,20 +474,6 @@ void UserCamera::SetViewportDimensions(float /*x_*/, float /*y_*/,
 }
 
 //////////////////////////////////////////////////
-float UserCamera::GetAvgFPS() const
-{
-  float avgFPS, lastFPS, bestFPS, worstFPS = 0;
-  this->renderTarget->getStatistics(lastFPS, avgFPS, bestFPS, worstFPS);
-  return avgFPS;
-}
-
-//////////////////////////////////////////////////
-unsigned int UserCamera::GetTriangleCount() const
-{
-  return this->renderTarget->getTriangleCount();
-}
-
-//////////////////////////////////////////////////
 void UserCamera::ToggleShowVisual()
 {
   // this->visual->ToggleVisible();
@@ -442,7 +488,7 @@ void UserCamera::ShowVisual(bool /*_s*/)
 //////////////////////////////////////////////////
 bool UserCamera::MoveToPosition(const math::Pose &_pose, double _time)
 {
-  return Camera::MoveToPosition(_pose, _time);
+  return Camera::MoveToPosition(_pose.Ign(), _time);
 }
 
 //////////////////////////////////////////////////
@@ -461,42 +507,42 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
   if (!_visual)
     return;
 
-  if (this->scene->GetManager()->hasAnimation("cameratrack"))
+  if (this->scene->OgreSceneManager()->hasAnimation("cameratrack"))
   {
-    this->scene->GetManager()->destroyAnimation("cameratrack");
+    this->scene->OgreSceneManager()->destroyAnimation("cameratrack");
   }
 
-  math::Box box = _visual->GetBoundingBox();
-  math::Vector3 size = box.GetSize();
-  double maxSize = std::max(std::max(size.x, size.y), size.z);
+  ignition::math::Box box = _visual->GetBoundingBox().Ign();
+  ignition::math::Vector3d size = box.Size();
+  double maxSize = size.Max();
 
-  math::Vector3 start = this->GetWorldPose().pos;
+  ignition::math::Vector3d start = this->WorldPose().Pos();
   start.Correct();
-  math::Vector3 end = box.GetCenter() + _visual->GetWorldPose().pos;
+  ignition::math::Vector3d end = box.Center() +
+    _visual->GetWorldPose().pos.Ign();
   end.Correct();
-  math::Vector3 dir = end - start;
+  ignition::math::Vector3d dir = end - start;
   dir.Correct();
   dir.Normalize();
 
   double dist = start.Distance(end) - maxSize;
 
-  math::Vector3 mid = start + dir*(dist*.5);
-  mid.z = box.GetCenter().z + box.GetSize().z + 2.0;
+  ignition::math::Vector3d mid = start + dir*(dist*.5);
+  mid.Z(box.Center().Z() + box.Size().Z() + 2.0);
 
   dir = end - mid;
   dir.Correct();
 
   dist = mid.Distance(end) - maxSize;
 
-  double yawAngle = atan2(dir.y, dir.x);
-  double pitchAngle = atan2(-dir.z, sqrt(dir.x*dir.x + dir.y*dir.y));
-  math::Quaternion pitchYawOnly(0, pitchAngle, yawAngle);
-  Ogre::Quaternion pitchYawFinal(pitchYawOnly.w, pitchYawOnly.x,
-    pitchYawOnly.y, pitchYawOnly.z);
+  double yawAngle = atan2(dir.Y(), dir.X());
+  double pitchAngle = atan2(-dir.Z(), sqrt(dir.X()*dir.X() + dir.Y()*dir.Y()));
+  ignition::math::Quaterniond pitchYawOnly(0, pitchAngle, yawAngle);
+  Ogre::Quaternion pitchYawFinal = Conversions::Convert(pitchYawOnly);
 
   dir.Normalize();
 
-  double scale = maxSize / tan((this->GetHFOV()/2.0).Radian());
+  double scale = maxSize / tan((this->HFOV()/2.0).Radian());
 
   end = mid + dir*(dist - scale);
 
@@ -505,16 +551,15 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
   double time = 0.5;  // dist / vel;
 
   Ogre::Animation *anim =
-    this->scene->GetManager()->createAnimation("cameratrack", time);
+    this->scene->OgreSceneManager()->createAnimation("cameratrack", time);
   anim->setInterpolationMode(Ogre::Animation::IM_SPLINE);
 
   Ogre::NodeAnimationTrack *strack = anim->createNodeTrack(0, this->sceneNode);
 
-
   Ogre::TransformKeyFrame *key;
 
   key = strack->createNodeKeyFrame(0);
-  key->setTranslate(Ogre::Vector3(start.x, start.y, start.z));
+  key->setTranslate(Conversions::Convert(start));
   key->setRotation(this->sceneNode->getOrientation());
 
   /*key = strack->createNodeKeyFrame(time * 0.5);
@@ -523,11 +568,11 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
   */
 
   key = strack->createNodeKeyFrame(time);
-  key->setTranslate(Ogre::Vector3(end.x, end.y, end.z));
+  key->setTranslate(Conversions::Convert(end));
   key->setRotation(pitchYawFinal);
 
   this->animState =
-    this->scene->GetManager()->createAnimationState("cameratrack");
+    this->scene->OgreSceneManager()->createAnimationState("cameratrack");
 
   this->animState->setTimePosition(0);
   this->animState->setEnabled(true);
@@ -544,8 +589,8 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
 void UserCamera::OnMoveToVisualComplete()
 {
   this->dataPtr->orbitViewController->SetDistance(
-      this->GetWorldPose().pos.Distance(
-      this->dataPtr->orbitViewController->GetFocalPoint()));
+      this->WorldPose().Pos().Distance(
+      this->dataPtr->orbitViewController->GetFocalPoint().Ign()));
 }
 
 //////////////////////////////////////////////////
@@ -570,7 +615,7 @@ void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
     this->dataPtr->rightViewport =
       this->renderTarget->addViewport(this->dataPtr->rightCamera, 1);
     this->dataPtr->rightViewport->setBackgroundColour(
-        Conversions::Convert(this->scene->GetBackgroundColor()));
+        Conversions::Convert(this->scene->BackgroundColor()));
 
 #if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR > 9
     this->viewport->setDrawBuffer(Ogre::CBT_BACK_LEFT);
@@ -585,7 +630,7 @@ void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
   this->initialized = true;
 
   this->dataPtr->selectionBuffer = new SelectionBuffer(this->scopedUniqueName,
-      this->scene->GetManager(), this->renderTarget);
+      this->scene->OgreSceneManager(), this->renderTarget);
 }
 
 //////////////////////////////////////////////////
@@ -602,9 +647,6 @@ VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos,
 
   if (!this->dataPtr->selectionBuffer)
     return result;
-
-  // Update the selection buffer
-  this->dataPtr->selectionBuffer->Update();
 
   Ogre::Entity *entity =
     this->dataPtr->selectionBuffer->OnSelectionClick(_mousePos.x, _mousePos.y);
@@ -684,7 +726,7 @@ std::string UserCamera::GetViewControllerTypeString()
 void UserCamera::OnJoyTwist(ConstJoystickPtr &_msg)
 {
   // Scaling factor applied to rotations.
-  static math::Vector3 rpyFactor(0, 0.01, 0.05);
+  static ignition::math::Vector3d rpyFactor(0, 0.01, 0.05);
 
   // toggle using joystick to move camera
   if (this->dataPtr->joystickButtonToggleLast == false &&
@@ -711,21 +753,23 @@ void UserCamera::OnJoyTwist(ConstJoystickPtr &_msg)
   if (this->dataPtr->joyTwistControl &&
       (_msg->has_translation() || _msg->has_rotation()))
   {
-    math::Pose pose = this->GetWorldPose();
+    ignition::math::Pose3d pose = this->WorldPose();
 
     // Get the joystick XYZ
     if (_msg->has_translation())
     {
       const double transRotRatio = 0.05;
-      math::Vector3 trans = msgs::Convert(_msg->translation()) * transRotRatio;
-      pose.pos = pose.rot.RotateVector(trans) + pose.pos;
+      ignition::math::Vector3d trans =
+        msgs::ConvertIgn(_msg->translation()) * transRotRatio;
+      pose.Pos() = pose.Rot().RotateVector(trans) + pose.Pos();
     }
 
     // Get the jostick RPY. We are disabling rotation around x.
     if (_msg->has_rotation())
     {
-      math::Vector3 rot = msgs::Convert(_msg->rotation()) * rpyFactor;
-      pose.rot.SetFromEuler(pose.rot.GetAsEuler() + rot);
+      ignition::math::Vector3d rot =
+        msgs::ConvertIgn(_msg->rotation()) * rpyFactor;
+      pose.Rot().Euler(pose.Rot().Euler() + rot);
     }
 
     this->SetWorldPose(pose);
@@ -741,8 +785,8 @@ void UserCamera::OnJoyPose(ConstPosePtr &_msg)
   if (_msg->has_position() && _msg->has_orientation())
   {
     // Get the XYZ
-    math::Pose pose(msgs::Convert(_msg->position()),
-                    msgs::Convert(_msg->orientation()));
+    ignition::math::Pose3d pose(msgs::ConvertIgn(_msg->position()),
+                                msgs::ConvertIgn(_msg->orientation()));
     this->SetWorldPose(pose);
   }
 }
@@ -799,4 +843,15 @@ void UserCamera::EnableStereo(bool _enable)
          << _enable
          << "). However, Ogre version >= 1.10.0 is required.\n";
 #endif
+}
+
+/////////////////////////////////////////////////
+bool UserCamera::SetProjectionType(const std::string &_type)
+{
+  if (_type == "orthographic")
+    this->SetViewController("ortho");
+  else if (!this->dataPtr->prevViewControllerName.empty())
+    this->SetViewController(this->dataPtr->prevViewControllerName);
+
+  return Camera::SetProjectionType(_type);
 }

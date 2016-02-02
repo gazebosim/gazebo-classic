@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,22 +15,18 @@
  *
 */
 
-#include <string>
+#include <boost/bind.hpp>
 
-#include "gazebo/rendering/DynamicLines.hh"
-#include "gazebo/rendering/Scene.hh"
-#include "gazebo/rendering/Visual.hh"
-#include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/common/Assert.hh"
+#include "gazebo/common/Events.hh"
 
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/KeyEventHandler.hh"
-#include "gazebo/gui/MouseEventHandler.hh"
 #include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/gui/model/ExtrudeDialog.hh"
 #include "gazebo/gui/model/ImportDialog.hh"
-#include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/ModelEditorPalette.hh"
-#include "gazebo/gui/model/ModelEditorEvents.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -40,8 +36,6 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
     : QWidget(_parent)
 {
   this->setObjectName("modelEditorPalette");
-
-  this->modelDefaultName = "Untitled";
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
 
@@ -113,92 +107,51 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   this->linkButtonGroup->addButton(boxButton);
   this->linkButtonGroup->addButton(customButton);
 
-  // Model Settings
-  QLabel *settingsLabel = new QLabel(tr(
-       "<font size=4 color='white'>Model Settings</font>"));
-
-  QGridLayout *settingsLayout = new QGridLayout;
-
-  // Model name
-  QLabel *modelLabel = new QLabel(tr("Model Name: "));
-  this->modelNameEdit = new QLineEdit();
-  this->modelNameEdit->setText(tr(this->modelDefaultName.c_str()));
-  connect(this->modelNameEdit, SIGNAL(textChanged(QString)), this,
-      SLOT(OnNameChanged(QString)));
-
-  // Static
-  QLabel *staticLabel = new QLabel(tr("Static:"));
-  this->staticCheck = new QCheckBox;
-  this->staticCheck->setChecked(false);
-  connect(this->staticCheck, SIGNAL(clicked()), this, SLOT(OnStatic()));
-
-  // Auto disable
-  QLabel *autoDisableLabel = new QLabel(tr("Auto-disable:"));
-  this->autoDisableCheck = new QCheckBox;
-  this->autoDisableCheck->setChecked(true);
-  connect(this->autoDisableCheck, SIGNAL(clicked()), this,
-      SLOT(OnAutoDisable()));
-
-  settingsLayout->addWidget(modelLabel, 0, 0);
-  settingsLayout->addWidget(this->modelNameEdit, 0, 1);
-  settingsLayout->addWidget(staticLabel, 1, 0);
-  settingsLayout->addWidget(this->staticCheck, 1, 1);
-  settingsLayout->addWidget(autoDisableLabel, 2, 0);
-  settingsLayout->addWidget(this->autoDisableCheck, 2, 1);
-
   this->modelCreator = new ModelCreator();
-  connect(modelCreator, SIGNAL(LinkAdded()), this, SLOT(OnLinkAdded()));
+  connect(this->modelCreator, SIGNAL(LinkAdded()), this, SLOT(OnLinkAdded()));
 
-  // Horizontal separator
-  QFrame *separator = new QFrame(this);
-  separator->setFrameShape(QFrame::HLine);
-  separator->setFrameShadow(QFrame::Sunken);
-  separator->setLineWidth(1);
+  this->otherItemsLayout = new QVBoxLayout();
+  this->otherItemsLayout->setContentsMargins(0, 0, 0, 0);
+
+  // Palette layout
+  QVBoxLayout *paletteLayout = new QVBoxLayout();
+  paletteLayout->addWidget(shapesLabel);
+  paletteLayout->addLayout(shapesLayout);
+  paletteLayout->addWidget(customShapesLabel);
+  paletteLayout->addLayout(customLayout);
+  paletteLayout->addLayout(this->otherItemsLayout);
+  paletteLayout->addItem(new QSpacerItem(30, 30, QSizePolicy::Minimum,
+      QSizePolicy::Minimum));
+  paletteLayout->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
+  QWidget *paletteWidget = new QWidget();
+  paletteWidget->setLayout(paletteLayout);
 
   // Main layout
-  mainLayout->addWidget(shapesLabel);
-  mainLayout->addLayout(shapesLayout);
-  mainLayout->addWidget(customShapesLabel);
-  mainLayout->addLayout(customLayout);
-  mainLayout->addItem(new QSpacerItem(30, 30, QSizePolicy::Minimum,
-      QSizePolicy::Minimum));
-  mainLayout->addWidget(separator);
-  mainLayout->addWidget(settingsLabel);
-  mainLayout->addLayout(settingsLayout);
-  mainLayout->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
+  QFrame *frame = new QFrame;
+  QVBoxLayout *frameLayout = new QVBoxLayout;
+
+  this->splitter = new QSplitter(Qt::Vertical, this);
+  this->splitter->addWidget(paletteWidget);
+  this->splitter->setCollapsible(0, false);
+
+  frameLayout->addWidget(this->splitter);
+  frameLayout->setContentsMargins(0, 0, 0, 0);
+  frame->setLayout(frameLayout);
+
+  mainLayout->addWidget(frame);
 
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(0, 0, 0, 0);
 
   KeyEventHandler::Instance()->AddPressFilter("model_editor",
     boost::bind(&ModelEditorPalette::OnKeyPress, this, _1));
-
-  // Connections
-  this->connections.push_back(
-      gui::model::Events::ConnectSaveModel(
-      boost::bind(&ModelEditorPalette::OnSaveModel, this, _1)));
-
-  this->connections.push_back(
-      gui::model::Events::ConnectNewModel(
-      boost::bind(&ModelEditorPalette::OnNewModel, this)));
-
-  this->connections.push_back(
-      gui::model::Events::ConnectModelPropertiesChanged(
-      boost::bind(&ModelEditorPalette::OnModelPropertiesChanged, this, _1, _2,
-      _3)));
 }
 
 /////////////////////////////////////////////////
 ModelEditorPalette::~ModelEditorPalette()
 {
-}
-
-/////////////////////////////////////////////////
-void ModelEditorPalette::OnItemSelection(QTreeWidgetItem *_item,
-                                         int /*_column*/)
-{
-  if (_item && _item->childCount() > 0)
-    _item->setExpanded(!_item->isExpanded());
+  delete this->modelCreator;
+  this->modelCreator = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -207,7 +160,7 @@ void ModelEditorPalette::OnCylinder()
   event::Events::setSelectedEntity("", "normal");
   g_arrowAct->trigger();
 
-  this->modelCreator->AddLink(ModelCreator::LINK_CYLINDER);
+  this->modelCreator->AddLink(ModelCreator::ENTITY_CYLINDER);
 }
 
 /////////////////////////////////////////////////
@@ -216,7 +169,7 @@ void ModelEditorPalette::OnSphere()
   event::Events::setSelectedEntity("", "normal");
   g_arrowAct->trigger();
 
-  this->modelCreator->AddLink(ModelCreator::LINK_SPHERE);
+  this->modelCreator->AddLink(ModelCreator::ENTITY_SPHERE);
 }
 
 /////////////////////////////////////////////////
@@ -225,7 +178,7 @@ void ModelEditorPalette::OnBox()
   event::Events::setSelectedEntity("", "normal");
   g_arrowAct->trigger();
 
-  this->modelCreator->AddLink(ModelCreator::LINK_BOX);
+  this->modelCreator->AddLink(ModelCreator::ENTITY_BOX);
 }
 
 /////////////////////////////////////////////////
@@ -235,10 +188,36 @@ void ModelEditorPalette::OnCustom()
   importDialog.deleteLater();
   if (importDialog.exec() == QDialog::Accepted)
   {
-    event::Events::setSelectedEntity("", "normal");
-    g_arrowAct->trigger();
-    this->modelCreator->AddShape(ModelCreator::LINK_MESH,
-        math::Vector3::One, math::Pose::Zero, importDialog.GetImportPath());
+    QFileInfo info(QString::fromStdString(importDialog.GetImportPath()));
+    if (info.isFile())
+    {
+      event::Events::setSelectedEntity("", "normal");
+      g_arrowAct->trigger();
+      if (info.completeSuffix().toLower() == "dae" ||
+          info.completeSuffix().toLower() == "stl")
+      {
+        this->modelCreator->AddShape(ModelCreator::ENTITY_MESH,
+            math::Vector3::One, math::Pose::Zero, importDialog.GetImportPath());
+      }
+      else if (info.completeSuffix().toLower() == "svg")
+      {
+        ExtrudeDialog extrudeDialog(importDialog.GetImportPath(), this);
+        extrudeDialog.deleteLater();
+        if (extrudeDialog.exec() == QDialog::Accepted)
+        {
+          this->modelCreator->AddShape(ModelCreator::ENTITY_POLYLINE,
+              math::Vector3(1.0/extrudeDialog.GetResolution(),
+              1.0/extrudeDialog.GetResolution(),
+              extrudeDialog.GetThickness()),
+              math::Pose::Zero, importDialog.GetImportPath(),
+              extrudeDialog.GetSamples());
+        }
+        else
+        {
+          this->OnCustom();
+        }
+      }
+    }
   }
   else
   {
@@ -248,7 +227,63 @@ void ModelEditorPalette::OnCustom()
 }
 
 /////////////////////////////////////////////////
-void ModelEditorPalette::AddJoint(const std::string &_type)
+void ModelEditorPalette::AddItem(QWidget *_item,
+    const std::string &_category)
+{
+  std::string category = _category;
+  if (category.empty())
+    category = "Other";
+
+  auto iter = this->categories.find(category);
+  QGridLayout *catLayout = NULL;
+  if (iter == this->categories.end())
+  {
+    catLayout = new QGridLayout();
+    this->categories[category] = catLayout;
+
+    std::string catStr =
+        "<font size=4 color='white'>" + category + "</font>";
+    QLabel *catLabel = new QLabel(tr(catStr.c_str()));
+    this->otherItemsLayout->addWidget(catLabel);
+    this->otherItemsLayout->addLayout(catLayout);
+  }
+  else
+    catLayout = iter->second;
+
+  int rowWidth = 3;
+  int row = catLayout->count() / rowWidth;
+  int col = catLayout->count() % rowWidth;
+  catLayout->addWidget(_item, row, col);
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::InsertWidget(unsigned int _index, QWidget *_widget)
+{
+  if (static_cast<int>(_index) > this->splitter->count())
+  {
+    gzerr << "Unable to add widget, index out of range " << std::endl;
+    return;
+  }
+
+  // set equal size for now. There should always be at least one widget
+  // (render3DFrame) in the splitter.
+  GZ_ASSERT(this->splitter->count() > 0,
+      "ModelEditorPalette splitter has no child widget");
+
+  this->splitter->insertWidget(_index, _widget);
+  this->splitter->setStretchFactor(_index, 1);
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::RemoveWidget(QWidget *_widget)
+{
+  int idx = this->splitter->indexOf(_widget);
+  if (idx > 0)
+    this->splitter->widget(idx)->hide();
+}
+
+/////////////////////////////////////////////////
+void ModelEditorPalette::CreateJoint(const std::string &_type)
 {
   event::Events::setSelectedEntity("", "normal");
   this->modelCreator->AddJoint(_type);
@@ -261,26 +296,6 @@ void ModelEditorPalette::OnLinkAdded()
   if (this->linkButtonGroup->checkedButton())
     this->linkButtonGroup->checkedButton()->setChecked(false);
   this->linkButtonGroup->setExclusive(true);
-}
-
-/////////////////////////////////////////////////
-void ModelEditorPalette::OnAutoDisable()
-{
-  this->modelCreator->SetAutoDisable(this->autoDisableCheck->isChecked());
-}
-
-/////////////////////////////////////////////////
-void ModelEditorPalette::OnStatic()
-{
-  this->modelCreator->SetStatic(this->staticCheck->isChecked());
-}
-
-/////////////////////////////////////////////////
-void ModelEditorPalette::OnModelPropertiesChanged(
-  bool _static, bool _autoDisable, const math::Pose &/*_pose*/)
-{
-  this->staticCheck->setChecked(_static);
-  this->autoDisableCheck->setChecked(_autoDisable);
 }
 
 /////////////////////////////////////////////////
@@ -303,22 +318,4 @@ bool ModelEditorPalette::OnKeyPress(const common::KeyEvent &_event)
 ModelCreator *ModelEditorPalette::GetModelCreator()
 {
   return this->modelCreator;
-}
-
-/////////////////////////////////////////////////
-void ModelEditorPalette::OnNameChanged(const QString &_name)
-{
-  gui::model::Events::modelNameChanged(_name.toStdString());
-}
-
-/////////////////////////////////////////////////
-void ModelEditorPalette::OnNewModel()
-{
-  this->modelNameEdit->setText(tr(this->modelDefaultName.c_str()));
-}
-
-/////////////////////////////////////////////////
-void ModelEditorPalette::OnSaveModel(const std::string &_saveName)
-{
-  this->modelNameEdit->setText(tr(_saveName.c_str()));
 }

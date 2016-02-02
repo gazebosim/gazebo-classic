@@ -23,8 +23,11 @@ message Scene
   optional bool grid           = 7;
 
   repeated Model model         = 8;
-  repeated Light light         = 9; 
+  repeated Light light         = 9;
   repeated Joint joint         = 10;
+
+  /// \brief Show/hide world origin indicator.
+  optional bool origin_visual  = 11;
 }
 
 

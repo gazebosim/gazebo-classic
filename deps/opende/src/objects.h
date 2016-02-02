@@ -30,6 +30,7 @@
 #include <ode/common.h>
 #include <ode/memory.h>
 #include <ode/mass.h>
+#include <ode/objects.h>
 #include "array.h"
 #include <boost/threadpool.hpp>
 
@@ -49,7 +50,6 @@ enum {
   dxBodyGyroscopic =                256// use gyroscopic term
 };
 
-
 // base class that does correct object allocation / deallocation
 
 struct dBase {
@@ -64,12 +64,12 @@ struct dBase {
 // base class for bodies and joints
 
 struct dObject : public dBase {
-  dxWorld *world;		// world this object is in
-  dObject *next;		// next object of this type in list
-  dObject **tome;		// pointer to previous object's next ptr
-  int tag;			// used by dynamics algorithms
-  int island_tag;		// used by island algorithms for grouping
-  void *userdata;		// user settable data
+  dxWorld *world;    // world this object is in
+  dObject *next;    // next object of this type in list
+  dObject **tome;    // pointer to previous object's next ptr
+  int tag;      // used by dynamics algorithms
+  int island_tag;    // used by island algorithms for grouping
+  void *userdata;    // user settable data
   dObject(dxWorld *w);
   virtual ~dObject() { }
 };
@@ -77,8 +77,8 @@ struct dObject : public dBase {
 
 // auto disable parameters
 struct dxAutoDisable {
-  dReal idle_time;		// time the body needs to be idle to auto-disable it
-  int idle_steps;		// steps the body needs to be idle to auto-disable it
+  dReal idle_time;    // time the body needs to be idle to auto-disable it
+  int idle_steps;    // steps the body needs to be idle to auto-disable it
   dReal linear_average_threshold;   // linear (squared) average velocity threshold
   dReal angular_average_threshold;  // angular (squared) average velocity threshold
   unsigned int average_samples;     // size of the average_lvel and average_avel buffers
@@ -96,13 +96,13 @@ struct dxDampingParameters {
 
 // quick-step parameters
 struct dxQuickStepParameters {
-  int precon_iterations;	// number of preconditioned SOR iterations to perform (without error correction)
-  int num_iterations;		// number of SOR iterations to perform
-  dReal w;			// the SOR over-relaxation parameter
-  int num_chunks;		// divide rows to these many chunks
-  int num_overlap;		// divide rows but over lap this many rows
-	// stop iteration if total rms_constraint_residual falls below this value
-  dReal sor_lcp_tolerance;
+  int precon_iterations;  // number of preconditioned PGS iterations to perform (without error correction)
+  int num_iterations;    // number of PGS iterations to perform
+  dReal w;      // the PGS over-relaxation parameter
+  int num_chunks;    // divide rows to these many chunks
+  int num_overlap;    // divide rows but over lap this many rows
+  // stop iteration if total rms_constraint_residual falls below this value
+  dReal pgs_lcp_tolerance;
   // rms_dlambda for this time step
   // rms_dlambda[0]: bilateral constraints (findex = -1)
   // rms_dlambda[1]: contact normal constraints (findex = -2)
@@ -118,16 +118,20 @@ struct dxQuickStepParameters {
   int num_contacts;           // for monitoring number of contacts
   bool dynamic_inertia_reduction;  // turn on/off quickstep inertia reduction.
   dReal smooth_contacts;  // control quickstep smoothing for contact solution.
+  dReal contact_sor_scale;  // sor scaling factor for contacts only
+  bool thread_position_correction;  // threaded position correction computations
   bool row_reorder1;  // control quickstep row reordering
   dReal warm_start;  // warm start factor, 0: no warm start, 1: full warm start
   int friction_iterations;  // extra quickstep iterations friction.
+  Friction_Model friction_model;  // friction model, enum type Friction_Model
+  World_Solver_Type world_solver_type;  // world step solver, enum type World_Solver_Type.
 };
 
 // robust-step parameters
 struct dxRobustStepParameters {
-  dxRobustStepParameters() 
-  { 
-     eps_feas = eps = std::numeric_limits<dReal>::epsilon(); 
+  dxRobustStepParameters()
+  {
+     eps_feas = eps = std::numeric_limits<dReal>::epsilon();
      max_iterations = 100;
   }
   dReal eps_feas;                       // feasibility tolerance
@@ -137,8 +141,8 @@ struct dxRobustStepParameters {
 
 // contact generation parameters
 struct dxContactParameters {
-  dReal max_vel;		// maximum correcting velocity
-  dReal min_depth;		// thickness of 'surface layer'
+  dReal max_vel;    // maximum correcting velocity
+  dReal min_depth;    // thickness of 'surface layer'
 };
 
 // position vector and rotation matrix for geometry objects that are not
@@ -149,22 +153,22 @@ struct dxPosR {
 };
 
 struct dxBody : public dObject {
-  dxJointNode *firstjoint;	// list of attached joints
-  unsigned flags;			// some dxBodyFlagXXX flags
-  dGeomID geom;			// first collision geom associated with body
-  dMass mass;			// mass parameters about POR
-  dMatrix3 invI;		// inverse of mass.I
-  dReal invMass;		// 1 / mass.mass
-  dxPosR posr;			// position and orientation of point of reference
-  dQuaternion q;		// orientation quaternion
-  dVector3 lvel,avel;		// linear and angular velocity of POR
-  dVector3 facc,tacc;		// force and torque accumulators
-  dVector3 finite_rot_axis;	// finite rotation axis, unit length or 0=none
+  dxJointNode *firstjoint;  // list of attached joints
+  unsigned flags;      // some dxBodyFlagXXX flags
+  dGeomID geom;      // first collision geom associated with body
+  dMass mass;      // mass parameters about POR
+  dMatrix3 invI;    // inverse of mass.I
+  dReal invMass;    // 1 / mass.mass
+  dxPosR posr;      // position and orientation of point of reference
+  dQuaternion q;    // orientation quaternion
+  dVector3 lvel,avel;    // linear and angular velocity of POR
+  dVector3 facc,tacc;    // force and torque accumulators
+  dVector3 finite_rot_axis;  // finite rotation axis, unit length or 0=none
 
   // auto-disable information
-  dxAutoDisable adis;		// auto-disable parameters
-  dReal adis_timeleft;		// time left to be idle
-  int adis_stepsleft;		// steps left to be idle
+  dxAutoDisable adis;    // auto-disable parameters
+  dReal adis_timeleft;    // time left to be idle
+  int adis_stepsleft;    // steps left to be idle
   dVector3* average_lvel_buffer;      // buffer for the linear average velocity calculation
   dVector3* average_avel_buffer;      // buffer for the angular average velocity calculation
   unsigned int average_counter;      // counter/index to fill the average-buffers
@@ -182,16 +186,16 @@ struct dxBody : public dObject {
 
 
 struct dxWorld : public dBase {
-  dxBody *firstbody;		// body linked list
-  dxJoint *firstjoint;		// joint linked list
-  int nb,nj;			// number of bodies and joints in lists
-  dVector3 gravity;		// gravity vector (m/s/s)
-  dReal global_erp;		// global error reduction parameter
-  dReal global_cfm;		// global constraint force mixing parameter
-  dxAutoDisable adis;		// auto-disable parameters
+  dxBody *firstbody;    // body linked list
+  dxJoint *firstjoint;    // joint linked list
+  int nb,nj;      // number of bodies and joints in lists
+  dVector3 gravity;    // gravity vector (m/s/s)
+  dReal global_erp;    // global error reduction parameter
+  dReal global_cfm;    // global constraint force mixing parameter
+  dxAutoDisable adis;    // auto-disable parameters
   int body_flags;               // flags for new bodies
   dxStepWorkingMemory *wmem; // Working memory object for dWorldStep/dWorldQuickStep
-  dxStepWorkingMemory *island_wmems[1000]; // Working memory object for dWorldStep/dWorldQuickStep
+  std::vector<dxStepWorkingMemory *> island_wmems; // Working memory object for dWorldStep/dWorldQuickStep
 
   dxQuickStepParameters qs;
   dxRobustStepParameters rs;

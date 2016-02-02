@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2015 Open Source Robotics Foundation
+ * Copyright (C) 2013-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ namespace gazebo
 
     /// \class SaveDialog SaveDialog.hh gui/gui.hh
     /// \brief Dialog for saving to file.
-    class GAZEBO_VISIBLE SaveDialog : public QDialog
+    class GZ_GUI_VISIBLE SaveDialog : public QDialog
     {
       Q_OBJECT
 
@@ -94,10 +94,10 @@ namespace gazebo
       /// \param[in] _path Path to be added.
       public: void AddDirToModelPaths(const std::string &_path);
 
-       /// \brief Helper function to generate a valid folder name from a
-       /// human-readable model name.
-       /// \param[in] _modelName Human-readable model name.
-       /// \return Folder name.
+      /// \brief Helper function to generate a valid folder name from a
+      /// human-readable model name.
+      /// \param[in] _modelName Human-readable model name.
+      /// \return Folder name.
       public: std::string GetFolderNameFromModelName(const std::string
           &_modelName);
 
@@ -113,6 +113,10 @@ namespace gazebo
 
       /// \brief Qt callback when the Save button is pressed.
       private slots: void OnAcceptSave();
+
+      /// \brief Qt callback when the model name line edit changes.
+      /// \param[in] _modelName New name.
+      private slots: void ModelNameChangedOnDialog(QString _modelName);
 
       /// \brief Get a template config file for a simple model.
       private: std::string GetTemplateConfigString();

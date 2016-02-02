@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -105,7 +105,11 @@ void BulletHingeJoint::Init()
   // If both links exist, then create a joint between the two links.
   if (bulletChildLink && bulletParentLink)
   {
+#ifdef LIBBULLET_VERSION_GT_282
+    this->bulletHinge = new btHingeAccumulatedAngleConstraint(
+#else
     this->bulletHinge = new btHingeConstraint(
+#endif
         *(bulletChildLink->GetBulletLink()),
         *(bulletParentLink->GetBulletLink()),
         BulletTypes::ConvertVector3(pivotChild),
@@ -117,7 +121,11 @@ void BulletHingeJoint::Init()
   // and the world.
   else if (bulletChildLink)
   {
+#ifdef LIBBULLET_VERSION_GT_282
+    this->bulletHinge = new btHingeAccumulatedAngleConstraint(
+#else
     this->bulletHinge = new btHingeConstraint(
+#endif
         *(bulletChildLink->GetBulletLink()),
         BulletTypes::ConvertVector3(pivotChild),
         BulletTypes::ConvertVector3(axisChild));
@@ -126,7 +134,11 @@ void BulletHingeJoint::Init()
   // and the world.
   else if (bulletParentLink)
   {
+#ifdef LIBBULLET_VERSION_GT_282
+    this->bulletHinge = new btHingeAccumulatedAngleConstraint(
+#else
     this->bulletHinge = new btHingeConstraint(
+#endif
         *(bulletParentLink->GetBulletLink()),
         BulletTypes::ConvertVector3(pivotParent),
         BulletTypes::ConvertVector3(axisParent));
@@ -149,7 +161,7 @@ void BulletHingeJoint::Init()
 
   // Set angleOffset based on hinge angle at joint creation.
   // GetAngleImpl will report angles relative to this offset.
-  this->angleOffset = this->bulletHinge->getHingeAngle();
+  this->angleOffset = this->GetAngleImpl(0).Radian();
 
   // Apply joint angle limits here.
   // TODO: velocity and effort limits.
@@ -219,7 +231,21 @@ math::Angle BulletHingeJoint::GetAngleImpl(unsigned int /*_index*/) const
 {
   math::Angle result;
   if (this->bulletHinge)
-    result = this->bulletHinge->getHingeAngle() - this->angleOffset;
+  {
+#ifdef LIBBULLET_VERSION_GT_282
+    btHingeAccumulatedAngleConstraint* hinge =
+      static_cast<btHingeAccumulatedAngleConstraint*>(this->bulletHinge);
+    if (hinge)
+    {
+      result = hinge->getAccumulatedHingeAngle();
+    }
+    else
+#endif
+    {
+      result = this->bulletHinge->getHingeAngle();
+    }
+    result -= this->angleOffset;
+  }
   return result;
 }
 
@@ -239,18 +265,6 @@ double BulletHingeJoint::GetVelocity(unsigned int /*_index*/) const
   if (this->parentLink)
     result -= globalAxis.Dot(this->parentLink->GetWorldAngularVel());
   return result;
-}
-
-//////////////////////////////////////////////////
-void BulletHingeJoint::SetMaxForce(unsigned int /*_index*/, double _t)
-{
-  this->bulletHinge->setMaxMotorImpulse(_t);
-}
-
-//////////////////////////////////////////////////
-double BulletHingeJoint::GetMaxForce(unsigned int /*_index*/)
-{
-  return this->bulletHinge->getMaxMotorImpulse();
 }
 
 //////////////////////////////////////////////////

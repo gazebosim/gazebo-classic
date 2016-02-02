@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _ALIGN_WIDGET_HH_
-#define _ALIGN_WIDGET_HH_
+#ifndef _GAZEBO_ALIGN_WIDGET_HH_
+#define _GAZEBO_ALIGN_WIDGET_HH_
 
 #include <string>
 
@@ -30,7 +30,7 @@ namespace gazebo
 
     /// \class AlignWidget AlignWidget.hh gui/Gui.hh
     /// \brief A gui widget for aligning models
-    class GAZEBO_VISIBLE AlignWidget : public QWidget
+    class GZ_GUI_VISIBLE AlignWidget : public QWidget
     {
       Q_OBJECT
 
@@ -75,6 +75,12 @@ namespace gazebo
       /// \param[in] _index Index in a combo box which indicates if alignment
       /// is now relative to the 'first' or 'last' selected entity.
       private slots: void OnAlignTargetChanged(int _index);
+
+      /// \brief Qt callback when the align direction is changed.
+      /// \param[in] _checked Whether the button was checked or unchecked. False
+      /// means the default alignment (min to min / max to max), true means
+      /// min to max.
+      private slots: void OnDirectionChanged(bool _checked);
 
       /// \brief Helper method to convert axis enum to string
       /// \param[in] _axis input alignment axis enum

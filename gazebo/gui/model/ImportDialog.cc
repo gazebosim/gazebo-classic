@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2015 Open Source Robotics Foundation
+ * Copyright (C) 2013-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
  *
 */
 
+#include "gazebo/common/SVGLoader.hh"
+
 #include "gazebo/gui/model/ImportDialog.hh"
 
 using namespace gazebo;
@@ -24,14 +26,17 @@ using namespace gui;
 ImportDialog::ImportDialog(QWidget *_parent) : QDialog(_parent)
 {
   this->setObjectName("ImportDialog");
-  this->setWindowTitle("Custom Link");
+  this->setWindowTitle("Import Link");
+  this->setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
 
   this->messageLabel = new QLabel;
   this->messageLabel->setText(
-      tr("You can import a 3D mesh that you have \n"
-      "made with a modelling tool such as Blender, \n"
-      "Maya or SolidWorks. It will appear as a \n"
-      "link in the 3D View."));
+      tr("You can import a 3D mesh (.dae, .stl) \n"
+      "that you have made with a modelling tool \n"
+      "such as Blender, Maya or SolidWorks.\n\n"
+      "You can also extrude a 2D image (.svg) to \n"
+      "create a 3D mesh."));
 
   this->pathLineEdit = new QLineEdit;
   this->pathLineEdit->setText(QDir::homePath());
@@ -66,6 +71,7 @@ ImportDialog::ImportDialog(QWidget *_parent) : QDialog(_parent)
   mainLayout->addLayout(buttonsLayout);
 
   this->setLayout(mainLayout);
+  this->layout()->setSizeConstraint(QLayout::SetFixedSize);
 }
 
 /////////////////////////////////////////////////
@@ -107,7 +113,9 @@ void ImportDialog::SetTitle(const std::string &_title)
 void ImportDialog::OnBrowse()
 {
   QFileDialog fd(this, tr("Import Link"), QDir::homePath(),
-      tr("Mesh files (*.dae *.stl)"));
+      tr("Files (*.svg *.dae *.stl)"));
+  fd.setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
   fd.setFilter(QDir::AllDirs | QDir::Hidden);
   fd.setFileMode(QFileDialog::ExistingFile);
   if (fd.exec())
@@ -138,11 +146,32 @@ void ImportDialog::OnImport()
   {
     this->accept();
   }
+  else if (info.completeSuffix().toLower() == "svg")
+  {
+    // Check if the SVG has any paths before accepting
+    std::string filename = this->pathLineEdit->text().toStdString();
+    common::SVGLoader svgLoader(2);
+    std::vector<common::SVGPath> paths;
+    svgLoader.Parse(filename, paths);
+
+    if (paths.empty())
+    {
+      std::string msg = "No paths found on file \"" + filename +
+          "\"\n\nPlease select another file.";
+      QMessageBox::warning(this, QString("Invalid File"),
+          QString(msg.c_str()), QMessageBox::Ok,
+          QMessageBox::Ok);
+    }
+    else
+    {
+      this->accept();
+    }
+  }
   else
   {
-    std::string msg = this->pathLineEdit->text().toStdString() +
-        " is not a valid mesh file.\nPlease select another file.";
-    QMessageBox::warning(this, QString("Invalid Mesh File"),
+    std::string msg = "\"" + this->pathLineEdit->text().toStdString() +
+        "\" is not a valid mesh or image file.\nPlease select another file.";
+    QMessageBox::warning(this, QString("Invalid File"),
         QString(msg.c_str()), QMessageBox::Ok,
         QMessageBox::Ok);
   }

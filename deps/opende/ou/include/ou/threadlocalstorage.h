@@ -33,6 +33,7 @@
 #include <ou/assert.h>
 #include <ou/platform.h>
 #include <ou/namespace.h>
+#include <ou/ou_dll.h>
 
 #if _OU_TARGET_OS == _OU_TARGET_OS_WINDOWS
 
@@ -42,7 +43,6 @@
 #else // #if _OU_TARGET_OS != _OU_TARGET_OS_WINDOWS
 
 #include <pthread.h>
-#include <gazebo/util/system.hh>
 
 
 #endif // #if _OU_TARGET_OS == ...
@@ -156,7 +156,7 @@ private:
 //////////////////////////////////////////////////////////////////////////
 // API declaration
 
-class GAZEBO_VISIBLE CThreadLocalStorage
+class OU_VISIBLE CThreadLocalStorage
 {
 public: // Safe methods
 	/*
@@ -261,7 +261,7 @@ private:
 //////////////////////////////////////////////////////////////////////////
 // Initialization/finalization
 
-class GAZEBO_VISIBLE CTLSInitialization
+class OU_VISIBLE CTLSInitialization
 {
 public:
 	enum EINITIALIZATIONFLAGS

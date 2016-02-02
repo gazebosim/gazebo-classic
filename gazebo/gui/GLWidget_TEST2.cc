@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,14 +47,8 @@ void GLWidget_TEST2::KeyPresses()
   gazebo::gui::MainWindow mainWindow;
 
   mainWindow.Load();
-
-  gazebo::rendering::create_scene(
-      gazebo::physics::get_world()->GetName(), false);
-
   mainWindow.Init();
   mainWindow.show();
-
-  gazebo::rendering::Events::createScene("default");
 
   // Process some events, and draw the screen
   for (unsigned int i = 0; i < 10; ++i)

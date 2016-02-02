@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,12 @@
 */
 #ifndef _GAZEBO_WORLD_HH_
 #define _GAZEBO_WORLD_HH_
+
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
 
 #include <vector>
 #include <list>
@@ -59,7 +65,8 @@ namespace gazebo
     /// (links, joints, sensors, plugins, etc), and WorldPlugin instances.
     /// Many core function are also handled in the World, including physics
     /// update, model updates, and message processing.
-    class GAZEBO_VISIBLE World : public boost::enable_shared_from_this<World>
+    class GZ_PHYSICS_VISIBLE World :
+      public boost::enable_shared_from_this<World>
     {
       /// \brief Constructor.
       /// Constructor for the World. Must specify a unique name.
@@ -115,9 +122,33 @@ namespace gazebo
       /// \return Pointer to the physics engine.
       public: PhysicsEnginePtr GetPhysicsEngine() const;
 
+      /// \brief Return the preset manager.
+      /// \return Pointer to the preset manager.
+      public: PresetManagerPtr GetPresetManager() const;
+
       /// \brief Return the spherical coordinates converter.
       /// \return Pointer to the spherical coordinates converter.
       public: common::SphericalCoordinatesPtr GetSphericalCoordinates() const;
+
+      /// \brief Return the gravity vector.
+      /// \return The gravity vector.
+      public: ignition::math::Vector3d Gravity() const;
+
+      /// \brief Set the gravity vector.
+      /// \param[in] _gravity New gravity vector.
+      public: void SetGravity(const ignition::math::Vector3d &_gravity);
+
+      /// \brief Set the gravity sdf value.
+      /// \param[in] _gravity New gravity vector.
+      public: void SetGravitySDF(const ignition::math::Vector3d &_gravity);
+
+      /// \brief Return the magnetic field vector.
+      /// \return The magnetic field vector.
+      public: virtual ignition::math::Vector3d MagneticField() const;
+
+      /// \brief Set the magnetic field vector.
+      /// \param[in] _mag New magnetic field vector.
+      public: void SetMagneticField(const ignition::math::Vector3d &_mag);
 
       /// \brief Get the number of models.
       /// \return The number of models in the World.
@@ -133,6 +164,10 @@ namespace gazebo
       /// \brief Get a list of all the models.
       /// \return A list of all the Models in the world.
       public: Model_V GetModels() const;
+
+      /// \brief Get a list of all the lights.
+      /// \return A list of all the Lights in the world.
+      public: Light_V Lights() const;
 
       /// \brief Reset with options.
       /// The _type parameter specifies which type of eneities to reset. See
@@ -192,6 +227,13 @@ namespace gazebo
       /// \param[in] _name The name of the Model to find.
       /// \return A pointer to the Model, or NULL if no model was found.
       public: ModelPtr GetModel(const std::string &_name);
+
+      /// \brief Get a light by name.
+      /// This function is the same as GetByName, but limits the search to
+      /// only lights.
+      /// \param[in] _name The name of the Light to find.
+      /// \return A pointer to the Light, or NULL if no light was found.
+      public: LightPtr Light(const std::string &_name);
 
       /// \brief Get a pointer to an Entity based on a name.
       /// This function is the same as GetByName, but limits the search to
@@ -295,6 +337,18 @@ namespace gazebo
       /// \param[in] _model Pointer to the model to publish.
       public: void PublishModelPose(physics::ModelPtr _model);
 
+      /// \brief Publish scale updates for a model.
+      /// This list of models to publish is processed and cleared once every
+      /// iteration.
+      /// \param[in] _model Pointer to the model to publish.
+      public: void PublishModelScale(physics::ModelPtr _model);
+
+      /// \brief Publish pose updates for a light.
+      /// Adds light to a list of lights to publish, which is processed and
+      /// cleared once every iteration.
+      /// \param[in] _light Pointer to the light to publish.
+      public: void PublishLightPose(const physics::LightPtr _light);
+
       /// \brief Get the total number of iterations.
       /// \return Number of iterations that simulation has taken.
       public: uint32_t GetIterations() const;
@@ -321,6 +375,28 @@ namespace gazebo
       /// \param[in] _name Name of the model to remove.
       public: void RemoveModel(const std::string &_name);
 
+      /// \brief Reset the velocity, acceleration, force and torque of
+      /// all child models.
+      public: void ResetPhysicsStates();
+
+      /// \internal
+      /// \brief Inform the World that an Entity has moved. The Entity
+      /// is added to a list that will be processed by the World.
+      /// Only a physics engine implementation should call this function.
+      /// If you are unsure whether you should use this function, do not.
+      /// \param[in] _entity Entity that has moved.
+      public: void _AddDirty(Entity *_entity);
+
+      /// \brief Get whether sensors have been initialized.
+      /// \return True if sensors have been initialized.
+      public: bool SensorsInitialized() const;
+
+      /// \internal
+      /// \brief Set whether sensors have been initialized. This should only
+      /// be called by SensorManager.
+      /// \param[in] _init True if sensors have been initialized.
+      public: void _SetSensorsInitialized(const bool _init);
+
       /// \cond
       /// This is an internal function.
       /// \brief Get a model by id.
@@ -346,6 +422,13 @@ namespace gazebo
       /// \param[in] _parent Parent of the model.
       /// \return Pointer to the newly created Model.
       private: ModelPtr LoadModel(sdf::ElementPtr _sdf, BasePtr _parent);
+
+      /// \brief Load a light.
+      /// \param[in] _sdf SDF element containing the Light description.
+      /// \param[in] _parent Parent of the light.
+      /// \return Pointer to the newly created Light.
+      private: LightPtr LoadLight(const sdf::ElementPtr &_sdf,
+          const BasePtr &_parent);
 
       /// \brief Load an actor.
       /// \param[in] _sdf SDF element containing the Actor description.
@@ -381,6 +464,10 @@ namespace gazebo
       /// \brief Called when a world control message is received.
       /// \param[in] _data The world control message.
       private: void OnControl(ConstWorldControlPtr &_data);
+
+      /// \brief Called when log playback control message is received.
+      /// \param[in] _data The log playback control message.
+      private: void OnPlaybackControl(ConstLogPlaybackControlPtr &_data);
 
       /// \brief Called when a request message is received.
       /// \param[in] _msg The request message.
@@ -435,6 +522,14 @@ namespace gazebo
       /// Must only be called from the World::ProcessMessages function.
       private: void ProcessModelMsgs();
 
+      /// \brief Process all received light factory messages.
+      /// Must only be called from the World::ProcessMessages function.
+      private: void ProcessLightFactoryMsgs();
+
+      /// \brief Process all received light modify messages.
+      /// Must only be called from the World::ProcessMessages function.
+      private: void ProcessLightModifyMsgs();
+
       /// \brief Log callback. This is where we write out state info.
       private: bool OnLog(std::ostringstream &_stream);
 
@@ -449,14 +544,24 @@ namespace gazebo
 
       /// \brief Callback when a light message is received.
       /// \param[in] _msg Pointer to the light message.
+      /// \deprecated Topic ~/light deprecated.
+      /// See OnLightFactoryMsg which subscribes to ~/factory/light and
+      /// OnLightModifyMsg which subscribes to ~/light/modify
       private: void OnLightMsg(ConstLightPtr &_msg);
+
+      /// \brief Callback when a light message is received in the
+      /// ~/factory/light topic.
+      /// \param[in] _msg Pointer to the light message.
+      private: void OnLightFactoryMsg(ConstLightPtr &_msg);
+
+      /// \brief Callback when a light message is received in the
+      /// ~/light/modify topic.
+      /// \param[in] _msg Pointer to the light message.
+      private: void OnLightModifyMsg(ConstLightPtr &_msg);
 
       /// \internal
       /// \brief Private data pointer.
       private: WorldPrivate *dataPtr;
-
-      /// Friend ODELink so that it has access to dataPtr->dirtyPoses
-      private: friend class ODELink;
 
       /// Friend DARTLink so that it has access to dataPtr->dirtyPoses
       private: friend class DARTLink;

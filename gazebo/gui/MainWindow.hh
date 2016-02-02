@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,16 @@
  * limitations under the License.
  *
 */
-#ifndef _MAINWINDOW_HH_
-#define _MAINWINDOW_HH_
+#ifndef _GAZEBO_GUI_MAINWINDOW_HH_
+#define _GAZEBO_GUI_MAINWINDOW_HH_
 
-#include <map>
+#include <memory>
 #include <string>
-#include <vector>
-#include <list>
 
 #include "gazebo/gazebo_config.h"
-#include "gazebo/gui/qt.h"
-#include "gazebo/common/Event.hh"
+#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/msgs/MessageTypes.hh"
-#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
 
 #ifdef HAVE_OCULUS
@@ -37,23 +34,36 @@ namespace gazebo
 {
   namespace gui
   {
-    class RenderWidget;
-    class ToolsWidget;
-    class ModelListWidget;
     class Editor;
-    class SpaceNav;
+    class RenderWidget;
 
-    class GAZEBO_VISIBLE MainWindow : public QMainWindow
+    // Forward declare private data
+    class MainWindowPrivate;
+
+    class GZ_GUI_VISIBLE MainWindow : public QMainWindow
     {
       Q_OBJECT
 
+      /// \brief Constructor
       public: MainWindow();
+
+      /// \brief Destructor
       public: virtual ~MainWindow();
 
+      /// \brief Load the mainwindow
       public: void Load();
+
+      /// \brief Initialization
       public: void Init();
 
-      public: unsigned int GetEntityId(const std::string &_name);
+      /// \brief Get an entity id
+      /// \param[in] _name The name of the entity
+      /// \return The entity id
+      public: unsigned int EntityId(const std::string &_name);
+
+      /// \brief Has an entity name
+      /// \param[in] _name The entity name
+      /// \return True if the entity has a name
       public: bool HasEntityName(const std::string &_name);
 
       /// \brief Add a widget to the left column stack of widgets.
@@ -68,9 +78,19 @@ namespace gazebo
       /// the main tab.
       public: void ShowLeftColumnWidget(const std::string &_name = "default");
 
+
       /// \brief Get a pointer to the render widget.
       /// \return A pointer to the render widget.
-      public: RenderWidget *GetRenderWidget() const;
+      /// \deprecated See RenderWidget() const.
+      public: gui::RenderWidget *GetRenderWidget() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get a pointer to the render widget.
+      /// \return A pointer to the render widget.
+      public: gui::RenderWidget *RenderWidget() const;
+
+      /// \brief Returns the state of the simulation, true if paused.
+      /// \return True if paused, false otherwise.
+      public: bool IsPaused() const;
 
       /// \brief Play simulation.
       public slots: void Play();
@@ -81,6 +101,38 @@ namespace gazebo
       /// \brief Set whether the left pane is visible
       /// \param[in] _on True to show the left pane, false to hide.
       public: void SetLeftPaneVisibility(bool _on);
+
+      /// \brief Add a menu to the main window menu bar.
+      /// \param[in] _menu Menu to be added.
+      public: void AddMenu(QMenu *_menu);
+
+      /// \brief Show a custom menubar. If NULL is used, the default menubar
+      /// is shown.
+      /// \param[in] _bar The menubar to show. NULL will show the default
+      /// menubar.
+      public: void ShowMenuBar(QMenuBar *_bar = NULL);
+
+      /// \brief Create a new action with information from the given action,
+      /// such as text and tooltip. The new action triggers the original action
+      /// and follows its checked state. This is used for example to have the
+      /// "same" action on the main window menu and the model editor menu,
+      /// since an action can't be added to 2 different menus.
+      /// \param[in] _action Action to be cloned.
+      /// \param[in] _parent Parent for the new action.
+      /// \return The new action.
+      public: QAction *CloneAction(QAction *_action, QObject *_parent);
+
+      /// \brief Get an editor by name
+      /// \param[in] _name Name of the editor.
+      /// \return Pointer to the editor.
+      /// \deprecated See Editor(const std::string &_name) const.
+      public: gui::Editor *GetEditor(
+          const std::string &_name) const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get an editor by name
+      /// \param[in] _name Name of the editor.
+      /// \return Pointer to the editor.
+      public: gui::Editor *Editor(const std::string &_name) const;
 
       /// \brief A signal to trigger loading of GUI plugins.
       signals: void AddPlugins();
@@ -95,7 +147,6 @@ namespace gazebo
       private slots: void ItemSelected(QTreeWidgetItem *, int);
       private slots: void New();
       private slots: void Open();
-      private slots: void Import();
       private slots: void Save();
       private slots: void SaveAs();
 
@@ -105,8 +156,15 @@ namespace gazebo
       /// \brief Clone a simulation.
       private slots: void Clone();
 
+      /// \brief Qt callback when the hotkey chart is triggered,
+      private slots: void HotkeyChart();
+
+      /// \brief Qt callback when about is triggered,
       private slots: void About();
+
       private slots: void Step();
+
+      /// \brief Qt callback when the arrow mode is triggered.
       private slots: void Arrow();
 
       /// \brief Qt callback when the translate mode is triggered.
@@ -141,6 +199,9 @@ namespace gazebo
       /// \brief Qt callback when the show grid action is triggered.
       private slots: void ShowGrid();
 
+      /// \brief Qt callback when the show origin action is triggered.
+      private slots: void ShowOrigin();
+
       /// \brief Qt callback when the show collisions action is triggered.
       private slots: void ShowCollisions();
 
@@ -156,8 +217,15 @@ namespace gazebo
       /// \brief Qt callback when the show inertia action is triggered.
       private slots: void ShowInertia();
 
-      private slots: void Reset();
+      /// \brief Qt callback when the show link frame action is triggered.
+      private slots: void ShowLinkFrame();
+
+      /// \brief Qt callback when the full screen action is triggered.
       private slots: void FullScreen();
+
+      /// \brief Qt callback when the show toolbars action is triggered.
+      private slots: void ShowToolbars();
+
       private slots: void FPS();
       private slots: void Orbit();
       private slots: void ViewOculus();
@@ -166,11 +234,14 @@ namespace gazebo
       private slots: void SetTransparent();
       private slots: void SetWireframe();
 
-      /// \brief Qt call back when the play action state changes
-      private slots: void OnPlayActionChanged();
+      /// \brief Qt callback when the show GUI overlays action is triggered.
+      private slots: void ShowGUIOverlays();
 
       /// \brief QT slot to open the data logger utility
       private slots: void DataLogger();
+
+      /// \brief QT callback when the data logger is shut down.
+      private slots: void OnDataLoggerClosed();
 
       /// \brief Callback when topic selection action.
       private slots: void SelectTopic();
@@ -188,28 +259,27 @@ namespace gazebo
       /// \brief Toggle full screen display.
       /// \param[in] _value True to display in full screen mode.
       private: void OnFullScreen(bool _value);
+
+      /// \brief Toggle toolbars display.
+      /// \param[in] _value True to display toolbars.
+      private: void OnShowToolbars(bool _value);
+
       private: void OnMoveMode(bool _mode);
 
       /// \brief Create most of the actions.
       private: void CreateActions();
 
+      /// \brief Delete the actions created in CreateActions.
+      private: void DeleteActions();
+
       /// \brief Create menus.
       private: void CreateMenus();
-
-      /// \brief Create the toolbars.
-      private: void CreateToolbars();
 
       /// \brief Create the main menu bar.
       private: void CreateMenuBar();
 
       /// \brief Create all the editors.
       private: void CreateEditors();
-
-      /// \brief Show a custom menubar. If NULL is used, the default menubar
-      /// is shown.
-      /// \param[in] _bar The menubar to show. NULL will show the default
-      /// menubar.
-      public: void ShowMenuBar(QMenuBar *_bar = NULL);
 
       private: void OnModel(ConstModelPtr &_msg);
 
@@ -222,7 +292,6 @@ namespace gazebo
       private: void OnManipMode(const std::string &_mode);
       private: void OnSetSelectedEntity(const std::string &_name,
                                         const std::string &_mode);
-      private: void OnStats(ConstWorldStatisticsPtr &_msg);
 
       /// \brief Handle event for changing the manual step size.
       /// \param[in] _value New input step size.
@@ -239,81 +308,13 @@ namespace gazebo
       private: void CreateDisabledIcon(const std::string &_pixmap,
                    QAction *_act);
 
-      private: QToolBar *playToolbar;
+      /// \brief Callback when window mode has changed.
+      /// \param[in] _mode Window mode, such as "Simulation", "LogPlayback"...
+      private: void OnWindowMode(const std::string &_mode);
 
-      private: RenderWidget *renderWidget;
-      private: ToolsWidget *toolsWidget;
-      private: ModelListWidget *modelListWidget;
-
-      private: transport::NodePtr node;
-      private: transport::PublisherPtr worldControlPub;
-      private: transport::PublisherPtr serverControlPub;
-      private: transport::PublisherPtr requestPub;
-      private: transport::PublisherPtr scenePub;
-      private: transport::SubscriberPtr responseSub;
-      private: transport::SubscriberPtr guiSub;
-      private: transport::SubscriberPtr newEntitySub, statsSub;
-      private: transport::SubscriberPtr worldModSub;
-
-      /// \brief Subscriber to the light topic.
-      private: transport::SubscriberPtr lightSub;
-
-      private: QDockWidget *toolsDock;
-
-      private: std::vector<event::ConnectionPtr> connections;
-
-      // A map that associates physics_id's with entity names
-      private: std::map<std::string, unsigned int> entities;
-
-      /// \brief Message used to field requests.
-      private: msgs::Request *requestMsg;
-
-      /// \brief The left-hand tab widget
-      private: QTabWidget *tabWidget;
-
-      /// \brief Mainwindow's menubar
-      private: QMenuBar *menuBar;
-
-      /// \brief The Edit menu.
-      private: QMenu *editMenu;
-
-      /// \brief A layout for the menu bar.
-      private: QHBoxLayout *menuLayout;
-
-      /// \brief Used to control size of each pane.
-      private: QStackedWidget *leftColumn;
-
-      /// \brief Map of names to widgets in the leftColumn QStackedWidget
-      private: std::map<std::string, int> leftColumnStack;
-
-      /// \brief The filename set via "Save As". This filename is used by
-      /// the "Save" feature.
-      private: std::string saveFilename;
-
-      /// \brief User specified step size for manually stepping the world
-      private: int inputStepSize;
-
-      /// \brief List of all the editors.
-      private: std::list<Editor*> editors;
-
-      /// \brief List of all the align action groups.
-      private: std::vector<QActionGroup *> alignActionGroups;
-
-      /// \brief Space navigator interface.
-      private: SpaceNav *spacenav;
-
-#ifdef HAVE_OCULUS
-      private: gui::OculusWindow *oculusWindow;
-#endif
-
-      /// \brief Buffer of plugin messages to process.
-      private: std::vector<boost::shared_ptr<msgs::Plugin const> > pluginMsgs;
-
-      /// \brief Mutext to protect plugin loading.
-      private: boost::mutex pluginLoadMutex;
-
-      /// \brief Splitter for the main window.
-      private: QSplitter *splitter;
+      /// \internal
+      /// \brief Private data pointer
+      private: std::unique_ptr<MainWindowPrivate> dataPtr;
     };
   }
 }

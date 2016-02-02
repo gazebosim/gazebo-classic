@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,13 @@
  * limitations under the License.
  *
 */
-#ifndef _MODEL_EDITOR_HH_
-#define _MODEL_EDITOR_HH_
+#ifndef _GAZEBO_GUI_MODEL_EDITOR_HH_
+#define _GAZEBO_GUI_MODEL_EDITOR_HH_
 
+#include <memory>
 #include <string>
+
+#include <sdf/sdf.hh>
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/Editor.hh"
@@ -27,11 +30,12 @@ namespace gazebo
 {
   namespace gui
   {
-    class ModelEditorPalette;
+    class TopToolbar;
+    class ModelEditorPrivate;
 
     /// \class ModelEditor ModelEditor.hh gui/gui.hh
     /// \brief Interface to the terrain editor.
-    class GAZEBO_VISIBLE ModelEditor : public Editor
+    class GZ_GUI_VISIBLE ModelEditor : public Editor
     {
       Q_OBJECT
 
@@ -41,6 +45,16 @@ namespace gazebo
 
       /// \brief Destuctor.
       public: virtual ~ModelEditor();
+
+      /// \brief Add an item to palette.
+      /// \param[in] _Item item to add.
+      /// \param[in] _category Category to add the item too.
+      public: void AddItemToPalette(QWidget *_item,
+          const std::string &_category = "");
+
+      /// \brief Add an entity to the editor
+      /// \param[in] _sdf SDF describing the entity.
+      public: void AddEntity(sdf::ElementPtr _sdf);
 
       /// \brief Qt callback when the model editor's save action is
       /// triggered.
@@ -72,58 +86,37 @@ namespace gazebo
       /// \brief Qt callback when a joint is added.
       private slots: void OnJointAdded();
 
-      /// \brief Callback when an action in the toolbar has been triggered.
-      /// \param[in] _action Triggered action.
-      private slots: void OnAction(QAction *_action);
+      /// \brief Show the schematic view widget
+      /// \param[in] _show True to show the widget, false to hide it.
+      private slots: void OnSchematicView(bool _show);
 
       /// \brief Callback when the model has been completed.
       private: void OnFinish();
 
+      /// \brief Toggle the model material scheme. This greys out all
+      /// non-editable models when the user enters the model editor mode.
+      private: void ToggleMaterialScheme();
+
       /// \brief Toggle main window's toolbar to display model editor icons.
       private: void ToggleToolbar();
+
+      /// \brief Toggle the Insert tab on and off in model editor mode.
+      /// This takes the main window Insert tab and adds it to the editor
+      /// Note that ToggleToolbar restores the Insert tab in the main window
+      private: void ToggleInsertWidget();
 
       /// \brief Create menus
       private: void CreateMenus();
 
-      /// \brief Menubar containing actions related to the editor.
-      private: QMenuBar *menuBar;
+      /// \brief Event callback used for inserting models into the editor
+      /// \param[in] _type Type of entity to be inserted
+      /// \param[in] _data Event data (e.g. name of model).
+      private: void OnCreateEntity(const std::string &_type,
+                                   const std::string &_data);
 
-      /// \brief Contains all the model editor tools.
-      private: ModelEditorPalette *modelPalette;
-
-      /// \brief True if model editor is active.
-      private: bool active;
-
-      /// \brief Qt action for selecting and adding a joint in the model editor.
-      private: QAction *jointTypeAct;
-
-      /// \brief Qt action for adding a previously selected joint in the
-      /// model editor.
-      private: QAction *jointAct;
-
-      /// \brief A separator for the joint icon.
-      private: QAction *jointSeparatorAct;
-
-      /// \brief Qt tool button associated with the joint action.
-      private: QToolButton *jointButton;
-
-      /// \brief Qt signal mapper for mapping add jointsignals.
-      private: QSignalMapper *signalMapper;
-
-      /// \brief Previously selected joint type.
-      private: std::string selectedJointType;
-
-      /// \brief Action to save model.
-      private: QAction *saveAct;
-
-      /// \brief Action to save model as.
-      private: QAction *saveAsAct;
-
-      /// \brief Action to start a new model.
-      private: QAction *newAct;
-
-      /// \brief Action to exit the editor.
-      private: QAction *exitAct;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<ModelEditorPrivate> dataPtr;
     };
   }
 }

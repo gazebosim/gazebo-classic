@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ namespace gazebo
 
     /// \class Level EditorView.hh
     /// \brief A convenient structure for storing level information
-    class GAZEBO_VISIBLE Level
+    class GZ_GUI_VISIBLE Level
     {
       /// \brief Constructor
       public: Level() : level(0), name("level"), baseHeight(0),
@@ -75,7 +75,7 @@ namespace gazebo
 
     /// \class EditorView EditorView.hh
     /// \brief Control the editor view and manage contents in the editor scene.
-    class GAZEBO_VISIBLE EditorView : public QGraphicsView
+    class GZ_GUI_VISIBLE EditorView : public QGraphicsView
     {
       Q_OBJECT
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 
 #include "gazebo/math/Pose.hh"
 #include "gazebo/rendering/Visual.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -32,7 +33,7 @@ namespace gazebo
 
     /// \class COMVisual COMVisual.hh rendering/rendering.hh
     /// \brief Basic Center of Mass visualization
-    class GAZEBO_VISIBLE COMVisual : public Visual
+    class GZ_RENDERING_VISIBLE COMVisual : public Visual
     {
       /// \brief Constructor
       /// \param[in] _name Name of the Visual
@@ -40,7 +41,10 @@ namespace gazebo
       public: COMVisual(const std::string &_name, VisualPtr _vis);
 
       /// \brief Destructor
-      public: virtual ~COMVisual();
+      public: ~COMVisual();
+
+      // Inherited from parent class
+      public: virtual void Fini();
 
       /// \brief Load the Visual from an SDF pointer
       /// \param[in] _elem SDF Element pointer
@@ -51,12 +55,17 @@ namespace gazebo
       /// \param[in] _msg Pointer to the message
       public: virtual void Load(ConstLinkPtr &_msg);
 
-      /// \brief Load based on a math::Pose
-      /// \param[in] _pose Pose of the COM visual.
-      /// \param[in] _radius Radius for the sphere visual.
-      /// \param[in] _box Link's bounding box.
-      private: void Load(const math::Pose &_pose,
-          double _radius = 0.01, math::Box _box = math::Box());
+      /// \brief Get inertia pose.
+      /// \return Inertia pose in link frame.
+      public: math::Pose GetInertiaPose() const;
+
+      /// \brief Load using previously set member variables.
+      private: void Load();
+
+      /// \brief Destroy all the movable objects attached to a scene node.
+      /// \param[in] _sceneNode Pointer to the scene node to process.
+      private: void DestroyAllAttachedMovableObjects(
+                        Ogre::SceneNode *_sceneNode);
     };
     /// \}
   }

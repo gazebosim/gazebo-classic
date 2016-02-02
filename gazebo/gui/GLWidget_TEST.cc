@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,21 +48,15 @@ void GLWidget_TEST::SelectObject()
   gazebo::transport::SubscriberPtr sub;
   node = gazebo::transport::NodePtr(new gazebo::transport::Node());
   node->Init();
-  sub = node->Subscribe("~/selection", &OnSelection, this);
+  sub = node->Subscribe("~/selection", &OnSelection, true);
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
   QVERIFY(mainWindow != NULL);
 
   mainWindow->Load();
-
-  gazebo::rendering::create_scene(
-      gazebo::physics::get_world()->GetName(), false);
-
   mainWindow->Init();
   mainWindow->show();
-
-  gazebo::rendering::Events::createScene("default");
 
   // Process some events, and draw the screen
   for (unsigned int i = 0; i < 10; ++i)
@@ -84,6 +78,28 @@ void GLWidget_TEST::SelectObject()
 
   // Verify the box was selected
   QVERIFY(g_gotBoxSelection);
+
+  // Check the selected visuals list
+  std::vector<gazebo::rendering::VisualPtr> selectedVisuals =
+      glWidget->SelectedVisuals();
+
+  QVERIFY(selectedVisuals.size() == 1u);
+  QVERIFY(selectedVisuals[0]->GetName() == "box");
+
+  // Delete the selected object. This is here to make sure the GUI does not
+  // segfault if an object is deleted.
+  {
+    std::string name = selectedVisuals.back()->GetName();
+    gazebo::transport::requestNoReply(node, "entity_delete", name);
+
+    // Process some events, and draw the screen
+    for (unsigned int i = 0; i < 10; ++i)
+    {
+      gazebo::common::Time::MSleep(30);
+      QCoreApplication::processEvents();
+      mainWindow->repaint();
+    }
+  }
 
   mainWindow->close();
   delete mainWindow;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <boost/bind.hpp>
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/Actions.hh"
@@ -32,19 +33,20 @@ BuildingEditor::BuildingEditor(MainWindow *_mainWindow)
   : Editor(_mainWindow)
 {
   // Tips
-  QLabel *tipsLabel = new QLabel(tr(
+  this->tipsLabel = new QLabel(tr(
       "<font size=4 color='white'><b>?</b></font>"));
-  tipsLabel->setToolTip(tr("<font size=3><p><b> Tips: </b></b>"
+  this->tipsLabel->setToolTip(tr("<font size=3><p><b> Tips: </b></b>"
       "<p>Double-click an object to open an Inspector with configuration "
       "options.</p>"
       "<p>Currently, windows & doors are simple holes in the wall.</p>"
       "<p>Because Gazebo only supports simple primitive shapes, all floors "
       "will be rectangular.</p>"));
+  this->tipsLabel->installEventFilter(this);
 
   // Create the building editor tab
   this->buildingPalette = new BuildingEditorPalette;
   this->Init("buildingEditorTab", "Building Editor", this->buildingPalette,
-      tipsLabel);
+      this->tipsLabel);
 
   this->newAct = new QAction(tr("&New"), this->mainWindow);
   this->newAct->setStatusTip(tr("New"));
@@ -77,12 +79,12 @@ BuildingEditor::BuildingEditor(MainWindow *_mainWindow)
       boost::bind(&BuildingEditor::OnFinish, this)));
 
   this->buildingEditorWidget = new BuildingEditorWidget(
-      this->mainWindow->GetRenderWidget());
+      this->mainWindow->RenderWidget());
   this->buildingEditorWidget->setSizePolicy(QSizePolicy::Expanding,
       QSizePolicy::Expanding);
   this->buildingEditorWidget->hide();
 
-  this->mainWindow->GetRenderWidget()->InsertWidget(0,
+  this->mainWindow->RenderWidget()->InsertWidget(0,
       this->buildingEditorWidget);
 
   this->menuBar = NULL;
@@ -146,25 +148,41 @@ void BuildingEditor::OnEdit(bool _checked)
   if (_checked)
   {
     this->CreateMenus();
+    this->mainWindowPaused = this->mainWindow->IsPaused();
     this->mainWindow->Pause();
     this->mainWindow->ShowLeftColumnWidget("buildingEditorTab");
     this->mainWindow->ShowMenuBar(this->menuBar);
     this->buildingEditorWidget->show();
-    this->mainWindow->GetRenderWidget()->DisplayOverlayMsg(
+    this->mainWindow->RenderWidget()->DisplayOverlayMsg(
         "Building is View Only");
-    this->mainWindow->GetRenderWidget()->ShowTimePanel(false);
-    this->mainWindow->GetRenderWidget()->ShowToolbar(false);
+    this->mainWindow->RenderWidget()->ShowTimePanel(false);
+    this->mainWindow->RenderWidget()->ShowToolbar(false);
   }
   else
   {
     this->buildingPalette->CustomColorDialog()->reject();
     this->mainWindow->ShowLeftColumnWidget();
     this->buildingEditorWidget->hide();
-    this->mainWindow->GetRenderWidget()->DisplayOverlayMsg("");
-    this->mainWindow->GetRenderWidget()->ShowTimePanel(true);
-    this->mainWindow->GetRenderWidget()->ShowToolbar(true);
+    this->mainWindow->RenderWidget()->DisplayOverlayMsg("");
+    this->mainWindow->RenderWidget()->ShowTimePanel(true);
+    this->mainWindow->RenderWidget()->ShowToolbar(true);
     this->mainWindow->ShowMenuBar();
-    this->mainWindow->Play();
+    if (!this->mainWindowPaused)
+      this->mainWindow->Play();
   }
   gui::editor::Events::toggleEditMode(_checked);
+}
+
+/////////////////////////////////////////////////
+bool BuildingEditor::eventFilter(QObject *_obj, QEvent *_event)
+{
+  QLabel *label = qobject_cast<QLabel *>(_obj);
+  if (label && label == this->tipsLabel &&
+      _event->type() == QEvent::MouseButtonRelease)
+  {
+    QToolTip::showText(this->tipsLabel->mapToGlobal(QPoint()),
+        this->tipsLabel->toolTip());
+    return true;
+  }
+  return false;
 }

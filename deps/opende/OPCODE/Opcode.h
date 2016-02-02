@@ -9,9 +9,9 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *  Main file for Opcode.dll.
- *  \file  	Opcode.h
- *  \author  	Pierre Terdiman
- *  \date  	March, 20, 2001
+ *  \file    Opcode.h
+ *  \author    Pierre Terdiman
+ *  \date    March, 20, 2001
  */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -24,8 +24,6 @@
 // stdarg.h must be included before Opcode headers as it later
 // may not compile being not able to find std::va_list
 #include <stdarg.h>
-
-#include <gazebo/util/system.hh>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Things to help us compile on non-windows platforms
@@ -59,11 +57,11 @@
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Automatic linking
     #ifndef BAN_OPCODE_AUTOLINK
-    	#ifdef _DEBUG
-    		//#pragma comment(lib, "Opcode_D.lib")
-    	#else
-    		//#pragma comment(lib, "Opcode.lib")
-    	#endif
+      #ifdef _DEBUG
+        //#pragma comment(lib, "Opcode_D.lib")
+      #else
+        //#pragma comment(lib, "Opcode.lib")
+      #endif
     #endif
   #endif
 #endif
@@ -81,7 +79,31 @@
 // #endif
 
 // Preprocessor__
-#define OPCODE_API GAZEBO_VISIBLE
+
+#if defined _WIN32 || defined __CYGWIN__
+  #ifdef BUILDING_DLL_OPCODE
+    #ifdef __GNUC__
+      #define OPCODE_API __attribute__ ((dllexport))
+    #else
+      #define OPCODE_API __declspec(dllexport)
+    #endif
+  #else
+    #ifdef __GNUC__
+      #define OPCODE_API __attribute__ ((dllimport))
+    #else
+      #define OPCODE_API __declspec(dllimport)
+    #endif
+  #endif
+  #define OPCODE_HIDDEN
+#else
+  #if __GNUC__ >= 4
+    #define OPCODE_API __attribute__ ((visibility ("default")))
+    #define OPCODE_HIDDEN  __attribute__ ((visibility ("hidden")))
+  #else
+    #define OPCODE_API
+    #define OPCODE_HIDDEN
+  #endif
+#endif
 
   #include "OPC_Settings.h"
   #include "OPC_IceHook.h"

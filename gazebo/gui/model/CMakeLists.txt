@@ -1,59 +1,99 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
-set (sources
-  CollisionConfig.cc
-  ImportDialog.cc
-  JointInspector.cc
-  JointMaker.cc
-  LinkConfig.cc
-  LinkInspector.cc
-  ModelCreator.cc
-  ModelData.cc
-  ModelEditor.cc
-  ModelEditorEvents.cc
-  ModelEditorPalette.cc
-  VisualConfig.cc
+set (sources_local
+  model/CollisionConfig.cc
+  model/EditorMaterialSwitcher.cc
+  model/ExtrudeDialog.cc
+  model/ImportDialog.cc
+  model/JointCreationDialog.cc
+  model/JointInspector.cc
+  model/JointMaker.cc
+  model/LinkConfig.cc
+  model/LinkInspector.cc
+  model/ModelCreator.cc
+  model/ModelData.cc
+  model/ModelEditor.cc
+  model/ModelEditorEvents.cc
+  model/ModelEditorPalette.cc
+  model/ModelPluginInspector.cc
+  model/ModelTreeWidget.cc
+  model/VisualConfig.cc
 )
 
-set (qt_headers
-  CollisionConfig.hh
-  ImportDialog.hh
-  JointInspector.hh
-  JointMaker.hh
-  LinkConfig.hh
-  LinkInspector.hh
-  ModelCreator.hh
-  ModelData.hh
-  ModelEditor.hh
-  ModelEditorPalette.hh
-  VisualConfig.hh
+set (qt_headers_local
+  model/CollisionConfig.hh
+  model/ExtrudeDialog.hh
+  model/ImportDialog.hh
+  model/JointCreationDialog.hh
+  model/JointInspector.hh
+  model/JointMaker.hh
+  model/LinkConfig.hh
+  model/LinkInspector.hh
+  model/ModelCreator.hh
+  model/ModelData.hh
+  model/ModelEditor.hh
+  model/ModelEditorPalette.hh
+  model/ModelPluginInspector.hh
+  model/ModelTreeWidget.hh
+  model/VisualConfig.hh
 )
 
-set (headers
+set (headers_install
   ModelEditorEvents.hh
+  ModelEditor.hh
 )
 
-# MainWindow is using screen rendering
+set (qt_tests_local
+  CollisionConfig_TEST.cc
+  JointCreationDialog_TEST.cc
+  JointInspector_TEST.cc
+  LinkConfig_TEST.cc
+  LinkInspector_TEST.cc
+  ModelPluginInspector_TEST.cc
+  VisualConfig_TEST.cc
+)
+
 if (ENABLE_SCREEN_TESTS)
-  set (qt_tests ${qt_tests} JointMaker_TEST.cc)
+  set (qt_tests_local
+    ${qt_tests_local}
+    EditorMaterialSwitcher_TEST.cc
+    ExtrudeDialog_TEST.cc
+    JointMaker_TEST.cc
+    ModelCreator_TEST.cc
+    ModelData_TEST.cc
+    ModelEditor_TEST.cc
+    ModelEditorPalette_TEST.cc
+    ModelTreeWidget_TEST.cc
+  )
 endif()
 
-# Generate executables for each of the QT unit tests
-gz_build_qt_tests(${qt_tests})
+if (HAVE_GRAPHVIZ)
+  set (qt_headers_local ${qt_headers_local}
+     model/GraphScene.hh
+     model/GraphView.hh
+     model/SchematicViewWidget.hh
+  )
 
-set (resources ../resources.qrc)
-QT5_WRAP_CPP(headers_MOC ${qt_headers})
-QT5_ADD_RESOURCES(resources_RCC ${resources})
+  set (sources_local ${sources_local}
+    model/GraphScene.cc
+    model/GraphView.cc
+    model/SchematicViewWidget.cc
+  )
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
+  set (qt_tests_local ${qt_tests_local}
+    GraphScene_TEST.cc
+  )
 
-gz_add_library(gazebo_gui_model ${sources} ${headers_MOC} ${headers} ${resources_RCC})
+  if (ENABLE_SCREEN_TESTS)
+    set (qt_tests_local ${qt_tests_local}
+      SchematicViewWidget_TEST.cc
+    )
+  endif()
 
-target_link_libraries(gazebo_gui_model
-  gazebo_common
-#  gazebo_transport
-#  gazebo_sdf_interface
-  gazebo_rendering
-  gazebo_msgs)
+endif()
 
-gz_install_library(gazebo_gui_model)
+set (sources ${sources} ${sources_local} PARENT_SCOPE)
+set (internal_qt_headers ${internal_qt_headers} ${qt_headers_local} PARENT_SCOPE)
+
+gz_build_qt_tests(${qt_tests_local})
+gz_install_includes("gui/model" ${headers_install})

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,10 @@
  * limitations under the License.
  *
 */
-
 #include <gtest/gtest.h>
 #include <boost/filesystem.hpp>
 
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/SystemPaths.hh"
@@ -33,7 +33,12 @@ TEST_F(LogRecord_TEST, Constructor)
 {
   gazebo::util::LogRecord *recorder = gazebo::util::LogRecord::Instance();
 
-  char *homePath = getenv("HOME");
+#ifndef _WIN32
+  const char *homePath = common::getEnv("HOME");
+#else
+  const char *homePath = common::getEnv("HOMEPATH");
+#endif
+
   EXPECT_TRUE(homePath != NULL);
 
   common::SystemPaths *paths = common::SystemPaths::Instance();
@@ -43,11 +48,11 @@ TEST_F(LogRecord_TEST, Constructor)
   logPath /= "/.gazebo/log/";
 
   // Make sure the log path is correct
-  EXPECT_EQ(recorder->GetBasePath(), logPath.string());
+  EXPECT_EQ(recorder->BasePath(), logPath.string());
 
-  EXPECT_FALSE(recorder->GetPaused());
-  EXPECT_FALSE(recorder->GetRunning());
-  EXPECT_TRUE(recorder->GetFirstUpdate());
+  EXPECT_FALSE(recorder->Paused());
+  EXPECT_FALSE(recorder->Running());
+  EXPECT_TRUE(recorder->FirstUpdate());
 
   // Init without a subdirectory
   EXPECT_FALSE(recorder->Init(""));
@@ -73,7 +78,7 @@ TEST_F(LogRecord_TEST, StartErrors)
   // Double start
   {
     EXPECT_TRUE(recorder->Start("bz2"));
-    EXPECT_TRUE(recorder->GetRunning());
+    EXPECT_TRUE(recorder->Running());
     EXPECT_FALSE(recorder->Start("bz2"));
   }
 
@@ -81,9 +86,9 @@ TEST_F(LogRecord_TEST, StartErrors)
   recorder->Stop();
 
   // Make sure everything has reset.
-  EXPECT_FALSE(recorder->GetRunning());
-  EXPECT_FALSE(recorder->GetPaused());
-  EXPECT_EQ(recorder->GetRunTime(), gazebo::common::Time());
+  EXPECT_FALSE(recorder->Running());
+  EXPECT_FALSE(recorder->Paused());
+  EXPECT_EQ(recorder->RunTime(), gazebo::common::Time());
 
   // Logger may still be writing so make sure we exit cleanly
   int i = 0;
@@ -105,27 +110,27 @@ TEST_F(LogRecord_TEST, Start_bzip2)
   EXPECT_TRUE(recorder->Start("bz2"));
 
   // Make sure the right flags have been set
-  EXPECT_FALSE(recorder->GetPaused());
-  EXPECT_TRUE(recorder->GetRunning());
-  EXPECT_TRUE(recorder->GetFirstUpdate());
+  EXPECT_FALSE(recorder->Paused());
+  EXPECT_TRUE(recorder->Running());
+  EXPECT_TRUE(recorder->FirstUpdate());
 
   // Make sure the right encoding is set
-  EXPECT_EQ(recorder->GetEncoding(), std::string("bz2"));
+  EXPECT_EQ(recorder->Encoding(), std::string("bz2"));
 
   // Make sure the log directories exist
-  EXPECT_TRUE(boost::filesystem::exists(recorder->GetBasePath()));
-  EXPECT_TRUE(boost::filesystem::is_directory(recorder->GetBasePath()));
+  EXPECT_TRUE(boost::filesystem::exists(recorder->BasePath()));
+  EXPECT_TRUE(boost::filesystem::is_directory(recorder->BasePath()));
 
   // Run time should be zero since no update has been triggered.
-  EXPECT_EQ(recorder->GetRunTime(), gazebo::common::Time());
+  EXPECT_EQ(recorder->RunTime(), gazebo::common::Time());
 
   // Stop recording.
   recorder->Stop();
 
   // Make sure everything has reset.
-  EXPECT_FALSE(recorder->GetRunning());
-  EXPECT_FALSE(recorder->GetPaused());
-  EXPECT_EQ(recorder->GetRunTime(), gazebo::common::Time());
+  EXPECT_FALSE(recorder->Running());
+  EXPECT_FALSE(recorder->Paused());
+  EXPECT_EQ(recorder->RunTime(), gazebo::common::Time());
 
   // Logger may still be writing so make sure we exit cleanly
   int i = 0;
@@ -147,27 +152,27 @@ TEST_F(LogRecord_TEST, Start_zlib)
   EXPECT_TRUE(recorder->Start("zlib"));
 
   // Make sure the right flags have been set
-  EXPECT_FALSE(recorder->GetPaused());
-  EXPECT_TRUE(recorder->GetRunning());
-  EXPECT_TRUE(recorder->GetFirstUpdate());
+  EXPECT_FALSE(recorder->Paused());
+  EXPECT_TRUE(recorder->Running());
+  EXPECT_TRUE(recorder->FirstUpdate());
 
   // Make sure the right encoding is set
-  EXPECT_EQ(recorder->GetEncoding(), std::string("zlib"));
+  EXPECT_EQ(recorder->Encoding(), std::string("zlib"));
 
   // Make sure the log directories exist
-  EXPECT_TRUE(boost::filesystem::exists(recorder->GetBasePath()));
-  EXPECT_TRUE(boost::filesystem::is_directory(recorder->GetBasePath()));
+  EXPECT_TRUE(boost::filesystem::exists(recorder->BasePath()));
+  EXPECT_TRUE(boost::filesystem::is_directory(recorder->BasePath()));
 
   // Run time should be zero since no update has been triggered.
-  EXPECT_EQ(recorder->GetRunTime(), gazebo::common::Time());
+  EXPECT_EQ(recorder->RunTime(), gazebo::common::Time());
 
   // Stop recording.
   recorder->Stop();
 
   // Make sure everything has reset.
-  EXPECT_FALSE(recorder->GetRunning());
-  EXPECT_FALSE(recorder->GetPaused());
-  EXPECT_EQ(recorder->GetRunTime(), gazebo::common::Time());
+  EXPECT_FALSE(recorder->Running());
+  EXPECT_FALSE(recorder->Paused());
+  EXPECT_EQ(recorder->RunTime(), gazebo::common::Time());
 
   // Logger may still be writing so make sure we exit cleanly
   int i = 0;

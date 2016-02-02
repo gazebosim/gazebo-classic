@@ -1,19 +1,30 @@
 #################################################
+# VAR: GZ_BUILD_TESTS_EXTRA_EXE_SRCS
 # Hack: extra sources to build binaries can be supplied to gz_build_tests in
 # the variable GZ_BUILD_TESTS_EXTRA_EXE_SRCS. This variable will be clean up
 # at the end of the function
+#
+# VAR: GZ_BUILD_TESTS_EXTRA_LIBS
+# Hack: extra libs to build binaries can be supplied to gz_build_tests in
+# the variable GZ_BUILD_TESTS_EXTRA_LIBS. This variable will be clean up
+# at the end of the function
+#
 macro (gz_build_tests)
   # Build all the tests
   foreach(GTEST_SOURCE_file ${ARGN})
-    string(REGEX REPLACE ".cc" "" BINARY_NAME ${GTEST_SOURCE_file})
+    string(REGEX REPLACE "\\.cc" "" BINARY_NAME ${GTEST_SOURCE_file})
     set(BINARY_NAME ${TEST_TYPE}_${BINARY_NAME})
     if(USE_LOW_MEMORY_TESTS)
       add_definitions(-DUSE_LOW_MEMORY_TESTS=1)
     endif(USE_LOW_MEMORY_TESTS)
-    add_executable(${BINARY_NAME} ${GTEST_SOURCE_file} ${GZ_BUILD_TESTS_EXTRA_EXE_SRCS})
+    add_executable(${BINARY_NAME} ${GTEST_SOURCE_file}
+                   ${GZ_BUILD_TESTS_EXTRA_EXE_SRCS})
 
+
+    link_directories(${PROJECT_BINARY_DIR}/test)
     add_dependencies(${BINARY_NAME}
-      gtest gtest_main
+      gtest
+      gtest_main
       gazebo_common
       gazebo_math
       gazebo_physics
@@ -21,29 +32,31 @@ macro (gz_build_tests)
       gazebo_rendering
       gazebo_msgs
       gazebo_transport
-      server_fixture
+      gazebo_test_fixture
       )
 
 
     target_link_libraries(${BINARY_NAME}
-      libgtest.a
-      libgtest_main.a
-      ${CMAKE_BINARY_DIR}/test/libserver_fixture.a
-      gazebo_common
-      gazebo_math
-      gazebo_physics
-      gazebo_sensors
-      gazebo_rendering
-      gazebo_msgs
-      gazebo_transport
+      # libgazebo will bring all most of gazebo libraries as dependencies
       libgazebo
-      pthread
+      gazebo_test_fixture
+      gtest
+      gtest_main
+      ${GZ_BUILD_TESTS_EXTRA_LIBS}
       )
 
     add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME}
 	--gtest_output=xml:${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
 
-    set_tests_properties(${BINARY_NAME} PROPERTIES TIMEOUT 240)
+    set(_env_vars)
+    list(APPEND _env_vars "CMAKE_PREFIX_PATH=${CMAKE_BINARY_DIR}:${CMAKE_PREFIX_PATH}")
+    list(APPEND _env_vars "GAZEBO_PLUGIN_PATH=${CMAKE_BINARY_DIR}/plugins:${CMAKE_BINARY_DIR}/plugins/events:${CMAKE_BINARY_DIR}/plugins/rest_web")
+    list(APPEND _env_vars "GAZEBO_RESOURCE_PATH=${CMAKE_SOURCE_DIR}")
+    list(APPEND _env_vars "PATH=${CMAKE_BINARY_DIR}/gazebo:${CMAKE_BINARY_DIR}/tools:$ENV{PATH}")
+    list(APPEND _env_vars "PKG_CONFIG_PATH=${CMAKE_BINARY_DIR}/cmake/pkgconfig:$PKG_CONFIG_PATH")
+    set_tests_properties(${BINARY_NAME} PROPERTIES
+      TIMEOUT 240
+      ENVIRONMENT "${_env_vars}")
 
     # Check that the test produced a result and create a failure if it didn't.
     # Guards against crashed and timed out tests.
@@ -52,6 +65,7 @@ macro (gz_build_tests)
   endforeach()
 
   set(GZ_BUILD_TESTS_EXTRA_EXE_SRCS "")
+  set(GZ_BUILD_TESTS_EXTRA_LIBS "")
 endmacro()
 
 if (VALID_DISPLAY)
@@ -84,16 +98,10 @@ if (VALID_DISPLAY)
       )
 
     target_link_libraries(${BINARY_NAME}
-      gazebo_gui
-      gazebo_common
-      gazebo_math
-      gazebo_physics
-      gazebo_sensors
-      gazebo_rendering
-      gazebo_msgs
-      gazebo_transport
+      # gazebo_gui and libgazebo will bring all most of gazebo
+      # libraries as dependencies
       libgazebo
-      pthread
+      gazebo_gui
       ${QT_QTTEST_LIBRARY}
       ${QT_LIBRARIES}
       )
@@ -102,7 +110,15 @@ if (VALID_DISPLAY)
     add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME}
 	-xml -o ${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
 
-    set_tests_properties(${BINARY_NAME} PROPERTIES TIMEOUT 240)
+    set(_env_vars)
+    list(APPEND _env_vars "CMAKE_PREFIX_PATH=${CMAKE_BINARY_DIR}:${CMAKE_PREFIX_PATH}")
+    list(APPEND _env_vars "GAZEBO_PLUGIN_PATH=${CMAKE_BINARY_DIR}/plugins:${CMAKE_BINARY_DIR}/plugins/events:${CMAKE_BINARY_DIR}/plugins/rest_web")
+    list(APPEND _env_vars "GAZEBO_RESOURCE_PATH=${CMAKE_SOURCE_DIR}")
+    list(APPEND _env_vars "PATH=${CMAKE_BINARY_DIR}/gazebo:${CMAKE_BINARY_DIR}/tools:$ENV{PATH}")
+    list(APPEND _env_vars "PKG_CONFIG_PATH=${CMAKE_BINARY_DIR}/cmake/pkgconfig:$PKG_CONFIG_PATH")
+    set_tests_properties(${BINARY_NAME} PROPERTIES
+      TIMEOUT 240
+      ENVIRONMENT "${_env_vars}")
 
     # Check that the test produced a result and create a failure if it didn't.
     # Guards against crashed and timed out tests.

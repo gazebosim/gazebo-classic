@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,7 +81,7 @@ namespace gazebo
   };
 
   /// \brief Plugin for simulating a torque-speed curve for actuators.
-  class ActuatorPlugin : public ModelPlugin
+  class GAZEBO_VISIBLE ActuatorPlugin : public ModelPlugin
   {
     /// Documentation inherited
     public: void Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf);

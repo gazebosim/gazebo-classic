@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,22 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_MODEL_ALIGN_HH_
-#define _GAZEBO_MODEL_ALIGN_HH_
+#ifndef _GAZEBO_GUI_MODEL_ALIGN_HH_
+#define _GAZEBO_GUI_MODEL_ALIGN_HH_
 
 #include <string>
 #include <vector>
 
-#include "gazebo/common/MouseEvent.hh"
 #include "gazebo/common/KeyEvent.hh"
+#include "gazebo/common/MouseEvent.hh"
+#include "gazebo/common/SingletonT.hh"
+
+#include "gazebo/math/Box.hh"
+#include "gazebo/math/Pose.hh"
+#include "gazebo/math/Vector3.hh"
 
 #include "gazebo/rendering/RenderTypes.hh"
 
-#include "gazebo/common/SingletonT.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -36,7 +40,7 @@ namespace gazebo
 
     /// \class ModelAlign ModelAlign.hh gui/Gui.hh
     /// \brief A gui tool for aligning models
-    class GAZEBO_VISIBLE ModelAlign : public SingletonT<ModelAlign>
+    class GZ_GUI_VISIBLE ModelAlign : public SingletonT<ModelAlign>
     {
       /// \brief Constructor
       private: ModelAlign();
@@ -47,18 +51,21 @@ namespace gazebo
       /// \brief Initialize the model alignment tool.
       public: void Init();
 
+      /// \brief Clear the model alignment tool. This explicity cleans up the
+      /// internal state of the singleton and prepares it for exit.
+      public: void Clear();
+
       /// \brief Callback when a specific alignment configuration is set.
       /// \param[in] _visuals Visuals to be aligned.
       /// \param[in] _axis Axis of alignment: x, y, or z.
-      /// \param[in] _config Configuration: min, center, or max.
+      /// \param[in] _config Either a configuration (min, center, max),
+      /// or "reset" to restore the original pose.
       /// \param[in] _publish True to publish new alignment pose
+      /// \param[in] _inverted True to invert alignment direction.
       public: void AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
           const std::string &_axis, const std::string &_config,
-          const std::string &_target, bool _publish = true);
-
-      /// \brief Publish visual's pose to the server
-      /// \param[in] _vis Pointer to the visual whose pose is to be published.
-      private: void PublishVisualPose(rendering::VisualPtr _vis);
+          const std::string &_target, const bool _publish = true,
+          const bool _inverted = false);
 
       /// \brief Get the minimum and maximum values of a list of vertices.
       /// \param[in] _vertices A list of input vertices.
@@ -74,6 +81,13 @@ namespace gazebo
       /// world coordinates.
       private: void Transform(math::Box _bbox, math::Pose _worldPose,
           std::vector<math::Vector3> &_vertices);
+
+      /// \brief Change the transparency of the visual's leaf children to
+      /// indicate a highlighted state or not. Must do it for each leaf as
+      /// they might have different transparencies.
+      /// \param[in] _vis Visual to be highlighted.
+      /// \param[in] _highlight Whether to highlight or not.
+      private: void SetHighlighted(rendering::VisualPtr _vis, bool _highlight);
 
       /// \brief This is a singleton class.
       private: friend class SingletonT<ModelAlign>;

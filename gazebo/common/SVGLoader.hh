@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,12 @@
 #include <string>
 #include <vector>
 
+#include <ignition/math/Vector2.hh>
+#include <ignition/math/Matrix3.hh>
+
 #include <gazebo/common/Console.hh>
 #include <gazebo/math/Vector2d.hh>
+#include <gazebo/math/Matrix3.hh>
 
 class TiXmlElement;
 class TiXmlNode;
@@ -35,7 +39,7 @@ namespace gazebo
     class SVGLoaderPrivate;
 
     /// \brief Handles errors during SVG parsing
-    class GAZEBO_VISIBLE SvgError: public std::runtime_error
+    class GZ_COMMON_VISIBLE SvgError: public std::runtime_error
     {
       /// \brief constructor
       /// \param[in] _what The error description
@@ -43,17 +47,23 @@ namespace gazebo
     };
 
     /// \brief SVG command data structure
-    struct GAZEBO_VISIBLE SVGCommand
+    class GZ_COMMON_VISIBLE SVGCommand
     {
+      /// \brief Constructor
+      public: SVGCommand() : cmd(' ') {}
+
+      /// \brief Destructor
+      public: virtual ~SVGCommand() = default;
+
       /// \brief A letter that describe the segment
-      char cmd;  // cppcheck style error is a false positive
+      public: char cmd;
 
       /// \brief Coordinates for the command
-      std::vector<double> numbers;
+      public: std::vector<double> numbers;
     };
 
     /// \brief An SVG path element data structure
-    struct GAZEBO_VISIBLE SVGPath
+    struct GZ_COMMON_VISIBLE SVGPath
     {
       /// \brief An id or name
       std::string id;
@@ -62,17 +72,17 @@ namespace gazebo
       std::string style;
 
       /// \brief A 2D transform (or a list of transforms)
-      std::string transform;
+      ignition::math::Matrix3d transform;
 
       /// \brief A list of subpaths (as lists of commands)
       std::vector< std::vector<SVGCommand> > subpaths;
 
       /// \brief The polylines described by the commands
-      std::vector< std::vector<math::Vector2d> > polylines;
+      std::vector< std::vector<ignition::math::Vector2d> > polylines;
     };
 
     /// \brief A loader for SVG files
-    class GAZEBO_VISIBLE SVGLoader
+    class GZ_COMMON_VISIBLE SVGLoader
     {
       /// \brief Constructor
       /// \param[in] _samples The number of points for cubic spline segments
@@ -87,6 +97,17 @@ namespace gazebo
       /// \return false when the file cannot be processed
       public: bool Parse(const std::string &_filename,
                          std::vector<SVGPath> &_paths);
+
+      /// \brief Reads in paths and outputs closed polylines and open polylines
+      /// \param[in] _paths The input paths
+      /// \param[in] _tol Tolerence when comparing distance between 2 points.
+      /// \param[out] _closedPolys A vector to collect new closed loops
+      /// \param[out] _openPolys A vector to collect non closed paths
+      public: static void PathsToClosedPolylines(
+          const std::vector<common::SVGPath> &_paths,
+          double _tol,
+          std::vector< std::vector<ignition::math::Vector2d> > &_closedPolys,
+          std::vector< std::vector<ignition::math::Vector2d> > &_openPolys);
 
       /// \brief Outputs the content of the paths to file (or console)
       /// \param[in] _paths The paths
@@ -130,18 +151,18 @@ namespace gazebo
       /// \param[in] _resolution The step size (between 0 and 1)
       /// \param[out] _polys The vector that receives the polylines
       private: void PathToPoints(const SVGPath &_path,
-                      double _resolution,
-                      std::vector< std::vector<math::Vector2d> > &_polys);
+                  double _resolution,
+                  std::vector< std::vector<ignition::math::Vector2d> > &_polys);
 
       /// \brief Generates polylines for each SVG subpath
       /// \param[in] _subpath The subpath commands
       /// \param[in] _last The previous position (for relative path commands)
       /// \param[out] _polyline The polyline that receives the data
       /// \return The last point of the subpath
-      private: math::Vector2d SubpathToPolyline(
+      private: ignition::math::Vector2d SubpathToPolyline(
                       const std::vector<SVGCommand> &_subpath,
-                      math::Vector2d _last,
-                      std::vector<math::Vector2d> &_polyline);
+                      ignition::math::Vector2d _last,
+                      std::vector<ignition::math::Vector2d> &_polyline);
 
       /// \internal
       /// \brief Pointer to private data

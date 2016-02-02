@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ namespace gazebo
     class ODEPhysicsPrivate;
 
     /// \brief ODE physics engine.
-    class GAZEBO_VISIBLE ODEPhysics : public PhysicsEngine
+    class GZ_PHYSICS_VISIBLE ODEPhysics : public PhysicsEngine
     {
       /// \enum ODEParam
       /// \brief ODE Physics parameter types.
@@ -78,7 +78,13 @@ namespace gazebo
 
         /// \brief Limit ratios of inertias of adjacent links (note that the
         /// corresponding SDF tag is "use_dynamic_moi_rescaling")
-        INERTIA_RATIO_REDUCTION
+        INERTIA_RATIO_REDUCTION,
+
+        /// \brief friction model
+        FRICTION_MODEL,
+
+        /// \brief LCP Solver
+        WORLD_SOLVER_TYPE
       };
 
       /// \brief Constructor.
@@ -152,6 +158,15 @@ namespace gazebo
       // Documentation inherited
       public: virtual void SetContactSurfaceLayer(double layer_depth);
 
+      /// \brief Set friction model type.
+      /// \param[in] _fricModel Type of friction model.
+      public: virtual void SetFrictionModel(const std::string &_fricModel);
+
+      /// \brief Set world step solver type.
+      /// \param[in] _worldSolverType Type of solver used by world step.
+      public: virtual void
+              SetWorldStepSolverType(const std::string &_worldSolverType);
+
       // Documentation inherited
       public: virtual void SetMaxContacts(unsigned int max_contacts);
 
@@ -173,6 +188,14 @@ namespace gazebo
       // Documentation inherited
       public: virtual double GetContactMaxCorrectingVel();
 
+      /// \brief Get friction model.
+      /// \return Friction model type.
+      public: virtual std::string GetFrictionModel() const;
+
+      /// \brief Get solver type for world step.
+      /// \return Type of solver used by world step.
+      public: virtual std::string GetWorldStepSolverType() const;
+
       // Documentation inherited
       public: virtual double GetContactSurfaceLayer();
 
@@ -192,6 +215,10 @@ namespace gazebo
       /// Documentation inherited
       public: virtual boost::any GetParam(const std::string &_key) const;
 
+      /// Documentation inherited
+      public: virtual bool GetParam(const std::string &_key,
+                  boost::any &_value) const;
+
       /// \brief Return the world space id.
       /// \return The space id for the world.
       public: dSpaceID GetSpaceId() const;
@@ -210,6 +237,34 @@ namespace gazebo
       /// \param[in] _intertial Pointer to an Inertial object that will be
       /// converted.
       public: static void ConvertMass(void *_odeMass, InertialPtr _inertial);
+
+      /// \brief Convert a string to a Friction_Model enum.
+      /// \param[in] _fricModel Friction model string.
+      /// \return A Friction_Model enum. Defaults to pyramid_friction
+      /// if _fricModel is unrecognized.
+      public: static Friction_Model
+              ConvertFrictionModel(const std::string &_fricModel);
+
+      /// \brief Convert a Friction_Model enum to a string.
+      /// \param[in] _fricModel Friction_Model enum.
+      /// \return Friction model string. Returns "unknown" if
+      /// _fricModel is unrecognized.
+      public: static std::string
+              ConvertFrictionModel(const Friction_Model _fricModel);
+
+      /// \brief Convert a World_Solver_Type enum to a string.
+      /// \param[in] _solverType World_Solver_Type enum.
+      /// \return World solver type string. Returns "unknown" if
+      /// _solverType is unrecognized.
+      public: static std::string
+              ConvertWorldStepSolverType(const World_Solver_Type _solverType);
+
+      /// \brief Convert a string to a World_Solver_Type enum.
+      /// \param[in] _solverType World solver type string.
+      /// \return A World_Solver_Type enum. Defaults to ODE_DEFAULT
+      /// if _solverType is unrecognized.
+      public: static World_Solver_Type
+              ConvertWorldStepSolverType(const std::string &_solverType);
 
       /// \brief Get the step type (quick, world).
       /// \return The step type.

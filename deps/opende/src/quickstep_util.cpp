@@ -30,7 +30,11 @@
 #include "objects.h"
 #include "joints/joint.h"
 #include "util.h"
-#include <sys/time.h>
+
+#ifndef _WIN32
+  #include <sys/time.h>
+#endif
+
 #include "quickstep_util.h"
 
 using namespace ode;
@@ -161,6 +165,7 @@ int quickstep::compare_index_error (const void *a, const void *b)
 }
 #endif
 
+//***************************************************************************
 // Modifying inertia along constrained axes without modifying dynamics.
 void quickstep::DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const int b1, const int b2,
                             const dJointWithInfo1 *jicurr,

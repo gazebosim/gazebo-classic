@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,11 +31,34 @@ using namespace rendering;
 InertiaVisual::InertiaVisual(const std::string &_name, VisualPtr _vis)
   : Visual(*new InertiaVisualPrivate, _name, _vis, false)
 {
+  InertiaVisualPrivate *dPtr =
+      reinterpret_cast<InertiaVisualPrivate *>(this->dataPtr);
+  dPtr->type = VT_PHYSICS;
 }
 
 /////////////////////////////////////////////////
 InertiaVisual::~InertiaVisual()
 {
+  InertiaVisualPrivate *dPtr =
+      reinterpret_cast<InertiaVisualPrivate *>(this->dataPtr);
+  if (dPtr && dPtr->sceneNode)
+  {
+    this->DestroyAllAttachedMovableObjects(dPtr->sceneNode);
+    dPtr->sceneNode->removeAndDestroyAllChildren();
+  }
+}
+
+/////////////////////////////////////////////////
+void InertiaVisual::Fini()
+{
+  InertiaVisualPrivate *dPtr =
+      reinterpret_cast<InertiaVisualPrivate *>(this->dataPtr);
+  if (dPtr && dPtr->sceneNode)
+  {
+    this->DestroyAllAttachedMovableObjects(dPtr->sceneNode);
+    dPtr->sceneNode->removeAndDestroyAllChildren();
+  }
+  Visual::Fini();
 }
 
 /////////////////////////////////////////////////
@@ -96,24 +119,24 @@ void InertiaVisual::Load(const math::Pose &_pose,
       reinterpret_cast<InertiaVisualPrivate *>(this->dataPtr);
 
   // Inertia position indicator
-  math::Vector3 p1(0, 0, -2*_scale.z);
-  math::Vector3 p2(0, 0, 2*_scale.z);
-  math::Vector3 p3(0, -2*_scale.y, 0);
-  math::Vector3 p4(0, 2*_scale.y, 0);
-  math::Vector3 p5(-2*_scale.x, 0, 0);
-  math::Vector3 p6(2*_scale.x, 0, 0);
-  p1 += _pose.pos;
-  p2 += _pose.pos;
-  p3 += _pose.pos;
-  p4 += _pose.pos;
-  p5 += _pose.pos;
-  p6 += _pose.pos;
-  p1 = _pose.rot.RotateVector(p1);
-  p2 = _pose.rot.RotateVector(p2);
-  p3 = _pose.rot.RotateVector(p3);
-  p4 = _pose.rot.RotateVector(p4);
-  p5 = _pose.rot.RotateVector(p5);
-  p6 = _pose.rot.RotateVector(p6);
+  ignition::math::Vector3d p1(0, 0, -2*_scale.z);
+  ignition::math::Vector3d p2(0, 0, 2*_scale.z);
+  ignition::math::Vector3d p3(0, -2*_scale.y, 0);
+  ignition::math::Vector3d p4(0, 2*_scale.y, 0);
+  ignition::math::Vector3d p5(-2*_scale.x, 0, 0);
+  ignition::math::Vector3d p6(2*_scale.x, 0, 0);
+  p1 += _pose.pos.Ign();
+  p2 += _pose.pos.Ign();
+  p3 += _pose.pos.Ign();
+  p4 += _pose.pos.Ign();
+  p5 += _pose.pos.Ign();
+  p6 += _pose.pos.Ign();
+  p1 = _pose.rot.RotateVector(p1).Ign();
+  p2 = _pose.rot.RotateVector(p2).Ign();
+  p3 = _pose.rot.RotateVector(p3).Ign();
+  p4 = _pose.rot.RotateVector(p4).Ign();
+  p5 = _pose.rot.RotateVector(p5).Ign();
+  p6 = _pose.rot.RotateVector(p6).Ign();
 
   dPtr->crossLines = this->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
   dPtr->crossLines->setMaterial("Gazebo/Green");
@@ -128,13 +151,13 @@ void InertiaVisual::Load(const math::Pose &_pose,
   this->InsertMesh("unit_box");
 
   Ogre::MovableObject *boxObj =
-    (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+    (Ogre::MovableObject*)(dPtr->scene->OgreSceneManager()->createEntity(
           this->GetName()+"__BOX__", "unit_box"));
   boxObj->setVisibilityFlags(GZ_VISIBILITY_GUI);
   ((Ogre::Entity*)boxObj)->setMaterialName("__GAZEBO_TRANS_PURPLE_MATERIAL__");
 
   dPtr->boxNode =
-      dPtr->sceneNode->createChildSceneNode(this->GetName() + "_BOX");
+      dPtr->sceneNode->createChildSceneNode(this->GetName() + "_BOX_");
 
   dPtr->boxNode->attachObject(boxObj);
   dPtr->boxNode->setScale(_scale.x, _scale.y, _scale.z);
@@ -143,4 +166,35 @@ void InertiaVisual::Load(const math::Pose &_pose,
                                                  _pose.rot.y, _pose.rot.z));
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+}
+
+/////////////////////////////////////////////////
+void InertiaVisual::DestroyAllAttachedMovableObjects(
+        Ogre::SceneNode *_sceneNode)
+{
+  if (!_sceneNode)
+    return;
+
+  // Destroy all the attached objects
+  Ogre::SceneNode::ObjectIterator itObject =
+    _sceneNode->getAttachedObjectIterator();
+
+  while (itObject.hasMoreElements())
+  {
+    Ogre::Entity *ent = static_cast<Ogre::Entity*>(itObject.getNext());
+    if (ent->getMovableType() != DynamicLines::GetMovableType())
+      this->dataPtr->scene->OgreSceneManager()->destroyEntity(ent);
+    else
+      delete ent;
+  }
+
+  // Recurse to child SceneNodes
+  Ogre::SceneNode::ChildNodeIterator itChild = _sceneNode->getChildIterator();
+
+  while (itChild.hasMoreElements())
+  {
+    Ogre::SceneNode* pChildNode =
+        static_cast<Ogre::SceneNode*>(itChild.getNext());
+    this->DestroyAllAttachedMovableObjects(pChildNode);
+  }
 }

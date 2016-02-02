@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,11 @@
  *
 */
 
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/sensors/sensors.hh"
 #include "gazebo/common/common.hh"
-#include "helper_physics_generator.hh"
+#include "gazebo/test/helper_physics_generator.hh"
 
 #define LASER_TOL 1e-5
 #define DOUBLE_TOL 1e-6
@@ -75,7 +75,7 @@ void NoiseTest::NoisePlugin(const std::string &_physicsEngine)
     << "        <type>custom</type>"
     << "      </noise>"
     << "    </ray>"
-    << "    <plugin name ='laser' filename='" << pluginFileName << "'>"
+    << "    <plugin name ='laser' filename='" << pluginFileName << "'/>"
     << "  </sensor>"
     << "</link>"
     << "</model>"
@@ -89,7 +89,7 @@ void NoiseTest::NoisePlugin(const std::string &_physicsEngine)
 
   sensors::SensorPtr sensor = sensors::get_sensor(raySensorName);
   sensors::RaySensorPtr raySensor =
-    boost::dynamic_pointer_cast<sensors::RaySensor>(sensor);
+    std::dynamic_pointer_cast<sensors::RaySensor>(sensor);
 
   EXPECT_TRUE(raySensor != NULL);
 
@@ -100,19 +100,19 @@ void NoiseTest::NoisePlugin(const std::string &_physicsEngine)
   // Expect the range to be within (max-noise) < max < (max+noise), see
   // custom noise model in RaySensorNoisePlugin.
   // Noise rate value also taken directly from plugin.
-  bool foundNoise = false;
   double fixedNoiseRate = 0.005;
   double noise = maxRange*fixedNoiseRate;
-  for (int i = 0; i < raySensor->GetRayCount(); ++i)
+  for (int i = 0; i < raySensor->RayCount(); ++i)
   {
-    double range = raySensor->GetRange(i);
-    if (fabs(range - maxRange) > LASER_TOL)
-      foundNoise = true;
+    double range = raySensor->Range(i);
+    if (std::isinf(range))
+    {
+      continue;
+    }
 
     EXPECT_TRUE(range >= maxRange - noise);
     EXPECT_TRUE(range <= maxRange + noise);
   }
-  EXPECT_TRUE(foundNoise);
 }
 
 TEST_P(NoiseTest, NoisePlugin)

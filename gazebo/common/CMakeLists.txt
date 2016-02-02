@@ -1,5 +1,9 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
+if (WIN32)
+ add_definitions(-DBUILDING_DLL_GZ_COMMON)
+endif()
+
 if (HAVE_OPENAL)
   include_directories(${OPENAL_INCLUDE_DIR})
 endif()
@@ -14,10 +18,22 @@ if (HAVE_GDAL)
   include_directories(${GDAL_INCLUDE_DIR})
 endif()
 
+if (CURL_FOUND)
+  include_directories(${CURL_INCLUDEDIR})
+  link_directories(${CURL_LIBDIR})
+  if (WIN32)
+    add_definitions(-DCURL_STATICLIB)
+  endif()
+endif()
+
+include_directories(${tinyxml_INCLUDE_DIRS})
+link_directories(${tinyxml_LIBRARY_DIRS})
+
 set (sources
   Animation.cc
   Assert.cc
   AudioDecoder.cc
+  Battery.cc
   Base64.cc
   BVHLoader.cc
   ColladaExporter.cc
@@ -31,6 +47,7 @@ set (sources
   Exception.cc
   Image.cc
   ImageHeightmap.cc
+  KeyEvent.cc
   KeyFrame.cc
   Material.cc
   Mesh.cc
@@ -38,6 +55,7 @@ set (sources
   MeshLoader.cc
   MeshManager.cc
   ModelDatabase.cc
+  MouseEvent.cc
   PID.cc
   SkeletonAnimation.cc
   Skeleton.cc
@@ -48,12 +66,23 @@ set (sources
   Time.cc
   Timer.cc
   Video.cc
+  ffmpeg_inc.cc
 )
+
+if (NOT USE_EXTERNAL_TINYXML)
+  include_directories (${CMAKE_SOURCE_DIR}/deps/win/tinyxml)
+  set (sources ${sources}
+       ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinystr.cpp
+       ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxml.cpp
+       ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxmlerror.cpp
+       ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxmlparser.cpp)
+endif()
 
 set (headers
   Animation.hh
   Assert.hh
   AudioDecoder.hh
+  Battery.hh
   Base64.hh
   BVHLoader.hh
   ColladaLoader.hh
@@ -62,6 +91,7 @@ set (headers
   Color.hh
   Console.hh
   Dem.hh
+  EnumIface.hh
   Event.hh
   Events.hh
   Exception.hh
@@ -95,12 +125,14 @@ set (headers
 
 set (gtest_sources
   Animation_TEST.cc
+  Battery_TEST.cc
   ColladaExporter_TEST.cc
   ColladaLoader_TEST.cc
   Color_TEST.cc
   CommonIface_TEST.cc
   Console_TEST.cc
   Dem_TEST.cc
+  EnumIface_TEST.cc
   Exception_TEST.cc
   Event_TEST.cc
   Image_TEST.cc
@@ -108,12 +140,22 @@ set (gtest_sources
   Material_TEST.cc
   Mesh_TEST.cc
   MeshManager_TEST.cc
+  MouseEvent_TEST.cc
   MovingWindowFilter_TEST.cc
   SphericalCoordinates_TEST.cc
   SystemPaths_TEST.cc
   SVGLoader_TEST.cc
   Time_TEST.cc
 )
+
+# Timer test fails on OSX
+# See issue #1626
+if (NOT APPLE)
+  set (gtest_sources
+    ${gtest_sources}
+    Timer_TEST.cc
+  )
+endif()
 
 if (HAVE_GTS)
 set (sources
@@ -147,6 +189,12 @@ foreach (hdr ${headers})
 endforeach()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/common.hh.in ${CMAKE_CURRENT_BINARY_DIR}/common.hh )
 
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GZ_COMMON")
+if (WIN32)
+  # 0x601 = Windows 7.  TBB needs to know this.
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_WIN32_WINNT=0x601")
+endif ()
+
 gz_add_library(gazebo_common ${sources})
 
 set_property(
@@ -160,12 +208,9 @@ set_property(
   OGRE_RESOURCE_PATH="${OGRE_RESOURCE_PATH}"
 )
 
-link_directories(
-  ${tinyxml_LIBRARY_DIRS}
-)
-
 target_link_libraries(gazebo_common
   gazebo_math
+  ${IGNITION-MATH_LIBRARIES}
   ${libdl_library}
   ${libtool_library}
   ${Boost_LIBRARIES}
@@ -179,11 +224,14 @@ target_link_libraries(gazebo_common
   ${libtar_LIBRARIES}
   ${TBB_LIBRARIES}
   ${SDFormat_LIBRARIES}
-  pthread
 )
 
-if (NOT APPLE)
-  # rt is used for clock_gettime, which is not available on apple
+if (UNIX)
+  target_link_libraries(gazebo_common pthread)
+endif()
+
+if (UNIX AND NOT APPLE)
+  # rt is used for clock_gettime, which is not available on apple or windows
   target_link_libraries(gazebo_common rt)
 endif()
 

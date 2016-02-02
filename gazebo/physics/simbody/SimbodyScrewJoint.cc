@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -138,19 +138,6 @@ void SimbodyScrewJoint::SetForceImpl(unsigned int _index, double _torque)
     this->simbodyPhysics->discreteForces.setOneMobilityForce(
       this->simbodyPhysics->integ->updAdvancedState(),
       this->mobod, SimTK::MobilizerUIndex(_index), _torque);
-}
-
-//////////////////////////////////////////////////
-void SimbodyScrewJoint::SetMaxForce(unsigned int /*_index*/, double /*_force*/)
-{
-  gzdbg << "SimbodyScrewJoint::SetMaxForce: doesn't make sense in simbody...\n";
-}
-
-//////////////////////////////////////////////////
-double SimbodyScrewJoint::GetMaxForce(unsigned int /*index*/)
-{
-  gzdbg << "SimbodyScrewJoint::GetMaxForce: doesn't make sense in simbody...\n";
-  return 0;
 }
 
 //////////////////////////////////////////////////

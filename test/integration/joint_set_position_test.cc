@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@
 #include <gtest/gtest.h>
 #include "gazebo/physics/physics.hh"
 // #include "gazebo/physics/Joint.hh"
-#include "ServerFixture.hh"
-#include "helper_physics_generator.hh"
+#include "gazebo/test/ServerFixture.hh"
+#include "gazebo/test/helper_physics_generator.hh"
 
 #define TOL 0.001
 using namespace gazebo;
@@ -396,10 +396,14 @@ void JointKinematicTest::SetJointPositionThreadedTest(
     << "]\n";
 }
 
+// This test fails on OSX (see issue #1219)
+// https://bitbucket.org/osrf/gazebo/issues/1219
+#ifndef __APPLE__
 TEST_P(JointKinematicTest, SetJointPositionThreadedTest)
 {
   SetJointPositionThreadedTest(GetParam());
 }
+#endif
 
 //////////////////////////////////////////////////
 void JointKinematicTest::SetJointPositionLoopJointTest(

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ namespace gazebo
 {
   namespace gui
   {
-    class GAZEBO_VISIBLE Events
+    class GZ_GUI_VISIBLE Events
     {
       /////////////////////////////////////////////////
       /// \brief Connect a signal the add entity signal
@@ -78,6 +78,17 @@ namespace gazebo
       /// \brief Disconnect a signal from the fullscreen signal
       public: static void DisconnectFullScreen(event::ConnectionPtr _subscriber)
               { fullScreen.Disconnect(_subscriber); }
+
+      //////////////////////////////////////////////////////////////////////////
+      /// \brief Connect a signal to the show toolbars signal
+      public: template<typename T>
+              static event::ConnectionPtr ConnectShowToolbars(T _subscriber)
+              { return showToolbars.Connect(_subscriber); }
+
+      /// \brief Disconnect a signal from the show toolbars signal
+      public: static void DisconnectShowToolbars(event::ConnectionPtr
+          _subscriber)
+              { showToolbars.Disconnect(_subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a signal to the view FPS signal
@@ -165,6 +176,17 @@ namespace gazebo
               { editModel.Disconnect(_subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
+      /// \brief Connect a signal to the window mode signal
+      public: template<typename T>
+              static event::ConnectionPtr ConnectWindowMode(T _subscriber)
+              { return windowMode.Connect(_subscriber); }
+
+      /// \brief Disconnect a signal from the window mode signal
+      public: static void DisconnectWindowMode(
+              event::ConnectionPtr _subscriber)
+              { windowMode.Disconnect(_subscriber); }
+
+      //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a signal to the main window ready signal
       public: template<typename T>
               static event::ConnectionPtr ConnectMainWindowReady(T _subscriber)
@@ -206,7 +228,7 @@ namespace gazebo
 
       /// \brief indicates the user is aligning objects
       public: static event::EventT<void (std::string,
-                  std::string, std::string, bool)> alignMode;
+                  std::string, std::string, bool, bool)> alignMode;
 
       /// \brief indicates an entity has been created
       public: static event::EventT<void (std::string,
@@ -221,6 +243,9 @@ namespace gazebo
       /// \brief An event to trigger full screen mode.
       public: static event::EventT<void (bool)> fullScreen;
 
+      /// \brief An event to trigger show toolbars.
+      public: static event::EventT<void (bool)> showToolbars;
+
       /// \brief An event to enable first-person-shooter view control.
       public: static event::EventT<void ()> fps;
 
@@ -234,6 +259,10 @@ namespace gazebo
       /// \brief Event triggered when the user selects edit a model. The model
       /// name is given as the function parameter.
       public: static event::EventT<void (const std::string &)> editModel;
+
+      /// \brief Event triggered when changing window mode. Possible modes are:
+      /// "Simulation", "ModelEditor", "LogPlayback"
+      public: static event::EventT<void (const std::string &)> windowMode;
 
       /// \brief Event triggered when a key is pressed
       public: static event::EventT<void (std::string)> keyPress;
