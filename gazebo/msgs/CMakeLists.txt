@@ -19,6 +19,7 @@ set (msgs
   cylindergeom.proto
   diagnostics.proto
   distortion.proto
+  empty.proto
   factory.proto
   fluid.proto
   fog.proto

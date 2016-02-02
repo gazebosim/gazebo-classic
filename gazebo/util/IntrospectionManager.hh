@@ -23,8 +23,10 @@
 #include <string>
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/msgs/any.pb.h"
-#include "gazebo/msgs/param_v.pb.h"
+#include "gazebo/msgs/empty.pb.h"
 #include "gazebo/msgs/gz_string.pb.h"
+#include "gazebo/msgs/param.pb.h"
+#include "gazebo/msgs/param_v.pb.h"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -55,34 +57,58 @@ namespace gazebo
       public: std::set<std::string> RegisteredItems() const;
 
       /// \brief ToDo
-      public: void NewFilter(const gazebo::msgs::Param_V &_req,
-                             gazebo::msgs::GzString &_rep,
-                             bool &_result);
+      public: bool NewFilter(const std::set<std::string> &_items,
+                             std::string &_filterId);
 
       /// \brief ToDo
-      public: void UpdateFilter(const gazebo::msgs::Param_V &_req,
-                                gazebo::msgs::GzString &_rep,
-                                bool &_result);
+      public: bool UpdateFilter(const std::string &_filterId,
+                                const std::set<std::string> &_newItems);
 
-      public: void RemoveFilter(const gazebo::msgs::Param_V &_req,
-                                gazebo::msgs::GzString &_rep,
-                                bool &_result);
+      /// \brief ToDo
+      public: bool RemoveFilter(const std::string &_filterId);
 
-      public: void Filter(const gazebo::msgs::Param_V &_req,
-                          gazebo::msgs::Param_V &_rep,
-                          bool &_result);
+      /// \brief ToDo
+      public: bool Filter(const std::string &_filterId,
+                          std::set<std::string> &_items) const;
 
       /// \brief ToDo.
       public: void Update();
 
       /// \brief ToDo.
-      public: void Show();
+      public: void Show() const;
 
       /// \brief Constructor.
       private: IntrospectionManager();
 
       /// \brief Destructor.
       private: virtual ~IntrospectionManager();
+
+      /// \brief ToDo
+      private: void NewFilter(const gazebo::msgs::Param_V &_req,
+                              gazebo::msgs::GzString &_rep,
+                              bool &_result);
+
+      /// \brief ToDo
+      private: void UpdateFilter(const gazebo::msgs::Param_V &_req,
+                                 gazebo::msgs::Empty &_rep,
+                                 bool &_result);
+
+      /// \brief ToDo
+      private: void RemoveFilter(const gazebo::msgs::Param_V &_req,
+                                 gazebo::msgs::Empty &_rep,
+                                 bool &_result);
+
+      /// \brief ToDo
+      private: void Filter(const gazebo::msgs::Param_V &_req,
+                           gazebo::msgs::Param_V &_rep,
+                           bool &_result);
+
+      /// \brief ToDo.
+      private: std::string CreateRandomId(const unsigned int &_size) const;
+
+      /// \brief ToDo
+      private: bool ValidateParameter(const gazebo::msgs::Param &_msg,
+                             const std::set<std::string> &_allowedValues) const;
 
       /// \brief This is a singleton.
       private: friend class SingletonT<IntrospectionManager>;

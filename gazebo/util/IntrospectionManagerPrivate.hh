@@ -19,7 +19,6 @@
 
 #include <functional>
 #include <map>
-#include <memory>
 #include <mutex>
 #include <set>
 #include <string>
@@ -85,7 +84,7 @@ namespace gazebo
       public: std::map<std::string, ObservedItem> observedItems;
 
       /// \brief Mutex to make this class thread-safe.
-      public: std::mutex mutex;
+      public: mutable std::mutex mutex;
 
       /// \brief Node used for communications.
       public: ignition::transport::Node node;
@@ -93,8 +92,8 @@ namespace gazebo
       /// \brief ID of this manager.
       public: std::string managerId;
 
-      /// \brief Prefix used for services and topic names.
-      /// E.g."/introspection/<manager_id>".
+      /// \brief Prefix used for announcing services.
+      /// E.g."/introspection/abcxyz/".
       public: std::string prefix;
     };
   }
