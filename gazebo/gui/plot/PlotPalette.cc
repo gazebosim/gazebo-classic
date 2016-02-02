@@ -44,8 +44,20 @@ PlotPalette::PlotPalette(QWidget *_parent) : QWidget(_parent),
 
   this->dataPtr->searchArea = new ConfigWidget();
 
+  auto searchAreaScroll = new QScrollArea;
+  searchAreaScroll->setWidget(this->dataPtr->searchArea);
+  searchAreaScroll->setWidgetResizable(true);
+
+  auto searchAreaLayout = new QVBoxLayout;
+  searchAreaLayout->setContentsMargins(0, 0, 0, 0);
+  searchAreaLayout->addWidget(searchAreaScroll);
+
+  auto searchAreaWidget = new QWidget;
+  searchAreaWidget->setLayout(searchAreaLayout);
+
   auto searchLayout = new QVBoxLayout();
   searchLayout->addWidget(searchEdit);
+  searchLayout->addWidget(searchAreaWidget);
 
   auto searchWidget = new QWidget();
   searchWidget->setLayout(searchLayout);
@@ -453,9 +465,9 @@ void PlotPalette::FillTopicFromMsg(google::protobuf::Message *_msg,
 
         auto fieldMsg = (ref->MutableMessage(_msg, field));
 
+        // Treat time as double
         if (field->message_type()->name() == "Time")
         {
-          // We treat a full time message as double
           auto humanName = ConfigWidget::HumanReadableKey(name);
           auto childWidget = new ItemConfigWidget(humanName, _level);
           childWidget->SetDraggable(true);
@@ -466,9 +478,40 @@ void PlotPalette::FillTopicFromMsg(google::protobuf::Message *_msg,
 
           _parentLayout->addWidget(childWidget);
         }
+        // Custom RPY widgets for orientation
+        else if (field->message_type()->name() == "Quaternion")
+        {
+          auto collapsibleLayout = new QVBoxLayout();
+          collapsibleLayout->setContentsMargins(0, 0, 0, 0);
+          collapsibleLayout->setSpacing(0);
+
+          auto collapsibleWidget = new ConfigChildWidget();
+          collapsibleWidget->setLayout(collapsibleLayout);
+
+          auto groupWidget =
+              this->dataPtr->topicsBottom->CreateGroupWidget(name,
+              collapsibleWidget, _level);
+
+          _parentLayout->addWidget(groupWidget);
+          auto scope = _scope + "::" + name;
+
+          std::vector<std::string> rpy = {"roll", "pitch", "yaw"};
+          for (auto it : rpy)
+          {
+            auto humanName = ConfigWidget::HumanReadableKey(it);
+            auto childWidget = new ItemConfigWidget(humanName, _level+1);
+            childWidget->SetDraggable(true);
+            childWidget->SetPlotInfo(_scope + "::" + name + "::" + it);
+
+            childWidget->setToolTip(tr(
+                "<font size=3><p><b>Type:</b> double </p></font>"));
+
+            collapsibleLayout->addWidget(childWidget);
+          }
+        }
+        // Create a collapsible list for submessages
         else
         {
-          // Create a collapsible list for submessages
           auto collapsibleLayout = new QVBoxLayout();
           collapsibleLayout->setContentsMargins(0, 0, 0, 0);
           collapsibleLayout->setSpacing(0);
@@ -533,10 +576,50 @@ void PlotPalette::FillModel(const std::string &_model)
 }
 
 /////////////////////////////////////////////////
-void PlotPalette::UpdateSearch(const QString &/*_search*/)
+void PlotPalette::UpdateSearch(const QString &_search)
 {
-  // To be able to search all fields, we need to generate them all at first
-  // and keep them in a list
+  // Clear previous layout
+  auto oldLayout = this->dataPtr->searchArea->layout();
+  if (oldLayout)
+  {
+    // Give ownership of all widgets to an object which will be out of scope
+    QWidget().setLayout(oldLayout);
+  }
+/*
+  // RegExp for multiword search
+  auto words = _search.split(" ");
+  QString exp = "^";
+
+  for (auto word : words)
+    exp = exp + "(?=.*" + word + ")";
+
+  auto topics = this->dataPtr->searchModel->findItems(exp, Qt::MatchRegExp);
+*/
+
+  // New layout
+  auto newLayout = new QVBoxLayout();
+  newLayout->setSpacing(0);
+
+  auto topics = this->dataPtr->searchModel->findItems(_search, Qt::MatchContains);
+
+  for (auto topic : topics)
+  {
+    auto childWidget = new ItemConfigWidget(topic->text().toStdString());
+    childWidget->SetPlotInfo(topic->text().toStdString());
+    this->connect(childWidget, SIGNAL(Clicked(const std::string &)), this,
+        SLOT(OnTopicClicked(const std::string &)));
+
+    this->dataPtr->searchArea->AddConfigChildWidget(_search.toStdString(),
+        childWidget);
+    newLayout->addWidget(childWidget);
+  }
+
+  // Spacer
+  auto spacer = new QWidget();
+  spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+  newLayout->addWidget(spacer);
+
+  this->dataPtr->searchArea->setLayout(newLayout);
 }
 
 /////////////////////////////////////////////////
