@@ -95,5 +95,82 @@ void ModelManipulator_TEST::Attach()
   mainWindow = NULL;
 }
 
+/////////////////////////////////////////////////
+void ModelManipulator_TEST::Translating()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("../../worlds/pioneer2dx_camera.world", false, false, true);
+
+  // Create the main window.
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Process some events, and draw the screen
+  for (unsigned int i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  gazebo::rendering::ScenePtr scene;
+  scene = gazebo::rendering::get_scene("default");
+  QVERIFY(scene != NULL);
+
+  // initialize the model manipulator
+  gazebo::gui::ModelManipulator::Instance()->Init();
+
+  // Create a visual.
+  gazebo::rendering::VisualPtr vis1;
+  vis1.reset(new gazebo::rendering::Visual("vis1", scene->GetWorldVisual()));
+  vis1->Load();
+  double vis1Transp = 0.2;
+  vis1->SetTransparency(vis1Transp);
+  QVERIFY(gazebo::math::equal(
+      static_cast<double>(vis1->GetTransparency()), vis1Transp, 1e-5));
+
+// TIme to translate visual 1.
+  // Mouse move
+  gazebo::common::MouseEvent mouseEvent;
+
+  mouseEvent.SetType(gazebo::common::MouseEvent::PRESS);
+  mouseEvent.SetButton(gazebo::common::MouseEvent::LEFT);
+  mouseEvent.SetDragging(true);
+  mouseEvent.SetPressPos(0, 0);
+  mouseEvent.SetPos(0, 0);
+
+// To set mouseStart.
+  gazebo::gui::ModelManipulator::Instance()->OnMousePressEvent(mouseEvent);
+
+// Set mode.
+  gazebo::gui::ModelManipulator::Instance()->SetManipulationMode("translate");
+
+// mouse moved.
+  mouseEvent.SetPressPos(10, 10);
+  mouseEvent.SetPos(10, 10);
+
+// On mouse move event.
+  gazebo::gui::ModelManipulator::Instance()->OnMouseMoveEvent(mouseEvent);
+
+  mouseEvent.SetType(gazebo::common::MouseEvent::RELEASE);
+  mouseEvent.SetButton(gazebo::common::MouseEvent::NO_BUTTON);
+
+  // Mouse release, translation done.
+  gazebo::gui::ModelManipulator::Instance()->OnMouseReleaseEvent(mouseEvent);
+
+// Test transperancy.
+  QVERIFY(ignition::math::equal(
+    static_cast<double>(vis1->GetTransparency()), vis1Transp, 1e-5));
+
+  mainWindow->close();
+  delete mainWindow;
+  mainWindow = NULL;
+}
+
 // Generate a main function for the test
 QTEST_MAIN(ModelManipulator_TEST)
