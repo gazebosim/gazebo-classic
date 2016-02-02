@@ -1697,19 +1697,13 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
 }
 
 //////////////////////////////////////////////////
-void Camera::AttachToVisual(const uint32_t _visualId,
+void Camera::AttachToVisual(uint32_t _visualId,
                             const bool _inheritOrientation,
                             const double _minDist, const double _maxDist)
 {
   this->SetTrackMinDistance(_minDist);
   this->SetTrackMaxDistance(_maxDist);
-  this->AttachToVisual(_visualId, _inheritOrientation);
-}
 
-//////////////////////////////////////////////////
-void Camera::AttachToVisual(const uint32_t _visualId,
-                            const bool _inheritOrientation)
-{
   msgs::Request request;
   msgs::TrackVisual track;
 
@@ -1734,13 +1728,7 @@ void Camera::AttachToVisual(const std::string &_visualName,
 {
   this->SetTrackMinDistance(_minDist);
   this->SetTrackMaxDistance(_maxDist);
-  this->AttachToVisual(_visualName, _inheritOrientation);
-}
 
-//////////////////////////////////////////////////
-void Camera::AttachToVisual(const std::string &_visualName,
-                            const bool _inheritOrientation)
-{
   msgs::Request request;
   msgs::TrackVisual track;
 
@@ -1778,7 +1766,7 @@ void Camera::TrackVisual(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
-bool Camera::AttachToVisualImpl(const uint32_t _id,
+bool Camera::AttachToVisualImpl(uint32_t _id,
     const bool _inheritOrientation, const double _minDist,
     const double _maxDist)
 {

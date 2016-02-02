@@ -704,13 +704,6 @@ namespace gazebo
                   const double _minDist = 0.0, const double _maxDist = 0.0);
 
       /// \brief Attach the camera to a scene node
-      /// \param[in] _visualName Name of the visual to attach the camera to
-      /// \param[in] _inheritOrientation True means camera acquires the visual's
-      /// orientation
-      public: void AttachToVisual(const std::string &_visualName,
-                  const bool _inheritOrientation);
-
-      /// \brief Attach the camera to a scene node
       /// \param[in] _id ID of the visual to attach the camera to
       /// \param[in] _inheritOrientation True means camera acquires the visual's
       /// orientation
@@ -721,13 +714,6 @@ namespace gazebo
       public: void AttachToVisual(uint32_t _id,
                   const bool _inheritOrientation,
                   const double _minDist = 0.0, const double _maxDist = 0.0);
-
-      /// \brief Attach the camera to a scene node
-      /// \param[in] _id ID of the visual to attach the camera to
-      /// \param[in] _inheritOrientation True means camera acquires the visual's
-      /// orientation
-      public: void AttachToVisual(const uint32_t _id,
-                                  const bool _inheritOrientation);
 
       /// \brief Set the camera to track a scene node
       /// \param[in] _visualName Name of the visual to track

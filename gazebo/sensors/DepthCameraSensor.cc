@@ -116,7 +116,7 @@ void DepthCameraSensor::Init()
     this->dataPtr->camera->CreateRenderTexture(this->Name() + "_RttTex_Image");
     this->dataPtr->camera->CreateDepthTexture(this->Name() + "_RttTex_Depth");
     this->dataPtr->camera->SetWorldPose(this->Pose());
-    this->dataPtr->camera->AttachToVisual(this->ParentId(), true);
+    this->dataPtr->camera->AttachToVisual(this->ParentId(), true, 0, 0);
   }
   else
     gzerr << "No world name\n";
