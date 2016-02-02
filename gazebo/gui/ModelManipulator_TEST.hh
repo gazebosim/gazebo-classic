@@ -27,6 +27,8 @@ class ModelManipulator_TEST : public QTestFixture
 
   /// \brief Test attaching to visual
   private slots: void Attach();
+  /// \brief Test Transparency of a visual after translating.
+  private slots: void Translating();
 };
 
 #endif
