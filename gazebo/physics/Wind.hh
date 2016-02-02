@@ -20,6 +20,7 @@
 #include <string>
 #include <functional>
 #include <memory>
+#include <boost/any.hpp>
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
