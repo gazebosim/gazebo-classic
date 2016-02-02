@@ -65,8 +65,6 @@ release will remove the deprecated code.
     + ***Replacement:*** public: virtual void SetClipDist();
     + ***Removed:*** public: template<typename T> event::ConnectionPtr ConnectNewImageFrame(T _subscriber);
     + ***Replacement:*** public: event::ConnectionPtr ConnectNewImageFrame(std::function<void (const unsigned char *, unsigned int, unsigned int, unsigned int, const std::string &)> _subscriber);
-    + ***Removed:*** public: void AttachToVisual(const std::string &_visualName, bool _inheritOrientation, double _minDist = 0.0, double _maxDist = 0.0);
-    + ***Replacement:*** public: void AttachToVisual(const std::string &_visualName, bool _inheritOrientation, double _minDist, double _maxDist);
 
 1. **gazebo/msgs/logical_camera_sensors.proto**
     + The `near` and `far` members have been replaced with `near_clip` and `far_clip`
