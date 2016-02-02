@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ TEST_F(SensorTest, GetScopedName)
   sensors::SensorPtr sensor = sensors::get_sensor("cam1");
   ASSERT_TRUE(sensor != NULL);
 
-  std::string sensorName = sensor->GetScopedName();
+  std::string sensorName = sensor->ScopedName();
   EXPECT_EQ(sensorName, std::string("default::rotated_box::link::cam1"));
 }
 
