@@ -701,7 +701,7 @@ namespace gazebo
       /// the visual
       public: void AttachToVisual(const std::string &_visualName,
                   const bool _inheritOrientation,
-                  const double _minDist, const double _maxDist);
+                  const double _minDist = 0.0, const double _maxDist = 0.0);
 
       /// \brief Attach the camera to a scene node
       /// \param[in] _visualName Name of the visual to attach the camera to
@@ -718,9 +718,9 @@ namespace gazebo
       /// the visual
       /// \param[in] _maxDist Maximum distance the camera is allowd to get from
       /// the visual
-      public: void AttachToVisual(const uint32_t _id,
+      public: void AttachToVisual(uint32_t _id,
                   const bool _inheritOrientation,
-                  const double _minDist, const double _maxDist);
+                  const double _minDist = 0.0, const double _maxDist = 0.0);
 
       /// \brief Attach the camera to a scene node
       /// \param[in] _id ID of the visual to attach the camera to
