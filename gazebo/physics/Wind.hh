@@ -125,7 +125,7 @@ namespace gazebo
 
       /// \brief Get the global wind velocity, ignoring the entity.
       /// \param[in] _wind Reference to the wind.
-      /// \param[in] _wind Pointer to an entity at which location the wind
+      /// \param[in] _entity Pointer to an entity at which location the wind
       /// velocity is to be calculated.
       /// \return Wind's velocity at entity's location.
       private: ignition::math::Vector3d LinearVelDefault(
