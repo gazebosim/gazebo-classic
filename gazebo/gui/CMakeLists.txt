@@ -138,20 +138,25 @@ endif ()
 #endif()
 
 set (qt_tests
+  BuildingEditor_TEST.cc
+  ConfigWidget_TEST.cc
   DataLogger_TEST.cc
   GuiIface_TEST.cc
+  GLWidget_TEST.cc
+  GLWidget_TEST2.cc
   HotkeyDialog_TEST.cc
   LightMaker_TEST.cc
   ModelAlign_TEST.cc
+  ModelListWidget_TEST.cc
   ModelMaker_TEST.cc
   ModelManipulator_TEST.cc
+  ModelSnap_TEST.cc
   RenderWidget_TEST.cc
   SaveDialog_TEST.cc
   SplashScreen_TEST.cc
   TimePanel_TEST.cc
   TimeWidget_TEST.cc
   TopToolbar_TEST.cc
-  ViewAngleWidget_TEST.cc
 )
 
 add_subdirectory(viewers)
@@ -176,16 +181,11 @@ if (ENABLE_SCREEN_TESTS)
   set (qt_tests
       ${qt_tests}
       ApplyWrenchDialog_TEST.cc
-      BuildingEditor_TEST.cc
-      ConfigWidget_TEST.cc
-      GLWidget_TEST.cc
-      GLWidget_TEST2.cc
       LaserVisualization_TEST.cc
       LayersWidget_TEST.cc
       MainWindow_TEST.cc
-      ModelListWidget_TEST.cc
-      ModelSnap_TEST.cc
-      Projection_TEST.cc)
+      Projection_TEST.cc
+      ViewAngleWidget_TEST.cc)
 endif()
 
 # Generate executables for each of the QT unit tests
