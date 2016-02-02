@@ -62,4 +62,3 @@ install (PROGRAMS gzprop DESTINATION ${BIN_INSTALL_DIR})
 if (NOT WIN32)
   manpage(gzprop 1)
 endif()
-

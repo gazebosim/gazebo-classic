@@ -1,4 +1,3 @@
-
 #################################################
 # VAR: GZ_BUILD_TESTS_EXTRA_EXE_SRCS
 # Hack: extra sources to build binaries can be supplied to gz_build_tests in
