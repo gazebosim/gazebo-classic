@@ -55,12 +55,36 @@ IntrospectionManager::IntrospectionManager()
 
   this->dataPtr->prefix = "/introspection/" + this->dataPtr->managerId + "/";
 
-  // Advertise services.
-  std::string service = this->dataPtr->prefix + "new_filter";
+  // Advertise the service for creating a new filter.
+  std::string service = this->dataPtr->prefix + "filter_new";
   if (!this->dataPtr->node.Advertise(service,
       &IntrospectionManager::NewFilter, this))
   {
+    gzerr << "Error advertising service [" << service << "]" << std::endl;
+  }
 
+  // Advertise the service for updating an existing filter.
+  service = this->dataPtr->prefix + "filter_update";
+  if (!this->dataPtr->node.Advertise(service,
+      &IntrospectionManager::UpdateFilter, this))
+  {
+    gzerr << "Error advertising service [" << service << "]" << std::endl;
+  }
+
+  // Advertise the service for removing an existing filter.
+  service = this->dataPtr->prefix + "filter_remove";
+  if (!this->dataPtr->node.Advertise(service,
+      &IntrospectionManager::RemoveFilter, this))
+  {
+    gzerr << "Error advertising service [" << service << "]" << std::endl;
+  }
+
+  // Advertise the service for listing the items of an existing filter.
+  service = this->dataPtr->prefix + "filter_info";
+  if (!this->dataPtr->node.Advertise(service,
+      &IntrospectionManager::Filter, this))
+  {
+    gzerr << "Error advertising service [" << service << "]" << std::endl;
   }
 }
 
@@ -134,8 +158,9 @@ void IntrospectionManager::NewFilter(const gazebo::msgs::Param_V &_req,
   }
 
   // Sanity check: Make sure that the message contains at least one parameter.
-  if (!_req.param_size() == 0)
+  if (_req.param_size() == 0)
   {
+    std::cerr << "Empty parameter message received." << std::endl;
     gzerr << "Empty parameter message received." << std::endl;
     gzerr << "Ignoring request." << std::endl;
     _result = false;
@@ -150,7 +175,7 @@ void IntrospectionManager::NewFilter(const gazebo::msgs::Param_V &_req,
     auto param = _req.param(i);
     if (param.name() != "item")
     {
-      gzerr << "Unexpected parameter name in filter. I expect 'item' but "
+      std::cerr << "Unexpected parameter name in filter. I expect 'item' but "
             << "instead [" << param.name() << "] was received." << std::endl;
       gzerr << "Ignoring request." << std::endl;
       _result = false;
@@ -159,7 +184,7 @@ void IntrospectionManager::NewFilter(const gazebo::msgs::Param_V &_req,
 
     if (!param.has_value())
     {
-      gzerr << "Parameter without a value field in filter." << std::endl;
+      std::cerr << "Parameter without a value field in filter." << std::endl;
       gzerr << "Ignoring request." << std::endl;
       _result = false;
       return;
@@ -168,7 +193,7 @@ void IntrospectionManager::NewFilter(const gazebo::msgs::Param_V &_req,
     auto value = param.value();
     if (value.type() != gazebo::msgs::Any::STRING)
     {
-      gzerr << "Expected a parameter with STRING value. Instead, I received ["
+      std::cerr << "Expected a parameter with STRING value. Instead, I received ["
             << value.type() << "]." << std::endl;
       gzerr << "Ignoring request." << std::endl;
       _result = false;
@@ -177,7 +202,7 @@ void IntrospectionManager::NewFilter(const gazebo::msgs::Param_V &_req,
 
     if (!value.has_string_value())
     {
-      gzerr << "Received a parameter without the 'string_value' field."
+      std::cerr << "Received a parameter without the 'string_value' field."
             << std::endl;
       gzerr << "Ignoring request." << std::endl;
       _result = false;
@@ -189,7 +214,7 @@ void IntrospectionManager::NewFilter(const gazebo::msgs::Param_V &_req,
   }
 
   // Advertise the new topic.
-  std::string topicName = this->dataPtr->prefix + filterId;
+  std::string topicName = "/introspection/filter/" + filterId;
   if (!this->dataPtr->node.Advertise<gazebo::msgs::Param_V>(topicName))
   {
     std::cerr << "Error advertising topic [" << topicName << "]." << std::endl;
@@ -200,6 +225,10 @@ void IntrospectionManager::NewFilter(const gazebo::msgs::Param_V &_req,
 
   // Add the items to the new filter.
   this->dataPtr->filters[filterId].items = requestedItems;
+
+  // Register the new filter in the list of observed items.
+  for (auto const item : requestedItems)
+    this->dataPtr->observedItems[item].filters.emplace(filterId);
 
   // Answer with the custom topic created for the client.
   _rep.set_data(topicName);
@@ -213,7 +242,7 @@ void IntrospectionManager::UpdateFilter(const gazebo::msgs::Param_V &_req,
   _rep.set_data("");
 
   // Sanity check: Make sure that the message contains at least one parameter.
-  if (!_req.param_size() == 0)
+  if (_req.param_size() == 0)
   {
     gzerr << "Empty parameter message received." << std::endl;
     gzerr << "Ignoring request." << std::endl;
@@ -357,7 +386,7 @@ void IntrospectionManager::RemoveFilter(const gazebo::msgs::Param_V &_req,
   _rep.set_data("");
 
   // Sanity check: Make sure that the message contains at least one parameter.
-  if (!_req.param_size() != 1)
+  if (_req.param_size() != 1)
   {
     gzerr << "Expecting message with exactly 1 parameter but "
           << _req.param_size() << " were received." << std::endl;
@@ -450,7 +479,7 @@ void IntrospectionManager::Filter(const gazebo::msgs::Param_V &_req,
     gazebo::msgs::Param_V &_rep, bool &_result)
 {
   // Sanity check: Make sure that the message contains at least one parameter.
-  if (!_req.param_size() != 1)
+  if (_req.param_size() != 1)
   {
     gzerr << "Expecting message with exactly 1 parameter but "
           << _req.param_size() << " were received." << std::endl;
@@ -528,12 +557,16 @@ void IntrospectionManager::Update()
     auto &item = observedItem.first;
     auto &lastValue = observedItem.second.lastValue;
 
+    // Sanity check: Make sure that we can update the item.
+    if (this->dataPtr->allItems.find(item) == this->dataPtr->allItems.end())
+      continue;
+
     // Update the values of the items under observation.
     auto &callback = this->dataPtr->allItems[item].cb;
     gazebo::msgs::Any value;
     if (!callback(value))
     {
-      gzerr << "Something went wrong updating the value for item [" << item
+      std::cerr << "Something went wrong updating the value for item [" << item
             << "]." << std::endl;
       continue;
     }
@@ -554,15 +587,24 @@ void IntrospectionManager::Update()
     // Insert the last value of each item under observation for this filter.
     for (auto const &item : filter.second.items)
     {
+      // Sanity check: Make sure that someone registered this item.
+      if (this->dataPtr->allItems.find(item) == this->dataPtr->allItems.end())
+        continue;
+
       auto nextParam = nextMsg.add_param();
-      nextParam->CopyFrom(this->dataPtr->observedItems[item].lastValue);
+      nextParam->set_name(item);
+      nextParam->mutable_value()->CopyFrom(this->dataPtr->observedItems[item].lastValue);
     }
 
+    // Sanity check: Make sure that we have at least one item updated.
+    if (nextMsg.param_size() == 0)
+      continue;
+
     // Publish the update for this filter.
-    std::string topicName = this->dataPtr->prefix + filter.first;
+    std::string topicName = "/introspection/filter/" + filter.first;
     if (!this->dataPtr->node.Publish(topicName, nextMsg))
     {
-      gzerr << "Error publishing update for topic [" << topicName << "]"
+      std::cerr << "Error publishing update for topic [" << topicName << "]"
             << std::endl;
     }
   }

@@ -17,6 +17,7 @@
 
 #include <gtest/gtest.h>
 #include "gazebo/msgs/any.pb.h"
+#include "gazebo/msgs/param_v.pb.h"
 #include "gazebo/util/IntrospectionManager.hh"
 #include "test/util.hh"
 
@@ -62,7 +63,44 @@ TEST(IntrospectionManagerTest, FilterManagement)
   std::set<std::string> items;
   auto intr = util::IntrospectionManager::Instance();
 
-  // EXPECT_FALSE(intr->RemoveFilter("filter_#1"));
+  gazebo::msgs::Param_V req;
+  gazebo::msgs::GzString rep;
+  bool result;
+
+  auto nextParam = req.add_param();
+  nextParam->set_name("filter_id");
+  nextParam->mutable_value()->set_type(gazebo::msgs::Any::STRING);
+  nextParam->mutable_value()->set_string_value("filter_#1");
+
+  intr->RemoveFilter(req, rep, result);
+  EXPECT_FALSE(result);
+
+  req.Clear();
+  nextParam = req.add_param();
+  nextParam->set_name("item");
+  nextParam->mutable_value()->set_type(gazebo::msgs::Any::STRING);
+  nextParam->mutable_value()->set_string_value("item1");
+  nextParam = req.add_param();
+  nextParam->set_name("item");
+  nextParam->mutable_value()->set_type(gazebo::msgs::Any::STRING);
+  nextParam->mutable_value()->set_string_value("item2");
+
+  intr->NewFilter(req, rep, result);
+  EXPECT_TRUE(result);
+  intr->Show();
+
+  auto func = [](gazebo::msgs::Any &_msg)
+  {
+    _msg.set_type(gazebo::msgs::Any::DOUBLE);
+    _msg.set_double_value(1.0);
+    return true;
+  };
+
+  EXPECT_TRUE(intr->Register("item1", "type1", func));
+  intr->Show();
+
+  intr->Update();
+
   // EXPECT_FALSE(intr->Filter("filter_#1", items));
   // intr->SetFilter("filter_#1", {"item1", "item2"});
   // intr->Show();
