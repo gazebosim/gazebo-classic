@@ -26,12 +26,16 @@
 #include <QtCore/QPoint>
 #include <QtWidgets/QWidgetAction>
 #include <QtWidgets/QFrame>
+#include <QtWidgets/QDialogButtonBox>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QTreeWidget>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QPlainTextEdit>
+#include <QtWidgets/QGraphicsDropShadowEffect>
 #include <QtGui/QPainter>
+#include <QtGui/QBitmap>
 #include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QSplitter>
 #include <QtWidgets/QButtonGroup>
@@ -44,6 +48,7 @@
 #include <QtWidgets/qmainwindow.h>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QScrollArea>
+#include <QtWidgets/QToolTip>
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsView>
 #include <QtWidgets/QGraphicsItem>

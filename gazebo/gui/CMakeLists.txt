@@ -1,6 +1,6 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
-include ( ${QT_USE_FILE} )
+# include ( ${QT_USE_FILE} )
 
 link_directories(
   ${Boost_LIBRARY_DIRS}
@@ -11,6 +11,7 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/deps
   ${Qt5Core_INCLUDE_DIRS}
   ${Qt5X11Extras_INCLUDE_DIRS}
+  ${Qt5WebKitWidgets_INCLUDE_DIRS}
 )
 
 include_directories(${tinyxml_INCLUDE_DIRS})
@@ -215,6 +216,7 @@ target_link_libraries(gazebo_gui
   gzqtpropertybrowser
   ${Qt5Core_LIBRARIES}
   ${Qt5Widgets_LIBRARIES}
+  ${Qt5WebKitWidgets_LIBRARIES}
   ${Qt5X11Extras_LIBRARIES}
   ${ogre_libraries}
   ${Boost_LIBRARIES}

@@ -1,10 +1,11 @@
-include ( ${QT_USE_FILE} )
+# include ( ${QT_USE_FILE} )
 add_definitions(${QT_DEFINITIONS})
 
 include_directories(
   ${tinyxml_INCLUDE_DIRS}
   ${PROTOBUF_INCLUDE_DIR}
   ${SDFormat_INCLUDE_DIRS}
+  ${Qt5Core_INCLUDE_DIRS}
 )
 
 link_directories(

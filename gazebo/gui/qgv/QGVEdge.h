@@ -19,8 +19,11 @@ License along with this library.
 #ifndef QGVEDGE_H
 #define QGVEDGE_H
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wfloat-equal"
 #include <QGraphicsItem>
 #include <QPen>
+#pragma GCC diagnostic pop
 
 #include "qgv.h"
 #include "gazebo/util/system.hh"

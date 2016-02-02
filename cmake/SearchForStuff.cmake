@@ -552,6 +552,14 @@ find_package (Qt5X11Extras)
 if (NOT Qt5X11Extras_FOUND)
   BUILD_ERROR("Missing: Qt5X11Extras")
 endif()
+find_package (Qt5WebKitWidgets)
+if (NOT Qt5WebKitWidgets_FOUND)
+  BUILD_ERROR("Missing: Qt5WebKitWidgets")
+endif()
+find_package (Qt5Test)
+if (NOT Qt5Test_FOUND)
+  BUILD_ERROR("Missing: Qt5Test")
+endif()
 
 ########################################
 # Find Boost, if not specified manually

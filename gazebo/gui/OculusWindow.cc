@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+#include <QtX11Extras/QX11Info>
 #include <boost/bind.hpp>
 
 #include "gazebo/gui/OculusWindow.hh"
@@ -187,17 +188,13 @@ std::string OculusWindow::GetOgreHandle() const
 #if defined(WIN32) || defined(__APPLE__)
   ogreHandle = boost::lexical_cast<std::string>(this->winId());
 #else
-  QX11Info info = x11Info();
-  QWidget *q_parent = dynamic_cast<QWidget*>(this->renderFrame);
-  ogreHandle = boost::lexical_cast<std::string>(
-      reinterpret_cast<uint64_t>(info.display()));
-  ogreHandle += ":";
-  ogreHandle += boost::lexical_cast<std::string>(
-      static_cast<uint32_t>(info.screen()));
-  ogreHandle += ":";
-  assert(q_parent);
-  ogreHandle += boost::lexical_cast<std::string>(
-      static_cast<uint64_t>(q_parent->winId()));
+  QWidget *qParent = dynamic_cast<QWidget*>(this->renderFrame);
+  GZ_ASSERT(qParent, "qParent is null");
+
+  ogreHandle =
+    std::to_string(reinterpret_cast<uint64_t>(QX11Info::display())) + ":" +
+    std::to_string(static_cast<uint32_t>(QX11Info::appScreen())) + ":" +
+    std::to_string(static_cast<uint64_t>(qParent->winId()));
 #endif
 
   return ogreHandle;

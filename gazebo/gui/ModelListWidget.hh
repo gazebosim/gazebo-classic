@@ -19,10 +19,8 @@
 
 #include <memory>
 #include <string>
-#include <QItemDelegate>
-#include <QObject>
-#include <QWidget>
 
+#include "gazebo/gui/qt.h"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/util/system.hh"
 

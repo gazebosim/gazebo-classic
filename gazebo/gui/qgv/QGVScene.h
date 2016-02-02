@@ -19,10 +19,11 @@ License along with this library.
 #ifndef QGVSCENE_H
 #define QGVSCENE_H
 
-
-
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wfloat-equal"
 #include <QMap>
 #include <QGraphicsScene>
+#pragma GCC diagnostic pop
 
 #include "qgv.h"
 #include "gazebo/util/system.hh"

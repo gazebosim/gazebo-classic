@@ -8,6 +8,7 @@ include_directories(
   ${SDFormat_INCLUDE_DIRS}
   ${OGRE_INCLUDE_DIRS}
   ${IGNITION-MATH_INCLUDE_DIRS}
+  ${Qt5Core_INCLUDE_DIRS}
 )
 
 # Tinyxml are used since the plugins are linking against gazebo_common
@@ -19,8 +20,8 @@ link_directories(
   ${tinyxml_LIBRARY_DIRS}
 )
 
-include (${QT_USE_FILE})
-add_definitions(${QT_DEFINITIONS})
+#include (${QT_USE_FILE})
+add_definitions(${Qt5Core_DEFINITIONS})
 
 if (HAVE_BULLET)
   link_directories(${BULLET_LIBRARY_DIRS})

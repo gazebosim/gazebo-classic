@@ -21,7 +21,11 @@
   #include <Winsock2.h>
 #endif
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wfloat-equal"
 #include <QWebView>
+#pragma GCC diagnostic pop
+#include <QtGui/qdesktopservices.h>
 
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/HotkeyDialog.hh"

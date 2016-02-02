@@ -228,7 +228,6 @@ void GLWidget::showEvent(QShowEvent *_event)
 {
   // These two functions are most applicable for Linux.
   QApplication::flush();
-  QApplication::syncX();
 
   // Get the window handle in a form that OGRE can use.
   std::string winHandle = this->OgreHandle();
@@ -920,14 +919,13 @@ std::string GLWidget::OgreHandle() const
   ogreHandle = std::to_string(
       reinterpret_cast<uint32_t>(this->renderFrame->winId()));
 #else
-  QX11Info info = x11Info();
-  QWidget *q_parent = dynamic_cast<QWidget*>(this->dataPtr->renderFrame);
-  GZ_ASSERT(q_parent, "q_parent is null");
+  QWidget *qParent = dynamic_cast<QWidget*>(this->dataPtr->renderFrame);
+  GZ_ASSERT(qParent, "qParent is null");
 
   ogreHandle =
-    std::to_string(reinterpret_cast<uint64_t>(info.display())) + ":" +
-    std::to_string(static_cast<uint32_t>(info.screen())) + ":" +
-    std::to_string(static_cast<uint64_t>(q_parent->winId()));
+    std::to_string(reinterpret_cast<uint64_t>(QX11Info::display())) + ":" +
+    std::to_string(static_cast<uint32_t>(QX11Info::appScreen())) + ":" +
+    std::to_string(static_cast<uint64_t>(qParent->winId()));
 #endif
 
   return ogreHandle;
