@@ -1,4 +1,11 @@
-## Gazebo 7.0
+## Gazebo 7
+
+## Gazebo 7.x.x (2016-xx-xx)
+
+1. Fix SensorManager::SensorContainer::RunLoop sensor update time assertion
+    * [Pull request #2115](https://bitbucket.org/osrf/gazebo/pull-request/2115)
+
+## Gazebo 7.0 (2016-01-25)
 
 1. Add FollowerPlugin
     * [Pull request #2085](https://bitbucket.org/osrf/gazebo/pull-request/2085)
