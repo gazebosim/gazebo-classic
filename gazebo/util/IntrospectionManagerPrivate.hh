@@ -21,8 +21,8 @@
 #include <map>
 #include <memory>
 #include <mutex>
+#include <set>
 #include <string>
-#include <vector>
 #include <ignition/transport.hh>
 #include "gazebo/msgs/any.pb.h"
 #include "gazebo/msgs/param_v.pb.h"
@@ -36,7 +36,7 @@ namespace gazebo
     struct IntrospectionFilter
     {
       /// \brief Items observed by this filter.
-      std::vector<std::string> items;
+      std::set<std::string> items;
 
       /// \brief Message containing the next update. A message is a collection
       /// of items and values.
@@ -50,7 +50,7 @@ namespace gazebo
       gazebo::msgs::Any lastValue;
 
       /// \brief ToDo.
-      std::vector<std::string> filters;
+      std::set<std::string> filters;
     };
 
     /// \brief Todo.
@@ -92,6 +92,10 @@ namespace gazebo
 
       /// \brief ID of this manager.
       public: std::string managerId;
+
+      /// \brief Prefix used for services and topic names.
+      /// E.g."/introspection/<manager_id>".
+      public: std::string prefix;
     };
   }
 }

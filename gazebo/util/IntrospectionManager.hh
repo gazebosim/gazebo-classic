@@ -19,9 +19,12 @@
 
 #include <functional>
 #include <memory>
+#include <set>
 #include <string>
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/msgs/any.pb.h"
+#include "gazebo/msgs/param_v.pb.h"
+#include "gazebo/msgs/gz_string.pb.h"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -49,22 +52,31 @@ namespace gazebo
       public: bool Unregister(const std::string &_item);
 
       /// \brief ToDo.
-      public: void SetFilter(const std::string &_filterId,
-                             const std::vector<std::string> &_items);
+      public: std::set<std::string> RegisteredItems() const;
 
-      /// \brief ToDo.
-      public: bool Filter(const std::string &_filterId,
-                          std::vector<std::string> &_items) const;
+      /// \brief ToDo
+      public: void NewFilter(const gazebo::msgs::Param_V &_req,
+                             gazebo::msgs::GzString &_rep,
+                             bool &_result);
 
-      /// \brief ToDo.
-      public: bool RemoveFilter(const std::string &_filterId);
+      /// \brief ToDo
+      public: void UpdateFilter(const gazebo::msgs::Param_V &_req,
+                                gazebo::msgs::GzString &_rep,
+                                bool &_result);
+
+      public: void RemoveFilter(const gazebo::msgs::Param_V &_req,
+                                gazebo::msgs::GzString &_rep,
+                                bool &_result);
+
+      public: void Filter(const gazebo::msgs::Param_V &_req,
+                          gazebo::msgs::Param_V &_rep,
+                          bool &_result);
 
       /// \brief ToDo.
       public: void Update();
 
+      /// \brief ToDo.
       public: void Show();
-
-      public: std::vector<std::string> RegisteredItems() const;
 
       /// \brief Constructor.
       private: IntrospectionManager();
