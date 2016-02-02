@@ -39,7 +39,7 @@
 #define DART_SUPPORT
 #define WORLD_STEP_DART_PGS
 
-#ifdef HAVE_SIMBODY
+#if defined(HAVE_SIMBODY) && !defined(BUILD_TYPE_COVERAGE)
 # undef SIMBODY_SUPPORT
 # define SIMBODY_SUPPORT , "simbody"
 #endif
