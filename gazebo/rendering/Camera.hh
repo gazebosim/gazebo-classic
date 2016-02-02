@@ -990,7 +990,7 @@ namespace gazebo
       /// \param[in] _maxDist Maximum distance the camera is allowd to get from
       /// the visual
       /// \return True on success
-      protected: virtual bool AttachToVisualImpl(const uint32_t _id,
+      protected: virtual bool AttachToVisualImpl(uint32_t _id,
                      const bool _inheritOrientation,
                      const double _minDist = 0, const double _maxDist = 0);
 
