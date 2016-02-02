@@ -1,7 +1,15 @@
+
 #################################################
+# VAR: GZ_BUILD_TESTS_EXTRA_EXE_SRCS
 # Hack: extra sources to build binaries can be supplied to gz_build_tests in
 # the variable GZ_BUILD_TESTS_EXTRA_EXE_SRCS. This variable will be clean up
 # at the end of the function
+#
+# VAR: GZ_BUILD_TESTS_EXTRA_LIBS
+# Hack: extra libs to build binaries can be supplied to gz_build_tests in
+# the variable GZ_BUILD_TESTS_EXTRA_LIBS. This variable will be clean up
+# at the end of the function
+#
 macro (gz_build_tests)
   # Build all the tests
   foreach(GTEST_SOURCE_file ${ARGN})
@@ -13,7 +21,6 @@ macro (gz_build_tests)
     add_executable(${BINARY_NAME} ${GTEST_SOURCE_file}
                    ${GZ_BUILD_TESTS_EXTRA_EXE_SRCS})
 
-    set_target_properties(${BINARY_NAME} PROPERTIES LINK_FLAGS "-Wl,--no-as-needed")
 
     link_directories(${PROJECT_BINARY_DIR}/test)
     add_dependencies(${BINARY_NAME}
@@ -31,15 +38,12 @@ macro (gz_build_tests)
 
 
     target_link_libraries(${BINARY_NAME}
-      # This two libraries are need to workaround on bug
-      # https://bitbucket.org/osrf/gazebo/issue/1516
-      gazebo_physics
-      gazebo_sensors
       # libgazebo will bring all most of gazebo libraries as dependencies
       libgazebo
       gazebo_test_fixture
       gtest
       gtest_main
+      ${GZ_BUILD_TESTS_EXTRA_LIBS}
       )
 
     add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME}
@@ -62,6 +66,7 @@ macro (gz_build_tests)
   endforeach()
 
   set(GZ_BUILD_TESTS_EXTRA_EXE_SRCS "")
+  set(GZ_BUILD_TESTS_EXTRA_LIBS "")
 endmacro()
 
 if (VALID_DISPLAY)
@@ -94,11 +99,8 @@ if (VALID_DISPLAY)
       )
 
     target_link_libraries(${BINARY_NAME}
-      # This two libraries are need to workaround on bug
-      # https://bitbucket.org/osrf/gazebo/issue/1516
-      gazebo_physics
-      gazebo_sensors
-      # gazebo_gui and libgazebo will bring all most of gazebo libraries as dependencies
+      # gazebo_gui and libgazebo will bring all most of gazebo
+      # libraries as dependencies
       libgazebo
       gazebo_gui
       ${QT_QTTEST_LIBRARY}

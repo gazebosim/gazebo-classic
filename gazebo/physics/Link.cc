@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,9 +39,6 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Battery.hh"
-
-#include "gazebo/sensors/SensorsIface.hh"
-#include "gazebo/sensors/Sensor.hh"
 
 #include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/physics/Model.hh"
@@ -171,9 +168,14 @@ void Link::Load(sdf::ElementPtr _sdf)
       }
       else if (sensorElem->Get<std::string>("type") != "__default__")
       {
-        std::string sensorName =
-          sensors::create_sensor(sensorElem, this->GetWorld()->GetName(),
-              this->GetScopedName(), this->GetId());
+        // This must match the implementation in Sensors::GetScopedName
+        std::string sensorName = this->GetScopedName(true) + "::" +
+          sensorElem->Get<std::string>("name");
+
+        // Tell the sensor library to create a sensor.
+        event::Events::createSensor(sensorElem,
+            this->GetWorld()->GetName(), this->GetScopedName(), this->GetId());
+
         this->sensors.push_back(sensorName);
       }
       sensorElem = sensorElem->GetNextElement("sensor");
@@ -301,11 +303,12 @@ void Link::Fini()
   this->inertial.reset();
   this->batteries.clear();
 
-  for (std::vector<std::string>::iterator iter = this->sensors.begin();
-       iter != this->sensors.end(); ++iter)
+  // Remove all the sensors attached to the link
+  for (auto const &sensor : this->sensors)
   {
-    sensors::remove_sensor(*iter);
+    event::Events::removeSensor(sensor);
   }
+
   this->sensors.clear();
 
   for (Visuals_M::iterator iter = this->visuals.begin();
@@ -920,12 +923,18 @@ void Link::FillMsg(msgs::Link &_msg)
     }
   }
 
-  for (std::vector<std::string>::iterator iter = this->sensors.begin();
-      iter != this->sensors.end(); ++iter)
+  // Add in the sensor data.
+  if (this->sdf->HasElement("sensor"))
   {
-    sensors::SensorPtr sensor = sensors::get_sensor(*iter);
-    if (sensor)
-      sensor->FillMsg(*_msg.add_sensor());
+    sdf::ElementPtr sensorElem = this->sdf->GetElement("sensor");
+    while (sensorElem)
+    {
+      msgs::Sensor *msg = _msg.add_sensor();
+      msg->CopyFrom(msgs::SensorFromSDF(sensorElem));
+      msg->set_parent(this->GetScopedName());
+      msg->set_parent_id(this->GetId());
+      sensorElem = sensorElem->GetNextElement("sensor");
+    }
   }
 
   if (this->visuals.empty())
@@ -1361,7 +1370,7 @@ void Link::SetScale(const math::Vector3 &_scale)
   // update the visual sdf to ensure cloning and saving has the correct values.
   this->UpdateVisualGeomSDF(_scale);
 
-  this->scale = _scale;
+  this->scale = _scale.Ign();
 }
 
 //////////////////////////////////////////////////
@@ -1387,8 +1396,8 @@ void Link::UpdateVisualGeomSDF(const math::Vector3 &_scale)
         // update radius the same way as collision shapes
         double radius = geomElem->GetElement("sphere")->Get<double>("radius");
         double newRadius = std::max(_scale.z, std::max(_scale.x, _scale.y));
-        double oldRadius = std::max(this->scale.z,
-            std::max(this->scale.x, this->scale.y));
+        double oldRadius = std::max(this->scale.Z(),
+            std::max(this->scale.X(), this->scale.Y()));
         geomElem->GetElement("sphere")->GetElement("radius")->Set(
             newRadius/oldRadius*radius);
       }
@@ -1397,13 +1406,13 @@ void Link::UpdateVisualGeomSDF(const math::Vector3 &_scale)
         // update radius the same way as collision shapes
         double radius = geomElem->GetElement("cylinder")->Get<double>("radius");
         double newRadius = std::max(_scale.x, _scale.y);
-        double oldRadius = std::max(this->scale.x, this->scale.y);
+        double oldRadius = std::max(this->scale.X(), this->scale.Y());
 
         double length = geomElem->GetElement("cylinder")->Get<double>("length");
         geomElem->GetElement("cylinder")->GetElement("radius")->Set(
             newRadius/oldRadius*radius);
         geomElem->GetElement("cylinder")->GetElement("length")->Set(
-            _scale.z/this->scale.z*length);
+            _scale.z/this->scale.Z()*length);
       }
       else if (geomElem->HasElement("mesh"))
         geomElem->GetElement("mesh")->GetElement("scale")->Set(_scale);

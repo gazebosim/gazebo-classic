@@ -79,6 +79,7 @@ set(tests
   region_events.cc
   rest_web.cc
   road.cc
+  saving_and_loading.cc
   sensor.cc
   server_fixture.cc
   sim_events.cc
@@ -119,6 +120,11 @@ if (ENABLE_TESTS_COMPILATION)
   set_tests_properties(${TEST_TYPE}_physics PROPERTIES TIMEOUT 500)
   set_tests_properties(${TEST_TYPE}_worlds_installed PROPERTIES TIMEOUT 700)
 
+  # Increase timeout for debug-mode
+  if (${CMAKE_BUILD_TYPE_UPPERCASE} STREQUAL "DEBUG")
+    set_tests_properties(${TEST_TYPE}_joint_gearbox PROPERTIES TIMEOUT 400)
+  endif()
+
   # Add plugin dependency
   add_dependencies(${TEST_TYPE}_joint_test SpringTestPlugin)
 endif()
@@ -150,6 +156,7 @@ gz_build_dri_tests(${dri_tests})
 set(qt_tests
   insert_model.cc
   model_editor.cc
+  model_manipulation.cc
   undo.cc
   visual_pose.cc
 )

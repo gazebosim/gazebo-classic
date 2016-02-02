@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -104,7 +104,8 @@ void JointCreationDialog_TEST::Links()
 
   // Add links to list
   std::vector<std::string> scopedLinkNames =
-      {"model::link1", "model::link2", "model::link3"};
+      {"model::link1", "model::link2", "model::link3",
+      "model::nested_model::link4"};
   std::vector<std::string> linkNames;
   for (auto scopedName : scopedLinkNames)
   {
@@ -138,9 +139,10 @@ void JointCreationDialog_TEST::Links()
   auto childCombo = childWidget->findChild<QComboBox *>();
   QVERIFY(childCombo != NULL);
 
-  // Check that each combo box has an empty option plus 3 link options
-  QVERIFY(parentCombo->count() == 4u);
-  QVERIFY(childCombo->count() == 4u);
+  // Check that each combo box has an empty option plus all link options
+  int linkSize = static_cast<int>(linkNames.size());
+  QVERIFY(parentCombo->count() == 1 + linkSize);
+  QVERIFY(childCombo->count() == 1 + linkSize);
 
   for (int i = 1; i < parentCombo->count(); ++i)
   {
@@ -237,6 +239,13 @@ void JointCreationDialog_TEST::Links()
   // Check that the child link was selected
   QVERIFY(configWidget->EnumWidgetValue("parentCombo") == linkNames[2]);
   QVERIFY(configWidget->EnumWidgetValue("childCombo") == linkNames[1]);
+
+  // Set parent from dialog, valid value
+  childCombo->setCurrentIndex(3);
+
+  // Check that the child link was selected
+  QVERIFY(configWidget->EnumWidgetValue("parentCombo") == linkNames[2]);
+  QVERIFY(configWidget->EnumWidgetValue("childCombo") == linkNames[3]);
 
   // Check that all buttons are enabled
   for (auto button : pushButtons)

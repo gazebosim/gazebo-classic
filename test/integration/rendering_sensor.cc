@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -131,11 +131,11 @@ TEST_F(RenderingSensorTest, Timestamp)
   transport::NodePtr node = transport::NodePtr(new transport::Node());
   node->Init();
 
-  transport::SubscriberPtr cam1Sub = node->Subscribe(camSensor1->GetTopic(),
+  transport::SubscriberPtr cam1Sub = node->Subscribe(camSensor1->Topic(),
       &OnReceiveCamera1Msg);
-  transport::SubscriberPtr cam2Sub = node->Subscribe(camSensor2->GetTopic(),
+  transport::SubscriberPtr cam2Sub = node->Subscribe(camSensor2->Topic(),
       &OnReceiveCamera2Msg);
-  transport::SubscriberPtr gpuRaySub = node->Subscribe(gpuRaySensor->GetTopic(),
+  transport::SubscriberPtr gpuRaySub = node->Subscribe(gpuRaySensor->Topic(),
       &OnReceiveGpuRayMsg);
 
   unsigned int numTimestamps = 100;
