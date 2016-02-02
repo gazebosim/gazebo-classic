@@ -55,7 +55,7 @@ namespace gazebo
       /// entity's location.
       /// It takes as input a reference to an instance of Wind and a pointer to
       /// an Entity.
-      public: std::function<ignition::math::Vector3d (
+      public: std::function< ignition::math::Vector3d (
                   std::shared_ptr<const Wind> &, const Entity *)> linearVelFunc;
     };
   }

@@ -119,7 +119,7 @@ namespace gazebo
       /// Wind and a pointer to an entity in the scene. The function must
       /// return the new wind velocity as a vector.
       public: void SetLinearVelFunc(
-                  std::function<ignition::math::Vector3d (
+                  std::function< ignition::math::Vector3d (
                       std::shared_ptr<const Wind> &,
                       const Entity *_entity)> _linearVelFunc);
 

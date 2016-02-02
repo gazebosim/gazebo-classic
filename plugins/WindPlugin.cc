@@ -47,31 +47,31 @@ void WindPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 
   physics::WindPtr wind = this->world->Wind();
 
-  if(_sdf->HasElement("horizontal"))
+  if (_sdf->HasElement("horizontal"))
   {
     sdf::ElementPtr sdfHoriz = _sdf->GetElement("horizontal");
 
-    if(sdfHoriz->HasElement("magnitude"))
+    if (sdfHoriz->HasElement("magnitude"))
     {
       sdf::ElementPtr sdfMag = sdfHoriz->GetElement("magnitude");
 
-      if(sdfMag->HasElement("time_for_rise"))
+      if (sdfMag->HasElement("time_for_rise"))
         this->characteristicTimeForWindRise =
           sdfMag->Get<double>("time_for_rise");
 
-      if(sdfMag->HasElement("sin"))
+      if (sdfMag->HasElement("sin"))
       {
         sdf::ElementPtr sdfMagSin = sdfMag->GetElement("sin");
 
-        if(sdfMagSin->HasElement("amplitude_percent"))
+        if (sdfMagSin->HasElement("amplitude_percent"))
           this->magnitudeSinAmplitudePercent =
             sdfMagSin->Get<double>("amplitude_percent");
 
-        if(sdfMagSin->HasElement("period"))
+        if (sdfMagSin->HasElement("period"))
           this->magnitudeSinPeriod = sdfMagSin->Get<double>("period");
       }
 
-      if(sdfMag->HasElement("noise"))
+      if (sdfMag->HasElement("noise"))
       {
         this->noiseMagnitude =
           sensors::NoiseFactory::NewNoiseModel(
@@ -79,28 +79,28 @@ void WindPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
       }
     }
 
-    if(sdfHoriz->HasElement("direction"))
+    if (sdfHoriz->HasElement("direction"))
     {
       sdf::ElementPtr sdfDir = sdfHoriz->GetElement("direction");
 
-      if(sdfDir->HasElement("time_for_rise"))
+      if (sdfDir->HasElement("time_for_rise"))
         this->characteristicTimeForWindOrientationChange =
           sdfDir->Get<double>("time_for_rise");
 
-      if(sdfDir->HasElement("sin"))
+      if (sdfDir->HasElement("sin"))
       {
         sdf::ElementPtr sdfDirSin = sdfDir->GetElement("sin");
 
-        if(sdfDirSin->HasElement("amplitude"))
+        if (sdfDirSin->HasElement("amplitude"))
           this->orientationSinAmplitude =
             sdfDirSin->Get<double>("amplitude");
 
-        if(sdfDirSin->HasElement("period"))
+        if (sdfDirSin->HasElement("period"))
           this->orientationSinPeriod =
             sdfDirSin->Get<double>("period");
       }
 
-      if(sdfDir->HasElement("noise"))
+      if (sdfDir->HasElement("noise"))
       {
         this->noiseDirection =
           sensors::NoiseFactory::NewNoiseModel(
@@ -109,11 +109,11 @@ void WindPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
     }
   }
 
-  if(_sdf->HasElement("vertical"))
+  if (_sdf->HasElement("vertical"))
   {
     sdf::ElementPtr sdfVert = _sdf->GetElement("vertical");
 
-    if(sdfVert->HasElement("noise"))
+    if (sdfVert->HasElement("noise"))
     {
       this->noiseVertical =
         sensors::NoiseFactory::NewNoiseModel(
