@@ -486,7 +486,7 @@ void SensorManager::SensorContainer::RunLoop()
 
   // The original value was hardcode to 1.0. Change the value to
   // 1000 * MaxStepSize in order to handle simulation with faster update rates
-  double maxSensorUpdate = engine->MaxStepSize() * 1000;
+  double maxSensorUpdate = engine->GetMaxStepSize() * 1000;
 
   common::Time sleepTime, startTime, eventTime, diffTime;
   double maxUpdateRate = 0;
