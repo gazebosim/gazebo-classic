@@ -92,20 +92,20 @@ void ModelSnap_TEST::Snap()
   gazebo::math::Vector2i srcPt = GetScreenSpaceCoords(
       model03Vis->GetWorldPose().pos + gazebo::math::Vector3(0.5, 0, 0), cam);
   ignition::math::Vector3d intersect;
-  std::vector<ignition::math::Vector3d> verticesSrc;
+  ignition::math::Triangle3d triangleSrc;
   rayQuery.SelectMeshTriangle(srcPt.x, srcPt.y, model03Vis, intersect,
-      verticesSrc);
+      triangleSrc);
 
   // select the front face of the box
   gazebo::math::Vector2i destPt = GetScreenSpaceCoords(
       model02Vis->GetWorldPose().pos + gazebo::math::Vector3(0.5, 0, 0), cam);
-  std::vector<ignition::math::Vector3d> verticesDest;
+  ignition::math::Triangle3d triangleDest;
   rayQuery.SelectMeshTriangle(destPt.x, destPt.y, model02Vis, intersect,
-      verticesDest);
+      triangleDest);
 
   // Snap the sphere to the front face of the box.
   gazebo::gui::ModelSnap::Instance()->Snap(
-      verticesSrc, verticesDest, model03Vis);
+      triangleSrc, triangleDest, model03Vis);
 
   double xDiff = 0;
   double yDiff = 0;
@@ -131,20 +131,18 @@ void ModelSnap_TEST::Snap()
   // select the spherical face of the cylinder
   gazebo::math::Vector2i srcPt2 = GetScreenSpaceCoords(
       model01Vis->GetWorldPose().pos + gazebo::math::Vector3(0.5, 0, 0.0), cam);
-  verticesSrc.clear();
   rayQuery.SelectMeshTriangle(srcPt2.x, srcPt2.y, model01Vis, intersect,
-      verticesSrc);
+      triangleSrc);
 
   // select the top face of the box
   gazebo::math::Vector2i destPt2 = GetScreenSpaceCoords(
       model02Vis->GetWorldPose().pos + gazebo::math::Vector3(0.0, 0, 0.5), cam);
-  verticesDest.clear();
   rayQuery.SelectMeshTriangle(destPt2.x, destPt2.y, model02Vis, intersect,
-      verticesDest);
+      triangleDest);
 
   // Snap the cylinder to the top of the box.
   gazebo::gui::ModelSnap::Instance()->Snap(
-      verticesSrc, verticesDest, model01Vis);
+      triangleSrc, triangleDest, model01Vis);
 
   // The cylinder should now be on top of the box
   // Given that they are both unit shapes, the height of the cylinder will now

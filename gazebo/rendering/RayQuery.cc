@@ -130,7 +130,7 @@ bool RayQuery::SelectMeshTriangle(int _x, int _y, VisualPtr _visual,
 /////////////////////////////////////////////////
 bool RayQuery::SelectMeshTriangle(int _x, int _y, VisualPtr _visual,
     ignition::math::Vector3d &_intersect,
-    std::vector<ignition::math::Vector3d> &_vertices)
+    ignition::math::Triangle3d &_triangle)
 {
   // create the ray to test
   Ogre::Ray ray =
@@ -204,10 +204,9 @@ bool RayQuery::SelectMeshTriangle(int _x, int _y, VisualPtr _visual,
   {
     // raycast success
     _intersect = Conversions::ConvertIgn(closestResult);
-    _vertices.clear();
-    _vertices.push_back(Conversions::ConvertIgn(vertices[0]));
-    _vertices.push_back(Conversions::ConvertIgn(vertices[1]));
-    _vertices.push_back(Conversions::ConvertIgn(vertices[2]));
+    _triangle.Set(Conversions::ConvertIgn(vertices[0]),
+                  Conversions::ConvertIgn(vertices[1]),
+                  Conversions::ConvertIgn(vertices[2]));
     return true;
   }
   // raycast failed

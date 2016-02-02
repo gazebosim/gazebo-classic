@@ -69,8 +69,6 @@ void ModelSnap::Clear()
 {
   this->dataPtr->selectedTriangleDirty = false;
   this->dataPtr->hoverTriangleDirty = false;
-  this->dataPtr->selectedTriangle.clear();
-  this->dataPtr->hoverTriangle.clear();
   this->dataPtr->selectedVis.reset();
   this->dataPtr->hoverVis.reset();
 
@@ -141,10 +139,8 @@ void ModelSnap::Reset()
 {
   boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
   this->dataPtr->selectedVis.reset();
-  this->dataPtr->selectedTriangle.clear();
 
   this->dataPtr->hoverVis.reset();
-  this->dataPtr->hoverTriangle.clear();
 
   this->dataPtr->hoverTriangleDirty = false;
   this->dataPtr->selectedTriangleDirty = false;
@@ -192,11 +188,11 @@ void ModelSnap::OnMouseMoveEvent(const common::MouseEvent &_event)
   {
     // get the triangle being hovered so that it can be highlighted
     ignition::math::Vector3d intersect;
-    std::vector<ignition::math::Vector3d> hoverTriangle;
+    ignition::math::Triangle3d hoverTriangle;
     this->dataPtr->rayQuery->SelectMeshTriangle(_event.Pos().X(),
         _event.Pos().Y(), vis->GetRootVisual(), intersect, hoverTriangle);
 
-    if (!hoverTriangle.empty())
+    if (hoverTriangle.Valid())
     {
       boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
       this->dataPtr->hoverVis = vis;
@@ -214,7 +210,6 @@ void ModelSnap::OnMouseMoveEvent(const common::MouseEvent &_event)
   {
     boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
     this->dataPtr->hoverVis.reset();
-    this->dataPtr->hoverTriangle.clear();
     this->dataPtr->hoverTriangleDirty = true;
   }
 
@@ -261,7 +256,7 @@ void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
           _event.Pos().Y(), currentParent, intersect,
           this->dataPtr->selectedTriangle);
 
-      if (!this->dataPtr->selectedTriangle.empty())
+      if (this->dataPtr->selectedTriangle.Valid())
       {
         this->dataPtr->selectedVis = vis;
         this->dataPtr->selectedTriangleDirty = true;
@@ -276,13 +271,13 @@ void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
     {
       // select triangle on the target
       ignition::math::Vector3d intersect;
-      std::vector<ignition::math::Vector3d> vertices;
+      ignition::math::Triangle3d triangle;
       this->dataPtr->rayQuery->SelectMeshTriangle(_event.Pos().X(),
-          _event.Pos().Y(), currentParent, intersect, vertices);
+          _event.Pos().Y(), currentParent, intersect, triangle);
 
-      if (!vertices.empty())
+      if (triangle.Valid())
       {
-        this->Snap(this->dataPtr->selectedTriangle, vertices, previousParent);
+        this->Snap(this->dataPtr->selectedTriangle, triangle, previousParent);
 
         this->Reset();
         gui::Events::manipMode("select");
@@ -312,8 +307,8 @@ void ModelSnap::Snap(const std::vector<math::Vector3> &_triangleSrc,
 }
 
 //////////////////////////////////////////////////
-void ModelSnap::Snap(const std::vector<ignition::math::Vector3d> &_triangleSrc,
-    const std::vector<ignition::math::Vector3d> &_triangleDest,
+void ModelSnap::Snap(const ignition::math::Triangle3d &_triangleSrc,
+    const ignition::math::Triangle3d &_triangleDest,
     rendering::VisualPtr _visualSrc)
 {
   ignition::math::Vector3d translation;
@@ -365,8 +360,8 @@ void ModelSnap::GetSnapTransform(const std::vector<math::Vector3> &_triangleSrc,
 
 //////////////////////////////////////////////////
 void ModelSnap::SnapTransform(
-    const std::vector<ignition::math::Vector3d> &_triangleSrc,
-    const std::vector<ignition::math::Vector3d> &_triangleDest,
+    const ignition::math::Triangle3d &_triangleSrc,
+    const ignition::math::Triangle3d &_triangleDest,
     const ignition::math::Pose3d &_poseSrc, ignition::math::Vector3d &_trans,
     ignition::math::Quaterniond &_rot)
 {
@@ -435,13 +430,13 @@ void ModelSnap::Update()
   boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
   if (this->dataPtr->hoverTriangleDirty)
   {
-    if (!this->dataPtr->hoverTriangle.empty())
+    if (this->dataPtr->hoverTriangle.Valid())
     {
       // convert triangle to local coordinates relative to parent visual
-      std::vector<ignition::math::Vector3d> hoverTriangle;
-      for (unsigned int i = 0; i < this->dataPtr->hoverTriangle.size(); ++i)
+      ignition::math::Triangle3d hoverTriangle;
+      for (unsigned int i = 0; i < 3; ++i)
       {
-        hoverTriangle.push_back(
+        hoverTriangle.Set(i,
             this->dataPtr->hoverVis->GetWorldPose().Ign().Rot().Inverse() *
             (this->dataPtr->hoverTriangle[i] -
             this->dataPtr->hoverVis->GetWorldPose().Ign().Pos()));
@@ -496,13 +491,13 @@ void ModelSnap::Update()
   }
 
   if (this->dataPtr->selectedTriangleDirty &&
-      !this->dataPtr->selectedTriangle.empty())
+      this->dataPtr->selectedTriangle.Valid())
   {
     // convert triangle to local coordinates relative to parent visual
-    std::vector<math::Vector3> triangle;
-    for (unsigned int i = 0; i < this->dataPtr->selectedTriangle.size(); ++i)
+    ignition::math::Triangle3d triangle;
+    for (unsigned int i = 0; i < 3; ++i)
     {
-      triangle.push_back(
+      triangle.Set(i,
           this->dataPtr->selectedVis->GetWorldPose().Ign().Rot().Inverse() *
           (this->dataPtr->selectedTriangle[i] -
           this->dataPtr->selectedVis->GetWorldPose().Ign().Pos()));
@@ -521,10 +516,10 @@ void ModelSnap::Update()
           this->dataPtr->snapVisual->CreateDynamicLine(
           rendering::RENDERING_LINE_STRIP);
       this->dataPtr->snapLines->setMaterial("Gazebo/RedGlow");
-      this->dataPtr->snapLines->AddPoint(triangle[0].Ign());
-      this->dataPtr->snapLines->AddPoint(triangle[1].Ign());
-      this->dataPtr->snapLines->AddPoint(triangle[2].Ign());
-      this->dataPtr->snapLines->AddPoint(triangle[0].Ign());
+      this->dataPtr->snapLines->AddPoint(triangle[0]);
+      this->dataPtr->snapLines->AddPoint(triangle[1]);
+      this->dataPtr->snapLines->AddPoint(triangle[2]);
+      this->dataPtr->snapLines->AddPoint(triangle[0]);
       this->dataPtr->snapVisual->SetVisible(true);
       this->dataPtr->snapVisual->GetSceneNode()->setInheritScale(false);
       this->dataPtr->snapVisual->SetVisibilityFlags(
@@ -544,10 +539,10 @@ void ModelSnap::Update()
         }
         this->dataPtr->selectedVis->AttachVisual(this->dataPtr->snapVisual);
       }
-      this->dataPtr->snapLines->SetPoint(0, triangle[0].Ign());
-      this->dataPtr->snapLines->SetPoint(1, triangle[1].Ign());
-      this->dataPtr->snapLines->SetPoint(2, triangle[2].Ign());
-      this->dataPtr->snapLines->SetPoint(3, triangle[0].Ign());
+      this->dataPtr->snapLines->SetPoint(0, triangle[0]);
+      this->dataPtr->snapLines->SetPoint(1, triangle[1]);
+      this->dataPtr->snapLines->SetPoint(2, triangle[2]);
+      this->dataPtr->snapLines->SetPoint(3, triangle[0]);
     }
     this->dataPtr->selectedTriangleDirty = false;
   }

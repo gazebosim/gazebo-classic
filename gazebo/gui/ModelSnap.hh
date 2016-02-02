@@ -74,8 +74,8 @@ namespace gazebo
       /// moved.
       /// \param[in] _visualSrc Visual being moved by the snap action.
       public: void Snap(
-          const std::vector<ignition::math::Vector3d> &_triangleSrc,
-          const std::vector<ignition::math::Vector3d> &_triangleDest,
+          const ignition::math::Triangle3d &_triangleSrc,
+          const ignition::math::Triangle3d &_triangleDest,
           rendering::VisualPtr _visualSrc);
 
       /// \brief Calculate the translation and rotation needed to snap the
@@ -105,9 +105,10 @@ namespace gazebo
       /// \param[out] _trans Translation output.
       /// \param[out] _rotation Rotation output.
       public: void SnapTransform(
-          const std::vector<ignition::math::Vector3d> &_triangleSrc,
-          const std::vector<ignition::math::Vector3d> &_triangleDest,
-          const ignition::math::Pose3d &_poseSrc, ignition::math::Vector3d &_trans,
+          const ignition::math::Triangle3d &_triangleSrc,
+          const ignition::math::Triangle3d &_triangleDest,
+          const ignition::math::Pose3d &_poseSrc,
+          ignition::math::Vector3d &_trans,
           ignition::math::Quaterniond &_rot);
 
       /// \brief Process an object translate mouse press event.

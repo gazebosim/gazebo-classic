@@ -111,9 +111,6 @@ namespace gazebo
 
       /// \brief Mutex to protect selectedVisuals array.
       public: std::mutex selectedVisMutex;
-
-      /// \brief Flag to enable the tape measure tool.
-      public: bool tapeMeasureEnabled;
     };
   }
 }

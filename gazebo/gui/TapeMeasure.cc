@@ -15,26 +15,28 @@
  *
 */
 
-#include "gazebo/transport/transport.hh"
-
-#include "gazebo/rendering/RenderTypes.hh"
-#include "gazebo/rendering/RenderEvents.hh"
-#include "gazebo/rendering/RenderingIface.hh"
-#include "gazebo/rendering/DynamicLines.hh"
-#include "gazebo/rendering/PointVisual.hh"
-#include "gazebo/rendering/Scene.hh"
-#include "gazebo/rendering/UserCamera.hh"
-#include "gazebo/rendering/Conversions.hh"
-#include "gazebo/rendering/RayQuery.hh"
+#include <ignition/math/Triangle3.hh>
 
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/MouseEventHandler.hh"
 #include "gazebo/gui/qt.h"
-
 #include "gazebo/gui/TapeMeasurePrivate.hh"
 #include "gazebo/gui/TapeMeasure.hh"
+
+#include "gazebo/rendering/Conversions.hh"
+#include "gazebo/rendering/DynamicLines.hh"
+#include "gazebo/rendering/PointVisual.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/rendering/RayQuery.hh"
+#include "gazebo/rendering/RenderEvents.hh"
+#include "gazebo/rendering/RenderingIface.hh"
+#include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/rendering/Visual.hh"
+
+#include "gazebo/transport/transport.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -278,15 +280,16 @@ bool TapeMeasure::OnMouseMove(const common::MouseEvent &_event)
 
   // Get the first triangle intercepted
   ignition::math::Vector3d pt;
-  std::vector<ignition::math::Vector3d> triangle;
-  if (vis)
+  ignition::math::Triangle3d triangle;
+  if (vis && vis->GetType() != rendering::Visual::VT_GUI &&
+      vis->GetType() != rendering::Visual::VT_PHYSICS)
   {
     this->dataPtr->rayQuery->SelectMeshTriangle(_event.Pos().X(),
         _event.Pos().Y(), vis->GetRootVisual(), pt, triangle);
   }
 
   // If holding Shift, get the closest triangle vertex
-  if (!triangle.empty() &&
+  if (triangle.Valid() &&
       QApplication::keyboardModifiers() & Qt::ShiftModifier)
   {
     this->dataPtr->snapPts.clear();
@@ -313,7 +316,7 @@ bool TapeMeasure::OnMouseMove(const common::MouseEvent &_event)
     this->dataPtr->snapPts.clear();
   }
 
-  if (pt != ignition::math::Vector3d::Zero)
+  if (pt != ignition::math::Vector3d::Zero && triangle.Valid())
   {
     this->dataPtr->hoverPt = pt;
     this->dataPtr->hoverVis = vis;

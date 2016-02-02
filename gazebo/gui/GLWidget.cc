@@ -428,13 +428,6 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
       g_scaleAct->trigger();
     else if (_event->key() == Qt::Key_N && g_snapAct->isEnabled())
       g_snapAct->trigger();
-    else if (_event->key() == Qt::Key_M && g_tapeMeasureAct->isEnabled())
-    {
-      if (g_tapeMeasureAct->isChecked())
-        g_arrowAct->trigger();
-      else
-        g_tapeMeasureAct->trigger();
-    }
     else if (_event->key() == Qt::Key_Escape && g_arrowAct->isEnabled())
       g_arrowAct->trigger();
   }

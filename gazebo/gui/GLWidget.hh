@@ -167,10 +167,6 @@ namespace gazebo
       private: void OnOrbit();
       private: void OnManipMode(const std::string &_mode);
 
-      /// \brief Enable the tape measure tool.
-      /// \param[in] _enable True to enable;
-      private: void OnEnableTapeMeasure(const bool _enable);
-
       private: void OnSetSelectedEntity(const std::string &_name,
                                         const std::string &_mode);
 
