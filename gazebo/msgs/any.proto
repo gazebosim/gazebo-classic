@@ -21,7 +21,7 @@ message Any
     COLOR      = 5;
     POSE       = 6;
     QUATERNION = 7;
-    BOOL       = 8;
+    BOOLEAN    = 8;
   }
 
   /// \brief ToDo.
