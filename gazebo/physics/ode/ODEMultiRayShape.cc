@@ -171,16 +171,7 @@ void ODEMultiRayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
 
     if (n > 0)
     {
-      RayShape *shape = NULL;
-      /*if (rayCollision)
-      {
-        shape = boost::static_pointer_cast<RayShape>(
-            rayCollision->GetShape()).get();
-      }
-      else
-      {*/
-        shape = static_cast<RayShape*>(dGeomGetData(rayId));
-      //}
+      RayShape *shape = static_cast<RayShape*>(dGeomGetData(rayId));
 
       if (shape && hitCollision && contact.depth < shape->GetLength())
       {
@@ -226,7 +217,6 @@ void ODEMultiRayShape::AddRay(const math::Vector3 &_start,
             this->GetWorld()->GetPhysicsEngine()), this->raySpaceId));
     dGeomSetData(ray->ODEGeomId(), ray.get());
   }
-
 
   ray->SetPoints(_start, _end);
   this->rays.push_back(ray);

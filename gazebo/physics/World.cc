@@ -272,8 +272,6 @@ void World::Load(sdf::ElementPtr _sdf)
     gzthrow("Unable to create physics engine\n");
 
   this->dataPtr->physicsEngine->Load(physicsElem);
-  this->dataPtr->physicsEngine->SetGravity(
-      this->dataPtr->sdf->Get<math::Vector3>("gravity"));
 
   // This should also come before loading of entities
   {

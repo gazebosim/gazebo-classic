@@ -212,6 +212,7 @@ ODESurfaceParamsPtr ODECollision::GetODESurface() const
 /////////////////////////////////////////////////
 void ODECollision::OnPoseChangeGlobal()
 {
+  // A collision is not guaranteed to have a link (such as a standalone ray)
   if (!this->link)
     return;
 
@@ -237,6 +238,7 @@ void ODECollision::OnPoseChangeGlobal()
 /////////////////////////////////////////////////
 void ODECollision::OnPoseChangeRelative()
 {
+  // A collision is not guaranteed to have a link (such as a standalone ray)
   if (!this->link)
     return;
 

@@ -145,7 +145,7 @@ namespace gazebo
       public: void DisconnectNewLaserScans(event::ConnectionPtr &_conn)
               {this->newLaserScans.Disconnect(_conn);}
 
-      /// \brief Physics engine specific method for updating the rays.
+      /// \brief Method for updating the rays.
       public: virtual void UpdateRays() = 0;
 
       /// \brief Add a ray to the collision.
@@ -161,8 +161,8 @@ namespace gazebo
       /// \return True if the ray was set. False can be returned if the
       /// _rayIndex is invalid.
       public: bool SetRay(const unsigned int _rayIndex,
-                  const math::Vector3 &_start,
-                  const math::Vector3 &_end);
+                  const ignition::math::Vector3d &_start,
+                  const ignition::math::Vector3d &_end);
 
       /// \brief Get the number of rays.
       /// \return Number of rays in this shape.
@@ -198,7 +198,10 @@ namespace gazebo
       /// \brief New laser scans event.
       protected: event::EventT<void()> newLaserScans;
 
+      /// \brief Min range of a ray
       private: double minRange = 0;
+
+      /// \brief Max range of a ray
       private: double maxRange = 1000;
     };
     /// \}

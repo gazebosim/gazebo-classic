@@ -200,7 +200,8 @@ void MultiRayShape::Update()
 
 //////////////////////////////////////////////////
 bool MultiRayShape::SetRay(const unsigned int _rayIndex,
-    const math::Vector3 &_start, const math::Vector3 &_end)
+    const ignition::math::Vector3d &_start,
+    const ignition::math::Vector3d &_end)
 {
   if (_rayIndex < this->rays.size())
   {

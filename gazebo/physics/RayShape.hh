@@ -161,6 +161,7 @@ namespace gazebo
       /// \brief End position of the ray in global cs
       protected: math::Vector3 globalEndPos;
 
+      /// \brief Name of the object this ray collided with
       private: std::string collisionName;
     };
     /// \}
