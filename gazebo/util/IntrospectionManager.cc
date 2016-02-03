@@ -72,10 +72,10 @@ IntrospectionManager::IntrospectionManager()
     gzerr << "Error advertising service [" << service << "]" << std::endl;
   }
 
-  // Advertise the service for listing the items of an existing filter.
-  service = this->dataPtr->prefix + "filter_info";
+  // Advertise the service for listing all items registered in this manager.
+  service = this->dataPtr->prefix + "items";
   if (!this->dataPtr->node.Advertise(service,
-      &IntrospectionManager::Filter, this))
+      &IntrospectionManager::Items, this))
   {
     gzerr << "Error advertising service [" << service << "]" << std::endl;
   }
@@ -117,16 +117,6 @@ bool IntrospectionManager::Unregister(const std::string &_item)
   this->dataPtr->allItems.erase(_item);
 
   return true;
-}
-
-//////////////////////////////////////////////////
-std::set<std::string> IntrospectionManager::RegisteredItems() const
-{
-  std::set<std::string> items;
-  for (auto item : this->dataPtr->allItems)
-    items.emplace(item.first);
-
-  return items;
 }
 
 //////////////////////////////////////////////////
@@ -253,18 +243,74 @@ bool IntrospectionManager::RemoveFilter(const std::string &_filterId)
 }
 
 //////////////////////////////////////////////////
-bool IntrospectionManager::Filter(const std::string &_filterId,
-    std::set<std::string> &_items) const
+std::set<std::string> IntrospectionManager::Items() const
 {
-  // Sanity check: Make sure that filter ID exists.
-  if (this->dataPtr->filters.find(_filterId) == this->dataPtr->filters.end())
+  std::set<std::string> items;
+  for (auto item : this->dataPtr->allItems)
+    items.emplace(item.first);
+
+  return items;
+}
+
+//////////////////////////////////////////////////
+void IntrospectionManager::Update()
+{
+  for (auto &observedItem : this->dataPtr->observedItems)
   {
-    gzerr << "Unknown filter ID [" << _filterId << "]" << std::endl;
-    return false;
+    auto &item = observedItem.first;
+    auto &lastValue = observedItem.second.lastValue;
+
+    // Sanity check: Make sure that we can update the item.
+    if (this->dataPtr->allItems.find(item) == this->dataPtr->allItems.end())
+      continue;
+
+    // Update the values of the items under observation.
+    auto &callback = this->dataPtr->allItems[item].cb;
+    gazebo::msgs::Any value;
+    if (!callback(value))
+    {
+      gzerr << "Something went wrong updating the value for item [" << item
+            << "]." << std::endl;
+      continue;
+    }
+    lastValue.CopyFrom(value);
+
+    // We should have at least one filter, otherwise this entry should have been
+    // previously recycled.
+    //GZ_ASSERT(!filters.empty(), "No filters on item [" + item + "]");
   }
 
-  _items = this->dataPtr->filters.at(_filterId).items;
-  return true;
+  // Prepare the next message to be sent in each filter.
+  for (auto &filter : this->dataPtr->filters)
+  {
+    // First of all, clear the old message.
+    auto &nextMsg = filter.second.msg;
+    nextMsg.Clear();
+
+    // Insert the last value of each item under observation for this filter.
+    for (auto const &item : filter.second.items)
+    {
+      // Sanity check: Make sure that someone registered this item.
+      if (this->dataPtr->allItems.find(item) == this->dataPtr->allItems.end())
+        continue;
+
+      auto nextParam = nextMsg.add_param();
+      nextParam->set_name(item);
+      nextParam->mutable_value()->CopyFrom(this->dataPtr->observedItems[item].lastValue);
+    }
+
+    // Sanity check: Make sure that we have at least one item updated.
+    if (nextMsg.param_size() == 0)
+      continue;
+
+    // Publish the update for this filter.
+    std::string topicName = "/introspection/filter/" + filter.first;
+    if (!this->dataPtr->node.Publish(topicName, nextMsg))
+    {
+      gzerr << "Error publishing update for topic [" << topicName << "]"
+            << std::endl;
+    }
+  }
 }
 
 //////////////////////////////////////////////////
@@ -406,123 +452,21 @@ void IntrospectionManager::RemoveFilter(const gazebo::msgs::Param_V &_req,
 }
 
 //////////////////////////////////////////////////
-void IntrospectionManager::Filter(const gazebo::msgs::Param_V &_req,
+void IntrospectionManager::Items(const gazebo::msgs::Empty &/*_req*/,
     gazebo::msgs::Param_V &_rep, bool &_result)
 {
-  _result = false;
-
-  // Sanity check: Make sure that the message contains at least one parameter.
-  if (_req.param_size() != 1)
-  {
-    gzerr << "Expecting message with exactly 1 parameter but "
-          << _req.param_size() << " were received." << std::endl;
-    gzerr << "Ignoring request." << std::endl;
-    return;
-  }
-
-  auto param = _req.param(0);
-  if (!this->ValidateParameter(param, {"filter_id"}))
-  {
-    gzerr << "Ignoring request." << std::endl;
-    return;
-  }
-
-  std::string filterId = param.value().string_value();
-  std::set<std::string> items;
-  if (!this->Filter(filterId, items))
-    return;
-
-  for (auto const &item : items)
-  {
-    auto newParam = _rep.add_param();
-    newParam->set_name("item");
-    newParam->mutable_value()->set_type(gazebo::msgs::Any::STRING);
-    newParam->mutable_value()->set_string_value(item);
-  }
-
-  _result = true;
-}
-
-//////////////////////////////////////////////////
-void IntrospectionManager::Update()
-{
-  for (auto &observedItem : this->dataPtr->observedItems)
-  {
-    auto &item = observedItem.first;
-    auto &lastValue = observedItem.second.lastValue;
-
-    // Sanity check: Make sure that we can update the item.
-    if (this->dataPtr->allItems.find(item) == this->dataPtr->allItems.end())
-      continue;
-
-    // Update the values of the items under observation.
-    auto &callback = this->dataPtr->allItems[item].cb;
-    gazebo::msgs::Any value;
-    if (!callback(value))
-    {
-      gzerr << "Something went wrong updating the value for item [" << item
-            << "]." << std::endl;
-      continue;
-    }
-    lastValue.CopyFrom(value);
-
-    // We should have at least one filter, otherwise this entry should have been
-    // previously recycled.
-    //GZ_ASSERT(!filters.empty(), "No filters on item [" + item + "]");
-  }
-
-  // Prepare the next message to be sent in each filter.
-  for (auto &filter : this->dataPtr->filters)
-  {
-    // First of all, clear the old message.
-    auto &nextMsg = filter.second.msg;
-    nextMsg.Clear();
-
-    // Insert the last value of each item under observation for this filter.
-    for (auto const &item : filter.second.items)
-    {
-      // Sanity check: Make sure that someone registered this item.
-      if (this->dataPtr->allItems.find(item) == this->dataPtr->allItems.end())
-        continue;
-
-      auto nextParam = nextMsg.add_param();
-      nextParam->set_name(item);
-      nextParam->mutable_value()->CopyFrom(this->dataPtr->observedItems[item].lastValue);
-    }
-
-    // Sanity check: Make sure that we have at least one item updated.
-    if (nextMsg.param_size() == 0)
-      continue;
-
-    // Publish the update for this filter.
-    std::string topicName = "/introspection/filter/" + filter.first;
-    if (!this->dataPtr->node.Publish(topicName, nextMsg))
-    {
-      gzerr << "Error publishing update for topic [" << topicName << "]"
-            << std::endl;
-    }
-  }
-}
-
-//////////////////////////////////////////////////
-void IntrospectionManager::Show() const
-{
-  std::cout << "***" << std::endl;
-  std::cout << "Registered items" << std::endl;
   for (auto const &item : this->dataPtr->allItems)
-    std::cout << "  " << item.first << " [" << item.second.type << "]" << std::endl;
-
-  std::cout << std::endl << "Filters" << std::endl;
-  for (auto const &filter : this->dataPtr->filters)
   {
-    std::cout << "Id: " << filter.first << std::endl;
-    std::cout << "Items: ";
-    for (auto const &item : filter.second.items)
-      std::cout << "[" << item << "] ";
-    std::cout << std::endl;
+    auto nextParam = _rep.add_param();
+    nextParam->set_name("item");
+    nextParam->mutable_value()->set_type(gazebo::msgs::Any::STRING);
+    nextParam->mutable_value()->set_string_value(item.first);
+    auto childParam = nextParam->add_children();
+    childParam->set_name("type");
+    childParam->mutable_value()->set_type(gazebo::msgs::Any::STRING);
+    childParam->mutable_value()->set_string_value(item.second.type);
   }
-
-  //std::cout << std::endl << "Observed items";
+  _result = true;
 }
 
 //////////////////////////////////////////////////
