@@ -56,6 +56,7 @@ using namespace physics;
 Entity::Entity(BasePtr _parent)
   : Base(_parent)
 {
+  this->isStatic = false;
   this->isCanonicalLink = false;
   this->node = transport::NodePtr(new transport::Node());
   this->AddType(ENTITY);
