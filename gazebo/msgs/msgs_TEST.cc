@@ -672,6 +672,59 @@ TEST_F(MsgsTest, IMUSensorFromSDF)
 }
 
 /////////////////////////////////////////////////
+TEST_F(MsgsTest, LogicalCameraSensorFromSDF)
+{
+  sdf::ElementPtr sdf(new sdf::Element());
+  sdf::initFile("sensor.sdf", sdf);
+
+  ASSERT_TRUE(sdf::readString(
+      "<sdf version='" SDF_VERSION "'>\
+         <sensor name='camera' type='logical_camera'>\
+           <always_on>true</always_on>\
+           <update_rate>15</update_rate>\
+           <pose>1 2 3 0.1 0.2 0.3</pose>\
+           <visualize>true</visualize>\
+           <topic>/gazebo/test</topic>\
+           <logical_camera>\
+             <near>0.1</near>\
+             <far>100.2</far>\
+             <aspect_ratio>1.43</aspect_ratio>\
+             <horizontal_fov>1.23</horizontal_fov>\
+           </logical_camera>\
+         </sensor>\
+       </sdf>", sdf));
+
+  msgs::Sensor msg = msgs::SensorFromSDF(sdf);
+
+  EXPECT_EQ(msg.name(), "camera");
+  EXPECT_EQ(msg.type(), "logical_camera");
+  EXPECT_EQ(msg.topic(), "/gazebo/test");
+  EXPECT_TRUE(msg.always_on());
+  EXPECT_TRUE(msg.visualize());
+  EXPECT_NEAR(msg.update_rate(), 15.0, 1e-4);
+  EXPECT_EQ(msgs::ConvertIgn(msg.pose()),
+      ignition::math::Pose3d(1, 2, 3, 0.1, 0.2, 0.3));
+
+  EXPECT_TRUE(msg.has_logical_camera());
+  EXPECT_FALSE(msg.has_camera());
+  EXPECT_FALSE(msg.has_ray());
+  EXPECT_FALSE(msg.has_contact());
+
+  EXPECT_NEAR(msg.logical_camera().near_clip(), 0.1, 1e-4);
+  EXPECT_NEAR(msg.logical_camera().far_clip(), 100.2, 1e-4);
+  EXPECT_NEAR(msg.logical_camera().aspect_ratio(), 1.43, 1e-4);
+  EXPECT_NEAR(msg.logical_camera().horizontal_fov(), 1.23, 1e-4);
+
+  sdf::ElementPtr elem = msgs::LogicalCameraSensorToSDF(msg.logical_camera());
+  msgs::LogicalCameraSensor sensorMsg = msgs::LogicalCameraSensorFromSDF(elem);
+
+  EXPECT_NEAR(sensorMsg.near_clip(), 0.1, 1e-4);
+  EXPECT_NEAR(sensorMsg.far_clip(), 100.2, 1e-4);
+  EXPECT_NEAR(sensorMsg.aspect_ratio(), 1.43, 1e-4);
+  EXPECT_NEAR(sensorMsg.horizontal_fov(), 1.23, 1e-4);
+}
+
+/////////////////////////////////////////////////
 TEST_F(MsgsTest, CameraSensorFromSDF)
 {
   sdf::ElementPtr sdf(new sdf::Element());

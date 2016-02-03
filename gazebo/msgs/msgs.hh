@@ -455,7 +455,8 @@ namespace gazebo
     /// creating a new sdf element.
     /// \return The new SDF element.
     GAZEBO_VISIBLE
-    sdf::ElementPtr LogicalCameraSensorToSDF(const msgs::CameraSensor &_msg,
+    sdf::ElementPtr LogicalCameraSensorToSDF(
+        const msgs::LogicalCameraSensor &_msg,
         sdf::ElementPtr _sdf = sdf::ElementPtr());
 
     /// \brief Create or update an SDF element from a msgs::IMUSensor

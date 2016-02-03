@@ -2190,7 +2190,7 @@ namespace gazebo
       else
       {
         logicalSDF.reset(new sdf::Element);
-        sdf::initFile("logical_camera_sensor.sdf", logicalSDF);
+        sdf::initFile("logical_camera.sdf", logicalSDF);
       }
 
       logicalSDF->GetElement("horizontal_fov")->Set(_msg.horizontal_fov());
