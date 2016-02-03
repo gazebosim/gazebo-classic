@@ -168,7 +168,8 @@ void ModelManipulator_TEST::Transparency()
 
   // Verify Transparency  while the visual is being moved.
   QVERIFY(ignition::math::equal(
-    static_cast<double>(vis1->GetTransparency()), (1.0 - vis1Transp) * 0.5, 1e-5));
+    static_cast<double>(vis1->GetTransparency()),
+    (1.0 - vis1Transp) * 0.5, 1e-5));
 
   mouseEvent.SetType(gazebo::common::MouseEvent::RELEASE);
   mouseEvent.SetButton(gazebo::common::MouseEvent::NO_BUTTON);
