@@ -74,7 +74,7 @@ void AtmosphereTest::AtmosphereParam(const std::string &_atmosphere)
   atmospherePubMsg.set_type(msgs::Atmosphere::ADIABATIC);
   atmospherePubMsg.set_temperature(0.01);
   atmospherePubMsg.set_pressure(500);
-  atmospherePubMsg.set_mass_density(1.2);
+  atmospherePubMsg.set_mass_density(174.18084087484144);
 
   atmospherePub->Publish(atmospherePubMsg);
 
