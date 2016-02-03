@@ -9,6 +9,8 @@ import "camerasensor.proto";
 import "raysensor.proto";
 import "contactsensor.proto";
 import "logical_camera_sensor.proto";
+import "gps_sensor.proto";
+import "imu_sensor.proto";
 
 message Sensor
 {
@@ -20,12 +22,24 @@ message Sensor
   optional bool always_on         = 6;
   optional double update_rate     = 7;
   optional Pose pose              = 8;
-  optional CameraSensor camera    = 9;
-  optional RaySensor ray          = 10;
-  optional ContactSensor contact  = 11;
-  optional bool visualize         = 12;
-  optional string topic           = 13;
+  optional bool visualize         = 9;
+  optional string topic           = 10;
+
+  /// \brief Description of a camera sensor
+  optional CameraSensor camera    = 11;
+
+  /// \brief Description of a ray (laser) sensor
+  optional RaySensor ray          = 12;
+
+  /// \brief Description of a contact sensor
+  optional ContactSensor contact  = 13;
+
+  /// \brief Description of a gps sensor
+  optional GPSSensor gps          = 14;
 
   /// \brief Description of a logical camera sensor
-  optional LogicalCameraSensor logical_camera = 14;
+  optional LogicalCameraSensor logical_camera = 15;
+
+  /// \brief Description of an IMU sensor
+  optional IMUSensor imu = 16;
 }
