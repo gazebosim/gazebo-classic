@@ -160,6 +160,7 @@ TEST(IntrospectionManagerTest, FiltersWithServices)
 
     // Request the "/introspection/<id>/items" service.
     ASSERT_TRUE(node.Request(itemsService, req, timeout, rep, result));
+    ASSERT_TRUE(result);
 
     // Let's save all the items received in a set.
     std::set<std::string> itemsReceived;
@@ -198,6 +199,7 @@ TEST(IntrospectionManagerTest, FiltersWithServices)
 
     // Set the new filter.
     ASSERT_TRUE(node.Request(newFilterService, req, timeout, rep, result));
+    ASSERT_TRUE(result);
     EXPECT_TRUE(!rep.data().empty());
 
     // Let's save the topic for receiving all the future updates.
