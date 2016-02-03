@@ -34,3 +34,5 @@ message Light
   optional float spot_outer_angle        = 13;
   optional float spot_falloff            = 14;
 }
+
+

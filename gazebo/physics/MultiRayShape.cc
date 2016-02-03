@@ -182,7 +182,7 @@ void MultiRayShape::Update()
   // Reset the ray lengths and mark the collisions as dirty (so they get
   // redrawn)
   unsigned int raySize = this->rays.size();
-  for (unsigned int i = 0; i < raySize; i++)
+  for (unsigned int i = 0; i < raySize; ++i)
   {
     this->rays[i]->SetLength(fullRange);
     this->rays[i]->SetRetro(0.0);
@@ -228,14 +228,12 @@ void MultiRayShape::AddRay(const math::Vector3 &/*_start*/,
 double MultiRayShape::GetMinRange() const
 {
   return this->minRange;
-  // return this->rangeElem->Get<double>("min");
 }
 
 //////////////////////////////////////////////////
 double MultiRayShape::GetMaxRange() const
 {
   return this->maxRange;
-  //return this->rangeElem->Get<double>("max");
 }
 
 //////////////////////////////////////////////////

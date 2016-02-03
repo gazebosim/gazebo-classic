@@ -541,6 +541,9 @@ void SensorManager::SensorContainer::RunLoop()
     // Set the default sleep time
     eventTime = std::max(common::Time::Zero, sleepTime - diffTime);
 
+    // Make sure update time is reasonable.
+    GZ_ASSERT(diffTime.sec < 1, "Took over 1.0 seconds to update a sensor.");
+
     // Make sure eventTime is not negative.
     GZ_ASSERT(eventTime >= common::Time::Zero,
         "Time to next sensor update is negative.");

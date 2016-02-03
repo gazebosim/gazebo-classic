@@ -29,3 +29,5 @@ message Scene
   /// \brief Show/hide world origin indicator.
   optional bool origin_visual  = 11;
 }
+
+

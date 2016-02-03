@@ -102,13 +102,6 @@ namespace gazebo
       /// \param[in] _retro Retro reflectance value.
       public: void SetRetro(float _retro);
 
-      /// \internal
-      /// \brief Set the name of the object this ray has collided with.
-      /// This function should only be called from a collision detection
-      /// engine.
-      ///// \param[in] _name Scoped name of the collision object.
-      public: void SetCollisionName(const std::string &_name);
-
       /// \brief Get the name of the object this ray collided with.
       /// \return Collision object name
       public: std::string CollisionName() const;
@@ -141,17 +134,27 @@ namespace gazebo
       /// Documentation inherited
       public: virtual double ComputeVolume() const;
 
+      /// \brief Set the name of the object this ray has collided with.
+      /// This function should only be called from a collision detection
+      /// engine.
+      /// Used by MultiRayShape
+      ///// \param[in] _name Scoped name of the collision object.
+      protected: void SetCollisionName(const std::string &_name);
+
       // Contact information; this is filled out during collision
       // detection.
       /// \brief Length of the ray.
       protected: double contactLen;
+
       /// \brief Retro reflectance value
       protected: double contactRetro;
+
       /// \brief Fiducial ID value.
       protected: int contactFiducial;
 
       /// \brief Start position of the ray, relative to the body
       protected: math::Vector3 relativeStartPos;
+
       /// \brief End position of the ray, relative to the body
       protected: math::Vector3 relativeEndPos;
 
@@ -163,6 +166,10 @@ namespace gazebo
 
       /// \brief Name of the object this ray collided with
       private: std::string collisionName;
+
+      /// \brief MultiRayShape needs to call SetCollisionName when it is
+      /// updated
+      protected: friend class MultiRayShape;
     };
     /// \}
   }

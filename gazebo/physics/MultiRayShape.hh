@@ -145,7 +145,10 @@ namespace gazebo
       public: void DisconnectNewLaserScans(event::ConnectionPtr &_conn)
               {this->newLaserScans.Disconnect(_conn);}
 
-      /// \brief Method for updating the rays.
+      /// \brief Method for updating the rays. This function is normally
+      /// called automatically, such as when a laser sensor is updated.
+      /// Only call this function on a standalone multiray shape.
+      /// \sa explicit MultiRayShape(PhysicsEnginePtr _physicsEngine)
       public: virtual void UpdateRays() = 0;
 
       /// \brief Add a ray to the collision.
