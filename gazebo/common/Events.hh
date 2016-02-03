@@ -147,6 +147,10 @@ namespace gazebo
       /// \brief Connect a boost::slot to the before physics update signal
       /// \param[in] _subscriber the subscriber to this event
       /// \return a connection
+      ///
+      /// The signal is called after collision detection has finished and before
+      /// the physics update step. So you can e.g. change some forces depending
+      /// on the collisions that have occured.
       public: template<typename T>
               static ConnectionPtr ConnectBeforePhysicsUpdate(T _subscriber)
               { return beforePhysicsUpdate.Connect(_subscriber); }
