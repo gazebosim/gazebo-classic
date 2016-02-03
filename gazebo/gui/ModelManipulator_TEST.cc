@@ -96,12 +96,12 @@ void ModelManipulator_TEST::Attach()
 }
 
 /////////////////////////////////////////////////
-void ModelManipulator_TEST::Translating()
+void ModelManipulator_TEST::Transparency()
 {
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("../../worlds/pioneer2dx_camera.world", false, false, true);
+  this->Load("worlds/shapes.world", false, false, true);
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
@@ -122,20 +122,28 @@ void ModelManipulator_TEST::Translating()
   scene = gazebo::rendering::get_scene("default");
   QVERIFY(scene != NULL);
 
-  // initialize the model manipulator
-  gazebo::gui::ModelManipulator::Instance()->Init();
+  gazebo::event::Events::preRender();
 
-  // Create a visual.
-  gazebo::rendering::VisualPtr vis1;
-  vis1.reset(new gazebo::rendering::Visual("vis1", scene->GetWorldVisual()));
-  vis1->Load();
+  int sleep  = 0;
+  int maxSleep = 200;
+  while (!scene->Initialized() && sleep < maxSleep)
+  {
+    gazebo::event::Events::preRender();
+    gazebo::common::Time::MSleep(30);
+    sleep++;
+  }
+
+  gazebo::rendering::VisualPtr vis1 = scene->GetVisual("box");
+  QVERIFY(vis1 != NULL);
+
   double vis1Transp = 0.2;
   vis1->SetTransparency(vis1Transp);
   QVERIFY(gazebo::math::equal(
       static_cast<double>(vis1->GetTransparency()), vis1Transp, 1e-5));
 
-// TIme to translate visual 1.
-  // Mouse move
+  gazebo::gui::ModelManipulator::Instance()->Init();
+
+  // Time to translate vis1.
   gazebo::common::MouseEvent mouseEvent;
 
   mouseEvent.SetType(gazebo::common::MouseEvent::PRESS);
@@ -144,18 +152,23 @@ void ModelManipulator_TEST::Translating()
   mouseEvent.SetPressPos(0, 0);
   mouseEvent.SetPos(0, 0);
 
-// To set mouseStart.
+  // To set mouseStart.
   gazebo::gui::ModelManipulator::Instance()->OnMousePressEvent(mouseEvent);
 
-// Set mode.
+  // Set mode.
   gazebo::gui::ModelManipulator::Instance()->SetManipulationMode("translate");
 
-// mouse moved.
+  // mouse moved.
   mouseEvent.SetPressPos(10, 10);
   mouseEvent.SetPos(10, 10);
 
-// On mouse move event.
+  // On mouse move event.
+  gazebo::gui::ModelManipulator::Instance()->SetAttachedVisual(vis1);
   gazebo::gui::ModelManipulator::Instance()->OnMouseMoveEvent(mouseEvent);
+
+  // Verify Transparency  while the visual is being moved.
+  QVERIFY(ignition::math::equal(
+    static_cast<double>(vis1->GetTransparency()), (1.0 - vis1Transp) * 0.5, 1e-5));
 
   mouseEvent.SetType(gazebo::common::MouseEvent::RELEASE);
   mouseEvent.SetButton(gazebo::common::MouseEvent::NO_BUTTON);
@@ -163,7 +176,7 @@ void ModelManipulator_TEST::Translating()
   // Mouse release, translation done.
   gazebo::gui::ModelManipulator::Instance()->OnMouseReleaseEvent(mouseEvent);
 
-// Test transperancy.
+  // Test transperancy.
   QVERIFY(ignition::math::equal(
     static_cast<double>(vis1->GetTransparency()), vis1Transp, 1e-5));
 
