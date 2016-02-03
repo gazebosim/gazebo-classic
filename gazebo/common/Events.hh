@@ -144,6 +144,20 @@ namespace gazebo
                   ConnectionPtr _subscriber);
 
       //////////////////////////////////////////////////////////////////////////
+      /// \brief Connect a boost::slot to the before physics update signal
+      /// \param[in] _subscriber the subscriber to this event
+      /// \return a connection
+      public: template<typename T>
+              static ConnectionPtr ConnectBeforePhysicsUpdate(T _subscriber)
+              { return beforePhysicsUpdate.Connect(_subscriber); }
+
+      /// \brief Disconnect a boost::slot from the before physics update signal
+      /// \param[in] _subscriber the subscriber to this event
+      public: static void DisconnectBeforePhysicsUpdate(
+                ConnectionPtr _subscriber)
+              { beforePhysicsUpdate.Disconnect(_subscriber); }
+
+      //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the the world update end signal
       /// \param[in] _subscriber the subscriber to this event
       /// \return a connection
@@ -305,6 +319,10 @@ namespace gazebo
 
       /// \brief World update has started
       public: static EventT<void (const common::UpdateInfo &)> worldUpdateBegin;
+
+      /// \brief Collision detection has been done, physics update not yet
+      public: static EventT<void (const common::UpdateInfo &)>
+                beforePhysicsUpdate;
 
       /// \brief World update has ended
       public: static EventT<void ()> worldUpdateEnd;
