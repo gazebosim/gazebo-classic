@@ -29,11 +29,10 @@ set (sources
   DataLogger.cc
   Editor.cc
   EntityMaker.cc
-  HotkeyDialog.cc
-  RenderWidget.cc
   GLWidget.cc
-  GuiIface.cc
   GuiEvents.cc
+  GuiIface.cc
+  HotkeyDialog.cc
   InsertModelWidget.cc
   JointControlWidget.cc
   KeyEventHandler.cc
@@ -42,12 +41,13 @@ set (sources
   LogPlayWidget.cc
   MainWindow.cc
   ModelAlign.cc
-  ModelManipulator.cc
-  ModelSnap.cc
   ModelListWidget.cc
   ModelMaker.cc
+  ModelManipulator.cc
   ModelRightMenu.cc
+  ModelSnap.cc
   MouseEventHandler.cc
+  RenderWidget.cc
   SaveDialog.cc
   SpaceNav.cc
   SplashScreen.cc
@@ -141,9 +141,9 @@ set (qt_tests
   BuildingEditor_TEST.cc
   ConfigWidget_TEST.cc
   DataLogger_TEST.cc
-  GuiIface_TEST.cc
   GLWidget_TEST.cc
   GLWidget_TEST2.cc
+  GuiIface_TEST.cc
   HotkeyDialog_TEST.cc
   LightMaker_TEST.cc
   ModelAlign_TEST.cc
