@@ -254,7 +254,6 @@ void PlotPalette::FillTopicsTop()
     this->connect(childWidget, SIGNAL(Clicked(const std::string &)), this,
         SLOT(OnTopicClicked(const std::string &)));
 
-    this->dataPtr->topicsTop->AddConfigChildWidget(topic, childWidget);
     configLayout->addWidget(childWidget);
   }
 
@@ -341,8 +340,6 @@ void PlotPalette::OnInsertModelSignal(const std::string &_name)
   auto childWidget = new ItemConfigWidget(_name);
   this->connect(childWidget, SIGNAL(Clicked(const std::string &)), this,
       SLOT(OnModelClicked(const std::string &)));
-
-  this->dataPtr->modelsTop->AddConfigChildWidget(_name, childWidget);
 
   // Insert it on top
   auto vBoxLayout = qobject_cast<QVBoxLayout *>(
@@ -585,22 +582,31 @@ void PlotPalette::UpdateSearch(const QString &_search)
     // Give ownership of all widgets to an object which will be out of scope
     QWidget().setLayout(oldLayout);
   }
-/*
-  // RegExp for multiword search
-  auto words = _search.split(" ");
-  QString exp = "^";
 
-  for (auto word : words)
-    exp = exp + "(?=.*" + word + ")";
+  // Get all words in any order
+  auto words = _search.split(" ");
+
+  QString exp;
+  if (!(words.size() == 1 && words[0] == ""))
+  {
+    exp = "^";
+    for (auto word : words)
+    {
+      exp = exp + "(?=.*" + word + ")";
+    }
+    exp = exp + ".*$";
+  }
+
+gzdbg << exp.toStdString() << std::endl;
 
   auto topics = this->dataPtr->searchModel->findItems(exp, Qt::MatchRegExp);
-*/
 
   // New layout
   auto newLayout = new QVBoxLayout();
   newLayout->setSpacing(0);
 
-  auto topics = this->dataPtr->searchModel->findItems(_search, Qt::MatchContains);
+  if (!topics.empty())
+    newLayout->addWidget(new QLabel(tr("<b>Topics</b>")));
 
   for (auto topic : topics)
   {
@@ -609,8 +615,6 @@ void PlotPalette::UpdateSearch(const QString &_search)
     this->connect(childWidget, SIGNAL(Clicked(const std::string &)), this,
         SLOT(OnTopicClicked(const std::string &)));
 
-    this->dataPtr->searchArea->AddConfigChildWidget(_search.toStdString(),
-        childWidget);
     newLayout->addWidget(childWidget);
   }
 
