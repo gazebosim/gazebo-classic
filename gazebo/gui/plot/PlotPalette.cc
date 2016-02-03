@@ -31,7 +31,7 @@ const std::vector<std::string> PlotPalette::ModelProperties(
 PlotPalette::PlotPalette(QWidget *_parent) : QWidget(_parent),
     dataPtr(new PlotPalettePrivate)
 {
-  // Search
+  // Search top
   auto searchEdit = new QLineEdit();
   this->connect(searchEdit, SIGNAL(textChanged(QString)), this,
       SLOT(UpdateSearch(QString)));
@@ -55,12 +55,36 @@ PlotPalette::PlotPalette(QWidget *_parent) : QWidget(_parent),
   auto searchAreaWidget = new QWidget;
   searchAreaWidget->setLayout(searchAreaLayout);
 
-  auto searchLayout = new QVBoxLayout();
-  searchLayout->addWidget(searchEdit);
-  searchLayout->addWidget(searchAreaWidget);
+  auto searchTopLayout = new QVBoxLayout();
+  searchTopLayout->addWidget(searchEdit);
+  searchTopLayout->addWidget(searchAreaWidget);
 
-  auto searchWidget = new QWidget();
-  searchWidget->setLayout(searchLayout);
+  auto searchTopWidget = new QWidget();
+  searchTopWidget->setLayout(searchTopLayout);
+
+  // Search bottom
+  this->dataPtr->searchBottom = new ConfigWidget();
+
+  auto searchBottomScroll = new QScrollArea;
+  searchBottomScroll->setWidget(this->dataPtr->searchBottom);
+  searchBottomScroll->setWidgetResizable(true);
+
+  auto searchBottomLayout = new QVBoxLayout;
+  searchBottomLayout->setContentsMargins(0, 0, 0, 0);
+  searchBottomLayout->addWidget(searchBottomScroll);
+
+  auto searchBottomWidget = new QWidget;
+  searchBottomWidget->setLayout(searchBottomLayout);
+
+  auto searchSplitter = new QSplitter(Qt::Vertical, this);
+  searchSplitter->addWidget(searchTopWidget);
+  searchSplitter->addWidget(searchBottomWidget);
+  searchSplitter->setCollapsible(0, false);
+  searchSplitter->setCollapsible(1, false);
+
+  QList<int> sizes;
+  sizes << 50 << 50;
+  searchSplitter->setSizes(sizes);
 
   // Topics top
   this->dataPtr->topicsTop = new ConfigWidget();
@@ -96,9 +120,6 @@ PlotPalette::PlotPalette(QWidget *_parent) : QWidget(_parent),
   topicsSplitter->addWidget(topicsBottomWidget);
   topicsSplitter->setCollapsible(0, false);
   topicsSplitter->setCollapsible(1, false);
-
-  QList<int> sizes;
-  sizes << 50 << 50;
   topicsSplitter->setSizes(sizes);
 
   // Models top
@@ -187,7 +208,7 @@ PlotPalette::PlotPalette(QWidget *_parent) : QWidget(_parent),
   tabWidget->addTab(topicsSplitter, "Topics");
   tabWidget->addTab(modelsSplitter, "Models");
   tabWidget->addTab(simSplitter, "Sim");
-  tabWidget->addTab(searchWidget, "Search");
+  tabWidget->addTab(searchSplitter, "Search");
 
   auto mainLayout = new QVBoxLayout;
   mainLayout->addWidget(tabWidget);
@@ -404,6 +425,46 @@ void PlotPalette::OnTopicClicked(const std::string &_topic)
 }
 
 /////////////////////////////////////////////////
+void PlotPalette::OnTopicSearchClicked(const std::string &_topic)
+{
+  // Clear previous layout
+  auto oldLayout = this->dataPtr->searchBottom->layout();
+  if (oldLayout)
+  {
+    // Give ownership of all widgets to an object which will be out of scope
+    QWidget().setLayout(oldLayout);
+  }
+
+  // Create a message from this topic
+  auto msgType = transport::getTopicMsgType(_topic);
+  if (msgType == "")
+    return;
+
+  auto msg = msgs::MsgFactory::NewMsg(msgType);
+
+  // Create a new layout and fill it
+  auto newLayout = new QVBoxLayout();
+  newLayout->setSpacing(0);
+
+  // Title
+  auto title = new QLabel(QString::fromStdString(_topic));
+  title->setMinimumHeight(40);
+  title->setToolTip(tr((
+      "<font size=3><p><b>Message type: </b>" + msgType + "</p></font>"
+      ).c_str()));
+  newLayout->addWidget(title);
+
+  this->FillTopicFromMsg(msg.get(), _topic, 0, newLayout);
+
+  // Spacer
+  auto spacer = new QWidget();
+  spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+  newLayout->addWidget(spacer);
+
+  this->dataPtr->searchBottom->setLayout(newLayout);
+}
+
+/////////////////////////////////////////////////
 void PlotPalette::FillTopicFromMsg(google::protobuf::Message *_msg,
     const std::string &_scope, const unsigned int _level,
     QVBoxLayout *_parentLayout)
@@ -597,8 +658,6 @@ void PlotPalette::UpdateSearch(const QString &_search)
     exp = exp + ".*$";
   }
 
-gzdbg << exp.toStdString() << std::endl;
-
   auto topics = this->dataPtr->searchModel->findItems(exp, Qt::MatchRegExp);
 
   // New layout
@@ -613,7 +672,7 @@ gzdbg << exp.toStdString() << std::endl;
     auto childWidget = new ItemConfigWidget(topic->text().toStdString());
     childWidget->SetPlotInfo(topic->text().toStdString());
     this->connect(childWidget, SIGNAL(Clicked(const std::string &)), this,
-        SLOT(OnTopicClicked(const std::string &)));
+        SLOT(OnTopicSearchClicked(const std::string &)));
 
     newLayout->addWidget(childWidget);
   }

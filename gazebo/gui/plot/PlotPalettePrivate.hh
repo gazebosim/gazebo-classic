@@ -37,6 +37,7 @@ namespace gazebo
       public: ConfigWidget *topicsBottom;
       public: ConfigWidget *modelsBottom;
       public: ConfigWidget *simBottom;
+      public: ConfigWidget *searchBottom;
       public: ConfigWidget *searchArea;
 
       /// \brief Transport node used for communication.
