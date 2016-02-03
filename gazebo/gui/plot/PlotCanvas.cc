@@ -32,7 +32,7 @@ namespace gazebo
 {
   namespace gui
   {
-    struct PlotCanvasData
+    struct PlotData
     {
       /// \brief Unique id of the plot
       public: unsigned int id;
@@ -61,7 +61,7 @@ namespace gazebo
       // public: std::map<unsigned int, IncrementalPlot *> plots;
 
       /// \brief Plot canvas data;
-      public: std::map<unsigned int, PlotCanvasData *> plotCanvasData;
+      public: std::map<unsigned int, PlotData *> plotData;
 
       /// \brief Pointer to an empty plot.
       public: IncrementalPlot *emptyPlot = NULL;
@@ -209,10 +209,10 @@ unsigned int PlotCanvas::AddVariable(const std::string &_variable)
 void PlotCanvas::AddVariable(const unsigned int _id,
     const std::string &_variable, const unsigned int _plotId)
 {
-  auto it = this->dataPtr->plotCanvasData.find(_plotId);
-  if (it != this->dataPtr->plotCanvasData.end())
+  auto it = this->dataPtr->plotData.find(_plotId);
+  if (it != this->dataPtr->plotData.end())
   {
-    PlotCanvasData *plotData = it->second;
+    PlotData *plotData = it->second;
     PlotCurve *curve = plotData->plot->AddCurve(_variable);
     plotData->variables[_id] = curve->id;
   }
@@ -222,7 +222,7 @@ void PlotCanvas::AddVariable(const unsigned int _id,
   }
 
   // hide initial empty plot
-  if (!this->dataPtr->plotCanvasData.empty() && this->dataPtr->emptyPlot)
+  if (!this->dataPtr->plotData.empty() && this->dataPtr->emptyPlot)
     this->dataPtr->emptyPlot->setVisible(false);
 
   // TODO remove me later
@@ -239,15 +239,15 @@ void PlotCanvas::AddVariable(const unsigned int _id,
   this->dataPtr->plotLayout->addWidget(plot);
 
   PlotCurve *curve = plot->AddCurve(_variable);
-  PlotCanvasData *plotData = new PlotCanvasData;
+  PlotData *plotData = new PlotData;
   plotData->id = this->dataPtr->globalPlotId++;
   plotData->plot = plot;
   plotData->variables[_id] = curve->id;
-  this->dataPtr->plotCanvasData[plotData->id] = plotData;
+  this->dataPtr->plotData[plotData->id] = plotData;
   std::cerr << " create new plot " << std::endl;
 
   // hide initial empty plot
-  if (!this->dataPtr->plotCanvasData.empty() && this->dataPtr->emptyPlot)
+  if (!this->dataPtr->plotData.empty() && this->dataPtr->emptyPlot)
     this->dataPtr->emptyPlot->setVisible(false);
 }
 
@@ -255,8 +255,8 @@ void PlotCanvas::AddVariable(const unsigned int _id,
 void PlotCanvas::RemoveVariable(const unsigned int _id)
 {
   // loop through plots and find the variable to be removed
-  for (auto it = this->dataPtr->plotCanvasData.begin();
-      it != this->dataPtr->plotCanvasData.end(); ++it)
+  for (auto it = this->dataPtr->plotData.begin();
+      it != this->dataPtr->plotData.end(); ++it)
   {
     auto v = it->second->variables.find(_id);
     if (v != it->second->variables.end())
@@ -272,7 +272,7 @@ void PlotCanvas::RemoveVariable(const unsigned int _id)
         it->second->plot->RemoveCurve(curveId);
         delete it->second->plot;
         delete it->second;
-        this->dataPtr->plotCanvasData.erase(it);
+        this->dataPtr->plotData.erase(it);
       }
       else
       {
@@ -283,7 +283,7 @@ void PlotCanvas::RemoveVariable(const unsigned int _id)
     }
   }
 
-  if (this->dataPtr->plotCanvasData.empty() && this->dataPtr->emptyPlot)
+  if (this->dataPtr->plotData.empty() && this->dataPtr->emptyPlot)
     this->dataPtr->emptyPlot->setVisible(true);
 
   // remove from variable pill container
@@ -294,8 +294,8 @@ void PlotCanvas::RemoveVariable(const unsigned int _id)
 void PlotCanvas::RemoveVariable(const unsigned int _id,
     const unsigned int _plotId)
 {
-  auto it = this->dataPtr->plotCanvasData.find(_plotId);
-  if (it == this->dataPtr->plotCanvasData.end())
+  auto it = this->dataPtr->plotData.find(_plotId);
+  if (it == this->dataPtr->plotData.end())
     return;
 
   auto v = it->second->variables.find(_id);
@@ -313,7 +313,7 @@ void PlotCanvas::RemoveVariable(const unsigned int _id,
     it->second->plot->RemoveCurve(curveId);
     delete it->second->plot;
     delete it->second;
-    this->dataPtr->plotCanvasData.erase(it);
+    this->dataPtr->plotData.erase(it);
   }
   else
   {
@@ -321,7 +321,7 @@ void PlotCanvas::RemoveVariable(const unsigned int _id,
     it->second->plot->RemoveCurve(curveId);
   }
 
-  if (this->dataPtr->plotCanvasData.empty() && this->dataPtr->emptyPlot)
+  if (this->dataPtr->plotData.empty() && this->dataPtr->emptyPlot)
     this->dataPtr->emptyPlot->setVisible(true);
 
   // remove from variable pill container
@@ -331,8 +331,8 @@ void PlotCanvas::RemoveVariable(const unsigned int _id,
 /////////////////////////////////////////////////
 void PlotCanvas::RemovePlot(const unsigned int _id)
 {
-  auto it = this->dataPtr->plotCanvasData.find(_id);
-  if (it == this->dataPtr->plotCanvasData.end())
+  auto it = this->dataPtr->plotData.find(_id);
+  if (it == this->dataPtr->plotData.end())
     return;
 
   unsigned int plotId = it->first;
@@ -351,9 +351,9 @@ void PlotCanvas::RemovePlot(const unsigned int _id)
 /////////////////////////////////////////////////
 void PlotCanvas::Clear()
 {
-  while (!this->dataPtr->plotCanvasData.empty())
+  while (!this->dataPtr->plotData.empty())
   {
-    auto p = this->dataPtr->plotCanvasData.begin();
+    auto p = this->dataPtr->plotData.begin();
     this->RemovePlot(p->first);
   }
 }
@@ -361,7 +361,7 @@ void PlotCanvas::Clear()
 /////////////////////////////////////////////////
 unsigned int PlotCanvas::VariablePlot(const unsigned int _variableId) const
 {
-  for (const auto it : this->dataPtr->plotCanvasData)
+  for (const auto it : this->dataPtr->plotData)
   {
     const auto v = it.second->variables.find(_variableId);
     if (v != it.second->variables.end())
@@ -381,7 +381,7 @@ void PlotCanvas::OnAddVariable(const unsigned int _id,
   if (_targetId != VariablePill::EMPTY_VARIABLE)
   {
     // Add a variable to existing plot
-    for (const auto it : this->dataPtr->plotCanvasData)
+    for (const auto it : this->dataPtr->plotData)
     {
       const auto v = it.second->variables.find(_targetId);
       if (v != it.second->variables.end())
@@ -412,14 +412,14 @@ void PlotCanvas::OnMoveVariable(const unsigned int _id,
     const unsigned int _targetId)
 {
   std::cerr << " PlotCanvas:: on move variable " << std::endl;
-  auto plotIt = this->dataPtr->plotCanvasData.end();
-  auto targetPlotIt = this->dataPtr->plotCanvasData.end();
+  auto plotIt = this->dataPtr->plotData.end();
+  auto targetPlotIt = this->dataPtr->plotData.end();
   unsigned int curveId = 0;
 
   // find plot which the variable belongs to
   // find target plot (if any) that the variable will be moved to
-  for (auto it = this->dataPtr->plotCanvasData.begin();
-      it != this->dataPtr->plotCanvasData.end(); ++it)
+  for (auto it = this->dataPtr->plotData.begin();
+      it != this->dataPtr->plotData.end(); ++it)
   {
     auto v = it->second->variables.find(_id);
     if (v != it->second->variables.end())
@@ -431,24 +431,24 @@ void PlotCanvas::OnMoveVariable(const unsigned int _id,
     if (it->second->variables.find(_targetId) != it->second->variables.end())
       targetPlotIt = it;
 
-    if (plotIt != this->dataPtr->plotCanvasData.end() &&
-        targetPlotIt != this->dataPtr->plotCanvasData.end())
+    if (plotIt != this->dataPtr->plotData.end() &&
+        targetPlotIt != this->dataPtr->plotData.end())
       break;
   }
 
   // detach from old plot and attach to new one
-  if (plotIt != this->dataPtr->plotCanvasData.end())
+  if (plotIt != this->dataPtr->plotData.end())
   {
     std::cerr << " move variable!! " <<  std::endl;
 
-    PlotCanvasData *plotCanvasData = plotIt->second;
+    PlotData *plotData = plotIt->second;
 
     // detach variable from plot (qwt plot doesn't seem to do anything
     // apart from setting the plot item to null)
-    PlotCurve *plotCurve = plotCanvasData->plot->DetachCurve(curveId);
-    plotCanvasData->variables.erase(plotCanvasData->variables.find(_id));
+    PlotCurve *plotCurve = plotData->plot->DetachCurve(curveId);
+    plotData->variables.erase(plotData->variables.find(_id));
 
-    if (targetPlotIt != this->dataPtr->plotCanvasData.end())
+    if (targetPlotIt != this->dataPtr->plotData.end())
     {
       // attach variable to target plot
       targetPlotIt->second->plot->AttachCurve(plotCurve);
@@ -462,36 +462,36 @@ void PlotCanvas::OnMoveVariable(const unsigned int _id,
 
     }
     // delete plot if empty
-    if (plotCanvasData->variables.empty())
+    if (plotData->variables.empty())
     {
       std::cerr << " delete plot as it's now empty " << std::endl;
       this->dataPtr->plotLayout->takeAt(
-          this->dataPtr->plotLayout->indexOf(plotCanvasData->plot));
+          this->dataPtr->plotLayout->indexOf(plotData->plot));
 
       // careful about deleting by iterator (plotIt) as it may have been
       // changed if a new plot is added to the vector in the OnAddVariable call
       // in this function
-      for (auto it = this->dataPtr->plotCanvasData.begin();
-          it != this->dataPtr->plotCanvasData.end(); ++it)
+      for (auto it = this->dataPtr->plotData.begin();
+          it != this->dataPtr->plotData.end(); ++it)
       {
-        if (it->second == plotCanvasData)
+        if (it->second == plotData)
         {
-          this->dataPtr->plotCanvasData.erase(it);
+          this->dataPtr->plotData.erase(it);
           break;
         }
       }
-        /*this->dataPtr->plotCanvasData.erase(std::remove(
-          this->dataPtr->plotCanvasData.begin(),
-          this->dataPtr->plotCanvasData.end(), plotCanvasData),
-          this->dataPtr->plotCanvasData.end());*/
+        /*this->dataPtr->plotData.erase(std::remove(
+          this->dataPtr->plotData.begin(),
+          this->dataPtr->plotData.end(), PlotData),
+          this->dataPtr->plotData.end());*/
 
-      //plotCanvasData->plot->hide();
-      plotCanvasData->plot->detachItems(QwtPlotItem::Rtti_PlotItem, false);
-      delete plotCanvasData->plot;
-      delete plotCanvasData;
+      //plotData->plot->hide();
+      plotData->plot->detachItems(QwtPlotItem::Rtti_PlotItem, false);
+      delete plotData->plot;
+      delete plotData;
 
 
-      // this->dataPtr->plotCanvasData.erase(plotIt);
+      // this->dataPtr->plotData.erase(plotIt);
     }
   }
 
@@ -505,7 +505,7 @@ void PlotCanvas::Update()
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
   // Update all the plots
-  for (auto p : this->dataPtr->plotCanvasData)
+  for (auto p : this->dataPtr->plotData)
     p.second->plot->Update();
 }
 
@@ -524,7 +524,7 @@ bool PlotCanvas::eventFilter(QObject *_o, QEvent *_e)
 /////////////////////////////////////////////////
 void PlotCanvas::RestartPlots()
 {
-  for (auto p : this->dataPtr->plotCanvasData)
+  for (auto p : this->dataPtr->plotData)
   {
     for (const auto v : p.second->variables)
     {
@@ -559,8 +559,8 @@ void PlotCanvas::OnDeleteCanvas()
 void PlotCanvas::debug()
 {
   std::cerr << "================" << std::endl;
-  for (auto it = this->dataPtr->plotCanvasData.begin();
-      it != this->dataPtr->plotCanvasData.end(); ++it)
+  for (auto it = this->dataPtr->plotData.begin();
+      it != this->dataPtr->plotData.end(); ++it)
   {
     for (auto &v : it->second->variables)
     {
