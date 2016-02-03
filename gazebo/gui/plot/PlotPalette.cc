@@ -304,6 +304,10 @@ void PlotPalette::FillSimBottom()
     childWidget->SetDraggable(true);
     childWidget->SetPlotInfo(field.first + "::" + field.second);
     configLayout->addWidget(childWidget);
+
+// TODO: Add to search
+//      this->dataPtr->searchModel->appendRow(new
+//          QStandardItem(QString::fromStdString(topic)));
   }
 
   // Spacer
@@ -625,6 +629,10 @@ void PlotPalette::FillModel(const std::string &_model)
     childWidget->SetDraggable(true);
     childWidget->SetPlotInfo(_model + "::" + prop);
     this->dataPtr->modelsBottom->layout()->addWidget(childWidget);
+
+// TODO: Add to search
+//      this->dataPtr->searchModel->appendRow(new
+//          QStandardItem(QString::fromStdString(topic)));
   }
 
   // Spacer
@@ -669,6 +677,9 @@ void PlotPalette::UpdateSearch(const QString &_search)
 
   for (auto topic : topics)
   {
+    // TODO: highlight matched words
+    // topic->text().replace(QRegExp(exp), "<b>\\1</b>");
+
     auto childWidget = new ItemConfigWidget(topic->text().toStdString());
     childWidget->SetPlotInfo(topic->text().toStdString());
     this->connect(childWidget, SIGNAL(Clicked(const std::string &)), this,
@@ -676,6 +687,8 @@ void PlotPalette::UpdateSearch(const QString &_search)
 
     newLayout->addWidget(childWidget);
   }
+
+  // TODO: Add Sim and Models
 
   // Spacer
   auto spacer = new QWidget();
