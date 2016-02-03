@@ -485,8 +485,8 @@ void SensorManager::SensorContainer::RunLoop()
   engine->InitForThread();
 
   // The original value was hardcode to 1.0. Changed the value to
-  // 1000 * MaxStepSize in order to handle simulation with
-  // large step sizes.
+  // 1000 * MaxStepSize in order to handle simulation with a
+  // large step size.
   double maxSensorUpdate = engine->GetMaxStepSize() * 1000;
 
   common::Time sleepTime, startTime, eventTime, diffTime;
