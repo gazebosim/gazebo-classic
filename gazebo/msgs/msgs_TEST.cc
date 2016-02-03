@@ -408,6 +408,42 @@ TEST_F(MsgsTest, Initialization)
 }
 
 /////////////////////////////////////////////////
+/// Helper function for GPSSensorFromSDF
+void CheckGPSSensorMsg(const msgs::GPSSensor &_msg)
+{
+  EXPECT_EQ(_msg.position().horizontal_noise().type(),
+      msgs::SensorNoise::GAUSSIAN);
+  EXPECT_NEAR(_msg.position().horizontal_noise().mean(), 0.1, 1e-4);
+  EXPECT_NEAR(_msg.position().horizontal_noise().stddev(), 0.2, 1e-4);
+  EXPECT_NEAR(_msg.position().horizontal_noise().bias_mean(), 0.3, 1e-4);
+  EXPECT_NEAR(_msg.position().horizontal_noise().bias_stddev(), 0.4, 1e-4);
+  EXPECT_NEAR(_msg.position().horizontal_noise().precision(), 1.0, 1e-4);
+
+  EXPECT_EQ(_msg.position().vertical_noise().type(),
+      msgs::SensorNoise::GAUSSIAN_QUANTIZED);
+  EXPECT_NEAR(_msg.position().vertical_noise().mean(), 0.1, 1e-4);
+  EXPECT_NEAR(_msg.position().vertical_noise().stddev(), 0.2, 1e-4);
+  EXPECT_NEAR(_msg.position().vertical_noise().bias_mean(), 0.3, 1e-4);
+  EXPECT_NEAR(_msg.position().vertical_noise().bias_stddev(), 0.4, 1e-4);
+  EXPECT_NEAR(_msg.position().vertical_noise().precision(), 1.0, 1e-4);
+
+  EXPECT_EQ(_msg.velocity().horizontal_noise().type(), msgs::SensorNoise::NONE);
+  EXPECT_NEAR(_msg.velocity().horizontal_noise().mean(), 0.1, 1e-4);
+  EXPECT_NEAR(_msg.velocity().horizontal_noise().stddev(), 0.2, 1e-4);
+  EXPECT_NEAR(_msg.velocity().horizontal_noise().bias_mean(), 0.3, 1e-4);
+  EXPECT_NEAR(_msg.velocity().horizontal_noise().bias_stddev(), 0.4, 1e-4);
+  EXPECT_NEAR(_msg.velocity().horizontal_noise().precision(), 1.0, 1e-4);
+
+  EXPECT_EQ(_msg.velocity().vertical_noise().type(),
+      msgs::SensorNoise::GAUSSIAN);
+  EXPECT_NEAR(_msg.velocity().vertical_noise().mean(), 0.1, 1e-4);
+  EXPECT_NEAR(_msg.velocity().vertical_noise().stddev(), 0.2, 1e-4);
+  EXPECT_NEAR(_msg.velocity().vertical_noise().bias_mean(), 0.3, 1e-4);
+  EXPECT_NEAR(_msg.velocity().vertical_noise().bias_stddev(), 0.4, 1e-4);
+  EXPECT_NEAR(_msg.velocity().vertical_noise().precision(), 1.0, 1e-4);
+}
+
+/////////////////////////////////////////////////
 TEST_F(MsgsTest, GPSSensorFromSDF)
 {
   sdf::ElementPtr sdf(new sdf::Element());
@@ -481,37 +517,64 @@ TEST_F(MsgsTest, GPSSensorFromSDF)
   EXPECT_FALSE(msg.has_camera());
   EXPECT_FALSE(msg.has_ray());
 
-  EXPECT_EQ(msg.gps().position().horizontal_noise().type(),
+  CheckGPSSensorMsg(msg.gps());
+
+  sdf::ElementPtr elem = msgs::GPSSensorToSDF(msg.gps());
+  msgs::GPSSensor sensorMsg = msgs::GPSSensorFromSDF(elem);
+  CheckGPSSensorMsg(sensorMsg);
+}
+
+/////////////////////////////////////////////////
+/// Helper function for IMUSensorFromSDF
+void CheckIMUSensorMsg(const msgs::IMUSensor &_msg)
+{
+  EXPECT_EQ(_msg.angular_velocity().x_noise().type(),
       msgs::SensorNoise::GAUSSIAN);
-  EXPECT_NEAR(msg.gps().position().horizontal_noise().mean(), 0.1, 1e-4);
-  EXPECT_NEAR(msg.gps().position().horizontal_noise().stddev(), 0.2, 1e-4);
-  EXPECT_NEAR(msg.gps().position().horizontal_noise().bias_mean(), 0.3, 1e-4);
-  EXPECT_NEAR(msg.gps().position().horizontal_noise().bias_stddev(), 0.4, 1e-4);
-  EXPECT_NEAR(msg.gps().position().horizontal_noise().precision(), 1.0, 1e-4);
+  EXPECT_NEAR(_msg.angular_velocity().x_noise().mean(), 0, 1e-4);
+  EXPECT_NEAR(_msg.angular_velocity().x_noise().stddev(), 0.0002, 1e-4);
+  EXPECT_NEAR(_msg.angular_velocity().x_noise().bias_mean(), 7.5e-6, 1e-4);
+  EXPECT_NEAR(_msg.angular_velocity().x_noise().bias_stddev(), 8e-7, 1e-4);
+  EXPECT_NEAR(_msg.angular_velocity().x_noise().precision(), 0.0, 1e-4);
 
-  EXPECT_EQ(msg.gps().position().vertical_noise().type(),
-      msgs::SensorNoise::GAUSSIAN_QUANTIZED);
-  EXPECT_NEAR(msg.gps().position().vertical_noise().mean(), 0.1, 1e-4);
-  EXPECT_NEAR(msg.gps().position().vertical_noise().stddev(), 0.2, 1e-4);
-  EXPECT_NEAR(msg.gps().position().vertical_noise().bias_mean(), 0.3, 1e-4);
-  EXPECT_NEAR(msg.gps().position().vertical_noise().bias_stddev(), 0.4, 1e-4);
-  EXPECT_NEAR(msg.gps().position().vertical_noise().precision(), 1.0, 1e-4);
-
-  EXPECT_EQ(msg.gps().velocity().horizontal_noise().type(),
-      msgs::SensorNoise::NONE);
-  EXPECT_NEAR(msg.gps().velocity().horizontal_noise().mean(), 0.1, 1e-4);
-  EXPECT_NEAR(msg.gps().velocity().horizontal_noise().stddev(), 0.2, 1e-4);
-  EXPECT_NEAR(msg.gps().velocity().horizontal_noise().bias_mean(), 0.3, 1e-4);
-  EXPECT_NEAR(msg.gps().velocity().horizontal_noise().bias_stddev(), 0.4, 1e-4);
-  EXPECT_NEAR(msg.gps().velocity().horizontal_noise().precision(), 1.0, 1e-4);
-
-  EXPECT_EQ(msg.gps().velocity().vertical_noise().type(),
+  EXPECT_EQ(_msg.angular_velocity().y_noise().type(),
       msgs::SensorNoise::GAUSSIAN);
-  EXPECT_NEAR(msg.gps().velocity().vertical_noise().mean(), 0.1, 1e-4);
-  EXPECT_NEAR(msg.gps().velocity().vertical_noise().stddev(), 0.2, 1e-4);
-  EXPECT_NEAR(msg.gps().velocity().vertical_noise().bias_mean(), 0.3, 1e-4);
-  EXPECT_NEAR(msg.gps().velocity().vertical_noise().bias_stddev(), 0.4, 1e-4);
-  EXPECT_NEAR(msg.gps().velocity().vertical_noise().precision(), 1.0, 1e-4);
+  EXPECT_NEAR(_msg.angular_velocity().y_noise().mean(), 0, 1e-4);
+  EXPECT_NEAR(_msg.angular_velocity().y_noise().stddev(), 0.0002, 1e-4);
+  EXPECT_NEAR(_msg.angular_velocity().y_noise().bias_mean(), 7.5e-6, 1e-4);
+  EXPECT_NEAR(_msg.angular_velocity().y_noise().bias_stddev(), 8e-7, 1e-4);
+  EXPECT_NEAR(_msg.angular_velocity().y_noise().precision(), 0.0, 1e-4);
+
+  EXPECT_EQ(_msg.angular_velocity().z_noise().type(),
+      msgs::SensorNoise::GAUSSIAN);
+  EXPECT_NEAR(_msg.angular_velocity().z_noise().mean(), 0, 1e-4);
+  EXPECT_NEAR(_msg.angular_velocity().z_noise().stddev(), 0.0002, 1e-4);
+  EXPECT_NEAR(_msg.angular_velocity().z_noise().bias_mean(), 7.5e-6, 1e-4);
+  EXPECT_NEAR(_msg.angular_velocity().z_noise().bias_stddev(), 8e-7, 1e-4);
+  EXPECT_NEAR(_msg.angular_velocity().z_noise().precision(), 0.0, 1e-4);
+
+  EXPECT_EQ(_msg.linear_acceleration().x_noise().type(),
+      msgs::SensorNoise::GAUSSIAN);
+  EXPECT_NEAR(_msg.linear_acceleration().x_noise().mean(), 0, 1e-4);
+  EXPECT_NEAR(_msg.linear_acceleration().x_noise().stddev(), 0.017, 1e-4);
+  EXPECT_NEAR(_msg.linear_acceleration().x_noise().bias_mean(), 0.1, 1e-4);
+  EXPECT_NEAR(_msg.linear_acceleration().x_noise().bias_stddev(), 0.001, 1e-4);
+  EXPECT_NEAR(_msg.linear_acceleration().x_noise().precision(), 0.0, 1e-4);
+
+  EXPECT_EQ(_msg.linear_acceleration().y_noise().type(),
+      msgs::SensorNoise::GAUSSIAN);
+  EXPECT_NEAR(_msg.linear_acceleration().y_noise().mean(), 0, 1e-4);
+  EXPECT_NEAR(_msg.linear_acceleration().y_noise().stddev(), 0.017, 1e-4);
+  EXPECT_NEAR(_msg.linear_acceleration().y_noise().bias_mean(), 0.1, 1e-4);
+  EXPECT_NEAR(_msg.linear_acceleration().y_noise().bias_stddev(), 0.001, 1e-4);
+  EXPECT_NEAR(_msg.linear_acceleration().y_noise().precision(), 0.0, 1e-4);
+
+  EXPECT_EQ(_msg.linear_acceleration().z_noise().type(),
+      msgs::SensorNoise::GAUSSIAN);
+  EXPECT_NEAR(_msg.linear_acceleration().z_noise().mean(), 0, 1e-4);
+  EXPECT_NEAR(_msg.linear_acceleration().z_noise().stddev(), 0.017, 1e-4);
+  EXPECT_NEAR(_msg.linear_acceleration().z_noise().bias_mean(), 0.1, 1e-4);
+  EXPECT_NEAR(_msg.linear_acceleration().z_noise().bias_stddev(), 0.001, 1e-4);
+  EXPECT_NEAR(_msg.linear_acceleration().z_noise().precision(), 0.0, 1e-4);
 }
 
 /////////////////////////////////////////////////
@@ -601,56 +664,11 @@ TEST_F(MsgsTest, IMUSensorFromSDF)
   EXPECT_FALSE(msg.has_camera());
   EXPECT_FALSE(msg.has_ray());
 
-  EXPECT_EQ(msg.imu().angular_velocity().x_noise().type(),
-      msgs::SensorNoise::GAUSSIAN);
-  EXPECT_NEAR(msg.imu().angular_velocity().x_noise().mean(), 0, 1e-4);
-  EXPECT_NEAR(msg.imu().angular_velocity().x_noise().stddev(), 0.0002, 1e-4);
-  EXPECT_NEAR(msg.imu().angular_velocity().x_noise().bias_mean(), 7.5e-6, 1e-4);
-  EXPECT_NEAR(msg.imu().angular_velocity().x_noise().bias_stddev(), 8e-7, 1e-4);
-  EXPECT_NEAR(msg.imu().angular_velocity().x_noise().precision(), 0.0, 1e-4);
+  CheckIMUSensorMsg(msg.imu());
 
-  EXPECT_EQ(msg.imu().angular_velocity().y_noise().type(),
-      msgs::SensorNoise::GAUSSIAN);
-  EXPECT_NEAR(msg.imu().angular_velocity().y_noise().mean(), 0, 1e-4);
-  EXPECT_NEAR(msg.imu().angular_velocity().y_noise().stddev(), 0.0002, 1e-4);
-  EXPECT_NEAR(msg.imu().angular_velocity().y_noise().bias_mean(), 7.5e-6, 1e-4);
-  EXPECT_NEAR(msg.imu().angular_velocity().y_noise().bias_stddev(), 8e-7, 1e-4);
-  EXPECT_NEAR(msg.imu().angular_velocity().y_noise().precision(), 0.0, 1e-4);
-
-  EXPECT_EQ(msg.imu().angular_velocity().z_noise().type(),
-      msgs::SensorNoise::GAUSSIAN);
-  EXPECT_NEAR(msg.imu().angular_velocity().z_noise().mean(), 0, 1e-4);
-  EXPECT_NEAR(msg.imu().angular_velocity().z_noise().stddev(), 0.0002, 1e-4);
-  EXPECT_NEAR(msg.imu().angular_velocity().z_noise().bias_mean(), 7.5e-6, 1e-4);
-  EXPECT_NEAR(msg.imu().angular_velocity().z_noise().bias_stddev(), 8e-7, 1e-4);
-  EXPECT_NEAR(msg.imu().angular_velocity().z_noise().precision(), 0.0, 1e-4);
-
-  EXPECT_EQ(msg.imu().linear_acceleration().x_noise().type(),
-      msgs::SensorNoise::GAUSSIAN);
-  EXPECT_NEAR(msg.imu().linear_acceleration().x_noise().mean(), 0, 1e-4);
-  EXPECT_NEAR(msg.imu().linear_acceleration().x_noise().stddev(), 0.017, 1e-4);
-  EXPECT_NEAR(msg.imu().linear_acceleration().x_noise().bias_mean(), 0.1, 1e-4);
-  EXPECT_NEAR(msg.imu().linear_acceleration().x_noise().bias_stddev(),
-      0.001, 1e-4);
-  EXPECT_NEAR(msg.imu().linear_acceleration().x_noise().precision(), 0.0, 1e-4);
-
-  EXPECT_EQ(msg.imu().linear_acceleration().y_noise().type(),
-      msgs::SensorNoise::GAUSSIAN);
-  EXPECT_NEAR(msg.imu().linear_acceleration().y_noise().mean(), 0, 1e-4);
-  EXPECT_NEAR(msg.imu().linear_acceleration().y_noise().stddev(), 0.017, 1e-4);
-  EXPECT_NEAR(msg.imu().linear_acceleration().y_noise().bias_mean(), 0.1, 1e-4);
-  EXPECT_NEAR(msg.imu().linear_acceleration().y_noise().bias_stddev(),
-      0.001, 1e-4);
-  EXPECT_NEAR(msg.imu().linear_acceleration().y_noise().precision(), 0.0, 1e-4);
-
-  EXPECT_EQ(msg.imu().linear_acceleration().z_noise().type(),
-      msgs::SensorNoise::GAUSSIAN);
-  EXPECT_NEAR(msg.imu().linear_acceleration().z_noise().mean(), 0, 1e-4);
-  EXPECT_NEAR(msg.imu().linear_acceleration().z_noise().stddev(), 0.017, 1e-4);
-  EXPECT_NEAR(msg.imu().linear_acceleration().z_noise().bias_mean(), 0.1, 1e-4);
-  EXPECT_NEAR(msg.imu().linear_acceleration().z_noise().bias_stddev(),
-      0.001, 1e-4);
-  EXPECT_NEAR(msg.imu().linear_acceleration().z_noise().precision(), 0.0, 1e-4);
+  sdf::ElementPtr elem = msgs::IMUSensorToSDF(msg.imu());
+  msgs::IMUSensor sensorMsg = msgs::IMUSensorFromSDF(elem);
+  CheckIMUSensorMsg(sensorMsg);
 }
 
 /////////////////////////////////////////////////

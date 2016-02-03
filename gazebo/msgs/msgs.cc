@@ -2022,20 +2022,20 @@ namespace gazebo
       else
       {
         noiseSDF.reset(new sdf::Element);
-        sdf::initFile("sensor_noise.sdf", noiseSDF);
+        sdf::initFile("noise.sdf", noiseSDF);
       }
 
       if (_msg.type() == msgs::SensorNoise::NONE)
       {
-        noiseSDF->GetElement("type")->Set("none");
+        noiseSDF->GetAttribute("type")->Set("none");
       }
       else if (_msg.type() == msgs::SensorNoise::GAUSSIAN)
       {
-        noiseSDF->GetElement("type")->Set("gaussian");
+        noiseSDF->GetAttribute("type")->Set("gaussian");
       }
       else if (_msg.type() == msgs::SensorNoise::GAUSSIAN_QUANTIZED)
       {
-        noiseSDF->GetElement("type")->Set("gaussian_quantized");
+        noiseSDF->GetAttribute("type")->Set("gaussian_quantized");
       }
 
       if (_msg.has_mean())
@@ -2069,7 +2069,7 @@ namespace gazebo
       else
       {
         gpsSDF.reset(new sdf::Element);
-        sdf::initFile("gps_sensor.sdf", gpsSDF);
+        sdf::initFile("gps.sdf", gpsSDF);
       }
 
       if (_msg.has_position())
@@ -2078,6 +2078,7 @@ namespace gazebo
         {
           auto noiseElem = gpsSDF->GetElement("position_sensing")->GetElement(
               "horizontal")->GetElement("noise");
+          noiseElem->PrintValues("  ");
           SensorNoiseToSDF(_msg.position().horizontal_noise(), noiseElem);
         }
 
@@ -2122,7 +2123,7 @@ namespace gazebo
       else
       {
         imuSDF.reset(new sdf::Element);
-        sdf::initFile("imu_sensor.sdf", imuSDF);
+        sdf::initFile("imu.sdf", imuSDF);
       }
 
       if (_msg.has_angular_velocity())
