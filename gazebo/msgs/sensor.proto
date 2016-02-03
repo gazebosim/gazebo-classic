@@ -40,27 +40,27 @@ message Sensor
   /// \brief Sensor pose
   optional Pose pose              = 8;
 
-  /// \brief True value indicates that sensor data should be
-  /// visualized in the GUI
-  optional bool visualize         = 9;
-
-  /// \brief Topic on which sensor data is published
-  optional string topic           = 10;
-
   /// \brief Description of a camera sensor
-  optional CameraSensor camera    = 11;
+  optional CameraSensor camera    = 9;
 
   /// \brief Description of a ray (laser) sensor
-  optional RaySensor ray          = 12;
+  optional RaySensor ray          = 10;
 
   /// \brief Description of a contact sensor
-  optional ContactSensor contact  = 13;
+  optional ContactSensor contact  = 11;
 
-  /// \brief Description of a gps sensor
-  optional GPSSensor gps          = 14;
+  /// \brief True value indicates that sensor data should be
+  /// visualized in the GUI
+  optional bool visualize         = 12;
+
+  /// \brief Topic on which sensor data is published
+  optional string topic           = 13;
 
   /// \brief Description of a logical camera sensor
-  optional LogicalCameraSensor logical_camera = 15;
+  optional LogicalCameraSensor logical_camera = 14;
+
+  /// \brief Description of a gps sensor
+  optional GPSSensor gps          = 15;
 
   /// \brief Description of an IMU sensor
   optional IMUSensor imu          = 16;
