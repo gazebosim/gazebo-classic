@@ -1845,53 +1845,6 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////////
-    sdf::ElementPtr SensorNoiseToSDF(const msgs::SensorNoise &_msg,
-        sdf::ElementPtr _sdf)
-    {
-      sdf::ElementPtr noiseSDF;
-
-      if (_sdf)
-      {
-        noiseSDF = _sdf;
-      }
-      else
-      {
-        noiseSDF.reset(new sdf::Element);
-        sdf::initFile("sensor_noise.sdf", noiseSDF);
-      }
-
-      if (_msg.type() == msgs::SensorNoise::NONE)
-      {
-        noiseSDF->GetElement("type")->Set("none");
-      }
-      else if (_msg.type() == msgs::SensorNoise::GAUSSIAN)
-      {
-        noiseSDF->GetElement("type")->Set("gaussian");
-      }
-      else if (_msg.type() == msgs::SensorNoise::GAUSSIAN_QUANTIZED)
-      {
-        noiseSDF->GetElement("type")->Set("gaussian_quantized");
-      }
-
-      if (_msg.has_mean())
-        noiseSDF->GetElement("mean")->Set(_msg.mean());
-
-      if (_msg.has_stddev())
-        noiseSDF->GetElement("stddev")->Set(_msg.stddev());
-
-      if (_msg.has_bias_mean())
-        noiseSDF->GetElement("bias_mean")->Set(_msg.bias_mean());
-
-      if (_msg.has_bias_stddev())
-        noiseSDF->GetElement("bias_stddev")->Set(_msg.bias_stddev());
-
-      if (_msg.has_precision())
-        noiseSDF->GetElement("precision")->Set(_msg.precision());
-
-      return noiseSDF;
-    }
-
-    /////////////////////////////////////////////////
     sdf::ElementPtr CameraSensorToSDF(const msgs::CameraSensor &_msg,
         sdf::ElementPtr _sdf)
     {
@@ -2727,45 +2680,6 @@ namespace gazebo
         if (_msg.has_limit_velocity())
           limitElem->GetElement("velocity")->Set(_msg.limit_velocity());
       }
-    }
-
-    /////////////////////////////////////////////
-    msgs::SensorNoise SensorNoiseFromSDF(sdf::ElementPtr _elem)
-    {
-      msgs::SensorNoise result;
-
-      auto noiseType = _elem->Get<std::string>("type");
-
-      if (noiseType == "none")
-        result.set_type(msgs::SensorNoise::NONE);
-      else if (noiseType == "gaussian")
-        result.set_type(msgs::SensorNoise::GAUSSIAN);
-      else if (noiseType == "gaussian_quantized")
-        result.set_type(msgs::SensorNoise::GAUSSIAN);
-      else
-      {
-        gzerr << "Invalid GPS sensor noise type["
-          << noiseType << "]. Using 'none'.\n";
-
-        result.set_type(msgs::SensorNoise::NONE);
-      }
-
-      if (_elem->HasElement("mean"))
-        result.set_mean(_elem->Get<double>("mean"));
-
-      if (_elem->HasElement("stddev"))
-        result.set_stddev(_elem->Get<double>("stddev"));
-
-      if (_elem->HasElement("bias_mean"))
-        result.set_stddev(_elem->Get<double>("bias_mean"));
-
-      if (_elem->HasElement("bias_stddev"))
-        result.set_stddev(_elem->Get<double>("bias_stddev"));
-
-      if (_elem->HasElement("precision"))
-        result.set_stddev(_elem->Get<double>("precision"));
-
-      return result;
     }
   }
 }
