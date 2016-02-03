@@ -122,6 +122,7 @@ World::World(const std::string &_name)
   this->dataPtr->loadModelMutex = new boost::mutex();
 
   this->dataPtr->initialized = false;
+  this->dataPtr->sensorsInitialized = false;
   this->dataPtr->loaded = false;
   this->dataPtr->stepInc = 0;
   this->dataPtr->pause = false;
@@ -1508,6 +1509,12 @@ void World::RemovePlugin(const std::string &_name)
 unsigned int World::PluginCount() const
 {
   return this->dataPtr->plugins.size();
+}
+
+//////////////////////////////////////////////////
+bool World::PluginsLoaded() const
+{
+  return this->dataPtr->pluginsLoaded;
 }
 
 //////////////////////////////////////////////////

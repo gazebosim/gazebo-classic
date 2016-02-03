@@ -203,6 +203,9 @@ void WorldOpenTest::OpenWorldMsg(const std::string &_physicsEngine)
     EXPECT_EQ(newWorldHasBeenCreated, worlds[i][0][0][0] != "invalid_world");
     ASSERT_TRUE(world != NULL);
 
+    EXPECT_TRUE(world->SensorsInitialized());
+    EXPECT_TRUE(world->PluginsLoaded());
+
     // Check models
     size_t count = 0;
     for (unsigned int j = 1; j < 10; ++j)

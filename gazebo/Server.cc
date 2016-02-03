@@ -802,6 +802,9 @@ bool Server::OpenWorld(const std::string &_filename)
   physics::run_world(world);
   sensors::run_once(true);
 
+  // Sleep for a while to make sure sensors and plugins are loaded
+  common::Time::MSleep(1000);
+
   // TODO: Notify clients that a new world is available
 /*
   msgs::WorldModify worldMsg;

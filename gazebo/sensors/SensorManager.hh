@@ -265,7 +265,8 @@ namespace gazebo
       ///        i.e. SensorManager::sensors are initialized.
       private: bool initialized;
 
-      /// \brief True removes all sensors from all sensor containers.
+      /// \brief True removes all sensors from all sensor containers. It also
+      /// removes all registered worlds.
       private: bool removeAllSensors;
 
       /// \brief Mutex used when adding and removing sensors.
@@ -292,7 +293,8 @@ namespace gazebo
       /// \brief Pointer to the sim time event handler.
       private: SimTimeEventHandler *simTimeEventHandler;
 
-      /// \brief All the worlds that have sensors.
+      /// \brief All the worlds whose sensors have been initialized. This
+      /// includes worlds without sensors.
       private: std::map<std::string, physics::WorldPtr> worlds;
 
       /// \brief Connect to the time reset event.

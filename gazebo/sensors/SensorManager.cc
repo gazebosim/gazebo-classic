@@ -162,6 +162,10 @@ void SensorManager::Update(bool _force)
         (*iter2)->RemoveSensors();
       }
       this->initSensors.clear();
+
+      // Also clear the list of worlds
+      this->worlds.clear();
+
       this->removeAllSensors = false;
     }
   }

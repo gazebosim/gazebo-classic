@@ -312,6 +312,10 @@ namespace gazebo
       /// \return The number of world plugins in this world.
       public: unsigned int PluginCount() const;
 
+      /// \brief Get whether plugins have been loaded or not.
+      /// \return True if plugins have been loaded.
+      public: bool PluginsLoaded() const;
+
       /// \brief Get the set world pose mutex.
       /// \return Pointer to the mutex.
       public: boost::mutex *GetSetWorldPoseMutex() const;
