@@ -91,6 +91,8 @@ bool IntrospectionManager::Register(const std::string &_item,
     const std::string &_type,
     const std::function <bool (gazebo::msgs::Any &_msg)> &_cb)
 {
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+
   // Sanity check: Make sure that nobody has registered the same item before.
   if (this->dataPtr->allItems.find(_item) != this->dataPtr->allItems.end())
   {
@@ -106,6 +108,8 @@ bool IntrospectionManager::Register(const std::string &_item,
 //////////////////////////////////////////////////
 bool IntrospectionManager::Unregister(const std::string &_item)
 {
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+
   // Sanity check: Make sure that the item has been previously registered.
   if (this->dataPtr->allItems.find(_item) == this->dataPtr->allItems.end())
   {
@@ -127,6 +131,8 @@ bool IntrospectionManager::NewFilter(const std::set<std::string> &_items,
   // expect to have a massive number of introspection managers running
   // concurrently, so no need to use UUIDs.
   _filterId = this->CreateRandomId(6);
+
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
   // Advertise the new topic.
   std::string topicName = "/introspection/filter/" + _filterId;
@@ -151,18 +157,20 @@ bool IntrospectionManager::NewFilter(const std::set<std::string> &_items,
 bool IntrospectionManager::UpdateFilter(const std::string &_filterId,
     const std::set<std::string> &_newItems)
 {
-  // Sanity check: Make sure that filter ID exists.
-  if (this->dataPtr->filters.find(_filterId) == this->dataPtr->filters.end())
-  {
-    gzerr << "Unknown ID [" << _filterId << "] in filter update" << std::endl;
-    gzerr << "Ignoring request." << std::endl;
-    return false;
-  }
-
   // Sanity check: Make sure that we have at least one item to be observed.
   if (_newItems.empty())
   {
     gzerr << "Filter update request without any items." << std::endl;
+    gzerr << "Ignoring request." << std::endl;
+    return false;
+  }
+
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+
+  // Sanity check: Make sure that filter ID exists.
+  if (this->dataPtr->filters.find(_filterId) == this->dataPtr->filters.end())
+  {
+    gzerr << "Unknown ID [" << _filterId << "] in filter update" << std::endl;
     gzerr << "Ignoring request." << std::endl;
     return false;
   }
@@ -205,6 +213,8 @@ bool IntrospectionManager::UpdateFilter(const std::string &_filterId,
 //////////////////////////////////////////////////
 bool IntrospectionManager::RemoveFilter(const std::string &_filterId)
 {
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+
   // Sanity check: Make sure that filter ID exists.
   if (this->dataPtr->filters.find(_filterId) == this->dataPtr->filters.end())
   {
@@ -246,8 +256,13 @@ bool IntrospectionManager::RemoveFilter(const std::string &_filterId)
 std::set<std::string> IntrospectionManager::Items() const
 {
   std::set<std::string> items;
-  for (auto item : this->dataPtr->allItems)
-    items.emplace(item.first);
+
+  {
+    std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+
+    for (auto item : this->dataPtr->allItems)
+      items.emplace(item.first);
+  }
 
   return items;
 }
@@ -255,6 +270,8 @@ std::set<std::string> IntrospectionManager::Items() const
 //////////////////////////////////////////////////
 void IntrospectionManager::Update()
 {
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+
   for (auto &observedItem : this->dataPtr->observedItems)
   {
     auto &item = observedItem.first;
@@ -455,16 +472,19 @@ void IntrospectionManager::RemoveFilter(const gazebo::msgs::Param_V &_req,
 void IntrospectionManager::Items(const gazebo::msgs::Empty &/*_req*/,
     gazebo::msgs::Param_V &_rep, bool &_result)
 {
-  for (auto const &item : this->dataPtr->allItems)
   {
-    auto nextParam = _rep.add_param();
-    nextParam->set_name("item");
-    nextParam->mutable_value()->set_type(gazebo::msgs::Any::STRING);
-    nextParam->mutable_value()->set_string_value(item.first);
-    auto childParam = nextParam->add_children();
-    childParam->set_name("type");
-    childParam->mutable_value()->set_type(gazebo::msgs::Any::STRING);
-    childParam->mutable_value()->set_string_value(item.second.type);
+    std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+    for (auto const &item : this->dataPtr->allItems)
+    {
+      auto nextParam = _rep.add_param();
+      nextParam->set_name("item");
+      nextParam->mutable_value()->set_type(gazebo::msgs::Any::STRING);
+      nextParam->mutable_value()->set_string_value(item.first);
+      auto childParam = nextParam->add_children();
+      childParam->set_name("type");
+      childParam->mutable_value()->set_type(gazebo::msgs::Any::STRING);
+      childParam->mutable_value()->set_string_value(item.second.type);
+    }
   }
   _result = true;
 }
