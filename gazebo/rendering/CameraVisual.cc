@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -94,7 +94,7 @@ void CameraVisual::Load(const msgs::CameraSensor &_msg)
   }
 
   Ogre::Entity *planeEnt =
-    dPtr->scene->GetManager()->createEntity(this->GetName() + "__plane",
+    dPtr->scene->OgreSceneManager()->createEntity(this->GetName() + "__plane",
         this->GetName() + "__floor");
   planeEnt->setMaterialName(this->GetName()+"_RTT_material");
   planeEnt->setCastShadows(false);
@@ -158,7 +158,7 @@ void CameraVisual::Fini()
   this->DetachObjects();
   if (this->dataPtr->scene)
   {
-    this->dataPtr->scene->GetManager()->destroyEntity(
+    this->dataPtr->scene->OgreSceneManager()->destroyEntity(
         this->GetName() + "__plane");
   }
 }

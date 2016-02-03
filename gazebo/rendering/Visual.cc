@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -103,7 +103,7 @@ void Visual::Init(const std::string &_name, ScenePtr _scene,
 
   std::string uniqueName = this->GetName();
   int index = 0;
-  while (_scene->GetManager()->hasSceneNode(uniqueName))
+  while (_scene->OgreSceneManager()->hasSceneNode(uniqueName))
   {
     uniqueName = this->GetName() + "_" +
                  boost::lexical_cast<std::string>(index++);
@@ -112,7 +112,7 @@ void Visual::Init(const std::string &_name, ScenePtr _scene,
   this->dataPtr->scene = _scene;
   this->SetName(uniqueName);
   this->dataPtr->sceneNode =
-    this->dataPtr->scene->GetManager()->getRootSceneNode()->
+    this->dataPtr->scene->OgreSceneManager()->getRootSceneNode()->
         createChildSceneNode(this->GetName());
 
   this->Init();
@@ -189,7 +189,7 @@ Visual::~Visual()
     // seems we never get into this block because Fini() runs first
     this->DestroyAllAttachedMovableObjects(this->dataPtr->sceneNode);
     this->dataPtr->sceneNode->removeAndDestroyAllChildren();
-    this->dataPtr->scene->GetManager()->destroySceneNode(
+    this->dataPtr->scene->OgreSceneManager()->destroySceneNode(
         this->dataPtr->sceneNode->getName());
     this->dataPtr->sceneNode = NULL;
   }
@@ -216,7 +216,7 @@ void Visual::Fini()
   if (this->dataPtr->sceneNode)
   {
     this->dataPtr->sceneNode->detachAllObjects();
-    this->dataPtr->scene->GetManager()->destroySceneNode(
+    this->dataPtr->scene->OgreSceneManager()->destroySceneNode(
         this->dataPtr->sceneNode);
     this->dataPtr->sceneNode = NULL;
   }
@@ -249,7 +249,7 @@ VisualPtr Visual::Clone(const std::string &_name, VisualPtr _newParent)
     iter->Clone(newName, result);
   }
 
-  if (_newParent == this->dataPtr->scene->GetWorldVisual())
+  if (_newParent == this->dataPtr->scene->WorldVisual())
     result->SetWorldPose(this->GetWorldPose());
   result->ShowCollision(false);
   result->SetInheritTransparency(this->InheritTransparency());
@@ -272,7 +272,7 @@ void Visual::DestroyAllAttachedMovableObjects(Ogre::SceneNode *_sceneNode)
   {
     Ogre::Entity *ent = static_cast<Ogre::Entity*>(itObject.getNext());
     if (ent->getMovableType() != DynamicLines::GetMovableType())
-      this->dataPtr->scene->GetManager()->destroyEntity(ent);
+      this->dataPtr->scene->OgreSceneManager()->destroyEntity(ent);
     else
       delete ent;
   }
@@ -554,7 +554,7 @@ std::string Visual::GetName() const
 void Visual::AttachVisual(VisualPtr _vis)
 {
   if (!_vis)
-    gzerr << "Visual is null\n";
+    gzerr << "Visual is null" << std::endl;
   else
   {
     if (_vis->GetSceneNode()->getParentSceneNode())
@@ -625,7 +625,7 @@ void Visual::AttachObject(Ogre::MovableObject *_obj)
     }
 
     this->dataPtr->sceneNode->attachObject(_obj);
-    if (this->dataPtr->useRTShader && this->dataPtr->scene->GetInitialized() &&
+    if (this->dataPtr->useRTShader && this->dataPtr->scene->Initialized() &&
       _obj->getName().find("__COLLISION_VISUAL__") == std::string::npos)
     {
       RTShaderSystem::Instance()->UpdateShaders();
@@ -833,7 +833,7 @@ ignition::math::Vector3d Visual::DerivedScale() const
 {
   ignition::math::Vector3d derivedScale = this->dataPtr->scale;
 
-  VisualPtr worldVis = this->dataPtr->scene->GetWorldVisual();
+  VisualPtr worldVis = this->dataPtr->scene->WorldVisual();
   VisualPtr vis = this->GetParent();
 
   while (vis && vis != worldVis)
@@ -1076,7 +1076,7 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique,
     }
   }
 
-  if (this->dataPtr->useRTShader && this->dataPtr->scene->GetInitialized()
+  if (this->dataPtr->useRTShader && this->dataPtr->scene->Initialized()
       && this->dataPtr->lighting &&
       this->GetName().find("__COLLISION_VISUAL__") == std::string::npos)
   {
@@ -1527,7 +1527,7 @@ void Visual::UpdateTransparency(const bool _cascade)
     }
   }
 
-  if (this->dataPtr->useRTShader && this->dataPtr->scene->GetInitialized())
+  if (this->dataPtr->useRTShader && this->dataPtr->scene->Initialized())
     RTShaderSystem::Instance()->UpdateShaders();
 
   this->dataPtr->sdf->GetElement("transparency")->Set(
@@ -1616,7 +1616,7 @@ float Visual::DerivedTransparency() const
 
   float derivedTransparency = this->dataPtr->transparency;
 
-  VisualPtr worldVis = this->dataPtr->scene->GetWorldVisual();
+  VisualPtr worldVis = this->dataPtr->scene->WorldVisual();
   VisualPtr vis = this->GetParent();
 
   while (vis && vis != worldVis)
@@ -1828,7 +1828,7 @@ void Visual::SetNormalMap(const std::string &_nmap)
 {
   this->dataPtr->sdf->GetElement("material")->GetElement(
       "shader")->GetElement("normal_map")->GetValue()->Set(_nmap);
-  if (this->dataPtr->useRTShader && this->dataPtr->scene->GetInitialized())
+  if (this->dataPtr->useRTShader && this->dataPtr->scene->Initialized())
     RTShaderSystem::Instance()->UpdateShaders();
 }
 
@@ -1844,7 +1844,7 @@ void Visual::SetShaderType(const std::string &_type)
 {
   this->dataPtr->sdf->GetElement("material")->GetElement(
       "shader")->GetAttribute("type")->Set(_type);
-  if (this->dataPtr->useRTShader && this->dataPtr->scene->GetInitialized())
+  if (this->dataPtr->useRTShader && this->dataPtr->scene->Initialized())
     RTShaderSystem::Instance()->UpdateShaders();
 }
 
@@ -1856,7 +1856,7 @@ void Visual::SetRibbonTrail(bool _value, const common::Color &_initialColor,
   if (this->dataPtr->ribbonTrail == NULL)
   {
     this->dataPtr->ribbonTrail =
-        this->dataPtr->scene->GetManager()->createRibbonTrail(
+        this->dataPtr->scene->OgreSceneManager()->createRibbonTrail(
         this->GetName() + "_RibbonTrail");
     this->dataPtr->ribbonTrail->setMaterialName("Gazebo/RibbonTrail");
     // this->dataPtr->ribbonTrail->setTrailLength(100);
@@ -1865,7 +1865,7 @@ void Visual::SetRibbonTrail(bool _value, const common::Color &_initialColor,
     this->dataPtr->ribbonTrail->setVisible(false);
     this->dataPtr->ribbonTrail->setCastShadows(false);
     this->dataPtr->ribbonTrail->setInitialWidth(0, 0.05);
-    this->dataPtr->scene->GetManager()->getRootSceneNode()->attachObject(
+    this->dataPtr->scene->OgreSceneManager()->getRootSceneNode()->attachObject(
         this->dataPtr->ribbonTrail);
 
     this->dataPtr->ribbonTrail->setInitialColour(0,
@@ -2530,7 +2530,7 @@ VisualPtr Visual::GetRootVisual()
 {
   VisualPtr p = shared_from_this();
   while (p->GetParent() &&
-      p->GetParent() != this->dataPtr->scene->GetWorldVisual())
+      p->GetParent() != this->dataPtr->scene->WorldVisual())
   {
     p = p->GetParent();
   }
@@ -2565,7 +2565,7 @@ bool Visual::IsAncestorOf(const rendering::VisualPtr _visual) const
   if (!_visual || !this->dataPtr->scene)
     return false;
 
-  rendering::VisualPtr world = this->dataPtr->scene->GetWorldVisual();
+  rendering::VisualPtr world = this->dataPtr->scene->WorldVisual();
   rendering::VisualPtr vis = _visual->GetParent();
   while (vis)
   {
@@ -2583,7 +2583,7 @@ bool Visual::IsDescendantOf(const rendering::VisualPtr _visual) const
   if (!_visual || !this->dataPtr->scene)
     return false;
 
-  rendering::VisualPtr world = this->dataPtr->scene->GetWorldVisual();
+  rendering::VisualPtr world = this->dataPtr->scene->WorldVisual();
   rendering::VisualPtr vis = this->GetParent();
   while (vis)
   {
@@ -2702,7 +2702,11 @@ std::string Visual::GetMeshName() const
         meshManager->CreateExtrudedPolyline(polyLineName, polylines,
             geomElem->GetElement("polyline")->Get<double>("height"));
       }
-      return polyLineName;
+
+      if (meshManager->HasMesh(polyLineName))
+        return polyLineName;
+      else
+        return std::string();
     }
     else if (geomElem->HasElement("mesh") || geomElem->HasElement("heightmap"))
     {

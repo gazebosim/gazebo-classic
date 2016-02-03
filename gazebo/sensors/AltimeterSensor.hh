@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_ALTIMETER_SENSOR_HH_
-#define _GAZEBO_ALTIMETER_SENSOR_HH_
+#ifndef _GAZEBO_SENSORS_ALTIMETERSENSOR_HH_
+#define _GAZEBO_SENSORS_ALTIMETERSENSOR_HH_
 
 #include <string>
 
@@ -85,7 +85,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Private data pointer
-      private: AltimeterSensorPrivate *dataPtr;
+      private: std::unique_ptr<AltimeterSensorPrivate> dataPtr;
     };
     /// \}
   }

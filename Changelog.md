@@ -1,37 +1,52 @@
 ## Gazebo 7.0
 
+1. Add FollowerPlugin
+    * [Pull request #2085](https://bitbucket.org/osrf/gazebo/pull-request/2085)
+
+1. Fix circular dependency so that physics does not call the sensors API.
+    * [Pull request #2089](https://bitbucket.org/osrf/gazebo/pull-request/2089)
+    * [Issue #1516](https://bitbucket.org/osrf/gazebo/issues/1516)
+
+1. Add Gravity and MagneticField API to World class to match sdformat change.
+    * [SDFormat pull request 247](https://bitbucket.org/osrf/sdformat/pull-requests/247)
+    * [Issue #1823](https://bitbucket.org/osrf/gazebo/issues/1823)
+    * [Pull request #2090](https://bitbucket.org/osrf/gazebo/pull-request/2090)
+
+1. Use opaque pointers and deprecate functions in the rendering library
+    * [Pull request #2069](https://bitbucket.org/osrf/gazebo/pull-request/2069)
+    * [Pull request #2064](https://bitbucket.org/osrf/gazebo/pull-request/2064)
+    * [Pull request #2066](https://bitbucket.org/osrf/gazebo/pull-request/2066)
+    * [Pull request #2069](https://bitbucket.org/osrf/gazebo/pull-request/2069)
+    * [Pull request #2074](https://bitbucket.org/osrf/gazebo/pull-request/2074)
+    * [Pull request #2076](https://bitbucket.org/osrf/gazebo/pull-request/2076)
+    * [Pull request #2070](https://bitbucket.org/osrf/gazebo/pull-request/2070)
+    * [Pull request #2071](https://bitbucket.org/osrf/gazebo/pull-request/2071)
+    * [Pull request #2084](https://bitbucket.org/osrf/gazebo/pull-request/2084)
+    * [Pull request #2073](https://bitbucket.org/osrf/gazebo/pull-request/2073)
+
 1. Use opaque pointers for the Master class.
     * [Pull request #2036](https://bitbucket.org/osrf/gazebo/pull-request/2036)
 
-1. Use opaque pointers in the rendering/WindowManager class.
-    * [Pull request #2064](https://bitbucket.org/osrf/gazebo/pull-request/2064)
-
-1. Use opaque pointers in the rendering/Light class.
-    * [Pull request #2066](https://bitbucket.org/osrf/gazebo/pull-request/2066)
-
-1. Use opaque pointers in the gui/JointControlWidget class.
+1. Use opaque pointers in the gui library
+    * [Pull request #2057](https://bitbucket.org/osrf/gazebo/pull-request/2057)
+    * [Pull request #2037](https://bitbucket.org/osrf/gazebo/pull-request/2037)
     * [Pull request #2052](https://bitbucket.org/osrf/gazebo/pull-request/2052)
-
-1. Use opaque pointers in the gui/KeyEventHandler class.
     * [Pull request #2053](https://bitbucket.org/osrf/gazebo/pull-request/2053)
-
-1 Use opaque pointers in the gui/ConfigWidget class.
     * [Pull request #2028](https://bitbucket.org/osrf/gazebo/pull-request/2028)
-
-1. Use opaque pointers in the gui/GLWidget class.
     * [Pull request #2051](https://bitbucket.org/osrf/gazebo/pull-request/2051)
+    * [Pull request #2027](https://bitbucket.org/osrf/gazebo/pull-request/2027)
+    * [Pull request #2026](https://bitbucket.org/osrf/gazebo/pull-request/2026)
+    * [Pull request #2029](https://bitbucket.org/osrf/gazebo/pull-request/2029)
+    * [Pull request #2042](https://bitbucket.org/osrf/gazebo/pull-request/2042)
 
 1. Use more opaque pointers.
+    * [Pull request #2022](https://bitbucket.org/osrf/gazebo/pull-request/2022)
     * [Pull request #2025](https://bitbucket.org/osrf/gazebo/pull-request/2025)
-
-1. Use opaque pointers in the gui/CloneWindow class.
-    * [Pull request #2027](https://bitbucket.org/osrf/gazebo/pull-request/2027)
-
-1. Use opaque pointers in the terrain editor.
-    * [Pull request #2026](https://bitbucket.org/osrf/gazebo/pull-request/2026)
-
-1. Use opaque pointers in the gui/DataLogger class.
-    * [Pull request #2029](https://bitbucket.org/osrf/gazebo/pull-request/2029)
+    * [Pull request #2043](https://bitbucket.org/osrf/gazebo/pull-request/2043)
+    * [Pull request #2044](https://bitbucket.org/osrf/gazebo/pull-request/2044)
+    * [Pull request #2065](https://bitbucket.org/osrf/gazebo/pull-request/2065)
+    * [Pull request #2067](https://bitbucket.org/osrf/gazebo/pull-request/2067)
+    * [Pull request #2079](https://bitbucket.org/osrf/gazebo/pull-request/2079)
 
 1. Fix visual transparency issues
     * [Pull request #2031](https://bitbucket.org/osrf/gazebo/pull-request/2031)
@@ -110,6 +125,9 @@ flags from c functions. Windows did not like `CPPTYPE_*` in
 
 1. Light and light state for the server side
     * [Pull request #1920](https://bitbucket.org/osrf/gazebo/pull-request/1920)
+
+1. Add scale to model state so scaling works on log/playback.
+    * [Pull request #2020](https://bitbucket.org/osrf/gazebo/pull-request/2020)
 
 1. Added tests for WorldState
     * [Pull request #1968](https://bitbucket.org/osrf/gazebo/pull-request/1968)
@@ -221,7 +239,15 @@ using the same arguments used in the command line.
 1. Refactored makers
     * [Pull request #1828](https://bitbucket.org/osrf/gazebo/pull-request/1828)
 
+1. Added gui::Conversions to convert between Gazebo and Qt
+    * [Pull request #2034](https://bitbucket.org/osrf/gazebo/pull-request/2034)
+
 1. Model editor updates
+    1. Support adding model plugins in model editor
+        * [Pull request #2060](https://bitbucket.org/osrf/gazebo/pull-request/2060)
+
+    1. Added support for copying and pasting top level nested models
+        * [Pull request #2006](https://bitbucket.org/osrf/gazebo/pull-request/2006)
 
     1. Make non-editable background models white in model editor
         * [Pull request #1950](https://bitbucket.org/osrf/gazebo/pull-request/1950)
@@ -245,6 +271,9 @@ using the same arguments used in the command line.
     1. Scale link mass and inertia when a link is scaled
         * [Pull request #1836](https://bitbucket.org/osrf/gazebo/pull-request/1836)
 
+    1. Add density widget to config widget and link inspector
+        * [Pull request #1978](https://bitbucket.org/osrf/gazebo/pull-request/1978)
+
     1. Added icons for child and parent link in joint inspector
         * [Pull request #1953](https://bitbucket.org/osrf/gazebo/pull-request/1953)
 
@@ -261,9 +290,6 @@ using the same arguments used in the command line.
         * [Pull request #1904](https://bitbucket.org/osrf/gazebo/pull-request/1904)
         * [Issue #1543](https://bitbucket.org/osrf/gazebo/issue/1543)
 
-    1. PIMPL JointInspector
-        * [Pull request #2059](https://bitbucket.org/osrf/gazebo/pull-request/2059)
-
     1. Apply inspector changes in real time and add reset button
         * [Pull request #1945](https://bitbucket.org/osrf/gazebo/pull-request/1945)
         * [Issue #1472](https://bitbucket.org/osrf/gazebo/issue/1472)
@@ -278,32 +304,50 @@ using the same arguments used in the command line.
     1. Support inserting nested models from model maker
         * [Pull request #1982](https://bitbucket.org/osrf/gazebo/pull-request/1982)
 
-    1. PIMPL LinkInspector
+    1. Added joint creation dialog
+        * [Pull request #2021](https://bitbucket.org/osrf/gazebo/pull-request/2021)
+
+    1. Added reverse checkboxes to joint creation dialog
+        * [Pull request #2086](https://bitbucket.org/osrf/gazebo/pull-request/2086)
+
+    1. Use opaque pointers in the model editor
         * [Pull request #2056](https://bitbucket.org/osrf/gazebo/pull-request/2056)
+        * [Pull request #2059](https://bitbucket.org/osrf/gazebo/pull-request/2059)
+        * [Pull request #2087](https://bitbucket.org/osrf/gazebo/pull-request/2087)
+
+    1. Support joint creation between links in nested model.
+        * [Pull request #2080](https://bitbucket.org/osrf/gazebo/pull-request/2080)
 
 1. Building editor updates
 
-    1. PIMPLize LevelWidget class
+    1. Use opaque pointers in the building editor
         * [Pull request #2041](https://bitbucket.org/osrf/gazebo/pull-request/2041)
-
-    1. PIMPLize ImportImageDialog and ImportImageView classes
         * [Pull request #2039](https://bitbucket.org/osrf/gazebo/pull-request/2039)
+        * [Pull request #2055](https://bitbucket.org/osrf/gazebo/pull-request/2055)
+        * [Pull request #2032](https://bitbucket.org/osrf/gazebo/pull-request/2032)
+        * [Pull request #2082](https://bitbucket.org/osrf/gazebo/pull-request/2082)
+        * [Pull request #2038](https://bitbucket.org/osrf/gazebo/pull-request/2038)
+        * [Pull request #2033](https://bitbucket.org/osrf/gazebo/pull-request/2033)
+
+    1. Use opaque pointers for GrabberHandle, add *LinkedGrabbers functions
+        * [Pull request #2034](https://bitbucket.org/osrf/gazebo/pull-request/2034)
 
     1. Removed unused class: BuildingItem
         * [Pull request #2045](https://bitbucket.org/osrf/gazebo/pull-request/2045)
 
-    1. PIMPL BuildingEditorWidget
-        * [Pull request #2055](https://bitbucket.org/osrf/gazebo/pull-request/2055)
-
-    1. PIMPLize gui/building/BuildingModelManip, move attachment logic to BuildingMaker
+    1. Use opaque pointers for BuildingModelManip, move attachment logic to BuildingMaker
         * [Pull request #2046](https://bitbucket.org/osrf/gazebo/pull-request/2046)
 
-    1. PIMPLize GridLines class
-        * [Pull request #2032](https://bitbucket.org/osrf/gazebo/pull-request/2032)
+    1. Use opaque pointers for all Dialog classes, add conversion from QPointF, move common logic to BaseInspectorDialog.
+        * [Pull request #2083](https://bitbucket.org/osrf/gazebo/pull-request/2083)
 
 ## Gazebo 6.0
 
 ### Gazebo 6.X.X (201X-XX-XX)
+
+1. Fix removing multiple camera sensors that have the same camera name.
+    * [Pull request #2081](https://bitbucket.org/osrf/gazebo/pull-request/2081)
+    * [Issue #1811](https://bitbucket.org/osrf/gazebo/issues/1811)
 
 1. Backport model editor toolbar fixed joint option from [pull request #1794](https://bitbucket.org/osrf/gazebo/pull-request/1794)
     * [Pull request #1957](https://bitbucket.org/osrf/gazebo/pull-request/1957)

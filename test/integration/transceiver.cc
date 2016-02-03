@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ class TransceiverTest : public ServerFixture,
   private: static const double Sensitivity;
   private: static const double MaxPos;
 
-  private: boost::mutex mutex;
+  private: std::mutex mutex;
   private: std::vector<int> num_msgs;
   private: std::vector<common::Time> elapsed_time;
   private: boost::shared_ptr<msgs::WirelessNodes const> nodesMsg;
@@ -64,7 +64,7 @@ TransceiverTest::TransceiverTest()
 /////////////////////////////////////////////////
 void TransceiverTest::RxMsg(const ConstWirelessNodesPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(mutex);
+  std::lock_guard<std::mutex> lock(mutex);
   // Just copy the message
   this->nodesMsg = _msg;
   this->receivedMsg = true;
@@ -98,7 +98,7 @@ void TransceiverTest::TxRxEmptySpace(const std::string &_physicsEngine)
         txPose.rot.GetAsEuler(), txEssid, txFreq, this->Power, this->Gain);
 
     sensors::WirelessTransmitterPtr tx =
-        boost::static_pointer_cast<sensors::WirelessTransmitter>(
+        std::static_pointer_cast<sensors::WirelessTransmitter>(
           sensors::SensorManager::Instance()->GetSensor(txSensorName));
 
     // Store the new transmitter sensor in the map
@@ -119,7 +119,7 @@ void TransceiverTest::TxRxEmptySpace(const std::string &_physicsEngine)
       this->Gain, this->Sensitivity);
 
   sensors::WirelessReceiverPtr rx =
-    boost::static_pointer_cast<sensors::WirelessReceiver>(
+    std::static_pointer_cast<sensors::WirelessReceiver>(
         sensors::SensorManager::Instance()->GetSensor(rxSensorName));
 
   ASSERT_TRUE(rx != NULL);
@@ -146,7 +146,7 @@ void TransceiverTest::TxRxEmptySpace(const std::string &_physicsEngine)
     rx->Update(true);
 
     common::Time::MSleep(100);
-    boost::mutex::scoped_lock lock(this->mutex);
+    std::lock_guard<std::mutex> lock(this->mutex);
 
     if (this->nodesMsg && this->receivedMsg)
     {
@@ -158,10 +158,10 @@ void TransceiverTest::TxRxEmptySpace(const std::string &_physicsEngine)
       {
         gazebo::msgs::WirelessNode txNode = nodesMsg->node(i);
         std::string essid = txNode.essid();
-        EXPECT_EQ(transmitters[essid]->GetESSID(), essid);
-        EXPECT_EQ(transmitters[essid]->GetFreq(), txNode.frequency());
+        EXPECT_EQ(transmitters[essid]->ESSID(), essid);
+        EXPECT_EQ(transmitters[essid]->Freq(), txNode.frequency());
         EXPECT_LE(txNode.signal_level(), 0);
-        EXPECT_GE(txNode.signal_level(), rx->GetSensitivity());
+        EXPECT_GE(txNode.signal_level(), rx->Sensitivity());
       }
       return;
     }
@@ -188,7 +188,7 @@ void TransceiverTest::TxRxFreqOutOfBounds(const std::string &_physicsEngine)
       txPose.rot.GetAsEuler(), txEssid, txFreq, this->Power, this->Gain);
 
   sensors::WirelessTransmitterPtr tx1 =
-      boost::static_pointer_cast<sensors::WirelessTransmitter>(
+      std::static_pointer_cast<sensors::WirelessTransmitter>(
         sensors::SensorManager::Instance()->GetSensor(tx1SensorName));
 
   ASSERT_TRUE(tx1 != NULL);
@@ -198,7 +198,7 @@ void TransceiverTest::TxRxFreqOutOfBounds(const std::string &_physicsEngine)
       txPose.rot.GetAsEuler(), txEssid, txFreq, this->Power, this->Gain);
 
   sensors::WirelessTransmitterPtr tx2 =
-      boost::static_pointer_cast<sensors::WirelessTransmitter>(
+      std::static_pointer_cast<sensors::WirelessTransmitter>(
         sensors::SensorManager::Instance()->GetSensor(tx2SensorName));
 
   ASSERT_TRUE(tx2 != NULL);
@@ -215,7 +215,7 @@ void TransceiverTest::TxRxFreqOutOfBounds(const std::string &_physicsEngine)
       this->Gain, this->Sensitivity);
 
   sensors::WirelessReceiverPtr rx =
-    boost::static_pointer_cast<sensors::WirelessReceiver>(
+    std::static_pointer_cast<sensors::WirelessReceiver>(
         sensors::SensorManager::Instance()->GetSensor(rxSensorName));
 
   ASSERT_TRUE(rx != NULL);
@@ -238,7 +238,7 @@ void TransceiverTest::TxRxFreqOutOfBounds(const std::string &_physicsEngine)
     rx->Update(true);
 
     common::Time::MSleep(100);
-    boost::mutex::scoped_lock lock(this->mutex);
+    std::lock_guard<std::mutex> lock(this->mutex);
   }
 
   EXPECT_FALSE(this->receivedMsg);
@@ -264,7 +264,7 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
       txPose.rot.GetAsEuler(), "osrf", 2450.0, this->Power, this->Gain);
 
   sensors::WirelessTransmitterPtr tx =
-      boost::static_pointer_cast<sensors::WirelessTransmitter>(
+      std::static_pointer_cast<sensors::WirelessTransmitter>(
         sensors::SensorManager::Instance()->GetSensor(txSensorName));
 
   ASSERT_TRUE(tx != NULL);
@@ -281,7 +281,7 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
       this->Gain, this->Sensitivity);
 
   sensors::WirelessReceiverPtr rx1 =
-      boost::static_pointer_cast<sensors::WirelessReceiver>(
+      std::static_pointer_cast<sensors::WirelessReceiver>(
         sensors::SensorManager::Instance()->GetSensor(rx1SensorName));
 
   ASSERT_TRUE(rx1 != NULL);
@@ -297,7 +297,7 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
       this->Gain, this->Sensitivity);
 
   sensors::WirelessReceiverPtr rx2 =
-      boost::static_pointer_cast<sensors::WirelessReceiver>(
+      std::static_pointer_cast<sensors::WirelessReceiver>(
         sensors::SensorManager::Instance()->GetSensor(rx2SensorName));
 
   ASSERT_TRUE(rx2 != NULL);
@@ -325,7 +325,7 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
     rx1->Update(true);
 
     common::Time::MSleep(100);
-    boost::mutex::scoped_lock lock(this->mutex);
+    std::lock_guard<std::mutex> lock(this->mutex);
 
     if (this->nodesMsg && this->receivedMsg)
     {
@@ -361,7 +361,7 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
     rx2->Update(true);
 
     common::Time::MSleep(100);
-    boost::mutex::scoped_lock lock(this->mutex);
+    std::lock_guard<std::mutex> lock(this->mutex);
 
     if (this->nodesMsg && this->receivedMsg)
     {

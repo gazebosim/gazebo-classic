@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -171,7 +171,7 @@ void PhysicsLinkTest::AddForce(const std::string &_physicsEngine)
   EXPECT_GT(dt, 0);
 
   // disable gravity
-  physics->SetGravity(math::Vector3::Zero);
+  world->SetGravity(ignition::math::Vector3d::Zero);
 
   // Spawn a box
   math::Vector3 size(1, 1, 1);
@@ -256,7 +256,7 @@ void PhysicsLinkTest::GetWorldAngularMomentum(const std::string &_physicsEngine)
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // disable gravity
-  physics->SetGravity(math::Vector3::Zero);
+  world->SetGravity(ignition::math::Vector3d::Zero);
 
   physics::ModelPtr model;
   {
@@ -382,7 +382,7 @@ void PhysicsLinkTest::GetWorldInertia(const std::string &_physicsEngine)
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // disable gravity
-  physics->SetGravity(math::Vector3::Zero);
+  world->SetGravity(ignition::math::Vector3d::Zero);
 
   // Box size
   const double dx = 1.0;
@@ -549,7 +549,7 @@ void PhysicsLinkTest::OnWrenchMsg(const std::string &_physicsEngine)
   EXPECT_GT(dt, 0);
 
   // disable gravity
-  physics->SetGravity(math::Vector3::Zero);
+  world->SetGravity(ignition::math::Vector3d::Zero);
 
   // Spawn a box
   math::Vector3 size(1, 1, 1);
@@ -666,7 +666,7 @@ void PhysicsLinkTest::SetVelocity(const std::string &_physicsEngine)
   EXPECT_GT(dt, 0);
 
   // disable gravity
-  physics->SetGravity(math::Vector3::Zero);
+  world->SetGravity(ignition::math::Vector3d::Zero);
 
   // Spawn a box
   math::Vector3 size(1, 1, 1);
