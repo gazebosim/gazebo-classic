@@ -41,6 +41,9 @@ namespace gazebo
     {
       Q_OBJECT
 
+      /// \brief Empty variable id used to indicate non-existent variable.
+      public: const static unsigned int EMPTY_VARIABLE = IGN_UINT32_MAX;
+
       /// \brief Constructor
       /// \param[in] _parent Pointer to a parent widget
       public: VariablePill(QWidget *_parent = NULL);
@@ -143,9 +146,6 @@ namespace gazebo
       /// as a child of this variable pill
       /// \param[in] Unique id of the existing variable pill that is added.
       Q_SIGNALS: void VariableMoved(const unsigned int _id);
-
-      /// \brief Destructor
-      public: const static unsigned int EMPTY_ID = IGN_UINT32_MAX;
 
       /// \internal
       /// \brief Private data pointer

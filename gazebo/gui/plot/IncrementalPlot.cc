@@ -543,3 +543,18 @@ void IncrementalPlot::RemoveCurve(unsigned int _id)
 
   this->dataPtr->curves.erase(it);
 }
+
+/////////////////////////////////////////////////
+void IncrementalPlot::SetCurveLabel(const unsigned int _id,
+    const std::string &_label)
+{
+  if (_label.empty())
+    return;
+
+  PlotCurve *plotCurve = this->FindCurve(_id);
+
+  if (!plotCurve)
+    return;
+
+  this->setTitle(QString::fromStdString(_label));
+}

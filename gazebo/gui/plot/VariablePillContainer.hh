@@ -62,6 +62,10 @@ namespace gazebo
       /// \return Maximum number of variable pills. -1 means unlimited.
       public: int MaxSize() const;
 
+      /// \brief Add a new variable pill to the container.
+      /// \param[in] _name Name of variable pill to add.
+      public: unsigned int AddVariablePill(const std::string &_name);
+
       /// \brief Add a variable pill to the container.
       /// \param[in] _variable Variable pill to add.
       public: void AddVariablePill(VariablePill *_variable);
@@ -70,9 +74,17 @@ namespace gazebo
       /// \param[in] _variable Variable pill to remove.
       public: void RemoveVariablePill(VariablePill *_variable);
 
+      /// \brief Remove a variable pill from the container.
+      /// \param[in] _id Unique id of the variable pill to remove.
+      public: void RemoveVariablePill(const unsigned int _id);
+
       /// \brief Get the number of child variable pills
       /// \return Number of child variable pills.
       public: unsigned int VariablePillCount() const;
+
+      /// \brief Get a variable pill by id
+      /// \return Variable pill with the specified id.
+      public: VariablePill *GetVariablePill(const unsigned int _id) const;
 
       /// \brief Set the selected state of a variable pill
       /// \param[in] _variable Variable pill to set the selected state.
@@ -96,12 +108,12 @@ namespace gazebo
 
       /// \brief Qt signal emitted when a variable is added to the container
       /// \param[in] _id Unique id of the variable pill.
+      /// \param[in] Name of variable pill added.
       /// \param[in] _targetId Unique id of the target variable pill that this
       /// variable is added to. VariablePill::EMPTY_ID if it is added to a
       /// container and not a variable pill.
-      /// \param[in] Name of variable pill added.
       Q_SIGNALS: void VariableAdded(const unsigned int _id,
-          const unsigned int _targetId, const std::string &_name);
+          const std::string &_name, const unsigned int _targetId);
 
       /// \brief Qt signal emitted when a variable is removed from the container
       /// \param[in] _id Unique id of the variable pill.

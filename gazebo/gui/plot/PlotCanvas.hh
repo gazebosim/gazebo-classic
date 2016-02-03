@@ -19,6 +19,8 @@
 
 #include <memory>
 
+#include <ignition/math/Vector2.hh>
+
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
 
@@ -34,6 +36,9 @@ namespace gazebo
     {
       Q_OBJECT
 
+      /// \brief Empty plot used to indicate non-existent plot.
+      public: const static unsigned int EMPTY_PLOT = IGN_UINT32_MAX;
+
       /// \brief Constructor.
       /// \param[in] _parent Pointer to the parent widget.
       public: PlotCanvas(QWidget *_parent);
@@ -41,20 +46,70 @@ namespace gazebo
       /// \brief Destructor.
       public: virtual ~PlotCanvas();
 
+      /// \brief Reset all the plots in this canvas
+      public: void RestartPlots();
+
       /// \brief Used to filter scroll wheel events.
       /// \param[in] _o Object that receives the event.
       /// \param[in] _event Pointer to the event.
       public: virtual bool eventFilter(QObject *_o, QEvent *_e);
+
+      /// \brief Add a new variable to a new plot.
+      /// \param[in] _variable Name of the variable.
+      /// \return Unique id of the variable
+      public: unsigned int AddVariable(const std::string &_variable);
+
+      /// \brief Remove a variable from a plot. This will search through all
+      /// plots for the variable and remove it from the plot if found.
+      /// \param[in] _id Unique id of the variable
+      public: void RemoveVariable(const unsigned int _id);
+
+      /// \brief Remove a variable from a plot.
+      /// \param[in] _id Unique id of the variable
+      /// \param[in] _plotId Unique if of plot to remove the variable from.
+      public: void RemoveVariable(const unsigned int _id,
+          const unsigned int _plotId);
+
+      /// \brief Remove a plot from the canvas.
+      /// \param[in] _id Unique id of the plot
+      public: void RemovePlot(const unsigned int _plotId);
+
+      /// \brief Get the plot id which the variable is plotted in
+      /// \param[in] _id Unique id of the variable
+      /// \return _id Unique id of the plot
+      public: unsigned int VariablePlot(const unsigned int _variableId) const;
+
+      /// \brief Clear the canvas and remove all variables and plots.
+      public: void Clear();
+
+      /// \brief Add a variable to an existing plot. Note this function
+      /// only updates the plot but not the variable pill container.
+      /// \param[in] _id Unique id of the variable
+      /// \param[in] _variable Name of the variable
+      /// \param[in] _plot Unique id of the plot to add the variable to.
+      private: void AddVariable(const unsigned int _id,
+          const std::string &_variable, const unsigned int _plotId);
+
+      /// \brief Add a new variable to a new plot. Note this function
+      /// only updates the plot but not the variable pill container.
+      /// \param[in] _id Unique id of the variable
+      /// \param[in] _variable Name of the variable
+      private: void AddVariable(const unsigned int _id,
+          const std::string &_variable);
+
+      /// \brief Qt signal to request self-deletion.
+      Q_SIGNALS: void CanvasDeleted();
 
       /// \brief Update plots.
       private slots: void Update();
 
       /// \brief Qt Callback when a new variable has been added.
       /// \param[_id] _id Unique id of the variable
+      /// \param[_id] _variable Name of the variable
       /// \param[_id] _targetId Unique id of the target variable that the
       /// the variable is now co-located with.
       private slots: void OnAddVariable(const unsigned int _id,
-          const unsigned int _targetId, const std::string &_variable);
+          const std::string &_variable, const unsigned int _targetId);
 
       /// \brief Qt Callback when a variable has been removed.
       /// \param[_id] _id Unique id of the variable
@@ -69,6 +124,12 @@ namespace gazebo
       /// the moved variable is now co-located with.
       private slots: void OnMoveVariable(const unsigned int _id,
           const unsigned int _targetId);
+
+      /// \brief Qt Callback to clear all variable and plots on canvas.
+      private slots: void OnClearCanvas();
+
+      /// \brief Qt Callback to delete entire canvas.
+      private slots: void OnDeleteCanvas();
 
       /// \internal
       /// \brief Pointer to private data.

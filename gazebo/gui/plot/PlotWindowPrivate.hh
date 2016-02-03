@@ -38,12 +38,6 @@ namespace gazebo
       /// \def PointMap
       public: using PointMap = std::map<QString, std::list<QPointF> >;
 
-      /// \brief Node for communications.
-      public: transport::NodePtr node;
-
-      /// \brief Subscribes to diagnostic info.
-      public: transport::SubscriberPtr sub;
-
       /// \brief The list of diagnostic labels.
       public: QListWidget *labelList;
 

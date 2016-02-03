@@ -127,6 +127,12 @@ namespace gazebo
       /// \param[in] _id Unique id of the plot curve to detach.
       public: PlotCurve *DetachCurve(const unsigned int _id);
 
+      /// \brief Set a new label for the given curve.
+      /// \param[in] _id Unique id of the plot curve
+      /// \param[in] _label New label to set the plot curve to.
+      public: void SetCurveLabel(const unsigned int _id,
+        const std::string &_label);
+
       /// \brief Give QT a size hint.
       /// \return Default size of the plot.
       public: virtual QSize sizeHint() const;

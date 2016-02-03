@@ -155,9 +155,6 @@ PlotWindow::PlotWindow(QWidget *_parent)
 
   this->setLayout(mainLayout);
   this->setSizeGripEnabled(true);
-
-  this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init();
 }
 
 /////////////////////////////////////////////////
@@ -185,6 +182,8 @@ void PlotWindow::OnPause()
 PlotCanvas *PlotWindow::AddCanvas()
 {
   PlotCanvas *canvas = new PlotCanvas(this);
+  connect(canvas, SIGNAL(CanvasDeleted()), this, SLOT(OnRemoveCanvas()));
+
   this->dataPtr->canvasLayout->addWidget(canvas);
   return canvas;
 }
@@ -196,9 +195,9 @@ void PlotWindow::RemoveCanvas(PlotCanvas *canvas)
   if (idx < 0)
     return;
 
-  canvas->hide();
+  // canvas->hide();
   this->dataPtr->canvasLayout->takeAt(idx);
-  delete canvas;
+  canvas->deleteLater();
 }
 
 /////////////////////////////////////////////////
@@ -210,11 +209,13 @@ void PlotWindow::OnAddCanvas()
 /////////////////////////////////////////////////
 void PlotWindow::OnRemoveCanvas()
 {
-  PlotCanvas *canvas =
-    qobject_cast<PlotCanvas *>(QObject::sender());
-
+  PlotCanvas *canvas = qobject_cast<PlotCanvas *>(QObject::sender());
   if (!canvas)
     return;
 
   this->RemoveCanvas(canvas);
+
+  // add an empty canvas if the plot window is now empty
+  if (this->dataPtr->canvasLayout->isEmpty())
+    this->AddCanvas();
 }

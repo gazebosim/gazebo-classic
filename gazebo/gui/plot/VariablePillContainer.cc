@@ -86,6 +86,24 @@ void VariablePillContainer::SetText(const std::string &_text)
 }
 
 /////////////////////////////////////////////////
+unsigned int VariablePillContainer::AddVariablePill(const std::string &_name)
+{
+  VariablePill *variable = new VariablePill;
+  variable->SetText(_name);
+
+  connect(variable, SIGNAL(VariableMoved(unsigned int)),
+      this, SLOT(OnMoveVariable(unsigned int)));
+  connect(variable, SIGNAL(VariableAdded(unsigned int, std::string)),
+      this, SLOT(OnAddVariable(unsigned int, std::string)));
+  connect(variable, SIGNAL(VariableRemoved(unsigned int)),
+      this, SLOT(OnRemoveVariable(unsigned int)));
+
+  this->AddVariablePill(variable);
+
+  return variable->Id();
+}
+
+/////////////////////////////////////////////////
 void VariablePillContainer::AddVariablePill(VariablePill *_variable)
 {
   if (!_variable)
@@ -103,8 +121,8 @@ void VariablePillContainer::AddVariablePill(VariablePill *_variable)
   std::cerr << " emit variable added into container event " <<
       _variable->Text() << " " << _variable->Id() <<  std::endl;
 
-  emit VariableAdded(_variable->Id(), VariablePill::EMPTY_ID,
-      _variable->Text());
+  emit VariableAdded(_variable->Id(), _variable->Text(),
+      VariablePill::EMPTY_VARIABLE);
 }
 
 /////////////////////////////////////////////////
@@ -120,29 +138,55 @@ int VariablePillContainer::MaxSize() const
 }
 
 /////////////////////////////////////////////////
+void VariablePillContainer::RemoveVariablePill(const unsigned int _id)
+{
+  VariablePill *variable = NULL;
+  auto it = this->dataPtr->variables.find(_id);
+  if (it == this->dataPtr->variables.end())
+  {
+    // look into children of multi-variable pills
+    for (auto v : this->dataPtr->variables)
+    {
+      auto &childVariables = v.second->VariablePills();
+      auto childIt = childVariables.find(_id);
+      if (childIt != childVariables.end())
+        variable = childIt->second;
+    }
+  }
+  else
+    variable = it->second;
+
+  if (!variable)
+    return;
+
+  int idx = this->dataPtr->variableLayout->indexOf(variable);
+  if (idx == -1)
+  {
+    if (variable->Parent())
+      variable->Parent()->RemoveVariablePill(variable);
+    return;
+  }
+
+  variable->SetContainer(NULL);
+  variable->setVisible(false);
+  this->dataPtr->variableLayout->takeAt(idx);
+  this->dataPtr->variables.erase(variable->Id());
+
+  emit VariableRemoved(variable->Id(), VariablePill::EMPTY_VARIABLE);
+
+  std::cerr
+      << "VariablePillContainer emit variable removed from container event "
+      << variable->Text() << " " << variable->Id() << std::endl;
+}
+
+
+/////////////////////////////////////////////////
 void VariablePillContainer::RemoveVariablePill(VariablePill *_variable)
 {
   if (!_variable)
     return;
 
-  if (this->dataPtr->variables.find(_variable->Id()) ==
-      this->dataPtr->variables.end())
-    return;
-
-  int idx = this->dataPtr->variableLayout->indexOf(_variable);
-  if (idx == -1)
-    return;
-
-  _variable->SetContainer(NULL);
-  _variable->setVisible(false);
-  this->dataPtr->variableLayout->takeAt(idx);
-  this->dataPtr->variables.erase(_variable->Id());
-
-  emit VariableRemoved(_variable->Id(), VariablePill::EMPTY_ID);
-
-  std::cerr
-      << "VariablePillContainer emit variable removed from container event "
-      << _variable->Text() << " " << _variable->Id() << std::endl;
+  this->RemoveVariablePill(_variable->Id());
 }
 
 /////////////////////////////////////////////////
@@ -155,6 +199,24 @@ unsigned int VariablePillContainer::VariablePillCount() const
     count += v.second->VariablePillCount();
   }
   return count;
+}
+
+/////////////////////////////////////////////////
+VariablePill *VariablePillContainer::GetVariablePill(
+    const unsigned int _id) const
+{
+  for (const auto v : this->dataPtr->variables)
+  {
+    if (v.first == _id)
+      return v.second;
+
+    for (const auto child : v.second->VariablePills())
+    {
+      if (child.first == _id)
+        return child.second;
+    }
+  }
+  return NULL;
 }
 
 /////////////////////////////////////////////////
@@ -219,17 +281,7 @@ void VariablePillContainer::dropEvent(QDropEvent *_evt)
         << "' dropped into container ["
         << this->dataPtr->label->text().toStdString() << "]"<< std::endl;
 
-    VariablePill *variable = new VariablePill;
-    variable->SetText(dataStr.toStdString());
-
-    connect(variable, SIGNAL(VariableMoved(unsigned int)),
-        this, SLOT(OnMoveVariable(unsigned int)));
-    connect(variable, SIGNAL(VariableAdded(unsigned int, std::string)),
-        this, SLOT(OnAddVariable(unsigned int, std::string)));
-    connect(variable, SIGNAL(VariableRemoved(unsigned int)),
-        this, SLOT(OnRemoveVariable(unsigned int)));
-
-    this->AddVariablePill(variable);
+    this->AddVariablePill(dataStr.toStdString());
   }
   else if (_evt->mimeData()->hasFormat("application/x-pill-item"))
   {
@@ -266,7 +318,7 @@ void VariablePillContainer::dropEvent(QDropEvent *_evt)
     this->AddVariablePill(variable);
     this->blockSignals(false);
 
-    emit VariableMoved(variable->Id(), VariablePill::EMPTY_ID);
+    emit VariableMoved(variable->Id(), VariablePill::EMPTY_VARIABLE);
     std::cerr << "VariablePillContainer emit variable moved event " <<
         variable->Text() << " " << variable->Id() << std::endl;
   }
@@ -363,7 +415,7 @@ void VariablePillContainer::OnAddVariable(const unsigned int _id,
   if (!variable)
     return;
 
-  emit VariableAdded(_id, variable->Id(), _label);
+  emit VariableAdded(_id, _label, variable->Id());
 }
 
 /////////////////////////////////////////////////
