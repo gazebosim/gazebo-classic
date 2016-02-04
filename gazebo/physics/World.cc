@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1020,6 +1020,7 @@ LightPtr World::LoadLight(const sdf::ElementPtr &_sdf, const BasePtr &_parent)
 
   // Create new light object
   LightPtr light(new physics::Light(_parent));
+  light->SetStatic(true);
   light->ProcessMsg(*msg);
   light->SetWorld(shared_from_this());
   light->Load(_sdf);

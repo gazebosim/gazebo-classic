@@ -109,6 +109,7 @@ set (headers
   GuiIface.hh
   GuiEvents.hh
   GuiPlugin.hh
+  GuiTypes.hh
   KeyEventHandler.hh
   LightMaker.hh
   ModelAlign.hh

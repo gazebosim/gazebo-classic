@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 #include <boost/filesystem.hpp>
 
 #include "gazebo/common/Console.hh"
+#include "gazebo/gazebo_config.h"
 
 ///////////////////////////////////////////////////////////////////
 // Create a temporary build folder
@@ -112,7 +113,7 @@ TEST_P(ExamplesBuild_Standalone, Standalone)
 }
 
 ///////////////////////////////////////////////////////////////////
-INSTANTIATE_TEST_CASE_P(Standalone, ExamplesBuild_Standalone, ::testing::Values(
+auto standaloneValues = ::testing::Values(
   "actuator"
   , "animated_box"
   , "arrange"
@@ -121,9 +122,12 @@ INSTANTIATE_TEST_CASE_P(Standalone, ExamplesBuild_Standalone, ::testing::Values(
   , "custom_main_pkgconfig"
   , "listener"
   , "publisher"
+#ifndef BUILD_TYPE_COVERAGE
   , "test_fixture"
+#endif
   , "transporter"
-));
+);
+INSTANTIATE_TEST_CASE_P(Standalone, ExamplesBuild_Standalone, standaloneValues);
 
 int main(int argc, char **argv)
 {

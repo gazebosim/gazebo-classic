@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,6 @@ TEST_F(RandTest, Rand)
   EXPECT_LE(d, 2);
   EXPECT_GE(d, 1);
 
-  d = math::Rand::GetDblNormal(2, 3);
   i = math::Rand::GetIntUniform(1, 2);
   EXPECT_LE(i, 2);
   EXPECT_GE(i, 1);
@@ -47,10 +46,29 @@ TEST_F(RandTest, Rand)
 
   // Test setting the random number seed
   {
+    // Set the seed and get two numbers
+    math::Rand::SetSeed(1001);
+    d = math::Rand::GetDblNormal(2, 3);
+    i = math::Rand::GetIntNormal(2, 3);
+
+    // Get two more numbers
+    double d1 = math::Rand::GetDblNormal(2, 3);
+    int i1 = math::Rand::GetIntNormal(2, 3);
+
+    // and make sure they're different
+    EXPECT_GT(std::abs(d - d1), 0);
+    EXPECT_NE(i, i1);
+
+    // Reset the seed to the original value
     math::Rand::SetSeed(1001);
 
-    d = math::Rand::GetDblNormal(2, 3);
-    EXPECT_TRUE(math::equal(d, 0.985827));
+    // Get two numbers again
+    double d2 = math::Rand::GetDblNormal(2, 3);
+    int i2 = math::Rand::GetIntNormal(2, 3);
+
+    // and make sure they match the first numbers
+    EXPECT_DOUBLE_EQ(d, d2);
+    EXPECT_EQ(i, i2);
   }
 }
 

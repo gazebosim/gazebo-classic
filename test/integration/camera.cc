@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ TEST_F(CameraTest, Follow)
   sensors::CameraSensorPtr camSensor =
     std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
   EXPECT_TRUE(camSensor != NULL);
-  rendering::CameraPtr camera = camSensor->GetCamera();
+  rendering::CameraPtr camera = camSensor->Camera();
   ASSERT_TRUE(camera != NULL);
 
   // Make sure the sensor is at the correct initial pose
@@ -105,7 +105,7 @@ TEST_F(CameraTest, Visible)
   sensors::CameraSensorPtr camSensor =
     std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
   EXPECT_TRUE(camSensor != NULL);
-  rendering::CameraPtr camera = camSensor->GetCamera();
+  rendering::CameraPtr camera = camSensor->Camera();
   ASSERT_TRUE(camera != NULL);
 
   // this makes sure a world step will trigger the camera render update
