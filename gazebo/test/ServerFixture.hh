@@ -341,8 +341,10 @@ namespace gazebo
                    const std::string &_cameraName,
                    const ignition::math::Vector3d &_pos,
                    const ignition::math::Vector3d &_rpy,
-                   unsigned int _width = 320, unsigned int _height = 240,
-                   double _rate = 25, double _near = 0.1, double _far = 10);
+                   const unsigned int _width = 320,
+                   const unsigned int _height = 240,
+                   const double _rate = 25, const double _near = 0.1,
+                   const double _far = 10);
 
     /// \brief Spawn an imu sensor laser.
     /// \param[in] _modelName Name of the model.

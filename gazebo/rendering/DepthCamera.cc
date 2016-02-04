@@ -271,7 +271,7 @@ void DepthCamera::UpdateRenderTarget(Ogre::RenderTarget *_target,
 
   vp = _target->getViewport(0);
 
-  // return 0 in case no renderable object is inside frustrum
+  // return farClip in case no renderable object is inside frustrum
   vp->setBackgroundColour(Ogre::ColourValue(this->FarClip(),
       this->FarClip(), this->FarClip()));
 

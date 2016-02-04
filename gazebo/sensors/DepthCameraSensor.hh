@@ -72,6 +72,7 @@ namespace gazebo
       // Documentation inherited
       protected: virtual bool UpdateImpl(const bool _force);
 
+      /// \internal
       /// \brief Private data pointer
       private: std::unique_ptr<DepthCameraSensorPrivate> dataPtr;
     };
