@@ -62,11 +62,11 @@ void MultirayShapeTest::Standalone(const std::string &_physicsEngine)
 
   rays->Ray(0)->GetIntersection(dist, entity);
   EXPECT_NEAR(dist, 0.5, 1e-4);
-  EXPECT_EQ(entity, "box");
+  EXPECT_EQ(entity, "box::link::collision");
 
   rays->Ray(1)->GetIntersection(dist, entity);
   EXPECT_NEAR(dist, 0.5, 1e-4);
-  EXPECT_EQ(entity, "sphere");
+  EXPECT_EQ(entity, "sphere::link::collision");
 
   rays->Ray(2)->GetIntersection(dist, entity);
   EXPECT_NEAR(dist, 0.5, 1e-4);
