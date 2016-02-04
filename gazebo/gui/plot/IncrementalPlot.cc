@@ -37,11 +37,14 @@
 #include <qwt/qwt_legend_item.h>
 #include <qwt/qwt_plot_directpainter.h>
 #include <qwt/qwt_plot_magnifier.h>
+#include <qwt/qwt_plot_picker.h>
+#include <qwt/qwt_picker_machine.h>
 
 #include "gazebo/common/Assert.hh"
 
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/gui/plot/IncrementalPlot.hh"
+#include "gazebo/gui/plot/CurveTracker.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -128,6 +131,9 @@ IncrementalPlot::IncrementalPlot(QWidget *_parent)
   : QwtPlot(_parent),
     dataPtr(new IncrementalPlotPrivate)
 {
+  // necessary to get mousemove events without button press
+  //this->setMouseTracking(true);
+
   this->dataPtr->period = 10;
   this->dataPtr->directPainter = new QwtPlotDirectPainter(this);
 
@@ -169,6 +175,20 @@ IncrementalPlot::IncrementalPlot(QWidget *_parent)
   this->replot();
 
   this->setAcceptDrops(true);
+
+/*
+  QwtPlotPicker* plotPicker = new QwtPlotPicker(this->xBottom, this->yLeft, QwtPicker::CrossRubberBand, QwtPicker::AlwaysOn, this->canvas());
+  QwtPickerMachine* pickerMachine = new QwtPickerClickPointMachine();
+  plotPicker->setStateMachine(pickerMachine);
+  connect(plotPicker, SIGNAL(moved(const QPointF&)), this, SLOT(onMoved(const QPointF&)));
+*/
+    CurveTracker* tracker = new CurveTracker( this->canvas() );
+
+    // for the demo we want the tracker to be active without
+    // having to click on the canvas
+    tracker->setStateMachine( new QwtPickerTrackerMachine() );
+    tracker->setRubberBandPen( QPen( "MediumOrchid" ) );
+
 }
 
 /////////////////////////////////////////////////
@@ -557,4 +577,20 @@ void IncrementalPlot::SetCurveLabel(const unsigned int _id,
     return;
 
   this->setTitle(QString::fromStdString(_label));
+}
+
+/////////////////////////////////////////////////
+/*void IncrementalPlot::mouseMoveEvent(QMouseEvent * _event)
+{
+  std::cerr << "Move " << _event->x() << ", " << _event->y() << std::endl;
+//  QWidget::mouseMoveEvent(_event);
+  const auto &p = _event->globalPos();
+  QToolTip::showText(p, "haha");
+}*/
+
+
+/////////////////////////////////////////////////
+void IncrementalPlot::OnMoved(const QPointF &_pos)
+{
+  std::cerr << _pos.x() << " " << _pos.y() << std::endl;
 }

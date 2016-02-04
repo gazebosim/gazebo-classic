@@ -137,6 +137,12 @@ namespace gazebo
       /// \return Default size of the plot.
       public: virtual QSize sizeHint() const;
 
+      /// \brief  Qt mouse press event.
+      /// \param[in] _event QT mouse event
+//      protected: virtual void mouseMoveEvent(QMouseEvent * _event);
+
+      private slots: void OnMoved(const QPointF &_pos);
+
       /// \brief Used to accept drag enter events.
       /// \param[in] _evt The drag event.
       protected: void dragEnterEvent(QDragEnterEvent *_evt);

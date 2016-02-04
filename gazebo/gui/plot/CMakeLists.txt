@@ -7,6 +7,7 @@ set (sources_local
   plot/PlotWindow.cc
   plot/VariablePill.cc
   plot/VariablePillContainer.cc
+  plot/CurveTracker.cc
 )
 
 set (qt_headers_local
@@ -15,6 +16,7 @@ set (qt_headers_local
   plot/PlotWindow.hh
   plot/VariablePill.hh
   plot/VariablePillContainer.hh
+  plot/CurveTracker.hh
 )
 
 set (headers_install
