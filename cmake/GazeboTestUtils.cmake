@@ -113,7 +113,7 @@ if (VALID_DISPLAY)
 
     # QTest need and extra -o parameter to write logging information to a file
     add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME}
-	-xml -o ${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
+      -xml -o ${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
 
     set(_env_vars)
     list(APPEND _env_vars "CMAKE_PREFIX_PATH=${CMAKE_BINARY_DIR}:${CMAKE_PREFIX_PATH}")
