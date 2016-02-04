@@ -578,7 +578,9 @@ void ModelManipulator::PublishVisualScale(rendering::VisualPtr _vis)
 {
   if (!_vis || this->dataPtr->manipMode != "scale" ||
       _vis->GetType() != gazebo::rendering::Visual::VT_MODEL)
+  {
     return;
+  }
 
   // Register user command on server
   msgs::UserCmd userCmdMsg;
