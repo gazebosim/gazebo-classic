@@ -1006,6 +1006,7 @@ LightPtr World::LoadLight(const sdf::ElementPtr &_sdf, const BasePtr &_parent)
 
   // Create new light object
   LightPtr light(new physics::Light(_parent));
+  light->SetStatic(true);
   light->ProcessMsg(*msg);
   light->SetWorld(shared_from_this());
   light->Load(_sdf);

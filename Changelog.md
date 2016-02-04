@@ -276,6 +276,9 @@ using the same arguments used in the command line.
     1. Scale link mass and inertia when a link is scaled
         * [Pull request #1836](https://bitbucket.org/osrf/gazebo/pull-request/1836)
 
+    1. Add density widget to config widget and link inspector
+        * [Pull request #1978](https://bitbucket.org/osrf/gazebo/pull-request/1978)
+
     1. Added icons for child and parent link in joint inspector
         * [Pull request #1953](https://bitbucket.org/osrf/gazebo/pull-request/1953)
 
