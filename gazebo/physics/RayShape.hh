@@ -167,9 +167,9 @@ namespace gazebo
       /// \brief Name of the object this ray collided with
       private: std::string collisionName;
 
-      /// \brief MultiRayShape needs to call SetCollisionName when it is
+      /// \brief ODEMultiRayShape needs to call SetCollisionName when it is
       /// updated
-      protected: friend class MultiRayShape;
+      protected: friend class ODEMultiRayShape;
     };
     /// \}
   }

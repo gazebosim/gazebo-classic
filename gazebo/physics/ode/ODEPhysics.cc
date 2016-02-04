@@ -536,10 +536,7 @@ ShapePtr ODEPhysics::CreateShape(const std::string &_type,
     if (_collision)
       shape.reset(new ODEMultiRayShape(collision));
     else
-    {
       shape.reset(new ODEMultiRayShape(this->world->GetPhysicsEngine()));
-      shape->SetWorld(this->world);
-    }
   }
   else if (_type == "mesh" || _type == "trimesh")
     shape.reset(new ODEMeshShape(collision));

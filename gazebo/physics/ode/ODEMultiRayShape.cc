@@ -61,6 +61,8 @@ ODEMultiRayShape::ODEMultiRayShape(PhysicsEnginePtr _physicsEngine)
   // Set collision bits
   dGeomSetCategoryBits((dGeomID) this->raySpaceId, GZ_SENSOR_COLLIDE);
   dGeomSetCollideBits((dGeomID) this->raySpaceId, ~GZ_SENSOR_COLLIDE);
+
+  this->SetWorld(_physicsEngine->World());
 }
 
 //////////////////////////////////////////////////
