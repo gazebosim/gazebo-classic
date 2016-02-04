@@ -18,11 +18,10 @@
 #include <gtest/gtest.h>
 
 #include "gazebo/math/Helpers.hh"
-#include "test/util.hh"
 
 using namespace gazebo;
 
-class HelpersTest : public gazebo::testing::AutoLogFixture { };
+class HelpersTest : public ::testing::Test { };
 
 /////////////////////////////////////////////////
 // Test a few function in Helpers
