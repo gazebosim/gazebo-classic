@@ -20,6 +20,7 @@
 #include <boost/filesystem.hpp>
 
 #include "gazebo/common/Console.hh"
+#include "gazebo/gazebo_config.h"
 
 ///////////////////////////////////////////////////////////////////
 // Create a temporary build folder
@@ -112,7 +113,7 @@ TEST_P(ExamplesBuild_Standalone, Standalone)
 }
 
 ///////////////////////////////////////////////////////////////////
-INSTANTIATE_TEST_CASE_P(Standalone, ExamplesBuild_Standalone, ::testing::Values(
+auto standaloneValues = ::testing::Values(
   "actuator"
   , "animated_box"
   , "arrange"
@@ -121,9 +122,12 @@ INSTANTIATE_TEST_CASE_P(Standalone, ExamplesBuild_Standalone, ::testing::Values(
   , "custom_main_pkgconfig"
   , "listener"
   , "publisher"
+#ifndef BUILD_TYPE_COVERAGE
   , "test_fixture"
+#endif
   , "transporter"
-));
+);
+INSTANTIATE_TEST_CASE_P(Standalone, ExamplesBuild_Standalone, standaloneValues);
 
 int main(int argc, char **argv)
 {

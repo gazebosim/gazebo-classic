@@ -267,8 +267,7 @@ void ModelEditorPalette::InsertWidget(unsigned int _index, QWidget *_widget)
 
   // set equal size for now. There should always be at least one widget
   // (render3DFrame) in the splitter.
-  int childCount = this->splitter->count();
-  GZ_ASSERT(childCount > 0,
+  GZ_ASSERT(this->splitter->count() > 0,
       "ModelEditorPalette splitter has no child widget");
 
   this->splitter->insertWidget(_index, _widget);
