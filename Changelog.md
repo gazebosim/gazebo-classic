@@ -1,3 +1,10 @@
+## Gazebo 8
+
+## Gazebo 8.x.x (2017-xx-xx)
+
+1. Fix ODE Ray-Cylinder collision, and added ability to instantiate stand alone MultiRayShapes.
+    * [Pull request #2122](https://bitbucket.org/osrf/gazebo/pull-request/2122)
+
 ## Gazebo 7
 
 ## Gazebo 7.x.x (2016-xx-xx)
