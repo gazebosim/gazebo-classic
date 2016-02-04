@@ -44,6 +44,10 @@ namespace gazebo
     class GZ_UTIL_VISIBLE IntrospectionManager
       : public SingletonT<IntrospectionManager>
     {
+      /// \brief Get the unique ID of this manager.
+      /// \return Manager ID.
+      public: std::string Id() const;
+
       /// \brief Register a new item in the introspection manager.
       /// \param[in] _item New item. E.g.:/default/world/model1/pose
       /// \param[in] _type Item type. E.g.: gazebo::msgs::pose
@@ -53,7 +57,7 @@ namespace gazebo
       public: bool Register(const std::string &_item,
                             const std::string &_type,
                             const std::function <bool(
-                            gazebo::msgs::Any &_msg)> &_cb);
+                                gazebo::msgs::Any &_msg)> &_cb);
 
       /// \brief Unregister an existing item from the introspection manager.
       /// \param[in] _item Item to remove.
@@ -61,31 +65,7 @@ namespace gazebo
       /// (the item was not previously registered).
       public: bool Unregister(const std::string &_item);
 
-      /// \brief Create a new filter for observing item updates. This function
-      /// will create a new topic for sending periodic updates of the items
-      /// specified in the filter.
-      /// \param[in] _items Non-empty set of items to observe.
-      /// \param[out] _filterId Unique ID of the filter. You'll need this ID
-      /// for future filter updates or for removing it. After the filter
-      /// creation, a client should subscribe to the topic
-      /// /introspection/filters/<filter_id> for receiving updates.
-      /// \return True if the filter was successfully created or false otherwise
-      public: bool NewFilter(const std::set<std::string> &_items,
-                             std::string &_filterId);
-
-      /// \brief Update an existing filter with a different set of items.
-      /// \param[in] _filterId ID of the filter to update.
-      /// \param[in] _New Non-empty set of items to be observed.
-      /// \return True if the filter was successfuly updated or false otherwise.
-      public: bool UpdateFilter(const std::string &_filterId,
-                                const std::set<std::string> &_newItems);
-
-      /// \brief Remove an existing filter.
-      /// \param[in] _filterId ID of the filter to remove.
-      /// \return True if the filter was successfully removed or false otherwise
-      public: bool RemoveFilter(const std::string &_filterId);
-
-      /// \brief Get a copy of the items already registered.
+      /// \brief Get a copy of the items already registered in this manager.
       /// \return Set of registered items.
       public: std::set<std::string> Items() const;
 
@@ -100,6 +80,30 @@ namespace gazebo
 
       /// \brief Destructor.
       private: virtual ~IntrospectionManager();
+
+      /// \brief Create a new filter for observing item updates. This function
+      /// will create a new topic for sending periodic updates of the items
+      /// specified in the filter.
+      /// \param[in] _newItems Non-empty set of items to observe.
+      /// \param[out] _filterId Unique ID of the filter. You'll need this ID
+      /// for future filter updates or for removing it. After the filter
+      /// creation, a client should subscribe to the topic
+      /// /introspection/filter/<filter_id> for receiving updates.
+      /// \return True if the filter was successfully created or false otherwise
+      private: bool NewFilter(const std::set<std::string> &_newItems,
+                              std::string &_filterId);
+
+      /// \brief Update an existing filter with a different set of items.
+      /// \param[in] _filterId ID of the filter to update.
+      /// \param[in] _NewItems Non-empty set of items to be observed.
+      /// \return True if the filter was successfuly updated or false otherwise.
+      private: bool UpdateFilter(const std::string &_filterId,
+                                 const std::set<std::string> &_newItems);
+
+      /// \brief Remove an existing filter.
+      /// \param[in] _filterId ID of the filter to remove.
+      /// \return True if the filter was successfully removed or false otherwise
+      private: bool RemoveFilter(const std::string &_filterId);
 
       /// \brief Internal callback for creating a filter via service request.
       /// \param[in] _req Input parameter of the service request. The service

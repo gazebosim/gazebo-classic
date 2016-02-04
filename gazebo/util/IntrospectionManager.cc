@@ -87,6 +87,12 @@ IntrospectionManager::~IntrospectionManager()
 }
 
 //////////////////////////////////////////////////
+std::string IntrospectionManager::Id() const
+{
+  return this->dataPtr->managerId;
+}
+
+//////////////////////////////////////////////////
 bool IntrospectionManager::Register(const std::string &_item,
     const std::string &_type,
     const std::function <bool (gazebo::msgs::Any &_msg)> &_cb)
@@ -124,7 +130,82 @@ bool IntrospectionManager::Unregister(const std::string &_item)
 }
 
 //////////////////////////////////////////////////
-bool IntrospectionManager::NewFilter(const std::set<std::string> &_items,
+std::set<std::string> IntrospectionManager::Items() const
+{
+  std::set<std::string> items;
+
+  {
+    std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+
+    for (auto item : this->dataPtr->allItems)
+      items.emplace(item.first);
+  }
+
+  return items;
+}
+
+//////////////////////////////////////////////////
+void IntrospectionManager::Update()
+{
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+
+  for (auto &observedItem : this->dataPtr->observedItems)
+  {
+    auto &item = observedItem.first;
+    auto &lastValue = observedItem.second.lastValue;
+
+    // Sanity check: Make sure that we can update the item.
+    if (this->dataPtr->allItems.find(item) == this->dataPtr->allItems.end())
+      continue;
+
+    // Update the values of the items under observation.
+    auto &callback = this->dataPtr->allItems[item].cb;
+    gazebo::msgs::Any value;
+    if (!callback(value))
+    {
+      gzerr << "Something went wrong updating the value for item [" << item
+            << "]." << std::endl;
+      continue;
+    }
+    lastValue.CopyFrom(value);
+  }
+
+  // Prepare the next message to be sent in each filter.
+  for (auto &filter : this->dataPtr->filters)
+  {
+    // First of all, clear the old message.
+    auto &nextMsg = filter.second.msg;
+    nextMsg.Clear();
+
+    // Insert the last value of each item under observation for this filter.
+    for (auto const &item : filter.second.items)
+    {
+      // Sanity check: Make sure that someone registered this item.
+      if (this->dataPtr->allItems.find(item) == this->dataPtr->allItems.end())
+        continue;
+
+      auto nextParam = nextMsg.add_param();
+      nextParam->set_name(item);
+      nextParam->mutable_value()->CopyFrom(
+          this->dataPtr->observedItems[item].lastValue);
+    }
+
+    // Sanity check: Make sure that we have at least one item updated.
+    if (nextMsg.param_size() == 0)
+      continue;
+
+    // Publish the update for this filter.
+    std::string topicName = "/introspection/filter/" + filter.first;
+    if (!this->dataPtr->node.Publish(topicName, nextMsg))
+    {
+      gzerr << "Error publishing update for topic [" << topicName << "]"
+            << std::endl;
+    }
+  }
+}
+
+//////////////////////////////////////////////////
+bool IntrospectionManager::NewFilter(const std::set<std::string> &_newItems,
     std::string &_filterId)
 {
   // Create a unique filter ID based on a combination of letters. We don't
@@ -144,10 +225,10 @@ bool IntrospectionManager::NewFilter(const std::set<std::string> &_items,
   }
 
   // Add the items to the new filter.
-  this->dataPtr->filters[_filterId].items = _items;
+  this->dataPtr->filters[_filterId].items = _newItems;
 
   // Register the new filter in the list of observed items.
-  for (auto const &item : _items)
+  for (auto const &item : _newItems)
     this->dataPtr->observedItems[item].filters.emplace(_filterId);
 
   return true;
@@ -250,84 +331,6 @@ bool IntrospectionManager::RemoveFilter(const std::string &_filterId)
   }
 
   return true;
-}
-
-//////////////////////////////////////////////////
-std::set<std::string> IntrospectionManager::Items() const
-{
-  std::set<std::string> items;
-
-  {
-    std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-
-    for (auto item : this->dataPtr->allItems)
-      items.emplace(item.first);
-  }
-
-  return items;
-}
-
-//////////////////////////////////////////////////
-void IntrospectionManager::Update()
-{
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-
-  for (auto &observedItem : this->dataPtr->observedItems)
-  {
-    auto &item = observedItem.first;
-    auto &lastValue = observedItem.second.lastValue;
-
-    // Sanity check: Make sure that we can update the item.
-    if (this->dataPtr->allItems.find(item) == this->dataPtr->allItems.end())
-      continue;
-
-    // Update the values of the items under observation.
-    auto &callback = this->dataPtr->allItems[item].cb;
-    gazebo::msgs::Any value;
-    if (!callback(value))
-    {
-      gzerr << "Something went wrong updating the value for item [" << item
-            << "]." << std::endl;
-      continue;
-    }
-    lastValue.CopyFrom(value);
-
-    // We should have at least one filter, otherwise this entry should have been
-    // previously recycled.
-    //GZ_ASSERT(!filters.empty(), "No filters on item [" + item + "]");
-  }
-
-  // Prepare the next message to be sent in each filter.
-  for (auto &filter : this->dataPtr->filters)
-  {
-    // First of all, clear the old message.
-    auto &nextMsg = filter.second.msg;
-    nextMsg.Clear();
-
-    // Insert the last value of each item under observation for this filter.
-    for (auto const &item : filter.second.items)
-    {
-      // Sanity check: Make sure that someone registered this item.
-      if (this->dataPtr->allItems.find(item) == this->dataPtr->allItems.end())
-        continue;
-
-      auto nextParam = nextMsg.add_param();
-      nextParam->set_name(item);
-      nextParam->mutable_value()->CopyFrom(this->dataPtr->observedItems[item].lastValue);
-    }
-
-    // Sanity check: Make sure that we have at least one item updated.
-    if (nextMsg.param_size() == 0)
-      continue;
-
-    // Publish the update for this filter.
-    std::string topicName = "/introspection/filter/" + filter.first;
-    if (!this->dataPtr->node.Publish(topicName, nextMsg))
-    {
-      gzerr << "Error publishing update for topic [" << topicName << "]"
-            << std::endl;
-    }
-  }
 }
 
 //////////////////////////////////////////////////
