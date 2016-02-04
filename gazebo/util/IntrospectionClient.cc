@@ -43,6 +43,9 @@ IntrospectionClient::IntrospectionClient()
 //////////////////////////////////////////////////
 IntrospectionClient::~IntrospectionClient()
 {
+  // Remove all the filters from the manager.
+  for (auto const &filter : this->dataPtr->filters)
+    this->RemoveFilter(filter.second, filter.first);
 }
 
 //////////////////////////////////////////////////
@@ -99,9 +102,15 @@ bool IntrospectionClient::NewFilter(const std::string &_managerId,
     return false;
   }
 
+  if (!result)
+    return false;
+
   _filterId = rep.data();
-  _newTopic = "/introspection/filter/" + _filterId;
-  return result;
+  _newTopic = "/introspection/" + _managerId + "/filter/" + _filterId;
+
+  // Save the new filter ID.
+  this->dataPtr->filters[_filterId] = _managerId;
+  return true;
 }
 
 //////////////////////////////////////////////////
@@ -162,7 +171,12 @@ bool IntrospectionClient::RemoveFilter(const std::string &_managerId,
     return false;
   }
 
-  return result;
+  if (!result)
+    return false;
+
+  // Remove this filter from our internal list.
+  this->dataPtr->filters.erase(_filterId);
+  return true;
 }
 
 //////////////////////////////////////////////////

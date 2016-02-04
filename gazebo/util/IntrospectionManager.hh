@@ -49,7 +49,7 @@ namespace gazebo
       public: std::string Id() const;
 
       /// \brief Register a new item in the introspection manager.
-      /// \param[in] _item New item. E.g.:/default/world/model1/pose
+      /// \param[in] _item New item. E.g.: /default/world/model1/pose
       /// \param[in] _type Item type. E.g.: gazebo::msgs::pose
       /// \param[in] _cb Callback used to get the last update for this item.
       /// \result True when the registration succeed or false otherwise

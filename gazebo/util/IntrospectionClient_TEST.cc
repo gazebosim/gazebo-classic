@@ -124,7 +124,7 @@ TEST_F(IntrospectionClientTest, Managers)
   // List of introspection managers. We should have at least one.
   std::set<std::string> managerIds;
   managerIds = this->client.Managers();
-  EXPECT_GT(managerIds.size(), 0);
+  EXPECT_GT(managerIds.size(), 0u);
   EXPECT_TRUE(managerIds.find(this->managerId) != managerIds.end());
 }
 
@@ -166,7 +166,7 @@ TEST_F(IntrospectionClientTest, NewAndRemoveFilter)
   // Trigger an update to verify that we don't receive any updates.
   this->manager->Update();
 
-  // Check that we received the update.
+  // Check that we didn't receive any updates, we shouldn't have filters.
   EXPECT_FALSE(this->callbackExecuted);
 }
 

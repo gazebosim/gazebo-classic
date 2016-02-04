@@ -17,6 +17,8 @@
 #ifndef _GAZEBO_UTIL_INTROSPECTION_CLIENT_PRIVATE_HH_
 #define _GAZEBO_UTIL_INTROSPECTION_CLIENT_PRIVATE_HH_
 
+#include <map>
+#include <string>
 #include <ignition/transport.hh>
 
 namespace gazebo
@@ -31,6 +33,11 @@ namespace gazebo
 
       /// \brief Timeout (ms) used for service requests.
       public: const unsigned int kTimeout = 500;
+
+      /// \brief Store all the active filters in this client.
+      /// The key is the filter ID.
+      /// The value is the manager ID where the filter is located.
+      public: std::map<std::string, std::string> filters;
     };
   }
 }
