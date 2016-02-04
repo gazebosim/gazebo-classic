@@ -128,13 +128,13 @@ if (VALID_DISPLAY)
     # Check that the test produced a result and create a failure if it didn't.
     # Guards against crashed and timed out tests.
     add_test(check_${BINARY_NAME} ${PROJECT_SOURCE_DIR}/tools/check_test_ran.py
-      ${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
+	${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
 
-    if(GAZEBO_RUN_VALGRIND_TESTS AND VALGRIND_PROGRAM)
+	if(GAZEBO_RUN_VALGRIND_TESTS AND VALGRIND_PROGRAM)
       add_test(memcheck_${BINARY_NAME} ${VALGRIND_PROGRAM} --leak-check=full
-        --error-exitcode=1 --show-leak-kinds=all ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME})
+               --error-exitcode=1 --show-leak-kinds=all ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME})
     endif()
-    endforeach()
+   endforeach()
   endmacro()
 endif()
 
