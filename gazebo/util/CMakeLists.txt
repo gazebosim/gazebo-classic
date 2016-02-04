@@ -11,6 +11,7 @@ include_directories(${TBB_INCLUDEDIR})
 include_directories(${tinyxml_INCLUDE_DIRS})
 set (sources
   Diagnostics.cc
+  IntrospectionClient.cc
   IntrospectionManager.cc
   LogPlay.cc
   LogRecord.cc
@@ -43,6 +44,7 @@ set (headers
 
 set (gtest_sources
   Diagnostics_TEST.cc
+  IntrospectionClient_TEST.cc
   IntrospectionManager_TEST.cc
   LogPlay_TEST.cc
   LogRecord_TEST.cc
