@@ -158,6 +158,7 @@ add_subdirectory(viewers)
 add_subdirectory(terrain)
 add_subdirectory(building)
 add_subdirectory(model)
+add_subdirectory(plot)
 
 if (HAVE_GRAPHVIZ)
   add_definitions(-DWITH_CGRAPH)
