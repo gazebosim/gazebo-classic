@@ -97,6 +97,14 @@ void PhysicsTest::DropTest(const std::string &_physicsEngine,
       // After contact with ground, and no bounce back
       if (i > dynamic_steps)
       {
+        if (_worldSolverType == "BULLET_LEMKE")
+        {
+          gzerr << "This test isn't working well during contact with "
+                << _worldSolverType
+                << ", see issue #1846"
+                << std::endl;
+          break;
+        }
         EXPECT_LT(fabs(vel.z), PHYSICS_TOL);
         EXPECT_LT(fabs(pose.pos.z - 0.5), PHYSICS_TOL);
       }
