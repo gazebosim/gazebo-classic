@@ -44,12 +44,22 @@ ODEMultiRayShape::ODEMultiRayShape(CollisionPtr _parent)
   // Set collision bits
   dGeomSetCategoryBits((dGeomID) this->raySpaceId, GZ_SENSOR_COLLIDE);
   dGeomSetCollideBits((dGeomID) this->raySpaceId, ~GZ_SENSOR_COLLIDE);
+
+  // These three lines may be unessecary
+  /*ODELinkPtr pLink =
+  boost::static_pointer_cast<ODELink>(this->collisionParent->GetLink());
+  pLink->SetSpaceId(this->raySpaceId);
+  boost::static_pointer_cast<ODECollision>(this->collisionParent)->SetSpaceId(
+      this->raySpaceId);
+      */
 }
 
 //////////////////////////////////////////////////
 ODEMultiRayShape::ODEMultiRayShape(PhysicsEnginePtr _physicsEngine)
 : MultiRayShape(_physicsEngine)
 {
+  this->defaultUpdate = false;
+
   this->SetName("ODE Multiray Shape");
 
   // Create a space to contain the ray space
@@ -171,23 +181,21 @@ void ODEMultiRayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
 
     int n = dCollide(_o1, _o2, 1, &contact, sizeof(contact));
 
-    if (n > 0)
+    RayShape *shape = NULL;
+    if (n > 0 && self->defaultUpdate)
     {
-      RayShape *shape = static_cast<RayShape*>(dGeomGetData(rayId));
+      if (self->defaultUpdate)
+      {
+        shape = boost::static_pointer_cast<RayShape>(
+            rayCollision->GetShape()).get();
+      }
+      else
+      {
+        shape = static_cast<RayShape*>(dGeomGetData(rayId));
+      }
 
       if (shape && hitCollision && contact.depth < shape->GetLength())
       {
-        // gzerr << "ODEMultiRayShape UpdateCallback dSpaceCollide2 "
-        //      << " depth[" << contact.depth << "]"
-        //      << " position[" << contact.pos[0]
-        //        << ", " << contact.pos[1]
-        //        << ", " << contact.pos[2]
-        //        << ", " << "]"
-        //      << " ray[" << rayCollision->GetScopedName() << "]"
-        //      << " pose[" << rayCollision->GetWorldPose() << "]"
-        //      << " hit[" << hitCollision->GetScopedName() << "]"
-        //      << " pose[" << hitCollision->GetWorldPose() << "]"
-        //      << "\n";
         shape->SetLength(contact.depth);
         shape->SetRetro(hitCollision->GetLaserRetro());
         shape->SetCollisionName(hitCollision->GetScopedName());

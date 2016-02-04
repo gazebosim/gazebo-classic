@@ -59,6 +59,10 @@ namespace gazebo
 
       /// \brief Ray space for collision detector.
       private: dSpaceID raySpaceId;
+
+      /// \brief Helper to get the correct ray shape in the UpdateCallback
+      /// function.
+      private: bool defaultUpdate = true;
     };
   }
 }

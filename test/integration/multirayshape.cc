@@ -55,7 +55,7 @@ void MultirayShapeTest::Standalone(const std::string &_physicsEngine)
 
   EXPECT_EQ(rays->RayCount(), 4);
 
-  rays->UpdateRays();
+  rays->Update();
 
   double dist;
   std::string entity;
@@ -70,7 +70,7 @@ void MultirayShapeTest::Standalone(const std::string &_physicsEngine)
 
   rays->Ray(2)->GetIntersection(dist, entity);
   EXPECT_NEAR(dist, 0.5, 1e-4);
-  EXPECT_EQ(entity, "cylinder");
+  EXPECT_EQ(entity, "cylinder::link::collision");
 
   rays->Ray(3)->GetIntersection(dist, entity);
   EXPECT_NEAR(dist, 1000, 1e-4);
@@ -83,9 +83,11 @@ TEST_P(MultirayShapeTest, Standalone)
   Standalone(GetParam());
 }
 
+/////////////////////////////////////////////////
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, MultirayShapeTest,
     ::testing::Values("ode"));
 
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
