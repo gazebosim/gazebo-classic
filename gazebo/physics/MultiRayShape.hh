@@ -44,7 +44,16 @@ namespace gazebo
       /// \param[in] _parent Parent collision shape.
       public: explicit MultiRayShape(CollisionPtr _parent);
 
-      /// \brief Constructor for a global multiray shape.
+      /// \brief Constructor for a stand alone multiray shape. Stand alone
+      /// means the multiray shape is not attached to a Collision object.
+      ///
+      /// Example:
+      ///
+      ///  gazebo::physics::MultiRayShapePtr rays =
+      ///      boost::dynamic_pointer_cast<gazebo::physics::MultiRayShape>(
+      ///        world->GetPhysicsEngine()->CreateShape("multiray",
+      ///          gazebo::physics::CollisionPtr()));
+      ///
       /// \param[in] _physicsEngine Pointer to the physics engine.
       public: explicit MultiRayShape(PhysicsEnginePtr _physicsEngine);
 
