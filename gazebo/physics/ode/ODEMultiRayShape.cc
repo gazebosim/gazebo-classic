@@ -44,14 +44,6 @@ ODEMultiRayShape::ODEMultiRayShape(CollisionPtr _parent)
   // Set collision bits
   dGeomSetCategoryBits((dGeomID) this->raySpaceId, GZ_SENSOR_COLLIDE);
   dGeomSetCollideBits((dGeomID) this->raySpaceId, ~GZ_SENSOR_COLLIDE);
-
-  // These three lines may be unessecary
-  /*ODELinkPtr pLink =
-  boost::static_pointer_cast<ODELink>(this->collisionParent->GetLink());
-  pLink->SetSpaceId(this->raySpaceId);
-  boost::static_pointer_cast<ODECollision>(this->collisionParent)->SetSpaceId(
-      this->raySpaceId);
-      */
 }
 
 //////////////////////////////////////////////////
@@ -179,26 +171,34 @@ void ODEMultiRayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
       dGeomRaySetClosestHit(_o2, 1);
     }
 
-    int n = dCollide(_o1, _o2, 1, &contact, sizeof(contact));
-
-    RayShape *shape = NULL;
-    if (n > 0 && self->defaultUpdate)
+    if (!self->defaultUpdate || (rayCollision && hitCollision))
     {
-      if (self->defaultUpdate)
-      {
-        shape = boost::static_pointer_cast<RayShape>(
-            rayCollision->GetShape()).get();
-      }
-      else
-      {
-        shape = static_cast<RayShape*>(dGeomGetData(rayId));
-      }
+      int n = dCollide(_o1, _o2, 1, &contact, sizeof(contact));
 
-      if (shape && hitCollision && contact.depth < shape->GetLength())
+      RayShape *shape = NULL;
+      if (n > 0 && self->defaultUpdate)
       {
-        shape->SetLength(contact.depth);
-        shape->SetRetro(hitCollision->GetLaserRetro());
-        shape->SetCollisionName(hitCollision->GetScopedName());
+        shape = self->defaultUpdate ?
+          boost::static_pointer_cast<RayShape>(rayCollision->GetShape()).get() :
+          shape = static_cast<RayShape*>(dGeomGetData(rayId));
+
+        if (shape && hitCollision && contact.depth < shape->GetLength())
+        {
+          // gzerr << "ODEMultiRayShape UpdateCallback dSpaceCollide2 "
+          //      << " depth[" << contact.depth << "]"
+          //      << " position[" << contact.pos[0]
+          //        << ", " << contact.pos[1]
+          //        << ", " << contact.pos[2]
+          //        << ", " << "]"
+          //      << " ray[" << rayCollision->GetScopedName() << "]"
+          //      << " pose[" << rayCollision->GetWorldPose() << "]"
+          //      << " hit[" << hitCollision->GetScopedName() << "]"
+          //      << " pose[" << hitCollision->GetWorldPose() << "]"
+          //      << "\n";
+          shape->SetLength(contact.depth);
+          shape->SetRetro(hitCollision->GetLaserRetro());
+          shape->SetCollisionName(hitCollision->GetScopedName());
+        }
       }
     }
   }
@@ -213,6 +213,8 @@ void ODEMultiRayShape::AddRay(const math::Vector3 &_start,
   ODECollisionPtr odeCollision;
   ODERayShapePtr ray;
 
+  // The collisionParent will exist in instances where the multiray is
+  // attached to an object, such as in the case of laser range finders
   if (this->collisionParent)
   {
     odeCollision.reset(new ODECollision(this->collisionParent->GetLink()));
@@ -221,6 +223,9 @@ void ODEMultiRayShape::AddRay(const math::Vector3 &_start,
     ray.reset(new ODERayShape(odeCollision));
     odeCollision->SetShape(ray);
   }
+  // The else clause is run when a standalone multiray shape is
+  // instantiated.
+  // See test/integration/multirayshape.cc for an example.
   else
   {
     ray.reset(new ODERayShape(boost::dynamic_pointer_cast<ODEPhysics>(
