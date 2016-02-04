@@ -11,6 +11,7 @@ include_directories(${TBB_INCLUDEDIR})
 include_directories(${tinyxml_INCLUDE_DIRS})
 set (sources
   Diagnostics.cc
+  IntrospectionManager.cc
   LogPlay.cc
   LogRecord.cc
   OpenAL.cc
@@ -42,6 +43,7 @@ set (headers
 
 set (gtest_sources
   Diagnostics_TEST.cc
+  IntrospectionManager_TEST.cc
   LogPlay_TEST.cc
   LogRecord_TEST.cc
   OpenAL_TEST.cc
@@ -70,6 +72,7 @@ target_link_libraries(gazebo_util
   gazebo_transport
   gazebo_msgs
   ${tinyxml2_LIBRARIES}
+  ${IGNITION-TRANSPORT_LIBRARIES}
 )
 
 gz_install_library(gazebo_util)
