@@ -63,6 +63,7 @@
 
 #include "gazebo/util/OpenAL.hh"
 #include "gazebo/util/Diagnostics.hh"
+#include "gazebo/util/IntrospectionManager.hh"
 #include "gazebo/util/LogRecord.hh"
 
 #include "gazebo/physics/Road.hh"
@@ -804,6 +805,8 @@ void World::Update()
   DIAG_TIMER_LAP("World::Update", "ContactManager::PublishContacts");
 
   event::Events::worldUpdateEnd();
+
+  gazebo::util::IntrospectionManager::Instance()->Update();
 
   DIAG_TIMER_STOP("World::Update");
 }
