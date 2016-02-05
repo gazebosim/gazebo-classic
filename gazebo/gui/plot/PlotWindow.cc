@@ -19,6 +19,7 @@
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/TransportIface.hh"
 
+#include "gazebo/gui/plot/ExportDialog.hh"
 #include "gazebo/gui/plot/VariablePillContainer.hh"
 #include "gazebo/gui/plot/PlotCanvas.hh"
 #include "gazebo/gui/plot/PlotWindow.hh"
@@ -100,11 +101,16 @@ PlotWindow::PlotWindow(QWidget *_parent)
   connect(this->dataPtr->plotPauseAct, SIGNAL(triggered()),
       this, SLOT(OnPause()));
 
+  QPushButton *exportButton = new QPushButton("Export");
+  connect(exportButton, SIGNAL(clicked()),
+      this, SLOT(OnExport()));
+
   QHBoxLayout *bottomPanelLayout = new QHBoxLayout;
   QToolBar *playToolbar = new QToolBar;
   playToolbar->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
   playToolbar->addAction(this->dataPtr->plotPlayAct);
   playToolbar->addAction(this->dataPtr->plotPauseAct);
+  playToolbar->addWidget(exportButton);
   bottomPanelLayout->addStretch();
   bottomPanelLayout->addWidget(playToolbar);
   bottomPanelLayout->addStretch();
@@ -181,6 +187,50 @@ void PlotWindow::OnPlay()
 }
 
 /////////////////////////////////////////////////
+void PlotWindow::OnExport()
+{
+  std::list<PlotCanvas*> plots = this->Plots();
+  ExportDialog exportDialog(this);
+  exportDialog.deleteLater();
+  if (exportDialog.exec() == QDialog::Accepted)
+  {
+  }
+  else
+  {
+    std::cout << "HERE\n";
+    if (plots.front())
+      std::cout << "valid\n";
+
+    QPixmap::grabWidget(plots.front()).save("/tmp/plot.png");
+    //QPixmap p;
+    //QImage image;
+    //this->grab()->save("/tmp/plot.png");
+    //p.grabWidget(this);//plots.front());
+    /*image = p.convertToImage();
+    QRgb frame_pixel = image.pixel(0, 0);
+    QBitmap mask(p.size());
+    mask.fill(Qt::color1);
+    QPainter pic(&mask);
+    pic.setPen(Qt::color0);
+    for (int y=0; y<image.height(); y++)
+    {
+      for ( int x=0; x<image.width(); x++ )
+      {
+        QRgb rgb = image.pixel(x, y);
+        if (rgb == frame_pixel) // we want the frame transparent
+        {
+          pic.drawPoint( x, y );
+        }
+      }
+    }
+    pic.end();
+    p.setMask(mask);
+    */
+    //p.save("/tmp/myplotimage.png");
+  }
+}
+
+/////////////////////////////////////////////////
 void PlotWindow::OnPause()
 {
   this->dataPtr->paused = true;
@@ -206,6 +256,18 @@ void PlotWindow::RemoveCanvas(PlotCanvas *canvas)
   canvas->hide();
   this->dataPtr->canvasLayout->takeAt(idx);
   delete canvas;
+}
+
+/////////////////////////////////////////////////
+std::list<PlotCanvas*> PlotWindow::Plots()
+{
+  std::list<PlotCanvas*> plots;
+  for (auto &child : this->dataPtr->canvasLayout->children())
+  {
+    plots.push_back(static_cast<PlotCanvas*>(child));
+  }
+
+  return plots;
 }
 
 /////////////////////////////////////////////////

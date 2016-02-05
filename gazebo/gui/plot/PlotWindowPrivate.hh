@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_GUI_PLOTWINDOWPRIVATE_HH_
-#define _GAZEBO_GUI_PLOTWINDOWPRIVATE_HH_
+#ifndef _GAZEBO_GUI_PLOT_PLOTWINDOWPRIVATE_HH_
+#define _GAZEBO_GUI_PLOT_PLOTWINDOWPRIVATE_HH_
 
 #include <list>
 #include <map>

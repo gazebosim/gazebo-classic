@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_GUI_PLOTWINDOW_HH_
-#define _GAZEBO_GUI_PLOTWINDOW_HH_
+#ifndef _GAZEBO_GUI_PLOT_PLOTWINDOW_HH_
+#define _GAZEBO_GUI_PLOT_PLOTWINDOW_HH_
 
 #include <memory>
 
@@ -60,6 +60,8 @@ namespace gazebo
       /// \brief Add a new plot canvas.
       public: PlotCanvas *AddCanvas();
 
+      public: std::list<PlotCanvas*> Plots();
+
       /// \brief Remove a plot canvas
       public: void RemoveCanvas(PlotCanvas *canvas);
 
@@ -68,6 +70,9 @@ namespace gazebo
 
       /// \brief QT callback for when plotting is to be paused.
       private slots: void OnPause();
+
+      /// \brief QT callback for when a plot is to be exported.
+      private slots: void OnExport();
 
       /// \brief Qt Callback when a new plot canvas should be added.
       private slots: void OnAddCanvas();
