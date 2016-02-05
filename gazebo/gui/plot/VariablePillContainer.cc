@@ -118,9 +118,6 @@ void VariablePillContainer::AddVariablePill(VariablePill *_variable)
   this->dataPtr->variableLayout->addWidget(_variable);
   this->dataPtr->variables[_variable->Id()] = _variable;
 
-  std::cerr << " emit variable added into container event " <<
-      _variable->Text() << " " << _variable->Id() <<  std::endl;
-
   emit VariableAdded(_variable->Id(), _variable->Text(),
       VariablePill::EMPTY_VARIABLE);
 }
@@ -173,10 +170,6 @@ void VariablePillContainer::RemoveVariablePill(const unsigned int _id)
   this->dataPtr->variables.erase(variable->Id());
 
   emit VariableRemoved(variable->Id(), VariablePill::EMPTY_VARIABLE);
-
-  std::cerr
-      << "VariablePillContainer emit variable removed from container event "
-      << variable->Text() << " " << variable->Id() << std::endl;
 }
 
 
@@ -234,8 +227,6 @@ void VariablePillContainer::SetSelected(VariablePill *_variable)
 /////////////////////////////////////////////////
 void VariablePillContainer::dragEnterEvent(QDragEnterEvent *_evt)
 {
-  std::cerr << " this->VariablePillCount() "<< this->VariablePillCount()
-      << std::endl;
   if (this->dataPtr->maxSize != -1 &&
       static_cast<int>(this->VariablePillCount()) >= this->dataPtr->maxSize)
   {
@@ -266,7 +257,6 @@ void VariablePillContainer::dropEvent(QDropEvent *_evt)
   if (this->dataPtr->maxSize != -1 &&
       static_cast<int>(this->VariablePillCount()) >= this->dataPtr->maxSize)
   {
-    std::cerr << "dropped and ignored "<< std::endl;
     _evt->ignore();
     return;
   }
@@ -274,8 +264,6 @@ void VariablePillContainer::dropEvent(QDropEvent *_evt)
   if (_evt->mimeData()->hasFormat("application/x-item"))
   {
     QString dataStr = _evt->mimeData()->data("application/x-item");
-
-    // emit VariableDropped(dataStr.toStdString());
 
     std::cerr << "variable '" << dataStr.toStdString()
         << "' dropped into container ["
@@ -296,9 +284,6 @@ void VariablePillContainer::dropEvent(QDropEvent *_evt)
     VariablePill *parentVariable = variable->Parent();
     if (parentVariable)
     {
-      std::cerr << " VariablePillContainer::dropEvent " <<
-           variable->Parent()->Text() << std::endl;
-
       parentVariable->blockSignals(true);
       parentVariable->RemoveVariablePill(variable);
       parentVariable->blockSignals(false);
@@ -319,8 +304,6 @@ void VariablePillContainer::dropEvent(QDropEvent *_evt)
     this->blockSignals(false);
 
     emit VariableMoved(variable->Id(), VariablePill::EMPTY_VARIABLE);
-    std::cerr << "VariablePillContainer emit variable moved event " <<
-        variable->Text() << " " << variable->Id() << std::endl;
   }
 }
 
@@ -334,7 +317,6 @@ void VariablePillContainer::keyPressEvent(QKeyEvent *_event)
       this->RemoveVariablePill(this->dataPtr->selectedVariable);
     }
   }
-
 }
 
 /////////////////////////////////////////////////
@@ -392,7 +374,6 @@ void VariablePillContainer::mouseReleaseEvent(QMouseEvent *_event)
         child->SetSelected(false);
       }
     }
-
   }
 }
 

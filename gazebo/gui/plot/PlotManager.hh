@@ -19,8 +19,11 @@
 #define _GAZEBO_GUI_PLOTMANAGER_HH_
 
 #include <memory>
+#include <string>
 
 #include "gazebo/msgs/msgs.hh"
+#include "gazebo/common/SingletonT.hh"
+#include "gazebo/gui/plot/PlottingTypes.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
 
@@ -31,8 +34,8 @@ namespace gazebo
     // Forward declare private data class
     class PlotManagerPrivate;
 
-    /// \brief Plot diagnostic information
-    class GZ_GUI_VISIBLE PlotManager
+    /// \brief A class that connects simulation data with the plotting tool
+    class GZ_GUI_VISIBLE PlotManager : public SingletonT<PlotManager>
     {
       /// \brief Constructor.
       public: PlotManager();
@@ -44,6 +47,26 @@ namespace gazebo
       /// to detect simulation resets.
       /// \param[in] _data Message data containing world control commands
       public: void OnWorldControl(ConstWorldControlPtr &_data);
+
+      /// \brief Add a curve to the manager. Data received from the named topic
+      /// will be added to the curve
+      /// \param[in] _name Name of topic
+      /// \param[in] _curve Curve that will be populated with data.
+      public: void AddCurve(const std::string &_name,
+          PlotCurveWeakPtr _curve);
+
+      /// \brief Remove a curve from the manager
+      /// \param[in] _curve Curve to remove.
+      public: void RemoveCurve(PlotCurveWeakPtr _curve);
+
+      /// TODO remove me
+      /// \brief Callback when a world control message is received. It is used
+      /// to detect simulation resets.
+      /// \param[in] _data Message data containing world stats msgs
+      public: void OnWorldStats(ConstWorldStatisticsPtr &_data);
+
+      /// \brief This is a singleton class.
+      private: friend class SingletonT<PlotManager>;
 
       /// \internal
       /// \brief Pointer to private data.

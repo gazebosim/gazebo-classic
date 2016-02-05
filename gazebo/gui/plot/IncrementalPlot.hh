@@ -19,13 +19,15 @@
 #define _GAZEBO_GUI_INCREMENTAL_PLOT_HH_
 
 #include <memory>
-#include <list>
+#include <string>
+#include <vector>
 
 #include <qwt/qwt_plot.h>
 
 #include <ignition/math/Vector2.hh>
 
 #include "gazebo/gui/qt.h"
+#include "gazebo/gui/plot/PlottingTypes.hh"
 #include "gazebo/util/system.hh"
 
 class QwtPlotCurve;
@@ -36,19 +38,6 @@ namespace gazebo
   {
     // Forward declare private data class
     struct IncrementalPlotPrivate;
-
-    /// \brief Plot Curve data.
-    class PlotCurve
-    {
-      /// \brief Unique id;
-      public: unsigned int id;
-
-      /// \brief Curve label.
-      public: std::string label;
-
-      /// \brief Qwt Curve object.
-      public: QwtPlotCurve *curve = NULL;
-    };
 
     /// \brief A plotting widget that handles incremental addition of data.
     class GZ_GUI_VISIBLE IncrementalPlot : public QwtPlot
@@ -74,7 +63,7 @@ namespace gazebo
       /// will be added if it doesn't exist.
       /// \param[in] _pt Points to add.
       public: void Add(const std::string &_label,
-          const std::list<ignition::math::Vector2d> &_pts);
+          const std::vector<ignition::math::Vector2d> &_pts);
 
       /// \brief Add a vertical line to the plot.
       /// \param[in] _label Label for the line.
@@ -96,12 +85,12 @@ namespace gazebo
       /// \brief Find a plot curve by name
       /// \param[in] _label Name of the curve to look for.
       /// \return Plot curve if found, NULL otherwise.
-      public: PlotCurve *FindCurve(const std::string &_label) const;
+      public: PlotCurveWeakPtr Curve(const std::string &_label) const;
 
       /// \brief Find a plot curve by id
       /// \param[in] _id Unique id of the plot curve.
       /// \return Plot curve if found, NULL otherwise.
-      public: PlotCurve *FindCurve(const unsigned int _id) const;
+      public: PlotCurveWeakPtr Curve(const unsigned int _id) const;
 
       /// \brief Update all the curves in the plot
       public: void Update();
@@ -109,7 +98,7 @@ namespace gazebo
       /// \brief Add a named curve.
       /// \param[in] _label Name of the curve.
       /// \return A pointer to the new curve.
-      public: PlotCurve *AddCurve(const std::string &_label);
+      public: PlotCurveWeakPtr AddCurve(const std::string &_label);
 
       /// \brief Remove a curve by id
       /// \param[in] _id Unique id of the curve.
@@ -121,17 +110,22 @@ namespace gazebo
 
       /// \brief Attach a curve to this plot.
       /// \param[in] _plotCurve The curve to attach to the plot.
-      public: void AttachCurve(PlotCurve *_curve);
+      public: void AttachCurve(PlotCurveWeakPtr _curve);
 
       /// \brief Dettach a curve from this plot.
       /// \param[in] _id Unique id of the plot curve to detach.
-      public: PlotCurve *DetachCurve(const unsigned int _id);
+      /// \return Pointer to the plot curve
+      public: PlotCurvePtr DetachCurve(const unsigned int _id);
 
       /// \brief Set a new label for the given curve.
       /// \param[in] _id Unique id of the plot curve
       /// \param[in] _label New label to set the plot curve to.
       public: void SetCurveLabel(const unsigned int _id,
         const std::string &_label);
+
+      /// \brief Get all curves in this plot
+      /// \return A list of curves in this plot.
+      public: std::vector<PlotCurveWeakPtr> Curves() const;
 
       /// \brief Give QT a size hint.
       /// \return Default size of the plot.
@@ -147,7 +141,7 @@ namespace gazebo
 
       /// \brief Adjust a curve to fit new data.
       /// \param[in] _curve Curve to adjust
-      private: void AdjustCurve(PlotCurve *_curve);
+      private: void AdjustCurve(PlotCurvePtr _curve);
 
       /// \internal
       /// \brief Private data pointer

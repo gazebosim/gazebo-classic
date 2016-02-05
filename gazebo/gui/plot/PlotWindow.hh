@@ -32,7 +32,7 @@ namespace gazebo
 
     class PlotCanvas;
 
-    /// \brief Plot diagnostic information
+    /// \brief Plot window
     class GZ_GUI_VISIBLE PlotWindow : public QDialog
     {
       Q_OBJECT
@@ -44,15 +44,18 @@ namespace gazebo
       /// \brief Destructor.
       public: virtual ~PlotWindow();
 
-      /// \brief Called when a diagnostic message is received.
-      /// \param[in] _msg Diagnostic message.
-      // private: void OnMsg(ConstPlotWindowPtr &_msg);
-
-      /// \brief Add a new plot canvas.
+      /// \brief Add a new canvas.
       public: PlotCanvas *AddCanvas();
 
       /// \brief Remove a plot canvas
-      public: void RemoveCanvas(PlotCanvas *canvas);
+      /// \param[in] _canvas Canvas to remove
+      public: void RemoveCanvas(PlotCanvas *_canvas);
+
+      /// \brief Export all canvas plots.
+      public: void Export();
+
+      /// \brief Update all canvases
+      public slots: void Update();
 
       /// \brief QT callback to continue plotting.
       private slots: void OnPlay();

@@ -3,6 +3,7 @@ include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 set (sources_local
   plot/IncrementalPlot.cc
   plot/PlotCanvas.cc
+  plot/PlotCurve.cc
   plot/PlotManager.cc
   plot/PlotWindow.cc
   plot/VariablePill.cc

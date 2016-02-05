@@ -19,6 +19,7 @@
 #define _GAZEBO_GUI_VARIABLE_PILL_CONTAINER_HH_
 
 #include <memory>
+#include <string>
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"

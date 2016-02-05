@@ -70,6 +70,9 @@ namespace gazebo
   }
 }
 
+// empty variable id
+unsigned int VariablePill::EMPTY_VARIABLE = IGN_UINT32_MAX;
+
 // global variable id counter
 unsigned int VariablePillPrivate::globalVariableId = 0;
 
@@ -112,7 +115,6 @@ VariablePill::VariablePill(QWidget *_parent)
   QFrame *mainFrame = new QFrame(this);
   mainFrame->setLayout(this->dataPtr->multiLayout);
 
-//  mainFrame->setAutoFillBackground(true);
   mainFrame->setStyleSheet("background-color: #1965b0; border-radius: 4px");
 
   mainLayout->addWidget(mainFrame);
@@ -188,9 +190,7 @@ void VariablePill::AddVariablePill(VariablePill *_variable)
   if (this->dataPtr->parent && this->dataPtr->parent != this)
   {
     // Cannot add a variable pill to one that already has a parent.
-    // Instead add to the parent
-    std::cerr << "Can not add a variable pill to another variable pill that "
-      << "already has a parent" << std::endl;
+    // Add to the parent instead
     this->dataPtr->parent->AddVariablePill(_variable);
     return;
   }
@@ -208,10 +208,6 @@ void VariablePill::AddVariablePill(VariablePill *_variable)
   _variable->SetContainer(this->dataPtr->container);
   this->dataPtr->variables[_variable->Id()] = _variable;
   this->dataPtr->variableLayout->addWidget(_variable);
-
-  std::cerr << " -- add " << _variable->Text()
-      << " to variable " << this->dataPtr->label->text().toStdString()
-      << std::endl;
 
   emit VariableAdded(_variable->Id(), _variable->Text());
 }
@@ -251,10 +247,6 @@ void VariablePill::RemoveVariablePill(VariablePill *_variable)
     this->dataPtr->variables.clear();
     this->SetMultiVariableMode(false);
 
-      std::cerr << " -- remove self " << _variable->Text()
-          << " from variable " << this->dataPtr->label->text().toStdString()
-          << std::endl;
-
     emit VariableRemoved(_variable->Id());
 
     return;
@@ -279,10 +271,6 @@ void VariablePill::RemoveVariablePill(VariablePill *_variable)
   }
 
   emit VariableRemoved(_variable->Id());
-
-  std::cerr << " -- remove " << _variable->Text()
-      << " from variable " << this->dataPtr->label->text().toStdString()
-      << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -377,9 +365,6 @@ void VariablePill::dropEvent(QDropEvent *_evt)
     this->AddVariablePill(variable);
     this->blockSignals(false);
 
-    std::cerr << "VariablePill::VariableMoved " << variable->Text() << " " <<
-        variable->Id() << std::endl;
-
     emit VariableMoved(variable->Id());
   }
 }
@@ -418,26 +403,6 @@ void VariablePill::mouseMoveEvent(QMouseEvent *_event)
   drag->exec(Qt::MoveAction);
 }
 
-/*/////////////////////////////////////////////////
-void VariablePill::mouseReleaseEvent(QMouseEvent *_event)
-{
-  if (_event->button() != Qt::LeftButton)
-    return;
-
-  QLabel *child = static_cast<QLabel *>(
-      this->childAt(_event->pos()));
-
-  // prevent clicking on the multi-variable label
-  if (child == this->dataPtr->multiLabel)
-    return;
-
-  this->SetSelected(true);
-  std::cerr << " variable pill selected " << this->Text() <<  std::endl;
-
-  // ignore so that the container also gets the event.
-  _event->ignore();
-}*/
-
 /////////////////////////////////////////////////
 bool VariablePill::ContainsPoint(const ignition::math::Vector2i &_pt) const
 {
@@ -468,9 +433,15 @@ void VariablePill::SetSelected(const bool _selected)
   this->dataPtr->isSelected = _selected;
 
   if (_selected)
-    this->dataPtr->label->setStyleSheet("background-color: #5289c7; border: 2px solid black");
+  {
+    this->dataPtr->label->setStyleSheet(
+        "background-color: #5289c7; border: 2px solid black");
+  }
   else
-    this->dataPtr->label->setStyleSheet("background-color: #5289c7; border: 0px");
+  {
+    this->dataPtr->label->setStyleSheet(
+        "background-color: #5289c7; border: 0px");
+  }
 }
 
 /////////////////////////////////////////////////

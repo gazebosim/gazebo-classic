@@ -18,6 +18,7 @@
 #ifndef _GAZEBO_GUI_VARIABLE_PILL_HH_
 #define _GAZEBO_GUI_VARIABLE_PILL_HH_
 
+#include <map>
 #include <memory>
 #include <string>
 
@@ -40,9 +41,6 @@ namespace gazebo
     class GZ_GUI_VISIBLE VariablePill : public QWidget
     {
       Q_OBJECT
-
-      /// \brief Empty variable id used to indicate non-existent variable.
-      public: const static unsigned int EMPTY_VARIABLE = IGN_UINT32_MAX;
 
       /// \brief Constructor
       /// \param[in] _parent Pointer to a parent widget
@@ -124,10 +122,6 @@ namespace gazebo
       /// \param[in] _event Qt mouse event.
       protected: void mousePressEvent(QMouseEvent *_event);
 
-      /// \brief Qt callback when the mouse is released.
-      /// \param[in] _event Qt mouse event.
-      // protected: void mouseReleaseEvent(QMouseEvent *_event);
-
       /// \brief Set whether to enable multi-variable mode
       /// \param[in] _enable True to enable multi-variable mode.
       private: void SetMultiVariableMode(const bool _enable);
@@ -146,6 +140,9 @@ namespace gazebo
       /// as a child of this variable pill
       /// \param[in] Unique id of the existing variable pill that is added.
       Q_SIGNALS: void VariableMoved(const unsigned int _id);
+
+     /// \brief Empty variable id used to indicate non-existent variable.
+      public: static unsigned int EMPTY_VARIABLE;
 
       /// \internal
       /// \brief Private data pointer

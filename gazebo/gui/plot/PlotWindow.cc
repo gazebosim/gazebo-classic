@@ -20,6 +20,8 @@
 #include "gazebo/transport/TransportIface.hh"
 
 #include "gazebo/gui/plot/VariablePillContainer.hh"
+#include "gazebo/gui/plot/PlotCurve.hh"
+#include "gazebo/gui/plot/IncrementalPlot.hh"
 #include "gazebo/gui/plot/PlotCanvas.hh"
 #include "gazebo/gui/plot/PlotWindow.hh"
 #include "gazebo/gui/plot/PlotWindowPrivate.hh"
@@ -59,7 +61,6 @@ PlotWindow::PlotWindow(QWidget *_parent)
   : QDialog(_parent),
     dataPtr(new PlotWindowPrivate())
 {
-  this->dataPtr->paused = false;
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));
   this->setWindowTitle("Gazebo: Plotting Utility");
   this->setObjectName("PlotWindow");
@@ -89,14 +90,14 @@ PlotWindow::PlotWindow(QWidget *_parent)
   this->dataPtr->plotPlayAct = new QAction(QIcon(":/images/play.png"),
       tr("Play"), this);
   this->dataPtr->plotPlayAct->setStatusTip(tr("Continue Plotting"));
-  this->dataPtr->plotPlayAct->setVisible(true);
+  this->dataPtr->plotPlayAct->setVisible(false);
   connect(this->dataPtr->plotPlayAct, SIGNAL(triggered()),
       this, SLOT(OnPlay()));
 
   this->dataPtr->plotPauseAct = new QAction(QIcon(":/images/pause.png"),
       tr("Pause"), this);
   this->dataPtr->plotPauseAct->setStatusTip(tr("Pause Plotting"));
-  this->dataPtr->plotPauseAct->setVisible(false);
+  this->dataPtr->plotPauseAct->setVisible(true);
   connect(this->dataPtr->plotPauseAct, SIGNAL(triggered()),
       this, SLOT(OnPause()));
 
@@ -141,12 +142,11 @@ PlotWindow::PlotWindow(QWidget *_parent)
   QListWidgetItem *itemc = new QListWidgetItem("Turtle");
   itemc->setToolTip(tr("Drag onto graph to plot"));
   this->dataPtr->labelList->addItem(itemc);
-
   //=================
 
   QVBoxLayout *leftLayout = new QVBoxLayout;
   leftLayout->addWidget(this->dataPtr->labelList);
-  //leftLayout->addLayout(pauseLayout);
+  // leftLayout->addLayout(pauseLayout);
 
   QHBoxLayout *mainLayout = new QHBoxLayout;
   mainLayout->addLayout(leftLayout);
@@ -155,6 +155,10 @@ PlotWindow::PlotWindow(QWidget *_parent)
 
   this->setLayout(mainLayout);
   this->setSizeGripEnabled(true);
+
+  QTimer *displayTimer = new QTimer(this);
+  connect(displayTimer, SIGNAL(timeout()), this, SLOT(Update()));
+  displayTimer->start(30);
 }
 
 /////////////////////////////////////////////////
@@ -189,15 +193,15 @@ PlotCanvas *PlotWindow::AddCanvas()
 }
 
 /////////////////////////////////////////////////
-void PlotWindow::RemoveCanvas(PlotCanvas *canvas)
+void PlotWindow::RemoveCanvas(PlotCanvas *_canvas)
 {
-  int idx = this->dataPtr->canvasLayout->indexOf(canvas);
+  int idx = this->dataPtr->canvasLayout->indexOf(_canvas);
   if (idx < 0)
     return;
 
   // canvas->hide();
   this->dataPtr->canvasLayout->takeAt(idx);
-  canvas->deleteLater();
+  _canvas->deleteLater();
 }
 
 /////////////////////////////////////////////////
@@ -218,4 +222,50 @@ void PlotWindow::OnRemoveCanvas()
   // add an empty canvas if the plot window is now empty
   if (this->dataPtr->canvasLayout->isEmpty())
     this->AddCanvas();
+}
+
+/////////////////////////////////////////////////
+void PlotWindow::Update()
+{
+  if (this->dataPtr->paused)
+    return;
+
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  for (int i = 0; i < this->dataPtr->canvasLayout->count(); ++i)
+  {
+    QLayoutItem *item = this->dataPtr->canvasLayout->itemAt(i);
+    PlotCanvas *canvas = qobject_cast<PlotCanvas *>(item->widget());
+    if (!canvas)
+      continue;
+    canvas->Update();
+  }
+}
+
+/////////////////////////////////////////////////
+void PlotWindow::Export()
+{
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  for (int i = 0; i < this->dataPtr->canvasLayout->count(); ++i)
+  {
+    QLayoutItem *item = this->dataPtr->canvasLayout->itemAt(i);
+    PlotCanvas *canvas = qobject_cast<PlotCanvas *>(item->widget());
+    if (!canvas)
+      continue;
+
+    for (const auto &plot : canvas->Plots())
+    {
+      for (const auto &curve : plot->Curves())
+      {
+        auto c = curve.lock();
+        if (!c)
+          continue;
+
+        for (unsigned int j = 0; j < c->Size(); ++j)
+        {
+          ignition::math::Vector2d pt = c->Point(j);
+          std::cerr << pt.X() << ", " << pt.Y() << std::endl;
+        }
+      }
+    }
+  }
 }
