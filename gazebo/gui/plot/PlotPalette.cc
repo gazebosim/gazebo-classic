@@ -248,15 +248,17 @@ void PlotPalette::FillTopicsTop()
   // Get all topics, independently of message type
   std::vector<std::string> topics;
   auto msgTypes = transport::getAdvertisedTopics();
+  QList<QStandardItem *> items;
   for (auto msgType : msgTypes)
   {
     for (auto topic : msgType.second)
     {
       topics.push_back(topic);
-      this->dataPtr->searchModel->appendRow(new
+      items.append(new
           QStandardItem(QString::fromStdString(topic)));
     }
   }
+  this->dataPtr->searchModel->insertColumn(0, items);
 
   // Sort alphabetically
   std::sort(topics.begin(), topics.end());
@@ -297,6 +299,7 @@ void PlotPalette::FillSimBottom()
       {"~/world_stats", "real_time"},
       {"~/world_stats", "iterations"}};
 
+  QList<QStandardItem *> items;
   for (auto field : simFields)
   {
     auto humanName = ConfigWidget::HumanReadableKey(field.second);
@@ -305,10 +308,9 @@ void PlotPalette::FillSimBottom()
     childWidget->SetPlotInfo(field.first + "::" + field.second);
     configLayout->addWidget(childWidget);
 
-// TODO: Add to search
-//      this->dataPtr->searchModel->appendRow(new
-//          QStandardItem(QString::fromStdString(topic)));
+    items.append(new QStandardItem(QString::fromStdString(humanName)));
   }
+  this->dataPtr->searchModel->insertColumn(1, items);
 
   // Spacer
   auto spacer = new QWidget();
@@ -666,29 +668,57 @@ void PlotPalette::UpdateSearch(const QString &_search)
     exp = exp + ".*$";
   }
 
-  auto topics = this->dataPtr->searchModel->findItems(exp, Qt::MatchRegExp);
-
   // New layout
   auto newLayout = new QVBoxLayout();
   newLayout->setSpacing(0);
 
-  if (!topics.empty())
-    newLayout->addWidget(new QLabel(tr("<b>Topics</b>")));
-
-  for (auto topic : topics)
+  if (exp != "")
   {
-    // TODO: highlight matched words
-    // topic->text().replace(QRegExp(exp), "<b>\\1</b>");
+    // Topics
+    auto topics =
+        this->dataPtr->searchModel->findItems(exp, Qt::MatchRegExp, 0);
 
-    auto childWidget = new ItemConfigWidget(topic->text().toStdString());
-    childWidget->SetPlotInfo(topic->text().toStdString());
-    this->connect(childWidget, SIGNAL(Clicked(const std::string &)), this,
-        SLOT(OnTopicSearchClicked(const std::string &)));
+    if (!topics.empty())
+      newLayout->addWidget(new QLabel(tr("<b>Topics</b>")));
 
-    newLayout->addWidget(childWidget);
+    for (auto topic : topics)
+    {
+      // TODO: highlight matched words
+      // topic->text().replace(QRegExp(exp), "<b>\\1</b>");
+
+      auto childWidget = new ItemConfigWidget(topic->text().toStdString());
+      childWidget->SetPlotInfo(topic->text().toStdString());
+      this->connect(childWidget, SIGNAL(Clicked(const std::string &)), this,
+          SLOT(OnTopicSearchClicked(const std::string &)));
+
+      newLayout->addWidget(childWidget);
+    }
+
+    // Sim
+    auto sims = this->dataPtr->searchModel->findItems(exp, Qt::MatchRegExp, 1);
+
+    if (!sims.empty())
+      newLayout->addWidget(new QLabel(tr("<b>Simulation</b>")));
+
+    for (auto sim : sims)
+    {
+      auto text = sim->text().toStdString();
+
+      auto childWidget = new ItemConfigWidget(text);
+      childWidget->SetDraggable(true);
+
+      if (text.find("Sim") != std::string::npos)
+        childWidget->SetPlotInfo("~/world_stats/sim_time");
+      else if (text.find("Real") != std::string::npos)
+        childWidget->SetPlotInfo("~/world_stats/real_time");
+      else if (text.find("Itera") != std::string::npos)
+        childWidget->SetPlotInfo("~/world_stats/iterations");
+
+      newLayout->addWidget(childWidget);
+    }
+
+    // TODO: Add Models
   }
-
-  // TODO: Add Sim and Models
 
   // Spacer
   auto spacer = new QWidget();
