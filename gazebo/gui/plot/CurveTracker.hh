@@ -41,22 +41,50 @@ namespace gazebo
   namespace gui
   {
 
+    /// \brief Track the mouse position to show values
     class CurveTracker: public QwtPlotPicker
     {
-    public:
-        CurveTracker(QwtPlotCanvas *_canvas);
 
-    protected:
-        virtual QwtText trackerTextF( const QPointF &_pos ) const;
-        virtual QRect trackerRect( const QFont &_pos ) const;
+      /// \brief constructor
+      /// \param[in] _canvas The plot canvas element
+      public: CurveTracker(QwtPlotCanvas *_canvas);
 
-    private:
-        QString curveInfoAt( const QwtPlotCurve *_curve,
+      /// \brief Called to get the tracker text to display
+      /// \param[in] _pos The mouse position
+      /// \return The text to display
+      protected: virtual QwtText trackerTextF( const QPointF &_pos ) const;
+
+      /// \brief Called to get the position where the hover text
+      /// is to be displayed
+      /// \param[in] _font The font
+      /// \return The rectangle
+      protected:  virtual QRect trackerRect( const QFont &_font ) const;
+
+      /// \brief Returns the curve information at a point
+      /// \param[in] _curve The curve instance
+      /// \param[in] _pos The mouse position
+      /// \return The curve information.
+      private: QString curveInfoAt( const QwtPlotCurve *_curve,
                              const QPointF &_pos ) const;
-        QLineF curveLineAt( const QwtPlotCurve *_curve, double x ) const;
 
-        int UpperSampleIndex( const QwtSeriesData<QPointF> &series,
-                              double value) const;
+      /// \brief Returns the curve line segment at position x
+      /// \param[in] _curve The curve instance
+      /// \param[in] _x The x mouse position
+      /// \return The line segment
+      private: QLineF curveLineAt( const QwtPlotCurve *_curve,
+                                   double _x ) const;
+
+      /// \brief Get the highest series sample index.
+      /// this is ported from a more recent version of qwt.
+      /// \param[in] _series The series data
+      /// \param[in] _value The horizontal mouse position
+      /// \return The line segment index
+      private: int UpperSampleIndex( const QwtSeriesData<QPointF> &_series,
+                                     double _value) const;
+
+      /// \brief Draws the (vertical) line on the chart
+      /// \param[in] _painter
+      private: virtual void drawRubberBand( QPainter *_painter ) const;
     };
   }
 }

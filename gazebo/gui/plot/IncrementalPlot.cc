@@ -138,12 +138,13 @@ IncrementalPlot::IncrementalPlot(QWidget *_parent)
   this->dataPtr->directPainter = new QwtPlotDirectPainter(this);
 
   // panning with the left mouse button
-  (void) new QwtPlotPanner(this->canvas());
+  // (void) new QwtPlotPanner(this->canvas());
 
   // zoom in/out with the wheel
   this->dataPtr->magnifier = new QwtPlotMagnifier(this->canvas());
 
 #if defined(Q_WS_X11)
+  std::cerr <<  "defined " << std::endl;
   this->canvas()->setAttribute(Qt::WA_PaintOutsidePaintEvent, true);
   this->canvas()->setAttribute(Qt::WA_PaintOnScreen, true);
 #endif
@@ -176,18 +177,26 @@ IncrementalPlot::IncrementalPlot(QWidget *_parent)
 
   this->setAcceptDrops(true);
 
-/*
-  QwtPlotPicker* plotPicker = new QwtPlotPicker(this->xBottom, this->yLeft, QwtPicker::CrossRubberBand, QwtPicker::AlwaysOn, this->canvas());
-  QwtPickerMachine* pickerMachine = new QwtPickerClickPointMachine();
-  plotPicker->setStateMachine(pickerMachine);
-  connect(plotPicker, SIGNAL(moved(const QPointF&)), this, SLOT(onMoved(const QPointF&)));
-*/
-    CurveTracker* tracker = new CurveTracker( this->canvas() );
+  // track mouse position and display values
+  new CurveTracker( this->canvas() );
 
-    // for the demo we want the tracker to be active without
-    // having to click on the canvas
-    tracker->setStateMachine( new QwtPickerTrackerMachine() );
-    tracker->setRubberBandPen( QPen( "MediumOrchid" ) );
+  // fake data points
+  std::list<ignition::math::Vector2d> dataVect;
+  std::list<ignition::math::Vector2d> dataVect2;
+
+  for (int i =0 ; i<100; i++)
+  {
+
+    auto p = ignition::math::Vector2d(i, i*10.);
+    dataVect.push_back(p);
+    p.Y(p.Y() * -1.);
+    dataVect2.push_back(p);
+  }
+ this->AddCurve("curve-1");
+ this->Add("curve-1", dataVect);
+
+ this->AddCurve("curve-2");
+ this->Add("curve-2", dataVect2);
 
 }
 
@@ -440,14 +449,6 @@ void IncrementalPlot::Clear(const std::string &_label)
 /////////////////////////////////////////////////
 void IncrementalPlot::Clear()
 {
-/*  for (CurveMap::iterator iter = this->dataPtr->curves.begin();
-       iter != this->dataPtr->curves.end(); ++iter)
-  {
-    CurveData *curveData = static_cast<CurveData *>(iter->second->data());
-    curveData->Clear();
-    delete iter->second;
-  }*/
-
   for (auto &c : this->dataPtr->curves)
   {
     CurveData *curveData = static_cast<CurveData *>(c.second->curve->data());
@@ -496,11 +497,6 @@ bool IncrementalPlot::HasCurve(const std::string &_label)
 /////////////////////////////////////////////////
 void IncrementalPlot::Update()
 {
-/*  for (CurveMap::iterator iter = this->dataPtr->curves.begin();
-       iter != this->dataPtr->curves.end(); ++iter)
-  {
-    this->AdjustCurve(iter->second);
-  }*/
   for (auto &c : this->dataPtr->curves)
   {
     this->AdjustCurve(c.second);

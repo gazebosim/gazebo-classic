@@ -15,6 +15,11 @@
  *
 */
 
+#include <iostream>
+
+#include <qwt/qwt_painter.h>
+#include "gazebo/gui/qt.h"
+
 #include "CurveTracker.hh"
 
 using namespace gazebo;
@@ -28,6 +33,104 @@ struct compareX
         return ( x < pos.x() );
     }
 };
+
+/////////////////////////////////////////////////
+void CurveTracker::drawRubberBand( QPainter *painter ) const
+{
+    if ( !isActive() || rubberBand() == NoRubberBand ||
+        rubberBandPen().style() == Qt::NoPen )
+    {
+        return;
+    }
+
+    const QPolygon pa = adjustedPoints( this->pickedPoints() );
+
+    QwtPickerMachine::SelectionType selectionType =
+        QwtPickerMachine::NoSelection;
+
+    if ( this->stateMachine() )
+        selectionType = this->stateMachine()->selectionType();
+
+    switch ( selectionType )
+    {
+        case QwtPickerMachine::NoSelection:
+        case QwtPickerMachine::PointSelection:
+        {
+            if ( pa.count() < 1 )
+                return;
+
+            const QPoint pos = pa[0];
+
+            QPainterPath path;
+
+            const QWidget *widget = parentWidget();
+            if ( widget )
+                path.addRect( widget->contentsRect() );
+
+            const QRect pRect = path.boundingRect().toRect();
+            switch ( rubberBand() )
+            {
+                case VLineRubberBand:
+                {
+                   int x = pos.x();
+                   int top = pRect.top();
+                   int bottom = pRect.bottom();
+                   QwtPainter::drawLine( painter, x, top, x, bottom);
+                   break;
+                }
+                case HLineRubberBand:
+                {
+                    QwtPainter::drawLine( painter, pRect.left(),
+                        pos.y(), pRect.right(), pos.y() );
+                    break;
+                }
+                case CrossRubberBand:
+                {
+                    QwtPainter::drawLine( painter, pos.x(),
+                        pRect.top(), pos.x(), pRect.bottom() );
+                    QwtPainter::drawLine( painter, pRect.left(),
+                        pos.y(), pRect.right(), pos.y() );
+                    break;
+                }
+                default:
+                    break;
+            }
+            break;
+        }
+        case QwtPickerMachine::RectSelection:
+        {
+            if ( pa.count() < 2 )
+              return;
+
+            const QRect rect = QRect( pa.first(), pa.last() ).normalized();
+            switch ( rubberBand() )
+            {
+                case EllipseRubberBand:
+                {
+                    QwtPainter::drawEllipse( painter, rect );
+                    break;
+                }
+                case RectRubberBand:
+                {
+                    QwtPainter::drawRect( painter, rect );
+                    break;
+                }
+                default:
+                    break;
+            }
+            break;
+        }
+        case QwtPickerMachine::PolygonSelection:
+        {
+            if ( rubberBand() == PolygonRubberBand )
+                painter->drawPolyline( pa );
+            break;
+        }
+        default:
+            break;
+    }
+}
+
 
 /////////////////////////////////////////////////
 CurveTracker::CurveTracker(QwtPlotCanvas *_canvas)
@@ -77,7 +180,6 @@ QwtText CurveTracker::trackerTextF( const QPointF &_pos ) const
     QString info;
     const QwtPlotItemList curves =
         plot()->itemList( QwtPlotItem::Rtti_PlotCurve );
-
     for ( int i = 0; i < curves.size(); i++ )
     {
         const QString curveInfo = curveInfoAt(
@@ -95,8 +197,8 @@ QwtText CurveTracker::trackerTextF( const QPointF &_pos ) const
 }
 
 /////////////////////////////////////////////////
-QString CurveTracker::curveInfoAt(
-    const QwtPlotCurve *curve, const QPointF &_pos ) const
+QString CurveTracker::curveInfoAt( const QwtPlotCurve *curve,
+                                   const QPointF &_pos ) const
 {
     const QLineF line = curveLineAt( curve, _pos.x() );
     if ( line.isNull() )
@@ -105,26 +207,24 @@ QString CurveTracker::curveInfoAt(
     const double y = line.pointAt(
         ( _pos.x() - line.p1().x() ) / line.dx() ).y();
 
-    QString info( "<font color=""%1"">%2</font>" );
-    return info.arg( curve->pen().color().name() ).arg( y );
+    QString info( "<font color=""%1"">[%2, %3]</font>" );
+    return info.arg( curve->pen().color().name() ).arg(_pos.x() ).arg(y);
 }
 
-
+/////////////////////////////////////////////////
 int CurveTracker::UpperSampleIndex( const QwtSeriesData<QPointF> &series,
-     double value ) const
+                                    double value ) const
 {
     auto lessThan = compareX();
     const int indexMax = series.size() - 1;
     if ( indexMax < 0 || !lessThan( value, series.sample( indexMax ) )  )
         return -1;
-
     int indexMin = 0;
     int n = indexMax;
     while ( n > 0 )
     {
         const int half = n >> 1;
         const int indexMid = indexMin + half;
-
         if ( lessThan( value, series.sample( indexMid ) ) )
         {
             n = half;
@@ -139,8 +239,8 @@ int CurveTracker::UpperSampleIndex( const QwtSeriesData<QPointF> &series,
 }
 
 /////////////////////////////////////////////////
-QLineF CurveTracker::curveLineAt(
-    const QwtPlotCurve *_curve, double _x ) const
+QLineF CurveTracker::curveLineAt( const QwtPlotCurve *_curve,
+                                  double _x ) const
 {
     QLineF line;
 
@@ -165,7 +265,6 @@ QLineF CurveTracker::curveLineAt(
             }
         }
     }
-
     return line;
 }
 
