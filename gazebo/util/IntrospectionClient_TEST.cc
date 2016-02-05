@@ -213,7 +213,8 @@ TEST_F(IntrospectionClientTest, Items)
   // Let's query the list of items available.
   EXPECT_TRUE(this->client.Items(this->managerId, items));
   EXPECT_TRUE(this->client.IsRegistered(this->managerId, "item1"));
-  EXPECT_TRUE(this->client.IsRegistered(this->managerId, {"item1", "item2"}));
+  EXPECT_TRUE(this->client.IsRegistered(this->managerId,
+        std::set<std::string>{"item1", "item2"}));
   EXPECT_EQ(items.size(), 3u);
   EXPECT_TRUE(items.find("item1") != items.end());
   EXPECT_TRUE(items.find("item2") != items.end());
