@@ -70,6 +70,11 @@ namespace gazebo
                                 const std::string &_filterId,
                                 const std::set<std::string> &_newItems) const;
 
+      /// \brief Remove all existing filters.
+      /// \return True if the filters wer successfully removed
+      /// or false otherwise
+      public: bool RemoveAllFilters() const;
+
       /// \brief Remove an existing filter.
       /// \param[in] _managerID ID of the manager to request the operation.
       /// \param[in] _filterId ID of the filter to remove.

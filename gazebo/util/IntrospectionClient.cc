@@ -43,9 +43,7 @@ IntrospectionClient::IntrospectionClient()
 //////////////////////////////////////////////////
 IntrospectionClient::~IntrospectionClient()
 {
-  // Remove all the filters from the manager.
-  for (auto const &filter : this->dataPtr->filters)
-    this->RemoveFilter(filter.second, filter.first);
+  this->RemoveAllFilters();
 }
 
 //////////////////////////////////////////////////
@@ -144,6 +142,18 @@ bool IntrospectionClient::UpdateFilter(const std::string &_managerId,
     gzerr << "Unable to update a remote introspection filter" << std::endl;
     return false;
   }
+
+  return result;
+}
+
+//////////////////////////////////////////////////
+bool IntrospectionClient::RemoveAllFilters() const
+{
+  bool result = true;
+
+  // Remove all the filters from the manager.
+  for (auto const &filter : this->dataPtr->filters)
+    result = result && this->RemoveFilter(filter.second, filter.first);
 
   return result;
 }
