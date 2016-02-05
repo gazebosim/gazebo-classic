@@ -35,6 +35,26 @@ namespace gazebo
     /// and "redone".
     class GAZEBO_VISIBLE UserCmd
     {
+      /// \enum CmdStatus
+      /// \brief Possible statuses of a user command.
+      public: enum CmdStatus
+      {
+        /// \brief Idle.
+        IDLE,
+        /// \brief Pending undo.
+        UNDO_PENDING,
+        /// \brief Pending redo.
+        REDO_PENDING,
+        /// \brief Pending undo.
+        UNDO_EXECUTED,
+        /// \brief Pending redo.
+        REDO_EXECUTED,
+        /// \brief Undo has been recently executed.
+        UNDO_TRIGGERED,
+        /// \brief Redo has been recently executed.
+        REDO_TRIGGERED
+      };
+
       /// \brief Constructor
       /// \param[in] _manager Pointer to the user command manager.
       /// \param[in] _id Unique ID for this command
@@ -70,6 +90,14 @@ namespace gazebo
       /// \brief Return this command's type.
       /// \return Command type
       public: msgs::UserCmd::Type Type() const;
+
+      /// \brief Set this command's status.
+      /// \param[in] New command status.
+      public: void SetStatus(const UserCmd::CmdStatus _status);
+
+      /// \brief Return this command's status.
+      /// \return Current command status.
+      public: UserCmd::CmdStatus Status() const;
 
       /// \brief Set the name of the entity related tot he command.
       /// \param[in] _name Entity name.
@@ -110,9 +138,16 @@ namespace gazebo
       private: void OnUndoRedoMsg(ConstUndoRedoPtr &_msg);
 
       /// \brief Publish a message about current user command statistics.
+      private: void AddToCmdQueue(UserCmdPtr _cmd);
+
+      /// \brief Publish a message about current user command statistics.
       private: void PublishCurrentStats();
 
-      /// \brief Called every world update iteration, it processes world states
+      /// \brief called every world update iteration, it processes world states
+      /// in order.
+      private: void OnUpdate();
+
+      /// \brief called every world update iteration, it processes world states
       /// in order.
       private: void ProcessPendingStates();
 

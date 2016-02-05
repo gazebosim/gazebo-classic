@@ -27,6 +27,7 @@
 #include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/physics/UserCmdManager.hh"
 #include "gazebo/physics/WorldState.hh"
 
 #include "gazebo/transport/TransportTypes.hh"
@@ -66,6 +67,9 @@ namespace gazebo
 
       /// \brief Pointer to the user command manager.
       public: UserCmdManagerPtr manager;
+
+      /// \brief Pointer to the user command manager.
+      public: UserCmd::CmdStatus status;
     };
 
     class UserCmd;
@@ -112,6 +116,9 @@ namespace gazebo
 
       /// \brief List of commands which can be redone.
       public: std::vector<UserCmdPtr> redoCmds;
+
+      /// \brief Vector of entities whose insertions are pending.
+      public: std::list<UserCmdPtr> cmdQueue;
 
       /// \brief All the event connections.
       public: event::Connection_V connections;

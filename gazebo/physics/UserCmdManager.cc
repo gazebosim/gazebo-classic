@@ -25,15 +25,14 @@
 
 #include "gazebo/common/Events.hh"
 
-#include "gazebo/transport/transport.hh"
-
-#include "gazebo/physics/Model.hh"
 #include "gazebo/physics/Light.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/UserCmdManager.hh"
+#include "gazebo/physics/UserCmdManagerPrivate.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/WorldState.hh"
 
-#include "gazebo/physics/UserCmdManagerPrivate.hh"
-#include "gazebo/physics/UserCmdManager.hh"
+#include "gazebo/transport/transport.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -53,6 +52,7 @@ UserCmd::UserCmd(UserCmdManagerPtr _manager,
   this->dataPtr->description = _description;
   this->dataPtr->type = _type;
   this->dataPtr->sdf = NULL;
+  this->dataPtr->status = IDLE;
 
   // Record current world state
   this->dataPtr->startState = WorldState(this->dataPtr->world);
@@ -104,6 +104,8 @@ void UserCmd::Undo()
   // Set state to the moment the command was executed
   this->dataPtr->manager->dataPtr->pendingStates.push_back(
       this->dataPtr->startState);
+
+  this->SetStatus(UserCmd::UNDO_EXECUTED);
 }
 
 /////////////////////////////////////////////////
@@ -133,6 +135,8 @@ void UserCmd::Redo()
   // Set state to the moment undo was triggered
   this->dataPtr->manager->dataPtr->pendingStates.push_back(
       this->dataPtr->endState);
+
+  this->SetStatus(UserCmd::REDO_EXECUTED);
 }
 
 /////////////////////////////////////////////////
@@ -166,6 +170,18 @@ std::string UserCmd::EntityName() const
 }
 
 /////////////////////////////////////////////////
+void UserCmd::SetStatus(const UserCmd::CmdStatus _status)
+{
+  this->dataPtr->status = _status;
+}
+
+/////////////////////////////////////////////////
+UserCmd::CmdStatus UserCmd::Status() const
+{
+  return this->dataPtr->status;
+}
+
+/////////////////////////////////////////////////
 UserCmdManager::UserCmdManager(const WorldPtr _world)
   : dataPtr(new UserCmdManagerPrivate())
 {
@@ -173,7 +189,7 @@ UserCmdManager::UserCmdManager(const WorldPtr _world)
 
   // Events
   this->dataPtr->connections.push_back(event::Events::ConnectWorldUpdateBegin(
-      boost::bind(&UserCmdManager::ProcessPendingStates, this)));
+      boost::bind(&UserCmdManager::OnUpdate, this)));
 
   // Transport
   this->dataPtr->node = transport::NodePtr(new transport::Node());
@@ -327,12 +343,17 @@ void UserCmdManager::OnUndoRedoMsg(ConstUndoRedoPtr &_msg)
     // Undo all commands up to the desired one
     for (auto cmdIt : boost::adaptors::reverse(this->dataPtr->undoCmds))
     {
-      // Undo it
-      cmdIt->Undo();
+      // Set command as pending undo
+      cmdIt->SetStatus(UserCmd::CmdStatus::UNDO_PENDING);
+
+      // Add to command queue
+      this->AddToCmdQueue(cmdIt);
+
+      //cmdIt->Undo();
 
       // Transfer to the redo list
-      this->dataPtr->undoCmds.pop_back();
-      this->dataPtr->redoCmds.push_back(cmdIt);
+      //this->dataPtr->undoCmds.pop_back();
+      //this->dataPtr->redoCmds.push_back(cmdIt);
 
       if (cmdIt == cmd)
         break;
@@ -374,19 +395,23 @@ void UserCmdManager::OnUndoRedoMsg(ConstUndoRedoPtr &_msg)
     // Redo all commands up to the desired one
     for (auto cmdIt : boost::adaptors::reverse(this->dataPtr->redoCmds))
     {
-      // Redo it
-      cmdIt->Redo();
+      // Set command as pending redo
+      cmdIt->SetStatus(UserCmd::CmdStatus::REDO_PENDING);
+
+      // Add to command queue
+      this->AddToCmdQueue(cmdIt);
+      //cmdIt->Redo();
 
       // Transfer to the undo list
-      this->dataPtr->redoCmds.pop_back();
-      this->dataPtr->undoCmds.push_back(cmdIt);
+      //this->dataPtr->redoCmds.pop_back();
+      //this->dataPtr->undoCmds.push_back(cmdIt);
 
       if (cmdIt == cmd)
         break;
     }
   }
 
-  this->PublishCurrentStats();
+  //this->PublishCurrentStats();
 }
 
 /////////////////////////////////////////////////
@@ -414,6 +439,63 @@ void UserCmdManager::PublishCurrentStats()
   }
 
   this->dataPtr->userCmdStatsPub->Publish(statsMsg);
+}
+
+/////////////////////////////////////////////////
+void UserCmdManager::AddToCmdQueue(UserCmdPtr _cmd)
+{
+  this->dataPtr->cmdQueue.push_back(_cmd);
+}
+
+/////////////////////////////////////////////////
+void UserCmdManager::OnUpdate()
+{
+  if (this->dataPtr->cmdQueue.empty())
+    return;
+
+gzdbg << "A" << std::endl;
+
+  // Don't move on to the next command until this has been processed.
+  auto cmdIt = this->dataPtr->cmdQueue.front();
+  if (cmdIt->Status() == UserCmd::CmdStatus::UNDO_TRIGGERED ||
+      cmdIt->Status() == UserCmd::CmdStatus::REDO_TRIGGERED)
+  {
+gzdbg << "triggered" << std::endl;
+    return;
+  }
+
+  if (cmdIt->Status() == UserCmd::UNDO_EXECUTED)
+  {
+    // Transfer to the redo list
+    this->dataPtr->undoCmds.pop_back();
+    this->dataPtr->redoCmds.push_back(cmdIt);
+  }
+  else if (cmdIt->Status() == UserCmd::REDO_EXECUTED)
+  {
+    // Transfer to the undo list
+    this->dataPtr->redoCmds.pop_back();
+    this->dataPtr->undoCmds.push_back(cmdIt);
+  }
+  else
+  {
+    gzerr << "Command [" << cmdIt->Description() << "] is not pending but has"
+        " not been executed either." << std::endl;
+  }
+  this->dataPtr->cmdQueue.pop_front();
+gzdbg << "executed" << std::endl;
+
+  // Trigger the next command
+  if (cmdIt->Status() == UserCmd::CmdStatus::UNDO_PENDING)
+    cmdIt->Undo();
+  else if (cmdIt->Status() == UserCmd::CmdStatus::REDO_PENDING)
+    cmdIt->Redo();
+  else
+  {
+    gzerr << "Command [" << cmdIt->Description() << "] is in queue but is not "
+        "pending. It will be removed from the queue." << std::endl;
+    this->dataPtr->cmdQueue.pop_front();
+  }
+gzdbg << "trigger" << std::endl;
 }
 
 /////////////////////////////////////////////////
