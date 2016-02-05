@@ -7,12 +7,12 @@
 
 1. Removes one function call and replaces a manual swap with std::swap in ODE heightfield.
     * [Pull request #2114](https://bitbucket.org/osrf/gazebo/pull-request/2114)
+    
+1. New world event: BeforePhysicsUpdate
+    * [Issue #1851](https://bitbucket.org/osrf/gazebo/issues/1851)
 
 
 ## Gazebo 7.0.0 (2016-01-25)
-
-1. New world event: BeforePhysicsUpdate
-    * [Issue #1851](https://bitbucket.org/osrf/gazebo/issues/1851)
 
 1. Add FollowerPlugin
     * [Pull request #2085](https://bitbucket.org/osrf/gazebo/pull-request/2085)
