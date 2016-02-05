@@ -22,7 +22,6 @@
 
 #include "gazebo/gui/plot/PlotCurve.hh"
 #include "gazebo/gui/plot/IncrementalPlot.hh"
-#include "gazebo/gui/plot/PlottingEvents.hh"
 #include "gazebo/gui/plot/PlotManager.hh"
 
 using namespace gazebo;
