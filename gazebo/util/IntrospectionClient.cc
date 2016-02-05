@@ -47,6 +47,27 @@ IntrospectionClient::~IntrospectionClient()
 }
 
 //////////////////////////////////////////////////
+std::set<std::string> IntrospectionClient::WaitForManagers(
+    const std::chrono::milliseconds _timeOut) const
+{
+  std::set<std::string> result;
+  result = this->Managers();
+
+  auto dur = std::chrono::milliseconds(500);
+  std::chrono::milliseconds slept(0);
+
+  while (result.empty() && (_timeOut == std::chrono::milliseconds::zero() ||
+                            slept < _timeOut))
+  {
+    std::this_thread::sleep_for(dur);
+    slept += dur;
+    result = this->Managers();
+  }
+
+  return result;
+}
+
+//////////////////////////////////////////////////
 std::set<std::string> IntrospectionClient::Managers() const
 {
   std::vector<std::string> availableServices;

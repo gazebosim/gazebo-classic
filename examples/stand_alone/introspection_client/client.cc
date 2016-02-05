@@ -18,8 +18,7 @@
 #include <chrono>
 #include <iostream>
 #include <thread>
-#include <gazebo/gazebo.hh>
-#include <gazebo/physics/World.hh>
+#include <gazebo/msgs/msgs.hh>
 #include <gazebo/util/IntrospectionClient.hh>
 #include <ignition/transport.hh>
 
@@ -32,7 +31,7 @@ void cb(const gazebo::msgs::Param_V &_msg)
   auto now = std::chrono::steady_clock::now();
   auto elapsed = now - last;
   if (std::chrono::duration_cast<std::chrono::milliseconds>(
-        elapsed).count() >= std::chrono_literals::1000ms)
+        elapsed).count() >= 1000)
   {
     std::cout << _msg.DebugString() << std::endl;
     last = now;
@@ -42,26 +41,24 @@ void cb(const gazebo::msgs::Param_V &_msg)
 /////////////////////////////////////////////////
 int main(int _argc, char **_argv)
 {
-  // Initialize gazebo.
-  gazebo::setupServer(_argc, _argv);
-
-  // Load a world
-  gazebo::physics::WorldPtr world = gazebo::loadWorld("worlds/empty.world");
-  world->Run();
-
   // Use the introspection service for finding the "sim_time" item.
   gazebo::util::IntrospectionClient client;
-  std::set<std::string> managerIds = client.Managers();
+
+  // Wait for the managers to come online
+  std::set<std::string> managerIds = client.WaitForManagers(
+      std::chrono::seconds(2));
+
   if (managerIds.empty())
   {
     std::cerr << "No introspection managers detected." << std::endl;
+    std::cerr << "Is a gzserver running?" << std::endl;
     return -1;
   }
 
   // Pick up the first manager.
   std::string id = *managerIds.begin();
 
-  if (!client.IsRegistered("sim_time"))
+  if (!client.IsRegistered(id, "sim_time"))
   {
     std::cerr << "The sim_time item is not registered on the manager.\n";
     return -1;
@@ -78,9 +75,6 @@ int main(int _argc, char **_argv)
 
   /// zZZZ.
   getchar();
-
-  // Make sure to shut everything down.
-  gazebo::shutdown();
 
   return 0;
 }

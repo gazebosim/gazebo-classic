@@ -17,6 +17,7 @@
 #ifndef _GAZEBO_UTIL_INTROSPECTION_CLIENT_HH_
 #define _GAZEBO_UTIL_INTROSPECTION_CLIENT_HH_
 
+#include <chrono>
 #include <memory>
 #include <set>
 #include <string>
@@ -41,6 +42,19 @@ namespace gazebo
 
       /// \brief Destructor.
       public: virtual ~IntrospectionClient();
+
+      /// \brief Wait for introspection managers to appear on the network.
+      /// This function is useful for clients that want to pause until
+      /// one or more IntrospectionManagers becomes available (such as
+      /// when gzserver is run).
+      /// \param[in] _timeOut Maximum duration to wait. A value of
+      /// std::chrono::duration::zero indicates that the function should
+      /// wait indefinitely. An indefinite wait is the default behavior.
+      /// \return List of available managers.
+      /// \sa Managers()
+      public: std::set<std::string> WaitForManagers(
+                  const std::chrono::milliseconds _timeOut =
+                  std::chrono::milliseconds::zero()) const;
 
       /// \brief Get the list of introspection managers currently available.
       /// \return Set of unique manager IDs.
