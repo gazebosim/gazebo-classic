@@ -16,7 +16,6 @@
 */
 
 #include "gazebo/common/Battery.hh"
-#include "gazebo/common/Console.hh"
 #include "test/util.hh"
 
 using namespace gazebo;
