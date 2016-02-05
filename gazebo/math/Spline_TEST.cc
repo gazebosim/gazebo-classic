@@ -19,11 +19,10 @@
 
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Spline.hh"
-#include "test/util.hh"
 
 using namespace gazebo;
 
-class SplineTest : public gazebo::testing::AutoLogFixture { };
+class SplineTest : public ::testing::Test { };
 
 TEST_F(SplineTest, Spline)
 {
