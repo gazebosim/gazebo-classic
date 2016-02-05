@@ -20,8 +20,8 @@
  *                                                                       *
  *************************************************************************/
 
-#include <ode/common.h>
-#include <ode/matrix.h>
+#include <gazebo/ode/common.h>
+#include <gazebo/ode/matrix.h>
 #include "config.h"
 #include "util.h"
 

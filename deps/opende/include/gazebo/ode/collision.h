@@ -23,12 +23,12 @@
 #ifndef _ODE_COLLISION_H_
 #define _ODE_COLLISION_H_
 
-#include <ode/common.h>
-#include <ode/collision_space.h>
-#include <ode/contact.h>
-// Include odeinit.h for backward compatibility as some of initialization APIs 
+#include <gazebo/ode/common.h>
+#include <gazebo/ode/collision_space.h>
+#include <gazebo/ode/contact.h>
+// Include odeinit.h for backward compatibility as some of initialization APIs
 // were initally declared in current header.
-#include <ode/odeinit.h>
+#include <gazebo/ode/odeinit.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -410,24 +410,24 @@ ODE_API int dGeomIsEnabled (dGeomID geom);
 
 enum
 {
-	dGeomCommonControlClass = 0,
-	dGeomColliderControlClass = 1
+  dGeomCommonControlClass = 0,
+  dGeomColliderControlClass = 1
 };
 
 enum
 {
-	dGeomCommonAnyControlCode = 0,
+  dGeomCommonAnyControlCode = 0,
 
-	dGeomColliderSetMergeSphereContactsControlCode = 1,
-	dGeomColliderGetMergeSphereContactsControlCode = 2
+  dGeomColliderSetMergeSphereContactsControlCode = 1,
+  dGeomColliderGetMergeSphereContactsControlCode = 2
 };
 
 enum
 {
-	dGeomColliderMergeContactsValue__Default = 0, // Used with Set... to restore default value
-	dGeomColliderMergeContactsValue_None = 1,
-	dGeomColliderMergeContactsValue_Normals = 2,
-	dGeomColliderMergeContactsValue_Full = 3
+  dGeomColliderMergeContactsValue__Default = 0, // Used with Set... to restore default value
+  dGeomColliderMergeContactsValue_None = 1,
+  dGeomColliderMergeContactsValue_Normals = 2,
+  dGeomColliderMergeContactsValue_Full = 3
 };
 
 /**
@@ -435,11 +435,11 @@ enum
  *
  * The variable the dataSize points to must be initialized before the call.
  * If the size does not match the one expected for the control class/code function
- * changes it to the size expected and returns failure. This implies the function 
+ * changes it to the size expected and returns failure. This implies the function
  * can be called with NULL data and zero size to test if control class/code is supported
  * and obtain required data size for it.
  *
- * dGeomCommonAnyControlCode applies to any control class and returns success if 
+ * dGeomCommonAnyControlCode applies to any control class and returns success if
  * at least one control code is available for the given class with given geom.
  *
  * Currently there are the folliwing control classes supported:
@@ -741,9 +741,9 @@ ODE_API void dGeomGetOffsetQuaternion (dGeomID geom, dQuaternion result);
 /* collision detection */
 
 /*
- *	Just generate any contacts (disables any contact refining).
+ *  Just generate any contacts (disables any contact refining).
  */
-#define CONTACTS_UNIMPORTANT			0x80000000
+#define CONTACTS_UNIMPORTANT      0x80000000
 
 /**
  *
@@ -759,10 +759,10 @@ ODE_API void dGeomGetOffsetQuaternion (dGeomID geom, dQuaternion result);
  * @param flags The flags specify how contacts should be generated if
  * the geoms touch. The lower 16 bits of flags is an integer that
  * specifies the maximum number of contact points to generate. You must
- * ask for at least one contact. 
+ * ask for at least one contact.
  * Additionally, following bits may be set:
  * CONTACTS_UNIMPORTANT -- just generate any contacts (skip contact refining).
- * All other bits in flags must be set to zero. In the future the other bits 
+ * All other bits in flags must be set to zero. In the future the other bits
  * may be used to select from different contact generation strategies.
  *
  * @param contact Points to an array of dContactGeom structures. The array
@@ -793,7 +793,7 @@ ODE_API void dGeomGetOffsetQuaternion (dGeomID geom, dQuaternion result);
  * @ingroup collide
  */
 ODE_API int dCollide (dGeomID o1, dGeomID o2, int flags, dContactGeom *contact,
-	      int skip);
+        int skip);
 
 /**
  * @brief Determines which pairs of geoms in a space may potentially intersect,
@@ -826,9 +826,9 @@ ODE_API void dSpaceCollide (dSpaceID space, void *data, dNearCallback *callback)
 
 
 /**
- * @brief Determines which geoms from one space may potentially intersect with 
- * geoms from another space, and calls the callback function for each candidate 
- * pair. 
+ * @brief Determines which geoms from one space may potentially intersect with
+ * geoms from another space, and calls the callback function for each candidate
+ * pair.
  *
  * @param space1 The first space to test.
  *
@@ -840,8 +840,8 @@ ODE_API void dSpaceCollide (dSpaceID space, void *data, dNearCallback *callback)
  *
  * @param callback A callback function is of type @ref dNearCallback.
  *
- * @remarks This function can also test a single non-space geom against a 
- * space. This function is useful when there is a collision hierarchy, i.e. 
+ * @remarks This function can also test a single non-space geom against a
+ * space. This function is useful when there is a collision hierarchy, i.e.
  * when there are spaces that contain other spaces.
  *
  * @remarks Other spaces that are contained within the colliding space are
@@ -908,7 +908,7 @@ enum {
  */
 
 /**
- * @brief Create a sphere geom of the given radius, and return its ID. 
+ * @brief Create a sphere geom of the given radius, and return its ID.
  *
  * @param space   a space to contain the new geom. May be null.
  * @param radius  the radius of the sphere.
@@ -955,7 +955,7 @@ ODE_API dReal dGeomSphereGetRadius (dGeomID sphere);
  * @param y       the Y coordinate of the point.
  * @param z       the Z coordinate of the point.
  *
- * @returns The depth of the point. Points inside the sphere will have a 
+ * @returns The depth of the point. Points inside the sphere will have a
  * positive depth, points outside it will have a negative depth, and points
  * on the surface will have a depth of zero.
  *
@@ -966,16 +966,16 @@ ODE_API dReal dGeomSpherePointDepth (dGeomID sphere, dReal x, dReal y, dReal z);
 
 //--> Convex Functions
 ODE_API dGeomID dCreateConvex (dSpaceID space,
-			       dReal *_planes,
-			       unsigned int _planecount,
-			       dReal *_points,
-			       unsigned int _pointcount,unsigned int *_polygons);
+             dReal *_planes,
+             unsigned int _planecount,
+             dReal *_points,
+             unsigned int _pointcount,unsigned int *_polygons);
 
 ODE_API void dGeomSetConvex (dGeomID g,
-			     dReal *_planes,
-			     unsigned int _count,
-			     dReal *_points,
-			     unsigned int _pointcount,unsigned int *_polygons);
+           dReal *_planes,
+           unsigned int _count,
+           dReal *_points,
+           unsigned int _pointcount,unsigned int *_polygons);
 //<-- Convex Functions
 
 /**
@@ -1030,13 +1030,13 @@ ODE_API void dGeomBoxGetLengths (dGeomID box, dVector3 result);
 
 /**
  * @brief Return the depth of a point in a box.
- * 
+ *
  * @param box  the box to query
  * @param x    the X coordinate of the point to test.
  * @param y    the Y coordinate of the point to test.
  * @param z    the Z coordinate of the point to test.
  *
- * @returns The depth of the point. Points inside the box will have a 
+ * @returns The depth of the point. Points inside the box will have a
  * positive depth, points outside it will have a negative depth, and points
  * on the surface will have a depth of zero.
  */
@@ -1068,7 +1068,7 @@ ODE_API dGeomID dCreateRay (dSpaceID space, dReal length);
 ODE_API void dGeomRaySetLength (dGeomID ray, dReal length);
 ODE_API dReal dGeomRayGetLength (dGeomID ray);
 ODE_API void dGeomRaySet (dGeomID ray, dReal px, dReal py, dReal pz,
-		  dReal dx, dReal dy, dReal dz);
+      dReal dx, dReal dy, dReal dz);
 ODE_API void dGeomRayGet (dGeomID ray, dVector3 start, dVector3 dir);
 
 /*
@@ -1142,7 +1142,7 @@ typedef dReal dHeightfieldGetHeight( void* p_user_data, int x, int z );
  * @ingroup collide
  */
 ODE_API dGeomID dCreateHeightfield( dSpaceID space,
-					dHeightfieldDataID data, int bPlaceable );
+          dHeightfieldDataID data, int bPlaceable );
 
 
 /**
@@ -1213,9 +1213,9 @@ ODE_API void dGeomHeightfieldDataDestroy( dHeightfieldDataID d );
  * @ingroup collide
  */
 ODE_API void dGeomHeightfieldDataBuildCallback( dHeightfieldDataID d,
-				void* pUserData, dHeightfieldGetHeight* pCallback,
-				dReal width, dReal depth, int widthSamples, int depthSamples,
-				dReal scale, dReal offset, dReal thickness, int bWrap );
+        void* pUserData, dHeightfieldGetHeight* pCallback,
+        dReal width, dReal depth, int widthSamples, int depthSamples,
+        dReal scale, dReal offset, dReal thickness, int bWrap );
 
 /**
  * @brief Configures a dHeightfieldDataID to use height data in byte format.
@@ -1261,9 +1261,9 @@ ODE_API void dGeomHeightfieldDataBuildCallback( dHeightfieldDataID d,
  * @ingroup collide
  */
 ODE_API void dGeomHeightfieldDataBuildByte( dHeightfieldDataID d,
-				const unsigned char* pHeightData, int bCopyHeightData,
-				dReal width, dReal depth, int widthSamples, int depthSamples,
-				dReal scale, dReal offset, dReal thickness,	int bWrap );
+        const unsigned char* pHeightData, int bCopyHeightData,
+        dReal width, dReal depth, int widthSamples, int depthSamples,
+        dReal scale, dReal offset, dReal thickness,  int bWrap );
 
 /**
  * @brief Configures a dHeightfieldDataID to use height data in short format.
@@ -1309,12 +1309,12 @@ ODE_API void dGeomHeightfieldDataBuildByte( dHeightfieldDataID d,
  * @ingroup collide
  */
 ODE_API void dGeomHeightfieldDataBuildShort( dHeightfieldDataID d,
-				const short* pHeightData, int bCopyHeightData,
-				dReal width, dReal depth, int widthSamples, int depthSamples,
-				dReal scale, dReal offset, dReal thickness, int bWrap );
+        const short* pHeightData, int bCopyHeightData,
+        dReal width, dReal depth, int widthSamples, int depthSamples,
+        dReal scale, dReal offset, dReal thickness, int bWrap );
 
 /**
- * @brief Configures a dHeightfieldDataID to use height data in 
+ * @brief Configures a dHeightfieldDataID to use height data in
  * single precision floating point format.
  *
  * Before a dHeightfieldDataID can be used by a geom it must be
@@ -1359,12 +1359,12 @@ ODE_API void dGeomHeightfieldDataBuildShort( dHeightfieldDataID d,
  * @ingroup collide
  */
 ODE_API void dGeomHeightfieldDataBuildSingle( dHeightfieldDataID d,
-				const float* pHeightData, int bCopyHeightData,
-				dReal width, dReal depth, int widthSamples, int depthSamples,
-				dReal scale, dReal offset, dReal thickness, int bWrap );
+        const float* pHeightData, int bCopyHeightData,
+        dReal width, dReal depth, int widthSamples, int depthSamples,
+        dReal scale, dReal offset, dReal thickness, int bWrap );
 
 /**
- * @brief Configures a dHeightfieldDataID to use height data in 
+ * @brief Configures a dHeightfieldDataID to use height data in
  * double precision floating point format.
  *
  * Before a dHeightfieldDataID can be used by a geom it must be
@@ -1409,9 +1409,9 @@ ODE_API void dGeomHeightfieldDataBuildSingle( dHeightfieldDataID d,
  * @ingroup collide
  */
 ODE_API void dGeomHeightfieldDataBuildDouble( dHeightfieldDataID d,
-				const double* pHeightData, int bCopyHeightData,
-				dReal width, dReal depth, int widthSamples, int depthSamples,
-				dReal scale, dReal offset, dReal thickness, int bWrap );
+        const double* pHeightData, int bCopyHeightData,
+        dReal width, dReal depth, int widthSamples, int depthSamples,
+        dReal scale, dReal offset, dReal thickness, int bWrap );
 
 /**
  * @brief Manually set the minimum and maximum height bounds.
@@ -1431,7 +1431,7 @@ ODE_API void dGeomHeightfieldDataBuildDouble( dHeightfieldDataID d,
  * @ingroup collide
  */
 ODE_API void dGeomHeightfieldDataSetBounds( dHeightfieldDataID d,
-				dReal minHeight, dReal maxHeight );
+        dReal minHeight, dReal maxHeight );
 
 
 /**
@@ -1464,19 +1464,19 @@ ODE_API dHeightfieldDataID dGeomHeightfieldGetHeightfieldData( dGeomID g );
 /* utility functions */
 
 ODE_API void dClosestLineSegmentPoints (const dVector3 a1, const dVector3 a2,
-				const dVector3 b1, const dVector3 b2,
-				dVector3 cp1, dVector3 cp2);
+        const dVector3 b1, const dVector3 b2,
+        dVector3 cp1, dVector3 cp2);
 
 ODE_API int dBoxTouchesBox (const dVector3 _p1, const dMatrix3 R1,
-		    const dVector3 side1, const dVector3 _p2,
-		    const dMatrix3 R2, const dVector3 side2);
+        const dVector3 side1, const dVector3 _p2,
+        const dMatrix3 R2, const dVector3 side2);
 
 // The meaning of flags parameter is the same as in dCollide()
 ODE_API int dBoxBox (const dVector3 p1, const dMatrix3 R1,
-	     const dVector3 side1, const dVector3 p2,
-	     const dMatrix3 R2, const dVector3 side2,
-	     dVector3 normal, dReal *depth, int *return_code,
-	     int flags, dContactGeom *contact, int skip);
+       const dVector3 side1, const dVector3 p2,
+       const dMatrix3 R2, const dVector3 side2,
+       dVector3 normal, dReal *depth, int *return_code,
+       int flags, dContactGeom *contact, int skip);
 
 ODE_API void dInfiniteAABB (dGeomID geom, dReal aabb[6]);
 
@@ -1486,7 +1486,7 @@ ODE_API void dInfiniteAABB (dGeomID geom, dReal aabb[6]);
 
 typedef void dGetAABBFn (dGeomID, dReal aabb[6]);
 typedef int dColliderFn (dGeomID o1, dGeomID o2,
-			 int flags, dContactGeom *contact, int skip);
+       int flags, dContactGeom *contact, int skip);
 typedef dColliderFn * dGetColliderFnFn (int num);
 typedef void dGeomDtorFn (dGeomID o);
 typedef int dAABBTestFn (dGeomID o1, dGeomID o2, dReal aabb[6]);
@@ -1504,7 +1504,7 @@ ODE_API void * dGeomGetClassData (dGeomID);
 ODE_API dGeomID dCreateGeom (int classnum);
 
 /**
- * @brief Sets a custom collider function for two geom classes. 
+ * @brief Sets a custom collider function for two geom classes.
  *
  * @param i The first geom class handled by this collider
  * @param j The second geom class handled by this collider

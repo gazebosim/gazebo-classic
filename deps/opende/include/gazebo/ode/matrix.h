@@ -25,7 +25,7 @@
 #ifndef _ODE_MATRIX_H_
 #define _ODE_MATRIX_H_
 
-#include <ode/common.h>
+#include <gazebo/ode/common.h>
 
 
 #ifdef __cplusplus
@@ -54,7 +54,7 @@ ODE_API dReal dDot (const dReal *a, const dReal *b, int n);
 
 /* NOT INCLUDED in the library for now.
 void dMultidot2 (const dReal *a0, const dReal *a1,
-		 const dReal *b, dReal *outsum, int n);
+     const dReal *b, dReal *outsum, int n);
 */
 
 
@@ -154,7 +154,7 @@ ODE_API void dSolveLDLT (const dReal *L, const dReal *d, dReal *b, int n, int ns
  *   - d has size n. d contains the reciprocal diagonal elements of D.
  *   - a has size n.
  * the result is written into L, except that the left column of L and d[0]
- * are not actually modified. see ldltaddTL.m for further comments. 
+ * are not actually modified. see ldltaddTL.m for further comments.
  */
 ODE_API void dLDLTAddTL (dReal *L, dReal *d, const dReal *a, int n, int nskip);
 
@@ -177,7 +177,7 @@ ODE_API void dLDLTAddTL (dReal *L, dReal *d, const dReal *a, int n, int nskip);
  * a fast O(n^2) algorithm is used. see ldltremove.m for further comments.
  */
 ODE_API void dLDLTRemove (dReal **A, const int *p, dReal *L, dReal *d,
-		  int n1, int n2, int r, int nskip);
+      int n1, int n2, int r, int nskip);
 
 
 /* given an n*n matrix A (with leading dimension nskip), remove the r'th row
