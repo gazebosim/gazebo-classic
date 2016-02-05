@@ -1,9 +1,11 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
 set (sources_local
+  plot/PlotWindow.cc
 )
 
 set (qt_headers_local
+  plot/PlotWindow.hh
 )
 
 set (qt_tests_local

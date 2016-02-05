@@ -9,6 +9,7 @@ link_directories(
 
 include_directories(
   ${CMAKE_SOURCE_DIR}/deps
+  ${QWT_INCLUDE_DIR}
 )
 
 include_directories(${tinyxml_INCLUDE_DIRS})
@@ -158,7 +159,10 @@ add_subdirectory(viewers)
 add_subdirectory(terrain)
 add_subdirectory(building)
 add_subdirectory(model)
+
+if (HAVE_QWT)
 add_subdirectory(plot)
+endif()
 
 if (HAVE_GRAPHVIZ)
   add_definitions(-DWITH_CGRAPH)
@@ -220,6 +224,10 @@ target_link_libraries(gazebo_gui
 
 if (UNIX)
   target_link_libraries(gazebo_gui pthread)
+endif()
+
+if (HAVE_QWT)
+  target_link_libraries(gazebo_gui ${QWT_LIBRARY})
 endif()
 
 if (HAVE_GRAPHVIZ)
