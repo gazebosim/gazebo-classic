@@ -36,8 +36,6 @@ class IntrospectionClientTest : public ::testing::Test
     callbackExecuted(false),
     manager(util::IntrospectionManager::Instance())
   {
-    // Give some time to discover nodes/services.
-    std::this_thread::sleep_for(std::chrono::milliseconds(300));
     this->managerId = this->manager->Id();
   }
 

@@ -61,7 +61,6 @@ std::set<std::string> IntrospectionClient::Managers() const
   auto from = kStartDelim.size();
   for (auto const &service : availableServices)
   {
-    std::cout << service << std::endl;
     if (service.find(kStartDelim) == 0)
     {
       // Find the next "/".

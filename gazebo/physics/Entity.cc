@@ -49,8 +49,6 @@
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/Entity.hh"
 
-#include "gazebo/util/IntrospectionManager.hh"
-
 using namespace gazebo;
 using namespace physics;
 
