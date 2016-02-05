@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,7 @@
 #include <chrono>
 #include <iostream>
 #include <thread>
-#include <gazebo/gazebo.hh>
-#include <gazebo/physics/World.hh>
+#include <gazebo/msgs/msgs.hh>
 #include <gazebo/util/IntrospectionClient.hh>
 #include <ignition/transport.hh>
 
@@ -42,33 +41,26 @@ void cb(const gazebo::msgs::Param_V &_msg)
 /////////////////////////////////////////////////
 int main(int _argc, char **_argv)
 {
-  // Initialize gazebo.
-  gazebo::setupServer(_argc, _argv);
-
-  // Load a world
-  gazebo::physics::WorldPtr world = gazebo::loadWorld("worlds/empty.world");
-  world->Run();
-
   // Use the introspection service for finding the "sim_time" item.
   gazebo::util::IntrospectionClient client;
-  std::set<std::string> managerIds = client.Managers();
+
+  // Wait for the managers to come online
+  std::set<std::string> managerIds = client.WaitForManagers(
+      std::chrono::seconds(2));
+
   if (managerIds.empty())
   {
     std::cerr << "No introspection managers detected." << std::endl;
+    std::cerr << "Is a gzserver running?" << std::endl;
     return -1;
   }
 
   // Pick up the first manager.
   std::string id = *managerIds.begin();
 
-  // Query its items.
-  std::set<std::string> items;
-  if (!client.Items(id, items))
-    return -1;
-
-  if (items.empty())
+  if (!client.IsRegistered(id, "sim_time"))
   {
-    std::cout << "No items registered in manager [" << id << "]." << std::endl;
+    std::cerr << "The sim_time item is not registered on the manager.\n";
     return -1;
   }
 
@@ -83,9 +75,6 @@ int main(int _argc, char **_argv)
 
   /// zZZZ.
   getchar();
-
-  // Make sure to shut everything down.
-  gazebo::shutdown();
 
   return 0;
 }
