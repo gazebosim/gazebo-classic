@@ -121,6 +121,7 @@ auto standaloneValues = ::testing::Values(
   , "custom_main"
   , "custom_main_pkgconfig"
   , "listener"
+  , "open_world"
   , "publisher"
 #ifndef BUILD_TYPE_COVERAGE
   , "test_fixture"
