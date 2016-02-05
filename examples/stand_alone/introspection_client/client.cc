@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ void cb(const gazebo::msgs::Param_V &_msg)
   auto now = std::chrono::steady_clock::now();
   auto elapsed = now - last;
   if (std::chrono::duration_cast<std::chrono::milliseconds>(
-        elapsed).count() >= 1000)
+        elapsed).count() >= std::chrono_literals::1000ms)
   {
     std::cout << _msg.DebugString() << std::endl;
     last = now;
@@ -61,14 +61,9 @@ int main(int _argc, char **_argv)
   // Pick up the first manager.
   std::string id = *managerIds.begin();
 
-  // Query its items.
-  std::set<std::string> items;
-  if (!client.Items(id, items))
-    return -1;
-
-  if (items.empty())
+  if (!client.IsRegistered("sim_time"))
   {
-    std::cout << "No items registered in manager [" << id << "]." << std::endl;
+    std::cerr << "The sim_time item is not registered on the manager.\n";
     return -1;
   }
 

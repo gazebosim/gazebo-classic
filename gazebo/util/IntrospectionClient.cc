@@ -82,6 +82,9 @@ bool IntrospectionClient::NewFilter(const std::string &_managerId,
   gazebo::msgs::GzString rep;
   bool result;
 
+  if (!this->IsRegistered(_managerId, _newItems))
+    return false;
+
   // Add to the message the list of items to include in the filter.
   for (auto const &itemName : _newItems)
   {
@@ -212,4 +215,38 @@ bool IntrospectionClient::Items(const std::string &_managerId,
     _items.emplace(param.value().string_value());
   }
   return true;
+}
+
+//////////////////////////////////////////////////
+bool IntrospectionClient::IsRegistered(const std::string &_managerId,
+    const std::string &_item) const
+{
+  std::set<std::string> items;
+
+  if (this->Items(_managerId, items))
+  {
+    if (items.find(_item) != items.end())
+      return true;
+  }
+
+  return false;
+}
+
+//////////////////////////////////////////////////
+bool IntrospectionClient::IsRegistered(const std::string &_managerId,
+    const std::set<std::string> &_items) const
+{
+  std::set<std::string> items;
+
+  if (this->Items(_managerId, items))
+  {
+    for (auto const &item : _items)
+    {
+      if (items.find(item) == items.end())
+        return false;
+    }
+    return true;
+  }
+
+  return false;
 }

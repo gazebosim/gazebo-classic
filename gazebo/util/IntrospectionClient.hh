@@ -90,6 +90,24 @@ namespace gazebo
       public: bool Items(const std::string &_managerId,
                          std::set<std::string> &_items) const;
 
+      /// \bried Check if the _item is registered on a manager with
+      /// _managerId.
+      /// \param[in] _managerId Id of the manager to query.
+      /// \param[in] _item Item name for the query.
+      /// \return True if the introspection manager with ID==_managerId has
+      /// an item registered with name == _item.
+      public: bool IsRegistered(const std::string &_managerId,
+                                const std::string &_item) const;
+
+      /// \bried Check if the _items are registered on a manager with
+      /// _managerId.
+      /// \param[in] _managerId Id of the manager to query.
+      /// \param[in] _items Set of item names for the query.
+      /// \return True if the introspection manager with ID==_managerId has
+      /// all the items registered.
+      public: bool IsRegistered(const std::string &_managerId,
+                                const std::set<std::string> &_items) const;
+
       /// \internal
       /// \brief Private data pointer.
       private: std::unique_ptr<IntrospectionClientPrivate> dataPtr;
