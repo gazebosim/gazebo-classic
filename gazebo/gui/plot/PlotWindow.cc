@@ -15,12 +15,10 @@
  *
 */
 
-#include "gazebo/transport/Node.hh"
-#include "gazebo/transport/Publisher.hh"
-#include "gazebo/transport/TransportIface.hh"
-
 #include "gazebo/gui/plot/ExportDialog.hh"
 #include "gazebo/gui/plot/VariablePillContainer.hh"
+#include "gazebo/gui/plot/PlotCurve.hh"
+#include "gazebo/gui/plot/IncrementalPlot.hh"
 #include "gazebo/gui/plot/PlotCanvas.hh"
 #include "gazebo/gui/plot/PlotWindow.hh"
 #include "gazebo/gui/plot/PlotWindowPrivate.hh"
@@ -60,7 +58,6 @@ PlotWindow::PlotWindow(QWidget *_parent)
   : QDialog(_parent),
     dataPtr(new PlotWindowPrivate())
 {
-  this->dataPtr->paused = false;
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));
   this->setWindowTitle("Gazebo: Plotting Utility");
   this->setObjectName("PlotWindow");
@@ -90,14 +87,14 @@ PlotWindow::PlotWindow(QWidget *_parent)
   this->dataPtr->plotPlayAct = new QAction(QIcon(":/images/play.png"),
       tr("Play"), this);
   this->dataPtr->plotPlayAct->setStatusTip(tr("Continue Plotting"));
-  this->dataPtr->plotPlayAct->setVisible(true);
+  this->dataPtr->plotPlayAct->setVisible(false);
   connect(this->dataPtr->plotPlayAct, SIGNAL(triggered()),
       this, SLOT(OnPlay()));
 
   this->dataPtr->plotPauseAct = new QAction(QIcon(":/images/pause.png"),
       tr("Pause"), this);
   this->dataPtr->plotPauseAct->setStatusTip(tr("Pause Plotting"));
-  this->dataPtr->plotPauseAct->setVisible(false);
+  this->dataPtr->plotPauseAct->setVisible(true);
   connect(this->dataPtr->plotPauseAct, SIGNAL(triggered()),
       this, SLOT(OnPause()));
 
@@ -147,12 +144,11 @@ PlotWindow::PlotWindow(QWidget *_parent)
   QListWidgetItem *itemc = new QListWidgetItem("Turtle");
   itemc->setToolTip(tr("Drag onto graph to plot"));
   this->dataPtr->labelList->addItem(itemc);
-
   //=================
 
   QVBoxLayout *leftLayout = new QVBoxLayout;
   leftLayout->addWidget(this->dataPtr->labelList);
-  //leftLayout->addLayout(pauseLayout);
+  // leftLayout->addLayout(pauseLayout);
 
   QHBoxLayout *mainLayout = new QHBoxLayout;
   mainLayout->addLayout(leftLayout);
@@ -162,15 +158,9 @@ PlotWindow::PlotWindow(QWidget *_parent)
   this->setLayout(mainLayout);
   this->setSizeGripEnabled(true);
 
-  this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init();
-//  this->dataPtr->sub = this->dataPtr->node->Subscribe("~/PlotWindow",
-//      &PlotWindow::OnMsg, this);
-
-  msgs::DiagnosticControl msg;
-  msg.set_enabled(true);
-  this->dataPtr->node->Publish<msgs::DiagnosticControl>(
-      "~/diagnostic/control", msg);
+  QTimer *displayTimer = new QTimer(this);
+  connect(displayTimer, SIGNAL(timeout()), this, SLOT(Update()));
+  displayTimer->start(30);
 }
 
 /////////////////////////////////////////////////
@@ -235,34 +225,6 @@ void PlotWindow::OnExport()
 }
 
 /////////////////////////////////////////////////
-void PlotWindow::OnPause()
-{
-  this->dataPtr->paused = true;
-  this->dataPtr->plotPauseAct->setVisible(false);
-  this->dataPtr->plotPlayAct->setVisible(true);
-}
-
-/////////////////////////////////////////////////
-PlotCanvas *PlotWindow::AddCanvas()
-{
-  PlotCanvas *canvas = new PlotCanvas(this);
-  this->dataPtr->canvasLayout->addWidget(canvas);
-  return canvas;
-}
-
-/////////////////////////////////////////////////
-void PlotWindow::RemoveCanvas(PlotCanvas *canvas)
-{
-  int idx = this->dataPtr->canvasLayout->indexOf(canvas);
-  if (idx < 0)
-    return;
-
-  canvas->hide();
-  this->dataPtr->canvasLayout->takeAt(idx);
-  delete canvas;
-}
-
-/////////////////////////////////////////////////
 std::list<PlotCanvas*> PlotWindow::Plots()
 {
   std::list<PlotCanvas*> plots;
@@ -275,6 +237,42 @@ std::list<PlotCanvas*> PlotWindow::Plots()
 }
 
 /////////////////////////////////////////////////
+void PlotWindow::OnPause()
+{
+  this->dataPtr->paused = true;
+  this->dataPtr->plotPauseAct->setVisible(false);
+  this->dataPtr->plotPlayAct->setVisible(true);
+}
+
+/////////////////////////////////////////////////
+PlotCanvas *PlotWindow::AddCanvas()
+{
+  PlotCanvas *canvas = new PlotCanvas(this);
+  connect(canvas, SIGNAL(CanvasDeleted()), this, SLOT(OnRemoveCanvas()));
+
+  this->dataPtr->canvasLayout->addWidget(canvas);
+  return canvas;
+}
+
+/////////////////////////////////////////////////
+void PlotWindow::RemoveCanvas(PlotCanvas *_canvas)
+{
+  int idx = this->dataPtr->canvasLayout->indexOf(_canvas);
+  if (idx < 0)
+    return;
+
+  // canvas->hide();
+  this->dataPtr->canvasLayout->takeAt(idx);
+  _canvas->deleteLater();
+}
+
+/////////////////////////////////////////////////
+unsigned int PlotWindow::CanvasCount() const
+{
+  return static_cast<unsigned int>(this->dataPtr->canvasLayout->count());
+}
+
+/////////////////////////////////////////////////
 void PlotWindow::OnAddCanvas()
 {
   this->AddCanvas();
@@ -283,149 +281,59 @@ void PlotWindow::OnAddCanvas()
 /////////////////////////////////////////////////
 void PlotWindow::OnRemoveCanvas()
 {
-  PlotCanvas *canvas =
-    qobject_cast<PlotCanvas *>(QObject::sender());
-
+  PlotCanvas *canvas = qobject_cast<PlotCanvas *>(QObject::sender());
   if (!canvas)
     return;
 
   this->RemoveCanvas(canvas);
+
+  // add an empty canvas if the plot window is now empty
+  if (this->dataPtr->canvasLayout->isEmpty())
+    this->AddCanvas();
 }
 
 /////////////////////////////////////////////////
-bool PlotWindow::eventFilter(QObject *o, QEvent *e)
+void PlotWindow::Update()
 {
-  if (e->type() == QEvent::Wheel)
-  {
-    e->ignore();
-    return true;
-  }
-
-  return QWidget::eventFilter(o, e);
-}
-
-/////////////////////////////////////////////////
-void PlotWindow::closeEvent(QCloseEvent *_evt)
-{
-  msgs::DiagnosticControl msg;
-  msg.set_enabled(false);
-  this->dataPtr->node->Publish<msgs::DiagnosticControl>(
-      "~/diagnostic/control", msg);
-
-  QDialog::closeEvent(_evt);
-}
-
-
-
-/*/////////////////////////////////////////////////
-void PlotWindow::OnMsg(ConstPlotWindowPtr &_msg)
-{
-  // Make sure plotting is not paused.
   if (this->dataPtr->paused)
     return;
 
-  // Make sure there is timing information
-  if (_msg->time_size() == 0)
-    return;
-
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-
-  common::Time wallTime, elapsedTime;
-
-  wallTime = msgs::Convert(_msg->real_time());
-
-  // Add real-time factor if it has been requested.
-  for (auto &plot : this->dataPtr->plots)
+  for (int i = 0; i < this->dataPtr->canvasLayout->count(); ++i)
   {
-    if (plot->HasCurve(QString("Real Time Factor")))
-    {
-      plot->Add(QString("Real Time Factor"),
-               QPointF(wallTime.Double(), _msg->real_time_factor()));
-    }
+    QLayoutItem *item = this->dataPtr->canvasLayout->itemAt(i);
+    PlotCanvas *canvas = qobject_cast<PlotCanvas *>(item->widget());
+    if (!canvas)
+      continue;
+    canvas->Update();
   }
+}
 
-  // Process each time point
-  for (int i = 0; i < _msg->time_size(); ++i)
+/////////////////////////////////////////////////
+void PlotWindow::Export()
+{
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  for (int i = 0; i < this->dataPtr->canvasLayout->count(); ++i)
   {
-    QString qstr = QString::fromStdString(_msg->time(i).name());
+    QLayoutItem *item = this->dataPtr->canvasLayout->itemAt(i);
+    PlotCanvas *canvas = qobject_cast<PlotCanvas *>(item->widget());
+    if (!canvas)
+      continue;
 
-    // Add the time label to the list if it's not already there.
-    QList<QListWidgetItem*> items = this->dataPtr->labelList->findItems(qstr,
-        Qt::MatchExactly);
-
-    if (items.size() == 0)
+    for (const auto &plot : canvas->Plots())
     {
-      QListWidgetItem *item = new QListWidgetItem(qstr);
-      item->setToolTip(tr("Drag onto graph to plot"));
-      this->dataPtr->labelList->addItem(item);
-    }
-
-    QString labelStr(_msg->time(i).name().c_str());
-
-    // Check to see if the data belongs in a plot, and add it.
-    for (auto &plot : this->dataPtr->plots)
-    {
-      if (plot->HasCurve(labelStr))
+      for (const auto &curve : plot->Curves())
       {
-        elapsedTime = msgs::Convert(_msg->time(i).elapsed());
+        auto c = curve.lock();
+        if (!c)
+          continue;
 
-        double msTime = elapsedTime.Double() * 1e3;
-        QPointF pt(wallTime.Double(), msTime);
-
-        plot->Add(labelStr, pt);
+        for (unsigned int j = 0; j < c->Size(); ++j)
+        {
+          ignition::math::Vector2d pt = c->Point(j);
+          std::cerr << pt.X() << ", " << pt.Y() << std::endl;
+        }
       }
     }
   }
-
-  // Process each variable
-  for (int i = 0; i < _msg->variable_size(); ++i)
-  {
-    QString qstr = QString::fromStdString(_msg->variable(i).name());
-
-    // Add the time label to the list if it's not already there.
-    QList<QListWidgetItem*> items = this->dataPtr->labelList->findItems(qstr,
-        Qt::MatchExactly);
-
-    if (items.size() == 0)
-    {
-      QListWidgetItem *item = new QListWidgetItem(qstr);
-      item->setToolTip(tr("Drag onto graph to plot"));
-      this->dataPtr->labelList->addItem(item);
-    }
-
-    // Check to see if the data belongs in a plot, and add it.
-    for (auto iter = this->dataPtr->plots.begin();
-        iter != this->dataPtr->plots.end(); ++iter)
-    {
-      if ((*iter)->HasCurve(qstr))
-      {
-        QPointF pt(wallTime.Double(), _msg->variable(i).value());
-        (*iter)->Add(qstr, pt);
-      }
-    }
-  }
-
-  // Process each marker
-  for (int i = 0; i < _msg->marker_size(); ++i)
-  {
-    QString qstr = QString::fromStdString(_msg->marker(i).name());
-
-    // Add the time label to the list if it's not already there.
-    QList<QListWidgetItem*> items = this->dataPtr->labelList->findItems(qstr,
-        Qt::MatchExactly);
-
-    if (items.size() == 0)
-    {
-      QListWidgetItem *item = new QListWidgetItem(qstr);
-      item->setToolTip(tr("Drag onto graph to plot"));
-      this->dataPtr->labelList->addItem(item);
-    }
-
-    // Add all marker to all plots
-    for (auto iter = this->dataPtr->plots.begin();
-        iter != this->dataPtr->plots.end(); ++iter)
-    {
-      (*iter)->AddVLine(qstr, wallTime.Double());
-    }
-  }
-}*/
+}

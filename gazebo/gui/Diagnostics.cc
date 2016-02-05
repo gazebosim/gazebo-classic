@@ -171,10 +171,11 @@ void Diagnostics::OnMsg(ConstDiagnosticsPtr &_msg)
   // Add real-time factor if it has been requested.
   for (auto &plot : this->dataPtr->plots)
   {
-    if (plot->HasCurve(QString("Real Time Factor")))
+    if (plot->HasCurve("Real Time Factor"))
     {
-      plot->Add(QString("Real Time Factor"),
-               QPointF(wallTime.Double(), _msg->real_time_factor()));
+      plot->Add("Real Time Factor",
+          ignition::math::Vector2d(wallTime.Double(),
+          _msg->real_time_factor()));
     }
   }
 
@@ -194,19 +195,17 @@ void Diagnostics::OnMsg(ConstDiagnosticsPtr &_msg)
       this->dataPtr->labelList->addItem(item);
     }
 
-    QString labelStr(_msg->time(i).name().c_str());
-
     // Check to see if the data belongs in a plot, and add it.
     for (auto &plot : this->dataPtr->plots)
     {
-      if (plot->HasCurve(labelStr))
+      if (plot->HasCurve(_msg->time(i).name()))
       {
         elapsedTime = msgs::Convert(_msg->time(i).elapsed());
 
         double msTime = elapsedTime.Double() * 1e3;
-        QPointF pt(wallTime.Double(), msTime);
 
-        plot->Add(labelStr, pt);
+        ignition::math::Vector2d pt(wallTime.Double(), msTime);
+        plot->Add(_msg->time(i).name(), pt);
       }
     }
   }
@@ -231,10 +230,11 @@ void Diagnostics::OnMsg(ConstDiagnosticsPtr &_msg)
     for (auto iter = this->dataPtr->plots.begin();
         iter != this->dataPtr->plots.end(); ++iter)
     {
-      if ((*iter)->HasCurve(qstr))
+      if ((*iter)->HasCurve(_msg->variable(i).name()))
       {
-        QPointF pt(wallTime.Double(), _msg->variable(i).value());
-        (*iter)->Add(qstr, pt);
+        ignition::math::Vector2d pt(wallTime.Double(),
+            _msg->variable(i).value());
+        (*iter)->Add(_msg->variable(i).name(), pt);
       }
     }
   }
@@ -259,7 +259,7 @@ void Diagnostics::OnMsg(ConstDiagnosticsPtr &_msg)
     for (auto iter = this->dataPtr->plots.begin();
         iter != this->dataPtr->plots.end(); ++iter)
     {
-      (*iter)->AddVLine(qstr, wallTime.Double());
+      (*iter)->AddVLine(_msg->marker(i).name(), wallTime.Double());
     }
   }
 }

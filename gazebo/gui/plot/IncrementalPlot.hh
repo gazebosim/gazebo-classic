@@ -17,24 +17,27 @@
 #ifndef _GAZEBO_GUI_PLOT_INCREMENTALPLOT_HH_
 #define _GAZEBO_GUI_PLOT_INCREMENTALPLOT_HH_
 
-#include <map>
-#include <list>
+#include <memory>
+#include <string>
+#include <vector>
 
-#include <qwt/qwt_plot_magnifier.h>
 #include <qwt/qwt_plot.h>
 
-#include "gazebo/math/Vector2d.hh"
+#include <ignition/math/Vector2.hh>
 
 #include "gazebo/gui/qt.h"
+#include "gazebo/gui/plot/PlottingTypes.hh"
 #include "gazebo/util/system.hh"
 
 class QwtPlotCurve;
-class QwtPlotDirectPainter;
 
 namespace gazebo
 {
   namespace gui
   {
+    // Forward declare private data class
+    struct IncrementalPlotPrivate;
+
     /// \brief A plotting widget that handles incremental addition of data.
     class GZ_GUI_VISIBLE IncrementalPlot : public QwtPlot
     {
@@ -47,31 +50,28 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~IncrementalPlot();
 
-      /// \brief Give QT a size hint.
-      /// \return Default size of the plot.
-      public: virtual QSize sizeHint() const;
-
       /// \brief Add a new point to a curve.
       /// \param[in] _label Name of the curve to add a point to. A curve
       /// will be added if it doesn't exist.
       /// \param[in] _pt Point to add.
-      public slots: void Add(const QString &_label, const QPointF &_pt);
+      public:  void Add(const std::string &_label,
+          const ignition::math::Vector2d &_pt);
 
       /// \brief Add new points to a curve.
       /// \param[in] _label Name of the curve to add a point to. A curve
       /// will be added if it doesn't exist.
       /// \param[in] _pt Points to add.
-      public slots: void Add(const QString &_label,
-                             const std::list<QPointF> &_pts);
+      public: void Add(const std::string &_label,
+          const std::vector<ignition::math::Vector2d> &_pts);
 
       /// \brief Add a vertical line to the plot.
       /// \param[in] _label Label for the line.
       /// \param[in] _x X position for the vertical line.
-      public: void AddVLine(const QString &_label, double _x);
+      public: void AddVLine(const std::string &_label, const double _x);
 
       /// \brief Clear a single curve from the plot.
       /// \param[in] _label Name of the curve to remove.
-      public: void Clear(const QString &_label);
+      public: void Clear(const std::string &_label);
 
       /// \brief Clear all points from the plot.
       public: void Clear();
@@ -79,7 +79,17 @@ namespace gazebo
       /// \brief Return true if the plot has the labeled curve.
       /// \param[in] _label Name of the curve to check for.
       /// \return True if _label is currently plotted.
-      public: bool HasCurve(const QString &_label);
+      public: bool HasCurve(const std::string &_label);
+
+      /// \brief Find a plot curve by name
+      /// \param[in] _label Name of the curve to look for.
+      /// \return Plot curve if found, NULL otherwise.
+      public: PlotCurveWeakPtr Curve(const std::string &_label) const;
+
+      /// \brief Find a plot curve by id
+      /// \param[in] _id Unique id of the plot curve.
+      /// \return Plot curve if found, NULL otherwise.
+      public: PlotCurveWeakPtr Curve(const unsigned int _id) const;
 
       /// \brief Update all the curves in the plot
       public: void Update();
@@ -87,15 +97,38 @@ namespace gazebo
       /// \brief Add a named curve.
       /// \param[in] _label Name of the curve.
       /// \return A pointer to the new curve.
-      public: QwtPlotCurve *AddCurve(const QString &_label);
+      public: PlotCurveWeakPtr AddCurve(const std::string &_label);
+
+      /// \brief Remove a curve by id
+      /// \param[in] _id Unique id of the curve.
+      public: void RemoveCurve(const unsigned int _id);
 
       /// \brief Set the period over which to plot.
       /// \param[in] _seconds Period duration in seconds.
-      public: void SetPeriod(unsigned int _seconds);
+      public: void SetPeriod(const unsigned int _seconds);
 
       /// \brief Attach a curve to this plot.
-      /// \param[in] _seconds Period duration in seconds.
-      public: void Attach(QwtPlotCurve *_curve);
+      /// \param[in] _plotCurve The curve to attach to the plot.
+      public: void AttachCurve(PlotCurveWeakPtr _curve);
+
+      /// \brief Dettach a curve from this plot.
+      /// \param[in] _id Unique id of the plot curve to detach.
+      /// \return Pointer to the plot curve
+      public: PlotCurvePtr DetachCurve(const unsigned int _id);
+
+      /// \brief Set a new label for the given curve.
+      /// \param[in] _id Unique id of the plot curve
+      /// \param[in] _label New label to set the plot curve to.
+      public: void SetCurveLabel(const unsigned int _id,
+        const std::string &_label);
+
+      /// \brief Get all curves in this plot
+      /// \return A list of curves in this plot.
+      public: std::vector<PlotCurveWeakPtr> Curves() const;
+
+      /// \brief Give QT a size hint.
+      /// \return Default size of the plot.
+      public: virtual QSize sizeHint() const;
 
       /// \brief Used to accept drag enter events.
       /// \param[in] _evt The drag event.
@@ -107,23 +140,11 @@ namespace gazebo
 
       /// \brief Adjust a curve to fit new data.
       /// \param[in] _curve Curve to adjust
-      private: void AdjustCurve(QwtPlotCurve *_curve);
+      private: void AdjustCurve(PlotCurvePtr _curve);
 
-      /// \def DiagnosticTimerPtr
-      /// \brief A map of strings to qwt plot curves.
-      private: typedef std::map<QString, QwtPlotCurve *> CurveMap;
-
-      /// \brief The curve to draw.
-      private: CurveMap curves;
-
-      /// \brief Drawing utility
-      private: QwtPlotDirectPainter *directPainter;
-
-      /// \brief Pointer to the plot maginfier
-      private: QwtPlotMagnifier *magnifier;
-
-      /// \brief Period duration in seconds.
-      private: unsigned int period;
+      /// \internal
+      /// \brief Private data pointer
+      private: std::unique_ptr<IncrementalPlotPrivate> dataPtr;
     };
   }
 }

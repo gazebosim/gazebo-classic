@@ -20,7 +20,6 @@
 #include <memory>
 
 #include "gazebo/gui/qt.h"
-#include "gazebo/msgs/msgs.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -32,7 +31,7 @@ namespace gazebo
 
     class PlotCanvas;
 
-    /// \brief Plot diagnostic information
+    /// \brief Plot window
     class GZ_GUI_VISIBLE PlotWindow : public QDialog
     {
       Q_OBJECT
@@ -44,26 +43,24 @@ namespace gazebo
       /// \brief Destructor.
       public: virtual ~PlotWindow();
 
-      /// \brief Used to filter scroll wheel events.
-      /// \param[in] _o Object that receives the event.
-      /// \param[in] _event Pointer to the event.
-      public: virtual bool eventFilter(QObject *_o, QEvent *_e);
-
-      /// \brief QT close event, used to stop PlotWindow.
-      /// \param[in] _evt The close event.
-      protected: virtual void closeEvent(QCloseEvent *_evt);
-
-      /// \brief Called when a diagnostic message is received.
-      /// \param[in] _msg Diagnostic message.
-      // private: void OnMsg(ConstPlotWindowPtr &_msg);
-
-      /// \brief Add a new plot canvas.
+      /// \brief Add a new canvas.
       public: PlotCanvas *AddCanvas();
 
       public: std::list<PlotCanvas*> Plots();
 
       /// \brief Remove a plot canvas
-      public: void RemoveCanvas(PlotCanvas *canvas);
+      /// \param[in] _canvas Canvas to remove
+      public: void RemoveCanvas(PlotCanvas *_canvas);
+
+      /// \brief Get the number of canvases in this plot window.
+      /// \return Number of canvases
+      public: unsigned int CanvasCount() const;
+
+      /// \brief Export all canvas plots.
+      public: void Export();
+
+      /// \brief Update all canvases
+      public slots: void Update();
 
       /// \brief QT callback to continue plotting.
       private slots: void OnPlay();

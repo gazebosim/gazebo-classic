@@ -17,13 +17,10 @@
 #ifndef _GAZEBO_GUI_PLOT_PLOTWINDOWPRIVATE_HH_
 #define _GAZEBO_GUI_PLOT_PLOTWINDOWPRIVATE_HH_
 
-#include <list>
-#include <map>
+
 #include <mutex>
-#include <vector>
 
 #include "gazebo/gui/qt.h"
-#include "gazebo/transport/TransportTypes.hh"
 
 namespace gazebo
 {
@@ -34,23 +31,11 @@ namespace gazebo
     /// \brief Private data for the PlotWindow class
     class PlotWindowPrivate
     {
-      /// \def PointMap
-      public: using PointMap = std::map<QString, std::list<QPointF> >;
-
-      /// \brief Node for communications.
-      public: transport::NodePtr node;
-
-      /// \brief Subscribes to diagnostic info.
-      public: transport::SubscriberPtr sub;
-
       /// \brief The list of diagnostic labels.
       public: QListWidget *labelList;
 
-      /// \brief The currently selected label.
-      public: PointMap selectedLabels;
-
       /// \brief True when plotting is paused.
-      public: bool paused;
+      public: bool paused = false;
 
       /// \brief Action to pause plotting
       public: QAction *plotPlayAct;
@@ -60,6 +45,9 @@ namespace gazebo
 
       /// \brief Layout to hold all the canvases.
       public: QVBoxLayout *canvasLayout;
+
+      /// \brief Mutex to protect the canvas updates
+      public: std::mutex mutex;
     };
   }
 }
