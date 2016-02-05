@@ -15,10 +15,6 @@
  *
 */
 
-#include "gazebo/transport/Node.hh"
-#include "gazebo/transport/Publisher.hh"
-#include "gazebo/transport/TransportIface.hh"
-
 #include "gazebo/gui/plot/VariablePillContainer.hh"
 #include "gazebo/gui/plot/PlotCurve.hh"
 #include "gazebo/gui/plot/IncrementalPlot.hh"
@@ -202,6 +198,12 @@ void PlotWindow::RemoveCanvas(PlotCanvas *_canvas)
   // canvas->hide();
   this->dataPtr->canvasLayout->takeAt(idx);
   _canvas->deleteLater();
+}
+
+/////////////////////////////////////////////////
+unsigned int PlotWindow::CanvasCount() const
+{
+  return static_cast<unsigned int>(this->dataPtr->canvasLayout->count());
 }
 
 /////////////////////////////////////////////////

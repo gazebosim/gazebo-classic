@@ -20,7 +20,6 @@
 #include <memory>
 
 #include "gazebo/gui/qt.h"
-#include "gazebo/msgs/msgs.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -50,6 +49,10 @@ namespace gazebo
       /// \brief Remove a plot canvas
       /// \param[in] _canvas Canvas to remove
       public: void RemoveCanvas(PlotCanvas *_canvas);
+
+      /// \brief Get the number of canvases in this plot window.
+      /// \return Number of canvases
+      public: unsigned int CanvasCount() const;
 
       /// \brief Export all canvas plots.
       public: void Export();

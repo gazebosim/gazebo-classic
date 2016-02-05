@@ -567,6 +567,26 @@ void PlotCanvas::RestartPlots()
 }
 
 /////////////////////////////////////////////////
+unsigned int PlotCanvas::PlotCount() const
+{
+  unsigned int plotCount =  this->dataPtr->plotData.size();
+  if (this->dataPtr->emptyPlot)
+    plotCount += (this->dataPtr->emptyPlot->isVisible() ? 1u : 0u);
+
+  return plotCount;
+}
+
+/////////////////////////////////////////////////
+unsigned int PlotCanvas::VariableCount(const unsigned int _plotId) const
+{
+  auto it = this->dataPtr->plotData.find(_plotId);
+  if (it == this->dataPtr->plotData.end())
+    return 0u;
+
+  return it->second->variables.size();
+}
+
+/////////////////////////////////////////////////
 PlotCurveWeakPtr PlotCanvas::PlotCurve(const unsigned int _variableId)
 {
   for (const auto it : this->dataPtr->plotData)

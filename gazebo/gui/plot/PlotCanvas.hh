@@ -72,6 +72,15 @@ namespace gazebo
       /// \param[in] _id Unique id of the plot
       public: void RemovePlot(const unsigned int _plotId);
 
+      /// \brief Get the number of plots in this canvas.
+      /// \return Number of plots
+      public: unsigned int PlotCount() const;
+
+      /// \brief Get the number of variables in a plot.
+      /// \param[in] _plotId Unique plot id
+      /// \return Number of variables
+      public: unsigned int VariableCount(const unsigned int _plotId) const;
+
       /// \brief Update plots.
       public: void Update();
 

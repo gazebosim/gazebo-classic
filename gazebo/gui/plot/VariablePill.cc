@@ -195,6 +195,10 @@ void VariablePill::AddVariablePill(VariablePill *_variable)
     return;
   }
 
+  // remove variable from parent if it already has one
+  if (_variable->Parent() != NULL && _variable->Parent() != _variable)
+    _variable->Parent()->RemoveVariablePill(_variable);
+
   if (this->dataPtr->variables.empty())
   {
     // becomes multi-variable pill
@@ -236,6 +240,7 @@ void VariablePill::RemoveVariablePill(VariablePill *_variable)
       newMultiVariable->blockSignals(false);
       this->dataPtr->container->blockSignals(true);
       this->dataPtr->container->AddVariablePill(newMultiVariable);
+      std::cerr << " container adding new mult var " << newMultiVariable->Text() << std::endl;
       this->dataPtr->container->blockSignals(false);
     }
     VariablePillContainer *tmpContainer =  this->dataPtr->container;
@@ -258,6 +263,7 @@ void VariablePill::RemoveVariablePill(VariablePill *_variable)
     return;
 
   _variable->setVisible(false);
+  _variable->setParent(NULL);
   _variable->SetParent(NULL);
   _variable->SetContainer(NULL);
   this->dataPtr->variableLayout->takeAt(idx);

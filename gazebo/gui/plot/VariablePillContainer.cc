@@ -147,7 +147,13 @@ void VariablePillContainer::RemoveVariablePill(const unsigned int _id)
       auto &childVariables = v.second->VariablePills();
       auto childIt = childVariables.find(_id);
       if (childIt != childVariables.end())
+      {
         variable = childIt->second;
+        // remove from parent
+        if (variable->Parent())
+          variable->Parent()->RemoveVariablePill(variable);
+        return;
+      }
     }
   }
   else
@@ -157,19 +163,20 @@ void VariablePillContainer::RemoveVariablePill(const unsigned int _id)
     return;
 
   int idx = this->dataPtr->variableLayout->indexOf(variable);
-  if (idx == -1)
+  if (idx != -1)
   {
+    this->dataPtr->variableLayout->takeAt(idx);
+    this->dataPtr->variables.erase(variable->Id());
+    // remove from parent
     if (variable->Parent())
       variable->Parent()->RemoveVariablePill(variable);
-    return;
   }
 
+  // otherwise remove from container
   variable->SetContainer(NULL);
   variable->setVisible(false);
-  this->dataPtr->variableLayout->takeAt(idx);
-  this->dataPtr->variables.erase(variable->Id());
 
-  emit VariableRemoved(variable->Id(), VariablePill::EMPTY_VARIABLE);
+ // emit VariableRemoved(variable->Id(), VariablePill::EMPTY_VARIABLE);
 }
 
 
@@ -315,6 +322,7 @@ void VariablePillContainer::keyPressEvent(QKeyEvent *_event)
     if (this->dataPtr->selectedVariable)
     {
       this->RemoveVariablePill(this->dataPtr->selectedVariable);
+      this->dataPtr->selectedVariable = NULL;
     }
   }
 }
