@@ -35,6 +35,8 @@ endif()
 
 set (headers
   Diagnostics.hh
+  IntrospectionClient.hh
+  IntrospectionManager.hh
   LogPlay.hh
   LogRecord.hh
   OpenAL.hh
