@@ -190,6 +190,15 @@ void PlotWindow::OnPlay()
 void PlotWindow::OnExport()
 {
   std::list<PlotCanvas*> plots = this->Plots();
+
+  if (!plots.front())
+    std::cout << "INVALID\n";
+
+  std::cout << plots.front() << std::endl;
+  std::cout << plots.front()->rect().top() << std::endl;
+  //std::cout << plots.front()->size().width() << std::endl;
+    //QPixmap::grabWindow(plots.front()->winId()).save("/tmp/plot.png");
+
   ExportDialog exportDialog(this);
   exportDialog.deleteLater();
   if (exportDialog.exec() == QDialog::Accepted)
@@ -197,11 +206,6 @@ void PlotWindow::OnExport()
   }
   else
   {
-    std::cout << "HERE\n";
-    if (plots.front())
-      std::cout << "valid\n";
-
-    QPixmap::grabWidget(plots.front()).save("/tmp/plot.png");
     //QPixmap p;
     //QImage image;
     //this->grab()->save("/tmp/plot.png");
