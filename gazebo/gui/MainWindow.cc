@@ -1796,8 +1796,10 @@ void MainWindow::DeleteActions()
   delete g_redoHistoryAct;
   g_redoHistoryAct = 0;
 
+#ifdef HAVE_QWT
   delete g_plotAct;
   g_plotAct = 0;
+#endif
 }
 
 
@@ -2373,7 +2375,9 @@ void MainWindow::OnWindowMode(const std::string &_mode)
   g_overlayAct->setVisible(simOrLog);
   g_showToolbarsAct->setVisible(simOrLog);
   g_fullScreenAct->setVisible(simOrLog);
+#ifdef HAVE_QWT
   g_plotAct->setVisible(simulation);
+#endif
 
   // About
   g_hotkeyChartAct->setVisible(simOrLog);
