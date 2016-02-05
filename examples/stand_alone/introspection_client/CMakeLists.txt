@@ -6,5 +6,11 @@ include_directories(${GAZEBO_INCLUDE_DIRS})
 link_directories(${GAZEBO_LIBRARY_DIRS})
 list(APPEND CMAKE_CXX_FLAGS "${GAZEBO_CXX_FLAGS}")
 
+# Find the Ignition_Transport library
+find_package(ignition-transport0 QUIET REQUIRED)
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${IGNITION-TRANSPORT_CXX_FLAGS}")
+include_directories(${IGNITION-TRANSPORT_INCLUDE_DIRS})
+link_directories(${IGNITION-TRANSPORT_LIBRARY_DIRS})
+
 add_executable(client client.cc)
-target_link_libraries(client ${GAZEBO_LIBRARIES})
+target_link_libraries(client ${GAZEBO_LIBRARIES} ${IGNITION-TRANSPORT_LIBRARIES})

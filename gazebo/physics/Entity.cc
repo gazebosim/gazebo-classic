@@ -150,20 +150,6 @@ void Entity::Load(sdf::ElementPtr _sdf)
     this->setWorldPoseFunc = &Entity::SetWorldPoseCanonicalLink;
   else
     this->setWorldPoseFunc = &Entity::SetWorldPoseDefault;
-
-  // Register the entity into the introspection service.
-  std::string item = this->GetName() + "/pose";
-
-  // A callback for updating items.
-  auto func = [this](gazebo::msgs::Any &_msg)
-  {
-    msgs::Pose poseMsg = msgs::Convert(this->GetWorldPose().Ign());
-    _msg.set_type(gazebo::msgs::Any::POSE);
-    _msg.mutable_pose_value()->CopyFrom(poseMsg);
-    return true;
-  };
-
-  gazebo::util::IntrospectionManager::Instance()->Register(item, "pose", func);
 }
 
 //////////////////////////////////////////////////

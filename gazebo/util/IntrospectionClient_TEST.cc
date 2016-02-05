@@ -33,12 +33,12 @@ class IntrospectionClientTest : public ::testing::Test
 {
   /// \brief Constructor
   public: IntrospectionClientTest() :
-    callbackExecuted(false)//,
-   // manager(util::IntrospectionManager::Instance())
+    callbackExecuted(false),
+    manager(util::IntrospectionManager::Instance())
   {
     // Give some time to discover nodes/services.
     std::this_thread::sleep_for(std::chrono::milliseconds(300));
-    //this->managerId = this->manager->Id();
+    this->managerId = this->manager->Id();
   }
 
   /// \brief Function called each time a topic update is received.
@@ -73,27 +73,28 @@ class IntrospectionClientTest : public ::testing::Test
       this->topicsSubscribed.emplace(_topic);
   }
 
-  /// \brief Initialize the test
-  //public: void SetUp()
-  //{
-  //  this->topicsSubscribed = {};
-//
-  //  // A callback for updating items.
-  //  auto func = [](gazebo::msgs::Any &_msg)
-  //  {
-  //    _msg.set_type(gazebo::msgs::Any::DOUBLE);
-  //    _msg.set_double_value(1.0);
-  //    return true;
-  //  };
-//
-  //  // Make sure that we always have some items registered.
-  //  this->manager->Register("item1", "type1", func);
-  //  this->manager->Register("item2", "type2", func);
-  //  this->manager->Register("item3", "type3", func);
-//
-  //  this->callbackExecuted = false;
-  //}
+  /// \brief Initialize the test.
+  public: void SetUp()
+  {
+    this->topicsSubscribed = {};
 
+    // A callback for updating items.
+    auto func = [](gazebo::msgs::Any &_msg)
+    {
+      _msg.set_type(gazebo::msgs::Any::DOUBLE);
+      _msg.set_double_value(1.0);
+      return true;
+    };
+
+    // Make sure that we always have some items registered.
+    this->manager->Register("item1", "type1", func);
+    this->manager->Register("item2", "type2", func);
+    this->manager->Register("item3", "type3", func);
+
+    this->callbackExecuted = false;
+  }
+
+  /// \brief Executed at the end of each test.
   public: void TearDown()
   {
     // Make sure that we unsubscribe from all the topics.
@@ -105,7 +106,7 @@ class IntrospectionClientTest : public ::testing::Test
   protected: bool callbackExecuted;
 
   /// \brief Pointer to the introspection manager.
-  //protected: util::IntrospectionManager *manager;
+  protected: util::IntrospectionManager *manager;
 
   /// \brief The ID of the manager.
   protected: std::string managerId;
@@ -120,39 +121,6 @@ class IntrospectionClientTest : public ::testing::Test
   private: std::set<std::string> topicsSubscribed;
 };
 
-/////////////////////////////////////////////////
-TEST_F(IntrospectionClientTest, caguero)
-{
-  std::set<std::string> managerIds;
-  managerIds = this->client.Managers();
-  if (managerIds.empty())
-  {
-    std::cerr << "No managers detected" << std::endl;
-    return;
-  }
-
-  std::string id = *managerIds.begin();
-
-  std::set<std::string> items;
-  if (!client.Items(id, items))
-  {
-    std::cerr << "Error in Items()" << std::endl;
-    return;
-  }
-
-  // Create a filter for watching the pose of a box_0 model.
-  std::string item = "unit_box_0/pose";
-  std::string filterId, topic;
-  if (!client.NewFilter(id, {item}, filterId, topic))
-  {
-    std::cerr << "Error creating filter" << std::endl;
-    return;
-  }
-
-  getchar();
-}
-
-/*
 /////////////////////////////////////////////////
 TEST_F(IntrospectionClientTest, Managers)
 {
@@ -249,7 +217,7 @@ TEST_F(IntrospectionClientTest, Items)
   EXPECT_TRUE(items.find("item2") != items.end());
   EXPECT_TRUE(items.find("item3") != items.end());
 }
-*/
+
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
