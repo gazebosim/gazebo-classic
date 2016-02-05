@@ -1,6 +1,12 @@
 ## Gazebo 7
 
-## Gazebo 7.X.X
+## Gazebo 7.x.x (2016-xx-xx)
+
+1. Fix SensorManager::SensorContainer::RunLoop sensor update time assertion
+    * [Pull request #2115](https://bitbucket.org/osrf/gazebo/pull-request/2115)
+
+1. Removes one function call and replaces a manual swap with std::swap in ODE heightfield.
+    * [Pull request #2114](https://bitbucket.org/osrf/gazebo/pull-request/2114)
 
 1. Open a new world, server side
     * [Pull request #2107](https://bitbucket.org/osrf/gazebo/pull-request/2107)
