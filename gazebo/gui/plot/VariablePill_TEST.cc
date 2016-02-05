@@ -99,7 +99,7 @@ void VariablePill_TEST::VariableId()
 /////////////////////////////////////////////////
 void VariablePill_TEST::MultiVariable()
 {
-  // create 3 variable pills
+  // create 4 variable pills
   gazebo::gui::VariablePill *var01 = new gazebo::gui::VariablePill(NULL);
   QVERIFY(var01 != NULL);
   QCOMPARE(var01->VariablePillCount(), 0u);

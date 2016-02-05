@@ -86,8 +86,21 @@ void VariablePillContainer::SetText(const std::string &_text)
 }
 
 /////////////////////////////////////////////////
+std::string VariablePillContainer::Text() const
+{
+  return this->dataPtr->label->text().toStdString();
+}
+
+/////////////////////////////////////////////////
 unsigned int VariablePillContainer::AddVariablePill(const std::string &_name)
 {
+  if (this->dataPtr->maxSize != -1 &&
+      static_cast<int>(this->VariablePillCount()) >= this->dataPtr->maxSize)
+  {
+    return VariablePill::EMPTY_VARIABLE;
+  }
+
+
   VariablePill *variable = new VariablePill;
   variable->SetText(_name);
 
@@ -112,6 +125,12 @@ void VariablePillContainer::AddVariablePill(VariablePill *_variable)
   if (this->dataPtr->variables.find(_variable->Id()) !=
       this->dataPtr->variables.end())
     return;
+
+  if (this->dataPtr->maxSize != -1 &&
+      static_cast<int>(this->VariablePillCount()) >= this->dataPtr->maxSize)
+  {
+    return;
+  }
 
   _variable->SetContainer(this);
   _variable->setVisible(true);

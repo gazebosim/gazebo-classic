@@ -187,6 +187,14 @@ void VariablePill::AddVariablePill(VariablePill *_variable)
   if (!_variable)
     return;
 
+  // check container capacity
+  if (this->Container() && this->Container()->MaxSize() != -1 &&
+    static_cast<int>(this->Container()->VariablePillCount()) >=
+    this->Container()->MaxSize())
+  {
+    return;
+  }
+
   if (this->dataPtr->parent && this->dataPtr->parent != this)
   {
     // Cannot add a variable pill to one that already has a parent.

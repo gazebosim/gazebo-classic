@@ -45,13 +45,13 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~VariablePillContainer();
 
-      /// \brief Get the unique id of this variable pill container.
-      /// \return Unique id;
-      public: unsigned int Id() const;
-
       /// \brief Set the label text for this variable pill container.
       /// \param[in] _text Text to set the label to.
       public: void SetText(const std::string &_text);
+
+      /// \brief Get the variable pill container's label text.
+      /// \return Container label.
+      public: std::string Text() const;
 
       /// \brief Set the maximum number of variable pills this container can
       /// hold
