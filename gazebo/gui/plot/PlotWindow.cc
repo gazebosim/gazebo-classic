@@ -15,6 +15,7 @@
  *
 */
 
+#include "gazebo/gui/plot/PlotPalette.hh"
 #include "gazebo/gui/plot/PlotWindow.hh"
 
 using namespace gazebo;
@@ -42,6 +43,14 @@ PlotWindow::PlotWindow(QWidget *_parent)
   this->setWindowFlags(Qt::Window | Qt::WindowTitleHint |
       Qt::WindowCloseButtonHint | Qt::WindowStaysOnTopHint |
       Qt::CustomizeWindowHint);
+
+  // Palette
+  auto plotPalette = new PlotPalette(this);
+
+  auto mainLayout = new QHBoxLayout;
+  mainLayout->addWidget(plotPalette);
+
+  this->setLayout(mainLayout);
 }
 
 /////////////////////////////////////////////////
