@@ -157,6 +157,7 @@ set (qt_tests
   TimePanel_TEST.cc
   TimeWidget_TEST.cc
   TopToolbar_TEST.cc
+  ViewAngleWidget_TEST.cc
 )
 
 add_subdirectory(viewers)
@@ -184,8 +185,7 @@ if (ENABLE_SCREEN_TESTS)
       LaserVisualization_TEST.cc
       LayersWidget_TEST.cc
       MainWindow_TEST.cc
-      Projection_TEST.cc
-      ViewAngleWidget_TEST.cc)
+      Projection_TEST.cc)
 endif()
 
 # Generate executables for each of the QT unit tests
