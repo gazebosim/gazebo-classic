@@ -177,7 +177,7 @@ void ModelManipulator_TEST::Transparency()
   // Mouse release, translation done.
   gazebo::gui::ModelManipulator::Instance()->OnMouseReleaseEvent(mouseEvent);
 
-  // Test transperancy.
+  // Test transparency.
   QVERIFY(ignition::math::equal(
     static_cast<double>(vis1->GetTransparency()), vis1Transp, 1e-5));
 
