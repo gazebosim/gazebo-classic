@@ -7,6 +7,7 @@ package gazebo.msgs;
 import "color.proto";
 import "pose.proto";
 import "quaternion.proto";
+import "time.proto";
 import "vector3d.proto";
 
 message Any
@@ -37,6 +38,9 @@ message Any
 
     /// \brief Indicates that the message contains a Boolean 
     BOOLEAN    = 8;
+
+    /// \brief Indicates that the message contains a Time
+    TIME       = 9;
   }
 
   /// \todo: Use protobuf oneof feature when we support protobuf 2.6
@@ -67,4 +71,7 @@ message Any
 
   /// \brief A boolean value
   optional bool bool_value             = 9;
+
+  /// \brief A Time value
+  optional Time time_value             = 10;
 }

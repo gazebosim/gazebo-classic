@@ -2615,10 +2615,10 @@ void World::RegisterIntrospectionItems()
   // A callback for updating simulation time.
   auto fSimTime = [this](gazebo::msgs::Any &_msg)
   {
-    _msg.set_type(gazebo::msgs::Any::DOUBLE);
-    _msg.set_double_value(this->GetSimTime().Double());
+    _msg.set_type(gazebo::msgs::Any::TIME);
+    msgs::Set(_msg.mutable_time_value(), this->GetSimTime());
     return true;
   };
   gazebo::util::IntrospectionManager::Instance()->Register(
-      "sim_time", "double", fSimTime);
+      "sim_time", "Time", fSimTime);
 }
