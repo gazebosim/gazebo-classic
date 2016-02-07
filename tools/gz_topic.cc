@@ -37,10 +37,10 @@ TopicCommand::TopicCommand()
 {
   // Options that are visible to the user through help.
   this->visibleOptions.add_options()
+    ("verbose", "Print more information "
+     "Applicable for all commands")
     ("world-name,w", po::value<std::string>(), "World name.")
     ("list,l", "List all topics.")
-    ("verbose", "print more information "
-     "Applicable for all commands")
     ("info,i", po::value<std::string>(), "Get information about a topic.")
     ("echo,e", po::value<std::string>(), "Output topic data to screen.")
     ("view,v", po::value<std::string>()->implicit_value(""),
