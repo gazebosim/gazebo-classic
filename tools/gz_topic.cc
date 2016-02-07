@@ -39,6 +39,8 @@ TopicCommand::TopicCommand()
   this->visibleOptions.add_options()
     ("world-name,w", po::value<std::string>(), "World name.")
     ("list,l", "List all topics.")
+    ("verbose", "print more information "
+     "Application for all commands")
     ("info,i", po::value<std::string>(), "Get information about a topic.")
     ("echo,e", po::value<std::string>(), "Output topic data to screen.")
     ("view,v", po::value<std::string>()->implicit_value(""),
@@ -70,6 +72,10 @@ bool TopicCommand::RunImpl()
 
   this->node.reset(new transport::Node());
   this->node->Init(worldName);
+
+  if (this->vm.count("verbose")) {
+    gazebo::common::Console::SetQuiet(false);
+  }
 
   if (this->vm.count("list"))
     this->List();
