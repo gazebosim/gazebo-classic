@@ -40,7 +40,7 @@ TopicCommand::TopicCommand()
     ("world-name,w", po::value<std::string>(), "World name.")
     ("list,l", "List all topics.")
     ("verbose", "print more information "
-     "Application for all commands")
+     "Applicable for all commands")
     ("info,i", po::value<std::string>(), "Get information about a topic.")
     ("echo,e", po::value<std::string>(), "Output topic data to screen.")
     ("view,v", po::value<std::string>()->implicit_value(""),
