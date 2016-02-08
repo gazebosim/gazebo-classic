@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,7 +72,7 @@ void LightMaker_TEST::PointLight()
   // Check that the light appeared in the center of the screen
   ignition::math::Vector3d startPos = pointLightMaker->EntityPosition();
   QVERIFY(startPos == ignition::math::Vector3d::UnitZ);
-  QVERIFY(light->GetPosition() == startPos);
+  QVERIFY(light->Position() == startPos);
 
   // Mouse move
   gazebo::common::MouseEvent mouseEvent;
@@ -82,7 +82,7 @@ void LightMaker_TEST::PointLight()
   // Check that entity moved
   ignition::math::Vector3d pos = pointLightMaker->EntityPosition();
   QVERIFY(pos != startPos);
-  QVERIFY(light->GetPosition() == pos);
+  QVERIFY(light->Position() == pos);
 
   // Mouse release
   mouseEvent.SetType(gazebo::common::MouseEvent::RELEASE);
@@ -165,7 +165,7 @@ void LightMaker_TEST::CopyLight()
   // Check that the light appeared in the center of the screen
   ignition::math::Vector3d startPos = lightMaker->EntityPosition();
   QVERIFY(startPos == ignition::math::Vector3d::UnitZ);
-  QVERIFY(light->GetPosition() == startPos);
+  QVERIFY(light->Position() == startPos);
 
   // Mouse move
   gazebo::common::MouseEvent mouseEvent;
@@ -175,7 +175,7 @@ void LightMaker_TEST::CopyLight()
   // Check that entity moved
   ignition::math::Vector3d pos = lightMaker->EntityPosition();
   QVERIFY(pos != startPos);
-  QVERIFY(light->GetPosition() == pos);
+  QVERIFY(light->Position() == pos);
 
   // Mouse release
   mouseEvent.SetType(gazebo::common::MouseEvent::RELEASE);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ void TimeWidget_TEST::Reset()
   }
 
   // Get the time panel
-  gazebo::gui::TimePanel *timePanel = mainWindow->GetRenderWidget()->
+  gazebo::gui::TimePanel *timePanel = mainWindow->RenderWidget()->
       GetTimePanel();
   QVERIFY(timePanel != NULL);
 
@@ -201,7 +201,7 @@ void TimeWidget_TEST::ValidTimes()
     QVERIFY(cam != NULL);
 
     // Get the time panel
-    gazebo::gui::TimePanel *timePanel = mainWindow->GetRenderWidget()->
+    gazebo::gui::TimePanel *timePanel = mainWindow->RenderWidget()->
         GetTimePanel();
     QVERIFY(timePanel != NULL);
 

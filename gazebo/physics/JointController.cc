@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -90,8 +90,8 @@ void JointController::Reset()
     iter->second.Reset();
   }
 
-  for (iter = this->dataPtr->posPids.begin();
-    iter != this->dataPtr->posPids.end(); ++iter)
+  for (iter = this->dataPtr->velPids.begin();
+    iter != this->dataPtr->velPids.end(); ++iter)
   {
     iter->second.Reset();
   }

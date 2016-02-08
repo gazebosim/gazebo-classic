@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,23 @@
  *
 */
 
-#ifndef _EDITOR_ITEM_HH_
-#define _EDITOR_ITEM_HH_
+#ifndef _GAZEBO_GUI_BUILDING_EDITORITEM_HH_
+#define _GAZEBO_GUI_BUILDING_EDITORITEM_HH_
 
 #include <string>
+#include <memory>
+
 #include "gazebo/gui/qt.h"
+
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
+    // Forward declare private data.
+    class EditorItemPrivate;
+
     /// \addtogroup gazebo_gui
     /// \{
 
@@ -104,6 +110,14 @@ namespace gazebo
       /// \brief Set whether this item should be highlighted or not.
       /// \param[in] _highlighted True for highlighted.
       public: virtual void SetHighlighted(bool _highlighted);
+
+      /// \brief Get the z value of this item when in idle state.
+      /// \return Z value.
+      public: int ZValueIdle() const;
+
+      /// \brief Get the z value of this item when in selected state.
+      /// \return Z value.
+      public: int ZValueSelected() const;
 
       /// \brief Qt signal emitted when the editor item size has changed.
       /// \param[in] _width Width of item in pixels.
@@ -207,10 +221,10 @@ namespace gazebo
       private slots: void OnTextureChanged(QString _texture);
 
       /// \brief Z ordering of the rect item when idle (unselected.)
-      public: int zValueIdle;
+      protected: int zValueIdle;
 
       /// \brief Z ordering of the rect item when selected.
-      public: int zValueSelected;
+      protected: int zValueSelected;
 
       /// \brief Type of editor item.
       protected: std::string editorType;
@@ -240,6 +254,10 @@ namespace gazebo
 
       /// \brief Scale for converting from pixel to metric units.
       protected: double itemScale;
+
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<EditorItemPrivate> dataPtr;
     };
     /// \}
   }

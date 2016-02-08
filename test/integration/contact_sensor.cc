@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  *
 */
 
+#include <cmath>
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/sensors/sensors.hh"
@@ -120,14 +121,14 @@ void ContactSensor::MultipleSensors(const std::string &_physicsEngine)
   {
     sensors::SensorPtr sensor1 = sensors::get_sensor(contactSensorName1);
     sensors::ContactSensorPtr contactSensor1 =
-        boost::dynamic_pointer_cast<sensors::ContactSensor>(sensor1);
+        std::dynamic_pointer_cast<sensors::ContactSensor>(sensor1);
     ASSERT_TRUE(contactSensor1 != NULL);
   }
 
   {
     sensors::SensorPtr sensor2 = sensors::get_sensor(contactSensorName2);
     sensors::ContactSensorPtr contactSensor2 =
-        boost::dynamic_pointer_cast<sensors::ContactSensor>(sensor2);
+        std::dynamic_pointer_cast<sensors::ContactSensor>(sensor2);
     ASSERT_TRUE(contactSensor2 != NULL);
   }
 
@@ -222,13 +223,13 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
 
   sensors::SensorPtr sensor01 = sensors::get_sensor(contactSensorName01);
   sensors::ContactSensorPtr contactSensor01 =
-      boost::dynamic_pointer_cast<sensors::ContactSensor>(sensor01);
+      std::dynamic_pointer_cast<sensors::ContactSensor>(sensor01);
 
   ASSERT_TRUE(contactSensor01 != NULL);
 
   sensors::SensorPtr sensor02 = sensors::get_sensor(contactSensorName02);
   sensors::ContactSensorPtr contactSensor02 =
-      boost::dynamic_pointer_cast<sensors::ContactSensor>(sensor02);
+      std::dynamic_pointer_cast<sensors::ContactSensor>(sensor02);
 
   ASSERT_TRUE(contactSensor02 != NULL);
 
@@ -272,8 +273,8 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
       && --steps > 0)
   {
     world->Step(1);
-    contacts01 = contactSensor01->GetContacts();
-    contacts02 = contactSensor02->GetContacts();
+    contacts01 = contactSensor01->Contacts();
+    contacts02 = contactSensor02->Contacts();
     // gzdbg << "steps[" << steps
     //       << "] contacts01[" << contacts01.contact_size()
     //       << "] contacts02[" << contacts02.contact_size()
@@ -342,7 +343,7 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
 
         EXPECT_NEAR(contacts[k].contact(i).normal(j).x(), 0, TOL);
         EXPECT_NEAR(contacts[k].contact(i).normal(j).y(), 0, TOL);
-        EXPECT_NEAR(contacts[k].contact(i).normal(j).z(), 1, TOL);
+        EXPECT_NEAR(std::abs(contacts[k].contact(i).normal(j).z()), 1, TOL);
 
         if (body1)
         {
@@ -446,7 +447,7 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
 
   sensors::SensorPtr sensor = sensors::get_sensor(contactSensorName);
   sensors::ContactSensorPtr contactSensor =
-      boost::dynamic_pointer_cast<sensors::ContactSensor>(sensor);
+      std::dynamic_pointer_cast<sensors::ContactSensor>(sensor);
 
   ASSERT_TRUE(contactSensor != NULL);
 
@@ -484,12 +485,12 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
   while (contacts.contact_size() == 0 && --steps > 0)
   {
     world->Step(1);
-    contacts = contactSensor->GetContacts();
+    contacts = contactSensor->Contacts();
   }
 
   EXPECT_GT(steps, 0);
 
-  contacts = contactSensor->GetContacts();
+  contacts = contactSensor->Contacts();
 
   unsigned int ColInd = 0;
   physics::CollisionPtr col = contactModel->GetLink()->GetCollision(ColInd);

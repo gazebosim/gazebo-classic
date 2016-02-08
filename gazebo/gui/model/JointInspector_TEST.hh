@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,9 @@ class JointInspector_TEST : public QTestFixture
 
   /// \brief Test adding and removing links.
   private slots: void AddRemoveLink();
+
+  /// \brief Test adding and removing nested links.
+  private slots: void AddRemoveNestedLink();
 
   /// \brief Test swapping parent / child links
   private slots: void Swap();

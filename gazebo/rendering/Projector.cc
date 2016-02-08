@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ Projector::Projector(rendering::VisualPtr _parent)
   this->visual = _parent;
 
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(this->visual->GetScene()->GetName());
+  this->node->Init(this->visual->GetScene()->Name());
 }
 
 /////////////////////////////////////////////////
@@ -255,7 +255,7 @@ void Projector::ProjectorFrameListener::Init(VisualPtr _visual,
   this->filterFrustum = new Ogre::Frustum();
   this->filterFrustum->setProjectionType(Ogre::PT_ORTHOGRAPHIC);
 
-  this->sceneMgr = this->visual->GetScene()->GetManager();
+  this->sceneMgr = this->visual->GetScene()->OgreSceneManager();
   this->projectorQuery = this->sceneMgr->createPlaneBoundedVolumeQuery(
       Ogre::PlaneBoundedVolumeList());
 

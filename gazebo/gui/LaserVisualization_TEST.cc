@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,10 +52,10 @@ void LaserVisualization_TEST::Lines()
   }
 
   // Get camera data
-  const unsigned char *data = cam->GetImageData();
-  unsigned int width = cam->GetImageWidth();
-  unsigned int height = cam->GetImageHeight();
-  unsigned int depth = cam->GetImageDepth();
+  const unsigned char *data = cam->ImageData();
+  unsigned int width = cam->ImageWidth();
+  unsigned int height = cam->ImageHeight();
+  unsigned int depth = cam->ImageDepth();
 
   // Make sure there are darker lines in the laser rendering
   int lightBlueCount = 0;
@@ -67,18 +67,28 @@ void LaserVisualization_TEST::Lines()
 
   // Read a horizontal line in the middle of the screen
   unsigned int y = height / 2;
+  bool transitioning = false;
   for (unsigned int x = 0; x < width*depth; x += depth)
   {
     int r = data[y*(width*depth) + x];
     int g = data[y*(width*depth) + x+1];
     int b = data[y*(width*depth) + x+2];
 
-    if (r < 189 && g < 189 && b == 255 &&
-        rPrev >= 204 && gPrev >= 204 && bPrev >= 255)
+    // check if current pixel is blue, prev pixel is also blue
+    // and the two shades of blue are different
+    if (!transitioning && r == g && r < b && rPrev == gPrev && rPrev < bPrev &&
+        r < rPrev)
+    {
       ++darkBlueTransition;
+      transitioning = true;
+    }
 
-    if (r >= 204 && g >= 204 && b == 255)
+    // check if current and prev pixels are the same blue color
+    if (r == g && r < b && r == rPrev && g == gPrev && b == bPrev)
+    {
       ++lightBlueCount;
+      transitioning = false;
+    }
 
     rPrev = r;
     bPrev = b;
@@ -89,7 +99,7 @@ void LaserVisualization_TEST::Lines()
   QVERIFY(darkBlueTransition == 2);
 
   // Make sure there is a bunch of light blue pixels
-  QVERIFY(lightBlueCount > 500);
+  QVERIFY(lightBlueCount > static_cast<int>(width * 0.95));
 
   mainWindow->close();
   delete mainWindow;

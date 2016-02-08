@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,10 +65,11 @@ void FPSViewController::Update()
     // Move based on the camera's current velocity
     // Calculate delta based on frame rate
     common::Time interval = common::Time::GetWallTime() -
-      this->camera->GetLastRenderWallTime();
+      this->camera->LastRenderWallTime();
     float dt = interval.Float();
 
-    math::Vector3 trans = this->xVelocity + this->yVelocity;
+    ignition::math::Vector3d trans = this->xVelocity.Ign() +
+                                     this->yVelocity.Ign();
     this->camera->Translate(trans * dt);
   }
 }
@@ -83,8 +84,10 @@ void FPSViewController::HandleMouseEvent(const common::MouseEvent &_event)
 
   if (_event.Buttons() & common::MouseEvent::LEFT)
   {
-    this->camera->Yaw(GZ_DTOR(-drag.X()*0.1));
-    this->camera->Pitch(GZ_DTOR(drag.Y()*0.1));
+    this->camera->Yaw(static_cast<ignition::math::Angle>(
+          IGN_DTOR(-drag.X()*0.1)));
+    this->camera->Pitch(static_cast<ignition::math::Angle>(
+          IGN_DTOR(drag.Y()*0.1)));
   }
   else if (_event.Type() == common::MouseEvent::SCROLL)
   {

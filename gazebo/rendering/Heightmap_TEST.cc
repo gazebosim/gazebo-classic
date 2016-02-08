@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 #include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
-class Heightmap_TEST : public ServerFixture
+class Heightmap_TEST : public RenderingFixture
 {
 };
 
@@ -56,10 +56,10 @@ TEST_F(Heightmap_TEST, splitTerrain)
     heights[i] = i + 1;
   }
 
-  heightmap->SplitHeights(heights, heightmap->GetTerrainSubdivisionCount(),
+  heightmap->SplitHeights(heights, heightmap->TerrainSubdivisionCount(),
       heightsSplit);
 
-  ASSERT_TRUE(heightsSplit.size() == heightmap->GetTerrainSubdivisionCount());
+  ASSERT_TRUE(heightsSplit.size() == heightmap->TerrainSubdivisionCount());
 
   // Precomputed subterrains for a known 9 x 9 terrain starting from 1 and with
   // consecutive values
@@ -82,7 +82,7 @@ TEST_F(Heightmap_TEST, splitTerrain)
   slices[15] = {61, 62, 62, 70, 71, 71, 70, 71, 71};
 
   // Make sure that the subterrain heights matches the precomputed slices
-  for (unsigned int i = 0; i < heightmap->GetTerrainSubdivisionCount(); ++i)
+  for (unsigned int i = 0; i < heightmap->TerrainSubdivisionCount(); ++i)
   {
     EXPECT_TRUE(std::equal(heightsSplit[i].begin(), heightsSplit[i].end(),
           slices[i].begin()));
