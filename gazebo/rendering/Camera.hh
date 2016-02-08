@@ -210,7 +210,7 @@ namespace gazebo
 
       /// \brief Set the camera FOV (horizontal)
       /// \param[in] _radians Horizontal field of view
-      public: void SetHFOV(math::Angle _angle);
+      public: virtual void SetHFOV(math::Angle _angle);
 
       /// \brief Get the camera FOV (horizontal)
       /// \return The horizontal field of view

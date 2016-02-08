@@ -700,3 +700,9 @@ void WideAngleCamera::notifyMaterialRender(Ogre::uint32 /*_pass_id*/,
   glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 #endif
 }
+
+/////////////////////////////////////////////////
+void WideAngleCamera::SetHFOV(math::Angle _angle)
+{
+  //if (this->dataPtr->lens->Type() != "custom")
+}

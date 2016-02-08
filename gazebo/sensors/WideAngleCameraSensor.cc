@@ -174,7 +174,9 @@ bool WideAngleCameraSensor::UpdateImpl(bool _force)
 
     for (; !this->dataPtr->hfovCmdQueue.empty();
         this->dataPtr->hfovCmdQueue.pop())
+    {
       this->camera->SetHFOV(math::Angle(this->dataPtr->hfovCmdQueue.front()));
+    }
 
     msgs::CameraLens msg;
 

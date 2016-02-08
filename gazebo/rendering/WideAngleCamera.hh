@@ -14,10 +14,8 @@
  * limitations under the License.
  *
 */
-
 #ifndef _GAZEBO_RENDERING_WIDEANGLECAMERA_HH_
 #define _GAZEBO_RENDERING_WIDEANGLECAMERA_HH_
-
 
 #include <string>
 #include <utility>
@@ -37,7 +35,6 @@
 #include "gazebo/util/system.hh"
 
 #include "gazebo/rendering/Camera.hh"
-
 
 namespace gazebo
 {
@@ -85,7 +82,13 @@ namespace gazebo
       /// \brief Load camera lens with default parameters
       public: void Load();
 
-      /// \brief Get lens projection type
+      /// \brief Get lens projection type. This is one of:
+      ///  * gnomonical
+      ///  * stereographic
+      ///  * equidistant
+      ///  * equisolid_angle
+      ///  * orthographic
+      ///  * custom
       /// \return Lens projection type string
       public: std::string Type() const;
 
@@ -220,6 +223,9 @@ namespace gazebo
       // Documentation inherited
       public: void SetClipDist() override;
 
+      // Documentation inherited
+      public: virtual void SetHFOV(math::Angle _angle);
+
       /// \brief Set the camera's render target
       /// \param[in] _textureName Name used as a base for environment texture
       protected: void CreateEnvRenderTexture(const std::string &_textureName);
@@ -241,6 +247,5 @@ namespace gazebo
     /// \}
   }
 }
-
 
 #endif
