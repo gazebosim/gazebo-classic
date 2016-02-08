@@ -19,6 +19,7 @@
 
 #include <iostream>
 #include <memory>
+#include "gazebo/util/system.hh"
 
 #include "gazebo/util/system.hh"
 

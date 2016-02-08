@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_SENSOR_HH_
-#define _GAZEBO_SENSOR_HH_
+#ifndef _GAZEBO_SENSORS_SENSOR_HH_
+#define _GAZEBO_SENSORS_SENSOR_HH_
 
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/thread/mutex.hpp>
