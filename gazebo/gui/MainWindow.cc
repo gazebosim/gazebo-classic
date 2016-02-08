@@ -61,7 +61,6 @@
 #include "gazebo/gui/TopToolbar.hh"
 #include "gazebo/gui/UserCmdHistory.hh"
 #include "gazebo/gui/ViewAngleWidget.hh"
-// #include "gazebo/gui/Diagnostics.hh"
 #include "gazebo/gui/plot/PlotWindow.hh"
 #include "gazebo/gui/building/BuildingEditor.hh"
 #include "gazebo/gui/model/ModelEditor.hh"
@@ -391,13 +390,6 @@ void MainWindow::New()
   msgs::ServerControl msg;
   msg.set_new_world(true);
   this->dataPtr->serverControlPub->Publish(msg);
-}
-
-/////////////////////////////////////////////////
-void MainWindow::Diagnostics()
-{
-  // gui::Diagnostics *diag = new gui::Diagnostics(this);
-  // diag->show();
 }
 
 /////////////////////////////////////////////////
@@ -1066,12 +1058,6 @@ void MainWindow::CreateActions()
   g_topicVisAct->setShortcut(tr("Ctrl+T"));
   g_topicVisAct->setStatusTip(tr("Select a topic to visualize"));
   connect(g_topicVisAct, SIGNAL(triggered()), this, SLOT(SelectTopic()));
-
-  /*g_diagnosticsAct = new QAction(tr("Diagnostic Plot"), this);
-  g_diagnosticsAct->setShortcut(tr("Ctrl+U"));
-  g_diagnosticsAct->setStatusTip(tr("Plot diagnostic information"));
-  connect(g_diagnosticsAct, SIGNAL(triggered()), this, SLOT(Diagnostics()));
-  */
 
   g_plotAct = new QAction(tr("Plot"), this);
   g_plotAct->setShortcut(tr("Ctrl+P"));
@@ -1851,8 +1837,6 @@ void MainWindow::CreateMenuBar()
   windowMenu->addAction(g_overlayAct);
   windowMenu->addAction(g_showToolbarsAct);
   windowMenu->addAction(g_fullScreenAct);
-
-  // windowMenu->addAction(g_diagnosticsAct);
   windowMenu->addAction(g_plotAct);
 
   bar->addSeparator();
