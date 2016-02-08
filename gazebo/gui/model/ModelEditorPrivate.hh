@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 #include <vector>
 #include <string>
 
+#include "gazebo/gui/model/ModelEditorTypes.hh"
 #include "gazebo/gui/qt.h"
 
 namespace gazebo
@@ -96,6 +97,10 @@ namespace gazebo
 
       /// \brief A list of event connections.
       public: std::vector<event::ConnectionPtr> connections;
+
+      /// \brief Model editor material switcher used to switch the non-editable
+      /// models in the background to use a different material
+      public: EditorMaterialSwitcherPtr materialSwitcher;
     };
   }
 }

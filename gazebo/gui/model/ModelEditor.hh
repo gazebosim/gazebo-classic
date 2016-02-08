@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,10 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_MODEL_EDITOR_HH_
-#define _GAZEBO_MODEL_EDITOR_HH_
+#ifndef _GAZEBO_GUI_MODEL_EDITOR_HH_
+#define _GAZEBO_GUI_MODEL_EDITOR_HH_
 
+#include <memory>
 #include <string>
 
 #include <sdf/sdf.hh>
@@ -85,16 +86,16 @@ namespace gazebo
       /// \brief Qt callback when a joint is added.
       private slots: void OnJointAdded();
 
-      /// \brief Callback when an action in the toolbar has been triggered.
-      /// \param[in] _action Triggered action.
-      private slots: void OnAction(QAction *_action);
-
       /// \brief Show the schematic view widget
       /// \param[in] _show True to show the widget, false to hide it.
       private slots: void OnSchematicView(bool _show);
 
       /// \brief Callback when the model has been completed.
       private: void OnFinish();
+
+      /// \brief Toggle the model material scheme. This greys out all
+      /// non-editable models when the user enters the model editor mode.
+      private: void ToggleMaterialScheme();
 
       /// \brief Toggle main window's toolbar to display model editor icons.
       private: void ToggleToolbar();
@@ -115,7 +116,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Pointer to private data.
-      private: ModelEditorPrivate *dataPtr;
+      private: std::unique_ptr<ModelEditorPrivate> dataPtr;
     };
   }
 }

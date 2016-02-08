@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,29 +15,31 @@
  *
 */
 
-#ifndef _FLOOR_ITEM_HH_
-#define _FLOOR_ITEM_HH_
+#ifndef _GAZEBO_GUI_BUILDING_FLOORITEM_HH_
+#define _GAZEBO_GUI_BUILDING_FLOORITEM_HH_
 
-#include <vector>
+#include <memory>
+
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/building/RectItem.hh"
-#include "gazebo/gui/building/BuildingItem.hh"
+
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
-    class BuildingItem;
     class WallSegmentItem;
+
+    // Forward declare private data.
+    class FloorItemPrivate;
 
     /// \addtogroup gazebo_gui
     /// \{
 
     /// \class FloorItem FloorItem.hh
     /// \brief 2D representation of a floor.
-    class GZ_GUI_VISIBLE FloorItem :
-      public RectItem, public BuildingItem
+    class GZ_GUI_VISIBLE FloorItem : public RectItem
     {
       Q_OBJECT
 
@@ -90,27 +92,9 @@ namespace gazebo
       /// \brief Emit size changed Qt signals.
       private: void SizeChanged();
 
-      /// \brief Depth of floor item in pixels.
-      private: double floorDepth;
-
-      /// \brief Height of floor item in pixels.
-      private: double floorHeight;
-
-      /// \brief Width of floor item in pixels.
-      private: double floorWidth;
-
-      /// \brief Scene position of floor item in pixel coordinates.
-      private: QPointF floorPos;
-
-      /// \brief A flag to indicate whether or not there have been changes to
-      /// the wall items.
-      private: bool dirty;
-
-      /// \brief A list of wall items that the floor item holds.
-      private: std::vector<WallSegmentItem *> wallSegments;
-
-      /// \brief Bounding box of the floor item.
-      private: QPolygonF floorBoundingRect;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<FloorItemPrivate> dataPtr;
     };
     /// \}
   }

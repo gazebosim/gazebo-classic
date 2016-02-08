@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -230,12 +230,12 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
   dWorldSetAutoDisableAngularThreshold(this->dataPtr->worldId, 0.1);
   dWorldSetAutoDisableSteps(this->dataPtr->worldId, 5);
 
-  math::Vector3 g = this->sdf->Get<math::Vector3>("gravity");
+  auto g = this->world->Gravity();
 
-  if (g == math::Vector3(0, 0, 0))
+  if (g == ignition::math::Vector3d::Zero)
     gzwarn << "Gravity vector is (0, 0, 0). Objects will float.\n";
 
-  dWorldSetGravity(this->dataPtr->worldId, g.x, g.y, g.z);
+  dWorldSetGravity(this->dataPtr->worldId, g.X(), g.Y(), g.Z());
 
   if (odeElem->HasElement("constraints"))
   {
@@ -917,7 +917,7 @@ void ODEPhysics::SetStepType(const std::string &_type)
 //////////////////////////////////////////////////
 void ODEPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
 {
-  this->sdf->GetElement("gravity")->Set(_gravity);
+  this->world->SetGravitySDF(_gravity.Ign());
   dWorldSetGravity(this->dataPtr->worldId, _gravity.x, _gravity.y, _gravity.z);
 }
 
@@ -1193,6 +1193,25 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
       {
         contact.surface.mode |= dContactSlip3;
       }
+    }
+  }
+
+  // Set the elastic modulus
+  // Using Hertzian contact
+  // equation 5.26 from Contact Mechanics and Friction by Popov
+  double nu1 = surf1->FrictionPyramid()->PoissonsRatio();
+  double nu2 = surf2->FrictionPyramid()->PoissonsRatio();
+  double e1 = surf1->FrictionPyramid()->ElasticModulus();
+  double e2 = surf2->FrictionPyramid()->ElasticModulus();
+  if (e1 > 0 && e2 > 0)
+  {
+    contact.surface.elastic_modulus = 1.0 /
+      ((1.0 - nu1*nu1)/e1 + (1.0 - nu2*nu2)/e2);
+
+    // Turn on Contact Elastic Modulus model if elastic modulus > 0
+    if (contact.surface.elastic_modulus > 0.0)
+    {
+      contact.surface.mode |= dContactEM;
     }
   }
 

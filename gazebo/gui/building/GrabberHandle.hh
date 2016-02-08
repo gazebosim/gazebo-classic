@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,30 @@
  *
 */
 
-#ifndef _GRABBER_HANDLE_HH_
-#define _GRABBER_HANDLE_HH_
+#ifndef _GAZEBO_GUI_GRABBER_HANDLE_HH_
+#define _GAZEBO_GUI_GRABBER_HANDLE_HH_
 
 #include <vector>
+#include <memory>
+
+#include <ignition/math/Vector2.hh>
+
 #include "gazebo/gui/qt.h"
+
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
+  namespace common
+  {
+    class Color;
+  }
+
   namespace gui
   {
+    // Forward declare private data class.
+    class GrabberHandlePrivate;
+
     class GZ_GUI_VISIBLE GrabberHandle : public QGraphicsItem
     {
       /// \brief Constructor
@@ -33,37 +46,39 @@ namespace gazebo
       /// \param[in] _index Index of the grabber handle
       public: GrabberHandle(QGraphicsItem *_parent = 0, int index = 0);
 
+      /// \brief Destructor.
+      public: virtual ~GrabberHandle();
+
       /// \brief Get the index of the grabber handle.
       /// \return Index of the grabber handle.
-      public: int GetIndex() const;
+      public: int Index() const;
 
       /// \brief Get the current mouse state.
       /// \return The current mouse state.
-      public: int  GetMouseState() const;
+      public: int MouseState() const;
 
       /// \brief Get the center point of the grabber handle.
       /// \return Center point in pixel coordinates.
-      public: QPointF GetCenterPoint() const;
+      public: ignition::math::Vector2d CenterPoint() const;
 
       /// \brief Get the X position of the mouse press.
       /// \return Mouse press X position in pixel coordinates.
-      public: double GetMouseDownX() const;
+      public: double MouseDownX() const;
 
       /// \brief Get the Y position of the mouse press.
       /// \return Mouse press Y position in pixel coordinates.
-      public: double GetMouseDownY() const;
-
+      public: double MouseDownY() const;
       /// \brief Get the width of the grabber handle.
       /// \return The width of the grabber handle in pixel coordinates.
-      public: double GetWidth() const;
+      public: double Width() const;
 
       /// \brief Get the height of the grabber handle.
       /// \return The height of the grabber handle in pixels.
-      public: double GetHeight() const;
+      public: double Height() const;
 
       /// \brief Get the fill color of the grabber handle.
       /// \return _color Fill color.
-      public: QColor GetColor() const;
+      public: common::Color Color() const;
 
       /// \brief Set the current mouse state.
       /// \param[in] _state Current mouse state.
@@ -87,15 +102,27 @@ namespace gazebo
 
       /// \brief Set the fill color of the grabber handle.
       /// \param[in] _color Fill Color.
-      public: void SetColor(const QColor &_color);
+      public: void SetColor(const common::Color &_color);
 
       /// \brief Set the border color of the grabber handle.
       /// \param[in] _borderColor Border Color.
-      public: void SetBorderColor(const QColor &_borderColor);
+      public: void SetBorderColor(const common::Color &_borderColor);
 
       /// \brief Get the bounding box of the grabber handle.
       /// \return The grabber handle bounding box.
       public: virtual QRectF boundingRect() const;
+
+      /// \brief Get the vector of grabbers linked to this.
+      /// \return Vector of linked grabbers.
+      public: std::vector<GrabberHandle *> LinkedGrabbers() const;
+
+      /// \brief Push a grabber to the list of grabbers linked to this.
+      /// \param[in] _grabber New grabber.
+      public: void PushLinkedGrabber(GrabberHandle *_grabber);
+
+      /// \brief Erase a grabber from the list of grabbers linked to this.
+      /// \param[in] _grabber Grabber which will be removed.
+      public: void EraseLinkedGrabber(GrabberHandle *_grabber);
 
       /// \brief Qt paint function for drawing the grabber handle.
       /// \param[in] _painter Qt painter object.
@@ -132,38 +159,9 @@ namespace gazebo
       /// \param[in] _event Qt mouse drag and drop event.
       protected: void mouseMoveEvent(QGraphicsSceneDragDropEvent *_event);
 
-      /// \brief A list of grabbers linked to this grabber.
-      public: std::vector<GrabberHandle*> linkedGrabbers;
-
-      /// \brief Index of this corner grabber.
-      private: int index;
-
-      /// \brief Mouse press X position in pixel coordinates.
-      private: double mouseDownX;
-
-      /// \brief Mouse press Y position in pixel coordinates.
-      private: double mouseDownY;
-
-      /// \brief Fill color of the grabber handle.
-      private: QColor handleColor;
-
-      /// \brief Border color of the grabber handle.
-      private: QColor borderColor;
-
-      /// \brief Width of the grabber handle in pixels.
-      private: double width;
-
-      /// \brief Height of the grabber handle in pixels.
-      private: double height;
-
-      /// \brief Extra width around the grabber handle for mouse grabbing.
-      private: double widthGrabBuffer;
-
-      /// \brief Extra height around the grabber handle for mouse grabbing.
-      private: double heightGrabBuffer;
-
-      /// \brief Current mouse state.
-      private: int mouseButtonState;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<GrabberHandlePrivate> dataPtr;
     };
     /// \}
   }

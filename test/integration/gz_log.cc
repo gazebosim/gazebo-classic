@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2015 Open Source Robotics Foundation
+ * Copyright (C) 2013-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,24 +39,24 @@ TEST_F(GzLog, Record)
 
   ASSERT_TRUE(recorder != NULL);
 
-  EXPECT_FALSE(recorder->GetPaused());
-  EXPECT_FALSE(recorder->GetRunning());
+  EXPECT_FALSE(recorder->Paused());
+  EXPECT_FALSE(recorder->Running());
 
   // Start log recording
   custom_exec("gz log -w default -d 1");
   world->Step(100);
 
-  std::string filename = recorder->GetFilename();
+  std::string filename = recorder->Filename();
 
-  EXPECT_TRUE(recorder->GetRunning());
-  EXPECT_FALSE(recorder->GetPaused());
+  EXPECT_TRUE(recorder->Running());
+  EXPECT_FALSE(recorder->Paused());
   EXPECT_FALSE(filename.empty());
-  EXPECT_GT(recorder->GetFileSize(), 0u);
+  EXPECT_GT(recorder->FileSize(), 0u);
 
   // Stop log recording
   custom_exec("gz log -w default -d 0");
 
-  EXPECT_FALSE(recorder->GetRunning());
+  EXPECT_FALSE(recorder->Running());
 
   std::string cmd = "gz log -i -f " + filename;
   std::string info = custom_exec(cmd);
