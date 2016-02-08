@@ -19,11 +19,10 @@
 
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/math/Angle.hh"
-#include "test/util.hh"
 
 using namespace gazebo;
 
-class AngleTest : public gazebo::testing::AutoLogFixture { };
+class AngleTest : public ::testing::Test { };
 
 TEST_F(AngleTest, Angle)
 {

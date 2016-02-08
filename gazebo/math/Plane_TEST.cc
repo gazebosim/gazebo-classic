@@ -19,11 +19,10 @@
 
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/math/Plane.hh"
-#include "test/util.hh"
 
 using namespace gazebo;
 
-class PlaneTest : public gazebo::testing::AutoLogFixture { };
+class PlaneTest : public ::testing::Test { };
 
 TEST_F(PlaneTest, Plane)
 {
