@@ -81,42 +81,47 @@ void DepthCameraSensor::Init()
     if (!this->scene)
       this->scene = rendering::create_scene(worldName, false, true);
 
-    rendering::DepthCameraPtr depthCamera = this->scene->CreateDepthCamera(
+    this->dataPtr->depthCamera = this->scene->CreateDepthCamera(
         this->sdf->Get<std::string>("name"), false);
 
-    if (!depthCamera)
+    if (!this->dataPtr->depthCamera)
     {
       gzerr << "Unable to create depth camera sensor" << std::endl;
       return;
     }
-    depthCamera->SetCaptureData(true);
+    this->dataPtr->depthCamera->SetCaptureData(true);
 
     sdf::ElementPtr cameraSdf = this->sdf->GetElement("camera");
-    depthCamera->Load(cameraSdf);
+    this->dataPtr->depthCamera->Load(cameraSdf);
 
     // Do some sanity checks
-    if (depthCamera->ImageWidth() == 0u ||
-        depthCamera->ImageHeight() == 0u)
+    if (this->dataPtr->depthCamera->ImageWidth() == 0u ||
+        this->dataPtr->depthCamera->ImageHeight() == 0u)
     {
       gzerr << "image has zero size" << std::endl;
     }
 
-    depthCamera->Init();
-    depthCamera->CreateRenderTexture(this->Name() + "_RttTex_Image");
-    depthCamera->CreateDepthTexture(this->Name() + "_RttTex_Depth");
+    this->dataPtr->depthCamera->Init();
+    this->dataPtr->depthCamera->CreateRenderTexture(
+        this->Name() + "_RttTex_Image");
+    this->dataPtr->depthCamera->CreateDepthTexture(
+        this->Name() + "_RttTex_Depth");
     ignition::math::Pose3d cameraPose = this->pose;
     if (cameraSdf->HasElement("pose"))
       cameraPose = cameraSdf->Get<ignition::math::Pose3d>("pose") + cameraPose;
 
-    depthCamera->SetWorldPose(cameraPose);
-    depthCamera->AttachToVisual(this->parentId, true);
+    this->dataPtr->depthCamera->SetWorldPose(cameraPose);
+    this->dataPtr->depthCamera->AttachToVisual(this->parentId, true);
 
-    this->camera = boost::dynamic_pointer_cast<rendering::Camera>(depthCamera);
+    this->camera = boost::dynamic_pointer_cast<rendering::Camera>(
+        this->dataPtr->depthCamera);
 
     GZ_ASSERT(this->camera, "Unable to cast depth camera to camera");
   }
   else
+  {
     gzerr << "No world name" << std::endl;
+  }
 
   // Disable clouds and moon on server side until fixed and also to improve
   // performance
@@ -130,7 +135,7 @@ void DepthCameraSensor::Init()
 //////////////////////////////////////////////////
 bool DepthCameraSensor::UpdateImpl(const bool /*_force*/)
 {
-  if (!this->rendered)
+  if (!this->Rendered())
     return false;
 
   this->camera->PostRender();
@@ -147,9 +152,6 @@ bool DepthCameraSensor::UpdateImpl(const bool /*_force*/)
     msg.mutable_image()->set_step(this->camera->ImageWidth() *
         this->camera->ImageDepth());
 
-    rendering::DepthCameraPtr depthCamera =
-        boost::dynamic_pointer_cast<rendering::DepthCamera>(this->camera);
-
     unsigned int depthSamples = msg.image().width() * msg.image().height();
     float f;
     // cppchecker recommends using sizeof(varname)
@@ -158,7 +160,7 @@ bool DepthCameraSensor::UpdateImpl(const bool /*_force*/)
     if (!this->dataPtr->depthBuffer)
       this->dataPtr->depthBuffer = new float[depthSamples];
 
-    memcpy(this->dataPtr->depthBuffer, depthCamera->DepthData(),
+    memcpy(this->dataPtr->depthBuffer, this->dataPtr->depthCamera->DepthData(),
         depthBufferSize);
 
     for (unsigned int i = 0; i < depthSamples; ++i)
@@ -177,7 +179,7 @@ bool DepthCameraSensor::UpdateImpl(const bool /*_force*/)
     this->imagePub->Publish(msg);
   }
 
-  this->rendered = false;
+  this->SetRendered(false);
   return true;
 }
 
@@ -196,5 +198,5 @@ rendering::DepthCameraPtr DepthCameraSensor::GetDepthCamera() const
 //////////////////////////////////////////////////
 rendering::DepthCameraPtr DepthCameraSensor::DepthCamera() const
 {
-  return boost::dynamic_pointer_cast<rendering::DepthCamera>(this->camera);
+  return this->dataPtr->depthCamera;
 }

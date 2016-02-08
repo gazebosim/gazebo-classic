@@ -118,15 +118,20 @@ namespace gazebo
       /// \brief Handle the render event.
       protected: virtual void Render();
 
+      /// \brief Get the value of the rendered flag
+      protected: bool Rendered() const;
+
+      /// \brief Set the value of the rendered flag
+      /// \param[in] _value New rendered value.
+      protected: void SetRendered(const bool _value);
+
       /// \brief Pointer to the camera.
       protected: rendering::CameraPtr camera;
 
       /// \brief Publisher of image messages.
       protected: transport::PublisherPtr imagePub;
 
-      /// \brief True if the sensor was rendered.
-      protected: bool rendered = false;
-
+      /// \internal
       /// \brief Private data pointer
       private: std::unique_ptr<CameraSensorPrivate> dataPtr;
     };

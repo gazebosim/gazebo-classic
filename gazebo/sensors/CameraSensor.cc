@@ -53,7 +53,6 @@ CameraSensor::CameraSensor()
 : Sensor(sensors::IMAGE),
   dataPtr(new CameraSensorPrivate)
 {
-  this->rendered = false;
   this->connections.push_back(
       event::Events::ConnectRender(
         std::bind(&CameraSensor::Render, this)));
@@ -189,14 +188,14 @@ void CameraSensor::Render()
   // Update all the cameras
   this->camera->Render();
 
-  this->rendered = true;
+  this->dataPtr->rendered = true;
   this->lastMeasurementTime = this->scene->SimTime();
 }
 
 //////////////////////////////////////////////////
 bool CameraSensor::UpdateImpl(const bool /*_force*/)
 {
-  if (!this->rendered)
+  if (!this->dataPtr->rendered)
     return false;
 
   this->camera->PostRender();
@@ -219,7 +218,7 @@ bool CameraSensor::UpdateImpl(const bool /*_force*/)
     this->imagePub->Publish(msg);
   }
 
-  this->rendered = false;
+  this->dataPtr->rendered = false;
   return true;
 }
 
@@ -301,3 +300,16 @@ rendering::CameraPtr CameraSensor::Camera() const
 {
   return this->camera;
 }
+
+//////////////////////////////////////////////////
+bool CameraSensor::Rendered() const
+{
+  return this->dataPtr->rendered;
+}
+
+//////////////////////////////////////////////////
+void CameraSensor::SetRendered(const bool _value)
+{
+  this->dataPtr->rendered = _value;
+}
+

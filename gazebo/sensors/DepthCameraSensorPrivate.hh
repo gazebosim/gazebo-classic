@@ -29,6 +29,9 @@ namespace gazebo
     {
       /// \brief Depth data buffer.
       public: float *depthBuffer = NULL;
+
+      /// \brief Local pointer to the depthCamera.
+      public: rendering::DepthCameraPtr depthCamera;
     };
   }
 }

@@ -25,6 +25,8 @@ namespace gazebo
     /// \brief CameraSensor private data
     class CameraSensorPrivate
     {
+      /// \brief True if the sensor was rendered.
+      public: bool rendered = false;
     };
   }
 }
