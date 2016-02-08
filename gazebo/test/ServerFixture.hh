@@ -337,6 +337,8 @@ namespace gazebo
     /// \param[in] _width Output image width.
     /// \param[in] _height Output image height.
     /// \param[in] _rate Output Hz.
+    /// \param[in] _near Near clipping distance
+    /// \param[in] _far Far clipping distance
     protected: void SpawnDepthCameraSensor(const std::string &_modelName,
                    const std::string &_cameraName,
                    const ignition::math::Vector3d &_pos,
