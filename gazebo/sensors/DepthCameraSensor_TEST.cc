@@ -51,7 +51,7 @@ TEST_F(DepthCameraSensor_TEST, CreateDepthCamera)
   Load("worlds/depth_camera.world");
   sensors::SensorManager *mgr = sensors::SensorManager::Instance();
 
-  // Create the Ray sensor
+  // Create the camera sensor
   std::string sensorName = "default::camera_model::my_link::camera";
 
   // Get a pointer to the depth camera sensor
