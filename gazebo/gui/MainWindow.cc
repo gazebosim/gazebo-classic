@@ -71,7 +71,6 @@
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/MainWindowPrivate.hh"
 
-#include "gazebo/gui/plot/PlotWindow.hh"
 #ifdef HAVE_OCULUS
 #include "gazebo/gui/OculusWindow.hh"
 #endif
@@ -398,15 +397,6 @@ void MainWindow::Plot()
 {
   gui::PlotWindow *plot = new gui::PlotWindow(this);
   plot->show();
-}
-
-/////////////////////////////////////////////////
-void MainWindow::Plot()
-{
-#ifdef HAVE_QWT
-  gui::PlotWindow *plot = new gui::PlotWindow(this);
-  plot->show();
-#endif
 }
 
 /////////////////////////////////////////////////
@@ -1073,7 +1063,6 @@ void MainWindow::CreateActions()
   g_plotAct->setShortcut(tr("Ctrl+P"));
   g_plotAct->setStatusTip(tr("Create a Plot"));
   connect(g_plotAct, SIGNAL(triggered()), this, SLOT(Plot()));
-
 
   g_openAct = new QAction(tr("&Open World"), this);
   g_openAct->setShortcut(tr("Ctrl+O"));
@@ -1848,7 +1837,6 @@ void MainWindow::CreateMenuBar()
   windowMenu->addAction(g_overlayAct);
   windowMenu->addAction(g_showToolbarsAct);
   windowMenu->addAction(g_fullScreenAct);
-  windowMenu->addAction(g_plotAct);
   windowMenu->addAction(g_plotAct);
 
   bar->addSeparator();

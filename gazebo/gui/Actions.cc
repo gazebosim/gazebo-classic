@@ -127,9 +127,6 @@ GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_plotAct = 0;
 
 GZ_GUI_VISIBLE
-QAction *gazebo::gui::g_plotAct = 0;
-
-GZ_GUI_VISIBLE
 gazebo::gui::DeleteAction *gazebo::gui::g_deleteAct = 0;
 
 GZ_GUI_VISIBLE

@@ -249,9 +249,6 @@ namespace gazebo
       /// \brief Callback for plot action.
       private slots: void Plot();
 
-      /// \brief Callback for plot action.
-      private slots: void Plot();
-
       /// \brief Callback for adding plugins.
       private slots: void OnAddPlugins();
 
