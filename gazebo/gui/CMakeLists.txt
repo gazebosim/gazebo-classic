@@ -127,17 +127,6 @@ if (HAVE_OCULUS)
   )
 endif ()
 
-#if (HAVE_QWT)
-#  set (sources ${sources}
-#    Diagnostics.cc
-#    IncrementalPlot.cc
-#  )
-#  set (qt_headers ${qt_headers}
-#    Diagnostics.hh
-#    IncrementalPlot.hh
-#  )
-#endif()
-
 set (qt_tests
   DataLogger_TEST.cc
   GuiIface_TEST.cc
@@ -159,10 +148,7 @@ add_subdirectory(viewers)
 add_subdirectory(terrain)
 add_subdirectory(building)
 add_subdirectory(model)
-
-if (HAVE_QWT)
 add_subdirectory(plot)
-endif()
 
 if (HAVE_GRAPHVIZ)
   add_definitions(-DWITH_CGRAPH)
@@ -220,14 +206,11 @@ target_link_libraries(gazebo_gui
   ${ogre_libraries}
   ${Boost_LIBRARIES}
   ${tinyxml_LIBRARIES}
+  ${QWT_LIBRARY}
 )
 
 if (UNIX)
   target_link_libraries(gazebo_gui pthread)
-endif()
-
-if (HAVE_QWT)
-  target_link_libraries(gazebo_gui ${QWT_LIBRARY})
 endif()
 
 if (HAVE_GRAPHVIZ)

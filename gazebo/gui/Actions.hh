@@ -97,8 +97,6 @@ namespace gazebo
 
     extern GZ_GUI_VISIBLE QAction *g_topicVisAct;
 
-    extern GZ_GUI_VISIBLE QAction *g_diagnosticsAct;
-
     /// \brief Action to show/hide the plotting utitlty
     extern GZ_GUI_VISIBLE QAction *g_plotAct;
 

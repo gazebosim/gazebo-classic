@@ -71,7 +71,7 @@ class IntrospectionClientTest : public ::testing::Test
       this->topicsSubscribed.emplace(_topic);
   }
 
-  /// \brief Initialize the test
+  /// \brief Initialize the test.
   public: void SetUp()
   {
     this->topicsSubscribed = {};
@@ -92,6 +92,7 @@ class IntrospectionClientTest : public ::testing::Test
     this->callbackExecuted = false;
   }
 
+  /// \brief Executed at the end of each test.
   public: void TearDown()
   {
     // Make sure that we unsubscribe from all the topics.
@@ -135,7 +136,9 @@ TEST_F(IntrospectionClientTest, NewAndRemoveFilter)
   std::string topic;
 
   // Try to create an empty filter.
-  EXPECT_FALSE(this->client.NewFilter(this->managerId, {}, filterId, topic));
+  std::set<std::string> emptySet;
+  EXPECT_FALSE(this->client.NewFilter(this->managerId, emptySet, filterId,
+      topic));
 
   // Let's create a filter for receiving updates on "item1" and "item2".
   std::set<std::string> items = {"item1", "item2"};
@@ -204,11 +207,16 @@ TEST_F(IntrospectionClientTest, Items)
 {
   std::set<std::string> items;
 
+  EXPECT_FALSE(this->client.IsRegistered("_wrong_id_", items));
+
   // Try to query the list of items with an incorrect manager ID.
   EXPECT_FALSE(this->client.Items("_wrong_id_", items));
 
   // Let's query the list of items available.
   EXPECT_TRUE(this->client.Items(this->managerId, items));
+  EXPECT_TRUE(this->client.IsRegistered(this->managerId, "item1"));
+  EXPECT_TRUE(this->client.IsRegistered(this->managerId,
+        std::set<std::string> {"item1", "item2"}));
   EXPECT_EQ(items.size(), 3u);
   EXPECT_TRUE(items.find("item1") != items.end());
   EXPECT_TRUE(items.find("item2") != items.end());
