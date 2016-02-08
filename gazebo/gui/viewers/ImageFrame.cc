@@ -124,9 +124,9 @@ void ImageFrame::OnImage(const msgs::Image &_msg)
     }
     unsigned int idx = 0;
     double factor = 255 / maxDepth;
-    for (unsigned int j = 0; j < _msg.height(); j++)
+    for (unsigned int j = 0; j < _msg.height(); ++j)
     {
-      for (unsigned int i = 0; i < _msg.width(); i++)
+      for (unsigned int i = 0; i < _msg.width(); ++i)
       {
         float d = this->dataPtr->depthBuffer[idx++];
         d = 255 - (d * factor);
