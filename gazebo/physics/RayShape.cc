@@ -204,7 +204,7 @@ ignition::math::Vector3d RayShape::Start() const
 //////////////////////////////////////////////////
 ignition::math::Vector3d RayShape::End() const
 {
-  return this->relativeStartPos.Ign();
+  return this->relativeEndPos.Ign();
 }
 
 //////////////////////////////////////////////////
