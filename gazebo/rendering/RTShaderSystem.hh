@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,12 @@
  * limitations under the License.
  *
 */
-/* Desc: Wrapper around the OGRE RTShader system
- * Author: Nate Koenig
- * Date: 27 Jan 2010
- */
 
-#ifndef _RTSHADERSYSTEM_HH_
-#define _RTSHADERSYSTEM_HH_
+#ifndef _GAZEBO_RTSHADERSYSTEM_HH_
+#define _GAZEBO_RTSHADERSYSTEM_HH_
 
 #include <list>
 #include <string>
-#include <vector>
 
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/gazebo_config.h"
@@ -37,8 +32,7 @@ namespace gazebo
 {
   namespace rendering
   {
-    class Visual;
-    class Scene;
+    class RTShaderSystemPrivate;
 
     /// \addtogroup gazebo_rendering
     /// \{
@@ -80,7 +74,7 @@ namespace gazebo
       public: void Fini();
 
       /// \brief Clear the shader system
-      public: void Clear();
+      public: void Clear() GAZEBO_DEPRECATED(7.0);
 
       /// \brief Add a scene manager
       /// \param[in] _scene The scene to process
@@ -94,16 +88,20 @@ namespace gazebo
       /// \param[in] Name of the scene to remove.
       public: void RemoveScene(const std::string &_scene);
 
-      /// \brief Update the shaders. This should not be called frequently.
+      /// \brief Queue a call to update the shaders.
       public: void UpdateShaders();
 
       /// \brief Set an Ogre::Entity to use RT shaders.
       /// \param[in] _vis Visual that will use the RTShaderSystem.
-      public: void AttachEntity(Visual *vis);
+      /// \deprecated This function is no longer needed, and has no
+      /// implementation.
+      public: void AttachEntity(Visual *vis) GAZEBO_DEPRECATED(7.0);
 
       /// \brief Remove and entity.
       /// \param[in] _vis Remove this visual.
-      public: void DetachEntity(Visual *_vis);
+      /// \deprecated This function is no longer needed, and has no
+      /// implementation.
+      public: void DetachEntity(Visual *_vis) GAZEBO_DEPRECATED(7.0);
 
       /// \brief Set a viewport to use shaders.
       /// \param[in] _viewport The viewport to add.
@@ -123,7 +121,12 @@ namespace gazebo
 
       /// \brief Generate shaders for an entity
       /// \param[in] _vis The visual to generate shaders for.
-      public: void GenerateShaders(Visual *_vis);
+      /// \sa GenerateShaders(const VisualPtr &_vis)
+      public: void GenerateShaders(Visual *_vis) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Generate shaders for an entity
+      /// \param[in] _vis The visual to generate shaders for.
+      public: void GenerateShaders(const VisualPtr &_vis);
 
       /// \brief Apply shadows to a scene.
       /// \param[in] _scene The scene to receive shadows.
@@ -137,6 +140,9 @@ namespace gazebo
       /// \return The Ogre PSSM Shadows camera setup.
       public: Ogre::PSSMShadowCameraSetup *GetPSSMShadowCameraSetup() const;
 
+      /// \brief Update the RT shaders. This should not be called frequently.
+      public: void Update();
+
       /// \brief Get paths for the shader system
       /// \param[out] _coreLibsPath Path to the core libraries.
       /// \param[out] _cachePath Path to where the generated shaders are
@@ -144,34 +150,16 @@ namespace gazebo
       private: bool GetPaths(std::string &_coreLibsPath,
                              std::string &_cachePath);
 
-#if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= 7
-      /// \brief The shader generator.
-      private: Ogre::RTShader::ShaderGenerator *shaderGenerator;
-
-      /// \brief Used to generate shadows.
-      private: Ogre::RTShader::SubRenderState *shadowRenderState;
-#endif
-
-      /// \brief All the entites being used.
-      private: std::list<Visual*> entities;
-
-      /// \brief True if initialized.
-      private: bool initialized;
-
-      /// \brief True if shadows have been applied.
-      private: bool shadowsApplied;
-
-      /// \brief All the scenes.
-      private: std::vector<ScenePtr> scenes;
-
-      /// \brief Mutex used to protext the entities list.
-      private: boost::mutex *entityMutex;
-
-      /// \brief Parallel Split Shadow Map (PSSM) camera setup
-      private: Ogre::ShadowCameraSetupPtr pssmSetup;
+      /// \brief Update the shaders for a visual.
+      /// \param[in] _vis Pointer to the visual to update.
+      private: void UpdateShaders(VisualPtr _vis);
 
       /// \brief Make the RTShader system a singleton.
       private: friend class SingletonT<RTShaderSystem>;
+
+      /// \internal
+      /// \brief Pointer to private data.
+      private: RTShaderSystemPrivate *dataPtr;
     };
     /// \}
   }

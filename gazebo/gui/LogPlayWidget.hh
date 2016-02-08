@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ namespace gazebo
 
     /// \class LogPlayWidget LogPlayWidget.hh
     /// \brief Widget which displays log playback options.
-    class GAZEBO_VISIBLE LogPlayWidget : public QWidget
+    class GZ_GUI_VISIBLE LogPlayWidget : public QWidget
     {
       Q_OBJECT
 
@@ -86,6 +86,9 @@ namespace gazebo
       /// \param[in] _time Desired time
       public slots: void OnSeek(const common::Time &_time);
 
+      /// \brief Callback when the current time has been edited.
+      public slots: void OnCurrentTime();
+
       /// \brief Qt signal to show the play button.
       signals: void ShowPlay();
 
@@ -98,9 +101,21 @@ namespace gazebo
       /// \brief Qt signal to hide the pause button.
       signals: void HidePause();
 
-      /// \brief Qt signal used to set the current time line edit.
-      /// \param[in] _string String representation of current time.
-      signals: void SetCurrentTime(const QString &);
+      /// \brief Qt signal used to set the current day line edit.
+      /// \param[in] _string String representation of current day.
+      signals: void SetCurrentDays(const QString &);
+
+      /// \brief Qt signal used to set the current hour line edit.
+      /// \param[in] _string String representation of current hour.
+      signals: void SetCurrentHours(const QString &);
+
+      /// \brief Qt signal used to set the current minute line edit.
+      /// \param[in] _string String representation of current minute.
+      signals: void SetCurrentMinutes(const QString &);
+
+      /// \brief Qt signal used to set the current second line edit.
+      /// \param[in] _string String representation of current second.
+      signals: void SetCurrentSeconds(const QString &);
 
       /// \brief Qt signal used to set the end time line edit.
       /// \param[in] _string String representation of current time.
@@ -136,7 +151,7 @@ namespace gazebo
 
     /// \class LogPlayView LogPlayView.hh
     /// \brief View for the timeline.
-    class GAZEBO_VISIBLE LogPlayView: public QGraphicsView
+    class GZ_GUI_VISIBLE LogPlayView: public QGraphicsView
     {
       Q_OBJECT
 
@@ -179,7 +194,7 @@ namespace gazebo
 
     /// \class CurrentTimeItem CurrentTimeItem.hh
     /// \brief Item which represents the current time within the view.
-    class GAZEBO_VISIBLE CurrentTimeItem: public QObject,
+    class GZ_GUI_VISIBLE CurrentTimeItem: public QObject,
         public QGraphicsRectItem
     {
       Q_OBJECT

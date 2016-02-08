@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,13 @@
 /* Desc: Handles pushing messages out on a named topic
  * Author: Nate Koenig
  */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
+
+#include <boost/bind.hpp>
 
 #include <ignition/math/Helpers.hh>
 
@@ -191,10 +192,12 @@ void Publisher::SendMessage()
         iter != localBuffer.end(); ++iter, ++pubIter)
     {
       // Send the latest message.
-      this->pubIds[*pubIter] = this->publication->Publish(*iter,
+      int result = this->publication->Publish(*iter,
           boost::bind(&Publisher::OnPublishComplete, this, _1), *pubIter);
 
-      if (this->pubIds[*pubIter] <= 0)
+      if (result > 0)
+        this->pubIds[*pubIter] = result;
+      else
         this->pubIds.erase(*pubIter);
     }
 
@@ -252,7 +255,7 @@ void Publisher::Fini()
     this->SendMessage();
 
   if (!this->topic.empty())
-    TopicManager::Instance()->Unadvertise(this->topic);
+    TopicManager::Instance()->Unadvertise(this->topic, this->id);
 
   common::Time slept;
 
@@ -287,4 +290,10 @@ MessagePtr Publisher::GetPrevMsgPtr() const
     return this->publication->GetPrevMsg(this->id);
   else
     return MessagePtr();
+}
+
+//////////////////////////////////////////////////
+uint32_t Publisher::Id() const
+{
+  return this->id;
 }

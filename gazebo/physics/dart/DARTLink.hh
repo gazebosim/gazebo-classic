@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -178,6 +178,9 @@ namespace gazebo
       /// \brief Set child joint of this link.
       /// \param[in] _dartChildJoint Pointer to the child joint.
       public: void AddDARTChildJoint(DARTJointPtr _dartChildJoint);
+
+      // Documentation inherited.
+      public: virtual void UpdateMass();
 
       /// \internal
       /// \brief Pointer to private data

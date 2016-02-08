@@ -4,9 +4,11 @@ include_directories(${IGNITION-MATH_INCLUDE_DIRS})
 set (msgs
   altimeter.proto
   axis.proto
+  battery.proto
   boxgeom.proto
   camerasensor.proto
   camera_cmd.proto
+  camera_lens.proto
   cessna.proto
   collision.proto
   color.proto
@@ -14,6 +16,7 @@ set (msgs
   contacts.proto
   contactsensor.proto
   cylindergeom.proto
+  density.proto
   diagnostics.proto
   distortion.proto
   factory.proto
@@ -83,7 +86,7 @@ set (msgs
   raysensor.proto
   request.proto
   response.proto
-  rest_error.proto
+  rest_response.proto
   rest_login.proto
   rest_logout.proto
   rest_post.proto
@@ -104,6 +107,9 @@ set (msgs
   time.proto
   topic_info.proto
   track_visual.proto
+  undo_redo.proto
+  user_cmd.proto
+  user_cmd_stats.proto
   vector2d.proto
   vector3d.proto
   visual.proto

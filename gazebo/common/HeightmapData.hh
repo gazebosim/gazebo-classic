@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,23 +38,6 @@ namespace gazebo
     {
       /// \brief Destructor.
       public: virtual ~HeightmapData() {}
-
-      /// \brief Create a lookup table of the terrain's height.
-      /// \param[in] _subsampling Multiplier used to increase the resolution.
-      /// Ex: A subsampling of 2 in a terrain of 129x129 means that the height
-      /// vector will be 257 * 257.
-      /// \param[in] _vertSize Number of points per row.
-      /// \param[in] _size Real dimmensions of the terrain.
-      /// \param[in] _scale Vector3 used to scale the height.
-      /// \param[in] _flipY If true, it inverts the order in which the vector
-      /// is filled.
-      /// \param[out] _heights Vector containing the terrain heights.
-      /// \deprecated See FillHeightMap() that accepts
-      /// ignition::math::Vector3d objects.
-      public: virtual void FillHeightMap(int _subSampling,
-          unsigned int _vertSize, const math::Vector3 &_size,
-          const math::Vector3 &_scale, bool _flipY,
-          std::vector<float> &_heights) GAZEBO_DEPRECATED(6.0) = 0;
 
       /// \brief Create a lookup table of the terrain's height.
       /// \param[in] _subsampling Multiplier used to increase the resolution.

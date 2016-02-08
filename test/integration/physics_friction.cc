@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,11 @@
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/physics.hh"
+
+#ifdef HAVE_BULLET
+#include "gazebo/physics/bullet/bullet_math_inc.h"
+#endif
+
 #include "gazebo/transport/transport.hh"
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/test/helper_physics_generator.hh"
@@ -53,7 +58,7 @@ class PhysicsFrictionTest : public ServerFixture,
                 physics::SurfaceParamsPtr surf = (*iter)->GetSurface();
                 // Use the Secondary friction value,
                 // since gravity has a non-zero component in the y direction
-                this->friction = surf->GetFrictionPyramid()->GetMuSecondary();
+                this->friction = surf->FrictionPyramid()->MuSecondary();
               }
             }
     public: ~FrictionDemoBox() {}
@@ -251,8 +256,15 @@ void PhysicsFrictionTest::FrictionDemo(const std::string &_physicsEngine,
       {
         // Friction is small enough to allow motion
         // Expect velocity = acceleration * time
+        double vyTolerance = yTolerance;
+#ifdef HAVE_BULLET
+        if (_physicsEngine == "bullet" && sizeof(btScalar) == 4)
+        {
+          vyTolerance *= 22;
+        }
+#endif
         EXPECT_NEAR(vel.y, (g.y + box->friction) * t.Double(),
-                    yTolerance);
+                    vyTolerance);
       }
     }
   }
@@ -529,7 +541,17 @@ TEST_P(PhysicsFrictionTest, FrictionDemo)
 /////////////////////////////////////////////////
 TEST_P(WorldStepFrictionTest, FrictionDemoWorldStep)
 {
-  FrictionDemo("ode", "world", GetParam());
+  std::string worldStepSolver = GetParam();
+  if (worldStepSolver.compare("BULLET_PGS") == 0 ||
+      worldStepSolver.compare("BULLET_LEMKE") == 0)
+  {
+    gzerr << "Solver ["
+          << worldStepSolver
+          << "] doesn't yet work with this test."
+          << std::endl;
+    return;
+  }
+  FrictionDemo("ode", "world", worldStepSolver);
 }
 
 /////////////////////////////////////////////////

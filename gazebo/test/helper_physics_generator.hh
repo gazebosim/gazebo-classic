@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,10 +21,18 @@
 #include "gazebo/gazebo_config.h"
 
 #define BULLET_SUPPORT
+#define WORLD_STEP_BULLET_LEMKE
+#define WORLD_STEP_BULLET_PGS
 
 #ifdef HAVE_BULLET
 # undef BULLET_SUPPORT
 # define BULLET_SUPPORT , "bullet"
+# undef WORLD_STEP_BULLET_PGS
+# define WORLD_STEP_BULLET_PGS , "BULLET_PGS"
+# ifdef LIBBULLET_VERSION_GT_282
+#  undef WORLD_STEP_BULLET_LEMKE
+#  define WORLD_STEP_BULLET_LEMKE , "BULLET_LEMKE"
+# endif
 #endif
 
 #define SIMBODY_SUPPORT
@@ -52,6 +60,8 @@
 /// \brief Helper macro to instantiate gtest for different solvers
 #define WORLD_STEP_SOLVERS ::testing::Values("ODE_DANTZIG" \
   WORLD_STEP_DART_PGS \
+  WORLD_STEP_BULLET_PGS \
+  WORLD_STEP_BULLET_LEMKE \
   )
 
 #endif

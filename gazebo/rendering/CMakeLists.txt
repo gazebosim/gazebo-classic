@@ -60,6 +60,7 @@ set (sources
   VideoVisual.cc
   ViewController.cc
   Visual.cc
+  WideAngleCamera.cc
   WireBox.cc
   WindowManager.cc
   WrenchVisual.cc
@@ -120,6 +121,7 @@ set (headers
   VideoVisual.hh
   ViewController.hh
   Visual.hh
+  WideAngleCamera.hh
   WireBox.hh
   WindowManager.hh
   WrenchVisual.hh
@@ -142,7 +144,9 @@ if (HAVE_OCULUS)
   )
 endif ()
 
-set (gtest_sources)
+set (gtest_sources
+  RenderingConversions_TEST.cc
+)
 
 gz_build_tests(${gtest_sources})
 

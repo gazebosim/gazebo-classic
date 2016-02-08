@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
  * Date: 13 Feb 2006
  */
 
+#include <boost/bind.hpp>
 #include <boost/thread.hpp>
 
 #include "gazebo/common/Assert.hh"
@@ -111,8 +112,14 @@ void SimbodyLink::Init()
 //////////////////////////////////////////////////
 void SimbodyLink::Fini()
 {
+  event::Events::DisconnectWorldUpdateBegin(this->gravityModeConnection);
   event::Events::DisconnectWorldUpdateEnd(this->staticLinkConnection);
   Link::Fini();
+}
+
+/////////////////////////////////////////////////////////////////////
+void SimbodyLink::UpdateMass()
+{
 }
 
 //////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 #define _TOPICMANAGER_HH_
 
 #include <boost/bind.hpp>
+#include <boost/function.hpp>
 #include <map>
 #include <list>
 #include <string>
@@ -76,11 +77,6 @@ namespace gazebo
       /// \param[in] _onlyOut True means only outbound messages on nodes will be
       /// sent. False means nodes process both outbound and inbound messages
       public: void ProcessNodes(bool _onlyOut = false);
-
-      /// \brief Has the topic been advertised?
-      /// \param[in] _topic The name of the topic to check
-      /// \return true if the topic has been advertised, false otherwise
-      public: bool IsAdvertised(const std::string &_topic);
 
       /// \brief Subscribe to a topic
       /// \param[in] _options The options to use for the subscription
@@ -162,6 +158,12 @@ namespace gazebo
       /// \brief Unadvertise a publisher.
       /// \param[in] _pub Publisher to unadvertise.
       public: void Unadvertise(PublisherPtr _pub);
+
+      /// \brief Unadvertise a publisher, based on a publisher id.
+      /// \param[in] _topic The publisher's topic. It will also be unadvertised
+      /// if there are no advertised publishers left.
+      /// \param[in] _id ID of the publisher to unadvertise.
+      public: void Unadvertise(const std::string &_topic, const uint32_t _id);
 
       /// \brief Send a message. Use a Publisher instead of calling this
       ///        function directly.

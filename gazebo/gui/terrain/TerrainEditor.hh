@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,10 @@
  * limitations under the License.
  *
 */
-#ifndef _TERRAIN_EDITOR_HH_
-#define _TERRAIN_EDITOR_HH_
+#ifndef _GAZEBO_GUI_TERRAINEDITOR_HH_
+#define _GAZEBO_GUI_TERRAINEDITOR_HH_
+
+#include <memory>
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/Editor.hh"
@@ -25,11 +27,11 @@ namespace gazebo
 {
   namespace gui
   {
-    class TerrainEditorPalette;
+    class TerrainEditorPrivate;
 
     /// \class TerrainEditor TerrainEditor.hh gui/gui.hh
     /// \brief Interface to the terrain editor.
-    class GZ_GUI_TERRAIN_VISIBLE TerrainEditor : public Editor
+    class GZ_GUI_VISIBLE TerrainEditor : public Editor
     {
       Q_OBJECT
 
@@ -44,8 +46,9 @@ namespace gazebo
       /// \param[in] _checked True if the menu item is checked
       private slots: void OnEdit(bool _checked);
 
-      /// \brief Contains all the terrain editor tools.
-      private: TerrainEditorPalette *terrainPalette;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<TerrainEditorPrivate> dataPtr;
     };
   }
 }

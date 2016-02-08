@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,15 @@
  * limitations under the License.
  *
 */
-/* Desc: A model state
- * Author: Nate Koenig
- */
 
-#ifndef _MODELSTATE_HH_
-#define _MODELSTATE_HH_
+#ifndef _GAZEBO_MODELSTATE_HH_
+#define _GAZEBO_MODELSTATE_HH_
 
 #include <vector>
 #include <string>
 #include <boost/regex.hpp>
 
+#include <ignition/math/Vector3.hh>
 #include "gazebo/math/Pose.hh"
 
 #include "gazebo/physics/State.hh"
@@ -100,6 +98,10 @@ namespace gazebo
       /// \return The math::Pose of the Model.
       public: const math::Pose &GetPose() const;
 
+      /// \brief Get the stored model scale.
+      /// \return The scale of the Model.
+      public: const ignition::math::Vector3d &Scale() const;
+
       /// \brief Return true if the values in the state are zero.
       /// \return True if the values in the state are zero.
       public: bool IsZero() const;
@@ -173,6 +175,30 @@ namespace gazebo
       /// \return True if the joint exists in the model.
       public: bool HasJointState(const std::string &_jointName) const;
 
+      /// \brief Get the number of model states.
+      ///
+      /// This returns the number of nested model states recorded.
+      /// \return Number of nested ModelState recorded.
+      public: unsigned int NestedModelStateCount() const;
+
+      /// \brief Get a model state by model name
+      ///
+      /// Searches through all nested model states. Returns the model state with
+      /// the matching name, if any.
+      /// \param[in] _modelName Name of the model state
+      /// \return State of the Model.
+      /// \throws common::Exception When _modelName is invalid.
+      public: ModelState NestedModelState(const std::string &_modelName) const;
+
+      /// \brief Return true if there is a nested model with the specified name.
+      /// \param[in] _modelName Name of the model state.
+      /// \return True if the model exists in this model state.
+      public: bool HasNestedModelState(const std::string &_modelName) const;
+
+      /// \brief Get the nested model states.
+      /// \return A map of model names to model states.
+      public: const ModelState_M &NestedModelStates() const;
+
       /// \brief Populate a state SDF element with data from the object.
       /// \param[out] _sdf SDF element to populate.
       public: void FillSDF(sdf::ElementPtr _sdf);
@@ -227,13 +253,21 @@ namespace gazebo
           << q.x << " "
           << q.y << " "
           << q.z << " "
-          << "</pose>";
+          << "</pose>"
+          << "<scale>"
+          << _state.scale
+          << "</scale>";
 
         for (LinkState_M::const_iterator iter =
             _state.linkStates.begin(); iter != _state.linkStates.end();
             ++iter)
         {
           _out << iter->second;
+        }
+
+        for (const auto &ms : _state.modelStates)
+        {
+          _out << ms.second;
         }
 
         // Output the joint information
@@ -252,11 +286,17 @@ namespace gazebo
       /// \brief Pose of the model.
       private: math::Pose pose;
 
+      /// \brief Scale of the model.
+      private: ignition::math::Vector3d scale;
+
       /// \brief All the link states.
       private: LinkState_M linkStates;
 
       /// \brief All the joint states.
       private: JointState_M jointStates;
+
+      /// \brief All the model states.
+      private: ModelState_M modelStates;
     };
     /// \}
   }

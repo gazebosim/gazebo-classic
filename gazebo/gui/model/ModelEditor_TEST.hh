@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,12 @@ class ModelEditor_TEST : public QTestFixture
 
   /// \brief Tests adding an item to the model editor palette.
   private slots: void AddItemToPalette();
+
+  /// \brief Tests entering and exiting model editor mode.
+  private slots: void OnEdit();
+
+  /// \brief Tests the visibility of the insert tab.
+  private slots: void InsertTab();
 };
 
 #endif

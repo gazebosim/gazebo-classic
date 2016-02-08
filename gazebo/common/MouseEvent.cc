@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,13 @@ using namespace common;
 MouseEvent::MouseEvent()
   : dataPtr(new MouseEventPrivate)
 {
+}
+
+/////////////////////////////////////////////////
+MouseEvent::MouseEvent(const MouseEvent &_other)
+  : dataPtr(new MouseEventPrivate)
+{
+  *dataPtr = *_other.dataPtr;
 }
 
 /////////////////////////////////////////////////
@@ -200,4 +207,15 @@ bool MouseEvent::Control() const
 void MouseEvent::SetControl(const bool _control) const
 {
   this->dataPtr->control = _control;
+}
+
+/////////////////////////////////////////////////
+MouseEvent &MouseEvent::operator=(const MouseEvent &_other)
+{
+  if (this == &_other)
+      return *this;
+
+  *this->dataPtr = *_other.dataPtr;
+
+  return *this;
 }

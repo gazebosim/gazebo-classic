@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -381,7 +381,7 @@ void ApplyWrenchDialog_TEST::MouseInteractions()
 
   // Get the ApplyWrenchVisual for the box
   gazebo::rendering::ApplyWrenchVisualPtr boxApplyWrenchVis =
-      boost::dynamic_pointer_cast<gazebo::rendering::ApplyWrenchVisual>(
+      std::dynamic_pointer_cast<gazebo::rendering::ApplyWrenchVisual>(
       scene->GetVisual("multilink__APPLY_WRENCH__"));
   QVERIFY(boxApplyWrenchVis != NULL);
   QVERIFY(boxApplyWrenchVis->GetParent() == boxLinkVis);
@@ -429,7 +429,7 @@ void ApplyWrenchDialog_TEST::MouseInteractions()
 
   // Get the ApplyWrenchVisual for the sphere
   gazebo::rendering::ApplyWrenchVisualPtr sphereApplyWrenchVis =
-      boost::dynamic_pointer_cast<gazebo::rendering::ApplyWrenchVisual>(
+      std::dynamic_pointer_cast<gazebo::rendering::ApplyWrenchVisual>(
       scene->GetVisual("multilink__APPLY_WRENCH__0"));
   QVERIFY(sphereApplyWrenchVis != NULL);
   QVERIFY(sphereApplyWrenchVis->GetParent() == sphereLinkVis);

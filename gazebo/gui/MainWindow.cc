@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,50 +20,55 @@
   #include <Winsock2.h>
 #endif
 
+#include <functional>
+
 #include <sdf/sdf.hh>
-#include <boost/scoped_ptr.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include "gazebo/gazebo_config.h"
-
-#include "gazebo/gui/GuiPlugin.hh"
-#include "gazebo/gui/CloneWindow.hh"
-#include "gazebo/gui/TopicSelector.hh"
-#include "gazebo/gui/DataLogger.hh"
-#include "gazebo/gui/viewers/ViewFactory.hh"
-#include "gazebo/gui/viewers/TopicView.hh"
-#include "gazebo/gui/viewers/ImageView.hh"
-
 #include "gazebo/gazebo_client.hh"
+
 #include "gazebo/common/Console.hh"
-#include "gazebo/common/Exception.hh"
 #include "gazebo/common/Events.hh"
+#include "gazebo/common/Exception.hh"
 
 #include "gazebo/msgs/msgs.hh"
+
+#include "gazebo/rendering/RenderEvents.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/UserCamera.hh"
 
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/TransportIface.hh"
 
-#include "gazebo/rendering/UserCamera.hh"
-#include "gazebo/rendering/RenderEvents.hh"
-#include "gazebo/rendering/Scene.hh"
-
 #include "gazebo/gui/Actions.hh"
+#include "gazebo/gui/AlignWidget.hh"
+#include "gazebo/gui/CloneWindow.hh"
+#include "gazebo/gui/DataLogger.hh"
+#include "gazebo/gui/GLWidget.hh"
+#include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/GuiIface.hh"
+#include "gazebo/gui/GuiPlugin.hh"
+#include "gazebo/gui/HotkeyDialog.hh"
 #include "gazebo/gui/InsertModelWidget.hh"
 #include "gazebo/gui/LayersWidget.hh"
 #include "gazebo/gui/ModelListWidget.hh"
 #include "gazebo/gui/RenderWidget.hh"
-#include "gazebo/gui/ToolsWidget.hh"
-#include "gazebo/gui/GLWidget.hh"
-#include "gazebo/gui/AlignWidget.hh"
-#include "gazebo/gui/ViewAngleWidget.hh"
-#include "gazebo/gui/TimePanel.hh"
-#include "gazebo/gui/MainWindow.hh"
-#include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/SpaceNav.hh"
+#include "gazebo/gui/TimePanel.hh"
+#include "gazebo/gui/ToolsWidget.hh"
+#include "gazebo/gui/TopicSelector.hh"
+#include "gazebo/gui/TopToolbar.hh"
+#include "gazebo/gui/UserCmdHistory.hh"
+#include "gazebo/gui/ViewAngleWidget.hh"
 #include "gazebo/gui/building/BuildingEditor.hh"
-#include "gazebo/gui/terrain/TerrainEditor.hh"
 #include "gazebo/gui/model/ModelEditor.hh"
+#include "gazebo/gui/terrain/TerrainEditor.hh"
+#include "gazebo/gui/viewers/ViewFactory.hh"
+#include "gazebo/gui/viewers/TopicView.hh"
+#include "gazebo/gui/viewers/ImageView.hh"
+#include "gazebo/gui/MainWindow.hh"
+#include "gazebo/gui/MainWindowPrivate.hh"
 
 #ifdef HAVE_QWT
 #include "gazebo/gui/Diagnostics.hh"
@@ -83,10 +88,11 @@ extern bool g_fullscreen;
 
 /////////////////////////////////////////////////
 MainWindow::MainWindow()
-  : renderWidget(0)
+  : dataPtr(new MainWindowPrivate)
 {
-  this->menuLayout = NULL;
-  this->menuBar = NULL;
+  this->dataPtr->renderWidget = NULL;
+  this->dataPtr->menuLayout = NULL;
+  this->dataPtr->menuBar = NULL;
   this->setObjectName("mainWindow");
 
   // Do these things first.
@@ -94,31 +100,22 @@ MainWindow::MainWindow()
     this->CreateActions();
   }
 
-  this->inputStepSize = 1;
-  this->requestMsg = NULL;
+  this->dataPtr->inputStepSize = 1;
+  this->dataPtr->requestMsg = NULL;
 
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init();
-  gui::set_world(this->node->GetTopicNamespace());
+  this->dataPtr->node = transport::NodePtr(new transport::Node());
+  this->dataPtr->node->Init();
+  gui::set_world(this->dataPtr->node->GetTopicNamespace());
 
-  //QWidget *mainWidget = new QWidget(this);
-  //mainWidget->show();
-
-  /*QHBoxLayout *mainLayout = new QHBoxLayout;
-  mainLayout->setSpacing(0);
-  mainLayout->setContentsMargins(0, 0, 0, 0);
-  */
 
 
   this->setDockOptions(QMainWindow::AnimatedDocks);
 
-  //this->leftColumn = new QStackedWidget(this);
-
   QDockWidget *dock = new QDockWidget(tr("Tree"), this);
   dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
   dock->setContentsMargins(4, 4, 4, 4);
-  this->modelListWidget = new ModelListWidget(dock);
-  dock->setWidget(this->modelListWidget);
+  this->dataPtr->modelListWidget = new ModelListWidget(dock);
+  dock->setWidget(this->dataPtr->modelListWidget);
   this->addDockWidget(Qt::LeftDockWidgetArea, dock);
 
   dock = new QDockWidget(tr("Insert"), this);
@@ -143,51 +140,61 @@ MainWindow::MainWindow()
 
   // this->toolsWidget = new ToolsWidget();
 
-  this->renderWidget = new RenderWidget(this);
-  this->setCentralWidget(this->renderWidget);
+  this->dataPtr->renderWidget = new gui::RenderWidget(this);
+  this->setCentralWidget(this->dataPtr->renderWidget);
 
   // this->CreateEditors();
 
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));
+
   std::string title = "Gazebo";
   this->setWindowIconText(tr(title.c_str()));
   this->setWindowTitle(tr(title.c_str()));
 
 #ifdef HAVE_OCULUS
-  this->oculusWindow = NULL;
+  this->dataPtr->oculusWindow = NULL;
 #endif
 
-  this->connections.push_back(
+  this->dataPtr->connections.push_back(
       gui::Events::ConnectLeftPaneVisibility(
-        boost::bind(&MainWindow::SetLeftPaneVisibility, this, _1)));
+        std::bind(&MainWindow::SetLeftPaneVisibility, this,
+        std::placeholders::_1)));
 
-  this->connections.push_back(
+  this->dataPtr->connections.push_back(
       gui::Events::ConnectFullScreen(
-        boost::bind(&MainWindow::OnFullScreen, this, _1)));
+        std::bind(&MainWindow::OnFullScreen, this, std::placeholders::_1)));
 
-  this->connections.push_back(
+  this->dataPtr->connections.push_back(
       gui::Events::ConnectShowToolbars(
-        boost::bind(&MainWindow::OnShowToolbars, this, _1)));
+        std::bind(&MainWindow::OnShowToolbars, this, std::placeholders::_1)));
 
-  this->connections.push_back(
+  this->dataPtr->connections.push_back(
       gui::Events::ConnectMoveMode(
-        boost::bind(&MainWindow::OnMoveMode, this, _1)));
+        std::bind(&MainWindow::OnMoveMode, this, std::placeholders::_1)));
 
-  this->connections.push_back(
+  this->dataPtr->connections.push_back(
       gui::Events::ConnectManipMode(
-        boost::bind(&MainWindow::OnManipMode, this, _1)));
+        std::bind(&MainWindow::OnManipMode, this, std::placeholders::_1)));
 
-  this->connections.push_back(
+  this->dataPtr->connections.push_back(
      event::Events::ConnectSetSelectedEntity(
-       boost::bind(&MainWindow::OnSetSelectedEntity, this, _1, _2)));
+       std::bind(&MainWindow::OnSetSelectedEntity, this,
+       std::placeholders::_1, std::placeholders::_2)));
 
-  this->connections.push_back(
+  this->dataPtr->connections.push_back(
       gui::Events::ConnectInputStepSize(
-      boost::bind(&MainWindow::OnInputStepSizeChanged, this, _1)));
+      std::bind(&MainWindow::OnInputStepSizeChanged, this,
+      std::placeholders::_1)));
 
-  this->connections.push_back(
+  this->dataPtr->connections.push_back(
       gui::Events::ConnectFollow(
-        boost::bind(&MainWindow::OnFollow, this, _1)));
+        std::bind(&MainWindow::OnFollow, this,
+        std::placeholders::_1)));
+
+  this->dataPtr->connections.push_back(
+      gui::Events::ConnectWindowMode(
+      std::bind(&MainWindow::OnWindowMode, this,
+      std::placeholders::_1)));
 
   gui::ViewFactory::RegisterAll();
 
@@ -198,18 +205,19 @@ MainWindow::MainWindow()
   }
 
   // Create a pointer to the space navigator interface
-  this->spacenav = new SpaceNav();
+  this->dataPtr->spacenav = new SpaceNav();
 
   // Use a signal/slot to load plugins. This makes the process thread safe.
   connect(this, SIGNAL(AddPlugins()),
           this, SLOT(OnAddPlugins()), Qt::QueuedConnection);
 
   // Create data logger dialog
-  this->dataLogger = new gui::DataLogger(this);
-  connect(dataLogger, SIGNAL(rejected()), this, SLOT(OnDataLoggerClosed()));
+  this->dataPtr->dataLogger = new gui::DataLogger(this);
+  connect(this->dataPtr->dataLogger, SIGNAL(rejected()), this, SLOT(
+    OnDataLoggerClosed()));
 
   // Hotkey dialog
-  this->hotkeyDialog = NULL;
+  this->dataPtr->hotkeyDialog = NULL;
 
   this->show();
 }
@@ -217,13 +225,17 @@ MainWindow::MainWindow()
 /////////////////////////////////////////////////
 MainWindow::~MainWindow()
 {
+  delete this->dataPtr->userCmdHistory;
+  this->dataPtr->userCmdHistory = NULL;
+  // Cleanup global actions
   this->DeleteActions();
 }
 
 /////////////////////////////////////////////////
 void MainWindow::Load()
 {
-  this->guiSub = this->node->Subscribe("~/gui", &MainWindow::OnGUI, this, true);
+  this->dataPtr->guiSub = this->dataPtr->node->Subscribe("~/gui",
+    &MainWindow::OnGUI, this, true);
 #ifdef HAVE_OCULUS
   int oculusAutoLaunch = getINIProperty<int>("oculus.autolaunch", 0);
   int oculusX = getINIProperty<int>("oculus.x", 0);
@@ -234,11 +246,11 @@ void MainWindow::Load()
   {
     if (!visual.empty())
     {
-      this->oculusWindow = new gui::OculusWindow(
+      this->dataPtr->oculusWindow = new gui::OculusWindow(
         oculusX, oculusY, visual);
 
-      if (this->oculusWindow->CreateCamera())
-        this->oculusWindow->show();
+      if (this->dataPtr->oculusWindow->CreateCamera())
+        this->dataPtr->oculusWindow->show();
     }
     else
       gzlog << "Oculus: No visual link specified in for attaching the camera. "
@@ -247,7 +259,7 @@ void MainWindow::Load()
 #endif
 
   // Load the space navigator
-  if (!this->spacenav->Load())
+  if (!this->dataPtr->spacenav->Load())
     gzerr << "Unable to load space navigator\n";
 }
 
@@ -269,29 +281,54 @@ void MainWindow::Init()
   int winYPos = getINIProperty<int>("geometry.y", 0);
 
   this->setGeometry(winXPos, winYPos, winWidth, winHeight);
-  //this->renderWidget->setMinimumSize(winWidth, winHeight);
 
-  this->worldControlPub =
-    this->node->Advertise<msgs::WorldControl>("~/world_control");
-  this->serverControlPub =
-    this->node->Advertise<msgs::ServerControl>("/gazebo/server/control");
-  this->scenePub =
-    this->node->Advertise<msgs::Scene>("~/scene");
+  if (this->width() > winWidth)
+  {
+    gzwarn << "Requested geometry.width of " << winWidth
+           << " but the minimum width of the window is "
+           << this->width() << "." << std::endl;
+  }
 
-  this->newEntitySub = this->node->Subscribe("~/model/info",
+  if (this->height() > winHeight)
+  {
+    gzwarn << "Requested geometry.height of " << winHeight
+           << " but the minimum height of the window is "
+           << this->height() << "." << std::endl;
+  }
+
+  this->dataPtr->worldControlPub =
+    this->dataPtr->node->Advertise<msgs::WorldControl>("~/world_control");
+  this->dataPtr->serverControlPub =
+    this->dataPtr->node->Advertise<msgs::ServerControl>(
+      "/gazebo/server/control");
+  this->dataPtr->scenePub =
+    this->dataPtr->node->Advertise<msgs::Scene>("~/scene");
+  this->dataPtr->userCmdPub = this->dataPtr->node->Advertise<msgs::UserCmd>(
+    "~/user_cmd");
+
+  this->dataPtr->newEntitySub = this->dataPtr->node->Subscribe("~/model/info",
       &MainWindow::OnModel, this, true);
 
-  this->lightSub = this->node->Subscribe("~/light", &MainWindow::OnLight, this);
+  // \todo Treating both light topics the same way, this should be improved
+  this->dataPtr->lightModifySub = this->dataPtr->node->Subscribe(
+    "~/light/modify",
+    &MainWindow::OnLight, this);
 
-  this->requestPub = this->node->Advertise<msgs::Request>("~/request");
-  this->responseSub = this->node->Subscribe("~/response",
+  this->dataPtr->lightFactorySub = this->dataPtr->node->Subscribe(
+    "~/factory/light",
+    &MainWindow::OnLight, this);
+
+  this->dataPtr->requestPub =
+    this->dataPtr->node->Advertise<msgs::Request>("~/request");
+  this->dataPtr->responseSub = this->dataPtr->node->Subscribe("~/response",
       &MainWindow::OnResponse, this);
 
-  this->worldModSub = this->node->Subscribe("/gazebo/world/modify",
+  this->dataPtr->worldModSub = this->dataPtr->node->Subscribe(
+                                            "/gazebo/world/modify",
                                             &MainWindow::OnWorldModify, this);
 
-  this->requestMsg = msgs::CreateRequest("scene_info");
-  this->requestPub->Publish(*this->requestMsg);
+  this->dataPtr->requestMsg = msgs::CreateRequest("scene_info");
+  this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
 
   gui::Events::mainWindowReady();
 }
@@ -299,24 +336,24 @@ void MainWindow::Init()
 /////////////////////////////////////////////////
 void MainWindow::closeEvent(QCloseEvent * /*_event*/)
 {
-  this->renderWidget->hide();
-  this->tabWidget->hide();
+  this->dataPtr->renderWidget->hide();
+  this->dataPtr->tabWidget->hide();
   // this->toolsWidget->hide();
 
-  this->connections.clear();
+  this->dataPtr->connections.clear();
 
 #ifdef HAVE_OCULUS
-  if (this->oculusWindow)
+  if (this->dataPtr->oculusWindow)
   {
-    delete this->oculusWindow;
-    this->oculusWindow = NULL;
+    delete this->dataPtr->oculusWindow;
+    this->dataPtr->oculusWindow = NULL;
   }
 #endif
-  delete this->renderWidget;
+  delete this->dataPtr->renderWidget;
 
   // Cleanup the space navigator
-  delete this->spacenav;
-  this->spacenav = NULL;
+  delete this->dataPtr->spacenav;
+  this->dataPtr->spacenav = NULL;
 
   emit Close();
 
@@ -328,7 +365,7 @@ void MainWindow::New()
 {
   msgs::ServerControl msg;
   msg.set_new_world(true);
-  this->serverControlPub->Publish(msg);
+  this->dataPtr->serverControlPub->Publish(msg);
 }
 
 /////////////////////////////////////////////////
@@ -371,7 +408,7 @@ void MainWindow::Open()
   {
     msgs::ServerControl msg;
     msg.set_open_filename(filename);
-    this->serverControlPub->Publish(msg);
+    this->dataPtr->serverControlPub->Publish(msg);
   }
 }
 
@@ -418,7 +455,7 @@ void MainWindow::SaveAs()
     std::string filename = selected[0].toStdString();
 
     g_saveAct->setEnabled(true);
-    this->saveFilename = filename;
+    this->dataPtr->saveFilename = filename;
     this->Save();
   }
 }
@@ -428,7 +465,7 @@ void MainWindow::Save()
 {
   // Get the latest world in SDF.
   boost::shared_ptr<msgs::Response> response =
-    transport::request(get_world(), "world_sdf");
+    transport::request(get_world(), "world_sdf_save");
 
   msgs::GzString msg;
   std::string msgData;
@@ -454,11 +491,11 @@ void MainWindow::Save()
       sdf::ElementPtr cameraElem = guiElem->GetElement("camera");
       rendering::UserCameraPtr cam = gui::get_active_camera();
 
-      cameraElem->GetElement("pose")->Set(cam->GetWorldPose());
+      cameraElem->GetElement("pose")->Set(cam->WorldPose());
       cameraElem->GetElement("view_controller")->Set(
           cam->GetViewControllerTypeString());
 
-      cameraElem->GetElement("projection_type")->Set(cam->GetProjectionType());
+      cameraElem->GetElement("projection_type")->Set(cam->ProjectionType());
 
       // TODO: export track_visual properties as well.
       msgData = sdf_parsed.Root()->ToString("");
@@ -470,13 +507,13 @@ void MainWindow::Save()
     }
 
     // Open the file
-    std::ofstream out(this->saveFilename.c_str(), std::ios::out);
+    std::ofstream out(this->dataPtr->saveFilename.c_str(), std::ios::out);
 
     if (!out)
     {
       QMessageBox msgBox;
-      std::string str = "Unable to open file: " + this->saveFilename + "\n";
-      str += "Check file permissions.";
+      std::string str = "Unable to open file: " + this->dataPtr->saveFilename;
+      str += ".\nCheck file permissions.";
       msgBox.setText(str.c_str());
       msgBox.exec();
     }
@@ -497,15 +534,15 @@ void MainWindow::Save()
 /////////////////////////////////////////////////
 void MainWindow::Clone()
 {
-  boost::scoped_ptr<CloneWindow> cloneWindow(new CloneWindow(this));
+  std::unique_ptr<CloneWindow> cloneWindow(new CloneWindow(this));
   if (cloneWindow->exec() == QDialog::Accepted && cloneWindow->IsValidPort())
   {
     // Create a gzserver clone in the server side.
     msgs::ServerControl msg;
     msg.set_save_world_name("");
     msg.set_clone(true);
-    msg.set_new_port(cloneWindow->GetPort());
-    this->serverControlPub->Publish(msg);
+    msg.set_new_port(cloneWindow->Port());
+    this->dataPtr->serverControlPub->Publish(msg);
   }
 }
 
@@ -563,12 +600,12 @@ void MainWindow::About()
 void MainWindow::HotkeyChart()
 {
   // Opening for the first time
-  if (!this->hotkeyDialog)
+  if (!this->dataPtr->hotkeyDialog)
   {
-    this->hotkeyDialog = new HotkeyDialog(this);
+    this->dataPtr->hotkeyDialog = new HotkeyDialog(this);
   }
 
-  this->hotkeyDialog->show();
+  this->dataPtr->hotkeyDialog->show();
 }
 
 /////////////////////////////////////////////////
@@ -577,7 +614,7 @@ void MainWindow::Play()
   msgs::WorldControl msg;
   msg.set_pause(false);
 
-  this->worldControlPub->Publish(msg);
+  this->dataPtr->worldControlPub->Publish(msg);
 }
 
 /////////////////////////////////////////////////
@@ -586,22 +623,22 @@ void MainWindow::Pause()
   msgs::WorldControl msg;
   msg.set_pause(true);
 
-  this->worldControlPub->Publish(msg);
+  this->dataPtr->worldControlPub->Publish(msg);
 }
 
 /////////////////////////////////////////////////
 void MainWindow::Step()
 {
   msgs::WorldControl msg;
-  msg.set_multi_step(this->inputStepSize);
+  msg.set_multi_step(this->dataPtr->inputStepSize);
 
-  this->worldControlPub->Publish(msg);
+  this->dataPtr->worldControlPub->Publish(msg);
 }
 
 /////////////////////////////////////////////////
 void MainWindow::OnInputStepSizeChanged(int _value)
 {
-  this->inputStepSize = _value;
+  this->dataPtr->inputStepSize = _value;
 }
 
 /////////////////////////////////////////////////
@@ -609,14 +646,14 @@ void MainWindow::OnFollow(const std::string &_modelName)
 {
   if (_modelName.empty())
   {
-    this->renderWidget->DisplayOverlayMsg("", 0);
-    this->editMenu->setEnabled(true);
+    this->dataPtr->renderWidget->DisplayOverlayMsg("", 0);
+    this->dataPtr->editMenu->setEnabled(true);
   }
   else
   {
-    this->renderWidget->DisplayOverlayMsg(
+    this->dataPtr->renderWidget->DisplayOverlayMsg(
         "Press Escape to exit Follow mode", 0);
-    this->editMenu->setEnabled(false);
+    this->dataPtr->editMenu->setEnabled(false);
   }
 }
 
@@ -627,7 +664,13 @@ void MainWindow::OnResetModelOnly()
   msg.mutable_reset()->set_all(false);
   msg.mutable_reset()->set_time_only(false);
   msg.mutable_reset()->set_model_only(true);
-  this->worldControlPub->Publish(msg);
+
+  // Register user command on server
+  msgs::UserCmd userCmdMsg;
+  userCmdMsg.set_description("Reset models");
+  userCmdMsg.set_type(msgs::UserCmd::WORLD_CONTROL);
+  userCmdMsg.mutable_world_control()->CopyFrom(msg);
+  this->dataPtr->userCmdPub->Publish(userCmdMsg);
 }
 
 /////////////////////////////////////////////////
@@ -635,7 +678,13 @@ void MainWindow::OnResetWorld()
 {
   msgs::WorldControl msg;
   msg.mutable_reset()->set_all(true);
-  this->worldControlPub->Publish(msg);
+
+  // Register user command on server
+  msgs::UserCmd userCmdMsg;
+  userCmdMsg.set_description("Reset world");
+  userCmdMsg.set_type(msgs::UserCmd::WORLD_CONTROL);
+  userCmdMsg.mutable_world_control()->CopyFrom(msg);
+  this->dataPtr->userCmdPub->Publish(userCmdMsg);
 }
 
 /////////////////////////////////////////////////
@@ -665,12 +714,12 @@ void MainWindow::Scale()
 /////////////////////////////////////////////////
 void MainWindow::Align()
 {
-  for (unsigned int i = 0 ; i < this->alignActionGroups.size(); ++i)
+  for (unsigned int i = 0 ; i < this->dataPtr->alignActionGroups.size(); ++i)
   {
-    this->alignActionGroups[i]->setExclusive(false);
-    if (this->alignActionGroups[i]->checkedAction())
-      this->alignActionGroups[i]->checkedAction()->setChecked(false);
-    this->alignActionGroups[i]->setExclusive(true);
+    this->dataPtr->alignActionGroups[i]->setExclusive(false);
+    if (this->dataPtr->alignActionGroups[i]->checkedAction())
+      this->dataPtr->alignActionGroups[i]->checkedAction()->setChecked(false);
+    this->dataPtr->alignActionGroups[i]->setExclusive(true);
   }
 }
 
@@ -734,8 +783,8 @@ void MainWindow::CaptureScreenshot()
 {
   rendering::UserCameraPtr cam = gui::get_active_camera();
   cam->SetCaptureDataOnce();
-  this->renderWidget->DisplayOverlayMsg(
-      "Screenshot saved in: " + cam->GetScreenshotPath(), 2000);
+  this->dataPtr->renderWidget->DisplayOverlayMsg(
+      "Screenshot saved in: " + cam->ScreenshotPath(), 2000);
 }
 
 /////////////////////////////////////////////////
@@ -749,18 +798,18 @@ void MainWindow::OnFullScreen(bool _value)
   if (_value)
   {
     this->showFullScreen();
-    this->leftColumn->hide();
-    // this->toolsWidget->hide();
-    this->menuBar->hide();
+    this->dataPtr->leftColumn->hide();
+    // this->dataPtr->toolsWidget->hide();
+    this->dataPtr->menuBar->hide();
     this->setContentsMargins(0, 0, 0, 0);
     this->centralWidget()->layout()->setContentsMargins(0, 0, 0, 0);
   }
   else
   {
     this->showNormal();
-    this->leftColumn->show();
-    // this->toolsWidget->show();
-    this->menuBar->show();
+    this->dataPtr->leftColumn->show();
+    // this->dataPtr->toolsWidget->show();
+    this->dataPtr->menuBar->show();
   }
   g_fullScreenAct->setChecked(_value);
   g_fullscreen = _value;
@@ -771,13 +820,13 @@ void MainWindow::OnShowToolbars(bool _value)
 {
   if (_value)
   {
-    this->GetRenderWidget()->GetTimePanel()->show();
-    this->GetRenderWidget()->GetToolbar()->show();
+    this->RenderWidget()->GetTimePanel()->show();
+    this->RenderWidget()->GetToolbar()->show();
   }
   else
   {
-    this->GetRenderWidget()->GetTimePanel()->hide();
-    this->GetRenderWidget()->GetToolbar()->hide();
+    this->RenderWidget()->GetTimePanel()->hide();
+    this->RenderWidget()->GetToolbar()->hide();
   }
   g_showToolbarsAct->setChecked(_value);
 }
@@ -786,10 +835,10 @@ void MainWindow::OnShowToolbars(bool _value)
 void MainWindow::ShowCollisions()
 {
   if (g_showCollisionsAct->isChecked())
-    transport::requestNoReply(this->node->GetTopicNamespace(),
+    transport::requestNoReply(this->dataPtr->node->GetTopicNamespace(),
         "show_collision", "all");
   else
-    transport::requestNoReply(this->node->GetTopicNamespace(),
+    transport::requestNoReply(this->dataPtr->node->GetTopicNamespace(),
         "hide_collision", "all");
 }
 
@@ -799,7 +848,7 @@ void MainWindow::ShowGrid()
   msgs::Scene msg;
   msg.set_name(gui::get_world());
   msg.set_grid(g_showGridAct->isChecked());
-  this->scenePub->Publish(msg);
+  this->dataPtr->scenePub->Publish(msg);
 }
 
 /////////////////////////////////////////////////
@@ -808,17 +857,17 @@ void MainWindow::ShowOrigin()
   msgs::Scene msg;
   msg.set_name(gui::get_world());
   msg.set_origin_visual(g_showOriginAct->isChecked());
-  this->scenePub->Publish(msg);
+  this->dataPtr->scenePub->Publish(msg);
 }
 
 /////////////////////////////////////////////////
 void MainWindow::ShowJoints()
 {
   if (g_showJointsAct->isChecked())
-    transport::requestNoReply(this->node->GetTopicNamespace(),
+    transport::requestNoReply(this->dataPtr->node->GetTopicNamespace(),
         "show_joints", "all");
   else
-    transport::requestNoReply(this->node->GetTopicNamespace(),
+    transport::requestNoReply(this->dataPtr->node->GetTopicNamespace(),
         "hide_joints", "all");
 }
 
@@ -826,10 +875,10 @@ void MainWindow::ShowJoints()
 void MainWindow::SetTransparent()
 {
   if (g_transparentAct->isChecked())
-    transport::requestNoReply(this->node->GetTopicNamespace(),
+    transport::requestNoReply(this->dataPtr->node->GetTopicNamespace(),
         "set_transparent", "all");
   else
-    transport::requestNoReply(this->node->GetTopicNamespace(),
+    transport::requestNoReply(this->dataPtr->node->GetTopicNamespace(),
         "set_opaque", "all");
 }
 
@@ -837,27 +886,27 @@ void MainWindow::SetTransparent()
 void MainWindow::SetWireframe()
 {
   if (g_viewWireframeAct->isChecked())
-    transport::requestNoReply(this->node->GetTopicNamespace(),
+    transport::requestNoReply(this->dataPtr->node->GetTopicNamespace(),
         "set_wireframe", "all");
   else
-    transport::requestNoReply(this->node->GetTopicNamespace(),
+    transport::requestNoReply(this->dataPtr->node->GetTopicNamespace(),
         "set_solid", "all");
 }
 
 /////////////////////////////////////////////////
 void MainWindow::ShowGUIOverlays()
 {
-  this->GetRenderWidget()->SetOverlaysVisible(g_overlayAct->isChecked());
+  this->RenderWidget()->SetOverlaysVisible(g_overlayAct->isChecked());
 }
 
 /////////////////////////////////////////////////
 void MainWindow::ShowCOM()
 {
   if (g_showCOMAct->isChecked())
-    transport::requestNoReply(this->node->GetTopicNamespace(),
+    transport::requestNoReply(this->dataPtr->node->GetTopicNamespace(),
         "show_com", "all");
   else
-    transport::requestNoReply(this->node->GetTopicNamespace(),
+    transport::requestNoReply(this->dataPtr->node->GetTopicNamespace(),
         "hide_com", "all");
 }
 
@@ -865,10 +914,10 @@ void MainWindow::ShowCOM()
 void MainWindow::ShowInertia()
 {
   if (g_showInertiaAct->isChecked())
-    transport::requestNoReply(this->node->GetTopicNamespace(),
+    transport::requestNoReply(this->dataPtr->node->GetTopicNamespace(),
         "show_inertia", "all");
   else
-    transport::requestNoReply(this->node->GetTopicNamespace(),
+    transport::requestNoReply(this->dataPtr->node->GetTopicNamespace(),
         "hide_inertia", "all");
 }
 
@@ -877,12 +926,12 @@ void MainWindow::ShowLinkFrame()
 {
   if (g_showLinkFrameAct->isChecked())
   {
-    transport::requestNoReply(this->node->GetTopicNamespace(),
+    transport::requestNoReply(this->dataPtr->node->GetTopicNamespace(),
         "show_link_frame", "all");
   }
   else
   {
-    transport::requestNoReply(this->node->GetTopicNamespace(),
+    transport::requestNoReply(this->dataPtr->node->GetTopicNamespace(),
         "hide_link_frame", "all");
   }
 }
@@ -891,10 +940,10 @@ void MainWindow::ShowLinkFrame()
 void MainWindow::ShowContacts()
 {
   if (g_showContactsAct->isChecked())
-    transport::requestNoReply(this->node->GetTopicNamespace(),
+    transport::requestNoReply(this->dataPtr->node->GetTopicNamespace(),
         "show_contact", "all");
   else
-    transport::requestNoReply(this->node->GetTopicNamespace(),
+    transport::requestNoReply(this->dataPtr->node->GetTopicNamespace(),
         "hide_contact", "all");
 }
 
@@ -928,7 +977,7 @@ void MainWindow::ViewOculus()
 {
 #ifdef HAVE_OCULUS
   rendering::ScenePtr scene = rendering::get_scene();
-  if (scene->GetOculusCameraCount() != 0)
+  if (scene->OculusCameraCount() != 0)
   {
     gzlog << "Oculus camera already exists." << std::endl;
     return;
@@ -940,11 +989,11 @@ void MainWindow::ViewOculus()
 
   if (!visual.empty())
   {
-    this->oculusWindow = new gui::OculusWindow(
+    this->dataPtr->oculusWindow = new gui::OculusWindow(
         oculusX, oculusY, visual);
 
-    if (this->oculusWindow->CreateCamera())
-      this->oculusWindow->show();
+    if (this->dataPtr->oculusWindow->CreateCamera())
+      this->dataPtr->oculusWindow->show();
   }
   else
   {
@@ -959,11 +1008,11 @@ void MainWindow::DataLogger()
 {
   if (g_dataLoggerAct->isChecked())
   {
-    this->dataLogger->show();
+    this->dataPtr->dataLogger->show();
   }
   else
   {
-    this->dataLogger->close();
+    this->dataPtr->dataLogger->close();
   }
 }
 
@@ -1380,9 +1429,9 @@ void MainWindow::CreateActions()
   zAlignActionGroup->addAction(zAlignCenter);
   zAlignActionGroup->addAction(zAlignMax);
   zAlignActionGroup->setExclusive(true);
-  this->alignActionGroups.push_back(xAlignActionGroup);
-  this->alignActionGroups.push_back(yAlignActionGroup);
-  this->alignActionGroups.push_back(zAlignActionGroup);
+  this->dataPtr->alignActionGroups.push_back(xAlignActionGroup);
+  this->dataPtr->alignActionGroups.push_back(yAlignActionGroup);
+  this->dataPtr->alignActionGroups.push_back(zAlignActionGroup);
 
   AlignWidget *alignWidget = new AlignWidget(this);
   alignWidget->Add(AlignWidget::ALIGN_X, AlignWidget::ALIGN_MIN, xAlignMin);
@@ -1439,31 +1488,64 @@ void MainWindow::CreateActions()
 
   g_viewAngleAct = new QWidgetAction(this);
   g_viewAngleAct->setDefaultWidget(viewAngleWidget);
+
+  // Undo
+  g_undoAct = new QAction(QIcon(":/images/undo.png"),
+      tr("Undo (Ctrl + Z)"), this);
+  g_undoAct->setShortcut(tr("Ctrl+Z"));
+  g_undoAct->setCheckable(false);
+  this->CreateDisabledIcon(":/images/undo.png", g_undoAct);
+  g_undoAct->setEnabled(false);
+
+  // Undo history
+  g_undoHistoryAct = new QAction(QIcon(":/images/down_spin_arrow.png"),
+      tr("Undo history"), this);
+  g_undoHistoryAct->setCheckable(false);
+  this->CreateDisabledIcon(":/images/down_spin_arrow.png", g_undoHistoryAct);
+  g_undoHistoryAct->setEnabled(false);
+
+  // Redo
+  g_redoAct = new QAction(QIcon(":/images/redo.png"),
+      tr("Redo (Shift + Ctrl + Z)"), this);
+  g_redoAct->setShortcut(tr("Shift+Ctrl+Z"));
+  g_redoAct->setCheckable(false);
+  this->CreateDisabledIcon(":/images/redo.png", g_redoAct);
+  g_redoAct->setEnabled(false);
+
+  // Redo history
+  g_redoHistoryAct = new QAction(QIcon(":/images/down_spin_arrow.png"),
+      tr("Redo history"), this);
+  g_redoHistoryAct->setCheckable(false);
+  this->CreateDisabledIcon(":/images/down_spin_arrow.png", g_redoHistoryAct);
+  g_redoHistoryAct->setEnabled(false);
+
+  this->dataPtr->userCmdHistory = new UserCmdHistory();
 }
 
 /////////////////////////////////////////////////
 void MainWindow::ShowMenuBar(QMenuBar *_bar)
 {
-  if (!this->menuLayout)
-    this->menuLayout = new QHBoxLayout;
+  if (!this->dataPtr->menuLayout)
+    this->dataPtr->menuLayout = new QHBoxLayout;
 
   // Remove all widgets from the menuLayout
-  while (this->menuLayout->takeAt(0) != 0)
+  while (this->dataPtr->menuLayout->takeAt(0) != 0)
   {
   }
 
-  if (!this->menuBar)
+  if (!this->dataPtr->menuBar)
   {
     // create the native menu bar
-    this->menuBar = new QMenuBar;
-    this->menuBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    this->setMenuBar(this->menuBar);
+    this->dataPtr->menuBar = new QMenuBar;
+    this->dataPtr->menuBar->setSizePolicy(QSizePolicy::Fixed,
+      QSizePolicy::Fixed);
+    this->setMenuBar(this->dataPtr->menuBar);
 
     // populate main window's menu bar with menus from normal simulation mode
     this->CreateMenuBar();
   }
 
-  this->menuBar->clear();
+  this->dataPtr->menuBar->clear();
 
   QMenuBar *newMenuBar = NULL;
   if (!_bar)
@@ -1489,13 +1571,13 @@ void MainWindow::ShowMenuBar(QMenuBar *_bar)
   QList<QMenu *> menus  = newMenuBar->findChildren<QMenu *>();
   for (int i = 0; i < menus.size(); ++i)
   {
-    this->menuBar->addMenu(menus[i]);
+    this->dataPtr->menuBar->addMenu(menus[i]);
   }
 
-  this->menuLayout->addWidget(this->menuBar);
+  this->dataPtr->menuLayout->addWidget(this->dataPtr->menuBar);
 
-  this->menuLayout->addStretch(5);
-  this->menuLayout->setContentsMargins(0, 0, 0, 0);
+  this->dataPtr->menuLayout->addStretch(5);
+  this->dataPtr->menuLayout->setContentsMargins(0, 0, 0, 0);
 }
 
 /////////////////////////////////////////////////
@@ -1659,6 +1741,18 @@ void MainWindow::DeleteActions()
 
   delete g_viewAngleAct;
   g_viewAngleAct = 0;
+
+  delete g_undoAct;
+  g_undoAct = 0;
+
+  delete g_undoHistoryAct;
+  g_undoHistoryAct = 0;
+
+  delete g_redoAct;
+  g_redoAct = 0;
+
+  delete g_redoHistoryAct;
+  g_redoHistoryAct = 0;
 }
 
 
@@ -1679,12 +1773,12 @@ void MainWindow::CreateMenuBar()
   fileMenu->addSeparator();
   fileMenu->addAction(g_quitAct);
 
-  this->editMenu = bar->addMenu(tr("&Edit"));
-  editMenu->addAction(g_resetModelsAct);
-  editMenu->addAction(g_resetWorldAct);
-  editMenu->addSeparator();
-  editMenu->addAction(g_editBuildingAct);
-  editMenu->addAction(g_editModelAct);
+  this->dataPtr->editMenu = bar->addMenu(tr("&Edit"));
+  this->dataPtr->editMenu->addAction(g_resetModelsAct);
+  this->dataPtr->editMenu->addAction(g_resetWorldAct);
+  this->dataPtr->editMenu->addSeparator();
+  this->dataPtr->editMenu->addAction(g_editBuildingAct);
+  this->dataPtr->editMenu->addAction(g_editModelAct);
 
   // \TODO: Add this back in when implementing the full Terrain Editor spec.
   // editMenu->addAction(g_editTerrainAct);
@@ -1763,7 +1857,7 @@ void MainWindow::CreateMenus()
   this->ShowMenuBar();
 
   QFrame *frame = new QFrame;
-  frame->setLayout(this->menuLayout);
+  frame->setLayout(this->dataPtr->menuLayout);
   frame->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
 
   this->setMenuWidget(frame);
@@ -1799,18 +1893,18 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
     {
       const msgs::Pose &msg_pose = _msg->camera().pose();
 
-      math::Vector3 cam_pose_pos = math::Vector3(
+      auto cam_pose_pos = ignition::math::Vector3d(
         msg_pose.position().x(),
         msg_pose.position().y(),
         msg_pose.position().z());
 
-      math::Quaternion cam_pose_rot = math::Quaternion(
+      auto cam_pose_rot = ignition::math::Quaterniond(
         msg_pose.orientation().w(),
         msg_pose.orientation().x(),
         msg_pose.orientation().y(),
         msg_pose.orientation().z());
 
-      math::Pose cam_pose(cam_pose_pos, cam_pose_rot);
+      ignition::math::Pose3d cam_pose(cam_pose_pos, cam_pose_rot);
 
       cam->SetDefaultPose(cam_pose);
       cam->SetUseSDFPose(true);
@@ -1848,11 +1942,11 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
 
   // Store all the plugins for processing
   {
-    boost::mutex::scoped_lock lock(this->pluginLoadMutex);
+    std::lock_guard<std::mutex> lock(this->dataPtr->pluginLoadMutex);
     for (int i = 0; i < _msg->plugin_size(); ++i)
     {
-      boost::shared_ptr<msgs::Plugin> pm(new msgs::Plugin(_msg->plugin(i)));
-      this->pluginMsgs.push_back(pm);
+      std::shared_ptr<msgs::Plugin> pm(new msgs::Plugin(_msg->plugin(i)));
+      this->dataPtr->pluginMsgs.push_back(pm);
     }
   }
 
@@ -1863,11 +1957,11 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
 /////////////////////////////////////////////////
 void MainWindow::OnAddPlugins()
 {
-  boost::mutex::scoped_lock lock(this->pluginLoadMutex);
+  std::lock_guard<std::mutex> lock(this->dataPtr->pluginLoadMutex);
 
   // Load all plugins.
-  for (std::vector<boost::shared_ptr<msgs::Plugin const> >::iterator iter =
-      this->pluginMsgs.begin(); iter != this->pluginMsgs.end(); ++iter)
+  for (auto iter = this->dataPtr->pluginMsgs.begin();
+      iter != this->dataPtr->pluginMsgs.end(); ++iter)
   {
     // Make sure the filename string is not empty
     if (!(*iter)->filename().empty())
@@ -1886,11 +1980,12 @@ void MainWindow::OnAddPlugins()
         gzlog << "Loaded GUI plugin[" << (*iter)->filename() << "]\n";
 
         // Attach the plugin to the render widget.
-        this->renderWidget->AddPlugin(plugin, msgs::PluginToSDF(**iter));
+        this->dataPtr->renderWidget->AddPlugin(plugin,
+          msgs::PluginToSDF(**iter));
       }
     }
   }
-  this->pluginMsgs.clear();
+  this->dataPtr->pluginMsgs.clear();
 
   g_overlayAct->setChecked(true);
   g_overlayAct->setEnabled(true);
@@ -1899,14 +1994,14 @@ void MainWindow::OnAddPlugins()
 /////////////////////////////////////////////////
 void MainWindow::OnModel(ConstModelPtr &_msg)
 {
-  this->entities[_msg->name()] = _msg->id();
+  this->dataPtr->entities[_msg->name()] = _msg->id();
   for (int i = 0; i < _msg->link_size(); i++)
   {
-    this->entities[_msg->link(i).name()] = _msg->link(i).id();
+    this->dataPtr->entities[_msg->link(i).name()] = _msg->link(i).id();
 
     for (int j = 0; j < _msg->link(i).collision_size(); j++)
     {
-      this->entities[_msg->link(i).collision(j).name()] =
+      this->dataPtr->entities[_msg->link(i).collision(j).name()] =
         _msg->link(i).collision(j).id();
     }
   }
@@ -1923,7 +2018,8 @@ void MainWindow::OnLight(ConstLightPtr &_msg)
 /////////////////////////////////////////////////
 void MainWindow::OnResponse(ConstResponsePtr &_msg)
 {
-  if (!this->requestMsg || _msg->id() != this->requestMsg->id())
+  if (!this->dataPtr->requestMsg || _msg->id() !=
+    this->dataPtr->requestMsg->id())
     return;
 
   msgs::Scene sceneMsg;
@@ -1934,16 +2030,18 @@ void MainWindow::OnResponse(ConstResponsePtr &_msg)
 
     for (int i = 0; i < sceneMsg.model_size(); ++i)
     {
-      this->entities[sceneMsg.model(i).name()] = sceneMsg.model(i).id();
+      this->dataPtr->entities[sceneMsg.model(i).name()] =
+        sceneMsg.model(i).id();
 
       for (int j = 0; j < sceneMsg.model(i).link_size(); ++j)
       {
-        this->entities[sceneMsg.model(i).link(j).name()] =
+        this->dataPtr->entities[sceneMsg.model(i).link(j).name()] =
           sceneMsg.model(i).link(j).id();
 
         for (int k = 0; k < sceneMsg.model(i).link(j).collision_size(); ++k)
         {
-          this->entities[sceneMsg.model(i).link(j).collision(k).name()] =
+          const auto &entity = sceneMsg.model(i).link(j).collision(k).name();
+          this->dataPtr->entities[entity] =
             sceneMsg.model(i).link(j).collision(k).id();
         }
       }
@@ -1956,12 +2054,12 @@ void MainWindow::OnResponse(ConstResponsePtr &_msg)
     }
   }
 
-  delete this->requestMsg;
-  this->requestMsg = NULL;
+  delete this->dataPtr->requestMsg;
+  this->dataPtr->requestMsg = NULL;
 }
 
 /////////////////////////////////////////////////
-unsigned int MainWindow::GetEntityId(const std::string &_name)
+unsigned int MainWindow::EntityId(const std::string &_name)
 {
   unsigned int result = 0;
 
@@ -1969,8 +2067,8 @@ unsigned int MainWindow::GetEntityId(const std::string &_name)
   boost::replace_first(name, gui::get_world()+"::", "");
 
   std::map<std::string, unsigned int>::iterator iter;
-  iter = this->entities.find(name);
-  if (iter != this->entities.end())
+  iter = this->dataPtr->entities.find(name);
+  if (iter != this->dataPtr->entities.end())
     result = iter->second;
 
   return result;
@@ -1985,9 +2083,9 @@ bool MainWindow::HasEntityName(const std::string &_name)
   boost::replace_first(name, gui::get_world()+"::", "");
 
   std::map<std::string, unsigned int>::iterator iter;
-  iter = this->entities.find(name);
+  iter = this->dataPtr->entities.find(name);
 
-  if (iter != this->entities.end())
+  if (iter != this->dataPtr->entities.end())
     result = true;
 
   return result;
@@ -1998,12 +2096,12 @@ void MainWindow::OnWorldModify(ConstWorldModifyPtr &_msg)
 {
   if (_msg->has_create() && _msg->create())
   {
-    this->renderWidget->CreateScene(_msg->world_name());
-    this->requestMsg = msgs::CreateRequest("scene_info");
-    this->requestPub->Publish(*this->requestMsg);
+    this->dataPtr->renderWidget->CreateScene(_msg->world_name());
+    this->dataPtr->requestMsg = msgs::CreateRequest("scene_info");
+    this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
   }
   else if (_msg->has_remove() && _msg->remove())
-    this->renderWidget->RemoveScene(_msg->world_name());
+    this->dataPtr->renderWidget->RemoveScene(_msg->world_name());
   else if (_msg->has_cloned())
   {
     if (_msg->cloned())
@@ -2029,7 +2127,7 @@ void MainWindow::OnSetSelectedEntity(const std::string &_name,
 {
   if (!_name.empty())
   {
-    this->tabWidget->setCurrentIndex(0);
+    this->dataPtr->tabWidget->setCurrentIndex(0);
   }
 }
 
@@ -2042,34 +2140,41 @@ void MainWindow::ItemSelected(QTreeWidgetItem *_item, int)
 /////////////////////////////////////////////////
 void MainWindow::AddToLeftColumn(const std::string &_name, QWidget *_widget)
 {
-  this->leftColumn->addWidget(_widget);
-  this->leftColumnStack[_name] = this->leftColumn->count()-1;
+  this->dataPtr->leftColumn->addWidget(_widget);
+  this->dataPtr->leftColumnStack[_name] = this->dataPtr->leftColumn->count()-1;
 }
 
 /////////////////////////////////////////////////
 void MainWindow::ShowLeftColumnWidget(const std::string &_name)
 {
-  std::map<std::string, int>::iterator iter = this->leftColumnStack.find(_name);
+  std::map<std::string, int>::iterator iter =
+    this->dataPtr->leftColumnStack.find(_name);
 
-  if (iter != this->leftColumnStack.end())
-    this->leftColumn->setCurrentIndex(iter->second);
+  if (iter != this->dataPtr->leftColumnStack.end())
+    this->dataPtr->leftColumn->setCurrentIndex(iter->second);
   else
     gzerr << "Widget with name[" << _name << "] has not been added to the left"
       << " column stack.\n";
 }
 
 /////////////////////////////////////////////////
+RenderWidget *MainWindow::RenderWidget() const
+{
+  return this->dataPtr->renderWidget;
+}
+
+/////////////////////////////////////////////////
 RenderWidget *MainWindow::GetRenderWidget() const
 {
-  return this->renderWidget;
+  return this->RenderWidget();
 }
 
 /////////////////////////////////////////////////
 bool MainWindow::IsPaused() const
 {
-  if (this->renderWidget)
+  if (this->dataPtr->renderWidget)
   {
-    TimePanel *timePanel = this->renderWidget->GetTimePanel();
+    TimePanel *timePanel = this->dataPtr->renderWidget->GetTimePanel();
     if (timePanel)
       return timePanel->IsPaused();
   }
@@ -2080,13 +2185,13 @@ bool MainWindow::IsPaused() const
 void MainWindow::CreateEditors()
 {
   // Create a Terrain Editor
-  this->editors["terrain"] = new TerrainEditor(this);
+  this->dataPtr->editors["terrain"] = new TerrainEditor(this);
 
   // Create a Building Editor
-  this->editors["building"] = new BuildingEditor(this);
+  this->dataPtr->editors["building"] = new BuildingEditor(this);
 
   // Create a Model Editor
-  this->editors["model"] = new ModelEditor(this);
+  this->dataPtr->editors["model"] = new ModelEditor(this);
 }
 
 /////////////////////////////////////////////////
@@ -2106,15 +2211,16 @@ void MainWindow::CreateDisabledIcon(const std::string &_pixmap, QAction *_act)
 /////////////////////////////////////////////////
 void MainWindow::SetLeftPaneVisibility(bool _on)
 {
-  /*int leftPane = _on ? MINIMUM_TAB_WIDTH : 0;
-  int rightPane = this->splitter->sizes().at(2);
+  /*
+  int leftPane = _on ? MINIMUM_TAB_WIDTH : 0;
+  int rightPane = this->dataPtr->splitter->sizes().at(2);
 
   QList<int> sizes;
   sizes.push_back(leftPane);
   sizes.push_back(this->width() - leftPane - rightPane);
   sizes.push_back(rightPane);
 
-  this->splitter->setSizes(sizes);
+  this->dataPtr->splitter->setSizes(sizes);
   */
 }
 
@@ -2133,13 +2239,19 @@ void MainWindow::OnEditorGroup(QAction *_action)
 }
 
 /////////////////////////////////////////////////
-Editor *MainWindow::GetEditor(const std::string &_name) const
+Editor *MainWindow::Editor(const std::string &_name) const
 {
-  auto iter = this->editors.find(_name);
-  if (iter != this->editors.end())
+  auto iter = this->dataPtr->editors.find(_name);
+  if (iter != this->dataPtr->editors.end())
     return iter->second;
 
   return NULL;
+}
+
+/////////////////////////////////////////////////
+Editor *MainWindow::GetEditor(const std::string &_name) const
+{
+  return this->Editor(_name);
 }
 
 /////////////////////////////////////////////////
@@ -2166,4 +2278,68 @@ QAction *MainWindow::CloneAction(QAction *_action, QObject *_parent)
   connect(_action, SIGNAL(toggled(bool)), actionClone, SLOT(setChecked(bool)));
 
   return actionClone;
+}
+
+/////////////////////////////////////////////////
+void MainWindow::OnWindowMode(const std::string &_mode)
+{
+  bool simulation = _mode == "Simulation";
+  bool logPlayback = _mode == "LogPlayback";
+
+  bool simOrLog = simulation || logPlayback;
+
+  // File
+  // g_openAct->setVisible(simOrLog);
+  g_saveAct->setVisible(simOrLog);
+  g_saveAsAct->setVisible(simOrLog);
+  g_saveCfgAct->setVisible(simOrLog);
+  g_cloneAct->setVisible(simulation);
+  g_quitAct->setVisible(simOrLog);
+
+  // Edit
+  this->dataPtr->editMenu->menuAction()->setVisible(simulation);
+  g_resetModelsAct->setVisible(simulation);
+  g_resetWorldAct->setVisible(simulation);
+  g_editBuildingAct->setVisible(simulation);
+  // g_editTerrainAct->setVisible(simulation);
+  g_editModelAct->setVisible(simulation);
+
+  // Camera
+  g_cameraOrthoAct->setVisible(simOrLog);
+  g_cameraPerspectiveAct->setVisible(simOrLog);
+  g_fpsAct->setVisible(simOrLog);
+  g_orbitAct->setVisible(simOrLog);
+  g_resetAct->setVisible(simOrLog);
+
+  // View
+  g_showGridAct->setVisible(simOrLog);
+  g_showOriginAct->setVisible(simOrLog);
+  g_transparentAct->setVisible(simOrLog);
+  g_viewWireframeAct->setVisible(simOrLog);
+  g_showCollisionsAct->setVisible(simOrLog);
+  g_showCOMAct->setVisible(simOrLog);
+  g_showInertiaAct->setVisible(simOrLog);
+  g_showLinkFrameAct->setVisible(simOrLog);
+  g_showContactsAct->setVisible(simOrLog);
+  g_showJointsAct->setVisible(simOrLog);
+
+  // Window
+  g_topicVisAct->setVisible(simOrLog);
+  g_viewOculusAct->setVisible(simOrLog);
+  g_overlayAct->setVisible(simOrLog);
+  g_showToolbarsAct->setVisible(simOrLog);
+  g_fullScreenAct->setVisible(simOrLog);
+
+  // About
+  g_hotkeyChartAct->setVisible(simOrLog);
+  g_aboutAct->setVisible(simOrLog);
+
+  // Insert
+  if (logPlayback)
+    this->dataPtr->tabWidget->removeTab(
+      this->dataPtr->tabWidget->indexOf(this->dataPtr->insertModel));
+  else if (simulation && this->dataPtr->tabWidget->indexOf(
+            this->dataPtr->insertModel) == -1)
+    this->dataPtr->tabWidget->insertTab(1, this->dataPtr->insertModel,
+      "Insert");
 }

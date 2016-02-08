@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,24 +14,32 @@
  * limitations under the License.
  *
 */
-#ifndef _KEY_EVENT_HANDLER_HH_
-#define _KEY_EVENT_HANDLER_HH_
+#ifndef _GAZEBO_GUI_KEYEVENTHANDLER_HH_
+#define _GAZEBO_GUI_KEYEVENTHANDLER_HH_
 
-#include <boost/function.hpp>
-#include <string>
 #include <list>
+#include <memory>
+#include <string>
+#include <boost/function.hpp>
 
+#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/common/SingletonT.hh"
-#include "gazebo/common/KeyEvent.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
+  namespace common
+  {
+    class KeyEvent;
+  }
+
   namespace gui
   {
+    class KeyEventHandlerPrivate;
+
     /// \class KeyEventHandler KeyEventHandler.hh gui/Gui.hh
     /// \brief Processes and filters keyboard events.
-    class GAZEBO_VISIBLE KeyEventHandler : public SingletonT<KeyEventHandler>
+    class GZ_GUI_VISIBLE KeyEventHandler : public SingletonT<KeyEventHandler>
     {
       /// \def KeyEventFilter
       /// \brief Key event function pointer.
@@ -40,7 +48,7 @@ namespace gazebo
 
       /// \cond
       /// \brief a class used to store key filters.
-      private: class Filter
+      public: class Filter
                {
                  /// \brief Constructor
                  /// \param[in] _name Name associated with the key filter
@@ -110,7 +118,12 @@ namespace gazebo
 
       /// \brief Method to check if autorepeats are toggled.
       /// \return Whether or not autorepeats are toggled for key presses.
-      public: bool GetAutoRepeat() const;
+      /// \deprecated See bool AutoRepeat() const.
+      public: bool GetAutoRepeat() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Method to check if autorepeats are toggled.
+      /// \return Whether or not autorepeats are toggled for key presses.
+      public: bool AutoRepeat() const;
 
       /// \brief Toggle the allowance of autorepeats on key presses.
       /// \param[in] _autorepeat Whether or not to allow autorepeats.
@@ -135,18 +148,12 @@ namespace gazebo
       private: bool Handle(const common::KeyEvent &_event,
                    std::list<Filter> &_list);
 
-      /// \brief List of key press filters.
-      private: std::list<Filter> pressFilters;
-
-      /// \brief List of key release filters.
-      private: std::list<Filter> releaseFilters;
-
       /// \brief This is a singleton class.
       private: friend class SingletonT<KeyEventHandler>;
 
-      /// \brief Boolean to toggle autorepeats (events that occur continuously
-      /// while a key held down by the user) for key presses.
-      private: bool autoRepeat;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<KeyEventHandlerPrivate> dataPtr;
     };
   }
 }

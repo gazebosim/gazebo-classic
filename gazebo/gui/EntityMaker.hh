@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 #ifndef _GAZEBO_ENTITYMAKER_HH_
 #define _GAZEBO_ENTITYMAKER_HH_
 
+#include <boost/function.hpp>
 #include <ignition/math/Vector3.hh>
 
 #include "gazebo/transport/TransportTypes.hh"
@@ -33,7 +34,7 @@ namespace gazebo
     /// \{
 
     /// \brief To make an entity, base class
-    class GAZEBO_VISIBLE EntityMaker
+    class GZ_GUI_VISIBLE EntityMaker
     {
       /// \brief Destructor
       public: virtual ~EntityMaker();

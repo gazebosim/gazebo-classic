@@ -36,6 +36,7 @@ set(tests
   concave_mesh.cc
   contact_sensor.cc
   dem.cc
+  elastic_modulus.cc
   file_handling.cc
   gripper.cc
   gz_joint.cc
@@ -58,6 +59,7 @@ set(tests
   logical_camera_sensor.cc
   model.cc
   model_database.cc
+  nested_model.cc
   noise.cc
   nondefault_world.cc
   physics.cc
@@ -67,12 +69,17 @@ set(tests
   physics_inertia_ratio.cc
   physics_link.cc
   physics_msgs.cc
+  physics_msgs_inertia.cc
   physics_presets.cc
+  physics_solver.cc
   physics_thread_safe.cc
+  physics_torsional_friction.cc
   pioneer2dx.cc
   plugin.cc
+  region_events.cc
   rest_web.cc
   road.cc
+  saving_and_loading.cc
   sensor.cc
   server_fixture.cc
   sim_events.cc
@@ -88,6 +95,7 @@ set(tests
   world.cc
   world_clone.cc
   world_entity_below_point.cc
+  world_playback.cc
   world_population.cc
   worlds_installed.cc
   )
@@ -111,6 +119,12 @@ if (ENABLE_TESTS_COMPILATION)
   set_tests_properties(${TEST_TYPE}_joint_revolute PROPERTIES TIMEOUT 500)
   set_tests_properties(${TEST_TYPE}_physics PROPERTIES TIMEOUT 500)
   set_tests_properties(${TEST_TYPE}_worlds_installed PROPERTIES TIMEOUT 700)
+
+  # Increase timeout for debug-mode
+  if (${CMAKE_BUILD_TYPE_UPPERCASE} STREQUAL "DEBUG" OR
+      ${CMAKE_BUILD_TYPE_UPPERCASE} STREQUAL "COVERAGE")
+    set_tests_properties(${TEST_TYPE}_joint_gearbox PROPERTIES TIMEOUT 400)
+  endif()
 
   # Add plugin dependency
   add_dependencies(${TEST_TYPE}_joint_test SpringTestPlugin)
@@ -142,6 +156,10 @@ gz_build_dri_tests(${dri_tests})
 
 set(qt_tests
   insert_model.cc
+  model_editor.cc
+  model_manipulation.cc
+  undo.cc
+  visual_pose.cc
 )
 
 gz_build_qt_tests(${qt_tests})

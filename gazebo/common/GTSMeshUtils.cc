@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -197,24 +197,6 @@ GtsSurface *GTSMeshUtils::DelaunayTriangulation(
 
   gts_fifo_destroy(edgeList);
   return surface;
-}
-
-//////////////////////////////////////////////////
-bool GTSMeshUtils::DelaunayTriangulation(
-    const std::vector<math::Vector2d> &_vertices,
-    const std::vector<math::Vector2i> &_edges,
-    SubMesh *_subMesh)
-{
-  std::vector<ignition::math::Vector2d> vertices;
-  std::vector<ignition::math::Vector2i> edges;
-
-  for (auto const &vert : _vertices)
-    vertices.push_back(vert.Ign());
-
-  for (auto const &edge : _edges)
-    edges.push_back(edge.Ign());
-
-  return DelaunayTriangulation(vertices, edges, _subMesh);
 }
 
 //////////////////////////////////////////////////

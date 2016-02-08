@@ -1,0 +1,22 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface UserCmdStats
+/// \brief Contains statistics about user commands.
+
+import "user_cmd.proto";
+
+message UserCmdStats
+{
+  /// \brief Number of user commands in the undo list.
+  required uint32 undo_cmd_count = 1;
+
+  /// \brief Number of user commands in the redo list.
+  required uint32 redo_cmd_count = 2;
+
+  /// \brief User commands in the undo list.
+  repeated UserCmd undo_cmd = 3;
+
+  /// \brief User commands in the redo list.
+  repeated UserCmd redo_cmd = 4;
+}

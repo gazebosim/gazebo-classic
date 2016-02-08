@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _AXISVISUAL_PRIVATE_HH_
-#define _AXISVISUAL_PRIVATE_HH_
+#ifndef _GAZEBO_AXISVISUAL_PRIVATE_HH_
+#define _GAZEBO_AXISVISUAL_PRIVATE_HH_
 
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/rendering/VisualPrivate.hh"
