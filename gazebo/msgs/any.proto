@@ -1,0 +1,70 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Any
+/// \brief A message that is capable of containing a wide variety of data types.
+
+import "color.proto";
+import "pose.proto";
+import "quaternion.proto";
+import "vector3d.proto";
+
+message Any
+{
+  /// \brief The type of data the message contains.
+  enum ValueType
+  {
+    /// \brief Indicates that the message contains a double
+    DOUBLE     = 1;
+
+    /// \brief Indicates that the message contains an int32
+    INT32      = 2;
+
+    /// \brief Indicates that the message contains a string
+    STRING     = 3;
+
+    /// \brief Indicates that the message contains a Vector3d
+    VECTOR3D   = 4;
+
+    /// \brief Indicates that the message contains a Color 
+    COLOR      = 5;
+
+    /// \brief Indicates that the message contains a Pose 
+    POSE       = 6;
+
+    /// \brief Indicates that the message contains a Quaternion 
+    QUATERNION = 7;
+
+    /// \brief Indicates that the message contains a Boolean 
+    BOOLEAN    = 8;
+  }
+
+  /// \todo: Use protobuf oneof feature when we support protobuf 2.6
+
+  /// \brief Type of value that is contained in this message.
+  required ValueType type              = 1;
+
+  /// \brief A double value
+  optional double double_value         = 2;
+
+  /// \brief An int32 value
+  optional int32 int_value             = 3;
+
+  /// \brief A string value
+  optional string string_value         = 4;
+
+  /// \brief A Vector3d value
+  optional Vector3d vector3_value      = 5;
+
+  /// \brief A Color value
+  optional Color color_value           = 6;
+
+  /// \brief A Pose value
+  optional Pose pose_value             = 7;
+
+  /// \brief A Quaternion value
+  optional Quaternion quaternion_value = 8;
+
+  /// \brief A boolean value
+  optional bool bool_value             = 9;
+}

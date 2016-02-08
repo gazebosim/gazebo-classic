@@ -20,10 +20,37 @@
 #include "gazebo/gui/plot/IncrementalPlot.hh"
 #include "gazebo/gui/plot/PlotCanvas.hh"
 #include "gazebo/gui/plot/PlotWindow.hh"
-#include "gazebo/gui/plot/PlotWindowPrivate.hh"
 
 using namespace gazebo;
 using namespace gui;
+
+namespace gazebo
+{
+  namespace gui
+  {
+    /// \brief Private data for the PlotWindow class
+    class PlotWindowPrivate
+    {
+      /// \brief The list of diagnostic labels.
+      public: QListWidget *labelList;
+
+      /// \brief True when plotting is paused.
+      public: bool paused = false;
+
+      /// \brief Action to pause plotting
+      public: QAction *plotPlayAct;
+
+      /// \brief Action to resume plotting
+      public: QAction *plotPauseAct;
+
+      /// \brief Layout to hold all the canvases.
+      public: QVBoxLayout *canvasLayout;
+
+      /// \brief Mutex to protect the canvas updates
+      public: std::mutex mutex;
+    };
+  }
+}
 
 // A special list widget that allows dragging of items from it to a
 // plot
