@@ -100,7 +100,6 @@ unsigned int VariablePillContainer::AddVariablePill(const std::string &_name)
     return VariablePill::EMPTY_VARIABLE;
   }
 
-
   VariablePill *variable = new VariablePill;
   variable->SetText(_name);
 
@@ -186,18 +185,21 @@ void VariablePillContainer::RemoveVariablePill(const unsigned int _id)
   {
     this->dataPtr->variableLayout->takeAt(idx);
     this->dataPtr->variables.erase(variable->Id());
-    // remove from parent
+    // remove from parent if any
     if (variable->Parent())
+    {
+      // remove and rely on callbacks to emit the VariableRemoved signal
       variable->Parent()->RemoveVariablePill(variable);
+
+    }
+    else
+      emit VariableRemoved(variable->Id(), VariablePill::EMPTY_VARIABLE);
   }
 
   // otherwise remove from container
   variable->SetContainer(NULL);
   variable->setVisible(false);
-
- // emit VariableRemoved(variable->Id(), VariablePill::EMPTY_VARIABLE);
 }
-
 
 /////////////////////////////////////////////////
 void VariablePillContainer::RemoveVariablePill(VariablePill *_variable)
@@ -306,6 +308,12 @@ void VariablePillContainer::dropEvent(QDropEvent *_evt)
       return;
     }
 
+    VariablePillContainer *container = variable->Container();
+
+    // moved to the same container - no op
+    if (!variable->Parent() && (container && container == this))
+      return;
+
     // block signals and emit VariableMoved instead.
     VariablePill *parentVariable = variable->Parent();
     if (parentVariable)
@@ -314,13 +322,14 @@ void VariablePillContainer::dropEvent(QDropEvent *_evt)
       parentVariable->RemoveVariablePill(variable);
       parentVariable->blockSignals(false);
     }
-
-    VariablePillContainer *container = variable->Container();
-    if (container)
+    else
     {
-      container->blockSignals(true);
-      container->RemoveVariablePill(variable);
-      container->blockSignals(false);
+      if (container)
+      {
+        container->blockSignals(true);
+        container->RemoveVariablePill(variable);
+        container->blockSignals(false);
+      }
     }
 
     // case when the variable is dragged out from a muli-variable pill to
@@ -407,7 +416,6 @@ void VariablePillContainer::mouseReleaseEvent(QMouseEvent *_event)
 /////////////////////////////////////////////////
 void VariablePillContainer::OnMoveVariable(const unsigned int _id)
 {
-  std::cerr << " VariablePillContainer::OnMoveVariable " << _id << std::endl;
   VariablePill *variable = qobject_cast<VariablePill *>(QObject::sender());
   if (!variable)
     return;

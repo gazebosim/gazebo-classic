@@ -156,4 +156,16 @@ void PlotManager::OnWorldStats(ConstWorldStatisticsPtr &/*_data*/)
       curve->AddPoint(ignition::math::Vector2d(testTime, 10));
     }
   }
+
+  it = this->dataPtr->curves.find("Turtle");
+  if (it != this->dataPtr->curves.end())
+  {
+    for (auto cIt : it->second)
+    {
+      auto curve = cIt.lock();
+      if (!curve)
+        continue;
+      curve->AddPoint(ignition::math::Vector2d(testTime, 6));
+    }
+  }
 }

@@ -79,7 +79,6 @@ void PlotCanvas_TEST::AddRemoveVariable()
 
   // Create a new plot canvas widget
   gazebo::gui::PlotCanvas *plotCanvas = new gazebo::gui::PlotCanvas(NULL);
-
   QVERIFY(plotCanvas != NULL);
 
   plotCanvas->show();
@@ -90,33 +89,49 @@ void PlotCanvas_TEST::AddRemoveVariable()
   // add variable to first plot
   unsigned int var01 = plotCanvas->AddVariable("var01");
   QCOMPARE(plotCanvas->PlotCount(), 1u);
+  QVERIFY(plotCanvas->PlotByVariable(var01) !=
+      gazebo::gui::PlotCanvas::EMPTY_PLOT);
 
   // add another variable - this creates a new plot
   unsigned int var02 = plotCanvas->AddVariable("var02");
   QCOMPARE(plotCanvas->PlotCount(), 2u);
+  QVERIFY(plotCanvas->PlotByVariable(var02) !=
+      gazebo::gui::PlotCanvas::EMPTY_PLOT);
 
   // add one more variable
   unsigned int var03 = plotCanvas->AddVariable("var03");
   QCOMPARE(plotCanvas->PlotCount(), 3u);
+  QVERIFY(plotCanvas->PlotByVariable(var03) !=
+      gazebo::gui::PlotCanvas::EMPTY_PLOT);
 
   // remove variable
   plotCanvas->RemoveVariable(var01);
   QCOMPARE(plotCanvas->PlotCount(), 2u);
+  QVERIFY(plotCanvas->PlotByVariable(var01) ==
+      gazebo::gui::PlotCanvas::EMPTY_PLOT);
 
   plotCanvas->RemoveVariable(var02);
   QCOMPARE(plotCanvas->PlotCount(), 1u);
+  QVERIFY(plotCanvas->PlotByVariable(var02) ==
+      gazebo::gui::PlotCanvas::EMPTY_PLOT);
 
   // remove already removed plot
   plotCanvas->RemoveVariable(var02);
   QCOMPARE(plotCanvas->PlotCount(), 1u);
+  QVERIFY(plotCanvas->PlotByVariable(var02) ==
+      gazebo::gui::PlotCanvas::EMPTY_PLOT);
 
   // remove last variable - this should leave an empty plot in the canvas
-  plotCanvas->RemovePlot(var03);
+  plotCanvas->RemoveVariable(var03);
   QCOMPARE(plotCanvas->PlotCount(), 1u);
+  QVERIFY(plotCanvas->PlotByVariable(var03) ==
+      gazebo::gui::PlotCanvas::EMPTY_PLOT);
 
-  // check we can add more variables
-  plotCanvas->AddVariable("var04");
-  QCOMPARE(plotCanvas->PlotCount(), 2u);
+  // check we can add more variables - should now have one plot with variable
+  unsigned int var04 = plotCanvas->AddVariable("var04");
+  QCOMPARE(plotCanvas->PlotCount(), 1u);
+  QVERIFY(plotCanvas->PlotByVariable(var04) !=
+      gazebo::gui::PlotCanvas::EMPTY_PLOT);
 
   plotCanvas->hide();
   delete plotCanvas;

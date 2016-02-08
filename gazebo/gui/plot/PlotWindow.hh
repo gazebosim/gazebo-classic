@@ -54,6 +54,9 @@ namespace gazebo
       /// \return Number of canvases
       public: unsigned int CanvasCount() const;
 
+      /// \brief Clear and remove all canvases
+      public: void Clear();
+
       /// \brief Export all canvas plots.
       public: void Export();
 

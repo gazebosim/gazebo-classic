@@ -119,8 +119,6 @@ IncrementalPlot::IncrementalPlot(QWidget *_parent)
   this->setAxisAutoScale(QwtPlot::yLeft, true);
 
   this->replot();
-
-  this->setAcceptDrops(true);
 }
 
 /////////////////////////////////////////////////
@@ -309,26 +307,6 @@ void IncrementalPlot::Clear()
 QSize IncrementalPlot::sizeHint() const
 {
   return QSize(540, 400);
-}
-
-/////////////////////////////////////////////////
-void IncrementalPlot::dragEnterEvent(QDragEnterEvent *_evt)
-{
-  if (_evt->mimeData()->hasFormat("application/x-item") &&
-      _evt->source() != this)
-  {
-    _evt->setDropAction(Qt::LinkAction);
-    _evt->acceptProposedAction();
-  }
-  else
-    _evt->ignore();
-}
-
-/////////////////////////////////////////////////
-void IncrementalPlot::dropEvent(QDropEvent *_evt)
-{
-  QString name = _evt->mimeData()->data("application/x-item");
-  this->AddCurve(name.toStdString());
 }
 
 /////////////////////////////////////////////////

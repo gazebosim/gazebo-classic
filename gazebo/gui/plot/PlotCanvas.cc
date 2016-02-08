@@ -120,12 +120,15 @@ PlotCanvas::PlotCanvas(QWidget *_parent)
   titleSettingsLayout->addLayout(titleLayout);
   titleSettingsLayout->addLayout(settingsLayout);
 
-  // X and Y variables
+  // X and Y variable containers
   VariablePillContainer *xVariableContainer = new VariablePillContainer(this);
   xVariableContainer->SetText("x: ");
   xVariableContainer->SetMaxSize(1);
   xVariableContainer->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+  // hardcode x axis for now
+  xVariableContainer->AddVariablePill("SimTime");
   xVariableContainer->setEnabled(false);
+
   this->dataPtr->yVariableContainer = new VariablePillContainer(this);
   this->dataPtr->yVariableContainer->SetText("y: ");
   this->dataPtr->yVariableContainer->setSizePolicy(
@@ -321,8 +324,6 @@ void PlotCanvas::RemoveVariable(const unsigned int _id,
 
   // remove from variable pill container
   this->dataPtr->yVariableContainer->RemoveVariablePill(_id);
-
-  // plotting::Events::VariableRemoved(_id);
 }
 
 
@@ -381,8 +382,8 @@ void PlotCanvas::Clear()
   }
 }
 
-/*/////////////////////////////////////////////////
-unsigned int PlotCanvas::Plot(const unsigned int _variableId) const
+/////////////////////////////////////////////////
+unsigned int PlotCanvas::PlotByVariable(const unsigned int _variableId) const
 {
   for (const auto it : this->dataPtr->plotData)
   {
@@ -393,7 +394,7 @@ unsigned int PlotCanvas::Plot(const unsigned int _variableId) const
     }
   }
   return EMPTY_PLOT;
-}*/
+}
 
 /////////////////////////////////////////////////
 void PlotCanvas::OnAddVariable(const unsigned int _id,

@@ -131,14 +131,6 @@ namespace gazebo
       /// \return Default size of the plot.
       public: virtual QSize sizeHint() const;
 
-      /// \brief Used to accept drag enter events.
-      /// \param[in] _evt The drag event.
-      protected: void dragEnterEvent(QDragEnterEvent *_evt);
-
-      /// \brief Used to accept drop events.
-      /// \param[in] _evt The drop event.
-      protected: void dropEvent(QDropEvent *_evt);
-
       /// \brief Adjust a curve to fit new data.
       /// \param[in] _curve Curve to adjust
       private: void AdjustCurve(PlotCurvePtr _curve);

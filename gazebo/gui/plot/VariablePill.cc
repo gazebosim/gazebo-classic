@@ -248,16 +248,17 @@ void VariablePill::RemoveVariablePill(VariablePill *_variable)
       newMultiVariable->blockSignals(false);
       this->dataPtr->container->blockSignals(true);
       this->dataPtr->container->AddVariablePill(newMultiVariable);
-      std::cerr << " container adding new mult var " << newMultiVariable->Text() << std::endl;
       this->dataPtr->container->blockSignals(false);
     }
+    // set parent and container to NULL before calling
+    // VariablePillContainer::RemoveVariablePill to prevent double removal
     VariablePillContainer *tmpContainer =  this->dataPtr->container;
-    tmpContainer->blockSignals(true);
-    tmpContainer->RemoveVariablePill(this);
-    tmpContainer->blockSignals(false);
     this->dataPtr->parent = NULL;
     this->dataPtr->container = NULL;
     this->dataPtr->variables.clear();
+    tmpContainer->blockSignals(true);
+    tmpContainer->RemoveVariablePill(this);
+    tmpContainer->blockSignals(false);
     this->SetMultiVariableMode(false);
 
     emit VariableRemoved(_variable->Id());
@@ -366,13 +367,15 @@ void VariablePill::dropEvent(QDropEvent *_evt)
       parentVariable->RemoveVariablePill(variable);
       parentVariable->blockSignals(false);
     }
-
-    VariablePillContainer *container = variable->Container();
-    if (container)
+    else
     {
-      container->blockSignals(true);
-      container->RemoveVariablePill(variable);
-      container->blockSignals(false);
+      VariablePillContainer *container = variable->Container();
+      if (container)
+      {
+        container->blockSignals(true);
+        container->RemoveVariablePill(variable);
+        container->blockSignals(false);
+      }
     }
 
     this->blockSignals(true);

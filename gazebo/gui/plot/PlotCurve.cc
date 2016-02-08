@@ -35,17 +35,38 @@ using namespace gazebo;
 using namespace gui;
 
 // The number of unique color
-static const int ColorCount = 5;
+static const int ColorCount = 3;
+static const int ColorGroupCount = 4;
 
 // The unique colors
-static const QColor Colors[ColorCount] =
+static const QColor Colors[ColorGroupCount][ColorCount] =
 {
-  QColor(255, 0, 0),
-  QColor(0, 255, 0),
-  QColor(0, 0, 255),
-  QColor(255, 255, 0),
-  QColor(255, 0, 255)
+  // purple
+  {
+    QColor(QRgb(0x882e72)),
+    QColor(QRgb(0xb178a6)),
+    QColor(QRgb(0xd6c1de))
+  },
+  // blue
+  {
+    QColor(QRgb(0x1965b0)),
+    QColor(QRgb(0x5289c7)),
+    QColor(QRgb(0x7bafde))
+  },
+  // green
+  {
+    QColor(QRgb(0x4eb265)),
+    QColor(QRgb(0x90c987)),
+    QColor(QRgb(0xcae0ab))
+  },
+  // red
+  {
+    QColor(QRgb(0xdc050c)),
+    QColor(QRgb(0xe8601c)),
+    QColor(QRgb(0xf1932d))
+  },
 };
+
 
 
 namespace gazebo
@@ -105,12 +126,18 @@ namespace gazebo
 
       /// \brief Global id incremented on every new curve
       public: static unsigned int globalCurveId;
+
+      /// \brief Color counter to cycle through all available colors
+      public: static unsigned int colorCounter;
     };
   }
 }
 
 // global curve id counter
 unsigned int PlotCurvePrivate::globalCurveId = 0;
+
+// curve color counter
+unsigned int PlotCurvePrivate::colorCounter = 0;
 
 /////////////////////////////////////////////////
 PlotCurve::PlotCurve(const std::string &_label)
@@ -121,7 +148,11 @@ PlotCurve::PlotCurve(const std::string &_label)
   curve->setStyle(QwtPlotCurve::Lines);
   curve->setData(new CurveData());
 
-  QColor penColor = Colors[0];
+  int colorGroup = this->dataPtr->colorCounter % ColorGroupCount;
+  int color = static_cast<int>(this->dataPtr->colorCounter / ColorGroupCount)
+      % ColorCount;
+  this->dataPtr->colorCounter++;
+  QColor penColor = Colors[colorGroup][color];
 
   /// \todo The following will add the curve to the right hand axis. Need
   /// a better way to do this based on user input.

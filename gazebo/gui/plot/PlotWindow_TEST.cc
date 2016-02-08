@@ -70,6 +70,10 @@ void PlotWindow_TEST::AddRemoveCanvas()
   QVERIFY(canvas04 != NULL);
   QCOMPARE(plotWindow->CanvasCount(), 2u);
 
+  // clear canvases
+  plotWindow->Clear();
+  QCOMPARE(plotWindow->CanvasCount(), 0u);
+
   plotWindow->hide();
   delete plotWindow;
 }

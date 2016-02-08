@@ -87,7 +87,7 @@ namespace gazebo
       /// \brief Get the plot id which the variable is plotted in
       /// \param[in] _id Unique id of the variable
       /// \return _id Unique id of the plot
-      // public: unsigned int Plot(const unsigned int _variableId) const;
+      public: unsigned int PlotByVariable(const unsigned int _variableId) const;
 
       /// \brief Get all the plots in this canvas.
       /// \return A list of plots in this canvas.

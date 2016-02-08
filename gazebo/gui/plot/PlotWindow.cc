@@ -127,6 +127,20 @@ PlotWindow::PlotWindow(QWidget *_parent)
   item->setToolTip(tr("Drag onto graph to plot"));
   this->dataPtr->labelList->addItem(item);
 
+  QVBoxLayout *leftLayout = new QVBoxLayout;
+  leftLayout->addWidget(this->dataPtr->labelList);
+
+  QHBoxLayout *mainLayout = new QHBoxLayout;
+  mainLayout->addLayout(leftLayout);
+  mainLayout->addLayout(plotLayout);
+
+  this->setLayout(mainLayout);
+  this->setSizeGripEnabled(true);
+
+  QTimer *displayTimer = new QTimer(this);
+  connect(displayTimer, SIGNAL(timeout()), this, SLOT(Update()));
+  displayTimer->start(30);
+
   //=================
   // TODO for testing - remove later
   QListWidgetItem *itema = new QListWidgetItem("Dog");
@@ -139,27 +153,13 @@ PlotWindow::PlotWindow(QWidget *_parent)
   itemc->setToolTip(tr("Drag onto graph to plot"));
   this->dataPtr->labelList->addItem(itemc);
   //=================
-
-  QVBoxLayout *leftLayout = new QVBoxLayout;
-  leftLayout->addWidget(this->dataPtr->labelList);
-  // leftLayout->addLayout(pauseLayout);
-
-  QHBoxLayout *mainLayout = new QHBoxLayout;
-  mainLayout->addLayout(leftLayout);
-//  mainLayout->addWidget(plotScrollArea, 2);
-  mainLayout->addLayout(plotLayout);
-
-  this->setLayout(mainLayout);
-  this->setSizeGripEnabled(true);
-
-  QTimer *displayTimer = new QTimer(this);
-  connect(displayTimer, SIGNAL(timeout()), this, SLOT(Update()));
-  displayTimer->start(30);
 }
 
 /////////////////////////////////////////////////
 PlotWindow::~PlotWindow()
 {
+  this->dataPtr->paused = true;
+  this->Clear();
 }
 
 /////////////////////////////////////////////////
@@ -195,9 +195,19 @@ void PlotWindow::RemoveCanvas(PlotCanvas *_canvas)
   if (idx < 0)
     return;
 
-  // canvas->hide();
   this->dataPtr->canvasLayout->takeAt(idx);
   _canvas->deleteLater();
+}
+
+/////////////////////////////////////////////////
+void PlotWindow::Clear()
+{
+  while (this->CanvasCount() > 0u)
+  {
+    QLayoutItem *item = this->dataPtr->canvasLayout->itemAt(0);
+    PlotCanvas *canvas = qobject_cast<PlotCanvas *>(item->widget());
+    this->RemoveCanvas(canvas);
+  }
 }
 
 /////////////////////////////////////////////////
