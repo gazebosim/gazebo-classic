@@ -676,7 +676,7 @@ endif()
 if (NOT WIN32)
   find_package(ignition-transport1 QUIET)
   if (NOT ignition-transport1_FOUND)
-    BUILD_WARNING ("Missing: Ignition Transport (libignition-transport1-dev)")
+    BUILD_ERROR ("Missing: Ignition Transport (libignition-transport1-dev)")
   else()
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${IGNITION-TRANSPORT_CXX_FLAGS}")
     include_directories(${IGNITION-TRANSPORT_INCLUDE_DIRS})
@@ -686,31 +686,30 @@ endif()
 
 ########################################
 # Find QWT (QT graphing library)
-#find_path(QWT_INCLUDE_DIR NAMES qwt.h PATHS
-#  /usr/include
-#  /usr/local/include
-#  "$ENV{LIB_DIR}/include"
-#  "$ENV{INCLUDE}"
-#  PATH_SUFFIXES qwt-qt4 qwt qwt5
-#  )
-#
-#find_library(QWT_LIBRARY NAMES qwt qwt6 qwt5 PATHS
-#  /usr/lib
-#  /usr/local/lib
-#  "$ENV{LIB_DIR}/lib"
-#  "$ENV{LIB}/lib"
-#  )
-#
-#if (QWT_INCLUDE_DIR AND QWT_LIBRARY)
-#  set(HAVE_QWT TRUE)
-#endif (QWT_INCLUDE_DIR AND QWT_LIBRARY)
-#
-#if (HAVE_QWT)
-#  if (NOT QWT_FIND_QUIETLY)
-#    message(STATUS "Found Qwt: ${QWT_LIBRARY}")
-#  endif (NOT QWT_FIND_QUIETLY)
-#else ()
-#  if (QWT_FIND_REQUIRED)
-#    BUILD_WARNING ("Could not find libqwt-dev. Plotting features will be disabled.")
-#  endif (QWT_FIND_REQUIRED)
-#endif ()
+find_path(QWT_INCLUDE_DIR NAMES qwt.h PATHS
+  /usr/include
+  /usr/local/include
+  "$ENV{LIB_DIR}/include"
+  "$ENV{INCLUDE}"
+  /usr/local/lib/qwt.framework/Headers
+  PATH_SUFFIXES qwt-qt4 qwt qwt5
+  )
+
+find_library(QWT_LIBRARY NAMES qwt qwt6 qwt5 PATHS
+  /usr/lib
+  /usr/local/lib
+  "$ENV{LIB_DIR}/lib"
+  "$ENV{LIB}/lib"
+  /usr/local/lib/qwt.framework
+  )
+
+if (QWT_INCLUDE_DIR AND QWT_LIBRARY)
+  set(HAVE_QWT TRUE)
+endif (QWT_INCLUDE_DIR AND QWT_LIBRARY)
+
+if (HAVE_QWT)
+  message (STATUS "Looking for qwt - found")
+else()
+  message (STATUS "Looking for qwt - not found")
+  BUILD_ERROR ("Missing: libqwt-dev. Required for plotting.")
+endif ()

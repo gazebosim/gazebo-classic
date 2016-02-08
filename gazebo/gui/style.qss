@@ -34,7 +34,6 @@ QDialog
 
 QWidget#topicSelector,
 QWidget#cameraSensor,
-QWidget#diagnosticsPlot,
 QWidget#dataLogger
 {
   background-color: #303030;
