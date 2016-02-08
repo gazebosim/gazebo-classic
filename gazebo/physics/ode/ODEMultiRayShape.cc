@@ -180,7 +180,7 @@ void ODEMultiRayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
       {
         shape = self->defaultUpdate ?
           boost::static_pointer_cast<RayShape>(rayCollision->GetShape()).get() :
-          shape = static_cast<RayShape*>(dGeomGetData(rayId));
+          static_cast<RayShape*>(dGeomGetData(rayId));
 
         if (shape && hitCollision && contact.depth < shape->GetLength())
         {
