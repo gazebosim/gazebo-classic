@@ -542,6 +542,9 @@ namespace gazebo
       /// \brief Thread function for logging state data.
       private: void LogWorker();
 
+      /// \brief Register items in the introspection service.
+      private: void RegisterIntrospectionItems();
+
       /// \brief Callback when a light message is received.
       /// \param[in] _msg Pointer to the light message.
       /// \deprecated Topic ~/light deprecated.
