@@ -1,3 +1,8 @@
+## Gazebo 8
+
+1. Update depth camera sensor to publish depth data over a topic.
+    * [Pull request #2112](https://bitbucket.org/osrf/gazebo/pull-request/2112)
+
 ## Gazebo 7
 
 ## Gazebo 7.x.x (2016-xx-xx)
