@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_GUI_PLOT_CURVE_HH_
-#define _GAZEBO_GUI_PLOT_CURVE_HH_
+#ifndef _GAZEBO_GUI_PLOT_PLOTCURVE_HH_
+#define _GAZEBO_GUI_PLOT_PLOTCURVE_HH_
 
 #include <memory>
 #include <string>

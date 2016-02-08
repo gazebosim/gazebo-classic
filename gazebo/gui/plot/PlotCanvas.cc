@@ -637,3 +637,9 @@ void PlotCanvas::debug()
   }
   std::cerr << "================" << std::endl;
 }
+
+/////////////////////////////////////////////////
+QString PlotCanvas::Title() const
+{
+  return this->dataPtr->title->text();
+}

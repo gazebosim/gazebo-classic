@@ -109,6 +109,10 @@ namespace gazebo
       /// \param[in] _event Pointer to the event.
       public: virtual bool eventFilter(QObject *_o, QEvent *_e);
 
+      /// \brief Get the plot's title
+      /// \return Name of the plot
+      public: QString Title() const;
+
       /// \brief Add a variable to an existing plot. Note this function
       /// only updates the plot but not the variable pill container.
       /// \param[in] _id Unique id of the variable

@@ -19,12 +19,16 @@
 #define _GAZEBO_GUI_PLOT_EXPORTDIALOG_HH_
 
 #include <string>
+#include <memory>
 #include "gazebo/gui/qt.h"
 
 namespace gazebo
 {
   namespace gui
   {
+    // Forward declare private data class
+    class ExportDialogPrivate;
+
     /// \addtogroup gazebo_gui
     /// \{
 
@@ -41,14 +45,18 @@ namespace gazebo
       /// \brief Destructor
       public: ~ExportDialog();
 
-      /// \brief Qt event emitted showing the dialog
-      protected: virtual void showEvent(QShowEvent *event);
-
       /// \brief Qt callback when the Cancel button is pressed.
       private slots: void OnCancel();
 
       /// \brief Qt callback when the import button is pressed.
       private slots: void OnExport();
+
+      /// \brief Qt callback when a plot icon is selected.
+      private slots: void OnSelected(const QModelIndex &_index);
+
+      /// \internal
+      /// \brief Private data pointer
+      private: std::unique_ptr<ExportDialogPrivate> dataPtr;
     };
     /// \}
   }

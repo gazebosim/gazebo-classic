@@ -179,58 +179,34 @@ void PlotWindow::OnPlay()
 /////////////////////////////////////////////////
 void PlotWindow::OnExport()
 {
-  std::list<PlotCanvas*> plots = this->Plots();
-
-  if (!plots.front())
-    std::cout << "INVALID\n";
-
-  std::cout << plots.front() << std::endl;
-  std::cout << plots.front()->rect().top() << std::endl;
-  //std::cout << plots.front()->size().width() << std::endl;
-    //QPixmap::grabWindow(plots.front()->winId()).save("/tmp/plot.png");
+  // Should we pause when exporting?
+  // this->OnPause();
 
   ExportDialog exportDialog(this);
-  exportDialog.deleteLater();
+  exportDialog.exec();
+  /*exportDialog.deleteLater();
   if (exportDialog.exec() == QDialog::Accepted)
   {
   }
   else
   {
-    //QPixmap p;
-    //QImage image;
-    //this->grab()->save("/tmp/plot.png");
-    //p.grabWidget(this);//plots.front());
-    /*image = p.convertToImage();
-    QRgb frame_pixel = image.pixel(0, 0);
-    QBitmap mask(p.size());
-    mask.fill(Qt::color1);
-    QPainter pic(&mask);
-    pic.setPen(Qt::color0);
-    for (int y=0; y<image.height(); y++)
-    {
-      for ( int x=0; x<image.width(); x++ )
-      {
-        QRgb rgb = image.pixel(x, y);
-        if (rgb == frame_pixel) // we want the frame transparent
-        {
-          pic.drawPoint( x, y );
-        }
-      }
-    }
-    pic.end();
-    p.setMask(mask);
-    */
-    //p.save("/tmp/myplotimage.png");
-  }
+  }*/
 }
 
 /////////////////////////////////////////////////
 std::list<PlotCanvas*> PlotWindow::Plots()
 {
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+
   std::list<PlotCanvas*> plots;
-  for (auto &child : this->dataPtr->canvasLayout->children())
+  for (int i = 0; i < this->dataPtr->canvasLayout->count(); ++i)
   {
-    plots.push_back(static_cast<PlotCanvas*>(child));
+    QLayoutItem *item = this->dataPtr->canvasLayout->itemAt(i);
+    PlotCanvas *canvas = qobject_cast<PlotCanvas *>(item->widget());
+    if (!canvas)
+      continue;
+
+    plots.push_back(canvas);
   }
 
   return plots;

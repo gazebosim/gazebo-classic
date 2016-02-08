@@ -14,16 +14,38 @@
  * limitations under the License.
  *
 */
+#include <fstream>
+#include <functional>
 
 #include "gazebo/common/SVGLoader.hh"
+#include "gazebo/gui/plot/PlotCurve.hh"
+#include "gazebo/gui/plot/PlotCanvas.hh"
+#include "gazebo/gui/plot/PlotWindow.hh"
 #include "gazebo/gui/plot/ExportDialog.hh"
 
 using namespace gazebo;
 using namespace gui;
 
+/////////////////////////////////////////////////
+class gazebo::gui::ExportDialogPrivate
+{
+  public: QListView *listView;
+  public: QPushButton *exportButton;
+};
+
+// Subclass QStandardItem so that we can store a pointer to the plot canvas
+class PlotViewItem : public QStandardItem
+{
+  public: PlotCanvas *canvas;
+};
+
 class PlotViewDelegate : public QStyledItemDelegate
 {
-  public: enum datarole {headerTextRole = Qt::UserRole + 100,subHeaderTextrole = Qt::UserRole+101,IconRole = Qt::UserRole+102};
+  public: enum datarole
+          {
+            headerTextRole = Qt::UserRole + 100,
+            iconRole = Qt::UserRole+101
+          };
 
   public: PlotViewDelegate()
           {
@@ -37,33 +59,62 @@ class PlotViewDelegate : public QStyledItemDelegate
               const QModelIndex &_index) const
           {
             QRectF r = _opt.rect;
+            QRectF iconRect = _opt.rect;
+            QIcon icon = qvariant_cast<QIcon>(_index.data(iconRole));
+            QString title = qvariant_cast<QString>(_index.data(headerTextRole));
 
             _painter->save();
 
             // Add margins to the rectangle
             r.adjust(5, 5, -5, -5);
-            _painter->setBrush(QColor(100, 100, 100));
+            if (_opt.state & QStyle::State_Selected)
+            {
+              _painter->setBrush(QColor(200, 200, 200));
+              _painter->setPen(QColor(255, 255, 255));
+            }
+            else
+            {
+              _painter->setBrush(QColor(90, 90, 90));
+              _painter->setPen(QColor(0, 0, 0));
+            }
             _painter->drawRect(r);
 
-            _painter->drawText(r, Qt::AlignCenter | Qt::AlignBottom, "aa");
+            iconRect.adjust(8, 8, -8, -8);
+            _painter->drawPixmap(iconRect.left(), iconRect.top(),
+                icon.pixmap(iconRect.width(), iconRect.height()));
+
+            if (_opt.state & QStyle::State_Selected)
+              _painter->setPen(QColor(0, 0, 0));
+            else
+              _painter->setPen(QColor(255, 255, 255));
+
+            _painter->drawText(r, Qt::AlignCenter | Qt::AlignBottom, title);
             _painter->restore();
           }
 
-  public: QSize sizeHint(const QStyleOptionViewItem & /*_option*/,
-                              const QModelIndex & /*_index*/) const
+  public: QSize sizeHint(const QStyleOptionViewItem &_option,
+                              const QModelIndex &_index) const
           {
+            QIcon icon = qvariant_cast<QIcon>(_index.data(iconRole));
+            QSize iconSize = icon.actualSize(_option.decorationSize);
+
+            iconSize.scale(320, 180, Qt::KeepAspectRatio);
+
             QFont font = QApplication::font();
             QFontMetrics fm(font);
-            return QSize(120, 80);
+            QSize result = QSize(iconSize.width(),
+                iconSize.height() + fm.height() + 10);
+            return result;
           }
 };
 
 /////////////////////////////////////////////////
 ExportDialog::ExportDialog(QWidget *_parent)
-: QDialog(_parent)
+: QDialog(_parent),
+  dataPtr(new ExportDialogPrivate)
 {
   QHBoxLayout *titleLayout = new QHBoxLayout;
-  titleLayout->addWidget(new QLabel("Export Plot"));
+  titleLayout->addWidget(new QLabel("Select plots to export"));
   titleLayout->setAlignment(Qt::AlignHCenter);
 
   this->setObjectName("PlotExportDialog");
@@ -75,83 +126,57 @@ ExportDialog::ExportDialog(QWidget *_parent)
   QPushButton *cancelButton = new QPushButton(tr("&Cancel"));
   connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
 
-  QPushButton *exportButton = new QPushButton("&Export");
-  exportButton->setDefault(true);
-  connect(exportButton, SIGNAL(clicked()), this, SLOT(OnExport()));
+  this->dataPtr->exportButton = new QPushButton("&Export");
+  this->dataPtr->exportButton->setDefault(true);
+  this->dataPtr->exportButton->setEnabled(false);
+  connect(this->dataPtr->exportButton, SIGNAL(clicked()),
+          this, SLOT(OnExport()));
   buttonsLayout->addWidget(cancelButton);
-  buttonsLayout->addWidget(exportButton);
-  buttonsLayout->setAlignment(Qt::AlignRight);
+  buttonsLayout->addStretch(2);
+  buttonsLayout->addWidget(this->dataPtr->exportButton);
 
   //QVBoxLayout *plotsLayout = new QVBoxLayout;
-  QListView *listView = new QListView;
+  this->dataPtr->listView = new QListView;
 
   QStandardItemModel *model = new QStandardItemModel();
 
-  for (int yp = 0; yp < 4; ++yp)
-  {
-    for (int xp = 0; xp < 2; ++xp)
-    {
-      QStandardItem *item = new QStandardItem();
-      item->setData("Test", PlotViewDelegate::headerTextRole);
-      item->setEditable(false);
-      model->appendRow(item);
+  PlotWindow *plotWindow = static_cast<PlotWindow*>(_parent);
+  std::list<PlotCanvas*> plots = plotWindow->Plots();
 
-      //QAction *action = new QAction(tr("test"), this);
-      //listView->addAction(action);
-    }
+  for (auto &plot : plots)
+  {
+    QIcon icon(QPixmap::grabWindow(plot->winId()));
+
+    PlotViewItem *item = new PlotViewItem;
+    item->canvas = plot;
+
+    //QStandardItem *item = new QStandardItem();
+    item->setData(plot->Title(), PlotViewDelegate::headerTextRole);
+    item->setData(icon, PlotViewDelegate::iconRole);
+    item->setEditable(false);
+    item->setCheckable(true);
+    model->appendRow(item);
   }
 
   //QAbstractItemModel *model = new QStringListModel(test);
-  listView->setViewMode(QListView::IconMode);
-  listView->setWrapping(true);
-  listView->setFlow(QListView::LeftToRight);
-  listView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-  listView->setResizeMode(QListView::Adjust);
-  listView->setMovement(QListView::Static);
+  this->dataPtr->listView->setViewMode(QListView::IconMode);
+  this->dataPtr->listView->setWrapping(true);
+  this->dataPtr->listView->setFlow(QListView::LeftToRight);
+  this->dataPtr->listView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+  this->dataPtr->listView->setResizeMode(QListView::Adjust);
+  this->dataPtr->listView->setMovement(QListView::Static);
+  this->dataPtr->listView->setSelectionMode(QAbstractItemView::MultiSelection);
+  connect(this->dataPtr->listView, SIGNAL(clicked(const QModelIndex &)),
+          this, SLOT(OnSelected(const QModelIndex &)));
 
   PlotViewDelegate *plotViewDelegate = new PlotViewDelegate;
 
-  listView->setModel(model);
-  listView->setItemDelegate(plotViewDelegate);
-
-  /*QScrollArea *plotScroll = new QScrollArea;
-  QFrame *plotsFrame = new QFrame;
-
-  QGridLayout *plotGridLayout = new QGridLayout;
-  for (int yp = 0; yp < 4; ++yp)
-  {
-    for (int xp = 0; xp < 2; ++xp)
-    {
-
-      QFrame *plotFrame = new QFrame;
-      plotFrame->setStyleSheet("QFrame { background-color: #dedede; padding: 10px; margin:4px; border: 0px}");
-
-      QVBoxLayout *plotFrameLayout = new QVBoxLayout;
-      plotFrameLayout->addWidget(new QPushButton("test"));
-      plotFrame->setLayout(plotFrameLayout);
-      QGraphicsDropShadowEffect *effect = new QGraphicsDropShadowEffect();
-      effect->setBlurRadius(4);
-      effect->setOffset(2, 2);
-      plotFrame->setGraphicsEffect(effect);
-
-      plotGridLayout->addWidget(plotFrame, yp, xp);
-    }
-  }
-
-  plotsFrame->setLayout(plotGridLayout);
-  plotScroll->setWidget(plotsFrame);
-  */
-  //plotsLayout->addWidget(listView);//plotScroll);
-  /*QGridLayout *gridLayout = new QGridLayout;
-  gridLayout->addWidget(this->pathLineEdit, 0, 0);
-  gridLayout->addWidget(browseButton, 0, 1);
-  gridLayout->addWidget(nameLabel, 1, 0);
-  gridLayout->addWidget(nameLineEdit, 1, 1);
-  */
+  this->dataPtr->listView->setModel(model);
+  this->dataPtr->listView->setItemDelegate(plotViewDelegate);
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->addLayout(titleLayout);
-  mainLayout->addWidget(listView);
+  mainLayout->addWidget(this->dataPtr->listView);
   //mainLayout->addWidget(this->messageLabel);
   //mainLayout->addLayout(gridLayout);
   mainLayout->addLayout(buttonsLayout);
@@ -161,6 +186,13 @@ ExportDialog::ExportDialog(QWidget *_parent)
   // Set a reasonable default size.
   this->resize(640, 400);
   //this->layout()->setSizeConstraint(QLayout::SetFixedSize);
+}
+
+/////////////////////////////////////////////////
+void ExportDialog::OnSelected(const QModelIndex & /*_index*/)
+{
+  this->dataPtr->exportButton->setEnabled(
+      this->dataPtr->listView->selectionModel()->selectedIndexes().size() > 0);
 }
 
 /////////////////////////////////////////////////
@@ -177,9 +209,59 @@ void ExportDialog::OnCancel()
 /////////////////////////////////////////////////
 void ExportDialog::OnExport()
 {
-}
+  QFileDialog fileDialog(this, tr("Save Directory"), QDir::homePath());
+  fileDialog.setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
+  fileDialog.setAcceptMode(QFileDialog::AcceptSave);
+  fileDialog.setFileMode(QFileDialog::DirectoryOnly);
 
-/////////////////////////////////////////////////
-void ExportDialog::showEvent(QShowEvent */*_event*/)
-{
+  if (fileDialog.exec() == QDialog::Accepted)
+  {
+    QStringList selected = fileDialog.selectedFiles();
+
+    if (selected.empty())
+      return;
+
+    std::string dir = selected[0].toStdString();
+
+    QModelIndexList selectedPlots =
+      this->dataPtr->listView->selectionModel()->selectedIndexes();
+    for (auto iter = selectedPlots.begin(); iter != selectedPlots.end(); ++iter)
+    {
+      PlotViewItem *plotItem =
+        static_cast<PlotViewItem*>(
+            static_cast<QStandardItemModel*>(
+              this->dataPtr->listView->model())->itemFromIndex(*iter));
+
+      if (plotItem)
+      {
+        std::string title =
+          plotItem->canvas->Title().toStdString();
+
+        for (const auto &plot : plotItem->canvas->Plots())
+        {
+          for (const auto &curve : plot->Curves())
+          {
+            auto c = curve.lock();
+            if (!c)
+              continue;
+
+            std::ofstream out(dir + "/" + title + "-" + c->Label() + ".csv");
+            out << "x, " << c->Label() << std::endl;
+            for (unsigned int j = 0; j < c->Size(); ++j)
+            {
+              ignition::math::Vector2d pt = c->Point(j);
+              out << pt.X() << ", " << pt.Y() << std::endl;
+            }
+            out.close();
+          }
+        }
+      }
+      else
+      {
+        std::cout << "Error!!!\n";
+      }
+    }
+    this->close();
+  }
 }
