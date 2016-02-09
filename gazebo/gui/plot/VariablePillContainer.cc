@@ -190,7 +190,6 @@ void VariablePillContainer::RemoveVariablePill(const unsigned int _id)
     {
       // remove and rely on callbacks to emit the VariableRemoved signal
       variable->Parent()->RemoveVariablePill(variable);
-
     }
     else
       emit VariableRemoved(variable->Id(), VariablePill::EMPTY_VARIABLE);

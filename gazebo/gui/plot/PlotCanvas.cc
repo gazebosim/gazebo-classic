@@ -99,7 +99,7 @@ PlotCanvas::PlotCanvas(QWidget *_parent)
   this->dataPtr->yVariableContainer->setSizePolicy(
       QSizePolicy::Minimum, QSizePolicy::Fixed);
 
- QVBoxLayout *variableContainerLayout = new QVBoxLayout;
+  QVBoxLayout *variableContainerLayout = new QVBoxLayout;
   variableContainerLayout->addWidget(xVariableContainer);
   variableContainerLayout->addWidget(this->dataPtr->yVariableContainer);
 
