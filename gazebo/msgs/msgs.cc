@@ -3054,7 +3054,7 @@ namespace gazebo
         result.set_type(msgs::SensorNoise::GAUSSIAN_QUANTIZED);
       else
       {
-        gzerr << "Invalid GPS sensor noise type["
+        gzerr << "Invalid sensor noise type["
           << noiseType << "]. Using 'none'.\n";
 
         result.set_type(msgs::SensorNoise::NONE);
