@@ -134,7 +134,7 @@ void AtmosphereTest::AtmosphereParamBool
 
   // Test shared atmosphere model parameter(s)
   EXPECT_NEAR(atmosphere->Temperature(), 288.15, 1e-6);
-  EXPECT_NEAR(atmosphere->MassDensity(), 1.225, 1e-6);
+  EXPECT_NEAR(atmosphere->MassDensity(), 1.2249782197913108, 1e-6);
   EXPECT_NEAR(atmosphere->Pressure(), 101325, 1e-6);
   EXPECT_NEAR(atmosphere->TemperatureGradient(), -0.0065, 1e-6);
   EXPECT_EQ(atmosphere->Type(), _atmosphere);
