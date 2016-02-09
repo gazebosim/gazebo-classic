@@ -19,6 +19,7 @@ set (msgs
   cylindergeom.proto
   density.proto
   diagnostics.proto
+  diagnostic_control.proto
   distortion.proto
   empty.proto
   factory.proto

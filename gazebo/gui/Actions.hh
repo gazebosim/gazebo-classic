@@ -100,6 +100,9 @@ namespace gazebo
     /// \brief Action to show/hide the plotting utitlty
     extern GZ_GUI_VISIBLE QAction *g_plotAct;
 
+    /// \brief Action to show/hide the plotting utitlty
+    extern GZ_GUI_VISIBLE QAction *g_plotAct;
+
     extern GZ_GUI_VISIBLE QAction *g_viewWireframeAct;
 
     extern GZ_GUI_VISIBLE QAction *g_viewOculusAct;

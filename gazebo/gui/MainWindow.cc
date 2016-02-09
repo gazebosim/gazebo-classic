@@ -71,6 +71,7 @@
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/MainWindowPrivate.hh"
 
+#include "gazebo/gui/plot/PlotWindow.hh"
 #ifdef HAVE_OCULUS
 #include "gazebo/gui/OculusWindow.hh"
 #endif
@@ -1064,6 +1065,7 @@ void MainWindow::CreateActions()
   g_plotAct->setStatusTip(tr("Create a Plot"));
   connect(g_plotAct, SIGNAL(triggered()), this, SLOT(Plot()));
 
+
   g_openAct = new QAction(tr("&Open World"), this);
   g_openAct->setShortcut(tr("Ctrl+O"));
   g_openAct->setStatusTip(tr("Open an world file"));
@@ -1837,6 +1839,7 @@ void MainWindow::CreateMenuBar()
   windowMenu->addAction(g_overlayAct);
   windowMenu->addAction(g_showToolbarsAct);
   windowMenu->addAction(g_fullScreenAct);
+  windowMenu->addAction(g_plotAct);
   windowMenu->addAction(g_plotAct);
 
   bar->addSeparator();

@@ -18,59 +18,53 @@
 #include "gazebo/common/Console.hh"
 
 #include "gazebo/gui/ConfigWidget.hh"
-#include "gazebo/gui/plot/PlotPalette.hh"
+#include "gazebo/gui/plot/Palette.hh"
 
 #include "gazebo/transport/TransportIface.hh"
-
-namespace gazebo
-{
-  namespace gui
-  {
-    /// \brief Private data for the PlotPalette class
-    class PlotPalettePrivate
-    {
-      /// \brief Top pane of the topics tab.
-      public: ConfigWidget *topicsTop;
-
-      /// \brief Bottom pane of the topics tab.
-      public: ConfigWidget *topicsBottom;
-
-      /// \brief Bottom pane of the sim tab.
-      public: ConfigWidget *simBottom;
-
-      /// \brief Area for search results.
-      public: ConfigWidget *searchArea;
-
-      /// \brief Bottom pane of the search tab.
-      public: ConfigWidget *searchBottom;
-
-      /// \brief Keep all the information which can be searched.
-      public: QStandardItemModel *searchModel;
-    };
-
-    /// \brief Private data for the PlotChildConfigWidget class
-    class PlotChildConfigWidgetPrivate
-    {
-      /// \brief Text which is displayed on the widget.
-      public: std::string text;
-
-      /// \brief Information which is transmitted when this is dragged.
-      /// It contains all the necessary information about the property to
-      /// be plotted.
-      public: std::string plotInfo;
-
-      /// \brief Whether this is draggable or not.
-      public: bool draggable;
-    };
-  }
-}
 
 using namespace gazebo;
 using namespace gui;
 
+/// \brief Private data for the Palette class
+class gazebo::gui::PalettePrivate
+{
+  /// \brief Top pane of the topics tab.
+  public: ConfigWidget *topicsTop;
+
+  /// \brief Bottom pane of the topics tab.
+  public: ConfigWidget *topicsBottom;
+
+  /// \brief Bottom pane of the sim tab.
+  public: ConfigWidget *simBottom;
+
+  /// \brief Area for search results.
+  public: ConfigWidget *searchArea;
+
+  /// \brief Bottom pane of the search tab.
+  public: ConfigWidget *searchBottom;
+
+  /// \brief Keep all the information which can be searched.
+  public: QStandardItemModel *searchModel;
+};
+
+/// \brief Private data for the PlotChildConfigWidget class
+class gazebo::gui::PlotChildConfigWidgetPrivate
+{
+  /// \brief Text which is displayed on the widget.
+  public: std::string text;
+
+  /// \brief Information which is transmitted when this is dragged.
+  /// It contains all the necessary information about the property to
+  /// be plotted.
+  public: std::string plotInfo;
+
+  /// \brief Whether this is draggable or not.
+  public: bool draggable;
+};
+
 /////////////////////////////////////////////////
-PlotPalette::PlotPalette(QWidget *_parent) : QWidget(_parent),
-    dataPtr(new PlotPalettePrivate)
+Palette::Palette(QWidget *_parent) : QWidget(_parent),
+    dataPtr(new PalettePrivate)
 {
   // Search top
   auto searchEdit = new QLineEdit();
@@ -208,12 +202,12 @@ PlotPalette::PlotPalette(QWidget *_parent) : QWidget(_parent),
 }
 
 /////////////////////////////////////////////////
-PlotPalette::~PlotPalette()
+Palette::~Palette()
 {
 }
 
 /////////////////////////////////////////////////
-void PlotPalette::FillTopicsTop()
+void Palette::FillTopicsTop()
 {
   auto configLayout = new QVBoxLayout();
   configLayout->setSpacing(0);
@@ -267,7 +261,7 @@ void PlotPalette::FillTopicsTop()
 }
 
 /////////////////////////////////////////////////
-void PlotPalette::FillSimBottom()
+void Palette::FillSimBottom()
 {
   auto configLayout = new QVBoxLayout();
   configLayout->setSpacing(0);
@@ -302,19 +296,19 @@ void PlotPalette::FillSimBottom()
 }
 
 /////////////////////////////////////////////////
-void PlotPalette::OnTopicClicked(const std::string &_topic)
+void Palette::OnTopicClicked(const std::string &_topic)
 {
   this->FillTopicsBottom(_topic, this->dataPtr->topicsBottom);
 }
 
 /////////////////////////////////////////////////
-void PlotPalette::OnTopicSearchClicked(const std::string &_topic)
+void Palette::OnTopicSearchClicked(const std::string &_topic)
 {
   this->FillTopicsBottom(_topic, this->dataPtr->searchBottom);
 }
 
 /////////////////////////////////////////////////
-void PlotPalette::FillTopicsBottom(const std::string &_topic,
+void Palette::FillTopicsBottom(const std::string &_topic,
     ConfigWidget *_widget)
 {
   // Clear previous layout
@@ -359,7 +353,7 @@ void PlotPalette::FillTopicsBottom(const std::string &_topic,
 }
 
 /////////////////////////////////////////////////
-void PlotPalette::FillFromMsg(google::protobuf::Message *_msg,
+void Palette::FillFromMsg(google::protobuf::Message *_msg,
     const std::string &_scope, const unsigned int _level,
     QVBoxLayout *_parentLayout)
 {
@@ -493,7 +487,7 @@ void PlotPalette::FillFromMsg(google::protobuf::Message *_msg,
 }
 
 /////////////////////////////////////////////////
-void PlotPalette::UpdateSearch(const QString &_search)
+void Palette::UpdateSearch(const QString &_search)
 {
   // Clear previous layout
   auto oldLayout = this->dataPtr->searchArea->layout();

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_GUI_PLOT_PLOTPALETTE_HH_
-#define _GAZEBO_GUI_PLOT_PLOTPALETTE_HH_
+#ifndef _GAZEBO_GUI_PLOT_PALETTE_HH_
+#define _GAZEBO_GUI_PLOT_PALETTE_HH_
 
 #include <memory>
 
@@ -29,20 +29,20 @@ namespace gazebo
   namespace gui
   {
     // Forward declare private data class
-    class PlotPalettePrivate;
+    class PalettePrivate;
 
     /// \brief A special list widget that allows dragging of items from it to a
     /// plot
-    class GZ_GUI_VISIBLE PlotPalette : public QWidget
+    class GZ_GUI_VISIBLE Palette : public QWidget
     {
       Q_OBJECT
 
       /// \brief Constructor
       /// \param[in] _parent Pointer to parent widget.
-      public: PlotPalette(QWidget *_parent);
+      public: Palette(QWidget *_parent);
 
       /// \brief Destructor
-      public: ~PlotPalette();
+      public: ~Palette();
 
       /// \brief Fill the top panel of the topics tab.
       private: void FillTopicsTop();
@@ -83,7 +83,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Pointer to private data.
-      private: std::unique_ptr<PlotPalettePrivate> dataPtr;
+      private: std::unique_ptr<PalettePrivate> dataPtr;
     };
 
     // Forward declare private data class

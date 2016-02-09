@@ -16,6 +16,8 @@
 */
 #include <boost/filesystem.hpp>
 
+#include "gazebo/gazebo_config.h"
+
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/transport.hh"
