@@ -23,6 +23,7 @@
 
 #include <map>
 
+#include <QFrame>
 #include <qwt/qwt_plot.h>
 #include <qwt/qwt_scale_widget.h>
 #include <qwt/qwt_plot_panner.h>
@@ -34,7 +35,7 @@
 #include <qwt/qwt_curve_fitter.h>
 #include <qwt/qwt_symbol.h>
 #include <qwt/qwt_legend.h>
-#include <qwt/qwt_legend_item.h>
+// #include <qwt/qwt_legend_item.h>
 #include <qwt/qwt_plot_directpainter.h>
 #include <qwt/qwt_plot_magnifier.h>
 
@@ -98,16 +99,29 @@ IncrementalPlot::IncrementalPlot(QWidget *_parent)
 
   this->setFrameStyle(QFrame::NoFrame);
   this->setLineWidth(0);
-  this->setCanvasLineWidth(2);
+#if (QWT_VERSION >= ((6 << 16) + (1 << 8) + 0))
+  static_cast<QFrame*>(this)->setLineWidth(2.0);
+#else
+  this->setLineWidth(2.0);
+#endif
 
   this->plotLayout()->setAlignCanvasToScales(true);
 
   QwtLegend *qLegend = new QwtLegend;
+#if (QWT_VERSION >= ((6 << 16) + (1 << 8) + 0))
+  qLegend->setDefaultItemMode(QwtLegendData::Checkable);
+#else
   qLegend->setItemMode(QwtLegend::CheckableItem);
+#endif
   this->insertLegend(qLegend, QwtPlot::RightLegend);
 
   QwtPlotGrid *grid = new QwtPlotGrid;
+#if (QWT_VERSION >= ((6 << 16) + (1 << 8) + 0))
+  grid->setMajorPen(QPen(Qt::gray, 0, Qt::DotLine));
+#else
   grid->setMajPen(QPen(Qt::gray, 0, Qt::DotLine));
+#endif
+
   grid->attach(this);
 
   /// \todo Figure out a way to properly label the y-axis
@@ -170,6 +184,7 @@ void IncrementalPlot::Add(const std::string &_label,
     plotCurve = this->AddCurve(_label);
   else
     plotCurve = curve;
+
 
   GZ_ASSERT(!plotCurve.expired(), "Curve is NULL");
 
