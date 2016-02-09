@@ -86,6 +86,8 @@ void Atmosphere::Load(sdf::ElementPtr _sdf)
     this->dataPtr->pressure =
         this->dataPtr->sdf->GetElement("pressure")->Get<double>();
   }
+
+  this->UpdateMassDensity();
 }
 
 //////////////////////////////////////////////////
