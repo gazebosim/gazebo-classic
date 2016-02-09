@@ -73,7 +73,9 @@ PlotCanvas::PlotCanvas(QWidget *_parent)
   QToolButton *settingsButton = new QToolButton();
   settingsButton->installEventFilter(this);
   settingsButton->setToolTip(tr("Settings"));
-  settingsButton->setIcon(QIcon(":/images/settings.png"));
+  settingsButton->setIcon(QIcon(":/images/settings.svg"));
+  settingsButton->setIconSize(QSize(25, 25));
+  settingsButton->setFixedSize(QSize(45, 35));
   settingsButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
   settingsButton->setPopupMode(QToolButton::InstantPopup);
   settingsButton->setMenu(settingsMenu);
@@ -91,7 +93,7 @@ PlotCanvas::PlotCanvas(QWidget *_parent)
   xVariableContainer->SetMaxSize(1);
   xVariableContainer->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
   // hardcode x axis for now
-  xVariableContainer->AddVariablePill("SimTime");
+  xVariableContainer->AddVariablePill("sim_time");
   xVariableContainer->setEnabled(false);
 
   this->dataPtr->yVariableContainer = new VariablePillContainer(this);
