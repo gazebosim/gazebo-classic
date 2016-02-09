@@ -29,7 +29,7 @@ namespace gazebo
   namespace gui
   {
     // Forward declare private data class
-    struct VariablePillContainerPrivate;
+    class VariablePillContainerPrivate;
 
     class VariablePill;
 

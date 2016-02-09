@@ -73,7 +73,7 @@ class DragableListWidget : public QListWidget
                drag->exec(Qt::LinkAction);
              }
 
-  protected: virtual Qt::DropActions supportedDropActions()
+  protected: virtual Qt::DropActions supportedDropActions() const
              {
                return Qt::LinkAction;
              }
