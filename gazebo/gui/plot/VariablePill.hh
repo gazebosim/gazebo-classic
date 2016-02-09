@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_GUI_VARIABLE_PILL_HH_
-#define _GAZEBO_GUI_VARIABLE_PILL_HH_
+#ifndef _GAZEBO_GUI_PLOT_VARIABLE_PILL_HH_
+#define _GAZEBO_GUI_PLOT_VARIABLE_PILL_HH_
 
 #include <map>
 #include <memory>

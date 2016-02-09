@@ -16,7 +16,6 @@
 */
 
 #include <map>
-#include <mutex>
 #include <set>
 
 #include "gazebo/common/Assert.hh"

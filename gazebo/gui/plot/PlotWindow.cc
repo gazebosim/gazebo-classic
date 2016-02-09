@@ -15,6 +15,8 @@
  *
 */
 
+#include <mutex>
+
 #include "gazebo/gui/plot/VariablePillContainer.hh"
 #include "gazebo/gui/plot/PlotCurve.hh"
 #include "gazebo/gui/plot/IncrementalPlot.hh"
