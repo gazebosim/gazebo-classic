@@ -91,7 +91,8 @@ PlotCanvas::PlotCanvas(QWidget *_parent)
   VariablePillContainer *xVariableContainer = new VariablePillContainer(this);
   xVariableContainer->SetText("x: ");
   xVariableContainer->SetMaxSize(1);
-  xVariableContainer->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+  xVariableContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+  xVariableContainer->setContentsMargins(0, 0, 0, 0);
   // hardcode x axis for now
   xVariableContainer->AddVariablePill("sim_time");
   xVariableContainer->setEnabled(false);
@@ -99,11 +100,14 @@ PlotCanvas::PlotCanvas(QWidget *_parent)
   this->dataPtr->yVariableContainer = new VariablePillContainer(this);
   this->dataPtr->yVariableContainer->SetText("y: ");
   this->dataPtr->yVariableContainer->setSizePolicy(
-      QSizePolicy::Minimum, QSizePolicy::Fixed);
+      QSizePolicy::Expanding, QSizePolicy::Fixed);
+  this->dataPtr->yVariableContainer->setContentsMargins(0, 0, 0, 0);
 
   QVBoxLayout *variableContainerLayout = new QVBoxLayout;
   variableContainerLayout->addWidget(xVariableContainer);
   variableContainerLayout->addWidget(this->dataPtr->yVariableContainer);
+  variableContainerLayout->setSpacing(0);
+  variableContainerLayout->setContentsMargins(0, 0, 0, 0);
 
   // plot
   QScrollArea *plotScrollArea = new QScrollArea(this);
@@ -122,7 +126,7 @@ PlotCanvas::PlotCanvas(QWidget *_parent)
   plotFrame->setLayout(this->dataPtr->plotLayout);
 
   plotScrollArea->setWidget(plotFrame);
-
+  plotFrame->setStyleSheet("background-color: #f2f4f7; border-radius: 10px");
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->addLayout(titleSettingsLayout);

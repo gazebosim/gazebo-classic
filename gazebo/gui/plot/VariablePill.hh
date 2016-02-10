@@ -53,6 +53,14 @@ namespace gazebo
       /// \return Unique id;
       public: unsigned int Id() const;
 
+      /// \brief Set a unique name for this variable
+      /// \return Number of child variable pills.
+      public: void SetName(const std::string &_name);
+
+      /// \brief Set a unique name for this variable
+      /// \return Number of child variable pills.
+      public: std::string Name() const;
+
       /// \brief Set the text label for this variable pill.
       /// \param[in] _text Text to set the label to.
       public: void SetText(const std::string &_text);
@@ -84,6 +92,10 @@ namespace gazebo
       /// \brief Remove a child variable pill.
       /// \param[in] _variable Child variable pill to remove.
       public: void RemoveVariablePill(VariablePill *_variable);
+
+      /// \brief Get a child variable pill by its unique name
+      /// \return Child variable pill.
+      public: VariablePill *VariablePillByName(const std::string &_name);
 
       /// \brief Get the number of child variable pills
       /// \return Number of child variable pills.
@@ -125,6 +137,11 @@ namespace gazebo
       /// \brief Set whether to enable multi-variable mode
       /// \param[in] _enable True to enable multi-variable mode.
       private: void SetMultiVariableMode(const bool _enable);
+
+      /// \brief Helper function to check whether the drag action is valid.
+      /// \param[in] _evt The drag event.
+      /// \return True if the drag action is valid
+      private: bool IsDragValid(QDropEvent *_evt);
 
       /// \brief Qt signal emitted when a child variable pill is added
       /// \param[in] Unique id of the child variable pill.

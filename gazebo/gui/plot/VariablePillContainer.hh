@@ -107,6 +107,11 @@ namespace gazebo
       /// \param[in] _event Qt mouse event.
       protected: void mouseReleaseEvent(QMouseEvent *_event);
 
+      /// \brief Helper function to check whether the drag action is valid.
+      /// \param[in] _evt The drag event.
+      /// \return True if the drag action is valid
+      private: bool IsDragValid(QDropEvent *_evt) const;
+
       /// \brief Qt signal emitted when a variable is added to the container
       /// \param[in] _id Unique id of the variable pill.
       /// \param[in] Name of variable pill added.

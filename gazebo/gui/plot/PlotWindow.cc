@@ -97,6 +97,7 @@ PlotWindow::PlotWindow(QWidget *_parent)
 
   // add button
   QPushButton *addCanvasButton = new QPushButton("+");
+  addCanvasButton->setFixedSize(QSize(25, 25));
   connect(addCanvasButton, SIGNAL(clicked()), this, SLOT(OnAddCanvas()));
   QVBoxLayout *addButtonLayout = new QVBoxLayout;
   addButtonLayout->addWidget(addCanvasButton);

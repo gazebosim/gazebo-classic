@@ -46,6 +46,9 @@ namespace gazebo
       /// \brief Text label
       public: QLabel *label;
 
+      /// \brief Frame that holds the label
+      public: QFrame *labelFrame;
+
       /// \brief Text label for the outer mulit-variable pill
       public: QLabel *multiLabel;
 
@@ -61,11 +64,14 @@ namespace gazebo
       /// \brief Selected state.
       public: bool isSelected = false;
 
-      /// \brief Unique id;
+      /// \brief Unique id.
       public: unsigned int id;
 
       /// \brief Global id incremented on every new variable pill
       public: static unsigned int globalVariableId;
+
+      /// \brief unique name.
+      public: std::string name;
     };
   }
 }
@@ -83,15 +89,23 @@ VariablePill::VariablePill(QWidget *_parent)
 {
   this->dataPtr->id = VariablePillPrivate::globalVariableId++;
 
+  // generate default unique name
+  std::stringstream nameStream;
+  nameStream << "variable" << this->dataPtr->id << std::endl;
+  this->dataPtr->name = nameStream.str();
+
   // label
   this->dataPtr->label = new QLabel;
   QHBoxLayout *labelLayout = new QHBoxLayout;
   labelLayout->addWidget(this->dataPtr->label);
+  labelLayout->setContentsMargins(2, 2, 2, 2);
+  this->dataPtr->labelFrame = new QFrame;
+  this->dataPtr->labelFrame->setObjectName("VariableLabelFrame");
+  this->dataPtr->labelFrame->setLayout(labelLayout);
 
   // child variable pills
   this->dataPtr->variableLayout = new QHBoxLayout;
   this->dataPtr->variableLayout->setAlignment(Qt::AlignLeft);
-  this->dataPtr->variableLayout->setContentsMargins(0, 0, 0, 0);
 
   this->dataPtr->multiLayout = new QHBoxLayout;
   this->dataPtr->multiLayout->setAlignment(Qt::AlignLeft);
@@ -103,7 +117,7 @@ VariablePill::VariablePill(QWidget *_parent)
 
   this->dataPtr->singleLayout = new QHBoxLayout;
   this->dataPtr->singleLayout->setAlignment(Qt::AlignLeft);
-  this->dataPtr->singleLayout->addLayout(labelLayout);
+  this->dataPtr->singleLayout->addWidget(this->dataPtr->labelFrame);
   this->dataPtr->singleLayout->addLayout(this->dataPtr->variableLayout);
   this->dataPtr->singleLayout->setContentsMargins(0, 0, 0, 0);
   this->dataPtr->multiLayout->addLayout(this->dataPtr->singleLayout);
@@ -114,7 +128,6 @@ VariablePill::VariablePill(QWidget *_parent)
 
   QFrame *mainFrame = new QFrame(this);
   mainFrame->setLayout(this->dataPtr->multiLayout);
-
   mainFrame->setStyleSheet("background-color: #1965b0; border-radius: 4px");
 
   mainLayout->addWidget(mainFrame);
@@ -134,6 +147,19 @@ unsigned int VariablePill::Id() const
 {
   return this->dataPtr->id;
 }
+
+/////////////////////////////////////////////////
+void VariablePill::SetName(const std::string &_name)
+{
+  this->dataPtr->name = _name;
+}
+
+/////////////////////////////////////////////////
+std::string VariablePill::Name() const
+{
+  return this->dataPtr->name;
+}
+
 
 /////////////////////////////////////////////////
 void VariablePill::SetText(const std::string &_text)
@@ -176,7 +202,7 @@ void VariablePill::SetMultiVariableMode(const bool _enable)
 {
   this->dataPtr->multiLabel->setVisible(_enable);
 
-  int margin = _enable ? 2 : 0;
+  int margin = _enable ? 4 : 0;
   this->dataPtr->multiLayout->setContentsMargins(
       margin, margin, margin, margin);
 }
@@ -289,58 +315,64 @@ void VariablePill::RemoveVariablePill(VariablePill *_variable)
 }
 
 /////////////////////////////////////////////////
-void VariablePill::dragEnterEvent(QDragEnterEvent *_evt)
+VariablePill *VariablePill::VariablePillByName(const std::string &_name)
 {
-  if (_evt->source() == this)
+  if (_name == this->dataPtr->name)
+    return this;
+
+  for (const auto &v : this->dataPtr->variables)
   {
-    _evt->ignore();
-    return;
+    if (v.second->Name() == _name)
+      return v.second;
   }
 
-  if (this->Container() && this->Container()->MaxSize() != -1 &&
-    static_cast<int>(this->Container()->VariablePillCount()) >=
-    this->Container()->MaxSize())
+  return NULL;
+}
+
+/////////////////////////////////////////////////
+void VariablePill::dragEnterEvent(QDragEnterEvent *_evt)
+{
+  if (!this->IsDragValid(_evt))
   {
-    _evt->ignore();
+    _evt->setDropAction(Qt::IgnoreAction);
+    _evt->accept();
     return;
   }
 
   if (_evt->mimeData()->hasFormat("application/x-item"))
   {
     _evt->setDropAction(Qt::LinkAction);
-    _evt->acceptProposedAction();
   }
   else if (_evt->mimeData()->hasFormat("application/x-pill-item"))
   {
     _evt->setDropAction(Qt::MoveAction);
-    _evt->acceptProposedAction();
   }
   else
+  {
     _evt->ignore();
+    return;
+  }
+
+  _evt->acceptProposedAction();
 }
 
 /////////////////////////////////////////////////
 void VariablePill::dropEvent(QDropEvent *_evt)
 {
-  if (_evt->source() == this)
+  if (!this->IsDragValid(_evt))
   {
-    _evt->ignore();
-    return;
-  }
-
-  if (this->Container() && this->Container()->MaxSize() != -1 &&
-    static_cast<int>(this->Container()->VariablePillCount()) >=
-    this->Container()->MaxSize())
-  {
-    _evt->ignore();
+    _evt->accept();
     return;
   }
 
   if (_evt->mimeData()->hasFormat("application/x-item"))
   {
-    QString dataStr = _evt->mimeData()->data("application/x-item");
+    QString mimeData = _evt->mimeData()->data("application/x-item");
+    std::string dataStr = mimeData.toStdString();
+
     VariablePill *variable = new VariablePill;
-    variable->SetText(dataStr.toStdString());
+    variable->SetText(dataStr);
+    variable->SetName(dataStr);
 
     connect(variable, SIGNAL(VariableMoved(unsigned int)),
         this->Container(), SLOT(OnMoveVariable(unsigned int)));
@@ -351,7 +383,7 @@ void VariablePill::dropEvent(QDropEvent *_evt)
 
     this->AddVariablePill(variable);
   }
-  else   if (_evt->mimeData()->hasFormat("application/x-pill-item"))
+  else if (_evt->mimeData()->hasFormat("application/x-pill-item"))
   {
     VariablePill *variable = qobject_cast<VariablePill *>(_evt->source());
     if (!variable)
@@ -384,6 +416,50 @@ void VariablePill::dropEvent(QDropEvent *_evt)
 
     emit VariableMoved(variable->Id());
   }
+}
+/////////////////////////////////////////////////
+bool VariablePill::IsDragValid(QDropEvent *_evt)
+{
+  if (_evt->source() == this)
+    return false;
+
+  std::string variableName;
+  if (_evt->mimeData()->hasFormat("application/x-item"))
+  {
+    QString mimeData = _evt->mimeData()->data("application/x-item");
+    variableName = mimeData.toStdString();
+  }
+  else if (_evt->mimeData()->hasFormat("application/x-pill-item"))
+  {
+    VariablePill *dragVariable = qobject_cast<VariablePill *>(_evt->source());
+    if (!dragVariable)
+      return false;
+
+    variableName = dragVariable->Name();
+  }
+  else
+    return false;
+
+  if (variableName.empty())
+    return false;
+
+  // check variable with same name is not in the variable pill already
+  if (this->dataPtr->name == variableName ||
+      (this->dataPtr->parent &&
+      this->dataPtr->parent->VariablePillByName(variableName)))
+  {
+    return false;
+  }
+
+  // check max size
+  if (this->Container() && this->Container()->MaxSize() != -1 &&
+      static_cast<int>(this->Container()->VariablePillCount()) >=
+      this->Container()->MaxSize())
+  {
+    return false;
+  }
+
+  return true;
 }
 
 /////////////////////////////////////////////////
@@ -451,14 +527,16 @@ void VariablePill::SetSelected(const bool _selected)
 
   if (_selected)
   {
-    this->dataPtr->label->setStyleSheet(
-        "background-color: #5289c7; border: 2px solid black");
+    this->dataPtr->labelFrame->setStyleSheet(
+        "background-color: #5289c7; border: 2px solid blue;");
   }
   else
   {
-    this->dataPtr->label->setStyleSheet(
-        "background-color: #5289c7; border: 0px");
+    this->dataPtr->labelFrame->setStyleSheet(
+        "background-color: #5289c7; border: 0px;");
   }
+  this->dataPtr->label->setStyleSheet(
+      "QLabel {background-color: #5289c7; border: 0px;}");
 }
 
 /////////////////////////////////////////////////
