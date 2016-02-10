@@ -101,7 +101,7 @@ void ModelManipulator_TEST::Transparency()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/shapes.world", false, false, true);
+  this->Load("worlds/shapes.world", false, false, false);
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
