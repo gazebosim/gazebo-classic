@@ -118,6 +118,12 @@ namespace gazebo
       /// \brief Curve label.
       public: std::string label;
 
+      /// \brief Active state of the plot curve;
+      public: bool active = true;
+
+      /// \brief Age of the curve since the first restart;
+      public: unsigned int age = 0;
+
       /// \brief Qwt Curve object.
       public: QwtPlotCurve *curve = NULL;
 
@@ -189,6 +195,9 @@ PlotCurve::~PlotCurve()
 /////////////////////////////////////////////////
 void PlotCurve::AddPoint(const ignition::math::Vector2d &_pt)
 {
+  if (!this->dataPtr->active)
+    return;
+
   // Add a point
   this->dataPtr->curveData->Add(QPointF(_pt.X(), _pt.Y()));
 }
@@ -196,6 +205,9 @@ void PlotCurve::AddPoint(const ignition::math::Vector2d &_pt)
 /////////////////////////////////////////////////
 void PlotCurve::AddPoints(const std::vector<ignition::math::Vector2d> &_pts)
 {
+  if (!this->dataPtr->active)
+    return;
+
   // Add all the points
   for (const auto &pt : _pts)
   {
@@ -226,6 +238,13 @@ void PlotCurve::SetLabel(const std::string &_label)
 {
   this->dataPtr->label = _label;
   this->dataPtr->curve->setTitle(QString::fromStdString(_label));
+/*  IncrementalPlot *plot =
+    dynamic_cast<IncrementalPlot *>(this->dataPtr->curve->plot());
+  if (plot)
+  {
+    this->Detach();
+    this->Attach(plot);
+  }*/
 }
 
 /////////////////////////////////////////////////
@@ -244,6 +263,30 @@ void PlotCurve::SetId(const unsigned int _id)
 unsigned int PlotCurve::Id() const
 {
   return this->dataPtr->id;
+}
+
+/////////////////////////////////////////////////
+bool PlotCurve::Active() const
+{
+  return this->dataPtr->active;
+}
+
+/////////////////////////////////////////////////
+void PlotCurve::SetActive(const bool _active)
+{
+  this->dataPtr->active = _active;
+}
+
+/////////////////////////////////////////////////
+unsigned int PlotCurve::Age() const
+{
+  return this->dataPtr->age;
+}
+
+/////////////////////////////////////////////////
+void PlotCurve::SetAge(const unsigned int _age)
+{
+  this->dataPtr->age = _age;
 }
 
 /////////////////////////////////////////////////

@@ -25,6 +25,7 @@
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/plot/PlottingTypes.hh"
+#include "gazebo/gui/plot/VariablePill.hh"
 #include "gazebo/gui/plot/IncrementalPlot.hh"
 #include "gazebo/gui/plot/PlotManager.hh"
 #include "gazebo/util/system.hh"
@@ -48,10 +49,19 @@ namespace gazebo
       /// \brief Destructor.
       public: virtual ~PlotCanvas();
 
-      /// \brief Add a new variable to a new plot.
+      /// \brief Set the label of a variable.
+      /// \param[in] _id Unique id of the variable
+      /// \param[in] _label New variable label.
+      public: void SetVariableLabel(const unsigned int _id,
+          const std::string &_label);
+
+      /// \brief Add a new variable to a plot.
       /// \param[in] _variable Name of the variable.
+      /// \param[in] _targetId Unique id of the target variable that the
+      /// the variable will be added to.
       /// \return Unique id of the variable
-      public: unsigned int AddVariable(const std::string &_variable);
+      public: unsigned int AddVariable(const std::string &_variable,
+          const unsigned int _targetId = VariablePill::EMPTY_VARIABLE);
 
       /// \brief Remove a variable from a plot. This will search through all
       /// plots for the variable and remove it from the plot if found.
@@ -81,7 +91,11 @@ namespace gazebo
       /// \return Number of variables
       public: unsigned int VariableCount(const unsigned int _plotId) const;
 
-      /// \brief Update plots.
+      /// \brief Restart plotting. A new plot curve will be created for each
+      /// variable in the plot. Existing plot curves will no longer be updated.
+      public: void Restart();
+
+      /// \brief Update plots and curves with new data.
       public: void Update();
 
       /// \brief Get the plot id which the variable is plotted in
@@ -100,9 +114,6 @@ namespace gazebo
 
       /// \brief Clear the canvas and remove all variables and plots.
       public: void Clear();
-
-      /// \brief Restart all the plots in this canvas
-      public: void RestartPlots();
 
       /// \brief Used to filter scroll wheel events.
       /// \param[in] _o Object that receives the event.
@@ -148,6 +159,12 @@ namespace gazebo
       /// the moved variable is now co-located with.
       private slots: void OnMoveVariable(const unsigned int _id,
           const unsigned int _targetId);
+
+      /// \brief Qt Callback when a variable label has changed.
+      /// \param[in] _id Unique id of the variable whose label has changed.
+      /// \param[in] _label New label text.
+      private slots: void OnSetVariableLabel(const unsigned int _id,
+          const std::string &_label);
 
       /// \brief Qt Callback to clear all variable and plots on canvas.
       private slots: void OnClearCanvas();

@@ -66,6 +66,9 @@ namespace gazebo
 
       /// \brief Global id incremented on every new variable pill
       public: static unsigned int globalVariableId;
+
+      /// \brief unique name.
+      public: std::string name;
     };
   }
 }
@@ -81,7 +84,14 @@ VariablePill::VariablePill(QWidget *_parent)
   : QWidget(_parent),
     dataPtr(new VariablePillPrivate)
 {
-  this->dataPtr->id = VariablePillPrivate::globalVariableId++;
+  this->dataPtr->id = VariablePillPrivate::globalVariableId;
+
+  // generate default unique name
+  std::stringstream nameStream;
+  nameStream << "variable" << this->dataPtr->id << std::endl;
+  this->dataPtr->name = nameStream.str();
+
+  VariablePillPrivate::globalVariableId++;
 
   // label
   this->dataPtr->label = new QLabel;
@@ -136,9 +146,22 @@ unsigned int VariablePill::Id() const
 }
 
 /////////////////////////////////////////////////
+void VariablePill::SetName(const std::string &_name)
+{
+  this->dataPtr->name = _name;
+}
+
+/////////////////////////////////////////////////
+std::string VariablePill::Name() const
+{
+  return this->dataPtr->name;
+}
+
+/////////////////////////////////////////////////
 void VariablePill::SetText(const std::string &_text)
 {
   this->dataPtr->label->setText(QString::fromStdString(_text));
+  emit VariableLabelChanged(_text);
 }
 
 /////////////////////////////////////////////////
@@ -338,9 +361,12 @@ void VariablePill::dropEvent(QDropEvent *_evt)
 
   if (_evt->mimeData()->hasFormat("application/x-item"))
   {
-    QString dataStr = _evt->mimeData()->data("application/x-item");
+    QString mimeData = _evt->mimeData()->data("application/x-item");
+    std::string dataStr = mimeData.toStdString();
+
     VariablePill *variable = new VariablePill;
-    variable->SetText(dataStr.toStdString());
+    variable->SetText(dataStr);
+    variable->SetName(dataStr);
 
     connect(variable, SIGNAL(VariableMoved(unsigned int)),
         this->Container(), SLOT(OnMoveVariable(unsigned int)));
@@ -348,6 +374,8 @@ void VariablePill::dropEvent(QDropEvent *_evt)
         this->Container(), SLOT(OnAddVariable(unsigned int, std::string)));
     connect(variable, SIGNAL(VariableRemoved(unsigned int)),
         this->Container(), SLOT(OnRemoveVariable(unsigned int)));
+    connect(variable, SIGNAL(VariableLabelChanged(std::string)),
+        this->Container(), SLOT(OnSetVariableLabel(std::string)));
 
     this->AddVariablePill(variable);
   }

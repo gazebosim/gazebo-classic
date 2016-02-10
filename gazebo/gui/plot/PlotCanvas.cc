@@ -45,7 +45,7 @@ namespace gazebo
       public: IncrementalPlot *plot = NULL;
 
       /// \brief A map of container variable ids to their plot curve ids.
-      public: std::map<unsigned int, unsigned int> variables;
+      public: std::map<unsigned int, unsigned int> variableCurves;
     };
 
     /// \internal
@@ -64,7 +64,7 @@ namespace gazebo
       /// \brief Pointer to an empty plot.
       public: IncrementalPlot *emptyPlot = NULL;
 
-      /// \brief Container for all the variables on the Y axis.
+      /// \brief Container for all the variableCurves on the Y axis.
       public: VariablePillContainer *yVariableContainer = NULL;
 
       /// \brief Global plot counter.
@@ -93,7 +93,7 @@ PlotCanvas::PlotCanvas(QWidget *_parent)
   // Settings
   QMenu *settingsMenu = new QMenu;
   QAction *clearPlotAct = new QAction("Clear all fields", settingsMenu);
-  clearPlotAct->setStatusTip(tr("Clear variables and all plots on canvas"));
+  clearPlotAct->setStatusTip(tr("Clear variableCurves and all plots on canvas"));
   connect(clearPlotAct, SIGNAL(triggered()), this, SLOT(OnClearCanvas()));
   QAction *deletePlotAct = new QAction("Delete Plot", settingsMenu);
   deletePlotAct->setStatusTip(tr("Delete entire canvas"));
@@ -125,7 +125,7 @@ PlotCanvas::PlotCanvas(QWidget *_parent)
   xVariableContainer->SetMaxSize(1);
   xVariableContainer->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
   // hardcode x axis for now
-  xVariableContainer->AddVariablePill("SimTime");
+  xVariableContainer->AddVariablePill("sim_time");
   xVariableContainer->setEnabled(false);
 
   this->dataPtr->yVariableContainer = new VariablePillContainer(this);
@@ -142,6 +142,9 @@ PlotCanvas::PlotCanvas(QWidget *_parent)
   connect(this->dataPtr->yVariableContainer,
       SIGNAL(VariableMoved(unsigned int, unsigned int)),
       this, SLOT(OnMoveVariable(unsigned int, unsigned int)));
+  connect(this->dataPtr->yVariableContainer,
+      SIGNAL(VariableLabelChanged(unsigned int, std::string)),
+      this, SLOT(OnSetVariableLabel(unsigned int, std::string)));
 
   QVBoxLayout *variableContainerLayout = new QVBoxLayout;
   variableContainerLayout->addWidget(xVariableContainer);
@@ -184,11 +187,22 @@ PlotCanvas::~PlotCanvas()
 }
 
 /////////////////////////////////////////////////
-unsigned int PlotCanvas::AddVariable(const std::string &_variable)
+void PlotCanvas::SetVariableLabel(const unsigned int _id,
+    const std::string &_label)
+{
+  // set new variable labeland let the signals/slots do the work on updating
+  // the plot curve
+  return this->dataPtr->yVariableContainer->SetVariablePillLabel(_id, _label);
+}
+
+/////////////////////////////////////////////////
+unsigned int PlotCanvas::AddVariable(const std::string &_variable,
+    const unsigned int _targetId)
 {
   // add to container and let the signals/slots do the work on adding the
   // a new plot with the curve in the overloaded AddVariable function
-  return this->dataPtr->yVariableContainer->AddVariablePill(_variable);
+  return this->dataPtr->yVariableContainer->AddVariablePill(_variable,
+      _targetId);
 }
 
 /////////////////////////////////////////////////
@@ -202,7 +216,7 @@ void PlotCanvas::AddVariable(const unsigned int _id,
     PlotData *plotData = it->second;
     PlotCurveWeakPtr curve = plotData->plot->AddCurve(_variable);
     auto c = curve.lock();
-    plotData->variables[_id] = c->Id();
+    plotData->variableCurves[_id] = c->Id();
   }
   else
   {
@@ -230,7 +244,7 @@ void PlotCanvas::AddVariable(const unsigned int _id,
   // add new curve
   PlotCurveWeakPtr curve = plotData->plot->AddCurve(_variable);
   auto c = curve.lock();
-  plotData->variables[_id] = c->Id();
+  plotData->variableCurves[_id] = c->Id();
 
   // hide initial empty plot
   if (!this->dataPtr->plotData.empty() && this->dataPtr->emptyPlot)
@@ -246,14 +260,14 @@ void PlotCanvas::RemoveVariable(const unsigned int _id)
   for (auto it = this->dataPtr->plotData.begin();
       it != this->dataPtr->plotData.end(); ++it)
   {
-    auto v = it->second->variables.find(_id);
-    if (v != it->second->variables.end())
+    auto v = it->second->variableCurves.find(_id);
+    if (v != it->second->variableCurves.end())
     {
       unsigned int curveId = v->second;
-      it->second->variables.erase(v);
+      it->second->variableCurves.erase(v);
 
       // delete whole plot if no more curves
-      if (it->second->variables.empty())
+      if (it->second->variableCurves.empty())
       {
         // remove curve from manager
         PlotManager::Instance()->RemoveCurve(it->second->plot->Curve(_id));
@@ -289,8 +303,8 @@ void PlotCanvas::RemoveVariable(const unsigned int _id,
   if (it == this->dataPtr->plotData.end())
     return;
 
-  auto v = it->second->variables.find(_id);
-  if (v == it->second->variables.end())
+  auto v = it->second->variableCurves.find(_id);
+  if (v == it->second->variableCurves.end())
     return;
 
   unsigned int curveId = v->second;
@@ -300,10 +314,10 @@ void PlotCanvas::RemoveVariable(const unsigned int _id,
 
 
   // erase from map
-  it->second->variables.erase(v);
+  it->second->variableCurves.erase(v);
 
   // delete whole plot if no more curves
-  if (it->second->variables.empty())
+  if (it->second->variableCurves.empty())
   {
     this->dataPtr->plotLayout->takeAt(
         this->dataPtr->plotLayout->indexOf(it->second->plot));
@@ -348,8 +362,8 @@ void PlotCanvas::RemovePlot(const unsigned int _id)
   if (it == this->dataPtr->plotData.end())
     return;
 
-  // remove the plot if it does not contain any variables (curves)
-  if (it->second->variables.empty())
+  // remove the plot if it does not contain any variableCurves (curves)
+  if (it->second->variableCurves.empty())
   {
     this->dataPtr->plotLayout->takeAt(
         this->dataPtr->plotLayout->indexOf(it->second->plot));
@@ -360,15 +374,15 @@ void PlotCanvas::RemovePlot(const unsigned int _id)
   }
 
   unsigned int plotId = it->first;
-  // remove all variables except last one
-  while (it->second->variables.size() > 1)
+  // remove all variableCurves except last one
+  while (it->second->variableCurves.size() > 1)
   {
-    auto v = it->second->variables.begin();
+    auto v = it->second->variableCurves.begin();
     this->RemoveVariable(v->first, plotId);
   }
 
   // remove last variable - this will also delete the plot
-  this->RemoveVariable(it->second->variables.begin()->first, plotId);
+  this->RemoveVariable(it->second->variableCurves.begin()->first, plotId);
 }
 
 /////////////////////////////////////////////////
@@ -386,8 +400,8 @@ unsigned int PlotCanvas::PlotByVariable(const unsigned int _variableId) const
 {
   for (const auto it : this->dataPtr->plotData)
   {
-    const auto v = it.second->variables.find(_variableId);
-    if (v != it.second->variables.end())
+    const auto v = it.second->variableCurves.find(_variableId);
+    if (v != it.second->variableCurves.end())
     {
       return it.first;
     }
@@ -407,8 +421,8 @@ void PlotCanvas::OnAddVariable(const unsigned int _id,
     // Add a variable to existing plot
     for (const auto it : this->dataPtr->plotData)
     {
-      const auto v = it.second->variables.find(_targetId);
-      if (v != it.second->variables.end())
+      const auto v = it.second->variableCurves.find(_targetId);
+      if (v != it.second->variableCurves.end())
       {
         this->AddVariable(_id, _variable, it.second->id);
         break;
@@ -445,14 +459,15 @@ void PlotCanvas::OnMoveVariable(const unsigned int _id,
   for (auto it = this->dataPtr->plotData.begin();
       it != this->dataPtr->plotData.end(); ++it)
   {
-    auto v = it->second->variables.find(_id);
-    if (v != it->second->variables.end())
+    auto v = it->second->variableCurves.find(_id);
+    if (v != it->second->variableCurves.end())
     {
       plotIt = it;
       curveId = v->second;
     }
 
-    if (it->second->variables.find(_targetId) != it->second->variables.end())
+    if (it->second->variableCurves.find(_targetId) !=
+        it->second->variableCurves.end())
       targetPlotIt = it;
 
     if (plotIt != this->dataPtr->plotData.end() &&
@@ -470,13 +485,13 @@ void PlotCanvas::OnMoveVariable(const unsigned int _id,
     // detach variable from plot (qwt plot doesn't seem to do anything
     // apart from setting the plot item to null)
     PlotCurvePtr plotCurve = plotData->plot->DetachCurve(curveId);
-    plotData->variables.erase(plotData->variables.find(_id));
+    plotData->variableCurves.erase(plotData->variableCurves.find(_id));
 
     if (targetPlotIt != this->dataPtr->plotData.end())
     {
       // attach variable to target plot
       targetPlotIt->second->plot->AttachCurve(plotCurve);
-      targetPlotIt->second->variables[_id] = plotCurve->Id();
+      targetPlotIt->second->variableCurves[_id] = plotCurve->Id();
     }
     else
     {
@@ -488,14 +503,14 @@ void PlotCanvas::OnMoveVariable(const unsigned int _id,
       PlotData *newPlotData = it->second;
       // attach curve to plot
       newPlotData->plot->AttachCurve(plotCurve);
-      newPlotData->variables[_id] = plotCurve->Id();
+      newPlotData->variableCurves[_id] = plotCurve->Id();
 
       // hide initial empty plot
       if (!this->dataPtr->plotData.empty() && this->dataPtr->emptyPlot)
         this->dataPtr->emptyPlot->setVisible(false);
     }
     // delete plot if empty
-    if (plotData->variables.empty())
+    if (plotData->variableCurves.empty())
     {
       std::cerr << " delete plot as it's now empty " << std::endl;
       this->dataPtr->plotLayout->takeAt(
@@ -524,11 +539,114 @@ void PlotCanvas::OnMoveVariable(const unsigned int _id,
 }
 
 /////////////////////////////////////////////////
+void PlotCanvas::OnSetVariableLabel(const unsigned int _id,
+    const std::string &_label)
+{
+  // find plot which the variable belongs to
+  for (auto it = this->dataPtr->plotData.begin();
+      it != this->dataPtr->plotData.end(); ++it)
+  {
+    auto v = it->second->variableCurves.find(_id);
+    if (v != it->second->variableCurves.end())
+    {
+      it->second->plot->SetCurveLabel(v->second, _label);
+      break;
+    }
+  }
+}
+
+/////////////////////////////////////////////////
 void PlotCanvas::Update()
 {
   // Update all the plots
   for (auto p : this->dataPtr->plotData)
     p.second->plot->Update();
+}
+
+/////////////////////////////////////////////////
+void PlotCanvas::Restart()
+{
+  // tupple of original variable label, variable pointer, plot id to add
+  // variable to.
+  std::vector<std::tuple<std::string, VariablePill *, unsigned int>>
+      variableCurvesToClone;
+
+  // Restart all the plots
+  for (const auto &it : this->dataPtr->plotData)
+  {
+    for (const auto &v : it.second->variableCurves)
+    {
+      unsigned int variableId = v.first;
+      unsigned int curveId = v.second;
+
+      // get variable pill
+      VariablePill *variablePill =
+          this->dataPtr->yVariableContainer->GetVariablePill(variableId);
+
+      if (!variablePill)
+        continue;
+
+      PlotCurveWeakPtr curve = it.second->plot->Curve(curveId);
+      auto c = curve.lock();
+      if (!c)
+        continue;
+
+      if (c->Active())
+      {
+        c->SetActive(false);
+        // remove from manager so they don't get updated any more.
+        PlotManager::Instance()->RemoveCurve(c);
+
+        // add to the list of variables to clone
+        variableCurvesToClone.push_back(std::make_tuple(variablePill->Text(),
+            variablePill, it.second->id));
+      }
+      // increment curve age.
+      c->SetAge(c->Age()+1);
+
+      // update the label of variable pill to show the age of the curve
+      std::string varText = variablePill->Text();
+      std::stringstream ss;
+      if (c->Age() == 1u)
+      {
+        // update curve label and append curve age to the end
+        ss << varText << "_1";
+        this->SetVariableLabel(variableId, ss.str());
+      }
+      else
+      {
+        // if it's more than one simulation-run old, update the age suffix
+        size_t idx = varText.rfind("_");
+        if (idx != std::string::npos)
+        {
+          int age = std::atoi(varText.substr(idx+1).c_str());
+          if (age > 0)
+          {
+            ss << varText.substr(0, idx+1) << c->Age();
+            this->SetVariableLabel(variableId, ss.str());
+          }
+        }
+      }
+    }
+  }
+
+  // add new copy of variable pill with original label
+  for (const auto &v : variableCurvesToClone)
+  {
+    std::string varText;
+    VariablePill *varPill;
+    unsigned int plotId;
+    std::tie(varText, varPill, plotId) = v;
+
+    std::cerr << " cloning " << varPill->Name() << " " << varPill->Id()
+        << std::endl;
+    // add clones of the variable - this will also add it to the plot manager.
+    unsigned int id = this->AddVariable(varPill->Name(), varPill->Id());
+
+    // give it the original variable label
+    if (varText != varPill->Name())
+      this->SetVariableLabel(id, varText);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -541,29 +659,6 @@ bool PlotCanvas::eventFilter(QObject *_o, QEvent *_e)
   }
 
   return QWidget::eventFilter(_o, _e);
-}
-
-/////////////////////////////////////////////////
-void PlotCanvas::RestartPlots()
-{
-  for (auto p : this->dataPtr->plotData)
-  {
-    for (const auto v : p.second->variables)
-    {
-      std::string newName = "";
-
-      VariablePill *variable =
-          this->dataPtr->yVariableContainer->GetVariablePill(v.first);
-      if (!variable)
-      {
-        gzerr << "Unable to find variable pill with id: '" << v.first << "'."
-            << std::endl;
-        continue;
-      }
-      newName = variable->Text() + "-1";
-      p.second->plot->SetCurveLabel(v.second, newName);
-    }
-  }
 }
 
 /////////////////////////////////////////////////
@@ -583,7 +678,7 @@ unsigned int PlotCanvas::VariableCount(const unsigned int _plotId) const
   if (it == this->dataPtr->plotData.end())
     return 0u;
 
-  return it->second->variables.size();
+  return it->second->variableCurves.size();
 }
 
 /////////////////////////////////////////////////
@@ -591,10 +686,10 @@ PlotCurveWeakPtr PlotCanvas::PlotCurve(const unsigned int _variableId)
 {
   for (const auto it : this->dataPtr->plotData)
   {
-    const auto v = it.second->variables.find(_variableId);
-    if (v != it.second->variables.end())
+    const auto v = it.second->variableCurves.find(_variableId);
+    if (v != it.second->variableCurves.end())
     {
-      return it.second->plot->Curve(_variableId);
+      return it.second->plot->Curve(v->second);
     }
   }
   return PlotCurveWeakPtr();
@@ -629,7 +724,7 @@ void PlotCanvas::debug()
   for (auto it = this->dataPtr->plotData.begin();
       it != this->dataPtr->plotData.end(); ++it)
   {
-    for (auto &v : it->second->variables)
+    for (auto &v : it->second->variableCurves)
     {
       std::cerr << v.first << " : " << v.second << std::endl;
     }

@@ -50,6 +50,9 @@ namespace gazebo
 
       /// \brief Mutex to protect the canvas updates
       public: std::mutex mutex;
+
+      /// \brief Flag to indicate whether the plots should be restarted.
+      public: bool restart = false;
     };
   }
 }
@@ -170,6 +173,8 @@ PlotWindow::PlotWindow(QWidget *_parent)
   connect(displayTimer, SIGNAL(timeout()), this, SLOT(Update()));
   displayTimer->start(30);
 
+  PlotManager::Instance()->AddWindow(this);
+
   //=================
   // TODO for testing - remove later
   QListWidgetItem *itema = new QListWidgetItem("Dog");
@@ -181,6 +186,9 @@ PlotWindow::PlotWindow(QWidget *_parent)
   QListWidgetItem *itemc = new QListWidgetItem("Turtle");
   itemc->setToolTip(tr("Drag onto graph to plot"));
   this->dataPtr->labelList->addItem(itemc);
+  QListWidgetItem *simTimeItem = new QListWidgetItem("sim_time");
+  itemc->setToolTip(tr("Drag onto graph to plot"));
+  this->dataPtr->labelList->addItem(simTimeItem);
   //=================
 }
 
@@ -188,6 +196,7 @@ PlotWindow::PlotWindow(QWidget *_parent)
 PlotWindow::~PlotWindow()
 {
   this->dataPtr->paused = true;
+  PlotManager::Instance()->RemoveWindow(this);
   this->Clear();
 }
 
@@ -268,10 +277,23 @@ void PlotWindow::OnRemoveCanvas()
 /////////////////////////////////////////////////
 void PlotWindow::Update()
 {
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  if (this->dataPtr->restart)
+  {
+    for (int i = 0; i < this->dataPtr->canvasLayout->count(); ++i)
+    {
+      QLayoutItem *item = this->dataPtr->canvasLayout->itemAt(i);
+      PlotCanvas *canvas = qobject_cast<PlotCanvas *>(item->widget());
+      if (!canvas)
+        continue;
+      canvas->Restart();
+    }
+    this->dataPtr->restart = false;
+  }
+
   if (this->dataPtr->paused)
     return;
 
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
   for (int i = 0; i < this->dataPtr->canvasLayout->count(); ++i)
   {
     QLayoutItem *item = this->dataPtr->canvasLayout->itemAt(i);
@@ -280,6 +302,13 @@ void PlotWindow::Update()
       continue;
     canvas->Update();
   }
+}
+
+/////////////////////////////////////////////////
+void PlotWindow::Restart()
+{
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  this->dataPtr->restart = true;
 }
 
 /////////////////////////////////////////////////

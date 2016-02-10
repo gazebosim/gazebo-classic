@@ -152,7 +152,10 @@ PlotCurveWeakPtr IncrementalPlot::Curve(const unsigned int _id) const
   if (it != this->dataPtr->curves.end())
     return it->second;
   else
+  {
+    std::cerr << "Curve with id " << _id << " not found " << std::endl;
     return PlotCurveWeakPtr();
+  }
 }
 
 /////////////////////////////////////////////////

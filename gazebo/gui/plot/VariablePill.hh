@@ -53,6 +53,14 @@ namespace gazebo
       /// \return Unique id;
       public: unsigned int Id() const;
 
+      /// \brief Set a unique name for this variable
+      /// \return Number of child variable pills.
+      public: void SetName(const std::string &_name);
+
+      /// \brief Set a unique name for this variable
+      /// \return Number of child variable pills.
+      public: std::string Name() const;
+
       /// \brief Set the text label for this variable pill.
       /// \param[in] _text Text to set the label to.
       public: void SetText(const std::string &_text);
@@ -140,6 +148,10 @@ namespace gazebo
       /// as a child of this variable pill
       /// \param[in] Unique id of the existing variable pill that is added.
       Q_SIGNALS: void VariableMoved(const unsigned int _id);
+
+      /// \brief Qt signal emitted when the variable pill's text has changed
+      /// \param[in] _label New variable label.
+      Q_SIGNALS: void VariableLabelChanged(const std::string &_label);
 
      /// \brief Empty variable id used to indicate non-existent variable.
       public: static unsigned int EMPTY_VARIABLE;
