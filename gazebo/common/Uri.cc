@@ -30,6 +30,26 @@ namespace gazebo
   {
     /// \internal
     /// \brief UriEntityPart private data.
+    class UriEntityPrivate
+    {
+      /// \brief ToDo.
+      public: std::string type;
+
+      /// \brief ToDo.
+      public: std::string name;
+    };
+
+    /// \internal
+    /// \brief UriNestedEntityPart private data.
+    class UriNestedEntityPrivate
+    {
+      /// \brief ToDo.
+      public: std::vector<UriEntity> entities;
+    };
+
+    /*
+    /// \internal
+    /// \brief UriEntityPart private data.
     class UriEntityPartPrivate
     {
       /// \brief ToDo.
@@ -41,6 +61,7 @@ namespace gazebo
       /// \brief ToDo.
       public: std::shared_ptr<UriEntityPart> children = nullptr;
     };
+    */
 
     /// \internal
     /// \brief UriParts private data.
@@ -50,13 +71,140 @@ namespace gazebo
       public: std::string world;
 
       /// \brief ToDo.
-      public: UriEntityPart entity;
+      public: UriNestedEntity entity;
 
       /// \brief ToDo.
       public: std::vector<std::string> parameters;
     };
   }
 }
+
+//////////////////////////////////////////////////
+UriEntity::UriEntity()
+  : dataPtr(new UriEntityPrivate())
+{
+}
+
+//////////////////////////////////////////////////
+UriEntity::UriEntity(const UriEntity &_entity)
+  : UriEntity()
+{
+  *this = _entity;
+}
+
+//////////////////////////////////////////////////
+UriEntity::~UriEntity()
+{
+}
+
+//////////////////////////////////////////////////
+std::string UriEntity::Type() const
+{
+  return this->dataPtr->type;
+}
+
+//////////////////////////////////////////////////
+std::string UriEntity::Name() const
+{
+  return this->dataPtr->name;
+}
+
+//////////////////////////////////////////////////
+void UriEntity::SetType(const std::string &_type)
+{
+  this->dataPtr->type = _type;
+}
+
+//////////////////////////////////////////////////
+void UriEntity::SetName(const std::string &_name)
+{
+  this->dataPtr->name = _name;
+}
+
+//////////////////////////////////////////////////
+UriEntity &UriEntity::operator=(const UriEntity &_p)
+{
+  this->SetType(_p.Type());
+  this->SetName(_p.Name());
+
+  return *this;
+}
+
+//////////////////////////////////////////////////
+UriNestedEntity::UriNestedEntity()
+  : dataPtr(new UriNestedEntityPrivate())
+{
+}
+
+//////////////////////////////////////////////////
+UriNestedEntity::~UriNestedEntity()
+{
+}
+
+//////////////////////////////////////////////////
+bool UriNestedEntity::Parent(UriEntity &_entity) const
+{
+  if (this->dataPtr->entities.empty())
+    return false;
+
+  _entity = this->dataPtr->entities.front();
+  return true;
+}
+
+//////////////////////////////////////////////////
+bool UriNestedEntity::Leaf(UriEntity &_entity) const
+{
+  if (this->dataPtr->entities.empty())
+    return false;
+
+  _entity = this->dataPtr->entities.back();
+  return true;
+}
+
+//////////////////////////////////////////////////
+bool UriNestedEntity::Entity(const unsigned int &_index,
+                             UriEntity &_entity) const
+{
+  if (_index > this->dataPtr->entities.size() - 1)
+    return false;
+
+  _entity = this->dataPtr->entities.at(_index);
+  return true;
+}
+
+//////////////////////////////////////////////////
+unsigned int UriNestedEntity::EntityCount() const
+{
+  return this->dataPtr->entities.size();
+}
+
+//////////////////////////////////////////////////
+void UriNestedEntity::AddEntity(const UriEntity &_entity)
+{
+  this->dataPtr->entities.push_back(_entity);
+}
+
+//////////////////////////////////////////////////
+void UriNestedEntity::Clear()
+{
+  this->dataPtr->entities.clear();
+}
+
+//////////////////////////////////////////////////
+UriNestedEntity &UriNestedEntity::operator=(const UriNestedEntity &_p)
+{
+  this->dataPtr->entities.clear();
+  for (auto i = 0u; i < _p.EntityCount(); ++i)
+  {
+    UriEntity entity;
+    _p.Entity(i, entity);
+    this->AddEntity(entity);
+  }
+
+  return *this;
+}
+
+/*
 
 //////////////////////////////////////////////////
 UriEntityPart::UriEntityPart()
@@ -129,6 +277,7 @@ UriEntityPart &UriEntityPart::operator=(const UriEntityPart &_p)
 
   return *this;
 }
+*/
 
 //////////////////////////////////////////////////
 UriParts::UriParts()
@@ -148,7 +297,7 @@ std::string UriParts::World() const
 }
 
 //////////////////////////////////////////////////
-UriEntityPart &UriParts::Entity() const
+UriNestedEntity &UriParts::Entity() const
 {
   return this->dataPtr->entity;
 }
@@ -166,7 +315,7 @@ void UriParts::SetWorld(const std::string &_world)
 }
 
 //////////////////////////////////////////////////
-void UriParts::SetEntity(const UriEntityPart &_entity)
+void UriParts::SetEntity(const UriNestedEntity &_entity)
 {
   this->dataPtr->entity = _entity;
 }
@@ -187,6 +336,7 @@ UriParts &UriParts::operator=(const UriParts &_p)
   return *this;
 }
 
+
 //////////////////////////////////////////////////
 Uri::~Uri()
 {
@@ -197,7 +347,7 @@ bool Uri::Parse(const std::string &_uri, UriParts &_parts)
 {
   std::string world;
   size_t next;
-  UriEntityPart entity;
+  UriNestedEntity entity;
 
   std::cout << "About to parse world" << std::endl;
 
@@ -243,16 +393,19 @@ bool Uri::ParseWorld(const std::string &_uri, std::string &_world,
 
 //////////////////////////////////////////////////
 bool Uri::ParseEntity(const std::string &_uri, const size_t &_from,
-    UriEntityPart &_entity)
+    UriNestedEntity &_entity)
 {
   size_t from = _from;
   size_t next;
-  UriEntityPart *entity = &_entity;
+  _entity.Clear();
 
   while (true)
   {
-    if (!ParseOneEntity(_uri, from, *entity, next))
+    UriEntity entity;
+    if (!ParseOneEntity(_uri, from, entity, next))
       return false;
+
+    _entity.AddEntity(entity);
 
     if (next == _uri.size())
     {
@@ -261,15 +414,10 @@ bool Uri::ParseEntity(const std::string &_uri, const size_t &_from,
     }
 
     std::cout << "Good pair!" << std::endl;
-    std::cout << "  Type: [" << entity->Type() << "]" << std::endl;
-    std::cout << "  Name: [" << entity->Name() << "]" << std::endl;
+    std::cout << "  Type: [" << entity.Type() << "]" << std::endl;
+    std::cout << "  Name: [" << entity.Name() << "]" << std::endl;
 
     from = next;
-    entity->Children().reset(new UriEntityPart());
-    if (!entity->Children())
-      std::cerr << "entity is NULL" << std::endl;
-    entity = entity->Children().get();
-
   }
 
   return true;
@@ -277,7 +425,7 @@ bool Uri::ParseEntity(const std::string &_uri, const size_t &_from,
 
 //////////////////////////////////////////////////
 bool Uri::ParseOneEntity(const std::string &_uri, const size_t &_from,
-    UriEntityPart &_entity, size_t &_next)
+    UriEntity &_entity, size_t &_next)
 {
   std::cout << "ParseOneEntity()" << std::endl;
   std::cout << "  uri: " << _uri.substr(_from) << std::endl;

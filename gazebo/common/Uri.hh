@@ -31,9 +31,118 @@ namespace gazebo
     /// \{
 
     // Forward declare private data classes.
-    class UriEntityPartPrivate;
+    class UriEntityPrivate;
+    class UriNestedEntityPrivate;
+    //class UriEntityPartPrivate;
     class UriPartsPrivate;
 
+    /// \brief ToDo.
+    class GZ_COMMON_VISIBLE UriEntity
+    {
+      /// \brief ToDo.
+      public: UriEntity();
+
+      /// \brief ToDo.
+      public: UriEntity(const UriEntity &_entity);
+
+      /// \brief ToDo.
+      public: virtual ~UriEntity();
+
+      /// \brief ToDo.
+      public: std::string Type() const;
+
+      /// \brief ToDo.
+      public: std::string Name() const;
+
+      /// \brief ToDo.
+      public: void SetType(const std::string &_type);
+
+      /// \brief ToDo.
+      public: void SetName(const std::string &_name);
+
+      /// \brief Equal operator.
+      /// \param _p another UriEntity.
+      /// \return itself.
+      public: UriEntity &operator=(const UriEntity &_p);
+
+      /// \brief ToDo.
+      private: std::unique_ptr<UriEntityPrivate> dataPtr;
+    };
+
+    /// \brief ToDo.
+    class GZ_COMMON_VISIBLE UriNestedEntity
+    {
+      /// \brief ToDo.
+      public: UriNestedEntity();
+
+      /// \brief ToDo.
+      public: virtual ~UriNestedEntity();
+
+      /// \brief ToDo.
+      public: unsigned int EntityCount() const;
+
+      /// \brief ToDo.
+      public: bool Parent(UriEntity &_entity) const;
+
+      /// \brief ToDo.
+      public: bool Leaf(UriEntity &_entity) const;
+
+      /// \brief ToDo.
+      public: bool Entity(const unsigned int &_index,
+                          UriEntity &_entity) const;
+
+      /// \brief ToDo.
+      public: void AddEntity(const UriEntity &_entity);
+
+      /// \brief ToDo.
+      public: void Clear();
+
+      /// \brief Equal operator.
+      /// \param _p another UriNestedEntity.
+      /// \return itself.
+      public: UriNestedEntity &operator=(const UriNestedEntity &_p);
+
+      /// \brief ToDo.
+      private: std::unique_ptr<UriNestedEntityPrivate> dataPtr;
+    };
+
+    /// \brief ToDo.
+    class GZ_COMMON_VISIBLE UriParts
+    {
+      /// \brief ToDo.
+      public: UriParts();
+
+      /// \brief ToDo.
+      public: virtual ~UriParts();
+
+      /// \brief ToDo.
+      public: std::string World() const;
+
+      /// \brief ToDo.
+      public: UriNestedEntity &Entity() const;
+
+      /// \brief ToDo.
+      public: std::vector<std::string> &Parameters() const;
+
+      /// \brief ToDo.
+      public: void SetWorld(const std::string &_world);
+
+      /// \brief ToDo.
+      public: void SetEntity(const UriNestedEntity &_entity);
+
+      /// \brief ToDo.
+      public: void SetParameters(const std::vector<std::string> &_params);
+
+      /// \brief Equal operator.
+      /// \param _p another UriParts.
+      /// \return itself.
+      public: UriParts &operator=(const UriParts &_p);
+
+      /// \brief ToDo.
+      private: std::unique_ptr<UriPartsPrivate> dataPtr;
+    };
+
+    /*
     /// \brief ToDo.
     class GZ_COMMON_VISIBLE UriEntityPart
     {
@@ -105,6 +214,7 @@ namespace gazebo
       /// \brief ToDo.
       private: std::unique_ptr<UriPartsPrivate> dataPtr;
     };
+    */
 
     /// \class Uri Uri.hh common/common.hh
     /// \brief Defines a Gazebo URI.
@@ -126,16 +236,16 @@ namespace gazebo
 
       private: static bool ParseEntity(const std::string &_uri,
                                        const size_t &_from,
-                                       UriEntityPart &_entity);
+                                       UriNestedEntity &_entity);
 
       private: static bool ParseOneEntity(const std::string &_uri,
                                           const size_t &_from,
-                                          UriEntityPart &_entity,
+                                          UriEntity &_entity,
                                           size_t &_next);
 
-      private: static void ShowEntityPart(const UriEntityPart &_part);
+      //private: static void ShowEntityPart(const UriEntityPart &_part);
 
-      private: std::set<std::string> kAllowedEntities = {"model, light"};
+      //private: std::set<std::string> kAllowedEntities = {"model, light"};
 
       private: UriParts parts;
     };
