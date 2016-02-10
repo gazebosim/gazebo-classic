@@ -87,18 +87,20 @@ VariablePill::VariablePill(QWidget *_parent)
   : QWidget(_parent),
     dataPtr(new VariablePillPrivate)
 {
-  this->dataPtr->id = VariablePillPrivate::globalVariableId++;
+  this->dataPtr->id = VariablePillPrivate::globalVariableId;
 
   // generate default unique name
   std::stringstream nameStream;
   nameStream << "variable" << this->dataPtr->id << std::endl;
   this->dataPtr->name = nameStream.str();
 
+  VariablePillPrivate::globalVariableId++;
+
   // label
   this->dataPtr->label = new QLabel;
   QHBoxLayout *labelLayout = new QHBoxLayout;
   labelLayout->addWidget(this->dataPtr->label);
-  labelLayout->setContentsMargins(2, 2, 2, 2);
+  labelLayout->setContentsMargins(8, 2, 8, 2);
   this->dataPtr->labelFrame = new QFrame;
   this->dataPtr->labelFrame->setObjectName("VariableLabelFrame");
   this->dataPtr->labelFrame->setLayout(labelLayout);
@@ -111,7 +113,7 @@ VariablePill::VariablePill(QWidget *_parent)
   this->dataPtr->multiLayout->setAlignment(Qt::AlignLeft);
   this->dataPtr->multiLayout->setContentsMargins(0, 0, 0, 0);
   this->dataPtr->multiLabel = new QLabel;
-  this->dataPtr->multiLabel->setText(QString("Variables:"));
+  this->dataPtr->multiLabel->setText(QString(" Variables:"));
   this->dataPtr->multiLabel->setVisible(false);
   this->dataPtr->multiLayout->addWidget(this->dataPtr->multiLabel);
 
@@ -128,7 +130,7 @@ VariablePill::VariablePill(QWidget *_parent)
 
   QFrame *mainFrame = new QFrame(this);
   mainFrame->setLayout(this->dataPtr->multiLayout);
-  mainFrame->setStyleSheet("background-color: #1965b0; border-radius: 4px");
+  mainFrame->setStyleSheet("background-color: #1965b0; border-radius: 10px");
 
   mainLayout->addWidget(mainFrame);
   this->setLayout(mainLayout);
@@ -159,7 +161,6 @@ std::string VariablePill::Name() const
 {
   return this->dataPtr->name;
 }
-
 
 /////////////////////////////////////////////////
 void VariablePill::SetText(const std::string &_text)
@@ -536,7 +537,7 @@ void VariablePill::SetSelected(const bool _selected)
         "background-color: #5289c7; border: 0px;");
   }
   this->dataPtr->label->setStyleSheet(
-      "QLabel {background-color: #5289c7; border: 0px;}");
+      "QLabel {background-color: #5289c7; border: 0px; border-radius: 6px}");
 }
 
 /////////////////////////////////////////////////

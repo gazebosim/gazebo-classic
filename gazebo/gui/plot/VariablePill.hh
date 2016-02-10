@@ -144,18 +144,18 @@ namespace gazebo
       private: bool IsDragValid(QDropEvent *_evt);
 
       /// \brief Qt signal emitted when a child variable pill is added
-      /// \param[in] Unique id of the child variable pill.
-      /// \param[in] Name of variable pill added.
+      /// \param[in] _id Unique id of the child variable pill.
+      /// \param[in] _name Name of variable pill added.
       Q_SIGNALS: void VariableAdded(const unsigned int _id,
           const std::string &_name);
 
       /// \brief Qt signal emitted when a child variable pill is removed.
-      /// \param[in] Name of child variable pill removed.
+      /// \param[in] _id Name of child variable pill removed.
       Q_SIGNALS: void VariableRemoved(const unsigned int _id);
 
       /// \brief Qt signal emitted when an existing variable pill is added
       /// as a child of this variable pill
-      /// \param[in] Unique id of the existing variable pill that is added.
+      /// \param[in] _id Unique id of the existing variable pill that is added.
       Q_SIGNALS: void VariableMoved(const unsigned int _id);
 
      /// \brief Empty variable id used to indicate non-existent variable.
