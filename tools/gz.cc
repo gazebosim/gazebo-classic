@@ -328,7 +328,6 @@ bool PhysicsCommand::RunImpl()
   if (this->vm.count("world-name"))
     worldName = this->vm["world-name"].as<std::string>();
 
-
   transport::NodePtr node(new transport::Node());
   node->Init(worldName);
 
