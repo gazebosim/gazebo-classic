@@ -30,22 +30,80 @@ namespace gazebo
     /// \addtogroup gazebo_common Common
     /// \{
 
-    struct GZ_COMMON_VISIBLE UriEntityPart
+    // Forward declare private data classes.
+    class UriEntityPartPrivate;
+    class UriPartsPrivate;
+
+    /// \brief ToDo.
+    class GZ_COMMON_VISIBLE UriEntityPart
     {
-      std::string type;
+      /// \brief ToDo.
+      public: UriEntityPart();
 
-      std::string name;
+      /// \brief ToDo.
+      public: virtual ~UriEntityPart();
 
-      std::shared_ptr<UriEntityPart> children = nullptr;
+      /// \brief ToDo.
+      public: std::string Type() const;
+
+      /// \brief ToDo.
+      public: std::string Name() const;
+
+      /// \brief ToDo.
+      public: std::shared_ptr<UriEntityPart> Children() const;
+
+      /// \brief ToDo.
+      public: void SetType(const std::string &_type);
+
+      /// \brief ToDo.
+      public: void SetName(const std::string &_name);
+
+      /// \brief ToDo.
+      public: void SetChildren(const std::shared_ptr<UriEntityPart> &_children);
+
+      /// \brief Equal operator.
+      /// \param _p another UriEntityPart.
+      /// \return itself.
+      public: UriEntityPart &operator=(const UriEntityPart &_p);
+
+      /// \brief ToDo.
+      private: std::unique_ptr<UriEntityPartPrivate> dataPtr;
     };
 
-    struct GZ_COMMON_VISIBLE UriParts
+    /// \brief ToDo.
+    class GZ_COMMON_VISIBLE UriParts
     {
-      std::string world;
+      /// \brief ToDo.
+      public: UriParts();
 
-      UriEntityPart entity;
+      /// \brief ToDo.
+      public: virtual ~UriParts();
 
-      std::vector<std::string> parameters;
+      /// \brief ToDo.
+      public: std::string World() const;
+
+      /// \brief ToDo.
+      public: UriEntityPart &Entity() const;
+
+      /// \brief ToDo.
+      public: std::vector<std::string> &Parameters() const;
+
+      /// \brief ToDo.
+      public: void SetWorld(const std::string &_world);
+
+      /// \brief ToDo.
+      public: void SetEntity(const UriEntityPart &_entity);
+
+      /// \brief ToDo.
+      public: void SetParameters(const std::vector<std::string> &_params);
+
+      /// \brief Equal operator.
+      /// \param _p another UriParts.
+      /// \return itself.
+      public: UriParts &operator=(const UriParts &_p);
+
+      /// \brief ToDo.
+      private: std::unique_ptr<UriPartsPrivate> dataPtr;
     };
 
     /// \class Uri Uri.hh common/common.hh
