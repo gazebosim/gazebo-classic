@@ -37,8 +37,6 @@ TopicCommand::TopicCommand()
 {
   // Options that are visible to the user through help.
   this->visibleOptions.add_options()
-    ("verbose", "Print more information "
-     "Applicable for all commands")
     ("world-name,w", po::value<std::string>(), "World name.")
     ("list,l", "List all topics.")
     ("info,i", po::value<std::string>(), "Get information about a topic.")
@@ -72,10 +70,6 @@ bool TopicCommand::RunImpl()
 
   this->node.reset(new transport::Node());
   this->node->Init(worldName);
-
-  if (this->vm.count("verbose")) {
-    gazebo::common::Console::SetQuiet(false);
-  }
 
   if (this->vm.count("list"))
     this->List();

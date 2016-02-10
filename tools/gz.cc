@@ -45,6 +45,7 @@ Command::Command(const std::string &_name, const std::string &_brief)
   : name(_name), brief(_brief), visibleOptions("Options"), argc(0), argv(NULL)
 {
   this->visibleOptions.add_options()
+    ("verbose", "Print extra information")
     ("help,h", "Print this help message");
 }
 
@@ -187,6 +188,10 @@ bool Command::Run(int _argc, char **_argv)
     return true;
   }
 
+  if (this->vm.count("verbose")) {
+    gazebo::common::Console::SetQuiet(false);
+  }
+
   if (!this->TransportInit())
   {
     std::cerr << "An instance of Gazebo is not running.\n";
@@ -209,8 +214,6 @@ WorldCommand::WorldCommand()
     ("world-name,w", po::value<std::string>(), "World name.")
     ("pause,p", po::value<bool>(), "Pause/unpause simulation. "
      "0=unpause, 1=pause.")
-    ("verbose", "Print more information "
-     "Applicable for all commands")
     ("step,s", "Step simulation one iteration.")
     ("multi-step,m", po::value<uint32_t>(),
      "Step simulation mulitple iteration.")
@@ -236,10 +239,6 @@ bool WorldCommand::RunImpl()
 
   if (this->vm.count("world-name"))
     worldName = this->vm["world-name"].as<std::string>();
-
-  if (this->vm.count("verbose")) {
-    gazebo::common::Console::SetQuiet(false);
-  }
 
   transport::NodePtr node(new transport::Node());
   node->Init(worldName);
@@ -301,8 +300,6 @@ PhysicsCommand::PhysicsCommand()
 {
   // Options that are visible to the user through help.
   this->visibleOptions.add_options()
-    ("verbose", "Print more information "
-     "Applicable for all commands")
     ("world-name,w", po::value<std::string>(), "World name.")
     ("gravity,g", po::value<std::string>(),
      "Gravity vector. Comma separated 3-tuple without whitespace, "
@@ -331,9 +328,6 @@ bool PhysicsCommand::RunImpl()
   if (this->vm.count("world-name"))
     worldName = this->vm["world-name"].as<std::string>();
 
-  if (this->vm.count("verbose")) {
-    gazebo::common::Console::SetQuiet(false);
-  }
 
   transport::NodePtr node(new transport::Node());
   node->Init(worldName);
@@ -397,8 +391,6 @@ ModelCommand::ModelCommand()
 {
   // Options that are visible to the user through help.
   this->visibleOptions.add_options()
-    ("verbose", "Print more information "
-     "Applicable for all commands")
     ("model-name,m", po::value<std::string>(), "Model name.")
     ("world-name,w", po::value<std::string>(), "World name.")
     ("delete,d", "Delete a model.")
@@ -442,10 +434,6 @@ bool ModelCommand::RunImpl()
       << "(-m <model_name> command line argument)\n";
     std::cerr << "For more information: gz help model.\n";
     return false;
-  }
-
-  if (this->vm.count("verbose")) {
-    gazebo::common::Console::SetQuiet(false);
   }
 
   math::Pose pose;
@@ -599,8 +587,6 @@ JointCommand::JointCommand()
 {
   // Options that are visible to the user through help.
   this->visibleOptions.add_options()
-    ("verbose", "Print more information "
-     "Applicable for all commands")
     ("world-name,w", po::value<std::string>(), "World name.")
     ("model-name,m", po::value<std::string>(), "Model name.")
     ("joint-name,j", po::value<std::string>(), "Joint name.")
@@ -643,10 +629,6 @@ bool JointCommand::RunImpl()
       << "(-m <model_name> command line argument)\n";
     std::cerr << "For more information: gz help joint.\n";
     return false;
-  }
-
-  if (this->vm.count("verbose")) {
-    gazebo::common::Console::SetQuiet(false);
   }
 
   if (this->vm.count("joint-name"))
@@ -713,8 +695,6 @@ CameraCommand::CameraCommand()
 {
   // Options that are visible to the user through help.
   this->visibleOptions.add_options()
-    ("verbose", "Print more information "
-     "Applicable for all commands")
     ("world-name,w", po::value<std::string>(), "World name.")
     ("camera-name,c", po::value<std::string>(),
      "Camera name. Use gz camera -l to get a list of camera names.")
@@ -740,10 +720,6 @@ bool CameraCommand::RunImpl()
 
   if (this->vm.count("world-name"))
     worldName = this->vm["world-name"].as<std::string>();
-
-  if (this->vm.count("verbose")) {
-    gazebo::common::Console::SetQuiet(false);
-  }
 
   if (this->vm.count("list"))
   {
@@ -839,8 +815,6 @@ StatsCommand::StatsCommand()
 {
   // Options that are visible to the user through help.
   this->visibleOptions.add_options()
-    ("verbose", "Print more information "
-     "Applicable for all commands")
     ("world-name,w", po::value<std::string>(), "World name.")
     ("duration,d", po::value<double>(), "Duration (seconds) to run.")
     ("plot,p", "Output comma-separated values, useful for processing and "
@@ -867,10 +841,6 @@ bool StatsCommand::RunImpl()
 
   transport::NodePtr node(new transport::Node());
   node->Init(worldName);
-
-  if (this->vm.count("verbose")) {
-    gazebo::common::Console::SetQuiet(false);
-  }
 
   transport::SubscriberPtr sub =
     node->Subscribe("~/world_stats", &StatsCommand::CB, this);
@@ -957,8 +927,6 @@ SDFCommand::SDFCommand()
 {
   // Options that are visible to the user through help.
   this->visibleOptions.add_options()
-    ("verbose", "Print more information "
-     "Applicable for all commands")
     ("describe,d", "Print SDF format for given version(-v).")
     ("convert,c", po::value<std::string>(),
      "In place conversion of arg to the latest SDF version.")
@@ -1003,10 +971,6 @@ bool SDFCommand::RunImpl()
   }
 
   sdf::SDFPtr sdf(new sdf::SDF());
-
-  if (this->vm.count("verbose")) {
-    gazebo::common::Console::SetQuiet(false);
-  }
 
   if (this->vm.count("version"))
   {
