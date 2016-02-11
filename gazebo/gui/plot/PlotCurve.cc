@@ -150,6 +150,7 @@ PlotCurve::PlotCurve(const std::string &_label)
   : dataPtr(new PlotCurvePrivate())
 {
   QwtPlotCurve *curve = new QwtPlotCurve(QString::fromStdString(_label));
+  this->dataPtr->curve = curve;
 
   curve->setStyle(QwtPlotCurve::Lines);
   curve->setData(new CurveData());
@@ -174,8 +175,6 @@ PlotCurve::PlotCurve(const std::string &_label)
   curve->setSymbol(new QwtSymbol(QwtSymbol::Ellipse,
         Qt::NoBrush, QPen(penColor), QSize(2, 2)));
 
-  this->dataPtr->curve = curve;
-
   this->dataPtr->curveData =
       static_cast<CurveData *>(this->dataPtr->curve->data());
   GZ_ASSERT(this->dataPtr->curveData != NULL, "Curve data is NULL");
@@ -188,8 +187,6 @@ PlotCurve::PlotCurve(const std::string &_label)
 /////////////////////////////////////////////////
 PlotCurve::~PlotCurve()
 {
-  this->dataPtr->curve->detach();
-  delete this->dataPtr->curve;
 }
 
 /////////////////////////////////////////////////
@@ -238,13 +235,6 @@ void PlotCurve::SetLabel(const std::string &_label)
 {
   this->dataPtr->label = _label;
   this->dataPtr->curve->setTitle(QString::fromStdString(_label));
-/*  IncrementalPlot *plot =
-    dynamic_cast<IncrementalPlot *>(this->dataPtr->curve->plot());
-  if (plot)
-  {
-    this->Detach();
-    this->Attach(plot);
-  }*/
 }
 
 /////////////////////////////////////////////////

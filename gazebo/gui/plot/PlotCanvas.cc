@@ -15,6 +15,7 @@
  *
 */
 
+#include <tuple>
 #include <map>
 #include <set>
 
@@ -197,51 +198,46 @@ void PlotCanvas::SetVariableLabel(const unsigned int _id,
 
 /////////////////////////////////////////////////
 unsigned int PlotCanvas::AddVariable(const std::string &_variable,
-    const unsigned int _targetId)
+    const unsigned int _plotId)
 {
+  unsigned int targetId = VariablePill::EMPTY_VARIABLE;
+  if (_plotId != EMPTY_PLOT)
+  {
+    // find a variable that belongs to the specified plotId and make that the
+    // the target variable that the new variable will be added to
+    auto it = this->dataPtr->plotData.find(_plotId);
+    if (it != this->dataPtr->plotData.end() &&
+        !it->second->variableCurves.empty())
+    {
+      targetId = it->second->variableCurves.begin()->first;
+    }
+  }
+
   // add to container and let the signals/slots do the work on adding the
   // a new plot with the curve in the overloaded AddVariable function
   return this->dataPtr->yVariableContainer->AddVariablePill(_variable,
-      _targetId);
+      targetId);
 }
 
 /////////////////////////////////////////////////
 void PlotCanvas::AddVariable(const unsigned int _id,
     const std::string &_variable, const unsigned int _plotId)
 {
-  // add variable to existing plot
-  auto it = this->dataPtr->plotData.find(_plotId);
-  if (it != this->dataPtr->plotData.end())
+  unsigned int plotId;
+  if (_plotId == EMPTY_PLOT)
   {
-    PlotData *plotData = it->second;
-    PlotCurveWeakPtr curve = plotData->plot->AddCurve(_variable);
-    auto c = curve.lock();
-    plotData->variableCurves[_id] = c->Id();
+    // create new plot for the variable and add plot to canvas
+    plotId = this->AddPlot();
   }
   else
-  {
-    return;
-  }
+    plotId = _plotId;
 
-  // hide initial empty plot
-  if (!this->dataPtr->plotData.empty() && this->dataPtr->emptyPlot)
-    this->dataPtr->emptyPlot->setVisible(false);
-
-  // TODO remove me later
-  this->debug();
-}
-
-/////////////////////////////////////////////////
-void PlotCanvas::AddVariable(const unsigned int _id,
-    const std::string &_variable)
-{
-  // create new plot for the variable and add plot to canvas
-  unsigned int plotId = this->AddPlot();
+  // add variable to existing plot
   auto it = this->dataPtr->plotData.find(plotId);
-  GZ_ASSERT(it != this->dataPtr->plotData.end(), "Failed to add new plot");
+  if (it == this->dataPtr->plotData.end())
+    return;
 
   PlotData *plotData = it->second;
-  // add new curve
   PlotCurveWeakPtr curve = plotData->plot->AddCurve(_variable);
   auto c = curve.lock();
   plotData->variableCurves[_id] = c->Id();
@@ -251,6 +247,9 @@ void PlotCanvas::AddVariable(const unsigned int _id,
     this->dataPtr->emptyPlot->setVisible(false);
 
   PlotManager::Instance()->AddCurve(_variable, curve);
+
+  // TODO remove me later
+  this->debug();
 }
 
 /////////////////////////////////////////////////
@@ -569,7 +568,7 @@ void PlotCanvas::Restart()
   // tupple of original variable label, variable pointer, plot id to add
   // variable to.
   std::vector<std::tuple<std::string, VariablePill *, unsigned int>>
-      variableCurvesToClone;
+    variableCurvesToClone;
 
   // Restart all the plots
   for (const auto &it : this->dataPtr->plotData)
@@ -599,7 +598,7 @@ void PlotCanvas::Restart()
 
         // add to the list of variables to clone
         variableCurvesToClone.push_back(std::make_tuple(variablePill->Text(),
-            variablePill, it.second->id));
+            variablePill, it.first));
       }
       // increment curve age.
       c->SetAge(c->Age()+1);
@@ -638,10 +637,8 @@ void PlotCanvas::Restart()
     unsigned int plotId;
     std::tie(varText, varPill, plotId) = v;
 
-    std::cerr << " cloning " << varPill->Name() << " " << varPill->Id()
-        << std::endl;
     // add clones of the variable - this will also add it to the plot manager.
-    unsigned int id = this->AddVariable(varPill->Name(), varPill->Id());
+    unsigned int id = this->AddVariable(varPill->Name(), plotId);
 
     // give it the original variable label
     if (varText != varPill->Name())

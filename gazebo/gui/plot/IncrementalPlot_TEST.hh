@@ -15,23 +15,26 @@
  *
 */
 
-#ifndef _GAZEBO_PLOT_CANVAS_TEST_HH_
-#define _GAZEBO_PLOT_CANVAS_TEST_HH_
+#ifndef _GAZEBO_INCREMENTAL_PLOT_HH_
+#define _GAZEBO_INCREMENTAL_PLOT_HH_
 
 #include "gazebo/gui/QTestFixture.hh"
 
-/// \brief A test class for the PlotCanvas widget.
-class PlotCanvas_TEST : public QTestFixture
+/// \brief A test class for the IncrementalPlot widget.
+class IncrementalPlot_TEST : public QTestFixture
 {
   Q_OBJECT
 
-  /// \brief Test adding and removing plots
-  private slots: void AddRemovePlot();
+  /// \brief Test adding and removing plot curves
+  private slots: void AddRemoveCurve();
 
-  /// \brief Test adding and removing variables
-  private slots: void AddRemoveVariable();
+  /// \brief Test detaching and attaching curves
+  private slots: void AttachDetachCurve();
 
-  /// \brief Test changing variable label
-  private slots: void VariableLabel();
+  /// \brief Test adding points to curves in the plot.
+  private slots: void AddPoint();
+
+  /// \brief Test changing the curve label.
+  private slots: void SetCurveLabel();
 };
 #endif

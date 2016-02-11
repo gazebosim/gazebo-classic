@@ -57,11 +57,10 @@ namespace gazebo
 
       /// \brief Add a new variable to a plot.
       /// \param[in] _variable Name of the variable.
-      /// \param[in] _targetId Unique id of the target variable that the
-      /// the variable will be added to.
+      /// \param[in] _plotId Unique id of the plot to add the variable to.
       /// \return Unique id of the variable
       public: unsigned int AddVariable(const std::string &_variable,
-          const unsigned int _targetId = VariablePill::EMPTY_VARIABLE);
+          const unsigned int _plotId = EMPTY_PLOT);
 
       /// \brief Remove a variable from a plot. This will search through all
       /// plots for the variable and remove it from the plot if found.
@@ -120,20 +119,15 @@ namespace gazebo
       /// \param[in] _event Pointer to the event.
       public: virtual bool eventFilter(QObject *_o, QEvent *_e);
 
-      /// \brief Add a variable to an existing plot. Note this function
+      /// \brief Add a variable to a plot. Note this function
       /// only updates the plot but not the variable pill container.
       /// \param[in] _id Unique id of the variable
       /// \param[in] _variable Name of the variable
       /// \param[in] _plot Unique id of the plot to add the variable to.
+      /// EMPTY_PLOT means add to a new plot.
       private: void AddVariable(const unsigned int _id,
-          const std::string &_variable, const unsigned int _plotId);
-
-      /// \brief Add a new variable to a new plot. Note this function
-      /// only updates the plot but not the variable pill container.
-      /// \param[in] _id Unique id of the variable
-      /// \param[in] _variable Name of the variable
-      private: void AddVariable(const unsigned int _id,
-          const std::string &_variable);
+          const std::string &_variable,
+          const unsigned int _plotId = EMPTY_PLOT);
 
       /// \brief Qt signal to request self-deletion.
       Q_SIGNALS: void CanvasDeleted();

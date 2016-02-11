@@ -131,7 +131,7 @@ void PlotManager::SetupIntrospection()
 
   if (this->dataPtr->managerId.empty())
   {
-    std::cerr << "Introspection manager ID is empty" << std::endl;
+    gzerr << "Introspection manager ID is empty" << std::endl;
     return;
   }
 

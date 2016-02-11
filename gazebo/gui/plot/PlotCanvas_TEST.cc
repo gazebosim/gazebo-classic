@@ -15,6 +15,8 @@
  *
 */
 
+#include "gazebo/gui/plot/PlottingTypes.hh"
+#include "gazebo/gui/plot/PlotCurve.hh"
 #include "gazebo/gui/plot/PlotCanvas.hh"
 #include "gazebo/gui/plot/PlotCanvas_TEST.hh"
 
@@ -132,6 +134,39 @@ void PlotCanvas_TEST::AddRemoveVariable()
   QCOMPARE(plotCanvas->PlotCount(), 1u);
   QVERIFY(plotCanvas->PlotByVariable(var04) !=
       gazebo::gui::PlotCanvas::EMPTY_PLOT);
+
+  plotCanvas->hide();
+  delete plotCanvas;
+}
+
+/////////////////////////////////////////////////
+void PlotCanvas_TEST::VariableLabel()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/empty.world");
+
+  // Create a new plot canvas widget
+  gazebo::gui::PlotCanvas *plotCanvas = new gazebo::gui::PlotCanvas(NULL);
+  QVERIFY(plotCanvas != NULL);
+
+  plotCanvas->show();
+
+  // add a variable to plot
+  unsigned int var01 = plotCanvas->AddVariable("var01");
+  QCOMPARE(plotCanvas->PlotCount(), 1u);
+  QVERIFY(plotCanvas->PlotByVariable(var01) !=
+      gazebo::gui::PlotCanvas::EMPTY_PLOT);
+
+  // find the curve associated with the variable
+  gazebo::gui::PlotCurveWeakPtr curve = plotCanvas->PlotCurve(var01);
+  auto c = curve.lock();
+  QCOMPARE(c->Label(), std::string("var01"));
+
+  // set new label and verify
+  plotCanvas->SetVariableLabel(var01, "new_var01");
+  QCOMPARE(c->Label(), std::string("new_var01"));
 
   plotCanvas->hide();
   delete plotCanvas;

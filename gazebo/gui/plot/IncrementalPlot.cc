@@ -55,7 +55,7 @@ namespace gazebo
   {
     /// \internal
     /// \brief IncrementalPlot private data
-    struct IncrementalPlotPrivate
+    class IncrementalPlotPrivate
     {
       /// \brief A map of unique ids to plot curves.
       public: typedef std::map<unsigned int, PlotCurvePtr > CurveMap;
@@ -124,12 +124,6 @@ IncrementalPlot::IncrementalPlot(QWidget *_parent)
 /////////////////////////////////////////////////
 IncrementalPlot::~IncrementalPlot()
 {
-  for (auto iter : this->dataPtr->curves)
-  {
-    iter.second->Clear();
-    iter.second->Detach();
-  }
-
   this->dataPtr->curves.clear();
 }
 
@@ -153,114 +147,38 @@ PlotCurveWeakPtr IncrementalPlot::Curve(const unsigned int _id) const
     return it->second;
   else
   {
-    std::cerr << "Curve with id " << _id << " not found " << std::endl;
     return PlotCurveWeakPtr();
   }
 }
 
 /////////////////////////////////////////////////
-void IncrementalPlot::Add(const std::string &_label,
+void IncrementalPlot::AddPoints(const unsigned int _id,
     const std::vector<ignition::math::Vector2d> &_pts)
 {
-  if (_label.empty())
-    return;
-
-  PlotCurveWeakPtr plotCurve;
-
-  // add curve if not found
-  PlotCurveWeakPtr curve = this->Curve(_label);
-  if (curve.expired())
-    plotCurve = this->AddCurve(_label);
-  else
-    plotCurve = curve;
-
-  GZ_ASSERT(!plotCurve.expired(), "Curve is NULL");
+  PlotCurveWeakPtr plotCurve = this->Curve(_id);
+  if (plotCurve.expired())
+  {
+    gzerr << "Unable to add points. "
+        << "Curve with id' " << _id << "' is not found" << std::endl;
+  }
 
   auto c = plotCurve.lock();
   c->AddPoints(_pts);
 }
 
 /////////////////////////////////////////////////
-void IncrementalPlot::Add(const std::string &_label,
+void IncrementalPlot::AddPoint(const unsigned int _id,
     const ignition::math::Vector2d &_pt)
 {
-  if (_label.empty())
-    return;
-
-  PlotCurveWeakPtr plotCurve;
-
-  PlotCurveWeakPtr curve = this->Curve(_label);
-  if (curve.expired())
-    plotCurve = this->AddCurve(_label);
-  else
-    plotCurve = curve;
-
-  GZ_ASSERT(!plotCurve.expired(), "Curve is NULL");
+  PlotCurveWeakPtr plotCurve = this->Curve(_id);
+  if (plotCurve.expired())
+  {
+    gzerr << "Unable to add point. "
+        << "Curve with id' " << _id << "' is not found" << std::endl;
+  }
 
   auto c = plotCurve.lock();
   c->AddPoint(_pt);
-}
-
-/////////////////////////////////////////////////
-void IncrementalPlot::AddVLine(const std::string &_label, const double _x)
-{
-  QwtPlotMarker *marker = new QwtPlotMarker();
-  marker->setValue(_x, 0.0);
-  marker->setLineStyle(QwtPlotMarker::VLine);
-  marker->setLabelAlignment(Qt::AlignRight | Qt::AlignBottom);
-  marker->setLinePen(QPen(Qt::green, 0, Qt::DashDotLine));
-  marker->attach(this);
-  marker->setLabel(QString::fromStdString(_label));
-}
-
-/////////////////////////////////////////////////
-void IncrementalPlot::AdjustCurve(PlotCurvePtr _plotCurve)
-{
-  if (!_plotCurve)
-    return;
-
-  unsigned int pointCount = _plotCurve->Size();
-  if (pointCount == 0u)
-    return;
-
-  ignition::math::Vector2d lastPoint = _plotCurve->Point(pointCount-1);
-
-/*  const bool doClip = !this->canvas()->testAttribute(Qt::WA_PaintOnScreen);
-
-  if (doClip)
-  {
-    // Depending on the platform setting a clip might be an important
-    // performance issue. F.e. for Qt Embedded this reduces the
-    // part of the backing store that has to be copied out - maybe
-    // to an unaccelerated frame buffer device.
-    const QwtScaleMap xMap = this->canvasMap(curve->xAxis());
-    const QwtScaleMap yMap = this->canvasMap(curve->yAxis());
-
-    QRegion clipRegion;
-
-    const QSize symbolSize = curve->symbol()->size();
-    QRect r(0, 0, symbolSize.width() + 2, symbolSize.height() + 2);
-
-    const QPointF center = QwtScaleMap::transform(xMap, yMap, lastPoint);
-    r.moveCenter(center.toPoint());
-    clipRegion += r;
-
-    this->dataPtr->directPainter->setClipRegion(clipRegion);
-  }*/
-
-  this->setAxisScale(this->xBottom,
-      std::max(0.0, static_cast<double>(lastPoint.X() - this->dataPtr->period)),
-      std::max(1.0, static_cast<double>(lastPoint.X())));
-
-  // this->setAxisScale(curve->yAxis(), 0.0, curve->maxYValue() * 2.0);
-
-  // this->setAxisAutoScale(this->yRight, true);
-  // this->setAxisAutoScale(this->yLeft, true);
-
-  this->dataPtr->directPainter->drawSeries(_plotCurve->Curve(),
-      pointCount - 1, pointCount - 1);
-
-  this->replot();
 }
 
 /////////////////////////////////////////////////
@@ -281,21 +199,6 @@ PlotCurveWeakPtr IncrementalPlot::AddCurve(const std::string &_label)
 }
 
 /////////////////////////////////////////////////
-void IncrementalPlot::Clear(const std::string &_label)
-{
-  PlotCurveWeakPtr plotCurve = this->Curve(_label);
-  if (plotCurve.expired())
-    return;
-
-  auto c = plotCurve.lock();
-  c->Clear();
-  c->Detach();
-  this->dataPtr->curves.erase(c->Id());
-
-  this->replot();
-}
-
-/////////////////////////////////////////////////
 void IncrementalPlot::Clear()
 {
   for (auto &c : this->dataPtr->curves)
@@ -313,16 +216,35 @@ QSize IncrementalPlot::sizeHint() const
 }
 
 /////////////////////////////////////////////////
-bool IncrementalPlot::HasCurve(const std::string &_label)
-{
-  return !this->Curve(_label).expired();
-}
-
-/////////////////////////////////////////////////
 void IncrementalPlot::Update()
 {
-  for (auto &c : this->dataPtr->curves)
-    this->AdjustCurve(c.second);
+  if (this->dataPtr->curves.empty())
+    return;
+
+  ignition::math::Vector2d lastPoint;
+  for (auto &curve : this->dataPtr->curves)
+  {
+    if (!curve.second->Active())
+      continue;
+
+    unsigned int pointCount = curve.second->Size();
+    if (pointCount == 0u)
+      continue;
+
+    lastPoint = curve.second->Point(pointCount-1);
+
+    this->dataPtr->directPainter->drawSeries(curve.second->Curve(),
+      pointCount - 1, pointCount - 1);
+  }
+
+  this->setAxisScale(this->xBottom,
+      std::max(0.0, static_cast<double>(lastPoint.X() - this->dataPtr->period)),
+      std::max(1.0, static_cast<double>(lastPoint.X())));
+
+  // this->setAxisAutoScale(this->yRight, true);
+  // this->setAxisAutoScale(this->yLeft, true);
+
+  this->replot();
 }
 
 /////////////////////////////////////////////////
@@ -361,7 +283,7 @@ void IncrementalPlot::RemoveCurve(const unsigned int _id)
 {
   auto it = this->dataPtr->curves.find(_id);
 
-  if (!it->second)
+  if (it == this->dataPtr->curves.end())
     return;
 
   this->dataPtr->curves.erase(it);
