@@ -138,6 +138,9 @@ namespace gazebo
       /// \param[in] _enable True to enable multi-variable mode.
       private: void SetMultiVariableMode(const bool _enable);
 
+      /// \brief Update the variable pill's stylesheet.
+      private: void UpdateStyleSheet();
+
       /// \brief Helper function to check whether the drag action is valid.
       /// \param[in] _evt The drag event.
       /// \return True if the drag action is valid

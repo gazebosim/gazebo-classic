@@ -101,7 +101,6 @@ PlotWindow::PlotWindow(QWidget *_parent)
   addCanvasShadow->setBlurRadius(8);
   addCanvasShadow->setOffset(0, 0);
   addCanvasButton->setGraphicsEffect(addCanvasShadow);
-  //addCanvasButton->setFixedSize(QSize(25, 25));
   connect(addCanvasButton, SIGNAL(clicked()), this, SLOT(OnAddCanvas()));
   QVBoxLayout *addButtonLayout = new QVBoxLayout;
   addButtonLayout->addWidget(addCanvasButton);

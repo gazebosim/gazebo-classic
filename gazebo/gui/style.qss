@@ -69,13 +69,13 @@ QFrame#variableContainerFrame > QLabel
 
 QFrame#variablePillFrame > QLabel
 {
-  color: #dedede;
+  color: #ffffff;
 }
 
 QFrame#variablePillFrame
 {
-  border-radius: 4px;
-  background-color: #60a0e8;
+  border-radius: 10px;
+  background-color: #2196f3;
 }
 
 QFrame#plotCanvasPlotFrame
@@ -259,8 +259,10 @@ QPushButton#plotAddCanvas
   background-color: #db4437;
   color: #ffffff;
   text-align: center;
-  border-radius: 20px;
+  border-radius: 2px;
   border: 0px;
+  width: 20px;
+  height: 20px;
 }
 
 QPushButton#expandButton
