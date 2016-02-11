@@ -31,6 +31,9 @@ namespace gazebo
     /// \brief VariablePill private data
     class VariablePillPrivate
     {
+      /// \brief Pointer to the main frame
+      public: QFrame *mainFrame;
+
       /// \brief Pointer to the container this variable pill is in
       public: VariablePillContainer *container = NULL;
 
@@ -100,9 +103,8 @@ VariablePill::VariablePill(QWidget *_parent)
   this->dataPtr->label = new QLabel;
   QHBoxLayout *labelLayout = new QHBoxLayout;
   labelLayout->addWidget(this->dataPtr->label);
-  labelLayout->setContentsMargins(8, 2, 8, 2);
+  labelLayout->setContentsMargins(0, 0, 0, 0);
   this->dataPtr->labelFrame = new QFrame;
-  this->dataPtr->labelFrame->setObjectName("VariableLabelFrame");
   this->dataPtr->labelFrame->setLayout(labelLayout);
 
   // child variable pills
@@ -128,11 +130,11 @@ VariablePill::VariablePill(QWidget *_parent)
   mainLayout->setContentsMargins(0, 0, 0, 0);
   mainLayout->setAlignment(Qt::AlignLeft);
 
-  QFrame *mainFrame = new QFrame(this);
-  mainFrame->setLayout(this->dataPtr->multiLayout);
-  mainFrame->setStyleSheet("background-color: #1965b0; border-radius: 10px");
+  this->dataPtr->mainFrame = new QFrame(this);
+  this->dataPtr->mainFrame->setLayout(this->dataPtr->multiLayout);
+  this->dataPtr->mainFrame->setObjectName("variablePillFrame");
 
-  mainLayout->addWidget(mainFrame);
+  mainLayout->addWidget(this->dataPtr->mainFrame);
   this->setLayout(mainLayout);
 
   this->SetSelected(false);
@@ -202,6 +204,7 @@ VariablePillContainer *VariablePill::Container() const
 void VariablePill::SetMultiVariableMode(const bool _enable)
 {
   this->dataPtr->multiLabel->setVisible(_enable);
+  //this->dataPtr->mainFrame->setStyleSheet("QFrame{border: 1px solid #365a82}");
 
   int margin = _enable ? 4 : 0;
   this->dataPtr->multiLayout->setContentsMargins(
@@ -528,16 +531,16 @@ void VariablePill::SetSelected(const bool _selected)
 
   if (_selected)
   {
-    this->dataPtr->labelFrame->setStyleSheet(
-        "background-color: #5289c7; border: 2px solid blue;");
+    this->dataPtr->label->setStyleSheet(
+      "QLabel {background-color: #a4c4e8; color: #232323;\
+      border-radius: 4px; padding: 2px; margin: 0px}");
   }
   else
   {
-    this->dataPtr->labelFrame->setStyleSheet(
-        "background-color: #5289c7; border: 0px;");
+    this->dataPtr->label->setStyleSheet(
+      "QLabel {background-color: #365a82; border-radius: 4px;\
+      padding: 2px; margin: 0px}");
   }
-  this->dataPtr->label->setStyleSheet(
-      "QLabel {background-color: #5289c7; border: 0px; border-radius: 6px}");
 }
 
 /////////////////////////////////////////////////

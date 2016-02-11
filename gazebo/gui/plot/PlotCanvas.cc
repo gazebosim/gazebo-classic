@@ -52,11 +52,13 @@ PlotCanvas::PlotCanvas(QWidget *_parent)
   : QWidget(_parent),
     dataPtr(new PlotCanvasPrivate())
 {
+  this->setObjectName("plotCanvas");
+
   // Plot title
   this->dataPtr->title = new QLabel("Plot Name");
   QHBoxLayout *titleLayout = new QHBoxLayout;
   titleLayout->addWidget(this->dataPtr->title);
-  titleLayout->setAlignment(Qt::AlignHCenter);
+  titleLayout->setAlignment(Qt::AlignLeft);
 
   // Settings
   QMenu *settingsMenu = new QMenu;
@@ -71,6 +73,7 @@ PlotCanvas::PlotCanvas(QWidget *_parent)
   settingsMenu->addAction(deletePlotAct);
 
   QToolButton *settingsButton = new QToolButton();
+  settingsButton->setObjectName("plotCanvasTitleTool");
   settingsButton->installEventFilter(this);
   settingsButton->setToolTip(tr("Settings"));
   settingsButton->setIcon(QIcon(":/images/settings.svg"));
@@ -86,10 +89,15 @@ PlotCanvas::PlotCanvas(QWidget *_parent)
   QHBoxLayout *titleSettingsLayout = new QHBoxLayout;
   titleSettingsLayout->addLayout(titleLayout);
   titleSettingsLayout->addLayout(settingsLayout);
+  titleSettingsLayout->setContentsMargins(0, 0, 0, 0);
+
+  QFrame *titleFrame = new QFrame;
+  titleFrame->setObjectName("plotCanvasTitleFrame");
+  titleFrame->setLayout(titleSettingsLayout);
 
   // X and Y variable containers
   VariablePillContainer *xVariableContainer = new VariablePillContainer(this);
-  xVariableContainer->SetText("x: ");
+  xVariableContainer->SetText("x ");
   xVariableContainer->SetMaxSize(1);
   xVariableContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
   xVariableContainer->setContentsMargins(0, 0, 0, 0);
@@ -98,7 +106,7 @@ PlotCanvas::PlotCanvas(QWidget *_parent)
   xVariableContainer->setEnabled(false);
 
   this->dataPtr->yVariableContainer = new VariablePillContainer(this);
-  this->dataPtr->yVariableContainer->SetText("y: ");
+  this->dataPtr->yVariableContainer->SetText("y ");
   this->dataPtr->yVariableContainer->setSizePolicy(
       QSizePolicy::Expanding, QSizePolicy::Fixed);
   this->dataPtr->yVariableContainer->setContentsMargins(0, 0, 0, 0);
@@ -111,6 +119,7 @@ PlotCanvas::PlotCanvas(QWidget *_parent)
 
   // plot
   QScrollArea *plotScrollArea = new QScrollArea(this);
+  plotScrollArea->setObjectName("plotScrollArea");
   plotScrollArea->setLineWidth(0);
   plotScrollArea->setFrameShape(QFrame::NoFrame);
   plotScrollArea->setFrameShadow(QFrame::Plain);
@@ -122,17 +131,30 @@ PlotCanvas::PlotCanvas(QWidget *_parent)
 
   QFrame *plotFrame = new QFrame(plotScrollArea);
   plotFrame->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
+  plotFrame->setObjectName("plotCanvasPlotFrame");
   this->dataPtr->plotLayout = new QVBoxLayout;
   plotFrame->setLayout(this->dataPtr->plotLayout);
 
   plotScrollArea->setWidget(plotFrame);
-  plotFrame->setStyleSheet("background-color: #f2f4f7; border-radius: 10px");
+
+  QFrame *mainFrame = new QFrame;
+  mainFrame->setObjectName("plotCanvasFrame");
+  QVBoxLayout *mainFrameLayout = new QVBoxLayout;
+  mainFrameLayout->addWidget(titleFrame);
+  mainFrameLayout->addLayout(variableContainerLayout);
+  mainFrameLayout->addWidget(plotScrollArea);
+  mainFrameLayout->setContentsMargins(0, 0, 0, 0);
+  mainFrame->setLayout(mainFrameLayout);
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
-  mainLayout->addLayout(titleSettingsLayout);
-  mainLayout->addLayout(variableContainerLayout);
-  mainLayout->addWidget(plotScrollArea);
+  mainLayout->addWidget(mainFrame);
+  mainLayout->setContentsMargins(0, 0, 0, 0);
   this->setLayout(mainLayout);
+
+  QGraphicsDropShadowEffect *shadow = new QGraphicsDropShadowEffect();
+  shadow->setBlurRadius(8);
+  shadow->setOffset(0, 0);
+  this->setGraphicsEffect(shadow);
 }
 
 /////////////////////////////////////////////////
