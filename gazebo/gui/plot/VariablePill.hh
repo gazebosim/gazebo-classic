@@ -33,7 +33,7 @@ namespace gazebo
   namespace gui
   {
     // Forward declare private data class
-    struct VariablePillPrivate;
+    class VariablePillPrivate;
 
     class VariablePillContainer;
 
@@ -93,6 +93,10 @@ namespace gazebo
       /// \param[in] _variable Child variable pill to remove.
       public: void RemoveVariablePill(VariablePill *_variable);
 
+      /// \brief Get a child variable pill by its unique name
+      /// \return Child variable pill.
+      public: VariablePill *VariablePillByName(const std::string &_name);
+
       /// \brief Get the number of child variable pills
       /// \return Number of child variable pills.
       public: unsigned int VariablePillCount() const;
@@ -134,25 +138,33 @@ namespace gazebo
       /// \param[in] _enable True to enable multi-variable mode.
       private: void SetMultiVariableMode(const bool _enable);
 
+      /// \brief Update the variable pill's stylesheet.
+      private: void UpdateStyleSheet();
+
+      /// \brief Helper function to check whether the drag action is valid.
+      /// \param[in] _evt The drag event.
+      /// \return True if the drag action is valid
+      private: bool IsDragValid(QDropEvent *_evt);
+
       /// \brief Qt signal emitted when a child variable pill is added
-      /// \param[in] Unique id of the child variable pill.
-      /// \param[in] Name of variable pill added.
+      /// \param[in] _id Unique id of the child variable pill.
+      /// \param[in] _name Name of variable pill added.
       Q_SIGNALS: void VariableAdded(const unsigned int _id,
           const std::string &_name);
 
       /// \brief Qt signal emitted when a child variable pill is removed.
-      /// \param[in] Name of child variable pill removed.
+      /// \param[in] _id Name of child variable pill removed.
       Q_SIGNALS: void VariableRemoved(const unsigned int _id);
 
       /// \brief Qt signal emitted when an existing variable pill is added
       /// as a child of this variable pill
-      /// \param[in] Unique id of the existing variable pill that is added.
+      /// \param[in] _id Unique id of the existing variable pill that is added.
       Q_SIGNALS: void VariableMoved(const unsigned int _id);
 
       /// \brief Qt signal emitted when the variable pill's text has changed
       /// \param[in] _label New variable label.
       Q_SIGNALS: void VariableLabelChanged(const std::string &_label);
-
+      
      /// \brief Empty variable id used to indicate non-existent variable.
       public: static unsigned int EMPTY_VARIABLE;
 
