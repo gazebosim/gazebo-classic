@@ -558,8 +558,15 @@ void VariablePill::UpdateStyleSheet()
     borderStr = "border: 0px;";
 
   this->dataPtr->label->setStyleSheet(QString::fromStdString(
-      "QLabel {color: #ffffff; border-radius: 10px;\
-      padding-left: 8px; padding-right: 8px;\
-      padding-top: 2px; padding-bottom: 2px; margin: 0px;"
-      + bgColorStr + borderStr + "}"));
+      "QLabel\
+      {\
+        color: #ffffff; \
+        border-radius: 10px;\
+        padding-left: 8px;\
+        padding-right: 8px;\
+        padding-top: 2px;\
+        padding-bottom: 2px;\
+        margin: 0px; "
+        + bgColorStr + borderStr +
+      "}"));
 }
