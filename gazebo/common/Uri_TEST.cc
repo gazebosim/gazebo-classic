@@ -155,10 +155,49 @@ TEST(UriTest, UriParts)
   EXPECT_EQ(p.size(), 2u);
   EXPECT_TRUE(std::find(p.begin(), p.end(), "param1") != p.end());
   EXPECT_TRUE(std::find(p.begin(), p.end(), "param2") != p.end());
+
+  // Copy constructor.
+  common::UriParts uriParts2(uriParts);
+
+  uriParts.SetWorld("modified_world1");
+  uriParts.Entity().Clear();
+  uriParts.Parameters().clear();
+
+  EXPECT_EQ(uriParts2.World(), "world1");
+  nestedEntity = uriParts2.Entity();
+  EXPECT_EQ(nestedEntity.Parent().Type(), "type1");
+  EXPECT_EQ(nestedEntity.Parent().Name(), "name1");
+  EXPECT_EQ(nestedEntity.Leaf().Type(), "type3");
+  EXPECT_EQ(nestedEntity.Leaf().Name(), "name3");
+  p = uriParts2.Parameters();
+  EXPECT_EQ(p.size(), 2u);
+  EXPECT_TRUE(std::find(p.begin(), p.end(), "param1") != p.end());
+  EXPECT_TRUE(std::find(p.begin(), p.end(), "param2") != p.end());
+
+  // Assignment operator.
+  EXPECT_EQ(uriParts.Entity().EntityCount(), 0u);
+  EXPECT_TRUE(uriParts.Parameters().empty());
+
+  uriParts = uriParts2;
+
+  uriParts.SetWorld("modified_world1");
+  uriParts.Entity().Clear();
+  uriParts.Parameters().clear();
+
+  EXPECT_EQ(uriParts2.World(), "world1");
+  nestedEntity = uriParts2.Entity();
+  EXPECT_EQ(nestedEntity.Parent().Type(), "type1");
+  EXPECT_EQ(nestedEntity.Parent().Name(), "name1");
+  EXPECT_EQ(nestedEntity.Leaf().Type(), "type3");
+  EXPECT_EQ(nestedEntity.Leaf().Name(), "name3");
+  p = uriParts2.Parameters();
+  EXPECT_EQ(p.size(), 2u);
+  EXPECT_TRUE(std::find(p.begin(), p.end(), "param1") != p.end());
+  EXPECT_TRUE(std::find(p.begin(), p.end(), "param2") != p.end());
 }
 
 /////////////////////////////////////////////////
-TEST(UriTest, Parse)
+TEST(UriTest, Uri)
 {
   common::UriEntity entity;
 
