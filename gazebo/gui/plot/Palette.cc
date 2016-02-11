@@ -183,20 +183,33 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   simSplitter->setCollapsible(0, false);
   simSplitter->setCollapsible(1, false);
 
+  auto tabBar = new QTabBar(this);
+  tabBar->setExpanding(true);
+  tabBar->addTab("Topics");
+  tabBar->addTab("Sim");
+  tabBar->addTab("Search");
+
+  auto tabStackedLayout = new QStackedLayout();
+  tabStackedLayout->addWidget(topicsSplitter);
+  tabStackedLayout->addWidget(simSplitter);
+  tabStackedLayout->addWidget(searchSplitter);
+
+
   // Tabs
-  auto tabWidget = new QTabWidget;
+  /*auto tabWidget = new QTabWidget;
+  tabWidget->setObjectName("plotTabWidget");
   tabWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   tabWidget->setMinimumWidth(300);
-  tabWidget->setStyleSheet("QTabWidget::pane{\
-      border: none;\
-      background-color: #303030}");
 
   tabWidget->addTab(topicsSplitter, "Topics");
   tabWidget->addTab(simSplitter, "Sim");
   tabWidget->addTab(searchSplitter, "Search");
+  */
 
   auto mainLayout = new QVBoxLayout;
-  mainLayout->addWidget(tabWidget);
+  mainLayout->addWidget(tabBar);
+  mainLayout->addLayout(tabStackedLayout);
+  mainLayout->setContentsMargins(0, 0, 0, 0);
 
   this->setLayout(mainLayout);
 }

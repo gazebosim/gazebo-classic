@@ -139,6 +139,7 @@ PlotWindow::PlotWindow(QWidget *_parent)
   plotLayout->setStretchFactor(this->dataPtr->canvasLayout, 1);
   plotLayout->setStretchFactor(addButtonLayout, 0);
   plotLayout->setStretchFactor(bottomFrame, 0);
+  plotLayout->setContentsMargins(0, 0, 0, 0);
 
   // Palette
   auto plotPalette = new Palette(this);
@@ -146,6 +147,7 @@ PlotWindow::PlotWindow(QWidget *_parent)
   auto mainLayout = new QHBoxLayout;
   mainLayout->addWidget(plotPalette);
   mainLayout->addLayout(plotLayout);
+  mainLayout->setContentsMargins(0, 0, 0, 0);
 
   this->setLayout(mainLayout);
   this->setSizeGripEnabled(true);

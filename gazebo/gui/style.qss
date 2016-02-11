@@ -428,111 +428,6 @@ QTextEdit#tipsTextEdit
   background-color: #808080;
 }
 
-QTabBar
-{
-  /*background-color: #808080;*/
-}
-
-QTabWidget#embeddedTab::pane
-{
-  border-top: 1px solid #101010;
-  border-left: 1px solid #101010;
-  border-bottom: 1px solid #101010;
-  border-right: 1px solid #101010;
-  top: -1px;
-
-  border-top-left-radius: 0px;
-  border-bottom-left-radius: 10px;
-  border-top-right-radius: 10px;
-  border-bottom-right-radius: 10px;
-
-  background-color: #808080;
-  padding: 2px;
-
-  margin: 0px;
-  color: #f0f0f0;
-}
-
-QTabBar::tab
-{
-  color: #d0d0d0;
-  background-color: #808080;
-  border-top: 1px solid  #101010;
-  border-left: 1px solid  #101010;
-  border-right: 1px solid  #101010;
-  border-bottom: 1px solid  #101010;
-
-  border-top-left-radius: 4px;
-  border-top-right-radius: 4px;
-
-  padding: 4px;
-  min-width: 8ex;
-}
-
-QTabBar::tab:selected
-{
-  background-color: #808080;
-  margin-left: -4px;
-  margin-right: -4px;
-  border-bottom-style: none;
-}
-
-QTabBar::tab:first:selected
-{
-  margin-left: 0;
-}
-
-QTabBar::tab:last:selected
-{
-  margin-right: 0;
-}
-
-QTabBar::tab::only-one
-{
-  margin-left: 0;
-  margin-right: 0;
-}
-
-QTabBar::tab:!selected
-{
-  background-color: #707070;
-  margin-top: 2px;
-}
-
-QTabWidget#mainTab::pane,
-QTabWidget#buildingEditorTab::pane,
-QTabWidget#modelEditorTab::pane,
-QTabWidget#terrainEditorTab::pane,
-QTabWidget#linkInspectorTab::pane
-{
-  border-left: 1px solid #101010;
-  border-bottom: 1px solid #101010;
-  border-top: 1px solid #101010;
-
-  border-top-left-radius: 0px;
-  border-bottom-left-radius: 10px;
-  border-top-right-radius: 10px;
-  border-bottom-right-radius: 10px;
-  top: -1px;
-
-  background-color: #808080;
-  padding: 2px;
-
-  margin: 0px;
-  color: #f0f0f0;
-}
-
-QTabWidget::tab
-{
-  border-top: 1px solid #101010;
-  background-color: #808080;
-}
-
-QTabWidget::tab-bar
-{
-  alignment: left;
-}
-
 QWidget#modelList,
 QWidget#jointControl,
 QWidget#toolsWidget
@@ -758,3 +653,84 @@ QTextEdit#splashVersionTextEdit
   color: #f58113;
   font-size: 10px;
 }
+
+
+/*---------------------------------------------*/
+/* Tab */
+/*---------------------------------------------*/
+
+QTabBar::tab
+{
+  margin: 0px;
+  border-radius: 0px;
+  color: #f2f2f2;
+  background-color: rgba(120,120,120,255);
+  border-bottom: 1px solid rgba(120,120,120,255);
+
+  padding: 4px;
+  min-width: 8ex;
+
+  font: 48em;
+  font-weight: 200;
+  padding-bottom: 10px;
+}
+
+QTabBar::tab:selected
+{
+  color: #f58113;
+  background-color: rgba(120,120,120,255);
+  border-bottom: 1px solid #f58113;
+}
+
+QTabBar::tab:first:selected
+{
+  margin-left: 0;
+}
+
+QTabBar::tab:last:selected
+{
+  margin-right: 0;
+}
+
+QTabBar::tab::only-one
+{
+  margin-left: 0;
+  margin-right: 0;
+}
+
+QTabBar
+{
+  alignment: centered;
+}
+
+QTabWidget::tab
+{
+  border-radius: 0px;
+  border: 0px;
+}
+
+QTabWidget::pane,
+QTabWidget#mainTab::pane,
+QTabWidget#buildingEditorTab::pane,
+QTabWidget#modelEditorTab::pane,
+QTabWidget#terrainEditorTab::pane,
+QTabWidget#linkInspectorTab::pane,
+QTabWidget#embeddedTab::pane
+{
+  background-color: #777777;
+  padding: 2px;
+  margin: 0px;
+  border: 0px;
+  color: #fafafa;
+}
+
+QTabWidget::tab-bar
+{
+  alignment: center;
+}
+
+/* End tab */
+/*=============================================*/
+
+
+
