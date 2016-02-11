@@ -162,7 +162,6 @@ TEST(UriTest, Parse)
 {
   common::UriEntity entity;
 
-  /*
   // Missing /world
   EXPECT_THROW(common::Uri("/def/model/model_1"), common::Exception);
   // Missing /world
@@ -193,7 +192,7 @@ TEST(UriTest, Parse)
   entity = parts.Entity().Parent();
   EXPECT_EQ(entity.Type(), "model");
   EXPECT_EQ(entity.Name(), "model_1");
-  EXPECT_EQ(uri1.CanonicalUri(), "/world/def/model/model_1/");
+  EXPECT_EQ(uri1.CanonicalUri(), "/world/def/model/model_1");
 
   common::Uri uri2("/world/def/model/model_1/");
   parts = uri2.Split();
@@ -201,7 +200,7 @@ TEST(UriTest, Parse)
   entity = parts.Entity().Parent();
   EXPECT_EQ(entity.Type(), "model");
   EXPECT_EQ(entity.Name(), "model_1");
-  EXPECT_EQ(uri2.CanonicalUri(), "/world/def/model/model_1/");
+  EXPECT_EQ(uri2.CanonicalUri(), "/world/def/model/model_1");
 
   common::Uri uri3("/world/def/model/model_1/model/model_2");
   parts = uri3.Split();
@@ -212,7 +211,7 @@ TEST(UriTest, Parse)
   entity = parts.Entity().Leaf();
   EXPECT_EQ(entity.Type(), "model");
   EXPECT_EQ(entity.Name(), "model_2");
-  EXPECT_EQ(uri3.CanonicalUri(), "/world/def/model/model_1/model/model_2/");
+  EXPECT_EQ(uri3.CanonicalUri(), "/world/def/model/model_1/model/model_2");
 
   common::Uri uri4("/world/def/model/model_1/model/model_2/");
   parts = uri4.Split();
@@ -223,30 +222,25 @@ TEST(UriTest, Parse)
   entity = parts.Entity().Leaf();
   EXPECT_EQ(entity.Type(), "model");
   EXPECT_EQ(entity.Name(), "model_2");
-  EXPECT_EQ(uri4.CanonicalUri(), "/world/def/model/model_1/model/model_2/");
-*/
-  // This is failing. Debugging.
-  common::Uri uri5("/world/def/model/model_1/?p=pose");
+  EXPECT_EQ(uri4.CanonicalUri(), "/world/def/model/model_1/model/model_2");
 
-  return;
-  auto parts = uri5.Split();
+  common::Uri uri5("/world/def/model/model_1?p=pose");
+  parts = uri5.Split();
   EXPECT_EQ(parts.World(), "def");
   entity = parts.Entity().Parent();
   EXPECT_EQ(entity.Type(), "model");
   EXPECT_EQ(entity.Name(), "model_1");
-  EXPECT_EQ(uri5.CanonicalUri(), "/world/def/model/model_1/");
+  EXPECT_EQ(uri5.CanonicalUri(), "/world/def/model/model_1?p=pose");
 
-  return;
-
-  common::Uri uri6("/world/def/model/model_1/p=pose&p=lin_vel");
+  common::Uri uri6("/world/def/model/model_1?p=pose&p=lin_vel");
   parts = uri6.Split();
   EXPECT_EQ(parts.World(), "def");
   entity = parts.Entity().Parent();
   EXPECT_EQ(entity.Type(), "model");
   EXPECT_EQ(entity.Name(), "model_1");
-  EXPECT_EQ(uri6.CanonicalUri(), "/world/def/model/model_1/");
+  EXPECT_EQ(uri6.CanonicalUri(), "/world/def/model/model_1?p=pose&p=lin_vel");
 
-  common::Uri uri7("/world/def/model/model_1/model/model_2/?p=pose/pos/x");
+  common::Uri uri7("/world/def/model/model_1/model/model_2?p=pose/pos/x");
   parts = uri7.Split();
   EXPECT_EQ(parts.World(), "def");
   entity = parts.Entity().Parent();
@@ -255,5 +249,6 @@ TEST(UriTest, Parse)
   entity = parts.Entity().Leaf();
   EXPECT_EQ(entity.Type(), "model");
   EXPECT_EQ(entity.Name(), "model_2");
-  EXPECT_EQ(uri7.CanonicalUri(), "/world/def/model/model_1/model/model_2/");
+  EXPECT_EQ(uri7.CanonicalUri(),
+    "/world/def/model/model_1/model/model_2?p=pose/pos/x");
 }
