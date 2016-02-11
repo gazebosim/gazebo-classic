@@ -59,6 +59,7 @@ set(tests
   logical_camera_sensor.cc
   model.cc
   model_database.cc
+  multirayshape.cc
   nested_model.cc
   noise.cc
   nondefault_world.cc
@@ -121,7 +122,8 @@ if (ENABLE_TESTS_COMPILATION)
   set_tests_properties(${TEST_TYPE}_worlds_installed PROPERTIES TIMEOUT 700)
 
   # Increase timeout for debug-mode
-  if (${CMAKE_BUILD_TYPE_UPPERCASE} STREQUAL "DEBUG")
+  if (${CMAKE_BUILD_TYPE_UPPERCASE} STREQUAL "DEBUG" OR
+      ${CMAKE_BUILD_TYPE_UPPERCASE} STREQUAL "COVERAGE")
     set_tests_properties(${TEST_TYPE}_joint_gearbox PROPERTIES TIMEOUT 400)
   endif()
 
