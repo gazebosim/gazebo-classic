@@ -18,7 +18,6 @@
 #define _GAZEBO_COMMON_URI_HH_
 
 #include <memory>
-#include <set>
 #include <string>
 #include <vector>
 #include "gazebo/util/system.hh"
@@ -33,221 +32,275 @@ namespace gazebo
     // Forward declare private data classes.
     class UriEntityPrivate;
     class UriNestedEntityPrivate;
-    //class UriEntityPartPrivate;
     class UriPartsPrivate;
+    class UriPrivate;
 
-    /// \brief ToDo.
+    /// \class UriEntity Uri.hh common/common.hh
+    /// \brief A URI entity abstraction.
+    ///
+    /// A URI entity is composed by a type and a name. The type is a keyword
+    /// such as "model" or "light" and the value is any alphanumeric identifier
+    /// without whitespaces or "?". A URI entity is part of a URI.
+    /// E.g.: /world/default/model/model_1/model/model_2?p=pose
+    ///                      ^^^^^^^^^^^^^^
+    /// "model/model_1" is a valid URI entity.
     class GZ_COMMON_VISIBLE UriEntity
     {
-      /// \brief ToDo.
+      /// \brief Constructor.
       public: UriEntity();
 
-      /// \brief ToDo.
+      /// \brief Copy constructor.
+      /// \param[in] _entity Another entity.
       public: UriEntity(const UriEntity &_entity);
 
-      /// \brief ToDo.
+      /// \brief Destructor.
       public: virtual ~UriEntity();
 
-      /// \brief ToDo.
+      /// \brief Get the URI entity type.
+      /// \return Type. E.g.: "model".
+      /// \sa SetType
       public: std::string Type() const;
 
-      /// \brief ToDo.
+      /// \brief Get the URI entity name.
+      /// \return The name. E.g.: "model_1".
+      /// \sa SetName
       public: std::string Name() const;
 
-      /// \brief ToDo.
+      /// \brief Set the type of the URI entity. Any alphanumeric value without
+      /// whitespaces or "?" is allowed.
+      /// \param[in] _type The type.
+      /// \throws common::Exception when _name contains a whitespace or a "?".
+      /// \sa Type
       public: void SetType(const std::string &_type);
 
-      /// \brief ToDo.
+      /// \brief Set the name of the URI entity.
+      /// \param[in] _name The name. Any alphanumeric value without whitespaces
+      /// or "?" is allowed.
+      /// \throws common::Exception when _name contains a whitespace or a "?".
+      /// \sa Name
       public: void SetName(const std::string &_name);
 
       /// \brief Equal operator.
-      /// \param _p another UriEntity.
+      /// \param[in] _p another UriEntity.
       /// \return itself.
       public: UriEntity &operator=(const UriEntity &_p);
 
-      /// \brief ToDo.
+      /// \brief Validate an identifier. Any alphanumeric identifier is valid
+      /// except if contains whitespaces or "?".
+      /// \throws common::Exception when _name contains a whitespace or a "?".
+      private: void Validate(const std::string &_identifier);
+
+      /// \internal
+      /// \brief Pointer to private data.
       private: std::unique_ptr<UriEntityPrivate> dataPtr;
     };
 
-    /// \brief ToDo.
+    /// \class UriNestedEntity Uri.hh common/common.hh
+    /// \brief A URI nested entity abstraction.
+    ///
+    /// Some URI entities can be nested and contain URI child entities.
+    /// E.g.: A model is a URI entity and can contain another URI nested models.
+    /// The top level URI entity is the parent. The last URI entity is the leaf.
+    /// All the URI nested entities are stored in a linear way starting from the
+    /// parent and finishing with the leaf. A URI nested entity is part of a URI
+    /// E.g.: /world/default/model/model_1/model/model_2?p=pose
+    ///                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    /// "model/model_1/model/model_2" is a valid nested URI entity.
     class GZ_COMMON_VISIBLE UriNestedEntity
     {
-      /// \brief ToDo.
+      /// \brief Constructor.
       public: UriNestedEntity();
 
-      /// \brief ToDo.
+      /// \brief Copy constructor.
+      /// \param[in] _entity Another nested entity.
+      public: UriNestedEntity(const UriNestedEntity &_entity);
+
+      /// \brief Destructor.
       public: virtual ~UriNestedEntity();
 
-      /// \brief ToDo.
+      /// \brief Number of URI nested entities.
+      /// \return The number of URI nested entities.
       public: unsigned int EntityCount() const;
 
-      /// \brief ToDo.
-      public: bool Parent(UriEntity &_entity) const;
+      /// \brief Get the parent URI entity.
+      /// \return The parent URI entity.
+      /// \throws common::Exception when the list of entities is empty.
+      public: UriEntity Parent() const;
 
-      /// \brief ToDo.
-      public: bool Leaf(UriEntity &_entity) const;
+      /// \brief Get the leaf URI entity.
+      /// \return The leaf URI entity.
+      /// \throws common::Exception when the list of URI entities is empty.
+      public: UriEntity Leaf() const;
 
-      /// \brief ToDo.
-      public: bool Entity(const unsigned int &_index,
-                          UriEntity &_entity) const;
+      /// \brief Get a specific URI nested entity.
+      /// \param[in] _index The position of the requested URI entity.
+      /// The parent has the 0 index and the leaf has the EntityCount() - 1.
+      /// \return The requested URI entity.
+      /// \throws common::Exception when _index >= EntityCount().
+      /// \sa EntityCount
+      public: UriEntity Entity(const unsigned int &_index) const;
 
-      /// \brief ToDo.
+      /// \brief Adds a new URI entity. The new URI entity becomes the leaf.
+      /// \param[in] _entity New URI entity.
       public: void AddEntity(const UriEntity &_entity);
 
-      /// \brief ToDo.
+      /// \brief Clear the list of URI entities stored in this object.
       public: void Clear();
 
       /// \brief Equal operator.
-      /// \param _p another UriNestedEntity.
+      /// \param[in] _p another UriNestedEntity.
       /// \return itself.
       public: UriNestedEntity &operator=(const UriNestedEntity &_p);
 
-      /// \brief ToDo.
+      /// \internal
+      /// \brief Pointer to private data.
       private: std::unique_ptr<UriNestedEntityPrivate> dataPtr;
     };
 
-    /// \brief ToDo.
+    /// \class UriParts Uri.hh common/common.hh
+    /// \brief Stores the components of a URI.
+    ///
+    /// There are multiple components in a URI:
+    ///
+    ///  - world:      URI entity with with type "/world/". The name contains
+    ///                the name of a Gazebo world. E.g.:"/world/default"
+    ///
+    ///  - entities:   URI nested entity.
+    ///                E.g.: "model/model_1/model/model_2"
+    ///
+    ///  - parameters: Vector of parameters. A parameter is some property
+    ///                applied to the nested entity in the specified world.
+    ///                E.g.: {"pose", "lin_vel"}
     class GZ_COMMON_VISIBLE UriParts
     {
-      /// \brief ToDo.
+      /// \brief Constructor.
       public: UriParts();
 
-      /// \brief ToDo.
+      /// \brief Copy constructor.
+      /// \param[in] _parts Another UriParts object.
+      public: UriParts(const UriParts &_parts);
+
+      /// \brief Destructor.
       public: virtual ~UriParts();
 
-      /// \brief ToDo.
+      /// \brief Get the world part.
+      /// \return The world part.
+      /// \sa SetWorld
       public: std::string World() const;
 
-      /// \brief ToDo.
+      /// \brief Get the nested entity part.
+      /// \return The nested entity part.
+      /// \sa SetEntity
       public: UriNestedEntity &Entity() const;
 
-      /// \brief ToDo.
+      /// \brief Get the parameters part.
+      /// \return The parameters part.
+      /// \sa SetParameters.
       public: std::vector<std::string> &Parameters() const;
 
-      /// \brief ToDo.
+      /// \brief Set the world part.
+      /// \param[in] _world World part.
+      /// \sa World
       public: void SetWorld(const std::string &_world);
 
-      /// \brief ToDo.
+      /// \brief Set the nested entity part.
+      /// \param[in] _entity A nested entity.
+      /// \sa Entity
       public: void SetEntity(const UriNestedEntity &_entity);
 
-      /// \brief ToDo.
+      /// \brief Set the parameters part.
+      /// \param[in] _params The parameters.
+      /// \sa Parameters
       public: void SetParameters(const std::vector<std::string> &_params);
 
-      /// \brief Equal operator.
-      /// \param _p another UriParts.
-      /// \return itself.
-      public: UriParts &operator=(const UriParts &_p);
-
-      /// \brief ToDo.
-      private: std::unique_ptr<UriPartsPrivate> dataPtr;
-    };
-
-    /*
-    /// \brief ToDo.
-    class GZ_COMMON_VISIBLE UriEntityPart
-    {
-      /// \brief ToDo.
-      public: UriEntityPart();
-
-      /// \brief ToDo.
-      public: virtual ~UriEntityPart();
-
-      /// \brief ToDo.
-      public: std::string Type() const;
-
-      /// \brief ToDo.
-      public: std::string Name() const;
-
-      /// \brief ToDo.
-      public: std::shared_ptr<UriEntityPart> Children() const;
-
-      /// \brief ToDo.
-      public: void SetType(const std::string &_type);
-
-      /// \brief ToDo.
-      public: void SetName(const std::string &_name);
-
-      /// \brief ToDo.
-      public: void SetChildren(const std::shared_ptr<UriEntityPart> &_children);
-
-      /// \brief Equal operator.
-      /// \param _p another UriEntityPart.
-      /// \return itself.
-      public: UriEntityPart &operator=(const UriEntityPart &_p);
-
-      /// \brief ToDo.
-      private: std::unique_ptr<UriEntityPartPrivate> dataPtr;
-    };
-
-    /// \brief ToDo.
-    class GZ_COMMON_VISIBLE UriParts
-    {
-      /// \brief ToDo.
-      public: UriParts();
-
-      /// \brief ToDo.
-      public: virtual ~UriParts();
-
-      /// \brief ToDo.
-      public: std::string World() const;
-
-      /// \brief ToDo.
-      public: UriEntityPart &Entity() const;
-
-      /// \brief ToDo.
-      public: std::vector<std::string> &Parameters() const;
-
-      /// \brief ToDo.
-      public: void SetWorld(const std::string &_world);
-
-      /// \brief ToDo.
-      public: void SetEntity(const UriEntityPart &_entity);
-
-      /// \brief ToDo.
-      public: void SetParameters(const std::vector<std::string> &_params);
-
-      /// \brief Equal operator.
-      /// \param _p another UriParts.
-      /// \return itself.
-      public: UriParts &operator=(const UriParts &_p);
-
-      /// \brief ToDo.
-      private: std::unique_ptr<UriPartsPrivate> dataPtr;
-    };
-    */
-
-    /// \class Uri Uri.hh common/common.hh
-    /// \brief Defines a Gazebo URI.
-    class GZ_COMMON_VISIBLE Uri
-    {
-      /// \brief Constructor
-      /// \throws common::Exception
-      //public: Uri(const UriParts &_parts);
-
-      /// \brief Destructor
-      public: virtual ~Uri();
-
+      /// \brief Parse a URI string and split it into its URI parts.
+      /// \param[in] _uri A URI string.
+      ///                 E.g.: "/model/default/model/model_1?p=pose"
+      /// \param[out] _parts URI parts after splitting the URI string.
+      /// \return True if the URI string was valid or false otherwise.
       public: static bool Parse(const std::string &_uri,
                                 UriParts &_parts);
 
+      /// \brief Equal operator.
+      /// \param[in] _p another UriParts.
+      /// \return itself.
+      public: UriParts &operator=(const UriParts &_p);
+
+      /// \brief Extract the world part from an URI string.
+      /// \param[in] _uri A URI string.
+      /// \param[out] _world Name of the world file.
+      /// \param[out] _next The next position after parsing the world part in
+      ///                   the URI string.
+      /// \return True when the world name was successfully parsed.
       private: static bool ParseWorld(const std::string &_uri,
                                       std::string &_world,
                                       size_t &_next);
 
+      /// \brief Extract the URI nested entity from an URI string.
+      /// \param[in] _uri A URI string.
+      /// \param[in/out] _from Position of the first character to parse.
+      /// \param[out] _entity URI nested entity.
+      /// \return True when the URI nested entity was successfully parsed.
       private: static bool ParseEntity(const std::string &_uri,
-                                       const size_t &_from,
+                                       size_t &_from,
                                        UriNestedEntity &_entity);
 
+      /// \brief Parse one single entity from an URI string.
+      /// \param[in] _uri A URI string.
+      /// \param[in] _from Position of the first character to parse.
+      /// \param[out] _entity URI entity.
+      /// \return True when the URI entity was successfully parsed.
       private: static bool ParseOneEntity(const std::string &_uri,
                                           const size_t &_from,
                                           UriEntity &_entity,
                                           size_t &_next);
 
-      //private: static void ShowEntityPart(const UriEntityPart &_part);
+      /// \brief Extract the parameters part from an URI string.
+      /// \param[in] _uri A URI string.
+      /// \param[in] _from Position of the first character to parse.
+      /// \param[out] _params Vector of parameters parsed.
+      /// \return True when the parameters were successfully parsed.
+      private: static bool ParseParameters(const std::string &_uri,
+                                           const size_t &_from,
+                                           std::vector<std::string> &_params);
 
-      //private: std::set<std::string> kAllowedEntities = {"model, light"};
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<UriPartsPrivate> dataPtr;
+    };
 
-      private: UriParts parts;
+    /// \class Uri Uri.hh common/common.hh
+    /// \brief A Gazebo URI abstraction.
+    ///
+    /// A Uri is a string representing some property of an entity in a given
+    /// world. For example, the pose (property) of the model "model_1" (entity)
+    /// in the "default" world.
+    class GZ_COMMON_VISIBLE Uri
+    {
+      /// \brief Constructor.
+      /// \param[in] _uri A URI string.
+      /// \throws common::Exception when _uri cannot be correctly parsed.
+      public: Uri(const std::string &_uri);
+
+      /// \brief Constructor.
+      /// \param[in] _parts Individual parts of the URI.
+      public: Uri(const UriParts &_parts);
+
+      /// \brief Destructor.
+      public: virtual ~Uri();
+
+      /// \brief Get the parts of the current URI.
+      /// \return The parts in which this URI is composed.
+      public: UriParts Split() const;
+
+      /// \brief Get the URI string of the current URI.
+      /// Note that the URI string is "/" terminated.
+      /// \return The URI string. E.g.: "/world/default/light/light_1?p=pose/"
+      public: std::string CanonicalUri() const;
+
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<UriPrivate> dataPtr;
     };
     /// \}
   }
