@@ -2363,7 +2363,6 @@ void ModelListWidget::FillPropertyTree(const msgs::Model &_msg,
     item->setValue(_msg.enable_wind());
   else
     item->setValue(false);
-  item->setEnabled(false);
   this->dataPtr->propTreeBrowser->addProperty(item);
 
   topItem = this->dataPtr->variantManager->addProperty(

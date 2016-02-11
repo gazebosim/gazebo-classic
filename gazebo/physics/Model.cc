@@ -1147,6 +1147,9 @@ void Model::ProcessMsg(const msgs::Model &_msg)
 
   if (_msg.has_scale())
     this->SetScale(msgs::ConvertIgn(_msg.scale()));
+
+  if (_msg.has_enable_wind())
+    this->SetWindMode(_msg.enable_wind());
 }
 
 //////////////////////////////////////////////////
@@ -1482,6 +1485,8 @@ bool Model::RemoveJoint(const std::string &_name)
 void Model::SetWindMode(const bool _enable)
 {
   this->sdf->GetElement("enable_wind")->Set(_enable);
+  for (auto &link : this->links)
+    link->SetWindMode(_enable);
 }
 
 /////////////////////////////////////////////////
