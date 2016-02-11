@@ -59,7 +59,6 @@ VariablePillContainer::VariablePillContainer(QWidget *_parent)
 {
   // label
   this->dataPtr->label = new QLabel;
-  this->dataPtr->label->setStyleSheet("color: #303030");
   QHBoxLayout *labelLayout = new QHBoxLayout;
   labelLayout->addWidget(this->dataPtr->label);
 
@@ -73,18 +72,10 @@ VariablePillContainer::VariablePillContainer(QWidget *_parent)
   frameLayout->setAlignment(Qt::AlignLeft);
   frameLayout->setContentsMargins(4, 4, 4, 4);
   QFrame *mainFrame = new QFrame;
-  mainFrame->setObjectName("VariableContainerFrame");
+  mainFrame->setObjectName("variableContainerFrame");
   mainFrame->setLayout(frameLayout);
   mainFrame->setFrameShape(QFrame::NoFrame);
   mainFrame->setContentsMargins(0, 0, 0, 0);
-
-  mainFrame->setStyleSheet(
-      "#VariableContainerFrame\
-      {\
-        background-color: #f2f4f7; \
-        border-radius: 4px; \
-        border: 2px solid #404040; \
-      }");
 
   QHBoxLayout *mainLayout = new QHBoxLayout;
   mainLayout->addWidget(mainFrame);
@@ -93,6 +84,12 @@ VariablePillContainer::VariablePillContainer(QWidget *_parent)
 
   this->setLayout(mainLayout);
   this->setAcceptDrops(true);
+
+  /*QGraphicsDropShadowEffect *shadow = new QGraphicsDropShadowEffect();
+  shadow->setBlurRadius(1);
+  shadow->setOffset(2, 2);
+  this->setGraphicsEffect(shadow);
+  */
 }
 
 /////////////////////////////////////////////////
