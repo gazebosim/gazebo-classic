@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -492,7 +492,7 @@ void MainWindow::Save()
 {
   // Get the latest world in SDF.
   boost::shared_ptr<msgs::Response> response =
-    transport::request(get_world(), "world_sdf");
+    transport::request(get_world(), "world_sdf_save");
 
   msgs::GzString msg;
   std::string msgData;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,9 @@
 #ifndef _GAZEBO_SENSORS_SONARSENSOR_HH_
 #define _GAZEBO_SENSORS_SONARSENSOR_HH_
 
+#include <memory>
 #include <string>
-#include <list>
-#include <ignition/math/Pose3.hh>
 
-#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/util/system.hh"
 
@@ -31,6 +29,9 @@ namespace gazebo
   /// \brief Sensors namespace
   namespace sensors
   {
+    // Forward declare private data class.
+    class SonarSensorPrivate;
+
     /// \addtogroup gazebo_sensors
     /// \{
 
@@ -53,19 +54,34 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited
-      public: virtual std::string GetTopic() const;
+      public: virtual std::string Topic() const;
 
       /// \brief Get the minimum range of the sonar
       /// \return The sonar's minimum range.
-      public: double GetRangeMin() const;
+      /// \deprecated See RangeMin()
+      public: double GetRangeMin() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the minimum range of the sonar
+      /// \return The sonar's minimum range.
+      public: double RangeMin() const;
 
       /// \brief Get the minimum range of the sonar.
       /// \return The sonar's maximum range.
-      public: double GetRangeMax() const;
+      /// \deprecated See RangeMax()
+      public: double GetRangeMax() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the minimum range of the sonar.
+      /// \return The sonar's maximum range.
+      public: double RangeMax() const;
 
       /// \brief Get the radius of the sonar cone at maximum range.
       /// \return The radisu of the sonar cone at max range.
-      public: double GetRadius() const;
+      /// \deprecated See Radius()
+      public: double GetRadius() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the radius of the sonar cone at maximum range.
+      /// \return The radius of the sonar cone at max range.
+      public: double Radius() const;
 
       /// \brief Get detected range for a sonar.
       ///         Warning: If you are accessing all the ray data in a loop
@@ -75,7 +91,19 @@ namespace gazebo
       ///         problem by using SetActive(false) <your accessor loop>
       ///         SetActive(true).
       /// \return Returns DBL_MAX for no detection.
-      public: double GetRange();
+      /// \deprecated See Range()
+      public: double GetRange() GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get detected range for a sonar.
+      ///         Warning: If you are accessing all the ray data in a loop
+      ///         it's possible that the Ray will update in the middle of
+      ///         your access loop. This means some data will come from one
+      ///         scan, and some from another scan. You can solve this
+      ///         problem by using SetActive(false) <your accessor loop>
+      ///         SetActive(true).
+      /// \return Returns DBL_MAX for no detection.
+      public: double Range();
+
 
       // Documentation inherited
       public: virtual bool IsActive() const;
@@ -83,9 +111,8 @@ namespace gazebo
       /// \brief Connect a to the new update signal.
       /// \param[in] _subscriber Callback function.
       /// \return The connection, which must be kept in scope.
-      public: template<typename T>
-              event::ConnectionPtr ConnectUpdate(T _subscriber)
-              {return update.Connect(_subscriber);}
+      public: event::ConnectionPtr ConnectUpdate(
+                  std::function<void (msgs::SonarStamped)> _subscriber);
 
       /// \brief Disconnect from the update signal.
       /// \param[in] _conn Connection to remove.
@@ -97,54 +124,12 @@ namespace gazebo
       // Documentation inherited
       protected: virtual void Fini();
 
-      /// \brief Update event.
-      protected: event::EventT<void(msgs::SonarStamped)> update;
-
       /// \brief Callback for contact messages from the physics engine.
       private: void OnContacts(ConstContactsPtr &_msg);
 
-      /// \brief Collison object that holds the sonarShape.
-      private: physics::CollisionPtr sonarCollision;
-
-      /// \brief Shape used to generate contact information.
-      private: physics::MeshShapePtr sonarShape;
-
-      /// \brief Parent entity of this sensor
-      private: physics::EntityPtr parentEntity;
-
-      /// \brief Subscription to contact messages from the physics engine
-      private: transport::SubscriberPtr contactSub;
-
-      /// \brief Publishes the sonsarMsg.
-      private: transport::PublisherPtr sonarPub;
-
-      /// \brief Store current sonar info
-      private: msgs::SonarStamped sonarMsg;
-
-      /// \brief Mutex used to protect reading/writing the sonar message.
-      private: boost::mutex mutex;
-
-      /// \brief Contact messages list type
-      typedef std::list<boost::shared_ptr<msgs::Contacts const> > ContactMsgs_L;
-
-      /// \brief List of received contacts from the sonar collision shape.
-      private: ContactMsgs_L incomingContacts;
-
-      /// \brief Pose of the sonar shape's midpoint.
-      private: ignition::math::Pose3d sonarMidPose;
-
-      /// \brief Minimum range
-      private: double rangeMin;
-
-      /// \brief Maximum range
-      private: double rangeMax;
-
-      /// \brief Radius of the sonar cone at maximum range.
-      private: double radius;
-
-      /// \brief Counts the number of times there were no contacts. This is
-      /// used to reduce the range value jumping.
-      private: int emptyContactCount;
+      /// \internal
+      /// \brief Internal data pointer
+      private: std::unique_ptr<SonarSensorPrivate> dataPtr;
     };
     /// \}
   }

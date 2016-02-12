@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -258,6 +258,9 @@ namespace gazebo
 
       /// \brief The list of models that need to publish their pose.
       public: std::set<ModelPtr> publishModelPoses;
+
+      /// \brief The list of models that need to publish their scale.
+      public: std::set<ModelPtr> publishModelScales;
 
       /// \brief The list of lights that need to publish their pose.
       public: std::set<LightPtr> publishLightPoses;

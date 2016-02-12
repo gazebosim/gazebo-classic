@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,18 +17,21 @@
 #ifndef _GAZEBO_SENSORS_CAMERASENSOR_HH_
 #define _GAZEBO_SENSORS_CAMERASENSOR_HH_
 
+#include <memory>
 #include <string>
 
 #include "gazebo/sensors/Sensor.hh"
-#include "gazebo/msgs/MessageTypes.hh"
-#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace sensors
   {
+    // Forward declare private data class
+    class CameraSensorPrivate;
+
     /// \addtogroup gazebo_sensors Sensors
     /// \{
 
@@ -59,25 +62,44 @@ namespace gazebo
 
       /// \brief Gets the topic name of the sensor
       /// \return Topic name
-      /// @todo to be implemented
-      public: virtual std::string GetTopic() const;
+      public: virtual std::string Topic() const;
 
       /// \brief Returns a pointer to the rendering::Camera.
       /// \return The Pointer to the camera sensor.
-      public: rendering::CameraPtr GetCamera() const
-              {return this->camera;}
+      /// \deprecated See Camera() function
+      public: rendering::CameraPtr GetCamera() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Returns a pointer to the rendering::Camera.
+      /// \return The Pointer to the camera sensor.
+      public: rendering::CameraPtr Camera() const;
 
       /// \brief Gets the width of the image in pixels.
       /// \return The image width in pixels.
-      public: unsigned int GetImageWidth() const;
+      /// \deprecated See ImageWidth()
+      public: unsigned int GetImageWidth() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Gets the width of the image in pixels.
+      /// \return The image width in pixels.
+      /// \deprecated See ImageWidth()
+      public: unsigned int ImageWidth() const;
 
       /// \brief Gets the height of the image in pixels.
       /// \return The image height in pixels.
-      public: unsigned int GetImageHeight() const;
+      /// \deprecated See ImageHeight()
+      public: unsigned int GetImageHeight() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Gets the height of the image in pixels.
+      /// \return The image height in pixels.
+      public: unsigned int ImageHeight() const;
 
       /// \brief Gets the raw image data from the sensor.
       /// \return The pointer to the image data array.
-      public: const unsigned char *GetImageData();
+      /// \deprecated See ImageData()
+      public: const unsigned char *GetImageData() GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Gets the raw image data from the sensor.
+      /// \return The pointer to the image data array.
+      public: const unsigned char *ImageData() const;
 
       /// \brief Saves the image to the disk.
       /// \param[in] _filename The name of the file to be saved.
@@ -94,7 +116,14 @@ namespace gazebo
       protected: virtual void Fini();
 
       /// \brief Handle the render event.
-      private: void Render();
+      protected: virtual void Render();
+
+      /// \brief Get the value of the rendered flag
+      protected: bool Rendered() const;
+
+      /// \brief Set the value of the rendered flag
+      /// \param[in] _value New rendered value.
+      protected: void SetRendered(const bool _value);
 
       /// \brief Pointer to the camera.
       protected: rendering::CameraPtr camera;
@@ -102,8 +131,9 @@ namespace gazebo
       /// \brief Publisher of image messages.
       protected: transport::PublisherPtr imagePub;
 
-      /// \brief True if the sensor was rendered.
-      private: bool rendered;
+      /// \internal
+      /// \brief Private data pointer
+      private: std::unique_ptr<CameraSensorPrivate> dataPtr;
     };
     /// \}
   }

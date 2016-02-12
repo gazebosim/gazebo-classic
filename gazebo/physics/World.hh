@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -336,6 +336,12 @@ namespace gazebo
       /// iteration.
       /// \param[in] _model Pointer to the model to publish.
       public: void PublishModelPose(physics::ModelPtr _model);
+
+      /// \brief Publish scale updates for a model.
+      /// This list of models to publish is processed and cleared once every
+      /// iteration.
+      /// \param[in] _model Pointer to the model to publish.
+      public: void PublishModelScale(physics::ModelPtr _model);
 
       /// \brief Publish pose updates for a light.
       /// Adds light to a list of lights to publish, which is processed and
