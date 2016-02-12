@@ -45,6 +45,7 @@ Command::Command(const std::string &_name, const std::string &_brief)
   : name(_name), brief(_brief), visibleOptions("Options"), argc(0), argv(NULL)
 {
   this->visibleOptions.add_options()
+    ("verbose", "Print extra information")
     ("help,h", "Print this help message");
 }
 
@@ -185,6 +186,10 @@ bool Command::Run(int _argc, char **_argv)
   {
     this->Help();
     return true;
+  }
+
+  if (this->vm.count("verbose")) {
+    gazebo::common::Console::SetQuiet(false);
   }
 
   if (!this->TransportInit())
