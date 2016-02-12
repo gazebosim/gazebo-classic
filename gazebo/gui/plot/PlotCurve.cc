@@ -23,11 +23,9 @@
 
 #include <map>
 
-#include <qwt/qwt_symbol.h>
-#include <qwt/qwt_plot_curve.h>
-
 #include "gazebo/common/Assert.hh"
 
+#include "gazebo/gui/plot/qwt_gazebo.h"
 #include "gazebo/gui/plot/IncrementalPlot.hh"
 #include "gazebo/gui/plot/PlotCurve.hh"
 

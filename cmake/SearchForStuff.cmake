@@ -707,8 +707,25 @@ if (QWT_INCLUDE_DIR AND QWT_LIBRARY)
   set(HAVE_QWT TRUE)
 endif (QWT_INCLUDE_DIR AND QWT_LIBRARY)
 
+# version
+set ( _VERSION_FILE ${QWT_INCLUDE_DIR}/qwt_global.h )
+if ( EXISTS ${_VERSION_FILE} )
+  file ( STRINGS ${_VERSION_FILE} _VERSION_LINE REGEX "define[ ]+QWT_VERSION_STR" )
+  if ( _VERSION_LINE )
+    string ( REGEX REPLACE ".*define[ ]+QWT_VERSION_STR[ ]+\"(.*)\".*" "\\1"
+        QWT_VERSION_STRING "${_VERSION_LINE}" )
+    string ( REGEX REPLACE "([0-9]+)\\.([0-9]+)\\.([0-9]+)" "\\1"
+        QWT_MAJOR_VERSION "${QWT_VERSION_STRING}" )
+    string ( REGEX REPLACE "([0-9]+)\\.([0-9]+)\\.([0-9]+)" "\\2"
+        QWT_MINOR_VERSION "${QWT_VERSION_STRING}" )
+    string ( REGEX REPLACE "([0-9]+)\\.([0-9]+)\\.([0-9]+)" "\\3"
+        QWT_PATCH_VERSION "${QWT_VERSION_STRING}" )
+    set(QWT_VERSION
+      ${QWT_MAJOR_VERSION}.${QWT_MINOR_VERSION}.${QWT_PATCH_VERSION})
+  endif ()
+endif ()
 if (HAVE_QWT)
-  message (STATUS "Looking for qwt - found")
+  message (STATUS "Looking for qwt - found: version ${QWT_VERSION}")
 else()
   message (STATUS "Looking for qwt - not found")
   BUILD_ERROR ("Missing: libqwt-dev. Required for plotting.")
