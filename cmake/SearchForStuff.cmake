@@ -661,7 +661,7 @@ endif ()
 # Find ignition math in unix platforms
 # In Windows we expect a call from configure.bat script with the paths
 if (NOT WIN32)
-  find_package(ignition-math2 QUIET)
+  find_package(ignition-math2 2.3 QUIET)
   if (NOT ignition-math2_FOUND)
     message(STATUS "Looking for ignition-math2-config.cmake - not found")
     BUILD_ERROR ("Missing: Ignition math2 library.")
@@ -674,9 +674,9 @@ endif()
 # Find the Ignition_Transport library
 # In Windows we expect a call from configure.bat script with the paths
 if (NOT WIN32)
-  find_package(ignition-transport0 QUIET)
-  if (NOT ignition-transport0_FOUND)
-    BUILD_WARNING ("Missing: Ignition Transport (libignition-transport0-dev)")
+  find_package(ignition-transport1 QUIET)
+  if (NOT ignition-transport1_FOUND)
+    BUILD_ERROR ("Missing: Ignition Transport (libignition-transport1-dev)")
   else()
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${IGNITION-TRANSPORT_CXX_FLAGS}")
     include_directories(${IGNITION-TRANSPORT_INCLUDE_DIRS})
@@ -691,6 +691,7 @@ find_path(QWT_INCLUDE_DIR NAMES qwt.h PATHS
   /usr/local/include
   "$ENV{LIB_DIR}/include"
   "$ENV{INCLUDE}"
+  /usr/local/lib/qwt.framework/Headers
   PATH_SUFFIXES qwt-qt4 qwt qwt5
   )
 
@@ -699,6 +700,7 @@ find_library(QWT_LIBRARY NAMES qwt qwt6 qwt5 PATHS
   /usr/local/lib
   "$ENV{LIB_DIR}/lib"
   "$ENV{LIB}/lib"
+  /usr/local/lib/qwt.framework
   )
 
 if (QWT_INCLUDE_DIR AND QWT_LIBRARY)
@@ -708,7 +710,8 @@ else()
 endif ()
 
 if (HAVE_QWT)
-  message(STATUS "Found Qwt: ${QWT_LIBRARY}")
-else ()
-  BUILD_WARNING ("Could not find libqwt-dev. Plotting features will be disabled.")
+  message (STATUS "Looking for qwt - found")
+else()
+  message (STATUS "Looking for qwt - not found")
+  BUILD_ERROR ("Missing: libqwt-dev. Required for plotting.")
 endif ()

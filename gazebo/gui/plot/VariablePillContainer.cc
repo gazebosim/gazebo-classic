@@ -32,7 +32,7 @@ namespace gazebo
   {
     /// \internal
     /// \brief VariablePillContainer private data
-    struct VariablePillContainerPrivate
+    class VariablePillContainerPrivate
     {
       /// \brief Text label
       public: QLabel *label;
@@ -66,12 +66,30 @@ VariablePillContainer::VariablePillContainer(QWidget *_parent)
   this->dataPtr->variableLayout = new QHBoxLayout;
   this->dataPtr->variableLayout->setAlignment(Qt::AlignLeft);
 
+  QHBoxLayout *frameLayout = new QHBoxLayout;
+  frameLayout->addLayout(labelLayout);
+  frameLayout->addLayout(this->dataPtr->variableLayout);
+  frameLayout->setAlignment(Qt::AlignLeft);
+  frameLayout->setContentsMargins(4, 4, 4, 4);
+  QFrame *mainFrame = new QFrame;
+  mainFrame->setObjectName("variableContainerFrame");
+  mainFrame->setLayout(frameLayout);
+  mainFrame->setFrameShape(QFrame::NoFrame);
+  mainFrame->setContentsMargins(0, 0, 0, 0);
+
   QHBoxLayout *mainLayout = new QHBoxLayout;
-  mainLayout->addLayout(labelLayout);
-  mainLayout->addLayout(this->dataPtr->variableLayout);
-  mainLayout->setAlignment(Qt::AlignLeft);
+  mainLayout->addWidget(mainFrame);
+  mainLayout->setContentsMargins(0, 0, 0, 0);
+  mainLayout->setSpacing(0);
+
   this->setLayout(mainLayout);
   this->setAcceptDrops(true);
+
+  /*QGraphicsDropShadowEffect *shadow = new QGraphicsDropShadowEffect();
+  shadow->setBlurRadius(1);
+  shadow->setOffset(2, 2);
+  this->setGraphicsEffect(shadow);
+  */
 }
 
 /////////////////////////////////////////////////
@@ -86,9 +104,22 @@ void VariablePillContainer::SetText(const std::string &_text)
 }
 
 /////////////////////////////////////////////////
+std::string VariablePillContainer::Text() const
+{
+  return this->dataPtr->label->text().toStdString();
+}
+
+/////////////////////////////////////////////////
 unsigned int VariablePillContainer::AddVariablePill(const std::string &_name)
 {
+  if (this->dataPtr->maxSize != -1 &&
+      static_cast<int>(this->VariablePillCount()) >= this->dataPtr->maxSize)
+  {
+    return VariablePill::EMPTY_VARIABLE;
+  }
+
   VariablePill *variable = new VariablePill;
+  variable->SetName(_name);
   variable->SetText(_name);
 
   connect(variable, SIGNAL(VariableMoved(unsigned int)),
@@ -112,6 +143,12 @@ void VariablePillContainer::AddVariablePill(VariablePill *_variable)
   if (this->dataPtr->variables.find(_variable->Id()) !=
       this->dataPtr->variables.end())
     return;
+
+  if (this->dataPtr->maxSize != -1 &&
+      static_cast<int>(this->VariablePillCount()) >= this->dataPtr->maxSize)
+  {
+    return;
+  }
 
   _variable->SetContainer(this);
   _variable->setVisible(true);
@@ -167,18 +204,20 @@ void VariablePillContainer::RemoveVariablePill(const unsigned int _id)
   {
     this->dataPtr->variableLayout->takeAt(idx);
     this->dataPtr->variables.erase(variable->Id());
-    // remove from parent
+    // remove from parent if any
     if (variable->Parent())
+    {
+      // remove and rely on callbacks to emit the VariableRemoved signal
       variable->Parent()->RemoveVariablePill(variable);
+    }
+    else
+      emit VariableRemoved(variable->Id(), VariablePill::EMPTY_VARIABLE);
   }
 
   // otherwise remove from container
   variable->SetContainer(NULL);
   variable->setVisible(false);
-
- // emit VariableRemoved(variable->Id(), VariablePill::EMPTY_VARIABLE);
 }
-
 
 /////////////////////////////////////////////////
 void VariablePillContainer::RemoveVariablePill(VariablePill *_variable)
@@ -205,12 +244,12 @@ unsigned int VariablePillContainer::VariablePillCount() const
 VariablePill *VariablePillContainer::GetVariablePill(
     const unsigned int _id) const
 {
-  for (const auto v : this->dataPtr->variables)
+  for (const auto &v : this->dataPtr->variables)
   {
     if (v.first == _id)
       return v.second;
 
-    for (const auto child : v.second->VariablePills())
+    for (const auto &child : v.second->VariablePills())
     {
       if (child.first == _id)
         return child.second;
@@ -234,35 +273,33 @@ void VariablePillContainer::SetSelected(VariablePill *_variable)
 /////////////////////////////////////////////////
 void VariablePillContainer::dragEnterEvent(QDragEnterEvent *_evt)
 {
-  if (this->dataPtr->maxSize != -1 &&
-      static_cast<int>(this->VariablePillCount()) >= this->dataPtr->maxSize)
+  if (!this->IsDragValid(_evt))
   {
     _evt->ignore();
     return;
   }
-
-  if (_evt->source() == this)
-    return;
 
   if (_evt->mimeData()->hasFormat("application/x-item"))
   {
     _evt->setDropAction(Qt::LinkAction);
-    _evt->acceptProposedAction();
   }
   else if (_evt->mimeData()->hasFormat("application/x-pill-item"))
   {
     _evt->setDropAction(Qt::MoveAction);
-    _evt->acceptProposedAction();
   }
   else
+  {
     _evt->ignore();
+    return;
+  }
+
+  _evt->acceptProposedAction();
 }
 
 /////////////////////////////////////////////////
 void VariablePillContainer::dropEvent(QDropEvent *_evt)
 {
-  if (this->dataPtr->maxSize != -1 &&
-      static_cast<int>(this->VariablePillCount()) >= this->dataPtr->maxSize)
+  if (!this->IsDragValid(_evt))
   {
     _evt->ignore();
     return;
@@ -270,13 +307,12 @@ void VariablePillContainer::dropEvent(QDropEvent *_evt)
 
   if (_evt->mimeData()->hasFormat("application/x-item"))
   {
-    QString dataStr = _evt->mimeData()->data("application/x-item");
+    QString mimeData = _evt->mimeData()->data("application/x-item");
+    std::string dataStr = mimeData.toStdString();
+    this->AddVariablePill(dataStr);
 
-    std::cerr << "variable '" << dataStr.toStdString()
-        << "' dropped into container ["
+    std::cerr << "variable '" << dataStr << "' dropped into container ["
         << this->dataPtr->label->text().toStdString() << "]"<< std::endl;
-
-    this->AddVariablePill(dataStr.toStdString());
   }
   else if (_evt->mimeData()->hasFormat("application/x-pill-item"))
   {
@@ -287,6 +323,12 @@ void VariablePillContainer::dropEvent(QDropEvent *_evt)
       return;
     }
 
+    VariablePillContainer *container = variable->Container();
+
+    // moved to the same container - no op
+    if (!variable->Parent() && (container && container == this))
+      return;
+
     // block signals and emit VariableMoved instead.
     VariablePill *parentVariable = variable->Parent();
     if (parentVariable)
@@ -295,13 +337,14 @@ void VariablePillContainer::dropEvent(QDropEvent *_evt)
       parentVariable->RemoveVariablePill(variable);
       parentVariable->blockSignals(false);
     }
-
-    VariablePillContainer *container = variable->Container();
-    if (container)
+    else
     {
-      container->blockSignals(true);
-      container->RemoveVariablePill(variable);
-      container->blockSignals(false);
+      if (container)
+      {
+        container->blockSignals(true);
+        container->RemoveVariablePill(variable);
+        container->blockSignals(false);
+      }
     }
 
     // case when the variable is dragged out from a muli-variable pill to
@@ -312,6 +355,35 @@ void VariablePillContainer::dropEvent(QDropEvent *_evt)
 
     emit VariableMoved(variable->Id(), VariablePill::EMPTY_VARIABLE);
   }
+}
+
+/////////////////////////////////////////////////
+bool VariablePillContainer::IsDragValid(QDropEvent *_evt) const
+{
+  if (this->dataPtr->maxSize != -1 &&
+      static_cast<int>(this->VariablePillCount()) >= this->dataPtr->maxSize)
+  {
+    return false;
+  }
+
+  std::string dataStr;
+  if (_evt->mimeData()->hasFormat("application/x-item"))
+  {
+    QString mimeData = _evt->mimeData()->data("application/x-item");
+    dataStr = mimeData.toStdString();
+  }
+  else if (_evt->mimeData()->hasFormat("application/x-pill-item"))
+  {
+    QString mimeData = _evt->mimeData()->data("application/x-pill-item");
+    dataStr = mimeData.toStdString();
+  }
+  else
+    return false;
+
+  if (dataStr.empty())
+    return false;
+
+  return true;
 }
 
 /////////////////////////////////////////////////
@@ -388,7 +460,6 @@ void VariablePillContainer::mouseReleaseEvent(QMouseEvent *_event)
 /////////////////////////////////////////////////
 void VariablePillContainer::OnMoveVariable(const unsigned int _id)
 {
-  std::cerr << " VariablePillContainer::OnMoveVariable " << _id << std::endl;
   VariablePill *variable = qobject_cast<VariablePill *>(QObject::sender());
   if (!variable)
     return;

@@ -27,6 +27,7 @@ set (qt_tests_local
   PlotCanvas_TEST.cc
   PlotWindow_TEST.cc
   VariablePill_TEST.cc
+  VariablePillContainer_TEST.cc
 )
 
 if (ENABLE_SCREEN_TESTS)

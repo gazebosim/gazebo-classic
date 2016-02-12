@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,6 @@
  *
 */
 #include <boost/filesystem.hpp>
-
-#include "gazebo/gazebo_config.h"
 
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/msgs/msgs.hh"
@@ -838,11 +836,7 @@ void MainWindow_TEST::ActionCreationDestruction()
 
   QVERIFY(gazebo::gui::g_redoHistoryAct);
 
-#ifdef HAVE_QWT
-  QVERIFY(gazebo::gui::g_diagnosticsAct);
-
   QVERIFY(gazebo::gui::g_plotAct);
-#endif
 
   mainWindow->close();
   delete mainWindow;
@@ -961,11 +955,7 @@ void MainWindow_TEST::ActionCreationDestruction()
 
   QVERIFY(!gazebo::gui::g_redoHistoryAct);
 
-#ifdef HAVE_QWT
-  QVERIFY(!gazebo::gui::g_diagnosticsAct);
-
   QVERIFY(!gazebo::gui::g_plotAct);
-#endif
 }
 
 /////////////////////////////////////////////////

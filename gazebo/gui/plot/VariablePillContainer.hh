@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_GUI_VARIABLE_PILL_CONTAINER_HH_
-#define _GAZEBO_GUI_VARIABLE_PILL_CONTAINER_HH_
+#ifndef _GAZEBO_GUI_PLOT_VARIABLE_PILL_CONTAINER_HH_
+#define _GAZEBO_GUI_PLOT_VARIABLE_PILL_CONTAINER_HH_
 
 #include <memory>
 #include <string>
@@ -29,7 +29,7 @@ namespace gazebo
   namespace gui
   {
     // Forward declare private data class
-    struct VariablePillContainerPrivate;
+    class VariablePillContainerPrivate;
 
     class VariablePill;
 
@@ -45,13 +45,13 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~VariablePillContainer();
 
-      /// \brief Get the unique id of this variable pill container.
-      /// \return Unique id;
-      public: unsigned int Id() const;
-
       /// \brief Set the label text for this variable pill container.
       /// \param[in] _text Text to set the label to.
       public: void SetText(const std::string &_text);
+
+      /// \brief Get the variable pill container's label text.
+      /// \return Container label.
+      public: std::string Text() const;
 
       /// \brief Set the maximum number of variable pills this container can
       /// hold
@@ -106,6 +106,11 @@ namespace gazebo
       /// \brief Qt callback when the mouse is released.
       /// \param[in] _event Qt mouse event.
       protected: void mouseReleaseEvent(QMouseEvent *_event);
+
+      /// \brief Helper function to check whether the drag action is valid.
+      /// \param[in] _evt The drag event.
+      /// \return True if the drag action is valid
+      private: bool IsDragValid(QDropEvent *_evt) const;
 
       /// \brief Qt signal emitted when a variable is added to the container
       /// \param[in] _id Unique id of the variable pill.

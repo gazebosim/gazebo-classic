@@ -15,16 +15,41 @@
  *
 */
 
-#include "gazebo/gui/plot/ExportDialog.hh"
-#include "gazebo/gui/plot/VariablePillContainer.hh"
-#include "gazebo/gui/plot/PlotCurve.hh"
-#include "gazebo/gui/plot/IncrementalPlot.hh"
+#include <mutex>
+
 #include "gazebo/gui/plot/PlotCanvas.hh"
 #include "gazebo/gui/plot/PlotWindow.hh"
-#include "gazebo/gui/plot/PlotWindowPrivate.hh"
 
 using namespace gazebo;
 using namespace gui;
+
+namespace gazebo
+{
+  namespace gui
+  {
+    /// \brief Private data for the PlotWindow class
+    class PlotWindowPrivate
+    {
+      /// \brief The list of variable labels.
+      public: QListWidget *labelList;
+
+      /// \brief True when plotting is paused.
+      public: bool paused = false;
+
+      /// \brief Action to pause plotting
+      public: QAction *plotPlayAct;
+
+      /// \brief Action to resume plotting
+      public: QAction *plotPauseAct;
+
+      /// \brief Layout to hold all the canvases.
+      public: QVBoxLayout *canvasLayout;
+
+      /// \brief Mutex to protect the canvas updates
+      public: std::mutex mutex;
+    };
+  }
+}
 
 // A special list widget that allows dragging of items from it to a
 // plot
@@ -47,7 +72,7 @@ class DragableListWidget : public QListWidget
                drag->exec(Qt::LinkAction);
              }
 
-  protected: virtual Qt::DropActions supportedDropActions()
+  protected: virtual Qt::DropActions supportedDropActions() const
              {
                return Qt::LinkAction;
              }
@@ -60,7 +85,7 @@ PlotWindow::PlotWindow(QWidget *_parent)
 {
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));
   this->setWindowTitle("Gazebo: Plotting Utility");
-  this->setObjectName("PlotWindow");
+  this->setObjectName("plotWindow");
   this->setWindowFlags(Qt::Window | Qt::WindowTitleHint |
       Qt::WindowCloseButtonHint | Qt::WindowStaysOnTopHint |
       Qt::CustomizeWindowHint);
@@ -71,6 +96,11 @@ PlotWindow::PlotWindow(QWidget *_parent)
 
   // add button
   QPushButton *addCanvasButton = new QPushButton("+");
+  addCanvasButton->setObjectName("plotAddCanvas");
+  QGraphicsDropShadowEffect *addCanvasShadow = new QGraphicsDropShadowEffect();
+  addCanvasShadow->setBlurRadius(8);
+  addCanvasShadow->setOffset(0, 0);
+  addCanvasButton->setGraphicsEffect(addCanvasShadow);
   connect(addCanvasButton, SIGNAL(clicked()), this, SLOT(OnAddCanvas()));
   QVBoxLayout *addButtonLayout = new QVBoxLayout;
   addButtonLayout->addWidget(addCanvasButton);
@@ -84,30 +114,26 @@ PlotWindow::PlotWindow(QWidget *_parent)
   bottomFrame->setSizePolicy(QSizePolicy::Expanding,
       QSizePolicy::Minimum);
 
-  this->dataPtr->plotPlayAct = new QAction(QIcon(":/images/play.png"),
+  this->dataPtr->plotPlayAct = new QAction(QIcon(":/images/play_dark.png"),
       tr("Play"), this);
   this->dataPtr->plotPlayAct->setStatusTip(tr("Continue Plotting"));
   this->dataPtr->plotPlayAct->setVisible(false);
   connect(this->dataPtr->plotPlayAct, SIGNAL(triggered()),
       this, SLOT(OnPlay()));
 
-  this->dataPtr->plotPauseAct = new QAction(QIcon(":/images/pause.png"),
+  this->dataPtr->plotPauseAct = new QAction(QIcon(":/images/pause_dark.png"),
       tr("Pause"), this);
   this->dataPtr->plotPauseAct->setStatusTip(tr("Pause Plotting"));
   this->dataPtr->plotPauseAct->setVisible(true);
   connect(this->dataPtr->plotPauseAct, SIGNAL(triggered()),
       this, SLOT(OnPause()));
 
-  QPushButton *exportButton = new QPushButton("Export");
-  connect(exportButton, SIGNAL(clicked()),
-      this, SLOT(OnExport()));
-
   QHBoxLayout *bottomPanelLayout = new QHBoxLayout;
   QToolBar *playToolbar = new QToolBar;
+  playToolbar->setObjectName("plotToolbar");
   playToolbar->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
   playToolbar->addAction(this->dataPtr->plotPlayAct);
   playToolbar->addAction(this->dataPtr->plotPauseAct);
-  playToolbar->addWidget(exportButton);
   bottomPanelLayout->addStretch();
   bottomPanelLayout->addWidget(playToolbar);
   bottomPanelLayout->addStretch();
@@ -133,6 +159,20 @@ PlotWindow::PlotWindow(QWidget *_parent)
   item->setToolTip(tr("Drag onto graph to plot"));
   this->dataPtr->labelList->addItem(item);
 
+  QVBoxLayout *leftLayout = new QVBoxLayout;
+  leftLayout->addWidget(this->dataPtr->labelList);
+
+  QHBoxLayout *mainLayout = new QHBoxLayout;
+  mainLayout->addLayout(leftLayout);
+  mainLayout->addLayout(plotLayout);
+
+  this->setLayout(mainLayout);
+  this->setSizeGripEnabled(true);
+
+  QTimer *displayTimer = new QTimer(this);
+  connect(displayTimer, SIGNAL(timeout()), this, SLOT(Update()));
+  displayTimer->start(30);
+
   //=================
   // TODO for testing - remove later
   QListWidgetItem *itema = new QListWidgetItem("Dog");
@@ -145,27 +185,13 @@ PlotWindow::PlotWindow(QWidget *_parent)
   itemc->setToolTip(tr("Drag onto graph to plot"));
   this->dataPtr->labelList->addItem(itemc);
   //=================
-
-  QVBoxLayout *leftLayout = new QVBoxLayout;
-  leftLayout->addWidget(this->dataPtr->labelList);
-  // leftLayout->addLayout(pauseLayout);
-
-  QHBoxLayout *mainLayout = new QHBoxLayout;
-  mainLayout->addLayout(leftLayout);
-//  mainLayout->addWidget(plotScrollArea, 2);
-  mainLayout->addLayout(plotLayout);
-
-  this->setLayout(mainLayout);
-  this->setSizeGripEnabled(true);
-
-  QTimer *displayTimer = new QTimer(this);
-  connect(displayTimer, SIGNAL(timeout()), this, SLOT(Update()));
-  displayTimer->start(30);
 }
 
 /////////////////////////////////////////////////
 PlotWindow::~PlotWindow()
 {
+  this->dataPtr->paused = true;
+  this->Clear();
 }
 
 /////////////////////////////////////////////////
@@ -174,42 +200,6 @@ void PlotWindow::OnPlay()
   this->dataPtr->paused = false;
   this->dataPtr->plotPauseAct->setVisible(true);
   this->dataPtr->plotPlayAct->setVisible(false);
-}
-
-/////////////////////////////////////////////////
-void PlotWindow::OnExport()
-{
-  // Should we pause when exporting?
-  // this->OnPause();
-
-  ExportDialog exportDialog(this);
-  exportDialog.exec();
-  /*exportDialog.deleteLater();
-  if (exportDialog.exec() == QDialog::Accepted)
-  {
-  }
-  else
-  {
-  }*/
-}
-
-/////////////////////////////////////////////////
-std::list<PlotCanvas*> PlotWindow::Plots()
-{
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-
-  std::list<PlotCanvas*> plots;
-  for (int i = 0; i < this->dataPtr->canvasLayout->count(); ++i)
-  {
-    QLayoutItem *item = this->dataPtr->canvasLayout->itemAt(i);
-    PlotCanvas *canvas = qobject_cast<PlotCanvas *>(item->widget());
-    if (!canvas)
-      continue;
-
-    plots.push_back(canvas);
-  }
-
-  return plots;
 }
 
 /////////////////////////////////////////////////
@@ -237,9 +227,19 @@ void PlotWindow::RemoveCanvas(PlotCanvas *_canvas)
   if (idx < 0)
     return;
 
-  // canvas->hide();
   this->dataPtr->canvasLayout->takeAt(idx);
   _canvas->deleteLater();
+}
+
+/////////////////////////////////////////////////
+void PlotWindow::Clear()
+{
+  while (this->CanvasCount() > 0u)
+  {
+    QLayoutItem *item = this->dataPtr->canvasLayout->itemAt(0);
+    PlotCanvas *canvas = qobject_cast<PlotCanvas *>(item->widget());
+    this->RemoveCanvas(canvas);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -282,34 +282,5 @@ void PlotWindow::Update()
     if (!canvas)
       continue;
     canvas->Update();
-  }
-}
-
-/////////////////////////////////////////////////
-void PlotWindow::Export()
-{
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-  for (int i = 0; i < this->dataPtr->canvasLayout->count(); ++i)
-  {
-    QLayoutItem *item = this->dataPtr->canvasLayout->itemAt(i);
-    PlotCanvas *canvas = qobject_cast<PlotCanvas *>(item->widget());
-    if (!canvas)
-      continue;
-
-    for (const auto &plot : canvas->Plots())
-    {
-      for (const auto &curve : plot->Curves())
-      {
-        auto c = curve.lock();
-        if (!c)
-          continue;
-
-        for (unsigned int j = 0; j < c->Size(); ++j)
-        {
-          ignition::math::Vector2d pt = c->Point(j);
-          std::cerr << pt.X() << ", " << pt.Y() << std::endl;
-        }
-      }
-    }
   }
 }

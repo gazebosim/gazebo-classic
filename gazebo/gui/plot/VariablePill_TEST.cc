@@ -31,10 +31,15 @@ void VariablePill_TEST::Variable()
   gazebo::gui::VariablePill *var01 = new gazebo::gui::VariablePill(NULL);
   QVERIFY(var01 != NULL);
 
+  // name
+  std::string varName = "var01name";
+  var01->SetName(varName);
+  QCOMPARE(var01->Name(), varName);
+
   // text
-  std::string varName = "var01";
-  var01->SetText(varName);
-  QCOMPARE(var01->Text(), varName);
+  std::string varText = "var01";
+  var01->SetText(varText);
+  QCOMPARE(var01->Text(), varText);
 
   // selected state
   QCOMPARE(var01->IsSelected(), false);
@@ -99,7 +104,7 @@ void VariablePill_TEST::VariableId()
 /////////////////////////////////////////////////
 void VariablePill_TEST::MultiVariable()
 {
-  // create 3 variable pills
+  // create 4 variable pills
   gazebo::gui::VariablePill *var01 = new gazebo::gui::VariablePill(NULL);
   QVERIFY(var01 != NULL);
   QCOMPARE(var01->VariablePillCount(), 0u);

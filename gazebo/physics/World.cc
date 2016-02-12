@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,6 +63,7 @@
 
 #include "gazebo/util/OpenAL.hh"
 #include "gazebo/util/Diagnostics.hh"
+#include "gazebo/util/IntrospectionManager.hh"
 #include "gazebo/util/LogRecord.hh"
 
 #include "gazebo/physics/Road.hh"
@@ -320,6 +321,8 @@ void World::Load(sdf::ElementPtr _sdf)
 
   this->dataPtr->userCmdManager = UserCmdManagerPtr(
       new UserCmdManager(shared_from_this()));
+
+  this->RegisterIntrospectionItems();
 
   this->dataPtr->loaded = true;
 }
@@ -804,6 +807,8 @@ void World::Update()
   DIAG_TIMER_LAP("World::Update", "ContactManager::PublishContacts");
 
   event::Events::worldUpdateEnd();
+
+  gazebo::util::IntrospectionManager::Instance()->Update();
 
   DIAG_TIMER_STOP("World::Update");
 }
@@ -2600,4 +2605,20 @@ void World::ResetPhysicsStates()
 {
   for (auto &model : this->dataPtr->models)
     model->ResetPhysicsStates();
+}
+
+/////////////////////////////////////////////////
+void World::RegisterIntrospectionItems()
+{
+  // Add here all the items that might be introspected.
+
+  // A callback for updating simulation time.
+  auto fSimTime = [this](gazebo::msgs::Any &_msg)
+  {
+    _msg.set_type(gazebo::msgs::Any::DOUBLE);
+    _msg.set_double_value(this->GetSimTime().Double());
+    return true;
+  };
+  gazebo::util::IntrospectionManager::Instance()->Register(
+      "sim_time", "double", fSimTime);
 }

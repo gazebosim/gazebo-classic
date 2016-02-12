@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -97,7 +97,8 @@ namespace gazebo
 
     extern GZ_GUI_VISIBLE QAction *g_topicVisAct;
 
-    extern GZ_GUI_VISIBLE QAction *g_diagnosticsAct;
+    /// \brief Action to show/hide the plotting utitlty
+    extern GZ_GUI_VISIBLE QAction *g_plotAct;
 
     /// \brief Action to show/hide the plotting utitlty
     extern GZ_GUI_VISIBLE QAction *g_plotAct;
