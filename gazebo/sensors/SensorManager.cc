@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
   #include <Winsock2.h>
 #endif
 
+#include <functional>
 #include <boost/bind.hpp>
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Time.hh"
@@ -103,20 +104,31 @@ void SensorManager::Update(bool _force)
   {
     boost::recursive_mutex::scoped_lock lock(this->mutex);
 
-    // in case things are spawn, sensors length changes
-    for (Sensor_V::iterator iter = this->initSensors.begin();
-         iter != this->initSensors.end(); ++iter)
+    if (this->worlds.empty() && physics::worlds_running() && this->initialized)
     {
-      GZ_ASSERT((*iter) != NULL, "Sensor pointer is NULL");
-      GZ_ASSERT((*iter)->Category() < 0 ||
-          (*iter)->Category() < CATEGORY_COUNT, "Sensor category is empty");
-      GZ_ASSERT(this->sensorContainers[(*iter)->Category()] != NULL,
-                "Sensor container is NULL");
-
-      (*iter)->Init();
-      this->sensorContainers[(*iter)->Category()]->AddSensor(*iter);
+      auto world = physics::get_world();
+      this->worlds[world->GetName()] = world;
+      world->_SetSensorsInitialized(true);
     }
-    this->initSensors.clear();
+
+    if (!this->initSensors.empty())
+    {
+      // in case things are spawned, sensors length changes
+      for (auto &sensor : this->initSensors)
+      {
+        GZ_ASSERT(sensor != NULL, "Sensor pointer is NULL");
+        GZ_ASSERT(sensor->Category() < 0 ||
+            sensor->Category() < CATEGORY_COUNT, "Sensor category is empty");
+        GZ_ASSERT(this->sensorContainers[sensor->Category()] != NULL,
+            "Sensor container is NULL");
+
+        sensor->Init();
+        this->sensorContainers[sensor->Category()]->AddSensor(sensor);
+      }
+      this->initSensors.clear();
+      for (auto &worldName_worldPtr : this->worlds)
+        worldName_worldPtr.second->_SetSensorsInitialized(true);
+    }
 
     for (std::vector<std::string>::iterator iter = this->removeSensors.begin();
          iter != this->removeSensors.end(); ++iter)
@@ -194,6 +206,20 @@ void SensorManager::Init()
     (*iter)->Init();
   }
 
+  // Connect to the time reset event.
+  this->timeResetConnection = event::Events::ConnectTimeReset(
+      std::bind(&SensorManager::ResetLastUpdateTimes, this));
+
+  // Connect to the remove sensor event.
+  this->removeSensorConnection = event::Events::ConnectRemoveSensor(
+      std::bind(&SensorManager::RemoveSensor, this, std::placeholders::_1));
+
+  // Connect to the create sensor event.
+  this->createSensorConnection = event::Events::ConnectCreateSensor(
+      std::bind(&SensorManager::OnCreateSensor, this,
+        std::placeholders::_1, std::placeholders::_2,
+        std::placeholders::_3, std::placeholders::_4));
+
   this->initialized = true;
 }
 
@@ -213,6 +239,7 @@ void SensorManager::Fini()
 
   this->removeSensors.clear();
   this->initSensors.clear();
+  this->worlds.clear();
 
   delete this->simTimeEventHandler;
   this->simTimeEventHandler = NULL;
@@ -224,6 +251,15 @@ void SensorManager::Fini()
 void SensorManager::GetSensorTypes(std::vector<std::string> &_types) const
 {
   sensors::SensorFactory::GetSensorTypes(_types);
+}
+
+//////////////////////////////////////////////////
+void SensorManager::OnCreateSensor(sdf::ElementPtr _elem,
+    const std::string &_worldName,
+    const std::string &_parentName,
+    const uint32_t _parentId)
+{
+  this->CreateSensor(_elem, _worldName, _parentName, _parentId);
 }
 
 //////////////////////////////////////////////////
@@ -246,6 +282,7 @@ std::string SensorManager::CreateSensor(sdf::ElementPtr _elem,
 
   // Load the sensor
   sensor->Load(_worldName, _elem);
+  this->worlds[_worldName] = physics::get_world(_worldName);
 
   // If the SensorManager has not been initialized, then it's okay to push
   // the sensor into one of the sensor vectors because the sensor will get
@@ -259,6 +296,7 @@ std::string SensorManager::CreateSensor(sdf::ElementPtr _elem,
   else
   {
     boost::recursive_mutex::scoped_lock lock(this->mutex);
+    this->worlds[_worldName]->_SetSensorsInitialized(false);
     this->initSensors.push_back(sensor);
   }
 
@@ -379,11 +417,10 @@ void SensorManager::SensorContainer::Init()
 {
   boost::recursive_mutex::scoped_lock lock(this->mutex);
 
-  Sensor_V::iterator iter;
-  for (iter = this->sensors.begin(); iter != this->sensors.end(); ++iter)
+  for (auto &sensor : this->sensors)
   {
-    GZ_ASSERT((*iter) != NULL, "Sensor is NULL");
-    (*iter)->Init();
+    GZ_ASSERT(sensor != NULL, "Sensor is NULL");
+    sensor->Init();
   }
 
   this->initialized = true;
@@ -447,6 +484,11 @@ void SensorManager::SensorContainer::RunLoop()
 
   engine->InitForThread();
 
+  // The original value was hardcode to 1.0. Changed the value to
+  // 1000 * MaxStepSize in order to handle simulation with a
+  // large step size.
+  double maxSensorUpdate = engine->GetMaxStepSize() * 1000;
+
   common::Time sleepTime, startTime, eventTime, diffTime;
   double maxUpdateRate = 0;
 
@@ -505,7 +547,8 @@ void SensorManager::SensorContainer::RunLoop()
     eventTime = std::max(common::Time::Zero, sleepTime - diffTime);
 
     // Make sure update time is reasonable.
-    GZ_ASSERT(diffTime.sec < 1, "Took over 1.0 seconds to update a sensor.");
+    GZ_ASSERT(diffTime.sec < maxSensorUpdate,
+        "Took over 1000*max_step_size to update a sensor.");
 
     // Make sure eventTime is not negative.
     GZ_ASSERT(eventTime >= common::Time::Zero,
@@ -558,7 +601,7 @@ SensorPtr SensorManager::SensorContainer::GetSensor(const std::string &_name,
     GZ_ASSERT((*iter) != NULL, "Sensor is NULL");
 
     // We match on the scoped name (model::link::sensor) because multiple
-    // sensors with the name leaf name make exists in a world.
+    // sensors with the same leaf name may exist in a world.
     if ((_useLeafName && (*iter)->Name() == _name) ||
         (!_useLeafName && (*iter)->ScopedName() == _name))
     {

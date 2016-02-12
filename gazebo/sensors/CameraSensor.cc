@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,18 +26,19 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Image.hh"
 
-#include "gazebo/transport/transport.hh"
 #include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/physics/World.hh"
 
-#include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/Camera.hh"
-#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/RenderingIface.hh"
+#include "gazebo/rendering/Scene.hh"
 
-#include "gazebo/sensors/SensorFactory.hh"
+#include "gazebo/transport/transport.hh"
+
 #include "gazebo/sensors/Noise.hh"
+#include "gazebo/sensors/SensorFactory.hh"
 
 #include "gazebo/sensors/CameraSensorPrivate.hh"
 #include "gazebo/sensors/CameraSensor.hh"
@@ -114,8 +115,8 @@ void CameraSensor::Init()
       }
     }
 
-    this->camera = this->scene->CreateCamera(
-        this->sdf->Get<std::string>("name"), false);
+    std::string scopedName = this->parentName + "::" + this->Name();
+    this->camera = this->scene->CreateCamera(scopedName, false);
 
     if (!this->camera)
     {
@@ -135,7 +136,7 @@ void CameraSensor::Init()
     }
 
     this->camera->Init();
-    this->camera->CreateRenderTexture(this->Name() + "_RttTex");
+    this->camera->CreateRenderTexture(scopedName + "_RttTex");
     ignition::math::Pose3d cameraPose = this->pose;
     if (cameraSdf->HasElement("pose"))
       cameraPose = cameraSdf->Get<ignition::math::Pose3d>("pose") + cameraPose;
@@ -171,7 +172,8 @@ void CameraSensor::Fini()
 
   if (this->camera)
   {
-    this->scene->RemoveCamera(this->camera->Name());
+    std::string scopedName = this->parentName + "::" + this->Name();
+    this->scene->RemoveCamera(scopedName);
   }
 
   this->camera.reset();
@@ -299,3 +301,16 @@ rendering::CameraPtr CameraSensor::Camera() const
 {
   return this->camera;
 }
+
+//////////////////////////////////////////////////
+bool CameraSensor::Rendered() const
+{
+  return this->dataPtr->rendered;
+}
+
+//////////////////////////////////////////////////
+void CameraSensor::SetRendered(const bool _value)
+{
+  this->dataPtr->rendered = _value;
+}
+

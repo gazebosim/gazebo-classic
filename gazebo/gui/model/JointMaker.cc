@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1057,19 +1057,26 @@ void JointData::OnApply()
   this->type = JointMaker::ConvertJointType(
       msgs::ConvertJointType(this->jointMsg->type()));
 
-  // Parent
-  if (this->parent->GetName().find(this->jointMsg->parent()) ==
-      std::string::npos)
-  {
-    // Get scoped name
-    std::string oldName = this->parent->GetName();
-    std::string scope = oldName;
-    size_t idx = oldName.rfind("::");
-    if (idx != std::string::npos)
-      scope = oldName.substr(0, idx+2);
+  // Get scoped names
+  std::string parentOldName = this->parent->GetName();
+  std::string parentScope = parentOldName;
+  size_t parentIdx = parentOldName.find("::");
+  if (parentIdx != std::string::npos)
+    parentScope = parentOldName.substr(0, parentIdx+2);
+  std::string childOldName = this->child->GetName();
+  std::string childScope = childOldName;
+  size_t childIdx = childOldName.find("::");
+  if (childIdx != std::string::npos)
+    childScope = childOldName.substr(0, childIdx+2);
 
+  std::string parentName = parentScope + this->jointMsg->parent();
+  std::string childName = childScope + this->jointMsg->child();
+
+  // Parent
+  if (parentName != this->jointMsg->parent())
+  {
     rendering::VisualPtr parentVis = gui::get_active_camera()->GetScene()
-        ->GetVisual(scope + this->jointMsg->parent());
+        ->GetVisual(parentName);
     if (parentVis)
       this->parent = parentVis;
     else
@@ -1077,18 +1084,10 @@ void JointData::OnApply()
   }
 
   // Child
-  if (this->child->GetName().find(this->jointMsg->child()) ==
-      std::string::npos)
+  if (childName != this->jointMsg->child())
   {
-    // Get scoped name
-    std::string oldName = this->child->GetName();
-    std::string scope = oldName;
-    size_t idx = oldName.rfind("::");
-    if (idx != std::string::npos)
-      scope = oldName.substr(0, idx+2);
-
     rendering::VisualPtr childVis = gui::get_active_camera()->GetScene()
-        ->GetVisual(scope + this->jointMsg->child());
+        ->GetVisual(childName);
     if (childVis)
     {
       this->child = childVis;
@@ -1251,12 +1250,12 @@ void JointData::UpdateMsg()
   if (this->parent)
   {
     std::string jointParentName = this->parent->GetName();
-    std::string leafName = jointParentName;
-    size_t pIdx = jointParentName.rfind("::");
+    std::string unscopedName = jointParentName;
+    size_t pIdx = jointParentName.find("::");
     if (pIdx != std::string::npos)
-      leafName = jointParentName.substr(pIdx+2);
+      unscopedName = jointParentName.substr(pIdx+2);
 
-    this->jointMsg->set_parent(leafName);
+    this->jointMsg->set_parent(unscopedName);
     this->jointMsg->set_parent_id(this->parent->GetId());
   }
 
@@ -1264,12 +1263,12 @@ void JointData::UpdateMsg()
   if (this->child)
   {
     std::string jointChildName = this->child->GetName();
-    std::string leafName = jointChildName;
-    size_t pIdx = jointChildName.rfind("::");
+    std::string unscopedName = jointChildName;
+    size_t pIdx = jointChildName.find("::");
     if (pIdx != std::string::npos)
-      leafName = jointChildName.substr(pIdx+2);
+      unscopedName = jointChildName.substr(pIdx+2);
 
-    this->jointMsg->set_child(leafName);
+    this->jointMsg->set_child(unscopedName);
     this->jointMsg->set_child_id(this->child->GetId());
   }
 
@@ -1518,12 +1517,12 @@ void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
 /////////////////////////////////////////////////
 void JointMaker::OnLinkInserted(const std::string &_linkName)
 {
-  std::string leafName = _linkName;
-  size_t idx = _linkName.rfind("::");
+  std::string unscopedName = _linkName;
+  size_t idx = unscopedName.find("::");
   if (idx != std::string::npos)
-    leafName = _linkName.substr(idx+2);
+    unscopedName = _linkName.substr(idx+2);
 
-  this->dataPtr->linkList[_linkName] = leafName;
+  this->dataPtr->linkList[_linkName] = unscopedName;
 
   this->EmitLinkInserted(_linkName);
 }

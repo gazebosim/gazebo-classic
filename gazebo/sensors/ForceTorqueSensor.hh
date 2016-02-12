@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,14 @@
 #ifndef _GAZEBO_SENSORS_FORCETORQUESENSOR_HH_
 #define _GAZEBO_SENSORS_FORCETORQUESENSOR_HH_
 
+#include <functional>
+#include <memory>
 #include <string>
 
-#include "gazebo/transport/TransportTypes.hh"
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/sensors/Sensor.hh"
+#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -72,7 +76,6 @@ namespace gazebo
 
       /// \brief Get Parent Joint
       /// \return Pointer to the joint containing this sensor
-      /// \deprecated See Joint()
       public: physics::JointPtr Joint() const;
 
       // Documentation inherited.

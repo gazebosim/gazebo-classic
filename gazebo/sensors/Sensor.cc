@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,6 @@
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
-
-#include <sdf/sdf.hh>
 
 #include "gazebo/transport/transport.hh"
 
@@ -195,8 +193,17 @@ bool Sensor::NeedsUpdate()
   else
     simTime = this->world->GetSimTime();
 
+  // case when last update occurred in the future probably due to
+  // world reset
   if (simTime <= this->lastMeasurementTime)
+  {
+    // Rendering sensors also set the lastMeasurementTime variable in Render()
+    // and lastUpdateTime in Sensor::Update based on Scene::SimTime() which
+    // could be outdated when the world is reset. In this case reset
+    // the variables back to 0.
+    this->ResetLastUpdateTime();
     return false;
+  }
 
   return (simTime - this->lastMeasurementTime +
       this->dataPtr->updateDelay) >= this->updatePeriod;
@@ -469,7 +476,7 @@ void Sensor::FillMsg(msgs::Sensor &_msg)
     camMsg->set_image_format(cam->ImageFormat());
     camMsg->set_near_clip(cam->NearClip());
     camMsg->set_far_clip(cam->FarClip());
-    auto distortion = cam->GetDistortion();
+    auto distortion = cam->LensDistortion();
     if (distortion)
     {
       msgs::Distortion *distortionMsg = camMsg->mutable_distortion();
@@ -530,6 +537,14 @@ void Sensor::ResetLastUpdateTime()
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutexLastUpdateTime);
   this->lastUpdateTime = 0.0;
+  this->lastMeasurementTime = 0.0;
+  this->dataPtr->updateDelay = 0.0;
+}
+
+//////////////////////////////////////////////////
+event::ConnectionPtr Sensor::ConnectUpdated(std::function<void()> _subscriber)
+{
+  return this->dataPtr->updated.Connect(_subscriber);
 }
 
 //////////////////////////////////////////////////

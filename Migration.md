@@ -5,6 +5,13 @@ Deprecated code produces compile-time warnings. These warning serve as
 notification to users that their code should be upgraded. The next major
 release will remove the deprecated code.
 
+## Gazebo 7.X to 8.X
+
+### Modifications
+
+1. **gazebo/sensors/DepthCameraSensor.hh**
+    + Modified to inherit from CameraSensor class.
+
 ## Gazebo 6.X to 7.X
 
 ### Additions
@@ -599,7 +606,15 @@ release will remove the deprecated code.
     + ***Deprecation:*** bool GetAutoRepeat() const
     + ***Replacement:*** bool AutoRepeat() const
 
+1. **gazebo/gui/MainWindow.hh**
+    + ***Deprecation:*** gui::RenderWidget *GetRenderWidget() const
+    + ***Replacement:*** gui::RenderWidget *RenderWidget() const
+    + ***Deprecation:*** gui::Editor *GetEditor(const std::string &_name) const
+    + ***Replacement:*** gui::Editor *Editor(const std::string &_name) const
+
 1. **gazebo/rendering/Camera.hh**
+    + ***Deprecation:*** public: DistortionPtr GetDistortion() const;
+    + ***Replacement:*** public: DistortionPtr LensDistortion() const;
     + ***Deprecation:*** public: double GetRenderRate() const;
     + ***Replacement:*** public: double RenderRate() const;
     + ***Deprecation:*** public: bool GetInitialized() const;
@@ -708,6 +723,10 @@ release will remove the deprecated code.
 1. **gazebo/gui/RTShaderSystem.hh**
     + ***Deprecation:*** void DetachEntity(Visual *_vis)
     + ***No replacement for DetachEntity ***
+
+1. **gazebo/physics/Model.hh**
+    + ***Deprecation:*** public: void SetScale(const math::Vector3 &_scale);
+    + ***Replacement:*** public: void SetScale(const ignition::math::Vector3d &_scale, const bool _publish = false);
 
 ### Deletions
 

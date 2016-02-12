@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -271,8 +271,9 @@ void DepthCamera::UpdateRenderTarget(Ogre::RenderTarget *_target,
 
   vp = _target->getViewport(0);
 
-  // return 0 in case no renderable object is inside frustrum
-  vp->setBackgroundColour(Ogre::ColourValue(Ogre::ColourValue(0, 0, 0)));
+  // return farClip in case no renderable object is inside frustrum
+  vp->setBackgroundColour(Ogre::ColourValue(this->FarClip(),
+      this->FarClip(), this->FarClip()));
 
   Ogre::CompositorManager::getSingleton().setCompositorEnabled(
                                                 vp, _matName, true);

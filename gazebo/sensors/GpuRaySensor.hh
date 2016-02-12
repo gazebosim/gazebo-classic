@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,17 +17,18 @@
 #ifndef _GAZEBO_SENSORS_GPURAYSENSOR_HH_
 #define _GAZEBO_SENSORS_GPURAYSENSOR_HH_
 
-#include <vector>
+#include <memory>
 #include <string>
+#include <vector>
 
 #include <ignition/math/Angle.hh>
 #include <ignition/math/Pose3.hh>
 
 #include "gazebo/math/Angle.hh"
 #include "gazebo/math/Pose.hh"
-#include "gazebo/transport/TransportTypes.hh"
-#include "gazebo/sensors/Sensor.hh"
 #include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/sensors/Sensor.hh"
+#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo

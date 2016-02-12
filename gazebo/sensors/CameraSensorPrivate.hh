@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,6 @@
 */
 #ifndef _GAZEBO_SENSORS_CAMERASENSOR_PRIVATE_HH_
 #define _GAZEBO_SENSORS_CAMERASENSOR_PRIVATE_HH_
-
-#include "gazebo/rendering/RenderTypes.hh"
-#include "gazebo/transport/TransportTypes.hh"
 
 namespace gazebo
 {

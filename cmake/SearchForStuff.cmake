@@ -661,7 +661,7 @@ endif ()
 # Find ignition math in unix platforms
 # In Windows we expect a call from configure.bat script with the paths
 if (NOT WIN32)
-  find_package(ignition-math2 QUIET)
+  find_package(ignition-math2 2.3 QUIET)
   if (NOT ignition-math2_FOUND)
     message(STATUS "Looking for ignition-math2-config.cmake - not found")
     BUILD_ERROR ("Missing: Ignition math2 library.")
@@ -683,6 +683,17 @@ if (NOT WIN32)
     link_directories(${IGNITION-TRANSPORT_LIBRARY_DIRS})
   endif()
 endif()
+
+################################################
+# Find Valgrind for checking memory leaks in the
+# tests
+find_program(VALGRIND_PROGRAM NAMES valgrind PATH ${VALGRIND_ROOT}/bin)
+option(GAZEBO_RUN_VALGRIND_TESTS "Run gazebo tests with Valgrind" FALSE)
+mark_as_advanced(GAZEBO_RUN_VALGRIND_TESTS)
+if (GAZEBO_RUN_VALGRIND_TESTS AND NOT VALGRIND_PROGRAM)
+  BUILD_WARNING("valgrind not found. Memory check tests will be skipped.")
+endif()
+
 
 ########################################
 # Find QWT (QT graphing library)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -110,6 +110,8 @@ void WirelessReceiver_TEST::TestCreateWirelessReceiver()
 }
 
 /////////////////////////////////////////////////
+/// \brief Create a sensor with an illegal value and checks that an exception
+/// is thrown
 void WirelessReceiver_TEST::CheckIllegalValue(std::string _sensorString)
 {
   sdf::readString(_sensorString, this->sdf);

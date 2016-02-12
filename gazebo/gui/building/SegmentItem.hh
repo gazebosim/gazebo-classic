@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,15 @@
  *
 */
 
-#ifndef _SEGMENT_ITEM_HH_
-#define _SEGMENT_ITEM_HH_
+#ifndef _GAZEBO_GUI_BUILDING_SEGMENTITEM_HH_
+#define _GAZEBO_GUI_BUILDING_SEGMENTITEM_HH_
 
+#include <memory>
 #include <vector>
+
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/building/EditorItem.hh"
+
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -28,7 +31,9 @@ namespace gazebo
   namespace gui
   {
     class GrabberHandle;
-    class EditorItem;
+
+    // Forward declare private data.
+    class SegmentItemPrivate;
 
     /// \addtogroup gazebo_gui
     /// \{
@@ -102,6 +107,10 @@ namespace gazebo
       // Documentation Inherited
       public: double GetSceneRotation() const;
 
+      /// \brief Get the grabber handles.
+      /// \return Vector of grabber pointers.
+      public: std::vector<GrabberHandle *>Grabbers() const;
+
       /// \brief Update item.
       protected: virtual void SegmentUpdated();
 
@@ -156,33 +165,19 @@ namespace gazebo
       private: void paint(QPainter *_painter,
           const QStyleOptionGraphicsItem *_option, QWidget *_widget);
 
-      /// \brief A list of grabber handles for this item. One grabber for each
-      /// endpoint.
-      public: std::vector<GrabberHandle *> grabbers;
-
       /// \brief Angle to snap in degrees.
       public: static const double SnapAngle;
 
       /// \brief Length to snap in meters.
       public: static const double SnapLength;
 
-      /// \brief Segment's start position in pixel coordinates.
-      private: QPointF start;
+      /// \brief A list of grabber handles for this item. One grabber for each
+      /// endpoint.
+      protected: std::vector<GrabberHandle *> grabbers;
 
-      /// \brief Segment's end position in pixel coordinates.
-      private: QPointF end;
-
-      /// \brief Keep track of mouse press position for translation.
-      private: QPointF segmentMouseMove;
-
-      /// \brief Thickness of the segment on the 2d view, in pixels.
-      private: double thickness;
-
-      /// \brief Width of grabbers in pixels.
-      private: double grabberWidth;
-
-      /// \brief Height of grabbers in pixels.
-      private: double grabberHeight;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<SegmentItemPrivate> dataPtr;
     };
     /// \}
   }

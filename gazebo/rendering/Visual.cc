@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/RTShaderSystem.hh"
 #include "gazebo/rendering/RenderEngine.hh"
+#include "gazebo/rendering/SelectionObj.hh"
 #include "gazebo/rendering/Material.hh"
 #include "gazebo/rendering/MovableText.hh"
 #include "gazebo/rendering/VisualPrivate.hh"
@@ -554,7 +555,7 @@ std::string Visual::GetName() const
 void Visual::AttachVisual(VisualPtr _vis)
 {
   if (!_vis)
-    gzerr << "Visual is null\n";
+    gzerr << "Visual is null" << std::endl;
   else
   {
     if (_vis->GetSceneNode()->getParentSceneNode())
@@ -754,6 +755,19 @@ void Visual::SetScale(const math::Vector3 &_scale)
 
   this->dataPtr->sceneNode->setScale(
       Conversions::Convert(math::Vector3(this->dataPtr->scale)));
+
+  // Scale selection object in case we have one attached. Other children were
+  // scaled from UpdateGeomSize
+  for (auto child : this->dataPtr->children)
+  {
+    auto selectionObj = std::dynamic_pointer_cast<SelectionObj>(child);
+
+    if (selectionObj)
+    {
+      selectionObj->UpdateSize();
+      break;
+    }
+  }
 }
 
 //////////////////////////////////////////////////
@@ -2643,7 +2657,11 @@ std::string Visual::GetMeshName() const
         meshManager->CreateExtrudedPolyline(polyLineName, polylines,
             geomElem->GetElement("polyline")->Get<double>("height"));
       }
-      return polyLineName;
+
+      if (meshManager->HasMesh(polyLineName))
+        return polyLineName;
+      else
+        return std::string();
     }
     else if (geomElem->HasElement("mesh") || geomElem->HasElement("heightmap"))
     {
