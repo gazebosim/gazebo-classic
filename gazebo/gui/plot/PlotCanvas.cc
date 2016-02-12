@@ -127,7 +127,7 @@ PlotCanvas::PlotCanvas(QWidget *_parent)
   QFrame *titleFrame = new QFrame;
   titleFrame->setObjectName("plotCanvasTitleFrame");
   titleFrame->setLayout(titleSettingsLayout);
-  
+
   // X and Y variable containers
   VariablePillContainer *xVariableContainer = new VariablePillContainer(this);
   xVariableContainer->SetText("x ");
@@ -156,7 +156,6 @@ PlotCanvas::PlotCanvas(QWidget *_parent)
   connect(this->dataPtr->yVariableContainer,
       SIGNAL(VariableLabelChanged(unsigned int, std::string)),
       this, SLOT(OnSetVariableLabel(unsigned int, std::string)));
-  
 
   QVBoxLayout *variableContainerLayout = new QVBoxLayout;
   variableContainerLayout->addWidget(xVariableContainer);
@@ -184,6 +183,10 @@ PlotCanvas::PlotCanvas(QWidget *_parent)
 
   plotScrollArea->setWidget(plotFrame);
 
+  // empty plot
+  this->dataPtr->emptyPlot = new IncrementalPlot(this);
+  this->dataPtr->plotLayout->addWidget(this->dataPtr->emptyPlot);
+
   QFrame *mainFrame = new QFrame;
   mainFrame->setObjectName("plotCanvasFrame");
   QVBoxLayout *mainFrameLayout = new QVBoxLayout;
@@ -198,10 +201,10 @@ PlotCanvas::PlotCanvas(QWidget *_parent)
   mainLayout->setContentsMargins(0, 0, 0, 0);
   this->setLayout(mainLayout);
 
-  QGraphicsDropShadowEffect *shadow = new QGraphicsDropShadowEffect();
+/*  QGraphicsDropShadowEffect *shadow = new QGraphicsDropShadowEffect();
   shadow->setBlurRadius(8);
   shadow->setOffset(0, 0);
-  this->setGraphicsEffect(shadow);
+  this->setGraphicsEffect(shadow);*/
 }
 
 /////////////////////////////////////////////////
@@ -588,7 +591,7 @@ void PlotCanvas::Update()
 /////////////////////////////////////////////////
 void PlotCanvas::Restart()
 {
-  // tupple of original variable label, variable pointer, plot id to add
+  // tuple of original variable label, variable pointer, plot id to add
   // variable to.
   std::vector<std::tuple<std::string, VariablePill *, unsigned int>>
     variableCurvesToClone;

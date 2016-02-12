@@ -102,7 +102,7 @@ void PlotCurve_TEST::AddPoint()
   QCOMPARE(plotCurve->Size(), 0u);
 
   // add points
-  ignition::math::Vector2d point01(12.3, 39.4);
+  ignition::math::Vector2d point01(12.3, -39.4);
   plotCurve->AddPoint(point01);
   QCOMPARE(plotCurve->Size(), 1u);
   QCOMPARE(plotCurve->Point(0), point01);
@@ -111,6 +111,9 @@ void PlotCurve_TEST::AddPoint()
   plotCurve->AddPoint(point02);
   QCOMPARE(plotCurve->Size(), 2u);
   QCOMPARE(plotCurve->Point(1), point02);
+
+  QCOMPARE(plotCurve->Min(), ignition::math::Vector2d(3.3, -39.4));
+  QCOMPARE(plotCurve->Max(), ignition::math::Vector2d(12.3, -3.4));
 
   int tmpPointSize = plotCurve->Size();
 

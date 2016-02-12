@@ -179,6 +179,8 @@ PlotWindow::PlotWindow(QWidget *_parent)
   connect(displayTimer, SIGNAL(timeout()), this, SLOT(Update()));
   displayTimer->start(30);
 
+  PlotManager::Instance()->AddWindow(this);
+
   //=================
   // TODO for testing - remove later
   QListWidgetItem *itema = new QListWidgetItem("Dog");
@@ -190,6 +192,9 @@ PlotWindow::PlotWindow(QWidget *_parent)
   QListWidgetItem *itemc = new QListWidgetItem("Turtle");
   itemc->setToolTip(tr("Drag onto graph to plot"));
   this->dataPtr->labelList->addItem(itemc);
+  QListWidgetItem *simTimeItem = new QListWidgetItem("sim_time");
+  itemc->setToolTip(tr("Drag onto graph to plot"));
+  this->dataPtr->labelList->addItem(simTimeItem);
   //=================
 }
 

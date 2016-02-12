@@ -34,7 +34,7 @@ namespace gazebo
   namespace gui
   {
     // Forward declare private data class
-    struct PlotCurvePrivate;
+    class PlotCurvePrivate;
 
     class IncrementalPlot;
 
@@ -103,6 +103,14 @@ namespace gazebo
       /// \brief Get the number of data points in the curve
       /// \return Number of data points.
       public: unsigned int Size() const;
+
+      /// \brief Get the min x and y values of this curve
+      /// \return Point with min values
+      public: ignition::math::Vector2d Min();
+
+      /// \brief Get the max x and y values of this curve
+      /// \return Point with max values
+      public: ignition::math::Vector2d Max();
 
       /// \brief Get a point in the curve
       /// \param[in] _index Index of the point in the curve.
