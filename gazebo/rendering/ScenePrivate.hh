@@ -317,6 +317,10 @@ namespace gazebo
       /// \brief Initialized.
       public: bool initialized;
 
+      /// \brief SimTime of this Scene, as we receive PosesStamped from
+      /// the world, we update this time accordingly.
+      public: common::Time sceneSimTimePosesReceived;
+
       /// \brief SimTime of this Scene.
       public: common::Time simTime;
 

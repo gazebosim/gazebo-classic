@@ -86,7 +86,7 @@ void MarkerManager::OnPreRender()
     {
       // Erase a marker if it has a lifetime and it's expired.
       if (it->second->Lifetime() != common::Time::Zero &&
-          it->second->Lifetime() <= this->dataPtr->scene->GetSimTime())
+          it->second->Lifetime() <= this->dataPtr->scene->SimTime())
       {
         it = mit->second.erase(it);
       }
@@ -133,7 +133,7 @@ bool MarkerManager::ProcessMarkerMsg(const msgs::Marker &_msg)
 
       // Create the new marker
       MarkerVisualPtr marker(new MarkerVisual(name,
-            this->dataPtr->scene->GetWorldVisual()));
+            this->dataPtr->scene->WorldVisual()));
 
       // Load the marker
       marker->Load(_msg);

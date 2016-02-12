@@ -178,8 +178,8 @@ void MultiCameraSensor::Init()
     }
 
     msgs::Image *image = this->dataPtr->msg.add_image();
-    image->set_width(camera->GetImageWidth());
-    image->set_height(camera->GetImageHeight());
+    image->set_width(camera->ImageWidth());
+    image->set_height(camera->ImageHeight());
     image->set_pixel_format(common::Image::ConvertPixelFormat(
           camera->ImageFormat()));
     image->set_step(camera->ImageWidth() * camera->ImageDepth());
@@ -276,7 +276,7 @@ bool MultiCameraSensor::UpdateImpl(const bool /*_force*/)
 
     if (publish)
     {
-      msgs::Image *image = this->msg.mutable_image(index);
+      msgs::Image *image = this->dataPtr->msg.mutable_image(index);
       image->set_data((*iter)->ImageData(0),
           image->width() * (*iter)->ImageDepth() * image->height());
     }
@@ -298,7 +298,8 @@ unsigned int MultiCameraSensor::GetCameraCount() const
 //////////////////////////////////////////////////
 unsigned int MultiCameraSensor::CameraCount() const
 {
-  return this->ImageWidth(_index);
+  std::lock_guard<std::mutex> lock(this->dataPtr->cameraMutex);
+  return this->dataPtr->cameras.size();
 }
 
 //////////////////////////////////////////////////

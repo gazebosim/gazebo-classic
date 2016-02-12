@@ -110,7 +110,7 @@ void MarkerVisual::AddModify(const msgs::Marker &_msg)
       (_msg.lifetime().sec() > 0 ||
        (_msg.lifetime().sec() == 0 && _msg.lifetime().nsec() > 0)))
   {
-    this->dPtr->lifetime = this->GetScene()->GetSimTime() +
+    this->dPtr->lifetime = this->GetScene()->SimTime() +
       msgs::Convert(_msg.lifetime());
   }
 

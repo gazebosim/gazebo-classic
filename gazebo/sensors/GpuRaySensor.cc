@@ -195,7 +195,7 @@ void GpuRaySensor::Init()
     if (this->VertFOV() > M_PI / 2)
     {
       gzwarn << "Vertical FOV for block GPU laser is capped at 90 degrees.\n";
-      this->laserCam->SetVertFOV(M_PI / 2);
+      this->dataPtr->laserCam->SetVertFOV(M_PI / 2);
       this->SetVerticalAngleMin(this->dataPtr->laserCam->VertHalfAngle() -
                                 (this->VertFOV() / 2));
       this->SetVerticalAngleMax(this->dataPtr->laserCam->VertHalfAngle() +
@@ -346,7 +346,7 @@ unsigned int GpuRaySensor::GetCameraCount() const
 //////////////////////////////////////////////////
 unsigned int GpuRaySensor::CameraCount() const
 {
-  return this->dataPtr->laserCam->GetCameraCount();
+  return this->dataPtr->laserCam->CameraCount();
 }
 
 //////////////////////////////////////////////////
@@ -727,7 +727,7 @@ bool GpuRaySensor::UpdateImpl(const bool /*_force*/)
     for (int i = 0; i < this->RayCount(); ++i)
     {
       int index = j * this->RayCount() + i;
-      double range = this->dataPtr->laserCam->GetLaserData()[index * 3];
+      double range = this->dataPtr->laserCam->LaserData()[index * 3];
 
       // Mask ranges outside of min/max to +/- inf, as per REP 117
       if (range >= this->RangeMax())
