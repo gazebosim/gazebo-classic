@@ -244,6 +244,21 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////////
+    msgs::Any Convert(const math::Pose &_v)
+    {
+      msgs::Any result;
+      result.set_type(gazebo::msgs::Any::POSE);
+      result.mutable_pose_value()->mutable_position()->set_x(_v.pos.x);
+      result.mutable_pose_value()->mutable_position()->set_y(_v.pos.y);
+      result.mutable_pose_value()->mutable_position()->set_z(_v.pos.z);
+      result.mutable_pose_value()->mutable_orientation()->set_x(_v.rot.x);
+      result.mutable_pose_value()->mutable_orientation()->set_y(_v.rot.y);
+      result.mutable_pose_value()->mutable_orientation()->set_z(_v.rot.z);
+      result.mutable_pose_value()->mutable_orientation()->set_w(_v.rot.w);
+      return result;
+    }
+
+    /////////////////////////////////////////////////
     msgs::Vector3d Convert(const ignition::math::Vector3d &_v)
     {
       msgs::Vector3d result;

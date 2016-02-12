@@ -2658,6 +2658,15 @@ void World::RegisterIntrospectionItems()
     return this->GetSimTime().Double();
   };
 
+  auto fSimTime3 = [this]()
+  {
+    math::Pose pose;
+    return pose;
+  };
+
   gazebo::util::IntrospectionManager::Instance()->Register<double>(
       "sim_time", "double", myCb);
+
+  gazebo::util::IntrospectionManager::Instance()->Register<math::Pose>(
+      "item2", "double", fSimTime3);
 }

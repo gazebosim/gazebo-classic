@@ -59,13 +59,23 @@ TEST_F(IntrospectionManagerTest, Id)
 }
 
 /////////////////////////////////////////////////
+TEST_F(IntrospectionManagerTest, Registration)
+{
+  // A callback for updating items.
+  auto func = [](){
+    return true;
+  };
+
+  EXPECT_TRUE(this->manager->Register<double>("item4", "type4", []{return 1.0}));
+  EXPECT_TRUE(this->manager->Register("item4", "type4", []{return 'a'}));
+
+}
+
+/////////////////////////////////////////////////
 TEST_F(IntrospectionManagerTest, RegistrationAndItems)
 {
   // A callback for updating items.
-  auto func = [](gazebo::msgs::Any &_msg)
-  {
-    _msg.set_type(gazebo::msgs::Any::DOUBLE);
-    _msg.set_double_value(1.0);
+  auto func = [](){
     return true;
   };
 

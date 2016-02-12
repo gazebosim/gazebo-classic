@@ -83,6 +83,10 @@ namespace gazebo
     GAZEBO_VISIBLE
     msgs::Any Convert(const double &_v);
 
+    /// \brief ToDo.
+    GAZEBO_VISIBLE
+    msgs::Any Convert(const math::Pose &_v);
+
     /// \brief Convert a ignition::math::Vector3 to a msgs::Vector3d
     /// \param[in] _v The vector to convert
     /// \return A msgs::Vector3d object
