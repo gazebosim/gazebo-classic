@@ -76,8 +76,14 @@ if (HAVE_GRAPHVIZ)
 
   set (qt_tests_local ${qt_tests_local}
     GraphScene_TEST.cc
-    SchematicViewWidget_TEST.cc
   )
+
+  if (ENABLE_SCREEN_TESTS)
+    set (qt_tests_local ${qt_tests_local}
+      SchematicViewWidget_TEST.cc
+    )
+  endif()
+
 endif()
 
 set (sources ${sources} ${sources_local} PARENT_SCOPE)
