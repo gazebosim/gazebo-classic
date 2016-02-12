@@ -100,28 +100,15 @@ void Model::Load(sdf::ElementPtr _sdf)
     this->LoadJoints();
 
   // A callback for updating simulation time.
-  auto fModelPose = [this](gazebo::msgs::Any &_msg)
-  {
-    auto pose = this->GetWorldPose();
-    _msg.set_type(gazebo::msgs::Any::POSE);
-    _msg.mutable_pose_value()->mutable_position()->set_x(pose.pos.x);
-    _msg.mutable_pose_value()->mutable_position()->set_y(pose.pos.y);
-    _msg.mutable_pose_value()->mutable_position()->set_z(pose.pos.z);
-    _msg.mutable_pose_value()->mutable_orientation()->set_x(pose.rot.x);
-    _msg.mutable_pose_value()->mutable_orientation()->set_y(pose.rot.y);
-    _msg.mutable_pose_value()->mutable_orientation()->set_z(pose.rot.z);
-    _msg.mutable_pose_value()->mutable_orientation()->set_w(pose.rot.w);
-    return true;
-  };
   auto uri = this->ScopedUri();
-  auto parts = uri.Split();
-  parts.SetParameters({"pose"});
-  common::Uri newUri(parts);
-
-  std::cout << newUri.CanonicalUri() << std::endl;
-
-  gazebo::util::IntrospectionManager::Instance()->Register(
-      newUri.CanonicalUri(), "pose", fModelPose);
+  auto fModelPose = [this](){return this->GetWorldPose().Ign();};
+  auto fModelLinVel = [this](){return this->GetWorldLinearVel().Ign();};
+  std::cout << uri.CanonicalUri({"pose"}) << std::endl;
+  std::cout << uri.CanonicalUri({"lin_vel"}) << std::endl;
+  gazebo::util::IntrospectionManager::Instance()->Register
+      <ignition::math::Pose3d>(uri.CanonicalUri({"pose"}), fModelPose);
+  gazebo::util::IntrospectionManager::Instance()->Register
+      <ignition::math::Vector3d>(uri.CanonicalUri({"lin_vel"}), fModelLinVel);
 }
 
 //////////////////////////////////////////////////

@@ -77,17 +77,12 @@ class IntrospectionClientTest : public ::testing::Test
     this->topicsSubscribed = {};
 
     // A callback for updating items.
-    auto func = [](gazebo::msgs::Any &_msg)
-    {
-      _msg.set_type(gazebo::msgs::Any::DOUBLE);
-      _msg.set_double_value(1.0);
-      return true;
-    };
+    auto func = [](){return 1.0;};
 
     // Make sure that we always have some items registered.
-    this->manager->Register("item1", "type1", func);
-    this->manager->Register("item2", "type2", func);
-    this->manager->Register("item3", "type3", func);
+    this->manager->Register<double>("item1", func);
+    this->manager->Register<double>("item2", func);
+    this->manager->Register<double>("item3", func);
 
     this->callbackExecuted = false;
   }

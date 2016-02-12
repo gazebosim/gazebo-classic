@@ -112,31 +112,6 @@ bool IntrospectionManager::Register(const std::string &_item,
   return true;
 }
 
-/*
-//////////////////////////////////////////////////
-bool IntrospectionManager::Register(const std::string &_item,
-    const std::string &_type, const std::function<double()> &_cb)
-{
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-
-  // Sanity check: Make sure that nobody has registered the same item before.
-  if (this->dataPtr->allItems.find(_item) != this->dataPtr->allItems.end())
-  {
-    gzwarn << "Item [" << _item << "] already registered" << std::endl;
-    return false;
-  }
-
-  auto func = [&](gazebo::msgs::Any &_msg)
-  {
-    _msg = msgs::Convert(_cb());
-    return true;
-  };
-
-  this->dataPtr->allItems[_item].type = _type;
-  this->dataPtr->allItems[_item].cb = func;
-  return true;
-}*/
-
 //////////////////////////////////////////////////
 bool IntrospectionManager::Unregister(const std::string &_item)
 {

@@ -522,10 +522,20 @@ UriParts Uri::Split() const
 }
 
 //////////////////////////////////////////////////
-std::string Uri::CanonicalUri() const
+std::string Uri::CanonicalUri(const std::vector<std::string> &_params) const
 {
   if (!this->dataPtr->correct)
     gzthrow("This URI is malformed");
 
-  return this->dataPtr->canonicalUri;
+  std::string result = this->dataPtr->canonicalUri;
+  if (!_params.empty())
+  {
+    // Add the parameter part.
+    result += "?p=" + _params.at(0);
+
+    for (auto i = 1u; i < _params.size(); ++i)
+      result += "&p=" + _params.at(i);
+  }
+
+  return result;
 }

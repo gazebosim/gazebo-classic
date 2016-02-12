@@ -26,16 +26,16 @@ message Any
     /// \brief Indicates that the message contains a Vector3d
     VECTOR3D   = 4;
 
-    /// \brief Indicates that the message contains a Color 
+    /// \brief Indicates that the message contains a Color
     COLOR      = 5;
 
-    /// \brief Indicates that the message contains a Pose 
-    POSE       = 6;
+    /// \brief Indicates that the message contains a Pose
+    POSE3D     = 6;
 
-    /// \brief Indicates that the message contains a Quaternion 
+    /// \brief Indicates that the message contains a Quaternion
     QUATERNION = 7;
 
-    /// \brief Indicates that the message contains a Boolean 
+    /// \brief Indicates that the message contains a Boolean
     BOOLEAN    = 8;
   }
 
@@ -54,13 +54,13 @@ message Any
   optional string string_value         = 4;
 
   /// \brief A Vector3d value
-  optional Vector3d vector3_value      = 5;
+  optional Vector3d vector3d_value     = 5;
 
   /// \brief A Color value
   optional Color color_value           = 6;
 
   /// \brief A Pose value
-  optional Pose pose_value             = 7;
+  optional Pose pose3d_value           = 7;
 
   /// \brief A Quaternion value
   optional Quaternion quaternion_value = 8;

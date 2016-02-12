@@ -15,6 +15,7 @@
  *
 */
 
+#include <ignition/math/Pose3.hh>
 #include <gtest/gtest.h>
 #include "gazebo/msgs/any.pb.h"
 #include "gazebo/util/IntrospectionManager.hh"
@@ -35,17 +36,12 @@ class IntrospectionManagerTest : public ::testing::Test
   public: void SetUp()
   {
     // A callback for updating items.
-    auto func = [](gazebo::msgs::Any &_msg)
-    {
-      _msg.set_type(gazebo::msgs::Any::DOUBLE);
-      _msg.set_double_value(1.0);
-      return true;
-    };
+    auto func = [](){return 1.0;};
 
     // Make sure that we always have some items registered.
-    this->manager->Register("item1", "type1", func);
-    this->manager->Register("item2", "type2", func);
-    this->manager->Register("item3", "type3", func);
+    this->manager->Register<double>("item1", func);
+    this->manager->Register<double>("item2", func);
+    this->manager->Register<double>("item3", func);
   }
 
   /// \brief Pointer to the introspection manager.
@@ -62,32 +58,28 @@ TEST_F(IntrospectionManagerTest, Id)
 TEST_F(IntrospectionManagerTest, Registration)
 {
   // A callback for updating items.
-  auto func = [](){
-    return true;
-  };
+  auto func = [](){return 2.0;};
+  auto func2 = [](){return ignition::math::Pose3d();};
 
-  EXPECT_TRUE(this->manager->Register<double>("item4", "type4", []{return 1.0}));
-  EXPECT_TRUE(this->manager->Register("item4", "type4", []{return 'a'}));
-
+  EXPECT_TRUE(this->manager->Register<double>("item4", func));
+  EXPECT_TRUE(this->manager->Register<ignition::math::Pose3d>("item5",func2));
 }
 
 /////////////////////////////////////////////////
 TEST_F(IntrospectionManagerTest, RegistrationAndItems)
 {
   // A callback for updating items.
-  auto func = [](){
-    return true;
-  };
+  auto func = [](){return 1.0;};
 
   // Try to unregister an unregistered item.
   EXPECT_FALSE(this->manager->Unregister("_unregistered_item_"));
 
   // Register one more item.
-  EXPECT_TRUE(this->manager->Register("item4", "type4", func));
+  EXPECT_TRUE(this->manager->Register<double>("item4", func));
   EXPECT_EQ(this->manager->Items().size(), 4u);
 
   // Try to register an existing item.
-  EXPECT_FALSE(this->manager->Register("item4", "type4", func));
+  EXPECT_FALSE(this->manager->Register<double>("item4", func));
 
   // Unegister an existing item.
   EXPECT_TRUE(this->manager->Unregister("item4"));

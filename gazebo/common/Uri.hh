@@ -304,7 +304,8 @@ namespace gazebo
       /// \brief Get the URI string of the current URI.
       /// Note that the URI string is "/" terminated.
       /// \return The URI string. E.g.: "/world/default/light/light_1?p=pose/"
-      public: std::string CanonicalUri() const;
+      public: std::string CanonicalUri(
+          const std::vector<std::string> &_params = {}) const;
 
       /// \internal
       /// \brief Pointer to private data.

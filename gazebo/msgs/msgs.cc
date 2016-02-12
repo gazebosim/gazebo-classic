@@ -235,26 +235,74 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////////
-    msgs::Any Convert(const double &_v)
+    msgs::Any ConvertAny(const double &_d)
     {
       msgs::Any result;
       result.set_type(msgs::Any::DOUBLE);
-      result.set_double_value(_v);
+      result.set_double_value(_d);
       return result;
     }
 
     /////////////////////////////////////////////////
-    msgs::Any Convert(const math::Pose &_v)
+    msgs::Any ConvertAny(const int &_i)
     {
       msgs::Any result;
-      result.set_type(gazebo::msgs::Any::POSE);
-      result.mutable_pose_value()->mutable_position()->set_x(_v.pos.x);
-      result.mutable_pose_value()->mutable_position()->set_y(_v.pos.y);
-      result.mutable_pose_value()->mutable_position()->set_z(_v.pos.z);
-      result.mutable_pose_value()->mutable_orientation()->set_x(_v.rot.x);
-      result.mutable_pose_value()->mutable_orientation()->set_y(_v.rot.y);
-      result.mutable_pose_value()->mutable_orientation()->set_z(_v.rot.z);
-      result.mutable_pose_value()->mutable_orientation()->set_w(_v.rot.w);
+      result.set_type(msgs::Any::INT32);
+      result.set_int_value(_i);
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    msgs::Any ConvertAny(const std::string &_s)
+    {
+      msgs::Any result;
+      result.set_type(msgs::Any::STRING);
+      result.set_string_value(_s);
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    msgs::Any ConvertAny(const ignition::math::Vector3d &_v)
+    {
+      msgs::Any result;
+      result.set_type(msgs::Any::VECTOR3D);
+      result.mutable_vector3d_value()->CopyFrom(Convert(_v));
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    msgs::Any ConvertAny(const common::Color &_c)
+    {
+      msgs::Any result;
+      result.set_type(msgs::Any::COLOR);
+      result.mutable_color_value()->CopyFrom(Convert(_c));
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    msgs::Any ConvertAny(const ignition::math::Pose3d &_p)
+    {
+      msgs::Any result;
+      result.set_type(msgs::Any::POSE3D);
+      result.mutable_pose3d_value()->CopyFrom(Convert(_p));
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    msgs::Any ConvertAny(const ignition::math::Quaterniond &_q)
+    {
+      msgs::Any result;
+      result.set_type(msgs::Any::QUATERNION);
+      result.mutable_quaternion_value()->CopyFrom(Convert(_q));
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    msgs::Any ConvertAny(const bool &_b)
+    {
+      msgs::Any result;
+      result.set_type(msgs::Any::BOOLEAN);
+      result.set_bool_value(_b);
       return result;
     }
 

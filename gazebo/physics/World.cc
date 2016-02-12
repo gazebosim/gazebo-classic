@@ -2646,27 +2646,8 @@ void World::RegisterIntrospectionItems()
   // Add here all the items that might be introspected.
 
   // A callback for updating simulation time.
-  auto fSimTime = [this](gazebo::msgs::Any &_msg)
-  {
-    _msg.set_type(gazebo::msgs::Any::DOUBLE);
-    _msg.set_double_value(this->GetSimTime().Double());
-    return true;
-  };
-
-  auto fSimTime2 = [this]()
-  {
-    return this->GetSimTime().Double();
-  };
-
-  auto fSimTime3 = [this]()
-  {
-    math::Pose pose;
-    return pose;
-  };
+  auto fSimTime = [this](){return this->GetSimTime().Double();};
 
   gazebo::util::IntrospectionManager::Instance()->Register<double>(
-      "sim_time", "double", myCb);
-
-  gazebo::util::IntrospectionManager::Instance()->Register<math::Pose>(
-      "item2", "double", fSimTime3);
+      "sim_time", fSimTime);
 }
