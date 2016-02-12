@@ -545,9 +545,6 @@ void PlotCanvas::OnMoveVariable(const unsigned int _id,
       delete plotData;
     }
   }
-
-  // TODO remove me later
-  this->debug();
 }
 
 /////////////////////////////////////////////////
