@@ -29,6 +29,7 @@
 #include "gazebo/msgs/any.pb.h"
 #include "gazebo/msgs/empty.pb.h"
 #include "gazebo/msgs/gz_string.pb.h"
+#include "gazebo/msgs/msgs.hh"
 #include "gazebo/msgs/param.pb.h"
 #include "gazebo/msgs/param_v.pb.h"
 #include "gazebo/util/IntrospectionManager.hh"
@@ -111,6 +112,7 @@ bool IntrospectionManager::Register(const std::string &_item,
   return true;
 }
 
+/*
 //////////////////////////////////////////////////
 bool IntrospectionManager::Register(const std::string &_item,
     const std::string &_type, const std::function<double()> &_cb)
@@ -124,10 +126,16 @@ bool IntrospectionManager::Register(const std::string &_item,
     return false;
   }
 
+  auto func = [&](gazebo::msgs::Any &_msg)
+  {
+    _msg = msgs::Convert(_cb());
+    return true;
+  };
+
   this->dataPtr->allItems[_item].type = _type;
-  //this->dataPtr->allItems[_item].cb = _cb;
+  this->dataPtr->allItems[_item].cb = func;
   return true;
-}
+}*/
 
 //////////////////////////////////////////////////
 bool IntrospectionManager::Unregister(const std::string &_item)

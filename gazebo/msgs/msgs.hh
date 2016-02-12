@@ -79,6 +79,10 @@ namespace gazebo
         const google::protobuf::Message &message);
     /// \endcond
 
+    /// \brief ToDo.
+    GAZEBO_VISIBLE
+    msgs::Any Convert(const double &_v);
+
     /// \brief Convert a ignition::math::Vector3 to a msgs::Vector3d
     /// \param[in] _v The vector to convert
     /// \return A msgs::Vector3d object

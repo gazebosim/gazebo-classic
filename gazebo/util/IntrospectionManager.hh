@@ -25,6 +25,7 @@
 #include "gazebo/msgs/any.pb.h"
 #include "gazebo/msgs/empty.pb.h"
 #include "gazebo/msgs/gz_string.pb.h"
+#include "gazebo/msgs/msgs.hh"
 #include "gazebo/msgs/param.pb.h"
 #include "gazebo/msgs/param_v.pb.h"
 #include "gazebo/util/system.hh"
@@ -59,9 +60,25 @@ namespace gazebo
                             const std::function <bool(
                                 gazebo::msgs::Any &_msg)> &_cb);
 
-      public: bool Register(const std::string &_item,
-                            const std::string &_type,
-                            const std::function<double()> &_cb);
+      /// \brief Register a new item in the introspection manager.
+      /// \param[in] _item New item. E.g.: /default/world/model1/pose
+      /// \param[in] _type Item type. E.g.: gazebo::msgs::pose
+      /// \param[in] _cb Callback used to get the last update for this item.
+      /// \result True when the registration succeed or false otherwise
+      /// (item already existing).
+      public: template<typename T>
+      bool Register(const std::string &_item,
+                    const std::string &_type,
+                    const std::function<T()> &_cb)
+      {
+        auto func = [&](gazebo::msgs::Any &_msg)
+        {
+          _msg = msgs::Convert(_cb());
+          return true;
+        };
+
+        return this->Register(_item, _type, func);
+      }
 
       /// \brief Unregister an existing item from the introspection manager.
       /// \param[in] _item Item to remove.

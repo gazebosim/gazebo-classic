@@ -2658,11 +2658,6 @@ void World::RegisterIntrospectionItems()
     return this->GetSimTime().Double();
   };
 
-  auto fSimTime3 = []()
-  {
-    return myCb;
-  };
-
-  gazebo::util::IntrospectionManager::Instance()->Register(
-      "sim_time", "double", fSimTime2);
+  gazebo::util::IntrospectionManager::Instance()->Register<double>(
+      "sim_time", "double", myCb);
 }

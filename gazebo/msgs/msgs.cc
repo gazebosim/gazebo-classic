@@ -235,6 +235,15 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////////
+    msgs::Any Convert(const double &_v)
+    {
+      msgs::Any result;
+      result.set_type(msgs::Any::DOUBLE);
+      result.set_double_value(_v);
+      return result;
+    }
+
+    /////////////////////////////////////////////////
     msgs::Vector3d Convert(const ignition::math::Vector3d &_v)
     {
       msgs::Vector3d result;
