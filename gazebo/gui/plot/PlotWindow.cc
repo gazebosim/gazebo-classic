@@ -17,7 +17,7 @@
 
 #include <mutex>
 
-#include "gazebo/gui/plot/VariablePillContainer.hh"
+#include "gazebo/gui/plot/PlotCanvas.hh"
 #include "gazebo/gui/plot/PlotCurve.hh"
 #include "gazebo/gui/plot/IncrementalPlot.hh"
 #include "gazebo/gui/plot/PlotCanvas.hh"
@@ -33,7 +33,7 @@ namespace gazebo
     /// \brief Private data for the PlotWindow class
     class PlotWindowPrivate
     {
-      /// \brief The list of diagnostic labels.
+      /// \brief The list of variable labels.
       public: QListWidget *labelList;
 
       /// \brief True when plotting is paused.
@@ -78,7 +78,7 @@ class DragableListWidget : public QListWidget
                drag->exec(Qt::LinkAction);
              }
 
-  protected: virtual Qt::DropActions supportedDropActions()
+  protected: virtual Qt::DropActions supportedDropActions() const
              {
                return Qt::LinkAction;
              }
@@ -91,7 +91,7 @@ PlotWindow::PlotWindow(QWidget *_parent)
 {
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));
   this->setWindowTitle("Gazebo: Plotting Utility");
-  this->setObjectName("PlotWindow");
+  this->setObjectName("plotWindow");
   this->setWindowFlags(Qt::Window | Qt::WindowTitleHint |
       Qt::WindowCloseButtonHint | Qt::WindowStaysOnTopHint |
       Qt::CustomizeWindowHint);
@@ -102,6 +102,11 @@ PlotWindow::PlotWindow(QWidget *_parent)
 
   // add button
   QPushButton *addCanvasButton = new QPushButton("+");
+  addCanvasButton->setObjectName("plotAddCanvas");
+  QGraphicsDropShadowEffect *addCanvasShadow = new QGraphicsDropShadowEffect();
+  addCanvasShadow->setBlurRadius(8);
+  addCanvasShadow->setOffset(0, 0);
+  addCanvasButton->setGraphicsEffect(addCanvasShadow);
   connect(addCanvasButton, SIGNAL(clicked()), this, SLOT(OnAddCanvas()));
   QVBoxLayout *addButtonLayout = new QVBoxLayout;
   addButtonLayout->addWidget(addCanvasButton);
@@ -115,14 +120,14 @@ PlotWindow::PlotWindow(QWidget *_parent)
   bottomFrame->setSizePolicy(QSizePolicy::Expanding,
       QSizePolicy::Minimum);
 
-  this->dataPtr->plotPlayAct = new QAction(QIcon(":/images/play.png"),
+  this->dataPtr->plotPlayAct = new QAction(QIcon(":/images/play_dark.png"),
       tr("Play"), this);
   this->dataPtr->plotPlayAct->setStatusTip(tr("Continue Plotting"));
   this->dataPtr->plotPlayAct->setVisible(false);
   connect(this->dataPtr->plotPlayAct, SIGNAL(triggered()),
       this, SLOT(OnPlay()));
 
-  this->dataPtr->plotPauseAct = new QAction(QIcon(":/images/pause.png"),
+  this->dataPtr->plotPauseAct = new QAction(QIcon(":/images/pause_dark.png"),
       tr("Pause"), this);
   this->dataPtr->plotPauseAct->setStatusTip(tr("Pause Plotting"));
   this->dataPtr->plotPauseAct->setVisible(true);
@@ -131,6 +136,7 @@ PlotWindow::PlotWindow(QWidget *_parent)
 
   QHBoxLayout *bottomPanelLayout = new QHBoxLayout;
   QToolBar *playToolbar = new QToolBar;
+  playToolbar->setObjectName("plotToolbar");
   playToolbar->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
   playToolbar->addAction(this->dataPtr->plotPlayAct);
   playToolbar->addAction(this->dataPtr->plotPauseAct);

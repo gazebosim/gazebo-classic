@@ -25,6 +25,7 @@
 
 #include <qwt/qwt_plot.h>
 #include <qwt/qwt_scale_widget.h>
+#include <qwt/qwt_scale_engine.h>
 #include <qwt/qwt_plot_panner.h>
 #include <qwt/qwt_plot_layout.h>
 #include <qwt/qwt_plot_grid.h>
@@ -37,6 +38,8 @@
 #include <qwt/qwt_legend_item.h>
 #include <qwt/qwt_plot_directpainter.h>
 #include <qwt/qwt_plot_magnifier.h>
+
+#include <ignition/math/Helpers.hh>
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
@@ -80,6 +83,8 @@ IncrementalPlot::IncrementalPlot(QWidget *_parent)
   : QwtPlot(_parent),
     dataPtr(new IncrementalPlotPrivate)
 {
+  this->setObjectName("incrementalPlot");
+
   this->dataPtr->period = 10;
   this->dataPtr->directPainter = new QwtPlotDirectPainter(this);
 
@@ -100,7 +105,7 @@ IncrementalPlot::IncrementalPlot(QWidget *_parent)
   this->setLineWidth(0);
   this->setCanvasLineWidth(2);
 
-  this->plotLayout()->setAlignCanvasToScales(true);
+  // this->plotLayout()->setAlignCanvasToScales(true);
 
   QwtLegend *qLegend = new QwtLegend;
   qLegend->setItemMode(QwtLegend::CheckableItem);
@@ -111,11 +116,12 @@ IncrementalPlot::IncrementalPlot(QWidget *_parent)
   grid->attach(this);
 
   /// \todo Figure out a way to properly label the y-axis
-  QwtText ytitle("Duration (ms)");
+  QwtText ytitle("Variable values");
   ytitle.setFont(QFont(fontInfo().family(), 10, QFont::Bold));
   this->setAxisTitle(QwtPlot::yLeft, ytitle);
 
-  this->setAxisAutoScale(QwtPlot::yRight, true);
+  this->enableAxis(QwtPlot::yLeft);
+  this->setAxisScaleEngine(QwtPlot::yLeft, new QwtLinearScaleEngine());
   this->setAxisAutoScale(QwtPlot::yLeft, true);
 
   this->replot();
@@ -210,16 +216,13 @@ void IncrementalPlot::Clear()
 }
 
 /////////////////////////////////////////////////
-QSize IncrementalPlot::sizeHint() const
-{
-  return QSize(540, 400);
-}
-
-/////////////////////////////////////////////////
 void IncrementalPlot::Update()
 {
   if (this->dataPtr->curves.empty())
     return;
+
+  double yMin = IGN_DBL_MAX;
+  double yMax = 0;
 
   ignition::math::Vector2d lastPoint;
   for (auto &curve : this->dataPtr->curves)
@@ -233,16 +236,20 @@ void IncrementalPlot::Update()
 
     lastPoint = curve.second->Point(pointCount-1);
 
+    ignition::math::Vector2d minPt = curve.second->Min();
+    ignition::math::Vector2d maxPt = curve.second->Max();
+    if (maxPt.Y() > yMax)
+      yMax = maxPt.Y();
+    if (minPt.Y() < yMin)
+      yMin = minPt.Y();
+
     this->dataPtr->directPainter->drawSeries(curve.second->Curve(),
       pointCount - 1, pointCount - 1);
   }
 
-  this->setAxisScale(this->xBottom,
+  this->setAxisScale(QwtPlot::xBottom,
       std::max(0.0, static_cast<double>(lastPoint.X() - this->dataPtr->period)),
       std::max(1.0, static_cast<double>(lastPoint.X())));
-
-  // this->setAxisAutoScale(this->yRight, true);
-  // this->setAxisAutoScale(this->yLeft, true);
 
   this->replot();
 }
@@ -313,4 +320,10 @@ std::vector<PlotCurveWeakPtr> IncrementalPlot::Curves() const
     curves.push_back(it.second);
 
   return curves;
+}
+
+/////////////////////////////////////////////////
+QSize IncrementalPlot::sizeHint() const
+{
+  return QSize(500, 380);
 }

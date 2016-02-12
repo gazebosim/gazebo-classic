@@ -73,12 +73,14 @@ namespace gazebo
 {
   namespace gui
   {
-    /// \brief A class that manages plotting data
+    /// \brief A class that manages curve data
     class CurveData: public QwtArraySeriesData<QPointF>
     {
       public: CurveData()
               {}
 
+      /// \brief Add a point to the sample.
+      /// \return Bounding box of the sample.
       public: virtual QRectF boundingRect() const
               {
                 if (this->d_boundingRect.width() < 0.0)
@@ -87,13 +89,39 @@ namespace gazebo
                 return this->d_boundingRect;
               }
 
+      /// \brief Add a point to the sample.
+      /// \param[in] _point Point to add.
       public: inline void Add(const QPointF &_point)
               {
                 this->d_samples += _point;
-                if (this->d_samples.size() > 11000)
-                  this->d_samples.remove(0, 1000);
+
+                if (this->d_samples.size() > maxSampleSize)
+                {
+                  // remove sample window
+                  // update bounding rect?
+                  this->d_samples.remove(0, windowSize);
+                }
+
+                if (this->d_samples.size() == 1)
+                {
+                  // init bounding rect
+                  this->d_boundingRect.setTopLeft(_point);
+                  this->d_boundingRect.setBottomRight(_point);
+                  return;
+                }
+
+                // expand bounding rect
+                if (_point.x() < this->d_boundingRect.left())
+                  this->d_boundingRect.setLeft(_point.x());
+                else if (_point.x() > this->d_boundingRect.right())
+                  this->d_boundingRect.setRight(_point.x());
+                if (_point.y() < this->d_boundingRect.top())
+                  this->d_boundingRect.setTop(_point.y());
+                else if (_point.y() > this->d_boundingRect.bottom())
+                  this->d_boundingRect.setBottom(_point.y());
               }
 
+      /// \brief Clear the sample data.
       public: void Clear()
               {
                 this->d_samples.clear();
@@ -101,16 +129,24 @@ namespace gazebo
                 this->d_boundingRect = QRectF(0.0, 0.0, -1.0, -1.0);
               }
 
+      /// \brief Get the sample data.
+      /// \return A vector of same points.
       public: QVector<QPointF> Samples() const
               {
                 return this->d_samples;
               }
+
+      /// \brief maxium sample size of this curve.
+      private: int maxSampleSize = 11000;
+
+      /// \brief Size of samples to remove when maxSampleSize is reached.
+      private: int windowSize = 1000;
     };
 
 
     /// \internal
     /// \brief PlotCurve private data
-    struct PlotCurvePrivate
+    class PlotCurvePrivate
     {
       /// \brief Unique id;
       public: unsigned int id;
@@ -152,6 +188,7 @@ PlotCurve::PlotCurve(const std::string &_label)
   QwtPlotCurve *curve = new QwtPlotCurve(QString::fromStdString(_label));
   this->dataPtr->curve = curve;
 
+  curve->setYAxis(QwtPlot::yLeft);
   curve->setStyle(QwtPlotCurve::Lines);
   curve->setData(new CurveData());
 
@@ -160,12 +197,6 @@ PlotCurve::PlotCurve(const std::string &_label)
       % ColorCount;
   this->dataPtr->colorCounter++;
   QColor penColor = Colors[colorGroup][color];
-
-  /// \todo The following will add the curve to the right hand axis. Need
-  /// a better way to do this based on user input.
-  // this->enableAxis(QwtPlot::yRight);
-  // this->axisAutoScale(QwtPlot::yRight);
-  // curve->setYAxis(QwtPlot::yRight);
 
   QPen pen(penColor);
   pen.setWidth(1.0);
@@ -283,6 +314,20 @@ void PlotCurve::SetAge(const unsigned int _age)
 unsigned int PlotCurve::Size() const
 {
   return static_cast<unsigned int>(this->dataPtr->curveData->samples().size());
+}
+
+/////////////////////////////////////////////////
+ignition::math::Vector2d PlotCurve::Min()
+{
+  return ignition::math::Vector2d(this->dataPtr->curve->minXValue(),
+      this->dataPtr->curve->minYValue());
+}
+
+/////////////////////////////////////////////////
+ignition::math::Vector2d PlotCurve::Max()
+{
+  return ignition::math::Vector2d(this->dataPtr->curve->maxXValue(),
+      this->dataPtr->curve->maxYValue());
 }
 
 /////////////////////////////////////////////////
