@@ -149,7 +149,9 @@ ignition::math::Vector3d WindPlugin::LinearVel(
     magnitude = this->noiseMagnitude->Apply(magnitude);
 
   // Compute horizontal direction
-  double direction = atan2(_wind->LinearVel().Y(), _wind->LinearVel().X());
+  //
+  double direction = GZ_RTOD(atan2(_wind->LinearVel().Y(),
+                                   _wind->LinearVel().X()));
   this->directionMean = (1. - this->KDir) * this->directionMean +
     this->KDir * direction;
   direction = this->directionMean;
@@ -161,8 +163,8 @@ ignition::math::Vector3d WindPlugin::LinearVel(
 
   // Apply wind velocity
   ignition::math::Vector3d windVel;
-  windVel.X(magnitude * cos(direction * M_PI / 180.));
-  windVel.Y(magnitude * sin(direction * M_PI / 180.));
+  windVel.X(magnitude * cos(GZ_DTOR(direction)));
+  windVel.Y(magnitude * sin(GZ_DTOR(direction)));
   if (this->noiseVertical)
     windVel.Z(noiseVertical->Apply(this->magnitudeMean));
   else
