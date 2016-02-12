@@ -188,7 +188,8 @@ bool Command::Run(int _argc, char **_argv)
     return true;
   }
 
-  if (this->vm.count("verbose")) {
+  if (this->vm.count("verbose"))
+  {
     gazebo::common::Console::SetQuiet(false);
   }
 
