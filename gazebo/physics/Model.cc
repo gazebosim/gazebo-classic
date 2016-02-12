@@ -30,7 +30,6 @@
 #include <boost/thread/recursive_mutex.hpp>
 #include <sstream>
 
-#include "gazebo/util/OpenAL.hh"
 #include "gazebo/common/KeyFrame.hh"
 #include "gazebo/common/Animation.hh"
 #include "gazebo/common/Plugin.hh"
@@ -49,6 +48,9 @@
 #include "gazebo/physics/Contact.hh"
 
 #include "gazebo/transport/Node.hh"
+
+#include "gazebo/util/IntrospectionManager.hh"
+#include "gazebo/util/OpenAL.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -96,6 +98,30 @@ void Model::Load(sdf::ElementPtr _sdf)
   // information.
   if (this->world->IsLoaded())
     this->LoadJoints();
+
+  // A callback for updating simulation time.
+  auto fModelPose = [this](gazebo::msgs::Any &_msg)
+  {
+    auto pose = this->GetWorldPose();
+    _msg.set_type(gazebo::msgs::Any::POSE);
+    _msg.mutable_pose_value()->mutable_position()->set_x(pose.pos.x);
+    _msg.mutable_pose_value()->mutable_position()->set_y(pose.pos.y);
+    _msg.mutable_pose_value()->mutable_position()->set_z(pose.pos.z);
+    _msg.mutable_pose_value()->mutable_orientation()->set_x(pose.rot.x);
+    _msg.mutable_pose_value()->mutable_orientation()->set_y(pose.rot.y);
+    _msg.mutable_pose_value()->mutable_orientation()->set_z(pose.rot.z);
+    _msg.mutable_pose_value()->mutable_orientation()->set_w(pose.rot.w);
+    return true;
+  };
+  auto uri = this->ScopedUri();
+  auto parts = uri.Split();
+  parts.SetParameters({"pose"});
+  common::Uri newUri(parts);
+
+  std::cout << newUri.CanonicalUri() << std::endl;
+
+  gazebo::util::IntrospectionManager::Instance()->Register(
+      newUri.CanonicalUri(), "pose", fModelPose);
 }
 
 //////////////////////////////////////////////////

@@ -197,6 +197,12 @@ void UriNestedEntity::AddEntity(const UriEntity &_entity)
 }
 
 //////////////////////////////////////////////////
+void UriNestedEntity::AddParentEntity(const UriEntity &_entity)
+{
+  this->dataPtr->entities.insert(this->dataPtr->entities.begin(), _entity);
+}
+
+//////////////////////////////////////////////////
 void UriNestedEntity::Clear()
 {
   this->dataPtr->entities.clear();
@@ -375,14 +381,24 @@ bool UriParts::ParseOneEntity(const std::string &_uri, const size_t &_from,
     }
     else
     {
-      _entity.SetName(_uri.substr(next, _uri.size() - next));
+      // Check whether are "?", "&", or "=" in the name as it would be invalid.
+      auto name = _uri.substr(next, _uri.size() - next);
+      if (name.find_first_of("?&=") != std::string::npos)
+        return false;
+
+      _entity.SetName(name);
       _next = _uri.size();
       return true;
     }
   }
   else
   {
-    _entity.SetName(_uri.substr(next, to - next));
+    // Check whether are "?", "&", or "=" in the name as it would be invalid.
+    auto name = _uri.substr(next, to - next);
+    if (name.find_first_of("?&=") != std::string::npos)
+      return false;
+
+    _entity.SetName(name);
     _next = to;
     return true;
   }
@@ -410,7 +426,7 @@ bool UriParts::ParseParameters(const std::string &_uri, const size_t &_from,
   while (true)
   {
     auto to = _uri.find("=", from);
-    if (to == std::string::npos)
+    if ((to == std::string::npos) || (to == _uri.size() - 1))
       return false;
 
     auto left = _uri.substr(from, to - from);
@@ -452,6 +468,12 @@ Uri::Uri(const std::string &_uri)
 
   this->dataPtr->correct = true;
   this->dataPtr->canonicalUri = uri;
+}
+
+//////////////////////////////////////////////////
+Uri::Uri(const Uri &_uri)
+  : Uri(_uri.CanonicalUri())
+{
 }
 
 //////////////////////////////////////////////////

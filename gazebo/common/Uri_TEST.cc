@@ -205,24 +205,41 @@ TEST(UriTest, Uri)
   EXPECT_THROW(common::Uri("/def/model/model_1"), common::Exception);
   // Missing /world
   EXPECT_THROW(common::Uri("/incorrect/def/model/model_1/"), common::Exception);
-
-  // Missing entity name
+ // Missing entity name
   EXPECT_THROW(common::Uri("/world/def/model"), common::Exception);
   // Missing entity name
   EXPECT_THROW(common::Uri("/world/def/model/"), common::Exception);
   // Wrong entity name (white space)
   EXPECT_THROW(common::Uri("/world/def/model/ "), common::Exception);
-
-  // Missing ? in parameter list.
+  // Invalid '/' before the parameter list.
   EXPECT_THROW(common::Uri("/world/def/model/model_1/p=pose"),
       common::Exception);
-
-  // Missing = in parameter list.
+  // Missing ? in parameter list.
+  EXPECT_THROW(common::Uri("/world/def/model/model_1p=pose"),
+      common::Exception);
+  // Invalid '/' before the parameter list.
   EXPECT_THROW(common::Uri("/world/def/model/model_1/?pose"),
       common::Exception);
-
-  // Missing right argument after "=" in parameter list.
+  // Missing = in parameter list.
+  EXPECT_THROW(common::Uri("/world/def/model/model_1?pose"),
+      common::Exception);
+  // Invalid '/' before the parameter list.
   EXPECT_THROW(common::Uri("/world/def/model/model_1/?p="),
+      common::Exception);
+  // Missing right argument after "=" in parameter list.
+  EXPECT_THROW(common::Uri("/world/def/model/model_1?p="),
+      common::Exception);
+
+  // Invalid entity name (contains '=').
+  EXPECT_THROW(common::Uri("/world/def/model/model_1p=pose"),
+      common::Exception);
+
+  // Missing part of the parameter.
+  EXPECT_THROW(common::Uri("/world/def/model/model_1p&pose"),
+      common::Exception);
+
+  // Invalid entity name (contains '=').
+  EXPECT_THROW(common::Uri("/world/def/model/model_1p?pose"),
       common::Exception);
 
   common::Uri uri1("/world/def/model/model_1");
@@ -289,5 +306,5 @@ TEST(UriTest, Uri)
   EXPECT_EQ(entity.Type(), "model");
   EXPECT_EQ(entity.Name(), "model_2");
   EXPECT_EQ(uri7.CanonicalUri(),
-    "/world/def/model/model_1/model/model_2?p=pose/pos/x");
+      "/world/def/model/model_1/model/model_2?p=pose/pos/x");
 }

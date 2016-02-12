@@ -59,6 +59,10 @@ namespace gazebo
                             const std::function <bool(
                                 gazebo::msgs::Any &_msg)> &_cb);
 
+      public: bool Register(const std::string &_item,
+                            const std::string &_type,
+                            const std::function<double()> &_cb);
+
       /// \brief Unregister an existing item from the introspection manager.
       /// \param[in] _item Item to remove.
       /// \return True if the unregistration succeed or false otherwise

@@ -144,6 +144,10 @@ namespace gazebo
       /// \param[in] _entity New URI entity.
       public: void AddEntity(const UriEntity &_entity);
 
+      /// \brief Adds a new URI entity. The new URI entity becomes the parent.
+      /// \param[in] _entity New URI entity.
+      public: void AddParentEntity(const UriEntity &_entity);
+
       /// \brief Clear the list of URI entities stored in this object.
       public: void Clear();
 
@@ -281,6 +285,10 @@ namespace gazebo
       /// \param[in] _uri A URI string.
       /// \throws common::Exception when _uri cannot be correctly parsed.
       public: Uri(const std::string &_uri);
+
+      /// \brief Copy constructor.
+      /// \param[in] _uri Another Uri object.
+      public: Uri(const common::Uri &_uri);
 
       /// \brief Constructor.
       /// \param[in] _parts Individual parts of the URI.

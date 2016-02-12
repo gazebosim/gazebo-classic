@@ -38,6 +38,7 @@ Base::Base(BasePtr _parent)
 : parent(_parent)
 {
   this->type = BASE;
+  this->typeStr = "base";
   this->id = physics::getUniqueId();
   this->saveable = true;
   this->selected = false;
@@ -223,6 +224,23 @@ unsigned int Base::GetChildCount() const
 void Base::AddType(Base::EntityType _t)
 {
   this->type = this->type | (unsigned int)_t;
+
+  if (this->type & MODEL)
+    this->typeStr = "model";
+  else if (this->type & LINK)
+    this->typeStr = "link";
+  else if (this->type & COLLISION)
+    this->typeStr = "collision";
+  else if (this->type & ACTOR)
+    this->typeStr = "actor";
+  else if (this->type & LIGHT)
+    this->typeStr = "light";
+  else if (this->type & VISUAL)
+    this->typeStr = "visual";
+  else if (this->type & JOINT)
+    this->typeStr = "joint";
+  else if (this->type & SHAPE)
+    this->typeStr = "shape";
 }
 
 //////////////////////////////////////////////////
@@ -308,6 +326,37 @@ std::string Base::GetScopedName(bool _prependWorldName) const
     return this->scopedName;
 }
 
+
+//////////////////////////////////////////////////
+common::Uri Base::ScopedUri() const
+{
+  common::UriParts parts;
+  common::UriEntity entity;
+  common::UriNestedEntity nestedEntity;
+
+  parts.SetWorld(this->world->GetName());
+
+  entity.SetType(this->TypeStr());
+  entity.SetName(this->GetName());
+  nestedEntity.AddEntity(entity);
+
+  BasePtr p = this->parent;
+  while (p)
+  {
+    if (p->GetParent())
+    {
+      entity.SetType(p->TypeStr());
+      entity.SetName(p->GetName());
+      nestedEntity.AddParentEntity(entity);
+    }
+    p = p->GetParent();
+  }
+
+  parts.SetEntity(nestedEntity);
+
+  return common::Uri(parts);
+}
+
 //////////////////////////////////////////////////
 void Base::ComputeScopedName()
 {
@@ -332,6 +381,12 @@ bool Base::HasType(const Base::EntityType &_t) const
 unsigned int Base::GetType() const
 {
   return this->type;
+}
+
+//////////////////////////////////////////////////
+std::string Base::TypeStr() const
+{
+  return this->typeStr;
 }
 
 //////////////////////////////////////////////////

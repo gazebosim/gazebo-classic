@@ -991,6 +991,7 @@ ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
 
   this->PublishModelPose(model);
   this->dataPtr->models.push_back(model);
+
   return model;
 }
 
@@ -2607,9 +2608,41 @@ void World::ResetPhysicsStates()
     model->ResetPhysicsStates();
 }
 
+double myCb()
+{
+  return 2.0;
+}
+
 /////////////////////////////////////////////////
 void World::RegisterIntrospectionItems()
 {
+  // caguero - testing
+  //std::cout << "Lights:" << std::endl;
+  //for (auto &light : this->Lights())
+  //  std::cout << "  " << light->ScopedUri().CanonicalUri() << std::endl;
+  //
+  //std::cout << "Models:" << std::endl;
+  //for (auto &model : this->GetModels())
+  //{
+  //  std::cout << "  * " << model->ScopedUri().CanonicalUri() << std::endl;
+  //
+  //  std::cout << "    Links:" << std::endl;
+  //  for (auto &l : model->GetLinks())
+  //    std::cout << "      " << l->ScopedUri().CanonicalUri() << std::endl;
+  //
+  //  std::cout << "    Nested models:" << std::endl;
+  //  if (model->NestedModels().empty())
+  //    std::cout << "      --" << std::endl;
+  //  for (auto &m : model->NestedModels())
+  //  {
+  //    std::cout << "      * " << m->ScopedUri().CanonicalUri() << std::endl;
+  //    std::cout << "      Links:" << std::endl;
+  //      for (auto &l : m->GetLinks())
+  //        std::cout << "      " << l->ScopedUri().CanonicalUri() << std::endl;
+  //  }
+  //}
+  // caguero - end testing
+
   // Add here all the items that might be introspected.
 
   // A callback for updating simulation time.
@@ -2619,6 +2652,17 @@ void World::RegisterIntrospectionItems()
     _msg.set_double_value(this->GetSimTime().Double());
     return true;
   };
+
+  auto fSimTime2 = [this]()
+  {
+    return this->GetSimTime().Double();
+  };
+
+  auto fSimTime3 = []()
+  {
+    return myCb;
+  };
+
   gazebo::util::IntrospectionManager::Instance()->Register(
-      "sim_time", "double", fSimTime);
+      "sim_time", "double", fSimTime2);
 }
