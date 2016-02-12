@@ -146,11 +146,25 @@ QToolButton
   border: 0px solid #808080;
 }
 
+QToolBar#plotToolbar > QToolButton:hover
+{
+  border: 0px;
+  background-color: transparent;
+}
+
 QToolButton:hover
 {
   border: 1px outset #252525;
   background-color: #454545;
 }
+
+QToolButton:hover#plotCanvasTitleTool
+{
+  border: 0px;
+  background-color: transparent;
+  color: #ffffff;
+}
+
 
 QToolButton:pressed
 {
@@ -162,6 +176,20 @@ QToolButton:checked
 {
   border: 1px outset #252525;
   background-color: #454545;
+}
+
+QPushButton#plotAddCanvas
+{
+  padding: 8px;
+  font-weight: 100;
+  font-size: 20px;
+  background-color: #db4437;
+  color: #ffffff;
+  text-align: center;
+  border-radius: 2px;
+  border: 0px;
+  width: 20px;
+  height: 20px;
 }
 
 QPushButton#expandButton
@@ -757,4 +785,102 @@ QTextEdit#splashVersionTextEdit
 {
   color: #f58113;
   font-size: 10px;
+}
+
+QDialog#plotWindow
+{
+  background-color: #f2f2f2;
+}
+
+QWidget#plotCanvas
+{
+  min-height: 300px;
+  min-width: 534px;
+  padding: 0px;
+  margin: 0px;
+}
+
+QScrollArea#plotScrollArea
+{
+  border-radius: 0px;
+  border: 0px;
+  padding:0px;
+  margin: 0px;
+  background-color: transparent;
+}
+
+QFrame#variableContainerFrame
+{
+  background-color: #ffffff;
+  border-radius: 0px;
+  border-bottom: 1px solid #a9a9a9;
+  margin: 0px;
+}
+
+QFrame#variableContainerFrame > QLabel
+{
+  color: #a9a9a9;
+}
+
+QFrame#variablePillFrame > QLabel
+{
+  color: #ffffff;
+}
+
+QFrame#variablePillFrame
+{
+  border-radius: 10px;
+  background-color: #2196f3;
+}
+
+QFrame#plotCanvasPlotFrame
+{
+  border: 0px;
+  border-radius: 0px;
+  background-color: transparent;
+}
+
+QFrame#plotCanvasTitleFrame
+{
+  background-color: #424242;
+}
+
+QFrame#plotCanvasTitleFrame > QLabel
+{
+  margin-left: 4px;
+}
+
+QFrame#plotCanvasFrame
+{
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  background-color: #ffffff;
+  border-radius: 0px;
+  padding: 0px;
+}
+
+QwtPlot#incrementalPlot
+{
+  background-color: #ffffff;
+}
+
+QwtPlot#incrementalPlot> QwtScaleWidget
+{
+  color: #a9a9a9;
+}
+
+QwtPlot#incrementalPlot > QwtLegend
+{
+  border: 1px solid #a9a9a9;
+  border-radius: 2px
+}
+
+QwtPlot#incrementalPlot > QwtLegend > QScrollArea
+{
+  background-color: #ffffff;
+}
+
+QwtPlot#incrementalPlot > QwtLegend > QwtLegendLabel
+{
+  background-color: #ffffff;
 }

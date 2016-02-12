@@ -29,6 +29,8 @@ namespace gazebo
     // Forward declare private data class
     class PlotWindowPrivate;
 
+    class PlotCanvas;
+
     /// \brief Plot window
     class GZ_GUI_VISIBLE PlotWindow : public QDialog
     {
@@ -40,6 +42,42 @@ namespace gazebo
 
       /// \brief Destructor.
       public: virtual ~PlotWindow();
+
+      /// \brief Add a new canvas.
+      public: PlotCanvas *AddCanvas();
+
+      /// \brief Remove a plot canvas
+      /// \param[in] _canvas Canvas to remove
+      public: void RemoveCanvas(PlotCanvas *_canvas);
+
+      /// \brief Get the number of canvases in this plot window.
+      /// \return Number of canvases
+      public: unsigned int CanvasCount() const;
+
+      /// \brief Clear and remove all canvases
+      public: void Clear();
+
+      /// \brief Restart plotting. A new plot curve will be created for each
+      /// variable in the plot. Existing plot curves will no longer be updated.
+      public: void Restart();
+
+      /// \brief Export all canvas plots.
+      public: void Export();
+
+      /// \brief Update all canvases
+      public slots: void Update();
+
+      /// \brief QT callback to continue plotting.
+      private slots: void OnPlay();
+
+      /// \brief QT callback for when plotting is to be paused.
+      private slots: void OnPause();
+
+      /// \brief Qt Callback when a new plot canvas should be added.
+      private slots: void OnAddCanvas();
+
+      /// \brief Qt Callback when a plot canvas should be removed.
+      private slots: void OnRemoveCanvas();
 
       /// \internal
       /// \brief Pointer to private data.
