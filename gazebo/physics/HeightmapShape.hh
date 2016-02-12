@@ -148,7 +148,7 @@ namespace gazebo
       protected: common::ImageHeightmap img;
 
       /// \brief HeightmapData used to generate the heights.
-      protected: common::HeightmapData *heightmapData;
+      protected: common::HeightmapData *heightmapData = NULL;
 
       /// \brief Size of the height lookup table.
       protected: unsigned int vertSize;

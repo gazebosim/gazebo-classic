@@ -225,6 +225,9 @@ int HeightmapShape::GetSubSampling() const
 //////////////////////////////////////////////////
 void HeightmapShape::Init()
 {
+  if (!this->heightmapData)
+    return;
+
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
 

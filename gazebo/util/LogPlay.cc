@@ -70,11 +70,16 @@ void LogPlay::Open(const std::string &_logFile)
   if (boost::filesystem::is_directory(path))
     gzthrow("Invalid logfile [" + _logFile + "]. This is a directory.");
 
+  //tinyxml2::XMLError xmlError;
   // Parse the log file
-  if (this->dataPtr->xmlDoc.LoadFile(_logFile.c_str()) !=
+  if ((this->dataPtr->xmlDoc.LoadFile(_logFile.c_str())) !=
       tinyxml2::XML_NO_ERROR)
   {
-    gzthrow("Unable to parse log file[" << _logFile << "]");
+    gzerr << "Unable to load file[" << _logFile << "]. "
+      << "Check the log file for more information";
+    gzlog << this->dataPtr->xmlDoc.GetErrorStr1() << std::endl;
+    gzlog << this->dataPtr->xmlDoc.GetErrorStr2() << std::endl;
+    gzthrow("Error parsing log file");
   }
 
   // Get the gazebo_log element

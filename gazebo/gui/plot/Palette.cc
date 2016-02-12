@@ -29,6 +29,9 @@ using namespace gui;
 class gazebo::gui::PalettePrivate
 {
   /// \brief Top pane of the topics tab.
+  public: QFrame *mainFrame;
+
+  /// \brief Top pane of the topics tab.
   public: ConfigWidget *topicsTop;
 
   /// \brief Bottom pane of the topics tab.
@@ -67,7 +70,7 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
     dataPtr(new PalettePrivate)
 {
   // Search top
-  auto searchEdit = new QLineEdit();
+  /*auto searchEdit = new QLineEdit();
   this->connect(searchEdit, SIGNAL(textChanged(QString)), this,
       SLOT(UpdateSearch(QString)));
 
@@ -116,10 +119,11 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   searchSplitter->addWidget(searchBottomWidget);
   searchSplitter->setCollapsible(0, false);
   searchSplitter->setCollapsible(1, false);
+  */
 
   QList<int> sizes;
   sizes << 50 << 50;
-  searchSplitter->setSizes(sizes);
+  //searchSplitter->setSizes(sizes);
 
   // Topics top
   this->dataPtr->topicsTop = new ConfigWidget();
@@ -156,7 +160,7 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   topicsSplitter->setCollapsible(0, false);
   topicsSplitter->setCollapsible(1, false);
   topicsSplitter->setSizes(sizes);
-
+/*
   // Sim top
   auto simTop = new ConfigWidget();
 
@@ -182,34 +186,53 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   simSplitter->setStretchFactor(1, 2);
   simSplitter->setCollapsible(0, false);
   simSplitter->setCollapsible(1, false);
+  */
 
-  auto tabBar = new QTabBar(this);
-  tabBar->setExpanding(true);
+  auto tabBar = new QTabBar;
   tabBar->addTab("Topics");
   tabBar->addTab("Sim");
   tabBar->addTab("Search");
+  tabBar->setExpanding(true);
+  tabBar->setDrawBase(false);
 
-  auto tabStackedLayout = new QStackedLayout();
+  auto tabStackedLayout = new QStackedLayout;
+  tabStackedLayout->setContentsMargins(0, 0, 0, 0);
   tabStackedLayout->addWidget(topicsSplitter);
-  tabStackedLayout->addWidget(simSplitter);
-  tabStackedLayout->addWidget(searchSplitter);
+  //tabStackedLayout->addWidget(simSplitter);
+  //tabStackedLayout->addWidget(searchSplitter);
 
+  connect(tabBar, SIGNAL(currentChanged(int)),
+          tabStackedLayout, SLOT(setCurrentIndex(int)));
 
-  // Tabs
-  /*auto tabWidget = new QTabWidget;
-  tabWidget->setObjectName("plotTabWidget");
-  tabWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-  tabWidget->setMinimumWidth(300);
+  auto mainFrameLayout = new QVBoxLayout;
+  mainFrameLayout->addWidget(tabBar);
+  mainFrameLayout->addLayout(tabStackedLayout);
+  mainFrameLayout->setContentsMargins(0, 0, 0, 0);
 
-  tabWidget->addTab(topicsSplitter, "Topics");
-  tabWidget->addTab(simSplitter, "Sim");
-  tabWidget->addTab(searchSplitter, "Search");
+  this->dataPtr->mainFrame = new QFrame(this);
+  this->dataPtr->mainFrame->setObjectName("plotPaletteFrame");
+  this->dataPtr->mainFrame->setLayout(mainFrameLayout);
+
+  /*auto collapseButton = new QPushButton("<");
+  collapseButton->setObjectName("plotPaletteCollapse");
+  connect(collapseButton, SIGNAL(clicked()), this, SLOT(OnCollapse()));
+
+  auto collapseFiller = new QFrame;
+  collapseFiller->setContentsMargins(0,0,0,0);
+  collapseFiller->setObjectName("plotPaletteCollapseFiller");
+  auto collapseFillerLayout = new QVBoxLayout;
+  collapseFillerLayout->addWidget(collapseButton);
+  collapseFillerLayout->addStretch(1);
+  collapseFillerLayout->setContentsMargins(0, 0, 0, 0);
+  collapseFiller->setLayout(collapseFillerLayout);
   */
 
-  auto mainLayout = new QVBoxLayout;
-  mainLayout->addWidget(tabBar);
-  mainLayout->addLayout(tabStackedLayout);
+
+  QHBoxLayout *mainLayout = new QHBoxLayout;
+  mainLayout->addWidget(this->dataPtr->mainFrame);
+  //mainLayout->addWidget(collapseFiller);
   mainLayout->setContentsMargins(0, 0, 0, 0);
+  mainLayout->setSpacing(0);
 
   this->setLayout(mainLayout);
 }
@@ -217,6 +240,12 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
 /////////////////////////////////////////////////
 Palette::~Palette()
 {
+}
+
+/////////////////////////////////////////////////
+void Palette::OnCollapse()
+{
+  this->dataPtr->mainFrame->setVisible(!this->dataPtr->mainFrame->isVisible());
 }
 
 /////////////////////////////////////////////////
@@ -243,7 +272,7 @@ void Palette::FillTopicsTop()
   }
 
   // So they can be searched
-  this->dataPtr->searchModel->insertColumn(0, items);
+  //this->dataPtr->searchModel->insertColumn(0, items);
 
   // Sort alphabetically
   std::sort(topics.begin(), topics.end());

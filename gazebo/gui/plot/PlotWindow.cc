@@ -29,7 +29,7 @@ using namespace gui;
 /// \brief Private data for the PlotWindow class
 class gazebo::gui::PlotWindowPrivate
 {
-  /// \brief The list of diagnostic labels.
+  /// \brief The list of variable labels.
   public: QListWidget *labelList;
 
   /// \brief True when plotting is paused.
@@ -69,7 +69,7 @@ class DragableListWidget : public QListWidget
                drag->exec(Qt::LinkAction);
              }
 
-  protected: virtual Qt::DropActions supportedDropActions()
+  protected: virtual Qt::DropActions supportedDropActions() const
              {
                return Qt::LinkAction;
              }
@@ -82,7 +82,7 @@ PlotWindow::PlotWindow(QWidget *_parent)
 {
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));
   this->setWindowTitle("Gazebo: Plotting Utility");
-  this->setObjectName("PlotWindow");
+  this->setObjectName("plotWindow");
   this->setWindowFlags(Qt::Window | Qt::WindowTitleHint |
       Qt::WindowCloseButtonHint | Qt::WindowStaysOnTopHint |
       Qt::CustomizeWindowHint);
@@ -93,6 +93,11 @@ PlotWindow::PlotWindow(QWidget *_parent)
 
   // add button
   QPushButton *addCanvasButton = new QPushButton("+");
+  addCanvasButton->setObjectName("plotAddCanvas");
+  QGraphicsDropShadowEffect *addCanvasShadow = new QGraphicsDropShadowEffect();
+  addCanvasShadow->setBlurRadius(8);
+  addCanvasShadow->setOffset(0, 0);
+  addCanvasButton->setGraphicsEffect(addCanvasShadow);
   connect(addCanvasButton, SIGNAL(clicked()), this, SLOT(OnAddCanvas()));
   QVBoxLayout *addButtonLayout = new QVBoxLayout;
   addButtonLayout->addWidget(addCanvasButton);
@@ -106,14 +111,14 @@ PlotWindow::PlotWindow(QWidget *_parent)
   bottomFrame->setSizePolicy(QSizePolicy::Expanding,
       QSizePolicy::Minimum);
 
-  this->dataPtr->plotPlayAct = new QAction(QIcon(":/images/play.png"),
+  this->dataPtr->plotPlayAct = new QAction(QIcon(":/images/play_dark.png"),
       tr("Play"), this);
   this->dataPtr->plotPlayAct->setStatusTip(tr("Continue Plotting"));
   this->dataPtr->plotPlayAct->setVisible(false);
   connect(this->dataPtr->plotPlayAct, SIGNAL(triggered()),
       this, SLOT(OnPlay()));
 
-  this->dataPtr->plotPauseAct = new QAction(QIcon(":/images/pause.png"),
+  this->dataPtr->plotPauseAct = new QAction(QIcon(":/images/pause_dark.png"),
       tr("Pause"), this);
   this->dataPtr->plotPauseAct->setStatusTip(tr("Pause Plotting"));
   this->dataPtr->plotPauseAct->setVisible(true);
@@ -122,6 +127,7 @@ PlotWindow::PlotWindow(QWidget *_parent)
 
   QHBoxLayout *bottomPanelLayout = new QHBoxLayout;
   QToolBar *playToolbar = new QToolBar;
+  playToolbar->setObjectName("plotToolbar");
   playToolbar->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
   playToolbar->addAction(this->dataPtr->plotPlayAct);
   playToolbar->addAction(this->dataPtr->plotPauseAct);
@@ -141,12 +147,26 @@ PlotWindow::PlotWindow(QWidget *_parent)
   plotLayout->setStretchFactor(bottomFrame, 0);
   plotLayout->setContentsMargins(0, 0, 0, 0);
 
+  QFrame *contentFrame = new QFrame;
+  contentFrame->setLayout(plotLayout);
+
   // Palette
   auto plotPalette = new Palette(this);
 
+  auto splitter = new QSplitter(Qt::Horizontal, this);
+  splitter->addWidget(plotPalette);
+  splitter->addWidget(contentFrame);
+  splitter->setCollapsible(0, true);
+  splitter->setCollapsible(1, false);
+
+  QList<int> sizes;
+  sizes << 30 << 70;
+  splitter->setSizes(sizes);
+
   auto mainLayout = new QHBoxLayout;
-  mainLayout->addWidget(plotPalette);
-  mainLayout->addLayout(plotLayout);
+  mainLayout->addWidget(splitter);
+  //mainLayout->addWidget(plotPalette);
+  //mainLayout->addWidget(contentFrame);
   mainLayout->setContentsMargins(0, 0, 0, 0);
 
   this->setLayout(mainLayout);
@@ -171,8 +191,14 @@ PlotWindow::PlotWindow(QWidget *_parent)
 
   QHBoxLayout *mainLayout = new QHBoxLayout;
   mainLayout->addLayout(leftLayout);
+  mainLayout->addLayout(plotLayout);
 
   this->setLayout(mainLayout);
+  this->setSizeGripEnabled(true);
+
+  QTimer *displayTimer = new QTimer(this);
+  connect(displayTimer, SIGNAL(timeout()), this, SLOT(Update()));
+  displayTimer->start(30);
 
   //=================
   // TODO for testing - remove later

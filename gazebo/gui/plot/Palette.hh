@@ -81,6 +81,8 @@ namespace gazebo
       /// \param[in] _search Latest search.
       private slots: void UpdateSearch(const QString &_search);
 
+      private slots: void OnCollapse();
+
       /// \internal
       /// \brief Pointer to private data.
       private: std::unique_ptr<PalettePrivate> dataPtr;
