@@ -96,7 +96,7 @@ std::string IntrospectionManager::Id() const
 //////////////////////////////////////////////////
 bool IntrospectionManager::Register(const std::string &_item,
     const std::string &_type,
-    const std::function <bool (gazebo::msgs::Any &_msg)> &_cb)
+    const std::function <gazebo::msgs::Any ()> _cb)
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
@@ -161,14 +161,7 @@ void IntrospectionManager::Update()
       continue;
 
     // Update the values of the items under observation.
-    gazebo::msgs::Any value;
-
-    if (!itemIter->second.cb(value))
-    {
-      gzerr << "Something went wrong updating the value for item [" << item
-            << "]." << std::endl;
-      continue;
-    }
+    gazebo::msgs::Any value = itemIter->second.cb();
     auto &lastValue = observedItem.second.lastValue;
     lastValue.CopyFrom(value);
   }

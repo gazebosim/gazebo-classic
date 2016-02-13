@@ -59,7 +59,7 @@ namespace gazebo
       std::string type;
 
       /// \brief ToDo.
-      std::function <bool (gazebo::msgs::Any &_msg)> cb;
+      std::function <gazebo::msgs::Any ()> cb;
     };
 
     /// \brief Private data for the IntrospectionManager class.

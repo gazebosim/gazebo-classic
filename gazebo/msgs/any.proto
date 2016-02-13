@@ -7,6 +7,7 @@ package gazebo.msgs;
 import "color.proto";
 import "pose.proto";
 import "quaternion.proto";
+import "time.proto";
 import "vector3d.proto";
 
 message Any
@@ -23,20 +24,23 @@ message Any
     /// \brief Indicates that the message contains a string
     STRING     = 3;
 
+    /// \brief Indicates that the message contains a Boolean
+    BOOLEAN    = 4;
+
     /// \brief Indicates that the message contains a Vector3d
-    VECTOR3D   = 4;
+    VECTOR3D   = 5;
 
     /// \brief Indicates that the message contains a Color
-    COLOR      = 5;
+    COLOR      = 6;
 
     /// \brief Indicates that the message contains a Pose
-    POSE3D     = 6;
+    POSE3D     = 7;
 
     /// \brief Indicates that the message contains a Quaternion
-    QUATERNION = 7;
+    QUATERNION = 8;
 
-    /// \brief Indicates that the message contains a Boolean
-    BOOLEAN    = 8;
+    /// \brief Indicates that the message contains a Time
+    TIME = 9;
   }
 
   /// \todo: Use protobuf oneof feature when we support protobuf 2.6
@@ -53,18 +57,21 @@ message Any
   /// \brief A string value
   optional string string_value         = 4;
 
+  /// \brief A boolean value
+  optional bool bool_value             = 5;
+
   /// \brief A Vector3d value
-  optional Vector3d vector3d_value     = 5;
+  optional Vector3d vector3d_value     = 6;
 
   /// \brief A Color value
-  optional Color color_value           = 6;
+  optional Color color_value           = 7;
 
   /// \brief A Pose value
-  optional Pose pose3d_value           = 7;
+  optional Pose pose3d_value           = 8;
 
   /// \brief A Quaternion value
-  optional Quaternion quaternion_value = 8;
+  optional Quaternion quaternion_value = 9;
 
-  /// \brief A boolean value
-  optional bool bool_value             = 9;
+  /// \brief A Time value
+  optional Time time_value             = 10;
 }

@@ -2645,9 +2645,11 @@ void World::RegisterIntrospectionItems()
 
   // Add here all the items that might be introspected.
 
-  // A callback for updating simulation time.
-  auto fSimTime = [this](){return this->GetSimTime().Double();};
+  // Callbacks.
+  auto fSimTime = [this](){return this->GetSimTime();};
 
-  gazebo::util::IntrospectionManager::Instance()->Register<double>(
-      "sim_time", fSimTime);
+  // Register items.
+  std::string item = "/world/" + this->GetName() + "/base/world?p=time";
+  gazebo::util::IntrospectionManager::Instance()->Register<common::Time>(
+      item, fSimTime);
 }

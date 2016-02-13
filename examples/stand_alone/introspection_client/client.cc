@@ -58,7 +58,7 @@ int main(int _argc, char **_argv)
   // Pick up the first manager.
   std::string id = *managerIds.begin();
 
-  if (!client.IsRegistered(id, "sim_time"))
+  if (!client.IsRegistered(id, "/world/default/base/sim_time"))
   {
     std::cerr << "The sim_time item is not registered on the manager.\n";
     return -1;
@@ -66,8 +66,10 @@ int main(int _argc, char **_argv)
 
   // Create a filter for watching the "sim_time" item.
   std::string filterId, topic;
-  if (!client.NewFilter(id, {"sim_time"}, filterId, topic))
+  if (!client.NewFilter(id, {"/world/default/base/sim_time"}, filterId, topic))
+  {
     return -1;
+  }
 
   // Let's subscribe to the topic for receiving updates.
   ignition::transport::Node node;

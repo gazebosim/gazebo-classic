@@ -21,6 +21,7 @@
 #include <memory>
 #include <set>
 #include <string>
+#include "gazebo/common/Console.hh"
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/msgs/any.pb.h"
 #include "gazebo/msgs/empty.pb.h"
@@ -56,15 +57,40 @@ namespace gazebo
       /// (item already existing).
       public: template<typename T>
       bool Register(const std::string &_item,
-                    const std::function<T()> &_cb)
+                    const std::function<T()> _cb)
       {
-        auto func = [&](gazebo::msgs::Any &_msg)
-        {
-          _msg = msgs::ConvertAny(_cb());
-          return true;
-        };
+        auto func = [=](){return msgs::ConvertAny(_cb());};
 
-        std::string type = msgs::Convert(T()).DebugString();
+        std::string type;
+        msgs::Any msg = func();
+        switch (msg.type())
+        {
+          case msgs::Any::DOUBLE:
+          {
+            type = "double";
+            break;
+          }
+          case msgs::Any::INT32:
+          {
+            type = "int";
+            break;
+          }
+          case msgs::Any::STRING:
+          {
+            type = "string";
+            break;
+          }
+          case msgs::Any::BOOLEAN:
+          {
+            type = "bool";
+            break;
+          }
+          default:
+          {
+            type = msgs::Convert(_cb()).GetTypeName();
+          }
+        }
+
         return this->Register(_item, type, func);
       }
 
@@ -98,8 +124,7 @@ namespace gazebo
       /// (item already existing).
       private: bool Register(const std::string &_item,
                              const std::string &_type,
-                             const std::function <bool(
-                                gazebo::msgs::Any &_msg)> &_cb);
+                             const std::function <gazebo::msgs::Any()> _cb);
 
       /// \brief Create a new filter for observing item updates. This function
       /// will create a new topic for sending periodic updates of the items

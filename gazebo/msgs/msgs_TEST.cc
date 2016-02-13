@@ -126,6 +126,14 @@ TEST_F(MsgsTest, ConvertStringToAny)
   EXPECT_EQ("test_string", msg.string_value());
 }
 
+TEST_F(MsgsTest, ConvertBoolToAny)
+{
+  msgs::Any msg = msgs::ConvertAny(true);
+
+  EXPECT_EQ(msg.type(), msgs::Any::BOOLEAN);
+  EXPECT_TRUE(msg.bool_value());
+}
+
 TEST_F(MsgsTest, ConvertVector3dToAny)
 {
   msgs::Any msg = msgs::ConvertAny(ignition::math::Vector3d(1, 2, 3));
@@ -183,12 +191,15 @@ TEST_F(MsgsTest, ConvertQuaternionToAny)
   EXPECT_TRUE(math::equal(msg.quaternion_value().w(), 0.27059805007309851));
 }
 
-TEST_F(MsgsTest, ConvertBoolToAny)
+TEST_F(MsgsTest, ConvertTimeToAny)
 {
-  msgs::Any msg = msgs::ConvertAny(true);
+  msgs::Any msg = msgs::ConvertAny(common::Time(2, 123));
 
-  EXPECT_EQ(msg.type(), msgs::Any::BOOLEAN);
-  EXPECT_TRUE(msg.bool_value());
+  EXPECT_EQ(msg.type(), msgs::Any::TIME);
+  EXPECT_TRUE(msg.has_time_value());
+
+  EXPECT_EQ(2, msg.time_value().sec());
+  EXPECT_EQ(123, msg.time_value().nsec());
 }
 
 TEST_F(MsgsTest, CovertMathVector3ToMsgs)

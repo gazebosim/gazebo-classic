@@ -99,16 +99,7 @@ void Model::Load(sdf::ElementPtr _sdf)
   if (this->world->IsLoaded())
     this->LoadJoints();
 
-  // A callback for updating simulation time.
-  auto uri = this->ScopedUri();
-  auto fModelPose = [this](){return this->GetWorldPose().Ign();};
-  auto fModelLinVel = [this](){return this->GetWorldLinearVel().Ign();};
-  std::cout << uri.CanonicalUri({"pose"}) << std::endl;
-  std::cout << uri.CanonicalUri({"lin_vel"}) << std::endl;
-  gazebo::util::IntrospectionManager::Instance()->Register
-      <ignition::math::Pose3d>(uri.CanonicalUri({"pose"}), fModelPose);
-  gazebo::util::IntrospectionManager::Instance()->Register
-      <ignition::math::Vector3d>(uri.CanonicalUri({"lin_vel"}), fModelLinVel);
+  this->RegisterIntrospectionItems();
 }
 
 //////////////////////////////////////////////////
@@ -1483,4 +1474,20 @@ bool Model::RemoveJoint(const std::string &_name)
            << "], not removed.\n";
     return false;
   }
+}
+
+/////////////////////////////////////////////////
+void Model::RegisterIntrospectionItems()
+{
+  auto uri = this->ScopedUri();
+
+  // Callbacks.
+  auto fModelPose = [this](){return this->GetWorldPose().Ign();};
+  auto fModelLinVel = [this](){return this->GetWorldLinearVel().Ign();};
+
+  // Register items.
+  gazebo::util::IntrospectionManager::Instance()->Register
+      <ignition::math::Pose3d>(uri.CanonicalUri({"pose"}), fModelPose);
+  gazebo::util::IntrospectionManager::Instance()->Register
+      <ignition::math::Vector3d>(uri.CanonicalUri({"lin_vel"}), fModelLinVel);
 }

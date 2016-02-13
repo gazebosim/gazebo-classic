@@ -63,6 +63,9 @@ TEST_F(IntrospectionManagerTest, Registration)
 
   EXPECT_TRUE(this->manager->Register<double>("item4", func));
   EXPECT_TRUE(this->manager->Register<ignition::math::Pose3d>("item5",func2));
+
+  EXPECT_TRUE(this->manager->Unregister("item4"));
+  EXPECT_TRUE(this->manager->Unregister("item5"));
 }
 
 /////////////////////////////////////////////////

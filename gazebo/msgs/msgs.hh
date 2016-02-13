@@ -97,6 +97,12 @@ namespace gazebo
     GAZEBO_VISIBLE
     msgs::Any ConvertAny(const std::string &_s);
 
+    /// \brief Convert a bool to a msgs::Any
+    /// \param[in] _b The bool to convert.
+    /// \return A msgs::Any object.
+    GAZEBO_VISIBLE
+    msgs::Any ConvertAny(const bool &_b);
+
     /// \brief Convert an ignition::math::Vector3d to a msgs::Any
     /// \param[in] _v The vector to convert.
     /// \return A msgs::Any object.
@@ -121,11 +127,11 @@ namespace gazebo
     GAZEBO_VISIBLE
     msgs::Any ConvertAny(const ignition::math::Quaterniond &_q);
 
-    /// \brief Convert a bool to a msgs::Any
-    /// \param[in] _b The bool to convert.
+    /// \brief Convert a common::Time to a msgs::Any
+    /// \param[in] _t The time to convert.
     /// \return A msgs::Any object.
     GAZEBO_VISIBLE
-    msgs::Any ConvertAny(const bool &_b);
+    msgs::Any ConvertAny(const common::Time &_t);
 
     /// \brief Convert a ignition::math::Vector3 to a msgs::Vector3d
     /// \param[in] _v The vector to convert

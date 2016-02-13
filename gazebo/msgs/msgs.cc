@@ -262,6 +262,15 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////////
+    msgs::Any ConvertAny(const bool &_b)
+    {
+      msgs::Any result;
+      result.set_type(msgs::Any::BOOLEAN);
+      result.set_bool_value(_b);
+      return result;
+    }
+
+    /////////////////////////////////////////////////
     msgs::Any ConvertAny(const ignition::math::Vector3d &_v)
     {
       msgs::Any result;
@@ -298,11 +307,11 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////////
-    msgs::Any ConvertAny(const bool &_b)
+    msgs::Any ConvertAny(const common::Time &_t)
     {
       msgs::Any result;
-      result.set_type(msgs::Any::BOOLEAN);
-      result.set_bool_value(_b);
+      result.set_type(msgs::Any::TIME);
+      result.mutable_time_value()->CopyFrom(Convert(_t));
       return result;
     }
 
