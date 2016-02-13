@@ -307,14 +307,14 @@ void PlotManager::OnIntrospection(const gazebo::msgs::Param_V &_msg)
     auto paramValue = param.value();
 
     // x axis is hardcoded to sim time for now
-    if (!hasSimTime && param.name() == "sim_time")
+    if (!hasSimTime && paramName == "sim_time")
     {
       simTime = paramValue.double_value();
       hasSimTime = true;
     }
 
     // see if there is a curve with variable name that matches param name
-    auto it = this->dataPtr->curves.find(param.name());
+    auto it = this->dataPtr->curves.find(paramName);
     if (it == this->dataPtr->curves.end())
       continue;
 
