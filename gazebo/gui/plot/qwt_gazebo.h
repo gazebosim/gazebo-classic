@@ -18,6 +18,7 @@
 #ifndef _GAZEBO_GUI_PLOT_QWT_GAZEBO_H_
 #define _GAZEBO_GUI_PLOT_QWT_GAZEBO_H_
 
+#pragma GCC system_header
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wfloat-equal"

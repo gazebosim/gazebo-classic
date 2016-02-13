@@ -714,11 +714,11 @@ if ( EXISTS ${_VERSION_FILE} )
   if ( _VERSION_LINE )
     string ( REGEX REPLACE ".*define[ ]+QWT_VERSION_STR[ ]+\"(.*)\".*" "\\1"
         QWT_VERSION_STRING "${_VERSION_LINE}" )
-    string ( REGEX REPLACE "([0-9]+)\\.([0-9]+)\\.([0-9]+)" "\\1"
+    string ( REGEX REPLACE "([0-9]+)\\.([0-9]+)\\.([0-9]+).*" "\\1"
         QWT_MAJOR_VERSION "${QWT_VERSION_STRING}" )
-    string ( REGEX REPLACE "([0-9]+)\\.([0-9]+)\\.([0-9]+)" "\\2"
+    string ( REGEX REPLACE "([0-9]+)\\.([0-9]+)\\.([0-9]+).*" "\\2"
         QWT_MINOR_VERSION "${QWT_VERSION_STRING}" )
-    string ( REGEX REPLACE "([0-9]+)\\.([0-9]+)\\.([0-9]+)" "\\3"
+    string ( REGEX REPLACE "([0-9]+)\\.([0-9]+)\\.([0-9]+).*" "\\3"
         QWT_PATCH_VERSION "${QWT_VERSION_STRING}" )
     set(QWT_VERSION
       ${QWT_MAJOR_VERSION}.${QWT_MINOR_VERSION}.${QWT_PATCH_VERSION})

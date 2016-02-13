@@ -51,7 +51,7 @@ namespace gazebo
 
     /// \internal
     /// \brief PlotCanvas private data
-    struct PlotCanvasPrivate
+    class PlotCanvasPrivate
     {
       /// \brief Text label
       public: QLabel *title;

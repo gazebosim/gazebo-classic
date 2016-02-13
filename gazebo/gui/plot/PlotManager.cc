@@ -39,16 +39,16 @@ namespace gazebo
   namespace gui
   {
     /// \brief Private data for the PlotManager class
-    struct PlotManagerPrivate
+    class PlotManagerPrivate
     {
       /// \def CurveVariableSet
       /// \brief A set of unique plot curve pointers
-      using CurveVariableSet = std::set<PlotCurveWeakPtr,
+      public: using CurveVariableSet = std::set<PlotCurveWeakPtr,
           std::owner_less<PlotCurveWeakPtr> >;
 
       /// \def CurveVariableSetIt
       /// \brief Curve variable map iterator
-      using CurveVariableMapIt =
+      public: using CurveVariableMapIt =
           std::map<std::string, CurveVariableSet>::iterator;
 
       /// \brief Node for communications.
