@@ -306,7 +306,7 @@ void PlotCanvas::RemoveVariable(const unsigned int _id)
       }
       else
       {
-        // TODO remove / detach curve from plot?
+        it->second->plot->DetachCurve(curveId);
         it->second->plot->RemoveCurve(curveId);
       }
       break;
