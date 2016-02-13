@@ -315,5 +315,6 @@ std::vector<PlotCurveWeakPtr> IncrementalPlot::Curves() const
 /////////////////////////////////////////////////
 QSize IncrementalPlot::sizeHint() const
 {
+  // TODO find better way to specify plot size
   return QSize(500, 380);
 }
