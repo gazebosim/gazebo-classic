@@ -262,6 +262,15 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////////
+    msgs::Any ConvertAny(const char *_s)
+    {
+      msgs::Any result;
+      result.set_type(msgs::Any::STRING);
+      result.set_string_value(std::string(_s));
+      return result;
+    }
+
+    /////////////////////////////////////////////////
     msgs::Any ConvertAny(const bool &_b)
     {
       msgs::Any result;

@@ -95,7 +95,6 @@ std::string IntrospectionManager::Id() const
 
 //////////////////////////////////////////////////
 bool IntrospectionManager::Register(const std::string &_item,
-    const std::string &_type,
     const std::function <gazebo::msgs::Any ()> _cb)
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
@@ -107,8 +106,7 @@ bool IntrospectionManager::Register(const std::string &_item,
     return false;
   }
 
-  this->dataPtr->allItems[_item].type = _type;
-  this->dataPtr->allItems[_item].cb = _cb;
+  this->dataPtr->allItems[_item] = _cb;
   return true;
 }
 
@@ -161,7 +159,7 @@ void IntrospectionManager::Update()
       continue;
 
     // Update the values of the items under observation.
-    gazebo::msgs::Any value = itemIter->second.cb();
+    gazebo::msgs::Any value = itemIter->second();
     auto &lastValue = observedItem.second.lastValue;
     lastValue.CopyFrom(value);
   }
@@ -486,10 +484,6 @@ void IntrospectionManager::Items(const gazebo::msgs::Empty &/*_req*/,
       nextParam->set_name("item");
       nextParam->mutable_value()->set_type(gazebo::msgs::Any::STRING);
       nextParam->mutable_value()->set_string_value(item.first);
-      auto childParam = nextParam->add_children();
-      childParam->set_name("type");
-      childParam->mutable_value()->set_type(gazebo::msgs::Any::STRING);
-      childParam->mutable_value()->set_string_value(item.second.type);
     }
   }
   _result = true;

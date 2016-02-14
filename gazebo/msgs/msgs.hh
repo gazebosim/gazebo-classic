@@ -97,6 +97,12 @@ namespace gazebo
     GAZEBO_VISIBLE
     msgs::Any ConvertAny(const std::string &_s);
 
+    /// \brief Convert a string literal to a msgs::Any
+    /// \param[in] _s The string to convert.
+    /// \return A msgs::Any object.
+    GAZEBO_VISIBLE
+    msgs::Any ConvertAny(const char *_s);
+
     /// \brief Convert a bool to a msgs::Any
     /// \param[in] _b The bool to convert.
     /// \return A msgs::Any object.

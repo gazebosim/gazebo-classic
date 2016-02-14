@@ -61,37 +61,7 @@ namespace gazebo
       {
         auto func = [=](){return msgs::ConvertAny(_cb());};
 
-        std::string type;
-        msgs::Any msg = func();
-        switch (msg.type())
-        {
-          case msgs::Any::DOUBLE:
-          {
-            type = "double";
-            break;
-          }
-          case msgs::Any::INT32:
-          {
-            type = "int";
-            break;
-          }
-          case msgs::Any::STRING:
-          {
-            type = "string";
-            break;
-          }
-          case msgs::Any::BOOLEAN:
-          {
-            type = "bool";
-            break;
-          }
-          default:
-          {
-            type = msgs::Convert(_cb()).GetTypeName();
-          }
-        }
-
-        return this->Register(_item, type, func);
+        return this->Register(_item, func);
       }
 
       /// \brief Unregister an existing item from the introspection manager.
@@ -118,12 +88,10 @@ namespace gazebo
 
       /// \brief Register a new item in the introspection manager.
       /// \param[in] _item New item. E.g.: /default/world/model1/pose
-      /// \param[in] _type Item type. E.g.: gazebo::msgs::pose
       /// \param[in] _cb Callback used to get the last update for this item.
       /// \result True when the registration succeed or false otherwise
       /// (item already existing).
       private: bool Register(const std::string &_item,
-                             const std::string &_type,
                              const std::function <gazebo::msgs::Any()> _cb);
 
       /// \brief Create a new filter for observing item updates. This function

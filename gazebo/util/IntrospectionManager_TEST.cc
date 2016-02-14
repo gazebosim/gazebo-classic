@@ -57,15 +57,37 @@ TEST_F(IntrospectionManagerTest, Id)
 /////////////////////////////////////////////////
 TEST_F(IntrospectionManagerTest, Registration)
 {
-  // A callback for updating items.
-  auto func = [](){return 2.0;};
-  auto func2 = [](){return ignition::math::Pose3d();};
+  // Callbacks.
+  auto func1 = [](){return 2.0;};
+  auto func2 = [](){return 3;};
+  auto func3 = [](){return "test_string";};
+  auto func4 = [](){return true;};
+  auto func5 = [](){return ignition::math::Vector3d();};
+  auto func6 = [](){return common::Color();};
+  auto func7 = [](){return ignition::math::Pose3d();};
+  auto func8 = [](){return ignition::math::Quaterniond();};
+  auto func9 = [](){return common::Time();};
 
-  EXPECT_TRUE(this->manager->Register<double>("item4", func));
-  EXPECT_TRUE(this->manager->Register<ignition::math::Pose3d>("item5",func2));
+  // Register items
+  EXPECT_TRUE(this->manager->Register<double>("item4", func1));
+  EXPECT_TRUE(this->manager->Register<int>("item5", func2));
+  EXPECT_TRUE(this->manager->Register<std::string>("item6", func3));
+  EXPECT_TRUE(this->manager->Register<bool>("item7", func4));
+  EXPECT_TRUE(this->manager->Register<ignition::math::Vector3d>("item8", func5));
+  EXPECT_TRUE(this->manager->Register<common::Color>("item9", func6));
+  EXPECT_TRUE(this->manager->Register<ignition::math::Pose3d>("item10", func7));
+  EXPECT_TRUE(this->manager->Register<ignition::math::Quaterniond>("item11", func8));
+  EXPECT_TRUE(this->manager->Register<common::Time>("item12", func9));
 
   EXPECT_TRUE(this->manager->Unregister("item4"));
   EXPECT_TRUE(this->manager->Unregister("item5"));
+  EXPECT_TRUE(this->manager->Unregister("item6"));
+  EXPECT_TRUE(this->manager->Unregister("item7"));
+  EXPECT_TRUE(this->manager->Unregister("item8"));
+  EXPECT_TRUE(this->manager->Unregister("item9"));
+  EXPECT_TRUE(this->manager->Unregister("item10"));
+  EXPECT_TRUE(this->manager->Unregister("item11"));
+  EXPECT_TRUE(this->manager->Unregister("item12"));
 }
 
 /////////////////////////////////////////////////
