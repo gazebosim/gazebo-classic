@@ -83,6 +83,9 @@ namespace gazebo
 
       /// \brief True to manipulate model in global frame.
       public: bool globalManip;
+
+      /// \brief True when a model is being manipulated, false otherwise.
+      public: bool transparent = false;
     };
   }
 }
