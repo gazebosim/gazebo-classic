@@ -36,7 +36,10 @@ class IntrospectionManagerTest : public ::testing::Test
   public: void SetUp()
   {
     // A callback for updating items.
-    auto func = [](){return 1.0;};
+    auto func = []()
+    {
+      return 1.0;
+    };
 
     // Make sure that we always have some items registered.
     EXPECT_TRUE(this->manager->Register<double>("item1", func));
@@ -67,15 +70,42 @@ TEST_F(IntrospectionManagerTest, Id)
 TEST_F(IntrospectionManagerTest, RegisterAllTypes)
 {
   // Callbacks.
-  auto func1 = [](){return 2.0;};
-  auto func2 = [](){return 3;};
-  auto func3 = [](){return "test_string";};
-  auto func4 = [](){return true;};
-  auto func5 = [](){return ignition::math::Vector3d();};
-  auto func6 = [](){return common::Color();};
-  auto func7 = [](){return ignition::math::Pose3d();};
-  auto func8 = [](){return ignition::math::Quaterniond();};
-  auto func9 = [](){return common::Time();};
+  auto func1 = []()
+  {
+    return 2.0;
+  };
+  auto func2 = []()
+  {
+    return 3;
+  };
+  auto func3 = []()
+  {
+    return "test_string";
+  };
+  auto func4 = []()
+  {
+    return true;
+  };
+  auto func5 = []()
+  {
+    return ignition::math::Vector3d();
+  };
+  auto func6 = []()
+  {
+    return common::Color();
+  };
+  auto func7 = []()
+  {
+    return ignition::math::Pose3d();
+  };
+  auto func8 = []()
+  {
+    return ignition::math::Quaterniond();
+  };
+  auto func9 = []()
+  {
+    return common::Time();
+  };
 
   // Register items
   EXPECT_TRUE(this->manager->Register<double>("item4", func1));
@@ -105,7 +135,10 @@ TEST_F(IntrospectionManagerTest, RegisterAllTypes)
 TEST_F(IntrospectionManagerTest, RegistrationAndItems)
 {
   // A callback for updating items.
-  auto func = [](){return 1.0;};
+  auto func = []()
+  {
+    return 1.0;
+  };
 
   // Try to unregister an unregistered item.
   EXPECT_FALSE(this->manager->Unregister("_unregistered_item_"));

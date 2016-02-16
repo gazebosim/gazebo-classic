@@ -57,9 +57,12 @@ namespace gazebo
       /// (item already existing).
       public: template<typename T>
       bool Register(const std::string &_item,
-                    const std::function<T()> _cb)
+                    const std::function<T()> &_cb)
       {
-        auto func = [=](){return msgs::ConvertAny(_cb());};
+        auto func = [=]()
+        {
+          return msgs::ConvertAny(_cb());
+        };
 
         return this->Register(_item, func);
       }
@@ -92,7 +95,7 @@ namespace gazebo
       /// \result True when the registration succeed or false otherwise
       /// (item already existing).
       private: bool Register(const std::string &_item,
-                             const std::function <gazebo::msgs::Any()> _cb);
+                             const std::function <gazebo::msgs::Any()> &_cb);
 
       /// \brief Create a new filter for observing item updates. This function
       /// will create a new topic for sending periodic updates of the items

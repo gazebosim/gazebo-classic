@@ -95,7 +95,7 @@ std::string IntrospectionManager::Id() const
 
 //////////////////////////////////////////////////
 bool IntrospectionManager::Register(const std::string &_item,
-    const std::function <gazebo::msgs::Any ()> _cb)
+    const std::function <gazebo::msgs::Any ()> &_cb)
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 

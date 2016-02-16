@@ -1482,8 +1482,15 @@ void Model::RegisterIntrospectionItems()
   auto uri = this->ScopedUri();
 
   // Callbacks.
-  auto fModelPose = [this](){return this->GetWorldPose().Ign();};
-  auto fModelLinVel = [this](){return this->GetWorldLinearVel().Ign();};
+  auto fModelPose = [this]()
+  {
+    return this->GetWorldPose().Ign();
+  };
+
+  auto fModelLinVel = [this]()
+  {
+    return this->GetWorldLinearVel().Ign();
+  };
 
   // Register items.
   gazebo::util::IntrospectionManager::Instance()->Register

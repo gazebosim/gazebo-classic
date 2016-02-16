@@ -177,7 +177,7 @@ UriEntity UriNestedEntity::Leaf() const
   if (this->dataPtr->entities.empty())
     gzthrow("Empty nested entity");
 
- return this->dataPtr->entities.back();
+  return this->dataPtr->entities.back();
 }
 
 //////////////////////////////////////////////////
@@ -316,7 +316,7 @@ void UriParts::ParseEntity(const std::string &_uri, size_t &_next)
 
   // No entity.
   if ((from >= _uri.size()) || (_uri.at(from) == '?'))
-    gzthrow("Unable to parse URI. Empty world");;
+    gzthrow("Unable to parse URI. Empty world");
 
   this->dataPtr->entity.Clear();
 
@@ -364,7 +364,7 @@ bool UriParts::ParseOneEntity(const std::string &_uri, const size_t &_from,
   auto type = _uri.substr(_from + 1, next - _from - 1);
   if (type.find_first_of(" ?&=") != std::string::npos)
     return false;
- _entity.SetType(type);
+  _entity.SetType(type);
 
   next += 1;
   auto to = _uri.find_first_of("/?", next);

@@ -77,7 +77,10 @@ class IntrospectionClientTest : public ::testing::Test
     this->topicsSubscribed = {};
 
     // A callback for updating items.
-    auto func = [](){return 1.0;};
+    auto func = []()
+    {
+      return 1.0;
+    };
 
     // Make sure that we always have some items registered.
     this->manager->Register<double>("item1", func);

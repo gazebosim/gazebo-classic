@@ -345,19 +345,13 @@ TEST(UriTest, UriParts)
 }
 
 /////////////////////////////////////////////////
-TEST(UriTest, Debug)
-{
-
-}
-
-/////////////////////////////////////////////////
 TEST(UriTest, UriInvalid)
 {
   // Missing /world
   EXPECT_THROW(Uri("/def/model/model_1"), Exception);
   // Missing /world
   EXPECT_THROW(Uri("/incorrect/def/model/model_1/"), Exception);
- // Missing entity name
+  // Missing entity name
   EXPECT_THROW(Uri("/world/def/model"), Exception);
   // Missing entity name
   EXPECT_THROW(Uri("/world/def/model/"), Exception);

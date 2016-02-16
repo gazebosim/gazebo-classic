@@ -106,7 +106,7 @@ TEST_F(MsgsTest, ConvertDoubleToAny)
 {
   msgs::Any msg = msgs::ConvertAny(1.0);
   EXPECT_EQ(msg.type(), msgs::Any::DOUBLE);
-  EXPECT_TRUE( msg.has_double_value());
+  EXPECT_TRUE(msg.has_double_value());
   EXPECT_DOUBLE_EQ(1, msg.double_value());
 }
 
@@ -114,7 +114,7 @@ TEST_F(MsgsTest, ConvertIntToAny)
 {
   msgs::Any msg = msgs::ConvertAny(2);
   EXPECT_EQ(msg.type(), msgs::Any::INT32);
-  EXPECT_TRUE( msg.has_int_value());
+  EXPECT_TRUE(msg.has_int_value());
   EXPECT_DOUBLE_EQ(2, msg.int_value());
 }
 
@@ -122,7 +122,7 @@ TEST_F(MsgsTest, ConvertStringToAny)
 {
   msgs::Any msg = msgs::ConvertAny("test_string");
   EXPECT_EQ(msg.type(), msgs::Any::STRING);
-  EXPECT_TRUE( msg.has_string_value());
+  EXPECT_TRUE(msg.has_string_value());
   EXPECT_EQ("test_string", msg.string_value());
 }
 
