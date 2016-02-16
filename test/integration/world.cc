@@ -352,6 +352,16 @@ TEST_F(WorldTest, RemoveModelUnPaused)
 }
 
 /////////////////////////////////////////////////
+TEST_F(WorldTest, ScopedUri)
+{
+  Load("worlds/nested_model.world");
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  EXPECT_EQ(world->ScopedUri().CanonicalUri(), "/world/default");
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

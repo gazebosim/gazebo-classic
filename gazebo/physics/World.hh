@@ -41,6 +41,7 @@
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/common/UpdateInfo.hh"
 #include "gazebo/common/Event.hh"
+#include "gazebo/common/Uri.hh"
 
 #include "gazebo/physics/Base.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
@@ -396,6 +397,10 @@ namespace gazebo
       /// be called by SensorManager.
       /// \param[in] _init True if sensors have been initialized.
       public: void _SetSensorsInitialized(const bool _init);
+
+      /// \brief Return the common::Uri of the world.
+      /// \return common::Uri of this world.
+      public: common::Uri ScopedUri() const;
 
       /// \cond
       /// This is an internal function.

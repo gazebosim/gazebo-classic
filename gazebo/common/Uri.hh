@@ -40,7 +40,7 @@ namespace gazebo
     ///
     /// A URI entity is composed by a type and a name. The type is a keyword
     /// such as "model" or "light" and the value is any alphanumeric identifier
-    /// without whitespaces or "?". A URI entity is part of a URI.
+    /// without whitespaces, '?', '=' or '&'. A URI entity is part of a URI.
     /// E.g.: /world/default/model/model_1/model/model_2?p=pose
     ///                      ^^^^^^^^^^^^^^
     /// "model/model_1" is a valid URI entity.
@@ -48,6 +48,14 @@ namespace gazebo
     {
       /// \brief Constructor.
       public: UriEntity();
+
+      /// \brief Constructor.
+      /// \param[in] _type Type of the URI entity. Any alphanumeric value
+      /// except ' ', '?', '&' or '=' is allowed. E.g.: "model"
+      /// \param[in] _name Name of the URI entity. Any alphanumeric value
+      /// except ' ', '?', '&' or '=' is allowed. E.g.: "model_1"
+      public: UriEntity(const std::string &_type,
+                        const std::string &_name);
 
       /// \brief Copy constructor.
       /// \param[in] _entity Another entity.
@@ -66,17 +74,17 @@ namespace gazebo
       /// \sa SetName
       public: std::string Name() const;
 
-      /// \brief Set the type of the URI entity. Any alphanumeric value without
-      /// whitespaces or "?" is allowed.
+      /// \brief Set the type of the URI entity. Any alphanumeric value
+      /// except ' ', '?', '&' or '=' is allowed. E.g.: "link"
       /// \param[in] _type The type.
-      /// \throws common::Exception when _name contains a whitespace or a "?".
+      /// \throws common::Exception when _name contains an invalid character.
       /// \sa Type
       public: void SetType(const std::string &_type);
 
-      /// \brief Set the name of the URI entity.
-      /// \param[in] _name The name. Any alphanumeric value without whitespaces
-      /// or "?" is allowed.
-      /// \throws common::Exception when _name contains a whitespace or a "?".
+      /// \brief Set the name of the URI entity. Any alphanumeric value
+      /// except ' ', '?', '&' or '=' is allowed.
+      /// \param[in] _name The name.
+      /// \throws common::Exception when _name contains an invalid character.
       /// \sa Name
       public: void SetName(const std::string &_name);
 
@@ -85,8 +93,8 @@ namespace gazebo
       /// \return itself.
       public: UriEntity &operator=(const UriEntity &_p);
 
-      /// \brief Validate an identifier. Any alphanumeric identifier is valid
-      /// except if contains whitespaces or "?".
+      /// \brief Validate an identifier. Any alphanumeric value
+      /// except ' ', '?', '&' or '=' is valid.
       /// \throws common::Exception when _name contains a whitespace or a "?".
       private: void Validate(const std::string &_identifier);
 
@@ -166,19 +174,24 @@ namespace gazebo
     ///
     /// There are multiple components in a URI:
     ///
-    ///  - world:      URI entity with with type "/world/". The name contains
+    ///  - world:      URI entity with type "/world/". The name contains
     ///                the name of a Gazebo world. E.g.:"/world/default"
     ///
     ///  - entities:   URI nested entity.
     ///                E.g.: "model/model_1/model/model_2"
     ///
-    ///  - parameters: Vector of parameters. A parameter is some property
-    ///                applied to the nested entity in the specified world.
-    ///                E.g.: {"pose", "lin_vel"}
+    ///  - parameter:  String representing a property of the entity.
+    ///                E.g.: "pose"
     class GZ_COMMON_VISIBLE UriParts
     {
       /// \brief Constructor.
       public: UriParts();
+
+      /// \brief Constructor.
+      /// \param[in] _uri A string that should be parsed into a UriParts object.
+      /// E.g.: "/world/default/model/model_1/link/link_1?p=pose".
+      /// \throws common::Exception when _uri cannot be correctly parsed.
+      public: UriParts(const std::string &_uri);
 
       /// \brief Copy constructor.
       /// \param[in] _parts Another UriParts object.
@@ -197,10 +210,10 @@ namespace gazebo
       /// \sa SetEntity
       public: UriNestedEntity &Entity() const;
 
-      /// \brief Get the parameters part.
-      /// \return The parameters part.
-      /// \sa SetParameters.
-      public: std::vector<std::string> &Parameters() const;
+      /// \brief Get the parameter part.
+      /// \return The parameter part.
+      /// \sa SetParameter
+      public: std::string Parameter() const;
 
       /// \brief Set the world part.
       /// \param[in] _world World part.
@@ -212,42 +225,36 @@ namespace gazebo
       /// \sa Entity
       public: void SetEntity(const UriNestedEntity &_entity);
 
-      /// \brief Set the parameters part.
-      /// \param[in] _params The parameters.
-      /// \sa Parameters
-      public: void SetParameters(const std::vector<std::string> &_params);
+      /// \brief Set the parameter part.
+      /// \param[in] _parameter Parameter part.
+      /// \sa Parameter
+      public: void SetParameter(const std::string &_parameter);
 
-      /// \brief Parse a URI string and split it into its URI parts.
+      /// \brief Parse a URI string and update the internal URI parts.
       /// \param[in] _uri A URI string.
-      ///                 E.g.: "/model/default/model/model_1?p=pose"
-      /// \param[out] _parts URI parts after splitting the URI string.
-      /// \return True if the URI string was valid or false otherwise.
-      public: static bool Parse(const std::string &_uri,
-                                UriParts &_parts);
+      ///                 E.g.: "/model/default/model/model_1"
+      /// \throws common::Exception when _uri cannot be correctly parsed.
+      public: void Parse(const std::string &_uri);
 
       /// \brief Equal operator.
       /// \param[in] _p another UriParts.
       /// \return itself.
       public: UriParts &operator=(const UriParts &_p);
 
-      /// \brief Extract the world part from an URI string.
+      /// \brief Update the URI nested entity part from an URI string.
       /// \param[in] _uri A URI string.
-      /// \param[out] _world Name of the world file.
-      /// \param[out] _next The next position after parsing the world part in
-      ///                   the URI string.
-      /// \return True when the world name was successfully parsed.
-      private: static bool ParseWorld(const std::string &_uri,
-                                      std::string &_world,
-                                      size_t &_next);
+      /// \param[out] _next The next position after parsing the nested entity
+      ///                   part in the URI string.
+      /// \throws common::Exception when _uri cannot be correctly parsed.
+      private: void ParseEntity(const std::string &_uri,
+                                size_t &next);
 
-      /// \brief Extract the URI nested entity from an URI string.
+      /// \brief Update the parameter part from an URI string.
       /// \param[in] _uri A URI string.
-      /// \param[in/out] _from Position of the first character to parse.
-      /// \param[out] _entity URI nested entity.
-      /// \return True when the URI nested entity was successfully parsed.
-      private: static bool ParseEntity(const std::string &_uri,
-                                       size_t &_from,
-                                       UriNestedEntity &_entity);
+      /// \param[in] _from Position of the first character to parse.
+      /// \throws common::Exception when _uri cannot be correctly parsed.
+      private: void ParseParameter(const std::string &_uri,
+                                   const size_t &_from);
 
       /// \brief Parse one single entity from an URI string.
       /// \param[in] _uri A URI string.
@@ -259,15 +266,6 @@ namespace gazebo
                                           UriEntity &_entity,
                                           size_t &_next);
 
-      /// \brief Extract the parameters part from an URI string.
-      /// \param[in] _uri A URI string.
-      /// \param[in] _from Position of the first character to parse.
-      /// \param[out] _params Vector of parameters parsed.
-      /// \return True when the parameters were successfully parsed.
-      private: static bool ParseParameters(const std::string &_uri,
-                                           const size_t &_from,
-                                           std::vector<std::string> &_params);
-
       /// \internal
       /// \brief Pointer to private data.
       private: std::unique_ptr<UriPartsPrivate> dataPtr;
@@ -276,36 +274,46 @@ namespace gazebo
     /// \class Uri Uri.hh common/common.hh
     /// \brief A Gazebo URI abstraction.
     ///
-    /// A Uri is a string representing some property of an entity in a given
-    /// world. For example, the pose (property) of the model "model_1" (entity)
-    /// in the "default" world.
+    /// A Uri is a string representing an entity in a given world. The URI
+    /// string contains information of the world name where is contained and
+    /// its hierarchy of entities. Optionally, it can also contain a parameter
+    /// that should be interpreted as a property of the entity.
+    /// E.g.: "/world/default/model/model_1/link/link_1?p=pose".
+    /// This is a valid URI representing the pose of a link "link_1" that is
+    /// part of a model named "model_1" contained in the "default" world.
     class GZ_COMMON_VISIBLE Uri
     {
       /// \brief Constructor.
       /// \param[in] _uri A URI string.
-      /// \throws common::Exception when _uri cannot be correctly parsed.
       public: Uri(const std::string &_uri);
-
-      /// \brief Copy constructor.
-      /// \param[in] _uri Another Uri object.
-      public: Uri(const common::Uri &_uri);
 
       /// \brief Constructor.
       /// \param[in] _parts Individual parts of the URI.
       public: Uri(const UriParts &_parts);
+
+      /// \brief Copy constructor.
+      /// \param[in] _uri Another Uri object.
+      public: Uri(const Uri &_uri);
 
       /// \brief Destructor.
       public: virtual ~Uri();
 
       /// \brief Get the parts of the current URI.
       /// \return The parts in which this URI is composed.
-      public: UriParts Split() const;
+      public: UriParts &Parts() const;
 
       /// \brief Get the URI string of the current URI.
-      /// Note that the URI string is "/" terminated.
-      /// \return The URI string. E.g.: "/world/default/light/light_1?p=pose/"
-      public: std::string CanonicalUri(
-          const std::vector<std::string> &_params = {}) const;
+      /// E.g.: "/world/default/model/model_1/link/link_1?p=pose"
+      /// Optionally, it's possible to pass a parameter that specifies an
+      /// alternative property. In this case, this parameter will be contained
+      /// in the URI string returned and the internal parameter stored in the
+      /// URI object will be ignored.
+      /// E.g.: Passing a "lin_vel" parameter returns the following URI string:
+      /// "/world/default/model/model_1/link/link_1?p=lin_vel".
+      /// \param[in] _param Optional parameter.
+      /// \return The URI string.
+      /// E.g.: "/world/default/model/model_1/link/link_1?p=pose"
+      public: std::string CanonicalUri(const std::string &_param = "") const;
 
       /// \internal
       /// \brief Pointer to private data.

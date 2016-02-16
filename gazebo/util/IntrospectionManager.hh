@@ -159,9 +159,7 @@ namespace gazebo
       /// \param[in] _req Not used.
       /// \param[out] _rep Collection of parameters representing the items
       /// registered. Each parameter should have a name "item", followed by a
-      /// value of type STRING. Additionally, each parameter has a child with
-      /// name "type" and another value of type STRING describing the type of
-      /// the item.
+      /// value of type STRING.
       /// \param[out] _result True when the request succeeded.
       private: void Items(const gazebo::msgs::Empty &_req,
                           gazebo::msgs::Param_V &_rep,

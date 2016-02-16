@@ -56,6 +56,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/common/Time.hh"
+#include "gazebo/common/Uri.hh"
 
 #include "gazebo/math/Vector3.hh"
 
@@ -321,6 +322,11 @@ void World::Load(sdf::ElementPtr _sdf)
 
   this->dataPtr->userCmdManager = UserCmdManagerPtr(
       new UserCmdManager(shared_from_this()));
+
+  // Initialize the world URI.
+  common::UriParts parts;
+  parts.SetWorld(this->GetName());
+  this->dataPtr->uri.reset(new common::Uri(parts));
 
   this->RegisterIntrospectionItems();
 
@@ -2608,9 +2614,10 @@ void World::ResetPhysicsStates()
     model->ResetPhysicsStates();
 }
 
-double myCb()
+/////////////////////////////////////////////////
+common::Uri World::ScopedUri() const
 {
-  return 2.0;
+  return *this->dataPtr->uri;
 }
 
 /////////////////////////////////////////////////
@@ -2643,13 +2650,9 @@ void World::RegisterIntrospectionItems()
   //}
   // caguero - end testing
 
+  auto uri = this->ScopedUri();
+
   // Add here all the items that might be introspected.
-
-  // Callbacks.
-  auto fSimTime = [this](){return this->GetSimTime();};
-
-  // Register items.
-  std::string item = "/world/" + this->GetName() + "/base/world?p=time";
   gazebo::util::IntrospectionManager::Instance()->Register<common::Time>(
-      item, fSimTime);
+      uri.CanonicalUri("time"), std::bind(&World::GetSimTime, this));
 }

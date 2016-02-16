@@ -39,9 +39,18 @@ class IntrospectionManagerTest : public ::testing::Test
     auto func = [](){return 1.0;};
 
     // Make sure that we always have some items registered.
-    this->manager->Register<double>("item1", func);
-    this->manager->Register<double>("item2", func);
-    this->manager->Register<double>("item3", func);
+    EXPECT_TRUE(this->manager->Register<double>("item1", func));
+    EXPECT_TRUE(this->manager->Register<double>("item2", func));
+    EXPECT_TRUE(this->manager->Register<double>("item3", func));
+  }
+
+  public: void TearDown()
+  {
+    // Unregister multiple items.
+    EXPECT_TRUE(this->manager->Unregister("item1"));
+    EXPECT_TRUE(this->manager->Unregister("item2"));
+    EXPECT_TRUE(this->manager->Unregister("item3"));
+    EXPECT_TRUE(this->manager->Items().empty());
   }
 
   /// \brief Pointer to the introspection manager.
@@ -55,7 +64,7 @@ TEST_F(IntrospectionManagerTest, Id)
 }
 
 /////////////////////////////////////////////////
-TEST_F(IntrospectionManagerTest, Registration)
+TEST_F(IntrospectionManagerTest, RegisterAllTypes)
 {
   // Callbacks.
   auto func1 = [](){return 2.0;};
@@ -73,10 +82,12 @@ TEST_F(IntrospectionManagerTest, Registration)
   EXPECT_TRUE(this->manager->Register<int>("item5", func2));
   EXPECT_TRUE(this->manager->Register<std::string>("item6", func3));
   EXPECT_TRUE(this->manager->Register<bool>("item7", func4));
-  EXPECT_TRUE(this->manager->Register<ignition::math::Vector3d>("item8", func5));
+  EXPECT_TRUE(this->manager->Register<ignition::math::Vector3d>(
+      "item8", func5));
   EXPECT_TRUE(this->manager->Register<common::Color>("item9", func6));
   EXPECT_TRUE(this->manager->Register<ignition::math::Pose3d>("item10", func7));
-  EXPECT_TRUE(this->manager->Register<ignition::math::Quaterniond>("item11", func8));
+  EXPECT_TRUE(this->manager->Register<ignition::math::Quaterniond>(
+      "item11", func8));
   EXPECT_TRUE(this->manager->Register<common::Time>("item12", func9));
 
   EXPECT_TRUE(this->manager->Unregister("item4"));
@@ -106,15 +117,9 @@ TEST_F(IntrospectionManagerTest, RegistrationAndItems)
   // Try to register an existing item.
   EXPECT_FALSE(this->manager->Register<double>("item4", func));
 
-  // Unegister an existing item.
+  // Unregister an existing item.
   EXPECT_TRUE(this->manager->Unregister("item4"));
-  EXPECT_TRUE(!this->manager->Items().empty());
-
-  // Unregister multiple items.
-  EXPECT_TRUE(this->manager->Unregister("item1"));
-  EXPECT_TRUE(this->manager->Unregister("item2"));
-  EXPECT_TRUE(this->manager->Unregister("item3"));
-  EXPECT_TRUE(this->manager->Items().empty());
+  EXPECT_EQ(this->manager->Items().size(), 3u);
 }
 
 /////////////////////////////////////////////////

@@ -56,8 +56,8 @@ namespace gazebo
       /// \brief URI nested entity.
       public: UriNestedEntity entity;
 
-      /// \brief Parameters.
-      public: std::vector<std::string> parameters;
+      /// \brief Parameter.
+      public: std::string parameter;
     };
 
     /// \internal
@@ -80,6 +80,14 @@ namespace gazebo
 UriEntity::UriEntity()
   : dataPtr(new UriEntityPrivate())
 {
+}
+
+//////////////////////////////////////////////////
+UriEntity::UriEntity(const std::string &_type, const std::string &_name)
+  : UriEntity()
+{
+  this->SetType(_type);
+  this->SetName(_name);
 }
 
 //////////////////////////////////////////////////
@@ -132,11 +140,8 @@ UriEntity &UriEntity::operator=(const UriEntity &_p)
 //////////////////////////////////////////////////
 void UriEntity::Validate(const std::string &_identifier)
 {
-  if (_identifier.find(" ") != std::string::npos)
-    gzthrow("Invalid URI entity identifier (contains whitespaces)");
-
-  if (_identifier.find("?") != std::string::npos)
-    gzthrow("Invalid URI entity identifier (contains '?'");
+  if (_identifier.find_first_of(" ?=&") != std::string::npos)
+    gzthrow("Invalid URI entity identifier");
 }
 
 //////////////////////////////////////////////////
@@ -225,6 +230,14 @@ UriParts::UriParts()
 }
 
 //////////////////////////////////////////////////
+UriParts::UriParts(const std::string &_uri)
+  : UriParts()
+{
+  this->Parse(_uri);
+}
+
+
+//////////////////////////////////////////////////
 UriParts::UriParts(const UriParts &_parts)
   : UriParts()
 {
@@ -249,9 +262,9 @@ UriNestedEntity &UriParts::Entity() const
 }
 
 //////////////////////////////////////////////////
-std::vector<std::string> &UriParts::Parameters() const
+std::string UriParts::Parameter() const
 {
-  return this->dataPtr->parameters;
+  return this->dataPtr->parameter;
 }
 
 //////////////////////////////////////////////////
@@ -267,9 +280,9 @@ void UriParts::SetEntity(const UriNestedEntity &_entity)
 }
 
 //////////////////////////////////////////////////
-void UriParts::SetParameters(const std::vector<std::string> &_params)
+void UriParts::SetParameter(const std::string &_param)
 {
-  this->dataPtr->parameters = _params;
+  this->dataPtr->parameter = _param;
 }
 
 //////////////////////////////////////////////////
@@ -277,87 +290,67 @@ UriParts &UriParts::operator=(const UriParts &_p)
 {
   this->SetWorld(_p.World());
   this->SetEntity(_p.Entity());
-  this->SetParameters(_p.Parameters());
+  this->SetParameter(_p.Parameter());
 
   return *this;
 }
 
 //////////////////////////////////////////////////
-bool UriParts::Parse(const std::string &_uri, UriParts &_parts)
+void UriParts::Parse(const std::string &_uri)
 {
-  size_t next;
-  std::string world;
-  UriNestedEntity entity;
-  std::vector<std::string> params;
+  size_t paramBegin;
+  std::string uri = _uri;
 
-  if (!UriParts::ParseWorld(_uri, world, next))
-    return false;
+  // Remove trailing '/'
+  if (uri.back() == '/')
+    uri.pop_back();
 
-  if (!UriParts::ParseEntity(_uri, next, entity))
-    return false;
-
-  if (!UriParts::ParseParameters(_uri, next, params))
-    return false;
-
-  _parts.SetWorld(world);
-  _parts.SetEntity(entity);
-  _parts.SetParameters(params);
-
-  return true;
+  this->ParseEntity(uri, paramBegin);
+  this->ParseParameter(uri, paramBegin);
 }
 
 //////////////////////////////////////////////////
-bool UriParts::ParseWorld(const std::string &_uri, std::string &_world,
-    size_t &_next)
+void UriParts::ParseEntity(const std::string &_uri, size_t &_next)
 {
-  // Sanity check: Make sure that there are no white spaces.
-  if (_uri.find(" ") != std::string::npos)
-    return false;
+  size_t from = 0;
 
-  const std::string kDelimWorld = "/world/";
-  auto start = _uri.find(kDelimWorld);
-  if (start != 0)
-    return false;
+  // No entity.
+  if ((from >= _uri.size()) || (_uri.at(from) == '?'))
+    gzthrow("Unable to parse URI. Empty world");;
 
-  auto from = kDelimWorld.size();
-  auto to = _uri.find("/", from);
-  if (to == std::string::npos)
-    return false;
+  this->dataPtr->entity.Clear();
 
-  _world = _uri.substr(from, to - from);
-  _next = to;
-  return true;
-}
-
-//////////////////////////////////////////////////
-bool UriParts::ParseEntity(const std::string &_uri, size_t &_from,
-    UriNestedEntity &_entity)
-{
-  size_t next;
-  _entity.Clear();
-
+  bool first = true;
   while (true)
   {
     UriEntity entity;
-    if (!ParseOneEntity(_uri, _from, entity, next))
-      return false;
+    if (!UriParts::ParseOneEntity(_uri, from, entity, _next))
+      gzthrow("Unable to parse entity");
 
-    _entity.AddEntity(entity);
-
-    _from = next;
-
-    if ((next >= _uri.size()) || (_uri.at(next) == '?'))
-      return true;
-
-    // The URI doesn't have parameters and ends with "/".
-    if ((_uri.at(next) == '/') && (next + 1 >= _uri.size()))
+    // Set the world.
+    if (first)
     {
-      _from += 1;
-      return true;
+      if (entity.Type() != "world")
+        gzthrow("Unable to parse world keyword");
+
+      this->SetWorld(entity.Name());
+      first = false;
+    }
+    else
+      this->dataPtr->entity.AddEntity(entity);
+
+    from = _next;
+
+    if ((_next >= _uri.size()) || (_uri.at(_next) == '?'))
+      return;
+
+    // The URI doesn't have parameter and ends with "/".
+    if ((_uri.at(_next) == '/') && (_next + 1 >= _uri.size()))
+    {
+      _next += 1;
+      return;
     }
   }
-
-  return true;
 }
 
 //////////////////////////////////////////////////
@@ -368,7 +361,10 @@ bool UriParts::ParseOneEntity(const std::string &_uri, const size_t &_from,
   if (next == std::string::npos)
     return false;
 
- _entity.SetType(_uri.substr(_from + 1, next - _from - 1));
+  auto type = _uri.substr(_from + 1, next - _from - 1);
+  if (type.find_first_of(" ?&=") != std::string::npos)
+    return false;
+ _entity.SetType(type);
 
   next += 1;
   auto to = _uri.find_first_of("/?", next);
@@ -381,9 +377,9 @@ bool UriParts::ParseOneEntity(const std::string &_uri, const size_t &_from,
     }
     else
     {
-      // Check whether are "?", "&", or "=" in the name as it would be invalid.
+      // Check whether invalid characters ' ', '?', '&', or '=' are found.
       auto name = _uri.substr(next, _uri.size() - next);
-      if (name.find_first_of("?&=") != std::string::npos)
+      if (name.find_first_of(" ?&=") != std::string::npos)
         return false;
 
       _entity.SetName(name);
@@ -393,9 +389,9 @@ bool UriParts::ParseOneEntity(const std::string &_uri, const size_t &_from,
   }
   else
   {
-    // Check whether are "?", "&", or "=" in the name as it would be invalid.
+    // Check whether invalid characters ' ', '?', '&', or '=' are found.
     auto name = _uri.substr(next, to - next);
-    if (name.find_first_of("?&=") != std::string::npos)
+    if (name.find_first_of(" ?&=") != std::string::npos)
       return false;
 
     _entity.SetName(name);
@@ -405,69 +401,45 @@ bool UriParts::ParseOneEntity(const std::string &_uri, const size_t &_from,
 }
 
 //////////////////////////////////////////////////
-bool UriParts::ParseParameters(const std::string &_uri, const size_t &_from,
-    std::vector<std::string> &_params)
+void UriParts::ParseParameter(const std::string &_uri, const size_t &_from)
 {
   size_t from = _from;
-  _params.clear();
+  this->SetParameter("");
 
-  // No parameters.
+  // No parameter.
   if (_from >= _uri.size())
-    return true;
+    return;
 
   // The first character of the parameter list has to be a '?'.
   if (_uri.at(from) != '?')
-    return false;
+    gzthrow("Unable to parse parameter ('?' not found)");
 
   from += 1;
 
-  // The parameters follow this convention:
-  // p=value1&p=value2
-  while (true)
-  {
-    auto to = _uri.find("=", from);
-    if ((to == std::string::npos) || (to == _uri.size() - 1))
-      return false;
+  auto to = _uri.find("=", from);
+  if ((to == std::string::npos) || (to == _uri.size() - 1))
+    gzthrow("Unable to parse parameter ('=' not found)");
 
-    auto left = _uri.substr(from, to - from);
+  // The parameter follows this convention: "p=value1".
+  // The name of the parameter (left from the '=') and the value (right from the
+  // '=') cannot contain ' ', '?', '=' or '&'.
+  auto left = _uri.substr(from, to - from);
+  if (left.find_first_of(" ?&=") != std::string::npos)
+    gzthrow("Unable to parse parameter (invalid parameter name)");
 
-    from = to + 1;
-    std::string right;
-    to = _uri.find("&", from);
-    if (to == std::string::npos)
-    {
-      // No more parameters.
-      right = _uri.substr(from);
-      _params.push_back(right);
-      return true;
-    }
-    else
-    {
-      right = _uri.substr(from, to - from);
-    }
+  from = to + 1;
+  std::string right = _uri.substr(from);
+  if (right.find_first_of(" ?&=") != std::string::npos)
+    gzthrow("Unable to parse parameter (invalid parameter value)");
 
-    _params.push_back(right);
-    from = to + 1;
-  }
-
-  return true;
+  this->SetParameter(right);
 }
 
 //////////////////////////////////////////////////
 Uri::Uri(const std::string &_uri)
   : dataPtr(new UriPrivate())
 {
-  std::string uri = _uri;
-
-  // Remove trailing '/'
-  if (uri.back() == '/')
-    uri.pop_back();
-
-  if (!UriParts::Parse(uri, this->dataPtr->parts))
-    gzthrow("Unable to parse URI");
-
-  this->dataPtr->correct = true;
-  this->dataPtr->canonicalUri = uri;
+  this->dataPtr->parts.Parse(_uri);
 }
 
 //////////////////////////////////////////////////
@@ -480,31 +452,7 @@ Uri::Uri(const Uri &_uri)
 Uri::Uri(const UriParts &_parts)
   : dataPtr(new UriPrivate())
 {
-  // Add the world part.
-  this->dataPtr->canonicalUri = "/world/" + _parts.World();
-
-  // Add the nested entity part.
-  auto nestedEntity = _parts.Entity();
-  for (auto i = 0u; i < nestedEntity.EntityCount(); ++i)
-  {
-    UriEntity entity = nestedEntity.Entity(i);
-    this->dataPtr->canonicalUri += "/" + entity.Type() + "/" + entity.Name();
-  }
-
-  auto params = _parts.Parameters();
-  if (!params.empty())
-  {
-    // Add the parameter part.
-    this->dataPtr->canonicalUri += "?p=" + params.at(0);
-
-    for (auto i = 1u; i < params.size(); ++i)
-      this->dataPtr->canonicalUri += "&p=" + params.at(i);
-  }
-
-  if (!UriParts::Parse(this->dataPtr->canonicalUri, this->dataPtr->parts))
-    gzthrow("Unable to create URI");
-
-  this->dataPtr->correct = true;
+  this->dataPtr->parts = _parts;
 }
 
 //////////////////////////////////////////////////
@@ -513,29 +461,39 @@ Uri::~Uri()
 }
 
 //////////////////////////////////////////////////
-UriParts Uri::Split() const
+UriParts &Uri::Parts() const
 {
-  if (!this->dataPtr->correct)
-    gzthrow("This URI is malformed");
-
   return this->dataPtr->parts;
 }
 
 //////////////////////////////////////////////////
-std::string Uri::CanonicalUri(const std::vector<std::string> &_params) const
+std::string Uri::CanonicalUri(const std::string &_param) const
 {
-  if (!this->dataPtr->correct)
-    gzthrow("This URI is malformed");
+  // Add the world part.
+  std::string canonicalUri = "/world/" + this->Parts().World();
 
-  std::string result = this->dataPtr->canonicalUri;
-  if (!_params.empty())
+  // Add the nested entity part.
+  auto nestedEntity = this->Parts().Entity();
+  for (auto i = 0u; i < nestedEntity.EntityCount(); ++i)
   {
-    // Add the parameter part.
-    result += "?p=" + _params.at(0);
-
-    for (auto i = 1u; i < _params.size(); ++i)
-      result += "&p=" + _params.at(i);
+    UriEntity entity = nestedEntity.Entity(i);
+    canonicalUri += "/" + entity.Type() + "/" + entity.Name();
   }
 
-  return result;
+  if (!_param.empty())
+  {
+    if (_param.find_first_of(" ?&=") != std::string::npos)
+      gzthrow("Incorrect parameter (' ', '?', '&', '=' not allowed");
+
+    // Add the parameter part.
+    canonicalUri += "?p=" + _param;
+  }
+  else
+  {
+    std::string param = this->Parts().Parameter();
+    if (!param.empty())
+      canonicalUri += "?p=" + param;
+  }
+
+  return canonicalUri;
 }
