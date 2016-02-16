@@ -41,7 +41,12 @@ using namespace gui;
 
 /////////////////////////////////////////////////
 EditorView::EditorView(QWidget *_parent)
-  : QGraphicsView(_parent), currentMouseItem(0)
+  : QGraphicsView(_parent)
+  , currentMouseItem(0)
+  , currentSelectedItem(NULL)
+  , snapToGrabber(false)
+  , snapGrabberOther(NULL)
+  , snapGrabberCurrent(NULL)
 {
   this->setObjectName("editorView");
 

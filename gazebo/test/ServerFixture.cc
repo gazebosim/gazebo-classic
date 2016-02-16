@@ -258,6 +258,7 @@ void ServerFixture::RunServer(const std::vector<std::string> &_args)
   {
     ASSERT_NO_THROW(delete this->server);
     this->server = NULL;
+    delete[] argv;
     return;
   }
 

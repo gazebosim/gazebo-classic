@@ -85,17 +85,17 @@ namespace gazebo
       /// Returns the default path suitable for temporary files.
       /// \return a full path name to directory.
       /// E.g.: /tmp (Linux).
-      public: std::string GetTmpPath();
+      public: const std::string &GetTmpPath() const;
 
       /// Returns a unique temporary file for this instance of SystemPath.
       /// \return a full path name to directory.
       /// E.g.: /tmp/gazebo_234123 (Linux).
-      public: std::string GetTmpInstancePath();
+      public: const std::string &GetTmpInstancePath() const;
 
       /// Returns the default temporary test path.
       /// \return a full path name to directory.
       /// E.g.: /tmp/gazebo_test (Linux).
-      public: std::string GetDefaultTestPath();
+      public: std::string GetDefaultTestPath() const;
 
       /// \brief Find a file or path using a URI
       /// \param[in] _uri the uniform resource identifier

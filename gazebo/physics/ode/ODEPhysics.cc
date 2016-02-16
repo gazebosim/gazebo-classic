@@ -1049,7 +1049,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
     this->dataPtr->indices[i] = i;
 
   // Choose only the best contacts if too many were generated.
-  if (numc > maxCollide)
+  if (maxCollide > 0 && numc > maxCollide)
   {
     double max = _contactCollisions[maxCollide-1].depth;
     for (unsigned int i = maxCollide; i < numc; ++i)

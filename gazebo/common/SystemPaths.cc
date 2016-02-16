@@ -159,19 +159,19 @@ const std::list<std::string> &SystemPaths::GetOgrePaths()
 }
 
 /////////////////////////////////////////////////
-std::string SystemPaths::GetTmpPath()
+const std::string &SystemPaths::GetTmpPath() const
 {
   return this->tmpPath.string();
 }
 
 /////////////////////////////////////////////////
-std::string SystemPaths::GetTmpInstancePath()
+const std::string &SystemPaths::GetTmpInstancePath() const
 {
   return this->tmpInstancePath.string();
 }
 
 /////////////////////////////////////////////////
-std::string SystemPaths::GetDefaultTestPath()
+std::string SystemPaths::GetDefaultTestPath() const
 {
   return this->GetTmpInstancePath() + "/gazebo_test";
 }

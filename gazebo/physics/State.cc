@@ -22,7 +22,7 @@ using namespace gazebo;
 using namespace physics;
 
 /////////////////////////////////////////////////
-State::State()
+State::State() : iterations(0)
 {
   this->wallTime = common::Time::GetWallTime();
 }

@@ -934,6 +934,9 @@ namespace gazebo
       /// \brief Update the camera's field of view.
       protected: virtual void UpdateFOV();
 
+      /// \brief Set the clip distance based on stored SDF values
+      protected: virtual void SetClipDist();
+
       /// \brief if user requests bayer image, post process rgb from ogre
       ///        to generate bayer formats
       /// \param[out] _dst Destination buffer for the image data
@@ -944,9 +947,6 @@ namespace gazebo
       private: void ConvertRGBToBAYER(unsigned char *_dst,
           const unsigned char *_src, const std::string &_format,
           const int _width, const int _height);
-
-      /// \brief Set the clip distance based on stored SDF values
-      private: virtual void SetClipDist();
 
       /// \brief Get the OGRE image pixel format in
       /// \param[in] _format The Gazebo image format
