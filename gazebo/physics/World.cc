@@ -2623,33 +2623,6 @@ common::Uri World::ScopedUri() const
 /////////////////////////////////////////////////
 void World::RegisterIntrospectionItems()
 {
-  // caguero - testing
-  //std::cout << "Lights:" << std::endl;
-  //for (auto &light : this->Lights())
-  //  std::cout << "  " << light->ScopedUri().CanonicalUri() << std::endl;
-  //
-  //std::cout << "Models:" << std::endl;
-  //for (auto &model : this->GetModels())
-  //{
-  //  std::cout << "  * " << model->ScopedUri().CanonicalUri() << std::endl;
-  //
-  //  std::cout << "    Links:" << std::endl;
-  //  for (auto &l : model->GetLinks())
-  //    std::cout << "      " << l->ScopedUri().CanonicalUri() << std::endl;
-  //
-  //  std::cout << "    Nested models:" << std::endl;
-  //  if (model->NestedModels().empty())
-  //    std::cout << "      --" << std::endl;
-  //  for (auto &m : model->NestedModels())
-  //  {
-  //    std::cout << "      * " << m->ScopedUri().CanonicalUri() << std::endl;
-  //    std::cout << "      Links:" << std::endl;
-  //      for (auto &l : m->GetLinks())
-  //        std::cout << "      " << l->ScopedUri().CanonicalUri() << std::endl;
-  //  }
-  //}
-  // caguero - end testing
-
   auto uri = this->ScopedUri();
 
   // Add here all the items that might be introspected.

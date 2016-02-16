@@ -359,6 +359,39 @@ TEST_F(WorldTest, ScopedUri)
   ASSERT_TRUE(world != NULL);
 
   EXPECT_EQ(world->ScopedUri().CanonicalUri(), "/world/default");
+
+  // Check a light.
+  auto light = world->Light("sun");
+  ASSERT_TRUE(light != NULL);
+  EXPECT_EQ(light->ScopedUri().CanonicalUri(), "/world/default/light/sun");
+
+  // Check a model.
+  auto model = world->GetModel("ground_plane");
+  ASSERT_TRUE(model != NULL);
+  EXPECT_EQ(model->ScopedUri().CanonicalUri(),
+      "/world/default/model/ground_plane");
+  auto link = model->GetLink("link");
+  ASSERT_TRUE(link != NULL);
+  EXPECT_EQ(link->ScopedUri().CanonicalUri(),
+      "/world/default/model/ground_plane/link/link");
+
+  // Check a nested model.
+  model = world->GetModel("model_00");
+  ASSERT_TRUE(model != NULL);
+  EXPECT_EQ(model->ScopedUri().CanonicalUri(),
+      "/world/default/model/model_00");
+  link = model->GetLink("link_00");
+  ASSERT_TRUE(link != NULL);
+  EXPECT_EQ(link->ScopedUri().CanonicalUri(),
+      "/world/default/model/model_00/link/link_00");
+  auto nestedModel = model->NestedModel("model_01");
+  ASSERT_TRUE(nestedModel != NULL);
+  EXPECT_EQ(nestedModel->ScopedUri().CanonicalUri(),
+      "/world/default/model/model_00/model/model_01");
+  link = nestedModel->GetLink("link_01");
+  ASSERT_TRUE(link != NULL);
+  EXPECT_EQ(link->ScopedUri().CanonicalUri(),
+      "/world/default/model/model_00/model/model_01/link/link_01");
 }
 
 /////////////////////////////////////////////////
