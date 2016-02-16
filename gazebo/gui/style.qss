@@ -374,7 +374,7 @@ QTreeView::item:hover
 QTreeView::item:selected
 {
   color: #f58113;
-  background: #808080;
+  background: transparent;
 }
 
 QTreeView::branch:selected
@@ -391,6 +391,19 @@ QTreeView::branch:selected:!active
 {
   background-color: #808080;
 }
+
+
+
+QTreeView#topicList::branch:selected:!active
+{
+  background-color: #dddddd;
+}
+
+QTreeView#topicList::branch:selected:active
+{
+  background-color: #dddddd;
+}
+
 
 QTreeView::branch:!open:has-children
 {

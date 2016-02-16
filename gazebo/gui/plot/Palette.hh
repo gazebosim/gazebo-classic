@@ -45,7 +45,7 @@ namespace gazebo
       public: ~Palette();
 
       /// \brief Fill the top panel of the topics tab.
-      private: void FillTopicsTop();
+      private: void FillTopics(QStandardItemModel *_topicsModel);
 
       /// \brief Fill the bottom panel of the sim tab.
       private: void FillSimBottom();

@@ -25,6 +25,44 @@
 using namespace gazebo;
 using namespace gui;
 
+class TopicsViewDelegate : public QStyledItemDelegate
+{
+  public: enum DataRole
+          {
+            topicNameRole = Qt::UserRole + 100,
+          };
+
+  public: TopicsViewDelegate()
+          {
+          }
+
+  public: virtual ~TopicsViewDelegate()
+          {
+          }
+
+  public: void paint(QPainter *_painter, const QStyleOptionViewItem &_opt,
+                     const QModelIndex &_index) const
+          {
+            QRectF r = _opt.rect;
+            r.adjust(0, 5, 0, -5);
+            _painter->setPen(QColor(30, 30, 30));
+
+            QString topicName = qvariant_cast<QString>(
+                _index.data(topicNameRole));
+            _painter->drawText(r, topicName);
+          }
+
+  public: QSize sizeHint(const QStyleOptionViewItem &_option,
+                         const QModelIndex &_index) const
+          {
+            QSize size = QStyledItemDelegate::sizeHint(_option, _index);
+            QFont font = QApplication::font();
+            QFontMetrics fm(font);
+            size.setHeight(fm.height() + 10);
+            return size;
+          }
+};
+
 /// \brief Private data for the Palette class
 class gazebo::gui::PalettePrivate
 {
@@ -126,8 +164,7 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   //searchSplitter->setSizes(sizes);
 
   // Topics top
-  this->dataPtr->topicsTop = new ConfigWidget();
-  this->FillTopicsTop();
+  /*this->dataPtr->topicsTop = new ConfigWidget();
 
   auto topicsTopScroll = new QScrollArea;
   topicsTopScroll->setWidget(this->dataPtr->topicsTop);
@@ -160,7 +197,7 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   topicsSplitter->setCollapsible(0, false);
   topicsSplitter->setCollapsible(1, false);
   topicsSplitter->setSizes(sizes);
-/*
+
   // Sim top
   auto simTop = new ConfigWidget();
 
@@ -188,6 +225,7 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   simSplitter->setCollapsible(1, false);
   */
 
+
   auto tabBar = new QTabBar;
   tabBar->addTab("Topics");
   tabBar->addTab("Sim");
@@ -195,9 +233,24 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   tabBar->setExpanding(true);
   tabBar->setDrawBase(false);
 
+  QStandardItemModel *topicsModel = new QStandardItemModel;
+
+  this->FillTopics(topicsModel);
+
+  TopicsViewDelegate *topicsViewDelegate = new TopicsViewDelegate;
+
+  QTreeView *topicsTree = new QTreeView;
+  topicsTree->setObjectName("topicList");
+  topicsTree->setAnimated(true);
+  topicsTree->setHeaderHidden(true);
+  topicsTree->setExpandsOnDoubleClick(true);
+  topicsTree->setModel(topicsModel);
+  topicsTree->setItemDelegate(topicsViewDelegate);
+  topicsTree->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
   auto tabStackedLayout = new QStackedLayout;
   tabStackedLayout->setContentsMargins(0, 0, 0, 0);
-  tabStackedLayout->addWidget(topicsSplitter);
+  tabStackedLayout->addWidget(topicsTree);
   //tabStackedLayout->addWidget(simSplitter);
   //tabStackedLayout->addWidget(searchSplitter);
 
@@ -249,33 +302,20 @@ void Palette::OnCollapse()
 }
 
 /////////////////////////////////////////////////
-void Palette::FillTopicsTop()
+void Palette::FillTopics(QStandardItemModel *_topicsModel)
 {
-  auto configLayout = new QVBoxLayout();
-  configLayout->setSpacing(0);
-
   // Get all topics, independent of message type
-  std::vector<std::string> topics;
+  std::set<std::string> topics;
   QList<QStandardItem *> items;
 
-  auto msgTypes = transport::getAdvertisedTopics();
-  for (auto msgType : msgTypes)
+  auto msgTopics = transport::getAdvertisedTopics();
+  for (auto msgTopic : msgTopics)
   {
-    for (auto topic : msgType.second)
+    for (auto topic : msgTopic.second)
     {
-      if (std::find(topics.begin(), topics.end(), topic) != topics.end())
-        continue;
-
-      topics.push_back(topic);
-      items.append(new QStandardItem(QString::fromStdString(topic)));
+      topics.emplace(topic);
     }
   }
-
-  // So they can be searched
-  //this->dataPtr->searchModel->insertColumn(0, items);
-
-  // Sort alphabetically
-  std::sort(topics.begin(), topics.end());
 
   // Populate widget
   for (auto topic : topics)
@@ -286,120 +326,38 @@ void Palette::FillTopicsTop()
     if (idX != std::string::npos)
       shortName.replace(0, 15, "~");
 
-    auto childWidget = new PlotChildConfigWidget(shortName);
+    QStandardItem *topicItem = new QStandardItem();
+    topicItem->setData(shortName.c_str(), TopicsViewDelegate::topicNameRole);
+    _topicsModel->appendRow(topicItem);
+
+    // Create a message from this topic
+    auto msgType = transport::getTopicMsgType(topic);
+    if (msgType == "")
+    {
+      gzwarn << "Couldn't find message type for topic [" << _topic << "]"
+        << std::endl;
+      return;
+    }
+
+    auto msg = msgs::MsgFactory::NewMsg(msgType);
+    this->FillFromMsg(msg.get(), topicItem);
+    /*auto childWidget = new PlotChildConfigWidget(shortName);
     childWidget->SetPlotInfo(topic);
     this->connect(childWidget, SIGNAL(Clicked(const std::string &)), this,
         SLOT(OnTopicClicked(const std::string &)));
 
     configLayout->addWidget(childWidget);
+    */
   }
-
-  // Spacer
-  auto spacer = new QWidget();
-  spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-  configLayout->addWidget(spacer);
-
-  this->dataPtr->topicsTop->setLayout(configLayout);
-}
-
-/////////////////////////////////////////////////
-void Palette::FillSimBottom()
-{
-  auto configLayout = new QVBoxLayout();
-  configLayout->setSpacing(0);
-
-  // Hard-coded values
-  std::multimap<std::string, std::string> simFields = {
-      {"~/world_stats", "sim_time"},
-      {"~/world_stats", "real_time"},
-      {"~/world_stats", "iterations"}};
-
-  QList<QStandardItem *> items;
-  for (auto field : simFields)
-  {
-    auto humanName = ConfigWidget::HumanReadableKey(field.second);
-    auto childWidget = new PlotChildConfigWidget(humanName);
-    childWidget->SetDraggable(true);
-    childWidget->SetPlotInfo(field.first + "::" + field.second);
-    configLayout->addWidget(childWidget);
-
-    items.append(new QStandardItem(QString::fromStdString(humanName)));
-  }
-
-  // So they can be searched
-  this->dataPtr->searchModel->insertColumn(1, items);
-
-  // Spacer
-  auto spacer = new QWidget();
-  spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-  configLayout->addWidget(spacer);
-
-  this->dataPtr->simBottom->setLayout(configLayout);
-}
-
-/////////////////////////////////////////////////
-void Palette::OnTopicClicked(const std::string &_topic)
-{
-  this->FillTopicsBottom(_topic, this->dataPtr->topicsBottom);
-}
-
-/////////////////////////////////////////////////
-void Palette::OnTopicSearchClicked(const std::string &_topic)
-{
-  this->FillTopicsBottom(_topic, this->dataPtr->searchBottom);
-}
-
-/////////////////////////////////////////////////
-void Palette::FillTopicsBottom(const std::string &_topic,
-    ConfigWidget *_widget)
-{
-  // Clear previous layout
-  auto oldLayout = _widget->layout();
-  if (oldLayout)
-  {
-    // Give ownership of all widgets to an object which will be out of scope
-    QWidget().setLayout(oldLayout);
-  }
-
-  // Create a message from this topic
-  auto msgType = transport::getTopicMsgType(_topic);
-  if (msgType == "")
-  {
-    gzwarn << "Couldn't find message type for topic [" << _topic << "]"
-        << std::endl;
-    return;
-  }
-
-  auto msg = msgs::MsgFactory::NewMsg(msgType);
-
-  // Create a new layout and fill it
-  auto newLayout = new QVBoxLayout();
-  newLayout->setSpacing(0);
-
-  // Title
-  auto title = new QLabel(QString::fromStdString(_topic));
-  title->setMinimumHeight(40);
-  title->setToolTip(tr((
-      "<font size=3><p><b>Message type: </b>" + msgType + "</p></font>"
-      ).c_str()));
-  newLayout->addWidget(title);
-
-  this->FillFromMsg(msg.get(), _topic, 0, newLayout);
-
-  // Spacer
-  auto spacer = new QWidget();
-  spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-  newLayout->addWidget(spacer);
-
-  _widget->setLayout(newLayout);
 }
 
 /////////////////////////////////////////////////
 void Palette::FillFromMsg(google::protobuf::Message *_msg,
-    const std::string &_scope, const unsigned int _level,
-    QVBoxLayout *_parentLayout)
+    QStandardItem *_item);
+    //const std::string &_scope, const unsigned int _level,
+    //QVBoxLayout *_parentLayout)
 {
-  if (!_msg || !_parentLayout)
+  if (!_msg || !_item)
     return;
 
   auto ref = _msg->GetReflection();
@@ -432,16 +390,22 @@ void Palette::FillFromMsg(google::protobuf::Message *_msg,
       case google::protobuf::FieldDescriptor::TYPE_BOOL:
       {
         auto humanName = ConfigWidget::HumanReadableKey(name);
-        auto childWidget = new PlotChildConfigWidget(humanName, _level);
-        childWidget->SetDraggable(true);
-        childWidget->SetPlotInfo(_scope + "::" + name);
+        // auto childWidget = new PlotChildConfigWidget(humanName, _level);
+        //childWidget->SetDraggable(true);
+        //childWidget->SetPlotInfo(_scope + "::" + name);
 
         std::string typeName = field->type_name();
-        childWidget->setToolTip(tr((
+        /*childWidget->setToolTip(tr((
             "<font size=3><p><b>Type: </b>" + typeName + "</p></font>"
             ).c_str()));
+            */
+          // Nate HERE
+        auto *childItem = new QStandardItem();
+        childItem->setData(humanName.c_str(),
+            TopicsViewDelegate::topicNameRole);
 
-        _parentLayout->addWidget(childWidget);
+        _item->appendRow(childItem)
+        //_parentLayout->addWidget(childWidget);
 
         break;
       }
@@ -527,9 +491,101 @@ void Palette::FillFromMsg(google::protobuf::Message *_msg,
     }
   }
 }
+/////////////////////////////////////////////////
+/*void Palette::FillSimBottom()
+{
+  auto configLayout = new QVBoxLayout();
+  configLayout->setSpacing(0);
+
+  // Hard-coded values
+  std::multimap<std::string, std::string> simFields = {
+      {"~/world_stats", "sim_time"},
+      {"~/world_stats", "real_time"},
+      {"~/world_stats", "iterations"}};
+
+  QList<QStandardItem *> items;
+  for (auto field : simFields)
+  {
+    auto humanName = ConfigWidget::HumanReadableKey(field.second);
+    auto childWidget = new PlotChildConfigWidget(humanName);
+    childWidget->SetDraggable(true);
+    childWidget->SetPlotInfo(field.first + "::" + field.second);
+    configLayout->addWidget(childWidget);
+
+    items.append(new QStandardItem(QString::fromStdString(humanName)));
+  }
+
+  // So they can be searched
+  this->dataPtr->searchModel->insertColumn(1, items);
+
+  // Spacer
+  auto spacer = new QWidget();
+  spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+  configLayout->addWidget(spacer);
+
+  this->dataPtr->simBottom->setLayout(configLayout);
+}
 
 /////////////////////////////////////////////////
-void Palette::UpdateSearch(const QString &_search)
+void Palette::OnTopicClicked(const std::string &_topic)
+{
+  this->FillTopicsBottom(_topic, this->dataPtr->topicsBottom);
+}
+
+/////////////////////////////////////////////////
+void Palette::OnTopicSearchClicked(const std::string &_topic)
+{
+  this->FillTopicsBottom(_topic, this->dataPtr->searchBottom);
+}*/
+
+/////////////////////////////////////////////////
+/*void Palette::FillTopicsBottom(const std::string &_topic,
+    ConfigWidget *_widget)
+{
+  // Clear previous layout
+  auto oldLayout = _widget->layout();
+  if (oldLayout)
+  {
+    // Give ownership of all widgets to an object which will be out of scope
+    QWidget().setLayout(oldLayout);
+  }
+
+  // Create a message from this topic
+  auto msgType = transport::getTopicMsgType(_topic);
+  if (msgType == "")
+  {
+    gzwarn << "Couldn't find message type for topic [" << _topic << "]"
+        << std::endl;
+    return;
+  }
+
+  auto msg = msgs::MsgFactory::NewMsg(msgType);
+
+  // Create a new layout and fill it
+  auto newLayout = new QVBoxLayout();
+  newLayout->setSpacing(0);
+
+  // Title
+  auto title = new QLabel(QString::fromStdString(_topic));
+  title->setMinimumHeight(40);
+  title->setToolTip(tr((
+      "<font size=3><p><b>Message type: </b>" + msgType + "</p></font>"
+      ).c_str()));
+  newLayout->addWidget(title);
+
+  this->FillFromMsg(msg.get(), _topic, 0, newLayout);
+
+  // Spacer
+  auto spacer = new QWidget();
+  spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+  newLayout->addWidget(spacer);
+
+  _widget->setLayout(newLayout);
+}*/
+
+
+/////////////////////////////////////////////////
+/*void Palette::UpdateSearch(const QString &_search)
 {
   // Clear previous layout
   auto oldLayout = this->dataPtr->searchArea->layout();
@@ -609,10 +665,10 @@ void Palette::UpdateSearch(const QString &_search)
   newLayout->addWidget(spacer);
 
   this->dataPtr->searchArea->setLayout(newLayout);
-}
+}*/
 
 /////////////////////////////////////////////////
-PlotChildConfigWidget::PlotChildConfigWidget(const std::string &_text,
+/*PlotChildConfigWidget::PlotChildConfigWidget(const std::string &_text,
     const unsigned int _level)
   : ConfigChildWidget(), dataPtr(new PlotChildConfigWidgetPrivate)
 {
@@ -668,7 +724,7 @@ void PlotChildConfigWidget::SetPlotInfo(const std::string &_info)
 }
 
 /////////////////////////////////////////////////
-void PlotChildConfigWidget::mouseReleaseEvent(QMouseEvent */*_event*/)
+void PlotChildConfigWidget::mouseReleaseEvent(QMouseEvent *_event)
 {
   if (this->dataPtr->plotInfo == "")
     this->Clicked(this->Text());
@@ -711,4 +767,4 @@ void PlotChildConfigWidget::leaveEvent(QEvent *_event)
     QApplication::setOverrideCursor(Qt::ArrowCursor);
 
   QWidget::leaveEvent(_event);
-}
+}*/
