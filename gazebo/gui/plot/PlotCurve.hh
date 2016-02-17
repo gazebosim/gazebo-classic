@@ -33,7 +33,7 @@ namespace gazebo
   namespace gui
   {
     // Forward declare private data class
-    struct PlotCurvePrivate;
+    class PlotCurvePrivate;
 
     class IncrementalPlot;
 
@@ -81,9 +81,35 @@ namespace gazebo
       /// \return Curve id
       public: unsigned int Id() const;
 
+      /// \brief Set whether the curve should be active.
+      /// \param[in] _active True to make the curve active and
+      /// accept new points.
+      public: void SetActive(const bool _active);
+
+      /// \brief Get whether the curve is active.
+      /// \return Active state of the plot curve
+      public: bool Active() const;
+
+      /// \brief Set the age of the curve.
+      /// \param[in] _age Age of the curve. Currently used to keep track of
+      /// how many restarts it has been through.
+      public: void SetAge(const unsigned int _age);
+
+      /// \brief Get the age of the curve.
+      /// \return Curve age
+      public: unsigned int Age() const;
+
       /// \brief Get the number of data points in the curve
       /// \return Number of data points.
       public: unsigned int Size() const;
+
+      /// \brief Get the min x and y values of this curve
+      /// \return Point with min values
+      public: ignition::math::Vector2d Min();
+
+      /// \brief Get the max x and y values of this curve
+      /// \return Point with max values
+      public: ignition::math::Vector2d Max();
 
       /// \brief Get a point in the curve
       /// \param[in] _index Index of the point in the curve.

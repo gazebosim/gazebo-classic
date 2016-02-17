@@ -161,6 +161,10 @@ namespace gazebo
       /// \param[in] _id Unique id of the existing variable pill that is added.
       Q_SIGNALS: void VariableMoved(const unsigned int _id);
 
+      /// \brief Qt signal emitted when the variable pill's text has changed
+      /// \param[in] _label New variable label.
+      Q_SIGNALS: void VariableLabelChanged(const std::string &_label);
+
      /// \brief Empty variable id used to indicate non-existent variable.
       public: static unsigned int EMPTY_VARIABLE;
 

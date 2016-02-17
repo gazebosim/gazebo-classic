@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_GUI_PLOTMANAGER_HH_
-#define _GAZEBO_GUI_PLOTMANAGER_HH_
+#ifndef _GAZEBO_GUI_PLOT_PLOTMANAGER_HH_
+#define _GAZEBO_GUI_PLOT_PLOTMANAGER_HH_
 
 #include <memory>
 #include <string>
@@ -33,6 +33,8 @@ namespace gazebo
   {
     // Forward declare private data class
     class PlotManagerPrivate;
+
+    class PlotWindow;
 
     /// \brief A class that connects simulation data with the plotting tool
     class GZ_GUI_VISIBLE PlotManager : public SingletonT<PlotManager>
@@ -59,11 +61,27 @@ namespace gazebo
       /// \param[in] _curve Curve to remove.
       public: void RemoveCurve(PlotCurveWeakPtr _curve);
 
+      /// \brief Add a plot window to the manager. The manager will listen to
+      /// world events, e.g. Reset, and update the window's plots accordingly
+      /// \param[in] _window Plot window to add
+      public: void AddWindow(PlotWindow *_window);
+
+      /// \brief Remove a plot window from the manager.
+      /// \param[in] _window Plot window to remove.
+      public: void RemoveWindow(PlotWindow *_window);
+
       /// TODO remove me
       /// \brief Callback when a world control message is received. It is used
       /// to detect simulation resets.
       /// \param[in] _data Message data containing world stats msgs
       public: void OnWorldStats(ConstWorldStatisticsPtr &_data);
+
+      /// \brief Set up introspection client
+      public: void SetupIntrospection();
+
+      /// \brief Function called each time a topic update is received.
+      /// \param[in] _msg Introspection message filled with param data
+      public: void OnIntrospection(const gazebo::msgs::Param_V &_msg);
 
       /// \brief This is a singleton class.
       private: friend class SingletonT<PlotManager>;

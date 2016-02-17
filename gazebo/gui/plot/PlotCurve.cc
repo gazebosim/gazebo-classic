@@ -23,11 +23,9 @@
 
 #include <map>
 
-#include <qwt/qwt_symbol.h>
-#include <qwt/qwt_plot_curve.h>
-
 #include "gazebo/common/Assert.hh"
 
+#include "gazebo/gui/plot/qwt_gazebo.h"
 #include "gazebo/gui/plot/IncrementalPlot.hh"
 #include "gazebo/gui/plot/PlotCurve.hh"
 
@@ -35,29 +33,52 @@ using namespace gazebo;
 using namespace gui;
 
 // The number of unique color
-static const int ColorCount = 5;
+static const int ColorCount = 3;
+static const int ColorGroupCount = 4;
 
 // The unique colors
-static const QColor Colors[ColorCount] =
+static const QColor Colors[ColorGroupCount][ColorCount] =
 {
-  QColor(255, 0, 0),
-  QColor(0, 255, 0),
-  QColor(0, 0, 255),
-  QColor(255, 255, 0),
-  QColor(255, 0, 255)
+  // purple
+  {
+    QColor(QRgb(0x882e72)),
+    QColor(QRgb(0xb178a6)),
+    QColor(QRgb(0xd6c1de))
+  },
+  // blue
+  {
+    QColor(QRgb(0x1965b0)),
+    QColor(QRgb(0x5289c7)),
+    QColor(QRgb(0x7bafde))
+  },
+  // green
+  {
+    QColor(QRgb(0x4eb265)),
+    QColor(QRgb(0x90c987)),
+    QColor(QRgb(0xcae0ab))
+  },
+  // red
+  {
+    QColor(QRgb(0xdc050c)),
+    QColor(QRgb(0xe8601c)),
+    QColor(QRgb(0xf1932d))
+  },
 };
+
 
 
 namespace gazebo
 {
   namespace gui
   {
-    /// \brief A class that manages plotting data
+    /// \brief A class that manages curve data
     class CurveData: public QwtArraySeriesData<QPointF>
     {
       public: CurveData()
               {}
 
+      /// \brief Add a point to the sample.
+      /// \return Bounding box of the sample.
       public: virtual QRectF boundingRect() const
               {
                 if (this->d_boundingRect.width() < 0.0)
@@ -66,13 +87,39 @@ namespace gazebo
                 return this->d_boundingRect;
               }
 
+      /// \brief Add a point to the sample.
+      /// \param[in] _point Point to add.
       public: inline void Add(const QPointF &_point)
               {
                 this->d_samples += _point;
-                if (this->d_samples.size() > 11000)
-                  this->d_samples.remove(0, 1000);
+
+                if (this->d_samples.size() > maxSampleSize)
+                {
+                  // remove sample window
+                  // update bounding rect?
+                  this->d_samples.remove(0, windowSize);
+                }
+
+                if (this->d_samples.size() == 1)
+                {
+                  // init bounding rect
+                  this->d_boundingRect.setTopLeft(_point);
+                  this->d_boundingRect.setBottomRight(_point);
+                  return;
+                }
+
+                // expand bounding rect
+                if (_point.x() < this->d_boundingRect.left())
+                  this->d_boundingRect.setLeft(_point.x());
+                else if (_point.x() > this->d_boundingRect.right())
+                  this->d_boundingRect.setRight(_point.x());
+                if (_point.y() < this->d_boundingRect.top())
+                  this->d_boundingRect.setTop(_point.y());
+                else if (_point.y() > this->d_boundingRect.bottom())
+                  this->d_boundingRect.setBottom(_point.y());
               }
 
+      /// \brief Clear the sample data.
       public: void Clear()
               {
                 this->d_samples.clear();
@@ -80,22 +127,36 @@ namespace gazebo
                 this->d_boundingRect = QRectF(0.0, 0.0, -1.0, -1.0);
               }
 
+      /// \brief Get the sample data.
+      /// \return A vector of same points.
       public: QVector<QPointF> Samples() const
               {
                 return this->d_samples;
               }
+
+      /// \brief maxium sample size of this curve.
+      private: int maxSampleSize = 11000;
+
+      /// \brief Size of samples to remove when maxSampleSize is reached.
+      private: int windowSize = 1000;
     };
 
 
     /// \internal
     /// \brief PlotCurve private data
-    struct PlotCurvePrivate
+    class PlotCurvePrivate
     {
       /// \brief Unique id;
       public: unsigned int id;
 
       /// \brief Curve label.
       public: std::string label;
+
+      /// \brief Active state of the plot curve;
+      public: bool active = true;
+
+      /// \brief Age of the curve since the first restart;
+      public: unsigned int age = 0;
 
       /// \brief Qwt Curve object.
       public: QwtPlotCurve *curve = NULL;
@@ -105,6 +166,9 @@ namespace gazebo
 
       /// \brief Global id incremented on every new curve
       public: static unsigned int globalCurveId;
+
+      /// \brief Color counter to cycle through all available colors
+      public: static unsigned int colorCounter;
     };
   }
 }
@@ -112,22 +176,25 @@ namespace gazebo
 // global curve id counter
 unsigned int PlotCurvePrivate::globalCurveId = 0;
 
+// curve color counter
+unsigned int PlotCurvePrivate::colorCounter = 0;
+
 /////////////////////////////////////////////////
 PlotCurve::PlotCurve(const std::string &_label)
   : dataPtr(new PlotCurvePrivate())
 {
   QwtPlotCurve *curve = new QwtPlotCurve(QString::fromStdString(_label));
+  this->dataPtr->curve = curve;
 
+  curve->setYAxis(QwtPlot::yLeft);
   curve->setStyle(QwtPlotCurve::Lines);
   curve->setData(new CurveData());
 
-  QColor penColor = Colors[0];
-
-  /// \todo The following will add the curve to the right hand axis. Need
-  /// a better way to do this based on user input.
-  // this->enableAxis(QwtPlot::yRight);
-  // this->axisAutoScale(QwtPlot::yRight);
-  // curve->setYAxis(QwtPlot::yRight);
+  int colorGroup = this->dataPtr->colorCounter % ColorGroupCount;
+  int color = static_cast<int>(this->dataPtr->colorCounter / ColorGroupCount)
+      % ColorCount;
+  this->dataPtr->colorCounter++;
+  QColor penColor = Colors[colorGroup][color];
 
   QPen pen(penColor);
   pen.setWidth(1.0);
@@ -136,8 +203,6 @@ PlotCurve::PlotCurve(const std::string &_label)
 
   curve->setSymbol(new QwtSymbol(QwtSymbol::Ellipse,
         Qt::NoBrush, QPen(penColor), QSize(2, 2)));
-
-  this->dataPtr->curve = curve;
 
   this->dataPtr->curveData =
       static_cast<CurveData *>(this->dataPtr->curve->data());
@@ -151,13 +216,14 @@ PlotCurve::PlotCurve(const std::string &_label)
 /////////////////////////////////////////////////
 PlotCurve::~PlotCurve()
 {
-  this->dataPtr->curve->detach();
-  delete this->dataPtr->curve;
 }
 
 /////////////////////////////////////////////////
 void PlotCurve::AddPoint(const ignition::math::Vector2d &_pt)
 {
+  if (!this->dataPtr->active)
+    return;
+
   // Add a point
   this->dataPtr->curveData->Add(QPointF(_pt.X(), _pt.Y()));
 }
@@ -165,6 +231,9 @@ void PlotCurve::AddPoint(const ignition::math::Vector2d &_pt)
 /////////////////////////////////////////////////
 void PlotCurve::AddPoints(const std::vector<ignition::math::Vector2d> &_pts)
 {
+  if (!this->dataPtr->active)
+    return;
+
   // Add all the points
   for (const auto &pt : _pts)
   {
@@ -216,9 +285,47 @@ unsigned int PlotCurve::Id() const
 }
 
 /////////////////////////////////////////////////
+bool PlotCurve::Active() const
+{
+  return this->dataPtr->active;
+}
+
+/////////////////////////////////////////////////
+void PlotCurve::SetActive(const bool _active)
+{
+  this->dataPtr->active = _active;
+}
+
+/////////////////////////////////////////////////
+unsigned int PlotCurve::Age() const
+{
+  return this->dataPtr->age;
+}
+
+/////////////////////////////////////////////////
+void PlotCurve::SetAge(const unsigned int _age)
+{
+  this->dataPtr->age = _age;
+}
+
+/////////////////////////////////////////////////
 unsigned int PlotCurve::Size() const
 {
   return static_cast<unsigned int>(this->dataPtr->curveData->samples().size());
+}
+
+/////////////////////////////////////////////////
+ignition::math::Vector2d PlotCurve::Min()
+{
+  return ignition::math::Vector2d(this->dataPtr->curve->minXValue(),
+      this->dataPtr->curve->minYValue());
+}
+
+/////////////////////////////////////////////////
+ignition::math::Vector2d PlotCurve::Max()
+{
+  return ignition::math::Vector2d(this->dataPtr->curve->maxXValue(),
+      this->dataPtr->curve->maxYValue());
 }
 
 /////////////////////////////////////////////////

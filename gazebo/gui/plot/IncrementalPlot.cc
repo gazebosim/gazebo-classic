@@ -23,20 +23,7 @@
 
 #include <map>
 
-#include <qwt/qwt_plot.h>
-#include <qwt/qwt_scale_widget.h>
-#include <qwt/qwt_plot_panner.h>
-#include <qwt/qwt_plot_layout.h>
-#include <qwt/qwt_plot_grid.h>
-#include <qwt/qwt_plot_curve.h>
-#include <qwt/qwt_plot_canvas.h>
-#include <qwt/qwt_plot_marker.h>
-#include <qwt/qwt_curve_fitter.h>
-#include <qwt/qwt_symbol.h>
-#include <qwt/qwt_legend.h>
-#include <qwt/qwt_legend_item.h>
-#include <qwt/qwt_plot_directpainter.h>
-#include <qwt/qwt_plot_magnifier.h>
+#include <ignition/math/Helpers.hh>
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
@@ -55,7 +42,7 @@ namespace gazebo
   {
     /// \internal
     /// \brief IncrementalPlot private data
-    struct IncrementalPlotPrivate
+    class IncrementalPlotPrivate
     {
       /// \brief A map of unique ids to plot curves.
       public: typedef std::map<unsigned int, PlotCurvePtr > CurveMap;
@@ -80,6 +67,8 @@ IncrementalPlot::IncrementalPlot(QWidget *_parent)
   : QwtPlot(_parent),
     dataPtr(new IncrementalPlotPrivate)
 {
+  this->setObjectName("incrementalPlot");
+
   this->dataPtr->period = 10;
   this->dataPtr->directPainter = new QwtPlotDirectPainter(this);
 
@@ -98,40 +87,39 @@ IncrementalPlot::IncrementalPlot(QWidget *_parent)
 
   this->setFrameStyle(QFrame::NoFrame);
   this->setLineWidth(0);
-  this->setCanvasLineWidth(2);
 
   this->plotLayout()->setAlignCanvasToScales(true);
 
   QwtLegend *qLegend = new QwtLegend;
-  qLegend->setItemMode(QwtLegend::CheckableItem);
   this->insertLegend(qLegend, QwtPlot::RightLegend);
 
   QwtPlotGrid *grid = new QwtPlotGrid;
+
+#if (QWT_VERSION < ((6 << 16) | (1 << 8) | 0))
   grid->setMajPen(QPen(Qt::gray, 0, Qt::DotLine));
+#else
+  grid->setMajorPen(QPen(Qt::gray, 0, Qt::DotLine));
+#endif
   grid->attach(this);
 
-  /// \todo Figure out a way to properly label the y-axis
-  QwtText ytitle("Duration (ms)");
+  /// TODO Figure out a way to properly label the x and y axis
+  QwtText xtitle("Sim Time");
+  xtitle.setFont(QFont(fontInfo().family(), 10, QFont::Bold));
+  this->setAxisTitle(QwtPlot::xBottom, xtitle);
+  QwtText ytitle("Variable values");
   ytitle.setFont(QFont(fontInfo().family(), 10, QFont::Bold));
   this->setAxisTitle(QwtPlot::yLeft, ytitle);
 
-  this->setAxisAutoScale(QwtPlot::yRight, true);
+  this->enableAxis(QwtPlot::yLeft);
+  this->setAxisScaleEngine(QwtPlot::yLeft, new QwtLinearScaleEngine());
   this->setAxisAutoScale(QwtPlot::yLeft, true);
 
   this->replot();
-
-  this->setAcceptDrops(true);
 }
 
 /////////////////////////////////////////////////
 IncrementalPlot::~IncrementalPlot()
 {
-  for (auto iter : this->dataPtr->curves)
-  {
-    iter.second->Clear();
-    iter.second->Detach();
-  }
-
   this->dataPtr->curves.clear();
 }
 
@@ -154,112 +142,43 @@ PlotCurveWeakPtr IncrementalPlot::Curve(const unsigned int _id) const
   if (it != this->dataPtr->curves.end())
     return it->second;
   else
+  {
     return PlotCurveWeakPtr();
+  }
 }
 
 /////////////////////////////////////////////////
-void IncrementalPlot::Add(const std::string &_label,
+void IncrementalPlot::AddPoints(const unsigned int _id,
     const std::vector<ignition::math::Vector2d> &_pts)
 {
-  if (_label.empty())
-    return;
-
-  PlotCurveWeakPtr plotCurve;
-
-  // add curve if not found
-  PlotCurveWeakPtr curve = this->Curve(_label);
-  if (curve.expired())
-    plotCurve = this->AddCurve(_label);
-  else
-    plotCurve = curve;
-
-  GZ_ASSERT(!plotCurve.expired(), "Curve is NULL");
+  PlotCurveWeakPtr plotCurve = this->Curve(_id);
 
   auto c = plotCurve.lock();
+  if (!c)
+  {
+    gzerr << "Unable to add points. "
+        << "Curve with id' " << _id << "' is not found" << std::endl;
+    return;
+  }
+
   c->AddPoints(_pts);
 }
 
 /////////////////////////////////////////////////
-void IncrementalPlot::Add(const std::string &_label,
+void IncrementalPlot::AddPoint(const unsigned int _id,
     const ignition::math::Vector2d &_pt)
 {
-  if (_label.empty())
-    return;
-
-  PlotCurveWeakPtr plotCurve;
-
-  PlotCurveWeakPtr curve = this->Curve(_label);
-  if (curve.expired())
-    plotCurve = this->AddCurve(_label);
-  else
-    plotCurve = curve;
-
-  GZ_ASSERT(!plotCurve.expired(), "Curve is NULL");
+  PlotCurveWeakPtr plotCurve = this->Curve(_id);
 
   auto c = plotCurve.lock();
-  c->AddPoint(_pt);
-}
-
-/////////////////////////////////////////////////
-void IncrementalPlot::AddVLine(const std::string &_label, const double _x)
-{
-  QwtPlotMarker *marker = new QwtPlotMarker();
-  marker->setValue(_x, 0.0);
-  marker->setLineStyle(QwtPlotMarker::VLine);
-  marker->setLabelAlignment(Qt::AlignRight | Qt::AlignBottom);
-  marker->setLinePen(QPen(Qt::green, 0, Qt::DashDotLine));
-  marker->attach(this);
-  marker->setLabel(QString::fromStdString(_label));
-}
-
-/////////////////////////////////////////////////
-void IncrementalPlot::AdjustCurve(PlotCurvePtr _plotCurve)
-{
-  if (!_plotCurve)
-    return;
-
-  unsigned int pointCount = _plotCurve->Size();
-  if (pointCount == 0u)
-    return;
-
-  ignition::math::Vector2d lastPoint = _plotCurve->Point(pointCount-1);
-
-/*  const bool doClip = !this->canvas()->testAttribute(Qt::WA_PaintOnScreen);
-
-  if (doClip)
+  if (!c)
   {
-    // Depending on the platform setting a clip might be an important
-    // performance issue. F.e. for Qt Embedded this reduces the
-    // part of the backing store that has to be copied out - maybe
-    // to an unaccelerated frame buffer device.
-    const QwtScaleMap xMap = this->canvasMap(curve->xAxis());
-    const QwtScaleMap yMap = this->canvasMap(curve->yAxis());
+    gzerr << "Unable to add point. "
+        << "Curve with id' " << _id << "' is not found" << std::endl;
+    return;
+  }
 
-    QRegion clipRegion;
-
-    const QSize symbolSize = curve->symbol()->size();
-    QRect r(0, 0, symbolSize.width() + 2, symbolSize.height() + 2);
-
-    const QPointF center = QwtScaleMap::transform(xMap, yMap, lastPoint);
-    r.moveCenter(center.toPoint());
-    clipRegion += r;
-
-    this->dataPtr->directPainter->setClipRegion(clipRegion);
-  }*/
-
-  this->setAxisScale(this->xBottom,
-      std::max(0.0, static_cast<double>(lastPoint.X() - this->dataPtr->period)),
-      std::max(1.0, static_cast<double>(lastPoint.X())));
-
-  // this->setAxisScale(curve->yAxis(), 0.0, curve->maxYValue() * 2.0);
-
-  // this->setAxisAutoScale(this->yRight, true);
-  // this->setAxisAutoScale(this->yLeft, true);
-
-  this->dataPtr->directPainter->drawSeries(_plotCurve->Curve(),
-      pointCount - 1, pointCount - 1);
-
-  this->replot();
+  c->AddPoint(_pt);
 }
 
 /////////////////////////////////////////////////
@@ -280,21 +199,6 @@ PlotCurveWeakPtr IncrementalPlot::AddCurve(const std::string &_label)
 }
 
 /////////////////////////////////////////////////
-void IncrementalPlot::Clear(const std::string &_label)
-{
-  PlotCurveWeakPtr plotCurve = this->Curve(_label);
-  if (plotCurve.expired())
-    return;
-
-  auto c = plotCurve.lock();
-  c->Clear();
-  c->Detach();
-  this->dataPtr->curves.erase(c->Id());
-
-  this->replot();
-}
-
-/////////////////////////////////////////////////
 void IncrementalPlot::Clear()
 {
   for (auto &c : this->dataPtr->curves)
@@ -306,42 +210,42 @@ void IncrementalPlot::Clear()
 }
 
 /////////////////////////////////////////////////
-QSize IncrementalPlot::sizeHint() const
-{
-  return QSize(540, 400);
-}
-
-/////////////////////////////////////////////////
-void IncrementalPlot::dragEnterEvent(QDragEnterEvent *_evt)
-{
-  if (_evt->mimeData()->hasFormat("application/x-item") &&
-      _evt->source() != this)
-  {
-    _evt->setDropAction(Qt::LinkAction);
-    _evt->acceptProposedAction();
-  }
-  else
-    _evt->ignore();
-}
-
-/////////////////////////////////////////////////
-void IncrementalPlot::dropEvent(QDropEvent *_evt)
-{
-  QString name = _evt->mimeData()->data("application/x-item");
-  this->AddCurve(name.toStdString());
-}
-
-/////////////////////////////////////////////////
-bool IncrementalPlot::HasCurve(const std::string &_label)
-{
-  return !this->Curve(_label).expired();
-}
-
-/////////////////////////////////////////////////
 void IncrementalPlot::Update()
 {
-  for (auto &c : this->dataPtr->curves)
-    this->AdjustCurve(c.second);
+  if (this->dataPtr->curves.empty())
+    return;
+
+  double yMin = IGN_DBL_MAX;
+  double yMax = 0;
+
+  ignition::math::Vector2d lastPoint;
+  for (auto &curve : this->dataPtr->curves)
+  {
+    if (!curve.second->Active())
+      continue;
+
+    unsigned int pointCount = curve.second->Size();
+    if (pointCount == 0u)
+      continue;
+
+    lastPoint = curve.second->Point(pointCount-1);
+
+    ignition::math::Vector2d minPt = curve.second->Min();
+    ignition::math::Vector2d maxPt = curve.second->Max();
+    if (maxPt.Y() > yMax)
+      yMax = maxPt.Y();
+    if (minPt.Y() < yMin)
+      yMin = minPt.Y();
+
+    this->dataPtr->directPainter->drawSeries(curve.second->Curve(),
+      pointCount - 1, pointCount - 1);
+  }
+
+  this->setAxisScale(QwtPlot::xBottom,
+      std::max(0.0, static_cast<double>(lastPoint.X() - this->dataPtr->period)),
+      std::max(1.0, static_cast<double>(lastPoint.X())));
+
+  this->replot();
 }
 
 /////////////////////////////////////////////////
@@ -378,12 +282,7 @@ PlotCurvePtr IncrementalPlot::DetachCurve(const unsigned int _id)
 /////////////////////////////////////////////////
 void IncrementalPlot::RemoveCurve(const unsigned int _id)
 {
-  auto it = this->dataPtr->curves.find(_id);
-
-  if (!it->second)
-    return;
-
-  this->dataPtr->curves.erase(it);
+  this->DetachCurve(_id);
 }
 
 /////////////////////////////////////////////////
@@ -395,10 +294,10 @@ void IncrementalPlot::SetCurveLabel(const unsigned int _id,
 
   PlotCurveWeakPtr plotCurve = this->Curve(_id);
 
-  if (plotCurve.expired())
+  auto c = plotCurve.lock();
+  if (!c)
     return;
 
-  auto c = plotCurve.lock();
   c->SetLabel(_label);
 }
 
@@ -410,4 +309,11 @@ std::vector<PlotCurveWeakPtr> IncrementalPlot::Curves() const
     curves.push_back(it.second);
 
   return curves;
+}
+
+/////////////////////////////////////////////////
+QSize IncrementalPlot::sizeHint() const
+{
+  // TODO find better way to specify plot size
+  return QSize(500, 380);
 }

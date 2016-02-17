@@ -24,7 +24,9 @@ set (headers_install
 )
 
 set (qt_tests_local
+  IncrementalPlot_TEST.cc
   PlotCanvas_TEST.cc
+  PlotCurve_TEST.cc
   PlotWindow_TEST.cc
   VariablePill_TEST.cc
   VariablePillContainer_TEST.cc
