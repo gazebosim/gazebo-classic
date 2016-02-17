@@ -152,13 +152,15 @@ void IncrementalPlot::AddPoints(const unsigned int _id,
     const std::vector<ignition::math::Vector2d> &_pts)
 {
   PlotCurveWeakPtr plotCurve = this->Curve(_id);
-  if (plotCurve.expired())
+
+  auto c = plotCurve.lock();
+  if (!c)
   {
     gzerr << "Unable to add points. "
         << "Curve with id' " << _id << "' is not found" << std::endl;
+    return;
   }
 
-  auto c = plotCurve.lock();
   c->AddPoints(_pts);
 }
 
@@ -167,13 +169,15 @@ void IncrementalPlot::AddPoint(const unsigned int _id,
     const ignition::math::Vector2d &_pt)
 {
   PlotCurveWeakPtr plotCurve = this->Curve(_id);
-  if (plotCurve.expired())
+
+  auto c = plotCurve.lock();
+  if (!c)
   {
     gzerr << "Unable to add point. "
         << "Curve with id' " << _id << "' is not found" << std::endl;
+    return;
   }
 
-  auto c = plotCurve.lock();
   c->AddPoint(_pt);
 }
 
@@ -295,10 +299,10 @@ void IncrementalPlot::SetCurveLabel(const unsigned int _id,
 
   PlotCurveWeakPtr plotCurve = this->Curve(_id);
 
-  if (plotCurve.expired())
+  auto c = plotCurve.lock();
+  if (!c)
     return;
 
-  auto c = plotCurve.lock();
   c->SetLabel(_label);
 }
 
