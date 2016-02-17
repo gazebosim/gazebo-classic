@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,11 +27,11 @@ namespace gazebo
     /// \brief Depth camera sensor private data.
     class DepthCameraSensorPrivate
     {
-      /// \brief Pointer to the camera.
-      public: rendering::DepthCameraPtr camera;
+      /// \brief Depth data buffer.
+      public: float *depthBuffer = NULL;
 
-      /// \brief True if the sensor was rendered.
-      public: bool rendered;
+      /// \brief Local pointer to the depthCamera.
+      public: rendering::DepthCameraPtr depthCamera;
     };
   }
 }

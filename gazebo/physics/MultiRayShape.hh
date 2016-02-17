@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,19 @@ namespace gazebo
       /// \brief Constructor.
       /// \param[in] _parent Parent collision shape.
       public: explicit MultiRayShape(CollisionPtr _parent);
+
+      /// \brief Constructor for a stand alone multiray shape. Stand alone
+      /// means the multiray shape is not attached to a Collision object.
+      ///
+      /// Example:
+      ///
+      ///  gazebo::physics::MultiRayShapePtr rays =
+      ///      boost::dynamic_pointer_cast<gazebo::physics::MultiRayShape>(
+      ///        world->GetPhysicsEngine()->CreateShape("multiray",
+      ///          gazebo::physics::CollisionPtr()));
+      ///
+      /// \param[in] _physicsEngine Pointer to the physics engine.
+      public: explicit MultiRayShape(PhysicsEnginePtr _physicsEngine);
 
       /// \brief Destructor.
       public: virtual ~MultiRayShape();
@@ -141,14 +154,37 @@ namespace gazebo
       public: void DisconnectNewLaserScans(event::ConnectionPtr &_conn)
               {this->newLaserScans.Disconnect(_conn);}
 
-      /// \brief Physics engine specific method for updating the rays.
-      protected: virtual void UpdateRays() = 0;
+      /// \brief Method for updating the rays. This function is normally
+      /// called automatically, such as when a laser sensor is updated.
+      /// Only call this function on a standalone multiray shape.
+      /// \sa explicit MultiRayShape(PhysicsEnginePtr _physicsEngine)
+      public: virtual void UpdateRays() = 0;
 
       /// \brief Add a ray to the collision.
       /// \param[in] _start Start of the ray.
       /// \param[in] _end End of the ray.
-      protected: virtual void AddRay(const math::Vector3 &_start,
-                                     const math::Vector3 &_end);
+      public: virtual void AddRay(const math::Vector3 &_start,
+                                  const math::Vector3 &_end);
+
+      /// \brief Set the points of a ray.
+      /// \param[in] _rayIndex Index of the ray to set.
+      /// \param[in] _start Start of the ray.
+      /// \param[in] _end End of the ray.
+      /// \return True if the ray was set. False can be returned if the
+      /// _rayIndex is invalid.
+      public: bool SetRay(const unsigned int _rayIndex,
+                  const ignition::math::Vector3d &_start,
+                  const ignition::math::Vector3d &_end);
+
+      /// \brief Get the number of rays.
+      /// \return Number of rays in this shape.
+      public: unsigned int RayCount() const;
+
+      /// \brief Get a pointer to a ray
+      /// \param[in] _rayIndex index to the ray
+      /// \return Pointer to the ray, or NULL on error
+      /// \sa RayCount()
+      public: RayShapePtr Ray(const unsigned int _rayIndex) const;
 
       /// \brief Ray data
       protected: std::vector<RayShapePtr> rays;
@@ -173,6 +209,12 @@ namespace gazebo
 
       /// \brief New laser scans event.
       protected: event::EventT<void()> newLaserScans;
+
+      /// \brief Min range of a ray
+      private: double minRange = 0;
+
+      /// \brief Max range of a ray
+      private: double maxRange = 1000;
     };
     /// \}
   }

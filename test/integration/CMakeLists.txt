@@ -59,6 +59,7 @@ set(tests
   logical_camera_sensor.cc
   model.cc
   model_database.cc
+  multirayshape.cc
   nested_model.cc
   noise.cc
   nondefault_world.cc
@@ -120,6 +121,12 @@ if (ENABLE_TESTS_COMPILATION)
   set_tests_properties(${TEST_TYPE}_physics PROPERTIES TIMEOUT 500)
   set_tests_properties(${TEST_TYPE}_worlds_installed PROPERTIES TIMEOUT 700)
 
+  # Increase timeout for debug-mode
+  if (${CMAKE_BUILD_TYPE_UPPERCASE} STREQUAL "DEBUG" OR
+      ${CMAKE_BUILD_TYPE_UPPERCASE} STREQUAL "COVERAGE")
+    set_tests_properties(${TEST_TYPE}_joint_gearbox PROPERTIES TIMEOUT 400)
+  endif()
+
   # Add plugin dependency
   add_dependencies(${TEST_TYPE}_joint_test SpringTestPlugin)
 endif()
@@ -133,6 +140,7 @@ gz_build_display_tests(${display_tests})
 set(dri_tests
   camera.cc
   camera_sensor.cc
+  depth_camera.cc
   factory.cc
   gpu_laser.cc
   gz_camera.cc
@@ -151,6 +159,7 @@ gz_build_dri_tests(${dri_tests})
 set(qt_tests
   insert_model.cc
   model_editor.cc
+  model_manipulation.cc
   undo.cc
   visual_pose.cc
 )

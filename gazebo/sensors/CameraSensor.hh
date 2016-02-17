@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -116,7 +116,14 @@ namespace gazebo
       protected: virtual void Fini();
 
       /// \brief Handle the render event.
-      private: void Render();
+      protected: virtual void Render();
+
+      /// \brief Get the value of the rendered flag
+      protected: bool Rendered() const;
+
+      /// \brief Set the value of the rendered flag
+      /// \param[in] _value New rendered value.
+      protected: void SetRendered(const bool _value);
 
       /// \brief Pointer to the camera.
       protected: rendering::CameraPtr camera;
