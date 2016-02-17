@@ -1,5 +1,10 @@
 ## Gazebo 8
 
+## Gazebo 8.x.x (2017-xx-xx)
+
+1. Fix ODE Ray-Cylinder collision, and added ability to instantiate stand alone MultiRayShapes.
+    * [Pull request #2122](https://bitbucket.org/osrf/gazebo/pull-request/2122)
+
 1. Update depth camera sensor to publish depth data over a topic.
     * [Pull request #2112](https://bitbucket.org/osrf/gazebo/pull-request/2112)
 
