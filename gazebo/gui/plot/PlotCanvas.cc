@@ -42,7 +42,7 @@ namespace gazebo
       /// \brief Unique id of the plot
       public: unsigned int id;
 
-      /// brief Poniter to the plot
+      /// brief Pointer to the plot
       public: IncrementalPlot *plot = NULL;
 
       /// \brief A map of container variable ids to their plot curve ids.
