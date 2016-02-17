@@ -160,11 +160,90 @@ class TopicsItemModel : public QStandardItemModel
 };
 
 /////////////////////////////////////////////////
+/// Customize the search model.
+class SearchModel : public QSortFilterProxyModel
+{
+  /////////////////////////////////////////////////
+  /// \brief Customize so we accept rows:
+  /// * That match themselves, or
+  /// * That have a parent that matches (on its own), or
+  /// * That have a child that matches.
+  /// \param[in] _srcRow Row on the source model.
+  /// \param[in] _srcParent Parent on the source model.
+  /// \return True if row matches at least one of the conditions.
+  public: bool filterAcceptsRow(int _srcRow, const QModelIndex &_srcParent)
+      const
+  {
+    if (this->filterAcceptsRowItself(_srcRow, _srcParent))
+      return true;
+
+    // accept if any of the parents is accepted on it's own merits
+    QModelIndex parentIndex = _srcParent;
+    while (parentIndex.isValid())
+    {
+      if (this->filterAcceptsRowItself(parentIndex.row(), parentIndex.parent()))
+        return true;
+      parentIndex = parentIndex.parent();
+    }
+
+    // accept if any of the children is accepted on it's own merits
+    if (this->hasAcceptedChildren(_srcRow, _srcParent))
+    {
+      return true;
+    }
+
+    return false;
+  }
+
+  /// \brief Check if the original filter accepts this row.
+  /// \param[in] _srcRow Row on the source model.
+  /// \param[in] _srcParent Parent on the source model.
+  /// \return True if row matches at least one of the conditions.
+  public: bool filterAcceptsRowItself(const int _srcRow, const
+      QModelIndex &_srcParent) const
+  {
+    return QSortFilterProxyModel::filterAcceptsRow(_srcRow, _srcParent);
+  }
+
+  /// \brief Check if any of the children match the filter.
+  /// \param[in] _srcRow Row on the source model.
+  /// \param[in] _srcParent Parent on the source model.
+  /// \return True if row matches at least one of the conditions.
+  public: bool hasAcceptedChildren(const int _srcRow,
+      const QModelIndex &_srcParent) const
+  {
+    QModelIndex item = sourceModel()->index(_srcRow, 0, _srcParent);
+    if (!item.isValid())
+      return false;
+
+    int childCount = item.model()->rowCount(item);
+    if (childCount == 0)
+      return false;
+
+    for (int i = 0; i < childCount; ++i)
+    {
+      if (this->filterAcceptsRowItself(i, item))
+        return true;
+
+      if (this->hasAcceptedChildren(i, item))
+        return true;
+    }
+
+    return false;
+  }
+};
+
+/////////////////////////////////////////////////
 /// \brief Private data for the Palette class
 class gazebo::gui::PalettePrivate
 {
   /// \brief Top pane of the topics tab.
   public: QFrame *mainFrame;
+
+  public: TopicsItemModel *topicsModel;
+  public: TopicsItemModel *simModel;
+  public: SearchModel *searchTopicsModel;
+  public: SearchModel *searchSimModel;
 };
 
 /////////////////////////////////////////////////
@@ -181,12 +260,14 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   tabBar->setFocusPolicy(Qt::NoFocus);
 
   // The model that will hold data to be displayed in the topicTree view
-  QStandardItemModel *topicsModel = new TopicsItemModel;
-  this->FillTopics(topicsModel);
+  this->dataPtr->topicsModel = new TopicsItemModel;
+  this->FillTopics(this->dataPtr->topicsModel);
 
-  // The model that will hold data to be displayed in the simTree view
-  QStandardItemModel *simModel = new TopicsItemModel;
-  this->FillSim(simModel);
+  // A proxy model to filter topic model
+  this->dataPtr->searchTopicsModel = new SearchModel;
+  this->dataPtr->searchTopicsModel->setFilterRole(
+      TopicsViewDelegate::TOPIC_NAME_ROLE);
+  this->dataPtr->searchTopicsModel->setSourceModel(this->dataPtr->topicsModel);
 
   // Create a view delegate, to handle drawing items in the topicTree view
   TopicsViewDelegate *topicsViewDelegate = new TopicsViewDelegate;
@@ -197,11 +278,21 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   topicsTree->setAnimated(true);
   topicsTree->setHeaderHidden(true);
   topicsTree->setExpandsOnDoubleClick(true);
-  topicsTree->setModel(topicsModel);
+  topicsTree->setModel(this->dataPtr->topicsModel);
   topicsTree->setItemDelegate(topicsViewDelegate);
   topicsTree->setEditTriggers(QAbstractItemView::NoEditTriggers);
   topicsTree->setDragEnabled(true);
   topicsTree->setDragDropMode(QAbstractItemView::DragOnly);
+
+  // The model that will hold data to be displayed in the simTree view
+  this->dataPtr->simModel = new TopicsItemModel;
+  this->FillSim(this->dataPtr->simModel);
+
+  // A proxy model to filter sim model
+  this->dataPtr->searchSimModel = new SearchModel;
+  this->dataPtr->searchSimModel->setFilterRole(
+      TopicsViewDelegate::TOPIC_NAME_ROLE);
+  this->dataPtr->searchSimModel->setSourceModel(this->dataPtr->simModel);
 
   // A tree to visualize sim variables
   QTreeView *simTree = new QTreeView;
@@ -209,18 +300,62 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   simTree->setAnimated(true);
   simTree->setHeaderHidden(true);
   simTree->setExpandsOnDoubleClick(true);
-  simTree->setModel(simModel);
+  simTree->setModel(this->dataPtr->simModel);
   simTree->setItemDelegate(topicsViewDelegate);
   simTree->setEditTriggers(QAbstractItemView::NoEditTriggers);
   simTree->setDragEnabled(true);
   simTree->setDragDropMode(QAbstractItemView::DragOnly);
+
+  // Search line edit
+  auto searchEdit = new QLineEdit();
+  this->connect(searchEdit, SIGNAL(textChanged(QString)), this,
+      SLOT(UpdateSearch(QString)));
+
+  // TODO Complete with other models too
+  auto completer = new QCompleter(this->dataPtr->topicsModel, this);
+  completer->setCaseSensitivity(Qt::CaseInsensitive);
+  searchEdit->setCompleter(completer);
+
+  // A tree to visualize topics search results
+  QTreeView *searchTopicsTree = new QTreeView;
+  searchTopicsTree->setObjectName("plottingSimList");
+  searchTopicsTree->setAnimated(true);
+  searchTopicsTree->setHeaderHidden(true);
+  searchTopicsTree->setExpandsOnDoubleClick(true);
+  searchTopicsTree->setModel(this->dataPtr->searchTopicsModel);
+  searchTopicsTree->setItemDelegate(topicsViewDelegate);
+  searchTopicsTree->setEditTriggers(QAbstractItemView::NoEditTriggers);
+  searchTopicsTree->setDragEnabled(true);
+  searchTopicsTree->setDragDropMode(QAbstractItemView::DragOnly);
+
+  // A tree to visualize sim search results
+  QTreeView *searchSimTree = new QTreeView;
+  searchSimTree->setObjectName("plottingSimList");
+  searchSimTree->setAnimated(true);
+  searchSimTree->setHeaderHidden(true);
+  searchSimTree->setExpandsOnDoubleClick(true);
+  searchSimTree->setModel(this->dataPtr->searchSimModel);
+  searchSimTree->setItemDelegate(topicsViewDelegate);
+  searchSimTree->setEditTriggers(QAbstractItemView::NoEditTriggers);
+  searchSimTree->setDragEnabled(true);
+  searchSimTree->setDragDropMode(QAbstractItemView::DragOnly);
+
+  auto searchLayout = new QVBoxLayout();
+  searchLayout->addWidget(searchEdit);
+  searchLayout->addWidget(new QLabel(tr("Topics")));
+  searchLayout->addWidget(searchTopicsTree);
+  searchLayout->addWidget(new QLabel(tr("Sim")));
+  searchLayout->addWidget(searchSimTree);
+
+  auto searchWidget = new QWidget();
+  searchWidget->setLayout(searchLayout);
 
   // The stacked layout is used by the TabBar to switch active layouts
   auto tabStackedLayout = new QStackedLayout;
   tabStackedLayout->setContentsMargins(0, 0, 0, 0);
   tabStackedLayout->addWidget(topicsTree);
   tabStackedLayout->addWidget(simTree);
-  //tabStackedLayout->addWidget(searchSplitter);
+  tabStackedLayout->addWidget(searchWidget);
 
   // Connect TabBar to StackedLayout
   connect(tabBar, SIGNAL(currentChanged(int)),
@@ -494,4 +629,25 @@ void Palette::FillFromMsg(google::protobuf::Message *_msg,
       }
     }
   }
+}
+
+/////////////////////////////////////////////////
+void Palette::UpdateSearch(const QString &_search)
+{
+  // Get all words in any order
+  auto words = _search.split(" ");
+
+  QString exp;
+  if (!(words.size() == 1 && words[0] == ""))
+  {
+    exp = "^";
+    for (auto word : words)
+    {
+      exp = exp + "(?=.*" + word + ")";
+    }
+    exp = exp + ".*$";
+  }
+
+  this->dataPtr->searchTopicsModel->setFilterRegExp(exp);
+  this->dataPtr->searchSimModel->setFilterRegExp(exp);
 }
