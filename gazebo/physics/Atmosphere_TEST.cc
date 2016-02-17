@@ -24,12 +24,15 @@ class AtmosphereTest : public ServerFixture,
                        public testing::WithParamInterface<const char*>
 {
   /// \brief Callback for gztopic "~/response".
+  /// \param[in] _msg Message received from topic.
   public: void OnAtmosphereMsgResponse(ConstResponsePtr &_msg);
 
   /// \brief Test getting/setting atmosphere model parameters.
+  /// \param[in] _atmosphere Name of the atmosphere model.
   public: void AtmosphereParam(const std::string &_atmosphere);
 
   /// \brief Test default atmosphere model parameters
+  /// \param[in] _atmosphere Name of the atmosphere model.
   public: void AtmosphereParamBool(const std::string &_atmosphere);
 
   /// \brief Incoming atmosphere message.

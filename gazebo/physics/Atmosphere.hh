@@ -120,8 +120,8 @@ namespace gazebo
       /// \return Pointer to the world.
       protected: WorldPtr World() const;
 
-      /// \brief Publish response.
-      /// Publish response to a request.
+      /// \brief Publish response to a request.
+      /// \param[in] _msg Message to be published.
       protected: void Publish(const msgs::Response &_msg) const;
 
       /// \brief Molar mass of the air in kg/mol
