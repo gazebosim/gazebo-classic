@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_GUI_PLOT_INCREMENTAL_PLOT_HH_
-#define _GAZEBO_GUI_PLOT_INCREMENTAL_PLOT_HH_
+#ifndef _GAZEBO_GUI_PLOT_INCREMENTALPLOT_HH_
+#define _GAZEBO_GUI_PLOT_INCREMENTALPLOT_HH_
 
 #include <memory>
 #include <string>
