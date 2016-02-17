@@ -282,12 +282,7 @@ PlotCurvePtr IncrementalPlot::DetachCurve(const unsigned int _id)
 /////////////////////////////////////////////////
 void IncrementalPlot::RemoveCurve(const unsigned int _id)
 {
-  auto it = this->dataPtr->curves.find(_id);
-
-  if (it == this->dataPtr->curves.end())
-    return;
-
-  this->dataPtr->curves.erase(it);
+  this->DetachCurve(_id);
 }
 
 /////////////////////////////////////////////////

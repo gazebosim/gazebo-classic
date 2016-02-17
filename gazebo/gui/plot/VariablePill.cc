@@ -421,9 +421,20 @@ void VariablePill::dropEvent(QDropEvent *_evt)
       }
     }
 
-    this->blockSignals(true);
-    this->AddVariablePill(variable);
-    this->blockSignals(false);
+    // add to parent if it exists, otherwise add to self and become a
+    // multi-variable
+    if (this->dataPtr->parent)
+    {
+      this->dataPtr->parent->blockSignals(true);
+      this->dataPtr->parent->AddVariablePill(variable);
+      this->dataPtr->parent->blockSignals(false);
+    }
+    else
+    {
+      this->blockSignals(true);
+      this->AddVariablePill(variable);
+      this->blockSignals(false);
+    }
 
     emit VariableMoved(variable->Id());
   }

@@ -276,52 +276,28 @@ void PlotCanvas::AddVariable(const unsigned int _id,
 }
 
 /////////////////////////////////////////////////
-void PlotCanvas::RemoveVariable(const unsigned int _id)
-{
-  // loop through plots and find the variable to be removed
-  for (auto it = this->dataPtr->plotData.begin();
-      it != this->dataPtr->plotData.end(); ++it)
-  {
-    auto v = it->second->variableCurves.find(_id);
-    if (v != it->second->variableCurves.end())
-    {
-      unsigned int curveId = v->second;
-      it->second->variableCurves.erase(v);
-
-      // delete whole plot if no more curves
-      if (it->second->variableCurves.empty())
-      {
-        // remove curve from manager
-        PlotManager::Instance()->RemoveCurve(it->second->plot->Curve(_id));
-
-        // remove from variable pill container
-        this->dataPtr->yVariableContainer->RemoveVariablePill(_id);
-
-        this->dataPtr->plotLayout->takeAt(
-            this->dataPtr->plotLayout->indexOf(it->second->plot));
-        it->second->plot->RemoveCurve(curveId);
-        delete it->second->plot;
-        delete it->second;
-        this->dataPtr->plotData.erase(it);
-      }
-      else
-      {
-        it->second->plot->DetachCurve(curveId);
-        it->second->plot->RemoveCurve(curveId);
-      }
-      break;
-    }
-  }
-
-  if (this->dataPtr->plotData.empty() && this->dataPtr->emptyPlot)
-    this->dataPtr->emptyPlot->setVisible(true);
-}
-
-/////////////////////////////////////////////////
 void PlotCanvas::RemoveVariable(const unsigned int _id,
     const unsigned int _plotId)
 {
-  auto it = this->dataPtr->plotData.find(_plotId);
+  auto it = this->dataPtr->plotData.end();
+  if (_plotId == EMPTY_PLOT)
+  {
+    for (auto pIt = this->dataPtr->plotData.begin();
+        pIt != this->dataPtr->plotData.end(); ++pIt)
+    {
+      auto v = pIt->second->variableCurves.find(_id);
+      if (v != pIt->second->variableCurves.end())
+      {
+        it = pIt;
+        break;
+      }
+    }
+  }
+  else
+  {
+    it = this->dataPtr->plotData.find(_plotId);
+  }
+
   if (it == this->dataPtr->plotData.end())
     return;
 
@@ -333,7 +309,6 @@ void PlotCanvas::RemoveVariable(const unsigned int _id,
 
   // remove curve from manager
   PlotManager::Instance()->RemoveCurve(it->second->plot->Curve(_id));
-
 
   // erase from map
   it->second->variableCurves.erase(v);
@@ -350,7 +325,6 @@ void PlotCanvas::RemoveVariable(const unsigned int _id,
   }
   else
   {
-    // TODO remove / detach curve from plot
     it->second->plot->RemoveCurve(curveId);
   }
 
@@ -403,7 +377,8 @@ void PlotCanvas::RemovePlot(const unsigned int _id)
     this->RemoveVariable(v->first, plotId);
   }
 
-  // remove last variable - this will also delete the plot
+  // remove last variable - this will also delete the plot which causes
+  // plot data iterator to be invalid. So do this last.
   this->RemoveVariable(it->second->variableCurves.begin()->first, plotId);
 }
 
@@ -484,7 +459,9 @@ void PlotCanvas::OnMoveVariable(const unsigned int _id,
 
     if (it->second->variableCurves.find(_targetId) !=
         it->second->variableCurves.end())
+    {
       targetPlotIt = it;
+    }
 
     if (plotIt != this->dataPtr->plotData.end() &&
         targetPlotIt != this->dataPtr->plotData.end())
@@ -522,6 +499,7 @@ void PlotCanvas::OnMoveVariable(const unsigned int _id,
       if (!this->dataPtr->plotData.empty() && this->dataPtr->emptyPlot)
         this->dataPtr->emptyPlot->setVisible(false);
     }
+
     // delete plot if empty
     if (plotData->variableCurves.empty())
     {

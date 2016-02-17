@@ -62,16 +62,13 @@ namespace gazebo
       public: unsigned int AddVariable(const std::string &_variable,
           const unsigned int _plotId = EMPTY_PLOT);
 
-      /// \brief Remove a variable from a plot. This will search through all
-      /// plots for the variable and remove it from the plot if found.
-      /// \param[in] _id Unique id of the variable
-      public: void RemoveVariable(const unsigned int _id);
-
       /// \brief Remove a variable from a plot.
       /// \param[in] _id Unique id of the variable
       /// \param[in] _plotId Unique if of plot to remove the variable from.
+      ///  If EMPTY_PLOT is specified, the function will search through all
+      /// plots for the variable and remove it from the plot if found.
       public: void RemoveVariable(const unsigned int _id,
-          const unsigned int _plotId);
+          const unsigned int _plotId = EMPTY_PLOT);
 
       /// \brief Add a new plot to the canvas.
       /// \return Unique id of the plot
