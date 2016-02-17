@@ -66,6 +66,7 @@ set (sources
   SVGLoader.cc
   Time.cc
   Timer.cc
+  URI.cc
   Video.cc
   ffmpeg_inc.cc
 )

@@ -14,12 +14,6 @@
  * limitations under the License.
  *
 */
-
-/* Desc: Base class shared by all classes in Gazebo.
- * Author: Nate Koenig
- * Date: 09 Sept. 2008
- */
-
 #ifndef _GAZEBO_PHYSICS_BASE_HH_
 #define _GAZEBO_PHYSICS_BASE_HH_
 
@@ -35,6 +29,7 @@
 #include <sdf/sdf.hh>
 
 #include "gazebo/common/CommonTypes.hh"
+#include "gazebo/common/URI.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/util/system.hh"
 
@@ -308,6 +303,12 @@ namespace gazebo
       /// \return The SDF values for the object.
       public: virtual const sdf::ElementPtr GetSDF();
 
+      /// \brief Get the URI for this element.
+      /// \return The full URI for this element
+      public: common::URI URI() const;
+
+      public: std::string TypeStr() const;
+
       /// \brief Compute the scoped name of this object based on its
       /// parents.
       /// \sa Base::GetScopedName
@@ -333,6 +334,8 @@ namespace gazebo
 
       /// \brief The type of this object.
       private: unsigned int type;
+
+      private: std::string typeStr;
 
       /// \brief True if selected.
       private: bool selected;

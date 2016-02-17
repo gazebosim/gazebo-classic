@@ -38,6 +38,7 @@ Base::Base(BasePtr _parent)
 : parent(_parent)
 {
   this->type = BASE;
+  this->typeStr = "base";
   this->id = physics::getUniqueId();
   this->saveable = true;
   this->selected = false;
@@ -223,6 +224,23 @@ unsigned int Base::GetChildCount() const
 void Base::AddType(Base::EntityType _t)
 {
   this->type = this->type | (unsigned int)_t;
+
+  if (this->type & MODEL)
+    this->typeStr = "model";
+  else if (this->type & LINK)
+    this->typeStr = "link";
+  else if (this->type & COLLISION)
+    this->typeStr = "collision";
+  else if (this->type & ACTOR)
+    this->typeStr = "actor";
+  else if (this->type & LIGHT)
+    this->typeStr = "light";
+  else if (this->type & VISUAL)
+    this->typeStr = "visual";
+  else if (this->type & JOINT)
+    this->typeStr = "joint";
+  else if (this->type & SHAPE)
+    this->typeStr = "shape";
 }
 
 //////////////////////////////////////////////////
@@ -392,4 +410,36 @@ const sdf::ElementPtr Base::GetSDF()
   GZ_ASSERT(this->sdf != NULL, "Base sdf member is NULL");
   this->sdf->Update();
   return this->sdf;
+}
+
+//////////////////////////////////////////////////
+common::URI Base::URI() const
+{
+  common::URI uri;
+
+  uri.SetScheme("data");
+
+  BasePtr p = this->parent;
+  while (p)
+  {
+    if (p->GetParent())
+    {
+      uri.Path().PushFront(p->GetName());
+      uri.Path().PushFront(p->TypeStr());
+    }
+
+    p = p->GetParent();
+  }
+
+  uri.Path().PushFront(this->GetName());
+  uri.Path().PushFront(this->TypeStr());
+  uri.Path().PushFront(this->world->GetName());
+
+  return uri;
+}
+
+/////////////////////////////////////////////////
+std::string Base::TypeStr() const
+{
+  return this->typeStr;
 }
