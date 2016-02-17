@@ -798,7 +798,7 @@ void ModelListWidget::PhysicsPropertyChanged(QtProperty * /*_item*/)
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::AtmospherePropertyChanged(QtProperty */*_item*/)
+void ModelListWidget::AtmospherePropertyChanged(QtProperty *_item)
 {
   msgs::Atmosphere msg;
 
@@ -825,6 +825,15 @@ void ModelListWidget::AtmospherePropertyChanged(QtProperty */*_item*/)
 
   msg.set_type(this->dataPtr->atmosphereType);
   this->dataPtr->atmospherePub->Publish(msg);
+
+  std::string changedProperty = _item->propertyName().toStdString();
+  if (changedProperty == "temperature" || changedProperty == "pressure")
+  {
+    // Send request to retrieve new value for mass_density
+    this->dataPtr->requestMsg = msgs::CreateRequest("atmosphere_info",
+                                           this->dataPtr->selectedEntityName);
+    this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
+  }
 }
 
 /////////////////////////////////////////////////
