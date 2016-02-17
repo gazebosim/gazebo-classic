@@ -194,3 +194,27 @@ double RayShape::ComputeVolume() const
 {
   return 0;
 }
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d RayShape::Start() const
+{
+  return this->relativeStartPos.Ign();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d RayShape::End() const
+{
+  return this->relativeEndPos.Ign();
+}
+
+//////////////////////////////////////////////////
+void RayShape::SetCollisionName(const std::string &_name)
+{
+  this->collisionName = _name;
+}
+
+//////////////////////////////////////////////////
+std::string RayShape::CollisionName() const
+{
+  return this->collisionName;
+}
