@@ -54,11 +54,9 @@ void AdiabaticAtmosphere::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void AdiabaticAtmosphere::Init(void)
+void AdiabaticAtmosphere::Init()
 {
-  this->dataPtr->adiabaticPower = Atmosphere::MOLAR_MASS *
-      this->World()->GetPhysicsEngine()->GetGravity().GetLength() /
-      (-Atmosphere::TemperatureGradient() * Atmosphere::IDEAL_GAS_CONSTANT_R);
+  this->ComputeAdiabaticPower();
 }
 
 //////////////////////////////////////////////////
@@ -114,7 +112,7 @@ void AdiabaticAtmosphere::OnAtmosphereMsg(ConstAtmospherePtr &_msg)
 void AdiabaticAtmosphere::SetTemperatureGradient(const double _gradient)
 {
   Atmosphere::SetTemperatureGradient(_gradient);
-  this->Init();
+  this->ComputeAdiabaticPower();
 }
 
 //////////////////////////////////////////////////
@@ -155,4 +153,12 @@ double AdiabaticAtmosphere::MassDensity(const double _altitude) const
   {
     return 0;
   }
+}
+
+//////////////////////////////////////////////////
+void AdiabaticAtmosphere::ComputeAdiabaticPower()
+{
+  this->dataPtr->adiabaticPower = Atmosphere::MOLAR_MASS *
+      this->World()->GetPhysicsEngine()->GetGravity().GetLength() /
+      (-Atmosphere::TemperatureGradient() * Atmosphere::IDEAL_GAS_CONSTANT_R);
 }

@@ -69,6 +69,9 @@ namespace gazebo
       // Documentation inherited
       public: double MassDensity(const double _altitude = 0.0) const;
 
+      // \brief Compute the adiabatic power used internally.
+      private: void ComputeAdiabaticPower();
+
       /// \internal
       /// \brief Private data pointer.
       protected: std::unique_ptr<AdiabaticAtmospherePrivate> dataPtr;
