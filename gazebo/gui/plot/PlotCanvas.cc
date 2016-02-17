@@ -348,6 +348,8 @@ unsigned int PlotCanvas::AddPlot()
   plotData->plot = plot;
   this->dataPtr->plotData[plotData->id] = plotData;
 
+  this->UpdateAxisLabel();
+
   return plotData->id;
 }
 
@@ -380,6 +382,8 @@ void PlotCanvas::RemovePlot(const unsigned int _id)
   // remove last variable - this will also delete the plot which causes
   // plot data iterator to be invalid. So do this last.
   this->RemoveVariable(it->second->variableCurves.begin()->first, plotId);
+
+  this->UpdateAxisLabel();
 }
 
 /////////////////////////////////////////////////
@@ -521,6 +525,8 @@ void PlotCanvas::OnMoveVariable(const unsigned int _id,
       plotData->plot->detachItems(QwtPlotItem::Rtti_PlotItem, false);
       delete plotData->plot;
       delete plotData;
+
+      this->UpdateAxisLabel();
     }
   }
 }
@@ -700,4 +706,23 @@ void PlotCanvas::OnClearCanvas()
 void PlotCanvas::OnDeleteCanvas()
 {
   emit CanvasDeleted();
+}
+
+/////////////////////////////////////////////////
+void PlotCanvas::UpdateAxisLabel()
+{
+  // show the x-axis label in the last plot only
+  for (int i = 0; i < this->dataPtr->plotLayout->count(); ++i)
+  {
+    QLayoutItem *item = this->dataPtr->plotLayout->itemAt(i);
+    if (item)
+    {
+      IncrementalPlot *p = qobject_cast<IncrementalPlot *>(item->widget());
+      if (p)
+      {
+        p->ShowAxisLabel(IncrementalPlot::X_BOTTOM_AXIS,
+            i == (this->dataPtr->plotLayout->count()-1));
+      }
+    }
+  }
 }

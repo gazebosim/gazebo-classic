@@ -102,13 +102,8 @@ IncrementalPlot::IncrementalPlot(QWidget *_parent)
 #endif
   grid->attach(this);
 
-  /// TODO Figure out a way to properly label the x and y axis
-  QwtText xtitle("Sim Time");
-  xtitle.setFont(QFont(fontInfo().family(), 10, QFont::Bold));
-  this->setAxisTitle(QwtPlot::xBottom, xtitle);
-  QwtText ytitle("Variable values");
-  ytitle.setFont(QFont(fontInfo().family(), 10, QFont::Bold));
-  this->setAxisTitle(QwtPlot::yLeft, ytitle);
+  this->ShowAxisLabel(X_BOTTOM_AXIS, true);
+  this->ShowAxisLabel(Y_LEFT_AXIS, true);
 
   this->enableAxis(QwtPlot::yLeft);
   this->setAxisScaleEngine(QwtPlot::yLeft, new QwtLinearScaleEngine());
@@ -299,6 +294,45 @@ void IncrementalPlot::SetCurveLabel(const unsigned int _id,
     return;
 
   c->SetLabel(_label);
+}
+
+/////////////////////////////////////////////////
+void IncrementalPlot::ShowAxisLabel(const PlotAxis _axis, const bool _show)
+{
+  /// TODO Figure out a way to properly label the x and y axis
+  std::string axisLabel;
+  QFont axisLabelFont(fontInfo().family(), 10, QFont::Bold);
+  switch (_axis)
+  {
+    case X_BOTTOM_AXIS:
+    {
+      if (_show)
+        axisLabel = "Sim Time (seconds)";
+      QwtText xtitle(QString::fromStdString(axisLabel));
+      xtitle.setFont(axisLabelFont);
+      this->setAxisTitle(QwtPlot::xBottom, xtitle);
+      break;
+    }
+    case X_TOP_AXIS:
+    {
+      break;
+    }
+    case Y_LEFT_AXIS:
+    {
+      if (_show)
+        axisLabel = "Variable values";
+      QwtText ytitle(QString::fromStdString(axisLabel));
+      ytitle.setFont(axisLabelFont);
+      this->setAxisTitle(QwtPlot::yLeft, ytitle);
+      break;
+    }
+    case Y_RIGHT_AXIS:
+    {
+      break;
+    }
+    default:
+      return;
+  }
 }
 
 /////////////////////////////////////////////////

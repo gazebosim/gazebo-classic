@@ -126,6 +126,11 @@ namespace gazebo
           const std::string &_variable,
           const unsigned int _plotId = EMPTY_PLOT);
 
+      /// \brief Update the axis label for plots in the canvas.
+      /// Currently used to determine which plot will display the x-axis label
+      /// when plots are added/removed
+      private: void UpdateAxisLabel();
+
       /// \brief Qt signal to request self-deletion.
       Q_SIGNALS: void CanvasDeleted();
 

@@ -43,6 +43,22 @@ namespace gazebo
     {
       Q_OBJECT
 
+      /// \brief Axis enum
+      public: enum PlotAxis
+      {
+        /// \brief bottom x axis
+        X_BOTTOM_AXIS = 0,
+
+        /// \brief top x axis
+        X_TOP_AXIS = 1,
+
+        /// \brief left y axis
+        Y_LEFT_AXIS = 2,
+
+        /// \brief right y axis
+        Y_RIGHT_AXIS = 3
+      };
+
       /// \brief Constructor
       /// \param[in] _parent Pointer to a parent widget
       public: IncrementalPlot(QWidget *_parent = NULL);
@@ -105,6 +121,11 @@ namespace gazebo
       /// \param[in] _label New label to set the plot curve to.
       public: void SetCurveLabel(const unsigned int _id,
         const std::string &_label);
+
+      /// \brief Set whether to show the axis label.
+      /// \param[in] _axis Plot axis: X_AXIS or Y_AXIS.
+      /// \param[in] _show True to show the label, false to hide it.
+      public: void ShowAxisLabel(PlotAxis _axis, const bool _show);
 
       /// \brief Get all curves in this plot
       /// \return A list of curves in this plot.
