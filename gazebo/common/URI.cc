@@ -185,11 +185,11 @@ bool URI::operator==(const URI &_uri) const
 /////////////////////////////////////////////////
 bool URIPath::operator==(const URIPath &_path) const
 {
- return this->path == _path.path;
+  return this->path == _path.path;
 }
 
 /////////////////////////////////////////////////
 bool URIQuery::operator==(const URIQuery &_query) const
 {
- return this->values == _query.values;
+  return this->values == _query.values;
 }
