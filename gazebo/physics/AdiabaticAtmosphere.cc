@@ -97,15 +97,6 @@ void AdiabaticAtmosphere::OnAtmosphereMsg(ConstAtmospherePtr &_msg)
   // This should be done first so that the profile settings
   // can be over-ridden by other message parameters.
   Atmosphere::OnAtmosphereMsg(_msg);
-
-  if (_msg->has_enable_atmosphere())
-    this->World()->SetAtmosphereEnabled(_msg->enable_atmosphere());
-
-  if (_msg->has_temperature())
-    this->SetTemperature(_msg->temperature());
-
-  if (_msg->has_pressure())
-    this->SetPressure(_msg->pressure());
 }
 
 //////////////////////////////////////////////////

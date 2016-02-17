@@ -114,8 +114,16 @@ void Atmosphere::OnRequest(ConstRequestPtr &/*_msg*/)
 }
 
 //////////////////////////////////////////////////
-void Atmosphere::OnAtmosphereMsg(ConstAtmospherePtr &/*_msg*/)
+void Atmosphere::OnAtmosphereMsg(ConstAtmospherePtr &_msg)
 {
+  if (_msg->has_enable_atmosphere())
+    this->World()->SetAtmosphereEnabled(_msg->enable_atmosphere());
+
+  if (_msg->has_temperature())
+    this->SetTemperature(_msg->temperature());
+
+  if (_msg->has_pressure())
+    this->SetPressure(_msg->pressure());
 }
 
 //////////////////////////////////////////////////
