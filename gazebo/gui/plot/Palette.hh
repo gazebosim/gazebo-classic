@@ -44,8 +44,11 @@ namespace gazebo
       /// \brief Destructor
       public: ~Palette();
 
-      /// \brief Fill the top panel of the topics tab.
+      /// \brief Fill the topics tab.
       private: void FillTopics(QStandardItemModel *_topicsModel);
+
+      /// \brief Fill the sim tab.
+      private: void FillSim(QStandardItemModel *_simModel);
 
       /// \brief Fill a layout with properties from a protobuf message.
       /// Only plottable fields such as int, double and bool are displayed.

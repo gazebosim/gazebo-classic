@@ -165,24 +165,6 @@ class gazebo::gui::PalettePrivate
 {
   /// \brief Top pane of the topics tab.
   public: QFrame *mainFrame;
-
-  /// \brief Top pane of the topics tab.
-  public: ConfigWidget *topicsTop;
-
-  /// \brief Bottom pane of the topics tab.
-  public: ConfigWidget *topicsBottom;
-
-  /// \brief Bottom pane of the sim tab.
-  public: ConfigWidget *simBottom;
-
-  /// \brief Area for search results.
-  public: ConfigWidget *searchArea;
-
-  /// \brief Bottom pane of the search tab.
-  public: ConfigWidget *searchBottom;
-
-  /// \brief Keep all the information which can be searched.
-  public: QStandardItemModel *searchModel;
 };
 
 /////////////////////////////////////////////////
@@ -202,6 +184,10 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   QStandardItemModel *topicsModel = new TopicsItemModel;
   this->FillTopics(topicsModel);
 
+  // The model that will hold data to be displayed in the simTree view
+  QStandardItemModel *simModel = new TopicsItemModel;
+  this->FillSim(simModel);
+
   // Create a view delegate, to handle drawing items in the topicTree view
   TopicsViewDelegate *topicsViewDelegate = new TopicsViewDelegate;
 
@@ -217,11 +203,23 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   topicsTree->setDragEnabled(true);
   topicsTree->setDragDropMode(QAbstractItemView::DragOnly);
 
+  // A tree to visualize sim variables
+  QTreeView *simTree = new QTreeView;
+  simTree->setObjectName("plottingSimList");
+  simTree->setAnimated(true);
+  simTree->setHeaderHidden(true);
+  simTree->setExpandsOnDoubleClick(true);
+  simTree->setModel(simModel);
+  simTree->setItemDelegate(topicsViewDelegate);
+  simTree->setEditTriggers(QAbstractItemView::NoEditTriggers);
+  simTree->setDragEnabled(true);
+  simTree->setDragDropMode(QAbstractItemView::DragOnly);
+
   // The stacked layout is used by the TabBar to switch active layouts
   auto tabStackedLayout = new QStackedLayout;
   tabStackedLayout->setContentsMargins(0, 0, 0, 0);
   tabStackedLayout->addWidget(topicsTree);
-  //tabStackedLayout->addWidget(simSplitter);
+  tabStackedLayout->addWidget(simTree);
   //tabStackedLayout->addWidget(searchSplitter);
 
   // Connect TabBar to StackedLayout
@@ -294,6 +292,37 @@ void Palette::FillTopics(QStandardItemModel *_topicsModel)
 
     auto msg = msgs::MsgFactory::NewMsg(msgType);
     this->FillFromMsg(msg.get(), topicItem, topic+"?p=");
+  }
+}
+
+/////////////////////////////////////////////////
+void Palette::FillSim(QStandardItemModel *_simModel)
+{
+  // Hard-coded values
+  std::multimap<std::string, std::string> simFields = {
+      {"~/world_stats", "sim_time"},
+      {"~/world_stats", "real_time"},
+      {"~/world_stats", "iterations"}};
+
+  for (auto field : simFields)
+  {
+    auto childItem = new QStandardItem();
+    childItem->setToolTip(tr(
+          "<font size=3><p>Drag to y label to plot.</p></font>"));
+    childItem->setDragEnabled(true);
+
+    auto humanName = ConfigWidget::HumanReadableKey(field.second);
+    childItem->setData(humanName.c_str(), TopicsViewDelegate::TOPIC_NAME_ROLE);
+
+    if (field.second == "iterations")
+      childItem->setData("Uint 64", TopicsViewDelegate::DATA_TYPE_NAME);
+    else
+      childItem->setData("Double", TopicsViewDelegate::DATA_TYPE_NAME);
+
+    std::string dataName = field.first + "?p=/" + field.second;
+    childItem->setData(dataName.c_str(), TopicsViewDelegate::DATA_ROLE);
+
+    _simModel->appendRow(childItem);
   }
 }
 
@@ -415,7 +444,7 @@ void Palette::FillFromMsg(google::protobuf::Message *_msg,
             auto *childItem = new QStandardItem();
             childItem->setData(it.c_str(), TopicsViewDelegate::TOPIC_NAME_ROLE);
             childItem->setData(dataName.c_str(), TopicsViewDelegate::DATA_ROLE);
-            childItem->setData("Dbl", TopicsViewDelegate::DATA_TYPE_NAME);
+            childItem->setData("Double", TopicsViewDelegate::DATA_TYPE_NAME);
 
             childItem->setToolTip(tr(
                 "<font size=3><p>Drag to y label to plot.</p></font>"));
