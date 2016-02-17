@@ -798,6 +798,11 @@ QTextEdit#splashVersionTextEdit
 /* Tab */
 /*---------------------------------------------*/
 
+QTabBar::tab:focus
+{
+  outline: 0px;
+}
+
 QTabBar::tab
 {
   min-width: 8ex;

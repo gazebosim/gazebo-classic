@@ -47,95 +47,16 @@ namespace gazebo
       /// \brief Fill the top panel of the topics tab.
       private: void FillTopics(QStandardItemModel *_topicsModel);
 
-      /// \brief Fill the bottom panel of the sim tab.
-      private: void FillSimBottom();
-
-      /// \brief Fill the bottom panel with plottable properties from a topic.
-      /// The panel to be filled will depend on the widget given, and could be
-      /// for example the bottom pane of the topics tab or the bottom pane of
-      /// search tab.
-      /// \param[in] _topic Scoped topic.
-      /// \param[out] _widget Config widget to be filled.
-      private: void FillTopicsBottom(const std::string &_topic,
-          ConfigWidget *_widget);
-
       /// \brief Fill a layout with properties from a protobuf message.
       /// Only plottable fields such as int, double and bool are displayed.
       /// \param[in] _msg A basic message from the topic's message type.
-      /// \param[in] _scope The topic name scope.
-      /// \param[in] _level Level of message within the tree.
-      /// \param[out _parentLayout Layout to be filled.
+      /// \param[in] _uri The current URI.
       private: void FillFromMsg(google::protobuf::Message *_msg,
-          const std::string &_scope, const unsigned int _level,
-          QVBoxLayout *_parentLayout);
-
-      /// \brief Callback when a topic has been clicked from the topics tab.
-      /// \param[in] _topic Topic scoped name.
-      private slots: void OnTopicClicked(const std::string &_topic);
-
-      /// \brief Callback when a topic has been clicked from the search tab.
-      /// \param[in] _topic Topic scoped name.
-      private slots: void OnTopicSearchClicked(const std::string &_topic);
-
-      /// \brief Callback when the user has modified the search.
-      /// \param[in] _search Latest search.
-      private slots: void UpdateSearch(const QString &_search);
-
-      private slots: void OnCollapse();
+                   QStandardItem *_item, const std::string &_uri);
 
       /// \internal
       /// \brief Pointer to private data.
       private: std::unique_ptr<PalettePrivate> dataPtr;
-    };
-
-    // Forward declare private data class
-    class PlotChildConfigWidgetPrivate;
-
-    /// \brief Config widget with properties helpful for the plot palette.
-    class GZ_GUI_VISIBLE PlotChildConfigWidget : public ConfigChildWidget
-    {
-      Q_OBJECT
-
-      /// \brief Constructor.
-      /// \param[in] _text Text to go on the label.
-      /// \param[in] _level Level in the hierarchy.
-      public: PlotChildConfigWidget(const std::string &_text,
-          const unsigned int _level = 0);
-
-      /// \brief Destructor.
-      public: ~PlotChildConfigWidget();
-
-      /// \brief Get the widget's text.
-      /// \return The text from the widget's label.
-      public: std::string Text() const;
-
-      /// \brief Set whether this can be dragged onto the plot. Widgets
-      /// are not draggable by default.
-      /// \param[in] _draggable True to make it draggable.
-      public: void SetDraggable(const bool _draggable);
-
-      /// \brief Set the information which this item carries when dragged.
-      /// \param[in] _info The information.
-      public: void SetPlotInfo(const std::string &_info);
-
-      /// \brief Signal that this has been clicked.
-      signals: void Clicked(const std::string &);
-
-      // Documentation inherited.
-      protected: virtual void mouseReleaseEvent(QMouseEvent *_event);
-
-      // Documentation inherited.
-      protected: virtual void mousePressEvent(QMouseEvent *_event);
-
-      // Documentation inherited.
-      protected: virtual void enterEvent(QEvent *_event);
-
-      // Documentation inherited.
-      protected: virtual void leaveEvent(QEvent *_event);
-
-      /// \internal
-      /// \brief Pointer to private data.
-      private: std::unique_ptr<PlotChildConfigWidgetPrivate> dataPtr;
     };
   }
 }

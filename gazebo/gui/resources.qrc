@@ -82,5 +82,6 @@
   <file>images/swap-parent-child.png</file>
   <file>images/child-link.png</file>
   <file>images/settings.svg</file>
+  <file>images/graph_line.svg</file>
 </qresource>
 </RCC>
