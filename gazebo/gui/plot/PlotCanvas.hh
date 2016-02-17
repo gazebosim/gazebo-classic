@@ -45,6 +45,10 @@ namespace gazebo
       /// \brief Update plots.
       public: void Update();
 
+      /// \brief Get the title of the plot
+      /// \return Title of the plot
+      public: QString Title() const;
+
       /// \brief Used to filter scroll wheel events.
       /// \param[in] _o Object that receives the event.
       /// \param[in] _event Pointer to the event.

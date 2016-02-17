@@ -189,3 +189,9 @@ void PlotCanvas::OnDeleteCanvas()
 {
   emit CanvasDeleted();
 }
+
+/////////////////////////////////////////////////
+QString PlotCanvas::Title() const
+{
+  return this->dataPtr->title.text();
+}
