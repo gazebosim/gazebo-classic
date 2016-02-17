@@ -117,6 +117,11 @@ QFrame#plotPaletteFrame
   margin: 0px;
 }
 
+QLabel#plottingSearchLabel
+{
+  color: #f58113;
+}
+
 
 QWidget#topicSelector,
 QWidget#cameraSensor,

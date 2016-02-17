@@ -268,6 +268,8 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   this->dataPtr->searchTopicsModel->setFilterRole(
       TopicsViewDelegate::TOPIC_NAME_ROLE);
   this->dataPtr->searchTopicsModel->setSourceModel(this->dataPtr->topicsModel);
+  this->dataPtr->searchTopicsModel->setFilterCaseSensitivity(
+      Qt::CaseInsensitive);
 
   // Create a view delegate, to handle drawing items in the topicTree view
   TopicsViewDelegate *topicsViewDelegate = new TopicsViewDelegate;
@@ -293,6 +295,8 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   this->dataPtr->searchSimModel->setFilterRole(
       TopicsViewDelegate::TOPIC_NAME_ROLE);
   this->dataPtr->searchSimModel->setSourceModel(this->dataPtr->simModel);
+  this->dataPtr->searchSimModel->setFilterCaseSensitivity(
+      Qt::CaseInsensitive);
 
   // A tree to visualize sim variables
   QTreeView *simTree = new QTreeView;
@@ -310,6 +314,7 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   auto searchEdit = new QLineEdit();
   this->connect(searchEdit, SIGNAL(textChanged(QString)), this,
       SLOT(UpdateSearch(QString)));
+  this->UpdateSearch("");
 
   // TODO Complete with other models too
   auto completer = new QCompleter(this->dataPtr->topicsModel, this);
@@ -340,11 +345,17 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   searchSimTree->setDragEnabled(true);
   searchSimTree->setDragDropMode(QAbstractItemView::DragOnly);
 
+  // Search layout
+  auto topicsLabel = new QLabel(tr("Topics"));
+  topicsLabel->setObjectName("plottingSearchLabel");
+  auto simLabel = new QLabel(tr("Sim"));
+  simLabel->setObjectName("plottingSearchLabel");
+
   auto searchLayout = new QVBoxLayout();
   searchLayout->addWidget(searchEdit);
-  searchLayout->addWidget(new QLabel(tr("Topics")));
+  searchLayout->addWidget(topicsLabel);
   searchLayout->addWidget(searchTopicsTree);
-  searchLayout->addWidget(new QLabel(tr("Sim")));
+  searchLayout->addWidget(simLabel);
   searchLayout->addWidget(searchSimTree);
 
   auto searchWidget = new QWidget();
@@ -647,6 +658,9 @@ void Palette::UpdateSearch(const QString &_search)
     }
     exp = exp + ".*$";
   }
+
+  if (exp == "")
+    exp = "_no_match_";
 
   this->dataPtr->searchTopicsModel->setFilterRegExp(exp);
   this->dataPtr->searchSimModel->setFilterRegExp(exp);
