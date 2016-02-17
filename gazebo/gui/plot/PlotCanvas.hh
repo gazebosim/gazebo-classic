@@ -60,15 +60,15 @@ namespace gazebo
       /// \param[in] _plotId Unique id of the plot to add the variable to.
       /// \return Unique id of the variable
       public: unsigned int AddVariable(const std::string &_variable,
-          const unsigned int _plotId = EMPTY_PLOT);
+          const unsigned int _plotId = EmptyPlot);
 
       /// \brief Remove a variable from a plot.
       /// \param[in] _id Unique id of the variable
       /// \param[in] _plotId Unique id of plot to remove the variable from.
-      ///  If EMPTY_PLOT is specified, the function will search through all
+      ///  If EmptyPlot is specified, the function will search through all
       /// plots for the variable and remove it from the plot if found.
       public: void RemoveVariable(const unsigned int _id,
-          const unsigned int _plotId = EMPTY_PLOT);
+          const unsigned int _plotId = EmptyPlot);
 
       /// \brief Add a new plot to the canvas.
       /// \return Unique id of the plot
@@ -121,10 +121,10 @@ namespace gazebo
       /// \param[in] _id Unique id of the variable
       /// \param[in] _variable Name of the variable
       /// \param[in] _plotId Unique id of the plot to add the variable to.
-      /// EMPTY_PLOT means add to a new plot.
+      /// EmptyPlot means add to a new plot.
       private: void AddVariable(const unsigned int _id,
           const std::string &_variable,
-          const unsigned int _plotId = EMPTY_PLOT);
+          const unsigned int _plotId = EmptyPlot);
 
       /// \brief Update the axis label for plots in the canvas.
       /// Currently used to determine which plot will display the x-axis label
@@ -169,7 +169,7 @@ namespace gazebo
       private slots: void OnDeleteCanvas();
 
       /// \brief Empty plot used to indicate non-existent plot.
-      public: static unsigned int EMPTY_PLOT;
+      public: static const unsigned int EmptyPlot;
 
       /// \internal
       /// \brief Pointer to private data.

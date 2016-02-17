@@ -140,14 +140,14 @@ unsigned int VariablePillContainer::AddVariablePill(const std::string &_name,
   if (this->dataPtr->maxSize != -1 &&
       static_cast<int>(this->VariablePillCount()) >= this->dataPtr->maxSize)
   {
-    return VariablePill::EMPTY_VARIABLE;
+    return VariablePill::EmptyVariable;
   }
 
-  if (_targetId != VariablePill::EMPTY_VARIABLE &&
+  if (_targetId != VariablePill::EmptyVariable &&
     !this->GetVariablePill(_targetId))
   {
     gzerr << "Unable to add variable. Target variable not found" << std::endl;
-    return VariablePill::EMPTY_VARIABLE;
+    return VariablePill::EmptyVariable;
   }
 
   VariablePill *variable = new VariablePill;
@@ -176,7 +176,7 @@ void VariablePillContainer::AddVariablePill(VariablePill *_variable,
     return;
 
   // add to target variable if it's not empty
-  if (_targetId != VariablePill::EMPTY_VARIABLE)
+  if (_targetId != VariablePill::EmptyVariable)
   {
     VariablePill *targetVariable = this->GetVariablePill(_targetId);
     if (!targetVariable)
@@ -189,8 +189,8 @@ void VariablePillContainer::AddVariablePill(VariablePill *_variable,
   {
     // check if variable already exists in this container
     // check only top level variables
-    auto it = this->dataPtr->variables.find(_variable->Id());
-    if (it != this->dataPtr->variables.end())
+    if (this->dataPtr->variables.find(_variable->Id()) !=
+        this->dataPtr->variables.end())
     {
       return;
     }
@@ -265,7 +265,7 @@ void VariablePillContainer::RemoveVariablePill(const unsigned int _id)
       variable->Parent()->RemoveVariablePill(variable);
     }
     else
-      emit VariableRemoved(variable->Id(), VariablePill::EMPTY_VARIABLE);
+      emit VariableRemoved(variable->Id(), VariablePill::EmptyVariable);
   }
 
   // otherwise remove from container
@@ -404,7 +404,7 @@ void VariablePillContainer::dropEvent(QDropEvent *_evt)
     this->AddVariablePill(variable);
     this->blockSignals(false);
 
-    emit VariableMoved(variable->Id(), VariablePill::EMPTY_VARIABLE);
+    emit VariableMoved(variable->Id(), VariablePill::EmptyVariable);
   }
 }
 

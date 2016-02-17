@@ -75,7 +75,7 @@ namespace gazebo
 }
 
 // empty plot id
-unsigned int PlotCanvas::EMPTY_PLOT = IGN_UINT32_MAX;
+const unsigned int PlotCanvas::EmptyPlot = IGN_UINT32_MAX;
 
 // global plot id count
 unsigned int PlotCanvasPrivate::globalPlotId = 0;
@@ -226,8 +226,8 @@ void PlotCanvas::SetVariableLabel(const unsigned int _id,
 unsigned int PlotCanvas::AddVariable(const std::string &_variable,
     const unsigned int _plotId)
 {
-  unsigned int targetId = VariablePill::EMPTY_VARIABLE;
-  if (_plotId != EMPTY_PLOT)
+  unsigned int targetId = VariablePill::EmptyVariable;
+  if (_plotId != EmptyPlot)
   {
     // find a variable that belongs to the specified plotId and make that the
     // the target variable that the new variable will be added to
@@ -250,7 +250,7 @@ void PlotCanvas::AddVariable(const unsigned int _id,
     const std::string &_variable, const unsigned int _plotId)
 {
   unsigned int plotId;
-  if (_plotId == EMPTY_PLOT)
+  if (_plotId == EmptyPlot)
   {
     // create new plot for the variable and add plot to canvas
     plotId = this->AddPlot();
@@ -280,7 +280,7 @@ void PlotCanvas::RemoveVariable(const unsigned int _id,
     const unsigned int _plotId)
 {
   auto it = this->dataPtr->plotData.end();
-  if (_plotId == EMPTY_PLOT)
+  if (_plotId == EmptyPlot)
   {
     for (auto pIt = this->dataPtr->plotData.begin();
         pIt != this->dataPtr->plotData.end(); ++pIt)
@@ -407,14 +407,14 @@ unsigned int PlotCanvas::PlotByVariable(const unsigned int _variableId) const
       return it.first;
     }
   }
-  return EMPTY_PLOT;
+  return EmptyPlot;
 }
 
 /////////////////////////////////////////////////
 void PlotCanvas::OnAddVariable(const unsigned int _id,
     const std::string &_variable, const unsigned int _targetId)
 {
-  if (_targetId != VariablePill::EMPTY_VARIABLE)
+  if (_targetId != VariablePill::EmptyVariable)
   {
     // Add a variable to existing plot
     for (const auto it : this->dataPtr->plotData)

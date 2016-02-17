@@ -53,8 +53,11 @@ namespace gazebo
       /// \brief Drawing utility
       public: QwtPlotDirectPainter *directPainter;
 
-      /// \brief Pointer to the plot maginfier
+      /// \brief Pointer to the plot panner
       public: QwtPlotMagnifier *magnifier;
+
+      /// \brief Pointer to the plot maginfier
+      public: QwtPlotPanner *panner;
 
       /// \brief Period duration in seconds.
       public: unsigned int period;
@@ -73,7 +76,7 @@ IncrementalPlot::IncrementalPlot(QWidget *_parent)
   this->dataPtr->directPainter = new QwtPlotDirectPainter(this);
 
   // panning with the left mouse button
-  (void) new QwtPlotPanner(this->canvas());
+  this->dataPtr->panner = new QwtPlotPanner(this->canvas());
 
   // zoom in/out with the wheel
   this->dataPtr->magnifier = new QwtPlotMagnifier(this->canvas());
@@ -244,9 +247,9 @@ void IncrementalPlot::Update()
 }
 
 /////////////////////////////////////////////////
-void IncrementalPlot::SetPeriod(const unsigned int _seconds)
+void IncrementalPlot::SetPeriod(const common::Time &_time)
 {
-  this->dataPtr->period = _seconds;
+  this->dataPtr->period = _time.Double();
 }
 
 /////////////////////////////////////////////////

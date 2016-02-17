@@ -24,6 +24,8 @@
 
 #include <ignition/math/Vector2.hh>
 
+#include "gazebo/common/Time.hh"
+
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/plot/qwt_gazebo.h"
 #include "gazebo/gui/plot/PlottingTypes.hh"
@@ -104,8 +106,8 @@ namespace gazebo
       public: void RemoveCurve(const unsigned int _id);
 
       /// \brief Set the period over which to plot.
-      /// \param[in] _seconds Period duration in seconds.
-      public: void SetPeriod(const unsigned int _seconds);
+      /// \param[in] _time Period duration in seconds.
+      public: void SetPeriod(const common::Time &_time);
 
       /// \brief Attach a curve to this plot.
       /// \param[in] _plotCurve The curve to attach to the plot.
