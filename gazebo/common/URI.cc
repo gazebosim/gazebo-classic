@@ -123,12 +123,11 @@ URIPath &URIPath::operator=(const URIPath &_path)
 }
 
 /////////////////////////////////////////////////
-const URIQuery URIQuery::Insert(const std::string &_key,
-                                    const std::string &_value) const
+const URIQuery &URIQuery::Insert(const std::string &_key,
+                                const std::string &_value)
 {
-  URIQuery result = *this;
-  result.values.insert(std::make_pair(_key, _value));
-  return result;
+  this->values.insert(std::make_pair(_key, _value));
+  return *this;
 }
 
 /////////////////////////////////////////////////

@@ -83,8 +83,8 @@ namespace gazebo
 
       /// \brief Get this query with a new _key=_value pair added.
       /// \return This query with the additional _key = _value pair
-      public: const URIQuery Insert(const std::string &_key,
-                                 const std::string &_value) const;
+      public: const URIQuery &Insert(const std::string &_key,
+                                     const std::string &_value);
 
       public: URIQuery &operator=(const URIQuery &_query);
 

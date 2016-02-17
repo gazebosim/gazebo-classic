@@ -15,13 +15,18 @@
  *
 */
 
-#include "gazebo/common/Uri.hh"
+#include <gtest/gtest.h>
+
+#include "gazebo/common/URI.hh"
+#include "test/util.hh"
 
 using namespace gazebo;
 using namespace common;
 
+class URITest : public gazebo::testing::AutoLogFixture { };
+
 /////////////////////////////////////////////////
-TEST(URITEST, Scheme)
+TEST_F(URITest, Scheme)
 {
   URI uri;
   EXPECT_TRUE(uri.Str().empty());
@@ -31,7 +36,7 @@ TEST(URITEST, Scheme)
 }
 
 /////////////////////////////////////////////////
-TEST(URITEST, Path)
+TEST_F(URITest, Path)
 {
   URI uri;
   uri.SetScheme("data");
@@ -44,12 +49,12 @@ TEST(URITEST, Path)
 }
 
 /////////////////////////////////////////////////
-TEST(URITEST, Query)
+TEST_F(URITest, Query)
 {
   URI uri;
   uri.SetScheme("data");
 
-  uri.Query().Add("p", "v");
+  uri.Query().Insert("p", "v");
   EXPECT_EQ(uri.Str(), "data://?p=v");
 
   uri.Path().PushFront("default");
