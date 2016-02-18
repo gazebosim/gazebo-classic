@@ -123,7 +123,7 @@ void LogPlay::Open(const std::string &_logFile)
   if (xmlParserFail)
   {
     gzerr << "Unable to load file[" << _logFile << "]. "
-      << "Check the Gazebo server log file for more information";
+      << "Check the Gazebo server log file for more information.\n";
     gzlog << "Log Error 1:\n"
       << this->dataPtr->xmlDoc.GetErrorStr1() << std::endl;
     gzlog << "Log Error 2:\n"
