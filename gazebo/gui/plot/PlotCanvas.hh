@@ -65,7 +65,7 @@ namespace gazebo
       /// \brief Remove a variable from a plot.
       /// \param[in] _id Unique id of the variable
       /// \param[in] _plotId Unique id of plot to remove the variable from.
-      ///  If EmptyPlot is specified, the function will search through all
+      /// If EmptyPlot is specified, the function will search through all
       /// plots for the variable and remove it from the plot if found.
       public: void RemoveVariable(const unsigned int _id,
           const unsigned int _plotId = EmptyPlot);
@@ -96,7 +96,7 @@ namespace gazebo
 
       /// \brief Get the plot id which the variable is plotted in
       /// \param[in] _id Unique id of the variable
-      /// \return _id Unique id of the plot
+      /// \return Unique id of the plot
       public: unsigned int PlotByVariable(const unsigned int _variableId) const;
 
       /// \brief Get all the plots in this canvas.
@@ -114,7 +114,8 @@ namespace gazebo
       /// \brief Used to filter scroll wheel events.
       /// \param[in] _o Object that receives the event.
       /// \param[in] _event Pointer to the event.
-      public: virtual bool eventFilter(QObject *_o, QEvent *_e);
+      /// \return True if event was handled.
+      public: virtual bool eventFilter(QObject *_o, QEvent *_event);
 
       /// \brief Add a variable to a plot. Note this function
       /// only updates the plot but not the variable pill container.
@@ -138,21 +139,21 @@ namespace gazebo
       /// \param[in] _id Unique id of the variable
       /// \param[in] _variable Name of the variable
       /// \param[in] _targetId Unique id of the target variable that the
-      /// the variable is now co-located with.
+      /// variable is now co-located with.
       private slots: void OnAddVariable(const unsigned int _id,
           const std::string &_variable, const unsigned int _targetId);
 
       /// \brief Qt Callback when a variable has been removed.
       /// \param[in] _id Unique id of the variable
       /// \param[in] _targetId Unique id of the target variable that the
-      /// the variable was co-located with.
+      /// variable was co-located with.
       private slots: void OnRemoveVariable(const unsigned int _id,
                 const unsigned int _targetId);
 
       /// \brief Qt Callback when a variable has moved from one plot to another.
       /// \param[in] _id Unique id of the variable that has moved.
       /// \param[in] _targetId Unique id of the target variable that the
-      /// the moved variable is now co-located with.
+      /// moved variable is now co-located with.
       private slots: void OnMoveVariable(const unsigned int _id,
           const unsigned int _targetId);
 

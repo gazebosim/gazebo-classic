@@ -53,10 +53,10 @@ namespace gazebo
       /// \brief Drawing utility
       public: QwtPlotDirectPainter *directPainter;
 
-      /// \brief Pointer to the plot panner
+      /// \brief Pointer to the plot maginfier.
       public: QwtPlotMagnifier *magnifier;
 
-      /// \brief Pointer to the plot maginfier
+      /// \brief Pointer to the plot panner.
       public: QwtPlotPanner *panner;
 
       /// \brief Period duration in seconds.
@@ -80,6 +80,10 @@ IncrementalPlot::IncrementalPlot(QWidget *_parent)
 
   // zoom in/out with the wheel
   this->dataPtr->magnifier = new QwtPlotMagnifier(this->canvas());
+  // invert the wheel direction
+  double wheelFactor = this->dataPtr->magnifier->wheelFactor();
+  if (!ignition::math::equal(wheelFactor, 0.0))
+    this->dataPtr->magnifier->setWheelFactor(1/wheelFactor);
 
 #if defined(Q_WS_X11)
   this->canvas()->setAttribute(Qt::WA_PaintOutsidePaintEvent, true);
@@ -105,12 +109,12 @@ IncrementalPlot::IncrementalPlot(QWidget *_parent)
 #endif
   grid->attach(this);
 
-  this->ShowAxisLabel(X_BOTTOM_AXIS, true);
-  this->ShowAxisLabel(Y_LEFT_AXIS, true);
-
   this->enableAxis(QwtPlot::yLeft);
   this->setAxisScaleEngine(QwtPlot::yLeft, new QwtLinearScaleEngine());
   this->setAxisAutoScale(QwtPlot::yLeft, true);
+
+  this->ShowAxisLabel(X_BOTTOM_AXIS, true);
+  this->ShowAxisLabel(Y_LEFT_AXIS, true);
 
   this->replot();
 }

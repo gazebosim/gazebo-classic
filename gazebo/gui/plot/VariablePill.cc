@@ -457,6 +457,11 @@ bool VariablePill::IsDragValid(QDropEvent *_evt)
     if (!dragVariable)
       return false;
 
+    // limit drag and drop to same container
+    if (dragVariable->Container() &&
+        dragVariable->Container() != this->Container())
+      return false;
+
     variableName = dragVariable->Name();
   }
   else
