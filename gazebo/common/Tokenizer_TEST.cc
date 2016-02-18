@@ -22,7 +22,7 @@ using namespace gazebo;
 using namespace common;
 
 /////////////////////////////////////////////////
-TEST(URITEST, URIPath)
+TEST(URITEST, TokenizerTest)
 {
   Tokenizer tk1("abc/def");
   auto tokens = tk1.Split("/");
