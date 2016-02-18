@@ -30,7 +30,7 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 MultiRayShape::MultiRayShape(CollisionPtr _parent)
-  : Shape(_parent)
+: Shape(_parent)
 {
   this->AddType(MULTIRAY_SHAPE);
   this->SetName("multiray");
@@ -38,10 +38,8 @@ MultiRayShape::MultiRayShape(CollisionPtr _parent)
 
 //////////////////////////////////////////////////
 MultiRayShape::MultiRayShape(PhysicsEnginePtr /*_physicsEngine*/)
-  : Shape(CollisionPtr())
+: MultiRayShape(CollisionPtr())
 {
-  this->AddType(MULTIRAY_SHAPE);
-  this->SetName("multiray");
 }
 
 //////////////////////////////////////////////////

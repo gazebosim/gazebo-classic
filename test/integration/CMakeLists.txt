@@ -140,6 +140,7 @@ gz_build_display_tests(${display_tests})
 set(dri_tests
   camera.cc
   camera_sensor.cc
+  depth_camera.cc
   factory.cc
   gpu_laser.cc
   gz_camera.cc
