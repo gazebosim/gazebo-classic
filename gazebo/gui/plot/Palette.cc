@@ -56,12 +56,69 @@ class TopicsViewDelegate : public QStyledItemDelegate
   public: void paint(QPainter *_painter, const QStyleOptionViewItem &_opt,
                      const QModelIndex &_index) const
   {
-    QFont font = QApplication::font();
+    // Find depth of this item
+    int depth = 0;
+    QModelIndex index = _index;
+    while (index.parent().isValid())
+    {
+      index = index.parent();
+      depth++;
+    }
+
+    // Choose font according to depth
+    QFont font;
+    QFont::Weight fontWeight;
+    switch (depth)
+    {
+      case 0:
+      {
+        font.setFamily("Roboto Black");
+        fontWeight = QFont::Black;
+        break;
+      }
+      case 1:
+      {
+        font.setFamily("Roboto Bold");
+        fontWeight = QFont::Bold;
+        break;
+      }
+      case 2:
+      {
+        font.setFamily("Roboto Medium");
+        fontWeight = QFont::Normal;
+        break;
+      }
+      case 3:
+      {
+        font.setFamily("Roboto Regular");
+        fontWeight = QFont::Normal;
+        break;
+      }
+      case 4:
+      {
+        font.setFamily("Roboto Light");
+        fontWeight = QFont::Light;
+        break;
+      }
+      case 5:
+      {
+        font.setFamily("Roboto Thin");
+        fontWeight = QFont::Light;
+        break;
+      }
+      default:
+      {
+        font.setFamily("Roboto Regular");
+        fontWeight = QFont::Normal;
+      }
+    }
     QFontMetrics fm(font);
 
+    // Bounding box for each text line
     QRectF r = _opt.rect;
     QRectF r2 = _opt.rect;
 
+    // Custom options
     QString topicName = qvariant_cast<QString>(_index.data(TOPIC_NAME_ROLE));
     QString typeName = qvariant_cast<QString>(_index.data(DATA_TYPE_NAME));
 
@@ -111,7 +168,7 @@ class TopicsViewDelegate : public QStyledItemDelegate
 
       // Paint data type
       _painter->setPen(QColor(110, 110, 110));
-      _painter->setFont(QFont(font.family(), font.pointSize()-1));
+      _painter->setFont(QFont(font.family(), font.pointSize()-depth-1));
       _painter->drawText(r2, "Type: " + typeName);
       _painter->setFont(font);
     }
@@ -121,6 +178,7 @@ class TopicsViewDelegate : public QStyledItemDelegate
       r.adjust(0, 5, 0, -5);
     }
 
+    _painter->setFont(QFont(font.family(), font.pointSize()-depth, fontWeight));
     _painter->setPen(QColor(30, 30, 30));
     _painter->drawText(r, topicName);
   }
@@ -133,7 +191,7 @@ class TopicsViewDelegate : public QStyledItemDelegate
   {
     QString typeName = qvariant_cast<QString>(_index.data(DATA_TYPE_NAME));
     QSize size = QStyledItemDelegate::sizeHint(_option, _index);
-    QFont font = QApplication::font();
+    QFont font("Roboto Regular");
     QFontMetrics fm(font);
 
     // Increase height if a data type name will be painted
@@ -273,6 +331,15 @@ class gazebo::gui::PalettePrivate
 Palette::Palette(QWidget *_parent) : QWidget(_parent),
     dataPtr(new PalettePrivate)
 {
+  QFontDatabase::addApplicationFont(":/fonts/Roboto-Regular.ttf");
+  QFontDatabase::addApplicationFont(":/fonts/Roboto-Bold.ttf");
+  QFontDatabase::addApplicationFont(":/fonts/Roboto-Black.ttf");
+  QFontDatabase::addApplicationFont(":/fonts/Roboto-Medium.ttf");
+  QFontDatabase::addApplicationFont(":/fonts/Roboto-Light.ttf");
+  QFontDatabase::addApplicationFont(":/fonts/Roboto-Thin.ttf");
+//  QFont newFont(":/fonts/Roboto-Regular.ttf");
+  //QApplication::setFont(newFont);
+
   // The tab bar along the top.
   auto tabBar = new QTabBar;
   tabBar->addTab("Topics");
@@ -436,7 +503,7 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   mainLayout->setSpacing(0);
 
   // Just a minimum size to prevent tab bar scrolling
-  this->setMinimumWidth(300);
+  this->setMinimumWidth(320);
 
   this->setLayout(mainLayout);
 }
