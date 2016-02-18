@@ -53,10 +53,10 @@ namespace gazebo
       /// \brief Drawing utility
       public: QwtPlotDirectPainter *directPainter;
 
-      /// \brief Pointer to the plot panner
+      /// \brief Pointer to the plot maginfier.
       public: QwtPlotMagnifier *magnifier;
 
-      /// \brief Pointer to the plot maginfier
+      /// \brief Pointer to the plot panner.
       public: QwtPlotPanner *panner;
 
       /// \brief Period duration in seconds.
