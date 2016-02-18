@@ -351,6 +351,9 @@ std::vector<PlotCurveWeakPtr> IncrementalPlot::Curves() const
 /////////////////////////////////////////////////
 QSize IncrementalPlot::sizeHint() const
 {
-  // TODO find better way to specify plot size
-  return QSize(500, 380);
+  int padding = 50;
+  QSize s = QWidget::sizeHint();
+  s.setWidth(s.width()+padding);
+  s.setHeight(s.height()+padding);
+  return s;
 }

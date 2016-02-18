@@ -98,7 +98,7 @@ PlotCanvas::PlotCanvas(QWidget *_parent)
   QAction *clearPlotAct = new QAction("Clear all fields", settingsMenu);
   clearPlotAct->setStatusTip(tr("Clear variables and all plots on canvas"));
   connect(clearPlotAct, SIGNAL(triggered()), this, SLOT(OnClearCanvas()));
-  QAction *deletePlotAct = new QAction("Delete Plot", settingsMenu);
+  QAction *deletePlotAct = new QAction("Delete canvas", settingsMenu);
   deletePlotAct->setStatusTip(tr("Delete entire canvas"));
   connect(deletePlotAct, SIGNAL(triggered()), this, SLOT(OnDeleteCanvas()));
 
@@ -322,6 +322,8 @@ void PlotCanvas::RemoveVariable(const unsigned int _id,
     delete it->second->plot;
     delete it->second;
     this->dataPtr->plotData.erase(it);
+
+    this->UpdateAxisLabel();
   }
   else
   {
@@ -699,12 +701,53 @@ std::vector<IncrementalPlot *> PlotCanvas::Plots()
 /////////////////////////////////////////////////
 void PlotCanvas::OnClearCanvas()
 {
+  // Ask for confirmation
+  std::string msg = "Are you sure you want to clear all fields? \n\n"
+        "This will remove all the plots in this canvas. \n";
+
+  QMessageBox msgBox(QMessageBox::Warning, QString("Clear canvas?"),
+      QString(msg.c_str()));
+  msgBox.setWindowFlags(Qt::Window | Qt::WindowTitleHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
+
+  QPushButton *cancelButton =
+      msgBox.addButton("Cancel", QMessageBox::RejectRole);
+  QPushButton *clearButton = msgBox.addButton("Clear",
+      QMessageBox::AcceptRole);
+  msgBox.setDefaultButton(clearButton);
+  msgBox.setEscapeButton(cancelButton);
+  msgBox.show();
+  msgBox.move(this->mapToGlobal(this->pos()));
+  msgBox.exec();
+  if (msgBox.clickedButton() != clearButton)
+    return;
+
   this->Clear();
 }
 
 /////////////////////////////////////////////////
 void PlotCanvas::OnDeleteCanvas()
 {
+  // Ask for confirmation
+  std::string msg = "Are you sure you want to delete the entire canvas? \n";
+
+  QMessageBox msgBox(QMessageBox::Warning, QString("Delete canvas?"),
+      QString(msg.c_str()));
+  msgBox.setWindowFlags(Qt::Window | Qt::WindowTitleHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
+
+  QPushButton *cancelButton =
+      msgBox.addButton("Cancel", QMessageBox::RejectRole);
+  QPushButton *deleteButton = msgBox.addButton("Delete",
+      QMessageBox::AcceptRole);
+  msgBox.setDefaultButton(deleteButton);
+  msgBox.setEscapeButton(cancelButton);
+  msgBox.show();
+  msgBox.move(this->mapToGlobal(this->pos()));
+  msgBox.exec();
+  if (msgBox.clickedButton() != deleteButton)
+    return;
+
   emit CanvasDeleted();
 }
 
