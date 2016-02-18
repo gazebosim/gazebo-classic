@@ -705,5 +705,5 @@ void PlotCanvas::OnDeleteCanvas()
 /////////////////////////////////////////////////
 QString PlotCanvas::Title() const
 {
-  return this->dataPtr->title.text();
+  return this->dataPtr->title->text();
 }

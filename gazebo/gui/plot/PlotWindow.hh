@@ -63,9 +63,6 @@ namespace gazebo
       /// variable in the plot. Existing plot curves will no longer be updated.
       public: void Restart();
 
-      /// \brief Export all canvas plots.
-      public: void Export();
-
       /// \brief Update all canvases
       public slots: void Update();
 

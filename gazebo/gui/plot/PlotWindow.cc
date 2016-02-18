@@ -17,6 +17,7 @@
 
 #include <mutex>
 
+#include "gazebo/gui/plot/ExportDialog.hh"
 #include "gazebo/gui/plot/PlotCanvas.hh"
 #include "gazebo/gui/plot/PlotCurve.hh"
 #include "gazebo/gui/plot/IncrementalPlot.hh"
@@ -319,30 +320,24 @@ void PlotWindow::Restart()
 }
 
 /////////////////////////////////////////////////
-void PlotWindow::Export()
+void PlotWindow::OnExport()
 {
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  ExportDialog *dialog = new ExportDialog(this);
+  dialog->show();
+}
+
+/////////////////////////////////////////////////
+std::list<PlotCanvas*> PlotWindow::Plots()
+{
+  std::list<PlotCanvas*> result;
   for (int i = 0; i < this->dataPtr->canvasLayout->count(); ++i)
   {
     QLayoutItem *item = this->dataPtr->canvasLayout->itemAt(i);
     PlotCanvas *canvas = qobject_cast<PlotCanvas *>(item->widget());
     if (!canvas)
       continue;
-
-    for (const auto &plot : canvas->Plots())
-    {
-      for (const auto &curve : plot->Curves())
-      {
-        auto c = curve.lock();
-        if (!c)
-          continue;
-
-        for (unsigned int j = 0; j < c->Size(); ++j)
-        {
-          ignition::math::Vector2d pt = c->Point(j);
-          std::cerr << pt.X() << ", " << pt.Y() << std::endl;
-        }
-      }
-    }
+    result.push_back(canvas);
   }
+
+  return result;
 }
