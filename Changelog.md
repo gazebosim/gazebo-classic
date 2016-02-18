@@ -2,6 +2,9 @@
 
 ## Gazebo 7.x.x (2016-xx-xx)
 
+1. Append a missing </gazebo_log> tag to log files when played.
+    * [Pull request #2143](https://bitbucket.org/osrf/gazebo/pull-request/2143)
+
 1. Undo scaling during simulation
     * [Pull request #2108](https://bitbucket.org/osrf/gazebo/pull-request/2108)
 
