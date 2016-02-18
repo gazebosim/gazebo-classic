@@ -46,6 +46,7 @@ namespace gazebo
 
       /// \brief Fill the topics tab.
       private: void FillTopics(QStandardItemModel *_topicsModel);
+      private: void FillModels(QStandardItemModel *_topicsModel);
 
       /// \brief Fill the sim tab.
       private: void FillSim(QStandardItemModel *_simModel);

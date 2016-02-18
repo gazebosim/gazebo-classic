@@ -73,8 +73,26 @@ class TopicsViewDelegate : public QStyledItemDelegate
       _painter->drawRect(_opt.rect);
     }
 
+    // Paint the icon, if present
+    if (typeName == "model" || typeName == "link" || typeName == "collision" ||
+        typeName == "visual" || typeName == "joint")
+    {
+      double iconSize = 15;
+
+      r.adjust(iconSize + 8, 5, 0, -5);
+      QRectF iconRect = _opt.rect;
+      iconRect.setTop(iconRect.top() + (_opt.rect.height()/2.0 - iconSize/2.0));
+
+      // Paint icon
+      _painter->setPen(QColor(90, 90, 90));
+      _painter->setBrush(QColor(90, 90, 90));
+
+      QIcon icon(":/images/" + typeName  + ".svg");
+      _painter->drawPixmap(iconRect.left(), iconRect.top(),
+          icon.pixmap(iconSize, iconSize));
+    }
     // Paint the icon and data type, if present
-    if (!typeName.isEmpty())
+    else if (!typeName.isEmpty())
     {
       double iconSize = 24;
 
@@ -119,8 +137,11 @@ class TopicsViewDelegate : public QStyledItemDelegate
     QFontMetrics fm(font);
 
     // Increase height if a data type name will be painted
-    if (typeName.isEmpty())
+    if (typeName == "model" || typeName == "link" || typeName == "collision" ||
+        typeName == "visual" || typeName == "joint" || typeName.isEmpty())
+    {
       size.setHeight(fm.height() + 10);
+    }
     else
       size.setHeight(fm.height() * 2 + 10);
     return size;
@@ -241,8 +262,10 @@ class gazebo::gui::PalettePrivate
   public: QFrame *mainFrame;
 
   public: TopicsItemModel *topicsModel;
+  public: TopicsItemModel *modelsModel;
   public: TopicsItemModel *simModel;
   public: SearchModel *searchTopicsModel;
+  public: SearchModel *searchModelsModel;
   public: SearchModel *searchSimModel;
 };
 
@@ -253,11 +276,15 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   // The tab bar along the top.
   auto tabBar = new QTabBar;
   tabBar->addTab("Topics");
+  tabBar->addTab("Models");
   tabBar->addTab("Sim");
   tabBar->addTab("Search");
   tabBar->setExpanding(true);
   tabBar->setDrawBase(false);
   tabBar->setFocusPolicy(Qt::NoFocus);
+
+  // Create a view delegate, to handle drawing items in the topicTree view
+  TopicsViewDelegate *topicsViewDelegate = new TopicsViewDelegate;
 
   // The model that will hold data to be displayed in the topicTree view
   this->dataPtr->topicsModel = new TopicsItemModel;
@@ -271,9 +298,6 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   this->dataPtr->searchTopicsModel->setFilterCaseSensitivity(
       Qt::CaseInsensitive);
 
-  // Create a view delegate, to handle drawing items in the topicTree view
-  TopicsViewDelegate *topicsViewDelegate = new TopicsViewDelegate;
-
   // A tree to visualize the topics and their messages.
   QTreeView *topicsTree = new QTreeView;
   topicsTree->setObjectName("topicList");
@@ -285,6 +309,30 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   topicsTree->setEditTriggers(QAbstractItemView::NoEditTriggers);
   topicsTree->setDragEnabled(true);
   topicsTree->setDragDropMode(QAbstractItemView::DragOnly);
+
+  // The model that will hold data to be displayed in the modelTree view
+  this->dataPtr->modelsModel = new TopicsItemModel;
+  this->FillModels(this->dataPtr->modelsModel);
+
+  // A proxy model to filter model model
+  this->dataPtr->searchModelsModel = new SearchModel;
+  this->dataPtr->searchModelsModel->setFilterRole(
+      TopicsViewDelegate::TOPIC_NAME_ROLE);
+  this->dataPtr->searchModelsModel->setSourceModel(this->dataPtr->modelsModel);
+  this->dataPtr->searchModelsModel->setFilterCaseSensitivity(
+      Qt::CaseInsensitive);
+
+  // A tree to visualize the models and their messages.
+  QTreeView *modelsTree = new QTreeView;
+  modelsTree->setObjectName("topicList");
+  modelsTree->setAnimated(true);
+  modelsTree->setHeaderHidden(true);
+  modelsTree->setExpandsOnDoubleClick(true);
+  modelsTree->setModel(this->dataPtr->modelsModel);
+  modelsTree->setItemDelegate(topicsViewDelegate);
+  modelsTree->setEditTriggers(QAbstractItemView::NoEditTriggers);
+  modelsTree->setDragEnabled(true);
+  modelsTree->setDragDropMode(QAbstractItemView::DragOnly);
 
   // The model that will hold data to be displayed in the simTree view
   this->dataPtr->simModel = new TopicsItemModel;
@@ -300,7 +348,7 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
 
   // A tree to visualize sim variables
   QTreeView *simTree = new QTreeView;
-  simTree->setObjectName("plottingSimList");
+  simTree->setObjectName("topicList");
   simTree->setAnimated(true);
   simTree->setHeaderHidden(true);
   simTree->setExpandsOnDoubleClick(true);
@@ -323,7 +371,7 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
 
   // A tree to visualize topics search results
   QTreeView *searchTopicsTree = new QTreeView;
-  searchTopicsTree->setObjectName("plottingSimList");
+  searchTopicsTree->setObjectName("topicList");
   searchTopicsTree->setAnimated(true);
   searchTopicsTree->setHeaderHidden(true);
   searchTopicsTree->setExpandsOnDoubleClick(true);
@@ -335,7 +383,7 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
 
   // A tree to visualize sim search results
   QTreeView *searchSimTree = new QTreeView;
-  searchSimTree->setObjectName("plottingSimList");
+  searchSimTree->setObjectName("topicList");
   searchSimTree->setAnimated(true);
   searchSimTree->setHeaderHidden(true);
   searchSimTree->setExpandsOnDoubleClick(true);
@@ -365,6 +413,7 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   auto tabStackedLayout = new QStackedLayout;
   tabStackedLayout->setContentsMargins(0, 0, 0, 0);
   tabStackedLayout->addWidget(topicsTree);
+  tabStackedLayout->addWidget(modelsTree);
   tabStackedLayout->addWidget(simTree);
   tabStackedLayout->addWidget(searchWidget);
 
@@ -387,7 +436,7 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   mainLayout->setSpacing(0);
 
   // Just a minimum size to prevent tab bar scrolling
-  this->setMinimumWidth(260);
+  this->setMinimumWidth(300);
 
   this->setLayout(mainLayout);
 }
@@ -438,6 +487,146 @@ void Palette::FillTopics(QStandardItemModel *_topicsModel)
 
     auto msg = msgs::MsgFactory::NewMsg(msgType);
     this->FillFromMsg(msg.get(), topicItem, topic+"?p=");
+  }
+}
+
+/////////////////////////////////////////////////
+void Palette::FillModels(QStandardItemModel *_modelsModel)
+{
+  // Hard-coded values
+  std::vector<std::string> models = {"robot_model", "another_model",
+      "one_more_model_here"};
+  std::vector<std::string> nestedModels = {"a_model_inside_a_model",
+      "nested_model_ftw"};
+  std::vector<std::string> links = {"a_link", "another_link",
+      "lots_and_lots_of_links_"};
+  std::vector<std::string> joints = {"I_rotate", "I_am_fixed",
+      "i_do_complex_things"};
+  std::vector<std::string> collisions = {"collision_1", "that_other_collision"};
+  std::vector<std::string> visuals = {"visual_1", "that_other_visual"};
+  std::vector<std::string> properties = {"pose", "velocity", "acceleration"};
+  std::vector<std::string> orientations = {"roll", "pitch", "yaw"};
+
+  for (auto model : models)
+  {
+    auto modelItem = new QStandardItem();
+    modelItem->setData(model.c_str(), TopicsViewDelegate::TOPIC_NAME_ROLE);
+    modelItem->setData("model", TopicsViewDelegate::DATA_TYPE_NAME);
+    _modelsModel->appendRow(modelItem);
+
+    for (auto nestedModel : nestedModels)
+    {
+      auto nestedModelItem = new QStandardItem();
+      nestedModelItem->setData(nestedModel.c_str(),
+          TopicsViewDelegate::TOPIC_NAME_ROLE);
+      nestedModelItem->setData("model", TopicsViewDelegate::DATA_TYPE_NAME);
+      modelItem->appendRow(nestedModelItem);
+    }
+
+    for (auto link : links)
+    {
+      auto linkItem = new QStandardItem();
+      linkItem->setData(link.c_str(), TopicsViewDelegate::TOPIC_NAME_ROLE);
+      linkItem->setData("link", TopicsViewDelegate::DATA_TYPE_NAME);
+      modelItem->appendRow(linkItem);
+
+      for (auto collision : collisions)
+      {
+        auto collisionItem = new QStandardItem();
+        collisionItem->setData(collision.c_str(),
+            TopicsViewDelegate::TOPIC_NAME_ROLE);
+        collisionItem->setData("collision", TopicsViewDelegate::DATA_TYPE_NAME);
+        linkItem->appendRow(collisionItem);
+
+        for (auto properti : properties)
+        {
+          auto propertiItem = new QStandardItem();
+          propertiItem->setData(properti.c_str(),
+              TopicsViewDelegate::TOPIC_NAME_ROLE);
+          collisionItem->appendRow(propertiItem);
+
+          auto positionItem = new QStandardItem();
+          positionItem->setData("position",
+              TopicsViewDelegate::TOPIC_NAME_ROLE);
+          propertiItem->appendRow(positionItem);
+
+          auto orientationItem = new QStandardItem();
+          orientationItem->setData("orientation",
+              TopicsViewDelegate::TOPIC_NAME_ROLE);
+          propertiItem->appendRow(orientationItem);
+
+          for (auto orientation : orientations)
+          {
+            auto oriItem = new QStandardItem();
+            oriItem->setData(orientation.c_str(),
+                TopicsViewDelegate::TOPIC_NAME_ROLE);
+            orientationItem->appendRow(oriItem);
+
+            oriItem->setToolTip(tr(
+                  "<font size=3><p>Drag to y label to plot.</p></font>"));
+            oriItem->setDragEnabled(true);
+            oriItem->setData("Double", TopicsViewDelegate::DATA_TYPE_NAME);
+
+            std::string dataName = model + "/" + link + "/" + collision + "/" +
+                properti + "/orientation/" + orientation;
+            oriItem->setData(dataName.c_str(), TopicsViewDelegate::DATA_ROLE);
+          }
+        }
+      }
+
+      for (auto visual : visuals)
+      {
+        auto visualItem = new QStandardItem();
+        visualItem->setData(visual.c_str(),
+            TopicsViewDelegate::TOPIC_NAME_ROLE);
+        visualItem->setData("visual", TopicsViewDelegate::DATA_TYPE_NAME);
+        linkItem->appendRow(visualItem);
+
+        for (auto properti : properties)
+        {
+          auto propertiItem = new QStandardItem();
+          propertiItem->setData(properti.c_str(),
+              TopicsViewDelegate::TOPIC_NAME_ROLE);
+          visualItem->appendRow(propertiItem);
+
+          auto positionItem = new QStandardItem();
+          positionItem->setData("position",
+              TopicsViewDelegate::TOPIC_NAME_ROLE);
+          propertiItem->appendRow(positionItem);
+
+          auto orientationItem = new QStandardItem();
+          orientationItem->setData("orientation",
+              TopicsViewDelegate::TOPIC_NAME_ROLE);
+          propertiItem->appendRow(orientationItem);
+
+          for (auto orientation : orientations)
+          {
+            auto oriItem = new QStandardItem();
+            oriItem->setData(orientation.c_str(),
+                TopicsViewDelegate::TOPIC_NAME_ROLE);
+            orientationItem->appendRow(oriItem);
+
+            oriItem->setToolTip(tr(
+                  "<font size=3><p>Drag to y label to plot.</p></font>"));
+            oriItem->setDragEnabled(true);
+            oriItem->setData("Double", TopicsViewDelegate::DATA_TYPE_NAME);
+
+            std::string dataName = model + "/" + link + "/" + visual + "/" +
+                properti + "/orientation/" + orientation;
+            oriItem->setData(dataName.c_str(), TopicsViewDelegate::DATA_ROLE);
+          }
+        }
+      }
+    }
+
+    for (auto joint : joints)
+    {
+      auto jointItem = new QStandardItem();
+      jointItem->setData(joint.c_str(),
+          TopicsViewDelegate::TOPIC_NAME_ROLE);
+      jointItem->setData("joint", TopicsViewDelegate::DATA_TYPE_NAME);
+      modelItem->appendRow(jointItem);
+    }
   }
 }
 
@@ -614,7 +803,7 @@ void Palette::FillFromMsg(google::protobuf::Message *_msg,
             auto *childItem = new QStandardItem();
             childItem->setData(it.c_str(), TopicsViewDelegate::TOPIC_NAME_ROLE);
             childItem->setData(dataName.c_str(), TopicsViewDelegate::DATA_ROLE);
-            childItem->setData("Dbl", TopicsViewDelegate::DATA_TYPE_NAME);
+            childItem->setData("Double", TopicsViewDelegate::DATA_TYPE_NAME);
 
             childItem->setToolTip(tr(
                 "<font size=3><p>Drag to y label to plot.</p></font>"));

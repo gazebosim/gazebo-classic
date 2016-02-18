@@ -83,5 +83,10 @@
   <file>images/child-link.png</file>
   <file>images/settings.svg</file>
   <file>images/graph_line.svg</file>
+  <file>images/model.svg</file>
+  <file>images/link.svg</file>
+  <file>images/joint.svg</file>
+  <file>images/collision.svg</file>
+  <file>images/visual.svg</file>
 </qresource>
 </RCC>
