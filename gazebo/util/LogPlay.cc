@@ -718,8 +718,7 @@ bool LogPlay::Chunk(unsigned int _index, std::string &_data) const
 }
 
 /////////////////////////////////////////////////
-bool LogPlayPrivate::ChunkData(
-    tinyxml2::XMLElement *_xml, std::string &_data) const
+bool LogPlayPrivate::ChunkData(tinyxml2::XMLElement *_xml, std::string &_data)
 {
   // Make sure we have valid xml pointer
   if (!_xml)
