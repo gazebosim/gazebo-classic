@@ -80,7 +80,7 @@ namespace gazebo
 }
 
 // empty variable id
-unsigned int VariablePill::EMPTY_VARIABLE = IGN_UINT32_MAX;
+const unsigned int VariablePill::EmptyVariable = IGN_UINT32_MAX;
 
 // global variable id counter
 unsigned int VariablePillPrivate::globalVariableId = 0;
@@ -421,9 +421,20 @@ void VariablePill::dropEvent(QDropEvent *_evt)
       }
     }
 
-    this->blockSignals(true);
-    this->AddVariablePill(variable);
-    this->blockSignals(false);
+    // add to parent if it exists, otherwise add to self and become a
+    // multi-variable
+    if (this->dataPtr->parent)
+    {
+      this->dataPtr->parent->blockSignals(true);
+      this->dataPtr->parent->AddVariablePill(variable);
+      this->dataPtr->parent->blockSignals(false);
+    }
+    else
+    {
+      this->blockSignals(true);
+      this->AddVariablePill(variable);
+      this->blockSignals(false);
+    }
 
     emit VariableMoved(variable->Id());
   }
@@ -548,17 +559,20 @@ bool VariablePill::IsSelected() const
 /////////////////////////////////////////////////
 void VariablePill::UpdateStyleSheet()
 {
+  std::string colorHex;
   std::string bgColorStr;
   std::string borderStr;
   if (this->dataPtr->parent)
-    bgColorStr = "background-color: #64b5f6;";
+    colorHex = "#64b5f6";
   else
-    bgColorStr = "background-color: #2196f3;";
+    colorHex = "#2196f3";
+
+  bgColorStr = "background-color: " + colorHex + ";";
 
   if (this->dataPtr->isSelected)
     borderStr = "border: 1.5px solid #1565c0;";
   else
-    borderStr = "border: 0px;";
+    borderStr = "border: 1.5px solid " + colorHex + ";";
 
   this->dataPtr->label->setStyleSheet(QString::fromStdString(
       "QLabel\

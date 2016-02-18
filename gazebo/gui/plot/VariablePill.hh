@@ -166,7 +166,7 @@ namespace gazebo
       Q_SIGNALS: void VariableLabelChanged(const std::string &_label);
 
      /// \brief Empty variable id used to indicate non-existent variable.
-      public: static unsigned int EMPTY_VARIABLE;
+      public: static const unsigned int EmptyVariable;
 
       /// \internal
       /// \brief Private data pointer

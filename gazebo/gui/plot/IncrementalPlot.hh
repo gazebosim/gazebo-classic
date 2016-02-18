@@ -15,14 +15,16 @@
  *
 */
 
-#ifndef _GAZEBO_GUI_PLOT_INCREMENTAL_PLOT_HH_
-#define _GAZEBO_GUI_PLOT_INCREMENTAL_PLOT_HH_
+#ifndef _GAZEBO_GUI_PLOT_INCREMENTALPLOT_HH_
+#define _GAZEBO_GUI_PLOT_INCREMENTALPLOT_HH_
 
 #include <memory>
 #include <string>
 #include <vector>
 
 #include <ignition/math/Vector2.hh>
+
+#include "gazebo/common/Time.hh"
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/plot/qwt_gazebo.h"
@@ -42,6 +44,22 @@ namespace gazebo
     class GZ_GUI_VISIBLE IncrementalPlot : public QwtPlot
     {
       Q_OBJECT
+
+      /// \brief Axis enum
+      public: enum PlotAxis
+      {
+        /// \brief bottom x axis
+        X_BOTTOM_AXIS = 0,
+
+        /// \brief top x axis
+        X_TOP_AXIS = 1,
+
+        /// \brief left y axis
+        Y_LEFT_AXIS = 2,
+
+        /// \brief right y axis
+        Y_RIGHT_AXIS = 3
+      };
 
       /// \brief Constructor
       /// \param[in] _parent Pointer to a parent widget
@@ -88,8 +106,8 @@ namespace gazebo
       public: void RemoveCurve(const unsigned int _id);
 
       /// \brief Set the period over which to plot.
-      /// \param[in] _seconds Period duration in seconds.
-      public: void SetPeriod(const unsigned int _seconds);
+      /// \param[in] _time Period duration in seconds.
+      public: void SetPeriod(const common::Time &_time);
 
       /// \brief Attach a curve to this plot.
       /// \param[in] _plotCurve The curve to attach to the plot.
@@ -105,6 +123,11 @@ namespace gazebo
       /// \param[in] _label New label to set the plot curve to.
       public: void SetCurveLabel(const unsigned int _id,
         const std::string &_label);
+
+      /// \brief Set whether to show the axis label.
+      /// \param[in] _axis Plot axis: X_AXIS or Y_AXIS.
+      /// \param[in] _show True to show the label, false to hide it.
+      public: void ShowAxisLabel(PlotAxis _axis, const bool _show);
 
       /// \brief Get all curves in this plot
       /// \return A list of curves in this plot.

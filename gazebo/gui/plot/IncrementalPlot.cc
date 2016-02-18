@@ -53,8 +53,11 @@ namespace gazebo
       /// \brief Drawing utility
       public: QwtPlotDirectPainter *directPainter;
 
-      /// \brief Pointer to the plot maginfier
+      /// \brief Pointer to the plot panner
       public: QwtPlotMagnifier *magnifier;
+
+      /// \brief Pointer to the plot maginfier
+      public: QwtPlotPanner *panner;
 
       /// \brief Period duration in seconds.
       public: unsigned int period;
@@ -73,7 +76,7 @@ IncrementalPlot::IncrementalPlot(QWidget *_parent)
   this->dataPtr->directPainter = new QwtPlotDirectPainter(this);
 
   // panning with the left mouse button
-  (void) new QwtPlotPanner(this->canvas());
+  this->dataPtr->panner = new QwtPlotPanner(this->canvas());
 
   // zoom in/out with the wheel
   this->dataPtr->magnifier = new QwtPlotMagnifier(this->canvas());
@@ -102,13 +105,8 @@ IncrementalPlot::IncrementalPlot(QWidget *_parent)
 #endif
   grid->attach(this);
 
-  /// TODO Figure out a way to properly label the x and y axis
-  QwtText xtitle("Sim Time");
-  xtitle.setFont(QFont(fontInfo().family(), 10, QFont::Bold));
-  this->setAxisTitle(QwtPlot::xBottom, xtitle);
-  QwtText ytitle("Variable values");
-  ytitle.setFont(QFont(fontInfo().family(), 10, QFont::Bold));
-  this->setAxisTitle(QwtPlot::yLeft, ytitle);
+  this->ShowAxisLabel(X_BOTTOM_AXIS, true);
+  this->ShowAxisLabel(Y_LEFT_AXIS, true);
 
   this->enableAxis(QwtPlot::yLeft);
   this->setAxisScaleEngine(QwtPlot::yLeft, new QwtLinearScaleEngine());
@@ -152,13 +150,15 @@ void IncrementalPlot::AddPoints(const unsigned int _id,
     const std::vector<ignition::math::Vector2d> &_pts)
 {
   PlotCurveWeakPtr plotCurve = this->Curve(_id);
-  if (plotCurve.expired())
+
+  auto c = plotCurve.lock();
+  if (!c)
   {
     gzerr << "Unable to add points. "
         << "Curve with id' " << _id << "' is not found" << std::endl;
+    return;
   }
 
-  auto c = plotCurve.lock();
   c->AddPoints(_pts);
 }
 
@@ -167,13 +167,15 @@ void IncrementalPlot::AddPoint(const unsigned int _id,
     const ignition::math::Vector2d &_pt)
 {
   PlotCurveWeakPtr plotCurve = this->Curve(_id);
-  if (plotCurve.expired())
+
+  auto c = plotCurve.lock();
+  if (!c)
   {
     gzerr << "Unable to add point. "
         << "Curve with id' " << _id << "' is not found" << std::endl;
+    return;
   }
 
-  auto c = plotCurve.lock();
   c->AddPoint(_pt);
 }
 
@@ -226,6 +228,10 @@ void IncrementalPlot::Update()
 
     lastPoint = curve.second->Point(pointCount-1);
 
+    if (ignition::math::isnan(lastPoint.X()) ||
+        ignition::math::isnan(lastPoint.Y()))
+      continue;
+
     ignition::math::Vector2d minPt = curve.second->Min();
     ignition::math::Vector2d maxPt = curve.second->Max();
     if (maxPt.Y() > yMax)
@@ -245,9 +251,9 @@ void IncrementalPlot::Update()
 }
 
 /////////////////////////////////////////////////
-void IncrementalPlot::SetPeriod(const unsigned int _seconds)
+void IncrementalPlot::SetPeriod(const common::Time &_time)
 {
-  this->dataPtr->period = _seconds;
+  this->dataPtr->period = _time.Double();
 }
 
 /////////////////////////////////////////////////
@@ -278,12 +284,7 @@ PlotCurvePtr IncrementalPlot::DetachCurve(const unsigned int _id)
 /////////////////////////////////////////////////
 void IncrementalPlot::RemoveCurve(const unsigned int _id)
 {
-  auto it = this->dataPtr->curves.find(_id);
-
-  if (it == this->dataPtr->curves.end())
-    return;
-
-  this->dataPtr->curves.erase(it);
+  this->DetachCurve(_id);
 }
 
 /////////////////////////////////////////////////
@@ -295,11 +296,50 @@ void IncrementalPlot::SetCurveLabel(const unsigned int _id,
 
   PlotCurveWeakPtr plotCurve = this->Curve(_id);
 
-  if (plotCurve.expired())
+  auto c = plotCurve.lock();
+  if (!c)
     return;
 
-  auto c = plotCurve.lock();
   c->SetLabel(_label);
+}
+
+/////////////////////////////////////////////////
+void IncrementalPlot::ShowAxisLabel(const PlotAxis _axis, const bool _show)
+{
+  /// TODO Figure out a way to properly label the x and y axis
+  std::string axisLabel;
+  QFont axisLabelFont(fontInfo().family(), 10, QFont::Bold);
+  switch (_axis)
+  {
+    case X_BOTTOM_AXIS:
+    {
+      if (_show)
+        axisLabel = "Sim Time (seconds)";
+      QwtText xtitle(QString::fromStdString(axisLabel));
+      xtitle.setFont(axisLabelFont);
+      this->setAxisTitle(QwtPlot::xBottom, xtitle);
+      break;
+    }
+    case X_TOP_AXIS:
+    {
+      break;
+    }
+    case Y_LEFT_AXIS:
+    {
+      if (_show)
+        axisLabel = "Variable values";
+      QwtText ytitle(QString::fromStdString(axisLabel));
+      ytitle.setFont(axisLabelFont);
+      this->setAxisTitle(QwtPlot::yLeft, ytitle);
+      break;
+    }
+    case Y_RIGHT_AXIS:
+    {
+      break;
+    }
+    default:
+      return;
+  }
 }
 
 /////////////////////////////////////////////////
@@ -315,6 +355,9 @@ std::vector<PlotCurveWeakPtr> IncrementalPlot::Curves() const
 /////////////////////////////////////////////////
 QSize IncrementalPlot::sizeHint() const
 {
-  // TODO find better way to specify plot size
-  return QSize(500, 380);
+  int padding = 50;
+  QSize s = QWidget::sizeHint();
+  s.setWidth(s.width()+padding);
+  s.setHeight(s.height()+padding);
+  return s;
 }

@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_VARIABLE_PILL_TEST_HH_
-#define _GAZEBO_VARIABLE_PILL_TEST_HH_
+#ifndef _GAZEBO_GUI_PLOT_VARIABLEPILL_TEST_HH_
+#define _GAZEBO_GUI_PLOT_VARIABLEPILL_TEST_HH_
 
 #include "gazebo/gui/QTestFixture.hh"
 

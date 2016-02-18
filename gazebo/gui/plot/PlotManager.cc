@@ -305,7 +305,7 @@ void PlotManager::OnIntrospection(const gazebo::msgs::Param_V &_msg)
     curvesUpdates.push_back(std::make_pair(it, data));
   }
 
-  // TODO only for testing purposes, remove later
+  // TODO remove later - for testing only
   // update curves!
   for (auto &curveUpdate : curvesUpdates)
   {

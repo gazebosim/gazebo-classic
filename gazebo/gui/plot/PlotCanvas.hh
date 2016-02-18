@@ -60,18 +60,15 @@ namespace gazebo
       /// \param[in] _plotId Unique id of the plot to add the variable to.
       /// \return Unique id of the variable
       public: unsigned int AddVariable(const std::string &_variable,
-          const unsigned int _plotId = EMPTY_PLOT);
-
-      /// \brief Remove a variable from a plot. This will search through all
-      /// plots for the variable and remove it from the plot if found.
-      /// \param[in] _id Unique id of the variable
-      public: void RemoveVariable(const unsigned int _id);
+          const unsigned int _plotId = EmptyPlot);
 
       /// \brief Remove a variable from a plot.
       /// \param[in] _id Unique id of the variable
-      /// \param[in] _plotId Unique if of plot to remove the variable from.
+      /// \param[in] _plotId Unique id of plot to remove the variable from.
+      ///  If EmptyPlot is specified, the function will search through all
+      /// plots for the variable and remove it from the plot if found.
       public: void RemoveVariable(const unsigned int _id,
-          const unsigned int _plotId);
+          const unsigned int _plotId = EmptyPlot);
 
       /// \brief Add a new plot to the canvas.
       /// \return Unique id of the plot
@@ -123,11 +120,16 @@ namespace gazebo
       /// only updates the plot but not the variable pill container.
       /// \param[in] _id Unique id of the variable
       /// \param[in] _variable Name of the variable
-      /// \param[in] _plot Unique id of the plot to add the variable to.
-      /// EMPTY_PLOT means add to a new plot.
+      /// \param[in] _plotId Unique id of the plot to add the variable to.
+      /// EmptyPlot means add to a new plot.
       private: void AddVariable(const unsigned int _id,
           const std::string &_variable,
-          const unsigned int _plotId = EMPTY_PLOT);
+          const unsigned int _plotId = EmptyPlot);
+
+      /// \brief Update the axis label for plots in the canvas.
+      /// Currently used to determine which plot will display the x-axis label
+      /// when plots are added/removed
+      private: void UpdateAxisLabel();
 
       /// \brief Qt signal to request self-deletion.
       Q_SIGNALS: void CanvasDeleted();
@@ -167,14 +169,11 @@ namespace gazebo
       private slots: void OnDeleteCanvas();
 
       /// \brief Empty plot used to indicate non-existent plot.
-      public: static unsigned int EMPTY_PLOT;
+      public: static const unsigned int EmptyPlot;
 
       /// \internal
       /// \brief Pointer to private data.
       private: std::unique_ptr<PlotCanvasPrivate> dataPtr;
-
-      // TODO remove me
-      private: void debug();
     };
   }
 }

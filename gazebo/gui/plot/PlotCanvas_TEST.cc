@@ -92,48 +92,48 @@ void PlotCanvas_TEST::AddRemoveVariable()
   unsigned int var01 = plotCanvas->AddVariable("var01");
   QCOMPARE(plotCanvas->PlotCount(), 1u);
   QVERIFY(plotCanvas->PlotByVariable(var01) !=
-      gazebo::gui::PlotCanvas::EMPTY_PLOT);
+      gazebo::gui::PlotCanvas::EmptyPlot);
 
   // add another variable - this creates a new plot
   unsigned int var02 = plotCanvas->AddVariable("var02");
   QCOMPARE(plotCanvas->PlotCount(), 2u);
   QVERIFY(plotCanvas->PlotByVariable(var02) !=
-      gazebo::gui::PlotCanvas::EMPTY_PLOT);
+      gazebo::gui::PlotCanvas::EmptyPlot);
 
   // add one more variable
   unsigned int var03 = plotCanvas->AddVariable("var03");
   QCOMPARE(plotCanvas->PlotCount(), 3u);
   QVERIFY(plotCanvas->PlotByVariable(var03) !=
-      gazebo::gui::PlotCanvas::EMPTY_PLOT);
+      gazebo::gui::PlotCanvas::EmptyPlot);
 
   // remove variable
   plotCanvas->RemoveVariable(var01);
   QCOMPARE(plotCanvas->PlotCount(), 2u);
   QVERIFY(plotCanvas->PlotByVariable(var01) ==
-      gazebo::gui::PlotCanvas::EMPTY_PLOT);
+      gazebo::gui::PlotCanvas::EmptyPlot);
 
   plotCanvas->RemoveVariable(var02);
   QCOMPARE(plotCanvas->PlotCount(), 1u);
   QVERIFY(plotCanvas->PlotByVariable(var02) ==
-      gazebo::gui::PlotCanvas::EMPTY_PLOT);
+      gazebo::gui::PlotCanvas::EmptyPlot);
 
   // remove already removed plot
   plotCanvas->RemoveVariable(var02);
   QCOMPARE(plotCanvas->PlotCount(), 1u);
   QVERIFY(plotCanvas->PlotByVariable(var02) ==
-      gazebo::gui::PlotCanvas::EMPTY_PLOT);
+      gazebo::gui::PlotCanvas::EmptyPlot);
 
   // remove last variable - this should leave an empty plot in the canvas
   plotCanvas->RemoveVariable(var03);
   QCOMPARE(plotCanvas->PlotCount(), 1u);
   QVERIFY(plotCanvas->PlotByVariable(var03) ==
-      gazebo::gui::PlotCanvas::EMPTY_PLOT);
+      gazebo::gui::PlotCanvas::EmptyPlot);
 
   // check we can add more variables - should now have one plot with variable
   unsigned int var04 = plotCanvas->AddVariable("var04");
   QCOMPARE(plotCanvas->PlotCount(), 1u);
   QVERIFY(plotCanvas->PlotByVariable(var04) !=
-      gazebo::gui::PlotCanvas::EMPTY_PLOT);
+      gazebo::gui::PlotCanvas::EmptyPlot);
 
   plotCanvas->hide();
   delete plotCanvas;
@@ -157,7 +157,7 @@ void PlotCanvas_TEST::VariableLabel()
   unsigned int var01 = plotCanvas->AddVariable("var01");
   QCOMPARE(plotCanvas->PlotCount(), 1u);
   QVERIFY(plotCanvas->PlotByVariable(var01) !=
-      gazebo::gui::PlotCanvas::EMPTY_PLOT);
+      gazebo::gui::PlotCanvas::EmptyPlot);
 
   // find the curve associated with the variable
   gazebo::gui::PlotCurveWeakPtr curve = plotCanvas->PlotCurve(var01);
