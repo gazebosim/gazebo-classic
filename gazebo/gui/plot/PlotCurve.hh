@@ -114,9 +114,12 @@ namespace gazebo
 
       /// \brief Get a point in the curve
       /// \param[in] _index Index of the point in the curve.
+      /// \return 2d point at the specified index. A Vector2d of nans is
+      /// returned if the index is out of bounds.
       public: ignition::math::Vector2d Point(const unsigned int _index) const;
 
       /// \brief Return all the sample points in the curve.
+      /// \return Curve sample points
       public: std::vector<ignition::math::Vector2d> Points() const;
 
       /// \internal

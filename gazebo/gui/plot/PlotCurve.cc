@@ -334,7 +334,8 @@ ignition::math::Vector2d PlotCurve::Point(const unsigned int _index) const
   if (_index >= static_cast<unsigned int>(
       this->dataPtr->curveData->samples().size()))
   {
-    return ignition::math::Vector2d();
+    return ignition::math::Vector2d(ignition::math::NAN_D,
+        ignition::math::NAN_D);
   }
 
   const QPointF &pt = this->dataPtr->curveData->samples()[_index];

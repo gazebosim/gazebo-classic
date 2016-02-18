@@ -228,6 +228,10 @@ void IncrementalPlot::Update()
 
     lastPoint = curve.second->Point(pointCount-1);
 
+    if (!ignition::math::isnan(lastPoint.X()) ||
+        !ignition::math::isnan(lastPoint.Y()))
+      continue;
+
     ignition::math::Vector2d minPt = curve.second->Min();
     ignition::math::Vector2d maxPt = curve.second->Max();
     if (maxPt.Y() > yMax)
