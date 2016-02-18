@@ -22,6 +22,7 @@
 
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/URI.hh"
+#include "gazebo/common/Tokenizer.hh"
 
 using namespace gazebo;
 using namespace common;
@@ -30,17 +31,6 @@ namespace gazebo
 {
   namespace common
   {
-    /// \internal
-    /// \brief URIPath private data.
-    class TokenizerPrivate
-    {
-      /// \brief Input string.
-      public: std::string buffer;
-
-      /// \brief Current position under check.
-      public: size_t currPos;
-    };
-
     /// \internal
     /// \brief URIPath private data.
     class URIPathPrivate
@@ -71,61 +61,6 @@ namespace gazebo
       public: URIQuery query;
     };
   }
-}
-
-/////////////////////////////////////////////////
-Tokenizer::Tokenizer(const std::string &_str)
-  : dataPtr(new TokenizerPrivate())
-{
-  this->dataPtr->buffer = _str;
-  this->dataPtr->currPos = 0;
-}
-
-/////////////////////////////////////////////////
-std::vector<std::string> Tokenizer::Split(const std::string &_delim)
-{
-  std::vector<std::string> tokens;
-  std::string token;
-
-  this->dataPtr->currPos = 0;
-  while ((token = this->NextToken(_delim)) != "")
-    tokens.push_back(token);
-
-  return tokens;
-}
-
-/////////////////////////////////////////////////
-std::string Tokenizer::NextToken(const std::string &_delim)
-{
-  std::string token;
-  this->SkipDelimiter(_delim);
-
-  // Append each char to token string until it meets delimiter.
-  while (this->dataPtr->currPos < this->dataPtr->buffer.size() &&
-         !this->IsDelimiter(_delim, this->dataPtr->currPos))
-  {
-    token += this->dataPtr->buffer.at(this->dataPtr->currPos);
-    ++this->dataPtr->currPos;
-  }
-
-  return token;
-}
-
-/////////////////////////////////////////////////
-void Tokenizer::SkipDelimiter(const std::string &_delim)
-{
-  while (this->dataPtr->currPos < this->dataPtr->buffer.size() &&
-         this->IsDelimiter(_delim, this->dataPtr->currPos))
-  {
-    this->dataPtr->currPos += _delim.size();
-  }
-}
-
-/////////////////////////////////////////////////
-bool Tokenizer::IsDelimiter(const std::string &_delim,
-    const size_t _pos) const
-{
-  return this->dataPtr->buffer.find(_delim, _pos) == _pos;
 }
 
 /////////////////////////////////////////////////
@@ -283,11 +218,9 @@ bool URIQuery::Load(const std::string &_str)
 }
 
 /////////////////////////////////////////////////
-const URIQuery URIQuery::Insert(const std::string &_key,
-                                const std::string &_value)
+void URIQuery::Insert(const std::string &_key, const std::string &_value)
 {
   this->dataPtr->values.insert(std::make_pair(_key, _value));
-  return *this;
 }
 
 /////////////////////////////////////////////////

@@ -66,6 +66,7 @@ set (sources
   SVGLoader.cc
   Time.cc
   Timer.cc
+  Tokenizer.cc
   URI.cc
   Video.cc
   ffmpeg_inc.cc
@@ -121,6 +122,7 @@ set (headers
   SVGLoader.hh
   Time.hh
   Timer.hh
+  Tokenizer.hh
   UpdateInfo.hh
   URI.hh
   Video.hh
@@ -151,6 +153,7 @@ set (gtest_sources
   SystemPaths_TEST.cc
   SVGLoader_TEST.cc
   Time_TEST.cc
+  Tokenizer_TEST.cc
   URI_TEST.cc
 )
 

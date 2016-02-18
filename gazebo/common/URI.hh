@@ -22,54 +22,14 @@
 #include <string>
 #include "gazebo/util/system.hh"
 
-//#include "gazebo/util/system.hh"
-
 namespace gazebo
 {
   namespace common
   {
     // Forward declare private data classes.
-    class TokenizerPrivate;
     class URIPathPrivate;
     class URIQueryPrivate;
     class URIPrivate;
-
-    /// \brief A string tokenizer class.
-    /// Heavily inspired by http://www.songho.ca/misc/tokenizer/tokenizer.html
-    class GZ_COMMON_VISIBLE Tokenizer
-    {
-      /// \brief Class constructor.
-      /// \param[in] _str A string argument.
-      public: Tokenizer(const std::string &_str);
-
-      /// \brief Class destructor.
-      public: ~Tokenizer() = default;
-
-      /// \brief Splits the internal string into tokens.
-      /// \param[in] _delim Token delimiter.
-      /// \return Vector of tokens.
-      public: std::vector<std::string> Split(const std::string &_delim);
-
-      /// \brief Get the next token.
-      /// \param[in] _delim Token delimiter.
-      /// \return The token or empty string if there are no more tokens.
-      private: std::string NextToken(const std::string &_delim);
-
-      /// \brief Consume a delimiter if we are currently pointing to it.
-      /// \param[in] _delim Token delimiter.
-      private: void SkipDelimiter(const std::string &_delim);
-
-      /// \brief Return if a delimiter starts at a given position
-      /// \param[in] _delim Token delimiter.
-      /// \param[in] _currPos Position to check.
-      /// \return True when a delimiter starts at _pos.
-      private: bool IsDelimiter(const std::string &_delim,
-                                const size_t _pos) const;
-
-      /// \internal
-      /// \brief Pointer to private data.
-      private: std::unique_ptr<TokenizerPrivate> dataPtr;
-    };
 
     /// \brief The path component of a URI
     class GZ_COMMON_VISIBLE URIPath
@@ -133,6 +93,7 @@ namespace gazebo
 
       /// \brief Validate a string as URIPath.
       /// \param[in] _str A string.
+      /// \param[out] _path URIPath parsed from the string.
       /// \return true if the string can be parsed as a URIPath.
       public: static bool Valid(const std::string &_str,
                                 URIPath &_path);
@@ -170,9 +131,8 @@ namespace gazebo
       /// \brief Get this query with a new _key=_value pair added.
       /// \param[in] _key Key of the query.
       /// \param[in] _value Value of the query.
-      /// \return This query with the additional _key = _value pair
-      public: const URIQuery Insert(const std::string &_key,
-                                    const std::string &_value);
+      public: void Insert(const std::string &_key,
+                          const std::string &_value);
 
       /// \brief Equal operator.
       /// \param[in] _p another URIQuery.
@@ -192,6 +152,7 @@ namespace gazebo
 
       /// \brief Validate a string as URIQuery.
       /// \param[in] _str A string.
+      /// \param[out] _query URIQuery parsed from the string.
       /// \return true if the string can be parsed as a URIQuery.
       public: static bool Valid(const std::string &_str,
                                 URIQuery &_query);
@@ -261,6 +222,7 @@ namespace gazebo
 
       /// \brief Validate a string as URI.
       /// \param[in] _str A string.
+      /// \param[out] _uri A URI parsed from the string.
       /// \return true if the string can be parsed as a URI.
       public: static bool Valid(const std::string &_str,
                                 URI &_uri);
