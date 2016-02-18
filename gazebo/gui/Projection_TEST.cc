@@ -48,6 +48,9 @@ void Projection_TEST::Projection()
   unsigned int width = cam->ImageWidth();
   unsigned int height = cam->ImageHeight();
   unsigned int depth = cam->ImageDepth();
+  std::cerr << "width: " << width << std::endl;
+  std::cerr << "height: " << height << std::endl;
+  std::cerr << "depth: " << depth << std::endl;
 
   int topWidth = 0;
   int bottomWidth = 0;
@@ -63,6 +66,12 @@ void Projection_TEST::Projection()
   }
 
   // Make sure the widths are roughly the same
+  std::cerr << "topWidth: " << topWidth << std::endl;
+  std::cerr << "bottomWidth: " << bottomWidth << std::endl;
+  std::cerr << "std::abs(topWidth - bottomWidth): "
+            << std::abs(topWidth - bottomWidth)
+            << " (should be less than 5)"
+            << std::endl;
   QVERIFY(std::abs(topWidth - bottomWidth) < 5);
 
   // Now change to Perspective projection
@@ -85,7 +94,15 @@ void Projection_TEST::Projection()
 
   // Make sure the top and bottom width difference is large enough to
   // indicate perspective rendering is used
-  QVERIFY(topWidth - bottomWidth < -200);
+  std::cerr << "topWidth: " << topWidth << std::endl;
+  std::cerr << "bottomWidth: " << bottomWidth << std::endl;
+  double widthRatio = topWidth - bottomWidth;
+  widthRatio /= height;
+  std::cerr << "(topWidth - bottomWidth) / height: "
+            << widthRatio
+            << " (should be less than -0.2)"
+            << std::endl;
+  QVERIFY(widthRatio < -0.2);
 
   cam->Fini();
   mainWindow->close();

@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+
 #include <sys/stat.h>
 #include <string>
 #include <map>
@@ -528,7 +529,6 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
 
   Mesh *mesh = new Mesh();
   mesh->SetName(_name);
-  this->meshes.insert(std::make_pair(_name, mesh));
 
   SubMesh *subMesh = new SubMesh();
   mesh->AddSubMesh(subMesh);
@@ -633,6 +633,7 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
   if (normals.size() != edges.size())
   {
     gzerr << "Unable to extrude mesh. Triangulation failed" << std::endl;
+    delete mesh;
     return;
   }
 
@@ -703,6 +704,9 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
       subMesh->AddNormal(normals[i]);
     }
   }
+
+  this->meshes.insert(std::make_pair(_name, mesh));
+  return;
 }
 
 //////////////////////////////////////////////////
