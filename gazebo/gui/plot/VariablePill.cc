@@ -390,7 +390,7 @@ void VariablePill::dropEvent(QDropEvent *_evt)
     connect(variable, SIGNAL(VariableRemoved(unsigned int)),
         this->Container(), SLOT(OnRemoveVariable(unsigned int)));
     connect(variable, SIGNAL(VariableLabelChanged(std::string)),
-        this->Container(), SLOT(OnSetVariableLabel(std::string)));        
+        this->Container(), SLOT(OnSetVariableLabel(std::string)));
 
     this->AddVariablePill(variable);
   }
@@ -556,7 +556,7 @@ void VariablePill::UpdateStyleSheet()
     bgColorStr = "background-color: #2196f3;";
 
   if (this->dataPtr->isSelected)
-    borderStr = "border: 1.5px solid #0d47a1;";
+    borderStr = "border: 1.5px solid #1565c0;";
   else
     borderStr = "border: 0px;";
 

@@ -103,6 +103,7 @@ PlotWindow::PlotWindow(QWidget *_parent)
   // add button
   QPushButton *addCanvasButton = new QPushButton("+");
   addCanvasButton->setObjectName("plotAddCanvas");
+  addCanvasButton->setToolTip("Add a new canvas");
   QGraphicsDropShadowEffect *addCanvasShadow = new QGraphicsDropShadowEffect();
   addCanvasShadow->setBlurRadius(8);
   addCanvasShadow->setOffset(0, 0);
@@ -122,14 +123,15 @@ PlotWindow::PlotWindow(QWidget *_parent)
 
   this->dataPtr->plotPlayAct = new QAction(QIcon(":/images/play_dark.png"),
       tr("Play"), this);
-  this->dataPtr->plotPlayAct->setStatusTip(tr("Continue Plotting"));
+  this->dataPtr->plotPlayAct->setToolTip(tr("Continue plotting"));
   this->dataPtr->plotPlayAct->setVisible(false);
   connect(this->dataPtr->plotPlayAct, SIGNAL(triggered()),
       this, SLOT(OnPlay()));
 
   this->dataPtr->plotPauseAct = new QAction(QIcon(":/images/pause_dark.png"),
       tr("Pause"), this);
-  this->dataPtr->plotPauseAct->setStatusTip(tr("Pause Plotting"));
+  this->dataPtr->plotPauseAct->setToolTip(
+      tr("Pause plotting (not simulation)"));
   this->dataPtr->plotPauseAct->setVisible(true);
   connect(this->dataPtr->plotPauseAct, SIGNAL(triggered()),
       this, SLOT(OnPause()));

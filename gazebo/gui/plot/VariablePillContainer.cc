@@ -175,10 +175,6 @@ void VariablePillContainer::AddVariablePill(VariablePill *_variable,
   if (!_variable)
     return;
 
-  // check if variable already exists in this container
-  if (this->GetVariablePill(_variable->Id()))
-    return;
-
   // add to target variable if it's not empty
   if (_targetId != VariablePill::EMPTY_VARIABLE)
   {
@@ -189,11 +185,23 @@ void VariablePillContainer::AddVariablePill(VariablePill *_variable,
     targetVariable->AddVariablePill(_variable);
     return;
   }
+  else
+  {
+    // check if variable already exists in this container
+    // check only top level variables
+    auto it = this->dataPtr->variables.find(_variable->Id());
+    if (it != this->dataPtr->variables.end())
+    {
+      return;
+    }
+  }
 
   // otherwise add to the container
   if (this->dataPtr->maxSize != -1 &&
       static_cast<int>(this->VariablePillCount()) >= this->dataPtr->maxSize)
   {
+    gzerr << "Unable to add variable to container. Container is full" <<
+        std::endl;
     return;
   }
 
@@ -356,9 +364,6 @@ void VariablePillContainer::dropEvent(QDropEvent *_evt)
     QString mimeData = _evt->mimeData()->data("application/x-item");
     std::string dataStr = mimeData.toStdString();
     this->AddVariablePill(dataStr);
-
-    std::cerr << "variable '" << dataStr << "' dropped into container ["
-        << this->dataPtr->label->text().toStdString() << "]"<< std::endl;
   }
   else if (_evt->mimeData()->hasFormat("application/x-pill-item"))
   {

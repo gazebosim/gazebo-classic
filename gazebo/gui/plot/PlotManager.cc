@@ -39,16 +39,16 @@ namespace gazebo
   namespace gui
   {
     /// \brief Private data for the PlotManager class
-    struct PlotManagerPrivate
+    class PlotManagerPrivate
     {
       /// \def CurveVariableSet
       /// \brief A set of unique plot curve pointers
-      using CurveVariableSet = std::set<PlotCurveWeakPtr,
+      public: using CurveVariableSet = std::set<PlotCurveWeakPtr,
           std::owner_less<PlotCurveWeakPtr> >;
 
       /// \def CurveVariableSetIt
       /// \brief Curve variable map iterator
-      using CurveVariableMapIt =
+      public: using CurveVariableMapIt =
           std::map<std::string, CurveVariableSet>::iterator;
 
       /// \brief Node for communications.
@@ -56,10 +56,6 @@ namespace gazebo
 
       /// \brief Subscriber to the world control topic
       public: transport::SubscriberPtr worldControlSub;
-
-      /// TODO remove me later
-      /// \brief Subscriber to the world stats topic
-      public: transport::SubscriberPtr worldStatsSub;
 
       /// \brief A map to variable topic names to plot curve.
       public: std::map<std::string, CurveVariableSet> curves;
@@ -96,11 +92,6 @@ PlotManager::PlotManager()
   this->dataPtr->worldControlSub =
       this->dataPtr->node->Subscribe("~/world_control",
       &PlotManager::OnWorldControl, this);
-
-  // TODO remove me later. Testing!
-  this->dataPtr->worldStatsSub =
-      this->dataPtr->node->Subscribe("~/world_stats",
-      &PlotManager::OnWorldStats, this);
 
   // set up introspection client in an other thread as it blocks on
   // discovery
@@ -243,51 +234,6 @@ void PlotManager::RemoveWindow(PlotWindow *_window)
 }
 
 /////////////////////////////////////////////////
-void PlotManager::OnWorldStats(ConstWorldStatisticsPtr &/*_data*/)
-{
-  // TODO only for testing purposes
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-
-  static double testTime = 0;
-  testTime += 0.1;
-  auto it = this->dataPtr->curves.find("Dog");
-  if (it != this->dataPtr->curves.end())
-  {
-    for (auto cIt : it->second)
-    {
-      auto curve = cIt.lock();
-      if (!curve)
-        continue;
-      curve->AddPoint(ignition::math::Vector2d(testTime, 2));
-    }
-  }
-
-  it = this->dataPtr->curves.find("Cat");
-  if (it != this->dataPtr->curves.end())
-  {
-    for (auto cIt : it->second)
-    {
-      auto curve = cIt.lock();
-      if (!curve)
-        continue;
-      curve->AddPoint(ignition::math::Vector2d(testTime, 10));
-    }
-  }
-
-  it = this->dataPtr->curves.find("Turtle");
-  if (it != this->dataPtr->curves.end())
-  {
-    for (auto cIt : it->second)
-    {
-      auto curve = cIt.lock();
-      if (!curve)
-        continue;
-      curve->AddPoint(ignition::math::Vector2d(testTime, 6));
-    }
-  }
-}
-
-/////////////////////////////////////////////////
 void PlotManager::OnIntrospection(const gazebo::msgs::Param_V &_msg)
 {
   // stores a list of curves iterators and their new values
@@ -307,14 +253,14 @@ void PlotManager::OnIntrospection(const gazebo::msgs::Param_V &_msg)
     auto paramValue = param.value();
 
     // x axis is hardcoded to sim time for now
-    if (!hasSimTime && param.name() == "sim_time")
+    if (!hasSimTime && paramName == "sim_time")
     {
       simTime = paramValue.double_value();
       hasSimTime = true;
     }
 
     // see if there is a curve with variable name that matches param name
-    auto it = this->dataPtr->curves.find(param.name());
+    auto it = this->dataPtr->curves.find(paramName);
     if (it == this->dataPtr->curves.end())
       continue;
 
@@ -359,6 +305,7 @@ void PlotManager::OnIntrospection(const gazebo::msgs::Param_V &_msg)
     curvesUpdates.push_back(std::make_pair(it, data));
   }
 
+  // TODO only for testing purposes, remove later
   // update curves!
   for (auto &curveUpdate : curvesUpdates)
   {
@@ -368,6 +315,42 @@ void PlotManager::OnIntrospection(const gazebo::msgs::Param_V &_msg)
       if (!curve)
         continue;
       curve->AddPoint(ignition::math::Vector2d(simTime, curveUpdate.second));
+    }
+  }
+
+  auto it = this->dataPtr->curves.find("Dog");
+  if (it != this->dataPtr->curves.end())
+  {
+    for (auto cIt : it->second)
+    {
+      auto curve = cIt.lock();
+      if (!curve)
+        continue;
+      curve->AddPoint(ignition::math::Vector2d(simTime, 2));
+    }
+  }
+
+  it = this->dataPtr->curves.find("Cat");
+  if (it != this->dataPtr->curves.end())
+  {
+    for (auto cIt : it->second)
+    {
+      auto curve = cIt.lock();
+      if (!curve)
+        continue;
+      curve->AddPoint(ignition::math::Vector2d(simTime, 10));
+    }
+  }
+
+  it = this->dataPtr->curves.find("Turtle");
+  if (it != this->dataPtr->curves.end())
+  {
+    for (auto cIt : it->second)
+    {
+      auto curve = cIt.lock();
+      if (!curve)
+        continue;
+      curve->AddPoint(ignition::math::Vector2d(simTime, 6));
     }
   }
 }

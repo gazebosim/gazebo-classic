@@ -23,22 +23,6 @@
 
 #include <map>
 
-#include <qwt/qwt_plot.h>
-#include <qwt/qwt_scale_widget.h>
-#include <qwt/qwt_scale_engine.h>
-#include <qwt/qwt_plot_panner.h>
-#include <qwt/qwt_plot_layout.h>
-#include <qwt/qwt_plot_grid.h>
-#include <qwt/qwt_plot_curve.h>
-#include <qwt/qwt_plot_canvas.h>
-#include <qwt/qwt_plot_marker.h>
-#include <qwt/qwt_curve_fitter.h>
-#include <qwt/qwt_symbol.h>
-#include <qwt/qwt_legend.h>
-#include <qwt/qwt_legend_item.h>
-#include <qwt/qwt_plot_directpainter.h>
-#include <qwt/qwt_plot_magnifier.h>
-
 #include <ignition/math/Helpers.hh>
 
 #include "gazebo/common/Assert.hh"
@@ -103,19 +87,25 @@ IncrementalPlot::IncrementalPlot(QWidget *_parent)
 
   this->setFrameStyle(QFrame::NoFrame);
   this->setLineWidth(0);
-  this->setCanvasLineWidth(2);
 
-  // this->plotLayout()->setAlignCanvasToScales(true);
+  this->plotLayout()->setAlignCanvasToScales(true);
 
   QwtLegend *qLegend = new QwtLegend;
-  qLegend->setItemMode(QwtLegend::CheckableItem);
   this->insertLegend(qLegend, QwtPlot::RightLegend);
 
   QwtPlotGrid *grid = new QwtPlotGrid;
+
+#if (QWT_VERSION < ((6 << 16) | (1 << 8) | 0))
   grid->setMajPen(QPen(Qt::gray, 0, Qt::DotLine));
+#else
+  grid->setMajorPen(QPen(Qt::gray, 0, Qt::DotLine));
+#endif
   grid->attach(this);
 
-  /// \todo Figure out a way to properly label the y-axis
+  /// TODO Figure out a way to properly label the x and y axis
+  QwtText xtitle("Sim Time");
+  xtitle.setFont(QFont(fontInfo().family(), 10, QFont::Bold));
+  this->setAxisTitle(QwtPlot::xBottom, xtitle);
   QwtText ytitle("Variable values");
   ytitle.setFont(QFont(fontInfo().family(), 10, QFont::Bold));
   this->setAxisTitle(QwtPlot::yLeft, ytitle);
@@ -325,5 +315,6 @@ std::vector<PlotCurveWeakPtr> IncrementalPlot::Curves() const
 /////////////////////////////////////////////////
 QSize IncrementalPlot::sizeHint() const
 {
+  // TODO find better way to specify plot size
   return QSize(500, 380);
 }

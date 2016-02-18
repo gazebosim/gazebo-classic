@@ -22,11 +22,10 @@
 #include <string>
 #include <vector>
 
-#include <qwt/qwt_plot.h>
-
 #include <ignition/math/Vector2.hh>
 
 #include "gazebo/gui/qt.h"
+#include "gazebo/gui/plot/qwt_gazebo.h"
 #include "gazebo/gui/plot/PlottingTypes.hh"
 #include "gazebo/util/system.hh"
 

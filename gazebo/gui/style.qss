@@ -879,3 +879,8 @@ QwtPlot#incrementalPlot > QwtLegend > QScrollArea
 {
   background-color: #ffffff;
 }
+
+QwtPlot#incrementalPlot > QwtLegend > QwtLegendLabel
+{
+  background-color: #ffffff;
+}
