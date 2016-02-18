@@ -2,10 +2,7 @@ set (tests
   examples_build.cc
 )
 add_definitions("-DCMAKE_SOURCE_DIR=\"${CMAKE_SOURCE_DIR}\"")
-set (GZ_BUILD_TESTS_EXTRA_LIBS
-  ${Boost_LIBRARIES}
-)
-gz_build_tests(${tests})
+gz_build_tests(${tests} EXTRA_LIBS ${Boost_LIBRARIES})
 
 if (ENABLE_TESTS_COMPILATION)
   # Increase timeout since there are many tests

@@ -39,10 +39,7 @@ set(tests
   1694_world_accel.cc
   1782_unadvertise.cc
 )
-set (GZ_BUILD_TESTS_EXTRA_LIBS
-  gazebo_test_fixture
-)
-gz_build_tests(${tests})
+gz_build_tests(${tests} EXTRA_LIBS gazebo_test_fixture)
 
 set(display_tests
 )
@@ -55,10 +52,7 @@ set(dri_tests
   846_typo_in_camera.cc
   1702_remove_model_scene_nodes.cc
 )
-set (GZ_BUILD_TESTS_EXTRA_LIBS
-  gazebo_test_fixture
-)
-gz_build_dri_tests(${dri_tests})
+gz_build_dri_tests(${dri_tests} EXTRA_LIBS gazebo_test_fixture)
 
 if (ENABLE_TESTS_COMPILATION)
   add_dependencies(${TEST_TYPE}_1112_force_torque_model_removal
