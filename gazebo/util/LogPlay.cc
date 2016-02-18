@@ -74,7 +74,62 @@ void LogPlay::Open(const std::string &_logFile)
   if (this->dataPtr->xmlDoc.LoadFile(_logFile.c_str()) !=
       tinyxml2::XML_NO_ERROR)
   {
-    gzthrow("Unable to parse log file[" << _logFile << "]");
+    std::string endTag = "</gazebo_log>";
+    // Open the log file for reading, we will check if the end of the log
+    // file has the correct closing tag: </gazebo_log>.
+    std::ifstream inFile(_logFile);
+    if (inFile)
+    {
+      // Move to the end of the file
+      inFile.seekg(0, std::ios::end);
+
+      // Get the length of the file.
+      int length = inFile.tellg();
+
+      // Back up the length of the closing tag.
+      inFile.seekg(length - 1 - endTag.length());
+
+      // Get the last line
+      std::string lastLine;
+      std::getline(inFile, lastLine);
+      inFile.close();
+
+      // Add missing </gazebo_log> if not present.
+      if (lastLine != endTag)
+      {
+        // Open the log file for append
+        std::ofstream fix(_logFile, std::ios::app);
+        if (fix)
+        {
+          // Add the end tag
+          fix << endTag << std::endl;
+          fix.close();
+
+          // Retry loading the log file.
+          if (this->dataPtr->xmlDoc.LoadFile(_logFile.c_str()) !=
+              tinyxml2::XML_NO_ERROR)
+          {
+            gzerr << "Unable to load file[" << _logFile << "]. "
+              << "Check the Gazebo server log file for more information";
+            gzlog << "Log Error 1:\n"
+              << this->dataPtr->xmlDoc.GetErrorStr1() << std::endl;
+            gzlog << "Log Error 2:\n"
+              << this->dataPtr->xmlDoc.GetErrorStr2() << std::endl;
+            gzthrow("Error parsing log file");
+          }
+        }
+      }
+    }
+    else
+    {
+      gzerr << "Unable to load file[" << _logFile << "]. "
+        << "Check the Gazebo server log file for more information";
+      gzlog << "Log Error 1:\n"
+        << this->dataPtr->xmlDoc.GetErrorStr1() << std::endl;
+      gzlog << "Log Error 2:\n"
+        << this->dataPtr->xmlDoc.GetErrorStr2() << std::endl;
+      gzthrow("Error parsing log file");
+    }
   }
 
   // Get the gazebo_log element
