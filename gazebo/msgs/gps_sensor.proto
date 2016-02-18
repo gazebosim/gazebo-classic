@@ -8,18 +8,8 @@ import "sensor_noise.proto";
 
 message GPSSensor
 {
-  /// \brief Position information
-  message PositionSensing
-  {
-    /// \brief Horizontal noise
-    optional SensorNoise horizontal_noise = 1;
-
-    /// \brief Vertical noise
-    optional SensorNoise vertical_noise   = 2;
-  }
-
-  /// \brief Velocity information
-  message VelocitySensing
+  /// \brief Sensing information
+  message Sensing
   {
     /// \brief Horizontal noise
     optional SensorNoise horizontal_noise = 1;
@@ -30,9 +20,9 @@ message GPSSensor
 
   /// \brief Position sensing. Consists of horizontal and vertical noise
   /// properties
-  optional PositionSensing position = 1;
+  optional Sensing position = 1;
 
   /// \brief Velocity sensing. Consists of horizontal and vertical noise
   /// properties
-  optional VelocitySensing velocity = 2;
+  optional Sensing velocity = 2;
 }

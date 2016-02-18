@@ -417,30 +417,30 @@ void CheckGPSSensorMsg(const msgs::GPSSensor &_msg)
   EXPECT_NEAR(_msg.position().horizontal_noise().stddev(), 0.2, 1e-4);
   EXPECT_NEAR(_msg.position().horizontal_noise().bias_mean(), 0.3, 1e-4);
   EXPECT_NEAR(_msg.position().horizontal_noise().bias_stddev(), 0.4, 1e-4);
-  EXPECT_NEAR(_msg.position().horizontal_noise().precision(), 1.0, 1e-4);
+  EXPECT_NEAR(_msg.position().horizontal_noise().precision(), 0.5, 1e-4);
 
   EXPECT_EQ(_msg.position().vertical_noise().type(),
       msgs::SensorNoise::GAUSSIAN_QUANTIZED);
-  EXPECT_NEAR(_msg.position().vertical_noise().mean(), 0.1, 1e-4);
-  EXPECT_NEAR(_msg.position().vertical_noise().stddev(), 0.2, 1e-4);
-  EXPECT_NEAR(_msg.position().vertical_noise().bias_mean(), 0.3, 1e-4);
-  EXPECT_NEAR(_msg.position().vertical_noise().bias_stddev(), 0.4, 1e-4);
+  EXPECT_NEAR(_msg.position().vertical_noise().mean(), 0.6, 1e-4);
+  EXPECT_NEAR(_msg.position().vertical_noise().stddev(), 0.7, 1e-4);
+  EXPECT_NEAR(_msg.position().vertical_noise().bias_mean(), 0.8, 1e-4);
+  EXPECT_NEAR(_msg.position().vertical_noise().bias_stddev(), 0.9, 1e-4);
   EXPECT_NEAR(_msg.position().vertical_noise().precision(), 1.0, 1e-4);
 
   EXPECT_EQ(_msg.velocity().horizontal_noise().type(), msgs::SensorNoise::NONE);
-  EXPECT_NEAR(_msg.velocity().horizontal_noise().mean(), 0.1, 1e-4);
-  EXPECT_NEAR(_msg.velocity().horizontal_noise().stddev(), 0.2, 1e-4);
-  EXPECT_NEAR(_msg.velocity().horizontal_noise().bias_mean(), 0.3, 1e-4);
-  EXPECT_NEAR(_msg.velocity().horizontal_noise().bias_stddev(), 0.4, 1e-4);
-  EXPECT_NEAR(_msg.velocity().horizontal_noise().precision(), 1.0, 1e-4);
+  EXPECT_NEAR(_msg.velocity().horizontal_noise().mean(), 1.1, 1e-4);
+  EXPECT_NEAR(_msg.velocity().horizontal_noise().stddev(), 1.2, 1e-4);
+  EXPECT_NEAR(_msg.velocity().horizontal_noise().bias_mean(), 1.3, 1e-4);
+  EXPECT_NEAR(_msg.velocity().horizontal_noise().bias_stddev(), 1.4, 1e-4);
+  EXPECT_NEAR(_msg.velocity().horizontal_noise().precision(), 1.5, 1e-4);
 
   EXPECT_EQ(_msg.velocity().vertical_noise().type(),
       msgs::SensorNoise::GAUSSIAN);
-  EXPECT_NEAR(_msg.velocity().vertical_noise().mean(), 0.1, 1e-4);
-  EXPECT_NEAR(_msg.velocity().vertical_noise().stddev(), 0.2, 1e-4);
-  EXPECT_NEAR(_msg.velocity().vertical_noise().bias_mean(), 0.3, 1e-4);
-  EXPECT_NEAR(_msg.velocity().vertical_noise().bias_stddev(), 0.4, 1e-4);
-  EXPECT_NEAR(_msg.velocity().vertical_noise().precision(), 1.0, 1e-4);
+  EXPECT_NEAR(_msg.velocity().vertical_noise().mean(), 1.6, 1e-4);
+  EXPECT_NEAR(_msg.velocity().vertical_noise().stddev(), 1.7, 1e-4);
+  EXPECT_NEAR(_msg.velocity().vertical_noise().bias_mean(), 1.8, 1e-4);
+  EXPECT_NEAR(_msg.velocity().vertical_noise().bias_stddev(), 1.9, 1e-4);
+  EXPECT_NEAR(_msg.velocity().vertical_noise().precision(), 2.0, 1e-4);
 }
 
 /////////////////////////////////////////////////
@@ -465,15 +465,15 @@ TEST_F(MsgsTest, GPSSensorFromSDF)
                    <stddev>0.2</stddev>\
                    <bias_mean>0.3</bias_mean>\
                    <bias_stddev>0.4</bias_stddev>\
-                   <precision>1.0</precision>\
+                   <precision>0.5</precision>\
                  </noise>\
                </horizontal>\
                <vertical>\
                  <noise type='gaussian_quantized'>\
-                   <mean>0.1</mean>\
-                   <stddev>0.2</stddev>\
-                   <bias_mean>0.3</bias_mean>\
-                   <bias_stddev>0.4</bias_stddev>\
+                   <mean>0.6</mean>\
+                   <stddev>0.7</stddev>\
+                   <bias_mean>0.8</bias_mean>\
+                   <bias_stddev>0.9</bias_stddev>\
                    <precision>1.0</precision>\
                  </noise>\
                </vertical>\
@@ -481,20 +481,20 @@ TEST_F(MsgsTest, GPSSensorFromSDF)
              <velocity_sensing>\
                <horizontal>\
                  <noise type='none'>\
-                   <mean>0.1</mean>\
-                   <stddev>0.2</stddev>\
-                   <bias_mean>0.3</bias_mean>\
-                   <bias_stddev>0.4</bias_stddev>\
-                   <precision>1.0</precision>\
+                   <mean>1.1</mean>\
+                   <stddev>1.2</stddev>\
+                   <bias_mean>1.3</bias_mean>\
+                   <bias_stddev>1.4</bias_stddev>\
+                   <precision>1.5</precision>\
                  </noise>\
                </horizontal>\
                <vertical>\
                  <noise type='gaussian'>\
-                   <mean>0.1</mean>\
-                   <stddev>0.2</stddev>\
-                   <bias_mean>0.3</bias_mean>\
-                   <bias_stddev>0.4</bias_stddev>\
-                   <precision>1.0</precision>\
+                   <mean>1.6</mean>\
+                   <stddev>1.7</stddev>\
+                   <bias_mean>1.8</bias_mean>\
+                   <bias_stddev>1.9</bias_stddev>\
+                   <precision>2.0</precision>\
                  </noise>\
                </vertical>\
              </velocity_sensing>\
