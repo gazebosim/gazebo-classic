@@ -32,6 +32,13 @@ namespace gazebo
     /// \brief Private data for log play
     class LogPlayPrivate
     {
+      /// \brief Helper function to get chunk data from XML.
+      /// \param[in] _xml Pointer to an xml block that has state data.
+      /// \param[out] _data Storage for the chunk's data.
+      /// \return True if the chunk was successfully parsed.
+      public: bool ChunkData(tinyxml2::XMLElement *_xml,
+                            std::string &_data) const;
+
       /// \brief Max number of chunks to inspect when looking for XML elements.
       public: const unsigned int kNumChunksToTry = 2u;
 

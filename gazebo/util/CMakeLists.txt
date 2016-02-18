@@ -6,7 +6,7 @@ if (HAVE_OPENAL)
   include_directories(${OPENAL_INCLUDE_DIR})
 endif()
 
-include_directories(${TBB_INCLUDEDIR})
+include_directories(${TBB_INCLUDEDIR} ${CMAKE_SOURCE_DIR}/deps/win/tinyxml2)
 
 include_directories(${tinyxml_INCLUDE_DIRS})
 set (sources
@@ -14,6 +14,7 @@ set (sources
   LogPlay.cc
   LogRecord.cc
   OpenAL.cc
+  ${CMAKE_SOURCE_DIR}/deps/win/tinyxml2/tinyxml2.cpp
 )
 
 if (NOT USE_EXTERNAL_TINYXML)
@@ -23,12 +24,6 @@ if (NOT USE_EXTERNAL_TINYXML)
        ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxml.cpp
        ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxmlerror.cpp
        ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxmlparser.cpp)
-endif()
-
-if (NOT USE_EXTERNAL_TINYXML2)
-  include_directories (${CMAKE_SOURCE_DIR}/deps/win/tinyxml2)
-  set (sources ${sources}
-       ${CMAKE_SOURCE_DIR}/deps/win/tinyxml2/tinyxml2.cpp)
 endif()
 
 set (headers
@@ -69,7 +64,6 @@ target_link_libraries(gazebo_util
   gazebo_common
   gazebo_transport
   gazebo_msgs
-  ${tinyxml2_LIBRARIES}
 )
 
 gz_install_library(gazebo_util)

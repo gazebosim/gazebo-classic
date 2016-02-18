@@ -20,6 +20,8 @@
   #include <Winsock2.h>
 #endif
 
+#include <tinyxml2.h>
+
 #include <algorithm>
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
@@ -105,8 +107,11 @@ void LogPlay::Open(const std::string &_logFile)
   if (!this->dataPtr->logCurrXml)
     gzthrow("Unable to find the first chunk");
 
-  if (!this->ChunkData(this->dataPtr->logCurrXml, this->dataPtr->currentChunk))
+  if (!this->dataPtr->ChunkData(this->dataPtr->logCurrXml,
+                                this->dataPtr->currentChunk))
+  {
     gzthrow("Unable to decode log file");
+  }
 
   this->dataPtr->start = 0;
   this->dataPtr->end = -1 * this->dataPtr->kEndFrame.size();
@@ -226,7 +231,7 @@ void LogPlay::ReadLogTimes()
       return;
     }
 
-    if (!this->ChunkData(chunkXml, chunk))
+    if (!this->dataPtr->ChunkData(chunkXml, chunk))
       return;
 
     // Find the first <sim_time> of the log.
@@ -258,7 +263,7 @@ void LogPlay::ReadLogTimes()
     return;
   }
 
-  if (!this->ChunkData(lastChunk, chunk))
+  if (!this->dataPtr->ChunkData(lastChunk, chunk))
     return;
 
   // Update the last <sim_time> of the log.
@@ -302,7 +307,7 @@ bool LogPlay::ReadIterations()
     }
 
     std::string chunk;
-    if (!this->ChunkData(chunkXml, chunk))
+    if (!this->dataPtr->ChunkData(chunkXml, chunk))
       return false;
 
     // Find the first <iterations> of the log.
@@ -544,8 +549,11 @@ bool LogPlay::Rewind()
     return false;
   }
 
-  if (!this->ChunkData(this->dataPtr->logCurrXml, this->dataPtr->currentChunk))
+  if (!this->dataPtr->ChunkData(this->dataPtr->logCurrXml,
+                                this->dataPtr->currentChunk))
+  {
     return false;
+  }
 
   // Skip first <sdf> block (it doesn't have a world state).
   this->dataPtr->end = this->dataPtr->currentChunk.find(
@@ -581,8 +589,11 @@ bool LogPlay::Forward()
     return false;
   }
 
-  if (!this->ChunkData(this->dataPtr->logCurrXml, this->dataPtr->currentChunk))
+  if (!this->dataPtr->ChunkData(this->dataPtr->logCurrXml,
+                                this->dataPtr->currentChunk))
+  {
     return false;
+  }
 
   this->dataPtr->start = this->dataPtr->currentChunk.size() - 1;
   this->dataPtr->end = this->dataPtr->currentChunk.size() - 1;
@@ -701,13 +712,14 @@ bool LogPlay::Chunk(unsigned int _index, std::string &_data) const
   }
 
   if (this->dataPtr->logCurrXml && count == _index)
-    return this->ChunkData(this->dataPtr->logCurrXml, _data);
+    return this->dataPtr->ChunkData(this->dataPtr->logCurrXml, _data);
   else
     return false;
 }
 
 /////////////////////////////////////////////////
-bool LogPlay::ChunkData(tinyxml2::XMLElement *_xml, std::string &_data) const
+bool LogPlayPrivate::ChunkData(
+    tinyxml2::XMLElement *_xml, std::string &_data) const
 {
   // Make sure we have valid xml pointer
   if (!_xml)
@@ -717,18 +729,17 @@ bool LogPlay::ChunkData(tinyxml2::XMLElement *_xml, std::string &_data) const
   }
 
   /// Get the chunk's encoding
-  this->dataPtr->encoding = _xml->Attribute("encoding");
+  this->encoding = _xml->Attribute("encoding");
 
   // Make sure there is an encoding value.
-  if (this->dataPtr->encoding.empty())
+  if (this->encoding.empty())
   {
-    gzthrow("Encoding missing for a chunk in log file[" +
-        this->dataPtr->filename + "]");
+    gzthrow("Encoding missing for a chunk in log file[" + this->filename + "]");
   }
 
-  if (this->dataPtr->encoding == "txt")
+  if (this->encoding == "txt")
     _data = _xml->GetText();
-  else if (this->dataPtr->encoding == "bz2")
+  else if (this->encoding == "bz2")
   {
     std::string data = _xml->GetText();
     std::string buffer;
@@ -747,7 +758,7 @@ bool LogPlay::ChunkData(tinyxml2::XMLElement *_xml, std::string &_data) const
       _data += '\0';
     }
   }
-  else if (this->dataPtr->encoding == "zlib")
+  else if (this->encoding == "zlib")
   {
     std::string data = _xml->GetText();
     std::string buffer;
@@ -768,8 +779,8 @@ bool LogPlay::ChunkData(tinyxml2::XMLElement *_xml, std::string &_data) const
   }
   else
   {
-    gzerr << "Invalid encoding[" << this->dataPtr->encoding << "] in log file["
-      << this->dataPtr->filename << "]\n";
+    gzerr << "Invalid encoding[" << this->encoding << "] in log file["
+      << this->filename << "]\n";
     return false;
   }
 
@@ -817,8 +828,11 @@ bool LogPlay::NextChunk()
     return false;
 
   this->dataPtr->logCurrXml = next;
-  if (!this->ChunkData(this->dataPtr->logCurrXml, this->dataPtr->currentChunk))
+  if (!this->dataPtr->ChunkData(this->dataPtr->logCurrXml,
+                                this->dataPtr->currentChunk))
+  {
     return false;
+  }
 
   this->dataPtr->start = 0;
   this->dataPtr->end = -1 * this->dataPtr->kEndFrame.size();
@@ -834,8 +848,11 @@ bool LogPlay::PrevChunk()
     return false;
 
   this->dataPtr->logCurrXml = prev;
-  if (!this->ChunkData(this->dataPtr->logCurrXml, this->dataPtr->currentChunk))
+  if (!this->dataPtr->ChunkData(this->dataPtr->logCurrXml,
+                                this->dataPtr->currentChunk))
+  {
     return false;
+  }
 
   this->dataPtr->start = this->dataPtr->currentChunk.size() - 1;
   this->dataPtr->end = this->dataPtr->currentChunk.size() - 1;
