@@ -28,7 +28,7 @@ namespace gazebo
   namespace common
   {
     /// \internal
-    /// \brief URIPath private data.
+    /// \brief Tokenizer private data.
     class TokenizerPrivate
     {
       /// \brief Input string.
