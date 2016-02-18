@@ -213,9 +213,6 @@ void IncrementalPlot::Update()
   if (this->dataPtr->curves.empty())
     return;
 
-  double yMin = IGN_DBL_MAX;
-  double yMax = 0;
-
   ignition::math::Vector2d lastPoint;
   for (auto &curve : this->dataPtr->curves)
   {
@@ -234,10 +231,6 @@ void IncrementalPlot::Update()
 
     ignition::math::Vector2d minPt = curve.second->Min();
     ignition::math::Vector2d maxPt = curve.second->Max();
-    if (maxPt.Y() > yMax)
-      yMax = maxPt.Y();
-    if (minPt.Y() < yMin)
-      yMin = minPt.Y();
 
     this->dataPtr->directPainter->drawSeries(curve.second->Curve(),
       pointCount - 1, pointCount - 1);
