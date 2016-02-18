@@ -35,11 +35,11 @@ TEST(URITEST, URIPath)
   path1.PushFront("part0");
   EXPECT_EQ(path1.Str(), "part0/part1/part2");
 
-  path2 = path1 / "part0";
-  EXPECT_EQ(path2.Str(), "part0");
+  path2 = path1 / "part3";
+  EXPECT_EQ(path2.Str(), "part0/part1/part2/part3");
 
-  //path2 /= "part1" / "part2";
-  //EXPECT_EQ(path2.Str(), "part0/part1/part2");
+  path1 /= "part3";
+  EXPECT_EQ(path1.Str(), "part0/part1/part2/part3");
 
   EXPECT_TRUE(path1 == path2);
 
@@ -130,7 +130,6 @@ TEST(URITEST, URIQueryString)
   EXPECT_FALSE(URIQuery::Valid("?key", query));
   EXPECT_FALSE(URIQuery::Valid("?key=", query));
   EXPECT_FALSE(URIQuery::Valid("?=value", query));
-  EXPECT_FALSE(URIQuery::Valid("?key=value", query));
 
   EXPECT_TRUE(URIQuery::Valid("", query));
   EXPECT_TRUE(URIQuery::Valid("?key=value", query));
@@ -143,7 +142,6 @@ TEST(URITEST, URIQueryString)
   EXPECT_FALSE(query.Load("?key"));
   EXPECT_FALSE(query.Load("?key="));
   EXPECT_FALSE(query.Load("?=value"));
-  EXPECT_FALSE(query.Load("?key=value"));
 
   EXPECT_TRUE(query.Load(""));
   EXPECT_TRUE(query.Load("?key=value"));
@@ -156,7 +154,6 @@ TEST(URITEST, URIQueryString)
   EXPECT_THROW(URIQuery("?key"), Exception);
   EXPECT_THROW(URIQuery("?key="), Exception);
   EXPECT_THROW(URIQuery("?=value"), Exception);
-  EXPECT_THROW(URIQuery("?key=value"), Exception);
 
   EXPECT_NO_THROW(URIQuery(""));
   EXPECT_NO_THROW(URIQuery("?key=value"));

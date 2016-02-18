@@ -286,9 +286,8 @@ bool URIQuery::Load(const std::string &_str)
 const URIQuery URIQuery::Insert(const std::string &_key,
                                 const std::string &_value)
 {
-  URIQuery result = *this;
-  result.dataPtr->values.insert(std::make_pair(_key, _value));
-  return result;
+  this->dataPtr->values.insert(std::make_pair(_key, _value));
+  return *this;
 }
 
 /////////////////////////////////////////////////
@@ -330,14 +329,17 @@ bool URIQuery::operator==(const URIQuery &_query) const
 /////////////////////////////////////////////////
 bool URIQuery::Valid(const std::string &_str, URIQuery &_query)
 {
+  _query.Clear();
+
+  if (_str.empty())
+    return true;
+
   if ((std::count(_str.begin(), _str.end(), '?') != 1u) ||
       (_str.find("?") != 0u) ||
       (_str.find_first_of(" ") != std::string::npos))
   {
     return false;
   }
-
-  _query.Clear();
 
   Tokenizer tokenizer(_str.substr(1));
   auto queries = tokenizer.Split("&");
@@ -473,7 +475,7 @@ bool URI::Valid(const std::string &_str, URI &_uri)
     path = _str.substr(from, to - from);
 
     // Update the query.
-    query = _str.substr(to + 1);
+    query = _str.substr(to);
   }
 
   URIPath newPath;
