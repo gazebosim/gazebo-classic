@@ -15,11 +15,6 @@
  *
 */
 
-/* Desc: Base class shared by all classes in Gazebo.
- * Author: Nate Koenig
- * Date: 09 Sept. 2008
- */
-
 #ifndef _GAZEBO_PHYSICS_BASE_HH_
 #define _GAZEBO_PHYSICS_BASE_HH_
 
@@ -35,7 +30,7 @@
 #include <sdf/sdf.hh>
 
 #include "gazebo/common/CommonTypes.hh"
-#include "gazebo/common/Uri.hh"
+#include "gazebo/common/URI.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/util/system.hh"
 
@@ -288,7 +283,7 @@ namespace gazebo
       /// E.g.: A link entity contains the name of the link and the model where
       /// the link is contained.
       /// \return The URI of this entity.
-      public: common::Uri ScopedUri() const;
+      public: common::URI URI() const;
 
       /// \brief Print this object to screen via gzmsg.
       /// \param[in] _prefix Usually a set of spaces.

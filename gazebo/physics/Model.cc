@@ -1479,7 +1479,7 @@ bool Model::RemoveJoint(const std::string &_name)
 /////////////////////////////////////////////////
 void Model::RegisterIntrospectionItems()
 {
-  auto uri = this->ScopedUri();
+  auto uri = this->URI();
 
   // Callbacks.
   auto fModelPose = [this]()
@@ -1493,8 +1493,13 @@ void Model::RegisterIntrospectionItems()
   };
 
   // Register items.
+  common::URI poseURI(uri);
+  poseURI.Query().Insert("p", "pose");
   gazebo::util::IntrospectionManager::Instance()->Register
-      <ignition::math::Pose3d>(uri.CanonicalUri({"pose"}), fModelPose);
+      <ignition::math::Pose3d>(poseURI.Str(), fModelPose);
+
+  common::URI linVelURI(uri);
+  poseURI.Query().Insert("p", "lin_vel");
   gazebo::util::IntrospectionManager::Instance()->Register
-      <ignition::math::Vector3d>(uri.CanonicalUri({"lin_vel"}), fModelLinVel);
+      <ignition::math::Vector3d>(linVelURI.Str(), fModelLinVel);
 }

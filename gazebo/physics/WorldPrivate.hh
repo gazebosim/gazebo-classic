@@ -29,7 +29,7 @@
 
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/Time.hh"
-#include "gazebo/common/Uri.hh"
+#include "gazebo/common/URI.hh"
 
 #include "gazebo/msgs/msgs.hh"
 
@@ -327,7 +327,7 @@ namespace gazebo
       public: std::atomic_bool sensorsInitialized;
 
       /// \brief URI of this world.
-      public: std::unique_ptr<common::Uri> uri;
+      public: common::URI uri;
     };
   }
 }

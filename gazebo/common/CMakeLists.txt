@@ -66,7 +66,8 @@ set (sources
   SVGLoader.cc
   Time.cc
   Timer.cc
-  Uri.cc
+  Tokenizer.cc
+  URI.cc
   Video.cc
   ffmpeg_inc.cc
 )
@@ -121,8 +122,9 @@ set (headers
   SVGLoader.hh
   Time.hh
   Timer.hh
+  Tokenizer.hh
   UpdateInfo.hh
-  Uri.hh
+  URI.hh
   Video.hh
   ffmpeg_inc.h
  )
@@ -151,7 +153,8 @@ set (gtest_sources
   SystemPaths_TEST.cc
   SVGLoader_TEST.cc
   Time_TEST.cc
-  Uri_TEST.cc
+  Tokenizer_TEST.cc
+  URI_TEST.cc
 )
 
 # Timer test fails on OSX

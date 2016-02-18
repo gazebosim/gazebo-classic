@@ -328,33 +328,30 @@ std::string Base::GetScopedName(bool _prependWorldName) const
 
 
 //////////////////////////////////////////////////
-common::Uri Base::ScopedUri() const
+common::URI Base::URI() const
 {
-  common::UriParts parts;
-  common::UriEntity entity;
-  common::UriNestedEntity nestedEntity;
+  common::URI uri;
 
-  parts.SetWorld(this->world->GetName());
-
-  entity.SetType(this->TypeStr());
-  entity.SetName(this->GetName());
-  nestedEntity.AddEntity(entity);
+  uri.SetScheme("data");
 
   BasePtr p = this->parent;
   while (p)
   {
     if (p->GetParent())
     {
-      entity.SetType(p->TypeStr());
-      entity.SetName(p->GetName());
-      nestedEntity.AddParentEntity(entity);
+      uri.Path().PushFront(p->GetName());
+      uri.Path().PushFront(p->TypeStr());
     }
+
     p = p->GetParent();
   }
 
-  parts.SetEntity(nestedEntity);
+  uri.Path().PushBack(this->TypeStr());
+  uri.Path().PushBack(this->GetName());
+  uri.Path().PushFront(this->world->GetName());
+  uri.Path().PushFront("world");
 
-  return common::Uri(parts);
+  return uri;
 }
 
 //////////////////////////////////////////////////
