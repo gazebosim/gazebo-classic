@@ -98,6 +98,7 @@ PlotWindow::PlotWindow(QWidget *_parent)
 
   // new empty canvas
   this->dataPtr->canvasLayout = new QVBoxLayout;
+  this->dataPtr->canvasLayout->setSpacing(20);
   this->AddCanvas();
 
   // add button
@@ -182,6 +183,8 @@ PlotWindow::PlotWindow(QWidget *_parent)
   displayTimer->start(30);
 
   PlotManager::Instance()->AddWindow(this);
+
+  this->setMinimumSize(640, 480);
 
   //=================
   // TODO for testing - remove later

@@ -75,7 +75,7 @@ namespace gazebo
 }
 
 // empty plot id
-unsigned int PlotCanvas::EMPTY_PLOT = IGN_UINT32_MAX;
+const unsigned int PlotCanvas::EmptyPlot = IGN_UINT32_MAX;
 
 // global plot id count
 unsigned int PlotCanvasPrivate::globalPlotId = 0;
@@ -98,7 +98,7 @@ PlotCanvas::PlotCanvas(QWidget *_parent)
   QAction *clearPlotAct = new QAction("Clear all fields", settingsMenu);
   clearPlotAct->setStatusTip(tr("Clear variables and all plots on canvas"));
   connect(clearPlotAct, SIGNAL(triggered()), this, SLOT(OnClearCanvas()));
-  QAction *deletePlotAct = new QAction("Delete Plot", settingsMenu);
+  QAction *deletePlotAct = new QAction("Delete canvas", settingsMenu);
   deletePlotAct->setStatusTip(tr("Delete entire canvas"));
   connect(deletePlotAct, SIGNAL(triggered()), this, SLOT(OnDeleteCanvas()));
 
@@ -226,8 +226,8 @@ void PlotCanvas::SetVariableLabel(const unsigned int _id,
 unsigned int PlotCanvas::AddVariable(const std::string &_variable,
     const unsigned int _plotId)
 {
-  unsigned int targetId = VariablePill::EMPTY_VARIABLE;
-  if (_plotId != EMPTY_PLOT)
+  unsigned int targetId = VariablePill::EmptyVariable;
+  if (_plotId != EmptyPlot)
   {
     // find a variable that belongs to the specified plotId and make that the
     // the target variable that the new variable will be added to
@@ -250,7 +250,7 @@ void PlotCanvas::AddVariable(const unsigned int _id,
     const std::string &_variable, const unsigned int _plotId)
 {
   unsigned int plotId;
-  if (_plotId == EMPTY_PLOT)
+  if (_plotId == EmptyPlot)
   {
     // create new plot for the variable and add plot to canvas
     plotId = this->AddPlot();
@@ -280,7 +280,7 @@ void PlotCanvas::RemoveVariable(const unsigned int _id,
     const unsigned int _plotId)
 {
   auto it = this->dataPtr->plotData.end();
-  if (_plotId == EMPTY_PLOT)
+  if (_plotId == EmptyPlot)
   {
     for (auto pIt = this->dataPtr->plotData.begin();
         pIt != this->dataPtr->plotData.end(); ++pIt)
@@ -322,6 +322,8 @@ void PlotCanvas::RemoveVariable(const unsigned int _id,
     delete it->second->plot;
     delete it->second;
     this->dataPtr->plotData.erase(it);
+
+    this->UpdateAxisLabel();
   }
   else
   {
@@ -347,6 +349,8 @@ unsigned int PlotCanvas::AddPlot()
   plotData->id = this->dataPtr->globalPlotId++;
   plotData->plot = plot;
   this->dataPtr->plotData[plotData->id] = plotData;
+
+  this->UpdateAxisLabel();
 
   return plotData->id;
 }
@@ -380,6 +384,8 @@ void PlotCanvas::RemovePlot(const unsigned int _id)
   // remove last variable - this will also delete the plot which causes
   // plot data iterator to be invalid. So do this last.
   this->RemoveVariable(it->second->variableCurves.begin()->first, plotId);
+
+  this->UpdateAxisLabel();
 }
 
 /////////////////////////////////////////////////
@@ -403,14 +409,14 @@ unsigned int PlotCanvas::PlotByVariable(const unsigned int _variableId) const
       return it.first;
     }
   }
-  return EMPTY_PLOT;
+  return EmptyPlot;
 }
 
 /////////////////////////////////////////////////
 void PlotCanvas::OnAddVariable(const unsigned int _id,
     const std::string &_variable, const unsigned int _targetId)
 {
-  if (_targetId != VariablePill::EMPTY_VARIABLE)
+  if (_targetId != VariablePill::EmptyVariable)
   {
     // Add a variable to existing plot
     for (const auto it : this->dataPtr->plotData)
@@ -521,6 +527,8 @@ void PlotCanvas::OnMoveVariable(const unsigned int _id,
       plotData->plot->detachItems(QwtPlotItem::Rtti_PlotItem, false);
       delete plotData->plot;
       delete plotData;
+
+      this->UpdateAxisLabel();
     }
   }
 }
@@ -693,13 +701,73 @@ std::vector<IncrementalPlot *> PlotCanvas::Plots()
 /////////////////////////////////////////////////
 void PlotCanvas::OnClearCanvas()
 {
+  // Ask for confirmation
+  std::string msg = "Are you sure you want to clear all fields? \n\n"
+        "This will remove all the plots in this canvas. \n";
+
+  QMessageBox msgBox(QMessageBox::Warning, QString("Clear canvas?"),
+      QString(msg.c_str()));
+  msgBox.setWindowFlags(Qt::Window | Qt::WindowTitleHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
+
+  QPushButton *cancelButton =
+      msgBox.addButton("Cancel", QMessageBox::RejectRole);
+  QPushButton *clearButton = msgBox.addButton("Clear",
+      QMessageBox::AcceptRole);
+  msgBox.setDefaultButton(clearButton);
+  msgBox.setEscapeButton(cancelButton);
+  msgBox.show();
+  msgBox.move(this->mapToGlobal(this->pos()));
+  msgBox.exec();
+  if (msgBox.clickedButton() != clearButton)
+    return;
+
   this->Clear();
 }
 
 /////////////////////////////////////////////////
 void PlotCanvas::OnDeleteCanvas()
 {
+  // Ask for confirmation
+  std::string msg = "Are you sure you want to delete the entire canvas? \n";
+
+  QMessageBox msgBox(QMessageBox::Warning, QString("Delete canvas?"),
+      QString(msg.c_str()));
+  msgBox.setWindowFlags(Qt::Window | Qt::WindowTitleHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
+
+  QPushButton *cancelButton =
+      msgBox.addButton("Cancel", QMessageBox::RejectRole);
+  QPushButton *deleteButton = msgBox.addButton("Delete",
+      QMessageBox::AcceptRole);
+  msgBox.setDefaultButton(deleteButton);
+  msgBox.setEscapeButton(cancelButton);
+  msgBox.show();
+  msgBox.move(this->mapToGlobal(this->pos()));
+  msgBox.exec();
+  if (msgBox.clickedButton() != deleteButton)
+    return;
+
   emit CanvasDeleted();
+}
+
+/////////////////////////////////////////////////
+void PlotCanvas::UpdateAxisLabel()
+{
+  // show the x-axis label in the last plot only
+  for (int i = 0; i < this->dataPtr->plotLayout->count(); ++i)
+  {
+    QLayoutItem *item = this->dataPtr->plotLayout->itemAt(i);
+    if (item)
+    {
+      IncrementalPlot *p = qobject_cast<IncrementalPlot *>(item->widget());
+      if (p)
+      {
+        p->ShowAxisLabel(IncrementalPlot::X_BOTTOM_AXIS,
+            i == (this->dataPtr->plotLayout->count()-1));
+      }
+    }
+  }
 }
 
 /////////////////////////////////////////////////

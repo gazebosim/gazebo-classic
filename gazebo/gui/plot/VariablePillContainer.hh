@@ -75,13 +75,13 @@ namespace gazebo
       /// \param[in] _name Name of variable pill to add.
       /// \param[in] _targetId Unqiue id of the variable pill to add to.
       public: unsigned int AddVariablePill(const std::string &_name,
-          const unsigned int _targetId = VariablePill::EMPTY_VARIABLE);
+          const unsigned int _targetId = VariablePill::EmptyVariable);
 
       /// \brief Add a variable pill to the container.
       /// \param[in] _variable Variable pill to add.
       /// \param[in] _targetId Unqiue id of the variable pill to add to.
       public: void AddVariablePill(VariablePill *_variable,
-          const unsigned int _targetId = VariablePill::EMPTY_VARIABLE);
+          const unsigned int _targetId = VariablePill::EmptyVariable);
 
       /// \brief Remove a variable pill from the container.
       /// \param[in] _variable Variable pill to remove.
@@ -128,7 +128,7 @@ namespace gazebo
       /// \param[in] _id Unique id of the variable pill.
       /// \param[in] Name of variable pill added.
       /// \param[in] _targetId Unique id of the target variable pill that this
-      /// variable is added to. VariablePill::EMPTY_VARIABLE if it is added to a
+      /// variable is added to. VariablePill::EmptyVariable if it is added to a
       /// container and not a variable pill.
       Q_SIGNALS: void VariableAdded(const unsigned int _id,
           const std::string &_name, const unsigned int _targetId);
@@ -136,7 +136,7 @@ namespace gazebo
       /// \brief Qt signal emitted when a variable is removed from the container
       /// \param[in] _id Unique id of the variable pill.
       /// \param[in] _targetId Unique id of the target variable pill that this
-      /// variable is removed from. VariablePill::EMPTY_VARIABLE if it is
+      /// variable is removed from. VariablePill::EmptyVariable if it is
       /// removed
       /// from a container and not a variable pill.
       Q_SIGNALS: void VariableRemoved(const unsigned int _id,
@@ -145,7 +145,7 @@ namespace gazebo
       /// \brief Qt signal emitted when a variable is moved into the container.
       /// \param[in] _id Unique id of the variable pill.
       /// \param[in] _targetId Unique id of the target variable pill that this
-      /// variable has moved to. VariablePill::EMPTY_VARIABLE if it moved to a
+      /// variable has moved to. VariablePill::EmptyVariable if it moved to a
       /// container and not a variable pill.
       Q_SIGNALS: void VariableMoved(const unsigned int _id,
           const unsigned int _targetId);
