@@ -113,7 +113,7 @@ namespace gazebo
       /// \param[in] _plotCurve The curve to attach to the plot.
       public: void AttachCurve(PlotCurveWeakPtr _curve);
 
-      /// \brief Dettach a curve from this plot.
+      /// \brief Detach a curve from this plot.
       /// \param[in] _id Unique id of the plot curve to detach.
       /// \return Pointer to the plot curve
       public: PlotCurvePtr DetachCurve(const unsigned int _id);
