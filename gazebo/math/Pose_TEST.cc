@@ -19,11 +19,10 @@
 
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/math/Pose.hh"
-#include "test/util.hh"
 
 using namespace gazebo;
 
-class PoseTest : public gazebo::testing::AutoLogFixture { };
+class PoseTest : public ::testing::Test { };
 
 TEST_F(PoseTest, Pose)
 {
