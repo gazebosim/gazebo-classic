@@ -20,6 +20,8 @@
   #include <Winsock2.h>
 #endif
 
+#include <gazebo/tinyxml2.h>
+
 #include <algorithm>
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
@@ -72,7 +74,7 @@ void LogPlay::Open(const std::string &_logFile)
 
   // Parse the log file
   if (this->dataPtr->xmlDoc.LoadFile(_logFile.c_str()) !=
-      tinyxml2::XML_NO_ERROR)
+      gazebo::tinyxml2::XML_NO_ERROR)
   {
     gzthrow("Unable to parse log file[" << _logFile << "]");
   }
@@ -105,17 +107,14 @@ void LogPlay::Open(const std::string &_logFile)
   if (!this->dataPtr->logCurrXml)
     gzthrow("Unable to find the first chunk");
 
-  if (!this->ChunkData(this->dataPtr->logCurrXml, this->dataPtr->currentChunk))
+  if (!this->dataPtr->ChunkData(this->dataPtr->logCurrXml,
+                                this->dataPtr->currentChunk))
+  {
     gzthrow("Unable to decode log file");
+  }
 
   this->dataPtr->start = 0;
   this->dataPtr->end = -1 * this->dataPtr->kEndFrame.size();
-}
-
-/////////////////////////////////////////////////
-std::string LogPlay::GetHeader() const
-{
-  return this->Header();
 }
 
 /////////////////////////////////////////////////
@@ -137,12 +136,6 @@ std::string LogPlay::Header() const
 }
 
 /////////////////////////////////////////////////
-uint64_t LogPlay::GetInitialIterations() const
-{
-  return this->InitialIterations();
-}
-
-/////////////////////////////////////////////////
 uint64_t LogPlay::InitialIterations() const
 {
   return this->dataPtr->initialIterations;
@@ -158,7 +151,7 @@ bool LogPlay::HasIterations() const
 void LogPlay::ReadHeader()
 {
   this->dataPtr->randSeed = ignition::math::Rand::Seed();
-  tinyxml2::XMLElement *headerXml, *childXml;
+  gazebo::tinyxml2::XMLElement *headerXml, *childXml;
 
   this->dataPtr->logVersion.clear();
   this->dataPtr->gazeboVersion.clear();
@@ -226,7 +219,7 @@ void LogPlay::ReadLogTimes()
       return;
     }
 
-    if (!this->ChunkData(chunkXml, chunk))
+    if (!this->dataPtr->ChunkData(chunkXml, chunk))
       return;
 
     // Find the first <sim_time> of the log.
@@ -258,7 +251,7 @@ void LogPlay::ReadLogTimes()
     return;
   }
 
-  if (!this->ChunkData(lastChunk, chunk))
+  if (!this->dataPtr->ChunkData(lastChunk, chunk))
     return;
 
   // Update the last <sim_time> of the log.
@@ -302,7 +295,7 @@ bool LogPlay::ReadIterations()
     }
 
     std::string chunk;
-    if (!this->ChunkData(chunkXml, chunk))
+    if (!this->dataPtr->ChunkData(chunkXml, chunk))
       return false;
 
     // Find the first <iterations> of the log.
@@ -333,21 +326,9 @@ bool LogPlay::IsOpen() const
 }
 
 /////////////////////////////////////////////////
-std::string LogPlay::GetLogVersion() const
-{
-  return this->LogVersion();
-}
-
-/////////////////////////////////////////////////
 std::string LogPlay::LogVersion() const
 {
   return this->dataPtr->logVersion;
-}
-
-/////////////////////////////////////////////////
-std::string LogPlay::GetGazeboVersion() const
-{
-  return this->GazeboVersion();
 }
 
 /////////////////////////////////////////////////
@@ -357,21 +338,9 @@ std::string LogPlay::GazeboVersion() const
 }
 
 /////////////////////////////////////////////////
-uint32_t LogPlay::GetRandSeed() const
-{
-  return this->RandSeed();
-}
-
-/////////////////////////////////////////////////
 uint32_t LogPlay::RandSeed() const
 {
   return this->dataPtr->randSeed;
-}
-
-/////////////////////////////////////////////////
-common::Time LogPlay::GetLogStartTime() const
-{
-  return this->LogStartTime();
 }
 
 /////////////////////////////////////////////////
@@ -381,21 +350,9 @@ common::Time LogPlay::LogStartTime() const
 }
 
 /////////////////////////////////////////////////
-common::Time LogPlay::GetLogEndTime() const
-{
-  return this->LogEndTime();
-}
-
-/////////////////////////////////////////////////
 common::Time LogPlay::LogEndTime() const
 {
   return this->dataPtr->logEndTime;
-}
-
-/////////////////////////////////////////////////
-std::string LogPlay::GetFilename() const
-{
-  return this->Filename();
 }
 
 /////////////////////////////////////////////////
@@ -406,22 +363,10 @@ std::string LogPlay::Filename() const
 }
 
 /////////////////////////////////////////////////
-std::string LogPlay::GetFullPathFilename() const
-{
-  return this->FullPathFilename();
-}
-
-/////////////////////////////////////////////////
 std::string LogPlay::FullPathFilename() const
 {
   const boost::filesystem::path logFilename(this->dataPtr->filename);
   return boost::filesystem::canonical(logFilename).string();
-}
-
-/////////////////////////////////////////////////
-uintmax_t LogPlay::GetFileSize() const
-{
-  return this->FileSize();
 }
 
 /////////////////////////////////////////////////
@@ -544,8 +489,11 @@ bool LogPlay::Rewind()
     return false;
   }
 
-  if (!this->ChunkData(this->dataPtr->logCurrXml, this->dataPtr->currentChunk))
+  if (!this->dataPtr->ChunkData(this->dataPtr->logCurrXml,
+                                this->dataPtr->currentChunk))
+  {
     return false;
+  }
 
   // Skip first <sdf> block (it doesn't have a world state).
   this->dataPtr->end = this->dataPtr->currentChunk.find(
@@ -581,8 +529,11 @@ bool LogPlay::Forward()
     return false;
   }
 
-  if (!this->ChunkData(this->dataPtr->logCurrXml, this->dataPtr->currentChunk))
+  if (!this->dataPtr->ChunkData(this->dataPtr->logCurrXml,
+                                this->dataPtr->currentChunk))
+  {
     return false;
+  }
 
   this->dataPtr->start = this->dataPtr->currentChunk.size() - 1;
   this->dataPtr->end = this->dataPtr->currentChunk.size() - 1;
@@ -681,12 +632,6 @@ bool LogPlay::Seek(const common::Time &_time)
 }
 
 /////////////////////////////////////////////////
-bool LogPlay::GetChunk(unsigned int _index, std::string &_data)
-{
-  return this->Chunk(_index, _data);
-}
-
-/////////////////////////////////////////////////
 bool LogPlay::Chunk(unsigned int _index, std::string &_data) const
 {
   unsigned int count = 0;
@@ -701,13 +646,14 @@ bool LogPlay::Chunk(unsigned int _index, std::string &_data) const
   }
 
   if (this->dataPtr->logCurrXml && count == _index)
-    return this->ChunkData(this->dataPtr->logCurrXml, _data);
+    return this->dataPtr->ChunkData(this->dataPtr->logCurrXml, _data);
   else
     return false;
 }
 
 /////////////////////////////////////////////////
-bool LogPlay::ChunkData(tinyxml2::XMLElement *_xml, std::string &_data) const
+bool LogPlayPrivate::ChunkData(
+    gazebo::tinyxml2::XMLElement *_xml, std::string &_data)
 {
   // Make sure we have valid xml pointer
   if (!_xml)
@@ -717,18 +663,17 @@ bool LogPlay::ChunkData(tinyxml2::XMLElement *_xml, std::string &_data) const
   }
 
   /// Get the chunk's encoding
-  this->dataPtr->encoding = _xml->Attribute("encoding");
+  this->encoding = _xml->Attribute("encoding");
 
   // Make sure there is an encoding value.
-  if (this->dataPtr->encoding.empty())
+  if (this->encoding.empty())
   {
-    gzthrow("Encoding missing for a chunk in log file[" +
-        this->dataPtr->filename + "]");
+    gzthrow("Encoding missing for a chunk in log file[" + this->filename + "]");
   }
 
-  if (this->dataPtr->encoding == "txt")
+  if (this->encoding == "txt")
     _data = _xml->GetText();
-  else if (this->dataPtr->encoding == "bz2")
+  else if (this->encoding == "bz2")
   {
     std::string data = _xml->GetText();
     std::string buffer;
@@ -747,7 +692,7 @@ bool LogPlay::ChunkData(tinyxml2::XMLElement *_xml, std::string &_data) const
       _data += '\0';
     }
   }
-  else if (this->dataPtr->encoding == "zlib")
+  else if (this->encoding == "zlib")
   {
     std::string data = _xml->GetText();
     std::string buffer;
@@ -768,8 +713,8 @@ bool LogPlay::ChunkData(tinyxml2::XMLElement *_xml, std::string &_data) const
   }
   else
   {
-    gzerr << "Invalid encoding[" << this->dataPtr->encoding << "] in log file["
-      << this->dataPtr->filename << "]\n";
+    gzerr << "Invalid encoding[" << this->encoding << "] in log file["
+      << this->filename << "]\n";
     return false;
   }
 
@@ -777,21 +722,9 @@ bool LogPlay::ChunkData(tinyxml2::XMLElement *_xml, std::string &_data) const
 }
 
 /////////////////////////////////////////////////
-std::string LogPlay::GetEncoding() const
-{
-  return this->Encoding();
-}
-
-/////////////////////////////////////////////////
 std::string LogPlay::Encoding() const
 {
   return this->dataPtr->encoding;
-}
-
-/////////////////////////////////////////////////
-unsigned int LogPlay::GetChunkCount() const
-{
-  return this->ChunkCount();
 }
 
 /////////////////////////////////////////////////
@@ -817,8 +750,11 @@ bool LogPlay::NextChunk()
     return false;
 
   this->dataPtr->logCurrXml = next;
-  if (!this->ChunkData(this->dataPtr->logCurrXml, this->dataPtr->currentChunk))
+  if (!this->dataPtr->ChunkData(this->dataPtr->logCurrXml,
+                                this->dataPtr->currentChunk))
+  {
     return false;
+  }
 
   this->dataPtr->start = 0;
   this->dataPtr->end = -1 * this->dataPtr->kEndFrame.size();
@@ -834,8 +770,11 @@ bool LogPlay::PrevChunk()
     return false;
 
   this->dataPtr->logCurrXml = prev;
-  if (!this->ChunkData(this->dataPtr->logCurrXml, this->dataPtr->currentChunk))
+  if (!this->dataPtr->ChunkData(this->dataPtr->logCurrXml,
+                                this->dataPtr->currentChunk))
+  {
     return false;
+  }
 
   this->dataPtr->start = this->dataPtr->currentChunk.size() - 1;
   this->dataPtr->end = this->dataPtr->currentChunk.size() - 1;

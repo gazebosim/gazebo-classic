@@ -31,6 +31,10 @@ namespace gazebo
       /// \param[in] _parent Parent Collision.
       public: explicit ODEMultiRayShape(CollisionPtr _parent);
 
+      /// \brief Constructor for a global multiray shape.
+      /// \param[in] _physicsEngine Pointer to the physics engine.
+      public: explicit ODEMultiRayShape(PhysicsEnginePtr _physicsEngine);
+
       /// \brief Destructor.
       public: virtual ~ODEMultiRayShape();
 
@@ -55,6 +59,10 @@ namespace gazebo
 
       /// \brief Ray space for collision detector.
       private: dSpaceID raySpaceId;
+
+      /// \brief Helper to get the correct ray shape in the UpdateCallback
+      /// function.
+      private: bool defaultUpdate = true;
     };
   }
 }
