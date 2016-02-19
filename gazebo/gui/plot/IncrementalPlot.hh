@@ -125,9 +125,9 @@ namespace gazebo
         const std::string &_label);
 
       /// \brief Set whether to show the axis label.
-      /// \param[in] _axis Plot axis: X_AXIS or Y_AXIS.
+      /// \param[in] _axis Plot axis: X_BOTTOM_AXIS or Y_LEFT_AXIS.
       /// \param[in] _show True to show the label, false to hide it.
-      public: void ShowAxisLabel(PlotAxis _axis, const bool _show);
+      public: void ShowAxisLabel(const PlotAxis _axis, const bool _show);
 
       /// \brief Get all curves in this plot
       /// \return A list of curves in this plot.

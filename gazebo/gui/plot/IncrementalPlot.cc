@@ -80,6 +80,10 @@ IncrementalPlot::IncrementalPlot(QWidget *_parent)
 
   // zoom in/out with the wheel
   this->dataPtr->magnifier = new QwtPlotMagnifier(this->canvas());
+  // invert the wheel direction
+  double wheelFactor = this->dataPtr->magnifier->wheelFactor();
+  if (!ignition::math::equal(wheelFactor, 0.0))
+    this->dataPtr->magnifier->setWheelFactor(1/wheelFactor);
 
 #if defined(Q_WS_X11)
   this->canvas()->setAttribute(Qt::WA_PaintOutsidePaintEvent, true);
@@ -105,12 +109,12 @@ IncrementalPlot::IncrementalPlot(QWidget *_parent)
 #endif
   grid->attach(this);
 
-  this->ShowAxisLabel(X_BOTTOM_AXIS, true);
-  this->ShowAxisLabel(Y_LEFT_AXIS, true);
-
   this->enableAxis(QwtPlot::yLeft);
   this->setAxisScaleEngine(QwtPlot::yLeft, new QwtLinearScaleEngine());
   this->setAxisAutoScale(QwtPlot::yLeft, true);
+
+  this->ShowAxisLabel(X_BOTTOM_AXIS, true);
+  this->ShowAxisLabel(Y_LEFT_AXIS, true);
 
   this->replot();
 }
@@ -213,9 +217,6 @@ void IncrementalPlot::Update()
   if (this->dataPtr->curves.empty())
     return;
 
-  double yMin = IGN_DBL_MAX;
-  double yMax = 0;
-
   ignition::math::Vector2d lastPoint;
   for (auto &curve : this->dataPtr->curves)
   {
@@ -234,10 +235,6 @@ void IncrementalPlot::Update()
 
     ignition::math::Vector2d minPt = curve.second->Min();
     ignition::math::Vector2d maxPt = curve.second->Max();
-    if (maxPt.Y() > yMax)
-      yMax = maxPt.Y();
-    if (minPt.Y() < yMin)
-      yMin = minPt.Y();
 
     this->dataPtr->directPainter->drawSeries(curve.second->Curve(),
       pointCount - 1, pointCount - 1);

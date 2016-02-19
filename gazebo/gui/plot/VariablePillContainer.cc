@@ -427,6 +427,14 @@ bool VariablePillContainer::IsDragValid(QDropEvent *_evt) const
   {
     QString mimeData = _evt->mimeData()->data("application/x-pill-item");
     dataStr = mimeData.toStdString();
+
+    VariablePill *dragVariable = qobject_cast<VariablePill *>(_evt->source());
+    if (!dragVariable)
+      return false;
+
+    // limit drag and drop to same container
+    if (dragVariable->Container() && dragVariable->Container() != this)
+      return false;
   }
   else
     return false;

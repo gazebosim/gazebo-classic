@@ -88,7 +88,7 @@ PlotManager::PlotManager()
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init();
 
-
+  // check for reset events and restart plots when time is reset
   this->dataPtr->worldControlSub =
       this->dataPtr->node->Subscribe("~/world_control",
       &PlotManager::OnWorldControl, this);

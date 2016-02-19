@@ -24,7 +24,9 @@
 #include <map>
 
 #include "gazebo/common/Assert.hh"
+#include "gazebo/common/Color.hh"
 
+#include "gazebo/gui/Conversions.hh"
 #include "gazebo/gui/plot/qwt_gazebo.h"
 #include "gazebo/gui/plot/IncrementalPlot.hh"
 #include "gazebo/gui/plot/PlotCurve.hh"
@@ -32,45 +34,23 @@
 using namespace gazebo;
 using namespace gui;
 
-// The number of unique color
-static const int ColorCount = 3;
-static const int ColorGroupCount = 4;
-
-// The unique colors
-static const QColor Colors[ColorGroupCount][ColorCount] =
-{
-  // purple
-  {
-    QColor(QRgb(0x882e72)),
-    QColor(QRgb(0xb178a6)),
-    QColor(QRgb(0xd6c1de))
-  },
-  // blue
-  {
-    QColor(QRgb(0x1965b0)),
-    QColor(QRgb(0x5289c7)),
-    QColor(QRgb(0x7bafde))
-  },
-  // green
-  {
-    QColor(QRgb(0x4eb265)),
-    QColor(QRgb(0x90c987)),
-    QColor(QRgb(0xcae0ab))
-  },
-  // red
-  {
-    QColor(QRgb(0xdc050c)),
-    QColor(QRgb(0xe8601c)),
-    QColor(QRgb(0xf1932d))
-  },
-};
-
-
-
 namespace gazebo
 {
   namespace gui
   {
+    /// \brief Color palette for the PlotCurve
+    class ColorPalette
+    {
+      /// \brief Number of unique colors in a color group.
+      public: static const int ColorCount = 3;
+
+      /// \brief Number of color groups.
+      public: static const int ColorGroupCount = 4;
+
+      /// \brief Unique colors
+      public: static const common::Color Colors[ColorGroupCount][ColorCount];
+    };
+
     /// \brief A class that manages curve data
     class CurveData: public QwtArraySeriesData<QPointF>
     {
@@ -173,6 +153,47 @@ namespace gazebo
   }
 }
 
+const common::Color ColorPalette::Colors
+    [ColorPalette::ColorGroupCount][ColorPalette::ColorCount] =
+    {
+      // purple
+      {
+        // 0x882e72
+        common::Color(136, 46, 114),
+        // 0xb178a6
+        common::Color(177, 120, 166),
+        // 0xd6c1de
+        common::Color(214, 193, 222)
+      },
+      // blue
+      {
+        // 0x1965b0
+        common::Color(25, 101, 176),
+        // 0x5289c7
+        common::Color(82, 137, 199),
+        // 0x7bafde
+        common::Color(123, 175, 222)
+      },
+      // green
+      {
+        // 0x4eb265
+        common::Color(78, 178, 101),
+        // 0x90c987
+        common::Color(144, 201, 135),
+        // 0xcae0ab
+        common::Color(202, 224, 171)
+      },
+      // red
+      {
+        // 0xdc050c
+        common::Color(220, 5, 12),
+        // 0xe8601c
+        common::Color(232, 96, 28),
+        // 0xf1932d
+        common::Color(241, 147, 45)
+      }
+    };
+
 // global curve id counter
 unsigned int PlotCurvePrivate::globalCurveId = 0;
 
@@ -190,11 +211,13 @@ PlotCurve::PlotCurve(const std::string &_label)
   curve->setStyle(QwtPlotCurve::Lines);
   curve->setData(new CurveData());
 
-  int colorGroup = this->dataPtr->colorCounter % ColorGroupCount;
-  int color = static_cast<int>(this->dataPtr->colorCounter / ColorGroupCount)
-      % ColorCount;
+  int colorGroup = this->dataPtr->colorCounter % ColorPalette::ColorGroupCount;
+  int color = static_cast<int>(
+      this->dataPtr->colorCounter / ColorPalette::ColorGroupCount)
+      % ColorPalette::ColorCount;
   this->dataPtr->colorCounter++;
-  QColor penColor = Colors[colorGroup][color];
+  QColor penColor =
+      Conversions::Convert(ColorPalette::Colors[colorGroup][color]);
 
   QPen pen(penColor);
   pen.setWidth(1.0);
