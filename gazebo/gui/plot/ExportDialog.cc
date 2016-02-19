@@ -33,12 +33,14 @@ class gazebo::gui::ExportDialogPrivate
   public: QPushButton *exportButton;
 };
 
+/////////////////////////////////////////////////
 // Subclass QStandardItem so that we can store a pointer to the plot canvas
 class PlotViewItem : public QStandardItem
 {
   public: PlotCanvas *canvas;
 };
 
+/////////////////////////////////////////////////
 class PlotViewDelegate : public QStyledItemDelegate
 {
   public: enum datarole
@@ -63,11 +65,14 @@ class PlotViewDelegate : public QStyledItemDelegate
             QIcon icon = qvariant_cast<QIcon>(_index.data(iconRole));
             QString title = qvariant_cast<QString>(_index.data(headerTextRole));
 
+            QFont font = QApplication::font();
+            QFontMetrics fm(font);
+
             _painter->save();
 
             // Add margins to the rectangle
             r.adjust(5, 5, -5, -5);
-            if (_opt.state & QStyle::State_Selected)
+            /*if (_opt.state & QStyle::State_Selected)
             {
               _painter->setBrush(QColor(200, 200, 200));
               _painter->setPen(QColor(255, 255, 255));
@@ -76,19 +81,41 @@ class PlotViewDelegate : public QStyledItemDelegate
             {
               _painter->setBrush(QColor(90, 90, 90));
               _painter->setPen(QColor(0, 0, 0));
-            }
-            _painter->drawRect(r);
+            }*/
+            //_painter->drawRect(r);
 
-            iconRect.adjust(8, 8, -8, -8);
-            _painter->drawPixmap(iconRect.left(), iconRect.top(),
-                icon.pixmap(iconRect.width(), iconRect.height()));
+            iconRect.adjust(10, 10, -10, -10);
+
+            QPixmap image = icon.pixmap(iconRect.width(), iconRect.height());
+            _painter->drawPixmap(iconRect.left(), iconRect.top(), image);
+
+            _painter->setPen(QColor(0, 0, 0));
+
+            QPixmap checkImage;
 
             if (_opt.state & QStyle::State_Selected)
-              _painter->setPen(QColor(0, 0, 0));
+             checkImage.load(":/images/check_box_black.svg");
             else
-              _painter->setPen(QColor(255, 255, 255));
+             checkImage.load(":/images/check_box_outline_black.svg");
 
-            _painter->drawText(r, Qt::AlignCenter | Qt::AlignBottom, title);
+            int checkSize = 24;
+            int checkMargin = 4;
+            int checkTitleWidth = fm.width(title) + checkSize + checkMargin;
+
+            QRectF checkRect = _opt.rect;
+            checkRect.setTop(iconRect.top() + image.height() + checkMargin);
+            checkRect.setLeft(iconRect.left() +
+                (iconRect.width() - checkTitleWidth)/2.0);
+            checkRect.setWidth(checkSize);
+            checkRect.setHeight(checkSize);
+            _painter->drawPixmap(checkRect, checkImage, checkImage.rect());
+
+            QRectF titleRect = _opt.rect;
+            titleRect.setTop(checkRect.top() +
+                (checkRect.height() - fm.height())/2.0);
+            titleRect.setLeft(
+                checkRect.left() + checkRect.width() + checkMargin);
+            _painter->drawText(titleRect, Qt::AlignVCenter, title);
             _painter->restore();
           }
 
@@ -113,30 +140,63 @@ ExportDialog::ExportDialog(QWidget *_parent)
 : QDialog(_parent),
   dataPtr(new ExportDialogPrivate)
 {
-  QHBoxLayout *titleLayout = new QHBoxLayout;
-  titleLayout->addWidget(new QLabel("Select plots to export"));
-  titleLayout->setAlignment(Qt::AlignHCenter);
+  QAction *selectAllAct = new QAction(
+      QIcon(":/images/select_all.svg"), tr("Select all"), this);
+  selectAllAct->setToolTip(tr("Select all"));
+  selectAllAct->setVisible(true);
 
-  this->setObjectName("PlotExportDialog");
+  QAction *clearAct = new QAction(
+      QIcon(":/images/clear.svg"), tr("Clear selection"), this);
+  clearAct->setToolTip(tr("Clear selection"));
+  clearAct->setVisible(true);
+
+  QToolBar *selectToolbar = new QToolBar;
+  selectToolbar->setObjectName("plotToolbar");
+  selectToolbar->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+  selectToolbar->addAction(selectAllAct);
+  selectToolbar->addAction(clearAct);
+
+  QHBoxLayout *titleLayout = new QHBoxLayout;
+  titleLayout->addWidget(new QLabel("Select plots to export", this));
+  titleLayout->addStretch();
+  titleLayout->addWidget(selectToolbar);
+  titleLayout->setAlignment(Qt::AlignHCenter);
+  titleLayout->setContentsMargins(0, 0, 0, 0);
+
+  QFrame *titleFrame = new QFrame;
+  titleFrame->setObjectName("plotExportTitleFrame");
+  titleFrame->setLayout(titleLayout);
+
+  this->setObjectName("plotExport");
   this->setWindowTitle("Export Plot");
   this->setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
                        Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
 
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
   QPushButton *cancelButton = new QPushButton(tr("&Cancel"));
+  cancelButton->setObjectName("flat");
   connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
 
-  this->dataPtr->exportButton = new QPushButton("&Export");
+  QMenu *exportMenu = new QMenu;
+  exportMenu->addAction("CSV");
+  exportMenu->addAction("PDF");
+  exportMenu->addAction("PNG");
+
+  this->dataPtr->exportButton = new QPushButton("&Export to");
+  this->dataPtr->exportButton->setObjectName("flat");
   this->dataPtr->exportButton->setDefault(true);
   this->dataPtr->exportButton->setEnabled(false);
-  connect(this->dataPtr->exportButton, SIGNAL(clicked()),
+  this->dataPtr->exportButton->setMenu(exportMenu);
+
+  /*connect(this->dataPtr->exportButton, SIGNAL(clicked()),
           this, SLOT(OnExport()));
+          */
   buttonsLayout->addWidget(cancelButton);
   buttonsLayout->addStretch(2);
   buttonsLayout->addWidget(this->dataPtr->exportButton);
 
-  //QVBoxLayout *plotsLayout = new QVBoxLayout;
   this->dataPtr->listView = new QListView;
+  this->dataPtr->listView->setObjectName("plotExportListView");
 
   QStandardItemModel *model = new QStandardItemModel();
 
@@ -150,7 +210,6 @@ ExportDialog::ExportDialog(QWidget *_parent)
     PlotViewItem *item = new PlotViewItem;
     item->canvas = plot;
 
-    //QStandardItem *item = new QStandardItem();
     item->setData(plot->Title(), PlotViewDelegate::headerTextRole);
     item->setData(icon, PlotViewDelegate::iconRole);
     item->setEditable(false);
@@ -158,7 +217,6 @@ ExportDialog::ExportDialog(QWidget *_parent)
     model->appendRow(item);
   }
 
-  //QAbstractItemModel *model = new QStringListModel(test);
   this->dataPtr->listView->setViewMode(QListView::IconMode);
   this->dataPtr->listView->setWrapping(true);
   this->dataPtr->listView->setFlow(QListView::LeftToRight);
@@ -167,7 +225,7 @@ ExportDialog::ExportDialog(QWidget *_parent)
   this->dataPtr->listView->setMovement(QListView::Static);
   this->dataPtr->listView->setSelectionMode(QAbstractItemView::MultiSelection);
   connect(this->dataPtr->listView, SIGNAL(clicked(const QModelIndex &)),
-          this, SLOT(OnSelected(const QModelIndex &)));
+          this, SLOT(OnSelected()));
 
   PlotViewDelegate *plotViewDelegate = new PlotViewDelegate;
 
@@ -175,21 +233,32 @@ ExportDialog::ExportDialog(QWidget *_parent)
   this->dataPtr->listView->setItemDelegate(plotViewDelegate);
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
-  mainLayout->addLayout(titleLayout);
+  mainLayout->addWidget(titleFrame);
   mainLayout->addWidget(this->dataPtr->listView);
   //mainLayout->addWidget(this->messageLabel);
   //mainLayout->addLayout(gridLayout);
   mainLayout->addLayout(buttonsLayout);
+  mainLayout->setContentsMargins(0, 0, 0, 0);
 
   this->setLayout(mainLayout);
 
   // Set a reasonable default size.
   this->resize(640, 400);
-  //this->layout()->setSizeConstraint(QLayout::SetFixedSize);
+
+  connect(clearAct, SIGNAL(triggered()),
+          this->dataPtr->listView, SLOT(clearSelection()));
+  connect(clearAct, SIGNAL(triggered()),
+          this, SLOT(OnSelected()));
+
+  connect(selectAllAct, SIGNAL(triggered()),
+          this->dataPtr->listView, SLOT(selectAll()));
+  connect(selectAllAct, SIGNAL(triggered()),
+          this, SLOT(OnSelected()));
 }
 
 /////////////////////////////////////////////////
-void ExportDialog::OnSelected(const QModelIndex & /*_index*/)
+//void ExportDialog::OnSelected(const QModelIndex & /*_index*/)
+void ExportDialog::OnSelected()
 {
   this->dataPtr->exportButton->setEnabled(
       this->dataPtr->listView->selectionModel()->selectedIndexes().size() > 0);

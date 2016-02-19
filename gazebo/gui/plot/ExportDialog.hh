@@ -52,7 +52,7 @@ namespace gazebo
       private slots: void OnExport();
 
       /// \brief Qt callback when a plot icon is selected.
-      private slots: void OnSelected(const QModelIndex &_index);
+      private slots: void OnSelected();
 
       /// \internal
       /// \brief Private data pointer

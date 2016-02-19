@@ -239,6 +239,16 @@ QToolButton#dataLoggerStopButton:hover
   background-color: #dddddd;
 }
 
+QListView#plotExportListView
+{
+  color: #d0d0d0;
+  background: transparent;
+  selection-background-color: transparent;
+  show-decoration-selected: 0;
+  border: 0px;
+  border-radius: 0px;
+}
+
 QListView
 {
   color: #d0d0d0;
@@ -325,19 +335,48 @@ QLineEdit:disabled
   color: #909090;
 }
 
+QPushButton#flat
+{
+  padding: 8px;
+  font-weight: 300;
+  color: #393939;
+  text-align: center;
+  border-radius: 0px;
+  border: 0px;
+  selection-color: transparent;
+  background: transparent;
+  min-width: 80px;
+  margin: 8px;
+}
+QPushButton#flat:hover
+{
+  selection-color: transparent;
+  background-color: rgba(153, 153, 153, 20%);
+}
+QPushButton#flat:pressed
+{
+  background-color: rgba(153, 153, 153, 40%);
+  selection-color: transparent;
+}
+QPushButton#flat:!enabled
+{
+  color: rgba(0, 0, 0, 26%);
+  selection-color: transparent;
+}
+QPushButton#flat:checked
+{
+  selection-color: transparent;
+}
+
 QPushButton
 {
-  /*
-  border: 2px outset #727272;
-  border-radius: 4px;
-  background: #737373;
-  */
-
-  color: #d0d0d0;
-  border: 2px solid #737373;
-  border-radius: 0px;
+  padding: 8px;
+  font-weight: 200;
+  color: #fefefe;
+  text-align: center;
+  border-radius: 2px;
+  border: 0px;
   selection-color: transparent;
-  padding: 2px;
   margin: 2px;
   background: #505050;
 }
@@ -360,12 +399,8 @@ QPushButton:pressed
 
 QPushButton:!enabled
 {
-  padding: 2px;
-  margin: 2px;
   color: #909090;
   background: #707070;
-  /* border: 2px solid #707070; */
-  /* border-radius: 4px; */
 }
 
 QScrollBar:vertical
@@ -787,7 +822,8 @@ QTextEdit#splashVersionTextEdit
   font-size: 10px;
 }
 
-QDialog#plotWindow
+QDialog#plotWindow,
+QDialog#plotExport
 {
   background-color: #f2f2f2;
 }
@@ -845,9 +881,21 @@ QFrame#plotCanvasTitleFrame
   background-color: #424242;
 }
 
+QFrame#plotExportTitleFrame
+{
+  padding: 10px;
+  background-color: transparent;
+}
+
 QFrame#plotCanvasTitleFrame > QLabel
 {
   margin-left: 4px;
+}
+
+QFrame#plotExportTitleFrame > QLabel
+{
+  font-size: 18px;
+  color: #303030;
 }
 
 QFrame#plotCanvasFrame

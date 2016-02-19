@@ -122,14 +122,14 @@ PlotWindow::PlotWindow(QWidget *_parent)
   bottomFrame->setSizePolicy(QSizePolicy::Expanding,
       QSizePolicy::Minimum);
 
-  this->dataPtr->plotPlayAct = new QAction(QIcon(":/images/play_dark.png"),
+  this->dataPtr->plotPlayAct = new QAction(QIcon(":/images/play_dark.svg"),
       tr("Play"), this);
   this->dataPtr->plotPlayAct->setToolTip(tr("Continue plotting"));
   this->dataPtr->plotPlayAct->setVisible(false);
   connect(this->dataPtr->plotPlayAct, SIGNAL(triggered()),
       this, SLOT(OnPlay()));
 
-  this->dataPtr->plotPauseAct = new QAction(QIcon(":/images/pause_dark.png"),
+  this->dataPtr->plotPauseAct = new QAction(QIcon(":/images/pause_dark.svg"),
       tr("Pause"), this);
   this->dataPtr->plotPauseAct->setToolTip(
       tr("Pause plotting (not simulation)"));
@@ -137,15 +137,28 @@ PlotWindow::PlotWindow(QWidget *_parent)
   connect(this->dataPtr->plotPauseAct, SIGNAL(triggered()),
       this, SLOT(OnPause()));
 
-  QHBoxLayout *bottomPanelLayout = new QHBoxLayout;
+  QAction *plotExportAct = new QAction(
+      QIcon(":/images/file_upload.svg"), tr("Export"), this);
+  plotExportAct->setToolTip(tr("Export plot data"));
+  plotExportAct->setVisible(true);
+  connect(plotExportAct, SIGNAL(triggered()), this, SLOT(OnExport()));
+
   QToolBar *playToolbar = new QToolBar;
   playToolbar->setObjectName("plotToolbar");
   playToolbar->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
   playToolbar->addAction(this->dataPtr->plotPlayAct);
   playToolbar->addAction(this->dataPtr->plotPauseAct);
+
+  QToolBar *exportToolbar = new QToolBar;
+  exportToolbar->setObjectName("plotToolbar");
+  exportToolbar->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+  exportToolbar->addAction(plotExportAct);
+
+  QHBoxLayout *bottomPanelLayout = new QHBoxLayout;
   bottomPanelLayout->addStretch();
   bottomPanelLayout->addWidget(playToolbar);
   bottomPanelLayout->addStretch();
+  bottomPanelLayout->addWidget(exportToolbar);
   bottomPanelLayout->setContentsMargins(0, 0, 0, 0);
   bottomFrame->setLayout(bottomPanelLayout);
 
@@ -332,15 +345,15 @@ void PlotWindow::OnExport()
 /////////////////////////////////////////////////
 std::list<PlotCanvas*> PlotWindow::Plots()
 {
-  std::list<PlotCanvas*> result;
+  std::list<PlotCanvas*> plots;
   for (int i = 0; i < this->dataPtr->canvasLayout->count(); ++i)
   {
     QLayoutItem *item = this->dataPtr->canvasLayout->itemAt(i);
     PlotCanvas *canvas = qobject_cast<PlotCanvas *>(item->widget());
     if (!canvas)
       continue;
-    result.push_back(canvas);
+    plots.push_back(canvas);
   }
 
-  return result;
+  return plots;
 }

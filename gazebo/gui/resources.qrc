@@ -3,9 +3,9 @@
   <file>style.qss</file>
   <file>images/mainwindow_bg.png</file>
   <file>images/play.png</file>
-  <file>images/play_dark.png</file>
+  <file>images/play_dark.svg</file>
   <file>images/pause.png</file>
-  <file>images/pause_dark.png</file>
+  <file>images/pause_dark.svg</file>
   <file>images/end.png</file>
   <file>images/sphere.png</file>
   <file>images/cylinder.png</file>
@@ -82,5 +82,10 @@
   <file>images/swap-parent-child.png</file>
   <file>images/child-link.png</file>
   <file>images/settings.svg</file>
+  <file>images/file_upload.svg</file>
+  <file>images/select_all.svg</file>
+  <file>images/clear.svg</file>
+  <file>images/check_box_black.svg</file>
+  <file>images/check_box_outline_black.svg</file>
 </qresource>
 </RCC>
