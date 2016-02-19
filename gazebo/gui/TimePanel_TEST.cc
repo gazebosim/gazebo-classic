@@ -71,7 +71,9 @@ void TimePanel_TEST::SpaceBar()
   // Process some events until it gets paused
   for (unsigned int i = 0; i < 10 && !timePanel->IsPaused(); ++i)
   {
-    this->ProcessEventsAndDraw(mainWindow, 1);
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
   }
   QVERIFY(timePanel->IsPaused());
 
