@@ -601,7 +601,7 @@ LogCommand::LogCommand()
      "Specify the encoding (txt, zlib, or bz2) for an output file."
      "Valid in conjunction with the output command.")
     ("filter", po::value<std::string>(),
-     "Filter output. Valid only wht the echo, step, or output commands");
+     "Filter output. Valid only with the echo, step, or output commands");
 }
 
 /////////////////////////////////////////////////
@@ -673,10 +673,8 @@ bool LogCommand::RunImpl()
 
   if (this->vm.count("output"))
   {
-    std::string encoding;
-
-    if (this->vm.count("encoding"))
-      encoding = this->vm["encoding"].as<std::string>();
+    std::string encoding = this->vm.count("encoding") ?
+      this->vm["encoding"].as<std::string>() : "";
 
     this->Output(this->vm["output"].as<std::string>(), filter, raw, stamp, hz,
         encoding);
