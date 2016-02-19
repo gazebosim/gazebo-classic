@@ -416,7 +416,7 @@ QTreeView#topicList::branch:has-siblings:!adjoins-item
 
 QTreeView#topicList::branch:has-siblings:adjoins-item
 {
-  border-image: url(:/images/branch-more.svg) 0;
+  border-image: url(:/images/branch-more.png) 0;
 }
 
 QTreeView#topicList::branch:!has-children:!has-siblings:adjoins-item
