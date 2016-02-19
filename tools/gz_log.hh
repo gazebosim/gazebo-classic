@@ -201,8 +201,10 @@ namespace gazebo
     /// \param[in] _filename Name of the file to parse.
     private: void Info(const std::string &_filename);
 
-    /// \brief Filter log data to a file.
+    /// \brief Output log data to a file. This is usually used with the
+    /// filter command.
     /// \param[in] _outFilename Output filename
+    /// \param[in] _filter Filter string
     /// \param[in] _raw True to output data without xml formatting.
     /// \param[in] _stamp Type of stamp to apply.
     /// \param[in] _hz Hertz rate.
