@@ -214,7 +214,7 @@ void MainWindow_TEST::UserCameraFPS()
   QVERIFY(cam != NULL);
 
   // Wait a little bit for the average FPS to even out.
-  this->ProcessEventsAndDraw(NULL, 5000, 5);
+  this->ProcessEventsAndDraw(NULL, 5000, 1);
 
   std::cerr << "\nFPS[" << cam->AvgFPS() << "]\n" << std::endl;
 

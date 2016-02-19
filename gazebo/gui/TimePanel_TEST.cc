@@ -68,8 +68,11 @@ void TimePanel_TEST::SpaceBar()
   // Press space bar
   QTest::keyClick(timePanel, Qt::Key_Space);
 
-  this->ProcessEventsAndDraw(mainWindow);
-
+  // Process some events until it gets paused
+  for (unsigned int i = 0; i < 10 && !timePanel->IsPaused(); ++i)
+  {
+    this->ProcessEventsAndDraw(mainWindow, 1);
+  }
   QVERIFY(timePanel->IsPaused());
 
   // Press space bar
