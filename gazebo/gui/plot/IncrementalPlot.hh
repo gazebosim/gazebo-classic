@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,6 @@
 
 #include <ignition/math/Vector2.hh>
 
-#include "gazebo/common/Time.hh"
-
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/plot/qwt_gazebo.h"
 #include "gazebo/gui/plot/PlottingTypes.hh"
@@ -35,6 +33,11 @@ class QwtPlotCurve;
 
 namespace gazebo
 {
+  namespace common
+  {
+    class Time;
+  }
+
   namespace gui
   {
     // Forward declare private data class

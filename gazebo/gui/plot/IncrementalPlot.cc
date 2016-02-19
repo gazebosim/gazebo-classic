@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,10 +25,9 @@
 
 #include <ignition/math/Helpers.hh>
 
-#include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/common/Time.hh"
 
-#include "gazebo/math/Helpers.hh"
 #include "gazebo/gui/plot/PlotCurve.hh"
 #include "gazebo/gui/plot/IncrementalPlot.hh"
 
@@ -53,7 +52,7 @@ namespace gazebo
       /// \brief Drawing utility
       public: QwtPlotDirectPainter *directPainter;
 
-      /// \brief Pointer to the plot maginfier.
+      /// \brief Pointer to the plot magnifier.
       public: QwtPlotMagnifier *magnifier;
 
       /// \brief Pointer to the plot panner.

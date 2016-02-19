@@ -15,9 +15,11 @@
  *
 */
 
-#include <map>
-#include <mutex>
 #include <chrono>
+#include <map>
+#include <memory>
+#include <mutex>
+#include <set>
 #include <thread>
 
 #include <ignition/transport.hh>
@@ -46,7 +48,7 @@ namespace gazebo
       public: using CurveVariableSet = std::set<PlotCurveWeakPtr,
           std::owner_less<PlotCurveWeakPtr> >;
 
-      /// \def CurveVariableSetIt
+      /// \def CurveVariableMapIt
       /// \brief Curve variable map iterator
       public: using CurveVariableMapIt =
           std::map<std::string, CurveVariableSet>::iterator;
@@ -63,7 +65,7 @@ namespace gazebo
       /// \brief A list of plot windows.
       public: std::vector<PlotWindow *> windows;
 
-      /// \brief Mutex to protect the
+      /// \brief Mutex to protect the PlotManager.
       public: std::mutex mutex;
 
       /// \brief Introspection Client

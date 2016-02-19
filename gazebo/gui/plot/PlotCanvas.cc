@@ -15,13 +15,13 @@
  *
 */
 
-#include <tuple>
 #include <map>
-#include <set>
+#include <tuple>
+#include <vector>
 
 #include "gazebo/common/Assert.hh"
-#include "gazebo/common/Console.hh"
 
+#include "gazebo/gui/plot/PlotManager.hh"
 #include "gazebo/gui/plot/PlottingTypes.hh"
 #include "gazebo/gui/plot/IncrementalPlot.hh"
 #include "gazebo/gui/plot/VariablePill.hh"
