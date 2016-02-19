@@ -41,6 +41,13 @@ namespace gazebo
 }
 
 /////////////////////////////////////////////////
+std::vector<std::string> common::split(const std::string &_str,
+                               const std::string &_delim)
+{
+  return Tokenizer(_str).Split(_delim);
+}
+
+/////////////////////////////////////////////////
 Tokenizer::Tokenizer(const std::string &_str)
   : dataPtr(new TokenizerPrivate())
 {

@@ -27,6 +27,15 @@ namespace gazebo
 {
   namespace common
   {
+    /// \brief Convenience function that splits a string based on
+    /// a delimeter.
+    /// \param[in] _str The string to split.
+    /// \param[in] _delim Token delimiter.
+    /// \return Vector of tokens.
+    GZ_COMMON_VISIBLE
+    std::vector<std::string> split(const std::string &_str,
+                                   const std::string &_delim);
+
     // Forward declare private data classes.
     class TokenizerPrivate;
 
