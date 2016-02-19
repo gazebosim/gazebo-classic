@@ -18,11 +18,19 @@
 #define _GAZEBO_GUI_PLOT_PALETTE_HH_
 
 #include <memory>
+#include <string>
 
-#include "gazebo/gui/ConfigWidget.hh"
 #include "gazebo/gui/qt.h"
 
 #include "gazebo/util/system.hh"
+
+namespace google
+{
+  namespace protobuf
+  {
+    class Message;
+  }
+}
 
 namespace gazebo
 {

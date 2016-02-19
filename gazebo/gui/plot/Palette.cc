@@ -15,6 +15,10 @@
  *
 */
 
+#include <set>
+#include <string>
+#include <google/protobuf/message.h>
+
 #include "gazebo/common/Console.hh"
 
 #include "gazebo/gui/ConfigWidget.hh"
