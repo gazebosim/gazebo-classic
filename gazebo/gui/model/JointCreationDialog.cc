@@ -772,9 +772,12 @@ void JointCreationDialog::UpdateRelativePose(
   this->dataPtr->configWidget->SetPoseWidgetValue("relative_pose", _pose);
 
   if (this->dataPtr->alignPending)
+  {
     this->dataPtr->alignPending = false;
-  else
-    this->UncheckAllAlign();
+    return;
+  }
+
+  this->UncheckAllAlign(true);
 }
 
 /////////////////////////////////////////////////
@@ -907,17 +910,33 @@ void JointCreationDialog::OnAlign(const int _int)
 }
 
 /////////////////////////////////////////////////
-void JointCreationDialog::UncheckAllAlign()
+void JointCreationDialog::UncheckAllAlign(const bool _blockSignals)
 {
   for (auto group : this->dataPtr->alignGroups)
   {
     for (auto button : group->buttons())
+    {
+      bool blocked = button->signalsBlocked();
+      button->blockSignals(_blockSignals);
       button->setChecked(false);
+      button->blockSignals(blocked);
+    }
   }
 
+  bool blocked = this->dataPtr->reverseXBox->signalsBlocked();
+  this->dataPtr->reverseXBox->blockSignals(_blockSignals);
   this->dataPtr->reverseXBox->setChecked(false);
+  this->dataPtr->reverseXBox->blockSignals(blocked);
+
+  blocked = this->dataPtr->reverseYBox->signalsBlocked();
+  this->dataPtr->reverseYBox->blockSignals(_blockSignals);
   this->dataPtr->reverseYBox->setChecked(false);
+  this->dataPtr->reverseYBox->blockSignals(blocked);
+
+  blocked = this->dataPtr->reverseZBox->signalsBlocked();
+  this->dataPtr->reverseZBox->blockSignals(_blockSignals);
   this->dataPtr->reverseZBox->setChecked(false);
+  this->dataPtr->reverseZBox->blockSignals(blocked);
 }
 
 /////////////////////////////////////////////////
