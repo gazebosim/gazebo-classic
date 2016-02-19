@@ -16,8 +16,8 @@
 */
 
 #include <ignition/math/Pose3.hh>
-#include <ignition/math/Quaterniond.hh>
-#include <ignition/math/Vector3d.hh>
+#include <ignition/math/Quaternion.hh>
+#include <ignition/math/Vector3.hh>
 #include <gtest/gtest.h>
 #include "gazebo/msgs/any.pb.h"
 #include "gazebo/util/IntrospectionManager.hh"
