@@ -201,9 +201,17 @@ namespace gazebo
     /// \param[in] _filename Name of the file to parse.
     private: void Info(const std::string &_filename);
 
+    /// \brief Filter log data to a file.
+    /// \param[in] _outFilename Output filename
+    /// \param[in] _raw True to output data without xml formatting.
+    /// \param[in] _stamp Type of stamp to apply.
+    /// \param[in] _hz Hertz rate.
+    /// \param[in] _encoding Specify output log file encoding. If empty, the
+    /// encoding from the source log file is used.
     private: void Output(const std::string &_outFilename,
-    const std::string &_filter, bool _raw,
-    const std::string &_stamp, double _hz, const std::string _encoding="zlib");
+                 const std::string &_filter, bool _raw,
+                 const std::string &_stamp, double _hz,
+                 const std::string _encoding = "");
 
     /// \brief Dump the contents of a log file to screen
     /// \param[in] _filter Filter string

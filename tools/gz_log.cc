@@ -595,7 +595,11 @@ LogCommand::LogCommand()
      "Only valid for echo and step commands.")
     ("file,f", po::value<std::string>(), "Path to a log file.")
     ("output,o", po::value<std::string>(),
-     "Output file, valid in conjunction with the filter command")
+     "Output file, valid in conjunction with the filter, raw, hz, and"
+     "encoding commands")
+    ("encoding,n", po::value<std::string>(),
+     "Specify the encoding (txt, zlib, or bz2) for an output file."
+     "Valid in conjunction with the output command.")
     ("filter", po::value<std::string>(),
      "Filter output. Valid only wht the echo, step, or output commands");
 }
@@ -668,7 +672,15 @@ bool LogCommand::RunImpl()
   sdf::initFile("state.sdf", g_stateSdf);
 
   if (this->vm.count("output"))
-    this->Output(this->vm["output"].as<std::string>(), filter, raw, stamp, hz);
+  {
+    std::string encoding;
+
+    if (this->vm.count("encoding"))
+      encoding = this->vm["encoding"].as<std::string>();
+
+    this->Output(this->vm["output"].as<std::string>(), filter, raw, stamp, hz,
+        encoding);
+  }
   else if (this->vm.count("echo"))
     this->Echo(filter, raw, stamp, hz);
   else if (this->vm.count("step"))
@@ -809,6 +821,8 @@ void LogCommand::Output(const std::string &_outFilename,
     outFile.write(header.c_str(), header.size());
   }
 
+  std::string encoding = _encoding.empty() ? play->Encoding() : _encoding;
+
   StateFilter filter(!_raw, _stamp, _hz);
   filter.Init(_filter);
 
@@ -824,11 +838,11 @@ void LogCommand::Output(const std::string &_outFilename,
     {
       if (!_raw)
       {
-        std::string buffer = "<chunk encoding='" + _encoding + "'><![CDATA[\n";
+        std::string buffer = "<chunk encoding='" + encoding + "'>\n<![CDATA[";
 
-        if (_encoding == "txt")
+        if (encoding == "txt")
           buffer.append(stateString);
-        else if (_encoding == "zlib")
+        else if (encoding == "zlib")
         {
           std::string str;
 
@@ -844,7 +858,7 @@ void LogCommand::Output(const std::string &_outFilename,
           // Encode in base64.
           Base64Encode(str.c_str(), str.size(), buffer);
         }
-        else if (_encoding == "bz2")
+        else if (encoding == "bz2")
         {
           std::string str;
 
@@ -861,7 +875,7 @@ void LogCommand::Output(const std::string &_outFilename,
           Base64Encode(str.c_str(), str.size(), buffer);
         }
 
-        buffer.append("]]></chunk>\n");
+        buffer.append("]]>\n</chunk>\n");
         outFile.write(buffer.c_str(), buffer.size());
       }
       else
