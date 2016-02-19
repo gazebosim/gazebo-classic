@@ -119,8 +119,7 @@ namespace gazebo
       public: void FinishModel();
 
       /// \brief Begin the process of inserting a custom link using the mouse.
-      /// \param[in] _type Type of link to add: ENTITY_BOX, ENTITY_CYLINDER,
-      /// ENTITY_SPHERE, ENTITY_MESH or ENTITY_POLYLINE.
+      /// \param[in] _type Type of link to add: ENTITY_MESH or ENTITY_POLYLINE.
       /// \param[in] _size Size of the link.
       /// \param[in] _pose Pose of the link.
       /// \param[in] _samples Number of samples for polyline.
