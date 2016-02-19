@@ -1402,6 +1402,8 @@ void ModelCreator::Reset()
   this->previewVisual->Load();
   this->modelPose = ignition::math::Pose3d::Zero;
   this->previewVisual->SetPose(this->modelPose);
+
+  MEUserCmdManager::Instance()->Reset();
 }
 
 /////////////////////////////////////////////////

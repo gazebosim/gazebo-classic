@@ -183,6 +183,7 @@ void MEUserCmdManager::Reset()
 {
   this->dataPtr->undoCmds.clear();
   this->dataPtr->redoCmds.clear();
+  this->UpdateStats();
 }
 
 /////////////////////////////////////////////////
