@@ -27,7 +27,7 @@
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
-
+#include "gazebo/common/Time.hh"
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/gui/plot/PlotCurve.hh"
 #include "gazebo/gui/plot/IncrementalPlot.hh"

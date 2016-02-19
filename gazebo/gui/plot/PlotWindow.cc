@@ -17,9 +17,10 @@
 
 #include <mutex>
 
+#include "gazebo/gui/plot/IncrementalPlot.hh"
 #include "gazebo/gui/plot/PlotCanvas.hh"
 #include "gazebo/gui/plot/PlotCurve.hh"
-#include "gazebo/gui/plot/IncrementalPlot.hh"
+#include "gazebo/gui/plot/PlotManager.hh"
 #include "gazebo/gui/plot/PlotWindow.hh"
 
 using namespace gazebo;

@@ -54,11 +54,11 @@ namespace gazebo
       public: unsigned int Id() const;
 
       /// \brief Set a unique name for this variable
-      /// \return Number of child variable pills.
+      /// \param[in] _name Name of the variable.
       public: void SetName(const std::string &_name);
 
-      /// \brief Set a unique name for this variable
-      /// \return Number of child variable pills.
+      /// \brief Get the unique name for this variable
+      /// \return Name for this variable
       public: std::string Name() const;
 
       /// \brief Set the text label for this variable pill.
@@ -94,6 +94,7 @@ namespace gazebo
       public: void RemoveVariablePill(VariablePill *_variable);
 
       /// \brief Get a child variable pill by its unique name
+      /// \param[in] _name Name of the variable pill
       /// \return Child variable pill.
       public: VariablePill *VariablePillByName(const std::string &_name);
 
