@@ -56,71 +56,34 @@ class TopicsViewDelegate : public QStyledItemDelegate
   public: void paint(QPainter *_painter, const QStyleOptionViewItem &_opt,
                      const QModelIndex &_index) const
   {
-    // Find depth of this item
-    int depth = 0;
-    QModelIndex index = _index;
-    while (index.parent().isValid())
-    {
-      index = index.parent();
-      depth++;
-    }
-
-    // Choose font according to depth
-    QFont font;
-    QFont::Weight fontWeight;
-    switch (depth)
-    {
-      case 0:
-      {
-        font.setFamily("Roboto Black");
-        fontWeight = QFont::Black;
-        break;
-      }
-      case 1:
-      {
-        font.setFamily("Roboto Bold");
-        fontWeight = QFont::Bold;
-        break;
-      }
-      case 2:
-      {
-        font.setFamily("Roboto Medium");
-        fontWeight = QFont::Normal;
-        break;
-      }
-      case 3:
-      {
-        font.setFamily("Roboto Regular");
-        fontWeight = QFont::Normal;
-        break;
-      }
-      case 4:
-      {
-        font.setFamily("Roboto Light");
-        fontWeight = QFont::Light;
-        break;
-      }
-      case 5:
-      {
-        font.setFamily("Roboto Thin");
-        fontWeight = QFont::Light;
-        break;
-      }
-      default:
-      {
-        font.setFamily("Roboto Regular");
-        fontWeight = QFont::Normal;
-      }
-    }
-    QFontMetrics fm(font);
-
     // Bounding box for each text line
     QRectF r = _opt.rect;
-    QRectF r2 = _opt.rect;
 
     // Custom options
     QString topicName = qvariant_cast<QString>(_index.data(TOPIC_NAME_ROLE));
     QString typeName = qvariant_cast<QString>(_index.data(DATA_TYPE_NAME));
+
+    // Choose font
+    QFont font;
+    auto fontWeight = QFont::Normal;
+    if (typeName == "title")
+    {
+      font.setFamily("Roboto Bold");
+      fontWeight = QFont::Bold;
+
+      // Erase the branch image for titles
+      QRectF titleRect = _opt.rect;
+      titleRect.setLeft(titleRect.left() - 13);
+       QBrush brush(QColor("#dddddd"));
+      _painter->save();
+      _painter->fillRect(titleRect, brush);
+      _painter->restore();
+    }
+    else
+    {
+      font.setFamily("Roboto Regular");
+    }
+    QFontMetrics fm(font);
 
     // Handle hover style
     if (_opt.state & QStyle::State_MouseOver)
@@ -148,13 +111,16 @@ class TopicsViewDelegate : public QStyledItemDelegate
       _painter->drawPixmap(iconRect.left(), iconRect.top(),
           icon.pixmap(iconSize, iconSize));
     }
+    else if (typeName == "title")
+    {
+      r.adjust(-15, 5, 0, -5);
+    }
     // Paint the icon and data type, if present
     else if (!typeName.isEmpty())
     {
-      double iconSize = 24;
+      double iconSize = 20;
 
-      r.adjust(iconSize + 10, 5, iconSize + 10, -(fm.height() + 4));
-      r2.adjust(iconSize + 10, 5 + fm.height() + 4, iconSize + 10 , 0);
+      r.adjust(iconSize + 8, 3, 0, 0);
 
       QRectF iconRect = _opt.rect;
       iconRect.setTop(iconRect.top() + (_opt.rect.height()/2.0 - iconSize/2.0));
@@ -165,12 +131,6 @@ class TopicsViewDelegate : public QStyledItemDelegate
       QIcon icon(":/images/graph_line.svg");
       _painter->drawPixmap(iconRect.left(), iconRect.top(),
           icon.pixmap(iconSize, iconSize));
-
-      // Paint data type
-      _painter->setPen(QColor(110, 110, 110));
-      _painter->setFont(QFont(font.family(), font.pointSize()-depth-1));
-      _painter->drawText(r2, "Type: " + typeName);
-      _painter->setFont(font);
     }
     else
     {
@@ -178,7 +138,7 @@ class TopicsViewDelegate : public QStyledItemDelegate
       r.adjust(0, 5, 0, -5);
     }
 
-    _painter->setFont(QFont(font.family(), font.pointSize()-depth, fontWeight));
+    _painter->setFont(QFont(font.family(), font.pointSize(), fontWeight));
     _painter->setPen(QColor(30, 30, 30));
     _painter->drawText(r, topicName);
   }
@@ -189,19 +149,13 @@ class TopicsViewDelegate : public QStyledItemDelegate
   public: QSize sizeHint(const QStyleOptionViewItem &_option,
                          const QModelIndex &_index) const
   {
-    QString typeName = qvariant_cast<QString>(_index.data(DATA_TYPE_NAME));
     QSize size = QStyledItemDelegate::sizeHint(_option, _index);
+
     QFont font("Roboto Regular");
     QFontMetrics fm(font);
 
-    // Increase height if a data type name will be painted
-    if (typeName == "model" || typeName == "link" || typeName == "collision" ||
-        typeName == "visual" || typeName == "joint" || typeName.isEmpty())
-    {
-      size.setHeight(fm.height() + 10);
-    }
-    else
-      size.setHeight(fm.height() * 2 + 10);
+    size.setHeight(5 + fm.height() + 5);
+
     return size;
   }
 };
@@ -574,12 +528,28 @@ void Palette::FillModels(QStandardItemModel *_modelsModel)
   std::vector<std::string> properties = {"pose", "velocity", "acceleration"};
   std::vector<std::string> orientations = {"roll", "pitch", "yaw"};
 
+  if (!models.empty())
+  {
+    auto modelsTitle = new QStandardItem();
+    modelsTitle->setData("Models", TopicsViewDelegate::TOPIC_NAME_ROLE);
+    modelsTitle->setData("title", TopicsViewDelegate::DATA_TYPE_NAME);
+    _modelsModel->appendRow(modelsTitle);
+  }
+
   for (auto model : models)
   {
     auto modelItem = new QStandardItem();
     modelItem->setData(model.c_str(), TopicsViewDelegate::TOPIC_NAME_ROLE);
     modelItem->setData("model", TopicsViewDelegate::DATA_TYPE_NAME);
     _modelsModel->appendRow(modelItem);
+
+    if (!nestedModels.empty())
+    {
+      auto nestedModelsTitle = new QStandardItem();
+      nestedModelsTitle->setData("Models", TopicsViewDelegate::TOPIC_NAME_ROLE);
+      nestedModelsTitle->setData("title", TopicsViewDelegate::DATA_TYPE_NAME);
+      modelItem->appendRow(nestedModelsTitle);
+    }
 
     for (auto nestedModel : nestedModels)
     {
@@ -590,12 +560,29 @@ void Palette::FillModels(QStandardItemModel *_modelsModel)
       modelItem->appendRow(nestedModelItem);
     }
 
+    if (!links.empty())
+    {
+      auto linksTitle = new QStandardItem();
+      linksTitle->setData("Links", TopicsViewDelegate::TOPIC_NAME_ROLE);
+      linksTitle->setData("title", TopicsViewDelegate::DATA_TYPE_NAME);
+      modelItem->appendRow(linksTitle);
+    }
+
     for (auto link : links)
     {
       auto linkItem = new QStandardItem();
       linkItem->setData(link.c_str(), TopicsViewDelegate::TOPIC_NAME_ROLE);
       linkItem->setData("link", TopicsViewDelegate::DATA_TYPE_NAME);
       modelItem->appendRow(linkItem);
+
+      if (!collisions.empty())
+      {
+        auto collisionsTitle = new QStandardItem();
+        collisionsTitle->setData("Collisions",
+            TopicsViewDelegate::TOPIC_NAME_ROLE);
+        collisionsTitle->setData("title", TopicsViewDelegate::DATA_TYPE_NAME);
+        linkItem->appendRow(collisionsTitle);
+      }
 
       for (auto collision : collisions)
       {
@@ -630,7 +617,7 @@ void Palette::FillModels(QStandardItemModel *_modelsModel)
             orientationItem->appendRow(oriItem);
 
             oriItem->setToolTip(tr(
-                  "<font size=3><p>Drag to y label to plot.</p></font>"));
+                  "<font size=3><p><b>Type</b>: Double</p></font>"));
             oriItem->setDragEnabled(true);
             oriItem->setData("Double", TopicsViewDelegate::DATA_TYPE_NAME);
 
@@ -639,6 +626,15 @@ void Palette::FillModels(QStandardItemModel *_modelsModel)
             oriItem->setData(dataName.c_str(), TopicsViewDelegate::DATA_ROLE);
           }
         }
+      }
+
+      if (!visuals.empty())
+      {
+        auto visualsTitle = new QStandardItem();
+        visualsTitle->setData("Visuals",
+            TopicsViewDelegate::TOPIC_NAME_ROLE);
+        visualsTitle->setData("title", TopicsViewDelegate::DATA_TYPE_NAME);
+        linkItem->appendRow(visualsTitle);
       }
 
       for (auto visual : visuals)
@@ -674,7 +670,7 @@ void Palette::FillModels(QStandardItemModel *_modelsModel)
             orientationItem->appendRow(oriItem);
 
             oriItem->setToolTip(tr(
-                  "<font size=3><p>Drag to y label to plot.</p></font>"));
+                  "<font size=3><p><b>Type</b>: Double</p></font>"));
             oriItem->setDragEnabled(true);
             oriItem->setData("Double", TopicsViewDelegate::DATA_TYPE_NAME);
 
@@ -684,6 +680,14 @@ void Palette::FillModels(QStandardItemModel *_modelsModel)
           }
         }
       }
+    }
+
+    if (!joints.empty())
+    {
+      auto jointsTitle = new QStandardItem();
+      jointsTitle->setData("Joints", TopicsViewDelegate::TOPIC_NAME_ROLE);
+      jointsTitle->setData("title", TopicsViewDelegate::DATA_TYPE_NAME);
+      modelItem->appendRow(jointsTitle);
     }
 
     for (auto joint : joints)
@@ -709,8 +713,6 @@ void Palette::FillSim(QStandardItemModel *_simModel)
   for (auto field : simFields)
   {
     auto childItem = new QStandardItem();
-    childItem->setToolTip(tr(
-          "<font size=3><p>Drag to y label to plot.</p></font>"));
     childItem->setDragEnabled(true);
 
     auto humanName = ConfigWidget::HumanReadableKey(field.second);
@@ -720,6 +722,12 @@ void Palette::FillSim(QStandardItemModel *_simModel)
       childItem->setData("Uint 64", TopicsViewDelegate::DATA_TYPE_NAME);
     else
       childItem->setData("Double", TopicsViewDelegate::DATA_TYPE_NAME);
+
+    std::string typeName =
+        "<font size=3><p><b>Type</b>:" + childItem->data(
+        TopicsViewDelegate::DATA_TYPE_NAME).toString().toStdString() +
+        "</p></font>";
+    childItem->setToolTip(QString::fromStdString(typeName));
 
     std::string dataName = field.first + "?p=/" + field.second;
     childItem->setData(dataName.c_str(), TopicsViewDelegate::DATA_ROLE);

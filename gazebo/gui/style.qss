@@ -409,19 +409,36 @@ QTreeView#topicList::branch:selected:active
   background-color: #dddddd;
 }
 
-
-QTreeView::branch:!open:has-children
+QTreeView#topicList::branch:has-siblings:!adjoins-item
 {
+  border-image: url(:/images/vline.png) 0;
+}
+
+QTreeView#topicList::branch:has-siblings:adjoins-item
+{
+  border-image: url(:/images/branch-more.svg) 0;
+}
+
+QTreeView#topicList::branch:!has-children:!has-siblings:adjoins-item
+{
+  border-image: url(:/images/branch-end.png) 0;
+}
+
+QTreeView#topicList::branch:has-children:!has-siblings:closed,
+QTreeView#topicList::branch:closed:has-children:has-siblings
+{
+  border-image: none;
   image: url(:/images/right_arrow.png);
 }
 
-QTreeView::branch:open:has-children:!has-siblings,
-QTreeView::branch:open:has-children:has-siblings
+QTreeView#topicList::branch:open:has-children:!has-siblings,
+QTreeView#topicList::branch:open:has-children:has-siblings
 {
+  border-image: none;
   image: url(:/images/down_arrow.png);
 }
 
-QTreeView QHeaderView:section
+QTreeView#topicList QHeaderView:section
 {
   color: #d0d0d0;
   font-weight: bold;
