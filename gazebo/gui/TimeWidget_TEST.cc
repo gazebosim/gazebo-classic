@@ -208,11 +208,7 @@ void TimeWidget_TEST::ValidTimes()
     QVERIFY(fpsEdit != NULL);
 
     // Wait a little bit so that time increases.
-    for (unsigned int i = 0; i < 10000; ++i)
-    {
-      gazebo::common::Time::NSleep(500000);
-      QCoreApplication::processEvents();
-    }
+    this->ProcessEventsAndDraw(NULL, 5000, 1);
 
     std::string txt;
     double value;

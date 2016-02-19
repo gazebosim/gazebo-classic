@@ -2,6 +2,9 @@
 
 ## Gazebo 7.x.x (2016-xx-xx)
 
+1. Add helper function QTestFixture::ProcessEventsAndDraw
+    * [Pull request #2146](https://bitbucket.org/osrf/gazebo/pull-request/2146)
+
 1. Undo scaling during simulation
     * [Pull request #2108](https://bitbucket.org/osrf/gazebo/pull-request/2108)
 

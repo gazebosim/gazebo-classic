@@ -214,11 +214,7 @@ void MainWindow_TEST::UserCameraFPS()
   QVERIFY(cam != NULL);
 
   // Wait a little bit for the average FPS to even out.
-  for (unsigned int i = 0; i < 10000; ++i)
-  {
-    gazebo::common::Time::NSleep(500000);
-    QCoreApplication::processEvents();
-  }
+  this->ProcessEventsAndDraw(NULL, 5000, 5);
 
   std::cerr << "\nFPS[" << cam->AvgFPS() << "]\n" << std::endl;
 
