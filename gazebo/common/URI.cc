@@ -20,9 +20,9 @@
 #include <map>
 #include <string>
 
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/URI.hh"
-#include "gazebo/common/Tokenizer.hh"
 
 using namespace gazebo;
 using namespace common;
@@ -172,9 +172,7 @@ bool URIPath::Valid(const std::string &_str, URIPath &_path)
   }
 
   _path.Clear();
-
-  Tokenizer tokenizer(_str);
-  for (auto part : tokenizer.Split("/"))
+  for (auto part : common::split(_str, "/"))
     _path.PushBack(part);
 
   return true;
@@ -274,12 +272,10 @@ bool URIQuery::Valid(const std::string &_str, URIQuery &_query)
     return false;
   }
 
-  Tokenizer tokenizer(_str.substr(1));
-  auto queries = tokenizer.Split("&");
+  auto queries = common::split(_str.substr(1), "&");
   for (auto query : queries)
   {
-    Tokenizer tk(query);
-    auto values = tk.Split("=");
+    auto values = common::split(query, "=");
     if (values.size() != 2u)
       return false;
 
