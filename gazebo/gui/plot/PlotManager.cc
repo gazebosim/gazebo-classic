@@ -95,7 +95,7 @@ PlotManager::PlotManager()
       this->dataPtr->node->Subscribe("~/world_control",
       &PlotManager::OnWorldControl, this);
 
-  // set up introspection client in an other thread as it blocks on
+  // set up introspection client in another thread as it blocks on
   // discovery
   this->dataPtr->introspectThread.reset(
       new std::thread(&PlotManager::SetupIntrospection, this));
@@ -174,7 +174,8 @@ void PlotManager::OnWorldControl(ConstWorldControlPtr &_data)
 /////////////////////////////////////////////////
 void PlotManager::AddCurve(const std::string &_name, PlotCurveWeakPtr _curve)
 {
-  if (_curve.expired())
+  auto c = _curve.lock();
+  if (!c)
     return;
 
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
@@ -198,7 +199,8 @@ void PlotManager::AddCurve(const std::string &_name, PlotCurveWeakPtr _curve)
 /////////////////////////////////////////////////
 void PlotManager::RemoveCurve(PlotCurveWeakPtr _curve)
 {
-  if (_curve.expired())
+  auto c = _curve.lock();
+  if (!c)
     return;
 
   // find and remove the curve
@@ -218,12 +220,14 @@ void PlotManager::RemoveCurve(PlotCurveWeakPtr _curve)
 /////////////////////////////////////////////////
 void PlotManager::AddWindow(PlotWindow *_window)
 {
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
   this->dataPtr->windows.push_back(_window);
 }
 
 /////////////////////////////////////////////////
 void PlotManager::RemoveWindow(PlotWindow *_window)
 {
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
   for (auto it = this->dataPtr->windows.begin();
       it != this->dataPtr->windows.end(); ++it)
   {
@@ -238,6 +242,8 @@ void PlotManager::RemoveWindow(PlotWindow *_window)
 /////////////////////////////////////////////////
 void PlotManager::OnIntrospection(const gazebo::msgs::Param_V &_msg)
 {
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+
   // stores a list of curves iterators and their new values
   std::vector<std::pair<PlotManagerPrivate::CurveVariableMapIt, double> >
       curvesUpdates;
@@ -307,7 +313,6 @@ void PlotManager::OnIntrospection(const gazebo::msgs::Param_V &_msg)
     curvesUpdates.push_back(std::make_pair(it, data));
   }
 
-  // TODO remove later - for testing only
   // update curves!
   for (auto &curveUpdate : curvesUpdates)
   {
@@ -320,6 +325,7 @@ void PlotManager::OnIntrospection(const gazebo::msgs::Param_V &_msg)
     }
   }
 
+  // TODO remove later - for testing only
   auto it = this->dataPtr->curves.find("Dog");
   if (it != this->dataPtr->curves.end())
   {

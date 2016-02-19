@@ -20,6 +20,7 @@
 #include <vector>
 
 #include "gazebo/common/Assert.hh"
+#include "gazebo/common/Console.hh"
 
 #include "gazebo/gui/plot/PlotManager.hh"
 #include "gazebo/gui/plot/PlottingTypes.hh"
@@ -266,7 +267,10 @@ void PlotCanvas::AddVariable(const unsigned int _id,
   PlotData *plotData = it->second;
   PlotCurveWeakPtr curve = plotData->plot->AddCurve(_variable);
   auto c = curve.lock();
-  plotData->variableCurves[_id] = c->Id();
+  if (c)
+    plotData->variableCurves[_id] = c->Id();
+  else
+    gzerr << "Unable to add curve to plot" << std::endl;
 
   // hide initial empty plot
   if (!this->dataPtr->plotData.empty() && this->dataPtr->emptyPlot)
