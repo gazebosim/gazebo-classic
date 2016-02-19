@@ -162,6 +162,13 @@ set(qt_tests
   visual_pose.cc
 )
 
+if (ENABLE_SCREEN_TESTS)
+  set (qt_tests
+    ${qt_tests}
+    model_editor_undo.cc
+  )
+endif()
+
 gz_build_qt_tests(${qt_tests})
 
 if (ENABLE_TESTS_COMPILATION AND VALID_DRI_DISPLAY)

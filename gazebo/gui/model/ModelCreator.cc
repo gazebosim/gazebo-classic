@@ -176,7 +176,7 @@ ModelCreator::ModelCreator()
       gui::model::Events::ConnectRequestLinkRemoval(
         std::bind(&ModelCreator::RemoveEntity, this, std::placeholders::_1)));
 
-   this->connections.push_back(
+  this->connections.push_back(
       gui::model::Events::ConnectRequestLinkInsertion(
       std::bind(&ModelCreator::InsertLinkFromSDF, this,
       std::placeholders::_1)));
@@ -1916,6 +1916,7 @@ void ModelCreator::EmitNestedModelInsertedEvent(
 void ModelCreator::ShowContextMenu(const std::string &_entity)
 {
   QMenu menu;
+  menu.setObjectName("ModelEditorContextMenu");
   auto linkIt = this->allLinks.find(_entity);
   bool isLink = linkIt != this->allLinks.end();
   bool isNestedModel = false;

@@ -1736,12 +1736,16 @@ void Visual::SetPose(const math::Pose &_pose)
 //////////////////////////////////////////////////
 math::Vector3 Visual::GetPosition() const
 {
+  if (!this->dataPtr->sceneNode)
+    return math::Vector3::Zero;
   return Conversions::Convert(this->dataPtr->sceneNode->getPosition());
 }
 
 //////////////////////////////////////////////////
 math::Quaternion Visual::GetRotation() const
 {
+  if (!this->dataPtr->sceneNode)
+    return math::Vector3::Zero;
   return Conversions::Convert(this->dataPtr->sceneNode->getOrientation());
 }
 
@@ -1764,12 +1768,16 @@ void Visual::SetWorldPose(const math::Pose &_pose)
 //////////////////////////////////////////////////
 void Visual::SetWorldPosition(const math::Vector3 &_pos)
 {
+  if (!this->dataPtr->sceneNode)
+    return;
   this->dataPtr->sceneNode->_setDerivedPosition(Conversions::Convert(_pos));
 }
 
 //////////////////////////////////////////////////
 void Visual::SetWorldRotation(const math::Quaternion &_q)
 {
+  if (!this->dataPtr->sceneNode)
+    return;
   this->dataPtr->sceneNode->_setDerivedOrientation(Conversions::Convert(_q));
 }
 
