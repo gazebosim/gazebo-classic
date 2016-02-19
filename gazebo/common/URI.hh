@@ -48,11 +48,6 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~URIPath();
 
-      /// \brief Parse a string and update the current path.
-      /// \param[in] _str A string containing a valid path.
-      /// \return True if the path was succesfully updated.
-      public: bool Load(const std::string &_str);
-
       /// \brief Remove all parts of the path
       public: void Clear();
 
@@ -91,12 +86,20 @@ namespace gazebo
       /// \return itself.
       public: URIPath &operator=(const URIPath &_path);
 
-      /// \brief Validate a string as URIPath.
+      /// \brief Return true if the string is a valid path.
+      /// \param[in] _str String to check.
+      /// \return True if _str is a valid URI path.
+      public: static bool Valid(const std::string &_str);
+
+      /// \brief Return true if this is a valid path.
+      /// \return True if this is a valid URI path.
+      public: bool Valid() const;
+
+      /// \brief Parse a string as URIPath.
       /// \param[in] _str A string.
       /// \param[out] _path URIPath parsed from the string.
       /// \return true if the string can be parsed as a URIPath.
-      public: static bool Valid(const std::string &_str,
-                                URIPath &_path);
+      public: bool Parse(const std::string &_str);
 
       /// \internal
       /// \brief Pointer to private data.
@@ -119,11 +122,6 @@ namespace gazebo
 
       /// \brief Destructor
       public: virtual ~URIQuery();
-
-      /// \brief Parse a string and update the current path.
-      /// \param[in] _str A string containing a valid path.
-      /// \return True if the path was succesfully updated.
-      public: bool Load(const std::string &_str);
 
       /// \brief Remove all values of the query
       public: void Clear();
@@ -150,12 +148,19 @@ namespace gazebo
       /// _delim.
       public: std::string Str(const std::string &_delim = "&") const;
 
-      /// \brief Validate a string as URIQuery.
+      /// \brief Check if a string is a valid URI query.
+      /// \param[in] _str The string to check.
+      /// \return true if the string can be parsed as a URI query.
+      public: static bool Valid(const std::string &_str);
+
+      /// \brief Check if this is a valid URI query.
+      /// \return true if this can be parsed as a URI query.
+      public: bool Valid() const;
+
+      /// \brief Parse a string as URIQuery.
       /// \param[in] _str A string.
-      /// \param[out] _query URIQuery parsed from the string.
       /// \return true if the string can be parsed as a URIQuery.
-      public: static bool Valid(const std::string &_str,
-                                URIQuery &_query);
+      public: bool Parse(const std::string &_string);
 
       /// \internal
       /// \brief Pointer to private data.
@@ -178,11 +183,6 @@ namespace gazebo
 
       /// \brief Destructor.
       public: ~URI();
-
-      /// \brief Parse a string and update the current path.
-      /// \param[in] _str A string containing a valid path.
-      /// \return True if the path was succesfully updated.
-      public: bool Load(const std::string &_str);
 
       /// \brief Get the URI as a string, which has the form:
       ///
@@ -220,12 +220,19 @@ namespace gazebo
       /// \return true if the two URIs match.
       public: bool operator==(const URI &_uri) const;
 
+      /// \brief Validate this URI.
+      /// \return True if this can be parsed as a URI.
+      public: bool Valid() const;
+
       /// \brief Validate a string as URI.
+      /// \param[in] _str The string to validate.
+      /// \return True if the string can be parsed as a URI.
+      public: static bool Valid(const std::string &_str);
+
+      /// \brief Parse a string as URI.
       /// \param[in] _str A string.
-      /// \param[out] _uri A URI parsed from the string.
       /// \return true if the string can be parsed as a URI.
-      public: static bool Valid(const std::string &_str,
-                                URI &_uri);
+      public: bool Parse(const std::string &_str);
 
       /// \internal
       /// \brief Pointer to private data.

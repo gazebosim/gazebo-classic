@@ -14,18 +14,18 @@
  * limitations under the License.
  *
 */
-
 #include <algorithm>
 #include <list>
 #include <map>
 #include <string>
 
 #include "gazebo/common/CommonIface.hh"
-#include "gazebo/common/Exception.hh"
 #include "gazebo/common/URI.hh"
 
 using namespace gazebo;
 using namespace common;
+
+static const std::string kSchemeDelim = "://";
 
 namespace gazebo
 {
@@ -78,8 +78,7 @@ URIPath::~URIPath()
 URIPath::URIPath(const std::string &_str)
   : URIPath()
 {
-  if (!this->Load(_str))
-    gzthrow("Invalid URIPath");
+  this->Parse(_str);
 }
 
 /////////////////////////////////////////////////
@@ -87,17 +86,6 @@ URIPath::URIPath(const URIPath &_path)
   : URIPath()
 {
   *this = _path;
-}
-
-/////////////////////////////////////////////////
-bool URIPath::Load(const std::string &_str)
-{
-  URIPath newPath;
-  if (!this->Valid(_str, newPath))
-    return false;
-
-  *this = newPath;
-  return true;
 }
 
 /////////////////////////////////////////////////
@@ -161,7 +149,13 @@ bool URIPath::operator==(const URIPath &_path) const
 }
 
 /////////////////////////////////////////////////
-bool URIPath::Valid(const std::string &_str, URIPath &_path)
+bool URIPath::Valid() const
+{
+  return this->Valid(this->Str());
+}
+
+/////////////////////////////////////////////////
+bool URIPath::Valid(const std::string &_str)
 {
   size_t slashCount = std::count(_str.begin(), _str.end(), '/');
   if ((_str.empty()) ||
@@ -171,9 +165,19 @@ bool URIPath::Valid(const std::string &_str, URIPath &_path)
     return false;
   }
 
-  _path.Clear();
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool URIPath::Parse(const std::string &_str)
+{
+  if (!this->Valid(_str))
+    return false;
+
+  this->Clear();
+
   for (auto part : common::split(_str, "/"))
-    _path.PushBack(part);
+    this->PushBack(part);
 
   return true;
 }
@@ -188,8 +192,7 @@ URIQuery::URIQuery()
 URIQuery::URIQuery(const std::string &_str)
   : URIQuery()
 {
-  if (!this->Load(_str))
-    gzthrow("Invalid URIQuery");
+  this->Parse(_str);
 }
 
 /////////////////////////////////////////////////
@@ -202,17 +205,6 @@ URIQuery::URIQuery(const URIQuery &_query)
 /////////////////////////////////////////////////
 URIQuery::~URIQuery()
 {
-}
-
-/////////////////////////////////////////////////
-bool URIQuery::Load(const std::string &_str)
-{
-  URIQuery newQuery;
-  if (!this->Valid(_str, newQuery))
-    return false;
-
-  *this = newQuery;
-  return true;
 }
 
 /////////////////////////////////////////////////
@@ -258,10 +250,14 @@ bool URIQuery::operator==(const URIQuery &_query) const
 }
 
 /////////////////////////////////////////////////
-bool URIQuery::Valid(const std::string &_str, URIQuery &_query)
+bool URIQuery::Valid() const
 {
-  _query.Clear();
+  return this->Valid(this->Str());
+}
 
+/////////////////////////////////////////////////
+bool URIQuery::Valid(const std::string &_str)
+{
   if (_str.empty())
     return true;
 
@@ -272,15 +268,32 @@ bool URIQuery::Valid(const std::string &_str, URIQuery &_query)
     return false;
   }
 
-  auto queries = common::split(_str.substr(1), "&");
-  for (auto query : queries)
+  for (auto const &query : common::split(_str.substr(1), "&"))
   {
-    auto values = common::split(query, "=");
-    if (values.size() != 2u)
+    if (common::split(query, "=").size() != 2u)
       return false;
-
-    _query.Insert(values.at(0), values.at(1));
   }
+
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool URIQuery::Parse(const std::string &_str)
+{
+  if (!this->Valid(_str))
+    return false;
+
+  this->Clear();
+
+  if (!_str.empty())
+  {
+    for (auto query : common::split(_str.substr(1), "&"))
+    {
+      auto values = common::split(query, "=");
+      this->Insert(values.at(0), values.at(1));
+    }
+  }
+
   return true;
 }
 
@@ -294,8 +307,7 @@ URI::URI()
 URI::URI(const std::string &_str)
   : URI()
 {
-  if (!this->Load(_str))
-    gzthrow("Invalid URI");
+  this->Parse(_str);
 }
 
 /////////////////////////////////////////////////
@@ -308,17 +320,6 @@ URI::URI(const URI &_uri)
 /////////////////////////////////////////////////
 URI::~URI()
 {
-}
-
-/////////////////////////////////////////////////
-bool URI::Load(const std::string &_str)
-{
-  URI newUri;
-  if (!this->Valid(_str, newUri))
-    return false;
-
-  *this = newUri;
-  return true;
 }
 
 //////////////////////////////////////////////////
@@ -380,10 +381,15 @@ URI &URI::operator=(const URI &_uri)
 }
 
 /////////////////////////////////////////////////
-bool URI::Valid(const std::string &_str, URI &_uri)
+bool URI::Valid() const
+{
+  return this->Valid(this->Str());
+}
+
+/////////////////////////////////////////////////
+bool URI::Valid(const std::string &_str)
 {
   // Validate scheme.
-  const std::string kSchemeDelim = "://";
   auto schemeDelimPos = _str.find(kSchemeDelim);
   if ((_str.empty()) ||
       (schemeDelimPos == std::string::npos) ||
@@ -393,34 +399,48 @@ bool URI::Valid(const std::string &_str, URI &_uri)
   }
 
   auto from = schemeDelimPos + kSchemeDelim.size();
-  std::string scheme = _str.substr(0, schemeDelimPos);
-  std::string path = _str.substr(from);
-  std::string query;
+  std::string localPath = _str.substr(from);
+  std::string localQuery;
 
   auto to = _str.find("?", from);
   if (to != std::string::npos)
   {
     // Update path.
-    path = _str.substr(from, to - from);
+    localPath = _str.substr(from, to - from);
 
     // Update the query.
-    query = _str.substr(to);
+    localQuery = _str.substr(to);
   }
 
-  URIPath newPath;
-  URIQuery newQuery;
+  // Validate the path and query.
+  return URIPath::Valid(localPath) && URIQuery::Valid(localQuery);
+}
 
-  // Validate the path.
-  if (!URIPath::Valid(path, newPath))
+/////////////////////////////////////////////////
+bool URI::Parse(const std::string &_str)
+{
+  if (!this->Valid(_str))
     return false;
 
-  // Validate the query.
-  if (!URIQuery::Valid(query, newQuery))
-    return false;
+  auto schemeDelimPos = _str.find(kSchemeDelim);
+  auto from = schemeDelimPos + kSchemeDelim.size();
+  std::string localScheme = _str.substr(0, schemeDelimPos);
+  std::string localPath = _str.substr(from);
+  std::string localQuery;
 
-  _uri.Clear();
-  _uri.SetScheme(scheme);
-  _uri.Path() = newPath;
-  _uri.Query() = newQuery;
-  return true;
+  auto to = _str.find("?", from);
+  if (to != std::string::npos)
+  {
+    // Update path.
+    localPath = _str.substr(from, to - from);
+
+    // Update the query.
+    localQuery = _str.substr(to);
+  }
+
+  this->Clear();
+  this->SetScheme(localScheme);
+
+  return this->dataPtr->path.Parse(localPath) &&
+         this->dataPtr->query.Parse(localQuery);
 }
