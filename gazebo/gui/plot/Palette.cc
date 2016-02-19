@@ -425,33 +425,6 @@ void Palette::FillFromMsg(google::protobuf::Message *_msg,
 
           _item->appendRow(childItem);
         }
-        // Custom XYZ widget for position
-        else if (field->message_type()->name() == "Vector3d")
-        {
-          auto *posItem = new QStandardItem();
-          posItem->setData(name.c_str(), PlotItemDelegate::TOPIC_NAME_ROLE);
-          _item->appendRow(posItem);
-
-          std::vector<std::string> xyz = {"x", "y", "z"};
-          for (auto it : xyz)
-          {
-            auto humanName = ConfigWidget::HumanReadableKey(it);
-            std::string dataName = _uri + "/" + name + "/" + it;
-
-            auto *childItem = new QStandardItem();
-            childItem->setData(it.c_str(), PlotItemDelegate::TOPIC_NAME_ROLE);
-            childItem->setData(dataName.c_str(), PlotItemDelegate::DATA_ROLE);
-            childItem->setData("Double", PlotItemDelegate::DATA_TYPE_NAME);
-
-            childItem->setToolTip(
-                "<font size=3><p><b>Type</b>: " + childItem->data(
-                PlotItemDelegate::DATA_TYPE_NAME).toString() +
-                "</p></font>");
-            childItem->setDragEnabled(true);
-
-            posItem->appendRow(childItem);
-          }
-        }
         // Custom RPY widgets for orientation
         else if (field->message_type()->name() == "Quaternion")
         {
@@ -464,11 +437,12 @@ void Palette::FillFromMsg(google::protobuf::Message *_msg,
           {
             auto humanName = ConfigWidget::HumanReadableKey(it);
             std::string dataName = _uri + "/" + name + "/" + it;
+
             auto *childItem = new QStandardItem();
-            childItem->setData(it.c_str(), PlotItemDelegate::TOPIC_NAME_ROLE);
+            childItem->setData(QString::fromStdString(humanName),
+                PlotItemDelegate::TOPIC_NAME_ROLE);
             childItem->setData(dataName.c_str(), PlotItemDelegate::DATA_ROLE);
             childItem->setData("Double", PlotItemDelegate::DATA_TYPE_NAME);
-
             childItem->setToolTip(
                 "<font size=3><p><b>Type</b>: " + childItem->data(
                 PlotItemDelegate::DATA_TYPE_NAME).toString() +
