@@ -437,15 +437,11 @@ TEST_F(LogPlay_TEST, NoEndTag)
 
   // Open the temporary file, which should now have the proper end tag
   std::ifstream inFile(tmpFilename);
-  inFile.seekg(0, std::ios::end);
-
-  // Get the length of the file.
-  int length = inFile.tellg();
 
   std::string endTag = "</gazebo_log>";
 
   // Back up the length of the closing tag.
-  inFile.seekg(length - 1 - endTag.length());
+  inFile.seekg(-1 - endTag.length(), std::ios::end);
 
   // Get the last line
   std::string lastLine;
