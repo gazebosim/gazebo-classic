@@ -57,36 +57,37 @@ TEST(URITEST, URIPath)
 TEST(URITEST, URIPathString)
 {
   URIPath path;
-  EXPECT_FALSE(URIPath::Valid("", path));
-  EXPECT_FALSE(URIPath::Valid("//", path));
-  EXPECT_FALSE(URIPath::Valid(" ", path));
-  EXPECT_FALSE(URIPath::Valid("?invalid", path));
-  EXPECT_FALSE(URIPath::Valid("=invalid", path));
-  EXPECT_FALSE(URIPath::Valid("&invalid", path));
-  EXPECT_TRUE(URIPath::Valid("part1", path));
-  EXPECT_TRUE(URIPath::Valid("/part1", path));
-  EXPECT_TRUE(URIPath::Valid("/part1/", path));
-  EXPECT_TRUE(URIPath::Valid("/part1/part2", path));
-  EXPECT_TRUE(URIPath::Valid("/part1/part2/", path));
+  EXPECT_FALSE(URIPath::Valid(""));
+  EXPECT_FALSE(URIPath::Valid("//"));
+  EXPECT_FALSE(URIPath::Valid(" "));
+  EXPECT_FALSE(URIPath::Valid("?invalid"));
+  EXPECT_FALSE(URIPath::Valid("=invalid"));
+  EXPECT_FALSE(URIPath::Valid("&invalid"));
+  EXPECT_TRUE(URIPath::Valid("part1"));
+  EXPECT_TRUE(URIPath::Valid("/part1"));
+  EXPECT_TRUE(URIPath::Valid("/part1/"));
+  EXPECT_TRUE(URIPath::Valid("/part1/part2"));
+  EXPECT_TRUE(URIPath::Valid("/part1/part2/"));
 
-  EXPECT_FALSE(path.Load(""));
-  EXPECT_FALSE(path.Load("//"));
-  EXPECT_FALSE(path.Load(" "));
-  EXPECT_FALSE(path.Load("?invalid"));
-  EXPECT_FALSE(path.Load("=invalid"));
-  EXPECT_FALSE(path.Load("&invalid"));
-  EXPECT_TRUE(path.Load("part1"));
-  EXPECT_TRUE(path.Load("/part1"));
-  EXPECT_TRUE(path.Load("/part1/"));
-  EXPECT_TRUE(path.Load("/part1/part2"));
-  EXPECT_TRUE(path.Load("/part1/part2/"));
+  EXPECT_FALSE(path.Parse(""));
+  EXPECT_FALSE(path.Parse("//"));
+  EXPECT_FALSE(path.Parse(" "));
+  EXPECT_FALSE(path.Parse("?invalid"));
+  EXPECT_FALSE(path.Parse("=invalid"));
+  EXPECT_FALSE(path.Parse("&invalid"));
+  EXPECT_TRUE(path.Parse("part1"));
+  EXPECT_TRUE(path.Parse("/part1"));
+  EXPECT_TRUE(path.Parse("/part1/"));
+  EXPECT_TRUE(path.Parse("/part1/part2"));
+  EXPECT_TRUE(path.Parse("/part1/part2/"));
 
-  EXPECT_THROW(URIPath(""), Exception);
-  EXPECT_THROW(URIPath("//"), Exception);
-  EXPECT_THROW(URIPath(" "), Exception);
-  EXPECT_THROW(URIPath("?invalid"), Exception);
-  EXPECT_THROW(URIPath("=invalid"), Exception);
-  EXPECT_THROW(URIPath("&invalid"), Exception);
+  EXPECT_NO_THROW(EXPECT_FALSE(URIPath("").Valid()));
+  EXPECT_NO_THROW(EXPECT_FALSE(URIPath("//").Valid()));
+  EXPECT_NO_THROW(EXPECT_FALSE(URIPath(" ").Valid()));
+  EXPECT_NO_THROW(EXPECT_FALSE(URIPath("?invalid").Valid()));
+  EXPECT_NO_THROW(EXPECT_FALSE(URIPath("=invalid").Valid()));
+  EXPECT_NO_THROW(EXPECT_FALSE(URIPath("&invalid").Valid()));
+
   EXPECT_NO_THROW(URIPath("part1"));
   EXPECT_NO_THROW(URIPath("/part1"));
   EXPECT_NO_THROW(URIPath("/part1/"));
@@ -123,37 +124,37 @@ TEST(URITEST, URIQuery)
 TEST(URITEST, URIQueryString)
 {
   URIQuery query;
-  EXPECT_FALSE(URIQuery::Valid("??", query));
-  EXPECT_FALSE(URIQuery::Valid("invalid?", query));
-  EXPECT_FALSE(URIQuery::Valid("?invalid?", query));
-  EXPECT_FALSE(URIQuery::Valid("? invalid", query));
-  EXPECT_FALSE(URIQuery::Valid("?key", query));
-  EXPECT_FALSE(URIQuery::Valid("?key=", query));
-  EXPECT_FALSE(URIQuery::Valid("?=value", query));
+  EXPECT_FALSE(URIQuery::Valid("??"));
+  EXPECT_FALSE(URIQuery::Valid("invalid?"));
+  EXPECT_FALSE(URIQuery::Valid("?invalid?"));
+  EXPECT_FALSE(URIQuery::Valid("? invalid"));
+  EXPECT_FALSE(URIQuery::Valid("?key"));
+  EXPECT_FALSE(URIQuery::Valid("?key="));
+  EXPECT_FALSE(URIQuery::Valid("?=value"));
 
-  EXPECT_TRUE(URIQuery::Valid("", query));
-  EXPECT_TRUE(URIQuery::Valid("?key=value", query));
-  EXPECT_TRUE(URIQuery::Valid("?key=value&key2=value2", query));
+  EXPECT_TRUE(URIQuery::Valid(""));
+  EXPECT_TRUE(URIQuery::Valid("?key=value"));
+  EXPECT_TRUE(URIQuery::Valid("?key=value&key2=value2"));
 
-  EXPECT_FALSE(query.Load("??"));
-  EXPECT_FALSE(query.Load("invalid?"));
-  EXPECT_FALSE(query.Load("?invalid?"));
-  EXPECT_FALSE(query.Load("? invalid"));
-  EXPECT_FALSE(query.Load("?key"));
-  EXPECT_FALSE(query.Load("?key="));
-  EXPECT_FALSE(query.Load("?=value"));
+  EXPECT_FALSE(query.Parse("??"));
+  EXPECT_FALSE(query.Parse("invalid?"));
+  EXPECT_FALSE(query.Parse("?invalid?"));
+  EXPECT_FALSE(query.Parse("? invalid"));
+  EXPECT_FALSE(query.Parse("?key"));
+  EXPECT_FALSE(query.Parse("?key="));
+  EXPECT_FALSE(query.Parse("?=value"));
 
-  EXPECT_TRUE(query.Load(""));
-  EXPECT_TRUE(query.Load("?key=value"));
-  EXPECT_TRUE(query.Load("?key=value&key2=value2"));
+  EXPECT_TRUE(query.Parse(""));
+  EXPECT_TRUE(query.Parse("?key=value"));
+  EXPECT_TRUE(query.Parse("?key=value&key2=value2"));
 
-  EXPECT_THROW(URIQuery("??"), Exception);
-  EXPECT_THROW(URIQuery("invalid?"), Exception);
-  EXPECT_THROW(URIQuery("?invalid?"), Exception);
-  EXPECT_THROW(URIQuery("? invalid"), Exception);
-  EXPECT_THROW(URIQuery("?key"), Exception);
-  EXPECT_THROW(URIQuery("?key="), Exception);
-  EXPECT_THROW(URIQuery("?=value"), Exception);
+  EXPECT_NO_THROW(URIQuery("??"));
+  EXPECT_NO_THROW(URIQuery("invalid?"));
+  EXPECT_NO_THROW(URIQuery("?invalid?"));
+  EXPECT_NO_THROW(URIQuery("? invalid"));
+  EXPECT_NO_THROW(URIQuery("?key"));
+  EXPECT_NO_THROW(URIQuery("?key="));
+  EXPECT_NO_THROW(URIQuery("?=value"));
 
   EXPECT_NO_THROW(URIQuery(""));
   EXPECT_NO_THROW(URIQuery("?key=value"));
@@ -215,31 +216,32 @@ TEST(URITEST, Query)
 TEST(URITEST, URIString)
 {
   URI uri;
-  EXPECT_FALSE(URI::Valid("", uri));
-  EXPECT_FALSE(URI::Valid("scheme", uri));
-  EXPECT_FALSE(URI::Valid("scheme://", uri));
-  EXPECT_FALSE(URI::Valid("scheme://?key=value", uri));
-  EXPECT_FALSE(URI::Valid("scheme://part1?keyvalue", uri));
-  EXPECT_TRUE(URI::Valid("scheme://part1", uri));
-  EXPECT_TRUE(URI::Valid("scheme://part1/part2", uri));
-  EXPECT_TRUE(URI::Valid("scheme://part1?key=value", uri));
-  EXPECT_TRUE(URI::Valid("scheme://part1/part2?k1=v1&k2=v2", uri));
+  EXPECT_FALSE(URI::Valid(""));
+  EXPECT_FALSE(URI::Valid("scheme"));
+  EXPECT_FALSE(URI::Valid("scheme://"));
+  EXPECT_FALSE(URI::Valid("scheme://?key=value"));
+  EXPECT_FALSE(URI::Valid("scheme://part1?keyvalue"));
+  EXPECT_TRUE(URI::Valid("scheme://part1"));
+  EXPECT_TRUE(URI::Valid("scheme://part1/part2"));
+  EXPECT_TRUE(URI::Valid("scheme://part1?key=value"));
+  EXPECT_TRUE(URI::Valid("scheme://part1/part2?k1=v1&k2=v2"));
 
-  EXPECT_FALSE(uri.Load(""));
-  EXPECT_FALSE(uri.Load("scheme"));
-  EXPECT_FALSE(uri.Load("scheme://"));
-  EXPECT_FALSE(uri.Load("scheme://?key=value"));
-  EXPECT_FALSE(uri.Load("scheme://part1?keyvalue"));
-  EXPECT_TRUE(uri.Load("scheme://part1"));
-  EXPECT_TRUE(uri.Load("scheme://part1/part2"));
-  EXPECT_TRUE(uri.Load("scheme://part1?key=value"));
-  EXPECT_TRUE(uri.Load("scheme://part1/part2?k1=v1&k2=v2"));
+  EXPECT_FALSE(uri.Parse(""));
+  EXPECT_FALSE(uri.Parse("scheme"));
+  EXPECT_FALSE(uri.Parse("scheme://"));
+  EXPECT_FALSE(uri.Parse("scheme://?key=value"));
+  EXPECT_FALSE(uri.Parse("scheme://part1?keyvalue"));
+  EXPECT_TRUE(uri.Parse("scheme://part1"));
+  EXPECT_TRUE(uri.Parse("scheme://part1/part2"));
+  EXPECT_TRUE(uri.Parse("scheme://part1?key=value"));
+  EXPECT_TRUE(uri.Parse("scheme://part1/part2?k1=v1&k2=v2"));
 
-  EXPECT_THROW(URI(""), Exception);
-  EXPECT_THROW(URI("scheme"), Exception);
-  EXPECT_THROW(URI("scheme://"), Exception);
-  EXPECT_THROW(URI("scheme://?key=value"), Exception);
-  EXPECT_THROW(URI("scheme://part1?keyvalue"), Exception);
+  EXPECT_NO_THROW(EXPECT_FALSE(URI("").Valid()));
+  EXPECT_NO_THROW(EXPECT_FALSE(URI("scheme").Valid()));
+  EXPECT_NO_THROW(EXPECT_FALSE(URI("scheme://").Valid()));
+  EXPECT_NO_THROW(EXPECT_FALSE(URI("scheme://?key=value").Valid()));
+  EXPECT_NO_THROW(EXPECT_FALSE(URI("scheme://part1?keyvalue").Valid()));
+
   EXPECT_NO_THROW(URI("scheme://part1"));
   EXPECT_NO_THROW(URI("scheme://part1/part2"));
   EXPECT_NO_THROW(URI("scheme://part1?key=value"));

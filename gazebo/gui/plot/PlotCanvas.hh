@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,13 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_GUI_DIAGNOSTICS_HH_
-#define _GAZEBO_GUI_DIAGNOSTICS_HH_
+#ifndef _GAZEBO_GUI_PLOT_PLOTCANVAS_HH_
+#define _GAZEBO_GUI_PLOT_PLOTCANVAS_HH_
 
 #include <memory>
+#include <string>
 
 #include "gazebo/gui/qt.h"
-#include "gazebo/msgs/msgs.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -28,42 +28,40 @@ namespace gazebo
   namespace gui
   {
     // Forward declare private data class
-    class DiagnosticsPrivate;
+    class PlotCanvasPrivate;
 
-    /// \brief Plot diagnostic information
-    class GZ_GUI_VISIBLE Diagnostics : public QDialog
+    /// \brief Plot canvas
+    class GZ_GUI_VISIBLE PlotCanvas : public QWidget
     {
       Q_OBJECT
 
       /// \brief Constructor.
       /// \param[in] _parent Pointer to the parent widget.
-      public: Diagnostics(QWidget *_parent);
+      public: PlotCanvas(QWidget *_parent);
 
       /// \brief Destructor.
-      public: virtual ~Diagnostics();
+      public: virtual ~PlotCanvas();
+
+      /// \brief Update plots.
+      public: void Update();
 
       /// \brief Used to filter scroll wheel events.
       /// \param[in] _o Object that receives the event.
       /// \param[in] _event Pointer to the event.
       public: virtual bool eventFilter(QObject *_o, QEvent *_e);
 
-      /// \brief Called when a diagnostic message is received.
-      /// \param[in] _msg Diagnostic message.
-      private: void OnMsg(ConstDiagnosticsPtr &_msg);
+      /// \brief Qt signal to request self-deletion.
+      Q_SIGNALS: void CanvasDeleted();
 
-      /// \brief Update plots.
-      private slots: void Update();
+      /// \brief Qt Callback to clear all variable and plots on canvas.
+      private slots: void OnClearCanvas();
 
-      /// \brief QT callback for the pause check button.
-      /// \param[in] _value True when paused.
-      private slots: void OnPause(bool _value);
-
-      /// \brief Qt Callback when a plot should be added.
-      private slots: void OnAddPlot();
+      /// \brief Qt Callback to delete entire canvas.
+      private slots: void OnDeleteCanvas();
 
       /// \internal
       /// \brief Pointer to private data.
-      private: std::unique_ptr<DiagnosticsPrivate> dataPtr;
+      private: std::unique_ptr<PlotCanvasPrivate> dataPtr;
     };
   }
 }

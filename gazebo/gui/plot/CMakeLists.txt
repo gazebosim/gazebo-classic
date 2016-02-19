@@ -1,13 +1,26 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
 set (sources_local
+  plot/PlotCanvas.cc
+  plot/PlotWindow.cc
+  plot/VariablePill.cc
+  plot/VariablePillContainer.cc
 )
 
 set (qt_headers_local
+  plot/PlotCanvas.hh
+  plot/PlotWindow.hh
+  plot/VariablePill.hh
+  plot/VariablePillContainer.hh
+)
+
+set (headers_install
 )
 
 set (qt_tests_local
-
+  PlotWindow_TEST.cc
+  VariablePill_TEST.cc
+  VariablePillContainer_TEST.cc
 )
 
 if (ENABLE_SCREEN_TESTS)

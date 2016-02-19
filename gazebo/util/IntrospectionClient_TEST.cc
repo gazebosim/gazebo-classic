@@ -134,7 +134,9 @@ TEST_F(IntrospectionClientTest, NewAndRemoveFilter)
   std::string topic;
 
   // Try to create an empty filter.
-  EXPECT_FALSE(this->client.NewFilter(this->managerId, {}, filterId, topic));
+  std::set<std::string> emptySet;
+  EXPECT_FALSE(this->client.NewFilter(this->managerId, emptySet, filterId,
+      topic));
 
   // Let's create a filter for receiving updates on "item1" and "item2".
   std::set<std::string> items = {"item1", "item2"};
