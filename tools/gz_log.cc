@@ -601,7 +601,7 @@ LogCommand::LogCommand()
      "Specify the encoding (txt, zlib, or bz2) for an output file."
      "Valid in conjunction with the output command.")
     ("filter", po::value<std::string>(),
-     "Filter output. Valid only with the echo, step, or output commands");
+     "Filter output. Valid only with the echo, step, and output commands");
 }
 
 /////////////////////////////////////////////////
@@ -812,6 +812,13 @@ void LogCommand::Output(const std::string &_outFilename,
   gazebo::util::LogPlay *play = gazebo::util::LogPlay::Instance();
   std::string stateString;
 
+  std::string encoding = _encoding.empty() ? play->Encoding() : _encoding;
+  if (encoding != "txt" && encoding != "zlib" && encoding != "bz2")
+  {
+    std::cerr << "Invalid log file encoding[" << encoding << "]. "
+      << "Use one of: txt, bz2, zlib.\n";
+  }
+
   // Output the header
   if (!_raw)
   {
@@ -819,7 +826,6 @@ void LogCommand::Output(const std::string &_outFilename,
     outFile.write(header.c_str(), header.size());
   }
 
-  std::string encoding = _encoding.empty() ? play->Encoding() : _encoding;
 
   StateFilter filter(!_raw, _stamp, _hz);
   filter.Init(_filter);
