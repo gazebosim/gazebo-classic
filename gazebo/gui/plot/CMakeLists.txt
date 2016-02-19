@@ -1,6 +1,7 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
 set (sources_local
+  plot/Palette.cc
   plot/PlotCanvas.cc
   plot/PlotWindow.cc
   plot/VariablePill.cc
@@ -8,6 +9,7 @@ set (sources_local
 )
 
 set (qt_headers_local
+  plot/Palette.hh
   plot/PlotCanvas.hh
   plot/PlotWindow.hh
   plot/VariablePill.hh

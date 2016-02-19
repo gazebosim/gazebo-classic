@@ -87,6 +87,9 @@ extern bool g_fullscreen;
 MainWindow::MainWindow()
   : dataPtr(new MainWindowPrivate)
 {
+  // Add font
+  QFontDatabase::addApplicationFont(":/fonts/Roboto-Regular.ttf");
+
   this->dataPtr->renderWidget = NULL;
   this->dataPtr->menuLayout = NULL;
   this->dataPtr->menuBar = NULL;
