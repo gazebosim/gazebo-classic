@@ -147,36 +147,58 @@ void UserCmdManager::OnUserCmdMsg(ConstUserCmdPtr &_msg)
       _msg->type()));
 
   // Forward message after we've saved the current state
-  if (_msg->type() == msgs::UserCmd::MOVING)
+  switch (_msg->type())
   {
-    for (int i = 0; i < _msg->model_size(); ++i)
-      this->dataPtr->modelModifyPub->Publish(_msg->model(i));
-
-    for (int i = 0; i < _msg->light_size(); ++i)
-      this->dataPtr->lightModifyPub->Publish(_msg->light(i));
-  }
-  else if (_msg->type() == msgs::UserCmd::WORLD_CONTROL)
-  {
-    if (_msg->has_world_control())
+    case msgs::UserCmd::MOVING:
     {
-      this->dataPtr->worldControlPub->Publish(_msg->world_control());
-    }
-    else
-    {
-      gzwarn << "World control command [" << _msg->description() <<
-          "] without a world control message. Command won't be executed."
-          << std::endl;
-    }
-  }
-  else if (_msg->type() == msgs::UserCmd::WRENCH)
-  {
-    // Set publisher
-    std::string topicName = "~/";
-    topicName += _msg->entity_name() + "/wrench";
-    boost::replace_all(topicName, "::", "/");
+      for (int i = 0; i < _msg->model_size(); ++i)
+        this->dataPtr->modelModifyPub->Publish(_msg->model(i));
 
-    auto wrenchPub = this->dataPtr->node->Advertise<msgs::Wrench>(topicName);
-    wrenchPub->Publish(_msg->wrench());
+      for (int i = 0; i < _msg->light_size(); ++i)
+        this->dataPtr->lightModifyPub->Publish(_msg->light(i));
+
+      break;
+    }
+    case msgs::UserCmd::SCALING:
+    {
+      for (int i = 0; i < _msg->model_size(); ++i)
+        this->dataPtr->modelModifyPub->Publish(_msg->model(i));
+
+      break;
+    }
+    case msgs::UserCmd::WORLD_CONTROL:
+    {
+      if (_msg->has_world_control())
+      {
+        this->dataPtr->worldControlPub->Publish(_msg->world_control());
+      }
+      else
+      {
+        gzwarn << "World control command [" << _msg->description() <<
+            "] without a world control message. Command won't be executed."
+            << std::endl;
+      }
+
+      break;
+    }
+    case msgs::UserCmd::WRENCH:
+    {
+      // Set publisher
+      std::string topicName = "~/";
+      topicName += _msg->entity_name() + "/wrench";
+      boost::replace_all(topicName, "::", "/");
+
+      auto wrenchPub = this->dataPtr->node->Advertise<msgs::Wrench>(topicName);
+      wrenchPub->Publish(_msg->wrench());
+
+      break;
+    }
+    default:
+    {
+      gzwarn << "Unsupported command type [" << _msg->type() << "]" <<
+          std::endl;
+      break;
+    }
   }
 
   // Add it to undo list
