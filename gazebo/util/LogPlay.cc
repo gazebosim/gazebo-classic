@@ -20,7 +20,7 @@
   #include <Winsock2.h>
 #endif
 
-#include <tinyxml2.h>
+#include <gazebo/tinyxml2.h>
 
 #include <algorithm>
 #include <boost/filesystem.hpp>
@@ -74,7 +74,7 @@ void LogPlay::Open(const std::string &_logFile)
 
   // Parse the log file
   if (this->dataPtr->xmlDoc.LoadFile(_logFile.c_str()) !=
-      tinyxml2::XML_NO_ERROR)
+      gazebo::tinyxml2::XML_NO_ERROR)
   {
     gzthrow("Unable to parse log file[" << _logFile << "]");
   }
@@ -151,7 +151,7 @@ bool LogPlay::HasIterations() const
 void LogPlay::ReadHeader()
 {
   this->dataPtr->randSeed = ignition::math::Rand::Seed();
-  tinyxml2::XMLElement *headerXml, *childXml;
+  gazebo::tinyxml2::XMLElement *headerXml, *childXml;
 
   this->dataPtr->logVersion.clear();
   this->dataPtr->gazeboVersion.clear();
@@ -652,7 +652,8 @@ bool LogPlay::Chunk(unsigned int _index, std::string &_data) const
 }
 
 /////////////////////////////////////////////////
-bool LogPlayPrivate::ChunkData(tinyxml2::XMLElement *_xml, std::string &_data)
+bool LogPlayPrivate::ChunkData(
+    gazebo::tinyxml2::XMLElement *_xml, std::string &_data)
 {
   // Make sure we have valid xml pointer
   if (!_xml)

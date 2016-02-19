@@ -6,7 +6,7 @@ if (HAVE_OPENAL)
   include_directories(${OPENAL_INCLUDE_DIR})
 endif()
 
-include_directories(${TBB_INCLUDEDIR} ${CMAKE_SOURCE_DIR}/deps/win/tinyxml2)
+include_directories(${TBB_INCLUDEDIR} ${CMAKE_SOURCE_DIR}/deps/tinyxml2)
 
 include_directories(${tinyxml_INCLUDE_DIRS})
 set (sources
@@ -14,7 +14,7 @@ set (sources
   LogPlay.cc
   LogRecord.cc
   OpenAL.cc
-  ${CMAKE_SOURCE_DIR}/deps/win/tinyxml2/tinyxml2.cpp
+  ${CMAKE_SOURCE_DIR}/deps/tinyxml2/gazebo/tinyxml2.cpp
 )
 
 if (NOT USE_EXTERNAL_TINYXML)

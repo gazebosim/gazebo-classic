@@ -17,7 +17,7 @@
 #ifndef _GAZEBO_UTIL_LOGPLAY_PRIVATE_HH_
 #define _GAZEBO_UTIL_LOGPLAY_PRIVATE_HH_
 
-#include <tinyxml2.h>
+#include <gazebo/tinyxml2.h>
 #include <mutex>
 #include <string>
 
@@ -36,7 +36,8 @@ namespace gazebo
       /// \param[in] _xml Pointer to an xml block that has state data.
       /// \param[out] _data Storage for the chunk's data.
       /// \return True if the chunk was successfully parsed.
-      public: bool ChunkData(tinyxml2::XMLElement *_xml, std::string &_data);
+      public: bool ChunkData(
+                  gazebo::tinyxml2::XMLElement *_xml, std::string &_data);
 
       /// \brief Max number of chunks to inspect when looking for XML elements.
       public: const unsigned int kNumChunksToTry = 2u;
@@ -54,13 +55,13 @@ namespace gazebo
       public: const std::string kEndTime = "</sim_time>";
 
       /// \brief The XML document of the log file.
-      public: tinyxml2::XMLDocument xmlDoc;
+      public: gazebo::tinyxml2::XMLDocument xmlDoc;
 
       /// \brief Start of the log.
-      public: tinyxml2::XMLElement *logStartXml;
+      public: gazebo::tinyxml2::XMLElement *logStartXml;
 
       /// \brief Current position in the log file.
-      public: tinyxml2::XMLElement *logCurrXml;
+      public: gazebo::tinyxml2::XMLElement *logCurrXml;
 
       /// \brief Name of the log file.
       public: std::string filename;
