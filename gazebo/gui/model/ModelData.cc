@@ -413,10 +413,17 @@ ignition::math::Vector3d LinkData::Scale() const
 /////////////////////////////////////////////////
 void LinkData::Load(sdf::ElementPtr _sdf)
 {
+  if (!_sdf)
+  {
+    gzwarn << "NULL SDF pointer, not loading link data." << std::endl;
+    return;
+  }
+
   LinkConfig *linkConfig = this->inspector->GetLinkConfig();
 
   this->SetName(_sdf->Get<std::string>("name"));
   this->SetPose(_sdf->Get<ignition::math::Pose3d>("pose"));
+  this->linkSDF = _sdf;
 
   msgs::LinkPtr linkMsgPtr(new msgs::Link);
   if (_sdf->HasElement("inertial"))

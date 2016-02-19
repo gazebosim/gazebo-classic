@@ -2367,4 +2367,7 @@ void MainWindow::OnWindowMode(const std::string &_mode)
             this->dataPtr->insertModel) == -1)
     this->dataPtr->tabWidget->insertTab(1, this->dataPtr->insertModel,
       "Insert");
+
+  // User commands
+  this->dataPtr->userCmdHistory->SetActive(simulation);
 }

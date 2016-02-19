@@ -317,7 +317,11 @@ namespace gazebo
       /// visual will also be added to the link.
       /// \param[in] _visual Visual used to create the link.
       /// \return Link data.
-      private: LinkData * CreateLink(const rendering::VisualPtr &_visual);
+      private: LinkData *CreateLink(const rendering::VisualPtr &_visual);
+
+      /// \brief Insert a link from an SDF element.
+      /// \param[in] _sdf SDF element with link data.
+      private: void InsertLinkFromSDF(sdf::ElementPtr _sdf);
 
       /// \brief Clone an existing nested model.
       /// \param[in] _modelName Name of nested model to be cloned.

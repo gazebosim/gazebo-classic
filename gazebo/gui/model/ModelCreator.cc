@@ -56,6 +56,7 @@
 #include "gazebo/gui/model/ModelPluginInspector.hh"
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/ModelEditorEvents.hh"
+#include "gazebo/gui/model/MEUserCmdManager.hh"
 #include "gazebo/gui/model/ModelCreator.hh"
 
 using namespace gazebo;
@@ -175,6 +176,11 @@ ModelCreator::ModelCreator()
       gui::model::Events::ConnectRequestLinkRemoval(
         std::bind(&ModelCreator::RemoveEntity, this, std::placeholders::_1)));
 
+   this->connections.push_back(
+      gui::model::Events::ConnectRequestLinkInsertion(
+      std::bind(&ModelCreator::InsertLinkFromSDF, this,
+      std::placeholders::_1)));
+
   this->connections.push_back(
       gui::model::Events::ConnectRequestModelPluginRemoval(
         std::bind(&ModelCreator::RemoveModelPlugin, this,
@@ -269,6 +275,9 @@ void ModelCreator::OnEdit(bool _checked)
     this->jointMaker->Stop();
 
     this->DeselectAll();
+
+  MEUserCmdManager::Instance()->Reset();
+  MEUserCmdManager::Instance()->SetActive(this->active);
   }
 }
 
@@ -965,6 +974,15 @@ LinkData *ModelCreator::CreateLink(const rendering::VisualPtr &_visual)
 }
 
 /////////////////////////////////////////////////
+void ModelCreator::InsertLinkFromSDF(sdf::ElementPtr _sdf)
+{
+  if (!_sdf)
+    return;
+
+  this->CreateLinkFromSDF(_sdf, this->previewVisual);
+}
+
+/////////////////////////////////////////////////
 LinkData *ModelCreator::CloneLink(const std::string &_linkName)
 {
   std::lock_guard<std::recursive_mutex> lock(this->updateMutex);
@@ -1035,6 +1053,12 @@ NestedModelData *ModelCreator::CloneNestedModel(
 LinkData *ModelCreator::CreateLinkFromSDF(const sdf::ElementPtr &_linkElem,
     const rendering::VisualPtr &_parentVis)
 {
+  if (_linkElem == NULL)
+  {
+    gzwarn << "NULL SDF pointer, not creating link." << std::endl;
+    return NULL;
+  }
+
   LinkData *link = new LinkData();
   MainWindow *mainWindow = gui::get_main_window();
   if (mainWindow)
@@ -1691,6 +1715,12 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
       LinkData *link = linkIt->second;
       link->SetPose((this->mouseVisual->GetWorldPose()-this->modelPose).Ign());
       gui::model::Events::linkInserted(this->mouseVisual->GetName());
+
+      auto cmd = MEUserCmdManager::Instance()->NewCmd(
+          "Insert [" + link->GetName() + "]",
+          MEUserCmd::INSERTING_LINK);
+      cmd->SetSDF(link->linkSDF);
+      cmd->SetScopedName(link->linkVisual->GetName());
     }
     else
     {
