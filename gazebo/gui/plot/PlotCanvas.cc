@@ -264,13 +264,18 @@ void PlotCanvas::AddVariable(const unsigned int _id,
   if (it == this->dataPtr->plotData.end())
     return;
 
-  PlotData *plotData = it->second;
-  PlotCurveWeakPtr curve = plotData->plot->AddCurve(_variable);
+  PlotData *p = it->second;
+  PlotCurveWeakPtr curve = p->plot->AddCurve(_variable);
   auto c = curve.lock();
   if (c)
-    plotData->variableCurves[_id] = c->Id();
+  {
+    p->variableCurves[_id] = c->Id();
+  }
   else
+  {
     gzerr << "Unable to add curve to plot" << std::endl;
+    return;
+  }
 
   // hide initial empty plot
   if (!this->dataPtr->plotData.empty() && this->dataPtr->emptyPlot)
@@ -349,14 +354,14 @@ unsigned int PlotCanvas::AddPlot()
   plot->setAutoDelete(false);
   this->dataPtr->plotLayout->addWidget(plot);
 
-  PlotData *plotData = new PlotData;
-  plotData->id = this->dataPtr->globalPlotId++;
-  plotData->plot = plot;
-  this->dataPtr->plotData[plotData->id] = plotData;
+  PlotData *p = new PlotData;
+  p->id = this->dataPtr->globalPlotId++;
+  p->plot = plot;
+  this->dataPtr->plotData[p->id] = p;
 
   this->UpdateAxisLabel();
 
-  return plotData->id;
+  return p->id;
 }
 
 /////////////////////////////////////////////////
@@ -481,12 +486,12 @@ void PlotCanvas::OnMoveVariable(const unsigned int _id,
   // detach from old plot and attach to new one
   if (plotIt != this->dataPtr->plotData.end())
   {
-    PlotData *plotData = plotIt->second;
+    PlotData *p = plotIt->second;
 
     // detach variable from plot (qwt plot doesn't seem to do anything
     // apart from setting the plot item to null)
-    PlotCurvePtr plotCurve = plotData->plot->DetachCurve(curveId);
-    plotData->variableCurves.erase(plotData->variableCurves.find(_id));
+    PlotCurvePtr plotCurve = p->plot->DetachCurve(curveId);
+    p->variableCurves.erase(p->variableCurves.find(_id));
 
     if (targetPlotIt != this->dataPtr->plotData.end())
     {
@@ -511,26 +516,26 @@ void PlotCanvas::OnMoveVariable(const unsigned int _id,
     }
 
     // delete plot if empty
-    if (plotData->variableCurves.empty())
+    if (p->variableCurves.empty())
     {
       this->dataPtr->plotLayout->takeAt(
-          this->dataPtr->plotLayout->indexOf(plotData->plot));
+          this->dataPtr->plotLayout->indexOf(p->plot));
 
       // careful about deleting by iterator (plotIt) as it may have been
       // changed if a new plot is added to the vector
       for (auto it = this->dataPtr->plotData.begin();
           it != this->dataPtr->plotData.end(); ++it)
       {
-        if (it->second == plotData)
+        if (it->second == p)
         {
           this->dataPtr->plotData.erase(it);
           break;
         }
       }
 
-      plotData->plot->detachItems(QwtPlotItem::Rtti_PlotItem, false);
-      delete plotData->plot;
-      delete plotData;
+      p->plot->detachItems(QwtPlotItem::Rtti_PlotItem, false);
+      delete p->plot;
+      delete p;
 
       this->UpdateAxisLabel();
     }
