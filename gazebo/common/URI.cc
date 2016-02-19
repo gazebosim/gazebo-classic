@@ -19,8 +19,8 @@
 #include <map>
 #include <string>
 
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/URI.hh"
-#include "gazebo/common/Tokenizer.hh"
 
 using namespace gazebo;
 using namespace common;
@@ -176,8 +176,7 @@ bool URIPath::Parse(const std::string &_str)
 
   this->Clear();
 
-  Tokenizer tokenizer(_str);
-  for (auto part : tokenizer.Split("/"))
+  for (auto part : common::split(_str, "/"))
     this->PushBack(part);
 
   return true;
