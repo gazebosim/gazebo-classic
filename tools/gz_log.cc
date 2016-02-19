@@ -24,6 +24,10 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/posix_time/posix_time_io.hpp>
+#include <boost/iostreams/filter/bzip2.hpp>
+#include <boost/iostreams/filter/zlib.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
+#include <boost/iostreams/copy.hpp>
 
 #include <gazebo/util/util.hh>
 #include "gz_log.hh"
@@ -590,8 +594,10 @@ LogCommand::LogCommand()
     ("hz,z", po::value<double>(), "Filter output to the specified Hz rate."
      "Only valid for echo and step commands.")
     ("file,f", po::value<std::string>(), "Path to a log file.")
+    ("output,o", po::value<std::string>(),
+     "Output file, valid in conjunction with the filter command")
     ("filter", po::value<std::string>(),
-     "Filter output. Valid only for the echo and step commands");
+     "Filter output. Valid only wht the echo, step, or output commands");
 }
 
 /////////////////////////////////////////////////
@@ -661,7 +667,9 @@ bool LogCommand::RunImpl()
   g_stateSdf.reset(new sdf::Element);
   sdf::initFile("state.sdf", g_stateSdf);
 
-  if (this->vm.count("echo"))
+  if (this->vm.count("output"))
+    this->Output(this->vm["output"].as<std::string>(), filter, raw, stamp, hz);
+  else if (this->vm.count("echo"))
     this->Echo(filter, raw, stamp, hz);
   else if (this->vm.count("step"))
     this->Step(filter, raw, stamp, hz);
@@ -776,6 +784,102 @@ void LogCommand::Info(const std::string &_filename)
     << "Encoding:       " << play->Encoding() << "\n"
     // << "Model Count:    " << modelCount << "\n"
     << "\n";
+}
+
+/////////////////////////////////////////////////
+void LogCommand::Output(const std::string &_outFilename,
+    const std::string &_filter, bool _raw,
+    const std::string &_stamp, double _hz, const std::string _encoding)
+{
+  std::ofstream outFile(_outFilename, std::fstream::out | std::ios::binary);
+
+  if (!outFile.is_open())
+  {
+    std::cerr << "Unable to open file[" << _outFilename << "] for writing.\n";
+    return;
+  }
+
+  gazebo::util::LogPlay *play = gazebo::util::LogPlay::Instance();
+  std::string stateString;
+
+  // Output the header
+  if (!_raw)
+  {
+    std::string header = play->Header();
+    outFile.write(header.c_str(), header.size());
+  }
+
+  StateFilter filter(!_raw, _stamp, _hz);
+  filter.Init(_filter);
+
+  unsigned int i = 0;
+  while (play->Step(stateString))
+  {
+    if (i > 0)
+      stateString = filter.Filter(stateString);
+    else if (i == 0 && _raw)
+      stateString.clear();
+
+    if (!stateString.empty())
+    {
+      if (!_raw)
+      {
+        std::string buffer = "<chunk encoding='" + _encoding + "'><![CDATA[\n";
+
+        if (_encoding == "txt")
+          buffer.append(stateString);
+        else if (_encoding == "zlib")
+        {
+          std::string str;
+
+          // Compress to zlib
+          {
+            boost::iostreams::filtering_ostream out;
+            out.push(boost::iostreams::zlib_compressor());
+            out.push(std::back_inserter(str));
+            boost::iostreams::copy(
+                boost::make_iterator_range(stateString), out);
+          }
+
+          // Encode in base64.
+          Base64Encode(str.c_str(), str.size(), buffer);
+        }
+        else if (_encoding == "bz2")
+        {
+          std::string str;
+
+          // Compress to bzip2
+          {
+            boost::iostreams::filtering_ostream out;
+            out.push(boost::iostreams::bzip2_compressor());
+            out.push(std::back_inserter(str));
+            boost::iostreams::copy(
+                boost::make_iterator_range(stateString), out);
+          }
+
+          // Encode in base64.
+          Base64Encode(str.c_str(), str.size(), buffer);
+        }
+
+        buffer.append("]]></chunk>\n");
+        outFile.write(buffer.c_str(), buffer.size());
+      }
+      else
+      {
+        outFile.write(stateString.c_str(), stateString.size());
+      }
+    }
+
+    ++i;
+  }
+
+  if (!_raw)
+  {
+    std::string endTag = "</gazebo_log>\n";
+    outFile.write(endTag.c_str(), endTag.size());
+  }
+
+  outFile.close();
 }
 
 /////////////////////////////////////////////////

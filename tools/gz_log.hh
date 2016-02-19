@@ -201,6 +201,10 @@ namespace gazebo
     /// \param[in] _filename Name of the file to parse.
     private: void Info(const std::string &_filename);
 
+    private: void Output(const std::string &_outFilename,
+    const std::string &_filter, bool _raw,
+    const std::string &_stamp, double _hz, const std::string _encoding="zlib");
+
     /// \brief Dump the contents of a log file to screen
     /// \param[in] _filter Filter string
     /// \param[in] _raw True to output data without xml formatting.
