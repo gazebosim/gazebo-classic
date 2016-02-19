@@ -42,6 +42,14 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~UserCmdHistory();
 
+      /// \brief Set whether the widget is active or not.
+      /// \param[in] _active True to make it active.
+      public: void SetActive(const bool _active);
+
+      /// \brief Set the widget to be active.
+      /// \return True if it is active.
+      public: bool Active() const;
+
       /// \internal
       /// \brief Triggers OnStatsSlot
       signals: void StatsSignal();
@@ -87,26 +95,15 @@ namespace gazebo
       /// stored in the server.
       private: void OnUserCmdStatsMsg(ConstUserCmdStatsPtr &_msg);
 
-      /// \internal
-      /// \brief Pointer to private data.
-      private: UserCmdHistoryPrivate *dataPtr;
-
-      // NOTE: Added in the end for ABI compatibility, move up when merging
-      // forward.
-
-      /// \brief Set whether the widget is active or not.
-      /// \param[in] _active True to make it active.
-      public: void SetActive(const bool _active);
-
-      /// \brief Set the widget to be active.
-      /// \return True if it is active.
-      public: bool Active() const;
-
       /// \brief Group of actions in undo history menu.
       protected: QActionGroup *undoActions;
 
       /// \brief Group of actions in redo history menu.
       protected: QActionGroup *redoActions;
+
+      /// \internal
+      /// \brief Pointer to private data.
+      private: UserCmdHistoryPrivate *dataPtr;
     };
   }
 }
