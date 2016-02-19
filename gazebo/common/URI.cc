@@ -20,6 +20,7 @@
 #include <string>
 
 #include "gazebo/common/CommonIface.hh"
+#include "gazebo/common/Console.hh"
 #include "gazebo/common/URI.hh"
 
 using namespace gazebo;
@@ -78,7 +79,11 @@ URIPath::~URIPath()
 URIPath::URIPath(const std::string &_str)
   : URIPath()
 {
-  this->Parse(_str);
+  if (!this->Parse(_str))
+  {
+    gzwarn << "Unable to parse URIPath [" << _str << "]. Ignoring."
+           << std::endl;
+  }
 }
 
 /////////////////////////////////////////////////
@@ -192,7 +197,11 @@ URIQuery::URIQuery()
 URIQuery::URIQuery(const std::string &_str)
   : URIQuery()
 {
-  this->Parse(_str);
+  if (!this->Parse(_str))
+  {
+    gzwarn << "Unable to parse URIQuery [" << _str << "]. Ignoring."
+           << std::endl;
+  }
 }
 
 /////////////////////////////////////////////////
@@ -307,7 +316,8 @@ URI::URI()
 URI::URI(const std::string &_str)
   : URI()
 {
-  this->Parse(_str);
+  if (!this->Parse(_str))
+    gzwarn << "Unable to parse URI [" << _str << "]. Ignoring." << std::endl;
 }
 
 /////////////////////////////////////////////////
