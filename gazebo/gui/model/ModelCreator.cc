@@ -751,6 +751,22 @@ void ModelCreator::AddJoint(const std::string &_type)
 }
 
 /////////////////////////////////////////////////
+void ModelCreator::AddCustomLink(const EntityType _type,
+    const ignition::math::Vector3d &_size, const ignition::math::Pose3d &_pose,
+    const std::string &_uri, const unsigned int _samples)
+{
+  this->Stop();
+
+  this->addEntityType = _type;
+  if (_type != ENTITY_NONE)
+  {
+    auto linkData = this->AddShape(_type, _size, _pose, _uri, _samples);
+    if (linkData)
+      this->mouseVisual = linkData->linkVisual;
+  }
+}
+
+/////////////////////////////////////////////////
 LinkData *ModelCreator::AddShape(EntityType _type,
     const math::Vector3 &_size, const math::Pose &_pose,
     const std::string &_uri, unsigned int _samples)

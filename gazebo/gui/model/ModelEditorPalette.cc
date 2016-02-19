@@ -196,8 +196,9 @@ void ModelEditorPalette::OnCustom()
       if (info.completeSuffix().toLower() == "dae" ||
           info.completeSuffix().toLower() == "stl")
       {
-        this->modelCreator->AddShape(ModelCreator::ENTITY_MESH,
-            math::Vector3::One, math::Pose::Zero, importDialog.GetImportPath());
+        this->modelCreator->AddCustomLink(ModelCreator::ENTITY_MESH,
+            ignition::math::Vector3d::One, ignition::math::Pose3d::Zero,
+            importDialog.GetImportPath());
       }
       else if (info.completeSuffix().toLower() == "svg")
       {
@@ -205,11 +206,11 @@ void ModelEditorPalette::OnCustom()
         extrudeDialog.deleteLater();
         if (extrudeDialog.exec() == QDialog::Accepted)
         {
-          this->modelCreator->AddShape(ModelCreator::ENTITY_POLYLINE,
-              math::Vector3(1.0/extrudeDialog.GetResolution(),
+          this->modelCreator->AddCustomLink(ModelCreator::ENTITY_POLYLINE,
+              ignition::math::Vector3d(1.0/extrudeDialog.GetResolution(),
               1.0/extrudeDialog.GetResolution(),
               extrudeDialog.GetThickness()),
-              math::Pose::Zero, importDialog.GetImportPath(),
+              ignition::math::Pose3d::Zero, importDialog.GetImportPath(),
               extrudeDialog.GetSamples());
         }
         else
