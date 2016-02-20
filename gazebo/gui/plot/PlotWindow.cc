@@ -92,9 +92,9 @@ PlotWindow::PlotWindow(QWidget *_parent)
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));
   this->setWindowTitle("Gazebo: Plotting Utility");
   this->setObjectName("plotWindow");
-  this->setWindowFlags(Qt::Window | Qt::WindowTitleHint |
+/*  this->setWindowFlags(Qt::Window | Qt::WindowTitleHint |
       Qt::WindowCloseButtonHint | Qt::WindowStaysOnTopHint |
-      Qt::CustomizeWindowHint);
+      Qt::CustomizeWindowHint);*/
 
   // new empty canvas
   this->dataPtr->canvasLayout = new QVBoxLayout;
@@ -214,6 +214,19 @@ PlotWindow::~PlotWindow()
 /////////////////////////////////////////////////
 void PlotWindow::OnPlay()
 {
+  QFileDialog fileDialog(0, tr("Save World"), QDir::homePath(),
+      tr("SDF Files (*.xml *.sdf *.world)"));
+
+//  QFileDialog::getOpenFileName(this,
+//    tr("Open Image"), QDir::homePath(), tr("Image Files (*.png *.jpg *.bmp)"));
+/*  fileDialog.setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
+  fileDialog.setAcceptMode(QFileDialog::AcceptSave);
+  fileDialog.setOption( QFileDialog::DontUseNativeDialog, true );*/
+
+//  if (fileDialog.exec() == QDialog::Accepted)
+//    return;
+
   this->dataPtr->paused = false;
   this->dataPtr->plotPauseAct->setVisible(true);
   this->dataPtr->plotPlayAct->setVisible(false);

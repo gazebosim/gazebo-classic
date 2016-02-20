@@ -22,9 +22,9 @@
 #include <set>
 #include <thread>
 
-#include <ignition/transport.hh>
+ #include <ignition/transport.hh>
 
-#include "gazebo/util/IntrospectionClient.hh"
+//#include "gazebo/util/IntrospectionClient.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportIface.hh"
 
@@ -69,7 +69,7 @@ namespace gazebo
       public: std::mutex mutex;
 
       /// \brief Introspection Client
-      public: util::IntrospectionClient introspectClient;
+      // public: util::IntrospectionClient introspectClient;
 
       /// \brief Introspection manager Id
       public: std::string managerId;
@@ -110,12 +110,14 @@ PlotManager::~PlotManager()
 /////////////////////////////////////////////////
 void PlotManager::SetupIntrospection()
 {
-  // Wait for the managers to come online
+  return;
+
+/*  // Wait for the managers to come online
   std::set<std::string> managerIds =
       this->dataPtr->introspectClient.WaitForManagers(std::chrono::seconds(2));
   if (managerIds.empty())
   {
-    gzerr << "No introspection managers detected." << std::endl;
+    gzerr << "qNo introspection managers detected." << std::endl;
     return;
   }
 
@@ -153,7 +155,7 @@ void PlotManager::SetupIntrospection()
   {
     gzerr << "Error subscribing to introspection manager" << std::endl;
     return;
-  }
+  }*/
 }
 
 /////////////////////////////////////////////////
