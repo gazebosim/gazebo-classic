@@ -361,8 +361,6 @@ void Palette::FillFromMsg(google::protobuf::Message *_msg,
       {
         auto humanName = ConfigWidget::HumanReadableKey(name);
 
-        std::string typeName = field->type_name();
-
         auto *childItem = new QStandardItem();
         childItem->setData(humanName.c_str(),
             PlotItemDelegate::TOPIC_NAME_ROLE);
