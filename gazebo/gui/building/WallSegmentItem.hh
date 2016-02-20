@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,30 +15,29 @@
  *
 */
 
-#ifndef _WALL_SEGMENT_ITEM_HH_
-#define _WALL_SEGMENT_ITEM_HH_
+#ifndef _GAZEBO_GUI_BUILDING_WALLSEGMENTITEM_HH_
+#define _GAZEBO_GUI_BUILDING_WALLSEGMENTITEM_HH_
+
+#include <memory>
 
 #include "gazebo/gui/qt.h"
-#include "gazebo/gui/building/MeasureItem.hh"
 #include "gazebo/gui/building/SegmentItem.hh"
-#include "gazebo/gui/building/BuildingItem.hh"
+
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
-    class MeasureItem;
-    class SegmentItem;
-    class BuildingItem;
-    class WallInspectorDialog;
+    // Forward declare private data.
+    class WallSegmentItemPrivate;
 
     /// \addtogroup gazebo_gui
     /// \{
 
     /// \class WallSegmentItem WallSegmentItem.hh
     /// \brief 2D representation of a wall.
-    class GZ_GUI_VISIBLE WallSegmentItem : public SegmentItem, public
-        BuildingItem
+    class GZ_GUI_VISIBLE WallSegmentItem : public SegmentItem
     {
       Q_OBJECT
 
@@ -85,8 +84,7 @@ namespace gazebo
 
       /// \brief Qt context menu event received on a mouse double click.
       /// \param[in] _event Qt double click event.
-      private: void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *
-          _event);
+      private: void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *_event);
 
       /// \brief React to item changes notified by Qt.
       /// \param[in] _change Qt change type, e.g. selected change
@@ -103,23 +101,9 @@ namespace gazebo
       // Documentation inherited
       private slots: void OnDeleteItem();
 
-      /// \brief Thickness of the wall segment in the 2d view, in pixels.
-      private: double wallThickness;
-
-      /// \brief Height of the wall segment in meters.
-      private: double wallHeight;
-
-      /// \brief This wall segment's measure item.
-      private: MeasureItem *measure;
-
-      /// \brief Qt action for opening the inspector.
-      private: QAction *openInspectorAct;
-
-      /// \brief Qt action for deleting the wall segment item.
-      private: QAction *deleteItemAct;
-
-      /// \brief Inspector for configuring the wall segment item.
-      private: WallInspectorDialog *inspector;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<WallSegmentItemPrivate> dataPtr;
     };
     /// \}
   }

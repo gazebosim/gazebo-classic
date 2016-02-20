@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -121,6 +121,123 @@ void ModelPluginInspector_TEST::RemoveButton()
   QVERIFY(!modelPluginInspector->isVisible());
 
   delete modelPluginInspector;
+}
+
+/////////////////////////////////////////////////
+void ModelPluginInspector_TEST::ReadOnly()
+{
+  gazebo::gui::ModelPluginInspector *inspector =
+      new gazebo::gui::ModelPluginInspector();
+  QVERIFY(inspector != NULL);
+
+  // Check fields
+  QList<QLineEdit *> lineEdits = inspector->findChildren<QLineEdit *>();
+  QList<QPlainTextEdit *> plainTextEdits =
+      inspector->findChildren<QPlainTextEdit *>();
+  QCOMPARE(lineEdits.size(), 2);
+  QCOMPARE(plainTextEdits.size(), 1);
+
+  QVERIFY(!lineEdits[0]->isEnabled());
+  QVERIFY(!lineEdits[1]->isEnabled());
+  QVERIFY(!plainTextEdits[0]->isEnabled());
+
+  inspector->SetReadOnly(false);
+  QVERIFY(lineEdits[0]->isEnabled());
+  QVERIFY(lineEdits[1]->isEnabled());
+  QVERIFY(plainTextEdits[0]->isEnabled());
+
+  // Destructor
+  delete inspector;
+}
+
+/////////////////////////////////////////////////
+void ModelPluginInspector_TEST::Clear()
+{
+  gazebo::gui::ModelPluginInspector *inspector =
+      new gazebo::gui::ModelPluginInspector();
+  QVERIFY(inspector != NULL);
+
+  // Check fields
+  QList<QLineEdit *> lineEdits = inspector->findChildren<QLineEdit *>();
+  QList<QPlainTextEdit *> plainTextEdits =
+      inspector->findChildren<QPlainTextEdit *>();
+  QCOMPARE(lineEdits.size(), 2);
+  QCOMPARE(plainTextEdits.size(), 1);
+
+  QCOMPARE(lineEdits[0]->text(), QString());
+  QCOMPARE(lineEdits[1]->text(), QString());
+  QCOMPARE(plainTextEdits[0]->toPlainText(), QString());
+
+  // set test data
+  lineEdits[0]->setText(QString("my_plugin_name"));
+  lineEdits[1]->setText(QString("my_plugin_filename"));
+  plainTextEdits[0]->setPlainText(QString("<data>test</data>"));
+
+  // verify values
+  QCOMPARE(lineEdits[0]->text(), QString("my_plugin_name"));
+  QCOMPARE(lineEdits[1]->text(), QString("my_plugin_filename"));
+  QCOMPARE(plainTextEdits[0]->toPlainText(), QString("<data>test</data>"));
+
+  // clear and verify values are empty
+  inspector->SetReadOnly(false);
+  inspector->Clear();
+
+  QCOMPARE(lineEdits[0]->text(), QString());
+  QCOMPARE(lineEdits[1]->text(), QString());
+  QCOMPARE(plainTextEdits[0]->toPlainText(), QString());
+
+  gazebo::msgs::Plugin *pluginMsg = inspector->Data();
+  QVERIFY(pluginMsg->name().empty());
+  QVERIFY(pluginMsg->filename().empty());
+  QVERIFY(pluginMsg->innerxml().empty());
+
+  // Destructor
+  delete inspector;
+}
+
+
+/////////////////////////////////////////////////
+void ModelPluginInspector_TEST::GetData()
+{
+  gazebo::gui::ModelPluginInspector *inspector =
+      new gazebo::gui::ModelPluginInspector();
+  QVERIFY(inspector != NULL);
+
+  // Check fields
+  QList<QLineEdit *> lineEdits = inspector->findChildren<QLineEdit *>();
+  QList<QPlainTextEdit *> plainTextEdits =
+      inspector->findChildren<QPlainTextEdit *>();
+  QCOMPARE(lineEdits.size(), 2);
+  QCOMPARE(plainTextEdits.size(), 1);
+
+  QCOMPARE(lineEdits[0]->text(), QString());
+  QCOMPARE(lineEdits[1]->text(), QString());
+  QCOMPARE(plainTextEdits[0]->toPlainText(), QString());
+
+  gazebo::msgs::Plugin *pluginMsg = inspector->Data();
+  QVERIFY(pluginMsg->name().empty());
+  QVERIFY(pluginMsg->filename().empty());
+  QVERIFY(pluginMsg->innerxml().empty());
+
+  // set test data
+  lineEdits[0]->setText(QString("my_plugin_name"));
+  lineEdits[1]->setText(QString("my_plugin_filename"));
+  plainTextEdits[0]->setPlainText(QString("<data>test</data>"));
+
+  // verify values
+  QCOMPARE(lineEdits[0]->text(), QString("my_plugin_name"));
+  QCOMPARE(lineEdits[1]->text(), QString("my_plugin_filename"));
+  QCOMPARE(plainTextEdits[0]->toPlainText(), QString("<data>test</data>"));
+
+  // set read-only to false so plugin msg can be updated with new values
+  inspector->SetReadOnly(false);
+  pluginMsg = inspector->Data();
+  QCOMPARE(pluginMsg->name(), std::string("my_plugin_name"));
+  QCOMPARE(pluginMsg->filename(), std::string("my_plugin_filename"));
+  QCOMPARE(pluginMsg->innerxml(), std::string("<data>test</data>"));
+
+  // Destructor
+  delete inspector;
 }
 
 // Generate a main function for the test

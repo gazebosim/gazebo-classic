@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,8 +36,9 @@ namespace gazebo
       /// \brief Subscriber to the statistics topic.
       public: transport::SubscriberPtr statsSub;
 
-      /// \brief Used to start, stop, and step simulation.
-      public: transport::PublisherPtr worldControlPub;
+      /// \brief Publish user command messages for the server to place in the
+      /// undo queue.
+      public: transport::PublisherPtr userCmdPub;
 
       /// \brief Event based connections.
       public: std::vector<event::ConnectionPtr> connections;

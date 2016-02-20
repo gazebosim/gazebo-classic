@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -117,7 +117,7 @@ void MudPlugin::Init()
       sensors::SensorManager *mgr = sensors::SensorManager::Instance();
       // Get a pointer to the contact sensor
       sensors::ContactSensorPtr sensor =
-          boost::dynamic_pointer_cast<sensors::ContactSensor>
+          std::dynamic_pointer_cast<sensors::ContactSensor>
           (mgr->GetSensor(name));
       if (sensor)
       {
@@ -159,7 +159,7 @@ void MudPlugin::Init()
   }
 
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-          boost::bind(&MudPlugin::OnUpdate, this));
+          std::bind(&MudPlugin::OnUpdate, this));
 }
 
 /////////////////////////////////////////////////

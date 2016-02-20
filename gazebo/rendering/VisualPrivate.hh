@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,7 +76,9 @@ namespace gazebo
                 visibilityFlags(GZ_VISIBILITY_ALL),
                 type(Visual::VT_ENTITY),
                 layer(0),
-                geomSize(ignition::math::Vector3d::One)
+                geomSize(ignition::math::Vector3d::One),
+                inheritTransparency(true),
+                wireframe(false)
       {
       }
 
@@ -201,6 +203,12 @@ namespace gazebo
 
       /// \brief Size of attached geometry
       public: ignition::math::Vector3d geomSize;
+
+      /// \brief True to inherit transparency from parent.
+      public: bool inheritTransparency;
+
+      /// \brief True if wireframe mode is enabled
+      public: bool wireframe;
     };
     /// \}
   }

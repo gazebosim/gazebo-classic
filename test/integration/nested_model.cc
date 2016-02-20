@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,10 +43,6 @@ class PhysicsMsgsTest : public ServerFixture,
 ////////////////////////////////////////////////////////////////////////
 void PhysicsMsgsTest::LoadNestedModel(const std::string &_physicsEngine)
 {
-  // Nested models are not working in simbody yet, issue #1718
-  if (_physicsEngine == "simbody")
-    return;
-
   // load a world with a nested model
   Load("worlds/nested_model.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
@@ -56,10 +52,33 @@ void PhysicsMsgsTest::LoadNestedModel(const std::string &_physicsEngine)
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
+  // take a step to verify that simulation won't crash
+  world->Step(1);
+
   // verify top level model
   physics::ModelPtr model;
-  model = world->GetModel("model_00");
-  EXPECT_TRUE(model != NULL);
+  EXPECT_NO_THROW(model = world->GetModel("model_00"));
+
+  if (_physicsEngine == "simbody")
+  {
+    gzerr << "Nested models are not working in simbody yet, issue #1718"
+          << std::endl;
+    EXPECT_TRUE(model == NULL);
+    return;
+  }
+  else if (_physicsEngine == "dart")
+  {
+    gzerr << "Nested models are not working in dart yet, issue #1833"
+          << std::endl;
+
+    EXPECT_TRUE(model == NULL);
+    return;
+  }
+  else
+  {
+    EXPECT_TRUE(model != NULL);
+  }
+
   EXPECT_EQ(model->GetWorldPose().Ign(),
       ignition::math::Pose3d(0, 0, 0.5, 0, 0, 0));
 
@@ -130,9 +149,19 @@ void PhysicsMsgsTest::LoadNestedModel(const std::string &_physicsEngine)
 ////////////////////////////////////////////////////////////////////////
 void PhysicsMsgsTest::SpawnNestedModel(const std::string &_physicsEngine)
 {
-  // Nested models are not working in simbody yet, issue #1718
   if (_physicsEngine == "simbody")
+  {
+    gzerr << "Nested models are not working in simbody yet, issue #1718"
+          << std::endl;
     return;
+  }
+
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Nested models are not working in dart yet, issue #1833"
+          << std::endl;
+    return;
+  }
 
   // load an empty world
   Load("worlds/empty.world", true, _physicsEngine);
