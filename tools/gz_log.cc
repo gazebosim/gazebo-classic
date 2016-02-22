@@ -817,6 +817,8 @@ void LogCommand::Output(const std::string &_outFilename,
   {
     std::cerr << "Invalid log file encoding[" << encoding << "]. "
       << "Use one of: txt, bz2, zlib.\n";
+    outFile.close();
+    return;
   }
 
   // Output the header
