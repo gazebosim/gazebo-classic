@@ -213,7 +213,7 @@ namespace gazebo
     private: void Output(const std::string &_outFilename,
                  const std::string &_filter, bool _raw,
                  const std::string &_stamp, double _hz,
-                 const std::string _encoding = "");
+                 const std::string &_encoding = "");
 
     /// \brief Dump the contents of a log file to screen
     /// \param[in] _filter Filter string

@@ -799,7 +799,7 @@ void LogCommand::Info(const std::string &_filename)
 /////////////////////////////////////////////////
 void LogCommand::Output(const std::string &_outFilename,
     const std::string &_filter, bool _raw,
-    const std::string &_stamp, double _hz, const std::string _encoding)
+    const std::string &_stamp, double _hz, const std::string &_encoding)
 {
   std::ofstream outFile(_outFilename, std::fstream::out | std::ios::binary);
 
