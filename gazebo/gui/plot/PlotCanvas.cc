@@ -95,6 +95,7 @@ PlotCanvas::PlotCanvas(QWidget *_parent)
 
   // Settings
   QMenu *settingsMenu = new QMenu;
+  settingsMenu->setObjectName("material");
   QAction *clearPlotAct = new QAction("Clear all fields", settingsMenu);
   clearPlotAct->setStatusTip(tr("Clear variables and all plots on canvas"));
   connect(clearPlotAct, SIGNAL(triggered()), this, SLOT(OnClearCanvas()));

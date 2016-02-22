@@ -32,7 +32,7 @@ namespace gazebo
     class PlotCanvas;
 
     /// \brief Plot window
-    class GZ_GUI_VISIBLE PlotWindow : public QDialog
+    class GZ_GUI_VISIBLE PlotWindow : public QWidget
     {
       Q_OBJECT
 

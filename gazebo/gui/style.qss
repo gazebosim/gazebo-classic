@@ -932,3 +932,31 @@ QwtPlot#incrementalPlot > QwtLegend > QwtLegendLabel
 {
   background-color: #ffffff;
 }
+
+QMenu#material
+{
+  color: rgba(0, 0, 0, 80%);
+  background-color: #fefefe;
+  border: 0px;
+}
+
+QMenu#material::item
+{
+  padding-left: 24px;
+  padding-right: 24px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+QMenu#material::item:selected
+{
+  color: rgba(0, 0, 0, 100%);
+  background-color: rgba(153, 153, 153, 20%);
+}
+
+QMenu#material::item:disabled
+{
+  color: rgba(0, 0, 0, 26%);
+}
+
+

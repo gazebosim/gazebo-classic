@@ -178,9 +178,18 @@ ExportDialog::ExportDialog(QWidget *_parent)
   connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
 
   QMenu *exportMenu = new QMenu;
-  exportMenu->addAction("CSV");
-  exportMenu->addAction("PDF");
-  exportMenu->addAction("PNG");
+  exportMenu->setObjectName("material");
+
+  QAction *csvAct = new QAction("CSV (.csv)", exportMenu);
+  csvAct->setStatusTip("Export to CSV files");
+  connect(csvAct, SIGNAL(triggered()), this, SLOT(OnExportCSV()));
+
+  QAction *pdfAct = new QAction("PDF (.pdf)", exportMenu);
+  pdfAct->setStatusTip("Export to PDF files");
+  connect(pdfAct, SIGNAL(triggered()), this, SLOT(OnExportPDF()));
+
+  exportMenu->addAction(csvAct);
+  exportMenu->addAction(pdfAct);
 
   this->dataPtr->exportButton = new QPushButton("&Export to");
   this->dataPtr->exportButton->setObjectName("flat");
@@ -188,9 +197,6 @@ ExportDialog::ExportDialog(QWidget *_parent)
   this->dataPtr->exportButton->setEnabled(false);
   this->dataPtr->exportButton->setMenu(exportMenu);
 
-  /*connect(this->dataPtr->exportButton, SIGNAL(clicked()),
-          this, SLOT(OnExport()));
-          */
   buttonsLayout->addWidget(cancelButton);
   buttonsLayout->addStretch(2);
   buttonsLayout->addWidget(this->dataPtr->exportButton);
@@ -276,61 +282,67 @@ void ExportDialog::OnCancel()
 }
 
 /////////////////////////////////////////////////
-void ExportDialog::OnExport()
+void ExportDialog::OnExportPDF()
 {
-  QFileDialog fileDialog(this, tr("Save Directory"), QDir::homePath());
+  std::cout << "PDF export\n";
+}
+
+/////////////////////////////////////////////////
+void ExportDialog::OnExportCSV()
+{
+  QFileDialog fileDialog(this, tr("Save Directory"),QDir::homePath());
   fileDialog.setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
       Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
   fileDialog.setAcceptMode(QFileDialog::AcceptSave);
   fileDialog.setFileMode(QFileDialog::DirectoryOnly);
 
-  if (fileDialog.exec() == QDialog::Accepted)
+  if (fileDialog.exec() != QDialog::Accepted)
+    return;
+
+  QStringList selected = fileDialog.selectedFiles();
+
+  if (selected.empty())
+    return;
+
+  std::string dir = selected[0].toStdString();
+
+  QModelIndexList selectedPlots =
+    this->dataPtr->listView->selectionModel()->selectedIndexes();
+  for (auto iter = selectedPlots.begin(); iter != selectedPlots.end(); ++iter)
   {
-    QStringList selected = fileDialog.selectedFiles();
+    PlotViewItem *plotItem =
+      static_cast<PlotViewItem*>(
+          static_cast<QStandardItemModel*>(
+            this->dataPtr->listView->model())->itemFromIndex(*iter));
 
-    if (selected.empty())
-      return;
-
-    std::string dir = selected[0].toStdString();
-
-    QModelIndexList selectedPlots =
-      this->dataPtr->listView->selectionModel()->selectedIndexes();
-    for (auto iter = selectedPlots.begin(); iter != selectedPlots.end(); ++iter)
+    if (plotItem)
     {
-      PlotViewItem *plotItem =
-        static_cast<PlotViewItem*>(
-            static_cast<QStandardItemModel*>(
-              this->dataPtr->listView->model())->itemFromIndex(*iter));
+      std::string title =
+        plotItem->canvas->Title().toStdString();
 
-      if (plotItem)
+      for (const auto &plot : plotItem->canvas->Plots())
       {
-        std::string title =
-          plotItem->canvas->Title().toStdString();
-
-        for (const auto &plot : plotItem->canvas->Plots())
+        for (const auto &curve : plot->Curves())
         {
-          for (const auto &curve : plot->Curves())
-          {
-            auto c = curve.lock();
-            if (!c)
-              continue;
+          auto c = curve.lock();
+          if (!c)
+            continue;
 
-            std::ofstream out(dir + "/" + title + "-" + c->Label() + ".csv");
-            out << "x, " << c->Label() << std::endl;
-            for (unsigned int j = 0; j < c->Size(); ++j)
-            {
-              ignition::math::Vector2d pt = c->Point(j);
-              out << pt.X() << ", " << pt.Y() << std::endl;
-            }
-            out.close();
+          std::ofstream out(dir + "/" + title + "-" + c->Label() + ".csv");
+          out << "x, " << c->Label() << std::endl;
+          for (unsigned int j = 0; j < c->Size(); ++j)
+          {
+            ignition::math::Vector2d pt = c->Point(j);
+            out << pt.X() << ", " << pt.Y() << std::endl;
           }
+          out.close();
         }
       }
-      else
-      {
-        std::cout << "Error!!!\n";
-      }
     }
-    this->close();
+    else
+    {
+      std::cout << "Error!!!\n";
+    }
   }
+  this->close();
 }

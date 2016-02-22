@@ -48,8 +48,11 @@ namespace gazebo
       /// \brief Qt callback when the Cancel button is pressed.
       private slots: void OnCancel();
 
-      /// \brief Qt callback when the import button is pressed.
-      private slots: void OnExport();
+      /// \brief Qt callback when the export to csv menu is selected.
+      private slots: void OnExportCSV();
+
+      /// \brief Qt callback when the export to pdf menu is selected.
+      private slots: void OnExportPDF();
 
       /// \brief Qt callback when a plot icon is selected.
       private slots: void OnSelected();

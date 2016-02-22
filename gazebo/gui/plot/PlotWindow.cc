@@ -14,9 +14,9 @@
  * limitations under the License.
  *
 */
-
 #include <mutex>
 
+#include "gazebo/gui/plot/PlotManager.hh"
 #include "gazebo/gui/plot/ExportDialog.hh"
 #include "gazebo/gui/plot/PlotCanvas.hh"
 #include "gazebo/gui/plot/PlotCurve.hh"
@@ -86,7 +86,7 @@ class DragableListWidget : public QListWidget
 
 /////////////////////////////////////////////////
 PlotWindow::PlotWindow(QWidget *_parent)
-  : QDialog(_parent),
+  : QWidget(_parent),
     dataPtr(new PlotWindowPrivate())
 {
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));
@@ -116,11 +116,6 @@ PlotWindow::PlotWindow(QWidget *_parent)
   addButtonLayout->setContentsMargins(0, 0, 0, 0);
   addCanvasButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
 
-  // Bottom toolbar
-  QFrame *bottomFrame = new QFrame;
-  bottomFrame->setObjectName("plotBottomFrame");
-  bottomFrame->setSizePolicy(QSizePolicy::Expanding,
-      QSizePolicy::Minimum);
 
   this->dataPtr->plotPlayAct = new QAction(QIcon(":/images/play_dark.svg"),
       tr("Play"), this);
@@ -137,17 +132,18 @@ PlotWindow::PlotWindow(QWidget *_parent)
   connect(this->dataPtr->plotPauseAct, SIGNAL(triggered()),
       this, SLOT(OnPause()));
 
+  QToolBar *playToolbar = new QToolBar;
+  playToolbar->setObjectName("plotToolbar");
+  playToolbar->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+  playToolbar->addAction(this->dataPtr->plotPlayAct);
+  playToolbar->addAction(this->dataPtr->plotPauseAct);
+
   QAction *plotExportAct = new QAction(
       QIcon(":/images/file_upload.svg"), tr("Export"), this);
   plotExportAct->setToolTip(tr("Export plot data"));
   plotExportAct->setVisible(true);
   connect(plotExportAct, SIGNAL(triggered()), this, SLOT(OnExport()));
 
-  QToolBar *playToolbar = new QToolBar;
-  playToolbar->setObjectName("plotToolbar");
-  playToolbar->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-  playToolbar->addAction(this->dataPtr->plotPlayAct);
-  playToolbar->addAction(this->dataPtr->plotPauseAct);
 
   QToolBar *exportToolbar = new QToolBar;
   exportToolbar->setObjectName("plotToolbar");
@@ -160,6 +156,12 @@ PlotWindow::PlotWindow(QWidget *_parent)
   bottomPanelLayout->addStretch();
   bottomPanelLayout->addWidget(exportToolbar);
   bottomPanelLayout->setContentsMargins(0, 0, 0, 0);
+
+  // Bottom toolbar
+  QFrame *bottomFrame = new QFrame;
+  bottomFrame->setObjectName("plotBottomFrame");
+  bottomFrame->setSizePolicy(QSizePolicy::Expanding,
+      QSizePolicy::Minimum);
   bottomFrame->setLayout(bottomPanelLayout);
 
   // main layout
@@ -189,7 +191,6 @@ PlotWindow::PlotWindow(QWidget *_parent)
   mainLayout->addLayout(plotLayout);
 
   this->setLayout(mainLayout);
-  this->setSizeGripEnabled(true);
 
   QTimer *displayTimer = new QTimer(this);
   connect(displayTimer, SIGNAL(timeout()), this, SLOT(Update()));
@@ -198,22 +199,6 @@ PlotWindow::PlotWindow(QWidget *_parent)
   PlotManager::Instance()->AddWindow(this);
 
   this->setMinimumSize(640, 480);
-
-  //=================
-  // TODO for testing - remove later
-  QListWidgetItem *itema = new QListWidgetItem("Dog");
-  itema->setToolTip(tr("Drag onto graph to plot"));
-  this->dataPtr->labelList->addItem(itema);
-  QListWidgetItem *itemb = new QListWidgetItem("Cat");
-  itemb->setToolTip(tr("Drag onto graph to plot"));
-  this->dataPtr->labelList->addItem(itemb);
-  QListWidgetItem *itemc = new QListWidgetItem("Turtle");
-  itemc->setToolTip(tr("Drag onto graph to plot"));
-  this->dataPtr->labelList->addItem(itemc);
-  QListWidgetItem *simTimeItem = new QListWidgetItem("sim_time");
-  itemc->setToolTip(tr("Drag onto graph to plot"));
-  this->dataPtr->labelList->addItem(simTimeItem);
-  //=================
 }
 
 /////////////////////////////////////////////////
@@ -346,6 +331,7 @@ void PlotWindow::OnExport()
 std::list<PlotCanvas*> PlotWindow::Plots()
 {
   std::list<PlotCanvas*> plots;
+
   for (int i = 0; i < this->dataPtr->canvasLayout->count(); ++i)
   {
     QLayoutItem *item = this->dataPtr->canvasLayout->itemAt(i);
