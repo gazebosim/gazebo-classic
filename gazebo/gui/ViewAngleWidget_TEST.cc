@@ -39,13 +39,7 @@ void ViewAngleWidget_TEST::EmptyWorld()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get camera
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
@@ -65,13 +59,7 @@ void ViewAngleWidget_TEST::EmptyWorld()
 
   QApplication::postEvent(viewAngleWidget, new QShowEvent());
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get buttons
   QList<QToolButton *> buttons =
@@ -81,13 +69,7 @@ void ViewAngleWidget_TEST::EmptyWorld()
   // Trigger the top view button
   buttons[0]->click();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 50; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow, 50);
 
   // Check the camera position
   double tol = 1e-6;
@@ -97,13 +79,7 @@ void ViewAngleWidget_TEST::EmptyWorld()
   // Trigger the front view button
   buttons[2]->click();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 50; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow, 50);
 
   // Check the camera position
   pose = cam->WorldPose();
@@ -112,13 +88,7 @@ void ViewAngleWidget_TEST::EmptyWorld()
   // Trigger the left view button
   buttons[5]->click();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 50; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow, 50);
 
   // Check the camera position
   pose = cam->WorldPose();
@@ -127,13 +97,7 @@ void ViewAngleWidget_TEST::EmptyWorld()
   // Trigger the bottom view button
   buttons[1]->click();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 50; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow, 50);
 
   // Check the camera position
   pose = cam->WorldPose();
@@ -142,13 +106,7 @@ void ViewAngleWidget_TEST::EmptyWorld()
   // Trigger the back view button
   buttons[3]->click();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 50; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow, 50);
 
   // Check the camera position
   pose = cam->WorldPose();
@@ -157,13 +115,7 @@ void ViewAngleWidget_TEST::EmptyWorld()
   // Trigger the right view button
   buttons[4]->click();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 50; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow, 50);
 
   // Check the camera position
   pose = cam->WorldPose();
@@ -172,13 +124,7 @@ void ViewAngleWidget_TEST::EmptyWorld()
   // Trigger the reset view button
   buttons[6]->click();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 50; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow, 50);
 
   // Check the camera position
   pose = cam->WorldPose();
@@ -205,13 +151,7 @@ void ViewAngleWidget_TEST::Projections()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get camera
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
@@ -235,13 +175,7 @@ void ViewAngleWidget_TEST::Projections()
   // Trigger ortho and see it changed
   gazebo::gui::g_cameraOrthoAct->trigger();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Check that it is in orthographic projection
   QVERIFY(!gazebo::gui::g_cameraPerspectiveAct->isChecked());
@@ -251,13 +185,7 @@ void ViewAngleWidget_TEST::Projections()
   // Trigger perpective and see it changed
   gazebo::gui::g_cameraPerspectiveAct->trigger();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Check that it is in perspective projection
   QVERIFY(gazebo::gui::g_cameraPerspectiveAct->isChecked());
@@ -267,13 +195,7 @@ void ViewAngleWidget_TEST::Projections()
   // Change combobox
   comboBoxes[0]->setCurrentIndex(1);
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Check that it is in orthographic projection
   QVERIFY(!gazebo::gui::g_cameraPerspectiveAct->isChecked());
@@ -283,13 +205,7 @@ void ViewAngleWidget_TEST::Projections()
   // Change combobox
   comboBoxes[0]->setCurrentIndex(0);
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Check that it is in perspective projection
   QVERIFY(gazebo::gui::g_cameraPerspectiveAct->isChecked());
