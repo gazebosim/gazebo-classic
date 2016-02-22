@@ -17,7 +17,7 @@
 1. Model editor updates
     1. Fix setting relative pose after alignment during joint creation.
         * [Issue #1844](https://bitbucket.org/osrf/gazebo/issues/1844)
-        * [Pull request #](https://bitbucket.org/osrf/gazebo/pull-request/)
+        * [Pull request #2150](https://bitbucket.org/osrf/gazebo/pull-request/2150)
 
 ## Gazebo 7.0.0 (2016-01-25)
 
