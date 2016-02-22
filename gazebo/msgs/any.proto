@@ -15,38 +15,41 @@ message Any
   /// \brief The type of data the message contains.
   enum ValueType
   {
+    /// \brief Indicates that the message is empty
+    NONE       = 1;
+
     /// \brief Indicates that the message contains a double
-    DOUBLE     = 1;
+    DOUBLE     = 2;
 
     /// \brief Indicates that the message contains an int32
-    INT32      = 2;
+    INT32      = 3;
 
     /// \brief Indicates that the message contains a string
-    STRING     = 3;
+    STRING     = 4;
 
     /// \brief Indicates that the message contains a Boolean
-    BOOLEAN    = 4;
+    BOOLEAN    = 5;
 
     /// \brief Indicates that the message contains a Vector3d
-    VECTOR3D   = 5;
+    VECTOR3D   = 6;
 
     /// \brief Indicates that the message contains a Color
-    COLOR      = 6;
+    COLOR      = 7;
 
     /// \brief Indicates that the message contains a Pose
-    POSE3D     = 7;
+    POSE3D     = 8;
 
     /// \brief Indicates that the message contains a Quaternion
-    QUATERNION = 8;
+    QUATERNION = 9;
 
     /// \brief Indicates that the message contains a Time
-    TIME = 9;
+    TIME       = 10;
   }
 
   /// \todo: Use protobuf oneof feature when we support protobuf 2.6
 
   /// \brief Type of value that is contained in this message.
-  required ValueType type              = 1;
+  required ValueType type              = 1 [default = NONE];
 
   /// \brief A double value
   optional double double_value         = 2;

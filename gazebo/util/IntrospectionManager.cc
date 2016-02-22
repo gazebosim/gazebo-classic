@@ -158,10 +158,18 @@ void IntrospectionManager::Update()
     if (itemIter == this->dataPtr->allItems.end())
       continue;
 
-    // Update the values of the items under observation.
-    gazebo::msgs::Any value = itemIter->second();
-    auto &lastValue = observedItem.second.lastValue;
-    lastValue.CopyFrom(value);
+    try
+    {
+      // Update the values of the items under observation.
+      gazebo::msgs::Any value = itemIter->second();
+      auto &lastValue = observedItem.second.lastValue;
+      lastValue.CopyFrom(value);
+    }
+    catch(...)
+    {
+      gzerr << "Exception caught calling user callback" << std::endl;
+      continue;
+    }
   }
 
   // Prepare the next message to be sent in each filter.
@@ -178,10 +186,15 @@ void IntrospectionManager::Update()
       if (this->dataPtr->allItems.find(item) == this->dataPtr->allItems.end())
         continue;
 
+      // Sanity check: Make sure that the value was updated.
+      // (e.g.: an exception was not raised).
+      auto &lastValue = this->dataPtr->observedItems[item].lastValue;
+      if (lastValue.type() == gazebo::msgs::Any::NONE)
+        continue;
+
       auto nextParam = nextMsg.add_param();
       nextParam->set_name(item);
-      nextParam->mutable_value()->CopyFrom(
-          this->dataPtr->observedItems[item].lastValue);
+      nextParam->mutable_value()->CopyFrom(lastValue);
     }
 
     // Sanity check: Make sure that we have at least one item updated.
