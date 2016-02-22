@@ -596,10 +596,12 @@ LogCommand::LogCommand()
     ("file,f", po::value<std::string>(), "Path to a log file.")
     ("output,o", po::value<std::string>(),
      "Output file, valid in conjunction with the filter, raw, hz, and "
-     "encoding commands")
+     "encoding commands. By default, the output file will have the same "
+     "encoding as the source file. Override with the --encoding option")
     ("encoding,n", po::value<std::string>(),
      "Specify the encoding (txt, zlib, or bz2) for an output file. "
-     "Valid in conjunction with the output command.")
+     "Valid in conjunction with the output command. See also the "
+     "--output argument.")
     ("filter", po::value<std::string>(),
      "Filter output. Valid only with the echo, step, and output commands");
 }
