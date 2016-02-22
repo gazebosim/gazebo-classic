@@ -493,6 +493,8 @@ void JointCreationDialog_TEST::Align()
   QVERIFY(alignButtons[0]->isChecked());
   alignReverseCheckboxes[0]->click();
   QVERIFY(alignReverseCheckboxes[0]->isChecked());
+  // simulate an align pose update callback
+  jointCreationDialog->UpdateRelativePose(ignition::math::Pose3d());
 
   // Set relative pose and verify
   ignition::math::Pose3d pose(1, -0.2, 3.3, 0.1, -0.2, 0);
