@@ -96,6 +96,7 @@ namespace gazebo
       public: unsigned int VariablePillCount() const;
 
       /// \brief Get a variable pill by id
+      /// \param[in] _id Variable pill id
       /// \return Variable pill with the specified id.
       public: VariablePill *GetVariablePill(const unsigned int _id) const;
 
@@ -126,7 +127,7 @@ namespace gazebo
 
       /// \brief Qt signal emitted when a variable is added to the container
       /// \param[in] _id Unique id of the variable pill.
-      /// \param[in] Name of variable pill added.
+      /// \param[in] _name Name of variable pill added.
       /// \param[in] _targetId Unique id of the target variable pill that this
       /// variable is added to. VariablePill::EmptyVariable if it is added to a
       /// container and not a variable pill.

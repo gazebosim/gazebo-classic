@@ -25,9 +25,6 @@
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/plot/PlottingTypes.hh"
-#include "gazebo/gui/plot/VariablePill.hh"
-#include "gazebo/gui/plot/IncrementalPlot.hh"
-#include "gazebo/gui/plot/PlotManager.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -35,6 +32,7 @@ namespace gazebo
   namespace gui
   {
     // Forward declare private data class
+    class IncrementalPlot;
     class PlotCanvasPrivate;
 
     /// \brief Plot canvas
