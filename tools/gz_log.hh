@@ -211,8 +211,8 @@ namespace gazebo
     /// \param[in] _encoding Specify output log file encoding. If empty, the
     /// encoding from the source log file is used.
     private: void Output(const std::string &_outFilename,
-                 const std::string &_filter, bool _raw,
-                 const std::string &_stamp, double _hz,
+                 const std::string &_filter, const bool _raw,
+                 const std::string &_stamp, const double _hz,
                  const std::string &_encoding = "");
 
     /// \brief Dump the contents of a log file to screen
