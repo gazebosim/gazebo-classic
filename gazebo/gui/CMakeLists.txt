@@ -32,11 +32,10 @@ set (sources
   DataLogger.cc
   Editor.cc
   EntityMaker.cc
-  HotkeyDialog.cc
-  RenderWidget.cc
   GLWidget.cc
-  GuiIface.cc
   GuiEvents.cc
+  GuiIface.cc
+  HotkeyDialog.cc
   InsertModelWidget.cc
   JointControlWidget.cc
   KeyEventHandler.cc
@@ -45,12 +44,13 @@ set (sources
   LogPlayWidget.cc
   MainWindow.cc
   ModelAlign.cc
-  ModelManipulator.cc
-  ModelSnap.cc
   ModelListWidget.cc
   ModelMaker.cc
+  ModelManipulator.cc
   ModelRightMenu.cc
+  ModelSnap.cc
   MouseEventHandler.cc
+  RenderWidget.cc
   SaveDialog.cc
   SpaceNav.cc
   SplashScreen.cc
@@ -141,13 +141,19 @@ endif ()
 #endif()
 
 set (qt_tests
+  BuildingEditor_TEST.cc
+  ConfigWidget_TEST.cc
   DataLogger_TEST.cc
+  GLWidget_TEST.cc
+  GLWidget_TEST2.cc
   GuiIface_TEST.cc
   HotkeyDialog_TEST.cc
   LightMaker_TEST.cc
   ModelAlign_TEST.cc
+  ModelListWidget_TEST.cc
   ModelMaker_TEST.cc
   ModelManipulator_TEST.cc
+  ModelSnap_TEST.cc
   RenderWidget_TEST.cc
   SaveDialog_TEST.cc
   SplashScreen_TEST.cc
@@ -179,15 +185,9 @@ if (ENABLE_SCREEN_TESTS)
   set (qt_tests
       ${qt_tests}
       ApplyWrenchDialog_TEST.cc
-      BuildingEditor_TEST.cc
-      ConfigWidget_TEST.cc
-      GLWidget_TEST.cc
-      GLWidget_TEST2.cc
       LaserVisualization_TEST.cc
       LayersWidget_TEST.cc
       MainWindow_TEST.cc
-      ModelListWidget_TEST.cc
-      ModelSnap_TEST.cc
       Projection_TEST.cc)
 endif()
 
