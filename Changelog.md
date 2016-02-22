@@ -2,6 +2,9 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
+1. Adds an output option to gz log that allows the tool to filter a log file and write to a new log file.
+    * [Pull request #2149](https://bitbucket.org/osrf/gazebo/pull-request/2149)
+
 1. Support conversions between SDF and protobuf for more sensors.
     * [Pull request #2118](https://bitbucket.org/osrf/gazebo/pull-request/2118)
 
