@@ -235,7 +235,7 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////////
-    msgs::Any ConvertAny(const double &_d)
+    msgs::Any ConvertAny(const double _d)
     {
       msgs::Any result;
       result.set_type(msgs::Any::DOUBLE);
@@ -244,7 +244,7 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////////
-    msgs::Any ConvertAny(const int &_i)
+    msgs::Any ConvertAny(const int _i)
     {
       msgs::Any result;
       result.set_type(msgs::Any::INT32);
@@ -271,7 +271,7 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////////
-    msgs::Any ConvertAny(const bool &_b)
+    msgs::Any ConvertAny(const bool _b)
     {
       msgs::Any result;
       result.set_type(msgs::Any::BOOLEAN);

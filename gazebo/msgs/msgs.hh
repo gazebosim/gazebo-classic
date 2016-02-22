@@ -83,13 +83,13 @@ namespace gazebo
     /// \param[in] _v The double to convert.
     /// \return A msgs::Any object.
     GAZEBO_VISIBLE
-    msgs::Any ConvertAny(const double &_v);
+    msgs::Any ConvertAny(const double _v);
 
     /// \brief Convert an int to a msgs::Any
     /// \param[in] _i The int to convert.
     /// \return A msgs::Any object.
     GAZEBO_VISIBLE
-    msgs::Any ConvertAny(const int &_i);
+    msgs::Any ConvertAny(const int _i);
 
     /// \brief Convert a std::string to a msgs::Any
     /// \param[in] _s The string to convert.
@@ -107,7 +107,7 @@ namespace gazebo
     /// \param[in] _b The bool to convert.
     /// \return A msgs::Any object.
     GAZEBO_VISIBLE
-    msgs::Any ConvertAny(const bool &_b);
+    msgs::Any ConvertAny(const bool _b);
 
     /// \brief Convert an ignition::math::Vector3d to a msgs::Any
     /// \param[in] _v The vector to convert.
