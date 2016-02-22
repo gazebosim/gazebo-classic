@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _VIDEO_HH_
-#define _VIDEO_HH_
+#ifndef _GAZEBO_COMMON_VIDEO_HH_
+#define _GAZEBO_COMMON_VIDEO_HH_
 
 #include <string>
 #include "gazebo/util/system.hh"
@@ -74,7 +74,7 @@ namespace gazebo
       /// \brief audio video frame
       private: AVFrame *avFrame;
 
-      /// \brief audi video picture
+      /// \brief audio video picture
       private: AVPicture *pic;
 
       /// \brief software scaling context
