@@ -57,6 +57,10 @@ namespace gazebo
       /// \brief Clear and remove all canvases
       public: void Clear();
 
+      /// \brief Restart plotting. A new plot curve will be created for each
+      /// variable in the plot. Existing plot curves will no longer be updated.
+      public: void Restart();
+
       /// \brief Export all canvas plots.
       public: void Export();
 

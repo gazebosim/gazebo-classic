@@ -80,7 +80,7 @@ namespace gazebo
 }
 
 // empty variable id
-unsigned int VariablePill::EMPTY_VARIABLE = IGN_UINT32_MAX;
+const unsigned int VariablePill::EmptyVariable = IGN_UINT32_MAX;
 
 // global variable id counter
 unsigned int VariablePillPrivate::globalVariableId = 0;
@@ -168,6 +168,7 @@ std::string VariablePill::Name() const
 void VariablePill::SetText(const std::string &_text)
 {
   this->dataPtr->label->setText(QString::fromStdString(_text));
+  emit VariableLabelChanged(_text);
 }
 
 /////////////////////////////////////////////////
@@ -388,6 +389,8 @@ void VariablePill::dropEvent(QDropEvent *_evt)
         this->Container(), SLOT(OnAddVariable(unsigned int, std::string)));
     connect(variable, SIGNAL(VariableRemoved(unsigned int)),
         this->Container(), SLOT(OnRemoveVariable(unsigned int)));
+    connect(variable, SIGNAL(VariableLabelChanged(std::string)),
+        this->Container(), SLOT(OnSetVariableLabel(std::string)));
 
     this->AddVariablePill(variable);
   }
@@ -418,9 +421,20 @@ void VariablePill::dropEvent(QDropEvent *_evt)
       }
     }
 
-    this->blockSignals(true);
-    this->AddVariablePill(variable);
-    this->blockSignals(false);
+    // add to parent if it exists, otherwise add to self and become a
+    // multi-variable
+    if (this->dataPtr->parent)
+    {
+      this->dataPtr->parent->blockSignals(true);
+      this->dataPtr->parent->AddVariablePill(variable);
+      this->dataPtr->parent->blockSignals(false);
+    }
+    else
+    {
+      this->blockSignals(true);
+      this->AddVariablePill(variable);
+      this->blockSignals(false);
+    }
 
     emit VariableMoved(variable->Id());
   }
@@ -441,6 +455,11 @@ bool VariablePill::IsDragValid(QDropEvent *_evt)
   {
     VariablePill *dragVariable = qobject_cast<VariablePill *>(_evt->source());
     if (!dragVariable)
+      return false;
+
+    // limit drag and drop to same container
+    if (dragVariable->Container() &&
+        dragVariable->Container() != this->Container())
       return false;
 
     variableName = dragVariable->Name();
@@ -545,17 +564,20 @@ bool VariablePill::IsSelected() const
 /////////////////////////////////////////////////
 void VariablePill::UpdateStyleSheet()
 {
+  std::string colorHex;
   std::string bgColorStr;
   std::string borderStr;
   if (this->dataPtr->parent)
-    bgColorStr = "background-color: #64b5f6;";
+    colorHex = "#64b5f6";
   else
-    bgColorStr = "background-color: #2196f3;";
+    colorHex = "#2196f3";
+
+  bgColorStr = "background-color: " + colorHex + ";";
 
   if (this->dataPtr->isSelected)
-    borderStr = "border: 1.5px solid #0d47a1;";
+    borderStr = "border: 1.5px solid #1565c0;";
   else
-    borderStr = "border: 0px;";
+    borderStr = "border: 1.5px solid " + colorHex + ";";
 
   this->dataPtr->label->setStyleSheet(QString::fromStdString(
       "QLabel\

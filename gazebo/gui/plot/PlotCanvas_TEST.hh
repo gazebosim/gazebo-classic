@@ -15,23 +15,23 @@
  *
 */
 
-#ifndef _GAZEBO_GUI_PLOT_VARIABLEPILL_TEST_HH_
-#define _GAZEBO_GUI_PLOT_VARIABLEPILL_TEST_HH_
+#ifndef _GAZEBO_GUI_PLOT_PLOTCANVAS_TEST_HH_
+#define _GAZEBO_GUI_PLOT_PLOTCANVAS_TEST_HH_
 
 #include "gazebo/gui/QTestFixture.hh"
 
-/// \brief A test class for the VariablePill widget.
-class VariablePill_TEST : public QTestFixture
+/// \brief A test class for the PlotCanvas widget.
+class PlotCanvas_TEST : public QTestFixture
 {
   Q_OBJECT
 
-  /// \brief Test various setter and accessor functions
-  private slots: void Variable();
+  /// \brief Test adding and removing plots
+  private slots: void AddRemovePlot();
 
-  /// \brief Test creating variable pills and verify they have unique ids
-  private slots: void VariableId();
+  /// \brief Test adding and removing variables
+  private slots: void AddRemoveVariable();
 
-  /// \brief Test creating a mulit-variable pill
-  private slots: void MultiVariable();
+  /// \brief Test changing variable label
+  private slots: void VariableLabel();
 };
 #endif

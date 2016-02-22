@@ -1,13 +1,17 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
 set (sources_local
+  plot/IncrementalPlot.cc
   plot/PlotCanvas.cc
+  plot/PlotCurve.cc
+  plot/PlotManager.cc
   plot/PlotWindow.cc
   plot/VariablePill.cc
   plot/VariablePillContainer.cc
 )
 
 set (qt_headers_local
+  plot/IncrementalPlot.hh
   plot/PlotCanvas.hh
   plot/PlotWindow.hh
   plot/VariablePill.hh
@@ -18,6 +22,9 @@ set (headers_install
 )
 
 set (qt_tests_local
+  IncrementalPlot_TEST.cc
+  PlotCanvas_TEST.cc
+  PlotCurve_TEST.cc
   PlotWindow_TEST.cc
   VariablePill_TEST.cc
   VariablePillContainer_TEST.cc
