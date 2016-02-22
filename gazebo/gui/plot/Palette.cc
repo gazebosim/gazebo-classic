@@ -185,7 +185,7 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
 
   // A tree to visualize the topics and their messages.
   auto topicsTree = new QTreeView;
-  topicsTree->setObjectName("topicList");
+  topicsTree->setObjectName("plotTree");
   topicsTree->setAnimated(true);
   topicsTree->setHeaderHidden(true);
   topicsTree->setExpandsOnDoubleClick(true);
@@ -201,7 +201,7 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
 
   // A tree to visualize sim variables
   auto simTree = new QTreeView;
-  simTree->setObjectName("topicList");
+  simTree->setObjectName("plotTree");
   simTree->setAnimated(true);
   simTree->setHeaderHidden(true);
   simTree->setExpandsOnDoubleClick(true);
@@ -265,10 +265,11 @@ void Palette::FillTopics(QStandardItemModel *_topicsModel)
   for (auto topic : topics)
   {
     // Shorten topic name
+    std::string prefix = "/gazebo/default";
     auto shortName = topic;
-    auto idX = shortName.find("/gazebo/default");
+    auto idX = shortName.find(prefix);
     if (idX != std::string::npos)
-      shortName.replace(0, 15, "~");
+      shortName.replace(0, prefix.size(), "~");
 
     auto topicItem = new QStandardItem();
     topicItem->setData(shortName.c_str(), PlotItemDelegate::TOPIC_NAME_ROLE);
@@ -367,7 +368,6 @@ void Palette::FillFromMsg(google::protobuf::Message *_msg,
 
         switch (field->type())
         {
-          default:
           case google::protobuf::FieldDescriptor::TYPE_DOUBLE:
             childItem->setData("Double", PlotItemDelegate::DATA_TYPE_NAME);
             break;
@@ -389,6 +389,8 @@ void Palette::FillFromMsg(google::protobuf::Message *_msg,
           case google::protobuf::FieldDescriptor::TYPE_BOOL:
             childItem->setData("Bool", PlotItemDelegate::DATA_TYPE_NAME);
             break;
+          default:
+            continue;
         }
         childItem->setToolTip(
             "<font size=3><p><b>Type</b>: " + childItem->data(

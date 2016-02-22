@@ -415,40 +415,40 @@ QTreeView QHeaderView:section
   border: 0px;
 }
 
-QTreeView#topicList::branch:selected:!active
+QTreeView#plotTree::branch:selected:!active
 {
   background-color: #dddddd;
 }
 
-QTreeView#topicList::branch:selected:active
+QTreeView#plotTree::branch:selected:active
 {
   background-color: #dddddd;
 }
 
-QTreeView#topicList::branch:has-siblings:!adjoins-item
+QTreeView#plotTree::branch:has-siblings:!adjoins-item
 {
   border-image: url(:/images/vline.png) 0;
 }
 
-QTreeView#topicList::branch:has-siblings:adjoins-item
+QTreeView#plotTree::branch:has-siblings:adjoins-item
 {
   border-image: url(:/images/branch-more.png) 0;
 }
 
-QTreeView#topicList::branch:!has-children:!has-siblings:adjoins-item
+QTreeView#plotTree::branch:!has-children:!has-siblings:adjoins-item
 {
   border-image: url(:/images/branch-end.png) 0;
 }
 
-QTreeView#topicList::branch:has-children:!has-siblings:closed,
-QTreeView#topicList::branch:closed:has-children:has-siblings
+QTreeView#plotTree::branch:has-children:!has-siblings:closed,
+QTreeView#plotTree::branch:closed:has-children:has-siblings
 {
   border-image: none;
   image: url(:/images/right_arrow.png);
 }
 
-QTreeView#topicList::branch:open:has-children:!has-siblings,
-QTreeView#topicList::branch:open:has-children:has-siblings
+QTreeView#plotTree::branch:open:has-children:!has-siblings,
+QTreeView#plotTree::branch:open:has-children:has-siblings
 {
   border-image: none;
   image: url(:/images/down_arrow.png);
@@ -946,7 +946,7 @@ QTabBar#plottingTabBar::tab
   background-color: rgba(120,120,120,255);
 
   padding: 4px;
-  font-weight: 200;
+  font-weight: 800;
   padding-bottom: 10px;
 }
 
