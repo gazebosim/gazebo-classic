@@ -14,24 +14,31 @@
  * limitations under the License.
  *
 */
+#ifndef _GAZEBO_GUI_PLOT_PLOTTINGTYPES_HH_
+#define _GAZEBO_GUI_PLOT_PLOTTINGTYPES_HH_
 
-#ifndef _GAZEBO_GUI_PLOT_VARIABLEPILL_TEST_HH_
-#define _GAZEBO_GUI_PLOT_VARIABLEPILL_TEST_HH_
+#include <memory>
 
-#include "gazebo/gui/QTestFixture.hh"
+#include "gazebo/util/system.hh"
 
-/// \brief A test class for the VariablePill widget.
-class VariablePill_TEST : public QTestFixture
+/// \file
+/// \ingroup gazebo_gui
+/// \brief default namespace for gazebo
+namespace gazebo
 {
-  Q_OBJECT
+  /// \brief Plotting tool forward declarations and type defines
+  namespace gui
+  {
+    class PlotCurve;
 
-  /// \brief Test various setter and accessor functions
-  private slots: void Variable();
+    /// \def PlotCurvePtr
+    /// \brief std shared pointer to a PlotCurve object
+    typedef std::shared_ptr<PlotCurve> PlotCurvePtr;
 
-  /// \brief Test creating variable pills and verify they have unique ids
-  private slots: void VariableId();
+    /// \def PlotCurveWeakPtr
+    /// \brief std weak pointer to a PlotCurve object
+    typedef std::weak_ptr<PlotCurve> PlotCurveWeakPtr;
+  }
+}
 
-  /// \brief Test creating a mulit-variable pill
-  private slots: void MultiVariable();
-};
 #endif

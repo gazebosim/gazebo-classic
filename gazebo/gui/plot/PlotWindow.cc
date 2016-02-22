@@ -17,8 +17,11 @@
 
 #include <mutex>
 
+#include "gazebo/gui/plot/IncrementalPlot.hh"
 #include "gazebo/gui/plot/Palette.hh"
 #include "gazebo/gui/plot/PlotCanvas.hh"
+#include "gazebo/gui/plot/PlotCurve.hh"
+#include "gazebo/gui/plot/PlotManager.hh"
 #include "gazebo/gui/plot/PlotWindow.hh"
 
 using namespace gazebo;
@@ -45,6 +48,9 @@ namespace gazebo
 
       /// \brief Mutex to protect the canvas updates
       public: std::mutex mutex;
+
+      /// \brief Flag to indicate whether the plots should be restarted.
+      public: bool restart = false;
     };
   }
 }
@@ -90,11 +96,13 @@ PlotWindow::PlotWindow(QWidget *_parent)
 
   // new empty canvas
   this->dataPtr->canvasLayout = new QVBoxLayout;
+  this->dataPtr->canvasLayout->setSpacing(20);
   this->AddCanvas();
 
   // add button
   QPushButton *addCanvasButton = new QPushButton("+");
   addCanvasButton->setObjectName("plotAddCanvas");
+  addCanvasButton->setToolTip("Add a new canvas");
   QGraphicsDropShadowEffect *addCanvasShadow = new QGraphicsDropShadowEffect();
   addCanvasShadow->setBlurRadius(8);
   addCanvasShadow->setOffset(0, 0);
@@ -114,14 +122,15 @@ PlotWindow::PlotWindow(QWidget *_parent)
 
   this->dataPtr->plotPlayAct = new QAction(QIcon(":/images/play_dark.png"),
       tr("Play"), this);
-  this->dataPtr->plotPlayAct->setStatusTip(tr("Continue Plotting"));
+  this->dataPtr->plotPlayAct->setToolTip(tr("Continue plotting"));
   this->dataPtr->plotPlayAct->setVisible(false);
   connect(this->dataPtr->plotPlayAct, SIGNAL(triggered()),
       this, SLOT(OnPlay()));
 
   this->dataPtr->plotPauseAct = new QAction(QIcon(":/images/pause_dark.png"),
       tr("Pause"), this);
-  this->dataPtr->plotPauseAct->setStatusTip(tr("Pause Plotting"));
+  this->dataPtr->plotPauseAct->setToolTip(
+      tr("Pause plotting (not simulation)"));
   this->dataPtr->plotPauseAct->setVisible(true);
   connect(this->dataPtr->plotPauseAct, SIGNAL(triggered()),
       this, SLOT(OnPause()));
@@ -173,12 +182,17 @@ PlotWindow::PlotWindow(QWidget *_parent)
   QTimer *displayTimer = new QTimer(this);
   connect(displayTimer, SIGNAL(timeout()), this, SLOT(Update()));
   displayTimer->start(30);
+
+  PlotManager::Instance()->AddWindow(this);
+
+  this->setMinimumSize(640, 480);
 }
 
 /////////////////////////////////////////////////
 PlotWindow::~PlotWindow()
 {
   this->dataPtr->paused = true;
+  PlotManager::Instance()->RemoveWindow(this);
   this->Clear();
 }
 
@@ -259,10 +273,23 @@ void PlotWindow::OnRemoveCanvas()
 /////////////////////////////////////////////////
 void PlotWindow::Update()
 {
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  if (this->dataPtr->restart)
+  {
+    for (int i = 0; i < this->dataPtr->canvasLayout->count(); ++i)
+    {
+      QLayoutItem *item = this->dataPtr->canvasLayout->itemAt(i);
+      PlotCanvas *canvas = qobject_cast<PlotCanvas *>(item->widget());
+      if (!canvas)
+        continue;
+      canvas->Restart();
+    }
+    this->dataPtr->restart = false;
+  }
+
   if (this->dataPtr->paused)
     return;
 
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
   for (int i = 0; i < this->dataPtr->canvasLayout->count(); ++i)
   {
     QLayoutItem *item = this->dataPtr->canvasLayout->itemAt(i);
@@ -270,5 +297,41 @@ void PlotWindow::Update()
     if (!canvas)
       continue;
     canvas->Update();
+  }
+}
+
+/////////////////////////////////////////////////
+void PlotWindow::Restart()
+{
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  this->dataPtr->restart = true;
+}
+
+/////////////////////////////////////////////////
+void PlotWindow::Export()
+{
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  for (int i = 0; i < this->dataPtr->canvasLayout->count(); ++i)
+  {
+    QLayoutItem *item = this->dataPtr->canvasLayout->itemAt(i);
+    PlotCanvas *canvas = qobject_cast<PlotCanvas *>(item->widget());
+    if (!canvas)
+      continue;
+
+    for (const auto &plot : canvas->Plots())
+    {
+      for (const auto &curve : plot->Curves())
+      {
+        auto c = curve.lock();
+        if (!c)
+          continue;
+
+        for (unsigned int j = 0; j < c->Size(); ++j)
+        {
+          ignition::math::Vector2d pt = c->Point(j);
+          std::cerr << pt.X() << ", " << pt.Y() << std::endl;
+        }
+      }
+    }
   }
 }

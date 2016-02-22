@@ -15,23 +15,23 @@
  *
 */
 
-#ifndef _GAZEBO_GUI_PLOT_VARIABLEPILL_TEST_HH_
-#define _GAZEBO_GUI_PLOT_VARIABLEPILL_TEST_HH_
+#ifndef _GAZEBO_GUI_PLOT_PLOT_CURVE_TEST_HH_
+#define _GAZEBO_GUI_PLOT_PLOT_CURVE_TEST_HH_
 
 #include "gazebo/gui/QTestFixture.hh"
 
-/// \brief A test class for the VariablePill widget.
-class VariablePill_TEST : public QTestFixture
+/// \brief A test class for the PlotCurve widget.
+class PlotCurve_TEST : public QTestFixture
 {
   Q_OBJECT
 
   /// \brief Test various setter and accessor functions
-  private slots: void Variable();
+  private slots: void Curve();
 
-  /// \brief Test creating variable pills and verify they have unique ids
-  private slots: void VariableId();
+  /// \brief Test creating plot curves and verify they have unique ids
+  private slots: void CurveId();
 
-  /// \brief Test creating a mulit-variable pill
-  private slots: void MultiVariable();
+  /// \brief Test adding points to the curve
+  private slots: void AddPoint();
 };
 #endif

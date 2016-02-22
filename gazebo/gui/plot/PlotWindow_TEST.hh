@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_PLOT_WINDOW_TEST_HH_
-#define _GAZEBO_PLOT_WINDOW_TEST_HH_
+#ifndef _GAZEBO_GUI_PLOT_PLOTWINDOW_TEST_HH_
+#define _GAZEBO_GUI_PLOT_PLOTWINDOW_TEST_HH_
 
 #include "gazebo/gui/QTestFixture.hh"
 

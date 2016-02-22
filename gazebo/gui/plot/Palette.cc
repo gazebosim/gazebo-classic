@@ -322,6 +322,30 @@ void Palette::FillSim(QStandardItemModel *_simModel)
 
     _simModel->appendRow(childItem);
   }
+
+  //=================
+  // TODO for testing - remove later
+  auto itema = new QStandardItem();
+  itema->setData("Dog", PlotItemDelegate::TOPIC_NAME_ROLE);
+  itema->setData("Dog", PlotItemDelegate::DATA_ROLE);
+  itema->setData("Double", PlotItemDelegate::DATA_TYPE_NAME);
+  _simModel->appendRow(itema);
+  auto itemb = new QStandardItem("Cat");
+  itemb->setData("Cat", PlotItemDelegate::TOPIC_NAME_ROLE);
+  itemb->setData("Cat", PlotItemDelegate::DATA_ROLE);
+  itemb->setData("Double", PlotItemDelegate::DATA_TYPE_NAME);
+  _simModel->appendRow(itemb);
+  auto itemc = new QStandardItem("Turtle");
+  itemc->setData("Turtle", PlotItemDelegate::TOPIC_NAME_ROLE);
+  itemc->setData("Turtle", PlotItemDelegate::DATA_ROLE);
+  itemc->setData("Double", PlotItemDelegate::DATA_TYPE_NAME);
+  _simModel->appendRow(itemc);
+  auto simTimeItem = new QStandardItem("sim_time");
+  simTimeItem->setData("sim_time", PlotItemDelegate::TOPIC_NAME_ROLE);
+  simTimeItem->setData("sim_time", PlotItemDelegate::DATA_ROLE);
+  simTimeItem->setData("Double", PlotItemDelegate::DATA_TYPE_NAME);
+  _simModel->appendRow(simTimeItem);
+  //=================
 }
 
 /////////////////////////////////////////////////
