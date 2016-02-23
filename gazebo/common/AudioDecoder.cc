@@ -262,9 +262,3 @@ std::string AudioDecoder::GetFile() const
 {
   return this->filename;
 }
-
-#if defined(__clang__)
-#pragma clang diagnostic pop
-#elif defined(__GNUC__)
-#pragma GCC diagnostic pop
-#endif
