@@ -19,6 +19,7 @@
 #include <string>
 #include <ignition/transport.hh>
 #include <gtest/gtest.h>
+#include "gazebo/common/Exception.hh"
 #include "gazebo/msgs/any.pb.h"
 #include "gazebo/msgs/gz_string.pb.h"
 #include "gazebo/msgs/param_v.pb.h"
@@ -77,17 +78,15 @@ class IntrospectionClientTest : public ::testing::Test
     this->topicsSubscribed = {};
 
     // A callback for updating items.
-    auto func = [](gazebo::msgs::Any &_msg)
+    auto func = []()
     {
-      _msg.set_type(gazebo::msgs::Any::DOUBLE);
-      _msg.set_double_value(1.0);
-      return true;
+      return 1.0;
     };
 
     // Make sure that we always have some items registered.
-    this->manager->Register("item1", "type1", func);
-    this->manager->Register("item2", "type2", func);
-    this->manager->Register("item3", "type3", func);
+    this->manager->Register<double>("item1", func);
+    this->manager->Register<double>("item2", func);
+    this->manager->Register<double>("item3", func);
 
     this->callbackExecuted = false;
   }
@@ -221,6 +220,37 @@ TEST_F(IntrospectionClientTest, Items)
   EXPECT_TRUE(items.find("item1") != items.end());
   EXPECT_TRUE(items.find("item2") != items.end());
   EXPECT_TRUE(items.find("item3") != items.end());
+}
+
+/////////////////////////////////////////////////
+TEST_F(IntrospectionClientTest, Exception)
+{
+  // A callback for updating items that triggers an exception.
+  auto func = []()
+  {
+    gzthrow("Simulating an exception in user callback");
+    return 1.0;
+  };
+
+  // Register a new item with the callback that raises exceptions.
+  EXPECT_TRUE(this->manager->Register<double>("item4", func));
+
+  // Let's create a filter.
+  std::set<std::string> items = {"item4"};
+  std::string filterId;
+  std::string topic;
+  EXPECT_TRUE(this->client.NewFilter(this->managerId, items, filterId, topic));
+
+  // Subscribe to my custom topic for receiving updates.
+  this->Subscribe(topic);
+
+  // Trigger an update.
+  this->manager->Update();
+
+  // Check that we didn't received the update.
+  EXPECT_FALSE(this->callbackExecuted);
+
+  EXPECT_TRUE(this->manager->Unregister("item4"));
 }
 
 /////////////////////////////////////////////////

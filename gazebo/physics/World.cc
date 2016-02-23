@@ -56,6 +56,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/common/Time.hh"
+#include "gazebo/common/URI.hh"
 
 #include "gazebo/math/Vector3.hh"
 
@@ -321,6 +322,12 @@ void World::Load(sdf::ElementPtr _sdf)
 
   this->dataPtr->userCmdManager = UserCmdManagerPtr(
       new UserCmdManager(shared_from_this()));
+
+  // Initialize the world URI.
+  this->dataPtr->uri.Clear();
+  this->dataPtr->uri.SetScheme("data");
+  this->dataPtr->uri.Path().PushFront(this->GetName());
+  this->dataPtr->uri.Path().PushFront("world");
 
   this->RegisterIntrospectionItems();
 
@@ -991,6 +998,7 @@ ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
 
   this->PublishModelPose(model);
   this->dataPtr->models.push_back(model);
+
   return model;
 }
 
@@ -2608,17 +2616,19 @@ void World::ResetPhysicsStates()
 }
 
 /////////////////////////////////////////////////
+common::URI World::URI() const
+{
+  return this->dataPtr->uri;
+}
+
+/////////////////////////////////////////////////
 void World::RegisterIntrospectionItems()
 {
-  // Add here all the items that might be introspected.
+  auto uri = this->URI();
 
-  // A callback for updating simulation time.
-  auto fSimTime = [this](gazebo::msgs::Any &_msg)
-  {
-    _msg.set_type(gazebo::msgs::Any::DOUBLE);
-    _msg.set_double_value(this->GetSimTime().Double());
-    return true;
-  };
-  gazebo::util::IntrospectionManager::Instance()->Register(
-      "sim_time", "double", fSimTime);
+  common::URI timeURI(uri);
+  timeURI.Query().Insert("p", "sim_time");
+  // Add here all the items that might be introspected.
+  gazebo::util::IntrospectionManager::Instance()->Register<common::Time>(
+      timeURI.Str(), std::bind(&World::GetSimTime, this));
 }
