@@ -865,9 +865,65 @@ bool JointCreationDialog::CheckValid()
 /////////////////////////////////////////////////
 void JointCreationDialog::OnAlign(const int _int)
 {
-  // Reset pose
-  this->dataPtr->jointMaker->SetLinksRelativePose(ignition::math::Pose3d(),
-      true);
+  // Button groups
+  std::vector<std::string> axes = {"x", "y", "z"};
+  std::vector<std::string> configs = {"min", "center", "max"};
+
+  // Find out which axis was changed
+  QButtonGroup *group;
+  unsigned int g;
+  if (this->sender() == this->dataPtr->reverseXBox)
+  {
+    g = 0;
+    group = this->dataPtr->alignGroups[g];
+  }
+  else if (this->sender() == this->dataPtr->reverseYBox)
+  {
+    g = 1;
+    group = this->dataPtr->alignGroups[g];
+  }
+  else if (this->sender() == this->dataPtr->reverseZBox)
+  {
+    g = 2;
+    group = this->dataPtr->alignGroups[g];
+  }
+  else
+  {
+    for (g = 0; g < this->dataPtr->alignGroups.size(); ++g)
+    {
+      group = this->dataPtr->alignGroups[g];
+
+      if (this->sender() == group)
+      {
+        break;
+      }
+    }
+  }
+
+  // When changing target, reset everything
+  if (this->sender() == this->dataPtr->alignCombo)
+  {
+    this->dataPtr->jointMaker->SetLinksRelativePose(ignition::math::Pose3d(),
+        true);
+  }
+  // Reset only the axis which was changed
+  else
+  {
+    this->dataPtr->jointMaker->SetLinksRelativePose(ignition::math::Pose3d(),
+        false, g);
+  }
+
+  // Uncheck other buttons in the same group
+  if (group && qobject_cast<QButtonGroup *>(this->sender()))
+  {
+    for (int i = 0; i < group->buttons().size(); ++i)
+    {
+      if (i != _int)
+      {
+        group->buttons()[i]->setChecked(false);
+      }
+    }
+  }
 
   // Reference link
   bool childToParent = this->dataPtr->alignCombo->currentIndex() == 0;
@@ -878,29 +934,16 @@ void JointCreationDialog::OnAlign(const int _int)
   reverse.push_back(this->dataPtr->reverseYBox->isChecked());
   reverse.push_back(this->dataPtr->reverseZBox->isChecked());
 
-  // Button groups
-  std::vector<std::string> axes = {"x", "y", "z"};
-  std::vector<std::string> configs = {"min", "center", "max"};
-  for (unsigned int g = 0; g < this->dataPtr->alignGroups.size(); ++g)
+  // Go through all groups and align
+  for (g = 0; g < this->dataPtr->alignGroups.size(); ++g)
   {
-    auto group = this->dataPtr->alignGroups[g];
+    group = this->dataPtr->alignGroups[g];
 
-    // Uncheck other buttons in the same group
-    if (this->sender() == group)
-    {
-      for (int i = 0; i < group->buttons().size(); ++i)
-      {
-        if (i != _int)
-        {
-          group->buttons()[i]->setChecked(false);
-        }
-      }
-    }
-
-    // Align for the checked button of each group
+    // Align if there is a checked button
     int checked = group->checkedId();
     if (checked >= 0 && checked <=2)
     {
+      // Align
       this->dataPtr->jointMaker->AlignLinks(childToParent, axes[g],
           configs[checked], reverse[g]);
     }
