@@ -173,8 +173,13 @@ bool IntrospectionClient::RemoveAllFilters() const
   bool result = true;
 
   // Remove all the filters from the manager.
-  for (auto const &filter : this->dataPtr->filters)
+  auto filterIter = this->dataPtr->filters.begin();
+  while (filterIter != this->dataPtr->filters.end())
+  {
+    auto filter = *filterIter;
+    ++filterIter;
     result = result && this->RemoveFilter(filter.second, filter.first);
+  }
 
   return result;
 }
