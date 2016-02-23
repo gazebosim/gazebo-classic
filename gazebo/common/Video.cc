@@ -167,6 +167,21 @@ bool Video::Load(const std::string &_filename)
       this->codecCtx->width, this->codecCtx->height, this->codecCtx->pix_fmt,
       1);
 
+  // DEBUG: Will save all the frames
+  /*Image img;
+  char buf[1024];
+  int frame = 0;
+
+  // the decoding loop, running until EOF
+  while (this->GetNextFrame(img))
+  {
+    printf("WH[%d %d]\n",this->codecCtx->width, this->codecCtx->height);
+    snprintf(buf, sizeof(buf), "/tmp/test_%3d.png", frame++);
+    img.SavePNG(buf);
+  }
+  printf("Done\n");
+  */
+
   return true;
 }
 #else
