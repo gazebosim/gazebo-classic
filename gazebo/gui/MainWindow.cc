@@ -87,6 +87,20 @@ extern bool g_fullscreen;
 MainWindow::MainWindow()
   : dataPtr(new MainWindowPrivate)
 {
+  // Add font
+  QFontDatabase::addApplicationFont(":/fonts/Roboto-Black.ttf");
+  QFontDatabase::addApplicationFont(":/fonts/Roboto-BlackItalic.ttf");
+  QFontDatabase::addApplicationFont(":/fonts/Roboto-Bold.ttf");
+  QFontDatabase::addApplicationFont(":/fonts/Roboto-BoldItalic.ttf");
+  QFontDatabase::addApplicationFont(":/fonts/Roboto-Italic.ttf");
+  QFontDatabase::addApplicationFont(":/fonts/Roboto-Light.ttf");
+  QFontDatabase::addApplicationFont(":/fonts/Roboto-LightItalic.ttf");
+  QFontDatabase::addApplicationFont(":/fonts/Roboto-Medium.ttf");
+  QFontDatabase::addApplicationFont(":/fonts/Roboto-MediumItalic.ttf");
+  QFontDatabase::addApplicationFont(":/fonts/Roboto-Regular.ttf");
+  QFontDatabase::addApplicationFont(":/fonts/Roboto-Thin.ttf");
+  QFontDatabase::addApplicationFont(":/fonts/Roboto-ThinItalic.ttf");
+
   this->dataPtr->renderWidget = NULL;
   this->dataPtr->menuLayout = NULL;
   this->dataPtr->menuBar = NULL;

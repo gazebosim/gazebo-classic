@@ -18,6 +18,7 @@
 #include <mutex>
 
 #include "gazebo/gui/plot/IncrementalPlot.hh"
+#include "gazebo/gui/plot/Palette.hh"
 #include "gazebo/gui/plot/PlotCanvas.hh"
 #include "gazebo/gui/plot/PlotCurve.hh"
 #include "gazebo/gui/plot/PlotManager.hh"
@@ -33,9 +34,6 @@ namespace gazebo
     /// \brief Private data for the PlotWindow class
     class PlotWindowPrivate
     {
-      /// \brief The list of variable labels.
-      public: QListWidget *labelList;
-
       /// \brief True when plotting is paused.
       public: bool paused = false;
 
@@ -149,7 +147,7 @@ PlotWindow::PlotWindow(QWidget *_parent)
   bottomPanelLayout->setContentsMargins(0, 0, 0, 0);
   bottomFrame->setLayout(bottomPanelLayout);
 
-  // main layout
+  // Plot layout
   QVBoxLayout *plotLayout = new QVBoxLayout;
   plotLayout->addLayout(this->dataPtr->canvasLayout);
   plotLayout->addLayout(addButtonLayout);
@@ -158,22 +156,25 @@ PlotWindow::PlotWindow(QWidget *_parent)
   plotLayout->setStretchFactor(addButtonLayout, 0);
   plotLayout->setStretchFactor(bottomFrame, 0);
 
-  // left panel
-  this->dataPtr->labelList = new DragableListWidget(this);
-  this->dataPtr->labelList->setDragEnabled(true);
-  this->dataPtr->labelList->setDragDropMode(QAbstractItemView::DragOnly);
-  this->dataPtr->labelList->setSizePolicy(
-      QSizePolicy::Minimum, QSizePolicy::Minimum);
-  QListWidgetItem *item = new QListWidgetItem("Real Time Factor");
-  item->setToolTip(tr("Drag onto graph to plot"));
-  this->dataPtr->labelList->addItem(item);
+  auto plotFrame = new QFrame;
+  plotFrame->setLayout(plotLayout);
 
-  QVBoxLayout *leftLayout = new QVBoxLayout;
-  leftLayout->addWidget(this->dataPtr->labelList);
+  // Palette
+  auto plotPalette = new Palette(this);
 
-  QHBoxLayout *mainLayout = new QHBoxLayout;
-  mainLayout->addLayout(leftLayout);
-  mainLayout->addLayout(plotLayout);
+  auto splitter = new QSplitter(Qt::Horizontal, this);
+  splitter->addWidget(plotPalette);
+  splitter->addWidget(plotFrame);
+  splitter->setCollapsible(0, true);
+  splitter->setCollapsible(1, false);
+
+  QList<int> sizes;
+  sizes << 30 << 70;
+  splitter->setSizes(sizes);
+
+  auto mainLayout = new QHBoxLayout;
+  mainLayout->addWidget(splitter);
+  mainLayout->setContentsMargins(0, 0, 0, 0);
 
   this->setLayout(mainLayout);
   this->setSizeGripEnabled(true);
@@ -185,22 +186,6 @@ PlotWindow::PlotWindow(QWidget *_parent)
   PlotManager::Instance()->AddWindow(this);
 
   this->setMinimumSize(640, 480);
-
-  //=================
-  // TODO for testing - remove later
-  QListWidgetItem *itema = new QListWidgetItem("Dog");
-  itema->setToolTip(tr("Drag onto graph to plot"));
-  this->dataPtr->labelList->addItem(itema);
-  QListWidgetItem *itemb = new QListWidgetItem("Cat");
-  itemb->setToolTip(tr("Drag onto graph to plot"));
-  this->dataPtr->labelList->addItem(itemb);
-  QListWidgetItem *itemc = new QListWidgetItem("Turtle");
-  itemc->setToolTip(tr("Drag onto graph to plot"));
-  this->dataPtr->labelList->addItem(itemc);
-  QListWidgetItem *simTimeItem = new QListWidgetItem("sim_time");
-  itemc->setToolTip(tr("Drag onto graph to plot"));
-  this->dataPtr->labelList->addItem(simTimeItem);
-  //=================
 }
 
 /////////////////////////////////////////////////
