@@ -1499,7 +1499,7 @@ void Model::RegisterIntrospectionItems()
       <ignition::math::Pose3d>(poseURI.Str(), fModelPose);
 
   common::URI linVelURI(uri);
-  poseURI.Query().Insert("p", "linear_velocity");
+  poseURI.Query().Insert("p", "world_linear_velocity");
   gazebo::util::IntrospectionManager::Instance()->Register
       <ignition::math::Vector3d>(linVelURI.Str(), fModelLinVel);
 }
