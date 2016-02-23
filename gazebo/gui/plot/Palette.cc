@@ -170,8 +170,8 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   // The tab bar along the top.
   auto tabBar = new QTabBar;
   tabBar->setObjectName("plottingTabBar");
-  tabBar->addTab("Topics");
-  tabBar->addTab("Sim");
+  tabBar->addTab("TOPICS");
+  tabBar->addTab("SIM");
   tabBar->setExpanding(true);
   tabBar->setDrawBase(false);
   tabBar->setFocusPolicy(Qt::NoFocus);
