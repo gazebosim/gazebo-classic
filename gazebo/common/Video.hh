@@ -75,6 +75,8 @@ namespace gazebo
       private: AVFrame *avFrame;
 
       /// \brief audio video picture
+      /// AVPicture is deprecated in ffmpeg3 and some of the avpicture functions
+      /// are removed. This variable is no longer used.
       private: AVPicture *pic;
 
       /// \brief software scaling context

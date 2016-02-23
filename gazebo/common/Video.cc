@@ -23,6 +23,16 @@
 using namespace gazebo;
 using namespace common;
 
+// suppress deprecation warnings for ffmpeg3
+// av_free_packet has been replaced by av_packet_unref
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 /// \brief Destination audio video frame
 /// TODO Do not merge forward. Declared here for gazebo7 ABI compatibility
 AVFrame *avFrameDst;
@@ -52,6 +62,7 @@ Video::Video()
   this->avFrame = NULL;
   this->videoStream = -1;
 
+  this->pic = NULL;
   avFrameDst = NULL;
 }
 
@@ -254,3 +265,9 @@ int Video::GetHeight() const
   return 0;
 #endif
 }
+
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#elif defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif

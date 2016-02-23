@@ -26,6 +26,16 @@
 using namespace gazebo;
 using namespace common;
 
+// suppress deprecation warnings for ffmpeg3
+// av_free_packet has been replaced by av_packet_unref
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 /////////////////////////////////////////////////
 AudioDecoder::AudioDecoder()
 {
@@ -262,3 +272,9 @@ std::string AudioDecoder::GetFile() const
 {
   return this->filename;
 }
+
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#elif defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
