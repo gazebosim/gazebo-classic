@@ -870,19 +870,20 @@ void JointCreationDialog::OnAlign(const int _int)
   std::vector<std::string> configs = {"min", "center", "max"};
 
   // Find out which axis was changed
-  QButtonGroup *group;
+  QButtonGroup *group = NULL;
   unsigned int g;
-  if (this->sender() == this->dataPtr->reverseXBox)
+  QObject *senderObject = this->sender();
+  if (senderObject == this->dataPtr->reverseXBox)
   {
     g = 0;
     group = this->dataPtr->alignGroups[g];
   }
-  else if (this->sender() == this->dataPtr->reverseYBox)
+  else if (senderObject == this->dataPtr->reverseYBox)
   {
     g = 1;
     group = this->dataPtr->alignGroups[g];
   }
-  else if (this->sender() == this->dataPtr->reverseZBox)
+  else if (senderObject == this->dataPtr->reverseZBox)
   {
     g = 2;
     group = this->dataPtr->alignGroups[g];
@@ -893,7 +894,7 @@ void JointCreationDialog::OnAlign(const int _int)
     {
       group = this->dataPtr->alignGroups[g];
 
-      if (this->sender() == group)
+      if (senderObject == group)
       {
         break;
       }
@@ -901,7 +902,7 @@ void JointCreationDialog::OnAlign(const int _int)
   }
 
   // When changing target, reset everything
-  if (this->sender() == this->dataPtr->alignCombo)
+  if (senderObject == this->dataPtr->alignCombo)
   {
     this->dataPtr->jointMaker->SetLinksRelativePose(ignition::math::Pose3d(),
         true);
@@ -914,7 +915,7 @@ void JointCreationDialog::OnAlign(const int _int)
   }
 
   // Uncheck other buttons in the same group
-  if (group && qobject_cast<QButtonGroup *>(this->sender()))
+  if (group && qobject_cast<QButtonGroup *>(senderObject))
   {
     for (int i = 0; i < group->buttons().size(); ++i)
     {
