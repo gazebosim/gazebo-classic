@@ -11,6 +11,10 @@
 1. Update depth camera sensor to publish depth data over a topic.
     * [Pull request #2112](https://bitbucket.org/osrf/gazebo/pull-request/2112)
 
+1. Model editor updates
+    1. Undo / redo inserting and deleting links
+        * [Pull request #2151](https://bitbucket.org/osrf/gazebo/pull-request/2151)
+
 ## Gazebo 7
 
 ## Gazebo 7.x.x (2016-xx-xx)
