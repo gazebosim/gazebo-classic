@@ -16,8 +16,10 @@
 */
 #include <fstream>
 #include <functional>
+#include <qwt_plot_renderer.h>
 
 #include "gazebo/common/SVGLoader.hh"
+#include "gazebo/gui/plot/IncrementalPlot.hh"
 #include "gazebo/gui/plot/PlotCurve.hh"
 #include "gazebo/gui/plot/PlotCanvas.hh"
 #include "gazebo/gui/plot/PlotWindow.hh"
@@ -174,7 +176,7 @@ ExportDialog::ExportDialog(QWidget *_parent)
 
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
   QPushButton *cancelButton = new QPushButton(tr("&Cancel"));
-  cancelButton->setObjectName("flat");
+  cancelButton->setObjectName("materialFlat");
   connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
 
   QMenu *exportMenu = new QMenu;
@@ -192,7 +194,7 @@ ExportDialog::ExportDialog(QWidget *_parent)
   exportMenu->addAction(pdfAct);
 
   this->dataPtr->exportButton = new QPushButton("&Export to");
-  this->dataPtr->exportButton->setObjectName("flat");
+  this->dataPtr->exportButton->setObjectName("materialFlat");
   this->dataPtr->exportButton->setDefault(true);
   this->dataPtr->exportButton->setEnabled(false);
   this->dataPtr->exportButton->setMenu(exportMenu);
@@ -284,13 +286,8 @@ void ExportDialog::OnCancel()
 /////////////////////////////////////////////////
 void ExportDialog::OnExportPDF()
 {
-  std::cout << "PDF export\n";
-}
-
-/////////////////////////////////////////////////
-void ExportDialog::OnExportCSV()
-{
-  QFileDialog fileDialog(this, tr("Save Directory"),QDir::homePath());
+  QFileDialog fileDialog(this, tr("Save Directory"), QDir::homePath());
+  fileDialog.setObjectName("material");
   fileDialog.setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
       Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
   fileDialog.setAcceptMode(QFileDialog::AcceptSave);
@@ -308,6 +305,60 @@ void ExportDialog::OnExportCSV()
 
   QModelIndexList selectedPlots =
     this->dataPtr->listView->selectionModel()->selectedIndexes();
+
+  for (auto iter = selectedPlots.begin(); iter != selectedPlots.end(); ++iter)
+  {
+    PlotViewItem *plotItem =
+      static_cast<PlotViewItem*>(
+          static_cast<QStandardItemModel*>(
+            this->dataPtr->listView->model())->itemFromIndex(*iter));
+
+    if (plotItem)
+    {
+      std::string title =
+        plotItem->canvas->Title().toStdString();
+
+      for (const auto &plot : plotItem->canvas->Plots())
+      {
+        std::string filename = dir + "/" + title + ".pdf";
+        QwtPlotRenderer renderer;
+        renderer.renderDocument(plot, QString(filename.c_str()),
+            QSizeF(280, 216));
+      }
+    }
+    else
+    {
+      std::cout << "Error!!!\n";
+    }
+  }
+
+  this->close();
+}
+
+/////////////////////////////////////////////////
+void ExportDialog::OnExportCSV()
+{
+  QFileDialog fileDialog(this, tr("Save Directory"), QDir::homePath());
+  fileDialog.setObjectName("material");
+  fileDialog.setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
+  fileDialog.setAcceptMode(QFileDialog::AcceptSave);
+  fileDialog.setFileMode(QFileDialog::DirectoryOnly);
+
+  if (fileDialog.exec() != QDialog::Accepted)
+    return;
+
+  QStringList selected = fileDialog.selectedFiles();
+
+  if (selected.empty())
+    return;
+
+  std::string dir = selected[0].toStdString();
+  std::cout << "DIR[" << dir << "]\n";
+
+  QModelIndexList selectedPlots =
+    this->dataPtr->listView->selectionModel()->selectedIndexes();
+
   for (auto iter = selectedPlots.begin(); iter != selectedPlots.end(); ++iter)
   {
     PlotViewItem *plotItem =
