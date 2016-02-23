@@ -20,13 +20,14 @@
 #include <memory>
 
 #include "gazebo/gui/qt.h"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
     // Forward declare private data class
-    class PlotWindowPrivate;
+    class GZ_GUI_VISIBLE PlotWindowPrivate;
 
     class PlotCanvas;
 

@@ -21,6 +21,7 @@
 #include <string>
 #include <memory>
 #include "gazebo/gui/qt.h"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -34,7 +35,7 @@ namespace gazebo
 
     /// \class ExportDialog gui/ExportDialog.hh
     /// \brief Dialog for saving to file.
-    class ExportDialog : public QDialog
+    class GZ_GUI_VISIBLE ExportDialog : public QDialog
     {
       Q_OBJECT
 

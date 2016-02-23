@@ -22,6 +22,7 @@
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/plot/VariablePill.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -33,7 +34,7 @@ namespace gazebo
     class VariablePill;
 
     /// \brief A container for holding variable pills
-    class VariablePillContainer : public QWidget
+    class GZ_GUI_VISIBLE VariablePillContainer : public QWidget
     {
       Q_OBJECT
 
