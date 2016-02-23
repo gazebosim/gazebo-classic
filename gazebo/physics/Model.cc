@@ -1494,12 +1494,12 @@ void Model::RegisterIntrospectionItems()
 
   // Register items.
   common::URI poseURI(uri);
-  poseURI.Query().Insert("p", "pose");
+  poseURI.Query().Insert("p", "world_pose");
   gazebo::util::IntrospectionManager::Instance()->Register
       <ignition::math::Pose3d>(poseURI.Str(), fModelPose);
 
   common::URI linVelURI(uri);
-  poseURI.Query().Insert("p", "lin_vel");
+  poseURI.Query().Insert("p", "linear_velocity");
   gazebo::util::IntrospectionManager::Instance()->Register
       <ignition::math::Vector3d>(linVelURI.Str(), fModelLinVel);
 }
