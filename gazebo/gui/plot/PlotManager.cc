@@ -26,6 +26,7 @@
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportIface.hh"
 
+#include "gazebo/gui/plot/TopicDataHandler.hh"
 #include "gazebo/gui/plot/PlotCurve.hh"
 #include "gazebo/gui/plot/PlotWindow.hh"
 #include "gazebo/gui/plot/IncrementalPlot.hh"
@@ -41,11 +42,6 @@ namespace gazebo
     /// \brief Private data for the PlotManager class
     class PlotManagerPrivate
     {
-      /// \def CurveVariableSet
-      /// \brief A set of unique plot curve pointers
-      public: using CurveVariableSet = std::set<PlotCurveWeakPtr,
-          std::owner_less<PlotCurveWeakPtr> >;
-
       /// \def CurveVariableSetIt
       /// \brief Curve variable map iterator
       public: using CurveVariableMapIt =
@@ -57,8 +53,11 @@ namespace gazebo
       /// \brief Subscriber to the world control topic
       public: transport::SubscriberPtr worldControlSub;
 
-      /// \brief A map to variable topic names to plot curve.
+      /// \brief A map of variable names to plot curves.
       public: std::map<std::string, CurveVariableSet> curves;
+
+      /// \brief A map of topic names to topic data handers.
+      public: std::map<std::string, TopicDataHandler *> topicDataHandlers;
 
       /// \brief A list of plot windows.
       public: std::vector<PlotWindow *> windows;
@@ -170,6 +169,63 @@ void PlotManager::OnWorldControl(ConstWorldControlPtr &_data)
 }
 
 /////////////////////////////////////////////////
+void PlotManager::AddTopicCurve(const std::string &_uri,
+    PlotCurveWeakPtr _curve)
+{
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+
+  // parse the uri to get topic
+  std::string topic;
+
+  // parse the uri to get param;
+  std::string param;
+
+  auto it = this->dataPtr->topicDataHandlers.find(topic);
+  if (it == this->dataPtr->topicDataHandlers.end())
+  {
+    TopicDataHandler *handler = new TopicDataHandler();
+    handler->SetTopic(topic);
+    handler->AddCurve(param, _curve);
+    this->dataPtr->topicDataHandlers[topic] = handler;
+  }
+  else
+  {
+    TopicDataHandler *handler = it->second;
+    handler->AddCurve(param, _curve);
+  }
+}
+
+/////////////////////////////////////////////////
+void PlotManager::RemoveTopicCurve(PlotCurveWeakPtr _curve)
+{
+  if (_curve.expired())
+    return;
+
+  // find and remove the curve
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  for (auto it = this->dataPtr->topicDataHandlers.begin();
+      it != this->dataPtr->topicDataHandlers.end(); ++it)
+  {
+    TopicDataHandler *handler = it->second;
+
+    if (!handler)
+      continue;
+
+    if (handler->HasCurve(_curve))
+    {
+      handler->RemoveCurve(_curve);
+      if (handler->Count() == 0u)
+      {
+        delete it->second;
+        this->dataPtr->topicDataHandlers.erase(it);
+      }
+
+      break;
+    }
+  }
+}
+
+/////////////////////////////////////////////////
 void PlotManager::AddCurve(const std::string &_name, PlotCurveWeakPtr _curve)
 {
   if (_curve.expired())
@@ -179,7 +235,7 @@ void PlotManager::AddCurve(const std::string &_name, PlotCurveWeakPtr _curve)
   auto it = this->dataPtr->curves.find(_name);
   if (it == this->dataPtr->curves.end())
   {
-    PlotManagerPrivate::CurveVariableSet curveSet;
+    CurveVariableSet curveSet;
     curveSet.insert(_curve);
     this->dataPtr->curves[_name] = curveSet;
   }
@@ -208,6 +264,8 @@ void PlotManager::RemoveCurve(PlotCurveWeakPtr _curve)
     if (cIt != it->second.end())
     {
       it->second.erase(cIt);
+      if (it->second.empty())
+        this->dataPtr->curves.erase(it);
       return;
     }
   }

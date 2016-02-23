@@ -6,6 +6,7 @@ set (sources_local
   plot/PlotCurve.cc
   plot/PlotManager.cc
   plot/PlotWindow.cc
+  plot/TopicDataHandler.cc
   plot/VariablePill.cc
   plot/VariablePillContainer.cc
 )
