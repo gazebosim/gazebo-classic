@@ -26,16 +26,6 @@
 using namespace gazebo;
 using namespace common;
 
-// suppress deprecation warnings for ffmpeg3
-// av_free_packet has been replaced by av_packet_unref
-#if defined(__clang__)
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-#elif defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-
 /////////////////////////////////////////////////
 AudioDecoder::AudioDecoder()
 {
@@ -148,10 +138,10 @@ bool AudioDecoder::Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize)
         packet1.size -= bytesDecoded;
       }
     }
-    av_free_packet(&packet);
+    AVPacketUnref(&packet);
   }
 
-  av_free_packet(&packet);
+  AVPacketUnref(&packet);
 
   // Seek to the beginning so that it can be decoded again, if necessary.
   av_seek_frame(this->formatCtx, this->audioStream, 0, 0);
