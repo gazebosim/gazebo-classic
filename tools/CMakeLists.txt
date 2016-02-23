@@ -37,6 +37,8 @@ set (test_sources
 
 gz_build_tests(${test_sources})
 
+add_dependencies(${TEST_TYPE}_gz_log_TEST gz)
+
 add_executable(gz gz.cc gz_topic.cc gz_log.cc)
 target_link_libraries(gz
  libgazebo_client

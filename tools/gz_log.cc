@@ -837,7 +837,6 @@ void LogCommand::Output(const std::string &_outFilename,
     outFile.write(header.c_str(), header.size());
   }
 
-
   StateFilter filter(!_raw, _stamp, _hz);
   filter.Init(_filter);
 
@@ -849,55 +848,58 @@ void LogCommand::Output(const std::string &_outFilename,
     else if (i == 0 && _raw)
       stateString.clear();
 
-    if (!stateString.empty())
+    if (stateString.empty())
     {
-      if (!_raw)
-      {
-        std::string buffer = "<chunk encoding='" + encoding + "'>\n<![CDATA[";
-
-        if (encoding == "txt")
-          buffer.append(stateString);
-        else if (encoding == "zlib")
-        {
-          std::string str;
-
-          // Compress to zlib
-          {
-            boost::iostreams::filtering_ostream out;
-            out.push(boost::iostreams::zlib_compressor());
-            out.push(std::back_inserter(str));
-            boost::iostreams::copy(
-                boost::make_iterator_range(stateString), out);
-          }
-
-          // Encode in base64.
-          Base64Encode(str.c_str(), str.size(), buffer);
-        }
-        else if (encoding == "bz2")
-        {
-          std::string str;
-
-          // Compress to bzip2
-          {
-            boost::iostreams::filtering_ostream out;
-            out.push(boost::iostreams::bzip2_compressor());
-            out.push(std::back_inserter(str));
-            boost::iostreams::copy(
-                boost::make_iterator_range(stateString), out);
-          }
-
-          // Encode in base64.
-          Base64Encode(str.c_str(), str.size(), buffer);
-        }
-
-        buffer.append("]]>\n</chunk>\n");
-        outFile.write(buffer.c_str(), buffer.size());
-      }
-      else
-      {
-        outFile.write(stateString.c_str(), stateString.size());
-      }
+      i++;
+      continue;
     }
+
+    if (_raw)
+    {
+      outFile.write(stateString.c_str(), stateString.size());
+      i++;
+      continue;
+    }
+
+    std::string buffer = "<chunk encoding='" + encoding + "'>\n<![CDATA[";
+
+    if (encoding == "txt")
+      buffer.append(stateString);
+    else if (encoding == "zlib")
+    {
+      std::string str;
+
+      // Compress to zlib
+      {
+        boost::iostreams::filtering_ostream out;
+        out.push(boost::iostreams::zlib_compressor());
+        out.push(std::back_inserter(str));
+        boost::iostreams::copy(
+            boost::make_iterator_range(stateString), out);
+      }
+
+      // Encode in base64.
+      Base64Encode(str.c_str(), str.size(), buffer);
+    }
+    else if (encoding == "bz2")
+    {
+      std::string str;
+
+      // Compress to bzip2
+      {
+        boost::iostreams::filtering_ostream out;
+        out.push(boost::iostreams::bzip2_compressor());
+        out.push(std::back_inserter(str));
+        boost::iostreams::copy(
+            boost::make_iterator_range(stateString), out);
+      }
+
+      // Encode in base64.
+      Base64Encode(str.c_str(), str.size(), buffer);
+    }
+
+    buffer.append("]]>\n</chunk>\n");
+    outFile.write(buffer.c_str(), buffer.size());
 
     ++i;
   }
