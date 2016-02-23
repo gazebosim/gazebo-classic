@@ -50,13 +50,7 @@ void MainWindow_TEST::StepState()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   QVERIFY(gazebo::gui::g_stepAct != NULL);
   QVERIFY(!gazebo::gui::g_stepAct->isEnabled());
@@ -67,39 +61,21 @@ void MainWindow_TEST::StepState()
   // enabled / disabled.
   mainWindow->Pause();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   QVERIFY(mainWindow->IsPaused());
   QVERIFY(gazebo::gui::g_stepAct->isEnabled());
 
   mainWindow->Play();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   QVERIFY(!mainWindow->IsPaused());
   QVERIFY(!gazebo::gui::g_stepAct->isEnabled());
 
   mainWindow->Pause();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   QVERIFY(mainWindow->IsPaused());
   QVERIFY(gazebo::gui::g_stepAct->isEnabled());
@@ -123,13 +99,7 @@ void MainWindow_TEST::Selection()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get the user camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
@@ -238,24 +208,14 @@ void MainWindow_TEST::UserCameraFPS()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get the user camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
   QVERIFY(cam != NULL);
 
   // Wait a little bit for the average FPS to even out.
-  for (unsigned int i = 0; i < 10000; ++i)
-  {
-    gazebo::common::Time::NSleep(500000);
-    QCoreApplication::processEvents();
-  }
+  this->ProcessEventsAndDraw(NULL, 5000, 1);
 
   std::cerr << "\nFPS[" << cam->AvgFPS() << "]\n" << std::endl;
 
@@ -303,13 +263,7 @@ void MainWindow_TEST::CopyPaste()
     // this call outside the rendering thread.
     gazebo::event::Events::setSelectedEntity(modelName, "normal");
 
-    // Process some events, and draw the screen
-    for (unsigned int i = 0; i < 10; ++i)
-    {
-      gazebo::common::Time::MSleep(30);
-      QCoreApplication::processEvents();
-      mainWindow->repaint();
-    }
+    this->ProcessEventsAndDraw(mainWindow);
 
     gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelName);
     QVERIFY(modelVis != NULL);
@@ -327,13 +281,8 @@ void MainWindow_TEST::CopyPaste()
     }
     QVERIFY(modelVis->GetHighlighted());
 
-    // Process some events, and draw the screen
-    for (unsigned int i = 0; i < 10; ++i)
-    {
-      gazebo::common::Time::MSleep(30);
-      QCoreApplication::processEvents();
-      mainWindow->repaint();
-    }
+    this->ProcessEventsAndDraw(mainWindow);
+
     QVERIFY(gazebo::gui::g_copyAct != NULL);
     QVERIFY(gazebo::gui::g_pasteAct != NULL);
 
@@ -443,13 +392,7 @@ void MainWindow_TEST::Wireframe()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get the user camera, and tell it to save frames
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
@@ -458,13 +401,7 @@ void MainWindow_TEST::Wireframe()
 
   cam->SetCaptureData(true);
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get the image data
   const unsigned char *image = cam->ImageData();
@@ -542,13 +479,7 @@ void MainWindow_TEST::NonDefaultWorld()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get the user camera, and tell it to save frames
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
@@ -558,13 +489,7 @@ void MainWindow_TEST::NonDefaultWorld()
 
   cam->SetCaptureData(true);
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get the image data
   const unsigned char *image = cam->ImageData();
@@ -608,13 +533,7 @@ void MainWindow_TEST::UserCameraJoystick()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get the user camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
@@ -640,13 +559,7 @@ void MainWindow_TEST::UserCameraJoystick()
 
     joyPub->Publish(joystickMsg);
 
-    // Process some events, and draw the screen
-    for (unsigned int i = 0; i < 10; ++i)
-    {
-      gazebo::common::Time::MSleep(30);
-      QCoreApplication::processEvents();
-      mainWindow->repaint();
-    }
+    this->ProcessEventsAndDraw(mainWindow);
 
     ignition::math::Pose3d endPose = cam->WorldPose();
     QVERIFY(endPose == ignition::math::Pose3d(4.98664, -5.00091, 2.01306,
@@ -663,13 +576,7 @@ void MainWindow_TEST::UserCameraJoystick()
 
     joyPub->Publish(joystickMsg);
 
-    // Process some events, and draw the screen
-    for (unsigned int i = 0; i < 10; ++i)
-    {
-      gazebo::common::Time::MSleep(30);
-      QCoreApplication::processEvents();
-      mainWindow->repaint();
-    }
+    this->ProcessEventsAndDraw(mainWindow);
 
     ignition::math::Pose3d endPose = cam->WorldPose();
     QVERIFY(endPose == ignition::math::Pose3d(4.98664, -5.00091, 2.01306,
@@ -690,13 +597,7 @@ void MainWindow_TEST::UserCameraJoystick()
 
     joyPub->Publish(joystickMsg);
 
-    // Process some events, and draw the screen
-    for (unsigned int i = 0; i < 10; ++i)
-    {
-      gazebo::common::Time::MSleep(30);
-      QCoreApplication::processEvents();
-      mainWindow->repaint();
-    }
+    this->ProcessEventsAndDraw(mainWindow);
 
     ignition::math::Pose3d endPose = cam->WorldPose();
     QVERIFY(endPose == ignition::math::Pose3d(4.84758, -5.01151, 2.15333,
@@ -980,13 +881,7 @@ void MainWindow_TEST::SetUserCameraPoseSDF()
 
   cam->SetCaptureData(true);
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   const unsigned char *data = cam->ImageData();
   unsigned int width = cam->ImageWidth();
@@ -1109,13 +1004,7 @@ void MainWindow_TEST::WindowModes()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Check edit actions are visible
   QVERIFY(gazebo::gui::g_resetModelsAct->isVisible());
