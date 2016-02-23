@@ -310,7 +310,7 @@ namespace gazebo
     msgs::Any ConvertAny(const ignition::math::Quaterniond &_q)
     {
       msgs::Any result;
-      result.set_type(msgs::Any::QUATERNION);
+      result.set_type(msgs::Any::QUATERNIOND);
       result.mutable_quaternion_value()->CopyFrom(Convert(_q));
       return result;
     }

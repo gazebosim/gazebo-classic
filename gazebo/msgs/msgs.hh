@@ -151,9 +151,9 @@ namespace gazebo
     GAZEBO_VISIBLE
     msgs::Vector2d Convert(const ignition::math::Vector2d &_v);
 
-    /// \brief Convert a ignition::math::Quaternion to a msgs::Quaternion
+    /// \brief Convert a ignition::math::Quaternion to a msgs::Quaterniond
     /// \param[in] _q The quaternion to convert
-    /// \return A msgs::Quaternion object
+    /// \return A msgs::Quaterniond object
     GAZEBO_VISIBLE
     msgs::Quaternion Convert(const ignition::math::Quaterniond &_q);
 
