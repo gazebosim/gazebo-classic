@@ -812,6 +812,13 @@ void LogCommand::Output(const std::string &_outFilename,
   }
 
   gazebo::util::LogPlay *play = gazebo::util::LogPlay::Instance();
+  if (!play->IsOpen())
+  {
+    std::cerr << "No source log file specified. Use the -f command line "
+      << "argument.\n";
+    return;
+  }
+
   std::string stateString;
 
   std::string encoding = _encoding.empty() ? play->Encoding() : _encoding;

@@ -31,6 +31,7 @@ namespace gazebo
     /// \brief Constructor
     /// \param[in] _xmlOutput True if the output should be in XML format.
     /// \param[in[ _stamp Type of stamp to apply.
+    /// Valid values are (sim,real,wall)
     public: FilterBase(bool _xmlOutput, const std::string &_stamp);
 
     /// \brief Output a line of data.
@@ -64,6 +65,7 @@ namespace gazebo
     /// \brief Constructor.
     /// \param[in] _xmlOutput True if the output should be in XML format.
     /// \param[in] _stamp Type of stamp to apply.
+    /// Valid values are (sim,real,wall)
     public: JointFilter(bool _xmlOutput, const std::string &_stamp);
 
     /// \brief Initialize the filter.
@@ -93,6 +95,7 @@ namespace gazebo
     /// \brief Constructor.
     /// \param[in] _xmlOutput True if the output should be in XML format.
     /// \param[in] _stamp Type of stamp to apply.
+    /// Valid values are (sim,real,wall)
     public: LinkFilter(bool _xmlOutput, const std::string &_stamp);
 
     /// \brief Initialize the filter.
@@ -122,6 +125,7 @@ namespace gazebo
     /// \brief Constructor.
     /// \param[in] _xmlOutput True if the output should be in XML format.
     /// \param[in] _stamp Type of stamp to apply.
+    /// Valid values are (sim,real,wall)
     public: ModelFilter(bool _xmlOutput, const std::string &_stamp);
 
     /// \brief Destructor.
@@ -160,6 +164,7 @@ namespace gazebo
     /// \brief Constructor
     /// \param[in] _xmlOutput True to format output as XML
     /// \param[in] _stamp Type of stamp to apply.
+    /// Valid values are (sim,real,wall)
     public: StateFilter(bool _xmlOutput, const std::string &_stamp,
                 double _hz = 0);
 
@@ -207,9 +212,11 @@ namespace gazebo
     /// \param[in] _filter Filter string
     /// \param[in] _raw True to output data without xml formatting.
     /// \param[in] _stamp Type of stamp to apply.
+    /// Valid values are (sim,real,wall)
     /// \param[in] _hz Hertz rate.
     /// \param[in] _encoding Specify output log file encoding. If empty, the
     /// encoding from the source log file is used.
+    /// Valid values include (txt, zlib, bz2)
     private: void Output(const std::string &_outFilename,
                  const std::string &_filter, const bool _raw,
                  const std::string &_stamp, const double _hz,
@@ -219,6 +226,7 @@ namespace gazebo
     /// \param[in] _filter Filter string
     /// \param[in] _raw True to output data without xml formatting.
     /// \param[in] _stamp Type of stamp to apply.
+    /// Valid values are (sim,real,wall)
     /// \param[in] _hz Hertz rate.
     private: void Echo(const std::string &_filter,
                  bool _raw, const std::string &_stamp, double _hz);
@@ -227,6 +235,7 @@ namespace gazebo
     /// \param[in] _filter Filter string
     /// \param[in] _raw True to output data without xml formatting.
     /// \param[in] _stamp Type of stamp to apply.
+    /// Valid values are (sim,real,wall)
     /// \param[in] _hz Hertz rate.
     private: void Step(const std::string &_filter, bool _raw,
                  const std::string &_stamp, double _hz);
