@@ -16,7 +16,6 @@
 */
 #include <fstream>
 #include <functional>
-#include <qwt_plot_renderer.h>
 
 #include "gazebo/common/SVGLoader.hh"
 #include "gazebo/gui/plot/IncrementalPlot.hh"
@@ -29,36 +28,46 @@ using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
+/// \brief Private data for the ExportDialog class
 class gazebo::gui::ExportDialogPrivate
 {
+  /// \brief List of the plots that can be exported
   public: QListView *listView;
+
+  /// \brief The export push button
   public: QPushButton *exportButton;
 };
 
 /////////////////////////////////////////////////
-// Subclass QStandardItem so that we can store a pointer to the plot canvas
+// \brief Subclass QStandardItem so that we can store a pointer to
+/// the plot canvas
 class PlotViewItem : public QStandardItem
 {
+  /// \brief Canvase pointer
   public: PlotCanvas *canvas;
 };
 
 /////////////////////////////////////////////////
+/// \brief QT delegate used to paint the plot export list view items
 class PlotViewDelegate : public QStyledItemDelegate
 {
+  /// \brief Various data roles for the plot list view delegate
   public: enum datarole
-          {
-            headerTextRole = Qt::UserRole + 100,
-            iconRole = Qt::UserRole+101
-          };
+  {
+    headerTextRole = Qt::UserRole + 100,
+    iconRole = Qt::UserRole+101
+  };
 
-  public: PlotViewDelegate()
-          {
-          }
+  /// \brief Constructor
+  public: PlotViewDelegate() = default;
 
-  public: virtual ~PlotViewDelegate()
-          {
-          }
+  /// \brief Destructor
+  public: virtual ~PlotViewDelegate() = default;
 
+  /// \brief Paint this item
+  /// \param[in] _painter Pointer to the QT painter.
+  /// \param[in] _opt Item options.
+  /// \param[in] _index Item model index.
   public: void paint(QPainter *_painter, const QStyleOptionViewItem &_opt,
               const QModelIndex &_index) const
           {
@@ -74,17 +83,6 @@ class PlotViewDelegate : public QStyledItemDelegate
 
             // Add margins to the rectangle
             r.adjust(5, 5, -5, -5);
-            /*if (_opt.state & QStyle::State_Selected)
-            {
-              _painter->setBrush(QColor(200, 200, 200));
-              _painter->setPen(QColor(255, 255, 255));
-            }
-            else
-            {
-              _painter->setBrush(QColor(90, 90, 90));
-              _painter->setPen(QColor(0, 0, 0));
-            }*/
-            //_painter->drawRect(r);
 
             iconRect.adjust(10, 10, -10, -10);
 
@@ -121,6 +119,9 @@ class PlotViewDelegate : public QStyledItemDelegate
             _painter->restore();
           }
 
+  /// \brief Size hint tells QT how big an item is.
+  /// \param[in] _option Style options
+  /// \param[in] _index Item model index
   public: QSize sizeHint(const QStyleOptionViewItem &_option,
                               const QModelIndex &_index) const
           {
@@ -243,8 +244,6 @@ ExportDialog::ExportDialog(QWidget *_parent)
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->addWidget(titleFrame);
   mainLayout->addWidget(this->dataPtr->listView);
-  //mainLayout->addWidget(this->messageLabel);
-  //mainLayout->addLayout(gridLayout);
   mainLayout->addLayout(buttonsLayout);
   mainLayout->setContentsMargins(0, 0, 0, 0);
 
@@ -265,7 +264,6 @@ ExportDialog::ExportDialog(QWidget *_parent)
 }
 
 /////////////////////////////////////////////////
-//void ExportDialog::OnSelected(const QModelIndex & /*_index*/)
 void ExportDialog::OnSelected()
 {
   this->dataPtr->exportButton->setEnabled(
@@ -301,11 +299,13 @@ void ExportDialog::OnExportPDF()
   if (selected.empty())
     return;
 
+  // Get the selected directory
   std::string dir = selected[0].toStdString();
 
   QModelIndexList selectedPlots =
     this->dataPtr->listView->selectionModel()->selectedIndexes();
 
+  // Export each selected plot
   for (auto iter = selectedPlots.begin(); iter != selectedPlots.end(); ++iter)
   {
     PlotViewItem *plotItem =
@@ -318,6 +318,7 @@ void ExportDialog::OnExportPDF()
       std::string title =
         plotItem->canvas->Title().toStdString();
 
+      // Render the plot to a PDF
       for (const auto &plot : plotItem->canvas->Plots())
       {
         std::string filename = dir + "/" + title + ".pdf";
@@ -328,7 +329,7 @@ void ExportDialog::OnExportPDF()
     }
     else
     {
-      std::cout << "Error!!!\n";
+      gzerr << "Invalid plot item.\n";
     }
   }
 
@@ -348,17 +349,18 @@ void ExportDialog::OnExportCSV()
   if (fileDialog.exec() != QDialog::Accepted)
     return;
 
+  // Get the selected directory
   QStringList selected = fileDialog.selectedFiles();
 
   if (selected.empty())
     return;
 
   std::string dir = selected[0].toStdString();
-  std::cout << "DIR[" << dir << "]\n";
 
   QModelIndexList selectedPlots =
     this->dataPtr->listView->selectionModel()->selectedIndexes();
 
+  // Export each selected plot
   for (auto iter = selectedPlots.begin(); iter != selectedPlots.end(); ++iter)
   {
     PlotViewItem *plotItem =
@@ -371,6 +373,7 @@ void ExportDialog::OnExportCSV()
       std::string title =
         plotItem->canvas->Title().toStdString();
 
+      // Save data from each curve into a separate file.
       for (const auto &plot : plotItem->canvas->Plots())
       {
         for (const auto &curve : plot->Curves())
@@ -392,7 +395,7 @@ void ExportDialog::OnExportCSV()
     }
     else
     {
-      std::cout << "Error!!!\n";
+      gzerr << "Invalid plot item.\n";
     }
   }
   this->close();
