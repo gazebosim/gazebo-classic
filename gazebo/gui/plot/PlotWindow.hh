@@ -20,7 +20,6 @@
 #include <memory>
 
 #include "gazebo/gui/qt.h"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -32,7 +31,7 @@ namespace gazebo
     class PlotCanvas;
 
     /// \brief Plot window
-    class GZ_GUI_VISIBLE PlotWindow : public QWidget
+    class PlotWindow : public QWidget
     {
       Q_OBJECT
 
@@ -46,6 +45,8 @@ namespace gazebo
       /// \brief Add a new canvas.
       public: PlotCanvas *AddCanvas();
 
+      /// \brief Get a list of all the plots
+      /// \return A list of all the plots.
       public: std::list<PlotCanvas*> Plots();
 
       /// \brief Remove a plot canvas

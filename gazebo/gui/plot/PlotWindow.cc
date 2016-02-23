@@ -144,7 +144,6 @@ PlotWindow::PlotWindow(QWidget *_parent)
   plotExportAct->setVisible(true);
   connect(plotExportAct, SIGNAL(triggered()), this, SLOT(OnExport()));
 
-
   QToolBar *exportToolbar = new QToolBar;
   exportToolbar->setObjectName("plotToolbar");
   exportToolbar->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);

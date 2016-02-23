@@ -24,7 +24,6 @@
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/gui/plot/PlottingTypes.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -36,7 +35,7 @@ namespace gazebo
     class PlotWindow;
 
     /// \brief A class that connects simulation data with the plotting tool
-    class GZ_GUI_VISIBLE PlotManager : public SingletonT<PlotManager>
+    class PlotManager : public SingletonT<PlotManager>
     {
       /// \brief Constructor.
       public: PlotManager();

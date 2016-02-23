@@ -25,7 +25,6 @@
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/plot/PlottingTypes.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -36,7 +35,7 @@ namespace gazebo
     class PlotCanvasPrivate;
 
     /// \brief Plot canvas
-    class GZ_GUI_VISIBLE PlotCanvas : public QWidget
+    class PlotCanvas : public QWidget
     {
       Q_OBJECT
 

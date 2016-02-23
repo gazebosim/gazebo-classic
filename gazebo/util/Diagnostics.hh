@@ -26,8 +26,6 @@
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/common/Timer.hh"
 
-#include "gazebo/msgs/MessageTypes.hh"
-
 #include "gazebo/util/UtilTypes.hh"
 #include "gazebo/util/system.hh"
 
@@ -63,17 +61,6 @@ namespace gazebo
     /// \param[in] name Name of the timer to stop
     #define DIAG_TIMER_STOP(_name) \
     gazebo::util::DiagnosticManager::Instance()->StopTimer(_name);
-
-    /// \brief Add an a arbitrary variable to diagnostics.
-    /// \param[in] _name Name associated with the variable.
-    /// \param[in] _value Value of the variable. Value must be a double.
-    #define DIAG_VARIABLE(_name, _value) \
-    (*gazebo::util::_diagVariablePtr)(_name, _value);
-
-    /// \brief Add a marker at the current time.
-    /// \param[in] _name Name of the marker
-    #define DIAG_MARKER(_name) \
-    (*gazebo::util::_diagMarkerPtr)(_name);
 #else
     #define DIAG_TIMER_START(_name) ((void) 0)
     #define DIAG_TIMER_LAP(_name, _prefix) ((void)0)
@@ -95,9 +82,6 @@ namespace gazebo
       /// \param[in] _worldName Name of the world.
       public: void Init(const std::string &_worldName);
 
-      /// \brief Shutdown diagnostics.
-      public: void Fini();
-
       /// \brief Start a new timer instance
       /// \param[in] _name Name of the timer.
       /// \return A pointer to the new diagnostic timer
@@ -113,15 +97,6 @@ namespace gazebo
       /// \param[in] _prefix Informational string that is output with the
       /// elapsed time.
       public: void Lap(const std::string &_name, const std::string &_prefix);
-
-      /// \brief Add an an arbitrary variable to diagnostics.
-      /// \param[in] _name Name associated with the variable.
-      /// \param[in] _value Value of the variable.
-      public: void Variable(const std::string &_name, const double _value);
-
-      /// \brief Add an a marker to diagnostics.
-      /// \param[in] _name Name of the marker.
-      public: void Marker(const std::string &_name);
 
       /// \brief Get the number of timers
       /// \return The number of timers
@@ -175,14 +150,6 @@ namespace gazebo
       /// \return The path in which logs are stored.
       public: boost::filesystem::path LogPath() const;
 
-      /// \brief Returns true if diagnostics is active.
-      /// \return True when generating diagnostic information.
-      public: bool Enabled() const;
-
-      /// \brief Set whether diagnostics is active.
-      /// \param[in] _enabled True to enable diagnostics.
-      public: void SetEnabled(const bool _enabled);
-
       /// \brief Publishes diagnostic information.
       /// \param[in] _info World update information.
       private: void Update(const common::UpdateInfo &_info);
@@ -195,10 +162,6 @@ namespace gazebo
       private: void AddTime(const std::string &_name,
                    const common::Time &_wallTime,
                    const common::Time &_elapsedtime);
-
-      /// \brief Recive control messages.
-      /// \param[in] _msg Diagnostic control message
-      private: void OnControl(ConstDiagnosticControlPtr &_msg);
 
       // Singleton implementation
       private: friend class SingletonT<DiagnosticManager>;
@@ -225,11 +188,6 @@ namespace gazebo
       /// \brief Output a lap time.
       /// \param[in] _prefix Annotation to output with the elapsed time.
       public: void Lap(const std::string &_prefix);
-
-      /// \brief Add an an arbitrary variable to diagnostics.
-      /// \param[in] _name Name associated with the variable.
-      /// \param[in] _value Value of the variable.
-      public: void Variable(const std::string &_name, const double _value);
 
       // Documentation inherited
       public: virtual void Start();

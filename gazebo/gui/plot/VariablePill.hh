@@ -26,7 +26,6 @@
 #include <ignition/math/Vector2.hh>
 
 #include "gazebo/gui/qt.h"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -38,7 +37,7 @@ namespace gazebo
     class VariablePillContainer;
 
     /// \brief A variable pill
-    class GZ_GUI_VISIBLE VariablePill : public QWidget
+    class VariablePill : public QWidget
     {
       Q_OBJECT
 

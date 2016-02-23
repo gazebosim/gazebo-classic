@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-
 #ifndef _GAZEBO_GUI_PLOT_VARIABLE_PILL_CONTAINER_HH_
 #define _GAZEBO_GUI_PLOT_VARIABLE_PILL_CONTAINER_HH_
 
@@ -23,7 +22,6 @@
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/plot/VariablePill.hh"
-#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -35,7 +33,7 @@ namespace gazebo
     class VariablePill;
 
     /// \brief A container for holding variable pills
-    class GZ_GUI_VISIBLE VariablePillContainer : public QWidget
+    class VariablePillContainer : public QWidget
     {
       Q_OBJECT
 

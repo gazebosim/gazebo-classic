@@ -27,7 +27,6 @@
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/plot/qwt_gazebo.h"
 #include "gazebo/gui/plot/PlottingTypes.hh"
-#include "gazebo/util/system.hh"
 
 class QwtPlotCurve;
 
@@ -44,7 +43,7 @@ namespace gazebo
     class IncrementalPlotPrivate;
 
     /// \brief A plotting widget that handles incremental addition of data.
-    class GZ_GUI_VISIBLE IncrementalPlot : public QwtPlot
+    class IncrementalPlot : public QwtPlot
     {
       Q_OBJECT
 

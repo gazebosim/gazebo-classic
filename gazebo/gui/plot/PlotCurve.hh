@@ -38,7 +38,7 @@ namespace gazebo
     class IncrementalPlot;
 
     /// \brief Plot Curve data.
-    class GZ_GUI_VISIBLE PlotCurve
+    class PlotCurve
     {
       /// \brief Constructor.
       /// \param[in] _label Plot label.
