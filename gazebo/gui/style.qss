@@ -840,7 +840,7 @@ QTextEdit#splashVersionTextEdit
 
 QDialog#plotWindow
 {
-  background-color: #e2e2e2;
+  background-color: #f2f2f2;
   font-family: Roboto;
 }
 
@@ -858,6 +858,7 @@ QLabel#plottingSearchLabel
 {
   color: #f58113;
   font-weight: 400;
+  margin-top: 15px;
 }
 
 QWidget#plotCanvas
@@ -975,9 +976,9 @@ QTabBar#plottingTabBar::tab
 
 QTabBar#plottingTabBar::tab:!selected
 {
-  color: rgba(240, 240, 240, 180);
+  color: rgba(240,240,240,180);
   background-color: rgba(120,120,120,255);
-  border-bottom: 2px solid rgba(0, 0, 0, 0);
+  border-bottom: 2px solid rgba(0,0,0,0);
   font-weight: 400;
 }
 
@@ -1012,7 +1013,7 @@ QTabBar#plottingTabBar
   padding: 0px;
 }
 
-QTabBar#plottingTabBar::pane,
+QTabBar#plottingTabBar::pane
 {
   padding: 0px;
   margin: 0px;
@@ -1022,6 +1023,5 @@ QTabBar#plottingTabBar::pane,
 
 QFrame#plotPaletteFrame
 {
-  background-color: rgba(255, 0, 0, 255);
+  background-color: #e2e2e2;
 }
-
