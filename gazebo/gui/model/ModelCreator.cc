@@ -1199,10 +1199,6 @@ LinkData *ModelCreator::CreateLinkFromSDF(const sdf::ElementPtr &_linkElem,
 
   linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
 
-  // emit linkInserted events for all links, including links in nested models
-  // gui::model::Events::linkInserted(linkName);
-  // FIXME trying to fix graphviz bug. Disabling events for nested links
-  // if (_parentVis == this->previewVisual)
   gui::model::Events::linkInserted(linkName);
 
   {

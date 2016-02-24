@@ -127,6 +127,16 @@ std::string SchematicViewWidget::UnscopedName(const std::string &_scopedName)
   if (idx != std::string::npos)
     unscopedName = _scopedName.substr(idx+2);
 
+  // FIXME for mentor2
+  // remove links from nested models and just display nested model
+  idx = unscopedName.find("::");
+  size_t rIdx = unscopedName.rfind("::");
+  if (idx != std::string::npos && rIdx != std::string::npos &&
+      (idx+1) != rIdx)
+  {
+    unscopedName = unscopedName.substr(0, rIdx);
+  }
+
   return unscopedName;
 }
 
@@ -138,13 +148,15 @@ void SchematicViewWidget::AddNode(const std::string &_node)
   if (name.empty() || this->scene->HasNode(name))
     return;
 
+  std::cerr << "add node " << name << std::endl;
+
   // this must be called before making changes to the graph
   this->scene->clearLayout();
 
   QGVNode *node = this->scene->AddNode(name);
   node->setData(0, tr(_node.c_str()));
   node->setData(1, tr("Link"));
-  this->nodes[_node] = node;
+  this->nodes[name] = node;
   this->scene->applyLayout();
 
   this->FitInView();
@@ -159,11 +171,11 @@ unsigned int SchematicViewWidget::GetNodeCount() const
 /////////////////////////////////////////////////
 void SchematicViewWidget::RemoveNode(const std::string &_node)
 {
-  auto it = this->nodes.find(_node);
+  std::string node = this->UnscopedName(_node);
+
+  auto it = this->nodes.find(node);
   if (it != this->nodes.end())
   {
-    std::string node = this->UnscopedName(_node);
-
     if (node.empty() || !this->scene->HasNode(node))
       return;
 
@@ -181,6 +193,7 @@ void SchematicViewWidget::RemoveNode(const std::string &_node)
 /////////////////////////////////////////////////
 bool SchematicViewWidget::HasNode(const std::string &_name) const
 {
+//  std::string name = this->UnscopedName(_name);
   return this->nodes.find(_name) != this->nodes.end();
 }
 
@@ -198,7 +211,7 @@ void SchematicViewWidget::AddSubGraph(const std::string &_subGraph)
   QGVSubGraph *subGraph = this->scene->AddSubGraph(name);
   subGraph->setData(0, tr(_subGraph.c_str()));
   subGraph->setData(1, tr("Model"));
-  this->subGraphs[_subGraph] = subGraph;
+  this->subGraphs[name] = subGraph;
   this->scene->applyLayout();
 
   this->FitInView();
@@ -207,11 +220,10 @@ void SchematicViewWidget::AddSubGraph(const std::string &_subGraph)
 /////////////////////////////////////////////////
 void SchematicViewWidget::RemoveSubGraph(const std::string &_subGraph)
 {
-  auto it = this->subGraphs.find(_subGraph);
+  std::string subGraph = this->UnscopedName(_subGraph);
+  auto it = this->subGraphs.find(subGraph);
   if (it != this->subGraphs.end())
   {
-    std::string subGraph = this->UnscopedName(_subGraph);
-
     if (subGraph.empty() || !this->scene->HasSubGraph(subGraph))
       return;
 
@@ -229,6 +241,7 @@ void SchematicViewWidget::RemoveSubGraph(const std::string &_subGraph)
 /////////////////////////////////////////////////
 bool SchematicViewWidget::HasSubGraph(const std::string &_name) const
 {
+//  std::string name = this->UnscopedName(_name);
   return this->subGraphs.find(_name) != this->subGraphs.end();
 }
 
@@ -239,6 +252,8 @@ void SchematicViewWidget::AddEdge(const std::string &_id,
 {
   std::string parentNode = this->UnscopedName(_parent);
   std::string childNode = this->UnscopedName(_child);
+
+  std::cerr << "add edge " << parentNode << " - " << childNode << std::endl;
 
   if (parentNode.empty() || childNode.empty())
     return;
@@ -358,7 +373,7 @@ void SchematicViewWidget::OnCustomContextMenu(const QString &_id)
   std::string itemId = _id.toStdString();
   if (this->edges.find(itemId) != this->edges.end())
     gui::model::Events::showJointContextMenu(itemId);
-  else if (this->scene->HasNode(this->UnscopedName(itemId)))
+  else if (this->HasNode(this->UnscopedName(itemId)))
     gui::model::Events::showLinkContextMenu(itemId);
 }
 
@@ -368,7 +383,7 @@ void SchematicViewWidget::OnItemDoubleClicked(const QString &_id)
   std::string itemId = _id.toStdString();
   if (this->HasEdge(itemId))
     gui::model::Events::openJointInspector(itemId);
-  else if (this->HasNode(itemId))
+  else if (this->HasNode(this->UnscopedName(itemId)))
     gui::model::Events::openLinkInspector(itemId);
 }
 
@@ -376,7 +391,7 @@ void SchematicViewWidget::OnItemDoubleClicked(const QString &_id)
 void SchematicViewWidget::OnSetSelectedLink(const std::string &_name,
     bool _selected)
 {
-  auto it = this->nodes.find(_name);
+  auto it = this->nodes.find(this->UnscopedName(_name));
   if (it != this->nodes.end())
     it->second->setSelected(_selected);
 }
