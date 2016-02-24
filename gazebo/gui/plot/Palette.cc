@@ -157,46 +157,82 @@ class PlotItemModel : public QStandardItemModel
 class SearchModel : public QSortFilterProxyModel
 {
   /////////////////////////////////////////////////
-  /// \brief Customize so we accept rows:
-  /// * That match themselves, or
-  /// * That have a parent that matches (on its own), or
-  /// * That have a child that matches.
+  /// \brief Customize so we accept rows where:
+  /// 1. Each of the words can be found in its ancestors or itself, but not
+  /// necessarily all words on the same row, or
+  /// 2. One of its descendants matches rule 1, or
+  /// 3. One of its parents matches rule 1.
+  ///
+  /// For example this structure:
+  /// - a
+  /// -- b
+  /// -- c
+  /// --- d
+  ///
+  /// * A search of "a" will display all rows.
+  /// * A search of "b" or "a b" will display "a" and "b".
+  /// * A search of "c", "d", "a c", "a d", "a c d" or "c d" will display "a",
+  /// "c" and "d".
+  /// * A search of "a b c d", "b c" or "b d" will display nothing.
+  ///
   /// \param[in] _srcRow Row on the source model.
   /// \param[in] _srcParent Parent on the source model.
-  /// \return True if row matches at least one of the conditions.
+  /// \return True if row is accepted.
   public: bool filterAcceptsRow(int _srcRow, const QModelIndex &_srcParent)
       const
   {
-    if (this->filterAcceptsRowItself(_srcRow, _srcParent))
-      return true;
+    auto words = this->search.split(" ");
 
-    // accept if any of the parents is accepted on its own merit
-    QModelIndex parentIndex = _srcParent;
-    while (parentIndex.isValid())
+    // Each word must match at least once, either self, parent or child
+    for (auto word : words)
     {
-      if (this->filterAcceptsRowItself(parentIndex.row(), parentIndex.parent()))
-        return true;
-      parentIndex = parentIndex.parent();
+      // Row itself contains this word
+      if (this->filterAcceptsRowItself(_srcRow, _srcParent, word))
+        continue;
+
+      // One of the ancestors contains this word
+      QModelIndex parentIndex = _srcParent;
+      bool parentAccepted = false;
+      while (parentIndex.isValid())
+      {
+        if (this->filterAcceptsRowItself(parentIndex.row(),
+            parentIndex.parent(), word))
+        {
+          parentAccepted = true;
+          break;
+        }
+        parentIndex = parentIndex.parent();
+      }
+
+      if (parentAccepted)
+        continue;
+
+      // At least one of the children fits rule 1
+      if (this->hasAcceptedChildren(_srcRow, _srcParent))
+        continue;
+
+      // This word can't be found on the row or a parent, and no child is fully
+      // accepted.
+      return false;
     }
 
-    // accept if any of the children is accepted on its own merit
-    if (this->hasAcceptedChildren(_srcRow, _srcParent))
-      return true;
-
-    return false;
+    return true;
   }
 
-  /// \brief Check if the original filter accepts this row.
+  /// \brief Check if row contains the word on itself.
   /// \param[in] _srcRow Row on the source model.
   /// \param[in] _srcParent Parent on the source model.
   /// \return True if row matches.
   public: bool filterAcceptsRowItself(const int _srcRow, const
-      QModelIndex &_srcParent) const
+      QModelIndex &_srcParent, QString _word) const
   {
-    return QSortFilterProxyModel::filterAcceptsRow(_srcRow, _srcParent);
+    auto id = this->sourceModel()->index(_srcRow, 0, _srcParent);
+
+    return (this->sourceModel()->data(id,
+        this->filterRole()).toString().contains(_word, Qt::CaseInsensitive));
   }
 
-  /// \brief Check if any of the children match the filter.
+  /// \brief Check if any of the children is fully accepted.
   /// \param[in] _srcRow Row on the source model.
   /// \param[in] _srcParent Parent on the source model.
   /// \return True if any of the children match.
@@ -210,15 +246,23 @@ class SearchModel : public QSortFilterProxyModel
 
     for (int i = 0; i < item.model()->rowCount(item); ++i)
     {
-      if (this->filterAcceptsRowItself(i, item) ||
-          this->hasAcceptedChildren(i, item))
-      {
+      if (this->filterAcceptsRow(i, item))
         return true;
-      }
     }
 
     return false;
   }
+
+  /// \brief Set a new search value.
+  /// \param[in] _search Full search string.
+  public: void setSearch(const QString &_search)
+  {
+    this->search = _search;
+    this->filterChanged();
+  }
+
+  /// \brief Full search string.
+  public: QString search;
 };
 
 /////////////////////////////////////////////////
@@ -264,8 +308,6 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   this->dataPtr->searchTopicsModel->setFilterRole(
       PlotItemDelegate::TOPIC_NAME_ROLE);
   this->dataPtr->searchTopicsModel->setSourceModel(this->dataPtr->topicsModel);
-  this->dataPtr->searchTopicsModel->setFilterCaseSensitivity(
-      Qt::CaseInsensitive);
 
   // A tree to visualize the topics and their messages.
   auto topicsTree = new QTreeView;
@@ -288,8 +330,6 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   this->dataPtr->searchSimModel->setFilterRole(
       PlotItemDelegate::TOPIC_NAME_ROLE);
   this->dataPtr->searchSimModel->setSourceModel(this->dataPtr->simModel);
-  this->dataPtr->searchSimModel->setFilterCaseSensitivity(
-      Qt::CaseInsensitive);
 
   // A tree to visualize sim variables
   auto simTree = new QTreeView;
@@ -328,6 +368,7 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   searchTopicsTree->setEditTriggers(QAbstractItemView::NoEditTriggers);
   searchTopicsTree->setDragEnabled(true);
   searchTopicsTree->setDragDropMode(QAbstractItemView::DragOnly);
+  // searchTopicsTree->expandAll();
 
   // A tree to visualize sim search results
   auto searchSimTree = new QTreeView;
@@ -340,6 +381,7 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   searchSimTree->setEditTriggers(QAbstractItemView::NoEditTriggers);
   searchSimTree->setDragEnabled(true);
   searchSimTree->setDragDropMode(QAbstractItemView::DragOnly);
+  // searchSimTree->expandAll();
 
   // Search layout
   auto topicsLabel = new QLabel(tr("TOPICS"));
@@ -649,23 +691,7 @@ void Palette::FillFromMsg(google::protobuf::Message *_msg,
 /////////////////////////////////////////////////
 void Palette::UpdateSearch(const QString &_search)
 {
-  // Get all words in any order
-  auto words = _search.split(" ");
-  QString exp;
-  if (!(words.size() == 1 && words[0] == ""))
-  {
-    exp = "^";
-    for (auto word : words)
-    {
-      exp = exp + "(?=.*" + word + ")";
-    }
-    exp = exp + ".*$";
-  }
-
-  if (exp == "")
-    exp = "_no_match_";
-
-  this->dataPtr->searchTopicsModel->setFilterRegExp(exp);
-  this->dataPtr->searchSimModel->setFilterRegExp(exp);
+  this->dataPtr->searchTopicsModel->setSearch(_search);
+  this->dataPtr->searchSimModel->setSearch(_search);
 }
 
