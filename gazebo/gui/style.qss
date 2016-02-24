@@ -178,6 +178,18 @@ QToolButton:checked
   background-color: #454545;
 }
 
+QPushButton#plotPaletteCollapse
+{
+  padding: 4px;
+  font-weight: 300;
+  background-color: rgba(120,120,120,255);
+  color: #ffffff;
+  text-align: center;
+  border: 0px;
+  margin: 0px;
+  padding-bottom: 11px;
+}
+
 QPushButton#plotAddCanvas
 {
   padding: 8px;
@@ -311,6 +323,45 @@ QTreeView QHeaderView:section
   font-weight: bold;
   background: #404040;
   border: 0px;
+}
+
+QTreeView#plotTree::branch:selected:!active
+{
+  background-color: #dddddd;
+}
+
+QTreeView#plotTree::branch:selected:active
+{
+  background-color: #dddddd;
+}
+
+QTreeView#plotTree::branch:has-siblings:!adjoins-item
+{
+  border-image: url(:/images/vline.png) 0;
+}
+
+QTreeView#plotTree::branch:has-siblings:adjoins-item
+{
+  border-image: url(:/images/branch-more.png) 0;
+}
+
+QTreeView#plotTree::branch:!has-children:!has-siblings:adjoins-item
+{
+  border-image: url(:/images/branch-end.png) 0;
+}
+
+QTreeView#plotTree::branch:has-children:!has-siblings:closed,
+QTreeView#plotTree::branch:closed:has-children:has-siblings
+{
+  border-image: none;
+  image: url(:/images/right_arrow.png);
+}
+
+QTreeView#plotTree::branch:open:has-children:!has-siblings,
+QTreeView#plotTree::branch:open:has-children:has-siblings
+{
+  border-image: none;
+  image: url(:/images/down_arrow.png);
 }
 
 QLineEdit
@@ -790,6 +841,7 @@ QTextEdit#splashVersionTextEdit
 QDialog#plotWindow
 {
   background-color: #f2f2f2;
+  font-family: Roboto;
 }
 
 QWidget#plotCanvas
@@ -884,3 +936,72 @@ QwtPlot#incrementalPlot > QwtLegend > QwtLegendLabel
 {
   background-color: #ffffff;
 }
+
+QTabBar#plottingTabBar::tab
+{
+  border-radius: 0px;
+  border: 0px;
+}
+
+QTabBar#plottingTabBar::tab:focus
+{
+  outline: 0px;
+}
+
+QTabBar#plottingTabBar::tab
+{
+  min-width: 8ex;
+  background-color: rgba(120,120,120,255);
+
+  margin: 0px;
+  padding: 10px;
+}
+
+QTabBar#plottingTabBar::tab:!selected
+{
+  color: rgba(240, 240, 240, 180);
+  background-color: rgba(120,120,120,255);
+  border-bottom: 2px solid rgba(0, 0, 0, 0);
+  font-weight: 400;
+}
+
+QTabBar#plottingTabBar::tab:selected
+{
+  color: #f58113;
+  background-color: rgba(120,120,120,255);
+  border-bottom: 2px solid #f58113;
+  font-weight: 600;
+}
+
+QTabBar#plottingTabBar::tab:first:selected
+{
+  margin-left: 0;
+}
+
+QTabBar#plottingTabBar::tab:last:selected
+{
+  margin-right: 0;
+}
+
+QTabBar#plottingTabBar::tab::only-one
+{
+  margin-left: 0;
+  margin-right: 0;
+}
+
+QTabBar#plottingTabBar
+{
+  background-color: rgba(120,120,120,255);
+  margin: 0px;
+  padding: 0px;
+}
+
+QTabBar#plottingTabBar::pane,
+{
+  background-color: #777777;
+  padding: 0px;
+  margin: 0px;
+  border: 0px;
+  color: #fafafa;
+}
+

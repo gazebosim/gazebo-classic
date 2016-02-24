@@ -5,6 +5,7 @@ set (sources_local
   plot/PlotCanvas.cc
   plot/PlotCurve.cc
   plot/PlotManager.cc
+  plot/Palette.cc
   plot/PlotWindow.cc
   plot/TopicDataHandler.cc
   plot/VariablePill.cc
@@ -14,6 +15,7 @@ set (sources_local
 set (qt_headers_local
   plot/IncrementalPlot.hh
   plot/PlotCanvas.hh
+  plot/Palette.hh
   plot/PlotWindow.hh
   plot/VariablePill.hh
   plot/VariablePillContainer.hh

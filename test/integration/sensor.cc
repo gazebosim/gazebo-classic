@@ -35,6 +35,19 @@ TEST_F(SensorTest, GetScopedName)
   EXPECT_EQ(sensorName, std::string("default::rotated_box::link::cam1"));
 }
 
+/////////////////////////////////////////////////
+// Make sure sensors can run without asserting in a world with a large
+// step size.
+TEST_F(SensorTest, FastSensor)
+{
+  Load("worlds/fast_sensor_test.world");
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // This test will cause an assertion if maxSensorUpdate in
+  // SensorManager::SensorContainer::RunLoop() is set improperly
+}
+
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

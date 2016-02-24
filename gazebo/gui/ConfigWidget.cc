@@ -103,13 +103,7 @@ google::protobuf::Message *ConfigWidget::Msg()
 }
 
 /////////////////////////////////////////////////
-std::string ConfigWidget::GetHumanReadableKey(const std::string &_key)
-{
-  return this->HumanReadableKey(_key);
-}
-
-/////////////////////////////////////////////////
-std::string ConfigWidget::HumanReadableKey(const std::string &_key) const
+std::string ConfigWidget::HumanReadableKey(const std::string &_key)
 {
   std::string humanKey = _key;
   humanKey[0] = std::toupper(humanKey[0]);

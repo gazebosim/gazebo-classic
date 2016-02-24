@@ -29,6 +29,7 @@
 #include "gazebo/msgs/any.pb.h"
 #include "gazebo/msgs/empty.pb.h"
 #include "gazebo/msgs/gz_string.pb.h"
+#include "gazebo/msgs/msgs.hh"
 #include "gazebo/msgs/param.pb.h"
 #include "gazebo/msgs/param_v.pb.h"
 #include "gazebo/util/IntrospectionManager.hh"
@@ -94,8 +95,7 @@ std::string IntrospectionManager::Id() const
 
 //////////////////////////////////////////////////
 bool IntrospectionManager::Register(const std::string &_item,
-    const std::string &_type,
-    const std::function <bool (gazebo::msgs::Any &_msg)> &_cb)
+    const std::function <gazebo::msgs::Any ()> &_cb)
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
@@ -106,8 +106,7 @@ bool IntrospectionManager::Register(const std::string &_item,
     return false;
   }
 
-  this->dataPtr->allItems[_item].type = _type;
-  this->dataPtr->allItems[_item].cb = _cb;
+  this->dataPtr->allItems[_item] = _cb;
   return true;
 }
 
@@ -159,17 +158,18 @@ void IntrospectionManager::Update()
     if (itemIter == this->dataPtr->allItems.end())
       continue;
 
-    // Update the values of the items under observation.
-    gazebo::msgs::Any value;
-
-    if (!itemIter->second.cb(value))
+    try
     {
-      gzerr << "Something went wrong updating the value for item [" << item
-            << "]." << std::endl;
+      // Update the values of the items under observation.
+      gazebo::msgs::Any value = itemIter->second();
+      auto &lastValue = observedItem.second.lastValue;
+      lastValue.CopyFrom(value);
+    }
+    catch(...)
+    {
+      gzerr << "Exception caught calling user callback" << std::endl;
       continue;
     }
-    auto &lastValue = observedItem.second.lastValue;
-    lastValue.CopyFrom(value);
   }
 
   // Prepare the next message to be sent in each filter.
@@ -186,10 +186,15 @@ void IntrospectionManager::Update()
       if (this->dataPtr->allItems.find(item) == this->dataPtr->allItems.end())
         continue;
 
+      // Sanity check: Make sure that the value was updated.
+      // (e.g.: an exception was not raised).
+      auto &lastValue = this->dataPtr->observedItems[item].lastValue;
+      if (lastValue.type() == gazebo::msgs::Any::NONE)
+        continue;
+
       auto nextParam = nextMsg.add_param();
       nextParam->set_name(item);
-      nextParam->mutable_value()->CopyFrom(
-          this->dataPtr->observedItems[item].lastValue);
+      nextParam->mutable_value()->CopyFrom(lastValue);
     }
 
     // Sanity check: Make sure that we have at least one item updated.
@@ -492,10 +497,6 @@ void IntrospectionManager::Items(const gazebo::msgs::Empty &/*_req*/,
       nextParam->set_name("item");
       nextParam->mutable_value()->set_type(gazebo::msgs::Any::STRING);
       nextParam->mutable_value()->set_string_value(item.first);
-      auto childParam = nextParam->add_children();
-      childParam->set_name("type");
-      childParam->mutable_value()->set_type(gazebo::msgs::Any::STRING);
-      childParam->mutable_value()->set_string_value(item.second.type);
     }
   }
   _result = true;
