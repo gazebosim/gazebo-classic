@@ -31,16 +31,10 @@ if (NOT APPLE)
     set_world_pose.cc
     transport_stress.cc
   )
-  set (GZ_BUILD_TESTS_EXTRA_LIBS
-    gazebo_test_fixture
-  )
-  gz_build_tests(${fixture_tests})
+  gz_build_tests(${fixture_tests} EXTRA_LIBS gazebo_test_fixture)
 
   set(tool_tests
     gz_stress.cc
   )
-  set (GZ_BUILD_TESTS_EXTRA_LIBS
-    gazebo_transport
-  )
-  gz_build_tests(${tool_tests})
+  gz_build_tests(${tool_tests} EXTRA_LIBS gazebo_transport)
 endif()

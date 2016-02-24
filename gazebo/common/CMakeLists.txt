@@ -180,10 +180,7 @@ if (HAVE_FFMPEG)
                      AudioDecoder_TEST.cc)
 endif()
 
-set (GZ_BUILD_TESTS_EXTRA_LIBS
-  gazebo_common
-)
-gz_build_tests(${gtest_sources})
+gz_build_tests(${gtest_sources} EXTRA_LIBS gazebo_common)
 
 set (common_headers "" CACHE INTERNAL "common headers" FORCE)
 foreach (hdr ${headers})

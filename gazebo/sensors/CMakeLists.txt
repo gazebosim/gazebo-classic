@@ -65,10 +65,7 @@ set (headers
 set (gtest_sources
   Noise_TEST.cc
 )
-set (GZ_BUILD_TESTS_EXTRA_LIBS
-  gazebo_sensors
-)
-gz_build_tests(${gtest_sources})
+gz_build_tests(${gtest_sources} EXTRA_LIBS gazebo_sensors)
 
 set (gtest_fixture_sources
   AltimeterSensor_TEST.cc
@@ -82,22 +79,16 @@ set (gtest_fixture_sources
   WirelessReceiver_TEST.cc
   WirelessTransmitter_TEST.cc
 )
-set (GZ_BUILD_TESTS_EXTRA_LIBS
-  gazebo_sensors
-  gazebo_test_fixture
-)
-gz_build_tests(${gtest_fixture_sources})
+gz_build_tests(${gtest_fixture_sources}
+  EXTRA_LIBS gazebo_sensors gazebo_test_fixture)
 
 set (gtest_sources_dri
   CameraSensor_TEST.cc
   GpuRaySensor_TEST.cc
   SensorManager_TEST.cc
 )
-set (GZ_BUILD_TESTS_EXTRA_LIBS
-  gazebo_sensors
-  gazebo_test_fixture
-)
-gz_build_dri_tests(${gtest_sources_dri})
+gz_build_dri_tests(${gtest_sources_dri}
+  EXTRA_LIBS gazebo_sensors gazebo_test_fixture)
 
 set (sensors_headers "" CACHE INTERNAL "sensors headers" FORCE)
 foreach (hdr ${headers})

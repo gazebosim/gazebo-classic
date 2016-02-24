@@ -74,7 +74,4 @@ gz_install_includes("transport" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/transport
 set (gtest_sources
   Connection_TEST.cc
 )
-set (GZ_BUILD_TESTS_EXTRA_LIBS
-  gazebo_transport
-)
-gz_build_tests(${gtest_sources})
+gz_build_tests(${gtest_sources} EXTRA_LIBS gazebo_transport)

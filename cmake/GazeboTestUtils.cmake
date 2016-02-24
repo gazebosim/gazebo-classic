@@ -4,14 +4,31 @@
 # the variable GZ_BUILD_TESTS_EXTRA_EXE_SRCS. This variable will be clean up
 # at the end of the function
 #
-# VAR: GZ_BUILD_TESTS_EXTRA_LIBS
-# Hack: extra libs to build binaries can be supplied to gz_build_tests in
-# the variable GZ_BUILD_TESTS_EXTRA_LIBS. This variable will be clean up
-# at the end of the function
+# ARG: EXTRA_LIBS
+# List extra libraries that the sources should be linked against after the
+# EXTRA_LIBS tag. Example:
+# gz_build_tests(${test_sources} EXTRA_LIBS ${test_libraries})
 #
 macro (gz_build_tests)
+  set(_append_sources TRUE)
+
+  set(_sources)
+  set(_extra_libs)
+
+  foreach(arg ${ARGN})
+    if ("${arg}" STREQUAL "EXTRA_LIBS")
+      set(_append_sources FALSE)
+    else()
+      if (_append_sources)
+        list(APPEND _sources ${arg})
+      else()
+        list(APPEND _extra_libs ${arg})
+      endif()
+    endif()
+  endforeach()
+
   # Build all the tests
-  foreach(GTEST_SOURCE_file ${ARGN})
+  foreach(GTEST_SOURCE_file ${_sources})
     string(REGEX REPLACE "\\.cc" "" BINARY_NAME ${GTEST_SOURCE_file})
     set(BINARY_NAME ${TEST_TYPE}_${BINARY_NAME})
     if(USE_LOW_MEMORY_TESTS)
@@ -20,19 +37,17 @@ macro (gz_build_tests)
     add_executable(${BINARY_NAME} ${GTEST_SOURCE_file}
                    ${GZ_BUILD_TESTS_EXTRA_EXE_SRCS})
 
-
     link_directories(${PROJECT_BINARY_DIR}/test)
     add_dependencies(${BINARY_NAME}
       gtest
       gtest_main
-      ${GZ_BUILD_TESTS_EXTRA_LIBS}
+      ${_extra_libs}
     )
-
 
     target_link_libraries(${BINARY_NAME}
       gtest
       gtest_main
-      ${GZ_BUILD_TESTS_EXTRA_LIBS}
+      ${_extra_libs}
     )
     if (UNIX)
       # gtest uses pthread on UNIX
@@ -64,7 +79,6 @@ macro (gz_build_tests)
   endforeach()
 
   set(GZ_BUILD_TESTS_EXTRA_EXE_SRCS "")
-  set(GZ_BUILD_TESTS_EXTRA_LIBS "")
 endmacro()
 
 if (VALID_DISPLAY)
