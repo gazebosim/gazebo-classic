@@ -5,6 +5,9 @@
 1. Atmosphere model
     * [Pull request #1989](https://bitbucket.org/osrf/gazebo/pull-request/1989)
 
+1. Added static camera when following a model.
+    * [Pull request #1980](https://bitbucket.org/osrf/gazebo/pull-request/1980)
+
 ## Gazebo 7.0.0 (2016-01-25)
 
 1. Add FollowerPlugin

@@ -120,6 +120,11 @@ if (ENABLE_TESTS_COMPILATION)
   set_tests_properties(${TEST_TYPE}_physics PROPERTIES TIMEOUT 500)
   set_tests_properties(${TEST_TYPE}_worlds_installed PROPERTIES TIMEOUT 700)
 
+  # Increase timeout for debug-mode
+  if (${CMAKE_BUILD_TYPE_UPPERCASE} STREQUAL "DEBUG")
+    set_tests_properties(${TEST_TYPE}_joint_gearbox PROPERTIES TIMEOUT 400)
+  endif()
+
   # Add plugin dependency
   add_dependencies(${TEST_TYPE}_joint_test SpringTestPlugin)
 endif()
@@ -152,6 +157,7 @@ set(qt_tests
   insert_model.cc
   model_editor.cc
   model_manipulation.cc
+  track_visual.cc
   undo.cc
   visual_pose.cc
 )

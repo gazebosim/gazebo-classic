@@ -71,6 +71,10 @@ bool g_fullscreen = false;
 // qRegisterMetaType is also required, see below.
 Q_DECLARE_METATYPE(common::Time)
 
+// This makes it possible to use std::string in QT signals and slots.
+// qRegisterMetaType is also required, see below.
+Q_DECLARE_METATYPE(std::string)
+
 //////////////////////////////////////////////////
 void print_usage()
 {
@@ -258,6 +262,10 @@ bool gui::load()
   // Register common::Time as a type that can be used in signals and slots.
   // Q_DECLARE_METATYPE is also required, see above.
   qRegisterMetaType<common::Time>();
+
+  // Register std::string as a type that can be used in signals and slots.
+  // Q_DECLARE_METATYPE is also required, see above.
+  qRegisterMetaType<std::string>();
 
   g_splashScreen = new gui::SplashScreen();
 

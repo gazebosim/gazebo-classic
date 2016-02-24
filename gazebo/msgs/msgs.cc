@@ -638,6 +638,21 @@ namespace gazebo
       if (_sdf->HasElement("max_dist"))
         result.set_max_dist(_sdf->GetElement("max_dist")->Get<double>());
 
+      if (_sdf->HasElement("static"))
+        result.set_static_(_sdf->Get<bool>("static"));
+
+      if (_sdf->HasElement("use_model_frame"))
+        result.set_use_model_frame(_sdf->Get<bool>("use_model_frame"));
+
+      if (_sdf->HasElement("inherit_yaw"))
+        result.set_inherit_yaw(_sdf->Get<bool>("inherit_yaw"));
+
+      if (_sdf->HasElement("xyz"))
+      {
+        msgs::Set(result.mutable_xyz(),
+            _sdf->Get<ignition::math::Vector3d>("xyz"));
+      }
+
       return result;
     }
 

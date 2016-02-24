@@ -118,7 +118,7 @@ void OculusWindow::AttachCameraToVisual()
     return;
   }
 
-  this->oculusCamera->AttachToVisual(this->visualName, true);
+  this->oculusCamera->AttachToVisual(this->visualName, true, 0, 0);
 
   math::Vector3 camPos(0.1, 0, 0);
   math::Vector3 lookAt(0, 0, 0);

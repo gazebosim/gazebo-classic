@@ -66,7 +66,6 @@ release will remove the deprecated code.
     + ***Removed:*** public: template<typename T> event::ConnectionPtr ConnectNewImageFrame(T _subscriber);
     + ***Replacement:*** public: event::ConnectionPtr ConnectNewImageFrame(std::function<void (const unsigned char *, unsigned int, unsigned int, unsigned int, const std::string &)> _subscriber);
 
-
 1. **gazebo/msgs/logical_camera_sensors.proto**
     + The `near` and `far` members have been replaced with `near_clip` and `far_clip`
     + [Pull request #1942](https://bitbucket.org/osrf/gazebo/pull-request/1942)
