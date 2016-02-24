@@ -55,15 +55,34 @@ void GraphScene::RemoveNode(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-bool GraphScene::HasNode(const std::string &_name)
+bool GraphScene::HasNode(const std::string &_name) const
 {
   return this->hasNode(tr(_name.c_str()));
 }
 
 /////////////////////////////////////////////////
-QGVNode *GraphScene::GetNode(const std::string &_name)
+QGVNode *GraphScene::GetNode(const std::string &_name) const
 {
   return this->getNode(tr(_name.c_str()));
+}
+
+/////////////////////////////////////////////////
+QGVSubGraph *GraphScene::AddSubGraph(const std::string &_name)
+{
+  QGVSubGraph *subGraph = this->addSubGraph(tr(_name.c_str()), false);
+  return subGraph;
+}
+
+/////////////////////////////////////////////////
+void GraphScene::RemoveSubGraph(const std::string &_name)
+{
+  this->removeSubGraph(tr(_name.c_str()));
+}
+
+/////////////////////////////////////////////////
+bool GraphScene::HasSubGraph(const std::string &_name) const
+{
+  return this->hasSubGraph(tr(_name.c_str()));
 }
 
 /////////////////////////////////////////////////

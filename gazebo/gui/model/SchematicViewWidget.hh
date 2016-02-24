@@ -27,6 +27,7 @@
 #include "gazebo/gui/qt.h"
 
 class QGVNode;
+class QGVSubGraph;
 class QGVEdge;
 
 namespace gazebo
@@ -67,6 +68,19 @@ namespace gazebo
       /// \param[in] _name Name of the node.
       /// \return True if the node exists.
       public: bool HasNode(const std::string &_name) const;
+
+      /// \brief Add a sub graph to the scene in the widget.
+      /// \param[in] _subGraph Name of subGraph.
+      public: void AddSubGraph(const std::string &_subGraph);
+
+      /// \brief Remove a sub graph from the scene in the widget
+      /// \param[in] _node Name of sub graph.
+      public: void RemoveSubGraph(const std::string &_subGraph);
+
+      /// \brief Check if a sub graph exists in the scene in the widget.
+      /// \param[in] _name Name of the sub graph.
+      /// \return True if the sub graph exists.
+      public: bool HasSubGraph(const std::string &_name) const;
 
       /// \brief Add an edge to the scene in the widget
       /// \param[in] _id Unique id of edge.
@@ -164,6 +178,9 @@ namespace gazebo
 
       /// \brief A map of node id to node item.
       private: std::map<std::string, QGVNode *> nodes;
+
+      /// \brief A map of subgraph id to subgraph item.
+      private: std::map<std::string, QGVSubGraph *> subGraphs;
 
       /// \brief A list of gazebo event connections.
       private: std::vector<event::ConnectionPtr> connections;

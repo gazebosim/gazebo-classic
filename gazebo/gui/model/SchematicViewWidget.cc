@@ -22,6 +22,7 @@
 
 #include "gazebo/gui/qgv/QGVNode.h"
 #include "gazebo/gui/qgv/QGVEdge.h"
+#include "gazebo/gui/qgv/QGVSubGraph.h"
 
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/GraphScene.hh"
@@ -88,10 +89,10 @@ void SchematicViewWidget::Init()
       boost::bind(&SchematicViewWidget::RemoveNode, this, _1)));
 
   this->connections.push_back(gui::model::Events::ConnectNestedModelInserted(
-      boost::bind(&SchematicViewWidget::AddNode, this, _1)));
+      boost::bind(&SchematicViewWidget::AddSubGraph, this, _1)));
 
   this->connections.push_back(gui::model::Events::ConnectNestedModelRemoved(
-      boost::bind(&SchematicViewWidget::RemoveNode, this, _1)));
+      boost::bind(&SchematicViewWidget::RemoveSubGraph, this, _1)));
 
   this->connections.push_back(gui::model::Events::ConnectJointInserted(
       boost::bind(&SchematicViewWidget::AddEdge, this, _1, _2, _3, _4, _5)));
@@ -133,8 +134,6 @@ std::string SchematicViewWidget::UnscopedName(const std::string &_scopedName)
 void SchematicViewWidget::AddNode(const std::string &_node)
 {
   std::string name = this->UnscopedName(_node);
-
-  std::cerr << "          add node " << name << std::endl;
 
   if (name.empty() || this->scene->HasNode(name))
     return;
@@ -183,6 +182,54 @@ void SchematicViewWidget::RemoveNode(const std::string &_node)
 bool SchematicViewWidget::HasNode(const std::string &_name) const
 {
   return this->nodes.find(_name) != this->nodes.end();
+}
+
+/////////////////////////////////////////////////
+void SchematicViewWidget::AddSubGraph(const std::string &_subGraph)
+{
+  std::string name = this->UnscopedName(_subGraph);
+
+  if (name.empty() || this->scene->HasSubGraph(name))
+    return;
+
+  // this must be called before making changes to the graph
+  this->scene->clearLayout();
+
+  QGVSubGraph *subGraph = this->scene->AddSubGraph(name);
+  subGraph->setData(0, tr(_subGraph.c_str()));
+  subGraph->setData(1, tr("Model"));
+  this->subGraphs[_subGraph] = subGraph;
+  this->scene->applyLayout();
+
+  this->FitInView();
+}
+
+/////////////////////////////////////////////////
+void SchematicViewWidget::RemoveSubGraph(const std::string &_subGraph)
+{
+  auto it = this->subGraphs.find(_subGraph);
+  if (it != this->subGraphs.end())
+  {
+    std::string subGraph = this->UnscopedName(_subGraph);
+
+    if (subGraph.empty() || !this->scene->HasSubGraph(subGraph))
+      return;
+
+    // this must be called before making changes to the graph
+    this->scene->clearLayout();
+    this->scene->RemoveSubGraph(subGraph);
+
+    this->scene->applyLayout();
+    this->FitInView();
+
+    this->subGraphs.erase(it);
+  }
+}
+
+/////////////////////////////////////////////////
+bool SchematicViewWidget::HasSubGraph(const std::string &_name) const
+{
+  return this->subGraphs.find(_name) != this->subGraphs.end();
 }
 
 /////////////////////////////////////////////////

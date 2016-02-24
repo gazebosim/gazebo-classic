@@ -51,21 +51,26 @@ class GZ_GUI_VISIBLE QGVScene : public QGraphicsScene
     void setEdgeAttribute(const QString &name, const QString &value);
 
     QGVNode* addNode(const QString& label);
+    QGVSubGraph* addSubGraph(const QString& name, bool cluster = true);
+
     QGVEdge* addEdge(QGVNode* source, QGVNode* target, const QString& label);
     QGVEdge *addEdge(const QString &source, const QString &target,
         const QString &label);
 
-    QGVSubGraph* addSubGraph(const QString& name, bool cluster = true);
     void removeNode(const QString &label);
+    void removeSubGraph(const QString &_name);
 //    void removeEdge(const QString& source, const QString& target);
 //    void removeEdge(const QPair<QString, QString>& key);
     void removeEdge(const QString &label);
 
-    bool hasNode(const QString &name);
-    QGVNode *getNode(const QString &name);
+    bool hasNode(const QString &name) const;
+    QGVNode *getNode(const QString &name) const;
 
-    bool hasEdge(const QString &_label);
-    QGVEdge *getEdge(const QString &_label);
+    bool hasSubGraph(const QString &name) const;
+    QGVSubGraph *getSubGraph(const QString &name) const;
+
+    bool hasEdge(const QString &_label) const;
+    QGVEdge *getEdge(const QString &_label) const;
 
     void setRootNode(QGVNode *node);
 

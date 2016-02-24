@@ -54,12 +54,26 @@ namespace gazebo
       /// \brief Check if a node exists in the scene.
       /// \param[in] _name Name of the node.
       /// \return True if the node exists.
-      public: bool HasNode(const std::string &_name);
+      public: bool HasNode(const std::string &_name) const;
 
       /// \brief Get a node from the scene.
       /// \param[in] _name Name of the name.
       /// \return Pointer to the node, NULL if it does not exist.
-      public: QGVNode *GetNode(const std::string &_name);
+      public: QGVNode *GetNode(const std::string &_name) const;
+
+      /// \brief Add a sub-graph to the scene.
+      /// \param[in] _name Name of the subgraph.
+      /// \return the Sub-graph created.
+      public: QGVSubGraph *AddSubGraph(const std::string &_name);
+
+      /// \brief Remove a sub-graph from the scene.
+      /// \param[in] _name Name of the sub-graph.
+      public: void RemoveSubGraph(const std::string &_name);
+
+      /// \brief Check if a sub-graph exists in the scene.
+      /// \param[in] _name Name of the sub-graph.
+      /// \return True if the sub-graph exists.
+      public: bool HasSubGraph(const std::string &_name) const;
 
       /// \brief Add an edge to connect two nodes.
       /// \param[in] _id Edge ID.

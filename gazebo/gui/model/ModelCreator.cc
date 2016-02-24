@@ -1202,8 +1202,8 @@ LinkData *ModelCreator::CreateLinkFromSDF(const sdf::ElementPtr &_linkElem,
   // emit linkInserted events for all links, including links in nested models
   // gui::model::Events::linkInserted(linkName);
   // FIXME trying to fix graphviz bug. Disabling events for nested links
-  if (_parentVis == this->previewVisual)
-    gui::model::Events::linkInserted(linkName);
+  // if (_parentVis == this->previewVisual)
+  gui::model::Events::linkInserted(linkName);
 
   {
     std::lock_guard<std::recursive_mutex> lock(this->updateMutex);

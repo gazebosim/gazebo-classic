@@ -137,6 +137,16 @@ QGVSubGraph *QGVScene::addSubGraph(const QString &name, bool cluster)
   return item;
 }
 
+void QGVScene::removeSubGraph(const QString &_name)
+{
+  if (_subGraphs.contains(_name))
+  {
+    agdelete(_graph->graph(), _subGraphs[_name]->_sgraph->graph());
+    removeItem(_subGraphs[_name]);
+    _subGraphs.remove(_name);
+  }
+}
+
 void QGVScene::removeNode(const QString &label)
 {
   if (_nodes.contains(label))
@@ -168,12 +178,12 @@ void QGVScene::removeEdge(const QString &_label)
   }
 }
 
-bool QGVScene::hasNode(const QString &_name)
+bool QGVScene::hasNode(const QString &_name) const
 {
   return _nodes.contains(_name);
 }
 
-QGVNode *QGVScene::getNode(const QString &_name)
+QGVNode *QGVScene::getNode(const QString &_name) const
 {
   if (this->hasNode(_name))
     return _nodes[_name];
@@ -181,12 +191,25 @@ QGVNode *QGVScene::getNode(const QString &_name)
     return NULL;
 }
 
-bool QGVScene::hasEdge(const QString &_label)
+bool QGVScene::hasSubGraph(const QString &_name) const
+{
+  return _subGraphs.contains(_name);
+}
+
+QGVSubGraph *QGVScene::getSubGraph(const QString &_name) const
+{
+  if (this->hasSubGraph(_name))
+    return _subGraphs[_name];
+  else
+    return NULL;
+}
+
+bool QGVScene::hasEdge(const QString &_label) const
 {
   return _edges.contains(_label);
 }
 
-QGVEdge *QGVScene::getEdge(const QString &_label)
+QGVEdge *QGVScene::getEdge(const QString &_label) const
 {
   if (this->hasEdge(_label))
     return _edges[_label];
