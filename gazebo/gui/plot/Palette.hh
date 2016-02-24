@@ -68,6 +68,10 @@ namespace gazebo
       private: void FillFromMsg(google::protobuf::Message *_msg,
                    QStandardItem *_item, const std::string &_uri);
 
+      /// \brief Callback when the user has modified the search.
+      /// \param[in] _search Latest search.
+      private slots: void UpdateSearch(const QString &_search);
+
       /// \internal
       /// \brief Pointer to private data.
       private: std::unique_ptr<PalettePrivate> dataPtr;
