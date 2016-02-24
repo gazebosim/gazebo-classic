@@ -239,12 +239,69 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
         ignition::math::Pose3d cameraPose = cam->WorldPose();
 
         this->FillPoseProperty(msgs::Convert(cameraPose), item);
-        // set expanded to true by default for easier viewing
-        this->dataPtr->propTreeBrowser->setExpanded(cameraBrowser, true);
-        for (auto browser : cameraBrowser->children())
-        {
-          this->dataPtr->propTreeBrowser->setExpanded(browser, true);
-        }
+      }
+
+      // Create and set the gui camera position relative to a tracked model
+      item = this->dataPtr->variantManager->addProperty(
+          QtVariantPropertyManager::groupTypeId(), tr("track_visual"));
+      {
+        topItem->addSubProperty(item);
+
+        rendering::VisualPtr trackedVisual = cam->TrackedVisual();
+        QtVariantProperty *item2 = this->dataPtr->variantManager->addProperty(
+            QVariant::String, tr("name"));
+        if (trackedVisual)
+            item2->setValue(trackedVisual->GetName().c_str());
+        else
+            item2->setValue("");
+        item2->setEnabled(false);
+        item->addSubProperty(item2);
+
+        bool isStatic = cam->TrackIsStatic();
+        item2 = this->dataPtr->variantManager->addProperty(
+            QVariant::Bool, tr("static"));
+        item2->setValue(isStatic);
+        item->addSubProperty(item2);
+
+        bool useModelFrame = cam->TrackUseModelFrame();
+        item2 = this->dataPtr->variantManager->addProperty(
+            QVariant::Bool, tr("use_model_frame"));
+        item2->setValue(useModelFrame);
+        item->addSubProperty(item2);
+
+        bool inheritYaw = cam->TrackInheritYaw();
+        item2 = this->dataPtr->variantManager->addProperty(
+            QVariant::Bool, tr("inherit_yaw"));
+        item2->setValue(inheritYaw);
+        item->addSubProperty(item2);
+
+        ignition::math::Vector3d trackPos = cam->TrackPosition();
+        this->FillVector3dProperty(msgs::Convert(trackPos), item);
+
+        double minDist = cam->TrackMinDistance();
+        item2 = this->dataPtr->variantManager->addProperty(
+            QVariant::Double, tr("min_distance"));
+        static_cast<QtVariantPropertyManager*>
+          (this->dataPtr->variantFactory->propertyManager(item2))->setAttribute(
+              item2, "decimals", 6);
+        item2->setValue(minDist);
+        item->addSubProperty(item2);
+
+        double maxDist = cam->TrackMaxDistance();
+        item2 = this->dataPtr->variantManager->addProperty(
+            QVariant::Double, tr("max_distance"));
+        static_cast<QtVariantPropertyManager*>
+          (this->dataPtr->variantFactory->propertyManager(item2))->setAttribute(
+              item2, "decimals", 6);
+        item2->setValue(maxDist);
+        item->addSubProperty(item2);
+      }
+
+      // set expanded to true by default for easier viewing
+      this->dataPtr->propTreeBrowser->setExpanded(cameraBrowser, true);
+      for (auto browser : cameraBrowser->children())
+      {
+        this->dataPtr->propTreeBrowser->setExpanded(browser, true);
       }
     }
     else
@@ -719,15 +776,12 @@ void ModelListWidget::LightPropertyChanged(QtProperty * /*_item*/)
 /////////////////////////////////////////////////
 void ModelListWidget::GUIPropertyChanged(QtProperty *_item)
 {
-  // Only camera pose editable for now
+  // Only camera pose and follow parameters editable for now
   QtProperty *cameraProperty = this->ChildItem("camera");
   if (!cameraProperty)
     return;
 
   QtProperty *cameraPoseProperty = this->ChildItem(cameraProperty, "pose");
-  if (!cameraPoseProperty)
-    return;
-
   if (cameraPoseProperty)
   {
     std::string changedProperty = _item->propertyName().toStdString();
@@ -743,6 +797,52 @@ void ModelListWidget::GUIPropertyChanged(QtProperty *_item)
       rendering::UserCameraPtr cam = gui::get_active_camera();
       if (cam)
         cam->SetWorldPose(msgs::ConvertIgn(poseMsg));
+    }
+  }
+
+  QtProperty *cameraFollowProperty = this->ChildItem(cameraProperty,
+                                                        "track_visual");
+  if (cameraFollowProperty)
+  {
+    rendering::UserCameraPtr cam = gui::get_active_camera();
+    if (!cam)
+      return;
+    std::string changedProperty = _item->propertyName().toStdString();
+    if (changedProperty == "static")
+    {
+      cam->SetTrackIsStatic(this->dataPtr->variantManager->value(
+             this->ChildItem(cameraFollowProperty, "static")).toBool());
+    }
+    else if (changedProperty == "use_model_frame")
+    {
+      cam->SetTrackUseModelFrame(this->dataPtr->variantManager->value(
+             this->ChildItem(cameraFollowProperty,
+                             "use_model_frame")).toBool());
+    }
+    else if (changedProperty == "inherit_yaw")
+    {
+      cam->SetTrackInheritYaw(this->dataPtr->variantManager->value(
+             this->ChildItem(cameraFollowProperty, "inherit_yaw")).toBool());
+    }
+    else if (changedProperty == "x"
+        || changedProperty == "y"
+        || changedProperty == "z")
+    {
+      msgs::Vector3d msg;
+      this->FillVector3Msg(cameraFollowProperty, &msg);
+      cam->SetTrackPosition(msgs::ConvertIgn(msg));
+    }
+    else if (changedProperty == "min_distance")
+    {
+      cam->SetTrackMinDistance(this->dataPtr->variantManager->value(
+             this->ChildItem(cameraFollowProperty,
+               "min_distance")).toDouble());
+    }
+    else if (changedProperty == "max_distance")
+    {
+      cam->SetTrackMaxDistance(this->dataPtr->variantManager->value(
+             this->ChildItem(cameraFollowProperty,
+               "max_distance")).toDouble());
     }
   }
 }
@@ -2705,30 +2805,30 @@ void ModelListWidget::FillPropertyTree(const msgs::Scene &_msg,
   this->dataPtr->propTreeBrowser->addProperty(item);
 
   /// \TODO: Put fog back in
-  /*topItem = this->variantManager->addProperty(
+  /*topItem = this->dataPtr->variantManager->addProperty(
       QtVariantPropertyManager::groupTypeId(), tr("fog"));
-  QtBrowserItem *bItem = this->propTreeBrowser->addProperty(topItem);
-  this->propTreeBrowser->setExpanded(bItem, false);
+  QtBrowserItem *bItem = this->dataPtr->propTreeBrowser->addProperty(topItem);
+  this->dataPtr->propTreeBrowser->setExpanded(bItem, false);
 
-  item = this->variantManager->addProperty(QVariant::Color, tr("color"));
+  item = this->dataPtr->variantManager->addProperty(QVariant::Color, tr("color"));
   topItem->addSubProperty(item);
 
-  item = this->variantManager->addProperty(QVariant::Double, tr("start"));
+  item = this->dataPtr->variantManager->addProperty(QVariant::Double, tr("start"));
   topItem->addSubProperty(item);
 
-  item = this->variantManager->addProperty(QVariant::Double, tr("end"));
+  item = this->dataPtr->variantManager->addProperty(QVariant::Double, tr("end"));
   topItem->addSubProperty(item);
 
-  item = this->variantManager->addProperty(QVariant::Double, tr("density"));
+  item = this->dataPtr->variantManager->addProperty(QVariant::Double, tr("density"));
   topItem->addSubProperty(item);
   */
 
   /// \TODO: Put sky modification back in GUI
   /*
-  topItem = this->variantManager->addProperty(
+  topItem = this->dataPtr->variantManager->addProperty(
       QtVariantPropertyManager::groupTypeId(), tr("sky"));
-  bItem = this->propTreeBrowser->addProperty(topItem);
-  this->propTreeBrowser->setExpanded(bItem, false);
+  bItem = this->dataPtr->propTreeBrowser->addProperty(topItem);
+  this->dataPtr->propTreeBrowser->setExpanded(bItem, false);
   */
 }
 
