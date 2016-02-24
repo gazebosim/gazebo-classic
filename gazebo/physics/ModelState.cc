@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
@@ -516,7 +516,7 @@ ModelState ModelState::operator+(const ModelState &_state) const
   result.name = this->name;
   result.pose.pos = this->pose.pos + _state.pose.pos;
   result.pose.rot = _state.pose.rot * this->pose.rot;
-  result.scale = this->scale - _state.scale;
+  result.scale = this->scale + _state.scale;
 
   // Insert the link state diffs.
   for (LinkState_M::const_iterator iter =

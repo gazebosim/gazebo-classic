@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,13 +43,7 @@ void LayersWidget_TEST::ToggleLayers()
 
   cam->SetCaptureData(true);
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   const unsigned char *data = cam->ImageData();
   unsigned int width = cam->ImageWidth();
@@ -73,6 +67,8 @@ void LayersWidget_TEST::ToggleLayers()
 
     // Make sure the black count is zero. This means the visual
     // is visible and compelty fills the camera field of view.
+    std::cerr << "blackCount: " << blackCount
+              << " (should be 0)" << std::endl;
     QVERIFY(blackCount == 0);
   }
 
@@ -82,13 +78,7 @@ void LayersWidget_TEST::ToggleLayers()
     // Disable the visual. This should hide the visual.
     gazebo::rendering::Events::toggleLayer(0);
 
-    // Process some events, and draw the screen
-    for (unsigned int i = 0; i < 10; ++i)
-    {
-      gazebo::common::Time::MSleep(30);
-      QCoreApplication::processEvents();
-      mainWindow->repaint();
-    }
+    this->ProcessEventsAndDraw(mainWindow);
 
     // Get the new image data
     data = cam->ImageData();
@@ -98,15 +88,23 @@ void LayersWidget_TEST::ToggleLayers()
     // Get the number of white pixels
     for (unsigned int y = 0; y < height; ++y)
     {
-      for (unsigned int x = 0; x < width*depth; ++x)
+      for (unsigned int x = 0; x < width; ++x)
       {
-        if (data[y*(width*depth) + x] >= 250)
+        unsigned int sum = 0;
+        for (unsigned int i = 0; i < depth; ++i)
+        {
+          sum += data[y*(width*depth) + x + i];
+        }
+
+        if (sum >= 250*depth)
           whiteCount++;
       }
     }
 
     // Make sure the white count is zero. This means the visual is not
     // visible.
+    std::cerr << "whiteCount: " << whiteCount
+              << " (should be 0)" << std::endl;
     QVERIFY(whiteCount == 0);
   }
 
@@ -116,13 +114,7 @@ void LayersWidget_TEST::ToggleLayers()
     // Re-enable the visual. This should make the visual visible again.
     gazebo::rendering::Events::toggleLayer(0);
 
-    // Process some events, and draw the screen
-    for (unsigned int i = 0; i < 10; ++i)
-    {
-      gazebo::common::Time::MSleep(30);
-      QCoreApplication::processEvents();
-      mainWindow->repaint();
-    }
+    this->ProcessEventsAndDraw(mainWindow);
 
     // Get the new image data
     data = cam->ImageData();
@@ -141,6 +133,8 @@ void LayersWidget_TEST::ToggleLayers()
 
     // Make sure the black count is zero. This means the visual
     // is visible and completely fills the camera field of view.
+    std::cerr << "blackCount: " << blackCount
+              << " (should be 0)" << std::endl;
     QVERIFY(blackCount == 0);
   }
 

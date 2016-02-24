@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -321,10 +321,6 @@ void Camera::Update()
   // Update animations
   if (this->animState)
   {
-    this->animState->addTime(
-        (common::Time::GetWallTime() - this->prevAnimTime).Double());
-    this->prevAnimTime = common::Time::GetWallTime();
-
     if (this->animState->hasEnded())
     {
       try
@@ -348,6 +344,12 @@ void Camera::Update()
                              this->dataPtr->moveToPositionQueue[0].second);
         this->dataPtr->moveToPositionQueue.pop_front();
       }
+    }
+    else
+    {
+      common::Time wallTime = common::Time::GetWallTime();
+      this->animState->addTime((wallTime - this->prevAnimTime).Double());
+      this->prevAnimTime = wallTime;
     }
   }
   else if (this->dataPtr->trackedVisual)

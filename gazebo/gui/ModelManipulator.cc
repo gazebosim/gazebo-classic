@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,7 +62,6 @@ ModelManipulator::~ModelManipulator()
 /////////////////////////////////////////////////
 void ModelManipulator::Clear()
 {
-  this->dataPtr->modelPub.reset();
   this->dataPtr->userCmdPub.reset();
   this->dataPtr->selectionObj.reset();
   this->dataPtr->userCamera.reset();
@@ -93,14 +92,14 @@ void ModelManipulator::Init()
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init();
-  this->dataPtr->modelPub =
-      this->dataPtr->node->Advertise<msgs::Model>("~/model/modify");
   this->dataPtr->userCmdPub =
       this->dataPtr->node->Advertise<msgs::UserCmd>("~/user_cmd");
 
   this->dataPtr->selectionObj.reset(new rendering::SelectionObj("__GL_MANIP__",
       this->dataPtr->scene->WorldVisual()));
   this->dataPtr->selectionObj->Load();
+
+  this->dataPtr->transparent = false;
 
   this->dataPtr->initialized = true;
 }
@@ -588,20 +587,31 @@ void ModelManipulator::PublishVisualPose(rendering::VisualPtr _vis)
 /////////////////////////////////////////////////
 void ModelManipulator::PublishVisualScale(rendering::VisualPtr _vis)
 {
-  if (_vis)
+  if (!_vis || this->dataPtr->manipMode != "scale" ||
+      _vis->GetType() != gazebo::rendering::Visual::VT_MODEL)
   {
-    // Check to see if the visual is a model.
-    if (gui::get_entity_id(_vis->GetName()))
-    {
-      msgs::Model msg;
-      msg.set_id(gui::get_entity_id(_vis->GetName()));
-      msg.set_name(_vis->GetName());
-
-      msgs::Set(msg.mutable_scale(), _vis->GetScale().Ign());
-      this->dataPtr->modelPub->Publish(msg);
-      _vis->SetScale(this->dataPtr->mouseVisualScale);
-    }
+    return;
   }
+
+  // Register user command on server
+  msgs::UserCmd userCmdMsg;
+  userCmdMsg.set_description("Scale [" + _vis->GetName() + "]");
+  userCmdMsg.set_type(msgs::UserCmd::SCALING);
+
+  msgs::Model msg;
+
+  auto id = gui::get_entity_id(_vis->GetName());
+  if (id)
+    msg.set_id(id);
+
+  msg.set_name(_vis->GetName());
+  msgs::Set(msg.mutable_scale(), _vis->GetScale().Ign());
+
+  auto modelMsg = userCmdMsg.add_model();
+  modelMsg->CopyFrom(msg);
+
+  this->dataPtr->userCmdPub->Publish(userCmdMsg);
+  _vis->SetScale(this->dataPtr->mouseVisualScale);
 }
 
 /////////////////////////////////////////////////
@@ -690,6 +700,12 @@ void ModelManipulator::OnMouseMoveEvent(const common::MouseEvent &_event)
     if (this->dataPtr->mouseMoveVis &&
         this->dataPtr->mouseEvent.Button() == common::MouseEvent::LEFT)
     {
+      if (this->dataPtr->transparent)
+      {
+        this->dataPtr->mouseMoveVis->SetTransparency(
+          (1.0 - this->dataPtr->mouseMoveVis->GetTransparency()) * 0.5);
+        this->dataPtr->transparent = false;
+      }
       math::Vector3 axis = math::Vector3::Zero;
       if (this->dataPtr->keyEvent.key == Qt::Key_X)
         axis.x = 1;
@@ -824,6 +840,8 @@ void ModelManipulator::OnMouseReleaseEvent(const common::MouseEvent &_event)
     // server
     if (this->dataPtr->mouseMoveVis)
     {
+      this->dataPtr->mouseMoveVis->SetTransparency(
+        std::abs(this->dataPtr->mouseMoveVis->GetTransparency()*2.0-1.0));
       if (this->dataPtr->manipMode == "scale")
       {
         this->dataPtr->selectionObj->UpdateSize();
@@ -890,6 +908,7 @@ void ModelManipulator::SetMouseMoveVisual(rendering::VisualPtr _vis)
   this->dataPtr->mouseMoveVis = _vis;
   if (_vis)
   {
+    this->dataPtr->transparent = true;
     this->dataPtr->mouseVisualScale = _vis->GetScale();
     this->dataPtr->mouseChildVisualScale.clear();
     // keep track of all child visual scale for scaling to work in

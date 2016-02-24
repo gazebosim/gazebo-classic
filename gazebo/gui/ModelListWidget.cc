@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -268,9 +268,12 @@ void ModelListWidget::OnSetSelectedEntity(const std::string &_name,
       this->dataPtr->lightsItem);
     if (mItem)
     {
-      this->dataPtr->requestMsg = msgs::CreateRequest("entity_info",
-          this->dataPtr->selectedEntityName);
-      this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
+      if (this->dataPtr->requestPub)
+      {
+        this->dataPtr->requestMsg = msgs::CreateRequest("entity_info",
+            this->dataPtr->selectedEntityName);
+        this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
+      }
       this->dataPtr->modelTreeWidget->setCurrentItem(mItem);
       mItem->setExpanded(!mItem->isExpanded());
     }
@@ -2648,10 +2651,32 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
                                        QtProperty * /*_parent*/)
 {
   QtVariantProperty *item = NULL;
-
   if (_msg.has_type())
-    this->dataPtr->physicsType = _msg.type();
+  {
+    item = this->dataPtr->variantManager->addProperty(
+      QtVariantPropertyManager::enumTypeId(), tr("physics engine"));
+    QStringList types;
 
+    const google::protobuf::EnumDescriptor *engineTypeEnum =
+      _msg.GetDescriptor()->FindEnumTypeByName("Type");
+
+    if (!engineTypeEnum)
+    {
+      gzerr << "Unable to get Type enum descriptor from "
+        << "Physics message. msgs::Physics "
+        << "has probably changed\n";
+      types << "invalid";
+    }
+    else
+    {
+      types << engineTypeEnum->value(_msg.type()-1)->name().c_str();
+    }
+
+    item->setAttribute("enumNames", types);
+    item->setValue(0);
+    this->dataPtr->propTreeBrowser->addProperty(item);
+    item->setEnabled(false);
+  }
   item = this->dataPtr->variantManager->addProperty(QVariant::Bool,
     tr("enable physics"));
   if (_msg.has_enable_physics())

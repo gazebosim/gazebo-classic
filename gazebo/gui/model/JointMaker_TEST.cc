@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,13 +67,7 @@ void JointMaker_TEST::CreateRemoveJoint()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   rendering::UserCameraPtr cam = gui::get_active_camera();
   Q_ASSERT(cam);
@@ -151,13 +145,7 @@ void JointMaker_TEST::CreateRemoveNestedJoint()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   rendering::UserCameraPtr cam = gui::get_active_camera();
   Q_ASSERT(cam);
@@ -264,13 +252,7 @@ void JointMaker_TEST::JointDefaultProperties()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   rendering::UserCameraPtr cam = gui::get_active_camera();
   Q_ASSERT(cam);
@@ -489,13 +471,7 @@ void JointMaker_TEST::ShowJoints()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   rendering::UserCameraPtr cam = gui::get_active_camera();
   Q_ASSERT(cam);
@@ -524,13 +500,7 @@ void JointMaker_TEST::ShowJoints()
   jointMaker->CreateHotSpot(prismaticJointData);
   QCOMPARE(jointMaker->JointCount(), 2u);
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   QVERIFY(revoluteJointData->hotspot != NULL);
   QVERIFY(prismaticJointData->hotspot != NULL);
@@ -580,13 +550,7 @@ void JointMaker_TEST::Selection()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   rendering::UserCameraPtr cam = gui::get_active_camera();
   Q_ASSERT(cam);
@@ -751,13 +715,7 @@ void JointMaker_TEST::UpdateMsg()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   auto cam = gui::get_active_camera();
   Q_ASSERT(cam);

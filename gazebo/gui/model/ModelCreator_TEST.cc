@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -111,13 +111,7 @@ void ModelCreator_TEST::NestedModel()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get the user camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
@@ -203,13 +197,7 @@ void ModelCreator_TEST::SaveState()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get the user camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
@@ -246,13 +234,9 @@ void ModelCreator_TEST::SaveState()
 
   // Move a link to have unsaved changes
   cylinder->SetWorldPose(math::Pose(1, 2, 3, 4, 5, 6));
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+
+  this->ProcessEventsAndDraw(mainWindow);
+
   QCOMPARE(modelCreator->GetCurrentSaveState(),
       gui::ModelCreator::UNSAVED_CHANGES);
 
@@ -293,13 +277,7 @@ void ModelCreator_TEST::Selection()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get the user camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
@@ -380,13 +358,7 @@ void ModelCreator_TEST::ModelPlugin()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get the user camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
@@ -444,13 +416,7 @@ void ModelCreator_TEST::NestedModelSelection()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get the user camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
@@ -484,13 +450,7 @@ void ModelCreator_TEST::NestedModelSelection()
       scene->GetVisual("ModelPreview_0_0::box_model");
   QVERIFY(boxModelVis != NULL);
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // a more complicated a nested model loaded from from sdf
   sdf::ElementPtr modelSDF(new sdf::Element);
@@ -498,13 +458,7 @@ void ModelCreator_TEST::NestedModelSelection()
   sdf::readString(GetNestedModelSDFString(), modelSDF);
   modelCreator->AddModel(modelSDF);
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // verify the model has been added
   gazebo::rendering::VisualPtr modelVis =
@@ -520,13 +474,7 @@ void ModelCreator_TEST::NestedModelSelection()
       scene->GetVisual("ModelPreview_0_0::model_00::model_01");
   QVERIFY(model01Vis != NULL);
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // verify initial selected state
   QVERIFY(!cylinder->GetHighlighted());
@@ -656,13 +604,7 @@ void ModelCreator_TEST::CopyPaste()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get the user camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
@@ -702,13 +644,7 @@ void ModelCreator_TEST::CopyPaste()
       scene->GetVisual("ModelPreview_0_0::box_model");
   QVERIFY(boxModel != NULL);
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // copy and paste cylinder link
   modelCreator->SetSelected(cylinder, true);
@@ -751,13 +687,7 @@ void ModelCreator_TEST::CopyPaste()
       scene->GetVisual(boxModel->GetName() + "_clone");
   QVERIFY(boxModelClone != NULL);
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   delete modelCreator;
   modelCreator = NULL;

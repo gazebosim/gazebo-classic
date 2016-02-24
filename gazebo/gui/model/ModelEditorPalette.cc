@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -268,8 +268,7 @@ void ModelEditorPalette::InsertWidget(unsigned int _index, QWidget *_widget)
 
   // set equal size for now. There should always be at least one widget
   // (render3DFrame) in the splitter.
-  int childCount = this->splitter->count();
-  GZ_ASSERT(childCount > 0,
+  GZ_ASSERT(this->splitter->count() > 0,
       "ModelEditorPalette splitter has no child widget");
 
   this->splitter->insertWidget(_index, _widget);

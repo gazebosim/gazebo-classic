@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -328,6 +328,25 @@ namespace gazebo
                    double _rangeResolution = 0.01, unsigned int _samples = 640,
                    const std::string &_noiseType = "", double _noiseMean = 0.0,
                    double _noiseStdDev = 0.0);
+
+    /// \brief Spawn a depth camera.
+    /// \param[in] _modelName Name of the model.
+    /// \param[in] _cameraName Name of the camera.
+    /// \param[in] _pos Camera position.
+    /// \param[in] _rpy Camera roll, pitch, yaw.
+    /// \param[in] _width Output image width.
+    /// \param[in] _height Output image height.
+    /// \param[in] _rate Output Hz.
+    /// \param[in] _near Near clipping distance
+    /// \param[in] _far Far clipping distance
+    protected: void SpawnDepthCameraSensor(const std::string &_modelName,
+                   const std::string &_cameraName,
+                   const ignition::math::Vector3d &_pos,
+                   const ignition::math::Vector3d &_rpy,
+                   const unsigned int _width = 320,
+                   const unsigned int _height = 240,
+                   const double _rate = 25, const double _near = 0.1,
+                   const double _far = 10);
 
     /// \brief Spawn an imu sensor laser.
     /// \param[in] _modelName Name of the model.

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,13 +56,7 @@ void TimePanel_TEST::SpaceBar()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get the time panel
   auto timePanel = mainWindow->RenderWidget()->GetTimePanel();
@@ -89,9 +83,7 @@ void TimePanel_TEST::SpaceBar()
   // Process some events until it gets unpaused
   for (unsigned int i = 0; i < 10 && timePanel->IsPaused(); ++i)
   {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
+    this->ProcessEventsAndDraw(mainWindow, 1);
   }
   QVERIFY(!timePanel->IsPaused());
 
