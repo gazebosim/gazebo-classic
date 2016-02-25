@@ -44,7 +44,10 @@ class PlotItemDelegate : public QStyledItemDelegate
     DATA_ROLE,
 
     // \brief Data type name, used to display type information to the user.
-    DATA_TYPE_NAME
+    DATA_TYPE_NAME,
+
+    // \brief Flag indicating whether to expand the item or not.
+    TO_EXPAND
   };
 
   /// \brief Constructor
@@ -161,7 +164,7 @@ class SearchModel : public QSortFilterProxyModel
   /// 1. Each of the words can be found in its ancestors or itself, but not
   /// necessarily all words on the same row, or
   /// 2. One of its descendants matches rule 1, or
-  /// 3. One of its parents matches rule 1.
+  /// 3. One of its ancestors matches rule 1.
   ///
   /// For example this structure:
   /// - a
@@ -178,14 +181,38 @@ class SearchModel : public QSortFilterProxyModel
   /// \param[in] _srcRow Row on the source model.
   /// \param[in] _srcParent Parent on the source model.
   /// \return True if row is accepted.
-  public: bool filterAcceptsRow(int _srcRow, const QModelIndex &_srcParent)
-      const
+  public: bool filterAcceptsRow(const int _srcRow,
+      const QModelIndex &_srcParent) const
   {
-    auto words = this->search.split(" ");
+    // Empty search matches nothing
+    if (this->search == "")
+      return false;
+
+    // Item index in search model
+    auto id = this->sourceModel()->index(_srcRow, 0, _srcParent);
+
+    // Collapsed by default
+    this->sourceModel()->setData(id, false, PlotItemDelegate::TO_EXPAND);
 
     // Each word must match at least once, either self, parent or child
+    auto words = this->search.split(" ");
     for (auto word : words)
     {
+      if (word == "")
+        continue;
+
+      // Expand this if at least one child contains the word
+      // Note that this is not enough for this to be accepted, we need to match
+      // all words
+      if (this->hasChildAcceptsItself(id, word))
+      {
+        this->sourceModel()->setData(id, true, PlotItemDelegate::TO_EXPAND);
+      }
+
+      // At least one of the children fits rule 1
+      if (this->hasAcceptedChildren(_srcRow, _srcParent))
+        continue;
+
       // Row itself contains this word
       if (this->filterAcceptsRowItself(_srcRow, _srcParent, word))
         continue;
@@ -205,10 +232,6 @@ class SearchModel : public QSortFilterProxyModel
       }
 
       if (parentAccepted)
-        continue;
-
-      // At least one of the children fits rule 1
-      if (this->hasAcceptedChildren(_srcRow, _srcParent))
         continue;
 
       // This word can't be found on the row or a parent, and no child is fully
@@ -239,7 +262,7 @@ class SearchModel : public QSortFilterProxyModel
   public: bool hasAcceptedChildren(const int _srcRow,
       const QModelIndex &_srcParent) const
   {
-    QModelIndex item = sourceModel()->index(_srcRow, 0, _srcParent);
+    auto item = sourceModel()->index(_srcRow, 0, _srcParent);
 
     if (!item.isValid())
       return false;
@@ -247,6 +270,28 @@ class SearchModel : public QSortFilterProxyModel
     for (int i = 0; i < item.model()->rowCount(item); ++i)
     {
       if (this->filterAcceptsRow(i, item))
+        return true;
+    }
+
+    return false;
+  }
+
+  /// \brief Check if any of the children accepts a specific word.
+  /// \param[in] _srcParent Parent on the source model.
+  /// \param[in] _word Word to be checked.
+  /// \return True if any of the children match.
+  public: bool hasChildAcceptsItself(const QModelIndex &_srcParent,
+      const QString &_word) const
+  {
+    for (int i = 0; i < this->sourceModel()->rowCount(_srcParent); ++i)
+    {
+      // Check immediate children
+      if (this->filterAcceptsRowItself(i, _srcParent, _word))
+        return true;
+
+      // Check gradchildren
+      auto item = this->sourceModel()->index(i, 0, _srcParent);
+      if (this->hasChildAcceptsItself(item, _word))
         return true;
     }
 
@@ -280,6 +325,12 @@ class gazebo::gui::PalettePrivate
 
   /// \brief Proxy model to filter sim data.
   public: SearchModel *searchSimModel;
+
+  /// \brief View holding the topics tree.
+  public: QTreeView *searchTopicsTree;
+
+  /// \brief View holding the sim tree.
+  public: QTreeView *searchSimTree;
 };
 
 /////////////////////////////////////////////////
@@ -358,30 +409,30 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   searchField->addWidget(searchEdit);
 
   // A tree to visualize topics search results
-  auto searchTopicsTree = new QTreeView;
-  searchTopicsTree->setObjectName("plotTree");
-  searchTopicsTree->setAnimated(true);
-  searchTopicsTree->setHeaderHidden(true);
-  searchTopicsTree->setExpandsOnDoubleClick(true);
-  searchTopicsTree->setModel(this->dataPtr->searchTopicsModel);
-  searchTopicsTree->setItemDelegate(plotItemDelegate);
-  searchTopicsTree->setEditTriggers(QAbstractItemView::NoEditTriggers);
-  searchTopicsTree->setDragEnabled(true);
-  searchTopicsTree->setDragDropMode(QAbstractItemView::DragOnly);
-  // searchTopicsTree->expandAll();
+  this->dataPtr->searchTopicsTree = new QTreeView;
+  this->dataPtr->searchTopicsTree->setObjectName("plotTree");
+  this->dataPtr->searchTopicsTree->setAnimated(true);
+  this->dataPtr->searchTopicsTree->setHeaderHidden(true);
+  this->dataPtr->searchTopicsTree->setExpandsOnDoubleClick(true);
+  this->dataPtr->searchTopicsTree->setModel(this->dataPtr->searchTopicsModel);
+  this->dataPtr->searchTopicsTree->setItemDelegate(plotItemDelegate);
+  this->dataPtr->searchTopicsTree->setEditTriggers(
+      QAbstractItemView::NoEditTriggers);
+  this->dataPtr->searchTopicsTree->setDragEnabled(true);
+  this->dataPtr->searchTopicsTree->setDragDropMode(QAbstractItemView::DragOnly);
 
   // A tree to visualize sim search results
-  auto searchSimTree = new QTreeView;
-  searchSimTree->setObjectName("plotTree");
-  searchSimTree->setAnimated(true);
-  searchSimTree->setHeaderHidden(true);
-  searchSimTree->setExpandsOnDoubleClick(true);
-  searchSimTree->setModel(this->dataPtr->searchSimModel);
-  searchSimTree->setItemDelegate(plotItemDelegate);
-  searchSimTree->setEditTriggers(QAbstractItemView::NoEditTriggers);
-  searchSimTree->setDragEnabled(true);
-  searchSimTree->setDragDropMode(QAbstractItemView::DragOnly);
-  // searchSimTree->expandAll();
+  this->dataPtr->searchSimTree = new QTreeView;
+  this->dataPtr->searchSimTree->setObjectName("plotTree");
+  this->dataPtr->searchSimTree->setAnimated(true);
+  this->dataPtr->searchSimTree->setHeaderHidden(true);
+  this->dataPtr->searchSimTree->setExpandsOnDoubleClick(true);
+  this->dataPtr->searchSimTree->setModel(this->dataPtr->searchSimModel);
+  this->dataPtr->searchSimTree->setItemDelegate(plotItemDelegate);
+  this->dataPtr->searchSimTree->setEditTriggers(
+      QAbstractItemView::NoEditTriggers);
+  this->dataPtr->searchSimTree->setDragEnabled(true);
+  this->dataPtr->searchSimTree->setDragDropMode(QAbstractItemView::DragOnly);
 
   // Search layout
   auto topicsLabel = new QLabel(tr("TOPICS"));
@@ -392,9 +443,9 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   auto searchLayout = new QVBoxLayout();
   searchLayout->addLayout(searchField);
   searchLayout->addWidget(topicsLabel);
-  searchLayout->addWidget(searchTopicsTree);
+  searchLayout->addWidget(this->dataPtr->searchTopicsTree);
   searchLayout->addWidget(simLabel);
-  searchLayout->addWidget(searchSimTree);
+  searchLayout->addWidget(this->dataPtr->searchSimTree);
 
   auto searchWidget = new QWidget();
   searchWidget->setLayout(searchLayout);
@@ -693,5 +744,33 @@ void Palette::UpdateSearch(const QString &_search)
 {
   this->dataPtr->searchTopicsModel->setSearch(_search);
   this->dataPtr->searchSimModel->setSearch(_search);
+
+  // Expand / collapse
+  this->ExpandChildren(this->dataPtr->searchTopicsModel,
+      this->dataPtr->searchTopicsTree, QModelIndex());
+  this->ExpandChildren(this->dataPtr->searchSimModel,
+      this->dataPtr->searchSimTree, QModelIndex());
+}
+
+/////////////////////////////////////////////////
+void Palette::ExpandChildren(QSortFilterProxyModel *_model,
+    QTreeView *_tree, const QModelIndex &_srcParent) const
+{
+  if (!_model || !_tree)
+    return;
+
+  for (int i = 0; i < _model->rowCount(_srcParent); ++i)
+  {
+    auto item = _model->index(i, 0, _srcParent);
+    if (!item.isValid())
+      return;
+
+    bool expand = _model->data(item,
+        PlotItemDelegate::TO_EXPAND).toBool();
+
+    _tree->setExpanded(item, expand);
+
+    this->ExpandChildren(_model, _tree, item);
+  }
 }
 

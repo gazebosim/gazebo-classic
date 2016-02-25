@@ -72,6 +72,13 @@ namespace gazebo
       /// \param[in] _search Latest search.
       private slots: void UpdateSearch(const QString &_search);
 
+      /// \brief Expand items in the given tree view based on their model data.
+      /// \param[in] _model Search model.
+      /// \param[in] _tree Tree view.
+      /// \param[in] _srcParent Model index of the parent to be checked.
+      private: void ExpandChildren(QSortFilterProxyModel *_model,
+          QTreeView *_tree, const QModelIndex &_srcParent) const;
+
       /// \internal
       /// \brief Pointer to private data.
       private: std::unique_ptr<PalettePrivate> dataPtr;
