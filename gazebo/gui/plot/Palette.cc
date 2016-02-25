@@ -437,15 +437,33 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   // Search layout
   auto topicsLabel = new QLabel(tr("TOPICS"));
   topicsLabel->setObjectName("plottingSearchLabel");
+
+  auto topicsLayout = new QVBoxLayout();
+  topicsLayout->addWidget(topicsLabel);
+  topicsLayout->addWidget(this->dataPtr->searchTopicsTree);
+
+  auto topicsWidget = new QWidget();
+  topicsWidget->setLayout(topicsLayout);
+
   auto simLabel = new QLabel(tr("SIM"));
   simLabel->setObjectName("plottingSearchLabel");
 
+  auto simLayout = new QVBoxLayout();
+  simLayout->addWidget(simLabel);
+  simLayout->addWidget(this->dataPtr->searchSimTree);
+
+  auto simWidget = new QWidget();
+  simWidget->setLayout(simLayout);
+
+  auto splitter = new QSplitter(Qt::Vertical, this);
+  splitter->addWidget(topicsWidget);
+  splitter->addWidget(simWidget);
+  splitter->setCollapsible(0, false);
+  splitter->setCollapsible(1, false);
+
   auto searchLayout = new QVBoxLayout();
   searchLayout->addLayout(searchField);
-  searchLayout->addWidget(topicsLabel);
-  searchLayout->addWidget(this->dataPtr->searchTopicsTree);
-  searchLayout->addWidget(simLabel);
-  searchLayout->addWidget(this->dataPtr->searchSimTree);
+  searchLayout->addWidget(splitter);
 
   auto searchWidget = new QWidget();
   searchWidget->setLayout(searchLayout);
