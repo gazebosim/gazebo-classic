@@ -18,6 +18,7 @@
 #define _GAZEBO_SIGNAL_STATS_HH_
 
 #include <map>
+#include <memory>
 #include <string>
 #include "gazebo/util/system.hh"
 
@@ -41,6 +42,10 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~SignalStatistic();
 
+      /// \brief Copy constructor
+      /// \param[in] _ss SignalStatistic to copy
+      public: SignalStatistic(const SignalStatistic &_ss);
+
       /// \brief Get the current value of the statistical measure.
       /// \return Current value of the statistical measure.
       public: virtual double Value() const = 0;
@@ -61,7 +66,7 @@ namespace gazebo
       public: virtual void Reset();
 
       /// \brief Pointer to private data.
-      protected: SignalStatisticPrivate *dataPtr;
+      protected: std::unique_ptr<SignalStatisticPrivate> dataPtr;
     };
     /// \}
 
@@ -129,6 +134,10 @@ namespace gazebo
       /// \brief Destructor
       public: ~SignalStats();
 
+      /// \brief Copy constructor
+      /// \param[in] _ss SignalStats to copy
+      public: SignalStats(const SignalStats &_ss);
+
       /// \brief Get number of data points in first statistic.
       /// Technically you can have different numbers of data points
       /// in each statistic if you call InsertStatistic after InsertData,
@@ -170,7 +179,7 @@ namespace gazebo
       public: void Reset();
 
       /// \brief Pointer to private data.
-      protected: SignalStatsPrivate *dataPtr;
+      protected: std::unique_ptr<SignalStatsPrivate> dataPtr;
     };
     /// \}
   }

@@ -32,6 +32,13 @@ namespace gazebo
 
       /// \brief Count of data values in mean.
       public: unsigned int count;
+
+      /// \brief Clone the SignalStatisticPrivate object. Used for implementing
+      /// copy semantics.
+      public: SignalStatisticPrivate* Clone() const
+      {
+        return new SignalStatisticPrivate(*this);
+      }
     };
 
     class SignalStatistic;
@@ -49,6 +56,13 @@ namespace gazebo
     {
       /// \brief Vector of `SignalStatistic`s.
       public: SignalStatistic_V stats;
+
+      /// \brief Clone the SignalStatsPrivate object. Used for implementing
+      /// copy semantics.
+      public: SignalStatsPrivate* Clone() const
+      {
+        return new SignalStatsPrivate(*this);
+      }
     };
   }
 }
