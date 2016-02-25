@@ -119,7 +119,7 @@ void MainWindow_TEST::Selection()
 
   // move camera to look at the box
   ignition::math::Pose3d cameraPose(ignition::math::Vector3d(-1, 0, 0.5),
-      ignition::math::Vector3d(0, 0, 0));
+      ignition::math::Quaterniond(0, 0, 0));
   cam->SetWorldPose(cameraPose);
   QVERIFY(cam->WorldPose() == cameraPose);
 
