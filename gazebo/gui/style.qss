@@ -996,12 +996,17 @@ QTabBar#plottingTabBar
   padding: 0px;
 }
 
-QTabBar#plottingTabBar::pane,
+QTabBar#plottingTabBar::pane
 {
   background-color: #777777;
   padding: 0px;
   margin: 0px;
   border: 0px;
   color: #fafafa;
+}
+
+QFrame#plotPaletteFrame
+{
+  background-color: #e2e2e2;
 }
 

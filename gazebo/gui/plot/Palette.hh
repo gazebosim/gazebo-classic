@@ -34,6 +34,11 @@ namespace google
 
 namespace gazebo
 {
+  namespace common
+  {
+    class URI;
+  }
+
   namespace gui
   {
     // Forward declare private data class
@@ -56,6 +61,10 @@ namespace gazebo
       /// \param[in] _topicsModel Pointer to the model which will be filled.
       private: void FillTopics(QStandardItemModel *_topicsModel);
 
+      /// \brief Fill the models model.
+      /// \param[in] _modelsModel Pointer to the model which will be filled.
+      private: void FillModels(QStandardItemModel *_modelsModel);
+
       /// \brief Fill the sim model.
       /// \param[in] _simModel Pointer to the model which will be filled.
       private: void FillSim(QStandardItemModel *_simModel);
@@ -67,6 +76,15 @@ namespace gazebo
       /// \param[in] _uri The current URI.
       private: void FillFromMsg(google::protobuf::Message *_msg,
                    QStandardItem *_item, const std::string &_uri);
+
+      private: void InsertPoseItem(QStandardItem *_item,
+          const common::URI &_uri, const std::string &_query);
+
+      private: void InsertVector3dItem(QStandardItem *_item,
+          const common::URI &_uri, const std::string &_query);
+
+      private: void InsertQuaterniondItem(QStandardItem *_item,
+          const common::URI &_uri, const std::string &_query);
 
       /// \internal
       /// \brief Pointer to private data.

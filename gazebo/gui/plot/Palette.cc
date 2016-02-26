@@ -17,14 +17,19 @@
 
 #include <set>
 #include <string>
+#include <vector>
 #include <google/protobuf/message.h>
 
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/common/URI.hh"
 
 #include "gazebo/gui/ConfigWidget.hh"
 #include "gazebo/gui/plot/Palette.hh"
 
 #include "gazebo/transport/TransportIface.hh"
+
+#include "gazebo/util/IntrospectionClient.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -67,19 +72,57 @@ class PlotItemDelegate : public QStyledItemDelegate
     QString typeName = qvariant_cast<QString>(_index.data(DATA_TYPE_NAME));
 
     // TODO: Change to QApplication::font() once Roboto is used everywhere
-    QFont font("Roboto Regular");
+    QFont font;
+    auto fontWeight = QFont::Normal;
+    if (typeName == "title")
+    {
+      font.setFamily("Roboto Bold");
+      fontWeight = QFont::Bold;
+
+      // Erase the branch image for titles
+      QRectF titleRect = _opt.rect;
+      titleRect.setLeft(titleRect.left() - 13);
+      // FIXME: Find a non-hardcoded way to get the bg color
+      QBrush brush(QColor("#e2e2e2"));
+      _painter->save();
+      _painter->fillRect(titleRect, brush);
+      _painter->restore();
+    }
+    else
+    {
+      font.setFamily("Roboto Regular");
+    }
     QFontMetrics fm(font);
 
     // Handle hover style
-    if (_opt.state & QStyle::State_MouseOver)
+    if (typeName != "title" && _opt.state & QStyle::State_MouseOver)
     {
       _painter->setPen(QPen(QColor(200, 200, 200, 0), 0));
       _painter->setBrush(QColor(200, 200, 200));
       _painter->drawRect(_opt.rect);
     }
 
-    // Paint the icon, if present
-    if (!typeName.isEmpty())
+    // Paint the type icon
+    if (typeName == "model" || typeName == "link" || typeName == "collision" ||
+        typeName == "visual" || typeName == "joint")
+    {
+      double iconSize = 15;
+
+      textRect.adjust(iconSize + 6, 5, 0, -5);
+      QRectF iconRect = _opt.rect;
+      iconRect.setTop(iconRect.top() + (_opt.rect.height()/2.0 - iconSize/2.0));
+
+      QIcon icon(":/images/" + typeName  + ".svg");
+      _painter->drawPixmap(iconRect.left(), iconRect.top(),
+          icon.pixmap(iconSize, iconSize));
+    }
+    // Titles
+    else if (typeName == "title")
+    {
+      textRect.adjust(-15, 5, 0, -5);
+    }
+    // Plottable items
+    else if (!typeName.isEmpty())
     {
       // Paint icon
       double iconSize = 20;
@@ -94,12 +137,14 @@ class PlotItemDelegate : public QStyledItemDelegate
       // Move text
       textRect.adjust(iconSize + 5, 5, 0, -5);
     }
+    // Normal expandable items
     else
     {
+      // Otherwise use a rectangle that is sized for the just the topic name
       textRect.adjust(0, 5, 0, -5);
     }
 
-    _painter->setFont(QFont(font.family(), font.pointSize()));
+    _painter->setFont(QFont(font.family(), font.pointSize(), fontWeight));
     _painter->setPen(QColor(30, 30, 30));
     _painter->drawText(textRect, topicName);
   }
@@ -159,6 +204,9 @@ class gazebo::gui::PalettePrivate
   /// \brief Model to hold topics data.
   public: PlotItemModel *topicsModel;
 
+  /// \brief Model to hold models data.
+  public: PlotItemModel *modelsModel;
+
   /// \brief Model to hold sim data.
   public: PlotItemModel *simModel;
 };
@@ -171,6 +219,7 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   auto tabBar = new QTabBar;
   tabBar->setObjectName("plottingTabBar");
   tabBar->addTab("TOPICS");
+  tabBar->addTab("MODELS");
   tabBar->addTab("SIM");
   tabBar->setExpanding(true);
   tabBar->setDrawBase(false);
@@ -195,6 +244,22 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   topicsTree->setDragEnabled(true);
   topicsTree->setDragDropMode(QAbstractItemView::DragOnly);
 
+  // The model that will hold data to be displayed in the model tree view
+  this->dataPtr->modelsModel = new PlotItemModel;
+  this->FillModels(this->dataPtr->modelsModel);
+
+  // A tree to visualize models and their properties
+  auto modelsTree = new QTreeView;
+  modelsTree->setObjectName("plotTree");
+  modelsTree->setAnimated(true);
+  modelsTree->setHeaderHidden(true);
+  modelsTree->setExpandsOnDoubleClick(true);
+  modelsTree->setModel(this->dataPtr->modelsModel);
+  modelsTree->setItemDelegate(plotItemDelegate);
+  modelsTree->setEditTriggers(QAbstractItemView::NoEditTriggers);
+  modelsTree->setDragEnabled(true);
+  modelsTree->setDragDropMode(QAbstractItemView::DragOnly);
+
   // The model that will hold data to be displayed in the sim tree view
   this->dataPtr->simModel = new PlotItemModel;
   this->FillSim(this->dataPtr->simModel);
@@ -215,6 +280,7 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   auto tabStackedLayout = new QStackedLayout;
   tabStackedLayout->setContentsMargins(0, 0, 0, 0);
   tabStackedLayout->addWidget(topicsTree);
+  tabStackedLayout->addWidget(modelsTree);
   tabStackedLayout->addWidget(simTree);
 
   // Connect TabBar to StackedLayout
@@ -236,7 +302,7 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   mainLayout->setContentsMargins(0, 0, 0, 0);
   mainLayout->setSpacing(0);
 
-  this->setMinimumWidth(250);
+  this->setMinimumWidth(350);
   this->setLayout(mainLayout);
 }
 
@@ -286,6 +352,167 @@ void Palette::FillTopics(QStandardItemModel *_topicsModel)
 
     auto msg = msgs::MsgFactory::NewMsg(msgType);
     this->FillFromMsg(msg.get(), topicItem, topic+"?p=");
+  }
+}
+
+/////////////////////////////////////////////////
+void Palette::FillModels(QStandardItemModel *_modelsModel)
+{
+  gazebo::util::IntrospectionClient client;
+
+  // Wait for the managers to come online
+  auto managerIds = client.WaitForManagers(std::chrono::seconds(2));
+
+  if (managerIds.empty())
+  {
+    std::cerr << "No introspection managers detected." << std::endl;
+    std::cerr << "Is a gzserver running?" << std::endl;
+    return;
+  }
+
+  // Pick up the first manager.
+  std::string id = *managerIds.begin();
+
+  // This is a blocking call
+  std::set<std::string> items;
+  if (!client.Items(id, items))
+  {
+    gzerr << "It wasn't possible to get items from manager [" << id << "]" <<
+        std::endl;
+    return;
+  }
+
+  // FIXME: Check if there is at least one model?
+  if (!items.empty())
+  {
+    auto modelsTitle = new QStandardItem();
+    modelsTitle->setData("MODELS", PlotItemDelegate::TOPIC_NAME_ROLE);
+    modelsTitle->setData("title", PlotItemDelegate::DATA_TYPE_NAME);
+    _modelsModel->appendRow(modelsTitle);
+  }
+
+  // Populate widget
+  for (auto item : items)
+  {
+    common::URI itemURI(item);
+
+    // Only take data
+    if (itemURI.Scheme() != "data")
+      continue;
+
+    // Only take model data
+    auto pathStr = itemURI.Path().Str();
+    if (pathStr.find("model") == std::string::npos)
+      continue;
+
+    // Make sure there is a query
+    auto queryStr = itemURI.Query().Str();
+    if (queryStr.empty())
+      continue;
+
+    // Process path
+    auto pathParts = common::split(pathStr, "/");
+
+    QStandardItem *modelItem = NULL;
+    unsigned int i = 0;
+    while (i < pathParts.size())
+    {
+      // Create model item based on part
+      auto part = pathParts[i];
+      auto nextPart = pathParts[i+1];
+      if (part == "model")
+      {
+        // Check if it has already been added
+        auto modelList = _modelsModel->findItems(nextPart.c_str());
+        if (modelList.isEmpty())
+        {
+          modelItem = new QStandardItem(nextPart.c_str());
+          modelItem->setData(nextPart.c_str(),
+              PlotItemDelegate::TOPIC_NAME_ROLE);
+          modelItem->setData("model", PlotItemDelegate::DATA_TYPE_NAME);
+          _modelsModel->appendRow(modelItem);
+        }
+        else
+        {
+          modelItem = modelList[0];
+        }
+      }
+      i += 2;
+    }
+
+    if (!modelItem)
+      return;
+
+    // Process query
+    queryStr = queryStr.substr(queryStr.find("=")+1);
+    auto queryParts = common::split(queryStr, "/");
+
+    if (queryParts.size() != 2)
+    {
+      gzwarn << "Unsupported query [" << itemURI.Str() << "]" << std::endl;
+      continue;
+    }
+
+    if (queryParts[0] == "pose")
+    {
+      this->InsertPoseItem(modelItem, itemURI, queryParts[1]);
+    }
+    else if (queryParts[0] == "vector3d")
+    {
+      auto parentItemName = queryParts[1];
+      if (parentItemName.find("velocity") != std::string::npos)
+        parentItemName = "velocity";
+
+      QStandardItem *velItem = NULL;
+
+      // Check if it has already been added
+      for (int k = 0; k < modelItem->rowCount(); ++k)
+      {
+        auto childItem = modelItem->child(k, 0);
+        if (childItem && childItem->text().toStdString() == parentItemName)
+        {
+          velItem = childItem;
+          break;
+        }
+      }
+
+      // Create new item
+      if (!velItem)
+      {
+        velItem = new QStandardItem(parentItemName.c_str());
+        modelItem->appendRow(velItem);
+      }
+
+      this->InsertVector3dItem(velItem, itemURI, queryParts[1]);
+    }
+    else if (queryParts[0] == "quaterniond")
+    {
+      auto parentItemName = queryParts[1];
+      if (parentItemName.find("velocity") != std::string::npos)
+        parentItemName = "velocity";
+
+      QStandardItem *velItem = NULL;
+
+      // Check if it has already been added
+      for (int k = 0; k < modelItem->rowCount(); ++k)
+      {
+        auto childItem = modelItem->child(k, 0);
+        if (childItem && childItem->text().toStdString() == parentItemName)
+        {
+          velItem = childItem;
+          break;
+        }
+      }
+
+      // Create new item
+      if (!velItem)
+      {
+        velItem = new QStandardItem(parentItemName.c_str());
+        modelItem->appendRow(velItem);
+      }
+
+      this->InsertQuaterniondItem(velItem, itemURI, queryParts[1]);
+    }
   }
 }
 
@@ -496,6 +723,139 @@ void Palette::FillFromMsg(google::protobuf::Message *_msg,
         continue;
       }
     }
+  }
+}
+
+/////////////////////////////////////////////////
+void Palette::InsertPoseItem(QStandardItem *_item, const common::URI &_uri,
+    const std::string &_query)
+{
+  // Pose
+  auto poseItem = new QStandardItem(_query.c_str());
+  poseItem->setData("Pose",
+      PlotItemDelegate::TOPIC_NAME_ROLE);
+  _item->appendRow(poseItem);
+
+  // Position
+  auto positionItem = new QStandardItem();
+  positionItem->setData("Position",
+      PlotItemDelegate::TOPIC_NAME_ROLE);
+  poseItem->appendRow(positionItem);
+
+  std::vector<std::string> positions = {"x", "y", "z"};
+  for (auto position : positions)
+  {
+    auto humanName = ConfigWidget::HumanReadableKey(position);
+
+    auto childItem = new QStandardItem();
+    childItem->setData(humanName.c_str(),
+        PlotItemDelegate::TOPIC_NAME_ROLE);
+    childItem->setData(
+        (_uri.Str() + "/vector3d/position/double/" + position).c_str(),
+        PlotItemDelegate::DATA_ROLE);
+    childItem->setData("Double", PlotItemDelegate::DATA_TYPE_NAME);
+    positionItem->appendRow(childItem);
+  }
+
+  // Orientation
+  auto orientationItem = new QStandardItem();
+  orientationItem->setData("Orientation",
+      PlotItemDelegate::TOPIC_NAME_ROLE);
+  poseItem->appendRow(orientationItem);
+
+  std::vector<std::string> orientations = {"roll", "pitch", "yaw"};
+  for (auto orientation : orientations)
+  {
+    auto humanName = ConfigWidget::HumanReadableKey(orientation);
+
+    auto childItem = new QStandardItem();
+    childItem->setData(humanName.c_str(),
+        PlotItemDelegate::TOPIC_NAME_ROLE);
+    childItem->setData(
+        (_uri.Str() + "/quaterniond/orientation/double/" + orientation).c_str(),
+        PlotItemDelegate::DATA_ROLE);
+    childItem->setData("Double", PlotItemDelegate::DATA_TYPE_NAME);
+    orientationItem->appendRow(childItem);
+  }
+}
+
+/////////////////////////////////////////////////
+void Palette::InsertVector3dItem(QStandardItem *_item, const common::URI &_uri,
+    const std::string &_query)
+{
+  bool isLinVel = _query.find("linear_velocity") != std::string::npos;
+
+  std::string title;
+  if (isLinVel)
+    title = "Velocity";
+  else
+    title = ConfigWidget::HumanReadableKey(_query);
+
+  // Main item
+  _item->setData(title.c_str(), PlotItemDelegate::TOPIC_NAME_ROLE);
+  auto parentItem = _item;
+
+   // Linear Velocity goes one deeper
+   if (isLinVel)
+   {
+     auto childItem = new QStandardItem();
+     childItem->setData("Linear", PlotItemDelegate::TOPIC_NAME_ROLE);
+     _item->appendRow(childItem);
+     parentItem = childItem;
+   }
+
+  std::vector<std::string> elements = {"x", "y", "z"};
+  for (auto element : elements)
+  {
+    auto humanName = ConfigWidget::HumanReadableKey(element);
+
+    auto childItem = new QStandardItem();
+    childItem->setData(humanName.c_str(),
+        PlotItemDelegate::TOPIC_NAME_ROLE);
+    childItem->setData((_uri.Str() + "/double/" + element).c_str(),
+        PlotItemDelegate::DATA_ROLE);
+    childItem->setData("Double", PlotItemDelegate::DATA_TYPE_NAME);
+    parentItem->appendRow(childItem);
+  }
+}
+
+/////////////////////////////////////////////////
+void Palette::InsertQuaterniondItem(QStandardItem *_item,
+    const common::URI &_uri, const std::string &_query)
+{
+  bool isAngVel = _query.find("angular_velocity") != std::string::npos;
+
+  std::string title;
+  if (isAngVel)
+    title = "Velocity";
+  else
+    title = ConfigWidget::HumanReadableKey(_query);
+
+  // Main item
+  _item->setData(title.c_str(), PlotItemDelegate::TOPIC_NAME_ROLE);
+  auto parentItem = _item;
+
+   // Angular Velocity goes one deeper
+   if (isAngVel)
+   {
+     auto childItem = new QStandardItem();
+     childItem->setData("Angular", PlotItemDelegate::TOPIC_NAME_ROLE);
+     _item->appendRow(childItem);
+     parentItem = childItem;
+   }
+
+  std::vector<std::string> elements = {"roll", "pitch", "yaw"};
+  for (auto element : elements)
+  {
+    auto humanName = ConfigWidget::HumanReadableKey(element);
+
+    auto childItem = new QStandardItem();
+    childItem->setData(humanName.c_str(),
+        PlotItemDelegate::TOPIC_NAME_ROLE);
+    childItem->setData((_uri.Str() + "/double/" + element).c_str(),
+        PlotItemDelegate::DATA_ROLE);
+    childItem->setData("Double", PlotItemDelegate::DATA_TYPE_NAME);
+    parentItem->appendRow(childItem);
   }
 }
 
