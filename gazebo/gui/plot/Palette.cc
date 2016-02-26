@@ -238,6 +238,13 @@ class SearchModel : public QSortFilterProxyModel
     // Item index in search model
     auto id = this->sourceModel()->index(_srcRow, 0, _srcParent);
 
+    // Ignore titles
+    if (this->sourceModel()->data(id, PlotItemDelegate::TYPE).toString() ==
+        "title")
+    {
+      return false;
+    }
+
     // Collapsed by default
     this->sourceModel()->setData(id, false, PlotItemDelegate::TO_EXPAND);
 
