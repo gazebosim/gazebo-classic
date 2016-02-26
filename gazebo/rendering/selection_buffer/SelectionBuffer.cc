@@ -208,7 +208,7 @@ Ogre::Entity *SelectionBuffer::OnSelectionClick(int _x, int _y)
   size_t posInStream = (this->dataPtr->pixelBox->getWidth() * _y) * 4;
   posInStream += _x * 4;
   common::Color::BGRA color(0);
-  if (!this->buffer)
+  if (!this->dataPtr->buffer)
   {
     gzerr << "Selection buffer is null.\n";
     return 0;
