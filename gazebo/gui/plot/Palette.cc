@@ -709,7 +709,8 @@ void Palette::FillModels(QStandardItemModel *_modelsModel)
 
     if (queryParts.size() != 2)
     {
-      gzwarn << "Unsupported query [" << itemURI.Str() << "]" << std::endl;
+      gzwarn << "Unsupported query [" << itemURI.Str() << "]. " <<
+          "Only top level queries can be handled." << std::endl;
       continue;
     }
 
@@ -719,59 +720,11 @@ void Palette::FillModels(QStandardItemModel *_modelsModel)
     }
     else if (queryParts[0] == "vector3d")
     {
-      auto parentItemName = queryParts[1];
-      if (parentItemName.find("velocity") != std::string::npos)
-        parentItemName = "velocity";
-
-      QStandardItem *velItem = NULL;
-
-      // Check if it has already been added
-      for (int k = 0; k < modelItem->rowCount(); ++k)
-      {
-        auto childItem = modelItem->child(k, 0);
-        if (childItem && childItem->text().toStdString() == parentItemName)
-        {
-          velItem = childItem;
-          break;
-        }
-      }
-
-      // Create new item
-      if (!velItem)
-      {
-        velItem = new QStandardItem(parentItemName.c_str());
-        modelItem->appendRow(velItem);
-      }
-
-      this->InsertVector3dItem(velItem, itemURI, queryParts[1]);
+      this->InsertVector3dItem(modelItem, itemURI, queryParts[1]);
     }
     else if (queryParts[0] == "quaterniond")
     {
-      auto parentItemName = queryParts[1];
-      if (parentItemName.find("velocity") != std::string::npos)
-        parentItemName = "velocity";
-
-      QStandardItem *velItem = NULL;
-
-      // Check if it has already been added
-      for (int k = 0; k < modelItem->rowCount(); ++k)
-      {
-        auto childItem = modelItem->child(k, 0);
-        if (childItem && childItem->text().toStdString() == parentItemName)
-        {
-          velItem = childItem;
-          break;
-        }
-      }
-
-      // Create new item
-      if (!velItem)
-      {
-        velItem = new QStandardItem(parentItemName.c_str());
-        modelItem->appendRow(velItem);
-      }
-
-      this->InsertQuaterniondItem(velItem, itemURI, queryParts[1]);
+      this->InsertQuaterniondItem(modelItem, itemURI, queryParts[1]);
     }
   }
 }
@@ -1043,27 +996,56 @@ void Palette::InsertPoseItem(QStandardItem *_item, const common::URI &_uri,
 void Palette::InsertVector3dItem(QStandardItem *_item, const common::URI &_uri,
     const std::string &_query)
 {
-  bool isLinVel = _query.find("linear_velocity") != std::string::npos;
+  // Use the full query as name by default
+  auto subItem0Name = _query;
 
-  std::string title;
-  if (isLinVel)
-    title = "Velocity";
-  else
-    title = ConfigWidget::HumanReadableKey(_query);
-
-  // Main item
-  _item->setData(title.c_str(), PlotItemDelegate::DISPLAY_NAME);
+  // Use the input item as the immediate parent item by default
   auto parentItem = _item;
 
-  // Linear Velocity goes one deeper
+  // If it's linear velocity, place it under velocity -> linear
+  bool isLinVel = _query.find("linear_velocity") != std::string::npos;
+
+  // If it's linear acceleration, place it under acceleration -> linear
+  bool isLinAcc = _query.find("linear_acceleration") != std::string::npos;
+
   if (isLinVel)
+    subItem0Name = "velocity";
+  else if (isLinAcc)
+    subItem0Name = "acceleration";
+
+  // Check if it has already been added (by angular sibling for example)
+  QStandardItem *subItem0 = NULL;
+  for (int k = 0; k < _item->rowCount(); ++k)
   {
-    auto childItem = new QStandardItem();
-    childItem->setData("Linear", PlotItemDelegate::DISPLAY_NAME);
-    _item->appendRow(childItem);
-    parentItem = childItem;
+    auto childItem = _item->child(k, 0);
+    if (childItem && childItem->text().toStdString() == subItem0Name)
+    {
+      subItem0 = childItem;
+      break;
+    }
   }
 
+  if (isLinVel || isLinAcc)
+  {
+    // Otherwise create new item
+    if (!subItem0)
+    {
+      subItem0 = new QStandardItem(subItem0Name.c_str());
+      _item->appendRow(subItem0);
+    }
+
+    subItem0Name = ConfigWidget::HumanReadableKey(subItem0Name);
+    subItem0->setData(subItem0Name.c_str(), PlotItemDelegate::DISPLAY_NAME);
+
+    // Linear
+    // We don't search for this because we assume no one else has added it yet
+    auto subItem1 = new QStandardItem();
+    subItem1->setData("Linear", PlotItemDelegate::DISPLAY_NAME);
+    subItem0->appendRow(subItem1);
+    parentItem = subItem1;
+  }
+
+  // The Vector3d
   std::vector<std::string> elements = {"x", "y", "z"};
   for (auto element : elements)
   {
@@ -1083,25 +1065,53 @@ void Palette::InsertVector3dItem(QStandardItem *_item, const common::URI &_uri,
 void Palette::InsertQuaterniondItem(QStandardItem *_item,
     const common::URI &_uri, const std::string &_query)
 {
-  bool isAngVel = _query.find("angular_velocity") != std::string::npos;
+  // Use the full query as name by default
+  auto subItem0Name = _query;
 
-  std::string title;
-  if (isAngVel)
-    title = "Velocity";
-  else
-    title = ConfigWidget::HumanReadableKey(_query);
-
-  // Main item
-  _item->setData(title.c_str(), PlotItemDelegate::DISPLAY_NAME);
+  // Use the input item as the immediate parent item by default
   auto parentItem = _item;
 
-  // Angular Velocity goes one deeper
+  // If it's angular velocity, place it under velocity -> angular
+  bool isAngVel = _query.find("angular_velocity") != std::string::npos;
+
+  // If it's angular acceleration, place it under acceleration -> angular
+  bool isAngAcc = _query.find("angular_acceleration") != std::string::npos;
+
   if (isAngVel)
+    subItem0Name = "velocity";
+  else if (isAngAcc)
+    subItem0Name = "acceleration";
+
+  // Check if it has already been added (by linear sibling for example)
+  QStandardItem *subItem0 = NULL;
+  for (int k = 0; k < _item->rowCount(); ++k)
   {
-    auto childItem = new QStandardItem();
-    childItem->setData("Angular", PlotItemDelegate::DISPLAY_NAME);
-    _item->appendRow(childItem);
-    parentItem = childItem;
+    auto childItem = _item->child(k, 0);
+    if (childItem && childItem->text().toStdString() == subItem0Name)
+    {
+      subItem0 = childItem;
+      break;
+    }
+  }
+
+  if (isAngVel || isAngAcc)
+  {
+    // Otherwise create new item
+    if (!subItem0)
+    {
+      subItem0 = new QStandardItem(subItem0Name.c_str());
+      _item->appendRow(subItem0);
+    }
+
+    subItem0Name = ConfigWidget::HumanReadableKey(subItem0Name);
+    subItem0->setData(subItem0Name.c_str(), PlotItemDelegate::DISPLAY_NAME);
+
+    // Angular
+    // We don't search for this because we assume no one else has added it yet
+    auto subItem1 = new QStandardItem();
+    subItem1->setData("Angular", PlotItemDelegate::DISPLAY_NAME);
+    subItem0->appendRow(subItem1);
+    parentItem = subItem1;
   }
 
   std::vector<std::string> elements = {"roll", "pitch", "yaw"};
