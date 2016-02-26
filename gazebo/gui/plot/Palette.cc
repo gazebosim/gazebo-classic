@@ -751,6 +751,8 @@ void Palette::FillSim(QStandardItemModel *_simModel)
     else
       childItem->setData("Double", PlotItemDelegate::TYPE);
 
+    // TODO: subclass QStandardItem and override setToolTip to do this
+    // automatically
     std::string typeName =
         "<font size=3><p><b>Type</b>: " + childItem->data(
         PlotItemDelegate::TYPE).toString().toStdString() +
@@ -955,20 +957,9 @@ void Palette::InsertPoseItem(QStandardItem *_item, const common::URI &_uri,
       PlotItemDelegate::DISPLAY_NAME);
   poseItem->appendRow(positionItem);
 
-  std::vector<std::string> positions = {"x", "y", "z"};
-  for (auto position : positions)
-  {
-    auto humanName = ConfigWidget::HumanReadableKey(position);
+  common::URI positionURI(_uri.Str() + "/vector3d/position");
 
-    auto childItem = new QStandardItem();
-    childItem->setData(humanName.c_str(),
-        PlotItemDelegate::DISPLAY_NAME);
-    childItem->setData(
-        (_uri.Str() + "/vector3d/position/double/" + position).c_str(),
-        PlotItemDelegate::URI_QUERY);
-    childItem->setData("Double", PlotItemDelegate::TYPE);
-    positionItem->appendRow(childItem);
-  }
+  this->InsertVector3dItem(positionItem, positionURI, _query);
 
   // Orientation
   auto orientationItem = new QStandardItem();
@@ -976,20 +967,9 @@ void Palette::InsertPoseItem(QStandardItem *_item, const common::URI &_uri,
       PlotItemDelegate::DISPLAY_NAME);
   poseItem->appendRow(orientationItem);
 
-  std::vector<std::string> orientations = {"roll", "pitch", "yaw"};
-  for (auto orientation : orientations)
-  {
-    auto humanName = ConfigWidget::HumanReadableKey(orientation);
+  common::URI orientationURI(_uri.Str() + "/quaterniond/orientation");
 
-    auto childItem = new QStandardItem();
-    childItem->setData(humanName.c_str(),
-        PlotItemDelegate::DISPLAY_NAME);
-    childItem->setData(
-        (_uri.Str() + "/quaterniond/orientation/double/" + orientation).c_str(),
-        PlotItemDelegate::URI_QUERY);
-    childItem->setData("Double", PlotItemDelegate::TYPE);
-    orientationItem->appendRow(childItem);
-  }
+  this->InsertQuaterniondItem(orientationItem, orientationURI, _query);
 }
 
 /////////////////////////////////////////////////
@@ -1057,6 +1037,13 @@ void Palette::InsertVector3dItem(QStandardItem *_item, const common::URI &_uri,
     childItem->setData((_uri.Str() + "/double/" + element).c_str(),
         PlotItemDelegate::URI_QUERY);
     childItem->setData("Double", PlotItemDelegate::TYPE);
+
+    std::string typeName =
+        "<font size=3><p><b>Type</b>: " + childItem->data(
+        PlotItemDelegate::TYPE).toString().toStdString() +
+        "</p></font>";
+    childItem->setToolTip(QString::fromStdString(typeName));
+
     parentItem->appendRow(childItem);
   }
 }
@@ -1125,6 +1112,13 @@ void Palette::InsertQuaterniondItem(QStandardItem *_item,
     childItem->setData((_uri.Str() + "/double/" + element).c_str(),
         PlotItemDelegate::URI_QUERY);
     childItem->setData("Double", PlotItemDelegate::TYPE);
+
+    std::string typeName =
+        "<font size=3><p><b>Type</b>: " + childItem->data(
+        PlotItemDelegate::TYPE).toString().toStdString() +
+        "</p></font>";
+    childItem->setToolTip(QString::fromStdString(typeName));
+
     parentItem->appendRow(childItem);
   }
 }
