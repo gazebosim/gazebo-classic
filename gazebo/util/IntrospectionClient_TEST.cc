@@ -15,8 +15,10 @@
  *
 */
 
+#include <mutex>
 #include <set>
 #include <string>
+
 #include <ignition/transport.hh>
 #include <gtest/gtest.h>
 #include "gazebo/common/Exception.hh"
@@ -65,10 +67,26 @@ class IntrospectionClientTest : public ::testing::Test
     this->callbackExecuted = true;
   }
 
+  /// \brief Function called each time a topic update is received.
+  public: void MyThreadedCb(const gazebo::msgs::Param_V &/*_msg*/)
+  {
+    std::lock_guard<std::mutex> lock(this->mutex);
+    for (unsigned int i = 0; i < 100; ++i)
+      common::Time::MSleep(10);
+  }
+
   /// \brief Subscribe to a given topic.
   public: void Subscribe(const std::string &_topic)
   {
     if (this->node.Subscribe(_topic, &IntrospectionClientTest::MyCb, this))
+      this->topicsSubscribed.emplace(_topic);
+  }
+
+  /// \brief Subscribe to a given topic.
+  public: void ThreadedSubscribe(const std::string &_topic)
+  {
+    if (this->node.Subscribe(_topic, &IntrospectionClientTest::MyThreadedCb,
+        this))
       this->topicsSubscribed.emplace(_topic);
   }
 
@@ -99,6 +117,19 @@ class IntrospectionClientTest : public ::testing::Test
       this->node.Unsubscribe(topic);
   }
 
+  /// \brief Subscribe to a given topic.
+  public: void UpdateFilterThreaded(const std::string &_filterId)
+  {
+    // Update the filter. We're interested on "item1" and "item2".
+    for (unsigned int i = 0; i < 100; ++i)
+    {
+      std::lock_guard<std::mutex> lock(this->mutex);
+      std::set<std::string> items = {"item1", "item2"};
+      EXPECT_TRUE(this->client.UpdateFilter(this->managerId, _filterId, items));
+      common::Time::MSleep(10);
+    }
+  }
+
   /// \brief Flag to detect whether the callback was executed.
   protected: bool callbackExecuted;
 
@@ -111,12 +142,45 @@ class IntrospectionClientTest : public ::testing::Test
   /// \brief An introspection client.
   protected: util::IntrospectionClient client;
 
+  /// \brief Mutex for testing threaded introspection client.
+  protected: std::mutex mutex;
+
   /// \brief Transport node.
   private: ignition::transport::Node node;
 
   /// \brief The set of topics subscribed.
   private: std::set<std::string> topicsSubscribed;
 };
+
+/////////////////////////////////////////////////
+TEST_F(IntrospectionClientTest, Threaded)
+{
+  std::string filterId;
+  std::string topic;
+
+  // Try to create an empty filter.
+  std::set<std::string> emptySet = {"item1"};
+  EXPECT_TRUE(this->client.NewFilter(this->managerId, emptySet, filterId,
+      topic));
+
+  // Trigger an update.
+  this->manager->Update();
+
+  // Subscribe to my custom topic for receiving updates.
+  this->ThreadedSubscribe(topic);
+
+  // update the filter in a thread
+  std::thread introspectThread(
+      &IntrospectionClientTest::UpdateFilterThreaded, this, filterId);
+
+  for (unsigned int i = 0; i < 10; ++i)
+  {
+    // this->manager->Update();
+    common::Time::MSleep(10);
+  }
+
+  introspectThread.join();
+}
 
 /////////////////////////////////////////////////
 TEST_F(IntrospectionClientTest, Managers)

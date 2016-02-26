@@ -22,7 +22,7 @@
 
 #include "gazebo/gui/plot/PlottingTypes.hh"
 #include "gazebo/gui/plot/PlotCurve.hh"
-#include "gazebo/gui/plot/TopicDataHandler.hh"
+#include "gazebo/gui/plot/TopicCurveHandler.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -31,8 +31,8 @@ namespace gazebo
 {
   namespace gui
   {
-    /// \brief Private data for the TopicDataHandler class.
-    class TopicDataHandlerPrivate
+    /// \brief Private data for the TopicCurveHandler class.
+    class TopicCurveHandlerPrivate
     {
       /// \brief Topic name
       public: std::string topic;
@@ -53,20 +53,20 @@ namespace gazebo
 }
 
 /////////////////////////////////////////////////
-TopicDataHandler::TopicDataHandler()
-  : dataPtr(new TopicDataHandlerPrivate())
+TopicCurveHandler::TopicCurveHandler()
+  : dataPtr(new TopicCurveHandlerPrivate())
 {
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init();
 }
 
 /////////////////////////////////////////////////
-TopicDataHandler::~TopicDataHandler()
+TopicCurveHandler::~TopicCurveHandler()
 {
 }
 
 /////////////////////////////////////////////////
-void TopicDataHandler::SetTopic(const std::string &_topic)
+void TopicCurveHandler::SetTopic(const std::string &_topic)
 {
   this->dataPtr->topic = _topic;
 
@@ -79,11 +79,11 @@ void TopicDataHandler::SetTopic(const std::string &_topic)
   }
 
   this->dataPtr->subscriber = this->dataPtr->node->Subscribe(
-      this->dataPtr->topic, &TopicDataHandler::OnTopicData, this);
+      this->dataPtr->topic, &TopicCurveHandler::OnTopicData, this);
 }
 
 /////////////////////////////////////////////////
-void TopicDataHandler::AddCurve(const std::string &_param,
+void TopicCurveHandler::AddCurve(const std::string &_param,
     PlotCurveWeakPtr _curve)
 {
   auto it = this->dataPtr->curves.find(_param);
@@ -104,7 +104,7 @@ void TopicDataHandler::AddCurve(const std::string &_param,
 }
 
 /////////////////////////////////////////////////
-void TopicDataHandler::RemoveCurve(PlotCurveWeakPtr _curve)
+void TopicCurveHandler::RemoveCurve(PlotCurveWeakPtr _curve)
 {
   for (auto it = this->dataPtr->curves.begin();
       it != this->dataPtr->curves.end(); ++it)
@@ -121,7 +121,7 @@ void TopicDataHandler::RemoveCurve(PlotCurveWeakPtr _curve)
 }
 
 /////////////////////////////////////////////////
-bool TopicDataHandler::HasCurve(PlotCurveWeakPtr _curve) const
+bool TopicCurveHandler::HasCurve(PlotCurveWeakPtr _curve) const
 {
   for (const auto &it : this->dataPtr->curves)
   {
@@ -133,7 +133,7 @@ bool TopicDataHandler::HasCurve(PlotCurveWeakPtr _curve) const
 }
 
 /////////////////////////////////////////////////
-unsigned int TopicDataHandler::Count() const
+unsigned int TopicCurveHandler::Count() const
 {
   unsigned int count = 0;
   for (const auto &it : this->dataPtr->curves)
@@ -142,7 +142,7 @@ unsigned int TopicDataHandler::Count() const
 }
 
 /////////////////////////////////////////////////
-void TopicDataHandler::OnTopicData(const std::string &_msg)
+void TopicCurveHandler::OnTopicData(const std::string &_msg)
 {
   if (this->dataPtr->curves.empty())
     return;
@@ -154,7 +154,7 @@ void TopicDataHandler::OnTopicData(const std::string &_msg)
 }
 
 /////////////////////////////////////////////////
-void TopicDataHandler::UpdateCurve(google::protobuf::Message *_msg,
+void TopicCurveHandler::UpdateCurve(google::protobuf::Message *_msg,
     const int _index)
 {
   auto ref = _msg->GetReflection();

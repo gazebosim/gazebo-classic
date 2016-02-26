@@ -2,12 +2,13 @@ include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
 set (sources_local
   plot/IncrementalPlot.cc
+  plot/IntrospectionCurveHandler.cc
   plot/PlotCanvas.cc
   plot/PlotCurve.cc
   plot/PlotManager.cc
   plot/Palette.cc
   plot/PlotWindow.cc
-  plot/TopicDataHandler.cc
+  plot/TopicCurveHandler.cc
   plot/VariablePill.cc
   plot/VariablePillContainer.cc
 )

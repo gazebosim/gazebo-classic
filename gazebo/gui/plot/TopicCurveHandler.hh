@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_GUI_PLOT_TOPICDATAHANDLER_HH_
-#define _GAZEBO_GUI_PLOT_TOPICDATAHANDLER_HH_
+#ifndef _GAZEBO_GUI_PLOT_TOPICCURVEHANDLER_HH_
+#define _GAZEBO_GUI_PLOT_TOPICCURVEHANDLER_HH_
 
 #include <memory>
 #include <string>
@@ -37,16 +37,16 @@ namespace gazebo
   namespace gui
   {
     // Forward declare private data class
-    class TopicDataHandlerPrivate;
+    class TopicCurveHandlerPrivate;
 
     /// \brief Manages and updates curves based on topic data.
-    class GZ_GUI_VISIBLE TopicDataHandler
+    class GZ_GUI_VISIBLE TopicCurveHandler
     {
       /// \brief Constructor.
-      public: TopicDataHandler();
+      public: TopicCurveHandler();
 
       /// \brief Destructor.
-      public: ~TopicDataHandler();
+      public: ~TopicCurveHandler();
 
       /// \brief Set topic to subscribe to.
       /// \param[in] _topic Name of topic
@@ -81,7 +81,7 @@ namespace gazebo
                   const int _index = 0);
 
       /// \brief Private data pointer
-      private: std::unique_ptr<TopicDataHandlerPrivate> dataPtr;
+      private: std::unique_ptr<TopicCurveHandlerPrivate> dataPtr;
     };
   }
 }

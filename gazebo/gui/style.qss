@@ -996,7 +996,7 @@ QTabBar#plottingTabBar
   padding: 0px;
 }
 
-QTabBar#plottingTabBar::pane,
+QTabBar#plottingTabBar::pane
 {
   background-color: #777777;
   padding: 0px;
@@ -1004,4 +1004,3 @@ QTabBar#plottingTabBar::pane,
   border: 0px;
   color: #fafafa;
 }
-

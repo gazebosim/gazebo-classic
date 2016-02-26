@@ -281,7 +281,7 @@ void PlotCanvas::AddVariable(const unsigned int _id,
   if (!this->dataPtr->plotData.empty() && this->dataPtr->emptyPlot)
     this->dataPtr->emptyPlot->setVisible(false);
 
-  PlotManager::Instance()->AddCurve(_variable, curve);
+  PlotManager::Instance()->AddIntrospectionCurve(_variable, curve);
 }
 
 /////////////////////////////////////////////////
@@ -317,7 +317,8 @@ void PlotCanvas::RemoveVariable(const unsigned int _id,
   unsigned int curveId = v->second;
 
   // remove curve from manager
-  PlotManager::Instance()->RemoveCurve(it->second->plot->Curve(_id));
+  PlotManager::Instance()->RemoveIntrospectionCurve(
+      it->second->plot->Curve(_id));
 
   // erase from map
   it->second->variableCurves.erase(v);
@@ -599,7 +600,7 @@ void PlotCanvas::Restart()
       {
         c->SetActive(false);
         // remove from manager so they don't get updated any more.
-        PlotManager::Instance()->RemoveCurve(c);
+        PlotManager::Instance()->RemoveIntrospectionCurve(c);
 
         // add to the list of variables to clone
         variableCurvesToClone.push_back(std::make_tuple(variablePill->Text(),

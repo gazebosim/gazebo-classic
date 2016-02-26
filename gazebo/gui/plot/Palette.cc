@@ -294,7 +294,7 @@ void Palette::FillSim(QStandardItemModel *_simModel)
 {
   // Hard-coded values for the sim tab
   std::multimap<std::string, std::string> simFields = {
-      {"~/world_stats", "sim_time"},
+      {"data://world/default", "sim_time"},
       {"~/world_stats", "real_time"},
       {"~/world_stats", "iterations"}};
 
@@ -317,7 +317,7 @@ void Palette::FillSim(QStandardItemModel *_simModel)
         "</p></font>";
     childItem->setToolTip(QString::fromStdString(typeName));
 
-    std::string dataName = field.first + "?p=/" + field.second;
+    std::string dataName = field.first + "?p=" + field.second;
     childItem->setData(dataName.c_str(), PlotItemDelegate::DATA_ROLE);
 
     _simModel->appendRow(childItem);
@@ -345,6 +345,24 @@ void Palette::FillSim(QStandardItemModel *_simModel)
   simTimeItem->setData("sim_time", PlotItemDelegate::DATA_ROLE);
   simTimeItem->setData("Double", PlotItemDelegate::DATA_TYPE_NAME);
   _simModel->appendRow(simTimeItem);
+
+  QString groundWorldPoseStr(
+      "data://world/default/model/ground_plane?p=world_pose/position/z");
+  auto groundPoseItem = new QStandardItem(groundWorldPoseStr);
+  groundPoseItem->setData(groundWorldPoseStr,
+      PlotItemDelegate::TOPIC_NAME_ROLE);
+  groundPoseItem->setData(groundWorldPoseStr,
+    PlotItemDelegate::DATA_ROLE);
+  groundPoseItem->setData("Double", PlotItemDelegate::DATA_TYPE_NAME);
+  _simModel->appendRow(groundPoseItem);
+
+  QString boxWorldPoseStr(
+      "data://world/default/model/unit_box_0?p=world_pose/position/z");
+  auto boxPoseItem = new QStandardItem(boxWorldPoseStr);
+  boxPoseItem->setData(boxWorldPoseStr, PlotItemDelegate::TOPIC_NAME_ROLE);
+  boxPoseItem->setData(boxWorldPoseStr, PlotItemDelegate::DATA_ROLE);
+  boxPoseItem->setData("Double", PlotItemDelegate::DATA_TYPE_NAME);
+  _simModel->appendRow(boxPoseItem);
   //=================
 }
 
@@ -498,4 +516,3 @@ void Palette::FillFromMsg(google::protobuf::Message *_msg,
     }
   }
 }
-
