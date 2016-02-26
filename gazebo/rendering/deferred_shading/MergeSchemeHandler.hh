@@ -54,11 +54,12 @@ namespace gazebo
         delete this->materialGenerator;
       }
 
-      /// Copy constructor is private: no copy
-      private: MergeSchemeHandler(const MergeSchemeHandler& x);
+      /// Delete copy constructor: no copy
+      public: MergeSchemeHandler(const MergeSchemeHandler& x) = delete;
 
-      /// Assignment operator is private: no assignment
-      private: MergeSchemeHandler &operator=(const MergeSchemeHandler& x);
+      /// Delete assignment operator: no assignment
+      public: MergeSchemeHandler &operator=(const MergeSchemeHandler& x) =
+        delete;
 
       /// @copydoc MaterialManager::Listener::handleSchemeNotFound
       public: virtual Ogre::Technique *handleSchemeNotFound(
