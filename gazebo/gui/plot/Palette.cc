@@ -48,7 +48,7 @@ class PlotItemDelegate : public QStyledItemDelegate
     /// the information carried during a drag-drop operation.
     URI_QUERY,
 
-    /// \brief Data type name, such as "Double" or "Bool",  used to display type
+    /// \brief Data type name, such as "Double" or "Bool", used to display type
     /// information to the user. Or something like "model", "link", used to
     /// choose icons.
     TYPE,
@@ -373,13 +373,19 @@ class gazebo::gui::PalettePrivate
   /// \brief Proxy model to filter topics data.
   public: SearchModel *searchTopicsModel;
 
+  /// \brief Proxy model to filter models data.
+  public: SearchModel *searchModelsModel;
+
   /// \brief Proxy model to filter sim data.
   public: SearchModel *searchSimModel;
 
-  /// \brief View holding the topics tree.
+  /// \brief View holding the search topics tree.
   public: QTreeView *searchTopicsTree;
 
-  /// \brief View holding the sim tree.
+  /// \brief View holding the search models tree.
+  public: QTreeView *searchModelsTree;
+
+  /// \brief View holding the search sim tree.
   public: QTreeView *searchSimTree;
 };
 
@@ -426,6 +432,12 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   // The model that will hold data to be displayed in the model tree view
   this->dataPtr->modelsModel = new PlotItemModel;
   this->FillModels(this->dataPtr->modelsModel);
+
+  // A proxy model to filter models model
+  this->dataPtr->searchModelsModel = new SearchModel;
+  this->dataPtr->searchModelsModel->setFilterRole(
+      PlotItemDelegate::DISPLAY_NAME);
+  this->dataPtr->searchModelsModel->setSourceModel(this->dataPtr->modelsModel);
 
   // A tree to visualize models and their properties
   auto modelsTree = new QTreeView;
@@ -488,6 +500,19 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   this->dataPtr->searchTopicsTree->setDragEnabled(true);
   this->dataPtr->searchTopicsTree->setDragDropMode(QAbstractItemView::DragOnly);
 
+  // A tree to visualize models search results
+  this->dataPtr->searchModelsTree = new QTreeView;
+  this->dataPtr->searchModelsTree->setObjectName("plotTree");
+  this->dataPtr->searchModelsTree->setAnimated(true);
+  this->dataPtr->searchModelsTree->setHeaderHidden(true);
+  this->dataPtr->searchModelsTree->setExpandsOnDoubleClick(true);
+  this->dataPtr->searchModelsTree->setModel(this->dataPtr->searchModelsModel);
+  this->dataPtr->searchModelsTree->setItemDelegate(plotItemDelegate);
+  this->dataPtr->searchModelsTree->setEditTriggers(
+      QAbstractItemView::NoEditTriggers);
+  this->dataPtr->searchModelsTree->setDragEnabled(true);
+  this->dataPtr->searchModelsTree->setDragDropMode(QAbstractItemView::DragOnly);
+
   // A tree to visualize sim search results
   this->dataPtr->searchSimTree = new QTreeView;
   this->dataPtr->searchSimTree->setObjectName("plotTree");
@@ -512,6 +537,16 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   auto topicsWidget = new QWidget();
   topicsWidget->setLayout(topicsLayout);
 
+  auto modelsLabel = new QLabel(tr("MODELS"));
+  modelsLabel->setObjectName("plottingSearchLabel");
+
+  auto modelsLayout = new QVBoxLayout();
+  modelsLayout->addWidget(modelsLabel);
+  modelsLayout->addWidget(this->dataPtr->searchModelsTree);
+
+  auto modelsWidget = new QWidget();
+  modelsWidget->setLayout(modelsLayout);
+
   auto simLabel = new QLabel(tr("SIM"));
   simLabel->setObjectName("plottingSearchLabel");
 
@@ -524,6 +559,7 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
 
   auto splitter = new QSplitter(Qt::Vertical, this);
   splitter->addWidget(topicsWidget);
+  splitter->addWidget(modelsWidget);
   splitter->addWidget(simWidget);
   splitter->setCollapsible(0, false);
   splitter->setCollapsible(1, false);
@@ -1127,11 +1163,14 @@ void Palette::InsertQuaterniondItem(QStandardItem *_item,
 void Palette::UpdateSearch(const QString &_search)
 {
   this->dataPtr->searchTopicsModel->setSearch(_search);
+  this->dataPtr->searchModelsModel->setSearch(_search);
   this->dataPtr->searchSimModel->setSearch(_search);
 
   // Expand / collapse
   this->ExpandChildren(this->dataPtr->searchTopicsModel,
       this->dataPtr->searchTopicsTree, QModelIndex());
+  this->ExpandChildren(this->dataPtr->searchModelsModel,
+      this->dataPtr->searchModelsTree, QModelIndex());
   this->ExpandChildren(this->dataPtr->searchSimModel,
       this->dataPtr->searchSimTree, QModelIndex());
 }
