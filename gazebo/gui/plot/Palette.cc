@@ -732,7 +732,7 @@ void Palette::FillModels(QStandardItemModel *_modelsModel)
         if (!previousItem)
         {
           auto modelList = _modelsModel->findItems(nextPart.c_str());
-          if(!modelList.isEmpty())
+          if (!modelList.isEmpty())
             existingItem = modelList[0];
         }
         // Check a QStandardItem
@@ -881,7 +881,8 @@ void Palette::FillSim(QStandardItemModel *_simModel)
   _simModel->appendRow(itemc);
   auto simTimeItem = new QStandardItem("sim_time");
   simTimeItem->setData("sim_time", PlotItemDelegate::DISPLAY_NAME);
-  simTimeItem->setData("sim_time", PlotItemDelegate::URI_QUERY);
+  simTimeItem->setData("data://world/default?p=time/sim_time",
+      PlotItemDelegate::URI_QUERY);
   simTimeItem->setData("Double", PlotItemDelegate::TYPE);
   _simModel->appendRow(simTimeItem);
   //=================
