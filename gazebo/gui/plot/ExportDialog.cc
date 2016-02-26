@@ -54,8 +54,8 @@ class PlotViewDelegate : public QStyledItemDelegate
   /// \brief Various data roles for the plot list view delegate
   public: enum datarole
   {
-    headerTextRole = Qt::UserRole + 100,
-    iconRole = Qt::UserRole+101
+    HEADER_TEXT_ROLE = Qt::UserRole + 100,
+    ICON_ROLE = Qt::UserRole
   };
 
   /// \brief Constructor
@@ -73,8 +73,9 @@ class PlotViewDelegate : public QStyledItemDelegate
           {
             QRectF r = _opt.rect;
             QRectF iconRect = _opt.rect;
-            QIcon icon = qvariant_cast<QIcon>(_index.data(iconRole));
-            QString title = qvariant_cast<QString>(_index.data(headerTextRole));
+            QIcon icon = qvariant_cast<QIcon>(_index.data(ICON_ROLE));
+            QString title = qvariant_cast<QString>(
+                _index.data(HEADER_TEXT_ROLE));
 
             QFont font = QApplication::font();
             QFontMetrics fm(font);
@@ -86,6 +87,14 @@ class PlotViewDelegate : public QStyledItemDelegate
 
             iconRect.adjust(10, 10, -10, -10);
 
+            /*const PlotViewItem *plotItem =
+              static_cast<const PlotViewItem*>(
+                  static_cast<const QStandardItemModel*>(
+                    _index.model())->itemFromIndex(_index));
+                    */
+
+            //QwtPlotRenderer renderer;
+            //renderer.render(plotItem->canvas->Plots()[0], _painter, iconRect);
             QPixmap image = icon.pixmap(iconRect.width(), iconRect.height());
             _painter->drawPixmap(iconRect.left(), iconRect.top(), image);
 
@@ -103,7 +112,8 @@ class PlotViewDelegate : public QStyledItemDelegate
             int checkTitleWidth = fm.width(title) + checkSize + checkMargin;
 
             QRectF checkRect = _opt.rect;
-            checkRect.setTop(iconRect.top() + image.height() + checkMargin);
+            //checkRect.setTop(iconRect.top() + image.height() + checkMargin);
+            checkRect.setTop(iconRect.top() + iconRect.height() + checkMargin);
             checkRect.setLeft(iconRect.left() +
                 (iconRect.width() - checkTitleWidth)/2.0);
             checkRect.setWidth(checkSize);
@@ -125,7 +135,7 @@ class PlotViewDelegate : public QStyledItemDelegate
   public: QSize sizeHint(const QStyleOptionViewItem &_option,
                               const QModelIndex &_index) const
           {
-            QIcon icon = qvariant_cast<QIcon>(_index.data(iconRole));
+            QIcon icon = qvariant_cast<QIcon>(_index.data(ICON_ROLE));
             QSize iconSize = icon.actualSize(_option.decorationSize);
 
             iconSize.scale(320, 180, Qt::KeepAspectRatio);
@@ -136,6 +146,8 @@ class PlotViewDelegate : public QStyledItemDelegate
                 iconSize.height() + fm.height() + 10);
             return result;
           }
+
+  public: IncrementalPlot *plot;
 };
 
 /////////////////////////////////////////////////
@@ -215,12 +227,21 @@ ExportDialog::ExportDialog(QWidget *_parent)
   for (auto &plot : plots)
   {
     QIcon icon(QPixmap::grabWindow(plot->winId()));
+    /*QPixmap *pix = new QPixmap(320, 200);
+    QPainter *paint = new QPainter(pix);
+
+    QwtPlotRenderer renderer;
+    std::cout << plot->Plots().size() << std::endl;
+    if (!plot->Plots().empty())
+      renderer.render(plot->Plots()[0], paint, QRectF(0,0,320,200));
+    QIcon icon(*pix);
+    */
 
     PlotViewItem *item = new PlotViewItem;
     item->canvas = plot;
 
-    item->setData(plot->Title(), PlotViewDelegate::headerTextRole);
-    item->setData(icon, PlotViewDelegate::iconRole);
+    item->setData(plot->Title(), PlotViewDelegate::HEADER_TEXT_ROLE);
+    item->setData(icon, PlotViewDelegate::ICON_ROLE);
     item->setEditable(false);
     item->setCheckable(true);
     model->appendRow(item);
@@ -245,12 +266,13 @@ ExportDialog::ExportDialog(QWidget *_parent)
   mainLayout->addWidget(titleFrame);
   mainLayout->addWidget(this->dataPtr->listView);
   mainLayout->addLayout(buttonsLayout);
+  mainLayout->addSpacing(20);
   mainLayout->setContentsMargins(0, 0, 0, 0);
 
   this->setLayout(mainLayout);
 
   // Set a reasonable default size.
-  this->resize(640, 400);
+  this->resize(720, 480);
 
   connect(clearAct, SIGNAL(triggered()),
           this->dataPtr->listView, SLOT(clearSelection()));

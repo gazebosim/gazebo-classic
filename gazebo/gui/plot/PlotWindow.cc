@@ -197,7 +197,7 @@ PlotWindow::PlotWindow(QWidget *_parent)
 
   PlotManager::Instance()->AddWindow(this);
 
-  this->setMinimumSize(640, 480);
+  this->setMinimumSize(820, 480);
 }
 
 /////////////////////////////////////////////////

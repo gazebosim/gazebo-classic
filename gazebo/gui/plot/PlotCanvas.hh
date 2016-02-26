@@ -25,6 +25,7 @@
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/plot/PlottingTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -35,7 +36,7 @@ namespace gazebo
     class PlotCanvasPrivate;
 
     /// \brief Plot canvas
-    class PlotCanvas : public QWidget
+    class GZ_GUI_VISIBLE PlotCanvas : public QWidget
     {
       Q_OBJECT
 
@@ -98,7 +99,7 @@ namespace gazebo
 
       /// \brief Get all the plots in this canvas.
       /// \return A list of plots in this canvas.
-      public: std::vector<IncrementalPlot *> Plots();
+      public: std::vector<IncrementalPlot *> Plots() const;
 
       /// \brief Get the curve associated with the variable
       /// \param[in] _id Unique id of the variable

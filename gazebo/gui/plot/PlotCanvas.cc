@@ -699,7 +699,7 @@ PlotCurveWeakPtr PlotCanvas::PlotCurve(const unsigned int _variableId)
 }
 
 /////////////////////////////////////////////////
-std::vector<IncrementalPlot *> PlotCanvas::Plots()
+std::vector<IncrementalPlot *> PlotCanvas::Plots() const
 {
   std::vector<IncrementalPlot *> plots;
   for (const auto it : this->dataPtr->plotData)

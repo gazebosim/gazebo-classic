@@ -27,12 +27,12 @@ namespace gazebo
   namespace gui
   {
     // Forward declare private data class
-    class GZ_GUI_VISIBLE PlotWindowPrivate;
+    class PlotWindowPrivate;
 
     class PlotCanvas;
 
     /// \brief Plot window
-    class PlotWindow : public QWidget
+    class GZ_GUI_VISIBLE PlotWindow : public QWidget
     {
       Q_OBJECT
 
