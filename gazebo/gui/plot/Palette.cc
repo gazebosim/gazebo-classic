@@ -680,8 +680,8 @@ void Palette::FillModels(QStandardItemModel *_modelsModel)
   std::set<std::string> items;
   if (!client.Items(id, items))
   {
-    gzerr << "It wasn't possible to get items from manager [" << id << "]" <<
-        std::endl;
+    gzerr << "It wasn't possible to get items from introspection manager [" <<
+        id << "]" << std::endl;
     return;
   }
 
@@ -716,7 +716,7 @@ void Palette::FillModels(QStandardItemModel *_modelsModel)
     // Process path
     auto pathParts = common::split(pathStr, "/");
 
-    QStandardItem *modelItem = NULL;
+    QStandardItem *previousItem = NULL;
     unsigned int i = 0;
     while (i < pathParts.size())
     {
@@ -726,24 +726,78 @@ void Palette::FillModels(QStandardItemModel *_modelsModel)
       if (part == "model")
       {
         // Check if it has already been added
-        auto modelList = _modelsModel->findItems(nextPart.c_str());
-        if (modelList.isEmpty())
+        QStandardItem *existingItem = NULL;
+
+        // Check top level (model)
+        if (!previousItem)
         {
-          modelItem = new QStandardItem(nextPart.c_str());
-          modelItem->setData(nextPart.c_str(),
+          auto modelList = _modelsModel->findItems(nextPart.c_str());
+          if(!modelList.isEmpty())
+            existingItem = modelList[0];
+        }
+        // Check a QStandardItem
+        else
+        {
+          // TODO: Make a helper function for this
+          for (int k = 0; k < previousItem->rowCount(); ++k)
+          {
+            auto childItem = previousItem->child(k, 0);
+            if (childItem && childItem->text().toStdString() == nextPart)
+            {
+              existingItem = childItem;
+              break;
+            }
+          }
+        }
+
+        if (!existingItem)
+        {
+          auto newItem = new QStandardItem(nextPart.c_str());
+          newItem->setData(nextPart.c_str(),
               PlotItemDelegate::DISPLAY_NAME);
-          modelItem->setData("model", PlotItemDelegate::TYPE);
-          _modelsModel->appendRow(modelItem);
+          newItem->setData("model", PlotItemDelegate::TYPE);
+
+          if (!previousItem)
+          {
+            _modelsModel->appendRow(newItem);
+            previousItem = newItem;
+          }
+          else
+          {
+            // Add title if there isn't one yet
+            bool hasTitle = false;
+            for (int k = 0; k < previousItem->rowCount(); ++k)
+            {
+              auto childItem = previousItem->child(k, 0);
+              if (childItem &&
+                  childItem->data(PlotItemDelegate::TYPE) == "title")
+              {
+                hasTitle = true;
+                break;
+              }
+            }
+
+            if (!hasTitle)
+            {
+              auto modelsTitle = new QStandardItem();
+              modelsTitle->setData("MODELS", PlotItemDelegate::DISPLAY_NAME);
+              modelsTitle->setData("title", PlotItemDelegate::TYPE);
+              previousItem->appendRow(modelsTitle);
+            }
+
+            previousItem->appendRow(newItem);
+            previousItem = newItem;
+          }
         }
         else
         {
-          modelItem = modelList[0];
+          previousItem = existingItem;
         }
       }
       i += 2;
     }
 
-    if (!modelItem)
+    if (!previousItem)
       return;
 
     // Process query
@@ -759,15 +813,15 @@ void Palette::FillModels(QStandardItemModel *_modelsModel)
 
     if (queryParts[0] == "pose")
     {
-      this->InsertPoseItem(modelItem, itemURI, queryParts[1]);
+      this->InsertPoseItem(previousItem, itemURI, queryParts[1]);
     }
     else if (queryParts[0] == "vector3d")
     {
-      this->InsertVector3dItem(modelItem, itemURI, queryParts[1]);
+      this->InsertVector3dItem(previousItem, itemURI, queryParts[1]);
     }
     else if (queryParts[0] == "quaterniond")
     {
-      this->InsertQuaterniondItem(modelItem, itemURI, queryParts[1]);
+      this->InsertQuaterniondItem(previousItem, itemURI, queryParts[1]);
     }
   }
 }
@@ -1144,6 +1198,7 @@ void Palette::InsertQuaterniondItem(QStandardItem *_item,
     parentItem = subItem1;
   }
 
+  // The Quaterniond
   std::vector<std::string> elements = {"roll", "pitch", "yaw"};
   for (auto element : elements)
   {
