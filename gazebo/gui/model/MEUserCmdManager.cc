@@ -67,7 +67,7 @@ using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-MEUserCmd::MEUserCmd(unsigned int _id,
+MEUserCmd::MEUserCmd(const unsigned int _id,
     const std::string &_description,
     MEUserCmd::CmdType _type)
   : dataPtr(new MEUserCmdPrivate())
@@ -183,7 +183,7 @@ void MEUserCmdManager::Reset()
 {
   this->dataPtr->undoCmds.clear();
   this->dataPtr->redoCmds.clear();
-  this->UpdateStats();
+  this->StatsSignal();
 }
 
 /////////////////////////////////////////////////
@@ -238,7 +238,7 @@ void MEUserCmdManager::OnUndoCommand(QAction *_action)
   }
 
   // Update buttons
-  this->UpdateStats();
+  this->StatsSignal();
 }
 
 /////////////////////////////////////////////////
@@ -293,7 +293,7 @@ void MEUserCmdManager::OnRedoCommand(QAction *_action)
   }
 
   // Update buttons
-  this->UpdateStats();
+  this->StatsSignal();
 }
 
 /////////////////////////////////////////////////
@@ -312,13 +312,13 @@ MEUserCmdPtr MEUserCmdManager::NewCmd(
   this->dataPtr->redoCmds.clear();
 
   // Update buttons
-  this->UpdateStats();
+  this->StatsSignal();
 
   return cmd;
 }
 
 /////////////////////////////////////////////////
-void MEUserCmdManager::UpdateStats()
+void MEUserCmdManager::OnStatsSlot()
 {
   g_undoAct->setEnabled(this->dataPtr->undoCmds.size() > 0);
   g_redoAct->setEnabled(this->dataPtr->redoCmds.size() > 0);

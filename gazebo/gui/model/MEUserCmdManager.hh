@@ -60,7 +60,7 @@ namespace gazebo
       /// \param[in] _description Description for the command, such as
       /// "Rotate box", "Delete sphere", etc.
       /// \param[in] _type Type of command, such as MOVING, DELETING, etc.
-      public: MEUserCmd(unsigned int _id, const std::string &_description,
+      public: MEUserCmd(const unsigned int _id, const std::string &_description,
           MEUserCmd::CmdType _type);
 
       /// \brief Destructor
@@ -113,6 +113,7 @@ namespace gazebo
       /// \param[in] _description Command description, to be displayed to the
       /// user.
       /// \param[in] _type Command type.
+      /// \return Pointer to new command.
       public: MEUserCmdPtr NewCmd(const std::string &_description,
           const MEUserCmd::CmdType _type);
 
@@ -133,7 +134,7 @@ namespace gazebo
       private slots: void OnRedoCmdHistory();
 
       /// \brief Updates the widgets according to the user commands available.
-      private slots: void UpdateStats();
+      private slots: virtual void OnStatsSlot();
 
       /// \brief This is a singleton class.
       private: friend class SingletonT<MEUserCmdManager>;
