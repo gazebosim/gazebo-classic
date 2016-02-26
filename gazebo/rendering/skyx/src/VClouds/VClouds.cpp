@@ -3,7 +3,7 @@
 This source file is part of SkyX.
 Visit http://www.paradise-studios.net/products/skyx/
 
-Copyright (C) 2009-2012 Xavier VerguÌn Gonz·lez <xavyiy@gmail.com>
+Copyright (C) 2009-2012 Xavier Vergu√≠n Gonz√°lez <xavyiy@gmail.com>
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU Lesser General Public License as published by the Free Software
@@ -49,9 +49,9 @@ VClouds::VClouds(Ogre::SceneManager *sm)
     , mCloudFieldScale(1.0f)
     , mNoiseScale(4.2f)
     , mVisible(true)
-    , mDataManager(new DataManager(this))
-    , mGeometryManager(new GeometryManager(this))
-    , mLightningManager(new LightningManager(this))
+    , mDataManager(this)
+    , mGeometryManager(this)
+    , mLightningManager(this)
     , mCamerasData(std::vector<CameraData>())
 {
 }
@@ -79,15 +79,15 @@ void VClouds::create()
   }
 
   // Data manager
-  mDataManager->create(128, 128, 20);
+  mDataManager.create(128, 128, 20);
 
   // Geometry manager
-  mGeometryManager->create(mGeometrySettings.Height,
+  mGeometryManager.create(mGeometrySettings.Height,
       mGeometrySettings.Radius, mGeometrySettings.Alpha,
       mGeometrySettings.Beta, mGeometrySettings.NumberOfBlocks,
       mGeometrySettings.Na, mGeometrySettings.Nb, mGeometrySettings.Nc);
 
-  mGeometryManager->getSceneNode()->setVisible(mVisible);
+  mGeometryManager.getSceneNode()->setVisible(mVisible);
 
   mVolCloudsMaterial
     ->getTechnique(0)->getPass(0)->getVertexProgramParameters()->
@@ -97,7 +97,7 @@ void VClouds::create()
     setNamedConstant("uRadius", mGeometrySettings.Radius);
 
   // Lightning manager
-  mLightningManager->create();
+  mLightningManager.create();
 
   mCreated = true;
 
@@ -135,9 +135,9 @@ void VClouds::remove()
     return;
   }
 
-  mDataManager->remove();
-  mGeometryManager->remove();
-  mLightningManager->remove();
+  mDataManager.remove();
+  mGeometryManager.remove();
+  mLightningManager.remove();
 
   mCamera = 0;
   mCamerasData.clear();
@@ -155,15 +155,15 @@ void VClouds::update(const Ogre::Real& timeSinceLastFrame)
     return;
   }
 
-  mDataManager->update(timeSinceLastFrame);
-  mGeometryManager->update(timeSinceLastFrame);
-  mLightningManager->update(timeSinceLastFrame);
+  mDataManager.update(timeSinceLastFrame);
+  mGeometryManager.update(timeSinceLastFrame);
+  mLightningManager.update(timeSinceLastFrame);
 
-  if (mLightningManager->isEnabled())
+  if (mLightningManager.isEnabled())
   {
     mVolCloudsLightningMaterial->
       getTechnique(0)->getPass(0)->getFragmentProgramParameters()->
-      setNamedConstant("uInterpolation", mDataManager->_getInterpolation());
+      setNamedConstant("uInterpolation", mDataManager._getInterpolation());
     mVolCloudsLightningMaterial->
       getTechnique(0)->getPass(0)->getFragmentProgramParameters()->
       setNamedConstant("uSunDirection", -mSunDirection);
@@ -172,7 +172,7 @@ void VClouds::update(const Ogre::Real& timeSinceLastFrame)
   {
     mVolCloudsMaterial->
       getTechnique(0)->getPass(0)->getFragmentProgramParameters()->
-      setNamedConstant("uInterpolation", mDataManager->_getInterpolation());
+      setNamedConstant("uInterpolation", mDataManager._getInterpolation());
     mVolCloudsMaterial->
       getTechnique(0)->getPass(0)->getFragmentProgramParameters()->
       setNamedConstant("uSunDirection", -mSunDirection);
@@ -207,8 +207,8 @@ void VClouds::notifyCameraRender(Ogre::Camera* c,
             "manual unregistering is needed before camera destruction");
   }
 
-  mGeometryManager->updateGeometry(c, timeSinceLastCameraFrame);
-  mLightningManager->updateMaterial();
+  mGeometryManager.updateGeometry(c, timeSinceLastCameraFrame);
+  mLightningManager.updateMaterial();
 }
 
 void VClouds::registerCamera(Ogre::Camera* c)
@@ -246,8 +246,8 @@ void VClouds::setVisible(const bool& visible)
     return;
   }
 
-  mGeometryManager->getSceneNode()->setVisible(mVisible);
-  mLightningManager->_setVisible(mVisible);
+  mGeometryManager.getSceneNode()->setVisible(mVisible);
+  mLightningManager._setVisible(mVisible);
 }
 
 void VClouds::setEnabled(bool _enabled)
@@ -258,8 +258,8 @@ void VClouds::setEnabled(bool _enabled)
   }
 
   bool visible = _enabled ? mVisible : false;
-  mGeometryManager->getSceneNode()->setVisible(visible);
-  mLightningManager->_setVisible(visible);
+  mGeometryManager.getSceneNode()->setVisible(visible);
+  mLightningManager._setVisible(visible);
 }
 
 void VClouds::setRenderQueueGroups(const RenderQueueGroups& rqg)
@@ -271,8 +271,8 @@ void VClouds::setRenderQueueGroups(const RenderQueueGroups& rqg)
     return;
   }
 
-  mGeometryManager->_updateRenderQueueGroup(rqg.vclouds);
-  mLightningManager->_updateRenderQueueGroup(rqg.vcloudsLightnings);
+  mGeometryManager._updateRenderQueueGroup(rqg.vclouds);
+  mLightningManager._updateRenderQueueGroup(rqg.vcloudsLightnings);
 }
 
 void VClouds::setSunColor(const Ogre::Vector3& SunColor)
@@ -355,6 +355,6 @@ void VClouds::setWheater(const float& Humidity,
     return;
   }
 
-  mDataManager->setWheater(mWheater.x, mWheater.y, mDelayedResponse);
+  mDataManager.setWheater(mWheater.x, mWheater.y, mDelayedResponse);
 }
 }}

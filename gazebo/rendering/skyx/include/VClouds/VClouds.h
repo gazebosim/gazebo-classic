@@ -3,7 +3,7 @@
 This source file is part of SkyX.
 Visit http://www.paradise-studios.net/products/skyx/
 
-Copyright (C) 2009-2012 Xavier VerguÌn Gonz·lez <xavyiy@gmail.com>
+Copyright (C) 2009-2012 Xavier Vergu√≠n Gonz√°lez <xavyiy@gmail.com>
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU Lesser General Public License as published by the Free Software
@@ -499,7 +499,7 @@ namespace SkyX { namespace VClouds {
      */
     inline DataManager* getDataManager()
     {
-      return mDataManager;
+      return &mDataManager;
     }
 
     /** Get geometry manager
@@ -507,7 +507,7 @@ namespace SkyX { namespace VClouds {
      */
     inline GeometryManager* getGeometryManager()
     {
-      return mGeometryManager;
+      return &mGeometryManager;
     }
 
     /** Get lightning manager
@@ -515,7 +515,7 @@ namespace SkyX { namespace VClouds {
      */
     inline LightningManager* getLightningManager()
     {
-      return mLightningManager;
+      return &mLightningManager;
     }
 
     /** Get cameras data
@@ -590,11 +590,11 @@ namespace SkyX { namespace VClouds {
     bool mVisible;
 
     /// Data manager
-    DataManager *mDataManager;
+    DataManager mDataManager;
     /// Geometry manager
-    GeometryManager *mGeometryManager;
+    GeometryManager mGeometryManager;
     /// Lightning manager
-    LightningManager *mLightningManager;
+    LightningManager mLightningManager;
 
     /// Cameras data
     std::vector<CameraData> mCamerasData;
