@@ -41,17 +41,19 @@ class PlotItemDelegate : public QStyledItemDelegate
   /// \brief The data roles
   public: enum DataRole
   {
-    /// \brief Associated with the topic name
-    TOPIC_NAME_ROLE = Qt::UserRole + 100,
+    /// \brief Text which will be displayed for the user.
+    DISPLAY_NAME = Qt::UserRole + 100,
 
-    /// \brief Associated with the data name, this is used to pass
-    /// information to a location during a drag-drop operation.
-    DATA_ROLE,
+    /// \brief URI including detailed query about a single plot value. This is
+    /// the information carried during a drag-drop operation.
+    URI_QUERY,
 
-    // \brief Data type name, used to display type information to the user.
-    DATA_TYPE_NAME,
+    /// \brief Data type name, such as "Double" or "Bool",  used to display type
+    /// information to the user. Or something like "model", "link", used to
+    /// choose icons.
+    TYPE,
 
-    // \brief Flag indicating whether to expand the item or not.
+    /// \brief Flag indicating whether to expand the item or not.
     TO_EXPAND
   };
 
@@ -71,8 +73,8 @@ class PlotItemDelegate : public QStyledItemDelegate
     auto textRect = _opt.rect;
 
     // Custom options
-    QString topicName = qvariant_cast<QString>(_index.data(TOPIC_NAME_ROLE));
-    QString typeName = qvariant_cast<QString>(_index.data(DATA_TYPE_NAME));
+    QString topicName = qvariant_cast<QString>(_index.data(DISPLAY_NAME));
+    QString typeName = qvariant_cast<QString>(_index.data(TYPE));
 
     // TODO: Change to QApplication::font() once Roboto is used everywhere
     QFont font;
@@ -189,7 +191,7 @@ class PlotItemModel : public QStandardItemModel
       if (idx.isValid())
       {
         QString text = this->data(idx,
-            PlotItemDelegate::DATA_ROLE).toString();
+            PlotItemDelegate::URI_QUERY).toString();
         curMimeData->setData("application/x-item", text.toLatin1().data());
 
         break;
@@ -406,7 +408,7 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   // A proxy model to filter topic model
   this->dataPtr->searchTopicsModel = new SearchModel;
   this->dataPtr->searchTopicsModel->setFilterRole(
-      PlotItemDelegate::TOPIC_NAME_ROLE);
+      PlotItemDelegate::DISPLAY_NAME);
   this->dataPtr->searchTopicsModel->setSourceModel(this->dataPtr->topicsModel);
 
   // A tree to visualize the topics and their messages.
@@ -444,7 +446,7 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   // A proxy model to filter sim model
   this->dataPtr->searchSimModel = new SearchModel;
   this->dataPtr->searchSimModel->setFilterRole(
-      PlotItemDelegate::TOPIC_NAME_ROLE);
+      PlotItemDelegate::DISPLAY_NAME);
   this->dataPtr->searchSimModel->setSourceModel(this->dataPtr->simModel);
 
   // A tree to visualize sim variables
@@ -596,7 +598,7 @@ void Palette::FillTopics(QStandardItemModel *_topicsModel)
       shortName.replace(0, prefix.size(), "~");
 
     auto topicItem = new QStandardItem();
-    topicItem->setData(shortName.c_str(), PlotItemDelegate::TOPIC_NAME_ROLE);
+    topicItem->setData(shortName.c_str(), PlotItemDelegate::DISPLAY_NAME);
     _topicsModel->appendRow(topicItem);
 
     // Create a message from this topic to find out its fields
@@ -644,8 +646,8 @@ void Palette::FillModels(QStandardItemModel *_modelsModel)
   if (!items.empty())
   {
     auto modelsTitle = new QStandardItem();
-    modelsTitle->setData("MODELS", PlotItemDelegate::TOPIC_NAME_ROLE);
-    modelsTitle->setData("title", PlotItemDelegate::DATA_TYPE_NAME);
+    modelsTitle->setData("MODELS", PlotItemDelegate::DISPLAY_NAME);
+    modelsTitle->setData("title", PlotItemDelegate::TYPE);
     _modelsModel->appendRow(modelsTitle);
   }
 
@@ -686,8 +688,8 @@ void Palette::FillModels(QStandardItemModel *_modelsModel)
         {
           modelItem = new QStandardItem(nextPart.c_str());
           modelItem->setData(nextPart.c_str(),
-              PlotItemDelegate::TOPIC_NAME_ROLE);
-          modelItem->setData("model", PlotItemDelegate::DATA_TYPE_NAME);
+              PlotItemDelegate::DISPLAY_NAME);
+          modelItem->setData("model", PlotItemDelegate::TYPE);
           _modelsModel->appendRow(modelItem);
         }
         else
@@ -789,21 +791,21 @@ void Palette::FillSim(QStandardItemModel *_simModel)
     childItem->setDragEnabled(true);
 
     auto humanName = ConfigWidget::HumanReadableKey(field.second);
-    childItem->setData(humanName.c_str(), PlotItemDelegate::TOPIC_NAME_ROLE);
+    childItem->setData(humanName.c_str(), PlotItemDelegate::DISPLAY_NAME);
 
     if (field.second == "iterations")
-      childItem->setData("Uint 64", PlotItemDelegate::DATA_TYPE_NAME);
+      childItem->setData("Uint 64", PlotItemDelegate::TYPE);
     else
-      childItem->setData("Double", PlotItemDelegate::DATA_TYPE_NAME);
+      childItem->setData("Double", PlotItemDelegate::TYPE);
 
     std::string typeName =
         "<font size=3><p><b>Type</b>: " + childItem->data(
-        PlotItemDelegate::DATA_TYPE_NAME).toString().toStdString() +
+        PlotItemDelegate::TYPE).toString().toStdString() +
         "</p></font>";
     childItem->setToolTip(QString::fromStdString(typeName));
 
     std::string dataName = field.first + "?p=/" + field.second;
-    childItem->setData(dataName.c_str(), PlotItemDelegate::DATA_ROLE);
+    childItem->setData(dataName.c_str(), PlotItemDelegate::URI_QUERY);
 
     _simModel->appendRow(childItem);
   }
@@ -811,24 +813,24 @@ void Palette::FillSim(QStandardItemModel *_simModel)
   //=================
   // TODO for testing - remove later
   auto itema = new QStandardItem();
-  itema->setData("Dog", PlotItemDelegate::TOPIC_NAME_ROLE);
-  itema->setData("Dog", PlotItemDelegate::DATA_ROLE);
-  itema->setData("Double", PlotItemDelegate::DATA_TYPE_NAME);
+  itema->setData("Dog", PlotItemDelegate::DISPLAY_NAME);
+  itema->setData("Dog", PlotItemDelegate::URI_QUERY);
+  itema->setData("Double", PlotItemDelegate::TYPE);
   _simModel->appendRow(itema);
   auto itemb = new QStandardItem("Cat");
-  itemb->setData("Cat", PlotItemDelegate::TOPIC_NAME_ROLE);
-  itemb->setData("Cat", PlotItemDelegate::DATA_ROLE);
-  itemb->setData("Double", PlotItemDelegate::DATA_TYPE_NAME);
+  itemb->setData("Cat", PlotItemDelegate::DISPLAY_NAME);
+  itemb->setData("Cat", PlotItemDelegate::URI_QUERY);
+  itemb->setData("Double", PlotItemDelegate::TYPE);
   _simModel->appendRow(itemb);
   auto itemc = new QStandardItem("Turtle");
-  itemc->setData("Turtle", PlotItemDelegate::TOPIC_NAME_ROLE);
-  itemc->setData("Turtle", PlotItemDelegate::DATA_ROLE);
-  itemc->setData("Double", PlotItemDelegate::DATA_TYPE_NAME);
+  itemc->setData("Turtle", PlotItemDelegate::DISPLAY_NAME);
+  itemc->setData("Turtle", PlotItemDelegate::URI_QUERY);
+  itemc->setData("Double", PlotItemDelegate::TYPE);
   _simModel->appendRow(itemc);
   auto simTimeItem = new QStandardItem("sim_time");
-  simTimeItem->setData("sim_time", PlotItemDelegate::TOPIC_NAME_ROLE);
-  simTimeItem->setData("sim_time", PlotItemDelegate::DATA_ROLE);
-  simTimeItem->setData("Double", PlotItemDelegate::DATA_TYPE_NAME);
+  simTimeItem->setData("sim_time", PlotItemDelegate::DISPLAY_NAME);
+  simTimeItem->setData("sim_time", PlotItemDelegate::URI_QUERY);
+  simTimeItem->setData("Double", PlotItemDelegate::TYPE);
   _simModel->appendRow(simTimeItem);
   //=================
 }
@@ -873,41 +875,41 @@ void Palette::FillFromMsg(google::protobuf::Message *_msg,
 
         auto *childItem = new QStandardItem();
         childItem->setData(humanName.c_str(),
-            PlotItemDelegate::TOPIC_NAME_ROLE);
+            PlotItemDelegate::DISPLAY_NAME);
 
         switch (field->type())
         {
           case google::protobuf::FieldDescriptor::TYPE_DOUBLE:
-            childItem->setData("Double", PlotItemDelegate::DATA_TYPE_NAME);
+            childItem->setData("Double", PlotItemDelegate::TYPE);
             break;
           case google::protobuf::FieldDescriptor::TYPE_FLOAT:
-            childItem->setData("Float", PlotItemDelegate::DATA_TYPE_NAME);
+            childItem->setData("Float", PlotItemDelegate::TYPE);
             break;
           case google::protobuf::FieldDescriptor::TYPE_INT64:
-            childItem->setData("Int 64", PlotItemDelegate::DATA_TYPE_NAME);
+            childItem->setData("Int 64", PlotItemDelegate::TYPE);
             break;
           case google::protobuf::FieldDescriptor::TYPE_UINT64:
-            childItem->setData("Uint 64", PlotItemDelegate::DATA_TYPE_NAME);
+            childItem->setData("Uint 64", PlotItemDelegate::TYPE);
             break;
           case google::protobuf::FieldDescriptor::TYPE_INT32:
-            childItem->setData("Int 32", PlotItemDelegate::DATA_TYPE_NAME);
+            childItem->setData("Int 32", PlotItemDelegate::TYPE);
             break;
           case google::protobuf::FieldDescriptor::TYPE_UINT32:
-            childItem->setData("Uint 32", PlotItemDelegate::DATA_TYPE_NAME);
+            childItem->setData("Uint 32", PlotItemDelegate::TYPE);
             break;
           case google::protobuf::FieldDescriptor::TYPE_BOOL:
-            childItem->setData("Bool", PlotItemDelegate::DATA_TYPE_NAME);
+            childItem->setData("Bool", PlotItemDelegate::TYPE);
             break;
           default:
             continue;
         }
         childItem->setToolTip(
             "<font size=3><p><b>Type</b>: " + childItem->data(
-            PlotItemDelegate::DATA_TYPE_NAME).toString() +
+            PlotItemDelegate::TYPE).toString() +
             "</p></font>");
 
         std::string dataName = _uri + "/" + name;
-        childItem->setData(dataName.c_str(), PlotItemDelegate::DATA_ROLE);
+        childItem->setData(dataName.c_str(), PlotItemDelegate::URI_QUERY);
         childItem->setDragEnabled(true);
 
         _item->appendRow(childItem);
@@ -927,13 +929,13 @@ void Palette::FillFromMsg(google::protobuf::Message *_msg,
 
           auto *childItem = new QStandardItem();
           childItem->setData(humanName.c_str(),
-              PlotItemDelegate::TOPIC_NAME_ROLE);
-          childItem->setData(dataName.c_str(), PlotItemDelegate::DATA_ROLE);
-          childItem->setData("Double", PlotItemDelegate::DATA_TYPE_NAME);
+              PlotItemDelegate::DISPLAY_NAME);
+          childItem->setData(dataName.c_str(), PlotItemDelegate::URI_QUERY);
+          childItem->setData("Double", PlotItemDelegate::TYPE);
           childItem->setDragEnabled(true);
           childItem->setToolTip(
               "<font size=3><p><b>Type</b>: " + childItem->data(
-              PlotItemDelegate::DATA_TYPE_NAME).toString() +
+              PlotItemDelegate::TYPE).toString() +
               "</p></font>");
 
           _item->appendRow(childItem);
@@ -942,7 +944,7 @@ void Palette::FillFromMsg(google::protobuf::Message *_msg,
         else if (field->message_type()->name() == "Quaternion")
         {
           auto *quatItem = new QStandardItem();
-          quatItem->setData(name.c_str(), PlotItemDelegate::TOPIC_NAME_ROLE);
+          quatItem->setData(name.c_str(), PlotItemDelegate::DISPLAY_NAME);
           _item->appendRow(quatItem);
 
           std::vector<std::string> rpy = {"roll", "pitch", "yaw"};
@@ -953,12 +955,12 @@ void Palette::FillFromMsg(google::protobuf::Message *_msg,
 
             auto *childItem = new QStandardItem();
             childItem->setData(QString::fromStdString(humanName),
-                PlotItemDelegate::TOPIC_NAME_ROLE);
-            childItem->setData(dataName.c_str(), PlotItemDelegate::DATA_ROLE);
-            childItem->setData("Double", PlotItemDelegate::DATA_TYPE_NAME);
+                PlotItemDelegate::DISPLAY_NAME);
+            childItem->setData(dataName.c_str(), PlotItemDelegate::URI_QUERY);
+            childItem->setData("Double", PlotItemDelegate::TYPE);
             childItem->setToolTip(
                 "<font size=3><p><b>Type</b>: " + childItem->data(
-                PlotItemDelegate::DATA_TYPE_NAME).toString() +
+                PlotItemDelegate::TYPE).toString() +
                 "</p></font>");
             childItem->setDragEnabled(true);
 
@@ -970,7 +972,7 @@ void Palette::FillFromMsg(google::protobuf::Message *_msg,
         {
           auto fieldMsg = (ref->MutableMessage(_msg, field));
           auto *childItem = new QStandardItem();
-          childItem->setData(name.c_str(), PlotItemDelegate::TOPIC_NAME_ROLE);
+          childItem->setData(name.c_str(), PlotItemDelegate::DISPLAY_NAME);
           _item->appendRow(childItem);
           this->FillFromMsg(fieldMsg, childItem, _uri + "/" + name);
         }
@@ -991,13 +993,13 @@ void Palette::InsertPoseItem(QStandardItem *_item, const common::URI &_uri,
   // Pose
   auto poseItem = new QStandardItem(_query.c_str());
   poseItem->setData("Pose",
-      PlotItemDelegate::TOPIC_NAME_ROLE);
+      PlotItemDelegate::DISPLAY_NAME);
   _item->appendRow(poseItem);
 
   // Position
   auto positionItem = new QStandardItem();
   positionItem->setData("Position",
-      PlotItemDelegate::TOPIC_NAME_ROLE);
+      PlotItemDelegate::DISPLAY_NAME);
   poseItem->appendRow(positionItem);
 
   std::vector<std::string> positions = {"x", "y", "z"};
@@ -1007,18 +1009,18 @@ void Palette::InsertPoseItem(QStandardItem *_item, const common::URI &_uri,
 
     auto childItem = new QStandardItem();
     childItem->setData(humanName.c_str(),
-        PlotItemDelegate::TOPIC_NAME_ROLE);
+        PlotItemDelegate::DISPLAY_NAME);
     childItem->setData(
         (_uri.Str() + "/vector3d/position/double/" + position).c_str(),
-        PlotItemDelegate::DATA_ROLE);
-    childItem->setData("Double", PlotItemDelegate::DATA_TYPE_NAME);
+        PlotItemDelegate::URI_QUERY);
+    childItem->setData("Double", PlotItemDelegate::TYPE);
     positionItem->appendRow(childItem);
   }
 
   // Orientation
   auto orientationItem = new QStandardItem();
   orientationItem->setData("Orientation",
-      PlotItemDelegate::TOPIC_NAME_ROLE);
+      PlotItemDelegate::DISPLAY_NAME);
   poseItem->appendRow(orientationItem);
 
   std::vector<std::string> orientations = {"roll", "pitch", "yaw"};
@@ -1028,11 +1030,11 @@ void Palette::InsertPoseItem(QStandardItem *_item, const common::URI &_uri,
 
     auto childItem = new QStandardItem();
     childItem->setData(humanName.c_str(),
-        PlotItemDelegate::TOPIC_NAME_ROLE);
+        PlotItemDelegate::DISPLAY_NAME);
     childItem->setData(
         (_uri.Str() + "/quaterniond/orientation/double/" + orientation).c_str(),
-        PlotItemDelegate::DATA_ROLE);
-    childItem->setData("Double", PlotItemDelegate::DATA_TYPE_NAME);
+        PlotItemDelegate::URI_QUERY);
+    childItem->setData("Double", PlotItemDelegate::TYPE);
     orientationItem->appendRow(childItem);
   }
 }
@@ -1050,17 +1052,17 @@ void Palette::InsertVector3dItem(QStandardItem *_item, const common::URI &_uri,
     title = ConfigWidget::HumanReadableKey(_query);
 
   // Main item
-  _item->setData(title.c_str(), PlotItemDelegate::TOPIC_NAME_ROLE);
+  _item->setData(title.c_str(), PlotItemDelegate::DISPLAY_NAME);
   auto parentItem = _item;
 
-   // Linear Velocity goes one deeper
-   if (isLinVel)
-   {
-     auto childItem = new QStandardItem();
-     childItem->setData("Linear", PlotItemDelegate::TOPIC_NAME_ROLE);
-     _item->appendRow(childItem);
-     parentItem = childItem;
-   }
+  // Linear Velocity goes one deeper
+  if (isLinVel)
+  {
+    auto childItem = new QStandardItem();
+    childItem->setData("Linear", PlotItemDelegate::DISPLAY_NAME);
+    _item->appendRow(childItem);
+    parentItem = childItem;
+  }
 
   std::vector<std::string> elements = {"x", "y", "z"};
   for (auto element : elements)
@@ -1069,10 +1071,10 @@ void Palette::InsertVector3dItem(QStandardItem *_item, const common::URI &_uri,
 
     auto childItem = new QStandardItem();
     childItem->setData(humanName.c_str(),
-        PlotItemDelegate::TOPIC_NAME_ROLE);
+        PlotItemDelegate::DISPLAY_NAME);
     childItem->setData((_uri.Str() + "/double/" + element).c_str(),
-        PlotItemDelegate::DATA_ROLE);
-    childItem->setData("Double", PlotItemDelegate::DATA_TYPE_NAME);
+        PlotItemDelegate::URI_QUERY);
+    childItem->setData("Double", PlotItemDelegate::TYPE);
     parentItem->appendRow(childItem);
   }
 }
@@ -1090,17 +1092,17 @@ void Palette::InsertQuaterniondItem(QStandardItem *_item,
     title = ConfigWidget::HumanReadableKey(_query);
 
   // Main item
-  _item->setData(title.c_str(), PlotItemDelegate::TOPIC_NAME_ROLE);
+  _item->setData(title.c_str(), PlotItemDelegate::DISPLAY_NAME);
   auto parentItem = _item;
 
-   // Angular Velocity goes one deeper
-   if (isAngVel)
-   {
-     auto childItem = new QStandardItem();
-     childItem->setData("Angular", PlotItemDelegate::TOPIC_NAME_ROLE);
-     _item->appendRow(childItem);
-     parentItem = childItem;
-   }
+  // Angular Velocity goes one deeper
+  if (isAngVel)
+  {
+    auto childItem = new QStandardItem();
+    childItem->setData("Angular", PlotItemDelegate::DISPLAY_NAME);
+    _item->appendRow(childItem);
+    parentItem = childItem;
+  }
 
   std::vector<std::string> elements = {"roll", "pitch", "yaw"};
   for (auto element : elements)
@@ -1109,10 +1111,10 @@ void Palette::InsertQuaterniondItem(QStandardItem *_item,
 
     auto childItem = new QStandardItem();
     childItem->setData(humanName.c_str(),
-        PlotItemDelegate::TOPIC_NAME_ROLE);
+        PlotItemDelegate::DISPLAY_NAME);
     childItem->setData((_uri.Str() + "/double/" + element).c_str(),
-        PlotItemDelegate::DATA_ROLE);
-    childItem->setData("Double", PlotItemDelegate::DATA_TYPE_NAME);
+        PlotItemDelegate::URI_QUERY);
+    childItem->setData("Double", PlotItemDelegate::TYPE);
     parentItem->appendRow(childItem);
   }
 }
