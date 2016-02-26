@@ -351,6 +351,8 @@ SensorPtr SensorManager::GetSensor(const std::string &_name) const
     }
   }
 
+  std::cerr << " get sensor " << _name << std::endl;
+
   return result;
 }
 

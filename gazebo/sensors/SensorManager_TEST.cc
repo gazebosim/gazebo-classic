@@ -160,6 +160,64 @@ TEST_F(SensorManager_TEST, InitRemove)
 }
 
 /////////////////////////////////////////////////
+/// \brief Test getting sensor by name
+TEST_F(SensorManager_TEST, GetSensor)
+{
+  sensors::SensorPtr sensor;
+
+  // Load in a world with cameras and lasers
+  Load("worlds/test_camera_laser.world");
+  sensors::SensorManager *mgr = sensors::SensorManager::Instance();
+  EXPECT_TRUE(mgr->SensorsInitialized());
+
+  // Make sure we have the right number of sensors
+  size_t sensorCount = 4;
+  sensors::Sensor_V sensors = mgr->GetSensors();
+
+  int i = 0;
+  while (sensors.size() != sensorCount && i < 100)
+  {
+    gazebo::common::Time::MSleep(100);
+    sensors.clear();
+    sensors = mgr->GetSensors();
+    gzdbg << "Sensor Count. Actual[" << sensors.size() << "] Expected["
+          << sensorCount << "]\n";
+    ++i;
+  }
+
+  EXPECT_LT(i, 100);
+  EXPECT_EQ(sensors.size(), sensorCount);
+
+  // Get the current simulation time
+  common::Time time = physics::get_world()->GetSimTime();
+
+  // Wait for 1 second
+  for (unsigned int i = 0; i < 10; ++i)
+  {
+    common::Time::MSleep(100);
+  }
+
+  // Get each sensor, and make sure that it has been updated
+  {
+    sensor = mgr->GetSensor("default::camera_1::link::camera");
+    ASSERT_TRUE(sensor != NULL);
+    EXPECT_TRUE(sensor->LastMeasurementTime() > time);
+
+    sensor = mgr->GetSensor("default::camera_2::link::camera");
+    ASSERT_TRUE(sensor != NULL);
+    EXPECT_TRUE(sensor->LastMeasurementTime() > time);
+
+    sensor = mgr->GetSensor("default::laser_1::link::laser");
+    ASSERT_TRUE(sensor != NULL);
+    EXPECT_TRUE(sensor->LastMeasurementTime() > time);
+
+    sensor = mgr->GetSensor("default::laser_2::link::laser");
+    ASSERT_TRUE(sensor != NULL);
+    EXPECT_TRUE(sensor->LastMeasurementTime() > time);
+  }
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
