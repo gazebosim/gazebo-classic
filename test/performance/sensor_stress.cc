@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,8 +59,8 @@ TEST_F(SensorStress_TEST, ResetWorldStressTest)
   // set update rate to unlimited
   double updateRate = 0.0;
   sensor->SetUpdateRate(updateRate);
-  gzdbg << sensor->GetScopedName() << " loaded with update rate of "
-        << sensor->GetUpdateRate() << " Hz\n";
+  gzdbg << sensor->ScopedName() << " loaded with update rate of "
+        << sensor->UpdateRate() << " Hz\n";
 
   g_hokuyoMsgCount = 0;
 

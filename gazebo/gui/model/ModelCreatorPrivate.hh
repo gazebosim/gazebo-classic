@@ -126,11 +126,14 @@ namespace gazebo
       /// \brief A list of selected link visuals.
       public: std::vector<rendering::VisualPtr> selectedLinks;
 
+      /// \brief A list of selected nested model visuals.
+      public: std::vector<rendering::VisualPtr> selectedNestedModels;
+
       /// \brief A list of selected model plugins.
       public: std::vector<std::string> selectedModelPlugins;
 
-      /// \brief Names of links copied through g_copyAct
-      public: std::vector<std::string> copiedLinkNames;
+      /// \brief Names of entities copied through g_copyAct
+      public: std::vector<std::string> copiedNames;
 
       /// \brief The last mouse event
       public: common::MouseEvent lastMouseEvent;

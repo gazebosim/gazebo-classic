@@ -15,11 +15,15 @@
  *
 */
 
-#ifndef _GAZEBO_GUI_MODELCREATOR_HH_
-#define _GAZEBO_GUI_MODELCREATOR_HH_
+#ifndef _GAZEBO_GUI_MODEL_MODELCREATOR_HH_
+#define _GAZEBO_GUI_MODEL_MODELCREATOR_HH_
+
+#include <sdf/sdf.hh>
 
 #include <memory>
+#include <mutex>
 #include <string>
+
 
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Vector3.hh>
@@ -122,45 +126,16 @@ namespace gazebo
       /// \param[in] _size Size of the link.
       /// \param[in] _pose Pose of the link.
       /// \param[in] _samples Number of samples for polyline.
-      /// \return Name of the link that has been added.
-      public: std::string AddShape(const EntityType _type,
+      /// \return Link data.
+      public: LinkData * AddShape(const EntityType _type,
           const ignition::math::Vector3d &_size = ignition::math::Vector3d::One,
           const ignition::math::Pose3d &_pose = ignition::math::Pose3d::Zero,
           const std::string &_uri = "", const unsigned int _samples = 5);
 
-      /// \brief Add a box to the model.
-      /// \param[in] _size Size of the box.
-      /// \param[in] _pose Pose of the box.
-      /// \return Name of the box that has been added.
-      public: std::string AddBox(
-          const ignition::math::Vector3d &_size = ignition::math::Vector3d::One,
-          const ignition::math::Pose3d &_pose = ignition::math::Pose3d::Zero);
-
-      /// \brief Add a sphere to the model.
-      /// \param[in] _radius Radius of the sphere.
-      /// \param[in] _pose Pose of the sphere.
-      /// \return Name of the sphere that has been added.
-      public: std::string AddSphere(const double _radius = 0.5,
-          const ignition::math::Pose3d &_pose = ignition::math::Pose3d::Zero);
-
-      /// \brief Add a cylinder to the model.
-      /// \param[in] _radius Radius of the cylinder.
-      /// \param[in] _length Length of the cylinder.
-      /// \param[in] _pose Pose of the cylinder.
-      /// \return Name of the cylinder that has been added.
-      public: std::string AddCylinder(const double _radius = 0.5,
-          const double _length = 1.0,
-          const ignition::math::Pose3d &_pose = ignition::math::Pose3d::Zero);
-
-      /// \brief Add a custom link to the model
-      /// \param[in] _name Name of the custom link.
-      /// \param[in] _scale Scale of the custom link.
-      /// \param[in] _pose Pose of the custom link.
-      /// \return Name of the custom that has been added.
-      public: std::string AddCustom(const std::string &_name,
-          const ignition::math::Vector3d &_scale =
-          ignition::math::Vector3d::One,
-          const ignition::math::Pose3d &_pose = ignition::math::Pose3d::Zero);
+      /// \brief Add a nested model to the model
+      /// \param[in] _sdf SDF describing the model.
+      /// \return Nested model data.
+      public: NestedModelData *AddModel(const sdf::ElementPtr &_sdf);
 
       /// \brief Add a joint to the model.
       /// \param[in] _type Type of joint to add.
@@ -192,15 +167,15 @@ namespace gazebo
       /// \return Joint maker
       public: JointMaker *GetJointMaker() const;
 
-      /// \brief Set the select state of a link.
+      /// \brief Set the select state of an entity.
       /// \param[in] _name Name of the link.
-      /// \param[in] _selected True to select the link.
+      /// \param[in] _selected True to select the entity.
       public: void SetSelected(const std::string &_name, const bool selected);
 
-      /// \brief Set the select state of a link visual.
-      /// \param[in] _linkVis Pointer to the link visual.
-      /// \param[in] _selected True to select the link.
-      public: void SetSelected(const rendering::VisualPtr &_linkVis,
+      /// \brief Set the select state of a entity visual.
+      /// \param[in] _linkVis Pointer to the entity visual.
+      /// \param[in] _selected True to select the entity.
+      public: void SetSelected(const rendering::VisualPtr &_entityVis,
           const bool selected);
 
       /// \brief Get current save state.
@@ -326,9 +301,9 @@ namespace gazebo
       private: void OnSetSelectedEntity(const std::string &_name,
           const std::string &_mode);
 
-      /// \brief Callback when a link is selected.
-      /// \param[in] _name Name of link.
-      /// \param[in] _selected True if the link is selected, false if
+      /// \brief Callback when a model editor entity is selected.
+      /// \param[in] _name Name of entity.
+      /// \param[in] _selected True if the entity is selected, false if
       /// deselected.
       private: void OnSetSelectedLink(const std::string &_name,
           const bool _selected);
@@ -345,18 +320,24 @@ namespace gazebo
       /// input visual. A collision visual with the same geometry as the input
       /// visual will also be added to the link.
       /// \param[in] _visual Visual used to create the link.
-      private: void CreateLink(const rendering::VisualPtr &_visual);
+      /// \return Link data.
+      private: LinkData * CreateLink(const rendering::VisualPtr &_visual);
+
+      /// \brief Clone an existing nested model.
+      /// \param[in] _modelName Name of nested model to be cloned.
+      /// \return Cloned nested model data.
+      private: NestedModelData *CloneNestedModel(const std::string &_modelName);
 
       /// \brief Clone an existing link.
       /// \param[in] _linkName Name of link to be cloned.
-      /// \return Cloned link.
+      /// \return Cloned link data.
       private: LinkData *CloneLink(const std::string &_linkName);
 
       /// \brief Create a link from an SDF with the specified parent visual.
       /// \param[in] _linkElem SDF element of the link that will be used to
       /// recreate its visual representation in the model editor.
       /// \param[in] _parentVis Parent visual that the link will be attached to.
-      /// \return Data describing this link.
+      /// \return Link data.
       private: LinkData *CreateLinkFromSDF(const sdf::ElementPtr &_linkElem,
           const rendering::VisualPtr &_parentVis);
 
@@ -413,6 +394,9 @@ namespace gazebo
 
       /// \brief Deselect all currently selected links.
       private: void DeselectAllLinks();
+
+      /// \brief Deselect all currently selected nested models.
+      private: void DeselectAllNestedModels();
 
       /// \brief Deselect all currently selected model plugins.
       private: void DeselectAllModelPlugins();
@@ -473,5 +457,4 @@ namespace gazebo
     /// \}
   }
 }
-
 #endif
