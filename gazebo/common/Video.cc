@@ -15,13 +15,17 @@
  *
 */
 
-#include <gazebo/common/Console.hh>
-#include <gazebo/common/Video.hh>
-#include <gazebo/gazebo_config.h>
-#include <gazebo/common/ffmpeg_inc.h>
+#include "gazebo/gazebo_config.h"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Video.hh"
+#include "gazebo/common/ffmpeg_inc.h"
 
 using namespace gazebo;
 using namespace common;
+
+/// \brief Destination audio video frame
+/// TODO Do not merge forward. Declared here for gazebo7 ABI compatibility
+AVFrame *avFrameDst;
 
 /////////////////////////////////////////////////
 // #ifdef HAVE_FFMPEG
@@ -44,25 +48,18 @@ Video::Video()
 {
   this->formatCtx = NULL;
   this->codecCtx = NULL;
-  this->avFrame = NULL;
   this->swsCtx = NULL;
   this->avFrame = NULL;
-  this->pic = NULL;
   this->videoStream = -1;
 
-#ifdef HAVE_FFMPEG
-  this->pic = new AVPicture;
-#endif
+  this->pic = NULL;
+  avFrameDst = NULL;
 }
 
 /////////////////////////////////////////////////
 Video::~Video()
 {
   this->Cleanup();
-
-#ifdef HAVE_FFMPEG
-  delete this->pic;
-#endif
 }
 
 /////////////////////////////////////////////////
@@ -78,7 +75,7 @@ void Video::Cleanup()
   // Close the codec
   avcodec_close(this->codecCtx);
 
-  avpicture_free(this->pic);
+  av_free(avFrameDst);
 #endif
 }
 
@@ -147,16 +144,13 @@ bool Video::Load(const std::string &_filename)
     return false;
   }
 
-  avpicture_alloc(this->pic, PIX_FMT_RGB24, this->codecCtx->width,
-                  this->codecCtx->height);
-
   this->swsCtx = sws_getContext(
       this->codecCtx->width,
       this->codecCtx->height,
       this->codecCtx->pix_fmt,
       this->codecCtx->width,
       this->codecCtx->height,
-      PIX_FMT_RGB24,
+      AV_PIX_FMT_RGB24,
       SWS_BICUBIC, NULL, NULL, NULL);
 
   if (this->swsCtx == NULL)
@@ -164,6 +158,14 @@ bool Video::Load(const std::string &_filename)
     gzerr << "Error while calling sws_getContext\n";
     return false;
   }
+
+  avFrameDst = common::AVFrameAlloc();
+  avFrameDst->format = this->codecCtx->pix_fmt;
+  avFrameDst->width = this->codecCtx->width;
+  avFrameDst->height = this->codecCtx->height;
+  av_image_alloc(avFrameDst->data, avFrameDst->linesize,
+      this->codecCtx->width, this->codecCtx->height, this->codecCtx->pix_fmt,
+      1);
 
   // DEBUG: Will save all the frames
   /*Image img;
@@ -226,9 +228,10 @@ bool Video::GetNextFrame(unsigned char **_buffer)
       if (frameAvailable)
       {
         sws_scale(swsCtx, this->avFrame->data, this->avFrame->linesize, 0,
-            this->codecCtx->height, this->pic->data, this->pic->linesize);
+            this->codecCtx->height, avFrameDst->data,
+            avFrameDst->linesize);
 
-        memcpy(*_buffer, this->pic->data[0],
+        memcpy(*_buffer, avFrameDst->data[0],
             this->codecCtx->height * (this->codecCtx->width*3));
 
         // Debug:
@@ -237,7 +240,7 @@ bool Video::GetNextFrame(unsigned char **_buffer)
       }
     }
   }
-  av_free_packet(&packet);
+  AVPacketUnref(&packet);
 
   return true;
 }
