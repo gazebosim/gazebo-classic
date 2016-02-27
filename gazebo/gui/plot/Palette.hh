@@ -112,6 +112,13 @@ namespace gazebo
       private: void ExpandChildren(QSortFilterProxyModel *_model,
           QTreeView *_tree, const QModelIndex &_srcParent) const;
 
+      /// \brief Get the number of visible rows in a model
+      /// \param[in] _model Search model.
+      /// \param[in] _tree Tree view.
+      /// \param[in] _srcParent Model index of the parent to be checked.
+      private: unsigned int VisibleRowCount(QSortFilterProxyModel *_model,
+          QTreeView *_tree, const QModelIndex &_srcParent) const;
+
       /// \internal
       /// \brief Pointer to private data.
       private: std::unique_ptr<PalettePrivate> dataPtr;

@@ -48,6 +48,8 @@
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/Link.hh"
 
+#include "gazebo/util/IntrospectionManager.hh"
+
 using namespace gazebo;
 using namespace physics;
 
@@ -244,6 +246,8 @@ void Link::Load(sdf::ElementPtr _sdf)
   std::string topicName = "~/" + this->GetScopedName() + "/wrench";
   boost::replace_all(topicName, "::", "/");
   this->wrenchSub = this->node->Subscribe(topicName, &Link::OnWrenchMsg, this);
+
+  this->RegisterIntrospectionItems();
 }
 
 //////////////////////////////////////////////////
@@ -1624,4 +1628,62 @@ void Link::LoadBattery(sdf::ElementPtr _sdf)
   common::BatteryPtr battery(new common::Battery());
   battery->Load(_sdf);
   this->batteries.push_back(battery);
+}
+
+/////////////////////////////////////////////////
+void Link::RegisterIntrospectionItems()
+{
+  auto uri = this->URI();
+
+  // Callbacks.
+  auto fLinkPose = [this]()
+  {
+    return this->GetWorldPose().Ign();
+  };
+
+  auto fLinkLinVel = [this]()
+  {
+    return this->GetWorldLinearVel().Ign();
+  };
+
+  auto fLinkAngVel = [this]()
+  {
+    return this->GetWorldAngularVel().Ign();
+  };
+
+  auto fLinkLinAcc = [this]()
+  {
+    return this->GetWorldLinearAccel().Ign();
+  };
+
+  auto fLinkAngAcc = [this]()
+  {
+    return this->GetWorldAngularAccel().Ign();
+  };
+
+  // Register items.
+  common::URI poseURI(uri);
+  poseURI.Query().Insert("p", "pose/world_pose");
+  gazebo::util::IntrospectionManager::Instance()->Register
+      <ignition::math::Pose3d>(poseURI.Str(), fLinkPose);
+
+  common::URI linVelURI(uri);
+  linVelURI.Query().Insert("p", "vector3d/world_linear_velocity");
+  gazebo::util::IntrospectionManager::Instance()->Register
+      <ignition::math::Vector3d>(linVelURI.Str(), fLinkLinVel);
+
+  common::URI angVelURI(uri);
+  angVelURI.Query().Insert("p", "quaterniond/world_angular_velocity");
+  gazebo::util::IntrospectionManager::Instance()->Register
+      <ignition::math::Quaterniond>(angVelURI.Str(), fLinkAngVel);
+
+  common::URI linAccURI(uri);
+  linAccURI.Query().Insert("p", "vector3d/world_linear_acceleration");
+  gazebo::util::IntrospectionManager::Instance()->Register
+      <ignition::math::Vector3d>(linAccURI.Str(), fLinkLinAcc);
+
+  common::URI angAccURI(uri);
+  angAccURI.Query().Insert("p", "quaterniond/world_angular_acceleration");
+  gazebo::util::IntrospectionManager::Instance()->Register
+      <ignition::math::Quaterniond>(angAccURI.Str(), fLinkAngAcc);
 }

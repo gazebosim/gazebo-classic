@@ -394,6 +394,9 @@ class gazebo::gui::PalettePrivate
 
   /// \brief View holding the search sim tree.
   public: QTreeView *searchSimTree;
+
+  /// \brief Manages splitting the search tab.
+  public: QSplitter *splitter;
 };
 
 /////////////////////////////////////////////////
@@ -488,7 +491,6 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   searchEdit->setObjectName("plotLineEdit");
   this->connect(searchEdit, SIGNAL(textChanged(QString)), this,
       SLOT(UpdateSearch(QString)));
-  this->UpdateSearch("");
 
   auto searchField = new QHBoxLayout();
   searchField->addWidget(searchIcon);
@@ -564,16 +566,20 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   auto simWidget = new QWidget();
   simWidget->setLayout(simLayout);
 
-  auto splitter = new QSplitter(Qt::Vertical, this);
-  splitter->addWidget(topicsWidget);
-  splitter->addWidget(modelsWidget);
-  splitter->addWidget(simWidget);
-  splitter->setCollapsible(0, false);
-  splitter->setCollapsible(1, false);
+  this->dataPtr->splitter = new QSplitter(Qt::Vertical, this);
+  this->dataPtr->splitter->addWidget(topicsWidget);
+  this->dataPtr->splitter->addWidget(modelsWidget);
+  this->dataPtr->splitter->addWidget(simWidget);
+  this->dataPtr->splitter->setCollapsible(0, false);
+  this->dataPtr->splitter->setCollapsible(1, false);
+  this->dataPtr->splitter->setCollapsible(2, false);
+  this->dataPtr->splitter->setStretchFactor(0, 1);
+  this->dataPtr->splitter->setStretchFactor(1, 1);
+  this->dataPtr->splitter->setStretchFactor(2, 1);
 
   auto searchLayout = new QVBoxLayout();
   searchLayout->addLayout(searchField);
-  searchLayout->addWidget(splitter);
+  searchLayout->addWidget(this->dataPtr->splitter);
 
   auto searchWidget = new QWidget();
   searchWidget->setLayout(searchLayout);
@@ -607,6 +613,8 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
 
   this->setMinimumWidth(350);
   this->setLayout(mainLayout);
+
+  this->UpdateSearch("");
 }
 
 /////////////////////////////////////////////////
@@ -688,10 +696,10 @@ void Palette::FillModels(QStandardItemModel *_modelsModel)
   // FIXME: Check if there is at least one model?
   if (!items.empty())
   {
-    auto modelsTitle = new QStandardItem();
-    modelsTitle->setData("MODELS", PlotItemDelegate::DISPLAY_NAME);
-    modelsTitle->setData("title", PlotItemDelegate::TYPE);
-    _modelsModel->appendRow(modelsTitle);
+    auto title = new QStandardItem();
+    title->setData("MODELS", PlotItemDelegate::DISPLAY_NAME);
+    title->setData("title", PlotItemDelegate::TYPE);
+    _modelsModel->appendRow(title);
   }
 
   // Populate widget
@@ -770,7 +778,8 @@ void Palette::FillModels(QStandardItemModel *_modelsModel)
             {
               auto childItem = previousItem->child(k, 0);
               if (childItem &&
-                  childItem->data(PlotItemDelegate::TYPE) == "title")
+                  childItem->data(PlotItemDelegate::TYPE) == "title" &&
+                  childItem->data(PlotItemDelegate::DISPLAY_NAME) == "MODELS")
               {
                 hasTitle = true;
                 break;
@@ -779,15 +788,78 @@ void Palette::FillModels(QStandardItemModel *_modelsModel)
 
             if (!hasTitle)
             {
-              auto modelsTitle = new QStandardItem();
-              modelsTitle->setData("MODELS", PlotItemDelegate::DISPLAY_NAME);
-              modelsTitle->setData("title", PlotItemDelegate::TYPE);
-              previousItem->appendRow(modelsTitle);
+              auto title = new QStandardItem();
+              title->setData("MODELS", PlotItemDelegate::DISPLAY_NAME);
+              title->setData("title", PlotItemDelegate::TYPE);
+              previousItem->appendRow(title);
             }
 
             previousItem->appendRow(newItem);
             previousItem = newItem;
           }
+        }
+        else
+        {
+          previousItem = existingItem;
+        }
+      }
+      else if (part == "link")
+      {
+        // Check if it has already been added
+        QStandardItem *existingItem = NULL;
+
+        // Check top level (model)
+        if (!previousItem)
+        {
+          gzerr << "A link cannot be outside of a model" << std::endl;
+          continue;
+        }
+        // Check a QStandardItem
+        else
+        {
+          // TODO: Make a helper function for this
+          for (int k = 0; k < previousItem->rowCount(); ++k)
+          {
+            auto childItem = previousItem->child(k, 0);
+            if (childItem && childItem->text().toStdString() == nextPart)
+            {
+              existingItem = childItem;
+              break;
+            }
+          }
+        }
+
+        if (!existingItem)
+        {
+          auto newItem = new QStandardItem(nextPart.c_str());
+          newItem->setData(nextPart.c_str(),
+              PlotItemDelegate::DISPLAY_NAME);
+          newItem->setData("link", PlotItemDelegate::TYPE);
+
+          // Add title if there isn't one yet
+          bool hasTitle = false;
+          for (int k = 0; k < previousItem->rowCount(); ++k)
+          {
+            auto childItem = previousItem->child(k, 0);
+            if (childItem &&
+                childItem->data(PlotItemDelegate::TYPE) == "title" &&
+                childItem->data(PlotItemDelegate::DISPLAY_NAME) == "LINKS")
+            {
+              hasTitle = true;
+              break;
+            }
+          }
+
+          if (!hasTitle)
+          {
+            auto title = new QStandardItem();
+            title->setData("LINKS", PlotItemDelegate::DISPLAY_NAME);
+            title->setData("title", PlotItemDelegate::TYPE);
+            previousItem->appendRow(title);
+          }
+
+          previousItem->appendRow(newItem);
+          previousItem = newItem;
         }
         else
         {
@@ -1236,6 +1308,42 @@ void Palette::UpdateSearch(const QString &_search)
       this->dataPtr->searchModelsTree, QModelIndex());
   this->ExpandChildren(this->dataPtr->searchSimModel,
       this->dataPtr->searchSimTree, QModelIndex());
+/*
+  // Stretch
+  auto visibleRowsTopics = this->VisibleRowCount(
+      this->dataPtr->searchTopicsModel,
+      this->dataPtr->searchTopicsTree, QModelIndex());
+
+  auto visibleRowsModels = this->VisibleRowCount(
+      this->dataPtr->searchModelsModel,
+      this->dataPtr->searchModelsTree, QModelIndex());
+
+  auto visibleRowsSim = this->VisibleRowCount(
+      this->dataPtr->searchSimModel,
+      this->dataPtr->searchSimTree, QModelIndex());
+
+  auto total = visibleRowsTopics + visibleRowsModels + visibleRowsSim;
+
+  QList<int> sizes;
+  if (total != 0)
+  {
+    sizes << this->height() * visibleRowsTopics / total <<
+             this->height() * visibleRowsModels / total <<
+             this->height() * visibleRowsSim / total;
+
+//    this->dataPtr->splitter->setStretchFactor(0, visibleRowsTopics / total);
+//    this->dataPtr->splitter->setStretchFactor(1, visibleRowsModels / total);
+//    this->dataPtr->splitter->setStretchFactor(2, visibleRowsSim / total);
+
+  }
+  else
+  {
+    sizes << this->height() / 3 <<
+             this->height() / 3 <<
+             this->height() / 3;
+  }
+  this->dataPtr->splitter->setSizes(sizes);
+*/
 }
 
 /////////////////////////////////////////////////
@@ -1258,4 +1366,28 @@ void Palette::ExpandChildren(QSortFilterProxyModel *_model,
 
     this->ExpandChildren(_model, _tree, item);
   }
+}
+
+/////////////////////////////////////////////////
+unsigned int Palette::VisibleRowCount(QSortFilterProxyModel *_model,
+    QTreeView *_tree, const QModelIndex &_srcParent) const
+{
+  if (!_model || !_tree)
+    return 0;
+
+  unsigned int count = 0;
+
+  for (int i = 0; i < _model->rowCount(_srcParent); ++i)
+  {
+    auto item = _model->index(i, 0, _srcParent);
+    if (!item.isValid())
+      return 0;
+
+    if (!_tree->isRowHidden(i, _srcParent))
+      count ++;
+
+    count += this->VisibleRowCount(_model, _tree, item);
+  }
+
+  return count;
 }
