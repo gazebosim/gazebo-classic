@@ -1519,9 +1519,9 @@ void Model::RegisterIntrospectionItems()
       <ignition::math::Vector3d>(linVelURI.Str(), fModelLinVel);
 
   common::URI angVelURI(uri);
-  angVelURI.Query().Insert("p", "quaterniond/world_angular_velocity");
+  angVelURI.Query().Insert("p", "vector3d/world_angular_velocity");
   gazebo::util::IntrospectionManager::Instance()->Register
-      <ignition::math::Quaterniond>(angVelURI.Str(), fModelAngVel);
+      <ignition::math::Vector3d>(angVelURI.Str(), fModelAngVel);
 
   common::URI linAccURI(uri);
   linAccURI.Query().Insert("p", "vector3d/world_linear_acceleration");
@@ -1529,7 +1529,7 @@ void Model::RegisterIntrospectionItems()
       <ignition::math::Vector3d>(linAccURI.Str(), fModelLinAcc);
 
   common::URI angAccURI(uri);
-  angAccURI.Query().Insert("p", "quaterniond/world_angular_acceleration");
+  angAccURI.Query().Insert("p", "vector3d/world_angular_acceleration");
   gazebo::util::IntrospectionManager::Instance()->Register
-      <ignition::math::Quaterniond>(angAccURI.Str(), fModelAngAcc);
+      <ignition::math::Vector3d>(angAccURI.Str(), fModelAngAcc);
 }
