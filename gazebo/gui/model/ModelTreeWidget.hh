@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_MODEL_TREE_WIDGET_HH_
-#define _GAZEBO_MODEL_TREE_WIDGET_HH_
+#ifndef _GAZEBO_GUI_MODEL_MODELTREEWIDGET_HH_
+#define _GAZEBO_GUI_MODEL_MODELTREEWIDGET_HH_
 
 #include <mutex>
 #include <string>

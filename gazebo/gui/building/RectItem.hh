@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,15 @@
  *
 */
 
-#ifndef _RECT_ITEM_HH_
-#define _RECT_ITEM_HH_
+#ifndef _GAZEBO_GUI_BUILDING_RECTITEM_HH_
+#define _GAZEBO_GUI_BUILDING_RECTITEM_HH_
 
+#include <memory>
 #include <vector>
+
 #include "gazebo/gui/qt.h"
-#include "gazebo/gui/building/WallSegmentItem.hh"
 #include "gazebo/gui/building/EditorItem.hh"
+
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -29,8 +31,11 @@ namespace gazebo
   namespace gui
   {
     class GrabberHandle;
+    class MeasureItem;
     class RotateHandle;
-    class EditorItem;
+
+    // Forward declare private data.
+    class RectItemPrivate;
 
     /// \addtogroup gazebo_gui
     /// \{
@@ -43,8 +48,17 @@ namespace gazebo
       Q_OBJECT
 
       /// \brief Resize flags used to indicate which dimension can be resized.
-      public: enum ResizeFlags {NONE = 0x00,
-          ITEM_WIDTH = 0x01, ITEM_HEIGHT = 0x02};
+      public: enum ResizeFlags
+          {
+            /// \brief No dimensions.
+            NONE = 0x00,
+
+            /// \brief Width
+            ITEM_WIDTH = 0x01,
+
+            /// \brief Height
+            ITEM_HEIGHT = 0x02
+          };
 
       /// \brief Constructor
       public: RectItem();
@@ -94,6 +108,9 @@ namespace gazebo
 
       // Documentation inherited
       public: void SetHighlighted(bool _highlighted);
+
+      /// \brief Detach the rect item from its parent.
+      public: void DetachFromParent();
 
       /// \brief Helper method for Updating the corner positions of the rect
       /// item.
@@ -148,7 +165,7 @@ namespace gazebo
           QEvent *_event);
 
       /// \brief Filter Qt events and redirect them to the grabber handle.
-      /// \param[in] _rotateHandle Grabber handle that will handle the event.
+      /// \param[in] _grabber Grabber handle that will handle the event.
       /// \param[in] _event Qt event
       private: virtual bool GrabberEventFilter(GrabberHandle *_grabber,
           QEvent *_event);
@@ -267,32 +284,9 @@ namespace gazebo
       /// towards each end of this item's parent wall.
       protected: std::vector<MeasureItem *> measures;
 
-      /// \brief Mouse press position in pixel coordinates.
-      private: QPointF mousePressPos;
-
-      /// \brief Mouse press position in pixel coordinates.
-      private: int gridSpace;
-
-      /// \brief A list of grabber handles for this item. Four for corners and
-      /// four for edges, going clockwise with 0 being top left
-      private: std::vector<GrabberHandle *> grabbers;
-
-      /// \brief Rotate handle for rotating the rect item.
-      private: RotateHandle *rotateHandle;
-
-      /// \brief A list of resize cursors used when the mouse hovers over the
-      /// grabber handles.
-      private: std::vector<Qt::CursorShape> cursors;
-
-      /// \brief Resize flag that controls how the rect item can be resized.
-      private: unsigned int resizeFlag;
-
-      /// \brief Normalized position with respect to the wall segment's start
-      /// point.
-      private: double positionOnWall;
-
-      /// \brief Angle with respect to parent wall, either 0 or 180 degrees.
-      private: double angleOnWall;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<RectItemPrivate> dataPtr;
     };
     /// \}
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ void TimeWidget_TEST::Reset()
   }
 
   // Get the time panel
-  gazebo::gui::TimePanel *timePanel = mainWindow->GetRenderWidget()->
+  gazebo::gui::TimePanel *timePanel = mainWindow->RenderWidget()->
       GetTimePanel();
   QVERIFY(timePanel != NULL);
 
@@ -97,26 +97,14 @@ void TimeWidget_TEST::Reset()
   // pause the world before resetting
   mainWindow->Pause();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   QVERIFY(mainWindow->IsPaused());
 
   // trigger reset world
   gazebo::gui::g_resetWorldAct->trigger();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Make sure real time is zero
   txt = realTimeEdit->text().toStdString();
@@ -136,13 +124,7 @@ void TimeWidget_TEST::Reset()
   // play the simulation and again and verify time increases
   mainWindow->Play();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   QVERIFY(!mainWindow->IsPaused());
 
@@ -190,18 +172,13 @@ void TimeWidget_TEST::ValidTimes()
     mainWindow->Init();
     mainWindow->show();
 
-    // Process some events, and draw the screen
-    for (unsigned int i = 0; i < 10; ++i)
-    {
-      gazebo::common::Time::MSleep(30);
-      QCoreApplication::processEvents();
-      mainWindow->repaint();
-    }
+    this->ProcessEventsAndDraw(mainWindow);
+
     gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
     QVERIFY(cam != NULL);
 
     // Get the time panel
-    gazebo::gui::TimePanel *timePanel = mainWindow->GetRenderWidget()->
+    gazebo::gui::TimePanel *timePanel = mainWindow->RenderWidget()->
         GetTimePanel();
     QVERIFY(timePanel != NULL);
 

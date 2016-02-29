@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,13 +43,7 @@ void ModelData_TEST::Clone()
   gazebo::rendering::ScenePtr scene = cam->GetScene();
   QVERIFY(scene != NULL);
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   gui::LinkData *link = new gui::LinkData();
 
@@ -61,7 +55,7 @@ void ModelData_TEST::Clone()
   msgs::AddBoxLink(model, mass, size);
   link->Load(msgs::LinkToSDF(model.link(0)));
   rendering::VisualPtr linkVis(new rendering::Visual("model::box_link",
-      scene->GetWorldVisual()));
+      scene->WorldVisual()));
   link->linkVisual = linkVis;
 
   // add a visual
@@ -175,13 +169,7 @@ void ModelData_TEST::LinkScale()
   gazebo::rendering::ScenePtr scene = cam->GetScene();
   QVERIFY(scene != NULL);
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // box
   {
