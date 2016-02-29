@@ -335,6 +335,10 @@ namespace gazebo
       /// \param[in] _sdf SDF element with link data.
       private: void InsertLinkFromSDF(sdf::ElementPtr _sdf);
 
+      /// \brief Insert a nested model from an SDF element.
+      /// \param[in] _sdf SDF element with nested model data.
+      private: void InsertNestedModelFromSDF(sdf::ElementPtr _sdf);
+
       /// \brief Clone an existing nested model.
       /// \param[in] _modelName Name of nested model to be cloned.
       /// \return Cloned nested model data.

@@ -164,6 +164,39 @@ namespace gazebo
             event::ConnectionPtr _subscriber)
           { newModel.Disconnect(_subscriber); }
 
+        /// \brief Connect a Gazebo event to the request nested model removal
+        /// signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectRequestNestedModelRemoval(
+            T _subscriber)
+          { return requestNestedModelRemoval.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the request nested model
+        /// removal signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectRequestNestedModelRemoval(
+            event::ConnectionPtr _subscriber)
+          { requestNestedModelRemoval.Disconnect(_subscriber); }
+
+        /// \brief Connect a Gazebo event to the request nested model insertion
+        /// signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectRequestNestedModelInsertion(
+            T _subscriber)
+          { return requestNestedModelInsertion.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the request nested model
+        /// insertion
+        /// signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectRequestNestedModelInsertion(
+            event::ConnectionPtr _subscriber)
+          { requestNestedModelInsertion.Disconnect(_subscriber); }
+
         /// \brief Connect a Gazebo event to the nested model inserted signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
@@ -538,6 +571,14 @@ namespace gazebo
         /// \brief Request to insert a link.
         public: static event::EventT<void (sdf::ElementPtr)>
             requestLinkInsertion;
+
+        /// \brief Request to remove a nested model.
+        public: static event::EventT<void (std::string)>
+            requestNestedModelRemoval;
+
+        /// \brief Request to insert a nested model.
+        public: static event::EventT<void (sdf::ElementPtr)>
+            requestNestedModelInsertion;
 
         /// \brief Request to remove a link.
         public: static event::EventT<void (std::string)> requestLinkRemoval;

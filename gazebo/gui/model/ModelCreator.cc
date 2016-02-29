@@ -173,6 +173,15 @@ ModelCreator::ModelCreator()
         std::placeholders::_1)));
 
   this->connections.push_back(
+      gui::model::Events::ConnectRequestNestedModelRemoval(
+        std::bind(&ModelCreator::RemoveEntity, this, std::placeholders::_1)));
+
+  this->connections.push_back(
+      gui::model::Events::ConnectRequestNestedModelInsertion(
+      std::bind(&ModelCreator::InsertNestedModelFromSDF, this,
+      std::placeholders::_1)));
+
+  this->connections.push_back(
       gui::model::Events::ConnectRequestLinkRemoval(
         std::bind(&ModelCreator::RemoveEntity, this, std::placeholders::_1)));
 
@@ -999,6 +1008,15 @@ void ModelCreator::InsertLinkFromSDF(sdf::ElementPtr _sdf)
 }
 
 /////////////////////////////////////////////////
+void ModelCreator::InsertNestedModelFromSDF(sdf::ElementPtr _sdf)
+{
+  if (!_sdf)
+    return;
+
+  this->CreateModelFromSDF(_sdf, this->previewVisual);
+}
+
+/////////////////////////////////////////////////
 LinkData *ModelCreator::CloneLink(const std::string &_linkName)
 {
   std::lock_guard<std::recursive_mutex> lock(this->updateMutex);
@@ -1087,7 +1105,7 @@ LinkData *ModelCreator::CreateLinkFromSDF(const sdf::ElementPtr &_linkElem,
 
   // Link
   std::stringstream linkNameStream;
-  std::string leafName = link->GetName();
+  std::string leafName = link->Name();
   linkNameStream << _parentVis->GetName() << "::";
   linkNameStream << leafName;
   std::string linkName = linkNameStream.str();
@@ -1566,13 +1584,25 @@ void ModelCreator::OnDelete()
 /////////////////////////////////////////////////
 void ModelCreator::OnDelete(const std::string &_entity)
 {
+  // if it's a nestedModel
+  auto nestedModel = this->allNestedModels.find(_entity);
+  if (nestedModel != this->allNestedModels.end())
+  {
+    // Register command
+    auto cmd = MEUserCmdManager::Instance()->NewCmd(
+        "Delete [" + nestedModel->second->Name() + "]",
+        MEUserCmd::DELETING_NESTED_MODEL);
+    cmd->SetSDF(nestedModel->second->modelSDF);
+    cmd->SetScopedName(nestedModel->second->modelVisual->GetName());
+  }
+
   // If it's a link
   auto link = this->allLinks.find(_entity);
   if (link != this->allLinks.end())
   {
     // Register command
     auto cmd = MEUserCmdManager::Instance()->NewCmd(
-        "Delete [" + link->second->GetName() + "]", MEUserCmd::DELETING_LINK);
+        "Delete [" + link->second->Name() + "]", MEUserCmd::DELETING_LINK);
     cmd->SetSDF(link->second->linkSDF);
     cmd->SetScopedName(link->second->linkVisual->GetName());
   }
@@ -1746,7 +1776,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
       gui::model::Events::linkInserted(this->mouseVisual->GetName());
 
       auto cmd = MEUserCmdManager::Instance()->NewCmd(
-          "Insert [" + link->GetName() + "]",
+          "Insert [" + link->Name() + "]",
           MEUserCmd::INSERTING_LINK);
       cmd->SetSDF(link->linkSDF);
       cmd->SetScopedName(link->linkVisual->GetName());
@@ -1761,6 +1791,12 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
             this->mouseVisual->GetWorldPose()-this->modelPose).Ign());
 
         this->EmitNestedModelInsertedEvent(this->mouseVisual);
+
+        auto cmd = MEUserCmdManager::Instance()->NewCmd(
+            "Insert [" + modelData->Name() + "]",
+            MEUserCmd::INSERTING_NESTED_MODEL);
+        cmd->SetSDF(modelData->modelSDF);
+        cmd->SetScopedName(modelData->modelVisual->GetName());
       }
     }
 
