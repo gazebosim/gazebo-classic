@@ -12,12 +12,22 @@
     * [Pull request #2112](https://bitbucket.org/osrf/gazebo/pull-request/2112)
 
 1. Model editor updates
+
     1. Undo / redo inserting and deleting links
         * [Pull request #2151](https://bitbucket.org/osrf/gazebo/pull-request/2151)
 
 ## Gazebo 7
 
 ## Gazebo 7.x.x (2016-xx-xx)
+
+1. Fix compilation against ffmpeg3 (libavcodec)
+    * [Pull request #2154](https://bitbucket.org/osrf/gazebo/pull-request/2154)
+
+1. Append a missing </gazebo_log> tag to log files when played.
+    * [Pull request #2143](https://bitbucket.org/osrf/gazebo/pull-request/2143)
+
+1. Add helper function QTestFixture::ProcessEventsAndDraw
+    * [Pull request #2147](https://bitbucket.org/osrf/gazebo/pull-request/2147)
 
 1. Undo scaling during simulation
     * [Pull request #2108](https://bitbucket.org/osrf/gazebo/pull-request/2108)

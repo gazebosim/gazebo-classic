@@ -1566,32 +1566,18 @@ void ModelCreator::OnDelete()
 /////////////////////////////////////////////////
 void ModelCreator::OnDelete(const std::string &_entity)
 {
-  // if it's a nestedModel
-  auto nestedModel = this->allNestedModels.find(_entity);
-  if (nestedModel != this->allNestedModels.end())
-  {
-    this->RemoveNestedModelImpl(_entity);
-    return;
-  }
-
-  // if it's a link
+  // If it's a link
   auto link = this->allLinks.find(_entity);
   if (link != this->allLinks.end())
   {
-    // First delete joints
-    if (this->jointMaker)
-      this->jointMaker->RemoveJointsByLink(_entity);
-
-    // Then register command
+    // Register command
     auto cmd = MEUserCmdManager::Instance()->NewCmd(
         "Delete [" + link->second->GetName() + "]", MEUserCmd::DELETING_LINK);
     cmd->SetSDF(link->second->linkSDF);
     cmd->SetScopedName(link->second->linkVisual->GetName());
-
-    // Then delete link
-    this->RemoveLinkImpl(_entity);
-    return;
   }
+
+  this->RemoveEntity(_entity);
 }
 
 /////////////////////////////////////////////////
