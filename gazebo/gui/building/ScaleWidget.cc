@@ -16,10 +16,28 @@
 */
 
 #include <sstream>
+#include <string>
+#include <vector>
 
 #include "gazebo/gui/building/BuildingEditorEvents.hh"
 #include "gazebo/gui/building/ScaleWidget.hh"
-#include "gazebo/gui/building/ScaleWidgetPrivate.hh"
+
+namespace gazebo
+{
+  namespace gui
+  {
+    /// \internal
+    /// \brief Private data for the ScaleWidget class
+    class ScaleWidgetPrivate
+    {
+      /// \brief Text displaying the scale.
+      public: std::string scaleText;
+
+      /// \brief A list of gui editor events connected to this widget.
+      public: std::vector<event::ConnectionPtr> connections;
+    };
+  }
+}
 
 using namespace gazebo;
 using namespace gui;
@@ -40,6 +58,7 @@ ScaleWidget::ScaleWidget(QWidget *_parent)
 //////////////////////////////////////////////////
 ScaleWidget::~ScaleWidget()
 {
+  this->dataPtr->connections.clear();
 }
 
 //////////////////////////////////////////////////
