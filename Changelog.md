@@ -15,6 +15,9 @@
 
 ## Gazebo 7.x.x (2016-xx-xx)
 
+1. Fix compilation against ffmpeg3 (libavcodec)
+    * [Pull request #2154](https://bitbucket.org/osrf/gazebo/pull-request/2154)
+
 1. Append a missing </gazebo_log> tag to log files when played.
     * [Pull request #2143](https://bitbucket.org/osrf/gazebo/pull-request/2143)
 

@@ -56,6 +56,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/common/Time.hh"
+#include "gazebo/common/URI.hh"
 
 #include "gazebo/math/Vector3.hh"
 
@@ -63,6 +64,7 @@
 
 #include "gazebo/util/OpenAL.hh"
 #include "gazebo/util/Diagnostics.hh"
+#include "gazebo/util/IntrospectionManager.hh"
 #include "gazebo/util/LogRecord.hh"
 
 #include "gazebo/physics/Road.hh"
@@ -320,6 +322,14 @@ void World::Load(sdf::ElementPtr _sdf)
 
   this->dataPtr->userCmdManager = UserCmdManagerPtr(
       new UserCmdManager(shared_from_this()));
+
+  // Initialize the world URI.
+  this->dataPtr->uri.Clear();
+  this->dataPtr->uri.SetScheme("data");
+  this->dataPtr->uri.Path().PushFront(this->GetName());
+  this->dataPtr->uri.Path().PushFront("world");
+
+  this->RegisterIntrospectionItems();
 
   this->dataPtr->loaded = true;
 }
@@ -805,6 +815,8 @@ void World::Update()
 
   event::Events::worldUpdateEnd();
 
+  gazebo::util::IntrospectionManager::Instance()->Update();
+
   DIAG_TIMER_STOP("World::Update");
 }
 
@@ -986,6 +998,7 @@ ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
 
   this->PublishModelPose(model);
   this->dataPtr->models.push_back(model);
+
   return model;
 }
 
@@ -2599,4 +2612,22 @@ void World::ResetPhysicsStates()
 {
   for (auto &model : this->dataPtr->models)
     model->ResetPhysicsStates();
+}
+
+/////////////////////////////////////////////////
+common::URI World::URI() const
+{
+  return this->dataPtr->uri;
+}
+
+/////////////////////////////////////////////////
+void World::RegisterIntrospectionItems()
+{
+  auto uri = this->URI();
+
+  common::URI timeURI(uri);
+  timeURI.Query().Insert("p", "time/sim_time");
+  // Add here all the items that might be introspected.
+  gazebo::util::IntrospectionManager::Instance()->Register<common::Time>(
+      timeURI.Str(), std::bind(&World::GetSimTime, this));
 }

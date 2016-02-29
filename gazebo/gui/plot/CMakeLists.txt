@@ -1,0 +1,46 @@
+include (${gazebo_cmake_dir}/GazeboUtils.cmake)
+
+set (sources_local
+  plot/IncrementalPlot.cc
+  plot/PlotCanvas.cc
+  plot/PlotCurve.cc
+  plot/PlotManager.cc
+  plot/Palette.cc
+  plot/PlotWindow.cc
+  plot/VariablePill.cc
+  plot/VariablePillContainer.cc
+)
+
+set (qt_headers_local
+  plot/IncrementalPlot.hh
+  plot/PlotCanvas.hh
+  plot/Palette.hh
+  plot/PlotWindow.hh
+  plot/VariablePill.hh
+  plot/VariablePillContainer.hh
+)
+
+set (headers_install
+)
+
+set (qt_tests_local
+  IncrementalPlot_TEST.cc
+  PlotCanvas_TEST.cc
+  PlotCurve_TEST.cc
+  PlotWindow_TEST.cc
+  VariablePill_TEST.cc
+  VariablePillContainer_TEST.cc
+)
+
+if (ENABLE_SCREEN_TESTS)
+  set (qt_tests_local
+    ${qt_tests_local}
+
+  )
+endif()
+
+set (sources ${sources} ${sources_local} PARENT_SCOPE)
+set (internal_qt_headers ${internal_qt_headers} ${qt_headers_local} PARENT_SCOPE)
+
+gz_build_qt_tests(${qt_tests_local})
+gz_install_includes("gui/plot" ${headers_install})
