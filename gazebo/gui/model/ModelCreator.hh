@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -127,7 +127,7 @@ namespace gazebo
       /// \param[in] _pose Pose of the link.
       /// \param[in] _samples Number of samples for polyline.
       /// \return Link data.
-      public: LinkData * AddShape(const EntityType _type,
+      public: LinkData *AddShape(const EntityType _type,
           const ignition::math::Vector3d &_size = ignition::math::Vector3d::One,
           const ignition::math::Pose3d &_pose = ignition::math::Pose3d::Zero,
           const std::string &_uri = "", const unsigned int _samples = 5);
@@ -165,7 +165,7 @@ namespace gazebo
 
       /// \brief Get joint maker
       /// \return Joint maker
-      public: JointMaker *GetJointMaker() const;
+      public: gui::JointMaker *JointMaker() const;
 
       /// \brief Set the select state of an entity.
       /// \param[in] _name Name of the link.
@@ -254,7 +254,7 @@ namespace gazebo
 
       /// \brief QT callback when entering model edit mode
       /// \param[in] _checked True if the menu item is checked
-      private slots: void OnEdit(bool _checked);
+      private slots: void OnEdit(const bool _checked);
 
       /// \brief QT callback when there's a request to edit an existing model.
       /// \param[in] _modelName Name of model to be edited.

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,8 @@
 #include <sstream>
 #include <functional>
 #include <string>
+
+#include <sdf/sdf.hh>
 
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/KeyEvent.hh"
@@ -56,7 +58,146 @@
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/ModelEditorEvents.hh"
 #include "gazebo/gui/model/ModelCreator.hh"
-#include "gazebo/gui/model/ModelCreatorPrivate.hh"
+
+namespace gazebo
+{
+  namespace gui
+  {
+    /// \internal
+    /// \class ModelCreator ModelCreator.hh
+    /// \brief Private data for the ModelCreator class.
+    class ModelCreatorPrivate
+    {
+      /// \brief Name of the model preview.
+      public: static const std::string previewName;
+
+      /// \brief Default name of the model.
+      public: static const std::string modelDefaultName;
+
+      /// \brief The model in SDF format.
+      public: sdf::SDFPtr modelSDF;
+
+      /// \brief A template SDF of a simple box model.
+      public: sdf::SDFPtr modelTemplateSDF;
+
+      /// \brief Name of the model.
+      public: std::string modelName;
+
+      /// \brief Folder name, which is the model name without spaces.
+      public: std::string folderName;
+
+      /// \brief The root visual of the model.
+      public: rendering::VisualPtr previewVisual;
+
+      /// \brief Visual currently being inserted into the model, which is
+      /// attached to the mouse.
+      public: rendering::VisualPtr mouseVisual;
+
+      /// \brief The pose of the model.
+      public: ignition::math::Pose3d modelPose;
+
+      /// \brief True to create a static model.
+      public: bool isStatic;
+
+      /// \brief True to auto disable model when it is at rest.
+      public: bool autoDisable;
+
+      /// \brief A list of gui editor events connected to the model creator.
+      public: std::vector<event::ConnectionPtr> connections;
+
+      /// \brief Counter for the number of links in the model.
+      public: int linkCounter;
+
+      /// \brief Counter for generating a unique model name.
+      public: int modelCounter;
+
+      /// \brief Type of entity being added.
+      public: ModelCreator::EntityType addEntityType;
+
+      /// \brief A map of nested model names to and their visuals.
+      public: std::map<std::string, NestedModelData *> allNestedModels;
+
+      /// \brief A map of model link names to and their data.
+      public: std::map<std::string, LinkData *> allLinks;
+
+      /// \brief A map of model plugin names to and their data.
+      public: std::map<std::string, ModelPluginData *> allModelPlugins;
+
+      /// \brief Transport node
+      public: transport::NodePtr node;
+
+      /// \brief Publisher that publishes msg to the server once the model is
+      /// created.
+      public: transport::PublisherPtr makerPub;
+
+      /// \brief Publisher that publishes delete entity msg to remove the
+      /// editor visual.
+      public: transport::PublisherPtr requestPub;
+
+      /// \brief Joint maker.
+      public: JointMaker *jointMaker;
+
+      /// \brief origin of the model.
+      public: ignition::math::Pose3d origin;
+
+      /// \brief A list of selected link visuals.
+      public: std::vector<rendering::VisualPtr> selectedLinks;
+
+      /// \brief A list of selected nested model visuals.
+      public: std::vector<rendering::VisualPtr> selectedNestedModels;
+
+      /// \brief A list of selected model plugins.
+      public: std::vector<std::string> selectedModelPlugins;
+
+      /// \brief Names of entities copied through g_copyAct
+      public: std::vector<std::string> copiedNames;
+
+      /// \brief The last mouse event
+      public: common::MouseEvent lastMouseEvent;
+
+      /// \brief Qt action for opening the link inspector.
+      public: QAction *inspectAct;
+
+      /// \brief Name of link that is currently being inspected.
+      public: std::string inspectName;
+
+      /// \brief True if the model editor mode is active.
+      public: bool active;
+
+      /// \brief Current model manipulation mode.
+      public: std::string manipMode;
+
+      /// \brief A dialog with options to save the model.
+      public: SaveDialog *saveDialog;
+
+      /// \brief Store the current save state of the model.
+      public: ModelCreator::SaveState currentSaveState;
+
+      /// \brief Mutex to protect updates
+      public: std::recursive_mutex updateMutex;
+
+      /// \brief A list of link names whose scale has changed externally.
+      public: std::map<std::string, ignition::math::Vector3d> linkScaleUpdate;
+
+      /// \brief Name of model on the server that is being edited here in the
+      /// model editor.
+      public: std::string serverModelName;
+
+      /// \brief SDF element of the model on the server.
+      public: sdf::ElementPtr serverModelSDF;
+
+      /// \brief A map of all visuals of the model to be edited to their
+      /// visibility.
+      public: std::map<uint32_t, bool> serverModelVisible;
+
+      /// \brief Name of the canonical model
+      public: std::string canonicalModel;
+
+      /// \brief Name of the canonical link in the model
+      public: std::string canonicalLink;
+    };
+  }
+}
 
 using namespace gazebo;
 using namespace gui;
@@ -84,7 +225,7 @@ ModelCreator::ModelCreator() : dataPtr(new ModelCreatorPrivate)
   this->dataPtr->requestPub =
       this->dataPtr->node->Advertise<msgs::Request>("~/request");
 
-  this->dataPtr->jointMaker = new JointMaker();
+  this->dataPtr->jointMaker = new gui::JointMaker();
 
   connect(g_editModelAct, SIGNAL(toggled(bool)), this, SLOT(OnEdit(bool)));
 
@@ -237,7 +378,7 @@ ModelCreator::~ModelCreator()
 }
 
 /////////////////////////////////////////////////
-void ModelCreator::OnEdit(bool _checked)
+void ModelCreator::OnEdit(const bool _checked)
 {
   if (_checked)
   {
@@ -405,8 +546,6 @@ NestedModelData *ModelCreator::CreateModelFromSDF(
     // Internal name
     std::stringstream parentNameStream;
     parentNameStream << _parentVis->GetName();
-    if (_parentVis->GetName() == this->dataPtr->previewName)
-      parentNameStream << "_" << this->dataPtr->modelCounter;
 
     modelNameStream << parentNameStream.str() << "::" <<
         _modelElem->Get<std::string>("name");
@@ -754,7 +893,7 @@ void ModelCreator::AddJoint(const std::string &_type)
 }
 
 /////////////////////////////////////////////////
-LinkData * ModelCreator::AddShape(const EntityType _type,
+LinkData *ModelCreator::AddShape(const EntityType _type,
     const ignition::math::Vector3d &_size, const ignition::math::Pose3d &_pose,
     const std::string &_uri, const unsigned int _samples)
 {
@@ -2147,7 +2286,8 @@ void ModelCreator::OnPaste()
 
     // Propagate copied entity's Z position and rotation
     ignition::math::Pose3d copiedPose = copiedLink->Pose();
-    clonePose.Pos().Z() = this->dataPtr->modelPose.Pos().Z() + copiedPose.Pos().Z();
+    clonePose.Pos().Z() = this->dataPtr->modelPose.Pos().Z() +
+        copiedPose.Pos().Z();
     clonePose.Rot() = copiedPose.Rot();
 
     LinkData *clonedLink = this->CloneLink(it->first);
@@ -2158,7 +2298,8 @@ void ModelCreator::OnPaste()
   }
   else
   {
-    auto it2 = this->dataPtr->allNestedModels.find(this->dataPtr->copiedNames.back());
+    auto it2 = this->dataPtr->allNestedModels.find(
+        this->dataPtr->copiedNames.back());
     if (it2 != this->dataPtr->allNestedModels.end())
     {
       NestedModelData *copiedNestedModel = it2->second;
@@ -2175,7 +2316,8 @@ void ModelCreator::OnPaste()
 
       // Propagate copied entity's Z position and rotation
       ignition::math::Pose3d copiedPose = copiedNestedModel->Pose();
-      clonePose.Pos().Z() = this->dataPtr->modelPose.Pos().Z() + copiedPose.Pos().Z();
+      clonePose.Pos().Z() = this->dataPtr->modelPose.Pos().Z() +
+          copiedPose.Pos().Z();
       clonePose.Rot() = copiedPose.Rot();
 
       NestedModelData *clonedNestedModel = this->CloneNestedModel(it2->first);
@@ -2187,7 +2329,7 @@ void ModelCreator::OnPaste()
 }
 
 /////////////////////////////////////////////////
-JointMaker *ModelCreator::GetJointMaker() const
+JointMaker *ModelCreator::JointMaker() const
 {
   return this->dataPtr->jointMaker;
 }
@@ -2612,8 +2754,8 @@ void ModelCreator::Update()
     NestedModelData *nestedModel = nestedModelIt.second;
     if (nestedModel->Pose() != nestedModel->modelVisual->GetPose().Ign())
     {
-      nestedModel->SetPose(
-            (nestedModel->modelVisual->GetWorldPose() - this->dataPtr->modelPose).Ign());
+      nestedModel->SetPose((nestedModel->modelVisual->GetWorldPose() -
+          this->dataPtr->modelPose).Ign());
       this->ModelChanged();
     }
   }
