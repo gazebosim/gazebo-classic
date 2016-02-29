@@ -115,7 +115,8 @@ void ForceTorqueSensor::Load(const std::string &_worldName,
     (this->pose +
      this->dataPtr->parentJoint->GetInitialAnchorPose().Ign()).Rot();
 
-  this->dataPtr->rotationSensorChild = rotationChildSensor.Inverse();
+  this->dataPtr->rotationSensorChild =
+    ignition::math::Matrix3d(rotationChildSensor.Inverse());
 
   // Handle measure direction
   bool defaultDirectionIsParentToChild = false;
