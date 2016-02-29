@@ -68,7 +68,7 @@ namespace gazebo
 
       /// \brief Get the number of curves managed by this handler
       /// \return Number of curves
-      public: unsigned int Count() const;
+      public: unsigned int CurveCount() const;
 
       /// \brief Topic data callback
       /// \param[in] _msg Message data

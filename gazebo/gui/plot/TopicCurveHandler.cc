@@ -48,6 +48,9 @@ namespace gazebo
 
       /// \brief Node for communications.
       public: transport::NodePtr node;
+
+      /// \brief Mutex to protect the topic data updates.
+      public: std::mutex mutex;
     };
   }
 }
@@ -86,6 +89,7 @@ void TopicCurveHandler::SetTopic(const std::string &_topic)
 void TopicCurveHandler::AddCurve(const std::string &_param,
     PlotCurveWeakPtr _curve)
 {
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
   auto it = this->dataPtr->curves.find(_param);
   if (it == this->dataPtr->curves.end())
   {
@@ -106,6 +110,7 @@ void TopicCurveHandler::AddCurve(const std::string &_param,
 /////////////////////////////////////////////////
 void TopicCurveHandler::RemoveCurve(PlotCurveWeakPtr _curve)
 {
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
   for (auto it = this->dataPtr->curves.begin();
       it != this->dataPtr->curves.end(); ++it)
   {
@@ -123,6 +128,7 @@ void TopicCurveHandler::RemoveCurve(PlotCurveWeakPtr _curve)
 /////////////////////////////////////////////////
 bool TopicCurveHandler::HasCurve(PlotCurveWeakPtr _curve) const
 {
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
   for (const auto &it : this->dataPtr->curves)
   {
     if (it.second.find(_curve) != it.second.end())
@@ -133,8 +139,9 @@ bool TopicCurveHandler::HasCurve(PlotCurveWeakPtr _curve) const
 }
 
 /////////////////////////////////////////////////
-unsigned int TopicCurveHandler::Count() const
+unsigned int TopicCurveHandler::CurveCount() const
 {
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
   unsigned int count = 0;
   for (const auto &it : this->dataPtr->curves)
     count += it.second.size();
@@ -144,6 +151,7 @@ unsigned int TopicCurveHandler::Count() const
 /////////////////////////////////////////////////
 void TopicCurveHandler::OnTopicData(const std::string &_msg)
 {
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
   if (this->dataPtr->curves.empty())
     return;
 

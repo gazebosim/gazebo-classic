@@ -146,34 +146,42 @@ std::set<std::string> IntrospectionManager::Items() const
 //////////////////////////////////////////////////
 void IntrospectionManager::Update()
 {
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-
-  for (auto &observedItem : this->dataPtr->observedItems)
+  std::map<std::string, IntrospectionFilter> filtersCopy;
+  std::map<std::string, std::function <gazebo::msgs::Any ()>> allItemsCopy;
+  std::map<std::string, ObservedItem> observedItemsCopy;
   {
-    auto &item = observedItem.first;
-
-    auto itemIter = this->dataPtr->allItems.find(item);
-
-    // Sanity check: Make sure that we can update the item.
-    if (itemIter == this->dataPtr->allItems.end())
-      continue;
-
-    try
+    std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+    for (auto &observedItem : this->dataPtr->observedItems)
     {
-      // Update the values of the items under observation.
-      gazebo::msgs::Any value = itemIter->second();
-      auto &lastValue = observedItem.second.lastValue;
-      lastValue.CopyFrom(value);
+      auto &item = observedItem.first;
+
+      auto itemIter = this->dataPtr->allItems.find(item);
+
+      // Sanity check: Make sure that we can update the item.
+      if (itemIter == this->dataPtr->allItems.end())
+        continue;
+
+      try
+      {
+        // Update the values of the items under observation.
+        gazebo::msgs::Any value = itemIter->second();
+        auto &lastValue = observedItem.second.lastValue;
+        lastValue.CopyFrom(value);
+      }
+      catch(...)
+      {
+        gzerr << "Exception caught calling user callback" << std::endl;
+        continue;
+      }
     }
-    catch(...)
-    {
-      gzerr << "Exception caught calling user callback" << std::endl;
-      continue;
-    }
+
+    filtersCopy = this->dataPtr->filters;
+    allItemsCopy = this->dataPtr->allItems;
+    observedItemsCopy = this->dataPtr->observedItems;
   }
 
   // Prepare the next message to be sent in each filter.
-  for (auto &filter : this->dataPtr->filters)
+  for (auto &filter : filtersCopy)
   {
     // First of all, clear the old message.
     auto &nextMsg = filter.second.msg;
@@ -183,12 +191,12 @@ void IntrospectionManager::Update()
     for (auto const &item : filter.second.items)
     {
       // Sanity check: Make sure that someone registered this item.
-      if (this->dataPtr->allItems.find(item) == this->dataPtr->allItems.end())
+      if (allItemsCopy.find(item) == allItemsCopy.end())
         continue;
 
       // Sanity check: Make sure that the value was updated.
       // (e.g.: an exception was not raised).
-      auto &lastValue = this->dataPtr->observedItems[item].lastValue;
+      auto &lastValue = observedItemsCopy[item].lastValue;
       if (lastValue.type() == gazebo::msgs::Any::NONE)
         continue;
 

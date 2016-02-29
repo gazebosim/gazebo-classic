@@ -22,8 +22,6 @@
 
 #include <ignition/transport.hh>
 
-#include "gazebo/msgs/msgs.hh"
-
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/URI.hh"
 
@@ -81,6 +79,10 @@ namespace gazebo
       /// \brief The sim time variable string registered in the
       /// introspection manager.
       public: std::string simTimeVar = "data://world/default?p=sim_time";
+
+      /// \brief Flag to indicate that the introspection client is initialized.
+      public: bool initialized = false;
+
     };
   }
 }
@@ -98,7 +100,88 @@ IntrospectionCurveHandler::IntrospectionCurveHandler()
 /////////////////////////////////////////////////
 IntrospectionCurveHandler::~IntrospectionCurveHandler()
 {
+  this->dataPtr->initialized = false;
   this->dataPtr->introspectThread->join();
+}
+
+/////////////////////////////////////////////////
+void IntrospectionCurveHandler::AddCurve(const std::string &_name,
+    PlotCurveWeakPtr _curve)
+{
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  if (!this->dataPtr->initialized)
+  {
+    gzerr << "Introspection client has not been initialized yet" << std::endl;
+    return;
+  }
+
+  auto c = _curve.lock();
+  if (!c)
+    return;
+
+  auto it = this->dataPtr->curves.find(_name);
+  if (it == this->dataPtr->curves.end())
+  {
+    // create entry in map
+    CurveVariableSet curveSet;
+    curveSet.insert(_curve);
+    this->dataPtr->curves[_name] = curveSet;
+
+    this->AddItemToFilter(_name);
+  }
+  else
+  {
+    auto cIt = it->second.find(_curve);
+    if (cIt == it->second.end())
+    {
+      it->second.insert(_curve);
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void IntrospectionCurveHandler::RemoveCurve(PlotCurveWeakPtr _curve)
+{
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  if (!this->dataPtr->initialized)
+  {
+    gzerr << "Introspection client has not been initialized yet" << std::endl;
+    return;
+  }
+
+  auto c = _curve.lock();
+  if (!c)
+    return;
+
+  // find and remove the curve
+  for (auto it = this->dataPtr->curves.begin();
+      it != this->dataPtr->curves.end(); ++it)
+  {
+    auto cIt = it->second.find(_curve);
+    if (cIt != it->second.end())
+    {
+      it->second.erase(cIt);
+      if (it->second.empty())
+      {
+        // remove item from introspection filter
+        this->RemoveItemFromFilter(it->first);
+
+        // erase from map
+        this->dataPtr->curves.erase(it);
+      }
+      return;
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+unsigned int IntrospectionCurveHandler::CurveCount() const
+{
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  unsigned int count = 0;
+  for (const auto &it : this->dataPtr->curves)
+    count += it.second.size();
+  return count;
 }
 
 /////////////////////////////////////////////////
@@ -134,7 +217,7 @@ void IntrospectionCurveHandler::SetupIntrospection()
   std::set<std::string> items;
   this->dataPtr->introspectClient.Items(this->dataPtr->managerId, items);
 
-  std::cerr << " items " << std::endl;
+  std::cerr << " SetupIntrospection items " << std::endl;
   for (auto i : items)
   {
     std::cerr << i << std::endl;
@@ -159,65 +242,9 @@ void IntrospectionCurveHandler::SetupIntrospection()
     gzerr << "Error subscribing to introspection manager" << std::endl;
     return;
   }
-}
 
-/////////////////////////////////////////////////
-void IntrospectionCurveHandler::AddCurve(const std::string &_name,
-    PlotCurveWeakPtr _curve)
-{
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-  auto c = _curve.lock();
-  if (!c)
-    return;
-
-  auto it = this->dataPtr->curves.find(_name);
-  if (it == this->dataPtr->curves.end())
-  {
-    // create entry in map
-    CurveVariableSet curveSet;
-    curveSet.insert(_curve);
-    this->dataPtr->curves[_name] = curveSet;
-
-    this->AddItemToFilter(_name);
-
-  }
-  else
-  {
-    auto cIt = it->second.find(_curve);
-    if (cIt == it->second.end())
-    {
-      it->second.insert(_curve);
-    }
-  }
-}
-
-/////////////////////////////////////////////////
-void IntrospectionCurveHandler::RemoveCurve(PlotCurveWeakPtr _curve)
-{
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-  auto c = _curve.lock();
-  if (!c)
-    return;
-
-  // find and remove the curve
-  for (auto it = this->dataPtr->curves.begin();
-      it != this->dataPtr->curves.end(); ++it)
-  {
-    auto cIt = it->second.find(_curve);
-    if (cIt != it->second.end())
-    {
-      it->second.erase(cIt);
-      if (it->second.empty())
-      {
-        // remove item from introspection filter
-        this->RemoveItemFromFilter(it->first);
-
-        // erase from map
-        this->dataPtr->curves.erase(it);
-      }
-      return;
-    }
-  }
+  this->dataPtr->initialized = true;
+  std::cerr << " done SetupIntrospection items " << std::endl;
 }
 
 /*

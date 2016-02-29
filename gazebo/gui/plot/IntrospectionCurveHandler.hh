@@ -24,6 +24,7 @@
 #include <ignition/math/Vector3.hh>
 #include <ignition/math/Quaternion.hh>
 
+#include "gazebo/msgs/msgs.hh"
 #include "gazebo/gui/plot/PlottingTypes.hh"
 #include "gazebo/util/system.hh"
 
@@ -53,12 +54,16 @@ namespace gazebo
       /// \param[in] _curve Pointer to the plot curve to remove.
       public: void RemoveCurve(PlotCurveWeakPtr _curve);
 
+      /// \brief Get the number of curves managed by this handler
+      /// \return Number of curves
+      public: unsigned int CurveCount() const;
+
       /// \brief Set up introspection client
-      public: void SetupIntrospection();
+      private: void SetupIntrospection();
 
       /// \brief Function called each time a topic update is received.
       /// \param[in] _msg Introspection message filled with param data
-      public: void OnIntrospection(const gazebo::msgs::Param_V &_msg);
+      private: void OnIntrospection(const gazebo::msgs::Param_V &_msg);
 
       /// \brief Helper function to get the value of an vector3 attribute
       /// based on a query string

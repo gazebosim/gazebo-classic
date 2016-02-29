@@ -26,6 +26,7 @@ set (headers_install
 )
 
 set (qt_tests_local
+  IntrospectionCurveHandler_TEST.cc
   IncrementalPlot_TEST.cc
   PlotCanvas_TEST.cc
   PlotCurve_TEST.cc
