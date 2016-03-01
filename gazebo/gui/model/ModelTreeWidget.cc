@@ -17,7 +17,10 @@
 
 #include "gazebo/common/Events.hh"
 
+#include "gazebo/msgs/msgs.hh"
+
 #include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/gui/model/MEUserCmdManager.hh"
 #include "gazebo/gui/model/ModelEditorEvents.hh"
 #include "gazebo/gui/model/ModelPluginInspector.hh"
 #include "gazebo/gui/model/ModelTreeWidget.hh"
@@ -696,6 +699,13 @@ void ModelTreeWidget::OnAddModelPlugin()
 void ModelTreeWidget::OnModelPluginApply()
 {
   msgs::Plugin *msg = this->modelPluginInspector->Data();
+
+  auto cmd = MEUserCmdManager::Instance()->NewCmd(
+      "Inserted plugin [" + msg->name() + "]",
+      MEUserCmd::INSERTING_MODEL_PLUGIN);
+  cmd->SetSDF(msgs::PluginToSDF(*msg));
+  cmd->SetScopedName(msg->name());
+
   model::Events::requestModelPluginInsertion(msg->name(), msg->filename(),
       msg->innerxml());
 }

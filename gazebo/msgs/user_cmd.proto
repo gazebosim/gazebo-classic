@@ -25,6 +25,9 @@ message UserCmd
 
     /// \brief Scaling an entity.
     SCALING = 4;
+
+    INSERTING = 5;
+    DELETING = 6;
   }
 
   /// \brief Unique id for user command.

@@ -60,6 +60,10 @@ namespace gazebo
       /// \param[in] _name Name of model.
       public: void SetName(const std::string &_name);
 
+      /// \brief Get the unscoped name of the model.
+      /// \return Name of model.
+      public: std::string Name() const;
+
       /// \brief Set the pose of the model.
       /// \param[in] _pose Pose of model.
       public: void SetPose(const ignition::math::Pose3d &_pose);
@@ -110,7 +114,7 @@ namespace gazebo
 
       /// \brief Get the name of the link.
       /// \return Name of link.
-      public: std::string GetName() const;
+      public: std::string Name() const;
 
       /// \brief Set the name of the link.
       /// \param[in] _name Name of link.
@@ -135,6 +139,11 @@ namespace gazebo
       /// \brief Set the scale of the link.
       /// \param[in] _scale Scale of link.
       public: void SetScale(const ignition::math::Vector3d &_scale);
+
+      /// \brief Set the scale of the link.
+      /// \param[in] _scale Scale of link.
+      public: void SetIsPreview(const bool _preview);
+      public: bool IsPreview() const;
 
       /// \brief Add a visual to the link.
       /// \param[in] _visual Visual to be added.
@@ -217,6 +226,9 @@ namespace gazebo
 
       /// \brief SDF representing the link data.
       public: sdf::ElementPtr linkSDF;
+
+      /// \brief
+      private: bool isPreview;
 
       /// \brief mass.
       private: double mass;
