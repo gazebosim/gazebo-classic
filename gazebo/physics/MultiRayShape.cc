@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,12 @@ MultiRayShape::MultiRayShape(CollisionPtr _parent)
 {
   this->AddType(MULTIRAY_SHAPE);
   this->SetName("multiray");
+}
+
+//////////////////////////////////////////////////
+MultiRayShape::MultiRayShape(PhysicsEnginePtr /*_physicsEngine*/)
+: MultiRayShape(CollisionPtr())
+{
 }
 
 //////////////////////////////////////////////////
@@ -88,8 +94,8 @@ void MultiRayShape::Init()
   // "resolution");
   yDiff = horzMaxAngle - horzMinAngle;
 
-  minRange = this->multiRayShapeDptr->rangeElem->Get<double>("min");
-  maxRange = this->multiRayShapeDptr->rangeElem->Get<double>("max");
+  this->minRange = this->multiRayShapeDptr->rangeElem->Get<double>("min");
+  this->maxRange = this->multiRayShapeDptr->rangeElem->Get<double>("max");
 
   this->multiRayShapeDPtr->offset = this->collisionParent->RelativePose();
 
@@ -110,8 +116,10 @@ void MultiRayShape::Init()
       axis = this->multiRayShapeDPtr->offset.Rot() * ray *
         ignition::math::Vector3d(1.0, 0.0, 0.0);
 
-      start = (axis * minRange) + this->multiRayShapeDPtr->offset.Pos();
-      end = (axis * maxRange) + this->multiRayShapeDPtr->offset.Pos();
+      start = (axis * this->multiRayShapeDPtrminRange) + 
+        this->multiRayShapeDPtr->offset.Pos();
+      end = (axis * this->multiRayShapeDPtrmaxRange) +
+        this->multiRayShapeDPtr->offset.Pos();
 
       this->AddRay(start, end);
     }
@@ -204,8 +212,8 @@ void MultiRayShape::Update()
 
   // Reset the ray lengths and mark the collisions as dirty (so they get
   // redrawn)
-  unsigned int ray_size = this->multiRayShapeDPtr->rays.size();
-  for (unsigned int i = 0; i < ray_size; i++)
+  unsigned int raySize = this->multiRayShapeDPtr->rays.size();
+  for (unsigned int i = 0; i < raySize; ++i)
   {
     this->multiRayShapeDPtr->rays[i]->SetLength(fullRange);
     this->multiRayShapeDPtr->rays[i]->SetRetro(0.0);
@@ -219,6 +227,20 @@ void MultiRayShape::Update()
 
   // for plugin
   this->multiRayShapeDPtr->newLaserScans();
+}
+
+//////////////////////////////////////////////////
+bool MultiRayShape::SetRay(const unsigned int _rayIndex,
+    const ignition::math::Vector3d &_start,
+    const ignition::math::Vector3d &_end)
+{
+  if (_rayIndex < this->rays.size())
+  {
+    this->rays[_rayIndex]->SetPoints(_start, _end);
+    return true;
+  }
+
+  return false;
 }
 
 //////////////////////////////////////////////////
@@ -397,6 +419,21 @@ void MultiRayShape::ProcessMsg(const msgs::Geometry &/*_msg*/)
 double MultiRayShape::ComputeVolume() const
 {
   return 0;
+}
+
+//////////////////////////////////////////////////
+unsigned int MultiRayShape::RayCount() const
+{
+  return this->rays.size();
+}
+
+//////////////////////////////////////////////////
+RayShapePtr MultiRayShape::Ray(const unsigned int _rayIndex) const
+{
+  if (_rayIndex < this->rays.size())
+    return this->rays[_rayIndex];
+  else
+    return RayShapePtr();
 }
 
 //////////////////////////////////////////////////

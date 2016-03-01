@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -104,6 +104,13 @@ void Publication::SetPrevMsg(uint32_t _pubId, MessagePtr _msg)
 {
   boost::mutex::scoped_lock lock(this->callbackMutex);
   this->prevMsgs[_pubId] = _msg;
+}
+
+//////////////////////////////////////////////////
+void Publication::ClearPrevMsgs()
+{
+  boost::mutex::scoped_lock lock(this->callbackMutex);
+  this->prevMsgs.clear();
 }
 
 //////////////////////////////////////////////////
@@ -508,8 +515,10 @@ void Publication::RemoveNodes()
 //////////////////////////////////////////////////
 MessagePtr Publication::GetPrevMsg(uint32_t _pubId)
 {
+  boost::mutex::scoped_lock lock(this->callbackMutex);
   if (this->prevMsgs.find(_pubId) != this->prevMsgs.end())
     return this->prevMsgs[_pubId];
   else
     return MessagePtr();
 }
+

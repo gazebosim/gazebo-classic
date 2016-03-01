@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@ namespace gazebo
       /// \brief This flag is used for manual activation of a pad.
       /// It is set to true when a string message that contains
       /// the name of the pad is sent over the activation topic.
-      public: bool activated;
+      public: bool activated = false;
     };
 
     /// \brief World pointer.

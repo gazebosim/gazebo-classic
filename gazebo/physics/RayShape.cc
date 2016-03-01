@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -233,4 +233,28 @@ double RayShape::ComputeVolume() const
 void RayShape::GetIntersection(double &_dist, std::string &_entity)
 {
   this->Intersection(_dist, _entity);
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d RayShape::Start() const
+{
+  return this->relativeStartPos.Ign();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d RayShape::End() const
+{
+  return this->relativeEndPos.Ign();
+}
+
+//////////////////////////////////////////////////
+void RayShape::SetCollisionName(const std::string &_name)
+{
+  this->collisionName = _name;
+}
+
+//////////////////////////////////////////////////
+std::string RayShape::CollisionName() const
+{
+  return this->collisionName;
 }

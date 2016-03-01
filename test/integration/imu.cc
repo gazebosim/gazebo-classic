@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -91,7 +91,7 @@ void ImuTest::GetImuData(sensors::ImuSensorPtr _imu,
     world->Step(1);
 
     int j = 0;
-    while (_imu->GetLastMeasurementTime() == gazebo::common::Time::Zero &&
+    while (_imu->LastMeasurementTime() == gazebo::common::Time::Zero &&
         j < 100)
     {
       _imu->Update(true);
@@ -134,7 +134,7 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
 
   std::string pendulumSensorName = "pendulum_imu_sensor";
   sensors::ImuSensorPtr pendulumImu =
-    boost::static_pointer_cast<sensors::ImuSensor>(
+    std::static_pointer_cast<sensors::ImuSensor>(
         sensors::SensorManager::Instance()->GetSensor(pendulumSensorName));
   ASSERT_TRUE(pendulumImu != NULL);
   pendulumImu->Init();
@@ -146,7 +146,7 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
 
   std::string ballFrictionSensorName = "ball_imu_sensor";
   sensors::ImuSensorPtr ballFrictionImu =
-    boost::static_pointer_cast<sensors::ImuSensor>(
+    std::static_pointer_cast<sensors::ImuSensor>(
     sensors::SensorManager::Instance()->GetSensor(ballFrictionSensorName));
   ASSERT_TRUE(ballFrictionImu != NULL);
   ballFrictionImu->Init();
@@ -158,7 +158,7 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
 
   std::string ballNoFrictionSensorName = "ball_no_friction_imu_sensor";
   sensors::ImuSensorPtr ballNoFrictionImu =
-    boost::static_pointer_cast<sensors::ImuSensor>(
+    std::static_pointer_cast<sensors::ImuSensor>(
     sensors::SensorManager::Instance()->GetSensor(ballNoFrictionSensorName));
   ASSERT_TRUE(ballNoFrictionImu != NULL);
   ballNoFrictionImu->Init();
@@ -366,7 +366,7 @@ void ImuTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
       testPose.rot.GetAsEuler());
 
   sensors::ImuSensorPtr imu =
-    boost::static_pointer_cast<sensors::ImuSensor>(
+    std::static_pointer_cast<sensors::ImuSensor>(
         sensors::SensorManager::Instance()->GetSensor(imuSensorName));
 
   ASSERT_TRUE(imu != NULL);
@@ -430,7 +430,7 @@ void ImuTest::Stationary_EmptyWorld_Noise(const std::string &_physicsEngine)
       accelBiasMean, accelBiasStddev);
 
   sensors::ImuSensorPtr imu =
-    boost::static_pointer_cast<sensors::ImuSensor>(
+    std::static_pointer_cast<sensors::ImuSensor>(
         sensors::SensorManager::Instance()->GetSensor(imuSensorName));
 
   ASSERT_TRUE(imu != NULL);
@@ -517,7 +517,7 @@ void ImuTest::Stationary_EmptyWorld_Bias(const std::string &_physicsEngine)
       accelBiasMean, accelBiasStddev);
 
   sensors::ImuSensorPtr imu =
-    boost::static_pointer_cast<sensors::ImuSensor>(
+    std::static_pointer_cast<sensors::ImuSensor>(
         sensors::SensorManager::Instance()->GetSensor(imuSensorName));
 
   ASSERT_TRUE(imu != NULL);

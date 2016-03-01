@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,6 @@
 
 #include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Publisher.hh"
-
-#include "gazebo/sensors/Sensor.hh"
-#include "gazebo/sensors/SensorsIface.hh"
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
@@ -96,10 +93,10 @@ void Joint::ConstructionHelper()
 //////////////////////////////////////////////////
 Joint::~Joint()
 {
-  for (std::vector<std::string>::iterator iter = this->jointDPtr->sensors.begin();
-      iter != this->jointDPtr->sensors.end(); ++iter)
+  // Remove all the sensors attached to the joint
+  for (auto const &sensor : this->jointDPtr->sensors)
   {
-    sensors::remove_sensor(*iter);
+    event::Events::removeSensor(sensor);
   }
   this->jointDPtr->sensors.clear();
 }
@@ -363,10 +360,15 @@ bool Joint::LoadImpl(const ignition::math::Pose3d &_pose)
       /// other sensors. We should make this more generic.
       if (sensorElem->Get<std::string>("type") == "force_torque")
       {
-        std::string sensorName =
-          sensors::create_sensor(sensorElem, this->World()->Name(),
-              this->ScopedName(), this->Id());
-        this->jointDPtr->sensors.push_back(sensorName);
+        // This must match the implementation in Sensors::ScopedName
+        std::string sensorName = this->ScopedName(true) + "::" +
+          sensorElem->Get<std::string>("name");
+
+        // Tell the sensor library to create a sensor.
+        event::Events::createSensor(sensorElem,
+            this->World()->Name(), this->ScopedName(), this->Id());
+
+        this->sensors.push_back(sensorName);
       }
       else
       {
@@ -438,10 +440,10 @@ void Joint::Init()
 //////////////////////////////////////////////////
 void Joint::Fini()
 {
-  for (std::vector<std::string>::iterator iter = this->jointDPtr->sensors.begin();
-      iter != this->jointDPtr->sensors.end(); ++iter)
+  // Remove all the sensors attached to the joint
+  for (auto const &sensor : this->jointDPtr->sensors)
   {
-    sensors::remove_sensor(*iter);
+    event::Events::removeSensor(sensor);
   }
   this->jointDPtr->sensors.clear();
 
@@ -725,18 +727,17 @@ void Joint::FillMsg(msgs::Joint &_msg)
     _msg.set_parent_id(0);
   }
 
-  for (std::vector<std::string>::iterator iter = this->jointDPtr->sensors.begin();
-       iter != this->jointDPtr->sensors.end(); ++iter)
+  // Add in the sensor data.
+  if (this->sdf->HasElement("sensor"))
   {
-    sensors::SensorPtr sensor = sensors::get_sensor(*iter);
-    if (sensor)
+    sdf::ElementPtr sensorElem = this->sdf->GetElement("sensor");
+    while (sensorElem)
     {
-      msgs::Sensor *sensorMsg =_msg.add_sensor();
-      sensor->FillMsg(*sensorMsg);
-    }
-    else
-    {
-      gzlog << "Joint::FillMsg: sensor [" << *iter << "] not found.\n";
+      msgs::Sensor *msg = _msg.add_sensor();
+      msg->CopyFrom(msgs::SensorFromSDF(sensorElem));
+      msg->set_parent(this->GetScopedName());
+      msg->set_parent_id(this->GetId());
+      sensorElem = sensorElem->GetNextElement("sensor");
     }
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -192,7 +192,7 @@ void SimbodyPhysics::OnRequest(ConstRequestPtr &_msg)
     physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
 
     physicsMsg.mutable_gravity()->CopyFrom(
-      msgs::Convert(this->GetGravity().Ign()));
+      msgs::Convert(this->world->Gravity()));
     physicsMsg.mutable_magnetic_field()->CopyFrom(
       msgs::Convert(this->MagneticField()));
     physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
@@ -253,7 +253,7 @@ void SimbodyPhysics::Reset()
   this->integ->initialize(this->system.getDefaultState());
 
   // restore potentially user run-time modified gravity
-  this->SetGravity(this->GetGravity());
+  this->SetGravity(this->world->Gravity());
 }
 
 //////////////////////////////////////////////////
@@ -793,7 +793,7 @@ JointPtr SimbodyPhysics::CreateJoint(const std::string &_type,
 //////////////////////////////////////////////////
 void SimbodyPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
 {
-  this->sdf->GetElement("gravity")->Set(_gravity);
+  this->world->SetGravitySDF(_gravity.Ign());
 
   {
     boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
@@ -888,9 +888,9 @@ void SimbodyPhysics::InitSimbodySystem()
   // this->contact.setTransitionVelocity(0.01);  // now done in Load using sdf
 
   // Specify gravity (read in above from world).
-  if (!math::equal(this->GetGravity().GetLength(), 0.0))
+  if (!math::equal(this->world->Gravity().Length(), 0.0))
     this->gravity.setDefaultGravityVector(
-      SimbodyPhysics::Vector3ToVec3(this->GetGravity()));
+      SimbodyPhysics::Vector3ToVec3(this->world->Gravity()));
   else
     this->gravity.setDefaultMagnitude(0.0);
 }

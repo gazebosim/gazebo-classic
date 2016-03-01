@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
-    /// \class RayShape RayShape.hh gazebo/physics/RayShape.hh
+    /// \class RayShape RayShape.hh physics/physics.hh
     /// \brief Base class for Ray collision geometry
     class GZ_PHYSICS_VISIBLE RayShape : public Shape
     {
@@ -54,6 +54,14 @@ namespace gazebo
       /// \deprecation See function that accepts ignition::math parameters.
       public: virtual void SetPoints(const math::Vector3 &_posStart,
                   const math::Vector3 &_posEnd) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the start point.
+      /// \return Position of the ray start
+      public: ignition::math::Vector3d Start() const;
+
+      /// \brief Get the end point.
+      /// \return Position of the ray end
+      public: ignition::math::Vector3d End() const;
 
       /// \brief Set the ray based on starting and ending points relative to
       /// the body
@@ -129,6 +137,10 @@ namespace gazebo
       /// \param[in] _retro Retro reflectance value.
       public: void SetRetro(const float _retro);
 
+      /// \brief Get the name of the object this ray collided with.
+      /// \return Collision object name
+      public: std::string CollisionName() const;
+
       /// \brief Get the retro-reflectivness detected by this ray.
       /// \return Retro reflectance value.
       /// \deprecated See Retro() const
@@ -166,6 +178,13 @@ namespace gazebo
 
       /// Documentation inherited
       public: virtual double ComputeVolume() const;
+
+      /// \brief Set the name of the object this ray has collided with.
+      /// This function should only be called from a collision detection
+      /// engine.
+      /// Used by MultiRayShape
+      ///// \param[in] _name Scoped name of the collision object.
+      protected: void SetCollisionName(const std::string &_name);
 
       /// \internal
       /// \brief Private class pointer

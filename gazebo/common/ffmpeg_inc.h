@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
+#include <libavutil/imgutils.h>
 #include <libavutil/opt.h>
 #include <libswscale/swscale.h>
 }
@@ -48,6 +49,11 @@ namespace gazebo
     /// \brief Helper function to avoid deprecation warnings.
     GZ_COMMON_VISIBLE
     void AVFrameUnref(AVFrame *_frame);
+
+    /// \brief Helper function to avoid deprecation warnings.
+    /// \param[in] _packet AVPacket structure that stores compressed data
+    GZ_COMMON_VISIBLE
+    void AVPacketUnref(AVPacket *_packet);
   }
 }
 // ifdef HAVE_FFMPEG

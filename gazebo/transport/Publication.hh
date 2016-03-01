@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -144,6 +144,9 @@ namespace gazebo
       /// \return Pointer to the previous message. NULL if there is no
       /// previous message.
       public: MessagePtr GetPrevMsg(uint32_t _pubId);
+
+      /// \brief Clear all previous messages for a publisher.
+      public: void ClearPrevMsgs();
 
       /// \brief Add a transport
       /// \param[in] _publink Pointer to publication transport object to

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,27 @@
  *
 */
 
-#include "gazebo/gui/building/BuildingItem.hh"
+#ifndef _GAZEBO_GUI_GRID_LINES_PRIVATE_HH_
+#define _GAZEBO_GUI_GRID_LINES_PRIVATE_HH_
 
-using namespace gazebo;
-using namespace gui;
-
-/////////////////////////////////////////////////
-BuildingItem::BuildingItem()
+namespace gazebo
 {
+  namespace gui
+  {
+    /// \internal
+    /// \brief Private data for GridLines
+    class GridLinesPrivate
+    {
+      /// \brief Width of grid lines in pixels.
+      public: int width;
+
+      /// \brief Height of grid lines in pixels.
+      public: int height;
+
+      /// \brief Space between the lines in pixels.
+      public: int space;
+    };
+  }
 }
 
-/////////////////////////////////////////////////
-BuildingItem::~BuildingItem()
-{
-}
+#endif

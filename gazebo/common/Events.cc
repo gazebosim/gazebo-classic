@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@ EventT<void (const common::UpdateInfo &)> Events::worldUpdateBegin;
 
 EventT<void ()> Events::worldUpdateEnd;
 EventT<void ()> Events::worldReset;
+EventT<void ()> Events::timeReset;
 
 EventT<void ()> Events::preRender;
 EventT<void ()> Events::render;
@@ -41,6 +42,11 @@ EventT<void ()> Events::postRender;
 
 EventT<void (std::string)> Events::diagTimerStart;
 EventT<void (std::string)> Events::diagTimerStop;
+
+EventT<void (std::string)> Events::removeSensor;
+
+EventT<void (sdf::ElementPtr, const std::string &,
+    const std::string &, const uint32_t)> Events::createSensor;
 
 /////////////////////////////////////////////////
 void Events::DisconnectWorldUpdateBegin(ConnectionPtr _subscriber)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_TERRAIN_EDITOR_HH_
-#define _GAZEBO_TERRAIN_EDITOR_HH_
+#ifndef _GAZEBO_GUI_TERRAINEDITOR_HH_
+#define _GAZEBO_GUI_TERRAINEDITOR_HH_
 
 #include <memory>
 
@@ -48,7 +48,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Pointer to private data.
-      protected: std::unique_ptr<TerrainEditorPrivate> dataPtr;
+      private: std::unique_ptr<TerrainEditorPrivate> dataPtr;
     };
   }
 }

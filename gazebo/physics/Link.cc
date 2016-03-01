@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,9 +38,6 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Battery.hh"
-
-#include "gazebo/sensors/SensorsIface.hh"
-#include "gazebo/sensors/Sensor.hh"
 
 #include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/physics/Model.hh"
@@ -184,10 +181,15 @@ void Link::Load(sdf::ElementPtr _sdf)
       }
       else if (sensorElem->Get<std::string>("type") != "__default__")
       {
-        std::string sensorName =
-          sensors::create_sensor(sensorElem, this->GetWorld()->GetName(),
-              this->GetScopedName(), this->GetId());
-        this->linkDPtr->sensors.push_back(sensorName);
+        // This must match the implementation in Sensors::GetScopedName
+        std::string sensorName = this->ScopedName(true) + "::" +
+          sensorElem->Get<std::string>("name");
+
+        // Tell the sensor library to create a sensor.
+        event::Events::createSensor(sensorElem,
+            this->World()->Name(), this->ScopedName(), this->Id());
+
+        this->sensors.push_back(sensorName);
       }
       sensorElem = sensorElem->GetNextElement("sensor");
     }
@@ -210,7 +212,7 @@ void Link::Load(sdf::ElementPtr _sdf)
       util::OpenALSourcePtr source = util::OpenAL::Instance()->CreateSource(
           audioElem);
 
-      std::vector<std::string> names = source->GetCollisionNames();
+      std::vector<std::string> names = source->CollisionNames();
       std::copy(names.begin(), names.end(), std::back_inserter(collisionNames));
 
       audioElem = audioElem->GetNextElement("audio_source");
@@ -300,10 +302,10 @@ void Link::Fini()
   this->linkDPtr->inertial.reset();
   this->linkDPtr->batteries.clear();
 
-  for (std::vector<std::string>::iterator iter = this->linkDPtr->sensors.begin();
-       iter != this->linkDPtr->sensors.end(); ++iter)
+  // Remove all the sensors attached to the link
+  for (auto const &sensor : this->sensors)
   {
-    sensors::remove_sensor(*iter);
+    event::Events::removeSensor(sensor);
   }
   this->linkDPtr->sensors.clear();
 
@@ -1010,12 +1012,18 @@ void Link::FillMsg(msgs::Link &_msg)
     }
   }
 
-  for (std::vector<std::string>::iterator iter = this->linkDPtr->sensors.begin();
-      iter != this->linkDPtr->sensors.end(); ++iter)
+  // Add in the sensor data.
+  if (this->sdf->HasElement("sensor"))
   {
-    sensors::SensorPtr sensor = sensors::get_sensor(*iter);
-    if (sensor)
-      sensor->FillMsg(*_msg.add_sensor());
+    sdf::ElementPtr sensorElem = this->sdf->GetElement("sensor");
+    while (sensorElem)
+    {
+      msgs::Sensor *msg = _msg.add_sensor();
+      msg->CopyFrom(msgs::SensorFromSDF(sensorElem));
+      msg->set_parent(this->GetScopedName());
+      msg->set_parent_id(this->GetId());
+      sensorElem = sensorElem->GetNextElement("sensor");
+    }
   }
 
   if (this->linkDPtr->visuals.empty())

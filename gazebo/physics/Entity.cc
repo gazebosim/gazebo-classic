@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,6 +62,7 @@ Entity::Entity(EntityPrivate &_dataPtr, BasePtr _parent)
 //////////////////////////////////////////////////
 void Entity::ConstructionHelper()
 {
+  this->entityDPtr->isStatic = false;
   this->entityDPtr->isCanonicalLink = false;
   this->entityDPtr->node = transport::NodePtr(new transport::Node());
   this->AddType(ENTITY);
@@ -690,10 +691,7 @@ void Entity::Fini()
 //////////////////////////////////////////////////
 void Entity::Reset()
 {
-  if (this->HasType(Base::MODEL))
-    this->SetWorldPose(this->entityDPtr->initialRelativePose);
-  else
-    this->SetRelativePose(this->entityDPtr->initialRelativePose);
+  this->SetRelativePose(this->enityDPtr->initialRelativePose);
 }
 
 //////////////////////////////////////////////////
