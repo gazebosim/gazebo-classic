@@ -384,7 +384,8 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
       }
     }
 
-    if (this->dataPtr->keyEvent.key == Qt::Key_Shift || geomType == "sphere")
+    if (QApplication::keyboardModifiers() & Qt::ShiftModifier ||
+        geomType == "sphere")
     {
       scale = this->UpdateScale(_axis, scale, "sphere");
     }
@@ -447,6 +448,28 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
           newScale.y = std::max(1e-4, newScale.y);
           newScale.z = std::max(1e-4, newScale.z);
         }
+
+        if (QApplication::keyboardModifiers() & Qt::ShiftModifier ||
+            geomType == "sphere")
+        {
+          newScale = this->UpdateScale(_axis, scale, "sphere");
+        }
+        else if (geomType == "cylinder")
+        {
+          newScale = this->UpdateScale(_axis, scale, "cylinder");
+        }
+        else if (geomType == "box")
+        {
+          // keep new scale as it is
+        }
+        else
+        {
+          // TODO scaling for complex models are not yet functional.
+          // Limit scaling to simple shapes for now.
+          gzwarn << " Scaling is currently limited to simple shapes." << std::endl;
+          return;
+        }
+
         childVis->SetScale(newScale);
         Events::scaleEntity(childVis->GetName(), newScale);
       }
@@ -923,7 +946,7 @@ void ModelManipulator::OnKeyPressEvent(const common::KeyEvent &_event)
             this->dataPtr->mouseMoveVis->GetWorldPose();
       }
     }
-    else  if (this->dataPtr->keyEvent.key == Qt::Key_Shift)
+    else if (QApplication::keyboardModifiers() & Qt::ShiftModifier)
     {
       this->dataPtr->globalManip = true;
       this->dataPtr->selectionObj->SetGlobal(this->dataPtr->globalManip);
@@ -950,7 +973,7 @@ void ModelManipulator::OnKeyReleaseEvent(const common::KeyEvent &_event)
             this->dataPtr->mouseMoveVis->GetWorldPose();
       }
     }
-    else  if (this->dataPtr->keyEvent.key == Qt::Key_Shift)
+    else if (QApplication::keyboardModifiers() & Qt::ShiftModifier)
     {
       this->dataPtr->globalManip = false;
       this->dataPtr->selectionObj->SetGlobal(this->dataPtr->globalManip);
