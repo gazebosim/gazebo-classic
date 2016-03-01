@@ -8,7 +8,7 @@ set (sources_local
   plot/PlotManager.cc
   plot/Palette.cc
   plot/PlotWindow.cc
-  plot/TopicCurveHandler.cc
+#  plot/TopicCurveHandler.cc
   plot/VariablePill.cc
   plot/VariablePillContainer.cc
 )
