@@ -435,8 +435,16 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
       if (childVis != this->dataPtr->selectionObj &&
           geomType != "" && geomType != "mesh")
       {
-        math::Vector3 geomScale = this->UpdateScale(_axis, scale,
-            childVis->GetGeometryType());
+        math::Vector3 geomScale;
+        if (QApplication::keyboardModifiers() & Qt::ShiftModifier)
+        {
+          geomScale = this->UpdateScale(_axis, scale, "sphere");
+        }
+        else
+        {
+          geomScale = this->UpdateScale(_axis, scale, geomType);
+        }
+
         math::Vector3 newScale = this->dataPtr->mouseChildVisualScale[i]
             * geomScale.GetAbs();
 
@@ -447,28 +455,6 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
           newScale.x = std::max(1e-4, newScale.x);
           newScale.y = std::max(1e-4, newScale.y);
           newScale.z = std::max(1e-4, newScale.z);
-        }
-
-        if (QApplication::keyboardModifiers() & Qt::ShiftModifier ||
-            geomType == "sphere")
-        {
-          newScale = this->UpdateScale(_axis, scale, "sphere");
-        }
-        else if (geomType == "cylinder")
-        {
-          newScale = this->UpdateScale(_axis, scale, "cylinder");
-        }
-        else if (geomType == "box")
-        {
-          // keep new scale as it is
-        }
-        else
-        {
-          // TODO scaling for complex models are not yet functional.
-          // Limit scaling to simple shapes for now.
-          gzwarn << " Scaling is currently limited to simple shapes." <<
-              std::endl;
-          return;
         }
 
         childVis->SetScale(newScale);
