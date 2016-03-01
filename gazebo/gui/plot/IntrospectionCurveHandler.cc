@@ -27,6 +27,7 @@
 
 #include "gazebo/util/IntrospectionClient.hh"
 
+#include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/plot/PlottingTypes.hh"
 #include "gazebo/gui/plot/PlotCurve.hh"
 #include "gazebo/gui/plot/IntrospectionCurveHandler.hh"
@@ -78,7 +79,7 @@ namespace gazebo
 
       /// \brief The sim time variable string registered in the
       /// introspection manager.
-      public: std::string simTimeVar = "data://world/default?p=sim_time";
+      public: std::string simTimeVar;
 
       /// \brief Flag to indicate that the introspection client is initialized.
       public: bool initialized = false;
@@ -207,12 +208,8 @@ void IntrospectionCurveHandler::SetupIntrospection()
     return;
   }
 
-  if (!this->dataPtr->introspectClient.IsRegistered(
-      this->dataPtr->managerId, this->dataPtr->simTimeVar))
-  {
-    gzerr << "The sim_time item is not registered on the manager.\n";
-    return;
-  }
+  this->dataPtr->simTimeVar= "data://world/" + gui::get_world()
+      + "?p=time/sim_time";
 
   std::set<std::string> items;
   this->dataPtr->introspectClient.Items(this->dataPtr->managerId, items);
@@ -223,6 +220,13 @@ void IntrospectionCurveHandler::SetupIntrospection()
     std::cerr << i << std::endl;
   }
   std::cerr << " ==== " << std::endl;
+
+  if (!this->dataPtr->introspectClient.IsRegistered(
+      this->dataPtr->managerId, this->dataPtr->simTimeVar))
+  {
+    gzerr << "The sim_time item is not registered on the manager.\n";
+    return;
+  }
 
   // Let's create a filter for sim_time.
   this->dataPtr->introspectFilter = {this->dataPtr->simTimeVar};
