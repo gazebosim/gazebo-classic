@@ -532,6 +532,8 @@ void IntrospectionCurveHandler::AddItemToFilter(const std::string &_name)
 {
   common::URI itemURI(_name);
 
+  std::cerr << " AddItemToFilter " << _name << std::endl;
+
   if (!itemURI.Valid())
     return;
 

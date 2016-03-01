@@ -346,8 +346,9 @@ void Palette::FillSim(QStandardItemModel *_simModel)
   simTimeItem->setData("Double", PlotItemDelegate::DATA_TYPE_NAME);
   _simModel->appendRow(simTimeItem);
 
-  QString groundWorldPoseStr(
-      "data://world/default/model/ground_plane?p=world_pose/position/z");
+  std::string groundZ = "data://world/default/model/ground_plane";
+  groundZ += "?p=pose/world_pose/vector3d/position/double/z";
+  QString groundWorldPoseStr(groundZ.c_str());
   auto groundPoseItem = new QStandardItem(groundWorldPoseStr);
   groundPoseItem->setData(groundWorldPoseStr,
       PlotItemDelegate::TOPIC_NAME_ROLE);
@@ -356,8 +357,9 @@ void Palette::FillSim(QStandardItemModel *_simModel)
   groundPoseItem->setData("Double", PlotItemDelegate::DATA_TYPE_NAME);
   _simModel->appendRow(groundPoseItem);
 
-  QString boxWorldPoseStr(
-      "data://world/default/model/unit_box_0?p=world_pose/position/z");
+  std::string boxZ = "data://world/default/model/unit_box_0";
+  boxZ += "?p=pose/world_pose/vector3d/position/double/z";
+  QString boxWorldPoseStr(boxZ.c_str());
   auto boxPoseItem = new QStandardItem(boxWorldPoseStr);
   boxPoseItem->setData(boxWorldPoseStr, PlotItemDelegate::TOPIC_NAME_ROLE);
   boxPoseItem->setData(boxWorldPoseStr, PlotItemDelegate::DATA_ROLE);
