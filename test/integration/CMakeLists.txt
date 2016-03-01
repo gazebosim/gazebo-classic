@@ -59,6 +59,7 @@ set(tests
   logical_camera_sensor.cc
   model.cc
   model_database.cc
+  multirayshape.cc
   nested_model.cc
   noise.cc
   nondefault_world.cc
@@ -139,6 +140,7 @@ gz_build_display_tests(${display_tests})
 set(dri_tests
   camera.cc
   camera_sensor.cc
+  depth_camera.cc
   factory.cc
   gpu_laser.cc
   gz_camera.cc
