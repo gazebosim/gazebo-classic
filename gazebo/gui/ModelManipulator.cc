@@ -466,7 +466,8 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
         {
           // TODO scaling for complex models are not yet functional.
           // Limit scaling to simple shapes for now.
-          gzwarn << " Scaling is currently limited to simple shapes." << std::endl;
+          gzwarn << " Scaling is currently limited to simple shapes." <<
+              std::endl;
           return;
         }
 
