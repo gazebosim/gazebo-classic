@@ -123,12 +123,13 @@ void IntrospectionCurveHandler::AddCurve(const std::string &_name,
   auto it = this->dataPtr->curves.find(_name);
   if (it == this->dataPtr->curves.end())
   {
-    // create entry in map
-    CurveVariableSet curveSet;
-    curveSet.insert(_curve);
-    this->dataPtr->curves[_name] = curveSet;
-
-    this->AddItemToFilter(_name);
+    if (this->AddItemToFilter(_name))
+    {
+      // create entry in map
+      CurveVariableSet curveSet;
+      curveSet.insert(_curve);
+      this->dataPtr->curves[_name] = curveSet;
+    }
   }
   else
   {
@@ -165,10 +166,11 @@ void IntrospectionCurveHandler::RemoveCurve(PlotCurveWeakPtr _curve)
       if (it->second.empty())
       {
         // remove item from introspection filter
-        this->RemoveItemFromFilter(it->first);
-
-        // erase from map
-        this->dataPtr->curves.erase(it);
+        if (this->RemoveItemFromFilter(it->first))
+        {
+          // erase from map
+          this->dataPtr->curves.erase(it);
+        }
       }
       return;
     }
@@ -528,14 +530,14 @@ void IntrospectionCurveHandler::OnIntrospection(
 }
 
 /////////////////////////////////////////////////
-void IntrospectionCurveHandler::AddItemToFilter(const std::string &_name)
+bool IntrospectionCurveHandler::AddItemToFilter(const std::string &_name)
 {
   common::URI itemURI(_name);
 
   std::cerr << " AddItemToFilter " << _name << std::endl;
 
   if (!itemURI.Valid())
-    return;
+    return false;
 
   common::URIPath itemPath = itemURI.Path();
   common::URIQuery itemQuery = itemURI.Query();
@@ -572,7 +574,6 @@ void IntrospectionCurveHandler::AddItemToFilter(const std::string &_name)
             this->dataPtr->introspectFilter.end())
         {
           std::cerr << " adding filter ! " << uri.Str() << std::endl;
-          this->dataPtr->introspectFilterCount[item] = 1;
           this->dataPtr->introspectFilter.insert(item);
 
           if (!this->dataPtr->introspectClient.UpdateFilter(
@@ -580,7 +581,11 @@ void IntrospectionCurveHandler::AddItemToFilter(const std::string &_name)
               this->dataPtr->introspectFilter))
           {
             gzerr << "Error updating introspection filter" << std::endl;
+            this->dataPtr->introspectFilter.erase(item);
+            return false;
           }
+          this->dataPtr->introspectFilterCount[item] = 1;
+
         }
         else
         {
@@ -593,15 +598,16 @@ void IntrospectionCurveHandler::AddItemToFilter(const std::string &_name)
       }
     }
   }
+  return true;
 }
 
 /////////////////////////////////////////////////
-void IntrospectionCurveHandler::RemoveItemFromFilter(const std::string &_name)
+bool IntrospectionCurveHandler::RemoveItemFromFilter(const std::string &_name)
 {
   common::URI itemURI(_name);
 
   if (!itemURI.Valid())
-    return;
+    return false;
 
   common::URIPath itemPath = itemURI.Path();
   common::URIQuery itemQuery = itemURI.Query();
@@ -632,7 +638,7 @@ void IntrospectionCurveHandler::RemoveItemFromFilter(const std::string &_name)
         auto itemIt = this->dataPtr->introspectFilter.find(item);
         if (itemIt == this->dataPtr->introspectFilter.end())
         {
-          return;
+          return false;
         }
         else
         {
@@ -641,14 +647,15 @@ void IntrospectionCurveHandler::RemoveItemFromFilter(const std::string &_name)
           if (count == 0u)
           {
             this->dataPtr->introspectFilter.erase(itemIt);
-            this->dataPtr->introspectFilterCount.erase(
-                this->dataPtr->introspectFilterCount.find(item));
+            this->dataPtr->introspectFilterCount.erase(item);
 
             if (!this->dataPtr->introspectClient.UpdateFilter(
                 this->dataPtr->managerId, this->dataPtr->introspectFilterId,
                 this->dataPtr->introspectFilter))
             {
               gzerr << "Error updating introspection filter" << std::endl;
+              this->dataPtr->introspectFilter.insert(item);
+              return false;
             }
           }
         }
@@ -656,6 +663,7 @@ void IntrospectionCurveHandler::RemoveItemFromFilter(const std::string &_name)
       }
     }
   }
+  return true;
 }
 
 /////////////////////////////////////////////////

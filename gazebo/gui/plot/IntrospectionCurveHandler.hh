@@ -85,11 +85,13 @@ namespace gazebo
 
       /// \brief Add an item to the introspection fitler
       /// \param[in] _name Name of item
-      private: void AddItemToFilter(const std::string &_name);
+      /// \return True if the filter is updated succesfully.
+      private: bool AddItemToFilter(const std::string &_name);
 
       /// \brief Remove an item from the introspection fitler
       /// \param[in] _name Name of item
-      private: void RemoveItemFromFilter(const std::string &_name);
+      /// \return True if the filter is updated succesfully.
+      private: bool RemoveItemFromFilter(const std::string &_name);
 
       /// \brief Private data pointer
       private: std::unique_ptr<IntrospectionCurveHandlerPrivate> dataPtr;

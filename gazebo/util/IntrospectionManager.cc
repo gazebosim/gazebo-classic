@@ -149,35 +149,36 @@ void IntrospectionManager::Update()
   std::map<std::string, IntrospectionFilter> filtersCopy;
   std::map<std::string, std::function <gazebo::msgs::Any ()>> allItemsCopy;
   std::map<std::string, ObservedItem> observedItemsCopy;
+
   {
     std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-    for (auto &observedItem : this->dataPtr->observedItems)
-    {
-      auto &item = observedItem.first;
-
-      auto itemIter = this->dataPtr->allItems.find(item);
-
-      // Sanity check: Make sure that we can update the item.
-      if (itemIter == this->dataPtr->allItems.end())
-        continue;
-
-      try
-      {
-        // Update the values of the items under observation.
-        gazebo::msgs::Any value = itemIter->second();
-        auto &lastValue = observedItem.second.lastValue;
-        lastValue.CopyFrom(value);
-      }
-      catch(...)
-      {
-        gzerr << "Exception caught calling user callback" << std::endl;
-        continue;
-      }
-    }
 
     filtersCopy = this->dataPtr->filters;
     allItemsCopy = this->dataPtr->allItems;
     observedItemsCopy = this->dataPtr->observedItems;
+  }
+
+  for (auto &observedItem : observedItemsCopy)
+  {
+    auto &item = observedItem.first;
+    auto itemIter = allItemsCopy.find(item);
+
+    // Sanity check: Make sure that we can update the item.
+    if (itemIter == allItemsCopy.end())
+      continue;
+
+    try
+    {
+      // Update the values of the items under observation.
+      gazebo::msgs::Any value = itemIter->second();
+      auto &lastValue = observedItem.second.lastValue;
+      lastValue.CopyFrom(value);
+    }
+    catch(...)
+    {
+      gzerr << "Exception caught calling user callback" << std::endl;
+      continue;
+    }
   }
 
   // Prepare the next message to be sent in each filter.
@@ -259,6 +260,7 @@ bool IntrospectionManager::NewFilter(const std::set<std::string> &_newItems,
 bool IntrospectionManager::UpdateFilter(const std::string &_filterId,
     const std::set<std::string> &_newItems)
 {
+  std::cerr << "IntrospectionManager::UpdateFilter " << std::endl;
   // Sanity check: Make sure that we have at least one item to be observed.
   if (_newItems.empty())
   {
@@ -308,7 +310,7 @@ bool IntrospectionManager::UpdateFilter(const std::string &_filterId,
         this->dataPtr->observedItems[newItem].filters.emplace(_filterId);
     }
   }
-
+  std::cerr << "IntrospectionManager::UpdateFilter done" << std::endl;
   return true;
 }
 
@@ -462,6 +464,7 @@ void IntrospectionManager::UpdateFilter(const gazebo::msgs::Param_V &_req,
     return;
 
   _result = true;
+  std::cerr << "    IntrospectionManager::UpdateFilter " << _result << std::endl;
 }
 
 //////////////////////////////////////////////////
@@ -497,6 +500,7 @@ void IntrospectionManager::RemoveFilter(const gazebo::msgs::Param_V &_req,
 void IntrospectionManager::Items(const gazebo::msgs::Empty &/*_req*/,
     gazebo::msgs::Param_V &_rep, bool &_result)
 {
+  std::cerr << "IntrospectionManager::Items " << std::endl;
   {
     std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
     for (auto const &item : this->dataPtr->allItems)
@@ -508,6 +512,7 @@ void IntrospectionManager::Items(const gazebo::msgs::Empty &/*_req*/,
     }
   }
   _result = true;
+  std::cerr << "IntrospectionManager::Items done" << std::endl;
 }
 
 //////////////////////////////////////////////////

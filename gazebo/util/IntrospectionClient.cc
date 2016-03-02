@@ -34,6 +34,13 @@
 using namespace gazebo;
 using namespace util;
 
+
+#include "gazebo/common/Time.hh"
+void printTime()
+{
+  std::cout << common::Time::GetWallTime() << std::endl;;
+}
+
 //////////////////////////////////////////////////
 IntrospectionClient::IntrospectionClient()
   : dataPtr(new IntrospectionClientPrivate)
@@ -155,15 +162,24 @@ bool IntrospectionClient::UpdateFilter(const std::string &_managerId,
     nextParam->mutable_value()->set_string_value(itemName);
   }
 
+  printTime();
+  std::cerr << "   IntrospectionClient::UpdateFilter " << std::endl;
+
   // Request the service.
   auto service = "/introspection/" + _managerId + "/filter_update";
   if (!this->dataPtr->node.Request(service, req,
           this->dataPtr->kTimeout, rep, result))
   {
     gzerr << "Unable to update a remote introspection filter" << std::endl;
+
+  printTime();
+  std::cerr << "   IntrospectionClient::UpdateFilter 1.5 " << std::endl;
+
     return false;
   }
 
+  printTime();
+  std::cerr << "   IntrospectionClient::UpdateFilter 2 " << std::endl;
   return result;
 }
 
