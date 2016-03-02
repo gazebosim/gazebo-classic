@@ -362,3 +362,9 @@ sdf::ElementPtr PhysicsEngine::GetSDF() const
 {
   return this->sdf;
 }
+
+//////////////////////////////////////////////////
+WorldPtr PhysicsEngine::World() const
+{
+  return this->world;
+}

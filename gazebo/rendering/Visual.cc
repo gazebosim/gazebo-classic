@@ -37,6 +37,7 @@
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/RTShaderSystem.hh"
 #include "gazebo/rendering/RenderEngine.hh"
+#include "gazebo/rendering/SelectionObj.hh"
 #include "gazebo/rendering/Material.hh"
 #include "gazebo/rendering/MovableText.hh"
 #include "gazebo/rendering/VisualPrivate.hh"
@@ -754,6 +755,19 @@ void Visual::SetScale(const math::Vector3 &_scale)
 
   this->dataPtr->sceneNode->setScale(
       Conversions::Convert(math::Vector3(this->dataPtr->scale)));
+
+  // Scale selection object in case we have one attached. Other children were
+  // scaled from UpdateGeomSize
+  for (auto child : this->dataPtr->children)
+  {
+    auto selectionObj = std::dynamic_pointer_cast<SelectionObj>(child);
+
+    if (selectionObj)
+    {
+      selectionObj->UpdateSize();
+      break;
+    }
+  }
 }
 
 //////////////////////////////////////////////////

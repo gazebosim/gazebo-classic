@@ -321,10 +321,6 @@ void Camera::Update()
   // Update animations
   if (this->animState)
   {
-    this->animState->addTime(
-        (common::Time::GetWallTime() - this->prevAnimTime).Double());
-    this->prevAnimTime = common::Time::GetWallTime();
-
     if (this->animState->hasEnded())
     {
       try
@@ -348,6 +344,12 @@ void Camera::Update()
                              this->dataPtr->moveToPositionQueue[0].second);
         this->dataPtr->moveToPositionQueue.pop_front();
       }
+    }
+    else
+    {
+      common::Time wallTime = common::Time::GetWallTime();
+      this->animState->addTime((wallTime - this->prevAnimTime).Double());
+      this->prevAnimTime = wallTime;
     }
   }
   else if (this->dataPtr->trackedVisual)
