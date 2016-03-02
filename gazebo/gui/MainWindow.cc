@@ -1806,6 +1806,8 @@ void MainWindow::CreateMenuBar()
   this->dataPtr->editMenu->addSeparator();
   this->dataPtr->editMenu->addAction(g_editBuildingAct);
   this->dataPtr->editMenu->addAction(g_editModelAct);
+  this->dataPtr->editMenu->addAction(g_copyAct);
+  this->dataPtr->editMenu->addAction(g_pasteAct);
 
   // \TODO: Add this back in when implementing the full Terrain Editor spec.
   // editMenu->addAction(g_editTerrainAct);
