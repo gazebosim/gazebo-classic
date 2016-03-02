@@ -40,9 +40,9 @@ void TimeWidget_TEST::Reset()
   mainWindow->show();
 
   // Wait a little bit so that time increases.
-  for (unsigned int i = 0; i < 1000; ++i)
+  for (unsigned int i = 0; i < 100; ++i)
   {
-    gazebo::common::Time::MSleep(1);
+    gazebo::common::Time::MSleep(10);
     QCoreApplication::processEvents();
   }
 
