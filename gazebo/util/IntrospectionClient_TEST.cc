@@ -173,6 +173,51 @@ TEST_F(IntrospectionClientTest, NewAndRemoveFilter)
 }
 
 /////////////////////////////////////////////////
+TEST_F(IntrospectionClientTest, NewFilterAsync)
+{
+  std::string filterId;
+  std::string topic;
+
+  bool executed = false;
+  auto cb = [&](const std::string &/*_filterId*/,
+               const std::string &/*_newTopic*/,
+               const bool _result)
+  {
+    executed = true;
+    EXPECT_FALSE(_result);
+  };
+
+  // Try to create an empty filter.
+  std::set<std::string> emptySet;
+  EXPECT_TRUE(this->client.NewFilterAsync(this->managerId, emptySet, cb));
+  std::this_thread::sleep_for(std::chrono::milliseconds(300));
+  EXPECT_TRUE(executed);
+
+  auto cb2 = [this](const std::string &/*_filterId*/,
+                 const std::string &_newTopic,
+                 const bool _result)
+  {
+    // Subscribe to my custom topic for receiving updates.
+    this->Subscribe(_newTopic);
+
+    EXPECT_TRUE(!_newTopic.empty());
+    EXPECT_TRUE(_result);
+  };
+
+  // Let's create a filter for receiving updates on "item1" and "item2".
+  std::set<std::string> items = {"item1", "item2"};
+  EXPECT_TRUE(this->client.NewFilterAsync(this->managerId, items, cb2));
+  std::this_thread::sleep_for(std::chrono::milliseconds(300));
+
+  // Trigger an update.
+  this->manager->Update();
+
+  // Check that we received the update.
+  EXPECT_TRUE(this->callbackExecuted);
+  this->callbackExecuted = false;
+}
+
+/////////////////////////////////////////////////
 TEST_F(IntrospectionClientTest, UpdateFilter)
 {
   // Let's create a filter.
@@ -197,6 +242,74 @@ TEST_F(IntrospectionClientTest, UpdateFilter)
   // Trigger an update.
   this->manager->Update();
 
+  // Check that we received the update.
+  EXPECT_TRUE(this->callbackExecuted);
+}
+
+/////////////////////////////////////////////////
+TEST_F(IntrospectionClientTest, UpdateFilterAsync)
+{
+  std::string filterId;
+  std::string topic;
+  bool executed = false;
+
+  auto cbNew = [&](const std::string &_filterId,
+                   const std::string &_newTopic,
+                   const bool _result)
+  {
+    executed = true;
+    EXPECT_TRUE(_result);
+
+    // Subscribe to my custom topic for receiving updates.
+    this->Subscribe(_newTopic);
+
+    filterId = _filterId;
+  };
+
+  // Let's create a filter.
+  std::set<std::string> items = {"item1", "item3"};
+
+  EXPECT_TRUE(this->client.NewFilterAsync(this->managerId, items, cbNew));
+  std::this_thread::sleep_for(std::chrono::milliseconds(300));
+  EXPECT_TRUE(executed);
+
+  auto cbUpdateWrong = [&](const bool _result)
+  {
+    executed = true;
+    EXPECT_FALSE(_result);
+  };
+
+  // Try to update a filter with an incorrect manager ID.
+  EXPECT_TRUE(this->client.UpdateFilterAsync("_wrong_id_", filterId, items,
+    cbUpdateWrong));
+  std::this_thread::sleep_for(std::chrono::milliseconds(300));
+  EXPECT_TRUE(executed);
+  executed = false;
+
+  // Try to update a filter wih an incorrect filter ID.
+  EXPECT_TRUE(this->client.UpdateFilterAsync(this->managerId, "_wrong_id_",
+    items, cbUpdateWrong));
+  std::this_thread::sleep_for(std::chrono::milliseconds(300));
+  EXPECT_TRUE(executed);
+  executed = false;
+
+  auto cbUpdate = [&](const bool _result)
+  {
+    executed = true;
+    EXPECT_TRUE(_result);
+  };
+
+  // Update the filter. We're interested on "item1" and "item2".
+  items = {"item1", "item2"};
+  EXPECT_TRUE(this->client.UpdateFilterAsync(this->managerId, filterId, items,
+    cbUpdate));
+  std::this_thread::sleep_for(std::chrono::milliseconds(300));
+
+  // Trigger an update.
+  this->manager->Update();
+
+  EXPECT_TRUE(executed);
+  executed = false;
   // Check that we received the update.
   EXPECT_TRUE(this->callbackExecuted);
 }

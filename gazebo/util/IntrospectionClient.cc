@@ -96,8 +96,8 @@ std::set<std::string> IntrospectionClient::Managers() const
 
 //////////////////////////////////////////////////
 bool IntrospectionClient::NewFilter(const std::string &_managerId,
-    const std::set<std::string> &_newItems,
-    std::string &_filterId, std::string &_newTopic) const
+    const std::set<std::string> &_newItems, std::string &_filterId,
+    std::string &_newTopic) const
 {
   gazebo::msgs::Param_V req;
   gazebo::msgs::GzString rep;
@@ -129,6 +129,49 @@ bool IntrospectionClient::NewFilter(const std::string &_managerId,
 
   // Save the new filter ID.
   this->dataPtr->filters[_filterId] = _managerId;
+  return true;
+}
+
+//////////////////////////////////////////////////
+bool IntrospectionClient::NewFilterAsync(const std::string &_managerId,
+    const std::set<std::string> &_newItems,
+    const std::function<void(const std::string &_filterId,
+                             const std::string &_newTopic,
+                             const bool _result)> &_cb) const
+{
+  std::function<void(const gazebo::msgs::GzString&, const bool)> f =
+    [=](const gazebo::msgs::GzString &_rep, const bool _result)
+  {
+    std::string filterId;
+    std::string newTopic;
+    if (_result)
+    {
+      filterId = _rep.data();
+      newTopic = "/introspection/" + _managerId + "/filter/" + filterId;
+    }
+    _cb(filterId, newTopic, _result);
+  };
+
+  gazebo::msgs::Param_V req;
+
+  // Add to the message the list of items to include in the filter.
+  for (auto const &itemName : _newItems)
+  {
+    auto nextParam = req.add_param();
+    nextParam->set_name("item");
+    nextParam->mutable_value()->set_type(gazebo::msgs::Any::STRING);
+    nextParam->mutable_value()->set_string_value(itemName);
+  }
+
+  // Request the service.
+  auto service = "/introspection/" + _managerId + "/filter_new";
+  if (!this->dataPtr->node.Request<
+    gazebo::msgs::Param_V, gazebo::msgs::GzString>(service, req, f))
+  {
+    gzerr << "Unable to request a new introspection filter" << std::endl;
+    return false;
+  }
+
   return true;
 }
 
@@ -165,6 +208,46 @@ bool IntrospectionClient::UpdateFilter(const std::string &_managerId,
   }
 
   return result;
+}
+
+//////////////////////////////////////////////////
+bool IntrospectionClient::UpdateFilterAsync(const std::string &_managerId,
+    const std::string &_filterId, const std::set<std::string> &_newItems,
+    const std::function<void(const bool _result)> &_cb) const
+{
+  std::function<void(const gazebo::msgs::Empty&, const bool)> f =
+    [=](const gazebo::msgs::Empty &/*_rep*/, const bool _result)
+  {
+    _cb(_result);
+  };
+
+  gazebo::msgs::Param_V req;
+
+  // Add the filter_id to the message.
+  auto nextParam = req.add_param();
+  nextParam->set_name("filter_id");
+  nextParam->mutable_value()->set_type(gazebo::msgs::Any::STRING);
+  nextParam->mutable_value()->set_string_value(_filterId);
+
+  // Add to the message the list of items to include in the filter.
+  for (auto const &itemName : _newItems)
+  {
+    nextParam = req.add_param();
+    nextParam->set_name("item");
+    nextParam->mutable_value()->set_type(gazebo::msgs::Any::STRING);
+    nextParam->mutable_value()->set_string_value(itemName);
+  }
+
+  // Request the service.
+  auto service = "/introspection/" + _managerId + "/filter_update";
+  if (!this->dataPtr->node.Request<
+    gazebo::msgs::Param_V, gazebo::msgs::Empty>(service, req, f))
+  {
+    gzerr << "Unable to update a remote introspection filter" << std::endl;
+    return false;
+  }
+
+  return true;
 }
 
 //////////////////////////////////////////////////

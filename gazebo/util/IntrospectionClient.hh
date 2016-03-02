@@ -18,6 +18,7 @@
 #define _GAZEBO_UTIL_INTROSPECTION_CLIENT_HH_
 
 #include <chrono>
+#include <functional>
 #include <memory>
 #include <set>
 #include <string>
@@ -75,6 +76,12 @@ namespace gazebo
                              std::string &_filterId,
                              std::string &_newTopic) const;
 
+      public: bool NewFilterAsync(const std::string &_managerId,
+                                  const std::set<std::string> &_newItems,
+            const std::function<void(const std::string &_filterId,
+                                     const std::string &_newTopic,
+                                     const bool _result)> &_cb) const;
+
       /// \brief Update an existing filter with a different set of items.
       /// \param[in] _managerID ID of the manager to request the operation.
       /// \param[in] _filterId ID of the filter to update.
@@ -83,6 +90,11 @@ namespace gazebo
       public: bool UpdateFilter(const std::string &_managerId,
                                 const std::string &_filterId,
                                 const std::set<std::string> &_newItems) const;
+
+      public: bool UpdateFilterAsync(const std::string &_managerId,
+                                const std::string &_filterId,
+                                const std::set<std::string> &_newItems,
+                      const std::function<void(const bool _result)> &_cb) const;
 
       /// \brief Remove all existing filters.
       /// \return True if the filters wer successfully removed
