@@ -1673,7 +1673,7 @@ void Link::RegisterIntrospectionItems()
       <ignition::math::Vector3d>(linVelURI.Str(), fLinkLinVel);
 
   common::URI angVelURI(uri);
-  angVelURI.Query().Insert("p", "quaterniond/world_angular_velocity");
+  angVelURI.Query().Insert("p", "vector3d/world_angular_velocity");
   gazebo::util::IntrospectionManager::Instance()->Register
       <ignition::math::Quaterniond>(angVelURI.Str(), fLinkAngVel);
 
@@ -1683,7 +1683,7 @@ void Link::RegisterIntrospectionItems()
       <ignition::math::Vector3d>(linAccURI.Str(), fLinkLinAcc);
 
   common::URI angAccURI(uri);
-  angAccURI.Query().Insert("p", "quaterniond/world_angular_acceleration");
+  angAccURI.Query().Insert("p", "vector3d/world_angular_acceleration");
   gazebo::util::IntrospectionManager::Instance()->Register
       <ignition::math::Quaterniond>(angAccURI.Str(), fLinkAngAcc);
 }

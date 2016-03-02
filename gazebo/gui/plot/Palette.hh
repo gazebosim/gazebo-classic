@@ -101,6 +101,13 @@ namespace gazebo
       private: void InsertQuaterniondItem(QStandardItem *_item,
           const common::URI &_uri, const std::string &_query);
 
+      /// \brief Insert a Quaterniond item under the given item.
+      /// \param[in] _item The parent item.
+      /// \param[in] _uri The URI of the original query.
+      /// \param[in] _query The part of the query relevant to this item.
+      private: void InsertAxisItem(QStandardItem *_item,
+          const common::URI &_uri, const std::string &_query);
+
       /// \brief Callback when the user has modified the search.
       /// \param[in] _search Latest search.
       private slots: void UpdateSearch(const QString &_search);
@@ -110,13 +117,6 @@ namespace gazebo
       /// \param[in] _tree Tree view.
       /// \param[in] _srcParent Model index of the parent to be checked.
       private: void ExpandChildren(QSortFilterProxyModel *_model,
-          QTreeView *_tree, const QModelIndex &_srcParent) const;
-
-      /// \brief Get the number of visible rows in a model
-      /// \param[in] _model Search model.
-      /// \param[in] _tree Tree view.
-      /// \param[in] _srcParent Model index of the parent to be checked.
-      private: unsigned int VisibleRowCount(QSortFilterProxyModel *_model,
           QTreeView *_tree, const QModelIndex &_srcParent) const;
 
       /// \internal
