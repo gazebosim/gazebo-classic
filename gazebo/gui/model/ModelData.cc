@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,6 +74,18 @@ std::string ModelData::GetTemplateSDFString()
 double ModelData::GetEditTransparency()
 {
   return 0.4;
+}
+
+/////////////////////////////////////////////////
+void ModelData::UpdateRenderGroup(rendering::VisualPtr _visual)
+{
+  // fix for transparency alpha compositing
+  if (_visual->GetSceneNode()->numAttachedObjects() <= 0)
+    return;
+
+  Ogre::MovableObject *obj = _visual->GetSceneNode()->
+      getAttachedObject(0);
+  obj->setRenderQueueGroup(obj->getRenderQueueGroup()+1);
 }
 
 /////////////////////////////////////////////////
@@ -588,7 +600,7 @@ void LinkData::AddCollision(rendering::VisualPtr _collisionVis,
 }
 
 /////////////////////////////////////////////////
-LinkData* LinkData::Clone(const std::string &_newName)
+LinkData *LinkData::Clone(const std::string &_newName)
 {
   LinkData *cloneLink = new LinkData();
 
@@ -649,10 +661,7 @@ LinkData* LinkData::Clone(const std::string &_newName)
 
     collisionVis->SetTransparency(
        ignition::math::clamp(ModelData::GetEditTransparency() * 2.0, 0.0, 0.8));
-    // fix for transparency alpha compositing
-    Ogre::MovableObject *colObj = collisionVis->GetSceneNode()->
-        getAttachedObject(0);
-    colObj->setRenderQueueGroup(colObj->getRenderQueueGroup()+1);
+    ModelData::UpdateRenderGroup(collisionVis);
     cloneLink->AddCollision(collisionVis);
   }
   return cloneLink;
@@ -1016,11 +1025,7 @@ void LinkData::OnAddCollision(const std::string &_name)
 
   collisionVis->SetTransparency(
       ignition::math::clamp(ModelData::GetEditTransparency() * 2.0, 0.0, 0.8));
-
-  // fix for transparency alpha compositing
-  Ogre::MovableObject *colObj = collisionVis->GetSceneNode()->
-      getAttachedObject(0);
-  colObj->setRenderQueueGroup(colObj->getRenderQueueGroup()+1);
+  ModelData::UpdateRenderGroup(collisionVis);
 }
 
 /////////////////////////////////////////////////

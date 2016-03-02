@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@
 #include "gazebo/gui/Conversions.hh"
 #include "gazebo/gui/building/BuildingEditorWidget.hh"
 #include "gazebo/gui/building/GrabberHandle.hh"
-#include "gazebo/gui/building/EditorItem.hh"
 #include "gazebo/gui/building/MeasureItem.hh"
 #include "gazebo/gui/building/RectItem.hh"
 #include "gazebo/gui/building/RectItemPrivate.hh"
@@ -101,7 +100,7 @@ RectItem::~RectItem()
   this->dataPtr->rotateHandle->setParentItem(NULL);
   delete this->dataPtr->rotateHandle;
 
-  if (!this->measures.empty())
+  if (!this->parentItem() && !this->measures.empty())
   {
     delete this->measures[0];
     delete this->measures[1];
@@ -246,7 +245,7 @@ bool RectItem::RotateEventFilter(RotateHandle *_rotate, QEvent *_event)
   if (!mouseEvent)
     return false;
 
-  if (_rotate->GetMouseState()
+  if (_rotate->MouseState()
       == static_cast<int>(QEvent::GraphicsSceneMouseMove))
   {
     QPoint localCenter(this->drawingOriginX, this->drawingOriginY);
@@ -1030,4 +1029,12 @@ void RectItem::UpdateMeasures()
     this->measures[1]->SetValue(
         (this->measures[1]->line().length())*this->itemScale);
   }
+}
+
+/////////////////////////////////////////////////
+void RectItem::DetachFromParent()
+{
+  this->setParentItem(NULL);
+  for (unsigned int i = 0; i < this->measures.size(); i++)
+    this->measures[i]->setParentItem(NULL);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
  * limitations under the License.
  *
  */
+
+#include "gazebo/common/Color.hh"
 
 #include "gazebo/gui/Conversions.hh"
 #include "gazebo/gui/building/BuildingEditorWidget.hh"
@@ -154,7 +156,7 @@ bool StairsItem::RotateEventFilter(RotateHandle *_rotate, QEvent *_event)
   if (mouseEvent == NULL)
     return false;
 
-  if (_rotate->GetMouseState() == QEvent::GraphicsSceneMouseMove)
+  if (_rotate->MouseState() == QEvent::GraphicsSceneMouseMove)
   {
     QPoint localCenter(this->drawingOriginX,
                        this->drawingOriginY);
@@ -247,28 +249,27 @@ void StairsItem::OnApply()
   QPointF startPos = Conversions::Convert(this->dataPtr->stairsPos) *
       this->itemScale;
   startPos.setY(-startPos.y());
-  this->SetSize(ignition::math::Vector2i(dialog->GetWidth() / this->itemScale,
-        dialog->GetDepth() / this->itemScale));
-  this->dataPtr->stairsWidth = dialog->GetWidth() / this->itemScale;
-  this->dataPtr->stairsHeight = dialog->GetHeight() / this->itemScale;
-  this->dataPtr->stairsDepth = dialog->GetDepth() / this->itemScale;
-  if ((fabs(dialog->GetStartPosition().x() - startPos.x()) >= 0.01)
-      || (fabs(dialog->GetStartPosition().y() - startPos.y()) >= 0.01))
+  this->SetSize(ignition::math::Vector2i(dialog->Width() / this->itemScale,
+        dialog->Depth() / this->itemScale));
+  this->dataPtr->stairsWidth = dialog->Width() / this->itemScale;
+  this->dataPtr->stairsHeight = dialog->Height() / this->itemScale;
+  this->dataPtr->stairsDepth = dialog->Depth() / this->itemScale;
+  if ((fabs(dialog->StartPosition().X() - startPos.x()) >= 0.01)
+      || (fabs(dialog->StartPosition().Y() - startPos.y()) >= 0.01))
   {
-    this->dataPtr->stairsPos = Conversions::Convert(
-        dialog->GetStartPosition() / this->itemScale);
+    this->dataPtr->stairsPos = dialog->StartPosition() / this->itemScale;
     this->dataPtr->stairsPos.Y(-this->dataPtr->stairsPos.Y());
     this->setPos(Conversions::Convert(this->dataPtr->stairsPos));
     this->setParentItem(NULL);
   }
-  if (this->dataPtr->stairsSteps != dialog->GetSteps())
+  if (this->dataPtr->stairsSteps != dialog->Steps())
   {
-    this->dataPtr->stairsSteps = dialog->GetSteps();
+    this->dataPtr->stairsSteps = dialog->Steps();
     this->StepsChanged();
   }
   // this->dataPtr->stairsElevation = dialog->GetElevation();
-  this->SetTexture3d(dialog->GetTexture().toStdString());
-  this->SetColor3d(Conversions::Convert(dialog->GetColor()));
+  this->SetTexture3d(dialog->Texture());
+  this->SetColor3d(dialog->Color());
   this->StairsChanged();
 }
 
@@ -284,13 +285,11 @@ void StairsItem::OnOpenInspector()
       this->dataPtr->stairsHeight * this->itemScale);
   this->dataPtr->inspector->SetSteps(this->dataPtr->stairsSteps);
   //  dialog.SetElevation(this->dataPtr->stairsElevation);
-  QPointF startPos = Conversions::Convert(this->dataPtr->stairsPos) *
-      this->itemScale;
-  startPos.setY(-startPos.y());
+  auto startPos = this->dataPtr->stairsPos * this->itemScale;
+  startPos.Y(-startPos.Y());
   this->dataPtr->inspector->SetStartPosition(startPos);
-  this->dataPtr->inspector->SetColor(Conversions::Convert(this->visual3dColor));
-  this->dataPtr->inspector->SetTexture(
-      QString::fromStdString(this->visual3dTexture));
+  this->dataPtr->inspector->SetColor(this->visual3dColor);
+  this->dataPtr->inspector->SetTexture(this->visual3dTexture);
   this->dataPtr->inspector->move(QCursor::pos());
   this->dataPtr->inspector->show();
 }

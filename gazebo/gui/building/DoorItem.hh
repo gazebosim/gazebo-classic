@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_GUI_DOORITEM_HH_
-#define _GAZEBO_GUI_DOORITEM_HH_
+#ifndef _GAZEBO_GUI_BUILDING_DOORITEM_HH_
+#define _GAZEBO_GUI_BUILDING_DOORITEM_HH_
 
 #include <memory>
 #include <ignition/math/Vector3.hh>

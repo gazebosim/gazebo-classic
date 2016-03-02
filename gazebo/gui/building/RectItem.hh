@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_GUI_RECTITEM_HH_
-#define _GAZEBO_GUI_RECTITEM_HH_
+#ifndef _GAZEBO_GUI_BUILDING_RECTITEM_HH_
+#define _GAZEBO_GUI_BUILDING_RECTITEM_HH_
 
 #include <memory>
 #include <vector>
@@ -112,6 +112,9 @@ namespace gazebo
 
       // Documentation inherited
       public: void SetHighlighted(const bool _highlighted);
+
+      /// \brief Detach the rect item from its parent.
+      public: void DetachFromParent();
 
       /// \brief Helper method for Updating the corner positions of the rect
       /// item.

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2015 Open Source Robotics Foundation
+ * Copyright (C) 2013-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ void BreakableJointPlugin::Load(sensors::SensorPtr _parent,
   if (_sdf->HasElement(paramName))
     this->breakingForce = _sdf->Get<double>(paramName);
 
-  this->parentJoint = this->parentSensor->GetJoint();
+  this->parentJoint = this->parentSensor->Joint();
 }
 
 /////////////////////////////////////////////////

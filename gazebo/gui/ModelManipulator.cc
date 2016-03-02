@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,7 +62,6 @@ ModelManipulator::~ModelManipulator()
 /////////////////////////////////////////////////
 void ModelManipulator::Clear()
 {
-  this->dataPtr->modelPub.reset();
   this->dataPtr->userCmdPub.reset();
   this->dataPtr->selectionObj.reset();
   this->dataPtr->userCamera.reset();
@@ -93,13 +92,11 @@ void ModelManipulator::Init()
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init();
-  this->dataPtr->modelPub =
-      this->dataPtr->node->Advertise<msgs::Model>("~/model/modify");
   this->dataPtr->userCmdPub =
       this->dataPtr->node->Advertise<msgs::UserCmd>("~/user_cmd");
 
   this->dataPtr->selectionObj.reset(new rendering::SelectionObj("__GL_MANIP__",
-      this->dataPtr->scene->GetWorldVisual()));
+      this->dataPtr->scene->WorldVisual()));
   this->dataPtr->selectionObj->Load();
 
   this->dataPtr->initialized = true;
@@ -579,20 +576,31 @@ void ModelManipulator::PublishVisualPose(rendering::VisualPtr _vis)
 /////////////////////////////////////////////////
 void ModelManipulator::PublishVisualScale(rendering::VisualPtr _vis)
 {
-  if (_vis)
+  if (!_vis || this->dataPtr->manipMode != "scale" ||
+      _vis->GetType() != gazebo::rendering::Visual::VT_MODEL)
   {
-    // Check to see if the visual is a model.
-    if (gui::get_entity_id(_vis->GetName()))
-    {
-      msgs::Model msg;
-      msg.set_id(gui::get_entity_id(_vis->GetName()));
-      msg.set_name(_vis->GetName());
-
-      msgs::Set(msg.mutable_scale(), _vis->GetScale().Ign());
-      this->dataPtr->modelPub->Publish(msg);
-      _vis->SetScale(this->dataPtr->mouseVisualScale);
-    }
+    return;
   }
+
+  // Register user command on server
+  msgs::UserCmd userCmdMsg;
+  userCmdMsg.set_description("Scale [" + _vis->GetName() + "]");
+  userCmdMsg.set_type(msgs::UserCmd::SCALING);
+
+  msgs::Model msg;
+
+  auto id = gui::get_entity_id(_vis->GetName());
+  if (id)
+    msg.set_id(id);
+
+  msg.set_name(_vis->GetName());
+  msgs::Set(msg.mutable_scale(), _vis->GetScale().Ign());
+
+  auto modelMsg = userCmdMsg.add_model();
+  modelMsg->CopyFrom(msg);
+
+  this->dataPtr->userCmdPub->Publish(userCmdMsg);
+  _vis->SetScale(this->dataPtr->mouseVisualScale);
 }
 
 /////////////////////////////////////////////////
@@ -636,7 +644,7 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
     // If it is not a model and its parent is either a direct child or
     // grandchild of the world, this is a light, so just keep vis = vis
     else if (vis->GetParent() == rootVis ||
-        vis->GetParent() == this->dataPtr->scene->GetWorldVisual())
+        vis->GetParent() == this->dataPtr->scene->WorldVisual())
     {
       // select light
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 #include "gazebo/common/Color.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Quaternion.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -84,6 +85,18 @@ namespace gazebo
       /// return Ignition math quaternion
       public: static ignition::math::Quaterniond ConvertIgn(
                   const Ogre::Quaternion &_v);
+
+      /// \brief Return the equivalent ogre transform space
+      /// \param[in] _rf gazebo reference frame to convert
+      /// \return Ogre node transform space
+      public: static Ogre::Node::TransformSpace Convert(
+          const ReferenceFrame &_rf);
+
+      /// \brief Return the equivalent gazebo reference frame
+      /// \param[in] _ts Ogre node transform space to convert
+      /// \return Gazebo reference frame
+      public: static ReferenceFrame Convert(
+          const Ogre::Node::TransformSpace &_ts);
     };
     /// \}
   }

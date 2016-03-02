@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,13 +44,7 @@ void VisualPoseTest::VisualPose()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get scene
   auto scene = gazebo::gui::get_active_camera()->GetScene();
@@ -95,13 +89,7 @@ void VisualPoseTest::VisualPose()
   ignition::math::Pose3d newVisualPose(1, -2, 3, -0.1, 0.2, -0.3);
   QVERIFY(boxLink->SetVisualPose(boxVisualId, newVisualPose));
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Check that only visual pose changed (physics)
   QVERIFY(boxLink->VisualPose(boxVisualId, boxVisualPose));

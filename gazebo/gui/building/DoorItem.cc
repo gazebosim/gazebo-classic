@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -159,17 +159,16 @@ void DoorItem::OnApply()
   QPointF itemPos = Conversions::Convert(this->dataPtr->doorPos) *
       this->itemScale;
   itemPos.setY(-itemPos.y());
-  this->SetSize(ignition::math::Vector2i(dialog->GetWidth() / this->itemScale,
-      (dialog->GetDepth() / this->itemScale)));
-  this->dataPtr->doorWidth = dialog->GetWidth() / this->itemScale;
-  this->dataPtr->doorHeight = dialog->GetHeight() / this->itemScale;
-  this->dataPtr->doorDepth = dialog->GetDepth() / this->itemScale;
-  this->dataPtr->doorElevation =
-      dialog->GetElevation() / this->itemScale;
-  if ((fabs(dialog->GetPosition().x() - itemPos.x()) >= 0.01)
-      || (fabs(dialog->GetPosition().y() - itemPos.y()) >= 0.01))
+  this->SetSize(ignition::math::Vector2i(dialog->Width() / this->itemScale,
+      (dialog->Depth() / this->itemScale)));
+  this->dataPtr->doorWidth = dialog->Width() / this->itemScale;
+  this->dataPtr->doorHeight = dialog->Height() / this->itemScale;
+  this->dataPtr->doorDepth = dialog->Depth() / this->itemScale;
+  this->dataPtr->doorElevation = dialog->Elevation() / this->itemScale;
+  if ((fabs(dialog->Position().X() - itemPos.x()) >= 0.01)
+      || (fabs(dialog->Position().Y() - itemPos.y()) >= 0.01))
   {
-    itemPos = dialog->GetPosition() / this->itemScale;
+    itemPos = Conversions::Convert(dialog->Position()) / this->itemScale;
     itemPos.setY(-itemPos.y());
     this->dataPtr->doorPos = Conversions::Convert(itemPos);
     this->setPos(itemPos);
@@ -190,9 +189,8 @@ void DoorItem::OnOpenInspector()
       this->dataPtr->doorHeight * this->itemScale);
   this->dataPtr->inspector->SetElevation(
       this->dataPtr->doorElevation * this->itemScale);
-  QPointF itemPos = Conversions::Convert(this->dataPtr->doorPos) *
-      this->itemScale;
-  itemPos.setY(-itemPos.y());
+  auto itemPos = this->dataPtr->doorPos * this->itemScale;
+  itemPos.Y(-itemPos.Y());
   this->dataPtr->inspector->SetPosition(itemPos);
   this->dataPtr->inspector->move(QCursor::pos());
   this->dataPtr->inspector->show();

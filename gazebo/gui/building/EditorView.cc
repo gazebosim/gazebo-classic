@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@
 #include <boost/bind.hpp>
 
 #include "gazebo/math/Angle.hh"
+
+#include "gazebo/common/Color.hh"
 
 #include "gazebo/gui/Conversions.hh"
 #include "gazebo/gui/building/ImportImageDialog.hh"
@@ -452,7 +454,7 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
         double distance = fabs(deltaLineMouse2) / sqrt(deltaLine2);
         if (distance > 30 || t > 1.0 || t < 0.0)
         {
-          editorItem->setParentItem(NULL);
+          editorItem->DetachFromParent();
           wallSegmentItem->setZValue(wallSegmentItem->ZValueIdle());
           editorItem->SetPositionOnWall(0);
           editorItem->SetAngleOnWall(0);
@@ -1284,14 +1286,13 @@ void EditorView::OnOpenLevelInspector()
   FloorItem *floorItem = this->levels[this->currentLevel]->floorItem;
   if (floorItem)
   {
-    this->levelInspector->floorWidget->show();
-    this->levelInspector->SetColor(Conversions::Convert(floorItem->Color3d()));
-    this->levelInspector->SetTexture(QString::fromStdString(
-        floorItem->Texture3d()));
+    this->levelInspector->ShowFloorWidget(true);
+    this->levelInspector->SetColor(floorItem->Color3d());
+    this->levelInspector->SetTexture(floorItem->Texture3d());
   }
   else
   {
-    this->levelInspector->floorWidget->hide();
+    this->levelInspector->ShowFloorWidget(false);
   }
   this->levelInspector->move(QCursor::pos());
   this->levelInspector->show();
@@ -1303,13 +1304,13 @@ void EditorView::OnLevelApply()
   LevelInspectorDialog *dialog =
       qobject_cast<LevelInspectorDialog *>(QObject::sender());
 
-  std::string newLevelName = dialog->GetLevelName();
+  std::string newLevelName = dialog->LevelName();
   this->levels[this->currentLevel]->name = newLevelName;
   FloorItem *floorItem = this->levels[this->currentLevel]->floorItem;
   if (floorItem)
   {
-    floorItem->SetTexture3d(dialog->GetTexture().toStdString());
-    floorItem->SetColor3d(Conversions::Convert(dialog->GetColor()));
+    floorItem->SetTexture3d(dialog->Texture());
+    floorItem->SetColor3d(dialog->Color());
     floorItem->Set3dTransparency(0.4);
     floorItem->FloorChanged();
   }
