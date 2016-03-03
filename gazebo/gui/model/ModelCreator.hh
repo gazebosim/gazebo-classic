@@ -30,6 +30,7 @@
 #include <sdf/sdf.hh>
 
 #include "gazebo/gui/qt.h"
+#include "gazebo/math/Vector3.hh"
 
 #include "gazebo/rendering/RenderTypes.hh"
 
@@ -386,7 +387,7 @@ namespace gazebo
       /// \param[in] _name Name of entity.
       /// \param[in] _scale New scale.
       private: void OnEntityScaleChanged(const std::string &_name,
-          const ignition::math::Vector3d &_scale);
+          const gazebo::math::Vector3 &_scale);
 
       /// \brief Deselect anything whose selection is handled here, such as
       /// links and model plugins.
