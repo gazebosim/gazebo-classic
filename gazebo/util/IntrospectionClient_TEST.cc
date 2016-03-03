@@ -348,19 +348,31 @@ TEST_F(IntrospectionClientTest, RemoveFilterAsync)
     EXPECT_FALSE(_result);
   };
 
-  // Try to remove a filter with the wrong manager ID.
-  EXPECT_TRUE(this->client.RemoveFilterAsync("_wrong_id_", filterId,
+  // Try to remove a filter with the wrong filter ID.
+  EXPECT_TRUE(this->client.RemoveFilterAsync(this->managerId, "_wrong_id_",
     cbRemoveBad));
   std::this_thread::sleep_for(std::chrono::milliseconds(300));
   EXPECT_TRUE(executed);
   executed = false;
 
-  // Try to remove a filter with the wrong filter ID.
-  //EXPECT_TRUE(this->client.RemoveFilterAsync(this->managerId, "_wrong_id_",
-  //  cbRemoveBad));
-  //std::this_thread::sleep_for(std::chrono::milliseconds(300));
-  //EXPECT_TRUE(executed);
-  //executed = false;
+  auto cbRemove = [&](const bool _result)
+  {
+    executed = true;
+    EXPECT_TRUE(_result);
+  };
+
+  // Remove an existing filter.
+  EXPECT_TRUE(this->client.RemoveFilterAsync(this->managerId, filterId,
+    cbRemove));
+  std::this_thread::sleep_for(std::chrono::milliseconds(300));
+  EXPECT_TRUE(executed);
+  executed = false;
+
+  // Trigger an update to verify that we don't receive any updates.
+  this->manager->Update();
+
+  // Check that we didn't receive any updates, we shouldn't have filters.
+  EXPECT_FALSE(this->callbackExecuted);
 }
 
 /////////////////////////////////////////////////
@@ -382,6 +394,37 @@ TEST_F(IntrospectionClientTest, Items)
   EXPECT_TRUE(items.find("item1") != items.end());
   EXPECT_TRUE(items.find("item2") != items.end());
   EXPECT_TRUE(items.find("item3") != items.end());
+}
+
+/////////////////////////////////////////////////
+TEST_F(IntrospectionClientTest, ItemsAsync)
+{
+  std::set<std::string> items;
+  bool executed = false;
+
+  EXPECT_FALSE(this->client.IsRegistered("_wrong_id_", items));
+
+  auto cbItems = [&](const std::set<std::string> &_items,
+                     const bool _result)
+  {
+    executed = true;
+    EXPECT_TRUE(_result);
+
+    EXPECT_EQ(_items.size(), 3u);
+    EXPECT_TRUE(_items.find("item1") != _items.end());
+    EXPECT_TRUE(_items.find("item2") != _items.end());
+    EXPECT_TRUE(_items.find("item3") != _items.end());
+  };
+
+  // Let's query the list of items available.
+  EXPECT_TRUE(this->client.ItemsAsync(this->managerId, cbItems));
+  std::this_thread::sleep_for(std::chrono::milliseconds(300));
+  EXPECT_TRUE(executed);
+  executed = false;
+
+  EXPECT_TRUE(this->client.IsRegistered(this->managerId, "item1"));
+  EXPECT_TRUE(this->client.IsRegistered(this->managerId,
+        std::set<std::string> {"item1", "item2"}));
 }
 
 /////////////////////////////////////////////////

@@ -140,7 +140,8 @@ bool IntrospectionClient::NewFilterAsync(const std::string &_managerId,
                              const bool _result)> &_cb) const
 {
   std::function<void(const gazebo::msgs::GzString&, const bool)> f =
-    [=](const gazebo::msgs::GzString &_rep, const bool _result)
+    [this, _managerId, &_cb](const gazebo::msgs::GzString &_rep,
+                             const bool _result)
   {
     std::string filterId;
     std::string newTopic;
@@ -148,6 +149,9 @@ bool IntrospectionClient::NewFilterAsync(const std::string &_managerId,
     {
       filterId = _rep.data();
       newTopic = "/introspection/" + _managerId + "/filter/" + filterId;
+
+      // Save the new filter ID.
+      this->dataPtr->filters[filterId] = _managerId;
     }
     _cb(filterId, newTopic, _result);
   };
@@ -298,9 +302,9 @@ bool IntrospectionClient::RemoveFilterAsync(const std::string &_managerId,
     const std::function<void(const bool _result)> &_cb) const
 {
   std::function<void(const gazebo::msgs::Empty&, const bool)> f =
-    [this, _filterId, &_cb](const gazebo::msgs::Empty &/*_rep*/, const bool _result)
+    [this, _filterId, &_cb](const gazebo::msgs::Empty &/*_rep*/,
+                            const bool _result)
   {
-    std::cout << "RemoveFilterAsync(): " << _result << std::endl;
     if (_result)
     {
       // Remove this filter from our internal list.
@@ -323,7 +327,6 @@ bool IntrospectionClient::RemoveFilterAsync(const std::string &_managerId,
   if (!this->dataPtr->node.Request<
     gazebo::msgs::Param_V, gazebo::msgs::Empty>(service, req, f))
   {
-    std::cerr << "Something went wrong" << std::endl;
     gzerr << "Unable to request an introspection filter removal" << std::endl;
     return false;
   }
@@ -358,12 +361,11 @@ bool IntrospectionClient::Items(const std::string &_managerId,
 
 //////////////////////////////////////////////////
 bool IntrospectionClient::ItemsAsync(const std::string &_managerId,
-    std::set<std::string> &_items,
-    const std::function<void(const std::set<std::string> &_items,
-                             const bool _result)> &_cb) const
+                   const std::function<void(const std::set<std::string> &_items,
+                                            const bool _result)> &_cb) const
 {
   std::function<void(const gazebo::msgs::Param_V&, const bool)> f =
-    [_items, &_cb](const gazebo::msgs::Param_V &_rep, const bool _result)
+    [=](const gazebo::msgs::Param_V &_rep, const bool _result)
   {
     std::set<std::string> items;
     if (_result)
