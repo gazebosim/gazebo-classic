@@ -37,6 +37,7 @@
 #include <qwt/qwt_legend.h>
 #include <qwt/qwt_plot_directpainter.h>
 #include <qwt/qwt_plot_magnifier.h>
+#include <qwt/qwt_plot_renderer.h>
 
 #pragma clang diagnostic pop
 

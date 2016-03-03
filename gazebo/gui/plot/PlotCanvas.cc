@@ -778,3 +778,9 @@ void PlotCanvas::UpdateAxisLabel()
     }
   }
 }
+
+/////////////////////////////////////////////////
+std::string PlotCanvas::Title() const
+{
+  return this->dataPtr->title->text().toStdString();
+}

@@ -17,6 +17,7 @@
 
 #include <mutex>
 
+#include "gazebo/gui/plot/ExportDialog.hh"
 #include "gazebo/gui/plot/IncrementalPlot.hh"
 #include "gazebo/gui/plot/Palette.hh"
 #include "gazebo/gui/plot/PlotCanvas.hh"
@@ -114,12 +115,6 @@ PlotWindow::PlotWindow(QWidget *_parent)
   addButtonLayout->setContentsMargins(0, 0, 0, 0);
   addCanvasButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
 
-  // Bottom toolbar
-  QFrame *bottomFrame = new QFrame;
-  bottomFrame->setObjectName("plotBottomFrame");
-  bottomFrame->setSizePolicy(QSizePolicy::Expanding,
-      QSizePolicy::Minimum);
-
   this->dataPtr->plotPlayAct = new QAction(QIcon(":/images/play_dark.png"),
       tr("Play"), this);
   this->dataPtr->plotPlayAct->setToolTip(tr("Continue plotting"));
@@ -135,16 +130,34 @@ PlotWindow::PlotWindow(QWidget *_parent)
   connect(this->dataPtr->plotPauseAct, SIGNAL(triggered()),
       this, SLOT(OnPause()));
 
-  QHBoxLayout *bottomPanelLayout = new QHBoxLayout;
   QToolBar *playToolbar = new QToolBar;
   playToolbar->setObjectName("plotToolbar");
   playToolbar->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
   playToolbar->addAction(this->dataPtr->plotPlayAct);
   playToolbar->addAction(this->dataPtr->plotPauseAct);
+
+  QAction *plotExportAct = new QAction(
+      QIcon(":/images/file_upload.svg"), tr("Export"), this);
+  plotExportAct->setToolTip(tr("Export plot data"));
+  plotExportAct->setVisible(true);
+  connect(plotExportAct, SIGNAL(triggered()), this, SLOT(OnExport()));
+
+  QToolBar *exportToolbar = new QToolBar;
+  exportToolbar->setObjectName("plotToolbar");
+  exportToolbar->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+  exportToolbar->addAction(plotExportAct);
+
+  QHBoxLayout *bottomPanelLayout = new QHBoxLayout;
   bottomPanelLayout->addStretch();
   bottomPanelLayout->addWidget(playToolbar);
   bottomPanelLayout->addStretch();
+  bottomPanelLayout->addWidget(exportToolbar);
   bottomPanelLayout->setContentsMargins(0, 0, 0, 0);
+
+  // Bottom toolbar
+  QFrame *bottomFrame = new QFrame;
+  bottomFrame->setObjectName("plotBottomFrame");
+  bottomFrame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
   bottomFrame->setLayout(bottomPanelLayout);
 
   // Plot layout
@@ -308,30 +321,23 @@ void PlotWindow::Restart()
 }
 
 /////////////////////////////////////////////////
-void PlotWindow::Export()
+std::list<PlotCanvas *> PlotWindow::Plots()
 {
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  std::list<PlotCanvas *> plots;
   for (int i = 0; i < this->dataPtr->canvasLayout->count(); ++i)
   {
     QLayoutItem *item = this->dataPtr->canvasLayout->itemAt(i);
     PlotCanvas *canvas = qobject_cast<PlotCanvas *>(item->widget());
     if (!canvas)
       continue;
-
-    for (const auto &plot : canvas->Plots())
-    {
-      for (const auto &curve : plot->Curves())
-      {
-        auto c = curve.lock();
-        if (!c)
-          continue;
-
-        for (unsigned int j = 0; j < c->Size(); ++j)
-        {
-          ignition::math::Vector2d pt = c->Point(j);
-          std::cerr << pt.X() << ", " << pt.Y() << std::endl;
-        }
-      }
-    }
+    plots.push_back(canvas);
   }
+  return plots;
+}
+
+/////////////////////////////////////////////////
+void PlotWindow::OnExport()
+{
+  auto dialog = new ExportDialog(this);
+  dialog->show();
 }

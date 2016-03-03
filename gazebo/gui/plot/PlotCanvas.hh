@@ -115,6 +115,10 @@ namespace gazebo
       /// \return True if event was handled.
       public: virtual bool eventFilter(QObject *_o, QEvent *_event);
 
+      /// \brief Get the title of the plot
+      /// \return Title of the plot
+      public: std::string Title() const;
+
       /// \brief Add a variable to a plot. Note this function
       /// only updates the plot but not the variable pill container.
       /// \param[in] _id Unique id of the variable

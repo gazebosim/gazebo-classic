@@ -46,6 +46,10 @@ namespace gazebo
       /// \brief Add a new canvas.
       public: PlotCanvas *AddCanvas();
 
+      /// \brief Get a list of all the plots
+      /// \return A list of all the plots.
+      public: std::list<PlotCanvas *> Plots();
+
       /// \brief Remove a plot canvas
       /// \param[in] _canvas Canvas to remove
       public: void RemoveCanvas(PlotCanvas *_canvas);
@@ -61,9 +65,6 @@ namespace gazebo
       /// variable in the plot. Existing plot curves will no longer be updated.
       public: void Restart();
 
-      /// \brief Export all canvas plots.
-      public: void Export();
-
       /// \brief Update all canvases
       public slots: void Update();
 
@@ -72,6 +73,9 @@ namespace gazebo
 
       /// \brief QT callback for when plotting is to be paused.
       private slots: void OnPause();
+
+      /// \brief QT callback for when a plot is to be exported.
+      private slots: void OnExport();
 
       /// \brief Qt Callback when a new plot canvas should be added.
       private slots: void OnAddCanvas();
