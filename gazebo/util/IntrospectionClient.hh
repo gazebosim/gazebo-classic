@@ -99,7 +99,7 @@ namespace gazebo
       /// \brief Remove all existing filters.
       /// \return True if the filters wer successfully removed
       /// or false otherwise
-      public: bool RemoveAllFilters() const;
+      public: void RemoveAllFilters() const;
 
       /// \brief Remove an existing filter.
       /// \param[in] _managerID ID of the manager to request the operation.
@@ -108,6 +108,10 @@ namespace gazebo
       public: bool RemoveFilter(const std::string &_managerId,
                                 const std::string &_filterId) const;
 
+      public: bool RemoveFilterAsync(const std::string &_managerId,
+                                     const std::string &_filterId,
+                      const std::function<void(const bool _result)> &_cb) const;
+
       /// \brief Get a copy of the items already registered.
       /// \param[in] _managerID ID of the manager to request the operation.
       /// \param[out] _items The list of items.
@@ -115,6 +119,11 @@ namespace gazebo
       /// (wrong managerID, transport problem).
       public: bool Items(const std::string &_managerId,
                          std::set<std::string> &_items) const;
+
+      public: bool ItemsAsync(const std::string &_managerId,
+                              std::set<std::string> &_items,
+                   const std::function<void(const std::set<std::string> &_items,
+                                            const bool _result)> &_cb) const;
 
       /// \bried Check if the _item is registered on a manager with
       /// _managerId.

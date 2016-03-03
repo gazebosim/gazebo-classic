@@ -315,6 +315,55 @@ TEST_F(IntrospectionClientTest, UpdateFilterAsync)
 }
 
 /////////////////////////////////////////////////
+TEST_F(IntrospectionClientTest, RemoveFilterAsync)
+{
+  std::string filterId;
+  std::string topic;
+  bool executed = false;
+
+  auto cbNew = [&](const std::string &_filterId,
+                   const std::string &_newTopic,
+                   const bool _result)
+  {
+    executed = true;
+    EXPECT_TRUE(_result);
+
+    // Subscribe to my custom topic for receiving updates.
+    this->Subscribe(_newTopic);
+
+    filterId = _filterId;
+  };
+
+  // Let's create a filter.
+  std::set<std::string> items = {"item1", "item3"};
+
+  EXPECT_TRUE(this->client.NewFilterAsync(this->managerId, items, cbNew));
+  std::this_thread::sleep_for(std::chrono::milliseconds(300));
+  EXPECT_TRUE(executed);
+  executed = false;
+
+  auto cbRemoveBad = [&](const bool _result)
+  {
+    executed = true;
+    EXPECT_FALSE(_result);
+  };
+
+  // Try to remove a filter with the wrong manager ID.
+  EXPECT_TRUE(this->client.RemoveFilterAsync("_wrong_id_", filterId,
+    cbRemoveBad));
+  std::this_thread::sleep_for(std::chrono::milliseconds(300));
+  EXPECT_TRUE(executed);
+  executed = false;
+
+  // Try to remove a filter with the wrong filter ID.
+  //EXPECT_TRUE(this->client.RemoveFilterAsync(this->managerId, "_wrong_id_",
+  //  cbRemoveBad));
+  //std::this_thread::sleep_for(std::chrono::milliseconds(300));
+  //EXPECT_TRUE(executed);
+  //executed = false;
+}
+
+/////////////////////////////////////////////////
 TEST_F(IntrospectionClientTest, Items)
 {
   std::set<std::string> items;

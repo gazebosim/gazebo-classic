@@ -243,7 +243,7 @@ bool IntrospectionClient::UpdateFilterAsync(const std::string &_managerId,
   if (!this->dataPtr->node.Request<
     gazebo::msgs::Param_V, gazebo::msgs::Empty>(service, req, f))
   {
-    gzerr << "Unable to update a remote introspection filter" << std::endl;
+    gzerr << "Unable to request an introspection filter update" << std::endl;
     return false;
   }
 
@@ -251,20 +251,14 @@ bool IntrospectionClient::UpdateFilterAsync(const std::string &_managerId,
 }
 
 //////////////////////////////////////////////////
-bool IntrospectionClient::RemoveAllFilters() const
+void IntrospectionClient::RemoveAllFilters() const
 {
-  bool result = true;
-
-  // Remove all the filters from the manager.
-  auto filterIter = this->dataPtr->filters.begin();
-  while (filterIter != this->dataPtr->filters.end())
+  auto f = [](const bool /*_result*/)
   {
-    auto filter = *filterIter;
-    ++filterIter;
-    result = result && this->RemoveFilter(filter.second, filter.first);
-  }
+  };
 
-  return result;
+  for (auto &filter : this->dataPtr->filters)
+    this->RemoveFilterAsync(filter.second, filter.first, f);
 }
 
 //////////////////////////////////////////////////
@@ -299,6 +293,45 @@ bool IntrospectionClient::RemoveFilter(const std::string &_managerId,
 }
 
 //////////////////////////////////////////////////
+bool IntrospectionClient::RemoveFilterAsync(const std::string &_managerId,
+    const std::string &_filterId,
+    const std::function<void(const bool _result)> &_cb) const
+{
+  std::function<void(const gazebo::msgs::Empty&, const bool)> f =
+    [this, _filterId, &_cb](const gazebo::msgs::Empty &/*_rep*/, const bool _result)
+  {
+    std::cout << "RemoveFilterAsync(): " << _result << std::endl;
+    if (_result)
+    {
+      // Remove this filter from our internal list.
+      this->dataPtr->filters.erase(_filterId);
+    }
+
+    _cb(_result);
+  };
+
+  gazebo::msgs::Param_V req;
+
+  // Add the filter_id to the message.
+  auto nextParam = req.add_param();
+  nextParam->set_name("filter_id");
+  nextParam->mutable_value()->set_type(gazebo::msgs::Any::STRING);
+  nextParam->mutable_value()->set_string_value(_filterId);
+
+  // Request the service.
+  auto service = "/introspection/" + _managerId + "/filter_remove";
+  if (!this->dataPtr->node.Request<
+    gazebo::msgs::Param_V, gazebo::msgs::Empty>(service, req, f))
+  {
+    std::cerr << "Something went wrong" << std::endl;
+    gzerr << "Unable to request an introspection filter removal" << std::endl;
+    return false;
+  }
+
+  return true;
+}
+
+//////////////////////////////////////////////////
 bool IntrospectionClient::Items(const std::string &_managerId,
     std::set<std::string> &_items) const
 {
@@ -320,6 +353,42 @@ bool IntrospectionClient::Items(const std::string &_managerId,
     auto param = rep.param(i);
     _items.emplace(param.value().string_value());
   }
+  return true;
+}
+
+//////////////////////////////////////////////////
+bool IntrospectionClient::ItemsAsync(const std::string &_managerId,
+    std::set<std::string> &_items,
+    const std::function<void(const std::set<std::string> &_items,
+                             const bool _result)> &_cb) const
+{
+  std::function<void(const gazebo::msgs::Param_V&, const bool)> f =
+    [_items, &_cb](const gazebo::msgs::Param_V &_rep, const bool _result)
+  {
+    std::set<std::string> items;
+    if (_result)
+    {
+      for (auto i = 0; i < _rep.param_size(); ++i)
+      {
+        auto param = _rep.param(i);
+        items.emplace(param.value().string_value());
+      }
+    }
+
+    _cb(items, _result);
+  };
+
+  gazebo::msgs::Empty req;
+
+  // Request the service.
+  auto service = "/introspection/" + _managerId + "/items";
+  if (!this->dataPtr->node.Request(service, req, f))
+  {
+    gzerr << "Unable to request the list of items from a remote manager"
+          << std::endl;
+    return false;
+  }
+
   return true;
 }
 
