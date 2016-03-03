@@ -83,7 +83,6 @@ namespace gazebo
 
       /// \brief Flag to indicate that the introspection client is initialized.
       public: bool initialized = false;
-
     };
   }
 }
@@ -136,14 +135,6 @@ void IntrospectionCurveHandler::AddCurve(const std::string &_name,
     };
 
     this->AddItemToFilter(_name, addItemToFilterCallback);
-
-    /*if (this->AddItemToFilter(_name))
-    {
-      // create entry in map
-      CurveVariableSet curveSet;
-      curveSet.insert(_curve);
-      this->dataPtr->curves[_name] = curveSet;
-    }*/
   }
   else
   {
@@ -180,11 +171,8 @@ void IntrospectionCurveHandler::RemoveCurve(PlotCurveWeakPtr _curve)
       if (it->second.empty())
       {
         // remove item from introspection filter
-        if (this->RemoveItemFromFilter(it->first))
-        {
-          // erase from map
-          this->dataPtr->curves.erase(it);
-        }
+        this->RemoveItemFromFilter(it->first);
+        this->dataPtr->curves.erase(it);
       }
       return;
     }
@@ -546,21 +534,13 @@ void IntrospectionCurveHandler::OnIntrospection(
 void IntrospectionCurveHandler::AddItemToFilter(const std::string &_name,
     const std::function<void(const bool _result)> &_cb)
 {
-  std::cerr << " AddItemToFilter " << _name << std::endl;
-
   // callback from a async items service request
   auto itemsCallback = [this, _name, _cb](const std::set<std::string> &_items,
       const bool _itemsResult)
   {
-    return;
-
     if (!_itemsResult)
       return;
 
-    for (auto item : _items)
-    {
-      std::cerr << "item: " << item << std::endl;
-    }
     std::lock_guard<std::mutex> itemLock(this->dataPtr->mutex);
 
     common::URI itemURI(_name);
@@ -590,7 +570,6 @@ void IntrospectionCurveHandler::AddItemToFilter(const std::string &_name,
           if (this->dataPtr->introspectFilter.find(item) ==
               this->dataPtr->introspectFilter.end())
           {
-            std::cerr << " adding filter ! " << uri.Str() << std::endl;
             auto filterCopy = this->dataPtr->introspectFilter;
             filterCopy.insert(item);
 
@@ -598,14 +577,14 @@ void IntrospectionCurveHandler::AddItemToFilter(const std::string &_name,
             // async service request is successful
             auto filterUpdateCallback = [this, item, _cb](const bool _result)
             {
-              std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-              if (_result)
-              {
-                this->dataPtr->introspectFilter.insert(item);
-                this->dataPtr->introspectFilterCount[item] = 1;
-              }
-              _cb(_result);
+              if (!_result)
+                return;
 
+              std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+              this->dataPtr->introspectFilter.insert(item);
+              this->dataPtr->introspectFilterCount[item] = 1;
+              if (_cb)
+                _cb(_result);
             };
 
             // Update the filter. We're interested on "item1" and "item2".
@@ -614,20 +593,8 @@ void IntrospectionCurveHandler::AddItemToFilter(const std::string &_name,
                 filterCopy, filterUpdateCallback))
             {
               gzerr << "Error updating introspection filter" << std::endl;
-              // this->dataPtr->introspectFilter.erase(item);
               return;
             }
-
-  /*          if (!this->dataPtr->introspectClient.UpdateFilter(
-                this->dataPtr->managerId, this->dataPtr->introspectFilterId,
-                this->dataPtr->introspectFilter))
-            {
-              gzerr << "Error updating introspection filter" << std::endl;
-              this->dataPtr->introspectFilter.erase(item);
-              return false;
-            }
-            this->dataPtr->introspectFilterCount[item] = 1;*/
-
           }
           else
           {
@@ -646,74 +613,96 @@ void IntrospectionCurveHandler::AddItemToFilter(const std::string &_name,
   if (!itemURI.Valid())
     return;
 
-  std::set<std::string> items;
   this->dataPtr->introspectClient.ItemsAsync(
-      this->dataPtr->managerId, items, itemsCallback);
+      this->dataPtr->managerId, itemsCallback);
 }
 
 /////////////////////////////////////////////////
-bool IntrospectionCurveHandler::RemoveItemFromFilter(const std::string &_name)
+void IntrospectionCurveHandler::RemoveItemFromFilter(const std::string &_name,
+    const std::function<void(const bool _result)> &_cb)
 {
+  // callback from a async items service request
+  auto itemsCallback = [this, _name, _cb](const std::set<std::string> &_items,
+      const bool _itemsResult)
+  {
+    if (!_itemsResult)
+      return;
+
+    std::lock_guard<std::mutex> itemLock(this->dataPtr->mutex);
+
+    common::URI itemURI(_name);
+    common::URIPath itemPath = itemURI.Path();
+    common::URIQuery itemQuery = itemURI.Query();
+
+    for (auto item : _items)
+    {
+      common::URI uri(item);
+      common::URIPath path = uri.Path();
+      common::URIQuery query = uri.Query();
+
+      // check if the entity matches
+      if (itemPath == path)
+      {
+        // A registered variable can have the query
+        //  "?p=world_pose"
+        // and if the variable we are looking for has the query
+        //  "?p=world_pose/position/x"
+        // we need to add "scheme://path?world_pose" to the filter instead of
+        // "scheme://path?p=world_pose/position/x"
+
+        // check substring starts at index 0
+        if (itemQuery.Str().find(query.Str()) == 0)
+        {
+          // check if it is in the filter list
+          auto itemIt = this->dataPtr->introspectFilter.find(item);
+          if (itemIt == this->dataPtr->introspectFilter.end())
+            continue;
+
+          // update filter only if no one else is subscribed to it
+          int &count = this->dataPtr->introspectFilterCount[item];
+          count--;
+          if (count <= 0)
+          {
+            auto filterCopy = this->dataPtr->introspectFilter;
+            filterCopy.erase(item);
+
+            // callback for updating the filter and curve map if the
+            // async service request is successful
+            auto filterUpdateCallback = [this, item, _cb](const bool _result)
+            {
+              if (!_result)
+                return;
+
+              std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+              this->dataPtr->introspectFilter.erase(item);
+              this->dataPtr->introspectFilterCount.erase(item);
+            };
+
+            // update filter
+            if (!this->dataPtr->introspectClient.UpdateFilterAsync(
+                this->dataPtr->managerId, this->dataPtr->introspectFilterId,
+                filterCopy, filterUpdateCallback))
+            {
+              gzerr << "Error updating introspection filter" << std::endl;
+              return;
+            }
+          }
+
+          if (_cb)
+            _cb(true);
+          break;
+        }
+      }
+    }
+  };
+
   common::URI itemURI(_name);
 
   if (!itemURI.Valid())
-    return false;
+    return;
 
-  common::URIPath itemPath = itemURI.Path();
-  common::URIQuery itemQuery = itemURI.Query();
-
-  std::set<std::string> items;
-  this->dataPtr->introspectClient.Items(this->dataPtr->managerId, items);
-
-  for (auto item : items)
-  {
-    common::URI uri(item);
-    common::URIPath path = uri.Path();
-    common::URIQuery query = uri.Query();
-
-    // check if the entity matches
-    if (itemPath == path)
-    {
-      // A registered variable can have the query
-      //  "?p=world_pose"
-      // and if the variable we are looking for has the query
-      //  "?p=world_pose/position/x"
-      // we need to remove "scheme://path?world_pose" from the filter instead of
-      // "scheme://path?p=world_pose/position/x"
-
-      // check substring
-      if (itemQuery.Str().find(query.Str()) == 0)
-      {
-        // remove item from introspection filter
-        auto itemIt = this->dataPtr->introspectFilter.find(item);
-        if (itemIt == this->dataPtr->introspectFilter.end())
-        {
-          return false;
-        }
-        else
-        {
-          int &count = this->dataPtr->introspectFilterCount[item];
-          count--;
-          if (count == 0u)
-          {
-            this->dataPtr->introspectFilter.erase(itemIt);
-            this->dataPtr->introspectFilterCount.erase(item);
-
-            if (!this->dataPtr->introspectClient.UpdateFilter(
-                this->dataPtr->managerId, this->dataPtr->introspectFilterId,
-                this->dataPtr->introspectFilter))
-            {
-              gzerr << "Error updating introspection filter" << std::endl;
-              this->dataPtr->introspectFilter.insert(item);
-              return false;
-            }
-          }
-        }
-        break;
-      }
-    }
-  }
-  return true;
+  this->dataPtr->introspectClient.ItemsAsync(
+      this->dataPtr->managerId, itemsCallback);
 }
 
 /////////////////////////////////////////////////

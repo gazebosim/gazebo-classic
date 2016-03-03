@@ -317,8 +317,8 @@ void PlotCanvas::RemoveVariable(const unsigned int _id,
   unsigned int curveId = v->second;
 
   // remove curve from manager
-  PlotManager::Instance()->RemoveIntrospectionCurve(
-      it->second->plot->Curve(_id));
+  PlotCurveWeakPtr plotCurve = it->second->plot->Curve(curveId);
+  PlotManager::Instance()->RemoveIntrospectionCurve(plotCurve);
 
   // erase from map
   it->second->variableCurves.erase(v);

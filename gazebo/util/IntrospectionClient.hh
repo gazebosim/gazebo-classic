@@ -121,7 +121,6 @@ namespace gazebo
                          std::set<std::string> &_items) const;
 
       public: bool ItemsAsync(const std::string &_managerId,
-                              std::set<std::string> &_items,
                    const std::function<void(const std::set<std::string> &_items,
                                             const bool _result)> &_cb) const;
 
