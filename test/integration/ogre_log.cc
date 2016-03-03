@@ -25,7 +25,7 @@ class OgreLog : public ServerFixture
 };
 
 /////////////////////////////////////////////////
-TEST_F(OgreLog, PubSub)
+TEST_F(OgreLog, LogError)
 {
   Load("worlds/empty.world");
 
