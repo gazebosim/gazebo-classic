@@ -86,7 +86,7 @@ namespace gazebo
       /// \brief Add an item to the introspection fitler
       /// \param[in] _name Name of item
       /// \return True if the filter is updated succesfully.
-      private: bool AddItemToFilter(const std::string &_name,
+      private: void AddItemToFilter(const std::string &_name,
           const std::function<void(const bool _result)> &_cb);
 
       /// \brief Remove an item from the introspection fitler

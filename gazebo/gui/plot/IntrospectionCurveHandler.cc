@@ -543,101 +543,112 @@ void IntrospectionCurveHandler::OnIntrospection(
 }
 
 /////////////////////////////////////////////////
-bool IntrospectionCurveHandler::AddItemToFilter(const std::string &_name,
+void IntrospectionCurveHandler::AddItemToFilter(const std::string &_name,
     const std::function<void(const bool _result)> &_cb)
 {
-  common::URI itemURI(_name);
-
   std::cerr << " AddItemToFilter " << _name << std::endl;
 
-  if (!itemURI.Valid())
-    return false;
-
-  common::URIPath itemPath = itemURI.Path();
-  common::URIQuery itemQuery = itemURI.Query();
-
-  std::set<std::string> items;
-  this->dataPtr->introspectClient.Items(this->dataPtr->managerId, items);
-  for (auto item : items)
+  // callback from a async items service request
+  auto itemsCallback = [this, _name, _cb](const std::set<std::string> &_items,
+      const bool _itemsResult)
   {
-    std::cerr << "item: " << item << std::endl;
-  }
+    return;
 
+    if (!_itemsResult)
+      return;
 
-  for (auto item : items)
-  {
-    common::URI uri(item);
-    common::URIPath path = uri.Path();
-    common::URIQuery query = uri.Query();
-
-    // check if the entity matches
-    if (itemPath == path)
+    for (auto item : _items)
     {
-      // A registered variable can have the query
-      //  "?p=world_pose"
-      // and if the variable we are looking for has the query
-      //  "?p=world_pose/position/x"
-      // we need to add "scheme://path?world_pose" to the filter instead of
-      // "scheme://path?p=world_pose/position/x"
+      std::cerr << "item: " << item << std::endl;
+    }
+    std::lock_guard<std::mutex> itemLock(this->dataPtr->mutex);
 
-      // check substring
-      if (itemQuery.Str().find(query.Str()) == 0)
+    common::URI itemURI(_name);
+    common::URIPath itemPath = itemURI.Path();
+    common::URIQuery itemQuery = itemURI.Query();
+
+    for (auto item : _items)
+    {
+      common::URI uri(item);
+      common::URIPath path = uri.Path();
+      common::URIQuery query = uri.Query();
+
+      // check if the entity matches
+      if (itemPath == path)
       {
-        // add item to introspection filter
-        if (this->dataPtr->introspectFilter.find(item) ==
-            this->dataPtr->introspectFilter.end())
-        {
-          std::cerr << " adding filter ! " << uri.Str() << std::endl;
-          auto filterCopy = this->dataPtr->introspectFilter;
-          filterCopy.insert(item);
+        // A registered variable can have the query
+        //  "?p=world_pose"
+        // and if the variable we are looking for has the query
+        //  "?p=world_pose/position/x"
+        // we need to add "scheme://path?world_pose" to the filter instead of
+        // "scheme://path?p=world_pose/position/x"
 
-          // callback to update the filter and curve map if the
-          // async service request is successful
-          auto filterUpdateCallback = [this, item, _cb](const bool _result)
+        // check substring
+        if (itemQuery.Str().find(query.Str()) == 0)
+        {
+          // add item to introspection filter
+          if (this->dataPtr->introspectFilter.find(item) ==
+              this->dataPtr->introspectFilter.end())
           {
-            std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-            if (_result)
+            std::cerr << " adding filter ! " << uri.Str() << std::endl;
+            auto filterCopy = this->dataPtr->introspectFilter;
+            filterCopy.insert(item);
+
+            // callback to update the filter and curve map if the
+            // async service request is successful
+            auto filterUpdateCallback = [this, item, _cb](const bool _result)
             {
-              this->dataPtr->introspectFilter.insert(item);
-              this->dataPtr->introspectFilterCount[item] = 1;
+              std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+              if (_result)
+              {
+                this->dataPtr->introspectFilter.insert(item);
+                this->dataPtr->introspectFilterCount[item] = 1;
+              }
+              _cb(_result);
+
+            };
+
+            // Update the filter. We're interested on "item1" and "item2".
+            if (!this->dataPtr->introspectClient.UpdateFilterAsync(
+                this->dataPtr->managerId, this->dataPtr->introspectFilterId,
+                filterCopy, filterUpdateCallback))
+            {
+              gzerr << "Error updating introspection filter" << std::endl;
+              // this->dataPtr->introspectFilter.erase(item);
+              return;
             }
-            _cb(_result);
 
-          };
+  /*          if (!this->dataPtr->introspectClient.UpdateFilter(
+                this->dataPtr->managerId, this->dataPtr->introspectFilterId,
+                this->dataPtr->introspectFilter))
+            {
+              gzerr << "Error updating introspection filter" << std::endl;
+              this->dataPtr->introspectFilter.erase(item);
+              return false;
+            }
+            this->dataPtr->introspectFilterCount[item] = 1;*/
 
-          // Update the filter. We're interested on "item1" and "item2".
-          if (!this->dataPtr->introspectClient.UpdateFilterAsync(
-              this->dataPtr->managerId, this->dataPtr->introspectFilterId,
-              filterCopy, filterUpdateCallback))
+          }
+          else
           {
-            gzerr << "Error updating introspection filter" << std::endl;
-            // this->dataPtr->introspectFilter.erase(item);
-            return false;
+            // filter already exists, increment counter.
+            int &count = this->dataPtr->introspectFilterCount[item];
+            count++;
           }
 
-/*          if (!this->dataPtr->introspectClient.UpdateFilter(
-              this->dataPtr->managerId, this->dataPtr->introspectFilterId,
-              this->dataPtr->introspectFilter))
-          {
-            gzerr << "Error updating introspection filter" << std::endl;
-            this->dataPtr->introspectFilter.erase(item);
-            return false;
-          }
-          this->dataPtr->introspectFilterCount[item] = 1;*/
-
+          break;
         }
-        else
-        {
-          // filter already exists, increment counter.
-          int &count = this->dataPtr->introspectFilterCount[item];
-          count++;
-        }
-
-        break;
       }
     }
-  }
-  return true;
+  };
+
+  common::URI itemURI(_name);
+  if (!itemURI.Valid())
+    return;
+
+  std::set<std::string> items;
+  this->dataPtr->introspectClient.ItemsAsync(
+      this->dataPtr->managerId, items, itemsCallback);
 }
 
 /////////////////////////////////////////////////
