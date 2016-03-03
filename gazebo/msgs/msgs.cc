@@ -1680,9 +1680,9 @@ namespace gazebo
       msgs::IMUSensor result;
 
       std::array<std::string, 2> senses
-        {{"angular_velocity", "linear_acceleration"}};
+        {{"angular_velocity", "linear_acceleration"}}
 
-      std::array<std::string, 3> dimensions {{"x", "y", "z"}};
+      std::array<std::string, 3> dimensions {{"x", "y", "z"}}
 
       for (auto const &sense : senses)
       {
@@ -1844,10 +1844,10 @@ namespace gazebo
 
       // The two types of sensing
       std::array<std::string, 2> sensing
-        {{"position_sensing", "velocity_sensing"}};
+        {{"position_sensing", "velocity_sensing"}}
 
       // The two dimensions for each of sensing types.
-      std::array<std::string, 2> dimensions {{"horizontal", "vertical"}};
+      std::array<std::string, 2> dimensions {{"horizontal", "vertical"}}
 
       // Process each sensing
       for (auto const &sense : sensing)
