@@ -18,8 +18,6 @@
 #ifndef _GAZEBO_GUI_MODEL_MODELCREATOR_HH_
 #define _GAZEBO_GUI_MODEL_MODELCREATOR_HH_
 
-#include <sdf/sdf.hh>
-
 #include <memory>
 #include <mutex>
 #include <string>
