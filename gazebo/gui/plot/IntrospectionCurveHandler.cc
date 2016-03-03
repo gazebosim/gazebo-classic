@@ -123,13 +123,27 @@ void IntrospectionCurveHandler::AddCurve(const std::string &_name,
   auto it = this->dataPtr->curves.find(_name);
   if (it == this->dataPtr->curves.end())
   {
-    if (this->AddItemToFilter(_name))
+
+    auto addItemToFilterCallback = [this, _curve, _name](const bool _result)
+    {
+      if (!_result)
+        return;
+
+      // create entry in map
+      CurveVariableSet curveSet;
+      curveSet.insert(_curve);
+      this->dataPtr->curves[_name] = curveSet;
+    };
+
+    this->AddItemToFilter(_name, addItemToFilterCallback);
+
+    /*if (this->AddItemToFilter(_name))
     {
       // create entry in map
       CurveVariableSet curveSet;
       curveSet.insert(_curve);
       this->dataPtr->curves[_name] = curveSet;
-    }
+    }*/
   }
   else
   {
@@ -250,7 +264,6 @@ void IntrospectionCurveHandler::SetupIntrospection()
   }
 
   this->dataPtr->initialized = true;
-  std::cerr << " done SetupIntrospection items " << std::endl;
 }
 
 /*
@@ -530,7 +543,8 @@ void IntrospectionCurveHandler::OnIntrospection(
 }
 
 /////////////////////////////////////////////////
-bool IntrospectionCurveHandler::AddItemToFilter(const std::string &_name)
+bool IntrospectionCurveHandler::AddItemToFilter(const std::string &_name,
+    const std::function<void(const bool _result)> &_cb)
 {
   common::URI itemURI(_name);
 
@@ -574,9 +588,34 @@ bool IntrospectionCurveHandler::AddItemToFilter(const std::string &_name)
             this->dataPtr->introspectFilter.end())
         {
           std::cerr << " adding filter ! " << uri.Str() << std::endl;
-          this->dataPtr->introspectFilter.insert(item);
+          auto filterCopy = this->dataPtr->introspectFilter;
+          filterCopy.insert(item);
 
-          if (!this->dataPtr->introspectClient.UpdateFilter(
+          // callback to update the filter and curve map if the
+          // async service request is successful
+          auto filterUpdateCallback = [this, item, _cb](const bool _result)
+          {
+            std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+            if (_result)
+            {
+              this->dataPtr->introspectFilter.insert(item);
+              this->dataPtr->introspectFilterCount[item] = 1;
+            }
+            _cb(_result);
+
+          };
+
+          // Update the filter. We're interested on "item1" and "item2".
+          if (!this->dataPtr->introspectClient.UpdateFilterAsync(
+              this->dataPtr->managerId, this->dataPtr->introspectFilterId,
+              filterCopy, filterUpdateCallback))
+          {
+            gzerr << "Error updating introspection filter" << std::endl;
+            // this->dataPtr->introspectFilter.erase(item);
+            return false;
+          }
+
+/*          if (!this->dataPtr->introspectClient.UpdateFilter(
               this->dataPtr->managerId, this->dataPtr->introspectFilterId,
               this->dataPtr->introspectFilter))
           {
@@ -584,7 +623,7 @@ bool IntrospectionCurveHandler::AddItemToFilter(const std::string &_name)
             this->dataPtr->introspectFilter.erase(item);
             return false;
           }
-          this->dataPtr->introspectFilterCount[item] = 1;
+          this->dataPtr->introspectFilterCount[item] = 1;*/
 
         }
         else
@@ -711,41 +750,3 @@ bool IntrospectionCurveHandler::QuaterniondFromQuery(const std::string &_query,
 
   return true;
 }
-
-
-
-/*/////////////////////////////////////////////////
-void IntrospectionCurveHandler::AddCurve(const std::string &_name,
-    PlotCurveWeakPtr _curve)
-{
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-  std::cerr << " querying filter items " << std::endl;
-  std::set<std::string> items;
-  this->dataPtr->introspectClient.Items(this->dataPtr->managerId, items);
-  for (auto item : items)
-  {
-    std::cerr << "item: " << item << std::endl;
-  }
-
-  std::cerr << " updating filter " << std::endl;
-
-  if (!this->dataPtr->introspectClient.UpdateFilter(
-      this->dataPtr->managerId, this->dataPtr->introspectFilterId,
-      this->dataPtr->introspectFilter))
-
-  std::cerr << " done updating filter " << std::endl;
-}
-
-/////////////////////////////////////////////////
-void IntrospectionCurveHandler::OnIntrospection(
-    const gazebo::msgs::Param_V &_msg)
-{
-  std::cerr << " on intro " << std::endl;
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-  std::cerr << " on intro pass lock " << std::endl;
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    common::Time::MSleep(50);
-  }
-  std::cerr << " done intro " << std::endl;
-}*/
