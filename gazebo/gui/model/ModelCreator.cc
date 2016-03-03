@@ -1431,11 +1431,17 @@ void ModelCreator::FinishModel()
 {
   if (!this->serverModelName.empty())
   {
+    // this resets the material properites of the model
+    // (important if we want to reuse it later, e.g. saving to same model name,
+    // if this is not done then the new model with same name will be invisible)
+    this->SetModelVisible(this->serverModelName, true);
+
     // delete model on server first before spawning the updated one.
     transport::request(gui::get_world(), "entity_delete",
         this->serverModelName);
     int timeoutCounter = 0;
     int timeout = 100;
+    // wait for entity to be deleted on server side
     while (timeoutCounter < timeout)
     {
       boost::shared_ptr<msgs::Response> response =
@@ -1446,9 +1452,25 @@ void ModelCreator::FinishModel()
         break;
 
       common::Time::MSleep(100);
+      QCoreApplication::processEvents();
+      timeoutCounter++;
+    }
+
+    timeoutCounter = 0;
+    // wait for client scene to acknowledge the deletion
+    rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
+    rendering::VisualPtr visual = scene->GetVisual(this->serverModelName);
+    while (timeoutCounter < timeout)
+    {
+      visual = scene->GetVisual(this->serverModelName);
+      if (!visual)
+        break;
+      common::Time::MSleep(100);
+      QCoreApplication::processEvents();
       timeoutCounter++;
     }
   }
+
   event::Events::setSelectedEntity("", "normal");
   this->CreateTheEntity();
   this->Reset();
@@ -1465,9 +1487,10 @@ void ModelCreator::CreateTheEntity()
 
   msgs::Factory msg;
   // Create a new name if the model exists
+
   sdf::ElementPtr modelElem = this->modelSDF->Root()->GetElement("model");
   std::string modelElemName = modelElem->Get<std::string>("name");
-  if (has_entity_name(modelElemName))
+  if (modelElemName != this->serverModelName && has_entity_name(modelElemName))
   {
     int i = 0;
     while (has_entity_name(modelElemName))
