@@ -588,7 +588,7 @@ void IntrospectionCurveHandler::AddItemToFilter(const std::string &_name,
             };
 
             // Update the filter. We're interested on "item1" and "item2".
-            if (!this->dataPtr->introspectClient.UpdateFilterAsync(
+            if (!this->dataPtr->introspectClient.UpdateFilter(
                 this->dataPtr->managerId, this->dataPtr->introspectFilterId,
                 filterCopy, filterUpdateCallback))
             {
@@ -613,7 +613,7 @@ void IntrospectionCurveHandler::AddItemToFilter(const std::string &_name,
   if (!itemURI.Valid())
     return;
 
-  this->dataPtr->introspectClient.ItemsAsync(
+  this->dataPtr->introspectClient.Items(
       this->dataPtr->managerId, itemsCallback);
 }
 
@@ -679,7 +679,7 @@ void IntrospectionCurveHandler::RemoveItemFromFilter(const std::string &_name,
             };
 
             // update filter
-            if (!this->dataPtr->introspectClient.UpdateFilterAsync(
+            if (!this->dataPtr->introspectClient.UpdateFilter(
                 this->dataPtr->managerId, this->dataPtr->introspectFilterId,
                 filterCopy, filterUpdateCallback))
             {
@@ -701,7 +701,7 @@ void IntrospectionCurveHandler::RemoveItemFromFilter(const std::string &_name,
   if (!itemURI.Valid())
     return;
 
-  this->dataPtr->introspectClient.ItemsAsync(
+  this->dataPtr->introspectClient.Items(
       this->dataPtr->managerId, itemsCallback);
 }
 
