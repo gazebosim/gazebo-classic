@@ -83,13 +83,19 @@ namespace gazebo
       private: bool QuaterniondFromQuery(const std::string &_query,
           const ignition::math::Quaterniond &_quat, double &_value) const;
 
-      /// \brief Add an item to the introspection fitler
+      /// \brief Add an item to the introspection filter
       /// \param[in] _name Name of item
-      private: void AddItemToFilter(const std::string &_name);
+      /// \param[in] _cb Async callback to indicate the result of the filter
+      /// update
+      private: void AddItemToFilter(const std::string &_name,
+          const std::function<void(const bool _result)> &_cb = nullptr);
 
-      /// \brief Remove an item from the introspection fitler
+      /// \brief Remove an item from the introspection filter
       /// \param[in] _name Name of item
-      private: void RemoveItemFromFilter(const std::string &_name);
+      /// \param[in] _cb Async callback to indicate the result of the filter
+      /// update
+      private: void RemoveItemFromFilter(const std::string &_name,
+          const std::function<void(const bool _result)> &_cb = nullptr);
 
       /// \brief Private data pointer
       private: std::unique_ptr<IntrospectionCurveHandlerPrivate> dataPtr;
