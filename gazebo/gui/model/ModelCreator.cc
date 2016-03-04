@@ -1513,8 +1513,8 @@ void ModelCreator::Reset()
   std::stringstream previewModelName;
   previewModelName << this->dataPtr->previewName << "_" <<
       this->dataPtr->modelCounter++;
-  this->dataPtr->previewVisual.reset(new rendering::Visual(previewModelName.str(),
-      scene->WorldVisual(), false));
+  this->dataPtr->previewVisual.reset(new rendering::Visual(
+      previewModelName.str(), scene->WorldVisual(), false));
 
   this->dataPtr->previewVisual->Load();
   this->dataPtr->modelPose = ignition::math::Pose3d::Zero;
@@ -1884,8 +1884,8 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
 
     bool isLink = this->dataPtr->allLinks.find(topLevelVis->GetName()) !=
         this->dataPtr->allLinks.end();
-    bool isNestedModel = this->dataPtr->allNestedModels.find(topLevelVis->GetName()) !=
-        this->dataPtr->allNestedModels.end();
+    bool isNestedModel = this->dataPtr->allNestedModels.find(
+        topLevelVis->GetName()) != this->dataPtr->allNestedModels.end();
 
     bool isSelectedLink = false;
     bool isSelectedNestedModel = false;
@@ -1897,7 +1897,8 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
     }
     else if (isNestedModel)
     {
-      isSelectedNestedModel = std::find(this->dataPtr->selectedNestedModels.begin(),
+      isSelectedNestedModel = std::find(
+          this->dataPtr->selectedNestedModels.begin(),
           this->dataPtr->selectedNestedModels.end(), topLevelVis) !=
           this->dataPtr->selectedNestedModels.end();
     }
@@ -2039,8 +2040,8 @@ void ModelCreator::ShowContextMenu(const std::string &_entity)
 
       if (this->dataPtr->jointMaker)
       {
-        std::vector<JointData *> joints = this->dataPtr->jointMaker->JointDataByLink(
-            _entity);
+        std::vector<JointData *> joints =
+            this->dataPtr->jointMaker->JointDataByLink(_entity);
 
         if (!joints.empty())
         {
@@ -2230,8 +2231,11 @@ void ModelCreator::OnCopy()
   if (!g_editModelAct->isChecked())
     return;
 
-  if (this->dataPtr->selectedLinks.empty()  && this->dataPtr->selectedNestedModels.empty())
+  if (this->dataPtr->selectedLinks.empty() &&
+      this->dataPtr->selectedNestedModels.empty())
+  {
     return;
+  }
 
   this->dataPtr->copiedNames.clear();
 
@@ -2560,7 +2564,8 @@ void ModelCreator::DeselectAllNestedModels()
   {
     rendering::VisualPtr vis = this->dataPtr->selectedNestedModels[0];
     vis->SetHighlighted(false);
-    this->dataPtr->selectedNestedModels.erase(this->dataPtr->selectedNestedModels.begin());
+    this->dataPtr->selectedNestedModels.erase(
+        this->dataPtr->selectedNestedModels.begin());
     model::Events::setSelectedLink(vis->GetName(), false);
   }
   this->dataPtr->selectedNestedModels.clear();
@@ -2604,11 +2609,13 @@ void ModelCreator::SetSelected(const rendering::VisualPtr &_entityVis,
   _entityVis->SetHighlighted(_selected);
 
   auto itLink = this->dataPtr->allLinks.find(_entityVis->GetName());
-  auto itNestedModel = this->dataPtr->allNestedModels.find(_entityVis->GetName());
+  auto itNestedModel =
+      this->dataPtr->allNestedModels.find(_entityVis->GetName());
 
   auto itLinkSelected = std::find(this->dataPtr->selectedLinks.begin(),
       this->dataPtr->selectedLinks.end(), _entityVis);
-  auto itNestedModelSelected = std::find(this->dataPtr->selectedNestedModels.begin(),
+  auto itNestedModelSelected = std::find(
+      this->dataPtr->selectedNestedModels.begin(),
       this->dataPtr->selectedNestedModels.end(), _entityVis);
 
   if (_selected)
@@ -2676,7 +2683,8 @@ void ModelCreator::OnManipMode(const std::string &_mode)
   else if (!this->dataPtr->selectedNestedModels.empty())
   {
     rendering::VisualPtr nestedModel =
-        this->dataPtr->selectedNestedModels[this->dataPtr->selectedNestedModels.size()-1];
+        this->dataPtr->selectedNestedModels[
+        this->dataPtr->selectedNestedModels.size()-1];
     this->DeselectAll();
     this->SetSelected(nestedModel, true);
   }
