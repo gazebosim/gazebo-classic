@@ -1,0 +1,39 @@
+Gazebo Open World Example
+
+These are very simple examples of how to open a new world.
+
+===================
+Build Instructions
+===================
+
+ * From this directory:
+
+  $ mkdir build
+  $ cd build
+  $ cmake ..
+  $ make
+
+===================
+Execute Instructions
+===================
+
+New world
+---------
+
+ * Launch gzserver with an existing world
+ * From the build directory above:
+
+  $ ./pub_new_world
+
+ * On another terminal, open gzclient. You'll se an empty world.
+
+Open world
+---------
+
+ * Launch gzserver
+ * From the build directory above:
+
+  $ ./pub_open_world <full world path>
+
+ * On another terminal, open gzclient. You'll se the world you opened.
+

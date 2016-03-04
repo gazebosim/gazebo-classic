@@ -1506,7 +1506,7 @@ void World::RemovePlugin(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
-unsigned int World::PluginCount() const
+size_t World::PluginCount() const
 {
   return this->dataPtr->plugins.size();
 }

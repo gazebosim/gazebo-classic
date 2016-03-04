@@ -310,7 +310,7 @@ namespace gazebo
 
       /// \brief Get the number of world plugins.
       /// \return The number of world plugins in this world.
-      public: unsigned int PluginCount() const;
+      public: size_t PluginCount() const;
 
       /// \brief Get whether plugins have been loaded or not.
       /// \return True if plugins have been loaded.
