@@ -190,6 +190,7 @@ set (gtest_sources
   Model_TEST.cc
   ModelState_TEST.cc
   PhysicsEngine_TEST.cc
+  PhysicsIface_TEST.cc
   PresetManager_TEST.cc
   Road_TEST.cc
   SphereShape_TEST.cc

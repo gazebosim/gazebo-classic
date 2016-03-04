@@ -45,7 +45,6 @@ Gripper::Gripper(ModelPtr _model)
 {
   this->model = _model;
   this->world = this->model->GetWorld();
-  this->physics = this->world->GetPhysicsEngine();
 
   this->diffs.resize(10);
   this->diffIndex = 0;
@@ -69,7 +68,6 @@ Gripper::~Gripper()
   }
 
   this->model.reset();
-  this->physics.reset();
   this->world.reset();
   this->connections.clear();
 }
@@ -80,7 +78,8 @@ void Gripper::Load(sdf::ElementPtr _sdf)
   this->node->Init(this->world->GetName());
 
   this->name = _sdf->Get<std::string>("name");
-  this->fixedJoint = this->physics->CreateJoint("revolute", this->model);
+  this->fixedJoint =
+      this->world->GetPhysicsEngine()->CreateJoint("revolute", this->model);
 
   sdf::ElementPtr graspCheck = _sdf->GetElement("grasp_check");
   this->minContactCount = graspCheck->Get<unsigned int>("min_contact_count");

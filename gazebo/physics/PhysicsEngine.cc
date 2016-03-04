@@ -89,21 +89,38 @@ void PhysicsEngine::Load(sdf::ElementPtr _sdf)
 void PhysicsEngine::Fini()
 {
   this->world.reset();
-  this->node->Fini();
+
+  if (this->node)
+  {
+    this->responsePub.reset();
+    this->requestSub.reset();
+    this->node->Fini();
+    this->node.reset();
+  }
+
+  if (this->sdf)
+  {
+    this->sdf->Reset();
+    this->sdf.reset();
+  }
+
+  if (this->contactManager)
+  {
+    delete this->contactManager;
+    this->contactManager = NULL;
+  }
+
+  if (this->physicsUpdateMutex)
+  {
+    delete this->physicsUpdateMutex;
+    this->physicsUpdateMutex = NULL;
+  }
 }
 
 //////////////////////////////////////////////////
 PhysicsEngine::~PhysicsEngine()
 {
-  this->sdf->Reset();
-  this->sdf.reset();
-  delete this->physicsUpdateMutex;
-  this->physicsUpdateMutex = NULL;
-  this->responsePub.reset();
-  this->requestSub.reset();
-  this->node.reset();
-
-  delete this->contactManager;
+  this->Fini();
 }
 
 //////////////////////////////////////////////////

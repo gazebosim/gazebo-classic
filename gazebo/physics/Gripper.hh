@@ -85,9 +85,6 @@ namespace gazebo
       /// \brief Model that contains this gripper.
       private: physics::ModelPtr model;
 
-      /// \brief The physics engine.
-      private: physics::PhysicsEnginePtr physics;
-
       /// \brief Pointer to the world.
       private: physics::WorldPtr world;
 

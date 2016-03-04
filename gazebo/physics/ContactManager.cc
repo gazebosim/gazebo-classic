@@ -66,6 +66,7 @@ ContactManager::~ContactManager()
   this->customContactPublishers.clear();
   delete this->customMutex;
   this->customMutex = NULL;
+  this->world.reset();
 }
 
 /////////////////////////////////////////////////
