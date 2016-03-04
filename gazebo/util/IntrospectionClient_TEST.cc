@@ -173,11 +173,45 @@ TEST_F(IntrospectionClientTest, NewAndRemoveFilter)
 }
 
 /////////////////////////////////////////////////
-TEST_F(IntrospectionClientTest, NewFilterAsync)
+TEST_F(IntrospectionClientTest, RemoveAllFilters)
 {
-  std::string filterId;
+  std::string filterId1;
+  std::string filterId2;
   std::string topic;
 
+  // Let's create a filter for receiving updates on "item1" and "item2".
+  std::set<std::string> items = {"item1", "item2"};
+  EXPECT_TRUE(this->client.NewFilter(this->managerId, items, filterId1, topic));
+
+  // Subscribe to my custom topic for receiving updates.
+  this->Subscribe(topic);
+
+  // Let's create another filter for receiving updates on "item1" and "item2".
+  EXPECT_TRUE(this->client.NewFilter(this->managerId, items, filterId2, topic));
+
+  // Subscribe to my custom topic for receiving updates.
+  this->Subscribe(topic);
+
+  // Trigger an update.
+  this->manager->Update();
+
+  // Check that we received the update.
+  EXPECT_TRUE(this->callbackExecuted);
+  this->callbackExecuted = false;
+
+  // Remove all filters.
+  EXPECT_TRUE(this->client.RemoveAllFilters());
+
+  // Trigger an update to verify that we don't receive any updates.
+  this->manager->Update();
+
+  // Check that we didn't receive any updates, we shouldn't have filters.
+  EXPECT_FALSE(this->callbackExecuted);
+}
+
+/////////////////////////////////////////////////
+TEST_F(IntrospectionClientTest, NewFilterAsync)
+{
   bool executed = false;
   auto cb = [&](const std::string &/*_filterId*/,
                const std::string &/*_newTopic*/,
@@ -189,7 +223,7 @@ TEST_F(IntrospectionClientTest, NewFilterAsync)
 
   // Try to create an empty filter.
   std::set<std::string> emptySet;
-  EXPECT_TRUE(this->client.NewFilterAsync(this->managerId, emptySet, cb));
+  EXPECT_TRUE(this->client.NewFilter(this->managerId, emptySet, cb));
   std::this_thread::sleep_for(std::chrono::milliseconds(300));
   EXPECT_TRUE(executed);
 
@@ -206,7 +240,7 @@ TEST_F(IntrospectionClientTest, NewFilterAsync)
 
   // Let's create a filter for receiving updates on "item1" and "item2".
   std::set<std::string> items = {"item1", "item2"};
-  EXPECT_TRUE(this->client.NewFilterAsync(this->managerId, items, cb2));
+  EXPECT_TRUE(this->client.NewFilter(this->managerId, items, cb2));
   std::this_thread::sleep_for(std::chrono::milliseconds(300));
 
   // Trigger an update.
@@ -250,7 +284,6 @@ TEST_F(IntrospectionClientTest, UpdateFilter)
 TEST_F(IntrospectionClientTest, UpdateFilterAsync)
 {
   std::string filterId;
-  std::string topic;
   bool executed = false;
 
   auto cbNew = [&](const std::string &_filterId,
@@ -269,9 +302,10 @@ TEST_F(IntrospectionClientTest, UpdateFilterAsync)
   // Let's create a filter.
   std::set<std::string> items = {"item1", "item3"};
 
-  EXPECT_TRUE(this->client.NewFilterAsync(this->managerId, items, cbNew));
+  EXPECT_TRUE(this->client.NewFilter(this->managerId, items, cbNew));
   std::this_thread::sleep_for(std::chrono::milliseconds(300));
   EXPECT_TRUE(executed);
+  executed = false;
 
   auto cbUpdateWrong = [&](const bool _result)
   {
@@ -280,14 +314,12 @@ TEST_F(IntrospectionClientTest, UpdateFilterAsync)
   };
 
   // Try to update a filter with an incorrect manager ID.
-  EXPECT_TRUE(this->client.UpdateFilterAsync("_wrong_id_", filterId, items,
+  EXPECT_FALSE(this->client.UpdateFilter("_wrong_id_", filterId, items,
     cbUpdateWrong));
-  std::this_thread::sleep_for(std::chrono::milliseconds(300));
-  EXPECT_TRUE(executed);
   executed = false;
 
   // Try to update a filter wih an incorrect filter ID.
-  EXPECT_TRUE(this->client.UpdateFilterAsync(this->managerId, "_wrong_id_",
+  EXPECT_TRUE(this->client.UpdateFilter(this->managerId, "_wrong_id_",
     items, cbUpdateWrong));
   std::this_thread::sleep_for(std::chrono::milliseconds(300));
   EXPECT_TRUE(executed);
@@ -301,7 +333,7 @@ TEST_F(IntrospectionClientTest, UpdateFilterAsync)
 
   // Update the filter. We're interested on "item1" and "item2".
   items = {"item1", "item2"};
-  EXPECT_TRUE(this->client.UpdateFilterAsync(this->managerId, filterId, items,
+  EXPECT_TRUE(this->client.UpdateFilter(this->managerId, filterId, items,
     cbUpdate));
   std::this_thread::sleep_for(std::chrono::milliseconds(300));
 
@@ -309,7 +341,7 @@ TEST_F(IntrospectionClientTest, UpdateFilterAsync)
   this->manager->Update();
 
   EXPECT_TRUE(executed);
-  executed = false;
+
   // Check that we received the update.
   EXPECT_TRUE(this->callbackExecuted);
 }
@@ -318,7 +350,6 @@ TEST_F(IntrospectionClientTest, UpdateFilterAsync)
 TEST_F(IntrospectionClientTest, RemoveFilterAsync)
 {
   std::string filterId;
-  std::string topic;
   bool executed = false;
 
   auto cbNew = [&](const std::string &_filterId,
@@ -337,7 +368,7 @@ TEST_F(IntrospectionClientTest, RemoveFilterAsync)
   // Let's create a filter.
   std::set<std::string> items = {"item1", "item3"};
 
-  EXPECT_TRUE(this->client.NewFilterAsync(this->managerId, items, cbNew));
+  EXPECT_TRUE(this->client.NewFilter(this->managerId, items, cbNew));
   std::this_thread::sleep_for(std::chrono::milliseconds(300));
   EXPECT_TRUE(executed);
   executed = false;
@@ -348,8 +379,12 @@ TEST_F(IntrospectionClientTest, RemoveFilterAsync)
     EXPECT_FALSE(_result);
   };
 
+  // Try to remove a filter with an incorrect manager ID.
+  EXPECT_FALSE(this->client.RemoveFilter("_wrong_id_", filterId, cbRemoveBad));
+  executed = false;
+
   // Try to remove a filter with the wrong filter ID.
-  EXPECT_TRUE(this->client.RemoveFilterAsync(this->managerId, "_wrong_id_",
+  EXPECT_TRUE(this->client.RemoveFilter(this->managerId, "_wrong_id_",
     cbRemoveBad));
   std::this_thread::sleep_for(std::chrono::milliseconds(300));
   EXPECT_TRUE(executed);
@@ -362,11 +397,10 @@ TEST_F(IntrospectionClientTest, RemoveFilterAsync)
   };
 
   // Remove an existing filter.
-  EXPECT_TRUE(this->client.RemoveFilterAsync(this->managerId, filterId,
+  EXPECT_TRUE(this->client.RemoveFilter(this->managerId, filterId,
     cbRemove));
   std::this_thread::sleep_for(std::chrono::milliseconds(300));
   EXPECT_TRUE(executed);
-  executed = false;
 
   // Trigger an update to verify that we don't receive any updates.
   this->manager->Update();
@@ -417,10 +451,9 @@ TEST_F(IntrospectionClientTest, ItemsAsync)
   };
 
   // Let's query the list of items available.
-  EXPECT_TRUE(this->client.ItemsAsync(this->managerId, cbItems));
+  EXPECT_TRUE(this->client.Items(this->managerId, cbItems));
   std::this_thread::sleep_for(std::chrono::milliseconds(300));
   EXPECT_TRUE(executed);
-  executed = false;
 
   EXPECT_TRUE(this->client.IsRegistered(this->managerId, "item1"));
   EXPECT_TRUE(this->client.IsRegistered(this->managerId,

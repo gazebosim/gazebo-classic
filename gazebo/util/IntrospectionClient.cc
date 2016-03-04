@@ -20,8 +20,12 @@
   #include <Winsock2.h>
 #endif
 
+#include <chrono>
+#include <functional>
+#include <mutex>
 #include <set>
 #include <string>
+#include <vector>
 #include "gazebo/common/Console.hh"
 #include "gazebo/msgs/any.pb.h"
 #include "gazebo/msgs/empty.pb.h"
@@ -127,13 +131,16 @@ bool IntrospectionClient::NewFilter(const std::string &_managerId,
   _filterId = rep.data();
   _newTopic = "/introspection/" + _managerId + "/filter/" + _filterId;
 
-  // Save the new filter ID.
-  this->dataPtr->filters[_filterId] = _managerId;
+  {
+    // Save the new filter ID.
+    std::lock_guard<std::mutex> lk(this->dataPtr->mutex);
+    this->dataPtr->filters[_filterId] = _managerId;
+  }
   return true;
 }
 
 //////////////////////////////////////////////////
-bool IntrospectionClient::NewFilterAsync(const std::string &_managerId,
+bool IntrospectionClient::NewFilter(const std::string &_managerId,
     const std::set<std::string> &_newItems,
     const std::function<void(const std::string &_filterId,
                              const std::string &_newTopic,
@@ -150,8 +157,11 @@ bool IntrospectionClient::NewFilterAsync(const std::string &_managerId,
       filterId = _rep.data();
       newTopic = "/introspection/" + _managerId + "/filter/" + filterId;
 
-      // Save the new filter ID.
-      this->dataPtr->filters[filterId] = _managerId;
+      {
+        // Save the new filter ID.
+        std::lock_guard<std::mutex> lk(this->dataPtr->mutex);
+        this->dataPtr->filters[filterId] = _managerId;
+      }
     }
     _cb(filterId, newTopic, _result);
   };
@@ -215,10 +225,25 @@ bool IntrospectionClient::UpdateFilter(const std::string &_managerId,
 }
 
 //////////////////////////////////////////////////
-bool IntrospectionClient::UpdateFilterAsync(const std::string &_managerId,
+bool IntrospectionClient::UpdateFilter(const std::string &_managerId,
     const std::string &_filterId, const std::set<std::string> &_newItems,
     const std::function<void(const bool _result)> &_cb) const
 {
+  {
+    std::lock_guard<std::mutex> lk(this->dataPtr->mutex);
+    auto it = std::find_if(this->dataPtr->filters.begin(),
+      this->dataPtr->filters.end(),
+      [&_managerId](const std::pair<std::string, std::string>& v)
+      {
+        return _managerId == v.second;
+      });
+
+
+    // We should have the managerId registered, otherwise something is wrong.
+    if (it == this->dataPtr->filters.end())
+      return false;
+  }
+
   std::function<void(const gazebo::msgs::Empty&, const bool)> f =
     [=](const gazebo::msgs::Empty &/*_rep*/, const bool _result)
   {
@@ -255,14 +280,15 @@ bool IntrospectionClient::UpdateFilterAsync(const std::string &_managerId,
 }
 
 //////////////////////////////////////////////////
-void IntrospectionClient::RemoveAllFilters() const
+bool IntrospectionClient::RemoveAllFilters() const
 {
-  auto f = [](const bool /*_result*/)
-  {
-  };
+  bool result = true;
 
-  for (auto &filter : this->dataPtr->filters)
-    this->RemoveFilterAsync(filter.second, filter.first, f);
+  // Remove all the filters from the manager.
+  for (auto const &filter : this->dataPtr->filters)
+    result = result && this->RemoveFilter(filter.second, filter.first);
+
+  return result;
 }
 
 //////////////////////////////////////////////////
@@ -291,24 +317,45 @@ bool IntrospectionClient::RemoveFilter(const std::string &_managerId,
   if (!result)
     return false;
 
-  // Remove this filter from our internal list.
-  this->dataPtr->filters.erase(_filterId);
+  {
+    // Remove this filter from our internal list.
+    std::lock_guard<std::mutex> lk(this->dataPtr->mutex);
+    this->dataPtr->filters.erase(_filterId);
+  }
+
   return true;
 }
 
 //////////////////////////////////////////////////
-bool IntrospectionClient::RemoveFilterAsync(const std::string &_managerId,
+bool IntrospectionClient::RemoveFilter(const std::string &_managerId,
     const std::string &_filterId,
     const std::function<void(const bool _result)> &_cb) const
 {
+  {
+    std::lock_guard<std::mutex> lk(this->dataPtr->mutex);
+    auto it = std::find_if(this->dataPtr->filters.begin(),
+      this->dataPtr->filters.end(),
+      [&_managerId](const std::pair<std::string, std::string>& v)
+      {
+        return _managerId == v.second;
+      });
+
+    // We should have the managerId registered, otherwise something is wrong.
+    if (it == this->dataPtr->filters.end())
+      return false;
+  }
+
   std::function<void(const gazebo::msgs::Empty&, const bool)> f =
     [this, _filterId, &_cb](const gazebo::msgs::Empty &/*_rep*/,
                             const bool _result)
   {
     if (_result)
     {
-      // Remove this filter from our internal list.
-      this->dataPtr->filters.erase(_filterId);
+      {
+        // Remove this filter from our internal list.
+        std::lock_guard<std::mutex> lk(this->dataPtr->mutex);
+        this->dataPtr->filters.erase(_filterId);
+      }
     }
 
     _cb(_result);
@@ -360,9 +407,9 @@ bool IntrospectionClient::Items(const std::string &_managerId,
 }
 
 //////////////////////////////////////////////////
-bool IntrospectionClient::ItemsAsync(const std::string &_managerId,
-                   const std::function<void(const std::set<std::string> &_items,
-                                            const bool _result)> &_cb) const
+bool IntrospectionClient::Items(const std::string &_managerId,
+    const std::function<void(const std::set<std::string> &_items,
+                             const bool _result)> &_cb) const
 {
   std::function<void(const gazebo::msgs::Param_V&, const bool)> f =
     [=](const gazebo::msgs::Param_V &_rep, const bool _result)
