@@ -21,11 +21,15 @@
 #include <memory>
 #include <string>
 
+#include "gazebo/transport/transport.hh"
+
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/gui/plot/PlottingTypes.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
+
+
 
 namespace gazebo
 {
@@ -50,16 +54,28 @@ namespace gazebo
       /// \param[in] _data Message data containing world control commands
       public: void OnWorldControl(ConstWorldControlPtr &_data);
 
-      /// \brief Add a curve to the manager. Data received from the named topic
-      /// will be added to the curve
-      /// \param[in] _name Name of topic
+      /// \brief Add an introspection curve to the manager. Data received from
+      /// the introspection client will be added to the curve
+      /// \param[in] _name Name of variable
       /// \param[in] _curve Curve that will be populated with data.
-      public: void AddCurve(const std::string &_name,
+      public: void AddIntrospectionCurve(const std::string &_name,
           PlotCurveWeakPtr _curve);
 
-      /// \brief Remove a curve from the manager
+      /// \brief Remove an introspection curve from the manager
       /// \param[in] _curve Curve to remove.
-      public: void RemoveCurve(PlotCurveWeakPtr _curve);
+      public: void RemoveIntrospectionCurve(PlotCurveWeakPtr _curve);
+
+      /// \brief Add a topic curve to the manager. Data received from the named
+      /// topic will be added to the curve
+      /// \param[in] _uri URI containing the topic path and param query
+      /// \param[in] _curve Curve that will be populated with data.
+      public: void AddTopicCurve(const std::string &_topic,
+                  PlotCurveWeakPtr _curve);
+
+      /// \brief Remove a topic curve from the manager.
+      /// \param[in] _topic Name of topic
+      /// \param[in] _curve Curve that will be populated with data.
+      public: void RemoveTopicCurve(PlotCurveWeakPtr _curve);
 
       /// \brief Add a plot window to the manager. The manager will listen to
       /// world events, e.g. Reset, and update the window's plots accordingly
@@ -70,18 +86,10 @@ namespace gazebo
       /// \param[in] _window Plot window to remove.
       public: void RemoveWindow(PlotWindow *_window);
 
-      /// TODO remove me
-      /// \brief Callback when a world control message is received. It is used
-      /// to detect simulation resets.
-      /// \param[in] _data Message data containing world stats msgs
-      public: void OnWorldStats(ConstWorldStatisticsPtr &_data);
+      /// \brief
+      /// \param[in] _msg Topic message data.
+      public: void OnTopicData(const std::string &_msg);
 
-      /// \brief Set up introspection client
-      public: void SetupIntrospection();
-
-      /// \brief Function called each time a topic update is received.
-      /// \param[in] _msg Introspection message filled with param data
-      public: void OnIntrospection(const gazebo::msgs::Param_V &_msg);
 
       /// \brief This is a singleton class.
       private: friend class SingletonT<PlotManager>;

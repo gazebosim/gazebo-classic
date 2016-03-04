@@ -103,7 +103,7 @@ bool IntrospectionManager::Register(const std::string &_item,
   if (this->dataPtr->allItems.find(_item) != this->dataPtr->allItems.end())
   {
     gzwarn << "Item [" << _item << "] already registered" << std::endl;
-    return false;
+//    return false;
   }
 
   this->dataPtr->allItems[_item] = _cb;
