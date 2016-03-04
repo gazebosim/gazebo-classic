@@ -335,9 +335,6 @@ namespace gazebo
       /// \brief The initial pose of the entity.
       private: math::Pose initialRelativePose;
 
-      /// \brief Pose publisher.
-      private: transport::PublisherPtr posePub;
-
       /// \brief Pose subscriber.
       private: transport::SubscriberPtr poseSub;
 

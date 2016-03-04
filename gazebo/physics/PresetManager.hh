@@ -112,6 +112,8 @@ namespace gazebo
       /// \brief Destructor
       public: ~PresetManager();
 
+      public: void Fini();
+
       /// \brief Set the current profile.
       /// \param[in] _name The name of the new current profile.
       /// \return True if the profile switch was successful.

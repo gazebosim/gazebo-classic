@@ -39,6 +39,7 @@ using namespace physics;
 /////////////////////////////////////////////////
 ContactManager::ContactManager()
 {
+gzwarn << "ContactManager CONSTRUCT" << std::endl;
   this->contactIndex = 0;
   this->customMutex = new boost::recursive_mutex();
 }
@@ -46,9 +47,20 @@ ContactManager::ContactManager()
 /////////////////////////////////////////////////
 ContactManager::~ContactManager()
 {
+gzwarn << "~ContactManager DESTRUCT" << std::endl;
+  this->Fini();
+}
+
+/////////////////////////////////////////////////
+void ContactManager::Fini()
+{
   this->Clear();
-  this->node.reset();
-  this->contactPub.reset();
+
+  // Clean transport
+  {
+    this->contactPub.reset();
+    this->node.reset();
+  }
 
   boost::unordered_map<std::string, ContactPublisher *>::iterator iter;
   for (iter = this->customContactPublishers.begin();
@@ -66,6 +78,8 @@ ContactManager::~ContactManager()
   this->customContactPublishers.clear();
   delete this->customMutex;
   this->customMutex = NULL;
+
+  this->world.reset();
 }
 
 /////////////////////////////////////////////////

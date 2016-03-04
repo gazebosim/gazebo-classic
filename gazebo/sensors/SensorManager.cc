@@ -57,18 +57,7 @@ SensorManager::SensorManager()
 //////////////////////////////////////////////////
 SensorManager::~SensorManager()
 {
-  // Clean up the sensors.
-  for (SensorContainer_V::iterator iter = this->sensorContainers.begin();
-       iter != this->sensorContainers.end(); ++iter)
-  {
-    GZ_ASSERT((*iter) != NULL, "Sensor Constainer is NULL");
-    (*iter)->Stop();
-    (*iter)->RemoveSensors();
-    delete (*iter);
-  }
-  this->sensorContainers.clear();
-
-  this->initSensors.clear();
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -232,6 +221,19 @@ void SensorManager::Fini()
 {
   boost::recursive_mutex::scoped_lock lock(this->mutex);
 
+  // Clean up the sensors.
+  for (SensorContainer_V::iterator iter = this->sensorContainers.begin();
+       iter != this->sensorContainers.end(); ++iter)
+  {
+    GZ_ASSERT((*iter) != NULL, "Sensor Constainer is NULL");
+    (*iter)->Stop();
+    (*iter)->RemoveSensors();
+    delete (*iter);
+  }
+  this->sensorContainers.clear();
+
+  this->initSensors.clear();
+
   // Finalize all the sensor containers.
   for (SensorContainer_V::iterator iter = this->sensorContainers.begin();
        iter != this->sensorContainers.end(); ++iter)
@@ -243,6 +245,12 @@ void SensorManager::Fini()
 
   this->removeSensors.clear();
   this->initSensors.clear();
+
+  for (auto world : this->worlds)
+  {
+    gzwarn << "SensorManager::Fini worldptr: " << world.second.use_count() << std::endl;
+    world.second.reset();
+  }
   this->worlds.clear();
 
   delete this->simTimeEventHandler;

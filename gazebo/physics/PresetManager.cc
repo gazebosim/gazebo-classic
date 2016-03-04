@@ -197,6 +197,7 @@ PresetManager::PresetManager(PhysicsEnginePtr _physicsEngine,
     const sdf::ElementPtr _sdf)
     : dataPtr(new PresetManagerPrivate)
 {
+gzwarn << "PresetManager CONSTRUCT" << std::endl;
   GZ_ASSERT(this->dataPtr != NULL, "Data pointer NULL for PresetManager!");
 
   this->dataPtr->physicsEngine = _physicsEngine;
@@ -245,9 +246,18 @@ PresetManager::PresetManager(PhysicsEnginePtr _physicsEngine,
 //////////////////////////////////////////////////
 PresetManager::~PresetManager()
 {
-  this->dataPtr->presetProfiles.clear();
+gzwarn << "PresetManager DESTRUCT" << std::endl;
+  this->Fini();
+
   delete this->dataPtr;
   this->dataPtr = NULL;
+}
+
+//////////////////////////////////////////////////
+void PresetManager::Fini()
+{
+  this->dataPtr->physicsEngine.reset();
+  this->dataPtr->presetProfiles.clear();
 }
 
 //////////////////////////////////////////////////

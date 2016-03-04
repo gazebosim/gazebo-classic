@@ -61,6 +61,12 @@ Gripper::Gripper(ModelPtr _model)
 /////////////////////////////////////////////////
 Gripper::~Gripper()
 {
+  this->Fini();
+}
+
+/////////////////////////////////////////////////
+void Gripper::Fini()
+{
   if (this->world && this->world->GetRunning())
   {
     physics::ContactManager *mgr =
@@ -72,6 +78,13 @@ Gripper::~Gripper()
   this->physics.reset();
   this->world.reset();
   this->connections.clear();
+
+  // Clean transport
+  {
+    this->contactSub.reset();
+
+    this->node.reset();
+  }
 }
 
 /////////////////////////////////////////////////

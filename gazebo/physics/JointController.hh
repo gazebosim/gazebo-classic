@@ -49,6 +49,8 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~JointController();
 
+      public: virtual void Fini();
+
       /// \brief Add a joint to control.
       /// \param[in] _joint Joint to control.
       public: void AddJoint(JointPtr _joint);

@@ -160,25 +160,8 @@ World::World(const std::string &_name)
 //////////////////////////////////////////////////
 World::~World()
 {
-  this->dataPtr->presetManager.reset();
-  this->dataPtr->userCmdManager.reset();
-  delete this->dataPtr->receiveMutex;
-  this->dataPtr->receiveMutex = NULL;
-  delete this->dataPtr->loadModelMutex;
-  this->dataPtr->loadModelMutex = NULL;
-  delete this->dataPtr->setWorldPoseMutex;
-  this->dataPtr->setWorldPoseMutex = NULL;
-  delete this->dataPtr->worldUpdateMutex;
-  this->dataPtr->worldUpdateMutex = NULL;
-
-  this->dataPtr->connections.clear();
+gzwarn << "World DESTRUCT" << std::endl;
   this->Fini();
-
-  this->dataPtr->sdf->Reset();
-  this->dataPtr->rootElement.reset();
-  this->dataPtr->node.reset();
-
-  this->dataPtr->testRay.reset();
 
   delete this->dataPtr;
   this->dataPtr = NULL;
@@ -812,14 +795,68 @@ void World::Update()
 //////////////////////////////////////////////////
 void World::Fini()
 {
+gzwarn << "World::Fini" << std::endl;
   this->Stop();
+
+  delete this->dataPtr->receiveMutex;
+  this->dataPtr->receiveMutex = NULL;
+
+  delete this->dataPtr->loadModelMutex;
+  this->dataPtr->loadModelMutex = NULL;
+
+  delete this->dataPtr->setWorldPoseMutex;
+  this->dataPtr->setWorldPoseMutex = NULL;
+
+  delete this->dataPtr->worldUpdateMutex;
+  this->dataPtr->worldUpdateMutex = NULL;
+
+  this->dataPtr->connections.clear();
+
+  this->dataPtr->sdf->Reset();
+  this->dataPtr->rootElement.reset();
+  this->dataPtr->node.reset();
+
+  this->dataPtr->testRay.reset();
   this->dataPtr->plugins.clear();
 
   this->dataPtr->publishModelPoses.clear();
   this->dataPtr->publishModelScales.clear();
   this->dataPtr->publishLightPoses.clear();
 
-  this->dataPtr->node->Fini();
+  // Clean transport
+  {
+    this->dataPtr->poseLocalPub.reset();
+    this->dataPtr->posePub.reset();
+    this->dataPtr->guiPub.reset();
+    this->dataPtr->factorySub.reset();
+    this->dataPtr->controlSub.reset();
+    this->dataPtr->playbackControlSub.reset();
+    this->dataPtr->requestSub.reset();
+    this->dataPtr->jointSub.reset();
+    this->dataPtr->lightSub.reset();
+    this->dataPtr->lightFactorySub.reset();
+    this->dataPtr->lightModifySub.reset();
+    this->dataPtr->modelSub.reset();
+    this->dataPtr->responsePub.reset();
+    this->dataPtr->statPub.reset();
+    this->dataPtr->modelPub.reset();
+    this->dataPtr->lightPub.reset();
+    this->dataPtr->node.reset();
+  }
+
+  // Clean entities
+  for (auto &model : this->dataPtr->models)
+  {
+    gzmsg << "World fini, fini model: " << model->GetName() << std::endl;
+    model->Fini();
+  }
+  this->dataPtr->models.clear();
+
+  for (auto &light : this->dataPtr->lights)
+  {
+    light->Fini();
+  }
+  this->dataPtr->lights.clear();
 
   this->dataPtr->deleteEntity.clear();
   this->dataPtr->requestMsgs.clear();
@@ -834,14 +871,19 @@ void World::Fini()
     this->dataPtr->rootElement.reset();
   }
 
-  if (this->dataPtr->physicsEngine)
+  if (this->dataPtr->presetManager)
   {
-    this->dataPtr->physicsEngine->Fini();
-    this->dataPtr->physicsEngine.reset();
+    this->dataPtr->presetManager->Fini();
+    this->dataPtr->presetManager.reset();
+  }
+  if (this->dataPtr->userCmdManager)
+  {
+    this->dataPtr->userCmdManager->Fini();
+    this->dataPtr->userCmdManager.reset();
   }
 
-  this->dataPtr->models.clear();
-  this->dataPtr->lights.clear();
+  this->dataPtr->physicsEngine.reset();
+
   this->dataPtr->prevStates[0].SetWorld(WorldPtr());
   this->dataPtr->prevStates[1].SetWorld(WorldPtr());
 

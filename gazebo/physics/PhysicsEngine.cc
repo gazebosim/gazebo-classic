@@ -88,22 +88,31 @@ void PhysicsEngine::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void PhysicsEngine::Fini()
 {
+gzwarn << "PhysicsEngine::Fini  worldPtrCout: " <<  this->world.use_count() << std::endl;
   this->world.reset();
   this->node->Fini();
+
+  this->sdf->Reset();
+  this->sdf.reset();
+  delete this->physicsUpdateMutex;
+  this->physicsUpdateMutex = NULL;
+
+  // Clean transport
+  {
+    this->responsePub.reset();
+    this->physicsSub.reset();
+    this->requestSub.reset();
+    this->node.reset();
+  }
+
+  delete this->contactManager;
 }
 
 //////////////////////////////////////////////////
 PhysicsEngine::~PhysicsEngine()
 {
-  this->sdf->Reset();
-  this->sdf.reset();
-  delete this->physicsUpdateMutex;
-  this->physicsUpdateMutex = NULL;
-  this->responsePub.reset();
-  this->requestSub.reset();
-  this->node.reset();
-
-  delete this->contactManager;
+gzwarn << "PhysicsEngine DESTRUCT" << std::endl;
+  this->Fini();
 }
 
 //////////////////////////////////////////////////

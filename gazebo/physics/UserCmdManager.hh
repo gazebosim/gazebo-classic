@@ -48,6 +48,9 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~UserCmd();
 
+      /// \brief Finish this command.
+      public: virtual void Fini();
+
       /// \brief Undo this command.
       public: virtual void Undo();
 
@@ -82,6 +85,9 @@ namespace gazebo
 
       /// \brief Destructor.
       public: virtual ~UserCmdManager();
+
+      /// \brief Finish this command.
+      public: virtual void Fini();
 
       /// \brief Callback when a UserCmd message is received, notifying that
       /// a new command has been executed by a user.

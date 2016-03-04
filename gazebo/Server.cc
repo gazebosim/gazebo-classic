@@ -765,26 +765,73 @@ bool Server::OpenWorld(const std::string &_filename)
     return false;
   }
 
+  auto oldWorldPtr = physics::get_world("default");
+  auto oldPhysicsEnginePtr = oldWorldPtr->GetPhysicsEngine();
+  gzdbg << "OLD PTR COUNT: " << oldWorldPtr.use_count() << "   ENGINE: " <<
+      oldPhysicsEnginePtr.use_count() << std::endl;
+
   // Stop and remove current worlds
   physics::remove_worlds();
-
-  // Sleep for a long time to make sure all the messages were properly sent back
-  // and forth. For example, to unadvertise a topic, it goes
-  // transport::ConnectionManager -> Master -> transport::ConnectionManager
   common::Time::MSleep(1000);
+  gzdbg << "OLD PTR COUNT: " << oldWorldPtr.use_count() << "   ENGINE: " <<
+      oldPhysicsEnginePtr.use_count() << std::endl;
 
   // Keep sensor manager but make sure it is clear.
   // (All sensors should be removed when the links containing them are removed,
   // but we do this here just to make sure.)
   sensors::remove_sensors();
   sensors::run_once(true);
+gzdbg << "removed sensors" << std::endl;
+  gzdbg << "OLD PTR COUNT: " << oldWorldPtr.use_count() << "   ENGINE: " <<
+      oldPhysicsEnginePtr.use_count() << std::endl;
 
   // Keep transport system but clear all previous messages
   gazebo::transport::clear_buffers();
+gzdbg << "cleared buffers" << std::endl;
+  gzdbg << "OLD PTR COUNT: " << oldWorldPtr.use_count() << "   ENGINE: " <<
+      oldPhysicsEnginePtr.use_count() << std::endl;
 
   // Sleep for a long time to make sure sensors and transport are clear.
   common::Time::MSleep(1000);
+  gzdbg << "OLD PTR COUNT: " << oldWorldPtr.use_count() << "   ENGINE: " <<
+      oldPhysicsEnginePtr.use_count() << std::endl;
+//gzdbg << "waited another second" << sleep << std::endl;
+/*
+  // Sleep for a long time to make sure all the messages were properly sent back
+  // and forth. For example, to unadvertise a topic, it goes
+  // transport::ConnectionManager -> Master -> transport::ConnectionManager
+  bool oldTopicsAvailable = true;
+  int maxSleep = 30;
+  int sleep = 0;
+  while (oldTopicsAvailable && sleep < maxSleep)
+  {
+gzdbg << "SLEEP: " << sleep << std::endl;
+    oldTopicsAvailable = false;
+    auto msgTypes = transport::getAdvertisedTopics();
+    for (auto msgType : msgTypes)
+    {
+      if (oldTopicsAvailable)
+        break;
 
+      for (auto topic : msgType.second)
+      {
+gzdbg << "topic: " << topic << std::endl;
+        if (topic.find("/gazebo/default") != std::string::npos)
+        {
+          oldTopicsAvailable = true;
+          break;
+        }
+      }
+    }
+    common::Time::MSleep(100);
+    sleep++;
+  }
+  if (oldTopicsAvailable || sleep == maxSleep)
+  {
+    gzerr << "Couldn't remove old topics. Problems might occur with new world."
+        << std::endl;
+  }
+*/
   // TODO: Notify clients that world has been removed
 /*
   msgs::WorldModify worldMsg;

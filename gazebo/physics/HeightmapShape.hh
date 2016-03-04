@@ -60,6 +60,7 @@ namespace gazebo
 
       /// \brief Initialize the heightmap.
       public: virtual void Init();
+      public: virtual void Fini();
 
       /// \brief Set the scale of the heightmap shape.
       /// \param[in] _scale Scale to set the heightmap shape to.

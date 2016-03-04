@@ -70,6 +70,8 @@ namespace gazebo
       /// \brief Destructor.
       public: virtual ~ContactManager();
 
+      public: void Fini();
+
       /// \brief Initialize the ContactManager. This is required in order to
       /// publish contact messages via the ContactManager::PublishContacts
       /// method.

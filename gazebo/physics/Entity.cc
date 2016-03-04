@@ -87,16 +87,8 @@ Entity::Entity(BasePtr _parent)
 //////////////////////////////////////////////////
 Entity::~Entity()
 {
-  // TODO: put this back in
-  // this->GetWorld()->GetPhysicsEngine()->RemoveEntity(this);
-
-  delete this->visualMsg;
-  this->visualMsg = NULL;
-
-  this->visPub.reset();
-  this->requestPub.reset();
-  this->poseSub.reset();
-  this->node.reset();
+gzdbg << "Entity::DESTRUCTOR" << std::endl;
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -585,18 +577,37 @@ void Entity::OnPoseMsg(ConstPosePtr &_msg)
 //////////////////////////////////////////////////
 void Entity::Fini()
 {
+gzdbg << "Entity::Fini  " << this->GetName() << std::endl;
+  // TODO: put this back in
+  // this->GetWorld()->GetPhysicsEngine()->RemoveEntity(this);
+
+  delete this->visualMsg;
+  this->visualMsg = NULL;
+
   if (this->requestPub)
   {
+gzmsg << "request enity delete" << std::endl;
     msgs::Request *msg = msgs::CreateRequest("entity_delete",
         this->GetScopedName());
     this->requestPub->Publish(*msg, true);
   }
 
+  // Clean transport
+  {
+    this->visPub.reset();
+    this->requestPub.reset();
+
+    this->poseSub.reset();
+
+    this->node.reset();
+  }
+
   this->parentEntity.reset();
-  Base::Fini();
 
   this->connections.clear();
-  this->node->Fini();
+
+  Base::Fini();
+gzdbg << "/Entity::Fini  " << this->GetName() << std::endl;
 }
 
 //////////////////////////////////////////////////

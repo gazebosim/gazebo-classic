@@ -51,6 +51,7 @@ namespace gazebo
 
       /// \brief Initialize the road.
       public: virtual void Init();
+      public: virtual void Fini();
 
       /// \brief Get the point that define the road.
       /// \return The vector of points that define the road.

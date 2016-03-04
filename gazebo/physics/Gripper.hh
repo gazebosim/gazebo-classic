@@ -57,6 +57,7 @@ namespace gazebo
 
       /// \brief Initialize.
       public: virtual void Init();
+      public: virtual void Fini();
 
       /// \brief Return the name of the gripper.
       public: std::string GetName() const;

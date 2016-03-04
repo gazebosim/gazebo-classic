@@ -55,22 +55,8 @@ Base::Base(BasePtr _parent)
 //////////////////////////////////////////////////
 Base::~Base()
 {
-  // remove self as a child of the parent
-  if (this->parent)
-    this->parent->RemoveChild(this->id);
-
-  this->SetParent(BasePtr());
-
-  for (Base_V::iterator iter = this->children.begin();
-       iter != this->children.end(); ++iter)
-  {
-    if (*iter)
-      (*iter)->SetParent(BasePtr());
-  }
-  this->children.clear();
-  if (this->sdf)
-    this->sdf->Reset();
-  this->sdf.reset();
+gzdbg << "Base::DESTRUCTOR" << std::endl;
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -106,16 +92,29 @@ void Base::UpdateParameters(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Base::Fini()
 {
-  Base_V::iterator iter;
+gzdbg << "Base::Fini  " << this->GetName() << std::endl;
+  // remove self as a child of the parent
+  if (this->parent)
+    this->parent->RemoveChild(this->id, false);
 
-  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
+  this->SetParent(BasePtr());
+  if (this->sdf)
+    this->sdf->Reset();
+  this->sdf.reset();
+
+  for (auto iter = this->children.begin(); iter != this->children.end(); ++iter)
+  {
     if (*iter)
+    {
+std::cout << "Base::Fini fini loop: " << (*iter)->GetName() << std::endl;
       (*iter)->Fini();
-
+    }
+  }
   this->children.clear();
 
   this->world.reset();
   this->parent.reset();
+gzdbg << "/Base::Fini  " << this->GetName() << std::endl;
 }
 
 //////////////////////////////////////////////////
@@ -199,14 +198,15 @@ void Base::AddChild(BasePtr _child)
 }
 
 //////////////////////////////////////////////////
-void Base::RemoveChild(unsigned int _id)
+void Base::RemoveChild(unsigned int _id, const bool _alsoDelete)
 {
   Base_V::iterator iter;
   for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     if ((*iter)->GetId() == _id)
     {
-      (*iter)->Fini();
+      if (_alsoDelete)
+        (*iter)->Fini();
       this->children.erase(iter);
       break;
     }

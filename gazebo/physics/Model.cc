@@ -63,6 +63,8 @@ Model::Model(BasePtr _parent)
 //////////////////////////////////////////////////
 Model::~Model()
 {
+gzdbg << "Model::DESTRUCTOR" << std::endl;
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -407,14 +409,16 @@ boost::shared_ptr<Model> Model::shared_from_this()
 //////////////////////////////////////////////////
 void Model::Fini()
 {
-  Entity::Fini();
-
+gzdbg << "Model::Fini  " << this->GetName() << std::endl;
   this->plugins.clear();
   this->attachedModels.clear();
   this->joints.clear();
   this->links.clear();
   this->canonicalLink.reset();
   this->models.clear();
+
+  Entity::Fini();
+gzdbg << "/Model::Fini  " << this->GetName() << std::endl;
 }
 
 //////////////////////////////////////////////////
