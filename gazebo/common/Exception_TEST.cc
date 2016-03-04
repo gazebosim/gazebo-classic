@@ -78,11 +78,7 @@ TEST_F(Exception, GZASSERT_Enabled_ThrowAssertion)
 {
     ASSERT_DEATH(
       GZ_ASSERT(true == false, "Assert thrown"),
-#if defined(__APPLE__)
-      ".*Assertion failed.*");
-#else
-      ".*Internal Program Error - assertion.*");
-#endif
+      ".*Assertion.*failed.*|.*Internal Program Error - assertion.*");
 }
 #endif
 
