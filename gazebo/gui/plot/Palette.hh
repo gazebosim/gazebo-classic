@@ -34,6 +34,11 @@ namespace google
 
 namespace gazebo
 {
+  namespace common
+  {
+    class URI;
+  }
+
   namespace gui
   {
     // Forward declare private data class
@@ -56,6 +61,10 @@ namespace gazebo
       /// \param[in] _topicsModel Pointer to the model which will be filled.
       private: void FillTopics(QStandardItemModel *_topicsModel);
 
+      /// \brief Fill the models model.
+      /// \param[in] _modelsModel Pointer to the model which will be filled.
+      private: void FillModels(QStandardItemModel *_modelsModel);
+
       /// \brief Fill the sim model.
       /// \param[in] _simModel Pointer to the model which will be filled.
       private: void FillSim(QStandardItemModel *_simModel);
@@ -68,6 +77,41 @@ namespace gazebo
       private: void FillFromMsg(google::protobuf::Message *_msg,
                    QStandardItem *_item, const std::string &_uri);
 
+      /// \brief Insert a pose item under the given item.
+      /// \param[in] _item The parent item.
+      /// \param[in] _uri The URI of the original query.
+      /// \param[in] _query The part of the query relevant to this item.
+      private: void InsertPoseItem(QStandardItem *_item,
+          const common::URI &_uri, const std::string &_query);
+
+      /// \brief Insert a Vector3d item under the given item. Intermediate items
+      /// are inserted if necessary. For example, if the _query is for
+      /// "linear_velocity", the Vector3d elements will be inserted under
+      /// Velocity -> Linear.
+      /// \param[in] _item The parent item.
+      /// \param[in] _uri The URI of the original query.
+      /// \param[in] _query The part of the query relevant to this item.
+      private: void InsertVector3dItem(QStandardItem *_item,
+          const common::URI &_uri, const std::string &_query);
+
+      /// \brief Insert a Quaterniond item under the given item.
+      /// \param[in] _item The parent item.
+      /// \param[in] _uri The URI of the original query.
+      /// \param[in] _query The part of the query relevant to this item.
+      private: void InsertQuaterniondItem(QStandardItem *_item,
+          const common::URI &_uri, const std::string &_query);
+
+      /// \brief Callback when the user has modified the search.
+      /// \param[in] _search Latest search.
+      private slots: void UpdateSearch(const QString &_search);
+
+      /// \brief Expand items in the given tree view based on their model data.
+      /// \param[in] _model Search model.
+      /// \param[in] _tree Tree view.
+      /// \param[in] _srcParent Model index of the parent to be checked.
+      private: void ExpandChildren(QSortFilterProxyModel *_model,
+          QTreeView *_tree, const QModelIndex &_srcParent) const;
+
       /// \internal
       /// \brief Pointer to private data.
       private: std::unique_ptr<PalettePrivate> dataPtr;
@@ -75,5 +119,3 @@ namespace gazebo
   }
 }
 #endif
-
-
