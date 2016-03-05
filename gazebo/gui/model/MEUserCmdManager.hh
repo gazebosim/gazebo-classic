@@ -22,8 +22,6 @@
 #include <string>
 #include <sdf/sdf.hh>
 
-#include "gazebo/common/SingletonT.hh"
-
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/UserCmdHistory.hh"
 #include "gazebo/gui/model/ModelEditorTypes.hh"
@@ -95,8 +93,7 @@ namespace gazebo
 
     /// \brief Class which manages user commands in the model editor. It
     /// combines features of gui::UserCmdHistory and physics::UserCmdManager.
-    class GZ_GUI_VISIBLE MEUserCmdManager : public UserCmdHistory,
-        public SingletonT<MEUserCmdManager>
+    class GZ_GUI_VISIBLE MEUserCmdManager : public UserCmdHistory
     {
       Q_OBJECT
 
@@ -135,9 +132,6 @@ namespace gazebo
 
       /// \brief Updates the widgets according to the user commands available.
       private slots: virtual void OnStatsSlot();
-
-      /// \brief This is a singleton class.
-      private: friend class SingletonT<MEUserCmdManager>;
 
       /// \internal
       /// \brief Pointer to private data.

@@ -83,6 +83,7 @@ ModelCreator::ModelCreator()
   this->requestPub = this->node->Advertise<msgs::Request>("~/request");
 
   this->jointMaker = new JointMaker();
+  this->userCmdManager.reset(new MEUserCmdManager());
 
   connect(g_editModelAct, SIGNAL(toggled(bool)), this, SLOT(OnEdit(bool)));
 
@@ -277,8 +278,8 @@ void ModelCreator::OnEdit(bool _checked)
     this->DeselectAll();
   }
 
-  MEUserCmdManager::Instance()->Reset();
-  MEUserCmdManager::Instance()->SetActive(this->active);
+  this->userCmdManager->Reset();
+  this->userCmdManager->SetActive(this->active);
 }
 
 /////////////////////////////////////////////////
@@ -1403,7 +1404,7 @@ void ModelCreator::Reset()
   this->modelPose = ignition::math::Pose3d::Zero;
   this->previewVisual->SetPose(this->modelPose);
 
-  MEUserCmdManager::Instance()->Reset();
+  this->userCmdManager->Reset();
 }
 
 /////////////////////////////////////////////////
@@ -1571,7 +1572,7 @@ void ModelCreator::OnDelete(const std::string &_entity)
   if (link != this->allLinks.end())
   {
     // Register command
-    auto cmd = MEUserCmdManager::Instance()->NewCmd(
+    auto cmd = this->userCmdManager->NewCmd(
         "Delete [" + link->second->GetName() + "]", MEUserCmd::DELETING_LINK);
     cmd->SetSDF(link->second->linkSDF);
     cmd->SetScopedName(link->second->linkVisual->GetName());
@@ -1745,7 +1746,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
       link->SetPose((this->mouseVisual->GetWorldPose()-this->modelPose).Ign());
       gui::model::Events::linkInserted(this->mouseVisual->GetName());
 
-      auto cmd = MEUserCmdManager::Instance()->NewCmd(
+      auto cmd = this->userCmdManager->NewCmd(
           "Insert [" + link->GetName() + "]",
           MEUserCmd::INSERTING_LINK);
       cmd->SetSDF(link->linkSDF);

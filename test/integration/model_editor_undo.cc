@@ -43,13 +43,7 @@ void ModelEditorUndoTest::LinkInsertionByMouse()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw();
 
   // Get the user camera, scene and GLWidget
   auto cam = gazebo::gui::get_active_camera();
@@ -89,13 +83,7 @@ void ModelEditorUndoTest::LinkInsertionByMouse()
   QTest::mouseRelease(glWidget, Qt::LeftButton, 0,
       QPoint(-mainWindow->width()*0.5, -mainWindow->height()*0.5));
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw();
 
   // Check the cylinder button is not pressed anymore
   QVERIFY(!cylinderButton->isChecked());

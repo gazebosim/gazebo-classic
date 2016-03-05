@@ -23,6 +23,7 @@
 
 #include <list>
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 #include <mutex>
@@ -48,6 +49,7 @@ namespace gazebo
   {
     class NestedModelData;
     class LinkData;
+    class MEUserCmdManager;
     class ModelPluginData;
     class SaveDialog;
     class JointMaker;
@@ -526,6 +528,9 @@ namespace gazebo
 
       /// \brief Joint maker.
       private: JointMaker *jointMaker;
+
+      /// \brief User command manager.
+      private: std::unique_ptr<MEUserCmdManager> userCmdManager;
 
       /// \brief origin of the model.
       private: math::Pose origin;

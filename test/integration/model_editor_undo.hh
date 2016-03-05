@@ -20,8 +20,6 @@
 
 #include "gazebo/gui/QTestFixture.hh"
 
-// FIXME: Tests only pass if ran individually, issue #1861
-
 /// \brief A test class for undo / redo link insertion in the model editor.
 class ModelEditorUndoTest : public QTestFixture
 {

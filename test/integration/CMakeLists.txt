@@ -159,17 +159,11 @@ gz_build_dri_tests(${dri_tests})
 set(qt_tests
   insert_model.cc
   model_editor.cc
+  model_editor_undo.cc
   model_manipulation.cc
   undo.cc
   visual_pose.cc
 )
-
-if (ENABLE_SCREEN_TESTS)
-  set (qt_tests
-    ${qt_tests}
-    model_editor_undo.cc
-  )
-endif()
 
 gz_build_qt_tests(${qt_tests})
 
