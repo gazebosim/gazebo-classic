@@ -49,7 +49,7 @@ namespace gazebo
       public: transport::SubscriberPtr worldControlSub;
 
       /// \brief A map of topic names to topic data handers.
-      //public: std::map<std::string, TopicDataHandler *> topicDataHandlers;
+      // public: std::map<std::string, TopicDataHandler *> topicDataHandlers;
 
       /// \brief Handler for updating topic curves
       // public: TopicCurveHandler topicCurve;

@@ -122,7 +122,6 @@ void IntrospectionCurveHandler::AddCurve(const std::string &_name,
   auto it = this->dataPtr->curves.find(_name);
   if (it == this->dataPtr->curves.end())
   {
-
     auto addItemToFilterCallback = [this, _curve, _name](const bool _result)
     {
       if (!_result)
@@ -397,15 +396,15 @@ void IntrospectionCurveHandler::OnIntrospection(
           // auto tokens = common::split(queryStr, "=/");
           // if (tokens.size() == 7u && tokens[1] == "pose")
           // {
-          //  if (tokens[4] == "position")
-          //    validData = Vector3dFromQuery(queryStr, p.Pos(), tokens[6]);
-          //  else if (tokens[4] == "orientation")
-          //    validData = Vector3dFromQuery(queryStr, p.Rot(), tokens[6]);
-          //  else
-          //    validData = false;
-          //}
-          //else
-          //  validData = false;
+          //   if (tokens[4] == "position")
+          //     validData = Vector3dFromQuery(queryStr, p.Pos(), tokens[6]);
+          //   else if (tokens[4] == "orientation")
+          //     validData = Vector3dFromQuery(queryStr, p.Rot(), tokens[6]);
+          //   else
+          //     validData = false;
+          // }
+          // else
+          //   validData = false;
 
 
           if (queryStr.find("position") != std::string::npos)
