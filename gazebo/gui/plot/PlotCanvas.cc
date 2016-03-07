@@ -282,6 +282,11 @@ void PlotCanvas::AddVariable(const unsigned int _id,
     this->dataPtr->emptyPlot->setVisible(false);
 
   PlotManager::Instance()->AddIntrospectionCurve(_variable, curve);
+
+  // give it a more compact, friendly name
+  // do this after PlotManager AddIntrospectionCurve call!
+  std::string label = PlotManager::Instance()->HumanReadableName(_variable);
+  this->SetVariableLabel(_id, label);
 }
 
 /////////////////////////////////////////////////
