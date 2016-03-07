@@ -35,43 +35,69 @@ void PhysicsIfaceTest::RemoveWorldTest(const std::string &_physicsEngine)
 
   // Load a world with some models
   // TODO: world with sensors?
-  // TODO: sleep to make sure things are being created?
-  this->Load("worlds/shapes.world", false, _physicsEngine);
+  this->Load("test/worlds/gps_test.world", false, _physicsEngine);
+
+  // Give time for everything to be created
+  int sleep = 0;
+  int maxSleep = 10;
+  while (sleep < maxSleep)
+  {
+    gazebo::common::Time::MSleep(300);
+    sleep++;
+  }
 
   // Get world pointer
   auto world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
+  auto worldPtrCount = world.use_count();
+  EXPECT_GT(worldPtrCount, 1);
+
   // Get physics engine pointer
   auto physicsEngine = world->GetPhysicsEngine();
   ASSERT_TRUE(physicsEngine != NULL);
 
-  // Check pointer use count
+  auto physicsEnginePtrCount = physicsEngine.use_count();
+  EXPECT_GT(physicsEnginePtrCount, 1);
+
+  // Check pointers use count
   gzdbg << "Use count: WorldPtr [" << world.use_count() <<
       "] PhysicsEnginePtr [" << physicsEngine.use_count() << "]" << std::endl;
-
-  auto worldPtrCount = world.use_count();
-  auto physicsEnginePtrCount = physicsEngine.use_count();
-
-  EXPECT_GT(worldPtrCount, 1);
-  EXPECT_GT(physicsEnginePtrCount, 1);
 
   // Remove world
   physics::remove_worlds();
 
-  // Check pointer use count
-  gzdbg << "Use count: WorldPtr [" << world.use_count() <<
-      "] PhysicsEnginePtr [" << physicsEngine.use_count() << "]" << std::endl;
+  // Give time for everything to be removed
+  sleep = 0;
+  while (sleep < maxSleep)
+  {
+    gazebo::common::Time::MSleep(300);
+    sleep++;
+  }
 
-  EXPECT_LT(world.use_count(), worldPtrCount);
-  EXPECT_LT(physicsEngine.use_count(), worldPtrCount);
-
-  EXPECT_EQ(world.use_count(), 1);
+  // Check the only shared pointer left to the physics engine is this one
+  EXPECT_LT(physicsEngine.use_count(), physicsEnginePtrCount);
   EXPECT_EQ(physicsEngine.use_count(), 1);
 
-  // Release the last pointer
-  world.reset();
+  // Release the last physics engine pointer
   physicsEngine.reset();
+
+  // Check the only pointer left to the world is this one
+  EXPECT_LT(world.use_count(), worldPtrCount);
+  EXPECT_EQ(world.use_count(), 1);
+
+  // Release the last world pointer
+  world.reset();
+
+  // Check we can't get the world pointer
+  try
+  {
+    world = physics::get_world("default");
+  }
+  catch(...)
+  {
+  }
+  ASSERT_TRUE(world == NULL);
 }
 
 /////////////////////////////////////////////////

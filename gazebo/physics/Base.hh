@@ -217,7 +217,8 @@ namespace gazebo
 
       /// \brief Remove a child from this entity.
       /// \param[in] _id ID of the child to remove.
-      public: virtual void RemoveChild(unsigned int _id);
+      public: virtual void RemoveChild(unsigned int _id,
+          const bool _alsoDelete = true);
 
       /// \brief Remove all children.
       public: void RemoveChildren();

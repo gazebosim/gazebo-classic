@@ -63,6 +63,12 @@ HeightmapShape::HeightmapShape(CollisionPtr _parent)
 //////////////////////////////////////////////////
 HeightmapShape::~HeightmapShape()
 {
+  // Clean transport
+  {
+    this->responsePub.reset();
+    this->requestSub.reset();
+    this->node.reset();
+  }
 }
 
 //////////////////////////////////////////////////

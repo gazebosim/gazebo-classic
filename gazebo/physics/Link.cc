@@ -66,58 +66,7 @@ Link::Link(EntityPtr _parent)
 //////////////////////////////////////////////////
 Link::~Link()
 {
-  this->attachedModels.clear();
-
-  for (Visuals_M::iterator iter = this->visuals.begin();
-      iter != this->visuals.end(); ++iter)
-  {
-    msgs::Visual msg;
-    msg.set_name(iter->second.name());
-    msg.set_id(iter->second.id());
-    if (this->parent)
-    {
-      msg.set_parent_name(this->parent->GetScopedName());
-      msg.set_parent_id(this->parent->GetId());
-    }
-    else
-    {
-      msg.set_parent_name("");
-      msg.set_parent_id(0);
-    }
-    msg.set_delete_me(true);
-    this->visPub->Publish(msg);
-  }
-  this->visuals.clear();
-
-  if (this->cgVisuals.size() > 0)
-  {
-    for (unsigned int i = 0; i < this->cgVisuals.size(); i++)
-    {
-      msgs::Visual msg;
-      msg.set_name(this->cgVisuals[i]);
-      if (this->parent)
-        msg.set_parent_name(this->parent->GetScopedName());
-      else
-        msg.set_parent_name("");
-      msg.set_delete_me(true);
-      this->visPub->Publish(msg);
-    }
-    this->cgVisuals.clear();
-  }
-
-  this->visPub.reset();
-  this->sensors.clear();
-
-  this->requestPub.reset();
-  this->dataPub.reset();
-  this->wrenchSub.reset();
-  this->connections.clear();
-
-  delete this->publishDataMutex;
-  this->publishDataMutex = NULL;
-
-  this->collisions.clear();
-  this->batteries.clear();
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -312,10 +261,69 @@ void Link::Fini()
   }
 
 #ifdef HAVE_OPENAL
-  this->world->GetPhysicsEngine()->GetContactManager()->RemoveFilter(
-      this->GetScopedName() + "/audio_collision");
+  if (this->world && this->world->GetPhysicsEngine() &&
+      this->world->GetPhysicsEngine()->GetContactManager())
+  {
+    this->world->GetPhysicsEngine()->GetContactManager()->RemoveFilter(
+        this->GetScopedName() + "/audio_collision");
+  }
   this->audioSink.reset();
+  this->audioContactsSub.reset();
 #endif
+
+  this->attachedModels.clear();
+
+  for (auto iter : this->visuals)
+  {
+    msgs::Visual msg;
+    msg.set_name(iter.second.name());
+    msg.set_id(iter.second.id());
+    if (this->parent)
+    {
+      msg.set_parent_name(this->parent->GetScopedName());
+      msg.set_parent_id(this->parent->GetId());
+    }
+    else
+    {
+      msg.set_parent_name("");
+      msg.set_parent_id(0);
+    }
+    msg.set_delete_me(true);
+    this->visPub->Publish(msg);
+  }
+  this->visuals.clear();
+
+  if (this->cgVisuals.size() > 0)
+  {
+    for (unsigned int i = 0; i < this->cgVisuals.size(); i++)
+    {
+      msgs::Visual msg;
+      msg.set_name(this->cgVisuals[i]);
+      if (this->parent)
+        msg.set_parent_name(this->parent->GetScopedName());
+      else
+        msg.set_parent_name("");
+      msg.set_delete_me(true);
+      this->visPub->Publish(msg);
+    }
+    this->cgVisuals.clear();
+  }
+
+  // Clean transport
+  {
+    this->dataPub.reset();
+    this->visPub.reset();
+
+    this->wrenchSub.reset();
+  }
+  this->connections.clear();
+  this->sensors.clear();
+
+  delete this->publishDataMutex;
+  this->publishDataMutex = NULL;
+
+  this->collisions.clear();
+  this->batteries.clear();
 
   Entity::Fini();
 }

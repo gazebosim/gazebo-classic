@@ -47,25 +47,34 @@ ContactManager::ContactManager()
 ContactManager::~ContactManager()
 {
   this->Clear();
-  this->node.reset();
-  this->contactPub.reset();
 
-  boost::unordered_map<std::string, ContactPublisher *>::iterator iter;
-  for (iter = this->customContactPublishers.begin();
+  // Clean transport
+  {
+    this->contactPub.reset();
+    this->node.reset();
+  }
+
+  for (auto iter = this->customContactPublishers.begin();
       iter != this->customContactPublishers.end(); ++iter)
   {
-    if (iter->second)
-    {
-      iter->second->collisions.clear();
-      iter->second->collisionNames.clear();
-      iter->second->publisher.reset();
-      delete iter->second;
-      iter->second = NULL;
-    }
+    if (!iter->second)
+      continue;
+
+    iter->second->collisions.clear();
+    iter->second->collisionNames.clear();
+    iter->second->publisher.reset();
+
+    delete iter->second;
+    iter->second = NULL;
   }
   this->customContactPublishers.clear();
-  delete this->customMutex;
-  this->customMutex = NULL;
+
+  if (this->customMutex)
+  {
+    delete this->customMutex;
+    this->customMutex = NULL;
+  }
+
   this->world.reset();
 }
 

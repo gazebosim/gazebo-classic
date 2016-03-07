@@ -55,22 +55,7 @@ Base::Base(BasePtr _parent)
 //////////////////////////////////////////////////
 Base::~Base()
 {
-  // remove self as a child of the parent
-  if (this->parent)
-    this->parent->RemoveChild(this->id);
-
-  this->SetParent(BasePtr());
-
-  for (Base_V::iterator iter = this->children.begin();
-       iter != this->children.end(); ++iter)
-  {
-    if (*iter)
-      (*iter)->SetParent(BasePtr());
-  }
-  this->children.clear();
-  if (this->sdf)
-    this->sdf->Reset();
-  this->sdf.reset();
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -106,16 +91,29 @@ void Base::UpdateParameters(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Base::Fini()
 {
-  Base_V::iterator iter;
+  // remove self as a child of the parent
+  if (this->parent)
+    this->parent->RemoveChild(this->id, false);
 
-  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
-    if (*iter)
-      (*iter)->Fini();
+  this->SetParent(BasePtr());
+  this->parent.reset();
 
+  // Fini children
+  for (auto iter : this->children)
+  {
+    if (iter)
+    {
+      iter->SetParent(BasePtr());
+      iter->Fini();
+    }
+  }
   this->children.clear();
 
+  if (this->sdf)
+    this->sdf->Reset();
+  this->sdf.reset();
+
   this->world.reset();
-  this->parent.reset();
 }
 
 //////////////////////////////////////////////////
@@ -199,14 +197,14 @@ void Base::AddChild(BasePtr _child)
 }
 
 //////////////////////////////////////////////////
-void Base::RemoveChild(unsigned int _id)
+void Base::RemoveChild(unsigned int _id, const bool _alsoDelete)
 {
-  Base_V::iterator iter;
-  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
+  for (auto iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     if ((*iter)->GetId() == _id)
     {
-      (*iter)->Fini();
+      if (_alsoDelete)
+        (*iter)->Fini();
       this->children.erase(iter);
       break;
     }

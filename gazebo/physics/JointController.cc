@@ -60,6 +60,12 @@ JointController::JointController(ModelPtr _model)
 /////////////////////////////////////////////////
 JointController::~JointController()
 {
+  // Clean transport
+  {
+    this->dataPtr->jointCmdSub.reset();
+    this->dataPtr->node.reset();
+  }
+
   delete this->dataPtr;
   this->dataPtr = NULL;
 }

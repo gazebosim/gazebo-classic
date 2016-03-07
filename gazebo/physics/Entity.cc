@@ -87,16 +87,7 @@ Entity::Entity(BasePtr _parent)
 //////////////////////////////////////////////////
 Entity::~Entity()
 {
-  // TODO: put this back in
-  // this->GetWorld()->GetPhysicsEngine()->RemoveEntity(this);
-
-  delete this->visualMsg;
-  this->visualMsg = NULL;
-
-  this->visPub.reset();
-  this->requestPub.reset();
-  this->poseSub.reset();
-  this->node.reset();
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -585,6 +576,12 @@ void Entity::OnPoseMsg(ConstPosePtr &_msg)
 //////////////////////////////////////////////////
 void Entity::Fini()
 {
+  // TODO: put this back in
+  // this->GetWorld()->GetPhysicsEngine()->RemoveEntity(this);
+
+  delete this->visualMsg;
+  this->visualMsg = NULL;
+
   if (this->requestPub)
   {
     msgs::Request *msg = msgs::CreateRequest("entity_delete",
@@ -592,11 +589,20 @@ void Entity::Fini()
     this->requestPub->Publish(*msg, true);
   }
 
-  this->parentEntity.reset();
-  Base::Fini();
+  // Clean transport
+  {
+    this->visPub.reset();
+    this->requestPub.reset();
 
+    this->poseSub.reset();
+
+    this->node.reset();
+  }
+
+  this->parentEntity.reset();
   this->connections.clear();
-  this->node->Fini();
+
+  Base::Fini();
 }
 
 //////////////////////////////////////////////////

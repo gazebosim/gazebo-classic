@@ -94,6 +94,7 @@ void PhysicsEngine::Fini()
   {
     this->responsePub.reset();
     this->requestSub.reset();
+
     this->node->Fini();
     this->node.reset();
   }

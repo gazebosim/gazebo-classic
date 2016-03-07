@@ -57,18 +57,7 @@ SensorManager::SensorManager()
 //////////////////////////////////////////////////
 SensorManager::~SensorManager()
 {
-  // Clean up the sensors.
-  for (SensorContainer_V::iterator iter = this->sensorContainers.begin();
-       iter != this->sensorContainers.end(); ++iter)
-  {
-    GZ_ASSERT((*iter) != NULL, "Sensor Constainer is NULL");
-    (*iter)->Stop();
-    (*iter)->RemoveSensors();
-    delete (*iter);
-  }
-  this->sensorContainers.clear();
-
-  this->initSensors.clear();
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -226,23 +215,26 @@ void SensorManager::Init()
 //////////////////////////////////////////////////
 void SensorManager::Fini()
 {
-  boost::recursive_mutex::scoped_lock lock(this->mutex);
-
-  // Finalize all the sensor containers.
-  for (SensorContainer_V::iterator iter = this->sensorContainers.begin();
+  // Clean up the sensors.
+  for (auto iter = this->sensorContainers.begin();
        iter != this->sensorContainers.end(); ++iter)
   {
-    GZ_ASSERT((*iter) != NULL, "SensorContainer is NULL");
-    (*iter)->Fini();
+    GZ_ASSERT((*iter) != NULL, "Sensor Container is NULL");
     (*iter)->Stop();
+    (*iter)->RemoveSensors();
+    delete (*iter);
   }
+  this->sensorContainers.clear();
 
   this->removeSensors.clear();
   this->initSensors.clear();
   this->worlds.clear();
 
-  delete this->simTimeEventHandler;
-  this->simTimeEventHandler = NULL;
+  if (this->simTimeEventHandler)
+  {
+    delete this->simTimeEventHandler;
+    this->simTimeEventHandler = NULL;
+  }
 
   this->initialized = false;
 }
