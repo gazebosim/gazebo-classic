@@ -15,6 +15,8 @@
  *
 */
 
+#include "gazebo/transport/transport.hh"
+
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/test/helper_physics_generator.hh"
 
@@ -26,6 +28,24 @@ class PhysicsIfaceTest : public ServerFixture,
   /// \brief
   public: void RemoveWorldTest(const std::string &_physicsEngine);
 };
+
+/////////////////////////////////////////////////
+unsigned int WorldTopicCount(std::map<std::string, std::list<std::string>>
+    &_msgTypes)
+{
+  unsigned int count = 0;
+  for (auto msgType : _msgTypes)
+  {
+    for (auto topic : msgType.second)
+    {
+      if (topic.find("/gazebo/default") != std::string::npos)
+      {
+        count++;
+      }
+    }
+  }
+  return count;
+}
 
 /////////////////////////////////////////////////
 void PhysicsIfaceTest::RemoveWorldTest(const std::string &_physicsEngine)
@@ -60,9 +80,19 @@ void PhysicsIfaceTest::RemoveWorldTest(const std::string &_physicsEngine)
   auto physicsEnginePtrCount = physicsEngine.use_count();
   EXPECT_GT(physicsEnginePtrCount, 1);
 
-  // Check pointers use count
-  gzdbg << "Use count: WorldPtr [" << world.use_count() <<
-      "] PhysicsEnginePtr [" << physicsEngine.use_count() << "]" << std::endl;
+  // Check advertised topics
+  auto msgTypes = gazebo::transport::getAdvertisedTopics();
+  EXPECT_FALSE(msgTypes.empty());
+
+  auto worldTopicCount = WorldTopicCount(msgTypes);
+  EXPECT_GT(worldTopicCount, 0);
+
+  // Stats before removing world
+  gzdbg << std::endl
+        << "- WorldPtr use count: [" << world.use_count() << "]" << std::endl
+        << "- PhysicsEnginePtr use count: [" << physicsEngine.use_count() << "]"
+        << std::endl << "- Topics in this world: [" << worldTopicCount << "]"
+        << std::endl;
 
   // Remove world
   physics::remove_worlds();
@@ -98,6 +128,11 @@ void PhysicsIfaceTest::RemoveWorldTest(const std::string &_physicsEngine)
   {
   }
   ASSERT_TRUE(world == NULL);
+
+  // Check all topics related to that world are gone
+  msgTypes = gazebo::transport::getAdvertisedTopics();
+  EXPECT_LT(WorldTopicCount(msgTypes), worldTopicCount);
+  EXPECT_EQ(WorldTopicCount(msgTypes), 0);
 }
 
 /////////////////////////////////////////////////
