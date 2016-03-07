@@ -86,10 +86,10 @@ namespace gazebo
       /// \param[in] _window Plot window to remove.
       public: void RemoveWindow(PlotWindow *_window);
 
-      /// \brief
-      /// \param[in] _msg Topic message data.
-      public: void OnTopicData(const std::string &_msg);
-
+      /// \brief Get Human-readable name from uri-formatted variable name
+      /// \param[in] _uri URI representing the variable
+      /// \return Human readable name
+      public: std::string HumanReadableName(const std::string &_uri) const;
 
       /// \brief This is a singleton class.
       private: friend class SingletonT<PlotManager>;
