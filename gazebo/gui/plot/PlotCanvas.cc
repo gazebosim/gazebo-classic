@@ -64,7 +64,7 @@ namespace gazebo
       public: std::map<unsigned int, PlotData *> plotData;
 
       /// \brief Pointer to an empty plot.
-      public: IncrementalPlot *emptyPlot = NULL;
+      public: EmptyIncrementalPlot *emptyPlot = NULL;
 
       /// \brief Container for all the variableCurves on the Y axis.
       public: VariablePillContainer *yVariableContainer = NULL;
@@ -185,7 +185,9 @@ PlotCanvas::PlotCanvas(QWidget *_parent)
   plotScrollArea->setWidget(plotFrame);
 
   // empty plot
-  this->dataPtr->emptyPlot = new IncrementalPlot(this);
+  this->dataPtr->emptyPlot = new EmptyIncrementalPlot(this);
+  connect(this->dataPtr->emptyPlot, SIGNAL(VariableAdded(std::string)),
+      this, SLOT(OnAddVariable(std::string)));
   this->dataPtr->plotLayout->addWidget(this->dataPtr->emptyPlot);
 
   QFrame *mainFrame = new QFrame;
@@ -425,6 +427,13 @@ unsigned int PlotCanvas::PlotByVariable(const unsigned int _variableId) const
     }
   }
   return EmptyPlot;
+}
+
+/////////////////////////////////////////////////
+void PlotCanvas::OnAddVariable(const std::string &_variable)
+{
+  // add new variable to new plot
+  this->AddVariable(_variable);
 }
 
 /////////////////////////////////////////////////

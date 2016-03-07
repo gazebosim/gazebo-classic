@@ -357,3 +357,43 @@ QSize IncrementalPlot::sizeHint() const
   s.setHeight(s.height()+padding);
   return s;
 }
+
+/////////////////////////////////////////////////
+EmptyIncrementalPlot::EmptyIncrementalPlot(QWidget *_parent)
+  : IncrementalPlot(_parent)
+{
+  this->setAcceptDrops(true);
+}
+
+/////////////////////////////////////////////////
+void EmptyIncrementalPlot::dragEnterEvent(QDragEnterEvent *_evt)
+{
+  if (_evt->mimeData()->hasFormat("application/x-item"))
+  {
+    QString mimeData =
+        _evt->mimeData()->data("application/x-item");
+    _evt->setDropAction(Qt::LinkAction);
+    if (!mimeData.isEmpty())
+    {
+      _evt->acceptProposedAction();
+      return;
+    }
+  }
+  _evt->ignore();
+}
+
+/////////////////////////////////////////////////
+void EmptyIncrementalPlot::dropEvent(QDropEvent *_evt)
+{
+  if (_evt->mimeData()->hasFormat("application/x-item"))
+  {
+    QString mimeData =
+        _evt->mimeData()->data("application/x-item");
+    if (!mimeData.isEmpty())
+    {
+      emit VariableAdded(mimeData.toStdString());
+      return;
+    }
+  }
+  _evt->ignore();
+}
