@@ -15,11 +15,11 @@
  *
  */
 #include <gtest/gtest.h>
+#include <iostream>
 #include <stdio.h>
 #include <string>
 #include <boost/filesystem.hpp>
 
-#include "gazebo/common/Console.hh"
 #include "gazebo/gazebo_config.h"
 
 ///////////////////////////////////////////////////////////////////
@@ -29,7 +29,7 @@ boost::filesystem::path createTempBuildFolder(const std::string &_prefix)
   boost::filesystem::path path = boost::filesystem::temp_directory_path();
   path /= boost::filesystem::unique_path(_prefix + "-%%%%-%%%%-%%%%-%%%%");
   boost::filesystem::create_directories(path);
-  gzdbg << "mkdir " << path.string() << std::endl;
+  std::cout << "mkdir " << path.string() << std::endl;
   return path;
 }
 
@@ -42,7 +42,7 @@ boost::filesystem::path getSourcePath(const std::string &_folder,
   path /= std::string("examples");
   path /= _folder;
   path /= _suffix;
-  gzdbg << "source " << path.string() << std::endl;
+  std::cout << "source " << path.string() << std::endl;
   return path;
 }
 
@@ -79,7 +79,7 @@ void ExamplesBuild::Build(const std::string &_type, const std::string &_name)
   ASSERT_EQ(system(cmd), 0);
 
   // remove temporary folder
-  gzdbg << "removing " << build.string() << std::endl;
+  std::cout << "removing " << build.string() << std::endl;
   boost::filesystem::remove_all(build);
 }
 
