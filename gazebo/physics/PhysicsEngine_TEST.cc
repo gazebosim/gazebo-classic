@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -148,14 +148,14 @@ void PhysicsEngineTest::PhysicsEngineParam(const std::string &_physicsEngine)
       gzdbg << "Set magnetic_field as ignition::math::Vector3d" << std::endl;
       EXPECT_TRUE(physics->SetParam("magnetic_field", magneticField));
       EXPECT_TRUE(physics->GetParam("magnetic_field", value));
-      EXPECT_EQ(boost::any_cast<math::Vector3>(value),
-                math::Vector3(magneticField));
+      EXPECT_EQ(boost::any_cast<ignition::math::Vector3d>(value),
+                magneticField);
       gzdbg << "Set magnetic_field as gazebo::math::Vector3" << std::endl;
       EXPECT_TRUE(physics->SetParam("magnetic_field",
                     math::Vector3(magneticField2)));
       EXPECT_TRUE(physics->GetParam("magnetic_field", value));
-      EXPECT_EQ(boost::any_cast<math::Vector3>(value),
-                math::Vector3(magneticField2));
+      EXPECT_EQ(boost::any_cast<ignition::math::Vector3d>(value),
+                magneticField2.Ign());
     }
     catch(boost::bad_any_cast &_e)
     {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,13 +67,7 @@ void JointMaker_TEST::CreateRemoveJoint()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   rendering::UserCameraPtr cam = gui::get_active_camera();
   Q_ASSERT(cam);
@@ -134,6 +128,113 @@ void JointMaker_TEST::CreateRemoveJoint()
 }
 
 /////////////////////////////////////////////////
+void JointMaker_TEST::CreateRemoveNestedJoint()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/deeply_nested_models.world", false, false, false);
+
+  gui::JointMaker *jointMaker = new gui::JointMaker();
+  QCOMPARE(jointMaker->State(), gui::JointMaker::JOINT_NONE);
+  QCOMPARE(jointMaker->JointCount(), 0u);
+
+  gui::MainWindow *mainWindow = new gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  this->ProcessEventsAndDraw(mainWindow);
+
+  rendering::UserCameraPtr cam = gui::get_active_camera();
+  Q_ASSERT(cam);
+  rendering::ScenePtr scene = cam->GetScene();
+  Q_ASSERT(scene);
+
+  // Get the top level model link
+  gazebo::rendering::VisualPtr link00Vis =
+      scene->GetVisual("model_00::link_00");
+  QVERIFY(link00Vis != NULL);
+
+  // Get the nested model links
+  gazebo::rendering::VisualPtr link01Vis =
+      scene->GetVisual("model_00::model_01::link_01");
+  QVERIFY(link01Vis != NULL);
+  gazebo::rendering::VisualPtr link02Vis =
+      scene->GetVisual("model_00::model_01::model_02::link_02");
+  QVERIFY(link02Vis != NULL);
+  gazebo::rendering::VisualPtr link03Vis =
+      scene->GetVisual("model_00::model_01::model_02::model_03::link_03");
+  QVERIFY(link03Vis != NULL);
+
+  unsigned int jointCount = jointMaker->JointCount();
+
+  // Remove joints connected to the each link
+  jointMaker->RemoveJointsByLink(link00Vis->GetName());
+  QVERIFY(jointMaker->JointCount() <= jointCount);
+  jointCount = jointMaker->JointCount();
+
+  jointMaker->RemoveJointsByLink(link01Vis->GetName());
+  QVERIFY(jointMaker->JointCount() <= jointCount);
+  jointCount = jointMaker->JointCount();
+
+  jointMaker->RemoveJointsByLink(link02Vis->GetName());
+  QVERIFY(jointMaker->JointCount() <= jointCount);
+  jointCount = jointMaker->JointCount();
+
+  jointMaker->RemoveJointsByLink(link03Vis->GetName());
+  QVERIFY(jointMaker->JointCount() <= jointCount);
+
+  // no more joints left
+  QCOMPARE(jointMaker->JointCount(), 0u);
+
+  // Add a revolute joint
+  jointMaker->AddJoint(gui::JointMaker::JOINT_HINGE);
+  gui::JointData *revoluteJointData =
+      jointMaker->CreateJoint(link00Vis, link01Vis);
+  jointMaker->CreateHotSpot(revoluteJointData);
+  QCOMPARE(jointMaker->JointCount(), 1u);
+
+  // Add a prismatic joint
+  jointMaker->AddJoint(gui::JointMaker::JOINT_SLIDER);
+  gui::JointData *prismaticJointData =
+      jointMaker->CreateJoint(link01Vis, link02Vis);
+  jointMaker->CreateHotSpot(prismaticJointData);
+  QCOMPARE(jointMaker->JointCount(), 2u);
+
+  // Add a screw joint
+  jointMaker->AddJoint(gui::JointMaker::JOINT_SCREW);
+  gui::JointData *screwJointData =
+      jointMaker->CreateJoint(link00Vis, link02Vis);
+  jointMaker->CreateHotSpot(screwJointData);
+  QCOMPARE(jointMaker->JointCount(), 3u);
+
+  // Remove the screw joint
+  jointMaker->RemoveJoint(screwJointData->hotspot->GetName());
+  QCOMPARE(jointMaker->JointCount(), 2u);
+
+  // Add a ball joint
+  jointMaker->AddJoint(gui::JointMaker::JOINT_BALL);
+  gui::JointData *ballJointData =
+      jointMaker->CreateJoint(link00Vis, link03Vis);
+  jointMaker->CreateHotSpot(ballJointData);
+  QCOMPARE(jointMaker->JointCount(), 3u);
+
+  // Remove the two joints connected to link01
+  jointMaker->RemoveJointsByLink(link01Vis->GetName());
+  QCOMPARE(jointMaker->JointCount(), 1u);
+
+  // Remove the last joint
+  jointMaker->RemoveJoint(ballJointData->hotspot->GetName());
+  QCOMPARE(jointMaker->JointCount(), 0u);
+
+  delete jointMaker;
+  mainWindow->close();
+  delete mainWindow;
+}
+
+/////////////////////////////////////////////////
 void JointMaker_TEST::JointDefaultProperties()
 {
   this->resMaxPercentChange = 5.0;
@@ -151,13 +252,7 @@ void JointMaker_TEST::JointDefaultProperties()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   rendering::UserCameraPtr cam = gui::get_active_camera();
   Q_ASSERT(cam);
@@ -376,13 +471,7 @@ void JointMaker_TEST::ShowJoints()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   rendering::UserCameraPtr cam = gui::get_active_camera();
   Q_ASSERT(cam);
@@ -411,13 +500,7 @@ void JointMaker_TEST::ShowJoints()
   jointMaker->CreateHotSpot(prismaticJointData);
   QCOMPARE(jointMaker->JointCount(), 2u);
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   QVERIFY(revoluteJointData->hotspot != NULL);
   QVERIFY(prismaticJointData->hotspot != NULL);
@@ -467,13 +550,7 @@ void JointMaker_TEST::Selection()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   rendering::UserCameraPtr cam = gui::get_active_camera();
   Q_ASSERT(cam);
@@ -638,13 +715,7 @@ void JointMaker_TEST::UpdateMsg()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   auto cam = gui::get_active_camera();
   Q_ASSERT(cam);

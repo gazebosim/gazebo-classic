@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -229,52 +229,75 @@ void UserCmdManager::OnUserCmdMsg(ConstUserCmdPtr &_msg)
     cmd->SetEntityName(_msg->entity_name());
 
   // Forward message after we've saved the current state
-  if (_msg->type() == msgs::UserCmd::MOVING)
+  switch (_msg->type())
   {
-    for (int i = 0; i < _msg->model_size(); ++i)
-      this->dataPtr->modelModifyPub->Publish(_msg->model(i));
+    case msgs::UserCmd::MOVING:
+    {
+      for (int i = 0; i < _msg->model_size(); ++i)
+        this->dataPtr->modelModifyPub->Publish(_msg->model(i));
 
-    for (int i = 0; i < _msg->light_size(); ++i)
-      this->dataPtr->lightModifyPub->Publish(_msg->light(i));
-  }
-  else if (_msg->type() == msgs::UserCmd::WORLD_CONTROL)
-  {
-    if (_msg->has_world_control())
-    {
-      this->dataPtr->worldControlPub->Publish(_msg->world_control());
-    }
-    else
-    {
-      gzwarn << "World control command [" << _msg->description() <<
-          "] without a world control message. Command won't be executed."
-          << std::endl;
-    }
-  }
-  else if (_msg->type() == msgs::UserCmd::WRENCH)
-  {
-    // Set publisher
-    std::string topicName = "~/";
-    topicName += _msg->entity_name() + "/wrench";
-    boost::replace_all(topicName, "::", "/");
+      for (int i = 0; i < _msg->light_size(); ++i)
+        this->dataPtr->lightModifyPub->Publish(_msg->light(i));
 
-    auto wrenchPub = this->dataPtr->node->Advertise<msgs::Wrench>(topicName);
-    wrenchPub->Publish(_msg->wrench());
-  }
-  else if (_msg->type() == msgs::UserCmd::INSERTING)
-  {
-    if (_msg->has_factory())
-    {
-      this->dataPtr->modelFactoryPub->Publish(_msg->factory());
+      break;
     }
-    else if (_msg->light_size() == 1)
+    case msgs::UserCmd::SCALING:
     {
-      this->dataPtr->lightFactoryPub->Publish(_msg->light(0));
+      for (int i = 0; i < _msg->model_size(); ++i)
+        this->dataPtr->modelModifyPub->Publish(_msg->model(i));
+
+      break;
     }
-    else
+    case msgs::UserCmd::WORLD_CONTROL:
     {
-      gzwarn << "Insert command [" << _msg->description() <<
-          "] does not contain factory or light messages." <<
-          " Command won't be executed." << std::endl;
+      if (_msg->has_world_control())
+      {
+        this->dataPtr->worldControlPub->Publish(_msg->world_control());
+      }
+      else
+      {
+        gzwarn << "World control command [" << _msg->description() <<
+            "] without a world control message. Command won't be executed."
+            << std::endl;
+      }
+
+      break;
+    }
+    case msgs::UserCmd::WRENCH:
+    {
+      // Set publisher
+      std::string topicName = "~/";
+      topicName += _msg->entity_name() + "/wrench";
+      boost::replace_all(topicName, "::", "/");
+
+      auto wrenchPub = this->dataPtr->node->Advertise<msgs::Wrench>(topicName);
+      wrenchPub->Publish(_msg->wrench());
+
+      break;
+    }
+    case msgs::UserCmd::INSERTING:
+    {
+      if (_msg->has_factory())
+      {
+        this->dataPtr->modelFactoryPub->Publish(_msg->factory());
+      }
+      else if (_msg->light_size() == 1)
+      {
+        this->dataPtr->lightFactoryPub->Publish(_msg->light(0));
+      }
+      else
+      {
+        gzwarn << "Insert command [" << _msg->description() <<
+            "] does not contain factory or light messages." <<
+            " Command won't be executed." << std::endl;
+      }
+      break;
+    }
+    default:
+    {
+      gzwarn << "Unsupported command type [" << _msg->type() << "]" <<
+          std::endl;
+      break;
     }
   }
 

@@ -684,6 +684,17 @@ if (NOT WIN32)
   endif()
 endif()
 
+################################################
+# Find Valgrind for checking memory leaks in the
+# tests
+find_program(VALGRIND_PROGRAM NAMES valgrind PATH ${VALGRIND_ROOT}/bin)
+option(GAZEBO_RUN_VALGRIND_TESTS "Run gazebo tests with Valgrind" FALSE)
+mark_as_advanced(GAZEBO_RUN_VALGRIND_TESTS)
+if (GAZEBO_RUN_VALGRIND_TESTS AND NOT VALGRIND_PROGRAM)
+  BUILD_WARNING("valgrind not found. Memory check tests will be skipped.")
+endif()
+
+
 ########################################
 # Find QWT (QT graphing library)
 #find_path(QWT_INCLUDE_DIR NAMES qwt.h PATHS

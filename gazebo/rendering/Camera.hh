@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -838,7 +838,12 @@ namespace gazebo
 
       /// \brief Get the distortion model of this camera.
       /// \return Distortion model.
-      public: DistortionPtr GetDistortion() const;
+      /// \deprecated See LensDistortion() const;
+      public: DistortionPtr GetDistortion() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get the distortion model of this camera.
+      /// \return Distortion model.
+      public: DistortionPtr LensDistortion() const;
 
       /// \brief Set the type of projection used by the camera.
       /// \param[in] _type The type of projection: "perspective" or
