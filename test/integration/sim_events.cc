@@ -54,7 +54,9 @@ void ReceiveSimEvent(ConstSimEventPtr &_msg)
   g_event_type = _msg->type();
   g_event_name = _msg->name();
   g_event_data = _msg->data();
-  gzdbg << "ReceiveSimEvent " << g_event_type << std::endl;
+  gzdbg << "ReceiveSimEvent " << g_event_type
+        << " " << g_event_name
+        << std::endl;
 }
 
 // get the count in a thread safe way
@@ -240,6 +242,7 @@ void SimEventsTest::JointEventSource(const std::string &_physicsEngine)
 
   this->Load("worlds/sim_events.world", false, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
+  world->SetGravity(ignition::math::Vector3d::Zero);
 
   // Get the revoluter model
   physics::ModelPtr model = world->GetModel("revoluter");
