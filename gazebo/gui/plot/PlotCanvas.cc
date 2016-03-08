@@ -102,9 +102,13 @@ PlotCanvas::PlotCanvas(QWidget *_parent)
   QAction *deletePlotAct = new QAction("Delete canvas", settingsMenu);
   deletePlotAct->setStatusTip(tr("Delete entire canvas"));
   connect(deletePlotAct, SIGNAL(triggered()), this, SLOT(OnDeleteCanvas()));
+  QAction *showGridAct = new QAction("Show grid", settingsMenu);
+  showGridAct->setStatusTip(tr("Show/hide grid lines on plot"));
+  showGridAct->setCheckable(true);
 
   settingsMenu->addAction(clearPlotAct);
   settingsMenu->addAction(deletePlotAct);
+  settingsMenu->addAction(showGridAct);
 
   QToolButton *settingsButton = new QToolButton();
   settingsButton->setObjectName("plotCanvasTitleTool");
@@ -189,6 +193,10 @@ PlotCanvas::PlotCanvas(QWidget *_parent)
   connect(this->dataPtr->emptyPlot, SIGNAL(VariableAdded(std::string)),
       this, SLOT(OnAddVariable(std::string)));
   this->dataPtr->plotLayout->addWidget(this->dataPtr->emptyPlot);
+
+  // set initial show grid state
+  showGridAct->setChecked(this->dataPtr->emptyPlot->ShowGrid());
+  connect(showGridAct, SIGNAL(triggered()), this, SLOT(OnShowGrid()));
 
   QFrame *mainFrame = new QFrame;
   mainFrame->setObjectName("plotCanvasFrame");
@@ -773,6 +781,15 @@ void PlotCanvas::OnDeleteCanvas()
     return;
 
   emit CanvasDeleted();
+}
+
+/////////////////////////////////////////////////
+void PlotCanvas::OnShowGrid()
+{
+  this->dataPtr->emptyPlot->ShowGrid(!this->dataPtr->emptyPlot->ShowGrid());
+
+  for (const auto &it : this->dataPtr->plotData)
+    it.second->plot->ShowGrid(!it.second->plot->ShowGrid());
 }
 
 /////////////////////////////////////////////////

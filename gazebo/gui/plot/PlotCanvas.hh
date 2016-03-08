@@ -172,6 +172,9 @@ namespace gazebo
       /// \brief Qt Callback to delete entire canvas.
       private slots: void OnDeleteCanvas();
 
+      /// \brief Qt Callback to show/hide grids on plot.
+      private slots: void OnShowGrid();
+
       /// \brief Empty plot used to indicate non-existent plot.
       public: static const unsigned int EmptyPlot;
 

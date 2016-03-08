@@ -172,6 +172,9 @@ namespace gazebo
       /// \brief Pointer to the plot panner.
       public: QwtPlotPanner *panner;
 
+      /// \brief Pointer to the grid lines.
+      public: QwtPlotGrid *grid;
+
       /// \brief Period duration in seconds.
       public: unsigned int period;
     };
@@ -218,14 +221,15 @@ IncrementalPlot::IncrementalPlot(QWidget *_parent)
   QwtLegend *qLegend = new QwtLegend;
   this->insertLegend(qLegend, QwtPlot::RightLegend);
 
-  QwtPlotGrid *grid = new QwtPlotGrid;
+
+  this->dataPtr->grid = new QwtPlotGrid;
 
 #if (QWT_VERSION < ((6 << 16) | (1 << 8) | 0))
-  grid->setMajPen(QPen(Qt::gray, 0, Qt::DotLine));
+  this->dataPtr->grid->setMajPen(QPen(Qt::gray, 0, Qt::DotLine));
 #else
-  grid->setMajorPen(QPen(Qt::gray, 0, Qt::DotLine));
+  this->dataPtr->grid->setMajorPen(QPen(Qt::gray, 0, Qt::DotLine));
 #endif
-  grid->attach(this);
+  this->dataPtr->grid->attach(this);
 
   this->enableAxis(QwtPlot::yLeft);
   this->setAxisScaleEngine(QwtPlot::yLeft, new QwtLinearScaleEngine());
@@ -455,6 +459,19 @@ void IncrementalPlot::ShowAxisLabel(const PlotAxis _axis, const bool _show)
     default:
       return;
   }
+}
+
+/////////////////////////////////////////////////
+void IncrementalPlot::ShowGrid(const bool _show)
+{
+  this->dataPtr->grid->setVisible(_show);
+  this->replot();
+}
+
+/////////////////////////////////////////////////
+bool IncrementalPlot::ShowGrid() const
+{
+  return this->dataPtr->grid->isVisible();
 }
 
 /////////////////////////////////////////////////

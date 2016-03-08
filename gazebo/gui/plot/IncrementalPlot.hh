@@ -132,6 +132,14 @@ namespace gazebo
       /// \param[in] _show True to show the label, false to hide it.
       public: void ShowAxisLabel(const PlotAxis _axis, const bool _show);
 
+      /// \brief Set whether to show the grid lines.
+      /// \param[in] _show True to show grid lines.
+      public: void ShowGrid(const bool _show);
+
+      /// \brief Get whether the grid lines are shown.
+      /// \return True if the grid lines are visible.
+      public: bool ShowGrid() const;
+
       /// \brief Get all curves in this plot
       /// \return A list of curves in this plot.
       public: std::vector<PlotCurveWeakPtr> Curves() const;
