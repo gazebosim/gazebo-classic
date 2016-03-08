@@ -264,9 +264,9 @@ void SimEventsTest::JointEventSource(const std::string &_physicsEngine)
 
   count_before = GetEventCount();
 
-  joint->SetVelocity(0, 3.1);
-  // check for event
-  count_after = WaitForNewEvent(count_before);
+  joint->SetVelocity(0, 3.2);
+  // check for event (3 seconds)
+  count_after = WaitForNewEvent(count_before, 30, 100);
   EXPECT_GT(count_after, count_before);
 }
 
