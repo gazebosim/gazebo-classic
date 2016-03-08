@@ -38,7 +38,7 @@ WindowItem::WindowItem() : RectItem(), dataPtr(new WindowItemPrivate())
   this->dataPtr->windowHeight = 80;
   this->dataPtr->windowWidth = 80;
   this->dataPtr->windowSideBar = 10;
-  this->dataPtr->windowPos = this->scenePos();
+  this->dataPtr->windowPos = Conversions::Convert(this->scenePos());
   this->dataPtr->windowElevation = 50;
 
   this->width = this->dataPtr->windowWidth;
@@ -147,7 +147,7 @@ void WindowItem::paint(QPainter *_painter,
 
   this->dataPtr->windowWidth = this->drawingWidth;
   this->dataPtr->windowDepth = this->drawingHeight;
-  this->dataPtr->windowPos = this->scenePos();
+  this->dataPtr->windowPos = Conversions::Convert(this->scenePos());
   _painter->restore();
 
   //  QGraphicsPolygonItem::paint(_painter, _option, _widget);
@@ -166,21 +166,21 @@ void WindowItem::OnApply()
   WindowDoorInspectorDialog *dialog =
      qobject_cast<WindowDoorInspectorDialog *>(QObject::sender());
 
-  QPointF itemPos = this->dataPtr->windowPos * this->itemScale;
-  itemPos.setY(-itemPos.y());
+  auto itemPos = this->dataPtr->windowPos * this->itemScale;
+  itemPos.Y(-itemPos.Y());
   this->SetSize(ignition::math::Vector2i(dialog->Width() / this->itemScale,
       dialog->Depth() / this->itemScale));
   this->dataPtr->windowWidth = dialog->Width() / this->itemScale;
   this->dataPtr->windowHeight = dialog->Height() / this->itemScale;
   this->dataPtr->windowDepth = dialog->Depth() / this->itemScale;
   this->dataPtr->windowElevation = dialog->Elevation() / this->itemScale;
-  if ((fabs(dialog->Position().X() - itemPos.x()) >= 0.01)
-      || (fabs(dialog->Position().Y() - itemPos.y()) >= 0.01))
+  if ((fabs(dialog->Position().X() - itemPos.X()) >= 0.01)
+      || (fabs(dialog->Position().Y() - itemPos.Y()) >= 0.01))
   {
-    itemPos = Conversions::Convert(dialog->Position()) / this->itemScale;
-    itemPos.setY(-itemPos.y());
+    itemPos = dialog->Position() / this->itemScale;
+    itemPos.Y(-itemPos.Y());
     this->dataPtr->windowPos = itemPos;
-    this->setPos(this->dataPtr->windowPos);
+    this->setPos(Conversions::Convert(this->dataPtr->windowPos));
     // this->dataPtr->setParentItem(NULL);
   }
   this->WindowChanged();
@@ -192,8 +192,8 @@ void WindowItem::WindowChanged()
   emit WidthChanged(this->dataPtr->windowWidth);
   emit DepthChanged(this->dataPtr->windowDepth);
   emit HeightChanged(this->dataPtr->windowHeight);
-  emit PositionChanged(this->dataPtr->windowPos.x(),
-      this->dataPtr->windowPos.y(),
+  emit PositionChanged(this->dataPtr->windowPos.X(),
+      this->dataPtr->windowPos.Y(),
       this->levelBaseHeight + this->dataPtr->windowElevation);
 }
 
@@ -221,9 +221,9 @@ void WindowItem::OnOpenInspector()
   this->dataPtr->inspector->SetDepth(
       this->dataPtr->windowDepth * this->itemScale);
 
-  QPointF itemPos = this->dataPtr->windowPos * this->itemScale;
-  itemPos.setY(-itemPos.y());
-  this->dataPtr->inspector->SetPosition(Conversions::Convert(itemPos));
+  auto itemPos = this->dataPtr->windowPos * this->itemScale;
+  itemPos.Y(-itemPos.Y());
+  this->dataPtr->inspector->SetPosition(itemPos);
   this->dataPtr->inspector->move(QCursor::pos());
   this->dataPtr->inspector->show();
 }

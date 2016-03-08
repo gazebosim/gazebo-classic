@@ -245,7 +245,7 @@ namespace gazebo
       /// brief Helper function for resizing the rect item.
       /// \param[in] _x Change in x (width).
       /// \param[in] _y Change in y (height).
-      private: void AdjustSize(double _x, double _y);
+      private: void AdjustSize(const double _x, const double _y);
 
       /// \brief Qt callback for opening the item inspector
       private slots: virtual void OnOpenInspector();

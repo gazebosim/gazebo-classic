@@ -126,8 +126,8 @@ namespace gazebo
       /// \param[in] _width Width of item in pixels.
       /// \param[in] _depth Depth of item in pixels.
       /// \param[in] _height Height of item in pixels.
-      Q_SIGNALS: void SizeChanged(double _width, double _depth,
-          double _height);
+      Q_SIGNALS: void SizeChanged(const double _width, const double _depth,
+          const double _height);
 
       /// \brief Qt signal emitted when the editor item pose has changed.
       /// \param[in] _x X position of item in pixels.
@@ -136,8 +136,9 @@ namespace gazebo
       /// \param[in] _roll Roll rotation of item in degrees.
       /// \param[in] _pitch Pitch rotation of item in degrees.
       /// \param[in] _yaw Yaw rotation of item in degrees.
-      Q_SIGNALS: void PoseChanged(double _x, double _y, double _z,
-          double _roll, double _pitch, double _yaw);
+      Q_SIGNALS: void PoseChanged(const double _x, const double _y,
+          const double _z, const double _roll, const double _pitch,
+          const double _yaw);
 
       /// \brief Qt signal emitted when the editor item pose origin has changed.
       /// \param[in] _x X position of item in pixels.
@@ -146,56 +147,59 @@ namespace gazebo
       /// \param[in] _roll Roll rotation of item in degrees.
       /// \param[in] _pitch Pitch rotation of item in degrees.
       /// \param[in] _yaw Yaw rotation of item in degrees.
-      Q_SIGNALS: void PoseOriginTransformed(double _x, double _y, double _z,
-          double _roll, double _pitch, double _yaw);
+      Q_SIGNALS: void PoseOriginTransformed(const double _x, const double _y,
+          const double _z, const double _roll, const double _pitch,
+          const double _yaw);
 
       /// \brief Qt signal emitted when the editor item position has changed.
       /// \param[in] _x X position of item in pixels.
       /// \param[in] _y Y position of item in pixels.
       /// \param[in] _z Z position of item in pixels.
-      Q_SIGNALS: void PositionChanged(double _x, double _y, double _z);
+      Q_SIGNALS: void PositionChanged(const double _x, const double _y,
+          const double _z);
 
       /// \brief Qt signal emitted when the editor item rotation has changed.
       /// \param[in] _roll Roll rotation of item in degrees.
       /// \param[in] _pitch Pitch rotation of item in degrees.
       /// \param[in] _yaw Yaw rotation of item in degrees.
-      Q_SIGNALS: void RotationChanged(double _roll, double _pitch, double _yaw);
+      Q_SIGNALS: void RotationChanged(const double _roll, const double _pitch,
+          const double _yaw);
 
       /// \brief Qt signal emitted when the editor item width has changed.
       /// \param[in] _width Width of item in pixels.
-      Q_SIGNALS: void WidthChanged(double _width);
+      Q_SIGNALS: void WidthChanged(const double _width);
 
       /// \brief Qt signal emitted when the editor item depth has changed.
       /// \param[in] _depth Depth of item in pixels.
-      Q_SIGNALS: void DepthChanged(double _depth);
+      Q_SIGNALS: void DepthChanged(const double _depth);
 
       /// \brief Qt signal emitted when the editor item height has changed.
       /// \param[in] _height Height of item in pixels.
-      Q_SIGNALS: void HeightChanged(double _height);
+      Q_SIGNALS: void HeightChanged(const double _height);
 
       /// \brief Qt signal emitted when the editor item's X position has
       /// changed.
       /// \param[in] _x X position of item in pixels.
-      Q_SIGNALS: void PosXChanged(double _posX);
+      Q_SIGNALS: void PosXChanged(const double _posX);
 
       /// \brief Qt signal emitted when the editor item's Y position has
       /// changed.
       /// \param[in] _y Y position of item in pixels.
-      Q_SIGNALS: void PosYChanged(double _posY);
+      Q_SIGNALS: void PosYChanged(const double _posY);
 
       /// \brief Qt signal emitted when the editor item's Z position has
       /// changed.
       /// \param[in] _z Z position of item in pixels.
-      Q_SIGNALS: void PosZChanged(double _posZ);
+      Q_SIGNALS: void PosZChanged(const double _posZ);
 
       /// \brief Qt signal emitted when the editor item yaw rotation has
       /// changed.
       /// \param[in] _yaw Yaw rotation of item in degrees.
-      Q_SIGNALS: void YawChanged(double _yaw);
+      Q_SIGNALS: void YawChanged(const double _yaw);
 
       /// \brief Qt signal emitted when the editor item's level has changed.
       /// \param[in] _level Level.
-      Q_SIGNALS: void LevelChanged(int _level);
+      Q_SIGNALS: void LevelChanged(const int _level);
 
       /// \brief Qt signal emitted when the editor item's 3D color has
       /// changed.

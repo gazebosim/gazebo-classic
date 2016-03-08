@@ -63,6 +63,9 @@ namespace gazebo
       /// \param[in] _wallSegmentItem Wall item to attach to the floor.
       public: void AttachWallSegment(WallSegmentItem *_wallSegmentItem);
 
+      /// \brief Emit floor changed Qt signals.
+      public: void FloorChanged();
+
       // Documentation inherited.
       private: virtual void paint(QPainter *_painter,
           const QStyleOptionGraphicsItem *_option, QWidget *_widget);
@@ -86,9 +89,6 @@ namespace gazebo
 
       /// \brief Update the floor properties and emit Qt signals
       private: void Update();
-
-      /// \brief Emit floor changed Qt signals.
-      public: void FloorChanged();
 
       /// \brief Emit size changed Qt signals.
       private: void SizeChanged();
