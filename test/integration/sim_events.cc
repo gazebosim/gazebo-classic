@@ -242,7 +242,6 @@ void SimEventsTest::JointEventSource(const std::string &_physicsEngine)
 
   this->Load("worlds/sim_events.world", false, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
-  world->SetGravity(ignition::math::Vector3d::Zero);
 
   // Get the revoluter model
   physics::ModelPtr model = world->GetModel("revoluter");
