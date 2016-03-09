@@ -2651,6 +2651,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
                                        QtProperty * /*_parent*/)
 {
   QtVariantProperty *item = NULL;
+
   if (_msg.has_type())
   {
     item = this->dataPtr->variantManager->addProperty(
@@ -2677,6 +2678,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
     this->dataPtr->propTreeBrowser->addProperty(item);
     item->setEnabled(false);
   }
+
   item = this->dataPtr->variantManager->addProperty(QVariant::Bool,
     tr("enable physics"));
   if (_msg.has_enable_physics())
