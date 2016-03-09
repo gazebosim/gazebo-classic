@@ -103,6 +103,13 @@ bool IntrospectionClient::NewFilter(const std::string &_managerId,
     const std::set<std::string> &_newItems, std::string &_filterId,
     std::string &_newTopic) const
 {
+  if (_newItems.empty())
+  {
+    gzerr << "Unable to request an introspection filter creation on manager "
+          << "[" << _managerId << "]. The list of items was empty" << std::endl;
+    return false;
+  }
+
   gazebo::msgs::Param_V req;
   gazebo::msgs::GzString rep;
   bool result;
@@ -121,8 +128,8 @@ bool IntrospectionClient::NewFilter(const std::string &_managerId,
   if (!this->dataPtr->node.Request(service, req,
           this->dataPtr->kTimeout, rep, result))
   {
-    gzerr << "Unable to create a remote introspection filter on manager [" <<
-          << _managerId << "]" std::endl;
+    gzerr << "Unable to create a remote introspection filter on manager ["
+          << _managerId << "]" << std::endl;
     return false;
   }
 
@@ -147,6 +154,15 @@ bool IntrospectionClient::NewFilter(const std::string &_managerId,
                              const std::string &_newTopic,
                              const bool _result)> &_cb) const
 {
+  if (_newItems.empty())
+  {
+    gzerr << "Unable to request an introspection filter creation on manager "
+          << "[" << _managerId << "]. The list of items was empty" << std::endl;
+    return false;
+  }
+
+  // Create a lambda function that will add the new filter when the request
+  // is received and invoke the user callback with the new filter ID and topic.
   std::function<void(const gazebo::msgs::GzString&, const bool)> f =
     [this, _managerId, &_cb](const gazebo::msgs::GzString &_rep,
                              const bool _result)
@@ -183,8 +199,8 @@ bool IntrospectionClient::NewFilter(const std::string &_managerId,
   if (!this->dataPtr->node.Request<
     gazebo::msgs::Param_V, gazebo::msgs::GzString>(service, req, f))
   {
-    gzerr << "Unable to create a remote introspection filter on manager [" <<
-          << _managerId << "]" std::endl;
+    gzerr << "Unable to create a remote introspection filter on manager ["
+          << _managerId << "]" << std::endl;
     return false;
   }
 
@@ -196,7 +212,12 @@ bool IntrospectionClient::UpdateFilter(const std::string &_managerId,
     const std::string &_filterId, const std::set<std::string> &_newItems) const
 {
   if (_newItems.empty())
+  {
+    gzerr << "Unable to request an introspection filter update on manager ["
+          << _managerId << "] and filter ID [" << _filterId << "]. The list"
+          << " of items was empty" << std::endl;
     return false;
+  }
 
   gazebo::msgs::Param_V req;
   gazebo::msgs::Empty rep;
@@ -222,7 +243,7 @@ bool IntrospectionClient::UpdateFilter(const std::string &_managerId,
   if (!this->dataPtr->node.Request(service, req,
           this->dataPtr->kTimeout, rep, result))
   {
-    gzerr << "Unable to request an introspection filter update on manager [" <<
+    gzerr << "Unable to request an introspection filter update on manager ["
           << _managerId << "] and filter ID [" << _filterId << "]" << std::endl;
     return false;
   }
@@ -236,7 +257,12 @@ bool IntrospectionClient::UpdateFilter(const std::string &_managerId,
     const std::function<void(const bool _result)> &_cb) const
 {
   if (_newItems.empty())
+  {
+    gzerr << "Unable to request an introspection filter update on manager ["
+          << _managerId << "] and filter ID [" << _filterId << "]. The list"
+          << " of items was empty" << std::endl;
     return false;
+  }
 
   {
     std::lock_guard<std::mutex> lk(this->dataPtr->mutex);
@@ -285,7 +311,7 @@ bool IntrospectionClient::UpdateFilter(const std::string &_managerId,
   if (!this->dataPtr->node.Request<
     gazebo::msgs::Param_V, gazebo::msgs::Empty>(service, req, f))
   {
-    gzerr << "Unable to request an introspection filter update on manager [" <<
+    gzerr << "Unable to request an introspection filter update on manager ["
           << _managerId << "] and filter ID [" << _filterId << "]" << std::endl;
     return false;
   }
@@ -324,7 +350,7 @@ bool IntrospectionClient::RemoveFilter(const std::string &_managerId,
   if (!this->dataPtr->node.Request(service, req,
           this->dataPtr->kTimeout, rep, result))
   {
-    gzerr << "Unable to request an introspection filter removal on manager [" <<
+    gzerr << "Unable to request an introspection filter removal on manager ["
           << _managerId << "] and filter ID [" << _filterId << "]" << std::endl;
     return false;
   }
@@ -389,7 +415,7 @@ bool IntrospectionClient::RemoveFilter(const std::string &_managerId,
   if (!this->dataPtr->node.Request<
     gazebo::msgs::Param_V, gazebo::msgs::Empty>(service, req, f))
   {
-    gzerr << "Unable to request an introspection filter removal on manager [" <<
+    gzerr << "Unable to request an introspection filter removal on manager ["
           << _managerId << "] and filter ID [" << _filterId << "]" << std::endl;
     return false;
   }
