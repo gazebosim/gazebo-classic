@@ -20,15 +20,70 @@
 #include "gazebo/transport/Node.hh"
 
 #include "gazebo/gui/Actions.hh"
-#include "gazebo/gui/model/MEUserCmdManagerPrivate.hh"
 #include "gazebo/gui/model/MEUserCmdManager.hh"
 #include "gazebo/gui/model/ModelEditorEvents.hh"
+
+namespace gazebo
+{
+  namespace gui
+  {
+    /// \internal
+    /// \brief Private data for the MEUserCmd class
+    class MEUserCmdPrivate
+    {
+      /// \brief Unique ID identifying this command in the server.
+      public: unsigned int id;
+
+      /// \brief Description for the command.
+      public: std::string description;
+
+      /// \brief Type of command, such as MOVING or DELETING.
+      public: MEUserCmd::CmdType type;
+
+      /// \brief SDF element with information about the entity.
+      public: sdf::ElementPtr sdf;
+
+      /// \brief Fully scoped name of the entity involved in the command.
+      public: std::string scopedName;
+
+      /// \brief Pose before the command (to be used by undo).
+      public: ignition::math::Pose3d poseBefore;
+
+      /// \brief Pose after the command (to be used by redo).
+      public: ignition::math::Pose3d poseAfter;
+
+      /// \brief Scale before the command (to be used by undo).
+      public: ignition::math::Vector3d scaleBefore;
+
+      /// \brief Scale after the command (to be used by redo).
+      public: ignition::math::Vector3d scaleAfter;
+
+      /// \brief If the command is related to a joint, this is its unique Id.
+      /// It's different from the scopedName and we need both.
+      public: std::string jointId;
+    };
+
+    /// \internal
+    /// \brief Private data for the MEUserCmdManager class
+    class MEUserCmdManagerPrivate
+    {
+      /// \brief Counter to give commands unique ids.
+      public: unsigned int idCounter;
+
+      /// \brief List of commands which can be undone.
+      public: std::vector<MEUserCmdPtr> undoCmds;
+
+      /// \brief List of commands which can be redone.
+      public: std::vector<MEUserCmdPtr> redoCmds;
+    };
+  }
+}
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-MEUserCmd::MEUserCmd(unsigned int _id,
+MEUserCmd::MEUserCmd(const unsigned int _id,
     const std::string &_description,
     MEUserCmd::CmdType _type)
   : dataPtr(new MEUserCmdPrivate())
@@ -309,6 +364,7 @@ void MEUserCmdManager::Reset()
 {
   this->dataPtr->undoCmds.clear();
   this->dataPtr->redoCmds.clear();
+  this->StatsSignal();
 }
 
 /////////////////////////////////////////////////
@@ -363,7 +419,7 @@ void MEUserCmdManager::OnUndoCommand(QAction *_action)
   }
 
   // Update buttons
-  this->UpdateStats();
+  this->StatsSignal();
 }
 
 /////////////////////////////////////////////////
@@ -418,7 +474,7 @@ void MEUserCmdManager::OnRedoCommand(QAction *_action)
   }
 
   // Update buttons
-  this->UpdateStats();
+  this->StatsSignal();
 }
 
 /////////////////////////////////////////////////
@@ -437,13 +493,13 @@ MEUserCmdPtr MEUserCmdManager::NewCmd(
   this->dataPtr->redoCmds.clear();
 
   // Update buttons
-  this->UpdateStats();
+  this->StatsSignal();
 
   return cmd;
 }
 
 /////////////////////////////////////////////////
-void MEUserCmdManager::UpdateStats()
+void MEUserCmdManager::OnStatsSlot()
 {
   g_undoAct->setEnabled(this->dataPtr->undoCmds.size() > 0);
   g_redoAct->setEnabled(this->dataPtr->redoCmds.size() > 0);
@@ -515,4 +571,5 @@ void MEUserCmdManager::OnRedoCmdHistory()
 
   menu.exec(QCursor::pos());
 }
+
 

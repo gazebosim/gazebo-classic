@@ -265,21 +265,6 @@ namespace gazebo
             event::ConnectionPtr _subscriber)
           { nestedModelRemoved.Disconnect(_subscriber); }
 
-        /// \brief Connect a Gazebo event to the request link removal signal.
-        /// \param[in] _subscriber the subscriber to this event
-        /// \return a connection
-        public: template<typename T>
-            static event::ConnectionPtr ConnectRequestLinkRemoval(
-            T _subscriber)
-          { return requestLinkRemoval.Connect(_subscriber); }
-
-        /// \brief Disconnect a Gazebo event from the request link removal
-        /// signal.
-        /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectRequestLinkRemoval(
-            event::ConnectionPtr _subscriber)
-          { requestLinkRemoval.Disconnect(_subscriber); }
-
         /// \brief Connect a Gazebo event to the request link insertion signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
@@ -294,6 +279,21 @@ namespace gazebo
         public: static void DisconnectRequestLinkInsertion(
             event::ConnectionPtr _subscriber)
           { requestLinkInsertion.Disconnect(_subscriber); }
+
+        /// \brief Connect a Gazebo event to the request link removal signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectRequestLinkRemoval(
+            T _subscriber)
+          { return requestLinkRemoval.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the request link removal
+        /// signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectRequestLinkRemoval(
+            event::ConnectionPtr _subscriber)
+          { requestLinkRemoval.Disconnect(_subscriber); }
 
         /// \brief Connect a Gazebo event to the link removed signal.
         /// \param[in] _subscriber the subscriber to this event
@@ -642,12 +642,12 @@ namespace gazebo
         /// \brief Notify that a link has been removed.
         public: static event::EventT<void (std::string)> linkRemoved;
 
-        /// \brief Request to remove a link.
-        public: static event::EventT<void (std::string)> requestLinkRemoval;
-
         /// \brief Request to insert a link.
         public: static event::EventT<void (sdf::ElementPtr)>
             requestLinkInsertion;
+
+        /// \brief Request to remove a link.
+        public: static event::EventT<void (std::string)> requestLinkRemoval;
 
         /// \brief Request to remove a nested model.
         public: static event::EventT<void (std::string)>

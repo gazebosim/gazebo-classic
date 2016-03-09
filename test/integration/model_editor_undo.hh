@@ -20,16 +20,18 @@
 
 #include "gazebo/gui/QTestFixture.hh"
 
-/// \brief A test class for undo / redo in the model editor
+// FIXME: Tests only pass if ran individually, issue #1861
+
+/// \brief A test class for undo / redo in the model editor.
 class ModelEditorUndoTest : public QTestFixture
 {
   Q_OBJECT
 
-  /// \brief Test undo/redo link insertion via the right-click context menu.
-  private slots: void LinkDeletionByContextMenu();
-
   /// \brief Test undo/redo link insertion using the mouse.
   private slots: void LinkInsertionByMouse();
+
+  /// \brief Test undo/redo link deletion via the right-click context menu.
+  private slots: void LinkDeletionByContextMenu();
 
   /// \brief Test undo/redo link insertion via the right-click context menu.
   private slots: void NestedModelDeletionByContextMenu();
@@ -46,3 +48,4 @@ class ModelEditorUndoTest : public QTestFixture
 };
 
 #endif
+

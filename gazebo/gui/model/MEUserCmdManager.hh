@@ -87,7 +87,7 @@ namespace gazebo
       /// \param[in] _description Description for the command, such as
       /// "Rotate box", "Delete sphere", etc.
       /// \param[in] _type Type of command, such as MOVING, DELETING, etc.
-      public: MEUserCmd(unsigned int _id, const std::string &_description,
+      public: MEUserCmd(const unsigned int _id, const std::string &_description,
           MEUserCmd::CmdType _type);
 
       /// \brief Destructor
@@ -107,9 +107,12 @@ namespace gazebo
       /// \return Description
       public: std::string Description() const;
 
-      /// \brief Return this command's type.
-      /// \return Command type
+      /// \brief Set the SDF element relevant to this command.
+      /// \param[in] _sdf SDF pointer.
       public: void SetSDF(sdf::ElementPtr _sdf);
+
+      /// \brief Set the scoped name of the entity related to this command.
+      /// \param[in] _name Fully scoped entity name.
       public: void SetScopedName(const std::string &_name);
       public: void SetPoseChange(const ignition::math::Pose3d &_before,
           const ignition::math::Pose3d &_after);
@@ -146,28 +149,31 @@ namespace gazebo
       public: void Reset();
 
       /// \brief Register that a new command has been executed by the user.
+      /// \param[in] _description Command description, to be displayed to the
+      /// user.
+      /// \param[in] _type Command type.
+      /// \return Pointer to new command.
       public: MEUserCmdPtr NewCmd(const std::string &_description,
-                 const MEUserCmd::CmdType _type);
+          const MEUserCmd::CmdType _type);
 
-      /// \brief Qt call back when an undo history action is triggered.
-      /// It publishes an undo request message.
+      /// \brief Qt callback to undo a command.
+      /// \param[in] _action Action corresponding to the command.
       private slots: void OnUndoCommand(QAction *_action);
 
-      /// \brief Qt call back when the undo history button is pressed.
+      /// \brief Qt callback when the undo history button is pressed.
       /// It opens the undo history menu.
       private slots: void OnUndoCmdHistory();
 
-      /// \brief Qt call back when a redo history action is triggered.
-      /// It publishes a redo request message.
+      /// \brief Qt callback to redo a command.
+      /// \param[in] _action Action corresponding to the command.
       private slots: void OnRedoCommand(QAction *_action);
 
-      /// \brief Qt call back when the redo history button is pressed.
+      /// \brief Qt callback when the redo history button is pressed.
       /// It opens the redo history menu.
       private slots: void OnRedoCmdHistory();
 
-      /// \brief Updates the widgets according to the user command stats
-      /// message.
-      private slots: void UpdateStats();
+      /// \brief Updates the widgets according to the user commands available.
+      private slots: virtual void OnStatsSlot();
 
       /// \brief This is a singleton class.
       private: friend class SingletonT<MEUserCmdManager>;
@@ -179,4 +185,5 @@ namespace gazebo
   }
 }
 #endif
+
 

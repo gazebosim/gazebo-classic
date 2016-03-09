@@ -89,7 +89,7 @@ namespace gazebo
 
       /// \brief Updates the widgets according to the user command stats
       /// message.
-      private slots: void OnStatsSlot();
+      private slots: virtual void OnStatsSlot();
 
       /// \brief User command statistics message callback.
       /// \param[in] _msg Message containing statistics about user commands

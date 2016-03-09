@@ -304,6 +304,7 @@ void ModelCreator::OnEdit(bool _checked)
 
     this->DeselectAll();
   }
+
   MEUserCmdManager::Instance()->Reset();
   MEUserCmdManager::Instance()->SetActive(this->active);
 }
@@ -775,6 +776,22 @@ void ModelCreator::AddJoint(const std::string &_type)
   this->Stop();
   if (this->jointMaker)
     this->jointMaker->AddJoint(_type);
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::AddCustomLink(const EntityType _type,
+    const ignition::math::Vector3d &_size, const ignition::math::Pose3d &_pose,
+    const std::string &_uri, const unsigned int _samples)
+{
+  this->Stop();
+
+  this->addEntityType = _type;
+  if (_type != ENTITY_NONE)
+  {
+    auto linkData = this->AddShape(_type, _size, _pose, _uri, _samples);
+    if (linkData)
+      this->mouseVisual = linkData->linkVisual;
+  }
 }
 
 /////////////////////////////////////////////////
@@ -1422,6 +1439,8 @@ void ModelCreator::Reset()
   this->previewVisual->Load();
   this->modelPose = ignition::math::Pose3d::Zero;
   this->previewVisual->SetPose(this->modelPose);
+
+  MEUserCmdManager::Instance()->Reset();
 }
 
 /////////////////////////////////////////////////
@@ -1638,8 +1657,7 @@ void ModelCreator::RemoveEntity(const std::string &_entity)
   }
 
   // if it's a link
-  auto link = this->allLinks.find(_entity);
-  if (link != this->allLinks.end())
+  if (this->allLinks.find(_entity) != this->allLinks.end())
   {
     if (this->jointMaker)
       this->jointMaker->RemoveJointsByLink(_entity);

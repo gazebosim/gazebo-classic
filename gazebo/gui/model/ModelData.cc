@@ -626,8 +626,9 @@ LinkData *LinkData::Clone(const std::string &_newName)
 {
   GZ_ASSERT(this->linkVisual, "LinkVisual is NULL");
   LinkData *cloneLink = new LinkData();
+  auto cloneSDF = this->linkSDF->Clone();
 
-  cloneLink->Load(this->linkSDF);
+  cloneLink->Load(cloneSDF);
   cloneLink->SetName(_newName);
 
   std::string linkVisualName = this->linkVisual->GetName();

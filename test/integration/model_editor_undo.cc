@@ -16,6 +16,7 @@
 */
 
 #include "gazebo/gui/Actions.hh"
+#include "gazebo/gui/GLWidget.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/InsertModelWidget.hh"
@@ -117,6 +118,7 @@ void ModelEditorUndoTest::LinkInsertionByMouse()
     QVERIFY(link != NULL);
 
     // Undo
+    gzmsg << "Undo inserting [" << insertedLinkDefaultName << "]" << std::endl;
     gazebo::gui::g_undoAct->trigger();
 
     // Check redo is enabled
@@ -130,6 +132,7 @@ void ModelEditorUndoTest::LinkInsertionByMouse()
     QVERIFY(link == NULL);
 
     // Redo
+    gzmsg << "Redo inserting [" << insertedLinkDefaultName << "]" << std::endl;
     gazebo::gui::g_redoAct->trigger();
   }
 
@@ -214,6 +217,7 @@ void ModelEditorUndoTest::LinkDeletionByContextMenu()
     QVERIFY(link == NULL);
 
     // Undo
+    gzmsg << "Undo deleting [" << linkVisName << "]" << std::endl;
     gazebo::gui::g_undoAct->trigger();
 
     // Process some events, and draw the screen
@@ -235,6 +239,7 @@ void ModelEditorUndoTest::LinkDeletionByContextMenu()
     QVERIFY(link != NULL);
 
     // Redo
+    gzmsg << "Redo deleting [" << linkVisName << "]" << std::endl;
     gazebo::gui::g_redoAct->trigger();
   }
 
@@ -484,7 +489,8 @@ void ModelEditorUndoTest::TriggerDelete()
       auto context = qobject_cast<QMenu *>(widget);
       QVERIFY(context != NULL);
 
-      // This only works as long as the Delete action is the last one
+      // This only works as long as the Delete action is the last one in the
+      // menu
       QTest::mouseClick(context, Qt::LeftButton, 0, QPoint(10,
           context->height() - 10));
 
@@ -630,3 +636,4 @@ void ModelEditorUndoTest::LinkTranslation()
 
 // Generate a main function for the test
 QTEST_MAIN(ModelEditorUndoTest)
+
