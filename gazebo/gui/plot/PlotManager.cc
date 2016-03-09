@@ -50,10 +50,10 @@ namespace gazebo
       public: transport::SubscriberPtr worldControlSub;
 
       /// \brief A map of topic names to topic data handers.
-      //public: std::map<std::string, TopicDataHandler *> topicDataHandlers;
+      // public: std::map<std::string, TopicDataHandler *> topicDataHandlers;
 
       /// \brief Handler for updating topic curves
-      public: TopicCurveHandler topicCurve;
+      // public: TopicCurveHandler topicCurve;
 
       /// \brief Handler for updating introspection curves
       public: IntrospectionCurveHandler introspectionCurve;
@@ -98,127 +98,6 @@ void PlotManager::OnWorldControl(ConstWorldControlPtr &_data)
   }
 }
 
-/*
-/////////////////////////////////////////////////
-void PlotManager::AddTopicCurve(const std::string &_uri,
-    PlotCurveWeakPtr _curve)
-{
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-
-  // parse the uri to get topic
-  std::string topic;
-
-  // parse the uri to get param;
-  std::string param;
-
-  auto it = this->dataPtr->topicDataHandlers.find(topic);
-  if (it == this->dataPtr->topicDataHandlers.end())
-  {
-    TopicDataHandler *handler = new TopicDataHandler();
-    handler->SetTopic(topic);
-    handler->AddCurve(param, _curve);
-    this->dataPtr->topicDataHandlers[topic] = handler;
-  }
-  else
-  {
-    TopicDataHandler *handler = it->second;
-    handler->AddCurve(param, _curve);
-  }
-}
-
-/////////////////////////////////////////////////
-void PlotManager::RemoveTopicCurve(PlotCurveWeakPtr _curve)
-{
-  if (_curve.expired())
-    return;
-
-  // find and remove the curve
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-  for (auto it = this->dataPtr->topicDataHandlers.begin();
-      it != this->dataPtr->topicDataHandlers.end(); ++it)
-  {
-    TopicDataHandler *handler = it->second;
-
-    if (!handler)
-      continue;
-
-    if (handler->HasCurve(_curve))
-    {
-      handler->RemoveCurve(_curve);
-      if (handler->Count() == 0u)
-      {
-        delete it->second;
-        this->dataPtr->topicDataHandlers.erase(it);
-      }
-
-      break;
-    }
-  }
-}*/
-
-
-
-/*/////////////////////////////////////////////////
-void PlotManager::AddCurve(const std::string &_name, PlotCurveWeakPtr _curve)
-{
-  std::cerr << " add curve " << std::endl;
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-  auto c = _curve.lock();
-  if (!c)
-    return;
-  std::cerr << " add curve after lock" << std::endl;
-
-  auto it = this->dataPtr->curves.find(_name);
-  if (it == this->dataPtr->curves.end())
-  {
-    // create entry in map
-    CurveVariableSet curveSet;
-    curveSet.insert(_curve);
-    this->dataPtr->curves[_name] = curveSet;
-
-    this->AddItemToFilter(_name);
-
-  }
-  else
-  {
-    auto cIt = it->second.find(_curve);
-    if (cIt == it->second.end())
-    {
-      it->second.insert(_curve);
-    }
-  }
-  std::cerr << " done add curve" << std::endl;
-}
-
-/////////////////////////////////////////////////
-void PlotManager::RemoveCurve(PlotCurveWeakPtr _curve)
-{
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-  auto c = _curve.lock();
-  if (!c)
-    return;
-
-  // find and remove the curve
-  for (auto it = this->dataPtr->curves.begin();
-      it != this->dataPtr->curves.end(); ++it)
-  {
-    auto cIt = it->second.find(_curve);
-    if (cIt != it->second.end())
-    {
-      it->second.erase(cIt);
-      if (it->second.empty())
-      {
-        // remove item from introspection filter
-        this->RemoveItemFromFilter(it->first);
-
-        // erase from map
-        this->dataPtr->curves.erase(it);
-      }
-      return;
-    }
-  }
-}*/
-
 /////////////////////////////////////////////////
 void PlotManager::AddIntrospectionCurve(const std::string &_uri,
     PlotCurveWeakPtr _curve)
@@ -234,15 +113,15 @@ void PlotManager::RemoveIntrospectionCurve(PlotCurveWeakPtr _curve)
 
 /////////////////////////////////////////////////
 void PlotManager::AddTopicCurve(const std::string &_uri,
-    PlotCurveWeakPtr _curve)
+    PlotCurveWeakPtr /*_curve*/)
 {
-  this->dataPtr->topicCurve.AddCurve(_uri, _curve);
+  // this->dataPtr->topicCurve.AddCurve(_uri, _curve);
 }
 
 /////////////////////////////////////////////////
-void PlotManager::RemoveTopicCurve(PlotCurveWeakPtr _curve)
+void PlotManager::RemoveTopicCurve(PlotCurveWeakPtr /*_curve*/)
 {
-  this->dataPtr->topicCurve.RemoveCurve( _curve);
+  // ggthis->dataPtr->topicCurve.RemoveCurve( _curve);
 }
 
 /////////////////////////////////////////////////

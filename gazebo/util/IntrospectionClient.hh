@@ -18,6 +18,7 @@
 #define _GAZEBO_UTIL_INTROSPECTION_CLIENT_HH_
 
 #include <chrono>
+#include <functional>
 #include <memory>
 #include <set>
 #include <string>
@@ -62,7 +63,8 @@ namespace gazebo
 
       /// \brief Create a new filter for observing item updates. This function
       /// will create a new topic for sending periodic updates of the items
-      /// specified in the filter.
+      /// specified in the filter. This function will block until the result is
+      /// received.
       /// \param[in] _managerID ID of the manager to request the operation.
       /// \param[in] _newItems Non-empty set of items to observe.
       /// \param[out] _filterId Unique ID of the filter. You'll need this ID
@@ -75,34 +77,107 @@ namespace gazebo
                              std::string &_filterId,
                              std::string &_newTopic) const;
 
+      /// \brief Create a new filter for observing item updates. This function
+      /// will create a new topic for sending periodic updates of the items
+      /// specified in the filter. This function will not block, the result
+      /// will be received in a callback function.
+      /// \param[in] _managerID ID of the manager to request the operation.
+      /// \param[in] _newItems Non-empty set of items to observe.
+      /// \param[in] _cb Callback function executed when the response arrives.
+      /// The callback has the following parameters:
+      ///   \param[in] _filterId Unique ID of the filter. You'll need this ID
+      /// for future filter updates or for removing it.
+      ///   \param[in] _newTopic After the filter creation, a client should
+      /// subscribe to this topic for receiving updates.
+      ///   \param[in] _result Result of the request. If false, there was
+      /// a problem executing your request.
+      /// \return True if the request was successfully sent.
+      public: bool NewFilter(const std::string &_managerId,
+                             const std::set< std::string> &_newItems,
+                             const std::function <void(
+                                 const std::string &_filterId,
+                                 const std::string &_newTopic,
+                                 const bool _result)> &_cb) const;
+
       /// \brief Update an existing filter with a different set of items.
+      /// This function will block until the result is received.
       /// \param[in] _managerID ID of the manager to request the operation.
       /// \param[in] _filterId ID of the filter to update.
-      /// \param[in] _NewItems Non-empty set of items to be observed.
+      /// \param[in] _newItems Non-empty set of items to be observed.
       /// \return True if the filter was successfuly updated or false otherwise.
       public: bool UpdateFilter(const std::string &_managerId,
                                 const std::string &_filterId,
                                 const std::set<std::string> &_newItems) const;
 
+      /// \brief Update an existing filter with a different set of items.
+      /// This function will not block, the result will be received in a
+      /// callback function.
+      /// \param[in] _managerID ID of the manager to request the operation.
+      /// \param[in] _filterId ID of the filter to update.
+      /// \param[in] _newItems Non-empty set of items to be observed.
+      /// \param[in] _cb Callback function executed when the response arrives.
+      /// The callback has the following parameter:
+      ///   \param[in] _result Result of the request. If false, there was
+      /// a problem executing your request.
+      /// \return True if the request was successfully sent.
+      public: bool UpdateFilter(const std::string &_managerId,
+                                const std::string &_filterId,
+                                const std::set<std::string> &_newItems,
+                                const std::function <void(
+                                    const bool _result)> &_cb) const;
+
       /// \brief Remove all existing filters.
-      /// \return True if the filters wer successfully removed
+      /// This function will block until the result is received.
+      /// \return True if the filters were successfully removed
       /// or false otherwise
       public: bool RemoveAllFilters() const;
 
       /// \brief Remove an existing filter.
+      /// This function will block until the result is received.
       /// \param[in] _managerID ID of the manager to request the operation.
       /// \param[in] _filterId ID of the filter to remove.
       /// \return True if the filter was successfully removed or false otherwise
       public: bool RemoveFilter(const std::string &_managerId,
                                 const std::string &_filterId) const;
 
+      /// \brief Remove an existing filter.
+      /// This function will not block, the result will be received in a
+      /// callback function.
+      /// \param[in] _managerID ID of the manager to request the operation.
+      /// \param[in] _filterId ID of the filter to remove.
+      /// \param[in] _cb Callback function executed when the response arrives.
+      /// The callback has the following parameter:
+      ///   \param[in] _result Result of the request. If false, there was
+      /// a problem executing your request.
+      /// \return True if the request was successfully sent.
+      public: bool RemoveFilter(const std::string &_managerId,
+                                const std::string &_filterId,
+                                const std::function <void(
+                                    const bool _result)> &_cb) const;
+
       /// \brief Get a copy of the items already registered.
+      /// This function will block until the result is received.
       /// \param[in] _managerID ID of the manager to request the operation.
       /// \param[out] _items The list of items.
       /// \return True if the operation succeed or false otherwise
       /// (wrong managerID, transport problem).
       public: bool Items(const std::string &_managerId,
                          std::set<std::string> &_items) const;
+
+      /// \brief Get a copy of the items already registered.
+      /// This function will not block, the result will be received in a
+      /// callback function.
+      /// \param[in] _managerID ID of the manager to request the operation.
+      /// \param[in] _cb Callback function executed when the response arrives.
+      /// The callback has the following parameter:
+      ///   \param[in] _items The list of items.
+      ///   \param[in] _result Result of the request. If false, there was
+      /// a problem executing your request.
+      /// \return True if the request was successfully sent.
+      public: bool Items(const std::string &_managerId,
+                         const std::function <void(
+                             const std::set<std::string> &_items,
+                             const bool _result)> &_cb) const;
 
       /// \bried Check if the _item is registered on a manager with
       /// _managerId.
