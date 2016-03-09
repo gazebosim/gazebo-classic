@@ -598,7 +598,13 @@ namespace gazebo
 
       /// \brief Register items in the introspection service.
       private: void RegisterIntrospectionItems();
+
+      /// \brief Register position items in the introspection service.
+      /// \param[in] _index Axis index.
       private: void RegisterIntrospectionPosition(const unsigned int _index);
+
+      /// \brief Register velocity items in the introspection service.
+      /// \param[in] _index Axis index.
       private: void RegisterIntrospectionVelocity(const unsigned int _index);
 
       /// \brief The first link this joint connects to
