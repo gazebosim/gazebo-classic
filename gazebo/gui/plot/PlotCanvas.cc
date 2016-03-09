@@ -22,6 +22,7 @@
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 
+#include "gazebo/gui/plot/EditableLabel.hh"
 #include "gazebo/gui/plot/PlotManager.hh"
 #include "gazebo/gui/plot/PlottingTypes.hh"
 #include "gazebo/gui/plot/IncrementalPlot.hh"
@@ -55,7 +56,7 @@ namespace gazebo
     class PlotCanvasPrivate
     {
       /// \brief Text label
-      public: QLabel *title;
+      public: EditableLabel *title;
 
       /// \brief Layout that contains all the plots.
       public: QLayout *plotLayout;
@@ -89,7 +90,8 @@ PlotCanvas::PlotCanvas(QWidget *_parent)
   this->setObjectName("plotCanvas");
 
   // Plot title
-  this->dataPtr->title = new QLabel("Plot Name");
+  this->dataPtr->title = new EditableLabel("Plot Name");
+
   QHBoxLayout *titleLayout = new QHBoxLayout;
   titleLayout->addWidget(this->dataPtr->title);
   titleLayout->setAlignment(Qt::AlignHCenter);
