@@ -102,6 +102,8 @@ PlotWindow::PlotWindow(QWidget *_parent)
   // add button
   QPushButton *addCanvasButton = new QPushButton("+");
   addCanvasButton->setObjectName("plotAddCanvas");
+  addCanvasButton->setDefault(false);
+  addCanvasButton->setAutoDefault(false);
   addCanvasButton->setToolTip("Add a new canvas");
   QGraphicsDropShadowEffect *addCanvasShadow = new QGraphicsDropShadowEffect();
   addCanvasShadow->setBlurRadius(8);

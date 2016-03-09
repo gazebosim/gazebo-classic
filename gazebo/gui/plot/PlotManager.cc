@@ -113,14 +113,14 @@ void PlotManager::RemoveIntrospectionCurve(PlotCurveWeakPtr _curve)
 }
 
 /////////////////////////////////////////////////
-void PlotManager::AddTopicCurve(const std::string &_uri,
-    PlotCurveWeakPtr _curve)
+void PlotManager::AddTopicCurve(const std::string &/*_uri*/,
+    PlotCurveWeakPtr /*_curve*/)
 {
   // this->dataPtr->topicCurve.AddCurve(_uri, _curve);
 }
 
 /////////////////////////////////////////////////
-void PlotManager::RemoveTopicCurve(PlotCurveWeakPtr _curve)
+void PlotManager::RemoveTopicCurve(PlotCurveWeakPtr /*_curve*/)
 {
   // this->dataPtr->topicCurve.RemoveCurve( _curve);
 }

@@ -22,6 +22,7 @@
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 
+#include "gazebo/gui/plot/EditableLabel.hh"
 #include "gazebo/gui/plot/PlotManager.hh"
 #include "gazebo/gui/plot/PlottingTypes.hh"
 #include "gazebo/gui/plot/IncrementalPlot.hh"
@@ -55,7 +56,7 @@ namespace gazebo
     class PlotCanvasPrivate
     {
       /// \brief Text label
-      public: QLabel *title;
+      public: EditableLabel *title;
 
       /// \brief Layout that contains all the plots.
       public: QLayout *plotLayout;
@@ -64,7 +65,7 @@ namespace gazebo
       public: std::map<unsigned int, PlotData *> plotData;
 
       /// \brief Pointer to an empty plot.
-      public: IncrementalPlot *emptyPlot = NULL;
+      public: EmptyIncrementalPlot *emptyPlot = NULL;
 
       /// \brief Container for all the variableCurves on the Y axis.
       public: VariablePillContainer *yVariableContainer = NULL;
@@ -89,7 +90,8 @@ PlotCanvas::PlotCanvas(QWidget *_parent)
   this->setObjectName("plotCanvas");
 
   // Plot title
-  this->dataPtr->title = new QLabel("Plot Name");
+  this->dataPtr->title = new EditableLabel("Plot Name");
+
   QHBoxLayout *titleLayout = new QHBoxLayout;
   titleLayout->addWidget(this->dataPtr->title);
   titleLayout->setAlignment(Qt::AlignHCenter);
@@ -102,9 +104,13 @@ PlotCanvas::PlotCanvas(QWidget *_parent)
   QAction *deletePlotAct = new QAction("Delete canvas", settingsMenu);
   deletePlotAct->setStatusTip(tr("Delete entire canvas"));
   connect(deletePlotAct, SIGNAL(triggered()), this, SLOT(OnDeleteCanvas()));
+  QAction *showGridAct = new QAction("Show grid", settingsMenu);
+  showGridAct->setStatusTip(tr("Show/hide grid lines on plot"));
+  showGridAct->setCheckable(true);
 
   settingsMenu->addAction(clearPlotAct);
   settingsMenu->addAction(deletePlotAct);
+  settingsMenu->addAction(showGridAct);
 
   QToolButton *settingsButton = new QToolButton();
   settingsButton->setObjectName("plotCanvasTitleTool");
@@ -185,8 +191,14 @@ PlotCanvas::PlotCanvas(QWidget *_parent)
   plotScrollArea->setWidget(plotFrame);
 
   // empty plot
-  this->dataPtr->emptyPlot = new IncrementalPlot(this);
+  this->dataPtr->emptyPlot = new EmptyIncrementalPlot(this);
+  connect(this->dataPtr->emptyPlot, SIGNAL(VariableAdded(std::string)),
+      this, SLOT(OnAddVariable(std::string)));
   this->dataPtr->plotLayout->addWidget(this->dataPtr->emptyPlot);
+
+  // set initial show grid state
+  showGridAct->setChecked(this->dataPtr->emptyPlot->ShowGrid());
+  connect(showGridAct, SIGNAL(triggered()), this, SLOT(OnShowGrid()));
 
   QFrame *mainFrame = new QFrame;
   mainFrame->setObjectName("plotCanvasFrame");
@@ -425,6 +437,13 @@ unsigned int PlotCanvas::PlotByVariable(const unsigned int _variableId) const
     }
   }
   return EmptyPlot;
+}
+
+/////////////////////////////////////////////////
+void PlotCanvas::OnAddVariable(const std::string &_variable)
+{
+  // add new variable to new plot
+  this->AddVariable(_variable);
 }
 
 /////////////////////////////////////////////////
@@ -764,6 +783,15 @@ void PlotCanvas::OnDeleteCanvas()
     return;
 
   emit CanvasDeleted();
+}
+
+/////////////////////////////////////////////////
+void PlotCanvas::OnShowGrid()
+{
+  this->dataPtr->emptyPlot->ShowGrid(!this->dataPtr->emptyPlot->ShowGrid());
+
+  for (const auto &it : this->dataPtr->plotData)
+    it.second->plot->ShowGrid(!it.second->plot->ShowGrid());
 }
 
 /////////////////////////////////////////////////
