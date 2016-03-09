@@ -83,7 +83,7 @@ namespace gazebo
       /// will be received in a callback function.
       /// \param[in] _managerID ID of the manager to request the operation.
       /// \param[in] _newItems Non-empty set of items to observe.
-      /// \param[in] _cb  Callback function executed when the response arrives.
+      /// \param[in] _cb Callback function executed when the response arrives.
       /// The callback has the following parameters:
       ///   \param[in] _filterId Unique ID of the filter. You'll need this ID
       /// for future filter updates or for removing it.
@@ -103,7 +103,7 @@ namespace gazebo
       /// This function will block until the result is received.
       /// \param[in] _managerID ID of the manager to request the operation.
       /// \param[in] _filterId ID of the filter to update.
-      /// \param[in] _NewItems Non-empty set of items to be observed.
+      /// \param[in] _newItems Non-empty set of items to be observed.
       /// \return True if the filter was successfuly updated or false otherwise.
       public: bool UpdateFilter(const std::string &_managerId,
                                 const std::string &_filterId,
@@ -114,8 +114,8 @@ namespace gazebo
       /// callback function.
       /// \param[in] _managerID ID of the manager to request the operation.
       /// \param[in] _filterId ID of the filter to update.
-      /// \param[in] _NewItems Non-empty set of items to be observed.
-      /// \param[in] _cb  Callback function executed when the response arrives.
+      /// \param[in] _newItems Non-empty set of items to be observed.
+      /// \param[in] _cb Callback function executed when the response arrives.
       /// The callback has the following parameter:
       ///   \param[in] _result Result of the request. If false, there was
       /// a problem executing your request.
@@ -145,7 +145,7 @@ namespace gazebo
       /// callback function.
       /// \param[in] _managerID ID of the manager to request the operation.
       /// \param[in] _filterId ID of the filter to remove.
-      /// \param[in] _cb  Callback function executed when the response arrives.
+      /// \param[in] _cb Callback function executed when the response arrives.
       /// The callback has the following parameter:
       ///   \param[in] _result Result of the request. If false, there was
       /// a problem executing your request.
@@ -168,7 +168,7 @@ namespace gazebo
       /// This function will not block, the result will be received in a
       /// callback function.
       /// \param[in] _managerID ID of the manager to request the operation.
-      /// \param[in] _cb  Callback function executed when the response arrives.
+      /// \param[in] _cb Callback function executed when the response arrives.
       /// The callback has the following parameter:
       ///   \param[in] _items The list of items.
       ///   \param[in] _result Result of the request. If false, there was
