@@ -817,6 +817,8 @@ void BuildingMaker::GenerateSDF()
                 Set(buildingModelManip->Color());
             visualElem->GetElement("material")->GetElement("script")
                 ->GetElement("name")->Set(buildingModelManip->Texture());
+            visualElem->GetElement("meta")->GetElement("layer")
+                ->Set(buildingModelManip->Level());
             newLinkElem->InsertElement(visualElem);
             newLinkElem->InsertElement(collisionElem);
           }
@@ -838,6 +840,8 @@ void BuildingMaker::GenerateSDF()
               Set(buildingModelManip->Color());
           visualElem->GetElement("material")->GetElement("script")
               ->GetElement("name")->Set(buildingModelManip->Texture());
+          visualElem->GetElement("meta")->GetElement("layer")
+              ->Set(buildingModelManip->Level());
         }
       }
       // Floor
@@ -927,6 +931,8 @@ void BuildingMaker::GenerateSDF()
                 Set(buildingModelManip->Color());
             visualElem->GetElement("material")->GetElement("script")
                 ->GetElement("name")->Set(buildingModelManip->Texture());
+            visualElem->GetElement("meta")->GetElement("layer")
+                ->Set(buildingModelManip->Level());
             newLinkElem->InsertElement(visualElem);
             newLinkElem->InsertElement(collisionElem);
           }
@@ -948,6 +954,8 @@ void BuildingMaker::GenerateSDF()
               Set(buildingModelManip->Color());
           visualElem->GetElement("material")->GetElement("script")
               ->GetElement("name")->Set(buildingModelManip->Texture());
+          visualElem->GetElement("meta")->GetElement("layer")
+              ->Set(buildingModelManip->Level());
         }
       }
     }
@@ -982,6 +990,8 @@ void BuildingMaker::GenerateSDF()
               Set(buildingModelManip->Color());
         visualElem->GetElement("material")->GetElement("script")
             ->GetElement("name")->Set(buildingModelManip->Texture());
+        visualElem->GetElement("meta")->GetElement("layer")
+            ->Set(buildingModelManip->Level());
         newLinkElem->InsertElement(visualElem);
         newLinkElem->InsertElement(collisionElem);
       }
