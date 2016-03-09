@@ -688,7 +688,10 @@ static void* ComputeRows(void *p)
 
       //////////////////////////////////////////////////////
       //                                                  //
-      // use the precon case repeated below for _mg       //
+      // IMPLEMENT MG                                     //
+      //                                                  //
+      // personal note:                                   //
+      // using the precon case repeated below for _mg     //
       // except here:                                     //
       //    rhs_precon --> mg_r (residual)                //
       //    lambda     --> mg_e (correction)              //
@@ -706,6 +709,7 @@ static void* ComputeRows(void *p)
         // pretty much what we need for _mg.
 
 
+        // @TODO:
         // fill rhs_precon with residue:
         //   rhs_precon = J inv(M) J^T lambda - rhs
         rhs_precon[index] = 0;
@@ -714,6 +718,15 @@ static void* ComputeRows(void *p)
         // update delta_precon
         delta_precon = rhs_precon[index] - old_mg_e*Adcfm_precon[index];
 
+        if (dFabs(delta_precon) > 0.00001) // debug
+        {
+          printf("1 delta_precon [%f]\n", delta_precon);
+          printf("index[%d] type[%d] rhs[%f] mg_e[%f] delta[%f]\n",
+                 index, constraint_index, rhs_precon[index],
+                 mg_e, delta_precon);
+          getchar();
+        }
+
         dRealPtr J_ptr = J_precon + index*12;
 
         // for preconditioned case, update delta using cforce, not caccel
@@ -721,6 +734,43 @@ static void* ComputeRows(void *p)
         delta_precon -= quickstep::dot6(cforce_ptr1, J_ptr);
         if (cforce_ptr2)
           delta_precon -= quickstep::dot6(cforce_ptr2, J_ptr + 6);
+
+        if (dFabs(delta_precon) > 0.00001) // debug
+        {
+          printf("2 delta_precon [%f]\n", delta_precon);
+          printf("index[%d] type[%d] rhs[%f] mg_e[%f] delta[%f]\n",
+                 index, constraint_index, rhs_precon[index],
+                 mg_e, delta_precon);
+
+          printf("cf [");
+          for (unsigned int iii = 0; iii < 6; ++iii)
+          {
+            printf("%f, ", cforce_ptr1[iii]);
+            if (cforce_ptr2)
+              printf("%f, ", cforce_ptr2[iii]);
+          }
+          printf("]\n");
+
+          getchar();
+        }
+
+        // debug
+        if (constraint_index == -1)  // bilateral
+        {
+        }
+        else if (constraint_index == -2)  // contact normal
+        {
+        }
+        else  // friction forces
+        {
+        }
+        if (dFabs(mg_e[index]) > 0.00001) // debug
+        {
+        // if (dFabs(rhs_precon[index]) > 0.00001)
+          printf("index[%d] type[%d] rhs[%f] mg_e[%f] delta[%f]\n",
+                 index, constraint_index, rhs_precon[index],
+                 mg_e, delta_precon);
+        }
 
         // set the limits for this constraint.
         // this is the place where the QuickStep method differs from the
@@ -766,13 +816,22 @@ static void* ComputeRows(void *p)
         // update cforce (this is strictly for the precon case)
         {
           // for preconditioning case, compute cforce
-          // FIXME: need un-altered unscaled J, not J_precon!!
+          // use un-altered unscaled original J, not J_precon
           J_ptr = J_orig + index*12;
 
           // update cforce.
           quickstep::sum6(cforce_ptr1, delta_precon, J_ptr);
           if (cforce_ptr2)
             quickstep::sum6(cforce_ptr2, delta_precon, J_ptr + 6);
+
+          printf("0 cf [");
+          for (unsigned int iii = 0; iii < 6; ++iii)
+          {
+            printf("%f, ", cforce_ptr1[iii]);
+            if (cforce_ptr2)
+              printf("%f, ", cforce_ptr2[iii]);
+          }
+          printf("]\n");
         }
 
         // record residual (error) (for the non-erp version)
@@ -1026,7 +1085,11 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
     // warm starting
     // compute cforce=(inv(M)*J')*lambda
     if (qs->precon_iterations > 0)
+    {
       multiply_invM_JT (m,nb,J,jb,mg_e,cforce);
+      printf("%f\n", qs->precon_iterations);
+      getchar();
+    }
 
     // re-compute caccel=(inv(M)*J')*lambda with new iMJ
     // seems much better than using stored caccel's
@@ -1041,6 +1104,7 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
     dSetZero (caccel,nb*6);
     dSetZero (caccel_erp,nb*6);
   }
+  dSetZero (cforce,nb*6);
 
   dReal *Ad = context->AllocateArray<dReal> (m);
 
