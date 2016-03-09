@@ -195,6 +195,9 @@ bool IntrospectionClient::NewFilter(const std::string &_managerId,
 bool IntrospectionClient::UpdateFilter(const std::string &_managerId,
     const std::string &_filterId, const std::set<std::string> &_newItems) const
 {
+  if (_newItems.empty())
+    return false;
+
   gazebo::msgs::Param_V req;
   gazebo::msgs::Empty rep;
   bool result;
@@ -232,6 +235,9 @@ bool IntrospectionClient::UpdateFilter(const std::string &_managerId,
     const std::string &_filterId, const std::set<std::string> &_newItems,
     const std::function<void(const bool _result)> &_cb) const
 {
+  if (_newItems.empty())
+    return false;
+
   {
     std::lock_guard<std::mutex> lk(this->dataPtr->mutex);
     auto it = std::find_if(this->dataPtr->filters.begin(),
@@ -244,7 +250,11 @@ bool IntrospectionClient::UpdateFilter(const std::string &_managerId,
 
     // We should have the managerId registered, otherwise something is wrong.
     if (it == this->dataPtr->filters.end())
+    {
+      gzerr << "Unable to request an introspection filter update. Unknown "
+            << "manager [" << _managerId << "]" << std::endl;
       return false;
+    }
   }
 
   std::function<void(const gazebo::msgs::Empty&, const bool)> f =
