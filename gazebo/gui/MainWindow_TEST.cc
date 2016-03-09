@@ -15,6 +15,7 @@
  *
 */
 #include <boost/filesystem.hpp>
+
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/transport.hh"
@@ -736,6 +737,8 @@ void MainWindow_TEST::ActionCreationDestruction()
 
   QVERIFY(gazebo::gui::g_redoHistoryAct);
 
+  QVERIFY(gazebo::gui::g_plotAct);
+
   mainWindow->close();
   delete mainWindow;
 
@@ -852,6 +855,8 @@ void MainWindow_TEST::ActionCreationDestruction()
   QVERIFY(!gazebo::gui::g_redoAct);
 
   QVERIFY(!gazebo::gui::g_redoHistoryAct);
+
+  QVERIFY(!gazebo::gui::g_plotAct);
 }
 
 /////////////////////////////////////////////////
