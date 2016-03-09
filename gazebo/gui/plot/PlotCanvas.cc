@@ -282,6 +282,11 @@ void PlotCanvas::AddVariable(const unsigned int _id,
     this->dataPtr->emptyPlot->setVisible(false);
 
   PlotManager::Instance()->AddIntrospectionCurve(_variable, curve);
+
+  // give it a more compact, friendly name
+  // do this after PlotManager AddIntrospectionCurve call!
+  std::string label = PlotManager::Instance()->HumanReadableName(_variable);
+  this->SetVariableLabel(_id, label);
 }
 
 /////////////////////////////////////////////////
@@ -317,8 +322,8 @@ void PlotCanvas::RemoveVariable(const unsigned int _id,
   unsigned int curveId = v->second;
 
   // remove curve from manager
-  PlotManager::Instance()->RemoveIntrospectionCurve(
-      it->second->plot->Curve(_id));
+  PlotCurveWeakPtr plotCurve = it->second->plot->Curve(curveId);
+  PlotManager::Instance()->RemoveIntrospectionCurve(plotCurve);
 
   // erase from map
   it->second->variableCurves.erase(v);

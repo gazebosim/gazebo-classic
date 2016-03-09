@@ -21,8 +21,9 @@
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportIface.hh"
+#include "gazebo/common/CommonIface.hh"
+#include "gazebo/common/URI.hh"
 
-// #include "gazebo/gui/plot/TopicCurveHandler.hh"
 #include "gazebo/gui/plot/IntrospectionCurveHandler.hh"
 #include "gazebo/gui/plot/PlotCurve.hh"
 #include "gazebo/gui/plot/PlotWindow.hh"
@@ -49,7 +50,7 @@ namespace gazebo
       public: transport::SubscriberPtr worldControlSub;
 
       /// \brief A map of topic names to topic data handers.
-      //public: std::map<std::string, TopicDataHandler *> topicDataHandlers;
+      // public: std::map<std::string, TopicDataHandler *> topicDataHandlers;
 
       /// \brief Handler for updating topic curves
       // public: TopicCurveHandler topicCurve;
@@ -144,4 +145,47 @@ void PlotManager::RemoveWindow(PlotWindow *_window)
       return;
     }
   }
+}
+
+/////////////////////////////////////////////////
+std::string PlotManager::HumanReadableName(const std::string &_uri) const
+{
+  std::string label;
+
+  // expected name format:
+  //   scheme: data://
+  //   path:   world/world_name/model/model_name/link/link_name
+  //   query:  ?p=param_type/param_name
+  // convert to friendly name:
+  //   name:   model_name/link_name?param_name
+  common::URI uri(_uri);
+  if (!uri.Valid())
+    return label;
+  common::URIPath path = uri.Path();
+  common::URIQuery query = uri.Query();
+  std::vector<std::string> pathTokens = common::split(path.Str(), "/");
+  std::vector<std::string> queryTokens = common::split(query.Str(), "=/");
+  if (queryTokens.size() < 2 || queryTokens.size() < 3)
+    return label;
+
+  // path: start from model name and ignore entity type str
+  std::string pathStr;
+  for (unsigned int i = 3; i < pathTokens.size(); i+=2)
+  {
+    if (!pathStr.empty())
+      pathStr += "/";
+    pathStr += pathTokens[i];
+  }
+
+  // query: take only first param name
+  std::string queryStr;
+  for (unsigned int i = 2; i < queryTokens.size(); i+=2)
+  {
+    if (!queryStr.empty())
+      queryStr +="/";
+    queryStr += queryTokens[i];
+  }
+  label = pathStr + "?" + queryStr;
+
+  return label;
 }
