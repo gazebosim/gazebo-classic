@@ -40,3 +40,5 @@ event::EventT<void (const std::string &)> Events::editModel;
 event::EventT<void (const std::string &)> Events::windowMode;
 event::EventT<void (const std::string &, const math::Vector3 &)>
     Events::scaleEntity;
+event::EventT<void (const std::string &, const ignition::math::Pose3d &,
+    const bool)> Events::moveEntity;

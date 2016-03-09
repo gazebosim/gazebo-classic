@@ -841,7 +841,6 @@ QTextEdit#splashVersionTextEdit
   color: #f58113;
   font-size: 10px;
 }
-
 QDialog#plotWindow
 {
   background-color: #f2f2f2;

@@ -81,6 +81,12 @@ double ModelData::GetEditTransparency()
 }
 
 /////////////////////////////////////////////////
+std::string NestedModelData::Name() const
+{
+  return this->modelSDF->Get<std::string>("name");
+}
+
+/////////////////////////////////////////////////
 void ModelData::UpdateRenderGroup(rendering::VisualPtr _visual)
 {
   // fix for transparency alpha compositing
@@ -227,7 +233,7 @@ LinkData::~LinkData()
 }
 
 /////////////////////////////////////////////////
-std::string LinkData::GetName() const
+std::string LinkData::Name() const
 {
   return this->linkSDF->Get<std::string>("name");
 }
@@ -252,6 +258,18 @@ void LinkData::SetPose(const ignition::math::Pose3d &_pose)
 
   LinkConfig *linkConfig = this->inspector->GetLinkConfig();
   linkConfig->SetPose(_pose);
+}
+
+/////////////////////////////////////////////////
+void LinkData::SetIsPreview(const bool _preview)
+{
+  this->isPreview = _preview;
+}
+
+/////////////////////////////////////////////////
+bool LinkData::IsPreview() const
+{
+  return this->isPreview;
 }
 
 /////////////////////////////////////////////////
@@ -468,16 +486,23 @@ ignition::math::Vector3d LinkData::Scale() const
 /////////////////////////////////////////////////
 void LinkData::Load(sdf::ElementPtr _sdf)
 {
+  if (!_sdf)
+  {
+    gzwarn << "NULL SDF pointer, not loading link data." << std::endl;
+    return;
+  }
+
   LinkConfig *linkConfig = this->inspector->GetLinkConfig();
 
   this->SetName(_sdf->Get<std::string>("name"));
   this->SetPose(_sdf->Get<ignition::math::Pose3d>("pose"));
+  this->linkSDF = _sdf;
 
   msgs::LinkPtr linkMsgPtr(new msgs::Link);
   if (_sdf->HasElement("inertial"))
   {
     sdf::ElementPtr inertialElem = _sdf->GetElement("inertial");
-    this->linkSDF->GetElement("inertial")->Copy(inertialElem);
+  //  this->linkSDF->GetElement("inertial")->Copy(inertialElem);
 
     msgs::Inertial *inertialMsg = linkMsgPtr->mutable_inertial();
 
@@ -512,13 +537,13 @@ void LinkData::Load(sdf::ElementPtr _sdf)
   {
     sdf::ElementPtr selfCollideSDF = _sdf->GetElement("self_collide");
     linkMsgPtr->set_self_collide(selfCollideSDF->Get<bool>(""));
-    this->linkSDF->InsertElement(selfCollideSDF->Clone());
+  //  this->linkSDF->InsertElement(selfCollideSDF->Clone());
   }
   if (_sdf->HasElement("kinematic"))
   {
     sdf::ElementPtr kinematicSDF = _sdf->GetElement("kinematic");
     linkMsgPtr->set_kinematic(kinematicSDF->Get<bool>());
-    this->linkSDF->InsertElement(kinematicSDF->Clone());
+ //   this->linkSDF->InsertElement(kinematicSDF->Clone());
   }
   if (_sdf->HasElement("must_be_base_link"))
   {
@@ -541,7 +566,7 @@ void LinkData::Load(sdf::ElementPtr _sdf)
     sdf::ElementPtr sensorElem = _sdf->GetElement("sensor");
     while (sensorElem)
     {
-      this->linkSDF->InsertElement(sensorElem->Clone());
+   //   this->linkSDF->InsertElement(sensorElem->Clone());
       sensorElem = sensorElem->GetNextElement("sensor");
     }
   }

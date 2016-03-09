@@ -38,6 +38,7 @@
 #include "gazebo/gui/model/JointCreationDialog.hh"
 #include "gazebo/gui/model/JointInspector.hh"
 #include "gazebo/gui/model/ModelEditorEvents.hh"
+#include "gazebo/gui/model/MEUserCmdManager.hh"
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/JointMakerPrivate.hh"
 
@@ -104,7 +105,7 @@ JointMaker::JointMaker() : dataPtr(new JointMakerPrivate())
       std::placeholders::_2)));
 
   this->dataPtr->inspectAct = new QAction(tr("Open Joint Inspector"), this);
-  connect(this->dataPtr->inspectAct, SIGNAL(triggered()), this,
+  this->connect(this->dataPtr->inspectAct, SIGNAL(triggered()), this,
       SLOT(OnOpenInspector()));
 
   // Gazebo event connections
@@ -115,6 +116,16 @@ JointMaker::JointMaker() : dataPtr(new JointMakerPrivate())
   this->dataPtr->connections.push_back(
       gui::model::Events::ConnectLinkRemoved(
       std::bind(&JointMaker::OnLinkRemoved, this, std::placeholders::_1)));
+
+  this->dataPtr->connections.push_back(
+      gui::model::Events::ConnectRequestJointInsertion(
+      std::bind(&JointMaker::CreateJointFromSDF, this,
+      std::placeholders::_1, std::placeholders::_2)));
+
+  this->dataPtr->connections.push_back(
+      gui::model::Events::ConnectRequestJointRemoval(
+      std::bind(&JointMaker::RemoveJoint, this,
+      std::placeholders::_1)));
 }
 
 /////////////////////////////////////////////////
@@ -242,6 +253,13 @@ void JointMaker::RemoveJoint(const std::string &_jointId)
 
   if (joint->hotspot)
   {
+    auto camera = gui::get_active_camera();
+    if (camera)
+    {
+      camera->GetScene()->OgreSceneManager()->destroyEntity(
+          joint->visual->GetName());
+    }
+
     scene->RemoveVisual(joint->hotspot);
     joint->hotspot->Fini();
   }
@@ -299,7 +317,7 @@ void JointMaker::RemoveJointsByLink(const std::string &_linkName)
   }
 
   for (unsigned i = 0; i < toDelete.size(); ++i)
-    this->RemoveJoint(toDelete[i]);
+    this->RemoveJointByUser(toDelete[i]);
 
   toDelete.clear();
 }
@@ -744,8 +762,26 @@ void JointMaker::OnDelete()
   if (this->dataPtr->inspectName.empty())
     return;
 
-  this->RemoveJoint(this->dataPtr->inspectName);
+  this->RemoveJointByUser(this->dataPtr->inspectName);
   this->dataPtr->inspectName = "";
+}
+
+/////////////////////////////////////////////////
+void JointMaker::RemoveJointByUser(const std::string &_name)
+{
+  // Register user cmd
+  auto jointIt = this->dataPtr->joints.find(_name);
+  if (jointIt != this->dataPtr->joints.end())
+  {
+    auto joint = jointIt->second;
+    auto cmd = MEUserCmdManager::Instance()->NewCmd(
+        "Deleted [" + joint->name + "]", MEUserCmd::DELETING_JOINT);
+    cmd->SetSDF(msgs::JointToSDF(*joint->jointMsg));
+    cmd->SetScopedName(joint->visual->GetName());
+    cmd->SetJointId(joint->hotspot->GetName());
+  }
+
+  this->RemoveJoint(_name);
 }
 
 /////////////////////////////////////////////////
@@ -1656,6 +1692,12 @@ bool JointMaker::SetChildLink(const rendering::VisualPtr &_childLink)
 
     // Create hotspot visual
     this->CreateHotSpot(this->dataPtr->newJoint);
+
+    auto cmd = MEUserCmdManager::Instance()->NewCmd(
+        "Inserted [" + joint->name + "]", MEUserCmd::INSERTING_JOINT);
+    cmd->SetSDF(msgs::JointToSDF(*joint->jointMsg));
+    cmd->SetScopedName(joint->visual->GetName());
+    cmd->SetJointId(joint->hotspot->GetName());
   }
   // Update child
   else

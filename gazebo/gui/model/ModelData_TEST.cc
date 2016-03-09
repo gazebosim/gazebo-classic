@@ -73,7 +73,7 @@ void ModelData_TEST::Clone()
   // verify clone link
   std::string cloneLinkName = "box_link_clone";
   gui::LinkData *cloneLink = link->Clone(cloneLinkName);
-  QCOMPARE(cloneLink->GetName(), cloneLinkName);
+  QCOMPARE(cloneLink->Name(), cloneLinkName);
   QCOMPARE(cloneLink->Scale(), ignition::math::Vector3d::One);
   QCOMPARE(cloneLink->Pose(), ignition::math::Pose3d::Zero);
   QVERIFY(cloneLink->linkVisual != NULL);
