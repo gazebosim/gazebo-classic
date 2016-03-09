@@ -52,9 +52,9 @@ class IntrospectionManagerTest : public ::testing::Test
   public: void TearDown()
   {
     // Unregister multiple items.
-    EXPECT_TRUE(this->manager->Unregister("item1"));
-    EXPECT_TRUE(this->manager->Unregister("item2"));
-    EXPECT_TRUE(this->manager->Unregister("item3"));
+    this->manager->Unregister("item1");
+    this->manager->Unregister("item2");
+    this->manager->Unregister("item3");
     EXPECT_TRUE(this->manager->Items().empty());
   }
 
@@ -155,6 +155,26 @@ TEST_F(IntrospectionManagerTest, RegistrationAndItems)
   // Unregister an existing item.
   EXPECT_TRUE(this->manager->Unregister("item4"));
   EXPECT_EQ(this->manager->Items().size(), 3u);
+}
+
+/////////////////////////////////////////////////
+TEST_F(IntrospectionManagerTest, ClearItems)
+{
+  // A callback for updating items.
+  auto func = []()
+  {
+    return 1.0;
+  };
+
+  // Register one more item.
+  EXPECT_TRUE(this->manager->Register<double>("item4", func));
+  EXPECT_EQ(this->manager->Items().size(), 4u);
+
+  // Unregister all items.
+  this->manager->Clear();
+
+  // Unregister an existing item.
+  EXPECT_TRUE(this->manager->Items().empty());
 }
 
 /////////////////////////////////////////////////

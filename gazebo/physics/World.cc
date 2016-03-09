@@ -851,6 +851,8 @@ void World::Fini()
 #ifdef HAVE_OPENAL
   util::OpenAL::Instance()->Fini();
 #endif
+
+  gazebo::util::IntrospectionManager::Instance()->Clear();
 }
 
 //////////////////////////////////////////////////
