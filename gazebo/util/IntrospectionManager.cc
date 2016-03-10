@@ -160,6 +160,9 @@ void IntrospectionManager::Update()
   {
     std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
+    // Make a copy of these members for avoiding locking a mutex while calling a
+    // user callback (we could create a deadlock).
+    // More creative solutions are welcome.
     filtersCopy = this->dataPtr->filters;
     allItemsCopy = this->dataPtr->allItems;
     observedItemsCopy = this->dataPtr->observedItems;
