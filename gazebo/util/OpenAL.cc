@@ -60,6 +60,21 @@ OpenAL::~OpenAL()
 }
 
 /////////////////////////////////////////////////
+std::set<std::string> OpenAL::DeviceList() const
+{
+  std::set<std::string> deviceList;
+  const ALCchar *devices = alcGetString(NULL, ALC_DEVICE_SPECIFIER);
+  while (*devices != '\0')
+  {
+    std::string str(devices);
+    deviceList.emplace(str);
+    devices += str.size() + 1;
+  }
+  return deviceList;
+}
+
+
+/////////////////////////////////////////////////
 bool OpenAL::Load(sdf::ElementPtr _sdf)
 {
   std::string deviceName = "default";
@@ -71,7 +86,12 @@ bool OpenAL::Load(sdf::ElementPtr _sdf)
   if (deviceName == "default")
     this->dataPtr->audioDevice = alcOpenDevice(NULL);
   else
+  {
+    auto deviceList = this->DeviceList();
+    if (deviceList.empty() || deviceList.find(deviceName) == deviceList.end())
+      return false;
     this->dataPtr->audioDevice = alcOpenDevice(deviceName.c_str());
+  }
 
   // Make sure that we could open the audio device
   if (this->dataPtr->audioDevice == NULL)

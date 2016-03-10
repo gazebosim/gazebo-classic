@@ -74,6 +74,10 @@ namespace gazebo
       /// \return A pointer to an OpenALSink object.
       public: OpenALSinkPtr CreateSink(sdf::ElementPtr _sdf);
 
+      /// \brief Get a list of available audio devices
+      /// \return A list of audio device names
+      private: std::set<std::string> DeviceList() const;
+
       /// \internal
       /// \brief Private data pointer.
       private: std::unique_ptr<OpenALPrivate> dataPtr;
