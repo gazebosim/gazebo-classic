@@ -392,11 +392,9 @@ bool IntrospectionClient::RemoveFilter(const std::string &_managerId,
   {
     if (_result)
     {
-      {
-        // Remove this filter from our internal list.
-        std::lock_guard<std::mutex> lk(this->dataPtr->mutex);
-        this->dataPtr->filters.erase(_filterId);
-      }
+      // Remove this filter from our internal list.
+      std::lock_guard<std::mutex> lk(this->dataPtr->mutex);
+      this->dataPtr->filters.erase(_filterId);
     }
 
     _cb(_result);
