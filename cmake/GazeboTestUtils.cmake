@@ -38,12 +38,6 @@ macro (gz_build_tests)
                    ${GZ_BUILD_TESTS_EXTRA_EXE_SRCS})
 
     link_directories(${PROJECT_BINARY_DIR}/test)
-    add_dependencies(${BINARY_NAME}
-      gtest
-      gtest_main
-      ${_extra_libs}
-    )
-
     target_link_libraries(${BINARY_NAME}
       gtest
       gtest_main
