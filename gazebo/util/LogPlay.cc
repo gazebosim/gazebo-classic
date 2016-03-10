@@ -84,7 +84,8 @@ void LogPlay::Open(const std::string &_logFile)
     if (inFile)
     {
       // Move to the end of the file
-      inFile.seekg(- 1 - endTag.length(), std::ios::end);
+      int len = -1 - static_cast<int>(endTag.length());
+      inFile.seekg(len, std::ios::end);
 
       // Get the last line
       std::string lastLine;
