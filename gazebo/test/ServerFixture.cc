@@ -1354,8 +1354,8 @@ void ServerFixture::SpawnCylinder(const std::string &_name,
   msgs::Model model;
   model.set_name(_name);
   model.set_is_static(_static);
-  msgs::Set(model.mutable_pose(),
-      ignition::math::Pose3d(_pos.Ign(), _rpy.Ign()));
+  msgs::Set(model.mutable_pose(), ignition::math::Pose3d(_pos.Ign(),
+      ignition::math::Quaterniond(_rpy.Ign())));
   msgs::AddCylinderLink(model, 1.0, 0.5, 1.0);
   auto link = model.mutable_link(0);
   link->set_name("body");
@@ -1419,8 +1419,8 @@ void ServerFixture::SpawnSphere(const std::string &_name,
   msgs::Model model;
   model.set_name(_name);
   model.set_is_static(_static);
-  msgs::Set(model.mutable_pose(),
-      ignition::math::Pose3d(_pos.Ign(), _rpy.Ign()));
+  msgs::Set(model.mutable_pose(), ignition::math::Pose3d(_pos.Ign(),
+      ignition::math::Quaterniond(_rpy.Ign())));
   msgs::AddSphereLink(model, 1.0, _radius);
   auto link = model.mutable_link(0);
   link->set_name("body");
@@ -1451,8 +1451,8 @@ void ServerFixture::SpawnBox(const std::string &_name,
   msgs::Model model;
   model.set_name(_name);
   model.set_is_static(_static);
-  msgs::Set(model.mutable_pose(),
-      ignition::math::Pose3d(_pos.Ign(), _rpy.Ign()));
+  msgs::Set(model.mutable_pose(), ignition::math::Pose3d(_pos.Ign(),
+      ignition::math::Quaterniond(_rpy.Ign())));
   msgs::AddBoxLink(model, 1.0, _size.Ign());
   auto link = model.mutable_link(0);
   link->set_name("body");
@@ -1519,8 +1519,8 @@ void ServerFixture::SpawnEmptyLink(const std::string &_name,
   msgs::Model model;
   model.set_name(_name);
   model.set_is_static(_static);
-  msgs::Set(model.mutable_pose(),
-      ignition::math::Pose3d(_pos.Ign(), _rpy.Ign()));
+  msgs::Set(model.mutable_pose(), ignition::math::Pose3d(_pos.Ign(),
+      ignition::math::Quaterniond(_rpy.Ign())));
   model.add_link();
   model.mutable_link(0)->set_name("body");
 
