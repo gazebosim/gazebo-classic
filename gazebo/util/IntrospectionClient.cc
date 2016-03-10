@@ -264,23 +264,12 @@ bool IntrospectionClient::UpdateFilter(const std::string &_managerId,
     return false;
   }
 
+  if (!this->IsManagerUsed(_managerId))
   {
-    std::lock_guard<std::mutex> lk(this->dataPtr->mutex);
-    auto it = std::find_if(this->dataPtr->filters.begin(),
-      this->dataPtr->filters.end(),
-      [&_managerId](const std::pair<std::string, std::string>& v)
-      {
-        return _managerId == v.second;
-      });
-
-
     // We should have the managerId registered, otherwise something is wrong.
-    if (it == this->dataPtr->filters.end())
-    {
-      gzerr << "Unable to request an introspection filter update. Unknown "
-            << "manager [" << _managerId << "]" << std::endl;
-      return false;
-    }
+    gzerr << "Unable to request an introspection filter update. I don't have "
+          << "any filters on manager [" << _managerId << "]" << std::endl;
+    return false;
   }
 
   std::function<void(const gazebo::msgs::Empty&, const bool)> f =
@@ -372,18 +361,12 @@ bool IntrospectionClient::RemoveFilter(const std::string &_managerId,
     const std::string &_filterId,
     const std::function<void(const bool _result)> &_cb) const
 {
+  if (!this->IsManagerUsed(_managerId))
   {
-    std::lock_guard<std::mutex> lk(this->dataPtr->mutex);
-    auto it = std::find_if(this->dataPtr->filters.begin(),
-      this->dataPtr->filters.end(),
-      [&_managerId](const std::pair<std::string, std::string>& v)
-      {
-        return _managerId == v.second;
-      });
-
     // We should have the managerId registered, otherwise something is wrong.
-    if (it == this->dataPtr->filters.end())
-      return false;
+    gzerr << "Unable to request an introspection filter removal. I don't have "
+          << "any filters on manager [" << _managerId << "]" << std::endl;
+    return false;
   }
 
   std::function<void(const gazebo::msgs::Empty&, const bool)> f =
@@ -514,4 +497,18 @@ bool IntrospectionClient::IsRegistered(const std::string &_managerId,
   }
 
   return false;
+}
+
+//////////////////////////////////////////////////
+bool IntrospectionClient::IsManagerUsed(const std::string &_managerId) const
+{
+  std::lock_guard<std::mutex> lk(this->dataPtr->mutex);
+  auto it = std::find_if(this->dataPtr->filters.begin(),
+    this->dataPtr->filters.end(),
+    [&_managerId](const std::pair<std::string, std::string>& v)
+    {
+      return _managerId == v.second;
+    });
+
+  return (it != this->dataPtr->filters.end());
 }
