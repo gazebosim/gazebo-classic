@@ -44,6 +44,7 @@ namespace gazebo
       protected: void AddRay(const math::Vector3 &start,
                              const math::Vector3 &end);
 
+      /// \brief Pointer to the physics engine.
       private: BulletPhysicsPtr physicsEngine;
     };
     /// \}

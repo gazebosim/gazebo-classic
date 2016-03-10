@@ -53,6 +53,7 @@ BulletRayShape::BulletRayShape(CollisionPtr _parent)
 //////////////////////////////////////////////////
 BulletRayShape::~BulletRayShape()
 {
+  this->physicsEngine.reset();
 }
 
 //////////////////////////////////////////////////

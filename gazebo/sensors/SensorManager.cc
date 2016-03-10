@@ -63,6 +63,8 @@ SensorManager::~SensorManager()
 //////////////////////////////////////////////////
 void SensorManager::RunThreads()
 {
+gzwarn << "SensorManager::RunThreads  size: " << this->sensorContainers.size() << std::endl;
+/*
   // Start the non-image sensor containers. The first item in the
   // sensorsContainers list are the image-based sensors, which rely on the
   // rendering engine, which in turn requires that they run in the main
@@ -70,19 +72,20 @@ void SensorManager::RunThreads()
   for (SensorContainer_V::iterator iter = ++this->sensorContainers.begin();
        iter != this->sensorContainers.end(); ++iter)
   {
-    GZ_ASSERT((*iter) != NULL, "Sensor Constainer is NULL");
+    GZ_ASSERT((*iter) != NULL, "Sensor Container is NULL");
     (*iter)->Run();
   }
+*/
 }
 
 //////////////////////////////////////////////////
 void SensorManager::Stop()
 {
-  // Start all the sensor containers.
+  // Stop all the sensor containers.
   for (SensorContainer_V::iterator iter = this->sensorContainers.begin();
        iter != this->sensorContainers.end(); ++iter)
   {
-    GZ_ASSERT((*iter) != NULL, "Sensor Constainer is NULL");
+    GZ_ASSERT((*iter) != NULL, "Sensor Container is NULL");
     (*iter)->Stop();
   }
 }
@@ -99,7 +102,13 @@ void SensorManager::Update(bool _force)
       this->worlds[world->GetName()] = world;
       world->_SetSensorsInitialized(true);
     }
+    // TODO: Improve to better support multiple worlds
+    else if (!physics::worlds_running())
+    {
+      this->worlds.clear();
+    }
 
+    // Initialize sensors
     if (!this->initSensors.empty())
     {
       // in case things are spawned, sensors length changes
@@ -119,6 +128,7 @@ void SensorManager::Update(bool _force)
         worldName_worldPtr.second->_SetSensorsInitialized(true);
     }
 
+    // Remove specific sensors
     for (std::vector<std::string>::iterator iter = this->removeSensors.begin();
          iter != this->removeSensors.end(); ++iter)
     {
@@ -142,6 +152,7 @@ void SensorManager::Update(bool _force)
     }
     this->removeSensors.clear();
 
+    // Remove all sensors
     if (this->removeAllSensors)
     {
       for (SensorContainer_V::iterator iter2 = this->sensorContainers.begin();
@@ -150,14 +161,27 @@ void SensorManager::Update(bool _force)
         GZ_ASSERT((*iter2) != NULL, "SensorContainer is NULL");
         (*iter2)->RemoveSensors();
       }
-      this->initSensors.clear();
+      this->sensorContainers.clear();
+
+      // Also clear the list of worlds
+      this->worlds.clear();
+
       this->removeAllSensors = false;
     }
   }
 
   // Only update if there are sensors
-  if (this->sensorContainers[sensors::IMAGE]->sensors.size() > 0)
+/*
+gzdbg << "A" << std::endl;
+  if (this->sensorContainers[sensors::IMAGE] &&
+      this->sensorContainers[sensors::IMAGE]->sensors.size() > 0)
+{
+gzdbg << "B" << std::endl;
     this->sensorContainers[sensors::IMAGE]->Update(_force);
+gzdbg << "C" << std::endl;
+}
+gzdbg << "D" << std::endl;
+*/
 }
 
 //////////////////////////////////////////////////
@@ -393,6 +417,7 @@ void SensorManager::RemoveSensors()
 //////////////////////////////////////////////////
 SensorManager::SensorContainer::SensorContainer()
 {
+gzmsg << "SensorContainer CONSTRUCTOR" << std::endl;
   this->stop = true;
   this->initialized = false;
   this->runThread = NULL;
@@ -402,12 +427,16 @@ SensorManager::SensorContainer::SensorContainer()
 SensorManager::SensorContainer::~SensorContainer()
 {
   this->sensors.clear();
+
+  if (this->runThread)
+    delete this->runThread;
 }
 
 //////////////////////////////////////////////////
 void SensorManager::SensorContainer::Init()
 {
-  boost::recursive_mutex::scoped_lock lock(this->mutex);
+//gzdbg << "Init" << std::endl;
+  std::unique_lock<std::recursive_mutex> lock(this->mutex);
 
   for (auto &sensor : this->sensors)
   {
@@ -416,12 +445,14 @@ void SensorManager::SensorContainer::Init()
   }
 
   this->initialized = true;
+//gzdbg << "/Init" << std::endl;
 }
 
 //////////////////////////////////////////////////
 void SensorManager::SensorContainer::Fini()
 {
-  boost::recursive_mutex::scoped_lock lock(this->mutex);
+//gzdbg << "Fini" << std::endl;
+  std::unique_lock<std::recursive_mutex> lock(this->mutex);
 
   Sensor_V::iterator iter;
 
@@ -436,15 +467,18 @@ void SensorManager::SensorContainer::Fini()
   this->sensors.clear();
 
   this->initialized = false;
+//gzdbg << "/Fini" << std::endl;
 }
 
 //////////////////////////////////////////////////
 void SensorManager::SensorContainer::Run()
 {
+/*gzwarn << "SensorManager::SensorContainer::Run" << std::endl;
   this->runThread = new boost::thread(
       boost::bind(&SensorManager::SensorContainer::RunLoop, this));
 
   GZ_ASSERT(this->runThread, "Unable to create boost::thread.");
+*/
 }
 
 //////////////////////////////////////////////////
@@ -466,6 +500,7 @@ void SensorManager::SensorContainer::Stop()
 //////////////////////////////////////////////////
 void SensorManager::SensorContainer::RunLoop()
 {
+gzdbg << "RunLoop START" << std::endl;
   this->stop = false;
 
   physics::WorldPtr world = physics::get_world();
@@ -489,15 +524,22 @@ void SensorManager::SensorContainer::RunLoop()
 
   // Wait for a sensor to be added.
   // Use a while loop since world resets will notify the runCondition.
+gzdbg << "RunLoop1.1" << std::endl;
   while (this->sensors.empty())
   {
+gzdbg << "RunLoop1.2    "  << this->stop << std::endl;
     this->runCondition.wait(lock2);
     if (this->stop)
+{
+gzdbg << "RunLoop1.3    "  << this->stop << std::endl;
       return;
+}
+gzdbg << "RunLoop1.4    "  << this->stop << std::endl;
   }
 
   {
-    boost::recursive_mutex::scoped_lock lock(this->mutex);
+gzdbg << "RunLoop2" << std::endl;
+    std::unique_lock<std::recursive_mutex> lock(this->mutex);
 
     // Get the minimum update rate from the sensors.
     for (Sensor_V::iterator iter = this->sensors.begin();
@@ -516,10 +558,12 @@ void SensorManager::SensorContainer::RunLoop()
 
   while (!this->stop)
   {
+gzdbg << "RunLoop3" << std::endl;
     // If all the sensors get deleted, wait here.
     // Use a while loop since world resets will notify the runCondition.
     while (this->sensors.empty())
     {
+gzdbg << "RunLoop4" << std::endl;
       this->runCondition.wait(lock2);
       if (this->stop)
         return;
@@ -559,12 +603,14 @@ void SensorManager::SensorContainer::RunLoop()
       this->runCondition.wait(timingLock);
     }
   }
+gzdbg << "/RunLoop" << std::endl;
 }
 
 //////////////////////////////////////////////////
 void SensorManager::SensorContainer::Update(bool _force)
 {
-  boost::recursive_mutex::scoped_lock lock(this->mutex);
+gzdbg << "Update" << std::endl;
+  std::unique_lock<std::recursive_mutex> lock(this->mutex);
 
   if (this->sensors.empty())
     gzlog << "Updating a sensor container without any sensors.\n";
@@ -576,13 +622,15 @@ void SensorManager::SensorContainer::Update(bool _force)
     GZ_ASSERT((*iter) != NULL, "Sensor is NULL");
     (*iter)->Update(_force);
   }
+gzdbg << "/Update" << std::endl;
 }
 
 //////////////////////////////////////////////////
 SensorPtr SensorManager::SensorContainer::GetSensor(const std::string &_name,
                                                     bool _useLeafName) const
 {
-  boost::recursive_mutex::scoped_lock lock(this->mutex);
+//gzdbg << "GetSensor" << std::endl;
+  std::unique_lock<std::recursive_mutex> lock(this->mutex);
 
   SensorPtr result;
 
@@ -602,27 +650,35 @@ SensorPtr SensorManager::SensorContainer::GetSensor(const std::string &_name,
     }
   }
 
+//gzdbg << "/GetSensor" << std::endl;
   return result;
 }
 
 //////////////////////////////////////////////////
 void SensorManager::SensorContainer::AddSensor(SensorPtr _sensor)
 {
+gzdbg << "AddSensor" << std::endl;
   GZ_ASSERT(_sensor != NULL, "Sensor is NULL when passed to ::AddSensor");
 
   {
-    boost::recursive_mutex::scoped_lock lock(this->mutex);
+gzdbg << "AddSensor2" << std::endl;
+    std::unique_lock<std::recursive_mutex> lock(this->mutex);
+gzdbg << "AddSensor3" << std::endl;
     this->sensors.push_back(_sensor);
+gzdbg << "AddSensor4" << std::endl;
   }
+gzdbg << "AddSensor5" << std::endl;
 
   // Tell the run loop that we have received a sensor
   this->runCondition.notify_one();
+gzdbg << "/AddSensor" << std::endl;
 }
 
 //////////////////////////////////////////////////
 bool SensorManager::SensorContainer::RemoveSensor(const std::string &_name)
 {
-  boost::recursive_mutex::scoped_lock lock(this->mutex);
+gzdbg << "RemoveSensor" << std::endl;
+  std::unique_lock<std::recursive_mutex> lock(this->mutex);
 
   Sensor_V::iterator iter;
 
@@ -642,13 +698,15 @@ bool SensorManager::SensorContainer::RemoveSensor(const std::string &_name)
     }
   }
 
+gzdbg << "/RemoveSensor" << std::endl;
   return removed;
 }
 
 //////////////////////////////////////////////////
 void SensorManager::SensorContainer::ResetLastUpdateTimes()
 {
-  boost::recursive_mutex::scoped_lock lock(this->mutex);
+gzdbg << "ResetLastUpdateTimes" << std::endl;
+  std::unique_lock<std::recursive_mutex> lock(this->mutex);
 
   Sensor_V::iterator iter;
 
@@ -661,12 +719,14 @@ void SensorManager::SensorContainer::ResetLastUpdateTimes()
 
   // Tell the run loop that world time has been reset.
   this->runCondition.notify_one();
+gzdbg << "/ResetLastUpdateTimes" << std::endl;
 }
 
 //////////////////////////////////////////////////
 void SensorManager::SensorContainer::RemoveSensors()
 {
-  boost::recursive_mutex::scoped_lock lock(this->mutex);
+gzdbg << "RemoveSensors" << std::endl;
+  std::unique_lock<std::recursive_mutex> lock(this->mutex);
 
   Sensor_V::iterator iter;
 
@@ -678,11 +738,13 @@ void SensorManager::SensorContainer::RemoveSensors()
   }
 
   this->sensors.clear();
+gzdbg << "/RemoveSensors" << std::endl;
 }
 
 //////////////////////////////////////////////////
 void SensorManager::ImageSensorContainer::Update(bool _force)
 {
+gzdbg << "SensorManager::ImageSensorContainer" << std::endl;
   event::Events::preRender();
 
   // Tell all the cameras to render
@@ -690,12 +752,10 @@ void SensorManager::ImageSensorContainer::Update(bool _force)
 
   event::Events::postRender();
 
+gzdbg << "SensorManager::ImageSensorContainer2" << std::endl;
   // Update the sensors, which will produce data messages.
   SensorContainer::Update(_force);
 }
-
-
-
 
 /////////////////////////////////////////////////
 SimTimeEventHandler::SimTimeEventHandler()

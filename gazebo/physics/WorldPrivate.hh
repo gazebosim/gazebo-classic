@@ -19,15 +19,17 @@
 
 #include <atomic>
 #include <deque>
-#include <vector>
 #include <list>
+#include <mutex>
 #include <set>
+#include <string>
+#include <vector>
+
 #include <boost/thread.hpp>
 #include <sdf/sdf.hh>
-#include <string>
 
-#include "gazebo/common/Event.hh"
 #include "gazebo/common/Time.hh"
+#include "gazebo/common/UpdateInfo.hh"
 
 #include "gazebo/msgs/msgs.hh"
 

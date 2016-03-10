@@ -197,7 +197,7 @@ void Base::AddChild(BasePtr _child)
 }
 
 //////////////////////////////////////////////////
-void Base::RemoveChild(unsigned int _id, const bool _alsoDelete)
+void Base::RemoveChild(const unsigned int _id, const bool _alsoDelete)
 {
   for (auto iter = this->children.begin(); iter != this->children.end(); ++iter)
   {

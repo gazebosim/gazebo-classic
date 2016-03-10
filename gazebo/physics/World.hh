@@ -23,10 +23,7 @@
   #include <Winsock2.h>
 #endif
 
-#include <vector>
-#include <list>
-#include <set>
-#include <deque>
+#include <memory>
 #include <string>
 #include <boost/thread.hpp>
 #include <boost/enable_shared_from_this.hpp>
@@ -34,17 +31,15 @@
 
 #include <sdf/sdf.hh>
 
-#include "gazebo/transport/TransportTypes.hh"
-
 #include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/common/CommonTypes.hh"
-#include "gazebo/common/UpdateInfo.hh"
-#include "gazebo/common/Event.hh"
+#include "gazebo/common/Time.hh"
 
 #include "gazebo/physics/Base.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/WorldState.hh"
+
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -561,7 +556,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Private data pointer.
-      private: WorldPrivate *dataPtr;
+      private: std::unique_ptr<WorldPrivate> dataPtr;
 
       /// Friend DARTLink so that it has access to dataPtr->dirtyPoses
       private: friend class DARTLink;

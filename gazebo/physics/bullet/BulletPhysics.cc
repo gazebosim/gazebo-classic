@@ -299,6 +299,7 @@ BulletPhysics::~BulletPhysics()
   this->broadPhase = NULL;
   this->dispatcher = NULL;
   this->collisionConfig = NULL;
+  this->world.reset();
 }
 
 //////////////////////////////////////////////////

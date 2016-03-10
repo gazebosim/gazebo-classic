@@ -160,9 +160,6 @@ World::World(const std::string &_name)
 World::~World()
 {
   this->Fini();
-
-  delete this->dataPtr;
-  this->dataPtr = NULL;
 }
 
 //////////////////////////////////////////////////

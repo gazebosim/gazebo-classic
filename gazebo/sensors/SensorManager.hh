@@ -18,10 +18,11 @@
 #define _GAZEBO_SENSORMANAGER_HH_
 
 #include <boost/thread.hpp>
-#include <string>
-#include <vector>
 #include <list>
 #include <map>
+#include <mutex>
+#include <string>
+#include <vector>
 
 #include <sdf/sdf.hh>
 
@@ -241,7 +242,7 @@ namespace gazebo
                  private: boost::thread *runThread;
 
                  /// \brief A mutex to manage access to the sensors vector.
-                 private: mutable boost::recursive_mutex mutex;
+                 private: mutable std::recursive_mutex mutex;
 
                  /// \brief Condition used to block the RunLoop if no
                  /// sensors are present.

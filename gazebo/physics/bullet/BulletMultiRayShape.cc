@@ -40,6 +40,7 @@ BulletMultiRayShape::BulletMultiRayShape(CollisionPtr _parent)
 //////////////////////////////////////////////////
 BulletMultiRayShape::~BulletMultiRayShape()
 {
+  this->physicsEngine.reset();
 }
 
 //////////////////////////////////////////////////

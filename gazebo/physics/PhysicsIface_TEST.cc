@@ -25,7 +25,8 @@ using namespace gazebo;
 class PhysicsIfaceTest : public ServerFixture,
     public testing::WithParamInterface<const char*>
 {
-  /// \brief
+  /// \brief Test removing worlds.
+  /// \param[in] _physicsEngines Physics engine to be tested.
   public: void RemoveWorldTest(const std::string &_physicsEngine);
 };
 
@@ -50,12 +51,12 @@ unsigned int WorldTopicCount(std::map<std::string, std::list<std::string>>
 /////////////////////////////////////////////////
 void PhysicsIfaceTest::RemoveWorldTest(const std::string &_physicsEngine)
 {
-  if (_physicsEngine != "ode")
+  if (_physicsEngine != "bullet" && _physicsEngine != "ode")
     return;
 
-  // Load a world with some models
-  // TODO: world with sensors?
-  this->Load("test/worlds/gps_test.world", false, _physicsEngine);
+  // Load a world with some models and sensors
+  //this->Load("test/worlds/gps_test.world", false, _physicsEngine);
+  this->Load("worlds/empty.world", false, _physicsEngine);
 
   // Give time for everything to be created
   int sleep = 0;
@@ -65,6 +66,9 @@ void PhysicsIfaceTest::RemoveWorldTest(const std::string &_physicsEngine)
     gazebo::common::Time::MSleep(300);
     sleep++;
   }
+
+  // Check there are worlds running
+  EXPECT_TRUE(physics::worlds_running());
 
   // Get world pointer
   auto world = physics::get_world("default");
@@ -104,6 +108,9 @@ void PhysicsIfaceTest::RemoveWorldTest(const std::string &_physicsEngine)
     gazebo::common::Time::MSleep(300);
     sleep++;
   }
+
+  // Check there are no worlds running
+  EXPECT_FALSE(physics::worlds_running());
 
   // Check the only shared pointer left to the physics engine is this one
   EXPECT_LT(physicsEngine.use_count(), physicsEnginePtrCount);
