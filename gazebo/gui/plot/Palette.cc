@@ -17,14 +17,19 @@
 
 #include <set>
 #include <string>
+#include <vector>
 #include <google/protobuf/message.h>
 
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/common/URI.hh"
 
 #include "gazebo/gui/ConfigWidget.hh"
 #include "gazebo/gui/plot/Palette.hh"
 
 #include "gazebo/transport/TransportIface.hh"
+
+#include "gazebo/util/IntrospectionClient.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -36,17 +41,19 @@ class PlotItemDelegate : public QStyledItemDelegate
   /// \brief The data roles
   public: enum DataRole
   {
-    /// \brief Associated with the topic name
-    TOPIC_NAME_ROLE = Qt::UserRole + 100,
+    /// \brief Text which will be displayed for the user.
+    DISPLAY_NAME = Qt::UserRole + 100,
 
-    /// \brief Associated with the data name, this is used to pass
-    /// information to a location during a drag-drop operation.
-    DATA_ROLE,
+    /// \brief URI including detailed query about a single plot value. This is
+    /// the information carried during a drag-drop operation.
+    URI_QUERY,
 
-    // \brief Data type name, used to display type information to the user.
-    DATA_TYPE_NAME,
+    /// \brief Data type name, such as "Double" or "Bool", used to display type
+    /// information to the user. Or something like "model", "link", used to
+    /// choose icons.
+    TYPE,
 
-    // \brief Flag indicating whether to expand the item or not.
+    /// \brief Flag indicating whether to expand the item or not.
     TO_EXPAND
   };
 
@@ -66,23 +73,61 @@ class PlotItemDelegate : public QStyledItemDelegate
     auto textRect = _opt.rect;
 
     // Custom options
-    QString topicName = qvariant_cast<QString>(_index.data(TOPIC_NAME_ROLE));
-    QString typeName = qvariant_cast<QString>(_index.data(DATA_TYPE_NAME));
+    QString topicName = qvariant_cast<QString>(_index.data(DISPLAY_NAME));
+    QString typeName = qvariant_cast<QString>(_index.data(TYPE));
 
     // TODO: Change to QApplication::font() once Roboto is used everywhere
-    QFont font("Roboto Regular");
+    QFont font;
+    auto fontWeight = QFont::Normal;
+    if (typeName == "title")
+    {
+      font.setFamily("Roboto Bold");
+      fontWeight = QFont::Bold;
+
+      // Erase the branch image for titles
+      QRectF titleRect = _opt.rect;
+      titleRect.setLeft(titleRect.left() - 13);
+      // FIXME: Find a non-hardcoded way to get the bg color
+      QBrush brush(QColor("#e2e2e2"));
+      _painter->save();
+      _painter->fillRect(titleRect, brush);
+      _painter->restore();
+    }
+    else
+    {
+      font.setFamily("Roboto Regular");
+    }
     QFontMetrics fm(font);
 
     // Handle hover style
-    if (_opt.state & QStyle::State_MouseOver)
+    if (typeName != "title" && _opt.state & QStyle::State_MouseOver)
     {
       _painter->setPen(QPen(QColor(200, 200, 200, 0), 0));
       _painter->setBrush(QColor(200, 200, 200));
       _painter->drawRect(_opt.rect);
     }
 
-    // Paint the icon, if present
-    if (!typeName.isEmpty())
+    // Paint the type icon
+    if (typeName == "model" || typeName == "link" || typeName == "collision" ||
+        typeName == "visual" || typeName == "joint")
+    {
+      double iconSize = 15;
+
+      textRect.adjust(iconSize + 6, 5, 0, -5);
+      QRectF iconRect = _opt.rect;
+      iconRect.setTop(iconRect.top() + (_opt.rect.height()/2.0 - iconSize/2.0));
+
+      QIcon icon(":/images/" + typeName  + ".svg");
+      _painter->drawPixmap(iconRect.left(), iconRect.top(),
+          icon.pixmap(iconSize, iconSize));
+    }
+    // Titles
+    else if (typeName == "title")
+    {
+      textRect.adjust(-15, 5, 0, -5);
+    }
+    // Plottable items
+    else if (!typeName.isEmpty())
     {
       // Paint icon
       double iconSize = 20;
@@ -97,12 +142,14 @@ class PlotItemDelegate : public QStyledItemDelegate
       // Move text
       textRect.adjust(iconSize + 5, 5, 0, -5);
     }
+    // Normal expandable items
     else
     {
+      // Otherwise use a rectangle that is sized for the just the topic name
       textRect.adjust(0, 5, 0, -5);
     }
 
-    _painter->setFont(QFont(font.family(), font.pointSize()));
+    _painter->setFont(QFont(font.family(), font.pointSize(), fontWeight));
     _painter->setPen(QColor(30, 30, 30));
     _painter->drawText(textRect, topicName);
   }
@@ -144,7 +191,7 @@ class PlotItemModel : public QStandardItemModel
       if (idx.isValid())
       {
         QString text = this->data(idx,
-            PlotItemDelegate::DATA_ROLE).toString();
+            PlotItemDelegate::URI_QUERY).toString();
         curMimeData->setData("application/x-item", text.toLatin1().data());
 
         break;
@@ -190,6 +237,13 @@ class SearchModel : public QSortFilterProxyModel
 
     // Item index in search model
     auto id = this->sourceModel()->index(_srcRow, 0, _srcParent);
+
+    // Ignore titles
+    if (this->sourceModel()->data(id, PlotItemDelegate::TYPE).toString() ==
+        "title")
+    {
+      return false;
+    }
 
     // Collapsed by default
     this->sourceModel()->setData(id, false, PlotItemDelegate::TO_EXPAND);
@@ -317,19 +371,28 @@ class gazebo::gui::PalettePrivate
   /// \brief Model to hold topics data.
   public: PlotItemModel *topicsModel;
 
+  /// \brief Model to hold models data.
+  public: PlotItemModel *modelsModel;
+
   /// \brief Model to hold sim data.
   public: PlotItemModel *simModel;
 
   /// \brief Proxy model to filter topics data.
   public: SearchModel *searchTopicsModel;
 
+  /// \brief Proxy model to filter models data.
+  public: SearchModel *searchModelsModel;
+
   /// \brief Proxy model to filter sim data.
   public: SearchModel *searchSimModel;
 
-  /// \brief View holding the topics tree.
+  /// \brief View holding the search topics tree.
   public: QTreeView *searchTopicsTree;
 
-  /// \brief View holding the sim tree.
+  /// \brief View holding the search models tree.
+  public: QTreeView *searchModelsTree;
+
+  /// \brief View holding the search sim tree.
   public: QTreeView *searchSimTree;
 };
 
@@ -341,6 +404,7 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   auto tabBar = new QTabBar;
   tabBar->setObjectName("plottingTabBar");
   tabBar->addTab("TOPICS");
+  tabBar->addTab("MODELS");
   tabBar->addTab("SIM");
   tabBar->addTab("SEARCH");
   tabBar->setExpanding(true);
@@ -357,7 +421,7 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   // A proxy model to filter topic model
   this->dataPtr->searchTopicsModel = new SearchModel;
   this->dataPtr->searchTopicsModel->setFilterRole(
-      PlotItemDelegate::TOPIC_NAME_ROLE);
+      PlotItemDelegate::DISPLAY_NAME);
   this->dataPtr->searchTopicsModel->setSourceModel(this->dataPtr->topicsModel);
 
   // A tree to visualize the topics and their messages.
@@ -372,6 +436,28 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   topicsTree->setDragEnabled(true);
   topicsTree->setDragDropMode(QAbstractItemView::DragOnly);
 
+  // The model that will hold data to be displayed in the model tree view
+  this->dataPtr->modelsModel = new PlotItemModel;
+  this->FillModels(this->dataPtr->modelsModel);
+
+  // A proxy model to filter models model
+  this->dataPtr->searchModelsModel = new SearchModel;
+  this->dataPtr->searchModelsModel->setFilterRole(
+      PlotItemDelegate::DISPLAY_NAME);
+  this->dataPtr->searchModelsModel->setSourceModel(this->dataPtr->modelsModel);
+
+  // A tree to visualize models and their properties
+  auto modelsTree = new QTreeView;
+  modelsTree->setObjectName("plotTree");
+  modelsTree->setAnimated(true);
+  modelsTree->setHeaderHidden(true);
+  modelsTree->setExpandsOnDoubleClick(true);
+  modelsTree->setModel(this->dataPtr->modelsModel);
+  modelsTree->setItemDelegate(plotItemDelegate);
+  modelsTree->setEditTriggers(QAbstractItemView::NoEditTriggers);
+  modelsTree->setDragEnabled(true);
+  modelsTree->setDragDropMode(QAbstractItemView::DragOnly);
+
   // The model that will hold data to be displayed in the sim tree view
   this->dataPtr->simModel = new PlotItemModel;
   this->FillSim(this->dataPtr->simModel);
@@ -379,7 +465,7 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   // A proxy model to filter sim model
   this->dataPtr->searchSimModel = new SearchModel;
   this->dataPtr->searchSimModel->setFilterRole(
-      PlotItemDelegate::TOPIC_NAME_ROLE);
+      PlotItemDelegate::DISPLAY_NAME);
   this->dataPtr->searchSimModel->setSourceModel(this->dataPtr->simModel);
 
   // A tree to visualize sim variables
@@ -421,6 +507,19 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   this->dataPtr->searchTopicsTree->setDragEnabled(true);
   this->dataPtr->searchTopicsTree->setDragDropMode(QAbstractItemView::DragOnly);
 
+  // A tree to visualize models search results
+  this->dataPtr->searchModelsTree = new QTreeView;
+  this->dataPtr->searchModelsTree->setObjectName("plotTree");
+  this->dataPtr->searchModelsTree->setAnimated(true);
+  this->dataPtr->searchModelsTree->setHeaderHidden(true);
+  this->dataPtr->searchModelsTree->setExpandsOnDoubleClick(true);
+  this->dataPtr->searchModelsTree->setModel(this->dataPtr->searchModelsModel);
+  this->dataPtr->searchModelsTree->setItemDelegate(plotItemDelegate);
+  this->dataPtr->searchModelsTree->setEditTriggers(
+      QAbstractItemView::NoEditTriggers);
+  this->dataPtr->searchModelsTree->setDragEnabled(true);
+  this->dataPtr->searchModelsTree->setDragDropMode(QAbstractItemView::DragOnly);
+
   // A tree to visualize sim search results
   this->dataPtr->searchSimTree = new QTreeView;
   this->dataPtr->searchSimTree->setObjectName("plotTree");
@@ -445,6 +544,16 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   auto topicsWidget = new QWidget();
   topicsWidget->setLayout(topicsLayout);
 
+  auto modelsLabel = new QLabel(tr("MODELS"));
+  modelsLabel->setObjectName("plottingSearchLabel");
+
+  auto modelsLayout = new QVBoxLayout();
+  modelsLayout->addWidget(modelsLabel);
+  modelsLayout->addWidget(this->dataPtr->searchModelsTree);
+
+  auto modelsWidget = new QWidget();
+  modelsWidget->setLayout(modelsLayout);
+
   auto simLabel = new QLabel(tr("SIM"));
   simLabel->setObjectName("plottingSearchLabel");
 
@@ -457,6 +566,7 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
 
   auto splitter = new QSplitter(Qt::Vertical, this);
   splitter->addWidget(topicsWidget);
+  splitter->addWidget(modelsWidget);
   splitter->addWidget(simWidget);
   splitter->setCollapsible(0, false);
   splitter->setCollapsible(1, false);
@@ -472,6 +582,7 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   auto tabStackedLayout = new QStackedLayout;
   tabStackedLayout->setContentsMargins(0, 0, 0, 0);
   tabStackedLayout->addWidget(topicsTree);
+  tabStackedLayout->addWidget(modelsTree);
   tabStackedLayout->addWidget(simTree);
   tabStackedLayout->addWidget(searchWidget);
 
@@ -494,7 +605,7 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   mainLayout->setContentsMargins(0, 0, 0, 0);
   mainLayout->setSpacing(0);
 
-  this->setMinimumWidth(250);
+  this->setMinimumWidth(350);
   this->setLayout(mainLayout);
 }
 
@@ -530,7 +641,7 @@ void Palette::FillTopics(QStandardItemModel *_topicsModel)
       shortName.replace(0, prefix.size(), "~");
 
     auto topicItem = new QStandardItem();
-    topicItem->setData(shortName.c_str(), PlotItemDelegate::TOPIC_NAME_ROLE);
+    topicItem->setData(shortName.c_str(), PlotItemDelegate::DISPLAY_NAME);
     _topicsModel->appendRow(topicItem);
 
     // Create a message from this topic to find out its fields
@@ -544,6 +655,170 @@ void Palette::FillTopics(QStandardItemModel *_topicsModel)
 
     auto msg = msgs::MsgFactory::NewMsg(msgType);
     this->FillFromMsg(msg.get(), topicItem, topic+"?p=");
+  }
+}
+
+/////////////////////////////////////////////////
+void Palette::FillModels(QStandardItemModel *_modelsModel)
+{
+  gazebo::util::IntrospectionClient client;
+
+  // Wait for the managers to come online
+  auto managerIds = client.WaitForManagers(std::chrono::seconds(2));
+
+  if (managerIds.empty())
+  {
+    std::cerr << "No introspection managers detected." << std::endl;
+    std::cerr << "Is a gzserver running?" << std::endl;
+    return;
+  }
+
+  // Pick up the first manager.
+  std::string id = *managerIds.begin();
+
+  // This is a blocking call
+  std::set<std::string> items;
+  if (!client.Items(id, items))
+  {
+    gzerr << "It wasn't possible to get items from introspection manager [" <<
+        id << "]" << std::endl;
+    return;
+  }
+
+  // FIXME: Check if there is at least one model?
+  if (!items.empty())
+  {
+    auto modelsTitle = new QStandardItem();
+    modelsTitle->setData("MODELS", PlotItemDelegate::DISPLAY_NAME);
+    modelsTitle->setData("title", PlotItemDelegate::TYPE);
+    _modelsModel->appendRow(modelsTitle);
+  }
+
+  // Populate widget
+  for (auto item : items)
+  {
+    common::URI itemURI(item);
+
+    // Only take data
+    if (itemURI.Scheme() != "data")
+      continue;
+
+    // Only take model data
+    auto pathStr = itemURI.Path().Str();
+    if (pathStr.find("model") == std::string::npos)
+      continue;
+
+    // Make sure there is a query
+    auto queryStr = itemURI.Query().Str();
+    if (queryStr.empty())
+      continue;
+
+    // Process path
+    auto pathParts = common::split(pathStr, "/");
+
+    QStandardItem *previousItem = NULL;
+    unsigned int i = 0;
+    while (i < pathParts.size())
+    {
+      // Create model item based on part
+      auto part = pathParts[i];
+      auto nextPart = pathParts[i+1];
+      if (part == "model")
+      {
+        // Check if it has already been added
+        QStandardItem *existingItem = NULL;
+
+        // Check top level (model)
+        if (!previousItem)
+        {
+          auto modelList = _modelsModel->findItems(nextPart.c_str());
+          if (!modelList.isEmpty())
+            existingItem = modelList[0];
+        }
+        // Check a QStandardItem
+        else
+        {
+          // TODO: Make a helper function for this
+          for (int k = 0; k < previousItem->rowCount(); ++k)
+          {
+            auto childItem = previousItem->child(k, 0);
+            if (childItem && childItem->text().toStdString() == nextPart)
+            {
+              existingItem = childItem;
+              break;
+            }
+          }
+        }
+
+        if (!existingItem)
+        {
+          auto newItem = new QStandardItem(nextPart.c_str());
+          newItem->setData(nextPart.c_str(),
+              PlotItemDelegate::DISPLAY_NAME);
+          newItem->setData("model", PlotItemDelegate::TYPE);
+
+          if (!previousItem)
+          {
+            _modelsModel->appendRow(newItem);
+            previousItem = newItem;
+          }
+          else
+          {
+            // Add title if there isn't one yet
+            bool hasTitle = false;
+            for (int k = 0; k < previousItem->rowCount(); ++k)
+            {
+              auto childItem = previousItem->child(k, 0);
+              if (childItem &&
+                  childItem->data(PlotItemDelegate::TYPE) == "title")
+              {
+                hasTitle = true;
+                break;
+              }
+            }
+
+            if (!hasTitle)
+            {
+              auto modelsTitle = new QStandardItem();
+              modelsTitle->setData("MODELS", PlotItemDelegate::DISPLAY_NAME);
+              modelsTitle->setData("title", PlotItemDelegate::TYPE);
+              previousItem->appendRow(modelsTitle);
+            }
+
+            previousItem->appendRow(newItem);
+            previousItem = newItem;
+          }
+        }
+        else
+        {
+          previousItem = existingItem;
+        }
+      }
+      i += 2;
+    }
+
+    if (!previousItem)
+      return;
+
+    // Process query
+    queryStr = queryStr.substr(queryStr.find("=")+1);
+    auto queryParts = common::split(queryStr, "/");
+
+    if (queryParts.size() != 2)
+    {
+      gzwarn << "Unsupported query [" << itemURI.Str() << "]. " <<
+          "Only top level queries can be handled." << std::endl;
+      continue;
+    }
+
+    if (queryParts[0] == "pose")
+    {
+      this->InsertPoseItem(previousItem, itemURI, queryParts[1]);
+    }
+    else if (queryParts[0] == "vector3d")
+    {
+      this->InsertVector3dItem(previousItem, itemURI, queryParts[1]);
+    }
   }
 }
 
@@ -562,21 +837,23 @@ void Palette::FillSim(QStandardItemModel *_simModel)
     childItem->setDragEnabled(true);
 
     auto humanName = ConfigWidget::HumanReadableKey(field.second);
-    childItem->setData(humanName.c_str(), PlotItemDelegate::TOPIC_NAME_ROLE);
+    childItem->setData(humanName.c_str(), PlotItemDelegate::DISPLAY_NAME);
 
     if (field.second == "iterations")
-      childItem->setData("Uint 64", PlotItemDelegate::DATA_TYPE_NAME);
+      childItem->setData("Uint 64", PlotItemDelegate::TYPE);
     else
-      childItem->setData("Double", PlotItemDelegate::DATA_TYPE_NAME);
+      childItem->setData("Double", PlotItemDelegate::TYPE);
 
+    // TODO: subclass QStandardItem and override setToolTip to do this
+    // automatically
     std::string typeName =
         "<font size=3><p><b>Type</b>: " + childItem->data(
-        PlotItemDelegate::DATA_TYPE_NAME).toString().toStdString() +
+        PlotItemDelegate::TYPE).toString().toStdString() +
         "</p></font>";
     childItem->setToolTip(QString::fromStdString(typeName));
 
     std::string dataName = field.first + "?p=/" + field.second;
-    childItem->setData(dataName.c_str(), PlotItemDelegate::DATA_ROLE);
+    childItem->setData(dataName.c_str(), PlotItemDelegate::URI_QUERY);
 
     _simModel->appendRow(childItem);
   }
@@ -584,24 +861,25 @@ void Palette::FillSim(QStandardItemModel *_simModel)
   //=================
   // TODO for testing - remove later
   auto itema = new QStandardItem();
-  itema->setData("Dog", PlotItemDelegate::TOPIC_NAME_ROLE);
-  itema->setData("Dog", PlotItemDelegate::DATA_ROLE);
-  itema->setData("Double", PlotItemDelegate::DATA_TYPE_NAME);
+  itema->setData("Dog", PlotItemDelegate::DISPLAY_NAME);
+  itema->setData("Dog", PlotItemDelegate::URI_QUERY);
+  itema->setData("Double", PlotItemDelegate::TYPE);
   _simModel->appendRow(itema);
   auto itemb = new QStandardItem("Cat");
-  itemb->setData("Cat", PlotItemDelegate::TOPIC_NAME_ROLE);
-  itemb->setData("Cat", PlotItemDelegate::DATA_ROLE);
-  itemb->setData("Double", PlotItemDelegate::DATA_TYPE_NAME);
+  itemb->setData("Cat", PlotItemDelegate::DISPLAY_NAME);
+  itemb->setData("Cat", PlotItemDelegate::URI_QUERY);
+  itemb->setData("Double", PlotItemDelegate::TYPE);
   _simModel->appendRow(itemb);
   auto itemc = new QStandardItem("Turtle");
-  itemc->setData("Turtle", PlotItemDelegate::TOPIC_NAME_ROLE);
-  itemc->setData("Turtle", PlotItemDelegate::DATA_ROLE);
-  itemc->setData("Double", PlotItemDelegate::DATA_TYPE_NAME);
+  itemc->setData("Turtle", PlotItemDelegate::DISPLAY_NAME);
+  itemc->setData("Turtle", PlotItemDelegate::URI_QUERY);
+  itemc->setData("Double", PlotItemDelegate::TYPE);
   _simModel->appendRow(itemc);
   auto simTimeItem = new QStandardItem("sim_time");
-  simTimeItem->setData("sim_time", PlotItemDelegate::TOPIC_NAME_ROLE);
-  simTimeItem->setData("sim_time", PlotItemDelegate::DATA_ROLE);
-  simTimeItem->setData("Double", PlotItemDelegate::DATA_TYPE_NAME);
+  simTimeItem->setData("sim_time", PlotItemDelegate::DISPLAY_NAME);
+  simTimeItem->setData("data://world/default?p=time/sim_time",
+      PlotItemDelegate::URI_QUERY);
+  simTimeItem->setData("Double", PlotItemDelegate::TYPE);
   _simModel->appendRow(simTimeItem);
   //=================
 }
@@ -646,41 +924,41 @@ void Palette::FillFromMsg(google::protobuf::Message *_msg,
 
         auto *childItem = new QStandardItem();
         childItem->setData(humanName.c_str(),
-            PlotItemDelegate::TOPIC_NAME_ROLE);
+            PlotItemDelegate::DISPLAY_NAME);
 
         switch (field->type())
         {
           case google::protobuf::FieldDescriptor::TYPE_DOUBLE:
-            childItem->setData("Double", PlotItemDelegate::DATA_TYPE_NAME);
+            childItem->setData("Double", PlotItemDelegate::TYPE);
             break;
           case google::protobuf::FieldDescriptor::TYPE_FLOAT:
-            childItem->setData("Float", PlotItemDelegate::DATA_TYPE_NAME);
+            childItem->setData("Float", PlotItemDelegate::TYPE);
             break;
           case google::protobuf::FieldDescriptor::TYPE_INT64:
-            childItem->setData("Int 64", PlotItemDelegate::DATA_TYPE_NAME);
+            childItem->setData("Int 64", PlotItemDelegate::TYPE);
             break;
           case google::protobuf::FieldDescriptor::TYPE_UINT64:
-            childItem->setData("Uint 64", PlotItemDelegate::DATA_TYPE_NAME);
+            childItem->setData("Uint 64", PlotItemDelegate::TYPE);
             break;
           case google::protobuf::FieldDescriptor::TYPE_INT32:
-            childItem->setData("Int 32", PlotItemDelegate::DATA_TYPE_NAME);
+            childItem->setData("Int 32", PlotItemDelegate::TYPE);
             break;
           case google::protobuf::FieldDescriptor::TYPE_UINT32:
-            childItem->setData("Uint 32", PlotItemDelegate::DATA_TYPE_NAME);
+            childItem->setData("Uint 32", PlotItemDelegate::TYPE);
             break;
           case google::protobuf::FieldDescriptor::TYPE_BOOL:
-            childItem->setData("Bool", PlotItemDelegate::DATA_TYPE_NAME);
+            childItem->setData("Bool", PlotItemDelegate::TYPE);
             break;
           default:
             continue;
         }
         childItem->setToolTip(
             "<font size=3><p><b>Type</b>: " + childItem->data(
-            PlotItemDelegate::DATA_TYPE_NAME).toString() +
+            PlotItemDelegate::TYPE).toString() +
             "</p></font>");
 
         std::string dataName = _uri + "/" + name;
-        childItem->setData(dataName.c_str(), PlotItemDelegate::DATA_ROLE);
+        childItem->setData(dataName.c_str(), PlotItemDelegate::URI_QUERY);
         childItem->setDragEnabled(true);
 
         _item->appendRow(childItem);
@@ -700,13 +978,13 @@ void Palette::FillFromMsg(google::protobuf::Message *_msg,
 
           auto *childItem = new QStandardItem();
           childItem->setData(humanName.c_str(),
-              PlotItemDelegate::TOPIC_NAME_ROLE);
-          childItem->setData(dataName.c_str(), PlotItemDelegate::DATA_ROLE);
-          childItem->setData("Double", PlotItemDelegate::DATA_TYPE_NAME);
+              PlotItemDelegate::DISPLAY_NAME);
+          childItem->setData(dataName.c_str(), PlotItemDelegate::URI_QUERY);
+          childItem->setData("Double", PlotItemDelegate::TYPE);
           childItem->setDragEnabled(true);
           childItem->setToolTip(
               "<font size=3><p><b>Type</b>: " + childItem->data(
-              PlotItemDelegate::DATA_TYPE_NAME).toString() +
+              PlotItemDelegate::TYPE).toString() +
               "</p></font>");
 
           _item->appendRow(childItem);
@@ -715,7 +993,7 @@ void Palette::FillFromMsg(google::protobuf::Message *_msg,
         else if (field->message_type()->name() == "Quaternion")
         {
           auto *quatItem = new QStandardItem();
-          quatItem->setData(name.c_str(), PlotItemDelegate::TOPIC_NAME_ROLE);
+          quatItem->setData(name.c_str(), PlotItemDelegate::DISPLAY_NAME);
           _item->appendRow(quatItem);
 
           std::vector<std::string> rpy = {"roll", "pitch", "yaw"};
@@ -726,12 +1004,12 @@ void Palette::FillFromMsg(google::protobuf::Message *_msg,
 
             auto *childItem = new QStandardItem();
             childItem->setData(QString::fromStdString(humanName),
-                PlotItemDelegate::TOPIC_NAME_ROLE);
-            childItem->setData(dataName.c_str(), PlotItemDelegate::DATA_ROLE);
-            childItem->setData("Double", PlotItemDelegate::DATA_TYPE_NAME);
+                PlotItemDelegate::DISPLAY_NAME);
+            childItem->setData(dataName.c_str(), PlotItemDelegate::URI_QUERY);
+            childItem->setData("Double", PlotItemDelegate::TYPE);
             childItem->setToolTip(
                 "<font size=3><p><b>Type</b>: " + childItem->data(
-                PlotItemDelegate::DATA_TYPE_NAME).toString() +
+                PlotItemDelegate::TYPE).toString() +
                 "</p></font>");
             childItem->setDragEnabled(true);
 
@@ -743,7 +1021,7 @@ void Palette::FillFromMsg(google::protobuf::Message *_msg,
         {
           auto fieldMsg = (ref->MutableMessage(_msg, field));
           auto *childItem = new QStandardItem();
-          childItem->setData(name.c_str(), PlotItemDelegate::TOPIC_NAME_ROLE);
+          childItem->setData(name.c_str(), PlotItemDelegate::DISPLAY_NAME);
           _item->appendRow(childItem);
           this->FillFromMsg(fieldMsg, childItem, _uri + "/" + name);
         }
@@ -758,14 +1036,160 @@ void Palette::FillFromMsg(google::protobuf::Message *_msg,
 }
 
 /////////////////////////////////////////////////
+void Palette::InsertPoseItem(QStandardItem *_item, const common::URI &_uri,
+    const std::string &_query)
+{
+  // Pose
+  auto poseItem = new QStandardItem(_query.c_str());
+  poseItem->setData("Pose",
+      PlotItemDelegate::DISPLAY_NAME);
+  _item->appendRow(poseItem);
+
+  // Position
+  auto positionItem = new QStandardItem();
+  positionItem->setData("Position",
+      PlotItemDelegate::DISPLAY_NAME);
+  poseItem->appendRow(positionItem);
+
+  common::URI positionURI(_uri.Str() + "/vector3d/position");
+
+  this->InsertVector3dItem(positionItem, positionURI, _query);
+
+  // Orientation
+  auto orientationItem = new QStandardItem();
+  orientationItem->setData("Orientation",
+      PlotItemDelegate::DISPLAY_NAME);
+  poseItem->appendRow(orientationItem);
+
+  common::URI orientationURI(_uri.Str() + "/quaterniond/orientation");
+
+  this->InsertQuaterniondItem(orientationItem, orientationURI, _query);
+}
+
+/////////////////////////////////////////////////
+void Palette::InsertVector3dItem(QStandardItem *_item, const common::URI &_uri,
+    const std::string &_query)
+{
+  // Use the full query as name by default
+  auto subItem0Name = _query;
+
+  // Use the input item as the immediate parent item by default
+  auto parentItem = _item;
+
+  // If it's linear velocity for example, place it under velocity -> linear
+  bool isVel = _query.find("velocity") != std::string::npos;
+  bool isAcc = _query.find("acceleration") != std::string::npos;
+  bool isLin = _query.find("linear") != std::string::npos;
+  bool isAng = _query.find("angular") != std::string::npos;
+
+  if (isVel)
+    subItem0Name = "velocity";
+  else if (isAcc)
+    subItem0Name = "acceleration";
+
+  // Check if it has already been added
+  QStandardItem *subItem0 = NULL;
+  for (int k = 0; k < _item->rowCount(); ++k)
+  {
+    auto childItem = _item->child(k, 0);
+    if (childItem && childItem->text().toStdString() == subItem0Name)
+    {
+      subItem0 = childItem;
+      break;
+    }
+  }
+
+  if (isVel || isAcc)
+  {
+    // Otherwise create new item
+    if (!subItem0)
+    {
+      subItem0 = new QStandardItem(subItem0Name.c_str());
+      _item->appendRow(subItem0);
+    }
+
+    subItem0Name = ConfigWidget::HumanReadableKey(subItem0Name);
+    subItem0->setData(subItem0Name.c_str(), PlotItemDelegate::DISPLAY_NAME);
+
+    // Linear / Angular
+    QString subItem1Name;
+    if (isLin)
+      subItem1Name = "Linear";
+    else if (isAng)
+      subItem1Name = "Angular";
+
+    // We don't search for this because we assume no one else has added it yet
+    auto subItem1 = new QStandardItem();
+    subItem1->setData(subItem1Name, PlotItemDelegate::DISPLAY_NAME);
+    subItem0->appendRow(subItem1);
+    parentItem = subItem1;
+  }
+
+  // The Vector3d
+  std::vector<std::string> elements = {"x", "y", "z"};
+  for (auto element : elements)
+  {
+    auto humanName = ConfigWidget::HumanReadableKey(element);
+
+    auto childItem = new QStandardItem();
+    childItem->setData(humanName.c_str(),
+        PlotItemDelegate::DISPLAY_NAME);
+    childItem->setData((_uri.Str() + "/double/" + element).c_str(),
+        PlotItemDelegate::URI_QUERY);
+    childItem->setData("Double", PlotItemDelegate::TYPE);
+
+    std::string typeName =
+        "<font size=3><p><b>Type</b>: " + childItem->data(
+        PlotItemDelegate::TYPE).toString().toStdString() +
+        "</p></font>";
+    childItem->setToolTip(QString::fromStdString(typeName));
+
+    parentItem->appendRow(childItem);
+  }
+}
+
+/////////////////////////////////////////////////
+void Palette::InsertQuaterniondItem(QStandardItem *_item,
+    const common::URI &_uri, const std::string &/*_query*/)
+{
+  // Use the input item as the immediate parent item by default
+  auto parentItem = _item;
+
+  // The Quaterniond
+  std::vector<std::string> elements = {"roll", "pitch", "yaw"};
+  for (auto element : elements)
+  {
+    auto humanName = ConfigWidget::HumanReadableKey(element);
+
+    auto childItem = new QStandardItem();
+    childItem->setData(humanName.c_str(),
+        PlotItemDelegate::DISPLAY_NAME);
+    childItem->setData((_uri.Str() + "/double/" + element).c_str(),
+        PlotItemDelegate::URI_QUERY);
+    childItem->setData("Double", PlotItemDelegate::TYPE);
+
+    std::string typeName =
+        "<font size=3><p><b>Type</b>: " + childItem->data(
+        PlotItemDelegate::TYPE).toString().toStdString() +
+        "</p></font>";
+    childItem->setToolTip(QString::fromStdString(typeName));
+
+    parentItem->appendRow(childItem);
+  }
+}
+
+/////////////////////////////////////////////////
 void Palette::UpdateSearch(const QString &_search)
 {
   this->dataPtr->searchTopicsModel->setSearch(_search);
+  this->dataPtr->searchModelsModel->setSearch(_search);
   this->dataPtr->searchSimModel->setSearch(_search);
 
   // Expand / collapse
   this->ExpandChildren(this->dataPtr->searchTopicsModel,
       this->dataPtr->searchTopicsTree, QModelIndex());
+  this->ExpandChildren(this->dataPtr->searchModelsModel,
+      this->dataPtr->searchModelsTree, QModelIndex());
   this->ExpandChildren(this->dataPtr->searchSimModel,
       this->dataPtr->searchSimTree, QModelIndex());
 }
@@ -791,4 +1215,3 @@ void Palette::ExpandChildren(QSortFilterProxyModel *_model,
     this->ExpandChildren(_model, _tree, item);
   }
 }
-
