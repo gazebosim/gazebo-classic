@@ -17,6 +17,7 @@
 #ifndef _GAZEBO_UTIL_OPENAL_HH_
 #define _GAZEBO_UTIL_OPENAL_HH_
 
+#include <set>
 #include <string>
 #include <vector>
 #include <sdf/sdf.hh>
