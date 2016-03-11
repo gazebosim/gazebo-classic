@@ -107,7 +107,7 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   this->linkButtonGroup->addButton(boxButton);
   this->linkButtonGroup->addButton(customButton);
 
-  this->modelCreator = new ModelCreator();
+  this->modelCreator = new ModelCreator(this);
   connect(this->modelCreator, SIGNAL(LinkAdded()), this, SLOT(OnLinkAdded()));
 
   this->otherItemsLayout = new QVBoxLayout();
@@ -150,8 +150,6 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
 /////////////////////////////////////////////////
 ModelEditorPalette::~ModelEditorPalette()
 {
-  delete this->modelCreator;
-  this->modelCreator = NULL;
 }
 
 /////////////////////////////////////////////////
