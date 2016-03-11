@@ -76,7 +76,7 @@ namespace gazebo
 
       /// \brief Get a list of available audio devices
       /// \return A list of audio device names
-      private: std::set<std::string> DeviceList() const;
+      public: std::set<std::string> DeviceList() const;
 
       /// \internal
       /// \brief Private data pointer.

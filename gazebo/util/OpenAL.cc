@@ -60,21 +60,6 @@ OpenAL::~OpenAL()
 }
 
 /////////////////////////////////////////////////
-std::set<std::string> OpenAL::DeviceList() const
-{
-  std::set<std::string> deviceList;
-  const ALCchar *devices = alcGetString(NULL, ALC_DEVICE_SPECIFIER);
-  while (*devices != '\0')
-  {
-    std::string str(devices);
-    deviceList.emplace(str);
-    devices += str.size() + 1;
-  }
-  return deviceList;
-}
-
-
-/////////////////////////////////////////////////
 bool OpenAL::Load(sdf::ElementPtr _sdf)
 {
   std::string deviceName = "default";
@@ -182,6 +167,20 @@ OpenALSourcePtr OpenAL::CreateSource(sdf::ElementPtr _sdf)
 
   // Return a pointer to the source
   return source;
+}
+
+/////////////////////////////////////////////////
+std::set<std::string> OpenAL::DeviceList() const
+{
+  std::set<std::string> deviceList;
+  const ALCchar *devices = alcGetString(NULL, ALC_DEVICE_SPECIFIER);
+  while (*devices != '\0')
+  {
+    std::string str(devices);
+    deviceList.emplace(str);
+    devices += str.size() + 1;
+  }
+  return deviceList;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
