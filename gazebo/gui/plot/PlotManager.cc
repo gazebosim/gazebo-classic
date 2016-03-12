@@ -49,12 +49,6 @@ namespace gazebo
       /// \brief Subscriber to the world control topic
       public: transport::SubscriberPtr worldControlSub;
 
-      /// \brief A map of topic names to topic data handers.
-      // public: std::map<std::string, TopicDataHandler *> topicDataHandlers;
-
-      /// \brief Handler for updating topic curves
-      // public: TopicCurveHandler topicCurve;
-
       /// \brief Handler for updating introspection curves
       public: IntrospectionCurveHandler introspectionCurve;
 
@@ -110,19 +104,6 @@ void PlotManager::AddIntrospectionCurve(const std::string &_uri,
 void PlotManager::RemoveIntrospectionCurve(PlotCurveWeakPtr _curve)
 {
   this->dataPtr->introspectionCurve.RemoveCurve(_curve);
-}
-
-/////////////////////////////////////////////////
-void PlotManager::AddTopicCurve(const std::string &_uri,
-    PlotCurveWeakPtr _curve)
-{
-  // this->dataPtr->topicCurve.AddCurve(_uri, _curve);
-}
-
-/////////////////////////////////////////////////
-void PlotManager::RemoveTopicCurve(PlotCurveWeakPtr _curve)
-{
-  // this->dataPtr->topicCurve.RemoveCurve( _curve);
 }
 
 /////////////////////////////////////////////////

@@ -58,6 +58,11 @@ namespace gazebo
       /// \return Number of curves
       public: unsigned int CurveCount() const;
 
+      /// \brief Get whether or not the introspection curve handler has been
+      /// initialized.
+      /// \return True if initialized.
+      public: bool Initialized() const;
+
       /// \brief Set up introspection client
       private: void SetupIntrospection();
 

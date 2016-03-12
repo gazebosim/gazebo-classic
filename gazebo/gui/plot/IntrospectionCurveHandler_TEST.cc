@@ -30,7 +30,12 @@ void IntrospectionCurveHandler_TEST::AddRemoveCurve()
 
   gazebo::gui::IntrospectionCurveHandler handler;
 
-//  gazebo::common::Time::MSleep(2000);
+  int sleep = 0;
+  int maxSleep = 20;
+  while (!handler.Initialized() && (sleep++ < maxSleep))
+    gazebo::common::Time::MSleep(100);
+
+  QVERIFY(handler.Initialized());
 
   QCOMPARE(handler.CurveCount(), 0u);
 

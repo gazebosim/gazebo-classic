@@ -189,6 +189,13 @@ unsigned int IntrospectionCurveHandler::CurveCount() const
 }
 
 /////////////////////////////////////////////////
+bool IntrospectionCurveHandler::Initialized() const
+{
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  return this->dataPtr->initialized;
+}
+
+/////////////////////////////////////////////////
 void IntrospectionCurveHandler::SetupIntrospection()
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
