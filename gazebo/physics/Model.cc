@@ -1492,14 +1492,44 @@ void Model::RegisterIntrospectionItems()
     return this->GetWorldLinearVel().Ign();
   };
 
+  auto fModelAngVel = [this]()
+  {
+    return this->GetWorldAngularVel().Ign();
+  };
+
+  auto fModelLinAcc = [this]()
+  {
+    return this->GetWorldLinearAccel().Ign();
+  };
+
+  auto fModelAngAcc = [this]()
+  {
+    return this->GetWorldAngularAccel().Ign();
+  };
+
   // Register items.
   common::URI poseURI(uri);
-  poseURI.Query().Insert("p", "world_pose");
+  poseURI.Query().Insert("p", "pose/world_pose");
   gazebo::util::IntrospectionManager::Instance()->Register
       <ignition::math::Pose3d>(poseURI.Str(), fModelPose);
 
   common::URI linVelURI(uri);
-  poseURI.Query().Insert("p", "world_linear_velocity");
+  linVelURI.Query().Insert("p", "vector3d/world_linear_velocity");
   gazebo::util::IntrospectionManager::Instance()->Register
       <ignition::math::Vector3d>(linVelURI.Str(), fModelLinVel);
+
+  common::URI angVelURI(uri);
+  angVelURI.Query().Insert("p", "vector3d/world_angular_velocity");
+  gazebo::util::IntrospectionManager::Instance()->Register
+      <ignition::math::Vector3d>(angVelURI.Str(), fModelAngVel);
+
+  common::URI linAccURI(uri);
+  linAccURI.Query().Insert("p", "vector3d/world_linear_acceleration");
+  gazebo::util::IntrospectionManager::Instance()->Register
+      <ignition::math::Vector3d>(linAccURI.Str(), fModelLinAcc);
+
+  common::URI angAccURI(uri);
+  angAccURI.Query().Insert("p", "vector3d/world_angular_acceleration");
+  gazebo::util::IntrospectionManager::Instance()->Register
+      <ignition::math::Vector3d>(angAccURI.Str(), fModelAngAcc);
 }

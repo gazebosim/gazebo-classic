@@ -223,9 +223,9 @@ TEST_F(IntrospectionClientTest, NewFilterAsync)
 
   // Try to create an empty filter.
   std::set<std::string> emptySet;
-  EXPECT_TRUE(this->client.NewFilter(this->managerId, emptySet, cb));
+  EXPECT_FALSE(this->client.NewFilter(this->managerId, emptySet, cb));
   std::this_thread::sleep_for(std::chrono::milliseconds(300));
-  EXPECT_TRUE(executed);
+  EXPECT_FALSE(executed);
 
   auto cb2 = [this](const std::string &/*_filterId*/,
                  const std::string &_newTopic,

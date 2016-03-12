@@ -851,6 +851,8 @@ void World::Fini()
 #ifdef HAVE_OPENAL
   util::OpenAL::Instance()->Fini();
 #endif
+
+  gazebo::util::IntrospectionManager::Instance()->Clear();
 }
 
 //////////////////////////////////////////////////
@@ -2626,7 +2628,7 @@ void World::RegisterIntrospectionItems()
   auto uri = this->URI();
 
   common::URI timeURI(uri);
-  timeURI.Query().Insert("p", "sim_time");
+  timeURI.Query().Insert("p", "time/sim_time");
   // Add here all the items that might be introspected.
   gazebo::util::IntrospectionManager::Instance()->Register<common::Time>(
       timeURI.Str(), std::bind(&World::GetSimTime, this));
