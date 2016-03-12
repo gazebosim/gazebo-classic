@@ -217,13 +217,6 @@ void IntrospectionCurveHandler::SetupIntrospection()
   std::set<std::string> items;
   this->dataPtr->introspectClient.Items(this->dataPtr->managerId, items);
 
-  std::cerr << " SetupIntrospection items " << std::endl;
-  for (auto i : items)
-  {
-    std::cerr << i << std::endl;
-  }
-  std::cerr << " ==== " << std::endl;
-
   if (!this->dataPtr->introspectClient.IsRegistered(
       this->dataPtr->managerId, this->dataPtr->simTimeVar))
   {
@@ -252,35 +245,6 @@ void IntrospectionCurveHandler::SetupIntrospection()
 
   this->dataPtr->initialized = true;
 }
-
-/*
-          common::URI uri(paramName);
-          URIPath path = uri.Path();
-          URIQuery query = uri.Query();
-          while (query.Valid())
-          {
-            uri.SetQuery(query);
-            uriStr = uri.Str();
-            auto it = this->dataPtr->curves.find(uriStr);
-            if (it == this->dataPtr->curves.end())
-            {
-              std::string queryStr = query.Str();
-              size_t pos = queryStr.find("/");
-              if (pos == std::string::npos);
-                continue;
-              queryStr = queryStr.substr(0, pos)
-              query.Parse(queryStr);
-            }
-            else
-            {
-              break;
-            }
-          }
-
-          if (!query.Valid())
-            continue;
-*/
-
 
 /////////////////////////////////////////////////
 void IntrospectionCurveHandler::OnIntrospection(
@@ -315,8 +279,6 @@ void IntrospectionCurveHandler::OnIntrospection(
         hasSimTime = true;
       }
     }
-
-    // std::cerr << "paramName " << paramName << std::endl;
 
     // see if there is a curve with variable name that matches param name or
     // a substring of the param name
@@ -405,7 +367,6 @@ void IntrospectionCurveHandler::OnIntrospection(
           // }
           // else
           //   validData = false;
-
 
           if (queryStr.find("position") != std::string::npos)
           {
