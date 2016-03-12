@@ -175,6 +175,11 @@ if (HAVE_GDAL)
   target_link_libraries(gazebo_physics ${GDAL_LIBRARY})
 endif()
 
+if (USE_PCH)
+  target_compile_options(gazebo_physics PRIVATE -Winvalid-pch -include gazebo/gazebo_pch.hh)
+  add_dependencies(gazebo_physics gazebo_pch)
+endif()
+
 gz_install_library(gazebo_physics)
 gz_install_includes("physics" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/physics.hh)
 

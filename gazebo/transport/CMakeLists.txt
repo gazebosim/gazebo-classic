@@ -67,6 +67,11 @@ if (WIN32)
   target_link_libraries(gazebo_transport ws2_32 Iphlpapi)
 endif()
 
+if (USE_PCH)
+  target_compile_options(gazebo_transport PRIVATE -Winvalid-pch -include gazebo/gazebo_pch.hh)
+  add_dependencies(gazebo_transport gazebo_pch)
+endif()
+
 gz_install_library(gazebo_transport)
 gz_install_includes("transport" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/transport.hh)
 
