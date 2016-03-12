@@ -18,6 +18,7 @@
 #define _GAZEBO_UTIL_INTROSPECTION_CLIENT_PRIVATE_HH_
 
 #include <map>
+#include <mutex>
 #include <string>
 #include <ignition/transport.hh>
 
@@ -38,6 +39,9 @@ namespace gazebo
       /// The key is the filter ID.
       /// The value is the manager ID where the filter is located.
       public: std::map<std::string, std::string> filters;
+
+      /// \brief A mutex to guarantee mutual exclusion.
+      public: std::mutex mutex;
     };
   }
 }
