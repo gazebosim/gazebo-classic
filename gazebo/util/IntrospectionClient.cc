@@ -314,8 +314,21 @@ bool IntrospectionClient::RemoveAllFilters() const
   bool result = true;
 
   // Remove all the filters from the manager.
-  for (auto const &filter : this->dataPtr->filters)
-    result = result && this->RemoveFilter(filter.second, filter.first);
+  int skipped = 0;
+  while (!this->dataPtr->filters.empty()
+      || this->dataPtr->filters.size() - skipped == 0u)
+  {
+    auto it = std::next(this->dataPtr->filters.begin(), skipped);
+    if (it == this->dataPtr->filters.end())
+      break;
+
+    bool res = this->RemoveFilter(it->second, it->first);
+
+    if (!res)
+      skipped++;
+
+    result = result && res;
+  }
 
   return result;
 }
