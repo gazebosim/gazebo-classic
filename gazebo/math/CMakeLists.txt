@@ -79,8 +79,7 @@ gz_add_library(gazebo_math ${sources})
 target_link_libraries(gazebo_math ${Boost_LIBRARIES} ${IGNITION-MATH_LIBRARIES})
 
 if (USE_PCH)
-  target_compile_options(gazebo_math PRIVATE -Winvalid-pch -include gazebo/gazebo_pch.hh)
-  add_dependencies(gazebo_math gazebo_pch)
+  add_pch(gazebo_math math_pch.in.hh)
 endif()
 
 gz_install_library(gazebo_math)
