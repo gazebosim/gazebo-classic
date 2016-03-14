@@ -162,7 +162,7 @@ void ModelEditorTest::SaveModelPose()
   QVERIFY(box->GetWorldPose() == boxPose);
 
   // Add a revolute joint
-  gazebo::gui::JointMaker *jointMaker = modelCreator->GetJointMaker();
+  gazebo::gui::JointMaker *jointMaker = modelCreator->JointMaker();
   QVERIFY(jointMaker != NULL);
   jointMaker->AddJoint(gazebo::gui::JointMaker::JOINT_HINGE);
   auto jointData = jointMaker->CreateJoint(cylinder, box);
@@ -176,7 +176,7 @@ void ModelEditorTest::SaveModelPose()
 
   // Save all changes
   modelCreator->SaveModelFiles();
-  QCOMPARE(modelCreator->GetCurrentSaveState(),
+  QCOMPARE(modelCreator->CurrentSaveState(),
       gazebo::gui::ModelCreator::ALL_SAVED);
 
   this->ProcessEventsAndDraw(mainWindow);
@@ -222,7 +222,7 @@ void ModelEditorTest::JointInspectorUpdate()
   QVERIFY(modelCreator != NULL);
 
   // get the joint maker
-  gazebo::gui::JointMaker *jointMaker = modelCreator->GetJointMaker();
+  gazebo::gui::JointMaker *jointMaker = modelCreator->JointMaker();
   QVERIFY(jointMaker != NULL);
 
   // add a cylinder link
