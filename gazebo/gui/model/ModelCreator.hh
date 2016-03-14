@@ -96,7 +96,6 @@ namespace gazebo
         UNSAVED_CHANGES
       };
 
-
       /// \brief Constructor
       /// \param[in] _parent Parent Qt Object
       public: ModelCreator(QObject *_parent = NULL);
