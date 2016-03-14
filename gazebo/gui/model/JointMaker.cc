@@ -1742,7 +1742,7 @@ rendering::VisualPtr JointMaker::LinkVisualFromName(const std::string &_name)
 
 /////////////////////////////////////////////////
 void JointMaker::SetLinksRelativePose(const ignition::math::Pose3d &_pose,
-    const bool _reset)
+    const bool _resetAll, const int _resetAxis)
 {
   if (!this->dataPtr->newJoint || !this->dataPtr->newJoint->parent ||
       !this->dataPtr->newJoint->child)
@@ -1750,13 +1750,25 @@ void JointMaker::SetLinksRelativePose(const ignition::math::Pose3d &_pose,
     return;
   }
 
-  ignition::math::Pose3d newChildPose;
+  auto newChildPose = this->dataPtr->newJoint->child->GetWorldPose().Ign();
 
-  if (_reset)
+  if (_resetAll)
   {
     newChildPose = this->dataPtr->childLinkOriginalPose;
     this->dataPtr->newJoint->parent->SetWorldPose(
         this->dataPtr->parentLinkOriginalPose);
+  }
+  else if (_resetAxis == 0)
+  {
+    newChildPose.Pos().X(this->dataPtr->childLinkOriginalPose.Pos().X());
+  }
+  else if (_resetAxis == 1)
+  {
+    newChildPose.Pos().Y(this->dataPtr->childLinkOriginalPose.Pos().Y());
+  }
+  else if (_resetAxis == 2)
+  {
+    newChildPose.Pos().Z(this->dataPtr->childLinkOriginalPose.Pos().Z());
   }
   else
   {
