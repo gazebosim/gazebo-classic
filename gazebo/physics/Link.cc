@@ -321,6 +321,8 @@ void Link::Fini()
   this->audioSink.reset();
 #endif
 
+  this->UnregisterIntrospectionItems();
+
   Entity::Fini();
 }
 
@@ -1664,26 +1666,40 @@ void Link::RegisterIntrospectionItems()
   // Register items.
   common::URI poseURI(uri);
   poseURI.Query().Insert("p", "pose3d/world_pose");
+  this->introspectionItems.push_back(poseURI);
   gazebo::util::IntrospectionManager::Instance()->Register
       <ignition::math::Pose3d>(poseURI.Str(), fLinkPose);
 
   common::URI linVelURI(uri);
   linVelURI.Query().Insert("p", "vector3d/world_linear_velocity");
+  this->introspectionItems.push_back(linVelURI);
   gazebo::util::IntrospectionManager::Instance()->Register
       <ignition::math::Vector3d>(linVelURI.Str(), fLinkLinVel);
 
   common::URI angVelURI(uri);
   angVelURI.Query().Insert("p", "vector3d/world_angular_velocity");
+  this->introspectionItems.push_back(angVelURI);
   gazebo::util::IntrospectionManager::Instance()->Register
       <ignition::math::Vector3d>(angVelURI.Str(), fLinkAngVel);
 
   common::URI linAccURI(uri);
   linAccURI.Query().Insert("p", "vector3d/world_linear_acceleration");
+  this->introspectionItems.push_back(linAccURI);
   gazebo::util::IntrospectionManager::Instance()->Register
       <ignition::math::Vector3d>(linAccURI.Str(), fLinkLinAcc);
 
   common::URI angAccURI(uri);
   angAccURI.Query().Insert("p", "vector3d/world_angular_acceleration");
+  this->introspectionItems.push_back(angAccURI);
   gazebo::util::IntrospectionManager::Instance()->Register
       <ignition::math::Vector3d>(angAccURI.Str(), fLinkAngAcc);
+}
+
+/////////////////////////////////////////////////
+void Link::UnregisterIntrospectionItems()
+{
+  for (auto &item : this->introspectionItems)
+    util::IntrospectionManager::Instance()->Unregister(item.Str());
+
+  this->introspectionItems.clear();
 }
