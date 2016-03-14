@@ -73,6 +73,9 @@ namespace gazebo
       /// (the item was not previously registered).
       public: bool Unregister(const std::string &_item);
 
+      /// \brief Unregister all items.
+      public: void Clear();
+
       /// \brief Get a copy of the items already registered in this manager.
       /// \return Set of registered items.
       public: std::set<std::string> Items() const;
