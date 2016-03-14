@@ -1,9 +1,11 @@
-## Gazebo 7
-
-## Gazebo 7.x.x (2016-xx-xx)
+## Gazebo 8
 
 1. Added static camera when following a model.
     * [Pull request #1980](https://bitbucket.org/osrf/gazebo/pull-request/1980)
+
+## Gazebo 7
+
+## Gazebo 7.x.x (2016-xx-xx)
 
 1. Fix compilation against ffmpeg3 (libavcodec)
     * [Pull request #2154](https://bitbucket.org/osrf/gazebo/pull-request/2154)
