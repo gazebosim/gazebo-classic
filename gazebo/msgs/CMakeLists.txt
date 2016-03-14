@@ -130,7 +130,7 @@ set (msgs_tests_sources
   msgs_TEST.cc
   MsgFactory_TEST.cc
 )
-gz_build_tests(${msgs_tests_sources})
+gz_build_tests(${msgs_tests_sources} EXTRA_LIBS gazebo_msgs)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
