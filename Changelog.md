@@ -2,6 +2,8 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
+1. Moved gazebo ODE includes to have correct include path
+
 1. Support conversions between SDF and protobuf for more sensors.
     * [Pull request #2118](https://bitbucket.org/osrf/gazebo/pull-request/2118)
 
