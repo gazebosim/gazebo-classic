@@ -206,7 +206,9 @@ const std::string ModelCreatorPrivate::modelDefaultName = "Untitled";
 const std::string ModelCreatorPrivate::previewName = "ModelPreview";
 
 /////////////////////////////////////////////////
-ModelCreator::ModelCreator() : dataPtr(new ModelCreatorPrivate)
+ModelCreator::ModelCreator(QObject *_parent)
+  : QObject(_parent),
+    dataPtr(new ModelCreatorPrivate)
 {
   this->dataPtr->active = false;
 
@@ -1566,11 +1568,17 @@ void ModelCreator::FinishModel()
 {
   if (!this->dataPtr->serverModelName.empty())
   {
+    // this resets the material properites of the model
+    // (important if we want to reuse it later, e.g. saving to same model name,
+    // if this is not done then the new model with same name will be invisible)
+    this->SetModelVisible(this->dataPtr->serverModelName, true);
+
     // delete model on server first before spawning the updated one.
     transport::request(gui::get_world(), "entity_delete",
         this->dataPtr->serverModelName);
     int timeoutCounter = 0;
     int timeout = 100;
+    // wait for entity to be deleted on server side
     while (timeoutCounter < timeout)
     {
       auto response = transport::request(gui::get_world(), "entity_info",
@@ -1580,9 +1588,26 @@ void ModelCreator::FinishModel()
         break;
 
       common::Time::MSleep(100);
+      QCoreApplication::processEvents();
+      timeoutCounter++;
+    }
+
+    timeoutCounter = 0;
+    // wait for client scene to acknowledge the deletion
+    rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
+    rendering::VisualPtr visual = scene->GetVisual(
+        this->dataPtr->serverModelName);
+    while (timeoutCounter < timeout)
+    {
+      visual = scene->GetVisual(this->dataPtr->serverModelName);
+      if (!visual)
+        break;
+      common::Time::MSleep(100);
+      QCoreApplication::processEvents();
       timeoutCounter++;
     }
   }
+
   event::Events::setSelectedEntity("", "normal");
   this->CreateTheEntity();
   this->Reset();
@@ -1601,7 +1626,8 @@ void ModelCreator::CreateTheEntity()
   // Create a new name if the model exists
   auto modelElem = this->dataPtr->modelSDF->Root()->GetElement("model");
   std::string modelElemName = modelElem->Get<std::string>("name");
-  if (has_entity_name(modelElemName))
+  if (modelElemName != this->dataPtr->serverModelName &&
+      has_entity_name(modelElemName))
   {
     int i = 0;
     while (has_entity_name(modelElemName))

@@ -97,7 +97,8 @@ namespace gazebo
       };
 
       /// \brief Constructor
-      public: ModelCreator();
+      /// \param[in] _parent Parent Qt Object
+      public: ModelCreator(QObject *_parent = NULL);
 
       /// \brief Destructor
       public: virtual ~ModelCreator();
