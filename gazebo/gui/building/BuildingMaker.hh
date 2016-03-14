@@ -196,7 +196,7 @@ namespace gazebo
 
       /// \brief Get the last generated SDF as string.
       /// \return String representation of the building's SDF.
-      public: std::string ModelSDF();
+      public: std::string ModelSDF() const;
 
       /// \brief Publish a factory message to spawn the new building.
       private: void CreateTheEntity();

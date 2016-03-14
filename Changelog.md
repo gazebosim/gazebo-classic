@@ -20,6 +20,9 @@
 1. Removes one function call and replaces a manual swap with std::swap in ODE heightfield.
     * [Pull request #2114](https://bitbucket.org/osrf/gazebo/pull-request/2114)
 
+1. Add layers to building levels
+    * [Pull request #2180](https://bitbucket.org/osrf/gazebo/pull-request/2180)
+    * [Issue #1806](https://bitbucket.org/osrf/gazebo/issues/1806)
 
 ## Gazebo 7.0.0 (2016-01-25)
 

@@ -1573,7 +1573,7 @@ void BuildingMaker::SaveModelFiles()
 }
 
 /////////////////////////////////////////////////
-std::string BuildingMaker::ModelSDF()
+std::string BuildingMaker::ModelSDF() const
 {
   return this->dataPtr->modelSDF->ToString();
 }
