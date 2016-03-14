@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2015 Open Source Robotics Foundation
+ * Copyright (C) 2013-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _MODEL_DATA_HH_
-#define _MODEL_DATA_HH_
+#ifndef _GAZEBO_MODEL_DATA_HH_
+#define _GAZEBO_MODEL_DATA_HH_
 
 #include <map>
 #include <string>
@@ -29,18 +29,14 @@ namespace boost
   class recursive_mutex;
 }
 
-namespace boost
-{
-  class recursive_mutex;
-}
-
 namespace gazebo
 {
   namespace gui
   {
     class LinkInspector;
+    class ModelPluginInspector;
 
-    class ModelData
+    class GZ_GUI_VISIBLE ModelData
     {
       /// \brief Get a template SDF string of a simple model.
       /// \return Template SDF string of a simple model.
@@ -49,11 +45,49 @@ namespace gazebo
       /// \brief Get the default transparency setting for entities in model
       /// editor.
       public: static double GetEditTransparency();
+
+      /// \internal
+      /// \brief Update visual's render group. This is needed to fix an
+      /// alpha compositing issue in ogre when transparent objects overlap.
+      /// \param[in] _visual Visual to update
+      public: static void UpdateRenderGroup(rendering::VisualPtr _visual);
+    };
+
+    /// \brief Helper class to store nested models data.
+    class GZ_GUI_VISIBLE NestedModelData
+    {
+      /// \brief Set the name of the model.
+      /// \param[in] _name Name of model.
+      public: void SetName(const std::string &_name);
+
+      /// \brief Set the pose of the model.
+      /// \param[in] _pose Pose of model.
+      public: void SetPose(const ignition::math::Pose3d &_pose);
+
+      /// \brief Get the pose of the nested model.
+      /// \return Pose of nested model.
+      public: ignition::math::Pose3d Pose() const;
+
+      /// \brief Get the depth of the nested model. The root model has depth 1.
+      /// \return Depth of nested model. Returns -1 if depth cannot be found.
+      public: int Depth() const;
+
+      /// \brief SDF representing the model data.
+      public: sdf::ElementPtr modelSDF;
+
+      /// \brief Visual representing this model.
+      public: rendering::VisualPtr modelVisual;
+
+      /// \brief Models inside this model
+      public: std::map<std::string, rendering::VisualWeakPtr> models;
+
+      /// \brief Links inside this model
+      public: std::map<std::string, rendering::VisualWeakPtr> links;
     };
 
     /// \class LinkData LinkData.hh
     /// \brief Helper class to store link data
-    class LinkData : public QObject
+    class GZ_GUI_VISIBLE LinkData : public QObject
     {
       Q_OBJECT
 
@@ -73,11 +107,11 @@ namespace gazebo
 
       /// \brief Get the pose of the link.
       /// \return Pose of link.
-      public: math::Pose GetPose() const;
+      public: ignition::math::Pose3d Pose() const;
 
       /// \brief Set the pose of the link.
       /// \param[in] _pose Pose of link.
-      public: void SetPose(const math::Pose &_pose);
+      public: void SetPose(const ignition::math::Pose3d &_pose3d);
 
       /// \brief Load the link with data from SDF.
       /// \param[in] _sdf Link SDF element.
@@ -85,11 +119,11 @@ namespace gazebo
 
       /// \brief Get the scale of the link.
       /// \return Scale of link.
-      public: math::Vector3 GetScale() const;
+      public: ignition::math::Vector3d Scale() const;
 
       /// \brief Set the scale of the link.
       /// \param[in] _scale Scale of link.
-      public: void SetScale(const math::Vector3 &_scale);
+      public: void SetScale(const ignition::math::Vector3d &_scale);
 
       /// \brief Add a visual to the link.
       /// \param[in] _visual Visual to be added.
@@ -97,7 +131,9 @@ namespace gazebo
 
       /// \brief Add a collision to the link.
       /// \param[in] _collisionVis Visual representing the collision.
-      public: void AddCollision(rendering::VisualPtr _collisionVis);
+      /// \param[in] _msg Optional message containing collision params.
+      public: void AddCollision(rendering::VisualPtr _collisionVis,
+          const msgs::Collision *_msg = NULL);
 
       /// \brief Update the inspector widget if necessary.
       public: void UpdateConfig();
@@ -147,8 +183,20 @@ namespace gazebo
       /// \brief SDF representing the link data.
       public: sdf::ElementPtr linkSDF;
 
+      /// \brief mass.
+      private: double mass;
+
+      /// \brief Inertia ixx.
+      private: double inertiaIxx;
+
+      /// \brief Inertia iyy.
+      private: double inertiaIyy;
+
+      /// \brief Inertia izz.
+      private: double inertiaIzz;
+
       /// \brief Scale of link.
-      public: math::Vector3 scale;
+      public: ignition::math::Vector3d scale;
 
       /// \brief Visual representing this link.
       public: rendering::VisualPtr linkVisual;
@@ -167,6 +215,31 @@ namespace gazebo
 
       /// \brief Inspector for configuring link properties.
       public: LinkInspector *inspector;
+
+      /// \brief Flag set to true if this is a link of a nested model.
+      public: bool nested;
+    };
+
+    /// \brief Helper class to store model plugin data
+    class GZ_GUI_VISIBLE ModelPluginData : public QObject
+    {
+      Q_OBJECT
+
+      /// \brief Constructor
+      public: ModelPluginData();
+
+      /// \brief Destructor
+      public: ~ModelPluginData();
+
+      /// \brief Load data from the plugin SDF
+      /// \param[in] _pluginElem SDF element.
+      public: void Load(sdf::ElementPtr _pluginElem);
+
+      /// \brief Inspector for configuring model plugin properties.
+      public: ModelPluginInspector *inspector;
+
+      /// \brief SDF representing the model plugin data.
+      public: sdf::ElementPtr modelPluginSDF;
     };
   }
 }

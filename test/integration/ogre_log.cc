@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2015 Open Source Robotics Foundation
+ * Copyright (C) 2013-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ class OgreLog : public ServerFixture
 };
 
 /////////////////////////////////////////////////
-TEST_F(OgreLog, PubSub)
+TEST_F(OgreLog, LogError)
 {
   Load("worlds/empty.world");
 
@@ -34,6 +34,20 @@ TEST_F(OgreLog, PubSub)
   logPath /= "ogre.log";
   std::ifstream ogreLog(logPath.string().c_str(), std::ios::in);
   ASSERT_TRUE(ogreLog.is_open());
+
+  // check rendering capability
+  const Ogre::RenderSystemCapabilities *capabilities =
+      Ogre::Root::getSingleton().getRenderSystem()->getCapabilities();
+  Ogre::DriverVersion glVersion;
+  glVersion.build = 0;
+  glVersion.major = 3;
+  glVersion.minor = 0;
+  glVersion.release = 0;
+  if (capabilities->isDriverOlderThanVersion(glVersion))
+  {
+    std::cout << "Ogre log error test is disabled. Issue #1847" << std::endl;
+    return;
+  }
 
   while (!ogreLog.eof())
   {

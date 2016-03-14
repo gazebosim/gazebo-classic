@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -182,21 +182,6 @@ double BulletFixedJoint::GetVelocity(unsigned int /*_index*/) const
 {
   gzwarn << "BulletFixedJoint: called method "
          << "GetVelocity that is not valid for joints of type fixed.\n";
-  return 0.0;
-}
-
-//////////////////////////////////////////////////
-void BulletFixedJoint::SetMaxForce(unsigned int /*_index*/, double /*_t*/)
-{
-  gzwarn << "BulletFixedJoint: called method "
-         << "SetMaxForce that is not valid for joints of type fixed.\n";
-}
-
-//////////////////////////////////////////////////
-double BulletFixedJoint::GetMaxForce(unsigned int /*_index*/)
-{
-  gzwarn << "BulletFixedJoint: called method "
-         << "GetMaxForce that is not valid for joints of type fixed.\n";
   return 0.0;
 }
 

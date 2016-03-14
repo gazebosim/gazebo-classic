@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 #ifndef _GAZEBO_WORLD_PRIVATE_HH_
 #define _GAZEBO_WORLD_PRIVATE_HH_
 
+#include <atomic>
 #include <deque>
 #include <vector>
 #include <list>
@@ -78,13 +79,6 @@ namespace gazebo
       /// \brief Number of steps in increment by.
       public: int stepInc;
 
-      /// \brief Stores the simulation time target during a 'seek' operation.
-      public: common::Time targetSimTime;
-
-      /// \brief When there is a 'seek' command pending during a log file
-      /// playback this member variable should be true.
-      public: bool seekPending;
-
       /// \brief All the event connections.
       public: event::Connection_V connections;
 
@@ -127,6 +121,12 @@ namespace gazebo
       /// \brief Subscriber to light messages.
       public: transport::SubscriberPtr lightSub;
 
+      /// \brief Subscriber to light factory messages.
+      public: transport::SubscriberPtr lightFactorySub;
+
+      /// \brief Subscriber to light modify messages.
+      public: transport::SubscriberPtr lightModifySub;
+
       /// \brief Subscriber to model messages.
       public: transport::SubscriberPtr modelSub;
 
@@ -156,6 +156,9 @@ namespace gazebo
 
       /// \brief Mutex to protext loading of models.
       public: boost::mutex *loadModelMutex;
+
+      /// \brief Mutex to protext loading of lights.
+      public: std::mutex loadLightMutex;
 
       /// \TODO: Add an accessor for this, and make it private
       /// Used in Entity.cc.
@@ -188,6 +191,12 @@ namespace gazebo
 
       /// \brief Model message buffer.
       public: std::list<msgs::Model> modelMsgs;
+
+      /// \brief Light factory message buffer.
+      public: std::list<msgs::Light> lightFactoryMsgs;
+
+      /// \brief Light modify message buffer.
+      public: std::list<msgs::Light> lightModifyMsgs;
 
       /// \brief True to reset the world on next update.
       public: bool needsReset;
@@ -250,6 +259,12 @@ namespace gazebo
       /// \brief The list of models that need to publish their pose.
       public: std::set<ModelPtr> publishModelPoses;
 
+      /// \brief The list of models that need to publish their scale.
+      public: std::set<ModelPtr> publishModelScales;
+
+      /// \brief The list of lights that need to publish their pose.
+      public: std::set<LightPtr> publishLightPoses;
+
       /// \brief Info passed through the WorldUpdateBegin event.
       public: common::UpdateInfo updateInfo;
 
@@ -287,6 +302,9 @@ namespace gazebo
       /// \brief A cached list of models. This is here for performance.
       public: Model_V models;
 
+      /// \brief A cached list of lights.
+      public: Light_V lights;
+
       /// \brief This mutex is used to by the ::RemoveModel and
       /// ::ProcessFactoryMsgs functions.
       public: boost::mutex factoryDeleteMutex;
@@ -298,6 +316,13 @@ namespace gazebo
 
       /// \brief Class to manage preset simulation parameter profiles.
       public: PresetManagerPtr presetManager;
+
+      /// \brief Class to manage user commands.
+      public: UserCmdManagerPtr userCmdManager;
+
+      /// \brief True if sensors have been initialized. This should be set
+      /// by the SensorManager.
+      public: std::atomic_bool sensorsInitialized;
     };
   }
 }

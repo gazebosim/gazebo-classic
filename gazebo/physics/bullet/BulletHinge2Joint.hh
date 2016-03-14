@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,12 +72,6 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual void SetVelocity(unsigned int _index, double _angle);
-
-      // Documentation inherited.
-      public: virtual void SetMaxForce(unsigned int _index, double _t);
-
-      // Documentation inherited.
-      public: virtual double GetMaxForce(unsigned int _index);
 
       // Documentation inherited.
       public: virtual bool SetHighStop(unsigned int _index,

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,7 +72,7 @@ namespace gazebo
       std::string style;
 
       /// \brief A 2D transform (or a list of transforms)
-      std::string transform;
+      ignition::math::Matrix3d transform;
 
       /// \brief A list of subpaths (as lists of commands)
       std::vector< std::vector<SVGCommand> > subpaths;
@@ -97,20 +97,6 @@ namespace gazebo
       /// \return false when the file cannot be processed
       public: bool Parse(const std::string &_filename,
                          std::vector<SVGPath> &_paths);
-
-      /// \brief Reads in paths and outputs closed polylines and open polylines
-      /// \param[in] _paths The input paths
-      /// \param[in] _tol Tolerence when comparing distance between 2 points.
-      /// \param[out] _closedPolys A vector to collect new closed loops
-      /// \param[out] _openPolys A vector to collect non closed paths
-      /// \deprecated See PathsToClosedPolylines that accepts ignition::math
-      /// objects
-      public: static void PathsToClosedPolylines(
-                  const std::vector<common::SVGPath> &_paths,
-                  double _tol,
-                  std::vector< std::vector<math::Vector2d> > &_closedPolys,
-                  std::vector< std::vector<math::Vector2d> > &_openPolys)
-              GAZEBO_DEPRECATED(6.0);
 
       /// \brief Reads in paths and outputs closed polylines and open polylines
       /// \param[in] _paths The input paths

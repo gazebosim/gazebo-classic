@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,20 +43,6 @@ namespace gazebo
     /// \brief Creates GTS utilities for meshes
     class GZ_COMMON_VISIBLE GTSMeshUtils
     {
-      /// \brief Perform delaunay triangulation on input vertices.
-      /// \param[in] _vertices A list of all vertices
-      /// \param[in] _edges A list of edges. Each edge is made of 2 vertex
-      /// indices from _vertices
-      /// \param[out] _submesh A submesh that will be populated with the
-      /// resulting triangles.
-      /// \return True on success.
-      /// \deprecated See DelaunayTriangulation function that accepts
-      /// ignition::math objects.
-      public: static bool DelaunayTriangulation(
-                  const std::vector<math::Vector2d> &_vertices,
-                  const std::vector<math::Vector2i> &_edges,
-                  SubMesh *_submesh) GAZEBO_DEPRECATED(6.0);
-
       /// \brief Perform delaunay triangulation on input vertices.
       /// \param[in] _vertices A list of all vertices
       /// \param[in] _edges A list of edges. Each edge is made of 2 vertex

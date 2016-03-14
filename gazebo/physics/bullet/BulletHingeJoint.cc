@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -265,18 +265,6 @@ double BulletHingeJoint::GetVelocity(unsigned int /*_index*/) const
   if (this->parentLink)
     result -= globalAxis.Dot(this->parentLink->GetWorldAngularVel());
   return result;
-}
-
-//////////////////////////////////////////////////
-void BulletHingeJoint::SetMaxForce(unsigned int /*_index*/, double _t)
-{
-  this->bulletHinge->setMaxMotorImpulse(_t);
-}
-
-//////////////////////////////////////////////////
-double BulletHingeJoint::GetMaxForce(unsigned int /*_index*/)
-{
-  return this->bulletHinge->getMaxMotorImpulse();
 }
 
 //////////////////////////////////////////////////

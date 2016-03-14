@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <memory>
 #include <boost/shared_ptr.hpp>
 #include "gazebo/util/system.hh"
 
@@ -90,6 +91,7 @@ namespace gazebo
   namespace common
   {
     class Animation;
+    class Battery;
     class Color;
     class DiagnosticTimer;
     class Image;
@@ -136,6 +138,10 @@ namespace gazebo
     /// \def SphericalCoordinatesPtr
     /// \brief Boost shared pointer to a SphericalCoordinates object
     typedef boost::shared_ptr<SphericalCoordinates> SphericalCoordinatesPtr;
+
+    /// \def BatteryPtr
+    /// \brief Standrd shared pointer to a Battery object
+    typedef std::shared_ptr<Battery> BatteryPtr;
   }
 
   namespace event

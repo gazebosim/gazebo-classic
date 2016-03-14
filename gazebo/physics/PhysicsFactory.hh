@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,11 +75,10 @@ namespace gazebo
     /// \param[in] name Physics type name, as it appears in the world file.
     /// \param[in] classname C++ class name for the physics engine.
     #define GZ_REGISTER_PHYSICS_ENGINE(name, classname) \
-    GZ_PHYSICS_VISIBLE PhysicsEnginePtr New##classname(WorldPtr _world) \
+    PhysicsEnginePtr New##classname(WorldPtr _world) \
     { \
       return PhysicsEnginePtr(new gazebo::physics::classname(_world)); \
     } \
-    GZ_PHYSICS_VISIBLE \
     void Register##classname() \
     {\
       PhysicsFactory::RegisterPhysicsEngine(name, New##classname);\

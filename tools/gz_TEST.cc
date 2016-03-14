@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2015 Open Source Robotics Foundation
+ * Copyright (C) 2013-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -350,7 +350,8 @@ TEST_F(gzTest, Model)
     // Check that a few values exist. We don't check the sha1 value
     // because a few values, such as pose, are dynamic.
     EXPECT_TRUE(modelInfo.find("name: \"my_box\"") != std::string::npos);
-    EXPECT_TRUE(modelInfo.find("id: 9") != std::string::npos);
+    EXPECT_TRUE(modelInfo.find("id: 10") != std::string::npos);
+    EXPECT_TRUE(modelInfo.find("is_static: false") != std::string::npos);
     EXPECT_TRUE(modelInfo.find("name: \"my_box::link::collision\"")
         != std::string::npos);
 

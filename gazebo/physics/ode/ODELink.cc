@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -117,7 +117,9 @@ void ODELink::Init()
   // Update the Collision Offsets, Surface, and Center of Mass.
   this->UpdateCollisionOffsets();
   this->UpdateSurface();
-  this->UpdateMass();
+  // Only update the Center of Mass if object is dynamic
+  if (!this->GetKinematic())
+    this->UpdateMass();
 
   if (this->linkId)
   {

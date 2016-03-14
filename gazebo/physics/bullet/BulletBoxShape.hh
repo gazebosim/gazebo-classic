@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: Box shape
- * Author: Nate Koenig
- * Date: 14 Oct 2009
- */
-
-#ifndef _BULLETBOXSHAPE_HH_
-#define _BULLETBOXSHAPE_HH_
+#ifndef _GAZEBO_BULLETBOXSHAPE_HH_
+#define _GAZEBO_BULLETBOXSHAPE_HH_
 
 #include "gazebo/physics/bullet/BulletPhysics.hh"
 #include "gazebo/physics/bullet/BulletTypes.hh"

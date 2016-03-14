@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,29 +14,24 @@
  * limitations under the License.
  *
 */
+#ifndef _GAZEBO_GUI_DIAGNOSTICS_HH_
+#define _GAZEBO_GUI_DIAGNOSTICS_HH_
 
-#ifndef _DIAGNOSTICS_WIDGET_HH_
-#define _DIAGNOSTICS_WIDGET_HH_
+#include <memory>
 
-#include <map>
-#include <list>
-#include <vector>
-#include <boost/thread/mutex.hpp>
-
-#include "gazebo/msgs/msgs.hh"
-#include "gazebo/common/Time.hh"
-#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/gui/qt.h"
+#include "gazebo/msgs/msgs.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
-    class IncrementalPlot;
+    // Forward declare private data class
+    class DiagnosticsPrivate;
 
     /// \brief Plot diagnostic information
-    class GAZEBO_VISIBLE Diagnostics : public QDialog
+    class GZ_GUI_VISIBLE Diagnostics : public QDialog
     {
       Q_OBJECT
 
@@ -66,31 +61,9 @@ namespace gazebo
       /// \brief Qt Callback when a plot should be added.
       private slots: void OnAddPlot();
 
-      /// \brief Node for communications.
-      private: transport::NodePtr node;
-
-      /// \brief Subscribes to diagnostic info.
-      private: transport::SubscriberPtr sub;
-
-      /// \brief The list of diagnostic labels.
-      private: QListWidget *labelList;
-
-      private: typedef std::map<QString, std::list<QPointF> > PointMap;
-
-      /// \brief The currently selected label.
-      private: PointMap selectedLabels;
-
-      /// \brief True when plotting is paused.
-      private: bool paused;
-
-      /// \brief Mutex to protect the point map
-      private: boost::mutex mutex;
-
-      /// \brief Plotting widget
-      private: std::vector<IncrementalPlot *> plots;
-
-      /// \brief Layout to hold all the plots.
-      private: QVBoxLayout *plotLayout;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<DiagnosticsPrivate> dataPtr;
     };
   }
 }

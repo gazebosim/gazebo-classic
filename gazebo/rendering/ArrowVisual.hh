@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ namespace gazebo
       public: ArrowVisual(const std::string &_name, VisualPtr _vis);
 
       /// \brief Destructor
-      public: virtual ~ArrowVisual();
+      public: virtual ~ArrowVisual() = default;
 
       /// \brief Load the visual with default parameters
       public: virtual void Load();
@@ -55,6 +55,9 @@ namespace gazebo
       /// \brief Show the head of the arrow visual.
       /// \param[in] _show True to show the arrow head.
       public: void ShowHead(bool _show);
+
+      // Documentation inherited
+      public: virtual void SetVisible(bool _visible, bool _cascade = true);
     };
     /// \}
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,9 @@
  *
 */
 
-#include <iostream>
+#include "gazebo/gui/qgv/QGVNode.h"
+#include "gazebo/gui/qgv/QGVEdge.h"
+
 #include "gazebo/gui/model/GraphScene.hh"
 
 using namespace gazebo;
@@ -43,7 +45,6 @@ GraphScene::GraphScene(QWidget *_parent)
 QGVNode *GraphScene::AddNode(const std::string &_name)
 {
   QGVNode *node = this->addNode(tr(_name.c_str()));
-
   return node;
 }
 
@@ -78,6 +79,18 @@ QGVEdge *GraphScene::AddEdge(const std::string &_id,
 void GraphScene::RemoveEdge(const std::string &_id)
 {
   this->removeEdge(tr(_id.c_str()));
+}
+
+/////////////////////////////////////////////////
+void GraphScene::SetEdgeColor(const std::string &_id,
+    const common::Color &_color)
+{
+  QGVEdge *edge = this->getEdge(tr(_id.c_str()));
+  if (edge)
+  {
+    edge->setColor(QColor(_color.r*255, _color.g*255, _color.b*255,
+        _color.a*255));
+  }
 }
 
 /////////////////////////////////////////////////

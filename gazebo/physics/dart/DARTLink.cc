@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -235,12 +235,12 @@ void DARTLink::Init()
 
       SurfaceParamsPtr surface = collision->GetSurface();
       GZ_ASSERT(surface, "Surface pointer for is invalid");
-      FrictionPyramidPtr friction = surface->GetFrictionPyramid();
+      FrictionPyramidPtr friction = surface->FrictionPyramid();
       GZ_ASSERT(friction, "Friction pointer for is invalid");
 
       numCollisions++;
-      hackAvgMu1 += friction->GetMuPrimary();
-      hackAvgMu2 += friction->GetMuSecondary();
+      hackAvgMu1 += friction->MuPrimary();
+      hackAvgMu2 += friction->MuSecondary();
     }
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,6 +49,10 @@ class JointTest : public ServerFixture,
   /// \brief Create and destroy joints repeatedly, monitors memory usage.
   /// \param[in] _physicsEngine Type of physics engine to use.
   public: void JointCreationDestructionTest(const std::string &_physicsEngine);
+
+  /// \brief Create joints dynamically and verify that they will be visualized.
+  /// \param[in] _physicsEngine Type of physics engine to use.
+  public: void DynamicJointVisualization(const std::string &_physicsEngine);
 
   // Documentation inherited.
   public: virtual void SetUp()
