@@ -48,7 +48,7 @@ namespace gazebo
           std::map<std::string, CurveVariableSet>::iterator;
 
       /// \brief Mutex to protect the introspection updates.
-      public: std::mutex mutex;
+      public: std::recursive_mutex mutex;
 
       /// \brief A map of variable names to plot curves.
       public: std::map<std::string, CurveVariableSet> curves;
@@ -108,13 +108,13 @@ IntrospectionCurveHandler::~IntrospectionCurveHandler()
 void IntrospectionCurveHandler::AddCurve(const std::string &_name,
     PlotCurveWeakPtr _curve)
 {
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
   if (!this->dataPtr->initialized)
   {
     gzerr << "Introspection client has not been initialized yet" << std::endl;
     return;
   }
 
+  this->dataPtr->mutex.lock();
   auto c = _curve.lock();
   if (!c)
     return;
@@ -122,6 +122,10 @@ void IntrospectionCurveHandler::AddCurve(const std::string &_name,
   auto it = this->dataPtr->curves.find(_name);
   if (it == this->dataPtr->curves.end())
   {
+    // unlock immediately to prevent deadlock in introspection client
+    // callback in AddItemToFilter
+    this->dataPtr->mutex.unlock();
+
     auto addItemToFilterCallback = [this, _curve, _name](const bool _result)
     {
       if (!_result)
@@ -137,6 +141,8 @@ void IntrospectionCurveHandler::AddCurve(const std::string &_name,
   }
   else
   {
+    this->dataPtr->mutex.unlock();
+
     auto cIt = it->second.find(_curve);
     if (cIt == it->second.end())
     {
@@ -148,7 +154,7 @@ void IntrospectionCurveHandler::AddCurve(const std::string &_name,
 /////////////////////////////////////////////////
 void IntrospectionCurveHandler::RemoveCurve(PlotCurveWeakPtr _curve)
 {
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->mutex);
   if (!this->dataPtr->initialized)
   {
     gzerr << "Introspection client has not been initialized yet" << std::endl;
@@ -181,7 +187,7 @@ void IntrospectionCurveHandler::RemoveCurve(PlotCurveWeakPtr _curve)
 /////////////////////////////////////////////////
 unsigned int IntrospectionCurveHandler::CurveCount() const
 {
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->mutex);
   unsigned int count = 0;
   for (const auto &it : this->dataPtr->curves)
     count += it.second.size();
@@ -191,14 +197,14 @@ unsigned int IntrospectionCurveHandler::CurveCount() const
 /////////////////////////////////////////////////
 bool IntrospectionCurveHandler::Initialized() const
 {
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->mutex);
   return this->dataPtr->initialized;
 }
 
 /////////////////////////////////////////////////
 void IntrospectionCurveHandler::SetupIntrospection()
 {
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->mutex);
 
   // Wait for the managers to come online
   std::set<std::string> managerIds =
@@ -257,7 +263,7 @@ void IntrospectionCurveHandler::SetupIntrospection()
 void IntrospectionCurveHandler::OnIntrospection(
     const gazebo::msgs::Param_V &_msg)
 {
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->mutex);
 
   // stores a list of curves iterators and their new values
   std::vector<
@@ -457,44 +463,6 @@ void IntrospectionCurveHandler::OnIntrospection(
       curve->AddPoint(ignition::math::Vector2d(simTime, curveUpdate.second));
     }
   }
-
-  return;
-  // TODO remove later - for testing only
-  auto it = this->dataPtr->curves.find("Dog");
-  if (it != this->dataPtr->curves.end())
-  {
-    for (auto cIt : it->second)
-    {
-      auto curve = cIt.lock();
-      if (!curve)
-        continue;
-      curve->AddPoint(ignition::math::Vector2d(simTime, 2));
-    }
-  }
-
-  it = this->dataPtr->curves.find("Cat");
-  if (it != this->dataPtr->curves.end())
-  {
-    for (auto cIt : it->second)
-    {
-      auto curve = cIt.lock();
-      if (!curve)
-        continue;
-      curve->AddPoint(ignition::math::Vector2d(simTime, 10));
-    }
-  }
-
-  it = this->dataPtr->curves.find("Turtle");
-  if (it != this->dataPtr->curves.end())
-  {
-    for (auto cIt : it->second)
-    {
-      auto curve = cIt.lock();
-      if (!curve)
-        continue;
-      curve->AddPoint(ignition::math::Vector2d(simTime, 6));
-    }
-  }
 }
 
 /////////////////////////////////////////////////
@@ -508,7 +476,7 @@ void IntrospectionCurveHandler::AddItemToFilter(const std::string &_name,
     if (!_itemsResult)
       return;
 
-    std::lock_guard<std::mutex> itemLock(this->dataPtr->mutex);
+    std::lock_guard<std::recursive_mutex> itemLock(this->dataPtr->mutex);
 
     common::URI itemURI(_name);
     common::URIPath itemPath = itemURI.Path();
@@ -547,7 +515,7 @@ void IntrospectionCurveHandler::AddItemToFilter(const std::string &_name,
               if (!_result)
                 return;
 
-              std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+              std::lock_guard<std::recursive_mutex> lock(this->dataPtr->mutex);
               this->dataPtr->introspectFilter.insert(item);
               this->dataPtr->introspectFilterCount[item] = 1;
               if (_cb)
@@ -595,7 +563,7 @@ void IntrospectionCurveHandler::RemoveItemFromFilter(const std::string &_name,
     if (!_itemsResult)
       return;
 
-    std::lock_guard<std::mutex> itemLock(this->dataPtr->mutex);
+    std::lock_guard<std::recursive_mutex> itemLock(this->dataPtr->mutex);
 
     common::URI itemURI(_name);
     common::URIPath itemPath = itemURI.Path();
@@ -640,7 +608,7 @@ void IntrospectionCurveHandler::RemoveItemFromFilter(const std::string &_name,
               if (!_result)
                 return;
 
-              std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+              std::lock_guard<std::recursive_mutex> lock(this->dataPtr->mutex);
               this->dataPtr->introspectFilter.erase(item);
               this->dataPtr->introspectFilterCount.erase(item);
             };
