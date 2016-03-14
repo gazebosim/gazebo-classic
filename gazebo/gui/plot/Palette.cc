@@ -942,7 +942,7 @@ void Palette::FillModels(QStandardItemModel *_modelsModel)
       queryValue = queryValue + "/" + queryParts[part];
     }
 
-    if (queryParts[0] == "pose")
+    if (queryParts[0] == "pose3d")
     {
       this->InsertPoseItem(previousItem, itemURI, queryValue);
     }

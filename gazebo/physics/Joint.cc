@@ -1481,8 +1481,7 @@ void Joint::RegisterIntrospectionVelocity(const unsigned int _index)
 {
   auto f = [this, _index]()
   {
-    // For prismatic axes, Radian -> meters
-    return this->GetAngle(_index).Ign().Radian();
+    return this->GetVelocity(_index);
   };
 
   common::URI uri(this->URI());

@@ -1663,7 +1663,7 @@ void Link::RegisterIntrospectionItems()
 
   // Register items.
   common::URI poseURI(uri);
-  poseURI.Query().Insert("p", "pose/world_pose");
+  poseURI.Query().Insert("p", "pose3d/world_pose");
   gazebo::util::IntrospectionManager::Instance()->Register
       <ignition::math::Pose3d>(poseURI.Str(), fLinkPose);
 

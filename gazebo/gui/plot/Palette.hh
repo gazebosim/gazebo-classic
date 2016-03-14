@@ -101,7 +101,7 @@ namespace gazebo
       private: void InsertQuaterniondItem(QStandardItem *_item,
           const common::URI &_uri, const std::string &_query);
 
-      /// \brief Insert a Quaterniond item under the given item.
+      /// \brief Insert an axis item under the given item.
       /// \param[in] _item The parent item.
       /// \param[in] _uri The URI of the original query.
       /// \param[in] _query The part of the query relevant to this item.
