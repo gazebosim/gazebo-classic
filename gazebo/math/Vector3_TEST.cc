@@ -18,11 +18,10 @@
 #include <gtest/gtest.h>
 
 #include "gazebo/math/Vector3.hh"
-#include "test/util.hh"
 
 using namespace gazebo;
 
-class Vector3Test : public gazebo::testing::AutoLogFixture { };
+class Vector3Test : public ::testing::Test { };
 
 TEST_F(Vector3Test, Vector3)
 {

@@ -2753,7 +2753,31 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
   QtVariantProperty *item = NULL;
 
   if (_msg.has_type())
-    this->dataPtr->physicsType = _msg.type();
+  {
+    item = this->dataPtr->variantManager->addProperty(
+      QtVariantPropertyManager::enumTypeId(), tr("physics engine"));
+    QStringList types;
+
+    const google::protobuf::EnumDescriptor *engineTypeEnum =
+      _msg.GetDescriptor()->FindEnumTypeByName("Type");
+
+    if (!engineTypeEnum)
+    {
+      gzerr << "Unable to get Type enum descriptor from "
+        << "Physics message. msgs::Physics "
+        << "has probably changed\n";
+      types << "invalid";
+    }
+    else
+    {
+      types << engineTypeEnum->value(_msg.type()-1)->name().c_str();
+    }
+
+    item->setAttribute("enumNames", types);
+    item->setValue(0);
+    this->dataPtr->propTreeBrowser->addProperty(item);
+    item->setEnabled(false);
+  }
 
   item = this->dataPtr->variantManager->addProperty(QVariant::Bool,
     tr("enable physics"));
