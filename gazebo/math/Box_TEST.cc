@@ -18,11 +18,10 @@
 #include <gtest/gtest.h>
 
 #include "gazebo/math/Box.hh"
-#include "test/util.hh"
 
 using namespace gazebo;
 
-class BoxTest : public gazebo::testing::AutoLogFixture { };
+class BoxTest : public ::testing::Test { };
 
 class ExampleBox : public ::testing::Test
 {
