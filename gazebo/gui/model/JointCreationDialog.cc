@@ -904,14 +904,14 @@ void JointCreationDialog::OnAlign(const int _int)
   // When changing target, reset everything
   if (senderObject == this->dataPtr->alignCombo)
   {
-    this->dataPtr->jointMaker->SetLinksRelativePose(ignition::math::Pose3d(),
-        true);
+    this->dataPtr->jointMaker->SetLinksRelativePose(
+        ignition::math::Pose3d::Zero, true);
   }
   // Reset only the axis which was changed
   else
   {
-    this->dataPtr->jointMaker->SetLinksRelativePose(ignition::math::Pose3d(),
-        false, g);
+    this->dataPtr->jointMaker->SetLinksRelativePose(
+        ignition::math::Pose3d::Zero, false, g);
   }
 
   // Uncheck other buttons in the same group
