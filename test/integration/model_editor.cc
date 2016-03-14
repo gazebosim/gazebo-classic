@@ -16,6 +16,8 @@
 */
 
 #include "gazebo/msgs/msgs.hh"
+#include "gazebo/gui/Actions.hh"
+#include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/model/JointInspector.hh"
@@ -26,6 +28,84 @@
 #include "model_editor.hh"
 
 #include "test_config.h"
+
+
+/////////////////////////////////////////////////
+void ModelEditorTest::EditModel()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/shapes.world", false, false, false);
+
+  // Create the main window.
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  this->ProcessEventsAndDraw(mainWindow);
+
+  // Get the user camera and scene
+  gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
+  QVERIFY(cam != NULL);
+  gazebo::rendering::ScenePtr scene = cam->GetScene();
+  QVERIFY(scene != NULL);
+
+  // Start never saved
+  gazebo::gui::ModelCreator *modelCreator =
+      mainWindow->findChild<gazebo::gui::ModelCreator *>();
+  QVERIFY(modelCreator != NULL);
+
+  // get the box visual
+  gazebo::rendering::VisualPtr boxLink =
+      scene->GetVisual("box::link");
+  QVERIFY(boxLink != NULL);
+  QVERIFY(boxLink->GetVisible());
+
+  // get number of visuals in the scene
+  // this will be checked later to make sure we keep a consistent state of the
+  // scene after exiting the model editor
+  unsigned int visualCount = scene->VisualCount();
+  QVERIFY(visualCount > 0u);
+
+  // trigger model editor mode and edit box model
+  QVERIFY(gazebo::gui::g_editModelAct != NULL);
+  gazebo::gui::g_editModelAct->trigger();
+  gazebo::gui::Events::editModel("box");
+
+  this->ProcessEventsAndDraw(mainWindow);
+
+  // Make sure we have the tmp box visual in model editor
+  gazebo::rendering::VisualPtr editorBoxLink =
+      scene->GetVisual("ModelPreview_1::link");
+  QVERIFY(editorBoxLink != NULL);
+  QVERIFY(editorBoxLink->GetVisible());
+
+  // save, finish, and spawn it onto the server
+  modelCreator->SaveModelFiles();
+  modelCreator->FinishModel();
+
+  this->ProcessEventsAndDraw(mainWindow);
+
+  // verify the tmp box visual is gone
+  editorBoxLink = scene->GetVisual("ModelPreview_1::link");
+  QVERIFY(editorBoxLink == NULL);
+
+  // verify there is a box visual in the scene
+  boxLink = scene->GetVisual("box::link");
+  QVERIFY(boxLink != NULL);
+  QVERIFY(boxLink->GetVisible());
+
+  // verify the number of visuals in the scene are the same before and after
+  // editing a model.
+  QCOMPARE(scene->VisualCount(), visualCount);
+
+  mainWindow->close();
+  delete mainWindow;
+  mainWindow = NULL;
+}
 
 /////////////////////////////////////////////////
 void ModelEditorTest::SaveModelPose()

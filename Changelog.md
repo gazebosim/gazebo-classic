@@ -25,6 +25,9 @@
         * [Issue #1844](https://bitbucket.org/osrf/gazebo/issues/1844)
         * [Pull request #2150](https://bitbucket.org/osrf/gazebo/pull-request/2150)
 
+    1. Fix saving and spawning model with its original name
+        * [Pull request #2183](https://bitbucket.org/osrf/gazebo/pull-request/2183)
+
 ## Gazebo 7.0.0 (2016-01-25)
 
 1. Add FollowerPlugin
