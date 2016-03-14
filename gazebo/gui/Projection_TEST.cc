@@ -42,13 +42,7 @@ void Projection_TEST::Projection()
 
   cam->SetCaptureData(true);
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   const unsigned char *data = cam->ImageData();
   unsigned int width = cam->ImageWidth();
@@ -83,13 +77,7 @@ void Projection_TEST::Projection()
   // Now change to Perspective projection
   cam->SetProjectionType("perspective");
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   topWidth = 0;
   bottomWidth = 0;

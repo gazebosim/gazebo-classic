@@ -199,7 +199,7 @@ set (resources resources.qrc)
 QT5_WRAP_CPP(headers_MOC ${qt_headers} ${internal_qt_headers})
 QT5_ADD_RESOURCES(resources_RCC ${resources})
 
-gz_add_library(gazebo_gui ${sources} ${headers_MOC})
+gz_add_library(gazebo_gui ${sources} ${headers_MOC} ${resources_RCC})
 gz_add_executable(gzclient main.cc ${resources_RCC})
 
 add_dependencies(gazebo_gui gazebo_msgs)
@@ -246,8 +246,7 @@ set (gtest_sources
   Conversions_TEST.cc
 )
 
-set (GZ_BUILD_TESTS_EXTRA_LIBS gazebo_gui)
-gz_build_tests(${gtest_sources})
+gz_build_tests(${gtest_sources} EXTRA_LIBS gazebo_gui)
 
 add_definitions(${QT_DEFINITIONS})
 
