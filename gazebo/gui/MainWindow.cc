@@ -1398,18 +1398,20 @@ void MainWindow::CreateActions()
       SLOT(CaptureScreenshot()));
 
   g_copyAct = new QAction(QIcon(":/images/copy_object.png"),
-      tr("Copy (Ctrl + C)"), this);
+      tr("Copy"), this);
   g_copyAct->setStatusTip(tr("Copy Entity"));
   g_copyAct->setCheckable(false);
   this->CreateDisabledIcon(":/images/copy_object.png", g_copyAct);
   g_copyAct->setEnabled(false);
+  g_copyAct->setShortcut(tr("Ctrl+C"));
 
   g_pasteAct = new QAction(QIcon(":/images/paste_object.png"),
-      tr("Paste (Ctrl + V)"), this);
+      tr("Paste"), this);
   g_pasteAct->setStatusTip(tr("Paste Entity"));
   g_pasteAct->setCheckable(false);
   this->CreateDisabledIcon(":/images/paste_object.png", g_pasteAct);
   g_pasteAct->setEnabled(false);
+  g_pasteAct->setShortcut(tr("Ctrl+V"));
 
   g_snapAct = new QAction(QIcon(":/images/magnet.png"),
       tr("Snap Mode (N)"), this);
@@ -1815,6 +1817,8 @@ void MainWindow::CreateMenuBar()
   this->dataPtr->editMenu->addSeparator();
   this->dataPtr->editMenu->addAction(g_editBuildingAct);
   this->dataPtr->editMenu->addAction(g_editModelAct);
+  this->dataPtr->editMenu->addAction(g_copyAct);
+  this->dataPtr->editMenu->addAction(g_pasteAct);
 
   // \TODO: Add this back in when implementing the full Terrain Editor spec.
   // editMenu->addAction(g_editTerrainAct);
