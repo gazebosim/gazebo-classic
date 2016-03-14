@@ -466,7 +466,7 @@ void Heightmap::Load()
                            sqrt(delta.X() * delta.X() + delta.Y() * delta.Y()));
 
       userCam->SetWorldPose(ignition::math::Pose3d(camPos,
-          ignition::math::Quaterniond(0, pitch, yaw)));
+          ignition::math::Quaterniond(0.0, pitch, yaw)));
     }
   }
 

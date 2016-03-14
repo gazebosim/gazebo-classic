@@ -163,12 +163,6 @@ void LogPlay::Open(const std::string &_logFile)
 }
 
 /////////////////////////////////////////////////
-std::string LogPlay::GetHeader() const
-{
-  return this->Header();
-}
-
-/////////////////////////////////////////////////
 std::string LogPlay::Header() const
 {
   std::ostringstream stream;
@@ -184,12 +178,6 @@ std::string LogPlay::Header() const
          << "</header>\n";
 
   return stream.str();
-}
-
-/////////////////////////////////////////////////
-uint64_t LogPlay::GetInitialIterations() const
-{
-  return this->InitialIterations();
 }
 
 /////////////////////////////////////////////////
@@ -383,21 +371,9 @@ bool LogPlay::IsOpen() const
 }
 
 /////////////////////////////////////////////////
-std::string LogPlay::GetLogVersion() const
-{
-  return this->LogVersion();
-}
-
-/////////////////////////////////////////////////
 std::string LogPlay::LogVersion() const
 {
   return this->dataPtr->logVersion;
-}
-
-/////////////////////////////////////////////////
-std::string LogPlay::GetGazeboVersion() const
-{
-  return this->GazeboVersion();
 }
 
 /////////////////////////////////////////////////
@@ -407,21 +383,9 @@ std::string LogPlay::GazeboVersion() const
 }
 
 /////////////////////////////////////////////////
-uint32_t LogPlay::GetRandSeed() const
-{
-  return this->RandSeed();
-}
-
-/////////////////////////////////////////////////
 uint32_t LogPlay::RandSeed() const
 {
   return this->dataPtr->randSeed;
-}
-
-/////////////////////////////////////////////////
-common::Time LogPlay::GetLogStartTime() const
-{
-  return this->LogStartTime();
 }
 
 /////////////////////////////////////////////////
@@ -431,21 +395,9 @@ common::Time LogPlay::LogStartTime() const
 }
 
 /////////////////////////////////////////////////
-common::Time LogPlay::GetLogEndTime() const
-{
-  return this->LogEndTime();
-}
-
-/////////////////////////////////////////////////
 common::Time LogPlay::LogEndTime() const
 {
   return this->dataPtr->logEndTime;
-}
-
-/////////////////////////////////////////////////
-std::string LogPlay::GetFilename() const
-{
-  return this->Filename();
 }
 
 /////////////////////////////////////////////////
@@ -456,22 +408,10 @@ std::string LogPlay::Filename() const
 }
 
 /////////////////////////////////////////////////
-std::string LogPlay::GetFullPathFilename() const
-{
-  return this->FullPathFilename();
-}
-
-/////////////////////////////////////////////////
 std::string LogPlay::FullPathFilename() const
 {
   const boost::filesystem::path logFilename(this->dataPtr->filename);
   return boost::filesystem::canonical(logFilename).string();
-}
-
-/////////////////////////////////////////////////
-uintmax_t LogPlay::GetFileSize() const
-{
-  return this->FileSize();
 }
 
 /////////////////////////////////////////////////
@@ -731,12 +671,6 @@ bool LogPlay::Seek(const common::Time &_time)
 }
 
 /////////////////////////////////////////////////
-bool LogPlay::GetChunk(unsigned int _index, std::string &_data)
-{
-  return this->Chunk(_index, _data);
-}
-
-/////////////////////////////////////////////////
 bool LogPlay::Chunk(unsigned int _index, std::string &_data) const
 {
   unsigned int count = 0;
@@ -827,21 +761,9 @@ bool LogPlay::ChunkData(tinyxml2::XMLElement *_xml, std::string &_data) const
 }
 
 /////////////////////////////////////////////////
-std::string LogPlay::GetEncoding() const
-{
-  return this->Encoding();
-}
-
-/////////////////////////////////////////////////
 std::string LogPlay::Encoding() const
 {
   return this->dataPtr->encoding;
-}
-
-/////////////////////////////////////////////////
-unsigned int LogPlay::GetChunkCount() const
-{
-  return this->ChunkCount();
 }
 
 /////////////////////////////////////////////////

@@ -138,6 +138,9 @@ material Gazebo/Grey
     }
   }
 }
+material Gazebo/Gray : Gazebo/Grey
+{
+}
 
 material Gazebo/DarkGrey
 {
@@ -150,6 +153,10 @@ material Gazebo/DarkGrey
       specular .175 .175 .175 1.000000 1.500000
     }
   }
+}
+
+material Gazebo/DarkGray : Gazebo/DarkGrey
+{
 }
 
 material Gazebo/White
