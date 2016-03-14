@@ -34,8 +34,7 @@ set (test_sources
   gz_log_TEST.cc
   gz_TEST.cc
 )
-
-gz_build_tests(${test_sources})
+gz_build_tests(${test_sources} EXTRA_LIBS gazebo_transport)
 
 if (ENABLE_TESTS_COMPILATION)
   add_dependencies(${TEST_TYPE}_gz_log_TEST gz)

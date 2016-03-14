@@ -123,6 +123,19 @@ void QTestFixture::SetPause(bool _pause)
 }
 
 /////////////////////////////////////////////////
+void QTestFixture::ProcessEventsAndDraw(QMainWindow *_mainWindow,
+    const unsigned int _repeat, const unsigned int _ms)
+{
+  for (size_t i = 0; i < _repeat; ++i)
+  {
+    gazebo::common::Time::MSleep(_ms);
+    QCoreApplication::processEvents();
+    if (_mainWindow)
+      _mainWindow->repaint();
+  }
+}
+
+/////////////////////////////////////////////////
 void QTestFixture::cleanup()
 {
   if (this->server)
