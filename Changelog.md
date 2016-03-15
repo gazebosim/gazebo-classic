@@ -5,6 +5,9 @@
 1. Use only Gazebo's internal version of tinyxml2. The version of tinyxml2 distributed with Ubuntu fails when parsing large log files.
     * [Pull request #2146](https://bitbucket.org/osrf/gazebo/pull-request/2146)
 
+1. Added static camera when following a model.
+    * [Pull request #1980](https://bitbucket.org/osrf/gazebo/pull-request/1980)
+
 1. Support conversions between SDF and protobuf for more sensors.
     * [Pull request #2118](https://bitbucket.org/osrf/gazebo/pull-request/2118)
 
