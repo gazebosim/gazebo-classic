@@ -52,5 +52,35 @@ void Palette_TEST::TopicsTab()
   delete palette;
 }
 
+/////////////////////////////////////////////////
+void Palette_TEST::ModelsTab()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/shapes.world");
+
+  // Get the number of models in the world
+  auto world = gazebo::physics::get_world("default");
+  QVERIFY(world != NULL);
+
+  int count = world->GetModelCount();
+
+  // Create a new plot window widget
+  auto palette = new gazebo::gui::Palette(NULL);
+  QVERIFY(palette != NULL);
+
+  // Get the models model
+  auto modelsModel =
+      palette->findChild<QStandardItemModel *>("plotModelsModel");
+  QVERIFY(modelsModel != NULL);
+
+  // Check the model has as many rows as there are top level models,
+  // plus the title
+  QCOMPARE(modelsModel->rowCount(), count + 1);
+
+  delete palette;
+}
+
 // Generate a main function for the test
 QTEST_MAIN(Palette_TEST)

@@ -440,6 +440,8 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
 
   // The model that will hold data to be displayed in the model tree view
   this->dataPtr->modelsModel = new PlotItemModel;
+  this->dataPtr->modelsModel->setObjectName("plotModelsModel");
+  this->dataPtr->modelsModel->setParent(this);
   this->FillModels(this->dataPtr->modelsModel);
 
   // A proxy model to filter models model

@@ -27,5 +27,8 @@ class Palette_TEST : public QTestFixture
 
   /// \brief Test the topics tab.
   private slots: void TopicsTab();
+
+  /// \brief Test the models tab.
+  private slots: void ModelsTab();
 };
 #endif
