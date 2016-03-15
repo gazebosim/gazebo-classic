@@ -300,5 +300,5 @@ void LinkInspector::OnCollisionChanged(const std::string &/*_name*/,
 ////////////////////////////////////////////////
 void LinkInspector::closeEvent(QCloseEvent*)
 {
-	this->accept();
+  this->accept();
 }
