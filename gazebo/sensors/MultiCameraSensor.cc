@@ -154,7 +154,7 @@ void MultiCameraSensor::Init()
     if (cameraSdf->HasElement("pose"))
       cameraPose = cameraSdf->Get<ignition::math::Pose3d>("pose") + cameraPose;
     camera->SetWorldPose(cameraPose);
-    camera->AttachToVisual(this->parentId, true, 0, 0);
+    camera->AttachToVisual(this->parentId, true);
 
     if (cameraSdf->HasElement("noise"))
     {

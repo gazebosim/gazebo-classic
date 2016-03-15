@@ -41,7 +41,6 @@
         * [Pull request #2183](https://bitbucket.org/osrf/gazebo/pull-request/2183)
 
 
-
 ## Gazebo 7.0.0 (2016-01-25)
 
 1. Add FollowerPlugin

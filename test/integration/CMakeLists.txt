@@ -159,7 +159,6 @@ set(qt_tests
   insert_model.cc
   model_editor.cc
   model_manipulation.cc
-  track_visual.cc
   undo.cc
   visual_pose.cc
 )

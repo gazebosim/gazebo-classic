@@ -238,10 +238,6 @@ MainWindow::MainWindow()
   connect(this, SIGNAL(AddPlugins()),
           this, SLOT(OnAddPlugins()), Qt::QueuedConnection);
 
-  // Use a signal/slot to track a visual. This makes the process thread safe.
-  connect(this, SIGNAL(TrackVisual(const std::string &)),
-          this, SLOT(OnTrackVisual(const std::string &)), Qt::QueuedConnection);
-
   // Create data logger dialog
   this->dataPtr->dataLogger = new gui::DataLogger(this);
   connect(this->dataPtr->dataLogger, SIGNAL(rejected()), this, SLOT(
@@ -1961,38 +1957,18 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
 
     if (_msg->camera().has_track())
     {
-      if (_msg->camera().track().has_static_())
-        cam->SetTrackIsStatic(_msg->camera().track().static_());
+      std::string name = _msg->camera().track().name();
 
-      if (_msg->camera().track().has_use_model_frame())
-        cam->SetTrackUseModelFrame(_msg->camera().track().use_model_frame());
-
-      if (_msg->camera().track().has_xyz())
-        cam->SetTrackPosition(msgs::ConvertIgn(_msg->camera().track().xyz()));
-
-      if (_msg->camera().track().has_inherit_yaw())
-        cam->SetTrackInheritYaw(_msg->camera().track().inherit_yaw());
+      double minDist = 0.0;
+      double maxDist = 0.0;
 
       if (_msg->camera().track().has_min_dist())
-      {
-        double minDist = _msg->camera().track().min_dist();
-        cam->SetTrackMinDistance(minDist);
-      }
+        minDist = _msg->camera().track().min_dist();
 
       if (_msg->camera().track().has_max_dist())
-      {
-        double maxDist = _msg->camera().track().max_dist();
-        cam->SetTrackMaxDistance(maxDist);
-      }
+        maxDist = _msg->camera().track().max_dist();
 
-      if (_msg->camera().track().has_name() &&
-          _msg->camera().track().name() != "__default__")
-      {
-        std::string name = _msg->camera().track().name();
-        cam->TrackVisual(name);
-        // Call the signal to track a visual in the main thread.
-        this->TrackVisual(name);
-      }
+      cam->AttachToVisual(name, false, minDist, maxDist);
     }
   }
 
@@ -2045,12 +2021,6 @@ void MainWindow::OnAddPlugins()
 
   g_overlayAct->setChecked(true);
   g_overlayAct->setEnabled(true);
-}
-
-/////////////////////////////////////////////////
-void MainWindow::OnTrackVisual(const std::string &_visualName)
-{
-  gui::Events::follow(_visualName);
 }
 
 /////////////////////////////////////////////////
