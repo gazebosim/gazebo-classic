@@ -484,11 +484,6 @@ void SensorManager::SensorContainer::RunLoop()
 
   engine->InitForThread();
 
-  // The original value was hardcode to 1.0. Changed the value to
-  // 1000 * MaxStepSize in order to handle simulation with a
-  // large step size.
-  double maxSensorUpdate = engine->GetMaxStepSize() * 1000;
-
   common::Time sleepTime, startTime, eventTime, diffTime;
   double maxUpdateRate = 0;
 
@@ -547,7 +542,10 @@ void SensorManager::SensorContainer::RunLoop()
     eventTime = std::max(common::Time::Zero, sleepTime - diffTime);
 
     // Make sure update time is reasonable.
-    GZ_ASSERT(diffTime.sec < maxSensorUpdate,
+    // The original value was hardcoded to 1.0. Changed the value to
+    // 1000 * MaxStepSize in order to handle simulation with a
+    // large step size.
+    GZ_ASSERT(diffTime.sec < engine->GetMaxStepSize() * 1000,
         "Took over 1000*max_step_size to update a sensor.");
 
     // Make sure eventTime is not negative.
