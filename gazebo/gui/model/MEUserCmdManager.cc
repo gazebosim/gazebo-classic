@@ -351,8 +351,8 @@ void MEUserCmdManager::OnUndoCmdHistory()
   for (auto cmdIt = this->dataPtr->undoCmds.rbegin();
       cmdIt != this->dataPtr->undoCmds.rend(); ++cmdIt)
   {
-    QAction *action = new QAction(QString::fromStdString((*cmdIt)->Description()),
-        this);
+    QAction *action =
+        new QAction(QString::fromStdString((*cmdIt)->Description()), this);
     action->setData(QVariant((*cmdIt)->Id()));
     action->setCheckable(true);
     menu.addAction(action);
@@ -385,8 +385,8 @@ void MEUserCmdManager::OnRedoCmdHistory()
   for (auto cmdIt = this->dataPtr->redoCmds.rbegin();
       cmdIt != this->dataPtr->redoCmds.rend(); ++cmdIt)
   {
-    QAction *action = new QAction(QString::fromStdString((*cmdIt)->Description()),
-        this);
+    QAction *action =
+        new QAction(QString::fromStdString((*cmdIt)->Description()), this);
     action->setData(QVariant((*cmdIt)->Id()));
     action->setCheckable(true);
     menu.addAction(action);
