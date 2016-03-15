@@ -720,7 +720,7 @@ void ModelListWidget::LightPropertyChanged(QtProperty * /*_item*/)
 /////////////////////////////////////////////////
 void ModelListWidget::GUIPropertyChanged(QtProperty *_item)
 {
-  // Only camera pose and follow parameters editable for now
+  // Only camera pose editable for now
   QtProperty *cameraProperty = this->ChildItem("camera");
   if (!cameraProperty)
     return;
