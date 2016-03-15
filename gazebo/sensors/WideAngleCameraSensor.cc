@@ -110,7 +110,7 @@ void WideAngleCameraSensor::Init()
       cameraPose = cameraSdf->Get<ignition::math::Pose3d>("pose") + cameraPose;
 
     this->camera->SetWorldPose(cameraPose);
-    this->camera->AttachToVisual(this->ParentId(), true, 0, 0);
+    this->camera->AttachToVisual(this->ParentId(), true);
 
     if (cameraSdf->HasElement("noise"))
     {

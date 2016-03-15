@@ -133,7 +133,7 @@ void WindTest::WindParam()
     try
     {
       boost::any value;
-      ignition::math::Vector3d vel = {-1.03, 0, 0};
+      ignition::math::Vector3d vel(-1.03, 0, 0);
       EXPECT_TRUE(wind->SetParam("linear_velocity", vel));
       EXPECT_TRUE(wind->Param("linear_velocity", value));
       EXPECT_EQ(boost::any_cast<ignition::math::Vector3d>(value), vel);

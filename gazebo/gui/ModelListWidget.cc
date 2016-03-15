@@ -239,70 +239,14 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
         ignition::math::Pose3d cameraPose = cam->WorldPose();
 
         this->FillPoseProperty(msgs::Convert(cameraPose), item);
+        // set expanded to true by default for easier viewing
+        this->dataPtr->propTreeBrowser->setExpanded(cameraBrowser, true);
+        for (auto browser : cameraBrowser->children())
+        {
+          this->dataPtr->propTreeBrowser->setExpanded(browser, true);
+        }
       }
 
-      // Create and set the gui camera position relative to a tracked model
-      item = this->dataPtr->variantManager->addProperty(
-          QtVariantPropertyManager::groupTypeId(), tr("track_visual"));
-      {
-        topItem->addSubProperty(item);
-
-        rendering::VisualPtr trackedVisual = cam->TrackedVisual();
-        QtVariantProperty *item2 = this->dataPtr->variantManager->addProperty(
-            QVariant::String, tr("name"));
-        if (trackedVisual)
-            item2->setValue(trackedVisual->GetName().c_str());
-        else
-            item2->setValue("");
-        item2->setEnabled(false);
-        item->addSubProperty(item2);
-
-        bool isStatic = cam->TrackIsStatic();
-        item2 = this->dataPtr->variantManager->addProperty(
-            QVariant::Bool, tr("static"));
-        item2->setValue(isStatic);
-        item->addSubProperty(item2);
-
-        bool useModelFrame = cam->TrackUseModelFrame();
-        item2 = this->dataPtr->variantManager->addProperty(
-            QVariant::Bool, tr("use_model_frame"));
-        item2->setValue(useModelFrame);
-        item->addSubProperty(item2);
-
-        bool inheritYaw = cam->TrackInheritYaw();
-        item2 = this->dataPtr->variantManager->addProperty(
-            QVariant::Bool, tr("inherit_yaw"));
-        item2->setValue(inheritYaw);
-        item->addSubProperty(item2);
-
-        ignition::math::Vector3d trackPos = cam->TrackPosition();
-        this->FillVector3dProperty(msgs::Convert(trackPos), item);
-
-        double minDist = cam->TrackMinDistance();
-        item2 = this->dataPtr->variantManager->addProperty(
-            QVariant::Double, tr("min_distance"));
-        static_cast<QtVariantPropertyManager*>
-          (this->dataPtr->variantFactory->propertyManager(item2))->setAttribute(
-              item2, "decimals", 6);
-        item2->setValue(minDist);
-        item->addSubProperty(item2);
-
-        double maxDist = cam->TrackMaxDistance();
-        item2 = this->dataPtr->variantManager->addProperty(
-            QVariant::Double, tr("max_distance"));
-        static_cast<QtVariantPropertyManager*>
-          (this->dataPtr->variantFactory->propertyManager(item2))->setAttribute(
-              item2, "decimals", 6);
-        item2->setValue(maxDist);
-        item->addSubProperty(item2);
-      }
-
-      // set expanded to true by default for easier viewing
-      this->dataPtr->propTreeBrowser->setExpanded(cameraBrowser, true);
-      for (auto browser : cameraBrowser->children())
-      {
-        this->dataPtr->propTreeBrowser->setExpanded(browser, true);
-      }
     }
     else
     {
@@ -782,6 +726,9 @@ void ModelListWidget::GUIPropertyChanged(QtProperty *_item)
     return;
 
   QtProperty *cameraPoseProperty = this->ChildItem(cameraProperty, "pose");
+  if (!cameraPoseProperty)
+    return;
+
   if (cameraPoseProperty)
   {
     std::string changedProperty = _item->propertyName().toStdString();
@@ -797,52 +744,6 @@ void ModelListWidget::GUIPropertyChanged(QtProperty *_item)
       rendering::UserCameraPtr cam = gui::get_active_camera();
       if (cam)
         cam->SetWorldPose(msgs::ConvertIgn(poseMsg));
-    }
-  }
-
-  QtProperty *cameraFollowProperty = this->ChildItem(cameraProperty,
-                                                        "track_visual");
-  if (cameraFollowProperty)
-  {
-    rendering::UserCameraPtr cam = gui::get_active_camera();
-    if (!cam)
-      return;
-    std::string changedProperty = _item->propertyName().toStdString();
-    if (changedProperty == "static")
-    {
-      cam->SetTrackIsStatic(this->dataPtr->variantManager->value(
-             this->ChildItem(cameraFollowProperty, "static")).toBool());
-    }
-    else if (changedProperty == "use_model_frame")
-    {
-      cam->SetTrackUseModelFrame(this->dataPtr->variantManager->value(
-             this->ChildItem(cameraFollowProperty,
-                             "use_model_frame")).toBool());
-    }
-    else if (changedProperty == "inherit_yaw")
-    {
-      cam->SetTrackInheritYaw(this->dataPtr->variantManager->value(
-             this->ChildItem(cameraFollowProperty, "inherit_yaw")).toBool());
-    }
-    else if (changedProperty == "x"
-        || changedProperty == "y"
-        || changedProperty == "z")
-    {
-      msgs::Vector3d msg;
-      this->FillVector3Msg(cameraFollowProperty, &msg);
-      cam->SetTrackPosition(msgs::ConvertIgn(msg));
-    }
-    else if (changedProperty == "min_distance")
-    {
-      cam->SetTrackMinDistance(this->dataPtr->variantManager->value(
-             this->ChildItem(cameraFollowProperty,
-               "min_distance")).toDouble());
-    }
-    else if (changedProperty == "max_distance")
-    {
-      cam->SetTrackMaxDistance(this->dataPtr->variantManager->value(
-             this->ChildItem(cameraFollowProperty,
-               "max_distance")).toDouble());
     }
   }
 }
@@ -2839,7 +2740,31 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
   QtVariantProperty *item = NULL;
 
   if (_msg.has_type())
-    this->dataPtr->physicsType = _msg.type();
+  {
+    item = this->dataPtr->variantManager->addProperty(
+      QtVariantPropertyManager::enumTypeId(), tr("physics engine"));
+    QStringList types;
+
+    const google::protobuf::EnumDescriptor *engineTypeEnum =
+      _msg.GetDescriptor()->FindEnumTypeByName("Type");
+
+    if (!engineTypeEnum)
+    {
+      gzerr << "Unable to get Type enum descriptor from "
+        << "Physics message. msgs::Physics "
+        << "has probably changed\n";
+      types << "invalid";
+    }
+    else
+    {
+      types << engineTypeEnum->value(_msg.type()-1)->name().c_str();
+    }
+
+    item->setAttribute("enumNames", types);
+    item->setValue(0);
+    this->dataPtr->propTreeBrowser->addProperty(item);
+    item->setEnabled(false);
+  }
 
   item = this->dataPtr->variantManager->addProperty(QVariant::Bool,
     tr("enable physics"));
