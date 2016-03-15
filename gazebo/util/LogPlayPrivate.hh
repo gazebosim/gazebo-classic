@@ -17,7 +17,14 @@
 #ifndef _GAZEBO_UTIL_LOGPLAY_PRIVATE_HH_
 #define _GAZEBO_UTIL_LOGPLAY_PRIVATE_HH_
 
+#include <gazebo/gazebo_config.h>
+
+#ifndef USE_EXTERNAL_TINYXML2
 #include <gazebo/tinyxml2.h>
+#else
+#include <tinyxml2.h>
+#endif
+
 #include <mutex>
 #include <string>
 

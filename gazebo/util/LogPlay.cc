@@ -19,8 +19,13 @@
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
+#include <gazebo/gazebo_config.h>
 
+#ifndef USE_EXTERNAL_TINYXML2
 #include <gazebo/tinyxml2.h>
+#else
+#include <tinyxml2.h>
+#endif
 
 #include <algorithm>
 #include <boost/filesystem.hpp>
