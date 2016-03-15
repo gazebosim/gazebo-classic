@@ -79,6 +79,9 @@ TEST_F(TimerTest, Timer)
 
   // Expect reset to reset the current time and stop the timer
   timer.Reset();
+  EXPECT_EQ(timer.GetElapsed().sec, 0);
+  EXPECT_EQ(timer.GetElapsed().nsec, 0);
+  EXPECT_FALSE(timer.GetRunning());
   common::Time::MSleep(1);
   EXPECT_EQ(timer.GetElapsed().sec, 0);
   EXPECT_EQ(timer.GetElapsed().nsec, 0);
