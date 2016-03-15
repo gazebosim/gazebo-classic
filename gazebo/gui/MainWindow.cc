@@ -1964,7 +1964,6 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
 
       if (_msg->camera().track().has_min_dist())
         minDist = _msg->camera().track().min_dist();
-
       if (_msg->camera().track().has_max_dist())
         maxDist = _msg->camera().track().max_dist();
 
