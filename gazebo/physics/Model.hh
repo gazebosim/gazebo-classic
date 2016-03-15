@@ -400,7 +400,7 @@ namespace gazebo
       /// \brief Create a new link for this model
       /// \param[in] _name name of the new link
       /// \return a LinkPtr to the new link created,
-      /// returns NULL link _name already exists.
+      /// returns NULL if link _name already exists.
       public: LinkPtr CreateLink(const std::string &_name);
 
       /// \brief Callback when the pose of the model has been changed.
