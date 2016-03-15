@@ -33,6 +33,12 @@ class ModelListWidget_TEST : public QTestFixture
   /// \brief _msg Message containing the response data
   private: void OnResponse(ConstResponsePtr &_msg);
 
+  /// \brief Verify vector3 attributes and values.
+  /// \param[in] _properties Vector3 properties.
+  /// \param[in] _pose Expected vector3 values.
+  private: void CheckVector3Property(QList<QtProperty *> _properties,
+      const ignition::math::Vector3d &_xyz);
+
   /// \brief Verify pose attributes and values.
   /// \param[in] _properties Pose properties.
   /// \param[in] _pose Expected pose values.

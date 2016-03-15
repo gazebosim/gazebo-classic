@@ -82,23 +82,28 @@ void ModelListWidget_TEST::OnResponse(ConstResponsePtr &_msg)
 }
 
 /////////////////////////////////////////////////
+void ModelListWidget_TEST::CheckVector3Property(QList<QtProperty *> _properties,
+    const ignition::math::Vector3d &_xyz)
+{
+  QVERIFY(_properties.size() >= 3);
+  for (unsigned char c = 0; c < 3; ++c)
+  {
+    QtVariantProperty *property =
+      static_cast<QtVariantProperty *>(_properties[c]);
+    Q_ASSERT(property);
+    std::string name(1, 'x' + c);
+    QCOMPARE(property->propertyName(), tr(name.c_str()));
+    QCOMPARE(property->value().toDouble(), _xyz[c]);
+  }
+}
+
+/////////////////////////////////////////////////
 void ModelListWidget_TEST::CheckPoseProperty(QList<QtProperty *> _properties,
     const gazebo::math::Pose &_pose)
 {
   QCOMPARE(_properties.size(), 6);
-  QtVariantProperty *property =
-      static_cast<QtVariantProperty *>(_properties[0]);
-  Q_ASSERT(property);
-  QCOMPARE(property->propertyName(), tr("x"));
-  QCOMPARE(property->value().toDouble(), _pose.pos.x);
-  property = static_cast<QtVariantProperty *>(_properties[1]);
-  Q_ASSERT(property);
-  QCOMPARE(property->propertyName(), tr("y"));
-  QCOMPARE(property->value().toDouble(), _pose.pos.y);
-  property = static_cast<QtVariantProperty *>(_properties[2]);
-  Q_ASSERT(property);
-  QCOMPARE(property->propertyName(), tr("z"));
-  QCOMPARE(property->value().toDouble(), _pose.pos.z);
+  CheckVector3Property(_properties, _pose.pos.Ign());
+  QtVariantProperty *property;
   property = static_cast<QtVariantProperty *>(_properties[3]);
   Q_ASSERT(property);
   QCOMPARE(property->propertyName(), tr("roll"));
