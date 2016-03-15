@@ -176,8 +176,7 @@ if (HAVE_GDAL)
 endif()
 
 if (USE_PCH)
-  target_compile_options(gazebo_physics PRIVATE -Winvalid-pch -include gazebo/gazebo_pch.hh)
-  add_dependencies(gazebo_physics gazebo_pch)
+  add_pch(gazebo_physics physics_pch.in.hh)
 endif()
 
 gz_install_library(gazebo_physics)

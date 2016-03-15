@@ -247,11 +247,9 @@ macro(add_pch target_name filename)
 
   set(pch_out ${CMAKE_CURRENT_BINARY_DIR}/${filename}.gch)
   set(pch_in ${CMAKE_CURRENT_SOURCE_DIR}/${filename})
-  set(FLAGS -g -O2 -mssse3 -msse3 -mfpmath=sse -msse -msse2 -fPIC -x c++-header)
+  set(FLAGS -g -O2 -fPIC -x c++-header)
 
-  separate_arguments(ARGS UNIX_COMMAND ${CMAKE_CXX_FLAGS})
-
-  message("custom flags for ${target_name}_pch: ${ARGV2}")
+  separate_arguments(ARGS UNIX_COMMAND "${CMAKE_C_FLAGS_ALL} ${CMAKE_CXX_FLAGS}")
 
   add_custom_command(OUTPUT ${pch_out}
     COMMAND ${CMAKE_CXX_COMPILER} ${ARGS} ${FLAGS} ${pch_in} -o ${pch_out}

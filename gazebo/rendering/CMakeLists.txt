@@ -204,8 +204,7 @@ if (NOT APPLE AND NOT WIN32)
 endif()
 
 if (USE_PCH)
-  target_compile_options(gazebo_rendering PRIVATE -Winvalid-pch -include gazebo/gazebo_pch.hh)
-  add_dependencies(gazebo_rendering gazebo_pch)
+  add_pch(gazebo_rendering rendering_pch.in.hh)
 endif()
 
 gz_install_library(gazebo_rendering)

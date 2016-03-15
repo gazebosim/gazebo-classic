@@ -68,8 +68,7 @@ if (WIN32)
 endif()
 
 if (USE_PCH)
-  target_compile_options(gazebo_transport PRIVATE -Winvalid-pch -include gazebo/gazebo_pch.hh)
-  add_dependencies(gazebo_transport gazebo_pch)
+  add_pch(gazebo_transport transport_pch.in.hh)
 endif()
 
 gz_install_library(gazebo_transport)
