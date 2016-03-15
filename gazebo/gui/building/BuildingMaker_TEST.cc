@@ -120,7 +120,8 @@ void BuildingMaker_TEST::Layers()
     QVERIFY(link->Get<std::string>("name") == "Wall_" + std::to_string(count));
     QVERIFY(link->HasElement("visual"));
     QVERIFY(link->GetElement("visual")->HasElement("meta"));
-    QVERIFY(link->GetElement("visual")->GetElement("meta")->HasElement("layer"));
+    QVERIFY(link->GetElement("visual")->GetElement("meta")
+        ->HasElement("layer"));
     QCOMPARE(link->GetElement("visual")->GetElement("meta")->GetElement("layer")
         ->Get<int>(), count);
 
