@@ -426,4 +426,3 @@ else (build_errors)
 
   message(STATUS "Configuration successful. Type make to compile gazebo")
 endif(build_errors)
-
