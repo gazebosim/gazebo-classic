@@ -31,6 +31,12 @@
     1. Fix saving and spawning model with its original name
         * [Pull request #2183](https://bitbucket.org/osrf/gazebo/pull-request/2183)
 
+1. Building editor updates
+
+    1. Add layers to building levels
+        * [Pull request #2180](https://bitbucket.org/osrf/gazebo/pull-request/2180)
+        * [Issue #1806](https://bitbucket.org/osrf/gazebo/issues/1806)
+
 ## Gazebo 7.0.0 (2016-01-25)
 
 1. Add FollowerPlugin
