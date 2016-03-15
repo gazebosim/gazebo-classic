@@ -65,7 +65,7 @@ TEST_F(ModelTest, CreateLink)
 
   const std::string linkName = "link_name";
   physics::LinkPtr link = model->CreateLink(linkName);
-  EXPECT_TRUE(link != NULL);
+  ASSERT_TRUE(link != NULL);
   EXPECT_EQ(link->GetName(), linkName);
   EXPECT_EQ(link, model->GetLink(linkName));
 
