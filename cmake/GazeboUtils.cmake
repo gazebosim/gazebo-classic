@@ -237,8 +237,12 @@ macro(filter_valid_compiler_flags)
   endforeach()
 endmacro()
 
-# ${target_name} a target name for generating the PCH file
-#
+#####################################
+# Gnu Precompiled Headers
+option(USE_PCH "compiles using gnu precompiled headers" OFF)
+
+# target_name a target name for generating the PCH file
+# filename the name of the PCH file, relative to the dir of the CMakeLists calling the macro
 macro(add_pch target_name filename)
 
   set(pch_out ${CMAKE_CURRENT_BINARY_DIR}/${filename}.gch)

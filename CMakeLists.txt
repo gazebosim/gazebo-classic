@@ -256,25 +256,6 @@ include_directories(SYSTEM
   ${IGNITION-MATH_INCLUDE_DIRS}
 )
 
-#####################################
-# Gnu Precompiled Headers
-option(USE_PCH "compiles using gnu precompiled headers" OFF)
-
-if (USE_PCH)
-  set(pch_out ${CMAKE_BINARY_DIR}/gazebo/gazebo_pch.hh.gch)
-  set(pch_in ${CMAKE_SOURCE_DIR}/gazebo/gazebo_pch.in.hh)
-  set(EXTRA_FLAGS -g -O2 -mssse3 -msse3 -mfpmath=sse -msse -msse2 -fPIC -x c++-header)
-
-  separate_arguments(ARGS UNIX_COMMAND ${CMAKE_CXX_FLAGS})
-
-  add_custom_command(OUTPUT ${pch_out}
-    COMMAND ${CMAKE_CXX_COMPILER} ${ARGS} ${EXTRA_FLAGS} ${pch_in} -o ${pch_out}
-    DEPENDS ${pch_in}
-    COMMENT "Generating precompiled headers"
-    VERBATIM)
-  add_custom_target(gazebo_pch DEPENDS ${pch_out})
-endif()
-
 #################################################
 # Configure 3rd Party Packages after OS Specific initialization
 message (STATUS "\n\n====== Configuring 3rd Party Packages ======")
