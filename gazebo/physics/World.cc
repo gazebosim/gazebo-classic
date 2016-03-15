@@ -821,11 +821,7 @@ void World::Fini()
 
   this->dataPtr->connections.clear();
 
-  if (this->dataPtr->sdf)
-  {
-    this->dataPtr->sdf->Reset();
-    this->dataPtr->sdf.reset();
-  }
+  this->dataPtr->sdf.reset();
 
   this->dataPtr->testRay.reset();
   this->dataPtr->plugins.clear();
