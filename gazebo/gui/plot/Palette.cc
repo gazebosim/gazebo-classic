@@ -416,6 +416,8 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
 
   // The model that will hold data to be displayed in the topic tree view
   this->dataPtr->topicsModel = new PlotItemModel;
+  this->dataPtr->topicsModel->setObjectName("plotTopicsModel");
+  this->dataPtr->topicsModel->setParent(this);
   this->FillTopics(this->dataPtr->topicsModel);
 
   // A proxy model to filter topic model
