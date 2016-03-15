@@ -397,7 +397,8 @@ TEST(gz_log, Output)
   newFileStream << "/tmp/__gz_log_test" << std::this_thread::get_id()
     << ".log";
 
-  stream << GZ_LOG_PATH + " -f " << PROJECT_SOURCE_PATH << "/test/data/empty_state.log"
+  stream << GZ_LOG_PATH + " -f " << PROJECT_SOURCE_PATH
+    << "/test/data/empty_state.log"
     << " -o " << newFileStream.str();
 
   // Generate new log file using the original encoding
@@ -413,14 +414,16 @@ TEST(gz_log, Output)
 
   // Output as txt
   std::ostringstream stream2;
-  stream2 << GZ_LOG_PATH + " -f " << PROJECT_SOURCE_PATH << "/test/data/empty_state.log"
+  stream2 << GZ_LOG_PATH + " -f " << PROJECT_SOURCE_PATH
+    << "/test/data/empty_state.log"
     << " -o " << newFileStream.str() << " -n txt";
   custom_exec(stream2.str());
 
   EXPECT_NO_THROW(gazebo::util::LogPlay::Instance()->Open(newFileStream.str()));
   EXPECT_EQ(gazebo::util::LogPlay::Instance()->Encoding(), "txt");
 
-  newEcho = custom_exec(std::string(GZ_LOG_PATH + " -e -f ") + newFileStream.str());
+  newEcho = custom_exec(std::string(GZ_LOG_PATH + " -e -f ") +
+      newFileStream.str());
   boost::trim_right(newEcho);
   EXPECT_EQ(validEcho, newEcho);
 #endif
