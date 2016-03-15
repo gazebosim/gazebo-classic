@@ -46,7 +46,7 @@ namespace gazebo
       /// \param[in] _active True to make it active.
       public: void SetActive(const bool _active);
 
-      /// \brief Set the widget to be active.
+      /// \brief Get whether the widget is active or not.
       /// \return True if it is active.
       public: bool Active() const;
 

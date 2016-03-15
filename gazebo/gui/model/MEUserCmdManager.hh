@@ -88,7 +88,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Pointer to private data.
-      protected: std::shared_ptr<MEUserCmdPrivate> dataPtr;
+      protected: std::unique_ptr<MEUserCmdPrivate> dataPtr;
     };
 
     /// \brief Class which manages user commands in the model editor. It
@@ -135,7 +135,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Pointer to private data.
-      private: std::shared_ptr<MEUserCmdManagerPrivate> dataPtr;
+      private: std::unique_ptr<MEUserCmdManagerPrivate> dataPtr;
     };
   }
 }

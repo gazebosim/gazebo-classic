@@ -177,6 +177,9 @@ void UserCmdHistory::OnUserCmdStatsMsg(ConstUserCmdStatsPtr &_msg)
 /////////////////////////////////////////////////
 void UserCmdHistory::OnStatsSlot()
 {
+  if (!this->dataPtr->active)
+    return;
+
   g_undoAct->setEnabled(this->dataPtr->msg.undo_cmd_count() > 0);
   g_redoAct->setEnabled(this->dataPtr->msg.redo_cmd_count() > 0);
   g_undoHistoryAct->setEnabled(this->dataPtr->msg.undo_cmd_count() > 0);

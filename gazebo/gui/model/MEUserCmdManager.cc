@@ -15,8 +15,6 @@
  *
 */
 
-#include <boost/range/adaptor/reversed.hpp>
-
 #include "gazebo/transport/Node.hh"
 
 #include "gazebo/gui/Actions.hh"
@@ -224,16 +222,17 @@ void MEUserCmdManager::OnUndoCommand(QAction *_action)
   }
 
   // Undo all commands up to the desired one
-  for (auto cmdIt : boost::adaptors::reverse(this->dataPtr->undoCmds))
+  for (auto cmdIt = this->dataPtr->undoCmds.rbegin();
+      cmdIt != this->dataPtr->undoCmds.rend(); ++cmdIt)
   {
     // Undo it
-    cmdIt->Undo();
+    (*cmdIt)->Undo();
 
     // Transfer to the redo list
+    this->dataPtr->redoCmds.push_back(*cmdIt);
     this->dataPtr->undoCmds.pop_back();
-    this->dataPtr->redoCmds.push_back(cmdIt);
 
-    if (cmdIt == cmd)
+    if ((*cmdIt) == cmd)
       break;
   }
 
@@ -279,16 +278,17 @@ void MEUserCmdManager::OnRedoCommand(QAction *_action)
   }
 
   // Redo all commands up to the desired one
-  for (auto cmdIt : boost::adaptors::reverse(this->dataPtr->redoCmds))
+  for (auto cmdIt = this->dataPtr->redoCmds.rbegin();
+      cmdIt != this->dataPtr->redoCmds.rend(); ++cmdIt)
   {
     // Redo it
-    cmdIt->Redo();
+    (*cmdIt)->Redo();
 
     // Transfer to the undo list
+    this->dataPtr->undoCmds.push_back(*cmdIt);
     this->dataPtr->redoCmds.pop_back();
-    this->dataPtr->undoCmds.push_back(cmdIt);
 
-    if (cmdIt == cmd)
+    if ((*cmdIt) == cmd)
       break;
   }
 
@@ -320,6 +320,9 @@ MEUserCmdPtr MEUserCmdManager::NewCmd(
 /////////////////////////////////////////////////
 void MEUserCmdManager::OnStatsSlot()
 {
+  if (!this->Active())
+    return;
+
   g_undoAct->setEnabled(this->dataPtr->undoCmds.size() > 0);
   g_redoAct->setEnabled(this->dataPtr->redoCmds.size() > 0);
   g_undoHistoryAct->setEnabled(this->dataPtr->undoCmds.size() > 0);
@@ -345,11 +348,12 @@ void MEUserCmdManager::OnUndoCmdHistory()
 
   // Create new menu
   QMenu menu;
-  for (auto cmd : boost::adaptors::reverse(this->dataPtr->undoCmds))
+  for (auto cmdIt = this->dataPtr->undoCmds.rbegin();
+      cmdIt != this->dataPtr->undoCmds.rend(); ++cmdIt)
   {
-    QAction *action = new QAction(QString::fromStdString(cmd->Description()),
+    QAction *action = new QAction(QString::fromStdString((*cmdIt)->Description()),
         this);
-    action->setData(QVariant(cmd->Id()));
+    action->setData(QVariant((*cmdIt)->Id()));
     action->setCheckable(true);
     menu.addAction(action);
     this->undoActions->addAction(action);
@@ -378,11 +382,12 @@ void MEUserCmdManager::OnRedoCmdHistory()
 
   // Create new menu
   QMenu menu;
-  for (auto cmd : boost::adaptors::reverse(this->dataPtr->redoCmds))
+  for (auto cmdIt = this->dataPtr->redoCmds.rbegin();
+      cmdIt != this->dataPtr->redoCmds.rend(); ++cmdIt)
   {
-    QAction *action = new QAction(QString::fromStdString(cmd->Description()),
+    QAction *action = new QAction(QString::fromStdString((*cmdIt)->Description()),
         this);
-    action->setData(QVariant(cmd->Id()));
+    action->setData(QVariant((*cmdIt)->Id()));
     action->setCheckable(true);
     menu.addAction(action);
     this->redoActions->addAction(action);

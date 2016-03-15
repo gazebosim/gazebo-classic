@@ -142,13 +142,7 @@ void ModelEditorUndoTest::LinkDeletionByContextMenu()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw();
 
   // Get the user camera, scene and GLWidget
   auto cam = gazebo::gui::get_active_camera();
@@ -183,13 +177,7 @@ void ModelEditorUndoTest::LinkDeletionByContextMenu()
   // Undo -> Redo a few times
   for (unsigned int j = 0; j < 3; ++j)
   {
-    // Process some events, and draw the screen
-    for (unsigned int i = 0; i < 10; ++i)
-    {
-      gazebo::common::Time::MSleep(30);
-      QCoreApplication::processEvents();
-      mainWindow->repaint();
-    }
+    this->ProcessEventsAndDraw();
 
     // Check undo is enabled
     QVERIFY(gazebo::gui::g_undoAct->isEnabled());
@@ -205,13 +193,7 @@ void ModelEditorUndoTest::LinkDeletionByContextMenu()
     gzmsg << "Undo deleting [" << linkVisName << "]" << std::endl;
     gazebo::gui::g_undoAct->trigger();
 
-    // Process some events, and draw the screen
-    for (unsigned int i = 0; i < 10; ++i)
-    {
-      gazebo::common::Time::MSleep(30);
-      QCoreApplication::processEvents();
-      mainWindow->repaint();
-    }
+    this->ProcessEventsAndDraw();
 
     // Check redo is enabled
     QVERIFY(!gazebo::gui::g_undoAct->isEnabled());
