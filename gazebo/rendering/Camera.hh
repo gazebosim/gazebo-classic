@@ -863,6 +863,80 @@ namespace gazebo
       /// \sa SetProjectionType(const std::string &_type)
       public: std::string ProjectionType() const;
 
+      /// \brief Get the visual tracked by this camera.
+      /// \return Tracked visual.
+      public: VisualPtr TrackedVisual() const;
+
+      /// \brief Get whether this camera is static when tracking a model.
+      /// \return True if camera is static when tracking a model.
+      /// \sa SetTrackIsStatic(const bool _isStatic)
+      public: bool TrackIsStatic() const;
+
+      /// \brief Set whether this camera is static when tracking a model.
+      /// \param[in] _isStatic True means camera is static when tracking a
+      /// model.
+      /// \sa TrackIsStatic()
+      public: void SetTrackIsStatic(const bool _isStatic);
+
+      /// \brief Get whether this camera's position is relative to tracked
+      /// models.
+      /// \return True if camera's position is relative to tracked models.
+      /// \sa SetTrackUseModelFrame(const bool _useModelFrame)
+      public: bool TrackUseModelFrame() const;
+
+      /// \brief Set whether this camera's position is relative to tracked
+      /// models.
+      /// \param[in] _useModelFrame True means camera's position is relative to
+      /// tracked models.
+      /// \sa TrackUseModelFrame()
+      public: void SetTrackUseModelFrame(const bool _useModelFrame);
+
+      /// \brief Return the position of the camera when tracking a model.
+      /// \return Position of the camera.
+      /// \sa SetTrackPosition(const ignition::math::Vector3d &_pos)
+      public: ignition::math::Vector3d TrackPosition() const;
+
+      /// \brief Set the position of the camera when tracking a visual.
+      /// \param[in] _pos Position of the camera.
+      /// \sa TrackPosition()
+      public: void SetTrackPosition(const ignition::math::Vector3d &_pos);
+
+      /// \brief Return the minimum distance to the tracked visual.
+      /// \return Minimum distance to the model.
+      /// \sa SetTrackMinDistance(const double _dist)
+      public: double TrackMinDistance() const;
+
+      /// \brief Return the maximum distance to the tracked visual.
+      /// \return Maximum distance to the model.
+      /// \sa SetTrackMaxDistance(const double _dist)
+      public: double TrackMaxDistance() const;
+
+      /// \brief Set the minimum distance between the camera and tracked
+      /// visual.
+      /// \param[in] _dist Minimum distance between camera and visual.
+      /// \sa TrackMinDistance()
+      public: void SetTrackMinDistance(const double _dist);
+
+      /// \brief Set the maximum distance between the camera and tracked
+      /// visual.
+      /// \param[in] _dist Maximum distance between camera and visual.
+      /// \sa TrackMaxDistance()
+      public: void SetTrackMaxDistance(const double _dist);
+
+      /// \brief Get whether this camera inherits the yaw rotation of the
+      /// tracked model.
+      /// \return True if the camera inherits the yaw rotation of the tracked
+      /// model.
+      /// \sa SetTrackInheritYaw(const bool _inheritYaw)
+      public: bool TrackInheritYaw() const;
+
+      /// \brief Set whether this camera inherits the yaw rotation of the
+      /// tracked model.
+      /// \param[in] _inheritYaw True means camera inherits the yaw rotation of
+      /// the tracked model.
+      /// \sa TrackInheritYaw()
+      public: void SetTrackInheritYaw(const bool _inheritYaw);
+
       /// \brief Implementation of the render call
       protected: virtual void RenderImpl();
 
