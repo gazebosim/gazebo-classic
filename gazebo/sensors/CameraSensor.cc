@@ -53,7 +53,6 @@ CameraSensor::CameraSensor()
 : Sensor(sensors::IMAGE),
   dataPtr(new CameraSensorPrivate)
 {
-  this->dataPtr->rendered = false;
   this->connections.push_back(
       event::Events::ConnectRender(
         std::bind(&CameraSensor::Render, this)));
@@ -301,3 +300,16 @@ rendering::CameraPtr CameraSensor::Camera() const
 {
   return this->camera;
 }
+
+//////////////////////////////////////////////////
+bool CameraSensor::Rendered() const
+{
+  return this->dataPtr->rendered;
+}
+
+//////////////////////////////////////////////////
+void CameraSensor::SetRendered(const bool _value)
+{
+  this->dataPtr->rendered = _value;
+}
+

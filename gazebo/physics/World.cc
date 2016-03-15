@@ -1027,6 +1027,7 @@ LightPtr World::LoadLight(const sdf::ElementPtr &_sdf, const BasePtr &_parent)
 
   // Create new light object
   LightPtr light(new physics::Light(_parent));
+  light->SetStatic(true);
   light->ProcessMsg(*msg);
   light->SetWorld(shared_from_this());
   light->Load(_sdf);
@@ -2008,8 +2009,6 @@ ModelPtr World::GetModelBelowPoint(const math::Vector3 &_pt)
 
   if (entity)
     model = entity->GetParentModel();
-  else
-    gzerr << "Unable to find entity below point[" << _pt << "]\n";
 
   return model;
 }
