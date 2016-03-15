@@ -72,11 +72,61 @@ void LogPlay::Open(const std::string &_logFile)
   if (boost::filesystem::is_directory(path))
     gzthrow("Invalid logfile [" + _logFile + "]. This is a directory.");
 
+  // Flag use to indicate if a parser failure has occurred
+  bool xmlParserFail = this->dataPtr->xmlDoc.LoadFile(_logFile.c_str()) !=
+    tinyxml2::XML_NO_ERROR;
+
   // Parse the log file
-  if (this->dataPtr->xmlDoc.LoadFile(_logFile.c_str()) !=
-      gazebo::tinyxml2::XML_NO_ERROR)
+  if (xmlParserFail)
   {
-    gzthrow("Unable to parse log file[" << _logFile << "]");
+    std::string endTag = "</gazebo_log>";
+    // Open the log file for reading, we will check if the end of the log
+    // file has the correct closing tag: </gazebo_log>.
+    std::ifstream inFile(_logFile);
+    if (inFile)
+    {
+      // Move to the end of the file
+      int len = -1 - static_cast<int>(endTag.length());
+      inFile.seekg(len, std::ios::end);
+
+      // Get the last line
+      std::string lastLine;
+      std::getline(inFile, lastLine);
+      inFile.close();
+
+      // Add missing </gazebo_log> if not present.
+      if (lastLine.find(endTag) == std::string::npos)
+      {
+        // Open the log file for append
+        std::ofstream fix(_logFile, std::ios::app);
+        if (fix)
+        {
+          // Add the end tag
+          fix << endTag << std::endl;
+          fix.close();
+
+          // Retry loading the log file.
+          xmlParserFail = this->dataPtr->xmlDoc.LoadFile(_logFile.c_str()) !=
+            tinyxml2::XML_NO_ERROR;
+        }
+      }
+    }
+  }
+
+  // Output error and throw if the log file had a problem.
+  // \todo Remove throws in this class. A failure to open a log file is not
+  // a critical failure.
+  if (xmlParserFail)
+  {
+    gzerr << "Unable to load file[" << _logFile << "]. "
+      << "Check the Gazebo server log file for more information.\n";
+    const char *errorStr1 = this->dataPtr->xmlDoc.GetErrorStr1();
+    const char *errorStr2 = this->dataPtr->xmlDoc.GetErrorStr2();
+    if (errorStr1)
+      gzlog << "Log Error 1:\n" << errorStr1 << std::endl;
+    if (errorStr2)
+      gzlog << "Log Error 2:\n" << errorStr2 << std::endl;
+    gzthrow("Error parsing log file");
   }
 
   // Get the gazebo_log element
