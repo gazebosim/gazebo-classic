@@ -158,7 +158,7 @@ void LinkInspector::OnRemove()
 /////////////////////////////////////////////////
 void LinkInspector::OnCancel()
 {
-  this->close();
+  this->reject();
 }
 
 /////////////////////////////////////////////////
@@ -297,4 +297,8 @@ void LinkInspector::OnCollisionChanged(const std::string &/*_name*/,
     }
   }
 }
-
+////////////////////////////////////////////////
+void LinkInspector::closeEvent(QCloseEvent*)
+{
+	this->accept();
+}

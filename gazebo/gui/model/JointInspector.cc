@@ -626,7 +626,7 @@ void JointInspector::OnCancel()
 {
   this->RestoreOriginalData();
 
-  this->close();
+  this->reject();
 }
 
 /////////////////////////////////////////////////
@@ -668,4 +668,9 @@ void JointInspector::keyPressEvent(QKeyEvent *_event)
     _event->accept();
   else
     QDialog::keyPressEvent(_event);
+}
+///////////////////////////////////////////////////
+void JointInspector::closeEvent(QCloseEvent*)
+{
+	this->accept();
 }
