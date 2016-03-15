@@ -132,6 +132,8 @@ namespace gazebo
       /// \brief Qt key press event.
       /// \param[in] _event Qt key event.
       private: void keyPressEvent(QKeyEvent *_event);
+      ///////////////////////////
+      private: void closeEvent(QCloseEvent *);
 
       /// \internal
       /// \brief Pointer to private data.

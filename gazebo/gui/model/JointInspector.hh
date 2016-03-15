@@ -148,6 +148,9 @@ namespace gazebo
       /// \internal
       /// \brief Pointer to private data.
       private: std::unique_ptr<JointInspectorPrivate> dataPtr;
+      /////////////////////////////////////////////////////
+       ///////////////////////////
+      private: void closeEvent(QCloseEvent *);
     };
     /// \}
   }
