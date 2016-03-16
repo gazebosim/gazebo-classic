@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
@@ -819,7 +818,7 @@ void LogCommand::Output(const std::string &_outFilename,
     return;
   }
 
-  std::string stateString;
+  std::string stateString, bufferString;
 
   std::string encoding = _encoding.empty() ? play->Encoding() : _encoding;
   if (encoding != "txt" && encoding != "zlib" && encoding != "bz2")
@@ -837,70 +836,32 @@ void LogCommand::Output(const std::string &_outFilename,
     outFile.write(header.c_str(), header.size());
   }
 
-
   StateFilter filter(!_raw, _stamp, _hz);
   filter.Init(_filter);
 
   unsigned int i = 0;
   while (play->Step(stateString))
   {
-    if (i > 0)
-      stateString = filter.Filter(stateString);
-    else if (i == 0 && _raw)
-      stateString.clear();
-
-    if (!stateString.empty())
+    if (i == 0 && !_raw)
     {
-      if (!_raw)
+      this->OutputWriter(outFile, stateString, _raw, encoding);
+    }
+    else
+    {
+      bufferString += filter.Filter(stateString);
+
+      if (i%1000 == 0 && !bufferString.empty())
       {
-        std::string buffer = "<chunk encoding='" + encoding + "'>\n<![CDATA[";
-
-        if (encoding == "txt")
-          buffer.append(stateString);
-        else if (encoding == "zlib")
-        {
-          std::string str;
-
-          // Compress to zlib
-          {
-            boost::iostreams::filtering_ostream out;
-            out.push(boost::iostreams::zlib_compressor());
-            out.push(std::back_inserter(str));
-            boost::iostreams::copy(
-                boost::make_iterator_range(stateString), out);
-          }
-
-          // Encode in base64.
-          Base64Encode(str.c_str(), str.size(), buffer);
-        }
-        else if (encoding == "bz2")
-        {
-          std::string str;
-
-          // Compress to bzip2
-          {
-            boost::iostreams::filtering_ostream out;
-            out.push(boost::iostreams::bzip2_compressor());
-            out.push(std::back_inserter(str));
-            boost::iostreams::copy(
-                boost::make_iterator_range(stateString), out);
-          }
-
-          // Encode in base64.
-          Base64Encode(str.c_str(), str.size(), buffer);
-        }
-
-        buffer.append("]]>\n</chunk>\n");
-        outFile.write(buffer.c_str(), buffer.size());
-      }
-      else
-      {
-        outFile.write(stateString.c_str(), stateString.size());
+        this->OutputWriter(outFile, bufferString, _raw, encoding);
+        bufferString.clear();
       }
     }
 
     ++i;
   }
+
+  if (!bufferString.empty())
+    this->OutputWriter(outFile, bufferString, _raw, encoding);
 
   if (!_raw)
   {
@@ -1084,4 +1045,57 @@ bool LogCommand::LoadLogFromFile(const std::string &_filename)
   }
 
   return true;
+}
+
+/////////////////////////////////////////////////
+void LogCommand::OutputWriter(std::ofstream &_outFile,
+    const std::string &_stateString, const bool _raw,
+    const std::string &_encoding)
+{
+  if (!_raw)
+  {
+    std::string buffer = "<chunk encoding='" + _encoding + "'>\n<![CDATA[";
+
+    if (_encoding == "txt")
+      buffer.append(_stateString);
+    else if (_encoding == "zlib")
+    {
+      std::string str;
+
+      // Compress to zlib
+      {
+        boost::iostreams::filtering_ostream out;
+        out.push(boost::iostreams::zlib_compressor());
+        out.push(std::back_inserter(str));
+        boost::iostreams::copy(
+            boost::make_iterator_range(_stateString), out);
+      }
+
+      // Encode in base64.
+      Base64Encode(str.c_str(), str.size(), buffer);
+    }
+    else if (_encoding == "bz2")
+    {
+      std::string str;
+
+      // Compress to bzip2
+      {
+        boost::iostreams::filtering_ostream out;
+        out.push(boost::iostreams::bzip2_compressor());
+        out.push(std::back_inserter(str));
+        boost::iostreams::copy(
+            boost::make_iterator_range(_stateString), out);
+      }
+
+      // Encode in base64.
+      Base64Encode(str.c_str(), str.size(), buffer);
+    }
+
+    buffer.append("]]>\n</chunk>\n");
+    _outFile.write(buffer.c_str(), buffer.size());
+  }
+  else
+  {
+    _outFile.write(_stateString.c_str(), _stateString.size());
+  }
 }

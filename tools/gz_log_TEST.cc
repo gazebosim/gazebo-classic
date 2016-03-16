@@ -31,7 +31,8 @@
 #include "test_config.h"
 #include "gazebo/gazebo_config.h"
 
-const std::string GZ_LOG_PATH(std::string(PROJECT_BINARY_PATH) + "/tools/gz log ");
+const std::string GZ_LOG_PATH(
+    std::string(PROJECT_BINARY_PATH) + "/tools/gz log ");
 
 std::string custom_exec(std::string _cmd)
 {
@@ -212,8 +213,8 @@ TEST(gz_log, EchoFilter)
     FAIL() << "Please add support for sdf version: " << SDF_VERSION;
 
   // Test joint filter
-  echo = custom_exec(
-      std::string(GZ_LOG_PATH + " -e --filter pr2//r_upper_arm_roll_joint -f ") +
+  echo = custom_exec(std::string(GZ_LOG_PATH +
+        " -e --filter pr2//r_upper_arm_roll_joint -f ") +
       PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
   shasum = gazebo::common::get_sha1<std::string>(echo);
   // EXPECT_EQ(pr2JointStateLog, echo);
@@ -265,24 +266,24 @@ TEST(gz_log, RawFilterStamp)
   std::string echo, validEcho;
 
   // Sim time
-  echo = custom_exec(
-      std::string(GZ_LOG_PATH + " --echo -r --stamp sim --filter pr2.pose.x -f ") +
+  echo = custom_exec(std::string(GZ_LOG_PATH +
+        " --echo -r --stamp sim --filter pr2.pose.x -f ") +
       PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
   boost::trim_right(echo);
   validEcho = "0.021344 0.000000 \n0.028958 0.000000";
   EXPECT_EQ(validEcho, echo);
 
   // Real time
-  echo = custom_exec(
-      std::string(GZ_LOG_PATH + " --echo -r --stamp real --filter pr2.pose.x -f ") +
+  echo = custom_exec(std::string(GZ_LOG_PATH +
+        " --echo -r --stamp real --filter pr2.pose.x -f ") +
       PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
   boost::trim_right(echo);
   validEcho = "0.001000 0.000000 \n0.002000 0.000000";
   EXPECT_EQ(validEcho, echo);
 
   // Wall time
-  echo = custom_exec(
-      std::string(GZ_LOG_PATH + " --echo -r --stamp wall --filter pr2.pose.x -f ") +
+  echo = custom_exec(std::string(GZ_LOG_PATH +
+        " --echo -r --stamp wall --filter pr2.pose.x -f ") +
       PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
   boost::trim_right(echo);
   validEcho = std::string("1360301758.939690 0.000000 \n")

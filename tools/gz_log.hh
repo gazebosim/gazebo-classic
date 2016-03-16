@@ -259,6 +259,11 @@ namespace gazebo
     /// \return True on success.
     private: bool LoadLogFromFile(const std::string &_filename);
 
+
+    private: void OutputWriter(std::ofstream &_outFile,
+                 const std::string &_stateString,
+                 const bool _raw, const std::string &_encoding);
+
     /// \brief Node pointer.
     private: gazebo::transport::NodePtr node;
   };
