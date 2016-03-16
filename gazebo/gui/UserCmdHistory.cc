@@ -206,7 +206,7 @@ bool UserCmdHistory::HasRedo() const
 
 /////////////////////////////////////////////////
 std::vector<std::pair<unsigned int, std::string>>
-    UserCmdHistory::Cmds(bool _undo) const
+    UserCmdHistory::Cmds(const bool _undo) const
 {
   auto cmds = this->dataPtr->msg.undo_cmd();
 
@@ -236,7 +236,7 @@ void UserCmdHistory::OnRedoCmdHistory()
 }
 
 /////////////////////////////////////////////////
-void UserCmdHistory::OnCmdHistory(bool _undo)
+void UserCmdHistory::OnCmdHistory(const bool _undo)
 {
   if (!this->dataPtr->active)
     return;

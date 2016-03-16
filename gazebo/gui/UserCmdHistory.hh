@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_USER_COMMAND_WIDGET_HH_
-#define _GAZEBO_USER_COMMAND_WIDGET_HH_
+#ifndef _GAZEBO_GUI_USERCOMMANDHISTORY_HH_
+#define _GAZEBO_GUI_USERCOMMANDHISTORY_HH_
 
 #include <string>
 #include <utility>
@@ -90,7 +89,7 @@ namespace gazebo
 
       /// \brief Implementation of the On*CmdHistory functions.
       /// \param[in] _undo True for undo, false for redo.
-      private: virtual void OnCmdHistory(bool _undo);
+      private: virtual void OnCmdHistory(const bool _undo);
 
       /// \brief Whether there are commands for undo or not.
       /// \return True if there are.
@@ -103,7 +102,7 @@ namespace gazebo
       /// \brief Get the list of user commands.
       /// \param[in] _undo True for undo, false for redo
       private: virtual std::vector<std::pair<unsigned int, std::string>>
-          Cmds(bool _undo) const;
+          Cmds(const bool _undo) const;
 
       /// \brief Updates the widgets according to the user command stats
       /// message.

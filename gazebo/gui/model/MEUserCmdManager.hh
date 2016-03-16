@@ -135,7 +135,7 @@ namespace gazebo
       /// \brief Get the list of commands.
       /// \return True if there are.
       private: virtual std::vector<std::pair<unsigned int, std::string>>
-          Cmds(bool _undo) const;
+          Cmds(const bool _undo) const;
 
       /// \internal
       /// \brief Pointer to private data.

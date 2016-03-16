@@ -316,7 +316,7 @@ bool MEUserCmdManager::HasRedo() const
 
 /////////////////////////////////////////////////
 std::vector<std::pair<unsigned int, std::string>>
-    MEUserCmdManager::Cmds(bool _undo) const
+    MEUserCmdManager::Cmds(const bool _undo) const
 {
   auto cmds = this->dataPtr->undoCmds;
 
