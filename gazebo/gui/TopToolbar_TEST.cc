@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,13 +37,7 @@ void TopToolbar_TEST::WindowModes()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get the top toolbar
   gazebo::gui::TopToolbar *topToolbar =
@@ -112,13 +106,7 @@ void TopToolbar_TEST::Insert()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get the top toolbar
   gazebo::gui::TopToolbar *topToolbar =
@@ -165,6 +153,57 @@ void TopToolbar_TEST::Insert()
   QAction *actionFail = new QAction(this);
   topToolbar->InsertAction("fail", actionFail);
   QCOMPARE(toolbar->actions().size(), actionsCount);
+
+  // Clean up
+  mainWindow->close();
+  delete mainWindow;
+}
+
+/////////////////////////////////////////////////
+void TopToolbar_TEST::Add()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/empty.world");
+
+  // Create the main window.
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  this->ProcessEventsAndDraw(mainWindow);
+
+  // Get the top toolbar
+  gazebo::gui::TopToolbar *topToolbar =
+      mainWindow->findChild<gazebo::gui::TopToolbar *>("topToolbar");
+  QVERIFY(topToolbar != NULL);
+
+  // Get number of actions
+  QToolBar *toolbar = topToolbar->findChild<QToolBar *>("topToolbarToolbar");
+  QVERIFY(toolbar != NULL);
+
+  int actionsCount = toolbar->actions().size();
+
+  // Add separator and see increase in number of actions
+  QAction *separator = topToolbar->AddSeparator();
+  QVERIFY(separator != NULL);
+  QCOMPARE(toolbar->actions().size(), actionsCount + 1);
+  actionsCount = toolbar->actions().size();
+
+  // Add widget and see increase in number of actions
+  QWidget *widget = new QWidget();
+  QAction *widgetAct = topToolbar->AddWidget(widget);
+  QVERIFY(widgetAct != NULL);
+  QCOMPARE(toolbar->actions().size(), actionsCount + 1);
+  actionsCount = toolbar->actions().size();
+
+  // Add action and see increase in number of actions
+  QAction *action = new QAction(this);
+  topToolbar->AddAction(action);
+  QCOMPARE(toolbar->actions().size(), actionsCount + 1);
 
   // Clean up
   mainWindow->close();

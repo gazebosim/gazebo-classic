@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,13 @@
  * limitations under the License.
  *
 */
-/* Desc: Dynamic line generator
- * Author: Nate Koenig
- * Date: 28 June 2007
- */
-
 #include <math.h>
 
 #include <cmath>
 #include <sstream>
 #include "gazebo/rendering/ogre_gazebo.h"
 
+#include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/rendering/DynamicLines.hh"
 
@@ -63,6 +59,13 @@ const Ogre::String &DynamicLines::getMovableType() const
 void DynamicLines::AddPoint(const math::Vector3 &_pt,
                             const common::Color &_color)
 {
+  this->AddPoint(_pt.Ign(), _color);
+}
+
+/////////////////////////////////////////////////
+void DynamicLines::AddPoint(const ignition::math::Vector3d &_pt,
+                            const common::Color &_color)
+{
   this->points.push_back(_pt);
   this->colors.push_back(_color);
   this->dirty = true;
@@ -72,21 +75,27 @@ void DynamicLines::AddPoint(const math::Vector3 &_pt,
 void DynamicLines::AddPoint(double _x, double _y, double _z,
                             const common::Color &_color)
 {
-  this->AddPoint(math::Vector3(_x, _y, _z), _color);
+  this->AddPoint(ignition::math::Vector3d(_x, _y, _z), _color);
 }
 
 /////////////////////////////////////////////////
-void DynamicLines::SetPoint(unsigned int index, const math::Vector3 &value)
+void DynamicLines::SetPoint(unsigned int _index, const math::Vector3 &_value)
 {
-  if (index >= this->points.size())
+  this->SetPoint(_index, _value.Ign());
+}
+
+/////////////////////////////////////////////////
+void DynamicLines::SetPoint(const unsigned int _index,
+                            const ignition::math::Vector3d &_value)
+{
+  if (_index >= this->points.size())
   {
-    std::ostringstream stream;
-    stream << "Point index[" << index << "] is out of bounds[0-"
-           << this->points.size()-1 << "]";
-    gzthrow(stream.str());
+    gzerr << "Point index[" << _index << "] is out of bounds[0-"
+           << this->points.size()-1 << "]\n";
+    return;
   }
 
-  this->points[index] = value;
+  this->points[_index] = _value;
 
   this->dirty = true;
 }
@@ -99,14 +108,27 @@ void DynamicLines::SetColor(unsigned int _index, const common::Color &_color)
 }
 
 /////////////////////////////////////////////////
-const math::Vector3& DynamicLines::GetPoint(unsigned int index) const
+math::Vector3 DynamicLines::GetPoint(unsigned int _index) const
 {
-  if (index >= this->points.size())
-  {
+  if (_index >= this->points.size())
     gzthrow("Point index is out of bounds");
+
+  return this->points[_index];
+}
+
+/////////////////////////////////////////////////
+ignition::math::Vector3d DynamicLines::Point(
+    const unsigned int _index) const
+{
+  if (_index >= this->points.size())
+  {
+    gzerr << "Point index[" << _index << "] is out of bounds[0-"
+           << this->points.size()-1 << "]\n";
+
+    return ignition::math::Vector3d(IGN_DBL_INF, IGN_DBL_INF, IGN_DBL_INF);
   }
 
-  return this->points[index];
+  return this->points[_index];
 }
 
 /////////////////////////////////////////////////
@@ -159,12 +181,11 @@ void DynamicLines::FillHardwareBuffers()
   {
     for (int i = 0; i < size; i++)
     {
-      *prPos++ = this->points[i].x;
-      *prPos++ = this->points[i].y;
-      *prPos++ = this->points[i].z;
+      *prPos++ = this->points[i].X();
+      *prPos++ = this->points[i].Y();
+      *prPos++ = this->points[i].Z();
 
-      this->mBox.merge(Ogre::Vector3(this->points[i].x,
-                                     this->points[i].y, this->points[i].z));
+      this->mBox.merge(Conversions::Convert(this->points[i]));
     }
   }
   vbuf->unlock();

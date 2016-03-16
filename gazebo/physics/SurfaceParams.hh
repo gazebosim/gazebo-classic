@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -99,6 +99,22 @@ namespace gazebo
       /// \param[in] _use True to use the surface radius.
       public: void SetUsePatchRadius(const bool _use);
 
+      /// \brief Get the Poisson's ratio
+      /// \return Poisson's ratio
+      public: double PoissonsRatio() const;
+
+      /// \brief Set the Poisson's ratio
+      /// \param[in] _ratio Poisson's ratio
+      public: void SetPoissonsRatio(const double _ratio);
+
+      /// \brief Get the elastic modulus
+      /// \return elastic modulus
+      public: double ElasticModulus() const;
+
+      /// \brief Set the elastic modulus
+      /// \param[in] _modulus elastic modulus to set to
+      public: void SetElasticModulus(const double _modulus);
+
       /// \brief Get the friction coefficient in a single direction.
       /// \param[in] _index Index of friction direction, 0 for primary,
       /// 1 for secondary direction.
@@ -146,6 +162,12 @@ namespace gazebo
       /// True to use the constant patch radius parameter. False to use the
       /// surface radius together with contact depth.
       private: bool usePatchRadius;
+
+      /// \brief Poisson's Ratio
+      private: double poissonsRatio;
+
+      /// \brief Elastic modulus.
+      private: double elasticModulus;
     };
 
     /// \class SurfaceParams SurfaceParams.hh physics/physics.hh

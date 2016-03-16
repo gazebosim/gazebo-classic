@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2015 Open Source Robotics Foundation
+ * Copyright (C) 2013-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -216,6 +216,20 @@ namespace gazebo
         public: static void DisconnectJointChanged(
             event::ConnectionPtr _subscriber)
           { jointChanged.Disconnect(_subscriber); }
+
+        /// \brief Connect a Gazebo event to the nested model removed signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectNestedModelRemoved(T _subscriber)
+          { return nestedModelRemoved.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the nested model removed
+        /// signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectNestedModelRemoved(
+            event::ConnectionPtr _subscriber)
+          { nestedModelRemoved.Disconnect(_subscriber); }
 
         /// \brief Connect a Gazebo event to the request link removal signal.
         /// \param[in] _subscriber the subscriber to this event
@@ -446,6 +460,22 @@ namespace gazebo
             event::ConnectionPtr _subscriber)
           { requestModelPluginRemoval.Disconnect(_subscriber); }
 
+        /// \brief Connect a Gazebo event to the request model plugin insertion
+        /// signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectRequestModelPluginInsertion(
+            T _subscriber)
+          { return requestModelPluginInsertion.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the request model plugin
+        /// insertion signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectRequestModelPluginInsertion(
+            event::ConnectionPtr _subscriber)
+          { requestModelPluginInsertion.Disconnect(_subscriber); }
+
         /// \brief A model has been completed and uploaded onto the server.
         public: static event::EventT<void ()> finishModel;
 
@@ -468,9 +498,8 @@ namespace gazebo
         public: static event::EventT<void (std::string)> modelNameChanged;
 
         /// \brief Notify that model properties have been changed.
-        // The properties are: is_static, auto_disable, pose, name.
-        public: static event::EventT<void (bool, bool, const math::Pose &,
-            const std::string &)> modelPropertiesChanged;
+        // The properties are: is_static, auto_disable.
+        public: static event::EventT<void (bool, bool)> modelPropertiesChanged;
 
         /// \brief Notify that model has been saved.
         public: static event::EventT<void (std::string)> saveModel;
@@ -483,6 +512,9 @@ namespace gazebo
 
         /// \brief Notify that a link has been inserted.
         public: static event::EventT<void (std::string)> linkInserted;
+
+        /// \brief Notify that a nested model has been removed.
+        public: static event::EventT<void (std::string)> nestedModelRemoved;
 
         /// \brief Notify that a link has been removed.
         public: static event::EventT<void (std::string)> linkRemoved;
@@ -550,6 +582,10 @@ namespace gazebo
         /// \brief Request to remove a model plugin.
         public: static event::EventT<void (std::string)>
             requestModelPluginRemoval;
+
+        /// \brief Request to insert a model plugin.
+        public: static event::EventT<void (std::string, std::string,
+            std::string)> requestModelPluginInsertion;
       };
     }
   }

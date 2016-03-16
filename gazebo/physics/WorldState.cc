@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -212,6 +212,12 @@ unsigned int WorldState::GetModelStateCount() const
 }
 
 /////////////////////////////////////////////////
+unsigned int WorldState::LightStateCount() const
+{
+  return this->lightStates.size();
+}
+
+/////////////////////////////////////////////////
 ModelState WorldState::GetModelState(const std::string &_modelName) const
 {
   // Search for the model name
@@ -315,7 +321,7 @@ WorldState &WorldState::operator=(const WorldState &_state)
   }
 
   // Copy the light states.
-  for (const auto &light : this->lightStates)
+  for (const auto &light : _state.lightStates)
   {
     this->lightStates.insert(std::make_pair(light.first,
           LightState(light.second)));
@@ -364,7 +370,7 @@ WorldState WorldState::operator-(const WorldState &_state) const
   }
 
   // Subtract the light states.
-  for (const auto &light : this->lightStates)
+  for (const auto &light : _state.lightStates)
   {
     if (this->HasLightState(light.second.GetName()))
     {
@@ -389,7 +395,8 @@ WorldState WorldState::operator-(const WorldState &_state) const
     if (!_state.HasModelState(iter->second.GetName()) && this->world)
     {
       ModelPtr model = this->world->GetModel(iter->second.GetName());
-      result.insertions.push_back(model->GetSDF()->ToString(""));
+      if (model)
+        result.insertions.push_back(model->UnscaledSDF()->ToString(""));
     }
   }
 
@@ -427,7 +434,7 @@ WorldState WorldState::operator+(const WorldState &_state) const
   }
 
   // Add the light states.
-  for (const auto &light : this->lightStates)
+  for (const auto &light : _state.lightStates)
   {
     LightState state = this->GetLightState(light.second.GetName()) +
         light.second;

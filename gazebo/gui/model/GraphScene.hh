@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ namespace gazebo
   {
     /// \class GraphScene GraphScene.hh
     /// \brief A scene of 2D graph nodes and edges
-    class GraphScene : public QGVScene
+    class GZ_GUI_VISIBLE GraphScene : public QGVScene
     {
       Q_OBJECT
 

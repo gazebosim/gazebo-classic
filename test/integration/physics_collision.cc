@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@
 
 using namespace gazebo;
 
-const double g_big = 1e29;
+const double g_big = 1e17;
 const double g_physics_tol = 1e-2;
 
 class PhysicsCollisionTest : public ServerFixture,

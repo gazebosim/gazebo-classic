@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@
 #include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
-class JointVisual_TEST : public ServerFixture
+class JointVisual_TEST : public RenderingFixture
 {
 };
 
@@ -42,13 +42,13 @@ TEST_F(JointVisual_TEST, JointVisualTest)
   // create a fake child visual where the joint visual will be attached to
   gazebo::rendering::VisualPtr childVis;
   childVis.reset(
-      new gazebo::rendering::Visual("child", scene->GetWorldVisual()));
+      new gazebo::rendering::Visual("child", scene->WorldVisual()));
 
   // create a joint message for testing
   gazebo::msgs::JointPtr jointMsg;
   jointMsg.reset(new gazebo::msgs::Joint);
-  jointMsg->set_parent(scene->GetWorldVisual()->GetName());
-  jointMsg->set_parent_id(scene->GetWorldVisual()->GetId());
+  jointMsg->set_parent(scene->WorldVisual()->GetName());
+  jointMsg->set_parent_id(scene->WorldVisual()->GetId());
   jointMsg->set_child(childVis->GetName());
   jointMsg->set_child_id(childVis->GetId());
   jointMsg->set_name("test_joint");

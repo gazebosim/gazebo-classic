@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@
 #ifndef _GAZEBO_MODEL_MAKER_PRIVATE_HH_
 #define _GAZEBO_MODEL_MAKER_PRIVATE_HH_
 
+#include <list>
+
 #include "gazebo/gui/EntityMakerPrivate.hh"
 
 namespace gazebo
@@ -28,6 +30,9 @@ namespace gazebo
     {
       /// \brief The model visual being created.
       public: rendering::VisualPtr modelVisual;
+
+      /// \brief A list of model visuals created by the model maker.
+      public: std::list<rendering::VisualWeakPtr> visuals;
 
       /// \brief The SDF representation of the model.
       public: sdf::SDFPtr modelSDF;

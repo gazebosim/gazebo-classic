@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,18 +23,24 @@
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Assert.hh"
 
+#include "gazebo/rendering/UserCamera.hh"
+
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/RenderWidget.hh"
 #include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/TopToolbar.hh"
+#include "gazebo/gui/model/EditorMaterialSwitcher.hh"
+#include "gazebo/gui/model/ModelTreeWidget.hh"
 #include "gazebo/gui/model/ModelEditorPalette.hh"
 #include "gazebo/gui/model/ModelEditorEvents.hh"
 #include "gazebo/gui/model/ModelCreator.hh"
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/ModelEditorPrivate.hh"
 #include "gazebo/gui/model/ModelEditor.hh"
+#include "gazebo/gui/model/ModelEditorTypes.hh"
 
 #ifdef HAVE_GRAPHVIZ
 #include "gazebo/gui/model/SchematicViewWidget.hh"
@@ -48,14 +54,34 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   : Editor(_mainWindow), dataPtr(new ModelEditorPrivate)
 {
   this->dataPtr->active = false;
-  // Create the model editor tab
+  // Create the model editor palette tab
   this->dataPtr->modelPalette = new ModelEditorPalette(_mainWindow);
-  this->Init("modelEditorTab", "Model Editor", this->dataPtr->modelPalette);
+  // create the model tree tab
+  this->dataPtr->modelTree = new ModelTreeWidget(_mainWindow);
+  this->dataPtr->modelTree->hide();
+  this->Init("modelEditorTab", "Insert", this->dataPtr->modelPalette);
+  this->tabWidget->addTab(this->dataPtr->modelTree, tr("Model"));
+
+  GZ_ASSERT(this->tabWidget != NULL, "Editor tab widget is NULL");
+
+  rendering::CameraPtr camera = boost::dynamic_pointer_cast<rendering::Camera>(
+      gui::get_active_camera());
+  if (camera)
+  {
+    this->dataPtr->materialSwitcher.reset(new EditorMaterialSwitcher(camera));
+  }
+  else
+  {
+    gzerr << "User camera is NULL. "
+        << "Non-editable models will keep their original material"
+        << std::endl;
+  }
+
 
   this->dataPtr->schematicViewAct = NULL;
   this->dataPtr->svWidget = NULL;
 #ifdef HAVE_GRAPHVIZ
-  RenderWidget *renderWidget = _mainWindow->GetRenderWidget();
+  RenderWidget *renderWidget = _mainWindow->RenderWidget();
   this->dataPtr->svWidget = new SchematicViewWidget(renderWidget);
   this->dataPtr->svWidget->setSizePolicy(QSizePolicy::Expanding,
       QSizePolicy::Expanding);
@@ -102,7 +128,7 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   this->dataPtr->showJointsAct->setCheckable(true);
   this->dataPtr->showJointsAct->setChecked(true);
   connect(this->dataPtr->showJointsAct, SIGNAL(toggled(bool)),
-      this->dataPtr->modelPalette->GetModelCreator()->GetJointMaker(),
+      this->dataPtr->modelPalette->GetModelCreator()->JointMaker(),
       SLOT(ShowJoints(bool)));
 
   // Clone actions from main window
@@ -126,15 +152,6 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
       tr("Joint"), this);
   this->dataPtr->jointAct->setCheckable(true);
   this->dataPtr->jointAct->setObjectName("modelEditorJointAct");
-
-  // set up the action group so that only one action is active at one time.
-  QActionGroup *actionGroup = g_arrowAct->actionGroup();
-  if (actionGroup)
-  {
-    this->dataPtr->jointAct->setActionGroup(actionGroup);
-    connect(actionGroup, SIGNAL(triggered(QAction *)),
-        this, SLOT(OnAction(QAction *)));
-  }
 
   QToolButton *jointButton = new QToolButton();
   jointButton->setObjectName("jointToolButton");
@@ -181,7 +198,7 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   jointActionGroup->addAction(fixedJointAct);
   jointActionGroup->setExclusive(true);
 
-  TopToolbar *topToolbar = this->mainWindow->GetRenderWidget()->GetToolbar();
+  TopToolbar *topToolbar = this->mainWindow->RenderWidget()->GetToolbar();
 
   // Separator
   QAction *jointSeparatorAct =
@@ -245,17 +262,20 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   connect(this->dataPtr->jointAct, SIGNAL(triggered()), this,
       SLOT(OnAddSelectedJoint()));
 
-  connect(this->dataPtr->modelPalette->GetModelCreator()->GetJointMaker(),
+  connect(this->dataPtr->modelPalette->GetModelCreator()->JointMaker(),
       SIGNAL(JointAdded()), this, SLOT(OnJointAdded()));
 
+  this->dataPtr->connections.push_back(
+      gui::Events::ConnectCreateEntity(
+        boost::bind(&ModelEditor::OnCreateEntity, this, _1, _2)));
+
   this->dataPtr->menuBar = NULL;
+  this->dataPtr->insertModel = NULL;
 }
 
 /////////////////////////////////////////////////
 ModelEditor::~ModelEditor()
 {
-  delete this->dataPtr;
-  this->dataPtr = NULL;
 }
 
 ////////////////////////////////////////////////
@@ -348,6 +368,7 @@ void ModelEditor::CreateMenus()
 /////////////////////////////////////////////////
 void ModelEditor::OnAddSelectedJoint()
 {
+  g_arrowAct->trigger();
   this->OnAddJoint(tr(this->dataPtr->selectedJointType.c_str()));
 }
 
@@ -364,7 +385,8 @@ void ModelEditor::OnAddJoint(const QString &_type)
 /////////////////////////////////////////////////
 void ModelEditor::OnJointAdded()
 {
-  if (this->dataPtr->jointAct->isChecked())
+  if (this->dataPtr && this->dataPtr->jointAct &&
+      this->dataPtr->jointAct->isChecked())
   {
     this->dataPtr->jointAct->setChecked(false);
     g_arrowAct->trigger();
@@ -382,13 +404,13 @@ void ModelEditor::OnEdit(bool /*_checked*/)
     this->mainWindow->ShowMenuBar(this->dataPtr->menuBar);
     if (!g_showToolbarsAct->isChecked())
       g_showToolbarsAct->trigger();
-    this->mainWindow->GetRenderWidget()->ShowTimePanel(false);
+    this->mainWindow->RenderWidget()->ShowTimePanel(false);
   }
   else
   {
     this->mainWindow->ShowLeftColumnWidget();
     this->mainWindow->ShowMenuBar();
-    this->mainWindow->GetRenderWidget()->ShowTimePanel(true);
+    this->mainWindow->RenderWidget()->ShowTimePanel(true);
   }
 
 #ifdef HAVE_GRAPHVIZ
@@ -402,8 +424,60 @@ void ModelEditor::OnEdit(bool /*_checked*/)
 #endif
 
   this->dataPtr->active = !this->dataPtr->active;
+  this->ToggleMaterialScheme();
   this->ToggleToolbar();
+  this->ToggleInsertWidget();
   // g_editModelAct->setChecked(this->dataPtr->active);
+}
+
+/////////////////////////////////////////////////
+void ModelEditor::ToggleInsertWidget()
+{
+  QTabWidget *mainTab = this->mainWindow->findChild<QTabWidget *>("mainTab");
+  if (!mainTab)
+    return;
+
+  if (!this->dataPtr->active)
+  {
+    if (this->dataPtr->insertModel)
+      this->dataPtr->modelPalette->RemoveWidget(this->dataPtr->insertModel);
+    this->dataPtr->modelTree->hide();
+    mainTab->setCurrentIndex(0);
+    return;
+  }
+
+  for (int i = 0; i < mainTab->count(); ++i)
+  {
+    if (mainTab->tabText(i) == tr("Insert"))
+    {
+      auto insertModel = mainTab->widget(i);
+
+      // Remove from main tab before inserting in new layout
+      mainTab->removeTab(i);
+
+      // Add title
+      auto databaseLabel = new QLabel(tr(
+          "<font size=4 color='white'>Model Database</font>"));
+
+      // Insert in new layout with title
+      auto insertLayout = new QVBoxLayout();
+      insertLayout->addWidget(databaseLabel);
+      insertLayout->addWidget(insertModel);
+
+      auto insertWidget = new QWidget();
+      insertWidget->setLayout(insertLayout);
+
+      this->dataPtr->insertModel = insertWidget;
+
+      // Insert in palette
+      this->dataPtr->modelPalette->InsertWidget(1, insertWidget);
+      this->dataPtr->modelPalette->show();
+      insertModel->show();
+      this->tabWidget->setCurrentIndex(0);
+
+      break;
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -414,10 +488,12 @@ void ModelEditor::OnFinish()
 }
 
 /////////////////////////////////////////////////
-void ModelEditor::OnAction(QAction *_action)
+void ModelEditor::ToggleMaterialScheme()
 {
-  if (_action != this->dataPtr->jointAct)
-    this->dataPtr->modelPalette->CreateJoint("none");
+  if (this->dataPtr->active)
+    this->dataPtr->materialSwitcher->SetMaterialScheme("ModelEditor");
+  else
+    this->dataPtr->materialSwitcher->SetMaterialScheme("");
 }
 
 /////////////////////////////////////////////////
@@ -427,4 +503,42 @@ void ModelEditor::ToggleToolbar()
     gui::Events::windowMode("ModelEditor");
   else
     gui::Events::windowMode("Simulation");
+}
+
+/////////////////////////////////////////////////
+void ModelEditor::OnCreateEntity(const std::string &_type,
+                                 const std::string &_data)
+{
+  if (!this->dataPtr->active)
+    return;
+
+  if (_type == "model" && !_data.empty())
+  {
+    sdf::SDFPtr modelSDF(new sdf::SDF);
+    sdf::initFile("root.sdf", modelSDF);
+
+    if (!sdf::readFile(_data, modelSDF))
+    {
+      gzerr << "Unable to load file[" << _data << "]\n";
+      return;
+    }
+
+    if (modelSDF->Root()->HasElement("model"))
+    {
+      this->AddEntity(modelSDF->Root()->GetElement("model"));
+    }
+    else
+    {
+      gzerr << "No model in SDF\n";
+      return;
+    }
+  }
+}
+
+////////////////////////////////////////////////
+void ModelEditor::AddEntity(sdf::ElementPtr _sdf)
+{
+  event::Events::setSelectedEntity("", "normal");
+  g_arrowAct->trigger();
+  this->dataPtr->modelPalette->GetModelCreator()->AddEntity(_sdf);
 }

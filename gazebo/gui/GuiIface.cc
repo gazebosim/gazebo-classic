@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,6 +70,10 @@ bool g_fullscreen = false;
 // This makes it possible to use common::Time in QT signals and slots.
 // qRegisterMetaType is also required, see below.
 Q_DECLARE_METATYPE(common::Time)
+
+// This makes it possible to use std::string in QT signals and slots.
+// qRegisterMetaType is also required, see below.
+Q_DECLARE_METATYPE(std::string)
 
 //////////////////////////////////////////////////
 void print_usage()
@@ -259,6 +263,10 @@ bool gui::load()
   // Q_DECLARE_METATYPE is also required, see above.
   qRegisterMetaType<common::Time>();
 
+  // Register std::string as a type that can be used in signals and slots.
+  // Q_DECLARE_METATYPE is also required, see above.
+  qRegisterMetaType<std::string>();
+
   g_splashScreen = new gui::SplashScreen();
 
   g_main_win = new gui::MainWindow();
@@ -272,7 +280,7 @@ bool gui::load()
 unsigned int gui::get_entity_id(const std::string &_name)
 {
   if (g_main_win)
-    return g_main_win->GetEntityId(_name);
+    return g_main_win->EntityId(_name);
   else
     return 0;
 }

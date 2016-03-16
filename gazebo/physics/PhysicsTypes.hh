@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,8 @@ namespace gazebo
     class JointController;
     class Contact;
     class PresetManager;
+    class UserCmd;
+    class UserCmdManager;
     class PhysicsEngine;
     class Mass;
     class Road;
@@ -116,6 +118,14 @@ namespace gazebo
     /// \def  PresetManagerPtr
     /// \brief Shared pointer to a PresetManager object
     typedef boost::shared_ptr<PresetManager> PresetManagerPtr;
+
+    /// \def  UserCmdPtr
+    /// \brief Shared pointer to a UserCmd object
+    typedef std::shared_ptr<UserCmd> UserCmdPtr;
+
+    /// \def  UserCmdManagerPtr
+    /// \brief Shared pointer to a UserCmdManager object
+    typedef std::shared_ptr<UserCmdManager> UserCmdManagerPtr;
 
     /// \def ShapePtr
     /// \brief Boost shared pointer to a Shape object

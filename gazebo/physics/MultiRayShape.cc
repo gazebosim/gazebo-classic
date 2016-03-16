@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,10 +30,16 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 MultiRayShape::MultiRayShape(CollisionPtr _parent)
-  : Shape(_parent)
+: Shape(_parent)
 {
   this->AddType(MULTIRAY_SHAPE);
   this->SetName("multiray");
+}
+
+//////////////////////////////////////////////////
+MultiRayShape::MultiRayShape(PhysicsEnginePtr /*_physicsEngine*/)
+: MultiRayShape(CollisionPtr())
+{
 }
 
 //////////////////////////////////////////////////
@@ -58,8 +64,6 @@ void MultiRayShape::Init()
   // double vertResolution = 1.0;
   double vertMinAngle = 0;
 
-  double minRange, maxRange;
-
   this->rayElem = this->sdf->GetElement("ray");
   this->scanElem = this->rayElem->GetElement("scan");
   this->horzElem = this->scanElem->GetElement("horizontal");
@@ -81,8 +85,8 @@ void MultiRayShape::Init()
   // horzResolution = this->horzElem->Get<double>("resolution");
   yDiff = horzMaxAngle - horzMinAngle;
 
-  minRange = this->rangeElem->Get<double>("min");
-  maxRange = this->rangeElem->Get<double>("max");
+  this->minRange = this->rangeElem->Get<double>("min");
+  this->maxRange = this->rangeElem->Get<double>("max");
 
   this->offset = this->collisionParent->GetRelativePose();
 
@@ -102,8 +106,8 @@ void MultiRayShape::Init()
       ray.SetFromEuler(math::Vector3(0.0, -pitchAngle, yawAngle));
       axis = this->offset.rot * ray * math::Vector3(1.0, 0.0, 0.0);
 
-      start = (axis * minRange) + this->offset.pos;
-      end = (axis * maxRange) + this->offset.pos;
+      start = (axis * this->minRange) + this->offset.pos;
+      end = (axis * this->maxRange) + this->offset.pos;
 
       this->AddRay(start, end);
     }
@@ -175,8 +179,8 @@ void MultiRayShape::Update()
 
   // Reset the ray lengths and mark the collisions as dirty (so they get
   // redrawn)
-  unsigned int ray_size = this->rays.size();
-  for (unsigned int i = 0; i < ray_size; i++)
+  unsigned int raySize = this->rays.size();
+  for (unsigned int i = 0; i < raySize; ++i)
   {
     this->rays[i]->SetLength(fullRange);
     this->rays[i]->SetRetro(0.0);
@@ -190,6 +194,20 @@ void MultiRayShape::Update()
 
   // for plugin
   this->newLaserScans();
+}
+
+//////////////////////////////////////////////////
+bool MultiRayShape::SetRay(const unsigned int _rayIndex,
+    const ignition::math::Vector3d &_start,
+    const ignition::math::Vector3d &_end)
+{
+  if (_rayIndex < this->rays.size())
+  {
+    this->rays[_rayIndex]->SetPoints(_start, _end);
+    return true;
+  }
+
+  return false;
 }
 
 //////////////////////////////////////////////////
@@ -207,13 +225,13 @@ void MultiRayShape::AddRay(const math::Vector3 &/*_start*/,
 //////////////////////////////////////////////////
 double MultiRayShape::GetMinRange() const
 {
-  return this->rangeElem->Get<double>("min");
+  return this->minRange;
 }
 
 //////////////////////////////////////////////////
 double MultiRayShape::GetMaxRange() const
 {
-  return this->rangeElem->Get<double>("max");
+  return this->maxRange;
 }
 
 //////////////////////////////////////////////////
@@ -296,4 +314,20 @@ void MultiRayShape::ProcessMsg(const msgs::Geometry &/*_msg*/)
 double MultiRayShape::ComputeVolume() const
 {
   return 0;
+}
+
+
+//////////////////////////////////////////////////
+unsigned int MultiRayShape::RayCount() const
+{
+  return this->rays.size();
+}
+
+//////////////////////////////////////////////////
+RayShapePtr MultiRayShape::Ray(const unsigned int _rayIndex) const
+{
+  if (_rayIndex < this->rays.size())
+    return this->rays[_rayIndex];
+  else
+    return RayShapePtr();
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@
 #include <string>
 #include <vector>
 
-#include "gazebo/sensors/SensorManager.hh"
+#include <ignition/math/Rand.hh>
 #include "gazebo/math/Rand.hh"
 
 #include "gazebo/transport/Node.hh"
@@ -71,6 +71,7 @@
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/PhysicsFactory.hh"
 #include "gazebo/physics/PresetManager.hh"
+#include "gazebo/physics/UserCmdManager.hh"
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/Light.hh"
 #include "gazebo/physics/Actor.hh"
@@ -159,6 +160,7 @@ World::World(const std::string &_name)
 World::~World()
 {
   this->dataPtr->presetManager.reset();
+  this->dataPtr->userCmdManager.reset();
   delete this->dataPtr->receiveMutex;
   this->dataPtr->receiveMutex = NULL;
   delete this->dataPtr->loadModelMutex;
@@ -315,6 +317,9 @@ void World::Load(sdf::ElementPtr _sdf)
   // this->dataPtr->modelUpdateFunc = &World::ModelUpdateTBB;
 
   event::Events::worldCreated(this->GetName());
+
+  this->dataPtr->userCmdManager = UserCmdManagerPtr(
+      new UserCmdManager(shared_from_this()));
 
   this->dataPtr->loaded = true;
 }
@@ -591,6 +596,18 @@ void World::LogStep()
 }
 
 //////////////////////////////////////////////////
+void World::_SetSensorsInitialized(const bool _init)
+{
+  this->dataPtr->sensorsInitialized = _init;
+}
+
+//////////////////////////////////////////////////
+bool World::SensorsInitialized() const
+{
+  return this->dataPtr->sensorsInitialized;
+}
+
+//////////////////////////////////////////////////
 void World::Step()
 {
   DIAG_TIMER_START("World::Step");
@@ -599,8 +616,7 @@ void World::Step()
   /// until dWorld.*Step
   /// Plugins that manipulate joints (and probably other properties) require
   /// one iteration of the physics engine. Do not remove this.
-  if (!this->dataPtr->pluginsLoaded &&
-      sensors::SensorManager::Instance()->SensorsInitialized())
+  if (!this->dataPtr->pluginsLoaded && this->SensorsInitialized())
   {
     this->LoadPlugins();
     this->dataPtr->pluginsLoaded = true;
@@ -663,7 +679,7 @@ void World::Step()
     else
     {
       // Flush the log record buffer, if there is data in it.
-      if (util::LogRecord::Instance()->GetBufferSize() > 0)
+      if (util::LogRecord::Instance()->BufferSize() > 0)
         util::LogRecord::Instance()->Notify();
       this->dataPtr->pauseTime += stepTime;
     }
@@ -736,7 +752,7 @@ void World::Update()
   DIAG_TIMER_LAP("World::Update", "PhysicsEngine::UpdateCollision");
 
   // Wait for logging to finish, if it's running.
-  if (util::LogRecord::Instance()->GetRunning())
+  if (util::LogRecord::Instance()->Running())
   {
     boost::mutex::scoped_lock lock(this->dataPtr->logMutex);
 
@@ -778,7 +794,7 @@ void World::Update()
   }
 
   // Only update state information if logging data.
-  if (util::LogRecord::Instance()->GetRunning())
+  if (util::LogRecord::Instance()->Running())
     this->dataPtr->logCondition.notify_one();
   DIAG_TIMER_LAP("World::Update", "LogRecordNotify");
 
@@ -799,6 +815,7 @@ void World::Fini()
   this->dataPtr->plugins.clear();
 
   this->dataPtr->publishModelPoses.clear();
+  this->dataPtr->publishModelScales.clear();
   this->dataPtr->publishLightPoses.clear();
 
   this->dataPtr->node->Fini();
@@ -838,6 +855,7 @@ void World::ClearModels()
   this->SetPaused(true);
 
   this->dataPtr->publishModelPoses.clear();
+  this->dataPtr->publishModelScales.clear();
 
   // Remove all models
   for (auto &model : this->dataPtr->models)
@@ -871,6 +889,38 @@ PresetManagerPtr World::GetPresetManager() const
 common::SphericalCoordinatesPtr World::GetSphericalCoordinates() const
 {
   return this->dataPtr->sphericalCoordinates;
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d World::Gravity() const
+{
+  return this->dataPtr->sdf->Get<ignition::math::Vector3d>("gravity");
+}
+
+//////////////////////////////////////////////////
+void World::SetGravity(const ignition::math::Vector3d &_gravity)
+{
+  // This function calls `PhysicsEngine::SetGravity`,
+  // which in turn should call `World::SetGravitySDF`.
+  this->dataPtr->physicsEngine->SetGravity(_gravity);
+}
+
+//////////////////////////////////////////////////
+void World::SetGravitySDF(const ignition::math::Vector3d &_gravity)
+{
+  this->dataPtr->sdf->GetElement("gravity")->Set(_gravity);
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d World::MagneticField() const
+{
+  return this->dataPtr->sdf->Get<ignition::math::Vector3d>("magnetic_field");
+}
+
+//////////////////////////////////////////////////
+void World::SetMagneticField(const ignition::math::Vector3d &_mag)
+{
+  this->dataPtr->sdf->GetElement("magnetic_field")->Set(_mag);
 }
 
 //////////////////////////////////////////////////
@@ -956,6 +1006,7 @@ LightPtr World::LoadLight(const sdf::ElementPtr &_sdf, const BasePtr &_parent)
 
   // Create new light object
   LightPtr light(new physics::Light(_parent));
+  light->SetStatic(true);
   light->ProcessMsg(*msg);
   light->SetWorld(shared_from_this());
   light->Load(_sdf);
@@ -1083,7 +1134,9 @@ void World::ResetTime()
   if (this->IsPaused())
     this->dataPtr->pauseStartTime = this->dataPtr->startTime;
 
-  sensors::SensorManager::Instance()->ResetLastUpdateTimes();
+  // Signal a reset has occurred. The SensorManager listens to this event
+  // to reset each sensor's last update time.
+  event::Events::timeReset();
 }
 
 //////////////////////////////////////////////////
@@ -1102,6 +1155,7 @@ void World::Reset()
     boost::recursive_mutex::scoped_lock lk(*this->dataPtr->worldUpdateMutex);
 
     math::Rand::SetSeed(math::Rand::GetSeed());
+    ignition::math::Rand::Seed(ignition::math::Rand::Seed());
     this->dataPtr->physicsEngine->SetSeed(math::Rand::GetSeed());
 
     this->ResetTime();
@@ -1238,6 +1292,7 @@ void World::OnControl(ConstWorldControlPtr &_data)
   if (_data->has_seed())
   {
     math::Rand::SetSeed(_data->seed());
+    ignition::math::Rand::Seed(_data->seed());
     this->dataPtr->physicsEngine->SetSeed(_data->seed());
   }
 
@@ -1554,14 +1609,41 @@ void World::ProcessRequestMsgs()
         response.set_response("nonexistent");
       }
     }
-    else if (requestMsg.request() == "world_sdf")
+    else if (requestMsg.request().find("world_sdf") != std::string::npos)
     {
-      msgs::GzString msg;
       this->UpdateStateSDF();
+
+      sdf::ElementPtr newSdf(this->dataPtr->sdf);
+
+      // FIXME: Handle scale better on the server so we don't need to unscale
+      // SDF here. Issue #1825
+      if (requestMsg.request() == "world_sdf_save")
+      {
+        // Substitute all models sdf with unscaled versions
+        if (newSdf->HasElement("model"))
+        {
+          auto modelElem = newSdf->GetElement("model");
+          while (modelElem)
+          {
+            auto name = modelElem->GetAttribute("name")->GetAsString();
+            auto model = this->GetModel(name);
+            if (model)
+            {
+              auto unscaled = model->UnscaledSDF()->Clone();
+
+              modelElem->Copy(unscaled);
+            }
+
+            modelElem = modelElem->GetNextElement("model");
+          }
+        }
+      }
+
+      msgs::GzString msg;
       std::ostringstream stream;
       stream << "<?xml version='1.0'?>\n"
              << "<sdf version='" << SDF_VERSION << "'>\n"
-             << this->dataPtr->sdf->ToString("")
+             << newSdf->ToString("")
              << "</sdf>";
 
       msg.set_data(stream.str());
@@ -1906,8 +1988,6 @@ ModelPtr World::GetModelBelowPoint(const math::Vector3 &_pt)
 
   if (entity)
     model = entity->GetParentModel();
-  else
-    gzerr << "Unable to find entity below point[" << _pt << "]\n";
 
   return model;
 }
@@ -2031,7 +2111,7 @@ bool World::OnLog(std::ostringstream &_stream)
 {
   int bufferIndex = this->dataPtr->currentStateBuffer;
   // Save the entire state when its the first call to OnLog.
-  if (util::LogRecord::Instance()->GetFirstUpdate())
+  if (util::LogRecord::Instance()->FirstUpdate())
   {
     this->dataPtr->sdf->Update();
     _stream << "<sdf version ='";
@@ -2058,7 +2138,7 @@ bool World::OnLog(std::ostringstream &_stream)
 
   // Logging has stopped. Wait for log worker to finish. Output last bit
   // of data, and reset states.
-  if (!util::LogRecord::Instance()->GetRunning())
+  if (!util::LogRecord::Instance()->Running())
   {
     boost::mutex::scoped_lock lock(this->dataPtr->logBufferMutex);
 
@@ -2156,6 +2236,43 @@ void World::ProcessMessages()
     this->dataPtr->publishModelPoses.clear();
   }
 
+  {
+    boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
+
+    if (this->dataPtr->modelPub && this->dataPtr->modelPub->HasConnections())
+    {
+      if (!this->dataPtr->publishModelScales.empty())
+      {
+        for (auto const &model : this->dataPtr->publishModelScales)
+        {
+          std::list<ModelPtr> modelList;
+          modelList.push_back(model);
+          while (!modelList.empty())
+          {
+            ModelPtr m = modelList.front();
+            modelList.pop_front();
+
+            // Publish the model's scale
+            msgs::Model msg;
+            msg.set_name(m->GetScopedName());
+            msg.set_id(m->GetId());
+            msgs::Set(msg.mutable_scale(), m->Scale());
+
+            // Not publishing for links for now
+
+            // add all nested models to the queue
+            Model_V models = m->NestedModels();
+            for (auto const &n : models)
+              modelList.push_back(n);
+
+            this->dataPtr->modelPub->Publish(msg);
+          }
+        }
+      }
+    }
+    this->dataPtr->publishModelScales.clear();
+  }
+
   if (common::Time::GetWallTime() - this->dataPtr->prevProcessMsgsTime >
       this->dataPtr->processMsgsPeriod)
   {
@@ -2208,9 +2325,9 @@ void World::PublishWorldStats()
   {
     msgs::LogPlaybackStatistics logStats;
     msgs::Set(logStats.mutable_start_time(),
-        util::LogPlay::Instance()->GetLogStartTime());
+        util::LogPlay::Instance()->LogStartTime());
     msgs::Set(logStats.mutable_end_time(),
-        util::LogPlay::Instance()->GetLogEndTime());
+        util::LogPlay::Instance()->LogEndTime());
 
     this->dataPtr->worldStatsMsg.mutable_log_playback_stats()->CopyFrom(
         logStats);
@@ -2234,6 +2351,15 @@ void World::PublishModelPose(physics::ModelPtr _model)
 
   // Only add if the model name is not in the list
   this->dataPtr->publishModelPoses.insert(_model);
+}
+
+//////////////////////////////////////////////////
+void World::PublishModelScale(physics::ModelPtr _model)
+{
+  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
+
+  // Only add if the model name is not in the list
+  this->dataPtr->publishModelScales.insert(_model);
 }
 
 //////////////////////////////////////////////////
@@ -2466,4 +2592,11 @@ void World::_AddDirty(Entity *_entity)
 {
   GZ_ASSERT(_entity != NULL, "_entity is NULL");
   this->dataPtr->dirtyPoses.push_back(_entity);
+}
+
+/////////////////////////////////////////////////
+void World::ResetPhysicsStates()
+{
+  for (auto &model : this->dataPtr->models)
+    model->ResetPhysicsStates();
 }

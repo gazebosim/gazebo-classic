@@ -63,7 +63,7 @@ set (gtest_sources
   Vector3Stats_TEST.cc
   Vector4_TEST.cc
 )
-gz_build_tests(${gtest_sources})
+gz_build_tests(${gtest_sources} EXTRA_LIBS gazebo_math)
 
 set (math_headers "" CACHE INTERNAL "transport headers" FORCE)
 foreach (hdr ${headers})

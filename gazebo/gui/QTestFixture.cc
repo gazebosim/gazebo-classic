@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,12 +38,14 @@ QTestFixture::QTestFixture()
     resMaxPercentChange(0), shareMaxPercentChange(0),
     residentStart(0), shareStart(0)
 {
-  gazebo::common::Console::SetQuiet(false);
 }
 
 /////////////////////////////////////////////////
 void QTestFixture::initTestCase()
 {
+  // Verbose mode
+  gazebo::common::Console::SetQuiet(false);
+
   // Initialize the informational logger. This will log warnings, and
   // errors.
   gzLogInit("qtest-", "test.log");
@@ -118,6 +120,19 @@ void QTestFixture::RunServer(const std::string &_worldFilename,
 void QTestFixture::SetPause(bool _pause)
 {
   gazebo::physics::pause_worlds(_pause);
+}
+
+/////////////////////////////////////////////////
+void QTestFixture::ProcessEventsAndDraw(QMainWindow *_mainWindow,
+    const unsigned int _repeat, const unsigned int _ms)
+{
+  for (size_t i = 0; i < _repeat; ++i)
+  {
+    gazebo::common::Time::MSleep(_ms);
+    QCoreApplication::processEvents();
+    if (_mainWindow)
+      _mainWindow->repaint();
+  }
 }
 
 /////////////////////////////////////////////////

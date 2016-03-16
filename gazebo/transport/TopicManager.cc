@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -402,17 +402,29 @@ void TopicManager::Unadvertise(const std::string &_topic)
 }
 
 //////////////////////////////////////////////////
+void TopicManager::Unadvertise(const std::string &_topic, const uint32_t _id)
+{
+  unsigned int pubsSameTopic = 0;
+  PublicationPtr publication = this->FindPublication(_topic);
+  if (publication)
+  {
+    publication->RemovePublisher(_id);
+    pubsSameTopic = publication->PublisherCount();
+  }
+
+  // Unadvertise topic if this was its last publisher
+  if (pubsSameTopic == 0)
+    this->Unadvertise(_topic);
+}
+
+//////////////////////////////////////////////////
 void TopicManager::Unadvertise(PublisherPtr _pub)
 {
   GZ_ASSERT(_pub, "Unadvertising a NULL Publisher");
 
   if (_pub)
   {
-    PublicationPtr publication = this->FindPublication(_pub->GetTopic());
-    if (publication)
-      publication->RemovePublisher(_pub);
-
-    this->Unadvertise(_pub->GetTopic());
+    this->Unadvertise(_pub->GetTopic(), _pub->Id());
   }
 }
 
@@ -431,11 +443,8 @@ void TopicManager::GetTopicNamespaces(std::list<std::string> &_namespaces)
 //////////////////////////////////////////////////
 void TopicManager::ClearBuffers()
 {
-  PublicationPtr_M::iterator iter;
-  for (iter = this->advertisedTopics.begin();
-       iter != this->advertisedTopics.end(); ++iter)
-  {
-  }
+  for (auto iter : this->advertisedTopics)
+    iter.second->ClearPrevMsgs();
 }
 
 //////////////////////////////////////////////////
