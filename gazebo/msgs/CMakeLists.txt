@@ -25,6 +25,7 @@ set (msgs
   friction.proto
   geometry.proto
   gps.proto
+  gps_sensor.proto
   gui_camera.proto
   gui.proto
   gz_string.proto
@@ -37,6 +38,7 @@ set (msgs
   image_stamped.proto
   images_stamped.proto
   imu.proto
+  imu_sensor.proto
   inertial.proto
   int.proto
   joint.proto
@@ -94,6 +96,7 @@ set (msgs
   scene.proto
   selection.proto
   sensor.proto
+  sensor_noise.proto
   server_control.proto
   shadows.proto
   sim_event.proto
