@@ -45,6 +45,14 @@ class ModelListWidget_TEST : public QTestFixture
   private: void CheckPoseProperty(QList<QtProperty *> _properties,
       const gazebo::math::Pose &_pose);
 
+  /// \brief Set vector3 values.
+  /// \param[in] _propTreeBrowser Property browser.
+  /// \param[in] _properties Pose properties.
+  /// \param[in] _xyz Expected vector3 values.
+  private: void SetVector3Property(QtTreePropertyBrowser *propTreeBrowser,
+      QList<QtProperty *> _properties,
+      const ignition::math::Vector3d &_xyz);
+
   /// \brief Set pose values.
   /// \param[in] _propTreeBrowser Property browser.
   /// \param[in] _properties Pose properties.

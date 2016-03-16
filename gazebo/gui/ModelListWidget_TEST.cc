@@ -119,48 +119,52 @@ void ModelListWidget_TEST::CheckPoseProperty(QList<QtProperty *> _properties,
 }
 
 /////////////////////////////////////////////////
+void ModelListWidget_TEST::SetVector3Property(
+    QtTreePropertyBrowser *_propTreeBrowser,
+    QList<QtProperty *> _properties,
+    const ignition::math::Vector3d &_xyz)
+{
+  QVERIFY(_properties.size() >= 3);
+  for (unsigned char c = 0; c < 3; ++c)
+  {
+    QtVariantProperty *property =
+      static_cast<QtVariantProperty *>(_properties[c]);
+    Q_ASSERT(property);
+    std::string name(1, 'x' + c);
+    QCOMPARE(property->propertyName(), tr(name.c_str()));
+    QVERIFY(_propTreeBrowser->items(property).size() == 1);
+    _propTreeBrowser->setCurrentItem(_propTreeBrowser->items(property)[0]);
+    property->setValue(_xyz[c]);
+  }
+  QTest::qWait(1000);
+}
+
+/////////////////////////////////////////////////
 void ModelListWidget_TEST::SetPoseProperty(
-    QtTreePropertyBrowser *propTreeBrowser,
+    QtTreePropertyBrowser *_propTreeBrowser,
     QList<QtProperty *> _properties,
     const gazebo::math::Pose &_pose)
 {
   QCOMPARE(_properties.size(), 6);
-  QtVariantProperty *property =
-      static_cast<QtVariantProperty *>(_properties[0]);
-  Q_ASSERT(property);
-  QCOMPARE(property->propertyName(), tr("x"));
-  QVERIFY(propTreeBrowser->items(property).size() == 1);
-  propTreeBrowser->setCurrentItem(propTreeBrowser->items(property)[0]);
-  property->setValue(_pose.pos.x);
-  property = static_cast<QtVariantProperty *>(_properties[1]);
-  Q_ASSERT(property);
-  QCOMPARE(property->propertyName(), tr("y"));
-  QVERIFY(propTreeBrowser->items(property).size() == 1);
-  propTreeBrowser->setCurrentItem(propTreeBrowser->items(property)[0]);
-  property->setValue(_pose.pos.y);
-  property = static_cast<QtVariantProperty *>(_properties[2]);
-  Q_ASSERT(property);
-  QCOMPARE(property->propertyName(), tr("z"));
-  QVERIFY(propTreeBrowser->items(property).size() == 1);
-  propTreeBrowser->setCurrentItem(propTreeBrowser->items(property)[0]);
-  property->setValue(_pose.pos.z);
+  SetVector3Property(_propTreeBrowser, _properties, _pose.pos.Ign());
+  QtVariantProperty *property;
   property = static_cast<QtVariantProperty *>(_properties[3]);
   Q_ASSERT(property);
   QCOMPARE(property->propertyName(), tr("roll"));
-  QVERIFY(propTreeBrowser->items(property).size() == 1);
-  propTreeBrowser->setCurrentItem(propTreeBrowser->items(property)[0]);
+  QVERIFY(_propTreeBrowser->items(property).size() == 1);
+  _propTreeBrowser->setCurrentItem(_propTreeBrowser->items(property)[0]);
   property->setValue(_pose.rot.GetAsEuler().x);
   property = static_cast<QtVariantProperty *>(_properties[4]);
   Q_ASSERT(property);
   QCOMPARE(property->propertyName(), tr("pitch"));
-  QVERIFY(propTreeBrowser->items(property).size() == 1);
-  propTreeBrowser->setCurrentItem(propTreeBrowser->items(property)[0]);
+  QVERIFY(_propTreeBrowser->items(property).size() == 1);
+  _propTreeBrowser->setCurrentItem(_propTreeBrowser->items(property)[0]);
   property->setValue(_pose.rot.GetAsEuler().y);
   property = static_cast<QtVariantProperty *>(_properties[5]);
   Q_ASSERT(property);
   QCOMPARE(property->propertyName(), tr("yaw"));
-  QVERIFY(propTreeBrowser->items(property).size() == 1);
-  propTreeBrowser->setCurrentItem(propTreeBrowser->items(property)[0]);
+  QVERIFY(_propTreeBrowser->items(property).size() == 1);
+  _propTreeBrowser->setCurrentItem(_propTreeBrowser->items(property)[0]);
   property->setValue(_pose.rot.GetAsEuler().z);
   QTest::qWait(1000);
 }
