@@ -20,6 +20,8 @@
 
 #include <memory>
 #include <string>
+#include <utility>
+#include <vector>
 #include <sdf/sdf.hh>
 
 #include "gazebo/gui/qt.h"

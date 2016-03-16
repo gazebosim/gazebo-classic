@@ -19,6 +19,8 @@
 #define _GAZEBO_USER_COMMAND_WIDGET_HH_
 
 #include <string>
+#include <utility>
+#include <vector>
 
 #include "gazebo/msgs/MessageTypes.hh"
 
