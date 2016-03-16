@@ -374,6 +374,7 @@ unsigned int PlotCanvas::AddPlot()
 {
   IncrementalPlot *plot = new IncrementalPlot(this);
   plot->setAutoDelete(false);
+  plot->ShowGrid(this->dataPtr->emptyPlot->ShowGrid());
   this->dataPtr->plotLayout->addWidget(plot);
 
   PlotData *p = new PlotData;

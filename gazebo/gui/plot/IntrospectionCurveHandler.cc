@@ -83,6 +83,9 @@ namespace gazebo
 
       /// \brief Flag to indicate that the introspection client is initialized.
       public: bool initialized = false;
+
+      /// \brief Pause updating plot curve.
+      public: bool paused = false;
     };
   }
 }
@@ -288,6 +291,8 @@ void IntrospectionCurveHandler::OnIntrospection(
     const gazebo::msgs::Param_V &_msg)
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  if (this->dataPtr->paused)
+    return;
 
   // stores a list of curves iterators and their new values
   std::vector<
@@ -749,4 +754,11 @@ bool IntrospectionCurveHandler::QuaterniondFromQuery(const std::string &_query,
     return false;
 
   return true;
+}
+
+/////////////////////////////////////////////////
+void IntrospectionCurveHandler::SetPaused(const bool _paused)
+{
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  this->dataPtr->paused = _paused;
 }

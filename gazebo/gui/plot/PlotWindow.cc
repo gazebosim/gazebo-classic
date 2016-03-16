@@ -202,6 +202,7 @@ PlotWindow::~PlotWindow()
 void PlotWindow::OnPlay()
 {
   this->dataPtr->paused = false;
+  PlotManager::Instance()->SetPaused(this->dataPtr->paused);
   this->dataPtr->plotPauseAct->setVisible(true);
   this->dataPtr->plotPlayAct->setVisible(false);
 }
@@ -210,6 +211,7 @@ void PlotWindow::OnPlay()
 void PlotWindow::OnPause()
 {
   this->dataPtr->paused = true;
+  PlotManager::Instance()->SetPaused(this->dataPtr->paused);
   this->dataPtr->plotPauseAct->setVisible(false);
   this->dataPtr->plotPlayAct->setVisible(true);
 }
