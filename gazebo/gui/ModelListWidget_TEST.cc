@@ -15,6 +15,7 @@
  *
 */
 #include <boost/filesystem.hpp>
+#include <memory>
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportIface.hh"
@@ -864,6 +865,180 @@ void ModelListWidget_TEST::LinkProperties()
   node.reset();
   delete requestMsg;
   delete modelListWidget;
+}
+
+/////////////////////////////////////////////////
+void ModelListWidget_TEST::PhysicsProperties()
+{
+  std::unique_ptr<gazebo::gui::ModelListWidget> modelListWidget(
+      new gazebo::gui::ModelListWidget);
+  modelListWidget->show();
+  modelListWidget->setGeometry(0, 0, 400, 800);
+  QCoreApplication::processEvents();
+
+  this->Load("worlds/empty.world");
+
+  // Verify that property browser widget is initially empty
+  QObject *propTreeObj =
+    modelListWidget->findChild<QObject *>("propTreeBrowser");
+  QtTreePropertyBrowser *propTreeBrowser =
+    dynamic_cast<QtTreePropertyBrowser *>(propTreeObj);
+  QVERIFY(propTreeBrowser != NULL);
+  QCOMPARE(propTreeBrowser->properties().size(), 0);
+
+  // Get the physics item from the model tree
+  QTreeWidget *modelTreeWidget = modelListWidget->findChild<QTreeWidget *>(
+      "modelTreeWidget");
+  QList<QTreeWidgetItem *> treePhysicsItems =
+    modelTreeWidget->findItems(tr("Physics"), Qt::MatchExactly);
+  QCOMPARE(treePhysicsItems.size(), 1);
+  QTreeWidgetItem *physicsItem = treePhysicsItems.front();
+  QVERIFY(physicsItem != NULL);
+
+  // select the physics item after giving it time to be rendered
+  QTest::qWait(10);
+  QRect physicsRect;
+  {
+    physicsRect = modelTreeWidget->visualItemRect(physicsItem);
+    QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton, 0,
+        physicsRect.center() );
+    QCoreApplication::processEvents();
+    // wait for the physics item to be selected
+    int sleep = 0;
+    int maxSleep = 5;
+    while (!physicsItem->isSelected() && sleep < maxSleep)
+    {
+      QTest::qWait(10);
+      sleep++;
+    }
+    QVERIFY(physicsItem->isSelected());
+  }
+
+  // wait for the physics properties to appear
+  {
+    int sleep = 0;
+    int maxSleep = 10;
+    while (propTreeBrowser->properties().size() == 0 && sleep < maxSleep)
+    {
+      QCoreApplication::processEvents();
+      QTest::qWait(500);
+      sleep++;
+    }
+    QVERIFY(propTreeBrowser->properties().size() > 0);
+  }
+
+  // verify that there are 8 physics properties
+  QCOMPARE(propTreeBrowser->properties().size(), 8);
+
+  // check default values of each parameter
+  // physics engine type: ODE
+  {
+    auto properties = propTreeBrowser->properties();
+    QtVariantProperty *property =
+        static_cast<QtVariantProperty *>(properties[0]);
+    Q_ASSERT(property);
+    QCOMPARE(property->propertyName(), tr("physics engine"));
+    QCOMPARE(property->valueText(), tr("ODE"));
+  }
+
+  // physics enabled: true
+  {
+    auto properties = propTreeBrowser->properties();
+    QtVariantProperty *property =
+        static_cast<QtVariantProperty *>(properties[1]);
+    Q_ASSERT(property);
+    QCOMPARE(property->propertyName(), tr("enable physics"));
+    QCOMPARE(property->value().toBool(), true);
+  }
+
+  // real time update rate: 1000
+  {
+    auto properties = propTreeBrowser->properties();
+    QtVariantProperty *property =
+        static_cast<QtVariantProperty *>(properties[2]);
+    Q_ASSERT(property);
+    QCOMPARE(property->propertyName(), tr("real time update rate"));
+    QCOMPARE(property->value().toDouble(), 1e3);
+  }
+
+  // max step size:  0.001
+  {
+    auto properties = propTreeBrowser->properties();
+    QtVariantProperty *property =
+        static_cast<QtVariantProperty *>(properties[3]);
+    Q_ASSERT(property);
+    QCOMPARE(property->propertyName(), tr("max step size"));
+    QCOMPARE(property->value().toDouble(), 1e-3);
+  }
+
+  // gravity: 0 0 -9.8
+  {
+    const ignition::math::Vector3d gravity(0, 0, -9.8);
+    auto properties = propTreeBrowser->properties();
+    QtVariantProperty *property =
+        static_cast<QtVariantProperty *>(properties[4]);
+    Q_ASSERT(property);
+    QCOMPARE(property->propertyName(), tr("gravity"));
+    this->CheckVector3Property(property->subProperties(), gravity);
+    // set gravity to 0 0 0
+    this->SetVector3Property(propTreeBrowser, property->subProperties(),
+        ignition::math::Vector3d::Zero);
+  }
+
+  // magnetic field: 6e-6 2.3e-5 -4.2e-5
+  {
+    const ignition::math::Vector3d xyz(6e-6, 2.3e-5, -4.2e-5);
+    auto properties = propTreeBrowser->properties();
+    QtVariantProperty *property =
+        static_cast<QtVariantProperty *>(properties[5]);
+    Q_ASSERT(property);
+    QCOMPARE(property->propertyName(), tr("magnetic field"));
+    CheckVector3Property(property->subProperties(), xyz);
+  }
+
+  // select the box link again to refresh the property browser
+  QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton, 0,
+      physicsRect.center() );
+
+  {
+    QCoreApplication::processEvents();
+    QTest::qWait(100);
+    int sleep = 0;
+    int maxSleep = 5;
+    while (!physicsItem->isSelected() && sleep < maxSleep)
+    {
+      QCoreApplication::processEvents();
+      QTest::qWait(10);
+      sleep++;
+    }
+    QVERIFY(physicsItem->isSelected());
+  }
+
+  // wait for the box link properties to appear
+  {
+    int sleep = 0;
+    int maxSleep = 10;
+    while (propTreeBrowser->properties().size() == 0 && sleep < maxSleep)
+    {
+      QCoreApplication::processEvents();
+      QTest::qWait(500);
+      sleep++;
+    }
+    QVERIFY(propTreeBrowser->properties().size() > 0);
+  }
+
+  // check gravity: 0 0 0
+  {
+    auto properties = propTreeBrowser->properties();
+    QtVariantProperty *property =
+        static_cast<QtVariantProperty *>(properties[4]);
+    Q_ASSERT(property);
+    QCOMPARE(property->propertyName(), tr("gravity"));
+    this->CheckVector3Property(property->subProperties(),
+        ignition::math::Vector3d::Zero);
+  }
+
+  modelListWidget->hide();
 }
 
 // Generate a main function for the test

@@ -103,6 +103,10 @@ class ModelListWidget_TEST : public QTestFixture
   /// now only displays link properties as the result of directly clicking on
   /// the link item in the models tree widget.
   private slots: void LinkProperties();
+
+  /// \brief Test that the property browser displays correct physics properties
+  /// and allows modification of physics properties.
+  private slots: void PhysicsProperties();
 };
 
 #endif
