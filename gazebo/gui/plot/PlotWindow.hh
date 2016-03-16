@@ -64,8 +64,13 @@ namespace gazebo
       /// \brief Export all canvas plots.
       public: void Export();
 
+      /// \brief Update a canvas. This currently just enables/disables the
+      /// delete canvas setting option based on the number of canvases in the
+      /// window.
+      private: void UpdateCanvas();
+
       /// \brief Update all canvases
-      public slots: void Update();
+      private slots: void Update();
 
       /// \brief QT callback to continue plotting.
       private slots: void OnPlay();

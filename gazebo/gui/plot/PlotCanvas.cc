@@ -70,6 +70,9 @@ namespace gazebo
       /// \brief Container for all the variableCurves on the Y axis.
       public: VariablePillContainer *yVariableContainer = NULL;
 
+      /// \brief Delete canvas Qt action
+      public: QAction *deleteCanvasAct = NULL;
+
       /// \brief Global plot counter.
       public: static unsigned int globalPlotId;
     };
@@ -101,15 +104,16 @@ PlotCanvas::PlotCanvas(QWidget *_parent)
   QAction *clearPlotAct = new QAction("Clear all fields", settingsMenu);
   clearPlotAct->setStatusTip(tr("Clear variables and all plots on canvas"));
   connect(clearPlotAct, SIGNAL(triggered()), this, SLOT(OnClearCanvas()));
-  QAction *deletePlotAct = new QAction("Delete canvas", settingsMenu);
-  deletePlotAct->setStatusTip(tr("Delete entire canvas"));
-  connect(deletePlotAct, SIGNAL(triggered()), this, SLOT(OnDeleteCanvas()));
+  this->dataPtr->deleteCanvasAct = new QAction("Delete canvas", settingsMenu);
+  this->dataPtr->deleteCanvasAct->setStatusTip(tr("Delete entire canvas"));
+  connect(this->dataPtr->deleteCanvasAct, SIGNAL(triggered()), this,
+      SLOT(OnDeleteCanvas()));
   QAction *showGridAct = new QAction("Show grid", settingsMenu);
   showGridAct->setStatusTip(tr("Show/hide grid lines on plot"));
   showGridAct->setCheckable(true);
 
   settingsMenu->addAction(clearPlotAct);
-  settingsMenu->addAction(deletePlotAct);
+  settingsMenu->addAction(this->dataPtr->deleteCanvasAct);
   settingsMenu->addAction(showGridAct);
 
   QToolButton *settingsButton = new QToolButton();
@@ -811,4 +815,11 @@ void PlotCanvas::UpdateAxisLabel()
       }
     }
   }
+}
+
+/////////////////////////////////////////////////
+void PlotCanvas::SetDeleteCanvasEnabled(const bool _enable)
+{
+  if (this->dataPtr->deleteCanvasAct)
+    this->dataPtr->deleteCanvasAct->setEnabled(_enable);
 }

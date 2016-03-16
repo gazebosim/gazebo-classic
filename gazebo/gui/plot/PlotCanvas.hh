@@ -109,6 +109,11 @@ namespace gazebo
       /// \brief Clear the canvas and remove all variables and plots.
       public: void Clear();
 
+      /// \brief Set whether or not to enable the delete canvas option in
+      /// settings
+      /// \param[in] _enable True to enable delete canvas option
+      public: void SetDeleteCanvasEnabled(const bool _enable);
+
       /// \brief Used to filter scroll wheel events.
       /// \param[in] _o Object that receives the event.
       /// \param[in] _event Pointer to the event.
