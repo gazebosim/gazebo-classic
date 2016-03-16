@@ -74,7 +74,7 @@ PlotManager::PlotManager()
 /////////////////////////////////////////////////
 PlotManager::~PlotManager()
 {
-  this->dataPtr->windows->clear();
+  this->dataPtr->windows.clear();
 }
 
 /////////////////////////////////////////////////

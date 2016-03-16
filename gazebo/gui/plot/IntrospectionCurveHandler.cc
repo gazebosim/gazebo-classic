@@ -144,13 +144,12 @@ void IntrospectionCurveHandler::AddCurve(const std::string &_name,
   }
   else
   {
-    this->dataPtr->mutex.unlock();
-
     auto cIt = it->second.find(_curve);
     if (cIt == it->second.end())
     {
       it->second.insert(_curve);
     }
+    this->dataPtr->mutex.unlock();
   }
 }
 
