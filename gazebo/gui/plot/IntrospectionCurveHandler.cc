@@ -144,13 +144,12 @@ void IntrospectionCurveHandler::AddCurve(const std::string &_name,
   }
   else
   {
-    this->dataPtr->mutex.unlock();
-
     auto cIt = it->second.find(_curve);
     if (cIt == it->second.end())
     {
       it->second.insert(_curve);
     }
+    this->dataPtr->mutex.unlock();
   }
 }
 
@@ -229,9 +228,6 @@ void IntrospectionCurveHandler::SetupIntrospection()
 
   this->dataPtr->simTimeVar= "data://world/" + gui::get_world()
       + "?p=time/sim_time";
-
-  for (auto i : items)
-    std::cerr <<  i  << std::endl;
 
   if (!this->dataPtr->introspectClient.IsRegistered(
       this->dataPtr->managerId, this->dataPtr->simTimeVar))
