@@ -62,8 +62,8 @@ TEST_F(DepthCameraSensor_TEST, CreateDepthCamera)
   // Make sure the above dynamic cast worked.
   EXPECT_TRUE(sensor != NULL);
 
-  EXPECT_EQ(sensor->ImageWidth(), 640);
-  EXPECT_EQ(sensor->ImageHeight(), 480);
+  EXPECT_EQ(sensor->ImageWidth(), 640u);
+  EXPECT_EQ(sensor->ImageHeight(), 480u);
   EXPECT_TRUE(sensor->IsActive());
 
   rendering::DepthCameraPtr depthCamera = sensor->DepthCamera();

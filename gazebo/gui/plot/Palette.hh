@@ -101,6 +101,13 @@ namespace gazebo
       private: void InsertQuaterniondItem(QStandardItem *_item,
           const common::URI &_uri, const std::string &_query);
 
+      /// \brief Insert an axis item under the given item.
+      /// \param[in] _item The parent item.
+      /// \param[in] _uri The URI of the original query.
+      /// \param[in] _query The part of the query relevant to this item.
+      private: void InsertAxisItem(QStandardItem *_item,
+          const common::URI &_uri, const std::string &_query);
+
       /// \brief Callback when the user has modified the search.
       /// \param[in] _search Latest search.
       private slots: void UpdateSearch(const QString &_search);
