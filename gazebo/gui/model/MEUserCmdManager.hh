@@ -118,20 +118,22 @@ namespace gazebo
       /// \param[in] _action Action corresponding to the command.
       private slots: void OnUndoCommand(QAction *_action);
 
-      /// \brief Qt callback when the undo history button is pressed.
-      /// It opens the undo history menu.
-      private slots: void OnUndoCmdHistory();
-
       /// \brief Qt callback to redo a command.
       /// \param[in] _action Action corresponding to the command.
       private slots: void OnRedoCommand(QAction *_action);
 
-      /// \brief Qt callback when the redo history button is pressed.
-      /// It opens the redo history menu.
-      private slots: void OnRedoCmdHistory();
+      /// \brief Whether there are commands for undo or not.
+      /// \return True if there are.
+      private: virtual bool HasUndo() const;
 
-      /// \brief Updates the widgets according to the user commands available.
-      private slots: virtual void OnStatsSlot();
+      /// \brief Whether there are commands for redo or not.
+      /// \return True if there are.
+      private: virtual bool HasRedo() const;
+
+      /// \brief Get the list of commands.
+      /// \return True if there are.
+      private: virtual std::vector<std::pair<unsigned int, std::string>>
+          Cmds(bool _undo) const;
 
       /// \internal
       /// \brief Pointer to private data.

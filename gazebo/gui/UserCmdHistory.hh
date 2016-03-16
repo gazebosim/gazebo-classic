@@ -86,20 +86,31 @@ namespace gazebo
       /// It opens the redo history menu.
       private slots: virtual void OnRedoCmdHistory();
 
+      /// \brief Implementation of the On*CmdHistory functions.
+      /// \param[in] _undo True for undo, false for redo.
+      private: virtual void OnCmdHistory(bool _undo);
+
+      /// \brief Whether there are commands for undo or not.
+      /// \return True if there are.
+      private: virtual bool HasUndo() const;
+
+      /// \brief Whether there are commands for redo or not.
+      /// \return True if there are.
+      private: virtual bool HasRedo() const;
+
+      /// \brief Get the list of user commands.
+      /// \param[in] _undo True for undo, false for redo
+      private: virtual std::vector<std::pair<unsigned int, std::string>>
+          Cmds(bool _undo) const;
+
       /// \brief Updates the widgets according to the user command stats
       /// message.
-      private slots: virtual void OnStatsSlot();
+      private slots: void OnStatsSlot();
 
       /// \brief User command statistics message callback.
       /// \param[in] _msg Message containing statistics about user commands
       /// stored in the server.
       private: void OnUserCmdStatsMsg(ConstUserCmdStatsPtr &_msg);
-
-      /// \brief Group of actions in undo history menu.
-      protected: QActionGroup *undoActions;
-
-      /// \brief Group of actions in redo history menu.
-      protected: QActionGroup *redoActions;
 
       /// \internal
       /// \brief Pointer to private data.
