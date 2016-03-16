@@ -202,6 +202,7 @@ PlotWindow::~PlotWindow()
 void PlotWindow::OnPlay()
 {
   this->dataPtr->paused = false;
+  PlotManager::Instance()->SetPaused(this->dataPtr->paused);
   this->dataPtr->plotPauseAct->setVisible(true);
   this->dataPtr->plotPlayAct->setVisible(false);
 }
@@ -210,6 +211,7 @@ void PlotWindow::OnPlay()
 void PlotWindow::OnPause()
 {
   this->dataPtr->paused = true;
+  PlotManager::Instance()->SetPaused(this->dataPtr->paused);
   this->dataPtr->plotPauseAct->setVisible(false);
   this->dataPtr->plotPlayAct->setVisible(true);
 }
@@ -221,6 +223,9 @@ PlotCanvas *PlotWindow::AddCanvas()
   connect(canvas, SIGNAL(CanvasDeleted()), this, SLOT(OnRemoveCanvas()));
 
   this->dataPtr->canvasLayout->addWidget(canvas);
+
+  this->UpdateCanvas();
+
   return canvas;
 }
 
@@ -270,6 +275,27 @@ void PlotWindow::OnRemoveCanvas()
   // add an empty canvas if the plot window is now empty
   if (this->dataPtr->canvasLayout->isEmpty())
     this->AddCanvas();
+  else
+  {
+    this->UpdateCanvas();
+  }
+}
+
+/////////////////////////////////////////////////
+void PlotWindow::UpdateCanvas()
+{
+  // disable Delete Canvas option in settings if there is only one
+  // canvas in the window
+  QLayoutItem *item = this->dataPtr->canvasLayout->itemAt(0);
+  if (item)
+  {
+    PlotCanvas *plotCanvas = qobject_cast<PlotCanvas *>(item->widget());
+    if (plotCanvas)
+    {
+      plotCanvas->SetDeleteCanvasEnabled(
+          this->dataPtr->canvasLayout->count() != 1);
+    }
+  }
 }
 
 /////////////////////////////////////////////////

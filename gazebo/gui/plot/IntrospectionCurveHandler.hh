@@ -63,6 +63,9 @@ namespace gazebo
       /// \return True if initialized.
       public: bool Initialized() const;
 
+      /// \brief Set whether or not to pause updating the plot curves.
+      /// \param[in] _paused True to pause update.
+      public: void SetPaused(const bool _paused);
       /// \brief Set up introspection client
       private: void SetupIntrospection();
 

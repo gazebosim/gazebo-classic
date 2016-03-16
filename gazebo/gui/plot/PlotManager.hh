@@ -21,11 +21,15 @@
 #include <memory>
 #include <string>
 
+#include "gazebo/transport/transport.hh"
+
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/gui/plot/PlottingTypes.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
+
+
 
 namespace gazebo
 {
@@ -86,6 +90,9 @@ namespace gazebo
       /// \param[in] _uri URI representing the variable
       /// \return Human readable name
       public: std::string HumanReadableName(const std::string &_uri) const;
+      /// \brief Set whether or not to pause updating the plot curves.
+      /// \param[in] _paused True to pause update.
+      public: void SetPaused(const bool _paused);
 
       /// \brief This is a singleton class.
       private: friend class SingletonT<PlotManager>;

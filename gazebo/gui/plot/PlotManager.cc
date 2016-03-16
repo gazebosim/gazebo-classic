@@ -74,6 +74,7 @@ PlotManager::PlotManager()
 /////////////////////////////////////////////////
 PlotManager::~PlotManager()
 {
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
   this->dataPtr->windows.clear();
 }
 
@@ -171,4 +172,10 @@ std::string PlotManager::HumanReadableName(const std::string &_uri) const
   label = pathStr + "?" + queryStr;
 
   return label;
+}
+
+/////////////////////////////////////////////////
+void PlotManager::SetPaused(const bool _paused)
+{
+  this->dataPtr->introspectionCurve.SetPaused(_paused);
 }
