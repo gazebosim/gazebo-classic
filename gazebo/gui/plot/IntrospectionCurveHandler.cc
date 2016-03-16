@@ -68,7 +68,7 @@ namespace gazebo
       /// \brief Introspection filter.
       public: std::set<std::string> introspectFilter;
 
-      /// \brief Number of subscribers to a introspection filter.
+      /// \brief Number of subscribers to an introspection filter.
       public: std::map<std::string, int> introspectFilterCount;
 
       /// \brief Introspection filter ID.
@@ -108,17 +108,20 @@ IntrospectionCurveHandler::~IntrospectionCurveHandler()
 void IntrospectionCurveHandler::AddCurve(const std::string &_name,
     PlotCurveWeakPtr _curve)
 {
-  if (!this->dataPtr->initialized)
   {
-    gzerr << "Introspection client has not been initialized yet" << std::endl;
-    return;
+    std::lock_guard<std::recursive_mutex> lock(this->dataPtr->mutex);
+    if (!this->dataPtr->initialized)
+    {
+      gzerr << "Introspection client has not been initialized yet" << std::endl;
+      return;
+    }
   }
 
-  this->dataPtr->mutex.lock();
   auto c = _curve.lock();
   if (!c)
     return;
 
+  this->dataPtr->mutex.lock();
   auto it = this->dataPtr->curves.find(_name);
   if (it == this->dataPtr->curves.end())
   {
@@ -226,9 +229,6 @@ void IntrospectionCurveHandler::SetupIntrospection()
 
   this->dataPtr->simTimeVar= "data://world/" + gui::get_world()
       + "?p=time/sim_time";
-
-  std::set<std::string> items;
-  this->dataPtr->introspectClient.Items(this->dataPtr->managerId, items);
 
   for (auto i : items)
     std::cerr <<  i  << std::endl;
@@ -358,29 +358,16 @@ void IntrospectionCurveHandler::OnIntrospection(
             std::string queryStr = query.Str();
 
             // example position query string:
-            //   p=pose/world_pose/vector3/position/double/x
+            //   p=pose3d/world_pose/vector3d/position/double/x
             // example rotation query string:
-            //   p=pose/world_pose/vector3/orientation/double/roll
-            // auto tokens = common::split(queryStr, "=/");
-            // if (tokens.size() == 7u && tokens[1] == "pose")
-            // {
-            //   if (tokens[4] == "position")
-            //     validData = Vector3dFromQuery(queryStr, p.Pos(), tokens[6]);
-            //   else if (tokens[4] == "orientation")
-            //     validData = Vector3dFromQuery(queryStr, p.Rot(), tokens[6]);
-            //   else
-            //     validData = false;
-            // }
-            // else
-            //   validData = false;
-
+            //   p=pose3d/world_pose/quaterniond/orientation/double/roll
             if (queryStr.find("position") != std::string::npos)
             {
-              validData = Vector3dFromQuery(queryStr, p.Pos(), d);
+              validData = this->Vector3dFromQuery(queryStr, p.Pos(), d);
             }
             else if (queryStr.find("orientation") != std::string::npos)
             {
-              validData = QuaterniondFromQuery(queryStr, p.Rot(), d);
+              validData = this->QuaterniondFromQuery(queryStr, p.Rot(), d);
             }
             else
               validData = false;
@@ -403,7 +390,7 @@ void IntrospectionCurveHandler::OnIntrospection(
             common::URI uri(curveVarName);
             common::URIQuery query = uri.Query();
             std::string queryStr = query.Str();
-            validData = Vector3dFromQuery(queryStr, vec, d);
+            validData = this->Vector3dFromQuery(queryStr, vec, d);
 
             data = d;
           }
@@ -423,7 +410,7 @@ void IntrospectionCurveHandler::OnIntrospection(
             common::URI uri(curveVarName);
             common::URIQuery query = uri.Query();
             std::string queryStr = query.Str();
-            validData = QuaterniondFromQuery(queryStr, quat, d);
+            validData = this->QuaterniondFromQuery(queryStr, quat, d);
 
             data = d;
           }
@@ -486,11 +473,11 @@ void IntrospectionCurveHandler::AddItemToFilter(const std::string &_name,
       if (itemPath == path)
       {
         // A registered variable can have the query
-        //  "?p=world_pose"
+        //  "?p=pose3d/world_pose"
         // and if the variable we are looking for has the query
-        //  "?p=world_pose/position/x"
-        // we need to add "scheme://path?world_pose" to the filter instead of
-        // "scheme://path?p=world_pose/position/x"
+        //  "?p=pose3d/world_pose/vector3d/position/double/x"
+        // we need to add "scheme://path?pose3d/world_pose" to filter instead of
+        //  "scheme://path?p=pose3d/world_pose/vector3d/position/double/x"
 
         // check substring
         if (itemQuery.Str().find(query.Str()) == 0)
@@ -575,11 +562,12 @@ void IntrospectionCurveHandler::RemoveItemFromFilter(const std::string &_name,
       if (itemPath == path)
       {
         // A registered variable can have the query
-        //  "?p=world_pose"
+        //  "?p=pose3d/world_pose"
         // and if the variable we are looking for has the query
-        //  "?p=world_pose/position/x"
-        // we need to add "scheme://path?world_pose" to the filter instead of
-        // "scheme://path?p=world_pose/position/x"
+        //  "?p=pose3d/world_pose/vector3d/position/double/x"
+        // we need to remove "scheme://path?pose3d/world_pose" from the filter
+        // instead of
+        //  "scheme://path?p=pose3d/world_pose/vector3d/position/double/x"
 
         // check substring starts at index 0
         if (itemQuery.Str().find(query.Str()) == 0)
@@ -647,11 +635,11 @@ bool IntrospectionCurveHandler::Vector3dFromQuery(const std::string &_query,
   }
   else if (elem == "y")
   {
-    _value= _vec.Y();
+    _value = _vec.Y();
   }
   else if (elem == "z")
   {
-    _value= _vec.Z();
+    _value = _vec.Z();
   }
   else
     return false;
