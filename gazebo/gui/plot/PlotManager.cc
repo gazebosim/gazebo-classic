@@ -92,7 +92,6 @@ void PlotManager::OnWorldControl(ConstWorldControlPtr &_data)
   }
 }
 
-
 /////////////////////////////////////////////////
 void PlotManager::AddIntrospectionCurve(const std::string &_uri,
     PlotCurveWeakPtr _curve)
@@ -146,10 +145,13 @@ std::string PlotManager::HumanReadableName(const std::string &_uri) const
   common::URIQuery query = uri.Query();
   std::vector<std::string> pathTokens = common::split(path.Str(), "/");
   std::vector<std::string> queryTokens = common::split(query.Str(), "=/");
-  if (queryTokens.size() < 2 || queryTokens.size() < 3)
+
+  // min path token size 2: [world, world_name]
+  // min query token size 3: [p, param_type, param_name]
+  if (pathTokens.size() < 2 || queryTokens.size() < 3)
     return label;
 
-  // path: start from model name and ignore entity type str
+  // path: start from model name and ignore world and entity type str for now
   std::string pathStr;
   for (unsigned int i = 3; i < pathTokens.size(); i+=2)
   {

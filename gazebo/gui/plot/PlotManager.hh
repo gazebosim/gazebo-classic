@@ -21,15 +21,11 @@
 #include <memory>
 #include <string>
 
-#include "gazebo/transport/transport.hh"
-
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/gui/plot/PlottingTypes.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
-
-
 
 namespace gazebo
 {
