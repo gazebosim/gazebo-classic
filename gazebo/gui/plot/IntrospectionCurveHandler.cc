@@ -68,7 +68,7 @@ namespace gazebo
       /// \brief Introspection filter.
       public: std::set<std::string> introspectFilter;
 
-      /// \brief Number of subscribers to a introspection filter.
+      /// \brief Number of subscribers to an introspection filter.
       public: std::map<std::string, int> introspectFilterCount;
 
       /// \brief Introspection filter ID.
@@ -651,11 +651,11 @@ bool IntrospectionCurveHandler::Vector3dFromQuery(const std::string &_query,
   }
   else if (elem == "y")
   {
-    _value= _vec.Y();
+    _value = _vec.Y();
   }
   else if (elem == "z")
   {
-    _value= _vec.Z();
+    _value = _vec.Z();
   }
   else
     return false;
