@@ -136,7 +136,7 @@ void ModelListWidget_TEST::SetVector3Property(
     _propTreeBrowser->setCurrentItem(_propTreeBrowser->items(property)[0]);
     property->setValue(_xyz[c]);
   }
-  QTest::qWait(1000);
+  QTest::qWait(500);
 }
 
 /////////////////////////////////////////////////
@@ -166,7 +166,7 @@ void ModelListWidget_TEST::SetPoseProperty(
   QVERIFY(_propTreeBrowser->items(property).size() == 1);
   _propTreeBrowser->setCurrentItem(_propTreeBrowser->items(property)[0]);
   property->setValue(_pose.rot.GetAsEuler().z);
-  QTest::qWait(1000);
+  QTest::qWait(500);
 }
 
 /////////////////////////////////////////////////
