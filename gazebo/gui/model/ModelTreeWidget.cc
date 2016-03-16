@@ -362,6 +362,8 @@ void ModelTreeWidget::OnItemDoubleClicked(QTreeWidgetItem *_item,
       gui::model::Events::openJointInspector(name);
     else if (type == "Model Plugin")
       gui::model::Events::openModelPluginInspector(name);
+    else if (type == "Nested Model")
+      gui::model::Events::openNestedModelInspector(name);
   }
 }
 
