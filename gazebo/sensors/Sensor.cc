@@ -548,12 +548,6 @@ event::ConnectionPtr Sensor::ConnectUpdated(std::function<void()> _subscriber)
 }
 
 //////////////////////////////////////////////////
-event::ConnectionPtr Sensor::ConnectUpdated(std::function<void()> _subscriber)
-{
-  return this->dataPtr->updated.Connect(_subscriber);
-}
-
-//////////////////////////////////////////////////
 void Sensor::DisconnectUpdated(event::ConnectionPtr &_c)
 {
   this->dataPtr->updated.Disconnect(_c);
