@@ -164,7 +164,7 @@ TEST_F(AudioDecoder, CheerFile)
     // later versions of ffmpeg produces a different buffer size probably due to
     // underlying changes in the decoder. The size of the first decoded frame
     // is much smaller than all other frames.
-    EXPECT_EQ(dataBufferSize, 4995072u || 4987612u);
+    EXPECT_EQ(dataBufferSize, 4995072u || dataBufferSize == 4987612u);
   }
 }
 
