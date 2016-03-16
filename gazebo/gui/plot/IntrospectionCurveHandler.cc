@@ -108,17 +108,20 @@ IntrospectionCurveHandler::~IntrospectionCurveHandler()
 void IntrospectionCurveHandler::AddCurve(const std::string &_name,
     PlotCurveWeakPtr _curve)
 {
-  if (!this->dataPtr->initialized)
   {
-    gzerr << "Introspection client has not been initialized yet" << std::endl;
-    return;
+    std::lock_guard<std::recursive_mutex> lock(this->dataPtr->mutex);
+    if (!this->dataPtr->initialized)
+    {
+      gzerr << "Introspection client has not been initialized yet" << std::endl;
+      return;
+    }
   }
 
-  this->dataPtr->mutex.lock();
   auto c = _curve.lock();
   if (!c)
     return;
 
+  this->dataPtr->mutex.lock();
   auto it = this->dataPtr->curves.find(_name);
   if (it == this->dataPtr->curves.end())
   {
