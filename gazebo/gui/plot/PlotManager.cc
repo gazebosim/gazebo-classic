@@ -69,7 +69,6 @@ PlotManager::PlotManager()
   this->dataPtr->worldControlSub =
       this->dataPtr->node->Subscribe("~/world_control",
       &PlotManager::OnWorldControl, this);
-
 }
 
 /////////////////////////////////////////////////

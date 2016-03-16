@@ -227,9 +227,6 @@ void IntrospectionCurveHandler::SetupIntrospection()
   this->dataPtr->simTimeVar= "data://world/" + gui::get_world()
       + "?p=time/sim_time";
 
-  std::set<std::string> items;
-  this->dataPtr->introspectClient.Items(this->dataPtr->managerId, items);
-
   if (!this->dataPtr->introspectClient.IsRegistered(
       this->dataPtr->managerId, this->dataPtr->simTimeVar))
   {
@@ -365,29 +362,16 @@ void IntrospectionCurveHandler::OnIntrospection(
           std::string queryStr = query.Str();
 
           // example position query string:
-          //   p=pose/world_pose/vector3/position/double/x
+          //   p=pose3d/world_pose/vector3d/position/double/x
           // example rotation query string:
-          //   p=pose/world_pose/vector3/orientation/double/roll
-          // auto tokens = common::split(queryStr, "=/");
-          // if (tokens.size() == 7u && tokens[1] == "pose")
-          // {
-          //   if (tokens[4] == "position")
-          //     validData = Vector3dFromQuery(queryStr, p.Pos(), tokens[6]);
-          //   else if (tokens[4] == "orientation")
-          //     validData = Vector3dFromQuery(queryStr, p.Rot(), tokens[6]);
-          //   else
-          //     validData = false;
-          // }
-          // else
-          //   validData = false;
-
+          //   p=pose3d/world_pose/quaterniond/orientation/double/roll
           if (queryStr.find("position") != std::string::npos)
           {
-            validData = Vector3dFromQuery(queryStr, p.Pos(), d);
+            validData = this->Vector3dFromQuery(queryStr, p.Pos(), d);
           }
           else if (queryStr.find("orientation") != std::string::npos)
           {
-            validData = QuaterniondFromQuery(queryStr, p.Rot(), d);
+            validData = this->QuaterniondFromQuery(queryStr, p.Rot(), d);
           }
           else
             validData = false;
@@ -410,7 +394,7 @@ void IntrospectionCurveHandler::OnIntrospection(
           common::URI uri(curveVarName);
           common::URIQuery query = uri.Query();
           std::string queryStr = query.Str();
-          validData = Vector3dFromQuery(queryStr, vec, d);
+          validData = this->Vector3dFromQuery(queryStr, vec, d);
 
           data = d;
         }
@@ -430,7 +414,7 @@ void IntrospectionCurveHandler::OnIntrospection(
           common::URI uri(curveVarName);
           common::URIQuery query = uri.Query();
           std::string queryStr = query.Str();
-          validData = QuaterniondFromQuery(queryStr, quat, d);
+          validData = this->QuaterniondFromQuery(queryStr, quat, d);
 
           data = d;
         }
@@ -492,11 +476,11 @@ void IntrospectionCurveHandler::AddItemToFilter(const std::string &_name,
       if (itemPath == path)
       {
         // A registered variable can have the query
-        //  "?p=world_pose"
+        //  "?p=pose3d/world_pose"
         // and if the variable we are looking for has the query
-        //  "?p=world_pose/position/x"
-        // we need to add "scheme://path?world_pose" to the filter instead of
-        // "scheme://path?p=world_pose/position/x"
+        //  "?p=pose3d/world_pose/vector3d/position/double/x"
+        // we need to add "scheme://path?pose3d/world_pose" to filter instead of
+        //  "scheme://path?p=pose3d/world_pose/vector3d/position/double/x"
 
         // check substring
         if (itemQuery.Str().find(query.Str()) == 0)
@@ -579,11 +563,12 @@ void IntrospectionCurveHandler::RemoveItemFromFilter(const std::string &_name,
       if (itemPath == path)
       {
         // A registered variable can have the query
-        //  "?p=world_pose"
+        //  "?p=pose3d/world_pose"
         // and if the variable we are looking for has the query
-        //  "?p=world_pose/position/x"
-        // we need to add "scheme://path?world_pose" to the filter instead of
-        // "scheme://path?p=world_pose/position/x"
+        //  "?p=pose3d/world_pose/vector3d/position/double/x"
+        // we need to remove "scheme://path?pose3d/world_pose" from the filter
+        // instead of
+        //  "scheme://path?p=pose3d/world_pose/vector3d/position/double/x"
 
         // check substring starts at index 0
         if (itemQuery.Str().find(query.Str()) == 0)
