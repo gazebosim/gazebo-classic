@@ -230,6 +230,9 @@ void IntrospectionCurveHandler::SetupIntrospection()
   std::set<std::string> items;
   this->dataPtr->introspectClient.Items(this->dataPtr->managerId, items);
 
+  for (auto i : items)
+    std::cerr <<  i  << std::endl;
+
   if (!this->dataPtr->introspectClient.IsRegistered(
       this->dataPtr->managerId, this->dataPtr->simTimeVar))
   {
@@ -295,161 +298,152 @@ void IntrospectionCurveHandler::OnIntrospection(
 
     // see if there is a curve with variable name that matches param name or
     // a substring of the param name
-    auto it = this->dataPtr->curves.find(paramName);
-    if (it == this->dataPtr->curves.end())
+    for (auto cIt = this->dataPtr->curves.begin();
+        cIt != this->dataPtr->curves.end(); ++cIt)
     {
-      for (auto cIt = this->dataPtr->curves.begin();
-          cIt != this->dataPtr->curves.end(); ++cIt)
+      if (cIt->first.find(paramName) != 0)
+        continue;
+
+      // get the data
+      double data = 0;
+      bool validData = true;
+      std::string curveVarName = cIt->first;
+
+      switch (paramValue.type())
       {
-        if (cIt->first.find(paramName) == 0)
+        case gazebo::msgs::Any::DOUBLE:
         {
-          it = cIt;
+          if (paramValue.has_double_value())
+          {
+            data = paramValue.double_value();
+          }
           break;
         }
-      }
-    }
-    if (it == this->dataPtr->curves.end())
-      continue;
-
-    // get the data
-    double data = 0;
-    bool validData = true;
-    std::string curveVarName = it->first;
-
-    switch (paramValue.type())
-    {
-      case gazebo::msgs::Any::DOUBLE:
-      {
-        if (paramValue.has_double_value())
+        case gazebo::msgs::Any::INT32:
         {
-          data = paramValue.double_value();
-        }
-        break;
-      }
-      case gazebo::msgs::Any::INT32:
-      {
-        if (paramValue.has_int_value())
-        {
-          data = paramValue.int_value();
-        }
-        break;
-      }
-      case gazebo::msgs::Any::BOOLEAN:
-      {
-        if (paramValue.has_bool_value())
-        {
-          data = static_cast<int>(paramValue.bool_value());
-        }
-        break;
-      }
-      case gazebo::msgs::Any::TIME:
-      {
-        if (paramValue.has_time_value())
-        {
-          common::Time t = msgs::Convert(paramValue.time_value());
-          data = t.Double();
-        }
-        break;
-      }
-      case gazebo::msgs::Any::POSE3D:
-      {
-        if (paramValue.has_pose3d_value())
-        {
-          ignition::math::Pose3d p =
-              msgs::ConvertIgn(paramValue.pose3d_value());
-
-          double d = 0;
-          // use uri to parse and get specific attribute
-          common::URI uri(curveVarName);
-          common::URIQuery query = uri.Query();
-          std::string queryStr = query.Str();
-
-          // example position query string:
-          //   p=pose/world_pose/vector3/position/double/x
-          // example rotation query string:
-          //   p=pose/world_pose/vector3/orientation/double/roll
-          // auto tokens = common::split(queryStr, "=/");
-          // if (tokens.size() == 7u && tokens[1] == "pose")
-          // {
-          //   if (tokens[4] == "position")
-          //     validData = Vector3dFromQuery(queryStr, p.Pos(), tokens[6]);
-          //   else if (tokens[4] == "orientation")
-          //     validData = Vector3dFromQuery(queryStr, p.Rot(), tokens[6]);
-          //   else
-          //     validData = false;
-          // }
-          // else
-          //   validData = false;
-
-          if (queryStr.find("position") != std::string::npos)
+          if (paramValue.has_int_value())
           {
-            validData = Vector3dFromQuery(queryStr, p.Pos(), d);
+            data = paramValue.int_value();
           }
-          else if (queryStr.find("orientation") != std::string::npos)
+          break;
+        }
+        case gazebo::msgs::Any::BOOLEAN:
+        {
+          if (paramValue.has_bool_value())
           {
-            validData = QuaterniondFromQuery(queryStr, p.Rot(), d);
+            data = static_cast<int>(paramValue.bool_value());
+          }
+          break;
+        }
+        case gazebo::msgs::Any::TIME:
+        {
+          if (paramValue.has_time_value())
+          {
+            common::Time t = msgs::Convert(paramValue.time_value());
+            data = t.Double();
+          }
+          break;
+        }
+        case gazebo::msgs::Any::POSE3D:
+        {
+          if (paramValue.has_pose3d_value())
+          {
+            ignition::math::Pose3d p =
+                msgs::ConvertIgn(paramValue.pose3d_value());
+
+            double d = 0;
+            // use uri to parse and get specific attribute
+            common::URI uri(curveVarName);
+            common::URIQuery query = uri.Query();
+            std::string queryStr = query.Str();
+
+            // example position query string:
+            //   p=pose/world_pose/vector3/position/double/x
+            // example rotation query string:
+            //   p=pose/world_pose/vector3/orientation/double/roll
+            // auto tokens = common::split(queryStr, "=/");
+            // if (tokens.size() == 7u && tokens[1] == "pose")
+            // {
+            //   if (tokens[4] == "position")
+            //     validData = Vector3dFromQuery(queryStr, p.Pos(), tokens[6]);
+            //   else if (tokens[4] == "orientation")
+            //     validData = Vector3dFromQuery(queryStr, p.Rot(), tokens[6]);
+            //   else
+            //     validData = false;
+            // }
+            // else
+            //   validData = false;
+
+            if (queryStr.find("position") != std::string::npos)
+            {
+              validData = Vector3dFromQuery(queryStr, p.Pos(), d);
+            }
+            else if (queryStr.find("orientation") != std::string::npos)
+            {
+              validData = QuaterniondFromQuery(queryStr, p.Rot(), d);
+            }
+            else
+              validData = false;
+
+            data = d;
+          }
+          else
+            validData = false;
+          break;
+        }
+        case gazebo::msgs::Any::VECTOR3D:
+        {
+          if (paramValue.has_vector3d_value())
+          {
+            ignition::math::Vector3d vec =
+                msgs::ConvertIgn(paramValue.vector3d_value());
+
+            double d = 0;
+            // use uri to parse and get specific attribute
+            common::URI uri(curveVarName);
+            common::URIQuery query = uri.Query();
+            std::string queryStr = query.Str();
+            validData = Vector3dFromQuery(queryStr, vec, d);
+
+            data = d;
+          }
+          else
+            validData = false;
+          break;
+        }
+        case gazebo::msgs::Any::QUATERNIOND:
+        {
+          if (paramValue.has_quaternion_value())
+          {
+            ignition::math::Quaterniond quat =
+                msgs::ConvertIgn(paramValue.quaternion_value());
+
+            double d = 0;
+            // use uri to parse and get specific attribute
+            common::URI uri(curveVarName);
+            common::URIQuery query = uri.Query();
+            std::string queryStr = query.Str();
+            validData = QuaterniondFromQuery(queryStr, quat, d);
+
+            data = d;
           }
           else
             validData = false;
 
-          data = d;
+          break;
         }
-        else
-          validData = false;
-        break;
-      }
-      case gazebo::msgs::Any::VECTOR3D:
-      {
-        if (paramValue.has_vector3d_value())
+        default:
         {
-          ignition::math::Vector3d vec =
-              msgs::ConvertIgn(paramValue.vector3d_value());
-
-          double d = 0;
-          // use uri to parse and get specific attribute
-          common::URI uri(curveVarName);
-          common::URIQuery query = uri.Query();
-          std::string queryStr = query.Str();
-          validData = Vector3dFromQuery(queryStr, vec, d);
-
-          data = d;
-        }
-        else
           validData = false;
-        break;
-      }
-      case gazebo::msgs::Any::QUATERNIOND:
-      {
-        if (paramValue.has_quaternion_value())
-        {
-          ignition::math::Quaterniond quat =
-              msgs::ConvertIgn(paramValue.quaternion_value());
-
-          double d = 0;
-          // use uri to parse and get specific attribute
-          common::URI uri(curveVarName);
-          common::URIQuery query = uri.Query();
-          std::string queryStr = query.Str();
-          validData = QuaterniondFromQuery(queryStr, quat, d);
-
-          data = d;
+          break;
         }
-        else
-          validData = false;
+      }
+      if (!validData)
+        continue;
 
-        break;
-      }
-      default:
-      {
-        validData = false;
-        break;
-      }
+      // push to tmp list and update later
+      curvesUpdates.push_back(std::make_pair(cIt, data));
     }
-    if (!validData)
-      continue;
-
-    // push to tmp list and update later
-    curvesUpdates.push_back(std::make_pair(it, data));
   }
 
   // update curves!
@@ -536,6 +530,8 @@ void IntrospectionCurveHandler::AddItemToFilter(const std::string &_name,
             // filter already exists, increment counter.
             int &count = this->dataPtr->introspectFilterCount[item];
             count++;
+            if (_cb)
+              _cb(true);
           }
 
           break;
