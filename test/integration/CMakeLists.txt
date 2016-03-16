@@ -59,6 +59,7 @@ set(tests
   logical_camera_sensor.cc
   model.cc
   model_database.cc
+  multirayshape.cc
   nested_model.cc
   noise.cc
   nondefault_world.cc
@@ -112,7 +113,7 @@ if (MANPAGES_SUPPORT)
 	      manpages.cc)
 endif()
 
-gz_build_tests(${tests})
+gz_build_tests(${tests} EXTRA_LIBS gazebo_test_fixture)
 
 if (ENABLE_TESTS_COMPILATION)
   # Increase timeout, to account for model download time.
@@ -139,6 +140,7 @@ gz_build_display_tests(${display_tests})
 set(dri_tests
   camera.cc
   camera_sensor.cc
+  depth_camera.cc
   factory.cc
   gpu_laser.cc
   gz_camera.cc
@@ -151,13 +153,13 @@ set(dri_tests
   speed_pr2.cc
   world_reset.cc
 )
-
-gz_build_dri_tests(${dri_tests})
+gz_build_dri_tests(${dri_tests} EXTRA_LIBS gazebo_test_fixture)
 
 set(qt_tests
   insert_model.cc
   model_editor.cc
   model_manipulation.cc
+  track_visual.cc
   undo.cc
   visual_pose.cc
 )

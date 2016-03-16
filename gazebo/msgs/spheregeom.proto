@@ -4,9 +4,8 @@ package gazebo.msgs;
 /// \interface SphereGeom 
 /// \brief Information about a sphere geometry
 
-
 message SphereGeom
 {
+  /// \brief Radius of the sphere.
   required double radius  = 1;
 }
-

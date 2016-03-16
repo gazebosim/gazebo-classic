@@ -5,6 +5,13 @@ Deprecated code produces compile-time warnings. These warning serve as
 notification to users that their code should be upgraded. The next major
 release will remove the deprecated code.
 
+## Gazebo 7.X to 8.X
+
+### Modifications
+
+1. **gazebo/sensors/DepthCameraSensor.hh**
+    + Modified to inherit from CameraSensor class.
+
 ## Gazebo 6.X to 7.X
 
 ### Additions
@@ -65,7 +72,6 @@ release will remove the deprecated code.
     + ***Replacement:*** public: virtual void SetClipDist();
     + ***Removed:*** public: template<typename T> event::ConnectionPtr ConnectNewImageFrame(T _subscriber);
     + ***Replacement:*** public: event::ConnectionPtr ConnectNewImageFrame(std::function<void (const unsigned char *, unsigned int, unsigned int, unsigned int, const std::string &)> _subscriber);
-
 
 1. **gazebo/msgs/logical_camera_sensors.proto**
     + The `near` and `far` members have been replaced with `near_clip` and `far_clip`
@@ -368,9 +374,9 @@ release will remove the deprecated code.
     + ***Replacement:** public: virtual std::string Topic() const;
     + ***Deprecation:** public: rendering::GpuLaserPtr GetLaserCamera() const
     + ***Replacement:** public: rendering::GpuLaserPtr LaserCamera() const;
-    + ***Deprecation:** public: double GetAngleResolution() const 
+    + ***Deprecation:** public: double GetAngleResolution() const
     + ***Replacement:** public: double AngleResolution() const;
-    + ***Deprecation:** public: double GetRangeMin() const 
+    + ***Deprecation:** public: double GetRangeMin() const
     + ***Replacement:** public: double RangeMin() const;
     + ***Deprecation:** public: double GetRangeMax() const
     + ***Replacement:** public: double RangeMax() const;
@@ -524,7 +530,7 @@ release will remove the deprecated code.
 1. **gazebo/sensors/WirelessTransmitter.hh**
     + ***Deprecation:** public: std::string GetESSID() const
     + ***Replacement:** public: std::string ESSID() const;
-    + ***Deprecation:** public: double GetFreq() const 
+    + ***Deprecation:** public: double GetFreq() const
     + ***Replacement:** public: double Freq() const;
 
 1. **gazebo/rendering/ApplyWrenchVisual.hh**

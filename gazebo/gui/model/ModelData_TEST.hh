@@ -30,6 +30,39 @@ class ModelData_TEST : public QTestFixture
 
   /// \brief Tests scaling link
   private slots: void LinkScale();
+
+  /// \brief Tests for computing volume
+  private slots: void LinkVolume();
+
+  /// \brief Tests for computing volume of box.
+  private slots: void BoxVolume();
+
+  /// \brief Tests for computing volume of cylinder.
+  private slots: void CylinderVolume();
+
+  /// \brief Tests for computing volume of sphere.
+  private slots: void SphereVolume();
+
+  /// \brief Tests for computing volume of mesh.
+  private slots: void MeshVolume();
+
+  /// \brief Tests for computing volume of polyline.
+  private slots: void PolylineVolume();
+
+  /// \brief Tests for computing moment of inertia for sphere.
+  private slots: void SphereMomentOfInertia();
+
+  /// \brief Tests for computing moment of inertia for cylinder.
+  private slots: void CylinderMomentOfInertia();
+
+  /// \brief Tests for computing moment of inertia for box.
+  private slots: void BoxMomentOfInertia();
+
+  /// \brief Tests for computing moment of inertia for mesh.
+  private slots: void MeshMomentOfInertia();
+
+  /// \brief Tests for computing moment of inertia for polyline.
+  private slots: void PolylineMomentOfInertia();
 };
 
 #endif
