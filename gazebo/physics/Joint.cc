@@ -409,6 +409,8 @@ void Joint::Fini()
   }
   this->sensors.clear();
 
+  this->UnregisterIntrospectionItems();
+
   Base::Fini();
 }
 
@@ -1472,6 +1474,7 @@ void Joint::RegisterIntrospectionPosition(const unsigned int _index)
   common::URI uri(this->URI());
   uri.Query().Insert("p",
       "axis/" + std::to_string(_index) + "/double/position");
+  this->introspectionItems.push_back(uri);
   gazebo::util::IntrospectionManager::Instance()->Register
       <double>(uri.Str(), f);
 }
@@ -1487,6 +1490,16 @@ void Joint::RegisterIntrospectionVelocity(const unsigned int _index)
   common::URI uri(this->URI());
   uri.Query().Insert("p",
       "axis/" + std::to_string(_index) + "/double/velocity");
+  this->introspectionItems.push_back(uri);
   gazebo::util::IntrospectionManager::Instance()->Register
       <double>(uri.Str(), f);
+}
+
+/////////////////////////////////////////////////
+void Joint::UnregisterIntrospectionItems()
+{
+  for (auto &item : this->introspectionItems)
+    util::IntrospectionManager::Instance()->Unregister(item.Str());
+
+  this->introspectionItems.clear();
 }

@@ -43,8 +43,8 @@ class IntrospectionItemsTest : public ServerFixture,
   /// \param[in] _joint Pointer to the joint.
   private: void JointItems(physics::JointPtr _joint);
 
-  /// \brief Stores the list of items available.
-  private: std::set<std::string> itemsAvailable;
+  /// \brief Stores the list of items expected to be registered.
+  private: std::vector<std::string> itemsExpected;
 };
 
 /////////////////////////////////////////////////
@@ -73,17 +73,11 @@ void IntrospectionItemsTest::RegisteredItems(const std::string &_physicsEngine)
   EXPECT_FALSE(id.empty());
 
   // Get available items
-  EXPECT_TRUE(client.Items(id, this->itemsAvailable));
-  EXPECT_FALSE(this->itemsAvailable.empty());
+  std::set<std::string> itemsAvailable;
+  EXPECT_TRUE(client.Items(id, itemsAvailable));
+  EXPECT_FALSE(itemsAvailable.empty());
 
-  // Check registered items for all models
-  auto models = world->GetModels();
-  EXPECT_FALSE(models.empty());
-
-  for (auto model : models)
-    this->ModelItems(model);
-
-  // Check registered items for the world
+  // Check items expected for the world
   std::vector<std::string> queries;
   queries.push_back("time/sim_time");
 
@@ -92,10 +86,35 @@ void IntrospectionItemsTest::RegisteredItems(const std::string &_physicsEngine)
   {
     common::URI uri(worldUri);
     uri.Query().Insert("p", query);
+    EXPECT_FALSE(itemsAvailable.find(uri.Str()) == itemsAvailable.end());
+  }
 
-    gzdbg << "Checking [" << uri.Str() << "]" << std::endl;
-    EXPECT_TRUE(this->itemsAvailable.find(uri.Str()) !=
-        this->itemsAvailable.end());
+  // Get list of items expected for models and their children
+  auto models = world->GetModels();
+  EXPECT_FALSE(models.empty());
+
+  for (auto model : models)
+    this->ModelItems(model);
+
+  // Check all items are registered
+  for (auto &item : this->itemsExpected)
+  {
+    gzdbg << "Checking [" << item << "] is registered" << std::endl;
+    EXPECT_FALSE(itemsAvailable.find(item) == itemsAvailable.end());
+  }
+
+  // Remove models
+  for (auto model : models)
+    world->RemoveModel(model);
+  EXPECT_TRUE(world->GetModels().empty());
+
+  // Expect items not to be registered
+  itemsAvailable.clear();
+  EXPECT_TRUE(client.Items(id, itemsAvailable));
+  for (auto &item : this->itemsExpected)
+  {
+    gzdbg << "Checking [" << item << "] is not registered" << std::endl;
+    EXPECT_TRUE(itemsAvailable.find(item) == itemsAvailable.end());
   }
 }
 
@@ -126,10 +145,7 @@ void IntrospectionItemsTest::ModelItems(physics::ModelPtr _model)
   {
     common::URI uri(modelUri);
     uri.Query().Insert("p", query);
-
-    gzdbg << "Checking [" << uri.Str() << "]" << std::endl;
-    EXPECT_TRUE(this->itemsAvailable.find(uri.Str()) !=
-        this->itemsAvailable.end());
+    this->itemsExpected.push_back(uri.Str());
   }
 }
 
@@ -149,10 +165,7 @@ void IntrospectionItemsTest::LinkItems(physics::LinkPtr _link)
   {
     common::URI uri(linkUri);
     uri.Query().Insert("p", query);
-
-    gzdbg << "Checking [" << uri.Str() << "]" << std::endl;
-    EXPECT_TRUE(this->itemsAvailable.find(uri.Str()) !=
-        this->itemsAvailable.end());
+    this->itemsExpected.push_back(uri.Str());
   }
 }
 
@@ -171,10 +184,7 @@ void IntrospectionItemsTest::JointItems(physics::JointPtr _joint)
     {
       common::URI uri(jointUri);
       uri.Query().Insert("p", query);
-
-      gzdbg << "Checking [" << uri.Str() << "]" << std::endl;
-      EXPECT_TRUE(this->itemsAvailable.find(uri.Str()) !=
-          this->itemsAvailable.end());
+      this->itemsExpected.push_back(uri.Str());
     }
   }
 }

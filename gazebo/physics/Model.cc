@@ -411,14 +411,16 @@ boost::shared_ptr<Model> Model::shared_from_this()
 //////////////////////////////////////////////////
 void Model::Fini()
 {
-  Entity::Fini();
-
   this->plugins.clear();
   this->attachedModels.clear();
   this->joints.clear();
   this->links.clear();
   this->canonicalLink.reset();
   this->models.clear();
+
+  this->UnregisterIntrospectionItems();
+
+  Entity::Fini();
 }
 
 //////////////////////////////////////////////////
@@ -1510,26 +1512,40 @@ void Model::RegisterIntrospectionItems()
   // Register items.
   common::URI poseURI(uri);
   poseURI.Query().Insert("p", "pose3d/world_pose");
+  this->introspectionItems.push_back(poseURI);
   gazebo::util::IntrospectionManager::Instance()->Register
       <ignition::math::Pose3d>(poseURI.Str(), fModelPose);
 
   common::URI linVelURI(uri);
   linVelURI.Query().Insert("p", "vector3d/world_linear_velocity");
+  this->introspectionItems.push_back(linVelURI);
   gazebo::util::IntrospectionManager::Instance()->Register
       <ignition::math::Vector3d>(linVelURI.Str(), fModelLinVel);
 
   common::URI angVelURI(uri);
   angVelURI.Query().Insert("p", "vector3d/world_angular_velocity");
+  this->introspectionItems.push_back(angVelURI);
   gazebo::util::IntrospectionManager::Instance()->Register
       <ignition::math::Vector3d>(angVelURI.Str(), fModelAngVel);
 
   common::URI linAccURI(uri);
   linAccURI.Query().Insert("p", "vector3d/world_linear_acceleration");
+  this->introspectionItems.push_back(linAccURI);
   gazebo::util::IntrospectionManager::Instance()->Register
       <ignition::math::Vector3d>(linAccURI.Str(), fModelLinAcc);
 
   common::URI angAccURI(uri);
   angAccURI.Query().Insert("p", "vector3d/world_angular_acceleration");
+  this->introspectionItems.push_back(angAccURI);
   gazebo::util::IntrospectionManager::Instance()->Register
       <ignition::math::Vector3d>(angAccURI.Str(), fModelAngAcc);
+}
+
+/////////////////////////////////////////////////
+void Model::UnregisterIntrospectionItems()
+{
+  for (auto &item : this->introspectionItems)
+    util::IntrospectionManager::Instance()->Unregister(item.Str());
+
+  this->introspectionItems.clear();
 }

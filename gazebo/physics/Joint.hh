@@ -607,6 +607,9 @@ namespace gazebo
       /// \param[in] _index Axis index.
       private: void RegisterIntrospectionVelocity(const unsigned int _index);
 
+      /// \brief Unregister items in the introspection service.
+      private: void UnregisterIntrospectionItems();
+
       /// \brief The first link this joint connects to
       protected: LinkPtr childLink;
 
@@ -687,6 +690,9 @@ namespace gazebo
 
       /// \brief Joint stop dissipation
       private: double stopDissipation[MAX_JOINT_AXIS];
+
+      /// \brief All the introspection items regsitered for this.
+      private: std::vector<common::URI> introspectionItems;
     };
     /// \}
   }
