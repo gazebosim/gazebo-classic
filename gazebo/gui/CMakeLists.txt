@@ -237,7 +237,7 @@ if (SPNAV_LIBRARY)
 endif()
 
 if (USE_PCH)
-  add_pch(gazebo_gui gui_pch.in.hh)
+  add_pch(gazebo_gui gui_pch.hh)
 endif()
 
 set (gtest_sources

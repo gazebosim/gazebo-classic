@@ -176,7 +176,7 @@ if (HAVE_GDAL)
 endif()
 
 if (USE_PCH)
-  add_pch(gazebo_physics physics_pch.in.hh)
+  add_pch(gazebo_physics physics_pch.hh)
 endif()
 
 gz_install_library(gazebo_physics)

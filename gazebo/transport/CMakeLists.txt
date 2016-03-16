@@ -68,7 +68,7 @@ if (WIN32)
 endif()
 
 if (USE_PCH)
-  add_pch(gazebo_transport transport_pch.in.hh)
+  add_pch(gazebo_transport transport_pch.hh)
 endif()
 
 gz_install_library(gazebo_transport)

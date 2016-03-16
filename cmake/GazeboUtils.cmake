@@ -245,11 +245,11 @@ option(USE_PCH "compiles using gnu precompiled headers" OFF)
 # filename the name of the PCH file, relative to the dir of the CMakeLists calling the macro
 macro(add_pch target_name filename)
 
-  set(pch_out ${CMAKE_CURRENT_BINARY_DIR}/${filename}.gch)
+  set(pch_out ${CMAKE_CURRENT_BINARY_DIR}/${filename}.out.gch)
   set(pch_in ${CMAKE_CURRENT_SOURCE_DIR}/${filename})
   set(FLAGS -g -O2 -fPIC -x c++-header)
 
-  separate_arguments(ARGS UNIX_COMMAND "${CMAKE_C_FLAGS_ALL} ${CMAKE_CXX_FLAGS}")
+  separate_arguments(ARGS UNIX_COMMAND "${CMAKE_C_FLAGS_ALL} ${CMAKE_CXX_FLAGS} ${ARGN}")
 
   add_custom_command(OUTPUT ${pch_out}
     COMMAND ${CMAKE_CXX_COMPILER} ${ARGS} ${FLAGS} ${pch_in} -o ${pch_out}
@@ -259,7 +259,7 @@ macro(add_pch target_name filename)
 
   add_custom_target(${target_name}_pch DEPENDS ${pch_out})
 
-  target_compile_options(${target_name} PRIVATE -Winvalid-pch -include ${pch_in})
+  target_compile_options(${target_name} PRIVATE -Winvalid-pch -include ${filename}.out)
   add_dependencies(${target_name} ${target_name}_pch)
 
 endmacro()
