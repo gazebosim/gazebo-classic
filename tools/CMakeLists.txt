@@ -34,8 +34,7 @@ set (test_sources
   gz_log_TEST.cc
   gz_TEST.cc
 )
-
-gz_build_tests(${test_sources})
+gz_build_tests(${test_sources} EXTRA_LIBS gazebo_transport)
 
 add_executable(gz gz.cc gz_topic.cc gz_log.cc gz_marker.cc)
 target_link_libraries(gz

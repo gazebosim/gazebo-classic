@@ -2,6 +2,12 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
+1. Added static camera when following a model.
+    * [Pull request #1980](https://bitbucket.org/osrf/gazebo/pull-request/1980)
+
+1. Support conversions between SDF and protobuf for more sensors.
+    * [Pull request #2118](https://bitbucket.org/osrf/gazebo/pull-request/2118)
+
 1. Fix ODE Ray-Cylinder collision, and added ability to instantiate stand alone MultiRayShapes.
     * [Pull request #2122](https://bitbucket.org/osrf/gazebo/pull-request/2122)
 
@@ -12,6 +18,15 @@
 
 ## Gazebo 7.x.x (2016-xx-xx)
 
+1. Fix compilation against ffmpeg3 (libavcodec)
+    * [Pull request #2154](https://bitbucket.org/osrf/gazebo/pull-request/2154)
+
+1. Append a missing </gazebo_log> tag to log files when played.
+    * [Pull request #2143](https://bitbucket.org/osrf/gazebo/pull-request/2143)
+
+1. Add helper function QTestFixture::ProcessEventsAndDraw
+    * [Pull request #2147](https://bitbucket.org/osrf/gazebo/pull-request/2147)
+
 1. Undo scaling during simulation
     * [Pull request #2108](https://bitbucket.org/osrf/gazebo/pull-request/2108)
 
@@ -20,6 +35,10 @@
 
 1. Removes one function call and replaces a manual swap with std::swap in ODE heightfield.
     * [Pull request #2114](https://bitbucket.org/osrf/gazebo/pull-request/2114)
+
+1. Model editor updates
+    1. Fix saving and spawning model with its original name
+        * [Pull request #2183](https://bitbucket.org/osrf/gazebo/pull-request/2183)
 
 
 ## Gazebo 7.0.0 (2016-01-25)

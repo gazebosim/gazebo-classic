@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,25 +15,25 @@
  *
 */
 
-#ifndef _GAZEBO_MODEL_EDITOR_TEST_HH_
-#define _GAZEBO_MODEL_EDITOR_TEST_HH_
+#ifndef _GAZEBO_TRACK_VISUAL_TEST_HH_
+#define _GAZEBO_TRACK_VISUAL_TEST_HH_
 
+#include <string>
 #include "gazebo/gui/QTestFixture.hh"
 
-/// \brief A test class for the model editor
-class ModelEditorTest : public QTestFixture
+class QtProperty;
+class QtTreePropertyBrowser;
+
+/// \brief Test undo / redo user commands.
+class TrackVisualTest : public QTestFixture
 {
   Q_OBJECT
 
-  /// \brief Test editing and saving existing model
-  private slots: void EditModel();
+  /// \brief Default constructor
+  public: TrackVisualTest() = default;
 
-  /// \brief Test pose of model links and joints before and after saving
-  private slots: void SaveModelPose();
-
-  /// \brief Test pose of joint hotspot visual when parent or child link is
-  /// changed via the joint inspector
-  private slots: void JointInspectorUpdate();
+  /// \brief Test tracking visual.
+  private slots: void TrackVisual();
 };
 
 #endif
