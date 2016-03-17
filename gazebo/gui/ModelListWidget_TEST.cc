@@ -103,7 +103,7 @@ void ModelListWidget_TEST::CheckPoseProperty(QList<QtProperty *> _properties,
     const gazebo::math::Pose &_pose)
 {
   QCOMPARE(_properties.size(), 6);
-  CheckVector3Property(_properties, _pose.pos.Ign());
+  this->CheckVector3Property(_properties, _pose.pos.Ign());
   QtVariantProperty *property;
   property = static_cast<QtVariantProperty *>(_properties[3]);
   Q_ASSERT(property);
@@ -147,7 +147,7 @@ void ModelListWidget_TEST::SetPoseProperty(
     const gazebo::math::Pose &_pose)
 {
   QCOMPARE(_properties.size(), 6);
-  SetVector3Property(_propTreeBrowser, _properties, _pose.pos.Ign());
+  this->SetVector3Property(_propTreeBrowser, _properties, _pose.pos.Ign());
   QtVariantProperty *property;
   property = static_cast<QtVariantProperty *>(_properties[3]);
   Q_ASSERT(property);
