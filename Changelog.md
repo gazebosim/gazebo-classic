@@ -21,6 +21,9 @@
 
 ## Gazebo 7.x.x (2016-xx-xx)
 
+1. Allow dynamically adding links to a model.
+    * [Pull request #2185](https://bitbucket.org/osrf/gazebo/pull-requests/2185)
+
 1. Fix compilation against ffmpeg3 (libavcodec)
     * [Pull request #2154](https://bitbucket.org/osrf/gazebo/pull-request/2154)
 
@@ -40,9 +43,18 @@
     * [Pull request #2114](https://bitbucket.org/osrf/gazebo/pull-request/2114)
 
 1. Model editor updates
+    1. Fix setting relative pose after alignment during joint creation.
+        * [Issue #1844](https://bitbucket.org/osrf/gazebo/issues/1844)
+        * [Pull request #2150](https://bitbucket.org/osrf/gazebo/pull-request/2150)
+
     1. Fix saving and spawning model with its original name
         * [Pull request #2183](https://bitbucket.org/osrf/gazebo/pull-request/2183)
 
+1. Building editor updates
+
+    1. Add layers to building levels
+        * [Pull request #2180](https://bitbucket.org/osrf/gazebo/pull-request/2180)
+        * [Issue #1806](https://bitbucket.org/osrf/gazebo/issues/1806)
 
 ## Gazebo 7.0.0 (2016-01-25)
 
