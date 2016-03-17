@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,19 +32,19 @@ void JointMaker_TEST::JointState()
   this->Load("worlds/empty.world");
 
   gui::JointMaker *jointMaker = new gui::JointMaker();
-  QCOMPARE(jointMaker->GetState(), gui::JointMaker::JOINT_NONE);
+  QCOMPARE(jointMaker->State(), gui::JointMaker::JOINT_NONE);
 
   jointMaker->AddJoint(gui::JointMaker::JOINT_HINGE);
-  QCOMPARE(jointMaker->GetState(), gui::JointMaker::JOINT_HINGE);
+  QCOMPARE(jointMaker->State(), gui::JointMaker::JOINT_HINGE);
 
   jointMaker->Reset();
-  QCOMPARE(jointMaker->GetState(), gui::JointMaker::JOINT_NONE);
+  QCOMPARE(jointMaker->State(), gui::JointMaker::JOINT_NONE);
 
   jointMaker->AddJoint(gui::JointMaker::JOINT_SLIDER);
-  QCOMPARE(jointMaker->GetState(), gui::JointMaker::JOINT_SLIDER);
+  QCOMPARE(jointMaker->State(), gui::JointMaker::JOINT_SLIDER);
 
   jointMaker->Stop();
-  QCOMPARE(jointMaker->GetState(), gui::JointMaker::JOINT_NONE);
+  QCOMPARE(jointMaker->State(), gui::JointMaker::JOINT_NONE);
 
   delete jointMaker;
 }
@@ -58,8 +58,8 @@ void JointMaker_TEST::CreateRemoveJoint()
   this->Load("worlds/shapes.world", false, false, false);
 
   gui::JointMaker *jointMaker = new gui::JointMaker();
-  QCOMPARE(jointMaker->GetState(), gui::JointMaker::JOINT_NONE);
-  QCOMPARE(jointMaker->GetJointCount(), 0u);
+  QCOMPARE(jointMaker->State(), gui::JointMaker::JOINT_NONE);
+  QCOMPARE(jointMaker->JointCount(), 0u);
 
   gui::MainWindow *mainWindow = new gui::MainWindow();
   QVERIFY(mainWindow != NULL);
@@ -67,13 +67,7 @@ void JointMaker_TEST::CreateRemoveJoint()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   rendering::UserCameraPtr cam = gui::get_active_camera();
   Q_ASSERT(cam);
@@ -93,40 +87,147 @@ void JointMaker_TEST::CreateRemoveJoint()
   gui::JointData *revoluteJointData =
       jointMaker->CreateJoint(boxLink, sphereLink);
   jointMaker->CreateHotSpot(revoluteJointData);
-  QCOMPARE(jointMaker->GetJointCount(), 1u);
+  QCOMPARE(jointMaker->JointCount(), 1u);
 
   // Add a prismatic joint
   jointMaker->AddJoint(gui::JointMaker::JOINT_SLIDER);
   gui::JointData *prismaticJointData =
       jointMaker->CreateJoint(sphereLink, cylinderLink);
   jointMaker->CreateHotSpot(prismaticJointData);
-  QCOMPARE(jointMaker->GetJointCount(), 2u);
+  QCOMPARE(jointMaker->JointCount(), 2u);
 
   // Add a screw joint
   jointMaker->AddJoint(gui::JointMaker::JOINT_SCREW);
   gui::JointData *screwJointData =
       jointMaker->CreateJoint(cylinderLink, boxLink);
   jointMaker->CreateHotSpot(screwJointData);
-  QCOMPARE(jointMaker->GetJointCount(), 3u);
+  QCOMPARE(jointMaker->JointCount(), 3u);
 
   // Remove the screw joint
   jointMaker->RemoveJoint(screwJointData->hotspot->GetName());
-  QCOMPARE(jointMaker->GetJointCount(), 2u);
+  QCOMPARE(jointMaker->JointCount(), 2u);
 
   // Add a ball joint
   jointMaker->AddJoint(gui::JointMaker::JOINT_BALL);
   gui::JointData *ballJointData =
       jointMaker->CreateJoint(cylinderLink, boxLink);
   jointMaker->CreateHotSpot(ballJointData);
-  QCOMPARE(jointMaker->GetJointCount(), 3u);
+  QCOMPARE(jointMaker->JointCount(), 3u);
 
   // Remove the two joints connected to the sphere
   jointMaker->RemoveJointsByLink(sphereLink->GetName());
-  QCOMPARE(jointMaker->GetJointCount(), 1u);
+  QCOMPARE(jointMaker->JointCount(), 1u);
 
   // Remove the last joint
   jointMaker->RemoveJoint(ballJointData->hotspot->GetName());
-  QCOMPARE(jointMaker->GetJointCount(), 0u);
+  QCOMPARE(jointMaker->JointCount(), 0u);
+
+  delete jointMaker;
+  mainWindow->close();
+  delete mainWindow;
+}
+
+/////////////////////////////////////////////////
+void JointMaker_TEST::CreateRemoveNestedJoint()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/deeply_nested_models.world", false, false, false);
+
+  gui::JointMaker *jointMaker = new gui::JointMaker();
+  QCOMPARE(jointMaker->State(), gui::JointMaker::JOINT_NONE);
+  QCOMPARE(jointMaker->JointCount(), 0u);
+
+  gui::MainWindow *mainWindow = new gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  this->ProcessEventsAndDraw(mainWindow);
+
+  rendering::UserCameraPtr cam = gui::get_active_camera();
+  Q_ASSERT(cam);
+  rendering::ScenePtr scene = cam->GetScene();
+  Q_ASSERT(scene);
+
+  // Get the top level model link
+  gazebo::rendering::VisualPtr link00Vis =
+      scene->GetVisual("model_00::link_00");
+  QVERIFY(link00Vis != NULL);
+
+  // Get the nested model links
+  gazebo::rendering::VisualPtr link01Vis =
+      scene->GetVisual("model_00::model_01::link_01");
+  QVERIFY(link01Vis != NULL);
+  gazebo::rendering::VisualPtr link02Vis =
+      scene->GetVisual("model_00::model_01::model_02::link_02");
+  QVERIFY(link02Vis != NULL);
+  gazebo::rendering::VisualPtr link03Vis =
+      scene->GetVisual("model_00::model_01::model_02::model_03::link_03");
+  QVERIFY(link03Vis != NULL);
+
+  unsigned int jointCount = jointMaker->JointCount();
+
+  // Remove joints connected to the each link
+  jointMaker->RemoveJointsByLink(link00Vis->GetName());
+  QVERIFY(jointMaker->JointCount() <= jointCount);
+  jointCount = jointMaker->JointCount();
+
+  jointMaker->RemoveJointsByLink(link01Vis->GetName());
+  QVERIFY(jointMaker->JointCount() <= jointCount);
+  jointCount = jointMaker->JointCount();
+
+  jointMaker->RemoveJointsByLink(link02Vis->GetName());
+  QVERIFY(jointMaker->JointCount() <= jointCount);
+  jointCount = jointMaker->JointCount();
+
+  jointMaker->RemoveJointsByLink(link03Vis->GetName());
+  QVERIFY(jointMaker->JointCount() <= jointCount);
+
+  // no more joints left
+  QCOMPARE(jointMaker->JointCount(), 0u);
+
+  // Add a revolute joint
+  jointMaker->AddJoint(gui::JointMaker::JOINT_HINGE);
+  gui::JointData *revoluteJointData =
+      jointMaker->CreateJoint(link00Vis, link01Vis);
+  jointMaker->CreateHotSpot(revoluteJointData);
+  QCOMPARE(jointMaker->JointCount(), 1u);
+
+  // Add a prismatic joint
+  jointMaker->AddJoint(gui::JointMaker::JOINT_SLIDER);
+  gui::JointData *prismaticJointData =
+      jointMaker->CreateJoint(link01Vis, link02Vis);
+  jointMaker->CreateHotSpot(prismaticJointData);
+  QCOMPARE(jointMaker->JointCount(), 2u);
+
+  // Add a screw joint
+  jointMaker->AddJoint(gui::JointMaker::JOINT_SCREW);
+  gui::JointData *screwJointData =
+      jointMaker->CreateJoint(link00Vis, link02Vis);
+  jointMaker->CreateHotSpot(screwJointData);
+  QCOMPARE(jointMaker->JointCount(), 3u);
+
+  // Remove the screw joint
+  jointMaker->RemoveJoint(screwJointData->hotspot->GetName());
+  QCOMPARE(jointMaker->JointCount(), 2u);
+
+  // Add a ball joint
+  jointMaker->AddJoint(gui::JointMaker::JOINT_BALL);
+  gui::JointData *ballJointData =
+      jointMaker->CreateJoint(link00Vis, link03Vis);
+  jointMaker->CreateHotSpot(ballJointData);
+  QCOMPARE(jointMaker->JointCount(), 3u);
+
+  // Remove the two joints connected to link01
+  jointMaker->RemoveJointsByLink(link01Vis->GetName());
+  QCOMPARE(jointMaker->JointCount(), 1u);
+
+  // Remove the last joint
+  jointMaker->RemoveJoint(ballJointData->hotspot->GetName());
+  QCOMPARE(jointMaker->JointCount(), 0u);
 
   delete jointMaker;
   mainWindow->close();
@@ -142,8 +243,8 @@ void JointMaker_TEST::JointDefaultProperties()
   this->Load("worlds/shapes.world", false, false, false);
 
   gui::JointMaker *jointMaker = new gui::JointMaker();
-  QCOMPARE(jointMaker->GetState(), gui::JointMaker::JOINT_NONE);
-  QCOMPARE(jointMaker->GetJointCount(), 0u);
+  QCOMPARE(jointMaker->State(), gui::JointMaker::JOINT_NONE);
+  QCOMPARE(jointMaker->JointCount(), 0u);
 
   gui::MainWindow *mainWindow = new gui::MainWindow();
   QVERIFY(mainWindow != NULL);
@@ -151,13 +252,7 @@ void JointMaker_TEST::JointDefaultProperties()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   rendering::UserCameraPtr cam = gui::get_active_camera();
   Q_ASSERT(cam);
@@ -177,11 +272,11 @@ void JointMaker_TEST::JointDefaultProperties()
   gui::JointData *revoluteJointData =
       jointMaker->CreateJoint(boxLink, sphereLink);
   jointMaker->CreateHotSpot(revoluteJointData);
-  QCOMPARE(jointMaker->GetJointCount(), 1u);
+  QCOMPARE(jointMaker->JointCount(), 1u);
 
   // verify connected joints
   std::vector<gui::JointData *> boxJointData =
-      jointMaker->GetJointDataByLink("box::link");
+      jointMaker->JointDataByLink("box::link");
   QCOMPARE(static_cast<unsigned int>(boxJointData.size()), 1u);
 
   gui::JointData *rev2joint = boxJointData[0];
@@ -227,15 +322,15 @@ void JointMaker_TEST::JointDefaultProperties()
   gui::JointData *prismaticJointData =
       jointMaker->CreateJoint(sphereLink, cylinderLink);
   jointMaker->CreateHotSpot(prismaticJointData);
-  QCOMPARE(jointMaker->GetJointCount(), 2u);
+  QCOMPARE(jointMaker->JointCount(), 2u);
 
   // verify connected joints
   std::vector<gui::JointData *> sphereJointData =
-      jointMaker->GetJointDataByLink("sphere::link");
+      jointMaker->JointDataByLink("sphere::link");
   QCOMPARE(static_cast<unsigned int>(sphereJointData.size()), 2u);
 
   std::vector<gui::JointData *> cylinderJointData =
-      jointMaker->GetJointDataByLink("cylinder::link");
+      jointMaker->JointDataByLink("cylinder::link");
   QCOMPARE(static_cast<unsigned int>(cylinderJointData.size()), 1u);
 
   gui::JointData *prisJoint = cylinderJointData[0];
@@ -270,15 +365,15 @@ void JointMaker_TEST::JointDefaultProperties()
   gui::JointData *gearboxJointData =
       jointMaker->CreateJoint(boxLink, cylinderLink);
   jointMaker->CreateHotSpot(gearboxJointData);
-  QCOMPARE(jointMaker->GetJointCount(), 3u);
+  QCOMPARE(jointMaker->JointCount(), 3u);
 
   // verify connected joints
   boxJointData =
-      jointMaker->GetJointDataByLink("box::link");
+      jointMaker->JointDataByLink("box::link");
   QCOMPARE(static_cast<unsigned int>(boxJointData.size()), 2u);
 
   cylinderJointData =
-      jointMaker->GetJointDataByLink("cylinder::link");
+      jointMaker->JointDataByLink("cylinder::link");
   QCOMPARE(static_cast<unsigned int>(cylinderJointData.size()), 2u);
 
   gui::JointData *gearboxJoint = cylinderJointData[0];
@@ -324,15 +419,15 @@ void JointMaker_TEST::JointDefaultProperties()
   gui::JointData *fixedJointData =
       jointMaker->CreateJoint(boxLink, cylinderLink);
   jointMaker->CreateHotSpot(fixedJointData);
-  QCOMPARE(jointMaker->GetJointCount(), 4u);
+  QCOMPARE(jointMaker->JointCount(), 4u);
 
   // verify connected joints
   boxJointData =
-      jointMaker->GetJointDataByLink("box::link");
+      jointMaker->JointDataByLink("box::link");
   QCOMPARE(static_cast<unsigned int>(boxJointData.size()), 3u);
 
   cylinderJointData =
-      jointMaker->GetJointDataByLink("cylinder::link");
+      jointMaker->JointDataByLink("cylinder::link");
   QCOMPARE(static_cast<unsigned int>(cylinderJointData.size()), 3u);
 
   gui::JointData *fixedJoint = cylinderJointData[1];
@@ -376,13 +471,7 @@ void JointMaker_TEST::ShowJoints()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   rendering::UserCameraPtr cam = gui::get_active_camera();
   Q_ASSERT(cam);
@@ -402,22 +491,16 @@ void JointMaker_TEST::ShowJoints()
   gui::JointData *revoluteJointData =
       jointMaker->CreateJoint(boxLink, sphereLink);
   jointMaker->CreateHotSpot(revoluteJointData);
-  QCOMPARE(jointMaker->GetJointCount(), 1u);
+  QCOMPARE(jointMaker->JointCount(), 1u);
 
   // Add a prismatic joint
   jointMaker->AddJoint(gui::JointMaker::JOINT_SLIDER);
   gui::JointData *prismaticJointData =
       jointMaker->CreateJoint(sphereLink, cylinderLink);
   jointMaker->CreateHotSpot(prismaticJointData);
-  QCOMPARE(jointMaker->GetJointCount(), 2u);
+  QCOMPARE(jointMaker->JointCount(), 2u);
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   QVERIFY(revoluteJointData->hotspot != NULL);
   QVERIFY(prismaticJointData->hotspot != NULL);
@@ -458,8 +541,8 @@ void JointMaker_TEST::Selection()
 
   gui::JointMaker *jointMaker = new gui::JointMaker();
 
-  QCOMPARE(jointMaker->GetState(), gui::JointMaker::JOINT_NONE);
-  QCOMPARE(jointMaker->GetJointCount(), 0u);
+  QCOMPARE(jointMaker->State(), gui::JointMaker::JOINT_NONE);
+  QCOMPARE(jointMaker->JointCount(), 0u);
 
   gui::MainWindow *mainWindow = new gui::MainWindow();
   QVERIFY(mainWindow != NULL);
@@ -467,13 +550,7 @@ void JointMaker_TEST::Selection()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   rendering::UserCameraPtr cam = gui::get_active_camera();
   Q_ASSERT(cam);
@@ -493,21 +570,21 @@ void JointMaker_TEST::Selection()
   gui::JointData *revoluteJointData =
       jointMaker->CreateJoint(boxLink, sphereLink);
   jointMaker->CreateHotSpot(revoluteJointData);
-  QCOMPARE(jointMaker->GetJointCount(), 1u);
+  QCOMPARE(jointMaker->JointCount(), 1u);
 
   // Add a prismatic joint
   jointMaker->AddJoint(gui::JointMaker::JOINT_SLIDER);
   gui::JointData *prismaticJointData =
       jointMaker->CreateJoint(sphereLink, cylinderLink);
   jointMaker->CreateHotSpot(prismaticJointData);
-  QCOMPARE(jointMaker->GetJointCount(), 2u);
+  QCOMPARE(jointMaker->JointCount(), 2u);
 
   // Add a screw joint
   jointMaker->AddJoint(gui::JointMaker::JOINT_SCREW);
   gui::JointData *screwJointData =
       jointMaker->CreateJoint(cylinderLink, boxLink);
   jointMaker->CreateHotSpot(screwJointData);
-  QCOMPARE(jointMaker->GetJointCount(), 3u);
+  QCOMPARE(jointMaker->JointCount(), 3u);
 
   // verify initial selected state
   QVERIFY(!revoluteJointData->hotspot->GetHighlighted());
@@ -566,7 +643,7 @@ void JointMaker_TEST::JointMaterial()
   std::set<std::string> jointMaterials;
   for (auto &j : jointTypes)
   {
-    std::string mat = jointMaker->GetJointMaterial(j);
+    std::string mat = jointMaker->JointMaterial(j);
     QVERIFY(mat != "");
     QVERIFY(jointMaterials.find(mat) == jointMaterials.end());
     jointMaterials.insert(mat);
@@ -616,6 +693,175 @@ void JointMaker_TEST::LinkList()
   QVERIFY(linkList.find("model::link1") == linkList.end());
 
   delete jointMaker;
+}
+
+/////////////////////////////////////////////////
+void JointMaker_TEST::UpdateMsg()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/shapes.world", false, false, false);
+
+  // Create joint maker
+  auto jointMaker = new gui::JointMaker();
+  QVERIFY(jointMaker != NULL);
+  QCOMPARE(jointMaker->JointCount(), 0u);
+
+  // Create main window
+  auto mainWindow = new gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  this->ProcessEventsAndDraw(mainWindow);
+
+  auto cam = gui::get_active_camera();
+  Q_ASSERT(cam);
+  auto scene = cam->GetScene();
+  Q_ASSERT(scene);
+
+  auto boxLink = scene->GetVisual("box::link");
+  auto sphereLink = scene->GetVisual("sphere::link");
+
+  Q_ASSERT(boxLink.get());
+  Q_ASSERT(sphereLink.get());
+
+  // Add a revolute joint
+  jointMaker->AddJoint(gui::JointMaker::JOINT_HINGE);
+  auto jointData = jointMaker->CreateJoint(boxLink, sphereLink);
+  jointMaker->CreateHotSpot(jointData);
+  QCOMPARE(jointMaker->JointCount(), 1u);
+
+  // Check data was properly generated
+  auto name1 = jointData->name;
+  QVERIFY(name1 == "link_JOINT_0");
+
+  auto type1 = jointData->type;
+  QCOMPARE(type1, gui::JointMaker::JOINT_HINGE);
+
+  auto msg1 = jointData->jointMsg;
+  QVERIFY(msg1 != NULL);
+  QVERIFY(msg1->name() == name1);
+  QVERIFY(gui::JointMaker::ConvertJointType(
+      msgs::ConvertJointType(msg1->type())) == type1);
+  QVERIFY(msg1->has_axis1());
+  QVERIFY(!msg1->has_axis2());
+  QCOMPARE(msgs::ConvertIgn(msg1->pose()), ignition::math::Pose3d::Zero);
+
+  auto parentVis = jointData->parent;
+  QVERIFY(parentVis != NULL);
+
+  auto childVis = jointData->child;
+  QVERIFY(childVis != NULL);
+
+  auto hotspot = jointData->hotspot;
+  QVERIFY(hotspot != NULL);
+
+  auto visual = jointData->visual;
+  QVERIFY(visual != NULL);
+
+  auto line = jointData->line;
+  QVERIFY(line != NULL);
+
+  auto handles = jointData->handles;
+  QVERIFY(handles != NULL);
+
+  auto inspector = jointData->inspector;
+  QVERIFY(inspector != NULL);
+
+  QVERIFY(jointData->dirty);
+
+  // Check there's no joint visual until update
+  auto jointVisual = jointData->jointVisual;
+  QVERIFY(jointVisual == NULL);
+
+  jointData->Update();
+
+  QVERIFY(!jointData->dirty);
+
+  jointVisual = jointData->jointVisual;
+  QVERIFY(jointVisual != NULL);
+
+  // Change data and update - 1 axis -> 2 axes
+  std::string name2 = "new_name";
+  auto type2 = gui::JointMaker::JOINT_UNIVERSAL;
+  auto pose2 = ignition::math::Pose3d(1, 2, -3, 0, -0.2, 1);
+
+  jointData->name = name2;
+  jointData->type = type2;
+  msgs::Set(jointData->jointMsg->mutable_pose(), pose2);
+
+  jointData->Update();
+
+  // Verify changes
+  auto msg2 = jointData->jointMsg;
+  QVERIFY(msg1 != msg2);
+
+  QVERIFY(msg1->name() != msg2->name());
+  QVERIFY(name2 == msg2->name());
+
+  QVERIFY(msg1->type() != msg2->type());
+  QVERIFY(gui::JointMaker::ConvertJointType(
+      msgs::ConvertJointType(msg2->type())) == type2);
+  QVERIFY(msg2->has_axis1());
+  QVERIFY(msg2->has_axis2());
+  QCOMPARE(msgs::ConvertIgn(msg2->pose()), pose2);
+
+  // Change data and update - 2 axes -> 0 axes
+  std::string name3 = "new_name2";
+  gui::JointMaker::JointType type3 = gui::JointMaker::JOINT_BALL;
+  auto pose3 = ignition::math::Pose3d(4, -5, 6, -0.1, 0, 0);
+
+  jointData->name = name3;
+  jointData->type = type3;
+  msgs::Set(jointData->jointMsg->mutable_pose(), pose3);
+
+  jointData->Update();
+
+  // Verify changes
+  auto msg3 = jointData->jointMsg;
+  QVERIFY(msg2 != msg3);
+
+  QVERIFY(msg2->name() != msg3->name());
+  QVERIFY(name3 == msg3->name());
+
+  QVERIFY(msg2->type() != msg3->type());
+  QVERIFY(gui::JointMaker::ConvertJointType(
+      msgs::ConvertJointType(msg3->type())) == type3);
+  QVERIFY(!msg3->has_axis1());
+  QVERIFY(!msg3->has_axis2());
+  QCOMPARE(msgs::ConvertIgn(msg3->pose()), pose3);
+
+  // Change data and update - 0 axes -> 1 axis
+  std::string name4 = "new_name3";
+  gui::JointMaker::JointType type4 = gui::JointMaker::JOINT_SLIDER;
+  auto pose4 = ignition::math::Pose3d(-2, 0, 3, 0.4, 1, 0.5);
+
+  jointData->name = name4;
+  jointData->type = type4;
+  msgs::Set(jointData->jointMsg->mutable_pose(), pose4);
+
+  jointData->Update();
+
+  // Verify changes
+  auto msg4 = jointData->jointMsg;
+  QVERIFY(msg3 != msg4);
+
+  QVERIFY(msg3->name() != msg4->name());
+  QVERIFY(name4 == msg4->name());
+
+  QVERIFY(msg3->type() != msg4->type());
+  QVERIFY(gui::JointMaker::ConvertJointType(
+      msgs::ConvertJointType(msg4->type())) == type4);
+  QVERIFY(msg4->has_axis1());
+  QVERIFY(!msg4->has_axis2());
+  QCOMPARE(msgs::ConvertIgn(msg4->pose()), pose4);
+
+  delete jointMaker;
+  mainWindow->close();
+  delete mainWindow;
 }
 
 // Generate a main function for the test

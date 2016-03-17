@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,8 +44,8 @@ namespace gazebo
       public: void CreateScene(const std::string &_name);
 
       /// \brief Add a widget inside the render widget
-      /// \param[in] _widget Widget to be added.
       /// \param[in] _index Index in the splitter to add the widget at.
+      /// \param[in] _widget Widget to be added.
       public: void InsertWidget(unsigned int _index, QWidget *_widget);
 
       /// \brief Show the time panel.

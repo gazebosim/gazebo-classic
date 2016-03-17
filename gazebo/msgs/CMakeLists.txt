@@ -3,6 +3,7 @@ include_directories(${IGNITION-MATH_INCLUDE_DIRS})
 
 set (msgs
   altimeter.proto
+  atmosphere.proto
   axis.proto
   battery.proto
   boxgeom.proto
@@ -16,6 +17,7 @@ set (msgs
   contacts.proto
   contactsensor.proto
   cylindergeom.proto
+  density.proto
   diagnostics.proto
   distortion.proto
   factory.proto
@@ -24,6 +26,7 @@ set (msgs
   friction.proto
   geometry.proto
   gps.proto
+  gps_sensor.proto
   gui_camera.proto
   gui.proto
   gz_string.proto
@@ -36,6 +39,7 @@ set (msgs
   image_stamped.proto
   images_stamped.proto
   imu.proto
+  imu_sensor.proto
   inertial.proto
   int.proto
   joint.proto
@@ -85,7 +89,7 @@ set (msgs
   raysensor.proto
   request.proto
   response.proto
-  rest_error.proto
+  rest_response.proto
   rest_login.proto
   rest_logout.proto
   rest_post.proto
@@ -93,6 +97,7 @@ set (msgs
   scene.proto
   selection.proto
   sensor.proto
+  sensor_noise.proto
   server_control.proto
   shadows.proto
   sim_event.proto
@@ -106,6 +111,9 @@ set (msgs
   time.proto
   topic_info.proto
   track_visual.proto
+  undo_redo.proto
+  user_cmd.proto
+  user_cmd_stats.proto
   vector2d.proto
   vector3d.proto
   visual.proto
@@ -123,7 +131,7 @@ set (msgs_tests_sources
   msgs_TEST.cc
   MsgFactory_TEST.cc
 )
-gz_build_tests(${msgs_tests_sources})
+gz_build_tests(${msgs_tests_sources} EXTRA_LIBS gazebo_msgs)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 

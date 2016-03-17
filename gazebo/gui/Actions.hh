@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -121,6 +121,18 @@ namespace gazebo
 
     /// \brief Action attached to the view angle button.
     extern GZ_GUI_VISIBLE QAction *g_viewAngleButtonAct;
+
+    /// \brief Action to undo last user command.
+    extern GZ_GUI_VISIBLE QAction *g_undoAct;
+
+    /// \brief Action to redo last undone user command.
+    extern GZ_GUI_VISIBLE QAction *g_redoAct;
+
+    /// \brief Action to open the undo history menu.
+    extern GZ_GUI_VISIBLE QAction *g_undoHistoryAct;
+
+    /// \brief Action to open the redo history menu.
+    extern GZ_GUI_VISIBLE QAction *g_redoHistoryAct;
 
     /// \class DeleteAction Actions.hh gui/gui.hh
     /// \brief Custom delete action.

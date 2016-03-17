@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -149,3 +149,15 @@ QWidgetAction *gazebo::gui::g_viewAngleAct = 0;
 
 GZ_GUI_VISIBLE
 QAction *gazebo::gui::g_viewAngleButtonAct = 0;
+
+GZ_GUI_VISIBLE
+QAction *gazebo::gui::g_undoAct = 0;
+
+GZ_GUI_VISIBLE
+QAction *gazebo::gui::g_redoAct = 0;
+
+GZ_GUI_VISIBLE
+QAction *gazebo::gui::g_undoHistoryAct = 0;
+
+GZ_GUI_VISIBLE
+QAction *gazebo::gui::g_redoHistoryAct = 0;

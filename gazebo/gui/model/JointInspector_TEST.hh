@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,14 +25,29 @@ class JointInspector_TEST : public QTestFixture
 {
   Q_OBJECT
 
+  /// \brief Constructor
+  public: JointInspector_TEST() = default;
+
   /// \brief Test adding and removing links.
   private slots: void AddRemoveLink();
+
+  /// \brief Test adding and removing nested links.
+  private slots: void AddRemoveNestedLink();
 
   /// \brief Test swapping parent / child links
   private slots: void Swap();
 
   /// \brief Test pressing remove button.
   private slots: void RemoveButton();
+
+  /// \brief Test that the Applied signal is emitted when widgets are edited.
+  private slots: void AppliedSignal();
+
+  /// \brief Slot that receives Applied signals.
+  private slots: void OnApply();
+
+  /// \brief Count how many Applied signals have been emitted.
+  private: unsigned int g_appliedSignalCount = 0;
 };
 
 #endif

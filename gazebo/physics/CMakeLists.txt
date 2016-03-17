@@ -45,6 +45,9 @@ endif()
 
 set (sources ${sources}
   Actor.cc
+  AdiabaticAtmosphere.cc
+  Atmosphere.cc
+  AtmosphereFactory.cc
   Base.cc
   BoxShape.cc
   Collision.cc
@@ -81,12 +84,16 @@ set (sources ${sources}
   SphereShape.cc
   State.cc
   SurfaceParams.cc
+  UserCmdManager.cc
   World.cc
   WorldState.cc
 )
 
 set (headers
   Actor.hh
+  AdiabaticAtmosphere.hh
+  Atmosphere.hh
+  AtmosphereFactory.hh
   BallJoint.hh
   Base.hh
   BoxShape.hh
@@ -133,6 +140,7 @@ set (headers
   State.hh
   SurfaceParams.hh
   UniversalJoint.hh
+  UserCmdManager.hh
   World.hh
   WorldState.hh)
 
@@ -178,17 +186,29 @@ gz_install_includes("physics" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/physics.hh)
 
 # unit tests
 set (gtest_sources
+  Atmosphere_TEST.cc
   BoxShape_TEST.cc
-  ContactManager_TEST.cc
   CylinderShape_TEST.cc
   Inertial_TEST.cc
   JointController_TEST.cc
-  Light_TEST.cc
-  LightState_TEST.cc
   ModelState_TEST.cc
-  PhysicsEngine_TEST.cc
-  PresetManager_TEST.cc
   Road_TEST.cc
   SphereShape_TEST.cc
 )
-gz_build_tests(${gtest_sources})
+
+gz_build_tests(${gtest_sources} EXTRA_LIBS gazebo_physics gazebo_test_fixture)
+
+# unit tests with gazebo_test_fixture
+set (gtest_fixture_sources
+  ContactManager_TEST.cc
+  Light_TEST.cc
+  LightState_TEST.cc
+  Model_TEST.cc
+  PhysicsEngine_TEST.cc
+  PresetManager_TEST.cc
+  UserCmdManager_TEST.cc
+  WorldState_TEST.cc
+)
+
+gz_build_tests(${gtest_fixture_sources}
+  EXTRA_LIBS gazebo_physics gazebo_test_fixture)

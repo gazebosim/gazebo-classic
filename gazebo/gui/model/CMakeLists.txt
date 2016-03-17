@@ -2,8 +2,10 @@ include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
 set (sources_local
   model/CollisionConfig.cc
+  model/EditorMaterialSwitcher.cc
   model/ExtrudeDialog.cc
   model/ImportDialog.cc
+  model/JointCreationDialog.cc
   model/JointInspector.cc
   model/JointMaker.cc
   model/LinkConfig.cc
@@ -14,6 +16,7 @@ set (sources_local
   model/ModelEditorEvents.cc
   model/ModelEditorPalette.cc
   model/ModelPluginInspector.cc
+  model/ModelTreeWidget.cc
   model/VisualConfig.cc
 )
 
@@ -21,6 +24,7 @@ set (qt_headers_local
   model/CollisionConfig.hh
   model/ExtrudeDialog.hh
   model/ImportDialog.hh
+  model/JointCreationDialog.hh
   model/JointInspector.hh
   model/JointMaker.hh
   model/LinkConfig.hh
@@ -30,6 +34,7 @@ set (qt_headers_local
   model/ModelEditor.hh
   model/ModelEditorPalette.hh
   model/ModelPluginInspector.hh
+  model/ModelTreeWidget.hh
   model/VisualConfig.hh
 )
 
@@ -38,19 +43,23 @@ set (headers_install
   ModelEditor.hh
 )
 
-if (ENABLE_SCREEN_TESTS)
-  set (qt_tests_local
-    ExtrudeDialog_TEST.cc
-    JointInspector_TEST.cc
-    JointMaker_TEST.cc
-    LinkInspector_TEST.cc
-    ModelCreator_TEST.cc
-    ModelData_TEST.cc
-    ModelEditor_TEST.cc
-    ModelEditorPalette_TEST.cc
-    ModelPluginInspector_TEST.cc
-  )
-endif()
+set (qt_tests_local
+  CollisionConfig_TEST.cc
+  EditorMaterialSwitcher_TEST.cc
+  ExtrudeDialog_TEST.cc
+  JointCreationDialog_TEST.cc
+  JointInspector_TEST.cc
+  JointMaker_TEST.cc
+  LinkConfig_TEST.cc
+  LinkInspector_TEST.cc
+  ModelCreator_TEST.cc
+  ModelData_TEST.cc
+  ModelEditor_TEST.cc
+  ModelEditorPalette_TEST.cc
+  ModelPluginInspector_TEST.cc
+  ModelTreeWidget_TEST.cc
+  VisualConfig_TEST.cc
+)
 
 if (HAVE_GRAPHVIZ)
   set (qt_headers_local ${qt_headers_local}
@@ -63,6 +72,10 @@ if (HAVE_GRAPHVIZ)
     model/GraphScene.cc
     model/GraphView.cc
     model/SchematicViewWidget.cc
+  )
+
+  set (qt_tests_local ${qt_tests_local}
+    GraphScene_TEST.cc
   )
 
   if (ENABLE_SCREEN_TESTS)

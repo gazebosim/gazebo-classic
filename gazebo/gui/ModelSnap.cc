@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,7 +75,7 @@ void ModelSnap::Clear()
   this->dataPtr->hoverVis.reset();
 
   this->dataPtr->node.reset();
-  this->dataPtr->modelPub.reset();
+  this->dataPtr->userCmdPub.reset();
 
   if (this->dataPtr->updateMutex)
   {
@@ -127,8 +127,8 @@ void ModelSnap::Init()
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init();
-  this->dataPtr->modelPub =
-      this->dataPtr->node->Advertise<msgs::Model>("~/model/modify");
+  this->dataPtr->userCmdPub =
+      this->dataPtr->node->Advertise<msgs::UserCmd>("~/user_cmd");
 
   this->dataPtr->rayQuery.reset(
       new rendering::RayQuery(this->dataPtr->userCamera));
@@ -351,15 +351,27 @@ void ModelSnap::PublishVisualPose(rendering::VisualPtr _vis)
   if (!_vis)
     return;
 
-  // Check to see if the visual is a model.
-  if (gui::get_entity_id(_vis->GetName()))
+  // Only publish for models
+  if (_vis->GetType() == gazebo::rendering::Visual::VT_MODEL)
   {
-    msgs::Model msg;
-    msg.set_id(gui::get_entity_id(_vis->GetName()));
-    msg.set_name(_vis->GetName());
+    // Register user command on server
+    msgs::UserCmd userCmdMsg;
+    userCmdMsg.set_description("Snap [" + _vis->GetName() + "]");
+    userCmdMsg.set_type(msgs::UserCmd::MOVING);
 
+    msgs::Model msg;
+
+    auto id = gui::get_entity_id(_vis->GetName());
+    if (id)
+      msg.set_id(id);
+
+    msg.set_name(_vis->GetName());
     msgs::Set(msg.mutable_pose(), _vis->GetWorldPose().Ign());
-    this->dataPtr->modelPub->Publish(msg);
+
+    auto modelMsg = userCmdMsg.add_model();
+    modelMsg->CopyFrom(msg);
+
+    this->dataPtr->userCmdPub->Publish(userCmdMsg);
   }
 }
 
@@ -391,10 +403,10 @@ void ModelSnap::Update()
             this->dataPtr->highlightVisual->CreateDynamicLine(
             rendering::RENDERING_TRIANGLE_FAN);
         this->dataPtr->snapHighlight->setMaterial("Gazebo/RedTransparent");
-        this->dataPtr->snapHighlight->AddPoint(hoverTriangle[0]);
-        this->dataPtr->snapHighlight->AddPoint(hoverTriangle[1]);
-        this->dataPtr->snapHighlight->AddPoint(hoverTriangle[2]);
-        this->dataPtr->snapHighlight->AddPoint(hoverTriangle[0]);
+        this->dataPtr->snapHighlight->AddPoint(hoverTriangle[0].Ign());
+        this->dataPtr->snapHighlight->AddPoint(hoverTriangle[1].Ign());
+        this->dataPtr->snapHighlight->AddPoint(hoverTriangle[2].Ign());
+        this->dataPtr->snapHighlight->AddPoint(hoverTriangle[0].Ign());
         this->dataPtr->highlightVisual->SetVisible(true);
         this->dataPtr->highlightVisual->GetSceneNode()->setInheritScale(false);
         this->dataPtr->highlightVisual->SetVisibilityFlags(
@@ -415,10 +427,10 @@ void ModelSnap::Update()
           }
           this->dataPtr->hoverVis->AttachVisual(this->dataPtr->highlightVisual);
         }
-        this->dataPtr->snapHighlight->SetPoint(0, hoverTriangle[0]);
-        this->dataPtr->snapHighlight->SetPoint(1, hoverTriangle[1]);
-        this->dataPtr->snapHighlight->SetPoint(2, hoverTriangle[2]);
-        this->dataPtr->snapHighlight->SetPoint(3, hoverTriangle[0]);
+        this->dataPtr->snapHighlight->SetPoint(0, hoverTriangle[0].Ign());
+        this->dataPtr->snapHighlight->SetPoint(1, hoverTriangle[1].Ign());
+        this->dataPtr->snapHighlight->SetPoint(2, hoverTriangle[2].Ign());
+        this->dataPtr->snapHighlight->SetPoint(3, hoverTriangle[0].Ign());
       }
     }
     else
@@ -455,10 +467,10 @@ void ModelSnap::Update()
           this->dataPtr->snapVisual->CreateDynamicLine(
           rendering::RENDERING_LINE_STRIP);
       this->dataPtr->snapLines->setMaterial("Gazebo/RedGlow");
-      this->dataPtr->snapLines->AddPoint(triangle[0]);
-      this->dataPtr->snapLines->AddPoint(triangle[1]);
-      this->dataPtr->snapLines->AddPoint(triangle[2]);
-      this->dataPtr->snapLines->AddPoint(triangle[0]);
+      this->dataPtr->snapLines->AddPoint(triangle[0].Ign());
+      this->dataPtr->snapLines->AddPoint(triangle[1].Ign());
+      this->dataPtr->snapLines->AddPoint(triangle[2].Ign());
+      this->dataPtr->snapLines->AddPoint(triangle[0].Ign());
       this->dataPtr->snapVisual->SetVisible(true);
       this->dataPtr->snapVisual->GetSceneNode()->setInheritScale(false);
       this->dataPtr->snapVisual->SetVisibilityFlags(
@@ -478,10 +490,10 @@ void ModelSnap::Update()
         }
         this->dataPtr->selectedVis->AttachVisual(this->dataPtr->snapVisual);
       }
-      this->dataPtr->snapLines->SetPoint(0, triangle[0]);
-      this->dataPtr->snapLines->SetPoint(1, triangle[1]);
-      this->dataPtr->snapLines->SetPoint(2, triangle[2]);
-      this->dataPtr->snapLines->SetPoint(3, triangle[0]);
+      this->dataPtr->snapLines->SetPoint(0, triangle[0].Ign());
+      this->dataPtr->snapLines->SetPoint(1, triangle[1].Ign());
+      this->dataPtr->snapLines->SetPoint(2, triangle[2].Ign());
+      this->dataPtr->snapLines->SetPoint(3, triangle[0].Ign());
     }
     this->dataPtr->selectedTriangleDirty = false;
   }

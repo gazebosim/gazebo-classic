@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 #ifndef _GAZEBO_WORLD_PRIVATE_HH_
 #define _GAZEBO_WORLD_PRIVATE_HH_
 
+#include <atomic>
 #include <deque>
 #include <vector>
 #include <list>
@@ -48,6 +49,9 @@ namespace gazebo
       /// \brief Pointer the physics engine.
       public: PhysicsEnginePtr physicsEngine;
 
+      /// \brief Pointer to the atmosphere model.
+      public: AtmospherePtr atmosphere;
+
       /// \brief Pointer the spherical coordinates data.
       public: common::SphericalCoordinatesPtr sphericalCoordinates;
 
@@ -77,13 +81,6 @@ namespace gazebo
 
       /// \brief Number of steps in increment by.
       public: int stepInc;
-
-      /// \brief Stores the simulation time target during a 'seek' operation.
-      public: common::Time targetSimTime;
-
-      /// \brief When there is a 'seek' command pending during a log file
-      /// playback this member variable should be true.
-      public: bool seekPending;
 
       /// \brief All the event connections.
       public: event::Connection_V connections;
@@ -225,6 +222,9 @@ namespace gazebo
       /// \brief True to enable the physics engine.
       public: bool enablePhysicsEngine;
 
+      /// \brief True to enable the atmosphere model.
+      public: bool enableAtmosphere;
+
       /// \brief Ray used to test for collisions when placing entities.
       public: RayShapePtr testRay;
 
@@ -264,6 +264,9 @@ namespace gazebo
 
       /// \brief The list of models that need to publish their pose.
       public: std::set<ModelPtr> publishModelPoses;
+
+      /// \brief The list of models that need to publish their scale.
+      public: std::set<ModelPtr> publishModelScales;
 
       /// \brief The list of lights that need to publish their pose.
       public: std::set<LightPtr> publishLightPoses;
@@ -319,6 +322,13 @@ namespace gazebo
 
       /// \brief Class to manage preset simulation parameter profiles.
       public: PresetManagerPtr presetManager;
+
+      /// \brief Class to manage user commands.
+      public: UserCmdManagerPtr userCmdManager;
+
+      /// \brief True if sensors have been initialized. This should be set
+      /// by the SensorManager.
+      public: std::atomic_bool sensorsInitialized;
     };
   }
 }

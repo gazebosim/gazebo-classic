@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,6 +71,17 @@ VisualConfig::~VisualConfig()
     auto config = this->configs.begin();
     delete config->second;
     this->configs.erase(config);
+  }
+}
+
+/////////////////////////////////////////////////
+void VisualConfig::Init()
+{
+  // Keep original data in case user cancels
+  for (auto &it : this->configs)
+  {
+    VisualConfigData *configData = it.second;
+    configData->originalDataMsg.CopyFrom(*this->GetData(configData->name));
   }
 }
 
@@ -179,6 +190,29 @@ void VisualConfig::AddVisual(const std::string &_name,
   configWidget->SetWidgetReadOnly("plugin", true);
   configWidget->SetWidgetReadOnly("type", true);
 
+  // Connect config widget signals
+  connect(configWidget, SIGNAL(PoseValueChanged(const QString &,
+      const ignition::math::Pose3d &)), this,
+      SLOT(OnPoseChanged(const QString &, const ignition::math::Pose3d &)));
+
+  connect(configWidget, SIGNAL(GeometryValueChanged(const std::string &,
+      const std::string &, const ignition::math::Vector3d &,
+      const std::string &)), this, SLOT(OnGeometryChanged(const std::string &,
+      const std::string &, const ignition::math::Vector3d &,
+      const std::string &)));
+
+  connect(configWidget, SIGNAL(ColorValueChanged(const QString &,
+      const gazebo::common::Color &)), this,
+      SLOT(OnColorChanged(const QString &, const gazebo::common::Color &)));
+
+  connect(configWidget, SIGNAL(DoubleValueChanged(const QString &,
+      const double)), this,
+      SLOT(OnDoubleChanged(const QString &, const double)));
+
+  connect(configWidget, SIGNAL(StringValueChanged(const QString &,
+      const std::string &)), this,
+      SLOT(OnStringChanged(const QString &, const std::string &)));
+
   // Item layout
   QVBoxLayout *itemLayout = new QVBoxLayout();
   itemLayout->addWidget(headerWidget);
@@ -276,7 +310,7 @@ msgs::Visual *VisualConfig::GetData(const std::string &_name) const
   for (auto const &it : this->configs)
   {
     if (it.second->name == _name)
-      return dynamic_cast<msgs::Visual *>(it.second->configWidget->GetMsg());
+      return dynamic_cast<msgs::Visual *>(it.second->configWidget->Msg());
   }
   return NULL;
 }
@@ -294,7 +328,7 @@ void VisualConfig::SetGeometry(const std::string &_name,
       std::string type = it.second->configWidget->GeometryWidgetValue(
           "geometry", dimensions, uri);
       it.second->configWidget->SetGeometryWidgetValue("geometry", type,
-          _size, _uri);
+          _size.Ign(), _uri);
       break;
     }
   }
@@ -340,10 +374,79 @@ void VisualConfig::SetMaterial(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
+const std::map<int, VisualConfigData *> &VisualConfig::ConfigData() const
+{
+  return this->configs;
+}
+
+/////////////////////////////////////////////////
+void VisualConfig::OnPoseChanged(const QString &/*_name*/,
+    const ignition::math::Pose3d &/*_value*/)
+{
+  emit Applied();
+}
+
+/////////////////////////////////////////////////
+void VisualConfig::OnGeometryChanged(const std::string &/*_name*/,
+    const std::string &/*_value*/,
+    const ignition::math::Vector3d &/*dimensions*/,
+    const std::string &/*_uri*/)
+{
+  emit Applied();
+}
+
+/////////////////////////////////////////////////
+void VisualConfig::OnColorChanged(const QString &/*_name*/,
+    const gazebo::common::Color &/*_value*/)
+{
+  emit Applied();
+}
+
+/////////////////////////////////////////////////
+void VisualConfig::OnDoubleChanged(const QString &_name,
+    const double /*_value*/)
+{
+  // Only transparency affects the visualization
+  if (_name == "transparency")
+    emit Applied();
+}
+
+/////////////////////////////////////////////////
+void VisualConfig::OnStringChanged(const QString &_name,
+    const std::string &/*_value*/)
+{
+  // Only material script affects the visualization
+  if (_name == "material::script::name")
+    emit Applied();
+}
+
+/////////////////////////////////////////////////
+void VisualConfig::RestoreOriginalData()
+{
+  for (auto &it : this->configs)
+  {
+    it.second->RestoreOriginalData();
+  }
+}
+
+/////////////////////////////////////////////////
 void VisualConfigData::OnToggleItem(bool _checked)
 {
   if (_checked)
     this->configWidget->show();
   else
     this->configWidget->hide();
+}
+
+/////////////////////////////////////////////////
+void VisualConfigData::RestoreOriginalData()
+{
+  msgs::VisualPtr visualPtr;
+  visualPtr.reset(new msgs::Visual);
+  visualPtr->CopyFrom(this->originalDataMsg);
+
+  // Update default widgets
+  this->configWidget->blockSignals(true);
+  this->configWidget->UpdateFromMsg(visualPtr.get());
+  this->configWidget->blockSignals(false);
 }

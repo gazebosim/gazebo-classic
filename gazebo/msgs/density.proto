@@ -1,0 +1,11 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Density
+/// \brief Information about density
+
+message Density
+{
+  required double density          = 1;
+}
+

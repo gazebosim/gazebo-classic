@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,29 +15,30 @@
  *
 */
 
-#ifndef _STAIRS_ITEM_HH_
-#define _STAIRS_ITEM_HH_
+#ifndef _GAZEBO_GUI_BUILDING_STAIRSITEM_HH_
+#define _GAZEBO_GUI_BUILDING_STAIRSITEM_HH_
 
-#include "gazebo/gui/qt.h"
+#include <memory>
+
 #include "gazebo/gui/building/RectItem.hh"
-#include "gazebo/gui/building/BuildingItem.hh"
+
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
-    class RectItem;
-    class BuildingItem;
-    class StairsInspectorDialog;
+    class RotateHandle;
+
+    // Forward declare private data.
+    class StairsItemPrivate;
 
     /// \addtogroup gazebo_gui
     /// \{
 
     /// \class StairsItem StairsItem.hh
     /// \brief 2D representation of a staircase.
-    class GZ_GUI_VISIBLE StairsItem :
-      public RectItem, public BuildingItem
+    class GZ_GUI_VISIBLE StairsItem : public RectItem
     {
       Q_OBJECT
 
@@ -86,30 +87,9 @@ namespace gazebo
       /// \brief Emit steps changed Qt signals.
       private: void StepsChanged();
 
-      /// \brief Depth of staircase item in pixels.
-      private: double stairsDepth;
-
-      /// \brief Height of staircase item in pixels.
-      private: double stairsHeight;
-
-      /// \brief Width of staircase item in pixels.
-      private: double stairsWidth;
-
-      /// \brief Scene position of staircase item in pixel coordinates.
-      private: QPointF stairsPos;
-
-      /// \brief Elevation of staircase item in pixels.
-      private: double stairsElevation;
-
-      /// \brief Number of steps in the staircase item.
-      private: int stairsSteps;
-
-      /// \brief Inspector for configuring the staircase item.
-      private: StairsInspectorDialog *inspector;
-
-      // private: double stairsUnitRise;
-
-      // private: double stairsUnitRun;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<StairsItemPrivate> dataPtr;
     };
     /// \}
   }

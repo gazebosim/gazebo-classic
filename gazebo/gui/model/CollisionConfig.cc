@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,6 +69,17 @@ CollisionConfig::~CollisionConfig()
     auto config = this->configs.begin();
     delete config->second;
     this->configs.erase(config);
+  }
+}
+
+/////////////////////////////////////////////////
+void CollisionConfig::Init()
+{
+  // Keep original data in case user cancels
+  for (auto &it : this->configs)
+  {
+    CollisionConfigData *configData = it.second;
+    configData->originalDataMsg.CopyFrom(*this->GetData(configData->name));
   }
 }
 
@@ -208,6 +219,16 @@ void CollisionConfig::AddCollision(const std::string &_name,
   configWidget->SetWidgetReadOnly("id", true);
   configWidget->SetWidgetReadOnly("name", true);
 
+  connect(configWidget, SIGNAL(PoseValueChanged(const QString &,
+      const ignition::math::Pose3d &)), this,
+      SLOT(OnPoseChanged(const QString &, const ignition::math::Pose3d &)));
+
+  connect(configWidget, SIGNAL(GeometryValueChanged(const std::string &,
+      const std::string &, const ignition::math::Vector3d &,
+      const std::string &)), this, SLOT(OnGeometryChanged(const std::string &,
+      const std::string &, const ignition::math::Vector3d &,
+      const std::string &)));
+
   // Item layout
   QVBoxLayout *itemLayout = new QVBoxLayout();
   itemLayout->addWidget(headerWidget);
@@ -226,10 +247,19 @@ void CollisionConfig::AddCollision(const std::string &_name,
   configData->id =  this->counter;
   configData->widget = item;
   configData->name = _name;
-  connect(headerButton, SIGNAL(toggled(bool)), configData,
-           SLOT(OnToggleItem(bool)));
-  this->configs[this->counter] = configData;
 
+  this->connect(headerButton, SIGNAL(toggled(bool)), configData,
+      SLOT(OnToggleItem(bool)));
+
+  this->connect(configWidget, SIGNAL(GeometryChanged()), configData,
+      SLOT(OnGeometryChanged()));
+
+  this->connect(configData, SIGNAL(CollisionChanged(
+      const std::string &, const std::string &)),
+      this, SLOT(OnCollisionChanged(
+      const std::string &, const std::string &)));
+
+  this->configs[this->counter] = configData;
   this->counter++;
 }
 
@@ -292,7 +322,7 @@ msgs::Collision *CollisionConfig::GetData(const std::string &_name) const
     std::string name = it.second->name;
     if (name == _name)
     {
-      return dynamic_cast<msgs::Collision *>(it.second->configWidget->GetMsg());
+      return dynamic_cast<msgs::Collision *>(it.second->configWidget->Msg());
     }
   }
   return NULL;
@@ -332,10 +362,67 @@ void CollisionConfig::Geometry(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
+const std::map<int, CollisionConfigData *> &CollisionConfig::ConfigData() const
+{
+  return this->configs;
+}
+
+/////////////////////////////////////////////////
+void CollisionConfig::OnPoseChanged(const QString &/*_name*/,
+    const ignition::math::Pose3d &/*_value*/)
+{
+  emit Applied();
+}
+
+/////////////////////////////////////////////////
+void CollisionConfig::OnGeometryChanged(const std::string &/*_name*/,
+    const std::string &/*_value*/,
+    const ignition::math::Vector3d &/*dimensions*/,
+    const std::string &/*_uri*/)
+{
+  emit Applied();
+}
+
+/////////////////////////////////////////////////
+void CollisionConfig::RestoreOriginalData()
+{
+  for (auto &it : this->configs)
+  {
+    it.second->RestoreOriginalData();
+  }
+}
+
+/////////////////////////////////////////////////
+void CollisionConfig::OnCollisionChanged(const std::string &_name,
+    const std::string &_type)
+{
+  emit CollisionChanged(_name, _type);
+}
+
+/////////////////////////////////////////////////
 void CollisionConfigData::OnToggleItem(bool _checked)
 {
   if (_checked)
     this->configWidget->show();
   else
     this->configWidget->hide();
+}
+
+/////////////////////////////////////////////////
+void CollisionConfigData::OnGeometryChanged()
+{
+  emit CollisionChanged(this->name, "geometry");
+}
+
+/////////////////////////////////////////////////
+void CollisionConfigData::RestoreOriginalData()
+{
+  msgs::CollisionPtr collisionPtr;
+  collisionPtr.reset(new msgs::Collision);
+  collisionPtr->CopyFrom(this->originalDataMsg);
+
+  // Update default widgets
+  this->configWidget->blockSignals(true);
+  this->configWidget->UpdateFromMsg(collisionPtr.get());
+  this->configWidget->blockSignals(false);
 }
