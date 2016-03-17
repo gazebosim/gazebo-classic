@@ -2,6 +2,9 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
+1. Atmosphere model
+    * [Pull request #1989](https://bitbucket.org/osrf/gazebo/pull-request/1989)
+
 1. Added static camera when following a model.
     * [Pull request #1980](https://bitbucket.org/osrf/gazebo/pull-request/1980)
 
