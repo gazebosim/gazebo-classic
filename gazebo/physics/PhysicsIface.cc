@@ -25,6 +25,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/physics/World.hh"
+#include "gazebo/physics/AtmosphereFactory.hh"
 #include "gazebo/physics/PhysicsFactory.hh"
 #include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/gazebo_config.h"
@@ -40,6 +41,7 @@ uint32_t g_uniqueId = 0;
 bool physics::load()
 {
   physics::PhysicsFactory::RegisterAll();
+  physics::AtmosphereFactory::RegisterAll();
   return true;
 }
 

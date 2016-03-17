@@ -122,6 +122,11 @@ namespace gazebo
       /// \return Pointer to the physics engine.
       public: PhysicsEnginePtr GetPhysicsEngine() const;
 
+      /// \brief Return the atmosphere model.
+      /// Get a pointer to the atmosphere model used by the world.
+      /// \return Pointer to the atmosphere model.
+      public: AtmospherePtr Atmosphere() const;
+
       /// \brief Return the preset manager.
       /// \return Pointer to the preset manager.
       public: PresetManagerPtr GetPresetManager() const;
@@ -319,6 +324,14 @@ namespace gazebo
       /// \brief enable/disable physics engine during World::Update.
       /// \param[in] _enable True to enable the physics engine.
       public: void EnablePhysicsEngine(bool _enable);
+
+      /// \brief check if atmosphere model is enabled/disabled.
+      /// \param True if the atmosphere model is enabled.
+      public: bool AtmosphereEnabled() const;
+
+      /// \brief enable/disable atmosphere model.
+      /// \param[in] _enable True to enable the atmosphere model.
+      public: void SetAtmosphereEnabled(const bool _enable);
 
       /// \brief Update the state SDF value from the current state.
       public: void UpdateStateSDF();
