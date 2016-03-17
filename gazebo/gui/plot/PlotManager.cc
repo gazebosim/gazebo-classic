@@ -49,12 +49,6 @@ namespace gazebo
       /// \brief Subscriber to the world control topic
       public: transport::SubscriberPtr worldControlSub;
 
-      /// \brief A map of topic names to topic data handers.
-      // public: std::map<std::string, TopicDataHandler *> topicDataHandlers;
-
-      /// \brief Handler for updating topic curves
-      // public: TopicCurveHandler topicCurve;
-
       /// \brief Handler for updating introspection curves
       public: IntrospectionCurveHandler introspectionCurve;
 
@@ -75,12 +69,12 @@ PlotManager::PlotManager()
   this->dataPtr->worldControlSub =
       this->dataPtr->node->Subscribe("~/world_control",
       &PlotManager::OnWorldControl, this);
-
 }
 
 /////////////////////////////////////////////////
 PlotManager::~PlotManager()
 {
+  this->dataPtr->windows.clear();
 }
 
 /////////////////////////////////////////////////
@@ -109,19 +103,6 @@ void PlotManager::AddIntrospectionCurve(const std::string &_uri,
 void PlotManager::RemoveIntrospectionCurve(PlotCurveWeakPtr _curve)
 {
   this->dataPtr->introspectionCurve.RemoveCurve(_curve);
-}
-
-/////////////////////////////////////////////////
-void PlotManager::AddTopicCurve(const std::string &_uri,
-    PlotCurveWeakPtr /*_curve*/)
-{
-  // this->dataPtr->topicCurve.AddCurve(_uri, _curve);
-}
-
-/////////////////////////////////////////////////
-void PlotManager::RemoveTopicCurve(PlotCurveWeakPtr /*_curve*/)
-{
-  // ggthis->dataPtr->topicCurve.RemoveCurve( _curve);
 }
 
 /////////////////////////////////////////////////
@@ -164,10 +145,13 @@ std::string PlotManager::HumanReadableName(const std::string &_uri) const
   common::URIQuery query = uri.Query();
   std::vector<std::string> pathTokens = common::split(path.Str(), "/");
   std::vector<std::string> queryTokens = common::split(query.Str(), "=/");
-  if (queryTokens.size() < 2 || queryTokens.size() < 3)
+
+  // min path token size 2: [world, world_name]
+  // min query token size 3: [p, param_type, param_name]
+  if (pathTokens.size() < 2 || queryTokens.size() < 3)
     return label;
 
-  // path: start from model name and ignore entity type str
+  // path: start from model name and ignore world and entity type str for now
   std::string pathStr;
   for (unsigned int i = 3; i < pathTokens.size(); i+=2)
   {

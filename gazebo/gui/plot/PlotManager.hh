@@ -90,7 +90,6 @@ namespace gazebo
       /// \param[in] _uri URI representing the variable
       /// \return Human readable name
       public: std::string HumanReadableName(const std::string &_uri) const;
-
       /// \brief Set whether or not to pause updating the plot curves.
       /// \param[in] _paused True to pause update.
       public: void SetPaused(const bool _paused);

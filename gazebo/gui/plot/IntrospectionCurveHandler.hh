@@ -62,6 +62,11 @@ namespace gazebo
       /// \param[in] _paused True to pause update.
       public: void SetPaused(const bool _paused);
 
+      /// \brief Get whether or not the introspection curve handler has been
+      /// initialized.
+      /// \return True if initialized.
+      public: bool Initialized() const;
+
       /// \brief Set up introspection client
       private: void SetupIntrospection();
 
