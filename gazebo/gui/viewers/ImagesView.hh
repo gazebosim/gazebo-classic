@@ -19,18 +19,14 @@
 
 #include <string>
 #include <utility>
-#include <vector>
 
 #include <boost/thread/mutex.hpp>
 
-#include "gazebo/common/Time.hh"
 #include "gazebo/msgs/msgs.hh"
 
-#include "gazebo/transport/TransportTypes.hh"
-
 #include "gazebo/gui/qt.h"
-#include "gazebo/gui/viewers/ImageFrame.hh"
 #include "gazebo/gui/viewers/TopicView.hh"
+
 #include "gazebo/util/system.hh"
 
 namespace gazebo

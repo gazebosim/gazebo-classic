@@ -21,9 +21,7 @@
   #include <Winsock2.h>
 #endif
 
-#include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Node.hh"
-#include "gazebo/transport/Publisher.hh"
 
 #include "gazebo/common/Image.hh"
 
@@ -44,7 +42,6 @@ ImagesView::ImagesView(QWidget *_parent)
   this->setWindowTitle(tr("Gazebo: Images View"));
 
   // Create the layout and frame for images
-  // {
   this->dataPtr->frameLayout = new QGridLayout;
   this->dataPtr->frameLayout->setSizeConstraint(QLayout::SetMinimumSize);
 
@@ -52,7 +49,6 @@ ImagesView::ImagesView(QWidget *_parent)
   this->frame->setLayout(this->dataPtr->frameLayout);
   this->frame->setMinimumHeight(240);
   this->frame->setMinimumWidth(320);
-  // }
 
   this->dataPtr->clearImages = false;
 }
@@ -117,7 +113,8 @@ void ImagesView::SetTopic(const std::string &_topicName)
   TopicView::SetTopic(_topicName);
 
   // Subscribe to the new topic.
-  this->sub = this->node->Subscribe(_topicName, &ImagesView::OnImages, this);
+  if (this->node)
+    this->sub = this->node->Subscribe(_topicName, &ImagesView::OnImages, this);
 }
 
 /////////////////////////////////////////////////
