@@ -331,10 +331,10 @@ namespace gazebo
       private: bool snapToGrabber;
 
       /// \brief Existing grabber to snap towards.
-      private: GrabberHandle *snapGrabberOther;
+      private: GrabberHandle *snapGrabberOther = NULL;
 
       /// \brief Currently held grabber which will be snapped.
-      private: GrabberHandle *snapGrabberCurrent;
+      private: GrabberHandle *snapGrabberCurrent = NULL;
 
       /// \brief Text tooltip to follow the mouse.
       private: QGraphicsTextItem *mouseTooltip;

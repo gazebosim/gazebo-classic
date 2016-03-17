@@ -18,6 +18,7 @@
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/MainWindow.hh"
+#include "gazebo/gui/building/EditorView.hh"
 #include "gazebo/gui/building/BuildingEditorEvents.hh"
 #include "gazebo/gui/building/BuildingMaker.hh"
 #include "gazebo/gui/building/BuildingMaker_TEST.hh"
@@ -86,6 +87,10 @@ void BuildingMaker_TEST::Layers()
   auto buildingMaker = new gazebo::gui::BuildingMaker();
   QVERIFY(buildingMaker != NULL);
 
+  gazebo::gui::EditorView *editorView =
+      mainWindow->findChild<gazebo::gui::EditorView *>("editorView");
+  QVERIFY(editorView != NULL);
+
   // Add a wall on each level
   int levelCount = 3;
   for (int i = 0; i < levelCount; ++i)
@@ -97,6 +102,20 @@ void BuildingMaker_TEST::Layers()
         QVector3D(0, 0, i+0.5), 0);
     QVERIFY(wall == "Wall_" + std::to_string(i));
     gzdbg << "Created [" << wall << "]" << std::endl;
+
+    // draw a wall in editor
+    gazebo::gui::editor::Events::createBuildingEditorItem("wall");
+    QTest::mouseClick(editorView->viewport(), Qt::LeftButton, Qt::NoModifier,
+        QPoint(1,1));
+    QTest::mouseMove(editorView->viewport(),
+        QPoint(editorView->viewport()->width()-1,1));
+    QTest::mouseClick(editorView->viewport(), Qt::LeftButton, Qt::NoModifier,
+        QPoint(editorView->viewport()->width()-1,1));
+    QTest::mouseDClick(editorView->viewport(), Qt::LeftButton,
+        Qt::NoModifier, QPoint(editorView->viewport()->width()-1,1));
+
+    // add level
+    gazebo::gui::editor::Events::addBuildingLevel();
   }
 
   // Generate SDF
