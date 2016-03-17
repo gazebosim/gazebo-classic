@@ -58,14 +58,15 @@ namespace gazebo
       /// \return Number of curves
       public: unsigned int CurveCount() const;
 
+      /// \brief Set whether or not to pause updating the plot curves.
+      /// \param[in] _paused True to pause update.
+      public: void SetPaused(const bool _paused);
+
       /// \brief Get whether or not the introspection curve handler has been
       /// initialized.
       /// \return True if initialized.
       public: bool Initialized() const;
 
-      /// \brief Set whether or not to pause updating the plot curves.
-      /// \param[in] _paused True to pause update.
-      public: void SetPaused(const bool _paused);
       /// \brief Set up introspection client
       private: void SetupIntrospection();
 

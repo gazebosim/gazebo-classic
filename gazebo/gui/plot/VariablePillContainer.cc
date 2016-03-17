@@ -61,6 +61,9 @@ VariablePillContainer::VariablePillContainer(QWidget *_parent)
   this->dataPtr->label = new QLabel;
   QHBoxLayout *labelLayout = new QHBoxLayout;
   labelLayout->addWidget(this->dataPtr->label);
+  QMargins labelMargins = labelLayout->contentsMargins();
+  labelMargins.setLeft(labelMargins.left() + 10);
+  labelLayout->setContentsMargins(labelMargins);
 
   // variable pills
   this->dataPtr->variableLayout = new QHBoxLayout;
@@ -70,7 +73,7 @@ VariablePillContainer::VariablePillContainer(QWidget *_parent)
   frameLayout->addLayout(labelLayout);
   frameLayout->addLayout(this->dataPtr->variableLayout);
   frameLayout->setAlignment(Qt::AlignLeft);
-  frameLayout->setContentsMargins(4, 4, 4, 4);
+  frameLayout->setContentsMargins(8, 4, 8, 4);
   QFrame *mainFrame = new QFrame;
   mainFrame->setObjectName("variableContainerFrame");
   mainFrame->setLayout(frameLayout);
