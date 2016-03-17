@@ -46,6 +46,43 @@ using namespace common;
 ModelDatabase *ModelDatabase::myself = ModelDatabase::Instance();
 
 /////////////////////////////////////////////////
+// a local util class to compare sdf versions
+struct Version
+{
+  explicit Version(std::string _versionStr)
+    :a(0), b(0), c(0), d(0)
+  {
+    if (_versionStr.empty())
+      return;  // empty string is like "0.0.0.0"
+    size_t points = std::count(_versionStr.begin(), _versionStr.end(), '.');
+    if (points == 0)
+      sscanf(_versionStr.c_str(), "%4d", &a);
+    if (points == 1)
+      sscanf(_versionStr.c_str(), "%4d.%4d", &a, &b);
+    if (points == 2)
+      sscanf(_versionStr.c_str(), "%4d.%4d.%4d", &a, &b, &c);
+    if (points == 3)
+      sscanf(_versionStr.c_str(), "%4d.%4d.%4d.%6d", &a, &b, &c, &d);
+  }
+
+  bool operator<(const Version &otherVersion)
+  {
+    bool r = false;
+    if (a < otherVersion.a)
+      r = true;
+    if (b < otherVersion.b)
+      r = true;
+    if (c < otherVersion.c)
+      r = true;
+    if (d < otherVersion.d)
+      r = true;
+    return r;
+  }
+
+  int a, b, c, d;
+};
+
+/////////////////////////////////////////////////
 size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream)
 {
   size_t written;
@@ -612,6 +649,7 @@ std::string ModelDatabase::GetModelFile(const std::string &_uri)
   }
 
   TiXmlDocument xmlDoc;
+  std::string bestVersion = "0.0";
   if (xmlDoc.LoadFile(manifestPath.string()))
   {
     TiXmlElement *modelXML = xmlDoc.FirstChildElement("model");
@@ -623,13 +661,37 @@ std::string ModelDatabase::GetModelFile(const std::string &_uri)
       // Find the SDF element that matches our current SDF version.
       while (sdfSearch)
       {
-        if (sdfSearch->Attribute("version") &&
-            std::string(sdfSearch->Attribute("version")) == SDF_VERSION)
+        if (sdfSearch->Attribute("version"))
         {
-          sdfXML = sdfSearch;
-          break;
-        }
+          std::string versionSt = std::string(sdfSearch->Attribute("version"));
+          if (versionSt == SDF_VERSION)
+          {
+            // found an exact match... this is the best possible outcome
+            sdfXML = sdfSearch;
+            break;
+          }
+          Version thisVersion(versionSt);
+          Version bestAvailableVersion(bestVersion);
+          Version parserVersion(SDF_VERSION);
 
+          if (bestAvailableVersion < thisVersion)
+          {
+            if (parserVersion < thisVersion)
+            {
+              gzwarn << "Ignoring version " << versionSt
+                << " for model " << _uri
+                << " because Gazebo is using an older sdf parser (version "
+                << SDF_VERSION << ")" << std::endl;
+            }
+            else
+            {
+              // this model's version is better, compatible with our parser
+              // let's upgrade!
+              bestVersion = versionSt;
+              sdfXML = sdfSearch;
+            }
+          }
+        }
         sdfSearch = sdfSearch->NextSiblingElement("sdf");
       }
 
