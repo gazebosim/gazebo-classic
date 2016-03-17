@@ -2824,6 +2824,8 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
 
   if (_msg.has_type())
   {
+    this->dataPtr->physicsType = _msg.type();
+
     item = this->dataPtr->variantManager->addProperty(
       QtVariantPropertyManager::enumTypeId(), tr("physics engine"));
     QStringList types;

@@ -24,6 +24,14 @@
 1. Allow dynamically adding links to a model.
     * [Pull request #2185](https://bitbucket.org/osrf/gazebo/pull-requests/2185)
 
+1. Fix editing physics parameters in gzclient, update test
+    * [Pull request #2192](https://bitbucket.org/osrf/gazebo/pull-requests/2192)
+    * [Issue #1876](https://bitbucket.org/osrf/gazebo/issues/1876)
+
+1. Display physics engine type in the GUI
+    * [Pull request #2155](https://bitbucket.org/osrf/gazebo/pull-requests/2155)
+    * [Issue #1121](https://bitbucket.org/osrf/gazebo/issues/1121)
+
 1. Fix compilation against ffmpeg3 (libavcodec)
     * [Pull request #2154](https://bitbucket.org/osrf/gazebo/pull-request/2154)
 
