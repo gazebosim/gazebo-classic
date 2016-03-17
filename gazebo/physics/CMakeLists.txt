@@ -196,7 +196,7 @@ set (gtest_sources
   SphereShape_TEST.cc
 )
 
-gz_build_tests(${gtest_sources} EXTRA_LIBS gazebo_physics)
+gz_build_tests(${gtest_sources} EXTRA_LIBS gazebo_physics gazebo_test_fixture)
 
 # unit tests with gazebo_test_fixture
 set (gtest_fixture_sources
