@@ -1131,19 +1131,19 @@ void MainWindow::CreateActions()
   connect(editorGroup, SIGNAL(triggered(QAction *)), this,
       SLOT(OnEditorGroup(QAction *)));
 
-  g_editBuildingAct = new QAction(tr("&Building Editor"), editorGroup);
+  g_editBuildingAct = new QAction(tr("&Open Building Editor"), editorGroup);
   g_editBuildingAct->setShortcut(tr("Ctrl+B"));
   g_editBuildingAct->setStatusTip(tr("Enter Building Editor Mode"));
   g_editBuildingAct->setCheckable(true);
   g_editBuildingAct->setChecked(false);
 
-  g_editTerrainAct = new QAction(tr("&Terrain Editor"), editorGroup);
+  g_editTerrainAct = new QAction(tr("&Open Terrain Editor"), editorGroup);
   g_editTerrainAct->setShortcut(tr("Ctrl+E"));
   g_editTerrainAct->setStatusTip(tr("Enter Terrain Editor Mode"));
   g_editTerrainAct->setCheckable(true);
   g_editTerrainAct->setChecked(false);
 
-  g_editModelAct = new QAction(tr("&Model Editor"), editorGroup);
+  g_editModelAct = new QAction(tr("&Open Model Editor"), editorGroup);
   g_editModelAct->setShortcut(tr("Ctrl+M"));
   g_editModelAct->setStatusTip(tr("Enter Model Editor Mode"));
   g_editModelAct->setCheckable(true);
@@ -1524,9 +1524,10 @@ void MainWindow::CreateActions()
 
   // Undo
   g_undoAct = new QAction(QIcon(":/images/undo.png"),
-      tr("Undo (Ctrl + Z)"), this);
+      tr("Undo"), this);
   g_undoAct->setShortcut(tr("Ctrl+Z"));
   g_undoAct->setCheckable(false);
+  g_undoAct->setStatusTip(tr("Undo Action"));
   this->CreateDisabledIcon(":/images/undo.png", g_undoAct);
   g_undoAct->setEnabled(false);
 
@@ -1539,9 +1540,10 @@ void MainWindow::CreateActions()
 
   // Redo
   g_redoAct = new QAction(QIcon(":/images/redo.png"),
-      tr("Redo (Shift + Ctrl + Z)"), this);
+      tr("Redo"), this);
   g_redoAct->setShortcut(tr("Shift+Ctrl+Z"));
   g_redoAct->setCheckable(false);
+  g_redoAct->setStatusTip(tr("Redo Action"));
   this->CreateDisabledIcon(":/images/redo.png", g_redoAct);
   g_redoAct->setEnabled(false);
 
@@ -1807,13 +1809,18 @@ void MainWindow::CreateMenuBar()
   fileMenu->addAction(g_quitAct);
 
   this->dataPtr->editMenu = bar->addMenu(tr("&Edit"));
+  this->dataPtr->editMenu->addAction(g_undoAct);
+  this->dataPtr->editMenu->addAction(g_redoAct);
+  this->dataPtr->editMenu->addSeparator();
+  this->dataPtr->editMenu->addAction(g_copyAct);
+  this->dataPtr->editMenu->addAction(g_pasteAct);
+  this->dataPtr->editMenu->addSeparator();
   this->dataPtr->editMenu->addAction(g_resetModelsAct);
   this->dataPtr->editMenu->addAction(g_resetWorldAct);
   this->dataPtr->editMenu->addSeparator();
   this->dataPtr->editMenu->addAction(g_editBuildingAct);
   this->dataPtr->editMenu->addAction(g_editModelAct);
-  this->dataPtr->editMenu->addAction(g_copyAct);
-  this->dataPtr->editMenu->addAction(g_pasteAct);
+
 
   // \TODO: Add this back in when implementing the full Terrain Editor spec.
   // editMenu->addAction(g_editTerrainAct);
