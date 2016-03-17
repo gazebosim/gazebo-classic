@@ -58,8 +58,8 @@ namespace gazebo
       /// \brief Text label
       public: EditableLabel *title;
 
-      /// \brief Layout that contains all the plots.
-      public: QLayout *plotLayout;
+      /// \brief Splitter that contains all the plots.
+      public: QSplitter *plotSplitter;
 
       /// \brief A map of plot id to plot data;
       public: std::map<unsigned int, PlotData *> plotData;
@@ -189,8 +189,12 @@ PlotCanvas::PlotCanvas(QWidget *_parent)
   QFrame *plotFrame = new QFrame(plotScrollArea);
   plotFrame->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
   plotFrame->setObjectName("plotCanvasPlotFrame");
-  this->dataPtr->plotLayout = new QVBoxLayout;
-  plotFrame->setLayout(this->dataPtr->plotLayout);
+  QVBoxLayout *plotLayout = new QVBoxLayout;
+  plotFrame->setLayout(plotLayout);
+
+  this->dataPtr->plotSplitter = new QSplitter(Qt::Vertical);
+  this->dataPtr->plotSplitter->setVisible(false);
+  plotLayout->addWidget(this->dataPtr->plotSplitter);
 
   plotScrollArea->setWidget(plotFrame);
 
@@ -198,7 +202,7 @@ PlotCanvas::PlotCanvas(QWidget *_parent)
   this->dataPtr->emptyPlot = new EmptyIncrementalPlot(this);
   connect(this->dataPtr->emptyPlot, SIGNAL(VariableAdded(std::string)),
       this, SLOT(OnAddVariable(std::string)));
-  this->dataPtr->plotLayout->addWidget(this->dataPtr->emptyPlot);
+  plotLayout->addWidget(this->dataPtr->emptyPlot);
 
   // set initial show grid state
   showGridAct->setChecked(this->dataPtr->emptyPlot->ShowGrid());
@@ -295,7 +299,10 @@ void PlotCanvas::AddVariable(const unsigned int _id,
 
   // hide initial empty plot
   if (!this->dataPtr->plotData.empty() && this->dataPtr->emptyPlot)
+  {
     this->dataPtr->emptyPlot->setVisible(false);
+    this->dataPtr->plotSplitter->setVisible(true);
+  }
 
   PlotManager::Instance()->AddIntrospectionCurve(_variable, curve);
 
@@ -347,8 +354,7 @@ void PlotCanvas::RemoveVariable(const unsigned int _id,
   // delete whole plot if no more curves
   if (it->second->variableCurves.empty())
   {
-    this->dataPtr->plotLayout->takeAt(
-        this->dataPtr->plotLayout->indexOf(it->second->plot));
+    it->second->plot->hide();
     it->second->plot->RemoveCurve(curveId);
     delete it->second->plot;
     delete it->second;
@@ -362,7 +368,10 @@ void PlotCanvas::RemoveVariable(const unsigned int _id,
   }
 
   if (this->dataPtr->plotData.empty() && this->dataPtr->emptyPlot)
+  {
     this->dataPtr->emptyPlot->setVisible(true);
+    this->dataPtr->plotSplitter->setVisible(false);
+  }
 
   // remove from variable pill container
   this->dataPtr->yVariableContainer->RemoveVariablePill(_id);
@@ -375,7 +384,7 @@ unsigned int PlotCanvas::AddPlot()
   IncrementalPlot *plot = new IncrementalPlot(this);
   plot->setAutoDelete(false);
   plot->ShowGrid(this->dataPtr->emptyPlot->ShowGrid());
-  this->dataPtr->plotLayout->addWidget(plot);
+  this->dataPtr->plotSplitter->addWidget(plot);
 
   PlotData *p = new PlotData;
   p->id = this->dataPtr->globalPlotId++;
@@ -397,8 +406,7 @@ void PlotCanvas::RemovePlot(const unsigned int _id)
   // remove the plot if it does not contain any variableCurves (curves)
   if (it->second->variableCurves.empty())
   {
-    this->dataPtr->plotLayout->takeAt(
-        this->dataPtr->plotLayout->indexOf(it->second->plot));
+    it->second->plot->hide();
     delete it->second->plot;
     delete it->second;
     this->dataPtr->plotData.erase(it);
@@ -542,14 +550,16 @@ void PlotCanvas::OnMoveVariable(const unsigned int _id,
 
       // hide initial empty plot
       if (!this->dataPtr->plotData.empty() && this->dataPtr->emptyPlot)
+      {
         this->dataPtr->emptyPlot->setVisible(false);
+        this->dataPtr->plotSplitter->setVisible(true);
+      }
     }
 
     // delete plot if empty
     if (p->variableCurves.empty())
     {
-      this->dataPtr->plotLayout->takeAt(
-          this->dataPtr->plotLayout->indexOf(p->plot));
+      p->plot->hide();
 
       // careful about deleting by iterator (plotIt) as it may have been
       // changed if a new plot is added to the vector
@@ -803,17 +813,15 @@ void PlotCanvas::OnShowGrid()
 void PlotCanvas::UpdateAxisLabel()
 {
   // show the x-axis label in the last plot only
-  for (int i = 0; i < this->dataPtr->plotLayout->count(); ++i)
+  for (int i = 0; i < this->dataPtr->plotSplitter->count(); ++i)
   {
-    QLayoutItem *item = this->dataPtr->plotLayout->itemAt(i);
-    if (item)
+    IncrementalPlot *p =
+        qobject_cast<IncrementalPlot *>(this->dataPtr->plotSplitter->widget(i));
+
+    if (p)
     {
-      IncrementalPlot *p = qobject_cast<IncrementalPlot *>(item->widget());
-      if (p)
-      {
-        p->ShowAxisLabel(IncrementalPlot::X_BOTTOM_AXIS,
-            i == (this->dataPtr->plotLayout->count()-1));
-      }
+      p->ShowAxisLabel(IncrementalPlot::X_BOTTOM_AXIS,
+          i == (this->dataPtr->plotSplitter->count()-1));
     }
   }
 }
