@@ -550,6 +550,9 @@ namespace gazebo
       /// \brief Register items in the introspection service.
       private: void RegisterIntrospectionItems();
 
+      /// \brief Unregister items in the introspection service.
+      private: void UnregisterIntrospectionItems();
+
       /// \brief Callback when a light message is received.
       /// \param[in] _msg Pointer to the light message.
       /// \deprecated Topic ~/light deprecated.

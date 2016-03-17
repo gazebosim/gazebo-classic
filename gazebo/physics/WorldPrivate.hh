@@ -328,6 +328,9 @@ namespace gazebo
 
       /// \brief URI of this world.
       public: common::URI uri;
+
+      /// \brief All the introspection items regsitered for this.
+      public: std::vector<common::URI> introspectionItems;
     };
   }
 }
