@@ -2,9 +2,6 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
-1. Added static camera when following a model.
-    * [Pull request #1980](https://bitbucket.org/osrf/gazebo/pull-request/1980)
-
 1. Support conversions between SDF and protobuf for more sensors.
     * [Pull request #2118](https://bitbucket.org/osrf/gazebo/pull-request/2118)
 
