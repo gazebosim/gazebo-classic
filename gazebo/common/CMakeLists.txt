@@ -143,7 +143,6 @@ set (gtest_sources
   MaterialDensity_TEST.cc
   Mesh_TEST.cc
   MeshManager_TEST.cc
-  ModelDatabase_TEST.cc
   MouseEvent_TEST.cc
   MovingWindowFilter_TEST.cc
   SphericalCoordinates_TEST.cc
