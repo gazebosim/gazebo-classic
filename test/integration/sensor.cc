@@ -46,6 +46,18 @@ TEST_F(SensorTest, FastSensor)
 
   // This test will cause an assertion if maxSensorUpdate in
   // SensorManager::SensorContainer::RunLoop() is set improperly
+
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  double dt = physics->GetMaxStepSize();
+  EXPECT_DOUBLE_EQ(dt, 0.5);
+
+  // Change time step by several orders of magnitude
+  // and verify that there are no assertions
+  physics->SetMaxStepSize(1e4);
+  common::Time::MSleep(20);
+  physics->SetMaxStepSize(1e-3);
+  common::Time::MSleep(20);
 }
 
 int main(int argc, char **argv)
