@@ -21,11 +21,15 @@
 #include <memory>
 #include <string>
 
+#include "gazebo/transport/transport.hh"
+
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/gui/plot/PlottingTypes.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
+
+
 
 namespace gazebo
 {
@@ -61,6 +65,18 @@ namespace gazebo
       /// \param[in] _curve Curve to remove.
       public: void RemoveIntrospectionCurve(PlotCurveWeakPtr _curve);
 
+      /// \brief Add a topic curve to the manager. Data received from the named
+      /// topic will be added to the curve
+      /// \param[in] _uri URI containing the topic path and param query
+      /// \param[in] _curve Curve that will be populated with data.
+      public: void AddTopicCurve(const std::string &_topic,
+                  PlotCurveWeakPtr _curve);
+
+      /// \brief Remove a topic curve from the manager.
+      /// \param[in] _topic Name of topic
+      /// \param[in] _curve Curve that will be populated with data.
+      public: void RemoveTopicCurve(PlotCurveWeakPtr _curve);
+
       /// \brief Add a plot window to the manager. The manager will listen to
       /// world events, e.g. Reset, and update the window's plots accordingly
       /// \param[in] _window Plot window to add
@@ -74,6 +90,9 @@ namespace gazebo
       /// \param[in] _uri URI representing the variable
       /// \return Human readable name
       public: std::string HumanReadableName(const std::string &_uri) const;
+      /// \brief Set whether or not to pause updating the plot curves.
+      /// \param[in] _paused True to pause update.
+      public: void SetPaused(const bool _paused);
 
       /// \brief This is a singleton class.
       private: friend class SingletonT<PlotManager>;

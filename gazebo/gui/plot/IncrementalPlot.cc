@@ -118,12 +118,6 @@ namespace gazebo
                 QPointF trans = zoomPos - QPointF(xCenter, yCenter);
                 trans = trans*factor;
 
-                std::cerr << "zoomPos " << zoomPos.x() << " " << zoomPos.y()
-                    << std::endl;
-                std::cerr << "xv " << xV1 << " " << xV2 << std::endl;
-                std::cerr << "yv " << yV1 << " " << yV2 << std::endl;
-                std::cerr << "trans " << trans.x() << " " << trans.y() << std::endl;
-
                 xV1 = zoomPos.x() - xHalfWidthScaled - trans.x();
                 xV2 = zoomPos.x() + xHalfWidthScaled - trans.x();
 

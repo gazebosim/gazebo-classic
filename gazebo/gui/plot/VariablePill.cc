@@ -167,7 +167,9 @@ std::string VariablePill::Name() const
 /////////////////////////////////////////////////
 void VariablePill::SetText(const std::string &_text)
 {
-  this->dataPtr->label->setText(QString::fromStdString(_text));
+  QString text = QString::fromStdString(_text);
+  this->dataPtr->label->setText(text);
+  this->dataPtr->label->setToolTip(text);
   emit VariableLabelChanged(_text);
 }
 
