@@ -1527,7 +1527,7 @@ void MainWindow::CreateActions()
       tr("Undo"), this);
   g_undoAct->setShortcut(tr("Ctrl+Z"));
   g_undoAct->setCheckable(false);
-  g_undoAct->setStatusTip(tr("Undo Action"));
+  g_undoAct->setStatusTip(tr("Undo"));
   this->CreateDisabledIcon(":/images/undo.png", g_undoAct);
   g_undoAct->setEnabled(false);
 
@@ -1543,7 +1543,7 @@ void MainWindow::CreateActions()
       tr("Redo"), this);
   g_redoAct->setShortcut(tr("Shift+Ctrl+Z"));
   g_redoAct->setCheckable(false);
-  g_redoAct->setStatusTip(tr("Redo Action"));
+  g_redoAct->setStatusTip(tr("Redo"));
   this->CreateDisabledIcon(":/images/redo.png", g_redoAct);
   g_redoAct->setEnabled(false);
 
