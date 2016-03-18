@@ -441,7 +441,8 @@ TEST_F(LogPlay_TEST, NoEndTag)
   std::string endTag = "</gazebo_log>";
 
   // Back up the length of the closing tag.
-  inFile.seekg(-1 - endTag.length(), std::ios::end);
+  int len = -1 - static_cast<int>(endTag.length());
+  inFile.seekg(len, std::ios::end);
 
   // Get the last line
   std::string lastLine;

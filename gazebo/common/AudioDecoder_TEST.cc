@@ -160,7 +160,11 @@ TEST_F(AudioDecoder, CheerFile)
     EXPECT_EQ(audio.GetSampleRate(), 44100);
 
     audio.Decode(&dataBuffer, &dataBufferSize);
-    EXPECT_EQ(dataBufferSize, 4995072u);
+
+    // later versions of ffmpeg produces a different buffer size probably due to
+    // underlying changes in the decoder. The size of the first decoded frame
+    // is much smaller than all other frames.
+    EXPECT_TRUE(dataBufferSize == 4995072u || dataBufferSize == 4987612u);
   }
 }
 
