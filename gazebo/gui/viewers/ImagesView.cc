@@ -20,6 +20,8 @@
   #include <Winsock2.h>
 #endif
 
+#include <memory>
+
 #include "gazebo/transport/Node.hh"
 
 #include "gazebo/common/Image.hh"
@@ -41,11 +43,11 @@ ImagesView::ImagesView(QWidget *_parent)
   this->setWindowTitle(tr("Gazebo: Images View"));
 
   // Create the layout and frame for images
-  auto frameLayout = new QGridLayout;
+  std::unique_ptr<QGridLayout> frameLayout(new QGridLayout);
   frameLayout->setSizeConstraint(QLayout::SetMinimumSize);
 
   this->frame->setObjectName("blackBorderFrame");
-  this->frame->setLayout(frameLayout);
+  this->frame->setLayout(frameLayout.release());
   this->frame->setMinimumHeight(240);
   this->frame->setMinimumWidth(320);
 
@@ -79,9 +81,9 @@ void ImagesView::UpdateImpl()
     }
 
     // Create new layout
-    auto newLayout = new QGridLayout;
+    std::unique_ptr<QGridLayout> newLayout(new QGridLayout);
     newLayout->setSizeConstraint(QLayout::SetMinimumSize);
-    this->frame->setLayout(newLayout);
+    this->frame->setLayout(newLayout.release());
 
     // Make sure to adjust the size of the widget
     this->frame->adjustSize();
@@ -120,7 +122,7 @@ void ImagesView::SetTopic(const std::string &_topicName)
 /////////////////////////////////////////////////
 void ImagesView::AddImage(int _width, int _height)
 {
-  ImageFrame *imageFrame = new ImageFrame(NULL);
+  std::unique_ptr<ImageFrame> imageFrame(new ImageFrame(NULL));
   imageFrame->setBaseSize(_width, _height);
   imageFrame->setMinimumSize(320, 240);
   imageFrame->show();
@@ -130,7 +132,7 @@ void ImagesView::AddImage(int _width, int _height)
   if (!frameLayout)
     return;
 
-  frameLayout->addWidget(imageFrame,
+  frameLayout->addWidget(imageFrame.release(),
       (frameLayout->count()) / 2,
       (frameLayout->count()) % 2);
 }

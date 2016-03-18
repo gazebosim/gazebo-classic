@@ -15,6 +15,7 @@
  *
 */
 
+#include <memory>
 #include <ignition/math/Rand.hh>
 
 #include "gazebo/gui/viewers/ImagesView_TEST.hh"
@@ -25,7 +26,8 @@ void ImagesView_TEST::Construction()
   this->Load("worlds/empty.world");
 
   // Create a new data logger widget
-  gazebo::gui::ImagesView *view = new gazebo::gui::ImagesView(NULL);
+  std::unique_ptr<gazebo::gui::ImagesView> view(
+      new gazebo::gui::ImagesView(NULL));
   view->show();
 
   QCoreApplication::processEvents();
@@ -37,7 +39,6 @@ void ImagesView_TEST::Construction()
   QVERIFY(frame->children().size() == 1);
 
   view->hide();
-  delete view;
 }
 
 /////////////////////////////////////////////////
@@ -46,7 +47,8 @@ void ImagesView_TEST::Switch()
   this->Load("worlds/multicamera_test.world");
 
   // Create a new data logger widget
-  gazebo::gui::ImagesView *view = new gazebo::gui::ImagesView(NULL);
+  std::unique_ptr<gazebo::gui::ImagesView> view(
+      new gazebo::gui::ImagesView(NULL));
   view->show();
 
   // Get the frame that holds the images
@@ -66,11 +68,11 @@ void ImagesView_TEST::Switch()
 
   gzmsg << "cam1 to cam6" << std::endl;
   for (int i = 2; i < 8; ++i)
-    this->SetTopic(view, topicMap[i], i);
+    this->SetTopic(view.get(), topicMap[i], i);
 
   gzmsg << "cam6 to cam1" << std::endl;
   for (int i = 7; i > 1; --i)
-    this->SetTopic(view, topicMap[i], i);
+    this->SetTopic(view.get(), topicMap[i], i);
 
   // Switch the topic 25 times
   for (unsigned int i = 0; i < 25; ++i)
@@ -89,7 +91,6 @@ void ImagesView_TEST::Switch()
   }
 
   view->hide();
-  delete view;
 }
 
 /////////////////////////////////////////////////
