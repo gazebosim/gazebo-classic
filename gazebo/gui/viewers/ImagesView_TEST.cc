@@ -25,7 +25,7 @@ void ImagesView_TEST::Construction()
   this->Load("worlds/empty.world");
 
   // Create a new data logger widget
-  gazebo::gui::ImagesView *view = new gazebo::gui::ImagesView(NULL);
+  auto view = std::make_unique<gazebo::gui::ImagesView>(NULL);
   view->show();
 
   QCoreApplication::processEvents();
@@ -37,7 +37,6 @@ void ImagesView_TEST::Construction()
   QVERIFY(frame->children().size() == 1);
 
   view->hide();
-  delete view;
 }
 
 /////////////////////////////////////////////////
@@ -46,7 +45,7 @@ void ImagesView_TEST::Switch()
   this->Load("worlds/multicamera_test.world");
 
   // Create a new data logger widget
-  gazebo::gui::ImagesView *view = new gazebo::gui::ImagesView(NULL);
+  auto view = std::make_unique<gazebo::gui::ImagesView>(NULL);
   view->show();
 
   // Get the frame that holds the images
@@ -89,7 +88,6 @@ void ImagesView_TEST::Switch()
   }
 
   view->hide();
-  delete view;
 }
 
 /////////////////////////////////////////////////
