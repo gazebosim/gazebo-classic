@@ -15,6 +15,7 @@
  *
 */
 
+#include <memory>
 #include <ignition/math/Rand.hh>
 
 #include "gazebo/gui/viewers/ImagesView_TEST.hh"
