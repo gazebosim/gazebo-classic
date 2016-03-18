@@ -416,6 +416,8 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
 
   // The model that will hold data to be displayed in the topic tree view
   this->dataPtr->topicsModel = new PlotItemModel;
+  this->dataPtr->topicsModel->setObjectName("plotTopicsModel");
+  this->dataPtr->topicsModel->setParent(this);
   this->FillTopics(this->dataPtr->topicsModel);
 
   // A proxy model to filter topic model
@@ -438,6 +440,8 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
 
   // The model that will hold data to be displayed in the model tree view
   this->dataPtr->modelsModel = new PlotItemModel;
+  this->dataPtr->modelsModel->setObjectName("plotModelsModel");
+  this->dataPtr->modelsModel->setParent(this);
   this->FillModels(this->dataPtr->modelsModel);
 
   // A proxy model to filter models model
@@ -488,7 +492,6 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   searchEdit->setObjectName("plotLineEdit");
   this->connect(searchEdit, SIGNAL(textChanged(QString)), this,
       SLOT(UpdateSearch(QString)));
-  this->UpdateSearch("");
 
   auto searchField = new QHBoxLayout();
   searchField->addWidget(searchIcon);
@@ -570,6 +573,10 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   splitter->addWidget(simWidget);
   splitter->setCollapsible(0, false);
   splitter->setCollapsible(1, false);
+  splitter->setCollapsible(2, false);
+  splitter->setStretchFactor(0, 1);
+  splitter->setStretchFactor(1, 1);
+  splitter->setStretchFactor(2, 1);
 
   auto searchLayout = new QVBoxLayout();
   searchLayout->addLayout(searchField);
@@ -607,6 +614,8 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
 
   this->setMinimumWidth(350);
   this->setLayout(mainLayout);
+
+  this->UpdateSearch("");
 }
 
 /////////////////////////////////////////////////
@@ -688,10 +697,10 @@ void Palette::FillModels(QStandardItemModel *_modelsModel)
   // FIXME: Check if there is at least one model?
   if (!items.empty())
   {
-    auto modelsTitle = new QStandardItem();
-    modelsTitle->setData("MODELS", PlotItemDelegate::DISPLAY_NAME);
-    modelsTitle->setData("title", PlotItemDelegate::TYPE);
-    _modelsModel->appendRow(modelsTitle);
+    auto title = new QStandardItem();
+    title->setData("MODELS", PlotItemDelegate::DISPLAY_NAME);
+    title->setData("title", PlotItemDelegate::TYPE);
+    _modelsModel->appendRow(title);
   }
 
   // Populate widget
@@ -770,7 +779,8 @@ void Palette::FillModels(QStandardItemModel *_modelsModel)
             {
               auto childItem = previousItem->child(k, 0);
               if (childItem &&
-                  childItem->data(PlotItemDelegate::TYPE) == "title")
+                  childItem->data(PlotItemDelegate::TYPE) == "title" &&
+                  childItem->data(PlotItemDelegate::DISPLAY_NAME) == "MODELS")
               {
                 hasTitle = true;
                 break;
@@ -779,15 +789,141 @@ void Palette::FillModels(QStandardItemModel *_modelsModel)
 
             if (!hasTitle)
             {
-              auto modelsTitle = new QStandardItem();
-              modelsTitle->setData("MODELS", PlotItemDelegate::DISPLAY_NAME);
-              modelsTitle->setData("title", PlotItemDelegate::TYPE);
-              previousItem->appendRow(modelsTitle);
+              auto title = new QStandardItem();
+              title->setData("MODELS", PlotItemDelegate::DISPLAY_NAME);
+              title->setData("title", PlotItemDelegate::TYPE);
+              previousItem->appendRow(title);
             }
 
             previousItem->appendRow(newItem);
             previousItem = newItem;
           }
+        }
+        else
+        {
+          previousItem = existingItem;
+        }
+      }
+      else if (part == "link")
+      {
+        // Check if it has already been added
+        QStandardItem *existingItem = NULL;
+
+        // Check top level (model)
+        if (!previousItem)
+        {
+          gzerr << "A link cannot be outside of a model" << std::endl;
+          continue;
+        }
+        // Check a QStandardItem
+        else
+        {
+          // TODO: Make a helper function for this
+          for (int k = 0; k < previousItem->rowCount(); ++k)
+          {
+            auto childItem = previousItem->child(k, 0);
+            if (childItem && childItem->text().toStdString() == nextPart)
+            {
+              existingItem = childItem;
+              break;
+            }
+          }
+        }
+
+        if (!existingItem)
+        {
+          auto newItem = new QStandardItem(nextPart.c_str());
+          newItem->setData(nextPart.c_str(),
+              PlotItemDelegate::DISPLAY_NAME);
+          newItem->setData("link", PlotItemDelegate::TYPE);
+
+          // Add title if there isn't one yet
+          bool hasTitle = false;
+          for (int k = 0; k < previousItem->rowCount(); ++k)
+          {
+            auto childItem = previousItem->child(k, 0);
+            if (childItem &&
+                childItem->data(PlotItemDelegate::TYPE) == "title" &&
+                childItem->data(PlotItemDelegate::DISPLAY_NAME) == "LINKS")
+            {
+              hasTitle = true;
+              break;
+            }
+          }
+
+          if (!hasTitle)
+          {
+            auto title = new QStandardItem();
+            title->setData("LINKS", PlotItemDelegate::DISPLAY_NAME);
+            title->setData("title", PlotItemDelegate::TYPE);
+            previousItem->appendRow(title);
+          }
+
+          previousItem->appendRow(newItem);
+          previousItem = newItem;
+        }
+        else
+        {
+          previousItem = existingItem;
+        }
+      }
+      else if (part == "joint")
+      {
+        // Check if it has already been added
+        QStandardItem *existingItem = NULL;
+
+        // Check top level (model)
+        if (!previousItem)
+        {
+          gzerr << "A joint cannot be outside of a model" << std::endl;
+          continue;
+        }
+        // Check a QStandardItem
+        else
+        {
+          // TODO: Make a helper function for this
+          for (int k = 0; k < previousItem->rowCount(); ++k)
+          {
+            auto childItem = previousItem->child(k, 0);
+            if (childItem && childItem->text().toStdString() == nextPart)
+            {
+              existingItem = childItem;
+              break;
+            }
+          }
+        }
+
+        if (!existingItem)
+        {
+          auto newItem = new QStandardItem(nextPart.c_str());
+          newItem->setData(nextPart.c_str(),
+              PlotItemDelegate::DISPLAY_NAME);
+          newItem->setData("joint", PlotItemDelegate::TYPE);
+
+          // Add title if there isn't one yet
+          bool hasTitle = false;
+          for (int k = 0; k < previousItem->rowCount(); ++k)
+          {
+            auto childItem = previousItem->child(k, 0);
+            if (childItem &&
+                childItem->data(PlotItemDelegate::TYPE) == "title" &&
+                childItem->data(PlotItemDelegate::DISPLAY_NAME) == "JOINTS")
+            {
+              hasTitle = true;
+              break;
+            }
+          }
+
+          if (!hasTitle)
+          {
+            auto title = new QStandardItem();
+            title->setData("JOINTS", PlotItemDelegate::DISPLAY_NAME);
+            title->setData("title", PlotItemDelegate::TYPE);
+            previousItem->appendRow(title);
+          }
+
+          previousItem->appendRow(newItem);
+          previousItem = newItem;
         }
         else
         {
@@ -804,20 +940,23 @@ void Palette::FillModels(QStandardItemModel *_modelsModel)
     queryStr = queryStr.substr(queryStr.find("=")+1);
     auto queryParts = common::split(queryStr, "/");
 
-    if (queryParts.size() != 2)
+    std::string queryValue(queryParts[1]);
+    for (unsigned int part = 2; part < queryParts.size(); ++part)
     {
-      gzwarn << "Unsupported query [" << itemURI.Str() << "]. " <<
-          "Only top level queries can be handled." << std::endl;
-      continue;
+      queryValue = queryValue + "/" + queryParts[part];
     }
 
-    if (queryParts[0] == "pose")
+    if (queryParts[0] == "pose3d")
     {
-      this->InsertPoseItem(previousItem, itemURI, queryParts[1]);
+      this->InsertPoseItem(previousItem, itemURI, queryValue);
     }
     else if (queryParts[0] == "vector3d")
     {
-      this->InsertVector3dItem(previousItem, itemURI, queryParts[1]);
+      this->InsertVector3dItem(previousItem, itemURI, queryValue);
+    }
+    else if (queryParts[0] == "axis")
+    {
+      this->InsertAxisItem(previousItem, itemURI, queryValue);
     }
   }
 }
@@ -857,31 +996,6 @@ void Palette::FillSim(QStandardItemModel *_simModel)
 
     _simModel->appendRow(childItem);
   }
-
-  //=================
-  // TODO for testing - remove later
-  auto itema = new QStandardItem();
-  itema->setData("Dog", PlotItemDelegate::DISPLAY_NAME);
-  itema->setData("Dog", PlotItemDelegate::URI_QUERY);
-  itema->setData("Double", PlotItemDelegate::TYPE);
-  _simModel->appendRow(itema);
-  auto itemb = new QStandardItem("Cat");
-  itemb->setData("Cat", PlotItemDelegate::DISPLAY_NAME);
-  itemb->setData("Cat", PlotItemDelegate::URI_QUERY);
-  itemb->setData("Double", PlotItemDelegate::TYPE);
-  _simModel->appendRow(itemb);
-  auto itemc = new QStandardItem("Turtle");
-  itemc->setData("Turtle", PlotItemDelegate::DISPLAY_NAME);
-  itemc->setData("Turtle", PlotItemDelegate::URI_QUERY);
-  itemc->setData("Double", PlotItemDelegate::TYPE);
-  _simModel->appendRow(itemc);
-  auto simTimeItem = new QStandardItem("sim_time");
-  simTimeItem->setData("sim_time", PlotItemDelegate::DISPLAY_NAME);
-  simTimeItem->setData("data://world/default?p=time/sim_time",
-      PlotItemDelegate::URI_QUERY);
-  simTimeItem->setData("Double", PlotItemDelegate::TYPE);
-  _simModel->appendRow(simTimeItem);
-  //=================
 }
 
 /////////////////////////////////////////////////
@@ -1043,7 +1157,9 @@ void Palette::InsertPoseItem(QStandardItem *_item, const common::URI &_uri,
   auto poseItem = new QStandardItem(_query.c_str());
   poseItem->setData("Pose",
       PlotItemDelegate::DISPLAY_NAME);
-  _item->appendRow(poseItem);
+
+  // Prepend so it's above titles
+  _item->insertRow(0, poseItem);
 
   // Position
   auto positionItem = new QStandardItem();
@@ -1105,7 +1221,9 @@ void Palette::InsertVector3dItem(QStandardItem *_item, const common::URI &_uri,
     if (!subItem0)
     {
       subItem0 = new QStandardItem(subItem0Name.c_str());
-      _item->appendRow(subItem0);
+
+      // Prepend so it's above titles
+      _item->insertRow(0, subItem0);
     }
 
     subItem0Name = ConfigWidget::HumanReadableKey(subItem0Name);
@@ -1174,7 +1292,87 @@ void Palette::InsertQuaterniondItem(QStandardItem *_item,
         "</p></font>";
     childItem->setToolTip(QString::fromStdString(typeName));
 
-    parentItem->appendRow(childItem);
+
+    // Prepend so it's above titles
+    parentItem->insertRow(0, childItem);
+  }
+}
+
+/////////////////////////////////////////////////
+void Palette::InsertAxisItem(QStandardItem *_item, const common::URI &_uri,
+    const std::string &_query)
+{
+  // Position
+  // - Axis 0
+  // - Axis 1
+  // Velocity
+  // - Axis 0
+  // - Axis 1
+
+  // Position / velocity
+  bool isPos = _query.find("position") != std::string::npos;
+  bool isVel = _query.find("velocity") != std::string::npos;
+
+  std::string subItem0Name;
+  if (isPos)
+    subItem0Name = "position";
+  else if (isVel)
+    subItem0Name = "velocity";
+  else
+  {
+    gzwarn << "Query not supported [" << _query << "]" << std::endl;
+    return;
+  }
+
+  // Axis
+  int axis = 0;
+  if (_query.find("1") != std::string::npos)
+    axis = 1;
+  else if (_query.find("2") != std::string::npos)
+    axis = 2;
+
+  // Check if it has already been added
+  QStandardItem *subItem0 = NULL;
+  for (int k = 0; k < _item->rowCount(); ++k)
+  {
+    auto childItem = _item->child(k, 0);
+    if (childItem && childItem->text().toStdString() == subItem0Name)
+    {
+      subItem0 = childItem;
+      break;
+    }
+  }
+
+  if (isVel || isPos)
+  {
+    // Otherwise create new item
+    if (!subItem0)
+    {
+      subItem0 = new QStandardItem(subItem0Name.c_str());
+
+      // Prepend so it's above titles
+      _item->insertRow(0, subItem0);
+    }
+
+    subItem0Name = ConfigWidget::HumanReadableKey(subItem0Name);
+    subItem0->setData(subItem0Name.c_str(), PlotItemDelegate::DISPLAY_NAME);
+
+    // Axis
+    QString subItem1Name("Axis " + QString::number(axis));
+
+    // We don't search for this because we assume no one else has added it yet
+    auto subItem1 = new QStandardItem();
+    subItem1->setData(subItem1Name, PlotItemDelegate::DISPLAY_NAME);
+    subItem1->setData((_uri.Str()).c_str(),
+        PlotItemDelegate::URI_QUERY);
+    subItem1->setData("Double", PlotItemDelegate::TYPE);
+
+    std::string typeName =
+        "<font size=3><p><b>Type</b>: " + subItem1->data(
+        PlotItemDelegate::TYPE).toString().toStdString() +
+        "</p></font>";
+    subItem1->setToolTip(QString::fromStdString(typeName));
+    subItem0->appendRow(subItem1);
   }
 }
 

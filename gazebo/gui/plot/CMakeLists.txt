@@ -9,7 +9,6 @@ set (sources_local
   plot/PlotManager.cc
   plot/Palette.cc
   plot/PlotWindow.cc
-#  plot/TopicCurveHandler.cc
   plot/VariablePill.cc
   plot/VariablePillContainer.cc
 )
@@ -30,6 +29,7 @@ set (headers_install
 set (qt_tests_local
   IntrospectionCurveHandler_TEST.cc
   IncrementalPlot_TEST.cc
+  Palette_TEST.cc
   PlotCanvas_TEST.cc
   PlotCurve_TEST.cc
   PlotWindow_TEST.cc

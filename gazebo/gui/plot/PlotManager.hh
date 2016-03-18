@@ -21,15 +21,11 @@
 #include <memory>
 #include <string>
 
-#include "gazebo/transport/transport.hh"
-
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/gui/plot/PlottingTypes.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
-
-
 
 namespace gazebo
 {
@@ -64,18 +60,6 @@ namespace gazebo
       /// \brief Remove an introspection curve from the manager
       /// \param[in] _curve Curve to remove.
       public: void RemoveIntrospectionCurve(PlotCurveWeakPtr _curve);
-
-      /// \brief Add a topic curve to the manager. Data received from the named
-      /// topic will be added to the curve
-      /// \param[in] _uri URI containing the topic path and param query
-      /// \param[in] _curve Curve that will be populated with data.
-      public: void AddTopicCurve(const std::string &_topic,
-                  PlotCurveWeakPtr _curve);
-
-      /// \brief Remove a topic curve from the manager.
-      /// \param[in] _topic Name of topic
-      /// \param[in] _curve Curve that will be populated with data.
-      public: void RemoveTopicCurve(PlotCurveWeakPtr _curve);
 
       /// \brief Add a plot window to the manager. The manager will listen to
       /// world events, e.g. Reset, and update the window's plots accordingly

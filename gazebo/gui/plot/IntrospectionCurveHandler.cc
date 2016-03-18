@@ -48,7 +48,7 @@ namespace gazebo
           std::map<std::string, CurveVariableSet>::iterator;
 
       /// \brief Mutex to protect the introspection updates.
-      public: std::mutex mutex;
+      public: std::recursive_mutex mutex;
 
       /// \brief A map of variable names to plot curves.
       public: std::map<std::string, CurveVariableSet> curves;
@@ -68,7 +68,7 @@ namespace gazebo
       /// \brief Introspection filter.
       public: std::set<std::string> introspectFilter;
 
-      /// \brief Number of subscribers to a introspection filter.
+      /// \brief Number of subscribers to an introspection filter.
       public: std::map<std::string, int> introspectFilterCount;
 
       /// \brief Introspection filter ID.
@@ -108,20 +108,27 @@ IntrospectionCurveHandler::~IntrospectionCurveHandler()
 void IntrospectionCurveHandler::AddCurve(const std::string &_name,
     PlotCurveWeakPtr _curve)
 {
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-  if (!this->dataPtr->initialized)
   {
-    gzerr << "Introspection client has not been initialized yet" << std::endl;
-    return;
+    std::lock_guard<std::recursive_mutex> lock(this->dataPtr->mutex);
+    if (!this->dataPtr->initialized)
+    {
+      gzerr << "Introspection client has not been initialized yet" << std::endl;
+      return;
+    }
   }
 
   auto c = _curve.lock();
   if (!c)
     return;
 
+  this->dataPtr->mutex.lock();
   auto it = this->dataPtr->curves.find(_name);
   if (it == this->dataPtr->curves.end())
   {
+    // unlock immediately to prevent deadlock in introspection client
+    // callback in AddItemToFilter
+    this->dataPtr->mutex.unlock();
+
     auto addItemToFilterCallback = [this, _curve, _name](const bool _result)
     {
       if (!_result)
@@ -142,13 +149,14 @@ void IntrospectionCurveHandler::AddCurve(const std::string &_name,
     {
       it->second.insert(_curve);
     }
+    this->dataPtr->mutex.unlock();
   }
 }
 
 /////////////////////////////////////////////////
 void IntrospectionCurveHandler::RemoveCurve(PlotCurveWeakPtr _curve)
 {
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->mutex);
   if (!this->dataPtr->initialized)
   {
     gzerr << "Introspection client has not been initialized yet" << std::endl;
@@ -181,7 +189,7 @@ void IntrospectionCurveHandler::RemoveCurve(PlotCurveWeakPtr _curve)
 /////////////////////////////////////////////////
 unsigned int IntrospectionCurveHandler::CurveCount() const
 {
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->mutex);
   unsigned int count = 0;
   for (const auto &it : this->dataPtr->curves)
     count += it.second.size();
@@ -189,9 +197,16 @@ unsigned int IntrospectionCurveHandler::CurveCount() const
 }
 
 /////////////////////////////////////////////////
+bool IntrospectionCurveHandler::Initialized() const
+{
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->mutex);
+  return this->dataPtr->initialized;
+}
+
+/////////////////////////////////////////////////
 void IntrospectionCurveHandler::SetupIntrospection()
 {
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->mutex);
 
   // Wait for the managers to come online
   std::set<std::string> managerIds =
@@ -213,16 +228,6 @@ void IntrospectionCurveHandler::SetupIntrospection()
 
   this->dataPtr->simTimeVar= "data://world/" + gui::get_world()
       + "?p=time/sim_time";
-
-  std::set<std::string> items;
-  this->dataPtr->introspectClient.Items(this->dataPtr->managerId, items);
-
-  std::cerr << " SetupIntrospection items " << std::endl;
-  for (auto i : items)
-  {
-    std::cerr << i << std::endl;
-  }
-  std::cerr << " ==== " << std::endl;
 
   if (!this->dataPtr->introspectClient.IsRegistered(
       this->dataPtr->managerId, this->dataPtr->simTimeVar))
@@ -253,40 +258,11 @@ void IntrospectionCurveHandler::SetupIntrospection()
   this->dataPtr->initialized = true;
 }
 
-/*
-          common::URI uri(paramName);
-          URIPath path = uri.Path();
-          URIQuery query = uri.Query();
-          while (query.Valid())
-          {
-            uri.SetQuery(query);
-            uriStr = uri.Str();
-            auto it = this->dataPtr->curves.find(uriStr);
-            if (it == this->dataPtr->curves.end())
-            {
-              std::string queryStr = query.Str();
-              size_t pos = queryStr.find("/");
-              if (pos == std::string::npos);
-                continue;
-              queryStr = queryStr.substr(0, pos)
-              query.Parse(queryStr);
-            }
-            else
-            {
-              break;
-            }
-          }
-
-          if (!query.Valid())
-            continue;
-*/
-
-
 /////////////////////////////////////////////////
 void IntrospectionCurveHandler::OnIntrospection(
     const gazebo::msgs::Param_V &_msg)
 {
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->mutex);
 
   // stores a list of curves iterators and their new values
   std::vector<
@@ -316,166 +292,141 @@ void IntrospectionCurveHandler::OnIntrospection(
       }
     }
 
-    // std::cerr << "paramName " << paramName << std::endl;
-
     // see if there is a curve with variable name that matches param name or
     // a substring of the param name
-    auto it = this->dataPtr->curves.find(paramName);
-    if (it == this->dataPtr->curves.end())
+    for (auto cIt = this->dataPtr->curves.begin();
+        cIt != this->dataPtr->curves.end(); ++cIt)
     {
-      for (auto cIt = this->dataPtr->curves.begin();
-          cIt != this->dataPtr->curves.end(); ++cIt)
+      if (cIt->first.find(paramName) != 0)
+        continue;
+
+      // get the data
+      double data = 0;
+      bool validData = true;
+      std::string curveVarName = cIt->first;
+
+      switch (paramValue.type())
       {
-        if (cIt->first.find(paramName) == 0)
+        case gazebo::msgs::Any::DOUBLE:
         {
-          it = cIt;
+          if (paramValue.has_double_value())
+          {
+            data = paramValue.double_value();
+          }
           break;
         }
-      }
-    }
-    if (it == this->dataPtr->curves.end())
-      continue;
-
-    // get the data
-    double data = 0;
-    bool validData = true;
-    std::string curveVarName = it->first;
-
-    switch (paramValue.type())
-    {
-      case gazebo::msgs::Any::DOUBLE:
-      {
-        if (paramValue.has_double_value())
+        case gazebo::msgs::Any::INT32:
         {
-          data = paramValue.double_value();
-        }
-        break;
-      }
-      case gazebo::msgs::Any::INT32:
-      {
-        if (paramValue.has_int_value())
-        {
-          data = paramValue.int_value();
-        }
-        break;
-      }
-      case gazebo::msgs::Any::BOOLEAN:
-      {
-        if (paramValue.has_bool_value())
-        {
-          data = static_cast<int>(paramValue.bool_value());
-        }
-        break;
-      }
-      case gazebo::msgs::Any::TIME:
-      {
-        if (paramValue.has_time_value())
-        {
-          common::Time t = msgs::Convert(paramValue.time_value());
-          data = t.Double();
-        }
-        break;
-      }
-      case gazebo::msgs::Any::POSE3D:
-      {
-        if (paramValue.has_pose3d_value())
-        {
-          ignition::math::Pose3d p =
-              msgs::ConvertIgn(paramValue.pose3d_value());
-
-          double d = 0;
-          // use uri to parse and get specific attribute
-          common::URI uri(curveVarName);
-          common::URIQuery query = uri.Query();
-          std::string queryStr = query.Str();
-
-          // example position query string:
-          //   p=pose/world_pose/vector3/position/double/x
-          // example rotation query string:
-          //   p=pose/world_pose/vector3/orientation/double/roll
-          // auto tokens = common::split(queryStr, "=/");
-          // if (tokens.size() == 7u && tokens[1] == "pose")
-          // {
-          //   if (tokens[4] == "position")
-          //     validData = Vector3dFromQuery(queryStr, p.Pos(), tokens[6]);
-          //   else if (tokens[4] == "orientation")
-          //     validData = Vector3dFromQuery(queryStr, p.Rot(), tokens[6]);
-          //   else
-          //     validData = false;
-          // }
-          // else
-          //   validData = false;
-
-
-          if (queryStr.find("position") != std::string::npos)
+          if (paramValue.has_int_value())
           {
-            validData = Vector3dFromQuery(queryStr, p.Pos(), d);
+            data = paramValue.int_value();
           }
-          else if (queryStr.find("orientation") != std::string::npos)
+          break;
+        }
+        case gazebo::msgs::Any::BOOLEAN:
+        {
+          if (paramValue.has_bool_value())
           {
-            validData = QuaterniondFromQuery(queryStr, p.Rot(), d);
+            data = static_cast<int>(paramValue.bool_value());
+          }
+          break;
+        }
+        case gazebo::msgs::Any::TIME:
+        {
+          if (paramValue.has_time_value())
+          {
+            common::Time t = msgs::Convert(paramValue.time_value());
+            data = t.Double();
+          }
+          break;
+        }
+        case gazebo::msgs::Any::POSE3D:
+        {
+          if (paramValue.has_pose3d_value())
+          {
+            ignition::math::Pose3d p =
+                msgs::ConvertIgn(paramValue.pose3d_value());
+
+            double d = 0;
+            // use uri to parse and get specific attribute
+            common::URI uri(curveVarName);
+            common::URIQuery query = uri.Query();
+            std::string queryStr = query.Str();
+
+            // example position query string:
+            //   p=pose3d/world_pose/vector3d/position/double/x
+            // example rotation query string:
+            //   p=pose3d/world_pose/quaterniond/orientation/double/roll
+            if (queryStr.find("position") != std::string::npos)
+            {
+              validData = this->Vector3dFromQuery(queryStr, p.Pos(), d);
+            }
+            else if (queryStr.find("orientation") != std::string::npos)
+            {
+              validData = this->QuaterniondFromQuery(queryStr, p.Rot(), d);
+            }
+            else
+              validData = false;
+
+            data = d;
+          }
+          else
+            validData = false;
+          break;
+        }
+        case gazebo::msgs::Any::VECTOR3D:
+        {
+          if (paramValue.has_vector3d_value())
+          {
+            ignition::math::Vector3d vec =
+                msgs::ConvertIgn(paramValue.vector3d_value());
+
+            double d = 0;
+            // use uri to parse and get specific attribute
+            common::URI uri(curveVarName);
+            common::URIQuery query = uri.Query();
+            std::string queryStr = query.Str();
+            validData = this->Vector3dFromQuery(queryStr, vec, d);
+
+            data = d;
+          }
+          else
+            validData = false;
+          break;
+        }
+        case gazebo::msgs::Any::QUATERNIOND:
+        {
+          if (paramValue.has_quaternion_value())
+          {
+            ignition::math::Quaterniond quat =
+                msgs::ConvertIgn(paramValue.quaternion_value());
+
+            double d = 0;
+            // use uri to parse and get specific attribute
+            common::URI uri(curveVarName);
+            common::URIQuery query = uri.Query();
+            std::string queryStr = query.Str();
+            validData = this->QuaterniondFromQuery(queryStr, quat, d);
+
+            data = d;
           }
           else
             validData = false;
 
-          data = d;
+          break;
         }
-        else
-          validData = false;
-        break;
-      }
-      case gazebo::msgs::Any::VECTOR3D:
-      {
-        if (paramValue.has_vector3d_value())
+        default:
         {
-          ignition::math::Vector3d vec =
-              msgs::ConvertIgn(paramValue.vector3d_value());
-
-          double d = 0;
-          // use uri to parse and get specific attribute
-          common::URI uri(curveVarName);
-          common::URIQuery query = uri.Query();
-          std::string queryStr = query.Str();
-          validData = Vector3dFromQuery(queryStr, vec, d);
-
-          data = d;
-        }
-        else
           validData = false;
-        break;
-      }
-      case gazebo::msgs::Any::QUATERNIOND:
-      {
-        if (paramValue.has_quaternion_value())
-        {
-          ignition::math::Quaterniond quat =
-              msgs::ConvertIgn(paramValue.quaternion_value());
-
-          double d = 0;
-          // use uri to parse and get specific attribute
-          common::URI uri(curveVarName);
-          common::URIQuery query = uri.Query();
-          std::string queryStr = query.Str();
-          validData = QuaterniondFromQuery(queryStr, quat, d);
-
-          data = d;
+          break;
         }
-        else
-          validData = false;
+      }
+      if (!validData)
+        continue;
 
-        break;
-      }
-      default:
-      {
-        validData = false;
-        break;
-      }
+      // push to tmp list and update later
+      curvesUpdates.push_back(std::make_pair(cIt, data));
     }
-    if (!validData)
-      continue;
-
-    // push to tmp list and update later
-    curvesUpdates.push_back(std::make_pair(it, data));
   }
 
   // update curves!
@@ -487,44 +438,6 @@ void IntrospectionCurveHandler::OnIntrospection(
       if (!curve)
         continue;
       curve->AddPoint(ignition::math::Vector2d(simTime, curveUpdate.second));
-    }
-  }
-
-  return;
-  // TODO remove later - for testing only
-  auto it = this->dataPtr->curves.find("Dog");
-  if (it != this->dataPtr->curves.end())
-  {
-    for (auto cIt : it->second)
-    {
-      auto curve = cIt.lock();
-      if (!curve)
-        continue;
-      curve->AddPoint(ignition::math::Vector2d(simTime, 2));
-    }
-  }
-
-  it = this->dataPtr->curves.find("Cat");
-  if (it != this->dataPtr->curves.end())
-  {
-    for (auto cIt : it->second)
-    {
-      auto curve = cIt.lock();
-      if (!curve)
-        continue;
-      curve->AddPoint(ignition::math::Vector2d(simTime, 10));
-    }
-  }
-
-  it = this->dataPtr->curves.find("Turtle");
-  if (it != this->dataPtr->curves.end())
-  {
-    for (auto cIt : it->second)
-    {
-      auto curve = cIt.lock();
-      if (!curve)
-        continue;
-      curve->AddPoint(ignition::math::Vector2d(simTime, 6));
     }
   }
 }
@@ -540,7 +453,7 @@ void IntrospectionCurveHandler::AddItemToFilter(const std::string &_name,
     if (!_itemsResult)
       return;
 
-    std::lock_guard<std::mutex> itemLock(this->dataPtr->mutex);
+    std::lock_guard<std::recursive_mutex> itemLock(this->dataPtr->mutex);
 
     common::URI itemURI(_name);
     common::URIPath itemPath = itemURI.Path();
@@ -556,11 +469,11 @@ void IntrospectionCurveHandler::AddItemToFilter(const std::string &_name,
       if (itemPath == path)
       {
         // A registered variable can have the query
-        //  "?p=world_pose"
+        //  "?p=pose3d/world_pose"
         // and if the variable we are looking for has the query
-        //  "?p=world_pose/position/x"
-        // we need to add "scheme://path?world_pose" to the filter instead of
-        // "scheme://path?p=world_pose/position/x"
+        //  "?p=pose3d/world_pose/vector3d/position/double/x"
+        // we need to add "scheme://path?pose3d/world_pose" to filter instead of
+        //  "scheme://path?p=pose3d/world_pose/vector3d/position/double/x"
 
         // check substring
         if (itemQuery.Str().find(query.Str()) == 0)
@@ -579,7 +492,7 @@ void IntrospectionCurveHandler::AddItemToFilter(const std::string &_name,
               if (!_result)
                 return;
 
-              std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+              std::lock_guard<std::recursive_mutex> lock(this->dataPtr->mutex);
               this->dataPtr->introspectFilter.insert(item);
               this->dataPtr->introspectFilterCount[item] = 1;
               if (_cb)
@@ -600,6 +513,8 @@ void IntrospectionCurveHandler::AddItemToFilter(const std::string &_name,
             // filter already exists, increment counter.
             int &count = this->dataPtr->introspectFilterCount[item];
             count++;
+            if (_cb)
+              _cb(true);
           }
 
           break;
@@ -627,7 +542,7 @@ void IntrospectionCurveHandler::RemoveItemFromFilter(const std::string &_name,
     if (!_itemsResult)
       return;
 
-    std::lock_guard<std::mutex> itemLock(this->dataPtr->mutex);
+    std::lock_guard<std::recursive_mutex> itemLock(this->dataPtr->mutex);
 
     common::URI itemURI(_name);
     common::URIPath itemPath = itemURI.Path();
@@ -643,11 +558,12 @@ void IntrospectionCurveHandler::RemoveItemFromFilter(const std::string &_name,
       if (itemPath == path)
       {
         // A registered variable can have the query
-        //  "?p=world_pose"
+        //  "?p=pose3d/world_pose"
         // and if the variable we are looking for has the query
-        //  "?p=world_pose/position/x"
-        // we need to add "scheme://path?world_pose" to the filter instead of
-        // "scheme://path?p=world_pose/position/x"
+        //  "?p=pose3d/world_pose/vector3d/position/double/x"
+        // we need to remove "scheme://path?pose3d/world_pose" from the filter
+        // instead of
+        //  "scheme://path?p=pose3d/world_pose/vector3d/position/double/x"
 
         // check substring starts at index 0
         if (itemQuery.Str().find(query.Str()) == 0)
@@ -672,7 +588,7 @@ void IntrospectionCurveHandler::RemoveItemFromFilter(const std::string &_name,
               if (!_result)
                 return;
 
-              std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+              std::lock_guard<std::recursive_mutex> lock(this->dataPtr->mutex);
               this->dataPtr->introspectFilter.erase(item);
               this->dataPtr->introspectFilterCount.erase(item);
             };
@@ -715,11 +631,11 @@ bool IntrospectionCurveHandler::Vector3dFromQuery(const std::string &_query,
   }
   else if (elem == "y")
   {
-    _value= _vec.Y();
+    _value = _vec.Y();
   }
   else if (elem == "z")
   {
-    _value= _vec.Z();
+    _value = _vec.Z();
   }
   else
     return false;

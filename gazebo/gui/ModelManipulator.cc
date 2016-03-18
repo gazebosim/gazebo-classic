@@ -387,7 +387,8 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
       }
     }
 
-    if (this->dataPtr->keyEvent.key == Qt::Key_Shift || geomType == "sphere")
+    if (QApplication::keyboardModifiers() & Qt::ShiftModifier ||
+        geomType == "sphere")
     {
       scale = this->UpdateScale(_axis, scale, "sphere");
     }
@@ -437,15 +438,14 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
       if (childVis != this->dataPtr->selectionObj &&
           geomType != "" && geomType != "mesh")
       {
-        math::Vector3 geomScale = scale;
-        if (this->dataPtr->keyEvent.key == Qt::Key_Shift ||
-            geomType == "sphere")
+        math::Vector3 geomScale;
+        if (QApplication::keyboardModifiers() & Qt::ShiftModifier)
         {
           geomScale = this->UpdateScale(_axis, scale, "sphere");
         }
-        else if (geomType == "cylinder")
+        else
         {
-          geomScale = this->UpdateScale(_axis, scale, "cylinder");
+          geomScale = this->UpdateScale(_axis, scale, geomType);
         }
 
         math::Vector3 newScale = this->dataPtr->mouseChildVisualScale[i]
@@ -459,6 +459,7 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
           newScale.y = std::max(1e-4, newScale.y);
           newScale.z = std::max(1e-4, newScale.z);
         }
+
         childVis->SetScale(newScale);
         Events::scaleEntity(childVis->GetName(), newScale);
       }
@@ -945,7 +946,7 @@ void ModelManipulator::OnKeyPressEvent(const common::KeyEvent &_event)
             this->dataPtr->mouseMoveVis->GetWorldPose();
       }
     }
-    else  if (this->dataPtr->keyEvent.key == Qt::Key_Shift)
+    else if (QApplication::keyboardModifiers() & Qt::ShiftModifier)
     {
       this->dataPtr->globalManip = true;
       this->dataPtr->selectionObj->SetGlobal(this->dataPtr->globalManip);
@@ -972,7 +973,7 @@ void ModelManipulator::OnKeyReleaseEvent(const common::KeyEvent &_event)
             this->dataPtr->mouseMoveVis->GetWorldPose();
       }
     }
-    else  if (this->dataPtr->keyEvent.key == Qt::Key_Shift)
+    else if (QApplication::keyboardModifiers() & Qt::ShiftModifier)
     {
       this->dataPtr->globalManip = false;
       this->dataPtr->selectionObj->SetGlobal(this->dataPtr->globalManip);
