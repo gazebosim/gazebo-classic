@@ -166,6 +166,12 @@ double PhysicsEngine::GetRealTimeUpdateRate() const
 //////////////////////////////////////////////////
 double PhysicsEngine::GetMaxStepSize() const
 {
+  return this->MaxStepSize();
+}
+
+//////////////////////////////////////////////////
+double PhysicsEngine::MaxStepSize() const
+{
   return this->maxStepSize;
 }
 

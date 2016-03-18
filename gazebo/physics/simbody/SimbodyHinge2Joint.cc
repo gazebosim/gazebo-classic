@@ -51,7 +51,7 @@ void SimbodyHinge2Joint::Load(sdf::ElementPtr _sdf)
 ignition::math::Vector3d SimbodyHinge2Joint::Anchor(
     const unsigned int /*index*/) const
 {
-  return this->anchorPos;
+  return this->simbodyJointDPtr->anchorPos;
 }
 
 //////////////////////////////////////////////////

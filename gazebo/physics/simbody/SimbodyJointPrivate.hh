@@ -17,13 +17,17 @@
 #ifndef _GAZEBO_PHYSICS_SIMBODY_SIMBODYJOINTPRIVATE_HH_
 #define _GAZEBO_PHYSICS_SIMBODY_SIMBODYJOINTPRIVATE_HH_
 
+#include "gazebo/physics/JointPrivate.hh"
+#include "gazebo/physics/simbody/SimbodyTypes.hh"
+#include "gazebo/physics/simbody/simbody_inc.h"
+
 namespace gazebo
 {
   namespace physics
   {
     /// \internal
     /// \brief Private data for SimbodyJoint
-    class SimbodyJointPrivate
+    class SimbodyJointPrivate : public JointPrivate
     {
       /// \brief Force Simbody to break a loop by using a weld constraint.
       /// This flag is needed by SimbodyPhysics::MultibodyGraphMaker, so kept

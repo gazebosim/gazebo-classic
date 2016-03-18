@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include "gazebo/physics/CollisionPrivate.hh"
 #include "gazebo/physics/simbody/simbody_inc.h"
 #include "gazebo/physics/simbody/SimbodyCollision.hh"
 #include "gazebo/physics/SurfaceParams.hh"
@@ -27,7 +28,7 @@ SimbodyCollision::SimbodyCollision(LinkPtr _parent)
 {
   this->SetName("Simbody_Collision");
   this->collisionShape = NULL;
-  this->collisionDPtr->surface.reset(new SurfaceParams());
+  this->collDPtr->surface.reset(new SurfaceParams());
 }
 
 //////////////////////////////////////////////////
@@ -75,7 +76,7 @@ void SimbodyCollision::SetCollisionShape(SimTK::ContactGeometry *_shape)
 }
 
 //////////////////////////////////////////////////
-SimTK::ContactGeometry *SimbodyCollision::GetCollisionShape() const
+SimTK::ContactGeometry *SimbodyCollision::CollisionShape() const
 {
   return this->collisionShape;
 }

@@ -82,7 +82,7 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual bool SetLowStop(const unsigned int _index,
-                                      const math::Angle &_angle);
+                                      const ignition::math::Angle &_angle);
 
       // Documentation inherited.
       protected: virtual void SetForceImpl(

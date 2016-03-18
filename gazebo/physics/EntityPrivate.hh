@@ -21,6 +21,7 @@
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Vector3.hh>
 
+#include "gazebo/transport/Node.hh"
 #include "gazebo/physics/BasePrivate.hh"
 
 namespace gazebo

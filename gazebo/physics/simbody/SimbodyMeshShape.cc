@@ -15,7 +15,7 @@
  *
 */
 #include "gazebo/common/Mesh.hh"
-#include "gazebo/common/MeshShapePrivate.hh"
+#include "gazebo/physics/MeshShapePrivate.hh"
 
 #include "gazebo/physics/simbody/SimbodyTypes.hh"
 #include "gazebo/physics/simbody/SimbodyMesh.hh"

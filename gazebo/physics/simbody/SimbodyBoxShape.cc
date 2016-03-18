@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-
+#include "gazebo/common/Console.hh"
 #include "gazebo/physics/ShapePrivate.hh"
 #include "gazebo/physics/simbody/SimbodyPhysics.hh"
 #include "gazebo/physics/simbody/SimbodyBoxShape.hh"
@@ -65,6 +65,8 @@ void SimbodyBoxShape::SetSize(const ignition::math::Vector3d &_size)
   BoxShape::SetSize(size);
 
   SimbodyCollisionPtr bParent;
-  bParent = std::dynamic_pointer_cast<SimbodyCollision>(
-      this->shapeDptr->collisionParent);
+  // Nate: put this back in
+  /*bParent = std::dynamic_pointer_cast<SimbodyCollision>(
+      this->shapeDPtr->collisionParent);
+      */
 }

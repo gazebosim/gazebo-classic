@@ -19,9 +19,6 @@
 
 #include <string>
 
-#include <boost/thread/thread.hpp>
-#include <boost/thread/mutex.hpp>
-
 #include <ignition/math/Vector3.hh>
 #include <ignition/math/Quaternion.hh>
 
@@ -144,7 +141,14 @@ namespace gazebo
       /// \brief Convert SimTK::Vec3 to gazebo::math::Vector3
       /// \param[in] _v Simbody's SimTK::Vec3 object
       /// \return Gazeb's math::Vector3 object
-      public: static math::Vector3 Vec3ToVector3(const SimTK::Vec3 &_v);
+      public: static math::Vector3 Vec3ToVector3(const SimTK::Vec3 &_v)
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Convert SimTK::Vec3 to ignition::math::Vector3d
+      /// \param[in] _v Simbody's SimTK::Vec3 object
+      /// \return ignition::math::Vector3d object
+      public: static ignition::math::Vector3d Vec3ToVector3Ign(
+                  const SimTK::Vec3 &_v);
 
       /// \brief Convert the given pose in x,y,z,thetax,thetay,thetaz format to
       /// a Simbody Transform. The rotation angles are interpreted as a
@@ -162,7 +166,7 @@ namespace gazebo
       /// \param[in] _pose ignition::math::Pose3d object
       /// \return Simbody's SimTK::Transform object
       public: static SimTK::Transform Pose2Transform(
-                  const ignition::math::Pose3d &_pose)
+                  const ignition::math::Pose3d &_pose);
 
       /// \brief Convert a Simbody transform to a pose in x,y,z,
       /// thetax,thetay,thetaz format.
@@ -175,7 +179,7 @@ namespace gazebo
       /// thetax,thetay,thetaz format.
       /// \param[in] _xAB Simbody's SimTK::Transform object
       /// \return ignition::math::Pose3d object
-      public: static ignition::math::Pose3d Transform2Pose(
+      public: static ignition::math::Pose3d Transform2PoseIgn(
                   const SimTK::Transform &_xAB);
 
       /// \brief If the given element contains a <pose> element, return it as a
@@ -195,6 +199,41 @@ namespace gazebo
       /// \return a hard-coded string needed by the MultibodyGraphMaker.
       public: static std::string TypeString(
                   const physics::Base::EntityType _type);
+
+      /// \brief Get a reference to the simtk multibody system
+      /// \return Reference to the simtk multibody system
+      public: SimTK::MultibodySystem &System() const;
+
+      /// \brief Get a reference to the simtk discrete forces
+      /// \return Reference to the simtk  discrete forces
+      public: SimTK::Force::DiscreteForces &DiscreteForces() const;
+
+      /// \brief Get a pointer to the simtk integrator
+      /// \return Pointer to the simtk integrator
+      public: SimTK::Integrator *Integ() const;
+
+      /// \brief Return if the physics engine has been initialized.
+      /// \return True if initialized.
+      public: bool PhysicsInitialized() const;
+
+      /// \brief Return simbody physics stepped flag.
+      /// \return True if physics is stepped.
+      public: bool PhysicsStepped() const;
+
+      // Documentation inherited
+      public: virtual boost::any Param(const std::string &_key) const;
+
+      // Documentation inherited
+      public: virtual bool Param(const std::string &_key,
+                  boost::any &_value) const;
+
+      // Documentation inherited
+      public: virtual bool SetParam(const std::string &_key,
+                  const boost::any &_value);
+
+      /// \brief Get a reference to a simbody gravity object.
+      /// \return Reference to a simbody gravity object.
+      public: SimTK::Force::Gravity &SimbodyGravity() const;
 
       // Documentation inherited
       protected: virtual void OnRequest(ConstRequestPtr &_msg);
@@ -240,17 +279,6 @@ namespace gazebo
       /// \brief helper function for building SimbodySystem
       private: void AddCollisionsToLink(const physics::SimbodyLink *_link,
         SimTK::MobilizedBody &_mobod, SimTK::ContactCliqueId _modelClique);
-
-      // Documentation inherited
-      public: virtual boost::any Param(const std::string &_key) const;
-
-      // Documentation inherited
-      public: virtual bool Param(const std::string &_key,
-                  boost::any &_value) const;
-
-      // Documentation inherited
-      public: virtual bool SetParam(const std::string &_key,
-                  const boost::any &_value);
 
       /// \internal
       /// \brief Private data pointer

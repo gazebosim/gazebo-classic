@@ -71,10 +71,10 @@ namespace gazebo
       public: virtual void SetThreadPitch(const double _threadPitch);
 
       // Documentation inherited.
-      public: virtual double ThreadPitch(const unsigned int /*_index*/);
+      public: virtual double ThreadPitch(const unsigned int /*_index*/) const;
 
       // Documentation inherited.
-      public: virtual double ThreadPitch();
+      public: virtual double ThreadPitch() const;
 
       // Documentation inherited.
       public: virtual double Velocity(const unsigned int _index) const;

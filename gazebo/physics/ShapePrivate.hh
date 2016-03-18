@@ -19,6 +19,7 @@
 
 #include <ignition/math/Vector3.hh>
 
+#include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/BasePrivate.hh"
 

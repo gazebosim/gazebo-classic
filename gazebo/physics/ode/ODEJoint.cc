@@ -867,7 +867,7 @@ void ODEJoint::ApplyImplicitStiffnessDamping()
      return;
   }
 
-  double dt = this->World()->GetPhysicsEngine()->GetMaxStepSize();
+  double dt = this->World()->GetPhysicsEngine()->MaxStepSize();
   for (unsigned int i = 0; i < this->AngleCount(); ++i)
   {
     double angle = this->Angle(i).Radian();

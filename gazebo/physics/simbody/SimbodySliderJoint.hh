@@ -45,7 +45,7 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual void SetAxis(const unsigned int _index,
-                  const ignition::ignition::math::Vector3d &_axis);
+                  const ignition::math::Vector3d &_axis);
 
       // Documentation inherited.
       public: virtual void SetVelocity(const unsigned int _index,

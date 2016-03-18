@@ -16,7 +16,7 @@
 */
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
-#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Events.hh"
 
 #include "gazebo/physics/World.hh"
 
@@ -55,7 +55,10 @@ void SimbodyLink::Load(sdf::ElementPtr _sdf)
       this->World()->GetPhysicsEngine());
 
   if (this->simbodyLinkDPtr->simbodyPhysics == NULL)
-    gzthrow("Not using the simbody physics engine");
+  {
+    gzerr << "Not using the simbody physics engine\n";
+    return;
+  }
 
   if (_sdf->HasElement("must_be_base_link"))
   {
@@ -78,20 +81,20 @@ void SimbodyLink::Init()
 
   Link::Init();
 
-  ignition::math::Vector3d cogVec = this->inertial->CoG();
+  ignition::math::Vector3d cogVec = this->simbodyLinkDPtr->inertial->CoG();
 
   // Set the initial pose of the body
 
-  for (Base_V::iterator iter = this->children.begin();
-       iter != this->children.end(); ++iter)
+  for (Base_V::iterator iter = this->simbodyLinkDPtr->children.begin();
+       iter != this->simbodyLinkDPtr->children.end(); ++iter)
   {
     if ((*iter)->HasType(Base::COLLISION))
     {
       SimbodyCollisionPtr collision;
       collision = std::static_pointer_cast<SimbodyCollision>(*iter);
 
-      ignition::math::Pose relativePose = collision->RelativePose();
-      relativePose.pos -= cogVec;
+      ignition::math::Pose3d relativePose = collision->RelativePose();
+      relativePose.Pos() -= cogVec;
     }
   }
 
@@ -144,15 +147,16 @@ void SimbodyLink::ProcessSetGravityMode()
   {
     if (this->simbodyLinkDPtr->physicsInitialized)
     {
-      this->sdf->GetElement("gravity")->Set(this->simbodyLinkDPtr->gravityMode);
-      this->simbodyLinkDPtr->simbodyPhysics->gravity.setBodyIsExcluded(
-          this->simbodyLinkDPtr->simbodyPhysics->integ->updAdvancedState(),
+      this->simbodyLinkDPtr->sdf->GetElement(
+          "gravity")->Set(this->simbodyLinkDPtr->gravityMode);
+      this->simbodyLinkDPtr->simbodyPhysics->SimbodyGravity().setBodyIsExcluded(
+          this->simbodyLinkDPtr->simbodyPhysics->Integ()->updAdvancedState(),
           this->simbodyLinkDPtr->masterMobod,
           !this->simbodyLinkDPtr->gravityMode);
 
       // realize system after changing gravity mode
-      this->simbodyLinkDPtr->simbodyPhysics->system.realize(
-        this->simbodyLinkDPtr->simbodyPhysics->integ->getState(),
+      this->simbodyLinkDPtr->simbodyPhysics->System().realize(
+        this->simbodyLinkDPtr->simbodyPhysics->Integ()->getState(),
         SimTK::Stage::Velocity);
 
       this->simbodyLinkDPtr->gravityModeDirty = false;
@@ -170,8 +174,9 @@ bool SimbodyLink::GravityMode() const
 {
   if (this->simbodyLinkDPtr->physicsInitialized)
   {
-    return this->simbodyLinkDPtr->simbodyPhysics->gravity.getBodyIsExcluded(
-      this->simbodyLinkDPtr->simbodyPhysics->integ->getState(),
+    return this->simbodyLinkDPtr->simbodyPhysics->SimbodyGravity(
+        ).getBodyIsExcluded(
+      this->simbodyLinkDPtr->simbodyPhysics->Integ()->getState(),
       this->simbodyLinkDPtr->masterMobod);
   }
   else
@@ -195,7 +200,10 @@ void SimbodyLink::SetSelfCollide(bool /*_collide*/)
 //   SimbodyCollision *bcollision = dynamic_cast<SimbodyCollision*>(_collision);
 //
 //   if (_collision == NULL)
-//     gzthrow("requires SimbodyCollision");
+//   {
+//     gzerr << "requires SimbodyCollision\n";
+//     return;
+//   }
 //
 //   ignition::math::Pose relativePose = _collision->RelativePose();
 // }
@@ -206,7 +214,7 @@ void SimbodyLink::OnPoseChange()
 {
   Link::OnPoseChange();
 
-  if (!this->simbodyLinkDPtr->simbodyPhysics->simbodyPhysicsInitialized)
+  if (!this->simbodyLinkDPtr->simbodyPhysics->PhysicsInitialized())
     return;
 
   if (this->simbodyLinkDPtr->masterMobod.isEmptyHandle())
@@ -215,7 +223,7 @@ void SimbodyLink::OnPoseChange()
   // debug
   // gzerr << "original: [" << SimbodyPhysics::Transform2Pose(
   //   this->simbodyLinkDPtr->masterMobod.getBodyTransform(
-  //   this->simbodyLinkDPtr->simbodyPhysics->integ->updAdvancedState()))
+  //   this->simbodyLinkDPtr->simbodyPhysics->Integ()->updAdvancedState()))
   //       << "]\n";
 
   if (!this->simbodyLinkDPtr->masterMobod.isGround())
@@ -226,7 +234,7 @@ void SimbodyLink::OnPoseChange()
       /// Setting 6 dof pose of a link works in simbody only if
       /// the inboard joint is a free joint to the ground for now.
       this->simbodyLinkDPtr->masterMobod.setQToFitTransform(
-         this->simbodyLinkDPtr->simbodyPhysics->integ->updAdvancedState(),
+         this->simbodyLinkDPtr->simbodyPhysics->Integ()->updAdvancedState(),
          SimbodyPhysics::Pose2Transform(this->WorldPose()));
     }
     else
@@ -238,16 +246,16 @@ void SimbodyLink::OnPoseChange()
       /// But first convert to relative pose to parent mobod.
       ignition::math::Pose parentPose = SimbodyPhysics::Transform2Pose(
         this->simbodyLinkDPtr->masterMobod.getBodyTransform(
-        this->simbodyLinkDPtr->simbodyPhysics->integ->updAdvancedState()));
+        this->simbodyLinkDPtr->simbodyPhysics->Integ()->updAdvancedState()));
       ignition::math::Pose relPose = this->WorldPose() - parentPose;
       this->simbodyLinkDPtr->masterMobod.setQToFitTransform(
-         this->simbodyLinkDPtr->simbodyPhysics->integ->updAdvancedState(),
+         this->simbodyLinkDPtr->simbodyPhysics->Integ()->updAdvancedState(),
          SimbodyPhysics::Pose2Transform(relPose));
       */
     }
     // realize system after updating Q's
-    this->simbodyLinkDPtr->simbodyPhysics->system.realize(
-        this->simbodyLinkDPtr->simbodyPhysics->integ->getState(),
+    this->simbodyLinkDPtr->simbodyPhysics->System().realize(
+        this->simbodyLinkDPtr->simbodyPhysics->Integ()->getState(),
         SimTK::Stage::Position);
   }
 }
@@ -341,14 +349,14 @@ void SimbodyLink::ProcessSetLinkStatic()
   {
     if (this->simbodyLinkDPtr->staticLink)
       this->simbodyLinkDPtr->masterMobod.lock(
-       this->simbodyLinkDPtr->simbodyPhysics->integ->updAdvancedState());
+       this->simbodyLinkDPtr->simbodyPhysics->Integ()->updAdvancedState());
     else
       this->simbodyLinkDPtr->masterMobod.unlock(
-       this->simbodyLinkDPtr->simbodyPhysics->integ->updAdvancedState());
+       this->simbodyLinkDPtr->simbodyPhysics->Integ()->updAdvancedState());
 
     // re-realize
-    this->simbodyLinkDPtr->simbodyPhysics->system.realize(
-      this->simbodyLinkDPtr->simbodyPhysics->integ->getAdvancedState(),
+    this->simbodyLinkDPtr->simbodyPhysics->System().realize(
+      this->simbodyLinkDPtr->simbodyPhysics->Integ()->getAdvancedState(),
       SimTK::Stage::Velocity);
   }
   else
@@ -368,30 +376,31 @@ void SimbodyLink::SetEnabled(const bool /*_enable*/) const
 void SimbodyLink::SetLinearVel(const ignition::math::Vector3d & _vel)
 {
   this->simbodyLinkDPtr->masterMobod.setUToFitLinearVelocity(
-    this->simbodyLinkDPtr->simbodyPhysics->integ->updAdvancedState(),
+    this->simbodyLinkDPtr->simbodyPhysics->Integ()->updAdvancedState(),
     SimbodyPhysics::Vector3ToVec3(_vel));
 
-  this->simbodyLinkDPtr->simbodyPhysics->system.realize(
-    this->simbodyLinkDPtr->simbodyPhysics->integ->getAdvancedState(),
+  this->simbodyLinkDPtr->simbodyPhysics->System().realize(
+    this->simbodyLinkDPtr->simbodyPhysics->Integ()->getAdvancedState(),
     SimTK::Stage::Velocity);
 }
 
 //////////////////////////////////////////////////
 ignition::math::Vector3d SimbodyLink::WorldLinearVel(
-  const ignition::math::Vector3& _offset) const
+  const ignition::math::Vector3d &_offset) const
 {
   SimTK::Vec3 station = SimbodyPhysics::Vector3ToVec3(_offset);
   ignition::math::Vector3d v;
 
-  if (this->simbodyLinkDPtr->simbodyPhysics->simbodyPhysicsInitialized)
+  if (this->simbodyLinkDPtr->simbodyPhysics->PhysicsInitialized())
   {
     // lock physics update mutex to ensure thread safety
     boost::recursive_mutex::scoped_lock lock(
-      *this->world->PhysicsEngine()->GetPhysicsUpdateMutex());
+      *this->simbodyLinkDPtr->world->GetPhysicsEngine(
+        )->GetPhysicsUpdateMutex());
 
-    v = SimbodyPhysics::Vec3ToVector3(
+    v = SimbodyPhysics::Vec3ToVector3Ign(
       this->simbodyLinkDPtr->masterMobod.findStationVelocityInGround(
-      this->simbodyLinkDPtr->simbodyPhysics->integ->getState(), station));
+      this->simbodyLinkDPtr->simbodyPhysics->Integ()->getState(), station));
   }
   else
   {
@@ -405,11 +414,11 @@ ignition::math::Vector3d SimbodyLink::WorldLinearVel(
 //////////////////////////////////////////////////
 ignition::math::Vector3d SimbodyLink::WorldLinearVel(
   const ignition::math::Vector3d &_offset,
-  const ignition::math::Quaternion &_q) const
+  const ignition::math::Quaterniond &_q) const
 {
   ignition::math::Vector3d v;
 
-  if (this->simbodyLinkDPtr->simbodyPhysics->simbodyPhysicsInitialized)
+  if (this->simbodyLinkDPtr->simbodyPhysics->PhysicsInitialized())
   {
     SimTK::Rotation rwf(SimbodyPhysics::QuadToQuad(_q));
     SimTK::Vec3 pf(SimbodyPhysics::Vector3ToVec3(_offset));
@@ -417,16 +426,17 @@ ignition::math::Vector3d SimbodyLink::WorldLinearVel(
 
     // lock physics update mutex to ensure thread safety
     boost::recursive_mutex::scoped_lock lock(
-      *this->world->PhysicsEngine()->GetPhysicsUpdateMutex());
+      *this->simbodyLinkDPtr->world->GetPhysicsEngine(
+        )->GetPhysicsUpdateMutex());
 
     const SimTK::Rotation &rwl =
       this->simbodyLinkDPtr->masterMobod.getBodyRotation(
-          this->simbodyLinkDPtr->simbodyPhysics->integ->getState());
+          this->simbodyLinkDPtr->simbodyPhysics->Integ()->getState());
 
     SimTK::Vec3 p_B(~rwl * pw);
-    v = SimbodyPhysics::Vec3ToVector3(
+    v = SimbodyPhysics::Vec3ToVector3Ign(
       this->simbodyLinkDPtr->masterMobod.findStationVelocityInGround(
-      this->simbodyLinkDPtr->simbodyPhysics->integ->getState(), p_B));
+      this->simbodyLinkDPtr->simbodyPhysics->Integ()->getState(), p_B));
   }
   else
   {
@@ -442,19 +452,20 @@ ignition::math::Vector3d SimbodyLink::WorldCoGLinearVel() const
 {
   ignition::math::Vector3d v;
 
-  if (this->simbodyLinkDPtr->simbodyPhysics->simbodyPhysicsInitialized)
+  if (this->simbodyLinkDPtr->simbodyPhysics->PhysicsInitialized())
   {
     // lock physics update mutex to ensure thread safety
     boost::recursive_mutex::scoped_lock lock(
-      *this->world->PhysicsEngine()->GetPhysicsUpdateMutex());
+      *this->simbodyLinkDPtr->world->GetPhysicsEngine(
+        )->GetPhysicsUpdateMutex());
 
     SimTK::Vec3 station =
       this->simbodyLinkDPtr->masterMobod.getBodyMassCenterStation(
-          this->simbodyLinkDPtr->simbodyPhysics->integ->getState());
+          this->simbodyLinkDPtr->simbodyPhysics->Integ()->getState());
 
-    v = SimbodyPhysics::Vec3ToVector3(
+    v = SimbodyPhysics::Vec3ToVector3Ign(
         this->simbodyLinkDPtr->masterMobod.findStationVelocityInGround(
-          this->simbodyLinkDPtr->simbodyPhysics->integ->getState(), station));
+          this->simbodyLinkDPtr->simbodyPhysics->Integ()->getState(), station));
   }
   else
   {
@@ -469,11 +480,11 @@ ignition::math::Vector3d SimbodyLink::WorldCoGLinearVel() const
 void SimbodyLink::SetAngularVel(const ignition::math::Vector3d &_vel)
 {
   this->simbodyLinkDPtr->masterMobod.setUToFitAngularVelocity(
-      this->simbodyLinkDPtr->simbodyPhysics->integ->updAdvancedState(),
+      this->simbodyLinkDPtr->simbodyPhysics->Integ()->updAdvancedState(),
       SimbodyPhysics::Vector3ToVec3(_vel));
 
-  this->simbodyLinkDPtr->simbodyPhysics->system.realize(
-      this->simbodyLinkDPtr->simbodyPhysics->integ->getAdvancedState(),
+  this->simbodyLinkDPtr->simbodyPhysics->System().realize(
+      this->simbodyLinkDPtr->simbodyPhysics->Integ()->getAdvancedState(),
       SimTK::Stage::Velocity);
 }
 
@@ -482,13 +493,13 @@ ignition::math::Vector3d SimbodyLink::WorldAngularVel() const
 {
   // lock physics update mutex to ensure thread safety
   boost::recursive_mutex::scoped_lock lock(
-    *this->world->PhysicsEngine()->GetPhysicsUpdateMutex());
+    *this->simbodyLinkDPtr->world->GetPhysicsEngine()->GetPhysicsUpdateMutex());
 
   SimTK::Vec3 w =
     this->simbodyLinkDPtr->masterMobod.getBodyAngularVelocity(
-    this->simbodyLinkDPtr->simbodyPhysics->integ->getState());
+    this->simbodyLinkDPtr->simbodyPhysics->Integ()->getState());
 
-  return SimbodyPhysics::Vec3ToVector3(w);
+  return SimbodyPhysics::Vec3ToVector3Ign(w);
 }
 
 //////////////////////////////////////////////////
@@ -496,8 +507,8 @@ void SimbodyLink::SetForce(const ignition::math::Vector3d &_force)
 {
   SimTK::Vec3 f(SimbodyPhysics::Vector3ToVec3(_force));
 
-  this->simbodyLinkDPtr->simbodyPhysics->discreteForces.setOneBodyForce(
-      this->simbodyLinkDPtr->simbodyPhysics->integ->updAdvancedState(),
+  this->simbodyLinkDPtr->simbodyPhysics->DiscreteForces().setOneBodyForce(
+      this->simbodyLinkDPtr->simbodyPhysics->Integ()->updAdvancedState(),
       this->simbodyLinkDPtr->masterMobod, SimTK::SpatialVec(SimTK::Vec3(0), f));
 }
 
@@ -505,14 +516,14 @@ void SimbodyLink::SetForce(const ignition::math::Vector3d &_force)
 ignition::math::Vector3d SimbodyLink::WorldForce() const
 {
   SimTK::SpatialVec sv =
-    this->simbodyLinkDPtr->simbodyPhysics->discreteForces.getOneBodyForce(
-        this->simbodyLinkDPtr->simbodyPhysics->integ->getState(),
+    this->simbodyLinkDPtr->simbodyPhysics->DiscreteForces().getOneBodyForce(
+        this->simbodyLinkDPtr->simbodyPhysics->Integ()->getState(),
         this->simbodyLinkDPtr->masterMobod);
 
   // get translational component
   SimTK::Vec3 f = sv[1];
 
-  return SimbodyPhysics::Vec3ToVector3(f);
+  return SimbodyPhysics::Vec3ToVector3Ign(f);
 }
 
 //////////////////////////////////////////////////
@@ -520,8 +531,8 @@ void SimbodyLink::SetTorque(const ignition::math::Vector3d &_torque)
 {
   SimTK::Vec3 t(SimbodyPhysics::Vector3ToVec3(_torque));
 
-  this->simbodyLinkDPtr->simbodyPhysics->discreteForces.setOneBodyForce(
-      this->simbodyLinkDPtr->simbodyPhysics->integ->updAdvancedState(),
+  this->simbodyLinkDPtr->simbodyPhysics->DiscreteForces().setOneBodyForce(
+      this->simbodyLinkDPtr->simbodyPhysics->Integ()->updAdvancedState(),
       this->simbodyLinkDPtr->masterMobod, SimTK::SpatialVec(t, SimTK::Vec3(0)));
 }
 
@@ -529,14 +540,14 @@ void SimbodyLink::SetTorque(const ignition::math::Vector3d &_torque)
 ignition::math::Vector3d SimbodyLink::WorldTorque() const
 {
   SimTK::SpatialVec sv =
-    this->simbodyLinkDPtr->simbodyPhysics->discreteForces.getOneBodyForce(
-        this->simbodyLinkDPtr->simbodyPhysics->integ->getState(),
+    this->simbodyLinkDPtr->simbodyPhysics->DiscreteForces().getOneBodyForce(
+        this->simbodyLinkDPtr->simbodyPhysics->Integ()->getState(),
         this->simbodyLinkDPtr->masterMobod);
 
   // get rotational component
   SimTK::Vec3 t = sv[0];
 
-  return SimbodyPhysics::Vec3ToVector3(t);
+  return SimbodyPhysics::Vec3ToVector3Ign(t);
 }
 
 //////////////////////////////////////////////////
@@ -556,8 +567,8 @@ void SimbodyLink::AddForce(const ignition::math::Vector3d &_force)
 {
   SimTK::Vec3 f(SimbodyPhysics::Vector3ToVec3(_force));
 
-  this->simbodyLinkDPtr->simbodyPhysics->discreteForces.addForceToBodyPoint(
-      this->simbodyLinkDPtr->simbodyPhysics->integ->updAdvancedState(),
+  this->simbodyLinkDPtr->simbodyPhysics->DiscreteForces().addForceToBodyPoint(
+      this->simbodyLinkDPtr->simbodyPhysics->Integ()->updAdvancedState(),
       this->simbodyLinkDPtr->masterMobod,
       SimTK::Vec3(0), f);
 }
@@ -617,39 +628,39 @@ SimTK::MassProperties SimbodyLink::MassProperties() const
 
   if (!this->IsStatic())
   {
-    const SimTK::Real mass = this->inertial->GetMass();
-    SimTK::Transform X_LI = physics::SimbodyPhysics::Pose2Transform(
-        this->inertial->Pose());
+    const SimTK::Real mass = this->simbodyLinkDPtr->inertial->Mass();
+    SimTK::Transform xli = physics::SimbodyPhysics::Pose2Transform(
+        this->simbodyLinkDPtr->inertial->Pose());
 
     // vector from Lo to com, exp. in L
-    const SimTK::Vec3 &com_L = X_LI.p();
+    const SimTK::Vec3 &coml = xli.p();
 
     if (ignition::math::equal(mass, 0.0))
-      return SimTK::MassProperties(mass, com_L, SimTK::UnitInertia(1, 1, 1));
+      return SimTK::MassProperties(mass, coml, SimTK::UnitInertia(1, 1, 1));
 
     // Get mass-weighted central inertia, expressed in I frame.
-    SimTK::Inertia Ic_I(this->inertial->IXX(),
-        this->inertial->IYY(),
-        this->inertial->IZZ(),
-        this->inertial->IXY(),
-        this->inertial->IXZ(),
-        this->inertial->IYZ());
+    SimTK::Inertia ici(
+        this->simbodyLinkDPtr->inertial->IXX(),
+        this->simbodyLinkDPtr->inertial->IYY(),
+        this->simbodyLinkDPtr->inertial->IZZ(),
+        this->simbodyLinkDPtr->inertial->IXY(),
+        this->simbodyLinkDPtr->inertial->IXZ(),
+        this->simbodyLinkDPtr->inertial->IYZ());
     // Re-express the central inertia from the I frame to the L frame.
-    // Ic_L=R_LI*Ic_I*R_IL
-    SimTK::Inertia Ic_L = Ic_I.reexpress(~X_LI.R());
+    // icl=ril*ici*ril
+    SimTK::Inertia icl = ici.reexpress(~xli.R());
 
     // Shift to L frame origin.
-    SimTK::Inertia Io_L = Ic_L.shiftFromMassCenter(-com_L, mass);
+    SimTK::Inertia iol = icl.shiftFromMassCenter(-coml, mass);
 
     // convert to unit inertia
-    return SimTK::MassProperties(mass, com_L, Io_L);
+    return SimTK::MassProperties(mass, coml, iol);
   }
-  else
-  {
-    gzerr << "inertial block no specified, using unit mass properties\n";
-    return SimTK::MassProperties(1, SimTK::Vec3(0),
-        SimTK::UnitInertia(0.1, 0.1, 0.1));
-  }
+
+  gzerr << "inertial block no specified, using unit mass properties\n";
+
+  return SimTK::MassProperties(1, SimTK::Vec3(0),
+      SimTK::UnitInertia(0.1, 0.1, 0.1));
 }
 
 /////////////////////////////////////////////////
@@ -676,7 +687,19 @@ bool SimbodyLink::Enabled() const
 }
 
 /////////////////////////////////////////////////
-void SimbodyLink::SetDirtyPose(const ignition::math::Pose &_pose)
+void SimbodyLink::SetDirtyPose(const ignition::math::Pose3d &_pose)
 {
   this->simbodyLinkDPtr->dirtyPose = _pose;
+}
+
+/////////////////////////////////////////////////
+void SimbodyLink::SetPhysicsInitialized(const bool _value)
+{
+  this->simbodyLinkDPtr->physicsInitialized = _value;
+}
+
+/////////////////////////////////////////////////
+SimTK::MobilizedBody &SimbodyLink::MobilizedBody() const
+{
+  return this->simbodyLinkDPtr->masterMobod;
 }

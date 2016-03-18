@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-
+#include "gazebo/common/Console.hh"
 #include "gazebo/physics/ShapePrivate.hh"
 #include "gazebo/physics/simbody/SimbodyPhysics.hh"
 #include "gazebo/physics/simbody/SimbodyCylinderShape.hh"
@@ -32,7 +32,7 @@ SimbodyCylinderShape::SimbodyCylinderShape(CollisionPtr _parent)
 SimbodyCylinderShape::~SimbodyCylinderShape() {}
 
 /////////////////////////////////////////////////
-void SetSize(double _radius, double _length)
+void CylinderShape::SetSize(double _radius, double _length)
 {
   if (_radius < 0)
   {
@@ -63,8 +63,10 @@ void SetSize(double _radius, double _length)
 
   CylinderShape::SetSize(_radius, _length);
   SimbodyCollisionPtr bParent;
-  bParent = std::dynamic_pointer_cast<SimbodyCollision>(
+  // Nate:: put this back in
+  /*bParent = std::dynamic_pointer_cast<gazebo::physics::SimbodyCollision>(
       this->shapeDPtr->collisionParent);
+      */
 
   // set collision shape
 }

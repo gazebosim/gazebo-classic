@@ -92,7 +92,11 @@ namespace gazebo
 
       /// \brief Get max step size.
       /// \return Max step size.
-      public: double GetMaxStepSize() const;
+      public: double GetMaxStepSize() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get max step size.
+      /// \return Max step size.
+      public: double MaxStepSize() const;
 
       /// \brief Set target real time factor
       /// \param[in] _factor Target real time factor

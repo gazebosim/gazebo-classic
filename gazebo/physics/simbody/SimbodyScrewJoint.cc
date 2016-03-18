@@ -250,13 +250,13 @@ ignition::math::Angle SimbodyScrewJoint::AngleImpl(
 }
 
 //////////////////////////////////////////////////
-double SimbodyScrewJoint::ThreadPitch(const unsigned int /*_index*/)
+double SimbodyScrewJoint::ThreadPitch(const unsigned int /*_index*/) const
 {
   return this->ThreadPitch();
 }
 
 //////////////////////////////////////////////////
-double SimbodyScrewJoint::ThreadPitch()
+double SimbodyScrewJoint::ThreadPitch() const
 {
   if (!this->simbodyJointDPtr->mobod.isEmptyHandle() &&
       this->simbodyJointDPtr->physicsInitialized &&

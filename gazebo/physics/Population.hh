@@ -19,8 +19,7 @@
 
 #include <string>
 #include <vector>
-#include <boost/shared_ptr.hpp>
-#include <boost/scoped_ptr.hpp>
+#include <memory>
 #include <sdf/sdf.hh>
 #include "gazebo/common/Console.hh"
 #include "gazebo/math/Pose.hh"
@@ -87,7 +86,7 @@ namespace gazebo
       /// \brief Constructor. Load an sdf file containing a population element.
       /// \param[in] _sdf SDF parameters.
       /// \param[in] _world Pointer to the world.
-      public: Population(sdf::ElementPtr _sdf, boost::shared_ptr<World> _world);
+      public: Population(sdf::ElementPtr _sdf, std::shared_ptr<World> _world);
 
       /// \brief Destructor.
       public: virtual ~Population();
@@ -238,7 +237,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Pointer to private data.
-      private: boost::scoped_ptr<PopulationPrivate> dataPtr;
+      private: std::unique_ptr<PopulationPrivate> dataPtr;
     };
     /// \}
   }

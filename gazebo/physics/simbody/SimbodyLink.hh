@@ -78,12 +78,12 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual ignition::math::Vector3d WorldLinearVel(
-        const ignition::math::Vector3 &_vector3) const;
+        const ignition::math::Vector3d &_vector3) const;
 
       // Documentation inherited.
       public: virtual ignition::math::Vector3d WorldLinearVel(
           const ignition::math::Vector3d &_offset,
-          const ignition::math::Quaternion &_q) const;
+          const ignition::math::Quaterniond &_q) const;
 
       // Documentation inherited.
       public: virtual ignition::math::Vector3d WorldCoGLinearVel() const;
@@ -133,7 +133,7 @@ namespace gazebo
       public: virtual void AddLinkForce(
                   const ignition::math::Vector3d &_force,
                   const ignition::math::Vector3d &_offset =
-                  ignition::math::Vector3::Zero);
+                  ignition::math::Vector3d::Zero);
 
       // Documentation inherited.
       public: virtual void AddTorque(
@@ -171,6 +171,15 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual void UpdateMass();
+
+      /// \brief Set the physics initialized flag
+      /// \param[in] _value True or false value for the
+      /// physics initialized flag.
+      public: void SetPhysicsInitialized(const bool _value);
+
+      /// \brief Get reference to mobilized body
+      /// \return Reference to mobilized body
+      public: SimTK::MobilizedBody &MobilizedBody() const;
 
       /// \brief Internal call to change effect of gravity on Link
       /// based on gravityMode if gravityModeDirty is true.

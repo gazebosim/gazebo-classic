@@ -14,8 +14,11 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PHYSICS_SIMBODY_SIMBODYJOINTPRIVATE_HH_
-#define _GAZEBO_PHYSICS_SIMBODY_SIMBODYJOINTPRIVATE_HH_
+#ifndef _GAZEBO_PHYSICS_SIMBODY_SIMBODYLINKPRIVATE_HH_
+#define _GAZEBO_PHYSICS_SIMBODY_SIMBODYLINKPRIVATE_HH_
+
+#include "gazebo/physics/LinkPrivate.hh"
+#include "gazebo/physics/simbody/simbody_inc.h"
 
 namespace gazebo
 {
@@ -23,9 +26,8 @@ namespace gazebo
   {
     /// \internal
     /// \brief Private data for SimbodyLink
-    class SimbodyLinkPrivate
+    class SimbodyLinkPrivate : public LinkPrivate
     {
-
       /// \brief: Force this link to be a base body, where its inboard
       /// body is the world with 6DOF.
       public: bool mustBeBaseLink;
@@ -45,31 +47,32 @@ namespace gazebo
       public: std::vector<SimTK::Constraint::Weld> slaveWelds;
 
       /// \brief store gravity mode given link might not be around
-      private: bool gravityMode;
+      public: bool gravityMode;
 
       /// \brief Trigger setting of link according to staticLink.
-      private: bool staticLinkDirty;
+      public: bool staticLinkDirty;
 
       /// \brief Trigger setting of link gravity mode
-      private: bool gravityModeDirty;
+      public: bool gravityModeDirty;
 
       /// \brief If true, freeze link to world (inertial) frame.
-      private: bool staticLink;
+      public: bool staticLink;
 
       /// \brief Event connection for SetLinkStatic
-      private: event::ConnectionPtr staticLinkConnection;
+      public: event::ConnectionPtr staticLinkConnection;
 
       /// \brief Event connection for SetGravityMode
-      private: event::ConnectionPtr gravityModeConnection;
+      public: event::ConnectionPtr gravityModeConnection;
 
       /// \brief save simbody free state for reconstructing simbody model graph
-      private: std::vector<double> simbodyQ;
+      public: std::vector<double> simbodyQ;
 
       /// \brief save simbody free state for reconstructing simbody model graph
-      private: std::vector<double> simbodyU;
+      public: std::vector<double> simbodyU;
 
       /// \brief keep a pointer to the simbody physics engine for convenience
-      private: SimbodyPhysicsPtr simbodyPhysics;
+      public: SimbodyPhysicsPtr simbodyPhysics;
     };
   }
 }
+#endif

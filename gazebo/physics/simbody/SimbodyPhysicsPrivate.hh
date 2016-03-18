@@ -46,7 +46,7 @@ namespace gazebo
       public: SimTK::Force::DiscreteForces discreteForces;
       public: SimTK::ContactTrackerSubsystem tracker;
       public: SimTK::CompliantContactSubsystem contact;
-      public: SimTK:: Integrator *integ = NULL;
+      public: SimTK::Integrator *integ = NULL;
 
       /// \brief contact material stiffness.  See sdf description for details.
       public: double contactMaterialStiffness = 0.0;

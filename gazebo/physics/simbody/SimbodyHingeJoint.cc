@@ -21,6 +21,7 @@
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/simbody/SimbodyLink.hh"
 #include "gazebo/physics/simbody/SimbodyPhysics.hh"
+#include "gazebo/physics/simbody/SimbodyJointPrivate.hh"
 #include "gazebo/physics/simbody/SimbodyHingeJoint.hh"
 
 using namespace gazebo;
@@ -61,12 +62,13 @@ void SimbodyHingeJoint::SetVelocity(
 {
   if (_index < this->AngleCount())
   {
-    this->mobod.setOneU(
-      this->simbodyPhysics->integ->updAdvancedState(),
+    this->simbodyJointDPtr->mobod.setOneU(
+      this->simbodyJointDPtr->simbodyPhysics->Integ()->updAdvancedState(),
       SimTK::MobilizerUIndex(_index), _rate);
 
-    this->simbodyPhysics->system.realize(
-      this->simbodyPhysics->integ->getAdvancedState(), SimTK::Stage::Velocity);
+    this->simbodyJointDPtr->simbodyPhysics->System().realize(
+      this->simbodyJointDPtr->simbodyPhysics->Integ()->getAdvancedState(),
+      SimTK::Stage::Velocity);
   }
   else
     gzerr << "SetVelocity _index too large.\n";
@@ -77,11 +79,11 @@ double SimbodyHingeJoint::Velocity(const unsigned int _index) const
 {
   if (_index < this->AngleCount())
   {
-    if (this->physicsInitialized &&
-        this->simbodyPhysics->simbodyPhysicsInitialized)
+    if (this->simbodyJointDPtr->physicsInitialized &&
+        this->simbodyJointDPtr->simbodyPhysics->PhysicsInitialized())
 
-      return this->mobod.getOneU(
-        this->simbodyPhysics->integ->getState(),
+      return this->simbodyJointDPtr->mobod.getOneU(
+        this->simbodyJointDPtr->simbodyPhysics->Integ()->getState(),
         SimTK::MobilizerUIndex(_index));
     else
     {
@@ -96,17 +98,19 @@ double SimbodyHingeJoint::Velocity(const unsigned int _index) const
     gzerr << "Invalid index for joint, returning NaN\n";
     return ignition::math::NAN_D;
   }
+  return ignition::math::NAN_D;
 }
 
 //////////////////////////////////////////////////
 void SimbodyHingeJoint::SetForceImpl(
     const unsigned int _index, const double _torque)
 {
-  if (_index < this->AngleCount() && this->physicsInitialized)
+  if (_index < this->AngleCount() && this->simbodyJointDPtr->physicsInitialized)
   {
-    this->simbodyPhysics->discreteForces.setOneMobilityForce(
-      this->simbodyPhysics->integ->updAdvancedState(),
-      this->mobod, SimTK::MobilizerUIndex(_index), _torque);
+    this->simbodyJointDPtr->simbodyPhysics->DiscreteForces(
+        ).setOneMobilityForce(
+      this->simbodyJointDPtr->simbodyPhysics->Integ()->updAdvancedState(),
+      this->simbodyJointDPtr->mobod, SimTK::MobilizerUIndex(_index), _torque);
   }
 }
 
@@ -114,20 +118,21 @@ void SimbodyHingeJoint::SetForceImpl(
 ignition::math::Vector3d SimbodyHingeJoint::GlobalAxis(
     const unsigned int _index) const
 {
-  if (this->simbodyPhysics &&
-      this->simbodyPhysics->simbodyPhysicsStepped &&
+  if (this->simbodyJointDPtr->simbodyPhysics &&
+      this->simbodyJointDPtr->simbodyPhysics->PhysicsStepped() &&
       _index < this->AngleCount())
   {
-    if (!this->mobod.isEmptyHandle())
+    if (!this->simbodyJointDPtr->mobod.isEmptyHandle())
     {
-      const SimTK::Transform &X_OM = this->mobod.getOutboardFrame(
-        this->simbodyPhysics->integ->getState());
+      const SimTK::Transform &xom =
+        this->simbodyJointDPtr->mobod.getOutboardFrame(
+        this->simbodyJointDPtr->simbodyPhysics->Integ()->getState());
 
-      // express Z-axis of X_OM in world frame
-      SimTK::Vec3 z_W(this->mobod.expressVectorInGroundFrame(
-        this->simbodyPhysics->integ->getState(), X_OM.z()));
+      // express Z-axis of xom in world frame
+      SimTK::Vec3 zw(this->simbodyJointDPtr->mobod.expressVectorInGroundFrame(
+        this->simbodyJointDPtr->simbodyPhysics->Integ()->getState(), xom.z()));
 
-      return SimbodyPhysics::Vec3ToVector3(z_W);
+      return SimbodyPhysics::Vec3ToVector3Ign(zw);
     }
     else
     {
@@ -144,7 +149,8 @@ ignition::math::Vector3d SimbodyHingeJoint::GlobalAxis(
     if (_index >= this->AngleCount())
     {
       gzerr << "index out of bound\n";
-      return ignition::math::Vector3d(ignition::math::NAN_D, ignition::math::NAN_D, ignition::math::NAN_D);
+      return ignition::math::Vector3d(ignition::math::NAN_D,
+          ignition::math::NAN_D, ignition::math::NAN_D);
     }
     else
     {
@@ -156,6 +162,9 @@ ignition::math::Vector3d SimbodyHingeJoint::GlobalAxis(
       return this->AxisFrame(_index).RotateVector(this->LocalAxis(_index));
     }
   }
+
+  return ignition::math::Vector3d(ignition::math::NAN_D,
+      ignition::math::NAN_D, ignition::math::NAN_D);
 }
 
 //////////////////////////////////////////////////
@@ -165,12 +174,12 @@ ignition::math::Angle SimbodyHingeJoint::AngleImpl(
   if (_index < this->AngleCount())
   {
     if (this->simbodyJointDPtr->physicsInitialized &&
-        this->simbodyJointDPtr->simbodyPhysics->simbodyPhysicsInitialized)
+        this->simbodyJointDPtr->simbodyPhysics->PhysicsInitialized())
     {
       if (!this->simbodyJointDPtr->mobod.isEmptyHandle())
       {
         return ignition::math::Angle(this->simbodyJointDPtr->mobod.getOneQ(
-          this->simbodyJointDPtr->simbodyPhysics->integ->getState(), _index));
+          this->simbodyJointDPtr->simbodyPhysics->Integ()->getState(), _index));
       }
       else
       {
@@ -192,12 +201,13 @@ ignition::math::Angle SimbodyHingeJoint::AngleImpl(
     gzerr << "index out of bound\n";
     return ignition::math::Angle(ignition::math::NAN_D);
   }
+  return ignition::math::Angle(0.0);
 }
 
 //////////////////////////////////////////////////
 void SimbodyHingeJoint::SaveSimbodyState(const SimTK::State &_state)
 {
-  if (!this->mobod.isEmptyHandle())
+  if (!this->simbodyJointDPtr->mobod.isEmptyHandle())
   {
     if (this->simbodyQ.empty())
       this->simbodyQ.resize(this->simbodyJointDPtr->mobod.getNumQ(_state));
@@ -220,7 +230,7 @@ void SimbodyHingeJoint::SaveSimbodyState(const SimTK::State &_state)
 //////////////////////////////////////////////////
 void SimbodyHingeJoint::RestoreSimbodyState(SimTK::State &_state)
 {
-  if (!this->mobod.isEmptyHandle())
+  if (!this->simbodyJointDPtr->mobod.isEmptyHandle())
   {
     for (unsigned int i = 0; i < this->simbodyQ.size(); ++i)
       this->simbodyJointDPtr->mobod.setOneQ(_state, i, this->simbodyQ[i]);

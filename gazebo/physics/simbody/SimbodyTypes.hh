@@ -26,6 +26,7 @@ namespace gazebo
   namespace physics
   {
     class SimbodyCollision;
+    class SimbodyJoint;
     class SimbodyLink;
     class SimbodyModel;
     class SimbodyPhysics;
@@ -50,5 +51,9 @@ namespace gazebo
     /// \def SimbodyRayShapePtr
     /// \brief Shared pointer to SimbodyRayShape
     typedef std::shared_ptr<SimbodyRayShape> SimbodyRayShapePtr;
+
+    /// \def SimbodyJointPtr
+    /// \brief Shared pointer to SimbodyJoint
+    typedef std::shared_ptr<gazebo::physics::SimbodyJoint> SimbodyJointPtr;
   }
 }

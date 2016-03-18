@@ -33,35 +33,13 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] _parent Collision parent pointer
-      public: SimbodySphereShape(CollisionPtr _parent) : SphereShape(_parent) {}
+      public: SimbodySphereShape(CollisionPtr _parent);
 
       /// \brief Destructor
-      public: virtual ~SimbodySphereShape() {}
+      public: virtual ~SimbodySphereShape();
 
       // Documentation inherited.
-      public: virtual void SetRadius(double _radius)
-              {
-                if (_radius < 0)
-                {
-                  gzerr << "Sphere shape does not support negative radius\n";
-                  return;
-                }
-                if (ignition::math::equal(_radius, 0.0))
-                {
-                  // Warn user, but still create shape with very small value
-                  // otherwise later resize operations using setLocalScaling
-                  // will not be possible
-                  gzwarn << "Setting sphere shape's radius to zero \n";
-                  _radius = 1e-4;
-                }
-
-                SphereShape::SetRadius(_radius);
-                SimbodyCollisionPtr bParent;
-                bParent = std::dynamic_pointer_cast<SimbodyCollision>(
-                    this->collisionParent);
-
-                // set collision shape
-              }
+      public: virtual void SetRadius(const double _radius);
     };
     /// \}
   }

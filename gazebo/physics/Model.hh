@@ -605,7 +605,7 @@ namespace gazebo
 
       /// \brief Allow Model class to share itself as a boost shared_ptr
       /// \return a shared pointer to itself
-      public: boost::shared_ptr<Model> shared_from_this();
+      public: std::shared_ptr<Model> shared_from_this();
 
       /// \brief Create a new link for this model
       /// \param[in] _name name of the new link

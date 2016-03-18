@@ -155,9 +155,14 @@ namespace gazebo
       public: virtual ignition::math::Angle LowStop(
                   const unsigned int _index) const;
 
+      /// \brief Set the physics initialized flag
+      /// \param[in] _value True or false value for the
+      /// physics initialized flag.
+      public: void SetPhysicsInitialized(const bool _value);
+
       /// \internal
       /// \brief Private data pointer
-      private: SimbodyJointPrivate *simbodyJointPrivate;
+      protected: SimbodyJointPrivate *simbodyJointDPtr;
     };
     /// \}
   }

@@ -14,11 +14,11 @@
  * limitations under the License.
  *
 */
-
 #include "gazebo/physics/World.hh"
+#include "gazebo/physics/Joint.hh"
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/Gripper.hh"
-#include "gazebo/transport/Publisher.hh"
+#include "gazebo/physics/ModelPrivate.hh"
 #include "gazebo/physics/simbody/SimbodyModel.hh"
 #include "gazebo/physics/simbody/SimbodyPhysics.hh"
 #include "gazebo/physics/simbody/SimbodyTypes.hh"
@@ -65,11 +65,11 @@ void SimbodyModel::Init()
   this->SetRelativePose(this->WorldPose());
 
   // Initialize the bodies before the joints
-  for (Base_V::iterator iter = this->modelDptr->children.begin();
-       iter!= this->modelDptr->children.end(); ++iter)
+  for (Base_V::iterator iter = this->modelDPtr->children.begin();
+       iter!= this->modelDPtr->children.end(); ++iter)
   {
     if ((*iter)->HasType(Base::LINK))
-      std::static_pointer_cast<Link>(*iter)->Init();
+      std::static_pointer_cast<gazebo::physics::Link>(*iter)->Init();
     else if ((*iter)->HasType(Base::MODEL))
       std::static_pointer_cast<SimbodyModel>(*iter)->Init();
   }

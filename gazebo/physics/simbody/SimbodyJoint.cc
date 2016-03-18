@@ -32,7 +32,7 @@ using namespace physics;
 //////////////////////////////////////////////////
 SimbodyJoint::SimbodyJoint(BasePtr _parent)
 : Joint(*new SimbodyJointPrivate, _parent),
-  simbodyJointDPtr(static_cast<SimbodyJointDPtr*>(this->jointDPtr)
+  simbodyJointDPtr(static_cast<SimbodyJointPrivate*>(this->jointDPtr))
 {
   this->simbodyJointDPtr->isReversed = false;
   this->simbodyJointDPtr->mustBreakLoopHere = false;
@@ -49,7 +49,7 @@ void SimbodyJoint::Load(sdf::ElementPtr _sdf)
   // store a pointer to the simbody physics engine for convenience
   this->simbodyJointDPtr->simbodyPhysics =
   std::dynamic_pointer_cast<SimbodyPhysics>(
-      this->model->World()->GetPhysicsEngine());
+      this->simbodyJointDPtr->model->World()->GetPhysicsEngine());
 
   Joint::Load(_sdf);
 
@@ -62,9 +62,9 @@ void SimbodyJoint::Load(sdf::ElementPtr _sdf)
       GetElement("simbody")->Get<bool>("must_be_loop_joint");
   }
 
-  if (this->sdf->HasElement("axis"))
+  if (this->simbodyJointDPtr->sdf->HasElement("axis"))
   {
-    sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
+    sdf::ElementPtr axisElem = this->simbodyJointDPtr->sdf->GetElement("axis");
     if (axisElem->HasElement("dynamics"))
     {
       sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
@@ -77,9 +77,9 @@ void SimbodyJoint::Load(sdf::ElementPtr _sdf)
     }
   }
 
-  if (this->sdf->HasElement("axis2"))
+  if (this->simbodyJointDPtr->sdf->HasElement("axis2"))
   {
-    sdf::ElementPtr axisElem = this->sdf->GetElement("axis2");
+    sdf::ElementPtr axisElem = this->simbodyJointDPtr->sdf->GetElement("axis2");
     if (axisElem->HasElement("dynamics"))
     {
       sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
@@ -108,8 +108,8 @@ void SimbodyJoint::Load(sdf::ElementPtr _sdf)
   // \TODO: consider storing the unassembled format parent pose when
   // calling Joint::Load(sdf::ElementPtr)
 
-  ignition::math::Pose3d3d childPose =
-    _sdf->Get<ignition::math::Pose3d3d>("pose");
+  ignition::math::Pose3d childPose =
+    _sdf->Get<ignition::math::Pose3d>("pose");
 
   if (_sdf->GetElement("child")->HasElement("pose"))
     childPose = _sdf->GetElement("child")->Get<ignition::math::Pose3d>("pose");
@@ -126,29 +126,29 @@ void SimbodyJoint::Load(sdf::ElementPtr _sdf)
   else
   {
     SimTK::Transform X_MC, X_MP;
-    if (this->parentLink)
+    if (this->simbodyJointDPtr->parentLink)
     {
       X_MP = physics::SimbodyPhysics::Pose2Transform(
-        this->parentLink->RelativePose());
+        this->simbodyJointDPtr->parentLink->RelativePose());
     }
     else
     {
       // TODO: verify
       // parent frame is at the world frame
       X_MP = ~physics::SimbodyPhysics::Pose2Transform(
-        this->model->WorldPose());
+        this->simbodyJointDPtr->model->WorldPose());
     }
 
-    if (this->childLink)
+    if (this->simbodyJointDPtr->childLink)
     {
       X_MC = physics::SimbodyPhysics::Pose2Transform(
-        this->childLink->RelativePose());
+        this->simbodyJointDPtr->childLink->RelativePose());
     }
     else
     {
       // TODO: verify
       X_MC = ~physics::SimbodyPhysics::Pose2Transform(
-        this->model->WorldPose());
+        this->simbodyJointDPtr->model->WorldPose());
     }
 
     const SimTK::Transform X_PC = ~X_MP*X_MC;
@@ -168,10 +168,10 @@ void SimbodyJoint::Reset()
 void SimbodyJoint::CacheForceTorque()
 {
   const SimTK::State &state =
-    this->simbodyJointDPtr->simbodyPhysics->integ->getAdvancedState();
+    this->simbodyJointDPtr->simbodyPhysics->Integ()->getAdvancedState();
 
   // force calculation of reaction forces
-  this->simbodyJointDPtr->simbodyPhysics->system.realize(state);
+  this->simbodyJointDPtr->simbodyPhysics->System().realize(state);
 
   // In simbody, parent is always inboard (closer to ground in the tree),
   //   child is always outboard (further away from ground in the tree).
@@ -231,15 +231,15 @@ void SimbodyJoint::CacheForceTorque()
 
   // Note minus sign indicates these are reaction forces
   // by the Link on the Joint in the target Link frame.
-  this->wrench.body1Force =
-    -SimbodyPhysics::Vec3ToVector3(reactionForceOnParentBody);
-  this->wrench.body1Torque =
-    -SimbodyPhysics::Vec3ToVector3(reactionTorqueOnParentBody);
+  this->simbodyJointDPtr->wrench.body1Force =
+    -SimbodyPhysics::Vec3ToVector3Ign(reactionForceOnParentBody);
+  this->simbodyJointDPtr->wrench.body1Torque =
+    -SimbodyPhysics::Vec3ToVector3Ign(reactionTorqueOnParentBody);
 
-  this->wrench.body2Force =
-    -SimbodyPhysics::Vec3ToVector3(reactionForceOnChildBody);
-  this->wrench.body2Torque =
-    -SimbodyPhysics::Vec3ToVector3(reactionTorqueOnChildBody);
+  this->simbodyJointDPtr->wrench.body2Force =
+    -SimbodyPhysics::Vec3ToVector3Ign(reactionForceOnChildBody);
+  this->simbodyJointDPtr->wrench.body2Torque =
+    -SimbodyPhysics::Vec3ToVector3Ign(reactionTorqueOnChildBody);
 }
 
 //////////////////////////////////////////////////
@@ -250,10 +250,10 @@ LinkPtr SimbodyJoint::JointLink(unsigned int _index) const
   if (_index == 0 || _index == 1)
   {
     SimbodyLinkPtr simbodyLink1 =
-      std::static_pointer_cast<SimbodyLink>(this->childLink);
+      std::static_pointer_cast<SimbodyLink>(this->simbodyJointDPtr->childLink);
 
     SimbodyLinkPtr simbodyLink2 =
-      std::static_pointer_cast<SimbodyLink>(this->parentLink);
+      std::static_pointer_cast<SimbodyLink>(this->simbodyJointDPtr->parentLink);
   }
 
   return result;
@@ -262,17 +262,17 @@ LinkPtr SimbodyJoint::JointLink(unsigned int _index) const
 //////////////////////////////////////////////////
 bool SimbodyJoint::AreConnected(LinkPtr _one, LinkPtr _two) const
 {
-  return ((this->childLink.get() == _one.get() &&
-           this->parentLink.get() == _two.get()) ||
-          (this->childLink.get() == _two.get() &&
-           this->parentLink.get() == _one.get()));
+  return ((this->simbodyJointDPtr->childLink.get() == _one.get() &&
+           this->simbodyJointDPtr->parentLink.get() == _two.get()) ||
+          (this->simbodyJointDPtr->childLink.get() == _two.get() &&
+           this->simbodyJointDPtr->parentLink.get() == _one.get()));
 }
 
 //////////////////////////////////////////////////
 void SimbodyJoint::Detach()
 {
-  this->childLink.reset();
-  this->parentLink.reset();
+  this->simbodyJointDPtr->childLink.reset();
+  this->simbodyJointDPtr->parentLink.reset();
 }
 
 //////////////////////////////////////////////////
@@ -280,40 +280,51 @@ void SimbodyJoint::SetAxis(const unsigned int _index,
     const ignition::math::Vector3d &/*_axis*/)
 {
   ignition::math::Pose3d parentModelPose;
-  if (this->parentLink)
-    parentModelPose = this->parentLink->Model()->WorldPose();
+  if (this->simbodyJointDPtr->parentLink)
+    parentModelPose = this->simbodyJointDPtr->parentLink->Model()->WorldPose();
 
   // Set joint axis
   // assuming incoming axis is defined in the model frame, so rotate them
   // into the inertial frame
   // TODO: switch so the incoming axis is defined in the child frame.
-  ignition::math::Vector3d axis = parentModelPose.rot.RotateVector(
-    this->sdf->GetElement("axis")->Get<ignition::math::Vector3>("xyz"));
+  ignition::math::Vector3d axis = parentModelPose.Rot().RotateVector(
+    this->simbodyJointDPtr->sdf->GetElement(
+      "axis")->Get<ignition::math::Vector3d>("xyz"));
 
   if (_index == 0)
-    this->sdf->GetElement("axis")->GetElement("xyz")->Set(axis);
+  {
+    this->simbodyJointDPtr->sdf->GetElement(
+        "axis")->GetElement("xyz")->Set(axis);
+  }
   else if (_index == 1)
-    this->sdf->GetElement("axis2")->GetElement("xyz")->Set(axis);
+  {
+    this->simbodyJointDPtr->sdf->GetElement(
+        "axis2")->GetElement("xyz")->Set(axis);
+  }
   else
+  {
     gzerr << "SetAxis index [" << _index << "] out of bounds\n";
+  }
 }
 
 //////////////////////////////////////////////////
 JointWrench SimbodyJoint::ForceTorque(const unsigned int /*_index*/) const
 {
-  return this->wrench;
+  return this->simbodyJointDPtr->wrench;
 }
 
 //////////////////////////////////////////////////
-void SimbodyJoint::SetForce(unsigned int _index, double _force)
+void SimbodyJoint::SetForce(const unsigned int _index, const double _force)
 {
   double force = Joint::CheckAndTruncateForce(_index, _force);
   this->SaveForce(_index, force);
   this->SetForceImpl(_index, force);
 
   // for engines that supports auto-disable of links
-  if (this->childLink) this->childLink->SetEnabled(true);
-  if (this->parentLink) this->parentLink->SetEnabled(true);
+  if (this->simbodyJointDPtr->childLink)
+    this->simbodyJointDPtr->childLink->SetEnabled(true);
+  if (this->simbodyJointDPtr->parentLink)
+    this->simbodyJointDPtr->parentLink->SetEnabled(true);
 }
 
 //////////////////////////////////////////////////
@@ -389,7 +400,7 @@ void SimbodyJoint::RestoreSimbodyState(SimTK::State &/*_state*/)
 
 //////////////////////////////////////////////////
 void SimbodyJoint::SetAnchor(const unsigned int /*_index*/,
-    const gazebo::ignition::math::Vector3d &/*_anchor*/)
+    const ignition::math::Vector3d &/*_anchor*/)
 {
   gzerr << "SimbodyJoint::SetAnchor:  Not implement in Simbody."
         << " Anchor is set during joint construction in SimbodyPhysics.cc\n";
@@ -400,8 +411,8 @@ void SimbodyJoint::SetDamping(const unsigned int _index, const double _damping)
 {
   if (_index < this->AngleCount())
   {
-    this->SetStiffnessDamping(_index, this->stiffnessCoefficient[_index],
-      _damping);
+    this->SetStiffnessDamping(_index,
+        this->simbodyJointDPtr->stiffnessCoefficient[_index], _damping);
   }
   else
   {
@@ -419,7 +430,7 @@ void SimbodyJoint::SetStiffness(const unsigned int _index,
   if (_index < this->AngleCount())
   {
     this->SetStiffnessDamping(_index, _stiffness,
-      this->dissipationCoefficient[_index]);
+      this->simbodyJointDPtr->dissipationCoefficient[_index]);
   }
   else
   {
@@ -436,23 +447,23 @@ void SimbodyJoint::SetStiffnessDamping(const unsigned int _index,
 {
   if (_index < this->AngleCount())
   {
-    this->stiffnessCoefficient[_index] = _stiffness;
-    this->dissipationCoefficient[_index] = _damping;
+    this->simbodyJointDPtr->stiffnessCoefficient[_index] = _stiffness;
+    this->simbodyJointDPtr->dissipationCoefficient[_index] = _damping;
     this->simbodyJointDPtr->springReferencePosition[_index] = _reference;
 
     if (this->simbodyJointDPtr->physicsInitialized)
     {
       // set damper coefficient
       this->simbodyJointDPtr->damper[_index].setDamping(
-        this->simbodyJointDPtr->simbodyPhysics->integ->updAdvancedState(),
+        this->simbodyJointDPtr->simbodyPhysics->Integ()->updAdvancedState(),
         _damping);
 
       // set spring stiffness and reference position
       this->simbodyJointDPtr->spring[_index].setStiffness(
-        this->simbodyJointDPtr->simbodyPhysics->integ->updAdvancedState(),
+        this->simbodyJointDPtr->simbodyPhysics->Integ()->updAdvancedState(),
         _stiffness);
       this->simbodyJointDPtr->spring[_index].setQZero(
-        this->simbodyJointDPtr->simbodyPhysics->integ->updAdvancedState(),
+        this->simbodyJointDPtr->simbodyPhysics->Integ()->updAdvancedState(),
         _reference);
     }
   }
@@ -512,7 +523,7 @@ bool SimbodyJoint::SetHighStop(const unsigned int _index,
       if (!this->simbodyJointDPtr->limitForce[_index].isEmptyHandle())
       {
         this->simbodyJointDPtr->limitForce[_index].setBounds(
-          this->simbodyJointDPtr->simbodyPhysics->integ->updAdvancedState(),
+          this->simbodyJointDPtr->simbodyPhysics->Integ()->updAdvancedState(),
           this->LowStop(_index).Radian(), _angle.Radian());
       }
       else
@@ -549,7 +560,7 @@ bool SimbodyJoint::SetLowStop(
       if (!this->simbodyJointDPtr->limitForce[_index].isEmptyHandle())
       {
         this->simbodyJointDPtr->limitForce[_index].setBounds(
-          this->simbodyJointDPtr->simbodyPhysics->integ->updAdvancedState(),
+          this->simbodyJointDPtr->simbodyPhysics->Integ()->updAdvancedState(),
           _angle.Radian(),
           this->HighStop(_index).Radian());
       }
@@ -587,13 +598,13 @@ ignition::math::Angle SimbodyJoint::HighStop(const unsigned int _index) const
   else if (_index == 0)
   {
     return ignition::math::Angle(
-        this->sdf->GetElement("axis")->GetElement(
+        this->simbodyJointDPtr->sdf->GetElement("axis")->GetElement(
           "limit")->Get<double>("upper"));
   }
   else if (_index == 1)
   {
     return ignition::math::Angle(
-        this->sdf->GetElement("axis2")->GetElement(
+        this->simbodyJointDPtr->sdf->GetElement("axis2")->GetElement(
           "limit")->Get<double>("upper"));
   }
   else
@@ -617,13 +628,13 @@ ignition::math::Angle SimbodyJoint::LowStop(const unsigned int _index) const
   else if (_index == 0)
   {
     return ignition::math::Angle(
-        this->sdf->GetElement("axis")->GetElement(
+        this->simbodyJointDPtr->sdf->GetElement("axis")->GetElement(
           "limit")->Get<double>("lower"));
   }
   else if (_index == 1)
   {
     return ignition::math::Angle(
-        this->sdf->GetElement("axis2")->GetElement(
+        this->simbodyJointDPtr->sdf->GetElement("axis2")->GetElement(
           "limit")->Get<double>("lower"));
   }
   else
@@ -632,4 +643,10 @@ ignition::math::Angle SimbodyJoint::LowStop(const unsigned int _index) const
     /// \TODO: should return NaN
     return ignition::math::Angle::Zero;
   }
+}
+
+/////////////////////////////////////////////////
+void SimbodyJoint::SetPhysicsInitialized(const bool _value)
+{
+  this->simbodyJointDPtr->physicsInitialized = _value;
 }

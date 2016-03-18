@@ -113,7 +113,7 @@ ignition::math::Angle SimbodyBallJoint::LowStop(
 }
 
 //////////////////////////////////////////////////
-bool SimbodyBallJoint::SetHighStop(unsigned int /*_index*/,
+bool SimbodyBallJoint::SetHighStop(const unsigned int /*_index*/,
                                    const ignition::math::Angle &/*_angle*/)
 {
   gzerr << "SimbodyBallJoint::SetHighStop not implemented" << std::endl;
@@ -121,7 +121,7 @@ bool SimbodyBallJoint::SetHighStop(unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-bool SimbodyBallJoint::SetLowStop(unsigned int /*_index*/,
+bool SimbodyBallJoint::SetLowStop(const unsigned int /*_index*/,
                                   const ignition::math::Angle &/*_angle*/)
 {
   gzerr << "SimbodyBallJoint::SetLowStop not implemented" << std::endl;
@@ -129,9 +129,9 @@ bool SimbodyBallJoint::SetLowStop(unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-ignition::ignition::math::Vector3d SimbodyBallJoint::Axis(
+ignition::math::Vector3d SimbodyBallJoint::Axis(
     const unsigned int /*_index*/) const
 {
-  return ignition::ignition::math::Vector3d::Zero;
+  return ignition::math::Vector3d::Zero;
 }
 
