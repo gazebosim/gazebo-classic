@@ -19,11 +19,10 @@
 
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/math/Rand.hh"
-#include "test/util.hh"
 
 using namespace gazebo;
 
-class RandTest : public gazebo::testing::AutoLogFixture { };
+class RandTest : public ::testing::Test { };
 
 //////////////////////////////////////////////////
 TEST_F(RandTest, Rand)
