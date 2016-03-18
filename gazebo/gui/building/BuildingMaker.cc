@@ -119,6 +119,8 @@ BuildingMaker::BuildingMaker() : dataPtr(new BuildingMakerPrivate())
 /////////////////////////////////////////////////
 BuildingMaker::~BuildingMaker()
 {
+  this->dataPtr->modelSDF.reset();
+
   this->dataPtr->node->Fini();
   this->dataPtr->node.reset();
   this->dataPtr->makerPub.reset();
@@ -817,6 +819,8 @@ void BuildingMaker::GenerateSDF()
                 Set(buildingModelManip->Color());
             visualElem->GetElement("material")->GetElement("script")
                 ->GetElement("name")->Set(buildingModelManip->Texture());
+            visualElem->GetElement("meta")->GetElement("layer")
+                ->Set(buildingModelManip->Level());
             newLinkElem->InsertElement(visualElem);
             newLinkElem->InsertElement(collisionElem);
           }
@@ -838,6 +842,8 @@ void BuildingMaker::GenerateSDF()
               Set(buildingModelManip->Color());
           visualElem->GetElement("material")->GetElement("script")
               ->GetElement("name")->Set(buildingModelManip->Texture());
+          visualElem->GetElement("meta")->GetElement("layer")
+              ->Set(buildingModelManip->Level());
         }
       }
       // Floor
@@ -927,6 +933,8 @@ void BuildingMaker::GenerateSDF()
                 Set(buildingModelManip->Color());
             visualElem->GetElement("material")->GetElement("script")
                 ->GetElement("name")->Set(buildingModelManip->Texture());
+            visualElem->GetElement("meta")->GetElement("layer")
+                ->Set(buildingModelManip->Level());
             newLinkElem->InsertElement(visualElem);
             newLinkElem->InsertElement(collisionElem);
           }
@@ -948,6 +956,8 @@ void BuildingMaker::GenerateSDF()
               Set(buildingModelManip->Color());
           visualElem->GetElement("material")->GetElement("script")
               ->GetElement("name")->Set(buildingModelManip->Texture());
+          visualElem->GetElement("meta")->GetElement("layer")
+              ->Set(buildingModelManip->Level());
         }
       }
     }
@@ -982,6 +992,8 @@ void BuildingMaker::GenerateSDF()
               Set(buildingModelManip->Color());
         visualElem->GetElement("material")->GetElement("script")
             ->GetElement("name")->Set(buildingModelManip->Texture());
+        visualElem->GetElement("meta")->GetElement("layer")
+            ->Set(buildingModelManip->Level());
         newLinkElem->InsertElement(visualElem);
         newLinkElem->InsertElement(collisionElem);
       }
@@ -1550,6 +1562,7 @@ void BuildingMaker::OnNew()
   }
 }
 
+/////////////////////////////////////////////////
 void BuildingMaker::SaveModelFiles()
 {
   this->dataPtr->saveDialog->GenerateConfig();
@@ -1557,6 +1570,12 @@ void BuildingMaker::SaveModelFiles()
   this->GenerateSDF();
   this->dataPtr->saveDialog->SaveToSDF(this->dataPtr->modelSDF);
   this->dataPtr->currentSaveState = BuildingMakerPrivate::ALL_SAVED;
+}
+
+/////////////////////////////////////////////////
+std::string BuildingMaker::ModelSDF() const
+{
+  return this->dataPtr->modelSDF->ToString();
 }
 
 /////////////////////////////////////////////////
