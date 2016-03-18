@@ -54,10 +54,13 @@ TEST_F(SensorTest, FastSensor)
 
   // Change time step by several orders of magnitude
   // and verify that there are no assertions
-  physics->SetMaxStepSize(1e4);
-  common::Time::MSleep(20);
-  physics->SetMaxStepSize(1e-3);
-  common::Time::MSleep(20);
+  for (int i = 0; i < 1000; ++i)
+  {
+    physics->SetMaxStepSize(1e3);
+    common::Time::MSleep(5);
+    physics->SetMaxStepSize(1e-3);
+    common::Time::MSleep(5);
+  }
 }
 
 int main(int argc, char **argv)
