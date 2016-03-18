@@ -14,25 +14,10 @@
  * limitations under the License.
  *
 */
-/* Desc: Collision class
- * Author: Nate Koenig
- * Date: 13 Feb 2006
- */
-
-#ifndef _BULLET_COLLISION_HH_
-#define _BULLET_COLLISION_HH_
+#ifndef _GAZEBO_PHYSICS_BULLET_BULLETCOLLISION_HH_
+#define _GAZEBO_PHYSICS_BULLET_BULLETCOLLISION_HH_
 
 #include <string>
-
-/*
-
-#include "gazebo/common/Param.hh"
-#include "Entity.hh"
-#include "gazebo/math/Pose.hh"
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/physics/Collision.hh"
-#include "gazebo/util/system.hh"
-*/
 
 #include "gazebo/physics/bullet/BulletTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
@@ -45,6 +30,9 @@ namespace gazebo
 {
   namespace physics
   {
+    // Forward declar privata data class
+    class BulletCollisionPrivate;
+
     /// \ingroup gazebo_physics
     /// \addtogroup gazebo_physics_bullet Bullet Physics
     /// \{
@@ -66,47 +54,43 @@ namespace gazebo
 
       /// \brief Set the category bits, used during collision detection
       /// \param bits The bits
-      public: virtual void SetCategoryBits(unsigned int _bits);
+      public: virtual void SetCategoryBits(const unsigned int _bits);
 
       /// \brief Set the collide bits, used during collision detection
       /// \param bits The bits
-      public: virtual void SetCollideBits(unsigned int _bits);
+      public: virtual void SetCollideBits(const unsigned int _bits);
 
       /// \brief Get the category bits, used during collision detection
       /// \return The bits
-      public: virtual unsigned int GetCategoryBits() const;
+      public: virtual unsigned int CategoryBits() const;
 
       /// \brief Get the collide bits, used during collision detection
       /// \return The bits
-      public: virtual unsigned int GetCollideBits() const;
+      public: virtual unsigned int CollideBits() const;
 
       /// \brief Get the bounding box, defined by the physics engine
-      public: virtual math::Box GetBoundingBox() const;
+      public: virtual ignition::math::Box BoundingBox() const;
 
       /// \brief Set the collision shape
       /// \param[in] _shape Collision shape
       /// \param[in] _placeable True to make the object movable.
       public: void SetCollisionShape(btCollisionShape *_shape,
-          bool _placeable = true);
+          const bool _placeable = true);
 
       /// \brief Get the bullet collision shape
-      public: btCollisionShape *GetCollisionShape() const;
+      public: btCollisionShape *CollisionShape() const;
 
       /// \brief Set the index of the compound shape
-      public: void SetCompoundShapeIndex(int _index);
+      public: void SetCompoundShapeIndex(const int _index);
 
       /// \brief Similar to Collision::GetSurface, but provides dynamically
       ///        casted pointer to BulletSurfaceParams.
       /// \return Dynamically casted pointer to BulletSurfaceParams.
-      public: BulletSurfaceParamsPtr GetBulletSurface() const;
+      public: BulletSurfaceParamsPtr BulletSurface() const;
 
-      protected: btCollisionShape *collisionShape;
-
-      /// \brief Category bits for collision detection
-      private: unsigned int categoryBits;
-
-      /// \brief Collide bits for collision detection
-      private: unsigned int collideBits;
+      /// \internal
+      /// \brief Private data pointer
+      protected: BulletCollisionPrivate *bulletCollisionDPtr;
     };
     /// \}
   }

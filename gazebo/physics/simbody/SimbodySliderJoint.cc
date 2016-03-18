@@ -14,9 +14,7 @@
  * limitations under the License.
  *
 */
-
 #include "gazebo/common/Console.hh"
-#include "gazebo/common/Exception.hh"
 
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/simbody/simbody_inc.h"
@@ -29,10 +27,10 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 SimbodySliderJoint::SimbodySliderJoint(SimTK::MultibodySystem * /*_world*/,
-                                     BasePtr _parent)
-    : SliderJoint<SimbodyJoint>(_parent)
+    BasePtr _parent)
+: SliderJoint<SimbodyJoint>(_parent)
 {
-  this->physicsInitialized = false;
+  this->simbodyJointDPtr->physicsInitialized = false;
 }
 
 //////////////////////////////////////////////////
@@ -47,8 +45,8 @@ void SimbodySliderJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void SimbodySliderJoint::SetAxis(unsigned int /*_index*/,
-    const math::Vector3 &/*_axis*/)
+void SimbodySliderJoint::SetAxis(const unsigned int /*_index*/,
+    const ignition::math::Vector3d &/*_axis*/)
 {
   // Simbody seems to handle setAxis improperly. It readjust all the pivot
   // points
@@ -56,32 +54,34 @@ void SimbodySliderJoint::SetAxis(unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-void SimbodySliderJoint::SetVelocity(unsigned int _index, double _rate)
+void SimbodySliderJoint::SetVelocity(const unsigned int _index,
+    const double _rate)
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->AngleCount())
   {
-    this->mobod.setOneU(
-      this->simbodyPhysics->integ->updAdvancedState(),
+    this->simbodyJointDPtr->mobod.setOneU(
+      this->simbodyJointDPtr->simbodyPhysics->integ->updAdvancedState(),
       SimTK::MobilizerUIndex(_index), _rate);
-    this->simbodyPhysics->system.realize(
-      this->simbodyPhysics->integ->getAdvancedState(), SimTK::Stage::Velocity);
+    this->simbodyJointDPtr->simbodyPhysics->system.realize(
+      this->simbodyJointDPtr->simbodyPhysics->integ->getAdvancedState(),
+      SimTK::Stage::Velocity);
   }
   else
     gzerr << "SetVelocity _index too large.\n";
 }
 
 //////////////////////////////////////////////////
-double SimbodySliderJoint::GetVelocity(unsigned int _index) const
+double SimbodySliderJoint::Velocity(unsigned int _index) const
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->AngleCount())
   {
-    if (this->simbodyPhysics->simbodyPhysicsInitialized)
-      return this->mobod.getOneU(
-        this->simbodyPhysics->integ->getState(),
+    if (this->simbodyJointDPtr->simbodyPhysics->simbodyPhysicsInitialized)
+      return this->simbodyJointDPtr->mobod.getOneU(
+        this->simbodyJointDPtr->simbodyPhysics->integ->getState(),
         SimTK::MobilizerUIndex(_index));
     else
     {
-      gzdbg << "Simbody::GetVelocity() simbody not yet initialized, "
+      gzdbg << "Simbody::Velocity() simbody not yet initialized, "
             << "initial velocity should be zero until restart from "
             << "state has been implemented.\n";
       return 0.0;
@@ -90,33 +90,38 @@ double SimbodySliderJoint::GetVelocity(unsigned int _index) const
   else
   {
     gzerr << "Invalid index for joint, returning NaN\n";
-    return SimTK::NaN;
+    return ignition::math::NAN_D;
   }
 }
 
 //////////////////////////////////////////////////
-void SimbodySliderJoint::SetForceImpl(unsigned int _index, double _torque)
+void SimbodySliderJoint::SetForceImpl(
+    const unsigned int _index, const double _torque)
 {
-  if (_index < this->GetAngleCount())
-    this->simbodyPhysics->discreteForces.setOneMobilityForce(
-      this->simbodyPhysics->integ->updAdvancedState(),
-      this->mobod, SimTK::MobilizerUIndex(_index), _torque);
+  if (_index < this->AngleCount())
+  {
+    this->simbodyJointDPtr->simbodyPhysics->discreteForces.setOneMobilityForce(
+      this->simbodyJointDPtr->simbodyPhysics->integ->updAdvancedState(),
+      this->simbodyJointDPtr->mobod, SimTK::MobilizerUIndex(_index), _torque);
+  }
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodySliderJoint::GetGlobalAxis(unsigned int _index) const
+ignition::math::Vector3d SimbodySliderJoint::GlobalAxis(
+    const unsigned int _index) const
 {
-  if (this->simbodyPhysics->simbodyPhysicsStepped &&
-      _index < this->GetAngleCount())
+  if (this->simbodyJointDPtr->simbodyPhysics->simbodyPhysicsStepped &&
+      _index < this->AngleCount())
   {
-    if (!this->mobod.isEmptyHandle())
+    if (!this->simbodyJointDPtr->mobod.isEmptyHandle())
     {
-      const SimTK::Transform &X_OM = this->mobod.getOutboardFrame(
-        this->simbodyPhysics->integ->getState());
+      const SimTK::Transform &X_OM =
+        this->simbodyJointDPtr->mobod.getOutboardFrame(
+        this->simbodyJointDPtr->simbodyPhysics->integ->getState());
 
       // express X-axis of X_OM in world frame
-      SimTK::Vec3 x_W(this->mobod.expressVectorInGroundFrame(
-        this->simbodyPhysics->integ->getState(), X_OM.x()));
+      SimTK::Vec3 x_W(this->simbodyJointDPtr->mobod.expressVectorInGroundFrame(
+        this->simbodyJointDPtr->simbodyPhysics->integ->getState(), X_OM.x()));
 
       return SimbodyPhysics::Vec3ToVector3(x_W);
     }
@@ -126,62 +131,62 @@ math::Vector3 SimbodySliderJoint::GetGlobalAxis(unsigned int _index) const
             << " initial axis vector in world frame (not valid if"
             << " joint frame has moved). Please file"
             << " a report on issue tracker.\n";
-      return this->GetAxisFrame(_index).RotateVector(
-        this->GetLocalAxis(_index));
+      return this->AxisFrame(_index).RotateVector(this->LocalAxis(_index));
     }
   }
   else
   {
-    if (_index >= this->GetAngleCount())
+    if (_index >= this->AngleCount())
     {
       gzerr << "index out of bound\n";
-      return math::Vector3(SimTK::NaN, SimTK::NaN, SimTK::NaN);
+      return ignition::math::Vector3d(ignition::math::NAN_D,
+          ignition::math::NAN_D, ignition::math::NAN_D);
     }
     else
     {
-      gzdbg << "Simbody::GetGlobalAxis() sibmody physics"
+      gzdbg << "Simbody::GlobalAxis() sibmody physics"
             << " engine not initialized yet, "
             << "use local axis and initial pose to compute "
             << "global axis.\n";
 
       // if local axis specified in model frame (to be changed)
       // switch to code below if issue #494 is to be addressed
-      return this->GetAxisFrame(_index).RotateVector(
-        this->GetLocalAxis(_index));
+      return this->AxisFrame(_index).RotateVector(this->LocalAxis(_index));
     }
   }
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodySliderJoint::GetAngleImpl(unsigned int _index) const
+ignition::math::Angle SimbodySliderJoint::AngleImpl(
+    const unsigned int _index) const
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->AngleCount())
   {
-    if (this->simbodyPhysics->simbodyPhysicsInitialized)
+    if (this->simbodyJointDPtr->simbodyPhysics->simbodyPhysicsInitialized)
     {
-      if (!this->mobod.isEmptyHandle())
+      if (!this->simbodyJointDPtr->mobod.isEmptyHandle())
       {
-        return math::Angle(this->mobod.getOneQ(
-          this->simbodyPhysics->integ->getState(), _index));
+        return ignition::math::Angle(this->simbodyJointDPtr->mobod.getOneQ(
+          this->simbodyJointDPtr->simbodyPhysics->integ->getState(), _index));
       }
       else
       {
         gzerr << "Joint mobod not initialized correctly.  Please file"
               << " a report on issue tracker.\n";
-        return math::Angle(0.0);
+        return ignition::math::Angle::Zero;
       }
     }
     else
     {
-      gzdbg << "Simbody::GetAngleImpl() simbody not yet initialized, "
+      gzdbg << "Simbody::AngleImpl() simbody not yet initialized, "
             << "initial angle should be zero until <initial_angle> "
             << "is implemented.\n";
-      return math::Angle(0.0);
+      return ignition::math::Angle::Zero;
     }
   }
   else
   {
     gzerr << "index out of bound\n";
-    return math::Angle(SimTK::NaN);
+    return ignition::math::Angle(ignition::math::NAN_D);
   }
 }

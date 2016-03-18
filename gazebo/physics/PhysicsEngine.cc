@@ -339,3 +339,16 @@ WorldPtr PhysicsEngine::World() const
 {
   return this->world;
 }
+
+//////////////////////////////////////////////////
+std::string PhysicsEngine::GetType() const
+{
+  return this->Type();
+}
+
+//////////////////////////////////////////////////
+void PhysicsEngine::SetGravity(const gazebo::math::Vector3 &_gravity)
+{
+  return this->SetGravity(_gravity.Ign());
+}
+

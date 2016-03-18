@@ -33,6 +33,9 @@ namespace gazebo
 {
   namespace physics
   {
+    // Forward declar private class.
+    class BulletJointPrivate;
+
     /// \ingroup gazebo_physics
     /// \addtogroup gazebo_physics_bullet Bullet Physics
     /// \{
@@ -54,7 +57,12 @@ namespace gazebo
 
       /// \brief Get the body to which the joint is attached
       ///        according the _index
+      /// \deprecated See JointLink
       public: LinkPtr GetJointLink(unsigned int _index) const;
+
+      /// \brief Get the body to which the joint is attached
+      ///        according the _index
+      public: LinkPtr JointLink(const unsigned int _index) const;
 
       /// \brief Determines of the two bodies are connected by a joint
       public: bool AreConnected(LinkPtr _one, LinkPtr _two) const;
@@ -63,69 +71,82 @@ namespace gazebo
       public: virtual void Detach();
 
       /// \brief Set the anchor point
-      public: virtual void SetAnchor(unsigned int _index,
-                                     const gazebo::math::Vector3 &_anchor);
+      public: virtual void SetAnchor(const unsigned int _index,
+                  const ignition::math::Vector3d &_anchor);
 
       // Documentation inherited
-      public: virtual void SetDamping(unsigned int _index, double _damping);
+      public: virtual void SetDamping(const unsigned int _index,
+                  const double _damping);
 
       // Documentation inherited.
-      public: virtual bool SetPosition(unsigned int _index, double _position);
+      public: virtual bool SetPosition(const unsigned int _index,
+                  const double _position);
 
       // Documentation inherited.
-      public: virtual void SetStiffness(unsigned int _index,
+      public: virtual void SetStiffness(const unsigned int _index,
                   const double _stiffness);
 
       // Documentation inherited.
-      public: virtual void SetStiffnessDamping(unsigned int _index,
-        double _stiffness, double _damping, double _reference = 0);
+      public: virtual void SetStiffnessDamping(
+                  const unsigned int _index,
+                  const double _stiffness,
+                  const double _damping, const double _reference = 0);
 
       /// \brief Get the anchor point
-      public: virtual math::Vector3 GetAnchor(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d Anchor(
+                  const unsigned int _index) const;
 
       /// \brief Get the force the joint applies to the first body
       /// \param index The index of the body(0 or 1)
-      public: virtual math::Vector3 GetLinkForce(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d LinkForce(
+                  const unsigned int _index) const;
 
       /// \brief Get the torque the joint applies to the first body
       /// \param index The index of the body(0 or 1)
-      public: virtual math::Vector3 GetLinkTorque(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d LinkTorque(
+                  const unsigned int _index) const;
 
       // Documentation inherited.
       public: virtual bool SetParam(const std::string &_key,
-                                        unsigned int _index,
-                                        const boost::any &_value);
+                  const unsigned int _index, const boost::any &_value);
 
       // Documentation inherited.
-      public: virtual double GetParam(const std::string &_key,
-                                          unsigned int _index);
+      public: virtual double Param(const std::string &_key,
+                  const unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual math::Angle GetHighStop(unsigned int _index);
+      public: virtual ignition::math::Angle HighStop(
+                  const unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual math::Angle GetLowStop(unsigned int _index);
+      public: virtual ignition::math::Angle LowStop(
+                  const unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual void SetProvideFeedback(bool _enable);
+      public: virtual void SetProvideFeedback(const bool _enable);
 
       // Documentation inherited.
       public: virtual void CacheForceTorque();
 
       // Documentation inherited.
-      public: virtual JointWrench GetForceTorque(unsigned int _index);
+      public: virtual JointWrench ForceTorque(const unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual void SetForce(unsigned int _index, double _force);
+      public: virtual void SetForce(const unsigned int _index,
+                  const double _force);
 
       // Documentation inherited.
-      public: virtual double GetForce(unsigned int _index);
+      public: virtual double Force(const unsigned int _index) const;
 
       // Documentation inherited.
       public: virtual void Init();
 
       // Documentation inherited.
       public: virtual void ApplyStiffnessDamping();
+
+      // Documentation inherited.
+      public: virtual void SetAxis(const unsigned int _index,
+                                   const ignition::math::Vector3d &_axis);
 
       /// \brief Set the force applied to this physics::Joint.
       /// Note that the unit of force should be consistent with the rest
@@ -137,8 +158,8 @@ namespace gazebo
       /// \param[in] _force Force value.
       /// internal force, e.g. damping forces.  This way, Joint::appliedForce
       /// keep track of external forces only.
-      protected: virtual void SetForceImpl(unsigned int _index,
-                     double _force) = 0;
+      protected: virtual void SetForceImpl(const unsigned int _index,
+                     const double _force) = 0;
 
       /// \brief: Setup joint feedback datatructure.
       /// This is called after Joint::constraint is setup in Init.
@@ -147,31 +168,11 @@ namespace gazebo
       /// \brief Save external forces applied to this Joint.
       /// \param[in] _index Index of the axis.
       /// \param[in] _force Force value.
-      private: void SaveForce(unsigned int _index, double _force);
+      private: void SaveForce(const unsigned int _index, const double _force);
 
-      /// \brief Pointer to a contraint object in Bullet.
-      protected: btTypedConstraint *constraint;
-
-      /// \brief Pointer to Bullet's btDynamicsWorld.
-      protected: btDynamicsWorld *bulletWorld;
-
-      /// \brief Feedback data for this joint
-      private: btJointFeedback *feedback;
-
-      /// \brief internal variable to keep track if ConnectJointUpdate
-      /// has been called on a damping method
-      private: bool stiffnessDampingInitialized;
-
-      /// \brief Save force applied by user
-      /// This plus the joint feedback (joint contstraint forces) is the
-      /// equivalent of simulated force torque sensor reading
-      /// Allocate a 2 vector in case hinge2 joint is used.
-      /// This is used by Bullet to store external force applied by the user.
-      private: double forceApplied[MAX_JOINT_AXIS];
-
-      /// \brief Save time at which force is applied by user
-      /// This will let us know if it's time to clean up forceApplied.
-      private: common::Time forceAppliedTime;
+      /// \internal
+      /// \brief Private data pointer
+      protected: BulletJointPrivate *bulletJointDPtr;
     };
     /// \}
   }

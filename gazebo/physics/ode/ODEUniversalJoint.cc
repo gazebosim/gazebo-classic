@@ -19,6 +19,7 @@
 
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/Link.hh"
+#include "gazebo/physics/ode/ODEJointPrivate.hh"
 #include "gazebo/physics/ode/ODEUniversalJoint.hh"
 
 using namespace gazebo;
@@ -39,7 +40,7 @@ ODEUniversalJoint::~ODEUniversalJoint()
 }
 
 //////////////////////////////////////////////////
-igntion::math::Vector3d ODEUniversalJoint::Anchor(
+ignition::math::Vector3d ODEUniversalJoint::Anchor(
     const unsigned int /*index*/) const
 {
   dVector3 result;
@@ -48,12 +49,12 @@ igntion::math::Vector3d ODEUniversalJoint::Anchor(
   else
     gzerr << "ODE Joint ID is invalid\n";
 
-  return igntion::math::Vector3d(result[0], result[1], result[2]);
+  return ignition::math::Vector3d(result[0], result[1], result[2]);
 }
 
 //////////////////////////////////////////////////
 void ODEUniversalJoint::SetAnchor(const unsigned int /*index*/,
-    const igntion::math::Vector3d &_anchor)
+    const ignition::math::Vector3d &_anchor)
 {
   if (this->odeJointDPtr->childLink)
     this->odeJointDPtr->childLink->SetEnabled(true);
@@ -72,7 +73,7 @@ void ODEUniversalJoint::SetAnchor(const unsigned int /*index*/,
 }
 
 //////////////////////////////////////////////////
-igntion::math::Vector3d ODEUniversalJoint::GlobalAxis(
+ignition::math::Vector3d ODEUniversalJoint::GlobalAxis(
     const unsigned int _index) const
 {
   dVector3 result;
@@ -90,12 +91,12 @@ igntion::math::Vector3d ODEUniversalJoint::GlobalAxis(
   else
     gzerr << "ODE Joint ID is invalid\n";
 
-  return igntion::math::Vector3d(result[0], result[1], result[2]);
+  return ignition::math::Vector3d(result[0], result[1], result[2]);
 }
 
 //////////////////////////////////////////////////
 void ODEUniversalJoint::SetAxis(const unsigned int _index,
-    const igntion::math::Vector3d &_axis)
+    const ignition::math::Vector3d &_axis)
 {
   if (this->odeJointDPtr->childLink)
     this->odeJointDPtr->childLink->SetEnabled(true);
@@ -104,7 +105,7 @@ void ODEUniversalJoint::SetAxis(const unsigned int _index,
 
   /// ODE needs global axis
   ignition::math::Quaterniond axisFrame = this->AxisFrame(_index);
-  igntion::math::Vector3d globalAxis = axisFrame.RotateVector(_axis);
+  ignition::math::Vector3d globalAxis = axisFrame.RotateVector(_axis);
 
   if (this->odeJointDPtr->jointId)
   {
@@ -326,7 +327,7 @@ bool ODEUniversalJoint::SetParam(const std::string &_key,
 
 //////////////////////////////////////////////////
 double ODEUniversalJoint::Param(const std::string &_key,
-    const unsigned int _index)
+    const unsigned int _index) const
 {
   // Axis parameters for multi-axis joints use a group bitmask
   // to identify the variable.

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _ODEPHYSICS_HH_
-#define _ODEPHYSICS_HH_
+#ifndef _GAZEBO_PHYSICS_ODE_ODEPHYSICS_HH_
+#define _GAZEBO_PHYSICS_ODE_ODEPHYSICS_HH_
 
 #include <tbb/spin_mutex.h>
 #include <tbb/concurrent_vector.h>
@@ -116,8 +116,7 @@ namespace gazebo
       public: virtual void Fini();
 
       // Documentation inherited
-      public: virtual std::string GetType() const
-                      { return "ode"; }
+      public: virtual std::string Type() const;
 
       // Documentation inherited
       public: virtual LinkPtr CreateLink(ModelPtr _parent);
@@ -135,7 +134,7 @@ namespace gazebo
                                            ModelPtr _parent);
 
       // Documentation inherited
-      public: virtual void SetGravity(const gazebo::math::Vector3 &_gravity);
+      public: virtual void SetGravity(const ignition::math::Vector3d &_gravity);
 
       // Documentation inherited
       public: virtual void SetWorldCFM(double cfm);

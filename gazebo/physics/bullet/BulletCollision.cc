@@ -19,28 +19,26 @@
 
 #include "gazebo/physics/bullet/bullet_inc.h"
 #include "gazebo/physics/bullet/BulletLink.hh"
-#include "gazebo/physics/bullet/BulletCollision.hh"
 #include "gazebo/physics/bullet/BulletSurfaceParams.hh"
+#include "gazebo/physics/bullet/BulletCollisionPrivate.hh"
+#include "gazebo/physics/bullet/BulletCollision.hh"
 
 using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
 BulletCollision::BulletCollision(LinkPtr _parent)
-    : Collision(_parent)
+: Collision(*new BulletCollisionPrivate, _parent),
+  bulletCollisionDPtr(static_cast<BulletCollisionPrivate*>(this->collDPtr))
 {
   this->SetName("Bullet_Collision");
-  this->collisionShape = NULL;
-  this->surface.reset(new BulletSurfaceParams());
+  this->bulletCollisionDPtr->collisionShape = NULL;
+  this->bulletCollisionDPtr->surface.reset(new BulletSurfaceParams());
 }
 
 //////////////////////////////////////////////////
 BulletCollision::~BulletCollision()
 {
-  /*
-  delete this->collisionShape;
-  this->collisionShape = NULL;
-  */
 }
 
 //////////////////////////////////////////////////
@@ -58,34 +56,35 @@ void BulletCollision::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void BulletCollision::OnPoseChange()
 {
-  math::Pose pose = this->GetRelativePose();
-  BulletLinkPtr bbody = std::dynamic_pointer_cast<BulletLink>(this->parent);
+  ignition::math::Pose3d pose = this->RelativePose();
+  BulletLinkPtr bbody = std::dynamic_pointer_cast<BulletLink>(
+      this->bulletCollisionDPtr->parent);
 
   // bbody->motionState.setWorldTransform(this, pose);
 }
 
 //////////////////////////////////////////////////
-void BulletCollision::SetCategoryBits(unsigned int _bits)
+void BulletCollision::SetCategoryBits(const unsigned int _bits)
 {
-  this->categoryBits = _bits;
+  this->bulletCollisionDPtr->categoryBits = _bits;
 }
 
 //////////////////////////////////////////////////
-void BulletCollision::SetCollideBits(unsigned int _bits)
+void BulletCollision::SetCollideBits(const unsigned int _bits)
 {
-  this->collideBits = _bits;
+  this->bulletCollisionDPtr->collideBits = _bits;
 }
 
 //////////////////////////////////////////////////
-unsigned int BulletCollision::GetCategoryBits() const
+unsigned int BulletCollision::CategoryBits() const
 {
-  return this->categoryBits;
+  return this->bulletCollisionDPtr->categoryBits;
 }
 
 //////////////////////////////////////////////////
-unsigned int BulletCollision::GetCollideBits() const
+unsigned int BulletCollision::CollideBits() const
 {
-  return this->collideBits;
+  return this->bulletCollisionDPtr->collideBits;
 }
 
 //////////////////////////////////////////////////
@@ -96,26 +95,27 @@ unsigned int BulletCollision::GetCollideBits() const
 }*/
 
 //////////////////////////////////////////////////
-math::Box BulletCollision::GetBoundingBox() const
+ignition::math::Box BulletCollision::BoundingBox() const
 {
-  math::Box result;
-  if (this->collisionShape)
+  ignition::math::Box result;
+  if (this->bulletCollisionDPtr->collisionShape)
   {
     btVector3 btMin, btMax;
-    this->collisionShape->getAabb(btTransform::getIdentity(), btMin, btMax);
+    this->bulletCollisionDPtr->collisionShape->getAabb(
+        btTransform::getIdentity(), btMin, btMax);
 
-    result.min.Set(btMin.x(), btMin.y(), btMin.z());
-    result.max.Set(btMax.x(), btMax.y(), btMax.z());
+    result.Min().Set(btMin.x(), btMin.y(), btMin.z());
+    result.Max().Set(btMax.x(), btMax.y(), btMax.z());
 
-    if (this->GetShapeType() & PLANE_SHAPE)
+    if (this->ShapeType() & PLANE_SHAPE)
     {
       PlaneShapePtr plane =
-        std::dynamic_pointer_cast<PlaneShape>(this->shape);
+        std::dynamic_pointer_cast<PlaneShape>(this->bulletCollisionDPtr->shape);
       ignition::math::Vector3d normal = plane->Normal();
       if (normal == ignition::math::Vector3d::UnitZ)
       {
         // Should check altitude, but it's not implemented
-        result.max.z =  0.0;
+        result.Max().Z(0.0);
       }
     }
   }
@@ -124,34 +124,37 @@ math::Box BulletCollision::GetBoundingBox() const
 
 //////////////////////////////////////////////////
 void BulletCollision::SetCollisionShape(btCollisionShape *_shape,
-    bool _placeable)
+    const bool _placeable)
 {
   Collision::SetCollision(_placeable);
-  this->collisionShape = _shape;
+  this->bulletCollisionDPtr->collisionShape = _shape;
 
   // btmath::Vector3 vec;
-  // this->collisionShape->calculateLocalInertia(this->mass.GetAsDouble(), vec);
+  // this->bulletCollisionDPtr->collisionShape->calculateLocalInertia(
+  // this->mass.GetAsDouble(), vec);
 
   // this->mass.SetCoG(this->GetRelativePose().pos);
 
-  // this->collisionShape->setFriction(1.0);
-  // this->collisionShape->setAnisotropicFriction(btVector3(0, 0, 0));
+  // this->bulletCollisionDPtr->collisionShape->setFriction(1.0);
+  // this->bulletCollisionDPtr->collisionShape->setAnisotropicFriction(
+  // btVector3(0, 0, 0));
 }
 
 //////////////////////////////////////////////////
-btCollisionShape *BulletCollision::GetCollisionShape() const
+btCollisionShape *BulletCollision::CollisionShape() const
 {
-  return this->collisionShape;
+  return this->bulletCollisionDPtr->collisionShape;
 }
 
 //////////////////////////////////////////////////
-void BulletCollision::SetCompoundShapeIndex(int /*_index*/)
+void BulletCollision::SetCompoundShapeIndex(const int /*_index*/)
 {
   // this->compoundShapeIndex = 0;
 }
 
 /////////////////////////////////////////////////
-BulletSurfaceParamsPtr BulletCollision::GetBulletSurface() const
+BulletSurfaceParamsPtr BulletCollision::BulletSurface() const
 {
-  return std::dynamic_pointer_cast<BulletSurfaceParams>(this->surface);
+  return std::dynamic_pointer_cast<BulletSurfaceParams>(
+      this->bulletCollisionDPtr->surface);
 }

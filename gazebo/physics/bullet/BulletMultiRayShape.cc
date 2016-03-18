@@ -17,6 +17,7 @@
 
 #include "gazebo/common/Exception.hh"
 
+#include "gazebo/physics/MultiRayShapePrivate.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/bullet/BulletTypes.hh"
 #include "gazebo/physics/bullet/BulletLink.hh"
@@ -34,7 +35,7 @@ BulletMultiRayShape::BulletMultiRayShape(CollisionPtr _parent)
 {
   this->SetName("Bullet Multiray Shape");
   this->physicsEngine = std::static_pointer_cast<BulletPhysics>(
-      this->collisionParent->GetWorld()->GetPhysicsEngine());
+      this->multiRayShapeDPtr->collisionParent->World()->GetPhysicsEngine());
 }
 
 //////////////////////////////////////////////////
@@ -46,7 +47,8 @@ BulletMultiRayShape::~BulletMultiRayShape()
 void BulletMultiRayShape::UpdateRays()
 {
   std::vector<RayShapePtr>::iterator iter;
-  for (iter = this->rays.begin(); iter != this->rays.end(); ++iter)
+  for (iter = this->multiRayShapeDPtr->rays.begin();
+       iter != this->multiRayShapeDPtr->rays.end(); ++iter)
   {
     (*iter)->Update();
   }
@@ -58,8 +60,9 @@ void BulletMultiRayShape::AddRay(const ignition::math::Vector3d &_start,
 {
   MultiRayShape::AddRay(_start, _end);
 
-  BulletRayShapePtr ray(new BulletRayShape(this->collisionParent));
+  BulletRayShapePtr ray(new BulletRayShape(
+        this->multiRayShapeDPtr->collisionParent));
   ray->SetPoints(_start, _end);
 
-  this->rays.push_back(ray);
+  this->multiRayShapeDPtr->rays.push_back(ray);
 }

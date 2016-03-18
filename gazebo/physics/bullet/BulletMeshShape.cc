@@ -16,6 +16,7 @@
 */
 #include "gazebo/common/Mesh.hh"
 
+#include "gazebo/physics/MeshShapePrivate.hh"
 #include "gazebo/physics/bullet/BulletMesh.hh"
 #include "gazebo/physics/bullet/BulletTypes.hh"
 #include "gazebo/physics/bullet/BulletCollision.hh"
@@ -50,16 +51,17 @@ void BulletMeshShape::Init()
   MeshShape::Init();
 
   BulletCollisionPtr bParent =
-    std::static_pointer_cast<BulletCollision>(this->collisionParent);
+    std::static_pointer_cast<BulletCollision>(
+        this->meshShapeDPtr->collisionParent);
 
-  if (this->submesh)
+  if (this->meshShapeDPtr->submesh)
   {
-    this->bulletMesh->Init(this->submesh, bParent,
-        this->sdf->Get<ignition::math::Vector3d>("scale"));
+    this->bulletMesh->Init(this->meshShapeDPtr->submesh, bParent,
+        this->meshShapeDPtr->sdf->Get<ignition::math::Vector3d>("scale"));
   }
   else
   {
-    this->bulletMesh->Init(this->mesh, bParent,
-        this->sdf->Get<ignition::math::Vector3d>("scale"));
+    this->bulletMesh->Init(this->meshShapeDPtr->mesh, bParent,
+        this->meshShapeDPtr->sdf->Get<ignition::math::Vector3d>("scale"));
   }
 }

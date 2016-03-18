@@ -16,13 +16,8 @@
 */
 #ifndef _GAZEBO_PHYSICS_BULLETBOXSHAPE_HH_
 #define _GAZEBO_PHYSICS_BULLETBOXSHAPE_HH_
-#include <ignition/math/Pose3.hh>
+#include <ignition/math/Vector3.hh>
 
-#include "gazebo/physics/bullet/BulletPhysics.hh"
-#include "gazebo/physics/bullet/BulletTypes.hh"
-#include "gazebo/physics/bullet/BulletCollision.hh"
-#include "gazebo/physics/bullet/BulletLink.hh"
-#include "gazebo/physics/World.hh"
 #include "gazebo/physics/BoxShape.hh"
 #include "gazebo/util/system.hh"
 
@@ -38,84 +33,13 @@ namespace gazebo
     class GZ_PHYSICS_VISIBLE BulletBoxShape : public BoxShape
     {
       /// \brief Constructor
-      public: BulletBoxShape(CollisionPtr _parent) : BoxShape(_parent) {}
+      public: BulletBoxShape(CollisionPtr _parent);
 
       /// \brief Destructor
-      public: virtual ~BulletBoxShape() {}
+      public: virtual ~BulletBoxShape();
 
       /// \brief Set the size of the box
-      public: void SetSize(const ignition::math::Vector3d &_size)
-              {
-                if (_size.Min() < 0)
-                {
-                  gzerr << "Box shape does not support negative size\n";
-                  return;
-                }
-                ignition::math::Vector3d size = _size;
-                if (ignition::math::equal(size.X(), 0.0))
-                {
-                  // Warn user, but still create shape with very small value
-                  // otherwise later resize operations using setLocalScaling
-                  // will not be possible
-                  gzwarn << "Setting box shape's x to zero \n";
-                  size.X(1e-4);
-                }
-                if (ignition::math::equal(size.Y(), 0.0))
-                {
-                  gzwarn << "Setting box shape's y to zero \n";
-                  size.Y(1e-4);
-                }
-                if (ignition::math::equal(size.Z(), 0.0))
-                {
-                  gzwarn << "Setting box shape's z to zero \n";
-                  size.Z(1e-4);
-                }
-
-                BoxShape::SetSize(size);
-                BulletCollisionPtr bParent;
-                bParent = std::dynamic_pointer_cast<BulletCollision>(
-                    this->collisionParent);
-
-                /// Bullet requires the half-extents of the box
-                btCollisionShape *shape = bParent->GetCollisionShape();
-                if (!shape)
-                {
-                  this->initialSize = size;
-                  bParent->SetCollisionShape(new btBoxShape(
-                      btVector3(size.X()*0.5, size.Y()*0.5, size.Z()*0.5)));
-                }
-                else
-                {
-                  btVector3 boxScale = shape->getLocalScaling();
-                  boxScale.setX(size.X() / this->initialSize.X());
-                  boxScale.setY(size.Y() / this->initialSize.Y());
-                  boxScale.setZ(size.Z() / this->initialSize.Z());
-
-                  shape->setLocalScaling(boxScale);
-
-                  // clear bullet cache and re-add the collision shape
-                  // otherwise collisions won't work properly after scaling
-                  BulletLinkPtr bLink =
-                    std::dynamic_pointer_cast<BulletLink>(
-                    bParent->GetLink());
-                  bLink->ClearCollisionCache();
-
-                  // remove and add the shape again
-                  if (bLink->GetBulletLink()->getCollisionShape()->isCompound())
-                  {
-                    btCompoundShape *compoundShape =
-                        dynamic_cast<btCompoundShape *>(
-                        bLink->GetBulletLink()->getCollisionShape());
-
-                    compoundShape->removeChildShape(shape);
-                    ignition::math::Pose3d relativePose =
-                        this->collisionParent->GetRelativePose().Ign();
-                    relativePose.Pos() -= bLink->GetInertial()->GetCoG().Ign();
-                    compoundShape->addChildShape(
-                        BulletTypes::ConvertPose(relativePose), shape);
-                  }
-                }
-              }
+      public: void SetSize(const ignition::math::Vector3d &_size);
 
       /// \brief Initial size of box.
       private: ignition::math::Vector3d initialSize;

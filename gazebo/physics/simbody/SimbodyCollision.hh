@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _SIMBODY_COLLISION_HH_
-#define _SIMBODY_COLLISION_HH_
+#ifndef _GAZEBO_PHYSICS_SIMBODY_SIMBODYCOLLISION_HH_
+#define _GAZEBO_PHYSICS_SIMBODY_SIMBODYCOLLISION_HH_
 
 #include <string>
 
@@ -53,13 +52,13 @@ namespace gazebo
       public: virtual void OnPoseChange();
 
       // Documentation inherited
-      public: virtual void SetCategoryBits(unsigned int _bits);
+      public: virtual void SetCategoryBits(const unsigned int _bits);
 
       // Documentation inherited
-      public: virtual void SetCollideBits(unsigned int _bits);
+      public: virtual void SetCollideBits(const unsigned int _bits);
 
       // Documentation inherited
-      public: virtual math::Box GetBoundingBox() const;
+      public: virtual ignition::math::Box BoundingBox() const;
 
       /// \brief Set the collision shape.
       /// \param[in] _shape SimTK geometry to use as the collision
@@ -68,7 +67,7 @@ namespace gazebo
 
       /// \brief Get the simbody collision shape.
       /// \return SimTK geometry used as the collision shape.
-      public: SimTK::ContactGeometry *GetCollisionShape() const;
+      public: SimTK::ContactGeometry *CollisionShape() const;
 
       /// \brief The SimTK collision geometry.
       private: SimTK::ContactGeometry *collisionShape;

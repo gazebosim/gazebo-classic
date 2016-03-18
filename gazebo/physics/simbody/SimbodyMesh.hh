@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PHYSICS_SIMBODYMESH_HH_
-#define _GAZEBO_PHYSICS_SIMBODYMESH_HH_
+#ifndef _GAZEBO_PHYSICS_SIMBODY_SIMBODYMESH_HH_
+#define _GAZEBO_PHYSICS_SIMBODY_SIMBODYMESH_HH_
 
 #include "gazebo/physics/simbody/SimbodyTypes.hh"
 #include "gazebo/util/system.hh"

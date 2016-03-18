@@ -202,10 +202,6 @@ namespace gazebo
                   const unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual void SetAxis(const unsigned int _index,
-                                   const ignition::math::Vector3d &_axis);
-
-      // Documentation inherited.
       public: virtual bool SetParam(const std::string &_key,
                                     const unsigned int _index,
                                     const boost::any &_value);

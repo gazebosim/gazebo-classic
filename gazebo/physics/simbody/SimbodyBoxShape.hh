@@ -14,11 +14,9 @@
  * limitations under the License.
  *
 */
-
 #ifndef _GAZEBO_PHYSICS_SIMBODY_BOXSHAPE_HH_
 #define _GAZEBO_PHYSICS_SIMBODY_BOXSHAPE_HH_
 
-#include "gazebo/physics/simbody/SimbodyPhysics.hh"
 #include "gazebo/physics/BoxShape.hh"
 #include "gazebo/util/system.hh"
 
@@ -34,45 +32,13 @@ namespace gazebo
     class GZ_PHYSICS_VISIBLE SimbodyBoxShape : public BoxShape
     {
       /// \brief Constructor
-      public: SimbodyBoxShape(CollisionPtr _parent) : BoxShape(_parent) {}
+      public: SimbodyBoxShape(CollisionPtr _parent);
 
       /// \brief Destructor
-      public: virtual ~SimbodyBoxShape() {}
+      public: virtual ~SimbodyBoxShape();
 
       // Documentation inherited
-      public: void SetSize(const ignition::math::Vector3d &_size)
-              {
-                if (_size.Min() < 0)
-                {
-                  gzerr << "Box shape does not support negative size\n";
-                  return;
-                }
-                ignition::math::Vector3d size = _size;
-                if (ignition::math::equal(size.X(), 0.0))
-                {
-                  // Warn user, but still create shape with very small value
-                  // otherwise later resize operations using setLocalScaling
-                  // will not be possible
-                  gzwarn << "Setting box shape's x to zero \n";
-                  size.X(1e-4);
-                }
-                if (ignition::math::equal(size.Y(), 0.0))
-                {
-                  gzwarn << "Setting box shape's y to zero \n";
-                  size.Y(1e-4);
-                }
-                if (ignition::math::equal(size.Z(), 0.0))
-                {
-                  gzwarn << "Setting box shape's z to zero \n";
-                  size.Z(1e-4);
-                }
-
-                BoxShape::SetSize(size);
-
-                SimbodyCollisionPtr bParent;
-                bParent = std::dynamic_pointer_cast<SimbodyCollision>(
-                    this->collisionParent);
-              }
+      public: void SetSize(const ignition::math::Vector3d &_size);
     };
     /// \}
   }

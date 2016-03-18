@@ -14,8 +14,9 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PHYSICS_BULLETHEIGHTMAPGEOM_HH_
-#define _GAZEBO_PHYSICS_BULLETHEIGHTMAPGEOM_HH_
+#ifndef _GAZEBO_PHYSICS_BULLET_BULLETHEIGHTMAPSHAPE_HH_
+#define _GAZEBO_PHYSICS_BULLET_BULLETHEIGHTMAPSHAPE_HH_
+
 #include <string>
 
 #include "gazebo/physics/HeightmapShape.hh"
@@ -45,7 +46,7 @@ namespace gazebo
       /// \brief Load the heightmap
       public: virtual void Init();
 
-      private: btHeightfieldTerrainShape* heightFieldShape;
+      private: btHeightfieldTerrainShape *heightFieldShape;
     };
     /// \}
   }

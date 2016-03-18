@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _BULLET_INC_H_
-#define _BULLET_INC_H_
+#ifndef _GAZEBO_PHYSICS_BULLET_BULLET_INC_H_
+#define _GAZEBO_PHYSICS_BULLET_BULLET_INC_H_
 
 // This disables warning messages for ODE
 #pragma GCC system_header

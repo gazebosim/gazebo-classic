@@ -49,7 +49,7 @@ void ODEScrewJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d ODEScrewJoint::GetAnchor(unsigned int /*index*/) const
+ignition::math::Vector3d ODEScrewJoint::Anchor(unsigned int /*index*/) const
 {
   dVector3 result;
   // initialize to 0
@@ -116,7 +116,7 @@ void ODEScrewJoint::SetAxis(const unsigned int /*_index*/,
   if (this->odeJointDPtr->parentLink)
   {
     globalAxis =
-      this->GetParent()->GetModel()->WorldPose().Rot().RotateVector(_axis);
+      this->Parent()->Model()->WorldPose().Rot().RotateVector(_axis);
   }
 
   if (this->odeJointDPtr->jointId)
@@ -216,7 +216,7 @@ void ODEScrewJoint::SetThreadPitch(const double _threadPitch)
 }
 
 //////////////////////////////////////////////////
-double ODEScrewJoint::ThreadPitch(unsigned int /*_index*/)
+double ODEScrewJoint::ThreadPitch(const unsigned int /*_index*/) const
 {
   return this->ThreadPitch();
 }
@@ -292,7 +292,7 @@ double ODEScrewJoint::Param(const std::string &_key,
     const unsigned int _index) const
 {
   if (_key  == "thread_pitch")
-    return this->GearboxRatio();
+    return this->ThreadPitch();
   else
     return ODEJoint::Param(_key, _index);
 }

@@ -80,7 +80,7 @@ namespace gazebo
 
       /// \brief An intersection class keeping track of name and depth of
       ///        intersections.
-      private: class Intersection
+      private: class Intersect
                {
                  /// \brief Depth of the ray intersection.
                  public: double depth;

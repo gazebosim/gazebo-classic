@@ -19,6 +19,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 
+#include "gazebo/physics/simbody/SimbodyJointPrivate.hh"
 #include "gazebo/physics/simbody/SimbodyTypes.hh"
 #include "gazebo/physics/simbody/SimbodyLink.hh"
 #include "gazebo/physics/simbody/SimbodyPhysics.hh"
@@ -30,9 +31,9 @@ using namespace physics;
 //////////////////////////////////////////////////
 SimbodyHinge2Joint::SimbodyHinge2Joint(SimTK::MultibodySystem * /*_world*/,
                                        BasePtr _parent)
-    : Hinge2Joint<SimbodyJoint>(_parent)
+: Hinge2Joint<SimbodyJoint>(_parent)
 {
-  this->physicsInitialized = false;
+  this->simbodyJointDPtr->physicsInitialized = false;
 }
 
 //////////////////////////////////////////////////
@@ -47,35 +48,38 @@ void SimbodyHinge2Joint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyHinge2Joint::GetAnchor(unsigned int /*index*/) const
+ignition::math::Vector3d SimbodyHinge2Joint::Anchor(
+    const unsigned int /*index*/) const
 {
   return this->anchorPos;
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyHinge2Joint::GetAxis(unsigned int /*index*/) const
+ignition::math::Vector3d SimbodyHinge2Joint::Axis(
+    const unsigned int /*index*/) const
 {
   gzerr << "Not implemented";
-  return math::Vector3();
+  return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
-double SimbodyHinge2Joint::GetVelocity(unsigned int /*_index*/) const
+double SimbodyHinge2Joint::Velocity(
+    const unsigned int /*_index*/) const
 {
   gzerr << "Not implemented";
   return 0;
 }
 
 //////////////////////////////////////////////////
-void SimbodyHinge2Joint::SetVelocity(unsigned int /*_index*/,
+void SimbodyHinge2Joint::SetVelocity(const unsigned int /*_index*/,
     double /*_angle*/)
 {
   gzerr << "Not implemented";
 }
 
 //////////////////////////////////////////////////
-void SimbodyHinge2Joint::SetAxis(unsigned int /*_index*/,
-    const math::Vector3 &/*_axis*/)
+void SimbodyHinge2Joint::SetAxis(const unsigned int /*_index*/,
+    const ignition::math::Vector3d &/*_axis*/)
 {
   // Simbody seems to handle setAxis improperly. It readjust all the pivot
   // points
@@ -83,21 +87,23 @@ void SimbodyHinge2Joint::SetAxis(unsigned int /*_index*/,
 
 //////////////////////////////////////////////////
 void SimbodyHinge2Joint::SetForceImpl(
-    unsigned int /*_index*/, double /*_torque*/)
+    const unsigned int /*_index*/, const double /*_torque*/)
 {
   gzerr << "Not implemented";
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyHinge2Joint::GetGlobalAxis(unsigned int /*_index*/) const
+ignition::math::Vector3d SimbodyHinge2Joint::GlobalAxis(
+    const unsigned int /*_index*/) const
 {
   gzerr << "SimbodyHinge2Joint::GetGlobalAxis not implemented\n";
-  return math::Vector3();
+  return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyHinge2Joint::GetAngleImpl(unsigned int /*_index*/) const
+ignition::math::Angle SimbodyHinge2Joint::AngleImpl(
+    const unsigned int /*_index*/) const
 {
   gzerr << "SimbodyHinge2Joint::GetAngleImpl not implemented\n";
-  return math::Angle();
+  return ignition::math::Angle::Zero;
 }

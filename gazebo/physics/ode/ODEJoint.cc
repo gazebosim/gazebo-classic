@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include <boost/bind.hpp>
+#include <functional>
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Assert.hh"
@@ -394,19 +394,6 @@ ignition::math::Vector3d ODEJoint::LinkTorque(const unsigned int _index) const
                jointFeedback->t2[2]);
 
   return result;
-}
-
-//////////////////////////////////////////////////
-void ODEJoint::SetAxis(const unsigned int _index,
-    const ignition::math::Vector3d &_axis)
-{
-  // record axis in sdf element
-  if (_index == 0)
-    this->jointDPtr->sdf->GetElement("axis")->GetElement("xyz")->Set(_axis);
-  else if (_index == 1)
-    this->jointDPtr->sdf->GetElement("axis2")->GetElement("xyz")->Set(_axis);
-  else
-    gzerr << "SetAxis index [" << _index << "] out of bounds\n";
 }
 
 //////////////////////////////////////////////////
@@ -1018,8 +1005,8 @@ void ODEJoint::SetDamping(const unsigned int _index, const double _damping)
 {
   if (_index < this->AngleCount())
   {
-    this->SetStiffnessDamping(_index, this->jointDPtr->stiffnessCoefficient[_index],
-      _damping);
+    this->SetStiffnessDamping(_index,
+        this->jointDPtr->stiffnessCoefficient[_index], _damping);
   }
   else
   {
@@ -1086,7 +1073,7 @@ void ODEJoint::SetStiffnessDamping(const unsigned int _index,
       if (!parentStatic && !childStatic)
       {
         this->odeJointDPtr->applyDamping = physics::Joint::ConnectJointUpdate(
-          boost::bind(&ODEJoint::ApplyStiffnessDamping, this));
+          std::bind(&ODEJoint::ApplyStiffnessDamping, this));
         this->odeJointDPtr->stiffnessDampingInitialized = true;
       }
       else

@@ -181,7 +181,7 @@ namespace gazebo
       /// \param[in] _axis Vector in local joint frame of axis direction
       ///                  (must have length greater than zero).
       public: virtual void SetAxis(const unsigned int _index,
-                  const ignition::math::Vector3d &_axis) = 0;
+                  const ignition::math::Vector3d &_axis);
 
       /// \brief Set the joint damping.
       /// \param[in] _index Index of the axis to set, currently ignored, to be

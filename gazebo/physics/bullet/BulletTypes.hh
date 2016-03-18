@@ -14,10 +14,10 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_BULLETTYPES_HH_
-#define _GAZEBO_BULLETTYPES_HH_
+#ifndef _GAZEBO_PHYSICS_BULLET_BULLETTYPES_HH_
+#define _GAZEBO_PHYSICS_BULLET_BULLETTYPES_HH_
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <ignition/math/Vector3.hh>
 #include <ignition/math/Vector4.hh>
 #include <ignition/math/Pose3.hh>
@@ -44,12 +44,12 @@ namespace gazebo
     class BulletRayShape;
     class BulletSurfaceParams;
 
-    typedef boost::shared_ptr<BulletCollision> BulletCollisionPtr;
-    typedef boost::shared_ptr<BulletLink> BulletLinkPtr;
-    typedef boost::shared_ptr<BulletMotionState> BulletMotionStatePtr;
-    typedef boost::shared_ptr<BulletPhysics> BulletPhysicsPtr;
-    typedef boost::shared_ptr<BulletRayShape> BulletRayShapePtr;
-    typedef boost::shared_ptr<BulletSurfaceParams> BulletSurfaceParamsPtr;
+    typedef std::shared_ptr<BulletCollision> BulletCollisionPtr;
+    typedef std::shared_ptr<BulletLink> BulletLinkPtr;
+    typedef std::shared_ptr<BulletMotionState> BulletMotionStatePtr;
+    typedef std::shared_ptr<BulletPhysics> BulletPhysicsPtr;
+    typedef std::shared_ptr<BulletRayShape> BulletRayShapePtr;
+    typedef std::shared_ptr<BulletSurfaceParams> BulletSurfaceParamsPtr;
 
     /// \addtogroup gazebo_physics_bullet
     /// \{
@@ -188,4 +188,6 @@ namespace gazebo
     /// \}
   }
 }
-#endif  // #ifndef _BULLETTYPES_HH
+
+// #ifndef _BULLETTYPES_HH
+#endif

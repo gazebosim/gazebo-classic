@@ -17,7 +17,6 @@
 #ifndef _GAZEBO_PHYSICS_SIMBODY_CYLINDERSHAPE_HH_
 #define _GAZEBO_PHYSICS_SIMBODY_CYLINDERSHAPE_HH_
 
-#include "gazebo/physics/simbody/SimbodyPhysics.hh"
 #include "gazebo/physics/CylinderShape.hh"
 #include "gazebo/util/system.hh"
 
@@ -33,46 +32,13 @@ namespace gazebo
     class GZ_PHYSICS_VISIBLE SimbodyCylinderShape : public CylinderShape
     {
       /// \brief Constructor
-      public: SimbodyCylinderShape(CollisionPtr _parent)
-              : CylinderShape(_parent) {}
+      public: SimbodyCylinderShape(CollisionPtr _parent);
 
       /// \brief Destructor
-      public: virtual ~SimbodyCylinderShape() {}
+      public: virtual ~SimbodyCylinderShape();
 
       // Documentation inherited
-      public: void SetSize(double _radius, double _length)
-              {
-                if (_radius < 0)
-                {
-                  gzerr << "Cylinder shape does not support negative radius\n";
-                  return;
-                }
-                if (_length < 0)
-                {
-                  gzerr << "Cylinder shape does not support negative length\n";
-                  return;
-                }
-                if (ignition::math::equal(_radius, 0.0))
-                {
-                  // Warn user, but still create shape with very small value
-                  // otherwise later resize operations using setLocalScaling
-                  // will not be possible
-                  gzwarn << "Setting cylinder shape's radius to zero \n";
-                  _radius = 1e-4;
-                }
-                if (ignition::math::equal(_length, 0.0))
-                {
-                  gzwarn << "Setting cylinder shape's length to zero \n";
-                  _length = 1e-4;
-                }
-
-                CylinderShape::SetSize(_radius, _length);
-                SimbodyCollisionPtr bParent;
-                bParent = std::dynamic_pointer_cast<SimbodyCollision>(
-                    this->collisionParent);
-
-                // set collision shape
-              }
+      public: void SetSize(const double _radius, const double _length);
     };
     /// \}
   }

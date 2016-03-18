@@ -19,6 +19,7 @@
 
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/Link.hh"
+#include "gazebo/physics/ode/ODEJointPrivate.hh"
 #include "gazebo/physics/ode/ODESliderJoint.hh"
 
 using namespace gazebo;
@@ -85,7 +86,7 @@ double ODESliderJoint::Velocity(const unsigned int /*index*/) const
 
 //////////////////////////////////////////////////
 void ODESliderJoint::SetVelocity(const unsigned int _index,
-    cons double _angle)
+    const double _angle)
 {
   this->SetVelocityMaximal(_index, _angle);
 }
@@ -94,10 +95,10 @@ void ODESliderJoint::SetVelocity(const unsigned int _index,
 void ODESliderJoint::SetAxis(const unsigned int /*index*/,
     const ignition::math::Vector3d &_axis)
 {
-  if (tihs->odeJointDPtr->childLink)
-    tihs->odeJointDPtr->childLink->SetEnabled(true);
-  if (tihs->odeJointDPtr->parentLink)
-    tihs->odeJointDPtr->parentLink->SetEnabled(true);
+  if (this->odeJointDPtr->childLink)
+    this->odeJointDPtr->childLink->SetEnabled(true);
+  if (this->odeJointDPtr->parentLink)
+    this->odeJointDPtr->parentLink->SetEnabled(true);
 
   // ODE needs global axis
   ignition::math::Quaterniond axisFrame = this->AxisFrame(0);

@@ -47,12 +47,12 @@ ODERayShape::ODERayShape(PhysicsEnginePtr _physicsEngine, dSpaceID _spaceId)
   this->SetName("ODE Ray Shape");
 
   this->physicsEngine =
-    boost::static_pointer_cast<ODEPhysics>(_physicsEngine);
+    std::static_pointer_cast<ODEPhysics>(_physicsEngine);
 
   this->geomId = dCreateRay(_spaceId, 2.0);
   dGeomSetCategoryBits(this->geomId, GZ_SENSOR_COLLIDE);
   dGeomSetCollideBits(this->geomId, ~GZ_SENSOR_COLLIDE);
-  this->collisionParent.reset();
+  this->shapeDPtr->collisionParent.reset();
 }
 
 //////////////////////////////////////////////////
@@ -124,7 +124,7 @@ void ODERayShape::Intersection(double &_dist, std::string &_entity)
 {
   if (this->physicsEngine)
   {
-    ODERayShape::Intersection intersection;
+    ODERayShape::Intersect intersection;
     intersection.depth = 1000;
 
     {
@@ -149,24 +149,26 @@ void ODERayShape::SetPoints(const ignition::math::Vector3d &_posStart,
   ignition::math::Vector3d dir;
   RayShape::SetPoints(_posStart, _posEnd);
 
-  dir = this->globalEndPos - this->globalStartPos;
+  dir = this->rayShapeDPtr->globalEndPos - this->rayShapeDPtr->globalStartPos;
   dir.Normalize();
 
-  dGeomRaySet(this->geomId, this->globalStartPos.X(),
-              this->globalStartPos.Y(), this->globalStartPos.Z(),
-              dir.X(), dir.Y(), dir.Z());
+  dGeomRaySet(this->geomId,
+      this->rayShapeDPtr->globalStartPos.X(),
+      this->rayShapeDPtr->globalStartPos.Y(),
+      this->rayShapeDPtr->globalStartPos.Z(),
+      dir.X(), dir.Y(), dir.Z());
 
-  dGeomRaySetLength(this->geomId,
-                    this->globalStartPos.Distance(this->globalEndPos));
+  dGeomRaySetLength(this->geomId, this->rayShapeDPtr->globalStartPos.Distance(
+        this->rayShapeDPtr->globalEndPos));
 }
 
 //////////////////////////////////////////////////
 void ODERayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
 {
   dContactGeom contact;
-  ODERayShape::Intersection *inter = NULL;
+  ODERayShape::Intersect *inter = NULL;
 
-  inter = static_cast<Intersection*>(_data);
+  inter = static_cast<ODERayShape::Intersect*>(_data);
 
   // Check space
   if (dGeomIsSpace(_o1) || dGeomIsSpace(_o2))

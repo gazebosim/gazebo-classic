@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: Bullet motion state class.
- * Author: Nate Koenig
- * Date: 25 May 2009
- */
-
-#ifndef _BULLETMOTIONSTATE_HH_
-#define _BULLETMOTIONSTATE_HH_
+#ifndef _GAZEBO_PHYSICS_BULLET_BULLETMOTIONSTATE_HH_
+#define _GAZEBO_PHYSICS_BULLET_BULLETMOTIONSTATE_HH_
 
 #include "gazebo/physics/bullet/bullet_inc.h"
 #include "gazebo/physics/PhysicsTypes.hh"

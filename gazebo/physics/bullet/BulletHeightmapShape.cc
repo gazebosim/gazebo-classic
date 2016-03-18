@@ -18,6 +18,7 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Assert.hh"
 
+#include "gazebo/physics/HeightmapShapePrivate.hh"
 #include "gazebo/physics/bullet/bullet_inc.h"
 #include "gazebo/physics/bullet/BulletTypes.hh"
 #include "gazebo/physics/bullet/BulletLink.hh"
@@ -33,7 +34,7 @@ BulletHeightmapShape::BulletHeightmapShape(CollisionPtr _parent)
     : HeightmapShape(_parent)
 {
   // Bullet need the height values flipped in the y direction
-  this->flipY = true;
+  this->heightmapShapeDPtr->flipY = true;
 }
 
 //////////////////////////////////////////////////
@@ -46,20 +47,21 @@ void BulletHeightmapShape::Init()
 {
   HeightmapShape::Init();
 
-  float maxHeight = this->GetMaxHeight();
-  float minHeight = this->GetMinHeight();
+  float maxHeight = this->MaxHeight();
+  float minHeight = this->MinHeight();
 
   // This will force the Z-axis to be up
   int upIndex = 2;
-  btVector3 localScaling(this->scale.X(), this->scale.Y(), 1.0);
+  btVector3 localScaling(this->heightmapShapeDPtr->scale.X(),
+      this->heightmapShapeDPtr->scale.Y(), 1.0);
 
   this->heightFieldShape  = new btHeightfieldTerrainShape(
       // # of heights along width
-      this->vertSize,
+      this->heightmapShapeDPtr->vertSize,
       // # of height along height
-      this->vertSize,
+      this->heightmapShapeDPtr->vertSize,
       // The heights
-      &this->heights[0],
+      &this->heightmapShapeDPtr->heights[0],
       // Height scaling
       1,
       // Min height
@@ -79,7 +81,8 @@ void BulletHeightmapShape::Init()
 
   // Get a pointer to the parent collision
   BulletCollisionPtr bParent;
-  bParent = std::dynamic_pointer_cast<BulletCollision>(this->collisionParent);
+  bParent = std::dynamic_pointer_cast<BulletCollision>(
+      this->heightmapShapeDPtr->collisionParent);
 
   GZ_ASSERT(bParent != NULL, "Bullet collision parent of a heightmap is NULL");
 
@@ -89,11 +92,11 @@ void BulletHeightmapShape::Init()
   this->heightFieldShape->getAabb(btTransform::getIdentity(), min, max);
 
   BulletLinkPtr bLink = std::dynamic_pointer_cast<BulletLink>(
-      bParent->GetParent());
+      bParent->Parent());
 
   GZ_ASSERT(bLink != NULL, "Bullet heightmap does not have a link.");
 
-  BulletMotionStatePtr motionState = bLink->motionState;
+  BulletMotionStatePtr motionState = bLink->MotionState();
 
   GZ_ASSERT(motionState != NULL, "Invalid motion state for heightmap.");
 

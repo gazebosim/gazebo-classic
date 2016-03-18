@@ -179,10 +179,10 @@ void ODEMultiRayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
       if (n > 0 && self->defaultUpdate)
       {
         RayShape *shape = self->defaultUpdate ?
-          boost::static_pointer_cast<RayShape>(rayCollision->GetShape()).get() :
+          std::static_pointer_cast<RayShape>(rayCollision->Shape()).get() :
           static_cast<RayShape*>(dGeomGetData(rayId));
 
-        if (shape && hitCollision && contact.depth < shape->GetLength())
+        if (shape && hitCollision && contact.depth < shape->Length())
         {
           // gzerr << "ODEMultiRayShape UpdateCallback dSpaceCollide2 "
           //      << " depth[" << contact.depth << "]"
@@ -197,7 +197,7 @@ void ODEMultiRayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
           //      << "\n";
           shape->SetLength(contact.depth);
           shape->SetRetro(hitCollision->LaserRetro());
-          shape->SetCollisionName(hitCollision->GetScopedName());
+          shape->SetCollisionName(hitCollision->ScopedName());
         }
       }
     }
@@ -215,9 +215,10 @@ void ODEMultiRayShape::AddRay(const ignition::math::Vector3d &_start,
 
   // The collisionParent will exist in instances where the multiray is
   // attached to an object, such as in the case of laser range finders
-  if (this->collisionParent)
+  if (this->multiRayShapeDPtr->collisionParent)
   {
-    odeCollision.reset(new ODECollision(this->collisionParent->GetLink()));
+    odeCollision.reset(new ODECollision(
+          this->multiRayShapeDPtr->collisionParent->Link()));
     odeCollision->SetName("ode_ray_collision");
     odeCollision->SetSpaceId(this->raySpaceId);
     ray.reset(new ODERayShape(odeCollision));
@@ -228,8 +229,8 @@ void ODEMultiRayShape::AddRay(const ignition::math::Vector3d &_start,
   // See test/integration/multirayshape.cc for an example.
   else
   {
-    ray.reset(new ODERayShape(boost::dynamic_pointer_cast<ODEPhysics>(
-            this->GetWorld()->GetPhysicsEngine()), this->raySpaceId));
+    ray.reset(new ODERayShape(std::dynamic_pointer_cast<ODEPhysics>(
+            this->World()->GetPhysicsEngine()), this->raySpaceId));
     dGeomSetData(ray->ODEGeomId(), ray.get());
   }
 

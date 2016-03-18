@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _SIMBODY_LINK_HH_
-#define _SIMBODY_LINK_HH_
+#ifndef _GAZEBO_PHYSICS_SIMBODY_SIMBODYLINK_HH_
+#define _GAZEBO_PHYSICS_SIMBODY_SIMBODYLINK_HH_
 
 #include <vector>
 
@@ -30,6 +29,9 @@ namespace gazebo
 {
   namespace physics
   {
+    // Forward declare private data class
+    class SimbodyLinkPrivate;
+
     /// \ingroup gazebo_physics
     /// \addtogroup gazebo_physics_simbody Simbody Physics
     /// \brief simbody physics engine wrapper
@@ -57,86 +59,92 @@ namespace gazebo
       public: virtual void OnPoseChange();
 
       // Documentation inherited.
-      public: virtual void SetEnabled(bool enable) const;
+      public: virtual void SetEnabled(const bool enable) const;
 
       // Documentation inherited.
-      public: virtual bool GetEnabled() const;
+      public: virtual bool Enabled() const;
 
       // Documentation inherited.
-      public: virtual void SetLinearVel(const math::Vector3 &_vel);
+      public: virtual void SetLinearVel(const ignition::math::Vector3d &_vel);
 
       // Documentation inherited.
-      public: virtual void SetAngularVel(const math::Vector3 &_vel);
+      public: virtual void SetAngularVel(const ignition::math::Vector3d &_vel);
 
       // Documentation inherited.
-      public: virtual void SetForce(const math::Vector3 &_force);
+      public: virtual void SetForce(const ignition::math::Vector3d &_force);
 
       // Documentation inherited.
-      public: virtual void SetTorque(const math::Vector3 &_force);
+      public: virtual void SetTorque(const ignition::math::Vector3d &_force);
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetWorldLinearVel(
-        const math::Vector3& _vector3) const;
+      public: virtual ignition::math::Vector3d WorldLinearVel(
+        const ignition::math::Vector3 &_vector3) const;
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetWorldLinearVel(
-          const math::Vector3 &_offset,
-          const math::Quaternion &_q) const;
+      public: virtual ignition::math::Vector3d WorldLinearVel(
+          const ignition::math::Vector3d &_offset,
+          const ignition::math::Quaternion &_q) const;
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetWorldCoGLinearVel() const;
+      public: virtual ignition::math::Vector3d WorldCoGLinearVel() const;
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetWorldAngularVel() const;
+      public: virtual ignition::math::Vector3d WorldAngularVel() const;
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetWorldForce() const;
+      public: virtual ignition::math::Vector3d WorldForce() const;
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetWorldTorque() const;
+      public: virtual ignition::math::Vector3d WorldTorque() const;
 
       // Documentation inherited.
-      public: virtual void SetGravityMode(bool _mode);
+      public: virtual void SetGravityMode(const bool _mode);
 
       // Documentation inherited.
-      public: virtual bool GetGravityMode() const;
+      public: virtual bool GravityMode() const;
 
       // Documentation inherited.
-      public: virtual void SetSelfCollide(bool _collide);
+      public: virtual void SetSelfCollide(const bool _collide);
 
       // Documentation inherited.
-      public: virtual void SetLinearDamping(double _damping);
+      public: virtual void SetLinearDamping(const double _damping);
 
       // Documentation inherited.
-      public: virtual void SetAngularDamping(double _damping);
+      public: virtual void SetAngularDamping(const double _damping);
 
       // Documentation inherited.
-      public: virtual void AddForce(const math::Vector3 &_force);
+      public: virtual void AddForce(const ignition::math::Vector3d &_force);
 
       // Documentation inherited.
-      public: virtual void AddRelativeForce(const math::Vector3 &_force);
+      public: virtual void AddRelativeForce(
+                  const ignition::math::Vector3d &_force);
 
       // Documentation inherited.
-      public: virtual void AddForceAtWorldPosition(const math::Vector3 &_force,
-                                                   const math::Vector3 &_pos);
+      public: virtual void AddForceAtWorldPosition(
+                  const ignition::math::Vector3d &_force,
+                  const ignition::math::Vector3d &_pos);
 
       // Documentation inherited.
       public: virtual void AddForceAtRelativePosition(
-                  const math::Vector3 &_force,
-                  const math::Vector3 &_relpos);
+                  const ignition::math::Vector3d &_force,
+                  const ignition::math::Vector3d &_relpos);
 
       // Documentation inherited
-      public: virtual void AddLinkForce(const math::Vector3 &_force,
-          const math::Vector3 &_offset = math::Vector3::Zero);
+      public: virtual void AddLinkForce(
+                  const ignition::math::Vector3d &_force,
+                  const ignition::math::Vector3d &_offset =
+                  ignition::math::Vector3::Zero);
 
       // Documentation inherited.
-      public: virtual void AddTorque(const math::Vector3 &_torque);
+      public: virtual void AddTorque(
+                  const ignition::math::Vector3d &_torque);
 
       // Documentation inherited.
-      public: virtual void AddRelativeTorque(const math::Vector3 &_torque);
+      public: virtual void AddRelativeTorque(
+                  const ignition::math::Vector3d &_torque);
 
       // Documentation inherited.
-      public: virtual void SetAutoDisable(bool _disable);
+      public: virtual void SetAutoDisable(const bool _disable);
 
       // Documentation inherited.
       public: virtual void SaveSimbodyState(const SimTK::State &_state);
@@ -149,17 +157,17 @@ namespace gazebo
       /// add a weld constraint to simulate freeze to ground effect.
       /// \param[in] _static if true, freeze link to ground.  Otherwise
       /// unfreeze link.
-      public: virtual void SetLinkStatic(bool _static);
+      public: virtual void SetLinkStatic(const bool _static);
 
       /// \brief Convert Gazebo Inertia to Simbody MassProperties
       /// Where Simbody MassProperties contains mass,
       /// center of mass location, and unit inertia about body origin.
-      public: SimTK::MassProperties GetMassProperties() const;
+      public: SimTK::MassProperties MassProperties() const;
 
-      public: SimTK::MassProperties GetEffectiveMassProps(
-        int _numFragments) const;
+      public: SimTK::MassProperties EffectiveMassProps(
+                  const int _numFragments) const;
 
-      public: void SetDirtyPose(const math::Pose &_pose);
+      public: void SetDirtyPose(const ignition::math::Pose3d &_pose);
 
       // Documentation inherited.
       public: virtual void UpdateMass();
@@ -172,50 +180,9 @@ namespace gazebo
       /// based on staticLink if staticLinkDirty is true.
       private: void ProcessSetLinkStatic();
 
-      /// \brief: Force this link to be a base body, where its inboard
-      /// body is the world with 6DOF.
-      public: bool mustBeBaseLink;
-
-      // Below to be filled in after everything is loaded
-      // Which MobilizedBody corresponds to the master instance of this link.
-      public: SimTK::MobilizedBody masterMobod;
-
-      // Keeps track if physics has been initialized
-      public: bool physicsInitialized;
-
-      // If this link got split into a master and slaves, these are the
-      // MobilizedBodies used to mobilize the slaves.
-      public: std::vector<SimTK::MobilizedBody> slaveMobods;
-
-      // And these are the Weld constraints used to attach slaves to master.
-      public: std::vector<SimTK::Constraint::Weld> slaveWelds;
-
-      /// \brief store gravity mode given link might not be around
-      private: bool gravityMode;
-
-      /// \brief Trigger setting of link according to staticLink.
-      private: bool staticLinkDirty;
-
-      /// \brief Trigger setting of link gravity mode
-      private: bool gravityModeDirty;
-
-      /// \brief If true, freeze link to world (inertial) frame.
-      private: bool staticLink;
-
-      /// \brief Event connection for SetLinkStatic
-      private: event::ConnectionPtr staticLinkConnection;
-
-      /// \brief Event connection for SetGravityMode
-      private: event::ConnectionPtr gravityModeConnection;
-
-      /// \brief save simbody free state for reconstructing simbody model graph
-      private: std::vector<double> simbodyQ;
-
-      /// \brief save simbody free state for reconstructing simbody model graph
-      private: std::vector<double> simbodyU;
-
-      /// \brief keep a pointer to the simbody physics engine for convenience
-      private: SimbodyPhysicsPtr simbodyPhysics;
+      /// \internal
+      /// \brief Private data pointer
+      private: SimbodyLinkPrivate *simbodyLinkDPtr;
     };
     /// \}
   }

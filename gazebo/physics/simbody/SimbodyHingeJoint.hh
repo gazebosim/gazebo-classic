@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _SIMBODY_HINGEJOINT_HH_
-#define _SIMBODY_HINGEJOINT_HH_
+#ifndef _GAZEBO_PHYSICS_SIMBODY_SIMBODYHINGEJOINT_HH_
+#define _GAZEBO_PHYSICS_SIMBODY_SIMBODYHINGEJOINT_HH_
 
 #include <vector>
 
@@ -48,16 +48,19 @@ namespace gazebo
       protected: virtual void Load(sdf::ElementPtr _sdf);
 
       // Documentation inherited.
-      public: void SetAxis(unsigned int _index, const math::Vector3 &_axis);
+      public: void SetAxis(const unsigned int _index,
+                  const ignition::math::Vector3d &_axis);
 
       // Documentation inherited.
-      public: virtual void SetVelocity(unsigned int _index, double _rate);
+      public: virtual void SetVelocity(
+                  const unsigned int _index, const double _rate);
 
       // Documentation inherited.
-      public: virtual double GetVelocity(unsigned int _index) const;
+      public: virtual double Velocity(const unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetGlobalAxis(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d GlobalAxis(
+                  const unsigned int _index) const;
 
       /// \brief save simbody state for spawning
       public: virtual void SaveSimbodyState(const SimTK::State &_state);
@@ -66,10 +69,12 @@ namespace gazebo
       public: virtual void RestoreSimbodyState(SimTK::State &_state);
 
       // Documentation inherited.
-      protected: virtual math::Angle GetAngleImpl(unsigned int _index) const;
+      protected: virtual ignition::math::Angle AngleImpl(
+                     const unsigned int _index) const;
 
       // Documentation inherited.
-      protected: virtual void SetForceImpl(unsigned int _index, double _torque);
+      protected: virtual void SetForceImpl(
+                     const unsigned int _index, const double _torque);
 
       /// \brief save simbody state for reconstructing simbody model graph
       private: std::vector<double> simbodyQ;

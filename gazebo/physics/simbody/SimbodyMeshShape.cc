@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-
 #include "gazebo/common/Mesh.hh"
+#include "gazebo/common/MeshShapePrivate.hh"
 
 #include "gazebo/physics/simbody/SimbodyTypes.hh"
 #include "gazebo/physics/simbody/SimbodyMesh.hh"
@@ -28,7 +28,7 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 SimbodyMeshShape::SimbodyMeshShape(CollisionPtr _parent)
-  : MeshShape(_parent)
+: MeshShape(_parent)
 {
   this->simbodyMesh = new SimbodyMesh();
 }
@@ -50,16 +50,18 @@ void SimbodyMeshShape::Init()
 {
   MeshShape::Init();
 
-  if (this->submesh)
+  if (this->meshShapeDPtr->submesh)
   {
-    this->simbodyMesh->Init(this->submesh,
-        std::static_pointer_cast<SimbodyCollision>(this->collisionParent),
-        this->sdf->Get<ignition::math::Vector3d>("scale"));
+    this->simbodyMesh->Init(this->meshShapeDPtr->submesh,
+        std::static_pointer_cast<SimbodyCollision>(
+          this->meshShapeDPtr->collisionParent),
+        this->meshShapeDPtr->sdf->Get<ignition::math::Vector3d>("scale"));
   }
   else
   {
-    this->simbodyMesh->Init(this->mesh,
-        std::static_pointer_cast<SimbodyCollision>(this->collisionParent),
-        this->sdf->Get<ignition::math::Vector3d>("scale"));
+    this->simbodyMesh->Init(this->meshShapeDPtr->mesh,
+        std::static_pointer_cast<SimbodyCollision>(
+          this->meshShapeDPtr->collisionParent),
+        this->meshShapeDPtr->sdf->Get<ignition::math::Vector3d>("scale"));
   }
 }

@@ -17,6 +17,7 @@
 #ifndef _GAZEBO_PHYSICS_ENTITY_PRIVATE_HH_
 #define _GAZEBO_PHYSICS_ENTITY_PRIVATE_HH_
 
+#include <functional>
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Vector3.hh>
 
@@ -82,7 +83,7 @@ namespace gazebo
       public: transport::SubscriberPtr poseSub;
 
       /// \brief Callback for when an animation completes.
-      public: boost::function<void()> onAnimationComplete;
+      public: std::function<void()> onAnimationComplete;
 
       /// \brief The function used to to set the world pose.
       public: void (Entity::*setWorldPoseFunc)(

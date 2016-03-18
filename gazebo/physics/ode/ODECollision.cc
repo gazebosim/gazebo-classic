@@ -236,14 +236,15 @@ ODESurfaceParamsPtr ODECollision::GetODESurface() const
 /////////////////////////////////////////////////
 ODESurfaceParamsPtr ODECollision::ODESurface() const
 {
-  return std::dynamic_pointer_cast<ODESurfaceParams>(this->odeCollisionDPtr->surface);
+  return std::dynamic_pointer_cast<ODESurfaceParams>(
+      this->odeCollisionDPtr->surface);
 }
 
 /////////////////////////////////////////////////
 void ODECollision::OnPoseChangeGlobal()
 {
   // A collision is not guaranteed to have a link (such as a standalone ray)
-  if (!this->link)
+  if (!this->odeCollisionDPtr->link)
     return;
 
   dQuaternion q;
@@ -270,7 +271,7 @@ void ODECollision::OnPoseChangeGlobal()
 void ODECollision::OnPoseChangeRelative()
 {
   // A collision is not guaranteed to have a link (such as a standalone ray)
-  if (!this->link)
+  if (!this->odeCollisionDPtr->link)
     return;
 
   dQuaternion q;

@@ -665,6 +665,10 @@ namespace gazebo
       /// \deprecated See Kinematic() const
       public: virtual bool GetKinematic() const GAZEBO_DEPRECATED(7.0);
 
+      /// \brief Get whether this body is in the kinematic state.
+      /// \return True if the link is kinematic only.
+      public: virtual bool Kinematic() const;
+
       /// \brief Get sensor count
       ///
       /// This will return the number of sensors created by the link when it

@@ -927,10 +927,11 @@ void ODEPhysics::SetStepType(const std::string &_type)
 }
 
 //////////////////////////////////////////////////
-void ODEPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
+void ODEPhysics::SetGravity(const ignition::math::Vector3d &_gravity)
 {
-  this->world->SetGravitySDF(_gravity.Ign());
-  dWorldSetGravity(this->dataPtr->worldId, _gravity.x, _gravity.y, _gravity.z);
+  this->world->SetGravitySDF(_gravity);
+  dWorldSetGravity(this->dataPtr->worldId,
+      _gravity.X(), _gravity.Y(), _gravity.Z());
 }
 
 //////////////////////////////////////////////////
@@ -1615,3 +1616,10 @@ bool ODEPhysics::GetParam(const std::string &_key, boost::any &_value) const
   }
   return true;
 }
+
+/////////////////////////////////////////////////
+std::string ODEPhysics::Type() const
+{
+  return "ode";
+}
+

@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/simbody/SimbodyLink.hh"
 #include "gazebo/physics/simbody/SimbodyPhysics.hh"
@@ -27,11 +26,11 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 SimbodyRayShape::SimbodyRayShape(PhysicsEnginePtr _physicsEngine)
-  : RayShape(_physicsEngine)
+: RayShape(_physicsEngine)
 {
   this->SetName("Simbody Ray Shape");
 
-  this->physicsEngine =
+  this-physicsEngine =
     std::static_pointer_cast<SimbodyPhysics>(_physicsEngine);
 }
 
@@ -41,7 +40,7 @@ SimbodyRayShape::SimbodyRayShape(CollisionPtr _parent)
 {
   this->SetName("Simbody Ray Shape");
   this->physicsEngine = std::static_pointer_cast<SimbodyPhysics>(
-      this->collisionParent->GetWorld()->GetPhysicsEngine());
+      this->shapeDPtr->collisionParent->World()->GetPhysicsEngine());
 }
 
 //////////////////////////////////////////////////
@@ -55,27 +54,16 @@ void SimbodyRayShape::Update()
 }
 
 //////////////////////////////////////////////////
-void SimbodyRayShape::GetIntersection(double &_dist, std::string &_entity)
+void SimbodyRayShape::Intersection(double &_dist, std::string &_entity)
 {
   _dist = 0;
   _entity = "";
-
-  if (this->physicsEngine)
-  {
-  }
-}
-
-//////////////////////////////////////////////////
-void SimbodyRayShape::SetPoints(const math::Vector3 &_posStart,
-                                const math::Vector3 &_posEnd)
-{
-  this->SetPoints(_posStart.Ign(), _posEnd.Ign());
 }
 
 //////////////////////////////////////////////////
 void SimbodyRayShape::SetPoints(const ignition::math::Vector3d &_posStart,
                                 const ignition::math::Vector3d &_posEnd)
 {
-  this->globalStartPos = _posStart;
-  this->globalEndPos = _posEnd;
+  this->rayShapeDPtr->globalStartPos = _posStart;
+  this->rayShapeDPtr->globalEndPos = _posEnd;
 }

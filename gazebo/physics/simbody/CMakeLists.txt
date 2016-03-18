@@ -2,7 +2,9 @@ include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
 set (sources ${sources}
   simbody/SimbodyBallJoint.cc
+  simbody/SimbodyBoxShape.cc
   simbody/SimbodyCollision.cc
+  simbody/SimbodyCylinderShape.cc
   simbody/SimbodyFixedJoint.cc
   simbody/SimbodyHeightmapShape.cc
   simbody/SimbodyHinge2Joint.cc
@@ -19,6 +21,7 @@ set (sources ${sources}
   simbody/SimbodyRayShape.cc
   simbody/SimbodyScrewJoint.cc
   simbody/SimbodySliderJoint.cc
+  simbody/SimbodySphereShape.cc
   simbody/SimbodyUniversalJoint.cc
   PARENT_SCOPE
 )

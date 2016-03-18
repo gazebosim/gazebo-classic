@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _SIMBODYBALLJOINT_HH_
-#define _SIMBODYBALLJOINT_HH_
+#ifndef _GAZEBO_PHYSICS_SIMBODY_SIMBODYBALLJOINT_HH_
+#define _GAZEBO_PHYSICS_SIMBODY_SIMBODYBALLJOINT_HH_
 
 #include "gazebo/physics/BallJoint.hh"
 #include "gazebo/physics/simbody/SimbodyJoint.hh"
@@ -44,44 +43,50 @@ namespace gazebo
       public: virtual void Load(sdf::ElementPtr _sdf);
 
       // Documentation inherited.
-      public: math::Vector3 GetAnchor(unsigned int _index) const;
+      public: ignition::math::Vector3d Anchor(const unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetAxis(unsigned int /*_index*/) const
-              {return math::Vector3();}
+      public: virtual ignition::math::Vector3d Axis(
+                  const unsigned int /*_index*/) const;
 
       // Documentation inherited.
-      public: virtual void SetVelocity(unsigned int _index, double _angle);
+      public: virtual void SetVelocity(const unsigned int _index,
+                  const double _angle);
 
       // Documentation inherited.
-      public: virtual double GetVelocity(unsigned int _index) const;
+      public: virtual double Velocity(const unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual math::Angle GetAngleImpl(unsigned int _index) const;
+      public: virtual ignition::math::Angle AngleImpl(
+                  const unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetGlobalAxis(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d GlobalAxis(
+                  const unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual void SetAxis(unsigned int _index,
-                                   const math::Vector3 &_axis);
+      public: virtual void SetAxis(const unsigned int _index,
+                                   const ignition::math::Vector3d &_axis);
 
       // Documentation inherited.
-      public: virtual math::Angle GetHighStop(unsigned int _index);
+      public: virtual ignition::math::Angle HighStop(
+                  const unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual math::Angle GetLowStop(unsigned int _index);
+      public: virtual ignition::math::Angle LowStop(
+                  const unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual bool SetHighStop(unsigned int _index,
-                                       const math::Angle &_angle);
+      public: virtual bool SetHighStop(const unsigned int _index,
+                                       const ignition::math::Angle &_angle);
 
       // Documentation inherited.
-      public: virtual bool SetLowStop(unsigned int _index,
+      public: virtual bool SetLowStop(const unsigned int _index,
                                       const math::Angle &_angle);
 
       // Documentation inherited.
-      protected: virtual void SetForceImpl(unsigned int _index, double _torque);
+      protected: virtual void SetForceImpl(
+                     const unsigned int _index, const double _torque);
     };
     /// \}
   }

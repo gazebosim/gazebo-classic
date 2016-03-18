@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
@@ -30,9 +29,9 @@ using namespace physics;
 //////////////////////////////////////////////////
 SimbodyFixedJoint::SimbodyFixedJoint(SimTK::MultibodySystem */*_world*/,
                                      BasePtr _parent)
-    : FixedJoint<SimbodyJoint>(_parent)
+: FixedJoint<SimbodyJoint>(_parent)
 {
-  this->physicsInitialized = false;
+  this->simbodyJointDPtr->physicsInitialized = false;
 }
 
 //////////////////////////////////////////////////
@@ -47,14 +46,15 @@ void SimbodyFixedJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void SimbodyFixedJoint::SetVelocity(unsigned int /*_index*/, double /*_angle*/)
+void SimbodyFixedJoint::SetVelocity(const unsigned int /*_index*/,
+   const double /*_angle*/)
 {
   gzwarn << "SimbodyFixedJoint: called method "
          << "SetVelocity that is not valid for joints of type fixed.\n";
 }
 
 //////////////////////////////////////////////////
-double SimbodyFixedJoint::GetVelocity(unsigned int /*index*/) const
+double SimbodyFixedJoint::Velocity(const unsigned int /*index*/) const
 {
   gzwarn << "SimbodyFixedJoint: called method "
          << "GetVelocity that is not valid for joints of type fixed.\n";
@@ -62,25 +62,27 @@ double SimbodyFixedJoint::GetVelocity(unsigned int /*index*/) const
 }
 
 //////////////////////////////////////////////////
-void SimbodyFixedJoint::SetForceImpl(unsigned int /*_index*/,
-                                     double /*_torque*/)
+void SimbodyFixedJoint::SetForceImpl(const unsigned int /*_index*/,
+                                     const double /*_torque*/)
 {
   gzwarn << "SimbodyFixedJoint: called method "
          << "SetForceImpl that is not valid for joints of type fixed.\n";
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyFixedJoint::GetGlobalAxis(unsigned int /*index*/) const
+ignition::math::Vector3d SimbodyFixedJoint::GlobalAxis(
+    const unsigned int /*index*/) const
 {
   gzwarn << "SimbodyFixedJoint: called method "
          << "GetGlobalAxis that is not valid for joints of type fixed.\n";
-  return math::Vector3();
+  return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyFixedJoint::GetAngleImpl(unsigned int /*_index*/) const
+ignition::math::Angle SimbodyFixedJoint::AngleImpl(
+    const unsigned int /*_index*/) const
 {
   gzwarn << "SimbodyFixedJoint: called method "
          << "GetAngleImpl that is not valid for joints of type fixed.\n";
-  return math::Angle();
+  return ignition::math::Angle::Zero;
 }

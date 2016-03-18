@@ -14,13 +14,9 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PHYSICS_BULLETPLANESHAPE_HH_
-#define _GAZEBO_PHYSICS_BULLETPLANESHAPE_HH_
+#ifndef _GAZEBO_PHYSICS_BULLET_BULLETPLANESHAPE_HH_
+#define _GAZEBO_PHYSICS_BULLET_BULLETPLANESHAPE_HH_
 
-#include <iostream>
-
-#include "gazebo/physics/bullet/BulletPhysics.hh"
-#include "gazebo/physics/bullet/BulletCollision.hh"
 #include "gazebo/physics/PlaneShape.hh"
 #include "gazebo/util/system.hh"
 
@@ -36,25 +32,13 @@ namespace gazebo
     class GZ_PHYSICS_VISIBLE BulletPlaneShape : public PlaneShape
     {
       /// \brief Constructor
-      public: BulletPlaneShape(CollisionPtr _parent) : PlaneShape(_parent) {}
+      public: BulletPlaneShape(CollisionPtr _parent);
 
       /// \brief Destructor
-      public: virtual ~BulletPlaneShape() {}
+      public: virtual ~BulletPlaneShape();
 
       /// \brief Create the plane
-      public: void CreatePlane()
-              {
-                PlaneShape::CreatePlane();
-                BulletCollisionPtr bParent;
-                bParent = std::dynamic_pointer_cast<BulletCollision>(
-                    this->collisionParent);
-
-                ignition::math::Vector3d n = this->Normal();
-                btVector3 vec(n.X(), n.Y(), n.Z());
-
-                bParent->SetCollisionShape(new btStaticPlaneShape(vec, 0.0),
-                    false);
-              }
+      public: void CreatePlane();
     };
     /// \}
   }

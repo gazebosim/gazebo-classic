@@ -14,17 +14,10 @@
  * limitations under the License.
  *
 */
-/* Desc: The Bullet physics engine wrapper
- * Author: Nate Koenig
- * Date: 11 June 2009
- */
+#ifndef _GAZEBO_PHYSICS_BULLET_BULLETPHYSICS_HH_
+#define _GAZEBO_PHYSICS_BULLET_BULLETPHYSICS_HH_
 
-#ifndef BULLETPHYSICS_HH
-#define BULLETPHYSICS_HH
 #include <string>
-
-#include <boost/thread/thread.hpp>
-#include <boost/thread/mutex.hpp>
 
 #include "gazebo/physics/bullet/bullet_inc.h"
 #include "gazebo/physics/PhysicsEngine.hh"
@@ -104,8 +97,7 @@ namespace gazebo
       public: virtual void Fini();
 
       // Documentation inherited
-      public: virtual std::string GetType() const
-                      { return "bullet"; }
+      public: virtual std::string Type() const;
 
       // Documentation inherited
       public: virtual LinkPtr CreateLink(ModelPtr _parent);
@@ -122,9 +114,6 @@ namespace gazebo
       public: virtual ShapePtr CreateShape(const std::string &_shapeType,
                                            CollisionPtr _collision);
 
-      /// \brief Create a physics based ray sensor
-      // public: virtual PhysicsRaySensor *CreateRaySensor(Link *body);
-
       // Documentation inherited
       protected: virtual void OnRequest(ConstRequestPtr &_msg);
 
@@ -140,20 +129,19 @@ namespace gazebo
                                        InertialPtr _inertial);
 
       // Documentation inherited
-      public: virtual void SetGravity(const gazebo::math::Vector3 &_gravity);
+      public: virtual void SetGravity(const ignition::math::Vector3d &_gravity);
 
       // Documentation inherited
-      public: virtual void SetWorldCFM(double _cfm);
+      public: virtual void SetWorldCFM(const double _cfm);
 
       // Documentation inherited
-      public: virtual double GetWorldCFM();
+      public: virtual double WorldCFM() const;
 
       // Documentation inherited
-      public: virtual void SetSeed(uint32_t _seed);
+      public: virtual void SetSeed(const uint32_t _seed);
 
       /// \brief Register a joint with the dynamics world
-      public: btDynamicsWorld *GetDynamicsWorld() const
-              {return this->dynamicsWorld;}
+      public: btDynamicsWorld *DynamicsWorld() const;
 
       public: virtual void DebugPrint() const;
 
@@ -162,14 +150,14 @@ namespace gazebo
                   const boost::any &_value);
 
       /// Documentation inherited
-      public: virtual boost::any GetParam(const std::string &_key) const;
+      public: virtual boost::any Param(const std::string &_key) const;
 
       /// Documentation inherited
-      public: virtual bool GetParam(const std::string &_key,
+      public: virtual bool Param(const std::string &_key,
           boost::any &_value) const;
 
       // Documentation inherited
-      public: virtual void SetSORPGSIters(unsigned int iters);
+      public: virtual void SetSORPGSIters(const unsigned int iters);
 
       private: btBroadphaseInterface *broadPhase;
       private: btDefaultCollisionConfiguration *collisionConfig;
@@ -182,7 +170,6 @@ namespace gazebo
       /// \brief The type of the solver.
       private: std::string solverType;
     };
-
   /// \}
   }
 }

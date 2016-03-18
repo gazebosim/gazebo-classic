@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-
 #include "gazebo/physics/simbody/simbody_inc.h"
 #include "gazebo/physics/simbody/SimbodyCollision.hh"
 #include "gazebo/physics/SurfaceParams.hh"
@@ -24,11 +23,11 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 SimbodyCollision::SimbodyCollision(LinkPtr _parent)
-    : Collision(_parent)
+: Collision(_parent)
 {
   this->SetName("Simbody_Collision");
   this->collisionShape = NULL;
-  this->surface.reset(new SurfaceParams());
+  this->collisionDPtr->surface.reset(new SurfaceParams());
 }
 
 //////////////////////////////////////////////////
@@ -63,9 +62,9 @@ void SimbodyCollision::SetCollideBits(unsigned int /*_bits*/)
 }
 
 //////////////////////////////////////////////////
-math::Box SimbodyCollision::GetBoundingBox() const
+ignition::math::Box SimbodyCollision::BoundingBox() const
 {
-  math::Box result;
+  ignition::math::Box result;
   return result;
 }
 

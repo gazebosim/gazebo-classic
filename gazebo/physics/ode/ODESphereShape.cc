@@ -14,11 +14,12 @@
  * limitations under the License.
  *
 */
-#include "gazebo/physics/ode/ODEPhysics.hh"
-#include "gazebo/physics/ode/ODECollision.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/ShapePrivate.hh"
 #include "gazebo/physics/SphereShape.hh"
+#include "gazebo/physics/ode/ODEPhysics.hh"
+#include "gazebo/physics/ode/ODECollision.hh"
+#include "gazebo/physics/ode/ODESphereShape.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -35,11 +36,11 @@ void ODESphereShape::SetRadius(const double _radius)
   SphereShape::SetRadius(_radius);
   ODECollisionPtr oParent;
   oParent =
-    std::dynamic_pointer_cast<ODECollision>(this->collisionParent);
+    std::dynamic_pointer_cast<ODECollision>(this->shapeDPtr->collisionParent);
 
   // Create the sphere geometry
-  if (oParent->GetCollisionId() == NULL)
+  if (oParent->CollisionId() == NULL)
     oParent->SetCollision(dCreateSphere(0, _radius), true);
   else
-    dGeomSphereSetRadius(oParent->GetCollisionId(), _radius);
+    dGeomSphereSetRadius(oParent->CollisionId(), _radius);
 }

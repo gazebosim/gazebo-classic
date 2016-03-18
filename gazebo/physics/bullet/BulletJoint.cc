@@ -14,21 +14,18 @@
  * limitations under the License.
  *
 */
-/* Desc: The base Bullet joint class
- * Author: Nate Koenig, Andrew Howard
- * Date: 15 May 2009
- */
-
-#include <boost/bind.hpp>
+#include <functional>
 #include <string>
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
 
+#include "gazebo/physics/Inertial.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/bullet/bullet_inc.h"
 #include "gazebo/physics/bullet/BulletLink.hh"
+#include "gazebo/physics/bullet/BulletJointPrivate.hh"
 #include "gazebo/physics/bullet/BulletJoint.hh"
 
 using namespace gazebo;
@@ -36,24 +33,27 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 BulletJoint::BulletJoint(BasePtr _parent)
-  : Joint(_parent)
+: Joint(*new BulletJointPrivate, _parent),
+  bulletJointDPtr(static_cast<BulletJointPrivate*>(this->jointDPtr))
 {
-  this->constraint = NULL;
-  this->bulletWorld = NULL;
-  this->feedback = NULL;
-  this->stiffnessDampingInitialized = false;
-  this->forceApplied[0] = 0;
-  this->forceApplied[1] = 0;
+  this->bulletJointDPtr->constraint = NULL;
+  this->bulletJointDPtr->bulletWorld = NULL;
+  this->bulletJointDPtr->feedback = NULL;
+  this->bulletJointDPtr->stiffnessDampingInitialized = false;
+  this->bulletJointDPtr->forceApplied[0] = 0;
+  this->bulletJointDPtr->forceApplied[1] = 0;
 }
 
 //////////////////////////////////////////////////
 BulletJoint::~BulletJoint()
 {
-  delete this->constraint;
-  this->constraint = NULL;
-  delete this->feedback;
-  this->feedback = NULL;
-  this->bulletWorld = NULL;
+  delete this->bulletJointDPtr->constraint;
+  this->bulletJointDPtr->constraint = NULL;
+  delete this->bulletJointDPtr->feedback;
+  this->bulletJointDPtr->feedback = NULL;
+  this->bulletJointDPtr->bulletWorld = NULL;
+
+  delete this->bulletJointDPtr;
 }
 
 //////////////////////////////////////////////////
@@ -61,9 +61,9 @@ void BulletJoint::Load(sdf::ElementPtr _sdf)
 {
   Joint::Load(_sdf);
 
-  if (this->sdf->HasElement("axis"))
+  if (this->bulletJointDPtr->sdf->HasElement("axis"))
   {
-    sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
+    sdf::ElementPtr axisElem = this->bulletJointDPtr->sdf->GetElement("axis");
     if (axisElem->HasElement("dynamics"))
     {
       sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
@@ -76,9 +76,9 @@ void BulletJoint::Load(sdf::ElementPtr _sdf)
     }
   }
 
-  if (this->sdf->HasElement("axis2"))
+  if (this->bulletJointDPtr->sdf->HasElement("axis2"))
   {
-    sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
+    sdf::ElementPtr axisElem = this->bulletJointDPtr->sdf->GetElement("axis");
     if (axisElem->HasElement("dynamics"))
     {
       sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
@@ -107,25 +107,34 @@ void BulletJoint::Reset()
 //////////////////////////////////////////////////
 LinkPtr BulletJoint::GetJointLink(unsigned int _index) const
 {
+  return this->JointLink(_index);
+}
+
+//////////////////////////////////////////////////
+LinkPtr BulletJoint::JointLink(const unsigned int _index) const
+{
   LinkPtr result;
 
-  if (this->constraint == NULL)
-    gzthrow("Attach bodies to the joint first");
+  if (this->bulletJointDPtr->constraint == NULL)
+  {
+    gzerr << "Attach bodies to the joint first";
+    return result;
+  }
 
   if (_index == 0 || _index == 1)
   {
     BulletLinkPtr bulletLink1 =
-      std::static_pointer_cast<BulletLink>(this->childLink);
+      std::static_pointer_cast<BulletLink>(this->bulletJointDPtr->childLink);
 
     BulletLinkPtr bulletLink2 =
-      std::static_pointer_cast<BulletLink>(this->parentLink);
+      std::static_pointer_cast<BulletLink>(this->bulletJointDPtr->parentLink);
 
-    btRigidBody rigidLink = this->constraint->getRigidBodyA();
+    btRigidBody rigidLink = this->bulletJointDPtr->constraint->getRigidBodyA();
 
     if (bulletLink1 && rigidLink.getUserPointer() == bulletLink1.get())
-      result = this->childLink;
+      result = this->bulletJointDPtr->childLink;
     else if (bulletLink2)
-      result = this->parentLink;
+      result = this->bulletJointDPtr->parentLink;
   }
 
   return result;
@@ -134,25 +143,29 @@ LinkPtr BulletJoint::GetJointLink(unsigned int _index) const
 //////////////////////////////////////////////////
 bool BulletJoint::AreConnected(LinkPtr _one, LinkPtr _two) const
 {
-  return this->constraint && ((this->childLink.get() == _one.get() &&
-                               this->parentLink.get() == _two.get()) ||
-                              (this->childLink.get() == _two.get() &&
-                               this->parentLink.get() == _one.get()));
+  return this->bulletJointDPtr->constraint &&
+    ((this->bulletJointDPtr->childLink.get() == _one.get() &&
+      this->bulletJointDPtr->parentLink.get() == _two.get()) ||
+     (this->bulletJointDPtr->childLink.get() == _two.get() &&
+      this->bulletJointDPtr->parentLink.get() == _one.get()));
 }
 
 //////////////////////////////////////////////////
 void BulletJoint::Detach()
 {
-  this->childLink.reset();
-  this->parentLink.reset();
-  if (this->constraint && this->bulletWorld)
-    this->bulletWorld->removeConstraint(this->constraint);
-  delete this->constraint;
-  this->constraint = NULL;
+  this->bulletJointDPtr->childLink.reset();
+  this->bulletJointDPtr->parentLink.reset();
+  if (this->bulletJointDPtr->constraint && this->bulletJointDPtr->bulletWorld)
+  {
+    this->bulletJointDPtr->bulletWorld->removeConstraint(
+        this->bulletJointDPtr->constraint);
+  }
+  delete this->bulletJointDPtr->constraint;
+  this->bulletJointDPtr->constraint = NULL;
 }
 
 //////////////////////////////////////////////////
-void BulletJoint::SetProvideFeedback(bool _enable)
+void BulletJoint::SetProvideFeedback(const bool _enable)
 {
   Joint::SetProvideFeedback(_enable);
 
@@ -162,25 +175,25 @@ void BulletJoint::SetProvideFeedback(bool _enable)
 //////////////////////////////////////////////////
 void BulletJoint::CacheForceTorque()
 {
-  if (!this->provideFeedback)
+  if (!this->bulletJointDPtr->provideFeedback)
     return;
 
   // caching force torque for the joint
   // if cached, GetForceTorque should use this value
-  // this->wrench
-  this->wrench.body2Force = BulletTypes::ConvertVector3(
-                      this->feedback->m_appliedForceBodyA);
-  this->wrench.body2Torque = BulletTypes::ConvertVector3(
-                      this->feedback->m_appliedTorqueBodyA);
-  this->wrench.body1Force = BulletTypes::ConvertVector3(
-                      this->feedback->m_appliedForceBodyB);
-  this->wrench.body1Torque = BulletTypes::ConvertVector3(
-                      this->feedback->m_appliedTorqueBodyB);
+  // this->bulletJointDPtr->wrench
+  this->bulletJointDPtr->wrench.body2Force = BulletTypes::ConvertVector3Ign(
+                      this->bulletJointDPtr->feedback->m_appliedForceBodyA);
+  this->bulletJointDPtr->wrench.body2Torque = BulletTypes::ConvertVector3Ign(
+                      this->bulletJointDPtr->feedback->m_appliedTorqueBodyA);
+  this->bulletJointDPtr->wrench.body1Force = BulletTypes::ConvertVector3Ign(
+                      this->bulletJointDPtr->feedback->m_appliedForceBodyB);
+  this->bulletJointDPtr->wrench.body1Torque = BulletTypes::ConvertVector3Ign(
+                      this->bulletJointDPtr->feedback->m_appliedTorqueBodyB);
   // gzerr << "   " << this->GetName()
-  //       << " : " << this->wrench.body1Force
-  //       << " : " << this->wrench.body1Torque
-  //       << " : " << this->wrench.body2Force
-  //       << " : " << this->wrench.body2Torque
+  //       << " : " << this->bulletJointDPtr->wrench.body1Force
+  //       << " : " << this->bulletJointDPtr->wrench.body1Torque
+  //       << " : " << this->bulletJointDPtr->wrench.body2Force
+  //       << " : " << this->bulletJointDPtr->wrench.body2Torque
   //       << "\n";
 
   // get force applied through SetForce
@@ -189,8 +202,7 @@ void BulletJoint::CacheForceTorque()
   {
     // rotate force into child link frame
     // GetLocalAxis is the axis specified in parent link frame!!!
-    wrenchAppliedWorld.body2Torque =
-      this->GetForce(0u) * this->GetLocalAxis(0u);
+    wrenchAppliedWorld.body2Torque = this->Force(0u) * this->LocalAxis(0u);
 
     // gzerr << "body2Torque [" << wrenchAppliedWorld.body2Torque
     //       << "] axis [" << this->GetLocalAxis(0u)
@@ -201,8 +213,7 @@ void BulletJoint::CacheForceTorque()
   else if (this->HasType(physics::Base::SLIDER_JOINT))
   {
     // rotate force into child link frame
-    wrenchAppliedWorld.body2Force =
-      this->GetForce(0u) * this->GetLocalAxis(0u);
+    wrenchAppliedWorld.body2Force = this->Force(0u) * this->LocalAxis(0u);
     wrenchAppliedWorld.body1Force = -wrenchAppliedWorld.body2Force;
   }
   else
@@ -214,226 +225,261 @@ void BulletJoint::CacheForceTorque()
   }
 
   // convert wrench from child cg location to child link frame
-  if (this->childLink)
+  if (this->bulletJointDPtr->childLink)
   {
-    math::Pose childPose = this->childLink->GetWorldPose();
+    ignition::math::Pose3d childPose =
+      this->bulletJointDPtr->childLink->WorldPose();
 
     // convert torque from about child CG to joint anchor location
     // cg position specified in child link frame
-    math::Pose cgPose = this->childLink->GetInertial()->GetPose();
+    ignition::math::Pose3d cgPose =
+      this->bulletJointDPtr->childLink->Inertial()->Pose();
 
     // anchorPose location of joint in child frame
     // childMomentArm: from child CG to joint location in child link frame
     // moment arm rotated into world frame (given feedback is in world frame)
-    math::Vector3 childMomentArm = childPose.rot.RotateVector(
-      (this->anchorPose - math::Pose(cgPose.pos, math::Quaternion())).pos);
+    ignition::math::Vector3d childMomentArm = childPose.Rot().RotateVector(
+        (this->bulletJointDPtr->anchorPose -
+         ignition::math::Pose3d(cgPose.Pos(),
+           ignition::math::Quaterniond())).Pos());
 
     // gzerr << "anchor [" << anchorPose
     //       << "] iarm[" << this->childLink->GetInertial()->GetPose().pos
     //       << "] childMomentArm[" << childMomentArm
-    //       << "] f1[" << this->wrench.body2Force
-    //       << "] t1[" << this->wrench.body2Torque
-    //       << "] fxp[" << this->wrench.body2Force.Cross(childMomentArm)
+    //       << "] f1[" << this->bulletJointDPtr->wrench.body2Force
+    //       << "] t1[" << this->bulletJointDPtr->wrench.body2Torque
+    //       << "] fxp[" << this->bulletJointDPtr->wrench.body2Force.Cross(
+    //       childMomentArm)
     //       << "]\n";
 
-    this->wrench.body2Torque += this->wrench.body2Force.Cross(childMomentArm);
+    this->bulletJointDPtr->wrench.body2Torque +=
+      this->bulletJointDPtr->wrench.body2Force.Cross(childMomentArm);
 
     // rotate resulting body2Force in world frame into link frame
-    this->wrench.body2Force = childPose.rot.RotateVectorReverse(
-      -this->wrench.body2Force);
+    this->bulletJointDPtr->wrench.body2Force =
+      childPose.Rot().RotateVectorReverse(
+          -this->bulletJointDPtr->wrench.body2Force);
 
     // rotate resulting body2Torque in world frame into link frame
-    this->wrench.body2Torque = childPose.rot.RotateVectorReverse(
-      -this->wrench.body2Torque);
+    this->bulletJointDPtr->wrench.body2Torque =
+      childPose.Rot().RotateVectorReverse(
+          -this->bulletJointDPtr->wrench.body2Torque);
   }
 
   // convert torque from about parent CG to joint anchor location
-  if (this->parentLink)
+  if (this->bulletJointDPtr->parentLink)
   {
     // get child pose, or it's the inertial world if childLink is NULL
-    math::Pose childPose;
-    if (this->childLink)
-      childPose = this->childLink->GetWorldPose();
+    ignition::math::Pose3d childPose;
 
-    math::Pose parentPose = this->parentLink->GetWorldPose();
+    if (this->bulletJointDPtr->childLink)
+      childPose = this->bulletJointDPtr->childLink->WorldPose();
+
+    ignition::math::Pose3d parentPose =
+      this->bulletJointDPtr->parentLink->WorldPose();
 
     // if parent link exists, convert torque from about parent
     // CG to joint anchor location
 
     // parent cg specified in parent link frame
-    math::Pose cgPose = this->parentLink->GetInertial()->GetPose();
+    ignition::math::Pose3d cgPose =
+      this->bulletJointDPtr->parentLink->Inertial()->Pose();
 
     // get parent CG pose in child link frame
-    math::Pose parentCGInChildLink =
-      math::Pose(cgPose.pos, math::Quaternion()) - (childPose - parentPose);
+    ignition::math::Pose3d parentCGInChildLink =
+      ignition::math::Pose3d(cgPose.Pos(), ignition::math::Quaterniond()) -
+      (childPose - parentPose);
 
     // anchor location in parent CG frame
     // this is the moment arm, but it's in parent CG frame, we need
     // to convert it into world frame
-    math::Pose anchorInParendCGFrame = this->anchorPose - parentCGInChildLink;
+    ignition::math::Pose3d anchorInParendCGFrame =
+      this->bulletJointDPtr->anchorPose - parentCGInChildLink;
 
     // paretnCGFrame in world frame
-    math::Pose parentCGInWorld = cgPose + parentPose;
+    ignition::math::Pose3d parentCGInWorld = cgPose + parentPose;
 
     // rotate momeent arms into world frame
-    math::Vector3 parentMomentArm = parentCGInWorld.rot.RotateVector(
-      (this->anchorPose - parentCGInChildLink).pos);
+    ignition::math::Vector3d parentMomentArm =
+      parentCGInWorld.Rot().RotateVector(
+          (this->bulletJointDPtr->anchorPose - parentCGInChildLink).Pos());
 
     // gzerr << "anchor [" << this->anchorPose
     //       << "] pcginc[" << parentCGInChildLink
     //       << "] iarm[" << cgPose
     //       << "] anc2pcg[" << this->anchorPose - parentCGInChildLink
     //       << "] parentMomentArm[" << parentMomentArm
-    //       << "] f1[" << this->wrench.body1Force
-    //       << "] t1[" << this->wrench.body1Torque
-    //       << "] fxp[" << this->wrench.body1Force.Cross(parentMomentArm)
+    //       << "] f1[" << this->bulletJointDPtr->wrench.body1Force
+    //       << "] t1[" << this->bulletJointDPtr->wrench.body1Torque
+    //       << "] fxp[" << this->bulletJointDPtr->wrench.body1Force.Cross(
+    //       parentMomentArm)
     //       << "]\n";
 
-    this->wrench.body1Torque += this->wrench.body1Force.Cross(parentMomentArm);
+    this->bulletJointDPtr->wrench.body1Torque +=
+      this->bulletJointDPtr->wrench.body1Force.Cross(parentMomentArm);
 
     // rotate resulting body1Force in world frame into link frame
-    this->wrench.body1Force = parentPose.rot.RotateVectorReverse(
-      -this->wrench.body1Force);
+    this->bulletJointDPtr->wrench.body1Force =
+      parentPose.Rot().RotateVectorReverse(
+          -this->bulletJointDPtr->wrench.body1Force);
 
     // rotate resulting body1Torque in world frame into link frame
-    this->wrench.body1Torque = parentPose.rot.RotateVectorReverse(
-      -this->wrench.body1Torque);
+    this->bulletJointDPtr->wrench.body1Torque =
+      parentPose.Rot().RotateVectorReverse(
+          -this->bulletJointDPtr->wrench.body1Torque);
 
-    if (!this->childLink)
+    if (!this->bulletJointDPtr->childLink)
     {
       // if child link does not exist, use equal and opposite
-      this->wrench.body2Force = -this->wrench.body1Force;
-      this->wrench.body2Torque = -this->wrench.body1Torque;
+      this->bulletJointDPtr->wrench.body2Force =
+        -this->bulletJointDPtr->wrench.body1Force;
+      this->bulletJointDPtr->wrench.body2Torque =
+        -this->bulletJointDPtr->wrench.body1Torque;
 
       // force/torque are in parent link frame, transform them into
       // child link(world) frame.
-      math::Pose parentToWorldTransform = this->parentLink->GetWorldPose();
-      this->wrench.body1Force =
-        parentToWorldTransform.rot.RotateVector(
-        this->wrench.body1Force);
-      this->wrench.body1Torque =
-        parentToWorldTransform.rot.RotateVector(
-        this->wrench.body1Torque);
+      ignition::math::Pose3d parentToWorldTransform =
+        this->bulletJointDPtr->parentLink->WorldPose();
+
+      this->bulletJointDPtr->wrench.body1Force =
+        parentToWorldTransform.Rot().RotateVector(
+        this->bulletJointDPtr->wrench.body1Force);
+
+      this->bulletJointDPtr->wrench.body1Torque =
+        parentToWorldTransform.Rot().RotateVector(
+        this->bulletJointDPtr->wrench.body1Torque);
     }
   }
   else
   {
-    if (!this->childLink)
+    if (!this->bulletJointDPtr->childLink)
     {
-      gzerr << "Joint [" << this->GetScopedName()
+      gzerr << "Joint [" << this->ScopedName()
             << "]: Both parent and child links are invalid, abort.\n";
       return;
     }
     else
     {
       // if parentLink does not exist, use equal opposite body1 wrench
-      this->wrench.body1Force = -this->wrench.body2Force;
-      this->wrench.body1Torque = -this->wrench.body2Torque;
+      this->bulletJointDPtr->wrench.body1Force =
+        -this->bulletJointDPtr->wrench.body2Force;
+      this->bulletJointDPtr->wrench.body1Torque =
+        -this->bulletJointDPtr->wrench.body2Torque;
 
       // force/torque are in child link frame, transform them into
       // parent link frame.  Here, parent link is world, so zero transform.
-      math::Pose childToWorldTransform = this->childLink->GetWorldPose();
-      this->wrench.body1Force =
-        childToWorldTransform.rot.RotateVector(
-        this->wrench.body1Force);
-      this->wrench.body1Torque =
-        childToWorldTransform.rot.RotateVector(
-        this->wrench.body1Torque);
+      ignition::math::Pose3d childToWorldTransform =
+        this->bulletJointDPtr->childLink->WorldPose();
+
+      this->bulletJointDPtr->wrench.body1Force =
+        childToWorldTransform.Rot().RotateVector(
+        this->bulletJointDPtr->wrench.body1Force);
+      this->bulletJointDPtr->wrench.body1Torque =
+        childToWorldTransform.Rot().RotateVector(
+        this->bulletJointDPtr->wrench.body1Torque);
     }
   }
-  this->wrench = this->wrench - wrenchAppliedWorld;
+  this->bulletJointDPtr->wrench = this->bulletJointDPtr->wrench - wrenchAppliedWorld;
 }
 
 //////////////////////////////////////////////////
-JointWrench BulletJoint::GetForceTorque(unsigned int /*_index*/)
+JointWrench BulletJoint::ForceTorque(const unsigned int /*_index*/) const
 {
-  GZ_ASSERT(this->constraint != NULL, "constraint should be valid");
-  return this->wrench;
+  GZ_ASSERT(this->bulletJointDPtr->constraint != NULL,
+      "constraint should be valid");
+  return this->bulletJointDPtr->wrench;
 }
 
 //////////////////////////////////////////////////
 void BulletJoint::SetupJointFeedback()
 {
-  if (this->provideFeedback)
+  if (this->bulletJointDPtr->provideFeedback)
   {
-    if (this->feedback == NULL)
+    if (this->bulletJointDPtr->feedback == NULL)
     {
-      this->feedback = new btJointFeedback;
-      this->feedback->m_appliedForceBodyA = btVector3(0, 0, 0);
-      this->feedback->m_appliedForceBodyB = btVector3(0, 0, 0);
-      this->feedback->m_appliedTorqueBodyA = btVector3(0, 0, 0);
-      this->feedback->m_appliedTorqueBodyB = btVector3(0, 0, 0);
+      this->bulletJointDPtr->feedback = new btJointFeedback;
+      this->bulletJointDPtr->feedback->m_appliedForceBodyA = btVector3(0, 0, 0);
+      this->bulletJointDPtr->feedback->m_appliedForceBodyB = btVector3(0, 0, 0);
+      this->bulletJointDPtr->feedback->m_appliedTorqueBodyA =
+        btVector3(0, 0, 0);
+      this->bulletJointDPtr->feedback->m_appliedTorqueBodyB =
+        btVector3(0, 0, 0);
     }
 
-    if (this->constraint)
-      this->constraint->setJointFeedback(this->feedback);
+    if (this->bulletJointDPtr->constraint)
+    {
+      this->bulletJointDPtr->constraint->setJointFeedback(
+          this->bulletJointDPtr->feedback);
+    }
     else
-      gzerr << "Bullet Joint [" << this->GetName() << "] ID is invalid\n";
+    {
+      gzerr << "Bullet Joint [" << this->Name() << "] ID is invalid\n";
+    }
   }
 }
 
 //////////////////////////////////////////////////
-void BulletJoint::SetDamping(unsigned int _index, double _damping)
+void BulletJoint::SetDamping(const unsigned int _index, const double _damping)
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->AngleCount())
   {
-    this->SetStiffnessDamping(_index, this->stiffnessCoefficient[_index],
-      _damping);
+    this->SetStiffnessDamping(_index,
+        this->bulletJointDPtr->stiffnessCoefficient[_index], _damping);
   }
   else
   {
      gzerr << "BulletJoint::SetDamping: index[" << _index
-           << "] is out of bounds (GetAngleCount() = "
-           << this->GetAngleCount() << ").\n";
+           << "] is out of bounds (AngleCount() = "
+           << this->AngleCount() << ").\n";
      return;
   }
 }
 
 //////////////////////////////////////////////////
-void BulletJoint::SetStiffness(unsigned int _index, double _stiffness)
+void BulletJoint::SetStiffness(const unsigned int _index,
+    const double _stiffness)
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->AngleCount())
   {
     this->SetStiffnessDamping(_index, _stiffness,
-      this->dissipationCoefficient[_index]);
+      this->bulletJointDPtr->dissipationCoefficient[_index]);
   }
   else
   {
      gzerr << "BulletJoint::SetStiffness: index[" << _index
-           << "] is out of bounds (GetAngleCount() = "
-           << this->GetAngleCount() << ").\n";
+           << "] is out of bounds (AngleCount() = "
+           << this->AngleCount() << ").\n";
      return;
   }
 }
 
 //////////////////////////////////////////////////
-void BulletJoint::SetStiffnessDamping(unsigned int _index,
-  double _stiffness, double _damping, double _reference)
+void BulletJoint::SetStiffnessDamping(const unsigned int _index,
+  const double _stiffness, const double _damping, const double _reference)
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->AngleCount())
   {
-    this->stiffnessCoefficient[_index] = _stiffness;
-    this->dissipationCoefficient[_index] = _damping;
-    this->springReferencePosition[_index] = _reference;
+    this->bulletJointDPtr->stiffnessCoefficient[_index] = _stiffness;
+    this->bulletJointDPtr->dissipationCoefficient[_index] = _damping;
+    this->bulletJointDPtr->springReferencePosition[_index] = _reference;
 
     /// \TODO: this check might not be needed?  attaching an object to a static
     /// body should not affect damping application.
-    bool parentStatic =
-      this->GetParent() ? this->GetParent()->IsStatic() : false;
-    bool childStatic =
-      this->GetChild() ? this->GetChild()->IsStatic() : false;
+    bool parentStatic = this->Parent() ? this->Parent()->IsStatic() : false;
+    bool childStatic = this->Child() ? this->Child()->IsStatic() : false;
 
-    if (!this->stiffnessDampingInitialized)
+    if (!this->bulletJointDPtr->stiffnessDampingInitialized)
     {
       if (!parentStatic && !childStatic)
       {
-        this->applyDamping = physics::Joint::ConnectJointUpdate(
-          boost::bind(&BulletJoint::ApplyStiffnessDamping, this));
-        this->stiffnessDampingInitialized = true;
+        this->bulletJointDPtr->applyDamping =
+          physics::Joint::ConnectJointUpdate(
+              std::bind(&BulletJoint::ApplyStiffnessDamping, this));
+        this->bulletJointDPtr->stiffnessDampingInitialized = true;
       }
       else
       {
-        gzwarn << "Spring Damper for Joint[" << this->GetName()
+        gzwarn << "Spring Damper for Joint[" << this->Name()
                << "] is not initialized because either parent[" << parentStatic
                << "] or child[" << childStatic << "] is static.\n";
       }
@@ -444,45 +490,51 @@ void BulletJoint::SetStiffnessDamping(unsigned int _index,
 }
 
 //////////////////////////////////////////////////
-void BulletJoint::SetForce(unsigned int _index, double _force)
+void BulletJoint::SetForce(const unsigned int _index,
+    const double _force)
 {
   double force = Joint::CheckAndTruncateForce(_index, _force);
   this->SaveForce(_index, force);
   this->SetForceImpl(_index, force);
 
   // for engines that supports auto-disable of links
-  if (this->childLink) this->childLink->SetEnabled(true);
-  if (this->parentLink) this->parentLink->SetEnabled(true);
+  if (this->bulletJointDPtr->childLink)
+    this->bulletJointDPtr->childLink->SetEnabled(true);
+  if (this->bulletJointDPtr->parentLink)
+    this->bulletJointDPtr->parentLink->SetEnabled(true);
 }
 
 //////////////////////////////////////////////////
-void BulletJoint::SaveForce(unsigned int _index, double _force)
+void BulletJoint::SaveForce(const unsigned int _index, const double _force)
 {
   // this bit of code actually doesn't do anything physical,
   // it simply records the forces commanded inside forceApplied.
-  if (_index < this->GetAngleCount())
+  if (_index < this->AngleCount())
   {
-    if (this->forceAppliedTime < this->GetWorld()->GetSimTime())
+    if (this->bulletJointDPtr->forceAppliedTime < this->World()->GetSimTime())
     {
       // reset forces if time step is new
-      this->forceAppliedTime = this->GetWorld()->GetSimTime();
-      this->forceApplied[0] = this->forceApplied[1] = 0;
+      this->bulletJointDPtr->forceAppliedTime = this->World()->GetSimTime();
+      this->bulletJointDPtr->forceApplied[0] =
+        this->bulletJointDPtr->forceApplied[1] = 0;
     }
 
-    this->forceApplied[_index] += _force;
+    this->bulletJointDPtr->forceApplied[_index] += _force;
   }
   else
-    gzerr << "Something's wrong, joint [" << this->GetName()
+  {
+    gzerr << "Something's wrong, joint [" << this->Name()
           << "] index [" << _index
           << "] out of range.\n";
+  }
 }
 
 //////////////////////////////////////////////////
-double BulletJoint::GetForce(unsigned int _index)
+double BulletJoint::Force(const unsigned int _index) const
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->AngleCount())
   {
-    return this->forceApplied[_index];
+    return this->bulletJointDPtr->forceApplied[_index];
   }
   else
   {
@@ -495,16 +547,18 @@ double BulletJoint::GetForce(unsigned int _index)
 //////////////////////////////////////////////////
 void BulletJoint::ApplyStiffnessDamping()
 {
-  for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
+  for (unsigned int i = 0; i < this->AngleCount(); ++i)
   {
     // Take absolute value of dissipationCoefficient, since negative values of
     // dissipationCoefficient are used for adaptive damping to
     // enforce stability.
-    double dampingForce = -fabs(this->dissipationCoefficient[i])
-      * this->GetVelocity(i);
+    double dampingForce =
+      -fabs(this->bulletJointDPtr->dissipationCoefficient[i]) *
+      this->Velocity(i);
 
-    double springForce = this->stiffnessCoefficient[i]
-      * (this->springReferencePosition[i] - this->GetAngle(i).Radian());
+    double springForce = this->bulletJointDPtr->stiffnessCoefficient[i] *
+      (this->bulletJointDPtr->springReferencePosition[i] -
+       this->Angle(i).Radian());
 
     // do not change forceApplied if setting internal damping forces
     this->SetForceImpl(i, dampingForce + springForce);
@@ -514,36 +568,39 @@ void BulletJoint::ApplyStiffnessDamping()
 }
 
 //////////////////////////////////////////////////
-void BulletJoint::SetAnchor(unsigned int /*_index*/,
-    const gazebo::math::Vector3 & /*_anchor*/)
+void BulletJoint::SetAnchor(const unsigned int /*_index*/,
+    const ignition::math::Vector3d &/*_anchor*/)
 {
   // nothing to do here for bullet.
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BulletJoint::GetAnchor(unsigned int /*_index*/) const
+ignition::math::Vector3d BulletJoint::Anchor(
+    const unsigned int /*_index*/) const
 {
   gzerr << "Not implement in Bullet\n";
-  return math::Vector3();
+  return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BulletJoint::GetLinkForce(unsigned int /*_index*/) const
+ignition::math::Vector3d BulletJoint::LinkForce(
+    const unsigned int /*_index*/) const
 {
   gzerr << "Not implement in Bullet\n";
-  return math::Vector3();
+  return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BulletJoint::GetLinkTorque(unsigned int /*_index*/) const
+ignition::math::Vector3d BulletJoint::LinkTorque(
+    const unsigned int /*_index*/) const
 {
   gzerr << "Not implement in Bullet\n";
-  return math::Vector3();
+  return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
 bool BulletJoint::SetParam(const std::string &/*_key*/,
-    unsigned int /*_index*/,
+    const unsigned int /*_index*/,
     const boost::any &/*_value*/)
 {
   gzdbg << "Not implement in Bullet\n";
@@ -551,26 +608,26 @@ bool BulletJoint::SetParam(const std::string &/*_key*/,
 }
 
 //////////////////////////////////////////////////
-double BulletJoint::GetParam(const std::string &_key,
-    unsigned int _index)
+double BulletJoint::Param(const std::string &_key,
+    const unsigned int _index) const
 {
-  return Joint::GetParam(_key, _index);
+  return Joint::Param(_key, _index);
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletJoint::GetHighStop(unsigned int _index)
+ignition::math::Angle BulletJoint::HighStop(const unsigned int _index) const
 {
-  return this->GetUpperLimit(_index);
+  return this->UpperLimit(_index);
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletJoint::GetLowStop(unsigned int _index)
+ignition::math::Angle BulletJoint::LowStop(const unsigned int _index) const
 {
-  return this->GetLowerLimit(_index);
+  return this->LowerLimit(_index);
 }
 
 //////////////////////////////////////////////////
-bool BulletJoint::SetPosition(unsigned int _index, double _position)
+bool BulletJoint::SetPosition(const unsigned int _index, const double _position)
 {
   return Joint::SetPositionMaximal(_index, _position);
 }

@@ -63,6 +63,10 @@ namespace gazebo
       public: void SetPoints(const ignition::math::Vector3d &_posStart,
                   const ignition::math::Vector3d &_posEnd);
 
+      // Documentation inherited
+      public: virtual void Intersection(double &_dist,
+                  std::string &_entity);
+
       /// \brief Pointer to the Bullet physics engine
       private: BulletPhysicsPtr physicsEngine;
     };

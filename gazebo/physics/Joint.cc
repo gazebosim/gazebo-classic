@@ -1794,3 +1794,14 @@ math::Angle Joint::GetAngleImpl(unsigned int _index) const
   return this->AngleImpl(_index);
 }
 
+/////////////////////////////////////////////////
+void Joint::SetAxis(const unsigned int _index)
+{
+  // record axis in sdf element
+  if (_index == 0)
+    this->jointDPtr->sdf->GetElement("axis")->GetElement("xyz")->Set(_axis);
+  else if (_index == 1)
+    this->jointDPtr->sdf->GetElement("axis2")->GetElement("xyz")->Set(_axis);
+  else
+    gzerr << "SetAxis index [" << _index << "] out of bounds\n";
+}

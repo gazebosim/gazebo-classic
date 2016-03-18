@@ -15,8 +15,10 @@
  *
 */
 #include "gazebo/common/Assert.hh"
+#include "gazebo/common/Console.hh"
 
 #include "gazebo/physics/World.hh"
+#include "gazebo/physics/RayShapePrivate.hh"
 #include "gazebo/physics/bullet/BulletLink.hh"
 #include "gazebo/physics/bullet/BulletPhysics.hh"
 #include "gazebo/physics/bullet/BulletTypes.hh"
@@ -42,7 +44,7 @@ BulletRayShape::BulletRayShape(CollisionPtr _parent)
 {
   this->SetName("Bullet Ray Shape");
   this->physicsEngine = std::static_pointer_cast<BulletPhysics>(
-      this->collisionParent->GetWorld()->GetPhysicsEngine());
+      this->rayShapeDPtr->collisionParent->World()->GetPhysicsEngine());
 }
 
 //////////////////////////////////////////////////
@@ -53,25 +55,28 @@ BulletRayShape::~BulletRayShape()
 //////////////////////////////////////////////////
 void BulletRayShape::Update()
 {
-  if (this->collisionParent)
+  if (this->rayShapeDPtr->collisionParent)
   {
     BulletCollisionPtr collision =
-        std::static_pointer_cast<BulletCollision>(this->collisionParent);
+        std::static_pointer_cast<BulletCollision>(
+            this->rayShapeDPtr->collisionParent);
 
-    LinkPtr link = this->collisionParent->GetLink();
+    LinkPtr link = this->rayShapeDPtr->collisionParent->Link();
     GZ_ASSERT(link != NULL, "Bullet link is NULL");
 
-    this->globalStartPos = link->GetWorldPose().CoordPositionAdd(
-          this->relativeStartPos).Ign();
+    this->rayShapeDPtr->globalStartPos = link->WorldPose().CoordPositionAdd(
+          this->rayShapeDPtr->relativeStartPos);
 
-    this->globalEndPos = link->GetWorldPose().CoordPositionAdd(
-          this->relativeEndPos).Ign();
+    this->rayShapeDPtr->globalEndPos = link->WorldPose().CoordPositionAdd(
+          this->rayShapeDPtr->relativeEndPos);
   }
 
-  btVector3 start(this->globalStartPos.X(), this->globalStartPos.Y(),
-      this->globalStartPos.Z());
-  btVector3 end(this->globalEndPos.X(), this->globalEndPos.Y(),
-      this->globalEndPos.Z());
+  btVector3 start(this->rayShapeDPtr->globalStartPos.X(),
+      this->rayShapeDPtr->globalStartPos.Y(),
+      this->rayShapeDPtr->globalStartPos.Z());
+  btVector3 end(this->rayShapeDPtr->globalEndPos.X(),
+      this->rayShapeDPtr->globalEndPos.Y(),
+      this->rayShapeDPtr->globalEndPos.Z());
 
   btCollisionWorld::ClosestRayResultCallback rayCallback(start, end);
   rayCallback.m_collisionFilterGroup = GZ_SENSOR_COLLIDE;
@@ -80,7 +85,7 @@ void BulletRayShape::Update()
   boost::recursive_mutex::scoped_lock lock(
       *this->physicsEngine->GetPhysicsUpdateMutex());
 
-  this->physicsEngine->GetDynamicsWorld()->rayTest(
+  this->physicsEngine->DynamicsWorld()->rayTest(
       start, end, rayCallback);
 
   if (rayCallback.hasHit())
@@ -88,7 +93,7 @@ void BulletRayShape::Update()
     ignition::math::Vector3d result(rayCallback.m_hitPointWorld.getX(),
                          rayCallback.m_hitPointWorld.getY(),
                          rayCallback.m_hitPointWorld.getZ());
-    this->SetLength(this->globalStartPos.Distance(result));
+    this->SetLength(this->rayShapeDPtr->globalStartPos.Distance(result));
   }
 }
 
@@ -98,44 +103,47 @@ void BulletRayShape::GetIntersection(double &_dist, std::string &_entity)
   _dist = 0;
   _entity = "";
 
-  if (this->collisionParent)
+  if (this->rayShapeDPtr->collisionParent)
   {
     BulletCollisionPtr collision =
-        std::static_pointer_cast<BulletCollision>(this->collisionParent);
+        std::static_pointer_cast<BulletCollision>(
+            this->rayShapeDPtr->collisionParent);
 
-    LinkPtr link = this->collisionParent->GetLink();
+    LinkPtr link = this->rayShapeDPtr->collisionParent->Link();
     GZ_ASSERT(link != NULL, "Bullet link is NULL");
 
-    this->globalStartPos = link->GetWorldPose().CoordPositionAdd(
-          this->relativeStartPos).Ign();
+    this->rayShapeDPtr->globalStartPos = link->WorldPose().CoordPositionAdd(
+          this->rayShapeDPtr->relativeStartPos);
 
-    this->globalEndPos = link->GetWorldPose().CoordPositionAdd(
-          this->relativeEndPos).Ign();
+    this->rayShapeDPtr->globalEndPos = link->WorldPose().CoordPositionAdd(
+          this->rayShapeDPtr->relativeEndPos);
   }
 
   if (this->physicsEngine)
   {
-    btVector3 start(this->globalStartPos.X(), this->globalStartPos.Y(),
-        this->globalStartPos.Z());
-    btVector3 end(this->globalEndPos.X(), this->globalEndPos.Y(),
-        this->globalEndPos.Z());
+    btVector3 start(this->rayShapeDPtr->globalStartPos.X(),
+        this->rayShapeDPtr->globalStartPos.Y(),
+        this->rayShapeDPtr->globalStartPos.Z());
+    btVector3 end(this->rayShapeDPtr->globalEndPos.X(),
+        this->rayShapeDPtr->globalEndPos.Y(),
+        this->rayShapeDPtr->globalEndPos.Z());
 
     btCollisionWorld::ClosestRayResultCallback rayCallback(start, end);
     rayCallback.m_collisionFilterGroup = GZ_SENSOR_COLLIDE;
     rayCallback.m_collisionFilterMask = ~GZ_SENSOR_COLLIDE;
-    this->physicsEngine->GetDynamicsWorld()->rayTest(
+    this->physicsEngine->DynamicsWorld()->rayTest(
         start, end, rayCallback);
     if (rayCallback.hasHit())
     {
       ignition::math::Vector3d result(rayCallback.m_hitPointWorld.getX(),
                            rayCallback.m_hitPointWorld.getY(),
                            rayCallback.m_hitPointWorld.getZ());
-      _dist = this->globalStartPos.Distance(result);
+      _dist = this->rayShapeDPtr->globalStartPos.Distance(result);
 
       BulletLink *link = static_cast<BulletLink *>(
           rayCallback.m_collisionObject->getUserPointer());
       GZ_ASSERT(link != NULL, "Bullet link is NULL");
-      _entity = link->GetScopedName();
+      _entity = link->ScopedName();
     }
   }
 }
@@ -152,4 +160,11 @@ void BulletRayShape::SetPoints(const ignition::math::Vector3d &_posStart,
                                const ignition::math::Vector3d &_posEnd)
 {
   RayShape::SetPoints(_posStart, _posEnd);
+}
+
+//////////////////////////////////////////////////
+void BulletRayShape::Intersection(double & /*_dist*/, std::string & /*_entity*/)
+{
+  gzerr << "Intersection function not implemented in Bullet\n";
+  return;
 }

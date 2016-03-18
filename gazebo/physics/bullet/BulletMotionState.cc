@@ -14,13 +14,10 @@
  * limitations under the License.
  *
 */
-/* Desc: Bullet motion state class.
- * Author: Nate Koenig
- * Date: 25 May 2009
- */
-
 #include "gazebo/common/Assert.hh"
 #include "gazebo/physics/Link.hh"
+#include "gazebo/physics/Joint.hh"
+#include "gazebo/physics/Inertial.hh"
 #include "gazebo/physics/bullet/BulletPhysics.hh"
 #include "gazebo/physics/bullet/BulletLink.hh"
 #include "gazebo/physics/bullet/BulletMotionState.hh"
@@ -31,7 +28,7 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 BulletMotionState::BulletMotionState(LinkPtr _link)
-  : btMotionState()
+: btMotionState()
 {
   this->link = _link;
 }
@@ -45,7 +42,7 @@ BulletMotionState::~BulletMotionState()
 void BulletMotionState::getWorldTransform(btTransform &_cogWorldTrans) const
 {
   _cogWorldTrans =
-    BulletTypes::ConvertPose(this->link->GetWorldInertialPose());
+    BulletTypes::ConvertPoseIgn(this->link->WorldInertialPose());
 }
 
 //////////////////////////////////////////////////
@@ -55,16 +52,18 @@ void BulletMotionState::setWorldTransform(const btTransform &/*_cogWorldTrans*/)
   // for now get transform from btRigidBody directly
   physics::BulletLinkPtr bulletLink =
     std::static_pointer_cast<BulletLink>(this->link);
+
   GZ_ASSERT(bulletLink, "parent link must be valid");
-  math::Pose pose;
-  if (bulletLink->GetBulletLink())
+  ignition::math::Pose3d pose;
+
+  if (bulletLink->BtLink())
   {
-    pose = BulletTypes::ConvertPose(
-      bulletLink->GetBulletLink()->getCenterOfMassTransform());
+    pose = BulletTypes::ConvertPoseIgn(
+      bulletLink->BtLink()->getCenterOfMassTransform());
   }
   else
   {
-    pose = bulletLink->GetWorldCoGPose();
+    pose = bulletLink->WorldCoGPose();
   }
 
   // transform pose from cg location to link location
@@ -72,7 +71,7 @@ void BulletMotionState::setWorldTransform(const btTransform &/*_cogWorldTrans*/)
   //     link defined in cg frame.
   // pose: transform from world origin to cg in inertial frame.
   // -cg + pose:  transform from world origin to link frame in inertial frame.
-  math::Pose cg = this->link->GetInertial()->GetPose();
+  ignition::math::Pose3d cg = this->link->Inertial()->Pose();
   pose = -cg + pose;
 
   // The second argument is set to false to prevent Entity.cc from propagating
@@ -83,13 +82,14 @@ void BulletMotionState::setWorldTransform(const btTransform &/*_cogWorldTrans*/)
   // below is inefficient as we end up double caching for some joints
   // should consider adding a "dirty" flag.
   // or trying doing this during BulletPhysics::InternalTickCallback(...)
-  Joint_V parentJoints = this->link->GetParentJoints();
+  Joint_V parentJoints = this->link->ParentJoints();
   for (unsigned int j = 0; j < parentJoints.size(); ++j)
   {
     JointPtr joint = parentJoints[j];
     joint->CacheForceTorque();
   }
-  Joint_V childJoints = this->link->GetChildJoints();
+
+  Joint_V childJoints = this->link->ChildJoints();
   for (unsigned int j = 0; j < childJoints.size(); ++j)
   {
     JointPtr joint = childJoints[j];

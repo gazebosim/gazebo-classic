@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: A screw or primastic joint
- * Author: Nate Koenig
- * Date: 24 May 2009
- */
-
-#ifndef _BULLETSCREWJOINT_HH_
-#define _BULLETSCREWJOINT_HH_
+#ifndef _GAZEBO_PHYISCS_BULLET_BULLETSCREWJOINT_HH_
+#define _GAZEBO_PHYISCS_BULLET_BULLETSCREWJOINT_HH_
 
 #include <string>
 
@@ -54,11 +49,12 @@ namespace gazebo
       public: virtual void Load(sdf::ElementPtr _sdf);
 
       // Documentation inherited
-      public: virtual math::Vector3 GetAnchor(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d Anchor(
+                  const unsigned int _index) const;
 
       // Documentation inherited
-      public: virtual void SetAnchor(unsigned int _index,
-                  const math::Vector3 &_anchor);
+      public: virtual void SetAnchor(const unsigned int _index,
+                  const ignition::math::Vector3d &_anchor);
 
       // Documentation inherited.
       public: virtual void Init();
@@ -66,59 +62,68 @@ namespace gazebo
       /// \brief Set the axis of motion
       /// \param[in] _index Axis index.
       /// \param[in] _axis Axis value.
-      public: void SetAxis(unsigned int _index, const math::Vector3 &_axis);
+      public: void SetAxis(const unsigned int _index,
+                  const ignition::math::Vector3d &_axis);
 
       // Documentation inherited
-      public: virtual void SetThreadPitch(unsigned int _index,
-                  double _threadPitch);
+      public: virtual void SetThreadPitch(const unsigned int _index,
+                  const double _threadPitch);
 
       // Documentation inherited
-      public: virtual void SetThreadPitch(double _threadPitch);
+      public: virtual void SetThreadPitch(const double _threadPitch);
 
       // Documentation inherited
-      public: virtual double GetThreadPitch(unsigned int _index);
+      public: virtual double ThreadPitch(const unsigned int _index) const;
 
       // Documentation inherited
-      public: virtual double GetThreadPitch();
+      public: virtual double ThreadPitch() const;
 
       // Documentation inherited.
-      public: virtual bool SetHighStop(unsigned int _index,
-                  const math::Angle &_angle);
+      public: virtual bool SetHighStop(const unsigned int _index,
+                  const ignition::math::Angle &_angle);
 
       // Documentation inherited.
-      public: virtual bool SetLowStop(unsigned int _index,
-                  const math::Angle &_angle);
+      public: virtual bool SetLowStop(const unsigned int _index,
+                  const ignition::math::Angle &_angle);
 
       /// \brief Get the rate of change
       /// \param[in] _index Axis index.
-      public: virtual double GetVelocity(unsigned int _index) const;
+      public: virtual double Velocity(const unsigned int _index) const;
 
       /// \brief Set the velocity of an axis(index).
       /// \param[in] _index Axis index.
       /// \param[in] _vel Velocity to apply to the joint axis.
-      public: virtual void SetVelocity(unsigned int _index, double _vel);
+      public: virtual void Velocity(const unsigned int _index,
+                  const double _vel);
+
+      // Documentation inherited
+      public: virtual void SetVelocity(const unsigned int _index,
+                  const double _angle);
 
       /// \brief Get the axis of rotation
       /// \param[in] _index Axis index.
       /// \return The axis in world coordinate frame.
-      public: virtual math::Vector3 GetGlobalAxis(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d GlobalAxis(
+                  const unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual double GetParam(const std::string &_key,
-                  unsigned int _index);
+      public: virtual double Param(const std::string &_key,
+                  const unsigned int _index) const;
 
       // Documentation inherited.
-      protected: virtual math::Angle GetAngleImpl(unsigned int _index) const;
+      protected: virtual ignition::math::Angle AngleImpl(
+                     const unsigned int _index) const;
 
       // Documentation inherited.
-      protected: virtual void SetForceImpl(unsigned int _index, double _force);
+      protected: virtual void SetForceImpl(const unsigned int _index,
+                     const double _force);
 
       /// \brief Pointer to bullet screw constraint
       private: btScrewConstraint *bulletScrew;
 
       /// \brief Initial value of joint axis, expressed as unit vector
       ///        in world frame.
-      private: math::Vector3 initialWorldAxis;
+      private: ignition::math::Vector3d initialWorldAxis;
     };
     /// \}
   }

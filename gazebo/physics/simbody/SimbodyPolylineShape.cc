@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-
 #include "gazebo/common/Mesh.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/physics/simbody/SimbodyMesh.hh"
@@ -48,7 +47,7 @@ void SimbodyPolylineShape::Load(sdf::ElementPtr _sdf)
 void SimbodyPolylineShape::Init()
 {
   PolylineShape::Init();
-  if (!this->mesh)
+  if (!this->shapeDPtr->mesh)
   {
     gzerr << "Unable to create polyline in Simbody. Mesh pointer is null.\n";
     return;

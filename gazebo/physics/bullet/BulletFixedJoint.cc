@@ -22,6 +22,7 @@
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/bullet/BulletLink.hh"
 #include "gazebo/physics/bullet/BulletPhysics.hh"
+#include "gazebo/physics/bullet/BulletJointPrivate.hh"
 #include "gazebo/physics/bullet/BulletFixedJoint.hh"
 
 using namespace gazebo;
@@ -29,10 +30,10 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 BulletFixedJoint::BulletFixedJoint(btDynamicsWorld *_world, BasePtr _parent)
-    : FixedJoint<BulletJoint>(_parent)
+: FixedJoint<BulletJoint>(_parent)
 {
   GZ_ASSERT(_world, "bullet world pointer is NULL");
-  this->bulletWorld = _world;
+  this->bulletJointDPtr->bulletWorld = _world;
   this->bulletFixed = NULL;
 }
 
@@ -54,45 +55,49 @@ void BulletFixedJoint::Init()
 
   // Cast to BulletLink
   BulletLinkPtr bulletChildLink =
-      std::static_pointer_cast<BulletLink>(this->childLink);
+      std::static_pointer_cast<BulletLink>(this->bulletJointDPtr->childLink);
   BulletLinkPtr bulletParentLink =
-      std::static_pointer_cast<BulletLink>(this->parentLink);
+      std::static_pointer_cast<BulletLink>(this->bulletJointDPtr->parentLink);
 
   // Get axis unit vector (expressed in world frame).
-  math::Vector3 axis = math::Vector3::UnitZ;
+  ignition::math::Vector3d axis = ignition::math::Vector3d::UnitZ;
 
   // Local variables used to compute pivots and axes in body-fixed frames
   // for the parent and child links.
-  math::Vector3 pivotParent, pivotChild, axisParent, axisChild;
-  math::Pose pose;
+  ignition::math::Vector3d pivotParent, pivotChild, axisParent, axisChild;
+  ignition::math::Pose3d pose;
 
   // Initialize pivots to anchorPos, which is expressed in the
   // world coordinate frame.
-  pivotParent = this->anchorPos;
-  pivotChild = this->anchorPos;
+  pivotParent = this->bulletJointDPtr->anchorPos;
+  pivotChild = this->bulletJointDPtr->anchorPos;
 
   // Check if parentLink exists. If not, the parent will be the world.
-  if (this->parentLink)
+  if (this->bulletJointDPtr->parentLink)
   {
     // Compute relative pose between joint anchor and CoG of parent link.
-    pose = this->parentLink->GetWorldCoGPose();
+    pose = this->bulletJointDPtr->parentLink->WorldCoGPose();
+
     // Subtract CoG position from anchor position, both in world frame.
-    pivotParent -= pose.pos;
+    pivotParent -= pose.Pos();
+
     // Rotate pivot offset and axis into body-fixed frame of parent.
-    pivotParent = pose.rot.RotateVectorReverse(pivotParent);
-    axisParent = pose.rot.RotateVectorReverse(axis);
+    pivotParent = pose.Rot().RotateVectorReverse(pivotParent);
+    axisParent = pose.Rot().RotateVectorReverse(axis);
     axisParent = axisParent.Normalize();
   }
   // Check if childLink exists. If not, the child will be the world.
-  if (this->childLink)
+  if (this->bulletJointDPtr->childLink)
   {
     // Compute relative pose between joint anchor and CoG of child link.
-    pose = this->childLink->GetWorldCoGPose();
+    pose = this->bulletJointDPtr->childLink->WorldCoGPose();
+
     // Subtract CoG position from anchor position, both in world frame.
-    pivotChild -= pose.pos;
+    pivotChild -= pose.Pos();
+
     // Rotate pivot offset and axis into body-fixed frame of child.
-    pivotChild = pose.rot.RotateVectorReverse(pivotChild);
-    axisChild = pose.rot.RotateVectorReverse(axis);
+    pivotChild = pose.Rot().RotateVectorReverse(pivotChild);
+    axisChild = pose.Rot().RotateVectorReverse(axis);
     axisChild = axisChild.Normalize();
   }
 
@@ -100,8 +105,8 @@ void BulletFixedJoint::Init()
   if (bulletChildLink && bulletParentLink)
   {
     this->bulletFixed = new btHingeConstraint(
-        *(bulletChildLink->GetBulletLink()),
-        *(bulletParentLink->GetBulletLink()),
+        *(bulletChildLink->BtLink()),
+        *(bulletParentLink->BtLink()),
         BulletTypes::ConvertVector3(pivotChild),
         BulletTypes::ConvertVector3(pivotParent),
         BulletTypes::ConvertVector3(axisChild),
@@ -112,7 +117,7 @@ void BulletFixedJoint::Init()
   else if (bulletChildLink)
   {
     this->bulletFixed = new btHingeConstraint(
-        *(bulletChildLink->GetBulletLink()),
+        *(bulletChildLink->BtLink()),
         BulletTypes::ConvertVector3(pivotChild),
         BulletTypes::ConvertVector3(axisChild));
   }
@@ -121,7 +126,7 @@ void BulletFixedJoint::Init()
   else if (bulletParentLink)
   {
     this->bulletFixed = new btHingeConstraint(
-        *(bulletParentLink->GetBulletLink()),
+        *(bulletParentLink->BtLink()),
         BulletTypes::ConvertVector3(pivotParent),
         BulletTypes::ConvertVector3(axisParent));
   }
@@ -139,13 +144,13 @@ void BulletFixedJoint::Init()
   }
 
   // Give parent class BulletJoint a pointer to this constraint.
-  this->constraint = this->bulletFixed;
+  this->bulletJointDPtr->constraint = this->bulletFixed;
 
   this->bulletFixed->setLimit(0.0, 0.0);
 
   // Add the joint to the world
-  GZ_ASSERT(this->bulletWorld, "bullet world pointer is NULL");
-  this->bulletWorld->addConstraint(this->bulletFixed, true);
+  GZ_ASSERT(this->bulletJointDPtr->bulletWorld, "bullet world pointer is NULL");
+  this->bulletJointDPtr->bulletWorld->addConstraint(this->bulletFixed, true);
 
   // Allows access to impulse
   this->bulletFixed->enableFeedback(true);
@@ -155,30 +160,32 @@ void BulletFixedJoint::Init()
 }
 
 //////////////////////////////////////////////////
-void BulletFixedJoint::SetAxis(unsigned int /*_index*/,
-    const math::Vector3 &/*_axis*/)
+void BulletFixedJoint::SetAxis(const unsigned int /*_index*/,
+    const ignition::math::Vector3d &/*_axis*/)
 {
   gzwarn << "BulletFixedJoint: called method "
          << "SetAxis that is not valid for joints of type fixed.\n";
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletFixedJoint::GetAngleImpl(unsigned int /*_index*/) const
+ignition::math::Angle BulletFixedJoint::AngleImpl(
+    const unsigned int /*_index*/) const
 {
   gzwarn << "BulletFixedJoint: called method "
-         << "GetAngleImpl that is not valid for joints of type fixed.\n";
-  return math::Angle();
+         << "AngleImpl that is not valid for joints of type fixed.\n";
+  return ignition::math::Angle::Zero;
 }
 
 //////////////////////////////////////////////////
-void BulletFixedJoint::SetVelocity(unsigned int /*_index*/, double /*_angle*/)
+void BulletFixedJoint::SetVelocity(const unsigned int /*_index*/,
+    const double /*_angle*/)
 {
   gzwarn << "BulletFixedJoint: called method "
          << "SetVelocity that is not valid for joints of type fixed.\n";
 }
 
 //////////////////////////////////////////////////
-double BulletFixedJoint::GetVelocity(unsigned int /*_index*/) const
+double BulletFixedJoint::Velocity(const unsigned int /*_index*/) const
 {
   gzwarn << "BulletFixedJoint: called method "
          << "GetVelocity that is not valid for joints of type fixed.\n";
@@ -186,7 +193,8 @@ double BulletFixedJoint::GetVelocity(unsigned int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-void BulletFixedJoint::SetForceImpl(unsigned int /*_index*/, double /*_effort*/)
+void BulletFixedJoint::SetForceImpl(const unsigned int /*_index*/,
+    const double /*_effort*/)
 {
   gzwarn << "BulletFixedJoint: called method "
          << "SetForceImpl that is not valid for joints of type fixed.\n";
@@ -194,8 +202,8 @@ void BulletFixedJoint::SetForceImpl(unsigned int /*_index*/, double /*_effort*/)
 }
 
 //////////////////////////////////////////////////
-bool BulletFixedJoint::SetHighStop(unsigned int /*_index*/,
-                      const math::Angle &/*_angle*/)
+bool BulletFixedJoint::SetHighStop(const unsigned int /*_index*/,
+                      const ignition::math::Angle &/*_angle*/)
 {
   gzwarn << "BulletFixedJoint: called method "
          << "SetHighStop that is not valid for joints of type fixed.\n";
@@ -203,8 +211,8 @@ bool BulletFixedJoint::SetHighStop(unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-bool BulletFixedJoint::SetLowStop(unsigned int /*_index*/,
-                     const math::Angle &/*_angle*/)
+bool BulletFixedJoint::SetLowStop(const unsigned int /*_index*/,
+                     const ignition::math::Angle &/*_angle*/)
 {
   gzwarn << "BulletFixedJoint: called method "
          << "SetLowStop that is not valid for joints of type fixed.\n";
@@ -212,9 +220,10 @@ bool BulletFixedJoint::SetLowStop(unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BulletFixedJoint::GetGlobalAxis(unsigned int /*_index*/) const
+ignition::math::Vector3d BulletFixedJoint::GlobalAxis(
+    const unsigned int /*_index*/) const
 {
   gzwarn << "BulletFixedJoint: called method "
          << "GetGlobalAxis that is not valid for joints of type fixed.\n";
-  return math::Vector3();
+  return ignition::math::Vector3d::Zero;
 }

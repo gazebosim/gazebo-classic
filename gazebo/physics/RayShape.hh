@@ -189,6 +189,10 @@ namespace gazebo
       /// \internal
       /// \brief Private class pointer
       protected: RayShapePrivate *rayShapeDPtr;
+
+      /// \brief ODEMultiRayShape needs to call SetCollisionName when it is
+      /// updated
+      protected: friend class ODEMultiRayShape;
     };
     /// \}
   }

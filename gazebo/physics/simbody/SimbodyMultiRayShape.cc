@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  */
-
 #include "gazebo/physics/World.hh"
+#include "gazebo/physics//MultiRayShapePrivate.hh"
 #include "gazebo/physics/simbody/SimbodyTypes.hh"
 #include "gazebo/physics/simbody/SimbodyLink.hh"
 #include "gazebo/physics/simbody/SimbodyCollision.hh"
@@ -32,7 +32,7 @@ SimbodyMultiRayShape::SimbodyMultiRayShape(CollisionPtr _parent)
 {
   this->SetName("Simbody Multiray Shape");
   this->physicsEngine = std::static_pointer_cast<SimbodyPhysics>(
-      this->collisionParent->GetWorld()->GetPhysicsEngine());
+      this->multiRayShapeDPtr->collisionParent->World()->GetPhysicsEngine());
 }
 
 //////////////////////////////////////////////////
@@ -44,7 +44,8 @@ SimbodyMultiRayShape::~SimbodyMultiRayShape()
 void SimbodyMultiRayShape::UpdateRays()
 {
   std::vector< RayShapePtr >::iterator iter;
-  for (iter = this->rays.begin(); iter != this->rays.end(); ++iter)
+  for (iter = this->multiRayShapeDPtr->rays.begin();
+       iter != this->multiRayShapeDPtr->rays.end(); ++iter)
   {
     (*iter)->Update();
   }
@@ -58,5 +59,5 @@ void SimbodyMultiRayShape::AddRay(const ignition::math::Vector3d &_start,
   SimbodyRayShapePtr ray(new SimbodyRayShape(this->physicsEngine));
   ray->SetPoints(_start, _end);
 
-  this->rays.push_back(ray);
+  this->multiRayShapeDPtr->rays.push_back(ray);
 }

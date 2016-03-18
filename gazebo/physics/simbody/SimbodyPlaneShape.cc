@@ -39,7 +39,7 @@ void SimbodyPlaneShape::CreatePlane()
   PlaneShape::CreatePlane();
   SimbodyCollisionPtr bParent;
   bParent = std::dynamic_pointer_cast<SimbodyCollision>(
-      this->collisionParent);
+      this->shapeDPtr->collisionParent);
 
   // set collision shape
 }

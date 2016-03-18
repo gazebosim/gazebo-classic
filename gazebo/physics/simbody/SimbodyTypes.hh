@@ -14,8 +14,7 @@
  * limitations under the License.
  *
 */
-
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "gazebo/util/system.hh"
 
 /// \file
@@ -33,23 +32,23 @@ namespace gazebo
     class SimbodyRayShape;
 
     /// \def SimbodyPhysicsPtr
-    /// \brief Boost shared point to SimbodyPhysics
-    typedef boost::shared_ptr<SimbodyPhysics> SimbodyPhysicsPtr;
+    /// \brief Shared pointer to SimbodyPhysics
+    typedef std::shared_ptr<SimbodyPhysics> SimbodyPhysicsPtr;
 
     /// \def SimbodyCollisionPtr
-    /// \brief Boost shared point to SimbodyCollision
-    typedef boost::shared_ptr<SimbodyCollision> SimbodyCollisionPtr;
+    /// \brief Shared pointer to SimbodyCollision
+    typedef std::shared_ptr<SimbodyCollision> SimbodyCollisionPtr;
 
     /// \def SimbodyLinkPtr
-    /// \brief Boost shared point to SimbodyLink
-    typedef boost::shared_ptr<SimbodyLink> SimbodyLinkPtr;
+    /// \brief Shared pointer to SimbodyLink
+    typedef std::shared_ptr<SimbodyLink> SimbodyLinkPtr;
 
     /// \def SimbodyModelPtr
-    /// \brief Boost shared point to SimbodyModel
-    typedef boost::shared_ptr<SimbodyModel> SimbodyModelPtr;
+    /// \brief Shared pointer to SimbodyModel
+    typedef std::shared_ptr<SimbodyModel> SimbodyModelPtr;
 
     /// \def SimbodyRayShapePtr
-    /// \brief Boost shared point to SimbodyRayShape
-    typedef boost::shared_ptr<SimbodyRayShape> SimbodyRayShapePtr;
+    /// \brief Shared pointer to SimbodyRayShape
+    typedef std::shared_ptr<SimbodyRayShape> SimbodyRayShapePtr;
   }
 }

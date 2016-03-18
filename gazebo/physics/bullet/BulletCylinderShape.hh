@@ -14,11 +14,9 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PHYSICS_BULLETCYLINDERSHAPE_HH_
-#define _GAZEBO_PHYSICS_BULLETCYLINDERSHAPE_HH_
+#ifndef _GAZEBO_PHYSICS_BULLET_BULLETCYLINDERSHAPE_HH_
+#define _GAZEBO_PHYSICS_BULLET_BULLETCYLINDERSHAPE_HH_
 
-#include "gazebo/physics/bullet/BulletPhysics.hh"
-#include "gazebo/physics/bullet/BulletLink.hh"
 #include "gazebo/physics/CylinderShape.hh"
 #include "gazebo/util/system.hh"
 
@@ -34,86 +32,15 @@ namespace gazebo
     class GZ_PHYSICS_VISIBLE BulletCylinderShape : public CylinderShape
     {
       /// \brief Constructor
-      public: BulletCylinderShape(CollisionPtr _parent)
-              : CylinderShape(_parent) {}
+      public: BulletCylinderShape(CollisionPtr _parent);
 
       /// \brief Destructor
-      public: virtual ~BulletCylinderShape() {}
+      public: virtual ~BulletCylinderShape();
 
       /// \brief Set the size of the cylinder
       /// \param[in] _radius Cylinder radius
       /// \param[in] _length Cylinder length
-      public: void SetSize(double _radius, double _length)
-              {
-                if (_radius < 0)
-                {
-                  gzerr << "Cylinder shape does not support negative radius\n";
-                  return;
-                }
-                if (_length < 0)
-                {
-                  gzerr << "Cylinder shape does not support negative length\n";
-                  return;
-                }
-                if (ignition::math::equal(_radius, 0.0))
-                {
-                  // Warn user, but still create shape with very small value
-                  // otherwise later resize operations using setLocalScaling
-                  // will not be possible
-                  gzwarn << "Setting cylinder shape's radius to zero \n";
-                  _radius = 1e-4;
-                }
-                if (ignition::math::equal(_length, 0.0))
-                {
-                  gzwarn << "Setting cylinder shape's length to zero \n";
-                  _length = 1e-4;
-                }
-
-                CylinderShape::SetSize(_radius, _length);
-                BulletCollisionPtr bParent;
-                bParent = std::dynamic_pointer_cast<BulletCollision>(
-                    this->collisionParent);
-
-                btCollisionShape *shape = bParent->GetCollisionShape();
-                if (!shape)
-                {
-                  this->initialSize = ignition::math::Vector3d(
-                      _radius, _radius, _length);
-                  bParent->SetCollisionShape(new btCylinderShapeZ(
-                      btVector3(_radius, _radius, _length * 0.5)));
-                }
-                else
-                {
-                  btVector3 cylinderScale;
-                  cylinderScale.setX(_radius / this->initialSize.X());
-                  cylinderScale.setY(_radius / this->initialSize.Y());
-                  cylinderScale.setZ(_length / this->initialSize.Z());
-
-                  shape->setLocalScaling(cylinderScale);
-
-                  // clear bullet cache and re-add the collision shape
-                  // otherwise collisions won't work properly after scaling
-                  BulletLinkPtr bLink =
-                      std::dynamic_pointer_cast<BulletLink>(
-                      bParent->GetLink());
-                  bLink->ClearCollisionCache();
-
-                  // remove and add the shape again
-                  if (bLink->GetBulletLink()->getCollisionShape()->isCompound())
-                  {
-                    btCompoundShape *compoundShape =
-                        dynamic_cast<btCompoundShape *>(
-                        bLink->GetBulletLink()->getCollisionShape());
-
-                    compoundShape->removeChildShape(shape);
-                    ignition::math::Pose3d relativePose =
-                        this->collisionParent->GetRelativePose().Ign();
-                    relativePose.Pos() -= bLink->GetInertial()->GetCoG().Ign();
-                    compoundShape->addChildShape(
-                        BulletTypes::ConvertPose(relativePose), shape);
-                  }
-                }
-              }
+      public: void SetSize(const double _radius, const double _length);
 
       /// \brief Initial size of cylinder.
       private: ignition::math::Vector3d initialSize;

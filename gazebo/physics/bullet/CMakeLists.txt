@@ -2,7 +2,9 @@ include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
 set (sources ${sources}
   bullet/BulletBallJoint.cc
+  bullet/BulletBoxShape.cc
   bullet/BulletCollision.cc
+  bullet/BulletCylinderShape.cc
   bullet/BulletFixedJoint.cc
   bullet/BulletHeightmapShape.cc
   bullet/BulletHinge2Joint.cc
@@ -14,10 +16,12 @@ set (sources ${sources}
   bullet/BulletMotionState.cc
   bullet/BulletMultiRayShape.cc
   bullet/BulletPhysics.cc
+  bullet/BulletPlaneShape.cc
   bullet/BulletPolylineShape.cc
   bullet/BulletRayShape.cc
   bullet/BulletScrewJoint.cc
   bullet/BulletSliderJoint.cc
+  bullet/BulletSphereShape.cc
   bullet/BulletSurfaceParams.cc
   bullet/BulletUniversalJoint.cc
   bullet/gzBtUniversalConstraint.cc

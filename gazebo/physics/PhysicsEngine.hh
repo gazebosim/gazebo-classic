@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _PHYSICSENGINE_HH_
-#define _PHYSICSENGINE_HH_
+#ifndef _GAZEBO_PHYSICS_PHYSICSENGINE_HH_
+#define _GAZEBO_PHYSICS_PHYSICSENGINE_HH_
 
 #include <boost/thread/recursive_mutex.hpp>
 #include <string>
@@ -67,7 +67,12 @@ namespace gazebo
 
       /// \brief Return the physics engine type (ode|bullet|dart|simbody).
       /// \return Type of the physics engine.
-      public: virtual std::string GetType() const = 0;
+      /// \sa Type()
+      public: virtual std::string GetType() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Return the physics engine type (ode|bullet|dart|simbody).
+      /// \return Type of the physics engine.
+      public: virtual std::string Type() const = 0;
 
       /// \brief Set the random number seed for the physics engine.
       /// \param[in] _seed The random number seed.
@@ -142,8 +147,14 @@ namespace gazebo
 
       /// \brief Set the gravity vector.
       /// \param[in] _gravity New gravity vector.
+      /// \deprecated See version that accepts ignition math parameters
       public: virtual void SetGravity(
-                  const gazebo::math::Vector3 &_gravity) = 0;
+                  const gazebo::math::Vector3 &_gravity) GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Set the gravity vector.
+      /// \param[in] _gravity New gravity vector.
+      public: virtual void SetGravity(
+                  const ignition::math::Vector3d &_gravity) = 0;
 
       /// \brief Return the magnetic field vector.
       /// \return The magnetic field vector.

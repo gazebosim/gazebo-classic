@@ -14,9 +14,9 @@
  * limitations under the License.
  *
 */
+#ifndef _GAZEBO_PHYSICS_SIMBODY_SIMBODYPHYSICS_HH
+#define _GAZEBO_PHYSICS_SIMBODY_SIMBODYPHYSICS_HH
 
-#ifndef _SIMBODY_PHYSICS_HH
-#define _SIMBODY_PHYSICS_HH
 #include <string>
 
 #include <boost/thread/thread.hpp>
@@ -37,6 +37,9 @@ namespace gazebo
 {
   namespace physics
   {
+    // Forward declare private data
+    class SimbodyPhysicsPrivate;
+
     /// \ingroup gazebo_physics
     /// \addtogroup gazebo_physics_simbody Simbody Physics
     /// \{
@@ -76,7 +79,7 @@ namespace gazebo
       public: virtual void Fini();
 
       // Documentation inherited
-      public: virtual std::string GetType() const;
+      public: virtual std::string Type() const;
 
       // Documentation inherited
       public: virtual LinkPtr CreateLink(ModelPtr _parent);
@@ -94,16 +97,16 @@ namespace gazebo
                                            CollisionPtr _collision);
 
       /// \brief Register a joint with the dynamics world
-      public: SimTK::MultibodySystem *GetDynamicsWorld() const;
+      public: SimTK::MultibodySystem *DynamicsWorld() const;
 
       // Documentation inherited
-      public: virtual void SetGravity(const gazebo::math::Vector3 &_gravity);
+      public: virtual void SetGravity(const ignition::math::Vector3d &_gravity);
 
       // Documentation inherited
       public: virtual void DebugPrint() const;
 
       // Documentation inherited
-      public: virtual void SetSeed(uint32_t _seed);
+      public: virtual void SetSeed(const uint32_t _seed);
 
       // Documentation inherited
       public: virtual ModelPtr CreateModel(BasePtr _parent);
@@ -111,7 +114,8 @@ namespace gazebo
       /// \brief Convert gazebo::math::Quaternion to SimTK::Quaternion
       /// \param[in] _q Gazebo's math::Quaternion object
       /// \return Simbody's SimTK::Quaternion object
-      public: static SimTK::Quaternion QuadToQuad(const math::Quaternion &_q);
+      public: static SimTK::Quaternion QuadToQuad(const math::Quaternion &_q)
+              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Convert ignition::math::Quaterniond to SimTK::Quaternion
       /// \param[in] _q ignition::math::Quaterniond object
@@ -122,12 +126,14 @@ namespace gazebo
       /// \brief Convert SimTK::Quaternion to gazebo::math::Quaternion
       /// \param[in] _q Simbody's SimTK::Quaternion object
       /// \return Gazeb's math::Quaternion object
-      public: static math::Quaternion QuadToQuad(const SimTK::Quaternion &_q);
+      public: static math::Quaternion QuadToQuad(const SimTK::Quaternion &_q)
+              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Convert gazebo::math::Vector3 to SimTK::Vec3
       /// \param[in] _v Gazebo's math::Vector3 object
       /// \return Simbody's SimTK::Vec3 object
-      public: static SimTK::Vec3 Vector3ToVec3(const math::Vector3 &_v);
+      public: static SimTK::Vec3 Vector3ToVec3(const math::Vector3 &_v)
+              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Convert ignition::math::Vector3d to SimTK::Vec3
       /// \param[in] _v ignition::math::Vector3d object
@@ -146,30 +152,49 @@ namespace gazebo
       /// the new y, then about the now twice-rotated z.
       /// \param[in] _pose Gazeb's math::Pose object
       /// \return Simbody's SimTK::Transform object
-      public: static SimTK::Transform Pose2Transform(const math::Pose &_pose);
+      public: static SimTK::Transform Pose2Transform(const math::Pose &_pose)
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Convert the given pose in x,y,z,thetax,thetay,thetaz format to
+      /// a Simbody Transform. The rotation angles are interpreted as a
+      /// body-fixed sequence, meaning we rotation about x, then about
+      /// the new y, then about the now twice-rotated z.
+      /// \param[in] _pose ignition::math::Pose3d object
+      /// \return Simbody's SimTK::Transform object
+      public: static SimTK::Transform Pose2Transform(
+                  const ignition::math::Pose3d &_pose)
 
       /// \brief Convert a Simbody transform to a pose in x,y,z,
       /// thetax,thetay,thetaz format.
       /// \param[in] _xAB Simbody's SimTK::Transform object
       /// \return Gazeb's math::Pose object
-      public: static math::Pose Transform2Pose(const SimTK::Transform &_xAB);
+      public: static math::Pose Transform2Pose(const SimTK::Transform &_xAB)
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Convert a Simbody transform to a pose in x,y,z,
+      /// thetax,thetay,thetaz format.
+      /// \param[in] _xAB Simbody's SimTK::Transform object
+      /// \return ignition::math::Pose3d object
+      public: static ignition::math::Pose3d Transform2Pose(
+                  const SimTK::Transform &_xAB);
 
       /// \brief If the given element contains a <pose> element, return it as a
       /// Transform. Otherwise return the identity Transform. If there
       /// is more than one <pose> element, only the first one is processed.
-      public: static SimTK::Transform GetPose(sdf::ElementPtr _element);
+      public: static SimTK::Transform Pose(sdf::ElementPtr _element);
 
-      /// \brief Convert Base::GetType() to string,
+      /// \brief Convert Base::Type() to string,
       /// this is needed by the MultibodyGraphMaker.
-      /// \param[in] _type Joint type returned by Joint::GetType().
+      /// \param[in] _type Joint type returned by Joint::Type().
       /// \return a hard-coded string needed by the MultibodyGraphMaker.
-      public: static std::string GetTypeString(unsigned int _type);
+      public: static std::string TypeString(const unsigned int _type);
 
-      /// \brief Convert Base::GetType() to string,
+      /// \brief Convert Base::Type() to string,
       /// this is needed by the MultibodyGraphMaker.
-      /// \param[in] _type Joint type returned by Joint::GetType().
+      /// \param[in] _type Joint type returned by Joint::Type().
       /// \return a hard-coded string needed by the MultibodyGraphMaker.
-      public: static std::string GetTypeString(physics::Base::EntityType _type);
+      public: static std::string TypeString(
+                  const physics::Base::EntityType _type);
 
       // Documentation inherited
       protected: virtual void OnRequest(ConstRequestPtr &_msg);
@@ -186,7 +211,7 @@ namespace gazebo
       /// of incoming physics::Model.
       /// \param[in] _model Model loaded by Gazebo parsing SDF.
       private: void CreateMultibodyGraph(
-        SimTK::MultibodyGraphMaker& _mbgraph, const physics::ModelPtr _model);
+        SimTK::MultibodyGraphMaker &_mbgraph, const physics::ModelPtr _model);
 
       /// \brief BUILD SIMBODY SYSTEM
       /// Given a desired multibody graph, gravity, and the Gazebo model
@@ -209,88 +234,27 @@ namespace gazebo
       /// \param[in] _mbgraph Contain MultibodyGraphMaker object.
       /// \param[in] _model Pointer to gazebo model, not used at this time.
       private: void AddDynamicModelToSimbodySystem(
-        const SimTK::MultibodyGraphMaker &_mbgraph,
-        const physics::ModelPtr _model);
+                   const SimTK::MultibodyGraphMaker &_mbgraph,
+                   const physics::ModelPtr _model);
 
       /// \brief helper function for building SimbodySystem
       private: void AddCollisionsToLink(const physics::SimbodyLink *_link,
         SimTK::MobilizedBody &_mobod, SimTK::ContactCliqueId _modelClique);
 
-      public: SimTK::MultibodySystem system;
-      public: SimTK::SimbodyMatterSubsystem matter;
-      public: SimTK::GeneralForceSubsystem forces;
-      public: SimTK::Force::Gravity gravity;
-      public: SimTK::Force::DiscreteForces discreteForces;
-      public: SimTK::ContactTrackerSubsystem tracker;
-      public: SimTK::CompliantContactSubsystem contact;
-      public: SimTK:: Integrator *integ;
-
-      /// \brief true if initialized
-      public: bool simbodyPhysicsInitialized;
-
-      public: bool simbodyPhysicsStepped;
+      // Documentation inherited
+      public: virtual boost::any Param(const std::string &_key) const;
 
       // Documentation inherited
-      public: virtual boost::any GetParam(const std::string &_key) const;
-
-      // Documentation inherited
-      public: virtual bool GetParam(const std::string &_key,
+      public: virtual bool Param(const std::string &_key,
                   boost::any &_value) const;
 
       // Documentation inherited
       public: virtual bool SetParam(const std::string &_key,
                   const boost::any &_value);
 
-      /// \brief contact material stiffness.  See sdf description for details.
-      private: double contactMaterialStiffness;
-
-      /// \brief contact material dissipation.  See sdf description for details.
-      private: double contactMaterialDissipation;
-
-      /// \brief contact material plastic coefficient of restitution.
-      /// See sdf description for details.
-      private: double contactMaterialPlasticCoefRestitution;
-
-      /// \brief contact material plastic impact velocity.
-      /// See sdf description for details.
-      private: double contactMaterialPlasticImpactVelocity;
-
-      /// \brief contact material static friction.
-      /// See sdf description for details.
-      private: double contactMaterialStaticFriction;
-
-      /// \brief contact material dynamic friction.
-      /// See sdf description for details.
-      private: double contactMaterialDynamicFriction;
-
-      /// \brief contact material viscous friction.
-      /// See sdf description for details.
-      private: double contactMaterialViscousFriction;
-
-      /// \brief contact impact capture velocity.
-      /// See sdf description for details.
-      private: double contactImpactCaptureVelocity;
-
-      /// \brief contact stiction transition velocity
-      /// See sdf description for details.
-      private: double contactStictionTransitionVelocity;
-
-      private: SimTK::MultibodySystem *dynamicsWorld;
-
-      private: common::Time lastUpdateTime;
-
-      private: double stepTimeDouble;
-
-      /// \brief The type of the solver.
-      /// Not used, just getting ready for optional pgs rigid contacts.
-      private: std::string solverType;
-
-      /// \brief The type of integrator:
-      ///   SimTK::RungeKuttaMersonIntegrator(system)
-      ///   SimTK::RungeKutta3Integrator(system)
-      ///   SimTK::RungeKutta2Integrator(system)
-      ///   SimTK::SemiExplicitEuler2Integrator(system)
-      private: std::string integratorType;
+      /// \internal
+      /// \brief Private data pointer
+      private: SimbodyPhysicsPrivate *simbodyPhysicsDPtr;
     };
   /// \}
   }

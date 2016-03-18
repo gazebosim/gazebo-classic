@@ -45,7 +45,7 @@ void SimbodyModel::Load(sdf::ElementPtr _sdf)
     gzerr << "Nested models are not currently supported in Simbody. ["
       << _sdf->Get<std::string>("name") << "] will not be loaded. "
       << std::endl;
-    this->sdf = _sdf;
+    this->modelDPtr->sdf = _sdf;
     return;
   }
 
@@ -56,17 +56,17 @@ void SimbodyModel::Load(sdf::ElementPtr _sdf)
 void SimbodyModel::Init()
 {
   // nested models are not supported for now, issue #1718
-  if (this->sdf->HasElement("model"))
+  if (this->modelDPtr->sdf->HasElement("model"))
     return;
 
   // Record the model's initial pose (for reseting)
-  this->SetInitialRelativePose(this->GetWorldPose());
+  this->SetInitialRelativePose(this->WorldPose());
 
-  this->SetRelativePose(this->GetWorldPose());
+  this->SetRelativePose(this->WorldPose());
 
   // Initialize the bodies before the joints
-  for (Base_V::iterator iter = this->children.begin();
-       iter!= this->children.end(); ++iter)
+  for (Base_V::iterator iter = this->modelDptr->children.begin();
+       iter!= this->modelDptr->children.end(); ++iter)
   {
     if ((*iter)->HasType(Base::LINK))
       std::static_pointer_cast<Link>(*iter)->Init();
@@ -74,22 +74,26 @@ void SimbodyModel::Init()
       std::static_pointer_cast<SimbodyModel>(*iter)->Init();
   }
 
-  for (unsigned int i = 0; i < this->GetGripperCount(); ++i)
+  for (unsigned int i = 0; i < this->GripperCount(); ++i)
   {
-    this->GetGripper(i)->Init();
+    this->Gripper(i)->Init();
   }
 
   // rebuild simbody state
   // this needs to happen before this->joints are used
   physics::SimbodyPhysicsPtr simbodyPhysics =
     std::dynamic_pointer_cast<physics::SimbodyPhysics>(
-      this->GetWorld()->GetPhysicsEngine());
+      this->World()->GetPhysicsEngine());
+
   if (simbodyPhysics)
+  {
     simbodyPhysics->InitModel(
         std::static_pointer_cast<Model>(shared_from_this()));
+  }
 
   // Initialize the joints last.
-  Joint_V myJoints = this->GetJoints();
+  Joint_V myJoints = this->Joints();
+
   for (Joint_V::iterator iter = myJoints.begin();
        iter != myJoints.end(); ++iter)
   {
@@ -100,7 +104,7 @@ void SimbodyModel::Init()
     catch(...)
     {
       gzerr << "Init failed for joint ["
-            << (*iter)->GetScopedName() << "]"
+            << (*iter)->ScopedName() << "]"
             << std::endl;
       return;
     }
@@ -115,7 +119,7 @@ void SimbodyModel::Init()
     // can be included in the message.
     msgs::Joint msg;
     (*iter)->FillMsg(msg);
-    this->jointPub->Publish(msg);
+    this->modelDPtr->jointPub->Publish(msg);
   }
 }
 
