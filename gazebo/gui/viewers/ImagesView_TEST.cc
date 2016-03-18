@@ -68,11 +68,11 @@ void ImagesView_TEST::Switch()
 
   gzmsg << "cam1 to cam6" << std::endl;
   for (int i = 2; i < 8; ++i)
-    this->SetTopic(view, topicMap[i], i);
+    this->SetTopic(view.get(), topicMap[i], i);
 
   gzmsg << "cam6 to cam1" << std::endl;
   for (int i = 7; i > 1; --i)
-    this->SetTopic(view, topicMap[i], i);
+    this->SetTopic(view.get(), topicMap[i], i);
 
   // Switch the topic 25 times
   for (unsigned int i = 0; i < 25; ++i)
