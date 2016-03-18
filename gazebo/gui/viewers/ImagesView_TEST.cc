@@ -26,7 +26,8 @@ void ImagesView_TEST::Construction()
   this->Load("worlds/empty.world");
 
   // Create a new data logger widget
-  auto view = std::make_unique<gazebo::gui::ImagesView>(NULL);
+  std::unique_ptr<gazebo::gui::ImagesView> view(
+      new gazebo::gui::ImagesView(NULL));
   view->show();
 
   QCoreApplication::processEvents();
@@ -46,7 +47,8 @@ void ImagesView_TEST::Switch()
   this->Load("worlds/multicamera_test.world");
 
   // Create a new data logger widget
-  auto view = std::make_unique<gazebo::gui::ImagesView>(NULL);
+  std::unique_ptr<gazebo::gui::ImagesView> view(
+      new gazebo::gui::ImagesView(NULL));
   view->show();
 
   // Get the frame that holds the images

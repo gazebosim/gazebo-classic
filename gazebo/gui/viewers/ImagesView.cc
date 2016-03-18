@@ -43,7 +43,7 @@ ImagesView::ImagesView(QWidget *_parent)
   this->setWindowTitle(tr("Gazebo: Images View"));
 
   // Create the layout and frame for images
-  auto frameLayout = std::make_unique<QGridLayout>();
+  std::unique_ptr<QGridLayout> frameLayout(new QGridLayout);
   frameLayout->setSizeConstraint(QLayout::SetMinimumSize);
 
   this->frame->setObjectName("blackBorderFrame");
@@ -81,7 +81,7 @@ void ImagesView::UpdateImpl()
     }
 
     // Create new layout
-    auto newLayout = std::make_unique<QGridLayout>();
+    std::unique_ptr<QGridLayout> newLayout(new QGridLayout);
     newLayout->setSizeConstraint(QLayout::SetMinimumSize);
     this->frame->setLayout(newLayout.release());
 
@@ -122,7 +122,7 @@ void ImagesView::SetTopic(const std::string &_topicName)
 /////////////////////////////////////////////////
 void ImagesView::AddImage(int _width, int _height)
 {
-  audo imageFrame = std::make_unique<ImageFrame>(NULL);
+  std::unique_ptr<ImageFrame> imageFrame(new ImageFrame(NULL));
   imageFrame->setBaseSize(_width, _height);
   imageFrame->setMinimumSize(320, 240);
   imageFrame->show();
