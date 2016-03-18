@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,24 +15,25 @@
  *
 */
 
-#ifndef _GAZEBO_GUI_BUILDING_MAKER_TEST_HH_
-#define _GAZEBO_GUI_BUILDING_MAKER_TEST_HH_
+#ifndef _GAZEBO_TRACK_VISUAL_TEST_HH_
+#define _GAZEBO_TRACK_VISUAL_TEST_HH_
 
+#include <string>
 #include "gazebo/gui/QTestFixture.hh"
 
-/// \brief A test class for the BuildingMaker class.
-class BuildingMaker_TEST : public QTestFixture
+class QtProperty;
+class QtTreePropertyBrowser;
+
+/// \brief Test undo / redo user commands.
+class TrackVisualTest : public QTestFixture
 {
   Q_OBJECT
 
-  /// \brief Constructor
-  public: BuildingMaker_TEST() = default;
+  /// \brief Default constructor
+  public: TrackVisualTest() = default;
 
-  /// \brief Test attaching and detaching manips.
-  private slots: void Attach();
-
-  /// \brief Test assigning layers according to level.
-  private slots: void Layers();
+  /// \brief Test tracking visual.
+  private slots: void TrackVisual();
 };
 
 #endif
