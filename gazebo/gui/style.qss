@@ -195,7 +195,7 @@ QPushButton#plotAddCanvas
   padding: 8px;
   font-weight: 100;
   font-size: 20px;
-  background-color: #db4437;
+  background-color: #f78e1e;
   color: #ffffff;
   text-align: center;
   border-radius: 2px;
@@ -984,9 +984,9 @@ QTabBar#plottingTabBar::tab:!selected
 
 QTabBar#plottingTabBar::tab:selected
 {
-  color: #f58113;
+  color: #f78e1e;
   background-color: rgba(120,120,120,255);
-  border-bottom: 2px solid #f58113;
+  border-bottom: 2px solid #f78e1e;
   font-weight: 600;
 }
 
