@@ -14,9 +14,12 @@ include_directories(
 # which uses tinxyml. Not defining the link directory here will end up
 # failures in clang.
 link_directories(
+  ${CMAKE_CURRENT_BINARY_DIR}
+  ${CURL_LIBDIR}
   ${CCD_LIBRARY_DIRS}
   ${SDFormat_LIBRARY_DIRS}
   ${tinyxml_LIBRARY_DIRS}
+  ${IGNITION-MATH_LIBRARY_DIRS}
 )
 
 include (${QT_USE_FILE})
@@ -39,7 +42,7 @@ endif()
 set (plugins
   ActuatorPlugin
   ArrangePlugin
-  BreakableJointPlugin
+  BreakableJointPlugin 
   BuoyancyPlugin
   CameraPlugin
   CartDemoPlugin
@@ -91,11 +94,6 @@ foreach (src ${plugins})
   install (TARGETS ${src} DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
   gz_install_includes("plugins" ${src}.hh)
 endforeach (src ${plugins})
-
-target_link_libraries(BreakableJointPlugin ForceTorquePlugin)
-set_target_properties(BreakableJointPlugin PROPERTIES
-  INSTALL_RPATH ${GAZEBO_PLUGIN_INSTALL_DIR}
-)
 
 foreach (src ${GUIplugins})
   QT4_WRAP_CPP(${src}_MOC ${src}.hh)

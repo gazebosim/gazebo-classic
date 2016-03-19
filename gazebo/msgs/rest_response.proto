@@ -12,7 +12,7 @@ message RestResponse
     SUCCESS = 1;
 
     /// \brief Error calling rest service
-    ERROR    = 2;
+    ERR    = 2;
 
     /// \brief Response to a login request
     LOGIN    = 3;

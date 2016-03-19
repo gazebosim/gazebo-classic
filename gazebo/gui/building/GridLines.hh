@@ -42,7 +42,7 @@ namespace gazebo
       public: GridLines(int _width, int _height);
 
       /// \brief Destructor
-      public: ~GridLines() = default;
+      public: ~GridLines();
 
       /// \return Set the size of grid lines in pixels.
       /// \param[in] _width Width of grid lines in pixels.
