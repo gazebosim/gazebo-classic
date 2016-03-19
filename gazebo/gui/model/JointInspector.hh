@@ -146,7 +146,7 @@ namespace gazebo
       private: bool CheckValid();
 
       /// \brief Qt close event
-      ///// \param[in] _event Qt close event pointer
+      /// \param[in] _event Qt close event pointer
       private: void closeEvent(QCloseEvent *_event);
 
       /// \internal

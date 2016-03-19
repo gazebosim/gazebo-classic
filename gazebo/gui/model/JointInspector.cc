@@ -670,7 +670,7 @@ void JointInspector::keyPressEvent(QKeyEvent *_event)
     QDialog::keyPressEvent(_event);
 }
 ///////////////////////////////////////////////////
-void JointInspector::closeEvent(QCloseEvent*)
+void JointInspector::closeEvent(QCloseEvent *_event)
 {
   this->accept();
 }
