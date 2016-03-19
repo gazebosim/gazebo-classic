@@ -18,7 +18,6 @@
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/MainWindow.hh"
-#include "gazebo/gui/building/EditorView.hh"
 #include "gazebo/gui/building/BuildingEditorEvents.hh"
 #include "gazebo/gui/building/BuildingMaker.hh"
 #include "gazebo/gui/building/BuildingMaker_TEST.hh"
@@ -87,10 +86,7 @@ void BuildingMaker_TEST::Layers()
   auto buildingMaker = new gazebo::gui::BuildingMaker();
   QVERIFY(buildingMaker != NULL);
 
-  gazebo::gui::EditorView *editorView =
-      mainWindow->findChild<gazebo::gui::EditorView *>("editorView");
-  QVERIFY(editorView != NULL);
-
+  // Add a wall on each level
   int levelCount = 3;
   for (int i = 0; i < levelCount; ++i)
   {
