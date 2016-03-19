@@ -672,5 +672,5 @@ void JointInspector::keyPressEvent(QKeyEvent *_event)
 ///////////////////////////////////////////////////
 void JointInspector::closeEvent(QCloseEvent *_event)
 {
-  this->accept();
+  _event->accept();
 }
