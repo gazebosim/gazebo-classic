@@ -19,6 +19,8 @@
  * LICENSE.TXT and LICENSE-BSD.TXT for more details.                     *
  *                                                                       *
  *************************************************************************/
+#pragma GCC diagnostic ignored "-Wcomment"
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 
 /*
 
@@ -528,7 +530,7 @@ int dCollideRayCylinder(dxGeom *o1, dxGeom *o2, int flags,
   //  Ray origin cases (ignoring origin on surface)
   //
   //  A          B
-  //     /-\-----------\
+  //     |-|-----------|
   //  C (   )    D      )
   //     \_/___________/
   //
@@ -570,9 +572,9 @@ int dCollideRayCylinder(dxGeom *o1, dxGeom *o2, int flags,
 
   // Find the different cases
   // Is ray parallel to the cylinder length?
-  int parallel = (dir[0]==0 && dir[1]==0);
+  int parallel = (_dequal(dir[0], 0.0) && _dequal(dir[1], 0.0));
   // Is ray perpendicular to the cylinder length?
-  int perpendicular = (dir[2]==0);
+  int perpendicular = (_dequal(dir[2], 0.0));
   // Is ray origin within the radius of the caps?
   int inRadius = (C<=0);
   // Is ray origin between the top and bottom caps?
