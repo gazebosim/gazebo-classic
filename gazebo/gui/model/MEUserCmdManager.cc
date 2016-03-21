@@ -515,4 +515,3 @@ void MEUserCmdManager::OnRedoCmdHistory()
 
   menu.exec(QCursor::pos());
 }
-

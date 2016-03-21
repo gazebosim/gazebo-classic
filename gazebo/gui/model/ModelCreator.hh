@@ -266,9 +266,6 @@ namespace gazebo
       /// \brief Callback received when exiting the editor mode.
       private: void OnExit();
 
-      /// \brief Update callback on PreRender.
-      private: void Update();
-
       /// \brief Internal helper function to remove a nestedModel without
       /// removing the joints.
       /// \param[in] _nestedModelName Name of the nestedModel to remove

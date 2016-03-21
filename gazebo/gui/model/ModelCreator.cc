@@ -360,9 +360,6 @@ ModelCreator::ModelCreator(QObject *_parent)
           std::placeholders::_1)));
 
   this->dataPtr->connections.push_back(
-      event::Events::ConnectPreRender(std::bind(&ModelCreator::Update, this)));
-
-  this->dataPtr->connections.push_back(
       gui::model::Events::ConnectModelPropertiesChanged(
       std::bind(&ModelCreator::OnPropertiesChanged, this, std::placeholders::_1,
       std::placeholders::_2)));
@@ -3116,44 +3113,6 @@ void ModelCreator::ModelChanged()
 }
 
 /////////////////////////////////////////////////
-void ModelCreator::Update()
-{
-  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->updateMutex);
-
-  // Check if any links have been moved or resized and trigger ModelChanged
-  for (auto &linksIt : this->dataPtr->allLinks)
-  {
-    LinkData *link = linksIt.second;
-    if (link->Pose() != link->linkVisual->GetPose().Ign())
-    {
-      link->SetPose(link->linkVisual->GetWorldPose().Ign() -
-          this->dataPtr->modelPose);
-      this->ModelChanged();
-    }
-    for (auto &scaleIt : this->dataPtr->linkScaleUpdate)
-    {
-      if (link->linkVisual->GetName() == scaleIt.first->Name())
-        link->SetScale(scaleIt.second);
-    }
-  }
-  if (!this->dataPtr->linkScaleUpdate.empty())
-    this->ModelChanged();
-  this->dataPtr->linkScaleUpdate.clear();
-
-  // check nested model
-  for (auto &nestedModelIt : this->dataPtr->allNestedModels)
-  {
-    NestedModelData *nestedModel = nestedModelIt.second;
-    if (nestedModel->Pose() != nestedModel->modelVisual->GetPose().Ign())
-    {
-      nestedModel->SetPose((nestedModel->modelVisual->GetWorldPose() -
-          this->dataPtr->modelPose).Ign());
-      this->ModelChanged();
-    }
-  }
-}
-
-/////////////////////////////////////////////////
 void ModelCreator::OnEntityScaleChanged(const std::string &_name,
   const gazebo::math::Vector3 &_scale)
 {
@@ -3171,7 +3130,6 @@ void ModelCreator::OnEntityScaleChanged(const std::string &_name,
     }
   }
 }
-
 
 /////////////////////////////////////////////////
 void ModelCreator::OnEntityMoved(const std::string &_name,
