@@ -14,50 +14,51 @@
  * limitations under the License.
  *
 */
+
 #ifndef _GAZEBO_GUI_MODEL_MODELCREATOR_HH_
 #define _GAZEBO_GUI_MODEL_MODELCREATOR_HH_
 
+#include <memory>
+#include <mutex>
+#include <string>
+
+
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Vector3.hh>
 #include <sdf/sdf.hh>
 
-#include <list>
-#include <map>
-#include <string>
-#include <vector>
-#include <mutex>
-
-#include "gazebo/common/KeyEvent.hh"
-#include "gazebo/common/MouseEvent.hh"
-#include "gazebo/math/Pose.hh"
-#include "gazebo/transport/TransportTypes.hh"
-#include "gazebo/rendering/Visual.hh"
-#include "gazebo/gui/model/LinkInspector.hh"
 #include "gazebo/gui/qt.h"
+#include "gazebo/math/Vector3.hh"
+
+#include "gazebo/rendering/RenderTypes.hh"
 
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
-  namespace msgs
+  namespace common
   {
-    class Visual;
+    class KeyEvent;
+    class MouseEvent;
   }
 
   namespace gui
   {
-    class NestedModelData;
+    class JointMaker;
     class LinkData;
     class ModelPluginData;
     class NestedModelData;
-    class ModelData;
-    class SaveDialog;
-    class JointMaker;
+
+    // Forward declare private data.
+    class ModelCreatorPrivate;
     class MEUserCmdManager;
 
     /// \addtogroup gazebo_gui
     /// \{
 
     /// \class ModelCreator ModelCreator.hh
-    /// \brief Create and manage 3D visuals of a model with links and joints.
+    /// \brief Create and manage 3D visuals of a model with links, nested models
+    /// and joints.
     class GZ_GUI_VISIBLE ModelCreator : public QObject
     {
       Q_OBJECT
@@ -86,18 +87,19 @@ namespace gazebo
       /// \brief Save states for the model editor.
       public: enum SaveState
       {
-        // NEVER_SAVED: The model has never been saved.
+        /// \brief The model has never been saved.
         NEVER_SAVED,
 
-        // ALL_SAVED: All changes have been saved.
+        /// \brief All changes have been saved.
         ALL_SAVED,
 
-        // UNSAVED_CHANGES: Has been saved before, but has unsaved changes.
+        /// \brief Has been saved before, but has unsaved changes.
         UNSAVED_CHANGES
       };
 
       /// \brief Constructor
-      public: ModelCreator();
+      /// \param[in] _parent Parent Qt Object
+      public: ModelCreator(QObject *_parent = NULL);
 
       /// \brief Destructor
       public: virtual ~ModelCreator();
@@ -108,7 +110,7 @@ namespace gazebo
 
       /// \brief Get the name of the model.
       /// \return Name of model.
-      public: std::string GetModelName() const;
+      public: std::string ModelName() const;
 
       /// \brief Set save state upon a change to the model.
       public: void ModelChanged();
@@ -126,10 +128,10 @@ namespace gazebo
       /// \param[in] _pose Pose of the link.
       /// \param[in] _samples Number of samples for polyline.
       /// \return Link data.
-      public: LinkData *AddShape(EntityType _type,
-          const math::Vector3 &_size = math::Vector3::One,
-          const math::Pose &_pose = math::Pose::Zero,
-          const std::string &_uri = "", unsigned int _samples = 5);
+      public: LinkData *AddShape(const EntityType _type,
+          const ignition::math::Vector3d &_size = ignition::math::Vector3d::One,
+          const ignition::math::Pose3d &_pose = ignition::math::Pose3d::Zero,
+          const std::string &_uri = "", const unsigned int _samples = 5);
 
       /// \brief Add a nested model to the model
       /// \param[in] _sdf SDF describing the model.
@@ -150,11 +152,11 @@ namespace gazebo
 
       /// \brief Set the model to be static
       /// \param[in] _static True to make the model static.
-      public: void SetStatic(bool _static);
+      public: void SetStatic(const bool _static);
 
       /// \brief Set the model to allow auto disable at rest.
       /// \param[in] _auto True to allow the model to auto disable.
-      public: void SetAutoDisable(bool _auto);
+      public: void SetAutoDisable(const bool _auto);
 
       /// \brief Reset the model creator and the SDF.
       public: void Reset();
@@ -164,7 +166,7 @@ namespace gazebo
 
       /// \brief Get joint maker
       /// \return Joint maker
-      public: JointMaker *GetJointMaker() const;
+      public: gui::JointMaker *JointMaker() const;
 
       /// \brief Set the select state of an entity.
       /// \param[in] _name Name of the link.
@@ -174,12 +176,12 @@ namespace gazebo
       /// \brief Set the select state of a entity visual.
       /// \param[in] _linkVis Pointer to the entity visual.
       /// \param[in] _selected True to select the entity.
-      public: void SetSelected(rendering::VisualPtr _linkVis,
+      public: void SetSelected(const rendering::VisualPtr &_entityVis,
           const bool selected);
 
       /// \brief Get current save state.
       /// \return Current save state.
-      public: enum SaveState GetCurrentSaveState() const;
+      public: enum SaveState CurrentSaveState() const;
 
       /// \brief Append a plugin element.
       /// \param[in[ _name Name of the plugin element.
@@ -206,7 +208,7 @@ namespace gazebo
 
       /// \brief Add a link to the model
       /// \param[in] _type Type of link to be added
-      public: void AddLink(EntityType _type);
+      public: void AddLink(const EntityType _type);
 
       /// \brief Add a model plugin to the model
       /// \param[in] _name Name of plugin
@@ -264,6 +266,9 @@ namespace gazebo
       /// \brief Callback received when exiting the editor mode.
       private: void OnExit();
 
+      /// \brief Update callback on PreRender.
+      private: void Update();
+
       /// \brief Internal helper function to remove a nestedModel without
       /// removing the joints.
       /// \param[in] _nestedModelName Name of the nestedModel to remove
@@ -276,7 +281,7 @@ namespace gazebo
 
       /// \brief QT callback when entering model edit mode
       /// \param[in] _checked True if the menu item is checked
-      private slots: void OnEdit(bool _checked);
+      private slots: void OnEdit(const bool _checked);
 
       /// \brief QT callback when there's a request to edit an existing model.
       /// \param[in] _modelName Name of model to be edited.
@@ -410,7 +415,7 @@ namespace gazebo
       /// \param[in] _name Name of entity.
       /// \param[in] _scale New scale.
       private: void OnEntityScaleChanged(const std::string &_name,
-          const math::Vector3 &_scale);
+          const gazebo::math::Vector3 &_scale);
 
       /// \brief Callback when an entity's pose has changed.
       /// \param[in] _name Name of entity.
@@ -447,14 +452,15 @@ namespace gazebo
       /// original values
       /// \param[in] _name Name of visual.
       /// \param[in] _visible True to set the visual to be visible.
-      private: void SetModelVisible(const std::string &_name, bool _visible);
+      private: void SetModelVisible(const std::string &_name,
+          const bool _visible);
 
       /// \brief Set visibilty of a visual recursively while storing their
       /// original values
       /// \param[in] _visual Pointer to the visual.
       /// \param[in] _visible True to set the visual to be visible.
-      private: void SetModelVisible(rendering::VisualPtr _visual,
-          bool _visible);
+      private: void SetModelVisible(const rendering::VisualPtr &_visual,
+          const bool _visible);
 
       /// \brief Show a link's context menu
       /// \param[in] _link Name of link the context menu is associated with.
@@ -491,143 +497,10 @@ namespace gazebo
       /// \brief Qt signal when the a link has been added.
       Q_SIGNALS: void LinkAdded();
 
-      /// \brief The model in SDF format.
-      private: sdf::SDFPtr modelSDF;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<ModelCreatorPrivate> dataPtr;
 
-      /// \brief A template SDF of a simple box model.
-      private: sdf::SDFPtr modelTemplateSDF;
-
-      /// \brief Name of the model.
-      private: std::string modelName;
-
-      /// \brief Folder name, which is the model name without spaces.
-      private: std::string folderName;
-
-      /// \brief Name of the model preview.
-      private: static const std::string previewName;
-
-      /// \brief The root visual of the model.
-      private: rendering::VisualPtr previewVisual;
-
-      /// \brief Visual currently being inserted into the model, which is
-      /// attached to the mouse.
-      private: rendering::VisualPtr mouseVisual;
-
-      /// \brief The pose of the model.
-      private: ignition::math::Pose3d modelPose;
-
-      /// \brief True to create a static model.
-      private: bool isStatic;
-
-      /// \brief True to auto disable model when it is at rest.
-      private: bool autoDisable;
-
-      /// \brief A list of gui editor events connected to the model creator.
-      private: std::vector<event::ConnectionPtr> connections;
-
-      /// \brief Counter for the number of links in the model.
-      private: int linkCounter;
-
-      /// \brief Counter for generating a unique model name.
-      private: int modelCounter;
-
-      /// \brief Type of entity being added.
-      private: EntityType addEntityType;
-
-      /// \brief A map of nested model names to and their visuals.
-      private: std::map<std::string, NestedModelData *> allNestedModels;
-
-      /// \brief A map of model link names to their data.
-      private: std::map<std::string, LinkData *> allLinks;
-
-      /// \brief A map of model plugin names to their data.
-      private: std::map<std::string, ModelPluginData *> allModelPlugins;
-
-      /// \brief Transport node
-      private: transport::NodePtr node;
-
-      /// \brief Publisher that publishes msg to the server once the model is
-      /// created.
-      private: transport::PublisherPtr makerPub;
-
-      /// \brief Publisher that publishes delete entity msg to remove the
-      /// editor visual.
-      private: transport::PublisherPtr requestPub;
-
-      /// \brief Joint maker.
-      private: JointMaker *jointMaker;
-
-      /// \brief origin of the model.
-      private: math::Pose origin;
-
-      /// \brief A list of selected nested model visuals.
-      private: std::vector<rendering::VisualPtr> selectedNestedModels;
-
-      /// \brief A list of selected link visuals.
-      private: std::vector<rendering::VisualPtr> selectedLinks;
-
-      /// \brief A list of selected model plugins.
-      private: std::vector<std::string> selectedModelPlugins;
-
-      /// \brief Names of entities copied through g_copyAct
-      private: std::vector<std::string> copiedNames;
-
-      /// \brief The last mouse event
-      private: common::MouseEvent lastMouseEvent;
-
-      /// \brief Qt action for opening the link inspector.
-      private: QAction *inspectAct;
-
-      /// \brief Name of link that is currently being inspected.
-      private: std::string inspectName;
-
-      /// \brief True if the model editor mode is active.
-      private: bool active;
-
-      /// \brief Current model manipulation mode.
-      private: std::string manipMode;
-
-      /// \brief Default name of the model.
-      private: static const std::string modelDefaultName;
-
-      /// \brief A dialog with options to save the model.
-      private: SaveDialog *saveDialog;
-
-      /// \brief Store the current save state of the model.
-      private: enum SaveState currentSaveState;
-
-      /// \brief Mutex to protect updates
-      private: std::recursive_mutex updateMutex;
-
-      /// \brief A list of link data whose scale has changed externally.
-      private: std::map<LinkData *, ignition::math::Vector3d> linkScaleUpdate;
-
-      /// \brief A list of link data whose pose has changed externally.
-      private: std::map<LinkData *, ignition::math::Pose3d> linkPoseUpdate;
-
-      /// \brief A list of nested model data whose pose has changed externally.
-      private: std::map<NestedModelData *, ignition::math::Pose3d>
-          nestedModelPoseUpdate;
-
-      /// \brief Name of model on the server that is being edited here in the
-      /// model editor.
-      private: std::string serverModelName;
-
-      /// \brief SDF element of the model on the server.
-      private: sdf::ElementPtr serverModelSDF;
-
-      /// \brief SDF element to append in the end.
-      private: sdf::ElementPtr sdfToAppend;
-
-      /// \brief A map of all visuals of the model to be edited to their
-      /// visibility.
-      private: std::map<uint32_t, bool> serverModelVisible;
-
-      /// \brief Name of the canonical model
-      private: std::string canonicalModel;
-
-      /// \brief Name of the canonical link in the model
-      private: std::string canonicalLink;
     };
     /// \}
   }
