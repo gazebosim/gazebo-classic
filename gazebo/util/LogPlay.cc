@@ -84,7 +84,8 @@ void LogPlay::Open(const std::string &_logFile)
     if (inFile)
     {
       // Move to the end of the file
-      inFile.seekg(- 1 - endTag.length(), std::ios::end);
+      int len = -1 - static_cast<int>(endTag.length());
+      inFile.seekg(len, std::ios::end);
 
       // Get the last line
       std::string lastLine;
@@ -117,10 +118,12 @@ void LogPlay::Open(const std::string &_logFile)
   {
     gzerr << "Unable to load file[" << _logFile << "]. "
       << "Check the Gazebo server log file for more information.\n";
-    gzlog << "Log Error 1:\n"
-      << this->dataPtr->xmlDoc.GetErrorStr1() << std::endl;
-    gzlog << "Log Error 2:\n"
-      << this->dataPtr->xmlDoc.GetErrorStr2() << std::endl;
+    const char *errorStr1 = this->dataPtr->xmlDoc.GetErrorStr1();
+    const char *errorStr2 = this->dataPtr->xmlDoc.GetErrorStr2();
+    if (errorStr1)
+      gzlog << "Log Error 1:\n" << errorStr1 << std::endl;
+    if (errorStr2)
+      gzlog << "Log Error 2:\n" << errorStr2 << std::endl;
     gzthrow("Error parsing log file");
   }
 
