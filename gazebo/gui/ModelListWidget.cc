@@ -197,6 +197,12 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
                                              this->dataPtr->selectedEntityName);
       this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
     }
+    else if (name == "Atmosphere")
+    {
+      this->dataPtr->requestMsg = msgs::CreateRequest("atmosphere_info",
+                                             this->dataPtr->selectedEntityName);
+      this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
+    }
     else if (name == "Spherical Coordinates")
     {
       this->dataPtr->requestMsg = msgs::CreateRequest(
@@ -372,6 +378,8 @@ void ModelListWidget::Update()
       this->FillPropertyTree(this->dataPtr->sceneMsg, NULL);
     else if (this->dataPtr->fillTypes[0] == "Physics")
       this->FillPropertyTree(this->dataPtr->physicsMsg, NULL);
+    else if (this->dataPtr->fillTypes[0] == "Atmosphere")
+      this->FillPropertyTree(this->dataPtr->atmosphereMsg, NULL);
     else if (this->dataPtr->fillTypes[0] == "Light")
       this->FillPropertyTree(this->dataPtr->lightMsg, NULL);
     else if (this->dataPtr->fillTypes[0] == "Spherical Coordinates")
@@ -535,6 +543,14 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
     this->dataPtr->propMutex->unlock();
   }
   else if (_msg->has_type() && _msg->type() ==
+      this->dataPtr->atmosphereMsg.GetTypeName())
+  {
+    this->dataPtr->propMutex->lock();
+    this->dataPtr->atmosphereMsg.ParseFromString(_msg->serialized_data());
+    this->dataPtr->fillTypes.push_back("Atmosphere");
+    this->dataPtr->propMutex->unlock();
+  }
+  else if (_msg->has_type() && _msg->type() ==
       this->dataPtr->lightMsg.GetTypeName())
   {
     this->dataPtr->propMutex->lock();
@@ -689,6 +705,8 @@ void ModelListWidget::OnPropertyChanged(QtProperty *_item)
     this->ScenePropertyChanged(_item);
   else if (currentItem == this->dataPtr->physicsItem)
     this->PhysicsPropertyChanged(_item);
+  else if (currentItem == this->dataPtr->atmosphereItem)
+    this->AtmospherePropertyChanged(_item);
   else if (currentItem == this->dataPtr->guiItem)
     this->GUIPropertyChanged(_item);
 }
@@ -877,6 +895,45 @@ void ModelListWidget::PhysicsPropertyChanged(QtProperty * /*_item*/)
 
   msg.set_type(this->dataPtr->physicsType);
   this->dataPtr->physicsPub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
+void ModelListWidget::AtmospherePropertyChanged(QtProperty *_item)
+{
+  msgs::Atmosphere msg;
+
+  QList<QtProperty*> properties = this->dataPtr->propTreeBrowser->properties();
+  for (QList<QtProperty*>::iterator iter = properties.begin();
+       iter != properties.end(); ++iter)
+  {
+    if ((*iter)->propertyName().toStdString() == "enable atmosphere")
+    {
+      msg.set_enable_atmosphere(this->dataPtr->variantManager->value(
+            (*iter)).toBool());
+    }
+    else if ((*iter)->propertyName().toStdString() == "temperature")
+    {
+      msg.set_temperature(
+          this->dataPtr->variantManager->value((*iter)).toDouble());
+    }
+    else if ((*iter)->propertyName().toStdString() == "pressure")
+    {
+      msg.set_pressure(this->dataPtr->variantManager->value(
+            (*iter)).toDouble());
+    }
+  }
+
+  msg.set_type(this->dataPtr->atmosphereType);
+  this->dataPtr->atmospherePub->Publish(msg);
+
+  std::string changedProperty = _item->propertyName().toStdString();
+  if (changedProperty == "temperature" || changedProperty == "pressure")
+  {
+    // Send request to retrieve new value for mass_density
+    this->dataPtr->requestMsg = msgs::CreateRequest("atmosphere_info",
+                                           this->dataPtr->selectedEntityName);
+    this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -2564,6 +2621,7 @@ void ModelListWidget::OnRemoveScene(const std::string &/*_name*/)
   this->dataPtr->modelPub.reset();
   this->dataPtr->scenePub.reset();
   this->dataPtr->physicsPub.reset();
+  this->dataPtr->atmospherePub.reset();
   this->dataPtr->lightPub.reset();
   this->dataPtr->responseSub.reset();
   this->dataPtr->requestSub.reset();
@@ -2592,6 +2650,7 @@ void ModelListWidget::InitTransport(const std::string &_name)
     this->dataPtr->modelPub.reset();
     this->dataPtr->scenePub.reset();
     this->dataPtr->physicsPub.reset();
+    this->dataPtr->atmospherePub.reset();
     this->dataPtr->lightPub.reset();
     this->dataPtr->responseSub.reset();
     this->dataPtr->requestSub.reset();
@@ -2606,6 +2665,8 @@ void ModelListWidget::InitTransport(const std::string &_name)
       "~/scene");
   this->dataPtr->physicsPub = this->dataPtr->node->Advertise<msgs::Physics>(
       "~/physics");
+  this->dataPtr->atmospherePub =
+      this->dataPtr->node->Advertise<msgs::Atmosphere>("~/atmosphere");
 
   this->dataPtr->lightPub = this->dataPtr->node->Advertise<msgs::Light>(
       "~/light/modify");
@@ -2652,6 +2713,15 @@ void ModelListWidget::ResetTree()
     this->dataPtr->physicsItem->setData(0, Qt::UserRole,
         QVariant(tr("Physics")));
     this->dataPtr->modelTreeWidget->addTopLevelItem(this->dataPtr->physicsItem);
+
+    // Atmosphere item
+    this->dataPtr->atmosphereItem = new QTreeWidgetItem(
+        static_cast<QTreeWidgetItem *>(0),
+        QStringList(QString("%1").arg(tr("Atmosphere"))));
+    this->dataPtr->atmosphereItem->setData(0, Qt::UserRole,
+        QVariant(tr("Atmosphere")));
+    this->dataPtr->modelTreeWidget->addTopLevelItem(
+        this->dataPtr->atmosphereItem);
 
     // Models item
     this->dataPtr->modelsItem = new QTreeWidgetItem(
@@ -2754,6 +2824,8 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
 
   if (_msg.has_type())
   {
+    this->dataPtr->physicsType = _msg.type();
+
     item = this->dataPtr->variantManager->addProperty(
       QtVariantPropertyManager::enumTypeId(), tr("physics engine"));
     QStringList types;
@@ -2890,6 +2962,50 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
   if (_msg.has_contact_surface_layer())
     item->setValue(_msg.contact_surface_layer());
   constraintsItem->addSubProperty(item);
+}
+
+/////////////////////////////////////////////////
+void ModelListWidget::FillPropertyTree(const msgs::Atmosphere &_msg,
+                                       QtProperty */*_parent*/)
+{
+  QtVariantProperty *item = NULL;
+
+  if (_msg.has_type())
+    this->dataPtr->atmosphereType = _msg.type();
+
+  item = this->dataPtr->variantManager->addProperty(QVariant::Bool,
+    tr("enable atmosphere"));
+  if (_msg.has_enable_atmosphere())
+    item->setValue(_msg.enable_atmosphere());
+  this->dataPtr->propTreeBrowser->addProperty(item);
+
+  item = this->dataPtr->variantManager->addProperty(QVariant::Double,
+      tr("temperature"));
+  static_cast<QtVariantPropertyManager *>
+    (this->dataPtr->variantFactory->propertyManager(item))->setAttribute(
+        item, "decimals", 6);
+  if (_msg.has_temperature())
+    item->setValue(_msg.temperature());
+  this->dataPtr->propTreeBrowser->addProperty(item);
+
+  item = this->dataPtr->variantManager->addProperty(QVariant::Double,
+      tr("pressure"));
+  static_cast<QtVariantPropertyManager *>
+    (this->dataPtr->variantFactory->propertyManager(item))->setAttribute(
+        item, "decimals", 6);
+  if (_msg.has_pressure())
+    item->setValue(_msg.pressure());
+  this->dataPtr->propTreeBrowser->addProperty(item);
+
+  item = this->dataPtr->variantManager->addProperty(QVariant::Double,
+      tr("mass_density"));
+  static_cast<QtVariantPropertyManager *>
+    (this->dataPtr->variantFactory->propertyManager(item))->setAttribute(
+        item, "decimals", 6);
+  if (_msg.has_mass_density())
+    item->setValue(_msg.mass_density());
+  item->setEnabled(false);
+  this->dataPtr->propTreeBrowser->addProperty(item);
 }
 
 /////////////////////////////////////////////////
