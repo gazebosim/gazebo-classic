@@ -30,6 +30,9 @@ class BuildingMaker_TEST : public QTestFixture
 
   /// \brief Test attaching and detaching manips.
   private slots: void Attach();
+
+  /// \brief Test assigning layers according to level.
+  private slots: void Layers();
 };
 
 #endif
