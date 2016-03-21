@@ -17,7 +17,7 @@
 #ifndef _GAZEBO_UTIL_LOGPLAY_HH_
 #define _GAZEBO_UTIL_LOGPLAY_HH_
 
-#include <gazebo/util/tinyxml2.h>
+#include <tinyxml2.h>
 #include <string>
 
 #include "gazebo/common/SingletonT.hh"

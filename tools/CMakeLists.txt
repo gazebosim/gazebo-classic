@@ -3,6 +3,7 @@ add_definitions(${QT_DEFINITIONS})
 
 include_directories(
   ${tinyxml_INCLUDE_DIRS}
+  ${tinyxml2_INCLUDE_DIRS}
   ${PROTOBUF_INCLUDE_DIR}
   ${SDFormat_INCLUDE_DIRS}
 )

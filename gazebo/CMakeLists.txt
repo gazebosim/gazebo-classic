@@ -7,6 +7,7 @@ include_directories(SYSTEM
   ${IGNITION-MATH_INCLUDE_DIRS}
   ${TBB_INCLUDEDIR}
   ${tinyxml_INCLUDE_DIRS}
+  ${tinyxml2_INCLUDE_DIRS}
 )
 
 link_directories(

@@ -6,11 +6,11 @@ if (HAVE_OPENAL)
   include_directories(${OPENAL_INCLUDE_DIR})
 endif()
 
-include_directories(${CMAKE_SOURCE_DIR}/deps/win/tinyxml2)
-
-message (STATUS "\n\n\n ${tinyxml2_INCLUDE_DIRS}\n\n")
-include_directories(${TBB_INCLUDEDIR} ${tinyxml_INCLUDE_DIRS}
+include_directories(${TBB_INCLUDEDIR}
+                    ${tinyxml_INCLUDE_DIRS}
                     ${tinyxml2_INCLUDE_DIRS})
+
+include_directories(${CMAKE_SOURCE_DIR}/deps)
 
 link_directories(${tinyxml2_LIBRARY_DIRS})
 
