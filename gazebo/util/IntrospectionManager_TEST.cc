@@ -174,7 +174,7 @@ TEST_F(IntrospectionManagerTest, ClearItems)
   // Unregister all items.
   this->manager->Clear();
 
-  // Unregister an existing item.
+  // Verify that there aren't items registered.
   EXPECT_TRUE(this->manager->Items().empty());
 }
 
@@ -226,9 +226,6 @@ TEST_F(IntrospectionManagerTest, UpdateItems)
   EXPECT_TRUE(executed);
   EXPECT_EQ(items.param_size(), 0);
   executed = false;
-
-  // Unregister an existing item.
-  EXPECT_TRUE(this->manager->Items().empty());
 }
 
 /////////////////////////////////////////////////
