@@ -67,16 +67,15 @@ struct Version
 
   bool operator<(const Version &otherVersion)
   {
-    bool r = false;
     if (a < otherVersion.a)
-      r = true;
+      return true;
     if (b < otherVersion.b)
-      r = true;
+      return true;
     if (c < otherVersion.c)
-      r = true;
+      return true;
     if (d < otherVersion.d)
-      r = true;
-    return r;
+      return true;
+    return false;
   }
 
   int a, b, c, d;
