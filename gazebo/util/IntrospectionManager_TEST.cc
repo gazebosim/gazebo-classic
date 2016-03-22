@@ -18,6 +18,7 @@
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Quaternion.hh>
 #include <ignition/math/Vector3.hh>
+#include <ignition/transport.hh>
 #include <gtest/gtest.h>
 #include "gazebo/msgs/any.pb.h"
 #include "gazebo/util/IntrospectionManager.hh"
@@ -173,8 +174,57 @@ TEST_F(IntrospectionManagerTest, ClearItems)
   // Unregister all items.
   this->manager->Clear();
 
-  // Unregister an existing item.
+  // Verify that there aren't items registered.
   EXPECT_TRUE(this->manager->Items().empty());
+}
+
+/////////////////////////////////////////////////
+TEST_F(IntrospectionManagerTest, UpdateItems)
+{
+  // A callback for updating items.
+  auto func = []()
+  {
+    return 1.0;
+  };
+
+  bool executed = false;
+  gazebo::msgs::Param_V items;
+  std::function<void(const gazebo::msgs::Param_V&)> subCb =
+    [&executed, &items](const gazebo::msgs::Param_V &_msg)
+    {
+      items.CopyFrom(_msg);
+      executed = true;
+    };
+
+  std::string topic = "/introspection/" + this->manager->Id() + "/items_update";
+  ignition::transport::Node node;
+  EXPECT_TRUE(node.Subscribe(topic, subCb));
+
+  // Register one more item.
+  EXPECT_TRUE(this->manager->Register<double>("item4", func));
+  EXPECT_EQ(this->manager->Items().size(), 4u);
+
+  // Trigger an update. This will also trigger a publication on the topic
+  // /introspection/<manager_id>/items_update
+  this->manager->Update();
+
+  // Check that the callback notifying an item update was executed.
+  EXPECT_TRUE(executed);
+  EXPECT_EQ(items.param_size(), 4);
+  executed = false;
+
+  // Trigger another update.
+  this->manager->Update();
+  EXPECT_FALSE(executed);
+  executed = false;
+
+  // Unregister all items.
+  this->manager->Clear();
+
+  // Trigger another update.
+  this->manager->Update();
+  EXPECT_TRUE(executed);
+  EXPECT_EQ(items.param_size(), 0);
 }
 
 /////////////////////////////////////////////////

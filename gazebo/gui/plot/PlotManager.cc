@@ -140,7 +140,8 @@ std::string PlotManager::HumanReadableName(const std::string &_uri) const
   //   name:   model_name/link_name?param_name
   common::URI uri(_uri);
   if (!uri.Valid())
-    return label;
+    return _uri;
+
   common::URIPath path = uri.Path();
   common::URIQuery query = uri.Query();
   std::vector<std::string> pathTokens = common::split(path.Str(), "/");

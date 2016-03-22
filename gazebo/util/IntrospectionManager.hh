@@ -84,6 +84,9 @@ namespace gazebo
       /// through all the topics. The message received in the update will
       /// contain the name and latest values of all the items specified
       /// in the filter.
+      /// If there are changes in the items list since the last update, a new
+      /// message is published under the topic
+      /// "/introspection/<manager_id>/items_update".
       public: void Update();
 
       /// \brief Constructor.
