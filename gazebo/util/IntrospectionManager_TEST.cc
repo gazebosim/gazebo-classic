@@ -225,7 +225,6 @@ TEST_F(IntrospectionManagerTest, UpdateItems)
   this->manager->Update();
   EXPECT_TRUE(executed);
   EXPECT_EQ(items.param_size(), 0);
-  executed = false;
 }
 
 /////////////////////////////////////////////////
