@@ -51,13 +51,13 @@ void BreakableJointPlugin::Load(sensors::SensorPtr _parent,
   if (!this->parentSensor)
   {
     gzerr << "BreakablJointPlugin requires a "
-          << "force_torque sensor as its parent.\n";
+      << "force_torque sensor as its parent.\n";
     return;
   }
 
   this->connection = this->parentSensor->ConnectUpdate(
-        std::bind(&BreakableJointPlugin::OnUpdate,
-	          this, std::placeholders::_1));
+      std::bind(&BreakableJointPlugin::OnUpdate,
+        this, std::placeholders::_1));
 
   std::string paramName = "breaking_force_N";
   if (_sdf->HasElement(paramName))

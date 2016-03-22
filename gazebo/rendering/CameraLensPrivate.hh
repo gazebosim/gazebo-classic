@@ -64,23 +64,23 @@ namespace gazebo
                 public: explicit MapFunctionEnum(const std::string &_str)
                 {
                   variants.push_back(std::make_tuple("sin",
-                                ignition::math::Vector3d::UnitX,
-                                std::function<float (float)>(
-                                    static_cast<float (*)(float)>(&std::sin))));
-  
+                        ignition::math::Vector3d::UnitX,
+                        std::function<float (float)>(
+                          static_cast<float (*)(float)>(&std::sin))));
+
                   variants.push_back(std::make_tuple("tan",
-                                ignition::math::Vector3d::UnitY,
-                                std::function<float (float)>(
-                                    static_cast<float (*)(float)>(&std::tan))));
-  
+                        ignition::math::Vector3d::UnitY,
+                        std::function<float (float)>(
+                          static_cast<float (*)(float)>(&std::tan))));
+
                   variants.push_back(std::make_tuple("id",
-                                ignition::math::Vector3d::UnitZ,
-                                std::function<float (float)>(
-                                    [](float t) -> float
-                                    {
-                                      return t;
-                                    })));
-  
+                        ignition::math::Vector3d::UnitZ,
+                        std::function<float (float)>(
+                          [](float t) -> float
+                          {
+                          return t;
+                          })));
+
                   for (auto item : variants)
                   {
                     if (std::get<0>(item) == _str)
@@ -129,8 +129,8 @@ namespace gazebo
                 /// \brief List of all available functions
                 ///   and its associated representations
                 private: std::vector<std::tuple<std::string,
-		        ignition::math::Vector3d,
-                        std::function<float (float)> > > variants;
+                         ignition::math::Vector3d,
+                           std::function<float (float)> > > variants;
 
                 /// \brief Current value of enumeration
                 private: decltype(variants)::value_type value;
