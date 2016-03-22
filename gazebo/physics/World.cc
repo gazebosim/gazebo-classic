@@ -2126,6 +2126,14 @@ void World::SetState(const WorldState &_state)
       }
     }
   }
+
+  // Deletions
+  auto deletions = _state.Deletions();
+  for (auto const &deletion : deletions)
+  {
+    // This works for models and lights
+    this->RemoveModel(deletion);
+  }
 }
 
 //////////////////////////////////////////////////
