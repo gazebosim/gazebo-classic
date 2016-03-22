@@ -18,6 +18,7 @@
 #define _GAZEBO_GUI_PLOT_PLOTTINGTYPES_HH_
 
 #include <memory>
+#include <set>
 
 #include "gazebo/util/system.hh"
 
@@ -38,6 +39,11 @@ namespace gazebo
     /// \def PlotCurveWeakPtr
     /// \brief std weak pointer to a PlotCurve object
     typedef std::weak_ptr<PlotCurve> PlotCurveWeakPtr;
+
+    /// \def CurveVariableSet
+    /// \brief A set of unique plot curve pointers
+    using CurveVariableSet = std::set<PlotCurveWeakPtr,
+        std::owner_less<PlotCurveWeakPtr> >;
   }
 }
 
