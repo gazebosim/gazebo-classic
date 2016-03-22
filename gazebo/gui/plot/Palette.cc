@@ -19,6 +19,7 @@
 #include <string>
 #include <vector>
 #include <google/protobuf/message.h>
+#include <ignition/transport/Node.hh>
 
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Console.hh"
@@ -394,6 +395,9 @@ class gazebo::gui::PalettePrivate
 
   /// \brief View holding the search sim tree.
   public: QTreeView *searchSimTree;
+
+  /// \brief Communication node.
+  public: ignition::transport::Node node;
 };
 
 /////////////////////////////////////////////////
@@ -418,7 +422,7 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   this->dataPtr->topicsModel = new PlotItemModel;
   this->dataPtr->topicsModel->setObjectName("plotTopicsModel");
   this->dataPtr->topicsModel->setParent(this);
-  this->FillTopics(this->dataPtr->topicsModel);
+  this->FillTopics();
 
   // A proxy model to filter topic model
   this->dataPtr->searchTopicsModel = new SearchModel;
@@ -442,7 +446,7 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   this->dataPtr->modelsModel = new PlotItemModel;
   this->dataPtr->modelsModel->setObjectName("plotModelsModel");
   this->dataPtr->modelsModel->setParent(this);
-  this->FillModels(this->dataPtr->modelsModel);
+  this->FillModels();
 
   // A proxy model to filter models model
   this->dataPtr->searchModelsModel = new SearchModel;
@@ -464,7 +468,7 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
 
   // The model that will hold data to be displayed in the sim tree view
   this->dataPtr->simModel = new PlotItemModel;
-  this->FillSim(this->dataPtr->simModel);
+  this->FillSim();
 
   // A proxy model to filter sim model
   this->dataPtr->searchSimModel = new SearchModel;
@@ -624,7 +628,7 @@ Palette::~Palette()
 }
 
 /////////////////////////////////////////////////
-void Palette::FillTopics(QStandardItemModel *_topicsModel)
+void Palette::FillTopics()
 {
   // Get all topics, independent of message type
   std::set<std::string> topics;
@@ -651,7 +655,7 @@ void Palette::FillTopics(QStandardItemModel *_topicsModel)
 
     auto topicItem = new QStandardItem();
     topicItem->setData(shortName.c_str(), PlotItemDelegate::DISPLAY_NAME);
-    _topicsModel->appendRow(topicItem);
+    this->dataPtr->topicsModel->appendRow(topicItem);
 
     // Create a message from this topic to find out its fields
     auto msgType = transport::getTopicMsgType(topic);
@@ -668,7 +672,7 @@ void Palette::FillTopics(QStandardItemModel *_topicsModel)
 }
 
 /////////////////////////////////////////////////
-void Palette::FillModels(QStandardItemModel *_modelsModel)
+void Palette::FillModels()
 {
   gazebo::util::IntrospectionClient client;
 
@@ -685,26 +689,58 @@ void Palette::FillModels(QStandardItemModel *_modelsModel)
   // Pick up the first manager.
   std::string id = *managerIds.begin();
 
-  // This is a blocking call
-  std::set<std::string> items;
-  if (!client.Items(id, items))
+  auto cbItems = [this](const std::set<std::string> &_items,
+                     const bool _result)
   {
-    gzerr << "It wasn't possible to get items from introspection manager [" <<
-        id << "]" << std::endl;
+    this->OnIntrospectionUpdate(_items, _result);
+  };
+
+  // Ask for the list of items, the tab will be filled on the callback
+  client.Items(id, cbItems);
+
+  // Receive the list of items whenever it changes on the manager
+  std::string topic = "/introspection/" + id + "/items_update";
+  this->dataPtr->node.Subscribe(topic,
+      &Palette::OnIntrospectionUpdate, this);
+}
+
+/////////////////////////////////////////////////
+void Palette::OnIntrospectionUpdate(const gazebo::msgs::Param_V &_msg)
+{
+  std::set<std::string> items;
+  for (auto i = 0; i < _msg.param_size(); ++i)
+  {
+    auto param = _msg.param(i);
+    if (param.name().empty() || !param.has_value())
+      continue;
+
+    items.insert(param.value().string_value());
+  }
+  this->OnIntrospectionUpdate(items, true);
+}
+
+/////////////////////////////////////////////////
+void Palette::OnIntrospectionUpdate(const std::set<std::string> &_items,
+    const bool _result)
+{
+  if (!_result || _items.empty())
+  {
+    gzerr << "Failure in introspection items update" << std::endl;
     return;
   }
 
+  this->dataPtr->modelsModel->clear();
+
   // FIXME: Check if there is at least one model?
-  if (!items.empty())
   {
     auto title = new QStandardItem();
     title->setData("MODELS", PlotItemDelegate::DISPLAY_NAME);
     title->setData("title", PlotItemDelegate::TYPE);
-    _modelsModel->appendRow(title);
+    this->dataPtr->modelsModel->appendRow(title);
   }
 
   // Populate widget
-  for (auto item : items)
+  for (auto item : _items)
   {
     common::URI itemURI(item);
 
@@ -740,7 +776,7 @@ void Palette::FillModels(QStandardItemModel *_modelsModel)
         // Check top level (model)
         if (!previousItem)
         {
-          auto modelList = _modelsModel->findItems(nextPart.c_str());
+          auto modelList = this->dataPtr->modelsModel->findItems(nextPart.c_str());
           if (!modelList.isEmpty())
             existingItem = modelList[0];
         }
@@ -768,7 +804,7 @@ void Palette::FillModels(QStandardItemModel *_modelsModel)
 
           if (!previousItem)
           {
-            _modelsModel->appendRow(newItem);
+            this->dataPtr->modelsModel->appendRow(newItem);
             previousItem = newItem;
           }
           else
@@ -962,7 +998,7 @@ void Palette::FillModels(QStandardItemModel *_modelsModel)
 }
 
 /////////////////////////////////////////////////
-void Palette::FillSim(QStandardItemModel *_simModel)
+void Palette::FillSim()
 {
   // Hard-coded values for the sim tab
   std::multimap<std::string, std::string> simFields = {
@@ -994,7 +1030,7 @@ void Palette::FillSim(QStandardItemModel *_simModel)
     std::string dataName = field.first + "?p=/" + field.second;
     childItem->setData(dataName.c_str(), PlotItemDelegate::URI_QUERY);
 
-    _simModel->appendRow(childItem);
+    this->dataPtr->simModel->appendRow(childItem);
   }
 }
 
