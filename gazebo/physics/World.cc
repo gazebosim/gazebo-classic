@@ -1894,6 +1894,13 @@ void World::ProcessFactoryMsgs()
 
         sdf::ElementPtr elem = factorySDF->Root()->Clone();
 
+        if (!elem)
+        {
+          gzerr << "Invalid SDF:";
+          factorySDF->Root()->PrintValues("");
+          continue;
+        }
+
         if (elem->HasElement("world"))
           elem = elem->GetElement("world");
 
@@ -1915,13 +1922,6 @@ void World::ProcessFactoryMsgs()
         else
         {
           gzerr << "Unable to find a model, light, or actor in:\n";
-          factorySDF->Root()->PrintValues("");
-          continue;
-        }
-
-        if (!elem)
-        {
-          gzerr << "Invalid SDF:";
           factorySDF->Root()->PrintValues("");
           continue;
         }
@@ -2067,6 +2067,13 @@ void World::SetState(const WorldState &_state)
 
     auto elem = factorySDF->Root()->Clone();
 
+    if (!elem)
+    {
+      gzerr << "Invalid SDF:" << std::endl;
+      factorySDF->Root()->PrintValues("");
+      continue;
+    }
+
     if (elem->HasElement("world"))
       elem = elem->GetElement("world");
 
@@ -2083,13 +2090,6 @@ void World::SetState(const WorldState &_state)
     else
     {
       gzerr << "Unable to find a model or light in:" << std::endl;
-      factorySDF->Root()->PrintValues("");
-      continue;
-    }
-
-    if (!elem)
-    {
-      gzerr << "Invalid SDF:" << std::endl;
       factorySDF->Root()->PrintValues("");
       continue;
     }
