@@ -190,12 +190,12 @@ IncrementalPlot::IncrementalPlot(QWidget *_parent)
 
   // stacked zooming with rectangle selection
   QwtPlotZoomer* zoomer = new QwtPlotZoomer(this->canvas());
-  zoomer->setMousePattern( QwtEventPattern::MouseSelect1,
+  zoomer->setMousePattern(QwtEventPattern::MouseSelect1,
       Qt::MidButton);
-  zoomer->setMousePattern( QwtEventPattern::MouseSelect2,
-      Qt::RightButton, Qt::ControlModifier );
-  zoomer->setMousePattern( QwtEventPattern::MouseSelect3,
-      Qt::RightButton );
+  zoomer->setMousePattern(QwtEventPattern::MouseSelect2,
+      Qt::RightButton, Qt::ControlModifier);
+  zoomer->setMousePattern(QwtEventPattern::MouseSelect3,
+      Qt::NoButton);
 
   // zoom in/out with the wheel
   this->dataPtr->magnifier = new PlotMagnifier(this->canvas());
