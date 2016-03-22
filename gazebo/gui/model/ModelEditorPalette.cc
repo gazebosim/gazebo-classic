@@ -19,6 +19,8 @@
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Events.hh"
+#include "gazebo/common/KeyEvent.hh"
+#include "gazebo/common/MouseEvent.hh"
 
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/GuiIface.hh"
@@ -110,7 +112,7 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   this->linkButtonGroup->addButton(boxButton);
   this->linkButtonGroup->addButton(customButton);
 
-  this->modelCreator = new ModelCreator();
+  this->modelCreator = new ModelCreator(this);
   connect(this->modelCreator, SIGNAL(LinkAdded()), this, SLOT(OnLinkAdded()));
 
   this->otherItemsLayout = new QVBoxLayout();
@@ -153,8 +155,6 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
 /////////////////////////////////////////////////
 ModelEditorPalette::~ModelEditorPalette()
 {
-  delete this->modelCreator;
-  this->modelCreator = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -200,7 +200,8 @@ void ModelEditorPalette::OnCustom()
           info.completeSuffix().toLower() == "stl")
       {
         this->modelCreator->AddShape(ModelCreator::ENTITY_MESH,
-            math::Vector3::One, math::Pose::Zero, importDialog.GetImportPath());
+            ignition::math::Vector3d::One, ignition::math::Pose3d::Zero,
+            importDialog.GetImportPath());
       }
       else if (info.completeSuffix().toLower() == "svg")
       {
@@ -209,10 +210,10 @@ void ModelEditorPalette::OnCustom()
         if (extrudeDialog.exec() == QDialog::Accepted)
         {
           this->modelCreator->AddShape(ModelCreator::ENTITY_POLYLINE,
-              math::Vector3(1.0/extrudeDialog.GetResolution(),
+              ignition::math::Vector3d(1.0/extrudeDialog.GetResolution(),
               1.0/extrudeDialog.GetResolution(),
               extrudeDialog.GetThickness()),
-              math::Pose::Zero, importDialog.GetImportPath(),
+              ignition::math::Pose3d::Zero, importDialog.GetImportPath(),
               extrudeDialog.GetSamples());
         }
         else
