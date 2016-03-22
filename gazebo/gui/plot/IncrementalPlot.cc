@@ -213,7 +213,7 @@ IncrementalPlot::IncrementalPlot(QWidget *_parent)
   this->plotLayout()->setAlignCanvasToScales(true);
 
   QwtLegend *qLegend = new QwtLegend;
-  this->insertLegend(qLegend, QwtPlot::RightLegend);
+  this->insertLegend(qLegend, QwtPlot::RightLegend, 0.2);
 
 
   this->dataPtr->grid = new QwtPlotGrid;
