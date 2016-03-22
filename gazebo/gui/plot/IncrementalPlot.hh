@@ -148,20 +148,6 @@ namespace gazebo
       /// \return Default size of the plot.
       public: virtual QSize sizeHint() const;
 
-      /// \internal
-      /// \brief Private data pointer
-      private: std::unique_ptr<IncrementalPlotPrivate> dataPtr;
-    };
-
-    /// \brief Empty plot that supports drop action
-    class GZ_GUI_VISIBLE EmptyIncrementalPlot : public IncrementalPlot
-    {
-      Q_OBJECT
-
-      /// \brief Constructor
-      /// \param[in] _parent Parent widget
-      public: EmptyIncrementalPlot(QWidget *_parent = NULL);
-
       /// \brief Used to accept drag enter events.
       /// \param[in] _evt The drag event.
       protected: void dragEnterEvent(QDragEnterEvent *_evt);
@@ -173,6 +159,10 @@ namespace gazebo
       /// \brief Qt signal emitted when a variable pill is added
       /// \param[in] _name Name of variable pill added.
       Q_SIGNALS: void VariableAdded(const std::string &_name);
+
+      /// \internal
+      /// \brief Private data pointer
+      private: std::unique_ptr<IncrementalPlotPrivate> dataPtr;
     };
   }
 }

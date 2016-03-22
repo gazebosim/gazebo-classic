@@ -65,7 +65,7 @@ namespace gazebo
       public: std::map<unsigned int, PlotData *> plotData;
 
       /// \brief Pointer to an empty plot.
-      public: EmptyIncrementalPlot *emptyPlot = NULL;
+      public: IncrementalPlot *emptyPlot = NULL;
 
       /// \brief Container for all the variableCurves on the Y axis.
       public: VariablePillContainer *yVariableContainer = NULL;
@@ -199,7 +199,7 @@ PlotCanvas::PlotCanvas(QWidget *_parent)
   plotScrollArea->setWidget(plotFrame);
 
   // empty plot
-  this->dataPtr->emptyPlot = new EmptyIncrementalPlot(this);
+  this->dataPtr->emptyPlot = new IncrementalPlot(this);
   connect(this->dataPtr->emptyPlot, SIGNAL(VariableAdded(std::string)),
       this, SLOT(OnAddVariable(std::string)));
   plotLayout->addWidget(this->dataPtr->emptyPlot);
@@ -384,6 +384,8 @@ unsigned int PlotCanvas::AddPlot()
   IncrementalPlot *plot = new IncrementalPlot(this);
   plot->setAutoDelete(false);
   plot->ShowGrid(this->dataPtr->emptyPlot->ShowGrid());
+  connect(plot, SIGNAL(VariableAdded(std::string)), this,
+      SLOT(OnAddVariable(std::string)));
   this->dataPtr->plotSplitter->addWidget(plot);
 
   PlotData *p = new PlotData;
@@ -455,8 +457,29 @@ unsigned int PlotCanvas::PlotByVariable(const unsigned int _variableId) const
 /////////////////////////////////////////////////
 void PlotCanvas::OnAddVariable(const std::string &_variable)
 {
-  // add new variable to new plot
-  this->AddVariable(_variable);
+  IncrementalPlot *plot =
+      qobject_cast<IncrementalPlot *>(QObject::sender());
+
+  if (!plot)
+    return;
+
+  if (plot == this->dataPtr->emptyPlot)
+  {
+    // add new variable to new plot
+    this->AddVariable(_variable);
+  }
+  else
+  {
+    for (const auto &it : this->dataPtr->plotData)
+    {
+      if (plot == it.second->plot)
+      {
+        // add to existing plot
+        this->AddVariable(_variable, it.second->id);
+        return;
+      }
+    }
+  }
 }
 
 /////////////////////////////////////////////////

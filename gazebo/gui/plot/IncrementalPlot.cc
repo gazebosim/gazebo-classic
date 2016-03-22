@@ -233,6 +233,7 @@ IncrementalPlot::IncrementalPlot(QWidget *_parent)
   this->ShowAxisLabel(Y_LEFT_AXIS, true);
 
   this->replot();
+  this->setAcceptDrops(true);
 }
 
 /////////////////////////////////////////////////
@@ -489,14 +490,7 @@ QSize IncrementalPlot::sizeHint() const
 }
 
 /////////////////////////////////////////////////
-EmptyIncrementalPlot::EmptyIncrementalPlot(QWidget *_parent)
-  : IncrementalPlot(_parent)
-{
-  this->setAcceptDrops(true);
-}
-
-/////////////////////////////////////////////////
-void EmptyIncrementalPlot::dragEnterEvent(QDragEnterEvent *_evt)
+void IncrementalPlot::dragEnterEvent(QDragEnterEvent *_evt)
 {
   if (_evt->mimeData()->hasFormat("application/x-item"))
   {
@@ -513,7 +507,7 @@ void EmptyIncrementalPlot::dragEnterEvent(QDragEnterEvent *_evt)
 }
 
 /////////////////////////////////////////////////
-void EmptyIncrementalPlot::dropEvent(QDropEvent *_evt)
+void IncrementalPlot::dropEvent(QDropEvent *_evt)
 {
   if (_evt->mimeData()->hasFormat("application/x-item"))
   {
