@@ -25,7 +25,7 @@
 #ifndef _ODE_ODEINIT_H_
 #define _ODE_ODEINIT_H_
 
-#include <ode/common.h>
+#include <gazebo/ode/common.h>
 
 
 #ifdef __cplusplus
@@ -53,14 +53,14 @@ extern "C" {
  * using ODE are to be cleared by library client with explicit call to @c dCleanupODEAllDataForThread.
  * If this flag is not specified the automatic resource tracking algorithm is used.
  *
- * With automatic resource tracking, On Windows, memory allocated for a thread may 
- * remain not freed for some time after the thread exits. The resources may be 
+ * With automatic resource tracking, On Windows, memory allocated for a thread may
+ * remain not freed for some time after the thread exits. The resources may be
  * released when one of other threads calls @c dAllocateODEDataForThread. Ultimately,
- * the resources are released when library is closed with @c dCloseODE. On other 
+ * the resources are released when library is closed with @c dCloseODE. On other
  * operating systems resources are always released by the thread itself on its exit
  * or on library closure with @c dCloseODE.
  *
- * With manual thread data cleanup mode every collision space object must be 
+ * With manual thread data cleanup mode every collision space object must be
  * explicitly switched to manual cleanup mode with @c dSpaceSetManualCleanup
  * after creation. See description of the function for more details.
  *
@@ -74,7 +74,7 @@ extern "C" {
  * @ingroup init
  */
 enum dInitODEFlags {
-	dInitFlagManualThreadCleanup = 0x00000001 //@< Thread local data is to be cleared explicitly on @c dCleanupODEAllDataForThread function call
+  dInitFlagManualThreadCleanup = 0x00000001 //@< Thread local data is to be cleared explicitly on @c dCleanupODEAllDataForThread function call
 };
 
 /**
@@ -99,15 +99,15 @@ ODE_API void dInitODE(void);
  * @param uiInitFlags Initialization options bitmask
  * @return A nonzero if initialization succeeded and zero otherwise.
  *
- * This function must be called to initialize ODE library before first use. If 
- * initialization succeeds the function may not be called again until library is 
+ * This function must be called to initialize ODE library before first use. If
+ * initialization succeeds the function may not be called again until library is
  * closed with a call to @c dCloseODE.
  *
  * The @a uiInitFlags parameter specifies initialization options to be used. These
  * can be combination of zero or more @c dInitODEFlags flags.
  *
  * @note
- * If @c dInitFlagManualThreadCleanup flag is used for initialization, 
+ * If @c dInitFlagManualThreadCleanup flag is used for initialization,
  * @c dSpaceSetManualCleanup must be called to set manual cleanup mode for every
  * space object right after creation. Failure to do so may lead to resource leaks.
  *
@@ -126,38 +126,38 @@ ODE_API int dInitODE2(unsigned int uiInitFlags/*=0*/);
  * @c dAllocateODEDataForThread.
  *
  * @c dAllocateFlagBasicData tells to allocate the basic data set required for
- * normal library operation. This flag is equal to zero and is always implicitly 
+ * normal library operation. This flag is equal to zero and is always implicitly
  * included.
  *
  * @c dAllocateFlagCollisionData tells that collision detection data is to be allocated.
- * Collision detection functions may not be called if the data has not be allocated 
+ * Collision detection functions may not be called if the data has not be allocated
  * in advance. If collision detection is not going to be used, it is not necessary
  * to specify this flag.
  *
- * @c dAllocateMaskAll is a mask that can be used for for allocating all possible 
+ * @c dAllocateMaskAll is a mask that can be used for for allocating all possible
  * data in cases when it is not known what exactly features of ODE will be used.
  * The mask may not be used in combination with other flags. It is guaranteed to
- * include all the current and future legal allocation flags. However, mature 
+ * include all the current and future legal allocation flags. However, mature
  * applications should use explicit flags they need rather than allocating everything.
  *
  * @see dAllocateODEDataForThread
  * @ingroup init
  */
 enum dAllocateODEDataFlags {
-	dAllocateFlagBasicData = 0, //@< Allocate basic data required for library to operate
+  dAllocateFlagBasicData = 0, //@< Allocate basic data required for library to operate
 
-	dAllocateFlagCollisionData = 0x00000001, //@< Allocate data for collision detection
+  dAllocateFlagCollisionData = 0x00000001, //@< Allocate data for collision detection
 
-	dAllocateMaskAll = ~0U //@< Allocate all the possible data that is currently defined or will be defined in the future.
+  dAllocateMaskAll = ~0U //@< Allocate all the possible data that is currently defined or will be defined in the future.
 };
 
 /**
  * @brief Allocate thread local data to allow the thread calling ODE.
  * @param uiAllocateFlags Allocation options bitmask.
  * @return A nonzero if allocation succeeded and zero otherwise.
- * 
+ *
  * The function is required to be called for every thread that is going to use
- * ODE. This function allocates the data that is required for accessing ODE from 
+ * ODE. This function allocates the data that is required for accessing ODE from
  * current thread along with optional data required for particular ODE subsystems.
  *
  * @a uiAllocateFlags parameter can contain zero or more flags from @c dAllocateODEDataFlags
@@ -166,8 +166,8 @@ enum dAllocateODEDataFlags {
  * is passed as the parameter, it means to only allocate the set of most important
  * data the library can not operate without.
  *
- * If the function returns failure status it means that none of the requested 
- * data has been allocated. The client may retry allocation attempt with the same 
+ * If the function returns failure status it means that none of the requested
+ * data has been allocated. The client may retry allocation attempt with the same
  * flags when more system resources are available.
  *
  * @see dAllocateODEDataFlags
@@ -179,21 +179,21 @@ ODE_API int dAllocateODEDataForThread(unsigned int uiAllocateFlags);
 /**
  * @brief Free thread local data that was allocated for current thread.
  *
- * If library was initialized with @c dInitFlagManualThreadCleanup flag the function 
+ * If library was initialized with @c dInitFlagManualThreadCleanup flag the function
  * is required to be called on exit of every thread that was calling @c dAllocateODEDataForThread.
- * Failure to call @c dCleanupODEAllDataForThread may result in some resources remaining 
- * not freed until program exit. The function may also be called when ODE is still 
- * being used to release resources allocated for all the current subsystems and 
+ * Failure to call @c dCleanupODEAllDataForThread may result in some resources remaining
+ * not freed until program exit. The function may also be called when ODE is still
+ * being used to release resources allocated for all the current subsystems and
  * possibly proceed with data pre-allocation for other subsystems.
  *
- * The function can safely be called several times in a row. The function can be 
- * called without prior invocation of @c dAllocateODEDataForThread. The function 
- * may not be called before ODE is initialized with @c dInitODE2 or after library 
- * has been closed with @c dCloseODE. A call to @c dCloseODE implicitly releases 
- * all the thread local resources that might be allocated for all the threads that 
+ * The function can safely be called several times in a row. The function can be
+ * called without prior invocation of @c dAllocateODEDataForThread. The function
+ * may not be called before ODE is initialized with @c dInitODE2 or after library
+ * has been closed with @c dCloseODE. A call to @c dCloseODE implicitly releases
+ * all the thread local resources that might be allocated for all the threads that
  * were using ODE.
  *
- * If library was initialized without @c dInitFlagManualThreadCleanup flag 
+ * If library was initialized without @c dInitFlagManualThreadCleanup flag
  * @c dCleanupODEAllDataForThread must not be called.
  *
  * @see dAllocateODEDataForThread
@@ -216,7 +216,7 @@ ODE_API void dCleanupODEAllDataForThread();
  * after successful library initialization.
  *
  * @note Important!
- * Make sure that all the threads that were using ODE have already terminated 
+ * Make sure that all the threads that were using ODE have already terminated
  * before calling @c dCloseODE. In particular it is not allowed to call
  * @c dCleanupODEAllDataForThread after @c dCloseODE.
  *

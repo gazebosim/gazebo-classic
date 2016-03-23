@@ -5,6 +5,9 @@
 1. Use only Gazebo's internal version of tinyxml2. The version of tinyxml2 distributed with Ubuntu fails when parsing large log files.
     * [Pull request #2146](https://bitbucket.org/osrf/gazebo/pull-request/2146)
 
+1. Moved gazebo ODE includes to have correct include path
+    * [Pull request #2186](https://bitbucket.org/osrf/gazebo/pull-request/2186)
+
 1. Atmosphere model
     * [Pull request #1989](https://bitbucket.org/osrf/gazebo/pull-request/1989)
 
