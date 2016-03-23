@@ -2110,7 +2110,8 @@ void World::SetState(const WorldState &_state)
       }
       catch(...)
       {
-        gzerr << "Loading model from factory message failed\n";
+        gzerr << "Loading model from world state insertion failed" <<
+            std::endl;
       }
     }
     else if (isLight)
@@ -2123,7 +2124,8 @@ void World::SetState(const WorldState &_state)
       }
       catch(...)
       {
-        gzerr << "Loading light from factory message failed\n";
+        gzerr << "Loading light from world state insertion failed." <<
+            std::endl;
       }
     }
   }
