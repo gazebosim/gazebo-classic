@@ -252,6 +252,10 @@ namespace gazebo
       /// \brief Current state when playing from a log file.
       public: WorldState logPlayState;
 
+      /// \brief Store a factory SDF object to improve speed at which
+      /// objects are inserted via the factory.
+      public: sdf::SDFPtr factorySDF;
+
       /// \brief The list of models that need to publish their pose.
       public: std::set<ModelPtr> publishModelPoses;
 
