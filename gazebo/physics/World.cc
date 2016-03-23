@@ -695,6 +695,8 @@ void World::Step()
     }
   }
 
+  gazebo::util::IntrospectionManager::Instance()->NotifyUpdates();
+
   this->ProcessMessages();
 
   DIAG_TIMER_STOP("World::Step");
