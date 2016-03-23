@@ -2024,31 +2024,6 @@ void World::SetState(const WorldState &_state)
   this->dataPtr->logRealTime = _state.GetRealTime();
   this->dataPtr->iterations = _state.GetIterations();
 
-  // Models
-  const ModelState_M modelStates = _state.GetModelStates();
-  for (auto const &modelState : modelStates)
-  {
-    ModelPtr model = this->GetModel(modelState.second.GetName());
-    if (model)
-      model->SetState(modelState.second);
-    else
-      gzerr << "Unable to find model[" << modelState.second.GetName() << "]\n";
-  }
-
-  // Lights
-  const LightState_M lightStates = _state.LightStates();
-  for (auto const &lightState : lightStates)
-  {
-    LightPtr light = this->Light(lightState.second.GetName());
-    if (light)
-      light->SetState(lightState.second);
-    else
-    {
-      gzerr << "Unable to find light[" << lightState.second.GetName() << "]"
-            << std::endl;
-    }
-  }
-
   // Insertions (adapted from ProcessFactoryMsgs)
   auto insertions = _state.Insertions();
   for (auto const &insertion : insertions)
@@ -2127,6 +2102,31 @@ void World::SetState(const WorldState &_state)
         gzerr << "Loading light from world state insertion failed." <<
             std::endl;
       }
+    }
+  }
+
+  // Model updates
+  const ModelState_M modelStates = _state.GetModelStates();
+  for (auto const &modelState : modelStates)
+  {
+    ModelPtr model = this->GetModel(modelState.second.GetName());
+    if (model)
+      model->SetState(modelState.second);
+    else
+      gzerr << "Unable to find model[" << modelState.second.GetName() << "]\n";
+  }
+
+  // Light updates
+  const LightState_M lightStates = _state.LightStates();
+  for (auto const &lightState : lightStates)
+  {
+    LightPtr light = this->Light(lightState.second.GetName());
+    if (light)
+      light->SetState(lightState.second);
+    else
+    {
+      gzerr << "Unable to find light[" << lightState.second.GetName() << "]"
+            << std::endl;
     }
   }
 
