@@ -140,10 +140,16 @@ namespace gazebo
       /// \return Default size of the plot.
       public: virtual QSize sizeHint() const;
 
+      /// \brief MouseMove event
+      /// \param _pos The cursor position.
+      private slots: void OnMoved(const QPointF &_pos);
+
       /// \internal
       /// \brief Private data pointer
       private: std::unique_ptr<IncrementalPlotPrivate> dataPtr;
     };
   }
 }
+
 #endif
+

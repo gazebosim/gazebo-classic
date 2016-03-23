@@ -1,6 +1,7 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
 set (sources_local
+  plot/CurveTracker.cc
   plot/IncrementalPlot.cc
   plot/PlotCanvas.cc
   plot/PlotCurve.cc

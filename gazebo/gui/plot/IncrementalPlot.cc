@@ -28,6 +28,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Time.hh"
 
+#include "gazebo/gui/plot/CurveTracker.hh"
 #include "gazebo/gui/plot/PlotCurve.hh"
 #include "gazebo/gui/plot/IncrementalPlot.hh"
 
@@ -116,6 +117,13 @@ IncrementalPlot::IncrementalPlot(QWidget *_parent)
   this->ShowAxisLabel(Y_LEFT_AXIS, true);
 
   this->replot();
+
+  // add plot tracking on mouse move events
+  CurveTracker* tracker = new CurveTracker( this->canvas() );
+  // for the demo we want the tracker to be active without
+  // having to click on the canvas
+  tracker->setStateMachine( new QwtPickerTrackerMachine() );
+  tracker->setRubberBandPen( QPen( "MediumOrchid" ) );
 }
 
 /////////////////////////////////////////////////
@@ -357,3 +365,10 @@ QSize IncrementalPlot::sizeHint() const
   s.setHeight(s.height()+padding);
   return s;
 }
+
+/////////////////////////////////////////////////
+void IncrementalPlot::OnMoved(const QPointF &_pos)
+{
+  std::cerr << "on move " << _pos.x() << " " << _pos.y() << std::endl;
+}
+
