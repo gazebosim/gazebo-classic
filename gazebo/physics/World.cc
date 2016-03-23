@@ -695,6 +695,8 @@ void World::Step()
     }
   }
 
+  gazebo::util::IntrospectionManager::Instance()->Update();
+
   this->ProcessMessages();
 
   DIAG_TIMER_STOP("World::Step");
@@ -814,8 +816,6 @@ void World::Update()
   DIAG_TIMER_LAP("World::Update", "ContactManager::PublishContacts");
 
   event::Events::worldUpdateEnd();
-
-  gazebo::util::IntrospectionManager::Instance()->Update();
 
   DIAG_TIMER_STOP("World::Update");
 }
