@@ -161,6 +161,19 @@ TEST_F(ModelDatabaseTest, GetModelsThrice)
 }
 
 /////////////////////////////////////////////////
+TEST_F(ModelDatabaseTest, Version)
+{
+  std::string uri = "model://coke_can";
+  std::string model;
+  model = gazebo::common::ModelDatabase::Instance()->GetModelFile(uri);
+
+  // uncomment to check the actual value. This assumes that the correct value
+  // is model.sdf, rather than model-1_2.sdf. This test
+  // is at the mercy of changes in the model database and sdf parser versions
+  EXPECT_TRUE(model.find("model.sdf") != std::string::npos);
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
