@@ -15,7 +15,7 @@ message Marker
   enum Type
   {
     NONE           = 0;
-    CUBE           = 1;
+    BOX            = 1;
     CYLINDER       = 2;
     LINE_LIST      = 4;
     LINE_STRIP     = 3;
@@ -122,5 +122,10 @@ message Marker
   /// Relevant Type: TEXT
   optional string text       = 11;
 
+  /// \brief Attach this marker to a "parent" visual.
+  ///
+  /// Relevant Action: ADD_MODIFY
+  ///
+  /// Relevant Type: all
   optional string parent     = 12;
 }
