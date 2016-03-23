@@ -668,10 +668,12 @@ TEST_F(PhysicsTest, StateChange)
   EXPECT_EQ(oldPose, oldModelState.GetPose().Ign());
 
   // Move the box
+  world->SetPaused(true);
+
   ignition::math::Pose3d newPose(1, 2, 0.5, 0, 0, 0);
   world->GetModel("box")->SetWorldPose(newPose);
 
-  gazebo::common::Time::MSleep(10);
+  world->Step(1);
 
   // Make sure the box state reflects the move
   physics::WorldState newWorldState(world);
@@ -744,9 +746,10 @@ TEST_F(PhysicsTest, StateInsertion)
   worldState.SetInsertions(insertions);
 
   // Set state which includes insertion
+  world->SetPaused(true);
   world->SetState(worldState);
 
-  gazebo::common::Time::MSleep(10);
+  world->Step(1);
 
   // Check entities were inserted
   EXPECT_EQ(2u, world->GetModelCount());

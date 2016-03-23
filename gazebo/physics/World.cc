@@ -112,6 +112,11 @@ World::World(const std::string &_name)
   this->dataPtr->sdf.reset(new sdf::Element);
   sdf::initFile("world.sdf", this->dataPtr->sdf);
 
+  // Keep this in the constructor for performance.
+  // sdf::initFile causes disk access.
+  this->dataPtr->factorySDF.reset(new sdf::SDF);
+  sdf::initFile("root.sdf", this->dataPtr->factorySDF);
+
   this->dataPtr->logPlayStateSDF.reset(new sdf::Element);
   sdf::initFile("state.sdf", this->dataPtr->logPlayStateSDF);
 
@@ -1809,19 +1814,16 @@ void World::ProcessFactoryMsgs()
 {
   std::list<sdf::ElementPtr> modelsToLoad, lightsToLoad;
 
-  sdf::SDFPtr factorySDF(new sdf::SDF);
-  sdf::initFile("root.sdf", factorySDF);
-
   {
     boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
     for (auto const &factoryMsg : this->dataPtr->factoryMsgs)
     {
-      factorySDF->Root()->ClearElements();
+      this->dataPtr->factorySDF->Root()->ClearElements();
 
       if (factoryMsg.has_sdf() && !factoryMsg.sdf().empty())
       {
         // SDF Parsing happens here
-        if (!sdf::readString(factoryMsg.sdf(), factorySDF))
+        if (!sdf::readString(factoryMsg.sdf(), this->dataPtr->factorySDF))
         {
           gzerr << "Unable to read sdf string[" << factoryMsg.sdf() << "]\n";
           continue;
@@ -1833,7 +1835,7 @@ void World::ProcessFactoryMsgs()
         std::string filename = common::ModelDatabase::Instance()->GetModelFile(
             factoryMsg.sdf_filename());
 
-        if (!sdf::readFile(filename, factorySDF))
+        if (!sdf::readFile(filename, this->dataPtr->factorySDF))
         {
           gzerr << "Unable to read sdf file.\n";
           continue;
@@ -1849,7 +1851,7 @@ void World::ProcessFactoryMsgs()
           continue;
         }
 
-        factorySDF->Root()->InsertElement(
+        this->dataPtr->factorySDF->Root()->InsertElement(
             model->GetSDF()->Clone());
 
         std::string newName = model->GetName() + "_clone";
@@ -1861,7 +1863,7 @@ void World::ProcessFactoryMsgs()
           i++;
         }
 
-        factorySDF->Root()->GetElement("model")->GetAttribute(
+        this->dataPtr->factorySDF->Root()->GetElement("model")->GetAttribute(
             "name")->Set(newName);
       }
       else
@@ -1878,10 +1880,10 @@ void World::ProcessFactoryMsgs()
         if (base)
         {
           sdf::ElementPtr elem;
-          if (factorySDF->Root()->GetName() == "sdf")
-            elem = factorySDF->Root()->GetFirstElement();
+          if (this->dataPtr->factorySDF->Root()->GetName() == "sdf")
+            elem = this->dataPtr->factorySDF->Root()->GetFirstElement();
           else
-            elem = factorySDF->Root();
+            elem = this->dataPtr->factorySDF->Root();
 
           base->UpdateParameters(elem);
         }
@@ -1892,7 +1894,14 @@ void World::ProcessFactoryMsgs()
         bool isModel = false;
         bool isLight = false;
 
-        sdf::ElementPtr elem = factorySDF->Root()->Clone();
+        sdf::ElementPtr elem = this->dataPtr->factorySDF->Root()->Clone();
+
+        if (!elem)
+        {
+          gzerr << "Invalid SDF:";
+          this->dataPtr->factorySDF->Root()->PrintValues("");
+          continue;
+        }
 
         if (elem->HasElement("world"))
           elem = elem->GetElement("world");
@@ -1915,14 +1924,7 @@ void World::ProcessFactoryMsgs()
         else
         {
           gzerr << "Unable to find a model, light, or actor in:\n";
-          factorySDF->Root()->PrintValues("");
-          continue;
-        }
-
-        if (!elem)
-        {
-          gzerr << "Invalid SDF:";
-          factorySDF->Root()->PrintValues("");
+          this->dataPtr->factorySDF->Root()->PrintValues("");
           continue;
         }
 
@@ -2051,11 +2053,10 @@ void World::SetState(const WorldState &_state)
   auto insertions = _state.Insertions();
   for (auto const &insertion : insertions)
   {
-    sdf::SDFPtr factorySDF(new sdf::SDF);
-    sdf::initFile("root.sdf", factorySDF);
+    this->dataPtr->factorySDF->Root()->ClearElements();
 
     // SDF Parsing happens here
-    if (!sdf::readString(insertion, factorySDF))
+    if (!sdf::readString(insertion, this->dataPtr->factorySDF))
     {
       gzerr << "Unable to read sdf string[" << insertion << "]" << std::endl;
       continue;
@@ -2065,7 +2066,14 @@ void World::SetState(const WorldState &_state)
     bool isModel = false;
     bool isLight = false;
 
-    auto elem = factorySDF->Root()->Clone();
+    auto elem = this->dataPtr->factorySDF->Root()->Clone();
+
+    if (!elem)
+    {
+      gzerr << "Invalid SDF:" << std::endl;
+      this->dataPtr->factorySDF->Root()->PrintValues("");
+      continue;
+    }
 
     if (elem->HasElement("world"))
       elem = elem->GetElement("world");
@@ -2083,14 +2091,7 @@ void World::SetState(const WorldState &_state)
     else
     {
       gzerr << "Unable to find a model or light in:" << std::endl;
-      factorySDF->Root()->PrintValues("");
-      continue;
-    }
-
-    if (!elem)
-    {
-      gzerr << "Invalid SDF:" << std::endl;
-      factorySDF->Root()->PrintValues("");
+      this->dataPtr->factorySDF->Root()->PrintValues("");
       continue;
     }
 
@@ -2109,7 +2110,8 @@ void World::SetState(const WorldState &_state)
       }
       catch(...)
       {
-        gzerr << "Loading model from factory message failed\n";
+        gzerr << "Loading model from world state insertion failed" <<
+            std::endl;
       }
     }
     else if (isLight)
@@ -2122,7 +2124,8 @@ void World::SetState(const WorldState &_state)
       }
       catch(...)
       {
-        gzerr << "Loading light from factory message failed\n";
+        gzerr << "Loading light from world state insertion failed." <<
+            std::endl;
       }
     }
   }
