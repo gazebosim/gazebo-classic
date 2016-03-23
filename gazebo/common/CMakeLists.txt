@@ -50,6 +50,7 @@ set (sources
   KeyEvent.cc
   KeyFrame.cc
   Material.cc
+  MaterialDensity.cc
   Mesh.cc
   MeshExporter.cc
   MeshLoader.cc
@@ -103,6 +104,7 @@ set (headers
   KeyEvent.hh
   KeyFrame.hh
   Material.hh
+  MaterialDensity.hh
   Mesh.hh
   MeshLoader.hh
   MeshManager.hh
@@ -140,6 +142,7 @@ set (gtest_sources
   Image_TEST.cc
   ImageHeightmap_TEST.cc
   Material_TEST.cc
+  MaterialDensity_TEST.cc
   Mesh_TEST.cc
   MeshManager_TEST.cc
   MouseEvent_TEST.cc
