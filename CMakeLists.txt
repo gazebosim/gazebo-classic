@@ -394,8 +394,6 @@ else (build_errors)
     set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_ccd)
   endif()
 
-  set(PKG_DEPENDS Boost Protobuf SDFormat OGRE)
-
   set(cmake_conf_file "cmake/gazebo-config.cmake")
   set(cmake_conf_version_file "cmake/gazebo-config-version.cmake")
   configure_file("${CMAKE_CURRENT_SOURCE_DIR}/${cmake_conf_file}.in" "${CMAKE_CURRENT_BINARY_DIR}/${cmake_conf_file}" @ONLY)
