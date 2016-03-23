@@ -36,17 +36,17 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 Base::Base(BasePtr _parent)
-: parent(_parent),
-  baseDPtr(new BasePrivate)
+: baseDPtr(new BasePrivate)
 {
+  this->baseDPtr->parent = _parent;
   this->ConstructionHelper();
 }
 
 //////////////////////////////////////////////////
 Base::Base(BasePrivate &_dataPtr, BasePtr _parent)
-: parent(_parent),
-  baseDPtr(&_dataPtr)
+: baseDPtr(&_dataPtr)
 {
+  this->baseDPtr->parent = _parent;
   this->ConstructionHelper();
 }
 
@@ -64,7 +64,7 @@ void Base::ConstructionHelper()
 
   if (this->baseDPtr->parent)
   {
-    this->baseDPtr->world = this->baseDPtr->parent->GetWorld();
+    this->baseDPtr->world = this->baseDPtr->parent->World();
   }
 }
 
@@ -107,11 +107,11 @@ void Base::Load(sdf::ElementPtr _sdf)
 
   if (this->baseDPtr->parent)
   {
-    this->baseDPtr->world = this->baseDPtr->parent->GetWorld();
+    this->baseDPtr->world = this->baseDPtr->parent->World();
     this->baseDPtr->parent->AddChild(shared_from_this());
   }
 
-  this->ComputeScopedName();
+  this->baseDPtr->ComputeScopedName();
 }
 
 //////////////////////////////////////////////////
@@ -163,7 +163,7 @@ void Base::SetName(const std::string &_name)
       "Base sdf missing name attribute");
   this->baseDPtr->sdf->GetAttribute("name")->Set(_name);
   this->baseDPtr->name = _name;
-  this->ComputeScopedName();
+  this->baseDPtr->ComputeScopedName();
 }
 
 //////////////////////////////////////////////////
@@ -252,9 +252,10 @@ void Base::AddChild(BasePtr _child)
 void Base::RemoveChild(unsigned int _id)
 {
   Base_V::iterator iter;
-  for (iter = this->baseDPtr->children.begin(); iter != this->baseDPtr->children.end(); ++iter)
+  for (iter = this->baseDPtr->children.begin();
+       iter != this->baseDPtr->children.end(); ++iter)
   {
-    if ((*iter)->GetId() == _id)
+    if ((*iter)->Id() == _id)
     {
       (*iter)->Fini();
       this->baseDPtr->children.erase(iter);
@@ -306,7 +307,7 @@ BasePtr Base::GetChild(const std::string &_name)
 BasePtr Base::Child(const std::string &_name) const
 {
   std::string fullName = this->ScopedName() + "::" + _name;
-  return this->BaseByName(fullName);
+  return BasePtr(this->BaseByName(fullName));
 }
 
 //////////////////////////////////////////////////
@@ -314,9 +315,10 @@ void Base::RemoveChild(const std::string &_name)
 {
   Base_V::iterator iter;
 
-  for (iter = this->baseDPtr->children.begin(); iter != this->baseDPtr->children.end(); ++iter)
+  for (iter = this->baseDPtr->children.begin();
+      iter != this->baseDPtr->children.end(); ++iter)
   {
-    if ((*iter)->GetScopedName() == _name)
+    if ((*iter)->ScopedName() == _name)
       break;
   }
 
@@ -348,7 +350,7 @@ BasePtr Base::BaseById(const unsigned int _id) const
   for (biter = this->baseDPtr->children.begin();
        biter != this->baseDPtr->children.end(); ++biter)
   {
-    if ((*biter)->GetId() == _id)
+    if ((*biter)->Id() == _id)
     {
       result = *biter;
       break;
@@ -361,16 +363,16 @@ BasePtr Base::BaseById(const unsigned int _id) const
 //////////////////////////////////////////////////
 BasePtr Base::GetByName(const std::string &_name)
 {
-  return this->BaseByName(_name);
+  return BasePtr(this->BaseByName(_name));
 }
 
 //////////////////////////////////////////////////
-BasePtr Base::BaseByName(const std::string &_name) const
+Base *Base::BaseByName(const std::string &_name) const
 {
   if (this->ScopedName() == _name || this->Name() == _name)
-    return shared_from_this();
+    return const_cast<Base*>(this);
 
-  BasePtr result;
+  Base *result;
 
   for (auto iter = this->baseDPtr->children.begin();
        iter != this->baseDPtr->children.end() && result == NULL; ++iter)
@@ -397,20 +399,6 @@ std::string Base::ScopedName(bool _prependWorldName) const
 }
 
 //////////////////////////////////////////////////
-void Base::ComputeScopedName()
-{
-  BasePtr p = this->baseDPtr->parent;
-  this->baseDPtr->scopedName = this->GetName();
-
-  while (p)
-  {
-    if (p->GetParent())
-      this->baseDPtr->scopedName.insert(0, p->GetName()+"::");
-    p = p->GetParent();
-  }
-}
-
-//////////////////////////////////////////////////
 bool Base::HasType(const Base::EntityType &_t) const
 {
   return ((unsigned int)(_t & this->baseDPtr->type) == (unsigned int)_t);
@@ -432,10 +420,13 @@ unsigned int Base::Type() const
 void Base::Print(const std::string &_prefix)
 {
   Base_V::iterator iter;
-  gzmsg << _prefix << this->GetName() << "\n";
+  gzmsg << _prefix << this->Name() << "\n";
 
-  for (iter = this->baseDPtr->children.begin(); iter != this->baseDPtr->children.end(); ++iter)
+  for (iter = this->baseDPtr->children.begin();
+       iter != this->baseDPtr->children.end(); ++iter)
+  {
     (*iter)->Print(_prefix + "  ");
+  }
 }
 
 //////////////////////////////////////////////////
@@ -457,9 +448,9 @@ bool Base::IsSelected() const
 }
 
 //////////////////////////////////////////////////
-bool Base::operator ==(const Base &ent) const
+bool Base::operator ==(const Base &_ent) const
 {
-  return ent.GetName() == this->GetName();
+  return _ent.Name() == this->Name();
 }
 
 //////////////////////////////////////////////////
@@ -468,7 +459,8 @@ void Base::SetWorld(const WorldPtr &_newWorld)
   this->baseDPtr->world = _newWorld;
 
   Base_V::iterator iter;
-  for (iter = this->baseDPtr->children.begin(); iter != this->baseDPtr->children.end(); ++iter)
+  for (iter = this->baseDPtr->children.begin();
+       iter != this->baseDPtr->children.end(); ++iter)
   {
     (*iter)->SetWorld(this->baseDPtr->world);
   }
@@ -493,3 +485,19 @@ const sdf::ElementPtr Base::SDF() const
   this->baseDPtr->sdf->Update();
   return this->baseDPtr->sdf;
 }
+
+//////////////////////////////////////////////////
+void BasePrivate::ComputeScopedName()
+{
+  BasePtr p = this->parent;
+  this->scopedName = this->name;
+
+  while (p)
+  {
+    if (p->Parent())
+      this->scopedName.insert(0, p->Name()+"::");
+    p = p->Parent();
+  }
+}
+
+

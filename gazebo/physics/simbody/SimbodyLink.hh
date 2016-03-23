@@ -181,6 +181,27 @@ namespace gazebo
       /// \return Reference to mobilized body
       public: SimTK::MobilizedBody &MobilizedBody() const;
 
+      /// \brief Get the must be base link flag.
+      /// \return True if the link must be a base link.
+      public: bool MustBeBaseLink() const;
+
+      /// \brief Get the number of slave mobilizers
+      /// \retur Number of slave mobilizers
+      public: size_t SlaveMobodsCount() const;
+
+      /// \brief Add a new slave mobilizer
+      /// \param[in] _mobod New slave mobilizer
+      public: void AddSlaveMobod(SimTK::MobilizedBody _mobod);
+
+      /// \brief Get a slave mobilizer.
+      /// \param[in] _index Index of the slave mobilizer
+      /// \return The slave mobilizer
+      public: SimTK::MobilizedBody &SlaveMobod(unsigned int _index) const;
+
+      /// \brief Add a new slave weld
+      /// \param[in] _weld New slave weld
+      public: void AddSlaveWeld(SimTK::Constraint::Weld _weld);
+
       /// \brief Internal call to change effect of gravity on Link
       /// based on gravityMode if gravityModeDirty is true.
       private: void ProcessSetGravityMode();

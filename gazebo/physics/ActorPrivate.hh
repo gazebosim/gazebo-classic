@@ -22,6 +22,7 @@
 
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/Skeleton.hh"
+#include "gazebo/physics/ModelPrivate.hh"
 
 namespace gazebo
 {

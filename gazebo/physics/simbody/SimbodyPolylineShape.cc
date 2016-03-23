@@ -16,6 +16,7 @@
 */
 #include "gazebo/common/Mesh.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/physics/PolylineShapePrivate.hh"
 #include "gazebo/physics/simbody/SimbodyMesh.hh"
 #include "gazebo/physics/simbody/SimbodyCollision.hh"
 #include "gazebo/physics/simbody/SimbodyPhysics.hh"
@@ -47,7 +48,7 @@ void SimbodyPolylineShape::Load(sdf::ElementPtr _sdf)
 void SimbodyPolylineShape::Init()
 {
   PolylineShape::Init();
-  if (!this->shapeDPtr->mesh)
+  if (!this->polylineShapeDPtr->mesh)
   {
     gzerr << "Unable to create polyline in Simbody. Mesh pointer is null.\n";
     return;

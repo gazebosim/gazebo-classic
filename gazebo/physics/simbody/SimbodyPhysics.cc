@@ -644,8 +644,7 @@ void SimbodyPhysics::UpdatePhysics()
   // need to lock, otherwise might conflict with world resetting
   boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
 
-  common::Time currTime =  this->world->GetRealTime();
-
+  common::Time currTime = this->world->GetRealTime();
 
   bool trying = true;
   while (trying &&
@@ -890,7 +889,7 @@ void SimbodyPhysics::CreateMultibodyGraph(
 
     if (simbodyLink)
       _mbgraph.addBody((*li)->Name(), (*li)->Inertial()->Mass(),
-                      simbodyLink->mustBeBaseLink, (*li).get());
+                      simbodyLink->MustBeBaseLink(), (*li).get());
     else
       gzerr << "simbodyLink [" << (*li)->Name()
             << "]is not a SimbodyLinkPtr\n";
@@ -906,17 +905,17 @@ void SimbodyPhysics::CreateMultibodyGraph(
       std::dynamic_pointer_cast<SimbodyJoint>(*ji);
     if (simbodyJoint)
     {
-      if ((*ji)->Parent()() && (*ji)->Child())
+      if ((*ji)->Parent() && (*ji)->Child())
       {
-        _mbgraph.addJoint((*ji)->Name(), TypeString((*ji)->GetType()),
-           (*ji)->Parent()->Name(), (*ji)->Child()->Name(),
-                            simbodyJoint->mustBreakLoopHere, (*ji).get());
+        _mbgraph.addJoint((*ji)->Name(), TypeString((*ji)->Type()),
+            (*ji)->Parent()->Name(), (*ji)->Child()->Name(),
+            simbodyJoint->MustBreakLoopHere(), (*ji).get());
       }
       else if ((*ji)->Child())
       {
-        _mbgraph.addJoint((*ji)->Name(), TypeString((*ji)->GetType()),
-           "world", (*ji)->Child()->Name(),
-                            simbodyJoint->mustBreakLoopHere, (*ji).get());
+        _mbgraph.addJoint((*ji)->Name(), TypeString((*ji)->Type()),
+            "world", (*ji)->Child()->Name(),
+            simbodyJoint->MustBreakLoopHere(), (*ji).get());
       }
       else
       {
@@ -1010,7 +1009,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
       static_cast<SimbodyLink*>(mob.getOutboardMasterBodyRef());
 
     const MassProperties massProps =
-        gzOutb->GetEffectiveMassProps(mob.getNumFragments());
+        gzOutb->EffectiveMassProps(mob.getNumFragments());
 
     // debug
     // if (gzInb)
@@ -1045,9 +1044,9 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
         if (gzInb == NULL)
         {
           // GZ_ASSERT(gzOutb, "must be here");
-          physics::ModelPtr model = gzOutb->Parent()->Model();
+          physics::ModelPtr model = gzOutb->ParentModel();
           inboard_X_ML =
-            ~SimbodyPhysics::Pose2Transform(model->GetWorldPose());
+            ~SimbodyPhysics::Pose2Transform(model->WorldPose());
         }
         else
           inboard_X_ML =
@@ -1066,14 +1065,14 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
       // This mobilizer does correspond to one of the input joints.
       // note: do not use boost shared pointer here, on scope out the
       // original pointer get scrambled
-      SimbodyJoint* gzJoint = static_cast<SimbodyJoint*>(mob.getJointRef());
+      SimbodyJoint *gzJoint = static_cast<SimbodyJoint*>(mob.getJointRef());
       const bool isReversed = mob.isReversedFromJoint();
 
       // Find inboard and outboard frames for the mobilizer; these are
       // parent and child frames or the reverse.
 
-      const Transform& X_IF0 = isReversed ? gzJoint->xCB : gzJoint->xPA;
-      const Transform& X_OM0 = isReversed ? gzJoint->xPA : gzJoint->xCB;
+      const Transform &X_IF0 = isReversed ? gzJoint->XCB() : gzJoint->XPA();
+      const Transform &X_OM0 = isReversed ? gzJoint->XPA() : gzJoint->XCB();
 
       const MobilizedBody::Direction direction =
           isReversed ? MobilizedBody::Reverse : MobilizedBody::Forward;
@@ -1084,8 +1083,8 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
             parentMobod,  X_IF0,
             massProps,          X_OM0,
             direction);
-        Transform defX_FM = isReversed ? Transform(~gzJoint->defxAB)
-                                       : gzJoint->defxAB;
+        Transform defX_FM = isReversed ? Transform(~gzJoint->DefxAB())
+                                       : gzJoint->DefxAB();
         freeJoint.setDefaultTransform(defX_FM);
         mobod = freeJoint;
       }
@@ -1093,11 +1092,10 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
       {
         UnitVec3 axis(
           SimbodyPhysics::Vector3ToVec3(
-            gzJoint->GetAxisFrameOffset(0).RotateVector(
-            gzJoint->GetLocalAxis(0))));
+            gzJoint->AxisFrameOffset(0).RotateVector(gzJoint->LocalAxis(0))));
 
         double pitch =
-          dynamic_cast<physics::SimbodyScrewJoint*>(gzJoint)->GetThreadPitch(0);
+          dynamic_cast<physics::SimbodyScrewJoint*>(gzJoint)->ThreadPitch(0);
 
         if (math::equal(pitch, 0.0))
         {
@@ -1119,42 +1117,42 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
 
         gzdbg << "Setting limitForce[0] for [" << gzJoint->Name() << "]\n";
 
-        double low = gzJoint->GetLowerLimit(0u).Radian();
-        double high = gzJoint->GetUpperLimit(0u).Radian();
+        double low = gzJoint->LowerLimit(0u).Radian();
+        double high = gzJoint->UpperLimit(0u).Radian();
 
         // initialize stop stiffness and dissipation from joint parameters
-        gzJoint->limitForce[0] =
+        gzJoint->SetLimitForce(0,
           Force::MobilityLinearStop(this->simbodyPhysicsDPtr->forces, mobod,
-          SimTK::MobilizerQIndex(0), gzJoint->GetStopStiffness(0),
-          gzJoint->GetStopDissipation(0), low, high);
+          SimTK::MobilizerQIndex(0), gzJoint->StopStiffness(0),
+          gzJoint->StopDissipation(0), low, high));
 
         // gzdbg << "SimbodyPhysics SetDamping ("
-        //       << gzJoint->GetDampingCoefficient()
+        //       << gzJoint->DampingCoefficient()
         //       << ")\n";
         // Create a damper for every joint even if damping coefficient
         // is zero.  This will allow user to change damping coefficients
         // on the fly.
-        gzJoint->damper[0] =
+        gzJoint->SetDamper(0,
           Force::MobilityLinearDamper(
               this->simbodyPhysicsDPtr->forces, mobod, 0,
-              gzJoint->GetDamping(0));
+              gzJoint->Damping(0)));
 
         // add spring (stiffness proportional to mass)
-        gzJoint->spring[0] =
+        gzJoint->SetSpring(0,
           Force::MobilityLinearSpring(
               this->simbodyPhysicsDPtr->forces, mobod, 0,
               gzJoint->GetStiffness(0),
-              gzJoint->GetSpringReferencePosition(0));
+              gzJoint->SpringReferencePosition(0)));
       }
       else if (type == "universal")
       {
         UnitVec3 axis1(SimbodyPhysics::Vector3ToVec3(
-          gzJoint->GetAxisFrameOffset(0).RotateVector(
-          gzJoint->GetLocalAxis(UniversalJoint<Joint>::AXIS_PARENT))));
+          gzJoint->AxisFrameOffset(0).RotateVector(
+          gzJoint->LocalAxis(UniversalJoint<Joint>::AXIS_PARENT))));
         /// \TODO: check if this is right, or GetAxisFrameOffset(1) is needed.
         UnitVec3 axis2(SimbodyPhysics::Vector3ToVec3(
-          gzJoint->GetAxisFrameOffset(0).RotateVector(
-          gzJoint->GetLocalAxis(UniversalJoint<Joint>::AXIS_CHILD))));
+          gzJoint->AxisFrameOffset(0).RotateVector(
+          gzJoint->LocalAxis(UniversalJoint<Joint>::AXIS_CHILD))));
 
         // Simbody's univeral joint is along axis1=Y and axis2=X
         // note X and Y are reversed because Simbody defines universal joint
@@ -1171,36 +1169,37 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
 
         for (unsigned int nj = 0; nj < 2; ++nj)
         {
-          double low = gzJoint->GetLowerLimit(nj).Radian();
-          double high = gzJoint->GetUpperLimit(nj).Radian();
+          double low = gzJoint->LowerLimit(nj).Radian();
+          double high = gzJoint->UpperLimit(nj).Radian();
 
           // initialize stop stiffness and dissipation from joint parameters
-          gzJoint->limitForce[nj] =
+          gzJoint->SetLimitForce(nj,
             Force::MobilityLinearStop(this->simbodyPhysicsDPtr->forces, mobod,
-            SimTK::MobilizerQIndex(nj), gzJoint->GetStopStiffness(nj),
-            gzJoint->GetStopDissipation(nj), low, high);
+            SimTK::MobilizerQIndex(nj), gzJoint->StopStiffness(nj),
+            gzJoint->StopDissipation(nj), low, high));
 
-          // gzdbg << "stop stiffness [" << gzJoint->GetStopStiffness(nj)
+          // gzdbg << "stop stiffness [" << gzJoint->StopStiffness(nj)
           //       << "] low [" << low
           //       << "] high [" << high
           //       << "]\n";
 
           // gzdbg << "SimbodyPhysics SetDamping ("
-          //       << gzJoint->GetDampingCoefficient()
+          //       << gzJoint->DampingCoefficient()
           //       << ")\n";
           // Create a damper for every joint even if damping coefficient
           // is zero.  This will allow user to change damping coefficients
           // on the fly.
-          gzJoint->damper[nj] =
+          gzJoint->SetDamper(nj,
             Force::MobilityLinearDamper(
                 this->simbodyPhysicsDPtr->forces, mobod, nj,
-                gzJoint->GetDamping(nj));
+                gzJoint->Damping(nj)));
+
           // add spring (stiffness proportional to mass)
-          gzJoint->spring[nj] =
+          gzJoint->SetSpring(nj,
             Force::MobilityLinearSpring(
                 this->simbodyPhysicsDPtr->forces, mobod, nj,
                 gzJoint->GetStiffness(nj),
-                gzJoint->GetSpringReferencePosition(nj));
+                gzJoint->SpringReferencePosition(nj)));
         }
       }
       else if (type == "revolute")
@@ -1216,13 +1215,13 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
         // flip transform based on isReversed flag.
         UnitVec3 axis(
           SimbodyPhysics::Vector3ToVec3(
-            gzJoint->GetAxisFrameOffset(0).RotateVector(
-            gzJoint->GetLocalAxis(0))));
+            gzJoint->AxisFrameOffset(0).RotateVector(
+            gzJoint->LocalAxis(0))));
 
-        // gzerr << "[" << gzJoint->GetAxisFrameOffset(0).GetAsEuler()
+        // gzerr << "[" << gzJoint->AxisFrameOffset(0).GetAsEuler()
         //       << "] ["
-        //       << gzJoint->GetAxisFrameOffset(0).RotateVector(
-        //          gzJoint->GetLocalAxis(0)) << "]\n";
+        //       << gzJoint->AxisFrameOffset(0).RotateVector(
+        //          gzJoint->LocalAxis(0)) << "]\n";
 
         // Simbody's pin is along Z
         Rotation R_JZ(axis, ZAxis);
@@ -1234,38 +1233,38 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
             direction);
         mobod = pinJoint;
 
-        double low = gzJoint->GetLowerLimit(0u).Radian();
-        double high = gzJoint->GetUpperLimit(0u).Radian();
+        double low = gzJoint->LowerLimit(0u).Radian();
+        double high = gzJoint->UpperLimit(0u).Radian();
 
         // initialize stop stiffness and dissipation from joint parameters
-        gzJoint->limitForce[0] =
+        gzJoint->SetLimitForce(0,
           Force::MobilityLinearStop(this->simbodyPhysicsDPtr->forces, mobod,
-          SimTK::MobilizerQIndex(0), gzJoint->GetStopStiffness(0),
-          gzJoint->GetStopDissipation(0), low, high);
+          SimTK::MobilizerQIndex(0), gzJoint->StopStiffness(0),
+          gzJoint->StopDissipation(0), low, high));
 
         // gzdbg << "SimbodyPhysics SetDamping ("
-        //       << gzJoint->GetDampingCoefficient()
+        //       << gzJoint->DampingCoefficient()
         //       << ")\n";
         // Create a damper for every joint even if damping coefficient
         // is zero.  This will allow user to change damping coefficients
         // on the fly.
-        gzJoint->damper[0] =
+        gzJoint->SetDamper(0,
           Force::MobilityLinearDamper(
               this->simbodyPhysicsDPtr->forces, mobod, 0,
-              gzJoint->GetDamping(0));
+              gzJoint->Damping(0)));
 
         // add spring (stiffness proportional to mass)
-        gzJoint->spring[0] =
+        gzJoint->SetSpring(0,
           Force::MobilityLinearSpring(
               this->simbodyPhysicsDPtr->forces, mobod, 0,
               gzJoint->GetStiffness(0),
-              gzJoint->GetSpringReferencePosition(0));
+              gzJoint->SpringReferencePosition(0)));
       }
       else if (type == "prismatic")
       {
         UnitVec3 axis(SimbodyPhysics::Vector3ToVec3(
-            gzJoint->GetAxisFrameOffset(0).RotateVector(
-            gzJoint->GetLocalAxis(0))));
+            gzJoint->AxisFrameOffset(0).RotateVector(
+            gzJoint->LocalAxis(0))));
 
         // Simbody's slider is along X
         Rotation R_JX(axis, XAxis);
@@ -1277,29 +1276,29 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
             direction);
         mobod = sliderJoint;
 
-        double low = gzJoint->GetLowerLimit(0u).Radian();
-        double high = gzJoint->GetUpperLimit(0u).Radian();
+        double low = gzJoint->LowerLimit(0u).Radian();
+        double high = gzJoint->UpperLimit(0u).Radian();
 
         // initialize stop stiffness and dissipation from joint parameters
-        gzJoint->limitForce[0] =
+        gzJoint->SetLimitForce(0,
           Force::MobilityLinearStop(this->simbodyPhysicsDPtr->forces, mobod,
-          SimTK::MobilizerQIndex(0), gzJoint->GetStopStiffness(0),
-          gzJoint->GetStopDissipation(0), low, high);
+          SimTK::MobilizerQIndex(0), gzJoint->StopStiffness(0),
+          gzJoint->StopDissipation(0), low, high));
 
         // Create a damper for every joint even if damping coefficient
         // is zero.  This will allow user to change damping coefficients
         // on the fly.
-        gzJoint->damper[0] =
+        gzJoint->SetDamper(0,
           Force::MobilityLinearDamper(
               this->simbodyPhysicsDPtr->forces, mobod, 0,
-              gzJoint->GetDamping(0));
+              gzJoint->Damping(0)));
 
         // add spring (stiffness proportional to mass)
-        gzJoint->spring[0] =
+        gzJoint->SetSpring(0,
           Force::MobilityLinearSpring(
               this->simbodyPhysicsDPtr->forces, mobod, 0,
               gzJoint->GetStiffness(0),
-              gzJoint->GetSpringReferencePosition(0));
+              gzJoint->SpringReferencePosition(0)));
       }
       else if (type == "ball")
       {
@@ -1308,8 +1307,8 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
             massProps,          X_OM0,
             direction);
         Rotation defR_FM = isReversed
-            ? Rotation(~gzJoint->defxAB.R())
-            : gzJoint->defxAB.R();
+            ? Rotation(~gzJoint->DefxAB().R())
+            : gzJoint->DefxAB().R();
         ballJoint.setDefaultRotation(defR_FM);
         mobod = ballJoint;
       }
@@ -1326,13 +1325,13 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
       }
 
       // Created a mobilizer that corresponds to gzJoint. Keep track.
-      gzJoint->mobod = mobod;
-      gzJoint->isReversed = isReversed;
+      gzJoint->SetMobod(mobod);
+      gzJoint->SetIsReversed(isReversed);
     }
 
     // Link gzOutb has been mobilized; keep track for later.
     if (isSlave)
-      gzOutb->slaveMobods.push_back(mobod);
+      gzOutb->AddSlaveMobod(mobod);
     else
       gzOutb->MobilizedBody() = mobod;
 
@@ -1352,13 +1351,16 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
     {
       physics::SimbodyLinkPtr link =
         std::dynamic_pointer_cast<physics::SimbodyLink>(*lx);
-      if (link->slaveMobods.empty()) continue;
-      for (unsigned i = 0; i < link->slaveMobods.size(); ++i)
+
+      if (link->SlaveMobodsCount() == 0)
+        continue;
+
+      for (unsigned i = 0; i < link->SlaveMobodsCount(); ++i)
       {
-        Constraint::Weld weld(link->MobilizedBody(), link->slaveMobods[i]);
+        Constraint::Weld weld(link->MobilizedBody(), link->SlaveMobod(i));
 
         // in case we want to know later
-        link->slaveWelds.push_back(weld);
+        link->AddSlaveWeld(weld);
       }
     }
   }
@@ -1374,12 +1376,12 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
   //     SimbodyLinkPtr  child(loop.getChildBodyRef());
 
   //     if (joint.type == "weld") {
-  //         Constraint::Weld weld(parent.masterMobod, joint.xPA,
-  //                               child.masterMobod,  joint.xCB);
+  //         Constraint::Weld weld(parent.masterMobod, joint.XPA(),
+  //                               child.masterMobod,  joint.XCB());
   //         joint.constraint = weld;
   //     } else if (joint.type == "ball") {
-  //         Constraint::Ball ball(parent.masterMobod, joint.xPA.p(),
-  //                               child.masterMobod,  joint.xCB.p());
+  //         Constraint::Ball ball(parent.masterMobod, joint.XPA().p(),
+  //                               child.masterMobod,  joint.XCB().p());
   //         joint.constraint = ball;
   //     } else if (joint.type == "free") {
   //         // A "free" loop constraint is no constraint at all so we can
@@ -1468,7 +1470,7 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
   //                                 0.5,   // mu_dynamic
   //                                 0.5);  // mu_viscous
 
-  bool addModelClique = _modelClique.isValid() && !_link->GetSelfCollide();
+  bool addModelClique = _modelClique.isValid() && !_link->SelfCollide();
 
   // COLLISION
   Collision_V collisions =  _link->Collisions();
@@ -1675,8 +1677,9 @@ ignition::math::Pose3d SimbodyPhysics::Transform2PoseIgn(
 {
   SimTK::Quaternion q(_xAB.R());
   const SimTK::Vec4 &qv = q.asVec4();
-  return math::Pose(math::Vector3(_xAB.p()[0], _xAB.p()[1], _xAB.p()[2]),
-    math::Quaternion(qv[0], qv[1], qv[2], qv[3]));
+  return ignition::math::Pose3d(
+      ignition::math::Vector3d(_xAB.p()[0], _xAB.p()[1], _xAB.p()[2]),
+    ignition::math::Quaterniond(qv[0], qv[1], qv[2], qv[3]));
 }
 
 /////////////////////////////////////////////////
@@ -1697,7 +1700,7 @@ std::string SimbodyPhysics::TypeString(const unsigned int _type)
 boost::any SimbodyPhysics::Param(const std::string &_key) const
 {
   boost::any value;
-  this->GetParam(_key, value);
+  this->Param(_key, value);
   return value;
 }
 

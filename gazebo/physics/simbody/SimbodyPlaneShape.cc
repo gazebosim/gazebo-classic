@@ -15,6 +15,7 @@
  *
 */
 
+#include "gazebo/physics/ShapePrivate.hh"
 #include "gazebo/physics/simbody/SimbodyPlaneShape.hh"
 #include "gazebo/physics/simbody/SimbodyTypes.hh"
 #include "gazebo/physics/simbody/SimbodyCollision.hh"

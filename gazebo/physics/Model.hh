@@ -613,6 +613,12 @@ namespace gazebo
       /// returns NULL if link _name already exists.
       public: LinkPtr CreateLink(const std::string &_name);
 
+      /// \internal
+      /// \brief Constructor used by inherited classes.
+      /// \param[in] _dataPtr Protected data class
+      /// \param[in] _parent Pointer to parent entity.
+      protected: Model(ModelPrivate &_dataPtr, BasePtr _parent);
+
       /// \brief Callback when the pose of the model has been changed.
       protected: virtual void OnPoseChange();
 

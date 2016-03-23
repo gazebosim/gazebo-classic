@@ -650,3 +650,129 @@ void SimbodyJoint::SetPhysicsInitialized(const bool _value)
 {
   this->simbodyJointDPtr->physicsInitialized = _value;
 }
+
+/////////////////////////////////////////////////
+bool SimbodyJoint::MustBreakLoopHere() const
+{
+  return this->simbodyJointDPtr->mustBreakLoopHere;
+}
+
+/////////////////////////////////////////////////
+SimTK::Transform SimbodyJoint::XPA() const
+{
+  return this->simbodyJointDPtr->xPA;
+}
+
+/////////////////////////////////////////////////
+SimTK::Transform SimbodyJoint::XCB() const
+{
+  return this->simbodyJointDPtr->xCB;
+}
+
+/////////////////////////////////////////////////
+SimTK::Transform SimbodyJoint::DefxAB() const
+{
+  return this->simbodyJointDPtr->defxAB;
+}
+
+/////////////////////////////////////////////////
+SimTK::Force::MobilityLinearStop SimbodyJoint::LimitForce(
+    unsigned int _index) const
+{
+  if (_index >= MAX_JOINT_AXIS)
+  {
+    _index = 0;
+    gzerr << "Axis index with value[" << _index << "] must be between zero and "
+      << MAX_JOINT_AXIS << ". Using an index of zero.\n";
+  }
+
+  return this->simbodyJointDPtr->limitForce[_index];
+}
+
+/////////////////////////////////////////////////
+void SimbodyJoint::SetLimitForce(const unsigned int _index,
+    const SimTK::Force::MobilityLinearStop _limit)
+{
+  if (_index >= MAX_JOINT_AXIS)
+  {
+    gzerr << "Axis index with value[" << _index << "] must be between zero and "
+      << MAX_JOINT_AXIS << ".\n";
+    return;
+  }
+
+  this->simbodyJointDPtr->limitForce[_index] = _limit;
+}
+
+/////////////////////////////////////////////////
+SimTK::Force::MobilityLinearDamper SimbodyJoint::Damper(
+    unsigned int _index) const
+{
+  if (_index >= MAX_JOINT_AXIS)
+  {
+    _index = 0;
+    gzerr << "Axis index with value[" << _index << "] must be between zero and "
+      << MAX_JOINT_AXIS << ". Using an index of zero.\n";
+  }
+
+  return this->simbodyJointDPtr->damper[_index];
+}
+
+/////////////////////////////////////////////////
+void SimbodyJoint::SetDamper(const unsigned int _index,
+    const SimTK::Force::MobilityLinearDamper _damper)
+{
+  if (_index >= MAX_JOINT_AXIS)
+  {
+    gzerr << "Axis index with value[" << _index << "] must be between zero and "
+      << MAX_JOINT_AXIS << ".\n";
+    return;
+  }
+
+  this->simbodyJointDPtr->damper[_index] = _damper;
+}
+
+/////////////////////////////////////////////////
+SimTK::Force::MobilityLinearSpring SimbodyJoint::Spring(
+    unsigned int _index) const
+{
+  if (_index >= MAX_JOINT_AXIS)
+  {
+    _index = 0;
+    gzerr << "Axis index with value[" << _index << "] must be between zero and "
+      << MAX_JOINT_AXIS << ". Using an index of zero.\n";
+  }
+
+  return this->simbodyJointDPtr->spring[_index];
+}
+
+/////////////////////////////////////////////////
+void SimbodyJoint::SetSpring(const unsigned int _index,
+    const SimTK::Force::MobilityLinearSpring _spring)
+{
+  if (_index >= MAX_JOINT_AXIS)
+  {
+    gzerr << "Axis index with value[" << _index << "] must be between zero and "
+      << MAX_JOINT_AXIS << ".\n";
+    return;
+  }
+
+  this->simbodyJointDPtr->spring[_index] = _spring;
+}
+
+/////////////////////////////////////////////////
+void SimbodyJoint::SetMobod(const SimTK::MobilizedBody &_mobod)
+{
+  this->simbodyJointDPtr->mobod = _mobod;
+}
+
+/////////////////////////////////////////////////
+bool SimbodyJoint::IsReversed() const
+{
+  return this->simbodyJointDPtr->isReversed;
+}
+
+/////////////////////////////////////////////////
+void SimbodyJoint::SetIsReversed(const bool _value)
+{
+  this->simbodyJointDPtr->isReversed = _value;
+}

@@ -703,3 +703,41 @@ SimTK::MobilizedBody &SimbodyLink::MobilizedBody() const
 {
   return this->simbodyLinkDPtr->masterMobod;
 }
+
+/////////////////////////////////////////////////
+bool SimbodyLink::MustBeBaseLink() const
+{
+  return this->simbodyLinkDPtr->mustBeBaseLink;
+}
+
+/////////////////////////////////////////////////
+size_t SimbodyLink::SlaveMobodsCount() const
+{
+  return this->simbodyLinkDPtr->slaveMobods.size();
+}
+
+/////////////////////////////////////////////////
+void SimbodyLink::AddSlaveMobod(SimTK::MobilizedBody _mobod)
+{
+  this->simbodyLinkDPtr->slaveMobods.push_back(_mobod);
+}
+
+/////////////////////////////////////////////////
+SimTK::MobilizedBody &SimbodyLink::SlaveMobod(unsigned int _index) const
+{
+  if (_index >= this->simbodyLinkDPtr->slaveMobods.size())
+  {
+    _index = 0;
+    gzerr << "Index with value[" << _index << "] must be between zero and "
+      << this->simbodyLinkDPtr->slaveMobods.size()
+      << ". Using a value of zero\n";
+  }
+
+  return this->simbodyLinkDPtr->slaveMobods[_index];
+}
+
+/////////////////////////////////////////////////
+void SimbodyLink::AddSlaveWeld(SimTK::Constraint::Weld _weld)
+{
+  this->simbodyLinkDPtr->slaveWelds.push_back(_weld);
+}

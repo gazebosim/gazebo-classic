@@ -17,6 +17,7 @@
 #include "gazebo/common/Console.hh"
 
 #include "gazebo/physics/Model.hh"
+#include "gazebo/physics/simbody/SimbodyJointPrivate.hh"
 #include "gazebo/physics/simbody/simbody_inc.h"
 #include "gazebo/physics/simbody/SimbodyLink.hh"
 #include "gazebo/physics/simbody/SimbodyPhysics.hh"
@@ -60,11 +61,11 @@ void SimbodySliderJoint::SetVelocity(const unsigned int _index,
   if (_index < this->AngleCount())
   {
     this->simbodyJointDPtr->mobod.setOneU(
-      this->simbodyJointDPtr->simbodyPhysics->integ->updAdvancedState(),
-      SimTK::MobilizerUIndex(_index), _rate);
-    this->simbodyJointDPtr->simbodyPhysics->system.realize(
-      this->simbodyJointDPtr->simbodyPhysics->integ->getAdvancedState(),
-      SimTK::Stage::Velocity);
+        this->simbodyJointDPtr->simbodyPhysics->Integ()->updAdvancedState(),
+        SimTK::MobilizerUIndex(_index), _rate);
+    this->simbodyJointDPtr->simbodyPhysics->System().realize(
+        this->simbodyJointDPtr->simbodyPhysics->Integ()->getAdvancedState(),
+        SimTK::Stage::Velocity);
   }
   else
     gzerr << "SetVelocity _index too large.\n";
@@ -75,9 +76,9 @@ double SimbodySliderJoint::Velocity(unsigned int _index) const
 {
   if (_index < this->AngleCount())
   {
-    if (this->simbodyJointDPtr->simbodyPhysics->simbodyPhysicsInitialized)
+    if (this->simbodyJointDPtr->simbodyPhysics->PhysicsInitialized())
       return this->simbodyJointDPtr->mobod.getOneU(
-        this->simbodyJointDPtr->simbodyPhysics->integ->getState(),
+        this->simbodyJointDPtr->simbodyPhysics->Integ()->getState(),
         SimTK::MobilizerUIndex(_index));
     else
     {
@@ -100,9 +101,11 @@ void SimbodySliderJoint::SetForceImpl(
 {
   if (_index < this->AngleCount())
   {
-    this->simbodyJointDPtr->simbodyPhysics->discreteForces.setOneMobilityForce(
-      this->simbodyJointDPtr->simbodyPhysics->integ->updAdvancedState(),
-      this->simbodyJointDPtr->mobod, SimTK::MobilizerUIndex(_index), _torque);
+    this->simbodyJointDPtr->simbodyPhysics->DiscreteForces(
+        ).setOneMobilityForce(
+          this->simbodyJointDPtr->simbodyPhysics->Integ()->updAdvancedState(),
+          this->simbodyJointDPtr->mobod,
+          SimTK::MobilizerUIndex(_index), _torque);
   }
 }
 
@@ -110,27 +113,28 @@ void SimbodySliderJoint::SetForceImpl(
 ignition::math::Vector3d SimbodySliderJoint::GlobalAxis(
     const unsigned int _index) const
 {
-  if (this->simbodyJointDPtr->simbodyPhysics->simbodyPhysicsStepped &&
+  if (this->simbodyJointDPtr->simbodyPhysics->PhysicsStepped() &&
       _index < this->AngleCount())
   {
     if (!this->simbodyJointDPtr->mobod.isEmptyHandle())
     {
-      const SimTK::Transform &X_OM =
+      const SimTK::Transform &xom =
         this->simbodyJointDPtr->mobod.getOutboardFrame(
-        this->simbodyJointDPtr->simbodyPhysics->integ->getState());
+            this->simbodyJointDPtr->simbodyPhysics->Integ()->getState());
 
       // express X-axis of X_OM in world frame
-      SimTK::Vec3 x_W(this->simbodyJointDPtr->mobod.expressVectorInGroundFrame(
-        this->simbodyJointDPtr->simbodyPhysics->integ->getState(), X_OM.x()));
+      SimTK::Vec3 xw(this->simbodyJointDPtr->mobod.expressVectorInGroundFrame(
+            this->simbodyJointDPtr->simbodyPhysics->Integ()->getState(),
+            xom.x()));
 
-      return SimbodyPhysics::Vec3ToVector3(x_W);
+      return SimbodyPhysics::Vec3ToVector3Ign(xw);
     }
     else
     {
       gzerr << "Joint mobod not initialized correctly.  Returning"
-            << " initial axis vector in world frame (not valid if"
-            << " joint frame has moved). Please file"
-            << " a report on issue tracker.\n";
+        << " initial axis vector in world frame (not valid if"
+        << " joint frame has moved). Please file"
+        << " a report on issue tracker.\n";
       return this->AxisFrame(_index).RotateVector(this->LocalAxis(_index));
     }
   }
@@ -145,15 +149,18 @@ ignition::math::Vector3d SimbodySliderJoint::GlobalAxis(
     else
     {
       gzdbg << "Simbody::GlobalAxis() sibmody physics"
-            << " engine not initialized yet, "
-            << "use local axis and initial pose to compute "
-            << "global axis.\n";
+        << " engine not initialized yet, "
+        << "use local axis and initial pose to compute "
+        << "global axis.\n";
 
       // if local axis specified in model frame (to be changed)
       // switch to code below if issue #494 is to be addressed
       return this->AxisFrame(_index).RotateVector(this->LocalAxis(_index));
     }
   }
+
+  return ignition::math::Vector3d(ignition::math::NAN_D,
+      ignition::math::NAN_D, ignition::math::NAN_D);
 }
 
 //////////////////////////////////////////////////
@@ -162,12 +169,12 @@ ignition::math::Angle SimbodySliderJoint::AngleImpl(
 {
   if (_index < this->AngleCount())
   {
-    if (this->simbodyJointDPtr->simbodyPhysics->simbodyPhysicsInitialized)
+    if (this->simbodyJointDPtr->simbodyPhysics->PhysicsInitialized())
     {
       if (!this->simbodyJointDPtr->mobod.isEmptyHandle())
       {
         return ignition::math::Angle(this->simbodyJointDPtr->mobod.getOneQ(
-          this->simbodyJointDPtr->simbodyPhysics->integ->getState(), _index));
+          this->simbodyJointDPtr->simbodyPhysics->Integ()->getState(), _index));
       }
       else
       {

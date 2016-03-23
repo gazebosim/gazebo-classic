@@ -150,7 +150,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Private data pointer.
-      private: ActorPrivate *dataPtr;
+      private: ActorPrivate *actorDPtr;
     };
     /// \}
   }

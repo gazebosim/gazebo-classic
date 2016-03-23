@@ -278,7 +278,7 @@ namespace gazebo
       /// \brief Get by name.
       /// \param[in] _name Get a child (or self) object by name
       /// \return A pointer to the object, NULL if not found
-      public: BasePtr BaseByName(const std::string &_name) const;
+      public: Base *BaseByName(const std::string &_name) const;
 
       /// \brief Get a child by index.
       /// \param[in] _i Index of the child to retreive.

@@ -48,7 +48,7 @@ namespace gazebo
       public: CollisionState state;
 
       /// \brief Number of contact points allowed for this collision.
-      public: unsigned int maxContacts;
+      public: unsigned int maxContacts = 1;
 
       /// \brief Unique id for collision visual.
       public: uint32_t collisionVisualId;

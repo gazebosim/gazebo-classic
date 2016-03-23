@@ -428,7 +428,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Private data pointer
-      protected: EntityPrivate *dataPtr;
+      protected: EntityPrivate *entityDPtr;
     };
     /// \}
   }

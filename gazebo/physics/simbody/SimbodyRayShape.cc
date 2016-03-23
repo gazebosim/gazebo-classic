@@ -15,6 +15,7 @@
  *
 */
 #include "gazebo/physics/World.hh"
+#include "gazebo/physics/RayShapePrivate.hh"
 #include "gazebo/physics/simbody/SimbodyLink.hh"
 #include "gazebo/physics/simbody/SimbodyPhysics.hh"
 #include "gazebo/physics/simbody/SimbodyTypes.hh"
@@ -30,7 +31,7 @@ SimbodyRayShape::SimbodyRayShape(PhysicsEnginePtr _physicsEngine)
 {
   this->SetName("Simbody Ray Shape");
 
-  this-physicsEngine =
+  this->physicsEngine =
     std::static_pointer_cast<SimbodyPhysics>(_physicsEngine);
 }
 

@@ -15,6 +15,9 @@
  *
 */
 
+#include "gazebo/common/Console.hh"
+#include "gazebo/physics/simbody/SimbodyTypes.hh"
+#include "gazebo/physics/ShapePrivate.hh"
 #include "gazebo/physics/simbody/SimbodySphereShape.hh"
 
 using namespace gazebo;
@@ -50,9 +53,10 @@ void SimbodySphereShape::SetRadius(double _radius)
   }
 
   SphereShape::SetRadius(_radius);
-  SimbodyCollisionPtr bParent;
-  bParent = std::dynamic_pointer_cast<SimbodyCollision>(
-      this->shapeDPtr->collisionParent);
+  // Nate: put back in
+  /*SimbodyCollisionPtr bParen(std::dynamic_pointer_cast<SimbodyCollision>(
+      this->shapeDPtr->collisionParent));
+      */
 
   // set collision shape
 }

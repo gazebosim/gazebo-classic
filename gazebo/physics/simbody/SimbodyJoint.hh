@@ -160,6 +160,70 @@ namespace gazebo
       /// physics initialized flag.
       public: void SetPhysicsInitialized(const bool _value);
 
+      /// \brief Get the mustBreakLoopHere flag.
+      /// \return True if a loop must be broken at this joint.
+      public: bool MustBreakLoopHere() const;
+
+      /// \brief Get the parent body frame to mobilizer frame transform.
+      /// \return Parent body frame to mobilizer frame transform.
+      public: SimTK::Transform XPA() const;
+
+      /// \brief Get the child body frame to mobilizer frame transform.
+      /// \return Child body frame to mobilizer frame transform.
+      public: SimTK::Transform XCB() const;
+
+      /// \brief Get the default mobilizer pose.
+      /// \return Default mobilizer pose.
+      public: SimTK::Transform DefxAB() const;
+
+      /// \brief Get the limit force for an axis.
+      /// \param[in] _index Index of the axis
+      /// \return Limit force for the specified joint axis.
+      public: SimTK::Force::MobilityLinearStop LimitForce(
+                  const unsigned int _index) const;
+
+      /// \brief Set the limit force for an axis.
+      /// \param[in] _index Index of the axis
+      /// \param[in] _limit New limit forces value
+      public: void SetLimitForce(const unsigned int _index,
+                  const SimTK::Force::MobilityLinearStop _limit);
+
+      /// \brief Get the damper value for an axis.
+      /// \param[in] _index Index of the axis
+      /// \return Damper value for the specified joint axis.
+      public: SimTK::Force::MobilityLinearDamper Damper(
+                  const unsigned int _index) const;
+
+      /// \brief Set the damper value for an axis.
+      /// \param[in] _index Index of the axis
+      /// \param[in] _damper New damper value
+      public: void SetDamper(const unsigned int _index,
+                  const SimTK::Force::MobilityLinearDamper _damper);
+
+      /// \brief Get the spring value for an axis.
+      /// \param[in] _index Index of the axis
+      /// \return Spring value for the specified joint axis.
+      public: SimTK::Force::MobilityLinearSpring Spring(
+                  const unsigned int _index) const;
+
+      /// \brief Set the spring value for an axis.
+      /// \param[in] _index Index of the axis
+      /// \param[in] _spring New spring value
+      public: void SetSpring(const unsigned int _index,
+                  const SimTK::Force::MobilityLinearSpring  _spring);
+
+      /// \brief Set the mobilizer.
+      /// \param[in] _mobod New mobilizer
+      public: void SetMobod(const SimTK::MobilizedBody &_mobod);
+
+      /// \brief Return whether the parent & child relationship is reversed.
+      /// \return True if parent & child relationship is reversed.
+      public: bool IsReversed() const;
+
+      /// \brief Set whether the parent & child relationship is reversed.
+      /// \param[in] _value True if parent & child relationship is reversed.
+      public: void SetIsReversed(const bool _value);
+
       /// \internal
       /// \brief Private data pointer
       protected: SimbodyJointPrivate *simbodyJointDPtr;

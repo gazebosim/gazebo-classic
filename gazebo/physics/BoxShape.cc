@@ -21,6 +21,7 @@
 #endif
 
 #include "gazebo/math/Vector3.hh"
+#include "gazebo/physics/ShapePrivate.hh"
 #include "gazebo/physics/BoxShape.hh"
 
 using namespace gazebo;
@@ -79,12 +80,12 @@ void BoxShape::SetScale(const ignition::math::Vector3d &_scale)
   if (_scale.X() < 0 || _scale.Y() < 0 || _scale.Z() < 0)
     return;
 
-  if (_scale == this->scale)
+  if (_scale == this->shapeDPtr->scale)
     return;
 
-  this->SetSize((_scale/this->scale) * this->Size());
+  this->SetSize((_scale/this->shapeDPtr->scale) * this->Size());
 
-  this->shapeDptr->scale = _scale;
+  this->shapeDPtr->scale = _scale;
 }
 
 //////////////////////////////////////////////////
@@ -103,5 +104,5 @@ void BoxShape::ProcessMsg(const msgs::Geometry &_msg)
 //////////////////////////////////////////////////
 double BoxShape::ComputeVolume() const
 {
-  return IGN_BOX_VOLUME_V(this->GetSize().Ign());
+  return IGN_BOX_VOLUME_V(this->Size());
 }

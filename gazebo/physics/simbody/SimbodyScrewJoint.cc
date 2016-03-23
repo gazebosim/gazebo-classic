@@ -20,6 +20,7 @@
 #include "gazebo/common/Exception.hh"
 
 #include "gazebo/physics/Model.hh"
+#include "gazebo/physics/simbody/SimbodyJointPrivate.hh"
 #include "gazebo/physics/simbody/SimbodyLink.hh"
 #include "gazebo/physics/simbody/SimbodyPhysics.hh"
 #include "gazebo/physics/simbody/SimbodyTypes.hh"
@@ -53,10 +54,10 @@ double SimbodyScrewJoint::Velocity(unsigned int _index) const
   if (_index < this->AngleCount())
   {
     if (this->simbodyJointDPtr->physicsInitialized &&
-        this->simbodyJointDPtr->simbodyPhysics->simbodyPhysicsInitialized)
+        this->simbodyJointDPtr->simbodyPhysics->PhysicsInitialized())
     {
       return this->simbodyJointDPtr->mobod.getOneU(
-          this->simbodyJointDPtr->simbodyPhysics->integ->getState(),
+          this->simbodyJointDPtr->simbodyPhysics->Integ()->getState(),
           SimTK::MobilizerUIndex(_index));
     }
     else
@@ -81,7 +82,7 @@ void SimbodyScrewJoint::SetVelocity(const unsigned int _index,
   if (_index < this->AngleCount())
   {
     this->simbodyJointDPtr->mobod.setOneU(
-      this->simbodyJointDPtr->simbodyPhysics->integ->updAdvancedState(),
+      this->simbodyJointDPtr->simbodyPhysics->Integ()->updAdvancedState(),
       SimTK::MobilizerUIndex(_index), _rate);
   }
   else
@@ -145,9 +146,11 @@ void SimbodyScrewJoint::SetForceImpl(const unsigned int _index,
   if (_index < this->AngleCount() &&
       this->simbodyJointDPtr->physicsInitialized)
   {
-    this->simbodyJointDPtr->simbodyPhysics->discreteForces.setOneMobilityForce(
-      this->simbodyJointDPtr->simbodyPhysics->integ->updAdvancedState(),
-      this->simbodyJointDPtr->mobod, SimTK::MobilizerUIndex(_index), _torque);
+    this->simbodyJointDPtr->simbodyPhysics->DiscreteForces(
+        ).setOneMobilityForce(
+          this->simbodyJointDPtr->simbodyPhysics->Integ()->updAdvancedState(),
+          this->simbodyJointDPtr->mobod,
+          SimTK::MobilizerUIndex(_index), _torque);
   }
 }
 
@@ -156,27 +159,28 @@ ignition::math::Vector3d SimbodyScrewJoint::GlobalAxis(
     const unsigned int _index) const
 {
   if (this->simbodyJointDPtr->simbodyPhysics &&
-      this->simbodyJointDPtr->simbodyPhysics->simbodyPhysicsStepped &&
+      this->simbodyJointDPtr->simbodyPhysics->PhysicsStepped() &&
       _index < this->AngleCount())
   {
     if (!this->simbodyJointDPtr->mobod.isEmptyHandle())
     {
-      const SimTK::Transform &X_OM =
+      const SimTK::Transform &xom =
         this->simbodyJointDPtr->mobod.getOutboardFrame(
-            this->simbodyJointDPtr->simbodyPhysics->integ->getState());
+            this->simbodyJointDPtr->simbodyPhysics->Integ()->getState());
 
       // express Z-axis of X_OM in world frame
-      SimTK::Vec3 z_W(this->simbodyJointDPtr->mobod.expressVectorInGroundFrame(
-        this->simbodyJointDPtr->simbodyPhysics->integ->getState(), X_OM.z()));
+      SimTK::Vec3 zw(this->simbodyJointDPtr->mobod.expressVectorInGroundFrame(
+            this->simbodyJointDPtr->simbodyPhysics->Integ()->getState(),
+            xom.z()));
 
-      return SimbodyPhysics::Vec3ToVector3(z_W);
+      return SimbodyPhysics::Vec3ToVector3Ign(zw);
     }
     else
     {
       gzerr << "Joint mobod not initialized correctly.  Returning"
-            << " initial axis vector in world frame (not valid if"
-            << " joint frame has moved). Please file"
-            << " a report on issue tracker.\n";
+        << " initial axis vector in world frame (not valid if"
+        << " joint frame has moved). Please file"
+        << " a report on issue tracker.\n";
       return this->AxisFrame(_index).RotateVector(this->LocalAxis(_index));
     }
   }
@@ -191,9 +195,9 @@ ignition::math::Vector3d SimbodyScrewJoint::GlobalAxis(
     else
     {
       gzdbg << "SimbodyScrewJoint::GlobalAxis() sibmody physics"
-            << " engine not initialized yet, "
-            << "use local axis and initial pose to compute "
-            << "global axis.\n";
+        << " engine not initialized yet, "
+        << "use local axis and initial pose to compute "
+        << "global axis.\n";
 
       // if local axis specified in model frame (to be changed)
       // switch to code below if issue #494 is to be addressed
@@ -209,7 +213,7 @@ ignition::math::Angle SimbodyScrewJoint::AngleImpl(
   if (_index < this->AngleCount())
   {
     if (this->simbodyJointDPtr->physicsInitialized &&
-        this->simbodyJointDPtr->simbodyPhysics->simbodyPhysicsInitialized)
+        this->simbodyJointDPtr->simbodyPhysics->PhysicsInitialized())
     {
       if (!this->simbodyJointDPtr->mobod.isEmptyHandle())
       {
@@ -217,7 +221,7 @@ ignition::math::Angle SimbodyScrewJoint::AngleImpl(
         // _index=0: angular dof
         // _index=1: linear dof
         ignition::math::Angle angle(this->simbodyJointDPtr->mobod.getOneQ(
-          this->simbodyJointDPtr->simbodyPhysics->integ->getState(), 0));
+          this->simbodyJointDPtr->simbodyPhysics->Integ()->getState(), 0));
 
         if (_index == 1)
         {
@@ -260,7 +264,7 @@ double SimbodyScrewJoint::ThreadPitch() const
 {
   if (!this->simbodyJointDPtr->mobod.isEmptyHandle() &&
       this->simbodyJointDPtr->physicsInitialized &&
-      this->simbodyJointDPtr->simbodyPhysics->simbodyPhysicsInitialized)
+      this->simbodyJointDPtr->simbodyPhysics->PhysicsInitialized())
   {
     // downcast mobod to screw mobod first
     // the way pitch is defined in simbody is -1.0 / gazebo thread pitch
@@ -272,7 +276,7 @@ double SimbodyScrewJoint::ThreadPitch() const
     gzwarn << "SimbodyScrewJoint physics not initialized yet, or failed"
            << " to initialize. Returning thread pitch from SDF.\n";
 
-    return this->screwJointDPtr->threadPitch;
+    return this->threadPitch;
   }
 }
 
@@ -304,7 +308,7 @@ double SimbodyScrewJoint::Param(const std::string &_key,
   const unsigned int _index)
 {
   if (_key  == "thread_pitch")
-    return this->screwJointDPtr->threadPitch;
+    return this->threadPitch;
   else
     return SimbodyJoint::Param(_key, _index);
 }
@@ -331,7 +335,7 @@ bool SimbodyScrewJoint::SetHighStop(
       {
         // angular limit is specified
         this->simbodyJointDPtr->limitForce[0].setBounds(
-          this->simbodyJointDPtr->simbodyPhysics->integ->updAdvancedState(),
+          this->simbodyJointDPtr->simbodyPhysics->Integ()->updAdvancedState(),
           this->LowStop(_index).Radian(), _angle.Radian());
       }
       else if (_index == 1)
@@ -352,7 +356,7 @@ bool SimbodyScrewJoint::SetHighStop(
           // convert linear limit to angular limit
           double upper = _angle.Radian() / tp;
           this->simbodyJointDPtr->limitForce[0].setBounds(
-            this->simbodyJointDPtr->simbodyPhysics->integ->updAdvancedState(),
+            this->simbodyJointDPtr->simbodyPhysics->Integ()->updAdvancedState(),
             this->LowStop(_index).Radian(), upper);
         }
         else
@@ -363,7 +367,7 @@ bool SimbodyScrewJoint::SetHighStop(
           // lower angular limit.
           double lower = _angle.Radian() / tp;
           this->simbodyJointDPtr->limitForce[0].setBounds(
-            this->simbodyJointDPtr->simbodyPhysics->integ->updAdvancedState(),
+            this->simbodyJointDPtr->simbodyPhysics->Integ()->updAdvancedState(),
             lower, this->HighStop(_index).Radian());
         }
       }
@@ -409,7 +413,7 @@ bool SimbodyScrewJoint::SetLowStop(
       {
         // angular limit is specified
         this->simbodyJointDPtr->limitForce[0].setBounds(
-          this->simbodyJointDPtr->simbodyPhysics->integ->updAdvancedState(),
+          this->simbodyJointDPtr->simbodyPhysics->Integ()->updAdvancedState(),
           _angle.Radian(),
           this->HighStop(_index).Radian());
       }
@@ -431,7 +435,7 @@ bool SimbodyScrewJoint::SetLowStop(
           // convert linear limit to angular limit
           double lower = _angle.Radian() / tp;
           this->simbodyJointDPtr->limitForce[0].setBounds(
-            this->simbodyJointDPtr->simbodyPhysics->integ->updAdvancedState(),
+            this->simbodyJointDPtr->simbodyPhysics->Integ()->updAdvancedState(),
             lower, this->HighStop(_index).Radian());
         }
         else
@@ -442,7 +446,7 @@ bool SimbodyScrewJoint::SetLowStop(
           // upper angular limit.
           double upper = _angle.Radian() / tp;
           this->simbodyJointDPtr->limitForce[0].setBounds(
-            this->simbodyJointDPtr->simbodyPhysics->integ->updAdvancedState(),
+            this->simbodyJointDPtr->simbodyPhysics->Integ()->updAdvancedState(),
             this->HighStop(_index).Radian(), upper);
         }
       }
@@ -535,7 +539,7 @@ ignition::math::Angle SimbodyScrewJoint::LowStop(const unsigned int _index)
     }
     else
     {
-      return this->GetUpperLimit(0) / tp;
+      return this->UpperLimit(0) / tp;
     }
   }
   else
