@@ -17,6 +17,12 @@ set(@PKG_NAME@_PLUGIN_PATH "@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@/gazebo
 # materials scripts, shaders, and other related resources are stored.
 set(@PKG_NAME@_MEDIA_PATH "@CMAKE_INSTALL_PREFIX@/share/gazebo-@GAZEBO_VERSION@/media")
 
+# Set whether Gazebo was built with Bullet support
+set (GAZEBO_HAS_BULLET @HAVE_BULLET@)
+
+# Set whether Gazebo was built with Simbody support
+set (GAZEBO_HAS_SIMBODY @HAVE_SIMBODY@)
+
 #################################################
 # @PKG_NAME@_PROTO_PATH, @PKG_NAME@_PROTO_INCLUDE_DIRS, and
 # @PKG_NAME@_PROTO_LIBRARIES
@@ -77,19 +83,13 @@ list(APPEND @PKG_NAME@_LIBRARY_DIRS @CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR
 list(APPEND @PKG_NAME@_CFLAGS -I@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_INCLUDEDIR@)
 list(APPEND @PKG_NAME@_CFLAGS -I@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_INCLUDEDIR@/gazebo-@GAZEBO_MAJOR_VERSION@)
 
-# Set whether Gazebo was built with Bullet support
-set (HAVE_BULLET @HAVE_BULLET@)
-
-# Set whether Gazebo was built with Simbody support
-set (HAVE_SIMBODY @HAVE_SIMBODY@)
-
-if (HAVE_BULLET)
+if (GAZEBO_HAS_BULLET)
   find_package(bullet REQUIRED)
   list(APPEND @PKG_NAME@_INCLUDE_DIRS ${BULLET_INCLUDE_DIRS})
   list(APPEND @PKG_NAME@_LIBRARIES ${BULLET_LIBRARIES})
 endif()
 
-if (HAVE_SIMBODY)
+if (GAZEBO_HAS_SIMBODY)
   find_package(simbody REQUIRED)
   list(APPEND @PKG_NAME@_INCLUDE_DIRS ${Simbody_INCLUDE_DIR})
   list(APPEND @PKG_NAME@_LIBRARIES ${Simbody_LIBRARIES})
