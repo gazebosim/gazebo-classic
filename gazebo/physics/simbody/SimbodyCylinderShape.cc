@@ -32,7 +32,7 @@ SimbodyCylinderShape::SimbodyCylinderShape(CollisionPtr _parent)
 SimbodyCylinderShape::~SimbodyCylinderShape() {}
 
 /////////////////////////////////////////////////
-void CylinderShape::SetSize(double _radius, double _length)
+void SimbodyCylinderShape::SetSize(double _radius, double _length)
 {
   if (_radius < 0)
   {
