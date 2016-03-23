@@ -3,6 +3,7 @@ include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 set (sources_local
   plot/CurveTracker.cc
   plot/IncrementalPlot.cc
+  plot/IntrospectionCurveHandler.cc
   plot/PlotCanvas.cc
   plot/PlotCurve.cc
   plot/PlotManager.cc
@@ -25,6 +26,7 @@ set (headers_install
 )
 
 set (qt_tests_local
+  IntrospectionCurveHandler_TEST.cc
   IncrementalPlot_TEST.cc
   Palette_TEST.cc
   PlotCanvas_TEST.cc
