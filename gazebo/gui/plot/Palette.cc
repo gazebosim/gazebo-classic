@@ -15,6 +15,7 @@
  *
 */
 
+#include <mutex>
 #include <set>
 #include <string>
 #include <vector>
@@ -398,6 +399,9 @@ class gazebo::gui::PalettePrivate
 
   /// \brief Communication node.
   public: ignition::transport::Node node;
+
+  /// \brief Mutex to protect the models model update.
+  public: std::mutex modelsMutex;
 };
 
 /////////////////////////////////////////////////
@@ -723,6 +727,8 @@ void Palette::OnIntrospectionUpdate(const gazebo::msgs::Param_V &_msg)
 void Palette::OnIntrospectionUpdate(const std::set<std::string> &_items,
     const bool _result)
 {
+  std::lock_guard<std::mutex> lock(this->dataPtr->modelsMutex);
+
   if (!_result || _items.empty())
   {
     gzerr << "Failure in introspection items update" << std::endl;
