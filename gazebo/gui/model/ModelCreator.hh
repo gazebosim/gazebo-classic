@@ -497,7 +497,6 @@ namespace gazebo
       /// \internal
       /// \brief Pointer to private data.
       private: std::unique_ptr<ModelCreatorPrivate> dataPtr;
-
     };
     /// \}
   }

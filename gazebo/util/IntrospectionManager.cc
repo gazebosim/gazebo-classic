@@ -80,6 +80,14 @@ IntrospectionManager::IntrospectionManager()
   {
     gzerr << "Error advertising service [" << service << "]" << std::endl;
   }
+
+  // Advertise the topic for notifying changes in the registered items.
+  std::string topic = "/introspection/" + this->dataPtr->managerId +
+      "/items_update";
+  if (!this->dataPtr->node.Advertise<gazebo::msgs::Param_V>(topic))
+  {
+    gzerr << "Error advertising topic [" << topic << "]" << std::endl;
+  }
 }
 
 //////////////////////////////////////////////////
@@ -107,6 +115,9 @@ bool IntrospectionManager::Register(const std::string &_item,
   }
 
   this->dataPtr->allItems[_item] = _cb;
+
+  this->dataPtr->itemsUpdated = true;
+
   return true;
 }
 
@@ -125,6 +136,8 @@ bool IntrospectionManager::Unregister(const std::string &_item)
   // Remove the item from the list of all items.
   this->dataPtr->allItems.erase(_item);
 
+  this->dataPtr->itemsUpdated = true;
+
   return true;
 }
 
@@ -133,6 +146,7 @@ void IntrospectionManager::Clear()
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
   this->dataPtr->allItems.clear();
+  this->dataPtr->itemsUpdated = true;
 }
 
 //////////////////////////////////////////////////
@@ -156,6 +170,8 @@ void IntrospectionManager::Update()
   std::map<std::string, IntrospectionFilter> filtersCopy;
   std::map<std::string, std::function <gazebo::msgs::Any ()>> allItemsCopy;
   std::map<std::string, ObservedItem> observedItemsCopy;
+  bool itemsUpdatedCopy;
+  gazebo::msgs::Param_V currentItems;
 
   {
     std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
@@ -166,6 +182,16 @@ void IntrospectionManager::Update()
     filtersCopy = this->dataPtr->filters;
     allItemsCopy = this->dataPtr->allItems;
     observedItemsCopy = this->dataPtr->observedItems;
+    itemsUpdatedCopy = this->dataPtr->itemsUpdated;
+    this->dataPtr->itemsUpdated = false;
+  }
+
+  if (itemsUpdatedCopy)
+  {
+    gazebo::msgs::Empty req;
+    bool result;
+    // Prepare the list of items to be sent.
+    this->Items(req, currentItems, result);
   }
 
   for (auto &observedItem : observedItemsCopy)
@@ -227,6 +253,14 @@ void IntrospectionManager::Update()
       gzerr << "Error publishing update for topic [" << topicName << "]"
             << std::endl;
     }
+  }
+
+  // Notify that there was a change in the registered items.
+  if (itemsUpdatedCopy)
+  {
+    std::string topicName = "/introspection/" + this->dataPtr->managerId +
+      "/items_update";
+    this->dataPtr->node.Publish(topicName, currentItems);
   }
 }
 

@@ -138,8 +138,7 @@ namespace gazebo
       /// \brief Qt signal to request self-deletion.
       Q_SIGNALS: void CanvasDeleted();
 
-      /// \brief Qt Callback when a new variable has been added to the empty
-      /// plot.
+      /// \brief Qt Callback when a new variable has been dropped into a plot.
       /// \param[in] _variable Name of the variable
       private slots: void OnAddVariable(const std::string &_variable);
 

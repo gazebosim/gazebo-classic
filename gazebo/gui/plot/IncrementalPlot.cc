@@ -190,12 +190,12 @@ IncrementalPlot::IncrementalPlot(QWidget *_parent)
 
   // stacked zooming with rectangle selection
   QwtPlotZoomer* zoomer = new QwtPlotZoomer(this->canvas());
-  zoomer->setMousePattern( QwtEventPattern::MouseSelect1,
+  zoomer->setMousePattern(QwtEventPattern::MouseSelect1,
       Qt::MidButton);
-  zoomer->setMousePattern( QwtEventPattern::MouseSelect2,
-      Qt::RightButton, Qt::ControlModifier );
-  zoomer->setMousePattern( QwtEventPattern::MouseSelect3,
-      Qt::RightButton );
+  zoomer->setMousePattern(QwtEventPattern::MouseSelect2,
+      Qt::RightButton, Qt::ControlModifier);
+  zoomer->setMousePattern(QwtEventPattern::MouseSelect3,
+      Qt::NoButton);
 
   // zoom in/out with the wheel
   this->dataPtr->magnifier = new PlotMagnifier(this->canvas());
@@ -213,7 +213,7 @@ IncrementalPlot::IncrementalPlot(QWidget *_parent)
   this->plotLayout()->setAlignCanvasToScales(true);
 
   QwtLegend *qLegend = new QwtLegend;
-  this->insertLegend(qLegend, QwtPlot::RightLegend);
+  this->insertLegend(qLegend, QwtPlot::RightLegend, 0.2);
 
 
   this->dataPtr->grid = new QwtPlotGrid;
@@ -233,6 +233,7 @@ IncrementalPlot::IncrementalPlot(QWidget *_parent)
   this->ShowAxisLabel(Y_LEFT_AXIS, true);
 
   this->replot();
+  this->setAcceptDrops(true);
 }
 
 /////////////////////////////////////////////////
@@ -489,14 +490,7 @@ QSize IncrementalPlot::sizeHint() const
 }
 
 /////////////////////////////////////////////////
-EmptyIncrementalPlot::EmptyIncrementalPlot(QWidget *_parent)
-  : IncrementalPlot(_parent)
-{
-  this->setAcceptDrops(true);
-}
-
-/////////////////////////////////////////////////
-void EmptyIncrementalPlot::dragEnterEvent(QDragEnterEvent *_evt)
+void IncrementalPlot::dragEnterEvent(QDragEnterEvent *_evt)
 {
   if (_evt->mimeData()->hasFormat("application/x-item"))
   {
@@ -513,7 +507,7 @@ void EmptyIncrementalPlot::dragEnterEvent(QDragEnterEvent *_evt)
 }
 
 /////////////////////////////////////////////////
-void EmptyIncrementalPlot::dropEvent(QDropEvent *_evt)
+void IncrementalPlot::dropEvent(QDropEvent *_evt)
 {
   if (_evt->mimeData()->hasFormat("application/x-item"))
   {
