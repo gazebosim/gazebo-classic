@@ -42,7 +42,7 @@ endif()
 set (plugins
   ActuatorPlugin
   ArrangePlugin
-  BreakableJointPlugin 
+  BreakableJointPlugin
   BuoyancyPlugin
   CameraPlugin
   CartDemoPlugin

@@ -50,7 +50,7 @@ void BreakableJointPlugin::Load(sensors::SensorPtr _parent,
 
   if (!this->parentSensor)
   {
-    gzerr << "BreakablJointPlugin requires a "
+    gzerr << "BreakableJointPlugin requires a "
       << "force_torque sensor as its parent.\n";
     return;
   }
