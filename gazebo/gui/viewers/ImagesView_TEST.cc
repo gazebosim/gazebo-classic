@@ -105,12 +105,15 @@ void ImagesView_TEST::SetTopic(gazebo::gui::ImagesView *_view,
   int i = 0;
 
   // Make sure images were cleared and there's only one child left
-  for (i = 0; frame->children().size() != 1 && i < 100; ++i)
+  // Unless it has already loaded the new number of images
+  for (i = 0; frame->children().size() != 1 && i < 100 &&
+              frame->children().size() != _count; ++i)
   {
     gazebo::common::Time::MSleep(10);
     QCoreApplication::processEvents();
   }
-  QCOMPARE(frame->children().size(), 1);
+  QVERIFY(frame->children().size() == _count
+       || frame->children().size() == 1);
 
   // Wait a bit for the images to appear
   for (i = 0; frame->children().size() != _count && i < 100; ++i)
@@ -120,7 +123,7 @@ void ImagesView_TEST::SetTopic(gazebo::gui::ImagesView *_view,
   }
 
   // Make sure the number of images is correct.
-  QVERIFY(frame->children().size() == _count);
+  QCOMPARE(frame->children().size(), _count);
 }
 
 // Generate a main function for the test
