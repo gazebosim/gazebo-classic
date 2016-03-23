@@ -57,10 +57,10 @@ ImagesView::ImagesView(QWidget *_parent)
 /////////////////////////////////////////////////
 ImagesView::~ImagesView()
 {
+  this->sub.reset();
+
   delete this->dataPtr;
   this->dataPtr = NULL;
-
-  this->sub.reset();
 }
 
 /////////////////////////////////////////////////
