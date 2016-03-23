@@ -420,7 +420,23 @@ void LinkData::Load(sdf::ElementPtr _sdf)
 
   this->SetName(_sdf->Get<std::string>("name"));
   this->SetPose(_sdf->Get<ignition::math::Pose3d>("pose"));
+
+  // Clone SDF except for visuals and collisions, which will be handled
+  // separately
   this->linkSDF = _sdf->Clone();
+
+  auto elem = this->linkSDF->GetElement("visual");
+  while (elem)
+  {
+    this->linkSDF->RemoveChild(elem);
+    elem = elem->GetNextElement("visual");
+  }
+  elem = this->linkSDF->GetElement("collision");
+  while (elem)
+  {
+    this->linkSDF->RemoveChild(elem);
+    elem = elem->GetNextElement("collision");
+  }
 
   // TODO: Use msgs::LinkFromSDF once that's available (issue #1903)
   msgs::LinkPtr linkMsgPtr(new msgs::Link);
