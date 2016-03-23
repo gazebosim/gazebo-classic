@@ -72,6 +72,8 @@
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/PhysicsFactory.hh"
+#include "gazebo/physics/Atmosphere.hh"
+#include "gazebo/physics/AtmosphereFactory.hh"
 #include "gazebo/physics/PresetManager.hh"
 #include "gazebo/physics/UserCmdManager.hh"
 #include "gazebo/physics/Model.hh"
@@ -143,6 +145,7 @@ World::World(const std::string &_name)
   this->dataPtr->resetTimeOnly = false;
   this->dataPtr->resetModelOnly = false;
   this->dataPtr->enablePhysicsEngine = true;
+  this->dataPtr->enableAtmosphere = true;
   this->dataPtr->setWorldPoseMutex = new boost::mutex();
   this->dataPtr->worldUpdateMutex = new boost::recursive_mutex();
 
@@ -274,6 +277,18 @@ void World::Load(sdf::ElementPtr _sdf)
     gzthrow("Unable to create physics engine\n");
 
   this->dataPtr->physicsEngine->Load(physicsElem);
+
+  // This should come after loading physics engine
+  sdf::ElementPtr atmosphereElem = this->dataPtr->sdf->GetElement("atmosphere");
+
+  type = atmosphereElem->Get<std::string>("type");
+  this->dataPtr->atmosphere = AtmosphereFactory::NewAtmosphere(type,
+      shared_from_this());
+
+  if (this->dataPtr->atmosphere == NULL)
+    gzerr << "Unable to create atmosphere model\n";
+
+  this->dataPtr->atmosphere->Load(atmosphereElem);
 
   // This should also come before loading of entities
   {
@@ -893,6 +908,12 @@ std::string World::GetName() const
 PhysicsEnginePtr World::GetPhysicsEngine() const
 {
   return this->dataPtr->physicsEngine;
+}
+
+//////////////////////////////////////////////////
+AtmospherePtr World::Atmosphere() const
+{
+  return this->dataPtr->atmosphere;
 }
 
 //////////////////////////////////////////////////
@@ -2602,6 +2623,18 @@ bool World::GetEnablePhysicsEngine()
 void World::EnablePhysicsEngine(bool _enable)
 {
   this->dataPtr->enablePhysicsEngine = _enable;
+}
+
+/////////////////////////////////////////////////
+bool World::AtmosphereEnabled() const
+{
+  return this->dataPtr->enableAtmosphere;
+}
+
+/////////////////////////////////////////////////
+void World::SetAtmosphereEnabled(const bool _enable)
+{
+  this->dataPtr->enableAtmosphere = _enable;
 }
 
 /////////////////////////////////////////////////

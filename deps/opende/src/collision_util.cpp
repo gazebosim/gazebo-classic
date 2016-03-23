@@ -27,9 +27,9 @@ functions that are defined in the public header files.
 
 */
 
-#include <ode/common.h>
-#include <ode/collision.h>
-#include <ode/odemath.h>
+#include <gazebo/ode/common.h>
+#include <gazebo/ode/collision.h>
+#include <gazebo/ode/odemath.h>
 #include "config.h"
 #include "collision_util.h"
 

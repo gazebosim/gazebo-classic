@@ -111,7 +111,7 @@ void DepthCameraSensor::Init()
       cameraPose = cameraSdf->Get<ignition::math::Pose3d>("pose") + cameraPose;
 
     this->dataPtr->depthCamera->SetWorldPose(cameraPose);
-    this->dataPtr->depthCamera->AttachToVisual(this->parentId, true);
+    this->dataPtr->depthCamera->AttachToVisual(this->parentId, true, 0, 0);
 
     this->camera = boost::dynamic_pointer_cast<rendering::Camera>(
         this->dataPtr->depthCamera);
