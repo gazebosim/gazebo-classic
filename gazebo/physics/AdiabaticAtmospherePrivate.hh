@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,24 +15,21 @@
  *
 */
 
-#ifndef _GAZEBO_GUI_BUILDING_MAKER_TEST_HH_
-#define _GAZEBO_GUI_BUILDING_MAKER_TEST_HH_
+#ifndef _GAZEBO_PHYSICS_ADIABATICATMOSPHEREPRIVATE_HH_
+#define _GAZEBO_PHYSICS_ADIABATICATMOSPHEREPRIVATE_HH_
 
-#include "gazebo/gui/QTestFixture.hh"
-
-/// \brief A test class for the BuildingMaker class.
-class BuildingMaker_TEST : public QTestFixture
+namespace gazebo
 {
-  Q_OBJECT
-
-  /// \brief Constructor
-  public: BuildingMaker_TEST() = default;
-
-  /// \brief Test assigning layers according to level.
-  private slots: void Layers();
-
-  /// \brief Test attaching and detaching manips.
-  private slots: void Attach();
-};
+  namespace physics
+  {
+    class AdiabaticAtmospherePrivate
+    {
+      /// \brief Adiabatic atmosphere power parameter used to calculate
+      /// pressure and density of air.
+      /// See https://en.wikipedia.org/wiki/Density_of_air#Altitude
+      public: double adiabaticPower;
+    };
+  }
+}
 
 #endif
