@@ -10,8 +10,6 @@ include_directories(${TBB_INCLUDEDIR}
                     ${tinyxml_INCLUDE_DIRS}
                     ${tinyxml2_INCLUDE_DIRS})
 
-include_directories(${CMAKE_SOURCE_DIR}/deps)
-
 link_directories(${tinyxml2_LIBRARY_DIRS})
 
 set (sources
