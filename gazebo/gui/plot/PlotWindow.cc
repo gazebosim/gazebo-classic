@@ -34,15 +34,6 @@ namespace gazebo
     /// \brief Private data for the PlotWindow class
     class PlotWindowPrivate
     {
-      /// \brief True when plotting is paused.
-      public: bool paused = false;
-
-      /// \brief Action to pause plotting
-      public: QAction *plotPlayAct;
-
-      /// \brief Action to resume plotting
-      public: QAction *plotPauseAct;
-
       /// \brief Layout to hold all the canvases.
       public: QVBoxLayout *canvasLayout;
 
@@ -116,47 +107,12 @@ PlotWindow::PlotWindow(QWidget *_parent)
   addButtonLayout->setContentsMargins(0, 0, 0, 0);
   addCanvasButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
 
-  // Bottom toolbar
-  QFrame *bottomFrame = new QFrame;
-  bottomFrame->setObjectName("plotBottomFrame");
-  bottomFrame->setSizePolicy(QSizePolicy::Expanding,
-      QSizePolicy::Minimum);
-
-  this->dataPtr->plotPlayAct = new QAction(QIcon(":/images/play_dark.png"),
-      tr("Play"), this);
-  this->dataPtr->plotPlayAct->setToolTip(tr("Continue plotting"));
-  this->dataPtr->plotPlayAct->setVisible(false);
-  connect(this->dataPtr->plotPlayAct, SIGNAL(triggered()),
-      this, SLOT(OnPlay()));
-
-  this->dataPtr->plotPauseAct = new QAction(QIcon(":/images/pause_dark.png"),
-      tr("Pause"), this);
-  this->dataPtr->plotPauseAct->setToolTip(
-      tr("Pause plotting (not simulation)"));
-  this->dataPtr->plotPauseAct->setVisible(true);
-  connect(this->dataPtr->plotPauseAct, SIGNAL(triggered()),
-      this, SLOT(OnPause()));
-
-  QHBoxLayout *bottomPanelLayout = new QHBoxLayout;
-  QToolBar *playToolbar = new QToolBar;
-  playToolbar->setObjectName("plotToolbar");
-  playToolbar->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-  playToolbar->addAction(this->dataPtr->plotPlayAct);
-  playToolbar->addAction(this->dataPtr->plotPauseAct);
-  bottomPanelLayout->addStretch();
-  bottomPanelLayout->addWidget(playToolbar);
-  bottomPanelLayout->addStretch();
-  bottomPanelLayout->setContentsMargins(0, 0, 0, 0);
-  bottomFrame->setLayout(bottomPanelLayout);
-
   // Plot layout
   QVBoxLayout *plotLayout = new QVBoxLayout;
   plotLayout->addLayout(this->dataPtr->canvasLayout);
   plotLayout->addLayout(addButtonLayout);
-  plotLayout->addWidget(bottomFrame);
   plotLayout->setStretchFactor(this->dataPtr->canvasLayout, 1);
   plotLayout->setStretchFactor(addButtonLayout, 0);
-  plotLayout->setStretchFactor(bottomFrame, 0);
 
   auto plotFrame = new QFrame;
   plotFrame->setLayout(plotLayout);
@@ -193,27 +149,8 @@ PlotWindow::PlotWindow(QWidget *_parent)
 /////////////////////////////////////////////////
 PlotWindow::~PlotWindow()
 {
-  this->dataPtr->paused = true;
   PlotManager::Instance()->RemoveWindow(this);
   this->Clear();
-}
-
-/////////////////////////////////////////////////
-void PlotWindow::OnPlay()
-{
-  this->dataPtr->paused = false;
-  PlotManager::Instance()->SetPaused(this->dataPtr->paused);
-  this->dataPtr->plotPauseAct->setVisible(true);
-  this->dataPtr->plotPlayAct->setVisible(false);
-}
-
-/////////////////////////////////////////////////
-void PlotWindow::OnPause()
-{
-  this->dataPtr->paused = true;
-  PlotManager::Instance()->SetPaused(this->dataPtr->paused);
-  this->dataPtr->plotPauseAct->setVisible(false);
-  this->dataPtr->plotPlayAct->setVisible(true);
 }
 
 /////////////////////////////////////////////////
@@ -314,9 +251,6 @@ void PlotWindow::Update()
     }
     this->dataPtr->restart = false;
   }
-
-  if (this->dataPtr->paused)
-    return;
 
   for (int i = 0; i < this->dataPtr->canvasLayout->count(); ++i)
   {

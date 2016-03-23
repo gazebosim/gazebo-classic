@@ -72,12 +72,6 @@ namespace gazebo
       /// \brief Update all canvases
       private slots: void Update();
 
-      /// \brief QT callback to continue plotting.
-      private slots: void OnPlay();
-
-      /// \brief QT callback for when plotting is to be paused.
-      private slots: void OnPause();
-
       /// \brief Qt Callback when a new plot canvas should be added.
       private slots: void OnAddCanvas();
 
