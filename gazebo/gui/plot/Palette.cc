@@ -776,7 +776,8 @@ void Palette::OnIntrospectionUpdate(const std::set<std::string> &_items,
         // Check top level (model)
         if (!previousItem)
         {
-          auto modelList = this->dataPtr->modelsModel->findItems(nextPart.c_str());
+          auto modelList =
+            this->dataPtr->modelsModel->findItems(nextPart.c_str());
           if (!modelList.isEmpty())
             existingItem = modelList[0];
         }
