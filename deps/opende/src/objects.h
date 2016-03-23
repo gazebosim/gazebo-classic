@@ -27,10 +27,10 @@
 #define _ODE_OBJECT_H_
 
 #include <limits>
-#include <ode/common.h>
-#include <ode/memory.h>
-#include <ode/mass.h>
-#include <ode/objects.h>
+#include <gazebo/ode/common.h>
+#include <gazebo/ode/memory.h>
+#include <gazebo/ode/mass.h>
+#include <gazebo/ode/objects.h>
 #include "array.h"
 #include <boost/threadpool.hpp>
 

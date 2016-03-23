@@ -23,7 +23,7 @@
 #ifndef _ODE_QUICK_STEP_UTIL_H_
 #define _ODE_QUICK_STEP_UTIL_H_
 
-#include <ode/common.h>
+#include <gazebo/ode/common.h>
 #include "gazebo/gazebo_config.h"
 
 #ifdef ODE_SSE
@@ -49,7 +49,7 @@
 #ifndef TIMING
 #ifdef HDF5_INSTRUMENT
 #define DUMP
-#include <ode/h5dump.h>
+#include <gazebo/ode/h5dump.h>
 #define DATA_FILE  "ode_frames.hdf5"
 #endif  // instrument
 #endif  // timing
@@ -58,7 +58,7 @@
 // added for threading per constraint rows
 #include <boost/thread/recursive_mutex.hpp>
 #include <boost/bind.hpp>
-#include "ode/odeinit.h"
+#include "gazebo/ode/odeinit.h"
 #endif
 
 typedef const dReal *dRealPtr;
