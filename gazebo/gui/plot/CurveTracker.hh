@@ -84,7 +84,7 @@ namespace gazebo
 
       /// \brief Draws the (vertical) line on the chart
       /// \param[in] _painter
-      private: virtual void drawRubberBand( QPainter *_painter ) const;
+       private: virtual void drawRubberBand( QPainter *_painter ) const;
     };
   }
 }

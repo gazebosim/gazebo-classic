@@ -122,7 +122,7 @@ IncrementalPlot::IncrementalPlot(QWidget *_parent)
   CurveTracker* tracker = new CurveTracker( this->canvas() );
   // for the demo we want the tracker to be active without
   // having to click on the canvas
-  tracker->setStateMachine( new QwtPickerTrackerMachine() );
+   tracker->setStateMachine( new QwtPickerTrackerMachine() );
   tracker->setRubberBandPen( QPen( "MediumOrchid" ) );
 }
 
@@ -371,4 +371,3 @@ void IncrementalPlot::OnMoved(const QPointF &_pos)
 {
   std::cerr << "on move " << _pos.x() << " " << _pos.y() << std::endl;
 }
-
