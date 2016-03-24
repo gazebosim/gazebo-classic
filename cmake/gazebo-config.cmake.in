@@ -127,8 +127,8 @@ set(CMAKE_MODULE_PATH
 # Find boost
 find_package(Boost @MIN_BOOST_VERSION@ REQUIRED thread signals system
   filesystem program_options regex iostreams date_time)
-list(APPEND @PKG_NAME@_INCLUDE_DIRS ${boost_INCLUDE_DIRS})
-list(APPEND @PKG_NAME@_LIBRARIES ${boost_LIBRARIES})
+list(APPEND @PKG_NAME@_INCLUDE_DIRS ${Boost_INCLUDE_DIRS})
+list(APPEND @PKG_NAME@_LIBRARIES ${Boost_LIBRARIES})
 
 # Find protobuf
 find_package(Protobuf REQUIRED)
