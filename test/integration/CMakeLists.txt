@@ -73,6 +73,7 @@ set(tests
   physics_thread_safe.cc
   pioneer2dx.cc
   plugin.cc
+  rayshape.cc
   rest_web.cc
   road.cc
   sensor.cc
