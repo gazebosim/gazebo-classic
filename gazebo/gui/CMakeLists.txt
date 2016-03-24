@@ -10,9 +10,12 @@ link_directories(
 include_directories(
   ${CMAKE_SOURCE_DIR}/deps
   ${Qt5Core_INCLUDE_DIRS}
-  ${Qt5X11Extras_INCLUDE_DIRS}
   ${Qt5WebKitWidgets_INCLUDE_DIRS}
 )
+
+if (UNIX)
+  include_directories(${Qt5X11Extras_INCLUDE_DIRS})
+endif()
 
 include_directories(${tinyxml_INCLUDE_DIRS})
 
@@ -217,14 +220,13 @@ target_link_libraries(gazebo_gui
   ${Qt5Core_LIBRARIES}
   ${Qt5Widgets_LIBRARIES}
   ${Qt5WebKitWidgets_LIBRARIES}
-  ${Qt5X11Extras_LIBRARIES}
   ${ogre_libraries}
   ${Boost_LIBRARIES}
   ${tinyxml_LIBRARIES}
 )
 
 if (UNIX)
-  target_link_libraries(gazebo_gui pthread)
+  target_link_libraries(gazebo_gui ${Qt5X11Extras_LIBRARIES} pthread)
 endif()
 
 if (HAVE_GRAPHVIZ)
