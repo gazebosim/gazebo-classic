@@ -91,7 +91,8 @@ namespace gazebo
       private slots: void OnAlign(const int _int);
 
       /// \brief Uncheck all align buttons.
-      private slots: void UncheckAllAlign();
+      /// \param[in] _blockSignals True to prevent firing signals.
+      private slots: void UncheckAllAlign(const bool _blockSignals = false);
 
       /// \brief Qt callback when type button is selected.
       /// \param[in] _typeInt Index of new selection.
