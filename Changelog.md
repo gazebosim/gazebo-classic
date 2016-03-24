@@ -5,6 +5,9 @@
 1. Adds an output option to gz log that allows the tool to filter a log file and write to a new log file.
     * [Pull request #2149](https://bitbucket.org/osrf/gazebo/pull-request/2149)
 
+1. Moved gazebo ODE includes to have correct include path
+    * [Pull request #2186](https://bitbucket.org/osrf/gazebo/pull-request/2186)
+
 1. Atmosphere model
     * [Pull request #1989](https://bitbucket.org/osrf/gazebo/pull-request/1989)
 

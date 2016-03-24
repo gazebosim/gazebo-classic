@@ -29,9 +29,9 @@ internal data structures and functions for collision detection.
 #ifndef _ODE_COLLISION_KERNEL_H_
 #define _ODE_COLLISION_KERNEL_H_
 
-#include <ode/common.h>
-#include <ode/contact.h>
-#include <ode/collision.h>
+#include <gazebo/ode/common.h>
+#include <gazebo/ode/contact.h>
+#include <gazebo/ode/collision.h>
 #include "objects.h"
 #include "odetls.h"
 #include <boost/thread/mutex.hpp>

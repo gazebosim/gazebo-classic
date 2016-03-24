@@ -10,7 +10,7 @@
 http://www.netlib.org/f2c/libf2c.zip
 */
 
-#include <ode/common.h>
+#include <gazebo/ode/common.h>
 #include <math.h>
 
 /* f2c stuff*/
