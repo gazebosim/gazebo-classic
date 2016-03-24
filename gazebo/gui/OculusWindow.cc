@@ -14,7 +14,10 @@
  * limitations under the License.
  *
  */
+#ifdef __linux__
 #include <QtX11Extras/QX11Info>
+#endif
+
 #include <boost/bind.hpp>
 
 #include "gazebo/gui/OculusWindow.hh"

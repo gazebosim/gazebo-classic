@@ -1,7 +1,5 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
-# include ( ${QT_USE_FILE} )
-
 link_directories(
   ${Boost_LIBRARY_DIRS}
   ${tinyxml_LIBRARY_DIRS}

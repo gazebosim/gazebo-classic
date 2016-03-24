@@ -1,4 +1,3 @@
-# include ( ${QT_USE_FILE} )
 add_definitions(${QT_DEFINITIONS})
 
 include_directories(

@@ -20,7 +20,6 @@ link_directories(
   ${tinyxml_LIBRARY_DIRS}
 )
 
-#include (${QT_USE_FILE})
 add_definitions(${Qt5Core_DEFINITIONS})
 
 if (HAVE_BULLET)

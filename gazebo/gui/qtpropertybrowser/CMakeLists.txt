@@ -1,7 +1,6 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 add_definitions(${Qt5Core_DEFINITIONS})
 include_directories(${Qt5Core_INCLUDE_DIRS})
-#include ( ${QT_USE_FILE} )
 
 set (sources qtpropertybrowser.cpp 
              qtpropertymanager.cpp
