@@ -2,8 +2,19 @@
 
 ## Gazebo 7.x.x (2016-xx-xx)
 
+1. Process insertions on World::SetState
+    * [Pull request #2200](https://bitbucket.org/osrf/gazebo/pull-requests/2200)
+
 1. Allow dynamically adding links to a model.
     * [Pull request #2185](https://bitbucket.org/osrf/gazebo/pull-requests/2185)
+
+1. Fix editing physics parameters in gzclient, update test
+    * [Pull request #2192](https://bitbucket.org/osrf/gazebo/pull-requests/2192)
+    * [Issue #1876](https://bitbucket.org/osrf/gazebo/issues/1876)
+
+1. Display physics engine type in the GUI
+    * [Pull request #2155](https://bitbucket.org/osrf/gazebo/pull-requests/2155)
+    * [Issue #1121](https://bitbucket.org/osrf/gazebo/issues/1121)
 
 1. Fix compilation against ffmpeg3 (libavcodec)
     * [Pull request #2154](https://bitbucket.org/osrf/gazebo/pull-request/2154)
@@ -132,15 +143,15 @@
 1. Enter time during log playback
     * [Pull request #2000](https://bitbucket.org/osrf/gazebo/pull-request/2000)
 
-1 Added Ignition Transport dependency.
+1. Added Ignition Transport dependency.
     * [Pull request #1930](https://bitbucket.org/osrf/gazebo/pull-request/1930)
 
-1 Make latched subscribers receive the message only once
+1. Make latched subscribers receive the message only once
     * [Issue #1789](https://bitbucket.org/osrf/gazebo/issue/1789)
     * [Pull request #2019](https://bitbucket.org/osrf/gazebo/pull-request/2019)
 
-1 Implemented transport clear buffers
-  * [Pull request #2017](https://bitbucket.org/osrf/gazebo/pull-request/2017)
+1. Implemented transport clear buffers
+    * [Pull request #2017](https://bitbucket.org/osrf/gazebo/pull-request/2017)
 
 1. KeyEvent constructor should be in a source file. Removed a few visibility
 flags from c functions. Windows did not like `CPPTYPE_*` in
