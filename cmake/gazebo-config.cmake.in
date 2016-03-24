@@ -23,6 +23,8 @@ set (GAZEBO_HAS_BULLET @HAVE_BULLET@)
 # Set whether Gazebo was built with Simbody support
 set (GAZEBO_HAS_SIMBODY @HAVE_SIMBODY@)
 
+include (FindPkgConfig)
+
 #################################################
 # @PKG_NAME@_PROTO_PATH, @PKG_NAME@_PROTO_INCLUDE_DIRS, and
 # @PKG_NAME@_PROTO_LIBRARIES
@@ -84,23 +86,27 @@ list(APPEND @PKG_NAME@_CFLAGS -I@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_INCLUDEDIR
 list(APPEND @PKG_NAME@_CFLAGS -I@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_INCLUDEDIR@/gazebo-@GAZEBO_MAJOR_VERSION@)
 
 if (GAZEBO_HAS_BULLET)
-  pkg_check_modules(BULLET bullet>=2.82)
-  if (NOT BULLET_FOUND)
-     pkg_check_modules(BULLET bullet2.82>=2.82)
-  endif()
+  if (PKG_CONFIG_FOUND)
+    pkg_check_modules(BULLET bullet>=2.82)
+    if (NOT BULLET_FOUND)
+       pkg_check_modules(BULLET bullet2.82>=2.82)
+    endif()
 
-  if (BULLET_FOUND)
-    add_definitions(-DLIBBULLET_VERSION=${BULLET_VERSION})
+    if (BULLET_FOUND)
+      add_definitions(-DLIBBULLET_VERSION=${BULLET_VERSION})
+    else()
+      message(FATAL_ERROR "Error: Bullet > 2.82 not found, please install libbullet2.82-dev.")
+    endif()
+
+    if (BULLET_VERSION VERSION_GREATER 2.82)
+      add_definitions(-DLIBBULLET_VERSION_GT_282)
+    endif()
+
+    list(APPEND @PKG_NAME@_INCLUDE_DIRS ${BULLET_INCLUDE_DIRS})
+    list(APPEND @PKG_NAME@_LIBRARIES ${BULLET_LIBRARIES})
   else()
-    message(FATAL_ERROR "Bullet > 2.82 not found, please install libbullet2.82-dev.")
+    message(FATAL_ERROR "Error: pkg-config not found.")
   endif()
-
-  if (BULLET_VERSION VERSION_GREATER 2.82)
-    add_definitions(-DLIBBULLET_VERSION_GT_282)
-  endif()
-
-  list(APPEND @PKG_NAME@_INCLUDE_DIRS ${BULLET_INCLUDE_DIRS})
-  list(APPEND @PKG_NAME@_LIBRARIES ${BULLET_LIBRARIES})
 endif()
 
 if (GAZEBO_HAS_SIMBODY)
