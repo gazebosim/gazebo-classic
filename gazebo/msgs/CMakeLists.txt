@@ -4,6 +4,7 @@ include_directories(${IGNITION-MATH_INCLUDE_DIRS})
 set (msgs
   altimeter.proto
   any.proto
+  atmosphere.proto
   axis.proto
   battery.proto
   boxgeom.proto

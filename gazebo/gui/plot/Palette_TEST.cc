@@ -64,7 +64,7 @@ void Palette_TEST::ModelsTab()
   auto world = gazebo::physics::get_world("default");
   QVERIFY(world != NULL);
 
-  int count = world->GetModelCount();
+  auto count = world->GetModelCount();
 
   // Create a new plot window widget
   auto palette = new gazebo::gui::Palette(NULL);
@@ -77,7 +77,25 @@ void Palette_TEST::ModelsTab()
 
   // Check the model has as many rows as there are top level models,
   // plus the title
-  QCOMPARE(modelsModel->rowCount(), count + 1);
+  QCOMPARE(modelsModel->rowCount(), static_cast<int>(count + 1));
+
+  // Delete a model
+  world->RemoveModel("sphere");
+
+  this->ProcessEventsAndDraw();
+
+  // Check it was deleted
+  QCOMPARE(count - 1, world->GetModelCount());
+  count--;
+
+  // Get the new models model
+  modelsModel =
+      palette->findChild<QStandardItemModel *>("plotModelsModel");
+  QVERIFY(modelsModel != NULL);
+
+  // Check the model has as many rows as there are top level models,
+  // plus the title
+  QCOMPARE(modelsModel->rowCount(), static_cast<int>(count + 1));
 
   delete palette;
 }

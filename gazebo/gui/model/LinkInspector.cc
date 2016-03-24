@@ -158,7 +158,7 @@ void LinkInspector::OnRemove()
 /////////////////////////////////////////////////
 void LinkInspector::OnCancel()
 {
-  this->close();
+  this->reject();
 }
 
 /////////////////////////////////////////////////
@@ -213,6 +213,95 @@ void LinkInspector::keyPressEvent(QKeyEvent *_event)
     _event->accept();
   else
     QDialog::keyPressEvent(_event);
+}
+
+/////////////////////////////////////////////////
+double LinkInspector::ComputeVolume() const
+{
+  double volume = 0;
+
+  for (auto it : this->dataPtr->collisionConfig->ConfigData())
+  {
+    msgs::Collision *coll =
+        this->dataPtr->collisionConfig->GetData(it.second->name);
+    if (coll)
+      volume += LinkData::ComputeVolume(*coll);
+  }
+  return volume;
+}
+
+/////////////////////////////////////////////////
+ignition::math::Vector3d LinkInspector::ComputeInertia(const double _mass) const
+{
+  ignition::math::Vector3d I = ignition::math::Vector3d::Zero;
+
+  // Use first collision entry
+  for (auto it : this->dataPtr->collisionConfig->ConfigData())
+  {
+    msgs::Collision *coll =
+        this->dataPtr->collisionConfig->GetData(it.second->name);
+    if (coll)
+    {
+      I = gui::LinkData::ComputeMomentOfInertia(*coll, _mass);
+      break;
+    }
+  }
+  return I;
+}
+
+/////////////////////////////////////////////////
+void LinkInspector::OnDensityValueChanged(const double _value)
+{
+  double volume = this->ComputeVolume();
+  double mass = volume * _value;
+
+  if (!ignition::math::equal(this->dataPtr->linkConfig->Mass(), mass))
+  {
+    ignition::math::Vector3d I = this->ComputeInertia(mass);
+    this->dataPtr->linkConfig->SetMass(mass);
+    this->dataPtr->linkConfig->SetInertiaMatrix(I.X(), I.Y(), I.Z(), 0, 0, 0);
+  }
+}
+
+/////////////////////////////////////////////////
+void LinkInspector::OnMassValueChanged(const double _value)
+{
+  double volume = this->ComputeVolume();
+
+  if (volume > 0.0)
+  {
+    double density = _value / volume;
+    if (!math::equal(this->dataPtr->linkConfig->Density(), density))
+    {
+      ignition::math::Vector3d I = ComputeInertia(_value);
+      this->dataPtr->linkConfig->SetDensity(density);
+      this->dataPtr->linkConfig->SetInertiaMatrix(I.X(), I.Y(), I.Z(), 0, 0, 0);
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void LinkInspector::OnCollisionChanged(const std::string &/*_name*/,
+    const std::string &_type)
+{
+  if (_type == "geometry")
+  {
+    double volume = this->ComputeVolume();
+
+    if (volume > 0.0)
+    {
+      double mass = this->dataPtr->linkConfig->Mass();
+      double density = mass / volume;
+
+      this->dataPtr->linkConfig->SetDensity(density);
+    }
+  }
+}
+
+////////////////////////////////////////////////
+void LinkInspector::closeEvent(QCloseEvent *_event)
+{
+  _event->accept();
 }
 
 /////////////////////////////////////////////////

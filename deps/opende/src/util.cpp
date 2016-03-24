@@ -20,14 +20,14 @@
  *                                                                       *
  *************************************************************************/
 
-#include <ode/ode.h>
+#include <gazebo/ode/ode.h>
 #include "config.h"
 #include "objects.h"
 #include "joints/joint.h"
 #include "util.h"
 #include <boost/thread/recursive_mutex.hpp>
 #include <boost/bind.hpp>
-#include <ode/timer.h>
+#include <gazebo/ode/timer.h>
 
 #undef REPORT_THREAD_TIMING
 #undef TIMING
