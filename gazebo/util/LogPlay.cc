@@ -79,11 +79,7 @@ void LogPlay::Open(const std::string &_logFile)
 
   // Flag use to indicate if a parser failure has occurred
   bool xmlParserFail = this->dataPtr->xmlDoc.LoadFile(_logFile.c_str()) !=
-#ifndef USE_EXTERNAL_TINYXML2
-    gazebo::tinyxml2::XML_NO_ERROR;
-#else
     tinyxml2::XML_NO_ERROR;
-#endif
 
   // Parse the log file
   if (xmlParserFail)
@@ -116,11 +112,7 @@ void LogPlay::Open(const std::string &_logFile)
 
           // Retry loading the log file.
           xmlParserFail = this->dataPtr->xmlDoc.LoadFile(_logFile.c_str()) !=
-#ifndef USE_EXTERNAL_TINYXML2
-            gazebo::tinyxml2::XML_NO_ERROR;
-#else
             tinyxml2::XML_NO_ERROR;
-#endif
         }
       }
     }
@@ -215,11 +207,7 @@ void LogPlay::ReadHeader()
 {
   this->dataPtr->randSeed = ignition::math::Rand::Seed();
 
-#ifndef USE_EXTERNAL_TINYXML2
-  gazebo::tinyxml2::XMLElement *headerXml, *childXml;
-#else
   tinyxml2::XMLElement *headerXml, *childXml;
-#endif
 
   this->dataPtr->logVersion.clear();
   this->dataPtr->gazeboVersion.clear();
@@ -721,11 +709,7 @@ bool LogPlay::Chunk(unsigned int _index, std::string &_data) const
 
 /////////////////////////////////////////////////
 bool LogPlayPrivate::ChunkData(
-#ifndef USE_EXTERNAL_TINYXML2
-    gazebo::tinyxml2::XMLElement *_xml,
-#else
     tinyxml2::XMLElement *_xml,
-#endif
     std::string &_data)
 {
   // Make sure we have valid xml pointer

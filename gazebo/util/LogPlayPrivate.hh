@@ -44,11 +44,7 @@ namespace gazebo
       /// \param[out] _data Storage for the chunk's data.
       /// \return True if the chunk was successfully parsed.
       public: bool ChunkData(
-                  #ifndef USE_EXTERNAL_TINYXML2
-                  gazebo::tinyxml2::XMLElement *_xml,
-                  #else
                   tinyxml2::XMLElement *_xml,
-                  #endif
                   std::string &_data);
 
       /// \brief Max number of chunks to inspect when looking for XML elements.
@@ -66,16 +62,6 @@ namespace gazebo
       /// \brief XML tag delimiting the end of a simulation time element.
       public: const std::string kEndTime = "</sim_time>";
 
-#ifndef USE_EXTERNAL_TINYXML2
-      /// \brief The XML document of the log file.
-      public: gazebo::tinyxml2::XMLDocument xmlDoc;
-
-      /// \brief Start of the log.
-      public: gazebo::tinyxml2::XMLElement *logStartXml;
-
-      /// \brief Current position in the log file.
-      public: gazebo::tinyxml2::XMLElement *logCurrXml;
-#else
       /// \brief The XML document of the log file.
       public: tinyxml2::XMLDocument xmlDoc;
 
@@ -84,7 +70,6 @@ namespace gazebo
 
       /// \brief Current position in the log file.
       public: tinyxml2::XMLElement *logCurrXml;
-#endif
 
       /// \brief Name of the log file.
       public: std::string filename;
