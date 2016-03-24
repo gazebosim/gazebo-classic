@@ -23,7 +23,7 @@
 #ifndef _ODE_QUICK_STEP_PGS_LCP_H_
 #define _ODE_QUICK_STEP_PGS_LCP_H_
 
-#include <ode/common.h>
+#include <gazebo/ode/common.h>
 #include "quickstep_util.h"
 
 namespace ode {
