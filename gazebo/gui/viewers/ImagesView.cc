@@ -43,11 +43,11 @@ ImagesView::ImagesView(QWidget *_parent)
   this->setWindowTitle(tr("Gazebo: Images View"));
 
   // Create the layout and frame for images
-  QGridLayout *frameLayout = new QGridLayout;
+  std::unique_ptr<QGridLayout> frameLayout(new QGridLayout);
   frameLayout->setSizeConstraint(QLayout::SetMinimumSize);
 
   this->frame->setObjectName("blackBorderFrame");
-  this->frame->setLayout(frameLayout);
+  this->frame->setLayout(frameLayout.release());
   this->frame->setMinimumHeight(240);
   this->frame->setMinimumWidth(320);
 
@@ -75,20 +75,15 @@ void ImagesView::UpdateImpl()
     auto oldLayout = this->frame->layout();
     if (oldLayout)
     {
-      while (!oldLayout->isEmpty())
-      {
-        QLayoutItem *item = oldLayout->takeAt(0);
-        if (item)
-        {
-          ImageFrame *imageFrame = qobject_cast<ImageFrame *>(item->widget());
-          if (imageFrame)
-          {
-            imageFrame->hide();
-            imageFrame->deleteLater();
-          }
-        }
-      }
+      // Let Qt delete the widgets. Give ownership of all widgets to an object
+      // which will be out of scope.
+      QWidget().setLayout(oldLayout);
     }
+
+    // Create new layout
+    std::unique_ptr<QGridLayout> newLayout(new QGridLayout);
+    newLayout->setSizeConstraint(QLayout::SetMinimumSize);
+    this->frame->setLayout(newLayout.release());
 
     // Make sure to adjust the size of the widget
     this->frame->adjustSize();
@@ -127,7 +122,7 @@ void ImagesView::SetTopic(const std::string &_topicName)
 /////////////////////////////////////////////////
 void ImagesView::AddImage(int _width, int _height)
 {
-  ImageFrame *imageFrame = new ImageFrame(this);
+  std::unique_ptr<ImageFrame> imageFrame(new ImageFrame(NULL));
   imageFrame->setBaseSize(_width, _height);
   imageFrame->setMinimumSize(320, 240);
   imageFrame->show();
@@ -137,7 +132,7 @@ void ImagesView::AddImage(int _width, int _height)
   if (!frameLayout)
     return;
 
-  frameLayout->addWidget(imageFrame,
+  frameLayout->addWidget(imageFrame.release(),
       (frameLayout->count()) / 2,
       (frameLayout->count()) % 2);
 }
