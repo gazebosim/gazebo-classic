@@ -21,8 +21,6 @@
 #include <memory>
 #include <string>
 
-#include "gazebo/transport/transport.hh"
-
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/gui/plot/PlottingTypes.hh"
