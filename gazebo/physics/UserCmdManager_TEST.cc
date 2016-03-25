@@ -38,10 +38,6 @@ TEST_F(UserCmdManagerTest, CreateCmd)
   physics::WorldPtr world = physics::get_world("default");
   EXPECT_TRUE(world != NULL);
 
-  // Create a manager
-  physics::UserCmdManagerPtr manager(new physics::UserCmdManager(world));
-  EXPECT_TRUE(manager != NULL);
-
   // Create the command
   unsigned int id = 21;
   std::string description = "Command description";
@@ -49,7 +45,7 @@ TEST_F(UserCmdManagerTest, CreateCmd)
   std::string entityName = "entity_name";
 
   std::unique_ptr<physics::UserCmd> cmd(
-      new physics::UserCmd(manager, id, world, description, type, entityName));
+      new physics::UserCmd(id, world, description, type, entityName));
   EXPECT_TRUE(cmd != NULL);
 
   // Check data
@@ -57,9 +53,6 @@ TEST_F(UserCmdManagerTest, CreateCmd)
   EXPECT_EQ(description, cmd->Description());
   EXPECT_EQ(type, cmd->Type());
   EXPECT_EQ(entityName, cmd->EntityName());
-
-  // Clean up
-  manager.reset();
 }
 
 int main(int argc, char **argv)

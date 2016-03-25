@@ -37,14 +37,13 @@ namespace gazebo
     class GAZEBO_VISIBLE UserCmd
     {
       /// \brief Constructor
-      /// \param[in] _manager Pointer to the user command manager.
       /// \param[in] _id Unique ID for this command
       /// \param[in] _world Pointer to the world
       /// \param[in] _description Description for the command, such as
       /// "Rotate box", "Delete sphere", etc.
       /// \param[in] _type Type of command, such as MOVING, DELETING, etc.
-      public: UserCmd(UserCmdManagerPtr _manager,
-                      const unsigned int _id,
+      /// \param[in] _entityName Name of entity involved in the command.
+      public: UserCmd(const unsigned int _id,
                       physics::WorldPtr _world,
                       const std::string &_description,
                       const msgs::UserCmd::Type &_type,
@@ -73,9 +72,8 @@ namespace gazebo
       /// \return Command type
       public: msgs::UserCmd::Type Type() const;
 
-      /// \brief Get the name of the entity related tot he command.
+      /// \brief Get the name of the entity related to the command.
       /// \return Entity name.
-      /// \sa void SetEntityName(const std::string &_name)
       public: std::string EntityName() const;
 
       /// \internal
@@ -87,7 +85,6 @@ namespace gazebo
 
     /// \brief Manages user commands from the server side.
     class GAZEBO_VISIBLE UserCmdManager
-        : public std::enable_shared_from_this<UserCmdManager>
     {
       /// \brief Constructor.
       /// \param[in] _world Pointer to the world.
@@ -109,12 +106,9 @@ namespace gazebo
       /// \brief Publish a message about current user command statistics.
       private: void PublishCurrentStats();
 
-      /// \brief Called every world update iteration, it processes world states
+      /// \brief Called every world update iteration, it processes user commands
       /// in order.
       private: void ProcessPendingCmds();
-
-      // UserCmd class is a friend so it can use resources such as transport.
-      private: friend class UserCmd;
 
       /// \internal
       /// \brief Pointer to private data.

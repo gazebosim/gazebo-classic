@@ -57,11 +57,8 @@ namespace gazebo
       /// \brief Type of command, such as MOVING or DELETING.
       public: msgs::UserCmd::Type type;
 
-      /// \brief Type of command, such as MOVING or DELETING.
+      /// \brief Name of entity related to the command.
       public: std::string entityName;
-
-      /// \brief Pointer to the user command manager.
-      public: UserCmdManagerPtr manager;
     };
 
     class UserCmd;
@@ -112,7 +109,7 @@ namespace gazebo
       /// \brief All the event connections.
       public: event::Connection_V connections;
 
-      /// \brief Vector of states waiting to be applied.
+      /// \brief Vector of commands waiting to be applied.
       public: std::vector<std::pair<UserCmdPtr, bool>> pending;
 
       /// \brief Mutex to protect vectors.

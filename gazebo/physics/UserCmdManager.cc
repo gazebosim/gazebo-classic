@@ -40,15 +40,13 @@ using namespace physics;
 
 
 /////////////////////////////////////////////////
-UserCmd::UserCmd(UserCmdManagerPtr _manager,
-                 const unsigned int _id,
+UserCmd::UserCmd(const unsigned int _id,
                  physics::WorldPtr _world,
                  const std::string &_description,
                  const msgs::UserCmd::Type &_type,
                  const std::string &_entityName)
   : dataPtr(new UserCmdPrivate())
 {
-  this->dataPtr->manager = _manager;
   this->dataPtr->id = _id;
   this->dataPtr->world = _world;
   this->dataPtr->description = _description;
@@ -82,7 +80,7 @@ void UserCmd::Undo()
 
   // Insertion
   if (this->dataPtr->type == msgs::UserCmd::INSERTING &&
-      this->dataPtr->manager && !this->dataPtr->entityName.empty())
+      !this->dataPtr->entityName.empty())
   {
     // Get the entity's latest SDF
     auto model = this->dataPtr->world->GetModel(this->dataPtr->entityName);
@@ -119,18 +117,6 @@ void UserCmd::Undo()
 /////////////////////////////////////////////////
 void UserCmd::Redo()
 {
-  // Insertion
-  if (this->dataPtr->type == msgs::UserCmd::INSERTING &&
-      !this->dataPtr->entityName.empty())
-  {
-    // Update deletion on start state with latest name
-    //std::vector<std::string> deletions;
-    //deletions.push_back(this->dataPtr->entityName);
-
-    //this->dataPtr->startState.SetDeletions(deletions);
-  }
-
-
   // Reset physics states for the whole world
   this->dataPtr->world->ResetPhysicsStates();
 
@@ -215,7 +201,7 @@ void UserCmdManager::OnUserCmdMsg(ConstUserCmdPtr &_msg)
   unsigned int id = this->dataPtr->idCounter++;
 
   // Create command
-  UserCmdPtr cmd(new UserCmd(shared_from_this(), id, this->dataPtr->world,
+  UserCmdPtr cmd(new UserCmd(id, this->dataPtr->world,
       _msg->description(), _msg->type(), _msg->entity_name()));
 
   // Forward message after we've saved the current state
