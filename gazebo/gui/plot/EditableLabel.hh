@@ -31,13 +31,14 @@ namespace gazebo
     // Forward declare private data class
     class EditableLabelPrivate;
 
-    /// \brief Plot Curve data.
+    /// \brief Editable Label. The widget toggles between a QLabel and
+    /// QLineEdit to support edits to the label text.
     class GZ_GUI_VISIBLE EditableLabel : public QWidget
     {
       Q_OBJECT
 
       /// \brief Constructor.
-      /// \param[in] _label Label.
+      /// \param[in] _label Label text.
       /// \param[in] _parent Parent widget.
       public: EditableLabel(const std::string &_label, QWidget *_parent = NULL);
 

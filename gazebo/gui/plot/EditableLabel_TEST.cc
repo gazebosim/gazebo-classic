@@ -21,7 +21,7 @@
 /////////////////////////////////////////////////
 void EditableLabel_TEST::Text()
 {
-  // Create a new plot window widget
+  // Create a new EditableLabel widget
   gazebo::gui::EditableLabel *editableLabel =
       new gazebo::gui::EditableLabel("test_label", NULL);
 
@@ -35,7 +35,7 @@ void EditableLabel_TEST::Text()
 /////////////////////////////////////////////////
 void EditableLabel_TEST::Edit()
 {
-  // Create a new plot window widget
+  // Create a new EditableLabel widget
   gazebo::gui::EditableLabel *editableLabel =
       new gazebo::gui::EditableLabel("test_label", NULL);
 
