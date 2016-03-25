@@ -110,7 +110,7 @@ if (GAZEBO_HAS_BULLET)
 endif()
 
 if (GAZEBO_HAS_SIMBODY)
-  find_package(simbody REQUIRED)
+  find_package(Simbody REQUIRED)
   list(APPEND @PKG_NAME@_INCLUDE_DIRS ${Simbody_INCLUDE_DIR})
   list(APPEND @PKG_NAME@_LIBRARIES ${Simbody_LIBRARIES})
 endif()

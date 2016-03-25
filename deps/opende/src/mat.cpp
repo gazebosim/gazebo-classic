@@ -20,11 +20,11 @@
  *                                                                       *
  *************************************************************************/
 
-#include <ode/odeconfig.h>
-#include <ode/misc.h>
-#include <ode/matrix.h>
-#include <ode/error.h>
-#include <ode/memory.h>
+#include <gazebo/ode/odeconfig.h>
+#include <gazebo/ode/misc.h>
+#include <gazebo/ode/matrix.h>
+#include <gazebo/ode/error.h>
+#include <gazebo/ode/memory.h>
 #include "config.h"
 #include "mat.h"
 

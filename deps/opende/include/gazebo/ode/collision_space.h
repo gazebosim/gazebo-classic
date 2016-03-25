@@ -23,7 +23,7 @@
 #ifndef _ODE_COLLISION_SPACE_H_
 #define _ODE_COLLISION_SPACE_H_
 
-#include <ode/common.h>
+#include <gazebo/ode/common.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -79,10 +79,10 @@ ODE_API int dSpaceGetCleanup (dSpaceID space);
 * @brief Sets sublevel value for a space.
 *
 * Sublevel affects how the space is handled in dSpaceCollide2 when it is collided
-* with another space. If sublevels of both spaces match, the function iterates 
+* with another space. If sublevels of both spaces match, the function iterates
 * geometries of both spaces and collides them with each other. If sublevel of one
-* space is greater than the sublevel of another one, only the geometries of the 
-* space with greater sublevel are iterated, another space is passed into 
+* space is greater than the sublevel of another one, only the geometries of the
+* space with greater sublevel are iterated, another space is passed into
 * collision callback as a geometry itself. By default all the spaces are assigned
 * zero sublevel.
 *
@@ -118,10 +118,10 @@ ODE_API int dSpaceGetSublevel (dSpaceID space);
 * @brief Sets manual cleanup flag for a space.
 *
 * Manual cleanup flag marks a space as eligible for manual thread data cleanup.
-* This function should be called for every space object right after creation in 
+* This function should be called for every space object right after creation in
 * case if ODE has been initialized with @c dInitFlagManualThreadCleanup flag.
-* 
-* Failure to set manual cleanup flag for a space may lead to some resources 
+*
+* Failure to set manual cleanup flag for a space may lead to some resources
 * remaining leaked until the program exit.
 *
 * @param space the space to modify
@@ -137,7 +137,7 @@ ODE_API void dSpaceSetManualCleanup (dSpaceID space, int mode);
 *
 * Manual cleanup flag marks a space space as eligible for manual thread data cleanup.
 * See @c dSpaceSetManualCleanup for more details.
-* 
+*
 * @param space the space to query
 * @returns 1 for manual cleanup mode and 0 for default cleanup mode of the space
 * @ingroup collide

@@ -6,7 +6,7 @@ if (HAVE_OPENAL)
   include_directories(${OPENAL_INCLUDE_DIR})
 endif()
 
-include_directories(${TBB_INCLUDEDIR})
+include_directories(${TBB_INCLUDEDIR} ${tinyxml2_INCLUDE_DIRS})
 
 include_directories(${tinyxml_INCLUDE_DIRS})
 set (sources
@@ -16,6 +16,10 @@ set (sources
   OpenAL.cc
 )
 
+if (NOT USE_EXTERNAL_TINYXML2)
+  list (APPEND sources ${CMAKE_SOURCE_DIR}/deps/tinyxml2/gazebo/tinyxml2.cpp)
+endif()
+
 if (NOT USE_EXTERNAL_TINYXML)
   include_directories (${CMAKE_SOURCE_DIR}/deps/win/tinyxml)
   set (sources ${sources}
@@ -23,12 +27,6 @@ if (NOT USE_EXTERNAL_TINYXML)
        ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxml.cpp
        ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxmlerror.cpp
        ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxmlparser.cpp)
-endif()
-
-if (NOT USE_EXTERNAL_TINYXML2)
-  include_directories (${CMAKE_SOURCE_DIR}/deps/win/tinyxml2)
-  set (sources ${sources}
-       ${CMAKE_SOURCE_DIR}/deps/win/tinyxml2/tinyxml2.cpp)
 endif()
 
 set (headers
