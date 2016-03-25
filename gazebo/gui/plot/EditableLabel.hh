@@ -44,6 +44,10 @@ namespace gazebo
       /// \brief Destructor.
       public: ~EditableLabel();
 
+      /// \brief Get the string of this label.
+      /// \return Label string.
+      public: std::string Text() const;
+
       /// \brief Set whether to show border.
       /// \param[in] _show True to show border.
       public: void ShowBorder(const bool _show);

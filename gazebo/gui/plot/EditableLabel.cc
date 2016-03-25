@@ -65,6 +65,12 @@ EditableLabel::~EditableLabel()
 }
 
 /////////////////////////////////////////////////
+std::string EditableLabel::Text() const
+{
+  return this->dataPtr->label->text().toStdString();
+}
+
+/////////////////////////////////////////////////
 void EditableLabel::ShowBorder(const bool _show)
 {
   QString borderColor;

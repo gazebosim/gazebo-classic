@@ -129,7 +129,7 @@ namespace gazebo
               }
 
       /// \brief maxium sample size of this curve.
-      private: int maxSampleSize = 100000;
+      private: int maxSampleSize = 11000;
 
       /// \brief Size of samples to remove when maxSampleSize is reached.
       private: int windowSize = 1000;
