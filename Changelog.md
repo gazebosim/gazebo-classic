@@ -5,6 +5,9 @@
 1. Process insertions on World::SetState
     * [Pull request #2200](https://bitbucket.org/osrf/gazebo/pull-requests/2200)
 
+1. Process deletions on World::SetState
+    * [Pull request #2204](https://bitbucket.org/osrf/gazebo/pull-requests/2204)
+
 1. Allow dynamically adding links to a model.
     * [Pull request #2185](https://bitbucket.org/osrf/gazebo/pull-requests/2185)
 

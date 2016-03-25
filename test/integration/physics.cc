@@ -763,6 +763,51 @@ TEST_F(PhysicsTest, StateInsertion)
   EXPECT_EQ(2u, newWorldState.LightStateCount());
 }
 
+//////////////////////////////////////////////////
+TEST_F(PhysicsTest, StateDeletion)
+{
+  this->Load("worlds/shapes.world");
+  auto world = physics::get_world("default");
+  EXPECT_TRUE(world != NULL);
+
+  std::string deleteModelName("box");
+  std::string deleteLightName("sun");
+
+  // Check initial count
+  EXPECT_EQ(4u, world->GetModelCount());
+  EXPECT_EQ(1u, world->LightCount());
+  EXPECT_FALSE(world->GetModel(deleteModelName) == NULL);
+  EXPECT_FALSE(world->Light(deleteLightName) == NULL);
+
+  // Current world state
+  physics::WorldState worldState(world);
+  EXPECT_EQ(4u, worldState.GetModelStateCount());
+  EXPECT_EQ(1u, worldState.LightStateCount());
+
+  // Deletions
+  std::vector<std::string> deletions;
+  deletions.push_back(deleteModelName);
+  deletions.push_back(deleteLightName);
+
+  worldState.SetDeletions(deletions);
+
+  // Set state which includes deletion
+  world->SetState(worldState);
+
+  gazebo::common::Time::MSleep(10);
+
+  // Check entities were deleted
+  EXPECT_EQ(3u, world->GetModelCount());
+  EXPECT_EQ(0u, world->LightCount());
+  EXPECT_TRUE(world->GetModel(deleteModelName) == NULL);
+  EXPECT_TRUE(world->Light(deleteLightName) == NULL);
+
+  // New world state
+  physics::WorldState newWorldState(world);
+  EXPECT_EQ(3u, newWorldState.GetModelStateCount());
+  EXPECT_EQ(0u, newWorldState.LightStateCount());
+}
+
 ////////////////////////////////////////////////////////////////////////
 void PhysicsTest::JointDampingTest(const std::string &_physicsEngine)
 {
