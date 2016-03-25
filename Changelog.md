@@ -5,6 +5,9 @@
 1. Adds an output option to gz log that allows the tool to filter a log file and write to a new log file.
     * [Pull request #2149](https://bitbucket.org/osrf/gazebo/pull-request/2149)
 
+1. Use only Gazebo's internal version of tinyxml2. The version of tinyxml2 distributed with Ubuntu fails when parsing large log files.
+    * [Pull request #2146](https://bitbucket.org/osrf/gazebo/pull-request/2146)
+
 1. Moved gazebo ODE includes to have correct include path
     * [Pull request #2186](https://bitbucket.org/osrf/gazebo/pull-request/2186)
 
