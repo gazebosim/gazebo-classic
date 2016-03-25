@@ -205,18 +205,18 @@ Projector::ProjectorFrameListener::~ProjectorFrameListener()
 {
   this->RemovePassFromMaterials();
 
+  if (this->filterNode)
+  {
+    this->filterNode->detachObject(this->filterFrustum);
+    this->node->removeAndDestroyChild(this->filterNodeName);
+    this->filterNode = NULL;
+  }
+
   if (this->node)
   {
     this->node->detachObject(this->frustum);
     this->visual->GetSceneNode()->removeAndDestroyChild(this->nodeName);
     this->node = NULL;
-  }
-
-  if (this->filterNode)
-  {
-    this->filterNode->detachObject(this->filterFrustum);
-    this->visual->GetSceneNode()->removeAndDestroyChild(this->filterNodeName);
-    this->filterNode = NULL;
   }
 
   delete this->frustum;
@@ -300,7 +300,7 @@ void Projector::ProjectorFrameListener::SetSceneNode()
   if (this->filterNode)
   {
     this->filterNode->detachObject(this->filterFrustum);
-    this->visual->GetSceneNode()->removeAndDestroyChild(this->filterNodeName);
+    this->node->removeAndDestroyChild(this->filterNodeName);
     this->filterNode = NULL;
   }
 
