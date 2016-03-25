@@ -73,6 +73,8 @@ void ImageFrame::OnImage(const msgs::Image &_msg)
 
   img.GetRGBData(&rgbData, rgbDataSize);
 
+  boost::mutex::scoped_lock lock(this->dataPtr->mutex);
+
   if (_msg.width() != static_cast<unsigned int>(this->dataPtr->image.width()) ||
       _msg.height() != static_cast<unsigned int>(this->dataPtr->image.height()))
   {
@@ -81,8 +83,13 @@ void ImageFrame::OnImage(const msgs::Image &_msg)
   }
 
   // Store the image data
-  memcpy(this->dataPtr->image.bits(), rgbData, rgbDataSize);
-  boost::mutex::scoped_lock lock(this->dataPtr->mutex);
+  const char *buffer = _msg.data().c_str();
+  for (int i = 0; i < this->dataPtr->image.height(); ++i)
+  {
+    memcpy(this->dataPtr->image.scanLine(i),
+        buffer + i*this->dataPtr->image.bytesPerLine(),
+        this->dataPtr->image.bytesPerLine());
+  }
 
   this->update();
   delete [] rgbData;
