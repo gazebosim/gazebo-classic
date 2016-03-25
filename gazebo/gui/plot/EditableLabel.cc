@@ -15,7 +15,6 @@
  *
 */
 
-#include <iostream>
 #include "gazebo/gui/plot/EditableLabel.hh"
 
 using namespace gazebo;

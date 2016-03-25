@@ -42,6 +42,8 @@ namespace gazebo
     /// \brief Zoom to mouse position
     class PlotMagnifier : QwtPlotMagnifier
     {
+      /// \brief Constructor
+      /// \param[in] _canvas Canvas the magnifier will be attached to.
 #if (QWT_VERSION < ((6 << 16) | (1 << 8) | 0))
       public: PlotMagnifier(QwtPlotCanvas *_canvas)
 #else
@@ -55,6 +57,8 @@ namespace gazebo
                   this->setWheelFactor(1/f);
               }
 
+      /// \brief Callback for a mouse wheel event
+      /// \param[in] _wheelEvent Qt mouse wheel event
       protected: virtual void widgetWheelEvent(QWheelEvent *_wheelEvent)
               {
                 this->mousePos = _wheelEvent->pos();
@@ -62,13 +66,15 @@ namespace gazebo
                 QwtMagnifier::widgetWheelEvent(_wheelEvent);
               }
 
-      protected: virtual void rescale(double factor)
+      /// \brief Update plot scale by changing bounds of x and y axes.
+      /// \param[in] _factor Factor to scale the plot by.
+      protected: virtual void rescale(double _factor)
               {
                 QwtPlot* plt = plot();
                 if ( plt == NULL )
                     return;
 
-                factor = qAbs(factor);
+                double factor = qAbs(_factor);
                 if ( ignition::math::equal(factor, 1.0) ||
                     ignition::math::equal(factor, 0.0))
                   return;
@@ -144,6 +150,7 @@ namespace gazebo
                 plt->replot();
               }
 
+        /// \brief Mouse position
         private: QPoint mousePos;
     };
 
