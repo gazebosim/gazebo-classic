@@ -21,7 +21,7 @@ Gazebo cmake parameters available at configuring time:
    Use the recommend gazebo developers compiler optimizations flags.
  - USE_EXTERNAL_TINYXML (bool) [default True]
    Use external copy of tinyxml during the build.
- - USE_EXTERNAL_TINYXML2 (bool) [default False]
+ - USE_EXTERNAL_TINYXML2 (bool) [default True]
    Use external copy of tinyxml2 during the build.
  - ENABLE_TESTS_COMPILATION (bool) [default True]
    Enabled or disable the test suite compilation. 
