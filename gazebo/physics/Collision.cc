@@ -68,9 +68,10 @@ Collision::~Collision()
 //////////////////////////////////////////////////
 void Collision::Fini()
 {
+  // Make sure clients were notified of the deletion
   if (this->requestPub)
   {
-    msgs::Request *msg = msgs::CreateRequest("entity_delete",
+    msgs::Request *msg = msgs::CreateRequest("notify_entity_delete",
         this->GetScopedName()+"__COLLISION_VISUAL__");
     this->requestPub->Publish(*msg, true);
   }

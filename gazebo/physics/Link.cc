@@ -296,10 +296,11 @@ void Link::Fini()
 
   this->sensors.clear();
 
+  // Make sure clients were notified of the deletion
   for (Visuals_M::iterator iter = this->visuals.begin();
        iter != this->visuals.end(); ++iter)
   {
-    msgs::Request *msg = msgs::CreateRequest("entity_delete",
+    msgs::Request *msg = msgs::CreateRequest("notify_entity_delete",
         boost::lexical_cast<std::string>(iter->second.id()));
     this->requestPub->Publish(*msg, true);
   }
@@ -307,7 +308,7 @@ void Link::Fini()
   for (std::vector<std::string>::iterator iter = this->cgVisuals.begin();
        iter != this->cgVisuals.end(); ++iter)
   {
-    msgs::Request *msg = msgs::CreateRequest("entity_delete", *iter);
+    msgs::Request *msg = msgs::CreateRequest("notify_entity_delete", *iter);
     this->requestPub->Publish(*msg, true);
   }
 

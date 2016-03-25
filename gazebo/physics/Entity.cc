@@ -585,9 +585,10 @@ void Entity::OnPoseMsg(ConstPosePtr &_msg)
 //////////////////////////////////////////////////
 void Entity::Fini()
 {
+  // Make sure clients were notified of the deletion
   if (this->requestPub)
   {
-    msgs::Request *msg = msgs::CreateRequest("entity_delete",
+    msgs::Request *msg = msgs::CreateRequest("notify_entity_delete",
         this->GetScopedName());
     this->requestPub->Publish(*msg, true);
   }

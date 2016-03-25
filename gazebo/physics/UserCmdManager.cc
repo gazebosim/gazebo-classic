@@ -44,7 +44,8 @@ UserCmd::UserCmd(UserCmdManagerPtr _manager,
                  const unsigned int _id,
                  physics::WorldPtr _world,
                  const std::string &_description,
-                 const msgs::UserCmd::Type &_type)
+                 const msgs::UserCmd::Type &_type,
+                 const std::string &_entityName)
   : dataPtr(new UserCmdPrivate())
 {
   this->dataPtr->manager = _manager;
@@ -52,87 +53,89 @@ UserCmd::UserCmd(UserCmdManagerPtr _manager,
   this->dataPtr->world = _world;
   this->dataPtr->description = _description;
   this->dataPtr->type = _type;
-  this->dataPtr->sdf = NULL;
+  this->dataPtr->entityName = _entityName;
 
   // Record current world state
   this->dataPtr->startState = WorldState(this->dataPtr->world);
+
+  // Insertion
+  if (this->dataPtr->type == msgs::UserCmd::INSERTING)
+  {
+    // Add deletion to start state so this is deleted on undo
+    std::vector<std::string> deletions;
+    deletions.push_back(this->dataPtr->entityName);
+
+    this->dataPtr->startState.SetDeletions(deletions);
+  }
 }
 
 /////////////////////////////////////////////////
 UserCmd::~UserCmd()
 {
-  delete this->dataPtr;
-  this->dataPtr = NULL;
 }
 
 /////////////////////////////////////////////////
 void UserCmd::Undo()
 {
   // Record / override the state for redo
-  // FIXME: If there are pending deletions for example, the state will be wrongly recorded here
-  // Manage the state recording from the manager? Make a queue?
   this->dataPtr->endState = WorldState(this->dataPtr->world);
 
-  // Undo insertion
+  // Insertion
   if (this->dataPtr->type == msgs::UserCmd::INSERTING &&
       this->dataPtr->manager && !this->dataPtr->entityName.empty())
   {
-    // Keep sdf for redo
-    if (!this->dataPtr->sdf)
+    // Get the entity's latest SDF
+    auto model = this->dataPtr->world->GetModel(this->dataPtr->entityName);
+    auto light = this->dataPtr->world->Light(this->dataPtr->entityName);
+
+    std::stringstream entityStr;
+    entityStr << "<sdf version='" << SDF_VERSION << "'>";
+    if (model)
+      entityStr << model->GetSDF()->ToString("");
+    else if (light)
+      entityStr << light->GetSDF()->ToString("");
+    else
     {
-      auto model = this->dataPtr->world->GetModel(this->dataPtr->entityName);
-      auto light = this->dataPtr->world->Light(this->dataPtr->entityName);
-      if (!model && !light)
-      {
-        gzerr << "Entity [" << this->dataPtr->entityName << "] not found."
-            << std::endl;
-        return;
-      }
-
-      this->dataPtr->sdf.reset(new sdf::SDF);
-      if (model)
-        this->dataPtr->sdf->Root()->Copy(model->GetSDF());
-      else if (light)
-        this->dataPtr->sdf->Root()->Copy(light->GetSDF());
+      gzerr << "Entity [" << this->dataPtr->entityName << "] not found."
+          << std::endl;
+      return;
     }
+    entityStr << "</sdf>";
 
-    // Delete
-    transport::requestNoReply(this->dataPtr->manager->dataPtr->node,
-        "entity_delete", this->dataPtr->entityName);
+    // Add insertion to end state so this is inserted on redo
+    std::vector<std::string> insertions;
+    insertions.push_back(entityStr.str());
+
+    this->dataPtr->endState.SetInsertions(insertions);
   }
 
+  // Reset physics states for the whole world
+  this->dataPtr->world->ResetPhysicsStates();
+
   // Set state to the moment the command was executed
-  this->dataPtr->manager->dataPtr->pendingStates.push_back(
-      this->dataPtr->startState);
+  this->dataPtr->world->SetState(this->dataPtr->startState);
 }
 
 /////////////////////////////////////////////////
 void UserCmd::Redo()
 {
-  // Redo insertion
+  // Insertion
   if (this->dataPtr->type == msgs::UserCmd::INSERTING &&
-      this->dataPtr->manager && this->dataPtr->sdf)
+      !this->dataPtr->entityName.empty())
   {
-    if (this->dataPtr->sdf->Root()->GetName() == "model")
-    {
-      msgs::Factory msg;
-      msg.set_sdf(this->dataPtr->sdf->ToString());
-      this->dataPtr->manager->dataPtr->modelFactoryPub->Publish(msg);
-    }
-    else if (this->dataPtr->sdf->Root()->GetName() == "light")
-    {
-      auto lightElem = this->dataPtr->sdf->Root();
-      msgs::Light msg = msgs::LightFromSDF(lightElem);
-      this->dataPtr->manager->dataPtr->lightFactoryPub->Publish(msg);
-    }
+    // Update deletion on start state with latest name
+    //std::vector<std::string> deletions;
+    //deletions.push_back(this->dataPtr->entityName);
 
-    this->dataPtr->manager->dataPtr->insertionsPending.push_back(
-        this->dataPtr->entityName);
+    //this->dataPtr->startState.SetDeletions(deletions);
   }
 
-  // Set state to the moment undo was triggered
-  this->dataPtr->manager->dataPtr->pendingStates.push_back(
-      this->dataPtr->endState);
+
+  // Reset physics states for the whole world
+  this->dataPtr->world->ResetPhysicsStates();
+
+  // Set state to the moment the command was executed
+  this->dataPtr->world->SetState(this->dataPtr->endState);
 }
 
 /////////////////////////////////////////////////
@@ -154,12 +157,6 @@ msgs::UserCmd::Type UserCmd::Type() const
 }
 
 /////////////////////////////////////////////////
-void UserCmd::SetEntityName(const std::string &_name)
-{
-  this->dataPtr->entityName = _name;
-}
-
-/////////////////////////////////////////////////
 std::string UserCmd::EntityName() const
 {
   return this->dataPtr->entityName;
@@ -173,7 +170,7 @@ UserCmdManager::UserCmdManager(const WorldPtr _world)
 
   // Events
   this->dataPtr->connections.push_back(event::Events::ConnectWorldUpdateBegin(
-      boost::bind(&UserCmdManager::ProcessPendingStates, this)));
+      boost::bind(&UserCmdManager::ProcessPendingCmds, this)));
 
   // Transport
   this->dataPtr->node = transport::NodePtr(new transport::Node());
@@ -209,10 +206,6 @@ UserCmdManager::UserCmdManager(const WorldPtr _world)
 /////////////////////////////////////////////////
 UserCmdManager::~UserCmdManager()
 {
-  this->dataPtr->connections.clear();
-
-  delete this->dataPtr;
-  this->dataPtr = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -223,10 +216,7 @@ void UserCmdManager::OnUserCmdMsg(ConstUserCmdPtr &_msg)
 
   // Create command
   UserCmdPtr cmd(new UserCmd(shared_from_this(), id, this->dataPtr->world,
-      _msg->description(), _msg->type()));
-
-  if (_msg->has_entity_name())
-    cmd->SetEntityName(_msg->entity_name());
+      _msg->description(), _msg->type(), _msg->entity_name()));
 
   // Forward message after we've saved the current state
   switch (_msg->type())
@@ -301,11 +291,16 @@ void UserCmdManager::OnUserCmdMsg(ConstUserCmdPtr &_msg)
     }
   }
 
-  // Add it to undo list
-  this->dataPtr->undoCmds.push_back(cmd);
+  {
+    // Protect undoCmds, redoCmds and pending
+    std::lock_guard<std::recursive_mutex> lock(this->dataPtr->mutex);
 
-  // Clear redo list
-  this->dataPtr->redoCmds.clear();
+    // Add it to undo list
+    this->dataPtr->undoCmds.push_back(cmd);
+
+    // Clear redo list
+    this->dataPtr->redoCmds.clear();
+  }
 
   // Publish stats
   this->PublishCurrentStats();
@@ -314,6 +309,9 @@ void UserCmdManager::OnUserCmdMsg(ConstUserCmdPtr &_msg)
 /////////////////////////////////////////////////
 void UserCmdManager::OnUndoRedoMsg(ConstUndoRedoPtr &_msg)
 {
+  // Protect undoCmds, redoCmds and pending
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->mutex);
+
   // Undo
   if (_msg->undo())
   {
@@ -347,15 +345,11 @@ void UserCmdManager::OnUndoRedoMsg(ConstUndoRedoPtr &_msg)
       }
     }
 
-    // Undo all commands up to the desired one
+    // Move all commands up to the desired one to pending
     for (auto cmdIt : boost::adaptors::reverse(this->dataPtr->undoCmds))
     {
-      // Undo it
-      cmdIt->Undo();
-
-      // Transfer to the redo list
       this->dataPtr->undoCmds.pop_back();
-      this->dataPtr->redoCmds.push_back(cmdIt);
+      this->dataPtr->pending.push_back(std::make_pair(cmdIt, true));
 
       if (cmdIt == cmd)
         break;
@@ -394,27 +388,25 @@ void UserCmdManager::OnUndoRedoMsg(ConstUndoRedoPtr &_msg)
       }
     }
 
-    // Redo all commands up to the desired one
+    // Move all commands up to the desired one to pending
     for (auto cmdIt : boost::adaptors::reverse(this->dataPtr->redoCmds))
     {
-      // Redo it
-      cmdIt->Redo();
-
       // Transfer to the undo list
       this->dataPtr->redoCmds.pop_back();
-      this->dataPtr->undoCmds.push_back(cmdIt);
+      this->dataPtr->pending.push_back(std::make_pair(cmdIt, false));
 
       if (cmdIt == cmd)
         break;
     }
   }
-
-  this->PublishCurrentStats();
 }
 
 /////////////////////////////////////////////////
 void UserCmdManager::PublishCurrentStats()
 {
+  // Protect undoCmds, redoCmds and pending
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->mutex);
+
   msgs::UserCmdStats statsMsg;
 
   statsMsg.set_undo_cmd_count(this->dataPtr->undoCmds.size());
@@ -440,36 +432,30 @@ void UserCmdManager::PublishCurrentStats()
 }
 
 /////////////////////////////////////////////////
-void UserCmdManager::ProcessPendingStates()
+void UserCmdManager::ProcessPendingCmds()
 {
-  if (this->dataPtr->pendingStates.empty())
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->mutex);
+
+  if (this->dataPtr->pending.empty())
     return;
 
-  // Check if there are insertions missing before changing state
-  if (!this->dataPtr->insertionsPending.empty())
+  for (auto cmdIt : this->dataPtr->pending)
   {
-    bool insertionMissing = false;
-    for (auto it = this->dataPtr->insertionsPending.begin();
-         it != this->dataPtr->insertionsPending.end();)
+    // Undo
+    if (cmdIt.second)
     {
-      if (!(this->dataPtr->world->GetModel(*it) ||
-            this->dataPtr->world->Light(*it)))
-      {
-        insertionMissing = true;
-        ++it;
-      }
-      else
-        this->dataPtr->insertionsPending.erase(it);
+      cmdIt.first->Undo();
+      this->dataPtr->redoCmds.push_back(cmdIt.first);
     }
-    if (insertionMissing)
-      return;
+    // Redo
+    else
+    {
+      cmdIt.first->Redo();
+      this->dataPtr->undoCmds.push_back(cmdIt.first);
+    }
   }
+  this->dataPtr->pending.clear();
 
-  // Reset physics states for the whole world
-  this->dataPtr->world->ResetPhysicsStates();
-
-  // Set world state to pending state
-  this->dataPtr->world->SetState(this->dataPtr->pendingStates.front());
-  this->dataPtr->pendingStates.pop_front();
+  this->PublishCurrentStats();
 }
 

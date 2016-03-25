@@ -2500,7 +2500,7 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
 
     // this->responsePub->Publish(response);
   }
-  else if (_msg->request() == "entity_delete")
+  else if (_msg->request() == "notify_entity_delete")
   {
     Light_M::iterator lightIter = this->dataPtr->lights.find(_msg->data());
 

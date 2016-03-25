@@ -332,7 +332,7 @@ void ModelListWidget::Update()
   this->ProcessRemoveEntity();
   this->ProcessModelMsgs();
   this->ProcessLightMsgs();
-  QTimer::singleShot(1000, this, SLOT(Update()));
+  QTimer::singleShot(100, this, SLOT(Update()));
 }
 
 /////////////////////////////////////////////////
@@ -2434,7 +2434,7 @@ void ModelListWidget::FillPoseProperty(const msgs::Pose &_msg,
 /////////////////////////////////////////////////
 void ModelListWidget::OnRequest(ConstRequestPtr &_msg)
 {
-  if (_msg->request() == "entity_delete")
+  if (_msg->request() == "notify_entity_delete")
   {
     this->dataPtr->removeEntityList.push_back(_msg->data());
   }

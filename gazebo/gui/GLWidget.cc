@@ -1264,7 +1264,7 @@ void GLWidget::OnSetSelectedEntity(const std::string &_name,
 /////////////////////////////////////////////////
 void GLWidget::OnRequest(ConstRequestPtr &_msg)
 {
-  if (_msg->request() == "entity_delete")
+  if (_msg->request() == "notify_entity_delete")
   {
     std::lock_guard<std::mutex> lock(this->dataPtr->selectedVisMutex);
     if (!this->dataPtr->selectedVisuals.empty())

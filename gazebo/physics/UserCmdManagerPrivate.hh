@@ -20,7 +20,6 @@
 
 #include <string>
 #include <vector>
-#include <sdf/sdf.hh>
 
 #include "gazebo/common/CommonTypes.hh"
 
@@ -60,9 +59,6 @@ namespace gazebo
 
       /// \brief Type of command, such as MOVING or DELETING.
       public: std::string entityName;
-
-      /// \brief SDF for the entity being inserted or deleted.
-      public: sdf::SDFPtr sdf;
 
       /// \brief Pointer to the user command manager.
       public: UserCmdManagerPtr manager;
@@ -116,11 +112,11 @@ namespace gazebo
       /// \brief All the event connections.
       public: event::Connection_V connections;
 
-      /// \brief Vector of entities whose insertions are pending.
-      public: std::vector<std::string> insertionsPending;
-
       /// \brief Vector of states waiting to be applied.
-      public: std::list<WorldState> pendingStates;
+      public: std::vector<std::pair<UserCmdPtr, bool>> pending;
+
+      /// \brief Mutex to protect vectors.
+      public: std::recursive_mutex mutex;
     };
   }
 }

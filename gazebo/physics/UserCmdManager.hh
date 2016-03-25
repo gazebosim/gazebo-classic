@@ -18,6 +18,7 @@
 #ifndef _GAZEBO_PHYSICS_USERCMDMANAGER_HH_
 #define _GAZEBO_PHYSICS_USERCMDMANAGER_HH_
 
+#include <memory>
 #include <string>
 
 #include "gazebo/transport/TransportTypes.hh"
@@ -46,7 +47,8 @@ namespace gazebo
                       const unsigned int _id,
                       physics::WorldPtr _world,
                       const std::string &_description,
-                      const msgs::UserCmd::Type &_type);
+                      const msgs::UserCmd::Type &_type,
+                      const std::string &_entityName);
 
       /// \brief Destructor
       public: virtual ~UserCmd();
@@ -71,11 +73,6 @@ namespace gazebo
       /// \return Command type
       public: msgs::UserCmd::Type Type() const;
 
-      /// \brief Set the name of the entity related tot he command.
-      /// \param[in] _name Entity name.
-      /// \sa std::string EntityName() const
-      public: void SetEntityName(const std::string &_name);
-
       /// \brief Get the name of the entity related tot he command.
       /// \return Entity name.
       /// \sa void SetEntityName(const std::string &_name)
@@ -83,7 +80,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Pointer to private data.
-      protected: UserCmdPrivate *dataPtr;
+      protected: std::unique_ptr<UserCmdPrivate> dataPtr;
     };
 
     class UserCmdManagerPrivate;
@@ -114,14 +111,14 @@ namespace gazebo
 
       /// \brief Called every world update iteration, it processes world states
       /// in order.
-      private: void ProcessPendingStates();
+      private: void ProcessPendingCmds();
 
       // UserCmd class is a friend so it can use resources such as transport.
       private: friend class UserCmd;
 
       /// \internal
       /// \brief Pointer to private data.
-      private: UserCmdManagerPrivate *dataPtr;
+      private: std::unique_ptr<UserCmdManagerPrivate> dataPtr;
     };
   }
 }

@@ -46,18 +46,19 @@ TEST_F(UserCmdManagerTest, CreateCmd)
   unsigned int id = 21;
   std::string description = "Command description";
   msgs::UserCmd::Type type = msgs::UserCmd::MOVING;
-  physics::UserCmd *cmd =
-      new physics::UserCmd(manager, id, world, description, type);
+  std::string entityName = "entity_name";
+
+  std::unique_ptr<physics::UserCmd> cmd(
+      new physics::UserCmd(manager, id, world, description, type, entityName));
   EXPECT_TRUE(cmd != NULL);
 
   // Check data
   EXPECT_EQ(id, cmd->Id());
   EXPECT_EQ(description, cmd->Description());
   EXPECT_EQ(type, cmd->Type());
+  EXPECT_EQ(entityName, cmd->EntityName());
 
   // Clean up
-  delete cmd;
-  cmd = NULL;
   manager.reset();
 }
 
