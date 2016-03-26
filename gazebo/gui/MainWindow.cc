@@ -1077,9 +1077,10 @@ void MainWindow::CreateActions()
   g_topicVisAct->setStatusTip(tr("Select a topic to visualize"));
   connect(g_topicVisAct, SIGNAL(triggered()), this, SLOT(SelectTopic()));
 
-  g_plotAct = new QAction(tr("Plot"), this);
+  g_plotAct = new QAction(QIcon(":images/graph_line_toolbar.svg"),
+      tr("Plot"), this);
   g_plotAct->setShortcut(tr("Ctrl+P"));
-  g_plotAct->setStatusTip(tr("Create a Plot"));
+  g_plotAct->setToolTip(tr("Create plot (Ctrl+P)"));
   connect(g_plotAct, SIGNAL(triggered()), this, SLOT(Plot()));
 
   g_openAct = new QAction(tr("&Open World"), this);
@@ -1390,14 +1391,14 @@ void MainWindow::CreateActions()
       tr("&Log Data"), this);
   g_dataLoggerAct->setShortcut(tr("Ctrl+D"));
   g_dataLoggerAct->setStatusTip(tr("Data Logging Utility"));
-  g_dataLoggerAct->setToolTip(tr("Log Data (Ctrl+D)"));
+  g_dataLoggerAct->setToolTip(tr("Log data (Ctrl+D)"));
   g_dataLoggerAct->setCheckable(true);
   g_dataLoggerAct->setChecked(false);
   connect(g_dataLoggerAct, SIGNAL(triggered()), this, SLOT(DataLogger()));
 
   g_screenshotAct = new QAction(QIcon(":/images/screenshot.png"),
       tr("Screenshot"), this);
-  g_screenshotAct->setStatusTip(tr("Take a screenshot"));
+  g_screenshotAct->setToolTip(tr("Take screenshot"));
   connect(g_screenshotAct, SIGNAL(triggered()), this,
       SLOT(CaptureScreenshot()));
 
