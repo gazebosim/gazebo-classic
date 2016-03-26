@@ -163,14 +163,16 @@ TEST_F(ModelDatabaseTest, GetModelsThrice)
 /////////////////////////////////////////////////
 TEST_F(ModelDatabaseTest, Version)
 {
-  std::string uri = "model://coke_can";
+  // add test model cococan to path so that the model database
+  // can pick it up
+  gazebo::common::SystemPaths::Instance()->AddModelPaths(
+    "/media/hugo/sdb1/code/gazebo/test/models/testdb");
+
+  std::string uri = "model://cococan";
   std::string model;
   model = gazebo::common::ModelDatabase::Instance()->GetModelFile(uri);
-
-  // uncomment to check the actual value. This assumes that the correct value
-  // is model.sdf, rather than model-1_2.sdf. This test
-  // is at the mercy of changes in the model database and sdf parser versions
-  EXPECT_TRUE(model.find("model.sdf") != std::string::npos);
+  // this model hias multiple sdf files. 1_5 is the correct one
+  EXPECT_TRUE(model.find("model-1_5.sdf") != std::string::npos);
 }
 
 /////////////////////////////////////////////////
