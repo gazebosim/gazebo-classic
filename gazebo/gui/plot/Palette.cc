@@ -489,6 +489,7 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   searchIcon->setPixmap(QPixmap(":/images/search.svg"));
 
   auto searchEdit = new QLineEdit();
+  searchEdit->setPlaceholderText("Start typing to search...");
   searchEdit->setObjectName("plotLineEdit");
   this->connect(searchEdit, SIGNAL(textChanged(QString)), this,
       SLOT(UpdateSearch(QString)));
