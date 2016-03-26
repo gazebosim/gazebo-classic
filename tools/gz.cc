@@ -15,6 +15,7 @@
  *
 */
 #include <signal.h>
+#include <tinyxml.h>
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 

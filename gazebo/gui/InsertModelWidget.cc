@@ -19,6 +19,7 @@
 #include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
 #include <sdf/sdf.hh>
+#include <tinyxml.h>
 
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/common/Console.hh"

@@ -19,6 +19,7 @@
 #include <set>
 #include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
+#include <tinyxml.h>
 
 #include "gazebo/common/Exception.hh"
 
