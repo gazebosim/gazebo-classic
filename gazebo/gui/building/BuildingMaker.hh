@@ -22,7 +22,6 @@
 #include <vector>
 #include <map>
 #include <sdf/sdf.hh>
-#include <tinyxml.h>
 
 #include "gazebo/math/Pose.hh"
 #include "gazebo/common/Events.hh"

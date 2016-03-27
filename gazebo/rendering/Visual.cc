@@ -16,7 +16,6 @@
 */
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
-#include <tinyxml.h>
 #include "gazebo/rendering/ogre_gazebo.h"
 
 #include "gazebo/msgs/msgs.hh"
