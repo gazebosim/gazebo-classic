@@ -10,7 +10,7 @@
     * [Issue #1876](https://bitbucket.org/osrf/gazebo/issues/1876)
 
 1. Model database selects the latest model version.
-    * [Pull request #2185](https://bitbucket.org/osrf/gazebo/pull-requests/2207)
+    * [Pull request #2207](https://bitbucket.org/osrf/gazebo/pull-requests/2207)
 
 1. Display physics engine type in the GUI
     * [Pull request #2155](https://bitbucket.org/osrf/gazebo/pull-requests/2155)
