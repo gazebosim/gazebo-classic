@@ -17,6 +17,8 @@
 
 #include <mutex>
 
+#include "gazebo/gui/GuiIface.hh"
+#include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/plot/IncrementalPlot.hh"
 #include "gazebo/gui/plot/Palette.hh"
 #include "gazebo/gui/plot/PlotCanvas.hh"
@@ -136,6 +138,9 @@ PlotWindow::PlotWindow(QWidget *_parent)
 
   this->setLayout(mainLayout);
   this->setSizeGripEnabled(true);
+
+  QShortcut *space = new QShortcut(Qt::Key_Space, this);
+  QObject::connect(space, SIGNAL(activated()), this, SLOT(TogglePause()));
 
   QTimer *displayTimer = new QTimer(this);
   connect(displayTimer, SIGNAL(timeout()), this, SLOT(Update()));
@@ -267,6 +272,19 @@ void PlotWindow::Restart()
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
   this->dataPtr->restart = true;
+}
+
+/////////////////////////////////////////////////
+void PlotWindow::TogglePause()
+{
+  MainWindow *mainWindow = gui::get_main_window();
+  if (!mainWindow)
+    return;
+
+  if (mainWindow->IsPaused())
+    mainWindow->Play();
+  else
+    mainWindow->Pause();
 }
 
 /////////////////////////////////////////////////

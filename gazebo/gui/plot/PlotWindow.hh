@@ -78,6 +78,9 @@ namespace gazebo
       /// \brief Qt Callback when a plot canvas should be removed.
       private slots: void OnRemoveCanvas();
 
+      /// \brief Toggle simulation play/pause state.
+      private slots: void TogglePause();
+
       /// \internal
       /// \brief Pointer to private data.
       private: std::unique_ptr<PlotWindowPrivate> dataPtr;
