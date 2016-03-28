@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,12 +32,14 @@ SemanticVersion::SemanticVersion(const std::string &_versionStr)
     return;
   unsigned int points = std::count(_versionStr.begin(), _versionStr.end(), '.');
   if (points == 0)
-      sscanf(_versionStr.c_str(), "%5u", &this->maj);
+    sscanf(_versionStr.c_str(), "%5u", &this->maj);
   if (points == 1)
-      sscanf(_versionStr.c_str(), "%5u.%5u", &this->maj, &this->min);
+    sscanf(_versionStr.c_str(), "%5u.%5u", &this->maj, &this->min);
   if (points >= 2)
-      sscanf(_versionStr.c_str(), "%5u.%5u.%5u", &this->maj, &this->min,
+  {
+    sscanf(_versionStr.c_str(), "%5u.%5u.%5u", &this->maj, &this->min,
         &this->patch);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -124,4 +126,3 @@ bool SemanticVersion::operator!=(const SemanticVersion &_other) const
 {
   return !(*this == _other);
 }
-
