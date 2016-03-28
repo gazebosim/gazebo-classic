@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_COMMON_SEMANTIC_VERSION_HH_
-#define _GAZEBO_COMMON_SEMANTIC_VERSION_HH_
+#ifndef _GAZEBO_COMMON_SEMANTICVERSION_HH_
+#define _GAZEBO_COMMON_SEMANTICVERSION_HH_
 
 #include <string>
 #include "gazebo/util/system.hh"
@@ -41,7 +41,7 @@ namespace gazebo
       /// \brief Constructor
       /// \param[in] _maj The major number
       /// \param[in] _min The minor number
-      /// \param[in] _patch The pathch number
+      /// \param[in] _patch The patch number
       public: SemanticVersion(const unsigned int _maj,
                               const unsigned int _min,
                               const unsigned int _patch);
@@ -80,13 +80,13 @@ namespace gazebo
       /// returns true if _other version is different
       public: bool operator!=(const SemanticVersion &_other) const;
 
-      /// \brief major revision (incompatible api changes)
+      /// \brief Major revision (incompatible api changes)
       private: unsigned int maj;
 
-      /// \brief minor revision (backwards compatible new functionality)
+      /// \brief Minor revision (backwards compatible new functionality)
       private: unsigned int min;
 
-      /// \brief patch (bug fixes)
+      /// \brief Patch (bug fixes)
       private: unsigned int patch;
     };
   }
