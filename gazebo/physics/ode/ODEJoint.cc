@@ -212,8 +212,8 @@ void ODEJoint::Detach()
 
   // Something funky is happening that sometimes the parent and child links ODE
   // pointers are cleared but gazebo objects remain valid.
-  if (odeParent && odeParent->GetODEId() == NULL ||
-      odeChild && odeChild->GetODEId() == NULL)
+  if ((odeParent && odeParent->GetODEId() == NULL) ||
+      (odeChild && odeChild->GetODEId() == NULL))
   {
     gzerr << "Either child [" << odeChild->GetName() <<
         "] has bad ODE pointer [" << odeChild->GetODEId() << "] or parent ["
