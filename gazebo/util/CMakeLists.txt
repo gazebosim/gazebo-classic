@@ -53,7 +53,7 @@ set (gtest_sources
   OpenAL_TEST.cc
 )
 
-gz_build_tests(${gtest_sources})
+gz_build_tests(${gtest_sources} EXTRA_LIBS gazebo_util)
 
 set (util_headers "" CACHE INTERNAL "util headers" FORCE)
 foreach (hdr ${headers})

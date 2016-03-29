@@ -661,7 +661,7 @@ bool IntrospectionCurveHandler::QuaterniondFromQuery(const std::string &_query,
   {
     _value = euler.Y();
   }
-  if (_query.find("yaw") != std::string::npos)
+  else if (_query.find("yaw") != std::string::npos)
   {
     _value = euler.Z();
   }

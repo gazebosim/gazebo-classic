@@ -80,6 +80,14 @@ IntrospectionManager::IntrospectionManager()
   {
     gzerr << "Error advertising service [" << service << "]" << std::endl;
   }
+
+  // Advertise the topic for notifying changes in the registered items.
+  std::string topic = "/introspection/" + this->dataPtr->managerId +
+      "/items_update";
+  if (!this->dataPtr->node.Advertise<gazebo::msgs::Param_V>(topic))
+  {
+    gzerr << "Error advertising topic [" << topic << "]" << std::endl;
+  }
 }
 
 //////////////////////////////////////////////////
@@ -107,6 +115,9 @@ bool IntrospectionManager::Register(const std::string &_item,
   }
 
   this->dataPtr->allItems[_item] = _cb;
+
+  this->dataPtr->itemsUpdated = true;
+
   return true;
 }
 
@@ -125,6 +136,8 @@ bool IntrospectionManager::Unregister(const std::string &_item)
   // Remove the item from the list of all items.
   this->dataPtr->allItems.erase(_item);
 
+  this->dataPtr->itemsUpdated = true;
+
   return true;
 }
 
@@ -133,6 +146,7 @@ void IntrospectionManager::Clear()
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
   this->dataPtr->allItems.clear();
+  this->dataPtr->itemsUpdated = true;
 }
 
 //////////////////////////////////////////////////
@@ -227,6 +241,33 @@ void IntrospectionManager::Update()
       gzerr << "Error publishing update for topic [" << topicName << "]"
             << std::endl;
     }
+  }
+
+  this->NotifyUpdates();
+}
+
+//////////////////////////////////////////////////
+void IntrospectionManager::NotifyUpdates()
+{
+  bool itemsUpdatedCopy;
+
+  {
+    std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+    itemsUpdatedCopy = this->dataPtr->itemsUpdated;
+    this->dataPtr->itemsUpdated = false;
+  }
+
+  if (itemsUpdatedCopy)
+  {
+    gazebo::msgs::Empty req;
+    bool result;
+    gazebo::msgs::Param_V currentItems;
+    // Prepare the list of items to be sent.
+    this->Items(req, currentItems, result);
+
+    std::string topicName = "/introspection/" + this->dataPtr->managerId +
+      "/items_update";
+    this->dataPtr->node.Publish(topicName, currentItems);
   }
 }
 
