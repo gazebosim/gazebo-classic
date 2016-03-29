@@ -418,7 +418,7 @@ void SimbodyPhysics::UpdateCollision()
   const SimTK::State &state = this->integ->getState();
 
   // The tracker cannot generate a snapshot without a subsystem
-  if(state.getNumSubsystems() == 0)
+  if (state.getNumSubsystems() == 0)
     return;
 
   // get contact snapshot
@@ -644,7 +644,7 @@ void SimbodyPhysics::UpdatePhysics()
 
   // Simbody cannot step the integrator without a subsystem
   const SimTK::State &s = this->integ->getState();
-  if(s.getNumSubsystems() == 0)
+  if (s.getNumSubsystems() == 0)
     return;
 
   bool trying = true;
