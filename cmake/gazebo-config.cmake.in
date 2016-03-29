@@ -103,6 +103,7 @@ if (GAZEBO_HAS_BULLET)
     endif()
 
     list(APPEND @PKG_NAME@_INCLUDE_DIRS ${BULLET_INCLUDE_DIRS})
+    list(APPEND @PKG_NAME@_LIBRARY_DIRS ${BULLET_LIBRARY_DIRS})
     list(APPEND @PKG_NAME@_LIBRARIES ${BULLET_LIBRARIES})
   else()
     message(FATAL_ERROR "Error: pkg-config not found.")
