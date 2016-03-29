@@ -624,6 +624,8 @@ std::string ModelDatabase::GetModelFile(const std::string &_uri)
       TiXmlElement *sdfSearch = sdfXML;
 
       // Find the SDF element that matches our current SDF version.
+      // If a match is not found, use the latest version of the element
+      // that is not older than the SDF parser.
       while (sdfSearch)
       {
         if (sdfSearch->Attribute("version"))

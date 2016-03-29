@@ -52,7 +52,7 @@ namespace gazebo
 
       /// \brief Comparison operator
       /// \param[in] _other The other version to compare to
-      /// returns true if _other version is older
+      /// returns true if _other version is newer
       public: bool operator<(const SemanticVersion &_other) const;
 
       /// \brief Comparison operator
@@ -62,12 +62,12 @@ namespace gazebo
 
       /// \brief Comparison operator
       /// \param[in] _other The other version to compare to
-      /// returns true if _other version is newer
+      /// returns true if _other version is older
       public: bool operator>(const SemanticVersion &_other) const;
 
       /// \brief Comparison operator
       /// \param[in] _other The other version to compare to
-      /// returns true if _other version is newer or equal
+      /// returns true if _other version is newer or the same
       public: bool operator>=(const SemanticVersion &_other) const;
 
       /// \brief Comparison operator
