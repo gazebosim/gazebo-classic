@@ -170,6 +170,10 @@ namespace gazebo
       /// \return A list of all the Models in the world.
       public: Model_V GetModels() const;
 
+      /// \brief Get the number of lights.
+      /// \return The number of lights in the World.
+      public: unsigned int LightCount() const;
+
       /// \brief Get a list of all the lights.
       /// \return A list of all the Lights in the world.
       public: Light_V Lights() const;

@@ -32,6 +32,12 @@
 
 ## Gazebo 7.x.x (2016-xx-xx)
 
+1. Process insertions on World::SetState
+    * [Pull request #2200](https://bitbucket.org/osrf/gazebo/pull-requests/2200)
+
+1. Process deletions on World::SetState
+    * [Pull request #2204](https://bitbucket.org/osrf/gazebo/pull-requests/2204)
+
 1. Allow dynamically adding links to a model.
     * [Pull request #2185](https://bitbucket.org/osrf/gazebo/pull-requests/2185)
 
@@ -170,15 +176,15 @@
 1. Enter time during log playback
     * [Pull request #2000](https://bitbucket.org/osrf/gazebo/pull-request/2000)
 
-1 Added Ignition Transport dependency.
+1. Added Ignition Transport dependency.
     * [Pull request #1930](https://bitbucket.org/osrf/gazebo/pull-request/1930)
 
-1 Make latched subscribers receive the message only once
+1. Make latched subscribers receive the message only once
     * [Issue #1789](https://bitbucket.org/osrf/gazebo/issue/1789)
     * [Pull request #2019](https://bitbucket.org/osrf/gazebo/pull-request/2019)
 
-1 Implemented transport clear buffers
-  * [Pull request #2017](https://bitbucket.org/osrf/gazebo/pull-request/2017)
+1. Implemented transport clear buffers
+    * [Pull request #2017](https://bitbucket.org/osrf/gazebo/pull-request/2017)
 
 1. KeyEvent constructor should be in a source file. Removed a few visibility
 flags from c functions. Windows did not like `CPPTYPE_*` in
