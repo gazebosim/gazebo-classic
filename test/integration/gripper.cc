@@ -31,9 +31,7 @@ class GripperTest : public ServerFixture
 // \brief Test to make sure the gripper forms a joint when grasping an object
 TEST_F(GripperTest, Close)
 {
-gzdbg << "A" << std::endl;
   this->Load("worlds/gripper.world");
-gzdbg << "A" << std::endl;
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
@@ -46,15 +44,11 @@ gzdbg << "A" << std::endl;
   physics::JointPtr rightJoint = model->GetJoint("palm_right_finger");
   ASSERT_TRUE(rightJoint != NULL);
 
-gzdbg << "A" << std::endl;
   physics::GripperPtr gripper = model->GetGripper(0);
-gzdbg << "A" << std::endl;
   ASSERT_TRUE(gripper != NULL);
-gzdbg << "A5" << std::endl;
 
   // The gripper should not be attached to anything
   EXPECT_FALSE(gripper->IsAttached());
-gzdbg << "A" << std::endl;
 
   // Close the gripper.
   leftJoint->SetForce(0, -0.5);
@@ -64,69 +58,50 @@ gzdbg << "A" << std::endl;
   nodePtr->Init();
   transport::PublisherPtr jointPub = nodePtr->Advertise<msgs::JointCmd>(
         "~/simple_gripper/joint_cmd");
-gzdbg << "A" << std::endl;
 
   msgs::JointCmd msg;
   msg.set_name("simple_gripper::palm_right_finger");
   msg.set_force(0.6);
   jointPub->Publish(msg);
-gzdbg << "A" << std::endl;
 
   msg.set_name("simple_gripper::palm_left_finger");
   msg.set_force(-0.6);
   jointPub->Publish(msg);
-gzdbg << "A10" << std::endl;
 
   int i = 0;
   while (!gripper->IsAttached() && i < 100)
   {
-gzdbg << "loop" << std::endl;
     common::Time::MSleep(500);
     ++i;
   }
   EXPECT_LT(i, 100);
-gzdbg << "A" << std::endl;
 
   // The gripper should be attached.
   EXPECT_TRUE(gripper->IsAttached());
-gzdbg << "end" << std::endl;
 }
 
 /////////////////////////////////////////////////
 // \brief Test grasp can close and open
 TEST_F(GripperTest, CloseOpen)
 {
-gzdbg << "A" << std::endl;
   Load("worlds/gripper.world");
-gzdbg << "A" << std::endl;
   physics::WorldPtr world = physics::get_world("default");
-gzdbg << "A" << std::endl;
   ASSERT_TRUE(world != NULL);
-gzdbg << "A" << std::endl;
 
   physics::ModelPtr model = world->GetModel("simple_gripper");
-gzdbg << "A5" << std::endl;
   ASSERT_TRUE(model != NULL);
-gzdbg << "A" << std::endl;
 
   physics::JointPtr leftJoint = model->GetJoint("palm_left_finger");
-gzdbg << "A" << std::endl;
   ASSERT_TRUE(leftJoint != NULL);
-gzdbg << "A" << std::endl;
 
   physics::JointPtr rightJoint = model->GetJoint("palm_right_finger");
-gzdbg << "A" << std::endl;
   ASSERT_TRUE(rightJoint != NULL);
-gzdbg << "A10" << std::endl;
 
   physics::GripperPtr gripper = model->GetGripper(0);
-gzdbg << "A" << std::endl;
   ASSERT_TRUE(gripper != NULL);
-gzdbg << "A" << std::endl;
 
   // The gripper should not be attached to anything
   EXPECT_FALSE(gripper->IsAttached());
-gzdbg << "A" << std::endl;
 
   // Close the gripper.
   leftJoint->SetForce(0, -0.5);
@@ -136,57 +111,46 @@ gzdbg << "A" << std::endl;
   nodePtr->Init();
   transport::PublisherPtr jointPub = nodePtr->Advertise<msgs::JointCmd>(
         "~/simple_gripper/joint_cmd");
-gzdbg << "A" << std::endl;
 
   msgs::JointCmd msg;
   msg.set_name("simple_gripper::palm_right_finger");
   msg.set_force(0.6);
   jointPub->Publish(msg);
-gzdbg << "A" << std::endl;
 
   msg.set_name("simple_gripper::palm_left_finger");
   msg.set_force(-0.6);
   jointPub->Publish(msg);
-gzdbg << "A" << std::endl;
 
   int i = 0;
   while (!gripper->IsAttached() && i < 100)
   {
-gzdbg << "loop" << std::endl;
     common::Time::MSleep(500);
     ++i;
   }
   EXPECT_LT(i, 100);
-gzdbg << "A" << std::endl;
 
   // The gripper should be attached.
   EXPECT_TRUE(gripper->IsAttached());
-gzdbg << "A" << std::endl;
 
   // Open the gripper.
   msg.set_name("simple_gripper::palm_right_finger");
   msg.set_force(-0.6);
   jointPub->Publish(msg);
-gzdbg << "A" << std::endl;
 
   msg.set_name("simple_gripper::palm_left_finger");
   msg.set_force(0.6);
   jointPub->Publish(msg);
-gzdbg << "A" << std::endl;
 
   i = 0;
   while (gripper->IsAttached() && i < 100)
   {
-gzdbg << "loop" << std::endl;
     common::Time::MSleep(500);
     ++i;
   }
   EXPECT_LT(i, 100);
-gzdbg << "A" << std::endl;
 
   // The gripper should release the box.
   EXPECT_FALSE(gripper->IsAttached());
-gzdbg << "end" << std::endl;
 }
 
 /////////////////////////////////////////////////

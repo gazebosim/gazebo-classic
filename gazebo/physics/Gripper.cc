@@ -80,6 +80,7 @@ void Gripper::Load(sdf::ElementPtr _sdf)
   this->name = _sdf->Get<std::string>("name");
   this->fixedJoint =
       this->world->GetPhysicsEngine()->CreateJoint("fixed", this->model);
+  this->fixedJoint->SetName(this->model->GetName() + "__gripper_fixed_joint__");
 
   sdf::ElementPtr graspCheck = _sdf->GetElement("grasp_check");
   this->minContactCount = graspCheck->Get<unsigned int>("min_contact_count");
@@ -244,7 +245,6 @@ void Gripper::HandleAttach()
 /////////////////////////////////////////////////
 void Gripper::HandleDetach()
 {
-gzdbg << "Gripper::HandleDetach" << std::endl;
   this->attached = false;
   this->fixedJoint->Detach();
 }

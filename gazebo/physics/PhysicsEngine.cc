@@ -88,8 +88,6 @@ void PhysicsEngine::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void PhysicsEngine::Fini()
 {
-  this->world.reset();
-
   // Clean up transport
   {
     this->responsePub.reset();
@@ -115,6 +113,8 @@ void PhysicsEngine::Fini()
     delete this->physicsUpdateMutex;
     this->physicsUpdateMutex = NULL;
   }
+
+  this->world.reset();
 }
 
 //////////////////////////////////////////////////
