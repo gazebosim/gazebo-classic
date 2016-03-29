@@ -37,6 +37,7 @@ if (HAVE_UUID)
 endif()
 
 set (plugins
+  ActorPlugin
   ActuatorPlugin
   ArrangePlugin
   BreakableJointPlugin

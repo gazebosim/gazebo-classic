@@ -968,6 +968,21 @@ void MainWindow::ShowLinkFrame()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::ShowSkeleton()
+{
+  if (g_showSkeletonAct->isChecked())
+  {
+    transport::requestNoReply(this->dataPtr->node->GetTopicNamespace(),
+        "show_skeleton", "all");
+  }
+  else
+  {
+    transport::requestNoReply(this->dataPtr->node->GetTopicNamespace(),
+        "hide_skeleton", "all");
+  }
+}
+
+/////////////////////////////////////////////////
 void MainWindow::ShowContacts()
 {
   if (g_showContactsAct->isChecked())
@@ -1303,6 +1318,13 @@ void MainWindow::CreateActions()
   g_showLinkFrameAct->setChecked(false);
   connect(g_showLinkFrameAct, SIGNAL(triggered()), this,
       SLOT(ShowLinkFrame()));
+
+  g_showSkeletonAct = new QAction(tr("Skeletons"), this);
+  g_showSkeletonAct->setStatusTip(tr("Show skeletons"));
+  g_showSkeletonAct->setCheckable(true);
+  g_showSkeletonAct->setChecked(false);
+  connect(g_showSkeletonAct, SIGNAL(triggered()), this,
+      SLOT(ShowSkeleton()));
 
   g_showContactsAct = new QAction(tr("Contacts"), this);
   g_showContactsAct->setStatusTip(tr("Show Contacts"));
@@ -1724,6 +1746,9 @@ void MainWindow::DeleteActions()
   delete g_showLinkFrameAct;
   g_showLinkFrameAct = 0;
 
+  delete g_showSkeletonAct;
+  g_showSkeletonAct = 0;
+
   delete g_showContactsAct;
   g_showContactsAct = 0;
 
@@ -1841,6 +1866,7 @@ void MainWindow::CreateMenuBar()
   viewMenu->addAction(g_showInertiaAct);
   viewMenu->addAction(g_showContactsAct);
   viewMenu->addAction(g_showLinkFrameAct);
+  viewMenu->addAction(g_showSkeletonAct);
 
   QMenu *windowMenu = bar->addMenu(tr("&Window"));
   windowMenu->addAction(g_topicVisAct);
@@ -2380,6 +2406,7 @@ void MainWindow::OnWindowMode(const std::string &_mode)
   g_showCOMAct->setVisible(simOrLog);
   g_showInertiaAct->setVisible(simOrLog);
   g_showLinkFrameAct->setVisible(simOrLog);
+  g_showSkeletonAct->setVisible(simOrLog);
   g_showContactsAct->setVisible(simOrLog);
   g_showJointsAct->setVisible(simOrLog);
 
