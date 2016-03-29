@@ -38,8 +38,8 @@ ImageFrame::~ImageFrame()
 /////////////////////////////////////////////////
 void ImageFrame::paintEvent(QPaintEvent * /*_event*/)
 {
-  QPainter painter(this);
   boost::mutex::scoped_lock lock(this->dataPtr->mutex);
+  QPainter painter(this);
 
   if (!this->dataPtr->image.isNull())
   {
@@ -83,13 +83,7 @@ void ImageFrame::OnImage(const msgs::Image &_msg)
   }
 
   // Store the image data
-  const char *buffer = _msg.data().c_str();
-  for (int i = 0; i < this->dataPtr->image.height(); ++i)
-  {
-    memcpy(this->dataPtr->image.scanLine(i),
-        buffer + i*this->dataPtr->image.bytesPerLine(),
-        this->dataPtr->image.bytesPerLine());
-  }
+  memcpy(this->dataPtr->image.bits(), rgbData, rgbDataSize);
 
   this->update();
   delete [] rgbData;
