@@ -1760,7 +1760,7 @@ void ModelCreator::OnDelete(const std::string &_entity)
     // Register command
     auto cmd = this->dataPtr->userCmdManager->NewCmd(
         "Delete [" + link->second->GetName() + "]", MEUserCmd::DELETING_LINK);
-    cmd->SetSDF(link->second->linkSDF);
+    cmd->SetSDF(this->GenerateLinkSDF(link->second));
     cmd->SetScopedName(link->second->linkVisual->GetName());
   }
 
@@ -1939,7 +1939,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
       auto cmd = this->dataPtr->userCmdManager->NewCmd(
           "Insert [" + link->GetName() + "]",
           MEUserCmd::INSERTING_LINK);
-      cmd->SetSDF(link->linkSDF);
+      cmd->SetSDF(this->GenerateLinkSDF(link));
       cmd->SetScopedName(link->linkVisual->GetName());
     }
     else
