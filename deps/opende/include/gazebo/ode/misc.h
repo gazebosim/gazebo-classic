@@ -25,7 +25,7 @@
 #ifndef _ODE_MISC_H_
 #define _ODE_MISC_H_
 
-#include <ode/common.h>
+#include <gazebo/ode/common.h>
 
 
 #ifdef __cplusplus

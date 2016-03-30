@@ -45,6 +45,10 @@ namespace gazebo
       public: transport::PublisherPtr modelPub;
       public: transport::PublisherPtr scenePub;
       public: transport::PublisherPtr physicsPub;
+
+      /// \brief Publisher for atmosphere messages.
+      public: transport::PublisherPtr atmospherePub;
+
       public: transport::PublisherPtr lightPub;
 
       public: transport::SubscriberPtr responseSub;
@@ -58,6 +62,9 @@ namespace gazebo
 
       /// \brief Physics tree item.
       public: QTreeWidgetItem *physicsItem;
+
+      /// \brief Atmosphere tree item.
+      public: QTreeWidgetItem *atmosphereItem;
 
       /// \brief Models tree item.
       public: QTreeWidgetItem *modelsItem;
@@ -94,6 +101,10 @@ namespace gazebo
       public: msgs::Scene sceneMsg;
       public: msgs::Joint jointMsg;
       public: msgs::Physics physicsMsg;
+
+      /// \brief Keep latest atmosphere message.
+      public: msgs::Atmosphere atmosphereMsg;
+
       public: msgs::Light lightMsg;
       public: msgs::SphericalCoordinates sphericalCoordMsg;
 
@@ -104,6 +115,9 @@ namespace gazebo
 
       /// \brief Type of physics engine.
       public: msgs::Physics_Type physicsType;
+
+      /// \brief Type of atmosphere model.
+      public: msgs::Atmosphere_Type atmosphereType;
     };
   }
 }

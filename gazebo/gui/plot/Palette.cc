@@ -15,6 +15,7 @@
  *
 */
 
+#include <mutex>
 #include <set>
 #include <string>
 #include <vector>
@@ -398,6 +399,9 @@ class gazebo::gui::PalettePrivate
 
   /// \brief Communication node.
   public: ignition::transport::Node node;
+
+  /// \brief Mutex to protect the models model update.
+  public: std::mutex modelsMutex;
 };
 
 /////////////////////////////////////////////////
@@ -493,6 +497,7 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   searchIcon->setPixmap(QPixmap(":/images/search.svg"));
 
   auto searchEdit = new QLineEdit();
+  searchEdit->setPlaceholderText("Start typing to search...");
   searchEdit->setObjectName("plotLineEdit");
   this->connect(searchEdit, SIGNAL(textChanged(QString)), this,
       SLOT(UpdateSearch(QString)));
@@ -723,6 +728,8 @@ void Palette::OnIntrospectionUpdate(const gazebo::msgs::Param_V &_msg)
 void Palette::OnIntrospectionUpdate(const std::set<std::string> &_items,
     const bool _result)
 {
+  std::lock_guard<std::mutex> lock(this->dataPtr->modelsMutex);
+
   if (!_result || _items.empty())
   {
     gzerr << "Failure in introspection items update" << std::endl;
@@ -776,7 +783,8 @@ void Palette::OnIntrospectionUpdate(const std::set<std::string> &_items,
         // Check top level (model)
         if (!previousItem)
         {
-          auto modelList = this->dataPtr->modelsModel->findItems(nextPart.c_str());
+          auto modelList =
+            this->dataPtr->modelsModel->findItems(nextPart.c_str());
           if (!modelList.isEmpty())
             existingItem = modelList[0];
         }

@@ -170,8 +170,6 @@ void IntrospectionManager::Update()
   std::map<std::string, IntrospectionFilter> filtersCopy;
   std::map<std::string, std::function <gazebo::msgs::Any ()>> allItemsCopy;
   std::map<std::string, ObservedItem> observedItemsCopy;
-  bool itemsUpdatedCopy;
-  gazebo::msgs::Param_V currentItems;
 
   {
     std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
@@ -182,16 +180,6 @@ void IntrospectionManager::Update()
     filtersCopy = this->dataPtr->filters;
     allItemsCopy = this->dataPtr->allItems;
     observedItemsCopy = this->dataPtr->observedItems;
-    itemsUpdatedCopy = this->dataPtr->itemsUpdated;
-    this->dataPtr->itemsUpdated = false;
-  }
-
-  if (itemsUpdatedCopy)
-  {
-    gazebo::msgs::Empty req;
-    bool result;
-    // Prepare the list of items to be sent.
-    this->Items(req, currentItems, result);
   }
 
   for (auto &observedItem : observedItemsCopy)
@@ -255,9 +243,28 @@ void IntrospectionManager::Update()
     }
   }
 
-  // Notify that there was a change in the registered items.
+  this->NotifyUpdates();
+}
+
+//////////////////////////////////////////////////
+void IntrospectionManager::NotifyUpdates()
+{
+  bool itemsUpdatedCopy;
+
+  {
+    std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+    itemsUpdatedCopy = this->dataPtr->itemsUpdated;
+    this->dataPtr->itemsUpdated = false;
+  }
+
   if (itemsUpdatedCopy)
   {
+    gazebo::msgs::Empty req;
+    bool result;
+    gazebo::msgs::Param_V currentItems;
+    // Prepare the list of items to be sent.
+    this->Items(req, currentItems, result);
+
     std::string topicName = "/introspection/" + this->dataPtr->managerId +
       "/items_update";
     this->dataPtr->node.Publish(topicName, currentItems);
