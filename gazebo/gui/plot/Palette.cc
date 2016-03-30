@@ -345,7 +345,7 @@ class SearchModel : public QSortFilterProxyModel
       if (this->filterAcceptsRowItself(i, _srcParent, _word))
         return true;
 
-      // Check gradchildren
+      // Check grandchildren
       auto item = this->sourceModel()->index(i, 0, _srcParent);
       if (this->hasChildAcceptsItself(item, _word))
         return true;
@@ -447,6 +447,10 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   topicsTree->setDragDropMode(QAbstractItemView::DragOnly);
 
   // The model that will hold data to be displayed in the model tree view
+  this->connect(
+      this, SIGNAL(IntrospectionUpdateSignal(const std::set<std::string>)),
+      this, SLOT(IntrospectionUpdateSlot(const std::set<std::string>)));
+
   this->dataPtr->modelsModel = new PlotItemModel;
   this->dataPtr->modelsModel->setObjectName("plotModelsModel");
   this->dataPtr->modelsModel->setParent(this);
@@ -721,20 +725,29 @@ void Palette::OnIntrospectionUpdate(const gazebo::msgs::Param_V &_msg)
 
     items.insert(param.value().string_value());
   }
-  this->OnIntrospectionUpdate(items, true);
+
+  // Process in the Qt thread
+  this->IntrospectionUpdateSignal(items);
 }
 
 /////////////////////////////////////////////////
 void Palette::OnIntrospectionUpdate(const std::set<std::string> &_items,
     const bool _result)
 {
-  std::lock_guard<std::mutex> lock(this->dataPtr->modelsMutex);
-
   if (!_result || _items.empty())
   {
     gzerr << "Failure in introspection items update" << std::endl;
     return;
   }
+
+  // Process in the Qt thread
+  this->IntrospectionUpdateSignal(_items);
+}
+
+/////////////////////////////////////////////////
+void Palette::IntrospectionUpdateSlot(const std::set<std::string> &_items)
+{
+  std::lock_guard<std::mutex> lock(this->dataPtr->modelsMutex);
 
   this->dataPtr->modelsModel->clear();
 
