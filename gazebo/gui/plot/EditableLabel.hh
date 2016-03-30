@@ -49,16 +49,6 @@ namespace gazebo
       /// \return Label string.
       public: std::string Text() const;
 
-      /// \brief Set whether to show border.
-      /// \param[in] _show True to show border.
-      public: void ShowBorder(const bool _show);
-
-      /// \brief Used to filter mouse hover events.
-      /// \param[in] _o Object that receives the event.
-      /// \param[in] _event Pointer to the event.
-      /// \return True if event was handled.
-      protected: virtual bool eventFilter(QObject *_o, QEvent *_event);
-
       /// \brief Qt mouse double click event.
       /// \param[in] _event Qt mouse event
       protected: virtual void mouseDoubleClickEvent(QMouseEvent *_event);
