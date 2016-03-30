@@ -25,7 +25,7 @@ using namespace gazebo;
 class RandTest : public ::testing::Test { };
 
 //////////////////////////////////////////////////
-TEST(RandTest, Rand1)
+TEST_F(RandTest, Rand1)
 {
   double d;
   int i;
@@ -37,7 +37,7 @@ TEST(RandTest, Rand1)
 }
 
 //////////////////////////////////////////////////
-TEST(RandTest, Rand2)
+TEST_F(RandTest, Rand2)
 {
   double d;
   int i;
