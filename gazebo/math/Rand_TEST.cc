@@ -31,7 +31,7 @@ TEST(RandTest, Rand1)
   int i;
   // TODO: implement a proper random number generator test
 
-  d = gazebo::math::Rand::DblUniform(1, 2);
+  d = gazebo::math::Rand::GetDblUniform(1, 2);
   EXPECT_LE(d, 2);
   EXPECT_GE(d, 1.5);
 }
@@ -43,7 +43,7 @@ TEST(RandTest, Rand2)
   int i;
   // TODO: implement a proper random number generator test
 
-  d = gazebo::math::Rand::DblUniform(1, 2);
+  d = gazebo::math::Rand::GetDblUniform(1, 2);
   EXPECT_LE(d, 2);
   EXPECT_GE(d, 1.5);
 }
