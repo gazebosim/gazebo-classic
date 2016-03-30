@@ -19,8 +19,10 @@
  * LICENSE.TXT and LICENSE-BSD.TXT for more details.                     *
  *                                                                       *
  *************************************************************************/
+#ifdef __GNUC__
 #pragma GCC diagnostic ignored "-Wcomment"
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif
 
 /*
 
@@ -31,11 +33,11 @@ dContactGeom::g1 and dContactGeom::g2.
 
 */
 
-#include <ode/common.h>
-#include <ode/collision.h>
-#include <ode/matrix.h>
-#include <ode/rotation.h>
-#include <ode/odemath.h>
+#include <gazebo/ode/common.h>
+#include <gazebo/ode/collision.h>
+#include <gazebo/ode/matrix.h>
+#include <gazebo/ode/rotation.h>
+#include <gazebo/ode/odemath.h>
 #include "config.h"
 #include "collision_kernel.h"
 #include "collision_std.h"

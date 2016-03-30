@@ -20,9 +20,9 @@
 
 #include <memory>
 #include <string>
+#include <utility>
+#include <vector>
 #include <sdf/sdf.hh>
-
-#include "gazebo/common/SingletonT.hh"
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/UserCmdHistory.hh"
@@ -96,13 +96,12 @@ namespace gazebo
 
       /// \internal
       /// \brief Pointer to private data.
-      protected: std::shared_ptr<MEUserCmdPrivate> dataPtr;
+      protected: std::unique_ptr<MEUserCmdPrivate> dataPtr;
     };
 
     /// \brief Class which manages user commands in the model editor. It
     /// combines features of gui::UserCmdHistory and physics::UserCmdManager.
-    class GZ_GUI_VISIBLE MEUserCmdManager : public UserCmdHistory,
-        public SingletonT<MEUserCmdManager>
+    class GZ_GUI_VISIBLE MEUserCmdManager : public UserCmdHistory
     {
       Q_OBJECT
 
@@ -127,27 +126,26 @@ namespace gazebo
       /// \param[in] _action Action corresponding to the command.
       private slots: void OnUndoCommand(QAction *_action);
 
-      /// \brief Qt callback when the undo history button is pressed.
-      /// It opens the undo history menu.
-      private slots: void OnUndoCmdHistory();
-
       /// \brief Qt callback to redo a command.
       /// \param[in] _action Action corresponding to the command.
       private slots: void OnRedoCommand(QAction *_action);
 
-      /// \brief Qt callback when the redo history button is pressed.
-      /// It opens the redo history menu.
-      private slots: void OnRedoCmdHistory();
+      /// \brief Whether there are commands for undo or not.
+      /// \return True if there are.
+      private: virtual bool HasUndo() const;
 
-      /// \brief Updates the widgets according to the user commands available.
-      private slots: virtual void OnStatsSlot();
+      /// \brief Whether there are commands for redo or not.
+      /// \return True if there are.
+      private: virtual bool HasRedo() const;
 
-      /// \brief This is a singleton class.
-      private: friend class SingletonT<MEUserCmdManager>;
+      /// \brief Get the list of commands.
+      /// \return True if there are.
+      private: virtual std::vector<std::pair<unsigned int, std::string>>
+          Cmds(const bool _undo) const;
 
       /// \internal
       /// \brief Pointer to private data.
-      private: std::shared_ptr<MEUserCmdManagerPrivate> dataPtr;
+      private: std::unique_ptr<MEUserCmdManagerPrivate> dataPtr;
     };
   }
 }

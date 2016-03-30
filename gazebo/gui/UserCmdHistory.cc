@@ -39,11 +39,11 @@ UserCmdHistory::UserCmdHistory()
   this->dataPtr->active = true;
 
   // Action groups
-  this->undoActions = new QActionGroup(this);
-  this->undoActions->setExclusive(false);
+  this->dataPtr->undoActions = new QActionGroup(this);
+  this->dataPtr->undoActions->setExclusive(false);
 
-  this->redoActions = new QActionGroup(this);
-  this->redoActions->setExclusive(false);
+  this->dataPtr->redoActions = new QActionGroup(this);
+  this->dataPtr->redoActions->setExclusive(false);
 
   // Pub / sub
   this->dataPtr->node = transport::NodePtr(new transport::Node());
@@ -65,14 +65,14 @@ UserCmdHistory::UserCmdHistory()
   connect(g_redoHistoryAct, SIGNAL(triggered()), this,
       SLOT(OnRedoCmdHistory()));
 
-  connect(this->undoActions, SIGNAL(triggered(QAction *)), this,
+  connect(this->dataPtr->undoActions, SIGNAL(triggered(QAction *)), this,
       SLOT(OnUndoCommand(QAction *)));
-  connect(this->undoActions, SIGNAL(hovered(QAction *)), this,
+  connect(this->dataPtr->undoActions, SIGNAL(hovered(QAction *)), this,
       SLOT(OnUndoHovered(QAction *)));
 
-  connect(this->redoActions, SIGNAL(triggered(QAction *)), this,
+  connect(this->dataPtr->redoActions, SIGNAL(triggered(QAction *)), this,
       SLOT(OnRedoCommand(QAction *)));
-  connect(this->redoActions, SIGNAL(hovered(QAction *)), this,
+  connect(this->dataPtr->redoActions, SIGNAL(hovered(QAction *)), this,
       SLOT(OnRedoHovered(QAction *)));
 }
 
@@ -112,8 +112,11 @@ void UserCmdHistory::OnUndoCommand(QAction *_action)
 /////////////////////////////////////////////////
 void UserCmdHistory::OnUndoHovered(QAction *_action)
 {
+  if (!this->dataPtr->active)
+    return;
+
   bool beforeThis = true;
-  for (auto action : this->undoActions->actions())
+  for (auto action : this->dataPtr->undoActions->actions())
   {
     action->blockSignals(true);
     action->setChecked(beforeThis);
@@ -153,8 +156,11 @@ void UserCmdHistory::OnRedoCommand(QAction *_action)
 /////////////////////////////////////////////////
 void UserCmdHistory::OnRedoHovered(QAction *_action)
 {
+  if (!this->dataPtr->active)
+    return;
+
   bool beforeThis = true;
-  for (auto action : this->redoActions->actions())
+  for (auto action : this->dataPtr->redoActions->actions())
   {
     action->blockSignals(true);
     action->setChecked(beforeThis);
@@ -177,61 +183,90 @@ void UserCmdHistory::OnUserCmdStatsMsg(ConstUserCmdStatsPtr &_msg)
 /////////////////////////////////////////////////
 void UserCmdHistory::OnStatsSlot()
 {
-  g_undoAct->setEnabled(this->dataPtr->msg.undo_cmd_count() > 0);
-  g_redoAct->setEnabled(this->dataPtr->msg.redo_cmd_count() > 0);
-  g_undoHistoryAct->setEnabled(this->dataPtr->msg.undo_cmd_count() > 0);
-  g_redoHistoryAct->setEnabled(this->dataPtr->msg.redo_cmd_count() > 0);
+  if (!this->dataPtr->active)
+    return;
+
+  g_undoAct->setEnabled(this->HasUndo());
+  g_redoAct->setEnabled(this->HasRedo());
+  g_undoHistoryAct->setEnabled(this->HasUndo());
+  g_redoHistoryAct->setEnabled(this->HasRedo());
+}
+
+/////////////////////////////////////////////////
+bool UserCmdHistory::HasUndo() const
+{
+  return this->dataPtr->msg.undo_cmd_count() > 0;
+}
+
+/////////////////////////////////////////////////
+bool UserCmdHistory::HasRedo() const
+{
+  return this->dataPtr->msg.redo_cmd_count() > 0;
+}
+
+/////////////////////////////////////////////////
+std::vector<std::pair<unsigned int, std::string>>
+    UserCmdHistory::Cmds(const bool _undo) const
+{
+  auto cmds = this->dataPtr->msg.undo_cmd();
+
+  if (!_undo)
+    cmds = this->dataPtr->msg.redo_cmd();
+
+  std::vector<std::pair<unsigned int, std::string>> result;
+  for (auto cmd : cmds)
+  {
+    result.push_back(std::pair<unsigned int, std::string>(
+        cmd.id(), cmd.description()));
+  }
+
+  return result;
 }
 
 /////////////////////////////////////////////////
 void UserCmdHistory::OnUndoCmdHistory()
 {
-  if (!this->dataPtr->active)
-    return;
-
-  // Clear undo action group
-  for (auto action : this->undoActions->actions())
-  {
-    this->undoActions->removeAction(action);
-  }
-
-  // Create new menu
-  QMenu menu;
-  for (auto cmd : boost::adaptors::reverse(this->dataPtr->msg.undo_cmd()))
-  {
-    QAction *action = new QAction(QString::fromStdString(cmd.description()),
-        this);
-    action->setData(QVariant(cmd.id()));
-    action->setCheckable(true);
-    menu.addAction(action);
-    this->undoActions->addAction(action);
-  }
-
-  menu.exec(QCursor::pos());
+  this->OnCmdHistory(true);
 }
 
 /////////////////////////////////////////////////
 void UserCmdHistory::OnRedoCmdHistory()
 {
+  this->OnCmdHistory(false);
+}
+
+/////////////////////////////////////////////////
+void UserCmdHistory::OnCmdHistory(const bool _undo)
+{
   if (!this->dataPtr->active)
     return;
 
-  // Clear redo action group
-  for (auto action : this->redoActions->actions())
+  // Clear action group
+  if (_undo)
   {
-    this->redoActions->removeAction(action);
+    for (auto action : this->dataPtr->undoActions->actions())
+      this->dataPtr->undoActions->removeAction(action);
+  }
+  else
+  {
+    for (auto action : this->dataPtr->redoActions->actions())
+      this->dataPtr->redoActions->removeAction(action);
   }
 
   // Create new menu
   QMenu menu;
-  for (auto cmd : boost::adaptors::reverse(this->dataPtr->msg.redo_cmd()))
+  auto cmds = this->Cmds(_undo);
+  for (auto cmd = cmds.rbegin(); cmd != cmds.rend(); ++cmd)
   {
-    QAction *action = new QAction(QString::fromStdString(cmd.description()),
-        this);
-    action->setData(QVariant(cmd.id()));
+    auto action = new QAction(QString::fromStdString((*cmd).second), this);
+    action->setData(QVariant((*cmd).first));
     action->setCheckable(true);
     menu.addAction(action);
-    this->redoActions->addAction(action);
+
+    if (_undo)
+      this->dataPtr->undoActions->addAction(action);
+    else
+      this->dataPtr->redoActions->addAction(action);
   }
 
   menu.exec(QCursor::pos());

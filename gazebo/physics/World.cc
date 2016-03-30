@@ -70,6 +70,8 @@
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/PhysicsFactory.hh"
+#include "gazebo/physics/Atmosphere.hh"
+#include "gazebo/physics/AtmosphereFactory.hh"
 #include "gazebo/physics/PresetManager.hh"
 #include "gazebo/physics/UserCmdManager.hh"
 #include "gazebo/physics/Model.hh"
@@ -112,6 +114,8 @@ World::World(const std::string &_name)
   this->dataPtr->sdf.reset(new sdf::Element);
   sdf::initFile("world.sdf", this->dataPtr->sdf);
 
+  // Keep this in the constructor for performance.
+  // sdf::initFile causes disk access.
   this->dataPtr->factorySDF.reset(new sdf::SDF);
   sdf::initFile("root.sdf", this->dataPtr->factorySDF);
 
@@ -141,6 +145,7 @@ World::World(const std::string &_name)
   this->dataPtr->resetTimeOnly = false;
   this->dataPtr->resetModelOnly = false;
   this->dataPtr->enablePhysicsEngine = true;
+  this->dataPtr->enableAtmosphere = true;
   this->dataPtr->setWorldPoseMutex = new boost::mutex();
   this->dataPtr->worldUpdateMutex = new boost::recursive_mutex();
 
@@ -272,6 +277,18 @@ void World::Load(sdf::ElementPtr _sdf)
     gzthrow("Unable to create physics engine\n");
 
   this->dataPtr->physicsEngine->Load(physicsElem);
+
+  // This should come after loading physics engine
+  sdf::ElementPtr atmosphereElem = this->dataPtr->sdf->GetElement("atmosphere");
+
+  type = atmosphereElem->Get<std::string>("type");
+  this->dataPtr->atmosphere = AtmosphereFactory::NewAtmosphere(type,
+      shared_from_this());
+
+  if (this->dataPtr->atmosphere == NULL)
+    gzerr << "Unable to create atmosphere model\n";
+
+  this->dataPtr->atmosphere->Load(atmosphereElem);
 
   // This should also come before loading of entities
   {
@@ -880,6 +897,12 @@ PhysicsEnginePtr World::GetPhysicsEngine() const
 }
 
 //////////////////////////////////////////////////
+AtmospherePtr World::Atmosphere() const
+{
+  return this->dataPtr->atmosphere;
+}
+
+//////////////////////////////////////////////////
 PresetManagerPtr World::GetPresetManager() const
 {
   return this->dataPtr->presetManager;
@@ -1095,6 +1118,12 @@ void World::LoadEntities(sdf::ElementPtr _sdf, BasePtr _parent)
 unsigned int World::GetModelCount() const
 {
   return this->dataPtr->models.size();
+}
+
+//////////////////////////////////////////////////
+unsigned int World::LightCount() const
+{
+  return this->dataPtr->lights.size();
 }
 
 //////////////////////////////////////////////////
@@ -1889,6 +1918,13 @@ void World::ProcessFactoryMsgs()
 
         sdf::ElementPtr elem = this->dataPtr->factorySDF->Root()->Clone();
 
+        if (!elem)
+        {
+          gzerr << "Invalid SDF:";
+          this->dataPtr->factorySDF->Root()->PrintValues("");
+          continue;
+        }
+
         if (elem->HasElement("world"))
           elem = elem->GetElement("world");
 
@@ -1910,13 +1946,6 @@ void World::ProcessFactoryMsgs()
         else
         {
           gzerr << "Unable to find a model, light, or actor in:\n";
-          this->dataPtr->factorySDF->Root()->PrintValues("");
-          continue;
-        }
-
-        if (!elem)
-        {
-          gzerr << "Invalid SDF:";
           this->dataPtr->factorySDF->Root()->PrintValues("");
           continue;
         }
@@ -2015,7 +2044,88 @@ void World::SetState(const WorldState &_state)
   this->dataPtr->logRealTime = _state.GetRealTime();
   this->dataPtr->iterations = _state.GetIterations();
 
-  // Models
+  // Insertions (adapted from ProcessFactoryMsgs)
+  auto insertions = _state.Insertions();
+  for (auto const &insertion : insertions)
+  {
+    this->dataPtr->factorySDF->Root()->ClearElements();
+
+    // SDF Parsing happens here
+    if (!sdf::readString(insertion, this->dataPtr->factorySDF))
+    {
+      gzerr << "Unable to read sdf string[" << insertion << "]" << std::endl;
+      continue;
+    }
+
+    // Get entity being inserted
+    bool isModel = false;
+    bool isLight = false;
+
+    auto elem = this->dataPtr->factorySDF->Root()->Clone();
+
+    if (!elem)
+    {
+      gzerr << "Invalid SDF:" << std::endl;
+      this->dataPtr->factorySDF->Root()->PrintValues("");
+      continue;
+    }
+
+    if (elem->HasElement("world"))
+      elem = elem->GetElement("world");
+
+    if (elem->HasElement("model"))
+    {
+      elem = elem->GetElement("model");
+      isModel = true;
+    }
+    else if (elem->HasElement("light"))
+    {
+      elem = elem->GetElement("light");
+      isLight = true;
+    }
+    else
+    {
+      gzerr << "Unable to find a model or light in:" << std::endl;
+      this->dataPtr->factorySDF->Root()->PrintValues("");
+      continue;
+    }
+
+    elem->SetParent(this->dataPtr->sdf);
+    elem->GetParent()->InsertElement(elem);
+
+    if (isModel)
+    {
+      try
+      {
+        boost::mutex::scoped_lock lock(this->dataPtr->factoryDeleteMutex);
+
+        ModelPtr model = this->LoadModel(elem, this->dataPtr->rootElement);
+        model->Init();
+        model->LoadPlugins();
+      }
+      catch(...)
+      {
+        gzerr << "Loading model from world state insertion failed" <<
+            std::endl;
+      }
+    }
+    else if (isLight)
+    {
+      try
+      {
+        boost::mutex::scoped_lock lock(this->dataPtr->factoryDeleteMutex);
+
+        LightPtr light = this->LoadLight(elem, this->dataPtr->rootElement);
+      }
+      catch(...)
+      {
+        gzerr << "Loading light from world state insertion failed." <<
+            std::endl;
+      }
+    }
+  }
+
+  // Model updates
   const ModelState_M modelStates = _state.GetModelStates();
   for (auto const &modelState : modelStates)
   {
@@ -2026,7 +2136,7 @@ void World::SetState(const WorldState &_state)
       gzerr << "Unable to find model[" << modelState.second.GetName() << "]\n";
   }
 
-  // Lights
+  // Light updates
   const LightState_M lightStates = _state.LightStates();
   for (auto const &lightState : lightStates)
   {
@@ -2038,6 +2148,14 @@ void World::SetState(const WorldState &_state)
       gzerr << "Unable to find light[" << lightState.second.GetName() << "]"
             << std::endl;
     }
+  }
+
+  // Deletions
+  auto deletions = _state.Deletions();
+  for (auto const &deletion : deletions)
+  {
+    // This works for models and lights
+    this->RemoveModel(deletion);
   }
 }
 
@@ -2585,6 +2703,18 @@ bool World::GetEnablePhysicsEngine()
 void World::EnablePhysicsEngine(bool _enable)
 {
   this->dataPtr->enablePhysicsEngine = _enable;
+}
+
+/////////////////////////////////////////////////
+bool World::AtmosphereEnabled() const
+{
+  return this->dataPtr->enableAtmosphere;
+}
+
+/////////////////////////////////////////////////
+void World::SetAtmosphereEnabled(const bool _enable)
+{
+  this->dataPtr->enableAtmosphere = _enable;
 }
 
 /////////////////////////////////////////////////

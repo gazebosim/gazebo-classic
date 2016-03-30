@@ -15,8 +15,6 @@
  *
 */
 
-#include <boost/range/adaptor/reversed.hpp>
-
 #include "gazebo/transport/Node.hh"
 
 #include "gazebo/gui/Actions.hh"
@@ -179,22 +177,7 @@ MEUserCmdManager::MEUserCmdManager()
 
   this->dataPtr->idCounter = 0;
 
-  // Action groups
-  this->undoActions = new QActionGroup(this);
-  this->undoActions->setExclusive(false);
-
-  this->redoActions = new QActionGroup(this);
-  this->redoActions->setExclusive(false);
-
-  connect(this->undoActions, SIGNAL(triggered(QAction *)), this,
-      SLOT(OnUndoCommand(QAction *)));
-  connect(this->undoActions, SIGNAL(hovered(QAction *)), this,
-      SLOT(OnUndoHovered(QAction *)));
-
-  connect(this->redoActions, SIGNAL(triggered(QAction *)), this,
-      SLOT(OnRedoCommand(QAction *)));
-  connect(this->redoActions, SIGNAL(hovered(QAction *)), this,
-      SLOT(OnRedoHovered(QAction *)));
+  this->SetActive(false);
 }
 
 /////////////////////////////////////////////////
@@ -248,16 +231,17 @@ void MEUserCmdManager::OnUndoCommand(QAction *_action)
   }
 
   // Undo all commands up to the desired one
-  for (auto cmdIt : boost::adaptors::reverse(this->dataPtr->undoCmds))
+  for (auto cmdIt = this->dataPtr->undoCmds.rbegin();
+      cmdIt != this->dataPtr->undoCmds.rend(); ++cmdIt)
   {
     // Undo it
-    cmdIt->Undo();
+    (*cmdIt)->Undo();
 
     // Transfer to the redo list
+    this->dataPtr->redoCmds.push_back(*cmdIt);
     this->dataPtr->undoCmds.pop_back();
-    this->dataPtr->redoCmds.push_back(cmdIt);
 
-    if (cmdIt == cmd)
+    if ((*cmdIt) == cmd)
       break;
   }
 
@@ -303,16 +287,17 @@ void MEUserCmdManager::OnRedoCommand(QAction *_action)
   }
 
   // Redo all commands up to the desired one
-  for (auto cmdIt : boost::adaptors::reverse(this->dataPtr->redoCmds))
+  for (auto cmdIt = this->dataPtr->redoCmds.rbegin();
+      cmdIt != this->dataPtr->redoCmds.rend(); ++cmdIt)
   {
     // Redo it
-    cmdIt->Redo();
+    (*cmdIt)->Redo();
 
     // Transfer to the undo list
+    this->dataPtr->undoCmds.push_back(*cmdIt);
     this->dataPtr->redoCmds.pop_back();
-    this->dataPtr->undoCmds.push_back(cmdIt);
 
-    if (cmdIt == cmd)
+    if ((*cmdIt) == cmd)
       break;
   }
 
@@ -342,77 +327,34 @@ MEUserCmdPtr MEUserCmdManager::NewCmd(
 }
 
 /////////////////////////////////////////////////
-void MEUserCmdManager::OnStatsSlot()
+bool MEUserCmdManager::HasUndo() const
 {
-  g_undoAct->setEnabled(this->dataPtr->undoCmds.size() > 0);
-  g_redoAct->setEnabled(this->dataPtr->redoCmds.size() > 0);
-  g_undoHistoryAct->setEnabled(this->dataPtr->undoCmds.size() > 0);
-  g_redoHistoryAct->setEnabled(this->dataPtr->redoCmds.size() > 0);
+  return !this->dataPtr->undoCmds.empty();
 }
 
 /////////////////////////////////////////////////
-void MEUserCmdManager::OnUndoCmdHistory()
+bool MEUserCmdManager::HasRedo() const
 {
-  if (!this->Active())
-    return;
-
-  if (!this->undoActions)
-  {
-    gzerr << "No undo actions" << std::endl;
-    return;
-  }
-  // Clear undo action group
-  for (auto action : this->undoActions->actions())
-  {
-    this->undoActions->removeAction(action);
-  }
-
-  // Create new menu
-  QMenu menu;
-  for (auto cmd : boost::adaptors::reverse(this->dataPtr->undoCmds))
-  {
-    QAction *action = new QAction(QString::fromStdString(cmd->Description()),
-        this);
-    action->setData(QVariant(cmd->Id()));
-    action->setCheckable(true);
-    menu.addAction(action);
-    this->undoActions->addAction(action);
-  }
-
-  menu.exec(QCursor::pos());
+  return !this->dataPtr->redoCmds.empty();
 }
 
 /////////////////////////////////////////////////
-void MEUserCmdManager::OnRedoCmdHistory()
+std::vector<std::pair<unsigned int, std::string>>
+    MEUserCmdManager::Cmds(const bool _undo) const
 {
-  if (!this->Active())
-    return;
+  auto cmds = this->dataPtr->undoCmds;
 
-  if (!this->redoActions)
+  if (!_undo)
+    cmds = this->dataPtr->redoCmds;
+
+  std::vector<std::pair<unsigned int, std::string>> result;
+  for (auto cmd : cmds)
   {
-    gzerr << "No redo actions" << std::endl;
-    return;
+    result.push_back(std::pair<unsigned int, std::string>(
+        cmd->Id(), cmd->Description()));
   }
 
-  // Clear redo action group
-  for (auto action : this->redoActions->actions())
-  {
-    this->redoActions->removeAction(action);
-  }
-
-  // Create new menu
-  QMenu menu;
-  for (auto cmd : boost::adaptors::reverse(this->dataPtr->redoCmds))
-  {
-    QAction *action = new QAction(QString::fromStdString(cmd->Description()),
-        this);
-    action->setData(QVariant(cmd->Id()));
-    action->setCheckable(true);
-    menu.addAction(action);
-    this->redoActions->addAction(action);
-  }
-
-  menu.exec(QCursor::pos());
+  return result;
 }
 
 

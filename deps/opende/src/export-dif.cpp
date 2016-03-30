@@ -33,7 +33,7 @@
 //	* make sure ODE-specific parameters divided out
 
 
-#include <ode/ode.h>
+#include <gazebo/ode/ode.h>
 #include "config.h"
 #include "objects.h"
 #include "joints/joints.h"

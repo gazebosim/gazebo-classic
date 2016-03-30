@@ -14,11 +14,12 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_USER_COMMAND_WIDGET_HH_
-#define _GAZEBO_USER_COMMAND_WIDGET_HH_
+#ifndef _GAZEBO_GUI_USERCOMMANDHISTORY_HH_
+#define _GAZEBO_GUI_USERCOMMANDHISTORY_HH_
 
 #include <string>
+#include <utility>
+#include <vector>
 
 #include "gazebo/msgs/MessageTypes.hh"
 
@@ -46,7 +47,7 @@ namespace gazebo
       /// \param[in] _active True to make it active.
       public: void SetActive(const bool _active);
 
-      /// \brief Set the widget to be active.
+      /// \brief Get whether the widget is active or not.
       /// \return True if it is active.
       public: bool Active() const;
 
@@ -86,20 +87,31 @@ namespace gazebo
       /// It opens the redo history menu.
       private slots: virtual void OnRedoCmdHistory();
 
+      /// \brief Implementation of the On*CmdHistory functions.
+      /// \param[in] _undo True for undo, false for redo.
+      private: virtual void OnCmdHistory(const bool _undo);
+
+      /// \brief Whether there are commands for undo or not.
+      /// \return True if there are.
+      private: virtual bool HasUndo() const;
+
+      /// \brief Whether there are commands for redo or not.
+      /// \return True if there are.
+      private: virtual bool HasRedo() const;
+
+      /// \brief Get the list of user commands.
+      /// \param[in] _undo True for undo, false for redo
+      private: virtual std::vector<std::pair<unsigned int, std::string>>
+          Cmds(const bool _undo) const;
+
       /// \brief Updates the widgets according to the user command stats
       /// message.
-      private slots: virtual void OnStatsSlot();
+      private slots: void OnStatsSlot();
 
       /// \brief User command statistics message callback.
       /// \param[in] _msg Message containing statistics about user commands
       /// stored in the server.
       private: void OnUserCmdStatsMsg(ConstUserCmdStatsPtr &_msg);
-
-      /// \brief Group of actions in undo history menu.
-      protected: QActionGroup *undoActions;
-
-      /// \brief Group of actions in redo history menu.
-      protected: QActionGroup *redoActions;
 
       /// \internal
       /// \brief Pointer to private data.
