@@ -28,10 +28,9 @@ namespace gazebo
     /// \addtogroup gazebo_common
     /// \{
 
-    /// \class  SemanticVersion.hh
-    /// \brief Version class based on Semantic Versioning 2.0.0
+    /// \brief Version comparison class based on Semantic Versioning 2.0.0
     /// http://semver.org/
-    /// compares versions and converts them from string.
+    /// Compares versions and converts versions from string.
     class GZ_COMMON_VISIBLE SemanticVersion
     {
       /// \brief Constructor
@@ -50,34 +49,34 @@ namespace gazebo
       /// \return The semantic version string
       public: std::string Version() const;
 
-      /// \brief Comparison operator
+      /// \brief Less than comparison operator
       /// \param[in] _other The other version to compare to
-      /// returns true if _other version is newer
+      /// returns True if _other version is newer
       public: bool operator<(const SemanticVersion &_other) const;
 
-      /// \brief Comparison operator
+      /// \brief Less than or equal comparison operator
       /// \param[in] _other The other version to compare to
-      /// returns true if _other version is older or equal
+      /// returns True if _other version is older or equal
       public: bool operator<=(const SemanticVersion &_other) const;
 
-      /// \brief Comparison operator
+      /// \brief Greater than comparison operator
       /// \param[in] _other The other version to compare to
-      /// returns true if _other version is older
+      /// returns True if _other version is older
       public: bool operator>(const SemanticVersion &_other) const;
 
-      /// \brief Comparison operator
+      /// \brief Greater than or equal comparison operator
       /// \param[in] _other The other version to compare to
-      /// returns true if _other version is newer or the same
+      /// returns True if _other version is newer or the same
       public: bool operator>=(const SemanticVersion &_other) const;
 
-      /// \brief Comparison operator
+      /// \brief Equality comparison operator
       /// \param[in] _other The other version to compare to
-      /// returns true if _other version is the same
+      /// returns True if _other version is the same
       public: bool operator==(const SemanticVersion &_other) const;
 
-      /// \brief Comparison operator
+      /// \brief Inequality comparison operator
       /// \param[in] _other The other version to compare to
-      /// returns true if _other version is different
+      /// returns True if _other version is different
       public: bool operator!=(const SemanticVersion &_other) const;
 
       /// \brief Major revision (incompatible api changes)
