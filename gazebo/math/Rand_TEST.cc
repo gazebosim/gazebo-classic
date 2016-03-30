@@ -25,6 +25,30 @@ using namespace gazebo;
 class RandTest : public ::testing::Test { };
 
 //////////////////////////////////////////////////
+TEST(RandTest, Rand1)
+{
+  double d;
+  int i;
+  // TODO: implement a proper random number generator test
+
+  d = gazebo::math::Rand::DblUniform(1, 2);
+  EXPECT_LE(d, 2);
+  EXPECT_GE(d, 1.5);
+}
+
+//////////////////////////////////////////////////
+TEST(RandTest, Rand2)
+{
+  double d;
+  int i;
+  // TODO: implement a proper random number generator test
+
+  d = gazebo::math::Rand::DblUniform(1, 2);
+  EXPECT_LE(d, 2);
+  EXPECT_GE(d, 1.5);
+}
+
+//////////////////////////////////////////////////
 TEST_F(RandTest, Rand)
 {
   double d;
@@ -33,7 +57,7 @@ TEST_F(RandTest, Rand)
 
   d = gazebo::math::Rand::GetDblUniform(1, 2);
   EXPECT_LE(d, 2);
-  EXPECT_GE(d, 1);
+  EXPECT_GE(d, 1.5);
 
   i = math::Rand::GetIntUniform(1, 2);
   EXPECT_LE(i, 2);
