@@ -411,9 +411,9 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   // The tab bar along the top.
   auto tabBar = new QTabBar;
   tabBar->setObjectName("plottingTabBar");
-  tabBar->addTab("TOPICS");
+//  tabBar->addTab("TOPICS");
   tabBar->addTab("MODELS");
-  tabBar->addTab("SIM");
+//  tabBar->addTab("SIM");
   tabBar->addTab("SEARCH");
   tabBar->setExpanding(true);
   tabBar->setDrawBase(false);
@@ -589,7 +589,8 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
 
   auto searchLayout = new QVBoxLayout();
   searchLayout->addLayout(searchField);
-  searchLayout->addWidget(splitter);
+//  searchLayout->addWidget(splitter);
+  searchLayout->addWidget(modelsWidget);
 
   auto searchWidget = new QWidget();
   searchWidget->setLayout(searchLayout);
@@ -597,9 +598,9 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   // The stacked layout is used by the TabBar to switch active layouts
   auto tabStackedLayout = new QStackedLayout;
   tabStackedLayout->setContentsMargins(0, 0, 0, 0);
-  tabStackedLayout->addWidget(topicsTree);
+//  tabStackedLayout->addWidget(topicsTree);
   tabStackedLayout->addWidget(modelsTree);
-  tabStackedLayout->addWidget(simTree);
+//  tabStackedLayout->addWidget(simTree);
   tabStackedLayout->addWidget(searchWidget);
 
   // Connect TabBar to StackedLayout
