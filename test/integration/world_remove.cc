@@ -89,7 +89,7 @@ void WorldRemoveTest::RemoveBlankWorld(const std::string &_physicsEngine)
   EXPECT_FALSE(msgTypes.empty());
 
   auto worldTopicCount = WorldTopicCount(msgTypes);
-  EXPECT_GT(worldTopicCount, 0);
+  EXPECT_GT(worldTopicCount, 0u);
 
   // Stats before removing world
   gzdbg << std::endl
@@ -139,7 +139,7 @@ void WorldRemoveTest::RemoveBlankWorld(const std::string &_physicsEngine)
   // Check all topics related to that world are gone
   msgTypes = gazebo::transport::getAdvertisedTopics();
   EXPECT_LT(WorldTopicCount(msgTypes), worldTopicCount);
-  EXPECT_EQ(WorldTopicCount(msgTypes), 0);
+  EXPECT_EQ(WorldTopicCount(msgTypes), 0u);
 }
 
 /////////////////////////////////////////////////
