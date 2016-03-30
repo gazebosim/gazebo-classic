@@ -20,10 +20,27 @@
 #include <algorithm>
 
 #include "SemanticVersion.hh"
-#include "SemanticVersionPrivate.hh"
 
 using namespace gazebo;
 using namespace common;
+
+namespace gazebo
+{
+  namespace common
+  {
+    class SemanticVersionPrivate
+    {
+      /// \brief Major revision (incompatible api changes)
+      public: unsigned int maj;
+
+      /// \brief Minor revision (backwards compatible new functionality)
+      public: unsigned int min;
+
+      /// \brief Patch (bug fixes)
+      public: unsigned int patch;
+    };
+  }
+}
 
 /////////////////////////////////////////////////
 SemanticVersion::SemanticVersion(const std::string &_versionStr)
