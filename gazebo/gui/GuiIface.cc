@@ -21,6 +21,7 @@
   #define snprintf _snprintf
 #endif
 
+#include <set>
 #include <signal.h>
 #include <boost/program_options.hpp>
 #include <boost/property_tree/ini_parser.hpp>
@@ -74,6 +75,10 @@ Q_DECLARE_METATYPE(common::Time)
 // This makes it possible to use std::string in QT signals and slots.
 // qRegisterMetaType is also required, see below.
 Q_DECLARE_METATYPE(std::string)
+
+// This makes it possible to use std::set<std::string> in QT signals and slots.
+// qRegisterMetaType is also required, see below.
+Q_DECLARE_METATYPE(std::set<std::string>)
 
 //////////////////////////////////////////////////
 void print_usage()
@@ -266,6 +271,10 @@ bool gui::load()
   // Register std::string as a type that can be used in signals and slots.
   // Q_DECLARE_METATYPE is also required, see above.
   qRegisterMetaType<std::string>();
+
+  // Register std::set<std::string> as a type that can be used in signals and
+  // slots. Q_DECLARE_METATYPE is also required, see above.
+  qRegisterMetaType< std::set<std::string> >();
 
   g_splashScreen = new gui::SplashScreen();
 
