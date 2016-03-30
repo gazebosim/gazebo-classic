@@ -260,6 +260,11 @@ namespace gazebo
     private: bool LoadLogFromFile(const std::string &_filename);
 
 
+    /// \brief Write data to a file.
+    /// \param[in] _outFile Output file stream reference.
+    /// \param[in] _stateString SDF state string to write
+    /// \param[in] _raw True to output data without xml formatting.
+    /// \param[in] _encoding Encoding type: txt, zlib, bz2
     private: void OutputWriter(std::ofstream &_outFile,
                  const std::string &_stateString,
                  const bool _raw, const std::string &_encoding);
