@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/KeyEvent.hh"
+#include "gazebo/common/MouseEvent.hh"
 
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/GuiIface.hh"
@@ -107,7 +108,7 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   this->dataPtr->linkButtonGroup->addButton(boxButton);
   this->dataPtr->linkButtonGroup->addButton(customButton);
 
-  this->dataPtr->modelCreator = new ModelCreator();
+  this->dataPtr->modelCreator = new ModelCreator(this);
   connect(this->dataPtr->modelCreator, SIGNAL(LinkAdded()), this, SLOT(OnLinkAdded()));
 
   this->dataPtr->otherItemsLayout = new QVBoxLayout();
@@ -268,8 +269,7 @@ void ModelEditorPalette::InsertWidget(unsigned int _index, QWidget *_widget)
 
   // set equal size for now. There should always be at least one widget
   // (render3DFrame) in the splitter.
-  int childCount = this->dataPtr->splitter->count();
-  GZ_ASSERT(childCount > 0,
+  GZ_ASSERT(this->dataPtr->splitter->count() > 0,
       "ModelEditorPalette splitter has no child widget");
 
   this->dataPtr->splitter->insertWidget(_index, _widget);

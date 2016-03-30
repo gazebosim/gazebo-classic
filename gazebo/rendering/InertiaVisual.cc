@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -151,7 +151,7 @@ void InertiaVisual::Load(const math::Pose &_pose,
   this->InsertMesh("unit_box");
 
   Ogre::MovableObject *boxObj =
-    (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+    (Ogre::MovableObject*)(dPtr->scene->OgreSceneManager()->createEntity(
           this->GetName()+"__BOX__", "unit_box"));
   boxObj->setVisibilityFlags(GZ_VISIBILITY_GUI);
   ((Ogre::Entity*)boxObj)->setMaterialName("__GAZEBO_TRANS_PURPLE_MATERIAL__");
@@ -183,7 +183,7 @@ void InertiaVisual::DestroyAllAttachedMovableObjects(
   {
     Ogre::Entity *ent = static_cast<Ogre::Entity*>(itObject.getNext());
     if (ent->getMovableType() != DynamicLines::GetMovableType())
-      this->dataPtr->scene->GetManager()->destroyEntity(ent);
+      this->dataPtr->scene->OgreSceneManager()->destroyEntity(ent);
     else
       delete ent;
   }

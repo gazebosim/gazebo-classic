@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -100,7 +100,7 @@ void BuildingModelManip::OnSizeChanged(double _width, double _depth,
     double _height)
 {
   this->dataPtr->size =
-      BuildingMaker::ConvertSize(_width, _depth, _height).Ign();
+      BuildingMaker::ConvertSize(_width, _depth, _height);
   double dScaleZ = this->dataPtr->visual->GetScale().Ign().Z() -
                    this->dataPtr->size.Z();
   this->dataPtr->visual->SetScale(this->dataPtr->size);
@@ -124,7 +124,7 @@ void BuildingModelManip::OnPoseOriginTransformed(double _x, double _y,
 {
   // Handle translations, currently used by polylines
   auto trans = BuildingMaker::ConvertPose(_x, -_y, _z, _roll, _pitch,
-      _yaw).Ign();
+      _yaw);
 
   auto oldPose = this->dataPtr->visual->GetParent()->GetWorldPose().Ign();
 
@@ -296,8 +296,7 @@ void BuildingModelManip::SetRotation(double _roll, double _pitch, double _yaw)
 /////////////////////////////////////////////////
 void BuildingModelManip::SetSize(double _width, double _depth, double _height)
 {
-  this->dataPtr->size =
-      BuildingMaker::ConvertSize(_width, _depth, _height).Ign();
+  this->dataPtr->size = BuildingMaker::ConvertSize(_width, _depth, _height);
 
   auto dScale = this->dataPtr->visual->GetScale() - this->dataPtr->size;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,15 @@ DARTModel::~DARTModel()
 //////////////////////////////////////////////////
 void DARTModel::Load(sdf::ElementPtr _sdf)
 {
+  if (_sdf->HasElement("model"))
+  {
+    gzerr << "Nested models are not currently supported in DART. ["
+      << _sdf->Get<std::string>("name") << "] will not be loaded. "
+      << std::endl;
+    this->sdf = _sdf;
+    return;
+  }
+
   // create skeleton of DART
   this->dataPtr->dtSkeleton = new dart::dynamics::Skeleton();
 
@@ -52,6 +61,10 @@ void DARTModel::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void DARTModel::Init()
 {
+  // nested models are not supported for now, issue #1833
+  if (this->sdf->HasElement("model"))
+    return;
+
   Model::Init();
 
   //----------------------------------------------
@@ -178,6 +191,9 @@ void DARTModel::BackupState()
 //////////////////////////////////////////////////
 void DARTModel::RestoreState()
 {
+  if (!this->dataPtr->dtSkeleton)
+    return;
+
   GZ_ASSERT(static_cast<size_t>(this->dataPtr->dtConfig.size()) ==
             this->dataPtr->dtSkeleton->getNumDofs(),
             "Cannot RestoreState, invalid size");

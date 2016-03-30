@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -186,8 +186,8 @@ void ModelPropShop::Update()
   if (this->camera && this->scene)
     event::Events::preRender();
 
-  if (this->camera && this->scene->GetInitialized() &&
-      this->camera->GetInitialized())
+  if (this->camera && this->scene->Initialized() &&
+      this->camera->Initialized())
   {
     rendering::VisualPtr vis = this->scene->GetVisual(this->modelName);
     if (vis)

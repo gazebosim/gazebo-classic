@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,15 @@
  *
 */
 
-#ifndef _IMAGESVIEW_TEST_HH_
-#define _IMAGESVIEW_TEST_HH_
+#ifndef _GAZEBO_GUI_VIEWERS_IMAGESVIEW_TEST_HH_
+#define _GAZEBO_GUI_VIEWERS_IMAGESVIEW_TEST_HH_
 
 #include <string>
 
 #include "gazebo/gui/QTestFixture.hh"
 #include "gazebo/gui/viewers/ImagesView.hh"
 
-/// \brief A test class for the DataLogger widget.
+/// \brief A test class for the ImagesView widget.
 class ImagesView_TEST : public QTestFixture
 {
   Q_OBJECT

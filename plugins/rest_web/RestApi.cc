@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,7 +65,7 @@ static void DumpRequest(const char *_text,
 
   for (i = 0; i < _size; i += width)
   {
-    fprintf(_stream, "%4.4lx: ", i);
+    fprintf(_stream, "%4.4zu: ", i);
     if (!_nohex)
     {
       // hex not disabled, show it

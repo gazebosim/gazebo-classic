@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,3 +58,26 @@ TEST_F(GuiConversionsTest, Color)
   }
 }
 
+/////////////////////////////////////////////////
+TEST_F(GuiConversionsTest, Point2d)
+{
+  // Ignition to Qt to Ignition
+  {
+    double x = -0.5;
+    double y = 123;
+
+    ignition::math::Vector2d point(x, y);
+    EXPECT_EQ(gazebo::gui::Conversions::Convert(
+              gazebo::gui::Conversions::Convert(point)), point);
+  }
+
+  // Qt to Ignition to Qt
+  {
+    double x = -0.5;
+    double y = 123;
+
+    QPointF point(x, y);
+    EXPECT_EQ(gazebo::gui::Conversions::Convert(
+              gazebo::gui::Conversions::Convert(point)), point);
+  }
+}

@@ -29,11 +29,10 @@ set (sources
   DataLogger.cc
   Editor.cc
   EntityMaker.cc
-  HotkeyDialog.cc
-  RenderWidget.cc
   GLWidget.cc
-  GuiIface.cc
   GuiEvents.cc
+  GuiIface.cc
+  HotkeyDialog.cc
   InsertModelWidget.cc
   JointControlWidget.cc
   KeyEventHandler.cc
@@ -42,12 +41,13 @@ set (sources
   LogPlayWidget.cc
   MainWindow.cc
   ModelAlign.cc
-  ModelManipulator.cc
-  ModelSnap.cc
   ModelListWidget.cc
   ModelMaker.cc
+  ModelManipulator.cc
   ModelRightMenu.cc
+  ModelSnap.cc
   MouseEventHandler.cc
+  RenderWidget.cc
   SaveDialog.cc
   SpaceNav.cc
   SplashScreen.cc
@@ -106,6 +106,7 @@ set (headers
   GuiIface.hh
   GuiEvents.hh
   GuiPlugin.hh
+  GuiTypes.hh
   KeyEventHandler.hh
   LightMaker.hh
   ModelAlign.hh
@@ -136,22 +137,20 @@ endif ()
 #  )
 #endif()
 
-set (gtest_sources
-  Conversions_TEST.cc
-)
-gz_build_tests(${gtest_sources})
-foreach(gtest_file ${gtest_sources})
-  string(REGEX REPLACE ".cc" "" BINARY_NAME ${gtest_file})
-  target_link_libraries(${TEST_TYPE}_${BINARY_NAME} gazebo_gui)
-endforeach()
-
 set (qt_tests
+  BuildingEditor_TEST.cc
+  ConfigWidget_TEST.cc
   DataLogger_TEST.cc
+  GLWidget_TEST.cc
+  GLWidget_TEST2.cc
   GuiIface_TEST.cc
   HotkeyDialog_TEST.cc
   LightMaker_TEST.cc
   ModelAlign_TEST.cc
+  ModelListWidget_TEST.cc
   ModelMaker_TEST.cc
+  ModelManipulator_TEST.cc
+  ModelSnap_TEST.cc
   RenderWidget_TEST.cc
   SaveDialog_TEST.cc
   SplashScreen_TEST.cc
@@ -183,15 +182,9 @@ if (ENABLE_SCREEN_TESTS)
   set (qt_tests
       ${qt_tests}
       ApplyWrenchDialog_TEST.cc
-      BuildingEditor_TEST.cc
-      ConfigWidget_TEST.cc
-      GLWidget_TEST.cc
-      GLWidget_TEST2.cc
       LaserVisualization_TEST.cc
       LayersWidget_TEST.cc
       MainWindow_TEST.cc
-      ModelListWidget_TEST.cc
-      ModelSnap_TEST.cc
       Projection_TEST.cc)
 endif()
 
@@ -203,7 +196,7 @@ set (resources resources.qrc)
 QT4_WRAP_CPP(headers_MOC ${qt_headers} ${internal_qt_headers})
 QT4_ADD_RESOURCES(resources_RCC ${resources})
 
-gz_add_library(gazebo_gui ${sources} ${headers_MOC})
+gz_add_library(gazebo_gui ${sources} ${headers_MOC} ${resources_RCC})
 gz_add_executable(gzclient main.cc ${resources_RCC})
 
 add_dependencies(gazebo_gui gazebo_msgs)
@@ -242,6 +235,12 @@ if (SPNAV_LIBRARY)
   target_link_libraries(gazebo_gui ${SPNAV_LIBRARY})
   target_link_libraries(gzclient ${SPNAV_LIBRARY})
 endif()
+
+set (gtest_sources
+  Conversions_TEST.cc
+)
+
+gz_build_tests(${gtest_sources} EXTRA_LIBS gazebo_gui)
 
 add_definitions(${QT_DEFINITIONS})
 

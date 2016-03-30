@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -633,67 +633,180 @@ TEST_P(PhysicsTest, SpawnDropCoGOffset)
   SpawnDropCoGOffset(GetParam());
 }
 
-/// \TODO: Redo state test
-// TEST_F(PhysicsTest, State)
-// {
-  /*
-  Load("worlds/empty.world");
-  physics::WorldPtr world = physics::get_world("default");
+//////////////////////////////////////////////////
+TEST_F(PhysicsTest, EmptyStates)
+{
+  this->Load("worlds/empty.world");
+  auto world = physics::get_world("default");
   EXPECT_TRUE(world != NULL);
 
-  physics::WorldState worldState = world->GetState();
-  physics::ModelState modelState = worldState.GetModelState(0);
-  physics::LinkState linkState = modelState.GetLinkState(0);
-  physics::CollisionState collisionState = linkState.GetCollisionState(0);
+  // Current world state
+  physics::WorldState worldState(world);
 
-  math::Pose pose;
+  auto modelStates = worldState.GetModelStates();
   EXPECT_EQ(1u, worldState.GetModelStateCount());
-  EXPECT_EQ(1u, modelState.GetLinkStateCount());
-  EXPECT_EQ(1u, linkState.GetCollisionStateCount());
-  EXPECT_EQ(pose, modelState.GetPose());
-  EXPECT_EQ(pose, linkState.GetPose());
-  EXPECT_EQ(pose, collisionState.GetPose());
+  EXPECT_EQ(1u, modelStates.size());
 
-  Unload();
-  Load("worlds/shapes.world");
-  world = physics::get_world("default");
+  // Model state
+  auto modelState = modelStates["box"];
+  EXPECT_EQ(ignition::math::Pose3d::Zero, modelState.GetPose().Ign());
+}
+
+//////////////////////////////////////////////////
+TEST_F(PhysicsTest, StateChange)
+{
+  this->Load("worlds/shapes.world");
+  auto world = physics::get_world("default");
   EXPECT_TRUE(world != NULL);
-  worldState = world->GetState();
 
-  for (unsigned int i = 0; i < worldState.GetModelStateCount(); ++i)
-  {
-    modelState = worldState.GetModelState(i);
-    if (modelState.GetName() == "plane")
-      pose.Set(math::Vector3(0, 0, 0), math::Quaternion(0, 0, 0));
-    else if (modelState.GetName() == "box")
-      pose.Set(math::Vector3(0, 0, 0.5), math::Quaternion(0, 0, 0));
-    else if (modelState.GetName() == "sphere")
-      pose.Set(math::Vector3(0, 1.5, 0.5), math::Quaternion(0, 0, 0));
-    else if (modelState.GetName() == "cylinder")
-      pose.Set(math::Vector3(0, -1.5, 0.5), math::Quaternion(0, 0, 0));
+  // Check initial world state
+  physics::WorldState oldWorldState(world);
+  EXPECT_EQ(4u, oldWorldState.GetModelStateCount());
 
-    EXPECT_TRUE(pose == modelState.GetPose());
-  }
+  auto oldModelState = oldWorldState.GetModelState("box");
+  ignition::math::Pose3d oldPose(0, 0, 0.5, 0, 0, 0);
+  EXPECT_EQ(oldPose, oldModelState.GetPose().Ign());
 
   // Move the box
-  world->GetModel("box")->SetWorldPose(
-      math::Pose(math::Vector3(1, 2, 0.5), math::Quaternion(0, 0, 0)));
+  world->SetPaused(true);
+
+  ignition::math::Pose3d newPose(1, 2, 0.5, 0, 0, 0);
+  world->GetModel("box")->SetWorldPose(newPose);
+
+  world->Step(1);
+
+  // Make sure the box state reflects the move
+  physics::WorldState newWorldState(world);
+  EXPECT_EQ(4u, newWorldState.GetModelStateCount());
+
+  auto newModelState = newWorldState.GetModelState("box");
+  EXPECT_EQ(newPose, newModelState.GetPose().Ign());
+
+  // Reset world state, and check for correctness
+  world->SetState(oldWorldState);
+
+  physics::WorldState resetWorldState(world);
+  EXPECT_EQ(4u, resetWorldState.GetModelStateCount());
+
+  auto resetModelState = resetWorldState.GetModelState("box");
+  EXPECT_EQ(oldPose, resetModelState.GetPose().Ign());
+}
+
+//////////////////////////////////////////////////
+TEST_F(PhysicsTest, StateInsertion)
+{
+  this->Load("worlds/empty.world");
+  auto world = physics::get_world("default");
+  EXPECT_TRUE(world != NULL);
+
+  std::string newModelName("new_model");
+  std::string newLightName("new_light");
+
+  // Check initial count
+  EXPECT_EQ(1u, world->GetModelCount());
+  EXPECT_EQ(1u, world->LightCount());
+  EXPECT_TRUE(world->GetModel(newModelName) == NULL);
+  EXPECT_TRUE(world->Light(newLightName) == NULL);
+
+  // Current world state
+  physics::WorldState worldState(world);
+  EXPECT_EQ(1u, worldState.GetModelStateCount());
+  EXPECT_EQ(1u, worldState.LightStateCount());
+
+  // Insertions
+  std::stringstream newModelStr;
+  newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+              << "<model name ='" << newModelName << "'>"
+              << "<link name ='link'>"
+              << "  <collision name ='collision'>"
+              << "    <geometry>"
+              << "      <box><size>1 1 1</size></box>"
+              << "    </geometry>"
+              << "  </collision>"
+              << "  <visual name ='visual'>"
+              << "    <geometry>"
+              << "      <box><size>1 1 1</size></box>"
+              << "    </geometry>"
+              << "  </visual>"
+              << "</link>"
+              << "</model>"
+              << "</sdf>";
+
+  std::stringstream newLightStr;
+  newLightStr << "<sdf version='" << SDF_VERSION << "'>"
+              << "<light name ='" << newLightName << "' type='spot'>"
+              << "<diffuse>0 1 0 1</diffuse>"
+              << "</light>"
+              << "</sdf>";
+
+  std::vector<std::string> insertions;
+  insertions.push_back(newModelStr.str());
+  insertions.push_back(newLightStr.str());
+
+  worldState.SetInsertions(insertions);
+
+  // Set state which includes insertion
+  world->SetPaused(true);
+  world->SetState(worldState);
+
+  world->Step(1);
+
+  // Check entities were inserted
+  EXPECT_EQ(2u, world->GetModelCount());
+  EXPECT_EQ(2u, world->LightCount());
+  EXPECT_FALSE(world->GetModel(newModelName) == NULL);
+  EXPECT_FALSE(world->Light(newLightName) == NULL);
+
+  // New world state
+  physics::WorldState newWorldState(world);
+  EXPECT_EQ(2u, newWorldState.GetModelStateCount());
+  EXPECT_EQ(2u, newWorldState.LightStateCount());
+}
+
+//////////////////////////////////////////////////
+TEST_F(PhysicsTest, StateDeletion)
+{
+  this->Load("worlds/shapes.world");
+  auto world = physics::get_world("default");
+  EXPECT_TRUE(world != NULL);
+
+  std::string deleteModelName("box");
+  std::string deleteLightName("sun");
+
+  // Check initial count
+  EXPECT_EQ(4u, world->GetModelCount());
+  EXPECT_EQ(1u, world->LightCount());
+  EXPECT_FALSE(world->GetModel(deleteModelName) == NULL);
+  EXPECT_FALSE(world->Light(deleteLightName) == NULL);
+
+  // Current world state
+  physics::WorldState worldState(world);
+  EXPECT_EQ(4u, worldState.GetModelStateCount());
+  EXPECT_EQ(1u, worldState.LightStateCount());
+
+  // Deletions
+  std::vector<std::string> deletions;
+  deletions.push_back(deleteModelName);
+  deletions.push_back(deleteLightName);
+
+  worldState.SetDeletions(deletions);
+
+  // Set state which includes deletion
+  world->SetState(worldState);
 
   gazebo::common::Time::MSleep(10);
 
-  // Make sure the box has been moved
-  physics::ModelState modelState2 = world->GetState().GetModelState("box");
-  pose.Set(math::Vector3(1, 2, 0.5), math::Quaternion(0, 0, 0));
-  EXPECT_TRUE(pose == modelState2.GetPose());
+  // Check entities were deleted
+  EXPECT_EQ(3u, world->GetModelCount());
+  EXPECT_EQ(0u, world->LightCount());
+  EXPECT_TRUE(world->GetModel(deleteModelName) == NULL);
+  EXPECT_TRUE(world->Light(deleteLightName) == NULL);
 
-  // Reset world state, and check for correctness
-  world->SetState(worldState);
-  modelState2 = world->GetState().GetModelState("box");
-  pose.Set(math::Vector3(0, 0, 0.5), math::Quaternion(0, 0, 0));
-  EXPECT_TRUE(pose == modelState2.GetPose());
-  Unload();
-  */
-// }
+  // New world state
+  physics::WorldState newWorldState(world);
+  EXPECT_EQ(3u, newWorldState.GetModelStateCount());
+  EXPECT_EQ(0u, newWorldState.LightStateCount());
+}
 
 ////////////////////////////////////////////////////////////////////////
 void PhysicsTest::JointDampingTest(const std::string &_physicsEngine)

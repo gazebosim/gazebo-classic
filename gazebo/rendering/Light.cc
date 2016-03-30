@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,10 +52,10 @@ Light::~Light()
 {
   if (this->dataPtr->light)
   {
-    this->dataPtr->scene->GetManager()->destroyLight(this->Name());
+    this->dataPtr->scene->OgreSceneManager()->destroyLight(this->Name());
   }
 
-  this->dataPtr->scene->GetManager()->destroyEntity(
+  this->dataPtr->scene->OgreSceneManager()->destroyEntity(
       this->Name() + "_selection_sphere");
 
   if (this->dataPtr->visual)
@@ -86,8 +86,8 @@ void Light::Load()
 
   try
   {
-    this->dataPtr->light = this->dataPtr->scene->GetManager()->createLight(
-        this->Name());
+    this->dataPtr->light =
+        this->dataPtr->scene->OgreSceneManager()->createLight(this->Name());
   }
   catch(Ogre::Exception &e)
   {
@@ -98,7 +98,7 @@ void Light::Load()
   this->Update();
 
   this->dataPtr->visual.reset(new Visual(this->Name(),
-                     this->dataPtr->scene->GetWorldVisual()));
+                     this->dataPtr->scene->WorldVisual()));
   this->dataPtr->visual->AttachObject(this->dataPtr->light);
   this->dataPtr->scene->AddVisual(this->dataPtr->visual);
 

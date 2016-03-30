@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 */
 #include <boost/bind.hpp>
 #include "gazebo/rendering/ogre_gazebo.h"
+
+#include "gazebo/math/Pose.hh"
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
@@ -121,7 +123,7 @@ void UserCamera::Init()
   // Right camera
   if (this->dataPtr->stereoEnabled)
   {
-    this->dataPtr->rightCamera = this->scene->GetManager()->createCamera(
+    this->dataPtr->rightCamera = this->scene->OgreSceneManager()->createCamera(
         "StereoUserRight");
     this->dataPtr->rightCamera->pitch(Ogre::Degree(90));
 
@@ -175,7 +177,7 @@ void UserCamera::Init()
   axisNode->setInheritOrientation(false);
 
   Ogre::ManualObject *x =
-    this->scene->GetManager()->createManualObject("MyXAxis");
+    this->scene->OgreSceneManager()->createManualObject("MyXAxis");
   x->begin("Gazebo/Red", Ogre::RenderOperation::OT_LINE_LIST);
   x->position(0, 0, 0);
   x->position(1, 0, 0);
@@ -183,7 +185,7 @@ void UserCamera::Init()
   x->setVisibilityFlags(GZ_VISIBILITY_GUI);
 
   Ogre::ManualObject *y =
-    this->scene->GetManager()->createManualObject("MyYAxis");
+    this->scene->OgreSceneManager()->createManualObject("MyYAxis");
   y->begin("Gazebo/Green", Ogre::RenderOperation::OT_LINE_LIST);
   y->position(0, 0, 0);
   y->position(0, 1, 0);
@@ -191,7 +193,7 @@ void UserCamera::Init()
   y->setVisibilityFlags(GZ_VISIBILITY_GUI);
 
   Ogre::ManualObject *z =
-    this->scene->GetManager()->createManualObject("MyZAxis");
+    this->scene->OgreSceneManager()->createManualObject("MyZAxis");
   z->begin("Gazebo/Blue", Ogre::RenderOperation::OT_LINE_LIST);
   z->position(0, 0, 0);
   z->position(0, 0, 1);
@@ -505,9 +507,9 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
   if (!_visual)
     return;
 
-  if (this->scene->GetManager()->hasAnimation("cameratrack"))
+  if (this->scene->OgreSceneManager()->hasAnimation("cameratrack"))
   {
-    this->scene->GetManager()->destroyAnimation("cameratrack");
+    this->scene->OgreSceneManager()->destroyAnimation("cameratrack");
   }
 
   ignition::math::Box box = _visual->GetBoundingBox().Ign();
@@ -549,7 +551,7 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
   double time = 0.5;  // dist / vel;
 
   Ogre::Animation *anim =
-    this->scene->GetManager()->createAnimation("cameratrack", time);
+    this->scene->OgreSceneManager()->createAnimation("cameratrack", time);
   anim->setInterpolationMode(Ogre::Animation::IM_SPLINE);
 
   Ogre::NodeAnimationTrack *strack = anim->createNodeTrack(0, this->sceneNode);
@@ -570,7 +572,7 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
   key->setRotation(pitchYawFinal);
 
   this->animState =
-    this->scene->GetManager()->createAnimationState("cameratrack");
+    this->scene->OgreSceneManager()->createAnimationState("cameratrack");
 
   this->animState->setTimePosition(0);
   this->animState->setEnabled(true);
@@ -613,7 +615,7 @@ void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
     this->dataPtr->rightViewport =
       this->renderTarget->addViewport(this->dataPtr->rightCamera, 1);
     this->dataPtr->rightViewport->setBackgroundColour(
-        Conversions::Convert(this->scene->GetBackgroundColor()));
+        Conversions::Convert(this->scene->BackgroundColor()));
 
 #if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR > 9
     this->viewport->setDrawBuffer(Ogre::CBT_BACK_LEFT);
@@ -628,7 +630,7 @@ void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
   this->initialized = true;
 
   this->dataPtr->selectionBuffer = new SelectionBuffer(this->scopedUniqueName,
-      this->scene->GetManager(), this->renderTarget);
+      this->scene->OgreSceneManager(), this->renderTarget);
 }
 
 //////////////////////////////////////////////////

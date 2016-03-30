@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-
+#include <functional>
 #include "gazebo/sensors/Noise.hh"
 #include "RaySensorNoisePlugin.hh"
 
@@ -45,12 +45,13 @@ void RaySensorNoisePlugin::Load(sensors::SensorPtr _parent,
     return;
   }
 
-  sensors::NoisePtr noise = _parent->GetNoise(sensors::RAY_NOISE);
+  sensors::NoisePtr noise = _parent->Noise(sensors::RAY_NOISE);
 
   if (noise)
   {
     noise->SetCustomNoiseCallback(
-      boost::bind(&RaySensorNoisePlugin::OnApplyNoise, this, _1));
+      std::bind(&RaySensorNoisePlugin::OnApplyNoise, this,
+        std::placeholders::_1));
   }
   else
   {
