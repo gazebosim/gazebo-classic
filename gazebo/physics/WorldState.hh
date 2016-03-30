@@ -142,13 +142,13 @@ namespace gazebo
       public: void SetInsertions(const std::vector<std::string> &_insertions);
 
       /// \brief Get the vector of SDF deletions.
-      /// \return A vector of SDF blocks. Each block contains the SDF of the
-      /// model to be removed from the simulation.
+      /// \return A vector containing the names of entities deleted in the
+      /// current state.
       public: const std::vector<std::string> &Deletions() const;
 
       /// \brief Set a new vector of SDF deletions.
-      /// \param[in] _deletions Vector containing SDF blocks. Each block should
-      /// contain the SDF of the models removed in the current simulation frame.
+      /// \param[in] _deletions Vector containing names of entities removed
+      /// in the current simulation frame.
       public: void SetDeletions(const std::vector<std::string> &_deletions);
 
       /// \brief Return true if the values in the state are zero.

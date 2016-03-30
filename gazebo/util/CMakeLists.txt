@@ -19,17 +19,16 @@ set (sources
   OpenAL.cc
 )
 
+if (NOT USE_EXTERNAL_TINYXML2)
+  list (APPEND sources ${CMAKE_SOURCE_DIR}/deps/tinyxml2/gazebo/tinyxml2.cpp)
+endif()
+
 if (NOT USE_EXTERNAL_TINYXML)
   set (sources ${sources}
        ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinystr.cpp
        ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxml.cpp
        ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxmlerror.cpp
        ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxmlparser.cpp)
-endif()
-
-if (NOT USE_EXTERNAL_TINYXML2)
-  set (sources ${sources}
-       ${CMAKE_SOURCE_DIR}/deps/win/tinyxml2/tinyxml2.cpp)
 endif()
 
 set (headers
