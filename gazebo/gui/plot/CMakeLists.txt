@@ -1,6 +1,7 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
 set (sources_local
+  plot/EditableLabel.cc
   plot/IncrementalPlot.cc
   plot/IntrospectionCurveHandler.cc
   plot/PlotCanvas.cc
@@ -13,6 +14,7 @@ set (sources_local
 )
 
 set (qt_headers_local
+  plot/EditableLabel.hh
   plot/IncrementalPlot.hh
   plot/PlotCanvas.hh
   plot/Palette.hh
@@ -25,6 +27,7 @@ set (headers_install
 )
 
 set (qt_tests_local
+  EditableLabel_TEST.cc
   IntrospectionCurveHandler_TEST.cc
   IncrementalPlot_TEST.cc
   Palette_TEST.cc

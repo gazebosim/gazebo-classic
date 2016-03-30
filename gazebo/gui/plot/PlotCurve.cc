@@ -64,6 +64,20 @@ namespace gazebo
                 if (this->d_boundingRect.width() < 0.0)
                   this->d_boundingRect = qwtBoundingRect(*this);
 
+                // set a minimum bounding box height
+                // this prevents plot's auto scale to zoom in on near-zero
+                // floating point noise.
+                double minHeight = 1e-3;
+                double absHeight = std::fabs(this->d_boundingRect.height());
+                if (absHeight < minHeight)
+                {
+                  double halfMinHeight = minHeight * 0.5;
+                  double mid = this->d_boundingRect.top() +
+                      (absHeight * 0.5);
+                  this->d_boundingRect.setTop(mid - halfMinHeight);
+                  this->d_boundingRect.setBottom(mid + halfMinHeight);
+                }
+
                 return this->d_boundingRect;
               }
 

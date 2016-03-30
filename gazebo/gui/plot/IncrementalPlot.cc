@@ -39,6 +39,123 @@ namespace gazebo
 {
   namespace gui
   {
+    /// \brief Zoom to mouse position
+    class PlotMagnifier : public QwtPlotMagnifier
+    {
+      /// \brief Constructor
+      /// \param[in] _canvas Canvas the magnifier will be attached to.
+#if (QWT_VERSION < ((6 << 16) | (1 << 8) | 0))
+      public: PlotMagnifier(QwtPlotCanvas *_canvas)
+#else
+      public: PlotMagnifier(QWidget *_canvas)
+#endif
+                : QwtPlotMagnifier(_canvas)
+              {
+                // invert the wheel direction
+                double f = this->wheelFactor();
+                if (!ignition::math::equal(f, 0.0))
+                  this->setWheelFactor(1/f);
+              }
+
+      /// \brief Callback for a mouse wheel event
+      /// \param[in] _wheelEvent Qt mouse wheel event
+      protected: virtual void widgetWheelEvent(QWheelEvent *_wheelEvent)
+              {
+                this->mousePos = _wheelEvent->pos();
+
+                QwtMagnifier::widgetWheelEvent(_wheelEvent);
+              }
+
+      /// \brief Update plot scale by changing bounds of x and y axes.
+      /// \param[in] _factor Factor to scale the plot by.
+      protected: virtual void rescale(double _factor)
+              {
+                QwtPlot *plt = plot();
+                if ( plt == NULL )
+                    return;
+
+                double factor = qAbs(_factor);
+                if (ignition::math::equal(factor, 1.0) ||
+                    ignition::math::equal(factor, 0.0))
+                {
+                  return;
+                }
+
+                const bool autoReplot = plt->autoReplot();
+                plt->setAutoReplot(false);
+
+                // canvas maps are used to transform between widget (paint) and
+                // canvas (scale) coordinates
+                const QwtScaleMap xScaleMap = plt->canvasMap(QwtPlot::xBottom);
+                const QwtScaleMap yScaleMap = plt->canvasMap(QwtPlot::yLeft);
+
+                // get coordinates of lower and upper x and y axis bounds
+                double xV1 = xScaleMap.s1();
+                double xV2 = xScaleMap.s2();
+                double yV1 = yScaleMap.s1();
+                double yV2 = yScaleMap.s2();
+
+                // transform to work in widget coordinates
+                if (xScaleMap.transformation())
+                {
+                  xV1 = xScaleMap.transform(xV1);
+                  xV2 = xScaleMap.transform(xV2);
+                }
+                if (yScaleMap.transformation())
+                {
+                  yV1 = yScaleMap.transform(yV1);
+                  yV2 = yScaleMap.transform(yV2);
+                }
+
+                // zoom in at mouse point
+                // 1. center the canvas at mouse point
+                // 2. zoom by specified factor
+                // 3. translate the the canvas back so that the zoom point is
+                // under the mouse
+
+                double xHalfWidth = (xV2 - xV1) * 0.5;
+                double yHalfHeight = (yV2 - yV1) * 0.5;
+
+                double xHalfWidthScaled = xHalfWidth * factor;
+                double yHalfHeightScaled = yHalfHeight * factor;
+
+                double xCenter = 0.5 * (xV1 + xV2);
+                double yCenter = 0.5 * (yV1 + yV2);
+
+                QPoint zoomPos = this->mousePos;
+                QPointF trans = zoomPos - QPointF(xCenter, yCenter);
+                trans = trans*factor;
+
+                xV1 = zoomPos.x() - xHalfWidthScaled - trans.x();
+                xV2 = zoomPos.x() + xHalfWidthScaled - trans.x();
+
+                yV1 = zoomPos.y() - yHalfHeightScaled - trans.y();
+                yV2 = zoomPos.y() + yHalfHeightScaled - trans.y();
+
+                // transform back to canvas coordinates
+                if (xScaleMap.transformation())
+                {
+                  xV1 = xScaleMap.invTransform(xV1);
+                  xV2 = xScaleMap.invTransform(xV2);
+                }
+                if (yScaleMap.transformation())
+                {
+                  yV1 = yScaleMap.invTransform(yV1);
+                  yV2 = yScaleMap.invTransform(yV2);
+                }
+
+                // zoom by setting axis scale
+                plt->setAxisScale(QwtPlot::xBottom, xV1, xV2);
+                plt->setAxisScale(QwtPlot::yLeft, yV1, yV2);
+
+                plt->setAutoReplot(autoReplot);
+                plt->replot();
+              }
+
+        /// \brief Mouse position
+        private: QPoint mousePos;
+    };
+
     /// \internal
     /// \brief IncrementalPlot private data
     class IncrementalPlotPrivate
@@ -53,13 +170,19 @@ namespace gazebo
       public: QwtPlotDirectPainter *directPainter;
 
       /// \brief Pointer to the plot magnifier.
-      public: QwtPlotMagnifier *magnifier;
+      public: PlotMagnifier *magnifier;
 
       /// \brief Pointer to the plot panner.
       public: QwtPlotPanner *panner;
 
+      /// \brief Pointer to the grid lines.
+      public: QwtPlotGrid *grid;
+
       /// \brief Period duration in seconds.
-      public: unsigned int period;
+      public: double period;
+
+      /// \brief Previous last point on plot
+      public: ignition::math::Vector2d prevPoint;
     };
   }
 }
@@ -77,12 +200,17 @@ IncrementalPlot::IncrementalPlot(QWidget *_parent)
   // panning with the left mouse button
   this->dataPtr->panner = new QwtPlotPanner(this->canvas());
 
+  // stacked zooming with rectangle selection
+  QwtPlotZoomer* zoomer = new QwtPlotZoomer(this->canvas());
+  zoomer->setMousePattern(QwtEventPattern::MouseSelect1,
+      Qt::MidButton);
+  zoomer->setMousePattern(QwtEventPattern::MouseSelect2,
+      Qt::RightButton, Qt::ControlModifier);
+  zoomer->setMousePattern(QwtEventPattern::MouseSelect3,
+      Qt::NoButton);
+
   // zoom in/out with the wheel
-  this->dataPtr->magnifier = new QwtPlotMagnifier(this->canvas());
-  // invert the wheel direction
-  double wheelFactor = this->dataPtr->magnifier->wheelFactor();
-  if (!ignition::math::equal(wheelFactor, 0.0))
-    this->dataPtr->magnifier->setWheelFactor(1/wheelFactor);
+  this->dataPtr->magnifier = new PlotMagnifier(this->canvas());
 
 #if defined(Q_WS_X11)
   this->canvas()->setAttribute(Qt::WA_PaintOutsidePaintEvent, true);
@@ -97,25 +225,30 @@ IncrementalPlot::IncrementalPlot(QWidget *_parent)
   this->plotLayout()->setAlignCanvasToScales(true);
 
   QwtLegend *qLegend = new QwtLegend;
-  this->insertLegend(qLegend, QwtPlot::RightLegend);
+  this->insertLegend(qLegend, QwtPlot::RightLegend, 0.2);
 
-  QwtPlotGrid *grid = new QwtPlotGrid;
+
+  this->dataPtr->grid = new QwtPlotGrid;
 
 #if (QWT_VERSION < ((6 << 16) | (1 << 8) | 0))
-  grid->setMajPen(QPen(Qt::gray, 0, Qt::DotLine));
+  this->dataPtr->grid->setMajPen(QPen(Qt::gray, 0, Qt::DotLine));
 #else
-  grid->setMajorPen(QPen(Qt::gray, 0, Qt::DotLine));
+  this->dataPtr->grid->setMajorPen(QPen(Qt::gray, 0, Qt::DotLine));
 #endif
-  grid->attach(this);
+  this->dataPtr->grid->attach(this);
 
   this->enableAxis(QwtPlot::yLeft);
   this->setAxisScaleEngine(QwtPlot::yLeft, new QwtLinearScaleEngine());
   this->setAxisAutoScale(QwtPlot::yLeft, true);
 
+  this->enableAxis(QwtPlot::xBottom);
+  this->setAxisScale(QwtPlot::xBottom, 0, this->dataPtr->period);
+
   this->ShowAxisLabel(X_BOTTOM_AXIS, true);
   this->ShowAxisLabel(Y_LEFT_AXIS, true);
 
   this->replot();
+  this->setAcceptDrops(true);
 }
 
 /////////////////////////////////////////////////
@@ -230,7 +363,9 @@ void IncrementalPlot::Update()
 
     if (ignition::math::isnan(lastPoint.X()) ||
         ignition::math::isnan(lastPoint.Y()))
+    {
       continue;
+    }
 
     ignition::math::Vector2d minPt = curve.second->Min();
     ignition::math::Vector2d maxPt = curve.second->Max();
@@ -239,9 +374,37 @@ void IncrementalPlot::Update()
       pointCount - 1, pointCount - 1);
   }
 
-  this->setAxisScale(QwtPlot::xBottom,
-      std::max(0.0, static_cast<double>(lastPoint.X() - this->dataPtr->period)),
-      std::max(1.0, static_cast<double>(lastPoint.X())));
+  // get x axis lower and upper bounds
+  const QwtScaleMap xScaleMap = this->canvasMap(QwtPlot::xBottom);
+  double lastX = lastPoint.X();
+  double prevX = this->dataPtr->prevPoint.X();
+  double dx = lastX - prevX;
+  double minX = 0;
+  double maxX = 0;
+
+  // plot the line until time = period then start moving the x window.
+  // Checking the min X bound (xScaleMap.s1()) helps to detect a
+  // user zoom at beginning of the plot. At any time the scale is changed
+  // (from zooming), the moving window size is updated.
+  if ((ignition::math::equal(xScaleMap.s1(), 0.0) &&
+      lastX < this->dataPtr->period) || ignition::math::equal(prevX, 0.0))
+  {
+    // update moving window based on specified period
+    minX = std::max(0.0, lastX - this->dataPtr->period);
+    maxX = std::max(1.0, lastX);
+  }
+  else
+  {
+    // update moving window based on current x scale
+    dx = std::max(0.0, dx);
+    minX = xScaleMap.s1() + dx;
+    maxX = xScaleMap.s2() + dx;
+    minX = std::max(0.0, minX);
+    maxX = std::max(1.0, maxX);
+  }
+
+  this->dataPtr->prevPoint = lastPoint;
+  this->setAxisScale(QwtPlot::xBottom, minX, maxX);
 
   this->replot();
 }
@@ -339,6 +502,19 @@ void IncrementalPlot::ShowAxisLabel(const PlotAxis _axis, const bool _show)
 }
 
 /////////////////////////////////////////////////
+void IncrementalPlot::ShowGrid(const bool _show)
+{
+  this->dataPtr->grid->setVisible(_show);
+  this->replot();
+}
+
+/////////////////////////////////////////////////
+bool IncrementalPlot::ShowGrid() const
+{
+  return this->dataPtr->grid->isVisible();
+}
+
+/////////////////////////////////////////////////
 std::vector<PlotCurveWeakPtr> IncrementalPlot::Curves() const
 {
   std::vector<PlotCurveWeakPtr> curves;
@@ -356,4 +532,37 @@ QSize IncrementalPlot::sizeHint() const
   s.setWidth(s.width()+padding);
   s.setHeight(s.height()+padding);
   return s;
+}
+
+/////////////////////////////////////////////////
+void IncrementalPlot::dragEnterEvent(QDragEnterEvent *_evt)
+{
+  if (_evt->mimeData()->hasFormat("application/x-item"))
+  {
+    QString mimeData =
+        _evt->mimeData()->data("application/x-item");
+    _evt->setDropAction(Qt::LinkAction);
+    if (!mimeData.isEmpty())
+    {
+      _evt->acceptProposedAction();
+      return;
+    }
+  }
+  _evt->ignore();
+}
+
+/////////////////////////////////////////////////
+void IncrementalPlot::dropEvent(QDropEvent *_evt)
+{
+  if (_evt->mimeData()->hasFormat("application/x-item"))
+  {
+    QString mimeData =
+        _evt->mimeData()->data("application/x-item");
+    if (!mimeData.isEmpty())
+    {
+      emit VariableAdded(mimeData.toStdString());
+      return;
+    }
+  }
+  _evt->ignore();
 }

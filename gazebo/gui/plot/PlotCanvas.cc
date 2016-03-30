@@ -22,6 +22,7 @@
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 
+#include "gazebo/gui/plot/EditableLabel.hh"
 #include "gazebo/gui/plot/PlotManager.hh"
 #include "gazebo/gui/plot/PlottingTypes.hh"
 #include "gazebo/gui/plot/IncrementalPlot.hh"
@@ -55,10 +56,10 @@ namespace gazebo
     class PlotCanvasPrivate
     {
       /// \brief Text label
-      public: QLabel *title;
+      public: EditableLabel *title;
 
-      /// \brief Layout that contains all the plots.
-      public: QLayout *plotLayout;
+      /// \brief Splitter that contains all the plots.
+      public: QSplitter *plotSplitter;
 
       /// \brief A map of plot id to plot data;
       public: std::map<unsigned int, PlotData *> plotData;
@@ -68,6 +69,9 @@ namespace gazebo
 
       /// \brief Container for all the variableCurves on the Y axis.
       public: VariablePillContainer *yVariableContainer = NULL;
+
+      /// \brief Delete canvas Qt action
+      public: QAction *deleteCanvasAct = NULL;
 
       /// \brief Global plot counter.
       public: static unsigned int globalPlotId;
@@ -89,7 +93,8 @@ PlotCanvas::PlotCanvas(QWidget *_parent)
   this->setObjectName("plotCanvas");
 
   // Plot title
-  this->dataPtr->title = new QLabel("Plot Name");
+  this->dataPtr->title = new EditableLabel("Plot Name");
+
   QHBoxLayout *titleLayout = new QHBoxLayout;
   titleLayout->addWidget(this->dataPtr->title);
   titleLayout->setAlignment(Qt::AlignHCenter);
@@ -99,12 +104,17 @@ PlotCanvas::PlotCanvas(QWidget *_parent)
   QAction *clearPlotAct = new QAction("Clear all fields", settingsMenu);
   clearPlotAct->setStatusTip(tr("Clear variables and all plots on canvas"));
   connect(clearPlotAct, SIGNAL(triggered()), this, SLOT(OnClearCanvas()));
-  QAction *deletePlotAct = new QAction("Delete canvas", settingsMenu);
-  deletePlotAct->setStatusTip(tr("Delete entire canvas"));
-  connect(deletePlotAct, SIGNAL(triggered()), this, SLOT(OnDeleteCanvas()));
+  this->dataPtr->deleteCanvasAct = new QAction("Delete canvas", settingsMenu);
+  this->dataPtr->deleteCanvasAct->setStatusTip(tr("Delete entire canvas"));
+  connect(this->dataPtr->deleteCanvasAct, SIGNAL(triggered()), this,
+      SLOT(OnDeleteCanvas()));
+  QAction *showGridAct = new QAction("Show grid", settingsMenu);
+  showGridAct->setStatusTip(tr("Show/hide grid lines on plot"));
+  showGridAct->setCheckable(true);
 
   settingsMenu->addAction(clearPlotAct);
-  settingsMenu->addAction(deletePlotAct);
+  settingsMenu->addAction(this->dataPtr->deleteCanvasAct);
+  settingsMenu->addAction(showGridAct);
 
   QToolButton *settingsButton = new QToolButton();
   settingsButton->setObjectName("plotCanvasTitleTool");
@@ -179,14 +189,24 @@ PlotCanvas::PlotCanvas(QWidget *_parent)
   QFrame *plotFrame = new QFrame(plotScrollArea);
   plotFrame->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
   plotFrame->setObjectName("plotCanvasPlotFrame");
-  this->dataPtr->plotLayout = new QVBoxLayout;
-  plotFrame->setLayout(this->dataPtr->plotLayout);
+  QVBoxLayout *plotLayout = new QVBoxLayout;
+  plotFrame->setLayout(plotLayout);
+
+  this->dataPtr->plotSplitter = new QSplitter(Qt::Vertical);
+  this->dataPtr->plotSplitter->setVisible(false);
+  plotLayout->addWidget(this->dataPtr->plotSplitter);
 
   plotScrollArea->setWidget(plotFrame);
 
   // empty plot
   this->dataPtr->emptyPlot = new IncrementalPlot(this);
-  this->dataPtr->plotLayout->addWidget(this->dataPtr->emptyPlot);
+  connect(this->dataPtr->emptyPlot, SIGNAL(VariableAdded(std::string)),
+      this, SLOT(OnAddVariable(std::string)));
+  plotLayout->addWidget(this->dataPtr->emptyPlot);
+
+  // set initial show grid state
+  showGridAct->setChecked(this->dataPtr->emptyPlot->ShowGrid());
+  connect(showGridAct, SIGNAL(triggered()), this, SLOT(OnShowGrid()));
 
   QFrame *mainFrame = new QFrame;
   mainFrame->setObjectName("plotCanvasFrame");
@@ -279,7 +299,10 @@ void PlotCanvas::AddVariable(const unsigned int _id,
 
   // hide initial empty plot
   if (!this->dataPtr->plotData.empty() && this->dataPtr->emptyPlot)
+  {
     this->dataPtr->emptyPlot->setVisible(false);
+    this->dataPtr->plotSplitter->setVisible(true);
+  }
 
   PlotManager::Instance()->AddIntrospectionCurve(_variable, curve);
 
@@ -331,8 +354,7 @@ void PlotCanvas::RemoveVariable(const unsigned int _id,
   // delete whole plot if no more curves
   if (it->second->variableCurves.empty())
   {
-    this->dataPtr->plotLayout->takeAt(
-        this->dataPtr->plotLayout->indexOf(it->second->plot));
+    it->second->plot->hide();
     it->second->plot->RemoveCurve(curveId);
     delete it->second->plot;
     delete it->second;
@@ -346,7 +368,10 @@ void PlotCanvas::RemoveVariable(const unsigned int _id,
   }
 
   if (this->dataPtr->plotData.empty() && this->dataPtr->emptyPlot)
+  {
     this->dataPtr->emptyPlot->setVisible(true);
+    this->dataPtr->plotSplitter->setVisible(false);
+  }
 
   // remove from variable pill container
   this->dataPtr->yVariableContainer->RemoveVariablePill(_id);
@@ -358,7 +383,10 @@ unsigned int PlotCanvas::AddPlot()
 {
   IncrementalPlot *plot = new IncrementalPlot(this);
   plot->setAutoDelete(false);
-  this->dataPtr->plotLayout->addWidget(plot);
+  plot->ShowGrid(this->dataPtr->emptyPlot->ShowGrid());
+  connect(plot, SIGNAL(VariableAdded(std::string)), this,
+      SLOT(OnAddVariable(std::string)));
+  this->dataPtr->plotSplitter->addWidget(plot);
 
   PlotData *p = new PlotData;
   p->id = this->dataPtr->globalPlotId++;
@@ -380,8 +408,7 @@ void PlotCanvas::RemovePlot(const unsigned int _id)
   // remove the plot if it does not contain any variableCurves (curves)
   if (it->second->variableCurves.empty())
   {
-    this->dataPtr->plotLayout->takeAt(
-        this->dataPtr->plotLayout->indexOf(it->second->plot));
+    it->second->plot->hide();
     delete it->second->plot;
     delete it->second;
     this->dataPtr->plotData.erase(it);
@@ -425,6 +452,34 @@ unsigned int PlotCanvas::PlotByVariable(const unsigned int _variableId) const
     }
   }
   return EmptyPlot;
+}
+
+/////////////////////////////////////////////////
+void PlotCanvas::OnAddVariable(const std::string &_variable)
+{
+  IncrementalPlot *plot =
+      qobject_cast<IncrementalPlot *>(QObject::sender());
+
+  if (!plot)
+    return;
+
+  if (plot == this->dataPtr->emptyPlot)
+  {
+    // add new variable to new plot
+    this->AddVariable(_variable);
+  }
+  else
+  {
+    for (const auto &it : this->dataPtr->plotData)
+    {
+      if (plot == it.second->plot)
+      {
+        // add to existing plot
+        this->AddVariable(_variable, it.second->id);
+        return;
+      }
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -518,14 +573,16 @@ void PlotCanvas::OnMoveVariable(const unsigned int _id,
 
       // hide initial empty plot
       if (!this->dataPtr->plotData.empty() && this->dataPtr->emptyPlot)
+      {
         this->dataPtr->emptyPlot->setVisible(false);
+        this->dataPtr->plotSplitter->setVisible(true);
+      }
     }
 
     // delete plot if empty
     if (p->variableCurves.empty())
     {
-      this->dataPtr->plotLayout->takeAt(
-          this->dataPtr->plotLayout->indexOf(p->plot));
+      p->plot->hide();
 
       // careful about deleting by iterator (plotIt) as it may have been
       // changed if a new plot is added to the vector
@@ -767,20 +824,34 @@ void PlotCanvas::OnDeleteCanvas()
 }
 
 /////////////////////////////////////////////////
+void PlotCanvas::OnShowGrid()
+{
+  this->dataPtr->emptyPlot->ShowGrid(!this->dataPtr->emptyPlot->ShowGrid());
+
+  for (const auto &it : this->dataPtr->plotData)
+    it.second->plot->ShowGrid(!it.second->plot->ShowGrid());
+}
+
+/////////////////////////////////////////////////
 void PlotCanvas::UpdateAxisLabel()
 {
   // show the x-axis label in the last plot only
-  for (int i = 0; i < this->dataPtr->plotLayout->count(); ++i)
+  for (int i = 0; i < this->dataPtr->plotSplitter->count(); ++i)
   {
-    QLayoutItem *item = this->dataPtr->plotLayout->itemAt(i);
-    if (item)
+    IncrementalPlot *p =
+        qobject_cast<IncrementalPlot *>(this->dataPtr->plotSplitter->widget(i));
+
+    if (p)
     {
-      IncrementalPlot *p = qobject_cast<IncrementalPlot *>(item->widget());
-      if (p)
-      {
-        p->ShowAxisLabel(IncrementalPlot::X_BOTTOM_AXIS,
-            i == (this->dataPtr->plotLayout->count()-1));
-      }
+      p->ShowAxisLabel(IncrementalPlot::X_BOTTOM_AXIS,
+          i == (this->dataPtr->plotSplitter->count()-1));
     }
   }
+}
+
+/////////////////////////////////////////////////
+void PlotCanvas::SetDeleteCanvasEnabled(const bool _enable)
+{
+  if (this->dataPtr->deleteCanvasAct)
+    this->dataPtr->deleteCanvasAct->setEnabled(_enable);
 }

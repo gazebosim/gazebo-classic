@@ -64,20 +64,22 @@ namespace gazebo
       /// \brief Export all canvas plots.
       public: void Export();
 
+      /// \brief Update a canvas. This currently just enables/disables the
+      /// delete canvas setting option based on the number of canvases in the
+      /// window.
+      private: void UpdateCanvas();
+
       /// \brief Update all canvases
-      public slots: void Update();
-
-      /// \brief QT callback to continue plotting.
-      private slots: void OnPlay();
-
-      /// \brief QT callback for when plotting is to be paused.
-      private slots: void OnPause();
+      private slots: void Update();
 
       /// \brief Qt Callback when a new plot canvas should be added.
       private slots: void OnAddCanvas();
 
       /// \brief Qt Callback when a plot canvas should be removed.
       private slots: void OnRemoveCanvas();
+
+      /// \brief Toggle simulation play/pause state.
+      private slots: void TogglePause();
 
       /// \internal
       /// \brief Pointer to private data.

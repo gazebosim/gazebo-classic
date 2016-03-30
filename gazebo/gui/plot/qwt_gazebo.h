@@ -26,6 +26,7 @@
 #include <qwt/qwt_plot.h>
 #include <qwt/qwt_scale_widget.h>
 #include <qwt/qwt_scale_engine.h>
+#include <qwt/qwt_plot_zoomer.h>
 #include <qwt/qwt_plot_panner.h>
 #include <qwt/qwt_plot_layout.h>
 #include <qwt/qwt_plot_grid.h>

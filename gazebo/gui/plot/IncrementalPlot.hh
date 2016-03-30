@@ -132,6 +132,14 @@ namespace gazebo
       /// \param[in] _show True to show the label, false to hide it.
       public: void ShowAxisLabel(const PlotAxis _axis, const bool _show);
 
+      /// \brief Set whether to show the grid lines.
+      /// \param[in] _show True to show grid lines.
+      public: void ShowGrid(const bool _show);
+
+      /// \brief Get whether the grid lines are shown.
+      /// \return True if the grid lines are visible.
+      public: bool ShowGrid() const;
+
       /// \brief Get all curves in this plot
       /// \return A list of curves in this plot.
       public: std::vector<PlotCurveWeakPtr> Curves() const;
@@ -139,6 +147,18 @@ namespace gazebo
       /// \brief Give QT a size hint.
       /// \return Default size of the plot.
       public: virtual QSize sizeHint() const;
+
+      /// \brief Used to accept drag enter events.
+      /// \param[in] _evt The drag event.
+      protected: void dragEnterEvent(QDragEnterEvent *_evt);
+
+      /// \brief Used to accept drop events.
+      /// \param[in] _evt The drop event.
+      protected: void dropEvent(QDropEvent *_evt);
+
+      /// \brief Qt signal emitted when a variable pill is added
+      /// \param[in] _name Name of variable pill added.
+      Q_SIGNALS: void VariableAdded(const std::string &_name);
 
       /// \internal
       /// \brief Private data pointer
