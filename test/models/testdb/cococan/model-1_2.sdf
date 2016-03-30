@@ -1,34 +1,25 @@
 <?xml version="1.0" ?>
-<gazebo version="1.2">
-  <model name="cococan">
+<sdf version="1.2">
+  <model name="box">
+    <pose>0 0 0.5 0 0 0</pose>
     <link name="link">
-      <inertial>
-        <mass>0.390</mass>
-        <inertia>
-          <ixx>0.00058</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>0.00058</iyy>
-          <iyz>0</iyz>
-          <izz>0.00019</izz>
-        </inertia>
-      </inertial>
       <collision name="collision">
-        <pose>0 0 -0.46 0 0 0</pose>
         <geometry>
-          <mesh>
-            <uri>model://cococan/meshes/cococan_12.dae</uri>
-          </mesh>
+          <box>
+            <size>1 1 1</size>
+          </box>
         </geometry>
       </collision>
       <visual name="visual">
-        <pose>0 0 -0.46 0 0 0</pose>
         <geometry>
-          <mesh>
-            <uri>model://cococan/meshes/cococan_12.dae</uri>
-          </mesh>
+          <box>
+            <size>1 1 1</size>
+          </box>
         </geometry>
+        <material>
+          <script>Gazebo/WoodPallet</script>
+        </material>
       </visual>
     </link>
   </model>
-</gazebo>
+</sdf>
