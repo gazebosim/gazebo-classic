@@ -146,6 +146,11 @@ QToolButton
   border: 0px solid #808080;
 }
 
+QWidget#plotEditTitle > QLabel:hover
+{
+  border-bottom: 1px solid white;
+}
+
 QToolBar#plotToolbar > QToolButton:hover
 {
   border: 0px;
@@ -195,7 +200,7 @@ QPushButton#plotAddCanvas
   padding: 8px;
   font-weight: 100;
   font-size: 20px;
-  background-color: #db4437;
+  background-color: #f78e1e;
   color: #ffffff;
   text-align: center;
   border-radius: 2px;

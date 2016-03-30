@@ -40,8 +40,10 @@ namespace gazebo
   namespace gui
   {
     /// \brief Zoom to mouse position
-    class PlotMagnifier : QwtPlotMagnifier
+    class PlotMagnifier : public QwtPlotMagnifier
     {
+      /// \brief Constructor
+      /// \param[in] _canvas Canvas the magnifier will be attached to.
 #if (QWT_VERSION < ((6 << 16) | (1 << 8) | 0))
       public: PlotMagnifier(QwtPlotCanvas *_canvas)
 #else
@@ -55,6 +57,8 @@ namespace gazebo
                   this->setWheelFactor(1/f);
               }
 
+      /// \brief Callback for a mouse wheel event
+      /// \param[in] _wheelEvent Qt mouse wheel event
       protected: virtual void widgetWheelEvent(QWheelEvent *_wheelEvent)
               {
                 this->mousePos = _wheelEvent->pos();
@@ -62,16 +66,20 @@ namespace gazebo
                 QwtMagnifier::widgetWheelEvent(_wheelEvent);
               }
 
-      protected: virtual void rescale(double factor)
+      /// \brief Update plot scale by changing bounds of x and y axes.
+      /// \param[in] _factor Factor to scale the plot by.
+      protected: virtual void rescale(double _factor)
               {
-                QwtPlot* plt = plot();
+                QwtPlot *plt = plot();
                 if ( plt == NULL )
                     return;
 
-                factor = qAbs(factor);
-                if ( ignition::math::equal(factor, 1.0) ||
+                double factor = qAbs(_factor);
+                if (ignition::math::equal(factor, 1.0) ||
                     ignition::math::equal(factor, 0.0))
+                {
                   return;
+                }
 
                 const bool autoReplot = plt->autoReplot();
                 plt->setAutoReplot(false);
@@ -144,6 +152,7 @@ namespace gazebo
                 plt->replot();
               }
 
+        /// \brief Mouse position
         private: QPoint mousePos;
     };
 
@@ -170,7 +179,10 @@ namespace gazebo
       public: QwtPlotGrid *grid;
 
       /// \brief Period duration in seconds.
-      public: unsigned int period;
+      public: double period;
+
+      /// \brief Previous last point on plot
+      public: ignition::math::Vector2d prevPoint;
     };
   }
 }
@@ -228,6 +240,9 @@ IncrementalPlot::IncrementalPlot(QWidget *_parent)
   this->enableAxis(QwtPlot::yLeft);
   this->setAxisScaleEngine(QwtPlot::yLeft, new QwtLinearScaleEngine());
   this->setAxisAutoScale(QwtPlot::yLeft, true);
+
+  this->enableAxis(QwtPlot::xBottom);
+  this->setAxisScale(QwtPlot::xBottom, 0, this->dataPtr->period);
 
   this->ShowAxisLabel(X_BOTTOM_AXIS, true);
   this->ShowAxisLabel(Y_LEFT_AXIS, true);
@@ -348,7 +363,9 @@ void IncrementalPlot::Update()
 
     if (ignition::math::isnan(lastPoint.X()) ||
         ignition::math::isnan(lastPoint.Y()))
+    {
       continue;
+    }
 
     ignition::math::Vector2d minPt = curve.second->Min();
     ignition::math::Vector2d maxPt = curve.second->Max();
@@ -357,9 +374,37 @@ void IncrementalPlot::Update()
       pointCount - 1, pointCount - 1);
   }
 
-  this->setAxisScale(QwtPlot::xBottom,
-      std::max(0.0, static_cast<double>(lastPoint.X() - this->dataPtr->period)),
-      std::max(1.0, static_cast<double>(lastPoint.X())));
+  // get x axis lower and upper bounds
+  const QwtScaleMap xScaleMap = this->canvasMap(QwtPlot::xBottom);
+  double lastX = lastPoint.X();
+  double prevX = this->dataPtr->prevPoint.X();
+  double dx = lastX - prevX;
+  double minX = 0;
+  double maxX = 0;
+
+  // plot the line until time = period then start moving the x window.
+  // Checking the min X bound (xScaleMap.s1()) helps to detect a
+  // user zoom at beginning of the plot. At any time the scale is changed
+  // (from zooming), the moving window size is updated.
+  if ((ignition::math::equal(xScaleMap.s1(), 0.0) &&
+      lastX < this->dataPtr->period) || ignition::math::equal(prevX, 0.0))
+  {
+    // update moving window based on specified period
+    minX = std::max(0.0, lastX - this->dataPtr->period);
+    maxX = std::max(1.0, lastX);
+  }
+  else
+  {
+    // update moving window based on current x scale
+    dx = std::max(0.0, dx);
+    minX = xScaleMap.s1() + dx;
+    maxX = xScaleMap.s2() + dx;
+    minX = std::max(0.0, minX);
+    maxX = std::max(1.0, maxX);
+  }
+
+  this->dataPtr->prevPoint = lastPoint;
+  this->setAxisScale(QwtPlot::xBottom, minX, maxX);
 
   this->replot();
 }

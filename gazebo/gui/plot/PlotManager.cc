@@ -173,9 +173,3 @@ std::string PlotManager::HumanReadableName(const std::string &_uri) const
 
   return label;
 }
-
-/////////////////////////////////////////////////
-void PlotManager::SetPaused(const bool _paused)
-{
-  this->dataPtr->introspectionCurve.SetPaused(_paused);
-}

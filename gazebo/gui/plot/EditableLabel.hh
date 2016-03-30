@@ -31,28 +31,23 @@ namespace gazebo
     // Forward declare private data class
     class EditableLabelPrivate;
 
-    /// \brief Plot Curve data.
+    /// \brief Editable Label. The widget toggles between a QLabel and
+    /// QLineEdit to support edits to the label text.
     class GZ_GUI_VISIBLE EditableLabel : public QWidget
     {
       Q_OBJECT
 
       /// \brief Constructor.
-      /// \param[in] _label Label.
+      /// \param[in] _label Label text.
       /// \param[in] _parent Parent widget.
       public: EditableLabel(const std::string &_label, QWidget *_parent = NULL);
 
       /// \brief Destructor.
       public: ~EditableLabel();
 
-      /// \brief Set whether to show border.
-      /// \param[in] _show True to show border.
-      public: void ShowBorder(const bool _show);
-
-      /// \brief Used to filter mouse hover events.
-      /// \param[in] _o Object that receives the event.
-      /// \param[in] _event Pointer to the event.
-      /// \return True if event was handled.
-      protected: virtual bool eventFilter(QObject *_o, QEvent *_event);
+      /// \brief Get the string of this label.
+      /// \return Label string.
+      public: std::string Text() const;
 
       /// \brief Qt mouse double click event.
       /// \param[in] _event Qt mouse event

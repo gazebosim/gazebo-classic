@@ -15,7 +15,6 @@
  *
 */
 
-#include <iostream>
 #include "gazebo/gui/plot/EditableLabel.hh"
 
 using namespace gazebo;
@@ -43,6 +42,7 @@ EditableLabel::EditableLabel(const std::string &_label, QWidget *_parent)
   : QWidget(_parent),
     dataPtr(new EditableLabelPrivate())
 {
+  this->setObjectName("plotEditTitle");
   this->dataPtr->lineEdit = new QLineEdit(this);
   connect(this->dataPtr->lineEdit, SIGNAL(editingFinished()),
     this, SLOT(OnEditingFinished()));
@@ -54,8 +54,6 @@ EditableLabel::EditableLabel(const std::string &_label, QWidget *_parent)
   mainLayout->addWidget(this->dataPtr->lineEdit);
   this->setLayout(mainLayout);
 
-  this->ShowBorder(false);
-
   this->installEventFilter(this);
 }
 
@@ -65,20 +63,9 @@ EditableLabel::~EditableLabel()
 }
 
 /////////////////////////////////////////////////
-void EditableLabel::ShowBorder(const bool _show)
+std::string EditableLabel::Text() const
 {
-  QString borderColor;
-  if (_show)
-    borderColor = "black";
-  else
-    borderColor = "transparent";
-
-  this->dataPtr->label->setStyleSheet(
-      "QLabel\
-      {\
-        border-radius: 6px;\
-        border: 1px solid " + borderColor +";\
-      }");
+  return this->dataPtr->label->text().toStdString();
 }
 
 /////////////////////////////////////////////////
@@ -89,26 +76,6 @@ void EditableLabel::mouseDoubleClickEvent(QMouseEvent */*_event*/)
   this->dataPtr->lineEdit->show();
   this->dataPtr->lineEdit->setFocus();
   this->dataPtr->lineEdit->selectAll();
-}
-
-/////////////////////////////////////////////////
-bool EditableLabel::eventFilter(QObject *_object, QEvent *_event)
-{
-  if (_object != this)
-    return false;
-
-  if (_event->type() == QEvent::Enter)
-  {
-    this->ShowBorder(true);
-    return true;
-  }
-  else if (_event->type() == QEvent::Leave)
-  {
-    this->ShowBorder(false);
-    return true;
-  }
-
-  return false;
 }
 
 /////////////////////////////////////////////////
