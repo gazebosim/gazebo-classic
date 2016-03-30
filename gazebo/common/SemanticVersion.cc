@@ -20,26 +20,35 @@
 #include <algorithm>
 
 #include "SemanticVersion.hh"
+#include "SemanticVersionPrivate.hh"
 
 using namespace gazebo;
 using namespace common;
 
 /////////////////////////////////////////////////
 SemanticVersion::SemanticVersion(const std::string &_versionStr)
-  :maj(0), min(0), patch(0)
+  :dataPtr(new SemanticVersionPrivate())
 {
   if (_versionStr.empty())
     return;
-  unsigned int points = std::count(_versionStr.begin(), _versionStr.end(), '.');
+  unsigned int points = std::count(
+    _versionStr.begin(), _versionStr.end(), '.');
   if (points == 0)
-    sscanf(_versionStr.c_str(), "%5u", &this->maj);
+    sscanf(_versionStr.c_str(), "%5u", &this->dataPtr->maj);
   if (points == 1)
-    sscanf(_versionStr.c_str(), "%5u.%5u", &this->maj, &this->min);
+    sscanf(_versionStr.c_str(),
+      "%5u.%5u", &this->dataPtr->maj, &this->dataPtr->min);
   if (points >= 2)
   {
-    sscanf(_versionStr.c_str(), "%5u.%5u.%5u", &this->maj, &this->min,
-        &this->patch);
+    sscanf(_versionStr.c_str(),
+      "%5u.%5u.%5u", &this->dataPtr->maj, &this->dataPtr->min,
+        &this->dataPtr->patch);
   }
+}
+
+/////////////////////////////////////////////////
+SemanticVersion::~SemanticVersion()
+{
 }
 
 /////////////////////////////////////////////////
@@ -47,16 +56,17 @@ SemanticVersion::SemanticVersion(const unsigned int _maj,
   const unsigned int _min,
   const unsigned int _patch)
 {
-  this->maj = _maj;
-  this->min = _min;
-  this->patch = _patch;
+  this->dataPtr->maj = _maj;
+  this->dataPtr->min = _min;
+  this->dataPtr->patch = _patch;
 }
 
 /////////////////////////////////////////////////
 std::string SemanticVersion::Version() const
 {
-  return std::to_string(this->maj) + "." + std::to_string(this->min) \
-    + "." + std::to_string(this->patch);
+  return std::to_string(this->dataPtr->maj) + "." +
+    std::to_string(this->dataPtr->min) \
+    + "." + std::to_string(this->dataPtr->patch);
 }
 
 /////////////////////////////////////////////////
@@ -65,27 +75,27 @@ bool SemanticVersion::operator<(const SemanticVersion &_other) const
   if (this == &_other)
     return false;
 
-  if (this->maj < _other.maj)
+  if (this->dataPtr->maj < _other.dataPtr->maj)
   {
     return true;
   }
-  if (this->maj > _other.maj)
+  if (this->dataPtr->maj > _other.dataPtr->maj)
   {
     return false;
   }
-  if (this->min < _other.min)
+  if (this->dataPtr->min < _other.dataPtr->min)
   {
     return true;
   }
-  if (this->min > _other.min)
+  if (this->dataPtr->min > _other.dataPtr->min)
   {
     return false;
   }
-  if (this->patch < _other.patch)
+  if (this->dataPtr->patch < _other.dataPtr->patch)
   {
     return true;
   }
-  if (this->patch > _other.patch)
+  if (this->dataPtr->patch > _other.dataPtr->patch)
   {
     return false;
   }
@@ -114,11 +124,12 @@ bool SemanticVersion::operator>=(const SemanticVersion &_other) const
 /////////////////////////////////////////////////
 bool SemanticVersion::operator==(const SemanticVersion &_other) const
 {
-  if ( &_other == this)
+  if (this == &_other)
     return true;
 
-  return (_other.maj == this->maj) && (_other.min == this->min)
-    && (_other.patch == this->patch);
+  return (_other.dataPtr->maj == this->dataPtr->maj)
+    && (_other.dataPtr->min == this->dataPtr->min)
+    && (_other.dataPtr->patch == this->dataPtr->patch);
 }
 
 /////////////////////////////////////////////////
@@ -126,3 +137,5 @@ bool SemanticVersion::operator!=(const SemanticVersion &_other) const
 {
   return !(*this == _other);
 }
+
+
