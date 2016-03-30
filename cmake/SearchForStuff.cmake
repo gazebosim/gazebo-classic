@@ -246,7 +246,7 @@ if (PKG_CONFIG_FOUND)
   else()
     # Needed in WIN32 since in UNIX the flag is added in the code installed
     message (STATUS "Skipping search for tinyxml2")
-    set (tinyxml2_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/deps/win/tinyxml2")
+    set (tinyxml2_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/deps/tinyxml2")
     set (tinyxml2_LIBRARIES "")
     set (tinyxml2_LIBRARY_DIRS "")
   endif()
