@@ -27,6 +27,71 @@ using namespace common;
 class SemVerTest : public gazebo::testing::AutoLogFixture { };
 
 /////////////////////////////////////////////////
+TEST_F(SemVerTest, Prerelease)
+{
+  SemanticVersion a("0.1.0");
+  SemanticVersion b("0.1.0-pr2");
+
+  EXPECT_TRUE(b < a);
+  EXPECT_TRUE(a.Prerelease().empty());
+  EXPECT_EQ(b.Prerelease(), "pr2");
+
+  EXPECT_EQ(b.Major(), a.Major());
+  EXPECT_EQ(b.Minor(), a.Minor());
+  EXPECT_EQ(b.Patch(), a.Patch());
+  EXPECT_EQ(b.Build(), a.Build());
+}
+
+/////////////////////////////////////////////////
+TEST_F(SemVerTest, Build)
+{
+  SemanticVersion a("0.1.0");
+  SemanticVersion b("0.1.0+012345");
+
+  EXPECT_TRUE(b == a);
+  EXPECT_TRUE(a.Build().empty());
+  EXPECT_EQ(b.Build(), "012345");
+
+  EXPECT_EQ(b.Major(), a.Major());
+  EXPECT_EQ(b.Minor(), a.Minor());
+  EXPECT_EQ(b.Patch(), a.Patch());
+  EXPECT_EQ(b.Prerelease(), a.Prerelease());
+}
+
+/////////////////////////////////////////////////
+TEST_F(SemVerTest, PrereleaseBuild)
+{
+  SemanticVersion a("0.1.0");
+  SemanticVersion b("0.1.0-pr2");
+  SemanticVersion c("0.1.0+012345");
+  SemanticVersion d("0.1.0-pr2+012345");
+
+  EXPECT_TRUE(b < a);
+  EXPECT_TRUE(b < c);
+  EXPECT_TRUE(b == d);
+  EXPECT_TRUE(a == c);
+
+  EXPECT_EQ(a.Major(), b.Major());
+  EXPECT_EQ(a.Minor(), b.Minor());
+  EXPECT_EQ(a.Patch(), b.Patch());
+  EXPECT_TRUE(a.Prerelease().empty());
+  EXPECT_TRUE(a.Build().empty());
+
+  EXPECT_EQ(b.Major(), c.Major());
+  EXPECT_EQ(b.Minor(), c.Minor());
+  EXPECT_EQ(b.Patch(), c.Patch());
+  EXPECT_EQ(b.Prerelease(), d.Prerelease());
+
+  EXPECT_EQ(c.Major(), d.Major());
+  EXPECT_EQ(c.Minor(), d.Minor());
+  EXPECT_EQ(c.Patch(), d.Patch());
+  EXPECT_EQ(c.Build(), d.Build());
+
+  EXPECT_EQ(d.Build(), "012345");
+  EXPECT_EQ(d.Prerelease(), "pr2");
+}
+
+/////////////////////////////////////////////////
 TEST_F(SemVerTest, Operators)
 {
   SemanticVersion a("0.1.0");

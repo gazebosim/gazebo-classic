@@ -38,16 +38,49 @@ namespace gazebo
       public: SemanticVersion(const std::string &_v);
 
       /// \brief Constructor
-      /// \param[in] _maj The major number
-      /// \param[in] _min The minor number
+      /// \param[in] _major The major number
+      /// \param[in] _minor The minor number
       /// \param[in] _patch The patch number
-      public: SemanticVersion(const unsigned int _maj,
-                              const unsigned int _min,
-                              const unsigned int _patch);
+      /// \param[in] _prerelease The prerelease string
+      /// \param[in] _build The build metadata string
+      public: SemanticVersion(const unsigned int _major,
+                              const unsigned int _minor = 0,
+                              const unsigned int _patch = 0,
+                              const std::string &_prerelease = "",
+                              const std::string &_build = "");
+
+      /// \brief Parse a version string and set the major, minor, patch
+      /// numbers, and prerelease and build strings.
+      /// \param[in] _versionStr The version string, such as "1.2.3-pr+123"
+      /// \retur True on success.
+      public: bool Parse(const std::string &_versionStr);
 
       /// \brief Returns the version as a string
       /// \return The semantic version string
       public: std::string Version() const;
+
+      /// \brief Get the major number
+      /// \return The major number
+      public: unsigned int Major() const;
+
+      /// \brief Get the minor number
+      /// \return The minor number
+      public: unsigned int Minor() const;
+
+      /// \brief Get the patch number
+      /// \return The patch number
+      public: unsigned int Patch() const;
+
+      /// \brief Get the prerelease string.
+      /// \return Prelrease string, empty if a prerelease string was not
+      /// specified.
+      public: std::string Prerelease() const;
+
+      /// \brief Get the build metadata string. Build meta data is not used
+      /// when determining precedence.
+      /// \return Build metadata string, empty if a build metadata string was
+      /// not specified.
+      public: std::string Build() const;
 
       /// \brief Less than comparison operator
       /// \param[in] _other The other version to compare to
@@ -80,13 +113,23 @@ namespace gazebo
       public: bool operator!=(const SemanticVersion &_other) const;
 
       /// \brief Major revision (incompatible api changes)
-      private: unsigned int maj;
+      private: unsigned int maj = 0;
 
       /// \brief Minor revision (backwards compatible new functionality)
-      private: unsigned int min;
+      private: unsigned int min = 0;
 
       /// \brief Patch (bug fixes)
-      private: unsigned int patch;
+      private: unsigned int patch = 0;
+
+      /// \brief Optional pre-release info. A prerelease string may be
+      /// denoted by appending a hyphen and a series of dot separated
+      /// identifiers immediately following the patch version
+      private: std::string prerelease = "";
+
+      /// \brief Optional build meta-data. Build metadata may be denoted by
+      //appending a plus sign and a series of dot separated identifiers
+      //immediately following the patch or pre-release version
+      private: std::string build = "";
     };
   }
 }
