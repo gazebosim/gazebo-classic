@@ -70,14 +70,16 @@ namespace gazebo
       /// \param[in] _factor Factor to scale the plot by.
       protected: virtual void rescale(double _factor)
               {
-                QwtPlot* plt = plot();
+                QwtPlot *plt = plot();
                 if ( plt == NULL )
                     return;
 
                 double factor = qAbs(_factor);
-                if ( ignition::math::equal(factor, 1.0) ||
+                if (ignition::math::equal(factor, 1.0) ||
                     ignition::math::equal(factor, 0.0))
+                {
                   return;
+                }
 
                 const bool autoReplot = plt->autoReplot();
                 plt->setAutoReplot(false);
@@ -361,7 +363,9 @@ void IncrementalPlot::Update()
 
     if (ignition::math::isnan(lastPoint.X()) ||
         ignition::math::isnan(lastPoint.Y()))
+    {
       continue;
+    }
 
     ignition::math::Vector2d minPt = curve.second->Min();
     ignition::math::Vector2d maxPt = curve.second->Max();
