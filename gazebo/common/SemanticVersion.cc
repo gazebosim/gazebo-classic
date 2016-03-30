@@ -117,7 +117,7 @@ bool SemanticVersion::operator==(const SemanticVersion &_other) const
   if ( &_other == this)
     return true;
 
-  return (_other.maj == this->maj) && (_other.min == this->min) \
+  return (_other.maj == this->maj) && (_other.min == this->min)
     && (_other.patch == this->patch);
 }
 

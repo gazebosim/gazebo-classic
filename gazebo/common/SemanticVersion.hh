@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_COMMON_SEMANTICVERSION_HH_
-#define _GAZEBO_COMMON_SEMANTICVERSION_HH_
+#ifndef GAZEBO_COMMON_SEMANTICVERSION_HH_
+#define GAZEBO_COMMON_SEMANTICVERSION_HH_
 
 #include <string>
 #include "gazebo/util/system.hh"
