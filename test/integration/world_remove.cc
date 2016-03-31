@@ -92,7 +92,7 @@ void WorldRemoveTest::RemoveBlankWorld(const std::string &_physicsEngine)
   EXPECT_GT(worldTopicCount, 0u);
 
   // Stats before removing world
-  gzdbg << std::endl
+  gzmsg << "Stats before removing world:" << std::endl
         << "- WorldPtr use count: [" << world.use_count() << "]" << std::endl
         << "- PhysicsEnginePtr use count: [" << physicsEngine.use_count() << "]"
         << std::endl << "- Topics in this world: [" << worldTopicCount << "]"
@@ -127,19 +127,30 @@ void WorldRemoveTest::RemoveBlankWorld(const std::string &_physicsEngine)
   world.reset();
 
   // Check we can't get the world pointer
+  gzmsg << "Expect exception when trying to get removed world:" << std::endl;
+  bool exceptionThrown = false;
   try
   {
     world = physics::get_world("default");
   }
   catch(...)
   {
+    exceptionThrown = true;
   }
-  ASSERT_TRUE(world == NULL);
+  EXPECT_TRUE(world == NULL);
+  EXPECT_TRUE(exceptionThrown);
 
   // Check all topics related to that world are gone
   msgTypes = gazebo::transport::getAdvertisedTopics();
   EXPECT_LT(WorldTopicCount(msgTypes), worldTopicCount);
   EXPECT_EQ(WorldTopicCount(msgTypes), 0u);
+
+  // Stats after removing world
+  gzmsg << "Stats after removing world:" << std::endl
+        << "- WorldPtr use count: [" << world.use_count() << "]" << std::endl
+        << "- PhysicsEnginePtr use count: [" << physicsEngine.use_count() << "]"
+        << std::endl << "- Topics in this world: [" <<
+        WorldTopicCount(msgTypes) << "]" << std::endl;
 }
 
 /////////////////////////////////////////////////

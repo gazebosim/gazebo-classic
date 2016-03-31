@@ -31,7 +31,7 @@ class GripperTest : public ServerFixture
 // \brief Test to make sure the gripper forms a joint when grasping an object
 TEST_F(GripperTest, Close)
 {
-  this->Load("worlds/gripper.world");
+  Load("worlds/gripper.world");
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
@@ -54,9 +54,7 @@ TEST_F(GripperTest, Close)
   leftJoint->SetForce(0, -0.5);
   rightJoint->SetForce(0, 0.5);
 
-  auto nodePtr = transport::NodePtr(new transport::Node());
-  nodePtr->Init();
-  transport::PublisherPtr jointPub = nodePtr->Advertise<msgs::JointCmd>(
+  transport::PublisherPtr jointPub = this->node->Advertise<msgs::JointCmd>(
         "~/simple_gripper/joint_cmd");
 
   msgs::JointCmd msg;
@@ -107,9 +105,7 @@ TEST_F(GripperTest, CloseOpen)
   leftJoint->SetForce(0, -0.5);
   rightJoint->SetForce(0, 0.5);
 
-  auto nodePtr = transport::NodePtr(new transport::Node());
-  nodePtr->Init();
-  transport::PublisherPtr jointPub = nodePtr->Advertise<msgs::JointCmd>(
+  transport::PublisherPtr jointPub = this->node->Advertise<msgs::JointCmd>(
         "~/simple_gripper/joint_cmd");
 
   msgs::JointCmd msg;
