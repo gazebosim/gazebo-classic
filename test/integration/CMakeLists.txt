@@ -73,6 +73,7 @@ set(tests
   physics_torsional_friction.cc
   pioneer2dx.cc
   plugin.cc
+  rayshape.cc
   region_events.cc
   rest_web.cc
   road.cc
@@ -154,6 +155,7 @@ gz_build_dri_tests(${dri_tests} EXTRA_LIBS gazebo_test_fixture)
 set(qt_tests
   insert_model.cc
   model_editor.cc
+  model_editor_undo.cc
   model_manipulation.cc
   track_visual.cc
   undo.cc
