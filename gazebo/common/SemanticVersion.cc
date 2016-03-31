@@ -53,6 +53,12 @@ namespace gazebo
 }
 
 /////////////////////////////////////////////////
+SemanticVersion::SemanticVersion()
+: dataPtr(new SemanticVersionPrivate())
+{
+}
+
+/////////////////////////////////////////////////
 SemanticVersion::SemanticVersion(const std::string &_versionStr)
 : dataPtr(new SemanticVersionPrivate())
 {

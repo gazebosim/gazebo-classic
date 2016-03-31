@@ -37,6 +37,10 @@ namespace gazebo
     /// Compares versions and converts versions from string.
     class GZ_COMMON_VISIBLE SemanticVersion
     {
+      /// \brief Default constructor. Use the Parse function to populate
+      /// an instance with version information.
+      public: SemanticVersion();
+
       /// \brief Constructor
       /// \param[in] _v the string version. ex: "0.3.2"
       public: SemanticVersion(const std::string &_v);
@@ -118,6 +122,17 @@ namespace gazebo
       /// \param[in] _other The other version to compare to
       /// \return True if _other version is different
       public: bool operator!=(const SemanticVersion &_other) const;
+
+      /// \brief Stream insertion operator
+      /// \param _out output stream
+      /// \param _v Semantic version to output
+      /// \return the stream
+      public: friend std::ostream &operator<<(std::ostream &_out,
+                                              const SemanticVersion &_v)
+      {
+        _out << _v.Version();
+        return _out;
+      }
 
       /// \brief Pointer to private data
       private: std::unique_ptr<SemanticVersionPrivate> dataPtr;

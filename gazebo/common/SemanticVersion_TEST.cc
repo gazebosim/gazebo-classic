@@ -103,6 +103,39 @@ TEST_F(SemVerTest, PrereleaseBuild)
 }
 
 /////////////////////////////////////////////////
+TEST_F(SemVerTest, OperatorStreamOut)
+{
+  SemanticVersion a("0.1.0");
+  SemanticVersion b("0.1.0-pr2");
+  SemanticVersion c("0.1.0+012345");
+  SemanticVersion d("0.1.0-pr2+012345");
+
+  {
+    std::ostringstream stream;
+    stream << a;
+    EXPECT_EQ(stream.str(), "0.1.0");
+  }
+
+  {
+    std::ostringstream stream;
+    stream << b;
+    EXPECT_EQ(stream.str(), "0.1.0-pr2");
+  }
+
+  {
+    std::ostringstream stream;
+    stream << c;
+    EXPECT_EQ(stream.str(), "0.1.0+012345");
+  }
+
+  {
+    std::ostringstream stream;
+    stream << d;
+    EXPECT_EQ(stream.str(), "0.1.0-pr2+012345");
+  }
+}
+
+/////////////////////////////////////////////////
 TEST_F(SemVerTest, Operators)
 {
   SemanticVersion a("0.1.0");
