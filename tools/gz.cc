@@ -21,7 +21,6 @@
   #include <Winsock2.h>
 #endif
 
-#include <tinyxml.h>
 #include <stdio.h>
 #include <signal.h>
 #include <tinyxml.h>

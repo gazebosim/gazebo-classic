@@ -22,7 +22,6 @@
 #endif
 
 #include <fstream>
-#include <tinyxml.h>
 
 #include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
