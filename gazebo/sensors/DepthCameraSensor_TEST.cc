@@ -16,6 +16,7 @@
 */
 
 #include <functional>
+#include <mutex>
 
 #include <gtest/gtest.h>
 
