@@ -32,7 +32,6 @@
 #include <boost/archive/iterators/remove_whitespace.hpp>
 #include <boost/archive/iterators/istream_iterator.hpp>
 #include <boost/archive/iterators/transform_width.hpp>
-#include <tinyxml.h>
 
 #include <ignition/math/Rand.hh>
 
