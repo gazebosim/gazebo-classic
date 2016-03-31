@@ -16,7 +16,7 @@
 */
 
 #include <string>
-#include <iostream>
+#include <sstream>
 #include <algorithm>
 
 #include "SemanticVersion.hh"
@@ -31,36 +31,53 @@ namespace gazebo
     class SemanticVersionPrivate
     {
       /// \brief Major revision (incompatible api changes)
-      public: unsigned int maj;
+      public: unsigned int maj = 0;
 
       /// \brief Minor revision (backwards compatible new functionality)
-      public: unsigned int min;
+      public: unsigned int min = 0;
 
       /// \brief Patch (bug fixes)
-      public: unsigned int patch;
+      public: unsigned int patch = 0;
+
+      /// \brief Optional pre-release info. A prerelease string may be
+      /// denoted by appending a hyphen and a series of dot separated
+      /// identifiers immediately following the patch version
+      public: std::string prerelease = "";
+
+      /// \brief Optional build meta-data. Build metadata may be denoted by
+      //appending a plus sign and a series of dot separated identifiers
+      //immediately following the patch or pre-release version
+      public: std::string build = "";
     };
   }
 }
 
 /////////////////////////////////////////////////
-SemanticVersion::SemanticVersion(const std::string &_versionStr)
-  :dataPtr(new SemanticVersionPrivate())
+SemanticVersion::SemanticVersion()
+: dataPtr(new SemanticVersionPrivate())
 {
-  if (_versionStr.empty())
-    return;
-  unsigned int points = std::count(
-    _versionStr.begin(), _versionStr.end(), '.');
-  if (points == 0)
-    sscanf(_versionStr.c_str(), "%5u", &this->dataPtr->maj);
-  if (points == 1)
-    sscanf(_versionStr.c_str(),
-      "%5u.%5u", &this->dataPtr->maj, &this->dataPtr->min);
-  if (points >= 2)
-  {
-    sscanf(_versionStr.c_str(),
-      "%5u.%5u.%5u", &this->dataPtr->maj, &this->dataPtr->min,
-        &this->dataPtr->patch);
-  }
+}
+
+/////////////////////////////////////////////////
+SemanticVersion::SemanticVersion(const std::string &_versionStr)
+: dataPtr(new SemanticVersionPrivate())
+{
+  this->Parse(_versionStr);
+}
+
+/////////////////////////////////////////////////
+SemanticVersion::SemanticVersion(const unsigned int _major,
+  const unsigned int _minor,
+  const unsigned int _patch,
+  const std::string &_prerelease,
+  const std::string &_build)
+: dataPtr(new SemanticVersionPrivate())
+{
+  this->dataPtr->maj = _major;
+  this->dataPtr->min = _minor;
+  this->dataPtr->patch = _patch;
+  this->dataPtr->prerelease = _prerelease;
+  this->dataPtr->build = _build;
 }
 
 /////////////////////////////////////////////////
@@ -69,21 +86,19 @@ SemanticVersion::~SemanticVersion()
 }
 
 /////////////////////////////////////////////////
-SemanticVersion::SemanticVersion(const unsigned int _maj,
-  const unsigned int _min,
-  const unsigned int _patch)
-{
-  this->dataPtr->maj = _maj;
-  this->dataPtr->min = _min;
-  this->dataPtr->patch = _patch;
-}
-
-/////////////////////////////////////////////////
 std::string SemanticVersion::Version() const
 {
-  return std::to_string(this->dataPtr->maj) + "." +
-    std::to_string(this->dataPtr->min) \
-    + "." + std::to_string(this->dataPtr->patch);
+  std::string result = std::to_string(this->dataPtr->maj) + "." +
+    std::to_string(this->dataPtr->min) + "." +
+    std::to_string(this->dataPtr->patch);
+
+  if (!this->dataPtr->prerelease.empty())
+    result += "-" + this->dataPtr->prerelease;
+
+  if (!this->dataPtr->build.empty())
+    result += "+" + this->dataPtr->build;
+
+  return result;
 }
 
 /////////////////////////////////////////////////
@@ -116,6 +131,13 @@ bool SemanticVersion::operator<(const SemanticVersion &_other) const
   {
     return false;
   }
+
+  // If this version has prelrease and the _other doesn't, then this
+  // version is lower. We don't compare the prerelease strings because
+  // they can contain any alphanumeric values.
+  if (!this->dataPtr->prerelease.empty() && _other.dataPtr->prerelease.empty())
+    return true;
+
   // _other is equal
   return false;
 }
@@ -155,4 +177,149 @@ bool SemanticVersion::operator!=(const SemanticVersion &_other) const
   return !(*this == _other);
 }
 
+/////////////////////////////////////////////////
+unsigned int SemanticVersion::Major() const
+{
+  return this->dataPtr->maj;
+}
 
+/////////////////////////////////////////////////
+unsigned int SemanticVersion::Minor() const
+{
+  return this->dataPtr->min;
+}
+
+/////////////////////////////////////////////////
+unsigned int SemanticVersion::Patch() const
+{
+  return this->dataPtr->patch;
+}
+
+/////////////////////////////////////////////////
+std::string SemanticVersion::Prerelease() const
+{
+  return this->dataPtr->prerelease;
+}
+
+/////////////////////////////////////////////////
+std::string SemanticVersion::Build() const
+{
+  return this->dataPtr->build;
+}
+
+/////////////////////////////////////////////////
+bool SemanticVersion::Parse(const std::string &_versionStr)
+{
+  if (_versionStr.empty())
+    return false;
+
+  size_t numericEnd = _versionStr.size();
+  size_t prereleaseStart = _versionStr.find("-");
+  size_t buildStart = _versionStr.find("+");
+
+  // Build meta data, if present, must be after prerelease string, if
+  // present
+  if (buildStart != std::string::npos &&
+      prereleaseStart != std::string::npos &&
+      buildStart < prereleaseStart)
+  {
+    return false;
+  }
+
+  // Check if a prerelease version is present
+  if (prereleaseStart != std::string::npos)
+  {
+    // Set the end of the numeric (major.minor.patch) portion to the
+    // start of the prerelease
+    numericEnd = prereleaseStart;
+
+    // Check if build metadata is present
+    if (buildStart != std::string::npos)
+    {
+      // Set prerelease to the portion between "-" and "+"
+      this->dataPtr->prerelease = _versionStr.substr(numericEnd + 1,
+           buildStart - numericEnd - 1);
+
+      // Get the build metadata.
+      this->dataPtr->build = _versionStr.substr(buildStart + 1);
+    }
+    else
+    {
+      // Set prerelease to the portion between "-" and the string's end
+      this->dataPtr->prerelease = _versionStr.substr(numericEnd + 1);
+    }
+  }
+  // Check if build metadata is present
+  else if (buildStart != std::string::npos)
+  {
+    // Set the end of the numeric (major.minor.patch) portion to the
+    // start of the build metadata
+    numericEnd = buildStart;
+
+    // Pre-release info can't follow the build metadata.
+    this->dataPtr->build = _versionStr.substr(numericEnd + 1);
+  }
+
+  std::string numeric = _versionStr.substr(0, numericEnd);
+  std::istringstream is(numeric);
+  std::string token;
+  for (int i = 0; std::getline(is, token, '.'); ++i)
+  {
+    switch (i)
+    {
+      default:
+      case 0:
+        this->dataPtr->maj = std::stoi(token);
+        break;
+      case 1:
+        this->dataPtr->min = std::stoi(token);
+        break;
+      case 2:
+        this->dataPtr->patch = std::stoi(token);
+        break;
+    };
+  }
+
+  /*char *token = std::strtok(numeric.c_str(), ".");
+  for (int i = 0; token; ++i)
+  {
+
+    switch (i)
+    {
+      default:
+      case 0:
+        this->dataPtr->maj = std::stoi(token);
+        break;
+      case 1:
+        this->dataPtr->min = std::stoi(token);
+        break;
+      case 2:
+        this->dataPtr->patch = std::stoi(token);
+        break;
+    };
+
+    token = std::strtok(NULL, ".");
+  }*/
+
+  /*std::istringstream numeric(
+
+  unsigned int points = std::count(numeric.begin(), numeric.end(), '.');
+  if (points == 0)
+  {
+    sscanf(numeric.c_str(), "%5u", &this->dataPtr->maj);
+  }
+
+  if (points == 1)
+  {
+    sscanf(numeric.c_str(), "%5u.%5u",
+           &this->dataPtr->maj, &this->dataPtr->min);
+  }
+
+  if (points >= 2)
+  {
+    sscanf(numeric.c_str(), "%5u.%5u.%5u", &this->dataPtr->maj,
+        &this->dataPtr->min, &this->dataPtr->patch);
+  }*/
+
+  return true;
+}
