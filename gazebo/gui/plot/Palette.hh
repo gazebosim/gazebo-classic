@@ -131,6 +131,16 @@ namespace gazebo
       /// \param[in] _msg Message containing list of items.
       private: void OnIntrospectionUpdate(const gazebo::msgs::Param_V &_msg);
 
+      /// \brief Signal to trigger IntrospectionUpdateSlot.
+      /// \param[in] _items The list of items.
+      Q_SIGNALS: void IntrospectionUpdateSignal(
+          const std::set<std::string> &_items);
+
+      /// \brief Slot to process introspection items in the Qt thread.
+      /// \param[in] _items The list of items.
+      private slots: void IntrospectionUpdateSlot(
+          const std::set<std::string> &_items);
+
       /// \internal
       /// \brief Pointer to private data.
       private: std::unique_ptr<PalettePrivate> dataPtr;

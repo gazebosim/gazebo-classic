@@ -21,22 +21,23 @@
   #define snprintf _snprintf
 #endif
 
+#include <set>
+#include <string>
 #include <signal.h>
 #include <boost/program_options.hpp>
 #include <boost/property_tree/ini_parser.hpp>
 
-#include "gazebo/gui/qt.h"
-#include "gazebo/gazebo_client.hh"
-
-#include "gazebo/common/Time.hh"
-#include "gazebo/common/ModelDatabase.hh"
-#include "gazebo/common/Console.hh"
-#include "gazebo/common/Plugin.hh"
 #include "gazebo/common/CommonTypes.hh"
-#include "gazebo/gui/SplashScreen.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/ModelDatabase.hh"
+#include "gazebo/common/Plugin.hh"
+#include "gazebo/common/Time.hh"
+#include "gazebo/gazebo_client.hh"
+#include "gazebo/gui/qt.h"
+#include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/ModelRightMenu.hh"
-#include "gazebo/gui/GuiIface.hh"
+#include "gazebo/gui/SplashScreen.hh"
 
 #ifdef WIN32
 # define HOMEDIR "HOMEPATH"
@@ -74,6 +75,10 @@ Q_DECLARE_METATYPE(common::Time)
 // This makes it possible to use std::string in QT signals and slots.
 // qRegisterMetaType is also required, see below.
 Q_DECLARE_METATYPE(std::string)
+
+// This makes it possible to use std::set<std::string> in QT signals and slots.
+// qRegisterMetaType is also required, see below.
+Q_DECLARE_METATYPE(std::set<std::string>)
 
 //////////////////////////////////////////////////
 void print_usage()
@@ -266,6 +271,10 @@ bool gui::load()
   // Register std::string as a type that can be used in signals and slots.
   // Q_DECLARE_METATYPE is also required, see above.
   qRegisterMetaType<std::string>();
+
+  // Register std::set<std::string> as a type that can be used in signals and
+  // slots. Q_DECLARE_METATYPE is also required, see above.
+  qRegisterMetaType< std::set<std::string> >();
 
   g_splashScreen = new gui::SplashScreen();
 
