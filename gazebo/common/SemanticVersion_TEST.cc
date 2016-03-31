@@ -40,6 +40,9 @@ TEST_F(SemVerTest, Prerelease)
   EXPECT_EQ(b.Minor(), a.Minor());
   EXPECT_EQ(b.Patch(), a.Patch());
   EXPECT_EQ(b.Build(), a.Build());
+
+  EXPECT_EQ(a.Version(), "0.1.0");
+  EXPECT_EQ(b.Version(), "0.1.0-pr2");
 }
 
 /////////////////////////////////////////////////
@@ -56,6 +59,9 @@ TEST_F(SemVerTest, Build)
   EXPECT_EQ(b.Minor(), a.Minor());
   EXPECT_EQ(b.Patch(), a.Patch());
   EXPECT_EQ(b.Prerelease(), a.Prerelease());
+
+  EXPECT_EQ(a.Version(), "0.1.0");
+  EXPECT_EQ(b.Version(), "0.1.0+012345");
 }
 
 /////////////////////////////////////////////////
@@ -65,6 +71,11 @@ TEST_F(SemVerTest, PrereleaseBuild)
   SemanticVersion b("0.1.0-pr2");
   SemanticVersion c("0.1.0+012345");
   SemanticVersion d("0.1.0-pr2+012345");
+
+  EXPECT_EQ(a.Version(), "0.1.0");
+  EXPECT_EQ(b.Version(), "0.1.0-pr2");
+  EXPECT_EQ(c.Version(), "0.1.0+012345");
+  EXPECT_EQ(d.Version(), "0.1.0-pr2+012345");
 
   EXPECT_TRUE(b < a);
   EXPECT_TRUE(b < c);

@@ -16,7 +16,7 @@
 */
 
 #include <string>
-#include <iostream>
+#include <sstream>
 #include <algorithm>
 
 #include "SemanticVersion.hh"
@@ -24,28 +24,75 @@
 using namespace gazebo;
 using namespace common;
 
+namespace gazebo
+{
+  namespace common
+  {
+    class SemanticVersionPrivate
+    {
+      /// \brief Major revision (incompatible api changes)
+      public: unsigned int maj = 0;
+
+      /// \brief Minor revision (backwards compatible new functionality)
+      public: unsigned int min = 0;
+
+      /// \brief Patch (bug fixes)
+      public: unsigned int patch = 0;
+
+      /// \brief Optional pre-release info. A prerelease string may be
+      /// denoted by appending a hyphen and a series of dot separated
+      /// identifiers immediately following the patch version
+      public: std::string prerelease = "";
+
+      /// \brief Optional build meta-data. Build metadata may be denoted by
+      //appending a plus sign and a series of dot separated identifiers
+      //immediately following the patch or pre-release version
+      public: std::string build = "";
+    };
+  }
+}
+
 /////////////////////////////////////////////////
 SemanticVersion::SemanticVersion(const std::string &_versionStr)
+: dataPtr(new SemanticVersionPrivate())
 {
   this->Parse(_versionStr);
 }
 
 /////////////////////////////////////////////////
-SemanticVersion::SemanticVersion(const unsigned int _maj,
-  const unsigned int _min,
+SemanticVersion::SemanticVersion(const unsigned int _major,
+  const unsigned int _minor,
   const unsigned int _patch,
   const std::string &_prerelease,
   const std::string &_build)
-: maj(_maj), min(_min), patch(_patch), prerelease(_prerelease),
-  build(_build)
+: dataPtr(new SemanticVersionPrivate())
+{
+  this->dataPtr->maj = _major;
+  this->dataPtr->min = _minor;
+  this->dataPtr->patch = _patch;
+  this->dataPtr->prerelease = _prerelease;
+  this->dataPtr->build = _build;
+}
+
+/////////////////////////////////////////////////
+SemanticVersion::~SemanticVersion()
 {
 }
 
 /////////////////////////////////////////////////
 std::string SemanticVersion::Version() const
 {
-  return std::to_string(this->maj) + "." + std::to_string(this->min) \
-    + "." + std::to_string(this->patch);
+  std::string result = std::to_string(this->dataPtr->maj) + "." +
+    std::to_string(this->dataPtr->min) + "." +
+    std::to_string(this->dataPtr->patch);
+
+  if (!this->dataPtr->prerelease.empty())
+    result += "-" + this->dataPtr->prerelease;
+
+  if (!this->dataPtr->build.empty())
+    result += "+" + this->dataPtr->build;
+
+  return result;
 }
 
 /////////////////////////////////////////////////
@@ -54,27 +101,27 @@ bool SemanticVersion::operator<(const SemanticVersion &_other) const
   if (this == &_other)
     return false;
 
-  if (this->maj < _other.maj)
+  if (this->dataPtr->maj < _other.dataPtr->maj)
   {
     return true;
   }
-  if (this->maj > _other.maj)
+  if (this->dataPtr->maj > _other.dataPtr->maj)
   {
     return false;
   }
-  if (this->min < _other.min)
+  if (this->dataPtr->min < _other.dataPtr->min)
   {
     return true;
   }
-  if (this->min > _other.min)
+  if (this->dataPtr->min > _other.dataPtr->min)
   {
     return false;
   }
-  if (this->patch < _other.patch)
+  if (this->dataPtr->patch < _other.dataPtr->patch)
   {
     return true;
   }
-  if (this->patch > _other.patch)
+  if (this->dataPtr->patch > _other.dataPtr->patch)
   {
     return false;
   }
@@ -82,7 +129,7 @@ bool SemanticVersion::operator<(const SemanticVersion &_other) const
   // If this version has prelrease and the _other doesn't, then this
   // version is lower. We don't compare the prerelease strings because
   // they can contain any alphanumeric values.
-  if (!this->prerelease.empty() && _other.prerelease.empty())
+  if (!this->dataPtr->prerelease.empty() && _other.dataPtr->prerelease.empty())
     return true;
 
   // _other is equal
@@ -110,11 +157,12 @@ bool SemanticVersion::operator>=(const SemanticVersion &_other) const
 /////////////////////////////////////////////////
 bool SemanticVersion::operator==(const SemanticVersion &_other) const
 {
-  if ( &_other == this)
+  if (this == &_other)
     return true;
 
-  return (_other.maj == this->maj) && (_other.min == this->min)
-    && (_other.patch == this->patch);
+  return (_other.dataPtr->maj == this->dataPtr->maj)
+    && (_other.dataPtr->min == this->dataPtr->min)
+    && (_other.dataPtr->patch == this->dataPtr->patch);
 }
 
 /////////////////////////////////////////////////
@@ -126,31 +174,31 @@ bool SemanticVersion::operator!=(const SemanticVersion &_other) const
 /////////////////////////////////////////////////
 unsigned int SemanticVersion::Major() const
 {
-  return this->maj;
+  return this->dataPtr->maj;
 }
 
 /////////////////////////////////////////////////
 unsigned int SemanticVersion::Minor() const
 {
-  return this->min;
+  return this->dataPtr->min;
 }
 
 /////////////////////////////////////////////////
 unsigned int SemanticVersion::Patch() const
 {
-  return this->patch;
+  return this->dataPtr->patch;
 }
 
 /////////////////////////////////////////////////
 std::string SemanticVersion::Prerelease() const
 {
-  return this->prerelease;
+  return this->dataPtr->prerelease;
 }
 
 /////////////////////////////////////////////////
 std::string SemanticVersion::Build() const
 {
-  return this->build;
+  return this->dataPtr->build;
 }
 
 /////////////////////////////////////////////////
@@ -183,16 +231,16 @@ bool SemanticVersion::Parse(const std::string &_versionStr)
     if (buildStart != std::string::npos)
     {
       // Set prerelease to the portion between "-" and "+"
-      this->prerelease = _versionStr.substr(numericEnd + 1,
+      this->dataPtr->prerelease = _versionStr.substr(numericEnd + 1,
            buildStart - numericEnd - 1);
 
       // Get the build metadata.
-      this->build = _versionStr.substr(buildStart + 1);
+      this->dataPtr->build = _versionStr.substr(buildStart + 1);
     }
     else
     {
       // Set prerelease to the portion between "-" and the string's end
-      this->prerelease = _versionStr.substr(numericEnd + 1);
+      this->dataPtr->prerelease = _versionStr.substr(numericEnd + 1);
     }
   }
   // Check if build metadata is present
@@ -203,27 +251,69 @@ bool SemanticVersion::Parse(const std::string &_versionStr)
     numericEnd = buildStart;
 
     // Pre-release info can't follow the build metadata.
-    this->build = _versionStr.substr(numericEnd + 1);
+    this->dataPtr->build = _versionStr.substr(numericEnd + 1);
   }
 
   std::string numeric = _versionStr.substr(0, numericEnd);
+  std::istringstream is(numeric);
+  std::string token;
+  for (int i = 0; std::getline(is, token, '.'); ++i)
+  {
+    switch (i)
+    {
+      default:
+      case 0:
+        this->dataPtr->maj = std::stoi(token);
+        break;
+      case 1:
+        this->dataPtr->min = std::stoi(token);
+        break;
+      case 2:
+        this->dataPtr->patch = std::stoi(token);
+        break;
+    };
+  }
+
+  /*char *token = std::strtok(numeric.c_str(), ".");
+  for (int i = 0; token; ++i)
+  {
+
+    switch (i)
+    {
+      default:
+      case 0:
+        this->dataPtr->maj = std::stoi(token);
+        break;
+      case 1:
+        this->dataPtr->min = std::stoi(token);
+        break;
+      case 2:
+        this->dataPtr->patch = std::stoi(token);
+        break;
+    };
+
+    token = std::strtok(NULL, ".");
+  }*/
+
+  /*std::istringstream numeric(
 
   unsigned int points = std::count(numeric.begin(), numeric.end(), '.');
   if (points == 0)
   {
-    sscanf(_versionStr.c_str(), "%5u", &this->maj);
+    sscanf(numeric.c_str(), "%5u", &this->dataPtr->maj);
   }
 
   if (points == 1)
   {
-    sscanf(_versionStr.c_str(), "%5u.%5u", &this->maj, &this->min);
+    sscanf(numeric.c_str(), "%5u.%5u",
+           &this->dataPtr->maj, &this->dataPtr->min);
   }
 
   if (points >= 2)
   {
-    sscanf(_versionStr.c_str(), "%5u.%5u.%5u", &this->maj, &this->min,
-        &this->patch);
-  }
+    sscanf(numeric.c_str(), "%5u.%5u.%5u", &this->dataPtr->maj,
+        &this->dataPtr->min, &this->dataPtr->patch);
+  }*/
 
   return true;
 }

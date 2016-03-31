@@ -19,12 +19,16 @@
 #define GAZEBO_COMMON_SEMANTICVERSION_HH_
 
 #include <string>
+#include <memory>
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace common
   {
+    // Forward declare private data class
+    class SemanticVersionPrivate;
+
     /// \addtogroup gazebo_common
     /// \{
 
@@ -48,6 +52,9 @@ namespace gazebo
                               const unsigned int _patch = 0,
                               const std::string &_prerelease = "",
                               const std::string &_build = "");
+
+      /// \brief Destructor
+      public: ~SemanticVersion();
 
       /// \brief Parse a version string and set the major, minor, patch
       /// numbers, and prerelease and build strings.
@@ -84,54 +91,37 @@ namespace gazebo
 
       /// \brief Less than comparison operator
       /// \param[in] _other The other version to compare to
-      /// returns True if _other version is newer
+      /// \return True if _other version is newer
       public: bool operator<(const SemanticVersion &_other) const;
 
       /// \brief Less than or equal comparison operator
       /// \param[in] _other The other version to compare to
-      /// returns True if _other version is older or equal
+      /// \return True if _other version is older or equal
       public: bool operator<=(const SemanticVersion &_other) const;
 
       /// \brief Greater than comparison operator
       /// \param[in] _other The other version to compare to
-      /// returns True if _other version is older
+      /// \return True if _other version is older
       public: bool operator>(const SemanticVersion &_other) const;
 
       /// \brief Greater than or equal comparison operator
       /// \param[in] _other The other version to compare to
-      /// returns True if _other version is newer or the same
+      /// \return True if _other version is newer or the same
       public: bool operator>=(const SemanticVersion &_other) const;
 
       /// \brief Equality comparison operator
       /// \param[in] _other The other version to compare to
-      /// returns True if _other version is the same
+      /// \return True if _other version is the same
       public: bool operator==(const SemanticVersion &_other) const;
 
       /// \brief Inequality comparison operator
       /// \param[in] _other The other version to compare to
-      /// returns True if _other version is different
+      /// \return True if _other version is different
       public: bool operator!=(const SemanticVersion &_other) const;
 
-      /// \brief Major revision (incompatible api changes)
-      private: unsigned int maj = 0;
-
-      /// \brief Minor revision (backwards compatible new functionality)
-      private: unsigned int min = 0;
-
-      /// \brief Patch (bug fixes)
-      private: unsigned int patch = 0;
-
-      /// \brief Optional pre-release info. A prerelease string may be
-      /// denoted by appending a hyphen and a series of dot separated
-      /// identifiers immediately following the patch version
-      private: std::string prerelease = "";
-
-      /// \brief Optional build meta-data. Build metadata may be denoted by
-      //appending a plus sign and a series of dot separated identifiers
-      //immediately following the patch or pre-release version
-      private: std::string build = "";
+      /// \brief Pointer to private data
+      private: std::unique_ptr<SemanticVersionPrivate> dataPtr;
     };
   }
 }
-
 #endif
