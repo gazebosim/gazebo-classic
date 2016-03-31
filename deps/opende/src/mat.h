@@ -26,7 +26,7 @@
 #ifndef _ODE_MAT_H_
 #define _ODE_MAT_H_
 
-#include <ode/common.h>
+#include <gazebo/ode/common.h>
 
 
 class dMatrix {

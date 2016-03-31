@@ -20,10 +20,10 @@
  *                                                                       *
  *************************************************************************/
 
-#include <ode/odeconfig.h>
-#include <ode/mass.h>
-#include <ode/odemath.h>
-#include <ode/matrix.h>
+#include <gazebo/ode/odeconfig.h>
+#include <gazebo/ode/mass.h>
+#include <gazebo/ode/odemath.h>
+#include <gazebo/ode/matrix.h>
 #include "config.h"
 
 // Local dependencies
