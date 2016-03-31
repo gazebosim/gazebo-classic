@@ -1131,19 +1131,19 @@ void MainWindow::CreateActions()
   connect(editorGroup, SIGNAL(triggered(QAction *)), this,
       SLOT(OnEditorGroup(QAction *)));
 
-  g_editBuildingAct = new QAction(tr("&Open Building Editor"), editorGroup);
+  g_editBuildingAct = new QAction(tr("&Building Editor"), editorGroup);
   g_editBuildingAct->setShortcut(tr("Ctrl+B"));
   g_editBuildingAct->setStatusTip(tr("Enter Building Editor Mode"));
   g_editBuildingAct->setCheckable(true);
   g_editBuildingAct->setChecked(false);
 
-  g_editTerrainAct = new QAction(tr("&Open Terrain Editor"), editorGroup);
+  g_editTerrainAct = new QAction(tr("&Terrain Editor"), editorGroup);
   g_editTerrainAct->setShortcut(tr("Ctrl+E"));
   g_editTerrainAct->setStatusTip(tr("Enter Terrain Editor Mode"));
   g_editTerrainAct->setCheckable(true);
   g_editTerrainAct->setChecked(false);
 
-  g_editModelAct = new QAction(tr("&Open Model Editor"), editorGroup);
+  g_editModelAct = new QAction(tr("&Model Editor"), editorGroup);
   g_editModelAct->setShortcut(tr("Ctrl+M"));
   g_editModelAct->setStatusTip(tr("Enter Model Editor Mode"));
   g_editModelAct->setCheckable(true);
