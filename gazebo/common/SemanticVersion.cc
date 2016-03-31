@@ -46,8 +46,8 @@ namespace gazebo
       public: std::string prerelease = "";
 
       /// \brief Optional build meta-data. Build metadata may be denoted by
-      //appending a plus sign and a series of dot separated identifiers
-      //immediately following the patch or pre-release version
+      /// appending a plus sign and a series of dot separated identifiers
+      /// immediately following the patch or pre-release version
       public: std::string build = "";
     };
   }
