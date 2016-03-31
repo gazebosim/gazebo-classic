@@ -15,6 +15,7 @@
  *
 */
 
+#include <iostream>
 #include <string>
 #include <sstream>
 #include <algorithm>
@@ -78,6 +79,20 @@ SemanticVersion::SemanticVersion(const unsigned int _major,
   this->dataPtr->patch = _patch;
   this->dataPtr->prerelease = _prerelease;
   this->dataPtr->build = _build;
+}
+
+/////////////////////////////////////////////////
+SemanticVersion::SemanticVersion(const SemanticVersion  &_copy)
+: dataPtr(new SemanticVersionPrivate())
+{
+  *this->dataPtr = *_copy.dataPtr;
+}
+
+/////////////////////////////////////////////////
+SemanticVersion& SemanticVersion::operator=(const SemanticVersion &_other)
+{
+  *this->dataPtr = *_other.dataPtr;
+  return *this;
 }
 
 /////////////////////////////////////////////////
@@ -255,7 +270,6 @@ bool SemanticVersion::Parse(const std::string &_versionStr)
     // Set the end of the numeric (major.minor.patch) portion to the
     // start of the build metadata
     numericEnd = buildStart;
-
     // Pre-release info can't follow the build metadata.
     this->dataPtr->build = _versionStr.substr(numericEnd + 1);
   }
@@ -281,3 +295,4 @@ bool SemanticVersion::Parse(const std::string &_versionStr)
   }
   return true;
 }
+

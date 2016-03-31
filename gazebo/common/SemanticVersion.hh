@@ -45,6 +45,15 @@ namespace gazebo
       /// \param[in] _v the string version. ex: "0.3.2"
       public: SemanticVersion(const std::string &_v);
 
+      /// \brief Copy constructor
+      /// \param[in] _copy the other version
+      public: SemanticVersion(const SemanticVersion  &_copy);
+
+      /// \brief Assignment operator
+      /// \param[in] _other The version to assign from.
+      /// \return The reference to this instance
+      public: SemanticVersion &operator=(const SemanticVersion &_other);
+
       /// \brief Constructor
       /// \param[in] _major The major number
       /// \param[in] _minor The minor number

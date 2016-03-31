@@ -167,6 +167,24 @@ TEST_F(SemVerTest, Operators)
   EXPECT_TRUE(b == b);
 }
 
+/////////////////////////////////////////////////
+TEST_F(SemVerTest, AssignCopy)
+{
+  SemanticVersion a("0.1+pr2");
+  SemanticVersion b("0.2");
+
+  SemanticVersion aa(a);
+  EXPECT_TRUE(a == aa);
+  SemanticVersion aaa = aa;
+  EXPECT_TRUE(a == aaa);
+  // change a
+  a = b;
+  // aaa unchanged
+  EXPECT_TRUE(aa == aaa);
+  // a and aaa now different
+  EXPECT_TRUE(a != aaa);
+}
+
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
