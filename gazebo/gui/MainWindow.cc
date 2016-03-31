@@ -256,8 +256,17 @@ MainWindow::MainWindow()
 /////////////////////////////////////////////////
 MainWindow::~MainWindow()
 {
+  // Delete editors
+  for (auto it = this->dataPtr->editors.begin();
+      it != this->dataPtr->editors.end(); ++it)
+  {
+    delete it->second;
+    this->dataPtr->editors.erase(it);
+  }
+
   delete this->dataPtr->userCmdHistory;
   this->dataPtr->userCmdHistory = NULL;
+
   // Cleanup global actions
   this->DeleteActions();
 }

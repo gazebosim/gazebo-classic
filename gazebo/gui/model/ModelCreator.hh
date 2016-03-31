@@ -103,6 +103,12 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~ModelCreator();
 
+      /// \brief Enable the mouse and key event handlers.
+      public: void EnableEventHandlers();
+
+      /// \brief Disable the mouse and key event handlers.
+      public: void DisableEventHandlers();
+
       /// \brief Set the name of the model.
       /// \param[in] _modelName Name of the model to set to.
       public: void SetModelName(const std::string &_modelName);
@@ -470,7 +476,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Pointer to private data.
-      private: std::unique_ptr<ModelCreatorPrivate> dataPtr;
+      private: ModelCreatorPrivate *dataPtr;
     };
     /// \}
   }

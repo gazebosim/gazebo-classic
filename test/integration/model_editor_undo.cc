@@ -43,7 +43,7 @@ void ModelEditorUndoTest::LinkInsertionByMouse()
   mainWindow->Init();
   mainWindow->show();
 
-  this->ProcessEventsAndDraw();
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get the user camera, scene and GLWidget
   auto cam = gazebo::gui::get_active_camera();
@@ -83,7 +83,7 @@ void ModelEditorUndoTest::LinkInsertionByMouse()
   QTest::mouseRelease(glWidget, Qt::LeftButton, 0,
       QPoint(-mainWindow->width()*0.5, -mainWindow->height()*0.5));
 
-  this->ProcessEventsAndDraw();
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Check the cylinder button is not pressed anymore
   QVERIFY(!cylinderButton->isChecked());
@@ -142,7 +142,7 @@ void ModelEditorUndoTest::LinkDeletionByContextMenu()
   mainWindow->Init();
   mainWindow->show();
 
-  this->ProcessEventsAndDraw();
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get the user camera, scene and GLWidget
   auto cam = gazebo::gui::get_active_camera();
@@ -177,7 +177,7 @@ void ModelEditorUndoTest::LinkDeletionByContextMenu()
   // Undo -> Redo a few times
   for (unsigned int j = 0; j < 3; ++j)
   {
-    this->ProcessEventsAndDraw();
+    this->ProcessEventsAndDraw(mainWindow);
 
     // Check undo is enabled
     QVERIFY(gazebo::gui::g_undoAct->isEnabled());
@@ -193,7 +193,7 @@ void ModelEditorUndoTest::LinkDeletionByContextMenu()
     gzmsg << "Undo deleting [" << linkVisName << "]" << std::endl;
     gazebo::gui::g_undoAct->trigger();
 
-    this->ProcessEventsAndDraw();
+    this->ProcessEventsAndDraw(mainWindow);
 
     // Check redo is enabled
     QVERIFY(!gazebo::gui::g_undoAct->isEnabled());
@@ -230,13 +230,7 @@ void ModelEditorUndoTest::NestedModelInsertionByMouse()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get the user camera, scene and GLWidget
   auto cam = gazebo::gui::get_active_camera();
@@ -276,17 +270,11 @@ void ModelEditorUndoTest::NestedModelInsertionByMouse()
   QMetaObject::invokeMethod(tree[0], "itemClicked", Q_ARG(QTreeWidgetItem *,
       cabinetItem[0]), Q_ARG(int, 0));
 
-  // Press the mouse in the scene to finish inserting a link
+  // Press the mouse in the scene to finish inserting a model
   QTest::mouseRelease(glWidget, Qt::LeftButton, 0,
       QPoint(-mainWindow->width()*0.5, -mainWindow->height()*0.5));
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Undo -> Redo a few times
   std::string insertedModelName = "ModelPreview_0::cabinet";
@@ -298,11 +286,12 @@ void ModelEditorUndoTest::NestedModelInsertionByMouse()
     QVERIFY(!gazebo::gui::g_redoAct->isEnabled());
     QVERIFY(!gazebo::gui::g_redoHistoryAct->isEnabled());
 
-    // Check the link has been inserted
+    // Check the model has been inserted
     auto link = scene->GetVisual(insertedModelName);
     QVERIFY(link != NULL);
 
     // Undo
+    gzmsg << "Undo inserting [" << insertedModelName << "]" << std::endl;
     gazebo::gui::g_undoAct->trigger();
 
     // Check redo is enabled
@@ -311,11 +300,12 @@ void ModelEditorUndoTest::NestedModelInsertionByMouse()
     QVERIFY(gazebo::gui::g_redoAct->isEnabled());
     QVERIFY(gazebo::gui::g_redoHistoryAct->isEnabled());
 
-    // Check the link has been removed
+    // Check the model has been removed
     link = scene->GetVisual(insertedModelName);
     QVERIFY(link == NULL);
 
     // Redo
+    gzmsg << "Redo inserting [" << insertedModelName << "]" << std::endl;
     gazebo::gui::g_redoAct->trigger();
   }
 
@@ -340,13 +330,7 @@ void ModelEditorUndoTest::NestedModelDeletionByContextMenu()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get the user camera, scene and GLWidget
   auto cam = gazebo::gui::get_active_camera();
@@ -354,7 +338,7 @@ void ModelEditorUndoTest::NestedModelDeletionByContextMenu()
   auto scene = cam->GetScene();
   QVERIFY(scene != NULL);
 
-  // Enter the model editor to edit the model
+  // Enter the model editor to edit the nested model
   QVERIFY(gazebo::gui::g_editModelAct != NULL);
   gazebo::gui::g_editModelAct->trigger();
   gazebo::gui::Events::editModel("model_00");
@@ -369,13 +353,7 @@ void ModelEditorUndoTest::NestedModelDeletionByContextMenu()
   QVERIFY(!gazebo::gui::g_redoAct->isEnabled());
   QVERIFY(!gazebo::gui::g_redoHistoryAct->isEnabled());
 
-    // Process some events, and draw the screen
-    for (unsigned int i = 0; i < 10; ++i)
-    {
-      gazebo::common::Time::MSleep(30);
-      QCoreApplication::processEvents();
-      mainWindow->repaint();
-    }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Check the visuals have been created inside the editor
   std::vector<std::string> visNames;
@@ -392,13 +370,7 @@ void ModelEditorUndoTest::NestedModelDeletionByContextMenu()
   // Undo -> Redo a few times
   for (unsigned int j = 0; j < 3; ++j)
   {
-    // Process some events, and draw the screen
-    for (unsigned int i = 0; i < 10; ++i)
-    {
-      gazebo::common::Time::MSleep(30);
-      QCoreApplication::processEvents();
-      mainWindow->repaint();
-    }
+    this->ProcessEventsAndDraw(mainWindow);
 
     // Check undo is enabled
     QVERIFY(gazebo::gui::g_undoAct->isEnabled());
@@ -410,18 +382,11 @@ void ModelEditorUndoTest::NestedModelDeletionByContextMenu()
     for (auto name : visNames)
       QVERIFY(scene->GetVisual(name) == NULL);
 
-    // TODO: Once joint deletion is added, Undo 4 times - one for each joint and
-    // one for the model
-    // for (unsigned int k = 0; k < 4; ++k)
-      gazebo::gui::g_undoAct->trigger();
+    // Undo
+    gzmsg << "Undo deleting [" << visNames[0] << "]" << std::endl;
+    gazebo::gui::g_undoAct->trigger();
 
-    // Process some events, and draw the screen
-    for (unsigned int i = 0; i < 10; ++i)
-    {
-      gazebo::common::Time::MSleep(30);
-      QCoreApplication::processEvents();
-      mainWindow->repaint();
-    }
+    this->ProcessEventsAndDraw(mainWindow);
 
     // Check redo is enabled
     QVERIFY(!gazebo::gui::g_undoAct->isEnabled());
@@ -433,10 +398,9 @@ void ModelEditorUndoTest::NestedModelDeletionByContextMenu()
     for (auto name : visNames)
       QVERIFY(scene->GetVisual(name) != NULL);
 
-    // TODO: Once joint deletion is added, Redo 4 times - one for each joint and
-    // one for the model
-    // for (unsigned int k = 0; k < 4; ++k)
-      gazebo::gui::g_redoAct->trigger();
+    // Redo
+    gzmsg << "Redo deleting [" << visNames[0] << "]" << std::endl;
+    gazebo::gui::g_redoAct->trigger();
   }
 
   mainWindow->close();

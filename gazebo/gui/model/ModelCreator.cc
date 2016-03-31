@@ -324,7 +324,7 @@ ModelCreator::ModelCreator(QObject *_parent)
 
   this->dataPtr->connections.push_back(
       gui::model::Events::ConnectRequestNestedModelRemoval(
-        std::bind(&ModelCreator::RemoveEntity, this, std::placeholders::_1)));
+      std::bind(&ModelCreator::RemoveEntity, this, std::placeholders::_1)));
 
   this->dataPtr->connections.push_back(
       gui::model::Events::ConnectRequestNestedModelInsertion(
@@ -377,6 +377,8 @@ ModelCreator::ModelCreator(QObject *_parent)
 /////////////////////////////////////////////////
 ModelCreator::~ModelCreator()
 {
+  this->DisableEventHandlers();
+
   while (!this->dataPtr->allLinks.empty())
     this->RemoveLinkImpl(this->dataPtr->allLinks.begin()->first);
 
@@ -396,6 +398,9 @@ ModelCreator::~ModelCreator()
   delete this->dataPtr->saveDialog;
 
   delete this->dataPtr->jointMaker;
+
+  delete this->dataPtr;
+  this->dataPtr = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -404,33 +409,12 @@ void ModelCreator::OnEdit(const bool _checked)
   if (_checked)
   {
     this->dataPtr->active = true;
-    KeyEventHandler::Instance()->AddPressFilter("model_creator",
-        std::bind(&ModelCreator::OnKeyPress, this, std::placeholders::_1));
-
-    MouseEventHandler::Instance()->AddPressFilter("model_creator",
-        std::bind(&ModelCreator::OnMousePress, this, std::placeholders::_1));
-
-    MouseEventHandler::Instance()->AddReleaseFilter("model_creator",
-        std::bind(&ModelCreator::OnMouseRelease, this, std::placeholders::_1));
-
-    MouseEventHandler::Instance()->AddMoveFilter("model_creator",
-        std::bind(&ModelCreator::OnMouseMove, this, std::placeholders::_1));
-
-    MouseEventHandler::Instance()->AddDoubleClickFilter("model_creator",
-        std::bind(&ModelCreator::OnMouseDoubleClick, this,
-        std::placeholders::_1));
-
-    this->dataPtr->jointMaker->EnableEventHandlers();
+    this->EnableEventHandlers();
   }
   else
   {
     this->dataPtr->active = false;
-    KeyEventHandler::Instance()->RemovePressFilter("model_creator");
-    MouseEventHandler::Instance()->RemovePressFilter("model_creator");
-    MouseEventHandler::Instance()->RemoveReleaseFilter("model_creator");
-    MouseEventHandler::Instance()->RemoveMoveFilter("model_creator");
-    MouseEventHandler::Instance()->RemoveDoubleClickFilter("model_creator");
-    this->dataPtr->jointMaker->DisableEventHandlers();
+    this->DisableEventHandlers();
     this->dataPtr->jointMaker->Stop();
 
     this->DeselectAll();
@@ -438,6 +422,39 @@ void ModelCreator::OnEdit(const bool _checked)
 
   this->dataPtr->userCmdManager->Reset();
   this->dataPtr->userCmdManager->SetActive(this->dataPtr->active);
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::EnableEventHandlers()
+{
+  KeyEventHandler::Instance()->AddPressFilter("model_creator",
+      std::bind(&ModelCreator::OnKeyPress, this, std::placeholders::_1));
+
+  MouseEventHandler::Instance()->AddPressFilter("model_creator",
+      std::bind(&ModelCreator::OnMousePress, this, std::placeholders::_1));
+
+  MouseEventHandler::Instance()->AddReleaseFilter("model_creator",
+      std::bind(&ModelCreator::OnMouseRelease, this, std::placeholders::_1));
+
+  MouseEventHandler::Instance()->AddMoveFilter("model_creator",
+      std::bind(&ModelCreator::OnMouseMove, this, std::placeholders::_1));
+
+  MouseEventHandler::Instance()->AddDoubleClickFilter("model_creator",
+      std::bind(&ModelCreator::OnMouseDoubleClick, this,
+      std::placeholders::_1));
+
+  this->dataPtr->jointMaker->EnableEventHandlers();
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::DisableEventHandlers()
+{
+  KeyEventHandler::Instance()->RemovePressFilter("model_creator");
+  MouseEventHandler::Instance()->RemovePressFilter("model_creator");
+  MouseEventHandler::Instance()->RemoveReleaseFilter("model_creator");
+  MouseEventHandler::Instance()->RemoveMoveFilter("model_creator");
+  MouseEventHandler::Instance()->RemoveDoubleClickFilter("model_creator");
+  this->dataPtr->jointMaker->DisableEventHandlers();
 }
 
 /////////////////////////////////////////////////
@@ -524,10 +541,17 @@ NestedModelData *ModelCreator::CreateModelFromSDF(
     const sdf::ElementPtr &_modelElem, const rendering::VisualPtr &_parentVis,
     const bool _emit)
 {
+  auto modelData = new NestedModelData();
+
+  if (!_modelElem)
+  {
+    gzerr << "No sdf element given, can't create model" << std::endl;
+    return modelData;
+  }
+
   rendering::VisualPtr modelVisual;
   std::stringstream modelNameStream;
   std::string nestedModelName;
-  NestedModelData *modelData = new NestedModelData();
 
   // If no parent vis, this is the root model
   if (!_parentVis)
