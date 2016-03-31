@@ -555,7 +555,7 @@ if (NOT Qt5Widgets_FOUND)
   BUILD_ERROR("Missing: Qt5")
 endif()
 # Only look for Qt5X11Extras on Unix.
-if (UNIX)
+if (UNIX && NOT APPLE)
   find_package (Qt5X11Extras)
   if (NOT Qt5X11Extras_FOUND)
     BUILD_ERROR("Missing: Qt5X11Extras")
