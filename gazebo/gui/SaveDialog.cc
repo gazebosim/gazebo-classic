@@ -21,6 +21,7 @@
   #include <Winsock2.h>
 #endif
 #include <boost/filesystem.hpp>
+#include <tinyxml.h>
 
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/common/Console.hh"
