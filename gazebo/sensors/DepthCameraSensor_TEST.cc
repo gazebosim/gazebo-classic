@@ -101,7 +101,7 @@ TEST_F(DepthCameraSensor_TEST, CreateDepthCamera)
   }
 
   // sphere with radius 1m is at 2m in front of depth camera
-  // so verify depth readings are between 1-2m
+  // so verify depth readings are between 1-2m in the mid row
   unsigned int halfHeight = static_cast<unsigned int>(imageHeight*0.5)-1;
   for (unsigned int i = imageWidth*halfHeight;
       i < imageWidth*(halfHeight+1); ++i)
