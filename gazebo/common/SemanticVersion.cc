@@ -279,47 +279,5 @@ bool SemanticVersion::Parse(const std::string &_versionStr)
         break;
     };
   }
-
-  /*char *token = std::strtok(numeric.c_str(), ".");
-  for (int i = 0; token; ++i)
-  {
-
-    switch (i)
-    {
-      default:
-      case 0:
-        this->dataPtr->maj = std::stoi(token);
-        break;
-      case 1:
-        this->dataPtr->min = std::stoi(token);
-        break;
-      case 2:
-        this->dataPtr->patch = std::stoi(token);
-        break;
-    };
-
-    token = std::strtok(NULL, ".");
-  }*/
-
-  /*std::istringstream numeric(
-
-  unsigned int points = std::count(numeric.begin(), numeric.end(), '.');
-  if (points == 0)
-  {
-    sscanf(numeric.c_str(), "%5u", &this->dataPtr->maj);
-  }
-
-  if (points == 1)
-  {
-    sscanf(numeric.c_str(), "%5u.%5u",
-           &this->dataPtr->maj, &this->dataPtr->min);
-  }
-
-  if (points >= 2)
-  {
-    sscanf(numeric.c_str(), "%5u.%5u.%5u", &this->dataPtr->maj,
-        &this->dataPtr->min, &this->dataPtr->patch);
-  }*/
-
   return true;
 }
