@@ -21,6 +21,7 @@
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/InsertModelWidget.hh"
 #include "gazebo/gui/MainWindow.hh"
+#include "gazebo/gui/SaveDialog.hh"
 #include "gazebo/gui/model/ModelCreator.hh"
 #include "gazebo/gui/model/ModelEditorEvents.hh"
 
@@ -240,6 +241,10 @@ void ModelEditorUndoTest::NestedModelInsertionByMouse()
   auto glWidget = mainWindow->findChild<gazebo::gui::GLWidget *>("GLWidget");
   QVERIFY(glWidget != NULL);
 
+  // Add the test model database to the insert tab
+  gazebo::gui::SaveDialog::AddDirToModelPaths(
+      CMAKE_SOURCE_DIR "/test/models/testdb/cococan");
+
   // Get the insert model widget
   auto insertModelWidget = mainWindow->findChild<
       gazebo::gui::InsertModelWidget *>("insertModel");
@@ -248,9 +253,9 @@ void ModelEditorUndoTest::NestedModelInsertionByMouse()
   // Get the items in the list
   auto tree = insertModelWidget->findChildren<QTreeWidget *>();
   QVERIFY(tree.size() == 1u);
-  auto cabinetItem = tree[0]->findItems(QString("Cabinet"),
+  auto cococanItem = tree[0]->findItems(QString("cococan"),
       Qt::MatchContains | Qt::MatchRecursive);
-  QVERIFY(cabinetItem.size() > 0);
+  QVERIFY(cococanItem.size() > 0);
 
   // Enter the model editor
   QVERIFY(gazebo::gui::g_editModelAct != NULL);
@@ -268,7 +273,7 @@ void ModelEditorUndoTest::NestedModelInsertionByMouse()
 
   // Trigger signal as if item was clicked
   QMetaObject::invokeMethod(tree[0], "itemClicked", Q_ARG(QTreeWidgetItem *,
-      cabinetItem[0]), Q_ARG(int, 0));
+      cococanItem[0]), Q_ARG(int, 0));
 
   // Press the mouse in the scene to finish inserting a model
   QTest::mouseRelease(glWidget, Qt::LeftButton, 0,
@@ -277,7 +282,7 @@ void ModelEditorUndoTest::NestedModelInsertionByMouse()
   this->ProcessEventsAndDraw(mainWindow);
 
   // Undo -> Redo a few times
-  std::string insertedModelName = "ModelPreview_0::cabinet";
+  std::string insertedModelName = "ModelPreview_0::cococan";
   for (unsigned int j = 0; j < 3; ++j)
   {
     // Check undo is enabled
