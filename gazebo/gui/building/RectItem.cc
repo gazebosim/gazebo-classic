@@ -820,7 +820,8 @@ ignition::math::Vector3d RectItem::Size() const
 /////////////////////////////////////////////////
 ignition::math::Vector3d RectItem::ScenePosition() const
 {
-  return ignition::math::Vector3d(this->scenePos().x(), this->scenePos().y(), 0);
+  return ignition::math::Vector3d(
+      this->scenePos().x(), this->scenePos().y(), 0);
 }
 
 /////////////////////////////////////////////////
