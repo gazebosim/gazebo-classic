@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,7 @@
  * limitations under the License.
  *
 */
-
-#include "gazebo/math/Rand.hh"
+#include <ignition/math.hh>
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/transport.hh"
 #include "plugins/ActorPlugin.hh"
@@ -102,8 +101,8 @@ void ActorPlugin::ChooseNewTarget()
   ignition::math::Vector3d newTarget(this->target);
   while ((newTarget - this->target).Length() < 2.0)
   {
-    newTarget.X(math::Rand::GetDblUniform(-3, 3.5));
-    newTarget.Y(math::Rand::GetDblUniform(-10, 2));
+    newTarget.X(ignition::math::Rand::DblUniform(-3, 3.5));
+    newTarget.Y(ignition::math::Rand::DblUniform(-10, 2));
 
     for (unsigned int i = 0; i < this->world->GetModelCount(); ++i)
     {
@@ -177,7 +176,8 @@ void ActorPlugin::OnUpdate(const common::UpdateInfo &_info)
   // Rotate in place, instead of jumping.
   if (std::abs(yaw.Radian()) > GZ_DTOR(10))
   {
-    pose.Rot() = ignition::math::Quaterniond(1.5707, 0, rpy.Z()+yaw.Radian()*0.001);
+    pose.Rot() = ignition::math::Quaterniond(1.5707, 0, rpy.Z()+
+        yaw.Radian()*0.001);
   }
   else
   {

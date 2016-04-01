@@ -2704,15 +2704,20 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
   else if (_msg->request() == "show_skeleton")
   {
     if (_msg->data() == "all")
+    {
       this->ShowSkeleton(true);
+    }
     else
     {
-      gzerr << "show_skeleton " << _msg->data() << "\n";
       VisualPtr vis = this->GetVisual(_msg->data());
       if (vis)
+      {
         vis->ShowSkeleton(true);
+      }
       else
+      {
         gzerr << "Unable to find link frame visual[" << _msg->data() << "]\n";
+      }
     }
   }
   else if (_msg->request() == "hide_skeleton")
@@ -2723,7 +2728,13 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
     {
       VisualPtr vis = this->GetVisual(_msg->data());
       if (vis)
+      {
         vis->ShowSkeleton(false);
+      }
+      else
+      {
+        gzerr << "Unable to find link frame visual[" << _msg->data() << "]\n";
+      }
     }
   }
 }
