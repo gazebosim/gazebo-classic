@@ -22,8 +22,8 @@
 
 #ifndef _ODE_COMMON_H_
 #define _ODE_COMMON_H_
-#include <ode/odeconfig.h>
-#include <ode/error.h>
+#include <gazebo/ode/odeconfig.h>
+#include <gazebo/ode/error.h>
 #include <math.h>
 
 
@@ -73,7 +73,7 @@ extern "C" {
        "assertion \"" #a "\" failed in %s() [%s]",__FUNCTION__,__FILE__);
 #    define dUASSERT(a,msg) if (!(a)) dDebug (d_ERR_UASSERT, \
        msg " in %s()", __FUNCTION__);
-#    define dDEBUGMSG(msg) dMessage (d_ERR_UASSERT,				\
+#    define dDEBUGMSG(msg) dMessage (d_ERR_UASSERT,        \
        msg " in %s() File %s Line %d", __FUNCTION__, __FILE__,__LINE__);
 #  else /* not __GNUC__*/
 #    define dIASSERT(a) if (!(a)) dDebug (d_ERR_IASSERT, \
@@ -143,17 +143,17 @@ typedef dReal dQuaternion[4];
 
 #if defined(dSINGLE)
 
-#define REAL(x) (x ## f)					/* form a constant */
-#define dRecip(x) ((1.0f/(x)))				/* reciprocal */
-#define dSqrt(x) (sqrtf(x))			/* square root */
-#define dRecipSqrt(x) ((1.0f/sqrtf(x)))		/* reciprocal square root */
-#define dSin(x) (sinf(x))				/* sine */
-#define dCos(x) (cosf(x))				/* cosine */
-#define dFabs(x) (fabsf(x))			/* absolute value */
-#define dAtan2(y,x) (atan2f(y,x))		/* arc tangent with 2 args */
-#define dFMod(a,b) (fmodf(a,b))		/* modulo */
-#define dFloor(x) floorf(x)			/* floor */
-#define dCeil(x) ceilf(x)			/* floor */
+#define REAL(x) (x ## f)          /* form a constant */
+#define dRecip(x) ((1.0f/(x)))        /* reciprocal */
+#define dSqrt(x) (sqrtf(x))      /* square root */
+#define dRecipSqrt(x) ((1.0f/sqrtf(x)))    /* reciprocal square root */
+#define dSin(x) (sinf(x))        /* sine */
+#define dCos(x) (cosf(x))        /* cosine */
+#define dFabs(x) (fabsf(x))      /* absolute value */
+#define dAtan2(y,x) (atan2f(y,x))    /* arc tangent with 2 args */
+#define dFMod(a,b) (fmodf(a,b))    /* modulo */
+#define dFloor(x) floorf(x)      /* floor */
+#define dCeil(x) ceilf(x)      /* floor */
 #define dCopySign(a,b) ((dReal)copysignf(a,b)) /* copy value sign */
 #define dNextAfter(x, y) nextafterf(x, y) /* next value after */
 
@@ -214,10 +214,10 @@ float _nextafterf(float x, float y);
 
 /* internal object types (all prefixed with `dx') */
 
-struct dxWorld;		/* dynamics world */
-struct dxSpace;		/* collision space */
-struct dxBody;		/* rigid body (dynamics object) */
-struct dxGeom;		/* geometry (collision object) */
+struct dxWorld;    /* dynamics world */
+struct dxSpace;    /* collision space */
+struct dxBody;    /* rigid body (dynamics object) */
+struct dxGeom;    /* geometry (collision object) */
 struct dxJoint;
 struct dxJointNode;
 struct dxJointGroup;
@@ -236,17 +236,17 @@ typedef struct dxWorldProcessContext *dWorldStepContextID;
 /* error numbers */
 
 enum {
-  d_ERR_UNKNOWN = 0,		/* unknown error */
-  d_ERR_IASSERT,		/* internal assertion failed */
-  d_ERR_UASSERT,		/* user assertion failed */
-  d_ERR_LCP			/* user assertion failed */
+  d_ERR_UNKNOWN = 0,    /* unknown error */
+  d_ERR_IASSERT,    /* internal assertion failed */
+  d_ERR_UASSERT,    /* user assertion failed */
+  d_ERR_LCP      /* user assertion failed */
 };
 
 
 /* joint type numbers */
 
 typedef enum {
-  dJointTypeNone = 0,		/* or "unknown" */
+  dJointTypeNone = 0,    /* or "unknown" */
   dJointTypeBall,
   dJointTypeHinge,
   dJointTypeScrew,
@@ -283,13 +283,13 @@ typedef struct dLimot {
 } dLimot;
 
 enum {
-  dLimotLoStop		= 0x0001,
-  dLimotHiStop		= 0x0002,
-  dLimotVel		= 0x0004,
-  dLimotFMax		= 0x0008,
-  dLimotFudgeFactor	= 0x0010,
-  dLimotBounce		= 0x0020,
-  dLimotSoft		= 0x0040
+  dLimotLoStop    = 0x0001,
+  dLimotHiStop    = 0x0002,
+  dLimotVel    = 0x0004,
+  dLimotFMax    = 0x0008,
+  dLimotFudgeFactor  = 0x0010,
+  dLimotBounce    = 0x0020,
+  dLimotSoft    = 0x0040
 };
 */
 
@@ -319,7 +319,7 @@ enum {
 
   /*
    \enum  D_ALL_PARAM_NAMES_X
-  
+
    \var dParamGroup This is the starting value of the different group
                     (i.e. dParamGroup1, dParamGroup2, dParamGroup3)
                     It also helps in the use of parameter
@@ -367,10 +367,10 @@ enum {
 /* joint force feedback information */
 
 typedef struct dJointFeedback {
-  dVector3 f1;		/* force applied to body 1 */
-  dVector3 t1;		/* torque applied to body 1 */
-  dVector3 f2;		/* force applied to body 2 */
-  dVector3 t2;		/* torque applied to body 2 */
+  dVector3 f1;    /* force applied to body 1 */
+  dVector3 t1;    /* torque applied to body 1 */
+  dVector3 f2;    /* force applied to body 2 */
+  dVector3 t2;    /* torque applied to body 2 */
 } dJointFeedback;
 
 

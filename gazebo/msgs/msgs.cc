@@ -638,6 +638,21 @@ namespace gazebo
       if (_sdf->HasElement("max_dist"))
         result.set_max_dist(_sdf->GetElement("max_dist")->Get<double>());
 
+      if (_sdf->HasElement("static"))
+        result.set_static_(_sdf->Get<bool>("static"));
+
+      if (_sdf->HasElement("use_model_frame"))
+        result.set_use_model_frame(_sdf->Get<bool>("use_model_frame"));
+
+      if (_sdf->HasElement("inherit_yaw"))
+        result.set_inherit_yaw(_sdf->Get<bool>("inherit_yaw"));
+
+      if (_sdf->HasElement("xyz"))
+      {
+        msgs::Set(result.mutable_xyz(),
+            _sdf->Get<ignition::math::Vector3d>("xyz"));
+      }
+
       return result;
     }
 
@@ -1680,9 +1695,9 @@ namespace gazebo
       msgs::IMUSensor result;
 
       std::array<std::string, 2> senses =
-        {"angular_velocity", "linear_acceleration"};
+        {{"angular_velocity", "linear_acceleration"}};
 
-      std::array<std::string, 3> dimensions = {"x", "y", "z"};
+      std::array<std::string, 3> dimensions = {{"x", "y", "z"}};
 
       for (auto const &sense : senses)
       {
@@ -1844,10 +1859,10 @@ namespace gazebo
 
       // The two types of sensing
       std::array<std::string, 2> sensing =
-        {"position_sensing", "velocity_sensing"};
+        {{"position_sensing", "velocity_sensing"}};
 
       // The two dimensions for each of sensing types.
-      std::array<std::string, 2> dimensions = {"horizontal", "vertical"};
+      std::array<std::string, 2> dimensions = {{"horizontal", "vertical"}};
 
       // Process each sensing
       for (auto const &sense : sensing)

@@ -204,6 +204,7 @@ namespace gazebo
       public: template<typename Handler>
               void AsyncRead(Handler _handler)
               {
+                boost::mutex::scoped_lock lock(this->socketMutex);
                 if (!this->IsOpen())
                 {
                   gzerr << "AsyncRead on a closed socket\n";

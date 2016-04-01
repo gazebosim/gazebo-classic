@@ -108,11 +108,11 @@ rows/columns and manipulate C.
 
 */
 
-#include <ode/common.h>
-#include <ode/matrix.h>
-#include <ode/misc.h>
-#include <ode/timer.h>		// for testing
-#include <ode/odemath.h>
+#include <gazebo/ode/common.h>
+#include <gazebo/ode/matrix.h>
+#include <gazebo/ode/misc.h>
+#include <gazebo/ode/timer.h>		// for testing
+#include <gazebo/ode/odemath.h>
 #include "config.h"
 #include "lcp.h"
 #include "mat.h"		// for testing
