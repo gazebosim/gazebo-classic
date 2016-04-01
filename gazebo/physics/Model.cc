@@ -1343,13 +1343,17 @@ bool Model::GetAutoDisable() const
 /////////////////////////////////////////////////
 void Model::SetSelfCollide(bool _self_collide)
 {
-  this->sdf->GetElement("self_collide")->Set(_self_collide);
+  if (this->sdf->HasElement("self_collide"))
+    this->sdf->GetElement("self_collide")->Set(_self_collide);
 }
 
 /////////////////////////////////////////////////
 bool Model::GetSelfCollide() const
 {
-  return this->sdf->Get<bool>("self_collide");
+  if (this->sdf->HasElement("self_collide"))
+    return this->sdf->Get<bool>("self_collide");
+  else
+    return false;
 }
 
 /////////////////////////////////////////////////
