@@ -19,6 +19,7 @@
  * Date: 15 July 2003
  */
 
+#include <boost/bind.hpp>
 #include <sstream>
 
 #include "gazebo/physics/World.hh"
