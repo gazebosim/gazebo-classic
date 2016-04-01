@@ -162,8 +162,6 @@ void QTestFixture::cleanup()
   delete this->serverThread;
   this->serverThread = NULL;
 
-  gazebo::gui::stop();
-
   double residentEnd, shareEnd;
   this->GetMemInfo(residentEnd, shareEnd);
 
