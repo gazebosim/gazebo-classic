@@ -30,11 +30,6 @@
 #include <fstream>
 #include <functional>
 #include <iostream>
-#include <libavcodec/avcodec.h>
-#include <libavformat/avformat.h>
-#include <libavutil/imgutils.h>
-#include <libavutil/opt.h>
-#include <libswscale/swscale.h>
 #include <libtar.h>
 #include <list>
 #include <malloc.h>
