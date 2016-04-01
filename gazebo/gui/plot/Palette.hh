@@ -43,6 +43,7 @@ namespace gazebo
 
   namespace gui
   {
+    /// \brief Customize the proxy model to display search results.
     class SearchModel : public QSortFilterProxyModel
     {
       /// \brief Customize so we accept rows where:
@@ -92,12 +93,11 @@ namespace gazebo
 
       /// \brief Set a new search value.
       /// \param[in] _search Full search string.
-      public: void setSearch(const QString &_search);
+      public: void SetSearch(const QString &_search);
 
       /// \brief Full search string.
       public: QString search;
     };
-
 
     // Forward declare private data class
     class PalettePrivate;

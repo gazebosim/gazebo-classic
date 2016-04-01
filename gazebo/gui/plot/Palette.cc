@@ -424,7 +424,7 @@ bool SearchModel::hasChildAcceptsItself(const QModelIndex &_srcParent,
 }
 
 /////////////////////////////////////////////////
-void SearchModel::setSearch(const QString &_search)
+void SearchModel::SetSearch(const QString &_search)
 {
   this->search = _search;
   this->filterChanged();
@@ -1500,9 +1500,9 @@ void Palette::InsertAxisItem(QStandardItem *_item, const common::URI &_uri,
 /////////////////////////////////////////////////
 void Palette::UpdateSearch(const QString &_search)
 {
-  this->dataPtr->searchTopicsModel->setSearch(_search);
-  this->dataPtr->searchModelsModel->setSearch(_search);
-  this->dataPtr->searchSimModel->setSearch(_search);
+  this->dataPtr->searchTopicsModel->SetSearch(_search);
+  this->dataPtr->searchModelsModel->SetSearch(_search);
+  this->dataPtr->searchSimModel->SetSearch(_search);
 
   // Expand / collapse
   this->ExpandChildren(this->dataPtr->searchTopicsModel,
