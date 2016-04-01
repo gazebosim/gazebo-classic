@@ -45,6 +45,10 @@
     1. Fix saving and spawning model with its original name
         * [Pull request #2183](https://bitbucket.org/osrf/gazebo/pull-request/2183)
 
+    1. Fix inserting custom links
+        * [Pull request #2222](https://bitbucket.org/osrf/gazebo/pull-request/2222)
+        * [Issue #1834](https://bitbucket.org/osrf/gazebo/issues/1834)
+
 1. Building editor updates
 
     1. Add layers to building levels
