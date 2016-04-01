@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -396,10 +396,14 @@ void JointKinematicTest::SetJointPositionThreadedTest(
     << "]\n";
 }
 
+// This test fails on OSX (see issue #1219)
+// https://bitbucket.org/osrf/gazebo/issues/1219
+#ifndef __APPLE__
 TEST_P(JointKinematicTest, SetJointPositionThreadedTest)
 {
   SetJointPositionThreadedTest(GetParam());
 }
+#endif
 
 //////////////////////////////////////////////////
 void JointKinematicTest::SetJointPositionLoopJointTest(

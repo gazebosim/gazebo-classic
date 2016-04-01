@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,7 +55,8 @@ void LinearBatteryConsumerPlugin::Load(physics::ModelPtr _parent,
     double powerLoad = _sdf->Get<double>("power_load");
     this->consumerId = this->battery->AddConsumer();
     bool success = this->battery->SetPowerLoad(this->consumerId, powerLoad);
-    GZ_ASSERT(success, "Failed to set consumer power load.");
+    if (!success)
+      gzerr << "Failed to set consumer power load." << std::endl;
   }
   else
   {

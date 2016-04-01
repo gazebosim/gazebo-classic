@@ -203,14 +203,20 @@ if (PKG_CONFIG_FOUND)
   endif()
 
   #################################################
-  # Find tinyxml2. Only debian distributions package tinyxml with a pkg-config
-  # Use pkg_check_modules and fallback to manual detection
-  # (needed, at least, for MacOS)
+  # Find tinyxml2. TinyXML version < 3 contains a bug that prevents large log
+  # files from being parsed. By default, we use Gazebo's internal version
+  # of tinyxml2 to overcome this problem.
 
   # Use system installation on UNIX and Apple, and internal copy on Windows
   if (UNIX OR APPLE)
-    message (STATUS "Using system tinyxml2.")
     set (USE_EXTERNAL_TINYXML2 True)
+    pkg_check_modules(TINYXML2_VERSION_3 tinyxml2>=3)
+    if (TINYXML2_VERSION_3_FOUND)
+      message (STATUS "Using system tinyxml2.")
+    else()
+      message (STATUS "Using internal tinyxml2.")
+      set (USE_EXTERNAL_TINYXML2 False)
+    endif()
   elseif(WIN32)
     message (STATUS "Using internal tinyxml2.")
     set (USE_EXTERNAL_TINYXML2 False)
@@ -249,7 +255,7 @@ if (PKG_CONFIG_FOUND)
   else()
     # Needed in WIN32 since in UNIX the flag is added in the code installed
     message (STATUS "Skipping search for tinyxml2")
-    set (tinyxml2_INCLUDE_DIRS "")
+    set (tinyxml2_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/deps/tinyxml2")
     set (tinyxml2_LIBRARIES "")
     set (tinyxml2_LIBRARY_DIRS "")
   endif()
@@ -661,7 +667,7 @@ endif ()
 # Find ignition math in unix platforms
 # In Windows we expect a call from configure.bat script with the paths
 if (NOT WIN32)
-  find_package(ignition-math2 QUIET)
+  find_package(ignition-math2 2.3 QUIET)
   if (NOT ignition-math2_FOUND)
     message(STATUS "Looking for ignition-math2-config.cmake - not found")
     BUILD_ERROR ("Missing: Ignition math2 library.")
@@ -683,6 +689,17 @@ if (NOT WIN32)
     link_directories(${IGNITION-TRANSPORT_LIBRARY_DIRS})
   endif()
 endif()
+
+################################################
+# Find Valgrind for checking memory leaks in the
+# tests
+find_program(VALGRIND_PROGRAM NAMES valgrind PATH ${VALGRIND_ROOT}/bin)
+option(GAZEBO_RUN_VALGRIND_TESTS "Run gazebo tests with Valgrind" FALSE)
+mark_as_advanced(GAZEBO_RUN_VALGRIND_TESTS)
+if (GAZEBO_RUN_VALGRIND_TESTS AND NOT VALGRIND_PROGRAM)
+  BUILD_WARNING("valgrind not found. Memory check tests will be skipped.")
+endif()
+
 
 ########################################
 # Find QWT (QT graphing library)

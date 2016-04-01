@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/physics/World.hh"
+#include "gazebo/physics/AtmosphereFactory.hh"
 #include "gazebo/physics/PhysicsFactory.hh"
 #include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/gazebo_config.h"
@@ -40,6 +41,7 @@ uint32_t g_uniqueId = 0;
 bool physics::load()
 {
   physics::PhysicsFactory::RegisterAll();
+  physics::AtmosphereFactory::RegisterAll();
   return true;
 }
 

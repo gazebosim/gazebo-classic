@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -118,7 +118,7 @@ void OculusWindow::AttachCameraToVisual()
     return;
   }
 
-  this->oculusCamera->AttachToVisual(this->visualName, true);
+  this->oculusCamera->AttachToVisual(this->visualName, true, 0, 0);
 
   math::Vector3 camPos(0.1, 0, 0);
   math::Vector3 lookAt(0, 0, 0);
@@ -128,8 +128,8 @@ void OculusWindow::AttachCameraToVisual()
 
   double pitch = atan2(-delta.z, sqrt(delta.x*delta.x + delta.y*delta.y));
 
-  this->oculusCamera->SetWorldPose(ignition::math::Pose3d(
-        camPos.Ign(), ignition::math::Vector3d(0, pitch, yaw)));
+  this->oculusCamera->SetWorldPose(ignition::math::Pose3d(camPos.Ign(),
+      ignition::math::Quaterniond(0.0, pitch, yaw)));
 }
 
 /////////////////////////////////////////////////

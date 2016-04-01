@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1470,4 +1470,24 @@ bool Model::RemoveJoint(const std::string &_name)
            << "], not removed.\n";
     return false;
   }
+}
+
+/////////////////////////////////////////////////
+LinkPtr Model::CreateLink(const std::string &_name)
+{
+  LinkPtr link;
+  if (this->GetLink(_name))
+  {
+    gzwarn << "Model [" << this->GetName()
+      << "] already has a link named [" << _name
+      << "], skipping creating link.\n";
+    return link;
+  }
+
+  link = this->world->GetPhysicsEngine()->CreateLink(shared_from_this());
+
+  link->SetName(_name);
+  this->links.push_back(link);
+
+  return link;
 }

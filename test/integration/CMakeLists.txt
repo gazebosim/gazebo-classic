@@ -59,6 +59,7 @@ set(tests
   logical_camera_sensor.cc
   model.cc
   model_database.cc
+  multirayshape.cc
   nested_model.cc
   noise.cc
   nondefault_world.cc
@@ -76,6 +77,7 @@ set(tests
   physics_torsional_friction.cc
   pioneer2dx.cc
   plugin.cc
+  rayshape.cc
   region_events.cc
   rest_web.cc
   road.cc
@@ -112,13 +114,19 @@ if (MANPAGES_SUPPORT)
 	      manpages.cc)
 endif()
 
-gz_build_tests(${tests})
+gz_build_tests(${tests} EXTRA_LIBS gazebo_test_fixture)
 
 if (ENABLE_TESTS_COMPILATION)
   # Increase timeout, to account for model download time.
   set_tests_properties(${TEST_TYPE}_joint_revolute PROPERTIES TIMEOUT 500)
   set_tests_properties(${TEST_TYPE}_physics PROPERTIES TIMEOUT 500)
   set_tests_properties(${TEST_TYPE}_worlds_installed PROPERTIES TIMEOUT 700)
+
+  # Increase timeout for debug-mode
+  if (${CMAKE_BUILD_TYPE_UPPERCASE} STREQUAL "DEBUG" OR
+      ${CMAKE_BUILD_TYPE_UPPERCASE} STREQUAL "COVERAGE")
+    set_tests_properties(${TEST_TYPE}_joint_gearbox PROPERTIES TIMEOUT 400)
+  endif()
 
   # Add plugin dependency
   add_dependencies(${TEST_TYPE}_joint_test SpringTestPlugin)
@@ -133,6 +141,7 @@ gz_build_display_tests(${display_tests})
 set(dri_tests
   camera.cc
   camera_sensor.cc
+  depth_camera.cc
   factory.cc
   gpu_laser.cc
   gz_camera.cc
@@ -145,12 +154,14 @@ set(dri_tests
   speed_pr2.cc
   world_reset.cc
 )
-
-gz_build_dri_tests(${dri_tests})
+gz_build_dri_tests(${dri_tests} EXTRA_LIBS gazebo_test_fixture)
 
 set(qt_tests
   insert_model.cc
   model_editor.cc
+  model_editor_undo.cc
+  model_manipulation.cc
+  track_visual.cc
   undo.cc
   visual_pose.cc
 )

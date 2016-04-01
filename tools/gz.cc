@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 
 #include <stdio.h>
 #include <signal.h>
+#include <tinyxml.h>
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 
@@ -45,6 +46,7 @@ Command::Command(const std::string &_name, const std::string &_brief)
   : name(_name), brief(_brief), visibleOptions("Options"), argc(0), argv(NULL)
 {
   this->visibleOptions.add_options()
+    ("verbose", "Print extra information")
     ("help,h", "Print this help message");
 }
 
@@ -185,6 +187,11 @@ bool Command::Run(int _argc, char **_argv)
   {
     this->Help();
     return true;
+  }
+
+  if (this->vm.count("verbose"))
+  {
+    gazebo::common::Console::SetQuiet(false);
   }
 
   if (!this->TransportInit())

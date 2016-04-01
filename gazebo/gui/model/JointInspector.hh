@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -144,6 +144,10 @@ namespace gazebo
       /// \brief Enable ok button if all values in the dialog are valid.
       /// \return True if all values are valid.
       private: bool CheckValid();
+
+      /// \brief Qt close event
+      /// \param[in] _event Qt close event pointer
+      private: void closeEvent(QCloseEvent *_event);
 
       /// \internal
       /// \brief Pointer to private data.

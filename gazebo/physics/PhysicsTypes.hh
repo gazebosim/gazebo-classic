@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,6 +48,7 @@ namespace gazebo
     class UserCmd;
     class UserCmdManager;
     class PhysicsEngine;
+    class Atmosphere;
     class Mass;
     class Road;
     class Shape;
@@ -114,6 +115,10 @@ namespace gazebo
     /// \def  PhysicsEnginePtr
     /// \brief Boost shared pointer to a PhysicsEngine object
     typedef boost::shared_ptr<PhysicsEngine> PhysicsEnginePtr;
+
+    /// \def AtmospherePtr
+    /// \brief Standard shared pointer to an Atmosphere object
+    typedef std::shared_ptr<Atmosphere> AtmospherePtr;
 
     /// \def  PresetManagerPtr
     /// \brief Shared pointer to a PresetManager object

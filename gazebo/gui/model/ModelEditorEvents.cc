@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2015 Open Source Robotics Foundation
+ * Copyright (C) 2013-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ event::EventT<void (std::string)> model::Events::nestedModelInserted;
 event::EventT<void (std::string)> model::Events::linkInserted;
 event::EventT<void (std::string)> model::Events::nestedModelRemoved;
 event::EventT<void (std::string)> model::Events::linkRemoved;
+event::EventT<void (sdf::ElementPtr)> model::Events::requestLinkInsertion;
 event::EventT<void (std::string)> model::Events::requestLinkRemoval;
 event::EventT<void (std::string, std::string, std::string, std::string,
     std::string)> model::Events::jointInserted;

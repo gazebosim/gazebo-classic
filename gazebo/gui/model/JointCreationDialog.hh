@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -91,7 +91,8 @@ namespace gazebo
       private slots: void OnAlign(const int _int);
 
       /// \brief Uncheck all align buttons.
-      private slots: void UncheckAllAlign();
+      /// \param[in] _blockSignals True to prevent firing signals.
+      private slots: void UncheckAllAlign(const bool _blockSignals = false);
 
       /// \brief Qt callback when type button is selected.
       /// \param[in] _typeInt Index of new selection.

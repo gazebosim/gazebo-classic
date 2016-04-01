@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,6 +48,9 @@ namespace gazebo
 
       /// \brief Pointer the physics engine.
       public: PhysicsEnginePtr physicsEngine;
+
+      /// \brief Pointer to the atmosphere model.
+      public: AtmospherePtr atmosphere;
 
       /// \brief Pointer the spherical coordinates data.
       public: common::SphericalCoordinatesPtr sphericalCoordinates;
@@ -218,6 +221,9 @@ namespace gazebo
 
       /// \brief True to enable the physics engine.
       public: bool enablePhysicsEngine;
+
+      /// \brief True to enable the atmosphere model.
+      public: bool enableAtmosphere;
 
       /// \brief Ray used to test for collisions when placing entities.
       public: RayShapePtr testRay;

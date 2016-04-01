@@ -1,4 +1,87 @@
-## Gazebo 7.0
+## Gazebo 8
+
+## Gazebo 8.x.x (2017-xx-xx)
+
+1. Use only Gazebo's internal version of tinyxml2. The version of tinyxml2 distributed with Ubuntu fails when parsing large log files.
+    * [Pull request #2146](https://bitbucket.org/osrf/gazebo/pull-request/2146)
+
+1. Moved gazebo ODE includes to have correct include path
+    * [Pull request #2186](https://bitbucket.org/osrf/gazebo/pull-request/2186)
+
+1. Atmosphere model
+    * [Pull request #1989](https://bitbucket.org/osrf/gazebo/pull-request/1989)
+
+1. Added static camera when following a model.
+    * [Pull request #1980](https://bitbucket.org/osrf/gazebo/pull-request/1980)
+
+1. Support conversions between SDF and protobuf for more sensors.
+    * [Pull request #2118](https://bitbucket.org/osrf/gazebo/pull-request/2118)
+
+1. Fix ODE Ray-Cylinder collision, and added ability to instantiate stand alone MultiRayShapes.
+    * [Pull request #2122](https://bitbucket.org/osrf/gazebo/pull-request/2122)
+
+1. Update depth camera sensor to publish depth data over a topic.
+    * [Pull request #2112](https://bitbucket.org/osrf/gazebo/pull-request/2112)
+
+1. Model editor updates
+
+    1. Undo / redo inserting and deleting links
+        * [Pull request #2151](https://bitbucket.org/osrf/gazebo/pull-request/2151)
+
+## Gazebo 7
+
+## Gazebo 7.x.x (2016-xx-xx)
+
+1. Process insertions on World::SetState
+    * [Pull request #2200](https://bitbucket.org/osrf/gazebo/pull-requests/2200)
+
+1. Process deletions on World::SetState
+    * [Pull request #2204](https://bitbucket.org/osrf/gazebo/pull-requests/2204)
+
+1. Allow dynamically adding links to a model.
+    * [Pull request #2185](https://bitbucket.org/osrf/gazebo/pull-requests/2185)
+
+1. Fix editing physics parameters in gzclient, update test
+    * [Pull request #2192](https://bitbucket.org/osrf/gazebo/pull-requests/2192)
+    * [Issue #1876](https://bitbucket.org/osrf/gazebo/issues/1876)
+
+1. Display physics engine type in the GUI
+    * [Pull request #2155](https://bitbucket.org/osrf/gazebo/pull-requests/2155)
+    * [Issue #1121](https://bitbucket.org/osrf/gazebo/issues/1121)
+
+1. Fix compilation against ffmpeg3 (libavcodec)
+    * [Pull request #2154](https://bitbucket.org/osrf/gazebo/pull-request/2154)
+
+1. Append a missing </gazebo_log> tag to log files when played.
+    * [Pull request #2143](https://bitbucket.org/osrf/gazebo/pull-request/2143)
+
+1. Add helper function QTestFixture::ProcessEventsAndDraw
+    * [Pull request #2147](https://bitbucket.org/osrf/gazebo/pull-request/2147)
+
+1. Undo scaling during simulation
+    * [Pull request #2108](https://bitbucket.org/osrf/gazebo/pull-request/2108)
+
+1. Fix SensorManager::SensorContainer::RunLoop sensor update time assertion
+    * [Pull request #2115](https://bitbucket.org/osrf/gazebo/pull-request/2115)
+
+1. Removes one function call and replaces a manual swap with std::swap in ODE heightfield.
+    * [Pull request #2114](https://bitbucket.org/osrf/gazebo/pull-request/2114)
+
+1. Model editor updates
+    1. Fix setting relative pose after alignment during joint creation.
+        * [Issue #1844](https://bitbucket.org/osrf/gazebo/issues/1844)
+        * [Pull request #2150](https://bitbucket.org/osrf/gazebo/pull-request/2150)
+
+    1. Fix saving and spawning model with its original name
+        * [Pull request #2183](https://bitbucket.org/osrf/gazebo/pull-request/2183)
+
+1. Building editor updates
+
+    1. Add layers to building levels
+        * [Pull request #2180](https://bitbucket.org/osrf/gazebo/pull-request/2180)
+        * [Issue #1806](https://bitbucket.org/osrf/gazebo/issues/1806)
+
+## Gazebo 7.0.0 (2016-01-25)
 
 1. Add FollowerPlugin
     * [Pull request #2085](https://bitbucket.org/osrf/gazebo/pull-request/2085)
@@ -93,15 +176,15 @@
 1. Enter time during log playback
     * [Pull request #2000](https://bitbucket.org/osrf/gazebo/pull-request/2000)
 
-1 Added Ignition Transport dependency.
+1. Added Ignition Transport dependency.
     * [Pull request #1930](https://bitbucket.org/osrf/gazebo/pull-request/1930)
 
-1 Make latched subscribers receive the message only once
+1. Make latched subscribers receive the message only once
     * [Issue #1789](https://bitbucket.org/osrf/gazebo/issue/1789)
     * [Pull request #2019](https://bitbucket.org/osrf/gazebo/pull-request/2019)
 
-1 Implemented transport clear buffers
-  * [Pull request #2017](https://bitbucket.org/osrf/gazebo/pull-request/2017)
+1. Implemented transport clear buffers
+    * [Pull request #2017](https://bitbucket.org/osrf/gazebo/pull-request/2017)
 
 1. KeyEvent constructor should be in a source file. Removed a few visibility
 flags from c functions. Windows did not like `CPPTYPE_*` in
@@ -270,6 +353,9 @@ using the same arguments used in the command line.
 
     1. Scale link mass and inertia when a link is scaled
         * [Pull request #1836](https://bitbucket.org/osrf/gazebo/pull-request/1836)
+
+    1. Add density widget to config widget and link inspector
+        * [Pull request #1978](https://bitbucket.org/osrf/gazebo/pull-request/1978)
 
     1. Added icons for child and parent link in joint inspector
         * [Pull request #1953](https://bitbucket.org/osrf/gazebo/pull-request/1953)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -110,7 +110,7 @@ void WideAngleCameraSensor::Init()
       cameraPose = cameraSdf->Get<ignition::math::Pose3d>("pose") + cameraPose;
 
     this->camera->SetWorldPose(cameraPose);
-    this->camera->AttachToVisual(this->ParentId(), true);
+    this->camera->AttachToVisual(this->ParentId(), true, 0, 0);
 
     if (cameraSdf->HasElement("noise"))
     {

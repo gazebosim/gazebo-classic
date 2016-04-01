@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 #ifndef _GAZEBO_ODE_STEP_BULLET_PGS_WRAPPER_H_
 #define _GAZEBO_ODE_STEP_BULLET_PGS_WRAPPER_H_
 
-#include <ode/common.h>
+#include <gazebo/ode/common.h>
 void dSolveLCP_bullet_pgs(int _m, dReal *_A, dReal *_x, dReal *_b,
   dReal *_lo, dReal *_hi, int *findex);
 #endif

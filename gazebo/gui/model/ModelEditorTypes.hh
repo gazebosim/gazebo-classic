@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,10 +26,15 @@ namespace gazebo
   namespace gui
   {
     class EditorMaterialSwitcher;
+    class MEUserCmd;
 
     /// \def EditorMaterialSwitcherPtr
     /// \brief Shared pointer to a EditorMaterialSwitcherPtr object
     using EditorMaterialSwitcherPtr = std::shared_ptr<EditorMaterialSwitcher>;
+
+    /// \def MEUserCmdPtr
+    /// \brief Shared pointer to a MEUserCmdPtr object
+    using MEUserCmdPtr = std::shared_ptr<MEUserCmd>;
   }
 }
 

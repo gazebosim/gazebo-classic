@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -496,11 +496,16 @@ void OculusCamera::SetRenderTarget(Ogre::RenderTarget *_target)
 
   float aspectRatio = combinedTanHalfFovHorizontal / combinedTanHalfFovVertical;
 
+  double vfov = 2.0 * atan(combinedTanHalfFovVertical);
   this->camera->setAspectRatio(aspectRatio);
+  this->camera->setFOVy(Ogre::Radian(vfov));
   this->dataPtr->rightCamera->setAspectRatio(aspectRatio);
+  this->dataPtr->rightCamera->setFOVy(Ogre::Radian(vfov));
 
-  ovrMatrix4f projL = ovrMatrix4f_Projection(fovLeft, 0.001, 500.0, true);
-  ovrMatrix4f projR = ovrMatrix4f_Projection(fovRight, 0.001, 500.0, true);
+  ovrMatrix4f projL = ovrMatrix4f_Projection(fovLeft, 0.001,
+      g_defaultFarClip, true);
+  ovrMatrix4f projR = ovrMatrix4f_Projection(fovRight, 0.001,
+      g_defaultFarClip, true);
 
   this->camera->setCustomProjectionMatrix(true,
     Ogre::Matrix4(
@@ -553,11 +558,14 @@ void OculusCamera::Oculus()
   this->dataPtr->externalSceneManager->setAmbientLight(
       Ogre::ColourValue(0.5, 0.5, 0.5));
 
+  ovrFovPort fovLeft = this->dataPtr->hmd->DefaultEyeFov[ovrEye_Left];
+  ovrFovPort fovRight = this->dataPtr->hmd->DefaultEyeFov[ovrEye_Right];
+
   // Get the texture sizes
   ovrSizei textureSizeLeft = ovrHmd_GetFovTextureSize(this->dataPtr->hmd,
-       ovrEye_Left, this->dataPtr->hmd->DefaultEyeFov[0], 1.0f);
+       ovrEye_Left, fovLeft, 1.0f);
   ovrSizei textureSizeRight = ovrHmd_GetFovTextureSize(this->dataPtr->hmd,
-      ovrEye_Right, this->dataPtr->hmd->DefaultEyeFov[1], 1.0f);
+      ovrEye_Right, fovRight, 1.0f);
 
   // Create the left and right render textures.
   this->dataPtr->renderTextureLeft =
@@ -593,9 +601,6 @@ void OculusCamera::Oculus()
       this->dataPtr->renderTextureLeft);
   matRight->getTechnique(0)->getPass(0)->getTextureUnitState(0)->setTexture(
       this->dataPtr->renderTextureRight);
-
-  ovrFovPort fovLeft = this->dataPtr->hmd->DefaultEyeFov[ovrEye_Left];
-  ovrFovPort fovRight = this->dataPtr->hmd->DefaultEyeFov[ovrEye_Right];
 
   // Get eye description information
   ovrEyeRenderDesc eyeRenderDesc[2];

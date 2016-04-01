@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -396,6 +396,12 @@ namespace gazebo
       /// \brief Allow Model class to share itself as a boost shared_ptr
       /// \return a shared pointer to itself
       public: boost::shared_ptr<Model> shared_from_this();
+
+      /// \brief Create a new link for this model
+      /// \param[in] _name name of the new link
+      /// \return a LinkPtr to the new link created,
+      /// returns NULL if link _name already exists.
+      public: LinkPtr CreateLink(const std::string &_name);
 
       /// \brief Callback when the pose of the model has been changed.
       protected: virtual void OnPoseChange();

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _VIDEO_HH_
-#define _VIDEO_HH_
+#ifndef _GAZEBO_COMMON_VIDEO_HH_
+#define _GAZEBO_COMMON_VIDEO_HH_
 
 #include <string>
 #include "gazebo/util/system.hh"
@@ -74,8 +74,8 @@ namespace gazebo
       /// \brief audio video frame
       private: AVFrame *avFrame;
 
-      /// \brief audi video picture
-      private: AVPicture *pic;
+      /// \brief Destination audio video frame
+      private: AVFrame *avFrameDst;
 
       /// \brief software scaling context
       private: SwsContext *swsCtx;
