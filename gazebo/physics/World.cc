@@ -112,6 +112,8 @@ World::World(const std::string &_name)
   this->dataPtr->sdf.reset(new sdf::Element);
   sdf::initFile("world.sdf", this->dataPtr->sdf);
 
+  // Keep this in the constructor for performance.
+  // sdf::initFile causes disk access.
   this->dataPtr->factorySDF.reset(new sdf::SDF);
   sdf::initFile("root.sdf", this->dataPtr->factorySDF);
 
@@ -160,25 +162,7 @@ World::World(const std::string &_name)
 //////////////////////////////////////////////////
 World::~World()
 {
-  this->dataPtr->presetManager.reset();
-  this->dataPtr->userCmdManager.reset();
-  delete this->dataPtr->receiveMutex;
-  this->dataPtr->receiveMutex = NULL;
-  delete this->dataPtr->loadModelMutex;
-  this->dataPtr->loadModelMutex = NULL;
-  delete this->dataPtr->setWorldPoseMutex;
-  this->dataPtr->setWorldPoseMutex = NULL;
-  delete this->dataPtr->worldUpdateMutex;
-  this->dataPtr->worldUpdateMutex = NULL;
-
-  this->dataPtr->connections.clear();
   this->Fini();
-
-  this->dataPtr->sdf->Reset();
-  this->dataPtr->rootElement.reset();
-  this->dataPtr->node.reset();
-
-  this->dataPtr->testRay.reset();
 
   delete this->dataPtr;
   this->dataPtr = NULL;
@@ -813,41 +797,103 @@ void World::Update()
 void World::Fini()
 {
   this->Stop();
+
+#ifdef HAVE_OPENAL
+  util::OpenAL::Instance()->Fini();
+#endif
+
+  // Clean transport
+  {
+    this->dataPtr->deleteEntity.clear();
+    this->dataPtr->requestMsgs.clear();
+    this->dataPtr->factoryMsgs.clear();
+    this->dataPtr->modelMsgs.clear();
+    this->dataPtr->lightFactoryMsgs.clear();
+    this->dataPtr->lightModifyMsgs.clear();
+
+    this->dataPtr->poseLocalPub.reset();
+    this->dataPtr->posePub.reset();
+    this->dataPtr->guiPub.reset();
+    this->dataPtr->responsePub.reset();
+    this->dataPtr->statPub.reset();
+    this->dataPtr->modelPub.reset();
+    this->dataPtr->lightPub.reset();
+
+    this->dataPtr->factorySub.reset();
+    this->dataPtr->controlSub.reset();
+    this->dataPtr->playbackControlSub.reset();
+    this->dataPtr->requestSub.reset();
+    this->dataPtr->jointSub.reset();
+    this->dataPtr->lightSub.reset();
+    this->dataPtr->lightFactorySub.reset();
+    this->dataPtr->lightModifySub.reset();
+    this->dataPtr->modelSub.reset();
+
+    this->dataPtr->node.reset();
+  }
+
+  this->dataPtr->connections.clear();
+
+  this->dataPtr->sdf.reset();
+
+  this->dataPtr->testRay.reset();
   this->dataPtr->plugins.clear();
 
   this->dataPtr->publishModelPoses.clear();
   this->dataPtr->publishModelScales.clear();
   this->dataPtr->publishLightPoses.clear();
 
-  this->dataPtr->node->Fini();
+  // Clean entities
+  for (auto &model : this->dataPtr->models)
+  {
+    if (model)
+      model->Fini();
+  }
+  this->dataPtr->models.clear();
 
-  this->dataPtr->deleteEntity.clear();
-  this->dataPtr->requestMsgs.clear();
-  this->dataPtr->factoryMsgs.clear();
-  this->dataPtr->modelMsgs.clear();
-  this->dataPtr->lightFactoryMsgs.clear();
-  this->dataPtr->lightModifyMsgs.clear();
+  for (auto &light : this->dataPtr->lights)
+  {
+    if (light)
+      light->Fini();
+  }
+  this->dataPtr->lights.clear();
 
   if (this->dataPtr->rootElement)
   {
     this->dataPtr->rootElement->Fini();
     this->dataPtr->rootElement.reset();
   }
-
-  if (this->dataPtr->physicsEngine)
-  {
-    this->dataPtr->physicsEngine->Fini();
-    this->dataPtr->physicsEngine.reset();
-  }
-
-  this->dataPtr->models.clear();
-  this->dataPtr->lights.clear();
   this->dataPtr->prevStates[0].SetWorld(WorldPtr());
   this->dataPtr->prevStates[1].SetWorld(WorldPtr());
 
-#ifdef HAVE_OPENAL
-  util::OpenAL::Instance()->Fini();
-#endif
+  this->dataPtr->presetManager.reset();
+  this->dataPtr->userCmdManager.reset();
+  this->dataPtr->physicsEngine.reset();
+
+  // Clean mutexes
+  if (this->dataPtr->receiveMutex)
+  {
+    delete this->dataPtr->receiveMutex;
+    this->dataPtr->receiveMutex = NULL;
+  }
+
+  if (this->dataPtr->loadModelMutex)
+  {
+    delete this->dataPtr->loadModelMutex;
+    this->dataPtr->loadModelMutex = NULL;
+  }
+
+  if (this->dataPtr->setWorldPoseMutex)
+  {
+    delete this->dataPtr->setWorldPoseMutex;
+    this->dataPtr->setWorldPoseMutex = NULL;
+  }
+
+  if (this->dataPtr->worldUpdateMutex)
+  {
+    delete this->dataPtr->worldUpdateMutex;
+    this->dataPtr->worldUpdateMutex = NULL;
+  }
 }
 
 //////////////////////////////////////////////////
@@ -1012,6 +1058,7 @@ LightPtr World::LoadLight(const sdf::ElementPtr &_sdf, const BasePtr &_parent)
   // Add to scene message
   msgs::Light *msg = this->dataPtr->sceneMsg.add_light();
   msg->CopyFrom(msgs::LightFromSDF(_sdf));
+
   // Create new light object
   LightPtr light(new physics::Light(_parent));
   light->ProcessMsg(*msg);
@@ -1102,6 +1149,12 @@ void World::LoadEntities(sdf::ElementPtr _sdf, BasePtr _parent)
 unsigned int World::GetModelCount() const
 {
   return this->dataPtr->models.size();
+}
+
+//////////////////////////////////////////////////
+unsigned int World::LightCount() const
+{
+  return this->dataPtr->lights.size();
 }
 
 //////////////////////////////////////////////////
@@ -1914,6 +1967,13 @@ void World::ProcessFactoryMsgs()
 
         sdf::ElementPtr elem = this->dataPtr->factorySDF->Root()->Clone();
 
+        if (!elem)
+        {
+          gzerr << "Invalid SDF:";
+          this->dataPtr->factorySDF->Root()->PrintValues("");
+          continue;
+        }
+
         if (elem->HasElement("world"))
           elem = elem->GetElement("world");
 
@@ -1935,13 +1995,6 @@ void World::ProcessFactoryMsgs()
         else
         {
           gzerr << "Unable to find a model, light, or actor in:\n";
-          this->dataPtr->factorySDF->Root()->PrintValues("");
-          continue;
-        }
-
-        if (!elem)
-        {
-          gzerr << "Invalid SDF:";
           this->dataPtr->factorySDF->Root()->PrintValues("");
           continue;
         }
@@ -2064,6 +2117,87 @@ void World::SetState(const WorldState &_state)
     {
       gzerr << "Unable to find light[" << lightState.second.GetName() << "]"
             << std::endl;
+    }
+  }
+
+  // Insertions (adapted from ProcessFactoryMsgs)
+  auto insertions = _state.Insertions();
+  for (auto const &insertion : insertions)
+  {
+    this->dataPtr->factorySDF->Root()->ClearElements();
+
+    // SDF Parsing happens here
+    if (!sdf::readString(insertion, this->dataPtr->factorySDF))
+    {
+      gzerr << "Unable to read sdf string[" << insertion << "]" << std::endl;
+      continue;
+    }
+
+    // Get entity being inserted
+    bool isModel = false;
+    bool isLight = false;
+
+    auto elem = this->dataPtr->factorySDF->Root()->Clone();
+
+    if (!elem)
+    {
+      gzerr << "Invalid SDF:" << std::endl;
+      this->dataPtr->factorySDF->Root()->PrintValues("");
+      continue;
+    }
+
+    if (elem->HasElement("world"))
+      elem = elem->GetElement("world");
+
+    if (elem->HasElement("model"))
+    {
+      elem = elem->GetElement("model");
+      isModel = true;
+    }
+    else if (elem->HasElement("light"))
+    {
+      elem = elem->GetElement("light");
+      isLight = true;
+    }
+    else
+    {
+      gzerr << "Unable to find a model or light in:" << std::endl;
+      this->dataPtr->factorySDF->Root()->PrintValues("");
+      continue;
+    }
+
+    elem->SetParent(this->dataPtr->sdf);
+    elem->GetParent()->InsertElement(elem);
+
+    if (isModel)
+    {
+      try
+      {
+        boost::mutex::scoped_lock lock(this->dataPtr->factoryDeleteMutex);
+
+        ModelPtr model = this->LoadModel(elem, this->dataPtr->rootElement);
+        model->Init();
+        model->LoadPlugins();
+      }
+      catch(...)
+      {
+        gzerr << "Loading model from world state insertion failed" <<
+            std::endl;
+      }
+    }
+    else if (isLight)
+    {
+      try
+      {
+        boost::mutex::scoped_lock lock(this->dataPtr->factoryDeleteMutex);
+
+        LightPtr light = this->LoadLight(elem, this->dataPtr->rootElement);
+      }
+      catch(...)
+      {
+        gzerr << "Loading light from world state insertion failed." <<
+            std::endl;
+      }
     }
   }
 }

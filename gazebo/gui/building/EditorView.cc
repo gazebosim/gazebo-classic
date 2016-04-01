@@ -749,7 +749,7 @@ void EditorView::DrawWall(const QPoint &_pos)
     wallSegmentItem->Set3dTexture(QString(""));
     wallSegmentItem->Set3dColor(Qt::white);
     wallSegmentItem->SetHighlighted(false);
-    wallSegmentList.push_back(wallSegmentItem);
+    this->wallSegmentList.push_back(wallSegmentItem);
     if (wallSegmentItem->GetLevel() > 0)
     {
       floorList[wallSegmentItem->GetLevel()-1]->AttachWallSegment(
@@ -1112,6 +1112,7 @@ void EditorView::OnAddLevel()
       {
         WallSegmentItem *parentItem = dynamic_cast<WallSegmentItem*>(
             oldGrabber->parentItem());
+
         int index = oldGrabber->Index();
 
         newWall->Grabbers()[g]->PushLinkedGrabber(
@@ -1262,6 +1263,9 @@ void EditorView::DeleteLevel(int _level)
 void EditorView::OnChangeLevel(int _level)
 {
   if (_level < 0)
+    return;
+
+  if (this->currentLevel >= static_cast<int>(this->levels.size()))
     return;
 
   if (this->levels[this->currentLevel]->backgroundPixmap)

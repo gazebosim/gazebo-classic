@@ -76,6 +76,7 @@ set(tests
   physics_torsional_friction.cc
   pioneer2dx.cc
   plugin.cc
+  rayshape.cc
   region_events.cc
   rest_web.cc
   road.cc
@@ -98,6 +99,7 @@ set(tests
   world_open.cc
   world_playback.cc
   world_population.cc
+  world_remove.cc
   worlds_installed.cc
   )
 
@@ -113,7 +115,7 @@ if (MANPAGES_SUPPORT)
 	      manpages.cc)
 endif()
 
-gz_build_tests(${tests})
+gz_build_tests(${tests} EXTRA_LIBS gazebo_test_fixture)
 
 if (ENABLE_TESTS_COMPILATION)
   # Increase timeout, to account for model download time.
@@ -152,8 +154,7 @@ set(dri_tests
   speed_pr2.cc
   world_reset.cc
 )
-
-gz_build_dri_tests(${dri_tests})
+gz_build_dri_tests(${dri_tests} EXTRA_LIBS gazebo_test_fixture)
 
 set(qt_tests
   insert_model.cc
