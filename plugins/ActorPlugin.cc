@@ -114,7 +114,6 @@ void ActorPlugin::ChooseNewTarget()
         break;
       }
     }
-
   }
   this->target = newTarget;
 }

@@ -670,7 +670,8 @@ void Actor::SetPose(std::map<std::string, ignition::math::Matrix4d> _frame,
   }
   else
   {
-    model_pose->mutable_position()->CopyFrom(msgs::Convert(this->worldPose.Ign().Pos()));
+    model_pose->mutable_position()->CopyFrom(
+        msgs::Convert(this->worldPose.Ign().Pos()));
     model_pose->mutable_orientation()->CopyFrom(
         msgs::Convert(this->worldPose.Ign().Rot()));
   }
