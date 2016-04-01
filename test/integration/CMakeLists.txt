@@ -77,6 +77,7 @@ set(tests
   physics_torsional_friction.cc
   pioneer2dx.cc
   plugin.cc
+  rayshape.cc
   region_events.cc
   rest_web.cc
   road.cc
@@ -159,6 +160,7 @@ set(qt_tests
   insert_model.cc
   model_editor.cc
   model_manipulation.cc
+  track_visual.cc
   undo.cc
   visual_pose.cc
 )

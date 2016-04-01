@@ -28,8 +28,8 @@ quaternions have the format: (s,vx,vy,vz) where (vx,vy,vz) is the
 */
 
 #include <iostream>
-#include <ode/rotation.h>
-#include <ode/odemath.h>
+#include <gazebo/ode/rotation.h>
+#include <gazebo/ode/odemath.h>
 #include "config.h"
 
 

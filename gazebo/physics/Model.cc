@@ -1495,3 +1495,22 @@ bool Model::WindMode() const
   return this->sdf->Get<bool>("enable_wind");
 }
 
+/////////////////////////////////////////////////
+LinkPtr Model::CreateLink(const std::string &_name)
+{
+  LinkPtr link;
+  if (this->GetLink(_name))
+  {
+    gzwarn << "Model [" << this->GetName()
+      << "] already has a link named [" << _name
+      << "], skipping creating link.\n";
+    return link;
+  }
+
+  link = this->world->GetPhysicsEngine()->CreateLink(shared_from_this());
+
+  link->SetName(_name);
+  this->links.push_back(link);
+
+  return link;
+}

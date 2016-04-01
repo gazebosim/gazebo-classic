@@ -52,6 +52,9 @@ namespace gazebo
       /// \brief Pointer the wind.
       public: WindPtr wind;
 
+      /// \brief Pointer to the atmosphere model.
+      public: AtmospherePtr atmosphere;
+
       /// \brief Pointer the spherical coordinates data.
       public: common::SphericalCoordinatesPtr sphericalCoordinates;
 
@@ -224,6 +227,9 @@ namespace gazebo
 
       /// \brief True to enable the wind.
       public: bool enableWind;
+
+      /// \brief True to enable the atmosphere model.
+      public: bool enableAtmosphere;
 
       /// \brief Ray used to test for collisions when placing entities.
       public: RayShapePtr testRay;

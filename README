@@ -18,7 +18,11 @@ Gazebo cmake parameters available at configuring time:
    Check the building machine for supported compiler optimizations and use 
    them to build the software.
  - USE_UPSTREAM_CFLAGS (bool) [default True]
-   Use the recommend gazebo developers compiler optimizations flags
+   Use the recommend gazebo developers compiler optimizations flags.
+ - USE_EXTERNAL_TINYXML (bool) [default True]
+   Use external copy of tinyxml during the build.
+ - USE_EXTERNAL_TINYXML2 (bool) [default True]
+   Use external copy of tinyxml2 during the build.
  - ENABLE_TESTS_COMPILATION (bool) [default True]
    Enabled or disable the test suite compilation. 
  - USE_LOW_MEMORY_TEST (bool) [default False]

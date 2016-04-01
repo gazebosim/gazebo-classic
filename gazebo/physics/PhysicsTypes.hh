@@ -49,6 +49,7 @@ namespace gazebo
     class UserCmdManager;
     class PhysicsEngine;
     class Wind;
+    class Atmosphere;
     class Mass;
     class Road;
     class Shape;
@@ -119,6 +120,10 @@ namespace gazebo
     /// \def  WindPtr
     /// \brief Standard shared pointer to a Wind object
     typedef std::shared_ptr<Wind> WindPtr;
+
+    /// \def AtmospherePtr
+    /// \brief Standard shared pointer to an Atmosphere object
+    typedef std::shared_ptr<Atmosphere> AtmospherePtr;
 
     /// \def  PresetManagerPtr
     /// \brief Shared pointer to a PresetManager object

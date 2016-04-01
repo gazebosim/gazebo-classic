@@ -31,6 +31,7 @@ ImageFrame::ImageFrame(QWidget *_parent)
 /////////////////////////////////////////////////
 ImageFrame::~ImageFrame()
 {
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
   if (this->dataPtr->depthBuffer)
     delete [] this->dataPtr->depthBuffer;
 }
@@ -38,8 +39,8 @@ ImageFrame::~ImageFrame()
 /////////////////////////////////////////////////
 void ImageFrame::paintEvent(QPaintEvent * /*_event*/)
 {
-  QPainter painter(this);
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  QPainter painter(this);
 
   if (!this->dataPtr->image.isNull())
   {
@@ -64,10 +65,8 @@ void ImageFrame::OnImage(const msgs::Image &_msg)
   if (_msg.width() == 0 || _msg.height() == 0)
     return;
 
-
-  common::Image img;
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
   QImage::Format qFormat;
-  unsigned int imgSize = 0;
   bool isDepthImage = false;
   switch (_msg.pixel_format())
   {
@@ -75,21 +74,18 @@ void ImageFrame::OnImage(const msgs::Image &_msg)
     case common::Image::PixelFormat::L_INT16:
     {
       qFormat = QImage::Format_Mono;
-      imgSize = _msg.width() * _msg.height();
       break;
     }
     case common::Image::PixelFormat::R_FLOAT16:
     case common::Image::PixelFormat::R_FLOAT32:
     {
       qFormat = QImage::Format_RGB888;
-      imgSize = _msg.width() * _msg.height() * 3;
       isDepthImage = true;
       break;
     }
     default:
     {
       qFormat = QImage::Format_RGB888;
-      imgSize = _msg.width() * _msg.height() * 3;
       break;
     }
   }
@@ -137,9 +133,13 @@ void ImageFrame::OnImage(const msgs::Image &_msg)
   }
   else
   {
-    memcpy(this->dataPtr->image.bits(), _msg.data().c_str(), imgSize);
+    const char *buffer = _msg.data().c_str();
+    for (int i = 0; i < this->dataPtr->image.height(); ++i)
+    {
+      memcpy(this->dataPtr->image.scanLine(i),
+          buffer + i*this->dataPtr->image.bytesPerLine(),
+          this->dataPtr->image.bytesPerLine());
+    }
   }
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-
   this->update();
 }

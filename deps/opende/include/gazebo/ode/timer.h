@@ -23,7 +23,7 @@
 #ifndef _ODE_TIMER_H_
 #define _ODE_TIMER_H_
 
-#include <ode/odeconfig.h>
+#include <gazebo/ode/odeconfig.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,20 +33,20 @@ extern "C" {
 /* stop watch objects */
 
 typedef struct dStopwatch {
-  double time;			/* total clock count */
-  unsigned long cc[2];		/* clock count since last `start' */
+  double time;    	/* total clock count */
+  unsigned long cc[2];    /* clock count since last `start' */
 } dStopwatch;
 
 ODE_API void dStopwatchReset (dStopwatch *);
 ODE_API void dStopwatchStart (dStopwatch *);
 ODE_API void dStopwatchStop  (dStopwatch *);
-ODE_API double dStopwatchTime (dStopwatch *);	/* returns total time in secs */
+ODE_API double dStopwatchTime (dStopwatch *);  /* returns total time in secs */
 
 
 /* code timers */
 
-ODE_API void dTimerStart (const char *description);	/* pass a static string here */
-ODE_API void dTimerNow (const char *description);	/* pass a static string here */
+ODE_API void dTimerStart (const char *description);  /* pass a static string here */
+ODE_API void dTimerNow (const char *description);  /* pass a static string here */
 ODE_API void dTimerEnd(void);
 
 /* print out a timer report. if `average' is nonzero, print out the average
