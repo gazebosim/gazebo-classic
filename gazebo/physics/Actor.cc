@@ -818,6 +818,17 @@ void Actor::AddActorVisual(const sdf::ElementPtr &_linkSdf,
       this->skinScale, this->skinScale));
 }
 
+/////////////////////////////////////////////////
+void Actor::SetSelfCollide(bool /*_self_collide*/)
+{
+}
+
+/////////////////////////////////////////////////
+bool Actor::GetSelfCollide() const
+{
+  return false;
+}
+
 //////////////////////////////////////////////////
 TrajectoryInfo::TrajectoryInfo()
   : id(0), type(""), duration(0.0), startTime(0.0), endTime(0.0),

@@ -131,6 +131,12 @@ namespace gazebo
       /// \brief Reset custom trajectory of the actor.
       public: void ResetCustomTrajectory();
 
+      // Documentation inherited
+      public: virtual bool GetSelfCollide() const;
+
+      // Documentation inherited
+      public: virtual void SetSelfCollide(bool _self_collide);
+
       /// \brief Add inertia for a sphere.
       /// \param[in] _linkSdf The link to add the inertia to.
       /// \param[in] _pose Pose of the inertia.
