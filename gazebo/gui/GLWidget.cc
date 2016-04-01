@@ -917,7 +917,7 @@ std::string GLWidget::OgreHandle() const
   ogreHandle = std::to_string(this->winId());
 #elif defined(WIN32)
   ogreHandle = std::to_string(
-      reinterpret_cast<uint32_t>(this->renderFrame->winId()));
+      reinterpret_cast<uint32_t>(this->dataPtr->renderFrame->winId()));
 #else
   QX11Info info = x11Info();
   QWidget *q_parent = dynamic_cast<QWidget*>(this->dataPtr->renderFrame);

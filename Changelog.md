@@ -48,6 +48,9 @@
     * [Pull request #2192](https://bitbucket.org/osrf/gazebo/pull-requests/2192)
     * [Issue #1876](https://bitbucket.org/osrf/gazebo/issues/1876)
 
+1. Model database selects the latest model version.
+    * [Pull request #2207](https://bitbucket.org/osrf/gazebo/pull-requests/2207)
+
 1. Display physics engine type in the GUI
     * [Pull request #2155](https://bitbucket.org/osrf/gazebo/pull-requests/2155)
     * [Issue #1121](https://bitbucket.org/osrf/gazebo/issues/1121)
@@ -77,6 +80,10 @@
 
     1. Fix saving and spawning model with its original name
         * [Pull request #2183](https://bitbucket.org/osrf/gazebo/pull-request/2183)
+
+    1. Fix inserting custom links
+        * [Pull request #2222](https://bitbucket.org/osrf/gazebo/pull-request/2222)
+        * [Issue #1834](https://bitbucket.org/osrf/gazebo/issues/1834)
 
 1. Building editor updates
 
