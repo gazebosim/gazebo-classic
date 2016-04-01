@@ -159,7 +159,6 @@ void ActorPlugin::OnUpdate(const common::UpdateInfo &_info)
   {
     this->ChooseNewTarget();
     pos = this->target - pose.Pos();
-    distance = pos.Length();
   }
 
   // Normalize the direction vector, and apply the target weight
