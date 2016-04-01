@@ -1,3 +1,4 @@
+<!-- Usage notes are located in this file, look for "Usage"-->
 <?xml version="1.0" ?>
 <sdf version="1.5">
   <world name="default">
@@ -72,6 +73,10 @@
       <uri>model://cafe_table</uri>
     </include>
 
+    <!-- Usage: modify the <pose> elements of each actor to change their
+         starting location. Modify the <target> elements of each actor to
+         change their destination. The <target_weight> can be used to
+         tune the vector field used by the ActorPlugin to control the Actor. -->
     <actor name="actor1">
       <pose>0 1 1.25 0 0 0</pose>
       <skin>
@@ -83,11 +88,14 @@
         <scale>1.000000</scale>
         <interpolate_x>true</interpolate_x>
       </animation>
+
       <plugin name="actor1_plugin" filename="libActorPlugin.so">
         <target>0 -5 1.2138</target>
         <target_weight>1.15</target_weight>
         <obstacle_weight>1.8</obstacle_weight>
         <animation_factor>5.1</animation_factor>
+        <!-- Usage: Modify the set of models that the vector field should
+             ignore when moving the actor -->
         <ignore_obstacles>
           <model>cafe</model>
           <model>ground_plane</model>
