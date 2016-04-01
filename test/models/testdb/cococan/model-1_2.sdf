@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <sdf version="1.2">
-  <model name="box">
+  <model name="cococan">
     <pose>0 0 0.5 0 0 0</pose>
     <link name="link">
       <collision name="collision">
