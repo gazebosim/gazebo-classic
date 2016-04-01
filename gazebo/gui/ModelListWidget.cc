@@ -246,7 +246,6 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
           this->dataPtr->propTreeBrowser->setExpanded(browser, true);
         }
       }
-
     }
     else
     {
