@@ -34,6 +34,11 @@ GridLines::GridLines(int _w, int _h) : QGraphicsItem(),
 }
 
 /////////////////////////////////////////////////
+GridLines::~GridLines()
+{
+}
+
+/////////////////////////////////////////////////
 void GridLines::paint(QPainter *_painter,
     const QStyleOptionGraphicsItem */*_option*/, QWidget */*_widget*/)
 {

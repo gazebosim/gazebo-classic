@@ -74,6 +74,11 @@ BuildingEditorWidget::BuildingEditorWidget(QWidget *_parent)
 }
 
 /////////////////////////////////////////////////
+BuildingEditorWidget::~BuildingEditorWidget()
+{
+}
+
+/////////////////////////////////////////////////
 void BuildingEditorWidget::resizeEvent(QResizeEvent *_event)
 {
   qreal boundingWidth =
