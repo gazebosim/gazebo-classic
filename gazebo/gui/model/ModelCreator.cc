@@ -398,9 +398,6 @@ ModelCreator::~ModelCreator()
   delete this->dataPtr->saveDialog;
 
   delete this->dataPtr->jointMaker;
-
-  delete this->dataPtr;
-  this->dataPtr = NULL;
 }
 
 /////////////////////////////////////////////////
