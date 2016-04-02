@@ -30,6 +30,7 @@
 #include "gazebo/gui/viewers/ImagesViewPrivate.hh"
 #include "gazebo/gui/viewers/ImagesView.hh"
 
+#include "gazebo/util/make_unique.hh"
 using namespace gazebo;
 using namespace gui;
 
@@ -43,7 +44,7 @@ ImagesView::ImagesView(QWidget *_parent)
   this->setWindowTitle(tr("Gazebo: Images View"));
 
   // Create the layout and frame for images
-  std::unique_ptr<QGridLayout> frameLayout(new QGridLayout);
+  auto frameLayout = gazebo::make_unique<QGridLayout>();
   frameLayout->setSizeConstraint(QLayout::SetMinimumSize);
 
   this->frame->setObjectName("blackBorderFrame");
@@ -81,7 +82,7 @@ void ImagesView::UpdateImpl()
     }
 
     // Create new layout
-    std::unique_ptr<QGridLayout> newLayout(new QGridLayout);
+    auto newLayout = gazebo::make_unique<QGridLayout>();
     newLayout->setSizeConstraint(QLayout::SetMinimumSize);
     this->frame->setLayout(newLayout.release());
 

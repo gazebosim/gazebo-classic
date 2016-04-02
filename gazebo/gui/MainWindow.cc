@@ -40,6 +40,7 @@
 
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/TransportIface.hh"
+#include "gazebo/util/make_unique.hh"
 
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/AlignWidget.hh"
@@ -561,7 +562,7 @@ void MainWindow::Save()
 /////////////////////////////////////////////////
 void MainWindow::Clone()
 {
-  std::unique_ptr<CloneWindow> cloneWindow(new CloneWindow(this));
+  auto cloneWindow = gazebo::make_unique<CloneWindow>(this);
   if (cloneWindow->exec() == QDialog::Accepted && cloneWindow->IsValidPort())
   {
     // Create a gzserver clone in the server side.

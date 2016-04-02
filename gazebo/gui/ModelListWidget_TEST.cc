@@ -25,6 +25,7 @@
 #include "gazebo/gui/qtpropertybrowser/qtvariantproperty.h"
 #include "gazebo/gui/ModelListWidget.hh"
 #include "gazebo/gui/ModelListWidget_TEST.hh"
+#include "gazebo/util/make_unique.hh"
 
 #include "test_config.h"
 
@@ -870,8 +871,7 @@ void ModelListWidget_TEST::LinkProperties()
 /////////////////////////////////////////////////
 void ModelListWidget_TEST::PhysicsProperties()
 {
-  std::unique_ptr<gazebo::gui::ModelListWidget> modelListWidget(
-      new gazebo::gui::ModelListWidget);
+  auto modelListWidget = gazebo::make_unique<gazebo::gui::ModelListWidget>();
   modelListWidget->show();
   modelListWidget->setGeometry(0, 0, 400, 800);
   QCoreApplication::processEvents();
