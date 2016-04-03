@@ -63,8 +63,8 @@ TEST_F(DepthCameraSensor_TEST, CreateDepthCamera)
   // Make sure the above dynamic cast worked.
   EXPECT_TRUE(sensor != NULL);
 
-  unsigned int imageWidth = sensor->DepthCamera()->GetImageWidth();
-  unsigned int imageHeight = sensor->DepthCamera()->GetImageHeight();
+  unsigned int imageWidth = sensor->DepthCamera()->ImageWidth();
+  unsigned int imageHeight = sensor->DepthCamera()->ImageHeight();
   EXPECT_EQ(imageWidth, 640u);
   EXPECT_EQ(imageHeight, 480u);
   EXPECT_TRUE(sensor->IsActive());
