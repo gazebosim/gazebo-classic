@@ -67,14 +67,14 @@ namespace gazebo
     private: ignition::math::Vector3d target;
 
     /// \brief Target location weight (used for vector field)
-    private: double targetWeight;
+    private: double targetWeight = 1.0;
 
     /// \brief Obstacle weight (used for vector field)
-    private: double obstacleWeight;
+    private: double obstacleWeight = 1.0;
 
     /// \brief Time scaling factor. Used to coordinate translational motion
     /// with the actor's walking animation.
-    private: double animationFactor;
+    private: double animationFactor = 1.0;
 
     /// \brief Time of the last update.
     private: common::Time lastUpdate;
