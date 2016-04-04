@@ -232,16 +232,7 @@ class PlotItemDelegate : public QStyledItemDelegate
     }
     else
     {
-      if (typeName == "title")
-      {
-        _painter->setFont(QFont(fontBold.family(), fontBold.pointSize(),
-                                QFont::Bold));
-      }
-      else
-      {
-        _painter->setFont(QFont(fontRegular.family(), fontRegular.pointSize(),
-                                QFont::Normal));
-      }
+      _painter->setFont(typeName == "title" ? fontBold : fontRegular);
       _painter->drawText(textRect, topicName);
     }
   }
