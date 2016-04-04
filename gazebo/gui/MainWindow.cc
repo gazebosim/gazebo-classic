@@ -87,6 +87,20 @@ extern bool g_fullscreen;
 MainWindow::MainWindow()
   : dataPtr(new MainWindowPrivate)
 {
+  // Add font
+  QFontDatabase::addApplicationFont(":/fonts/Roboto-Black.ttf");
+  QFontDatabase::addApplicationFont(":/fonts/Roboto-BlackItalic.ttf");
+  QFontDatabase::addApplicationFont(":/fonts/Roboto-Bold.ttf");
+  QFontDatabase::addApplicationFont(":/fonts/Roboto-BoldItalic.ttf");
+  QFontDatabase::addApplicationFont(":/fonts/Roboto-Italic.ttf");
+  QFontDatabase::addApplicationFont(":/fonts/Roboto-Light.ttf");
+  QFontDatabase::addApplicationFont(":/fonts/Roboto-LightItalic.ttf");
+  QFontDatabase::addApplicationFont(":/fonts/Roboto-Medium.ttf");
+  QFontDatabase::addApplicationFont(":/fonts/Roboto-MediumItalic.ttf");
+  QFontDatabase::addApplicationFont(":/fonts/Roboto-Regular.ttf");
+  QFontDatabase::addApplicationFont(":/fonts/Roboto-Thin.ttf");
+  QFontDatabase::addApplicationFont(":/fonts/Roboto-ThinItalic.ttf");
+
   this->dataPtr->renderWidget = NULL;
   this->dataPtr->menuLayout = NULL;
   this->dataPtr->menuBar = NULL;
@@ -234,6 +248,10 @@ MainWindow::MainWindow()
   // Use a signal/slot to load plugins. This makes the process thread safe.
   connect(this, SIGNAL(AddPlugins()),
           this, SLOT(OnAddPlugins()), Qt::QueuedConnection);
+
+  // Use a signal/slot to track a visual. This makes the process thread safe.
+  connect(this, SIGNAL(TrackVisual(const std::string &)),
+          this, SLOT(OnTrackVisual(const std::string &)), Qt::QueuedConnection);
 
   // Create data logger dialog
   this->dataPtr->dataLogger = new gui::DataLogger(this);
@@ -1059,9 +1077,10 @@ void MainWindow::CreateActions()
   g_topicVisAct->setStatusTip(tr("Select a topic to visualize"));
   connect(g_topicVisAct, SIGNAL(triggered()), this, SLOT(SelectTopic()));
 
-  g_plotAct = new QAction(tr("Plot"), this);
+  g_plotAct = new QAction(QIcon(":images/graph_line_toolbar.svg"),
+      tr("Plot"), this);
   g_plotAct->setShortcut(tr("Ctrl+P"));
-  g_plotAct->setStatusTip(tr("Create a Plot"));
+  g_plotAct->setToolTip(tr("Create plot (Ctrl+P)"));
   connect(g_plotAct, SIGNAL(triggered()), this, SLOT(Plot()));
 
   g_openAct = new QAction(tr("&Open World"), this);
@@ -1372,30 +1391,32 @@ void MainWindow::CreateActions()
       tr("&Log Data"), this);
   g_dataLoggerAct->setShortcut(tr("Ctrl+D"));
   g_dataLoggerAct->setStatusTip(tr("Data Logging Utility"));
-  g_dataLoggerAct->setToolTip(tr("Log Data (Ctrl+D)"));
+  g_dataLoggerAct->setToolTip(tr("Log data (Ctrl+D)"));
   g_dataLoggerAct->setCheckable(true);
   g_dataLoggerAct->setChecked(false);
   connect(g_dataLoggerAct, SIGNAL(triggered()), this, SLOT(DataLogger()));
 
   g_screenshotAct = new QAction(QIcon(":/images/screenshot.png"),
       tr("Screenshot"), this);
-  g_screenshotAct->setStatusTip(tr("Take a screenshot"));
+  g_screenshotAct->setToolTip(tr("Take screenshot"));
   connect(g_screenshotAct, SIGNAL(triggered()), this,
       SLOT(CaptureScreenshot()));
 
   g_copyAct = new QAction(QIcon(":/images/copy_object.png"),
-      tr("Copy (Ctrl + C)"), this);
+      tr("Copy"), this);
   g_copyAct->setStatusTip(tr("Copy Entity"));
   g_copyAct->setCheckable(false);
   this->CreateDisabledIcon(":/images/copy_object.png", g_copyAct);
   g_copyAct->setEnabled(false);
+  g_copyAct->setShortcut(tr("Ctrl+C"));
 
   g_pasteAct = new QAction(QIcon(":/images/paste_object.png"),
-      tr("Paste (Ctrl + V)"), this);
+      tr("Paste"), this);
   g_pasteAct->setStatusTip(tr("Paste Entity"));
   g_pasteAct->setCheckable(false);
   this->CreateDisabledIcon(":/images/paste_object.png", g_pasteAct);
   g_pasteAct->setEnabled(false);
+  g_pasteAct->setShortcut(tr("Ctrl+V"));
 
   g_snapAct = new QAction(QIcon(":/images/magnet.png"),
       tr("Snap Mode (N)"), this);
@@ -1801,6 +1822,8 @@ void MainWindow::CreateMenuBar()
   this->dataPtr->editMenu->addSeparator();
   this->dataPtr->editMenu->addAction(g_editBuildingAct);
   this->dataPtr->editMenu->addAction(g_editModelAct);
+  this->dataPtr->editMenu->addAction(g_copyAct);
+  this->dataPtr->editMenu->addAction(g_pasteAct);
 
   // \TODO: Add this back in when implementing the full Terrain Editor spec.
   // editMenu->addAction(g_editTerrainAct);
@@ -1945,17 +1968,38 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
 
     if (_msg->camera().has_track())
     {
-      std::string name = _msg->camera().track().name();
+      if (_msg->camera().track().has_static_())
+        cam->SetTrackIsStatic(_msg->camera().track().static_());
 
-      double minDist = 0.0;
-      double maxDist = 0.0;
+      if (_msg->camera().track().has_use_model_frame())
+        cam->SetTrackUseModelFrame(_msg->camera().track().use_model_frame());
+
+      if (_msg->camera().track().has_xyz())
+        cam->SetTrackPosition(msgs::ConvertIgn(_msg->camera().track().xyz()));
+
+      if (_msg->camera().track().has_inherit_yaw())
+        cam->SetTrackInheritYaw(_msg->camera().track().inherit_yaw());
 
       if (_msg->camera().track().has_min_dist())
-        minDist = _msg->camera().track().min_dist();
-      if (_msg->camera().track().has_max_dist())
-        maxDist = _msg->camera().track().max_dist();
+      {
+        double minDist = _msg->camera().track().min_dist();
+        cam->SetTrackMinDistance(minDist);
+      }
 
-      cam->AttachToVisual(name, false, minDist, maxDist);
+      if (_msg->camera().track().has_max_dist())
+      {
+        double maxDist = _msg->camera().track().max_dist();
+        cam->SetTrackMaxDistance(maxDist);
+      }
+
+      if (_msg->camera().track().has_name() &&
+          _msg->camera().track().name() != "__default__")
+      {
+        std::string name = _msg->camera().track().name();
+        cam->TrackVisual(name);
+        // Call the signal to track a visual in the main thread.
+        this->TrackVisual(name);
+      }
     }
   }
 
@@ -2008,6 +2052,12 @@ void MainWindow::OnAddPlugins()
 
   g_overlayAct->setChecked(true);
   g_overlayAct->setEnabled(true);
+}
+
+/////////////////////////////////////////////////
+void MainWindow::OnTrackVisual(const std::string &_visualName)
+{
+  gui::Events::follow(_visualName);
 }
 
 /////////////////////////////////////////////////

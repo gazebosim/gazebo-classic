@@ -80,6 +80,14 @@ IntrospectionManager::IntrospectionManager()
   {
     gzerr << "Error advertising service [" << service << "]" << std::endl;
   }
+
+  // Advertise the topic for notifying changes in the registered items.
+  std::string topic = "/introspection/" + this->dataPtr->managerId +
+      "/items_update";
+  if (!this->dataPtr->node.Advertise<gazebo::msgs::Param_V>(topic))
+  {
+    gzerr << "Error advertising topic [" << topic << "]" << std::endl;
+  }
 }
 
 //////////////////////////////////////////////////
@@ -107,6 +115,9 @@ bool IntrospectionManager::Register(const std::string &_item,
   }
 
   this->dataPtr->allItems[_item] = _cb;
+
+  this->dataPtr->itemsUpdated = true;
+
   return true;
 }
 
@@ -125,7 +136,17 @@ bool IntrospectionManager::Unregister(const std::string &_item)
   // Remove the item from the list of all items.
   this->dataPtr->allItems.erase(_item);
 
+  this->dataPtr->itemsUpdated = true;
+
   return true;
+}
+
+//////////////////////////////////////////////////
+void IntrospectionManager::Clear()
+{
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  this->dataPtr->allItems.clear();
+  this->dataPtr->itemsUpdated = true;
 }
 
 //////////////////////////////////////////////////
@@ -146,16 +167,28 @@ std::set<std::string> IntrospectionManager::Items() const
 //////////////////////////////////////////////////
 void IntrospectionManager::Update()
 {
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  std::map<std::string, IntrospectionFilter> filtersCopy;
+  std::map<std::string, std::function <gazebo::msgs::Any ()>> allItemsCopy;
+  std::map<std::string, ObservedItem> observedItemsCopy;
 
-  for (auto &observedItem : this->dataPtr->observedItems)
+  {
+    std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+
+    // Make a copy of these members for avoiding locking a mutex while calling a
+    // user callback (we could create a deadlock).
+    // More creative solutions are welcome.
+    filtersCopy = this->dataPtr->filters;
+    allItemsCopy = this->dataPtr->allItems;
+    observedItemsCopy = this->dataPtr->observedItems;
+  }
+
+  for (auto &observedItem : observedItemsCopy)
   {
     auto &item = observedItem.first;
-
-    auto itemIter = this->dataPtr->allItems.find(item);
+    auto itemIter = allItemsCopy.find(item);
 
     // Sanity check: Make sure that we can update the item.
-    if (itemIter == this->dataPtr->allItems.end())
+    if (itemIter == allItemsCopy.end())
       continue;
 
     try
@@ -173,7 +206,7 @@ void IntrospectionManager::Update()
   }
 
   // Prepare the next message to be sent in each filter.
-  for (auto &filter : this->dataPtr->filters)
+  for (auto &filter : filtersCopy)
   {
     // First of all, clear the old message.
     auto &nextMsg = filter.second.msg;
@@ -183,12 +216,12 @@ void IntrospectionManager::Update()
     for (auto const &item : filter.second.items)
     {
       // Sanity check: Make sure that someone registered this item.
-      if (this->dataPtr->allItems.find(item) == this->dataPtr->allItems.end())
+      if (allItemsCopy.find(item) == allItemsCopy.end())
         continue;
 
       // Sanity check: Make sure that the value was updated.
       // (e.g.: an exception was not raised).
-      auto &lastValue = this->dataPtr->observedItems[item].lastValue;
+      auto &lastValue = observedItemsCopy[item].lastValue;
       if (lastValue.type() == gazebo::msgs::Any::NONE)
         continue;
 
@@ -208,6 +241,33 @@ void IntrospectionManager::Update()
       gzerr << "Error publishing update for topic [" << topicName << "]"
             << std::endl;
     }
+  }
+
+  this->NotifyUpdates();
+}
+
+//////////////////////////////////////////////////
+void IntrospectionManager::NotifyUpdates()
+{
+  bool itemsUpdatedCopy;
+
+  {
+    std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+    itemsUpdatedCopy = this->dataPtr->itemsUpdated;
+    this->dataPtr->itemsUpdated = false;
+  }
+
+  if (itemsUpdatedCopy)
+  {
+    gazebo::msgs::Empty req;
+    bool result;
+    gazebo::msgs::Param_V currentItems;
+    // Prepare the list of items to be sent.
+    this->Items(req, currentItems, result);
+
+    std::string topicName = "/introspection/" + this->dataPtr->managerId +
+      "/items_update";
+    this->dataPtr->node.Publish(topicName, currentItems);
   }
 }
 

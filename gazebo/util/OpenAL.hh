@@ -17,6 +17,7 @@
 #ifndef _GAZEBO_UTIL_OPENAL_HH_
 #define _GAZEBO_UTIL_OPENAL_HH_
 
+#include <set>
 #include <string>
 #include <vector>
 #include <sdf/sdf.hh>
@@ -73,6 +74,10 @@ namespace gazebo
       /// \param[in] _sdf SDF element parameters for an audio_source.
       /// \return A pointer to an OpenALSink object.
       public: OpenALSinkPtr CreateSink(sdf::ElementPtr _sdf);
+
+      /// \brief Get a list of available audio devices
+      /// \return A list of audio device names
+      public: std::set<std::string> DeviceList() const;
 
       /// \internal
       /// \brief Private data pointer.

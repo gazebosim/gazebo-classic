@@ -51,6 +51,9 @@ namespace gazebo
       /// \brief Pointer the physics engine.
       public: PhysicsEnginePtr physicsEngine;
 
+      /// \brief Pointer to the atmosphere model.
+      public: AtmospherePtr atmosphere;
+
       /// \brief Pointer the spherical coordinates data.
       public: common::SphericalCoordinatesPtr sphericalCoordinates;
 
@@ -221,6 +224,9 @@ namespace gazebo
       /// \brief True to enable the physics engine.
       public: bool enablePhysicsEngine;
 
+      /// \brief True to enable the atmosphere model.
+      public: bool enableAtmosphere;
+
       /// \brief Ray used to test for collisions when placing entities.
       public: RayShapePtr testRay;
 
@@ -328,6 +334,9 @@ namespace gazebo
 
       /// \brief URI of this world.
       public: common::URI uri;
+
+      /// \brief All the introspection items regsitered for this.
+      public: std::vector<common::URI> introspectionItems;
     };
   }
 }

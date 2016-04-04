@@ -397,6 +397,12 @@ namespace gazebo
       /// \return a shared pointer to itself
       public: boost::shared_ptr<Model> shared_from_this();
 
+      /// \brief Create a new link for this model
+      /// \param[in] _name name of the new link
+      /// \return a LinkPtr to the new link created,
+      /// returns NULL if link _name already exists.
+      public: LinkPtr CreateLink(const std::string &_name);
+
       /// \brief Callback when the pose of the model has been changed.
       protected: virtual void OnPoseChange();
 
@@ -428,6 +434,9 @@ namespace gazebo
 
       /// \brief Register items in the introspection service.
       private: void RegisterIntrospectionItems();
+
+      /// \brief Unregister items in the introspection service.
+      private: void UnregisterIntrospectionItems();
 
       /// used by Model::AttachStaticModel
       protected: std::vector<ModelPtr> attachedModels;
@@ -468,6 +477,9 @@ namespace gazebo
 
       /// \brief Controller for the joints.
       private: JointControllerPtr jointController;
+
+      /// \brief All the introspection items regsitered for this.
+      private: std::vector<common::URI> introspectionItems;
     };
     /// \}
   }

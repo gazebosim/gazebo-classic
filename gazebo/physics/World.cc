@@ -72,6 +72,8 @@
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/PhysicsFactory.hh"
+#include "gazebo/physics/Atmosphere.hh"
+#include "gazebo/physics/AtmosphereFactory.hh"
 #include "gazebo/physics/PresetManager.hh"
 #include "gazebo/physics/UserCmdManager.hh"
 #include "gazebo/physics/Model.hh"
@@ -143,6 +145,7 @@ World::World(const std::string &_name)
   this->dataPtr->resetTimeOnly = false;
   this->dataPtr->resetModelOnly = false;
   this->dataPtr->enablePhysicsEngine = true;
+  this->dataPtr->enableAtmosphere = true;
   this->dataPtr->setWorldPoseMutex = new boost::mutex();
   this->dataPtr->worldUpdateMutex = new boost::recursive_mutex();
 
@@ -274,6 +277,18 @@ void World::Load(sdf::ElementPtr _sdf)
     gzthrow("Unable to create physics engine\n");
 
   this->dataPtr->physicsEngine->Load(physicsElem);
+
+  // This should come after loading physics engine
+  sdf::ElementPtr atmosphereElem = this->dataPtr->sdf->GetElement("atmosphere");
+
+  type = atmosphereElem->Get<std::string>("type");
+  this->dataPtr->atmosphere = AtmosphereFactory::NewAtmosphere(type,
+      shared_from_this());
+
+  if (this->dataPtr->atmosphere == NULL)
+    gzerr << "Unable to create atmosphere model\n";
+
+  this->dataPtr->atmosphere->Load(atmosphereElem);
 
   // This should also come before loading of entities
   {
@@ -695,6 +710,8 @@ void World::Step()
     }
   }
 
+  gazebo::util::IntrospectionManager::Instance()->NotifyUpdates();
+
   this->ProcessMessages();
 
   DIAG_TIMER_STOP("World::Step");
@@ -851,6 +868,8 @@ void World::Fini()
 #ifdef HAVE_OPENAL
   util::OpenAL::Instance()->Fini();
 #endif
+
+  this->UnregisterIntrospectionItems();
 }
 
 //////////////////////////////////////////////////
@@ -889,6 +908,12 @@ std::string World::GetName() const
 PhysicsEnginePtr World::GetPhysicsEngine() const
 {
   return this->dataPtr->physicsEngine;
+}
+
+//////////////////////////////////////////////////
+AtmospherePtr World::Atmosphere() const
+{
+  return this->dataPtr->atmosphere;
 }
 
 //////////////////////////////////////////////////
@@ -2601,6 +2626,18 @@ void World::EnablePhysicsEngine(bool _enable)
 }
 
 /////////////////////////////////////////////////
+bool World::AtmosphereEnabled() const
+{
+  return this->dataPtr->enableAtmosphere;
+}
+
+/////////////////////////////////////////////////
+void World::SetAtmosphereEnabled(const bool _enable)
+{
+  this->dataPtr->enableAtmosphere = _enable;
+}
+
+/////////////////////////////////////////////////
 void World::_AddDirty(Entity *_entity)
 {
   GZ_ASSERT(_entity != NULL, "_entity is NULL");
@@ -2626,8 +2663,18 @@ void World::RegisterIntrospectionItems()
   auto uri = this->URI();
 
   common::URI timeURI(uri);
-  timeURI.Query().Insert("p", "sim_time");
+  timeURI.Query().Insert("p", "time/sim_time");
+  this->dataPtr->introspectionItems.push_back(timeURI);
   // Add here all the items that might be introspected.
   gazebo::util::IntrospectionManager::Instance()->Register<common::Time>(
       timeURI.Str(), std::bind(&World::GetSimTime, this));
+}
+
+/////////////////////////////////////////////////
+void World::UnregisterIntrospectionItems()
+{
+  for (auto &item : this->dataPtr->introspectionItems)
+    util::IntrospectionManager::Instance()->Unregister(item.Str());
+
+  this->dataPtr->introspectionItems.clear();
 }

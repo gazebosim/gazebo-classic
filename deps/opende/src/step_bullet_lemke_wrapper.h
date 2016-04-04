@@ -18,7 +18,7 @@
 #define _GAZEBO_ODE_STEP_BULLET_LEMKE_WRAPPER_H_
 
 #ifdef HAVE_BULLET
-#include <ode/common.h>
+#include <gazebo/ode/common.h>
 void dSolveLCP_bullet_lemke(int _m, dReal *_A, dReal *_x, dReal *_b,
   dReal *_lo, dReal *_hi);
 #endif

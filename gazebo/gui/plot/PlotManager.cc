@@ -15,19 +15,16 @@
  *
 */
 
-#include <chrono>
-#include <map>
 #include <memory>
 #include <mutex>
-#include <set>
-#include <thread>
 
-#include <ignition/transport.hh>
 
-#include "gazebo/util/IntrospectionClient.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportIface.hh"
+#include "gazebo/common/CommonIface.hh"
+#include "gazebo/common/URI.hh"
 
+#include "gazebo/gui/plot/IntrospectionCurveHandler.hh"
 #include "gazebo/gui/plot/PlotCurve.hh"
 #include "gazebo/gui/plot/PlotWindow.hh"
 #include "gazebo/gui/plot/IncrementalPlot.hh"
@@ -43,15 +40,8 @@ namespace gazebo
     /// \brief Private data for the PlotManager class
     class PlotManagerPrivate
     {
-      /// \def CurveVariableSet
-      /// \brief A set of unique plot curve pointers
-      public: using CurveVariableSet = std::set<PlotCurveWeakPtr,
-          std::owner_less<PlotCurveWeakPtr> >;
-
-      /// \def CurveVariableMapIt
-      /// \brief Curve variable map iterator
-      public: using CurveVariableMapIt =
-          std::map<std::string, CurveVariableSet>::iterator;
+      /// \brief Mutex to protect plot manager updates.
+      public: std::mutex mutex;
 
       /// \brief Node for communications.
       public: transport::NodePtr node;
@@ -59,26 +49,11 @@ namespace gazebo
       /// \brief Subscriber to the world control topic
       public: transport::SubscriberPtr worldControlSub;
 
-      /// \brief A map to variable topic names to plot curve.
-      public: std::map<std::string, CurveVariableSet> curves;
+      /// \brief Handler for updating introspection curves
+      public: IntrospectionCurveHandler introspectionCurve;
 
       /// \brief A list of plot windows.
       public: std::vector<PlotWindow *> windows;
-
-      /// \brief Mutex to protect the PlotManager.
-      public: std::mutex mutex;
-
-      /// \brief Introspection Client
-      public: util::IntrospectionClient introspectClient;
-
-      /// \brief Introspection manager Id
-      public: std::string managerId;
-
-      /// \brief Ign transport node.
-      public: ignition::transport::Node ignNode;
-
-      /// \brief Introspection thread.
-      public: std::unique_ptr<std::thread> introspectThread;
     };
   }
 }
@@ -94,66 +69,12 @@ PlotManager::PlotManager()
   this->dataPtr->worldControlSub =
       this->dataPtr->node->Subscribe("~/world_control",
       &PlotManager::OnWorldControl, this);
-
-  // set up introspection client in another thread as it blocks on
-  // discovery
-  this->dataPtr->introspectThread.reset(
-      new std::thread(&PlotManager::SetupIntrospection, this));
 }
 
 /////////////////////////////////////////////////
 PlotManager::~PlotManager()
 {
-  this->dataPtr->introspectThread->join();
-}
-
-/////////////////////////////////////////////////
-void PlotManager::SetupIntrospection()
-{
-  // Wait for the managers to come online
-  std::set<std::string> managerIds =
-      this->dataPtr->introspectClient.WaitForManagers(std::chrono::seconds(2));
-  if (managerIds.empty())
-  {
-    gzerr << "No introspection managers detected." << std::endl;
-    return;
-  }
-
-  // get the first manager
-  this->dataPtr->managerId = *managerIds.begin();
-
-  if (this->dataPtr->managerId.empty())
-  {
-    gzerr << "Introspection manager ID is empty" << std::endl;
-    return;
-  }
-
-  if (!this->dataPtr->introspectClient.IsRegistered(
-      this->dataPtr->managerId, "sim_time"))
-  {
-    gzerr << "The sim_time item is not registered on the manager.\n";
-    return;
-  }
-
-  std::string filterId;
-  std::string topic;
-
-  // Let's create a filter for sim_time.
-  std::set<std::string> items = {"sim_time"};
-  if (!this->dataPtr->introspectClient.NewFilter(
-      this->dataPtr->managerId, items, filterId, topic))
-  {
-    gzerr << "Unable to create introspection filter" << std::endl;
-    return;
-  }
-
-  // Subscribe to custom introspection topic for receiving updates.
-  if (!this->dataPtr->ignNode.Subscribe(
-      topic, &PlotManager::OnIntrospection, this))
-  {
-    gzerr << "Error subscribing to introspection manager" << std::endl;
-    return;
-  }
+  this->dataPtr->windows.clear();
 }
 
 /////////////////////////////////////////////////
@@ -172,49 +93,16 @@ void PlotManager::OnWorldControl(ConstWorldControlPtr &_data)
 }
 
 /////////////////////////////////////////////////
-void PlotManager::AddCurve(const std::string &_name, PlotCurveWeakPtr _curve)
+void PlotManager::AddIntrospectionCurve(const std::string &_uri,
+    PlotCurveWeakPtr _curve)
 {
-  auto c = _curve.lock();
-  if (!c)
-    return;
-
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-  auto it = this->dataPtr->curves.find(_name);
-  if (it == this->dataPtr->curves.end())
-  {
-    PlotManagerPrivate::CurveVariableSet curveSet;
-    curveSet.insert(_curve);
-    this->dataPtr->curves[_name] = curveSet;
-  }
-  else
-  {
-    auto cIt = it->second.find(_curve);
-    if (cIt == it->second.end())
-    {
-      it->second.insert(_curve);
-    }
-  }
+  this->dataPtr->introspectionCurve.AddCurve(_uri, _curve);
 }
 
 /////////////////////////////////////////////////
-void PlotManager::RemoveCurve(PlotCurveWeakPtr _curve)
+void PlotManager::RemoveIntrospectionCurve(PlotCurveWeakPtr _curve)
 {
-  auto c = _curve.lock();
-  if (!c)
-    return;
-
-  // find and remove the curve
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-  for (auto it = this->dataPtr->curves.begin();
-      it != this->dataPtr->curves.end(); ++it)
-  {
-    auto cIt = it->second.find(_curve);
-    if (cIt != it->second.end())
-    {
-      it->second.erase(cIt);
-      return;
-    }
-  }
+  this->dataPtr->introspectionCurve.RemoveCurve(_curve);
 }
 
 /////////////////////////////////////////////////
@@ -240,125 +128,48 @@ void PlotManager::RemoveWindow(PlotWindow *_window)
 }
 
 /////////////////////////////////////////////////
-void PlotManager::OnIntrospection(const gazebo::msgs::Param_V &_msg)
+std::string PlotManager::HumanReadableName(const std::string &_uri) const
 {
-  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  std::string label;
 
-  // stores a list of curves iterators and their new values
-  std::vector<std::pair<PlotManagerPrivate::CurveVariableMapIt, double> >
-      curvesUpdates;
+  // expected name format:
+  //   scheme: data://
+  //   path:   world/world_name/model/model_name/link/link_name
+  //   query:  ?p=param_type/param_name
+  // convert to friendly name:
+  //   name:   model_name/link_name?param_name
+  common::URI uri(_uri);
+  if (!uri.Valid())
+    return _uri;
 
-  // collect data for updates
-  double simTime = 0;
-  bool hasSimTime = false;
-  for (auto i = 0; i < _msg.param_size(); ++i)
+  common::URIPath path = uri.Path();
+  common::URIQuery query = uri.Query();
+  std::vector<std::string> pathTokens = common::split(path.Str(), "/");
+  std::vector<std::string> queryTokens = common::split(query.Str(), "=/");
+
+  // min path token size 2: [world, world_name]
+  // min query token size 3: [p, param_type, param_name]
+  if (pathTokens.size() < 2 || queryTokens.size() < 3)
+    return label;
+
+  // path: start from model name and ignore world and entity type str for now
+  std::string pathStr;
+  for (unsigned int i = 3; i < pathTokens.size(); i+=2)
   {
-    auto param = _msg.param(i);
-    if (param.name().empty() || !param.has_value())
-      continue;
-
-    std::string paramName = param.name();
-    auto paramValue = param.value();
-
-    // x axis is hardcoded to sim time for now
-    if (!hasSimTime && paramName == "sim_time")
-    {
-      simTime = paramValue.double_value();
-      hasSimTime = true;
-    }
-
-    // see if there is a curve with variable name that matches param name
-    auto it = this->dataPtr->curves.find(paramName);
-    if (it == this->dataPtr->curves.end())
-      continue;
-
-    // get the data
-    double data = 0;
-    bool validData = true;
-    switch (paramValue.type())
-    {
-      case gazebo::msgs::Any::DOUBLE:
-      {
-        if (paramValue.has_double_value())
-        {
-          data = paramValue.double_value();
-        }
-        break;
-      }
-      case gazebo::msgs::Any::INT32:
-      {
-        if (paramValue.has_int_value())
-        {
-          data = paramValue.int_value();
-        }
-        break;
-      }
-      case gazebo::msgs::Any::BOOLEAN:
-      {
-        if (paramValue.has_bool_value())
-        {
-          data = static_cast<int>(paramValue.bool_value());
-        }
-        break;
-      }
-      default:
-      {
-        validData = false;
-        break;
-      }
-    }
-    if (!validData)
-      continue;
-    // push to tmp list and update later
-    curvesUpdates.push_back(std::make_pair(it, data));
+    if (!pathStr.empty())
+      pathStr += "/";
+    pathStr += pathTokens[i];
   }
 
-  // update curves!
-  for (auto &curveUpdate : curvesUpdates)
+  // query: take only first param name
+  std::string queryStr;
+  for (unsigned int i = 2; i < queryTokens.size(); i+=2)
   {
-    for (auto cIt : curveUpdate.first->second)
-    {
-      auto curve = cIt.lock();
-      if (!curve)
-        continue;
-      curve->AddPoint(ignition::math::Vector2d(simTime, curveUpdate.second));
-    }
+    if (!queryStr.empty())
+      queryStr +="/";
+    queryStr += queryTokens[i];
   }
+  label = pathStr + "?" + queryStr;
 
-  // TODO remove later - for testing only
-  auto it = this->dataPtr->curves.find("Dog");
-  if (it != this->dataPtr->curves.end())
-  {
-    for (auto cIt : it->second)
-    {
-      auto curve = cIt.lock();
-      if (!curve)
-        continue;
-      curve->AddPoint(ignition::math::Vector2d(simTime, 2));
-    }
-  }
-
-  it = this->dataPtr->curves.find("Cat");
-  if (it != this->dataPtr->curves.end())
-  {
-    for (auto cIt : it->second)
-    {
-      auto curve = cIt.lock();
-      if (!curve)
-        continue;
-      curve->AddPoint(ignition::math::Vector2d(simTime, 10));
-    }
-  }
-
-  it = this->dataPtr->curves.find("Turtle");
-  if (it != this->dataPtr->curves.end())
-  {
-    for (auto cIt : it->second)
-    {
-      auto curve = cIt.lock();
-      if (!curve)
-        continue;
-      curve->AddPoint(ignition::math::Vector2d(simTime, 6));
-    }
-  }
+  return label;
 }

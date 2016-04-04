@@ -45,6 +45,7 @@ set(tests
   gz_physics.cc
   gz_world.cc
   imu.cc
+  introspection_items.cc
   joint_controller.cc
   joint_force_torque.cc
   joint_gearbox.cc
@@ -113,7 +114,7 @@ if (MANPAGES_SUPPORT)
 	      manpages.cc)
 endif()
 
-gz_build_tests(${tests})
+gz_build_tests(${tests} EXTRA_LIBS gazebo_test_fixture)
 
 if (ENABLE_TESTS_COMPILATION)
   # Increase timeout, to account for model download time.
@@ -153,13 +154,13 @@ set(dri_tests
   speed_pr2.cc
   world_reset.cc
 )
-
-gz_build_dri_tests(${dri_tests})
+gz_build_dri_tests(${dri_tests} EXTRA_LIBS gazebo_test_fixture)
 
 set(qt_tests
   insert_model.cc
   model_editor.cc
   model_manipulation.cc
+  track_visual.cc
   undo.cc
   visual_pose.cc
 )

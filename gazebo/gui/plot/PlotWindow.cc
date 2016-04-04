@@ -16,8 +16,11 @@
 */
 #include <mutex>
 
+#include "gazebo/gui/GuiIface.hh"
+#include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/plot/IncrementalPlot.hh"
 #include "gazebo/gui/plot/ExportDialog.hh"
+#include "gazebo/gui/plot/Palette.hh"
 #include "gazebo/gui/plot/PlotCanvas.hh"
 #include "gazebo/gui/plot/PlotCurve.hh"
 #include "gazebo/gui/plot/PlotManager.hh"
@@ -33,18 +36,6 @@ namespace gazebo
     /// \brief Private data for the PlotWindow class
     class PlotWindowPrivate
     {
-      /// \brief The list of variable labels.
-      public: QListWidget *labelList;
-
-      /// \brief True when plotting is paused.
-      public: bool paused = false;
-
-      /// \brief Action to pause plotting
-      public: QAction *plotPlayAct;
-
-      /// \brief Action to resume plotting
-      public: QAction *plotPauseAct;
-
       /// \brief Layout to hold all the canvases.
       public: QVBoxLayout *canvasLayout;
 
@@ -104,6 +95,8 @@ PlotWindow::PlotWindow(QWidget *_parent)
   // add button
   QPushButton *addCanvasButton = new QPushButton("+");
   addCanvasButton->setObjectName("plotAddCanvas");
+  addCanvasButton->setDefault(false);
+  addCanvasButton->setAutoDefault(false);
   addCanvasButton->setToolTip("Add a new canvas");
   QGraphicsDropShadowEffect *addCanvasShadow = new QGraphicsDropShadowEffect();
   addCanvasShadow->setBlurRadius(8);
@@ -115,28 +108,6 @@ PlotWindow::PlotWindow(QWidget *_parent)
   addButtonLayout->setAlignment(Qt::AlignRight | Qt::AlignBottom);
   addButtonLayout->setContentsMargins(0, 0, 0, 0);
   addCanvasButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
-
-
-  this->dataPtr->plotPlayAct = new QAction(QIcon(":/images/play_dark.svg"),
-      tr("Play"), this);
-  this->dataPtr->plotPlayAct->setToolTip(tr("Continue plotting"));
-  this->dataPtr->plotPlayAct->setVisible(false);
-  connect(this->dataPtr->plotPlayAct, SIGNAL(triggered()),
-      this, SLOT(OnPlay()));
-
-  this->dataPtr->plotPauseAct = new QAction(QIcon(":/images/pause_dark.svg"),
-      tr("Pause"), this);
-  this->dataPtr->plotPauseAct->setToolTip(
-      tr("Pause plotting (not simulation)"));
-  this->dataPtr->plotPauseAct->setVisible(true);
-  connect(this->dataPtr->plotPauseAct, SIGNAL(triggered()),
-      this, SLOT(OnPause()));
-
-  QToolBar *playToolbar = new QToolBar;
-  playToolbar->setObjectName("plotToolbar");
-  playToolbar->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-  playToolbar->addAction(this->dataPtr->plotPlayAct);
-  playToolbar->addAction(this->dataPtr->plotPauseAct);
 
   QAction *plotExportAct = new QAction(
       QIcon(":/images/file_upload.svg"), tr("Export"), this);
@@ -150,8 +121,6 @@ PlotWindow::PlotWindow(QWidget *_parent)
   exportToolbar->addAction(plotExportAct);
 
   QHBoxLayout *bottomPanelLayout = new QHBoxLayout;
-  bottomPanelLayout->addStretch();
-  bottomPanelLayout->addWidget(playToolbar);
   bottomPanelLayout->addStretch();
   bottomPanelLayout->addWidget(exportToolbar);
   bottomPanelLayout->setContentsMargins(0, 0, 0, 0);
@@ -172,24 +141,30 @@ PlotWindow::PlotWindow(QWidget *_parent)
   plotLayout->setStretchFactor(addButtonLayout, 0);
   plotLayout->setStretchFactor(bottomFrame, 0);
 
-  // left panel
-  this->dataPtr->labelList = new DragableListWidget(this);
-  this->dataPtr->labelList->setDragEnabled(true);
-  this->dataPtr->labelList->setDragDropMode(QAbstractItemView::DragOnly);
-  this->dataPtr->labelList->setSizePolicy(
-      QSizePolicy::Minimum, QSizePolicy::Minimum);
-  QListWidgetItem *item = new QListWidgetItem("Real Time Factor");
-  item->setToolTip(tr("Drag onto graph to plot"));
-  this->dataPtr->labelList->addItem(item);
+  auto plotFrame = new QFrame;
+  plotFrame->setLayout(plotLayout);
 
-  QVBoxLayout *leftLayout = new QVBoxLayout;
-  leftLayout->addWidget(this->dataPtr->labelList);
+  // Palette
+  auto plotPalette = new Palette(this);
 
-  QHBoxLayout *mainLayout = new QHBoxLayout;
-  mainLayout->addLayout(leftLayout);
-  mainLayout->addLayout(plotLayout);
+  auto splitter = new QSplitter(Qt::Horizontal, this);
+  splitter->addWidget(plotPalette);
+  splitter->addWidget(plotFrame);
+  splitter->setCollapsible(0, true);
+  splitter->setCollapsible(1, false);
+
+  QList<int> sizes;
+  sizes << 30 << 70;
+  splitter->setSizes(sizes);
+
+  auto mainLayout = new QHBoxLayout;
+  mainLayout->addWidget(splitter);
+  mainLayout->setContentsMargins(0, 0, 0, 0);
 
   this->setLayout(mainLayout);
+
+  QShortcut *space = new QShortcut(Qt::Key_Space, this);
+  QObject::connect(space, SIGNAL(activated()), this, SLOT(TogglePause()));
 
   QTimer *displayTimer = new QTimer(this);
   connect(displayTimer, SIGNAL(timeout()), this, SLOT(Update()));
@@ -197,31 +172,14 @@ PlotWindow::PlotWindow(QWidget *_parent)
 
   PlotManager::Instance()->AddWindow(this);
 
-  this->setMinimumSize(820, 480);
+  this->setMinimumSize(640, 480);
 }
 
 /////////////////////////////////////////////////
 PlotWindow::~PlotWindow()
 {
-  this->dataPtr->paused = true;
   PlotManager::Instance()->RemoveWindow(this);
   this->Clear();
-}
-
-/////////////////////////////////////////////////
-void PlotWindow::OnPlay()
-{
-  this->dataPtr->paused = false;
-  this->dataPtr->plotPauseAct->setVisible(true);
-  this->dataPtr->plotPlayAct->setVisible(false);
-}
-
-/////////////////////////////////////////////////
-void PlotWindow::OnPause()
-{
-  this->dataPtr->paused = true;
-  this->dataPtr->plotPauseAct->setVisible(false);
-  this->dataPtr->plotPlayAct->setVisible(true);
 }
 
 /////////////////////////////////////////////////
@@ -231,6 +189,9 @@ PlotCanvas *PlotWindow::AddCanvas()
   connect(canvas, SIGNAL(CanvasDeleted()), this, SLOT(OnRemoveCanvas()));
 
   this->dataPtr->canvasLayout->addWidget(canvas);
+
+  this->UpdateCanvas();
+
   return canvas;
 }
 
@@ -280,6 +241,27 @@ void PlotWindow::OnRemoveCanvas()
   // add an empty canvas if the plot window is now empty
   if (this->dataPtr->canvasLayout->isEmpty())
     this->AddCanvas();
+  else
+  {
+    this->UpdateCanvas();
+  }
+}
+
+/////////////////////////////////////////////////
+void PlotWindow::UpdateCanvas()
+{
+  // disable Delete Canvas option in settings if there is only one
+  // canvas in the window
+  QLayoutItem *item = this->dataPtr->canvasLayout->itemAt(0);
+  if (item)
+  {
+    PlotCanvas *plotCanvas = qobject_cast<PlotCanvas *>(item->widget());
+    if (plotCanvas)
+    {
+      plotCanvas->SetDeleteCanvasEnabled(
+          this->dataPtr->canvasLayout->count() != 1);
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -299,9 +281,6 @@ void PlotWindow::Update()
     this->dataPtr->restart = false;
   }
 
-  if (this->dataPtr->paused)
-    return;
-
   for (int i = 0; i < this->dataPtr->canvasLayout->count(); ++i)
   {
     QLayoutItem *item = this->dataPtr->canvasLayout->itemAt(i);
@@ -317,6 +296,19 @@ void PlotWindow::Restart()
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
   this->dataPtr->restart = true;
+}
+
+/////////////////////////////////////////////////
+void PlotWindow::TogglePause()
+{
+  MainWindow *mainWindow = gui::get_main_window();
+  if (!mainWindow)
+    return;
+
+  if (mainWindow->IsPaused())
+    mainWindow->Play();
+  else
+    mainWindow->Pause();
 }
 
 /////////////////////////////////////////////////
