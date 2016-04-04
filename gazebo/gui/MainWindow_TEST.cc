@@ -700,6 +700,8 @@ void MainWindow_TEST::ActionCreationDestruction()
 
   QVERIFY(gazebo::gui::g_showLinkFrameAct);
 
+  QVERIFY(gazebo::gui::g_showSkeletonAct);
+
   QVERIFY(gazebo::gui::g_transparentAct);
 
   QVERIFY(gazebo::gui::g_viewWireframeAct);
@@ -816,6 +818,8 @@ void MainWindow_TEST::ActionCreationDestruction()
   QVERIFY(!gazebo::gui::g_showOriginAct);
 
   QVERIFY(!gazebo::gui::g_showLinkFrameAct);
+
+  QVERIFY(!gazebo::gui::g_showSkeletonAct);
 
   QVERIFY(!gazebo::gui::g_transparentAct);
 

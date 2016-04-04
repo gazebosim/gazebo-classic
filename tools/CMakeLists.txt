@@ -3,6 +3,7 @@ add_definitions(${QT_DEFINITIONS})
 
 include_directories(
   ${tinyxml_INCLUDE_DIRS}
+  ${tinyxml2_INCLUDE_DIRS}
   ${PROTOBUF_INCLUDE_DIR}
   ${SDFormat_INCLUDE_DIRS}
 )
@@ -11,6 +12,7 @@ link_directories(
   ${CCD_LIBRARY_DIRS}
   ${SDFormat_LIBRARY_DIRS}
   ${tinyxml_LIBRARY_DIRS}
+  ${IGNITION-MATH_LIBRARY_DIRS}
 )
 
 if (HAVE_BULLET)

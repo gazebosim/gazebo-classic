@@ -89,8 +89,6 @@ namespace gazebo
       /// \brief QT callback when snap below has been selected.
       // private slots: void OnSnapBelow();
 
-      // private slots: void OnSkeleton();
-
       /// \brief Key release callback.
       /// \param[in] _event The key event.
       /// \return True if the key press was handled.
@@ -134,7 +132,6 @@ namespace gazebo
       /// \brief Action for snapping an object to another object below the
       /// first.
       // private: QAction *snapBelowAct;
-      // private: QAction *skeletonAct;
 
       /// \brief The various view states
       private: std::vector<ViewState*> viewStates;
