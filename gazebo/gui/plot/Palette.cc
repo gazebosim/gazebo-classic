@@ -200,6 +200,7 @@ class PlotItemDelegate : public QStyledItemDelegate
       for (std::map<size_t, size_t>::iterator iter = bold.begin();
            iter != bold.end(); ++iter)
       {
+        // Skip this bold text if it has already been rendered.
         if (renderPos > iter->first)
         {
           renderPos = iter->first + 1;
