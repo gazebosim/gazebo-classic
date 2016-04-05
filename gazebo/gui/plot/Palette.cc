@@ -202,10 +202,7 @@ class PlotItemDelegate : public QStyledItemDelegate
       {
         // Skip this bold text if it has already been rendered.
         if (renderPos > iter->first)
-        {
-          renderPos = iter->first + 1;
           continue;
-        }
 
         // First paint text that is not bold
         auto textStr = QString::fromStdString(
@@ -230,7 +227,7 @@ class PlotItemDelegate : public QStyledItemDelegate
       }
 
       // Render any remaining text.
-      if (renderPos < text.size()-1)
+      if (renderPos < text.size())
       {
         auto textStr = QString::fromStdString(text.substr(renderPos));
         _painter->setFont(QFont(fontRegular.family(), fontRegular.pointSize(),
