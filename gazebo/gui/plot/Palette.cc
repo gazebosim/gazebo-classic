@@ -182,6 +182,7 @@ class PlotItemDelegate : public QStyledItemDelegate
       // therefore be bold.
       //
       // Bold map: key = position of bold text start, value=bold text length
+      //std::map<size_t, size_t> bold;
       std::map<size_t, size_t> bold;
       std::for_each(wordsUpper.begin(), wordsUpper.end(),
           [upperText, &bold](const std::string &_word)
@@ -189,7 +190,7 @@ class PlotItemDelegate : public QStyledItemDelegate
             size_t pos = upperText.find(_word);
             while (pos != std::string::npos)
             {
-              bold[pos] = _word.size();
+              bold[pos] = std::max(bold[pos], _word.size());
               pos = upperText.find(_word, pos+1);
             }
           });
