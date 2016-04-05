@@ -857,7 +857,6 @@ void PlotCanvas::SetDeleteCanvasEnabled(const bool _enable)
     this->dataPtr->deleteCanvasAct->setEnabled(_enable);
 }
 
-
 /////////////////////////////////////////////////
 std::string PlotCanvas::Title() const
 {
