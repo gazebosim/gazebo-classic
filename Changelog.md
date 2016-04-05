@@ -38,6 +38,9 @@
 
 ## Gazebo 7.x.x (2016-xx-xx)
 
+1. Update `gz sdf -c` command line tool to use the new `sdf::convertFile` API.
+    * [Pull request #2227](https://bitbucket.org/osrf/gazebo/pull-requests/2227)
+
 1. Process insertions on World::SetState
     * [Pull request #2200](https://bitbucket.org/osrf/gazebo/pull-requests/2200)
 
