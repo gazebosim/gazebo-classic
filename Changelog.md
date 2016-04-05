@@ -91,6 +91,9 @@
         * [Pull request #2180](https://bitbucket.org/osrf/gazebo/pull-request/2180)
         * [Issue #1806](https://bitbucket.org/osrf/gazebo/issues/1806)
 
+    1. Update gui/building/*Item API
+        * [Pull request #2228](https://bitbucket.org/osrf/gazebo/pull-request/2228)
+
 ## Gazebo 7.0.0 (2016-01-25)
 
 1. Add FollowerPlugin
