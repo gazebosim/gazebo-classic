@@ -202,12 +202,12 @@ namespace gazebo
       /// Bodies connected by a joint are exempt from this, and will
       /// never collide.
       /// \return True if self-collide enabled for this model, false otherwise.
-      public: bool GetSelfCollide() const;
+      public: virtual bool GetSelfCollide() const;
 
       /// \brief Set this model's self_collide property
       /// \sa GetSelfCollide
       /// \param[in] _self_collide True if self-collisions enabled by default.
-      public: void SetSelfCollide(bool _self_collide);
+      public: virtual void SetSelfCollide(bool _self_collide);
 
       /// \brief Set the gravity mode of the model.
       /// \param[in] _value False to turn gravity on for the model.
