@@ -179,6 +179,7 @@ void PlotWindow::RemoveCanvas(PlotCanvas *_canvas)
     return;
 
   _canvas->hide();
+  _canvas->setParent(NULL);
   _canvas->deleteLater();
 }
 

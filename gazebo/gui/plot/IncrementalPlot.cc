@@ -29,6 +29,7 @@
 #include "gazebo/common/Time.hh"
 
 #include "gazebo/gui/plot/PlotCurve.hh"
+#include "gazebo/gui/plot/PlotZoomer.hh"
 #include "gazebo/gui/plot/IncrementalPlot.hh"
 
 using namespace gazebo;
@@ -172,6 +173,9 @@ namespace gazebo
       /// \brief Pointer to the plot magnifier.
       public: PlotMagnifier *magnifier;
 
+      /// \brief Pointer to the plot zoomer.
+      public: PlotZoomer* zoomer;
+
       /// \brief Pointer to the plot panner.
       public: QwtPlotPanner *panner;
 
@@ -200,13 +204,13 @@ IncrementalPlot::IncrementalPlot(QWidget *_parent)
   // panning with the left mouse button
   this->dataPtr->panner = new QwtPlotPanner(this->canvas());
 
-  // stacked zooming with rectangle selection
-  QwtPlotZoomer* zoomer = new QwtPlotZoomer(this->canvas());
-  zoomer->setMousePattern(QwtEventPattern::MouseSelect1,
+  // box zoom with line hover display
+  this->dataPtr->zoomer = new PlotZoomer(this->canvas());
+  this->dataPtr->zoomer->setMousePattern(QwtEventPattern::MouseSelect1,
       Qt::MidButton);
-  zoomer->setMousePattern(QwtEventPattern::MouseSelect2,
+  this->dataPtr->zoomer->setMousePattern(QwtEventPattern::MouseSelect2,
       Qt::RightButton, Qt::ControlModifier);
-  zoomer->setMousePattern(QwtEventPattern::MouseSelect3,
+  this->dataPtr->zoomer->setMousePattern(QwtEventPattern::MouseSelect3,
       Qt::NoButton);
 
   // zoom in/out with the wheel
@@ -406,6 +410,7 @@ void IncrementalPlot::Update()
   this->dataPtr->prevPoint = lastPoint;
   this->setAxisScale(QwtPlot::xBottom, minX, maxX);
 
+  this->dataPtr->zoomer->Update();
   this->replot();
 }
 
