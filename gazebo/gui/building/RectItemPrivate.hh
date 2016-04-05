@@ -19,6 +19,7 @@
 #define _GAZEBO_GUI_BUILDING_RECTITEM_PRIVATE_HH_
 
 #include <vector>
+#include <ignition/math/Vector2.hh>
 
 #include "gazebo/gui/qt.h"
 
@@ -33,7 +34,7 @@ namespace gazebo
     class RectItemPrivate
     {
       /// \brief Mouse press position in pixel coordinates.
-      public: QPointF mousePressPos;
+      public: ignition::math::Vector2d mousePressPos;
 
       /// \brief Mouse press position in pixel coordinates.
       public: int gridSpace;

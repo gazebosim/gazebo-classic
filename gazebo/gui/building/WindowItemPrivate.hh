@@ -18,6 +18,8 @@
 #ifndef _GAZEBO_GUI_BUILDING_WINDOWITEM_PRIVATE_HH_
 #define _GAZEBO_GUI_BUILDING_WINDOWITEM_PRIVATE_HH_
 
+#include <ignition/math/Vector2.hh>
+
 #include "gazebo/gui/qt.h"
 
 namespace gazebo
@@ -42,7 +44,7 @@ namespace gazebo
       public: double windowSideBar;
 
       /// \brief Scene position of the window item in pixel coordinates.
-      public: QPointF windowPos;
+      public: ignition::math::Vector2d windowPos;
 
       /// \brief Elevation of the window item in pixels.
       public: double windowElevation;

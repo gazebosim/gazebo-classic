@@ -667,6 +667,7 @@ void Visual::DetachObjects()
   this->dataPtr->meshName = "";
   this->dataPtr->subMeshName = "";
   this->dataPtr->myMaterialName = "";
+  this->dataPtr->skeleton = NULL;
 }
 
 //////////////////////////////////////////////////
@@ -2367,10 +2368,11 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
 
       this->DetachObjects();
 
+      Ogre::MovableObject *obj = NULL;
       if (newGeometryType == "box" || newGeometryType == "cylinder" ||
           newGeometryType == "sphere" || newGeometryType == "plane")
       {
-        this->AttachMesh("unit_" + newGeometryType);
+        obj = this->AttachMesh("unit_" + newGeometryType);
         sdf::ElementPtr shapeElem = geomElem->AddElement(newGeometryType);
         if (newGeometryType == "sphere" || newGeometryType == "cylinder")
           shapeElem->GetElement("radius")->Set(0.5);
@@ -2395,7 +2397,7 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
             centerSubmesh= _msg->geometry().mesh().center_submesh();
         }
 
-        this->AttachMesh(meshName, submeshName, centerSubmesh);
+        obj = this->AttachMesh(meshName, submeshName, centerSubmesh);
 
         sdf::ElementPtr meshElem = geomElem->AddElement(newGeometryType);
         if (!filename.empty())
@@ -2407,6 +2409,9 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
           submeshElem->GetElement("center")->Set(centerSubmesh);
         }
       }
+      Ogre::Entity *ent = static_cast<Ogre::Entity *>(obj);
+      if (ent && ent->hasSkeleton())
+        this->dataPtr->skeleton = ent->getSkeleton();
       this->SetTransparency(origTransparency);
       this->SetMaterial(origMaterial);
     }
