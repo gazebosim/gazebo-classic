@@ -200,6 +200,12 @@ class PlotItemDelegate : public QStyledItemDelegate
       for (std::map<size_t, size_t>::iterator iter = bold.begin();
            iter != bold.end(); ++iter)
       {
+        if (renderPos > iter->first)
+        {
+          renderPos = iter->first + 1;
+          continue;
+        }
+
         // First paint text that is not bold
         auto textStr = QString::fromStdString(
             text.substr(renderPos, iter->first - renderPos));
