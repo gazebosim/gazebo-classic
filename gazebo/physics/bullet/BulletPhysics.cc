@@ -287,18 +287,9 @@ BulletPhysics::BulletPhysics(WorldPtr _world)
 //////////////////////////////////////////////////
 BulletPhysics::~BulletPhysics()
 {
-  // Delete in reverse-order of creation
-  delete this->dynamicsWorld;
-  delete this->solver;
-  delete this->broadPhase;
-  delete this->dispatcher;
-  delete this->collisionConfig;
+gzdbg << "BulletPhysics destructor" << std::endl;
 
-  this->dynamicsWorld = NULL;
-  this->solver = NULL;
-  this->broadPhase = NULL;
-  this->dispatcher = NULL;
-  this->collisionConfig = NULL;
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -485,6 +476,20 @@ void BulletPhysics::UpdatePhysics()
 //////////////////////////////////////////////////
 void BulletPhysics::Fini()
 {
+gzdbg << "BulletPhysics Fini" << std::endl;
+  // Delete in reverse-order of creation
+  delete this->dynamicsWorld;
+  delete this->solver;
+  delete this->broadPhase;
+  delete this->dispatcher;
+  delete this->collisionConfig;
+
+  this->dynamicsWorld = NULL;
+  this->solver = NULL;
+  this->broadPhase = NULL;
+  this->dispatcher = NULL;
+  this->collisionConfig = NULL;
+
   PhysicsEngine::Fini();
 }
 
