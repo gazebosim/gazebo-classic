@@ -230,7 +230,7 @@ class PlotItemDelegate : public QStyledItemDelegate
       }
 
       // Render any remaining text.
-      if (renderPos < text.size())
+      if (renderPos < text.size()-1)
       {
         auto textStr = QString::fromStdString(text.substr(renderPos));
         _painter->setFont(QFont(fontRegular.family(), fontRegular.pointSize(),
