@@ -19,6 +19,7 @@
 #include <set>
 #include <string>
 #include <vector>
+#include <future>
 #include <google/protobuf/message.h>
 #include <ignition/transport/Node.hh>
 
@@ -454,7 +455,10 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   this->dataPtr->modelsModel = new PlotItemModel;
   this->dataPtr->modelsModel->setObjectName("plotModelsModel");
   this->dataPtr->modelsModel->setParent(this);
-  this->FillModels();
+
+  // Fill the models asynchronously so that the GUI window appears
+  // immediately.
+  std::async(&Palette::FillModels, this);
 
   // A proxy model to filter models model
   this->dataPtr->searchModelsModel = new SearchModel;

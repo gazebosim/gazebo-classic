@@ -859,7 +859,7 @@ void PlotCanvas::SetDeleteCanvasEnabled(const bool _enable)
 
 
 /////////////////////////////////////////////////
-QString PlotCanvas::Title() const
+std::string PlotCanvas::Title() const
 {
-  return this->dataPtr->title->text();
+  return this->dataPtr->title->Text();
 }

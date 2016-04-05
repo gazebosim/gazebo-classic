@@ -122,7 +122,7 @@ namespace gazebo
 
       /// \brief Get the title of the plot
       /// \return Title of the plot
-      public: QString Title() const;
+      public: std::string Title() const;
 
       /// \brief Add a variable to a plot. Note this function
       /// only updates the plot but not the variable pill container.

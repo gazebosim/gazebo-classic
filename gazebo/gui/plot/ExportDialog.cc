@@ -71,7 +71,6 @@ class PlotViewDelegate : public QStyledItemDelegate
   public: void paint(QPainter *_painter, const QStyleOptionViewItem &_opt,
               const QModelIndex &_index) const
           {
-            QRectF r = _opt.rect;
             QRectF iconRect = _opt.rect;
             QIcon icon = qvariant_cast<QIcon>(_index.data(ICON_ROLE));
             QString title = qvariant_cast<QString>(
@@ -82,19 +81,8 @@ class PlotViewDelegate : public QStyledItemDelegate
 
             _painter->save();
 
-            // Add margins to the rectangle
-            r.adjust(5, 5, -5, -5);
+            iconRect.adjust(10, 10, -10, -fm.height() - 10);
 
-            iconRect.adjust(10, 10, -10, -10);
-
-            /*const PlotViewItem *plotItem =
-              static_cast<const PlotViewItem*>(
-                  static_cast<const QStandardItemModel*>(
-                    _index.model())->itemFromIndex(_index));
-                    */
-
-            //QwtPlotRenderer renderer;
-            //renderer.render(plotItem->canvas->Plots()[0], _painter, iconRect);
             QPixmap image = icon.pixmap(iconRect.width(), iconRect.height());
             _painter->drawPixmap(iconRect.left(), iconRect.top(), image);
 
@@ -112,8 +100,7 @@ class PlotViewDelegate : public QStyledItemDelegate
             int checkTitleWidth = fm.width(title) + checkSize + checkMargin;
 
             QRectF checkRect = _opt.rect;
-            //checkRect.setTop(iconRect.top() + image.height() + checkMargin);
-            checkRect.setTop(iconRect.top() + iconRect.height() + checkMargin);
+            checkRect.setTop(iconRect.bottom() + checkMargin);
             checkRect.setLeft(iconRect.left() +
                 (iconRect.width() - checkTitleWidth)/2.0);
             checkRect.setWidth(checkSize);
@@ -121,10 +108,10 @@ class PlotViewDelegate : public QStyledItemDelegate
             _painter->drawPixmap(checkRect, checkImage, checkImage.rect());
 
             QRectF titleRect = _opt.rect;
-            titleRect.setTop(checkRect.top() +
-                (checkRect.height() - fm.height())/2.0);
+            titleRect.setTop(checkRect.top());
             titleRect.setLeft(
                 checkRect.left() + checkRect.width() + checkMargin);
+            titleRect.setHeight(checkSize);
             _painter->drawText(titleRect, Qt::AlignVCenter, title);
             _painter->restore();
           }
@@ -133,17 +120,32 @@ class PlotViewDelegate : public QStyledItemDelegate
   /// \param[in] _option Style options
   /// \param[in] _index Item model index
   public: QSize sizeHint(const QStyleOptionViewItem &_option,
-                              const QModelIndex &_index) const
+                         const QModelIndex &_index) const
           {
             QIcon icon = qvariant_cast<QIcon>(_index.data(ICON_ROLE));
             QSize iconSize = icon.actualSize(_option.decorationSize);
 
-            iconSize.scale(320, 180, Qt::KeepAspectRatio);
+            double maxWidth = 320.0;
+            double maxHeight = 180.0;
 
+            double ratio = maxWidth / iconSize.width();
+
+            iconSize.scale(maxWidth,  iconSize.height() * ratio,
+                Qt::IgnoreAspectRatio);
+
+            if (iconSize.height() > maxHeight)
+            {
+              ratio = maxHeight / iconSize.height();
+
+              iconSize.scale(iconSize.width() * ratio,  maxHeight,
+                  Qt::IgnoreAspectRatio);
+            }
+
+            // Add in space at the bottom for the checkbox and text
             QFont font = QApplication::font();
             QFontMetrics fm(font);
-            QSize result = QSize(iconSize.width(),
-                iconSize.height() + fm.height() + 10);
+            QSize result = QSize(iconSize.width() + 20,
+                iconSize.height() + fm.height() + 20);
             return result;
           }
 
@@ -227,20 +229,11 @@ ExportDialog::ExportDialog(QWidget *_parent)
   for (auto &plot : plots)
   {
     QIcon icon(QPixmap::grabWindow(plot->winId()));
-    /*QPixmap *pix = new QPixmap(320, 200);
-    QPainter *paint = new QPainter(pix);
-
-    QwtPlotRenderer renderer;
-    std::cout << plot->Plots().size() << std::endl;
-    if (!plot->Plots().empty())
-      renderer.render(plot->Plots()[0], paint, QRectF(0,0,320,200));
-    QIcon icon(*pix);
-    */
-
     PlotViewItem *item = new PlotViewItem;
     item->canvas = plot;
 
-    item->setData(plot->Title(), PlotViewDelegate::HEADER_TEXT_ROLE);
+    item->setData(QString::fromStdString(plot->Title()),
+        PlotViewDelegate::HEADER_TEXT_ROLE);
     item->setData(icon, PlotViewDelegate::ICON_ROLE);
     item->setEditable(false);
     item->setCheckable(true);
@@ -272,7 +265,7 @@ ExportDialog::ExportDialog(QWidget *_parent)
   this->setLayout(mainLayout);
 
   // Set a reasonable default size.
-  this->resize(720, 480);
+  this->resize(720, 520);
 
   connect(clearAct, SIGNAL(triggered()),
           this->dataPtr->listView, SLOT(clearSelection()));
@@ -337,8 +330,7 @@ void ExportDialog::OnExportPDF()
 
     if (plotItem)
     {
-      std::string title =
-        plotItem->canvas->Title().toStdString();
+      std::string title = plotItem->canvas->Title();
 
       // Render the plot to a PDF
       for (const auto &plot : plotItem->canvas->Plots())
@@ -392,8 +384,7 @@ void ExportDialog::OnExportCSV()
 
     if (plotItem)
     {
-      std::string title =
-        plotItem->canvas->Title().toStdString();
+      std::string title = plotItem->canvas->Title();
 
       // Save data from each curve into a separate file.
       for (const auto &plot : plotItem->canvas->Plots())
