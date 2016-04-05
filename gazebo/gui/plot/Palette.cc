@@ -452,7 +452,7 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   this->dataPtr->topicsTree->setDragEnabled(true);
   this->dataPtr->topicsTree->setDragDropMode(QAbstractItemView::DragOnly);
   connect(this->dataPtr->topicsTree, SIGNAL(clicked(const QModelIndex &)),
-          this, SLOT(ExpandTopic(const QModelIndex &)));
+          this, SLOT(ExpandTree(const QModelIndex &)));
 
   // The model that will hold data to be displayed in the model tree view
   this->connect(
@@ -482,7 +482,7 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   this->dataPtr->modelsTree->setDragEnabled(true);
   this->dataPtr->modelsTree->setDragDropMode(QAbstractItemView::DragOnly);
   connect(this->dataPtr->modelsTree, SIGNAL(clicked(const QModelIndex &)),
-          this, SLOT(ExpandModel(const QModelIndex &)));
+          this, SLOT(ExpandTree(const QModelIndex &)));
 
   // The model that will hold data to be displayed in the sim tree view
   this->dataPtr->simModel = new PlotItemModel;
@@ -533,7 +533,7 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   this->dataPtr->searchTopicsTree->setDragEnabled(true);
   this->dataPtr->searchTopicsTree->setDragDropMode(QAbstractItemView::DragOnly);
   connect(this->dataPtr->searchTopicsTree, SIGNAL(clicked(const QModelIndex &)),
-          this, SLOT(ExpandSearchTopic(const QModelIndex &)));
+          this, SLOT(ExpandTree(const QModelIndex &)));
 
   // A tree to visualize models search results
   this->dataPtr->searchModelsTree = new QTreeView;
@@ -548,7 +548,7 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   this->dataPtr->searchModelsTree->setDragEnabled(true);
   this->dataPtr->searchModelsTree->setDragDropMode(QAbstractItemView::DragOnly);
   connect(this->dataPtr->searchModelsTree, SIGNAL(clicked(const QModelIndex &)),
-          this, SLOT(ExpandSearchModel(const QModelIndex &)));
+          this, SLOT(ExpandTree(const QModelIndex &)));
 
   // A tree to visualize sim search results
   this->dataPtr->searchSimTree = new QTreeView;
@@ -1486,53 +1486,12 @@ void Palette::ExpandChildren(QSortFilterProxyModel *_model,
 }
 
 /////////////////////////////////////////////////
-void Palette::ExpandTopic(const QModelIndex &_index)
+void Palette::ExpandTree(const QModelIndex &_index)
 {
-  if (this->dataPtr->topicsTree->isExpanded(_index) == true)
-  { 
-    this->dataPtr->topicsTree->setExpanded(_index, false);
-  }
-  else
-  {
-    this->dataPtr->topicsTree->setExpanded(_index, true);
-  }
-}
+  auto tree = qobject_cast<QTreeView *>(QObject::sender());
 
-/////////////////////////////////////////////////
-void Palette::ExpandSearchTopic(const QModelIndex &_index)
-{
-  if (this->dataPtr->searchTopicsTree->isExpanded(_index) == true)
-  { 
-    this->dataPtr->searchTopicsTree->setExpanded(_index, false);
-  }
-  else
-  {
-    this->dataPtr->searchTopicsTree->setExpanded(_index, true);
-  }
-}
+  if (!tree)
+    return;
 
-/////////////////////////////////////////////////
-void Palette::ExpandModel(const QModelIndex &_index)
-{
-  if (this->dataPtr->modelsTree->isExpanded(_index) == true)
-  { 
-    this->dataPtr->modelsTree->setExpanded(_index, false);
-  }
-  else
-  {
-    this->dataPtr->modelsTree->setExpanded(_index, true);
-  }
-}
-
-/////////////////////////////////////////////////
-void Palette::ExpandSearchModel(const QModelIndex &_index)
-{
-  if (this->dataPtr->searchModelsTree->isExpanded(_index) == true)
-  { 
-    this->dataPtr->searchModelsTree->setExpanded(_index, false);
-  }
-  else
-  {
-    this->dataPtr->searchModelsTree->setExpanded(_index, true);
-  }
+  tree->setExpanded(_index, !tree->isExpanded(_index));
 }

@@ -141,21 +141,9 @@ namespace gazebo
       private slots: void IntrospectionUpdateSlot(
           const std::set<std::string> &_items);
 
-      /// \brief Expand given topic tree on single click.
-      /// \param[in] _index Index of this item.
-      private slots: void ExpandTopic(const QModelIndex &_index);
-
-      /// \brief Expand given search topic tree on single click.
-      /// \param[in] _index Index of this item.
-      private slots: void ExpandSearchTopic(const QModelIndex &_index);
-
-      /// \brief Expand given model tree on single click.
-      /// \param[in] _index Index of this item.
-      private slots: void ExpandModel(const QModelIndex &_index);
-
-      /// \brief Expand given search model tree on single click.
-      /// \param[in] _index Index of this item.
-      private slots: void ExpandSearchModel(const QModelIndex &_index);
+      /// \brief Expand given items tree on single click.
+      /// \param[in] _index Index of tree.
+      private slots: void ExpandTree(const QModelIndex &_index);
 
       /// \internal
       /// \brief Pointer to private data.
