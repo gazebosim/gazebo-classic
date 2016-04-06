@@ -14,13 +14,13 @@
  * limitations under the License.
  *
 */
+#ifndef GAZEBO_PLUGINS_WINDPLUGIN_HH_
+#define GAZEBO_PLUGINS_WINDPLUGIN_HH_
 
-#ifndef _GAZEBO_PLUGINS_WINDPLUGIN_HH_
-#define _GAZEBO_PLUGINS_WINDPLUGIN_HH_
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/Plugin.hh"
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/sensors/Noise.hh"
 
@@ -68,27 +68,44 @@ namespace gazebo
     /// \brief Connection to World Update events.
     private: event::ConnectionPtr updateConnection;
 
-    private: double characteristicTimeForWindRise;
-    private: double magnitudeSinAmplitudePercent;
-    private: double magnitudeSinPeriod;
-    private: double characteristicTimeForWindOrientationChange;
-    private: double orientationSinAmplitude;
-    private: double orientationSinPeriod;
-    private: double verticalNoiseAmplitudePercent;
+    /// \brief Time for wind to rise
+    private: double characteristicTimeForWindRise = 1;
 
-    private: double KMag;
-    private: double KDir;
-    private: double magnitudeMean;
-    private: double directionMean;
+    /// \brief Wind amplitude
+    private: double magnitudeSinAmplitudePercent = 0;
+
+    /// \brief Wind period
+    private: double magnitudeSinPeriod = 1;
+
+    /// \brief Time for wind to change direction.
+    private: double characteristicTimeForWindOrientationChange = 1;
+
+    /// \brief Orientation amplitude
+    private: double orientationSinAmplitude = 0;
+
+    /// \brief Orientation period
+    private: double orientationSinPeriod = 1;
+
+    /// \brief period over characteristicTimeForWindRise
+    private: double kMag = 0;
+
+    /// \brief period over characteristicTimeForWindOrientationChange
+    private: double kDir = 0;
+
+    /// \brief Mean of the magnitude
+    private: double magnitudeMean = 0;
+
+    /// \brief Mean of the direction
+    private: double directionMean = 0;
 
     /// \brief Noise added to magnitude
-    protected: sensors::NoisePtr noiseMagnitude;
+    private: sensors::NoisePtr noiseMagnitude;
 
     /// \brief Noise added to direction
-    protected: sensors::NoisePtr noiseDirection;
+    private: sensors::NoisePtr noiseDirection;
 
     /// \brief Noise added to Z axis
-    protected: sensors::NoisePtr noiseVertical;
+    private: sensors::NoisePtr noiseVertical;
   };
 }
 

@@ -247,12 +247,6 @@ void ModelListWidget_TEST::SetLinkProperty(
   // only set the pose for non-canonical links
   QCOMPARE(property->propertyName(), tr("canonical"));
   QCOMPARE(property->value().toBool(), _canonical);
-  property = static_cast<QtVariantProperty *>(_properties[6]);
-  Q_ASSERT(property);
-  QCOMPARE(property->propertyName(), tr("enable_wind"));
-  QVERIFY(propTreeBrowser->items(property).size() == 1);
-  propTreeBrowser->setCurrentItem(propTreeBrowser->items(property)[0]);
-  property->setValue(_enableWind);
   if (!property->value().toBool())
   {
     property = static_cast<QtVariantProperty *>(_properties[7]);
@@ -263,6 +257,13 @@ void ModelListWidget_TEST::SetLinkProperty(
     propTreeBrowser->setExpanded(propTreeBrowser->topLevelItem(property), true);
     this->SetPoseProperty(propTreeBrowser, property->subProperties(), _pose);
   }
+  property = static_cast<QtVariantProperty *>(_properties[6]);
+  Q_ASSERT(property);
+  QCOMPARE(property->propertyName(), tr("enable_wind"));
+  QVERIFY(propTreeBrowser->items(property).size() == 1);
+  propTreeBrowser->setCurrentItem(propTreeBrowser->items(property)[0]);
+  property->setValue(_enableWind);
+
   QTest::qWait(1000);
   /// TODO set inertial, collision, visual properties
 }

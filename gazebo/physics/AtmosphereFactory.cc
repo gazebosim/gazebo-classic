@@ -42,10 +42,7 @@ void AtmosphereFactory::RegisterAtmosphere(const std::string &_classname,
                                            AtmosphereFactoryFn _factoryfn)
 {
   if (AtmosphereFactory::models.find(_classname) != models.end())
-  {
-    gzerr << "Atmosphere Type[" << _classname << "] already registered.\n";
     return;
-  }
   AtmosphereFactory::models[_classname] = _factoryfn;
 }
 
