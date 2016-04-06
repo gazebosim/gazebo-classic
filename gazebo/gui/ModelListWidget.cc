@@ -384,6 +384,8 @@ void ModelListWidget::Update()
       this->FillPropertyTree(this->dataPtr->sceneMsg, NULL);
     else if (this->dataPtr->fillTypes[0] == "Physics")
       this->FillPropertyTree(this->dataPtr->physicsMsg, NULL);
+    else if (this->dataPtr->fillTypes[0] == "Atmosphere")
+      this->FillPropertyTree(this->dataPtr->atmosphereMsg, NULL);
     else if (this->dataPtr->fillTypes[0] == "Wind")
       this->FillPropertyTree(this->dataPtr->windMsg, NULL);
     else if (this->dataPtr->fillTypes[0] == "Light")
@@ -2740,8 +2742,10 @@ void ModelListWidget::InitTransport(const std::string &_name)
       "~/scene");
   this->dataPtr->physicsPub = this->dataPtr->node->Advertise<msgs::Physics>(
       "~/physics");
+
   this->dataPtr->atmospherePub =
     this->dataPtr->node->Advertise<msgs::Wind>("~/atmosphere");
+
   this->dataPtr->windPub = this->dataPtr->node->Advertise<msgs::Wind>(
       "~/wind");
 
@@ -2793,9 +2797,9 @@ void ModelListWidget::ResetTree()
 
     // Atmosphere item
     this->dataPtr->atmosphereItem = new QTreeWidgetItem(
-        static_cast<QTreeWidgetItem*>(0),
+        static_cast<QTreeWidgetItem *>(0),
         QStringList(QString("%1").arg(tr("Atmosphere"))));
-    this->dataPtr->atmospherItem->setData(0, Qt::UserRole,
+    this->dataPtr->atmosphereItem->setData(0, Qt::UserRole,
         QVariant(tr("Atmosphere")));
     this->dataPtr->modelTreeWidget->addTopLevelItem(
         this->dataPtr->atmosphereItem);
