@@ -2744,7 +2744,7 @@ void ModelListWidget::InitTransport(const std::string &_name)
       "~/physics");
 
   this->dataPtr->atmospherePub =
-    this->dataPtr->node->Advertise<msgs::Wind>("~/atmosphere");
+    this->dataPtr->node->Advertise<msgs::Atmosphere>("~/atmosphere");
 
   this->dataPtr->windPub = this->dataPtr->node->Advertise<msgs::Wind>(
       "~/wind");
