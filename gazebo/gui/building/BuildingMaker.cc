@@ -175,10 +175,10 @@ void BuildingMaker::ConnectItem(const std::string &_partName,
       manip, SLOT(OnRotationChanged(double, double, double)));
   QObject::connect(_item, SIGNAL(LevelChanged(int)),
       manip, SLOT(OnLevelChanged(int)));
-  QObject::connect(_item, SIGNAL(ColorChanged(QColor)),
-      manip, SLOT(OnColorChanged(QColor)));
-  QObject::connect(_item, SIGNAL(TextureChanged(QString)),
-      manip, SLOT(OnTextureChanged(QString)));
+  QObject::connect(_item, SIGNAL(ColorChanged(common::Color)),
+      manip, SLOT(OnColorChanged(common::Color)));
+  QObject::connect(_item, SIGNAL(TextureChanged(std::string)),
+      manip, SLOT(OnTextureChanged(std::string)));
   QObject::connect(_item, SIGNAL(TransparencyChanged(float)),
       manip, SLOT(OnTransparencyChanged(float)));
 
@@ -199,10 +199,10 @@ void BuildingMaker::ConnectItem(const std::string &_partName,
   QObject::connect(_item, SIGNAL(ItemDeleted()), manip, SLOT(OnDeleted()));
 
   // manip changes -> item changes
-  QObject::connect(manip, SIGNAL(ColorChanged(QColor)),
-      _item, SLOT(OnColorChanged(QColor)));
-  QObject::connect(manip, SIGNAL(TextureChanged(QString)),
-      _item, SLOT(OnTextureChanged(QString)));
+  QObject::connect(manip, SIGNAL(ColorChanged(common::Color)),
+      _item, SLOT(OnColorChanged(common::Color)));
+  QObject::connect(manip, SIGNAL(TextureChanged(std::string)),
+      _item, SLOT(OnTextureChanged(std::string)));
 }
 
 /////////////////////////////////////////////////
