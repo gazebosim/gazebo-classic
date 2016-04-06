@@ -176,7 +176,7 @@ void ArduCopterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 
   // Get sensors
   this->imuSensor =
-    boost::dynamic_pointer_cast<sensors::ImuSensor>
+    std::dynamic_pointer_cast<sensors::ImuSensor>
       (sensors::SensorManager::Instance()->GetSensor(
         this->model->GetWorld()->GetName()
         + "::" + this->model->GetScopedName()

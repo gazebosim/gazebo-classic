@@ -258,7 +258,7 @@ namespace gazebo
 
     private: physics::LinkPtr imuLink;
 
-    private: boost::shared_ptr<sensors::ImuSensor> imuSensor;
+    private: std::shared_ptr<sensors::ImuSensor> imuSensor;
   };
 }
 #endif
