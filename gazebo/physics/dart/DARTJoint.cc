@@ -55,7 +55,7 @@ void DARTJoint::Load(sdf::ElementPtr _sdf)
 {
   if (!this->dataPtr->dtJoint)
   {
-    gzerr << "dtJoint should be created in each subclass constructor" << 
+    gzerr << "dtJoint should be created in each subclass constructor" <<
         std::endl;
   }
 

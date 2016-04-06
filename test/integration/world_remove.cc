@@ -307,7 +307,8 @@ void WorldRemoveTest::RemoveWorldWithJoints(const std::string &_physicsEngine,
   gzmsg << "Test world [" << _worldName << "] engine [" << _physicsEngine
       << "]" << std::endl;
 
-  if (_physicsEngine != "ode" && _worldName.find("gearbox") != std::string::npos)
+  if (_physicsEngine != "ode" &&
+      _worldName.find("gearbox") != std::string::npos)
   {
     gzerr << "Skip test, gearbox is only supported in ODE. " <<
          "See issues: #859, #1914, #1915" << std::endl;
