@@ -320,12 +320,6 @@ void WorldRemoveTest::RemoveWorldWithJoints(const std::string &_physicsEngine,
           << std::endl;
     return;
   }
-  if (_physicsEngine == "dart")
-  {
-    // Crash when destrying DARTPhysicsPrivate. Possibly an issue upstream in
-    // dart::simulation::World::~World()
-    return;
-  }
 
   // Load a world with entities
   this->Load(_worldName, false, _physicsEngine);

@@ -36,7 +36,7 @@ DARTSliderJoint::DARTSliderJoint(BasePtr _parent)
 //////////////////////////////////////////////////
 DARTSliderJoint::~DARTSliderJoint()
 {
-  delete this->dataPtr->dtJoint;
+  // We don't need to delete dtJoint because the world will delete it
 }
 
 //////////////////////////////////////////////////

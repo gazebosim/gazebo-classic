@@ -34,7 +34,7 @@ DARTBallJoint::DARTBallJoint(BasePtr _parent)
 //////////////////////////////////////////////////
 DARTBallJoint::~DARTBallJoint()
 {
-  delete this->dataPtr->dtJoint;
+  // We don't need to delete dtJoint because the world will delete it
 }
 
 //////////////////////////////////////////////////
