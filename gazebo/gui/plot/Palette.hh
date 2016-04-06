@@ -73,6 +73,7 @@ namespace gazebo
       /// \brief Check if row contains the word on itself.
       /// \param[in] _srcRow Row on the source model.
       /// \param[in] _srcParent Parent on the source model.
+      /// \param[in] _word Word to be checked.
       /// \return True if row matches.
       public: bool filterAcceptsRowItself(const int _srcRow, const
           QModelIndex &_srcParent, QString _word) const;

@@ -172,9 +172,9 @@ class PlotItemDelegate : public QStyledItemDelegate
       std::vector<std::string> wordsUpper;
       for (auto word : wordsStringList)
       {
-        std::string wd = word.toStdString();
-        if (!wd.empty())
-          wordsUpper.push_back(wd);
+        if (word.isEmpty())
+          continue;
+        wordsUpper.push_back(word.toStdString());
       }
 
       // Find the portions of text that match the search words, and should
@@ -326,14 +326,14 @@ bool SearchModel::filterAcceptsRow(const int _srcRow,
   this->sourceModel()->setData(id, false, PlotItemDelegate::TO_EXPAND);
 
   // Empty search matches everything
-  if (this->search == "")
+  if (this->search.isEmpty())
     return true;
 
   // Each word must match at least once, either self, parent or child
   auto words = this->search.split(" ");
   for (auto word : words)
   {
-    if (word == "")
+    if (word.isEmpty())
       continue;
 
     // Expand this if at least one child contains the word
