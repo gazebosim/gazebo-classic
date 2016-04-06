@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-#include <future>
 #include <mutex>
 #include <set>
 #include <string>
@@ -403,10 +402,6 @@ class gazebo::gui::PalettePrivate
 
   /// \brief Mutex to protect the models model update.
   public: std::mutex modelsMutex;
-
-  /// \brief Holds a future from the FillModels function, which allows
-  /// the PlotWindow to open immediately. See more in the constructor
-  // public: std::future<void> fillModelsFuture;
 };
 
 /////////////////////////////////////////////////
@@ -461,11 +456,6 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   this->dataPtr->modelsModel->setParent(this);
 
   this->FillModels();
-  // Fill the models asynchronously so that the GUI window appears
-  // immediately. The Future is used to make sure FillModels completes when
-  // a tab is pressed.
-  //this->dataPtr->fillModelsFuture = std::async(
-  //    std::launch::async, &Palette::FillModels, this);
 
   // A proxy model to filter models model
   this->dataPtr->searchModelsModel = new SearchModel;
@@ -620,10 +610,6 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   // Connect TabBar to StackedLayout
   connect(tabBar, SIGNAL(currentChanged(int)),
           tabStackedLayout, SLOT(setCurrentIndex(int)));
-
-  // Connect TabBar to OnTabChanged.
-  //connect(tabBar, SIGNAL(currentChanged(int)),
-  //        this, SLOT(OnTabChanged(int)));
 
   // Main frame
   auto mainFrameLayout = new QVBoxLayout;
@@ -1488,15 +1474,4 @@ void Palette::ExpandChildren(QSortFilterProxyModel *_model,
 
     this->ExpandChildren(_model, _tree, item);
   }
-}
-
-/////////////////////////////////////////////////
-void Palette::OnTabChanged(int)
-{
-  /*printf("Here\n");
-  if (this->dataPtr->fillModelsFuture.valid())
-  {
-    this->dataPtr->fillModelsFuture.get();
-    disconnect(this, SLOT(OnTabChanged(int)));
-  }*/
 }
