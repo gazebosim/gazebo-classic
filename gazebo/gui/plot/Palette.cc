@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-
+#include <future>
 #include <mutex>
 #include <set>
 #include <string>
@@ -26,6 +26,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/URI.hh"
 
+#include "gazebo/gui/Futures.hh"
 #include "gazebo/gui/ConfigWidget.hh"
 #include "gazebo/gui/plot/Palette.hh"
 
@@ -402,6 +403,10 @@ class gazebo::gui::PalettePrivate
 
   /// \brief Mutex to protect the models model update.
   public: std::mutex modelsMutex;
+
+  /// \brief Holds a future from the FillModels function, which allows
+  /// the PlotWindow to open immediately. See more in the constructor
+  // public: std::future<void> fillModelsFuture;
 };
 
 /////////////////////////////////////////////////
@@ -454,7 +459,13 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   this->dataPtr->modelsModel = new PlotItemModel;
   this->dataPtr->modelsModel->setObjectName("plotModelsModel");
   this->dataPtr->modelsModel->setParent(this);
+
   this->FillModels();
+  // Fill the models asynchronously so that the GUI window appears
+  // immediately. The Future is used to make sure FillModels completes when
+  // a tab is pressed.
+  //this->dataPtr->fillModelsFuture = std::async(
+  //    std::launch::async, &Palette::FillModels, this);
 
   // A proxy model to filter models model
   this->dataPtr->searchModelsModel = new SearchModel;
@@ -610,6 +621,10 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   connect(tabBar, SIGNAL(currentChanged(int)),
           tabStackedLayout, SLOT(setCurrentIndex(int)));
 
+  // Connect TabBar to OnTabChanged.
+  //connect(tabBar, SIGNAL(currentChanged(int)),
+  //        this, SLOT(OnTabChanged(int)));
+
   // Main frame
   auto mainFrameLayout = new QVBoxLayout;
   mainFrameLayout->addWidget(tabBar);
@@ -683,10 +698,14 @@ void Palette::FillTopics()
 /////////////////////////////////////////////////
 void Palette::FillModels()
 {
+  // Make sure that the managers have been retreived.
+  if (Futures::introspectionClientFuture.valid())
+    Futures::introspectionClientFuture.get();
+
   gazebo::util::IntrospectionClient client;
 
-  // Wait for the managers to come online
-  auto managerIds = client.WaitForManagers(std::chrono::seconds(2));
+  // Get the managers to come online
+  auto managerIds = client.Managers();
 
   if (managerIds.empty())
   {
@@ -1469,4 +1488,15 @@ void Palette::ExpandChildren(QSortFilterProxyModel *_model,
 
     this->ExpandChildren(_model, _tree, item);
   }
+}
+
+/////////////////////////////////////////////////
+void Palette::OnTabChanged(int)
+{
+  /*printf("Here\n");
+  if (this->dataPtr->fillModelsFuture.valid())
+  {
+    this->dataPtr->fillModelsFuture.get();
+    disconnect(this, SLOT(OnTabChanged(int)));
+  }*/
 }

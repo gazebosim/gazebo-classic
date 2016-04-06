@@ -141,6 +141,8 @@ namespace gazebo
       private slots: void IntrospectionUpdateSlot(
           const std::set<std::string> &_items);
 
+      private slots: void OnTabChanged(int);
+
       /// \internal
       /// \brief Pointer to private data.
       private: std::unique_ptr<PalettePrivate> dataPtr;
