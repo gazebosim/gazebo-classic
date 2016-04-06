@@ -2289,13 +2289,16 @@ bool MainWindow::IsPaused() const
 void MainWindow::CreateEditors()
 {
   // Create a Terrain Editor
-  this->dataPtr->editors["terrain"] = new TerrainEditor(this);
+  this->dataPtr->editors["terrain"] =
+      std::unique_ptr<TerrainEditor>(new TerrainEditor(this));
 
   // Create a Building Editor
-  this->dataPtr->editors["building"] = new BuildingEditor(this);
+  this->dataPtr->editors["building"] =
+      std::unique_ptr<BuildingEditor>(new BuildingEditor(this));
 
   // Create a Model Editor
-  this->dataPtr->editors["model"] = new ModelEditor(this);
+  this->dataPtr->editors["model"] =
+      std::unique_ptr<ModelEditor>(new ModelEditor(this));
 }
 
 /////////////////////////////////////////////////
@@ -2345,7 +2348,7 @@ Editor *MainWindow::Editor(const std::string &_name) const
 {
   auto iter = this->dataPtr->editors.find(_name);
   if (iter != this->dataPtr->editors.end())
-    return iter->second;
+    return iter->second.get();
 
   return NULL;
 }
