@@ -59,6 +59,12 @@ namespace gazebo
 
         /// \brief Delete a nested model.
         DELETING_NESTED_MODEL,
+
+        /// \brief Insert a joint.
+        INSERTING_JOINT,
+
+        /// \brief Delete a joint.
+        DELETING_JOINT
       };
 
       /// \brief Constructor
@@ -93,6 +99,10 @@ namespace gazebo
       /// \brief Set the scoped name of the entity related to this command.
       /// \param[in] _name Fully scoped entity name.
       public: void SetScopedName(const std::string &_name);
+
+      /// \brief Set the unique id of the joint related to this command.
+      /// \param[in] _id Unique id of joint.
+      public: void SetJointId(const std::string &_id);
 
       /// \internal
       /// \brief Pointer to private data.
