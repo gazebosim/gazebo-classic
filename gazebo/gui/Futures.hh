@@ -24,13 +24,20 @@ namespace gazebo
 {
   namespace gui
   {
+    /// \addtogroup gazebo_gui
+    /// \{
+
     /// \brief The Futures class holds static std::future variables. Each
     /// variable is used to perform some asynchronous operation on start.
     ///
     /// Example usage of an existing future:
     ///
-    ///   if (Futures::introspectionClientFuture.valid())
-    ///     Futures::introspectionClientFuture.get();
+    /// \code{.cpp}
+    /// if (Futures::introspectionClientFuture.valid())
+    /// {
+    ///   Futures::introspectionClientFuture.get();
+    /// }
+    /// \endcode
     ///
     /// To add a new future:
     ///
@@ -53,6 +60,8 @@ namespace gazebo
       // Used to instantiate Futures class, and create all the futures.
       private: static Futures futures;
     };
+
+    /// \}
   }
 }
 #endif

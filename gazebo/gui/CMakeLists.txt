@@ -79,6 +79,7 @@ set (qt_headers
   ConfigWidget.hh
   DataLogger.hh
   Editor.hh
+  Futures.hh
   GLWidget.hh
   HotkeyDialog.hh
   InsertModelWidget.hh
