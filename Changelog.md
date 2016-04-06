@@ -5,6 +5,9 @@
 1. Add Wind support
     * [Pull request #1985](https://bitbucket.org/osrf/gazebo/pull-request/1985)
 
+1. Adds an output option to gz log that allows the tool to filter a log file and write to a new log file.
+    * [Pull request #2149](https://bitbucket.org/osrf/gazebo/pull-request/2149)
+
 1. Update Actor animations by faciliting skeleton visualization, control via a plugin. Also resolves issue #1785.
     * [Pull request #2219](https://bitbucket.org/osrf/gazebo/pull-request/2219)
 
@@ -37,6 +40,9 @@
 ## Gazebo 7
 
 ## Gazebo 7.x.x (2016-xx-xx)
+
+1. Update `gz sdf -c` command line tool to use the new `sdf::convertFile` API.
+    * [Pull request #2227](https://bitbucket.org/osrf/gazebo/pull-requests/2227)
 
 1. Process insertions on World::SetState
     * [Pull request #2200](https://bitbucket.org/osrf/gazebo/pull-requests/2200)
@@ -93,6 +99,9 @@
     1. Add layers to building levels
         * [Pull request #2180](https://bitbucket.org/osrf/gazebo/pull-request/2180)
         * [Issue #1806](https://bitbucket.org/osrf/gazebo/issues/1806)
+
+    1. Update gui/building/*Item API
+        * [Pull request #2228](https://bitbucket.org/osrf/gazebo/pull-request/2228)
 
 ## Gazebo 7.0.0 (2016-01-25)
 
