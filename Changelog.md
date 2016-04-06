@@ -5,6 +5,9 @@
 1. Add Wind support
     * [Pull request #1985](https://bitbucket.org/osrf/gazebo/pull-request/1985)
 
+1. Update Actor animations by faciliting skeleton visualization, control via a plugin. Also resolves issue #1785.
+    * [Pull request #2219](https://bitbucket.org/osrf/gazebo/pull-request/2219)
+
 1. Use only Gazebo's internal version of tinyxml2. The version of tinyxml2 distributed with Ubuntu fails when parsing large log files.
     * [Pull request #2146](https://bitbucket.org/osrf/gazebo/pull-request/2146)
 
@@ -48,6 +51,9 @@
     * [Pull request #2192](https://bitbucket.org/osrf/gazebo/pull-requests/2192)
     * [Issue #1876](https://bitbucket.org/osrf/gazebo/issues/1876)
 
+1. Model database selects the latest model version.
+    * [Pull request #2207](https://bitbucket.org/osrf/gazebo/pull-requests/2207)
+
 1. Display physics engine type in the GUI
     * [Pull request #2155](https://bitbucket.org/osrf/gazebo/pull-requests/2155)
     * [Issue #1121](https://bitbucket.org/osrf/gazebo/issues/1121)
@@ -77,6 +83,10 @@
 
     1. Fix saving and spawning model with its original name
         * [Pull request #2183](https://bitbucket.org/osrf/gazebo/pull-request/2183)
+
+    1. Fix inserting custom links
+        * [Pull request #2222](https://bitbucket.org/osrf/gazebo/pull-request/2222)
+        * [Issue #1834](https://bitbucket.org/osrf/gazebo/issues/1834)
 
 1. Building editor updates
 
