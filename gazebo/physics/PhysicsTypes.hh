@@ -67,6 +67,7 @@ namespace gazebo
     class LightState;
     class LinkState;
     class JointState;
+    class TrajectoryInfo;
 
     /// \def BasePtr
     /// \brief Boost shared pointer to a Base object
@@ -91,6 +92,10 @@ namespace gazebo
     /// \def Actor
     /// \brief Boost shared pointer to an Actor object
     typedef boost::shared_ptr<Actor> ActorPtr;
+
+    /// \def TrajectoryInfoPtr
+    /// \brief Shared pointer to a TrajectoryInfo object
+    typedef std::shared_ptr<TrajectoryInfo> TrajectoryInfoPtr;
 
     /// \def LightPtr
     /// \brief Boost shared pointer to a Light object

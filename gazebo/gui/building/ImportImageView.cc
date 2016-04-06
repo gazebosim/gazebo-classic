@@ -15,6 +15,7 @@
  *
 */
 
+#include "gazebo/gui/Conversions.hh"
 #include "gazebo/gui/building/EditorItem.hh"
 #include "gazebo/gui/building/GridLines.hh"
 #include "gazebo/gui/building/MeasureItem.hh"
@@ -145,8 +146,8 @@ void ImportImageView::resizeEvent(QResizeEvent *_event)
         p1.setY(p1.y() * scaleHeight);
         p2.setY(p2.y() * scaleHeight);
 
-        this->dataPtr->measureItem->SetStartPoint(p1);
-        this->dataPtr->measureItem->SetEndPoint(p2);
+        this->dataPtr->measureItem->SetStartPoint(Conversions::Convert(p1));
+        this->dataPtr->measureItem->SetEndPoint(Conversions::Convert(p2));
       }
     }
 
@@ -186,7 +187,7 @@ void ImportImageView::mouseMoveEvent(QMouseEvent *_event)
       }
     }
 
-    this->dataPtr->measureItem->SetEndPoint(p2);
+    this->dataPtr->measureItem->SetEndPoint(Conversions::Convert(p2));
   }
 
   if (!this->dataPtr->drawInProgress)
@@ -248,8 +249,8 @@ void ImportImageView::DrawMeasure(const QPoint &_pos)
 
     QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
 
-    QPointF pointStart = mapToScene(_pos);
-    QPointF pointEnd = pointStart + QPointF(1, 0);
+    auto pointStart = Conversions::Convert(this->mapToScene(_pos));
+    auto pointEnd = pointStart + ignition::math::Vector2d(1, 0);
 
     this->dataPtr->measureItem = new MeasureItem(pointStart, pointEnd);
     this->dataPtr->measureItem->SetValue(
@@ -264,7 +265,7 @@ void ImportImageView::DrawMeasure(const QPoint &_pos)
         this->dataPtr->currentMouseItem);
     if (this->dataPtr->measureItem)
     {
-      this->dataPtr->measureScenePx = this->dataPtr->measureItem->GetDistance();
+      this->dataPtr->measureScenePx = this->dataPtr->measureItem->Distance();
 
       this->dataPtr->dialog->dataPtr->distanceSpin->setButtonSymbols(
           QAbstractSpinBox::UpDownArrows);
