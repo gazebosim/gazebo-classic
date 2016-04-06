@@ -783,6 +783,13 @@ void World::Update()
     }
   }
 
+  // Give clients a possibility to react to collisions before the physics
+  // gets updated.
+  this->dataPtr->updateInfo.realTime = this->GetRealTime();
+  event::Events::beforePhysicsUpdate(this->dataPtr->updateInfo);
+
+  DIAG_TIMER_LAP("World::Update", "Events::beforePhysicsUpdate");
+
   // Update the physics engine
   if (this->dataPtr->enablePhysicsEngine && this->dataPtr->physicsEngine)
   {
