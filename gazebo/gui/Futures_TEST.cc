@@ -25,9 +25,6 @@ void Futures_TEST::Verify()
 {
   this->Load("worlds/shapes.world", false, false, false);
 
-  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
-
   QVERIFY(gazebo::gui::Futures::introspectionClientFuture.valid());
 }
 
