@@ -100,6 +100,11 @@ namespace gazebo
     };
     protected: std::vector<JointControl> jointControls;
     protected: common::Time lastUpdateTime;
+
+    private: bool stop;
+    private: void OnKeyHit();
+    private: boost::thread *keyHitThread;
+    private: boost::mutex mutex;
   };
 }
 #endif

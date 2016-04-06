@@ -15,8 +15,6 @@
  *
 */
 
-#include "keyboard/kbhit.h"
-
 #include <boost/unordered_map.hpp>
 #include <boost/unordered_set.hpp>
 
@@ -38,6 +36,7 @@ PlaneDemoPlugin::PlaneDemoPlugin()
 /////////////////////////////////////////////////
 PlaneDemoPlugin::~PlaneDemoPlugin()
 {
+  this->stop = true;
 }
 
 /////////////////////////////////////////////////
@@ -189,21 +188,21 @@ void PlaneDemoPlugin::Init()
   this->lastUpdateTime = this->world->GetSimTime();
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
           boost::bind(&PlaneDemoPlugin::OnUpdate, this));
+  this->keyHitThread =
+    new boost::thread(boost::bind(&PlaneDemoPlugin::OnKeyHit, this));
+  this->stop = false;
 }
 
 /////////////////////////////////////////////////
-void PlaneDemoPlugin::OnUpdate()
+void PlaneDemoPlugin::OnKeyHit()
 {
-  common::Time curTime = this->world->GetSimTime();
   char ch='x';
-  if( _kbhit() )
+  ch = getchar();
+  while (!this->stop)
   {
+    boost::mutex::scoped_lock lock(this->mutex);
     printf("you hit");
-    do
-    {
-      ch = getchar();
-      printf(" '%c'(%i)", isprint(ch)?ch:'?', (int)ch );
-    } while( _kbhit() );
+    printf(" '%c'(%i)", isprint(ch)?ch:'?', (int)ch );
     // puts("");
 
     for (std::vector<EngineControl>::iterator ei = this->engineControls.begin();
@@ -284,7 +283,13 @@ void PlaneDemoPlugin::OnUpdate()
       }
     }
   }
+}
 
+/////////////////////////////////////////////////
+void PlaneDemoPlugin::OnUpdate()
+{
+  boost::mutex::scoped_lock lock(this->mutex);
+  common::Time curTime = this->world->GetSimTime();
   for (std::vector<EngineControl>::iterator ei = this->engineControls.begin();
     ei != this->engineControls.end(); ++ei)
   {
