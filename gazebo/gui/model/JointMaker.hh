@@ -264,10 +264,12 @@ namespace gazebo
       /// created hass been chosen. The pose is expressed in the parent link
       /// frame. This has no effect if triggered before both links are chosen.
       /// \param[in] _pose New pose.
-      /// \param[in] _reset Set to true to reset the relative pose to the
+      /// \param[in] _resetAll Set to true to reset the relative pose to the
       /// original one.
+      /// \paran[in] _resetAxis Reset only the given axis 0 == x, 1 == y, 2 == z
       public: void SetLinksRelativePose(
-          const ignition::math::Pose3d &_pose, const bool _reset);
+          const ignition::math::Pose3d &_pose, const bool _resetAll,
+          const int _resetAxis = -1);
 
       /// \brief Align the parent and child links of the joint being created.
       /// \param[in] _childToParent True to align the child to the parent,

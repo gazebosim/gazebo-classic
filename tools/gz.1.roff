@@ -27,6 +27,10 @@ A camera name is required.
 Options:
 .INDENT 0.0
 .TP
+.B \-\-verbose
+.
+Print extra information
+.TP
 .B \-h, \-\-help
 .
 Print this help message
@@ -63,6 +67,10 @@ return the completion list for a given command.
 Options:
 .INDENT 0.0
 .TP
+.B \-\-verbose
+.
+Print extra information
+.TP
 .B \-h, \-\-help
 .
 Print this help message
@@ -86,6 +94,10 @@ Output information about a gz command.
 Options:
 .INDENT 0.0
 .TP
+.B \-\-verbose
+.
+Print extra information
+.TP
 .B \-h, \-\-help
 .
 Print this help message
@@ -107,6 +119,10 @@ A model name and joint name are required.
 .sp
 Options:
 .INDENT 0.0
+.TP
+.B \-\-verbose
+.
+Print extra information
 .TP
 .B \-h, \-\-help
 .
@@ -181,6 +197,10 @@ an active Gazebo server.
 Options:
 .INDENT 0.0
 .TP
+.B \-\-verbose
+.
+Print extra information
+.TP
 .B \-h, \-\-help
 .
 Print this help message
@@ -221,9 +241,17 @@ Filter output to the specified Hz rate.Only valid for echo and step commands.
 .
 Path to a log file.
 .TP
+.B \-o, \-\-output\fR=\fIarg\fR
+.
+Output file, valid in conjunction with the filter, raw, hz, and encoding commands. By default, the output file will have the same encoding as the source file. Override with the --encoding option
+.TP
+.B \-n, \-\-encoding\fR=\fIarg\fR
+.
+Specify the encoding (txt, zlib, or bz2) for an output file. Valid in conjunction with the output command. See also the --output argument.
+.TP
 .B \-\-filter\fR=\fIarg\fR
 .
-Filter output. Valid only for the echo and step commands
+Filter output. Valid only with the echo, step, and output commands
 .UNINDENT
 .SS model
 .sp
@@ -242,6 +270,10 @@ will be used.
 .sp
 Options:
 .INDENT 0.0
+.TP
+.B \-\-verbose
+.
+Print extra information
 .TP
 .B \-h, \-\-help
 .
@@ -304,6 +336,10 @@ the first world found on the Gazebo master will be used.
 Options:
 .INDENT 0.0
 .TP
+.B \-\-verbose
+.
+Print extra information
+.TP
 .B \-h, \-\-help
 .
 Print this help message
@@ -348,6 +384,10 @@ SDF for use with other options.
 .sp
 Options:
 .INDENT 0.0
+.TP
+.B \-\-verbose
+.
+Print extra information
 .TP
 .B \-h, \-\-help
 .
@@ -394,6 +434,10 @@ the Gazebo master will be used.
 Options:
 .INDENT 0.0
 .TP
+.B \-\-verbose
+.
+Print extra information
+.TP
 .B \-h, \-\-help
 .
 Print this help message
@@ -426,6 +470,10 @@ the Gazebo master will be used.
 .sp
 Options:
 .INDENT 0.0
+.TP
+.B \-\-verbose
+.
+Print extra information
 .TP
 .B \-h, \-\-help
 .
@@ -483,6 +531,10 @@ the first world found on the Gazebo master will be used.
 .sp
 Options:
 .INDENT 0.0
+.TP
+.B \-\-verbose
+.
+Print extra information
 .TP
 .B \-h, \-\-help
 .

@@ -430,6 +430,9 @@ void JointCreationDialog_TEST::Align()
   auto alignButtons = alignWidget->findChildren<QToolButton *>();
   QVERIFY(alignButtons.size() == 9u);
 
+  auto alignReverseCheckboxes = alignWidget->findChildren<QCheckBox *>();
+  QVERIFY(alignReverseCheckboxes.size() == 3u);
+
   // Check that only one button per axis can be checked at a time
   alignButtons[0]->click();
   QVERIFY(alignButtons[0]->isChecked());
@@ -455,6 +458,22 @@ void JointCreationDialog_TEST::Align()
   QVERIFY(alignButtons[3]->isChecked());
   QVERIFY(alignButtons[6]->isChecked());
 
+  // Check that any number of Reverse checkboxes can be active at the same time.
+  alignReverseCheckboxes[0]->click();
+  QVERIFY(alignReverseCheckboxes[0]->isChecked());
+  QVERIFY(!alignReverseCheckboxes[1]->isChecked());
+  QVERIFY(!alignReverseCheckboxes[2]->isChecked());
+
+  alignReverseCheckboxes[1]->click();
+  QVERIFY(alignReverseCheckboxes[0]->isChecked());
+  QVERIFY(alignReverseCheckboxes[1]->isChecked());
+  QVERIFY(!alignReverseCheckboxes[2]->isChecked());
+
+  alignReverseCheckboxes[2]->click();
+  QVERIFY(alignReverseCheckboxes[0]->isChecked());
+  QVERIFY(alignReverseCheckboxes[1]->isChecked());
+  QVERIFY(alignReverseCheckboxes[2]->isChecked());
+
   // Check that all buttons are disabled when the link is changed
   auto parentWidget = configWidget->ConfigChildWidgetByName("parentCombo");
   QVERIFY(parentWidget != NULL);
@@ -464,6 +483,30 @@ void JointCreationDialog_TEST::Align()
 
   for (auto button : alignButtons)
     QVERIFY(!button->isChecked());
+
+  for (auto checkbox : alignReverseCheckboxes)
+    QVERIFY(!checkbox->isChecked());
+
+  // Try aligning links then updating relative pose and see if
+  // the align widgets are unchecked.
+  alignButtons[0]->click();
+  QVERIFY(alignButtons[0]->isChecked());
+  alignReverseCheckboxes[0]->click();
+  QVERIFY(alignReverseCheckboxes[0]->isChecked());
+  // simulate an align pose update callback
+  jointCreationDialog->UpdateRelativePose(ignition::math::Pose3d());
+
+  // Set relative pose and verify
+  ignition::math::Pose3d pose(1, -0.2, 3.3, 0.1, -0.2, 0);
+  jointCreationDialog->UpdateRelativePose(pose);
+  QVERIFY(configWidget->PoseWidgetValue("relative_pose") == pose);
+
+  // Check that all buttons are disabled when the pose has changed
+  for (auto button : alignButtons)
+    QVERIFY(!button->isChecked());
+
+  for (auto checkbox : alignReverseCheckboxes)
+    QVERIFY(!checkbox->isChecked());
 
   delete jointCreationDialog;
   delete jointMaker;

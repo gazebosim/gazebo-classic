@@ -55,7 +55,8 @@ void LinearBatteryConsumerPlugin::Load(physics::ModelPtr _parent,
     double powerLoad = _sdf->Get<double>("power_load");
     this->consumerId = this->battery->AddConsumer();
     bool success = this->battery->SetPowerLoad(this->consumerId, powerLoad);
-    GZ_ASSERT(success, "Failed to set consumer power load.");
+    if (!success)
+      gzerr << "Failed to set consumer power load." << std::endl;
   }
   else
   {

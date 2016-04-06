@@ -202,12 +202,12 @@ namespace gazebo
       /// Bodies connected by a joint are exempt from this, and will
       /// never collide.
       /// \return True if self-collide enabled for this model, false otherwise.
-      public: bool GetSelfCollide() const;
+      public: virtual bool GetSelfCollide() const;
 
       /// \brief Set this model's self_collide property
       /// \sa GetSelfCollide
       /// \param[in] _self_collide True if self-collisions enabled by default.
-      public: void SetSelfCollide(bool _self_collide);
+      public: virtual void SetSelfCollide(bool _self_collide);
 
       /// \brief Set the gravity mode of the model.
       /// \param[in] _value False to turn gravity on for the model.
@@ -396,6 +396,12 @@ namespace gazebo
       /// \brief Allow Model class to share itself as a boost shared_ptr
       /// \return a shared pointer to itself
       public: boost::shared_ptr<Model> shared_from_this();
+
+      /// \brief Create a new link for this model
+      /// \param[in] _name name of the new link
+      /// \return a LinkPtr to the new link created,
+      /// returns NULL if link _name already exists.
+      public: LinkPtr CreateLink(const std::string &_name);
 
       /// \brief Callback when the pose of the model has been changed.
       protected: virtual void OnPoseChange();

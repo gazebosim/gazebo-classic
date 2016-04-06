@@ -14,24 +14,15 @@
  * limitations under the License.
  *
 */
-#ifndef _IMAGESVIEW_HH_
-#define _IMAGESVIEW_HH_
+#ifndef _GAZEBO_GUI_VIEWERS_IMAGESVIEW_HH_
+#define _GAZEBO_GUI_VIEWERS_IMAGESVIEW_HH_
 
 #include <string>
-#include <utility>
-#include <vector>
 
-#include <boost/thread/mutex.hpp>
-
-#include "gazebo/common/Time.hh"
-#include "gazebo/msgs/msgs.hh"
-
-#include "gazebo/transport/TransportTypes.hh"
-
-#include "gazebo/gui/qt.h"
-#include "gazebo/gui/viewers/ImageFrame.hh"
-#include "gazebo/gui/viewers/TopicView.hh"
 #include "gazebo/util/system.hh"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/gui/qt.h"
+#include "gazebo/gui/viewers/TopicView.hh"
 
 namespace gazebo
 {

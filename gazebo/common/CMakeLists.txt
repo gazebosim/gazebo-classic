@@ -50,6 +50,7 @@ set (sources
   KeyEvent.cc
   KeyFrame.cc
   Material.cc
+  MaterialDensity.cc
   Mesh.cc
   MeshExporter.cc
   MeshLoader.cc
@@ -57,6 +58,7 @@ set (sources
   ModelDatabase.cc
   MouseEvent.cc
   PID.cc
+  SemanticVersion.cc
   SkeletonAnimation.cc
   Skeleton.cc
   SphericalCoordinates.cc
@@ -102,6 +104,7 @@ set (headers
   KeyEvent.hh
   KeyFrame.hh
   Material.hh
+  MaterialDensity.hh
   Mesh.hh
   MeshLoader.hh
   MeshManager.hh
@@ -109,6 +112,7 @@ set (headers
   MouseEvent.hh
   PID.hh
   Plugin.hh
+  SemanticVersion.hh
   SkeletonAnimation.hh
   Skeleton.hh
   SingletonT.hh
@@ -138,10 +142,12 @@ set (gtest_sources
   Image_TEST.cc
   ImageHeightmap_TEST.cc
   Material_TEST.cc
+  MaterialDensity_TEST.cc
   Mesh_TEST.cc
   MeshManager_TEST.cc
   MouseEvent_TEST.cc
   MovingWindowFilter_TEST.cc
+  SemanticVersion_TEST.cc
   SphericalCoordinates_TEST.cc
   SystemPaths_TEST.cc
   SVGLoader_TEST.cc
@@ -180,7 +186,7 @@ if (HAVE_FFMPEG)
                      AudioDecoder_TEST.cc)
 endif()
 
-gz_build_tests(${gtest_sources})
+gz_build_tests(${gtest_sources} EXTRA_LIBS gazebo_common)
 
 set (common_headers "" CACHE INTERNAL "common headers" FORCE)
 foreach (hdr ${headers})
