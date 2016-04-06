@@ -14,12 +14,12 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_GUI_PLOT_EXPORTDIALOG_HH_
-#define _GAZEBO_GUI_PLOT_EXPORTDIALOG_HH_
+#ifndef GAZEBO_GUI_PLOT_EXPORTDIALOG_HH_
+#define GAZEBO_GUI_PLOT_EXPORTDIALOG_HH_
 
 #include <string>
 #include <memory>
+#include "gazebo/gui/plot/PlotCanvas.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
 
@@ -41,7 +41,9 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Parent QWidget.
-      public: ExportDialog(QWidget *_parent = 0);
+      /// \param[in] _plots Plots to export.
+      public: ExportDialog(QWidget *_parent,
+                           const std::list<PlotCanvas*> &_plots);
 
       /// \brief Destructor
       public: ~ExportDialog();

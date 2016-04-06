@@ -20,7 +20,6 @@
 #include "gazebo/common/SVGLoader.hh"
 #include "gazebo/gui/plot/IncrementalPlot.hh"
 #include "gazebo/gui/plot/PlotCurve.hh"
-#include "gazebo/gui/plot/PlotCanvas.hh"
 #include "gazebo/gui/plot/PlotWindow.hh"
 #include "gazebo/gui/plot/ExportDialog.hh"
 
@@ -153,7 +152,8 @@ class PlotViewDelegate : public QStyledItemDelegate
 };
 
 /////////////////////////////////////////////////
-ExportDialog::ExportDialog(QWidget *_parent)
+ExportDialog::ExportDialog(QWidget *_parent,
+    const std::list<PlotCanvas*> &_plots)
 : QDialog(_parent),
   dataPtr(new ExportDialogPrivate)
 {
@@ -223,10 +223,10 @@ ExportDialog::ExportDialog(QWidget *_parent)
 
   QStandardItemModel *model = new QStandardItemModel();
 
-  PlotWindow *plotWindow = static_cast<PlotWindow*>(_parent);
-  std::list<PlotCanvas*> plots = plotWindow->Plots();
+  //PlotWindow *plotWindow = static_cast<PlotWindow*>(_parent);
+  //std::list<PlotCanvas*> plots = plotWindow->Plots();
 
-  for (auto &plot : plots)
+  for (auto &plot : _plots)
   {
     QIcon icon(QPixmap::grabWindow(plot->winId()));
     PlotViewItem *item = new PlotViewItem;
@@ -333,12 +333,18 @@ void ExportDialog::OnExportPDF()
       std::string title = plotItem->canvas->Title();
 
       // Render the plot to a PDF
-      for (const auto &plot : plotItem->canvas->Plots())
+      int index = 0;
+      std::vector<IncrementalPlot *> plots = plotItem->canvas->Plots();
+      for (const auto &plot : plots)
       {
-        std::string filename = dir + "/" + title + ".pdf";
+        std::string filename = dir + "/" + title;
+        filename += plots.size() > 1 ? std::to_string(index) : "";
+        filename += ".pdf";
+
         QwtPlotRenderer renderer;
         renderer.renderDocument(plot, QString(filename.c_str()),
             QSizeF(280, 216));
+        index++;
       }
     }
     else
@@ -395,7 +401,18 @@ void ExportDialog::OnExportCSV()
           if (!c)
             continue;
 
-          std::ofstream out(dir + "/" + title + "-" + c->Label() + ".csv");
+          // Cleanup the title
+          std::replace(title.begin(), title.end(), '/', '_');
+          std::replace(title.begin(), title.end(), '?', ':');
+
+          // Cleanup the label
+          std::string label = c->Label();
+          std::replace(label.begin(), label.end(), '/', '_');
+          std::replace(label.begin(), label.end(), '?', ':');
+
+          std::string filename = dir + "/" + title + "-" + label + ".csv";
+
+          std::ofstream out(filename);
           out << "x, " << c->Label() << std::endl;
           for (unsigned int j = 0; j < c->Size(); ++j)
           {

@@ -103,43 +103,37 @@ PlotWindow::PlotWindow(QWidget *_parent)
   addCanvasShadow->setOffset(0, 0);
   addCanvasButton->setGraphicsEffect(addCanvasShadow);
   connect(addCanvasButton, SIGNAL(clicked()), this, SLOT(OnAddCanvas()));
-  QVBoxLayout *addButtonLayout = new QVBoxLayout;
+
+  // export button
+  QPushButton *exportPlotButton = new QPushButton("Export");
+  exportPlotButton->setIcon(QIcon(":/images/file_upload.svg"));
+  exportPlotButton->setObjectName("plotExport");
+  exportPlotButton->setDefault(false);
+  exportPlotButton->setAutoDefault(false);
+  exportPlotButton->setToolTip("Export plot data");
+  QGraphicsDropShadowEffect *exportPlotShadow = new QGraphicsDropShadowEffect();
+  exportPlotShadow->setBlurRadius(8);
+  exportPlotShadow->setOffset(0, 0);
+  exportPlotButton->setGraphicsEffect(exportPlotShadow);
+  connect(exportPlotButton, SIGNAL(clicked()), this, SLOT(OnExport()));
+
+
+  QHBoxLayout *addButtonLayout = new QHBoxLayout;
+  addButtonLayout->addWidget(exportPlotButton);
+  addButtonLayout->addStretch();
   addButtonLayout->addWidget(addCanvasButton);
   addButtonLayout->setAlignment(Qt::AlignRight | Qt::AlignBottom);
   addButtonLayout->setContentsMargins(0, 0, 0, 0);
   addCanvasButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
 
-  QAction *plotExportAct = new QAction(
-      QIcon(":/images/file_upload.svg"), tr("Export"), this);
-  plotExportAct->setToolTip(tr("Export plot data"));
-  plotExportAct->setVisible(true);
-  connect(plotExportAct, SIGNAL(triggered()), this, SLOT(OnExport()));
-
-  QToolBar *exportToolbar = new QToolBar;
-  exportToolbar->setObjectName("plotToolbar");
-  exportToolbar->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-  exportToolbar->addAction(plotExportAct);
-
-  QHBoxLayout *bottomPanelLayout = new QHBoxLayout;
-  bottomPanelLayout->addStretch();
-  bottomPanelLayout->addWidget(exportToolbar);
-  bottomPanelLayout->setContentsMargins(0, 0, 0, 0);
-
-  // Bottom toolbar
-  QFrame *bottomFrame = new QFrame;
-  bottomFrame->setObjectName("plotBottomFrame");
-  bottomFrame->setSizePolicy(QSizePolicy::Expanding,
-      QSizePolicy::Minimum);
-  bottomFrame->setLayout(bottomPanelLayout);
-
   // main layout
   QVBoxLayout *plotLayout = new QVBoxLayout;
   plotLayout->addLayout(this->dataPtr->canvasLayout);
   plotLayout->addLayout(addButtonLayout);
-  plotLayout->addWidget(bottomFrame);
+  //plotLayout->addWidget(bottomFrame);
   plotLayout->setStretchFactor(this->dataPtr->canvasLayout, 1);
   plotLayout->setStretchFactor(addButtonLayout, 0);
-  plotLayout->setStretchFactor(bottomFrame, 0);
+  //plotLayout->setStretchFactor(bottomFrame, 0);
 
   auto plotFrame = new QFrame;
   plotFrame->setLayout(plotLayout);
@@ -314,8 +308,50 @@ void PlotWindow::TogglePause()
 /////////////////////////////////////////////////
 void PlotWindow::OnExport()
 {
-  ExportDialog *dialog = new ExportDialog(this);
-  dialog->show();
+  // Get the plots that have data.
+  std::list<PlotCanvas*> plots;
+  for (int i = 0; i < this->dataPtr->canvasLayout->count(); ++i)
+  {
+    bool hasData = false;
+    QLayoutItem *item = this->dataPtr->canvasLayout->itemAt(i);
+    PlotCanvas *canvas = qobject_cast<PlotCanvas *>(item->widget());
+    if (!canvas)
+      continue;
+    for (const auto &plot : canvas->Plots())
+    {
+      for (const auto &curve : plot->Curves())
+      {
+        auto c = curve.lock();
+        if (!c)
+          continue;
+
+        hasData = hasData || c->Size() > 0;
+      }
+    }
+
+    if (hasData)
+      plots.push_back(canvas);
+  }
+
+  // Display an error message if no plots have data.
+  if (plots.empty())
+  {
+    QMessageBox msgBox(
+        QMessageBox::Information,
+        QString("Unable to export"),
+        QString(
+          "No data to export.\nAdd variables with data to a graph first."),
+        QMessageBox::Close,
+        this,
+        Qt::Window | Qt::WindowTitleHint |
+        Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
+    msgBox.exec();
+  }
+  else
+  {
+    ExportDialog *dialog = new ExportDialog(this, plots);
+    dialog->show();
+  }
 }
 
 /////////////////////////////////////////////////
