@@ -690,7 +690,7 @@ void Palette::FillModels()
 
   gazebo::util::IntrospectionClient client;
 
-  // Get the managers to come online
+  // Get the managers
   auto managerIds = client.Managers();
 
   if (managerIds.empty())

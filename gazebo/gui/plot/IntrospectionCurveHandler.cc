@@ -213,7 +213,7 @@ void IntrospectionCurveHandler::SetupIntrospection()
   if (Futures::introspectionClientFuture.valid())
     Futures::introspectionClientFuture.get();
 
-  // Wait for the managers to come online
+  // Get the managers
   std::set<std::string> managerIds = this->dataPtr->introspectClient.Managers();
   if (managerIds.empty())
   {
