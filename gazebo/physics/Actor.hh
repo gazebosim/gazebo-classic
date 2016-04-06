@@ -70,6 +70,10 @@ namespace gazebo
     /// scriptable animation.
     class GZ_PHYSICS_VISIBLE Actor : public Model
     {
+      /// \brief Typedef the skeleton animation map.
+      public: typedef std::map<std::string, common::SkeletonAnimation*>
+              SkeletonAnimation_M;
+
       /// \brief Constructor
       /// \param[in] _parent Parent object
       public: explicit Actor(BasePtr _parent);
@@ -106,6 +110,32 @@ namespace gazebo
       /// \brief Get the SDF values for the actor.
       /// \return Pointer to the SDF values.
       public: virtual const sdf::ElementPtr GetSDF();
+
+      /// \brief Set the current script time.
+      /// \param[in] _time Current script time.
+      public: void SetScriptTime(const double _time);
+
+      /// \brief Get the current script time.
+      /// \return Script time.
+      public: double ScriptTime() const;
+
+      /// \brief Returns a dictionary of all the skeleton animations associated
+      /// with the actor.
+      /// \return a map of SkeletonAnimation, indexed by their name.
+      public: const SkeletonAnimation_M &SkeletonAnimations() const;
+
+      /// \brief Set a custom trajectory for the actor.
+      /// \param[in] _trajInfo Information about custom trajectory.
+      public: void SetCustomTrajectory(TrajectoryInfoPtr &_trajInfo);
+
+      /// \brief Reset custom trajectory of the actor.
+      public: void ResetCustomTrajectory();
+
+      // Documentation inherited
+      public: virtual bool GetSelfCollide() const;
+
+      // Documentation inherited
+      public: virtual void SetSelfCollide(bool _self_collide);
 
       /// \brief Add inertia for a sphere.
       /// \param[in] _linkSdf The link to add the inertia to.
@@ -194,9 +224,6 @@ namespace gazebo
       /// \brief Time length of a scipt.
       protected: double scriptLength;
 
-      /// \brief Time the scipt was last updated.
-      protected: double lastScriptTime;
-
       /// \brief True if the animation should loop.
       protected: bool loop;
 
@@ -222,10 +249,9 @@ namespace gazebo
       protected: std::vector<TrajectoryInfo> trajInfo;
 
       /// \brief Skeleton animations
-      protected: std::map<std::string, common::SkeletonAnimation*>
-                                                            skelAnimation;
+      protected: SkeletonAnimation_M skelAnimation;
 
-      /// \brief Skeleton to naode map
+      /// \brief Skeleton to node map
       protected: std::map<std::string, std::map<std::string, std::string> >
                                                             skelNodesMap;
 
@@ -250,8 +276,12 @@ namespace gazebo
       /// \brief Where to send bone info.
       protected: transport::PublisherPtr bonePosePub;
 
-      /// \brief THe old action.
-      protected: std::string oldAction;
+      /// \brief Current script time
+      private: double scriptTime;
+
+      /// \brief Custom trajectory.
+      /// Used to control an actor with a plugin.
+      private: TrajectoryInfoPtr customTrajectoryInfo;
     };
     /// \}
   }

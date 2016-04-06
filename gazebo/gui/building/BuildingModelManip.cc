@@ -22,6 +22,7 @@
 
 #include "gazebo/rendering/Visual.hh"
 
+#include "gazebo/gui/Conversions.hh"
 #include "gazebo/gui/building/BuildingEditorEvents.hh"
 #include "gazebo/gui/building/BuildingMaker.hh"
 #include "gazebo/gui/building/BuildingModelManip.hh"
@@ -236,16 +237,16 @@ void BuildingModelManip::OnLevelChanged(int _level)
 }
 
 /////////////////////////////////////////////////
-void BuildingModelManip::OnColorChanged(QColor _color)
+void BuildingModelManip::OnColorChanged(const common::Color &_color)
 {
-  this->SetColor(_color);
+  this->SetColor(Conversions::Convert(_color));
   this->dataPtr->maker->BuildingChanged();
 }
 
 /////////////////////////////////////////////////
-void BuildingModelManip::OnTextureChanged(QString _texture)
+void BuildingModelManip::OnTextureChanged(const std::string &_texture)
 {
-  this->SetTexture(_texture);
+  this->SetTexture(QString::fromStdString(_texture));
   this->dataPtr->maker->BuildingChanged();
 }
 
@@ -317,7 +318,7 @@ void BuildingModelManip::SetColor(QColor _color)
   this->dataPtr->color = newColor;
   this->dataPtr->visual->SetAmbient(this->dataPtr->color);
   this->dataPtr->maker->BuildingChanged();
-  emit ColorChanged(_color);
+  emit ColorChanged(Conversions::Convert(_color));
 }
 
 /////////////////////////////////////////////////
@@ -339,7 +340,7 @@ void BuildingModelManip::SetTexture(QString _texture)
   // Must set color after texture otherwise it gets overwritten
   this->dataPtr->visual->SetAmbient(this->dataPtr->color);
   this->dataPtr->maker->BuildingChanged();
-  emit TextureChanged(_texture);
+  emit TextureChanged(_texture.toStdString());
 }
 
 /////////////////////////////////////////////////
