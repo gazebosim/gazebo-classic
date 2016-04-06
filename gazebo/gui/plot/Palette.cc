@@ -200,14 +200,33 @@ class PlotItemDelegate : public QStyledItemDelegate
       for (std::map<size_t, size_t>::iterator iter = bold.begin();
            iter != bold.end(); ++iter)
       {
-        // Skip this bold text if it has already been rendered.
-        if (renderPos > iter->first)
-          continue;
+        // Start of bold text
+        size_t start = iter->first;
+
+        // Length of bold text.
+        size_t len = iter->second;
+
+        // Check if start is before the current render position.
+        if (renderPos > start)
+        {
+          // It's possible that the bold text goes beyond the current render
+          // position. If so, adjust the start and length appropriately.
+          if (start + len > renderPos)
+          {
+            len = (start + len) - renderPos;
+            start = renderPos;
+          }
+          // Otherwise this bold text has already been rendered, so skip.
+          else
+          {
+            continue;
+          }
+        }
 
         // First paint text that is not bold
         auto textStr = QString::fromStdString(
-            text.substr(renderPos, iter->first - renderPos));
-        renderPos += (iter->first - renderPos);
+            text.substr(renderPos, start - renderPos));
+        renderPos += (start - renderPos);
 
         _painter->setFont(fontRegular);
         _painter->drawText(textRect, textStr);
@@ -216,8 +235,8 @@ class PlotItemDelegate : public QStyledItemDelegate
         textRect.adjust(fmRegular.width(textStr), 0, 0, 0);
 
         // Next, paint text that is bold
-        textStr = QString::fromStdString(text.substr(renderPos, iter->second));
-        renderPos += iter->second;
+        textStr = QString::fromStdString(text.substr(renderPos, len));
+        renderPos += len;
 
         _painter->setFont(fontBold);
         _painter->drawText(textRect, textStr);
