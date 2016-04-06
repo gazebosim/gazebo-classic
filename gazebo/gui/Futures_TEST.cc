@@ -15,6 +15,7 @@
  *
 */
 #include "gazebo/gui/Futures.hh"
+#include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/Futures_TEST.hh"
 
 #include "test_config.h"
