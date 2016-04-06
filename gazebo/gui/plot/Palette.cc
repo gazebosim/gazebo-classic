@@ -79,13 +79,20 @@ class PlotItemDelegate : public QStyledItemDelegate
     QString typeName = qvariant_cast<QString>(_index.data(TYPE));
 
     // TODO: Change to QApplication::font() once Roboto is used everywhere
-    QFont font;
-    auto fontWeight = QFont::Normal;
+    QFont fontBold, fontRegular;
+
+    // Create a bold font
+    fontBold.setFamily("Roboto Bold");
+    fontBold.setWeight(QFont::Bold);
+    QFontMetrics fmBold(fontBold);
+
+    // Create a regular font
+    fontRegular.setFamily("Roboto Regular");
+    fontRegular.setWeight(QFont::Normal);
+    QFontMetrics fmRegular(fontRegular);
+
     if (typeName == "title")
     {
-      font.setFamily("Roboto Bold");
-      fontWeight = QFont::Bold;
-
       // Erase the branch image for titles
       QRectF titleRect = _opt.rect;
       titleRect.setLeft(titleRect.left() - 13);
@@ -94,10 +101,6 @@ class PlotItemDelegate : public QStyledItemDelegate
       _painter->save();
       _painter->fillRect(titleRect, brush);
       _painter->restore();
-    }
-    else
-    {
-      font.setFamily("Roboto Regular");
     }
 
     // Handle hover style
@@ -154,107 +157,105 @@ class PlotItemDelegate : public QStyledItemDelegate
 
     // If this is a search result
     auto searchModel = dynamic_cast<const SearchModel *>(_index.model());
-    if (searchModel)
+    if (searchModel && !topicName.isEmpty())
     {
       std::string text(topicName.toStdString());
 
-      auto wordsStringList = searchModel->search.split(" ");
+      // Case insensitive search
+      std::string upperText(text);
+      std::transform(upperText.begin(), upperText.end(),
+          upperText.begin(), ::toupper);
 
-      // Reorder terms so longer ones come first, in case the shorter ones are
-      // substrings
-      std::vector<std::string> words;
+      // Split search into words
+      QStringList wordsStringList = searchModel->search.toUpper().split(" ");
+
+      std::vector<std::string> wordsUpper;
       for (auto word : wordsStringList)
-        words.push_back(word.toStdString());
-
-      std::sort(words.begin(), words.end(),
-          [](const std::string &_first, const std::string &_second)
       {
-        return _first.size() > _second.size();
-      });
+        std::string wd = word.toStdString();
+        if (!wd.empty())
+          wordsUpper.push_back(wd);
+      }
 
-      while (!text.empty())
-      {
-        int searchPosition = -1;
-        std::string matchedWord = "";
-
-        // Find first search word that matches
-        for (auto word : words)
-        {
-          if (word == "")
-            continue;
-
-          // Case insensitive search
-          std::string upperText(text);
-          std::transform(upperText.begin(), upperText.end(),
-              upperText.begin(), ::toupper);
-
-          std::string upperWord(word);
-          std::transform(upperWord.begin(), upperWord.end(),
-              upperWord.begin(), ::toupper);
-
-          auto id = static_cast<int>(upperText.find(upperWord));
-          if (id == -1)
-            continue;
-
-          if (searchPosition == -1 || id < searchPosition)
+      // Find the portions of text that match the search words, and should
+      // therefore be bold.
+      //
+      // Bold map: key = position of bold text start, value = bold text length
+      std::map<size_t, size_t> bold;
+      std::for_each(wordsUpper.begin(), wordsUpper.end(),
+          [upperText, &bold](const std::string &_word)
           {
-            searchPosition = id;
-            matchedWord = word;
+            size_t pos = upperText.find(_word);
+            // Find all occurences of _word
+            while (pos != std::string::npos)
+            {
+              // Use longest word starting at a given position
+              bold[pos] = std::max(bold[pos], _word.size());
+              pos = upperText.find(_word, pos + 1);
+            }
+          });
+
+      // Paint the text from left to right
+      size_t renderPos = 0;
+      for (std::map<size_t, size_t>::iterator iter = bold.begin();
+           iter != bold.end(); ++iter)
+      {
+        // Start of bold text
+        size_t start = iter->first;
+
+        // Length of bold text.
+        size_t len = iter->second;
+
+        // Check if start is before the current render position.
+        if (renderPos > start)
+        {
+          // It's possible that the bold text goes beyond the current render
+          // position. If so, adjust the start and length appropriately.
+          if (start + len > renderPos)
+          {
+            len = (start + len) - renderPos;
+            start = renderPos;
           }
-
-          // Short-circuit if we're already in the beginning
-          if (searchPosition == 0)
-            break;
-        }
-
-        // Draw unmatching string
-        if (searchPosition != 0)
-        {
-          auto textStr = QString::fromStdString(text.substr(0, searchPosition));
-
-          font.setFamily("Roboto Regular");
-          fontWeight = QFont::Normal;
-          font.setWeight(fontWeight);
-
-          _painter->setFont(QFont(font.family(), font.pointSize(), fontWeight));
-          _painter->drawText(textRect, textStr);
-
-          // Move rect to the right
-          QFontMetrics fm(font);
-          textRect.adjust(fm.width(textStr), 0, 0, 0);
-
-          // Reduce text
-          if (searchPosition > 0)
-            text = text.substr(searchPosition);
+          // Otherwise this bold text has already been rendered, so skip.
           else
-            text = "";
+          {
+            continue;
+          }
         }
 
-        // Draw matched string
-        if (!matchedWord.empty())
-        {
-          auto textStr = QString::fromStdString(
-              text.substr(0, matchedWord.length()));
+        // First paint text that is not bold
+        auto textStr = QString::fromStdString(
+            text.substr(renderPos, start - renderPos));
+        renderPos += (start - renderPos);
 
-          font.setFamily("Roboto Bold");
-          fontWeight = QFont::Bold;
-          font.setWeight(fontWeight);
+        _painter->setFont(fontRegular);
+        _painter->drawText(textRect, textStr);
 
-          _painter->setFont(QFont(font.family(), font.pointSize(), fontWeight));
-          _painter->drawText(textRect, textStr);
+        // Move rect to the right
+        textRect.adjust(fmRegular.width(textStr), 0, 0, 0);
 
-          // Move rect to the right
-          QFontMetrics fm(font);
-          textRect.adjust(fm.width(textStr), 0, 0, 0);
+        // Next, paint text that is bold
+        textStr = QString::fromStdString(text.substr(renderPos, len));
+        renderPos += len;
 
-          // Reduce text
-          text = text.substr(matchedWord.length());
-        }
+        _painter->setFont(fontBold);
+        _painter->drawText(textRect, textStr);
+
+        // Move rect to the right
+        textRect.adjust(fmBold.width(textStr), 0, 0, 0);
+      }
+
+      // Render any remaining text.
+      if (renderPos < text.size())
+      {
+        auto textStr = QString::fromStdString(text.substr(renderPos));
+        _painter->setFont(fontRegular);
+        _painter->drawText(textRect, textStr);
       }
     }
     else
     {
-      _painter->setFont(QFont(font.family(), font.pointSize(), fontWeight));
+      _painter->setFont(typeName == "title" ? fontBold : fontRegular);
       _painter->drawText(textRect, topicName);
     }
   }
