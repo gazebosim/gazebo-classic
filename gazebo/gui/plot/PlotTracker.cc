@@ -21,7 +21,7 @@
 
 #include "gazebo/gui/qt.h"
 
-#include "PlotZoomer.hh"
+#include "gazebo/gui/plot/PlotTracker.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -30,6 +30,7 @@ namespace gazebo
 {
   namespace gui
   {
+#if (QWT_VERSION < ((6 << 16) | (1 << 8) | 0))
     /// \brief A widget that renders the hover line inside the main plot canvas.
     class HoverLineWidget : public QWidget
     {
@@ -70,34 +71,43 @@ namespace gazebo
         QwtPainter::drawLine(_painter, trackerX, top, trackerX, bottom);
       }
 
-      /// \brief Picker object. In this case, the PlotZoomer.
+      /// \brief Picker object. In this case, the PlotTracker.
       private: QwtPicker *picker;
     };
+#endif
 
     /// \internal
-    /// \brief PlotZoomer private data
-    class PlotZoomerPrivate
+    /// \brief PlotTracker private data
+    class PlotTrackerPrivate
     {
+#if (QWT_VERSION < ((6 << 16) | (1 << 8) | 0))
       /// \brief The curve to draw.
       public: HoverLineWidget *hoverLineWidget = NULL;
+#endif
     };
   }
 }
 
 /////////////////////////////////////////////////
 #if (QWT_VERSION < ((6 << 16) | (1 << 8) | 0))
-PlotZoomer::PlotZoomer(QwtPlotCanvas *_canvas)
+PlotTracker::PlotTracker(QwtPlotCanvas *_canvas)
 #else
-PlotZoomer::PlotZoomer(QWidget *_canvas)
+PlotTracker::PlotTracker(QWidget *_canvas)
 #endif
-  : QwtPlotZoomer(_canvas), dataPtr(new PlotZoomerPrivate)
+  : QwtPlotPicker(_canvas), dataPtr(new PlotTrackerPrivate)
 {
   this->setTrackerMode(QwtPlotPicker::AlwaysOn);
+
+#if (QWT_VERSION >= ((6 << 16) | (1 << 8) | 0))
+  this->setStateMachine(new QwtPickerTrackerMachine());
+  this->setRubberBand(QwtPicker::VLineRubberBand);
+#endif
 }
 
 /////////////////////////////////////////////////
-void PlotZoomer::Update()
+void PlotTracker::Update()
 {
+#if (QWT_VERSION < ((6 << 16) | (1 << 8) | 0))
   // default behavior of a tracker widget is that it only updates when mouse
   // moves. This is a workaround to force the tracker text to update given
   // that we are constantly updating the x-axis when simulation is playing.
@@ -108,14 +118,16 @@ void PlotZoomer::Update()
       return;
     w->update();
   }
+#endif
 }
 
 /////////////////////////////////////////////////
-void PlotZoomer::updateDisplay()
+void PlotTracker::updateDisplay()
 {
   // this updates default rubberband and tracker text
   QwtPicker::updateDisplay();
 
+#if (QWT_VERSION < ((6 << 16) | (1 << 8) | 0))
   // update hover line only when zoom is not active
   if (!this->isActive())
   {
@@ -165,10 +177,11 @@ void PlotZoomer::updateDisplay()
       this->dataPtr->hoverLineWidget->hide();
     }
   }
+#endif
 }
 
 /////////////////////////////////////////////////
-QwtText PlotZoomer::trackerTextF(const QPointF &_pos) const
+QwtText PlotTracker::trackerTextF(const QPointF &_pos) const
 {
   // format hover text
   QwtText tracker;
@@ -197,7 +210,7 @@ QwtText PlotZoomer::trackerTextF(const QPointF &_pos) const
 }
 
 /////////////////////////////////////////////////
-QString PlotZoomer::CurveInfoAt(const QwtPlotCurve *curve,
+QString PlotTracker::CurveInfoAt(const QwtPlotCurve *curve,
     const QPointF &_pos) const
 {
   const QLineF line = this->CurveLineAt(curve, _pos.x());
@@ -214,7 +227,7 @@ QString PlotZoomer::CurveInfoAt(const QwtPlotCurve *curve,
 }
 
 /////////////////////////////////////////////////
-QLineF PlotZoomer::CurveLineAt(const QwtPlotCurve *_curve,
+QLineF PlotTracker::CurveLineAt(const QwtPlotCurve *_curve,
     const double _x) const
 {
   // line segment of curve at x
@@ -246,7 +259,7 @@ QLineF PlotZoomer::CurveLineAt(const QwtPlotCurve *_curve,
 }
 
 /////////////////////////////////////////////////
-int PlotZoomer::UpperSampleIndex(const QwtSeriesData<QPointF> &_series,
+int PlotTracker::UpperSampleIndex(const QwtSeriesData<QPointF> &_series,
     const double _value) const
 {
   // binary search to find index in series with the closest value

@@ -701,6 +701,9 @@ void Palette::FillModels()
   auto cbItems = [this](const std::set<std::string> &_items,
                      const bool _result)
   {
+ /*   std::cerr << "items " << std::endl;
+    for (auto i : _items)
+      std::cerr << i << std::endl;*/
     this->OnIntrospectionUpdate(_items, _result);
   };
 
@@ -725,6 +728,10 @@ void Palette::OnIntrospectionUpdate(const gazebo::msgs::Param_V &_msg)
 
     items.insert(param.value().string_value());
   }
+    std::cerr << "items " << std::endl;
+    for (auto i : items)
+      std::cerr << i << std::endl;
+
 
   // Process in the Qt thread
   this->IntrospectionUpdateSignal(items);

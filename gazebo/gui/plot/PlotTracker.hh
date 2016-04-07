@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_GUI_PLOT_PLOTZOOMER_HH_
-#define _GAZEBO_GUI_PLOT_PLOTZOOMER_HH_
+#ifndef GAZEBO_GUI_PLOT_PLOTTRACKER_HH
+#define GAZEBO_GUI_PLOT_PLOTTRACKER_HH
 
 #include <memory>
 
@@ -26,24 +26,23 @@ namespace gazebo
 {
   namespace gui
   {
-    class PlotZoomerPrivate;
+    class PlotTrackerPrivate;
 
-    /// \brief Box zoom with mouse hover tracking
-    class PlotZoomer: public QwtPlotZoomer
+    /// \brief Mouse hover tracking
+    class PlotTracker: public QwtPlotPicker
     {
       /// \brief Constructor
       /// \param[in] _canvas Canvas the zoomer will be attached to.
 #if (QWT_VERSION < ((6 << 16) | (1 << 8) | 0))
-      public: PlotZoomer(QwtPlotCanvas *_canvas);
+      public: PlotTracker(QwtPlotCanvas *_canvas);
 #else
-      public: PlotZoomer(QWidget *_canvas);
+      public: PlotTracker(QWidget *_canvas);
 #endif
 
       /// \brief Update the hover text, also known as the tracker text.
       public: void Update();
 
-      /// \brief Overriden to update the hover line in addition to the default
-      /// widgets (rubberband and tracker text).
+      /// \brief Overriden to update the hover line and tracker text.
       public: void updateDisplay();
 
       /// \brief Overriden to provide customized hover text
@@ -75,7 +74,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Private data pointer
-      private: std::unique_ptr<PlotZoomerPrivate> dataPtr;
+      private: std::unique_ptr<PlotTrackerPrivate> dataPtr;
     };
   }
 }

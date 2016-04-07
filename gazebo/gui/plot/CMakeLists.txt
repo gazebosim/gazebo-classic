@@ -9,7 +9,7 @@ set (sources_local
   plot/PlotManager.cc
   plot/Palette.cc
   plot/PlotWindow.cc
-  plot/PlotZoomer.cc
+  plot/PlotTracker.cc
   plot/VariablePill.cc
   plot/VariablePillContainer.cc
 )
