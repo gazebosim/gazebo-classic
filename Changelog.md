@@ -36,16 +36,55 @@
 
 ## Gazebo 7
 
-## Gazebo 7.x.x (2016-xx-xx)
+## Gazebo 7.1.0 (2016-04-07)
+
+1. Fix oculus 2 camera field of view
+    * [Pull request 2157](https://bitbucket.org/osrf/gazebo/pull-request/2157)
+
+1. Added BeforePhysicsUpdate world event
+    * [Pull request 2128](https://bitbucket.org/osrf/gazebo/pull-request/2128)
 
 1. Update `gz sdf -c` command line tool to use the new `sdf::convertFile` API.
     * [Pull request #2227](https://bitbucket.org/osrf/gazebo/pull-requests/2227)
+
+1. Backport depth camera OSX fix 
+    * [Pull request 2233](https://bitbucket.org/osrf/gazebo/pull-request/2233)
+
+1. Feat load collision.sdf only once
+    * [Pull request 2236](https://bitbucket.org/osrf/gazebo/pull-request/2236)
+
+1. Update gui/building/Item API
+    * [Pull request 2228](https://bitbucket.org/osrf/gazebo/pull-request/2228)
+
+1. Semantic version class to compare model versions in the model database.
+    * [Pull request 2207](https://bitbucket.org/osrf/gazebo/pull-request/2207)
+
+1. Backport issue 1834 fix to gazebo7
+    * [Pull request 2222](https://bitbucket.org/osrf/gazebo/pull-request/2222)
+
+1. Backport ImagesView_TEST changes
+    * [Pull request 2217](https://bitbucket.org/osrf/gazebo/pull-request/2217)
+
+1. Backport pull request #2189 (mutex in Transport::Conection)
+    * [Pull request 2208](https://bitbucket.org/osrf/gazebo/pull-request/2208)
 
 1. Process insertions on World::SetState
     * [Pull request #2200](https://bitbucket.org/osrf/gazebo/pull-requests/2200)
 
 1. Process deletions on World::SetState
     * [Pull request #2204](https://bitbucket.org/osrf/gazebo/pull-requests/2204)
+
+1. Fix ray-cylinder collision
+    * [Pull request 2124](https://bitbucket.org/osrf/gazebo/pull-request/2124)
+
+1. Fix editing physics parameters in gzclient, update test
+    * [Pull request 2192](https://bitbucket.org/osrf/gazebo/pull-request/2192)
+
+1. Fix Audio Decoder test failure
+    * [Pull request 2193](https://bitbucket.org/osrf/gazebo/pull-request/2193)
+
+1. Add layers to building levels
+    * [Pull request 2180](https://bitbucket.org/osrf/gazebo/pull-request/2180)
 
 1. Allow dynamically adding links to a model.
     * [Pull request #2185](https://bitbucket.org/osrf/gazebo/pull-requests/2185)
@@ -56,6 +95,27 @@
 
 1. Model database selects the latest model version.
     * [Pull request #2207](https://bitbucket.org/osrf/gazebo/pull-requests/2207)
+
+1. Only link relevant libraries to tests
+    * [Pull request 2130](https://bitbucket.org/osrf/gazebo/pull-request/2130)
+
+1. PIMPLize gui/model/ModelCreator
+    * [Pull request 2171](https://bitbucket.org/osrf/gazebo/pull-request/2171)
+
+1. backport warning and test fixes from pull request #2177
+    * [Pull request 2179](https://bitbucket.org/osrf/gazebo/pull-request/2179)
+
+1. Prevent xml parser error from crashing LogPlay on osx -> gazebo7
+    * [Pull request 2174](https://bitbucket.org/osrf/gazebo/pull-request/2174)
+
+1. PIMPLize gui/building/ScaleWidget
+    * [Pull request 2164](https://bitbucket.org/osrf/gazebo/pull-request/2164)
+
+1. Fix using Shift key while scaling inside the model editor
+    * [Pull request 2165](https://bitbucket.org/osrf/gazebo/pull-request/2165)
+
+1. Backport fix for ign-math explicit constructors -> gazebo7
+    * [Pull request 2163](https://bitbucket.org/osrf/gazebo/pull-request/2163)
 
 1. Display physics engine type in the GUI
     * [Pull request #2155](https://bitbucket.org/osrf/gazebo/pull-requests/2155)
@@ -70,11 +130,20 @@
 1. Add helper function QTestFixture::ProcessEventsAndDraw
     * [Pull request #2147](https://bitbucket.org/osrf/gazebo/pull-request/2147)
 
+1. Add qt resources to gazebo gui library
+    * [Pull request 2134](https://bitbucket.org/osrf/gazebo/pull-request/2134)
+
 1. Undo scaling during simulation
     * [Pull request #2108](https://bitbucket.org/osrf/gazebo/pull-request/2108)
 
 1. Fix SensorManager::SensorContainer::RunLoop sensor update time assertion
     * [Pull request #2115](https://bitbucket.org/osrf/gazebo/pull-request/2115)
+
+1. Fix use of not initialized static attribute in Light class
+    * [Pull request 2075](https://bitbucket.org/osrf/gazebo/pull-request/2075)
+
+1. Install GuiTypes header
+    * [Pull request 2106](https://bitbucket.org/osrf/gazebo/pull-request/2106)
 
 1. Removes one function call and replaces a manual swap with std::swap in ODE heightfield.
     * [Pull request #2114](https://bitbucket.org/osrf/gazebo/pull-request/2114)
@@ -82,26 +151,23 @@
 1. New world event: BeforePhysicsUpdate
     * [Issue #1851](https://bitbucket.org/osrf/gazebo/issues/1851)
 
-1. Model editor updates
-    1. Fix setting relative pose after alignment during joint creation.
-        * [Issue #1844](https://bitbucket.org/osrf/gazebo/issues/1844)
-        * [Pull request #2150](https://bitbucket.org/osrf/gazebo/pull-request/2150)
+1. Model editor: Fix setting relative pose after alignment during joint creation.
+    * [Issue #1844](https://bitbucket.org/osrf/gazebo/issues/1844)
+    * [Pull request #2150](https://bitbucket.org/osrf/gazebo/pull-request/2150)
 
-    1. Fix saving and spawning model with its original name
-        * [Pull request #2183](https://bitbucket.org/osrf/gazebo/pull-request/2183)
+1. Model editor: Fix saving and spawning model with its original name
+    * [Pull request #2183](https://bitbucket.org/osrf/gazebo/pull-request/2183)
 
-    1. Fix inserting custom links
-        * [Pull request #2222](https://bitbucket.org/osrf/gazebo/pull-request/2222)
-        * [Issue #1834](https://bitbucket.org/osrf/gazebo/issues/1834)
+1. Model editor: Fix inserting custom links
+    * [Pull request #2222](https://bitbucket.org/osrf/gazebo/pull-request/2222)
+    * [Issue #1834](https://bitbucket.org/osrf/gazebo/issues/1834)
 
-1. Building editor updates
+1. Building editor: Add layers to building levels
+    * [Pull request #2180](https://bitbucket.org/osrf/gazebo/pull-request/2180)
+    * [Issue #1806](https://bitbucket.org/osrf/gazebo/issues/1806)
 
-    1. Add layers to building levels
-        * [Pull request #2180](https://bitbucket.org/osrf/gazebo/pull-request/2180)
-        * [Issue #1806](https://bitbucket.org/osrf/gazebo/issues/1806)
-
-    1. Update gui/building/*Item API
-        * [Pull request #2228](https://bitbucket.org/osrf/gazebo/pull-request/2228)
+1. Building editor: Update gui/building/Item API
+    * [Pull request #2228](https://bitbucket.org/osrf/gazebo/pull-request/2228)
 
 ## Gazebo 7.0.0 (2016-01-25)
 
