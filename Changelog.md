@@ -2,6 +2,10 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
+1. Add Wind support
+    * [Pull request #1985](https://bitbucket.org/osrf/gazebo/pull-request/1985)
+    * A contribution from Olivier Crave
+
 1. Adds an output option to gz log that allows the tool to filter a log file and write to a new log file.
     * [Pull request #2149](https://bitbucket.org/osrf/gazebo/pull-request/2149)
 
