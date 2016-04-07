@@ -18,6 +18,7 @@
 #include <tinyxml.h>
 #include <math.h>
 #include <sstream>
+#include <memory>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/unordered_map.hpp>
@@ -1489,6 +1490,7 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
   // indices, used for identifying vertices that can be shared.
   std::map<unsigned int, std::vector<GeometryIndices> > vertexIndexMap;
   unsigned int *values = new unsigned int[inputs.size()];
+  memset(values, 0, inputs.size());
 
   std::vector<std::string> strs;
   boost::split(strs, pStr, boost::is_any_of("   "));
@@ -1678,7 +1680,7 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
                                   const ignition::math::Matrix4d &_transform,
                                   Mesh *_mesh)
 {
-  SubMesh *subMesh = new SubMesh;
+  std::unique_ptr<SubMesh> subMesh(new SubMesh);
   subMesh->SetName(this->dataPtr->currentNodeName);
   bool combinedVertNorms = false;
 
@@ -1947,7 +1949,7 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
   }
 
   delete [] values;
-  _mesh->AddSubMesh(subMesh);
+  _mesh->AddSubMesh(subMesh.release());
 }
 
 /////////////////////////////////////////////////
