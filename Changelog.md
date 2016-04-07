@@ -19,6 +19,7 @@
 
 1. Added static camera when following a model.
     * [Pull request #1980](https://bitbucket.org/osrf/gazebo/pull-request/1980)
+    * A contribution from Oliver Crave
 
 1. Support conversions between SDF and protobuf for more sensors.
     * [Pull request #2118](https://bitbucket.org/osrf/gazebo/pull-request/2118)
@@ -38,11 +39,16 @@
 
 ## Gazebo 7.1.0 (2016-04-07)
 
+1. fix: remove back projection
+    * [Pull request 2201](https://bitbucket.org/osrf/gazebo/pull-request/2201)
+    * A contribution from Yuki Furuta
+
 1. Fix oculus 2 camera field of view
     * [Pull request 2157](https://bitbucket.org/osrf/gazebo/pull-request/2157)
 
 1. Added BeforePhysicsUpdate world event
     * [Pull request 2128](https://bitbucket.org/osrf/gazebo/pull-request/2128)
+    * A contribution from Martin Pecka
 
 1. Update `gz sdf -c` command line tool to use the new `sdf::convertFile` API.
     * [Pull request #2227](https://bitbucket.org/osrf/gazebo/pull-requests/2227)
@@ -120,6 +126,7 @@
 1. Display physics engine type in the GUI
     * [Pull request #2155](https://bitbucket.org/osrf/gazebo/pull-requests/2155)
     * [Issue #1121](https://bitbucket.org/osrf/gazebo/issues/1121)
+    * A contribution from Mohamd Ayman
 
 1. Fix compilation against ffmpeg3 (libavcodec)
     * [Pull request #2154](https://bitbucket.org/osrf/gazebo/pull-request/2154)
@@ -141,6 +148,7 @@
 
 1. Fix use of not initialized static attribute in Light class
     * [Pull request 2075](https://bitbucket.org/osrf/gazebo/pull-request/2075)
+    * A contribution from Silvio Traversaro
 
 1. Install GuiTypes header
     * [Pull request 2106](https://bitbucket.org/osrf/gazebo/pull-request/2106)
@@ -515,6 +523,10 @@ using the same arguments used in the command line.
 ## Gazebo 6.0
 
 ### Gazebo 6.6.0 (2016-04-07)
+
+1. fix: remove back projection
+    * [Pull request 2201](https://bitbucket.org/osrf/gazebo/pull-request/2201)
+    * A contribution from Yuki Furuta
 
 1. Backport depth camera OSX fix and test
     * [Pull request 2230](https://bitbucket.org/osrf/gazebo/pull-request/2230)
@@ -999,6 +1011,7 @@ compilation on Windows.
 
 1. fix: remove back projection
     * [Pull request 2201](https://bitbucket.org/osrf/gazebo/pull-request/2201)
+    * A contribution from Yuki Furuta
 
 1. Backport depth camera OSX fix and test
     * [Pull request 2230](https://bitbucket.org/osrf/gazebo/pull-request/2230)
@@ -1026,6 +1039,7 @@ compilation on Windows.
 
 1. Fix_send_message (backport of pull request #1951)
     * [Pull request 1964](https://bitbucket.org/osrf/gazebo/pull-request/1964)
+    * A contribution from Samuel Lekieffre
 
 1. Export the media path in the cmake config file.
     * [Pull request 1933](https://bitbucket.org/osrf/gazebo/pull-request/1933)
