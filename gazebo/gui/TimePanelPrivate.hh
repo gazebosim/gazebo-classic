@@ -30,18 +30,6 @@ namespace gazebo
     /// \brief Private data for the TimePanel class
     class TimePanelPrivate
     {
-      /// \brief Node used for communication.
-      public: transport::NodePtr node;
-
-      /// \brief Subscriber to the statistics topic.
-      public: transport::SubscriberPtr statsSub;
-
-      /// \brief Used to start, stop, and step simulation.
-      public: transport::PublisherPtr worldControlPub;
-
-      /// \brief Event based connections.
-      public: std::vector<event::ConnectionPtr> connections;
-
       /// \brief List of simulation times used to compute averages.
       public: std::list<common::Time> simTimes;
 
@@ -59,6 +47,18 @@ namespace gazebo
 
       /// \brief Paused state of the simulation.
       public: LogPlayWidget *logPlayWidget;
+
+      /// \brief Node used for communication.
+      public: transport::NodePtr node;
+
+      /// \brief Subscriber to the statistics topic.
+      public: transport::SubscriberPtr statsSub;
+
+      /// \brief Used to start, stop, and step simulation.
+      public: transport::PublisherPtr worldControlPub;
+
+      /// \brief Event based connections.
+      public: std::vector<event::ConnectionPtr> connections;
     };
   }
 }
