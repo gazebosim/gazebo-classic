@@ -89,6 +89,7 @@ void Collision::Fini()
     msgs::Request *msg = msgs::CreateRequest("entity_delete",
         this->GetScopedName()+"__COLLISION_VISUAL__");
     this->requestPub->Publish(*msg, true);
+    delete msg;
   }
 
   Entity::Fini();

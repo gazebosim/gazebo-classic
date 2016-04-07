@@ -86,6 +86,7 @@ namespace gazebo
 
       /// \brief Reset the link.
       public: void Reset();
+      using Entity::Reset;
 
       /// \brief Reset the velocity, acceleration, force and torque of link.
       public: void ResetPhysicsStates();

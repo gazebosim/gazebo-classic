@@ -590,6 +590,7 @@ void Entity::Fini()
     msgs::Request *msg = msgs::CreateRequest("entity_delete",
         this->GetScopedName());
     this->requestPub->Publish(*msg, true);
+    delete msg;
   }
 
   this->parentEntity.reset();

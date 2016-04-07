@@ -97,6 +97,7 @@ namespace gazebo
 
       /// \brief Reset the model.
       public: void Reset();
+      using Entity::Reset;
 
       /// \brief Reset the velocity, acceleration, force and torque of
       /// all child links.
