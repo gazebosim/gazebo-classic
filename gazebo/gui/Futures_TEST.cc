@@ -23,6 +23,8 @@
 /////////////////////////////////////////////////
 void Futures_TEST::Verify()
 {
+  this->Load("worlds/shapes.world", false, false, false);
+
   QVERIFY(gazebo::gui::Futures::introspectionClientFuture.valid());
   gazebo::gui::Futures::introspectionClientFuture.wait();
 }
