@@ -17,6 +17,7 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/util/LogRecord.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/Server.hh"
 
 //////////////////////////////////////////////////
@@ -45,6 +46,14 @@ int main(int argc, char **argv)
   catch(gazebo::common::Exception &_e)
   {
     _e.Print();
+
+    server->Fini();
+    delete server;
+    return -1;
+  }
+  catch(Ogre::Exception &_e)
+  {
+    gzerr << "Ogre Error:" << _e.getFullDescription() << "\n";
 
     server->Fini();
     delete server;
