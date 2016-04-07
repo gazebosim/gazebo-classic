@@ -99,6 +99,8 @@ void ModelManipulator::Init()
       this->dataPtr->scene->WorldVisual()));
   this->dataPtr->selectionObj->Load();
 
+  this->dataPtr->transparent = false;
+
   this->dataPtr->initialized = true;
 }
 
@@ -384,7 +386,8 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
       }
     }
 
-    if (this->dataPtr->keyEvent.key == Qt::Key_Shift || geomType == "sphere")
+    if (QApplication::keyboardModifiers() & Qt::ShiftModifier ||
+        geomType == "sphere")
     {
       scale = this->UpdateScale(_axis, scale, "sphere");
     }
@@ -434,8 +437,16 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
       if (childVis != this->dataPtr->selectionObj &&
           geomType != "" && geomType != "mesh")
       {
-        math::Vector3 geomScale = this->UpdateScale(_axis, scale,
-            childVis->GetGeometryType());
+        math::Vector3 geomScale;
+        if (QApplication::keyboardModifiers() & Qt::ShiftModifier)
+        {
+          geomScale = this->UpdateScale(_axis, scale, "sphere");
+        }
+        else
+        {
+          geomScale = this->UpdateScale(_axis, scale, geomType);
+        }
+
         math::Vector3 newScale = this->dataPtr->mouseChildVisualScale[i]
             * geomScale.GetAbs();
 
@@ -447,6 +458,7 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
           newScale.y = std::max(1e-4, newScale.y);
           newScale.z = std::max(1e-4, newScale.z);
         }
+
         childVis->SetScale(newScale);
         Events::scaleEntity(childVis->GetName(), newScale);
       }
@@ -689,6 +701,12 @@ void ModelManipulator::OnMouseMoveEvent(const common::MouseEvent &_event)
     if (this->dataPtr->mouseMoveVis &&
         this->dataPtr->mouseEvent.Button() == common::MouseEvent::LEFT)
     {
+      if (this->dataPtr->transparent)
+      {
+        this->dataPtr->mouseMoveVis->SetTransparency(
+          (1.0 - this->dataPtr->mouseMoveVis->GetTransparency()) * 0.5);
+        this->dataPtr->transparent = false;
+      }
       math::Vector3 axis = math::Vector3::Zero;
       if (this->dataPtr->keyEvent.key == Qt::Key_X)
         axis.x = 1;
@@ -823,6 +841,8 @@ void ModelManipulator::OnMouseReleaseEvent(const common::MouseEvent &_event)
     // server
     if (this->dataPtr->mouseMoveVis)
     {
+      this->dataPtr->mouseMoveVis->SetTransparency(
+        std::abs(this->dataPtr->mouseMoveVis->GetTransparency()*2.0-1.0));
       if (this->dataPtr->manipMode == "scale")
       {
         this->dataPtr->selectionObj->UpdateSize();
@@ -889,6 +909,7 @@ void ModelManipulator::SetMouseMoveVisual(rendering::VisualPtr _vis)
   this->dataPtr->mouseMoveVis = _vis;
   if (_vis)
   {
+    this->dataPtr->transparent = true;
     this->dataPtr->mouseVisualScale = _vis->GetScale();
     this->dataPtr->mouseChildVisualScale.clear();
     // keep track of all child visual scale for scaling to work in
@@ -923,7 +944,7 @@ void ModelManipulator::OnKeyPressEvent(const common::KeyEvent &_event)
             this->dataPtr->mouseMoveVis->GetWorldPose();
       }
     }
-    else  if (this->dataPtr->keyEvent.key == Qt::Key_Shift)
+    else if (QApplication::keyboardModifiers() & Qt::ShiftModifier)
     {
       this->dataPtr->globalManip = true;
       this->dataPtr->selectionObj->SetGlobal(this->dataPtr->globalManip);
@@ -950,7 +971,7 @@ void ModelManipulator::OnKeyReleaseEvent(const common::KeyEvent &_event)
             this->dataPtr->mouseMoveVis->GetWorldPose();
       }
     }
-    else  if (this->dataPtr->keyEvent.key == Qt::Key_Shift)
+    else if (QApplication::keyboardModifiers() & Qt::ShiftModifier)
     {
       this->dataPtr->globalManip = false;
       this->dataPtr->selectionObj->SetGlobal(this->dataPtr->globalManip);

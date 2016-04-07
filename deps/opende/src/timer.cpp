@@ -30,8 +30,8 @@ TODO
 
 */
 
-#include <ode/common.h>
-#include <ode/timer.h>
+#include <gazebo/ode/common.h>
+#include <gazebo/ode/timer.h>
 #include "config.h"
 #include "util.h"
 
@@ -192,7 +192,7 @@ static inline void getClockCount (unsigned long cc[2])
 #else // macintosh
 
 #include <CoreServices/CoreServices.h>
-#include <ode/Timer.h>
+#include <gazebo/ode/Timer.h>
 
 static inline void getClockCount (unsigned long cc[2])
 {

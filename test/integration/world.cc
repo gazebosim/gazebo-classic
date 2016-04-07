@@ -351,6 +351,127 @@ TEST_F(WorldTest, RemoveModelUnPaused)
   EXPECT_FALSE(boxModel != NULL);
 }
 
+/// \brief Pose before simulation step
+math::Pose initialPose;
+/// \brief Pose before physics update
+math::Pose poseBeforeUpdate;
+/// \brief Has the WorldUpdateBegin event been called
+bool updateBeginCalled = false;
+/// \brief Has the BeforePhysicsUpdate event been called
+bool beforePhysicsUpdateCalled = false;
+/// \brief Has the WorldUpdateEnd event been called
+bool updateEndCalled = false;
+
+/// \brief Callback for WorldUpdateBegin event, just records it's been called.
+/// \param[in] updateInfo Information about the event time and world.
+void onWorldUpdateBegin(const common::UpdateInfo&)
+{
+  updateBeginCalled = true;
+}
+
+/// \brief Callback for BeforePhysicsUpdate event.
+/// \param[in] updateInfo Information about the event time and world.
+///
+/// Record it's been called and also record the reported ball position.
+void beforePhysicsUpdate(const common::UpdateInfo& updateInfo)
+{
+  beforePhysicsUpdateCalled = true;
+
+  physics::WorldPtr world = physics::get_world(updateInfo.worldName);
+  ASSERT_TRUE(world != NULL);
+
+  physics::ModelPtr sphereModel = world->GetModel("sphere");
+  ASSERT_TRUE(sphereModel != NULL);
+
+  physics::LinkPtr link = sphereModel->GetLink("link");
+  ASSERT_TRUE(link != NULL);
+
+  poseBeforeUpdate = link->GetWorldPose();
+}
+
+/// \brief Callback for WorldUpdateEnd event, just records it's been called.
+void onWorldUpdateEnd()
+{
+  updateEndCalled = true;
+}
+
+/////////////////////////////////////////////////
+TEST_F(WorldTest, CheckWorldEventsWork)
+{
+  // Check if WorldUpdateBegin, BeforePhysicsUpdate and WorldUpdateEnd events
+  // are called, and if the BeforePhysicsUpdate event is really called before
+  // the physics engine update happens
+
+  Load("worlds/shapes.world");
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  physics::ModelPtr sphereModel = world->GetModel("sphere");
+  ASSERT_TRUE(sphereModel != NULL);
+
+  physics::LinkPtr link = sphereModel->GetLink("link");
+  ASSERT_TRUE(link != NULL);
+
+  // run the world for a while just to stabilize
+  world->Step(10);
+
+  // initial pose of the link
+  initialPose = link->GetWorldPose();
+
+  // connect to the world events
+  event::ConnectionPtr worldUpdateBeginEventConnection =
+    event::Events::ConnectWorldUpdateBegin(&onWorldUpdateBegin);
+
+  event::ConnectionPtr beforePhysicsUpdateConnection =
+    event::Events::ConnectBeforePhysicsUpdate(&beforePhysicsUpdate);
+
+  event::ConnectionPtr worldUpdateEndEventConnection =
+    event::Events::ConnectWorldUpdateEnd(&onWorldUpdateEnd);
+
+  // iterate for a while pushing to the ball and check the events get called
+  // and that the pose changes only after BeforePhysicUpdate is called.
+  for (size_t i = 0; i < 100; i++)
+  {
+    ASSERT_FALSE(updateBeginCalled);
+    ASSERT_FALSE(beforePhysicsUpdateCalled);
+    ASSERT_FALSE(updateEndCalled);
+
+    // push to the ball
+    link->AddForce(math::Vector3(1000, 0, 0));
+
+    world->Step(1);
+
+    // pose after the physics update
+    math::Pose poseAfterUpdate = link->GetWorldPose();
+
+    // initial pose and pose before physics update should be the same
+    EXPECT_EQ(initialPose.pos.x, poseBeforeUpdate.pos.x);
+    EXPECT_EQ(initialPose.pos.y, poseBeforeUpdate.pos.y);
+    EXPECT_EQ(initialPose.pos.z, poseBeforeUpdate.pos.z);
+
+    // pose before physics update and after it should be different
+    EXPECT_FALSE(
+            fabs(poseAfterUpdate.pos.x - poseBeforeUpdate.pos.x) +
+                    fabs(poseAfterUpdate.pos.y - poseBeforeUpdate.pos.y) +
+                    fabs(poseAfterUpdate.pos.z - poseBeforeUpdate.pos.z)
+            < 1e-9);
+
+    // the events should get called
+    EXPECT_TRUE(updateBeginCalled);
+    EXPECT_TRUE(beforePhysicsUpdateCalled);
+    EXPECT_TRUE(updateEndCalled);
+
+    updateBeginCalled = beforePhysicsUpdateCalled = updateEndCalled = false;
+    // remember the current pose to compare it in the next iteration
+    initialPose = poseAfterUpdate;
+  }
+
+  // disconnect from world events
+  event::Events::DisconnectWorldUpdateBegin(worldUpdateBeginEventConnection);
+  event::Events::DisconnectBeforePhysicsUpdate(beforePhysicsUpdateConnection);
+  event::Events::DisconnectWorldUpdateEnd(worldUpdateEndEventConnection);
+}
+
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
 {

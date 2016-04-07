@@ -532,7 +532,12 @@ ShapePtr ODEPhysics::CreateShape(const std::string &_type,
   else if (_type == "polyline")
     shape.reset(new ODEPolylineShape(collision));
   else if (_type == "multiray")
-    shape.reset(new ODEMultiRayShape(collision));
+  {
+    if (_collision)
+      shape.reset(new ODEMultiRayShape(collision));
+    else
+      shape.reset(new ODEMultiRayShape(this->world->GetPhysicsEngine()));
+  }
   else if (_type == "mesh" || _type == "trimesh")
     shape.reset(new ODEMeshShape(collision));
   else if (_type == "heightmap")
@@ -540,10 +545,12 @@ ShapePtr ODEPhysics::CreateShape(const std::string &_type,
   else if (_type == "map" || _type == "image")
     shape.reset(new MapShape(collision));
   else if (_type == "ray")
+  {
     if (_collision)
       shape.reset(new ODERayShape(collision));
     else
       shape.reset(new ODERayShape(this->world->GetPhysicsEngine()));
+  }
   else
     gzerr << "Unable to create collision of type[" << _type << "]\n";
 

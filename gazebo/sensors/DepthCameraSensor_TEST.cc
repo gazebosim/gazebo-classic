@@ -16,6 +16,7 @@
 */
 
 #include <functional>
+#include <mutex>
 
 #include <gtest/gtest.h>
 
@@ -62,8 +63,8 @@ TEST_F(DepthCameraSensor_TEST, CreateDepthCamera)
   // Make sure the above dynamic cast worked.
   EXPECT_TRUE(sensor != NULL);
 
-  EXPECT_EQ(sensor->ImageWidth(), 640);
-  EXPECT_EQ(sensor->ImageHeight(), 480);
+  EXPECT_EQ(sensor->ImageWidth(), 640u);
+  EXPECT_EQ(sensor->ImageHeight(), 480u);
   EXPECT_TRUE(sensor->IsActive());
 
   rendering::DepthCameraPtr depthCamera = sensor->DepthCamera();
@@ -93,6 +94,17 @@ TEST_F(DepthCameraSensor_TEST, CreateDepthCamera)
     EXPECT_TRUE(g_depthBuffer[i] <= depthCamera->FarClip());
     EXPECT_TRUE(g_depthBuffer[i] >= depthCamera->NearClip());
     EXPECT_TRUE(!ignition::math::equal(g_depthBuffer[i], 0.0f));
+  }
+
+  // sphere with radius 1m is at 2m in front of depth camera
+  // so verify depth readings are between 1-2m in the mid row
+  unsigned int halfHeight =
+    static_cast<unsigned int>(sensor->ImageHeight()*0.5)-1;
+  for (unsigned int i = sensor->ImageWidth()*halfHeight;
+      i < sensor->ImageWidth()*(halfHeight+1); ++i)
+  {
+    EXPECT_TRUE(g_depthBuffer[i] < 2.0f);
+    EXPECT_TRUE(g_depthBuffer[i] >= 1.0f);
   }
 
   if (g_depthBuffer)

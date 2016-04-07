@@ -238,6 +238,10 @@ MainWindow::MainWindow()
   connect(this, SIGNAL(AddPlugins()),
           this, SLOT(OnAddPlugins()), Qt::QueuedConnection);
 
+  // Use a signal/slot to track a visual. This makes the process thread safe.
+  connect(this, SIGNAL(TrackVisual(const std::string &)),
+          this, SLOT(OnTrackVisual(const std::string &)), Qt::QueuedConnection);
+
   // Create data logger dialog
   this->dataPtr->dataLogger = new gui::DataLogger(this);
   connect(this->dataPtr->dataLogger, SIGNAL(rejected()), this, SLOT(
@@ -964,6 +968,21 @@ void MainWindow::ShowLinkFrame()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::ShowSkeleton()
+{
+  if (g_showSkeletonAct->isChecked())
+  {
+    transport::requestNoReply(this->dataPtr->node->GetTopicNamespace(),
+        "show_skeleton", "all");
+  }
+  else
+  {
+    transport::requestNoReply(this->dataPtr->node->GetTopicNamespace(),
+        "hide_skeleton", "all");
+  }
+}
+
+/////////////////////////////////////////////////
 void MainWindow::ShowContacts()
 {
   if (g_showContactsAct->isChecked())
@@ -1300,6 +1319,13 @@ void MainWindow::CreateActions()
   connect(g_showLinkFrameAct, SIGNAL(triggered()), this,
       SLOT(ShowLinkFrame()));
 
+  g_showSkeletonAct = new QAction(tr("Skeletons"), this);
+  g_showSkeletonAct->setStatusTip(tr("Show skeletons"));
+  g_showSkeletonAct->setCheckable(true);
+  g_showSkeletonAct->setChecked(false);
+  connect(g_showSkeletonAct, SIGNAL(triggered()), this,
+      SLOT(ShowSkeleton()));
+
   g_showContactsAct = new QAction(tr("Contacts"), this);
   g_showContactsAct->setStatusTip(tr("Show Contacts"));
   g_showContactsAct->setCheckable(true);
@@ -1392,18 +1418,20 @@ void MainWindow::CreateActions()
       SLOT(CaptureScreenshot()));
 
   g_copyAct = new QAction(QIcon(":/images/copy_object.png"),
-      tr("Copy (Ctrl + C)"), this);
+      tr("Copy"), this);
   g_copyAct->setStatusTip(tr("Copy Entity"));
   g_copyAct->setCheckable(false);
   this->CreateDisabledIcon(":/images/copy_object.png", g_copyAct);
   g_copyAct->setEnabled(false);
+  g_copyAct->setShortcut(tr("Ctrl+C"));
 
   g_pasteAct = new QAction(QIcon(":/images/paste_object.png"),
-      tr("Paste (Ctrl + V)"), this);
+      tr("Paste"), this);
   g_pasteAct->setStatusTip(tr("Paste Entity"));
   g_pasteAct->setCheckable(false);
   this->CreateDisabledIcon(":/images/paste_object.png", g_pasteAct);
   g_pasteAct->setEnabled(false);
+  g_pasteAct->setShortcut(tr("Ctrl+V"));
 
   g_snapAct = new QAction(QIcon(":/images/magnet.png"),
       tr("Snap Mode (N)"), this);
@@ -1518,9 +1546,10 @@ void MainWindow::CreateActions()
 
   // Undo
   g_undoAct = new QAction(QIcon(":/images/undo.png"),
-      tr("Undo (Ctrl + Z)"), this);
+      tr("Undo"), this);
   g_undoAct->setShortcut(tr("Ctrl+Z"));
   g_undoAct->setCheckable(false);
+  g_undoAct->setStatusTip(tr("Undo"));
   this->CreateDisabledIcon(":/images/undo.png", g_undoAct);
   g_undoAct->setEnabled(false);
 
@@ -1533,9 +1562,10 @@ void MainWindow::CreateActions()
 
   // Redo
   g_redoAct = new QAction(QIcon(":/images/redo.png"),
-      tr("Redo (Shift + Ctrl + Z)"), this);
+      tr("Redo"), this);
   g_redoAct->setShortcut(tr("Shift+Ctrl+Z"));
   g_redoAct->setCheckable(false);
+  g_redoAct->setStatusTip(tr("Redo"));
   this->CreateDisabledIcon(":/images/redo.png", g_redoAct);
   g_redoAct->setEnabled(false);
 
@@ -1718,6 +1748,9 @@ void MainWindow::DeleteActions()
   delete g_showLinkFrameAct;
   g_showLinkFrameAct = 0;
 
+  delete g_showSkeletonAct;
+  g_showSkeletonAct = 0;
+
   delete g_showContactsAct;
   g_showContactsAct = 0;
 
@@ -1801,11 +1834,18 @@ void MainWindow::CreateMenuBar()
   fileMenu->addAction(g_quitAct);
 
   this->dataPtr->editMenu = bar->addMenu(tr("&Edit"));
+  this->dataPtr->editMenu->addAction(g_undoAct);
+  this->dataPtr->editMenu->addAction(g_redoAct);
+  this->dataPtr->editMenu->addSeparator();
+  this->dataPtr->editMenu->addAction(g_copyAct);
+  this->dataPtr->editMenu->addAction(g_pasteAct);
+  this->dataPtr->editMenu->addSeparator();
   this->dataPtr->editMenu->addAction(g_resetModelsAct);
   this->dataPtr->editMenu->addAction(g_resetWorldAct);
   this->dataPtr->editMenu->addSeparator();
   this->dataPtr->editMenu->addAction(g_editBuildingAct);
   this->dataPtr->editMenu->addAction(g_editModelAct);
+
 
   // \TODO: Add this back in when implementing the full Terrain Editor spec.
   // editMenu->addAction(g_editTerrainAct);
@@ -1833,6 +1873,7 @@ void MainWindow::CreateMenuBar()
   viewMenu->addAction(g_showInertiaAct);
   viewMenu->addAction(g_showContactsAct);
   viewMenu->addAction(g_showLinkFrameAct);
+  viewMenu->addAction(g_showSkeletonAct);
 
   QMenu *windowMenu = bar->addMenu(tr("&Window"));
   windowMenu->addAction(g_topicVisAct);
@@ -1953,17 +1994,38 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
 
     if (_msg->camera().has_track())
     {
-      std::string name = _msg->camera().track().name();
+      if (_msg->camera().track().has_static_())
+        cam->SetTrackIsStatic(_msg->camera().track().static_());
 
-      double minDist = 0.0;
-      double maxDist = 0.0;
+      if (_msg->camera().track().has_use_model_frame())
+        cam->SetTrackUseModelFrame(_msg->camera().track().use_model_frame());
+
+      if (_msg->camera().track().has_xyz())
+        cam->SetTrackPosition(msgs::ConvertIgn(_msg->camera().track().xyz()));
+
+      if (_msg->camera().track().has_inherit_yaw())
+        cam->SetTrackInheritYaw(_msg->camera().track().inherit_yaw());
 
       if (_msg->camera().track().has_min_dist())
-        minDist = _msg->camera().track().min_dist();
-      if (_msg->camera().track().has_max_dist())
-        maxDist = _msg->camera().track().max_dist();
+      {
+        double minDist = _msg->camera().track().min_dist();
+        cam->SetTrackMinDistance(minDist);
+      }
 
-      cam->AttachToVisual(name, false, minDist, maxDist);
+      if (_msg->camera().track().has_max_dist())
+      {
+        double maxDist = _msg->camera().track().max_dist();
+        cam->SetTrackMaxDistance(maxDist);
+      }
+
+      if (_msg->camera().track().has_name() &&
+          _msg->camera().track().name() != "__default__")
+      {
+        std::string name = _msg->camera().track().name();
+        cam->TrackVisual(name);
+        // Call the signal to track a visual in the main thread.
+        this->TrackVisual(name);
+      }
     }
   }
 
@@ -2016,6 +2078,12 @@ void MainWindow::OnAddPlugins()
 
   g_overlayAct->setChecked(true);
   g_overlayAct->setEnabled(true);
+}
+
+/////////////////////////////////////////////////
+void MainWindow::OnTrackVisual(const std::string &_visualName)
+{
+  gui::Events::follow(_visualName);
 }
 
 /////////////////////////////////////////////////
@@ -2345,6 +2413,7 @@ void MainWindow::OnWindowMode(const std::string &_mode)
   g_showCOMAct->setVisible(simOrLog);
   g_showInertiaAct->setVisible(simOrLog);
   g_showLinkFrameAct->setVisible(simOrLog);
+  g_showSkeletonAct->setVisible(simOrLog);
   g_showContactsAct->setVisible(simOrLog);
   g_showJointsAct->setVisible(simOrLog);
 
@@ -2367,4 +2436,7 @@ void MainWindow::OnWindowMode(const std::string &_mode)
             this->dataPtr->insertModel) == -1)
     this->dataPtr->tabWidget->insertTab(1, this->dataPtr->insertModel,
       "Insert");
+
+  // User commands
+  this->dataPtr->userCmdHistory->SetActive(simulation);
 }

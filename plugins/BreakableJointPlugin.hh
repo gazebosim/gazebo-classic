@@ -14,11 +14,9 @@
  * limitations under the License.
  *
 */
+#ifndef _GAZEBO_PLUGINS_BREAKABLE_JOINT_PLUGIN_HH_
+#define _GAZEBO_PLUGINS_BREAKABLE_JOINT_PLUGIN_HH_
 
-#ifndef _GAZEBO_BREAKABLE_JOINT_PLUGIN_HH_
-#define _GAZEBO_BREAKABLE_JOINT_PLUGIN_HH_
-
-#include "plugins/ForceTorquePlugin.hh"
 #include "gazebo/sensors/sensors.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/common/Events.hh"
@@ -27,7 +25,7 @@
 namespace gazebo
 {
   /// \brief A plugin for breakable joints, based on a ForceTorque sensor plugin
-  class GAZEBO_VISIBLE BreakableJointPlugin : public ForceTorquePlugin
+  class GAZEBO_VISIBLE BreakableJointPlugin : public SensorPlugin
   {
     /// \brief Constructor
     public: BreakableJointPlugin();
@@ -55,6 +53,12 @@ namespace gazebo
 
     /// \brief Breaking force threshold (N).
     private: double breakingForce;
+
+    /// \brief The parent sensor
+    private: sensors::ForceTorqueSensorPtr parentSensor;
+
+    /// \brief Pointer to the update event connection
+    private: event::ConnectionPtr connection;
   };
 }
 #endif

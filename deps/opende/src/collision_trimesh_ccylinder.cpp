@@ -50,10 +50,10 @@
 //edge, and it needs to be solved as a special case probably. This is a
 //problem we are looking forward to address soon.
 
-#include <ode/collision.h>
-#include <ode/matrix.h>
-#include <ode/rotation.h>
-#include <ode/odemath.h>
+#include <gazebo/ode/collision.h>
+#include <gazebo/ode/matrix.h>
+#include <gazebo/ode/rotation.h>
+#include <gazebo/ode/odemath.h>
 #include "config.h"
 #include "collision_util.h"
 #include "collision_trimesh_internal.h"

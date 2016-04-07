@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_FORCE_TORQUE_PLUGIN_HH_
-#define _GAZEBO_FORCE_TORQUE_PLUGIN_HH_
+#ifndef _GAZEBO_PLUGINS_FORCE_TORQUE_PLUGIN_HH_
+#define _GAZEBO_PLUGINS_FORCE_TORQUE_PLUGIN_HH_
 
 #include "gazebo/sensors/sensors.hh"
 #include "gazebo/common/Plugin.hh"
