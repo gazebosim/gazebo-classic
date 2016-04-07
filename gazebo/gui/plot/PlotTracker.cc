@@ -15,8 +15,6 @@
  *
 */
 
-#include <iostream>
-
 #include <ignition/math/Helpers.hh>
 
 #include "gazebo/gui/qt.h"
@@ -97,10 +95,10 @@ PlotTracker::PlotTracker(QWidget *_canvas)
   : QwtPlotPicker(_canvas), dataPtr(new PlotTrackerPrivate)
 {
   this->setTrackerMode(QwtPlotPicker::AlwaysOn);
+  this->setRubberBand(QwtPicker::VLineRubberBand);
 
 #if (QWT_VERSION >= ((6 << 16) | (1 << 8) | 0))
   this->setStateMachine(new QwtPickerTrackerMachine());
-  this->setRubberBand(QwtPicker::VLineRubberBand);
 #endif
 }
 
@@ -136,8 +134,15 @@ void PlotTracker::updateDisplay()
     if (!widget)
       return;
 
-    if (this->dataPtr->hoverLineWidget == NULL)
+    if (!this->dataPtr->hoverLineWidget)
       this->dataPtr->hoverLineWidget = new HoverLineWidget(this, widget);
+
+    if (this->trackerPosition().x() < 0 ||
+        this->rubberBand() == QwtPicker::NoRubberBand)
+    {
+      this->dataPtr->hoverLineWidget->hide();
+      return;
+    }
 
     // resize in case parent widget size changed.
     this->dataPtr->hoverLineWidget->resize(widget->size());
@@ -178,6 +183,20 @@ void PlotTracker::updateDisplay()
     }
   }
 #endif
+}
+
+/////////////////////////////////////////////////
+void PlotTracker::widgetMousePressEvent(QMouseEvent *_e)
+{
+  this->setRubberBand(QwtPicker::NoRubberBand);
+  QwtPicker::widgetMousePressEvent(_e);
+}
+
+/////////////////////////////////////////////////
+void PlotTracker::widgetMouseReleaseEvent(QMouseEvent *_e)
+{
+  this->setRubberBand(QwtPicker::VLineRubberBand);
+  QwtPicker::widgetMouseReleaseEvent(_e);
 }
 
 /////////////////////////////////////////////////

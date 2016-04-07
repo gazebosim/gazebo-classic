@@ -39,16 +39,26 @@ namespace gazebo
       public: PlotTracker(QWidget *_canvas);
 #endif
 
-      /// \brief Update the hover text, also known as the tracker text.
+      /// \brief Update the tracker text.
       public: void Update();
 
       /// \brief Overriden to update the hover line and tracker text.
-      public: void updateDisplay();
+      protected: virtual void updateDisplay();
 
       /// \brief Overriden to provide customized hover text
       /// \param[in] _pos Mouse position
       /// \return Text to display
       protected: virtual QwtText trackerTextF(const QPointF &_pos) const;
+
+      /// \brief Mouse press event used to determine when to show/hide hover
+      /// line
+      /// \param[in] _e Qt mouse event.
+      protected: virtual void widgetMousePressEvent(QMouseEvent *_e);
+
+      /// \brief Mouse release event used to determine when to show/hide hover
+      /// line
+      /// \param[in] _e Qt mouse event.
+      protected: virtual void widgetMouseReleaseEvent(QMouseEvent *_e);
 
       /// \brief Get curve information at a point
       /// \param[in] _curve Plot curve instance

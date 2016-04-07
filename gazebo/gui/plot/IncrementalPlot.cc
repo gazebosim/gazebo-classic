@@ -218,6 +218,7 @@ IncrementalPlot::IncrementalPlot(QWidget *_parent)
       Qt::RightButton, Qt::ControlModifier);
   this->dataPtr->zoomer->setMousePattern(QwtEventPattern::MouseSelect3,
       Qt::NoButton);
+  this->dataPtr->zoomer->setTrackerMode(QwtPicker::AlwaysOff);
 
   // zoom in/out with the wheel
   this->dataPtr->magnifier = new PlotMagnifier(this->canvas());
