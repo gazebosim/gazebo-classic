@@ -38,7 +38,6 @@ common::Color Conversions::Convert(const QColor &_color)
                        _color.alpha() / 255.0);
 }
 
-
 //////////////////////////////////////////////////
 QPointF Conversions::Convert(const ignition::math::Vector2d &_pt)
 {
@@ -50,3 +49,16 @@ ignition::math::Vector2d Conversions::Convert(const QPointF &_pt)
 {
   return ignition::math::Vector2d(_pt.x(), _pt.y());
 }
+
+//////////////////////////////////////////////////
+QVector3D Conversions::Convert(const ignition::math::Vector3d &_vec)
+{
+  return QVector3D(_vec.X(), _vec.Y(), _vec.Z());
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d Conversions::Convert(const QVector3D &_vec)
+{
+  return ignition::math::Vector3d(_vec.x(), _vec.y(), _vec.z());
+}
+

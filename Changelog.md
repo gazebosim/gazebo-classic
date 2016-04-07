@@ -2,8 +2,14 @@
 
 ## Gazebo 7.x.x (2016-xx-xx)
 
+1. Update `gz sdf -c` command line tool to use the new `sdf::convertFile` API.
+    * [Pull request #2227](https://bitbucket.org/osrf/gazebo/pull-requests/2227)
+
 1. Process insertions on World::SetState
     * [Pull request #2200](https://bitbucket.org/osrf/gazebo/pull-requests/2200)
+
+1. Process deletions on World::SetState
+    * [Pull request #2204](https://bitbucket.org/osrf/gazebo/pull-requests/2204)
 
 1. Allow dynamically adding links to a model.
     * [Pull request #2185](https://bitbucket.org/osrf/gazebo/pull-requests/2185)
@@ -11,6 +17,9 @@
 1. Fix editing physics parameters in gzclient, update test
     * [Pull request #2192](https://bitbucket.org/osrf/gazebo/pull-requests/2192)
     * [Issue #1876](https://bitbucket.org/osrf/gazebo/issues/1876)
+
+1. Model database selects the latest model version.
+    * [Pull request #2207](https://bitbucket.org/osrf/gazebo/pull-requests/2207)
 
 1. Display physics engine type in the GUI
     * [Pull request #2155](https://bitbucket.org/osrf/gazebo/pull-requests/2155)
@@ -33,6 +42,10 @@
 
 1. Removes one function call and replaces a manual swap with std::swap in ODE heightfield.
     * [Pull request #2114](https://bitbucket.org/osrf/gazebo/pull-request/2114)
+    
+1. New world event: BeforePhysicsUpdate
+    * [Pull request #2128](https://bitbucket.org/osrf/gazebo/pull-request/2128)
+    * [Issue #1851](https://bitbucket.org/osrf/gazebo/issues/1851)
 
 1. Model editor updates
     1. Fix setting relative pose after alignment during joint creation.
@@ -42,11 +55,18 @@
     1. Fix saving and spawning model with its original name
         * [Pull request #2183](https://bitbucket.org/osrf/gazebo/pull-request/2183)
 
+    1. Fix inserting custom links
+        * [Pull request #2222](https://bitbucket.org/osrf/gazebo/pull-request/2222)
+        * [Issue #1834](https://bitbucket.org/osrf/gazebo/issues/1834)
+
 1. Building editor updates
 
     1. Add layers to building levels
         * [Pull request #2180](https://bitbucket.org/osrf/gazebo/pull-request/2180)
         * [Issue #1806](https://bitbucket.org/osrf/gazebo/issues/1806)
+
+    1. Update gui/building/*Item API
+        * [Pull request #2228](https://bitbucket.org/osrf/gazebo/pull-request/2228)
 
 ## Gazebo 7.0.0 (2016-01-25)
 
