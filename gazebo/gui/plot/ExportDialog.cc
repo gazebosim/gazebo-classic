@@ -223,9 +223,6 @@ ExportDialog::ExportDialog(QWidget *_parent,
 
   QStandardItemModel *model = new QStandardItemModel();
 
-  //PlotWindow *plotWindow = static_cast<PlotWindow*>(_parent);
-  //std::list<PlotCanvas*> plots = plotWindow->Plots();
-
   for (auto &plot : _plots)
   {
     QIcon icon(QPixmap::grabWindow(plot->winId()));
@@ -281,6 +278,7 @@ ExportDialog::ExportDialog(QWidget *_parent,
 /////////////////////////////////////////////////
 void ExportDialog::OnSelected()
 {
+  std::cout << "Selected\n";
   this->dataPtr->exportButton->setEnabled(
       this->dataPtr->listView->selectionModel()->selectedIndexes().size() > 0);
 }

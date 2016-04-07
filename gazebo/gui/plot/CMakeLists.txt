@@ -30,6 +30,7 @@ set (headers_install
 
 set (qt_tests_local
   EditableLabel_TEST.cc
+  ExportDialog_TEST.cc
   IntrospectionCurveHandler_TEST.cc
   IncrementalPlot_TEST.cc
   Palette_TEST.cc
