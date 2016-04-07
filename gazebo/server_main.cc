@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <memory>
 #include "gazebo/common/Exception.hh"
 #include "gazebo/util/LogRecord.hh"
 #include "gazebo/common/Console.hh"
@@ -23,7 +24,7 @@
 //////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
-  gazebo::Server *server = NULL;
+  std::unique_ptr<gazebo::Server> server = nullptr;
 
   try
   {
@@ -34,21 +35,18 @@ int main(int argc, char **argv)
     // Initialize the data logger. This will log state information.
     gazebo::util::LogRecord::Instance()->Init("gzserver");
 
-    server = new gazebo::Server();
+    server.reset(new gazebo::Server());
     if (!server->ParseArgs(argc, argv))
       return -1;
 
     server->Run();
     server->Fini();
-
-    delete server;
   }
   catch(gazebo::common::Exception &_e)
   {
     _e.Print();
 
     server->Fini();
-    delete server;
     return -1;
   }
   catch(Ogre::Exception &_e)
@@ -56,7 +54,6 @@ int main(int argc, char **argv)
     gzerr << "Ogre Error:" << _e.getFullDescription() << "\n";
 
     server->Fini();
-    delete server;
     return -1;
   }
 
