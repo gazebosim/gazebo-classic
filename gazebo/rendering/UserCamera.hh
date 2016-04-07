@@ -55,6 +55,7 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual void SetClipDist(float _near, float _far);
+      using Camera::SetClipDist;
 
       /// \brief Generic load function
       public: void Load();
@@ -220,6 +221,7 @@ namespace gazebo
       protected: virtual bool AttachToVisualImpl(VisualPtr _visual,
                      bool _inheritOrientation, double _minDist = 0,
                      double _maxDist = 0);
+      using Camera::AttachToVisualImpl;
 
       // Documentation inherited.
       protected: virtual void AnimationComplete();

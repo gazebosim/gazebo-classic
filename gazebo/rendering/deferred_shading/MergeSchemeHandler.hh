@@ -49,6 +49,19 @@ namespace gazebo
         }
       }
 
+      /// \brief Destructor
+      public: ~MergeSchemeHandler()
+      {
+        delete this->materialGenerator;
+      }
+
+      /// Delete copy constructor: no copy
+      public: MergeSchemeHandler(const MergeSchemeHandler& x) = delete;
+
+      /// Delete assignment operator: no assignment
+      public: MergeSchemeHandler &operator=(
+                  const MergeSchemeHandler& x) = delete;
+
       /// @copydoc MaterialManager::Listener::handleSchemeNotFound
       public: virtual Ogre::Technique *handleSchemeNotFound(
                   uint16_t _schemeIndex,

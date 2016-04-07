@@ -195,6 +195,7 @@ namespace gazebo
 
       // Documentation inherited
       public: void Load() override;
+      using Camera::Load;
 
       // Documentation inherited
       public: virtual void Fini() override;
@@ -219,6 +220,7 @@ namespace gazebo
 
       // Documentation inherited
       public: void SetClipDist() override;
+      using Camera::SetClipDist;
 
       /// \brief Set the camera's render target
       /// \param[in] _textureName Name used as a base for environment texture
