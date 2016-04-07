@@ -50,5 +50,10 @@ class ExportDialog_TEST : public QTestFixture
   /// \brief Test adding and removing plots
   private slots: void OnePlot();
 
+  /// \brief Export a plot to PDF
+  private slots: void ExportPDF();
+
+  /// \brief Export a plot to CSV
+  private slots: void ExportCSV();
 };
 #endif

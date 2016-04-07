@@ -124,6 +124,16 @@ namespace gazebo
       /// \return Title of the plot
       public: std::string Title() const;
 
+      /// \brief Export to PDF files in the given directory.
+      /// \param[in] _dirName Name of the directory to save the PDF files
+      /// into.
+      public: void ExportPDF(const std::string &_dirName) const;
+
+      /// \brief Export to CSV files in the given directory.
+      /// \param[in] _dirName Name of the directory to save the CSV files
+      /// into.
+      public: void ExportCSV(const std::string &_dirName) const;
+
       /// \brief Add a variable to a plot. Note this function
       /// only updates the plot but not the variable pill container.
       /// \param[in] _id Unique id of the variable

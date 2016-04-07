@@ -194,7 +194,7 @@ ExportDialog::ExportDialog(QWidget *_parent,
   cancelButton->setObjectName("materialFlat");
   connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
 
-  QMenu *exportMenu = new QMenu;
+  QMenu *exportMenu = new QMenu(this);
   exportMenu->setObjectName("material");
 
   QAction *csvAct = new QAction("CSV (.csv)", exportMenu);
@@ -278,7 +278,6 @@ ExportDialog::ExportDialog(QWidget *_parent,
 /////////////////////////////////////////////////
 void ExportDialog::OnSelected()
 {
-  std::cout << "Selected\n";
   this->dataPtr->exportButton->setEnabled(
       this->dataPtr->listView->selectionModel()->selectedIndexes().size() > 0);
 }
@@ -312,9 +311,6 @@ void ExportDialog::OnExportPDF()
   if (selected.empty())
     return;
 
-  // Get the selected directory
-  std::string dir = selected[0].toStdString();
-
   QModelIndexList selectedPlots =
     this->dataPtr->listView->selectionModel()->selectedIndexes();
 
@@ -328,26 +324,8 @@ void ExportDialog::OnExportPDF()
 
     if (plotItem)
     {
-      std::string title = plotItem->canvas->Title();
-
-      // Render the plot to a PDF
-      int index = 0;
-      std::vector<IncrementalPlot *> plots = plotItem->canvas->Plots();
-      for (const auto &plot : plots)
-      {
-        std::string filename = dir + "/" + title;
-        filename += plots.size() > 1 ? std::to_string(index) : "";
-        filename += ".pdf";
-
-        QwtPlotRenderer renderer;
-        renderer.renderDocument(plot, QString(filename.c_str()),
-            QSizeF(280, 216));
-        index++;
-      }
-    }
-    else
-    {
-      gzerr << "Invalid plot item.\n";
+      // Export to the selected directory
+      plotItem->canvas->ExportPDF( selected[0].toStdString());
     }
   }
 
@@ -373,8 +351,6 @@ void ExportDialog::OnExportCSV()
   if (selected.empty())
     return;
 
-  std::string dir = selected[0].toStdString();
-
   QModelIndexList selectedPlots =
     this->dataPtr->listView->selectionModel()->selectedIndexes();
 
@@ -388,43 +364,9 @@ void ExportDialog::OnExportCSV()
 
     if (plotItem)
     {
-      std::string title = plotItem->canvas->Title();
-
-      // Save data from each curve into a separate file.
-      for (const auto &plot : plotItem->canvas->Plots())
-      {
-        for (const auto &curve : plot->Curves())
-        {
-          auto c = curve.lock();
-          if (!c)
-            continue;
-
-          // Cleanup the title
-          std::replace(title.begin(), title.end(), '/', '_');
-          std::replace(title.begin(), title.end(), '?', ':');
-
-          // Cleanup the label
-          std::string label = c->Label();
-          std::replace(label.begin(), label.end(), '/', '_');
-          std::replace(label.begin(), label.end(), '?', ':');
-
-          std::string filename = dir + "/" + title + "-" + label + ".csv";
-
-          std::ofstream out(filename);
-          out << "x, " << c->Label() << std::endl;
-          for (unsigned int j = 0; j < c->Size(); ++j)
-          {
-            ignition::math::Vector2d pt = c->Point(j);
-            out << pt.X() << ", " << pt.Y() << std::endl;
-          }
-          out.close();
-        }
-      }
-    }
-    else
-    {
-      gzerr << "Invalid plot item.\n";
+      plotItem->canvas->ExportCSV(selected[0].toStdString());
     }
   }
+
   this->close();
 }

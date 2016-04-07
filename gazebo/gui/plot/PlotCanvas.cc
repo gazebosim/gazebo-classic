@@ -862,3 +862,64 @@ std::string PlotCanvas::Title() const
 {
   return this->dataPtr->title->Text();
 }
+
+/////////////////////////////////////////////////
+void PlotCanvas::ExportPDF(const std::string &_dirName) const
+{
+  std::string title = this->Title();
+
+  // Cleanup the title
+  std::replace(title.begin(), title.end(), '/', '_');
+  std::replace(title.begin(), title.end(), '?', ':');
+
+  // Render the plot to a PDF
+  int index = 0;
+  for (const auto it : this->dataPtr->plotData)
+  {
+    std::string filename = _dirName + "/" + title;
+    filename += this->dataPtr->plotData.size() > 1 ? std::to_string(index) : "";
+    filename += ".pdf";
+
+    QwtPlotRenderer renderer;
+    renderer.renderDocument(it.second->plot, QString(filename.c_str()),
+        QSizeF(280, 216));
+    index++;
+  }
+}
+
+/////////////////////////////////////////////////
+void PlotCanvas::ExportCSV(const std::string &_dirName) const
+{
+  std::string title = this->Title();
+
+  // Cleanup the title
+  std::replace(title.begin(), title.end(), '/', '_');
+  std::replace(title.begin(), title.end(), '?', ':');
+
+  // Save data from each curve into a separate file.
+  for (const auto it : this->dataPtr->plotData)
+  {
+    for (const auto &curve : it.second->plot->Curves())
+    {
+      auto c = curve.lock();
+      if (!c)
+        continue;
+
+      // Cleanup the label
+      std::string label = c->Label();
+      std::replace(label.begin(), label.end(), '/', '_');
+      std::replace(label.begin(), label.end(), '?', ':');
+
+      std::string filename = _dirName + "/" + title + "-" + label + ".csv";
+
+      std::ofstream out(filename);
+      out << "x, " << c->Label() << std::endl;
+      for (unsigned int j = 0; j < c->Size(); ++j)
+      {
+        ignition::math::Vector2d pt = c->Point(j);
+        out << pt.X() << ", " << pt.Y() << std::endl;
+      }
+      out.close();
+    }
+  }
+}

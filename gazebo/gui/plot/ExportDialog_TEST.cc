@@ -14,7 +14,8 @@
  * limitations under the License.
  *
 */
-
+#include <sys/types.h>
+#include <sys/stat.h>
 #include "gazebo/gui/plot/PlotCanvas.hh"
 #include "gazebo/gui/plot/ExportDialog.hh"
 #include "gazebo/gui/plot/ExportDialog_TEST.hh"
@@ -150,27 +151,11 @@ void ExportDialog_TEST::OnePlot()
   // The export button should now be disabled.
   this->VerifyButtons(exportDialog, false);
 
-  /*QList<QAction*> actions = exportDialog->findChildren<QAction*>();
-  std::cout << "Size[" << actions.count() << "]\n";
-
-  QAction *selectAll = nullptr;
-  QAction *selectNone = nullptr;
-  for (int i = 0; i < actions.count(); ++i)
-  {
-    std::string txt = actions.at(i)->text().toStdString();
-    if (txt == "Select all")
-      selectAll = actions.at(i);
-    if (txt == "Clear selection")
-      selectNone = actions.at(i);
-  }
-  QVERIFY(selectAll != nullptr);
-  QVERIFY(selectNone != nullptr);
-  selectAll->trigger();
-  */
-
+  // Select all
   this->Select(exportDialog, true);
   this->VerifyButtons(exportDialog, true);
 
+  // Select none
   this->Select(exportDialog, false);
   this->VerifyButtons(exportDialog, false);
 
@@ -179,6 +164,117 @@ void ExportDialog_TEST::OnePlot()
 
   plotCanvas->hide();
   delete plotCanvas;
+}
+
+/////////////////////////////////////////////////
+void ExportDialog_TEST::ExportPDF()
+{
+  // Create a new plot canvas widget
+  gazebo::gui::PlotCanvas *plotCanvas = new gazebo::gui::PlotCanvas(NULL);
+  QVERIFY(plotCanvas != NULL);
+  plotCanvas->show();
+
+  // Add a plot to the canvas
+  int index = plotCanvas->AddPlot();
+  QCOMPARE(index, 0);
+
+  // Using linux filesystem commands for this test.
+  // \todo: Test on mac.
+#ifdef __linux__
+  std::string outputDir = "/tmp/_gz_test_plot_pdf_export_";
+
+  // Create a directory to store the PDF file
+  mkdir(outputDir.c_str(), S_IRUSR | S_IWUSR | S_IXUSR);
+
+  // Export the plot to pdf
+  plotCanvas->ExportPDF(outputDir.c_str());
+
+  DIR *dir;
+  struct dirent *ent;
+  bool foundFile = false;
+  if ((dir = opendir(outputDir.c_str())) != NULL)
+  {
+    // Check the directory contents for the correct pdf file.
+    while ((ent = readdir(dir)) != NULL)
+    {
+      std::string filename = ent->d_name;
+      if (filename == plotCanvas->Title() + ".pdf")
+      {
+        foundFile = true;
+        std::string fullPath = outputDir + "/" + filename;
+        // Remove the file
+        remove(fullPath.c_str());
+      }
+    }
+    closedir(dir);
+  }
+
+  // Remove the directory
+  rmdir(outputDir.c_str());
+  QVERIFY(foundFile);
+#endif
+}
+
+/////////////////////////////////////////////////
+void ExportDialog_TEST::ExportCSV()
+{
+  // Load a world with the box model
+  this->Load("worlds/shapes.world");
+
+  // Create a new plot canvas widget
+  gazebo::gui::PlotCanvas *plotCanvas = new gazebo::gui::PlotCanvas(NULL);
+  QVERIFY(plotCanvas != NULL);
+  plotCanvas->show();
+
+  // Add a plot to the canvas
+  int index = plotCanvas->AddPlot();
+  QCOMPARE(index, 1);
+
+  // Add a variable to the plot
+  std::string var = std::string("data://world/default/model/box") +
+    "?p=pose3d/world_pose/vector3d/position/double/x";
+  plotCanvas->AddVariable(var, index);
+  plotCanvas->SetVariableLabel(index, "test");
+
+  // Collect some data
+  gazebo::common::Time::MSleep(500);
+
+  // Using linux filesystem commands for this test.
+  // \todo: Test on mac.
+#ifdef __linux__
+  std::string outputDir = "/tmp/_gz_test_plot_csv_export_";
+
+  // Create a directory to store the PDF file
+  mkdir(outputDir.c_str(), S_IRUSR | S_IWUSR | S_IXUSR);
+
+  // Export the plot to csv
+  plotCanvas->ExportCSV(outputDir.c_str());
+
+  DIR *dir;
+  struct dirent *ent;
+  bool foundFile = false;
+  if ((dir = opendir(outputDir.c_str())) != NULL)
+  {
+    // Check the directory contents for the correct csv file.
+    while ((ent = readdir(dir)) != NULL)
+    {
+      std::string filename = ent->d_name;
+      std::cout << "Filename[" << filename << "]\n";
+      if (filename == plotCanvas->Title() + "-box:world_pose_position_x.csv")
+      {
+        foundFile = true;
+        std::string fullPath = outputDir + "/" + filename;
+        // Remove the file
+        remove(fullPath.c_str());
+      }
+    }
+    closedir(dir);
+  }
+
+  // Remove the directory
+  rmdir(outputDir.c_str());
+  QVERIFY(foundFile);
+#endif
 }
 
 // Generate a main function for the test
