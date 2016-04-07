@@ -40,6 +40,7 @@ Subscriber::Subscriber(const std::string &t, NodePtr _node)
 //////////////////////////////////////////////////
 Subscriber::~Subscriber()
 {
+  common::Time::MSleep(300);
   this->Unsubscribe();
   this->node.reset();
 }
