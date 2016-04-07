@@ -867,7 +867,45 @@ compilation on Windows.
 
 ## Gazebo 5.0
 
-### Gazebo 5.x.x
+### Gazebo 5.3.0 (2015-04-07)
+
+1. fix: remove back projection
+    * [Pull request 2201](https://bitbucket.org/osrf/gazebo/pull-request/2201)
+
+1. Backport depth camera OSX fix and test
+    * [Pull request 2230](https://bitbucket.org/osrf/gazebo/pull-request/2230)
+
+1. Add missing tinyxml includes
+    * [Pull request 2216](https://bitbucket.org/osrf/gazebo/pull-request/2216)
+
+1. backport fixes for ffmpeg3 to gazebo5 (from pull request #2154)
+    * [Pull request 2161](https://bitbucket.org/osrf/gazebo/pull-request/2161)
+
+1. Check for valid display using xwininfo -root
+    * [Pull request 2111](https://bitbucket.org/osrf/gazebo/pull-request/2111)
+
+1. Don't search for sdformat4 on gazebo5, since gazebo5 can't handle sdformat protocol 1.6
+    * [Pull request 2092](https://bitbucket.org/osrf/gazebo/pull-request/2092)
+
+1. Fix minimum window height
+    * [Pull request 2002](https://bitbucket.org/osrf/gazebo/pull-request/2002)
+
+1. Relax physics tolerances for single-precision bullet
+    * [Pull request 1976](https://bitbucket.org/osrf/gazebo/pull-request/1976)
+
+1. Try finding sdformat 4 in gazebo5 branch
+    * [Pull request 1972](https://bitbucket.org/osrf/gazebo/pull-request/1972)
+
+1. Fix_send_message (backport of pull request #1951)
+    * [Pull request 1964](https://bitbucket.org/osrf/gazebo/pull-request/1964)
+
+1. Export the media path in the cmake config file.
+    * [Pull request 1933](https://bitbucket.org/osrf/gazebo/pull-request/1933)
+
+1. Shorten gearbox test since it is failing via timeout on osx
+    * [Pull request 1937](https://bitbucket.org/osrf/gazebo/pull-request/1937)
+
+### Gazebo 5.2.1
 
 1. Fix minimum window height
     * Backport of [pull request #1977](https://bitbucket.org/osrf/gazebo/pull-request/1977)
