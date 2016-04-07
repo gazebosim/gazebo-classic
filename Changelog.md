@@ -448,7 +448,69 @@ using the same arguments used in the command line.
 
 ## Gazebo 6.0
 
-### Gazebo 6.X.X (201X-XX-XX)
+### Gazebo 6.6.0 (2016-04-07)
+
+1. Backport depth camera OSX fix and test
+    * [Pull request 2230](https://bitbucket.org/osrf/gazebo/pull-request/2230)
+
+1. Add missing tinyxml includes (gazebo6)
+    * [Pull request 2218](https://bitbucket.org/osrf/gazebo/pull-request/2218)
+
+1. Fix ray-cylinder collision in ode
+    * [Pull request 2125](https://bitbucket.org/osrf/gazebo/pull-request/2125)
+
+1. backport fixes for ffmpeg3 to gazebo6 (from pull request #2154)
+    * [Pull request 2162](https://bitbucket.org/osrf/gazebo/pull-request/2162)
+
+1. Install shapes_bitmask.world
+    * [Pull request 2104](https://bitbucket.org/osrf/gazebo/pull-request/2104)
+
+1. Add gazebo_client to gazebo.pc (gazebo6)
+    * [Pull request 2102](https://bitbucket.org/osrf/gazebo/pull-request/2102)
+
+1. Fix removing multiple camera sensors that have the same camera name
+    * [Pull request 2081](https://bitbucket.org/osrf/gazebo/pull-request/2081)
+
+1. Ensure that LINK_FRAME_VISUAL arrow components are deleted (#1812)
+    * [Pull request 2078](https://bitbucket.org/osrf/gazebo/pull-request/2078)
+
+1. add migration notes for gazebo::setupClient to gazebo::client::setup
+    * [Pull request 2068](https://bitbucket.org/osrf/gazebo/pull-request/2068)
+
+1. Update inertia properties during simulation: part 2
+    * [Pull request 1984](https://bitbucket.org/osrf/gazebo/pull-request/1984)
+
+1. Fix minimum window height
+    * [Pull request 2002](https://bitbucket.org/osrf/gazebo/pull-request/2002)
+
+1. Backport gpu laser test fix
+    * [Pull request 1999](https://bitbucket.org/osrf/gazebo/pull-request/1999)
+
+1. Relax physics tolerances for single-precision bullet (gazebo6)
+    * [Pull request 1997](https://bitbucket.org/osrf/gazebo/pull-request/1997)
+
+1. Fix minimum window height
+    * [Pull request 1998](https://bitbucket.org/osrf/gazebo/pull-request/1998)
+
+1. backport model editor fixed joint option to gazebo6
+    * [Pull request 1957](https://bitbucket.org/osrf/gazebo/pull-request/1957)
+
+1. Update shaders once per render update
+    * [Pull request 1991](https://bitbucket.org/osrf/gazebo/pull-request/1991)
+
+1. Relax physics tolerances for single-precision bullet
+    * [Pull request 1976](https://bitbucket.org/osrf/gazebo/pull-request/1976)
+
+1. Fix visual transparency issues
+    * [Pull request 1967](https://bitbucket.org/osrf/gazebo/pull-request/1967)
+
+1. fix memory corruption in transport/Publisher.cc
+    * [Pull request 1951](https://bitbucket.org/osrf/gazebo/pull-request/1951)
+
+1. Add test for SphericalCoordinates::LocalFromGlobal
+    * [Pull request 1959](https://bitbucket.org/osrf/gazebo/pull-request/1959)
+
+### Gazebo 6.5.1 (2015-10-29)
 
 1. Fix removing multiple camera sensors that have the same camera name.
     * [Pull request #2081](https://bitbucket.org/osrf/gazebo/pull-request/2081)
