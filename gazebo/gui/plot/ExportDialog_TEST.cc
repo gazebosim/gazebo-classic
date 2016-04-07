@@ -133,7 +133,7 @@ void ExportDialog_TEST::OnePlot()
   this->VerifyButtons(exportDialog, false);
 
   // Get the rectangle for the plot item in the list view
-  QRect rect = listView->visualRect(listView->model()->index(0,0));
+  QRect rect = listView->visualRect(listView->model()->index(0, 0));
 
   // Click the list item
   QTest::mouseClick(listView->viewport(), Qt::LeftButton,
@@ -189,15 +189,17 @@ void ExportDialog_TEST::ExportPDF()
   // Export the plot to pdf
   plotCanvas->ExportPDF(outputDir.c_str());
 
-  DIR *dir;
-  struct dirent *ent;
+  DIR *dir = nullptr;
+  struct dirent entry;
+  struct dirent *result = nullptr;
   bool foundFile = false;
   if ((dir = opendir(outputDir.c_str())) != NULL)
   {
     // Check the directory contents for the correct pdf file.
-    while ((ent = readdir(dir)) != NULL)
+    while (readdir_r(dir, &entry, &result) == 0 && result != nullptr)
     {
-      std::string filename = ent->d_name;
+      std::string filename = result->d_name;
+      std::cout << "Filename[" << filename << "]\n";
       if (filename == plotCanvas->Title() + ".pdf")
       {
         foundFile = true;
@@ -250,16 +252,16 @@ void ExportDialog_TEST::ExportCSV()
   // Export the plot to csv
   plotCanvas->ExportCSV(outputDir.c_str());
 
-  DIR *dir;
-  struct dirent *ent;
+  DIR *dir = nullptr;
+  struct dirent entry;
+  struct dirent *result = nullptr;
   bool foundFile = false;
   if ((dir = opendir(outputDir.c_str())) != NULL)
   {
     // Check the directory contents for the correct csv file.
-    while ((ent = readdir(dir)) != NULL)
+    while (readdir_r(dir, &entry, &result) == 0 && result != nullptr)
     {
-      std::string filename = ent->d_name;
-      std::cout << "Filename[" << filename << "]\n";
+      std::string filename = result->d_name;
       if (filename == plotCanvas->Title() + "-box:world_pose_position_x.csv")
       {
         foundFile = true;

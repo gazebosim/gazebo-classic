@@ -70,7 +70,6 @@ class PlotViewDelegate : public QStyledItemDelegate
   public: void paint(QPainter *_painter, const QStyleOptionViewItem &_opt,
               const QModelIndex &_index) const
           {
-            QRectF iconRect = _opt.rect;
             QIcon icon = qvariant_cast<QIcon>(_index.data(ICON_ROLE));
             QString title = qvariant_cast<QString>(
                 _index.data(HEADER_TEXT_ROLE));
@@ -80,15 +79,18 @@ class PlotViewDelegate : public QStyledItemDelegate
 
             _painter->save();
 
+            // Create the rectangle to display the icon
+            QRectF iconRect = _opt.rect;
             iconRect.adjust(10, 10, -10, -fm.height() - 10);
 
+            // Draw the icon
             QPixmap image = icon.pixmap(iconRect.width(), iconRect.height());
             _painter->drawPixmap(iconRect.left(), iconRect.top(), image);
 
             _painter->setPen(QColor(0, 0, 0));
 
+            // Get the appropriate check box image
             QPixmap checkImage;
-
             if (_opt.state & QStyle::State_Selected)
              checkImage.load(":/images/check_box_black.svg");
             else
@@ -98,6 +100,7 @@ class PlotViewDelegate : public QStyledItemDelegate
             int checkMargin = 4;
             int checkTitleWidth = fm.width(title) + checkSize + checkMargin;
 
+            // Draw the checkbox
             QRectF checkRect = _opt.rect;
             checkRect.setTop(iconRect.bottom() + checkMargin);
             checkRect.setLeft(iconRect.left() +
@@ -106,12 +109,14 @@ class PlotViewDelegate : public QStyledItemDelegate
             checkRect.setHeight(checkSize);
             _painter->drawPixmap(checkRect, checkImage, checkImage.rect());
 
+            // Draw the plot title
             QRectF titleRect = _opt.rect;
             titleRect.setTop(checkRect.top());
             titleRect.setLeft(
                 checkRect.left() + checkRect.width() + checkMargin);
             titleRect.setHeight(checkSize);
             _painter->drawText(titleRect, Qt::AlignVCenter, title);
+
             _painter->restore();
           }
 
@@ -124,11 +129,14 @@ class PlotViewDelegate : public QStyledItemDelegate
             QIcon icon = qvariant_cast<QIcon>(_index.data(ICON_ROLE));
             QSize iconSize = icon.actualSize(_option.decorationSize);
 
+            // Adjust these values to contol the default size of the plot
+            // icon
             double maxWidth = 320.0;
             double maxHeight = 180.0;
 
             double ratio = maxWidth / iconSize.width();
 
+            // Scale the icon
             iconSize.scale(maxWidth,  iconSize.height() * ratio,
                 Qt::IgnoreAspectRatio);
 
@@ -325,7 +333,7 @@ void ExportDialog::OnExportPDF()
     if (plotItem)
     {
       // Export to the selected directory
-      plotItem->canvas->ExportPDF( selected[0].toStdString());
+      plotItem->canvas->ExportPDF(selected[0].toStdString());
     }
   }
 

@@ -17,8 +17,9 @@
 #ifndef GAZEBO_GUI_PLOT_EXPORTDIALOG_HH_
 #define GAZEBO_GUI_PLOT_EXPORTDIALOG_HH_
 
-#include <string>
+#include <list>
 #include <memory>
+#include <string>
 #include "gazebo/gui/plot/PlotCanvas.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"

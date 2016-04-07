@@ -130,10 +130,8 @@ PlotWindow::PlotWindow(QWidget *_parent)
   QVBoxLayout *plotLayout = new QVBoxLayout;
   plotLayout->addLayout(this->dataPtr->canvasLayout);
   plotLayout->addLayout(addButtonLayout);
-  //plotLayout->addWidget(bottomFrame);
   plotLayout->setStretchFactor(this->dataPtr->canvasLayout, 1);
   plotLayout->setStretchFactor(addButtonLayout, 0);
-  //plotLayout->setStretchFactor(bottomFrame, 0);
 
   auto plotFrame = new QFrame;
   plotFrame->setLayout(plotLayout);

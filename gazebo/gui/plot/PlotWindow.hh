@@ -17,6 +17,7 @@
 #ifndef GAZEBO_GUI_PLOT_PLOTWINDOW_HH_
 #define GAZEBO_GUI_PLOT_PLOTWINDOW_HH_
 
+#include <list>
 #include <memory>
 
 #include "gazebo/gui/qt.h"
