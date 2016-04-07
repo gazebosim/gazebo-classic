@@ -1810,10 +1810,10 @@ void ModelCreator::OnDelete(const std::string &_entity)
 
     // Register command
     auto cmd = this->dataPtr->userCmdManager->NewCmd(
-        "Delete [" + nestedModel->second->Name() + "]",
+        "Delete [" + name + "]",
         MEUserCmd::DELETING_NESTED_MODEL);
-    cmd->SetSDF(nestedModel->second->modelSDF);
-    cmd->SetScopedName(nestedModel->second->modelVisual->GetName());
+    cmd->SetSDF(sdf);
+    cmd->SetScopedName(scopedName);
 
     return;
   }
