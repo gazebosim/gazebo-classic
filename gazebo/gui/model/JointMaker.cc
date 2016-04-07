@@ -478,6 +478,12 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
 JointData *JointMaker::CreateJointLine(const std::string &_name,
     const rendering::VisualPtr &_parent)
 {
+  if (this->dataPtr->jointType == JOINT_NONE)
+  {
+    gzwarn << "Can't create joint line of type JOINT_NONE" << std::endl;
+    return NULL;
+  }
+
   rendering::VisualPtr jointVis(
       new rendering::Visual(_name, _parent->GetParent(), false));
   jointVis->Load();
@@ -1771,7 +1777,10 @@ rendering::VisualPtr JointMaker::LinkVisualFromName(const std::string &_name)
   }
 
   if (scopedName.empty())
+  {
+    gzwarn << "No link found with name [" << _name << "]" << std::endl;
     return NULL;
+  }
 
   // Get visual
   rendering::ScenePtr scene = rendering::get_scene();
