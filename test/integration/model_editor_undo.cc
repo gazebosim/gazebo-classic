@@ -365,6 +365,9 @@ void ModelEditorUndoTest::NestedModelDeletionByContextMenu()
   visNames.push_back("ModelPreview_1::model_01");
   visNames.push_back("ModelPreview_1::model_01::model_02");
   visNames.push_back("ModelPreview_1::model_01::model_02::model_03");
+  visNames.push_back("ModelPreview_1::joint_00_UNIQUE_ID_");
+  visNames.push_back("ModelPreview_1::joint_01_UNIQUE_ID_");
+  visNames.push_back("ModelPreview_1::joint_02_UNIQUE_ID_");
   for (auto name : visNames)
     QVERIFY(scene->GetVisual(name) != NULL);
 
@@ -387,9 +390,10 @@ void ModelEditorUndoTest::NestedModelDeletionByContextMenu()
     for (auto name : visNames)
       QVERIFY(scene->GetVisual(name) == NULL);
 
-    // Undo
+    // Undo 4 times - one for each joint and one for the model
     gzmsg << "Undo deleting [" << visNames[0] << "]" << std::endl;
-    gazebo::gui::g_undoAct->trigger();
+    for (unsigned int k = 0; k < 4; ++k)
+      gazebo::gui::g_undoAct->trigger();
 
     this->ProcessEventsAndDraw(mainWindow);
 
@@ -403,9 +407,10 @@ void ModelEditorUndoTest::NestedModelDeletionByContextMenu()
     for (auto name : visNames)
       QVERIFY(scene->GetVisual(name) != NULL);
 
-    // Redo
+    // Redo 4 times - one for each joint and one for the model
     gzmsg << "Redo deleting [" << visNames[0] << "]" << std::endl;
-    gazebo::gui::g_redoAct->trigger();
+    for (unsigned int k = 0; k < 4; ++k)
+      gazebo::gui::g_redoAct->trigger();
   }
 
   mainWindow->close();
