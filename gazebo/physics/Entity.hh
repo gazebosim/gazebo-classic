@@ -73,6 +73,7 @@ namespace gazebo
 
       /// \brief Reset the entity.
       public: virtual void Reset();
+      using Base::Reset;
 
       /// \brief Update the parameters using new sdf values.
       /// \param[in] _sdf SDF to update from.
