@@ -1837,13 +1837,13 @@ void ModelCreator::OnDelete(const std::string &_entity)
   if (link != this->dataPtr->allLinks.end())
   {
     // First delete joints
-    if (this->dataPtr->jointMaker)
-      this->dataPtr->jointMaker->RemoveJointsByLink(_entity);
+//    if (this->dataPtr->jointMaker)
+//      this->dataPtr->jointMaker->RemoveJointsByLink(_entity);
 
     // Then register command
     auto cmd = MEUserCmdManager::Instance()->NewCmd(
         "Delete [" + link->second->Name() + "]", MEUserCmd::DELETING_LINK);
-    cmd->SetSDF(link->second->linkSDF);
+    cmd->SetSDF(this->GenerateLinkSDF(link->second));
     cmd->SetScopedName(link->second->linkVisual->GetName());
 
     // Then delete link
@@ -2036,7 +2036,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
       auto cmd = MEUserCmdManager::Instance()->NewCmd(
           "Insert [" + link->Name() + "]",
           MEUserCmd::INSERTING_LINK);
-      cmd->SetSDF(link->linkSDF);
+      cmd->SetSDF(this->GenerateLinkSDF(link));
       cmd->SetScopedName(link->linkVisual->GetName());
     }
     else
