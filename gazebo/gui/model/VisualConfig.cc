@@ -47,6 +47,8 @@ VisualConfig::VisualConfig()
   // Add Visual button
   QPushButton *addVisualButton = new QPushButton(tr("+ &Another Visual"));
   addVisualButton->setMaximumWidth(200);
+  addVisualButton->setDefault(false);
+  addVisualButton->setAutoDefault(false);
   connect(addVisualButton, SIGNAL(clicked()), this, SLOT(OnAddVisual()));
 
   // Main layout

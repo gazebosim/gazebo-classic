@@ -45,6 +45,8 @@ CollisionConfig::CollisionConfig()
   // Add Collision button
   QPushButton *addCollisionButton = new QPushButton(tr("+ &Another Collision"));
   addCollisionButton->setMaximumWidth(200);
+  addCollisionButton->setDefault(false);
+  addCollisionButton->setAutoDefault(false);
   connect(addCollisionButton, SIGNAL(clicked()), this, SLOT(OnAddCollision()));
 
   // Main layout
