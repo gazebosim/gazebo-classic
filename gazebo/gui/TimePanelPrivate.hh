@@ -52,6 +52,9 @@ namespace gazebo
       public: transport::NodePtr node;
 
       /// \brief Subscriber to the statistics topic.
+      /// Per issue #1919, this subscriber needs to be declared below any
+      /// variables that it uses (like mutex, and the std::list's).
+      /// https://bitbucket.org/osrf/gazebo/issues/1919
       public: transport::SubscriberPtr statsSub;
 
       /// \brief Used to start, stop, and step simulation.
