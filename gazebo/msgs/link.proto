@@ -13,6 +13,7 @@ import "projector.proto";
 import "pose.proto";
 import "battery.proto";
 import "density.proto";
+import "vector3d.proto";
 
 message Link
 {
@@ -33,4 +34,10 @@ message Link
 
   /// \brief An optional vector of batteries that are attached to this link.
   repeated Battery battery      = 15;
+
+  /// \brief Enable/disable wind effect on this link.
+  optional bool enable_wind     = 16;
+
+  /// \brief Wind linear velocity affecting this link.
+  optional Vector3d wind        = 17;
 }

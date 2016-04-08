@@ -205,18 +205,18 @@ Projector::ProjectorFrameListener::~ProjectorFrameListener()
 {
   this->RemovePassFromMaterials();
 
+  if (this->filterNode)
+  {
+    this->filterNode->detachObject(this->filterFrustum);
+    this->node->removeAndDestroyChild(this->filterNodeName);
+    this->filterNode = NULL;
+  }
+
   if (this->node)
   {
     this->node->detachObject(this->frustum);
     this->visual->GetSceneNode()->removeAndDestroyChild(this->nodeName);
     this->node = NULL;
-  }
-
-  if (this->filterNode)
-  {
-    this->filterNode->detachObject(this->filterFrustum);
-    this->visual->GetSceneNode()->removeAndDestroyChild(this->filterNodeName);
-    this->filterNode = NULL;
   }
 
   delete this->frustum;
@@ -297,6 +297,13 @@ void Projector::ProjectorFrameListener::SetUsingShaders(bool _usingShaders)
 /////////////////////////////////////////////////
 void Projector::ProjectorFrameListener::SetSceneNode()
 {
+  if (this->filterNode)
+  {
+    this->filterNode->detachObject(this->filterFrustum);
+    this->node->removeAndDestroyChild(this->filterNodeName);
+    this->filterNode = NULL;
+  }
+
   if (this->node)
   {
     this->node->detachObject(this->frustum);
@@ -304,17 +311,10 @@ void Projector::ProjectorFrameListener::SetSceneNode()
     this->node = NULL;
   }
 
-  if (this->filterNode)
-  {
-    this->filterNode->detachObject(this->filterFrustum);
-    this->visual->GetSceneNode()->removeAndDestroyChild(this->filterNodeName);
-    this->filterNode = NULL;
-  }
-
   this->node = this->visual->GetSceneNode()->createChildSceneNode(
       this->nodeName);
 
-  this->filterNode = this->visual->GetSceneNode()->createChildSceneNode(
+  this->filterNode = this->node->createChildSceneNode(
       this->filterNodeName);
 
   if (this->node)
@@ -340,7 +340,7 @@ void Projector::ProjectorFrameListener::SetPose(const math::Pose &_pose)
   this->filterNode->setPosition(ogreVec);
 
   offsetQuaternion = Ogre::Quaternion(Ogre::Degree(90), Ogre::Vector3::UNIT_Y);
-  this->filterNode->setOrientation(offsetQuaternion + ogreQuaternion);
+  this->filterNode->setOrientation(offsetQuaternion);
 }
 
 /////////////////////////////////////////////////
