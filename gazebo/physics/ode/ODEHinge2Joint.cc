@@ -63,7 +63,10 @@ math::Vector3 ODEHinge2Joint::GetAnchor(unsigned int _index) const
       dJointGetHinge2Anchor2(this->jointId, result);
   }
   else
+  {
     gzerr << "ODE Joint ID is invalid\n";
+    return math::Vector3::Zero;
+  }
 
   return math::Vector3(result[0], result[1], result[2]);
 }
