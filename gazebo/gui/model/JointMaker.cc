@@ -657,7 +657,6 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
   if (this->dataPtr->newJoint && this->dataPtr->newJoint->parent &&
       this->dataPtr->hoverVis && this->dataPtr->newJoint->line)
   {
-
     ignition::math::Vector3d posWorld;
 
     // Set end point to center of child link
@@ -1476,7 +1475,8 @@ void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
   auto parentOriginInRootFrame = parentVis->GetWorldPose().Ign().Pos()
       - parentVis->GetRootVisual()->GetWorldPose().Ign().Pos();
   jointLine->AddPoint(parentOriginInRootFrame);
-  jointLine->AddPoint(parentOriginInRootFrame + ignition::math::Vector3d(0, 0, 0.1));
+  jointLine->AddPoint(parentOriginInRootFrame +
+                      ignition::math::Vector3d(0, 0, 0.1));
 
   jointVis->GetSceneNode()->setInheritScale(false);
   jointVis->GetSceneNode()->setInheritOrientation(false);
