@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_VISUAL_CONFIG_HH_
-#define _GAZEBO_VISUAL_CONFIG_HH_
+#ifndef GAZEBO_GUI_MODEL_VISUALCONFIG_HH_
+#define GAZEBO_GUI_MODEL_VISUALCONFIG_HH_
 
 #include <map>
 #include <string>
@@ -195,6 +195,9 @@ namespace gazebo
 
       /// \brief Map of id to visual config widget.
       private: std::map<int, VisualConfigData *> configs;
+
+      /// \brief Map of visual config widgets which were deleted.
+      private: std::map<int, VisualConfigData *> deletedConfigs;
 
       /// \brief Counter for the number of visuals.
       private: int counter;

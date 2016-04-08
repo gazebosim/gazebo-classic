@@ -130,6 +130,7 @@ LinkData::LinkData()
 
   this->inspector = new LinkInspector();
   this->inspector->setModal(false);
+  connect(this->inspector, SIGNAL(Opened()), this, SLOT(OnInspectorOpened()));
   connect(this->inspector, SIGNAL(Applied()), this, SLOT(OnApply()));
   connect(this->inspector, SIGNAL(Accepted()), this, SLOT(OnAccept()));
   connect(this->inspector->GetVisualConfig(),
@@ -681,6 +682,18 @@ void LinkData::OnApply()
 }
 
 /////////////////////////////////////////////////
+void LinkData::OnInspectorOpened()
+{
+  for (auto it = this->deletedVisuals.begin(); 
+      it != this->deletedVisuals.end();)
+  {
+    this->linkVisual->DetachVisual(it->first);
+    this->linkVisual->GetScene()->RemoveVisual(it->first);
+  }
+  this->deletedVisuals.clear();
+}
+
+/////////////////////////////////////////////////
 bool LinkData::Apply()
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
@@ -945,14 +958,34 @@ void LinkData::OnAddVisual(const std::string &_name)
   visualName << this->linkVisual->GetName() << "::" << _name;
 
   rendering::VisualPtr visVisual;
-  rendering::VisualPtr refVisual;
-  if (!this->visuals.empty())
+  msgs::Visual visualMsg;
+
+  // See if this is in the deleted list
+  for (auto it = this->deletedVisuals.begin();
+      it != this->deletedVisuals.end();)
+  {
+    if (it->first->GetName() == visualName.str())
+    {
+      visVisual = it->first;
+      visVisual->SetVisible(true);
+      visualMsg = it->second;
+
+      this->deletedVisuals.erase(it++);
+      break;
+    }
+    ++it;
+  }
+
+  if (!visVisual && !this->visuals.empty())
   {
     // add new visual by cloning last instance
-    refVisual = this->visuals.rbegin()->first;
+    auto refVisual = this->visuals.rbegin()->first;
     visVisual = refVisual->Clone(visualName.str(), this->linkVisual);
+
+    visualMsg = msgs::VisualFromSDF(visVisual->GetSDF());
+    visualMsg.set_transparency(this->visuals[refVisual].transparency());
   }
-  else
+  else if (!visVisual)
   {
     // create new visual based on sdf template (box)
     sdf::SDFPtr modelTemplateSDF(new sdf::SDF);
@@ -964,12 +997,8 @@ void LinkData::OnAddVisual(const std::string &_name)
     sdf::ElementPtr visualElem =  modelTemplateSDF->Root()
         ->GetElement("model")->GetElement("link")->GetElement("visual");
     visVisual->Load(visualElem);
+    visualMsg = msgs::VisualFromSDF(visVisual->GetSDF());
   }
-
-  msgs::Visual visualMsg = msgs::VisualFromSDF(visVisual->GetSDF());
-  // store the correct transparency setting
-  if (refVisual)
-    visualMsg.set_transparency(this->visuals[refVisual].transparency());
 
   msgs::VisualPtr visualMsgPtr(new msgs::Visual);
   visualMsgPtr->CopyFrom(visualMsg);
@@ -1037,15 +1066,17 @@ void LinkData::OnRemoveVisual(const std::string &_name)
   name << this->linkVisual->GetName() << "::" << _name;
   std::string visualName = name.str();
 
-  for (auto it = this->visuals.begin(); it != this->visuals.end(); ++it)
+  for (auto it = this->visuals.begin(); it != this->visuals.end();)
   {
     if (visualName == it->first->GetName())
     {
-      this->linkVisual->DetachVisual(it->first);
-      this->linkVisual->GetScene()->RemoveVisual(it->first);
-      this->visuals.erase(it);
+      it->first->SetVisible(false);
+
+      this->deletedVisuals[it->first] = it->second;
+      this->visuals.erase(it++);
       break;
     }
+    ++it;
   }
 }
 

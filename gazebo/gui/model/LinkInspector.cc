@@ -181,6 +181,8 @@ void LinkInspector::Open()
 
   this->move(QCursor::pos());
   this->show();
+
+  emit this->Opened();
 }
 
 /////////////////////////////////////////////////

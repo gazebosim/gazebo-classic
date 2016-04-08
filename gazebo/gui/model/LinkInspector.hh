@@ -81,6 +81,9 @@ namespace gazebo
       /// \param[in] _name Name to set to.
       // public: void SetName(const std::string &_name);
 
+      /// \brief Qt signal emitted to indicate that the inspector was opened.
+      Q_SIGNALS: void Opened();
+
       /// \brief Qt signal emitted to indicate that changes should be applied.
       Q_SIGNALS: void Applied();
 

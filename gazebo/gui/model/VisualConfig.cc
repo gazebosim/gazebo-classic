@@ -85,6 +85,13 @@ void VisualConfig::Init()
     VisualConfigData *configData = it.second;
     configData->originalDataMsg.CopyFrom(*this->GetData(configData->name));
   }
+
+  // Clear lists
+  for (auto &it : this->deletedConfigs)
+  {
+    delete it.second->widget;
+  }
+  this->deletedConfigs.clear();
 }
 
 /////////////////////////////////////////////////
@@ -300,9 +307,10 @@ void VisualConfig::OnRemoveVisual(int _id)
 
   // Remove
   this->listLayout->removeWidget(configData->widget);
-  delete configData->widget;
+  configData->widget->hide();
 
   emit VisualRemoved(configData->name);
+  this->deletedConfigs[_id] = configData;
   this->configs.erase(it);
 }
 
@@ -425,10 +433,22 @@ void VisualConfig::OnStringChanged(const QString &_name,
 /////////////////////////////////////////////////
 void VisualConfig::RestoreOriginalData()
 {
+  // Restore existing configs
   for (auto &it : this->configs)
   {
     it.second->RestoreOriginalData();
   }
+
+  // Reinsert deleted configs
+  for (auto &it : this->deletedConfigs)
+  {
+    this->listLayout->addWidget(it.second->widget);
+    it.second->widget->show();
+
+    this->configs[it.first] = it.second;
+    emit VisualAdded(it.second->name);
+  }
+  this->deletedConfigs.clear();
 }
 
 /////////////////////////////////////////////////
