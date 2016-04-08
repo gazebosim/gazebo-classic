@@ -659,7 +659,7 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
   {
     ignition::math::Vector3d posWorld;
 
-    // Set end point to center of child link
+    // Set end point to origin of child link
     if (!this->dataPtr->hoverVis->IsPlane())
     {
       posWorld = this->dataPtr->hoverVis->GetWorldPose().Ign().Pos();
