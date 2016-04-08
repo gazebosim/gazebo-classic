@@ -74,15 +74,7 @@ Sensor::Sensor(SensorCategory _cat)
 //////////////////////////////////////////////////
 Sensor::~Sensor()
 {
-  if (this->node)
-    this->node->Fini();
-  this->node.reset();
-
-  if (this->sdf)
-    this->sdf->Reset();
-  this->sdf.reset();
-  this->connections.clear();
-  this->noises.clear();
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -261,9 +253,17 @@ void Sensor::Fini()
 {
   for (auto &it : this->noises)
     it.second->Fini();
+  this->noises.clear();
 
   this->active = false;
   this->plugins.clear();
+  this->node.reset();
+
+  if (this->sdf)
+    this->sdf->Reset();
+  this->sdf.reset();
+
+  this->connections.clear();
 }
 
 //////////////////////////////////////////////////

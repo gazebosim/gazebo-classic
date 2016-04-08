@@ -1043,6 +1043,11 @@ void Link::SetKinematic(const bool &/*_kinematic*/)
 /////////////////////////////////////////////////
 void Link::SetPublishData(bool _enable)
 {
+  // Skip if we're trying to disable after the publisher has already been
+  // cleared
+  if (!_enable && !this->dataPub)
+    return;
+
   {
     boost::recursive_mutex::scoped_lock lock(*this->publishDataMutex);
     if (this->publishData == _enable)
@@ -1061,6 +1066,7 @@ void Link::SetPublishData(bool _enable)
   else
   {
     this->dataPub.reset();
+    // Do we want to clear all of them though?
     this->connections.clear();
   }
 }

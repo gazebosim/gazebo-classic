@@ -113,7 +113,7 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
 {
   if (_physicsEngine != "ode")
   {
-    gzerr << "not working yet for anything other than ode. see issue #9999.\n";
+    gzerr << "not working yet for anything other than ode. see issue #893.\n";
     return;
   }
 
