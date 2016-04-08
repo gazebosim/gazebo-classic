@@ -52,6 +52,9 @@ namespace gazebo
       // Documentation inherited.
       public: virtual void Load(sdf::ElementPtr _sdf);
 
+      /// \brief Finialize the object
+      public: virtual void Fini();
+
       // Documentation inherited.
       public: virtual void Reset();
 

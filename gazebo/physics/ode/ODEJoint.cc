@@ -55,14 +55,27 @@ ODEJoint::ODEJoint(BasePtr _parent)
 //////////////////////////////////////////////////
 ODEJoint::~ODEJoint()
 {
+  this->Fini();
+}
+
+//////////////////////////////////////////////////
+void ODEJoint::Fini()
+{
   if (this->applyDamping)
     physics::Joint::DisconnectJointUpdate(this->applyDamping);
+  this->applyDamping.reset();
 
-  delete this->feedback;
+  if (this->feedback)
+    delete this->feedback;
+  this->feedback = NULL;
+
   this->Detach();
 
   if (this->jointId)
     dJointDestroy(this->jointId);
+  this->jointId = NULL;
+
+  Joint::Fini();
 }
 
 //////////////////////////////////////////////////
