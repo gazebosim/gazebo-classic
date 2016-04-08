@@ -370,6 +370,9 @@ void ModelEditor::CreateMenus()
 
   QMenu *editMenu = this->dataPtr->menuBar->addMenu(tr("&Edit"));
 
+  editMenu->addAction(g_undoAct);
+  editMenu->addAction(g_redoAct);
+  editMenu->addSeparator();
   editMenu->addAction(g_copyAct);
   editMenu->addAction(g_pasteAct);
 
