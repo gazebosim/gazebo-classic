@@ -52,6 +52,7 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
 
   // Cylinder button
   QToolButton *cylinderButton = new QToolButton(this);
+  cylinderButton->setObjectName("modelEditorPaletteCylinderButton");
   cylinderButton->setFixedSize(toolButtonSize);
   cylinderButton->setToolTip(tr("Cylinder"));
   cylinderButton->setIcon(QPixmap(":/images/cylinder.png"));
@@ -64,6 +65,7 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
 
   // Sphere button
   QToolButton *sphereButton = new QToolButton(this);
+  sphereButton->setObjectName("modelEditorPaletteSphereButton");
   sphereButton->setFixedSize(toolButtonSize);
   sphereButton->setToolTip(tr("Sphere"));
   sphereButton->setIcon(QPixmap(":/images/sphere.png"));
@@ -76,6 +78,7 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
 
   // Box button
   QToolButton *boxButton = new QToolButton(this);
+  boxButton->setObjectName("modelEditorPaletteBoxButton");
   boxButton->setFixedSize(toolButtonSize);
   boxButton->setToolTip(tr("Box"));
   boxButton->setIcon(QPixmap(":/images/box.png"));
@@ -196,7 +199,7 @@ void ModelEditorPalette::OnCustom()
       if (info.completeSuffix().toLower() == "dae" ||
           info.completeSuffix().toLower() == "stl")
       {
-        this->modelCreator->AddShape(ModelCreator::ENTITY_MESH,
+        this->modelCreator->AddCustomLink(ModelCreator::ENTITY_MESH,
             ignition::math::Vector3d::One, ignition::math::Pose3d::Zero,
             importDialog.GetImportPath());
       }
@@ -206,7 +209,7 @@ void ModelEditorPalette::OnCustom()
         extrudeDialog.deleteLater();
         if (extrudeDialog.exec() == QDialog::Accepted)
         {
-          this->modelCreator->AddShape(ModelCreator::ENTITY_POLYLINE,
+          this->modelCreator->AddCustomLink(ModelCreator::ENTITY_POLYLINE,
               ignition::math::Vector3d(1.0/extrudeDialog.GetResolution(),
               1.0/extrudeDialog.GetResolution(),
               extrudeDialog.GetThickness()),

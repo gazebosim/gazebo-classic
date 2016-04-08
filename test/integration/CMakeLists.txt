@@ -130,6 +130,9 @@ if (ENABLE_TESTS_COMPILATION)
 
   # Add plugin dependency
   add_dependencies(${TEST_TYPE}_joint_test SpringTestPlugin)
+
+  set_target_properties(${TEST_TYPE}_model_database PROPERTIES
+    COMPILE_DEFINITIONS "CMAKE_SOURCE_DIR=\"${CMAKE_SOURCE_DIR}\"")
 endif()
 
 set(display_tests
@@ -159,6 +162,7 @@ gz_build_dri_tests(${dri_tests} EXTRA_LIBS gazebo_test_fixture)
 set(qt_tests
   insert_model.cc
   model_editor.cc
+  model_editor_undo.cc
   model_manipulation.cc
   track_visual.cc
   undo.cc

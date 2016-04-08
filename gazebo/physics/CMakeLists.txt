@@ -85,6 +85,7 @@ set (sources ${sources}
   State.cc
   SurfaceParams.cc
   UserCmdManager.cc
+  Wind.cc
   World.cc
   WorldState.cc
 )
@@ -141,6 +142,7 @@ set (headers
   SurfaceParams.hh
   UniversalJoint.hh
   UserCmdManager.hh
+  Wind.hh
   World.hh
   WorldState.hh)
 
@@ -207,6 +209,7 @@ set (gtest_fixture_sources
   PhysicsEngine_TEST.cc
   PresetManager_TEST.cc
   UserCmdManager_TEST.cc
+  Wind_TEST.cc
   WorldState_TEST.cc
 )
 
