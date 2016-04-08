@@ -275,7 +275,11 @@ std::string Sensor::GetName() const
 //////////////////////////////////////////////////
 std::string Sensor::Name() const
 {
-  return this->sdf->Get<std::string>("name");
+  if (this->sdf)
+    return this->sdf->Get<std::string>("name");
+
+  gzwarn << "Missing sensor SDF." << std::endl;
+  return "";
 }
 
 //////////////////////////////////////////////////
