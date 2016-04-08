@@ -229,7 +229,7 @@ void ODEJoint::Detach()
       (odeChild == NULL || odeChild->GetODEId() == NULL))
   {
     gzerr << "Either child [" << odeChild <<
-        "] or parent [" << odeParent << "] hava bad pointers." << std::endl;
+        "] or parent [" << odeParent << "] have bad pointers." << std::endl;
     return;
   }
 
