@@ -22,7 +22,6 @@
 #include <mutex>
 #include <string>
 
-
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Vector3.hh>
 #include <sdf/sdf.hh>
@@ -120,6 +119,17 @@ namespace gazebo
 
       /// \brief Finish the model and create the entity on the gzserver.
       public: void FinishModel();
+
+      /// \brief Begin the process of inserting a custom link using the mouse.
+      /// \param[in] _type Type of link to add: ENTITY_BOX, ENTITY_CYLINDER,
+      /// ENTITY_SPHERE, ENTITY_MESH or ENTITY_POLYLINE.
+      /// \param[in] _size Size of the link.
+      /// \param[in] _pose Pose of the link.
+      /// \param[in] _samples Number of samples for polyline.
+      public: void AddCustomLink(const EntityType _type,
+          const ignition::math::Vector3d &_size = ignition::math::Vector3d::One,
+          const ignition::math::Pose3d &_pose = ignition::math::Pose3d::Zero,
+          const std::string &_uri = "", const unsigned int _samples = 5);
 
       /// \brief Add a link to the model.
       /// \param[in] _type Type of link to add: ENTITY_BOX, ENTITY_CYLINDER,

@@ -1576,6 +1576,7 @@ void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
     gui::model::Events::jointInserted(jointId, joint->name,
         jointTypes[joint->type], joint->parent->GetName(),
         joint->child->GetName());
+    std::cerr << "CreateJointFromSDF joint inserted " << std::endl;
   }
 }
 
@@ -1920,7 +1921,7 @@ void JointMaker::FinalizeCreation()
         this->jointTypes[this->dataPtr->newJoint->type],
         this->dataPtr->newJoint->parent->GetName(),
         this->dataPtr->newJoint->child->GetName());
-
+    std::cerr << "FinalizeCreation joint inserted " << std::endl;
 
     // Reset visuals
     this->SetVisualMoved(this->dataPtr->newJoint->parent, false);
