@@ -23,6 +23,8 @@ using namespace gazebo;
 class WorldTest : public ServerFixture,
                   public testing::WithParamInterface<const char*>
 {
+  /// \brief Test clearing an empty (blank) world.
+  /// \param[in] _physicsEngine Name of physics engine.
   public: void ClearEmptyWorld(const std::string &_physicsEngine);
 };
 
@@ -54,6 +56,7 @@ void WorldTest::ClearEmptyWorld(const std::string &_physicsEngine)
   EXPECT_EQ(world->GetModelCount(), 1u);
 }
 
+/////////////////////////////////////////////////
 TEST_P(WorldTest, ClearEmptyWorld)
 {
   ClearEmptyWorld(GetParam());
