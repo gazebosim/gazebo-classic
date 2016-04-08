@@ -169,6 +169,7 @@
     * [Pull request #2114](https://bitbucket.org/osrf/gazebo/pull-request/2114)
     
 1. New world event: BeforePhysicsUpdate
+    * [Pull request #2128](https://bitbucket.org/osrf/gazebo/pull-request/2128)
     * [Issue #1851](https://bitbucket.org/osrf/gazebo/issues/1851)
 
 1. Model editor: Fix setting relative pose after alignment during joint creation.
