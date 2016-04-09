@@ -74,6 +74,12 @@ VisualConfig::~VisualConfig()
     delete config->second;
     this->configs.erase(config);
   }
+  while (!this->deletedConfigs.empty())
+  {
+    auto config = this->deletedConfigs.begin();
+    delete config->second;
+    this->deletedConfigs.erase(config);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -88,10 +94,10 @@ void VisualConfig::Init()
 
   // Clear lists
   for (auto &it : this->deletedConfigs)
-  {
     delete it.second->widget;
-  }
   this->deletedConfigs.clear();
+
+  this->addedConfigs.clear();
 }
 
 /////////////////////////////////////////////////
@@ -243,6 +249,7 @@ void VisualConfig::AddVisual(const std::string &_name,
   connect(headerButton, SIGNAL(toggled(bool)), configData,
            SLOT(OnToggleItem(bool)));
   this->configs[this->counter] = configData;
+  this->addedConfigs.push_back(this->counter);
 
   this->counter++;
 }
@@ -433,7 +440,21 @@ void VisualConfig::OnStringChanged(const QString &_name,
 /////////////////////////////////////////////////
 void VisualConfig::RestoreOriginalData()
 {
-  // Restore existing configs
+  // Remove added configs
+  for (auto id : this->addedConfigs)
+  {
+    auto configData = this->configs[id];
+
+    this->listLayout->removeWidget(configData->widget);
+    delete configData->widget;
+
+    emit VisualRemoved(configData->name);
+
+    this->configs.erase(id);
+  }
+  this->addedConfigs.clear();
+
+  // Restore previously existing configs
   for (auto &it : this->configs)
   {
     it.second->RestoreOriginalData();

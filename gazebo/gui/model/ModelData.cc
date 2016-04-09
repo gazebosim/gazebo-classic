@@ -686,7 +686,7 @@ void LinkData::OnInspectorOpened()
 {
   // Reset backup lists
   for (auto it = this->deletedVisuals.begin();
-      it != this->deletedVisuals.end();)
+      it != this->deletedVisuals.end(); ++it)
   {
     this->linkVisual->DetachVisual(it->first);
     this->linkVisual->GetScene()->RemoveVisual(it->first);
@@ -694,7 +694,7 @@ void LinkData::OnInspectorOpened()
   this->deletedVisuals.clear();
 
   for (auto it = this->deletedCollisions.begin();
-      it != this->deletedCollisions.end();)
+      it != this->deletedCollisions.end(); ++it)
   {
     this->linkVisual->DetachVisual(it->first);
     this->linkVisual->GetScene()->RemoveVisual(it->first);

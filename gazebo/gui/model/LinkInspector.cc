@@ -175,14 +175,14 @@ void LinkInspector::SetLinkId(const std::string &_id)
 /////////////////////////////////////////////////
 void LinkInspector::Open()
 {
+  emit this->Opened();
+
   this->dataPtr->linkConfig->Init();
   this->dataPtr->visualConfig->Init();
   this->dataPtr->collisionConfig->Init();
 
   this->move(QCursor::pos());
   this->show();
-
-  emit this->Opened();
 }
 
 /////////////////////////////////////////////////

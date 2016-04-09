@@ -72,6 +72,12 @@ CollisionConfig::~CollisionConfig()
     delete config->second;
     this->configs.erase(config);
   }
+  while (!this->deletedConfigs.empty())
+  {
+    auto config = this->deletedConfigs.begin();
+    delete config->second;
+    this->deletedConfigs.erase(config);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -83,6 +89,13 @@ void CollisionConfig::Init()
     CollisionConfigData *configData = it.second;
     configData->originalDataMsg.CopyFrom(*this->GetData(configData->name));
   }
+
+  // Clear lists
+  for (auto &it : this->deletedConfigs)
+    delete it.second->widget;
+  this->deletedConfigs.clear();
+
+  this->addedConfigs.clear();
 }
 
 /////////////////////////////////////////////////
@@ -252,6 +265,7 @@ void CollisionConfig::AddCollision(const std::string &_name,
   connect(headerButton, SIGNAL(toggled(bool)), configData,
            SLOT(OnToggleItem(bool)));
   this->configs[this->counter] = configData;
+  this->addedConfigs.push_back(this->counter);
 
   this->counter++;
 }
@@ -380,7 +394,21 @@ void CollisionConfig::OnGeometryChanged(const std::string &/*_name*/,
 /////////////////////////////////////////////////
 void CollisionConfig::RestoreOriginalData()
 {
-  // Restore existing configs
+  // Remove added configs
+  for (auto id : this->addedConfigs)
+  {
+    auto configData = this->configs[id];
+
+    this->listLayout->removeWidget(configData->widget);
+    delete configData->widget;
+
+    emit CollisionRemoved(configData->name);
+
+    this->configs.erase(id);
+  }
+  this->addedConfigs.clear();
+
+  // Restore previously existing configs
   for (auto &it : this->configs)
   {
     it.second->RestoreOriginalData();

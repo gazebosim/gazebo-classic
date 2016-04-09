@@ -20,6 +20,7 @@
 
 #include <map>
 #include <string>
+#include <vector>
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/model/ModelData.hh"
@@ -166,6 +167,9 @@ namespace gazebo
 
       /// \brief Map of collision config widgets which were deleted.
       private: std::map<int, CollisionConfigData *> deletedConfigs;
+
+      /// \brief Vector of collision config widgets which were added.
+      private: std::vector<int> addedConfigs;
 
       /// \brief Counter for the number of collisions.
       private: int counter;
