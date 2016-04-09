@@ -42,7 +42,7 @@
 
 1. Removes one function call and replaces a manual swap with std::swap in ODE heightfield.
     * [Pull request #2114](https://bitbucket.org/osrf/gazebo/pull-request/2114)
-    
+
 1. New world event: BeforePhysicsUpdate
     * [Pull request #2128](https://bitbucket.org/osrf/gazebo/pull-request/2128)
     * [Issue #1851](https://bitbucket.org/osrf/gazebo/issues/1851)
@@ -54,6 +54,11 @@
 
     1. Fix saving and spawning model with its original name
         * [Pull request #2183](https://bitbucket.org/osrf/gazebo/pull-request/2183)
+
+    1. Reset visual / collision insertion / deletion
+        * [Pull request #2254](https://bitbucket.org/osrf/gazebo/pull-request/2254)
+        * [Issue #1777](https://bitbucket.org/osrf/gazebo/issues/1777)
+        * [Issue #1852](https://bitbucket.org/osrf/gazebo/issues/1852)
 
     1. Fix inserting custom links
         * [Pull request #2222](https://bitbucket.org/osrf/gazebo/pull-request/2222)
