@@ -162,6 +162,8 @@ void CollisionConfig::AddCollision(const std::string &_name,
 
   // Remove button
   QToolButton *removeCollisionButton = new QToolButton(this);
+  removeCollisionButton->setObjectName(
+      "removeCollisionButton_" + QString::number(this->counter));
   removeCollisionButton->setFixedSize(QSize(30, 30));
   removeCollisionButton->setToolTip("Remove " + QString(_name.c_str()));
   removeCollisionButton->setIcon(QPixmap(":/images/trashcan.png"));
@@ -310,7 +312,7 @@ void CollisionConfig::OnRemoveCollision(int _id)
   msgBox.setDefaultButton(removeButton);
   msgBox.setEscapeButton(cancelButton);
   msgBox.exec();
-  if (msgBox.clickedButton() != removeButton)
+  if (msgBox.clickedButton() && msgBox.clickedButton() != removeButton)
     return;
 
   // Remove

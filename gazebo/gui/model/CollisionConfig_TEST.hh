@@ -43,6 +43,9 @@ class CollisionConfig_TEST : public QTestFixture
   /// \brief Slot that receives Applied signals.
   private slots: void OnApply();
 
+  /// \brief Test restoring original data.
+  private slots: void Restore();
+
   /// \brief Count how many Applied signals have been emitted.
   private: unsigned int g_appliedSignalCount = 0;
 };
