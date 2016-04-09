@@ -257,6 +257,9 @@ void Sensor::Fini()
 
   this->active = false;
   this->plugins.clear();
+
+  if (this->node)
+    this->node->Fini();
   this->node.reset();
 
   if (this->sdf)

@@ -62,6 +62,7 @@ CameraSensor::CameraSensor()
 //////////////////////////////////////////////////
 CameraSensor::~CameraSensor()
 {
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -172,8 +173,7 @@ void CameraSensor::Fini()
 
   if (this->camera)
   {
-    std::string scopedName = this->parentName + "::" + this->Name();
-    this->scene->RemoveCamera(scopedName);
+    this->scene->RemoveCamera(this->camera->Name());
   }
 
   this->camera.reset();
