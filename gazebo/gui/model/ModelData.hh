@@ -219,6 +219,9 @@ namespace gazebo
       /// \brief Collisions of the link.
       public: std::map<rendering::VisualPtr, msgs::Collision> collisions;
 
+      /// \brief Deleted collisions of the link.
+      public: std::map<rendering::VisualPtr, msgs::Collision> deletedCollisions;
+
       /// \brief Inspector for configuring link properties.
       public: LinkInspector *inspector;
 

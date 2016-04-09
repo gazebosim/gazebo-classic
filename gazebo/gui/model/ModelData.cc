@@ -684,13 +684,22 @@ void LinkData::OnApply()
 /////////////////////////////////////////////////
 void LinkData::OnInspectorOpened()
 {
-  for (auto it = this->deletedVisuals.begin(); 
+  // Reset backup lists
+  for (auto it = this->deletedVisuals.begin();
       it != this->deletedVisuals.end();)
   {
     this->linkVisual->DetachVisual(it->first);
     this->linkVisual->GetScene()->RemoveVisual(it->first);
   }
   this->deletedVisuals.clear();
+
+  for (auto it = this->deletedCollisions.begin();
+      it != this->deletedCollisions.end();)
+  {
+    this->linkVisual->DetachVisual(it->first);
+    this->linkVisual->GetScene()->RemoveVisual(it->first);
+  }
+  this->deletedCollisions.clear();
 }
 
 /////////////////////////////////////////////////
@@ -1020,32 +1029,52 @@ void LinkData::OnAddCollision(const std::string &_name)
   collisionName << this->linkVisual->GetName() << "::" << _name;
 
   rendering::VisualPtr collisionVis;
-  if (!this->collisions.empty())
-  {
-    // add new collision by cloning last instance
-    collisionVis = this->collisions.rbegin()->first->Clone(collisionName.str(),
-        this->linkVisual);
-  }
-  else
-  {
-    // create new collision based on sdf template (box)
-    sdf::SDFPtr modelTemplateSDF(new sdf::SDF);
-    modelTemplateSDF->SetFromString(
-        ModelData::GetTemplateSDFString());
-
-    collisionVis.reset(new rendering::Visual(collisionName.str(),
-        this->linkVisual));
-    sdf::ElementPtr collisionElem =  modelTemplateSDF->Root()
-        ->GetElement("model")->GetElement("link")->GetElement("visual");
-    collisionVis->Load(collisionElem);
-    collisionVis->SetMaterial("Gazebo/Orange");
-  }
-
-  msgs::Visual visualMsg = msgs::VisualFromSDF(collisionVis->GetSDF());
   msgs::Collision collisionMsg;
-  collisionMsg.set_name(_name);
-  msgs::Geometry *geomMsg = collisionMsg.mutable_geometry();
-  geomMsg->CopyFrom(visualMsg.geometry());
+
+  // See if this is in the deleted list
+  for (auto it = this->deletedCollisions.begin();
+      it != this->deletedCollisions.end();)
+  {
+    if (it->first->GetName() == collisionName.str())
+    {
+      collisionVis = it->first;
+      collisionVis->SetVisible(true);
+      collisionMsg = it->second;
+
+      this->deletedCollisions.erase(it++);
+      break;
+    }
+    ++it;
+  }
+
+  if (!collisionVis)
+  {
+    if (!this->collisions.empty())
+    {
+      // add new collision by cloning last instance
+      collisionVis = this->collisions.rbegin()->first->Clone(
+          collisionName.str(), this->linkVisual);
+    }
+    else
+    {
+      // create new collision based on sdf template (box)
+      sdf::SDFPtr modelTemplateSDF(new sdf::SDF);
+      modelTemplateSDF->SetFromString(
+          ModelData::GetTemplateSDFString());
+
+      collisionVis.reset(new rendering::Visual(collisionName.str(),
+          this->linkVisual));
+      sdf::ElementPtr collisionElem =  modelTemplateSDF->Root()
+          ->GetElement("model")->GetElement("link")->GetElement("visual");
+      collisionVis->Load(collisionElem);
+      collisionVis->SetMaterial("Gazebo/Orange");
+    }
+
+    msgs::Visual visualMsg = msgs::VisualFromSDF(collisionVis->GetSDF());
+    collisionMsg.set_name(_name);
+    msgs::Geometry *geomMsg = collisionMsg.mutable_geometry();
+    geomMsg->CopyFrom(visualMsg.geometry());
+  }
 
   msgs::CollisionPtr collisionMsgPtr(new msgs::Collision);
   collisionMsgPtr->CopyFrom(collisionMsg);
@@ -1089,15 +1118,17 @@ void LinkData::OnRemoveCollision(const std::string &_name)
   name << this->linkVisual->GetName() << "::" << _name;
   std::string collisionName = name.str();
 
-  for (auto it = this->collisions.begin(); it != this->collisions.end(); ++it)
+  for (auto it = this->collisions.begin(); it != this->collisions.end();)
   {
     if (collisionName == it->first->GetName())
     {
-      this->linkVisual->DetachVisual(it->first);
-      this->linkVisual->GetScene()->RemoveVisual(it->first);
-      this->collisions.erase(it);
+      it->first->SetVisible(false);
+
+      this->deletedCollisions[it->first] = it->second;
+      this->collisions.erase(it++);
       break;
     }
+    ++it;
   }
 }
 

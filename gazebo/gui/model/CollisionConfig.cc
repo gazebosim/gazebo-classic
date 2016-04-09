@@ -301,9 +301,10 @@ void CollisionConfig::OnRemoveCollision(int _id)
 
   // Remove
   this->listLayout->removeWidget(configData->widget);
-  delete configData->widget;
+  configData->widget->hide();
 
   emit CollisionRemoved(configData->name);
+  this->deletedConfigs[_id] = configData;
   this->configs.erase(it);
 }
 
@@ -379,10 +380,22 @@ void CollisionConfig::OnGeometryChanged(const std::string &/*_name*/,
 /////////////////////////////////////////////////
 void CollisionConfig::RestoreOriginalData()
 {
+  // Restore existing configs
   for (auto &it : this->configs)
   {
     it.second->RestoreOriginalData();
   }
+
+  // Reinsert deleted configs
+  for (auto &it : this->deletedConfigs)
+  {
+    this->listLayout->addWidget(it.second->widget);
+    it.second->widget->show();
+
+    this->configs[it.first] = it.second;
+    emit CollisionAdded(it.second->name);
+  }
+  this->deletedConfigs.clear();
 }
 
 /////////////////////////////////////////////////
