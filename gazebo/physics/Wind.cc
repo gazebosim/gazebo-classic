@@ -165,7 +165,8 @@ void Wind::Fini()
     this->dataPtr->windSub.reset();
     this->dataPtr->requestSub.reset();
 
-    this->dataPtr->node->Fini();
+    if (this->dataPtr->node)
+      this->dataPtr->node->Fini();
     this->dataPtr->node.reset();
   }
   this->dataPtr->world.reset();
