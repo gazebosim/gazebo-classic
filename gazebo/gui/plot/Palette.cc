@@ -397,12 +397,6 @@ class gazebo::gui::PalettePrivate
   /// \brief View holding the search sim tree.
   public: QTreeView *searchSimTree;
 
-  /// \brief View holding the topics tree.
-  public: QTreeView *topicsTree;
-
-  /// \brief View holding the models tree.
-  public: QTreeView *modelsTree;
-
   /// \brief Communication node.
   public: ignition::transport::Node node;
 
@@ -441,17 +435,17 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   this->dataPtr->searchTopicsModel->setSourceModel(this->dataPtr->topicsModel);
 
   // A tree to visualize the topics and their messages.
-  this->dataPtr->topicsTree = new QTreeView;
-  this->dataPtr->topicsTree->setObjectName("plotTree");
-  this->dataPtr->topicsTree->setAnimated(true);
-  this->dataPtr->topicsTree->setHeaderHidden(true);
-  this->dataPtr->topicsTree->setExpandsOnDoubleClick(true);
-  this->dataPtr->topicsTree->setModel(this->dataPtr->topicsModel);
-  this->dataPtr->topicsTree->setItemDelegate(plotItemDelegate);
-  this->dataPtr->topicsTree->setEditTriggers(QAbstractItemView::NoEditTriggers);
-  this->dataPtr->topicsTree->setDragEnabled(true);
-  this->dataPtr->topicsTree->setDragDropMode(QAbstractItemView::DragOnly);
-  connect(this->dataPtr->topicsTree, SIGNAL(clicked(const QModelIndex &)),
+  auto topicsTree = new QTreeView;
+  topicsTree->setObjectName("plotTree");
+  topicsTree->setAnimated(true);
+  topicsTree->setHeaderHidden(true);
+  topicsTree->setExpandsOnDoubleClick(true);
+  topicsTree->setModel(this->dataPtr->topicsModel);
+  topicsTree->setItemDelegate(plotItemDelegate);
+  topicsTree->setEditTriggers(QAbstractItemView::NoEditTriggers);
+  topicsTree->setDragEnabled(true);
+  topicsTree->setDragDropMode(QAbstractItemView::DragOnly);
+  connect(topicsTree, SIGNAL(clicked(const QModelIndex &)),
           this, SLOT(ExpandTree(const QModelIndex &)));
 
   // The model that will hold data to be displayed in the model tree view
@@ -471,17 +465,17 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   this->dataPtr->searchModelsModel->setSourceModel(this->dataPtr->modelsModel);
 
   // A tree to visualize models and their properties
-  this->dataPtr->modelsTree = new QTreeView;
-  this->dataPtr->modelsTree->setObjectName("plotTree");
-  this->dataPtr->modelsTree->setAnimated(true);
-  this->dataPtr->modelsTree->setHeaderHidden(true);
-  this->dataPtr->modelsTree->setExpandsOnDoubleClick(true);
-  this->dataPtr->modelsTree->setModel(this->dataPtr->modelsModel);
-  this->dataPtr->modelsTree->setItemDelegate(plotItemDelegate);
-  this->dataPtr->modelsTree->setEditTriggers(QAbstractItemView::NoEditTriggers);
-  this->dataPtr->modelsTree->setDragEnabled(true);
-  this->dataPtr->modelsTree->setDragDropMode(QAbstractItemView::DragOnly);
-  connect(this->dataPtr->modelsTree, SIGNAL(clicked(const QModelIndex &)),
+  auto modelsTree = new QTreeView;
+  modelsTree->setObjectName("plotTree");
+  modelsTree->setAnimated(true);
+  modelsTree->setHeaderHidden(true);
+  modelsTree->setExpandsOnDoubleClick(true);
+  modelsTree->setModel(this->dataPtr->modelsModel);
+  modelsTree->setItemDelegate(plotItemDelegate);
+  modelsTree->setEditTriggers(QAbstractItemView::NoEditTriggers);
+  modelsTree->setDragEnabled(true);
+  modelsTree->setDragDropMode(QAbstractItemView::DragOnly);
+  connect(modelsTree, SIGNAL(clicked(const QModelIndex &)),
           this, SLOT(ExpandTree(const QModelIndex &)));
 
   // The model that will hold data to be displayed in the sim tree view
@@ -615,8 +609,8 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   // The stacked layout is used by the TabBar to switch active layouts
   auto tabStackedLayout = new QStackedLayout;
   tabStackedLayout->setContentsMargins(0, 0, 0, 0);
-  tabStackedLayout->addWidget(this->dataPtr->topicsTree);
-  tabStackedLayout->addWidget(this->dataPtr->modelsTree);
+  tabStackedLayout->addWidget(topicsTree);
+  tabStackedLayout->addWidget(modelsTree);
   tabStackedLayout->addWidget(simTree);
   tabStackedLayout->addWidget(searchWidget);
 
