@@ -353,9 +353,9 @@ void PlotWindow::OnExport()
 }
 
 /////////////////////////////////////////////////
-std::list<PlotCanvas*> PlotWindow::Plots()
+std::list<PlotCanvas *> PlotWindow::Plots()
 {
-  std::list<PlotCanvas*> plots;
+  std::list<PlotCanvas *> plots;
 
   for (int i = 0; i < this->dataPtr->canvasLayout->count(); ++i)
   {

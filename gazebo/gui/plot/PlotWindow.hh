@@ -49,7 +49,7 @@ namespace gazebo
 
       /// \brief Get a list of all the plots
       /// \return A list of all the plots.
-      public: std::list<PlotCanvas*> Plots();
+      public: std::list<PlotCanvas *> Plots();
 
       /// \brief Remove a plot canvas
       /// \param[in] _canvas Canvas to remove

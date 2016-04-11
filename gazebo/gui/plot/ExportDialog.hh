@@ -19,15 +19,17 @@
 
 #include <list>
 #include <memory>
-#include <string>
-#include "gazebo/gui/plot/PlotCanvas.hh"
+
 #include "gazebo/gui/qt.h"
+
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
+    class PlotCanvas;
+
     // Forward declare private data class
     class ExportDialogPrivate;
 
@@ -44,7 +46,7 @@ namespace gazebo
       /// \param[in] _parent Parent QWidget.
       /// \param[in] _plots Plots to export.
       public: ExportDialog(QWidget *_parent,
-                           const std::list<PlotCanvas*> &_plots);
+                           const std::list<PlotCanvas *> &_plots);
 
       /// \brief Destructor
       public: ~ExportDialog();

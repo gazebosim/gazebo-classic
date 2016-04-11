@@ -17,11 +17,11 @@
 #include <fstream>
 #include <functional>
 
-#include "gazebo/common/SVGLoader.hh"
+#include "gazebo/gui/plot/ExportDialog.hh"
 #include "gazebo/gui/plot/IncrementalPlot.hh"
+#include "gazebo/gui/plot/PlotCanvas.hh"
 #include "gazebo/gui/plot/PlotCurve.hh"
 #include "gazebo/gui/plot/PlotWindow.hh"
-#include "gazebo/gui/plot/ExportDialog.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -53,7 +53,10 @@ class PlotViewDelegate : public QStyledItemDelegate
   /// \brief Various data roles for the plot list view delegate
   public: enum datarole
   {
+    /// \brief Holds the header text.
     HEADER_TEXT_ROLE = Qt::UserRole + 100,
+
+    /// \brief Holds the icon.
     ICON_ROLE = Qt::UserRole
   };
 
@@ -155,8 +158,6 @@ class PlotViewDelegate : public QStyledItemDelegate
                 iconSize.height() + fm.height() + 20);
             return result;
           }
-
-  public: IncrementalPlot *plot;
 };
 
 /////////////////////////////////////////////////
