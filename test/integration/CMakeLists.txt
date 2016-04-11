@@ -98,6 +98,7 @@ set(tests
   world_entity_below_point.cc
   world_playback.cc
   world_population.cc
+  world_remove.cc
   worlds_installed.cc
   )
 
@@ -129,6 +130,9 @@ if (ENABLE_TESTS_COMPILATION)
 
   # Add plugin dependency
   add_dependencies(${TEST_TYPE}_joint_test SpringTestPlugin)
+
+  set_target_properties(${TEST_TYPE}_model_database PROPERTIES
+    COMPILE_DEFINITIONS "CMAKE_SOURCE_DIR=\"${CMAKE_SOURCE_DIR}\"")
 endif()
 
 set(display_tests

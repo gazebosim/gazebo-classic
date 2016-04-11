@@ -196,7 +196,7 @@ void ModelEditorPalette::OnCustom()
       if (info.completeSuffix().toLower() == "dae" ||
           info.completeSuffix().toLower() == "stl")
       {
-        this->modelCreator->AddShape(ModelCreator::ENTITY_MESH,
+        this->modelCreator->AddCustomLink(ModelCreator::ENTITY_MESH,
             ignition::math::Vector3d::One, ignition::math::Pose3d::Zero,
             importDialog.GetImportPath());
       }
@@ -206,7 +206,7 @@ void ModelEditorPalette::OnCustom()
         extrudeDialog.deleteLater();
         if (extrudeDialog.exec() == QDialog::Accepted)
         {
-          this->modelCreator->AddShape(ModelCreator::ENTITY_POLYLINE,
+          this->modelCreator->AddCustomLink(ModelCreator::ENTITY_POLYLINE,
               ignition::math::Vector3d(1.0/extrudeDialog.GetResolution(),
               1.0/extrudeDialog.GetResolution(),
               extrudeDialog.GetThickness()),
