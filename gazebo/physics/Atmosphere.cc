@@ -100,7 +100,8 @@ void Atmosphere::Fini()
     this->dataPtr->atmosphereSub.reset();
     this->dataPtr->requestSub.reset();
 
-    this->dataPtr->node->Fini();
+    if (this->dataPtr->node)
+      this->dataPtr->node->Fini();
     this->dataPtr->node.reset();
   }
   this->dataPtr->sdf.reset();
