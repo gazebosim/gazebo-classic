@@ -892,6 +892,9 @@ void World::Fini()
   }
   this->dataPtr->lights.clear();
 
+  this->dataPtr->atmosphere.reset();
+  this->dataPtr->wind.reset();
+
   if (this->dataPtr->rootElement)
   {
     this->dataPtr->rootElement->Fini();

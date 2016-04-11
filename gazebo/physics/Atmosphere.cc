@@ -62,6 +62,7 @@ Atmosphere::Atmosphere(WorldPtr _world)
 //////////////////////////////////////////////////
 Atmosphere::~Atmosphere()
 {
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -93,8 +94,17 @@ void Atmosphere::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Atmosphere::Fini()
 {
+  // Clean up transport
+  {
+    this->dataPtr->responsePub.reset();
+    this->dataPtr->atmosphereSub.reset();
+    this->dataPtr->requestSub.reset();
+
+    this->dataPtr->node->Fini();
+    this->dataPtr->node.reset();
+  }
+  this->dataPtr->sdf.reset();
   this->dataPtr->world.reset();
-  this->dataPtr->node->Fini();
 }
 
 //////////////////////////////////////////////////

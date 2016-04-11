@@ -58,6 +58,7 @@ Wind::Wind(WorldPtr _world, sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 Wind::~Wind()
 {
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -157,8 +158,17 @@ bool Wind::Param(const std::string &_key,
 //////////////////////////////////////////////////
 void Wind::Fini()
 {
+  // Clean up transport
+  {
+    this->dataPtr->responsePub.reset();
+
+    this->dataPtr->windSub.reset();
+    this->dataPtr->requestSub.reset();
+
+    this->dataPtr->node->Fini();
+    this->dataPtr->node.reset();
+  }
   this->dataPtr->world.reset();
-  this->dataPtr->node->Fini();
 }
 
 //////////////////////////////////////////////////
