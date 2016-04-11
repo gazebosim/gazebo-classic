@@ -75,8 +75,6 @@ void Palette_TEST::ModelsTab()
       palette->findChild<QStandardItemModel *>("plotModelsModel");
   QVERIFY(modelsModel != NULL);
 
-  std::cerr << modelsModel->rowCount() << std::endl;
-
   // Check the model has as many rows as there are top level models,
   // plus the title
   QCOMPARE(modelsModel->rowCount(), static_cast<int>(count + 1));
