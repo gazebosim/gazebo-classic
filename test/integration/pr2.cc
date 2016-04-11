@@ -41,8 +41,8 @@ void PR2Test::LoadPR2(std::string _physicsEngine)
 
   // Cleanup test directory.
   common::SystemPaths *paths = common::SystemPaths::Instance();
-  boost::filesystem::remove_all(paths->GetDefaultTestPath());
-  boost::filesystem::create_directories(paths->GetDefaultTestPath());
+  boost::filesystem::remove_all(paths->DefaultTestPath());
+  boost::filesystem::create_directories(paths->DefaultTestPath());
 
   ServerFixture::Load("worlds/empty.world", false, _physicsEngine);
   SpawnModel("model://pr2");
@@ -65,7 +65,7 @@ void PR2Test::LoadPR2(std::string _physicsEngine)
     std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
   EXPECT_TRUE(camSensor != NULL);
 
-  while (!camSensor->SaveFrame(paths->GetDefaultTestPath() + "/frame_10.jpg"))
+  while (!camSensor->SaveFrame(paths->DefaultTestPath() + "/frame_10.jpg"))
     common::Time::MSleep(100);
 
   physics::get_world("default")->GetPhysicsEngine()->SetGravity(
@@ -73,13 +73,13 @@ void PR2Test::LoadPR2(std::string _physicsEngine)
   for (int i = 11; i < 200; i++)
   {
     std::ostringstream filename;
-    filename << paths->GetDefaultTestPath() << "/frame_" << i << ".jpg";
+    filename << paths->DefaultTestPath() << "/frame_" << i << ".jpg";
     camSensor->SaveFrame(filename.str());
     common::Time::MSleep(100);
   }
 
   // Cleanup test directory.
-  boost::filesystem::remove_all(paths->GetDefaultTestPath());
+  boost::filesystem::remove_all(paths->DefaultTestPath());
 }
 
 TEST_P(PR2Test, LoadPR2)

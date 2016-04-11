@@ -317,6 +317,7 @@ void Link::Fini()
     msgs::Request *msg = msgs::CreateRequest("entity_delete",
         boost::lexical_cast<std::string>(iter->second.id()));
     this->requestPub->Publish(*msg, true);
+    delete msg;
   }
 
   for (std::vector<std::string>::iterator iter = this->cgVisuals.begin();
@@ -324,11 +325,16 @@ void Link::Fini()
   {
     msgs::Request *msg = msgs::CreateRequest("entity_delete", *iter);
     this->requestPub->Publish(*msg, true);
+    delete msg;
   }
 
 #ifdef HAVE_OPENAL
-  this->world->GetPhysicsEngine()->GetContactManager()->RemoveFilter(
-      this->GetScopedName() + "/audio_collision");
+  if (this->world && this->world->GetPhysicsEngine() &&
+      this->world->GetPhysicsEngine()->GetContactManager())
+  {
+    this->world->GetPhysicsEngine()->GetContactManager()->RemoveFilter(
+        this->GetScopedName() + "/audio_collision");
+  }
   this->audioSink.reset();
 #endif
 
