@@ -150,7 +150,7 @@ void VisualConfig::AddVisual(const std::string &_name,
   // Remove button
   QToolButton *removeVisualButton = new QToolButton(this);
   removeVisualButton->setObjectName(
-      "removeCollisionButton_" + QString::number(this->counter));
+      "removeVisualButton_" + QString::number(this->counter));
   removeVisualButton->setFixedSize(QSize(30, 30));
   removeVisualButton->setToolTip("Remove " + QString(_name.c_str()));
   removeVisualButton->setIcon(QPixmap(":/images/trashcan.png"));
