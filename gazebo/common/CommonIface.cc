@@ -137,10 +137,10 @@ std::string common::unique_file_path(const std::string &_pathAndName,
   if (stat((result + "." + _extension).c_str(), &buf) != -1)
   {
     int count = 0;
-    while (stat((result + "(" + std::to_string(count) + ")." + _extension
-        ).c_str(), &buf) != -1)
+    while (stat((result + "(" + std::to_string(count) + ")." +
+        _extension).c_str(), &buf) != -1)
     {
-      count ++;
+      count++;
     }
 
     result += "(" + std::to_string(count) + ")";
