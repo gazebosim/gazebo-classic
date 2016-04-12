@@ -22,13 +22,14 @@
 
 #include "gazebo/msgs/msgs.hh"
 
-#include "gazebo/physics/World.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
+    class World;
+
     /// \addtogroup gazebo_physics
     /// \{
 
