@@ -21,19 +21,61 @@
   #include <Winsock2.h>
 #endif
 
+#include <functional>
 #include <sdf/sdf.hh>
 
-#include "gazebo/physics/World.hh"
+#include <ignition/math/Vector3.hh>
+
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/TransportTypes.hh"
+
 #include "gazebo/physics/Entity.hh"
-#include "gazebo/transport/TransportIface.hh"
-#include "gazebo/physics/WindPrivate.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Wind.hh"
+#include "gazebo/physics/World.hh"
+
+namespace gazebo
+{
+  namespace physics
+  {
+    /// \internal
+    /// \brief Private data for the Wind class
+    class WindPrivate
+    {
+      /// \brief Pointer to the world.
+      /// We are not responsible for its lifetime, so do not delete.
+      public: World *world;
+
+      /// \brief Node for communication.
+      public: transport::NodePtr node;
+
+      /// \brief Response publisher.
+      public: transport::PublisherPtr responsePub;
+
+      /// \brief Subscribe to the wind topic.
+      public: transport::SubscriberPtr windSub;
+
+      /// \brief Subscribe to the request topic.
+      public: transport::SubscriberPtr requestSub;
+
+      /// \brief Wind linear velocity.
+      public: ignition::math::Vector3d linearVel;
+
+      /// \brief The function used to to calculate the wind velocity at an
+      /// entity's location.
+      /// It takes as input a reference to an instance of Wind and a pointer to
+      /// an Entity.
+      public: std::function< ignition::math::Vector3d (
+                  const Wind *, const Entity *)> linearVelFunc;
+    };
+  }
+}
 
 using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-Wind::Wind(WorldPtr _world, sdf::ElementPtr _sdf)
+Wind::Wind(World *_world, sdf::ElementPtr _sdf)
   : dataPtr(new WindPrivate)
 {
   this->dataPtr->world = _world;
@@ -58,17 +100,11 @@ Wind::Wind(WorldPtr _world, sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 Wind::~Wind()
 {
-  this->Fini();
-}
-
-//////////////////////////////////////////////////
-void Wind::Init(void)
-{
 }
 
 //////////////////////////////////////////////////
 ignition::math::Vector3d Wind::LinearVelDefault(
-    std::shared_ptr<const Wind> &_wind, const Entity * /*_entity*/)
+    const Wind *_wind, const Entity */*_entity*/)
 {
   return _wind->LinearVel();
 }
@@ -76,8 +112,7 @@ ignition::math::Vector3d Wind::LinearVelDefault(
 //////////////////////////////////////////////////
 ignition::math::Vector3d Wind::WorldLinearVel(const Entity *_entity) const
 {
-  std::shared_ptr<const Wind> w = shared_from_this();
-  return this->dataPtr->linearVelFunc(w, _entity);
+  return this->dataPtr->linearVelFunc(this, _entity);
 }
 
 //////////////////////////////////////////////////
@@ -156,23 +191,6 @@ bool Wind::Param(const std::string &_key,
 }
 
 //////////////////////////////////////////////////
-void Wind::Fini()
-{
-  // Clean up transport
-  {
-    this->dataPtr->responsePub.reset();
-
-    this->dataPtr->windSub.reset();
-    this->dataPtr->requestSub.reset();
-
-    if (this->dataPtr->node)
-      this->dataPtr->node->Fini();
-    this->dataPtr->node.reset();
-  }
-  this->dataPtr->world.reset();
-}
-
-//////////////////////////////////////////////////
 void Wind::Load(sdf::ElementPtr _sdf)
 {
   if (_sdf && _sdf->HasElement("linear_velocity"))
@@ -212,9 +230,8 @@ void Wind::OnWindMsg(ConstWindPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-void Wind::SetLinearVelFunc(
-  std::function<ignition::math::Vector3d (std::shared_ptr<const Wind> &,
-    const Entity *_entity)> _linearVelFunc)
+void Wind::SetLinearVelFunc(std::function<ignition::math::Vector3d (
+    const Wind *, const Entity *_entity)> _linearVelFunc)
 {
   this->dataPtr->linearVelFunc = _linearVelFunc;
 }

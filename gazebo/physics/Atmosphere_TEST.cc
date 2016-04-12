@@ -99,13 +99,13 @@ void AtmosphereTest::AtmosphereParam(const std::string &_atmosphere)
 
   // Test Atmosphere::[GS]etParam()
   {
-    physics::AtmospherePtr atmosphere = world->Atmosphere();
+    physics::Atmosphere *atmosphere = world->Atmosphere();
     double temperature = atmosphere->Temperature();
     EXPECT_DOUBLE_EQ(temperature, atmospherePubMsg.temperature());
   }
 
   // Test SetParam for non-implementation-specific parameters
-  physics::AtmospherePtr atmosphere = world->Atmosphere();
+  physics::Atmosphere *atmosphere = world->Atmosphere();
   double temperature = 0.02;
   double pressure = 0.03;
   double temperatureGradient = 0.05;
@@ -133,7 +133,7 @@ void AtmosphereTest::AtmosphereParamBool
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::AtmospherePtr atmosphere = world->Atmosphere();
+  physics::Atmosphere *atmosphere = world->Atmosphere();
 
   // Test shared atmosphere model parameter(s)
   EXPECT_NEAR(atmosphere->Temperature(), 288.15, 1e-6);

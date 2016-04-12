@@ -14,13 +14,15 @@
  * limitations under the License.
  *
 */
-#ifndef _PHYSICSTYPES_HH_
-#define _PHYSICSTYPES_HH_
+#ifndef GAZEBO_PHYSICS_PHYSICSTYPES_HH_
+#define GAZEBO_PHYSICS_PHYSICSTYPES_HH_
 
-#include <vector>
 #include <map>
+#include <memory>
 #include <string>
+#include <vector>
 #include <boost/shared_ptr.hpp>
+
 #include "gazebo/util/system.hh"
 
 /// \file
@@ -122,13 +124,13 @@ namespace gazebo
     /// \brief Boost shared pointer to a PhysicsEngine object
     typedef boost::shared_ptr<PhysicsEngine> PhysicsEnginePtr;
 
-    /// \def  WindPtr
-    /// \brief Standard shared pointer to a Wind object
-    typedef std::shared_ptr<Wind> WindPtr;
+    /// \def WindUPtr
+    /// \brief Standard unique pointer to a Wind object
+    typedef std::unique_ptr<Wind> WindUPtr;
 
-    /// \def AtmospherePtr
-    /// \brief Standard shared pointer to an Atmosphere object
-    typedef std::shared_ptr<Atmosphere> AtmospherePtr;
+    /// \def AtmosphereUPtr
+    /// \brief Standard unique pointer to an Atmosphere object
+    typedef std::unique_ptr<Atmosphere> AtmosphereUPtr;
 
     /// \def  PresetManagerPtr
     /// \brief Shared pointer to a PresetManager object

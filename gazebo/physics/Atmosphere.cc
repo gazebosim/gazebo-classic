@@ -29,8 +29,49 @@
 #include "gazebo/transport/TransportIface.hh"
 
 #include "gazebo/physics/Atmosphere.hh"
-#include "gazebo/physics/AtmospherePrivate.hh"
 #include "gazebo/physics/World.hh"
+
+namespace gazebo
+{
+  namespace physics
+  {
+    /// \internal
+    /// \brief Pointer to private data.
+    class AtmospherePrivate
+    {
+      /// \brief Our SDF values.
+      public: sdf::ElementPtr sdf;
+
+      /// \brief Pointer to the world.
+      /// We are not responsible for its lifetime, so do not delete.
+      public: World *world;
+
+      /// \brief Node for communication.
+      public: transport::NodePtr node;
+
+      /// \brief Response publisher.
+      public: transport::PublisherPtr responsePub;
+
+      /// \brief Subscribe to the atmosphere topic.
+      public: transport::SubscriberPtr atmosphereSub;
+
+      /// \brief Subscribe to the request topic.
+      public: transport::SubscriberPtr requestSub;
+
+      /// \brief Temperature at sea level in kelvins.
+      public: double temperature = 288.15;
+
+      /// \brief Temperature gradient at sea level in K/m.
+      public: double temperatureGradient = -0.0065;
+
+      /// \brief Pressure of the air at sea level in pascals.
+      public: double pressure = 101325;
+
+      /// \brief Mass density of the air at sea level in kg/m^3.
+      public: double massDensity = 1.225;
+    };
+  }
+}
 
 using namespace gazebo;
 using namespace physics;
@@ -39,7 +80,7 @@ const double Atmosphere::MOLAR_MASS = 0.0289644;
 const double Atmosphere::IDEAL_GAS_CONSTANT_R = 8.3144621;
 
 //////////////////////////////////////////////////
-Atmosphere::Atmosphere(WorldPtr _world)
+Atmosphere::Atmosphere(physics::World *_world)
   : dataPtr(new AtmospherePrivate)
 {
   this->dataPtr->world = _world;
@@ -62,7 +103,6 @@ Atmosphere::Atmosphere(WorldPtr _world)
 //////////////////////////////////////////////////
 Atmosphere::~Atmosphere()
 {
-  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -89,23 +129,6 @@ void Atmosphere::Load(sdf::ElementPtr _sdf)
   }
 
   this->UpdateMassDensity();
-}
-
-//////////////////////////////////////////////////
-void Atmosphere::Fini()
-{
-  // Clean up transport
-  {
-    this->dataPtr->responsePub.reset();
-    this->dataPtr->atmosphereSub.reset();
-    this->dataPtr->requestSub.reset();
-
-    if (this->dataPtr->node)
-      this->dataPtr->node->Fini();
-    this->dataPtr->node.reset();
-  }
-  this->dataPtr->sdf.reset();
-  this->dataPtr->world.reset();
 }
 
 //////////////////////////////////////////////////
@@ -182,7 +205,7 @@ double Atmosphere::TemperatureGradient() const
 }
 
 //////////////////////////////////////////////////
-WorldPtr Atmosphere::World() const
+World *Atmosphere::World() const
 {
   return this->dataPtr->world;
 }

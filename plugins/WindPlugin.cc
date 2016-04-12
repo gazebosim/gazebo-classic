@@ -33,7 +33,7 @@ void WindPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
   GZ_ASSERT(_world, "WindPlugin world pointer is NULL");
   this->world = _world;
 
-  physics::WindPtr wind = this->world->Wind();
+  auto wind = this->world->Wind();
 
   if (_sdf->HasElement("horizontal"))
   {
@@ -131,8 +131,7 @@ void WindPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 }
 
 /////////////////////////////////////////////////
-ignition::math::Vector3d WindPlugin::LinearVel(
-    std::shared_ptr<const physics::Wind> &_wind,
+ignition::math::Vector3d WindPlugin::LinearVel(const physics::Wind *_wind,
     const physics::Entity * /*_entity*/)
 {
   // Compute magnitude

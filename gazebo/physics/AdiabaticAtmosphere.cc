@@ -23,13 +23,28 @@
 
 #include <sdf/sdf.hh>
 
-#include "gazebo/transport/Publisher.hh"
-
 #include "gazebo/physics/AdiabaticAtmosphere.hh"
-#include "gazebo/physics/AdiabaticAtmospherePrivate.hh"
 #include "gazebo/physics/AtmosphereFactory.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/World.hh"
+
+#include "gazebo/transport/Publisher.hh"
+
+namespace gazebo
+{
+  namespace physics
+  {
+    /// \internal
+    /// \brief Private data for AdiabaticAtmosphere.
+    class AdiabaticAtmospherePrivate
+    {
+      /// \brief Adiabatic atmosphere power parameter used to calculate
+      /// pressure and density of air.
+      /// See https://en.wikipedia.org/wiki/Density_of_air#Altitude
+      public: double adiabaticPower;
+    };
+  }
+}
 
 using namespace gazebo;
 using namespace physics;
@@ -37,7 +52,7 @@ using namespace physics;
 GZ_REGISTER_ATMOSPHERE_MODEL("adiabatic", AdiabaticAtmosphere)
 
 //////////////////////////////////////////////////
-AdiabaticAtmosphere::AdiabaticAtmosphere(WorldPtr _world)
+AdiabaticAtmosphere::AdiabaticAtmosphere(physics::World *_world)
   : Atmosphere(_world), dataPtr(new AdiabaticAtmospherePrivate)
 {
 }

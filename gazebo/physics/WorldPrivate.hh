@@ -49,11 +49,12 @@ namespace gazebo
       /// \brief Pointer the physics engine.
       public: PhysicsEnginePtr physicsEngine;
 
-      /// \brief Pointer the wind.
-      public: WindPtr wind;
+      /// \brief Unique pointer the wind. The world owns this pointer.
+      public: WindUPtr wind;
 
-      /// \brief Pointer to the atmosphere model.
-      public: AtmospherePtr atmosphere;
+      /// \brief Unique pointer the atmosphere model.
+      /// The world owns this pointer.
+      public: AtmosphereUPtr atmosphere;
 
       /// \brief Pointer the spherical coordinates data.
       public: common::SphericalCoordinatesPtr sphericalCoordinates;

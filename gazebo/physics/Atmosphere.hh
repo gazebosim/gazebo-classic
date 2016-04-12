@@ -14,15 +14,15 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PHYSICS_ATMOSPHERE_HH_
-#define _GAZEBO_PHYSICS_ATMOSPHERE_HH_
+#ifndef GAZEBO_PHYSICS_ATMOSPHERE_HH_
+#define GAZEBO_PHYSICS_ATMOSPHERE_HH_
 
 #include <memory>
 #include <string>
 
 #include "gazebo/msgs/msgs.hh"
 
-#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/physics/World.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -42,7 +42,7 @@ namespace gazebo
     {
       /// \brief Default constructor.
       /// \param[in] _world Pointer to the world.
-      public: explicit Atmosphere(WorldPtr _world);
+      public: explicit Atmosphere(physics::World *_world);
 
       /// \brief Destructor.
       public: virtual ~Atmosphere();
@@ -53,9 +53,6 @@ namespace gazebo
 
       /// \brief Initialize the atmosphere model.
       public: virtual void Init() = 0;
-
-      /// \brief Finalize the atmosphere model.
-      public: virtual void Fini();
 
       /// \brief Reset the atmosphere model.
       public: virtual void Reset();
@@ -118,7 +115,7 @@ namespace gazebo
 
       /// \brief Return the world.
       /// \return Pointer to the world.
-      protected: WorldPtr World() const;
+      protected: physics::World *World() const;
 
       /// \brief Publish response to a request.
       /// \param[in] _msg Message to be published.

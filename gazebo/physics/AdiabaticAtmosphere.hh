@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PHYSICS_ADIABATICATMOSPHERE_HH_
-#define _GAZEBO_PHYSICS_ADIABATICATMOSPHERE_HH_
+#ifndef GAZEBO_PHYSICS_ADIABATICATMOSPHERE_HH_
+#define GAZEBO_PHYSICS_ADIABATICATMOSPHERE_HH_
 
 #include <memory>
 #include <string>
@@ -37,7 +37,7 @@ namespace gazebo
     {
       /// \brief Constructor.
       /// \param[in] _world The World that uses this atmosphere model.
-      public: AdiabaticAtmosphere(WorldPtr _world);
+      public: AdiabaticAtmosphere(physics::World *_world);
 
       /// \brief Destructor.
       public: virtual ~AdiabaticAtmosphere();

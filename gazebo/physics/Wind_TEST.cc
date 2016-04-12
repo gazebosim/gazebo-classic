@@ -32,7 +32,7 @@ class WindTest : public ServerFixture
   /// velocity is to be calculated.
   /// \return Wind's velocity at entity's location.
   public: ignition::math::Vector3d LinearVel(
-                  std::shared_ptr<const physics::Wind> &_wind,
+                  const physics::Wind *_wind,
                   const physics::Entity *_entity);
 
   /// \brief Test getting/setting wind parameters.
@@ -59,7 +59,7 @@ msgs::Wind WindTest::windResponseMsg;
 
 /////////////////////////////////////////////////
 ignition::math::Vector3d WindTest::LinearVel(
-                  std::shared_ptr<const physics::Wind> &_wind,
+                  const physics::Wind *_wind,
                   const physics::Entity * /*_entity*/)
 {
   return _wind->LinearVel() * this->windFactor;
@@ -115,7 +115,7 @@ void WindTest::WindParam()
 
   // Test Wind::[GS]etParam()
   {
-    physics::WindPtr wind = world->Wind();
+    auto wind = world->Wind();
     ignition::math::Vector3d vel = boost::any_cast<ignition::math::Vector3d>(
       wind->Param("linear_velocity"));
     EXPECT_EQ(vel, msgs::ConvertIgn(windPubMsg.linear_velocity()));
@@ -129,7 +129,7 @@ void WindTest::WindParam()
 
   {
     // Test SetParam for non-implementation-specific parameters
-    physics::WindPtr wind = world->Wind();
+    auto wind = world->Wind();
     try
     {
       boost::any value;
@@ -162,7 +162,7 @@ void WindTest::WindParamBool()
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::WindPtr wind = world->Wind();
+  auto wind = world->Wind();
 
   // Initialize to failure conditions
   boost::any value;
@@ -195,7 +195,7 @@ void WindTest::WindSetLinearVelFunc()
   physics::ModelPtr model(new physics::Model(physics::BasePtr()));
   EXPECT_TRUE(model != NULL);
 
-  physics::WindPtr wind = world->Wind();
+  auto wind = world->Wind();
 
   // Double the speed
   this->windFactor = 2.0;
@@ -203,10 +203,8 @@ void WindTest::WindSetLinearVelFunc()
   wind->SetLinearVelFunc(std::bind(&WindTest::LinearVel, this,
         std::placeholders::_1, std::placeholders::_2));
 
-  std::shared_ptr<const physics::Wind> w =
-    std::static_pointer_cast<const physics::Wind>(wind);
   EXPECT_EQ(wind->WorldLinearVel(model.get()),
-            this->LinearVel(w, model.get()));
+            this->LinearVel(wind, model.get()));
 }
 
 /////////////////////////////////////////////////
