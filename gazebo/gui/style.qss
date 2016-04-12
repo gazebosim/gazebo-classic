@@ -1192,12 +1192,26 @@ QTabBar#plottingTabBar::tab:!selected
   font-weight: 400;
 }
 
+QTabBar#plottingTabBar::tab:!hover
+{
+  color: rgba(240,240,240,180);
+  background-color: rgba(120,120,120,255);
+  border-bottom: 2px solid rgba(0,0,0,0);
+  font-weight: 400;
+}
+
 QTabBar#plottingTabBar::tab:selected
 {
   color: #f78e1e;
   background-color: rgba(120,120,120,255);
   border-bottom: 2px solid #f78e1e;
   font-weight: 600;
+}
+
+QTabBar#plottingTabBar::tab:hover
+{
+  color: #f58113;
+  background-color: rgba(120,120,120,255);
 }
 
 QTabBar#plottingTabBar::tab:first:selected

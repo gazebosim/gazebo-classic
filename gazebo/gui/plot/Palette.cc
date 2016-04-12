@@ -79,13 +79,20 @@ class PlotItemDelegate : public QStyledItemDelegate
     QString typeName = qvariant_cast<QString>(_index.data(TYPE));
 
     // TODO: Change to QApplication::font() once Roboto is used everywhere
-    QFont font;
-    auto fontWeight = QFont::Normal;
+    QFont fontBold, fontRegular;
+
+    // Create a bold font
+    fontBold.setFamily("Roboto Bold");
+    fontBold.setWeight(QFont::Bold);
+    QFontMetrics fmBold(fontBold);
+
+    // Create a regular font
+    fontRegular.setFamily("Roboto Regular");
+    fontRegular.setWeight(QFont::Normal);
+    QFontMetrics fmRegular(fontRegular);
+
     if (typeName == "title")
     {
-      font.setFamily("Roboto Bold");
-      fontWeight = QFont::Bold;
-
       // Erase the branch image for titles
       QRectF titleRect = _opt.rect;
       titleRect.setLeft(titleRect.left() - 13);
@@ -95,11 +102,6 @@ class PlotItemDelegate : public QStyledItemDelegate
       _painter->fillRect(titleRect, brush);
       _painter->restore();
     }
-    else
-    {
-      font.setFamily("Roboto Regular");
-    }
-    QFontMetrics fm(font);
 
     // Handle hover style
     if (typeName != "title" && _opt.state & QStyle::State_MouseOver)
@@ -151,9 +153,111 @@ class PlotItemDelegate : public QStyledItemDelegate
       textRect.adjust(0, 5, 0, -5);
     }
 
-    _painter->setFont(QFont(font.family(), font.pointSize(), fontWeight));
     _painter->setPen(QColor(30, 30, 30));
-    _painter->drawText(textRect, topicName);
+
+    // If this is a search result
+    auto searchModel = dynamic_cast<const SearchModel *>(_index.model());
+    if (searchModel && !topicName.isEmpty())
+    {
+      std::string text(topicName.toStdString());
+
+      // Case insensitive search
+      std::string upperText(text);
+      std::transform(upperText.begin(), upperText.end(),
+          upperText.begin(), ::toupper);
+
+      // Split search into words
+      QStringList wordsStringList = searchModel->search.toUpper().split(" ");
+
+      std::vector<std::string> wordsUpper;
+      for (auto word : wordsStringList)
+      {
+        if (word.isEmpty())
+          continue;
+        wordsUpper.push_back(word.toStdString());
+      }
+
+      // Find the portions of text that match the search words, and should
+      // therefore be bold.
+      //
+      // Bold map: key = position of bold text start, value = bold text length
+      std::map<size_t, size_t> bold;
+      std::for_each(wordsUpper.begin(), wordsUpper.end(),
+          [upperText, &bold](const std::string &_word)
+          {
+            size_t pos = upperText.find(_word);
+            // Find all occurences of _word
+            while (pos != std::string::npos)
+            {
+              // Use longest word starting at a given position
+              bold[pos] = std::max(bold[pos], _word.size());
+              pos = upperText.find(_word, pos + 1);
+            }
+          });
+
+      // Paint the text from left to right
+      size_t renderPos = 0;
+      for (std::map<size_t, size_t>::iterator iter = bold.begin();
+           iter != bold.end(); ++iter)
+      {
+        // Start of bold text
+        size_t start = iter->first;
+
+        // Length of bold text.
+        size_t len = iter->second;
+
+        // Check if start is before the current render position.
+        if (renderPos > start)
+        {
+          // It's possible that the bold text goes beyond the current render
+          // position. If so, adjust the start and length appropriately.
+          if (start + len > renderPos)
+          {
+            len = (start + len) - renderPos;
+            start = renderPos;
+          }
+          // Otherwise this bold text has already been rendered, so skip.
+          else
+          {
+            continue;
+          }
+        }
+
+        // First paint text that is not bold
+        auto textStr = QString::fromStdString(
+            text.substr(renderPos, start - renderPos));
+        renderPos += (start - renderPos);
+
+        _painter->setFont(fontRegular);
+        _painter->drawText(textRect, textStr);
+
+        // Move rect to the right
+        textRect.adjust(fmRegular.width(textStr), 0, 0, 0);
+
+        // Next, paint text that is bold
+        textStr = QString::fromStdString(text.substr(renderPos, len));
+        renderPos += len;
+
+        _painter->setFont(fontBold);
+        _painter->drawText(textRect, textStr);
+
+        // Move rect to the right
+        textRect.adjust(fmBold.width(textStr), 0, 0, 0);
+      }
+
+      // Render any remaining text.
+      if (renderPos < text.size())
+      {
+        auto textStr = QString::fromStdString(text.substr(renderPos));
+        _painter->setFont(fontRegular);
+        _painter->drawText(textRect, textStr);
+      }
+    }
+    else
+    {
+      _painter->setFont(typeName == "title" ? fontBold : fontRegular);
+      _painter->drawText(textRect, topicName);
+    }
   }
 
   /// \brief Size hint tells QT how big an item is.
@@ -205,166 +309,127 @@ class PlotItemModel : public QStandardItemModel
 };
 
 /////////////////////////////////////////////////
-/// Customize the search model.
-class SearchModel : public QSortFilterProxyModel
+bool SearchModel::filterAcceptsRow(const int _srcRow,
+      const QModelIndex &_srcParent) const
 {
-  /////////////////////////////////////////////////
-  /// \brief Customize so we accept rows where:
-  /// 1. Each of the words can be found in its ancestors or itself, but not
-  /// necessarily all words on the same row, or
-  /// 2. One of its descendants matches rule 1, or
-  /// 3. One of its ancestors matches rule 1.
-  ///
-  /// For example this structure:
-  /// - a
-  /// -- b
-  /// -- c
-  /// --- d
-  ///
-  /// * A search of "a" will display all rows.
-  /// * A search of "b" or "a b" will display "a" and "b".
-  /// * A search of "c", "d", "a c", "a d", "a c d" or "c d" will display "a",
-  /// "c" and "d".
-  /// * A search of "a b c d", "b c" or "b d" will display nothing.
-  ///
-  /// \param[in] _srcRow Row on the source model.
-  /// \param[in] _srcParent Parent on the source model.
-  /// \return True if row is accepted.
-  public: bool filterAcceptsRow(const int _srcRow,
-      const QModelIndex &_srcParent) const
+  // Item index in search model
+  auto id = this->sourceModel()->index(_srcRow, 0, _srcParent);
+
+  // Ignore titles
+  if (this->sourceModel()->data(id, PlotItemDelegate::TYPE).toString() ==
+      "title")
   {
-    // Empty search matches nothing
-    if (this->search == "")
-      return false;
+    return false;
+  }
 
-    // Item index in search model
-    auto id = this->sourceModel()->index(_srcRow, 0, _srcParent);
+  // Collapsed by default
+  this->sourceModel()->setData(id, false, PlotItemDelegate::TO_EXPAND);
 
-    // Ignore titles
-    if (this->sourceModel()->data(id, PlotItemDelegate::TYPE).toString() ==
-        "title")
-    {
-      return false;
-    }
-
-    // Collapsed by default
-    this->sourceModel()->setData(id, false, PlotItemDelegate::TO_EXPAND);
-
-    // Each word must match at least once, either self, parent or child
-    auto words = this->search.split(" ");
-    for (auto word : words)
-    {
-      if (word == "")
-        continue;
-
-      // Expand this if at least one child contains the word
-      // Note that this is not enough for this to be accepted, we need to match
-      // all words
-      if (this->hasChildAcceptsItself(id, word))
-      {
-        this->sourceModel()->setData(id, true, PlotItemDelegate::TO_EXPAND);
-      }
-
-      // At least one of the children fits rule 1
-      if (this->hasAcceptedChildren(_srcRow, _srcParent))
-        continue;
-
-      // Row itself contains this word
-      if (this->filterAcceptsRowItself(_srcRow, _srcParent, word))
-        continue;
-
-      // One of the ancestors contains this word
-      QModelIndex parentIndex = _srcParent;
-      bool parentAccepted = false;
-      while (parentIndex.isValid())
-      {
-        if (this->filterAcceptsRowItself(parentIndex.row(),
-            parentIndex.parent(), word))
-        {
-          parentAccepted = true;
-          break;
-        }
-        parentIndex = parentIndex.parent();
-      }
-
-      if (parentAccepted)
-        continue;
-
-      // This word can't be found on the row or a parent, and no child is fully
-      // accepted.
-      return false;
-    }
-
+  // Empty search matches everything
+  if (this->search.isEmpty())
     return true;
+
+  // Each word must match at least once, either self, parent or child
+  auto words = this->search.split(" ");
+  for (auto word : words)
+  {
+    if (word.isEmpty())
+      continue;
+
+    // Expand this if at least one child contains the word
+    // Note that this is not enough for this to be accepted, we need to match
+    // all words
+    if (this->hasChildAcceptsItself(id, word))
+    {
+      this->sourceModel()->setData(id, true, PlotItemDelegate::TO_EXPAND);
+    }
+
+    // At least one of the children fits rule 1
+    if (this->hasAcceptedChildren(_srcRow, _srcParent))
+      continue;
+
+    // Row itself contains this word
+    if (this->filterAcceptsRowItself(_srcRow, _srcParent, word))
+      continue;
+
+    // One of the ancestors contains this word
+    QModelIndex parentIndex = _srcParent;
+    bool parentAccepted = false;
+    while (parentIndex.isValid())
+    {
+      if (this->filterAcceptsRowItself(parentIndex.row(),
+          parentIndex.parent(), word))
+      {
+        parentAccepted = true;
+        break;
+      }
+      parentIndex = parentIndex.parent();
+    }
+
+    if (parentAccepted)
+      continue;
+
+    // This word can't be found on the row or a parent, and no child is fully
+    // accepted.
+    return false;
   }
 
-  /// \brief Check if row contains the word on itself.
-  /// \param[in] _srcRow Row on the source model.
-  /// \param[in] _srcParent Parent on the source model.
-  /// \return True if row matches.
-  public: bool filterAcceptsRowItself(const int _srcRow, const
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool SearchModel::filterAcceptsRowItself(const int _srcRow, const
       QModelIndex &_srcParent, QString _word) const
-  {
-    auto id = this->sourceModel()->index(_srcRow, 0, _srcParent);
+{
+  auto id = this->sourceModel()->index(_srcRow, 0, _srcParent);
 
-    return (this->sourceModel()->data(id,
-        this->filterRole()).toString().contains(_word, Qt::CaseInsensitive));
-  }
+  return (this->sourceModel()->data(id,
+      this->filterRole()).toString().contains(_word, Qt::CaseInsensitive));
+}
 
-  /// \brief Check if any of the children is fully accepted.
-  /// \param[in] _srcRow Row on the source model.
-  /// \param[in] _srcParent Parent on the source model.
-  /// \return True if any of the children match.
-  public: bool hasAcceptedChildren(const int _srcRow,
+/////////////////////////////////////////////////
+bool SearchModel::hasAcceptedChildren(const int _srcRow,
       const QModelIndex &_srcParent) const
-  {
-    auto item = sourceModel()->index(_srcRow, 0, _srcParent);
+{
+  auto item = sourceModel()->index(_srcRow, 0, _srcParent);
 
-    if (!item.isValid())
-      return false;
-
-    for (int i = 0; i < item.model()->rowCount(item); ++i)
-    {
-      if (this->filterAcceptsRow(i, item))
-        return true;
-    }
-
+  if (!item.isValid())
     return false;
+
+  for (int i = 0; i < item.model()->rowCount(item); ++i)
+  {
+    if (this->filterAcceptsRow(i, item))
+      return true;
   }
 
-  /// \brief Check if any of the children accepts a specific word.
-  /// \param[in] _srcParent Parent on the source model.
-  /// \param[in] _word Word to be checked.
-  /// \return True if any of the children match.
-  public: bool hasChildAcceptsItself(const QModelIndex &_srcParent,
+  return false;
+}
+
+/////////////////////////////////////////////////
+bool SearchModel::hasChildAcceptsItself(const QModelIndex &_srcParent,
       const QString &_word) const
+{
+  for (int i = 0; i < this->sourceModel()->rowCount(_srcParent); ++i)
   {
-    for (int i = 0; i < this->sourceModel()->rowCount(_srcParent); ++i)
-    {
-      // Check immediate children
-      if (this->filterAcceptsRowItself(i, _srcParent, _word))
-        return true;
+    // Check immediate children
+    if (this->filterAcceptsRowItself(i, _srcParent, _word))
+      return true;
 
-      // Check grandchildren
-      auto item = this->sourceModel()->index(i, 0, _srcParent);
-      if (this->hasChildAcceptsItself(item, _word))
-        return true;
-    }
-
-    return false;
+    // Check grandchildren
+    auto item = this->sourceModel()->index(i, 0, _srcParent);
+    if (this->hasChildAcceptsItself(item, _word))
+      return true;
   }
 
-  /// \brief Set a new search value.
-  /// \param[in] _search Full search string.
-  public: void setSearch(const QString &_search)
-  {
-    this->search = _search;
-    this->filterChanged();
-  }
+  return false;
+}
 
-  /// \brief Full search string.
-  public: QString search;
-};
+/////////////////////////////////////////////////
+void SearchModel::SetSearch(const QString &_search)
+{
+  this->search = _search;
+  this->filterChanged();
+}
 
 /////////////////////////////////////////////////
 /// \brief Private data for the Palette class
@@ -445,6 +510,8 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   topicsTree->setEditTriggers(QAbstractItemView::NoEditTriggers);
   topicsTree->setDragEnabled(true);
   topicsTree->setDragDropMode(QAbstractItemView::DragOnly);
+  connect(topicsTree, SIGNAL(clicked(const QModelIndex &)),
+          this, SLOT(ExpandTree(const QModelIndex &)));
 
   // The model that will hold data to be displayed in the model tree view
   this->connect(
@@ -473,6 +540,8 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   modelsTree->setEditTriggers(QAbstractItemView::NoEditTriggers);
   modelsTree->setDragEnabled(true);
   modelsTree->setDragDropMode(QAbstractItemView::DragOnly);
+  connect(modelsTree, SIGNAL(clicked(const QModelIndex &)),
+          this, SLOT(ExpandTree(const QModelIndex &)));
 
   // The model that will hold data to be displayed in the sim tree view
   this->dataPtr->simModel = new PlotItemModel;
@@ -522,6 +591,8 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
       QAbstractItemView::NoEditTriggers);
   this->dataPtr->searchTopicsTree->setDragEnabled(true);
   this->dataPtr->searchTopicsTree->setDragDropMode(QAbstractItemView::DragOnly);
+  connect(this->dataPtr->searchTopicsTree, SIGNAL(clicked(const QModelIndex &)),
+          this, SLOT(ExpandTree(const QModelIndex &)));
 
   // A tree to visualize models search results
   this->dataPtr->searchModelsTree = new QTreeView;
@@ -535,6 +606,8 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
       QAbstractItemView::NoEditTriggers);
   this->dataPtr->searchModelsTree->setDragEnabled(true);
   this->dataPtr->searchModelsTree->setDragDropMode(QAbstractItemView::DragOnly);
+  connect(this->dataPtr->searchModelsTree, SIGNAL(clicked(const QModelIndex &)),
+          this, SLOT(ExpandTree(const QModelIndex &)));
 
   // A tree to visualize sim search results
   this->dataPtr->searchSimTree = new QTreeView;
@@ -1437,9 +1510,9 @@ void Palette::InsertAxisItem(QStandardItem *_item, const common::URI &_uri,
 /////////////////////////////////////////////////
 void Palette::UpdateSearch(const QString &_search)
 {
-  this->dataPtr->searchTopicsModel->setSearch(_search);
-  this->dataPtr->searchModelsModel->setSearch(_search);
-  this->dataPtr->searchSimModel->setSearch(_search);
+  this->dataPtr->searchTopicsModel->SetSearch(_search);
+  this->dataPtr->searchModelsModel->SetSearch(_search);
+  this->dataPtr->searchSimModel->SetSearch(_search);
 
   // Expand / collapse
   this->ExpandChildren(this->dataPtr->searchTopicsModel,
@@ -1470,4 +1543,15 @@ void Palette::ExpandChildren(QSortFilterProxyModel *_model,
 
     this->ExpandChildren(_model, _tree, item);
   }
+}
+
+/////////////////////////////////////////////////
+void Palette::ExpandTree(const QModelIndex &_index)
+{
+  auto tree = qobject_cast<QTreeView *>(QObject::sender());
+
+  if (!tree)
+    return;
+
+  tree->setExpanded(_index, !tree->isExpanded(_index));
 }
