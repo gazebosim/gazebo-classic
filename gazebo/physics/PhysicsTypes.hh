@@ -124,14 +124,6 @@ namespace gazebo
     /// \brief Boost shared pointer to a PhysicsEngine object
     typedef boost::shared_ptr<PhysicsEngine> PhysicsEnginePtr;
 
-    /// \def WindUPtr
-    /// \brief Standard unique pointer to a Wind object
-    typedef std::unique_ptr<Wind> WindUPtr;
-
-    /// \def AtmosphereUPtr
-    /// \brief Standard unique pointer to an Atmosphere object
-    typedef std::unique_ptr<Atmosphere> AtmosphereUPtr;
-
     /// \def  PresetManagerPtr
     /// \brief Shared pointer to a PresetManager object
     typedef boost::shared_ptr<PresetManager> PresetManagerPtr;

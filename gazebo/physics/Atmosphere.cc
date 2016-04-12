@@ -46,18 +46,6 @@ namespace gazebo
       /// We are not responsible for its lifetime, so do not delete.
       public: World *world;
 
-      /// \brief Node for communication.
-      public: transport::NodePtr node;
-
-      /// \brief Response publisher.
-      public: transport::PublisherPtr responsePub;
-
-      /// \brief Subscribe to the atmosphere topic.
-      public: transport::SubscriberPtr atmosphereSub;
-
-      /// \brief Subscribe to the request topic.
-      public: transport::SubscriberPtr requestSub;
-
       /// \brief Temperature at sea level in kelvins.
       public: double temperature = 288.15;
 
@@ -69,6 +57,19 @@ namespace gazebo
 
       /// \brief Mass density of the air at sea level in kg/m^3.
       public: double massDensity = 1.225;
+
+      // Transport is declared last.
+      /// \brief Node for communication.
+      public: transport::NodePtr node;
+
+      /// \brief Response publisher.
+      public: transport::PublisherPtr responsePub;
+
+      /// \brief Subscribe to the atmosphere topic.
+      public: transport::SubscriberPtr atmosphereSub;
+
+      /// \brief Subscribe to the request topic.
+      public: transport::SubscriberPtr requestSub;
     };
   }
 }
@@ -103,6 +104,8 @@ Atmosphere::Atmosphere(physics::World *_world)
 //////////////////////////////////////////////////
 Atmosphere::~Atmosphere()
 {
+  // Must call fini on node to remove it from topic manager.
+  this->dataPtr->node->Fini();
 }
 
 //////////////////////////////////////////////////

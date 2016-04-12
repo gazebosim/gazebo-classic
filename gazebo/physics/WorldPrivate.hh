@@ -50,11 +50,11 @@ namespace gazebo
       public: PhysicsEnginePtr physicsEngine;
 
       /// \brief Unique pointer the wind. The world owns this pointer.
-      public: WindUPtr wind;
+      public: std::unique_ptr<Wind> wind;
 
       /// \brief Unique pointer the atmosphere model.
       /// The world owns this pointer.
-      public: AtmosphereUPtr atmosphere;
+      public: std::unique_ptr<Atmosphere> atmosphere;
 
       /// \brief Pointer the spherical coordinates data.
       public: common::SphericalCoordinatesPtr sphericalCoordinates;

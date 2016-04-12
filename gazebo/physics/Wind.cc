@@ -46,6 +46,17 @@ namespace gazebo
       /// We are not responsible for its lifetime, so do not delete.
       public: World *world;
 
+      /// \brief Wind linear velocity.
+      public: ignition::math::Vector3d linearVel;
+
+      /// \brief The function used to to calculate the wind velocity at an
+      /// entity's location.
+      /// It takes as input a reference to an instance of Wind and a pointer to
+      /// an Entity.
+      public: std::function< ignition::math::Vector3d (
+                  const Wind *, const Entity *)> linearVelFunc;
+
+      // Transport is declared last.
       /// \brief Node for communication.
       public: transport::NodePtr node;
 
@@ -57,16 +68,6 @@ namespace gazebo
 
       /// \brief Subscribe to the request topic.
       public: transport::SubscriberPtr requestSub;
-
-      /// \brief Wind linear velocity.
-      public: ignition::math::Vector3d linearVel;
-
-      /// \brief The function used to to calculate the wind velocity at an
-      /// entity's location.
-      /// It takes as input a reference to an instance of Wind and a pointer to
-      /// an Entity.
-      public: std::function< ignition::math::Vector3d (
-                  const Wind *, const Entity *)> linearVelFunc;
     };
   }
 }
@@ -100,6 +101,8 @@ Wind::Wind(World *_world, sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 Wind::~Wind()
 {
+  // Must call fini on node to remove it from topic manager.
+  this->dataPtr->node->Fini();
 }
 
 //////////////////////////////////////////////////

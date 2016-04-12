@@ -32,7 +32,7 @@ namespace gazebo
 
     /// \def AtmosphereFactoryFn
     /// \brief Prototype for atmosphere factory functions.
-    typedef AtmosphereUPtr (*AtmosphereFactoryFn) (World *world);
+    typedef std::unique_ptr<Atmosphere> (*AtmosphereFactoryFn) (World *world);
 
     /// \class AtmosphereFactory AtmosphereFactory.hh physics/physics.hh
     /// \brief The atmosphere factory instantiates different atmosphere models.
@@ -52,7 +52,7 @@ namespace gazebo
       /// \param[in] _className Name of the atmosphere class.
       /// \param[in] _world World to pass to the created atmosphere model.
       /// \return Unique pointer to the atmosphere model.
-      public: static AtmosphereUPtr NewAtmosphere(
+      public: static std::unique_ptr<Atmosphere> NewAtmosphere(
                   const std::string &_className, World *_world);
 
       /// \brief Check if an atmosphere model is registered.
@@ -70,9 +70,9 @@ namespace gazebo
     /// \param[in] name Atmosphere type name, as it appears in the world file.
     /// \param[in] classname C++ class name for the atmosphere model.
     #define GZ_REGISTER_ATMOSPHERE_MODEL(name, classname) \
-    GZ_PHYSICS_VISIBLE AtmosphereUPtr New##classname(World *_world) \
+    GZ_PHYSICS_VISIBLE std::unique_ptr<Atmosphere> New##classname(World *_world) \
     { \
-      return AtmosphereUPtr(new gazebo::physics::classname(_world)); \
+      return std::unique_ptr<Atmosphere>(new gazebo::physics::classname(_world)); \
     } \
     GZ_PHYSICS_VISIBLE \
     void Register##classname() \
