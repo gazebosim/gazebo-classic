@@ -313,12 +313,6 @@ namespace gazebo
       /// \return True if the event was handled
       private: bool OnKeyPress(const common::KeyEvent &_event);
 
-      /// \brief Get the centroid of the link visual in world coordinates.
-      /// \param[in] _visual Visual of the link.
-      /// \return Centroid in world coordinates;
-      private: ignition::math::Vector3d LinkWorldCentroid(
-          const rendering::VisualPtr &_visual);
-
       /// \brief Open joint inspector.
       /// \param[in] _name Name of joint.
       private: void OpenInspector(const std::string &_name);
