@@ -20,6 +20,7 @@
 #include <vector>
 
 #include "gazebo/common/Assert.hh"
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Console.hh"
 
 #include "gazebo/gui/plot/EditableLabel.hh"
@@ -864,7 +865,8 @@ std::string PlotCanvas::Title() const
 }
 
 /////////////////////////////////////////////////
-void PlotCanvas::ExportPDF(const std::string &_dirName) const
+void PlotCanvas::Export(const std::string &_dirName,
+    const FileType _type) const
 {
   std::string title = this->Title();
 
@@ -872,30 +874,39 @@ void PlotCanvas::ExportPDF(const std::string &_dirName) const
   std::replace(title.begin(), title.end(), '/', '_');
   std::replace(title.begin(), title.end(), '?', ':');
 
+  std::string filePrefix = _dirName + "/" + title;
+
+  if (_type == FileType::PDFFile)
+    this->ExportPDF(filePrefix);
+  else if (_type == FileType::CSVFile)
+    this->ExportCSV(filePrefix);
+}
+
+/////////////////////////////////////////////////
+void PlotCanvas::ExportPDF(const std::string &_filePrefix) const
+{
   // Render the plot to a PDF
   int index = 0;
   for (const auto it : this->dataPtr->plotData)
   {
-    std::string filename = _dirName + "/" + title;
-    filename += this->dataPtr->plotData.size() > 1 ? std::to_string(index) : "";
-    filename += ".pdf";
+    std::string suffix =
+        this->dataPtr->plotData.size() > 1 ? std::to_string(index) : "";
+
+    auto filename = common::unique_file_path(_filePrefix + suffix, "pdf");
 
     QwtPlotRenderer renderer;
     renderer.renderDocument(it.second->plot, QString(filename.c_str()),
         QSizeF(280, 216));
+
+    gzmsg << "Plot exported to file [" << filename << "]" << std::endl;
+
     index++;
   }
 }
 
 /////////////////////////////////////////////////
-void PlotCanvas::ExportCSV(const std::string &_dirName) const
+void PlotCanvas::ExportCSV(const std::string &_filePrefix) const
 {
-  std::string title = this->Title();
-
-  // Cleanup the title
-  std::replace(title.begin(), title.end(), '/', '_');
-  std::replace(title.begin(), title.end(), '?', ':');
-
   // Save data from each curve into a separate file.
   for (const auto it : this->dataPtr->plotData)
   {
@@ -910,7 +921,7 @@ void PlotCanvas::ExportCSV(const std::string &_dirName) const
       std::replace(label.begin(), label.end(), '/', '_');
       std::replace(label.begin(), label.end(), '?', ':');
 
-      std::string filename = _dirName + "/" + title + "-" + label + ".csv";
+      std::string filename = _filePrefix + "-" + label + ".csv";
 
       std::ofstream out(filename);
       out << "x, " << c->Label() << std::endl;
@@ -920,6 +931,8 @@ void PlotCanvas::ExportCSV(const std::string &_dirName) const
         out << pt.X() << ", " << pt.Y() << std::endl;
       }
       out.close();
+
+      gzmsg << "Plot exported to file [" << filename << "]" << std::endl;
     }
   }
 }

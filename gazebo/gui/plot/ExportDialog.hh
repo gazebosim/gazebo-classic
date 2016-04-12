@@ -30,6 +30,16 @@ namespace gazebo
   {
     class PlotCanvas;
 
+    /// \brief Supported file types
+    enum FileType
+    {
+      /// \brief Comma separated value (CSV)
+      CSVFile,
+
+      /// \brief Portable document format (PDF)
+      PDFFile
+    };
+
     // Forward declare private data class
     class ExportDialogPrivate;
 
@@ -62,6 +72,10 @@ namespace gazebo
 
       /// \brief Qt callback when a plot icon is selected.
       private slots: void OnSelected();
+
+      /// \brief Export according to the given file type.
+      /// \param[in] _type File type, such as CSV or PDF.
+      private: void OnExport(FileType _type);
 
       /// \internal
       /// \brief Private data pointer

@@ -50,8 +50,8 @@ class PlotViewItem : public QStandardItem
 /// \brief QT delegate used to paint the plot export list view items
 class PlotViewDelegate : public QStyledItemDelegate
 {
-  /// \brief Various data roles for the plot list view delegate
-  public: enum datarole
+  /// \brief Various data roles for the plot view delegate
+  public: enum DataRole
   {
     /// \brief Holds the header text.
     HEADER_TEXT_ROLE = Qt::UserRole + 100,
@@ -303,46 +303,7 @@ void ExportDialog::OnCancel()
 }
 
 /////////////////////////////////////////////////
-void ExportDialog::OnExportPDF()
-{
-  QFileDialog fileDialog(this, tr("Save Directory"), QDir::homePath());
-  fileDialog.setObjectName("material");
-  fileDialog.setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
-      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
-  fileDialog.setAcceptMode(QFileDialog::AcceptSave);
-  fileDialog.setFileMode(QFileDialog::DirectoryOnly);
-
-  if (fileDialog.exec() != QDialog::Accepted)
-    return;
-
-  QStringList selected = fileDialog.selectedFiles();
-
-  if (selected.empty())
-    return;
-
-  QModelIndexList selectedPlots =
-    this->dataPtr->listView->selectionModel()->selectedIndexes();
-
-  // Export each selected plot
-  for (auto iter = selectedPlots.begin(); iter != selectedPlots.end(); ++iter)
-  {
-    PlotViewItem *plotItem =
-      static_cast<PlotViewItem*>(
-          static_cast<QStandardItemModel*>(
-            this->dataPtr->listView->model())->itemFromIndex(*iter));
-
-    if (plotItem)
-    {
-      // Export to the selected directory
-      plotItem->canvas->ExportPDF(selected[0].toStdString());
-    }
-  }
-
-  this->close();
-}
-
-/////////////////////////////////////////////////
-void ExportDialog::OnExportCSV()
+void ExportDialog::OnExport(FileType _type)
 {
   QFileDialog fileDialog(this, tr("Save Directory"), QDir::homePath());
   fileDialog.setObjectName("material");
@@ -363,7 +324,7 @@ void ExportDialog::OnExportCSV()
   QModelIndexList selectedPlots =
     this->dataPtr->listView->selectionModel()->selectedIndexes();
 
-  // Export each selected plot
+  // Export each selected canvas
   for (auto iter = selectedPlots.begin(); iter != selectedPlots.end(); ++iter)
   {
     PlotViewItem *plotItem =
@@ -373,9 +334,21 @@ void ExportDialog::OnExportCSV()
 
     if (plotItem)
     {
-      plotItem->canvas->ExportCSV(selected[0].toStdString());
+      plotItem->canvas->Export(selected[0].toStdString(), _type);
     }
   }
 
   this->close();
+}
+
+/////////////////////////////////////////////////
+void ExportDialog::OnExportPDF()
+{
+  this->OnExport(FileType::PDFFile);
+}
+
+/////////////////////////////////////////////////
+void ExportDialog::OnExportCSV()
+{
+  this->OnExport(FileType::CSVFile);
 }

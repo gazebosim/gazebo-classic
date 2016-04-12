@@ -21,6 +21,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <string>
+#include <sys/stat.h>
 #include <vector>
 
 #include <boost/filesystem/operations.hpp>
@@ -123,4 +124,29 @@ std::vector<std::string> common::split(const std::string &_str,
 
   free(str);
   return tokens;
+}
+
+/////////////////////////////////////////////////
+std::string common::unique_file_path(const std::string &_pathAndName,
+    const std::string &_extension)
+{
+  std::string result = _pathAndName;
+
+  // Check if file exists and change name accordingly
+  struct stat buf;
+  if (stat((result + "." + _extension).c_str(), &buf) != -1)
+  {
+    int count = 0;
+    while (stat((result + "(" + std::to_string(count) + ")." + _extension
+        ).c_str(), &buf) != -1)
+    {
+      count ++;
+    }
+
+    result += "(" + std::to_string(count) + ")";
+  }
+
+  result += "." + _extension;
+
+  return result;
 }

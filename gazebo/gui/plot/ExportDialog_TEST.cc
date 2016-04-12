@@ -24,7 +24,7 @@
 void ExportDialog_TEST::VerifyButtons(
     gazebo::gui::ExportDialog *_exportDialog, const bool _enabled)
 {
-  QList<QPushButton*> buttons = _exportDialog->findChildren<QPushButton*>(
+  QList<QPushButton *> buttons = _exportDialog->findChildren<QPushButton *>(
       "materialFlat");
 
   QVERIFY(buttons.count() == 2);
@@ -48,7 +48,7 @@ void ExportDialog_TEST::VerifyButtons(
 void ExportDialog_TEST::Select(gazebo::gui::ExportDialog *_exportDialog,
     const bool _all)
 {
-  QList<QAction*> actions = _exportDialog->findChildren<QAction*>();
+  QList<QAction *> actions = _exportDialog->findChildren<QAction *>();
 
   QAction *selectAll = nullptr;
   QAction *selectNone = nullptr;
@@ -76,7 +76,7 @@ void ExportDialog_TEST::Empty()
 {
   this->Load("worlds/empty.world");
 
-  std::list<gazebo::gui::PlotCanvas*> plots;
+  std::list<gazebo::gui::PlotCanvas *> plots;
 
   // Create a new plot canvas widget
   gazebo::gui::ExportDialog *exportDialog =
@@ -86,7 +86,7 @@ void ExportDialog_TEST::Empty()
 
   exportDialog->show();
 
-  auto listView = exportDialog->findChild<QListView*>("plotExportListView");
+  auto listView = exportDialog->findChild<QListView *>("plotExportListView");
   QVERIFY(listView != NULL);
   QVERIFY(listView->model()->columnCount() == 0);
   QVERIFY(listView->model()->rowCount() == 0);
@@ -102,7 +102,7 @@ void ExportDialog_TEST::OnePlot()
 {
   this->Load("worlds/empty.world");
 
-  std::list<gazebo::gui::PlotCanvas*> plots;
+  std::list<gazebo::gui::PlotCanvas *> plots;
 
   // Create a new plot canvas widget
   gazebo::gui::PlotCanvas *plotCanvas = new gazebo::gui::PlotCanvas(NULL);
@@ -124,7 +124,7 @@ void ExportDialog_TEST::OnePlot()
   this->ProcessEventsAndDraw();
 
   // Get the list view, which holds the plotcanvas items.
-  auto listView = exportDialog->findChild<QListView*>("plotExportListView");
+  auto listView = exportDialog->findChild<QListView *>("plotExportListView");
   QVERIFY(listView != NULL);
   QCOMPARE(listView->model()->columnCount(), 1);
   QCOMPARE(listView->model()->rowCount(), 1);
@@ -187,7 +187,7 @@ void ExportDialog_TEST::ExportPDF()
   mkdir(outputDir.c_str(), S_IRUSR | S_IWUSR | S_IXUSR);
 
   // Export the plot to pdf
-  plotCanvas->ExportPDF(outputDir.c_str());
+  plotCanvas->Export(outputDir.c_str(), gazebo::gui::FileType::PDFFile);
 
   DIR *dir = nullptr;
   struct dirent entry;
@@ -250,7 +250,7 @@ void ExportDialog_TEST::ExportCSV()
   mkdir(outputDir.c_str(), S_IRUSR | S_IWUSR | S_IXUSR);
 
   // Export the plot to csv
-  plotCanvas->ExportCSV(outputDir.c_str());
+  plotCanvas->Export(outputDir.c_str(), gazebo::gui::FileType::CSVFile);
 
   DIR *dir = nullptr;
   struct dirent entry;
