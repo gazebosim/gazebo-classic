@@ -86,7 +86,7 @@ LogRecord::LogRecord()
   if (!homePath)
   {
     common::SystemPaths *paths = common::SystemPaths::Instance();
-    this->dataPtr->logBasePath = paths->GetTmpPath() + "/gazebo";
+    this->dataPtr->logBasePath = paths->TmpPath() + "/gazebo";
   }
   else
     this->dataPtr->logBasePath = boost::filesystem::path(homePath);

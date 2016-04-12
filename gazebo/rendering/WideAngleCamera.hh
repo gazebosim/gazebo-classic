@@ -195,6 +195,7 @@ namespace gazebo
 
       // Documentation inherited
       public: void Load() override;
+      using Camera::Load;
 
       // Documentation inherited
       public: virtual void Fini() override;
