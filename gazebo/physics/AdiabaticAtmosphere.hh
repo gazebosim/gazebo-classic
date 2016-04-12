@@ -31,8 +31,15 @@ namespace gazebo
     /// Forward declare private data class.
     class AdiabaticAtmospherePrivate;
 
-    /// \brief Adiabatic atmosphere model.
-    /// Models the adiabatic atmosphere.
+    /// \brief Adiabatic atmosphere model based on the
+    /// troposphere model in the
+    /// Manual of the ICAO Standard Atmosphere.
+    /// http://ntrs.nasa.gov/search.jsp?R=19930083952
+    /// This model assumes a specific composition of gases,
+    /// the ideal gas law, hydrostatic equilibrium, and
+    /// constant gradients of gravity and temperature
+    /// with respect to altitude.
+    /// The troposphere model is recommended for altitudes below 11 km.
     class GZ_PHYSICS_VISIBLE AdiabaticAtmosphere : public Atmosphere
     {
       /// \brief Constructor.

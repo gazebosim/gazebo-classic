@@ -135,6 +135,8 @@ double AdiabaticAtmosphere::Pressure(const double _altitude) const
   if (!ignition::math::equal(Atmosphere::Temperature(), 0.0, 1e-6))
   {
     // See https://en.wikipedia.org/wiki/Density_of_air#Altitude
+    // or equation (18) from Manual of the ICAO Standard Atmosphere.
+    // http://ntrs.nasa.gov/search.jsp?R=19930083952
     return Atmosphere::Pressure() *
         pow(1 + (Atmosphere::TemperatureGradient() * _altitude) /
             Atmosphere::Temperature(), this->dataPtr->adiabaticPower);
@@ -151,6 +153,8 @@ double AdiabaticAtmosphere::MassDensity(const double _altitude) const
   if (!ignition::math::equal(Atmosphere::Temperature(), 0.0, 1e-6))
   {
     // See https://en.wikipedia.org/wiki/Density_of_air#Altitude
+    // or equation (33) from Manual of the ICAO Standard Atmosphere.
+    // http://ntrs.nasa.gov/search.jsp?R=19930083952
     return Atmosphere::MassDensity() *
       pow(1 + (Atmosphere::TemperatureGradient() * _altitude) /
           Atmosphere::Temperature(), this->dataPtr->adiabaticPower - 1);
@@ -164,6 +168,8 @@ double AdiabaticAtmosphere::MassDensity(const double _altitude) const
 //////////////////////////////////////////////////
 void AdiabaticAtmosphere::ComputeAdiabaticPower()
 {
+  // See equation (17) from Manual of the ICAO Standard Atmosphere.
+  // http://ntrs.nasa.gov/search.jsp?R=19930083952
   this->dataPtr->adiabaticPower = Atmosphere::MOLAR_MASS *
       this->World()->GetPhysicsEngine()->GetGravity().GetLength() /
       (-Atmosphere::TemperatureGradient() * Atmosphere::IDEAL_GAS_CONSTANT_R);
