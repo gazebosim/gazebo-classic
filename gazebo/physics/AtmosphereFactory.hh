@@ -70,9 +70,11 @@ namespace gazebo
     /// \param[in] name Atmosphere type name, as it appears in the world file.
     /// \param[in] classname C++ class name for the atmosphere model.
     #define GZ_REGISTER_ATMOSPHERE_MODEL(name, classname) \
-    GZ_PHYSICS_VISIBLE std::unique_ptr<Atmosphere> New##classname(World *_world) \
+    GZ_PHYSICS_VISIBLE std::unique_ptr<Atmosphere> \
+        New##classname(World *_world) \
     { \
-      return std::unique_ptr<Atmosphere>(new gazebo::physics::classname(_world)); \
+      return std::unique_ptr<Atmosphere>( \
+          new gazebo::physics::classname(_world)); \
     } \
     GZ_PHYSICS_VISIBLE \
     void Register##classname() \
