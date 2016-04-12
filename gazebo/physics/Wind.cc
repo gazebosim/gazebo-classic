@@ -230,8 +230,8 @@ void Wind::OnWindMsg(ConstWindPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-void Wind::SetLinearVelFunc(std::function<ignition::math::Vector3d (
-    const Wind *, const Entity *_entity)> _linearVelFunc)
+void Wind::SetLinearVelFunc(std::function< ignition::math::Vector3d (
+    const Wind *, const Entity *_entity) > _linearVelFunc)
 {
   this->dataPtr->linearVelFunc = _linearVelFunc;
 }

@@ -111,8 +111,8 @@ namespace gazebo
       /// function callback is a reference to an instance of
       /// Wind and a pointer to an entity in the scene. The function must
       /// return the new wind velocity as a vector.
-      public: void SetLinearVelFunc(std::function<ignition::math::Vector3d (
-          const Wind *_wind, const Entity *_entity)> _linearVelFunc);
+      public: void SetLinearVelFunc(std::function< ignition::math::Vector3d (
+          const Wind *_wind, const Entity *_entity) > _linearVelFunc);
 
       /// \brief Get the global wind velocity, ignoring the entity.
       /// \param[in] _wind Reference to the wind.
