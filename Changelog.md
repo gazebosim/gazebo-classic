@@ -349,8 +349,6 @@
     * [Pull request #1492](https://bitbucket.org/osrf/gazebo/pull-request/1492)
 1. Reduce selection buffer updates -> 4.1
     * [Pull request #1494](https://bitbucket.org/osrf/gazebo/pull-request/1494)
-1. Fix QT rendering, and rendering update rate
-    * [Pull request #1487](https://bitbucket.org/osrf/gazebo/pull-request/1487)
 1. Fix loading of SimbodyPhysics parameters
     * [Pull request #1474](https://bitbucket.org/osrf/gazebo/pull-request/1474)
 1. Fix heightmap on OSX -> 4.1
@@ -395,9 +393,6 @@
 
 1. Modified GUI rendering to improve the rendering update rate.
     * [Pull request #1487](https://bitbucket.org/osrf/gazebo/pull-request/1487)
-
-### Gazebo 4.1.0 (2014-11-20)
-
 1. Add ArrangePlugin for arranging groups of models.
    Also add Model::ResetPhysicsStates to call Link::ResetPhysicsStates
    recursively on all links in model.
@@ -421,7 +416,7 @@
 ### Gazebo 4.0.2 (2014-09-23)
 
 1. Fix and improve mechanism to generate pkgconfig libs
-    * [Pull request #1027](https://bitbucket.org/osrf/gazebo/pull-request/1027)
+    * [Pull request #1207](https://bitbucket.org/osrf/gazebo/pull-request/1207)
     * [Issue #1284](https://bitbucket.org/osrf/gazebo/issue/1284)
 1. Added arat.world
     * [Pull request #1205](https://bitbucket.org/osrf/gazebo/pull-request/1205)
@@ -575,7 +570,7 @@
     * [Pull request #1068](https://bitbucket.org/osrf/gazebo/pull-request/1068)
     * [Issue #1132](https://bitbucket.org/osrf/gazebo/issue/1132)
 1. Fix error correction in screw constraints for ODE
-    * [Pull request #1159](https://bitbucket.org/osrf/gazebo/pull-request/1159)
+    * [Pull request #1070](https://bitbucket.org/osrf/gazebo/pull-request/1070)
     * [Issue #1159](https://bitbucket.org/osrf/gazebo/issue/1159)
 1. Improved pkgconfig with SDF
     * [Pull request #1062](https://bitbucket.org/osrf/gazebo/pull-request/1062)
@@ -623,7 +618,7 @@
     * [Pull request #984](https://bitbucket.org/osrf/gazebo/pull-request/984)
 1. Update to the GPS sensor
     * [Issue #1059](https://bitbucket.org/osrf/gazebo/issue/1059)
-    * [Pull request #984](https://bitbucket.org/osrf/gazebo/pull-request/984)
+    * [Pull request #978](https://bitbucket.org/osrf/gazebo/pull-request/978)
 1. Removed libtool from plugin loading
     * [Pull request #981](https://bitbucket.org/osrf/gazebo/pull-request/981)
 1. Added functions to get inertial information for a link in the world frame.
@@ -1127,7 +1122,6 @@
  * [https://bitbucket.org/osrf/gazebo/issue/104 Issue #104]
  * [https://bitbucket.org/osrf/gazebo/issue/249 Issue #249]
  * [https://bitbucket.org/osrf/gazebo/issue/244 Issue #244]
- * [https://bitbucket.org/osrf/gazebo/issue/36 Issue #36]
 
 * New features:
  * Default camera view changed to look down at the origin from a height of 2 meters at location (5, -5, 2).
