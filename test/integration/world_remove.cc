@@ -221,8 +221,8 @@ void WorldRemoveTest::RemoveWorldWithEntities(const std::string &_physicsEngine)
   gzmsg << "Stats before removing world:" << std::endl;
   gzmsg << "- [WorldPtr] use count: [" << world.use_count() << "]"
         << std::endl;
-  gzmsg << "- [PhysicsEnginePtr] use count: [" << physicsEngine.use_count() << "]"
-        << std::endl;
+  gzmsg << "- [PhysicsEnginePtr] use count: [" << physicsEngine.use_count()
+        << "]" << std::endl;
   gzmsg << "- Topics in this world: [" << worldTopicCount << "]"
         << std::endl;
 
