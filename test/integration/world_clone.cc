@@ -88,7 +88,7 @@ TEST_F(WorldClone, CloneUnknownWorld)
   msgs::ServerControl msg;
   msg.set_save_world_name("UnknownWorld");
   msg.set_clone(true);
-  msg.set_new_port(11348);
+  msg.set_new_port(11346);
   serverControlPub->Publish(msg);
 
   // Wait until the response from our cloning request is ready.
@@ -103,15 +103,22 @@ TEST_F(WorldClone, CloneUnknownWorld)
   char* master = getenv("GAZEBO_MASTER_URI");
 
   // Change GAZEBO_MASTER_URI to be able to see the topics of the new server.
-  setenv("GAZEBO_MASTER_URI", "http://localhost:11348", 1);
+  setenv("GAZEBO_MASTER_URI", "http://localhost:11346", 1);
 
   // Check that the world was not cloned by looking for some topics.
   std::string output = custom_exec_str("gz topic -l");
   EXPECT_EQ(output.find("/gazebo/default/"), std::string::npos);
 
-  // Restore GAZEBO_MASTER_URI (if needed)
+  // Restore GAZEBO_MASTER_URI
   if (master)
     setenv("GAZEBO_MASTER_URI", master, 1);
+  // Use default if not available
+  else
+  {
+    std::string port = "http://localhost:" +
+        boost::lexical_cast<std::string>(GAZEBO_DEFAULT_MASTER_PORT);
+    setenv("GAZEBO_MASTER_URI", port.c_str(), 1);
+  }
 }
 
 /////////////////////////////////////////////////
