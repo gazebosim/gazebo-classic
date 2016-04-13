@@ -349,8 +349,6 @@
     * [Pull request #1492](https://bitbucket.org/osrf/gazebo/pull-request/1492)
 1. Reduce selection buffer updates -> 4.1
     * [Pull request #1494](https://bitbucket.org/osrf/gazebo/pull-request/1494)
-1. Fix QT rendering, and rendering update rate
-    * [Pull request #1487](https://bitbucket.org/osrf/gazebo/pull-request/1487)
 1. Fix loading of SimbodyPhysics parameters
     * [Pull request #1474](https://bitbucket.org/osrf/gazebo/pull-request/1474)
 1. Fix heightmap on OSX -> 4.1
@@ -395,9 +393,6 @@
 
 1. Modified GUI rendering to improve the rendering update rate.
     * [Pull request #1487](https://bitbucket.org/osrf/gazebo/pull-request/1487)
-
-### Gazebo 4.1.0 (2014-11-20)
-
 1. Add ArrangePlugin for arranging groups of models.
    Also add Model::ResetPhysicsStates to call Link::ResetPhysicsStates
    recursively on all links in model.
@@ -1127,7 +1122,6 @@
  * [https://bitbucket.org/osrf/gazebo/issue/104 Issue #104]
  * [https://bitbucket.org/osrf/gazebo/issue/249 Issue #249]
  * [https://bitbucket.org/osrf/gazebo/issue/244 Issue #244]
- * [https://bitbucket.org/osrf/gazebo/issue/36 Issue #36]
 
 * New features:
  * Default camera view changed to look down at the origin from a height of 2 meters at location (5, -5, 2).
