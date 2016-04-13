@@ -42,7 +42,7 @@
 1. Shorten gearbox test since it is failing via timeout on osx
     * [Pull request 1937](https://bitbucket.org/osrf/gazebo/pull-request/1937)
 
-### Gazebo 5.2.1
+### Gazebo 5.2.1 (2015-10-02)
 
 1. Fix minimum window height
     * Backport of [pull request #1977](https://bitbucket.org/osrf/gazebo/pull-request/1977)
