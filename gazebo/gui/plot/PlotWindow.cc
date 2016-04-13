@@ -18,6 +18,7 @@
 
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/MainWindow.hh"
+#include "gazebo/gui/material/RaisedButton.hh"
 #include "gazebo/gui/plot/IncrementalPlot.hh"
 #include "gazebo/gui/plot/ExportDialog.hh"
 #include "gazebo/gui/plot/Palette.hh"
@@ -105,18 +106,12 @@ PlotWindow::PlotWindow(QWidget *_parent)
   connect(addCanvasButton, SIGNAL(clicked()), this, SLOT(OnAddCanvas()));
 
   // export button
-  QPushButton *exportPlotButton = new QPushButton("Export");
+  auto exportPlotButton = new material::RaisedButton("Export");
   exportPlotButton->setIcon(QIcon(":/images/file_upload.svg"));
-  exportPlotButton->setObjectName("plotExport");
   exportPlotButton->setDefault(false);
   exportPlotButton->setAutoDefault(false);
   exportPlotButton->setToolTip("Export plot data");
-  QGraphicsDropShadowEffect *exportPlotShadow = new QGraphicsDropShadowEffect();
-  exportPlotShadow->setBlurRadius(8);
-  exportPlotShadow->setOffset(0, 0);
-  exportPlotButton->setGraphicsEffect(exportPlotShadow);
   connect(exportPlotButton, SIGNAL(clicked()), this, SLOT(OnExport()));
-
 
   QHBoxLayout *addButtonLayout = new QHBoxLayout;
   addButtonLayout->addWidget(exportPlotButton);

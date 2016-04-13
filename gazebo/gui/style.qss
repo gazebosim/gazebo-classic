@@ -232,7 +232,13 @@ QPushButton#plotExport
   color: #ffffff;
   text-align: center;
   border-radius: 2px;
-  border: 0px;
+  border-color: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                stop:0 white, stop: 0.4 rgba(10, 20, 30, 40), stop:1 rgb(0, 200, 230, 200));
+}
+
+QPushButton#plotExport:hover
+{
+  background-color: #ff0000;
 }
 
 QPushButton#expandButton

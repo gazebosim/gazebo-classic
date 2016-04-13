@@ -153,6 +153,7 @@ set (qt_tests
 add_subdirectory(viewers)
 add_subdirectory(terrain)
 add_subdirectory(building)
+add_subdirectory(material)
 add_subdirectory(model)
 add_subdirectory(plot)
 
