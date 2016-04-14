@@ -6,7 +6,8 @@
     * [Pull request 2250](https://bitbucket.org/osrf/gazebo/pull-request/2250)
 
 1. Fix MeshToSDF missing scale issue
-    * [Pull request 2258 ](https://bitbucket.org/osrf/gazebo/pull-request/2258)
+    * [Pull request 2258](https://bitbucket.org/osrf/gazebo/pull-request/2258)
+    * [Issue #1925](https://bitbucket.org/osrf/gazebo/issues/1925)
 
 ### Gazebo 6.6.0 (2016-04-07)
 
