@@ -93,6 +93,9 @@ Connection::~Connection()
     this->dataPtr->id = -1;
     this->dataPtr->event = NULL;
   }
+
+  delete this->dataPtr;
+  this->dataPtr = NULL;
 }
 
 //////////////////////////////////////////////////

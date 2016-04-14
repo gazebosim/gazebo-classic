@@ -49,6 +49,9 @@ namespace gazebo
       /// \brief Pointer the physics engine.
       public: PhysicsEnginePtr physicsEngine;
 
+      /// \brief Pointer the wind.
+      public: WindPtr wind;
+
       /// \brief Pointer to the atmosphere model.
       public: AtmospherePtr atmosphere;
 
@@ -221,6 +224,9 @@ namespace gazebo
 
       /// \brief True to enable the physics engine.
       public: bool enablePhysicsEngine;
+
+      /// \brief True to enable the wind.
+      public: bool enableWind;
 
       /// \brief True to enable the atmosphere model.
       public: bool enableAtmosphere;

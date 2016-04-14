@@ -158,30 +158,8 @@ ODEPhysics::ODEPhysics(WorldPtr _world)
 //////////////////////////////////////////////////
 ODEPhysics::~ODEPhysics()
 {
-  dCloseODE();
+  this->Fini();
 
-  dJointGroupDestroy(this->dataPtr->contactGroup);
-
-  // Delete all the joint feedbacks.
-  for (std::vector<ODEJointFeedback*>::iterator iter =
-      this->dataPtr->jointFeedbacks.begin(); iter !=
-          this->dataPtr->jointFeedbacks.end(); ++iter)
-  {
-    delete *iter;
-  }
-  this->dataPtr->jointFeedbacks.clear();
-
-  if (this->dataPtr->spaceId)
-  {
-    dSpaceSetCleanup(this->dataPtr->spaceId, 0);
-    dSpaceDestroy(this->dataPtr->spaceId);
-  }
-
-  if (this->dataPtr->worldId)
-    dWorldDestroy(this->dataPtr->worldId);
-
-  this->dataPtr->spaceId = NULL;
-  this->dataPtr->worldId = NULL;
   delete this->dataPtr;
   this->dataPtr = NULL;
 }
@@ -470,6 +448,30 @@ void ODEPhysics::UpdatePhysics()
 //////////////////////////////////////////////////
 void ODEPhysics::Fini()
 {
+  dCloseODE();
+
+  dJointGroupDestroy(this->dataPtr->contactGroup);
+
+  // Delete all the joint feedbacks.
+  for (auto iter = this->dataPtr->jointFeedbacks.begin();
+      iter != this->dataPtr->jointFeedbacks.end(); ++iter)
+  {
+    delete *iter;
+  }
+  this->dataPtr->jointFeedbacks.clear();
+
+  if (this->dataPtr->spaceId)
+  {
+    dSpaceSetCleanup(this->dataPtr->spaceId, 0);
+    dSpaceDestroy(this->dataPtr->spaceId);
+  }
+
+  if (this->dataPtr->worldId)
+    dWorldDestroy(this->dataPtr->worldId);
+  this->dataPtr->worldId = NULL;
+
+  this->dataPtr->spaceId = NULL;
+
   PhysicsEngine::Fini();
 }
 
@@ -1056,7 +1058,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
     this->dataPtr->indices[i] = i;
 
   // Choose only the best contacts if too many were generated.
-  if (numc > maxCollide)
+  if (maxCollide > 0 && numc > maxCollide)
   {
     double max = _contactCollisions[maxCollide-1].depth;
     for (unsigned int i = maxCollide; i < numc; ++i)

@@ -42,7 +42,7 @@ TEST_F(LogRecord_TEST, Constructor)
   EXPECT_TRUE(homePath != NULL);
 
   common::SystemPaths *paths = common::SystemPaths::Instance();
-  boost::filesystem::path logPath = paths->GetTmpPath() + "/gazebo";
+  boost::filesystem::path logPath = paths->TmpPath() + "/gazebo";
   if (homePath)
     logPath = boost::filesystem::path(homePath);
   logPath /= "/.gazebo/log/";

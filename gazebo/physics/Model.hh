@@ -97,6 +97,7 @@ namespace gazebo
 
       /// \brief Reset the model.
       public: void Reset();
+      using Entity::Reset;
 
       /// \brief Reset the velocity, acceleration, force and torque of
       /// all child links.
@@ -392,6 +393,14 @@ namespace gazebo
       /// \param[in] _name name of joint
       /// \return true if successful, false if not.
       public: bool RemoveJoint(const std::string &_name);
+
+      /// \brief Set whether wind affects this body.
+      /// \param[in] _mode True to enable wind.
+      public: virtual void SetWindMode(const bool _mode);
+
+      /// \brief Get the wind mode.
+      /// \return True if wind is enabled.
+      public: virtual bool WindMode() const;
 
       /// \brief Allow Model class to share itself as a boost shared_ptr
       /// \return a shared pointer to itself

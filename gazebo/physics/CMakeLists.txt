@@ -85,6 +85,7 @@ set (sources ${sources}
   State.cc
   SurfaceParams.cc
   UserCmdManager.cc
+  Wind.cc
   World.cc
   WorldState.cc
 )
@@ -141,6 +142,7 @@ set (headers
   SurfaceParams.hh
   UniversalJoint.hh
   UserCmdManager.hh
+  Wind.hh
   World.hh
   WorldState.hh)
 
@@ -186,7 +188,6 @@ gz_install_includes("physics" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/physics.hh)
 
 # unit tests
 set (gtest_sources
-  Atmosphere_TEST.cc
   BoxShape_TEST.cc
   CylinderShape_TEST.cc
   Inertial_TEST.cc
@@ -196,10 +197,11 @@ set (gtest_sources
   SphereShape_TEST.cc
 )
 
-gz_build_tests(${gtest_sources} EXTRA_LIBS gazebo_physics gazebo_test_fixture)
+gz_build_tests(${gtest_sources} EXTRA_LIBS gazebo_physics)
 
 # unit tests with gazebo_test_fixture
 set (gtest_fixture_sources
+  Atmosphere_TEST.cc
   ContactManager_TEST.cc
   Light_TEST.cc
   LightState_TEST.cc
@@ -207,6 +209,7 @@ set (gtest_fixture_sources
   PhysicsEngine_TEST.cc
   PresetManager_TEST.cc
   UserCmdManager_TEST.cc
+  Wind_TEST.cc
   WorldState_TEST.cc
 )
 

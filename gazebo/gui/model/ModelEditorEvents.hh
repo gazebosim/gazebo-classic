@@ -190,8 +190,7 @@ namespace gazebo
           { return requestNestedModelInsertion.Connect(_subscriber); }
 
         /// \brief Disconnect a Gazebo event from the request nested model
-        /// insertion
-        /// signal.
+        /// insertion signal.
         /// \param[in] _subscriber the subscriber to this event
         public: static void DisconnectRequestNestedModelInsertion(
             event::ConnectionPtr _subscriber)

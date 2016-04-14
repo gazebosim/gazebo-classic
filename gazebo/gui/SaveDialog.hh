@@ -92,7 +92,7 @@ namespace gazebo
       /// the "Insert Models" tab, and write the parent folder filename to
       /// gui.ini
       /// \param[in] _path Path to be added.
-      public: static void AddDirToModelPaths(const std::string &_path);
+      public: void AddDirToModelPaths(const std::string &_path);
 
       /// \brief Helper function to generate a valid folder name from a
       /// human-readable model name.

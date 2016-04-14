@@ -86,6 +86,8 @@ namespace gazebo
       private: physics::ModelPtr model;
 
       /// \brief The physics engine.
+      // NOTE: Variable not used, left here for ABI compatibility. Remove when
+      // merging forward.
       private: physics::PhysicsEnginePtr physics;
 
       /// \brief Pointer to the world.
