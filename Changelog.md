@@ -2,6 +2,9 @@
 
 ## Gazebo 7.x.x (2016-xx-xx)
 
+1. Update model editor snap to grid modifier key
+    * [Pull request 2259](https://bitbucket.org/osrf/gazebo/pull-request/2259)
+
 1. Remove blank world
     * [Pull request 2220](https://bitbucket.org/osrf/gazebo/pull-request/2220)
 
