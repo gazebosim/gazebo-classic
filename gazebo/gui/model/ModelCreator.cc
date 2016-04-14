@@ -240,9 +240,6 @@ ModelCreator::ModelCreator(QObject *_parent)
 
   this->dataPtr->jointMaker = new gui::JointMaker();
 
-  this->dataPtr->sdfToAppend.reset(new sdf::Element);
-  this->dataPtr->sdfToAppend->SetName("sdf_to_append");
-
   connect(g_editModelAct, SIGNAL(toggled(bool)), this, SLOT(OnEdit(bool)));
 
   this->dataPtr->inspectAct = new QAction(tr("Open Link Inspector"), this);
@@ -1582,6 +1579,9 @@ void ModelCreator::Reset()
   if (g_pasteAct)
     g_pasteAct->setEnabled(false);
 
+  this->dataPtr->sdfToAppend.reset(new sdf::Element);
+  this->dataPtr->sdfToAppend->SetName("sdf_to_append");
+
   this->dataPtr->currentSaveState = NEVER_SAVED;
   this->SetModelName(this->dataPtr->modelDefaultName);
   this->dataPtr->serverModelName = "";
@@ -2823,7 +2823,9 @@ void ModelCreator::GenerateSDF()
 
   // Add plugin elements
   for (auto modelPlugin : this->dataPtr->allModelPlugins)
+  {
     modelElem->InsertElement(modelPlugin.second->modelPluginSDF->Clone());
+  }
 
   // update root visual pose at the end after link, model, joint visuals
   this->dataPtr->previewVisual->SetWorldPose(this->dataPtr->modelPose);
@@ -2844,12 +2846,47 @@ void ModelCreator::GenerateSDF()
     }
   }*/
 
+  std::cerr << " modelElem =============== "  << std::endl;
+  std::cerr << modelElem->ToString("") << std::endl;
+
+
+  std::cerr << " sdfToAppend =============== "  << std::endl;
+  std::cerr << this->dataPtr->sdfToAppend->ToString("") << std::endl;
+
+  // for mentor2.
   // Append custom SDF - only plugins for now
+  // remove old plugin if necessary
   sdf::ElementPtr pluginElem;
   if (this->dataPtr->sdfToAppend->HasElement("plugin"))
      pluginElem = this->dataPtr->sdfToAppend->GetElement("plugin");
   while (pluginElem)
   {
+    std::string sdfAppendPluginName = pluginElem->Get<std::string>("name");
+    std::string sdfAppendPluginFilename = pluginElem->Get<std::string>("filename");
+    // find and remove old plugin with same name and filename
+    if (modelElem->HasElement("plugin"))
+    {
+      sdf::ElementPtr modelPluginElem = modelElem->GetElement("plugin");
+      while (modelPluginElem)
+      {
+        std::string modelPluginName =
+            modelPluginElem->Get<std::string>("name");
+        std::string modelPluginFilename =
+            modelPluginElem->Get<std::string>("filename");
+
+        std::cerr << sdfAppendPluginName << " VS " << modelPluginName << std::endl;
+        std::cerr << sdfAppendPluginFilename << " VS " << modelPluginFilename << std::endl;
+
+        if (modelPluginName == sdfAppendPluginName &&
+            modelPluginFilename == sdfAppendPluginFilename)
+        {
+          std::cerr << " removing plugin !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! " << std::endl;
+          modelElem->RemoveChild(modelPluginElem);
+          break;
+        }
+        modelPluginElem = modelPluginElem->GetNextElement("plugin");
+      }
+    }
     modelElem->InsertElement(pluginElem->Clone());
     pluginElem = pluginElem->GetNextElement("plugin");
   }
