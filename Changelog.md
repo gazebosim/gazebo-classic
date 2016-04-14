@@ -47,6 +47,9 @@
     1. Undo / redo inserting and deleting links
         * [Pull request #2151](https://bitbucket.org/osrf/gazebo/pull-request/2151)
 
+    1. Undo / redo inserting and deleting nested models
+        * [Pull request #2229](https://bitbucket.org/osrf/gazebo/pull-request/2229)
+
 ## Gazebo 7
 
 ## Gazebo 7.1.0 (2016-04-07)

@@ -102,6 +102,12 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~ModelCreator();
 
+      /// \brief Enable the mouse and key event handlers.
+      public: void EnableEventHandlers();
+
+      /// \brief Disable the mouse and key event handlers.
+      public: void DisableEventHandlers();
+
       /// \brief Set the name of the model.
       /// \param[in] _modelName Name of the model to set to.
       public: void SetModelName(const std::string &_modelName);
@@ -336,6 +342,10 @@ namespace gazebo
       /// \brief Insert a link from an SDF element.
       /// \param[in] _sdf SDF element with link data.
       private: void InsertLinkFromSDF(sdf::ElementPtr _sdf);
+
+      /// \brief Insert a nested model from an SDF element.
+      /// \param[in] _sdf SDF element with nested model data.
+      private: void InsertNestedModelFromSDF(sdf::ElementPtr _sdf);
 
       /// \brief Clone an existing nested model.
       /// \param[in] _modelName Name of nested model to be cloned.

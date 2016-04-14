@@ -60,6 +60,10 @@ namespace gazebo
       /// \param[in] _name Name of model.
       public: void SetName(const std::string &_name);
 
+      /// \brief Get the unscoped name of the model.
+      /// \return Name of model.
+      public: std::string Name() const;
+
       /// \brief Set the pose of the model.
       /// \param[in] _pose Pose of model.
       public: void SetPose(const ignition::math::Pose3d &_pose);
@@ -99,7 +103,7 @@ namespace gazebo
 
       /// \brief Get the name of the link.
       /// \return Name of link.
-      public: std::string GetName() const;
+      public: std::string Name() const;
 
       /// \brief Set the name of the link.
       /// \param[in] _name Name of link.
