@@ -49,7 +49,7 @@ namespace gazebo
       /// \param[in] _canvas The plot canvas element
       public: CurveTracker(QwtPlotCanvas *_canvas);
 
-      /// \brief Called to get the tracker text to display
+/*      /// \brief Called to get the tracker text to display
       /// \param[in] _pos The mouse position
       /// \return The text to display
       protected: virtual QwtText trackerTextF( const QPointF &_pos ) const;
@@ -84,7 +84,16 @@ namespace gazebo
 
       /// \brief Draws the (vertical) line on the chart
       /// \param[in] _painter
-       private: virtual void drawRubberBand( QPainter *_painter ) const;
+      private: virtual void drawRubberBand( QPainter *_painter ) const;*/
+
+
+/*      private: void widgetMouseMoveEvent(QMouseEvent *_e);
+      private: void widgetMousePressEvent(QMouseEvent *_e);
+      private: void widgetMouseReleaseEvent(QMouseEvent *_e);*/
+      private: void widgetEnterEvent( QEvent *event );
+
+      private: void widgetLeaveEvent( QEvent *event );
+
     };
   }
 }

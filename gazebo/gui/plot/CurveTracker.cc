@@ -34,71 +34,108 @@ struct compareX
   }
 };
 
-/////////////////////////////////////////////////
-void CurveTracker::drawRubberBand( QPainter *painter ) const
+
+/*/////////////////////////////////////////////////
+void CurveTracker::widgetMousePressEvent(QMouseEvent *_e)
 {
-    // painter->setClipping(true);
+}
 
-    if (!isActive() || rubberBand() == NoRubberBand ||
-        rubberBandPen().style() == Qt::NoPen)
-    {
-      return;
-    }
+/////////////////////////////////////////////////
+void CurveTracker::widgetMouseMoveEvent(QMouseEvent *_e)
+{
+}
 
-    const QPolygon pa = adjustedPoints( this->pickedPoints() );
+/////////////////////////////////////////////////
+void CurveTracker::widgetMouseReleaseEvent(QMouseEvent *_e)
+{
+}*/
 
-    QwtPickerMachine::SelectionType selectionType =
-        QwtPickerMachine::NoSelection;
+/////////////////////////////////////////////////
+void CurveTracker::widgetEnterEvent(QEvent *_event)
+{
+  QwtPicker::widgetEnterEvent(_event);
+}
 
-    if ( this->stateMachine() )
-        selectionType = this->stateMachine()->selectionType();
+/////////////////////////////////////////////////
+void CurveTracker::widgetLeaveEvent(QEvent */*_event*/)
+{
+  this->remove();
 
-    switch (selectionType)
-    {
-      case QwtPickerMachine::PointSelection:
-      {
-        if ( pa.count() < 1 )
-          return;
-
-        const QPoint pos = pa[0];
-        QPainterPath path;
-        const QWidget *widget = parentWidget();
-        if ( widget )
-            path.addRect( widget->contentsRect() );
-
-        const QRect pRect = path.boundingRect().toRect();
-        switch (rubberBand())
-        {
-          case VLineRubberBand:
-          {
-             int x = pos.x();
-             int top = pRect.top();
-             int bottom = pRect.bottom();
-             QwtPainter::drawLine( painter, x, top, x, bottom);
-             break;
-          }
-          default:
-            break;
-        }
-        break;
-      }
-      default:
-        break;
-    }
+//  QwtPicker::widgetLeaveEvent(_event);
+  QWidget *rw = const_cast<QWidget *>(this->rubberBandWidget());
+  if (rw)
+    rw->hide();
+  QWidget *tw = const_cast<QWidget *>(this->trackerWidget());
+  if (tw)
+    tw->hide();
+  std::cerr << " leave " << std::endl;
 }
 
 /////////////////////////////////////////////////
 CurveTracker::CurveTracker(QwtPlotCanvas *_canvas)
-  :QwtPlotPicker(_canvas)
+  : QwtPlotPicker(_canvas)
 {
-  setTrackerMode(QwtPlotPicker::ActiveOnly);
-  setRubberBand(VLineRubberBand);
+  this->setMousePattern(QwtEventPattern::MouseSelect1,
+      Qt::NoButton);
+}
+
+/*/////////////////////////////////////////////////
+void CurveTracker::drawRubberBand( QPainter *painter ) const
+{
+  if (!isActive() || rubberBand() == NoRubberBand ||
+      rubberBandPen().style() == Qt::NoPen)
+  {
+    return;
+  }
+
+  if (this->pickedPoints().isEmpty())
+    return;
+
+  const QPolygon pa = adjustedPoints( this->pickedPoints() );
+
+  QwtPickerMachine::SelectionType selectionType =
+      QwtPickerMachine::NoSelection;
+
+  if (this->stateMachine())
+      selectionType = this->stateMachine()->selectionType();
+
+  switch (selectionType)
+  {
+    case QwtPickerMachine::NoSelection:
+    case QwtPickerMachine::PointSelection:
+    {
+      if (pa.count() < 1)
+        return;
+      const QPoint pos = pa[0];
+      QPainterPath path;
+      const QWidget *widget = parentWidget();
+      if (widget)
+        path.addRect( widget->contentsRect() );
+
+      const QRect pRect = path.boundingRect().toRect();
+      switch (rubberBand())
+      {
+        case VLineRubberBand:
+        {
+          int x = pos.x();
+          int top = pRect.top();
+          int bottom = pRect.bottom();
+          QwtPainter::drawLine( painter, x, top, x, bottom);
+          break;
+        }
+        default:
+          break;
+      }
+      break;
+    }
+    default:
+      break;
+  }
 }
 
 /////////////////////////////////////////////////
 QRect CurveTracker::trackerRect(const QFont &_font) const
 {
-  return QRect();
   QRect r = QwtPlotPicker::trackerRect( _font );
   // align r to the first curve
   const QwtPlotItemList curves = plot()->itemList(
@@ -235,3 +272,4 @@ QLineF CurveTracker::curveLineAt( const QwtPlotCurve *_curve, double _x) const
   }
   return line;
 }
+*/

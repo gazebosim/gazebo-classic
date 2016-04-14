@@ -119,11 +119,13 @@ IncrementalPlot::IncrementalPlot(QWidget *_parent)
   this->replot();
 
   // add plot tracking on mouse move events
-  CurveTracker* tracker = new CurveTracker( this->canvas() );
+  CurveTracker* tracker = new CurveTracker(this->canvas());
   // for the demo we want the tracker to be active without
   // having to click on the canvas
-   tracker->setStateMachine( new QwtPickerTrackerMachine() );
-  tracker->setRubberBandPen( QPen( "MediumOrchid" ) );
+  tracker->setStateMachine(new QwtPickerTrackerMachine());
+  tracker->setTrackerMode(QwtPlotPicker::AlwaysOn);
+  tracker->setRubberBand(QwtPicker::VLineRubberBand);
+  // tracker->setRubberBandPen( QPen( "MediumOrchid" ) );
 }
 
 /////////////////////////////////////////////////
