@@ -15,6 +15,8 @@
  *
 */
 
+#include "gazebo/physics/PhysicsTypes.hh"
+
 #include "gazebo/transport/transport.hh"
 
 #include "gazebo/test/ServerFixture.hh"
@@ -29,7 +31,8 @@ class WorldRemoveTest : public ServerFixture,
   /// \param[in] _physicsEngines Physics engine to be tested.
   public: void RemoveBlankWorld(const std::string &_physicsEngine);
 
-  /// \brief Test removing a world which contains entities.
+  /// \brief Test removing a world which contains models and lights, but no
+  /// joints.
   /// \param[in] _physicsEngines Physics engine to be tested.
   public: void RemoveWorldWithEntities(const std::string &_physicsEngine);
 
@@ -194,39 +197,52 @@ void WorldRemoveTest::RemoveWorldWithEntities(const std::string &_physicsEngine)
   EXPECT_GT(worldTopicCount, 0u);
 
   // Get model pointers
-  auto ground_plane = world->GetModel("ground_plane");
-  ASSERT_TRUE(ground_plane != NULL);
+  std::vector<std::string> modelNames;
+  modelNames.push_back("ground_plane");
+  modelNames.push_back("box");
+  modelNames.push_back("sphere");
+  modelNames.push_back("cylinder");
 
-  auto box = world->GetModel("box");
-  ASSERT_TRUE(box != NULL);
+  std::vector<physics::ModelPtr> modelPtrs;
+  for (auto &name : modelNames)
+  {
+    auto model = world->GetModel(name);
+    ASSERT_TRUE(model != NULL);
+    modelPtrs.push_back(model);
+  }
 
-  auto sphere = world->GetModel("sphere");
-  ASSERT_TRUE(sphere != NULL);
+  // Get light pointers
+  std::vector<std::string> lightNames;
+  lightNames.push_back("sun");
 
-  auto cylinder = world->GetModel("cylinder");
-  ASSERT_TRUE(cylinder != NULL);
-
-  auto sun = world->Light("sun");
-  ASSERT_TRUE(sun != NULL);
+  std::vector<physics::LightPtr> lightPtrs;
+  for (auto &name : lightNames)
+  {
+    auto light = world->Light(name);
+    ASSERT_TRUE(light != NULL);
+    lightPtrs.push_back(light);
+  }
 
   // Stats before removing world
-  gzmsg << "Stats before removing world:" << std::endl
-        << "- WorldPtr use count: [" << world.use_count() << "]"
-        << std::endl
-        << "- PhysicsEnginePtr use count: [" << physicsEngine.use_count() << "]"
-        << std::endl
-        << "- Topics in this world: [" << worldTopicCount << "]"
-        << std::endl
-        << "- ground_plane ptr use count: [" << ground_plane.use_count() << "]"
-        << std::endl
-        << "- box ptr use count: [" << box.use_count() << "]"
-        << std::endl
-        << "- sphere ptr use count: [" << sphere.use_count() << "]"
-        << std::endl
-        << "- cylinder ptr use count: [" << cylinder.use_count() << "]"
-        << std::endl
-        << "- sun ptr use count: [" << sun.use_count() << "]"
+  gzmsg << "Stats before removing world:" << std::endl;
+  gzmsg << "- [WorldPtr] use count: [" << world.use_count() << "]"
         << std::endl;
+  gzmsg << "- [PhysicsEnginePtr] use count: [" << physicsEngine.use_count()
+        << "]" << std::endl;
+  gzmsg << "- Topics in this world: [" << worldTopicCount << "]"
+        << std::endl;
+
+  for (size_t i = 0; i < modelNames.size(); ++i)
+  {
+    gzmsg << "- [" << modelNames[i] << "] ptr use count: ["
+        << modelPtrs[i].use_count() << "]" << std::endl;
+  }
+
+  for (size_t i = 0; i < lightNames.size(); ++i)
+  {
+    gzmsg << "- [" << lightNames[i] << "] ptr use count: ["
+        << lightPtrs[i].use_count() << "]" << std::endl;
+  }
 
   // Remove world
   physics::remove_worlds();
@@ -242,19 +258,25 @@ void WorldRemoveTest::RemoveWorldWithEntities(const std::string &_physicsEngine)
   // Check there are no worlds running
   EXPECT_FALSE(physics::worlds_running());
 
-  // Check the only shared pointers left to the models are these
-  EXPECT_EQ(ground_plane.use_count(), 1);
-  EXPECT_EQ(box.use_count(), 1);
-  EXPECT_EQ(sphere.use_count(), 1);
-  EXPECT_EQ(cylinder.use_count(), 1);
-  EXPECT_EQ(sun.use_count(), 1);
+  // Check the only shared pointers to entities left are the ones we're holding
+  for (auto &ptr : modelPtrs)
+  {
+    EXPECT_EQ(ptr.use_count(), 1);
+  }
+  for (auto &ptr : lightPtrs)
+  {
+    EXPECT_EQ(ptr.use_count(), 1);
+  }
 
   // Release entity pointers
-  ground_plane.reset();
-  box.reset();
-  sphere.reset();
-  cylinder.reset();
-  sun.reset();
+  for (auto &ptr : modelPtrs)
+  {
+    ptr.reset();
+  }
+  for (auto &ptr : lightPtrs)
+  {
+    ptr.reset();
+  }
 
   // Check the only shared pointer left to the physics engine is this one
   EXPECT_LT(physicsEngine.use_count(), physicsEnginePtrCount);
@@ -281,23 +303,25 @@ void WorldRemoveTest::RemoveWorldWithEntities(const std::string &_physicsEngine)
   EXPECT_EQ(WorldTopicCount(msgTypes), 0u);
 
   // Stats after removing world
-  gzmsg << "Stats after removing world:" << std::endl
-        << "- WorldPtr use count: [" << world.use_count() << "]"
-        << std::endl
-        << "- PhysicsEnginePtr use count: [" << physicsEngine.use_count() << "]"
-        << std::endl
-        << "- Topics in this world: [" << WorldTopicCount(msgTypes) << "]"
-        << std::endl
-        << "- ground_plane ptr use count: [" << ground_plane.use_count() << "]"
-        << std::endl
-        << "- box ptr use count: [" << box.use_count() << "]"
-        << std::endl
-        << "- sphere ptr use count: [" << sphere.use_count() << "]"
-        << std::endl
-        << "- cylinder ptr use count: [" << cylinder.use_count() << "]"
-        << std::endl
-        << "- sun ptr use count: [" << sun.use_count() << "]"
+  gzmsg << "Stats after removing world:" << std::endl;
+  gzmsg << "- WorldPtr use count: [" << world.use_count() << "]"
         << std::endl;
+  gzmsg << "- PhysicsEnginePtr use count: [" << physicsEngine.use_count() << "]"
+        << std::endl;
+  gzmsg << "- Topics in this world: [" << WorldTopicCount(msgTypes) << "]"
+        << std::endl;
+
+  for (size_t i = 0; i < modelNames.size(); ++i)
+  {
+    gzmsg << "- [" << modelNames[i] << "] ptr use count: ["
+        << modelPtrs[i].use_count() << "]" << std::endl;
+  }
+
+  for (size_t i = 0; i < lightNames.size(); ++i)
+  {
+    gzmsg << "- [" << lightNames[i] << "] ptr use count: ["
+        << lightPtrs[i].use_count() << "]" << std::endl;
+  }
 }
 
 /////////////////////////////////////////////////

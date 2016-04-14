@@ -247,23 +247,31 @@ void Link::Fini()
   this->sensors.clear();
 
   // Clean up visuals
-  for (auto iter : this->visuals)
+  // FIXME: Do we really need to send 2 msgs to delete a visual?!
+  if (this->visPub && this->requestPub)
   {
-    msgs::Visual msg;
-    msg.set_name(iter.second.name());
-    msg.set_id(iter.second.id());
-    if (this->parent)
+    for (auto iter : this->visuals)
     {
-      msg.set_parent_name(this->parent->GetScopedName());
-      msg.set_parent_id(this->parent->GetId());
+      auto deleteMsg = msgs::CreateRequest("entity_delete",
+          boost::lexical_cast<std::string>(iter.second.id()));
+      this->requestPub->Publish(*deleteMsg, true);
+
+      msgs::Visual msg;
+      msg.set_name(iter.second.name());
+      msg.set_id(iter.second.id());
+      if (this->parent)
+      {
+        msg.set_parent_name(this->parent->GetScopedName());
+        msg.set_parent_id(this->parent->GetId());
+      }
+      else
+      {
+        msg.set_parent_name("");
+        msg.set_parent_id(0);
+      }
+      msg.set_delete_me(true);
+      this->visPub->Publish(msg);
     }
-    else
-    {
-      msg.set_parent_name("");
-      msg.set_parent_id(0);
-    }
-    msg.set_delete_me(true);
-    this->visPub->Publish(msg);
   }
   this->visuals.clear();
 
@@ -282,7 +290,6 @@ void Link::Fini()
   // Clean transport
   {
     this->dataPub.reset();
-    this->requestPub.reset();
     this->visPub.reset();
 
     this->wrenchSub.reset();

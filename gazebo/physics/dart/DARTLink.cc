@@ -412,7 +412,7 @@ void DARTLink::SetLinearVel(const math::Vector3 &_vel)
   }
   else
   {
-    gzdbg << "DARTLink::SetLinearVel() doesn't make sense if the parent joint"
+    gzdbg << "DARTLink::SetLinearVel() doesn't make sense if the parent joint "
           << "is not free joint (6-dof).\n";
   }
 }
@@ -478,7 +478,7 @@ void DARTLink::SetAngularVel(const math::Vector3 &_vel)
   }
   else
   {
-    gzdbg << "DARTLink::SetLinearVel() doesn't make sense if the parent joint"
+    gzdbg << "DARTLink::SetLinearVel() doesn't make sense if the parent joint "
           << "is not free joint (6-dof).\n";
   }
 }

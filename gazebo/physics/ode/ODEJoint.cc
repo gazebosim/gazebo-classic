@@ -223,13 +223,11 @@ void ODEJoint::Detach()
   this->childLink.reset();
   this->parentLink.reset();
 
-  // Something funky is happening that sometimes the parent and child links ODE
-  // pointers are cleared but gazebo objects remain valid.
+  // By the time we get here, links and ODEIds might have already been
+  // cleaned up
   if ((odeParent == NULL || odeParent->GetODEId() == NULL) ||
       (odeChild == NULL || odeChild->GetODEId() == NULL))
   {
-    gzerr << "Either child [" << odeChild <<
-        "] or parent [" << odeParent << "] have bad pointers." << std::endl;
     return;
   }
 
