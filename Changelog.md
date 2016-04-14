@@ -5,6 +5,9 @@
 1. Fix race condition in ~TimePanelPrivate (#1919)
     * [Pull request 2250](https://bitbucket.org/osrf/gazebo/pull-request/2250)
 
+1. Fix MeshToSDF missing scale issue
+    * [Pull request 2258 ](https://bitbucket.org/osrf/gazebo/pull-request/2258)
+
 ### Gazebo 6.6.0 (2016-04-07)
 
 1. fix: remove back projection
