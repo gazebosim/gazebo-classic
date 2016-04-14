@@ -456,6 +456,22 @@ void ModelEditorUndoTest::JointInsertionByDialog()
       "modelEditorPaletteCylinderButton");
   QVERIFY(cylinderButton != NULL);
 
+  // Add the test model database to the insert tab
+  gazebo::common::SystemPaths::Instance()->AddModelPathsUpdate(
+      CMAKE_SOURCE_DIR "/test/models/testdb");
+
+  // Get the insert model widget
+  auto insertModelWidget = mainWindow->findChild<
+      gazebo::gui::InsertModelWidget *>("insertModel");
+  QVERIFY(insertModelWidget != NULL);
+
+  // Get the items in the list
+  auto tree = insertModelWidget->findChildren<QTreeWidget *>();
+  QVERIFY(tree.size() == 1u);
+  auto nestedModelItem = tree[0]->findItems(QString("Nested Model Test"),
+      Qt::MatchContains | Qt::MatchRecursive);
+  QVERIFY(nestedModelItem.size() > 0);
+
   // Enter the model editor
   QVERIFY(gazebo::gui::g_editModelAct != NULL);
   gazebo::gui::g_editModelAct->trigger();
@@ -470,24 +486,32 @@ void ModelEditorUndoTest::JointInsertionByDialog()
   QVERIFY(!gazebo::gui::g_redoAct->isEnabled());
   QVERIFY(!gazebo::gui::g_redoHistoryAct->isEnabled());
 
-  // Insert two links
-  for (int i = 0; i < 2; ++i)
-  {
-    // Press the cylinder button to start inserting a link
-    cylinderButton->click();
-    QVERIFY(cylinderButton->isChecked());
+  // Trigger signal as if item was clicked
+  QMetaObject::invokeMethod(tree[0], "itemClicked", Q_ARG(QTreeWidgetItem *,
+      nestedModelItem[0]), Q_ARG(int, 0));
 
-    // Press the mouse in the scene to finish inserting a link
-    QTest::mouseRelease(glWidget, Qt::LeftButton, 0,
-        QPoint(-mainWindow->width()*0.3*i, -mainWindow->height()*0.5));
+  // Press the mouse in the scene to finish inserting a model
+  QTest::mouseRelease(glWidget, Qt::LeftButton, 0,
+      QPoint(-mainWindow->width()*0.5, -mainWindow->height()*0.5));
 
-    this->ProcessEventsAndDraw(mainWindow);
-  }
+  this->ProcessEventsAndDraw(mainWindow);
+
+  // Press the cylinder button to start inserting a link
+  cylinderButton->click();
+  QVERIFY(cylinderButton->isChecked());
+
+  // Press the mouse in the scene to finish inserting a link
+  QTest::mouseRelease(glWidget, Qt::LeftButton, 0,
+      QPoint(-mainWindow->width()*0.3, -mainWindow->height()*0.5));
+
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Insert joint
+  std::string parentLink = "link_0";
+  std::string childLink = "model_00::model_01::model_02::model_03::link_03";
   jointMaker->AddJoint("revolute");
-  jointMaker->SetParentLink("link_0");
-  jointMaker->SetChildLink("link_1");
+  jointMaker->SetParentLink(parentLink);
+  jointMaker->SetChildLink(childLink);
   jointMaker->FinalizeCreation();
 
   this->ProcessEventsAndDraw(mainWindow);
@@ -495,10 +519,13 @@ void ModelEditorUndoTest::JointInsertionByDialog()
   // Check the visuals have been created inside the editor
   std::vector<std::string> visNames;
   visNames.push_back("ModelPreview_0::link_0_JOINT_0");
-  visNames.push_back("ModelPreview_0::link_0");
-  visNames.push_back("ModelPreview_0::link_1");
+  visNames.push_back("ModelPreview_0::" + parentLink);
+  visNames.push_back("ModelPreview_0::" + childLink);
   for (auto name : visNames)
-    QVERIFY(scene->GetVisual(name) != NULL);
+  {
+    QVERIFY2(scene->GetVisual(name) != NULL,
+        std::string("Can't find visual [" + name + "]").c_str());
+  }
 
   // Undo -> Redo a few times
   for (unsigned int j = 0; j < 3; ++j)

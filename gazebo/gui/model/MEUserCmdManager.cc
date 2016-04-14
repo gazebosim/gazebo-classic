@@ -123,12 +123,12 @@ void MEUserCmd::Undo()
   else if (this->dataPtr->type == MEUserCmd::DELETING_JOINT &&
       this->dataPtr->sdf)
   {
-    auto modelName = this->dataPtr->scopedName;
-    size_t pIdx = modelName.find("::");
+    auto topModelName = this->dataPtr->scopedName;
+    size_t pIdx = topModelName.find("::");
     if (pIdx != std::string::npos)
-      modelName = modelName.substr(0, pIdx);
+      topModelName = topModelName.substr(0, pIdx);
 
-    model::Events::requestJointInsertion(this->dataPtr->sdf, modelName);
+    model::Events::requestJointInsertion(this->dataPtr->sdf, topModelName);
   }
 }
 
@@ -163,12 +163,12 @@ void MEUserCmd::Redo()
   else if (this->dataPtr->type == MEUserCmd::INSERTING_JOINT &&
      this->dataPtr->sdf)
   {
-    auto modelName = this->dataPtr->scopedName;
-    size_t pIdx = modelName.find("::");
+    auto topModelName = this->dataPtr->scopedName;
+    size_t pIdx = topModelName.find("::");
     if (pIdx != std::string::npos)
-      modelName = modelName.substr(0, pIdx);
+      topModelName = topModelName.substr(0, pIdx);
 
-    model::Events::requestJointInsertion(this->dataPtr->sdf, modelName);
+    model::Events::requestJointInsertion(this->dataPtr->sdf, topModelName);
   }
   // Deleting joint
   else if (this->dataPtr->type == MEUserCmd::DELETING_JOINT &&
