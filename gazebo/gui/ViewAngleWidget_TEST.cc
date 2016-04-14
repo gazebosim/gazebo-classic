@@ -30,7 +30,7 @@ void ViewAngleWidget_TEST::EmptyWorld()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/empty.world");
+  this->Load("worlds/empty.world", false, false, false);
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
@@ -122,7 +122,7 @@ void ViewAngleWidget_TEST::EmptyWorld()
 
   // Check the camera position
   pose = cam->GetWorldPose();
-  QVERIFY((pose.pos - gazebo::math::Vector3(0, -dist, 0)).GetLength() < tol);
+  QVERIFY((pose.pos - gazebo::math::Vector3(0, dist, 0)).GetLength() < tol);
 
   // Trigger the bottom view button
   buttons[1]->click();
@@ -167,7 +167,7 @@ void ViewAngleWidget_TEST::EmptyWorld()
 
   // Check the camera position
   pose = cam->GetWorldPose();
-  QVERIFY((pose.pos - gazebo::math::Vector3(0, dist, 0)).GetLength() < tol);
+  QVERIFY((pose.pos - gazebo::math::Vector3(0, -dist, 0)).GetLength() < tol);
 
   // Trigger the reset view button
   buttons[6]->click();
@@ -196,7 +196,7 @@ void ViewAngleWidget_TEST::Projections()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/empty.world");
+  this->Load("worlds/empty.world", false, false, false);
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
