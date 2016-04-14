@@ -15,13 +15,14 @@
  *
 */
 
+#include "gazebo/common/SystemPaths.hh"
+
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/GLWidget.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/InsertModelWidget.hh"
 #include "gazebo/gui/MainWindow.hh"
-#include "gazebo/gui/SaveDialog.hh"
 #include "gazebo/gui/model/ModelCreator.hh"
 #include "gazebo/gui/model/ModelEditorEvents.hh"
 
@@ -242,8 +243,8 @@ void ModelEditorUndoTest::NestedModelInsertionByMouse()
   QVERIFY(glWidget != NULL);
 
   // Add the test model database to the insert tab
-  gazebo::gui::SaveDialog::AddDirToModelPaths(
-      CMAKE_SOURCE_DIR "/test/models/testdb/cococan");
+  gazebo::common::SystemPaths::Instance()->AddModelPathsUpdate(
+      CMAKE_SOURCE_DIR "/test/models/testdb");
 
   // Get the insert model widget
   auto insertModelWidget = mainWindow->findChild<
