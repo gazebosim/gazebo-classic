@@ -894,9 +894,13 @@ void PlotCanvas::ExportPDF(const std::string &_filePrefix) const
 
     auto filename = common::unique_file_path(_filePrefix + suffix, "pdf");
 
+    auto plot = it.second->plot;
+
+    QSizeF docSize(plot->canvas()->width() + plot->legend()->width(),
+                   plot->canvas()->height()/3);
+
     QwtPlotRenderer renderer;
-    renderer.renderDocument(it.second->plot, QString(filename.c_str()),
-        QSizeF(280, 216));
+    renderer.renderDocument(plot, QString(filename.c_str()), docSize, 20);
 
     gzmsg << "Plot exported to file [" << filename << "]" << std::endl;
 
