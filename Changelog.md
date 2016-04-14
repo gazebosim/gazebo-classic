@@ -2,6 +2,77 @@
 
 ### Gazebo 6.X.X (201X-XX-XX)
 
+1. Fix race condition in ~TimePanelPrivate (#1919)
+    * [Pull request 2250](https://bitbucket.org/osrf/gazebo/pull-request/2250)
+
+### Gazebo 6.6.0 (2016-04-07)
+
+1. fix: remove back projection
+    * [Pull request 2201](https://bitbucket.org/osrf/gazebo/pull-request/2201)
+    * A contribution from Yuki Furuta
+
+1. Backport depth camera OSX fix and test
+    * [Pull request 2230](https://bitbucket.org/osrf/gazebo/pull-request/2230)
+
+1. Add missing tinyxml includes (gazebo6)
+    * [Pull request 2218](https://bitbucket.org/osrf/gazebo/pull-request/2218)
+
+1. Fix ray-cylinder collision in ode
+    * [Pull request 2125](https://bitbucket.org/osrf/gazebo/pull-request/2125)
+
+1. backport fixes for ffmpeg3 to gazebo6 (from pull request #2154)
+    * [Pull request 2162](https://bitbucket.org/osrf/gazebo/pull-request/2162)
+
+1. Install shapes_bitmask.world
+    * [Pull request 2104](https://bitbucket.org/osrf/gazebo/pull-request/2104)
+
+1. Add gazebo_client to gazebo.pc (gazebo6)
+    * [Pull request 2102](https://bitbucket.org/osrf/gazebo/pull-request/2102)
+
+1. Fix removing multiple camera sensors that have the same camera name
+    * [Pull request 2081](https://bitbucket.org/osrf/gazebo/pull-request/2081)
+
+1. Ensure that LINK_FRAME_VISUAL arrow components are deleted (#1812)
+    * [Pull request 2078](https://bitbucket.org/osrf/gazebo/pull-request/2078)
+
+1. add migration notes for gazebo::setupClient to gazebo::client::setup
+    * [Pull request 2068](https://bitbucket.org/osrf/gazebo/pull-request/2068)
+
+1. Update inertia properties during simulation: part 2
+    * [Pull request 1984](https://bitbucket.org/osrf/gazebo/pull-request/1984)
+
+1. Fix minimum window height
+    * [Pull request 2002](https://bitbucket.org/osrf/gazebo/pull-request/2002)
+
+1. Backport gpu laser test fix
+    * [Pull request 1999](https://bitbucket.org/osrf/gazebo/pull-request/1999)
+
+1. Relax physics tolerances for single-precision bullet (gazebo6)
+    * [Pull request 1997](https://bitbucket.org/osrf/gazebo/pull-request/1997)
+
+1. Fix minimum window height
+    * [Pull request 1998](https://bitbucket.org/osrf/gazebo/pull-request/1998)
+
+1. backport model editor fixed joint option to gazebo6
+    * [Pull request 1957](https://bitbucket.org/osrf/gazebo/pull-request/1957)
+
+1. Update shaders once per render update
+    * [Pull request 1991](https://bitbucket.org/osrf/gazebo/pull-request/1991)
+
+1. Relax physics tolerances for single-precision bullet
+    * [Pull request 1976](https://bitbucket.org/osrf/gazebo/pull-request/1976)
+
+1. Fix visual transparency issues
+    * [Pull request 1967](https://bitbucket.org/osrf/gazebo/pull-request/1967)
+
+1. fix memory corruption in transport/Publisher.cc
+    * [Pull request 1951](https://bitbucket.org/osrf/gazebo/pull-request/1951)
+
+1. Add test for SphericalCoordinates::LocalFromGlobal
+    * [Pull request 1959](https://bitbucket.org/osrf/gazebo/pull-request/1959)
+
+### Gazebo 6.5.1 (2015-10-29)
+
 1. Fix removing multiple camera sensors that have the same camera name
     * [Pull request #2081](https://bitbucket.org/osrf/gazebo/pull-request/2081)
     * [Issue #1811](https://bitbucket.org/osrf/gazebo/issues/1811)
@@ -421,6 +492,48 @@ compilation on Windows.
 
 ### Gazebo 5.x.x
 
+### Gazebo 5.3.0 (2015-04-07)
+
+1. fix: remove back projection
+    * [Pull request 2201](https://bitbucket.org/osrf/gazebo/pull-request/2201)
+    * A contribution from Yuki Furuta
+
+1. Backport depth camera OSX fix and test
+    * [Pull request 2230](https://bitbucket.org/osrf/gazebo/pull-request/2230)
+
+1. Add missing tinyxml includes
+    * [Pull request 2216](https://bitbucket.org/osrf/gazebo/pull-request/2216)
+
+1. backport fixes for ffmpeg3 to gazebo5 (from pull request #2154)
+    * [Pull request 2161](https://bitbucket.org/osrf/gazebo/pull-request/2161)
+
+1. Check for valid display using xwininfo -root
+    * [Pull request 2111](https://bitbucket.org/osrf/gazebo/pull-request/2111)
+
+1. Don't search for sdformat4 on gazebo5, since gazebo5 can't handle sdformat protocol 1.6
+    * [Pull request 2092](https://bitbucket.org/osrf/gazebo/pull-request/2092)
+
+1. Fix minimum window height
+    * [Pull request 2002](https://bitbucket.org/osrf/gazebo/pull-request/2002)
+
+1. Relax physics tolerances for single-precision bullet
+    * [Pull request 1976](https://bitbucket.org/osrf/gazebo/pull-request/1976)
+
+1. Try finding sdformat 4 in gazebo5 branch
+    * [Pull request 1972](https://bitbucket.org/osrf/gazebo/pull-request/1972)
+
+1. Fix_send_message (backport of pull request #1951)
+    * [Pull request 1964](https://bitbucket.org/osrf/gazebo/pull-request/1964)
+    * A contribution from Samuel Lekieffre
+
+1. Export the media path in the cmake config file.
+    * [Pull request 1933](https://bitbucket.org/osrf/gazebo/pull-request/1933)
+
+1. Shorten gearbox test since it is failing via timeout on osx
+    * [Pull request 1937](https://bitbucket.org/osrf/gazebo/pull-request/1937)
+
+### Gazebo 5.2.1 (2015-10-02)
+
 1. Fix minimum window height
     * Backport of [pull request #1977](https://bitbucket.org/osrf/gazebo/pull-request/1977)
     * [Pull request #2002](https://bitbucket.org/osrf/gazebo/pull-request/2002)
@@ -726,8 +839,6 @@ compilation on Windows.
     * [Pull request #1492](https://bitbucket.org/osrf/gazebo/pull-request/1492)
 1. Reduce selection buffer updates -> 4.1
     * [Pull request #1494](https://bitbucket.org/osrf/gazebo/pull-request/1494)
-1. Fix QT rendering, and rendering update rate
-    * [Pull request #1487](https://bitbucket.org/osrf/gazebo/pull-request/1487)
 1. Fix loading of SimbodyPhysics parameters
     * [Pull request #1474](https://bitbucket.org/osrf/gazebo/pull-request/1474)
 1. Fix heightmap on OSX -> 4.1
@@ -772,9 +883,6 @@ compilation on Windows.
 
 1. Modified GUI rendering to improve the rendering update rate.
     * [Pull request #1487](https://bitbucket.org/osrf/gazebo/pull-request/1487)
-
-### Gazebo 4.1.0 (2014-11-20)
-
 1. Add ArrangePlugin for arranging groups of models.
    Also add Model::ResetPhysicsStates to call Link::ResetPhysicsStates
    recursively on all links in model.
@@ -798,7 +906,7 @@ compilation on Windows.
 ### Gazebo 4.0.2 (2014-09-23)
 
 1. Fix and improve mechanism to generate pkgconfig libs
-    * [Pull request #1027](https://bitbucket.org/osrf/gazebo/pull-request/1027)
+    * [Pull request #1207](https://bitbucket.org/osrf/gazebo/pull-request/1207)
     * [Issue #1284](https://bitbucket.org/osrf/gazebo/issue/1284)
 1. Added arat.world
     * [Pull request #1205](https://bitbucket.org/osrf/gazebo/pull-request/1205)
@@ -952,7 +1060,7 @@ compilation on Windows.
     * [Pull request #1068](https://bitbucket.org/osrf/gazebo/pull-request/1068)
     * [Issue #1132](https://bitbucket.org/osrf/gazebo/issue/1132)
 1. Fix error correction in screw constraints for ODE
-    * [Pull request #1159](https://bitbucket.org/osrf/gazebo/pull-request/1159)
+    * [Pull request #1070](https://bitbucket.org/osrf/gazebo/pull-request/1070)
     * [Issue #1159](https://bitbucket.org/osrf/gazebo/issue/1159)
 1. Improved pkgconfig with SDF
     * [Pull request #1062](https://bitbucket.org/osrf/gazebo/pull-request/1062)
@@ -1000,7 +1108,7 @@ compilation on Windows.
     * [Pull request #984](https://bitbucket.org/osrf/gazebo/pull-request/984)
 1. Update to the GPS sensor
     * [Issue #1059](https://bitbucket.org/osrf/gazebo/issue/1059)
-    * [Pull request #984](https://bitbucket.org/osrf/gazebo/pull-request/984)
+    * [Pull request #978](https://bitbucket.org/osrf/gazebo/pull-request/978)
 1. Removed libtool from plugin loading
     * [Pull request #981](https://bitbucket.org/osrf/gazebo/pull-request/981)
 1. Added functions to get inertial information for a link in the world frame.
@@ -1504,7 +1612,6 @@ compilation on Windows.
  * [https://bitbucket.org/osrf/gazebo/issue/104 Issue #104]
  * [https://bitbucket.org/osrf/gazebo/issue/249 Issue #249]
  * [https://bitbucket.org/osrf/gazebo/issue/244 Issue #244]
- * [https://bitbucket.org/osrf/gazebo/issue/36 Issue #36]
 
 * New features:
  * Default camera view changed to look down at the origin from a height of 2 meters at location (5, -5, 2).
