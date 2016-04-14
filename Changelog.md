@@ -2,6 +2,9 @@
 
 ## Gazebo 7.x.x (2016-xx-xx)
 
+1. Reset ODE joint force feedback after world reset
+    * [Pull request 2255](https://bitbucket.org/osrf/gazebo/pull-request/2255)
+
 1. Remove blank world
     * [Pull request 2220](https://bitbucket.org/osrf/gazebo/pull-request/2220)
 
