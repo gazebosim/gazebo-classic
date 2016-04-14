@@ -777,15 +777,18 @@ void JointMaker::OnDelete()
 void JointMaker::RemoveJointByUser(const std::string &_name)
 {
   // Register user cmd
-  auto jointIt = this->dataPtr->joints.find(_name);
-  if (jointIt != this->dataPtr->joints.end())
+  if (this->dataPtr->userCmdManager)
   {
-    auto joint = jointIt->second;
-    auto cmd = this->dataPtr->userCmdManager->NewCmd(
-        "Deleted [" + joint->name + "]", MEUserCmd::DELETING_JOINT);
-    cmd->SetSDF(msgs::JointToSDF(*joint->jointMsg));
-    cmd->SetScopedName(joint->visual->GetName());
-    cmd->SetJointId(joint->hotspot->GetName());
+    auto jointIt = this->dataPtr->joints.find(_name);
+    if (jointIt != this->dataPtr->joints.end())
+    {
+      auto joint = jointIt->second;
+      auto cmd = this->dataPtr->userCmdManager->NewCmd(
+          "Deleted [" + joint->name + "]", MEUserCmd::DELETING_JOINT);
+      cmd->SetSDF(msgs::JointToSDF(*joint->jointMsg));
+      cmd->SetScopedName(joint->visual->GetName());
+      cmd->SetJointId(joint->hotspot->GetName());
+    }
   }
 
   this->RemoveJoint(_name);
@@ -1651,11 +1654,15 @@ bool JointMaker::SetChildLink(const rendering::VisualPtr &_childLink)
     // Create hotspot visual
     this->CreateHotSpot(this->dataPtr->newJoint);
 
-    auto cmd = this->dataPtr->userCmdManager->NewCmd(
-        "Inserted [" + joint->name + "]", MEUserCmd::INSERTING_JOINT);
-    cmd->SetSDF(msgs::JointToSDF(*joint->jointMsg));
-    cmd->SetScopedName(joint->visual->GetName());
-    cmd->SetJointId(joint->hotspot->GetName());
+    // Register command
+    if (this->dataPtr->userCmdManager)
+    {
+      auto cmd = this->dataPtr->userCmdManager->NewCmd(
+          "Inserted [" + joint->name + "]", MEUserCmd::INSERTING_JOINT);
+      cmd->SetSDF(msgs::JointToSDF(*joint->jointMsg));
+      cmd->SetScopedName(joint->visual->GetName());
+      cmd->SetJointId(joint->hotspot->GetName());
+    }
   }
   // Update child
   else
