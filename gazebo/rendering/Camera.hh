@@ -543,6 +543,10 @@ namespace gazebo
       /// \sa SetProjectionType(const std::string &_type)
       public: std::string GetProjectionType() const;
 
+      /// \brief Return the projection matrix of this camera.
+      /// \return the projection matrix
+      public: ignition::math::Matrix4d ProjectionMatrix() const;
+
       /// \brief Implementation of the render call
       protected: virtual void RenderImpl();
 

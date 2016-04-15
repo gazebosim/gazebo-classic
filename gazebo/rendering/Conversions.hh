@@ -63,8 +63,18 @@ namespace gazebo
 
       /// \brief Ogre quaternion to Gazebo quaternion
       /// \param[in] _v Ogre quaternion
-      /// return Gazebo quaternion
+      /// \return Gazebo quaternion
       public: static math::Quaternion Convert(const Ogre::Quaternion &_v);
+
+      /// \brief Ogre matrix4 to ignition math matrix4d
+      /// \param[in] _v Ogre matrix4
+      /// \return ignition math matrix4d
+      public: static ignition::math::Matrix4d Convert(const Ogre::Matrix4 &_v);
+
+      /// \brief Ignition math matrix4d to Ogre matrix4
+      /// \param[in] _v ignition math matrix4d
+      /// \return Ogre matrix4
+      public: static Ogre::Matrix4 Convert(const ignition::math::Matrix4d &_v);
     };
     /// \}
   }
