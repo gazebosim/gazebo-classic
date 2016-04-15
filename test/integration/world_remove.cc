@@ -128,17 +128,8 @@ void WorldRemoveTest::RemoveBlankWorld(const std::string &_physicsEngine)
 
   // Check we can't get the world pointer
   gzmsg << "Expect exception when trying to get removed world:" << std::endl;
-  bool exceptionThrown = false;
-  try
-  {
-    world = physics::get_world("default");
-  }
-  catch(...)
-  {
-    exceptionThrown = true;
-  }
+  EXPECT_THROW(world = physics::get_world("default"), common::Exception);
   EXPECT_TRUE(world == NULL);
-  EXPECT_TRUE(exceptionThrown);
 
   // Check all topics related to that world are gone
   msgTypes = gazebo::transport::getAdvertisedTopics();

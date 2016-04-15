@@ -199,18 +199,18 @@ void DepthCamera::PostRender()
       // Get access to the buffer and make an image and write it to file
       pixelBuffer = this->depthTexture->getBuffer();
 
-      Ogre::PixelFormat format = pixelBuffer->getFormat();
+      size_t size = Ogre::PixelUtil::getMemorySize(width, height, 1,
+          Ogre::PF_FLOAT32_R);
 
       // Blit the depth buffer if needed
       if (!this->dataPtr->depthBuffer)
-        this->dataPtr->depthBuffer = new float[width * height];
+        this->dataPtr->depthBuffer = new float[size];
 
-      Ogre::Box src_box(0, 0, width, height);
-      Ogre::PixelBox dst_box(width, height,
-          1, format, this->dataPtr->depthBuffer);
+      Ogre::PixelBox dstBox(width, height,
+          1, Ogre::PF_FLOAT32_R, this->dataPtr->depthBuffer);
 
       pixelBuffer->lock(Ogre::HardwarePixelBuffer::HBL_NORMAL);
-      pixelBuffer->blitToMemory(src_box, dst_box);
+      pixelBuffer->blitToMemory(dstBox);
       pixelBuffer->unlock();  // FIXME: do we need to lock/unlock still?
 
       this->dataPtr->newDepthFrame(
