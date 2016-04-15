@@ -145,7 +145,6 @@ set (gtest_sources
   RenderingConversions_TEST.cc
 )
 
-
 gz_build_tests(${gtest_sources})
 
 set (gtest_sources_dri
