@@ -5,6 +5,10 @@
 1. Fix race condition in ~TimePanelPrivate (#1919)
     * [Pull request 2250](https://bitbucket.org/osrf/gazebo/pull-request/2250)
 
+1. Swap view angle widget left and right view
+    * [Pull request XXXX](https://bitbucket.org/osrf/gazebo/pull-request/XXXX)
+    * [Issue #1924](https://bitbucket.org/osrf/gazebo/issues/1924)
+
 ### Gazebo 6.6.0 (2016-04-07)
 
 1. fix: remove back projection
