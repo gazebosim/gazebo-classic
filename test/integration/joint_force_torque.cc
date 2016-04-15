@@ -536,7 +536,6 @@ void JointForceTorqueTest::GetForceTorqueWithAppliedForceReset(
             << "] force2 [" << wrench_01.body2Force
             << "] torque2 [" << wrench_01.body2Torque
             << "]\n";
-
     }
 
     world->Reset();
