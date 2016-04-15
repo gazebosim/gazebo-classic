@@ -2,6 +2,10 @@
 
 ### Gazebo 6.X.X (201X-XX-XX)
 
+1. Reverse view angle widget left and right view
+    * [Pull request 2265](https://bitbucket.org/osrf/gazebo/pull-request/2265)
+    * [Issue 1924](https://bitbucket.org/osrf/gazebo/issue/1924)
+
 1. Fix race condition in ~TimePanelPrivate (#1919)
     * [Pull request 2250](https://bitbucket.org/osrf/gazebo/pull-request/2250)
 
