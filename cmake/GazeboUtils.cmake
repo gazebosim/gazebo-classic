@@ -239,7 +239,9 @@ endmacro()
 
 #####################################
 # Gnu Precompiled Headers
-option(USE_PCH "compiles using gnu precompiled headers" OFF)
+if (CMAKE_COMPILER_IS_GNUCXX)
+  option(USE_PCH "compiles using gnu precompiled headers" OFF)
+endif()
 
 # target_name a target name for generating the PCH file
 # filename the name of the PCH file, relative to the dir of the CMakeLists calling the macro

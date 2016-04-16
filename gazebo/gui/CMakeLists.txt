@@ -236,8 +236,10 @@ if (SPNAV_LIBRARY)
   target_link_libraries(gzclient ${SPNAV_LIBRARY})
 endif()
 
-if (USE_PCH)
-  add_pch(gazebo_gui gui_pch.hh)
+if (CMAKE_COMPILER_IS_GNUCXX)
+  if (USE_PCH)
+    add_pch(gazebo_gui gui_pch.hh)
+  endif()
 endif()
 
 set (gtest_sources

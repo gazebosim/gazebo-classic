@@ -250,9 +250,11 @@ if (HAVE_GDAL)
   target_link_libraries(gazebo_common ${GDAL_LIBRARY})
 endif()
 
-if (USE_PCH)
-  set(MORE_FLAGS "-pthread")
-  add_pch(gazebo_common common_pch.hh ${MORE_FLAGS})
+if (CMAKE_COMPILER_IS_GNUCXX)
+  if (USE_PCH)
+    set(MORE_FLAGS "-pthread")
+    add_pch(gazebo_common common_pch.hh ${MORE_FLAGS})
+  endif()
 endif()
 
 
