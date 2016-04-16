@@ -5,8 +5,8 @@
 1. Fix race condition in ~TimePanelPrivate (#1919)
     * [Pull request 2250](https://bitbucket.org/osrf/gazebo/pull-request/2250)
 
-1. Prevent camera from resetting zoom after an animation in orthographic view mode
-    * [Pull request XXXX](https://bitbucket.org/osrf/gazebo/pull-request/XXXX)
+1. Prevent orthographic camera from resetting zoom after animation
+    * [Pull request 2267](https://bitbucket.org/osrf/gazebo/pull-request/2267)
     * [Issue #1927](https://bitbucket.org/osrf/gazebo/issues/1927)
 
 ### Gazebo 6.6.0 (2016-04-07)
