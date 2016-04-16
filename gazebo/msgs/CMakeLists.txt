@@ -20,6 +20,7 @@ set (msgs
   density.proto
   diagnostics.proto
   distortion.proto
+  empty.proto
   factory.proto
   fluid.proto
   fog.proto

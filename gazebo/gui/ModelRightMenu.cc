@@ -22,6 +22,8 @@
 
 #include <boost/bind.hpp>
 
+#include <ignition/transport/Node.hh>
+
 #include "gazebo/transport/transport.hh"
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Scene.hh"
@@ -315,6 +317,8 @@ void ModelRightMenu::OnApplyWrench()
 //   // cam->GetScene()->SnapVisualToNearestBelow(this->entityName);
 // }
 
+void unused(const msgs::Empty &/*_rep*/, const bool /*_result*/){}
+
 /////////////////////////////////////////////////
 void ModelRightMenu::OnDelete(const std::string &_name)
 {
@@ -324,7 +328,12 @@ void ModelRightMenu::OnDelete(const std::string &_name)
 
   // Delete the entity
   if (!name.empty())
-    transport::requestNoReply(this->node, "entity_delete", name);
+  {
+    ignition::transport::Node nodeIgn;
+    msgs::GzString req;
+    req.set_data(name);
+    nodeIgn.Request("/request/deletion", req, unused);
+  }
 }
 
 /////////////////////////////////////////////////

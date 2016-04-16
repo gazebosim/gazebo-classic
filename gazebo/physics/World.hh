@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_WORLD_HH_
-#define _GAZEBO_WORLD_HH_
+#ifndef GAZEBO_PHYSICS_WORLD_HH_
+#define GAZEBO_PHYSICS_WORLD_HH_
 
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
@@ -544,6 +544,9 @@ namespace gazebo
       /// Must only be called from the World::ProcessMessages function.
       private: void ProcessRequestMsgs();
 
+      /// \brief
+      private: void ProcessRequests();
+
       /// \brief Process all received factory messages.
       /// Must only be called from the World::ProcessMessages function.
       private: void ProcessFactoryMsgs();
@@ -571,6 +574,10 @@ namespace gazebo
 
       /// \brief Thread function for logging state data.
       private: void LogWorker();
+
+      /// \brief
+      private: void EntityDeleteService(const msgs::GzString &_req,
+          gazebo::msgs::Empty &/*_rep*/, bool &/*_result*/);
 
       /// \brief Callback when a light message is received.
       /// \param[in] _msg Pointer to the light message.

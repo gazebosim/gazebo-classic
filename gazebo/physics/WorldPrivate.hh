@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_WORLD_PRIVATE_HH_
-#define _GAZEBO_WORLD_PRIVATE_HH_
+#ifndef GAZEBO_PHYSICS_WORLD_PRIVATE_HH_
+#define GAZEBO_PHYSICS_WORLD_PRIVATE_HH_
 
 #include <atomic>
 #include <deque>
@@ -25,6 +25,8 @@
 #include <boost/thread.hpp>
 #include <sdf/sdf.hh>
 #include <string>
+
+#include <ignition/transport.hh>
 
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/Time.hh"
@@ -40,6 +42,22 @@ namespace gazebo
 {
   namespace physics
   {
+    class Request
+    {
+      public: enum Type
+      {
+        DELETE_ENTITY,
+        INSERT_ENTITY
+      };
+
+      public: Request(const Type _type, const msgs::GzString _msg)
+        : msg(_msg), type(_type) {};
+
+      public: const msgs::GzString msg;
+
+      public: Type type;
+    };
+
     /// \brief Private data class for World.
     class WorldPrivate
     {
@@ -335,6 +353,15 @@ namespace gazebo
       /// \brief True if sensors have been initialized. This should be set
       /// by the SensorManager.
       public: std::atomic_bool sensorsInitialized;
+
+      /// \brief Ignition node used for communications.
+      public: ignition::transport::Node nodeIgn;
+
+      /// \brief Mutex to protect request queue.
+      public: std::mutex requestsMutex;
+
+      /// \brief Request queue.
+      public: std::vector<physics::Request> requests;
     };
   }
 }

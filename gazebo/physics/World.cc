@@ -250,6 +250,10 @@ void World::Load(sdf::ElementPtr _sdf)
   this->dataPtr->lightPub = this->dataPtr->node->Advertise<msgs::Light>(
       "~/light/modify");
 
+  // Ignition transport
+  this->dataPtr->nodeIgn.Advertise("/request/deletion",
+      &World::EntityDeleteService, this);
+
   // This should come before loading of entities
   sdf::ElementPtr physicsElem = this->dataPtr->sdf->GetElement("physics");
 
@@ -2474,6 +2478,7 @@ void World::ProcessMessages()
   {
     this->ProcessEntityMsgs();
     this->ProcessRequestMsgs();
+    this->ProcessRequests();
     this->ProcessFactoryMsgs();
     this->ProcessModelMsgs();
     this->ProcessLightFactoryMsgs();
@@ -2833,3 +2838,33 @@ void World::ResetPhysicsStates()
   for (auto &model : this->dataPtr->models)
     model->ResetPhysicsStates();
 }
+
+/////////////////////////////////////////////////
+void World::EntityDeleteService(const gazebo::msgs::GzString &_req,
+    gazebo::msgs::Empty &/*_rep*/, bool &/*_result*/)
+{
+  std::lock_guard<std::mutex> lock(this->dataPtr->requestsMutex);
+  this->dataPtr->requests.push_back(Request(Request::DELETE_ENTITY, _req));
+}
+
+//////////////////////////////////////////////////
+void World::ProcessRequests()
+{
+  std::lock_guard<std::mutex> lock(this->dataPtr->requestsMutex);
+
+  for (const auto &request : this->dataPtr->requests)
+  {
+    if (request.type == Request::DELETE_ENTITY &&
+        request.msg.has_data())
+    {
+      this->RemoveModel(request.msg.data());
+    }
+  }
+
+  if (!this->dataPtr->requests.empty())
+  {
+    this->EnableAllModels();
+    this->dataPtr->requests.clear();
+  }
+}
+

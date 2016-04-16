@@ -215,6 +215,7 @@ target_link_libraries(gazebo_gui
   ${ogre_libraries}
   ${Boost_LIBRARIES}
   ${tinyxml_LIBRARIES}
+  ${IGNITION-TRANSPORT_LIBRARIES}
 )
 
 if (UNIX)
