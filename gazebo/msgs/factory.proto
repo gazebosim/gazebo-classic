@@ -12,6 +12,7 @@ message Factory
   optional string sdf                       = 1;
   optional string sdf_filename              = 2;
   optional Pose pose                        = 3;
-  optional string edit_name                 = 4;
-  optional string clone_model_name          = 5;
+  optional Pose initial_relative_pose       = 4;
+  optional string edit_name                 = 5;
+  optional string clone_model_name          = 6;
 }

@@ -1843,8 +1843,8 @@ void World::ProcessLightFactoryMsgs()
 //////////////////////////////////////////////////
 void World::ProcessFactoryMsgs()
 {
-  std::list<sdf::ElementPtr> modelsToLoad, lightsToLoad;
-
+  std::list<std::pair<sdf::ElementPtr, ignition::math::Pose3d>>
+      modelsToLoad, lightsToLoad;
   {
     boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
     for (auto const &factoryMsg : this->dataPtr->factoryMsgs)
@@ -1961,11 +1961,20 @@ void World::ProcessFactoryMsgs()
 
         elem->SetParent(this->dataPtr->sdf);
         elem->GetParent()->InsertElement(elem);
+
+        ignition::math::Pose3d initRelPose;
         if (factoryMsg.has_pose())
         {
           elem->GetElement("pose")->Set(msgs::ConvertIgn(factoryMsg.pose()));
         }
-
+        if (factoryMsg.has_initial_relative_pose())
+        {
+          initRelPose = msgs::ConvertIgn(factoryMsg.initial_relative_pose());
+        }
+        else
+        {
+          initRelPose = elem->Get<ignition::math::Pose3d>("pose");
+        }
         if (isActor)
         {
           ActorPtr actor = this->LoadActor(elem, this->dataPtr->rootElement);
@@ -1973,11 +1982,12 @@ void World::ProcessFactoryMsgs()
         }
         else if (isModel)
         {
-          modelsToLoad.push_back(elem);
+          modelsToLoad.push_back(std::make_pair(elem, initRelPose));
+
         }
         else if (isLight)
         {
-          lightsToLoad.push_back(elem);
+          lightsToLoad.push_back(std::make_pair(elem, initRelPose));
         }
       }
     }
@@ -1986,14 +1996,15 @@ void World::ProcessFactoryMsgs()
   }
 
   // Load models
-  for (auto const &elem : modelsToLoad)
+  for (auto const &m : modelsToLoad)
   {
     try
     {
       boost::mutex::scoped_lock lock(this->dataPtr->factoryDeleteMutex);
 
-      ModelPtr model = this->LoadModel(elem, this->dataPtr->rootElement);
+      ModelPtr model = this->LoadModel(m.first, this->dataPtr->rootElement);
       model->Init();
+      model->SetInitialRelativePose(m.second);
       model->LoadPlugins();
     }
     catch(...)
@@ -2003,13 +2014,13 @@ void World::ProcessFactoryMsgs()
   }
 
   // Load lights
-  for (auto const &elem : lightsToLoad)
+  for (auto const &l : lightsToLoad)
   {
     try
     {
       boost::mutex::scoped_lock lock(this->dataPtr->factoryDeleteMutex);
 
-      LightPtr light = this->LoadLight(elem, this->dataPtr->rootElement);
+      LightPtr light = this->LoadLight(l.first, this->dataPtr->rootElement);
     }
     catch(...)
     {
