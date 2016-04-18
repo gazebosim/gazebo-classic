@@ -256,6 +256,7 @@ void JointMaker::RemoveJoint(const std::string &_jointId)
     auto camera = gui::get_active_camera();
     if (camera)
     {
+      // FIXME: Ogre object destruction should be handled in rendering::Visual
       camera->GetScene()->OgreSceneManager()->destroyEntity(
           joint->visual->GetName());
     }
@@ -810,6 +811,7 @@ std::string JointMaker::CreateHotSpot(JointData *_joint)
 
   // create a cylinder to represent the joint
   hotspotVisual->InsertMesh("unit_cylinder");
+  // FIXME: Ogre object creation should be handled in rendering::Visual
   Ogre::MovableObject *hotspotObj =
       (Ogre::MovableObject*)(
       camera->GetScene()->OgreSceneManager()->createEntity(
