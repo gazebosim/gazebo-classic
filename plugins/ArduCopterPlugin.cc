@@ -42,7 +42,6 @@ ArduCopterPlugin::ArduCopterPlugin()
   this->bind("127.0.0.1", 9002);
 
   setsockopt(this->handle, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one));
-  //fcntl(this->handle, F_SETFL, fcntl(this->handle, F_GETFL, 0) & ~O_NONBLOCK);
   fcntl(this->handle, F_SETFL, fcntl(this->handle, F_GETFL, 0) | O_NONBLOCK);
 }
 
@@ -185,7 +184,7 @@ void ArduCopterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     gzerr << "imu_sensor not found\n" << "\n";
 
   // Controller time control.
-  this->lastControllerUpdateTime = 0; // this->model->GetWorld()->GetSimTime();
+  this->lastControllerUpdateTime = 0;
 
   // Listen to the update event. This event is broadcast every simulation
   // iteration.
@@ -240,7 +239,8 @@ void ArduCopterPlugin::GetMotorCommand()
     we re-send the servo packet every 0.1 seconds until we get a
     reply. This allows us to cope with some packet loss to the FDM
   */
-  while (this->recv(&pkt, sizeof(pkt), 100) != sizeof(pkt)) {
+  while (this->recv(&pkt, sizeof(pkt), 100) != sizeof(pkt))
+  {
     // send_servos(input);
     usleep(100);
   }

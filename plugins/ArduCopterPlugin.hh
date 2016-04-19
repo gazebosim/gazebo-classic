@@ -18,6 +18,8 @@
 #ifndef _GAZEBO_ARDUCOPTER_PLUGIN_HH_
 #define _GAZEBO_ARDUCOPTER_PLUGIN_HH_
 
+#include <vector>
+
 // #include <fcntl.h>
 // #include <unistd.h>
 // #include <sys/ioctl.h>
@@ -49,11 +51,13 @@ template<class T>
 bool getSdfParam(sdf::ElementPtr sdf, const std::string& name,
   T& param, const T& default_value, const bool& verbose = false)
 {
-  if (sdf->HasElement(name)) {
+  if (sdf->HasElement(name))
+  {
     param = sdf->GetElement(name)->Get<T>();
     return true;
   }
-  else {
+  else
+  {
     param = default_value;
     if (verbose)
       gzerr << "[ArduCopterPlugin] Please specify a value for parameter ["
@@ -200,7 +204,8 @@ namespace gazebo
         make_sockaddr(address, port, sockaddr);
 
         if (::bind(this->handle,
-          (struct sockaddr *)&sockaddr, sizeof(sockaddr)) != 0) {
+          (struct sockaddr *)&sockaddr, sizeof(sockaddr)) != 0)
+        {
             return false;
         }
         return true;
@@ -232,10 +237,11 @@ namespace gazebo
         tv.tv_sec = timeout_ms / 1000;
         tv.tv_usec = (timeout_ms % 1000) * 1000UL;
 
-        if (select(this->handle+1, &fds, NULL, NULL, &tv) != 1) {
+        if (select(this->handle+1, &fds, NULL, NULL, &tv) != 1)
+        {
             return -1;
         }
-        
+
         return ::recv(this->handle, buf, size, 0);
     }
 
@@ -253,7 +259,7 @@ namespace gazebo
       double velocity_xyz[3];
       double position_xyz[3];
     };
-        
+
     private: int handle;
 
     private: physics::LinkPtr imuLink;

@@ -33,14 +33,16 @@ Small2dGimbalPlugin::Small2dGimbalPlugin()
 }
 
 /////////////////////////////////////////////////
-void Small2dGimbalPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr /*_sdf*/)
+void Small2dGimbalPlugin::Load(physics::ModelPtr _model,
+  sdf::ElementPtr /*_sdf*/)
 {
   this->model = _model;
-  std::string jointName = "small_2d_gimbal::tilt_joint";
+  std::string jointName = "gimbal_small_2d::tilt_joint";
   this->tiltJoint = this->model->GetJoint(jointName);
-  if(!this->tiltJoint)
+  if (!this->tiltJoint)
   {
-    gzerr << "Small2dGimbalPlugin::Load ERROR! Can't get joint '" << jointName << "' " << endl;
+    gzerr << "Small2dGimbalPlugin::Load ERROR! Can't get joint '"
+          << jointName << "' " << endl;
   }
 }
 
@@ -52,7 +54,8 @@ void Small2dGimbalPlugin::Init()
 
   this->lastUpdateTime = this->model->GetWorld()->GetSimTime();
 
-  std::string topic = std::string("~/") +  this->model->GetName() + "/gimbal_tilt_cmd";
+  std::string topic = std::string("~/") +  this->model->GetName() +
+    "/gimbal_tilt_cmd";
   this->sub = this->node->Subscribe(topic,
                                        &Small2dGimbalPlugin::OnStringMsg,
                                        this);
@@ -70,20 +73,18 @@ void Small2dGimbalPlugin::Init()
 void Small2dGimbalPlugin::OnStringMsg(ConstGzStringPtr &_msg)
 {
   gzmsg << "Command received " << _msg->data() << std::endl;
-
   this->command = atof(_msg->data().c_str());
-
 }
 
 /////////////////////////////////////////////////
 void Small2dGimbalPlugin::OnUpdate()
 {
-  if( !this->tiltJoint)
+  if (!this->tiltJoint)
     return;
 
   double angle = this->tiltJoint->GetAngle(0).Radian();
 
-  common::Time time = this->model->GetWorld()->GetSimTime();  
+  common::Time time = this->model->GetWorld()->GetSimTime();
   if (time < this->lastUpdateTime)
   {
     gzerr << "time reset event\n";
@@ -100,8 +101,8 @@ void Small2dGimbalPlugin::OnUpdate()
   }
 
   static int i =1000;
-  i ++;
-  if ( i>100) {
+  if (++i>100)
+  {
     i = 0;
     std::stringstream ss;
     ss << angle;
