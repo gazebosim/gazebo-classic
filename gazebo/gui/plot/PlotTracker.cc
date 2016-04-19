@@ -208,6 +208,7 @@ QwtText PlotTracker::trackerTextF(const QPointF &_pos) const
   QColor c("#f0f0f0");
   c.setAlpha(200);
   tracker.setBackgroundBrush(c);
+  tracker.setRenderFlags(Qt::AlignLeft);
 
   QString info;
   const QwtPlotItemList curves =
@@ -238,10 +239,10 @@ QString PlotTracker::CurveInfoAt(const QwtPlotCurve *curve,
 
   // interpolate
   const double y = line.pointAt(
-      (_pos.x() - line.p1().x() ) / line.dx() ).y();
+      (_pos.x() - line.p1().x()) / line.dx()).y();
 
   // return value string in curve color
-  QString info("<font color=""%1"">[%2, %3]</font>");
+  QString info("<font color=""%1"">(%2, %3)</font>");
   return info.arg(curve->pen().color().name()).arg(_pos.x()).arg(y);
 }
 
