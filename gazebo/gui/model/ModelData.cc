@@ -99,6 +99,12 @@ void NestedModelData::SetName(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
+std::string NestedModelData::Name() const
+{
+  return this->modelSDF->Get<std::string>("name");
+}
+
+/////////////////////////////////////////////////
 void NestedModelData::SetPose(const ignition::math::Pose3d &_pose)
 {
   this->modelSDF->GetElement("pose")->Set(_pose);
@@ -169,7 +175,7 @@ LinkData::~LinkData()
 }
 
 /////////////////////////////////////////////////
-std::string LinkData::GetName() const
+std::string LinkData::Name() const
 {
   return this->linkSDF->Get<std::string>("name");
 }

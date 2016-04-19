@@ -87,7 +87,7 @@ void MEUserCmd::Undo()
 {
   // Inserting link
   if (this->dataPtr->type == MEUserCmd::INSERTING_LINK &&
-     !this->dataPtr->scopedName.empty())
+      !this->dataPtr->scopedName.empty())
   {
     model::Events::requestLinkRemoval(this->dataPtr->scopedName);
   }
@@ -97,6 +97,18 @@ void MEUserCmd::Undo()
   {
     model::Events::requestLinkInsertion(this->dataPtr->sdf);
   }
+  // Inserting nested model
+  else if (this->dataPtr->type == MEUserCmd::INSERTING_NESTED_MODEL &&
+      !this->dataPtr->scopedName.empty())
+  {
+    model::Events::requestNestedModelRemoval(this->dataPtr->scopedName);
+  }
+  // Deleting nested model
+  else if (this->dataPtr->type == MEUserCmd::DELETING_NESTED_MODEL &&
+      this->dataPtr->sdf)
+  {
+    model::Events::requestNestedModelInsertion(this->dataPtr->sdf);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -104,15 +116,27 @@ void MEUserCmd::Redo()
 {
   // Inserting link
   if (this->dataPtr->type == MEUserCmd::INSERTING_LINK &&
-     this->dataPtr->sdf)
+      this->dataPtr->sdf)
   {
     model::Events::requestLinkInsertion(this->dataPtr->sdf);
   }
   // Deleting link
   else if (this->dataPtr->type == MEUserCmd::DELETING_LINK &&
-     !this->dataPtr->scopedName.empty())
+      !this->dataPtr->scopedName.empty())
   {
     model::Events::requestLinkRemoval(this->dataPtr->scopedName);
+  }
+  // Inserting nested model
+  else if (this->dataPtr->type == MEUserCmd::INSERTING_NESTED_MODEL &&
+      this->dataPtr->sdf)
+  {
+    model::Events::requestNestedModelInsertion(this->dataPtr->sdf);
+  }
+  // Deleting nested model
+  else if (this->dataPtr->type == MEUserCmd::DELETING_NESTED_MODEL &&
+      !this->dataPtr->scopedName.empty())
+  {
+    model::Events::requestNestedModelRemoval(this->dataPtr->scopedName);
   }
 }
 
