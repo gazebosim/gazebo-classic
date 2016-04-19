@@ -130,23 +130,15 @@ std::vector<std::string> common::split(const std::string &_str,
 std::string common::unique_file_path(const std::string &_pathAndName,
     const std::string &_extension)
 {
-  std::string result = _pathAndName;
+  std::string result = _pathAndName + "." + _extension;
+  int count = 1;
+  struct stat buf;
 
   // Check if file exists and change name accordingly
-  struct stat buf;
-  if (stat((result + "." + _extension).c_str(), &buf) != -1)
+  while (stat(result.c_str(), &buf) != -1)
   {
-    int count = 0;
-    while (stat((result + "(" + std::to_string(count) + ")." +
-        _extension).c_str(), &buf) != -1)
-    {
-      count++;
-    }
-
-    result += "(" + std::to_string(count) + ")";
+    result = _pathAndName + "(" + std::to_string(count++) + ")." + _extension;
   }
-
-  result += "." + _extension;
 
   return result;
 }
