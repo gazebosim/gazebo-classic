@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef GAZEBO_GUI_PLOT_PLOTTRACKER_HH
-#define GAZEBO_GUI_PLOT_PLOTTRACKER_HH
+#ifndef GAZEBO_GUI_PLOT_PLOTTRACKER_HH_
+#define GAZEBO_GUI_PLOT_PLOTTRACKER_HH_
 
 #include <memory>
 
@@ -32,7 +32,7 @@ namespace gazebo
     class PlotTracker: public QwtPlotPicker
     {
       /// \brief Constructor
-      /// \param[in] _canvas Canvas the zoomer will be attached to.
+      /// \param[in] _canvas Canvas the tracker will be attached to.
 #if (QWT_VERSION < ((6 << 16) | (1 << 8) | 0))
       public: PlotTracker(QwtPlotCanvas *_canvas);
 #else
