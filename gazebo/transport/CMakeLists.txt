@@ -60,6 +60,7 @@ target_link_libraries(gazebo_transport
   gazebo_common
   gazebo_msgs
   ${IGNITION-MATH_LIBRARIES}
+  ${IGNITION-TRANSPORT_LIBRARIES}
   ${Boost_LIBRARIES}
   ${TBB_LIBRARIES}
 )

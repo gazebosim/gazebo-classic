@@ -20,10 +20,13 @@
   #include <Winsock2.h>
 #endif
 
+#include <functional>
 #include <list>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 #include <string>
+
+#include <ignition/transport/Node.hh>
 
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
@@ -430,3 +433,21 @@ bool transport::waitForNamespaces(const gazebo::common::Time &_maxWait)
     return true;
   return false;
 }
+
+/////////////////////////////////////////////////
+void transport::RequestNoReply(const std::string &_service,
+    const std::string &_data)
+{
+  // Unused callback
+  std::function<void(const gazebo::msgs::Empty &, const bool)> unused =
+    [](const gazebo::msgs::Empty &, const bool &)
+  {
+  };
+
+  msgs::GzString req;
+  req.set_data(_data);
+
+  ignition::transport::Node nodeIgn;
+  nodeIgn.Request(_service, req, unused);
+}
+

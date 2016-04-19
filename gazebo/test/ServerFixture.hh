@@ -679,9 +679,6 @@ namespace gazebo
     /// \brief Factory publisher.
     protected: transport::PublisherPtr factoryPub;
 
-    /// \brief Request publisher.
-    protected: transport::PublisherPtr requestPub;
-
     /// \brief Map of received poses.
     protected: std::map<std::string, math::Pose> poses;
 

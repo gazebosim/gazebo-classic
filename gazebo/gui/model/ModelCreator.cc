@@ -1659,8 +1659,9 @@ void ModelCreator::FinishModel()
     this->SetModelVisible(this->dataPtr->serverModelName, true);
 
     // delete model on server first before spawning the updated one.
-    transport::request(gui::get_world(), "entity_delete",
+    transport::RequestNoReply("/request/deletion",
         this->dataPtr->serverModelName);
+
     int timeoutCounter = 0;
     int timeout = 100;
     // wait for entity to be deleted on server side

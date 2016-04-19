@@ -459,11 +459,7 @@ bool ModelCommand::RunImpl()
 
   if (this->vm.count("delete"))
   {
-    msgs::Request *msg = msgs::CreateRequest("entity_delete", modelName);
-    transport::PublisherPtr pub = node->Advertise<msgs::Request>("~/request");
-    pub->WaitForConnection();
-    pub->Publish(*msg, true);
-    delete msg;
+    transport::RequestNoReply("/request/deletion", modelName);
   }
   else if (this->vm.count("spawn-file"))
   {

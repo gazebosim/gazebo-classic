@@ -591,7 +591,7 @@ void World::LogStep()
 
           while (nameElem)
           {
-            transport::requestNoReply(this->GetName(), "entity_delete",
+            transport::RequestNoReply("/request/deletion",
                                       nameElem->Get<std::string>());
             nameElem = nameElem->GetNextElement("name");
           }
@@ -1662,8 +1662,13 @@ void World::ProcessRequestMsgs()
       std::string *serializedData = response.mutable_serialized_data();
       modelVMsg.SerializeToString(serializedData);
     }
+    // TODO: Remove on Gazebo 9
     else if (requestMsg.request() == "entity_delete")
     {
+      gzwarn << "Request for `entity_delete` [" << requestMsg.data()
+          << "] is deprecated. Use "
+          << "transport::RequestNoReply(\"/request/deletion\", <entity name>)"
+          << " instead." << std::endl;
       boost::mutex::scoped_lock lock2(this->dataPtr->entityDeleteMutex);
       this->dataPtr->deleteEntity.push_back(requestMsg.data());
     }

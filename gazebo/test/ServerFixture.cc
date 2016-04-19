@@ -216,9 +216,6 @@ void ServerFixture::LoadArgs(const std::string &_args)
   this->factoryPub =
     this->node->Advertise<msgs::Factory>("~/factory");
 
-  this->requestPub =
-    this->node->Advertise<msgs::Request>("~/request");
-
   // Wait for the world to reach the correct pause state.
   // This might not work properly with multiple worlds.
   // Use a 30 second timeout.
@@ -234,7 +231,6 @@ void ServerFixture::LoadArgs(const std::string &_args)
   ASSERT_LT(waitCount, maxWaitCount);
 
   this->factoryPub->WaitForConnection();
-  this->requestPub->WaitForConnection();
 }
 
 /////////////////////////////////////////////////
@@ -1633,9 +1629,7 @@ physics::ModelPtr ServerFixture::GetModel(const std::string &_name)
 /////////////////////////////////////////////////
 void ServerFixture::RemoveModel(const std::string &_name)
 {
-  msgs::Request *msg = msgs::CreateRequest("entity_delete", _name);
-  this->requestPub->Publish(*msg);
-  delete msg;
+  transport::RequestNoReply("/request/deletion", _name);
 }
 
 /////////////////////////////////////////////////

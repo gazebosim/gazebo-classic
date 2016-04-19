@@ -205,6 +205,7 @@ namespace gazebo
       public: std::vector<WorldPluginPtr> plugins;
 
       /// \brief List of entities to delete.
+      /// \deprecated Stop handling "entity_delete" from Gazebo 9.
       public: std::list<std::string> deleteEntity;
 
       /// \brief Request message buffer.
@@ -324,6 +325,7 @@ namespace gazebo
       public: boost::mutex logBufferMutex;
 
       /// \brief Mutex to protect the deleteEntity list.
+      /// \deprecated Stop handling "entity_delete" from Gazebo 9.
       public: boost::mutex entityDeleteMutex;
 
       /// \brief Worker thread for logging.
