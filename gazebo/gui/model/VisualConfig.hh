@@ -20,7 +20,6 @@
 
 #include <map>
 #include <string>
-#include <vector>
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/model/ModelData.hh"
@@ -200,8 +199,8 @@ namespace gazebo
       /// \brief Map of visual config widgets which were deleted.
       private: std::map<int, VisualConfigData *> deletedConfigs;
 
-      /// \brief Vector of visual config widgets which were added.
-      private: std::vector<int> addedConfigs;
+      /// \brief Map of visual config widgets which were added.
+      private: std::map<int, VisualConfigData *> addedConfigs;
 
       /// \brief Counter for the number of visuals.
       private: int counter;

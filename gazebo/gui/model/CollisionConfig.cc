@@ -267,7 +267,7 @@ void CollisionConfig::AddCollision(const std::string &_name,
   connect(headerButton, SIGNAL(toggled(bool)), configData,
            SLOT(OnToggleItem(bool)));
   this->configs[this->counter] = configData;
-  this->addedConfigs.push_back(this->counter);
+  this->addedConfigs[this->counter] = configData;
 
   this->counter++;
 }
@@ -320,8 +320,18 @@ void CollisionConfig::OnRemoveCollision(int _id)
   configData->widget->hide();
 
   emit CollisionRemoved(configData->name);
-  this->deletedConfigs[_id] = configData;
-  this->configs.erase(it);
+
+  // Add to delete list only if this existed from the beginning
+  auto itAdded = this->addedConfigs.find(_id);
+  if (itAdded == this->addedConfigs.end())
+  {
+    this->deletedConfigs[_id] = configData;
+    this->configs.erase(it);
+  }
+  else
+  {
+    this->addedConfigs.erase(itAdded);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -397,16 +407,16 @@ void CollisionConfig::OnGeometryChanged(const std::string &/*_name*/,
 void CollisionConfig::RestoreOriginalData()
 {
   // Remove added configs
-  for (auto id : this->addedConfigs)
+  for (auto &it : this->addedConfigs)
   {
-    auto configData = this->configs[id];
+    auto configData = it.second;
 
     this->listLayout->removeWidget(configData->widget);
     delete configData->widget;
 
     emit CollisionRemoved(configData->name);
 
-    this->configs.erase(id);
+    this->configs.erase(it.first);
   }
   this->addedConfigs.clear();
 
