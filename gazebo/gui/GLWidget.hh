@@ -156,7 +156,6 @@ namespace gazebo
       /// \return True if handled by this function.
       private: bool OnMouseDoubleClick(const common::MouseEvent &_event);
 
-      private: void OnRequest(ConstRequestPtr &_msg);
       private: void OnCreateScene(const std::string &_name);
       private: void OnRemoveScene(const std::string &_name);
       private: void OnMoveMode(bool _mode);
@@ -229,6 +228,8 @@ namespace gazebo
       /// \sa SetMouseEventButton
       /// \param[in] _button The QT mouse buttons
       private: void SetMouseEventButtons(const Qt::MouseButtons &_buttons);
+
+      private: void HandleEntityDeletion(const std::string &_name);
 
       /// \internal
       /// \brief Pointer to private data.

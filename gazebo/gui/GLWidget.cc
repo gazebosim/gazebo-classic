@@ -134,8 +134,13 @@ GLWidget::GLWidget(QWidget *_parent)
   this->dataPtr->selectionPub =
     this->dataPtr->node->Advertise<msgs::Selection>("~/selection");
 
-  this->dataPtr->requestSub = this->dataPtr->node->Subscribe("~/request",
-      &GLWidget::OnRequest, this);
+  // Ignition transport
+  std::function<void(const msgs::GzString &)> onEntityDeletion =
+              [this](const msgs::GzString &_msg)
+  {
+    this->HandleEntityDeletion(_msg.data());
+  };
+  this->dataPtr->ignNode.Subscribe("/notify/deletion", onEntityDeletion);
 
   this->installEventFilter(this);
   this->dataPtr->keyModifiers = 0;
@@ -1262,32 +1267,29 @@ void GLWidget::OnSetSelectedEntity(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
-void GLWidget::OnRequest(ConstRequestPtr &_msg)
+void GLWidget::HandleEntityDeletion(const std::string &_name)
 {
-  if (_msg->request() == "entity_delete")
+  std::lock_guard<std::mutex> lock(this->dataPtr->selectedVisMutex);
+  if (!this->dataPtr->selectedVisuals.empty())
   {
-    std::lock_guard<std::mutex> lock(this->dataPtr->selectedVisMutex);
-    if (!this->dataPtr->selectedVisuals.empty())
+    for (std::vector<rendering::VisualPtr>::iterator it =
+        this->dataPtr->selectedVisuals.begin();
+        it != this->dataPtr->selectedVisuals.end();
+        ++it)
     {
-      for (std::vector<rendering::VisualPtr>::iterator it =
-          this->dataPtr->selectedVisuals.begin();
-          it != this->dataPtr->selectedVisuals.end();
-          ++it)
+      if ((*it)->GetName() == _name)
       {
-        if ((*it)->GetName() == _msg->data())
-        {
-          ModelManipulator::Instance()->Detach();
-          this->dataPtr->selectedVisuals.erase(it);
-          break;
-        }
+        ModelManipulator::Instance()->Detach();
+        this->dataPtr->selectedVisuals.erase(it);
+        break;
       }
     }
+  }
 
-    if (this->dataPtr->copyEntityName == _msg->data())
-    {
-      this->dataPtr->copyEntityName = "";
-      g_pasteAct->setEnabled(false);
-    }
+  if (this->dataPtr->copyEntityName == _name)
+  {
+    this->dataPtr->copyEntityName = "";
+    g_pasteAct->setEnabled(false);
   }
 }
 

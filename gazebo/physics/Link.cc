@@ -311,23 +311,6 @@ void Link::Fini()
 
   this->sensors.clear();
 
-  for (Visuals_M::iterator iter = this->visuals.begin();
-       iter != this->visuals.end(); ++iter)
-  {
-    msgs::Request *msg = msgs::CreateRequest("entity_delete",
-        boost::lexical_cast<std::string>(iter->second.id()));
-    this->requestPub->Publish(*msg, true);
-    delete msg;
-  }
-
-  for (std::vector<std::string>::iterator iter = this->cgVisuals.begin();
-       iter != this->cgVisuals.end(); ++iter)
-  {
-    msgs::Request *msg = msgs::CreateRequest("entity_delete", *iter);
-    this->requestPub->Publish(*msg, true);
-    delete msg;
-  }
-
 #ifdef HAVE_OPENAL
   if (this->world && this->world->GetPhysicsEngine() &&
       this->world->GetPhysicsEngine()->GetContactManager())

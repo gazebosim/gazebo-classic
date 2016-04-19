@@ -182,6 +182,14 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
   this->dataPtr->sceneSub =
       this->dataPtr->node->Subscribe("~/scene", &Scene::OnScene, this);
 
+  // Ignition transport
+  std::function<void(const msgs::GzString &)> onEntityDeletion =
+              [this](const msgs::GzString &_msg)
+  {
+    this->HandleEntityDeletion(_msg.data());
+  };
+  this->dataPtr->ignNode.Subscribe("/notify/deletion", onEntityDeletion);
+
   this->dataPtr->sdf.reset(new sdf::Element);
   sdf::initFile("scene.sdf", this->dataPtr->sdf);
 
@@ -2503,34 +2511,6 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
 
     // this->responsePub->Publish(response);
   }
-  else if (_msg->request() == "entity_delete")
-  {
-    Light_M::iterator lightIter = this->dataPtr->lights.find(_msg->data());
-
-    // Check to see if the deleted entity is a light.
-    if (lightIter != this->dataPtr->lights.end())
-    {
-      this->dataPtr->lights.erase(lightIter);
-    }
-    // Otherwise delete a visual
-    else
-    {
-      VisualPtr visPtr;
-      try
-      {
-        Visual_M::iterator iter;
-        iter = this->dataPtr->visuals.find(
-            boost::lexical_cast<uint32_t>(_msg->data()));
-        visPtr = iter->second;
-      } catch(...)
-      {
-        visPtr = this->GetVisual(_msg->data());
-      }
-
-      if (visPtr)
-        this->RemoveVisual(visPtr);
-    }
-  }
   else if (_msg->request() == "show_contact")
   {
     this->ShowContacts(true);
@@ -3593,5 +3573,35 @@ void Scene::ToggleLayer(const int32_t _layer)
   for (auto visual : this->dataPtr->visuals)
   {
     visual.second->ToggleLayer(_layer);
+  }
+}
+
+/////////////////////////////////////////////////
+void Scene::HandleEntityDeletion(const std::string &_name)
+{
+  Light_M::iterator lightIter = this->dataPtr->lights.find(_name);
+
+  // Check to see if the deleted entity is a light.
+  if (lightIter != this->dataPtr->lights.end())
+  {
+    this->dataPtr->lights.erase(lightIter);
+  }
+  // Otherwise delete a visual
+  else
+  {
+    VisualPtr visPtr;
+    try
+    {
+      Visual_M::iterator iter;
+      iter = this->dataPtr->visuals.find(
+          boost::lexical_cast<uint32_t>(_name));
+      visPtr = iter->second;
+    } catch(...)
+    {
+      visPtr = this->GetVisual(_name);
+    }
+
+    if (visPtr)
+      this->RemoveVisual(visPtr);
   }
 }

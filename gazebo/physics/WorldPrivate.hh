@@ -51,7 +51,7 @@ namespace gazebo
       };
 
       public: Request(const Type _type, const msgs::GzString _msg)
-        : msg(_msg), type(_type) {};
+        : msg(_msg), type(_type) {}
 
       public: const msgs::GzString msg;
 
@@ -357,7 +357,7 @@ namespace gazebo
       public: std::atomic_bool sensorsInitialized;
 
       /// \brief Ignition node used for communications.
-      public: ignition::transport::Node nodeIgn;
+      public: ignition::transport::Node ignNode;
 
       /// \brief Mutex to protect request queue.
       public: std::mutex requestsMutex;

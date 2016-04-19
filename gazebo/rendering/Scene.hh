@@ -830,6 +830,8 @@ namespace gazebo
       /// \param[in] _vis Visual that the visualizations are attached to.
       private: void RemoveVisualizations(VisualPtr _vis);
 
+      private: void HandleEntityDeletion(const std::string &_name);
+
       /// \internal
       /// \brief Pointer to private data.
       private: std::unique_ptr<ScenePrivate> dataPtr;

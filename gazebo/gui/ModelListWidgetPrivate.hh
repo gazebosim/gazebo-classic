@@ -23,6 +23,8 @@
 #include <deque>
 #include <sdf/sdf.hh>
 
+#include <ignition/transport/Node.hh>
+
 #include "gazebo/gui/qt.h"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportTypes.hh"
@@ -47,13 +49,14 @@ namespace gazebo
       public: transport::PublisherPtr physicsPub;
       public: transport::PublisherPtr windPub;
 
+      public: ignition::transport::Node ignNode;
+
       /// \brief Publisher for atmosphere messages.
       public: transport::PublisherPtr atmospherePub;
 
       public: transport::PublisherPtr lightPub;
 
       public: transport::SubscriberPtr responseSub;
-      public: transport::SubscriberPtr requestSub;
 
       /// \brief GUI tree item.
       public: QTreeWidgetItem *guiItem;

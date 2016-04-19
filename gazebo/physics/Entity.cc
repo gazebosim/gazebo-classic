@@ -585,12 +585,12 @@ void Entity::OnPoseMsg(ConstPosePtr &_msg)
 //////////////////////////////////////////////////
 void Entity::Fini()
 {
-  if (this->requestPub)
+  // Notify that deletion was completed
   {
-    msgs::Request *msg = msgs::CreateRequest("entity_delete",
-        this->GetScopedName());
-    this->requestPub->Publish(*msg, true);
-    delete msg;
+    msgs::GzString msg;
+    msg.set_data("HELLO");
+
+    this->ignNode.Publish("/notify/deletion", msg);
   }
 
   this->parentEntity.reset();

@@ -21,6 +21,8 @@
 #include <string>
 #include <vector>
 
+#include <ignition/transport/Node.hh>
+
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/common/KeyEvent.hh"
 #include "gazebo/common/MouseEvent.hh"
@@ -91,9 +93,6 @@ namespace gazebo
       /// \brief Publishes information about user selections.
       public: transport::PublisherPtr selectionPub;
 
-      /// \brief Susbcribes to the requests.
-      public: transport::SubscriberPtr requestSub;
-
       /// \brief Text key.
       public: std::string keyText;
 
@@ -111,6 +110,9 @@ namespace gazebo
 
       /// \brief Mutex to protect selectedVisuals array.
       public: std::mutex selectedVisMutex;
+
+      /// \brief
+      public: ignition::transport::Node ignNode;
     };
   }
 }

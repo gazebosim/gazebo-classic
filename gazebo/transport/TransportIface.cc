@@ -447,7 +447,7 @@ void transport::RequestNoReply(const std::string &_service,
   msgs::GzString req;
   req.set_data(_data);
 
-  ignition::transport::Node nodeIgn;
-  nodeIgn.Request(_service, req, unused);
+  ignition::transport::Node ignNode;
+  ignNode.Request(_service, req, unused);
 }
 

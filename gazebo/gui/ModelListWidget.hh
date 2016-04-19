@@ -52,13 +52,13 @@ namespace gazebo
                                         const std::string &_mode);
       private: void OnResponse(ConstResponsePtr &_msg);
 
+      private: void OnDeletionRequest(const msgs::GzString &_data);
+
       private: void OnModelUpdate(const msgs::Model &_msg);
 
       /// \brief An event callback to handle light update msgs.
       /// \param[in] _msg Light message.
       private: void OnLightUpdate(const msgs::Light &_msg);
-
-      private: void OnRequest(ConstRequestPtr &_msg);
 
       private: void OnRemoveScene(const std::string &_name);
       private: void OnCreateScene(const std::string &_name);

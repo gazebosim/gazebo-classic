@@ -2664,12 +2664,9 @@ void ModelListWidget::FillPoseProperty(const msgs::Pose &_msg,
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::OnRequest(ConstRequestPtr &_msg)
+void ModelListWidget::OnDeletionRequest(const msgs::GzString &_data)
 {
-  if (_msg->request() == "entity_delete")
-  {
-    this->dataPtr->removeEntityList.push_back(_msg->data());
-  }
+  this->dataPtr->removeEntityList.push_back(_data.data());
 }
 
 /////////////////////////////////////////////////
@@ -2700,7 +2697,6 @@ void ModelListWidget::OnRemoveScene(const std::string &/*_name*/)
   this->dataPtr->windPub.reset();
   this->dataPtr->lightPub.reset();
   this->dataPtr->responseSub.reset();
-  this->dataPtr->requestSub.reset();
 }
 
 /////////////////////////////////////////////////
@@ -2730,7 +2726,6 @@ void ModelListWidget::InitTransport(const std::string &_name)
     this->dataPtr->windPub.reset();
     this->dataPtr->lightPub.reset();
     this->dataPtr->responseSub.reset();
-    this->dataPtr->requestSub.reset();
   }
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
@@ -2757,8 +2752,9 @@ void ModelListWidget::InitTransport(const std::string &_name)
   this->dataPtr->responseSub = this->dataPtr->node->Subscribe("~/response",
                                             &ModelListWidget::OnResponse, this);
 
-  this->dataPtr->requestSub = this->dataPtr->node->Subscribe("~/request",
-      &ModelListWidget::OnRequest, this, false);
+  // Ignition
+  this->dataPtr->ignNode.Subscribe("/notify/deletion",
+      &ModelListWidget::OnDeletionRequest, this);
 }
 
 /////////////////////////////////////////////////

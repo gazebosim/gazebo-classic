@@ -23,6 +23,8 @@
 #include <string>
 #include <vector>
 
+#include <ignition/transport/Node.hh>
+
 #include "SimEventsException.hh"
 #include "SimStateEventSource.hh"
 
@@ -47,10 +49,6 @@ namespace gazebo
     /// \brief callback for ~/model/info topic
     /// \param[in] _msg model message
     private: void OnModelInfo(ConstModelPtr &_msg);
-
-    /// \brief callback for ~/request topic
-    /// \param [in] _msg the request message
-    private: void OnRequest(ConstRequestPtr &_msg);
 
     /// \brief world pointer to get simulation state
     private: physics::WorldPtr world;
@@ -78,6 +76,9 @@ namespace gazebo
 
     /// \brief subscription to the request topic
     private: transport::SubscriberPtr requestSub;
+
+    /// \brief
+    private: ignition::transport::Node ignNode;
   };
 }
 

@@ -251,7 +251,7 @@ void World::Load(sdf::ElementPtr _sdf)
       "~/light/modify");
 
   // Ignition transport
-  this->dataPtr->nodeIgn.Advertise("/request/deletion",
+  this->dataPtr->ignNode.Advertise("/request/deletion",
       &World::EntityDeleteService, this);
 
   // This should come before loading of entities

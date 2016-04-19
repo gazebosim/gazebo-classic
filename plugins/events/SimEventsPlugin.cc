@@ -45,20 +45,6 @@ SimEventsPlugin::~SimEventsPlugin()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SimEventsPlugin::OnRequest(ConstRequestPtr &_msg)
-{
-  if (_msg->request() == "entity_delete")
-  {
-    std::string modelName = _msg->data();
-    if (models.erase(modelName) == 1)
-    {
-      // notify everyone!
-      SimEventConnector::spawnModel(modelName, false);
-    }
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////
 void SimEventsPlugin::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
 {
   this->world = _parent;
@@ -79,8 +65,17 @@ void SimEventsPlugin::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
       &SimEventsPlugin::OnModelInfo, this);
 
   // detect model deletion
-  this->requestSub = this->node->Subscribe("~/request",
-      &SimEventsPlugin::OnRequest, this);
+  std::function<void(const msgs::GzString &)> onEntityDeletion =
+              [this](const msgs::GzString &_msg)
+  {
+    std::string modelName = _msg.data();
+    if (models.erase(modelName) == 1)
+    {
+      // notify everyone!
+      SimEventConnector::spawnModel(modelName, false);
+    }
+  };
+  this->ignNode.Subscribe("/notify/deletion", onEntityDeletion);
 
   // read regions, if any
   if (this->sdf->HasElement("region"))
