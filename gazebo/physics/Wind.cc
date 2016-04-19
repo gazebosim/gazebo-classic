@@ -42,9 +42,15 @@ namespace gazebo
     /// \brief Private data for the Wind class
     class WindPrivate
     {
-      /// \brief Pointer to the world.
-      /// We are not responsible for its lifetime, so do not delete.
-      public: World *world;
+      /// \brief Class constructor.
+      /// \param[in] _world A reference to the world.
+      public: WindPrivate(physics::World &_world)
+        : world(_world)
+      {
+      }
+
+      /// \brief Reference to the world.
+      public: World &world;
 
       /// \brief Wind linear velocity.
       public: ignition::math::Vector3d linearVel;
@@ -76,15 +82,13 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-Wind::Wind(World *_world, sdf::ElementPtr _sdf)
-  : dataPtr(new WindPrivate)
+Wind::Wind(World &_world, sdf::ElementPtr _sdf)
+  : dataPtr(new WindPrivate(_world))
 {
-  this->dataPtr->world = _world;
-
   this->Load(_sdf);
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init(this->dataPtr->world->GetName());
+  this->dataPtr->node->Init(this->dataPtr->world.GetName());
   this->dataPtr->windSub = this->dataPtr->node->Subscribe("~/wind",
       &Wind::OnWindMsg, this);
 
@@ -214,7 +218,7 @@ void Wind::OnRequest(ConstRequestPtr &_msg)
     msgs::Wind windMsg;
     windMsg.mutable_linear_velocity()->CopyFrom(
       msgs::Convert(this->dataPtr->linearVel));
-    windMsg.set_enable_wind(this->dataPtr->world->WindEnabled());
+    windMsg.set_enable_wind(this->dataPtr->world.WindEnabled());
 
     response.set_type(windMsg.GetTypeName());
     windMsg.SerializeToString(serializedData);
@@ -229,7 +233,7 @@ void Wind::OnWindMsg(ConstWindPtr &_msg)
     this->SetLinearVel(msgs::ConvertIgn(_msg->linear_velocity()));
 
   if (_msg->has_enable_wind())
-    this->dataPtr->world->SetWindEnabled(_msg->enable_wind());
+    this->dataPtr->world.SetWindEnabled(_msg->enable_wind());
 }
 
 /////////////////////////////////////////////////

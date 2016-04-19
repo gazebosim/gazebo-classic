@@ -122,19 +122,17 @@ namespace gazebo
       /// \return Pointer to the physics engine.
       public: PhysicsEnginePtr GetPhysicsEngine() const;
 
-      /// \brief Get a pointer to the atmosphere model used by the world.
-      /// The world is responsible for the pointer's lifetime, do not delete it.
-      /// \return Raw pointer to the atmosphere model.
-      public: physics::Atmosphere *Atmosphere() const;
+      /// \brief Get a reference to the atmosphere model used by the world.
+      /// \return Reference to the atmosphere model.
+      public: physics::Atmosphere &Atmosphere() const;
 
       /// \brief Return the preset manager.
       /// \return Pointer to the preset manager.
       public: PresetManagerPtr GetPresetManager() const;
 
-      /// \brief Get a pointer to the wind used by the world.
-      /// The world is responsible for the pointer's lifetime, do not delete it.
-      /// \return Pointer to the wind.
-      public: physics::Wind *Wind() const;
+      /// \brief Get a reference to the wind used by the world.
+      /// \return Reference to the wind.
+      public: physics::Wind &Wind() const;
 
       /// \brief Return the spherical coordinates converter.
       /// \return Pointer to the spherical coordinates converter.

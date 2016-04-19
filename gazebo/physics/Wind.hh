@@ -41,9 +41,9 @@ namespace gazebo
     class GZ_PHYSICS_VISIBLE Wind
     {
       /// \brief Default constructor.
-      /// \param[in] _world Pointer to the world.
+      /// \param[in] _world Reference to the world.
       /// \param[in] _sdf SDF element parameters for the wind.
-      public: explicit Wind(World *_world, sdf::ElementPtr _sdf);
+      public: explicit Wind(World &_world, sdf::ElementPtr _sdf);
 
       /// \brief Destructor.
       public: virtual ~Wind();
@@ -61,7 +61,7 @@ namespace gazebo
       /// \param[in] _value The value to set to
       /// \return true if SetParam is successful, false if operation fails.
       public: bool SetParam(const std::string &_key,
-                  const boost::any &_value);
+                            const boost::any &_value);
 
       /// \brief Get a wind parameter
       /// \param[in] _attr String key

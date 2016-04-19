@@ -39,12 +39,18 @@ namespace gazebo
     /// \brief Pointer to private data.
     class AtmospherePrivate
     {
+      /// \brief Class constructor.
+      /// \param[in] _world The reference to the world.
+      public: AtmospherePrivate(physics::World &_world)
+        : world(_world)
+      {
+      }
+
       /// \brief Our SDF values.
       public: sdf::ElementPtr sdf;
 
-      /// \brief Pointer to the world.
-      /// We are not responsible for its lifetime, so do not delete.
-      public: World *world;
+      /// \brief Reference to the world.
+      public: World &world;
 
       /// \brief Temperature at sea level in kelvins.
       public: double temperature = 288.15;
@@ -81,16 +87,14 @@ const double Atmosphere::MOLAR_MASS = 0.0289644;
 const double Atmosphere::IDEAL_GAS_CONSTANT_R = 8.3144621;
 
 //////////////////////////////////////////////////
-Atmosphere::Atmosphere(physics::World *_world)
-  : dataPtr(new AtmospherePrivate)
+Atmosphere::Atmosphere(physics::World &_world)
+  : dataPtr(new AtmospherePrivate(_world))
 {
-  this->dataPtr->world = _world;
-
   this->dataPtr->sdf.reset(new sdf::Element);
   sdf::initFile("atmosphere.sdf", this->dataPtr->sdf);
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init(this->dataPtr->world->GetName());
+  this->dataPtr->node->Init(this->dataPtr->world.GetName());
   this->dataPtr->atmosphereSub = this->dataPtr->node->Subscribe("~/atmosphere",
       &Atmosphere::OnAtmosphereMsg, this);
 
@@ -154,7 +158,7 @@ void Atmosphere::OnRequest(ConstRequestPtr &/*_msg*/)
 void Atmosphere::OnAtmosphereMsg(ConstAtmospherePtr &_msg)
 {
   if (_msg->has_enable_atmosphere())
-    this->World()->SetAtmosphereEnabled(_msg->enable_atmosphere());
+    this->World().SetAtmosphereEnabled(_msg->enable_atmosphere());
 
   if (_msg->has_temperature())
     this->SetTemperature(_msg->temperature());
@@ -208,7 +212,7 @@ double Atmosphere::TemperatureGradient() const
 }
 
 //////////////////////////////////////////////////
-World *Atmosphere::World() const
+World &Atmosphere::World() const
 {
   return this->dataPtr->world;
 }

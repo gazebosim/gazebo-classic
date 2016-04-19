@@ -559,7 +559,7 @@ void Link::Update(const common::UpdateInfo & /*_info*/)
 //////////////////////////////////////////////////
 void Link::UpdateWind(const common::UpdateInfo & /*_info*/)
 {
-  this->windLinearVel = this->world->Wind()->WorldLinearVel(this);
+  this->windLinearVel = this->world->Wind().WorldLinearVel(this);
 }
 
 /////////////////////////////////////////////////
