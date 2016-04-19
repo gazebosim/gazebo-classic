@@ -202,19 +202,19 @@ void PlaneDemoPlugin::OnKeyHit()
   {
     boost::mutex::scoped_lock lock(this->mutex);
     printf("you hit");
-    printf(" '%c'(%i)", isprint(ch)?ch:'?', static_cast<int>ch);
+    printf(" '%c'(%i)", isprint(ch)?ch:'?', static_cast<int>(ch));
     // puts("");
 
     for (std::vector<EngineControl>::iterator ei = this->engineControls.begin();
       ei != this->engineControls.end(); ++ei)
     {
-      if (static_cast<int>ch == ei->incKey)
+      if (static_cast<int>(ch) == ei->incKey)
       {
         // spin up motor
         ei->torque += ei->incVal;
         gzerr << "torque: " << ei->torque << "\n";
       }
-      else if (static_cast<int>ch == ei->decKey)
+      else if (static_cast<int>(ch) == ei->decKey)
       {
         ei->torque -= ei->incVal;
         gzerr << "torque: " << ei->torque << "\n";
@@ -230,13 +230,13 @@ void PlaneDemoPlugin::OnKeyHit()
       ti = this->thrusterControls.begin();
       ti != this->thrusterControls.end(); ++ti)
     {
-      if (static_cast<int>ch == ti->incKey)
+      if (static_cast<int>(ch) == ti->incKey)
       {
         // spin up motor
         ti->force += ti->incVal;
         gzerr << "force: " << ti->force << "\n";
       }
-      else if (static_cast<int>ch == ti->decKey)
+      else if (static_cast<int>(ch) == ti->decKey)
       {
         ti->force -= ti->incVal;
         gzerr << "force: " << ti->force << "\n";
@@ -251,7 +251,7 @@ void PlaneDemoPlugin::OnKeyHit()
     for (std::vector<JointControl>::iterator ji = this->jointControls.begin();
       ji != this->jointControls.end(); ++ji)
     {
-      if (static_cast<int>ch == ji->incKey)
+      if (static_cast<int>(ch) == ji->incKey)
       {
         // spin up motor
         ji->cmd += ji->incVal;
@@ -260,7 +260,7 @@ void PlaneDemoPlugin::OnKeyHit()
               << " cur: " << ji->joint->GetAngle(0).Radian()
               << " cmd: " << ji->cmd << "\n";
       }
-      else if (static_cast<int>ch == ji->decKey)
+      else if (static_cast<int>(ch) == ji->decKey)
       {
         ji->cmd -= ji->incVal;
         ji->pid.SetCmd(ji->cmd);
@@ -268,7 +268,7 @@ void PlaneDemoPlugin::OnKeyHit()
               << " cur: " << ji->joint->GetAngle(0).Radian()
               << " cmd: " << ji->cmd << "\n";
       }
-      else if (static_cast<int>ch == 99)  // 'c' resets all control surfaces
+      else if (static_cast<int>(ch) == 99)  // 'c' resets all control surfaces
       {
         ji->cmd = 0;
         ji->pid.SetCmd(ji->cmd);
