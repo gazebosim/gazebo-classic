@@ -147,7 +147,7 @@ PlotCanvas::PlotCanvas(QWidget *_parent)
   xVariableContainer->SetMaxSize(1);
   xVariableContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
   xVariableContainer->setContentsMargins(0, 0, 0, 0);
-  // hardcode x axis for now
+  // FIXME: hardcode x axis for now
   xVariableContainer->AddVariablePill("sim_time");
   xVariableContainer->setEnabled(false);
 
@@ -925,10 +925,12 @@ void PlotCanvas::ExportCSV(const std::string &_filePrefix) const
       std::replace(label.begin(), label.end(), '/', '_');
       std::replace(label.begin(), label.end(), '?', ':');
 
-      std::string filename = _filePrefix + "-" + label + ".csv";
+      auto filename =
+          common::unique_file_path(_filePrefix + "-" + label, "csv");
 
       std::ofstream out(filename);
-      out << "x, " << c->Label() << std::endl;
+      // FIXME: sim_time hardcoded for now
+      out << "sim_time, " << c->Label() << std::endl;
       for (unsigned int j = 0; j < c->Size(); ++j)
       {
         ignition::math::Vector2d pt = c->Point(j);

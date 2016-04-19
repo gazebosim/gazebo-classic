@@ -234,6 +234,8 @@ ExportDialog::ExportDialog(QWidget *_parent,
 
   for (auto &plot : _plots)
   {
+    // FIXME: This is getting the header too, it would be nice to see only the
+    // plot itself
     QIcon icon(QPixmap::grabWindow(plot->winId()));
     PlotViewItem *item = new PlotViewItem;
     item->canvas = plot;
