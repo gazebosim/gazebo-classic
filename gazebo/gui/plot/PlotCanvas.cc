@@ -104,17 +104,25 @@ PlotCanvas::PlotCanvas(QWidget *_parent)
   QAction *clearPlotAct = new QAction("Clear all fields", settingsMenu);
   clearPlotAct->setStatusTip(tr("Clear variables and all plots on canvas"));
   connect(clearPlotAct, SIGNAL(triggered()), this, SLOT(OnClearCanvas()));
+
   this->dataPtr->deleteCanvasAct = new QAction("Delete canvas", settingsMenu);
   this->dataPtr->deleteCanvasAct->setStatusTip(tr("Delete entire canvas"));
   connect(this->dataPtr->deleteCanvasAct, SIGNAL(triggered()), this,
       SLOT(OnDeleteCanvas()));
+
   QAction *showGridAct = new QAction("Show grid", settingsMenu);
   showGridAct->setStatusTip(tr("Show/hide grid lines on plot"));
   showGridAct->setCheckable(true);
 
+  QAction *showHoverLineAct = new QAction("Show hover line", settingsMenu);
+  showHoverLineAct->setStatusTip(tr("Show hover line"));
+  showHoverLineAct->setCheckable(true);
+  connect(showHoverLineAct, SIGNAL(triggered()), this, SLOT(OnShowHoverLine()));
+
   settingsMenu->addAction(clearPlotAct);
   settingsMenu->addAction(this->dataPtr->deleteCanvasAct);
   settingsMenu->addAction(showGridAct);
+  settingsMenu->addAction(showHoverLineAct);
 
   QToolButton *settingsButton = new QToolButton();
   settingsButton->setObjectName("plotCanvasTitleTool");
@@ -384,6 +392,7 @@ unsigned int PlotCanvas::AddPlot()
   IncrementalPlot *plot = new IncrementalPlot(this);
   plot->setAutoDelete(false);
   plot->ShowGrid(this->dataPtr->emptyPlot->ShowGrid());
+  plot->ShowHoverLine(this->dataPtr->emptyPlot->ShowHoverLine());
   connect(plot, SIGNAL(VariableAdded(std::string)), this,
       SLOT(OnAddVariable(std::string)));
   this->dataPtr->plotSplitter->addWidget(plot);
@@ -830,6 +839,16 @@ void PlotCanvas::OnShowGrid()
 
   for (const auto &it : this->dataPtr->plotData)
     it.second->plot->ShowGrid(!it.second->plot->ShowGrid());
+}
+
+/////////////////////////////////////////////////
+void PlotCanvas::OnShowHoverLine()
+{
+  this->dataPtr->emptyPlot->ShowHoverLine(
+      !this->dataPtr->emptyPlot->ShowHoverLine());
+
+  for (const auto &it : this->dataPtr->plotData)
+    it.second->plot->ShowHoverLine(!it.second->plot->ShowHoverLine());
 }
 
 /////////////////////////////////////////////////

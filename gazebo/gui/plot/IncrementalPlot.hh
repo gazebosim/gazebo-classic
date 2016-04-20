@@ -140,6 +140,14 @@ namespace gazebo
       /// \return True if the grid lines are visible.
       public: bool ShowGrid() const;
 
+      /// \brief Set whether to show the hover line.
+      /// \param[in] _show True to show hover line.
+      public: void ShowHoverLine(const bool _show);
+
+      /// \brief Get whether the hover line is shown.
+      /// \return True if the hover line is visible.
+      public: bool ShowHoverLine() const;
+
       /// \brief Get all curves in this plot
       /// \return A list of curves in this plot.
       public: std::vector<PlotCurveWeakPtr> Curves() const;

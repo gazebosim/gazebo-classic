@@ -209,6 +209,7 @@ IncrementalPlot::IncrementalPlot(QWidget *_parent)
 
   // line hover display
   this->dataPtr->tracker = new PlotTracker(this->canvas());
+  this->dataPtr->tracker->setEnabled(false);
 
   // box zoom
   this->dataPtr->zoomer = new QwtPlotZoomer(this->canvas());
@@ -524,6 +525,19 @@ void IncrementalPlot::ShowGrid(const bool _show)
 bool IncrementalPlot::ShowGrid() const
 {
   return this->dataPtr->grid->isVisible();
+}
+
+/////////////////////////////////////////////////
+void IncrementalPlot::ShowHoverLine(const bool _show)
+{
+  this->dataPtr->tracker->setEnabled(_show);
+  this->replot();
+}
+
+/////////////////////////////////////////////////
+bool IncrementalPlot::ShowHoverLine() const
+{
+  return this->dataPtr->tracker->isEnabled();
 }
 
 /////////////////////////////////////////////////
