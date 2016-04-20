@@ -1816,3 +1816,9 @@ std::string Camera::GetProjectionType() const
     return "perspective";
   }
 }
+
+//////////////////////////////////////////////////
+ignition::math::Matrix4d Camera::ProjectionMatrix() const
+{
+  return Conversions::Convert(this->camera->getProjectionMatrix());
+}
