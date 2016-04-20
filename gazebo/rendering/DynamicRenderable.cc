@@ -30,8 +30,8 @@ DynamicRenderable::DynamicRenderable()
 //////////////////////////////////////////////////
 DynamicRenderable::~DynamicRenderable()
 {
-  delete this->mRenderOp.vertexData;
   delete this->mRenderOp.indexData;
+  // It looks like someone else is taking care of vertexData
 }
 
 //////////////////////////////////////////////////
