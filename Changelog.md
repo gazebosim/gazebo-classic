@@ -2,6 +2,10 @@
 
 ### Gazebo 5.x.x
 
+1. Backport sensor reset fix
+    * [Pull request 2272](https://bitbucket.org/osrf/gazebo/pull-request/2272)
+    * [Issue #1917](https://bitbucket.org/osrf/gazebo/issue/1917)
+
 ### Gazebo 5.3.0 (2015-04-07)
 
 1. fix: remove back projection
