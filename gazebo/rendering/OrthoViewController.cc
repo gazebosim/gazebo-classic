@@ -50,18 +50,7 @@ OrthoViewController::~OrthoViewController()
 //////////////////////////////////////////////////
 void OrthoViewController::Init()
 {
-  this->dataPtr->scale = 100;
-  this->distance = 1000.0/this->dataPtr->scale;
-
-  int width = this->camera->GetViewportWidth();
-  int height = this->camera->GetViewportHeight();
-
-  if (width > 0 && height > 0)
-  {
-    // set up the view projection
-    this->Zoom(1.0);
-  }
-
+  // this will call the overloaded Init function
   OrbitViewController::Init();
 }
 
@@ -69,7 +58,13 @@ void OrthoViewController::Init()
 void OrthoViewController::Init(const math::Vector3 &_focalPoint,
     double _yaw, double _pitch)
 {
-  this->dataPtr->scale = 100;
+  // this function also gets called when camera animation is complete so make
+  // sure zoom is reset only if not yet initialized.
+  if (!this->init)
+  {
+    this->dataPtr->scale = 100;
+    this->distance = 1000.0/this->dataPtr->scale;
+  }
 
   int width = this->camera->GetViewportWidth();
   int height = this->camera->GetViewportHeight();
