@@ -497,8 +497,20 @@ using the same arguments used in the command line.
 
 ### Gazebo 6.X.X (201X-XX-XX)
 
+1. Reverse view angle widget left and right view
+    * [Pull request 2265](https://bitbucket.org/osrf/gazebo/pull-request/2265)
+    * [Issue 1924](https://bitbucket.org/osrf/gazebo/issue/1924)
+
 1. Fix race condition in ~TimePanelPrivate (#1919)
     * [Pull request 2250](https://bitbucket.org/osrf/gazebo/pull-request/2250)
+
+1. Prevent orthographic camera from resetting zoom after animation
+    * [Pull request 2267](https://bitbucket.org/osrf/gazebo/pull-request/2267)
+    * [Issue #1927](https://bitbucket.org/osrf/gazebo/issues/1927)
+
+1. Fix MeshToSDF missing scale issue
+    * [Pull request 2258](https://bitbucket.org/osrf/gazebo/pull-request/2258)
+    * [Issue #1925](https://bitbucket.org/osrf/gazebo/issues/1925)
 
 ### Gazebo 6.6.0 (2016-04-07)
 

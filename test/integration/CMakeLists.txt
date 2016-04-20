@@ -163,6 +163,7 @@ set(qt_tests
   model_editor.cc
   model_manipulation.cc
   undo.cc
+  view_angle.cc
   visual_pose.cc
 )
 
