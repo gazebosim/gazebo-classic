@@ -32,6 +32,10 @@ namespace gazebo
     /// \brief A widget that renders the hover line inside the main plot canvas.
     class HoverLineWidget : public QWidget
     {
+      /// \brief Constructor
+      /// \param[in] _picker Plot picker that provides mouse tracking over a
+      /// plot canvas.
+      /// \param[in] _parent Parent wiget.
       public: HoverLineWidget(QwtPicker *_picker, QWidget *_parent)
         : QWidget(_parent), picker(_picker)
       {
@@ -79,7 +83,7 @@ namespace gazebo
     class PlotTrackerPrivate
     {
 #if (QWT_VERSION < ((6 << 16) | (1 << 8) | 0))
-      /// \brief The curve to draw.
+      /// \brief The hover line widget drawn over the canvas.
       public: HoverLineWidget *hoverLineWidget = NULL;
 #endif
     };

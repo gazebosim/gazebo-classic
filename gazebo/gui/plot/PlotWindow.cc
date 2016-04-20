@@ -37,7 +37,6 @@ namespace gazebo
     class PlotWindowPrivate
     {
       /// \brief Splitter to hold all the canvases.
-      // public: QVBoxLayout *canvasLayout;
       public: QSplitter *canvasSplitter;
 
       /// \brief Mutex to protect the canvas updates
