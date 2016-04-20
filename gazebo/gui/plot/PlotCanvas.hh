@@ -126,14 +126,14 @@ namespace gazebo
       public: std::string Title() const;
 
       /// \brief Export to PDF files in the given directory.
-      /// \param[in] _dirName Name of the directory to save the PDF files
-      /// into.
+      /// \param[in] _dirName Name of the directory to save the files into.
       /// \param[in] _type File type, such as PDFFile or CSVFile.
       public: void Export(const std::string &_dirName,
           const FileType _type) const;
 
       /// \brief Export to PDF files in the given directory.
-      /// \param[in] _filePrefix Prefix
+      /// \param[in] _dirName Name of the directory to save the PDF files
+      /// into.
       private: void ExportPDF(const std::string &_dirName) const;
 
       /// \brief Export to CSV files in the given directory.

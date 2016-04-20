@@ -42,7 +42,7 @@ class gazebo::gui::ExportDialogPrivate
 /// the plot canvas
 class PlotViewItem : public QStandardItem
 {
-  /// \brief Canvase pointer
+  /// \brief Canvas pointer
   public: PlotCanvas *canvas;
 };
 
@@ -162,7 +162,7 @@ class PlotViewDelegate : public QStyledItemDelegate
 
 /////////////////////////////////////////////////
 ExportDialog::ExportDialog(QWidget *_parent,
-    const std::list<PlotCanvas*> &_plots)
+    const std::list<PlotCanvas *> &_plots)
 : QDialog(_parent),
   dataPtr(new ExportDialogPrivate)
 {
