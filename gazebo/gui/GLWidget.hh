@@ -229,7 +229,9 @@ namespace gazebo
       /// \param[in] _button The QT mouse buttons
       private: void SetMouseEventButtons(const Qt::MouseButtons &_buttons);
 
-      private: void HandleEntityDeletion(const std::string &_name);
+      /// \brief Ignition callback notifying an entity was deleted.
+      /// \param[in] _msg Message containing data about the deleted entity.
+      private: void OnDeletionNotification(const msgs::GzString &_msg);
 
       /// \internal
       /// \brief Pointer to private data.

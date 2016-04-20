@@ -332,7 +332,7 @@ namespace gazebo
       /// \brief Keep track of data of joints.
       public: JointMsgs_M joints;
 
-      /// \brief
+      /// \brief Ignition node used for communication.
       public: ignition::transport::Node ignNode;
     };
   }

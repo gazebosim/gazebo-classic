@@ -52,7 +52,9 @@ namespace gazebo
                                         const std::string &_mode);
       private: void OnResponse(ConstResponsePtr &_msg);
 
-      private: void OnDeletionRequest(const msgs::GzString &_data);
+      /// \brief Ignition callback notifying an entity was deleted.
+      /// \param[in] _msg Message containing data about the deleted entity.
+      private: void OnDeletionNotification(const msgs::GzString &_msg);
 
       private: void OnModelUpdate(const msgs::Model &_msg);
 

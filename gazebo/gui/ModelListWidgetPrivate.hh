@@ -49,6 +49,7 @@ namespace gazebo
       public: transport::PublisherPtr physicsPub;
       public: transport::PublisherPtr windPub;
 
+      /// \brief Ignition node used for communication.
       public: ignition::transport::Node ignNode;
 
       /// \brief Publisher for atmosphere messages.

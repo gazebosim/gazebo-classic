@@ -356,7 +356,7 @@ namespace gazebo
       /// by the SensorManager.
       public: std::atomic_bool sensorsInitialized;
 
-      /// \brief Ignition node used for communications.
+      /// \brief Ignition node used for communication.
       public: ignition::transport::Node ignNode;
 
       /// \brief Mutex to protect request queue.

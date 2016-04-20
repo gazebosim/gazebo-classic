@@ -830,7 +830,9 @@ namespace gazebo
       /// \param[in] _vis Visual that the visualizations are attached to.
       private: void RemoveVisualizations(VisualPtr _vis);
 
-      private: void HandleEntityDeletion(const std::string &_name);
+      /// \brief Ignition callback notifying an entity was deleted.
+      /// \param[in] _msg Message containing data about the deleted entity.
+      private: void OnDeletionNotification(const msgs::GzString &_msg);
 
       /// \internal
       /// \brief Pointer to private data.

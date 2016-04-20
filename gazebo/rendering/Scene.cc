@@ -16,6 +16,7 @@
 */
 
 #include <functional>
+#include <string>
 
 #include <boost/lexical_cast.hpp>
 
@@ -183,12 +184,11 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
       this->dataPtr->node->Subscribe("~/scene", &Scene::OnScene, this);
 
   // Ignition transport
-  std::function<void(const msgs::GzString &)> onEntityDeletion =
-              [this](const msgs::GzString &_msg)
+  if (!this->dataPtr->ignNode.Subscribe("/notify/deletion",
+      &Scene::OnDeletionNotification, this))
   {
-    this->HandleEntityDeletion(_msg.data());
-  };
-  this->dataPtr->ignNode.Subscribe("/notify/deletion", onEntityDeletion);
+    gzerr << "Error subscribing to deletion notifications." << std::endl;
+  }
 
   this->dataPtr->sdf.reset(new sdf::Element);
   sdf::initFile("scene.sdf", this->dataPtr->sdf);
@@ -3576,10 +3576,12 @@ void Scene::ToggleLayer(const int32_t _layer)
   }
 }
 
-/////////////////////////////////////////////////
-void Scene::HandleEntityDeletion(const std::string &_name)
+//////////////////////////////////////////////////
+void Scene::OnDeletionNotification(const msgs::GzString &_msg)
 {
-  Light_M::iterator lightIter = this->dataPtr->lights.find(_name);
+  std::string name = _msg.data();
+
+  Light_M::iterator lightIter = this->dataPtr->lights.find(name);
 
   // Check to see if the deleted entity is a light.
   if (lightIter != this->dataPtr->lights.end())
@@ -3593,12 +3595,11 @@ void Scene::HandleEntityDeletion(const std::string &_name)
     try
     {
       Visual_M::iterator iter;
-      iter = this->dataPtr->visuals.find(
-          boost::lexical_cast<uint32_t>(_name));
+      iter = this->dataPtr->visuals.find(std::stoul(name));
       visPtr = iter->second;
     } catch(...)
     {
-      visPtr = this->GetVisual(_name);
+      visPtr = this->GetVisual(name);
     }
 
     if (visPtr)

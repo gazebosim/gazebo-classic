@@ -298,7 +298,7 @@ namespace gazebo
       /// \brief Communication node.
       protected: transport::NodePtr node;
 
-      /// \brief Communication node.
+      /// \brief Ignition node used for communication.
       protected: ignition::transport::Node ignNode;
 
       /// \brief Visual publisher.

@@ -82,6 +82,9 @@ Entity::Entity(BasePtr _parent)
   this->setWorldPoseFunc = &Entity::SetWorldPoseDefault;
 
   this->scale = ignition::math::Vector3d::One;
+
+  // Ignition transport
+  this->ignNode.Advertise<msgs::GzString>("/notify/deletion");
 }
 
 //////////////////////////////////////////////////
@@ -588,7 +591,7 @@ void Entity::Fini()
   // Notify that deletion was completed
   {
     msgs::GzString msg;
-    msg.set_data("HELLO");
+    msg.set_data(this->GetScopedName());
 
     this->ignNode.Publish("/notify/deletion", msg);
   }

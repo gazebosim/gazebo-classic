@@ -111,7 +111,7 @@ namespace gazebo
       /// \brief Mutex to protect selectedVisuals array.
       public: std::mutex selectedVisMutex;
 
-      /// \brief
+      /// \brief Ignition node used for communication.
       public: ignition::transport::Node ignNode;
     };
   }

@@ -135,12 +135,11 @@ GLWidget::GLWidget(QWidget *_parent)
     this->dataPtr->node->Advertise<msgs::Selection>("~/selection");
 
   // Ignition transport
-  std::function<void(const msgs::GzString &)> onEntityDeletion =
-              [this](const msgs::GzString &_msg)
+  if (!this->dataPtr->ignNode.Subscribe("/notify/deletion",
+      &GLWidget::OnDeletionNotification, this))
   {
-    this->HandleEntityDeletion(_msg.data());
-  };
-  this->dataPtr->ignNode.Subscribe("/notify/deletion", onEntityDeletion);
+    gzerr << "Error subscribing to deletion notifications." << std::endl;
+  }
 
   this->installEventFilter(this);
   this->dataPtr->keyModifiers = 0;
@@ -1267,8 +1266,10 @@ void GLWidget::OnSetSelectedEntity(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
-void GLWidget::HandleEntityDeletion(const std::string &_name)
+void GLWidget::OnDeletionNotification(const msgs::GzString &_msg)
 {
+  std::string name = _msg.data();
+
   std::lock_guard<std::mutex> lock(this->dataPtr->selectedVisMutex);
   if (!this->dataPtr->selectedVisuals.empty())
   {
@@ -1277,7 +1278,7 @@ void GLWidget::HandleEntityDeletion(const std::string &_name)
         it != this->dataPtr->selectedVisuals.end();
         ++it)
     {
-      if ((*it)->GetName() == _name)
+      if ((*it)->GetName() == name)
       {
         ModelManipulator::Instance()->Detach();
         this->dataPtr->selectedVisuals.erase(it);
@@ -1286,7 +1287,7 @@ void GLWidget::HandleEntityDeletion(const std::string &_name)
     }
   }
 
-  if (this->dataPtr->copyEntityName == _name)
+  if (this->dataPtr->copyEntityName == name)
   {
     this->dataPtr->copyEntityName = "";
     g_pasteAct->setEnabled(false);
