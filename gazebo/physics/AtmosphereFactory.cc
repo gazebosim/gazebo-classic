@@ -49,7 +49,7 @@ void AtmosphereFactory::RegisterAtmosphere(const std::string &_classname,
 //////////////////////////////////////////////////
 std::unique_ptr<Atmosphere> AtmosphereFactory::NewAtmosphere(
     const std::string &_classname,
-    World *_world)
+    World &_world)
 {
   std::unique_ptr<Atmosphere> result;
 

@@ -42,8 +42,8 @@ namespace gazebo
     class GZ_PHYSICS_VISIBLE Atmosphere
     {
       /// \brief Default constructor.
-      /// \param[in] _world Pointer to the world.
-      public: explicit Atmosphere(physics::World *_world);
+      /// \param[in] _world Reference to the world.
+      public: explicit Atmosphere(physics::World &_world);
 
       /// \brief Destructor.
       public: virtual ~Atmosphere();
@@ -115,8 +115,8 @@ namespace gazebo
       protected: void UpdateMassDensity();
 
       /// \brief Return the world.
-      /// \return Pointer to the world.
-      protected: physics::World *World() const;
+      /// \return Reference to the world.
+      protected: physics::World &World() const;
 
       /// \brief Publish response to a request.
       /// \param[in] _msg Message to be published.

@@ -52,7 +52,7 @@ using namespace physics;
 GZ_REGISTER_ATMOSPHERE_MODEL("adiabatic", AdiabaticAtmosphere)
 
 //////////////////////////////////////////////////
-AdiabaticAtmosphere::AdiabaticAtmosphere(physics::World *_world)
+AdiabaticAtmosphere::AdiabaticAtmosphere(physics::World &_world)
   : Atmosphere(_world), dataPtr(new AdiabaticAtmospherePrivate)
 {
 }
@@ -93,8 +93,7 @@ void AdiabaticAtmosphere::OnRequest(ConstRequestPtr &_msg)
   {
     msgs::Atmosphere atmosphereMsg;
     atmosphereMsg.set_type(msgs::Atmosphere::ADIABATIC);
-    atmosphereMsg.set_enable_atmosphere(
-            this->World()->AtmosphereEnabled());
+    atmosphereMsg.set_enable_atmosphere(this->World().AtmosphereEnabled());
     atmosphereMsg.set_temperature(Atmosphere::Temperature());
     atmosphereMsg.set_pressure(Atmosphere::Pressure());
     atmosphereMsg.set_mass_density(Atmosphere::MassDensity());
@@ -171,6 +170,6 @@ void AdiabaticAtmosphere::ComputeAdiabaticPower()
   // See equation (17) from Manual of the ICAO Standard Atmosphere.
   // http://ntrs.nasa.gov/search.jsp?R=19930083952
   this->dataPtr->adiabaticPower = Atmosphere::MOLAR_MASS *
-      this->World()->GetPhysicsEngine()->GetGravity().GetLength() /
+      this->World().GetPhysicsEngine()->GetGravity().GetLength() /
       (-Atmosphere::TemperatureGradient() * Atmosphere::IDEAL_GAS_CONSTANT_R);
 }

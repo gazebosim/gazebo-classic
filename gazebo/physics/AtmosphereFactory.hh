@@ -32,7 +32,7 @@ namespace gazebo
 
     /// \def AtmosphereFactoryFn
     /// \brief Prototype for atmosphere factory functions.
-    typedef std::unique_ptr<Atmosphere> (*AtmosphereFactoryFn) (World *world);
+    typedef std::unique_ptr<Atmosphere> (*AtmosphereFactoryFn) (World &world);
 
     /// \class AtmosphereFactory AtmosphereFactory.hh physics/physics.hh
     /// \brief The atmosphere factory instantiates different atmosphere models.
@@ -53,7 +53,7 @@ namespace gazebo
       /// \param[in] _world World to pass to the created atmosphere model.
       /// \return Unique pointer to the atmosphere model.
       public: static std::unique_ptr<Atmosphere> NewAtmosphere(
-                  const std::string &_className, World *_world);
+                  const std::string &_className, World &_world);
 
       /// \brief Check if an atmosphere model is registered.
       /// \param[in] _name Name of the atmosphere model.
@@ -67,19 +67,19 @@ namespace gazebo
     /// \brief Static atmosphere registration macro
     ///
     /// Use this macro to register atmosphere model with the server.
-    /// \param[in] name Atmosphere type name, as it appears in the world file.
-    /// \param[in] classname C++ class name for the atmosphere model.
-    #define GZ_REGISTER_ATMOSPHERE_MODEL(name, classname) \
+    /// \param[in] _name Atmosphere type name, as it appears in the world file.
+    /// \param[in] _classname C++ class name for the atmosphere model.
+    #define GZ_REGISTER_ATMOSPHERE_MODEL(_name, _classname) \
     GZ_PHYSICS_VISIBLE std::unique_ptr<Atmosphere> \
-        New##classname(World *_world) \
+        New##_classname(World &_world) \
     { \
       return std::unique_ptr<Atmosphere>( \
-          new gazebo::physics::classname(_world)); \
+          new gazebo::physics::_classname(_world)); \
     } \
     GZ_PHYSICS_VISIBLE \
-    void Register##classname() \
+    void Register##_classname() \
     {\
-      AtmosphereFactory::RegisterAtmosphere(name, New##classname);\
+      AtmosphereFactory::RegisterAtmosphere(_name, New##_classname);\
     }
     /// \}
   }

@@ -33,7 +33,7 @@ void WindPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
   GZ_ASSERT(_world, "WindPlugin world pointer is NULL");
   this->world = _world;
 
-  auto wind = this->world->Wind();
+  physics::Wind &wind = this->world->Wind();
 
   if (_sdf->HasElement("horizontal"))
   {
@@ -123,7 +123,7 @@ void WindPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
   this->kMag = period / this->characteristicTimeForWindRise;
   this->kDir = period / this->characteristicTimeForWindOrientationChange;
 
-  wind->SetLinearVelFunc(std::bind(&WindPlugin::LinearVel, this,
+  wind.SetLinearVelFunc(std::bind(&WindPlugin::LinearVel, this,
         std::placeholders::_1, std::placeholders::_2));
 
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
