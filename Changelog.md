@@ -13,6 +13,10 @@
     * [Pull request 2267](https://bitbucket.org/osrf/gazebo/pull-request/2267)
     * [Issue #1927](https://bitbucket.org/osrf/gazebo/issues/1927)
 
+1. Fix MeshToSDF missing scale issue
+    * [Pull request 2258](https://bitbucket.org/osrf/gazebo/pull-request/2258)
+    * [Issue #1925](https://bitbucket.org/osrf/gazebo/issues/1925)
+
 ### Gazebo 6.6.0 (2016-04-07)
 
 1. fix: remove back projection
