@@ -47,11 +47,11 @@ void AtmosphereFactory::RegisterAtmosphere(const std::string &_classname,
 }
 
 //////////////////////////////////////////////////
-AtmospherePtr AtmosphereFactory::NewAtmosphere(
+std::unique_ptr<Atmosphere> AtmosphereFactory::NewAtmosphere(
     const std::string &_classname,
-    WorldPtr _world)
+    World &_world)
 {
-  AtmospherePtr result;
+  std::unique_ptr<Atmosphere> result;
 
   std::map<std::string, AtmosphereFactoryFn>::iterator iter =
     AtmosphereFactory::models.find(_classname);

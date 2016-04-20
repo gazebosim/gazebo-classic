@@ -265,7 +265,7 @@ void World::Load(sdf::ElementPtr _sdf)
   // This should come before loading of entities
   sdf::ElementPtr windElem = this->dataPtr->sdf->GetElement("wind");
 
-  this->dataPtr->wind.reset(new physics::Wind(shared_from_this(),
+  this->dataPtr->wind.reset(new physics::Wind(*this,
                             this->dataPtr->sdf->GetElement("wind")));
 
   if (this->dataPtr->wind == NULL)
@@ -277,8 +277,7 @@ void World::Load(sdf::ElementPtr _sdf)
   sdf::ElementPtr atmosphereElem = this->dataPtr->sdf->GetElement("atmosphere");
 
   type = atmosphereElem->Get<std::string>("type");
-  this->dataPtr->atmosphere = AtmosphereFactory::NewAtmosphere(type,
-      shared_from_this());
+  this->dataPtr->atmosphere = AtmosphereFactory::NewAtmosphere(type, *this);
 
   if (this->dataPtr->atmosphere == NULL)
     gzerr << "Unable to create atmosphere model\n";
@@ -969,15 +968,15 @@ PhysicsEnginePtr World::GetPhysicsEngine() const
 }
 
 //////////////////////////////////////////////////
-WindPtr World::Wind() const
+Wind &World::Wind() const
 {
-  return this->dataPtr->wind;
+  return *this->dataPtr->wind;
 }
 
 //////////////////////////////////////////////////
-AtmospherePtr World::Atmosphere() const
+Atmosphere &World::Atmosphere() const
 {
-  return this->dataPtr->atmosphere;
+  return *this->dataPtr->atmosphere;
 }
 
 //////////////////////////////////////////////////
