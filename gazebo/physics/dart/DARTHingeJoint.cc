@@ -36,7 +36,7 @@ DARTHingeJoint::DARTHingeJoint(BasePtr _parent)
 //////////////////////////////////////////////////
 DARTHingeJoint::~DARTHingeJoint()
 {
-  delete this->dataPtr->dtJoint;
+  // We don't need to delete dtJoint because the world will delete it
 }
 
 //////////////////////////////////////////////////

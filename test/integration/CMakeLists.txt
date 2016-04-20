@@ -122,6 +122,12 @@ if (ENABLE_TESTS_COMPILATION)
   set_tests_properties(${TEST_TYPE}_physics PROPERTIES TIMEOUT 500)
   set_tests_properties(${TEST_TYPE}_worlds_installed PROPERTIES TIMEOUT 700)
 
+  set_property(
+    SOURCE world_clone.cc
+    PROPERTY COMPILE_DEFINITIONS
+    GAZEBO_DEFAULT_MASTER_PORT=${GAZEBO_DEFAULT_MASTER_PORT}
+  )
+
   # Increase timeout for debug-mode
   if (${CMAKE_BUILD_TYPE_UPPERCASE} STREQUAL "DEBUG" OR
       ${CMAKE_BUILD_TYPE_UPPERCASE} STREQUAL "COVERAGE")
