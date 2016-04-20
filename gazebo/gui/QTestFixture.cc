@@ -70,6 +70,8 @@ void QTestFixture::init()
   this->serverThread = NULL;
   this->GetMemInfo(this->residentStart, this->shareStart);
   gazebo::rendering::load();
+
+  gazebo::gui::register_metatypes();
 }
 
 /////////////////////////////////////////////////
