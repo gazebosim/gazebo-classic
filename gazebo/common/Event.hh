@@ -88,7 +88,7 @@ namespace gazebo
 
     /// \internal
     // Private data members for Connection class.
-    class GZ_COMMON_VISIBLE ConnectionPrivate
+    class ConnectionPrivate
     {
       /// \brief Constructor.
       /// \param[in] _e Event pointer to connect with
@@ -121,7 +121,7 @@ namespace gazebo
       public: int GetId() const;
 
       /// \brief Private data pointer.
-      private: ConnectionPrivate *dataPtr;
+      private: std::unique_ptr<ConnectionPrivate> dataPtr;
 
       /// \brief Friend class.
       public: template<typename T> friend class EventT;
@@ -630,7 +630,7 @@ namespace gazebo
         return;
 
       this->Disconnect(_c->GetId());
-      _c->dataPtr->event = NULL;
+      _c->dataPtr->event = nullptr;
       _c->dataPtr->id = -1;
     }
 

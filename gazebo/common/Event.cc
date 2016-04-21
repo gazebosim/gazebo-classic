@@ -79,11 +79,8 @@ Connection::~Connection()
   {
     this->dataPtr->event->Disconnect(this->dataPtr->id);
     this->dataPtr->id = -1;
-    this->dataPtr->event = NULL;
+    this->dataPtr->event = nullptr;
   }
-
-  delete this->dataPtr;
-  this->dataPtr = NULL;
 }
 
 //////////////////////////////////////////////////
