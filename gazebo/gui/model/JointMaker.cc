@@ -1655,16 +1655,6 @@ bool JointMaker::SetChildLink(const rendering::VisualPtr &_childLink)
 
     // Create hotspot visual
     this->CreateHotSpot(this->dataPtr->newJoint);
-
-    // Register command
-    if (this->dataPtr->userCmdManager)
-    {
-      auto cmd = this->dataPtr->userCmdManager->NewCmd(
-          "Inserted [" + joint->name + "]", MEUserCmd::INSERTING_JOINT);
-      cmd->SetSDF(msgs::JointToSDF(*joint->jointMsg));
-      cmd->SetScopedName(joint->visual->GetName());
-      cmd->SetJointId(joint->hotspot->GetName());
-    }
   }
   // Update child
   else
@@ -1896,6 +1886,18 @@ void JointMaker::FinalizeCreation()
     this->SetVisualMoved(this->dataPtr->newJoint->parent, false);
     this->SetVisualMoved(this->dataPtr->newJoint->child, false);
   }
+
+  // Register command
+  if (this->dataPtr->userCmdManager)
+  {
+    auto cmd = this->dataPtr->userCmdManager->NewCmd(
+        "Inserted [" + this->dataPtr->newJoint->name + "]",
+        MEUserCmd::INSERTING_JOINT);
+    cmd->SetSDF(msgs::JointToSDF(*this->dataPtr->newJoint->jointMsg));
+    cmd->SetScopedName(this->dataPtr->newJoint->visual->GetName());
+    cmd->SetJointId(this->dataPtr->newJoint->hotspot->GetName());
+  }
+
   this->dataPtr->newJoint = NULL;
 
   // Notify ModelEditor to uncheck tool button
