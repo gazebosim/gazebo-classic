@@ -2186,3 +2186,9 @@ void Camera::DisconnectNewImageFrame(event::ConnectionPtr &_c)
 {
   this->newImageFrame.Disconnect(_c);
 }
+
+//////////////////////////////////////////////////
+ignition::math::Matrix4d Camera::ProjectionMatrix() const
+{
+  return Conversions::ConvertIgn(this->camera->getProjectionMatrix());
+}
