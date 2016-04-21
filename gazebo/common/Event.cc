@@ -22,34 +22,20 @@ using namespace gazebo;
 using namespace event;
 
 //////////////////////////////////////////////////
-EventPrivate::EventPrivate()
-  : signaled(false)
-{
-}
-
-//////////////////////////////////////////////////
 Event::Event()
-  : dataPtr(new EventPrivate())
-{
-}
-
-//////////////////////////////////////////////////
-Event::Event(EventPrivate &_d)
-  : dataPtr(&_d)
+  : signaled(false)
 {
 }
 
 //////////////////////////////////////////////////
 Event::~Event()
 {
-  delete this->dataPtr;
-  this->dataPtr = NULL;
 }
 
 //////////////////////////////////////////////////
 bool Event::GetSignaled() const
 {
-  return this->dataPtr->signaled;
+  return this->signaled;
 }
 
 //////////////////////////////////////////////////

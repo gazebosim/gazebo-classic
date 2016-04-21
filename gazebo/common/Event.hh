@@ -44,18 +44,6 @@ namespace gazebo
     /// \addtogroup gazebo_event Events
     /// \{
 
-    /// \internal
-    // Private data members for Event class.
-    // This must be in the header due to templatization.
-    class GZ_COMMON_VISIBLE EventPrivate
-    {
-      // \brief Constructor
-      public: EventPrivate();
-
-      /// \brief True if the event has been signaled.
-      public: bool signaled;
-    };
-
     /// \class Event Event.hh common/common.hh
     /// \brief Base class for all events
     class GZ_COMMON_VISIBLE Event
@@ -78,12 +66,8 @@ namespace gazebo
       /// \return True if the event has been signaled.
       public: bool GetSignaled() const;
 
-      /// \brief Allow subclasses to initialize their own data pointer.
-      /// \param[in] _d Reference to data pointer.
-      protected: Event(EventPrivate &_d);
-
-      /// \brief Data pointer.
-      protected: EventPrivate *dataPtr;
+      /// \brief True if the event has been signaled.
+      protected: bool signaled;
     };
 
     /// \internal
@@ -150,7 +134,7 @@ namespace gazebo
     /// \internal
     // Private data members for EventT<T> class.
     template< typename T>
-    class EventTPrivate : public EventPrivate
+    class EventTPrivate
     {
       /// \def EvtConnectionMap
       /// \brief Event Connection map typedef.
@@ -351,7 +335,7 @@ namespace gazebo
       {
         this->Cleanup();
 
-        this->myDataPtr->signaled = true;
+        this->signaled = true;
         for (auto iter: this->myDataPtr->connections)
         {
           if (iter.second->on)
@@ -366,7 +350,7 @@ namespace gazebo
       {
         this->Cleanup();
 
-        this->myDataPtr->signaled = true;
+        this->signaled = true;
         for (auto iter: this->myDataPtr->connections)
         {
           if (iter.second->on)
@@ -382,7 +366,7 @@ namespace gazebo
       {
         this->Cleanup();
 
-        this->myDataPtr->signaled = true;
+        this->signaled = true;
         for (auto iter: this->myDataPtr->connections)
         {
           if (iter.second->on)
@@ -399,7 +383,7 @@ namespace gazebo
       {
         this->Cleanup();
 
-        this->myDataPtr->signaled = true;
+        this->signaled = true;
         for (auto iter: this->myDataPtr->connections)
         {
           if (iter.second->on)
@@ -418,7 +402,7 @@ namespace gazebo
       {
         this->Cleanup();
 
-        this->myDataPtr->signaled = true;
+        this->signaled = true;
         for (auto iter: this->myDataPtr->connections)
         {
           if (iter.second->on)
@@ -439,7 +423,7 @@ namespace gazebo
       {
         this->Cleanup();
 
-        this->myDataPtr->signaled = true;
+        this->signaled = true;
         for (auto iter: this->myDataPtr->connections)
         {
           if (iter.second->on)
@@ -461,7 +445,7 @@ namespace gazebo
       {
         this->Cleanup();
 
-        this->myDataPtr->signaled = true;
+        this->signaled = true;
         for (auto iter: this->myDataPtr->connections)
         {
           if (iter.second->on)
@@ -484,8 +468,8 @@ namespace gazebo
       {
         this->Cleanup();
 
-        this->myDataPtr->signaled = true;
-        for (auto iter: this->myDataPtr->connections.begin())
+        this->signaled = true;
+        for (auto iter: this->myDataPtr->connections)
         {
           if (iter.second->on)
             iter.second->callback(_p1, _p2, _p3, _p4, _p5, _p6, _p7);
@@ -509,7 +493,7 @@ namespace gazebo
       {
         this->Cleanup();
 
-        this->myDataPtr->signaled = true;
+        this->signaled = true;
         for (auto iter: this->myDataPtr->connections)
         {
           if (iter.second->on)
@@ -538,7 +522,7 @@ namespace gazebo
       {
         this->Cleanup();
 
-        this->myDataPtr->signaled = true;
+        this->signaled = true;
         for (auto iter: this->myDataPtr->connections)
         {
           if (iter.second->on)
@@ -569,7 +553,7 @@ namespace gazebo
       {
         this->Cleanup();
 
-        this->myDataPtr->signaled = true;
+        this->signaled = true;
         for (auto iter: this->myDataPtr->connections)
         {
           if (iter.second->on)
@@ -586,15 +570,14 @@ namespace gazebo
       private: void Cleanup();
 
       /// \brief Private data pointer.
-      private: EventTPrivate<T> *myDataPtr;
+      private: std::unique_ptr<EventTPrivate<T>> myDataPtr;
     };
 
     /// \brief Constructor.
     template<typename T>
     EventT<T>::EventT()
-    : Event(*(new EventTPrivate<T>()))
+    : Event(), myDataPtr(new EventTPrivate<T>())
     {
-      this->myDataPtr = static_cast<EventTPrivate<T>*>(this->dataPtr);
     }
 
     /// \brief Destructor. Deletes all the associated connections.
