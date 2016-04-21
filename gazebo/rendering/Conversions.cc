@@ -45,6 +45,18 @@ math::Vector3 Conversions::Convert(const Ogre::Vector3 &v)
 }
 
 //////////////////////////////////////////////////
+ignition::math::Vector3d Conversions::ConvertIgn(const Ogre::Vector3 &_v)
+{
+  return ignition::math::Vector3d(_v.x, _v.y, _v.z);
+}
+
+//////////////////////////////////////////////////
+Ogre::Vector3 Conversions::Convert(const ignition::math::Vector3d &_v)
+{
+  return Ogre::Vector3(_v.X(), _v.Y(), _v.Z());
+}
+
+//////////////////////////////////////////////////
 Ogre::Quaternion Conversions::Convert(const math::Quaternion &_v)
 {
   return Ogre::Quaternion(_v.w, _v.x, _v.y, _v.z);
@@ -57,7 +69,19 @@ math::Quaternion Conversions::Convert(const Ogre::Quaternion &_v)
 }
 
 //////////////////////////////////////////////////
-ignition::math::Matrix4d Conversions::Convert(const Ogre::Matrix4 &_m)
+ignition::math::Quaterniond Conversions::ConvertIgn(const Ogre::Quaternion &_v)
+{
+  return ignition::math::Quaterniond(_v.w, _v.x, _v.y, _v.z);
+}
+
+//////////////////////////////////////////////////
+Ogre::Quaternion Conversions::Convert(const ignition::math::Quaterniond &_q)
+{
+  return Ogre::Quaternion(_q.W(), _q.X(), _q.Y(), _q.X());
+}
+
+//////////////////////////////////////////////////
+ignition::math::Matrix4d Conversions::ConvertIgn(const Ogre::Matrix4 &_m)
 {
   return ignition::math::Matrix4d(_m[0][0], _m[0][1], _m[0][2], _m[0][3],
                                   _m[1][0], _m[1][1], _m[1][2], _m[1][3],
