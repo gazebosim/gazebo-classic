@@ -21,27 +21,74 @@
   #include <Winsock2.h>
 #endif
 
+#include <functional>
 #include <sdf/sdf.hh>
 
-#include "gazebo/physics/World.hh"
+#include <ignition/math/Vector3.hh>
+
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/TransportTypes.hh"
+
 #include "gazebo/physics/Entity.hh"
-#include "gazebo/transport/TransportIface.hh"
-#include "gazebo/physics/WindPrivate.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Wind.hh"
+#include "gazebo/physics/World.hh"
+
+namespace gazebo
+{
+  namespace physics
+  {
+    /// \internal
+    /// \brief Private data for the Wind class
+    class WindPrivate
+    {
+      /// \brief Class constructor.
+      /// \param[in] _world A reference to the world.
+      public: WindPrivate(physics::World &_world)
+        : world(_world)
+      {
+      }
+
+      /// \brief Reference to the world.
+      public: World &world;
+
+      /// \brief Wind linear velocity.
+      public: ignition::math::Vector3d linearVel;
+
+      /// \brief The function used to to calculate the wind velocity at an
+      /// entity's location.
+      /// It takes as input a reference to an instance of Wind and a pointer to
+      /// an Entity.
+      public: std::function< ignition::math::Vector3d (
+                  const Wind *, const Entity *)> linearVelFunc;
+
+      // Transport is declared last.
+      /// \brief Node for communication.
+      public: transport::NodePtr node;
+
+      /// \brief Response publisher.
+      public: transport::PublisherPtr responsePub;
+
+      /// \brief Subscribe to the wind topic.
+      public: transport::SubscriberPtr windSub;
+
+      /// \brief Subscribe to the request topic.
+      public: transport::SubscriberPtr requestSub;
+    };
+  }
+}
 
 using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-Wind::Wind(WorldPtr _world, sdf::ElementPtr _sdf)
-  : dataPtr(new WindPrivate)
+Wind::Wind(World &_world, sdf::ElementPtr _sdf)
+  : dataPtr(new WindPrivate(_world))
 {
-  this->dataPtr->world = _world;
-
   this->Load(_sdf);
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init(this->dataPtr->world->GetName());
+  this->dataPtr->node->Init(this->dataPtr->world.GetName());
   this->dataPtr->windSub = this->dataPtr->node->Subscribe("~/wind",
       &Wind::OnWindMsg, this);
 
@@ -58,16 +105,13 @@ Wind::Wind(WorldPtr _world, sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 Wind::~Wind()
 {
-}
-
-//////////////////////////////////////////////////
-void Wind::Init(void)
-{
+  // Must call fini on node to remove it from topic manager.
+  this->dataPtr->node->Fini();
 }
 
 //////////////////////////////////////////////////
 ignition::math::Vector3d Wind::LinearVelDefault(
-    std::shared_ptr<const Wind> &_wind, const Entity * /*_entity*/)
+    const Wind *_wind, const Entity */*_entity*/)
 {
   return _wind->LinearVel();
 }
@@ -75,8 +119,7 @@ ignition::math::Vector3d Wind::LinearVelDefault(
 //////////////////////////////////////////////////
 ignition::math::Vector3d Wind::WorldLinearVel(const Entity *_entity) const
 {
-  std::shared_ptr<const Wind> w = shared_from_this();
-  return this->dataPtr->linearVelFunc(w, _entity);
+  return this->dataPtr->linearVelFunc(this, _entity);
 }
 
 //////////////////////////////////////////////////
@@ -155,13 +198,6 @@ bool Wind::Param(const std::string &_key,
 }
 
 //////////////////////////////////////////////////
-void Wind::Fini()
-{
-  this->dataPtr->world.reset();
-  this->dataPtr->node->Fini();
-}
-
-//////////////////////////////////////////////////
 void Wind::Load(sdf::ElementPtr _sdf)
 {
   if (_sdf && _sdf->HasElement("linear_velocity"))
@@ -182,7 +218,7 @@ void Wind::OnRequest(ConstRequestPtr &_msg)
     msgs::Wind windMsg;
     windMsg.mutable_linear_velocity()->CopyFrom(
       msgs::Convert(this->dataPtr->linearVel));
-    windMsg.set_enable_wind(this->dataPtr->world->WindEnabled());
+    windMsg.set_enable_wind(this->dataPtr->world.WindEnabled());
 
     response.set_type(windMsg.GetTypeName());
     windMsg.SerializeToString(serializedData);
@@ -197,13 +233,12 @@ void Wind::OnWindMsg(ConstWindPtr &_msg)
     this->SetLinearVel(msgs::ConvertIgn(_msg->linear_velocity()));
 
   if (_msg->has_enable_wind())
-    this->dataPtr->world->SetWindEnabled(_msg->enable_wind());
+    this->dataPtr->world.SetWindEnabled(_msg->enable_wind());
 }
 
 /////////////////////////////////////////////////
-void Wind::SetLinearVelFunc(
-  std::function<ignition::math::Vector3d (std::shared_ptr<const Wind> &,
-    const Entity *_entity)> _linearVelFunc)
+void Wind::SetLinearVelFunc(std::function< ignition::math::Vector3d (
+    const Wind *, const Entity *_entity) > _linearVelFunc)
 {
   this->dataPtr->linearVelFunc = _linearVelFunc;
 }

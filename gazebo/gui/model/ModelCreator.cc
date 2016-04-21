@@ -2329,7 +2329,9 @@ bool ModelCreator::OnMouseMove(const common::MouseEvent &_event)
   pose.Pos() = ModelManipulator::GetMousePositionOnPlane(
       userCamera, _event).Ign();
 
-  if (!_event.Shift())
+  // there is a problem detecting control key from common::MouseEvent, so
+  // check using Qt for now
+  if (QApplication::keyboardModifiers() & Qt::ControlModifier)
   {
     pose.Pos() = ModelManipulator::SnapPoint(pose.Pos()).Ign();
   }
