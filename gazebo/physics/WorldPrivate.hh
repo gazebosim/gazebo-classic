@@ -42,22 +42,6 @@ namespace gazebo
 {
   namespace physics
   {
-    class Request
-    {
-      public: enum Type
-      {
-        DELETE_ENTITY,
-        INSERT_ENTITY
-      };
-
-      public: Request(const Type _type, const msgs::GzString _msg)
-        : msg(_msg), type(_type) {}
-
-      public: const msgs::GzString msg;
-
-      public: Type type;
-    };
-
     /// \brief Private data class for World.
     class WorldPrivate
     {
@@ -363,7 +347,7 @@ namespace gazebo
       public: std::mutex requestsMutex;
 
       /// \brief Request queue.
-      public: std::vector<physics::Request> requests;
+      public: std::vector<msgs::Operation> requests;
     };
   }
 }

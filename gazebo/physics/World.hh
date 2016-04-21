@@ -575,10 +575,6 @@ namespace gazebo
       /// \brief Thread function for logging state data.
       private: void LogWorker();
 
-      /// \brief
-      private: void EntityDeleteService(const msgs::GzString &_req,
-          gazebo::msgs::Empty &/*_rep*/, bool &/*_result*/);
-
       /// \brief Callback when a light message is received.
       /// \param[in] _msg Pointer to the light message.
       /// \deprecated Topic ~/light deprecated.

@@ -18,6 +18,7 @@
 #include <gtest/gtest.h>
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/test/ServerFixture.hh"
+#include "gazebo/transport/Request.hh"
 
 
 using namespace gazebo;
@@ -169,7 +170,7 @@ TEST_F(Scene_TEST, RemoveModelVisual)
   }
 
   // Send request to delete the box model
-  transport::RequestNoReply("/request/deletion", "box");
+  transport::RequestEntityDelete("box");
 
   sleep = 0;
   while (box && sleep < maxSleep)

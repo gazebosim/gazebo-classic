@@ -459,7 +459,7 @@ bool ModelCommand::RunImpl()
 
   if (this->vm.count("delete"))
   {
-    transport::RequestNoReply("/request/deletion", modelName);
+    transport::RequestEntityDelete(modelName);
   }
   else if (this->vm.count("spawn-file"))
   {

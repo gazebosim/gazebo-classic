@@ -11,6 +11,7 @@ set (sources
   Publication.cc
   PublicationTransport.cc
   Publisher.cc
+  Request.cc
   Subscriber.cc
   SubscriptionTransport.cc
   TopicManager.cc
@@ -26,6 +27,7 @@ set (headers
   Publication.hh
   Publisher.hh
   PublicationTransport.hh
+  Request.hh
   SubscribeOptions.hh
   Subscriber.hh
   SubscriptionTransport.hh

@@ -19,6 +19,7 @@
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/transport.hh"
+#include "gazebo/transport/Request.hh"
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/KeyEventHandler.hh"
@@ -84,7 +85,7 @@ void GLWidget_TEST::SelectObject()
   // segfault if an object is deleted.
   {
     std::string name = selectedVisuals.back()->GetName();
-    gazebo::transport::RequestNoReply("/request/deletion", name);
+    gazebo::transport::RequestEntityDelete(name);
 
     this->ProcessEventsAndDraw(mainWindow);
   }

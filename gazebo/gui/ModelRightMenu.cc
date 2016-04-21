@@ -23,6 +23,7 @@
 #include <boost/bind.hpp>
 
 #include "gazebo/transport/transport.hh"
+#include "gazebo/transport/Request.hh"
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/Visual.hh"
@@ -324,7 +325,7 @@ void ModelRightMenu::OnDelete(const std::string &_name)
 
   // Request deletion
   if (!name.empty())
-    transport::RequestNoReply("/request/deletion", name);
+    transport::RequestEntityDelete(name);
 }
 
 /////////////////////////////////////////////////

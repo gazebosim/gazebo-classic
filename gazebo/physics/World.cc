@@ -34,6 +34,7 @@
 #include <sdf/sdf.hh>
 
 #include <deque>
+#include <functional>
 #include <list>
 #include <set>
 #include <string>
@@ -46,6 +47,7 @@
 #include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/Subscriber.hh"
+#include "gazebo/transport/Request.hh"
 
 #include "gazebo/util/LogPlay.hh"
 
@@ -251,8 +253,14 @@ void World::Load(sdf::ElementPtr _sdf)
       "~/light/modify");
 
   // Ignition transport
-  this->dataPtr->ignNode.Advertise("/request/deletion",
-      &World::EntityDeleteService, this);
+  std::function<void(const msgs::Operation &, msgs::Empty &, bool &)>
+      requestService = [this]
+      (const msgs::Operation &_req, msgs::Empty &, bool &)
+  {
+    std::lock_guard<std::mutex> lock(this->dataPtr->requestsMutex);
+    this->dataPtr->requests.push_back(_req);
+  };
+  this->dataPtr->ignNode.Advertise("/request", requestService);
 
   // This should come before loading of entities
   sdf::ElementPtr physicsElem = this->dataPtr->sdf->GetElement("physics");
@@ -591,8 +599,7 @@ void World::LogStep()
 
           while (nameElem)
           {
-            transport::RequestNoReply("/request/deletion",
-                                      nameElem->Get<std::string>());
+            transport::RequestEntityDelete(nameElem->Get<std::string>());
             nameElem = nameElem->GetNextElement("name");
           }
         }
@@ -2844,14 +2851,6 @@ void World::ResetPhysicsStates()
     model->ResetPhysicsStates();
 }
 
-/////////////////////////////////////////////////
-void World::EntityDeleteService(const gazebo::msgs::GzString &_req,
-    gazebo::msgs::Empty &/*_rep*/, bool &/*_result*/)
-{
-  std::lock_guard<std::mutex> lock(this->dataPtr->requestsMutex);
-  this->dataPtr->requests.push_back(Request(Request::DELETE_ENTITY, _req));
-}
-
 //////////////////////////////////////////////////
 void World::ProcessRequests()
 {
@@ -2859,10 +2858,16 @@ void World::ProcessRequests()
 
   for (const auto &request : this->dataPtr->requests)
   {
-    if (request.type == Request::DELETE_ENTITY &&
-        request.msg.has_data())
+    switch (request.type())
     {
-      this->RemoveModel(request.msg.data());
+      case msgs::Operation::DELETE_ENTITY:
+      {
+        if (request.has_uri())
+          this->RemoveModel(request.uri());
+        break;
+      }
+      default:
+        gzwarn << "Unrecognized request [" << request.type() << "]" << std::endl;
     }
   }
 

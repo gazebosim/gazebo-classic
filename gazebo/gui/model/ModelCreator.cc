@@ -40,6 +40,7 @@
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/TransportIface.hh"
+#include "gazebo/transport/Request.hh"
 
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/KeyEventHandler.hh"
@@ -1659,8 +1660,7 @@ void ModelCreator::FinishModel()
     this->SetModelVisible(this->dataPtr->serverModelName, true);
 
     // delete model on server first before spawning the updated one.
-    transport::RequestNoReply("/request/deletion",
-        this->dataPtr->serverModelName);
+    transport::RequestEntityDelete(this->dataPtr->serverModelName);
 
     int timeoutCounter = 0;
     int timeout = 100;

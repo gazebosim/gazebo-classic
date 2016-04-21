@@ -66,6 +66,7 @@ set (msgs
   model.proto
   model_configuration.proto
   model_v.proto
+  operation.proto
   packet.proto
   physics.proto
   planegeom.proto

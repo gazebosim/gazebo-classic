@@ -1,0 +1,41 @@
+package gazebo.msgs;
+
+import "factory.proto";
+
+/// \ingroup gazebo_msgs
+/// \interface Operation
+/// \brief A message containing a single operation, specified by type.
+/// The operation data will be contained in another field.
+/// It can be used to request that an operation is performed, or to
+/// notify it has been performed, for example. For example:
+///
+/// if (msg.type() == DELETE_ENTITY)
+/// {
+///   if (msg.has_uri())
+///     <perform deletion>
+///   else
+///     gzwarn << "Message does not contain URI, which is required for deletion operation.\n";
+/// }
+
+message Operation
+{
+  /// \brief Types of operations.
+  enum Type
+  {
+    /// \brief Deleting an entity.
+    DELETE_ENTITY = 1;
+
+    /// \brief Inserting an entity.
+    INSERT_ENTITY = 2;
+  }
+
+  /// \brief Type of operation.
+  required Type type = 1;
+
+  /// \brief Entity URI in string format, for delete operations for example.
+  optional string uri = 2;
+
+  /// \brief Factory message, for insert operations.
+  optional Factory factory = 3;
+}
+

@@ -116,14 +116,6 @@ namespace gazebo
 
     /// \brief Send a request and don't wait for a response. This is
     /// non-blocking.
-    /// \param[in] _service The service.
-    /// \param[in] _data Data.
-    GZ_TRANSPORT_VISIBLE
-    void RequestNoReply(const std::string &_service,
-                        const std::string &_data = "");
-
-    /// \brief Send a request and don't wait for a response. This is
-    /// non-blocking.
     /// \param[in] _node Pointer to a node that provides communication.
     /// \param[in] _request The type request.
     /// \param[in] _data Optional data string.
