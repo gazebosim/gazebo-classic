@@ -58,7 +58,7 @@ Connection::~Connection()
     this->dataPtr->creationTime;
   if ((this->dataPtr->event && !this->dataPtr->event->GetSignaled()) &&
       diffTime < common::Time(0, 10000))
-    gzwarn << "Warning: Deleteing a connection right after creation. "
+    gzwarn << "Warning: Deleting a connection right after creation. "
           << "Make sure to save the ConnectionPtr from a Connect call\n";
 
   if (this->dataPtr->event && this->dataPtr->id >= 0)
