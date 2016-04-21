@@ -132,8 +132,7 @@ namespace gazebo
     class EventConnection
     {
       /// \brief Constructor
-      public: EventConnection(const bool _on,
-                  boost::function<T> *_cb)
+      public: EventConnection(const bool _on, boost::function<T> _cb)
               : callback(_cb)
       {
         // Windows Visual Studio 2012 does not have atomic_bool constructor,
@@ -145,7 +144,7 @@ namespace gazebo
       public: std::atomic_bool on;
 
       /// \brief Callback function
-      public: std::shared_ptr<boost::function<T> > callback;
+      public: boost::function<T> callback;
     };
 
     /// \internal
@@ -356,7 +355,7 @@ namespace gazebo
         for (auto iter: this->myDataPtr->connections)
         {
           if (iter.second->on)
-            (*iter.second->callback)();
+            iter.second->callback();
         }
       }
 
@@ -371,7 +370,7 @@ namespace gazebo
         for (auto iter: this->myDataPtr->connections)
         {
           if (iter.second->on)
-            (*iter.second->callback)(_p);
+            iter.second->callback(_p);
         }
       }
 
@@ -387,7 +386,7 @@ namespace gazebo
         for (auto iter: this->myDataPtr->connections)
         {
           if (iter.second->on)
-            (*iter.second->callback)(_p1, _p2);
+            iter.second->callback(_p1, _p2);
         }
       }
 
@@ -404,7 +403,7 @@ namespace gazebo
         for (auto iter: this->myDataPtr->connections)
         {
           if (iter.second->on)
-            (*iter.second->callback)(_p1, _p2, _p3);
+            iter.second->callback(_p1, _p2, _p3);
         }
       }
 
@@ -423,7 +422,7 @@ namespace gazebo
         for (auto iter: this->myDataPtr->connections)
         {
           if (iter.second->on)
-            (*iter.second->callback)(_p1, _p2, _p3, _p4);
+            iter.second->callback(_p1, _p2, _p3, _p4);
         }
       }
 
@@ -444,7 +443,7 @@ namespace gazebo
         for (auto iter: this->myDataPtr->connections)
         {
           if (iter.second->on)
-            (*iter.second->callback)(_p1, _p2, _p3, _p4, _p5);
+            iter.second->callback(_p1, _p2, _p3, _p4, _p5);
         }
       }
 
@@ -466,7 +465,7 @@ namespace gazebo
         for (auto iter: this->myDataPtr->connections)
         {
           if (iter.second->on)
-            (*iter.second->callback)(_p1, _p2, _p3, _p4, _p5, _p6);
+            iter.second->callback(_p1, _p2, _p3, _p4, _p5, _p6);
         }
       }
 
@@ -489,7 +488,7 @@ namespace gazebo
         for (auto iter: this->myDataPtr->connections.begin())
         {
           if (iter.second->on)
-            (*iter.second->callback)(_p1, _p2, _p3, _p4, _p5, _p6, _p7);
+            iter.second->callback(_p1, _p2, _p3, _p4, _p5, _p6, _p7);
         }
       }
 
@@ -515,7 +514,7 @@ namespace gazebo
         {
           if (iter.second->on)
           {
-            (*iter.second->callback)(_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8);
+            iter.second->callback(_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8);
           }
         }
       }
@@ -544,7 +543,7 @@ namespace gazebo
         {
           if (iter.second->on)
           {
-            (*iter.second->callback)(
+            iter.second->callback(
                 _p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8, _p9);
           }
         }
@@ -575,7 +574,7 @@ namespace gazebo
         {
           if (iter.second->on)
           {
-            (*iter.second->callback)(
+            iter.second->callback(
                 _p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8, _p9, _p10);
           }
         }
@@ -617,7 +616,7 @@ namespace gazebo
         index = iter->first + 1;
       }
       this->myDataPtr->connections[index].reset(new EventConnection<T>(true,
-          new boost::function<T>(_subscriber)));
+          _subscriber));
       return ConnectionPtr(new Connection(this, index));
     }
 
