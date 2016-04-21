@@ -21,7 +21,6 @@
   #include <Winsock2.h>
 #endif
 
-#include <boost/algorithm/string.hpp>
 #include <boost/bind.hpp>
 #include <sstream>
 #include <functional>
@@ -66,58 +65,7 @@ Link::Link(EntityPtr _parent)
 //////////////////////////////////////////////////
 Link::~Link()
 {
-  this->attachedModels.clear();
-
-  for (Visuals_M::iterator iter = this->visuals.begin();
-      iter != this->visuals.end(); ++iter)
-  {
-    msgs::Visual msg;
-    msg.set_name(iter->second.name());
-    msg.set_id(iter->second.id());
-    if (this->parent)
-    {
-      msg.set_parent_name(this->parent->GetScopedName());
-      msg.set_parent_id(this->parent->GetId());
-    }
-    else
-    {
-      msg.set_parent_name("");
-      msg.set_parent_id(0);
-    }
-    msg.set_delete_me(true);
-    this->visPub->Publish(msg);
-  }
-  this->visuals.clear();
-
-  if (this->cgVisuals.size() > 0)
-  {
-    for (unsigned int i = 0; i < this->cgVisuals.size(); i++)
-    {
-      msgs::Visual msg;
-      msg.set_name(this->cgVisuals[i]);
-      if (this->parent)
-        msg.set_parent_name(this->parent->GetScopedName());
-      else
-        msg.set_parent_name("");
-      msg.set_delete_me(true);
-      this->visPub->Publish(msg);
-    }
-    this->cgVisuals.clear();
-  }
-
-  this->visPub.reset();
-  this->sensors.clear();
-
-  this->requestPub.reset();
-  this->dataPub.reset();
-  this->wrenchSub.reset();
-  this->connections.clear();
-
-  delete this->publishDataMutex;
-  this->publishDataMutex = NULL;
-
-  this->collisions.clear();
-  this->batteries.clear();
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -282,6 +230,7 @@ void Link::Init()
 //////////////////////////////////////////////////
 void Link::Fini()
 {
+  this->attachedModels.clear();
   this->parentJoints.clear();
   this->childJoints.clear();
   this->collisions.clear();
@@ -296,20 +245,34 @@ void Link::Fini()
 
   this->sensors.clear();
 
-  for (Visuals_M::iterator iter = this->visuals.begin();
-       iter != this->visuals.end(); ++iter)
+  // Clean up visuals
+  // FIXME: Do we really need to send 2 msgs to delete a visual?!
+  if (this->visPub && this->requestPub)
   {
-    msgs::Request *msg = msgs::CreateRequest("entity_delete",
-        boost::lexical_cast<std::string>(iter->second.id()));
-    this->requestPub->Publish(*msg, true);
-  }
+    for (auto iter : this->visuals)
+    {
+      auto deleteMsg = msgs::CreateRequest("entity_delete",
+          std::to_string(iter.second.id()));
+      this->requestPub->Publish(*deleteMsg, true);
 
-  for (std::vector<std::string>::iterator iter = this->cgVisuals.begin();
-       iter != this->cgVisuals.end(); ++iter)
-  {
-    msgs::Request *msg = msgs::CreateRequest("entity_delete", *iter);
-    this->requestPub->Publish(*msg, true);
+      msgs::Visual msg;
+      msg.set_name(iter.second.name());
+      msg.set_id(iter.second.id());
+      if (this->parent)
+      {
+        msg.set_parent_name(this->parent->GetScopedName());
+        msg.set_parent_id(this->parent->GetId());
+      }
+      else
+      {
+        msg.set_parent_name("");
+        msg.set_parent_id(0);
+      }
+      msg.set_delete_me(true);
+      this->visPub->Publish(msg);
+    }
   }
+  this->visuals.clear();
 
 #ifdef HAVE_OPENAL
   if (this->world && this->world->GetPhysicsEngine() &&
@@ -318,8 +281,22 @@ void Link::Fini()
     this->world->GetPhysicsEngine()->GetContactManager()->RemoveFilter(
         this->GetScopedName() + "/audio_collision");
   }
+  this->audioContactsSub.reset();
   this->audioSink.reset();
+  this->audioSources.clear();
 #endif
+
+  // Clean transport
+  {
+    this->dataPub.reset();
+    this->visPub.reset();
+
+    this->wrenchSub.reset();
+  }
+  this->connections.clear();
+
+  delete this->publishDataMutex;
+  this->publishDataMutex = NULL;
 
   Entity::Fini();
 }
@@ -1072,6 +1049,11 @@ void Link::SetKinematic(const bool &/*_kinematic*/)
 /////////////////////////////////////////////////
 void Link::SetPublishData(bool _enable)
 {
+  // Skip if we're trying to disable after the publisher has already been
+  // cleared
+  if (!_enable && !this->dataPub)
+    return;
+
   {
     boost::recursive_mutex::scoped_lock lock(*this->publishDataMutex);
     if (this->publishData == _enable)
@@ -1090,6 +1072,7 @@ void Link::SetPublishData(bool _enable)
   else
   {
     this->dataPub.reset();
+    // Do we want to clear all of them though?
     this->connections.clear();
   }
 }
