@@ -1674,7 +1674,7 @@ void World::ProcessRequestMsgs()
     {
       gzwarn << "Request for `entity_delete` [" << requestMsg.data()
           << "] is deprecated. Use "
-          << "transport::RequestNoReply(\"/request/deletion\", <entity name>)"
+          << "transport::RequestEntityDelete(<entity uri>)"
           << " instead." << std::endl;
       boost::mutex::scoped_lock lock2(this->dataPtr->entityDeleteMutex);
       this->dataPtr->deleteEntity.push_back(requestMsg.data());
@@ -2867,7 +2867,10 @@ void World::ProcessRequests()
         break;
       }
       default:
-        gzwarn << "Unrecognized request [" << request.type() << "]" << std::endl;
+      {
+        gzwarn << "Unrecognized request [" << request.type() << "]"
+               << std::endl;
+      }
     }
   }
 

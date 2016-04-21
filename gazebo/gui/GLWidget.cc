@@ -135,8 +135,8 @@ GLWidget::GLWidget(QWidget *_parent)
     this->dataPtr->node->Advertise<msgs::Selection>("~/selection");
 
   // Ignition transport
-  if (!this->dataPtr->ignNode.Subscribe("/notify/deletion",
-      &GLWidget::OnDeletionNotification, this))
+  if (!this->dataPtr->ignNode.Subscribe("/notification",
+      &GLWidget::OnNotification, this))
   {
     gzerr << "Error subscribing to deletion notifications." << std::endl;
   }
@@ -1266,9 +1266,15 @@ void GLWidget::OnSetSelectedEntity(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
-void GLWidget::OnDeletionNotification(const msgs::GzString &_msg)
+void GLWidget::OnNotification(const msgs::Operation &_msg)
 {
-  std::string name = _msg.data();
+  if (!(_msg.type() == msgs::Operation::DELETE_ENTITY &&
+      _msg.has_uri()))
+  {
+    return;
+  }
+
+  std::string name = _msg.uri();
 
   std::lock_guard<std::mutex> lock(this->dataPtr->selectedVisMutex);
   if (!this->dataPtr->selectedVisuals.empty())

@@ -231,7 +231,7 @@ namespace gazebo
 
       /// \brief Ignition callback notifying an entity was deleted.
       /// \param[in] _msg Message containing data about the deleted entity.
-      private: void OnDeletionNotification(const msgs::GzString &_msg);
+      private: void OnNotification(const msgs::Operation &_msg);
 
       /// \internal
       /// \brief Pointer to private data.

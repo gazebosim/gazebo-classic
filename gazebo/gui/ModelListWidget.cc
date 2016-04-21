@@ -2664,9 +2664,15 @@ void ModelListWidget::FillPoseProperty(const msgs::Pose &_msg,
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::OnDeletionNotification(const msgs::GzString &_msg)
+void ModelListWidget::OnNotification(const msgs::Operation &_msg)
 {
-  this->dataPtr->removeEntityList.push_back(_msg.data());
+  if (!(_msg.type() == msgs::Operation::DELETE_ENTITY &&
+      _msg.has_uri()))
+  {
+    return;
+  }
+
+  this->dataPtr->removeEntityList.push_back(_msg.uri());
 }
 
 /////////////////////////////////////////////////
@@ -2753,8 +2759,8 @@ void ModelListWidget::InitTransport(const std::string &_name)
                                             &ModelListWidget::OnResponse, this);
 
   // Ignition
-  this->dataPtr->ignNode.Subscribe("/notify/deletion",
-      &ModelListWidget::OnDeletionNotification, this);
+  this->dataPtr->ignNode.Subscribe("/notification",
+      &ModelListWidget::OnNotification, this);
 }
 
 /////////////////////////////////////////////////

@@ -184,8 +184,8 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
       this->dataPtr->node->Subscribe("~/scene", &Scene::OnScene, this);
 
   // Ignition transport
-  if (!this->dataPtr->ignNode.Subscribe("/notify/deletion",
-      &Scene::OnDeletionNotification, this))
+  if (!this->dataPtr->ignNode.Subscribe("/notification",
+      &Scene::OnNotification, this))
   {
     gzerr << "Error subscribing to deletion notifications." << std::endl;
   }
@@ -3577,9 +3577,15 @@ void Scene::ToggleLayer(const int32_t _layer)
 }
 
 //////////////////////////////////////////////////
-void Scene::OnDeletionNotification(const msgs::GzString &_msg)
+void Scene::OnNotification(const msgs::Operation &_msg)
 {
-  std::string name = _msg.data();
+  if (!(_msg.type() == msgs::Operation::DELETE_ENTITY &&
+      _msg.has_uri()))
+  {
+    return;
+  }
+
+  std::string name = _msg.uri();
 
   Light_M::iterator lightIter = this->dataPtr->lights.find(name);
 

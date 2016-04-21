@@ -65,17 +65,23 @@ void SimEventsPlugin::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
       &SimEventsPlugin::OnModelInfo, this);
 
   // detect model deletion
-  std::function<void(const msgs::GzString &)> onEntityDeletion =
-              [this](const msgs::GzString &_msg)
+  std::function<void(const msgs::Operation &)> onNotification =
+              [this](const msgs::Operation &_msg)
   {
-    std::string modelName = _msg.data();
+    if (!(_msg.type() == msgs::Operation::DELETE_ENTITY &&
+        _msg.has_uri()))
+    {
+      return;
+    }
+
+    std::string modelName = _msg.uri();
     if (models.erase(modelName) == 1)
     {
       // notify everyone!
       SimEventConnector::spawnModel(modelName, false);
     }
   };
-  this->ignNode.Subscribe("/notify/deletion", onEntityDeletion);
+  this->ignNode.Subscribe("/notification", onNotification);
 
   // read regions, if any
   if (this->sdf->HasElement("region"))
