@@ -77,7 +77,7 @@ ignition::math::Quaterniond Conversions::ConvertIgn(const Ogre::Quaternion &_v)
 //////////////////////////////////////////////////
 Ogre::Quaternion Conversions::Convert(const ignition::math::Quaterniond &_q)
 {
-  return Ogre::Quaternion(_q.W(), _q.X(), _q.Y(), _q.X());
+  return Ogre::Quaternion(_q.W(), _q.X(), _q.Y(), _q.Z());
 }
 
 //////////////////////////////////////////////////
