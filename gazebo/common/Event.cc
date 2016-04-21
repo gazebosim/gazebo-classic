@@ -53,20 +53,8 @@ bool Event::GetSignaled() const
 }
 
 //////////////////////////////////////////////////
-ConnectionPrivate::ConnectionPrivate()
-  : event(NULL), id(-1)
-{
-}
-
-//////////////////////////////////////////////////
 ConnectionPrivate::ConnectionPrivate(Event *_e, int _i)
   : event(_e), id(_i)
-{
-}
-
-//////////////////////////////////////////////////
-Connection::Connection()
-  : dataPtr(new ConnectionPrivate())
 {
 }
 

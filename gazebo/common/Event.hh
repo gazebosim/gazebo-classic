@@ -91,9 +91,6 @@ namespace gazebo
     class GZ_COMMON_VISIBLE ConnectionPrivate
     {
       /// \brief Constructor.
-      public: ConnectionPrivate();
-
-      /// \brief Constructor.
       /// \param[in] _e Event pointer to connect with
       /// \param[in] _i Unique id
       public: ConnectionPrivate(Event *_e, int _i);
@@ -111,9 +108,6 @@ namespace gazebo
     /// \brief A class that encapsulates a connection.
     class GZ_COMMON_VISIBLE Connection
     {
-      /// \brief Constructor.
-      public: Connection();
-
       /// \brief Constructor.
       /// \param[in] _e Event pointer to connect with.
       /// \param[in] _i Unique id.
