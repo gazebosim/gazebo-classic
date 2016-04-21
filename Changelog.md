@@ -2,6 +2,9 @@
 
 ### Gazebo 6.X.X (201X-XX-XX)
 
+1. Add vector3 and quaternion rendering conversions
+    * [Pull request 2276](https://bitbucket.org/osrf/gazebo/pull-request/2276)
+
 1. Reverse view angle widget left and right view
     * [Pull request 2265](https://bitbucket.org/osrf/gazebo/pull-request/2265)
     * [Issue 1924](https://bitbucket.org/osrf/gazebo/issue/1924)
