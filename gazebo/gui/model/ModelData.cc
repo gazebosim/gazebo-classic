@@ -1102,7 +1102,7 @@ void LinkData::OnRemoveVisual(const std::string &_name)
       it->first->SetVisible(false);
 
       this->deletedVisuals[it->first] = it->second;
-      this->visuals.erase(it++);
+      this->visuals.erase(it);
       break;
     }
     ++it;
