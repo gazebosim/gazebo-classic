@@ -522,7 +522,7 @@ void IncrementalPlot::ShowGrid(const bool _show)
 }
 
 /////////////////////////////////////////////////
-bool IncrementalPlot::ShowGrid() const
+bool IncrementalPlot::IsShowGrid() const
 {
   return this->dataPtr->grid->isVisible();
 }
@@ -535,7 +535,7 @@ void IncrementalPlot::ShowHoverLine(const bool _show)
 }
 
 /////////////////////////////////////////////////
-bool IncrementalPlot::ShowHoverLine() const
+bool IncrementalPlot::IsShowHoverLine() const
 {
   return this->dataPtr->tracker->isEnabled();
 }

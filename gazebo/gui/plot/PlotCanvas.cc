@@ -213,7 +213,7 @@ PlotCanvas::PlotCanvas(QWidget *_parent)
   plotLayout->addWidget(this->dataPtr->emptyPlot);
 
   // set initial show grid state
-  showGridAct->setChecked(this->dataPtr->emptyPlot->ShowGrid());
+  showGridAct->setChecked(this->dataPtr->emptyPlot->IsShowGrid());
   connect(showGridAct, SIGNAL(triggered()), this, SLOT(OnShowGrid()));
 
   QFrame *mainFrame = new QFrame;
@@ -391,8 +391,8 @@ unsigned int PlotCanvas::AddPlot()
 {
   IncrementalPlot *plot = new IncrementalPlot(this);
   plot->setAutoDelete(false);
-  plot->ShowGrid(this->dataPtr->emptyPlot->ShowGrid());
-  plot->ShowHoverLine(this->dataPtr->emptyPlot->ShowHoverLine());
+  plot->ShowGrid(this->dataPtr->emptyPlot->IsShowGrid());
+  plot->ShowHoverLine(this->dataPtr->emptyPlot->IsShowHoverLine());
   connect(plot, SIGNAL(VariableAdded(std::string)), this,
       SLOT(OnAddVariable(std::string)));
   this->dataPtr->plotSplitter->addWidget(plot);
@@ -835,20 +835,20 @@ void PlotCanvas::OnDeleteCanvas()
 /////////////////////////////////////////////////
 void PlotCanvas::OnShowGrid()
 {
-  this->dataPtr->emptyPlot->ShowGrid(!this->dataPtr->emptyPlot->ShowGrid());
+  this->dataPtr->emptyPlot->ShowGrid(!this->dataPtr->emptyPlot->IsShowGrid());
 
   for (const auto &it : this->dataPtr->plotData)
-    it.second->plot->ShowGrid(!it.second->plot->ShowGrid());
+    it.second->plot->ShowGrid(!it.second->plot->IsShowGrid());
 }
 
 /////////////////////////////////////////////////
 void PlotCanvas::OnShowHoverLine()
 {
   this->dataPtr->emptyPlot->ShowHoverLine(
-      !this->dataPtr->emptyPlot->ShowHoverLine());
+      !this->dataPtr->emptyPlot->IsShowHoverLine());
 
   for (const auto &it : this->dataPtr->plotData)
-    it.second->plot->ShowHoverLine(!it.second->plot->ShowHoverLine());
+    it.second->plot->ShowHoverLine(!it.second->plot->IsShowHoverLine());
 }
 
 /////////////////////////////////////////////////
