@@ -8,6 +8,7 @@ include_directories(
   ${SDFormat_INCLUDE_DIRS}
   ${OGRE_INCLUDE_DIRS}
   ${IGNITION-MATH_INCLUDE_DIRS}
+  ${IGNITION-TRANSPORT_INCLUDE_DIRS}
 )
 
 # Tinyxml are used since the plugins are linking against gazebo_common
@@ -17,6 +18,7 @@ link_directories(
   ${CCD_LIBRARY_DIRS}
   ${SDFormat_LIBRARY_DIRS}
   ${tinyxml_LIBRARY_DIRS}
+  ${IGNITION-TRANSPORT_LIBRARY_DIRS}
 )
 
 include (${QT_USE_FILE})
@@ -68,6 +70,7 @@ set (plugins
   SonarPlugin
   SphereAtlasDemoPlugin
   TransporterPlugin
+  ValidationPlugin
   VehiclePlugin)
 
 if (HAVE_USB AND UNIX AND NOT APPLE)
@@ -87,7 +90,7 @@ set(GAZEBO_PLUGIN_INSTALL_DIR
 )
 foreach (src ${plugins})
   add_library(${src} SHARED ${src}.cc)
-  target_link_libraries(${src} libgazebo ${ogre_libraries})
+  target_link_libraries(${src} libgazebo ${ogre_libraries} ${IGNITION-TRANSPORT_LIBRARIES})
   install (TARGETS ${src} DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
   gz_install_includes("plugins" ${src}.hh)
 endforeach (src ${plugins})
