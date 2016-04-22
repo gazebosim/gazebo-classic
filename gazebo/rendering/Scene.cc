@@ -2518,10 +2518,10 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
       VisualPtr visPtr;
       try
       {
-        Visual_M::iterator iter;
-        iter = this->dataPtr->visuals.find(
+        auto iter = this->dataPtr->visuals.find(
             boost::lexical_cast<uint32_t>(_msg->data()));
-        visPtr = iter->second;
+        if (iter != this->dataPtr->visuals.end())
+          visPtr = iter->second;
       } catch(...)
       {
         visPtr = this->GetVisual(_msg->data());
