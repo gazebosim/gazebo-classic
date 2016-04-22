@@ -49,7 +49,7 @@ namespace gazebo
       /// \brief Load a BulletJoint
       public: virtual void Load(sdf::ElementPtr _sdf);
 
-      /// \brief Documentation inherited.
+      // Documentation inherited.
       public: virtual void Fini();
 
       /// \brief Reset the joint

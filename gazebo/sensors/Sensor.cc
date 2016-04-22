@@ -251,6 +251,8 @@ void Sensor::Update(const bool _force)
 //////////////////////////////////////////////////
 void Sensor::Fini()
 {
+  this->connections.clear();
+
   for (auto &it : this->noises)
     it.second->Fini();
   this->noises.clear();
@@ -265,8 +267,6 @@ void Sensor::Fini()
   if (this->sdf)
     this->sdf->Reset();
   this->sdf.reset();
-
-  this->connections.clear();
 }
 
 //////////////////////////////////////////////////

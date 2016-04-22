@@ -646,6 +646,8 @@ void ODEJoint::Reset()
   else
     gzerr << "ODE Joint ID is invalid\n";
 
+  this->forceAppliedTime = common::Time::Zero;
+
   Joint::Reset();
 }
 

@@ -116,7 +116,7 @@ TEST_F(WorldClone, CloneUnknownWorld)
   else
   {
     std::string port = "http://localhost:" +
-        boost::lexical_cast<std::string>(GAZEBO_DEFAULT_MASTER_PORT);
+        std::to_string(GAZEBO_DEFAULT_MASTER_PORT);
     setenv("GAZEBO_MASTER_URI", port.c_str(), 1);
   }
 }

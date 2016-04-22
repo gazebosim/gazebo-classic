@@ -253,7 +253,7 @@ void Link::Fini()
     for (auto iter : this->visuals)
     {
       auto deleteMsg = msgs::CreateRequest("entity_delete",
-          boost::lexical_cast<std::string>(iter.second.id()));
+          std::to_string(iter.second.id()));
       this->requestPub->Publish(*deleteMsg, true);
 
       msgs::Visual msg;
