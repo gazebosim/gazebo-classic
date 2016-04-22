@@ -69,11 +69,9 @@ void TimePanel_TEST::SpaceBar()
   QTest::keyClick(timePanel, Qt::Key_Space);
 
   // Process some events until it gets paused
-  for (unsigned int i = 0; i < 10 && !timePanel->IsPaused(); ++i)
+  for (unsigned int i = 0; i < 50 && !timePanel->IsPaused(); ++i)
   {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
+    this->ProcessEventsAndDraw(mainWindow, 1);
   }
   QVERIFY(timePanel->IsPaused());
 
@@ -81,13 +79,15 @@ void TimePanel_TEST::SpaceBar()
   QTest::keyClick(timePanel, Qt::Key_Space);
 
   // Process some events until it gets unpaused
-  for (unsigned int i = 0; i < 10 && timePanel->IsPaused(); ++i)
+  for (unsigned int i = 0; i < 50 && timePanel->IsPaused(); ++i)
   {
     this->ProcessEventsAndDraw(mainWindow, 1);
   }
   QVERIFY(!timePanel->IsPaused());
 
-  delete timePanel;
+  mainWindow->close();
+  delete mainWindow;
+  mainWindow = NULL;
 }
 
 // Generate a main function for the test
