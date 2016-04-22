@@ -61,7 +61,7 @@ math::Vector3 ODEHingeJoint::GetAnchor(unsigned int /*index*/) const
   else
   {
     gzerr << "ODE Joint ID is invalid\n";
-    return math::Vector3();
+    return math::Vector3::Zero;
   }
 
   return math::Vector3(result[0], result[1], result[2]);
@@ -92,7 +92,7 @@ math::Vector3 ODEHingeJoint::GetGlobalAxis(unsigned int /*_index*/) const
   else
   {
     gzerr << "ODE Joint ID is invalid\n";
-    return math::Vector3();
+    return math::Vector3::Zero;
   }
 
   return math::Vector3(result[0], result[1], result[2]);

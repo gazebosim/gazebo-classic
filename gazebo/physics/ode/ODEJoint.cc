@@ -203,9 +203,24 @@ void ODEJoint::Attach(LinkPtr _parent, LinkPtr _child)
 //////////////////////////////////////////////////
 void ODEJoint::Detach()
 {
+  auto odeChild = boost::dynamic_pointer_cast<ODELink>(this->childLink);
+  auto odeParent = boost::dynamic_pointer_cast<ODELink>(this->parentLink);
+
   Joint::Detach();
   this->childLink.reset();
   this->parentLink.reset();
+
+  // Something funky is happening that sometimes the parent and child links ODE
+  // pointers are cleared but gazebo objects remain valid.
+  if ((odeParent && odeParent->GetODEId() == NULL) ||
+      (odeChild && odeChild->GetODEId() == NULL))
+  {
+    gzerr << "Either child [" << odeChild->GetName() <<
+        "] has bad ODE pointer [" << odeChild->GetODEId() << "] or parent ["
+        << odeParent->GetName() << "] has bad ODE pointer [" <<
+        odeParent->GetODEId() << "]" << std::endl;
+    return;
+  }
 
   if (this->jointId)
     dJointAttach(this->jointId, 0, 0);
@@ -621,6 +636,8 @@ void ODEJoint::Reset()
     dJointReset(this->jointId);
   else
     gzerr << "ODE Joint ID is invalid\n";
+
+  this->forceAppliedTime = common::Time::Zero;
 
   Joint::Reset();
 }

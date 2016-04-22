@@ -127,7 +127,7 @@ void SelectionBuffer::DeleteRTTBuffer()
   if (this->dataPtr->buffer)
   {
     delete [] this->dataPtr->buffer;
-    this->dataPtr->buffer = 0;
+    this->dataPtr->buffer = nullptr;
   }
   if (this->dataPtr->pixelBox)
     delete this->dataPtr->pixelBox;
@@ -211,7 +211,7 @@ Ogre::Entity *SelectionBuffer::OnSelectionClick(int _x, int _y)
   if (!this->dataPtr->buffer)
   {
     gzerr << "Selection buffer is null.\n";
-    return 0;
+    return nullptr;
   }
   memcpy(static_cast<void *>(&color), this->dataPtr->buffer + posInStream, 4);
   common::Color cv;

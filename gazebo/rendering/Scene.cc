@@ -1303,8 +1303,8 @@ bool Scene::FirstContact(CameraPtr _camera,
           }
         }
       }
-      delete[] vertices;
-      delete[] indices;
+      delete [] vertices;
+      delete [] indices;
     }
   }
 

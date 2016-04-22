@@ -93,7 +93,7 @@ math::Vector3 ODEGearboxJoint::GetGlobalAxis(unsigned int _index) const
   else
   {
     gzerr << "index [" << _index << "] out of range\n";
-    return math::Vector3();
+    return math::Vector3::Zero;
   }
 
   return math::Vector3(result[0], result[1], result[2]);
@@ -175,7 +175,7 @@ void ODEGearboxJoint::SetParam(unsigned int /*_parameter*/, double /*_value*/)
 math::Vector3 ODEGearboxJoint::GetAnchor(unsigned int /*_index*/) const
 {
   gzlog << "ODEGearboxJoint::GetAnchor not implemented.\n";
-  return math::Vector3();
+  return math::Vector3::Zero;
 }
 
 //////////////////////////////////////////////////

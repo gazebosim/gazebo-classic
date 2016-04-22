@@ -69,7 +69,7 @@ SystemPaths::SystemPaths()
   char *homePath = getenv("HOME");
   std::string home;
   if (!homePath)
-    home = this->GetTmpPath() + "/gazebo";
+    home = this->TmpPath() + "/gazebo";
   else
     home = homePath;
 
@@ -81,7 +81,7 @@ SystemPaths::SystemPaths()
   std::string fullPath;
   if (!path)
   {
-    if (home != this->GetTmpPath() + "/gazebo")
+    if (home != this->TmpPath() + "/gazebo")
       fullPath = home + "/.gazebo";
     else
       fullPath = home;
@@ -159,21 +159,39 @@ const std::list<std::string> &SystemPaths::GetOgrePaths()
 }
 
 /////////////////////////////////////////////////
-const std::string &SystemPaths::GetTmpPath() const
+std::string SystemPaths::GetTmpPath()
+{
+  return this->TmpPath();
+}
+
+/////////////////////////////////////////////////
+const std::string &SystemPaths::TmpPath() const
 {
   return this->tmpPath.string();
 }
 
 /////////////////////////////////////////////////
-const std::string &SystemPaths::GetTmpInstancePath() const
+std::string SystemPaths::GetTmpInstancePath()
+{
+  return this->TmpInstancePath();
+}
+
+/////////////////////////////////////////////////
+const std::string &SystemPaths::TmpInstancePath() const
 {
   return this->tmpInstancePath.string();
 }
 
 /////////////////////////////////////////////////
-std::string SystemPaths::GetDefaultTestPath() const
+std::string SystemPaths::GetDefaultTestPath()
 {
-  return this->GetTmpInstancePath() + "/gazebo_test";
+  return this->DefaultTestPath();
+}
+
+/////////////////////////////////////////////////
+std::string SystemPaths::DefaultTestPath() const
+{
+  return this->TmpInstancePath() + "/gazebo_test";
 }
 
 /////////////////////////////////////////////////

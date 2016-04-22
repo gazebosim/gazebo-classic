@@ -412,14 +412,14 @@ boost::shared_ptr<Model> Model::shared_from_this()
 //////////////////////////////////////////////////
 void Model::Fini()
 {
-  Entity::Fini();
-
+  this->joints.clear();
   this->plugins.clear();
   this->attachedModels.clear();
-  this->joints.clear();
   this->links.clear();
   this->canonicalLink.reset();
   this->models.clear();
+
+  Entity::Fini();
 }
 
 //////////////////////////////////////////////////

@@ -23,6 +23,54 @@ class WorldTest : public ServerFixture
 {
 };
 
+/// \brief Pose after physics update
+ignition::math::Pose3d g_poseAfterUpdate;
+
+/// \brief Pose before physics update
+ignition::math::Pose3d g_poseBeforeUpdate;
+
+/// \brief Has the WorldUpdateBegin event been called
+bool g_updateBeginCalled = false;
+
+/// \brief Has the BeforePhysicsUpdate event been called
+bool g_beforePhysicsUpdateCalled = false;
+
+/// \brief Has the WorldUpdateEnd event been called
+bool g_updateEndCalled = false;
+
+/// \brief Callback for WorldUpdateBegin event, just records it's been called.
+/// \param[in] _updateInfo Information about the event time and world.
+void onWorldUpdateBegin(const common::UpdateInfo & /*_updateInfo*/)
+{
+  g_updateBeginCalled = true;
+}
+
+/// \brief Callback for BeforePhysicsUpdate event.
+/// Record that it has been called, and also record the reported ball
+/// position.
+/// \param[in] updateInfo Information about the event time and world.
+void beforePhysicsUpdate(const common::UpdateInfo &_updateInfo)
+{
+  g_beforePhysicsUpdateCalled = true;
+
+  physics::WorldPtr world = physics::get_world(_updateInfo.worldName);
+  ASSERT_TRUE(world != NULL);
+
+  physics::ModelPtr sphereModel = world->GetModel("sphere");
+  ASSERT_TRUE(sphereModel != NULL);
+
+  physics::LinkPtr link = sphereModel->GetLink("link");
+  ASSERT_TRUE(link != NULL);
+
+  g_poseBeforeUpdate = link->GetWorldPose().Ign();
+}
+
+/// \brief Callback for WorldUpdateEnd event, just records it's been called.
+void onWorldUpdateEnd()
+{
+  g_updateEndCalled = true;
+}
+
 /////////////////////////////////////////////////
 TEST_F(WorldTest, ClearEmptyWorld)
 {
@@ -303,7 +351,6 @@ TEST_F(WorldTest, ModifyLight)
   }
 }
 
-
 /////////////////////////////////////////////////
 TEST_F(WorldTest, RemoveModelPaused)
 {
@@ -351,57 +398,12 @@ TEST_F(WorldTest, RemoveModelUnPaused)
   EXPECT_FALSE(boxModel != NULL);
 }
 
-/// \brief Pose before simulation step
-math::Pose initialPose;
-/// \brief Pose before physics update
-math::Pose poseBeforeUpdate;
-/// \brief Has the WorldUpdateBegin event been called
-bool updateBeginCalled = false;
-/// \brief Has the BeforePhysicsUpdate event been called
-bool beforePhysicsUpdateCalled = false;
-/// \brief Has the WorldUpdateEnd event been called
-bool updateEndCalled = false;
-
-/// \brief Callback for WorldUpdateBegin event, just records it's been called.
-/// \param[in] updateInfo Information about the event time and world.
-void onWorldUpdateBegin(const common::UpdateInfo&)
-{
-  updateBeginCalled = true;
-}
-
-/// \brief Callback for BeforePhysicsUpdate event.
-/// \param[in] updateInfo Information about the event time and world.
-///
-/// Record it's been called and also record the reported ball position.
-void beforePhysicsUpdate(const common::UpdateInfo& updateInfo)
-{
-  beforePhysicsUpdateCalled = true;
-
-  physics::WorldPtr world = physics::get_world(updateInfo.worldName);
-  ASSERT_TRUE(world != NULL);
-
-  physics::ModelPtr sphereModel = world->GetModel("sphere");
-  ASSERT_TRUE(sphereModel != NULL);
-
-  physics::LinkPtr link = sphereModel->GetLink("link");
-  ASSERT_TRUE(link != NULL);
-
-  poseBeforeUpdate = link->GetWorldPose();
-}
-
-/// \brief Callback for WorldUpdateEnd event, just records it's been called.
-void onWorldUpdateEnd()
-{
-  updateEndCalled = true;
-}
-
 /////////////////////////////////////////////////
+/// \brief Check if WorldUpdateBegin, BeforePhysicsUpdate and WorldUpdateEnd
+/// events are called, and if the BeforePhysicsUpdate event is really called
+/// before the physics engine update happens
 TEST_F(WorldTest, CheckWorldEventsWork)
 {
-  // Check if WorldUpdateBegin, BeforePhysicsUpdate and WorldUpdateEnd events
-  // are called, and if the BeforePhysicsUpdate event is really called before
-  // the physics engine update happens
-
   Load("worlds/shapes.world");
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
@@ -416,7 +418,7 @@ TEST_F(WorldTest, CheckWorldEventsWork)
   world->Step(10);
 
   // initial pose of the link
-  initialPose = link->GetWorldPose();
+  ignition::math::Pose3d initialPose = link->GetWorldPose().Ign();
 
   // connect to the world events
   event::ConnectionPtr worldUpdateBeginEventConnection =
@@ -430,38 +432,35 @@ TEST_F(WorldTest, CheckWorldEventsWork)
 
   // iterate for a while pushing to the ball and check the events get called
   // and that the pose changes only after BeforePhysicUpdate is called.
-  for (size_t i = 0; i < 100; i++)
+  for (size_t i = 0; i < 100; ++i)
   {
-    ASSERT_FALSE(updateBeginCalled);
-    ASSERT_FALSE(beforePhysicsUpdateCalled);
-    ASSERT_FALSE(updateEndCalled);
+    ASSERT_FALSE(g_updateBeginCalled);
+    ASSERT_FALSE(g_beforePhysicsUpdateCalled);
+    ASSERT_FALSE(g_updateEndCalled);
 
     // push to the ball
-    link->AddForce(math::Vector3(1000, 0, 0));
+    link->AddForce(ignition::math::Vector3d(1000, 0, 0));
 
     world->Step(1);
 
     // pose after the physics update
-    math::Pose poseAfterUpdate = link->GetWorldPose();
+    ignition::math::Pose3d poseAfterUpdate = link->GetWorldPose().Ign();
 
     // initial pose and pose before physics update should be the same
-    EXPECT_EQ(initialPose.pos.x, poseBeforeUpdate.pos.x);
-    EXPECT_EQ(initialPose.pos.y, poseBeforeUpdate.pos.y);
-    EXPECT_EQ(initialPose.pos.z, poseBeforeUpdate.pos.z);
+    EXPECT_EQ(initialPose.Pos(), g_poseBeforeUpdate.Pos());
 
     // pose before physics update and after it should be different
-    EXPECT_FALSE(
-            fabs(poseAfterUpdate.pos.x - poseBeforeUpdate.pos.x) +
-                    fabs(poseAfterUpdate.pos.y - poseBeforeUpdate.pos.y) +
-                    fabs(poseAfterUpdate.pos.z - poseBeforeUpdate.pos.z)
-            < 1e-9);
+    EXPECT_GT((g_poseAfterUpdate - g_poseBeforeUpdate).Pos().Abs().Sum(), 1e-9);
 
     // the events should get called
-    EXPECT_TRUE(updateBeginCalled);
-    EXPECT_TRUE(beforePhysicsUpdateCalled);
-    EXPECT_TRUE(updateEndCalled);
+    EXPECT_TRUE(g_updateBeginCalled);
+    EXPECT_TRUE(g_beforePhysicsUpdateCalled);
+    EXPECT_TRUE(g_updateEndCalled);
 
-    updateBeginCalled = beforePhysicsUpdateCalled = updateEndCalled = false;
+    g_updateBeginCalled = false;
+    g_beforePhysicsUpdateCalled = false;
+    g_updateEndCalled = false;
+
     // remember the current pose to compare it in the next iteration
     initialPose = poseAfterUpdate;
   }
