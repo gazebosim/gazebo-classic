@@ -141,6 +141,15 @@ void AtmosphereTest::AtmosphereParamBool
   EXPECT_NEAR(atmosphere.Pressure(), 101325, 1e-6);
   EXPECT_NEAR(atmosphere.TemperatureGradient(), -0.0065, 1e-6);
   EXPECT_EQ(atmosphere.Type(), _atmosphere);
+
+  // Test atmosphere model parameters at a given altitude
+  if (_atmosphere == "adiabatic")
+  {
+    double altitude = 1000;
+    EXPECT_NEAR(atmosphere.Temperature(altitude), 281.64999999999998, 1e-6);
+    EXPECT_NEAR(atmosphere.MassDensity(altitude), 1.1117154882870524, 1e-6);
+    EXPECT_NEAR(atmosphere.Pressure(altitude), 89882.063292207444, 1e-6);
+  }
 }
 
 /////////////////////////////////////////////////

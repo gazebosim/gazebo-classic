@@ -55,6 +55,7 @@ GZ_REGISTER_ATMOSPHERE_MODEL("adiabatic", AdiabaticAtmosphere)
 AdiabaticAtmosphere::AdiabaticAtmosphere(physics::World &_world)
   : Atmosphere(_world), dataPtr(new AdiabaticAtmospherePrivate)
 {
+  this->ComputeAdiabaticPower();
 }
 
 //////////////////////////////////////////////////
@@ -66,11 +67,6 @@ AdiabaticAtmosphere::~AdiabaticAtmosphere()
 void AdiabaticAtmosphere::Load(sdf::ElementPtr _sdf)
 {
   Atmosphere::Load(_sdf);
-}
-
-//////////////////////////////////////////////////
-void AdiabaticAtmosphere::Init()
-{
   this->ComputeAdiabaticPower();
 }
 
