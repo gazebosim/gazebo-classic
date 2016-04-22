@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_GUI_MODELEDITORPALETTE_HH_
-#define _GAZEBO_GUI_MODELEDITORPALETTE_HH_
+#ifndef GAZEBO_GUI_MODEL_MODELEDITORPALETTE_HH_
+#define GAZEBO_GUI_MODEL_MODELEDITORPALETTE_HH_
 
 #include <memory>
 #include <string>
@@ -75,7 +75,7 @@ namespace gazebo
 
       /// \brief Get the model creator.
       /// \return a pointer to the model creator.
-      public: ModelCreator *GetModelCreator();
+      public: gui::ModelCreator *ModelCreator();
 
       /// \brief Key event filter callback when key is pressed.
       /// \param[in] _event The key event.

@@ -18,16 +18,41 @@
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/KeyEvent.hh"
-#include "gazebo/common/MouseEvent.hh"
 
 #include "gazebo/gui/Actions.hh"
-#include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/KeyEventHandler.hh"
 #include "gazebo/gui/model/ExtrudeDialog.hh"
 #include "gazebo/gui/model/ImportDialog.hh"
 #include "gazebo/gui/model/ModelEditorPalette.hh"
-#include "gazebo/gui/model/ModelEditorPalettePrivate.hh"
+
+namespace gazebo
+{
+  namespace gui
+  {
+    /// \internal
+    /// \class ModelEditorPalette ModelEditorPalette.hh
+    /// \brief Private data for the ModelEditorPalette class.
+    class ModelEditorPalettePrivate
+    {
+      /// \brief Links button group.
+      public: QButtonGroup *linkButtonGroup;
+
+      /// \brief Model creator.
+      public: ModelCreator *modelCreator;
+
+      /// \brief Layout for other items in the palette.
+      public: QVBoxLayout *otherItemsLayout;
+
+      /// \brief Map of categories to their layout
+      public: std::map<std::string, QGridLayout *> categories;
+
+      /// \brief Vertical splitter between widgets.
+      public: QSplitter *splitter;
+    };
+  }
+}
 
 using namespace gazebo;
 using namespace gui;
@@ -108,8 +133,9 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   this->dataPtr->linkButtonGroup->addButton(boxButton);
   this->dataPtr->linkButtonGroup->addButton(customButton);
 
-  this->dataPtr->modelCreator = new ModelCreator(this);
-  connect(this->dataPtr->modelCreator, SIGNAL(LinkAdded()), this, SLOT(OnLinkAdded()));
+  this->dataPtr->modelCreator = new gui::ModelCreator(this);
+  connect(this->dataPtr->modelCreator, SIGNAL(LinkAdded()), this,
+      SLOT(OnLinkAdded()));
 
   this->dataPtr->otherItemsLayout = new QVBoxLayout();
   this->dataPtr->otherItemsLayout->setContentsMargins(0, 0, 0, 0);
@@ -151,8 +177,6 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
 /////////////////////////////////////////////////
 ModelEditorPalette::~ModelEditorPalette()
 {
-  delete this->dataPtr->modelCreator;
-  this->dataPtr->modelCreator = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -318,7 +342,7 @@ bool ModelEditorPalette::OnKeyPress(const common::KeyEvent &_event)
 }
 
 /////////////////////////////////////////////////
-ModelCreator *ModelEditorPalette::GetModelCreator()
+gui::ModelCreator *ModelEditorPalette::ModelCreator()
 {
   return this->dataPtr->modelCreator;
 }
