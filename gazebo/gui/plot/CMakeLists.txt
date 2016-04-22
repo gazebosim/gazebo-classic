@@ -9,6 +9,7 @@ set (sources_local
   plot/PlotManager.cc
   plot/Palette.cc
   plot/PlotWindow.cc
+  plot/TopicCurveHandler.cc
   plot/VariablePill.cc
   plot/VariablePillContainer.cc
 )
@@ -34,6 +35,7 @@ set (qt_tests_local
   PlotCanvas_TEST.cc
   PlotCurve_TEST.cc
   PlotWindow_TEST.cc
+  TopicCurveHandler_TEST.cc
   VariablePill_TEST.cc
   VariablePillContainer_TEST.cc
 )
