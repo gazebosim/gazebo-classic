@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -200,15 +200,15 @@ namespace gazebo
 
     private: bool bind(const char *address, uint16_t port)
     {
-        struct sockaddr_in sockaddr;
-        make_sockaddr(address, port, sockaddr);
+      struct sockaddr_in sockaddr;
+      make_sockaddr(address, port, sockaddr);
 
-        if (::bind(this->handle,
-          (struct sockaddr *)&sockaddr, sizeof(sockaddr)) != 0)
-        {
-            return false;
-        }
-        return true;
+      if (::bind(this->handle,
+        (struct sockaddr *)&sockaddr, sizeof(sockaddr)) != 0)
+      {
+        return false;
+      }
+      return true;
     }
 
     // socket stuff

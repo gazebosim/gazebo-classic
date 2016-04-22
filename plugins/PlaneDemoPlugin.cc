@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -187,9 +187,9 @@ void PlaneDemoPlugin::Init()
 {
   this->lastUpdateTime = this->world->GetSimTime();
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-          boost::bind(&PlaneDemoPlugin::OnUpdate, this));
+          std::bind(&PlaneDemoPlugin::OnUpdate, this));
   this->keyHitThread =
-    new boost::thread(boost::bind(&PlaneDemoPlugin::OnKeyHit, this));
+    new std::thread(std::bind(&PlaneDemoPlugin::OnKeyHit, this));
   this->stop = false;
 }
 
@@ -200,7 +200,7 @@ void PlaneDemoPlugin::OnKeyHit()
   ch = getchar();
   while (!this->stop)
   {
-    boost::mutex::scoped_lock lock(this->mutex);
+    std::lock_guard<std::mutex> lock(this->mutex);
     printf("you hit");
     printf(" '%c'(%i)", isprint(ch)?ch:'?', static_cast<int>(ch));
     // puts("");
@@ -288,7 +288,7 @@ void PlaneDemoPlugin::OnKeyHit()
 /////////////////////////////////////////////////
 void PlaneDemoPlugin::OnUpdate()
 {
-  boost::mutex::scoped_lock lock(this->mutex);
+  std::lock_guard<std::mutex> lock(this->mutex);
   common::Time curTime = this->world->GetSimTime();
   for (std::vector<EngineControl>::iterator ei = this->engineControls.begin();
     ei != this->engineControls.end(); ++ei)

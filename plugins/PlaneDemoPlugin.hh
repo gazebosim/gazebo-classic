@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,11 @@
 #ifndef _GAZEBO_PLANE_DEMO_PLUGIN_HH_
 #define _GAZEBO_PLANE_DEMO_PLUGIN_HH_
 
+#include <thread>
 #include <string>
 #include <vector>
+
+#include <ignition/math.hh>
 
 #include "gazebo/common/common.hh"
 #include "gazebo/physics/physics.hh"
@@ -103,8 +106,8 @@ namespace gazebo
 
     private: bool stop;
     private: void OnKeyHit();
-    private: boost::thread *keyHitThread;
-    private: boost::mutex mutex;
+    private: std::thread *keyHitThread;
+    private: std::mutex mutex;
   };
 }
 #endif

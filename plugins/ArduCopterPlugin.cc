@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,16 +74,14 @@ void ArduCopterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
       }
       else
       {
-        gzwarn << "[ArduCopterPlugin] id attribute not specified,"
-               << " check motorNumber.\n";
+        gzwarn << "id attribute not specified, check motorNumber.\n";
         if (rotorSDF->HasElement("motorNumber"))
         {
           rotor.id = rotorSDF->Get<int>("motorNumber");
         }
         else
         {
-          gzwarn << "[ArduCopterPlugin] motorNumber not specified,"
-                 << " use order parsed.\n";
+          gzwarn << "motorNumber not specified, use order parsed.\n";
           rotor.id = this->rotors.size();
         }
       }
@@ -91,23 +89,22 @@ void ArduCopterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
       if (rotorSDF->HasElement("jointName"))
         rotor.jointName = rotorSDF->Get<std::string>("jointName");
       else
-        gzerr << "[ArduCopterPlugin] Please specify a jointName,"
+        gzerr << "Please specify a jointName,"
               << " where the rotor is attached.\n";
       // Get the pointer to the joint.
       rotor.joint = _model->GetJoint(rotor.jointName);
       if (rotor.joint == NULL)
-        gzthrow("[ArduCopterPlugin] Couldn't find specified"
-              << " joint [" << rotor.jointName << "].");
+        gzthrow("Couldn't find specified joint ["
+                << rotor.jointName << "].");
 
       if (rotorSDF->HasElement("linkName"))
         rotor.linkName = rotorSDF->Get<std::string>("linkName");
       else
-        gzerr << "[ArduCopterPlugin] Please specify a linkName for"
-              << " the rotor\n";
+        gzerr << "Please specify a linkName for the rotor\n";
       rotor.link = _model->GetLink(rotor.linkName);
       if (rotor.link == NULL)
-        gzthrow("[ArduCopterPlugin] Couldn't find specified"
-              << " link [" << rotor.linkName << "].");
+        gzthrow("Couldn't find specified link ["
+                << rotor.linkName << "].");
 
       if (rotorSDF->HasElement("turningDirection"))
       {
@@ -120,15 +117,14 @@ void ArduCopterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
           rotor.multiplier = 1;
         else
         {
-          gzdbg << "[ArduCopterPlugin] not string,"
-                << " check turningDirection as float\n";
+          gzdbg << "not string, check turningDirection as float\n";
           rotor.multiplier = rotorSDF->Get<double>("turningDirection");
         }
       }
       else
       {
         rotor.multiplier = 1;
-        gzerr << "[ArduCopterPlugin] Please specify a turning"
+        gzerr << "Please specify a turning"
               << " direction multiplier ('cw' or 'ccw'). Default 1.\n";
       }
 
@@ -190,10 +186,6 @@ void ArduCopterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   // iteration.
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
     boost::bind(&ArduCopterPlugin::Update, this, _1));
-
-  // Initialize transport.
-  // this->node = transport::NodePtr(new transport::Node());
-  // this->node->Init();
 
   gzlog << "ArduCopter ready to fly. The force will be with you" << std::endl;
 }
@@ -266,7 +258,7 @@ void ArduCopterPlugin::SendState()
   //   z down
 
   // get linear acceleration in body frame
-  math::Vector3 linearAccel = this->imuSensor->LinearAcceleration();
+  ignition::math::Vector3d linearAccel = this->imuSensor->LinearAcceleration();
 
   // rotate gravity into imu frame, subtract it
   // math::Vector3 gravity =
@@ -275,17 +267,17 @@ void ArduCopterPlugin::SendState()
   //   this->imuLink.GetWorldPose().rot.RotateVectorReverse(gravity);
 
   // copy to pkt
-  pkt.imu_linear_acceleration_xyz[0] = linearAccel.x;
-  pkt.imu_linear_acceleration_xyz[1] = linearAccel.y;
-  pkt.imu_linear_acceleration_xyz[2] = linearAccel.z;
+  pkt.imu_linear_acceleration_xyz[0] = linearAccel.X();
+  pkt.imu_linear_acceleration_xyz[1] = linearAccel.Y();
+  pkt.imu_linear_acceleration_xyz[2] = linearAccel.Z();
   // gzerr << "lin accel [" << linearAccel << "]\n";
 
   // get angular velocity in body frame
-  math::Vector3 angularVel = this->imuSensor->AngularVelocity();
+  ignition::math::Vector3d angularVel = this->imuSensor->AngularVelocity();
   // copy to pkt
-  pkt.imu_angular_velocity_rpy[0] = angularVel.x;
-  pkt.imu_angular_velocity_rpy[1] = angularVel.y;
-  pkt.imu_angular_velocity_rpy[2] = angularVel.z;
+  pkt.imu_angular_velocity_rpy[0] = angularVel.X();
+  pkt.imu_angular_velocity_rpy[1] = angularVel.Y();
+  pkt.imu_angular_velocity_rpy[2] = angularVel.Z();
 
   // get orientation with offset added
   // math::Quaternion worldQ = this->imuSensor->Orientation();
