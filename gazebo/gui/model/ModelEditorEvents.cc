@@ -40,6 +40,9 @@ event::EventT<void (sdf::ElementPtr)>
     model::Events::requestNestedModelInsertion;
 event::EventT<void (std::string)> model::Events::requestNestedModelRemoval;
 
+event::EventT<void (std::string, ignition::math::Pose3d)>
+    model::Events::requestNestedModelMove;
+
 // Links
 event::EventT<void (std::string)> model::Events::linkInserted;
 event::EventT<void (std::string)> model::Events::linkRemoved;
@@ -50,6 +53,9 @@ event::EventT<void (std::string)> model::Events::requestLinkRemoval;
 event::EventT<void (std::string)> model::Events::openLinkInspector;
 event::EventT<void (std::string)> model::Events::showLinkContextMenu;
 event::EventT<void (std::string, bool)> model::Events::setSelectedLink;
+
+event::EventT<void (std::string, ignition::math::Pose3d)>
+    model::Events::requestLinkMove;
 
 // Joints
 event::EventT<void (std::string, std::string, std::string, std::string,

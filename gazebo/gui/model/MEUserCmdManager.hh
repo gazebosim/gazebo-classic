@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_GUI_MODEL_MEUSERCMDMANAGER_HH_
-#define _GAZEBO_GUI_MODEL_MEUSERCMDMANAGER_HH_
+#ifndef GAZEBO_GUI_MODEL_MEUSERCMDMANAGER_HH_
+#define GAZEBO_GUI_MODEL_MEUSERCMDMANAGER_HH_
 
 #include <memory>
 #include <string>
@@ -64,7 +64,13 @@ namespace gazebo
         INSERTING_JOINT,
 
         /// \brief Delete a joint.
-        DELETING_JOINT
+        DELETING_JOINT,
+
+        /// \brief Move a link.
+        MOVING_LINK,
+
+        /// \brief Move a nested model.
+        MOVING_NESTED_MODEL
       };
 
       /// \brief Constructor
@@ -103,6 +109,9 @@ namespace gazebo
       /// \brief Set the unique id of the joint related to this command.
       /// \param[in] _id Unique id of joint.
       public: void SetJointId(const std::string &_id);
+
+      public: void SetPoseChange(const ignition::math::Pose3d &_before,
+          const ignition::math::Pose3d &_after);
 
       /// \internal
       /// \brief Pointer to private data.

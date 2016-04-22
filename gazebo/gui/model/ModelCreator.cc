@@ -183,6 +183,13 @@ namespace gazebo
       /// \brief A list of link names whose scale has changed externally.
       public: std::map<std::string, ignition::math::Vector3d> linkScaleUpdate;
 
+      /// \brief A list of link data whose pose has changed externally.
+      public: std::map<LinkData *, ignition::math::Pose3d> linkPoseUpdate;
+
+      /// \brief A list of nested model data whose pose has changed externally.
+      public: std::map<NestedModelData *, ignition::math::Pose3d>
+          nestedModelPoseUpdate;
+
       /// \brief Name of model on the server that is being edited here in the
       /// model editor.
       public: std::string serverModelName;
@@ -319,6 +326,11 @@ ModelCreator::ModelCreator(QObject *_parent)
       std::placeholders::_1, std::placeholders::_2)));
 
   this->dataPtr->connections.push_back(
+      gui::Events::ConnectMoveEntity(
+      std::bind(&ModelCreator::OnEntityMoved, this,
+      std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+
+  this->dataPtr->connections.push_back(
       gui::model::Events::ConnectShowLinkContextMenu(
       std::bind(&ModelCreator::ShowContextMenu, this, std::placeholders::_1)));
 
@@ -351,9 +363,6 @@ ModelCreator::ModelCreator(QObject *_parent)
       std::placeholders::_1)));
 
   this->dataPtr->connections.push_back(
-      event::Events::ConnectPreRender(std::bind(&ModelCreator::Update, this)));
-
-  this->dataPtr->connections.push_back(
       gui::model::Events::ConnectModelPropertiesChanged(
       std::bind(&ModelCreator::OnPropertiesChanged, this, std::placeholders::_1,
       std::placeholders::_2)));
@@ -362,6 +371,16 @@ ModelCreator::ModelCreator(QObject *_parent)
       gui::model::Events::ConnectRequestModelPluginInsertion(
       std::bind(&ModelCreator::OnAddModelPlugin, this,
       std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+
+  this->dataPtr->connections.push_back(
+      gui::model::Events::ConnectRequestLinkMove(
+      std::bind(&ModelCreator::OnRequestLinkMove, this, std::placeholders::_1,
+      std::placeholders::_2)));
+
+  this->dataPtr->connections.push_back(
+      gui::model::Events::ConnectRequestNestedModelMove(
+      std::bind(&ModelCreator::OnRequestNestedModelMove, this,
+      std::placeholders::_1, std::placeholders::_2)));
 
   if (g_copyAct)
   {
@@ -2040,6 +2059,39 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
     return true;
   }
 
+  // Set all links as not preview
+//  for (auto &link : this->dataPtr->allLinks)
+  //  link.second->SetIsPreview(false);
+
+  // End moving links
+  for (auto link : this->dataPtr->linkPoseUpdate)
+  {
+    auto cmd = this->dataPtr->userCmdManager->NewCmd(
+        "Move [" + link.first->Name() + "]", MEUserCmd::MOVING_LINK);
+    cmd->SetScopedName(link.first->linkVisual->GetName());
+    cmd->SetPoseChange(link.first->Pose(), link.second);
+
+    link.first->SetPose(link.second);
+  }
+  if (!this->dataPtr->linkPoseUpdate.empty())
+    this->ModelChanged();
+  this->dataPtr->linkPoseUpdate.clear();
+
+  // End moving nested models
+  for (auto nestedModel : this->dataPtr->nestedModelPoseUpdate)
+  {
+    auto cmd = this->dataPtr->userCmdManager->NewCmd(
+        "Move [" + nestedModel.first->Name() + "]",
+        MEUserCmd::MOVING_NESTED_MODEL);
+    cmd->SetScopedName(nestedModel.first->modelVisual->GetName());
+    cmd->SetPoseChange(nestedModel.first->Pose(), nestedModel.second);
+
+    nestedModel.first->SetPose(nestedModel.second);
+  }
+  if (!this->dataPtr->nestedModelPoseUpdate.empty())
+    this->ModelChanged();
+  this->dataPtr->nestedModelPoseUpdate.clear();
+
   // mouse selection and context menu events
   rendering::VisualPtr vis = userCamera->GetVisual(_event.Pos());
   if (vis)
@@ -2701,7 +2753,14 @@ void ModelCreator::OnAlignMode(const std::string &_axis,
     const std::string &_config, const std::string &_target, const bool _preview,
     const bool _inverted)
 {
-  ModelAlign::Instance()->AlignVisuals(this->dataPtr->selectedLinks, _axis,
+  // FIXME: This messes up the order in which things were selected
+//  std::vector<rendering::VisualPtr> allSelected;
+//  for (auto vis : this->dataPtr->selectedLinks)
+//    allSelected.push_back(vis);
+//  for (auto vis : this->dataPtr->selectedNestedModels)
+//    allSelected.push_back(vis);
+
+  ModelAlign::Instance()->AlignVisuals(allSelected, _axis,
       _config, _target, !_preview, _inverted);
 }
 
@@ -2901,44 +2960,6 @@ void ModelCreator::ModelChanged()
 }
 
 /////////////////////////////////////////////////
-void ModelCreator::Update()
-{
-  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->updateMutex);
-
-  // Check if any links have been moved or resized and trigger ModelChanged
-  for (auto &linksIt : this->dataPtr->allLinks)
-  {
-    LinkData *link = linksIt.second;
-    if (link->Pose() != link->linkVisual->GetPose().Ign())
-    {
-      link->SetPose(link->linkVisual->GetWorldPose().Ign() -
-          this->dataPtr->modelPose);
-      this->ModelChanged();
-    }
-    for (auto &scaleIt : this->dataPtr->linkScaleUpdate)
-    {
-      if (link->linkVisual->GetName() == scaleIt.first)
-        link->SetScale(scaleIt.second);
-    }
-  }
-  if (!this->dataPtr->linkScaleUpdate.empty())
-    this->ModelChanged();
-  this->dataPtr->linkScaleUpdate.clear();
-
-  // check nested model
-  for (auto &nestedModelIt : this->dataPtr->allNestedModels)
-  {
-    NestedModelData *nestedModel = nestedModelIt.second;
-    if (nestedModel->Pose() != nestedModel->modelVisual->GetPose().Ign())
-    {
-      nestedModel->SetPose((nestedModel->modelVisual->GetWorldPose() -
-          this->dataPtr->modelPose).Ign());
-      this->ModelChanged();
-    }
-  }
-}
-
-/////////////////////////////////////////////////
 void ModelCreator::OnEntityScaleChanged(const std::string &_name,
   const gazebo::math::Vector3 &_scale)
 {
@@ -2952,6 +2973,54 @@ void ModelCreator::OnEntityScaleChanged(const std::string &_name,
     if (_name == linksIt.first || linkName == linksIt.first)
     {
       this->dataPtr->linkScaleUpdate[linksIt.first] = _scale.Ign();
+      break;
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::OnEntityMoved(const std::string &_name,
+  const ignition::math::Pose3d &_pose, const bool _finalPoseForSure)
+{
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->updateMutex);
+  for (auto linksIt : this->dataPtr->allLinks)
+  {
+    std::string linkName;
+    size_t pos = _name.rfind("::");
+    if (pos != std::string::npos)
+      linkName = _name.substr(0, pos);
+    if (_name == linksIt.first || linkName == linksIt.first)
+    {
+      // Register user command
+      if (_finalPoseForSure)
+      {
+        auto cmd = this->dataPtr->userCmdManager->NewCmd(
+            "Move [" + linksIt.second->Name() + "]", MEUserCmd::MOVING_LINK);
+        cmd->SetScopedName(linksIt.second->linkVisual->GetName());
+        cmd->SetPoseChange(linksIt.second->Pose(), _pose);
+
+        linksIt.second->SetPose(_pose);
+        this->ModelChanged();
+      }
+      // Only register command on MouseRelease
+      else
+      {
+        this->dataPtr->linkPoseUpdate[linksIt.second] = _pose;
+      }
+
+      break;
+    }
+  }
+  for (auto nestedModelsIt : this->dataPtr->allNestedModels)
+  {
+    std::string nestedModelName;
+    size_t pos = _name.rfind("::");
+    if (pos != std::string::npos)
+      nestedModelName = _name.substr(0, pos);
+    if (_name == nestedModelsIt.first ||
+        nestedModelName == nestedModelsIt.first)
+    {
+      this->dataPtr->nestedModelPoseUpdate[nestedModelsIt.second] = _pose;
       break;
     }
   }
@@ -3088,4 +3157,28 @@ void ModelCreator::OpenModelPluginInspector(const std::string &_name)
   ModelPluginData *modelPlugin = it->second;
   modelPlugin->inspector->move(QCursor::pos());
   modelPlugin->inspector->show();
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::OnRequestLinkMove(const std::string &_name,
+    const ignition::math::Pose3d &_pose)
+{
+  auto link = this->dataPtr->allLinks.find(_name);
+  if (link == this->dataPtr->allLinks.end())
+    return;
+
+  link->second->linkVisual->SetPose(_pose);
+  link->second->SetPose(_pose);
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::OnRequestNestedModelMove(const std::string &_name,
+    const ignition::math::Pose3d &_pose)
+{
+  auto nestedModel = this->dataPtr->allNestedModels.find(_name);
+  if (nestedModel == this->dataPtr->allNestedModels.end())
+    return;
+
+  nestedModel->second->modelVisual->SetPose(_pose);
+  nestedModel->second->SetPose(_pose);
 }

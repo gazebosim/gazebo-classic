@@ -14,12 +14,11 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_GUI_MODEL_MODELEDITOREVENTS_HH_
-#define _GAZEBO_GUI_MODEL_MODELEDITOREVENTS_HH_
+#ifndef GAZEBO_GUI_MODEL_MODELEDITOREVENTS_HH_
+#define GAZEBO_GUI_MODEL_MODELEDITOREVENTS_HH_
 
 #include <string>
 #include <sdf/sdf.hh>
-#include "gazebo/math/Pose.hh"
 #include "gazebo/common/Event.hh"
 #include "gazebo/util/system.hh"
 
@@ -195,6 +194,36 @@ namespace gazebo
         public: static void DisconnectRequestNestedModelInsertion(
             event::ConnectionPtr _subscriber)
           { requestNestedModelInsertion.Disconnect(_subscriber); }
+
+        /// \brief Connect a Gazebo event to the request link move signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectRequestLinkMove(
+            T _subscriber)
+          { return requestLinkMove.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the request link move signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectRequestLinkMove(
+            event::ConnectionPtr _subscriber)
+          { requestLinkMove.Disconnect(_subscriber); }
+
+        /// \brief Connect a Gazebo event to the request nested model move
+        /// signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectRequestNestedModelMove(
+            T _subscriber)
+          { return requestNestedModelMove.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the request nested model move
+        /// signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectRequestNestedModelMove(
+            event::ConnectionPtr _subscriber)
+          { requestNestedModelMove.Disconnect(_subscriber); }
 
         /// \brief Connect a Gazebo event to the nested model inserted signal.
         /// \param[in] _subscriber the subscriber to this event
@@ -683,6 +712,14 @@ namespace gazebo
         /// \brief Request to insert a model plugin.
         public: static event::EventT<void (std::string, std::string,
             std::string)> requestModelPluginInsertion;
+
+        /// \brief Request to move a link.
+        public: static event::EventT<void (std::string, ignition::math::Pose3d)>
+            requestLinkMove;
+
+        /// \brief Request to move a nestedModel.
+        public: static event::EventT<void (std::string, ignition::math::Pose3d)>
+            requestNestedModelMove;
       };
     }
   }
