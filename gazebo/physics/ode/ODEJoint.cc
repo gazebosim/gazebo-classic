@@ -55,14 +55,27 @@ ODEJoint::ODEJoint(BasePtr _parent)
 //////////////////////////////////////////////////
 ODEJoint::~ODEJoint()
 {
+  this->Fini();
+}
+
+//////////////////////////////////////////////////
+void ODEJoint::Fini()
+{
   if (this->applyDamping)
     physics::Joint::DisconnectJointUpdate(this->applyDamping);
+  this->applyDamping.reset();
 
-  delete this->feedback;
+  if (this->feedback)
+    delete this->feedback;
+  this->feedback = NULL;
+
   this->Detach();
 
   if (this->jointId)
     dJointDestroy(this->jointId);
+  this->jointId = NULL;
+
+  Joint::Fini();
 }
 
 //////////////////////////////////////////////////
@@ -210,15 +223,11 @@ void ODEJoint::Detach()
   this->childLink.reset();
   this->parentLink.reset();
 
-  // Something funky is happening that sometimes the parent and child links ODE
-  // pointers are cleared but gazebo objects remain valid.
-  if ((odeParent && odeParent->GetODEId() == NULL) ||
-      (odeChild && odeChild->GetODEId() == NULL))
+  // By the time we get here, links and ODEIds might have already been
+  // cleaned up
+  if ((odeParent == NULL || odeParent->GetODEId() == NULL) ||
+      (odeChild == NULL || odeChild->GetODEId() == NULL))
   {
-    gzerr << "Either child [" << odeChild->GetName() <<
-        "] has bad ODE pointer [" << odeChild->GetODEId() << "] or parent ["
-        << odeParent->GetName() << "] has bad ODE pointer [" <<
-        odeParent->GetODEId() << "]" << std::endl;
     return;
   }
 

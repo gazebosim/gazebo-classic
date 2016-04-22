@@ -63,6 +63,7 @@ Model::Model(BasePtr _parent)
 //////////////////////////////////////////////////
 Model::~Model()
 {
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -412,12 +413,13 @@ boost::shared_ptr<Model> Model::shared_from_this()
 //////////////////////////////////////////////////
 void Model::Fini()
 {
-  this->joints.clear();
-  this->plugins.clear();
   this->attachedModels.clear();
-  this->links.clear();
   this->canonicalLink.reset();
+  this->jointController.reset();
+  this->joints.clear();
+  this->links.clear();
   this->models.clear();
+  this->plugins.clear();
 
   Entity::Fini();
 }
