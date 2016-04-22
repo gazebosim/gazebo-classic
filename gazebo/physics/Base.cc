@@ -93,8 +93,12 @@ void Base::Fini()
 {
   // Remove self as a child of the parent
   if (this->parent)
-    this->parent->RemoveChild(this->id);
-  this->parent.reset();
+  {
+    auto temp = this->parent;
+    this->parent.reset();
+
+    temp->RemoveChild(this->id);
+  }
 
   // Also destroy all children.
   for (auto &iter : this->children)
@@ -199,8 +203,7 @@ void Base::RemoveChild(unsigned int _id)
   {
     if ((*iter)->GetId() == _id)
     {
-      // We don't own the child, it could be given to another parent.
-      // So we don't finish it.
+      (*iter)->Fini();
       this->children.erase(iter);
       break;
     }
