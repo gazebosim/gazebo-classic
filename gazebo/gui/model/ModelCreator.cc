@@ -895,6 +895,22 @@ void ModelCreator::AddJoint(const std::string &_type)
 }
 
 /////////////////////////////////////////////////
+void ModelCreator::AddCustomLink(const EntityType _type,
+    const ignition::math::Vector3d &_size, const ignition::math::Pose3d &_pose,
+    const std::string &_uri, const unsigned int _samples)
+{
+  this->Stop();
+
+  this->dataPtr->addEntityType = _type;
+  if (_type != ENTITY_NONE)
+  {
+    auto linkData = this->AddShape(_type, _size, _pose, _uri, _samples);
+    if (linkData)
+      this->dataPtr->mouseVisual = linkData->linkVisual;
+  }
+}
+
+/////////////////////////////////////////////////
 LinkData *ModelCreator::AddShape(const EntityType _type,
     const ignition::math::Vector3d &_size, const ignition::math::Pose3d &_pose,
     const std::string &_uri, const unsigned int _samples)
@@ -2188,7 +2204,9 @@ bool ModelCreator::OnMouseMove(const common::MouseEvent &_event)
   pose.Pos() = ModelManipulator::GetMousePositionOnPlane(
       userCamera, _event).Ign();
 
-  if (!_event.Shift())
+  // there is a problem detecting control key from common::MouseEvent, so
+  // check using Qt for now
+  if (QApplication::keyboardModifiers() & Qt::ControlModifier)
   {
     pose.Pos() = ModelManipulator::SnapPoint(pose.Pos()).Ign();
   }
