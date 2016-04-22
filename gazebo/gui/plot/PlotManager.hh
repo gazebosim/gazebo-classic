@@ -63,9 +63,9 @@ namespace gazebo
 
       /// \brief Add a topic curve to the manager. Data received from
       /// the topic subscriber will be added to the curve
-      /// \param[in] _name Name of topic
+      /// \param[in] _topic Name of topic
       /// \param[in] _curve Curve that will be populated with data.
-      public: void AddTopicCurve(const std::string &_name,
+      public: void AddTopicCurve(const std::string &_topic,
           PlotCurveWeakPtr _curve);
 
       /// \brief Remove a topic curve from the manager

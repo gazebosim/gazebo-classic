@@ -37,11 +37,11 @@ namespace gazebo
 {
   namespace gui
   {
-    /// \brief Time value for topic messages
+    /// \brief Time data for topic messages
     /// Gazebo messages are not timestamped so as a workaround this class
-    /// tries to match the message agains the nearest sim time.
-    /// WARNING: This produces inaccurate plots! A better solution is to
-    /// properly timestamp the messages.
+    /// tries to match the messages against the last sim time received.
+    /// WARNING: This produces plots with inaccurate x values!
+    /// A better solution is to properly timestamp the messages.
     class TopicTime : public SingletonT<TopicTime>
     {
       /// \brief Initialize the topic time helper class.
@@ -58,7 +58,7 @@ namespace gazebo
       /// \brief Node for communications.
       private: transport::NodePtr node;
 
-      /// \brief Mutex to protect the topic data updates.
+      /// \brief Mutex to protect the sime time updates.
       private: std::mutex mutex;
 
       /// \brief Subscriber to specified topic
@@ -68,7 +68,7 @@ namespace gazebo
       private: common::Time lastSimTime;
     };
 
-    /// \brief Helper class to update to curves associated with one topic
+    /// \brief Helper class to update curves associated with a single topic
     class TopicCurve
     {
       /// \def CurveVariableMapIt
@@ -88,15 +88,15 @@ namespace gazebo
       /// \param[in] _curve Pointer to the plot curve to add.
       public: bool AddCurve(const std::string &_query, PlotCurveWeakPtr _curve);
 
-      /// \brief Remove a curve from the topic data hander
+      /// \brief Remove a curve from the topic data handler
       /// \param[in] _curve Pointer to the plot curve to remove.
       public: bool RemoveCurve(PlotCurveWeakPtr _curve);
 
-      /// \brief Get whether this topic data handler has the specified curve
+      /// \brief Get whether the topic curve class has the specified curve.
       /// \return True if curve exists
       public: bool HasCurve(PlotCurveWeakPtr _curve) const;
 
-      /// \brief Get the number of curves managed by this handler
+      /// \brief Get the number of curves managed by this topic curve class.
       /// \return Number of curves
       public: unsigned int CurveCount() const;
 
@@ -104,7 +104,7 @@ namespace gazebo
       /// \param[in] _msg Message data
       public: void OnTopicData(const std::string &_msg);
 
-      /// \brief Update th plot curve based on message
+      /// \brief Update the plot curve based on message
       /// \param[in] _msg Message containing data to be added to the curve
       /// \param[in] _index Index of token in the param path string
       /// \param[in] _curvesUpdates A list of curves and values to update
@@ -126,7 +126,7 @@ namespace gazebo
       /// \brief Mutex to protect the topic data updates.
       private: mutable std::mutex mutex;
 
-      /// \brief Message type for the topic.
+      /// \brief Topic message type.
       private: std::string msgType;
 
       /// \brief A map of param names to plot curves.
@@ -313,7 +313,6 @@ void TopicCurve::OnTopicData(const std::string &_msg)
       if (!curve)
         continue;
 
-      // TODO what to put down for x?
       curve->AddPoint(ignition::math::Vector2d(x, curveUpdate.second));
     }
   }
@@ -343,14 +342,12 @@ void TopicCurve::UpdateCurve(google::protobuf::Message *_msg, const int _index,
     // loop through all the topic param name + curve pairs
     for (auto cIt = this->curves.begin(); cIt != this->curves.end(); ++cIt)
     {
-      std::string param = cIt->first;
-
       // parse param to get field at current index
       std::string topicField;
 
       std::string query = cIt->first;
 
-      // ?p=sim_time -> [?p, sim_time]
+      // tokenize query, e.g. ?p=sim_time -> [?p, sim_time]
       std::vector<std::string> queryTokens = common::split(query, "=/");
 
       // skip ?p
@@ -442,8 +439,7 @@ void TopicCurve::UpdateCurve(google::protobuf::Message *_msg, const int _index,
             else
               continue;
           }
-          else if (field->message_type()->name() ==
-              "Quaternion")
+          else if (field->message_type()->name() == "Quaternion")
           {
             msgs::Quaternion *msg =
                 dynamic_cast<msgs::Quaternion *>(valueMsg);
