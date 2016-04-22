@@ -22,8 +22,11 @@
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/test/helper_physics_generator.hh"
 
+#include "test/integration/joint_test.hh"
+
 using namespace gazebo;
 
+/// \brief Test removing different worlds.
 class WorldRemoveTest : public ServerFixture,
                         public testing::WithParamInterface<const char*>
 {
@@ -35,12 +38,17 @@ class WorldRemoveTest : public ServerFixture,
   /// joints.
   /// \param[in] _physicsEngines Physics engine to be tested.
   public: void RemoveWorldWithEntities(const std::string &_physicsEngine);
+};
 
+/// \brief Test removing worlds with joints. Inherits from JointTest to make
+/// use of SpawnJoint.
+class WorldRemoveJointsTest : public JointTest
+{
   /// \brief Test removing worlds which contain joints.
-  /// \param[in] _physicsEngines Physics engine to be tested.
-  /// \param[in] _worldName Path to the world to be tested.
-  public: void RemoveWorldWithJoints(const std::string &_physicsEngine,
-      const std::string &_worldName);
+  /// \param[in] _physicsEngine Type of physics engine to use.
+  /// \param[in] _jointType Type of joint to spawn and test.
+  public: void RemoveWorldWithJoint(const std::string &_physicsEngine,
+                                    const std::string &_jointType);
 };
 
 /////////////////////////////////////////////////
@@ -325,29 +333,42 @@ void WorldRemoveTest::RemoveWorldWithEntities(const std::string &_physicsEngine)
 }
 
 /////////////////////////////////////////////////
-void WorldRemoveTest::RemoveWorldWithJoints(const std::string &_physicsEngine,
-    const std::string &_worldName)
+TEST_P(WorldRemoveTest, RemoveBlankWorld)
 {
-  gzmsg << "Test world [" << _worldName << "] engine [" << _physicsEngine
-      << "]" << std::endl;
+  RemoveBlankWorld(GetParam());
+}
 
-  if (_physicsEngine != "ode" &&
-      _worldName.find("gearbox") != std::string::npos)
+/////////////////////////////////////////////////
+TEST_P(WorldRemoveTest, RemoveWorldWithEntities)
+{
+  RemoveWorldWithEntities(GetParam());
+}
+
+INSTANTIATE_TEST_CASE_P(WorldRemoveTest, WorldRemoveTest,
+                        PHYSICS_ENGINE_VALUES);
+
+/////////////////////////////////////////////////
+void WorldRemoveJointsTest::RemoveWorldWithJoint(
+    const std::string &_physicsEngine, const std::string &_jointType)
+{
+  gzmsg << "Test joint [" << _jointType << "] engine [" << _physicsEngine
+       << "]" << std::endl;
+
+  if (_physicsEngine != "ode" && _jointType == "gearbox")
   {
     gzerr << "Skip test, gearbox is only supported in ODE. " <<
          "See issues: #859, #1914, #1915" << std::endl;
     return;
   }
-  if (_physicsEngine == "simbody" &&
-      _worldName.find("revolute2") != std::string::npos)
+  if (_physicsEngine == "simbody" && _jointType == "revolute2")
   {
     gzerr << "Skip test, revolute2 not supported in Simbody, see issue #859."
           << std::endl;
     return;
   }
 
-  // Load a world with entities
-  this->Load(_worldName, false, _physicsEngine);
+  // Load an empty world
+  this->Load("worlds/empty.world", true, _physicsEngine);
 
   // Give time for everything to be created
   int sleep = 0;
@@ -361,12 +382,23 @@ void WorldRemoveTest::RemoveWorldWithJoints(const std::string &_physicsEngine,
   // Check there are worlds running
   EXPECT_TRUE(physics::worlds_running());
 
+  // Spawn a model with a joint
+  auto joint = SpawnJoint(_jointType, false, false);
+  ASSERT_TRUE(joint != NULL);
+
   // Get world pointer
   auto world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
   auto worldPtrCount = world.use_count();
   EXPECT_GT(worldPtrCount, 1);
+
+  // Get model pointer
+  auto model = world->GetModel("joint_model0");
+  ASSERT_TRUE(model != NULL);
+
+  // Check model has the joint
+  EXPECT_EQ(joint, model->GetJoint("joint"));
 
   // Get physics engine pointer
   auto physicsEngine = world->GetPhysicsEngine();
@@ -381,14 +413,6 @@ void WorldRemoveTest::RemoveWorldWithJoints(const std::string &_physicsEngine,
 
   auto worldTopicCount = WorldTopicCount(msgTypes);
   EXPECT_GT(worldTopicCount, 0u);
-
-  // Get model pointer
-  auto model = world->GetModel("model");
-  ASSERT_TRUE(model != NULL);
-
-  // Get joint pointer
-  auto joint = model->GetJoint("joint");
-  ASSERT_TRUE(joint != NULL);
 
   // Stats before removing world
   gzmsg << "Stats before removing world:" << std::endl
@@ -463,37 +487,34 @@ void WorldRemoveTest::RemoveWorldWithJoints(const std::string &_physicsEngine,
         << std::endl;
 }
 
-/////////////////////////////////////////////////
-TEST_P(WorldRemoveTest, RemoveBlankWorld)
+///////////////////////////////////////////////////
+TEST_P(WorldRemoveJointsTest, RemoveWorldWithJoint)
 {
-  RemoveBlankWorld(GetParam());
+  if (this->jointType == "gearbox" && this->physicsEngine != "ode")
+  {
+    gzerr << "Skip test, gearbox is only supported in ODE. " <<
+         "See issues: #859, #1914, #1915" << std::endl;
+    return;
+  }
+  if (physicsEngine == "simbody" && jointType == "revolute2")
+  {
+    gzerr << "Skip test, revolute2 not supported in simbody, see issue #859."
+          << std::endl;
+    return;
+  }
+  RemoveWorldWithJoint(this->physicsEngine, this->jointType);
 }
 
-/////////////////////////////////////////////////
-TEST_P(WorldRemoveTest, RemoveWorldWithEntities)
-{
-  RemoveWorldWithEntities(GetParam());
-}
-
-/////////////////////////////////////////////////
-TEST_P(WorldRemoveTest, RemoveWorldWithJoints)
-{
-  std::vector<std::string> worlds;
-  worlds.push_back("test/worlds/joint_fixed.world");
-  worlds.push_back("test/worlds/joint_revolute.world");
-  worlds.push_back("test/worlds/joint_revolute2.world");
-  worlds.push_back("test/worlds/joint_prismatic.world");
-  worlds.push_back("test/worlds/joint_universal.world");
-  worlds.push_back("test/worlds/joint_screw.world");
-  worlds.push_back("test/worlds/joint_ball.world");
-  worlds.push_back("test/worlds/joint_gearbox.world");
-
-  for (auto world : worlds)
-    RemoveWorldWithJoints(GetParam(), world);
-}
-
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, WorldRemoveTest,
-                        PHYSICS_ENGINE_VALUES);
+INSTANTIATE_TEST_CASE_P(RemoveJointTypes, WorldRemoveJointsTest,
+  ::testing::Combine(PHYSICS_ENGINE_VALUES,
+  ::testing::Values("revolute"
+                  , "prismatic"
+                  , "screw"
+                  , "universal"
+                  , "fixed"
+                  , "ball"
+                  , "revolute2"
+                  , "gearbox")));
 
 int main(int argc, char **argv)
 {
