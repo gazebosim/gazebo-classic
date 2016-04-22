@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_GUI_PLOT_TOPICCURVEHANDLER_HH_
-#define _GAZEBO_GUI_PLOT_TOPICCURVEHANDLER_HH_
+#ifndef GAZEBO_GUI_PLOT_TOPICCURVEHANDLER_HH_
+#define GAZEBO_GUI_PLOT_TOPICCURVEHANDLER_HH_
 
 #include <memory>
 #include <string>
@@ -59,6 +59,7 @@ namespace gazebo
       public: void RemoveCurve(PlotCurveWeakPtr _curve);
 
       /// \brief Get whether this topic data handler has the specified curve
+      /// \param[in] _curve Pointer to the curve.
       /// \return True if curve exists
       public: bool HasCurve(PlotCurveWeakPtr _curve) const;
 

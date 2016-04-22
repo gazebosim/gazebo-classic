@@ -43,13 +43,12 @@ void TopicCurveHandler_TEST::AddRemoveCurve()
   handler.AddCurve("/gazebo/default/world_stats?p=sim_time", plotCurve01);
   QCOMPARE(handler.CurveCount(), 1u);
 
-  // verify we can have two different curves associated to the same
-  // variable
+  // verify we can have two different curves associated to the same topic
   gazebo::gui::PlotCurvePtr plotCurve02(new gazebo::gui::PlotCurve("curve02"));
   handler.AddCurve("/gazebo/default/world_stats?p=iterations", plotCurve02);
   QCOMPARE(handler.CurveCount(), 2u);
 
-  // add another curve associated to a different variable name
+  // add another curve associated to a different topic
   gazebo::gui::PlotCurvePtr plotCurve03(new gazebo::gui::PlotCurve("curve03"));
   handler.AddCurve("/gazebo/default/pose/local/info?p=time",
       plotCurve03);
