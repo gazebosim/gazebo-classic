@@ -79,6 +79,7 @@ Collision::Collision(LinkPtr _link)
 //////////////////////////////////////////////////
 Collision::~Collision()
 {
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -91,10 +92,11 @@ void Collision::Fini()
     this->requestPub->Publish(*msg, true);
   }
 
-  Entity::Fini();
   this->link.reset();
   this->shape.reset();
   this->surface.reset();
+
+  Entity::Fini();
 }
 
 //////////////////////////////////////////////////

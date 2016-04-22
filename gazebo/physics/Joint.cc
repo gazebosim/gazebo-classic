@@ -403,8 +403,8 @@ void Joint::Fini()
   this->anchorLink.reset();
   this->applyDamping.reset();
   this->childLink.reset();
-  this->model.reset();
   this->parentLink.reset();
+  this->model.reset();
   this->sdfJoint.reset();
 
   Base::Fini();

@@ -354,19 +354,6 @@ void WorldRemoveJointsTest::RemoveWorldWithJoint(
   gzmsg << "Test joint [" << _jointType << "] engine [" << _physicsEngine
        << "]" << std::endl;
 
-  if (_physicsEngine != "ode" && _jointType == "gearbox")
-  {
-    gzerr << "Skip test, gearbox is only supported in ODE. " <<
-         "See issues: #859, #1914, #1915" << std::endl;
-    return;
-  }
-  if (_physicsEngine == "simbody" && _jointType == "revolute2")
-  {
-    gzerr << "Skip test, revolute2 not supported in Simbody, see issue #859."
-          << std::endl;
-    return;
-  }
-
   // Load an empty world
   this->Load("worlds/empty.world", true, _physicsEngine);
 
@@ -398,7 +385,15 @@ void WorldRemoveJointsTest::RemoveWorldWithJoint(
   ASSERT_TRUE(model != NULL);
 
   // Check model has the joint
+  EXPECT_EQ(model->GetJointCount(), 1);
   EXPECT_EQ(joint, model->GetJoint("joint"));
+
+  // Get link pointers
+  auto parentLink = model->GetLink("parent");
+  ASSERT_TRUE(parentLink != NULL);
+
+  auto childLink = model->GetLink("child");
+  ASSERT_TRUE(childLink != NULL);
 
   // Get physics engine pointer
   auto physicsEngine = world->GetPhysicsEngine();
@@ -424,6 +419,10 @@ void WorldRemoveJointsTest::RemoveWorldWithJoint(
         << std::endl
         << "- model ptr use count: [" << model.use_count() << "]"
         << std::endl
+        << "- parent link ptr use count: [" << parentLink.use_count() << "]"
+        << std::endl
+        << "- childLink ptr use count: [" << childLink.use_count() << "]"
+        << std::endl
         << "- joint ptr use count: [" << joint.use_count() << "]"
         << std::endl;
 
@@ -442,11 +441,17 @@ void WorldRemoveJointsTest::RemoveWorldWithJoint(
   EXPECT_FALSE(physics::worlds_running());
 
   // Check the only shared pointers left are these
-  EXPECT_EQ(model.use_count(), 1);
-  EXPECT_EQ(joint.use_count(), 1);
+  EXPECT_EQ(model.use_count(), 1) << "Model pointer [" << model << "]";
+  EXPECT_EQ(parentLink.use_count(), 1)
+      << "Parent link pointer [" << parentLink << "]";
+  EXPECT_EQ(childLink.use_count(), 1)
+      << "Child link pointer [" << childLink << "]";
+  EXPECT_EQ(joint.use_count(), 1) << "Joint pointer [" << joint << "]";
 
   // Release pointers
   model.reset();
+  parentLink.reset();
+  childLink.reset();
   joint.reset();
 
   // Check the only shared pointer left to the physics engine is this one
@@ -496,7 +501,7 @@ TEST_P(WorldRemoveJointsTest, RemoveWorldWithJoint)
          "See issues: #859, #1914, #1915" << std::endl;
     return;
   }
-  if (physicsEngine == "simbody" && jointType == "revolute2")
+  if (this->physicsEngine == "simbody" && this->jointType == "revolute2")
   {
     gzerr << "Skip test, revolute2 not supported in simbody, see issue #859."
           << std::endl;

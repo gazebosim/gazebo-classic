@@ -55,22 +55,7 @@ Base::Base(BasePtr _parent)
 //////////////////////////////////////////////////
 Base::~Base()
 {
-  // remove self as a child of the parent
-  if (this->parent)
-    this->parent->RemoveChild(this->id);
-
-  this->SetParent(BasePtr());
-
-  for (Base_V::iterator iter = this->children.begin();
-       iter != this->children.end(); ++iter)
-  {
-    if (*iter)
-      (*iter)->SetParent(BasePtr());
-  }
-  this->children.clear();
-  if (this->sdf)
-    this->sdf->Reset();
-  this->sdf.reset();
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -106,16 +91,24 @@ void Base::UpdateParameters(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Base::Fini()
 {
-  Base_V::iterator iter;
+  // Remove self as a child of the parent
+  if (this->parent)
+    this->parent->RemoveChild(this->id);
+  this->parent.reset();
 
-  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
-    if (*iter)
-      (*iter)->Fini();
-
+  // Also destroy all children.
+  for (auto &iter : this->children)
+  {
+    if (iter)
+      iter->Fini();
+  }
   this->children.clear();
 
+  if (this->sdf)
+    this->sdf->Reset();
+  this->sdf.reset();
+
   this->world.reset();
-  this->parent.reset();
 }
 
 //////////////////////////////////////////////////
@@ -206,7 +199,8 @@ void Base::RemoveChild(unsigned int _id)
   {
     if ((*iter)->GetId() == _id)
     {
-      (*iter)->Fini();
+      // We don't own the child, it could be given to another parent.
+      // So we don't finish it.
       this->children.erase(iter);
       break;
     }

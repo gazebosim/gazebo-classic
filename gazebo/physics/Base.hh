@@ -215,7 +215,8 @@ namespace gazebo
       /// \param[in] _child Child entity.
       public: void AddChild(BasePtr _child);
 
-      /// \brief Remove a child from this entity.
+      /// \brief Remove a child from this entity, but don't destroy it, since it
+      /// can be given to another entity.
       /// \param[in] _id ID of the child to remove.
       public: virtual void RemoveChild(unsigned int _id);
 
