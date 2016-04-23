@@ -19,15 +19,34 @@
 
 #include <string>
 
+#include <ignition/math/Helpers.hh>
+#include <ignition/math/Pose3.hh>
+
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace transport
   {
+    /// \brief Helper function to create entity delete requests using ignition
+    /// transport.
+    /// \param[in] _uri URI of entity to be deleted.
+    GZ_TRANSPORT_VISIBLE
+    void RequestEntityDelete(const std::string &_uri);
+
     /// \brief Helper class to create requests for ignition transport.
     GZ_TRANSPORT_VISIBLE
-    void RequestEntityDelete(const std::string &_name);
+    void RequestEntityInsert(const std::string &_sdf,
+        const ignition::math::Pose3d &_pose =
+        ignition::math::Pose3d(IGN_DBL_MAX, IGN_DBL_MAX, IGN_DBL_MAX,
+                               0, 0, 0));
+
+    /// \brief Helper class to create requests for ignition transport.
+    GZ_TRANSPORT_VISIBLE
+    void RequestEntityClone(const std::string &_name,
+        const ignition::math::Pose3d &_pose =
+        ignition::math::Pose3d(IGN_DBL_MAX, IGN_DBL_MAX, IGN_DBL_MAX,
+                               0, 0, 0));
   }
 }
 #endif

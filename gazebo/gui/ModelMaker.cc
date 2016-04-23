@@ -34,6 +34,7 @@
 
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Request.hh"
 
 #include "gazebo/gui/ModelManipulator.hh"
 #include "gazebo/gui/GuiIface.hh"
@@ -51,16 +52,11 @@ ModelMaker::ModelMaker() : EntityMaker(*new ModelMakerPrivate)
       static_cast<ModelMakerPrivate *>(this->dataPtr);
 
   dPtr->clone = false;
-  dPtr->makerPub = dPtr->node->Advertise<msgs::Factory>("~/factory");
 }
 
 /////////////////////////////////////////////////
 ModelMaker::~ModelMaker()
 {
-  ModelMakerPrivate *dPtr =
-      static_cast<ModelMakerPrivate *>(this->dataPtr);
-
-  dPtr->makerPub.reset();
 }
 
 /////////////////////////////////////////////////
@@ -376,7 +372,6 @@ void ModelMaker::CreateTheEntity()
   ModelMakerPrivate *dPtr =
       static_cast<ModelMakerPrivate *>(this->dataPtr);
 
-  msgs::Factory msg;
   if (!dPtr->clone)
   {
     sdf::ElementPtr modelElem;
@@ -413,22 +408,20 @@ void ModelMaker::CreateTheEntity()
     // by the World automatically
     modelName.erase(0, dPtr->node->GetTopicNamespace().size()+2);
 
-    // The the SDF model's name
+    // The SDF model's name
     modelElem->GetAttribute("name")->Set(modelName);
     modelElem->GetElement("pose")->Set(
         dPtr->modelVisual->GetWorldPose().Ign());
 
     // Spawn the model in the physics server
-    msg.set_sdf(dPtr->modelSDF->ToString());
+    transport::RequestEntityInsert(dPtr->modelSDF->ToString());
   }
   else
   {
-    msgs::Set(msg.mutable_pose(), dPtr->modelVisual->GetWorldPose().Ign());
-    msg.set_clone_model_name(dPtr->modelVisual->GetName().substr(0,
-          dPtr->modelVisual->GetName().find("_clone_tmp")));
+    transport::RequestEntityClone(dPtr->modelVisual->GetName().substr(0,
+          dPtr->modelVisual->GetName().find("_clone_tmp")),
+          dPtr->modelVisual->GetWorldPose().Ign());
   }
-
-  dPtr->makerPub->Publish(msg);
 }
 
 /////////////////////////////////////////////////

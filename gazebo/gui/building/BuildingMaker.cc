@@ -42,9 +42,7 @@
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/Scene.hh"
 
-#include "gazebo/transport/TransportIface.hh"
-#include "gazebo/transport/Publisher.hh"
-#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Request.hh"
 
 #ifdef HAVE_GTS
   #include "gazebo/common/Mesh.hh"
@@ -107,12 +105,6 @@ BuildingMaker::BuildingMaker() : dataPtr(new BuildingMakerPrivate())
 
   this->dataPtr->saveDialog.reset(new SaveDialog(SaveDialog::BUILDING));
 
-  // Transport
-  this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init();
-  this->dataPtr->makerPub =
-      this->dataPtr->node->Advertise<msgs::Factory>("~/factory");
-
   this->Reset();
 }
 
@@ -120,10 +112,6 @@ BuildingMaker::BuildingMaker() : dataPtr(new BuildingMakerPrivate())
 BuildingMaker::~BuildingMaker()
 {
   this->dataPtr->modelSDF.reset();
-
-  this->dataPtr->node->Fini();
-  this->dataPtr->node.reset();
-  this->dataPtr->makerPub.reset();
 }
 
 /////////////////////////////////////////////////
@@ -1200,7 +1188,6 @@ void BuildingMaker::CreateTheEntity()
     return;
   }
 
-  msgs::Factory msg;
   // Create a new name if the model exists
   sdf::ElementPtr modelElem =
       this->dataPtr->modelSDF->Root()->GetElement("model");
@@ -1216,8 +1203,7 @@ void BuildingMaker::CreateTheEntity()
     modelElem->GetAttribute("name")->Set(modelElemName);
   }
 
-  msg.set_sdf(this->dataPtr->modelSDF->ToString());
-  this->dataPtr->makerPub->Publish(msg);
+  transport::RequestEntityInsert(this->dataPtr->modelSDF->ToString());
 }
 
 /////////////////////////////////////////////////

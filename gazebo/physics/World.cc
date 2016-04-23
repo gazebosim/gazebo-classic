@@ -450,10 +450,15 @@ void World::RunBlocking(unsigned int _iterations)
 }
 
 //////////////////////////////////////////////////
-void World::RemoveModel(ModelPtr _model)
+bool World::RemoveModel(ModelPtr _model)
 {
   if (_model)
-    this->RemoveModel(_model->GetName());
+    return this->RemoveModel(_model->GetName());
+  else
+  {
+    gzerr << "Invalid model pointer, can't remove." << std::endl;
+    return false;
+  }
 }
 
 //////////////////////////////////////////////////
@@ -849,9 +854,7 @@ void World::Fini()
 
   // Clean transport
   {
-    this->dataPtr->deleteEntity.clear();
     this->dataPtr->requestMsgs.clear();
-    this->dataPtr->factoryMsgs.clear();
     this->dataPtr->modelMsgs.clear();
     this->dataPtr->lightFactoryMsgs.clear();
     this->dataPtr->lightModifyMsgs.clear();
@@ -1385,8 +1388,18 @@ void World::SetPaused(bool _p)
 //////////////////////////////////////////////////
 void World::OnFactoryMsg(ConstFactoryPtr &_msg)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
-  this->dataPtr->factoryMsgs.push_back(*_msg);
+  gzwarn << "Factory topic is deprecated. Use "
+      << "transport::RequestEntityInsert() instead." << std::endl;
+
+  // TODO: Converting to operation on Gazebo8, remove on Gazebo9
+  msgs::Operation msg;
+  msg.set_type(msgs::Operation::INSERT_ENTITY);
+  msg.mutable_factory()->CopyFrom(*_msg);
+
+  {
+    std::lock_guard<std::mutex> lock(this->dataPtr->requestsMutex);
+    this->dataPtr->requests.push_back(msg);
+  }
 }
 
 //////////////////////////////////////////////////
@@ -1620,23 +1633,6 @@ void World::LoadPlugin(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void World::ProcessEntityMsgs()
-{
-  boost::mutex::scoped_lock lock(this->dataPtr->entityDeleteMutex);
-
-  for (auto &entityName : this->dataPtr->deleteEntity)
-  {
-    this->RemoveModel(entityName);
-  }
-
-  if (!this->dataPtr->deleteEntity.empty())
-  {
-    this->EnableAllModels();
-    this->dataPtr->deleteEntity.clear();
-  }
-}
-
-//////////////////////////////////////////////////
 void World::ProcessRequestMsgs()
 {
   boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
@@ -1669,15 +1665,22 @@ void World::ProcessRequestMsgs()
       std::string *serializedData = response.mutable_serialized_data();
       modelVMsg.SerializeToString(serializedData);
     }
-    // TODO: Remove on Gazebo 9
+    // TODO: Converting to operation on Gazebo8, remove on Gazebo9
     else if (requestMsg.request() == "entity_delete")
     {
       gzwarn << "Request for `entity_delete` [" << requestMsg.data()
           << "] is deprecated. Use "
           << "transport::RequestEntityDelete(<entity uri>)"
           << " instead." << std::endl;
-      boost::mutex::scoped_lock lock2(this->dataPtr->entityDeleteMutex);
-      this->dataPtr->deleteEntity.push_back(requestMsg.data());
+
+      msgs::Operation msg;
+      msg.set_type(msgs::Operation::DELETE_ENTITY);
+      msg.set_uri(requestMsg.data());
+
+      {
+        std::lock_guard<std::mutex> lockReq(this->dataPtr->requestsMutex);
+        this->dataPtr->requests.push_back(msg);
+      }
     }
     else if (requestMsg.request() == "entity_info")
     {
@@ -1926,148 +1929,139 @@ void World::ProcessLightFactoryMsgs()
 }
 
 //////////////////////////////////////////////////
-void World::ProcessFactoryMsgs()
+void World::ProcessInsertEntityRequest(const msgs::Factory &_msg)
 {
   std::list<sdf::ElementPtr> modelsToLoad, lightsToLoad;
 
+  this->dataPtr->factorySDF->Root()->ClearElements();
+
+  // From SDF string
+  if (_msg.has_sdf() && !_msg.sdf().empty())
   {
-    boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
-    for (auto const &factoryMsg : this->dataPtr->factoryMsgs)
+    // SDF Parsing happens here
+    if (!sdf::readString(_msg.sdf(), this->dataPtr->factorySDF))
     {
-      this->dataPtr->factorySDF->Root()->ClearElements();
+      gzerr << "Unable to read sdf string[" << _msg.sdf() << "]\n";
+    }
+  }
+  // From SDF file
+  else if (_msg.has_sdf_filename() &&
+          !_msg.sdf_filename().empty())
+  {
+    std::string filename = common::ModelDatabase::Instance()->GetModelFile(
+        _msg.sdf_filename());
 
-      if (factoryMsg.has_sdf() && !factoryMsg.sdf().empty())
-      {
-        // SDF Parsing happens here
-        if (!sdf::readString(factoryMsg.sdf(), this->dataPtr->factorySDF))
-        {
-          gzerr << "Unable to read sdf string[" << factoryMsg.sdf() << "]\n";
-          continue;
-        }
-      }
-      else if (factoryMsg.has_sdf_filename() &&
-              !factoryMsg.sdf_filename().empty())
-      {
-        std::string filename = common::ModelDatabase::Instance()->GetModelFile(
-            factoryMsg.sdf_filename());
-
-        if (!sdf::readFile(filename, this->dataPtr->factorySDF))
-        {
-          gzerr << "Unable to read sdf file.\n";
-          continue;
-        }
-      }
-      else if (factoryMsg.has_clone_model_name())
-      {
-        ModelPtr model = this->GetModel(factoryMsg.clone_model_name());
-        if (!model)
-        {
-          gzerr << "Unable to clone model[" << factoryMsg.clone_model_name()
-            << "]. Model not found.\n";
-          continue;
-        }
-
-        this->dataPtr->factorySDF->Root()->InsertElement(
-            model->GetSDF()->Clone());
-
-        std::string newName = model->GetName() + "_clone";
-        int i = 0;
-        while (this->GetModel(newName))
-        {
-          newName = model->GetName() + "_clone_" +
-            boost::lexical_cast<std::string>(i);
-          i++;
-        }
-
-        this->dataPtr->factorySDF->Root()->GetElement("model")->GetAttribute(
-            "name")->Set(newName);
-      }
-      else
-      {
-        gzerr << "Unable to load sdf from factory message."
-          << "No SDF or SDF filename specified.\n";
-        continue;
-      }
-
-      if (factoryMsg.has_edit_name())
-      {
-        BasePtr base =
-          this->dataPtr->rootElement->GetByName(factoryMsg.edit_name());
-        if (base)
-        {
-          sdf::ElementPtr elem;
-          if (this->dataPtr->factorySDF->Root()->GetName() == "sdf")
-            elem = this->dataPtr->factorySDF->Root()->GetFirstElement();
-          else
-            elem = this->dataPtr->factorySDF->Root();
-
-          base->UpdateParameters(elem);
-        }
-      }
-      else
-      {
-        bool isActor = false;
-        bool isModel = false;
-        bool isLight = false;
-
-        sdf::ElementPtr elem = this->dataPtr->factorySDF->Root()->Clone();
-
-        if (!elem)
-        {
-          gzerr << "Invalid SDF:";
-          this->dataPtr->factorySDF->Root()->PrintValues("");
-          continue;
-        }
-
-        if (elem->HasElement("world"))
-          elem = elem->GetElement("world");
-
-        if (elem->HasElement("model"))
-        {
-          elem = elem->GetElement("model");
-          isModel = true;
-        }
-        else if (elem->HasElement("light"))
-        {
-          elem = elem->GetElement("light");
-          isLight = true;
-        }
-        else if (elem->HasElement("actor"))
-        {
-          elem = elem->GetElement("actor");
-          isActor = true;
-        }
-        else
-        {
-          gzerr << "Unable to find a model, light, or actor in:\n";
-          this->dataPtr->factorySDF->Root()->PrintValues("");
-          continue;
-        }
-
-        elem->SetParent(this->dataPtr->sdf);
-        elem->GetParent()->InsertElement(elem);
-        if (factoryMsg.has_pose())
-        {
-          elem->GetElement("pose")->Set(msgs::ConvertIgn(factoryMsg.pose()));
-        }
-
-        if (isActor)
-        {
-          ActorPtr actor = this->LoadActor(elem, this->dataPtr->rootElement);
-          actor->Init();
-        }
-        else if (isModel)
-        {
-          modelsToLoad.push_back(elem);
-        }
-        else if (isLight)
-        {
-          lightsToLoad.push_back(elem);
-        }
-      }
+    if (!sdf::readFile(filename, this->dataPtr->factorySDF))
+    {
+      gzerr << "Unable to read sdf file.\n";
+    }
+  }
+  // Clone existing model
+  else if (_msg.has_clone_model_name())
+  {
+    ModelPtr model = this->GetModel(_msg.clone_model_name());
+    if (!model)
+    {
+      gzerr << "Unable to clone model[" << _msg.clone_model_name()
+        << "]. Model not found.\n";
     }
 
-    this->dataPtr->factoryMsgs.clear();
+    this->dataPtr->factorySDF->Root()->InsertElement(
+        model->GetSDF()->Clone());
+
+    std::string newName = model->GetName() + "_clone";
+    int i = 0;
+    while (this->GetModel(newName))
+    {
+      newName = model->GetName() + "_clone_" +
+        boost::lexical_cast<std::string>(i);
+      i++;
+    }
+
+    this->dataPtr->factorySDF->Root()->GetElement("model")->GetAttribute(
+        "name")->Set(newName);
+  }
+  else
+  {
+    gzerr << "Unable to load sdf from factory message: " << std::endl <<
+      _msg.DebugString() << std::endl
+      << "No SDF or SDF filename specified.\n";
+  }
+
+  // Edit name
+  if (_msg.has_edit_name())
+  {
+    BasePtr base =
+      this->dataPtr->rootElement->GetByName(_msg.edit_name());
+    if (base)
+    {
+      sdf::ElementPtr elem;
+      if (this->dataPtr->factorySDF->Root()->GetName() == "sdf")
+        elem = this->dataPtr->factorySDF->Root()->GetFirstElement();
+      else
+        elem = this->dataPtr->factorySDF->Root();
+
+      base->UpdateParameters(elem);
+    }
+  }
+  else
+  {
+    bool isActor = false;
+    bool isModel = false;
+    bool isLight = false;
+
+    sdf::ElementPtr elem = this->dataPtr->factorySDF->Root()->Clone();
+
+    if (!elem)
+    {
+      gzerr << "Invalid SDF:";
+      this->dataPtr->factorySDF->Root()->PrintValues("");
+    }
+
+    if (elem->HasElement("world"))
+      elem = elem->GetElement("world");
+
+    if (elem->HasElement("model"))
+    {
+      elem = elem->GetElement("model");
+      isModel = true;
+    }
+    else if (elem->HasElement("light"))
+    {
+      elem = elem->GetElement("light");
+      isLight = true;
+    }
+    else if (elem->HasElement("actor"))
+    {
+      elem = elem->GetElement("actor");
+      isActor = true;
+    }
+    else
+    {
+      gzerr << "Unable to find a model, light, or actor in:\n";
+      this->dataPtr->factorySDF->Root()->PrintValues("");
+    }
+
+    elem->SetParent(this->dataPtr->sdf);
+    elem->GetParent()->InsertElement(elem);
+    if (_msg.has_pose())
+    {
+      elem->GetElement("pose")->Set(msgs::ConvertIgn(_msg.pose()));
+    }
+
+    if (isActor)
+    {
+      ActorPtr actor = this->LoadActor(elem, this->dataPtr->rootElement);
+      actor->Init();
+    }
+    else if (isModel)
+    {
+      modelsToLoad.push_back(elem);
+    }
+    else if (isLight)
+    {
+      lightsToLoad.push_back(elem);
+    }
   }
 
   // Load models
@@ -2256,28 +2250,49 @@ void World::SetState(const WorldState &_state)
 //////////////////////////////////////////////////
 void World::InsertModelFile(const std::string &_sdfFilename)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
   msgs::Factory msg;
   msg.set_sdf_filename(_sdfFilename);
-  this->dataPtr->factoryMsgs.push_back(msg);
+
+  msgs::Operation opMsg;
+  opMsg.set_type(msgs::Operation::INSERT_ENTITY);
+  opMsg.mutable_factory()->CopyFrom(msg);
+
+  {
+    std::lock_guard<std::mutex> lock(this->dataPtr->requestsMutex);
+    this->dataPtr->requests.push_back(opMsg);
+  }
 }
 
 //////////////////////////////////////////////////
 void World::InsertModelSDF(const sdf::SDF &_sdf)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
   msgs::Factory msg;
   msg.set_sdf(_sdf.ToString());
-  this->dataPtr->factoryMsgs.push_back(msg);
+
+  msgs::Operation opMsg;
+  opMsg.set_type(msgs::Operation::INSERT_ENTITY);
+  opMsg.mutable_factory()->CopyFrom(msg);
+
+  {
+    std::lock_guard<std::mutex> lock(this->dataPtr->requestsMutex);
+    this->dataPtr->requests.push_back(opMsg);
+  }
 }
 
 //////////////////////////////////////////////////
 void World::InsertModelString(const std::string &_sdfString)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
   msgs::Factory msg;
   msg.set_sdf(_sdfString);
-  this->dataPtr->factoryMsgs.push_back(msg);
+
+  msgs::Operation opMsg;
+  opMsg.set_type(msgs::Operation::INSERT_ENTITY);
+  opMsg.mutable_factory()->CopyFrom(msg);
+
+  {
+    std::lock_guard<std::mutex> lock(this->dataPtr->requestsMutex);
+    this->dataPtr->requests.push_back(opMsg);
+  }
 }
 
 //////////////////////////////////////////////////
@@ -2488,10 +2503,8 @@ void World::ProcessMessages()
   if (common::Time::GetWallTime() - this->dataPtr->prevProcessMsgsTime >
       this->dataPtr->processMsgsPeriod)
   {
-    this->ProcessEntityMsgs();
     this->ProcessRequestMsgs();
     this->ProcessRequests();
-    this->ProcessFactoryMsgs();
     this->ProcessModelMsgs();
     this->ProcessLightFactoryMsgs();
     this->ProcessLightModifyMsgs();
@@ -2645,16 +2658,63 @@ uint32_t World::GetIterations() const
 }
 
 //////////////////////////////////////////////////
-void World::RemoveModel(const std::string &_name)
+// TODO: RemoveEntity? RemoveLight? Use URI?
+bool World::RemoveModel(const std::string &_name)
 {
+  if (_name.empty())
+  {
+    gzerr << "Can't remove a model with an empty name." << std::endl;
+    return false;
+  }
+
   boost::recursive_mutex::scoped_lock plock(
       *this->GetPhysicsEngine()->GetPhysicsUpdateMutex());
+
   boost::mutex::scoped_lock flock(this->dataPtr->factoryDeleteMutex);
 
-  // Remove all the dirty poses from the delete entity.
+  // Destroy physics entities
+  bool isModel = false;
+  bool isLight = false;
+  {
+    boost::recursive_mutex::scoped_lock lock(
+        *this->GetPhysicsEngine()->GetPhysicsUpdateMutex());
+
+    this->dataPtr->rootElement->RemoveChild(_name);
+
+    for (auto model = this->dataPtr->models.begin();
+              model != this->dataPtr->models.end(); ++model)
+    {
+      if ((*model)->GetName() == _name || (*model)->GetScopedName() == _name)
+      {
+        this->dataPtr->models.erase(model);
+        isModel = true;
+        break;
+      }
+    }
+
+    for (auto light = this->dataPtr->lights.begin();
+              light != this->dataPtr->lights.end(); ++light)
+    {
+      if ((*light)->GetName() == _name || (*light)->GetScopedName() == _name)
+      {
+        isLight = true;
+        this->dataPtr->lights.erase(light);
+        break;
+      }
+    }
+  }
+
+  if (!isModel && !isLight)
+  {
+    gzerr << "Can't find a model or light named [" << _name
+          << "], not removing." << std::endl;
+    return false;
+  }
+
+  // Remove dirty poses
   {
     for (auto entity = this->dataPtr->dirtyPoses.begin();
-             entity != this->dataPtr->dirtyPoses.end(); ++entity)
+              entity != this->dataPtr->dirtyPoses.end();)
     {
       if ((*entity)->GetName() == _name ||
          ((*entity)->GetParent() && (*entity)->GetParent()->GetName() == _name))
@@ -2666,6 +2726,45 @@ void World::RemoveModel(const std::string &_name)
     }
   }
 
+  // Remove poses to be published
+  {
+    boost::recursive_mutex::scoped_lock lock2(*this->dataPtr->receiveMutex);
+    for (auto model = this->dataPtr->publishModelPoses.begin();
+              model != this->dataPtr->publishModelPoses.end(); ++model)
+    {
+      if ((*model)->GetName() == _name || (*model)->GetScopedName() == _name)
+      {
+        this->dataPtr->publishModelPoses.erase(model);
+        break;
+      }
+    }
+  }
+
+  {
+    boost::recursive_mutex::scoped_lock lock2(*this->dataPtr->receiveMutex);
+    for (auto light : this->dataPtr->publishLightPoses)
+    {
+      if (light->GetName() == _name || light->GetScopedName() == _name)
+      {
+        this->dataPtr->publishLightPoses.erase(light);
+        break;
+      }
+    }
+  }
+
+  // Remove from scene message (only light? what happens to models?)
+  for (int i = 0; i < this->dataPtr->sceneMsg.light_size(); ++i)
+  {
+    if (this->dataPtr->sceneMsg.light(i).name() == _name)
+    {
+      this->dataPtr->sceneMsg.mutable_light()->SwapElements(i,
+          this->dataPtr->sceneMsg.light_size()-1);
+      this->dataPtr->sceneMsg.mutable_light()->RemoveLast();
+      break;
+    }
+  }
+
+  // Remove SDF element
   if (this->dataPtr->sdf->HasElement("model"))
   {
     sdf::ElementPtr childElem = this->dataPtr->sdf->GetElement("model");
@@ -2682,78 +2781,13 @@ void World::RemoveModel(const std::string &_name)
       childElem = childElem->GetNextElement("light");
     if (childElem)
     {
-      // Remove light object
-      for (auto light = this->dataPtr->lights.begin();
-          light != this->dataPtr->lights.end(); ++light)
-      {
-        if ((*light)->GetName() == _name || (*light)->GetScopedName() == _name)
-        {
-          this->dataPtr->lights.erase(light);
-          break;
-        }
-      }
-
-      // Remove from SDF
       this->dataPtr->sdf->RemoveChild(childElem);
-
-      // Find the light by name in the scene msg, and remove it.
-      for (int i = 0; i < this->dataPtr->sceneMsg.light_size(); ++i)
-      {
-        if (this->dataPtr->sceneMsg.light(i).name() == _name)
-        {
-          this->dataPtr->sceneMsg.mutable_light()->SwapElements(i,
-              this->dataPtr->sceneMsg.light_size()-1);
-          this->dataPtr->sceneMsg.mutable_light()->RemoveLast();
-          break;
-        }
-      }
     }
   }
 
-  {
-    boost::recursive_mutex::scoped_lock lock(
-        *this->GetPhysicsEngine()->GetPhysicsUpdateMutex());
-
-    this->dataPtr->rootElement->RemoveChild(_name);
-
-    for (auto model = this->dataPtr->models.begin();
-             model != this->dataPtr->models.end(); ++model)
-    {
-      if ((*model)->GetName() == _name || (*model)->GetScopedName() == _name)
-      {
-        this->dataPtr->models.erase(model);
-        break;
-      }
-    }
-  }
-
-  // Cleanup the publishModelPoses list.
-  {
-    boost::recursive_mutex::scoped_lock lock2(*this->dataPtr->receiveMutex);
-    for (auto model = this->dataPtr->publishModelPoses.begin();
-             model != this->dataPtr->publishModelPoses.end(); ++model)
-    {
-      if ((*model)->GetName() == _name || (*model)->GetScopedName() == _name)
-      {
-        this->dataPtr->publishModelPoses.erase(model);
-        break;
-      }
-    }
-  }
-
-  // Cleanup the publishLightPoses list.
-  {
-    boost::recursive_mutex::scoped_lock lock2(*this->dataPtr->receiveMutex);
-    for (auto light : this->dataPtr->publishLightPoses)
-    {
-      if (light->GetName() == _name || light->GetScopedName() == _name)
-      {
-        this->dataPtr->publishLightPoses.erase(light);
-        break;
-      }
-    }
-  }
+  return true;
 }
+
 
 /////////////////////////////////////////////////
 void World::OnLightMsg(ConstLightPtr &/*_msg*/)
@@ -2858,19 +2892,25 @@ void World::ProcessRequests()
 
   for (const auto &request : this->dataPtr->requests)
   {
-    switch (request.type())
+    if (request.type() == msgs::Operation::DELETE_ENTITY &&
+        request.has_uri())
     {
-      case msgs::Operation::DELETE_ENTITY:
+      // TODO: Rename to ProcessDeleteEntityRequest and make sure it's only
+      // called from here? So we can only delete on Step?
+      if (this->RemoveModel(request.uri()))
       {
-        if (request.has_uri())
-          this->RemoveModel(request.uri());
-        break;
+// publish notification with request id
       }
-      default:
-      {
-        gzwarn << "Unrecognized request [" << request.type() << "]"
-               << std::endl;
-      }
+    }
+    else if (request.type() == msgs::Operation::INSERT_ENTITY &&
+        request.has_factory())
+    {
+      this->ProcessInsertEntityRequest(request.factory());
+    }
+    else
+    {
+      gzwarn << "Unrecognized request [" << request.DebugString() << "]"
+             << std::endl;
     }
   }
 

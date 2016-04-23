@@ -125,17 +125,6 @@ namespace gazebo
       /// \brief A map of model plugin names to and their data.
       public: std::map<std::string, ModelPluginData *> allModelPlugins;
 
-      /// \brief Transport node
-      public: transport::NodePtr node;
-
-      /// \brief Publisher that publishes msg to the server once the model is
-      /// created.
-      public: transport::PublisherPtr makerPub;
-
-      /// \brief Publisher that publishes delete entity msg to remove the
-      /// editor visual.
-      public: transport::PublisherPtr requestPub;
-
       /// \brief Joint maker.
       public: JointMaker *jointMaker;
 
@@ -224,13 +213,6 @@ ModelCreator::ModelCreator(QObject *_parent)
   this->dataPtr->manipMode = "";
   this->dataPtr->linkCounter = 0;
   this->dataPtr->modelCounter = 0;
-
-  this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init();
-  this->dataPtr->makerPub =
-      this->dataPtr->node->Advertise<msgs::Factory>("~/factory");
-  this->dataPtr->requestPub =
-      this->dataPtr->node->Advertise<msgs::Request>("~/request");
 
   this->dataPtr->jointMaker = new gui::JointMaker();
   this->dataPtr->userCmdManager.reset(new MEUserCmdManager());
@@ -389,11 +371,7 @@ ModelCreator::~ModelCreator()
   this->dataPtr->allNestedModels.clear();
   this->dataPtr->allLinks.clear();
   this->dataPtr->allModelPlugins.clear();
-  this->dataPtr->node->Fini();
-  this->dataPtr->node.reset();
   this->dataPtr->modelTemplateSDF.reset();
-  this->dataPtr->requestPub.reset();
-  this->dataPtr->makerPub.reset();
   this->dataPtr->connections.clear();
 
   delete this->dataPtr->saveDialog;
@@ -1724,9 +1702,8 @@ void ModelCreator::CreateTheEntity()
     modelElem->GetAttribute("name")->Set(modelElemName);
   }
 
-  msg.set_sdf(this->dataPtr->modelSDF->ToString());
-  msgs::Set(msg.mutable_pose(), this->dataPtr->modelPose);
-  this->dataPtr->makerPub->Publish(msg);
+  transport::RequestEntityInsert(this->dataPtr->modelSDF->ToString(),
+      this->dataPtr->modelPose);
 }
 
 /////////////////////////////////////////////////

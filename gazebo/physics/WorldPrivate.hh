@@ -188,15 +188,8 @@ namespace gazebo
       /// \brief All the plugins.
       public: std::vector<WorldPluginPtr> plugins;
 
-      /// \brief List of entities to delete.
-      /// \deprecated Stop handling "entity_delete" from Gazebo 9.
-      public: std::list<std::string> deleteEntity;
-
       /// \brief Request message buffer.
       public: std::list<msgs::Request> requestMsgs;
-
-      /// \brief Factory message buffer.
-      public: std::list<msgs::Factory> factoryMsgs;
 
       /// \brief Model message buffer.
       public: std::list<msgs::Model> modelMsgs;
@@ -308,10 +301,6 @@ namespace gazebo
       /// \brief Mutex to protect the log state buffers
       public: boost::mutex logBufferMutex;
 
-      /// \brief Mutex to protect the deleteEntity list.
-      /// \deprecated Stop handling "entity_delete" from Gazebo 9.
-      public: boost::mutex entityDeleteMutex;
-
       /// \brief Worker thread for logging.
       public: boost::thread *logThread;
 
@@ -328,7 +317,7 @@ namespace gazebo
       /// \brief when physics engine makes an update and changes a link pose,
       /// this flag is set to trigger Entity::SetWorldPose on the
       /// physics::Link in World::Update.
-      public: std::list<Entity*> dirtyPoses;
+      public: std::list<Entity *> dirtyPoses;
 
       /// \brief Class to manage preset simulation parameter profiles.
       public: PresetManagerPtr presetManager;

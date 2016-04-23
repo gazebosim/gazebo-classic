@@ -397,13 +397,13 @@ namespace gazebo
       /// the physics engine is not locked. The duration of the block
       /// is less than the time to complete a simulation iteration.
       /// \param[in] _model Pointer to a model to remove.
-      public: void RemoveModel(ModelPtr _model);
+      public: bool RemoveModel(ModelPtr _model);
 
       /// \brief Remove a model by name. This function will block until
       /// the physics engine is not locked. The duration of the block
       /// is less than the time to complete a simulation iteration.
       /// \param[in] _name Name of the model to remove.
-      public: void RemoveModel(const std::string &_name);
+      public: bool RemoveModel(const std::string &_name);
 
       /// \brief Reset the velocity, acceleration, force and torque of
       /// all child models.
@@ -515,7 +515,9 @@ namespace gazebo
 
       /// \brief Called when a factory message is received.
       /// \param[in] _data The factory message.
-      private: void OnFactoryMsg(ConstFactoryPtr &_data);
+      /// \deprecated Send request using ignition transport instead.
+      private: void OnFactoryMsg(ConstFactoryPtr &_data)
+              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Called when a model message is received.
       /// \param[in] _msg The model message.
@@ -536,10 +538,6 @@ namespace gazebo
       /// \param[in] _model Pointer to the model to get the data from.
       private: void FillModelMsg(msgs::Model &_msg, ModelPtr _model);
 
-      /// \brief Process all received entity messages.
-      /// Must only be called from the World::ProcessMessages function.
-      private: void ProcessEntityMsgs();
-
       /// \brief Process all received request messages.
       /// Must only be called from the World::ProcessMessages function.
       private: void ProcessRequestMsgs();
@@ -549,7 +547,7 @@ namespace gazebo
 
       /// \brief Process all received factory messages.
       /// Must only be called from the World::ProcessMessages function.
-      private: void ProcessFactoryMsgs();
+      private: void ProcessInsertEntityRequest(const msgs::Factory &_msg);
 
       /// \brief Process all received model messages.
       /// Must only be called from the World::ProcessMessages function.

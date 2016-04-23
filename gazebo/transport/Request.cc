@@ -31,10 +31,70 @@ void transport::RequestEntityDelete(const std::string &_name)
   {
   };
 
+  // Operation msg
   msgs::Operation req;
   req.set_type(msgs::Operation::DELETE_ENTITY);
   req.set_uri(_name);
 
+  // Request
+  ignition::transport::Node ignNode;
+  ignNode.Request("/request", req, unused);
+}
+
+/////////////////////////////////////////////////
+void transport::RequestEntityInsert(const std::string &_sdf,
+    const ignition::math::Pose3d &_pose)
+{
+  // Unused callback
+  std::function<void(const msgs::Empty &, const bool)> unused =
+    [](const msgs::Empty &, const bool &)
+  {
+  };
+
+  // Factory msg
+  msgs::Factory msg;
+  msg.set_sdf(_sdf);
+  if (_pose != ignition::math::Pose3d(IGN_DBL_MAX, IGN_DBL_MAX, IGN_DBL_MAX,
+                                      0, 0, 0))
+  {
+    msgs::Set(msg.mutable_pose(), _pose);
+  }
+
+  // Operation msg
+  msgs::Operation req;
+  req.set_type(msgs::Operation::INSERT_ENTITY);
+  req.mutable_factory()->CopyFrom(msg);
+
+  // Request
+  ignition::transport::Node ignNode;
+  ignNode.Request("/request", req, unused);
+}
+
+/////////////////////////////////////////////////
+void transport::RequestEntityClone(const std::string &_name,
+    const ignition::math::Pose3d &_pose)
+{
+  // Unused callback
+  std::function<void(const msgs::Empty &, const bool)> unused =
+    [](const msgs::Empty &, const bool &)
+  {
+  };
+
+  // Factory msg
+  msgs::Factory msg;
+  msg.set_clone_model_name(_name);
+  if (_pose != ignition::math::Pose3d(IGN_DBL_MAX, IGN_DBL_MAX, IGN_DBL_MAX,
+                                      0, 0, 0))
+  {
+    msgs::Set(msg.mutable_pose(), _pose);
+  }
+
+  // Operation msg
+  msgs::Operation req;
+  req.set_type(msgs::Operation::INSERT_ENTITY);
+  req.mutable_factory()->CopyFrom(msg);
+
+  // Request
   ignition::transport::Node ignNode;
   ignNode.Request("/request", req, unused);
 }

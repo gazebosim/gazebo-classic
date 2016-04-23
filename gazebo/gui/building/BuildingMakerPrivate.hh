@@ -31,8 +31,6 @@
 
 #include "gazebo/rendering/RenderTypes.hh"
 
-#include "gazebo/transport/TransportTypes.hh"
-
 namespace gazebo
 {
   namespace gui
@@ -124,12 +122,6 @@ namespace gazebo
 
       /// \brief The current level that is being edited.
       public: int currentLevel;
-
-      /// \brief Node used to publish messages.
-      public: transport::NodePtr node;
-
-      /// \brief Publisher for factory messages.
-      public: transport::PublisherPtr makerPub;
     };
   }
 }
