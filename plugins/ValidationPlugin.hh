@@ -31,11 +31,10 @@
 namespace gazebo
 {
   /// \brief Labels for states.
-  static std::string kInitState  = "init_state";
-  static std::string kSetupState = "setup_state";
-  static std::string kRunState   = "run_state";
-  static std::string kEvalState  = "eval_state";
-  static std::string kStopState  = "stop_state";
+  static std::string kReadyState = "gazebo_ready";
+  static std::string kSetState   = "gazebo_set";
+  static std::string kGoState    = "gazebo_go";
+  static std::string kEndState   = "gazebo_end";
 
   // Forward declarations.
   class ValidationPlugin;
@@ -123,8 +122,8 @@ namespace gazebo
     protected: ignition::transport::Node node;
   };
 
-  /// \brief State that handles the "init" state.
-  class InitState : public State
+  /// \brief State that handles the "ready" state.
+  class ReadyState : public State
   {
     // Use class constructor from base class.
     using State::State;
@@ -136,44 +135,31 @@ namespace gazebo
     public: virtual void DoFeedback();
   };
 
-  /// \brief State that handles the "setup" state.
-  class SetupState : public State
-  {
-    // Use class constructor from base class.
-    using State::State;
-
-    // Documentation inherited
-    public: virtual void DoFeedback();
-  };
-
-  /// \brief State that handles the "run" state.
-  class RunState : public State
-  {
-    // Use class constructor from base class.
-    using State::State;
-
-    // Documentation inherited.
-    public: virtual void DoFeedback();
-  };
-
-  /// \brief State that handles the "eval" state.
-  class EvalState : public State
-  {
-    // Use class constructor from base class.
-    using State::State;
-
-    // Documentation inherited
-    public: virtual void DoFeedback();
-  };
-
-  /// \brief State that handles the "stop" state.
-  class StopState : public State
+  /// \brief State that handles the "set" state.
+  class SetState : public State
   {
     // Use class constructor from base class.
     using State::State;
 
     // Documentation inherited.
     public: virtual void DoInitialize();
+  };
+
+  /// \brief State that handles the "go" state.
+  class GoState : public State
+  {
+    // Use class constructor from base class.
+    using State::State;
+
+    // Documentation inherited.
+    public: virtual void DoFeedback();
+  };
+
+  /// \brief State that handles the "end" state.
+  class EndState : public State
+  {
+    // Use class constructor from base class.
+    using State::State;
   };
 
   /// Example SDF:
@@ -219,7 +205,7 @@ namespace gazebo
     private: bool LoadModelParams();
 
     /// \brief ToDo.
-    public: void SetState(State &_newState);
+    public: void ChangeState(State &_newState);
 
     /// \brief ToDo.
     public: bool MoreRuns() const;
@@ -227,20 +213,11 @@ namespace gazebo
     /// \brief Connection to World Update events.
     private: event::ConnectionPtr updateConnection;
 
-    /// \brief "init" state.
-    public: std::unique_ptr<InitState> initState;
-
-    /// \brief "setup" state.
-    public: std::unique_ptr<SetupState> setupState;
-
-    /// \brief "run" state.
-    public: std::unique_ptr<RunState> runState;
-
-    /// \brief "eval" state.
-    public: std::unique_ptr<EvalState> evalState;
-
-    /// \brief "stop" state.
-    public: std::unique_ptr<StopState> stopState;
+    /// \brief State machine states.
+    public: std::unique_ptr<ReadyState> readyState;
+    public: std::unique_ptr<SetState> setState;
+    public: std::unique_ptr<GoState> goState;
+    public: std::unique_ptr<EndState> endState;
 
     /// \brief Pointer to the current game state.
     public: State *currentState;
