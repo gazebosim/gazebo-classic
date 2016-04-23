@@ -32,7 +32,7 @@ for f in $(ls *.hh | grep -v Private); do
     sed -i -e /.*\public.*/d ${new}
     sed -i -e /.*\protected.*/d ${new}
 
-    sed -i -e s:GZ_.*_VISIBLE ::g ${new}
+    sed -i -e s:GZ_.*_VISIBLE\ ::g ${new}
 
     # Add file to mercurial
     hg add ${new}
