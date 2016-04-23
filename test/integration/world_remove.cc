@@ -385,7 +385,7 @@ void WorldRemoveJointsTest::RemoveWorldWithJoint(
   ASSERT_TRUE(model != NULL);
 
   // Check model has the joint
-  EXPECT_EQ(model->GetJointCount(), 1);
+  EXPECT_EQ(model->GetJointCount(), 1u);
   EXPECT_EQ(joint, model->GetJoint("joint"));
 
   // Get link pointers
