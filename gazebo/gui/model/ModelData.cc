@@ -971,7 +971,7 @@ void LinkData::OnAddVisual(const std::string &_name)
 
   // See if this is in the deleted list
   for (auto it = this->deletedVisuals.begin();
-      it != this->deletedVisuals.end();)
+      it != this->deletedVisuals.end(); ++it)
   {
     if (it->first->GetName() == visualName.str())
     {
@@ -979,10 +979,9 @@ void LinkData::OnAddVisual(const std::string &_name)
       visVisual->SetVisible(true);
       visualMsg = it->second;
 
-      this->deletedVisuals.erase(it++);
+      this->deletedVisuals.erase(it);
       break;
     }
-    ++it;
   }
 
   if (!visVisual && !this->visuals.empty())
@@ -1033,7 +1032,7 @@ void LinkData::OnAddCollision(const std::string &_name)
 
   // See if this is in the deleted list
   for (auto it = this->deletedCollisions.begin();
-      it != this->deletedCollisions.end();)
+      it != this->deletedCollisions.end(); ++it)
   {
     if (it->first->GetName() == collisionName.str())
     {
@@ -1041,10 +1040,9 @@ void LinkData::OnAddCollision(const std::string &_name)
       collisionVis->SetVisible(true);
       collisionMsg = it->second;
 
-      this->deletedCollisions.erase(it++);
+      this->deletedCollisions.erase(it);
       break;
     }
-    ++it;
   }
 
   if (!collisionVis)
@@ -1095,7 +1093,7 @@ void LinkData::OnRemoveVisual(const std::string &_name)
   name << this->linkVisual->GetName() << "::" << _name;
   std::string visualName = name.str();
 
-  for (auto it = this->visuals.begin(); it != this->visuals.end();)
+  for (auto it = this->visuals.begin(); it != this->visuals.end(); ++it)
   {
     if (visualName == it->first->GetName())
     {
@@ -1105,7 +1103,6 @@ void LinkData::OnRemoveVisual(const std::string &_name)
       this->visuals.erase(it);
       break;
     }
-    ++it;
   }
 }
 
@@ -1118,17 +1115,16 @@ void LinkData::OnRemoveCollision(const std::string &_name)
   name << this->linkVisual->GetName() << "::" << _name;
   std::string collisionName = name.str();
 
-  for (auto it = this->collisions.begin(); it != this->collisions.end();)
+  for (auto it = this->collisions.begin(); it != this->collisions.end(); ++it)
   {
     if (collisionName == it->first->GetName())
     {
       it->first->SetVisible(false);
 
       this->deletedCollisions[it->first] = it->second;
-      this->collisions.erase(it++);
+      this->collisions.erase(it);
       break;
     }
-    ++it;
   }
 }
 
