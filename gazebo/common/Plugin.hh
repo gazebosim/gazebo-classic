@@ -173,7 +173,6 @@ namespace gazebo
               {
                 gzerr << "Failed to resolve " << registerName
                       << ": " << dlerror();
-                dlclose(dlHandle);
                 return result;
               }
 
