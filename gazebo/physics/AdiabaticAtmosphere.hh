@@ -53,9 +53,6 @@ namespace gazebo
       public: virtual void Load(sdf::ElementPtr _sdf);
 
       // Documentation inherited
-      public: virtual void Init();
-
-      // Documentation inherited
       public: virtual std::string Type() const;
 
       // Documentation inherited
