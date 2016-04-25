@@ -52,9 +52,6 @@ namespace gazebo
       /// \param[in] _sdf Pointer to the SDF parameters.
       public: virtual void Load(sdf::ElementPtr _sdf);
 
-      /// \brief Initialize the atmosphere model.
-      public: virtual void Init() = 0;
-
       /// \brief Reset the atmosphere model.
       public: virtual void Reset();
 
