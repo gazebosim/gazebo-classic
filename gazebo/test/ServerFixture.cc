@@ -254,20 +254,19 @@ void ServerFixture::RunServer(const std::vector<std::string> &_args)
 
   ASSERT_NO_THROW(this->server = new Server());
 
-  if (!this->server->ParseArgs(argc, argv))
-    goto exit;
-
-  if (!rendering::get_scene(gazebo::physics::get_world()->GetName()))
+  if (this->server->ParseArgs(argc, argv))
   {
-    ASSERT_NO_THROW(rendering::create_scene(
-        gazebo::physics::get_world()->GetName(), false, true));
+    if (!rendering::get_scene(gazebo::physics::get_world()->GetName()))
+    {
+      ASSERT_NO_THROW(rendering::create_scene(
+            gazebo::physics::get_world()->GetName(), false, true));
+    }
+
+    ASSERT_NO_THROW(this->server->Run());
+
+    ASSERT_NO_THROW(this->server->Fini());
   }
 
-  ASSERT_NO_THROW(this->server->Run());
-
-  ASSERT_NO_THROW(this->server->Fini());
-
-exit:
   ASSERT_NO_THROW(delete this->server);
   this->server = NULL;
 
