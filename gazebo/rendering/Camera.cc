@@ -1820,5 +1820,5 @@ std::string Camera::GetProjectionType() const
 //////////////////////////////////////////////////
 ignition::math::Matrix4d Camera::ProjectionMatrix() const
 {
-  return Conversions::Convert(this->camera->getProjectionMatrix());
+  return Conversions::ConvertIgn(this->camera->getProjectionMatrix());
 }
