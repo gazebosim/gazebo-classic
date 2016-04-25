@@ -147,7 +147,7 @@ PlotCanvas::PlotCanvas(QWidget *_parent)
   xVariableContainer->SetMaxSize(1);
   xVariableContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
   xVariableContainer->setContentsMargins(0, 0, 0, 0);
-  // FIXME: hardcode x axis for now
+  // \todo: fix hardcoded x axis
   xVariableContainer->AddVariablePill("sim_time");
   xVariableContainer->setEnabled(false);
 
@@ -892,12 +892,13 @@ void PlotCanvas::ExportPDF(const std::string &_filePrefix) const
     std::string suffix =
         this->dataPtr->plotData.size() > 1 ? std::to_string(index) : "";
 
-    auto filename = common::unique_file_path(_filePrefix + suffix, "pdf");
+    std::string filename =
+      common::unique_file_path(_filePrefix + suffix, "pdf");
 
-    auto plot = it.second->plot;
+    IncrementalPlot *plot = it.second->plot;
 
     QSizeF docSize(plot->canvas()->width() + plot->legend()->width(),
-                   plot->canvas()->height()/3);
+                   plot->canvas()->height());
 
     QwtPlotRenderer renderer;
     renderer.renderDocument(plot, QString(filename.c_str()), docSize, 20);
@@ -925,11 +926,11 @@ void PlotCanvas::ExportCSV(const std::string &_filePrefix) const
       std::replace(label.begin(), label.end(), '/', '_');
       std::replace(label.begin(), label.end(), '?', ':');
 
-      auto filename =
+      std::string filename =
           common::unique_file_path(_filePrefix + "-" + label, "csv");
 
       std::ofstream out(filename);
-      // FIXME: sim_time hardcoded for now
+      // \todo: fix hardcoded sim_time
       out << "sim_time, " << c->Label() << std::endl;
       for (unsigned int j = 0; j < c->Size(); ++j)
       {
