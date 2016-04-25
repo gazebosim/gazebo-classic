@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PHYSICS_WIND_HH_
-#define _GAZEBO_PHYSICS_WIND_HH_
+#ifndef GAZEBO_PHYSICS_WIND_HH_
+#define GAZEBO_PHYSICS_WIND_HH_
 
 #include <string>
 #include <functional>
@@ -38,13 +38,12 @@ namespace gazebo
 
     /// \class Wind Wind.hh physics/physics.hh
     /// \brief Base class for wind.
-    class GZ_PHYSICS_VISIBLE Wind :
-      public std::enable_shared_from_this<Wind>
+    class GZ_PHYSICS_VISIBLE Wind
     {
       /// \brief Default constructor.
-      /// \param[in] _world Pointer to the world.
+      /// \param[in] _world Reference to the world.
       /// \param[in] _sdf SDF element parameters for the wind.
-      public: explicit Wind(WorldPtr _world, sdf::ElementPtr _sdf);
+      public: explicit Wind(World &_world, sdf::ElementPtr _sdf);
 
       /// \brief Destructor.
       public: virtual ~Wind();
@@ -52,12 +51,6 @@ namespace gazebo
       /// \brief Load the wind.
       /// \param[in] _sdf Pointer to the SDF parameters.
       public: virtual void Load(sdf::ElementPtr _sdf);
-
-      /// \brief Initialize the wind.
-      public: virtual void Init();
-
-      /// \brief Finilize the wind.
-      public: virtual void Fini();
 
       /// \brief Set a parameter of the wind.
       /// See SetParam documentation for descriptions of duplicate parameters.
@@ -68,7 +61,7 @@ namespace gazebo
       /// \param[in] _value The value to set to
       /// \return true if SetParam is successful, false if operation fails.
       public: bool SetParam(const std::string &_key,
-                  const boost::any &_value);
+                            const boost::any &_value);
 
       /// \brief Get a wind parameter
       /// \param[in] _attr String key
@@ -118,19 +111,16 @@ namespace gazebo
       /// function callback is a reference to an instance of
       /// Wind and a pointer to an entity in the scene. The function must
       /// return the new wind velocity as a vector.
-      public: void SetLinearVelFunc(
-                  std::function< ignition::math::Vector3d (
-                      std::shared_ptr<const Wind> &,
-                      const Entity *_entity)> _linearVelFunc);
+      public: void SetLinearVelFunc(std::function< ignition::math::Vector3d (
+          const Wind *_wind, const Entity *_entity) > _linearVelFunc);
 
       /// \brief Get the global wind velocity, ignoring the entity.
       /// \param[in] _wind Reference to the wind.
       /// \param[in] _entity Pointer to an entity at which location the wind
       /// velocity is to be calculated.
       /// \return Wind's velocity at entity's location.
-      private: ignition::math::Vector3d LinearVelDefault(
-                  std::shared_ptr<const Wind> &_wind,
-                  const Entity *_entity);
+      private: ignition::math::Vector3d LinearVelDefault(const Wind *_wind,
+          const Entity *_entity);
 
       /// \internal
       /// \brief Private data pointer.

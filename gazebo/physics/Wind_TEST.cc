@@ -27,12 +27,12 @@ class WindTest : public ServerFixture
   public: void OnWindMsgResponse(ConstResponsePtr &_msg);
 
   /// \brief Get the global wind velocity, ignoring the entity.
-  /// \param[in] _wind Reference to the wind.
+  /// \param[in] _wind Pointer to the wind.
   /// \param[in] _entity Pointer to an entity at which location the wind
   /// velocity is to be calculated.
   /// \return Wind's velocity at entity's location.
   public: ignition::math::Vector3d LinearVel(
-                  std::shared_ptr<const physics::Wind> &_wind,
+                  const physics::Wind *_wind,
                   const physics::Entity *_entity);
 
   /// \brief Test getting/setting wind parameters.
@@ -59,7 +59,7 @@ msgs::Wind WindTest::windResponseMsg;
 
 /////////////////////////////////////////////////
 ignition::math::Vector3d WindTest::LinearVel(
-                  std::shared_ptr<const physics::Wind> &_wind,
+                  const physics::Wind *_wind,
                   const physics::Entity * /*_entity*/)
 {
   return _wind->LinearVel() * this->windFactor;
@@ -115,27 +115,27 @@ void WindTest::WindParam()
 
   // Test Wind::[GS]etParam()
   {
-    physics::WindPtr wind = world->Wind();
+    physics::Wind &wind = world->Wind();
     ignition::math::Vector3d vel = boost::any_cast<ignition::math::Vector3d>(
-      wind->Param("linear_velocity"));
+      wind.Param("linear_velocity"));
     EXPECT_EQ(vel, msgs::ConvertIgn(windPubMsg.linear_velocity()));
 
-    EXPECT_NO_THROW(wind->Param("fake_param_name"));
-    EXPECT_NO_THROW(wind->SetParam("fake_param_name", 0));
+    EXPECT_NO_THROW(wind.Param("fake_param_name"));
+    EXPECT_NO_THROW(wind.SetParam("fake_param_name", 0));
 
     // Try SetParam with wrong type
-    EXPECT_NO_THROW(wind->SetParam("linear_velocity", std::string("wrong")));
+    EXPECT_NO_THROW(wind.SetParam("linear_velocity", std::string("wrong")));
   }
 
   {
     // Test SetParam for non-implementation-specific parameters
-    physics::WindPtr wind = world->Wind();
+    physics::Wind &wind = world->Wind();
     try
     {
       boost::any value;
       ignition::math::Vector3d vel(-1.03, 0, 0);
-      EXPECT_TRUE(wind->SetParam("linear_velocity", vel));
-      EXPECT_TRUE(wind->Param("linear_velocity", value));
+      EXPECT_TRUE(wind.SetParam("linear_velocity", vel));
+      EXPECT_TRUE(wind.Param("linear_velocity", value));
       EXPECT_EQ(boost::any_cast<ignition::math::Vector3d>(value), vel);
     }
     catch(boost::bad_any_cast &_e)
@@ -162,20 +162,20 @@ void WindTest::WindParamBool()
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::WindPtr wind = world->Wind();
+  physics::Wind &wind = world->Wind();
 
   // Initialize to failure conditions
   boost::any value;
 
   // Test wind parameter(s)
-  EXPECT_TRUE(wind->Param("linear_velocity", value));
+  EXPECT_TRUE(wind.Param("linear_velocity", value));
   const ignition::math::Vector3d &vel =
     boost::any_cast<ignition::math::Vector3d>(value);
   EXPECT_NEAR(vel.X(), 0.0, 1e-6);
   EXPECT_NEAR(vel.Y(), 0.0, 1e-6);
   EXPECT_NEAR(vel.Z(), 0.0, 1e-6);
 
-  EXPECT_FALSE(wind->Param("param_does_not_exist", value));
+  EXPECT_FALSE(wind.Param("param_does_not_exist", value));
 }
 
 /////////////////////////////////////////////////
@@ -195,18 +195,16 @@ void WindTest::WindSetLinearVelFunc()
   physics::ModelPtr model(new physics::Model(physics::BasePtr()));
   EXPECT_TRUE(model != NULL);
 
-  physics::WindPtr wind = world->Wind();
+  physics::Wind &wind = world->Wind();
 
   // Double the speed
   this->windFactor = 2.0;
 
-  wind->SetLinearVelFunc(std::bind(&WindTest::LinearVel, this,
+  wind.SetLinearVelFunc(std::bind(&WindTest::LinearVel, this,
         std::placeholders::_1, std::placeholders::_2));
 
-  std::shared_ptr<const physics::Wind> w =
-    std::static_pointer_cast<const physics::Wind>(wind);
-  EXPECT_EQ(wind->WorldLinearVel(model.get()),
-            this->LinearVel(w, model.get()));
+  EXPECT_EQ(wind.WorldLinearVel(model.get()),
+            this->LinearVel(&wind, model.get()));
 }
 
 /////////////////////////////////////////////////

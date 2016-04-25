@@ -3600,9 +3600,10 @@ void Scene::OnNotification(const msgs::Operation &_msg)
     VisualPtr visPtr;
     try
     {
-      Visual_M::iterator iter;
-      iter = this->dataPtr->visuals.find(std::stoul(name));
-      visPtr = iter->second;
+      auto iter = this->dataPtr->visuals.find(std::stoul(name));
+      if (iter != this->dataPtr->visuals.end())
+        visPtr = iter->second;
+
     } catch(...)
     {
       visPtr = this->GetVisual(name);
