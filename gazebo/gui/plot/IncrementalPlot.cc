@@ -35,7 +35,6 @@
 using namespace gazebo;
 using namespace gui;
 
-
 namespace gazebo
 {
   namespace gui
