@@ -23,21 +23,23 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wfloat-equal"
 
-#include <qwt/qwt_plot.h>
-#include <qwt/qwt_scale_widget.h>
-#include <qwt/qwt_scale_engine.h>
-#include <qwt/qwt_plot_zoomer.h>
-#include <qwt/qwt_plot_panner.h>
-#include <qwt/qwt_plot_layout.h>
-#include <qwt/qwt_plot_grid.h>
-#include <qwt/qwt_plot_curve.h>
-#include <qwt/qwt_plot_canvas.h>
-#include <qwt/qwt_plot_marker.h>
 #include <qwt/qwt_curve_fitter.h>
-#include <qwt/qwt_symbol.h>
 #include <qwt/qwt_legend.h>
+#include <qwt/qwt_painter.h>
+#include <qwt/qwt_picker_machine.h>
+#include <qwt/qwt_plot.h>
+#include <qwt/qwt_plot_canvas.h>
+#include <qwt/qwt_plot_curve.h>
 #include <qwt/qwt_plot_directpainter.h>
+#include <qwt/qwt_plot_grid.h>
+#include <qwt/qwt_plot_layout.h>
 #include <qwt/qwt_plot_magnifier.h>
+#include <qwt/qwt_plot_marker.h>
+#include <qwt/qwt_plot_panner.h>
+#include <qwt/qwt_plot_zoomer.h>
+#include <qwt/qwt_scale_engine.h>
+#include <qwt/qwt_scale_widget.h>
+#include <qwt/qwt_symbol.h>
 
 #pragma clang diagnostic pop
 

@@ -29,6 +29,7 @@
 #include "gazebo/common/Time.hh"
 
 #include "gazebo/gui/plot/PlotCurve.hh"
+#include "gazebo/gui/plot/PlotTracker.hh"
 #include "gazebo/gui/plot/IncrementalPlot.hh"
 
 using namespace gazebo;
@@ -171,6 +172,12 @@ namespace gazebo
       /// \brief Pointer to the plot magnifier.
       public: PlotMagnifier *magnifier;
 
+      /// \brief Pointer to the plot tracker.
+      public: PlotTracker *tracker;
+
+      /// \brief Pointer to the plot zoomer.
+      public: QwtPlotZoomer *zoomer;
+
       /// \brief Pointer to the plot panner.
       public: QwtPlotPanner *panner;
 
@@ -199,14 +206,19 @@ IncrementalPlot::IncrementalPlot(QWidget *_parent)
   // panning with the left mouse button
   this->dataPtr->panner = new QwtPlotPanner(this->canvas());
 
-  // stacked zooming with rectangle selection
-  QwtPlotZoomer* zoomer = new QwtPlotZoomer(this->canvas());
-  zoomer->setMousePattern(QwtEventPattern::MouseSelect1,
+  // line hover display
+  this->dataPtr->tracker = new PlotTracker(this->canvas());
+  this->dataPtr->tracker->setEnabled(false);
+
+  // box zoom
+  this->dataPtr->zoomer = new QwtPlotZoomer(this->canvas());
+  this->dataPtr->zoomer->setMousePattern(QwtEventPattern::MouseSelect1,
       Qt::MidButton);
-  zoomer->setMousePattern(QwtEventPattern::MouseSelect2,
+  this->dataPtr->zoomer->setMousePattern(QwtEventPattern::MouseSelect2,
       Qt::RightButton, Qt::ControlModifier);
-  zoomer->setMousePattern(QwtEventPattern::MouseSelect3,
+  this->dataPtr->zoomer->setMousePattern(QwtEventPattern::MouseSelect3,
       Qt::NoButton);
+  this->dataPtr->zoomer->setTrackerMode(QwtPicker::AlwaysOff);
 
   // zoom in/out with the wheel
   this->dataPtr->magnifier = new PlotMagnifier(this->canvas());
@@ -405,6 +417,7 @@ void IncrementalPlot::Update()
   this->dataPtr->prevPoint = lastPoint;
   this->setAxisScale(QwtPlot::xBottom, minX, maxX);
 
+  this->dataPtr->tracker->Update();
   this->replot();
 }
 
@@ -508,9 +521,22 @@ void IncrementalPlot::ShowGrid(const bool _show)
 }
 
 /////////////////////////////////////////////////
-bool IncrementalPlot::ShowGrid() const
+bool IncrementalPlot::IsShowGrid() const
 {
   return this->dataPtr->grid->isVisible();
+}
+
+/////////////////////////////////////////////////
+void IncrementalPlot::ShowHoverLine(const bool _show)
+{
+  this->dataPtr->tracker->setEnabled(_show);
+  this->replot();
+}
+
+/////////////////////////////////////////////////
+bool IncrementalPlot::IsShowHoverLine() const
+{
+  return this->dataPtr->tracker->isEnabled();
 }
 
 /////////////////////////////////////////////////

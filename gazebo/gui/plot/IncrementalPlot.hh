@@ -138,7 +138,15 @@ namespace gazebo
 
       /// \brief Get whether the grid lines are shown.
       /// \return True if the grid lines are visible.
-      public: bool ShowGrid() const;
+      public: bool IsShowGrid() const;
+
+      /// \brief Set whether to show the hover line.
+      /// \param[in] _show True to show hover line.
+      public: void ShowHoverLine(const bool _show);
+
+      /// \brief Get whether the hover line is shown.
+      /// \return True if the hover line is visible.
+      public: bool IsShowHoverLine() const;
 
       /// \brief Get all curves in this plot
       /// \return A list of curves in this plot.

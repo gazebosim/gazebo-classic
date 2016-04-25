@@ -179,6 +179,9 @@ namespace gazebo
       /// \brief Qt Callback to show/hide grids on plot.
       private slots: void OnShowGrid();
 
+      /// \brief Qt Callback to show/hide hover line on plot.
+      private slots: void OnShowHoverLine();
+
       /// \brief Empty plot used to indicate non-existent plot.
       public: static const unsigned int EmptyPlot;
 
