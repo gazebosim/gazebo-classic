@@ -198,16 +198,7 @@ void Base::AddChild(BasePtr _child)
 //////////////////////////////////////////////////
 void Base::RemoveChild(unsigned int _id)
 {
-  Base_V::iterator iter;
-  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
-  {
-    if ((*iter)->GetId() == _id)
-    {
-      (*iter)->Fini();
-      this->children.erase(iter);
-      break;
-    }
-  }
+  this->RemoveChild(this->GetById(_id));
 }
 
 //////////////////////////////////////////////////
@@ -241,17 +232,22 @@ BasePtr Base::GetChild(const std::string &_name)
 //////////////////////////////////////////////////
 void Base::RemoveChild(const std::string &_name)
 {
-  for (auto &iter : this->children)
-  {
-    if (iter->GetScopedName() == _name)
-    {
-      iter->Fini();
-      this->children.erase(std::remove(this->children.begin(),
-                                       this->children.end(), iter),
-                                       this->children.end());
-      break;
-    }
-  }
+  this->RemoveChild(this->GetByName(_name));
+}
+
+//////////////////////////////////////////////////
+void Base::RemoveChild(physics::BasePtr _child)
+{
+  if (!_child)
+    return;
+
+  // Fini
+  _child->Fini();
+
+  // Remove from vector if still there
+  this->children.erase(std::remove(this->children.begin(),
+                                   this->children.end(), _child),
+                                   this->children.end());
 }
 
 //////////////////////////////////////////////////
