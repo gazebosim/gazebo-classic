@@ -55,14 +55,27 @@ ODEJoint::ODEJoint(BasePtr _parent)
 //////////////////////////////////////////////////
 ODEJoint::~ODEJoint()
 {
+  this->Fini();
+}
+
+//////////////////////////////////////////////////
+void ODEJoint::Fini()
+{
   if (this->applyDamping)
     physics::Joint::DisconnectJointUpdate(this->applyDamping);
+  this->applyDamping.reset();
 
-  delete this->feedback;
+  if (this->feedback)
+    delete this->feedback;
+  this->feedback = NULL;
+
   this->Detach();
 
   if (this->jointId)
     dJointDestroy(this->jointId);
+  this->jointId = NULL;
+
+  Joint::Fini();
 }
 
 //////////////////////////////////////////////////
@@ -203,9 +216,20 @@ void ODEJoint::Attach(LinkPtr _parent, LinkPtr _child)
 //////////////////////////////////////////////////
 void ODEJoint::Detach()
 {
+  auto odeChild = boost::dynamic_pointer_cast<ODELink>(this->childLink);
+  auto odeParent = boost::dynamic_pointer_cast<ODELink>(this->parentLink);
+
   Joint::Detach();
   this->childLink.reset();
   this->parentLink.reset();
+
+  // By the time we get here, links and ODEIds might have already been
+  // cleaned up
+  if ((odeParent == NULL || odeParent->GetODEId() == NULL) ||
+      (odeChild == NULL || odeChild->GetODEId() == NULL))
+  {
+    return;
+  }
 
   if (this->jointId)
     dJointAttach(this->jointId, 0, 0);
@@ -621,6 +645,8 @@ void ODEJoint::Reset()
     dJointReset(this->jointId);
   else
     gzerr << "ODE Joint ID is invalid\n";
+
+  this->forceAppliedTime = common::Time::Zero;
 
   Joint::Reset();
 }
