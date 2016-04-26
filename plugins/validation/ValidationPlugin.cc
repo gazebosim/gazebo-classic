@@ -26,16 +26,22 @@ using namespace gazebo;
 using namespace ignition;
 
 /////////////////////////////////////////////////
-State::State(const std::string &_name, ValidationPlugin &_plugin)
+State::State(const std::string &_name, ValidationPlugin &_plugin,
+             const ValidationComponent_t &_componentType)
   : name(_name),
     plugin(_plugin),
     publicationInterval(1.0)
 {
-  // This is the topic where we receive feedback from the controllers.
-  this->node.Subscribe("/gazebo/validation/feedback", &State::OnFeedback, this);
+  std::string inboundTopic = "/gazebo/validation/state";
+  this->outboundTopic = "/gazebo/validation/feedback";
+  if (_componentType == ValidationComponent_t::GAZEBO)
+    std::swap(inboundTopic, outboundTopic);
+
+  // This is the topic where we receive feedback.
+  this->node.Subscribe(inboundTopic, &State::OnFeedback, this);
 
   // Advertise the current state.
-  this->node.Advertise<msgs::GzString>("/gazebo/validation/state");
+  this->node.Advertise<msgs::GzString>(outboundTopic);
 }
 
 /////////////////////////////////////////////////
@@ -44,10 +50,6 @@ void State::Update()
   //std::lock_guard<std::mutex> lock(this->mutex);
   if (!this->initialized)
     this->Initialize();
-
-  std::cout << this->name << std::endl;
-  std::cout << "State::Update()" << std::endl;
-  std::cout << timer.GetElapsed() << std::endl;
 
   this->DoUpdate();
 
@@ -63,7 +65,7 @@ void State::Teardown()
   //std::lock_guard<std::mutex> lock(this->mutex);
   this->initialized = false;
 
-  std::cout << "State::Teardown()" << std::endl;
+  //std::cout << "State::Teardown()" << std::endl;
   this->DoTeardown();
 
   this->PublishState();
@@ -97,19 +99,19 @@ void State::DoInitialize()
 /////////////////////////////////////////////////
 void State::DoUpdate()
 {
-  std::cout << "State::DoUpdate" << std::endl;
+  //std::cout << "State::DoUpdate" << std::endl;
 }
 
 /////////////////////////////////////////////////
 void State::DoTeardown()
 {
-  std::cout << "State::DoTeardown" << std::endl;
+  //std::cout << "State::DoTeardown" << std::endl;
 }
 
 /////////////////////////////////////////////////
 void State::DoFeedback()
 {
-  std::cout << "State::DoFeedback" << std::endl;
+  //std::cout << "State::DoFeedback" << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -125,7 +127,7 @@ void State::Initialize()
 /////////////////////////////////////////////////
 void State::OnFeedback(const msgs::GzString &_msg)
 {
-  std::cout << "State::OnFeedback()" << std::endl;
+  //std::cout << "State::OnFeedback()" << std::endl;
   //std::lock_guard<std::mutex> lock(this->mutex);
   this->feedback = _msg.data();
 
@@ -139,14 +141,14 @@ void State::PublishState()
 {
   msgs::GzString msg;
   msg.set_data(this->name);
-  this->node.Publish("/gazebo/validation/state", msg);
+  this->node.Publish(this->outboundTopic, msg);
   this->lastPublication = common::Time::GetWallTime();
 }
 
 /////////////////////////////////////////////////
 void ReadyState::DoInitialize()
 {
-  std::cout << "InitState::Initialize()" << std::endl;
+  std::cout << "ReadyState::Initialize()" << std::endl;
 
   // Reset the world.
 }
@@ -158,23 +160,49 @@ void ReadyState::DoFeedback()
   if (this->Feedback() == "controller_ready")
     this->plugin.ChangeState(*this->plugin.setState);
 
-  std::cout << "InitiState::DoFeedback()" << std::endl;
+  //std::cout << "ReadyState::DoFeedback()" << std::endl;
 }
 
 /////////////////////////////////////////////////
 void SetState::DoInitialize()
 {
-  // Load parameters.
+  // Load the parameters.
+
+  // Start the run.
   this->plugin.ChangeState(*this->plugin.goState);
+
+  std::cout << "SetState::DoInitialize()" << std::endl;
+}
+
+/////////////////////////////////////////////////
+void GoState::DoInitialize()
+{
+  std::cout << "GoState::DoInitialize()" << std::endl;
 }
 
 /////////////////////////////////////////////////
 void GoState::DoFeedback()
 {
-  if (this->Feedback() == "end_run")
-    this->plugin.ChangeState(*this->plugin.endState);
+  if (this->Feedback() == "controller_end")
+  {
+    if (this->plugin.MoreRuns())
+    {
+      // Go for the next run.
+      this->plugin.ChangeState(*this->plugin.readyState);
+    }
+    else
+    {
+      this->plugin.ChangeState(*this->plugin.endState);
+    }
+  }
 
-  std::cout << "RunState::DoFeedback()" << std::endl;
+ // std::cout << "RunState::DoFeedback()" << std::endl;
+}
+
+/////////////////////////////////////////////////
+void EndState::DoInitialize()
+{
+  std::cout << "EndState::DoInitialize()" << std::endl;
 }
 
 //////////////////////////////////////////////////
@@ -224,5 +252,8 @@ void ValidationPlugin::ChangeState(State &_newState)
 //////////////////////////////////////////////////
 bool ValidationPlugin::MoreRuns() const
 {
-  return false;
+  static int counter = 0;
+  ++counter;
+
+  return counter <= 3;
 }

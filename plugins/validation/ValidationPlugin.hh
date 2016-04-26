@@ -27,6 +27,7 @@
 #include "gazebo/common/Timer.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/gazebo.hh"
+#include "State.hh"
 
 namespace gazebo
 {
@@ -35,92 +36,6 @@ namespace gazebo
   static std::string kSetState   = "gazebo_set";
   static std::string kGoState    = "gazebo_go";
   static std::string kEndState   = "gazebo_end";
-
-  // Forward declarations.
-  class ValidationPlugin;
-
-  namespace msgs
-  {
-    class GzString;
-  }
-
-  /// \brief State pattern used for the state machine.
-  class State
-  {
-    /// \brief Class constructor.
-    /// \param[in] _name Name of the state.
-    /// \param[in] _plugin Pointer to the model plugin.
-    public: State(const std::string &_name,
-                  ValidationPlugin &_plugin);
-
-    /// \brief Update the state.
-    public: void Update();
-
-    /// \brief Called once before changing to a different state.
-    public: void Teardown();
-
-    /// \brief Equal to operator.
-    /// \param[in] _state The state to compare against.
-    /// \return true if the state has the same name.
-    public: bool operator ==(const State &_state) const;
-
-    /// \brief Not equal to operator
-    /// \param[in] _state The state to compare against
-    /// \return true if the state doesn't have the same name.
-    public: bool operator !=(const State &_v) const;
-
-    /// \brief Return the current feedback value.
-    protected: std::string Feedback() const;
-
-    /// \brief ToDo.
-    private: virtual void DoInitialize();
-
-    /// \brief ToDo.
-    private: virtual void DoUpdate();
-
-    /// \brief ToDo.
-    private: virtual void DoTeardown();
-
-    /// \brief ToDo.
-    private: virtual void DoFeedback();
-
-    /// \brief Initialize the state. Called once after a pause duration after
-    /// entering state.
-    private: void Initialize();
-
-    /// \brief Callback that updates the feedback member variable.
-    private: void OnFeedback(const msgs::GzString &_msg);
-
-     /// \brief Publish the current state.
-    private: void PublishState();
-
-    /// \brief Name of the state.
-    public: const std::string name;
-
-    /// \brief Pointer to the validation plugin.
-    protected: ValidationPlugin &plugin;
-
-    /// \brief Timer to measure time in the current state.
-    protected: common::Timer timer;
-
-    /// \brief Has initialized
-    protected: bool initialized = false;
-
-    /// \brief Last feedback message.
-    private: std::string feedback;
-
-    /// \brief Mutex to protect the feedback message.
-    private: mutable std::mutex mutex;
-
-    /// \brief Last time the we published the state.
-    private: common::Time lastPublication;
-
-    /// \brief Elapsed time between state publications.
-    private: common::Time publicationInterval;
-
-    /// \brief Transport node.
-    protected: ignition::transport::Node node;
-  };
 
   /// \brief State that handles the "ready" state.
   class ReadyState : public State
@@ -151,6 +66,8 @@ namespace gazebo
     // Use class constructor from base class.
     using State::State;
 
+    public: virtual void DoInitialize();
+
     // Documentation inherited.
     public: virtual void DoFeedback();
   };
@@ -160,6 +77,8 @@ namespace gazebo
   {
     // Use class constructor from base class.
     using State::State;
+
+    public: virtual void DoInitialize();
   };
 
   /// Example SDF:
@@ -219,7 +138,7 @@ namespace gazebo
     public: std::unique_ptr<GoState> goState;
     public: std::unique_ptr<EndState> endState;
 
-    /// \brief Pointer to the current game state.
+    /// \brief Pointer to the current state.
     public: State *currentState;
   };
 

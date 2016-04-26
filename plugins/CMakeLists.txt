@@ -70,7 +70,6 @@ set (plugins
   SonarPlugin
   SphereAtlasDemoPlugin
   TransporterPlugin
-  ValidationPlugin
   VehiclePlugin)
 
 if (HAVE_USB AND UNIX AND NOT APPLE)
@@ -109,6 +108,7 @@ foreach (src ${GUIplugins})
 endforeach (src ${GUIplugins})
 
 add_subdirectory(events)
+add_subdirectory(validation)
 
 if (NOT WIN32)
   add_subdirectory(rest_web)
