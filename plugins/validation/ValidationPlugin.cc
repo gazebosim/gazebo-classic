@@ -17,9 +17,7 @@
 
 #include <functional>
 #include <mutex>
-#include <string>
 #include "gazebo/common/Console.hh"
-#include "gazebo/msgs/gz_string.pb.h"
 #include "ValidationPlugin.hh"
 
 using namespace gazebo;

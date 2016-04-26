@@ -26,7 +26,6 @@
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/gazebo.hh"
 #include "State.hh"
-#include "ValidationController.hh"
 
 namespace gazebo
 {

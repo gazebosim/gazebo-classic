@@ -24,15 +24,12 @@
 #include <ignition/transport/Node.hh>
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/Timer.hh"
+#include "gazebo/msgs/gz_string.pb.h"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/gazebo.hh"
 
 namespace gazebo
 {
-  // Forward declarations.
-  class ValidationPlugin;
-  template <typename T> class State;
-
   /// \def
   enum class ValidationComponent_t
   {
@@ -41,11 +38,6 @@ namespace gazebo
     /// \brief .
     CONTROLLER
   };
-
-  namespace msgs
-  {
-    class GzString;
-  }
 
   /// \brief State pattern used for the state machine.
   template <typename T>
@@ -69,8 +61,14 @@ namespace gazebo
       // This is the topic where we receive feedback.
       this->node.Subscribe(inboundTopic, &State::OnFeedback, this);
 
+      // testing
+      gazebo::msgs::GzString msg;
+      ignition::transport::Node n;
+      n.Advertise<gazebo::msgs::GzString>(outboundTopic);
+      // testing
+
       // Advertise the current state.
-      //this->node.Advertise<msgs::GzString>(outboundTopic);
+      this->node.Advertise<gazebo::msgs::GzString>(outboundTopic);
     }
 
     /// \brief Update the state.
@@ -191,6 +189,9 @@ namespace gazebo
     /// \brief Has initialized
     protected: bool initialized = false;
 
+    /// \brief Transport node.
+    protected: ignition::transport::Node node;
+
     /// \brief ToDo.
     private: std::string outboundTopic;
 
@@ -205,9 +206,6 @@ namespace gazebo
 
     /// \brief Elapsed time between state publications.
     private: common::Time publicationInterval;
-
-    /// \brief Transport node.
-    protected: ignition::transport::Node node;
   };
 }
 #endif
