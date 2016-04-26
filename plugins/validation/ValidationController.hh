@@ -18,11 +18,9 @@
 #ifndef _GAZEBO_PLUGINS_VALIDATION_CONTROLLER_
 #define _GAZEBO_PLUGINS_VALIDATION_CONTROLLER_
 
+#include <memory>
 #include <mutex>
 #include <string>
-#include <ignition/transport/Node.hh>
-#include "gazebo/common/Time.hh"
-#include "gazebo/common/Timer.hh"
 #include "State.hh"
 
 namespace gazebo
@@ -33,104 +31,66 @@ namespace gazebo
   static std::string kControllerRunningState   = "controller_running";
   static std::string kControllerEndState       = "controller_end";
 
-  /// \brief State that handles the "ready" state.
-  template <class T>
-  class ControllerReadyState : public State<T>
+  class ValidationController;
+
+  /// \brief A generic state for the validation controller.
+  class GAZEBO_VISIBLE ControllerState : public State
   {
     // Use class constructor from base class.
-    using State<T>::State;
+    public: ControllerState(const std::string &_name,
+                            ValidationController &_plugin);
 
-    // Documentation inherited.
-    public: virtual void DoInitialize()
-    {
-      std::cout << "ReadyState::Initialize()" << std::endl;
-    }
+    /// \brief ToDo.
+    protected: ValidationController &controller;
+  };
+
+  /// \brief State that handles the "ready" state.
+  class ControllerReadyState : public ControllerState
+  {
+    // Use class constructor from base class.
+    using ControllerState::ControllerState;
 
     // Documentation inherited
-    public: virtual void DoFeedback()
-    {
-      //if (this->Feedback() == "gazebo_go")
-      //  this->fsm.ChangeState(*this->fsm.initCondsState);
-
-      //std::cout << "ReadyState::DoOnState()" << std::endl;
-    }
+    public: virtual void DoFeedback();
   };
 
   /// \brief State that handles the "initConds" state.
-  template <typename T>
-  class ControllerInitCondsState : public State<T>
+  class ControllerInitCondsState : public ControllerState
   {
     // Use class constructor from base class.
-    using State<T>::State;
+    using ControllerState::ControllerState;
 
     // Documentation inherited.
-    public: virtual void DoInitialize()
-    {
-      // Send initial conditions.
-      std::cout << "InitCondsState::DoInitialize()" << std::endl;
-      //std::cout << "Initial conditions" << std::endl;
-    }
+    public: virtual void DoInitialize();
 
     // Documentation inherited.
-    public: virtual void DoUpdate()
-    {
-      // Check if the initial conditions are satisfied.
-
-      //std::cout << "InitCondsState::DoUpdate()" << std::endl;
-
-      if (this->timer.GetElapsed() >= gazebo::common::Time(2.0))
-        this->fsm.ChangeState(*this->fsm.runningState);
-    }
+    public: virtual void DoUpdate();
   };
 
   /// \brief State that handles the "running" state.
-  template <typename T>
-  class ControllerRunningState : public State<T>
+  class ControllerRunningState : public ControllerState
   {
     // Use class constructor from base class.
-    using State<T>::State;
+    using ControllerState::ControllerState;
 
     // Documentation inherited.
-    public: virtual void DoInitialize()
-    {
-      std::cout << "RunningState::Initialize()" << std::endl;
-    }
+    public: virtual void DoInitialize();
 
     // Documentation inherited.
-    public: virtual void DoUpdate()
-    {
-      // Send the next command.
-
-      //std::cout << "RunningState::DoUpdate()" << std::endl;
-
-      // Check if we are done with the run
-      if (this->timer.GetElapsed() >= gazebo::common::Time(5.0))
-        this->fsm.ChangeState(*this->fsm.endState);
-    }
+    public: virtual void DoUpdate();
   };
 
   /// \brief State that handles the "running" state.
-  template <typename T>
-  class ControllerEndState : public State<T>
+  class ControllerEndState : public ControllerState
   {
     // Use class constructor from base class.
-    using State<T>::State;
+    using ControllerState::ControllerState;
 
     // Documentation inherited.
-    public: virtual void DoInitialize()
-    {
-      std::cout << "EndState::Initialize()" << std::endl;
-    }
+    public: virtual void DoInitialize();
 
     // Documentation inherited
-    public: virtual void DoOnState()
-    {
-      // Check if Gazebo is ready for another run.
-      if (this->Feedback() == "gazebo_ready")
-        this->fsm.ChangeState(*this->fsm.readyState);
-
-      //std::cout << "EndState::DoOnState()" << std::endl;
-    }
+    public: virtual void DoFeedback();
   };
 
   /// \brief ToDo
@@ -146,16 +106,16 @@ namespace gazebo
     public: void Start();
 
     /// \brief ToDo.
-    public: void ChangeState(State<ValidationController> &_newState);
+    public: void ChangeState(State &_newState);
 
     /// \brief State machine states.
-    public: std::unique_ptr<ControllerReadyState<ValidationController>>     readyState;
-    public: std::unique_ptr<ControllerInitCondsState<ValidationController>> initCondsState;
-    public: std::unique_ptr<ControllerRunningState<ValidationController>>   runningState;
-    public: std::unique_ptr<ControllerEndState<ValidationController>>       endState;
+    public: std::unique_ptr<ControllerReadyState>     readyState;
+    public: std::unique_ptr<ControllerInitCondsState> initCondsState;
+    public: std::unique_ptr<ControllerRunningState>   runningState;
+    public: std::unique_ptr<ControllerEndState>       endState;
 
     /// \brief Pointer to the current state.
-    public: State<ValidationController> *currentState;
+    public: State *currentState;
   };
 }
 

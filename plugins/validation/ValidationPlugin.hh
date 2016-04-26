@@ -21,7 +21,6 @@
 #include <memory>
 #include <mutex>
 #include <string>
-#include <ignition/transport/Node.hh>
 #include <sdf/sdf.hh>
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/gazebo.hh"
@@ -35,92 +34,58 @@ namespace gazebo
   static std::string kGoState    = "gazebo_go";
   static std::string kEndState   = "gazebo_end";
 
-  /// \brief State that handles the "ready" state.
-  template <typename T>
-  class GazeboReadyState : public State<T>
+  class ValidationPlugin;
+
+  /// \brief A generic state for the validation plugin.
+  class GAZEBO_VISIBLE GazeboState : public State
   {
     // Use class constructor from base class.
-    using State<T>::State;
+    public: GazeboState(const std::string &_name,
+                        ValidationPlugin &_plugin);
 
-    // Documentation inherited.
-    public: virtual void DoInitialize()
-    {
-      std::cout << "ReadyState::Initialize()" << std::endl;
-    }
+    /// \brief ToDo.
+    protected: ValidationPlugin &plugin;
+  };
+
+  /// \brief State that handles the "ready" state.
+  class GAZEBO_VISIBLE GazeboReadyState : public GazeboState
+  {
+    // Use class constructor from base class.
+    using GazeboState::GazeboState;
 
     // Documentation inherited
-    public: virtual void DoFeedback()
-    {
-      // Is the controller ready?
-      if (this->Feedback() == "controller_ready")
-        this->fsm.ChangeState(*this->fsm.setState);
-
-      //std::cout << "ReadyState::DoFeedback()" << std::endl;
-    }
+    public: virtual void DoFeedback();
   };
 
   /// \brief State that handles the "set" state.
-  template <typename T>
-  class GazeboSetState : public State<T>
+  class GazeboSetState : public GazeboState
   {
     // Use class constructor from base class.
-    using State<T>::State;
+    using GazeboState::GazeboState;
 
     // Documentation inherited.
-    public: virtual void DoInitialize()
-    {
-      // Load the parameters.
-
-      // Start the run.
-      this->fsm.ChangeState(*this->fsm.goState);
-
-      std::cout << "SetState::DoInitialize()" << std::endl;
-    }
+    public: virtual void DoInitialize();
   };
 
   /// \brief State that handles the "go" state.
-  template <typename T>
-  class GazeboGoState : public State<T>
+  class GazeboGoState : public GazeboState
   {
     // Use class constructor from base class.
-    using State<T>::State;
+    using GazeboState::GazeboState;
 
-    public: virtual void DoInitialize()
-    {
-      std::cout << "GoState::DoInitialize()" << std::endl;
-    }
+    public: virtual void DoInitialize();
 
     // Documentation inherited.
-    public: virtual void DoFeedback()
-    {
-      if (this->Feedback() == "controller_end")
-      {
-        if (this->fsm.MoreRuns())
-        {
-          // Go for the next run.
-          this->fsm.ChangeState(*this->fsm.readyState);
-        }
-        else
-        {
-          this->fsm.ChangeState(*this->fsm.endState);
-        }
-      }
-
-      // std::cout << "RunState::DoFeedback()" << std::endl;
-    }
+    public: virtual void DoFeedback();
   };
 
   /// \brief State that handles the "end" state.
-  template <typename T>
-  class GazeboEndState : public State<T>
+  class GazeboEndState : public GazeboState
   {
     // Use class constructor from base class.
-    using State<T>::State;
+    using GazeboState::GazeboState;
 
-    public: virtual void DoInitialize()
-    {
-      std::cout << "EndState::DoInitialize()" << std::endl;
-    }
+    public: virtual void DoInitialize();
   };
 
   /// \brief ToDo
@@ -140,7 +105,7 @@ namespace gazebo
     private: bool LoadModelParams();
 
     /// \brief ToDo.
-    public: void ChangeState(State<ValidationPlugin> &_newState);
+    public: void ChangeState(State &_newState);
 
     /// \brief ToDo.
     public: bool MoreRuns() const;
@@ -149,13 +114,13 @@ namespace gazebo
     private: event::ConnectionPtr updateConnection;
 
     /// \brief State machine states.
-    public: std::unique_ptr<GazeboReadyState<ValidationPlugin>> readyState;
-    public: std::unique_ptr<GazeboSetState<ValidationPlugin>>   setState;
-    public: std::unique_ptr<GazeboGoState<ValidationPlugin>>    goState;
-    public: std::unique_ptr<GazeboEndState<ValidationPlugin>>   endState;
+    public: std::unique_ptr<GazeboReadyState> readyState;
+    public: std::unique_ptr<GazeboSetState>   setState;
+    public: std::unique_ptr<GazeboGoState>    goState;
+    public: std::unique_ptr<GazeboEndState>   endState;
 
     /// \brief Pointer to the current state.
-    public: State<ValidationPlugin> *currentState;
+    public: State *currentState;
   };
 
   // Register this plugin with the simulator

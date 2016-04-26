@@ -17,18 +17,80 @@
 
 #include <functional>
 #include <mutex>
+#include <string>
 #include "gazebo/common/Console.hh"
+#include "State.hh"
 #include "ValidationPlugin.hh"
 
 using namespace gazebo;
-using namespace ignition;
+
+//////////////////////////////////////////////////
+GazeboState::GazeboState(const std::string &_name,
+    ValidationPlugin &_plugin)
+  : State(_name, ValidationComponent_t::GAZEBO),
+    plugin(_plugin)
+{
+}
+
+//////////////////////////////////////////////////
+void GazeboReadyState::DoFeedback()
+{
+  // Is the controller ready?
+  if (this->Feedback() == "controller_ready")
+    this->plugin.ChangeState(*this->plugin.setState);
+
+  //std::cout << "ReadyState::DoFeedback()" << std::endl;
+}
+
+//////////////////////////////////////////////////
+void GazeboSetState::DoInitialize()
+{
+  // Load the parameters.
+
+  // Start the run.
+  this->plugin.ChangeState(*this->plugin.goState);
+
+  std::cout << "SetState::DoInitialize()" << std::endl;
+}
+
+//////////////////////////////////////////////////
+void GazeboGoState::DoInitialize()
+{
+  std::cout << "GoState::DoInitialize()" << std::endl;
+}
+
+
+//////////////////////////////////////////////////
+void GazeboGoState::DoFeedback()
+{
+  if (this->Feedback() == "controller_end")
+  {
+    if (this->plugin.MoreRuns())
+    {
+      // Go for the next run.
+      this->plugin.ChangeState(*this->plugin.readyState);
+    }
+    else
+    {
+      this->plugin.ChangeState(*this->plugin.endState);
+    }
+  }
+
+  // std::cout << "RunState::DoFeedback()" << std::endl;
+}
+
+//////////////////////////////////////////////////
+void GazeboEndState::DoInitialize()
+{
+  std::cout << "EndState::DoInitialize()" << std::endl;
+}
 
 //////////////////////////////////////////////////
 ValidationPlugin::ValidationPlugin()
-  : readyState(new GazeboReadyState<ValidationPlugin>(kReadyState, *this)),
-    setState(new GazeboSetState<ValidationPlugin>(kSetState, *this)),
-    goState(new GazeboGoState<ValidationPlugin>(kGoState, *this)),
-    endState(new GazeboEndState<ValidationPlugin>(kEndState, *this)),
+  : readyState(new GazeboReadyState(kReadyState, *this)),
+    setState(new GazeboSetState(kSetState, *this)),
+    goState(new GazeboGoState(kGoState, *this)),
+    endState(new GazeboEndState(kEndState, *this)),
     currentState(readyState.get())
 {
   std::cout << "Validation plugin loaded" << std::endl;
@@ -57,7 +119,7 @@ bool ValidationPlugin::LoadModelParams()
 }
 
 //////////////////////////////////////////////////
-void ValidationPlugin::ChangeState(State<ValidationPlugin> &_newState)
+void ValidationPlugin::ChangeState(State &_newState)
 {
   // Only update the state if _newState is different than the current state.
   if (!this->currentState || *this->currentState != _newState)

@@ -39,33 +39,25 @@ namespace gazebo
     CONTROLLER
   };
 
+  //class ValidationFSM;
+
   /// \brief State pattern used for the state machine.
-  template <typename T>
   class State
   {
     /// \brief Class constructor.
     /// \param[in] _name Name of the state.
     /// \param[in] _plugin Pointer to the model plugin.
-    public: State(const std::string &_name,
-                  T &_fsm,
-                  const ValidationComponent_t &_componentType =
-                      ValidationComponent_t::CONTROLLER)
-      : name(_name),
-        fsm(_fsm)
+    public: State(const std::string &_name, const ValidationComponent_t &_type =
+      ValidationComponent_t::CONTROLLER)
+      : name(_name)
     {
       std::string inboundTopic = "/gazebo/validation/state";
       this->outboundTopic = "/gazebo/validation/feedback";
-      if (_componentType == ValidationComponent_t::GAZEBO)
+      if (_type == ValidationComponent_t::GAZEBO)
         std::swap(inboundTopic, outboundTopic);
 
       // This is the topic where we receive feedback.
       this->node.Subscribe(inboundTopic, &State::OnFeedback, this);
-
-      // testing
-      gazebo::msgs::GzString msg;
-      ignition::transport::Node n;
-      n.Advertise<gazebo::msgs::GzString>(outboundTopic);
-      // testing
 
       // Advertise the current state.
       this->node.Advertise<gazebo::msgs::GzString>(outboundTopic);
@@ -149,7 +141,7 @@ namespace gazebo
     /// entering state.
     private: void Initialize()
     {
-      std::cout << "State::Initialize()" << std::endl;
+      //std::cout << "State::Initialize()" << std::endl;
       this->initialized = true;
       this->timer.Reset();
       this->timer.Start();
@@ -181,7 +173,7 @@ namespace gazebo
     public: const std::string name;
 
     /// \brief Reference to the finite state machine.
-    protected: T &fsm;
+    //protected: ValidationFSM &fsm;
 
     /// \brief Timer to measure time in the current state.
     protected: common::Timer timer;

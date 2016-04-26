@@ -8,13 +8,13 @@ link_directories(
 )
 
 set (validation_src
-  #ValidationController.cc
+  ValidationController.cc
   ValidationPlugin.cc
 )
 
 set (validation_headers
   State.hh
-  #ValidationController.hh
+  ValidationController.hh
   ValidationPlugin.hh
 )
 

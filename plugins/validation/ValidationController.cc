@@ -17,21 +17,87 @@
 
 #include <mutex>
 #include <string>
-#include <ignition/transport/Node.hh>
-#include "gazebo/common/Time.hh"
-#include "gazebo/common/Timer.hh"
-#include "gazebo/msgs/msgs.hh"
+#include "State.hh"
 #include "ValidationController.hh"
 
 using namespace gazebo;
-using namespace common;
+
+//////////////////////////////////////////////////
+ControllerState::ControllerState(const std::string &_name,
+    ValidationController &_controller)
+  : State(_name),
+    controller(_controller)
+{
+}
+
+/////////////////////////////////////////////////
+void ControllerReadyState::DoFeedback()
+{
+  if (this->Feedback() == "gazebo_go")
+    this->controller.ChangeState(*this->controller.initCondsState);
+
+  //std::cout << "ReadyState::DoOnState()" << std::endl;
+}
+
+/////////////////////////////////////////////////
+void ControllerInitCondsState::DoInitialize()
+{
+  // Send initial conditions.
+  std::cout << "InitCondsState::DoInitialize()" << std::endl;
+  //std::cout << "Initial conditions" << std::endl;
+}
+
+/////////////////////////////////////////////////
+void ControllerInitCondsState::DoUpdate()
+{
+  // Check if the initial conditions are satisfied.
+
+  //std::cout << "InitCondsState::DoUpdate()" << std::endl;
+
+  if (this->timer.GetElapsed() >= gazebo::common::Time(2.0))
+    this->controller.ChangeState(*this->controller.runningState);
+}
+
+/////////////////////////////////////////////////
+void ControllerRunningState::DoInitialize()
+{
+  std::cout << "RunningState::Initialize()" << std::endl;
+}
+
+/////////////////////////////////////////////////
+void ControllerRunningState::DoUpdate()
+{
+  // Send the next command.
+
+  //std::cout << "RunningState::DoUpdate()" << std::endl;
+
+  // Check if we are done with the run
+  if (this->timer.GetElapsed() >= gazebo::common::Time(5.0))
+    this->controller.ChangeState(*this->controller.endState);
+}
+
+/////////////////////////////////////////////////
+void ControllerEndState::DoInitialize()
+{
+  std::cout << "EndState::Initialize()" << std::endl;
+}
+
+/////////////////////////////////////////////////
+void ControllerEndState::DoFeedback()
+{
+  // Check if Gazebo is ready for another run.
+  if (this->Feedback() == "gazebo_ready")
+    this->controller.ChangeState(*this->controller.readyState);
+
+  //std::cout << "EndState::DoOnState()" << std::endl;
+}
 
 /////////////////////////////////////////////////
 ValidationController::ValidationController()
-  : readyState(new ControllerReadyState<ValidationController>(kControllerReadyState, *this)),
-    initCondsState(new ControllerInitCondsState<ValidationController>(kControllerInitCondsState, *this)),
-    runningState(new ControllerRunningState<ValidationController>(kControllerRunningState, *this)),
-    endState(new ControllerEndState<ValidationController>(kControllerEndState, *this)),
+  : readyState(new ControllerReadyState(kControllerReadyState, *this)),
+    initCondsState(new ControllerInitCondsState(kControllerInitCondsState, *this)),
+    runningState(new ControllerRunningState(kControllerRunningState, *this)),
+    endState(new ControllerEndState(kControllerEndState, *this)),
     currentState(readyState.get())
  {
  }
@@ -55,7 +121,7 @@ void ValidationController::Start()
 }
 
 //////////////////////////////////////////////////
-void ValidationController::ChangeState(State<ValidationController> &_newState)
+void ValidationController::ChangeState(State &_newState)
 {
   // Only update the state if _newState is different than the current state.
   if (!this->currentState || *this->currentState != _newState)
