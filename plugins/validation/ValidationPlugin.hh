@@ -15,19 +15,18 @@
  *
 */
 
-#ifndef _GAZEBO_VALIDATION_PLUGIN_
-#define _GAZEBO_VALIDATION_PLUGIN_
+#ifndef _GAZEBO_PLUGINS_VALIDATION_PLUGIN_
+#define _GAZEBO_PLUGINS_VALIDATION_PLUGIN_
 
 #include <memory>
 #include <mutex>
 #include <string>
 #include <ignition/transport/Node.hh>
 #include <sdf/sdf.hh>
-#include "gazebo/common/Time.hh"
-#include "gazebo/common/Timer.hh"
-#include "gazebo/physics/physics.hh"
+#include "gazebo/common/Plugin.hh"
 #include "gazebo/gazebo.hh"
 #include "State.hh"
+#include "ValidationController.hh"
 
 namespace gazebo
 {
@@ -38,75 +37,93 @@ namespace gazebo
   static std::string kEndState   = "gazebo_end";
 
   /// \brief State that handles the "ready" state.
-  class ReadyState : public State
+  template <typename T>
+  class GazeboReadyState : public State<T>
   {
     // Use class constructor from base class.
-    using State::State;
+    using State<T>::State;
 
     // Documentation inherited.
-    public: virtual void DoInitialize();
+    public: virtual void DoInitialize()
+    {
+      std::cout << "ReadyState::Initialize()" << std::endl;
+    }
 
     // Documentation inherited
-    public: virtual void DoFeedback();
+    public: virtual void DoFeedback()
+    {
+      // Is the controller ready?
+      if (this->Feedback() == "controller_ready")
+        this->fsm.ChangeState(*this->fsm.setState);
+
+      //std::cout << "ReadyState::DoFeedback()" << std::endl;
+    }
   };
 
   /// \brief State that handles the "set" state.
-  class SetState : public State
+  template <typename T>
+  class GazeboSetState : public State<T>
   {
     // Use class constructor from base class.
-    using State::State;
+    using State<T>::State;
 
     // Documentation inherited.
-    public: virtual void DoInitialize();
+    public: virtual void DoInitialize()
+    {
+      // Load the parameters.
+
+      // Start the run.
+      this->fsm.ChangeState(*this->fsm.goState);
+
+      std::cout << "SetState::DoInitialize()" << std::endl;
+    }
   };
 
   /// \brief State that handles the "go" state.
-  class GoState : public State
+  template <typename T>
+  class GazeboGoState : public State<T>
   {
     // Use class constructor from base class.
-    using State::State;
+    using State<T>::State;
 
-    public: virtual void DoInitialize();
+    public: virtual void DoInitialize()
+    {
+      std::cout << "GoState::DoInitialize()" << std::endl;
+    }
 
     // Documentation inherited.
-    public: virtual void DoFeedback();
+    public: virtual void DoFeedback()
+    {
+      if (this->Feedback() == "controller_end")
+      {
+        if (this->fsm.MoreRuns())
+        {
+          // Go for the next run.
+          this->fsm.ChangeState(*this->fsm.readyState);
+        }
+        else
+        {
+          this->fsm.ChangeState(*this->fsm.endState);
+        }
+      }
+
+      // std::cout << "RunState::DoFeedback()" << std::endl;
+    }
   };
 
   /// \brief State that handles the "end" state.
-  class EndState : public State
+  template <typename T>
+  class GazeboEndState : public State<T>
   {
     // Use class constructor from base class.
-    using State::State;
+    using State<T>::State;
 
-    public: virtual void DoInitialize();
+    public: virtual void DoInitialize()
+    {
+      std::cout << "EndState::DoInitialize()" << std::endl;
+    }
   };
 
-  /// Example SDF:
-  ///       <plugin name="actuator_plugin" filename="libActuatorPlugin.so">
-  ///        <actuator>
-  ///          <name>actuator_0</name> <!-- optional -->
-  ///          <joint>JOINT_0</joint> <!-- name of joint to actuate -->
-  ///          <index>0</index> <!-- needed for multi-DOF joints -->
-  ///          <type>electric_motor</type> <!-- motor model type -->
-  ///          <power>20</power> <!-- parameters for motor model -->
-  ///          <max_velocity>6</max_velocity>
-  ///          <max_torque>10.0</max_torque>
-  ///        </actuator>
-  ///      </plugin>
-  ///    </model>
-  ///
-  /// Required fields:
-  /// - name
-  /// - joint
-  /// - index (can be 0 in most cases)
-  /// - type: current options are electric_motor, velocity_limiter or null
-  /// Required for motor model electric_motor:
-  /// - power
-  /// - max_velocity
-  /// - max_torque
-  /// Required for motor model velocity_limiter:
-  /// - max_velocity
-  /// - max_torque
   /// \brief ToDo
   class GAZEBO_VISIBLE ValidationPlugin : public ModelPlugin
   {
@@ -124,7 +141,7 @@ namespace gazebo
     private: bool LoadModelParams();
 
     /// \brief ToDo.
-    public: void ChangeState(State &_newState);
+    public: void ChangeState(State<ValidationPlugin> &_newState);
 
     /// \brief ToDo.
     public: bool MoreRuns() const;
@@ -133,13 +150,13 @@ namespace gazebo
     private: event::ConnectionPtr updateConnection;
 
     /// \brief State machine states.
-    public: std::unique_ptr<ReadyState> readyState;
-    public: std::unique_ptr<SetState> setState;
-    public: std::unique_ptr<GoState> goState;
-    public: std::unique_ptr<EndState> endState;
+    public: std::unique_ptr<GazeboReadyState<ValidationPlugin>> readyState;
+    public: std::unique_ptr<GazeboSetState<ValidationPlugin>>   setState;
+    public: std::unique_ptr<GazeboGoState<ValidationPlugin>>    goState;
+    public: std::unique_ptr<GazeboEndState<ValidationPlugin>>   endState;
 
     /// \brief Pointer to the current state.
-    public: State *currentState;
+    public: State<ValidationPlugin> *currentState;
   };
 
   // Register this plugin with the simulator

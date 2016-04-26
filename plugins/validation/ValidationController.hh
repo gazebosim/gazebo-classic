@@ -15,130 +15,148 @@
  *
 */
 
-#ifndef _HAPTIX_VALIDATION_CONTROLLER_
-#define _HAPTIX_VALIDATION_CONTROLLER_
+#ifndef _GAZEBO_PLUGINS_VALIDATION_CONTROLLER_
+#define _GAZEBO_PLUGINS_VALIDATION_CONTROLLER_
 
 #include <mutex>
 #include <string>
-#include <gazebo/common/Time.hh>
-#include <gazebo/common/Timer.hh>
 #include <ignition/transport/Node.hh>
+#include "gazebo/common/Time.hh"
+#include "gazebo/common/Timer.hh"
 #include "State.hh"
 
-  /// \brief Labels for states.
-  static std::string kReadyState     = "controller_ready";
-  static std::string kInitCondsState = "controller_init_conds";
-  static std::string kRunningState   = "controller_running";
-  static std::string kEndState       = "controller_end";
-
-// Forward declarations.
-class ValidationController;
-
-namespace msgs
+namespace gazebo
 {
-  class GzString;
+  /// \brief Labels for states.
+  static std::string kControllerReadyState     = "controller_ready";
+  static std::string kControllerInitCondsState = "controller_init_conds";
+  static std::string kControllerRunningState   = "controller_running";
+  static std::string kControllerEndState       = "controller_end";
+
+  /// \brief State that handles the "ready" state.
+  template <class T>
+  class ControllerReadyState : public State<T>
+  {
+    // Use class constructor from base class.
+    using State<T>::State;
+
+    // Documentation inherited.
+    public: virtual void DoInitialize()
+    {
+      std::cout << "ReadyState::Initialize()" << std::endl;
+    }
+
+    // Documentation inherited
+    public: virtual void DoFeedback()
+    {
+      //if (this->Feedback() == "gazebo_go")
+      //  this->fsm.ChangeState(*this->fsm.initCondsState);
+
+      //std::cout << "ReadyState::DoOnState()" << std::endl;
+    }
+  };
+
+  /// \brief State that handles the "initConds" state.
+  template <typename T>
+  class ControllerInitCondsState : public State<T>
+  {
+    // Use class constructor from base class.
+    using State<T>::State;
+
+    // Documentation inherited.
+    public: virtual void DoInitialize()
+    {
+      // Send initial conditions.
+      std::cout << "InitCondsState::DoInitialize()" << std::endl;
+      //std::cout << "Initial conditions" << std::endl;
+    }
+
+    // Documentation inherited.
+    public: virtual void DoUpdate()
+    {
+      // Check if the initial conditions are satisfied.
+
+      //std::cout << "InitCondsState::DoUpdate()" << std::endl;
+
+      if (this->timer.GetElapsed() >= gazebo::common::Time(2.0))
+        this->fsm.ChangeState(*this->fsm.runningState);
+    }
+  };
+
+  /// \brief State that handles the "running" state.
+  template <typename T>
+  class ControllerRunningState : public State<T>
+  {
+    // Use class constructor from base class.
+    using State<T>::State;
+
+    // Documentation inherited.
+    public: virtual void DoInitialize()
+    {
+      std::cout << "RunningState::Initialize()" << std::endl;
+    }
+
+    // Documentation inherited.
+    public: virtual void DoUpdate()
+    {
+      // Send the next command.
+
+      //std::cout << "RunningState::DoUpdate()" << std::endl;
+
+      // Check if we are done with the run
+      if (this->timer.GetElapsed() >= gazebo::common::Time(5.0))
+        this->fsm.ChangeState(*this->fsm.endState);
+    }
+  };
+
+  /// \brief State that handles the "running" state.
+  template <typename T>
+  class ControllerEndState : public State<T>
+  {
+    // Use class constructor from base class.
+    using State<T>::State;
+
+    // Documentation inherited.
+    public: virtual void DoInitialize()
+    {
+      std::cout << "EndState::Initialize()" << std::endl;
+    }
+
+    // Documentation inherited
+    public: virtual void DoOnState()
+    {
+      // Check if Gazebo is ready for another run.
+      if (this->Feedback() == "gazebo_ready")
+        this->fsm.ChangeState(*this->fsm.readyState);
+
+      //std::cout << "EndState::DoOnState()" << std::endl;
+    }
+  };
+
+  /// \brief ToDo
+  class GAZEBO_VISIBLE ValidationController
+  {
+    /// \brief Class constructor.
+    public: ValidationController();
+
+    /// \brief Class destructor.
+    public: ~ValidationController();
+
+    /// \brief Callback on world update event.
+    public: void Start();
+
+    /// \brief ToDo.
+    public: void ChangeState(State<ValidationController> &_newState);
+
+    /// \brief State machine states.
+    public: std::unique_ptr<ControllerReadyState<ValidationController>>     readyState;
+    public: std::unique_ptr<ControllerInitCondsState<ValidationController>> initCondsState;
+    public: std::unique_ptr<ControllerRunningState<ValidationController>>   runningState;
+    public: std::unique_ptr<ControllerEndState<ValidationController>>       endState;
+
+    /// \brief Pointer to the current state.
+    public: State<ValidationController> *currentState;
+  };
 }
 
-/// \brief State that handles the "ready" state.
-class ReadyState : public State
-{
-  // Use class constructor from base class.
-  using State::State;
-
-  // Documentation inherited.
-  public: virtual void DoInitialize();
-
-  // Documentation inherited
-  public: virtual void DoOnState();
-};
-
-/// \brief State that handles the "initConds" state.
-class InitCondsState : public State
-{
-  // Use class constructor from base class.
-  using State::State;
-
-  // Documentation inherited.
-  public: virtual void DoInitialize();
-
-  // Documentation inherited.
-  public: virtual void DoUpdate();
-};
-
-/// \brief State that handles the "running" state.
-class RunningState : public State
-{
-  // Use class constructor from base class.
-  using State::State;
-
-  // Documentation inherited.
-  public: virtual void DoInitialize();
-
-  // Documentation inherited.
-  public: virtual void DoUpdate();
-};
-
-/// \brief State that handles the "running" state.
-class EndState : public State
-{
-  // Use class constructor from base class.
-  using State::State;
-
-  // Documentation inherited.
-  public: virtual void DoInitialize();
-
-  // Documentation inherited
-  public: virtual void DoOnState();
-};
-
-
-/// Example SDF:
-///       <plugin name="actuator_plugin" filename="libActuatorPlugin.so">
-///        <actuator>
-///          <name>actuator_0</name> <!-- optional -->
-///          <joint>JOINT_0</joint> <!-- name of joint to actuate -->
-///          <index>0</index> <!-- needed for multi-DOF joints -->
-///          <type>electric_motor</type> <!-- motor model type -->
-///          <power>20</power> <!-- parameters for motor model -->
-///          <max_velocity>6</max_velocity>
-///          <max_torque>10.0</max_torque>
-///        </actuator>
-///      </plugin>
-///    </model>
-///
-/// Required fields:
-/// - name
-/// - joint
-/// - index (can be 0 in most cases)
-/// - type: current options are electric_motor, velocity_limiter or null
-/// Required for motor model electric_motor:
-/// - power
-/// - max_velocity
-/// - max_torque
-/// Required for motor model velocity_limiter:
-/// - max_velocity
-/// - max_torque
-/// \brief ToDo
-class GAZEBO_VISIBLE ValidationController
-{
-  /// \brief Class constructor.
-  public: ValidationController();
-
-  /// \brief Class destructor.
-  public: ~ValidationController();
-
-  /// \brief Callback on world update event.
-  public: void Start();
-
-  /// \brief ToDo.
-  public: void ChangeState(State &_newState);
-
-  /// \brief State machine states.
-  public: std::unique_ptr<ReadyState> readyState;
-  public: std::unique_ptr<InitCondsState> initCondsState;
-  public: std::unique_ptr<RunningState> runningState;
-  public: std::unique_ptr<EndState> endState;
-
-  /// \brief Pointer to the current state.
-  public: State *currentState;
-};
+#endif

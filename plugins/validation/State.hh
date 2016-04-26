@@ -31,6 +31,7 @@ namespace gazebo
 {
   // Forward declarations.
   class ValidationPlugin;
+  template <typename T> class State;
 
   /// \def
   enum class ValidationComponent_t
@@ -47,62 +48,142 @@ namespace gazebo
   }
 
   /// \brief State pattern used for the state machine.
+  template <typename T>
   class State
   {
     /// \brief Class constructor.
     /// \param[in] _name Name of the state.
     /// \param[in] _plugin Pointer to the model plugin.
     public: State(const std::string &_name,
-                  ValidationPlugin &_plugin,
+                  T &_fsm,
                   const ValidationComponent_t &_componentType =
-                      ValidationComponent_t::CONTROLLER);
+                      ValidationComponent_t::CONTROLLER)
+      : name(_name),
+        fsm(_fsm)
+    {
+      std::string inboundTopic = "/gazebo/validation/state";
+      this->outboundTopic = "/gazebo/validation/feedback";
+      if (_componentType == ValidationComponent_t::GAZEBO)
+        std::swap(inboundTopic, outboundTopic);
+
+      // This is the topic where we receive feedback.
+      this->node.Subscribe(inboundTopic, &State::OnFeedback, this);
+
+      // Advertise the current state.
+      //this->node.Advertise<msgs::GzString>(outboundTopic);
+    }
 
     /// \brief Update the state.
-    public: void Update();
+    public: void Update()
+    {
+      //std::lock_guard<std::mutex> lock(this->mutex);
+      if (!this->initialized)
+        this->Initialize();
+
+      this->DoUpdate();
+
+      // Time to publish the current state?
+      auto now = gazebo::common::Time::GetWallTime();
+      if (now - this->lastPublication >= this->publicationInterval)
+        this->PublishState();
+    }
 
     /// \brief Called once before changing to a different state.
-    public: void Teardown();
+    public: void Teardown()
+    {
+      //std::lock_guard<std::mutex> lock(this->mutex);
+      this->initialized = false;
+
+      //std::cout << "State::Teardown()" << std::endl;
+      this->DoTeardown();
+
+      this->PublishState();
+    }
 
     /// \brief Equal to operator.
     /// \param[in] _state The state to compare against.
     /// \return true if the state has the same name.
-    public: bool operator ==(const State &_state) const;
+    public: bool operator ==(const State &_state) const
+    {
+      return this->name == _state.name;
+    }
 
     /// \brief Not equal to operator
     /// \param[in] _state The state to compare against
     /// \return true if the state doesn't have the same name.
-    public: bool operator !=(const State &_v) const;
+    public: bool operator !=(const State &_state) const
+    {
+      return !(*this == _state);
+    }
 
     /// \brief Return the current feedback value.
-    protected: std::string Feedback() const;
+    protected: std::string Feedback() const
+    {
+      //std::lock_guard<std::mutex> lock(this->mutex);
+      return this->feedback;
+    }
 
     /// \brief ToDo.
-    private: virtual void DoInitialize();
+    private: virtual void DoInitialize()
+    {
+      std::cout << "State::DoInitialize" << std::endl;
+    }
 
     /// \brief ToDo.
-    private: virtual void DoUpdate();
+    private: virtual void DoUpdate()
+    {
+
+    }
 
     /// \brief ToDo.
-    private: virtual void DoTeardown();
+    private: virtual void DoTeardown()
+    {
+
+    }
 
     /// \brief ToDo.
-    private: virtual void DoFeedback();
+    private: virtual void DoFeedback()
+    {
+
+    }
 
     /// \brief Initialize the state. Called once after a pause duration after
     /// entering state.
-    private: void Initialize();
+    private: void Initialize()
+    {
+      std::cout << "State::Initialize()" << std::endl;
+      this->initialized = true;
+      this->timer.Reset();
+      this->timer.Start();
+      this->DoInitialize();
+    }
 
     /// \brief Callback that updates the feedback member variable.
-    private: void OnFeedback(const msgs::GzString &_msg);
+    private: void OnFeedback(const gazebo::msgs::GzString &_msg)
+    {
+      //std::cout << "State::OnFeedback()" << std::endl;
+      //std::lock_guard<std::mutex> lock(this->mutex);
+      this->feedback = _msg.data();
+
+      // Only if we're the active state.
+      if (this->initialized)
+        this->DoFeedback();
+    }
 
      /// \brief Publish the current state.
-    private: void PublishState();
+    private: void PublishState()
+    {
+      gazebo::msgs::GzString msg;
+      msg.set_data(this->name);
+      this->node.Publish(this->outboundTopic, msg);
+      this->lastPublication = common::Time::GetWallTime();
+    }
 
     /// \brief Name of the state.
     public: const std::string name;
 
-    /// \brief Pointer to the validation plugin.
-    protected: ValidationPlugin &plugin;
+    /// \brief Reference to the finite state machine.
+    protected: T &fsm;
 
     /// \brief Timer to measure time in the current state.
     protected: common::Timer timer;
@@ -128,3 +209,5 @@ namespace gazebo
     /// \brief Transport node.
     protected: ignition::transport::Node node;
   };
+}
+#endif

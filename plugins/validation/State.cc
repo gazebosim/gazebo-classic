@@ -25,10 +25,10 @@ using namespace gazebo;
 using namespace ignition;
 
 /////////////////////////////////////////////////
-State::State(const std::string &_name, ValidationPlugin &_plugin,
+State::State(const std::string &_name, FSMi &_fsm,
              const ValidationComponent_t &_componentType)
   : name(_name),
-    plugin(_plugin),
+    FSMi(_fsm),
     publicationInterval(1.0)
 {
   std::string inboundTopic = "/gazebo/validation/state";
