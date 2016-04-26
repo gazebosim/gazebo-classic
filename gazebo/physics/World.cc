@@ -1930,10 +1930,8 @@ void World::ProcessLightFactoryMsgs()
 }
 
 //////////////////////////////////////////////////
-void World::ProcessInsertEntityRequest(const msgs::Factory &_msg)
+bool World::ProcessInsertEntityRequest(const msgs::Factory &_msg)
 {
-  std::list<sdf::ElementPtr> modelsToLoad, lightsToLoad;
-
   this->dataPtr->factorySDF->Root()->ClearElements();
 
   // From SDF string
@@ -1943,6 +1941,7 @@ void World::ProcessInsertEntityRequest(const msgs::Factory &_msg)
     if (!sdf::readString(_msg.sdf(), this->dataPtr->factorySDF))
     {
       gzerr << "Unable to read sdf string[" << _msg.sdf() << "]\n";
+      return false;
     }
   }
   // From SDF file
@@ -1955,6 +1954,7 @@ void World::ProcessInsertEntityRequest(const msgs::Factory &_msg)
     if (!sdf::readFile(filename, this->dataPtr->factorySDF))
     {
       gzerr << "Unable to read sdf file.\n";
+      return false;
     }
   }
   // Clone existing model
@@ -1965,6 +1965,7 @@ void World::ProcessInsertEntityRequest(const msgs::Factory &_msg)
     {
       gzerr << "Unable to clone model[" << _msg.clone_model_name()
         << "]. Model not found.\n";
+      return false;
     }
 
     this->dataPtr->factorySDF->Root()->InsertElement(
@@ -1987,6 +1988,7 @@ void World::ProcessInsertEntityRequest(const msgs::Factory &_msg)
     gzerr << "Unable to load sdf from factory message: " << std::endl <<
       _msg.DebugString() << std::endl
       << "No SDF or SDF filename specified.\n";
+    return false;
   }
 
   // Edit name
@@ -2017,6 +2019,7 @@ void World::ProcessInsertEntityRequest(const msgs::Factory &_msg)
     {
       gzerr << "Invalid SDF:";
       this->dataPtr->factorySDF->Root()->PrintValues("");
+      return false;
     }
 
     if (elem->HasElement("world"))
@@ -2041,6 +2044,7 @@ void World::ProcessInsertEntityRequest(const msgs::Factory &_msg)
     {
       gzerr << "Unable to find a model, light, or actor in:\n";
       this->dataPtr->factorySDF->Root()->PrintValues("");
+      return false;
     }
 
     elem->SetParent(this->dataPtr->sdf);
@@ -2057,45 +2061,50 @@ void World::ProcessInsertEntityRequest(const msgs::Factory &_msg)
     }
     else if (isModel)
     {
-      modelsToLoad.push_back(elem);
+      try
+      {
+        auto name = elem->Get<std::string>("name");
+        if (name.empty())
+        {
+          gzerr << "Can't load model with empty name" << std::endl;
+          return false;
+        }
+
+        if (this->GetModel(name))
+        {
+          gzerr << "A model named [" << name << "] already exists. "
+                << "Spawn model with an unique name." << std::endl;
+          return false;
+        }
+
+        boost::mutex::scoped_lock lock(this->dataPtr->factoryDeleteMutex);
+
+        ModelPtr model = this->LoadModel(elem, this->dataPtr->rootElement);
+        model->Init();
+        model->LoadPlugins();
+      }
+      catch(...)
+      {
+        gzerr << "Loading model from factory message failed\n";
+        return false;
+      }
     }
     else if (isLight)
     {
-      lightsToLoad.push_back(elem);
+      try
+      {
+        boost::mutex::scoped_lock lock(this->dataPtr->factoryDeleteMutex);
+
+        LightPtr light = this->LoadLight(elem, this->dataPtr->rootElement);
+      }
+      catch(...)
+      {
+        gzerr << "Loading light from factory message failed\n";
+        return false;
+      }
     }
   }
-
-  // Load models
-  for (auto const &elem : modelsToLoad)
-  {
-    try
-    {
-      boost::mutex::scoped_lock lock(this->dataPtr->factoryDeleteMutex);
-
-      ModelPtr model = this->LoadModel(elem, this->dataPtr->rootElement);
-      model->Init();
-      model->LoadPlugins();
-    }
-    catch(...)
-    {
-      gzerr << "Loading model from factory message failed\n";
-    }
-  }
-
-  // Load lights
-  for (auto const &elem : lightsToLoad)
-  {
-    try
-    {
-      boost::mutex::scoped_lock lock(this->dataPtr->factoryDeleteMutex);
-
-      LightPtr light = this->LoadLight(elem, this->dataPtr->rootElement);
-    }
-    catch(...)
-    {
-      gzerr << "Loading light from factory message failed\n";
-    }
-  }
+  return true;
 }
 
 //////////////////////////////////////////////////
@@ -2893,6 +2902,7 @@ void World::ProcessRequests()
 
   for (const auto &request : this->dataPtr->requests)
   {
+    // Entity delete
     if (request.type() == msgs::Operation::DELETE_ENTITY &&
         request.has_uri())
     {
@@ -2909,15 +2919,33 @@ void World::ProcessRequests()
       }
       else
       {
-        msg.set_msg("Failed to remove [" + request.uri() + "].");
+        msg.set_msg("Failed to remove [" + request.uri() +
+            "]. See log for details.");
         msg.set_success(false);
       }
       this->dataPtr->ignNode.Publish("/notification", msg);
     }
+    // Entity insert
     else if (request.type() == msgs::Operation::INSERT_ENTITY &&
         request.has_factory())
     {
-      this->ProcessInsertEntityRequest(request.factory());
+      // Notify whether insertion succeeded or failed
+      msgs::Operation msg;
+      msg.set_type(msgs::Operation::INSERT_ENTITY);
+      msg.mutable_factory()->CopyFrom(request.factory());
+      msg.set_id(request.id());
+
+      if (this->ProcessInsertEntityRequest(request.factory()))
+      {
+        msg.set_msg("Entity inserted successfully.");
+        msg.set_success(true);
+      }
+      else
+      {
+        msg.set_msg("Failed to insert entity. See log for details.");
+        msg.set_success(false);
+      }
+      this->dataPtr->ignNode.Publish("/notification", msg);
     }
     else
     {

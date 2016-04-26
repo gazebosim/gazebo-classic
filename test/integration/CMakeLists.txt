@@ -80,6 +80,7 @@ set(tests
   plugin.cc
   rayshape.cc
   region_events.cc
+  request.cc
   rest_web.cc
   road.cc
   saving_and_loading.cc

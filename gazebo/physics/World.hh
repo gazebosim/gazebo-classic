@@ -545,7 +545,7 @@ namespace gazebo
 
       /// \brief Process all received factory messages.
       /// Must only be called from the World::ProcessMessages function.
-      private: void ProcessInsertEntityRequest(const msgs::Factory &_msg);
+      private: bool ProcessInsertEntityRequest(const msgs::Factory &_msg);
 
       /// \brief Process all received model messages.
       /// Must only be called from the World::ProcessMessages function.
