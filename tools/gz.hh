@@ -22,6 +22,8 @@
 #include <boost/thread.hpp>
 #include <boost/program_options.hpp>
 
+#include <ignition/transport/Node.hh>
+
 #include "gazebo/transport/transport.hh"
 #include "gazebo/common/common.hh"
 #include "gazebo/msgs/msgs.hh"
@@ -150,6 +152,12 @@ namespace gazebo
     private: bool ProcessSpawn(sdf::SDFPtr _sdf,
                  const std::string &_name, const math::Pose &_pose,
                  transport::NodePtr _node);
+
+    /// \brief Spawn helper function.
+    private: void OnNotification(const msgs::Operation &_msg);
+
+    private: size_t requestId;
+    private: ignition::transport::Node ignNode;
   };
 
   /// \brief Joint command

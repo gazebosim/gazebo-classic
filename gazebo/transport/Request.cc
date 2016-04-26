@@ -23,7 +23,7 @@
 using namespace gazebo;
 
 /////////////////////////////////////////////////
-void transport::RequestEntityDelete(const std::string &_name)
+size_t transport::RequestEntityDelete(const std::string &_name)
 {
   // Unused callback
   std::function<void(const msgs::Empty &, const bool)> unused =
@@ -31,18 +31,24 @@ void transport::RequestEntityDelete(const std::string &_name)
   {
   };
 
+  // Unique id for request
+  auto id = ignition::math::Rand::IntUniform(1, 10000);
+
   // Operation msg
   msgs::Operation req;
   req.set_type(msgs::Operation::DELETE_ENTITY);
+  req.set_id(id);
   req.set_uri(_name);
 
   // Request
   ignition::transport::Node ignNode;
   ignNode.Request("/request", req, unused);
+
+  return id;
 }
 
 /////////////////////////////////////////////////
-void transport::RequestEntityInsert(const std::string &_sdf,
+size_t transport::RequestEntityInsert(const std::string &_sdf,
     const ignition::math::Pose3d &_pose)
 {
   // Unused callback
@@ -50,6 +56,9 @@ void transport::RequestEntityInsert(const std::string &_sdf,
     [](const msgs::Empty &, const bool &)
   {
   };
+
+  // Unique id for request
+  auto id = ignition::math::Rand::IntUniform(1, 10000);
 
   // Factory msg
   msgs::Factory msg;
@@ -63,15 +72,18 @@ void transport::RequestEntityInsert(const std::string &_sdf,
   // Operation msg
   msgs::Operation req;
   req.set_type(msgs::Operation::INSERT_ENTITY);
+  req.set_id(id);
   req.mutable_factory()->CopyFrom(msg);
 
   // Request
   ignition::transport::Node ignNode;
   ignNode.Request("/request", req, unused);
+
+  return id;
 }
 
 /////////////////////////////////////////////////
-void transport::RequestEntityClone(const std::string &_name,
+size_t transport::RequestEntityClone(const std::string &_name,
     const ignition::math::Pose3d &_pose)
 {
   // Unused callback
@@ -79,6 +91,9 @@ void transport::RequestEntityClone(const std::string &_name,
     [](const msgs::Empty &, const bool &)
   {
   };
+
+  // Unique id for request
+  auto id = ignition::math::Rand::IntUniform(1, 10000);
 
   // Factory msg
   msgs::Factory msg;
@@ -92,10 +107,13 @@ void transport::RequestEntityClone(const std::string &_name,
   // Operation msg
   msgs::Operation req;
   req.set_type(msgs::Operation::INSERT_ENTITY);
+  req.set_id(id);
   req.mutable_factory()->CopyFrom(msg);
 
   // Request
   ignition::transport::Node ignNode;
   ignNode.Request("/request", req, unused);
+
+  return id;
 }
 

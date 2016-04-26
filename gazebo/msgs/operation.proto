@@ -32,10 +32,19 @@ message Operation
   /// \brief Type of operation.
   required Type type = 1;
 
+  /// \brief Unique ID of operation.
+  optional uint32 id = 2;
+
+  /// \brief Optional message about operation.
+  optional bool success = 3;
+
+  /// \brief Optional message about operation.
+  optional string msg = 4;
+
   /// \brief Entity URI in string format, for delete operations for example.
-  optional string uri = 2;
+  optional string uri = 5;
 
   /// \brief Factory message, for insert operations.
-  optional Factory factory = 3;
+  optional Factory factory = 6;
 }
 

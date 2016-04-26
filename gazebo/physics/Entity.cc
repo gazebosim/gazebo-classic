@@ -587,6 +587,7 @@ void Entity::Fini()
     msgs::Operation msg;
     msg.set_type(msgs::Operation::DELETE_ENTITY);
     msg.set_uri(this->GetScopedName());
+    msg.set_success(true);
 
     this->ignNode.Publish("/notification", msg);
   }

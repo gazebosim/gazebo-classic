@@ -32,18 +32,18 @@ namespace gazebo
     /// transport.
     /// \param[in] _uri URI of entity to be deleted.
     GZ_TRANSPORT_VISIBLE
-    void RequestEntityDelete(const std::string &_uri);
+    size_t RequestEntityDelete(const std::string &_uri);
 
     /// \brief Helper class to create requests for ignition transport.
     GZ_TRANSPORT_VISIBLE
-    void RequestEntityInsert(const std::string &_sdf,
+    size_t RequestEntityInsert(const std::string &_sdf,
         const ignition::math::Pose3d &_pose =
         ignition::math::Pose3d(IGN_DBL_MAX, IGN_DBL_MAX, IGN_DBL_MAX,
                                0, 0, 0));
 
     /// \brief Helper class to create requests for ignition transport.
     GZ_TRANSPORT_VISIBLE
-    void RequestEntityClone(const std::string &_name,
+    size_t RequestEntityClone(const std::string &_name,
         const ignition::math::Pose3d &_pose =
         ignition::math::Pose3d(IGN_DBL_MAX, IGN_DBL_MAX, IGN_DBL_MAX,
                                0, 0, 0));

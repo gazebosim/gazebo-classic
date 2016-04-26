@@ -323,9 +323,7 @@ void ModelRightMenu::OnDelete(const std::string &_name)
   if (name.empty())
     name = this->entityName;
 
-  // Request deletion
-  if (!name.empty())
-    transport::RequestEntityDelete(name);
+  transport::RequestEntityDelete(name);
 }
 
 /////////////////////////////////////////////////

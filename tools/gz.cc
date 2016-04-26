@@ -27,6 +27,8 @@
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 
+#include <ignition/transport/Node.hh>
+
 #include <gazebo/common/common.hh>
 #include <gazebo/transport/transport.hh>
 #include <sdf/sdf.hh>
@@ -459,7 +461,16 @@ bool ModelCommand::RunImpl()
 
   if (this->vm.count("delete"))
   {
-    transport::RequestEntityDelete(modelName);
+    if (!this->ignNode.Subscribe("/notification", &ModelCommand::OnNotification,
+        this))
+    {
+      std::cout << "Error subscribing to deletion notification" << std::endl;
+    }
+
+    this->requestId = transport::RequestEntityDelete(modelName);
+
+    // Wait for Ctrl+C while we might receive the notification
+    ignition::transport::waitForShutdown();
   }
   else if (this->vm.count("spawn-file"))
   {
@@ -577,6 +588,15 @@ bool ModelCommand::ProcessSpawn(sdf::SDFPtr _sdf,
   return true;
 }
 
+//////////////////////////////////////////////////
+void ModelCommand::OnNotification(const msgs::Operation &_msg)
+{
+  if (_msg.has_id() && _msg.id() == this->requestId && _msg.has_msg())
+  {
+    std::cout << _msg.msg() << std::endl;
+    raise(SIGINT);
+  }
+}
 
 /////////////////////////////////////////////////
 JointCommand::JointCommand()

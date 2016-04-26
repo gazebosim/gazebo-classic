@@ -262,6 +262,8 @@ void World::Load(sdf::ElementPtr _sdf)
   };
   this->dataPtr->ignNode.Advertise("/request", requestService);
 
+  this->dataPtr->ignNode.Advertise<msgs::Operation>("/notification");
+
   // This should come before loading of entities
   sdf::ElementPtr physicsElem = this->dataPtr->sdf->GetElement("physics");
 
@@ -2894,12 +2896,23 @@ void World::ProcessRequests()
     if (request.type() == msgs::Operation::DELETE_ENTITY &&
         request.has_uri())
     {
-      // TODO: Rename to ProcessDeleteEntityRequest and make sure it's only
-      // called from here? So we can only delete on Step?
+      // Notify whether deletion succeeded or failed
+      msgs::Operation msg;
+      msg.set_type(msgs::Operation::DELETE_ENTITY);
+      msg.set_uri(request.uri());
+      msg.set_id(request.id());
+
       if (this->RemoveModel(request.uri()))
       {
-// publish notification with request id
+        msg.set_msg("[" + request.uri() + "] removed successfully.");
+        msg.set_success(true);
       }
+      else
+      {
+        msg.set_msg("Failed to remove [" + request.uri() + "].");
+        msg.set_success(false);
+      }
+      this->dataPtr->ignNode.Publish("/notification", msg);
     }
     else if (request.type() == msgs::Operation::INSERT_ENTITY &&
         request.has_factory())
