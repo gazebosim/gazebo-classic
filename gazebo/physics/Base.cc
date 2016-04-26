@@ -241,18 +241,16 @@ BasePtr Base::GetChild(const std::string &_name)
 //////////////////////////////////////////////////
 void Base::RemoveChild(const std::string &_name)
 {
-  Base_V::iterator iter;
-
-  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
+  for (auto &iter : this->children)
   {
-    if ((*iter)->GetScopedName() == _name)
+    if (iter->GetScopedName() == _name)
+    {
+      iter->Fini();
+      this->children.erase(std::remove(this->children.begin(),
+                                       this->children.end(), iter),
+                                       this->children.end());
       break;
-  }
-
-  if (iter != this->children.end())
-  {
-    (*iter)->Fini();
-    this->children.erase(iter);
+    }
   }
 }
 
