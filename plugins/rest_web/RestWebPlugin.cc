@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -187,7 +187,7 @@ void RestWebPlugin::OnSimEvent(ConstSimEventPtr &_msg)
   {
     response = "There was a problem trying to send data to the server: ";
     response += x.what();
-    msg.set_type(msgs::RestResponse::ERROR);
+    msg.set_type(msgs::RestResponse::ERR);
     // alert the user via the gui plugin
     gzerr << "ERROR in REST service POST request: " << response << std::endl;
   }
@@ -270,7 +270,7 @@ void RestWebPlugin::OnEventRestPost(ConstRestPostPtr &_msg)
   {
     response = "There was a problem trying to send data to the server: ";
     response += x.what();
-    msg.set_type(msgs::RestResponse::ERROR);
+    msg.set_type(msgs::RestResponse::ERR);
     // alert the user via the gui plugin
     gzerr << "ERROR in REST request: " << response << std::endl;
   }
@@ -323,7 +323,7 @@ void RestWebPlugin::ProcessLoginRequest(ConstRestLoginPtr _msg)
   {
     response = "There was a problem trying to login to the server: ";
     response += x.what();
-    msg.set_type(msgs::RestResponse::ERROR);
+    msg.set_type(msgs::RestResponse::ERR);
 
     // alert the user via the gui plugin
     gzerr << "ERROR in REST login request. : " << response << std::endl;

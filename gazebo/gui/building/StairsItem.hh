@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #define _GAZEBO_GUI_BUILDING_STAIRSITEM_HH_
 
 #include <memory>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/gui/building/RectItem.hh"
 
@@ -49,17 +50,17 @@ namespace gazebo
       public: ~StairsItem();
 
       // Documentation inherited
-      public: virtual QVector3D GetSize() const;
+      public: virtual ignition::math::Vector3d Size() const;
 
       // Documentation inherited
-      public: virtual QVector3D GetScenePosition() const;
+      public: virtual ignition::math::Vector3d ScenePosition() const;
 
       // Documentation inherited
-      public: virtual double GetSceneRotation() const;
+      public: virtual double SceneRotation() const;
 
       /// \brief Get the number of steps in the staircase
       /// \return The number of steps in the staircase
-      public: int GetSteps() const;
+      public: int Steps() const;
 
       // Documentation inherited
       private: virtual void paint(QPainter *_painter,

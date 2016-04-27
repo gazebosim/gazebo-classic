@@ -10,11 +10,11 @@ string (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 string (TOUPPER ${PROJECT_NAME} PROJECT_NAME_UPPER)
 
 set (GAZEBO_MAJOR_VERSION 7)
-set (GAZEBO_MINOR_VERSION 0)
+set (GAZEBO_MINOR_VERSION 1)
 # The patch version may have been bumped for prerelease purposes; be sure to
 # check gazebo-release/ubuntu/debian/changelog@default to determine what the
 # next patch version should be for a regular release.
-set (GAZEBO_PATCH_VERSION 1)
+set (GAZEBO_PATCH_VERSION 0)
 
 set (GAZEBO_VERSION ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION})
 set (GAZEBO_VERSION_FULL ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION}.${GAZEBO_PATCH_VERSION})
@@ -178,7 +178,9 @@ elseif ("${CMAKE_BUILD_TYPE_UPPERCASE}" STREQUAL "RELWITHDEBINFO")
 elseif ("${CMAKE_BUILD_TYPE_UPPERCASE}" STREQUAL "DEBUG")
   set (BUILD_TYPE_DEBUG TRUE)
 elseif ("${CMAKE_BUILD_TYPE_UPPERCASE}" STREQUAL "COVERAGE")
-  # Disable DART for now due to eigen problem (issue #1160)
+  BUILD_WARNING ("Simbody physics engine not supported during Coverage builds (issue #1849).")
+  set (HAVE_SIMBODY FALSE)
+  BUILD_WARNING ("DART physics engine not supported during Coverage builds (issue #1160).")
   set (HAVE_DART FALSE)
   set (BUILD_TYPE_COVERAGE TRUE)
   include (${gazebo_cmake_dir}/CodeCoverage.cmake)
@@ -250,9 +252,7 @@ endif()
 
 # Main includes for compilation
 include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
-include_directories(SYSTEM
-  ${IGNITION-MATH_INCLUDE_DIRS}
-)
+include_directories(SYSTEM ${IGNITION-MATH_INCLUDE_DIRS})
 
 #################################################
 # Configure 3rd Party Packages after OS Specific initialization
@@ -391,8 +391,6 @@ else (build_errors)
   if (NOT CCD_FOUND)
     set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_ccd)
   endif()
-
-  set(PKG_DEPENDS Boost Protobuf SDFormat OGRE)
 
   set(cmake_conf_file "cmake/gazebo-config.cmake")
   set(cmake_conf_version_file "cmake/gazebo-config-version.cmake")

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #define _GAZEBO_GUI_BUILDING_FLOORITEM_HH_
 
 #include <memory>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/building/RectItem.hh"
@@ -50,17 +51,20 @@ namespace gazebo
       public: ~FloorItem();
 
       // Documentation inherited.
-      public: virtual QVector3D GetSize() const;
+      public: virtual ignition::math::Vector3d Size() const;
 
       // Documentation inherited.
-      public: virtual QVector3D GetScenePosition() const;
+      public: virtual ignition::math::Vector3d ScenePosition() const;
 
       // Documentation inherited.
-      public: virtual double GetSceneRotation() const;
+      public: virtual double SceneRotation() const;
 
       /// \brief Attach walls so the floor can auto expand to hold the wall.
       /// \param[in] _wallSegmentItem Wall item to attach to the floor.
       public: void AttachWallSegment(WallSegmentItem *_wallSegmentItem);
+
+      /// \brief Emit floor changed Qt signals.
+      public: void FloorChanged();
 
       // Documentation inherited.
       private: virtual void paint(QPainter *_painter,
@@ -85,9 +89,6 @@ namespace gazebo
 
       /// \brief Update the floor properties and emit Qt signals
       private: void Update();
-
-      /// \brief Emit floor changed Qt signals.
-      public: void FloorChanged();
 
       /// \brief Emit size changed Qt signals.
       private: void SizeChanged();

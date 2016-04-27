@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1323,12 +1323,7 @@ void ModelAlign_TEST::SetHighlighted()
   gazebo::gui::ModelAlign::Instance()->AlignVisuals(
       modelVisuals, "x", "min", "last", false);
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-  }
+  this->ProcessEventsAndDraw();
 
   // Check that the transparency of the leaves have changed
   QVERIFY(!ignition::math::equal(
@@ -1340,12 +1335,7 @@ void ModelAlign_TEST::SetHighlighted()
   gazebo::gui::ModelAlign::Instance()->AlignVisuals(
       modelVisuals, "x", "reset", "last", false);
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-  }
+  this->ProcessEventsAndDraw();
 
   // Check that the transparency of the leaves have the original value
   QVERIFY(ignition::math::equal(
@@ -1357,12 +1347,7 @@ void ModelAlign_TEST::SetHighlighted()
   gazebo::gui::ModelAlign::Instance()->AlignVisuals(
       modelVisuals, "z", "max", "last", false);
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-  }
+  this->ProcessEventsAndDraw();
 
   // Check that the transparency of the leaves have changed
   QVERIFY(!ignition::math::equal(
@@ -1374,12 +1359,7 @@ void ModelAlign_TEST::SetHighlighted()
   gazebo::gui::ModelAlign::Instance()->AlignVisuals(
       modelVisuals, "z", "max", "last", true);
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-  }
+  this->ProcessEventsAndDraw();
 
   // Check that the transparency of the leaves have the original value
   QVERIFY(ignition::math::equal(

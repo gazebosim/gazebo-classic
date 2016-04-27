@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -118,7 +118,7 @@ void CameraVisual::Load(const msgs::CameraSensor &_msg)
   line->setVisibilityFlags(GZ_VISIBILITY_GUI);
 
   this->AttachObject(planeEnt);
-  dPtr->camera->AttachToVisual(this->GetId(), true);
+  dPtr->camera->AttachToVisual(this->GetId(), true, 0, 0);
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
 

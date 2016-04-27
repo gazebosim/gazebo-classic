@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -151,11 +151,10 @@ void WorldResetTest::NestedModelPose(const std::string &_physicsEngine,
     return;
   }
 
-  if (_physicsEngine == "dart" &&
-      _world.find("pr2") != std::string::npos)
+  if (_physicsEngine == "dart")
   {
-    gzerr << "Abort test since dart does not support ray sensor in PR2, "
-          << "Please see issue #911.\n";
+    gzerr  << "Nested models are not working in dart yet, issue #1833"
+        << std::endl;
     return;
   }
 

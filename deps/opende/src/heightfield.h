@@ -7,7 +7,7 @@
 #define _DHEIGHTFIELD_H_
 //------------------------------------------------------------------------------
 
-#include <ode/common.h>
+#include <gazebo/ode/common.h>
 #include "collision_kernel.h"
 
 

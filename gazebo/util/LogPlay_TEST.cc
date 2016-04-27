@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 #include <gtest/gtest.h>
 #include <boost/filesystem.hpp>
 #include <string>
+#include <thread>
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Time.hh"
 #include "gazebo/util/LogPlay.hh"
@@ -403,6 +404,57 @@ TEST_F(LogPlay_TEST, Seek)
   EXPECT_TRUE(player->Step(frame));
   shasum = gazebo::common::get_sha1<std::string>(frame);
   EXPECT_EQ(shasum, expectedShashum4);
+}
+
+/////////////////////////////////////////////////
+/// \brief Test reading a log file that is missing the closing </gazebo_log>
+/// tag
+TEST_F(LogPlay_TEST, NoEndTag)
+{
+  // \todo Make temporary files work in windows.
+#ifndef _WIN32
+  gazebo::util::LogPlay *player = gazebo::util::LogPlay::Instance();
+
+  // Open the log file that is missing the end tag
+  std::ifstream srcFile(std::string(TEST_PATH) + "/logs/state_no_end.log",
+      std::ios::binary);
+  ASSERT_TRUE(srcFile.good());
+
+  // Create a temporary test file.
+  std::ostringstream stream;
+  stream << "/tmp/__gz_log_test" << std::this_thread::get_id();
+
+  std::string tmpFilename = stream.str();
+  std::ofstream destFile(tmpFilename, std::ios::binary);
+  ASSERT_TRUE(destFile.good());
+
+  // Copy source to a temporary file so that we can modify it.
+  destFile << srcFile.rdbuf();
+  destFile.close();
+
+  // Make sure we can read the log file
+  EXPECT_NO_THROW(player->Open(tmpFilename));
+
+  // Open the temporary file, which should now have the proper end tag
+  std::ifstream inFile(tmpFilename);
+
+  std::string endTag = "</gazebo_log>";
+
+  // Back up the length of the closing tag.
+  int len = -1 - static_cast<int>(endTag.length());
+  inFile.seekg(len, std::ios::end);
+
+  // Get the last line
+  std::string lastLine;
+  std::getline(inFile, lastLine);
+  inFile.close();
+
+  // Remove the temp file
+  std::remove(tmpFilename.c_str());
+
+  // Check that the log file now has the closing end tag
+  EXPECT_EQ(lastLine, endTag);
+#endif
 }
 
 /////////////////////////////////////////////////

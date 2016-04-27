@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -264,10 +264,12 @@ namespace gazebo
       /// created hass been chosen. The pose is expressed in the parent link
       /// frame. This has no effect if triggered before both links are chosen.
       /// \param[in] _pose New pose.
-      /// \param[in] _reset Set to true to reset the relative pose to the
+      /// \param[in] _resetAll Set to true to reset the relative pose to the
       /// original one.
+      /// \paran[in] _resetAxis Reset only the given axis 0 == x, 1 == y, 2 == z
       public: void SetLinksRelativePose(
-          const ignition::math::Pose3d &_pose, const bool _reset);
+          const ignition::math::Pose3d &_pose, const bool _resetAll,
+          const int _resetAxis = -1);
 
       /// \brief Align the parent and child links of the joint being created.
       /// \param[in] _childToParent True to align the child to the parent,
@@ -306,12 +308,6 @@ namespace gazebo
       /// \param[in] _event The key event.
       /// \return True if the event was handled
       private: bool OnKeyPress(const common::KeyEvent &_event);
-
-      /// \brief Get the centroid of the link visual in world coordinates.
-      /// \param[in] _visual Visual of the link.
-      /// \return Centroid in world coordinates;
-      private: ignition::math::Vector3d LinkWorldCentroid(
-          const rendering::VisualPtr &_visual);
 
       /// \brief Open joint inspector.
       /// \param[in] _name Name of joint.

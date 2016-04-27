@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,8 @@ using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-MeasureItem::MeasureItem(const QPointF &_start, const QPointF &_end)
+MeasureItem::MeasureItem(const ignition::math::Vector2d &_start,
+    const ignition::math::Vector2d &_end)
     : SegmentItem(), dataPtr(new MeasureItemPrivate())
 {
   this->editorType = "Measure";
@@ -120,7 +121,7 @@ void MeasureItem::paint(QPainter *_painter,
 }
 
 /////////////////////////////////////////////////
-double MeasureItem::GetDistance() const
+double MeasureItem::Distance() const
 {
   return this->line().length();
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,6 +51,7 @@ ForceTorqueSensor::ForceTorqueSensor()
 //////////////////////////////////////////////////
 ForceTorqueSensor::~ForceTorqueSensor()
 {
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -115,7 +116,8 @@ void ForceTorqueSensor::Load(const std::string &_worldName,
     (this->pose +
      this->dataPtr->parentJoint->GetInitialAnchorPose().Ign()).Rot();
 
-  this->dataPtr->rotationSensorChild = rotationChildSensor.Inverse();
+  this->dataPtr->rotationSensorChild =
+    ignition::math::Matrix3d(rotationChildSensor.Inverse());
 
   // Handle measure direction
   bool defaultDirectionIsParentToChild = false;
@@ -178,6 +180,8 @@ void ForceTorqueSensor::Init()
 void ForceTorqueSensor::Fini()
 {
   this->dataPtr->wrenchPub.reset();
+  this->dataPtr->parentJoint.reset();
+
   Sensor::Fini();
 }
 

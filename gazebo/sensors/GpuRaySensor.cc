@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -298,7 +298,7 @@ void GpuRaySensor::Init()
     this->dataPtr->laserCam->CreateRenderTexture(
         this->ScopedName() + "_RttTex_Image");
     this->dataPtr->laserCam->SetWorldPose(this->pose);
-    this->dataPtr->laserCam->AttachToVisual(this->ParentId(), true);
+    this->dataPtr->laserCam->AttachToVisual(this->ParentId(), true, 0, 0);
 
     this->dataPtr->laserMsg.mutable_scan()->set_frame(this->ParentName());
   }

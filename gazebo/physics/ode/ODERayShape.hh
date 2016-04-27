@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,11 @@ namespace gazebo
       /// \param[in] _physicsEngine Pointer to the physics engine.
       public: explicit ODERayShape(PhysicsEnginePtr _physicsEngine);
 
+      /// \brief Constructor for a ray in a space.
+      /// \param[in] _physicsEngine Pointer to the physics engine.
+      /// \param[in] _spaceID Space id.
+      public: ODERayShape(PhysicsEnginePtr _physicsEngine, dSpaceID _spaceId);
+
       /// \brief Constructor.
       /// \param[in] _collision Collision object this ray is attached to.
       public: explicit ODERayShape(CollisionPtr _collision);
@@ -60,6 +65,10 @@ namespace gazebo
       /// \param[in] _posEnd End position, relative to the body
       public: virtual void SetPoints(const math::Vector3 &_posStart,
                                      const math::Vector3 &_posEnd);
+
+      /// \brief Get the ODE Geom ID
+      /// \return The ODE Geom id
+      public: dGeomID ODEGeomId() const;
 
       /// \brief Ray-intersection callback.
       /// \param[in] _data Pointer to user data.

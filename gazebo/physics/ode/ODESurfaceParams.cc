@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ ODESurfaceParams::ODESurfaceParams()
     bounce(0), bounceThreshold(100000),
     kp(1000000000000), kd(1), cfm(0), erp(0.2),
     maxVel(0.01), minDepth(0),
-    slip1(0), slip2(0),
+    slip1(0), slip2(0), slipTorsion(0),
     frictionPyramid(new physics::FrictionPyramid())
 {
 }

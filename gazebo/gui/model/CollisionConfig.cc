@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -247,10 +247,19 @@ void CollisionConfig::AddCollision(const std::string &_name,
   configData->id =  this->counter;
   configData->widget = item;
   configData->name = _name;
-  connect(headerButton, SIGNAL(toggled(bool)), configData,
-           SLOT(OnToggleItem(bool)));
-  this->configs[this->counter] = configData;
 
+  this->connect(headerButton, SIGNAL(toggled(bool)), configData,
+      SLOT(OnToggleItem(bool)));
+
+  this->connect(configWidget, SIGNAL(GeometryChanged()), configData,
+      SLOT(OnGeometryChanged()));
+
+  this->connect(configData, SIGNAL(CollisionChanged(
+      const std::string &, const std::string &)),
+      this, SLOT(OnCollisionChanged(
+      const std::string &, const std::string &)));
+
+  this->configs[this->counter] = configData;
   this->counter++;
 }
 
@@ -384,12 +393,25 @@ void CollisionConfig::RestoreOriginalData()
 }
 
 /////////////////////////////////////////////////
+void CollisionConfig::OnCollisionChanged(const std::string &_name,
+    const std::string &_type)
+{
+  emit CollisionChanged(_name, _type);
+}
+
+/////////////////////////////////////////////////
 void CollisionConfigData::OnToggleItem(bool _checked)
 {
   if (_checked)
     this->configWidget->show();
   else
     this->configWidget->hide();
+}
+
+/////////////////////////////////////////////////
+void CollisionConfigData::OnGeometryChanged()
+{
+  emit CollisionChanged(this->name, "geometry");
 }
 
 /////////////////////////////////////////////////

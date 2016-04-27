@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -193,6 +193,10 @@ namespace gazebo
 
       /// \brief Set save state upon a change to the building.
       public: void BuildingChanged();
+
+      /// \brief Get the last generated SDF as string.
+      /// \return String representation of the building's SDF.
+      public: std::string ModelSDF() const;
 
       /// \brief Publish a factory message to spawn the new building.
       private: void CreateTheEntity();

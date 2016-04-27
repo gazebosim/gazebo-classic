@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  *
 */
 
+#include "gazebo/gui/Conversions.hh"
 #include "gazebo/gui/building/FloorItem.hh"
 #include "gazebo/gui/building/FloorItemPrivate.hh"
 #include "gazebo/gui/building/WallSegmentItem.hh"
@@ -50,22 +51,23 @@ FloorItem::~FloorItem()
 }
 
 /////////////////////////////////////////////////
-QVector3D FloorItem::GetSize() const
+ignition::math::Vector3d FloorItem::Size() const
 {
-  return QVector3D(this->dataPtr->floorWidth,
-                   this->dataPtr->floorDepth,
-                   this->dataPtr->floorHeight);
+  return ignition::math::Vector3d(this->dataPtr->floorWidth,
+                                  this->dataPtr->floorDepth,
+                                  this->dataPtr->floorHeight);
 }
 
 /////////////////////////////////////////////////
-QVector3D FloorItem::GetScenePosition() const
+ignition::math::Vector3d FloorItem::ScenePosition() const
 {
-  return QVector3D(this->dataPtr->floorPos.x(), this->dataPtr->floorPos.y(),
-      this->levelBaseHeight);
+  return ignition::math::Vector3d(this->dataPtr->floorPos.x(),
+                                  this->dataPtr->floorPos.y(),
+                                  this->levelBaseHeight);
 }
 
 /////////////////////////////////////////////////
-double FloorItem::GetSceneRotation() const
+double FloorItem::SceneRotation() const
 {
   return 0;
 }
@@ -176,7 +178,7 @@ void FloorItem::paint(QPainter *_painter,
 
   QPen rectPen;
   rectPen.setStyle(Qt::SolidLine);
-  rectPen.setColor(this->borderColor);
+  rectPen.setColor(Conversions::Convert(this->borderColor));
   _painter->setPen(rectPen);
 
   _painter->drawLine(topLeft, topRight);

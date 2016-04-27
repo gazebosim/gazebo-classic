@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,30 +51,30 @@ TEST_F(SystemPathsTest, SystemPaths)
   paths->ClearOgrePaths();
   paths->ClearPluginPaths();
 
-  std::string gzResourcePath = "GAZEBO_RESOURCE_PATH=" + paths->GetTmpPath() +
+  std::string gzResourcePath = "GAZEBO_RESOURCE_PATH=" + paths->TmpPath() +
       "/resource:/test/me/now";
   putenv(const_cast<char*>(gzResourcePath.c_str()));
   const std::list<std::string> &pathList1 = paths->GetGazeboPaths();
   EXPECT_EQ(static_cast<unsigned int>(2), pathList1.size());
-  EXPECT_STREQ((paths->GetTmpPath() + "/resource").c_str(),
+  EXPECT_STREQ((paths->TmpPath() + "/resource").c_str(),
       pathList1.front().c_str());
   EXPECT_STREQ("/test/me/now", pathList1.back().c_str());
 
-  std::string ogreResourcePath = "OGRE_RESOURCE_PATH=" + paths->GetTmpPath() +
+  std::string ogreResourcePath = "OGRE_RESOURCE_PATH=" + paths->TmpPath() +
       "/ogre:/test/ogre/now";
   putenv(const_cast<char*>(ogreResourcePath.c_str()));
   const std::list<std::string> &pathList2 = paths->GetOgrePaths();
   EXPECT_EQ(static_cast<unsigned int>(2), pathList2.size());
-  EXPECT_STREQ((paths->GetTmpPath() + "/ogre").c_str(),
+  EXPECT_STREQ((paths->TmpPath() + "/ogre").c_str(),
       pathList2.front().c_str());
   EXPECT_STREQ("/test/ogre/now", pathList2.back().c_str());
 
-  std::string gzPluginPath = "GAZEBO_PLUGIN_PATH=" + paths->GetTmpPath() +
+  std::string gzPluginPath = "GAZEBO_PLUGIN_PATH=" + paths->TmpPath() +
       "/plugin:/test/plugin/now";
   putenv(const_cast<char*>(gzPluginPath.c_str()));
   const std::list<std::string> &pathList3 = paths->GetPluginPaths();
   EXPECT_EQ(static_cast<unsigned int>(2), pathList3.size());
-  EXPECT_STREQ((paths->GetTmpPath() + "/plugin").c_str(),
+  EXPECT_STREQ((paths->TmpPath() + "/plugin").c_str(),
       pathList3.front().c_str());
   EXPECT_STREQ("/test/plugin/now", pathList3.back().c_str());
 

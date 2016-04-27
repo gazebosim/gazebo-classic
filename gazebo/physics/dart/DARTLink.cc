@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -411,7 +411,7 @@ void DARTLink::SetLinearVel(const math::Vector3 &_vel)
   }
   else
   {
-    gzdbg << "DARTLink::SetLinearVel() doesn't make sense if the parent joint"
+    gzdbg << "DARTLink::SetLinearVel() doesn't make sense if the parent joint "
           << "is not free joint (6-dof).\n";
   }
 }
@@ -477,7 +477,7 @@ void DARTLink::SetAngularVel(const math::Vector3 &_vel)
   }
   else
   {
-    gzdbg << "DARTLink::SetLinearVel() doesn't make sense if the parent joint"
+    gzdbg << "DARTLink::SetLinearVel() doesn't make sense if the parent joint "
           << "is not free joint (6-dof).\n";
   }
 }

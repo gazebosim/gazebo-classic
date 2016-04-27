@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 #define _GAZEBO_GUI_MAINWINDOW_PRIVATE_HH_
 
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -127,7 +128,7 @@ namespace gazebo
       public: int inputStepSize;
 
       /// \brief Map of all the editors to their names.
-      public: std::map<std::string, Editor *> editors;
+      public: std::map<std::string, std::unique_ptr<Editor> > editors;
 
       /// \brief List of all the align action groups.
       public: std::vector<QActionGroup *> alignActionGroups;

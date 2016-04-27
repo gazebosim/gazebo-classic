@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2015 Open Source Robotics Foundation
+ * Copyright (C) 2013-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 #define _MODEL_EDITOR_EVENTS_HH_
 
 #include <string>
+#include <sdf/sdf.hh>
 #include "gazebo/math/Pose.hh"
 #include "gazebo/common/Event.hh"
 #include "gazebo/util/system.hh"
@@ -163,6 +164,38 @@ namespace gazebo
             event::ConnectionPtr _subscriber)
           { newModel.Disconnect(_subscriber); }
 
+        /// \brief Connect a Gazebo event to the request nested model removal
+        /// signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectRequestNestedModelRemoval(
+            T _subscriber)
+          { return requestNestedModelRemoval.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the request nested model
+        /// removal signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectRequestNestedModelRemoval(
+            event::ConnectionPtr _subscriber)
+          { requestNestedModelRemoval.Disconnect(_subscriber); }
+
+        /// \brief Connect a Gazebo event to the request nested model insertion
+        /// signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectRequestNestedModelInsertion(
+            T _subscriber)
+          { return requestNestedModelInsertion.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the request nested model
+        /// insertion signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectRequestNestedModelInsertion(
+            event::ConnectionPtr _subscriber)
+          { requestNestedModelInsertion.Disconnect(_subscriber); }
+
         /// \brief Connect a Gazebo event to the nested model inserted signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
@@ -230,6 +263,21 @@ namespace gazebo
         public: static void DisconnectNestedModelRemoved(
             event::ConnectionPtr _subscriber)
           { nestedModelRemoved.Disconnect(_subscriber); }
+
+        /// \brief Connect a Gazebo event to the request link insertion signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectRequestLinkInsertion(
+            T _subscriber)
+          { return requestLinkInsertion.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the request link insertion
+        /// signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectRequestLinkInsertion(
+            event::ConnectionPtr _subscriber)
+          { requestLinkInsertion.Disconnect(_subscriber); }
 
         /// \brief Connect a Gazebo event to the request link removal signal.
         /// \param[in] _subscriber the subscriber to this event
@@ -518,6 +566,18 @@ namespace gazebo
 
         /// \brief Notify that a link has been removed.
         public: static event::EventT<void (std::string)> linkRemoved;
+
+        /// \brief Request to insert a link.
+        public: static event::EventT<void (sdf::ElementPtr)>
+            requestLinkInsertion;
+
+        /// \brief Request to remove a nested model.
+        public: static event::EventT<void (std::string)>
+            requestNestedModelRemoval;
+
+        /// \brief Request to insert a nested model.
+        public: static event::EventT<void (sdf::ElementPtr)>
+            requestNestedModelInsertion;
 
         /// \brief Request to remove a link.
         public: static event::EventT<void (std::string)> requestLinkRemoval;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -119,6 +119,8 @@ BuildingMaker::BuildingMaker() : dataPtr(new BuildingMakerPrivate())
 /////////////////////////////////////////////////
 BuildingMaker::~BuildingMaker()
 {
+  this->dataPtr->modelSDF.reset();
+
   this->dataPtr->node->Fini();
   this->dataPtr->node.reset();
   this->dataPtr->makerPub.reset();
@@ -173,10 +175,10 @@ void BuildingMaker::ConnectItem(const std::string &_partName,
       manip, SLOT(OnRotationChanged(double, double, double)));
   QObject::connect(_item, SIGNAL(LevelChanged(int)),
       manip, SLOT(OnLevelChanged(int)));
-  QObject::connect(_item, SIGNAL(ColorChanged(QColor)),
-      manip, SLOT(OnColorChanged(QColor)));
-  QObject::connect(_item, SIGNAL(TextureChanged(QString)),
-      manip, SLOT(OnTextureChanged(QString)));
+  QObject::connect(_item, SIGNAL(ColorChanged(common::Color)),
+      manip, SLOT(OnColorChanged(common::Color)));
+  QObject::connect(_item, SIGNAL(TextureChanged(std::string)),
+      manip, SLOT(OnTextureChanged(std::string)));
   QObject::connect(_item, SIGNAL(TransparencyChanged(float)),
       manip, SLOT(OnTransparencyChanged(float)));
 
@@ -197,10 +199,10 @@ void BuildingMaker::ConnectItem(const std::string &_partName,
   QObject::connect(_item, SIGNAL(ItemDeleted()), manip, SLOT(OnDeleted()));
 
   // manip changes -> item changes
-  QObject::connect(manip, SIGNAL(ColorChanged(QColor)),
-      _item, SLOT(OnColorChanged(QColor)));
-  QObject::connect(manip, SIGNAL(TextureChanged(QString)),
-      _item, SLOT(OnTextureChanged(QString)));
+  QObject::connect(manip, SIGNAL(ColorChanged(common::Color)),
+      _item, SLOT(OnColorChanged(common::Color)));
+  QObject::connect(manip, SIGNAL(TextureChanged(std::string)),
+      _item, SLOT(OnTextureChanged(std::string)));
 }
 
 /////////////////////////////////////////////////
@@ -817,6 +819,8 @@ void BuildingMaker::GenerateSDF()
                 Set(buildingModelManip->Color());
             visualElem->GetElement("material")->GetElement("script")
                 ->GetElement("name")->Set(buildingModelManip->Texture());
+            visualElem->GetElement("meta")->GetElement("layer")
+                ->Set(buildingModelManip->Level());
             newLinkElem->InsertElement(visualElem);
             newLinkElem->InsertElement(collisionElem);
           }
@@ -838,6 +842,8 @@ void BuildingMaker::GenerateSDF()
               Set(buildingModelManip->Color());
           visualElem->GetElement("material")->GetElement("script")
               ->GetElement("name")->Set(buildingModelManip->Texture());
+          visualElem->GetElement("meta")->GetElement("layer")
+              ->Set(buildingModelManip->Level());
         }
       }
       // Floor
@@ -927,6 +933,8 @@ void BuildingMaker::GenerateSDF()
                 Set(buildingModelManip->Color());
             visualElem->GetElement("material")->GetElement("script")
                 ->GetElement("name")->Set(buildingModelManip->Texture());
+            visualElem->GetElement("meta")->GetElement("layer")
+                ->Set(buildingModelManip->Level());
             newLinkElem->InsertElement(visualElem);
             newLinkElem->InsertElement(collisionElem);
           }
@@ -948,6 +956,8 @@ void BuildingMaker::GenerateSDF()
               Set(buildingModelManip->Color());
           visualElem->GetElement("material")->GetElement("script")
               ->GetElement("name")->Set(buildingModelManip->Texture());
+          visualElem->GetElement("meta")->GetElement("layer")
+              ->Set(buildingModelManip->Level());
         }
       }
     }
@@ -982,6 +992,8 @@ void BuildingMaker::GenerateSDF()
               Set(buildingModelManip->Color());
         visualElem->GetElement("material")->GetElement("script")
             ->GetElement("name")->Set(buildingModelManip->Texture());
+        visualElem->GetElement("meta")->GetElement("layer")
+            ->Set(buildingModelManip->Level());
         newLinkElem->InsertElement(visualElem);
         newLinkElem->InsertElement(collisionElem);
       }
@@ -1550,6 +1562,7 @@ void BuildingMaker::OnNew()
   }
 }
 
+/////////////////////////////////////////////////
 void BuildingMaker::SaveModelFiles()
 {
   this->dataPtr->saveDialog->GenerateConfig();
@@ -1557,6 +1570,12 @@ void BuildingMaker::SaveModelFiles()
   this->GenerateSDF();
   this->dataPtr->saveDialog->SaveToSDF(this->dataPtr->modelSDF);
   this->dataPtr->currentSaveState = BuildingMakerPrivate::ALL_SAVED;
+}
+
+/////////////////////////////////////////////////
+std::string BuildingMaker::ModelSDF() const
+{
+  return this->dataPtr->modelSDF->ToString();
 }
 
 /////////////////////////////////////////////////
