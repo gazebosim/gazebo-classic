@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_VISUAL_HH_
-#define _GAZEBO_VISUAL_HH_
+#ifndef _GAZEBO_RENDERING_VISUAL_HH_
+#define _GAZEBO_RENDERING_VISUAL_HH_
 
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/function.hpp>
@@ -25,6 +24,7 @@
 #include <vector>
 
 #include <sdf/sdf.hh>
+#include <ignition/msgs/MessageTypes.hh>
 
 #include "gazebo/common/Color.hh"
 #include "gazebo/common/Mesh.hh"
@@ -647,6 +647,10 @@ namespace gazebo
       /// \brief Process a material message.
       /// \param[in] _msg The material message.
       protected: void ProcessMaterialMsg(const msgs::Material &_msg);
+
+      /// \brief Process a material message.
+      /// \param[in] _msg The ignition material message.
+      protected: void ProcessMaterialMsg(const ignition::msgs::Material &_msg);
 
       /// \brief Helper function for initializing the visual with a scene as
       /// its parent.

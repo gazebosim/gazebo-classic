@@ -44,6 +44,7 @@ target_link_libraries(gz
  gazebo_sensors
  ${QT_LIBRARIES}
  ${Boost_LIBRARIES}
+ ${IGNITION-TRANSPORT_LIBRARIES}
 )
 
 if (UNIX)

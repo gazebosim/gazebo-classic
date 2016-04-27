@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,46 +43,50 @@ MarkerVisual::~MarkerVisual()
 }
 
 /////////////////////////////////////////////////
-void MarkerVisual::Load(const msgs::Marker &_msg)
+void MarkerVisual::Load(const ignition::msgs::Marker &_msg)
 {
   std::lock_guard<std::mutex> lock(this->dPtr->mutex);
-  Visual::Load();
 
-  if (_msg.action() == msgs::Marker::ADD_MODIFY)
+  if (!this->dPtr->loaded)
+    Visual::Load();
+
+  if (_msg.action() == ignition::msgs::Marker::ADD_MODIFY)
   {
     this->AddModify(_msg);
   }
+
+  this->dPtr->loaded = true;
 }
 
 /////////////////////////////////////////////////
-void MarkerVisual::AddModify(const msgs::Marker &_msg)
+void MarkerVisual::AddModify(const ignition::msgs::Marker &_msg)
 {
   // Set the type of visual
   if (this->dPtr->msg.type() != _msg.type())
   {
     switch (_msg.type())
     {
-      case msgs::Marker::CUBE:
+      case ignition::msgs::Marker::BOX:
         this->DetachObjects();
         this->AttachMesh("unit_box");
         break;
-      case msgs::Marker::CYLINDER:
+      case ignition::msgs::Marker::CYLINDER:
         this->DetachObjects();
         this->AttachMesh("unit_cylinder");
         break;
-      case msgs::Marker::LINE_STRIP:
-      case msgs::Marker::LINE_LIST:
-      case msgs::Marker::POINTS:
-      case msgs::Marker::TRIANGLE_FAN:
-      case msgs::Marker::TRIANGLE_LIST:
-      case msgs::Marker::TRIANGLE_STRIP:
+      case ignition::msgs::Marker::LINE_STRIP:
+      case ignition::msgs::Marker::LINE_LIST:
+      case ignition::msgs::Marker::POINTS:
+      case ignition::msgs::Marker::TRIANGLE_FAN:
+      case ignition::msgs::Marker::TRIANGLE_LIST:
+      case ignition::msgs::Marker::TRIANGLE_STRIP:
         this->DynamicRenderable(_msg);
         break;
-      case msgs::Marker::SPHERE:
+      case ignition::msgs::Marker::SPHERE:
         this->DetachObjects();
         this->AttachMesh("unit_sphere");
         break;
-      case msgs::Marker::TEXT:
+      case ignition::msgs::Marker::TEXT:
         this->Text(_msg);
         break;
       default:
@@ -99,11 +103,27 @@ void MarkerVisual::AddModify(const msgs::Marker &_msg)
 
   // Scale the visual
   if (_msg.has_scale())
-    this->SetScale(msgs::ConvertIgn(_msg.scale()));
+  {
+    this->SetScale(ignition::math::Vector3d(
+          _msg.scale().x(), _msg.scale().y(), _msg.scale().z()));
+  }
 
   // Set the visual's pose
   if (_msg.has_pose())
-    this->SetPose(msgs::ConvertIgn(_msg.pose()));
+  {
+    this->SetPose(
+        ignition::math::Pose3d(
+          ignition::math::Vector3d(_msg.pose().position().x(),
+                                   _msg.pose().position().y(),
+                                   _msg.pose().position().z()
+                                   ),
+          ignition::math::Quaterniond(_msg.pose().orientation().w(),
+                                      _msg.pose().orientation().x(),
+                                      _msg.pose().orientation().y(),
+                                      _msg.pose().orientation().z()
+                                      )
+          ));
+  }
 
   // Set the marker's end time
   if (_msg.has_lifetime() &&
@@ -111,24 +131,37 @@ void MarkerVisual::AddModify(const msgs::Marker &_msg)
        (_msg.lifetime().sec() == 0 && _msg.lifetime().nsec() > 0)))
   {
     this->dPtr->lifetime = this->GetScene()->SimTime() +
-      msgs::Convert(_msg.lifetime());
+      gazebo::common::Time(_msg.lifetime().sec(),_msg.lifetime().nsec());
   }
 
   // Attach marker to a parent visual, if specified in the message.
   if (_msg.has_parent())
   {
-    // Detach from existing parent
-    if (this->GetParent())
+    // Detach from existing parent. Only detach if a parent exists
+    // and is not the root node when the new parent name is not empty.
+    if (this->GetParent())/* && (!_msg.parent().empty() ||
+          this->GetParent()->GetName() !=
+          this->scene->GetWorldVisual()->GetName()))*/
+    {
       this->GetParent()->DetachVisual(shared_from_this());
+    }
 
     // Get the new parent
     VisualPtr parent = this->GetScene()->GetVisual(_msg.parent());
 
     // Attach to the new parent, if the parent is valid
     if (parent)
+    {
       parent->AttachVisual(shared_from_this());
-    else
+    }
+    else if (_msg.parent().empty())
+    {
+      this->GetScene()->WorldVisual()->AttachVisual(shared_from_this());
+    }
+    else if (!_msg.parent().empty())
+    {
       gzerr << "No visual with the name[" << _msg.parent() << "]\n";
+    }
   }
 }
 
@@ -139,33 +172,33 @@ common::Time MarkerVisual::Lifetime() const
 }
 
 /////////////////////////////////////////////////
-void MarkerVisual::DynamicRenderable(const msgs::Marker &_msg)
+void MarkerVisual::DynamicRenderable(const ignition::msgs::Marker &_msg)
 {
   if (!this->dPtr->dynamicRenderable)
   {
     switch (_msg.type())
     {
-      case msgs::Marker::LINE_STRIP:
+      case ignition::msgs::Marker::LINE_STRIP:
         this->dPtr->dynamicRenderable.reset(
           this->CreateDynamicLine(rendering::RENDERING_LINE_STRIP));
         break;
-      case msgs::Marker::LINE_LIST:
+      case ignition::msgs::Marker::LINE_LIST:
         this->dPtr->dynamicRenderable.reset(
           this->CreateDynamicLine(rendering::RENDERING_LINE_LIST));
         break;
-      case msgs::Marker::POINTS:
+      case ignition::msgs::Marker::POINTS:
         this->dPtr->dynamicRenderable.reset(
           this->CreateDynamicLine(rendering::RENDERING_POINT_LIST));
         break;
-      case msgs::Marker::TRIANGLE_FAN:
+      case ignition::msgs::Marker::TRIANGLE_FAN:
         this->dPtr->dynamicRenderable.reset(
           this->CreateDynamicLine(rendering::RENDERING_TRIANGLE_FAN));
         break;
-      case msgs::Marker::TRIANGLE_LIST:
+      case ignition::msgs::Marker::TRIANGLE_LIST:
         this->dPtr->dynamicRenderable.reset(
           this->CreateDynamicLine(rendering::RENDERING_TRIANGLE_LIST));
         break;
-      case msgs::Marker::TRIANGLE_STRIP:
+      case ignition::msgs::Marker::TRIANGLE_STRIP:
         this->dPtr->dynamicRenderable.reset(
           this->CreateDynamicLine(rendering::RENDERING_TRIANGLE_STRIP));
         break;
@@ -176,7 +209,12 @@ void MarkerVisual::DynamicRenderable(const msgs::Marker &_msg)
     };
 
     for (int i = 0; i < _msg.point_size(); ++i)
-      this->dPtr->dynamicRenderable->AddPoint(msgs::ConvertIgn(_msg.point(i)));
+    {
+      this->dPtr->dynamicRenderable->AddPoint(
+          ignition::math::Vector3d(_msg.point(i).x(),
+            _msg.point(i).y(),
+            _msg.point(i).z()));
+    }
   }
   else
   {
@@ -184,13 +222,15 @@ void MarkerVisual::DynamicRenderable(const msgs::Marker &_msg)
     for (int i = 0; i < _msg.point_size(); ++i)
     {
       this->dPtr->dynamicRenderable->AddPoint(
-          msgs::ConvertIgn(_msg.point(i)));
+          ignition::math::Vector3d(_msg.point(i).x(),
+            _msg.point(i).y(),
+            _msg.point(i).z()));
     }
   }
 }
 
 /////////////////////////////////////////////////
-void MarkerVisual::Text(const msgs::Marker &_msg)
+void MarkerVisual::Text(const ignition::msgs::Marker &_msg)
 {
   if (!this->dPtr->text)
   {

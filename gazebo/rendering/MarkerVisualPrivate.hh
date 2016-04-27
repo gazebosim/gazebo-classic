@@ -19,6 +19,7 @@
 
 #include <vector>
 #include <memory>
+#include <ignition/msgs.hh>
 
 #include "gazebo/rendering/MovableText.hh"
 #include "gazebo/rendering/VisualPrivate.hh"
@@ -42,10 +43,13 @@ namespace gazebo
       public: std::mutex mutex;
 
       /// \brief The last marker message received.
-      public: msgs::Marker msg;
+      public: ignition::msgs::Marker msg;
 
       /// \brief Lifetime of the marker
       public: common::Time lifetime;
+
+      /// \brief True when the marker has already been loaded.
+      public: bool loaded = false;
     };
   }
 }

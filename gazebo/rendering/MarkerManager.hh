@@ -18,6 +18,7 @@
 #ifndef _GAZEBO_MARKER_MANAGER_HH_
 #define _GAZEBO_MARKER_MANAGER_HH_
 
+#include <ignition/msgs.hh>
 #include "gazebo/rendering/RenderTypes.hh"
 
 namespace gazebo
@@ -49,12 +50,18 @@ namespace gazebo
       private: void OnPreRender();
 
       /// \brief Callback that receives marker messages.
-      /// \param[in] _msg The marker message.
-      private: void OnMarkerMsg(ConstMarkerPtr &_msg);
+      /// \param[in] _req The marker message.
+      /// \param[out] _rep The response message.
+      /// \param[out] _result True/false result.
+      private: void OnMarkerMsg(const ignition::msgs::Marker &_req,
+                   ignition::msgs::StringMsg &_rep, bool &_result);
 
       /// \brief Process a marker message.
       /// \param[in] _msg The message data.
-      private: bool ProcessMarkerMsg(const msgs::Marker &_msg);
+      private: bool ProcessMarkerMsg(const ignition::msgs::Marker &_msg);
+
+      private: void OnList(const ignition::msgs::StringMsg &_req,
+                   ignition::msgs::Marker_V &_rep, bool &_result);
 
       /// \internal
       /// \brief Private data pointer

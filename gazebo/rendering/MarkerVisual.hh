@@ -21,7 +21,8 @@
 #include <string>
 #include <memory>
 
-#include "gazebo/msgs/MessageTypes.hh"
+#include <ignition/msgs.hh>
+
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/util/system.hh"
 
@@ -48,7 +49,7 @@ namespace gazebo
 
       /// \brief Load the marker
       /// \param[in] _msg The marker message to load the visual from.
-      public: void Load(const msgs::Marker &_msg);
+      public: void Load(const ignition::msgs::Marker &_msg);
 
       /// \brief Get the lifetime of the marker
       /// \return Life time of the marker in simulation time.
@@ -56,15 +57,15 @@ namespace gazebo
 
       /// \brief Add or modify a marker
       /// \param[in] _msg The message that defines what to add or modify
-      private: void AddModify(const msgs::Marker &_msg);
+      private: void AddModify(const ignition::msgs::Marker &_msg);
 
       /// \brief Add or modify a dynamic renderable.
       /// \param[in] _msg The message that defines what to add or modify
-      private: void DynamicRenderable(const msgs::Marker &_msg);
+      private: void DynamicRenderable(const ignition::msgs::Marker &_msg);
 
       /// \brief Add or modify movable text.
       /// \param[in] _msg The message that defines what to add or modify
-      private: void Text(const msgs::Marker &_msg);
+      private: void Text(const ignition::msgs::Marker &_msg);
 
       /// \brief Private data pointer
       private: MarkerVisualPrivate *dPtr;

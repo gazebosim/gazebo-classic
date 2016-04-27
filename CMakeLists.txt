@@ -254,7 +254,9 @@ endif()
 include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
 include_directories(SYSTEM
   ${IGNITION-MATH_INCLUDE_DIRS}
+  ${IGNITION-MSGS_INCLUDE_DIRS}
 )
+link_directories(${IGNITION-MSGS_LIBRARY_DIRS})
 
 #################################################
 # Configure 3rd Party Packages after OS Specific initialization

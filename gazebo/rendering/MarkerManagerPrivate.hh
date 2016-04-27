@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,16 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_MARKER_MANAGER_PRIVATE_HH_
-#define _GAZEBO_MARKER_MANAGER_PRIVATE_HH_
+#ifndef _GAZEBO_RENDERING_MARKER_MANAGER_PRIVATE_HH_
+#define _GAZEBO_RENDERING_MARKER_MANAGER_PRIVATE_HH_
 
 #include <string>
 #include <map>
 #include <list>
 #include <mutex>
+#include <ignition/transport/Node.hh>
 
-#include "gazebo/msgs/msgs.hh"
-#include "gazebo/transport/TransportTypes.hh"
+#include <ignition/msgs.hh>
 #include "gazebo/common/Event.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 
@@ -40,17 +40,20 @@ namespace gazebo
 
     /// \def MarkerMsgs_L
     /// \brief List of marker messages.
-    typedef std::list<boost::shared_ptr<msgs::Marker const> > MarkerMsgs_L;
+    typedef std::list<ignition::msgs::Marker> MarkerMsgs_L;
 
     /// \internal
     /// Private data for the MarkerManager class
     class MarkerManagerPrivate
     {
       /// \brief Communication Node
-      public: transport::NodePtr node;
+      // public: transport::NodePtr node;
+
+      /// \brief Ignition node
+      public: ignition::transport::Node node;
 
       /// \brief Subscribe to marker topic
-      public: transport::SubscriberPtr markerSub;
+      // public: transport::SubscriberPtr markerSub;
 
       /// \brief Map of markers
       public: Marker_M markers;

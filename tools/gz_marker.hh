@@ -14,10 +14,11 @@
  * limitations under the License.
  *
 */
-#ifndef _GZ_TOOL_MARKER_HH_
-#define _GZ_TOOL_MARKER_HH_
+#ifndef _GAZEBO_TOOLS_MARKER_HH_
+#define _GAZEBO_TOOLS_MARKER_HH_
 
 #include <string>
+#include <ignition/transport/Node.hh>
 #include "gz.hh"
 
 namespace gazebo
@@ -36,18 +37,29 @@ namespace gazebo
     protected: virtual bool RunImpl();
 
     /// \brief List all the visual markers.
-    private: void List() const;
+    private: void List();
 
     /// \brief Add or modify a marker.
+    /// \param[in] _ns Namespace for the marker
+    /// \param[in] _id Marker id
+    /// \param[in] _type Shape type. See the Type enum in
+    /// gazebo::msgs::Marker protobuf message
+    /// \param[in] _lifetime Length of time the marker should be visible.
+    /// \param[in] _parent Name of a parent visual to attach a marker to.
     private: void Add(const std::string &_ns, const unsigned int _id,
                  const std::string &_type, const common::Time _lifetime,
-                 const std::string &_parent) const;
+                 const std::string &_parent);
+
+    /// \brief Delete a marker.
+    /// \param[in] _ns Namespace for the marker
+    /// \param[in] _id Marker id
+    private: void Delete(const std::string &_ns, const unsigned int _id);
+
+    /// \brief Delete all markers
+    private: void DeleteAll();
 
     /// \brief Node pointer.
-    private: transport::NodePtr node;
-
-    /// \brief Pointer to the marker publisher.
-    private: transport::PublisherPtr pub;
+    private: ignition::transport::Node node;
   };
 }
 #endif

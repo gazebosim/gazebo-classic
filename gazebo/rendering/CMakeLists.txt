@@ -7,7 +7,6 @@ include_directories(SYSTEM
   skyx/include
 )
 
-
 if (WIN32)
   include_directories(${libdl_include_dir})
 endif()
@@ -198,6 +197,8 @@ target_link_libraries(gazebo_rendering
   ${ogre_libraries}
   ${OPENGL_LIBRARIES}
   ${tinyxml_LIBRARIES}
+  ${IGNITION-TRANSPORT_LIBRARIES}
+  ${IGNITION-MSGS_LIBRARIES}
 )
 
 if (HAVE_OCULUS)

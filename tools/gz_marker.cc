@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,14 @@
  * limitations under the License.
  *
 */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
+
+#include <ignition/transport.hh>
+#include <ignition/msgs.hh>
 
 #include "gz_marker.hh"
 
@@ -27,7 +29,7 @@ using namespace gazebo;
 
 /////////////////////////////////////////////////
 MarkerCommand::MarkerCommand()
-  : Command("marker", "Add, modify, or delete visual markers")
+: Command("marker", "Add, modify, or delete visual markers")
 {
   // Options that are visible to the user through help.
   this->visibleOptions.add_options()
@@ -66,10 +68,12 @@ bool MarkerCommand::RunImpl()
   if (this->vm.count("world-name"))
     worldName = this->vm["world-name"].as<std::string>();
 
-  this->node.reset(new transport::Node());
-  this->node->Init(worldName);
-  this->pub = this->node->Advertise<gazebo::msgs::Marker>("~/marker");
-  this->pub->WaitForConnection();
+  // this->node.reset(new transport::Node());
+  // this->node->Init(worldName);
+  // this->pub = this->node->Advertise<ignition::msgs::Marker>("~/marker");
+  // this->pub->WaitForConnection();
+
+  node.Advertise<ignition::msgs::Marker>("/marker");
 
   std::string ns = "default";
   unsigned int id = 0;
@@ -92,6 +96,10 @@ bool MarkerCommand::RunImpl()
     this->List();
   else if (this->vm.count("add"))
     this->Add(ns, id, type, lifetime, parent);
+  else if (this->vm.count("delete"))
+    this->Delete(ns, id);
+  else if (this->vm.count("delete-all"))
+    this->DeleteAll();
   else
     this->Help();
 
@@ -99,42 +107,89 @@ bool MarkerCommand::RunImpl()
 }
 
 /////////////////////////////////////////////////
-void MarkerCommand::List() const
+void MarkerCommand::List()
 {
+  ignition::msgs::StringMsg req;
+  req.set_data("list");
+
+  ignition::msgs::StringMsg_V rep;
+  bool result;
+  bool executed = this->node.Request("/marker/list", req, 5000u, rep, result);
+
+  if (executed)
+  {
+    if (result)
+    {
+      std::cout << "HERE\n";
+    }
+    else
+    {
+      std::cerr << "Error when getting the list of visual markers\n";
+    }
+  }
+  else
+  {
+    std::cerr << "Failed to get the list of visual markers.\n";
+  }
 }
 
 /////////////////////////////////////////////////
 void MarkerCommand::Add(const std::string &_ns, const unsigned int _id,
     const std::string &_type, const common::Time _lifetime,
-    const std::string &_parent) const
+    const std::string &_parent)
 {
-  gazebo::msgs::Marker msg;
+  ignition::msgs::Marker msg;
   msg.set_ns(_ns);
   msg.set_id(_id);
+
   msg.set_parent(_parent);
 
-  msgs::Set(msg.mutable_lifetime(), _lifetime);
+  if (_lifetime > common::Time::Zero)
+  {
+    msg.mutable_lifetime()->set_sec(_lifetime.sec);
+    msg.mutable_lifetime()->set_nsec(_lifetime.nsec);
+  }
 
-  msg.set_action(gazebo::msgs::Marker::ADD_MODIFY);
+  msg.set_action(ignition::msgs::Marker::ADD_MODIFY);
   if (_type == "cube" || _type == "box")
-    msg.set_type(gazebo::msgs::Marker::CUBE);
+    msg.set_type(ignition::msgs::Marker::BOX);
   else if (_type == "sphere")
-    msg.set_type(gazebo::msgs::Marker::SPHERE);
+    msg.set_type(ignition::msgs::Marker::SPHERE);
   else if (_type == "cylinder")
-    msg.set_type(gazebo::msgs::Marker::CYLINDER);
+    msg.set_type(ignition::msgs::Marker::CYLINDER);
   else if (_type == "line_list" || _type == "line-list")
-    msg.set_type(gazebo::msgs::Marker::LINE_LIST);
+    msg.set_type(ignition::msgs::Marker::LINE_LIST);
   else if (_type == "line_strip" || _type == "line-strip")
-    msg.set_type(gazebo::msgs::Marker::LINE_STRIP);
+    msg.set_type(ignition::msgs::Marker::LINE_STRIP);
   else if (_type == "points")
-    msg.set_type(gazebo::msgs::Marker::POINTS);
+    msg.set_type(ignition::msgs::Marker::POINTS);
   else if (_type == "text")
-    msg.set_type(gazebo::msgs::Marker::TEXT);
+    msg.set_type(ignition::msgs::Marker::TEXT);
   else if (_type == "triangle_fan" || _type == "triangle-fan")
-    msg.set_type(gazebo::msgs::Marker::TRIANGLE_FAN);
+    msg.set_type(ignition::msgs::Marker::TRIANGLE_FAN);
   else if (_type == "triangle_strip" || _type == "triangle-strip")
-    msg.set_type(gazebo::msgs::Marker::TRIANGLE_STRIP);
+    msg.set_type(ignition::msgs::Marker::TRIANGLE_STRIP);
 
   std::cout << msg.DebugString() << std::endl;
-  this->pub->Publish(msg);
+  bool result;
+  ignition::msgs::StringMsg rep;
+  this->node.Request("/marker", msg, 5000u, rep, result);
+}
+
+/////////////////////////////////////////////////
+void MarkerCommand::Delete(const std::string &_ns, const unsigned int _id)
+{
+  ignition::msgs::Marker msg;
+  msg.set_ns(_ns);
+  msg.set_id(_id);
+  msg.set_action(ignition::msgs::Marker::DELETE);
+  this->node.Publish("/marker", msg);
+}
+
+/////////////////////////////////////////////////
+void MarkerCommand::DeleteAll()
+{
+  ignition::msgs::Marker msg;
+  msg.set_action(ignition::msgs::Marker::DELETE_ALL);
+  this->node.Publish("/marker", msg);
 }
