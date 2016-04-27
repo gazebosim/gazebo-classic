@@ -40,11 +40,11 @@
  *                                                                 *
  *******************************************************************/
 
-#include <ode/collision.h>
-#include <ode/matrix.h>
-#include <ode/rotation.h>
-#include <ode/odemath.h>
-#include <ode/objects.h>
+#include <gazebo/ode/collision.h>
+#include <gazebo/ode/matrix.h>
+#include <gazebo/ode/rotation.h>
+#include <gazebo/ode/odemath.h>
+#include <gazebo/ode/objects.h>
 
 #include "config.h"
 #include "collision_kernel.h"	// for dxGeom

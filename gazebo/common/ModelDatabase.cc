@@ -39,6 +39,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/ModelDatabasePrivate.hh"
 #include "gazebo/common/ModelDatabase.hh"
+#include "gazebo/common/SemanticVersion.hh"
 
 using namespace gazebo;
 using namespace common;
@@ -612,6 +613,8 @@ std::string ModelDatabase::GetModelFile(const std::string &_uri)
   }
 
   TiXmlDocument xmlDoc;
+  SemanticVersion sdfParserVersion(SDF_VERSION);
+  std::string bestVersionStr = "0.0";
   if (xmlDoc.LoadFile(manifestPath.string()))
   {
     TiXmlElement *modelXML = xmlDoc.FirstChildElement("model");
@@ -621,15 +624,33 @@ std::string ModelDatabase::GetModelFile(const std::string &_uri)
       TiXmlElement *sdfSearch = sdfXML;
 
       // Find the SDF element that matches our current SDF version.
+      // If a match is not found, use the latest version of the element
+      // that is not older than the SDF parser.
       while (sdfSearch)
       {
-        if (sdfSearch->Attribute("version") &&
-            std::string(sdfSearch->Attribute("version")) == SDF_VERSION)
+        if (sdfSearch->Attribute("version"))
         {
-          sdfXML = sdfSearch;
-          break;
+          std::string version = std::string(sdfSearch->Attribute("version"));
+          SemanticVersion modelVersion(version);
+          SemanticVersion bestVersion(bestVersionStr);
+          if (modelVersion > bestVersion)
+          {
+            // this model is better than the previous one
+            if (modelVersion <= sdfParserVersion)
+            {
+              // the parser can read it
+              sdfXML = sdfSearch;
+              bestVersionStr = version;
+            }
+            else
+            {
+              gzwarn << "Ignoring version " << version
+                << " for model " << _uri
+                << " because Gazebo is using an older sdf parser (version "
+                << SDF_VERSION << ")" << std::endl;
+            }
+          }
         }
-
         sdfSearch = sdfSearch->NextSiblingElement("sdf");
       }
 

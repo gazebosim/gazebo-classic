@@ -302,6 +302,9 @@ namespace gazebo
       /// \brief True when all link frames should be visualized.
       public: bool showLinkFrames;
 
+      /// \brief True when all skeletons should be visualized.
+      public: bool showSkeleton;
+
       /// \brief True when all collisions should be visualized.
       public: bool showCollisions;
 

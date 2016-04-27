@@ -133,6 +133,10 @@ namespace gazebo
       /// \param[in] _event Qt key event.
       private: void keyPressEvent(QKeyEvent *_event);
 
+      /// \brief Qt close event
+      /// \param[in] _event Qt close event pointer
+      private: void closeEvent(QCloseEvent *_event);
+
       /// \internal
       /// \brief Pointer to private data.
       private: std::unique_ptr<LinkInspectorPrivate> dataPtr;

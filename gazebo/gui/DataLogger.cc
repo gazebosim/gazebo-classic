@@ -258,7 +258,7 @@ DataLogger::DataLogger(QWidget *_parent)
   {
     common::SystemPaths *paths = common::SystemPaths::Instance();
     this->dataPtr->basePath =
-        QString::fromStdString(paths->GetTmpPath() + "/gazebo");
+        QString::fromStdString(paths->TmpPath() + "/gazebo");
   }
   else
   {

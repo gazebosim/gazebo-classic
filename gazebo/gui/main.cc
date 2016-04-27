@@ -14,15 +14,26 @@
  * limitations under the License.
  *
 */
+#include "gazebo/common/Console.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/GuiIface.hh"
+#include "gazebo/rendering/ogre_gazebo.h"
 
 //////////////////////////////////////////////////
 int main(int _argc, char **_argv)
 {
   Q_INIT_RESOURCE(resources);
   int result = 0;
-  if (!gazebo::gui::run(_argc, _argv))
+  try
+  {
+    if (!gazebo::gui::run(_argc, _argv))
+      result = -1;
+  }
+  catch(Ogre::Exception &_e)
+  {
+    gzerr << "Ogre Error:" << _e.getFullDescription() << "\n";
     result = -1;
+  }
+
   return result;
 }

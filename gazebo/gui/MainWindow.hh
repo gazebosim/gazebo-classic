@@ -224,6 +224,9 @@ namespace gazebo
       /// \brief Qt callback when the show link frame action is triggered.
       private slots: void ShowLinkFrame();
 
+      /// \brief Qt callback when the show skeleton action is triggered.
+      private slots: void ShowSkeleton();
+
       /// \brief Qt callback when the full screen action is triggered.
       private slots: void FullScreen();
 
