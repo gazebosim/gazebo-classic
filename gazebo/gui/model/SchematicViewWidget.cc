@@ -328,7 +328,14 @@ void SchematicViewWidget::OnSetSelectedEntity(const std::string &_name,
   for (auto &node : this->nodes)
   {
     if (node.first.find(_name) == 0)
+    {
       node.second->setSelected(_selected);
+
+      if (!this->selectedItems.contains(node.second))
+      {
+        this->selectedItems.push_back(node.second);
+      }
+    }
   }
 
   this->scene->blockSignals(false);
@@ -338,60 +345,73 @@ void SchematicViewWidget::OnSetSelectedEntity(const std::string &_name,
 void SchematicViewWidget::OnSetSelectedJoint(const std::string &_id,
     bool _selected)
 {
+  this->scene->blockSignals(true);
+
   auto it = this->edges.find(_id);
   if (it != this->edges.end())
+  {
     it->second->setSelected(_selected);
+
+    if (!this->selectedItems.contains(it->second))
+    {
+      this->selectedItems.push_back(it->second);
+    }
+  }
+
+  this->scene->blockSignals(false);
 }
 
 /////////////////////////////////////////////////
 void SchematicViewWidget::OnDeselectAll(const std::string &/*_name*/,
     const std::string &/*_mode*/)
 {
+  this->scene->blockSignals(true);
+
   // deselect all
   for (auto &node : this->nodes)
     node.second->setSelected(false);
 
   for (auto &edge : this->edges)
     edge.second->setSelected(false);
+
+  this->selectedItems.clear();
+
+  this->scene->blockSignals(false);
 }
 
 /////////////////////////////////////////////////
 void SchematicViewWidget::OnSelectionChanged()
 {
-  QList<QGraphicsItem *> items = this->scene->selectedItems();
+  QList<QGraphicsItem *> newlySelected = this->scene->selectedItems();
 
-  // update and signal new selection
-  for (auto const item : items)
+  for (auto &item : this->scene->items())
   {
-    int idx = this->selectedItems.indexOf(item);
-    if (idx >= 0)
-    {
-      this->selectedItems.removeAt(idx);
-      continue;
-    }
     std::string id = item->data(0).toString().toStdString();
     std::string type = item->data(1).toString().toStdString();
 
-    if (type == "Link")
-      gui::model::Events::setSelectedLink(id, true);
-    else if (type == "Joint")
-      gui::model::Events::setSelectedJoint(id, true);
-  }
+    bool selected = false;
 
-  // deselect
-  for (auto const &item : this->selectedItems)
-  {
-    if (item)
+    // Deselect previously selected
+    if (this->selectedItems.contains(item) && !newlySelected.contains(item))
     {
-      std::string id = item->data(0).toString().toStdString();
-      std::string type = item->data(1).toString().toStdString();
-
-      if (type == "Link")
-        gui::model::Events::setSelectedLink(id, false);
-      else if (type == "Joint")
-        gui::model::Events::setSelectedJoint(id, false);
+      selected = false;
     }
+    // Select all newly selected
+    else if (!this->selectedItems.contains(item) &&
+        newlySelected.contains(item))
+    {
+      selected = true;
+    }
+    else
+      continue;
+
+    if (type == "Link")
+      gui::model::Events::setSelectedLink(id, selected);
+    else if (type == "Joint")
+      gui::model::Events::setSelectedJoint(id, selected);
+    else
+      gzwarn << "Unknown type [" << type << "]" << std::endl;
   }
 
-  this->selectedItems = items;
+  this->selectedItems = newlySelected;
 }
