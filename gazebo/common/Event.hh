@@ -14,25 +14,18 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_EVENT_HH_
-#define _GAZEBO_EVENT_HH_
+#ifndef GAZEBO_COMMON_EVENT_HH_
+#define GAZEBO_COMMON_EVENT_HH_
 
 #include <atomic>
-#include <iostream>
-#include <vector>
 #include <map>
-#include <memory>
 #include <mutex>
 #include <list>
-
-#include <boost/function.hpp>
-#include <boost/bind.hpp>
+#include <functional>
 
 #include <gazebo/gazebo_config.h>
 #include <gazebo/common/Time.hh>
 #include <gazebo/common/CommonTypes.hh>
-#include <gazebo/math/Helpers.hh>
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -64,29 +57,19 @@ namespace gazebo
 
       /// \brief Get whether this event has been signaled.
       /// \return True if the event has been signaled.
-      public: bool GetSignaled() const;
+      /// \deprecated See bool Signaled() const;
+      public: bool GetSignaled() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get whether this event has been signaled.
+      /// \return True if the event has been signaled.
+      public: bool Signaled() const;
+
+      /// \brief Set whether this event has been signaled.
+      /// \param[in] _sig True if the event has been signaled.
+      public: void SetSignaled(const bool _sig);
 
       /// \brief True if the event has been signaled.
-      protected: bool signaled;
-    };
-
-    /// \internal
-    // Private data members for Connection class.
-    class ConnectionPrivate
-    {
-      /// \brief Constructor.
-      /// \param[in] _e Event pointer to connect with
-      /// \param[in] _i Unique id
-      public: ConnectionPrivate(Event *_e, int _i);
-
-      /// \brief the event for this connection
-      public: Event *event;
-
-      /// \brief the id set in the constructor
-      public: int id;
-
-      /// \brief set during the constructor
-      public: common::Time creationTime;
+      private: bool signaled;
     };
 
     /// \brief A class that encapsulates a connection.
@@ -95,66 +78,35 @@ namespace gazebo
       /// \brief Constructor.
       /// \param[in] _e Event pointer to connect with.
       /// \param[in] _i Unique id.
-      public: Connection(Event *_e, int _i);
+      public: Connection(Event *_e, const int _i);
 
       /// \brief Destructor.
       public: ~Connection();
 
       /// \brief Get the id of this connection.
       /// \return The id of this connection.
-      public: int GetId() const;
+      /// \deprecated See const Id() const;
+      public: int GetId() const GAZEBO_DEPRECATED(8.0);
 
-      /// \brief Private data pointer.
-      private: std::unique_ptr<ConnectionPrivate> dataPtr;
+      /// \brief Get the id of this connection.
+      /// \return The id of this connection.
+      public: int Id() const;
+
+      /// \brief the event for this connection
+      private: Event *event = nullptr;
+
+      /// \brief the id set in the constructor
+      private: int id = -1;
+
+      /// \brief set during the constructor
+      private: common::Time creationTime;
 
       /// \brief Friend class.
       public: template<typename T> friend class EventT;
     };
 
-    /// \internal
-    template<typename T>
-    class EventConnection
-    {
-      /// \brief Constructor
-      public: EventConnection(const bool _on, boost::function<T> _cb)
-              : callback(_cb)
-      {
-        // Windows Visual Studio 2012 does not have atomic_bool constructor,
-        // so we have to set "on" using operator=
-        this->on = _on;
-      }
-
-      /// \brief On/off value for the event callback
-      public: std::atomic_bool on;
-
-      /// \brief Callback function
-      public: boost::function<T> callback;
-    };
-
-    /// \internal
-    // Private data members for EventT<T> class.
-    template< typename T>
-    class EventTPrivate
-    {
-      /// \def EvtConnectionMap
-      /// \brief Event Connection map typedef.
-      typedef std::map<int, std::shared_ptr<EventConnection<T> > >
-        EvtConnectionMap;
-
-      /// \brief Array of connection callbacks.
-      public: EvtConnectionMap connections;
-
-      /// \brief A thread lock.
-      public: std::mutex mutex;
-
-      /// \brief List of connections to remove
-      public: std::list<typename EvtConnectionMap::const_iterator>
-              connectionsToRemove;
-    };
-
-    /// \class EventT Event.hh common/common.hh
     /// \brief A class for event processing.
-    template< typename T>
+    template<typename T>
     class EventT : public Event
     {
       /// \brief Constructor.
@@ -167,7 +119,7 @@ namespace gazebo
       /// \param[in] _subscriber Pointer to a callback function.
       /// \return A Connection object, which will automatically call
       /// Disconnect when it goes out of scope.
-      public: ConnectionPtr Connect(const boost::function<T> &_subscriber);
+      public: ConnectionPtr Connect(const std::function<T> &_subscriber);
 
       /// \brief Disconnect a callback to this event.
       /// \param[in] _c The connection to disconnect.
@@ -335,8 +287,8 @@ namespace gazebo
       {
         this->Cleanup();
 
-        this->signaled = true;
-        for (auto iter: this->myDataPtr->connections)
+        this->SetSignaled(true);
+        for (auto iter: this->connections)
         {
           if (iter.second->on)
             iter.second->callback();
@@ -350,8 +302,8 @@ namespace gazebo
       {
         this->Cleanup();
 
-        this->signaled = true;
-        for (auto iter: this->myDataPtr->connections)
+        this->SetSignaled(true);
+        for (auto iter: this->connections)
         {
           if (iter.second->on)
             iter.second->callback(_p);
@@ -366,8 +318,8 @@ namespace gazebo
       {
         this->Cleanup();
 
-        this->signaled = true;
-        for (auto iter: this->myDataPtr->connections)
+        this->SetSignaled(true);
+        for (auto iter: this->connections)
         {
           if (iter.second->on)
             iter.second->callback(_p1, _p2);
@@ -383,8 +335,8 @@ namespace gazebo
       {
         this->Cleanup();
 
-        this->signaled = true;
-        for (auto iter: this->myDataPtr->connections)
+        this->SetSignaled(true);
+        for (auto iter: this->connections)
         {
           if (iter.second->on)
             iter.second->callback(_p1, _p2, _p3);
@@ -402,8 +354,8 @@ namespace gazebo
       {
         this->Cleanup();
 
-        this->signaled = true;
-        for (auto iter: this->myDataPtr->connections)
+        this->SetSignaled(true);
+        for (auto iter: this->connections)
         {
           if (iter.second->on)
             iter.second->callback(_p1, _p2, _p3, _p4);
@@ -423,8 +375,8 @@ namespace gazebo
       {
         this->Cleanup();
 
-        this->signaled = true;
-        for (auto iter: this->myDataPtr->connections)
+        this->SetSignaled(true);
+        for (auto iter: this->connections)
         {
           if (iter.second->on)
             iter.second->callback(_p1, _p2, _p3, _p4, _p5);
@@ -445,8 +397,8 @@ namespace gazebo
       {
         this->Cleanup();
 
-        this->signaled = true;
-        for (auto iter: this->myDataPtr->connections)
+        this->SetSignaled(true);
+        for (auto iter: this->connections)
         {
           if (iter.second->on)
             iter.second->callback(_p1, _p2, _p3, _p4, _p5, _p6);
@@ -468,8 +420,8 @@ namespace gazebo
       {
         this->Cleanup();
 
-        this->signaled = true;
-        for (auto iter: this->myDataPtr->connections)
+        this->StSignaled(true);
+        for (auto iter: this->connections)
         {
           if (iter.second->on)
             iter.second->callback(_p1, _p2, _p3, _p4, _p5, _p6, _p7);
@@ -493,8 +445,8 @@ namespace gazebo
       {
         this->Cleanup();
 
-        this->signaled = true;
-        for (auto iter: this->myDataPtr->connections)
+        this->SetSignaled(true);
+        for (auto iter: this->connections)
         {
           if (iter.second->on)
           {
@@ -522,8 +474,8 @@ namespace gazebo
       {
         this->Cleanup();
 
-        this->signaled = true;
-        for (auto iter: this->myDataPtr->connections)
+        this->SetSignaled(true);
+        for (auto iter: this->connections)
         {
           if (iter.second->on)
           {
@@ -553,8 +505,8 @@ namespace gazebo
       {
         this->Cleanup();
 
-        this->signaled = true;
-        for (auto iter: this->myDataPtr->connections)
+        this->SetSignaled(true);
+        for (auto iter: this->connections)
         {
           if (iter.second->on)
           {
@@ -569,14 +521,44 @@ namespace gazebo
       /// We assume that this function is called from a Signal function.
       private: void Cleanup();
 
-      /// \brief Private data pointer.
-      private: std::unique_ptr<EventTPrivate<T>> myDataPtr;
+      /// \brief A private helper class used in maintaining connections.
+      private: class EventConnection
+      {
+        /// \brief Constructor
+        public: EventConnection(const bool _on, std::function<T> _cb)
+                : callback(_cb)
+        {
+          // Windows Visual Studio 2012 does not have atomic_bool constructor,
+          // so we have to set "on" using operator=
+          this->on = _on;
+        }
+
+        /// \brief On/off value for the event callback
+        public: std::atomic_bool on;
+
+        /// \brief Callback function
+        public: std::function<T> callback;
+      };
+
+      /// \def EvtConnectionMap
+      /// \brief Event Connection map typedef.
+      typedef std::map<int, std::shared_ptr<EventConnection>> EvtConnectionMap;
+
+      /// \brief Array of connection callbacks.
+      private: EvtConnectionMap connections;
+
+      /// \brief A thread lock.
+      private: std::mutex mutex;
+
+      /// \brief List of connections to remove
+      private: std::list<typename EvtConnectionMap::const_iterator>
+              connectionsToRemove;
     };
 
     /// \brief Constructor.
     template<typename T>
     EventT<T>::EventT()
-    : Event(), myDataPtr(new EventTPrivate<T>())
+    : Event()
     {
     }
 
@@ -584,22 +566,21 @@ namespace gazebo
     template<typename T>
     EventT<T>::~EventT()
     {
-      this->myDataPtr->connections.clear();
+      this->connections.clear();
     }
 
     /// \brief Adds a connection.
     /// \param[in] _subscriber the subscriber to connect.
     template<typename T>
-    ConnectionPtr EventT<T>::Connect(const boost::function<T> &_subscriber)
+    ConnectionPtr EventT<T>::Connect(const std::function<T> &_subscriber)
     {
       int index = 0;
-      if (!this->myDataPtr->connections.empty())
+      if (!this->connections.empty())
       {
-        auto const &iter = this->myDataPtr->connections.rbegin();
+        auto const &iter = this->connections.rbegin();
         index = iter->first + 1;
       }
-      this->myDataPtr->connections[index].reset(new EventConnection<T>(true,
-          _subscriber));
+      this->connections[index].reset(new EventConnection(true, _subscriber));
       return ConnectionPtr(new Connection(this, index));
     }
 
@@ -611,9 +592,9 @@ namespace gazebo
       if (!_c)
         return;
 
-      this->Disconnect(_c->GetId());
-      _c->dataPtr->event = nullptr;
-      _c->dataPtr->id = -1;
+      this->Disconnect(_c->Id());
+      _c->event = nullptr;
+      _c->id = -1;
     }
 
     /// \brief Get the number of connections.
@@ -621,7 +602,7 @@ namespace gazebo
     template<typename T>
     unsigned int EventT<T>::ConnectionCount() const
     {
-      return this->myDataPtr->connections.size();
+      return this->connections.size();
     }
 
     /// \brief Removes a connection.
@@ -630,12 +611,12 @@ namespace gazebo
     void EventT<T>::Disconnect(int _id)
     {
       // Find the connection
-      auto const &it = this->myDataPtr->connections.find(_id);
+      auto const &it = this->connections.find(_id);
 
-      if (it != this->myDataPtr->connections.end())
+      if (it != this->connections.end())
       {
         it->second->on = false;
-        this->myDataPtr->connectionsToRemove.push_back(it);
+        this->connectionsToRemove.push_back(it);
       }
     }
 
@@ -643,13 +624,12 @@ namespace gazebo
     template<typename T>
     void EventT<T>::Cleanup()
     {
-      std::lock_guard<std::mutex> lock(this->myDataPtr->mutex);
+      std::lock_guard<std::mutex> lock(this->mutex);
       // Remove all queue connections.
-      for (auto &conn : this->myDataPtr->connectionsToRemove)
-        this->myDataPtr->connections.erase(conn);
-      this->myDataPtr->connectionsToRemove.clear();
+      for (auto &conn : this->connectionsToRemove)
+        this->connections.erase(conn);
+      this->connectionsToRemove.clear();
     }
-
     /// \}
   }
 }
