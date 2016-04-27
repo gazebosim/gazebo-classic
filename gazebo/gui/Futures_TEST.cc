@@ -29,7 +29,7 @@ void Futures_TEST::Verify()
   std::cerr << "Getting result\n";
   bool result = gazebo::gui::Futures::introspectionClientFuture.valid();
   std::cerr << "Result is[" << result << "]\n";
-  // QVERIFY();
+  QVERIFY(result);
   gazebo::gui::Futures::introspectionClientFuture.wait();
   std::cerr << "After introspection client wait\n";
 }

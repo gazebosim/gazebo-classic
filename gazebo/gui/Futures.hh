@@ -56,9 +56,6 @@ namespace gazebo
 
       /// \brief This will get the introspection managers, used by plotting.
       public: static std::future<void> introspectionClientFuture;
-
-      // Used to instantiate Futures class, and create all the futures.
-      private: static Futures futures;
     };
 
     /// \}

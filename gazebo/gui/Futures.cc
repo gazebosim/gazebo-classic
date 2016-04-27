@@ -20,22 +20,17 @@
 using namespace gazebo;
 using namespace gui;
 
-// Declare the futures static member variable.
-Futures Futures::futures;
-
-// Delcare the introspection client future.
-std::future<void> Futures::introspectionClientFuture;
+// Delcare and instantiate the introspection client future.
+std::future<void> Futures::introspectionClientFuture =
+  std::async(std::launch::async, []()
+  {
+    gazebo::util::IntrospectionClient client;
+    client.WaitForManagers(std::chrono::seconds(2));
+  });
 
 /////////////////////////////////////////////////
 Futures::Futures()
 {
-  // Instantiate the introspection client future..
-  this->introspectionClientFuture = std::async(
-      std::launch::async, []()
-      {
-        gazebo::util::IntrospectionClient client;
-        client.WaitForManagers(std::chrono::seconds(2));
-      });
 }
 
 /////////////////////////////////////////////////
