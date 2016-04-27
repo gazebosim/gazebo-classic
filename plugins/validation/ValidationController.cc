@@ -33,10 +33,12 @@ ControllerState::ControllerState(const std::string &_name,
 /////////////////////////////////////////////////
 void ControllerReadyState::DoFeedback()
 {
+  std::lock_guard<std::mutex> lock(this->mutex);
+  if (*this->controller.currentState != *this)
+    return;
+
   if (this->Feedback() == "gazebo_go")
     this->controller.ChangeState(*this->controller.initCondsState);
-
-  //std::cout << "ReadyState::DoOnState()" << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -54,6 +56,7 @@ void ControllerInitCondsState::DoUpdate()
 
   //std::cout << "InitCondsState::DoUpdate()" << std::endl;
 
+  std::lock_guard<std::mutex> lock(this->mutex);
   if (this->timer.GetElapsed() >= gazebo::common::Time(2.0))
     this->controller.ChangeState(*this->controller.runningState);
 }
@@ -72,6 +75,7 @@ void ControllerRunningState::DoUpdate()
   //std::cout << "RunningState::DoUpdate()" << std::endl;
 
   // Check if we are done with the run
+  std::lock_guard<std::mutex> lock(this->mutex);
   if (this->timer.GetElapsed() >= gazebo::common::Time(5.0))
     this->controller.ChangeState(*this->controller.endState);
 }
@@ -85,6 +89,10 @@ void ControllerEndState::DoInitialize()
 /////////////////////////////////////////////////
 void ControllerEndState::DoFeedback()
 {
+  std::lock_guard<std::mutex> lock(this->mutex);
+  if (*this->controller.currentState != *this)
+    return;
+
   // Check if Gazebo is ready for another run.
   if (this->Feedback() == "gazebo_ready")
     this->controller.ChangeState(*this->controller.readyState);

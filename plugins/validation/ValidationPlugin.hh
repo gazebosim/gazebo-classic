@@ -89,20 +89,33 @@ namespace gazebo
   };
 
   /// \brief ToDo
+  /// The plugin accepts the following parameters:
+  /// <lower_limit>
+  ///   <name>a_joint</name>
+  ///   <min>1.0</min>
+  ///   <max>2.0</max>
+  ///   <step>0.25</step>
+  /// </lower_limit>
+  /// <upper_limit>
+  ///   <name>a_joint</name>
+  ///   <min>3.0</min>
+  ///   <max>4.0</max>
+  ///   <step>0.25</step>
+  /// </upper_limit>
   class GAZEBO_VISIBLE ValidationPlugin : public ModelPlugin
   {
     /// \brief Class constructor.
     public: ValidationPlugin();
 
     /// Documentation inherited
-    public: void Load(physics::ModelPtr _parent,
+    public: void Load(physics::ModelPtr _model,
                       sdf::ElementPtr _sdf);
+
+    /// \brief ToDo.
+    public: bool LoadModelParams();
 
     /// \brief Callback on world update event.
     private: void WorldUpdateCallback();
-
-    /// \brief ToDo.
-    private: bool LoadModelParams();
 
     /// \brief ToDo.
     public: void ChangeState(State &_newState);
@@ -121,6 +134,15 @@ namespace gazebo
 
     /// \brief Pointer to the current state.
     public: State *currentState;
+
+    /// \brief Pointer to the model;
+    private: physics::ModelPtr model;
+
+    /// \brief Lower joint limits to test.
+    private: std::map<std::string, std::vector<double>> lowerLimitParams;
+
+    /// \brief Upper joint limits to test.
+    private: std::map<std::string, std::vector<double>> upperLimitParams;
   };
 
   // Register this plugin with the simulator

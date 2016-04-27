@@ -39,8 +39,6 @@ namespace gazebo
     CONTROLLER
   };
 
-  //class ValidationFSM;
-
   /// \brief State pattern used for the state machine.
   class State
   {
@@ -116,32 +114,27 @@ namespace gazebo
     /// \brief ToDo.
     private: virtual void DoInitialize()
     {
-      std::cout << "State::DoInitialize" << std::endl;
     }
 
     /// \brief ToDo.
     private: virtual void DoUpdate()
     {
-
     }
 
     /// \brief ToDo.
     private: virtual void DoTeardown()
     {
-
     }
 
     /// \brief ToDo.
     private: virtual void DoFeedback()
     {
-
     }
 
     /// \brief Initialize the state. Called once after a pause duration after
     /// entering state.
     private: void Initialize()
     {
-      //std::cout << "State::Initialize()" << std::endl;
       this->initialized = true;
       this->timer.Reset();
       this->timer.Start();
@@ -172,9 +165,6 @@ namespace gazebo
     /// \brief Name of the state.
     public: const std::string name;
 
-    /// \brief Reference to the finite state machine.
-    //protected: ValidationFSM &fsm;
-
     /// \brief Timer to measure time in the current state.
     protected: common::Timer timer;
 
@@ -184,14 +174,14 @@ namespace gazebo
     /// \brief Transport node.
     protected: ignition::transport::Node node;
 
+    /// \brief Mutex to protect the feedback message.
+    protected: mutable std::mutex mutex;
+
     /// \brief ToDo.
     private: std::string outboundTopic;
 
     /// \brief Last feedback message.
     private: std::string feedback;
-
-    /// \brief Mutex to protect the feedback message.
-    private: mutable std::mutex mutex;
 
     /// \brief Last time the we published the state.
     private: common::Time lastPublication;

@@ -31,6 +31,18 @@
 
       <!-- Validation plugin -->
       <plugin filename="libValidationPlugin.so" name="box_validation_plugin">
+        <lower_limit>
+          <name>my_joint</name>
+          <min>1.0</min>
+          <max>2.0</max>
+          <step>0.25</step>
+        </lower_limit>
+        <upper_limit>
+          <name>my_joint</name>
+          <min>4.0</min>
+          <max>5.0</max>
+          <step>0.25</step>
+        </upper_limit>
       </plugin>
     </model>
   </world>
