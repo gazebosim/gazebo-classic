@@ -19,6 +19,9 @@
 #endif
 
 #include <cstdlib>
+#include <cstring>
+#include <string>
+#include <vector>
 
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
@@ -31,6 +34,11 @@
 #include "gazebo/common/SystemPaths.hh"
 
 using namespace gazebo;
+#ifdef _WIN32
+  const auto& gzstrtok = strtok_s;
+#else
+  const auto& gzstrtok = strtok_r;
+#endif
 
 /////////////////////////////////////////////////
 void common::load()
@@ -94,4 +102,24 @@ const char *common::getEnv(const char *_name)
 #else
   return getenv(_name);
 #endif
+}
+
+/////////////////////////////////////////////////
+std::vector<std::string> common::split(const std::string &_str,
+    const std::string &_delim)
+{
+  std::vector<std::string> tokens;
+  char *saveptr;
+  char *str = strdup(_str.c_str());
+
+  auto token = gzstrtok(str, _delim.c_str(), &saveptr);
+
+  while (token)
+  {
+    tokens.push_back(token);
+    token = gzstrtok(NULL, _delim.c_str(), &saveptr);
+  }
+
+  free(str);
+  return tokens;
 }

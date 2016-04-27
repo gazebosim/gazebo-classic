@@ -93,12 +93,7 @@ void Joint::ConstructionHelper()
 //////////////////////////////////////////////////
 Joint::~Joint()
 {
-  // Remove all the sensors attached to the joint
-  for (auto const &sensor : this->jointDPtr->sensors)
-  {
-    event::Events::removeSensor(sensor);
-  }
-  this->jointDPtr->sensors.clear();
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -446,6 +441,13 @@ void Joint::Fini()
     event::Events::removeSensor(sensor);
   }
   this->jointDPtr->sensors.clear();
+
+  this->anchorLink.reset();
+  this->applyDamping.reset();
+  this->childLink.reset();
+  this->model.reset();
+  this->parentLink.reset();
+  this->sdfJoint.reset();
 
   Base::Fini();
 }

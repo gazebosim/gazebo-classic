@@ -319,7 +319,7 @@ void Actor::LoadScript(sdf::ElementPtr _sdf)
       trajSdf = trajSdf->GetNextElement("trajectory");
     }
   }
-  double scriptTime = 0.0;
+  double time = 0.0;
   if (!this->actorDPtr->skelAnimation.empty())
   {
     if (this->actorDPtr->trajInfo.empty())
@@ -337,12 +337,12 @@ void Actor::LoadScript(sdf::ElementPtr _sdf)
     }
     for (unsigned int i = 0; i < this->actorDPtr->trajInfo.size(); i++)
     {
-      this->actorDPtr->trajInfo[i].startTime = scriptTime;
-      scriptTime += this->actorDPtr->trajInfo[i].duration;
-      this->actorDPtr->trajInfo[i].endTime = scriptTime;
+      this->actorDPtr->trajInfo[i].startTime = time;
+      time += this->actorDPtr->trajInfo[i].duration;
+      this->actorDPtr->trajInfo[i].endTime = time;
     }
   }
-  this->actorDPtr->scriptLength = scriptTime;
+  this->actorDPtr->scriptLength = time;
 }
 
 //////////////////////////////////////////////////
@@ -432,6 +432,7 @@ void Actor::LoadAnimation(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Actor::Init()
 {
+  this->scriptTime = 0;
   this->actorDPtr->prevFrameTime = this->actorDPtr->world->GetSimTime();
   if (this->actorDPtr->autoStart)
     this->Play();
@@ -443,7 +444,6 @@ void Actor::Play()
 {
   this->actorDPtr->active = true;
   this->actorDPtr->playStartTime = this->actorDPtr->world->GetSimTime();
-  this->actorDPtr->lastScriptTime = std::numeric_limits<double>::max();
 }
 
 //////////////////////////////////////////////////
@@ -474,82 +474,103 @@ void Actor::Update()
   if ((currentTime - this->actorDPtr->prevFrameTime).Double() < (1.0 / 20.0))
     return;
 
-  double scriptTime = currentTime.Double() - this->actorDPtr->startDelay -
-            this->actorDPtr->playStartTime.Double();
+  TrajectoryInfo *tinfo = NULL;
 
-  /// waiting for delayed start
-  if (scriptTime < 0)
-    return;
-
-  if (scriptTime >= this->actorDPtr->scriptLength)
+  if (!this->actorDPtr->customTrajectoryInfo)
   {
-    if (!this->actorDPtr->loop)
+    this->actorDPtr->scriptTime = currentTime.Double() - this->actorDPtr->startDelay -
+              this->actorDPtr->playStartTime.Double();
+
+    /// waiting for delayed start
+    if (this->actorDPtr->scriptTime < 0)
       return;
-    else
+
+    if (this->actorDPtr->scriptTime >= this->actorDPtr->scriptLength)
     {
-      scriptTime = scriptTime - this->actorDPtr->scriptLength;
-      this->actorDPtr->playStartTime = currentTime - scriptTime;
+      if (!this->actorDPtr->loop)
+      {
+        return;
+      }
+      else
+      {
+        this->actorDPtr->scriptTime = this->actorDPtr->scriptTime - this->actorDPtr->scriptLength;
+        this->actorDPtr->playStartTime = currentTime - this->actorDPtr->scriptTime;
+      }
     }
+
+    for (unsigned int i = 0; i < this->actorDPtr->trajInfo.size(); ++i)
+    {
+      if (this->actorDPtr->trajInfo[i].startTime <= this->actorDPtr->scriptTime &&
+          this->actorDPtr->trajInfo[i].endTime >= this->actorDPtr->scriptTime)
+      {
+        tinfo = &this->actorDPtr->trajInfo[i];
+        break;
+      }
+    }
+
+    if (tinfo == NULL)
+    {
+      gzerr << "Trajectory not found at " << this->actorDPtr->scriptTime << "\n";
+      return;
+    }
+
+    this->actorDPtr->scriptTime = this->actorDPtr->scriptTime - tinfo->startTime;
+  }
+  else
+  {
+    tinfo = this->actorDPtr->customTrajectoryInfo.get();
   }
 
   /// at this point we are certain that a new frame will be animated
   this->actorDPtr->prevFrameTime = currentTime;
 
-  TrajectoryInfo tinfo;
+  SkeletonAnimation *skelAnim = this->actorDPtr->skelAnimation[tinfo->type];
+  if (!skelAnim)
+    return;
 
-  for (unsigned int i = 0; i < this->actorDPtr->trajInfo.size(); ++i)
-    if (this->actorDPtr->trajInfo[i].startTime <= scriptTime &&
-          this->actorDPtr->trajInfo[i].endTime >= scriptTime)
-    {
-      tinfo = this->actorDPtr->trajInfo[i];
-      break;
-    }
-
-  scriptTime = scriptTime - tinfo.startTime;
-
-  SkeletonAnimation *skelAnim = this->actorDPtr->skelAnimation[tinfo.type];
-  std::map<std::string, std::string> skelMap = this->actorDPtr->skelNodesMap[tinfo.type];
+  auto skelMap = this->actorDPtr->skelNodesMap[tinfo->type];
 
   ignition::math::Pose3d modelPose;
   std::map<std::string, ignition::math::Matrix4d> frame;
-  if (this->actorDPtr->trajectories.find(tinfo.id) != this->actorDPtr->trajectories.end())
+  if (!this->actorDPtr->customTrajectoryInfo)
   {
-    common::PoseKeyFrame posFrame(0.0);
-    this->actorDPtr->trajectories[tinfo.id]->SetTime(scriptTime);
-    this->actorDPtr->trajectories[tinfo.id]->GetInterpolatedKeyFrame(posFrame);
-
-    modelPose.Pos() = posFrame.Translation();
-    modelPose.Rot() = posFrame.Rotation();
-
-    if (this->actorDPtr->lastTraj == tinfo.id)
+    if (this->actorDPtr->trajectories.find(tinfo->id) != this->actorDPtr->trajectories.end())
     {
-      this->actorDPtr->pathLength +=
-        fabs(this->actorDPtr->lastPos.Distance(modelPose.Pos()));
+      common::PoseKeyFrame posFrame(0.0);
+      this->actorDPtr->trajectories[tinfo->id]->SetTime(this->actorDPtr->scriptTime);
+      this->actorDPtr->trajectories[tinfo->id]->GetInterpolatedKeyFrame(posFrame);
+
+      modelPose.Pos() = posFrame.Translation();
+      modelPose.Rot() = posFrame.Rotation();
+      if (this->actorDPtr->lastTraj == tinfo->id)
+        this->actorDPtr->pathLength += fabs(this->actorDPtr->lastPos.Distance(modelPose.Pos()));
+      else
+      {
+        common::PoseKeyFrame *frame0 = dynamic_cast<common::PoseKeyFrame*>
+          (this->actorDPtr->trajectories[tinfo->id]->GetKeyFrame(0));
+        ignition::math::Vector3d vector3Ign;
+        vector3Ign = frame0->Translation();
+        this->actorDPtr->pathLength = fabs(modelPose.Pos().Distance(vector3Ign));
+      }
+      this->actorDPtr->lastPos = modelPose.Pos();
+    }
+    if (this->actorDPtr->interpolateX[tinfo->type] &&
+          this->actorDPtr->trajectories.find(tinfo->id) != this->actorDPtr->trajectories.end())
+    {
+      frame = skelAnim->PoseAtX(this->actorDPtr->pathLength,
+                skelMap[this->actorDPtr->skeleton->GetRootNode()->GetName()]);
     }
     else
     {
-      common::PoseKeyFrame *frame0 = dynamic_cast<common::PoseKeyFrame*>
-        (this->actorDPtr->trajectories[tinfo.id]->GetKeyFrame(0));
-      ignition::math::Vector3d vector3Ign;
-      vector3Ign = frame0->Translation();
-      this->actorDPtr->pathLength = fabs(modelPose.Pos().Distance(vector3Ign));
+      frame = skelAnim->PoseAt(this->actorDPtr->scriptTime);
     }
-    this->actorDPtr->lastPos = modelPose.Pos();
-  }
-
-  if (this->actorDPtr->interpolateX[tinfo.type] &&
-      this->actorDPtr->trajectories.find(tinfo.id) !=
-      this->actorDPtr->trajectories.end())
-  {
-    frame = skelAnim->PoseAtX(this->actorDPtr->pathLength,
-              skelMap[this->actorDPtr->skeleton->GetRootNode()->GetName()]);
   }
   else
   {
-    frame = skelAnim->PoseAt(scriptTime);
+    frame = skelAnim->PoseAt(this->actorDPtr->scriptTime);
   }
 
-  this->actorDPtr->lastTraj = tinfo.id;
+  this->actorDPtr->lastTraj = tinfo->id;
 
   ignition::math::Matrix4d rootTrans =
     frame[skelMap[this->actorDPtr->skeleton->GetRootNode()->GetName()]];
@@ -557,20 +578,22 @@ void Actor::Update()
   ignition::math::Vector3d rootPos = rootTrans.Translation();
   ignition::math::Quaterniond rootRot = rootTrans.Rotation();
 
-  if (tinfo.translated)
+  if (tinfo->translated)
     rootPos.X() = 0.0;
   ignition::math::Pose3d actorPose;
   actorPose.Pos() = modelPose.Pos() + modelPose.Rot().RotateVector(rootPos);
-  actorPose.Rot() = modelPose.Rot() * rootRot;
+  if (!this->actorDPtr->customTrajectoryInfo)
+    actorPose.Rot() = modelPose.Rot() * rootRot;
+  else
+    actorPose.Rot() = modelPose.Rot() * this->GetWorldPose().Rot();
 
   ignition::math::Matrix4d rootM(actorPose.Rot());
-  rootM.Translate(actorPose.Pos());
+  if (!this->actorDPtr->customTrajectoryInfo)
+    rootM.Translate(actorPose.Pos());
 
   frame[skelMap[this->actorDPtr->skeleton->GetRootNode()->GetName()]] = rootM;
 
   this->SetPose(frame, skelMap, currentTime.Double());
-
-  this->actorDPtr->lastScriptTime = scriptTime;
 }
 
 //////////////////////////////////////////////////
@@ -584,6 +607,9 @@ void Actor::SetPose(
 
   ignition::math::Matrix4d modelTrans(ignition::math::Matrix4d::Identity);
   ignition::math::Pose3d mainLinkPose;
+
+  if (this->actorDPtr->customTrajectoryInfo)
+    mainLinkPose.Rot() = this->actorDPtr->worldPose.Rot();
 
   for (unsigned int i = 0; i < this->actorDPtr->skeleton->GetNumNodes(); ++i)
   {
@@ -623,7 +649,8 @@ void Actor::SetPose(
           msgs::Convert(ignition::math::Vector3d()));
       bone_pose->mutable_orientation()->CopyFrom(msgs::Convert(
             ignition::math::Quaterniond()));
-      mainLinkPose = bonePose;
+      if (!this->actorDPtr->customTrajectoryInfo)
+        mainLinkPose = bonePose;
     }
     else
     {
@@ -648,24 +675,37 @@ void Actor::SetPose(
   msgs::Time *stamp = msg.add_time();
   stamp->CopyFrom(msgs::Convert(_time));
 
-  msgs::Pose *model_pose = msg.add_pose();
-  model_pose->set_name(this->ScopedName());
-  model_pose->set_id(this->Id());
-  model_pose->mutable_position()->CopyFrom(msgs::Convert(mainLinkPose.Pos()));
-  model_pose->mutable_orientation()->CopyFrom(
-      msgs::Convert(mainLinkPose.Rot()));
+  msgs::Pose *modelPose = msg.add_pose();
+  modelPose->set_name(this->ScopedName());
+  modelPose->set_id(this->Id());
+  if (!this->actorDPtr->customTrajectoryInfo)
+  {
+    modelPose->mutable_position()->CopyFrom(msgs::Convert(mainLinkPose.Pos()));
+    modelPose->mutable_orientation()->CopyFrom(
+        msgs::Convert(mainLinkPose.Rot()));
+  }
+  else
+  {
+    modelPose->mutable_position()->CopyFrom(
+        msgs::Convert(this->actorDPtr->worldPose.Pos()));
+    modelPose->mutable_orientation()->CopyFrom(
+        msgs::Convert(this->actorDPtr->worldPose.Rot()));
+  }
 
   if (this->actorDPtr->bonePosePub &&
       this->actorDPtr->bonePosePub->HasConnections())
   {
     this->actorDPtr->bonePosePub->Publish(msg);
   }
-  this->SetWorldPose(mainLinkPose, true, false);
+
+  if (!this->actorDPtr->customTrajectoryInfo)
+    this->SetWorldPose(mainLinkPose, true, false);
 }
 
 //////////////////////////////////////////////////
 void Actor::Fini()
 {
+  this->ResetCustomTrajectory();
   Model::Fini();
 }
 
@@ -673,6 +713,36 @@ void Actor::Fini()
 void Actor::UpdateParameters(sdf::ElementPtr /*_sdf*/)
 {
 //  Model::UpdateParameters(_sdf);
+}
+
+//////////////////////////////////////////////////
+void Actor::SetScriptTime(const double _time)
+{
+  this->scriptTime = _time;
+}
+
+//////////////////////////////////////////////////
+double Actor::ScriptTime() const
+{
+  return this->scriptTime;
+}
+
+//////////////////////////////////////////////////
+const Actor::SkeletonAnimation_M &Actor::SkeletonAnimations() const
+{
+  return this->skelAnimation;
+}
+
+//////////////////////////////////////////////////
+void Actor::SetCustomTrajectory(TrajectoryInfoPtr &_trajInfo)
+{
+  this->customTrajectoryInfo = _trajInfo;
+}
+
+//////////////////////////////////////////////////
+void Actor::ResetCustomTrajectory()
+{
+  this->customTrajectoryInfo.reset();
 }
 
 //////////////////////////////////////////////////
@@ -760,6 +830,17 @@ void Actor::AddActorVisual(const sdf::ElementPtr &_linkSdf,
   meshSdf->GetElement("uri")->Set(this->actorDPtr->skinFile);
   meshSdf->GetElement("scale")->Set(math::Vector3(this->actorDPtr->skinScale,
       this->actorDPtr->skinScale, this->actorDPtr->skinScale));
+}
+
+/////////////////////////////////////////////////
+void Actor::SetSelfCollide(bool /*_self_collide*/)
+{
+}
+
+/////////////////////////////////////////////////
+bool Actor::GetSelfCollide() const
+{
+  return false;
 }
 
 //////////////////////////////////////////////////

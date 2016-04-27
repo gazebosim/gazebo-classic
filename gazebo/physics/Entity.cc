@@ -95,16 +95,7 @@ void Entity::ConstructionHelper()
 //////////////////////////////////////////////////
 Entity::~Entity()
 {
-  // TODO: put this back in
-  // this->World()->GetPhysicsEngine()->RemoveEntity(this);
-
-  delete this->entityDPtr->visualMsg;
-  this->entityDPtr->visualMsg = NULL;
-
-  this->entityDPtr->visPub.reset();
-  this->entityDPtr->requestPub.reset();
-  this->entityDPtr->poseSub.reset();
-  this->entityDPtr->node.reset();
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -674,18 +665,39 @@ void Entity::OnPoseMsg(ConstPosePtr &_msg)
 //////////////////////////////////////////////////
 void Entity::Fini()
 {
+  // TODO: put this back in
+  // this->GetWorld()->GetPhysicsEngine()->RemoveEntity(this);
+
   if (this->entityDPtr->requestPub)
   {
-    msgs::Request *msg = msgs::CreateRequest("entity_delete",
-        this->ScopedName());
+    msgs::Request *msg = msgs::CreateRequest("entity_delete", this->GetScopedName());
     this->entityDPtr->requestPub->Publish(*msg, true);
+    delete msg;
   }
 
-  this->entityDPtr->parentEntity.reset();
-  Base::Fini();
+  // Clean transport
+  {
+    this->entityDPtr->posePub.reset();
+    this->entityDPtr->requestPub.reset();
+    this->entityDPtr->visPub.reset();
 
-  this->connections.clear();
-  this->entityDPtr->node->Fini();
+    this->entityDPtr->poseSub.reset();
+
+    if (this->entityDPtr->node)
+      this->entityDPtr->node->Fini();
+    this->entityDPtr->node.reset();
+  }
+
+  this->entityDPtr->animationConnection.reset();
+  this->entityDPtr->connections.clear();
+
+  if (this->entityDPtr->visualMsg)
+    delete this->entityDPtr->visualMsg;
+  this->entityDPtr->visualMsg = NULL;
+
+  this->parentEntity.reset();
+
+  Base::Fini();
 }
 
 //////////////////////////////////////////////////

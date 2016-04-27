@@ -220,6 +220,7 @@ namespace gazebo
       protected: virtual bool AttachToVisualImpl(VisualPtr _visual,
                      bool _inheritOrientation, double _minDist = 0,
                      double _maxDist = 0);
+      using Camera::AttachToVisualImpl;
 
       // Documentation inherited.
       protected: virtual void AnimationComplete();

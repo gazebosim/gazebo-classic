@@ -402,7 +402,7 @@ bool RTShaderSystem::GetPaths(std::string &coreLibsPath, std::string &cachePath)
           if (!tmpdir)
           {
             common::SystemPaths *paths = common::SystemPaths::Instance();
-            tmpdir = const_cast<char*>(paths->GetTmpPath().c_str());
+            tmpdir = const_cast<char*>(paths->TmpPath().c_str());
           }
           // Get the user
           user = getenv("USER");

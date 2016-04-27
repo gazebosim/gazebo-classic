@@ -87,6 +87,7 @@ namespace gazebo
 
       /// \brief Reset the model.
       public: void Reset();
+      using Entity::Reset;
 
       /// \brief Reset the velocity, acceleration, force and torque of
       /// all child links.
@@ -312,7 +313,7 @@ namespace gazebo
       /// never collide.
       /// \return True if self-collide enabled for this model, false otherwise.
       /// \deprecated See SelfCollide() const
-      public: bool GetSelfCollide() const GAZEBO_DEPRECATED(7.0);
+      public: virtual bool GetSelfCollide() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief If true, all links within the model will collide by default.
       /// Two links within the same model will not collide if both have
@@ -321,12 +322,12 @@ namespace gazebo
       /// Bodies connected by a joint are exempt from this, and will
       /// never collide.
       /// \return True if self-collide enabled for this model, false otherwise.
-      public: bool SelfCollide() const;
+      public: virtual bool SelfCollide() const;
 
       /// \brief Set this model's self_collide property
       /// \sa GetSelfCollide
       /// \param[in] _self_collide True if self-collisions enabled by default.
-      public: void SetSelfCollide(const bool _selfCollide);
+      public: virtual void SetSelfCollide(const bool _selfCollide);
 
       /// \brief Set the gravity mode of the model.
       /// \param[in] _value False to turn gravity on for the model.
@@ -602,6 +603,14 @@ namespace gazebo
       /// \param[in] _name name of joint
       /// \return true if successful, false if not.
       public: bool RemoveJoint(const std::string &_name);
+
+      /// \brief Set whether wind affects this body.
+      /// \param[in] _mode True to enable wind.
+      public: virtual void SetWindMode(const bool _mode);
+
+      /// \brief Get the wind mode.
+      /// \return True if wind is enabled.
+      public: virtual bool WindMode() const;
 
       /// \brief Allow Model class to share itself as a boost shared_ptr
       /// \return a shared pointer to itself

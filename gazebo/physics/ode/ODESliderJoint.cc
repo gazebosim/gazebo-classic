@@ -54,7 +54,10 @@ ignition::math::Vector3d ODESliderJoint::GlobalAxis(
   if (this->odeJointDPtr->jointId)
     dJointGetSliderAxis(this->odeJointDPtr->jointId, result);
   else
+  {
     gzerr << "ODE Joint ID is invalid\n";
+    return ignition::math::Vector3d::Zero;
+  }
 
   return ignition::math::Vector3d(result[0], result[1], result[2]);
 }
@@ -148,9 +151,8 @@ double ODESliderJoint::Param(const unsigned int _parameter) const
 ignition::math::Vector3d ODESliderJoint::Anchor(
     const unsigned int /*_index*/) const
 {
-  dVector3 result;
   gzlog << "ODESliderJoint::GetAnchor not implemented.\n";
-  return ignition::math::Vector3d(result[0], result[1], result[2]);
+  return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////

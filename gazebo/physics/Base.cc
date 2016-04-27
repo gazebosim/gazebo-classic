@@ -54,6 +54,7 @@ Base::Base(BasePrivate &_dataPtr, BasePtr _parent)
 void Base::ConstructionHelper()
 {
   this->baseDPtr->type = BASE;
+  this->baseDPtr->typeStr = "base";
   this->baseDPtr->id = physics::getUniqueId();
   this->baseDPtr->saveable = true;
   this->baseDPtr->selected = false;
@@ -280,6 +281,23 @@ unsigned int Base::ChildCount() const
 void Base::AddType(Base::EntityType _t)
 {
   this->baseDPtr->type = this->baseDPtr->type | (unsigned int)_t;
+
+  if (this->baseDPtr->type & MODEL)
+    this->baseDPtr->typeStr = "model";
+  else if (this->baseDPtr->type & LINK)
+    this->baseDPtr->typeStr = "link";
+  else if (this->baseDPtr->type & COLLISION)
+    this->baseDPtr->typeStr = "collision";
+  else if (this->baseDPtr->type & ACTOR)
+    this->baseDPtr->typeStr = "actor";
+  else if (this->baseDPtr->type & LIGHT)
+    this->baseDPtr->typeStr = "light";
+  else if (this->baseDPtr->type & VISUAL)
+    this->baseDPtr->typeStr = "visual";
+  else if (this->baseDPtr->type & JOINT)
+    this->baseDPtr->typeStr = "joint";
+  else if (this->baseDPtr->type & SHAPE)
+    this->baseDPtr->typeStr = "shape";
 }
 
 //////////////////////////////////////////////////
@@ -399,6 +417,33 @@ std::string Base::ScopedName(bool _prependWorldName) const
 }
 
 //////////////////////////////////////////////////
+common::URI Base::URI() const
+{
+  common::URI uri;
+
+  uri.SetScheme("data");
+
+  BasePtr p = this->parent;
+  while (p)
+  {
+    if (p->GetParent())
+    {
+      uri.Path().PushFront(p->GetName());
+      uri.Path().PushFront(p->TypeStr());
+    }
+
+    p = p->GetParent();
+  }
+
+  uri.Path().PushBack(this->TypeStr());
+  uri.Path().PushBack(this->GetName());
+  uri.Path().PushFront(this->world->GetName());
+  uri.Path().PushFront("world");
+
+  return uri;
+}
+
+//////////////////////////////////////////////////
 bool Base::HasType(const Base::EntityType &_t) const
 {
   return ((unsigned int)(_t & this->baseDPtr->type) == (unsigned int)_t);
@@ -414,6 +459,12 @@ unsigned int Base::GetType() const
 unsigned int Base::Type() const
 {
   return this->baseDPtr->type;
+}
+
+//////////////////////////////////////////////////
+std::string Base::TypeStr() const
+{
+  return this->typeStr;
 }
 
 //////////////////////////////////////////////////

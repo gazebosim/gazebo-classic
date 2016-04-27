@@ -127,6 +127,7 @@ namespace gazebo
 
       /// \brief Reset the joint.
       public: virtual void Reset();
+      using Base::Reset;
 
       /// \brief Set the joint state.
       /// \param[in] _state Joint state

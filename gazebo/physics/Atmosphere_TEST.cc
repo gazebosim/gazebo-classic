@@ -99,22 +99,22 @@ void AtmosphereTest::AtmosphereParam(const std::string &_atmosphere)
 
   // Test Atmosphere::[GS]etParam()
   {
-    physics::AtmospherePtr atmosphere = world->Atmosphere();
-    double temperature = atmosphere->Temperature();
+    physics::Atmosphere &atmosphere = world->Atmosphere();
+    double temperature = atmosphere.Temperature();
     EXPECT_DOUBLE_EQ(temperature, atmospherePubMsg.temperature());
   }
 
   // Test SetParam for non-implementation-specific parameters
-  physics::AtmospherePtr atmosphere = world->Atmosphere();
+  physics::Atmosphere &atmosphere = world->Atmosphere();
   double temperature = 0.02;
   double pressure = 0.03;
   double temperatureGradient = 0.05;
-  atmosphere->SetTemperature(temperature);
-  EXPECT_NEAR(atmosphere->Temperature(), temperature, 1e-6);
-  atmosphere->SetPressure(pressure);
-  EXPECT_NEAR(atmosphere->Pressure(), pressure, 1e-6);
-  atmosphere->SetTemperatureGradient(temperatureGradient);
-  EXPECT_NEAR(atmosphere->TemperatureGradient(), temperatureGradient, 1e-6);
+  atmosphere.SetTemperature(temperature);
+  EXPECT_NEAR(atmosphere.Temperature(), temperature, 1e-6);
+  atmosphere.SetPressure(pressure);
+  EXPECT_NEAR(atmosphere.Pressure(), pressure, 1e-6);
+  atmosphere.SetTemperatureGradient(temperatureGradient);
+  EXPECT_NEAR(atmosphere.TemperatureGradient(), temperatureGradient, 1e-6);
 
   atmosphereNode->Fini();
 }
@@ -133,14 +133,23 @@ void AtmosphereTest::AtmosphereParamBool
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::AtmospherePtr atmosphere = world->Atmosphere();
+  physics::Atmosphere &atmosphere = world->Atmosphere();
 
   // Test shared atmosphere model parameter(s)
-  EXPECT_NEAR(atmosphere->Temperature(), 288.15, 1e-6);
-  EXPECT_NEAR(atmosphere->MassDensity(), 1.2249782197913108, 1e-6);
-  EXPECT_NEAR(atmosphere->Pressure(), 101325, 1e-6);
-  EXPECT_NEAR(atmosphere->TemperatureGradient(), -0.0065, 1e-6);
-  EXPECT_EQ(atmosphere->Type(), _atmosphere);
+  EXPECT_NEAR(atmosphere.Temperature(), 288.15, 1e-6);
+  EXPECT_NEAR(atmosphere.MassDensity(), 1.2249782197913108, 1e-6);
+  EXPECT_NEAR(atmosphere.Pressure(), 101325, 1e-6);
+  EXPECT_NEAR(atmosphere.TemperatureGradient(), -0.0065, 1e-6);
+  EXPECT_EQ(atmosphere.Type(), _atmosphere);
+
+  // Test atmosphere model parameters at a given altitude
+  if (_atmosphere == "adiabatic")
+  {
+    double altitude = 1000;
+    EXPECT_NEAR(atmosphere.Temperature(altitude), 281.64999999999998, 1e-6);
+    EXPECT_NEAR(atmosphere.MassDensity(altitude), 1.1117154882870524, 1e-6);
+    EXPECT_NEAR(atmosphere.Pressure(altitude), 89882.063292207444, 1e-6);
+  }
 }
 
 /////////////////////////////////////////////////

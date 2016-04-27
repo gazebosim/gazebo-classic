@@ -1,6 +1,6 @@
 /* generated code, do not edit. */
 
-#include "ode/matrix.h"
+#include "gazebo/ode/matrix.h"
 
 /* solve L*X=B, with B containing 1 right hand sides.
  * L is an n*n lower triangular matrix with ones on the diagonal.
@@ -13,7 +13,7 @@
  */
 
 void _dSolveL1 (const dReal *L, dReal *B, int n, int lskip1)
-{  
+{
   /* declare variables - Z matrix, p and q vectors, etc */
   dReal Z11,Z21,Z31,Z41,p1,q1,p2,p3,p4,*ex;
   const dReal *ell;

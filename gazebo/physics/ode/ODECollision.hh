@@ -17,8 +17,7 @@
 #ifndef _GAZEBO_PHYSICS_ODECOLLISION_HH_
 #define _GAZEBO_PHYSICS_ODECOLLISION_HH_
 
-#include "ode/ode.h"
-
+#include "gazebo/physics/ode/ode_inc.h"
 #include "gazebo/common/CommonTypes.hh"
 
 #include "gazebo/physics/PhysicsTypes.hh"

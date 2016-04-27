@@ -47,7 +47,10 @@ ignition::math::Vector3d ODEUniversalJoint::Anchor(
   if (this->odeJointDPtr->jointId)
     dJointGetUniversalAnchor(this->odeJointDPtr->jointId, result);
   else
+  {
     gzerr << "ODE Joint ID is invalid\n";
+    return math::Vector3::Zero;
+  }
 
   return ignition::math::Vector3d(result[0], result[1], result[2]);
 }
@@ -86,10 +89,16 @@ ignition::math::Vector3d ODEUniversalJoint::GlobalAxis(
     else if (_index == UniversalJoint::AXIS_PARENT)
       dJointGetUniversalAxis2(this->odeJointDPtr->jointId, result);
     else
+    {
       gzerr << "Joint index out of bounds.\n";
+      return math::Vector3::Zero;
+    }
   }
   else
+  {
     gzerr << "ODE Joint ID is invalid\n";
+    return math::Vector3::Zero;
+  }
 
   return ignition::math::Vector3d(result[0], result[1], result[2]);
 }

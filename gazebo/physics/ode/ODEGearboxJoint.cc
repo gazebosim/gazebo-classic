@@ -91,7 +91,10 @@ ignition::math::Vector3d ODEGearboxJoint::GlobalAxis(
   else if (_index == 1)
     dJointGetGearboxAxis2(this->odeJointDPtr->jointId, result);
   else
+  {
     gzerr << "index [" << _index << "] out of range\n";
+    return ignition::math::Vector3d::Zero;
+  }
 
   return ignition::math::Vector3d(result[0], result[1], result[2]);
 }
@@ -177,9 +180,8 @@ void ODEGearboxJoint::SetParam(const unsigned int /*_parameter*/,
 ignition::math::Vector3d ODEGearboxJoint::Anchor(
     const unsigned int /*_index*/) const
 {
-  dVector3 result;
   gzlog << "ODEGearboxJoint::Anchor not implemented.\n";
-  return ignition::math::Vector3d(result[0], result[1], result[2]);
+  return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
