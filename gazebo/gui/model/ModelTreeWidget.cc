@@ -215,11 +215,11 @@ ModelTreeWidget::ModelTreeWidget(QWidget *_parent)
 
   this->connections.push_back(
      event::Events::ConnectSetSelectedEntity(
-       boost::bind(&ModelTreeWidget::OnSetSelectedEntity, this, _1, _2)));
+       boost::bind(&ModelTreeWidget::OnDeselectAll, this, _1, _2)));
 
   this->connections.push_back(
-     gui::model::Events::ConnectSetSelectedLink(
-       boost::bind(&ModelTreeWidget::OnSetSelectedLink, this, _1, _2)));
+     gui::model::Events::ConnectSetSelectedEntity(
+       boost::bind(&ModelTreeWidget::OnSetSelectedEntity, this, _1, _2)));
 
   this->connections.push_back(
      gui::model::Events::ConnectSetSelectedJoint(
@@ -285,7 +285,7 @@ void ModelTreeWidget::OnItemSelectionChanged()
     std::string type = item->data(1, Qt::UserRole).toString().toStdString();
 
     if (type == "Link")
-      gui::model::Events::setSelectedLink(name, true);
+      gui::model::Events::setSelectedEntity(name, true);
     else if (type == "Joint")
       gui::model::Events::setSelectedJoint(name, true);
     else if (type == "Model Plugin")
@@ -301,7 +301,7 @@ void ModelTreeWidget::OnItemSelectionChanged()
       std::string type = item->data(1, Qt::UserRole).toString().toStdString();
 
       if (type == "Link")
-        gui::model::Events::setSelectedLink(name, false);
+        gui::model::Events::setSelectedEntity(name, false);
       else if (type == "Joint")
         gui::model::Events::setSelectedJoint(name, false);
     else if (type == "Model Plugin")
@@ -313,7 +313,7 @@ void ModelTreeWidget::OnItemSelectionChanged()
 }
 
 /////////////////////////////////////////////////
-void ModelTreeWidget::OnSetSelectedEntity(const std::string &/*_name*/,
+void ModelTreeWidget::OnDeselectAll(const std::string &/*_name*/,
     const std::string &/*_mode*/)
 {
   // deselect all
@@ -397,7 +397,7 @@ void ModelTreeWidget::DeselectType(const std::string &_type)
       (*it)->setSelected(false);
       it = this->selected.erase(it);
       if (type == "Link")
-        gui::model::Events::setSelectedLink(name, false);
+        gui::model::Events::setSelectedEntity(name, false);
       else if (type == "Joint")
         gui::model::Events::setSelectedJoint(name, false);
       else if (type == "Model Plugin")
@@ -563,11 +563,18 @@ void ModelTreeWidget::OnJointNameChanged(const std::string &_jointId,
 }
 
 /////////////////////////////////////////////////
-void ModelTreeWidget::OnSetSelectedLink(const std::string &_linkId,
+void ModelTreeWidget::OnSetSelectedEntity(const std::string &_entityId,
     const bool _selected)
 {
   std::unique_lock<std::recursive_mutex> lock(this->updateMutex);
-  QTreeWidgetItem *item = this->FindItemByData(_linkId, *this->linksItem);
+
+  // Link
+  auto item = this->FindItemByData(_entityId, *this->linksItem);
+  if (item)
+    item->setSelected(_selected);
+
+  // Nested model
+  item = this->FindItemByData(_entityId, *this->nestedModelsItem);
   if (item)
     item->setSelected(_selected);
 }

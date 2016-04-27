@@ -480,18 +480,19 @@ namespace gazebo
             event::ConnectionPtr _subscriber)
           { showModelPluginContextMenu.Disconnect(_subscriber); }
 
-        /// \brief Connect a Gazebo event to the set selected link signal.
+        /// \brief Connect a Gazebo event to the set selected entity signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
         public: template<typename T> static event::ConnectionPtr
-            ConnectSetSelectedLink(T _subscriber)
-          { return setSelectedLink.Connect(_subscriber); }
+            ConnectSetSelectedEntity(T _subscriber)
+          { return setSelectedEntity.Connect(_subscriber); }
 
-        /// \brief Disconnect a Gazebo event from the set selected link signal.
+        /// \brief Disconnect a Gazebo event from the set selected entity
+        /// signal.
         /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectSetSelectedLink(
+        public: static void DisconnectSetSelectedEntity(
             event::ConnectionPtr _subscriber)
-          { setSelectedLink.Disconnect(_subscriber); }
+          { setSelectedEntity.Disconnect(_subscriber); }
 
         /// \brief Connect a Gazebo event to the set selected joint signal.
         /// \param[in] _subscriber the subscriber to this event
@@ -689,8 +690,9 @@ namespace gazebo
         public: static event::EventT<void (std::string)>
             showModelPluginContextMenu;
 
-        /// \brief Request to select or deselect a link.
-        public: static event::EventT<void (std::string, bool)> setSelectedLink;
+        /// \brief Request to select or deselect an entity.
+        public: static event::EventT<void (std::string, bool)>
+            setSelectedEntity;
 
         /// \brief Request to select or deselect a joint.
         public: static event::EventT<void (std::string, bool)> setSelectedJoint;
