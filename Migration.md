@@ -12,6 +12,17 @@ release will remove the deprecated code.
 1. **gazebo/sensors/DepthCameraSensor.hh**
     + Modified to inherit from CameraSensor class.
 
+### Deprecations
+
+1. **gazebo/physics/PhysicsEngine.hh**
+    + ***Deprecation:*** public: math::Vector3 GetGravity const
+    + ***Deprecation:*** public: ignition::math::Vector3d MagneticField const
+
+1. **gazebo/physics/World.hh**
+    + ***Replacement:*** public: ignition::math::Vector3 Gravity const
+    + ***Replacement:*** public: ignition::math::Vector3d MagneticField const
+
+
 ## Gazebo 7.1.0 to 7.X
 
 ### Additions
@@ -157,14 +168,6 @@ release will remove the deprecated code.
     + ***Replacement:*** public: bool FirstUpdate() const;
     + ***Deprecation:*** public: unsigned int GetBufferSize() const;
     + ***Replacement:*** public: unsigned int BufferSize() const;
-
-1. **gazebo/physics/PhysicsEngine.hh**
-    + ***Deprecation:*** public: math::Vector3 GetGravity const
-    + ***Deprecation:*** public: ignition::math::Vector3d MagneticField const
-
-1. **gazebo/physics/World.hh**
-    + ***Replacement:*** public: ignition::math::Vector3 Gravity const
-    + ***Replacement:*** public: ignition::math::Vector3d MagneticField const
 
 1. **gazebo/rendering/Scene.hh**
     + ***Deprecation:*** public: Ogre::SceneManager *GetManager() const;
