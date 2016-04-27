@@ -125,15 +125,7 @@ Camera::Camera(const std::string &_name, ScenePtr _scene,
 //////////////////////////////////////////////////
 Camera::~Camera()
 {
-  delete [] this->saveFrameBuffer;
-  this->saveFrameBuffer = NULL;
-  delete [] this->bayerFrameBuffer;
-  this->bayerFrameBuffer = NULL;
-
   this->Fini();
-
-  this->sdf->Reset();
-  this->sdf.reset();
 }
 
 //////////////////////////////////////////////////
@@ -227,8 +219,23 @@ void Camera::Init()
 //////////////////////////////////////////////////
 void Camera::Fini()
 {
+  if (this->saveFrameBuffer)
+    delete [] this->saveFrameBuffer;
+  this->saveFrameBuffer = NULL;
+
+  if (this->bayerFrameBuffer)
+    delete [] this->bayerFrameBuffer;
+  this->bayerFrameBuffer = NULL;
+
   this->initialized = false;
+
+  this->dataPtr->cmdSub.reset();
+  if (this->dataPtr->node)
+    this->dataPtr->node->Fini();
   this->dataPtr->node.reset();
+
+  this->dataPtr->distortion.reset();
+  this->dataPtr->trackedVisual.reset();
 
   if (this->viewport && this->scene)
     RTShaderSystem::DetachViewport(this->viewport, this->scene);
@@ -252,6 +259,10 @@ void Camera::Fini()
 
   this->scene.reset();
   this->connections.clear();
+
+  if (this->sdf)
+    this->sdf->Reset();
+  this->sdf.reset();
 }
 
 //////////////////////////////////////////////////

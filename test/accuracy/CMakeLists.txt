@@ -31,7 +31,7 @@ set(tests
   sphere_impact.cc
 )
 
-gz_build_tests(${tests})
+gz_build_tests(${tests} EXTRA_LIBS gazebo_test_fixture)
 
 if (ENABLE_TESTS_COMPILATION)
   # Increase timeout

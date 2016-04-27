@@ -22,7 +22,6 @@
 #include <mutex>
 #include <string>
 
-
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Vector3.hh>
 #include <sdf/sdf.hh>
@@ -103,6 +102,12 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~ModelCreator();
 
+      /// \brief Enable the mouse and key event handlers.
+      public: void EnableEventHandlers();
+
+      /// \brief Disable the mouse and key event handlers.
+      public: void DisableEventHandlers();
+
       /// \brief Set the name of the model.
       /// \param[in] _modelName Name of the model to set to.
       public: void SetModelName(const std::string &_modelName);
@@ -121,7 +126,8 @@ namespace gazebo
       public: void FinishModel();
 
       /// \brief Begin the process of inserting a custom link using the mouse.
-      /// \param[in] _type Type of link to add: ENTITY_MESH or ENTITY_POLYLINE.
+      /// \param[in] _type Type of link to add: ENTITY_BOX, ENTITY_CYLINDER,
+      /// ENTITY_SPHERE, ENTITY_MESH or ENTITY_POLYLINE.
       /// \param[in] _size Size of the link.
       /// \param[in] _pose Pose of the link.
       /// \param[in] _samples Number of samples for polyline.
@@ -336,6 +342,10 @@ namespace gazebo
       /// \brief Insert a link from an SDF element.
       /// \param[in] _sdf SDF element with link data.
       private: void InsertLinkFromSDF(sdf::ElementPtr _sdf);
+
+      /// \brief Insert a nested model from an SDF element.
+      /// \param[in] _sdf SDF element with nested model data.
+      private: void InsertNestedModelFromSDF(sdf::ElementPtr _sdf);
 
       /// \brief Clone an existing nested model.
       /// \param[in] _modelName Name of nested model to be cloned.

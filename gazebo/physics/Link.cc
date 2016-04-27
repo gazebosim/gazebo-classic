@@ -47,6 +47,7 @@
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/Link.hh"
+#include "gazebo/physics/Wind.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -66,58 +67,7 @@ Link::Link(EntityPtr _parent)
 //////////////////////////////////////////////////
 Link::~Link()
 {
-  this->attachedModels.clear();
-
-  for (Visuals_M::iterator iter = this->visuals.begin();
-      iter != this->visuals.end(); ++iter)
-  {
-    msgs::Visual msg;
-    msg.set_name(iter->second.name());
-    msg.set_id(iter->second.id());
-    if (this->parent)
-    {
-      msg.set_parent_name(this->parent->GetScopedName());
-      msg.set_parent_id(this->parent->GetId());
-    }
-    else
-    {
-      msg.set_parent_name("");
-      msg.set_parent_id(0);
-    }
-    msg.set_delete_me(true);
-    this->visPub->Publish(msg);
-  }
-  this->visuals.clear();
-
-  if (this->cgVisuals.size() > 0)
-  {
-    for (unsigned int i = 0; i < this->cgVisuals.size(); i++)
-    {
-      msgs::Visual msg;
-      msg.set_name(this->cgVisuals[i]);
-      if (this->parent)
-        msg.set_parent_name(this->parent->GetScopedName());
-      else
-        msg.set_parent_name("");
-      msg.set_delete_me(true);
-      this->visPub->Publish(msg);
-    }
-    this->cgVisuals.clear();
-  }
-
-  this->visPub.reset();
-  this->sensors.clear();
-
-  this->requestPub.reset();
-  this->dataPub.reset();
-  this->wrenchSub.reset();
-  this->connections.clear();
-
-  delete this->publishDataMutex;
-  this->publishDataMutex = NULL;
-
-  this->collisions.clear();
-  this->batteries.clear();
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -238,6 +188,17 @@ void Link::Load(sdf::ElementPtr _sdf)
     }
   }
 
+  if (this->sdf->HasElement("enable_wind"))
+  {
+    this->SetWindMode(this->sdf->Get<bool>("enable_wind"));
+  }
+  else
+  {
+    this->SetWindMode(this->GetModel()->WindMode());
+  }
+  this->sdf->GetElement("enable_wind")->GetValue()->SetUpdateFunc(
+      std::bind(&Link::WindMode, this));
+
   this->connections.push_back(event::Events::ConnectWorldUpdateBegin(
       boost::bind(&Link::Update, this, _1)));
 
@@ -276,12 +237,16 @@ void Link::Init()
     battery->Init();
   }
 
+  if (this->WindMode() && this->world->WindEnabled())
+    this->SetWindEnabled(true);
+
   this->initialized = true;
 }
 
 //////////////////////////////////////////////////
 void Link::Fini()
 {
+  this->attachedModels.clear();
   this->parentJoints.clear();
   this->childJoints.clear();
   this->collisions.clear();
@@ -296,26 +261,59 @@ void Link::Fini()
 
   this->sensors.clear();
 
-  for (Visuals_M::iterator iter = this->visuals.begin();
-       iter != this->visuals.end(); ++iter)
+  // Clean up visuals
+  // FIXME: Do we really need to send 2 msgs to delete a visual?!
+  if (this->visPub && this->requestPub)
   {
-    msgs::Request *msg = msgs::CreateRequest("entity_delete",
-        boost::lexical_cast<std::string>(iter->second.id()));
-    this->requestPub->Publish(*msg, true);
-  }
+    for (auto iter : this->visuals)
+    {
+      auto deleteMsg = msgs::CreateRequest("entity_delete",
+          std::to_string(iter.second.id()));
+      this->requestPub->Publish(*deleteMsg, true);
+      delete deleteMsg;
 
-  for (std::vector<std::string>::iterator iter = this->cgVisuals.begin();
-       iter != this->cgVisuals.end(); ++iter)
-  {
-    msgs::Request *msg = msgs::CreateRequest("entity_delete", *iter);
-    this->requestPub->Publish(*msg, true);
+      msgs::Visual msg;
+      msg.set_name(iter.second.name());
+      msg.set_id(iter.second.id());
+      if (this->parent)
+      {
+        msg.set_parent_name(this->parent->GetScopedName());
+        msg.set_parent_id(this->parent->GetId());
+      }
+      else
+      {
+        msg.set_parent_name("");
+        msg.set_parent_id(0);
+      }
+      msg.set_delete_me(true);
+      this->visPub->Publish(msg);
+    }
   }
+  this->visuals.clear();
 
 #ifdef HAVE_OPENAL
-  this->world->GetPhysicsEngine()->GetContactManager()->RemoveFilter(
-      this->GetScopedName() + "/audio_collision");
+  if (this->world && this->world->GetPhysicsEngine() &&
+      this->world->GetPhysicsEngine()->GetContactManager())
+  {
+    this->world->GetPhysicsEngine()->GetContactManager()->RemoveFilter(
+        this->GetScopedName() + "/audio_collision");
+  }
+  this->audioContactsSub.reset();
   this->audioSink.reset();
+  this->audioSources.clear();
 #endif
+
+  // Clean transport
+  {
+    this->dataPub.reset();
+    this->visPub.reset();
+
+    this->wrenchSub.reset();
+  }
+  this->connections.clear();
+
+  delete this->publishDataMutex;
+  this->publishDataMutex = NULL;
 
   Entity::Fini();
 }
@@ -354,11 +352,15 @@ void Link::UpdateParameters(sdf::ElementPtr _sdf)
 
   this->sdf->GetElement("gravity")->GetValue()->SetUpdateFunc(
       boost::bind(&Link::GetGravityMode, this));
+  this->sdf->GetElement("enable_wind")->GetValue()->SetUpdateFunc(
+      std::bind(&Link::WindMode, this));
   this->sdf->GetElement("kinematic")->GetValue()->SetUpdateFunc(
       boost::bind(&Link::GetKinematic, this));
 
   if (this->sdf->Get<bool>("gravity") != this->GetGravityMode())
     this->SetGravityMode(this->sdf->Get<bool>("gravity"));
+
+  this->SetWindMode(this->sdf->Get<bool>("enable_wind"));
 
   // before loading child collision, we have to figure out if
   // selfCollide is true and modify parent class Entity so this
@@ -529,6 +531,12 @@ void Link::Update(const common::UpdateInfo & /*_info*/)
   {
     battery->Update();
   }
+}
+
+//////////////////////////////////////////////////
+void Link::UpdateWind(const common::UpdateInfo & /*_info*/)
+{
+  this->windLinearVel = this->world->Wind().WorldLinearVel(this);
 }
 
 /////////////////////////////////////////////////
@@ -740,6 +748,46 @@ math::Box Link::GetBoundingBox() const
 }
 
 //////////////////////////////////////////////////
+void Link::SetWindMode(const bool _mode)
+{
+  this->sdf->GetElement("enable_wind")->Set(_mode);
+
+  if (!this->WindMode() && this->updateConnection)
+    this->SetWindEnabled(false);
+  else if (this->WindMode() && !this->updateConnection)
+    this->SetWindEnabled(true);
+}
+
+/////////////////////////////////////////////////
+void Link::SetWindEnabled(const bool _enable)
+{
+  if (_enable)
+  {
+    this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+        std::bind(&Link::UpdateWind, this, std::placeholders::_1));
+  }
+  else
+  {
+    event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
+    this->updateConnection.reset();
+    // Make sure wind velocity is null
+    this->windLinearVel.Set(0, 0, 0);
+  }
+}
+
+//////////////////////////////////////////////////
+const ignition::math::Vector3d Link::WorldWindLinearVel() const
+{
+  return this->windLinearVel;
+}
+
+//////////////////////////////////////////////////
+bool Link::WindMode() const
+{
+  return this->sdf->Get<bool>("enable_wind");
+}
+
+//////////////////////////////////////////////////
 bool Link::SetSelected(bool _s)
 {
   Entity::SetSelected(_s);
@@ -831,6 +879,7 @@ void Link::FillMsg(msgs::Link &_msg)
   _msg.set_name(this->GetScopedName());
   _msg.set_self_collide(this->GetSelfCollide());
   _msg.set_gravity(this->GetGravityMode());
+  _msg.set_enable_wind(this->WindMode());
   _msg.set_kinematic(this->GetKinematic());
   _msg.set_enabled(this->GetEnabled());
   msgs::Set(_msg.mutable_pose(), relPose.Ign());
@@ -926,6 +975,8 @@ void Link::ProcessMsg(const msgs::Link &_msg)
     this->SetGravityMode(_msg.gravity());
     this->SetEnabled(true);
   }
+  if (_msg.has_enable_wind())
+    this->SetWindMode(_msg.enable_wind());
   if (_msg.has_kinematic())
   {
     this->SetKinematic(_msg.kinematic());
@@ -1068,6 +1119,11 @@ void Link::SetKinematic(const bool &/*_kinematic*/)
 /////////////////////////////////////////////////
 void Link::SetPublishData(bool _enable)
 {
+  // Skip if we're trying to disable after the publisher has already been
+  // cleared
+  if (!_enable && !this->dataPub)
+    return;
+
   {
     boost::recursive_mutex::scoped_lock lock(*this->publishDataMutex);
     if (this->publishData == _enable)
@@ -1086,6 +1142,7 @@ void Link::SetPublishData(bool _enable)
   else
   {
     this->dataPub.reset();
+    // Do we want to clear all of them though?
     this->connections.clear();
   }
 }
@@ -1624,4 +1681,11 @@ void Link::LoadBattery(sdf::ElementPtr _sdf)
   common::BatteryPtr battery(new common::Battery());
   battery->Load(_sdf);
   this->batteries.push_back(battery);
+}
+
+/////////////////////////////////////////////////
+const ignition::math::Vector3d Link::RelativeWindLinearVel() const
+{
+  return this->GetWorldPose().Ign().Rot().Inverse().RotateVector(
+      this->windLinearVel);
 }

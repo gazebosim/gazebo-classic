@@ -138,8 +138,10 @@ if (PKG_CONFIG_FOUND)
   #list(APPEND CMAKE_MODULE_PATH ${SimTK_INSTALL_PREFIX}/share/cmake)
   find_package(Simbody)
   if (Simbody_FOUND)
+    message (STATUS "Looking for Simbody - found")
     set (HAVE_SIMBODY TRUE)
   else()
+    message (STATUS "Looking for Simbody - not found")
     BUILD_WARNING ("Simbody not found, for simbody physics engine option, please install libsimbody-dev.")
     set (HAVE_SIMBODY FALSE)
   endif()
@@ -529,7 +531,7 @@ endif ()
 
 ########################################
 # Find SDFormat
-set (SDFormat_MIN_VERSION 4.0.0)
+set (SDFormat_MIN_VERSION 4.1.0)
 find_package(SDFormat ${SDFormat_MIN_VERSION})
 
 if (NOT SDFormat_FOUND)

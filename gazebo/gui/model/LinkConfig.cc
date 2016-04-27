@@ -49,6 +49,7 @@ LinkConfig::LinkConfig()
   this->configWidget->SetBoolWidgetValue("gravity", true);
   this->configWidget->SetBoolWidgetValue("self_collide", false);
   this->configWidget->SetBoolWidgetValue("kinematic", false);
+  this->configWidget->SetBoolWidgetValue("enable_wind", false);
 
   this->configWidget->SetWidgetVisible("id", false);
   this->configWidget->SetWidgetVisible("name", false);

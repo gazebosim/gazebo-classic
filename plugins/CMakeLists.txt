@@ -40,6 +40,7 @@ if (HAVE_UUID)
 endif()
 
 set (plugins
+  ActorPlugin
   ActuatorPlugin
   ArrangePlugin
   BreakableJointPlugin
@@ -71,7 +72,8 @@ set (plugins
   SonarPlugin
   SphereAtlasDemoPlugin
   TransporterPlugin
-  VehiclePlugin)
+  VehiclePlugin
+  WindPlugin)
 
 if (HAVE_USB AND UNIX AND NOT APPLE)
   set (plugins ${plugins}

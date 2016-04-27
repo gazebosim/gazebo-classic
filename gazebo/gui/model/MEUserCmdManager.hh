@@ -52,7 +52,13 @@ namespace gazebo
         INSERTING_LINK,
 
         /// \brief Delete a link.
-        DELETING_LINK
+        DELETING_LINK,
+
+        /// \brief Insert a nested model.
+        INSERTING_NESTED_MODEL,
+
+        /// \brief Delete a nested model.
+        DELETING_NESTED_MODEL,
       };
 
       /// \brief Constructor
