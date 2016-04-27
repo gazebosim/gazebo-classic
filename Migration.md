@@ -9,8 +9,29 @@ release will remove the deprecated code.
 
 ### Modifications
 
+1. **gazebo/common/Event.hh**
+    + added protected: bool signaled to Event class
+    + ConnectionPrivate made not visible
+    + Connection::dataPtr changed to std::unique_ptr
+    + EventConnection(const bool, boost::function<T>*) changed to
+      EventConnection(const bool, boost::function<T>) (function pointer
+      passed as a copy instead of as a pointer)
+    + EventConnection::callback stored as boost::function<T>
+      instead of std::shared_ptr<boost::function<T>>
+    + EventTPrivate no longer inherits from EventPrivate
+    + EventT::myDataPtr changed to std::unique_ptr
+
 1. **gazebo/sensors/DepthCameraSensor.hh**
     + Modified to inherit from CameraSensor class.
+
+### Deletions
+
+1. **gazebo/common/Event.hh**
+    + EventPrivate class
+    + Event(EventPrivate&) constructor
+    + Event::dataPtr member variable
+    + ConnectionPrivate() constructor
+    + Connection() constructor
 
 ## Gazebo 7.1.0 to 7.X
 
