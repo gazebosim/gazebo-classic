@@ -54,6 +54,8 @@ UserCmd::UserCmd(const unsigned int _id,
 /////////////////////////////////////////////////
 UserCmd::~UserCmd()
 {
+  this->dataPtr->world.reset();
+
   delete this->dataPtr;
   this->dataPtr = NULL;
 }
@@ -132,6 +134,24 @@ UserCmdManager::UserCmdManager(const WorldPtr _world)
 /////////////////////////////////////////////////
 UserCmdManager::~UserCmdManager()
 {
+  this->dataPtr->world.reset();
+
+  // Clean transport
+  {
+    this->dataPtr->lightModifyPub.reset();
+    this->dataPtr->modelModifyPub.reset();
+    this->dataPtr->userCmdStatsPub.reset();
+    this->dataPtr->worldControlPub.reset();
+
+    this->dataPtr->userCmdSub.reset();
+    this->dataPtr->undoRedoSub.reset();
+
+    this->dataPtr->node.reset();
+  }
+
+  this->dataPtr->undoCmds.clear();
+  this->dataPtr->redoCmds.clear();
+
   delete this->dataPtr;
   this->dataPtr = NULL;
 }

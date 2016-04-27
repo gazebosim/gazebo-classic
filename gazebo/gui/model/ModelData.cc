@@ -99,6 +99,12 @@ void NestedModelData::SetName(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
+std::string NestedModelData::Name() const
+{
+  return this->modelSDF->Get<std::string>("name");
+}
+
+/////////////////////////////////////////////////
 void NestedModelData::SetPose(const ignition::math::Pose3d &_pose)
 {
   this->modelSDF->GetElement("pose")->Set(_pose);
@@ -169,7 +175,7 @@ LinkData::~LinkData()
 }
 
 /////////////////////////////////////////////////
-std::string LinkData::GetName() const
+std::string LinkData::Name() const
 {
   return this->linkSDF->Get<std::string>("name");
 }
@@ -476,6 +482,11 @@ void LinkData::Load(sdf::ElementPtr _sdf)
   {
     sdf::ElementPtr selfCollideSDF = this->linkSDF->GetElement("self_collide");
     linkMsgPtr->set_self_collide(selfCollideSDF->Get<bool>(""));
+  }
+  if (_sdf->HasElement("enable_wind"))
+  {
+    sdf::ElementPtr enableWindSDF = this->linkSDF->GetElement("enable_wind");
+    linkMsgPtr->set_enable_wind(enableWindSDF->Get<bool>(""));
   }
   if (this->linkSDF->HasElement("kinematic"))
   {

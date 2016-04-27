@@ -75,6 +75,14 @@ namespace gazebo
     /// \return Environment variable contents, or NULL on error.
     GZ_COMMON_VISIBLE
     const char *getEnv(const char *_name);
+
+    /// \brief Splits a string into tokens.
+    /// \param[in] _str Input string.
+    /// \param[in] _delim Token delimiter.
+    /// \return Vector of tokens.
+    GZ_COMMON_VISIBLE
+    std::vector<std::string> split(const std::string &_str,
+                                   const std::string &_delim);
     /// \}
   }
 
