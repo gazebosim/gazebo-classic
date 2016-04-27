@@ -23,15 +23,10 @@
 /////////////////////////////////////////////////
 void Futures_TEST::Verify()
 {
-  std::cerr << "Loading shapes world\n";
   this->Load("worlds/shapes.world", false, false, false);
 
-  std::cerr << "Getting result\n";
-  bool result = gazebo::gui::Futures::introspectionClientFuture.valid();
-  std::cerr << "Result is[" << result << "]\n";
-  QVERIFY(result);
+  QVERIFY(gazebo::gui::Futures::introspectionClientFuture.valid());
   gazebo::gui::Futures::introspectionClientFuture.wait();
-  std::cerr << "After introspection client wait\n";
 }
 
 // Generate a main function for the test
