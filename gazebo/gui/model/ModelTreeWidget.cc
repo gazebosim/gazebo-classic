@@ -215,11 +215,11 @@ ModelTreeWidget::ModelTreeWidget(QWidget *_parent)
 
   this->connections.push_back(
      event::Events::ConnectSetSelectedEntity(
-       boost::bind(&ModelTreeWidget::OnSetSelectedEntity, this, _1, _2)));
+       boost::bind(&ModelTreeWidget::OnDeselectAll, this, _1, _2)));
 
   this->connections.push_back(
      gui::model::Events::ConnectSetSelectedLink(
-       boost::bind(&ModelTreeWidget::OnSetSelectedLink, this, _1, _2)));
+       boost::bind(&ModelTreeWidget::OnSetSelectedEntity, this, _1, _2)));
 
   this->connections.push_back(
      gui::model::Events::ConnectSetSelectedJoint(
@@ -313,7 +313,7 @@ void ModelTreeWidget::OnItemSelectionChanged()
 }
 
 /////////////////////////////////////////////////
-void ModelTreeWidget::OnSetSelectedEntity(const std::string &/*_name*/,
+void ModelTreeWidget::OnDeselectAll(const std::string &/*_name*/,
     const std::string &/*_mode*/)
 {
   // deselect all
@@ -563,11 +563,18 @@ void ModelTreeWidget::OnJointNameChanged(const std::string &_jointId,
 }
 
 /////////////////////////////////////////////////
-void ModelTreeWidget::OnSetSelectedLink(const std::string &_linkId,
+void ModelTreeWidget::OnSetSelectedEntity(const std::string &_entityId,
     const bool _selected)
 {
   std::unique_lock<std::recursive_mutex> lock(this->updateMutex);
-  QTreeWidgetItem *item = this->FindItemByData(_linkId, *this->linksItem);
+
+  // Link
+  auto item = this->FindItemByData(_entityId, *this->linksItem);
+  if (item)
+    item->setSelected(_selected);
+
+  // Nested model
+  item = this->FindItemByData(_entityId, *this->nestedModelsItem);
   if (item)
     item->setSelected(_selected);
 }

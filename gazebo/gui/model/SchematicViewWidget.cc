@@ -98,11 +98,11 @@ void SchematicViewWidget::Init()
 
   this->connections.push_back(
      event::Events::ConnectSetSelectedEntity(
-       boost::bind(&SchematicViewWidget::OnSetSelectedEntity, this, _1, _2)));
+       boost::bind(&SchematicViewWidget::OnDeselectAll, this, _1, _2)));
 
   this->connections.push_back(
      gui::model::Events::ConnectSetSelectedLink(
-       boost::bind(&SchematicViewWidget::OnSetSelectedLink, this, _1, _2)));
+       boost::bind(&SchematicViewWidget::OnSetSelectedEntity, this, _1, _2)));
 
   this->connections.push_back(
      gui::model::Events::ConnectSetSelectedJoint(
@@ -318,12 +318,20 @@ void SchematicViewWidget::OnItemDoubleClicked(const QString &_id)
 }
 
 /////////////////////////////////////////////////
-void SchematicViewWidget::OnSetSelectedLink(const std::string &_name,
+void SchematicViewWidget::OnSetSelectedEntity(const std::string &_name,
     bool _selected)
 {
-  auto it = this->nodes.find(_name);
-  if (it != this->nodes.end())
-    it->second->setSelected(_selected);
+  this->scene->blockSignals(true);
+
+  // Select all nodes which start with _name, so we select all links of a
+  // nested model.
+  for (auto &node : this->nodes)
+  {
+    if (node.first.find(_name) == 0)
+      node.second->setSelected(_selected);
+  }
+
+  this->scene->blockSignals(false);
 }
 
 /////////////////////////////////////////////////
@@ -336,7 +344,7 @@ void SchematicViewWidget::OnSetSelectedJoint(const std::string &_id,
 }
 
 /////////////////////////////////////////////////
-void SchematicViewWidget::OnSetSelectedEntity(const std::string &/*_name*/,
+void SchematicViewWidget::OnDeselectAll(const std::string &/*_name*/,
     const std::string &/*_mode*/)
 {
   // deselect all

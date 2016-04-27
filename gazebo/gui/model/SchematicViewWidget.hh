@@ -113,11 +113,12 @@ namespace gazebo
       /// \return Unscoped name.
       private: std::string UnscopedName(const std::string &_scopedName);
 
-      /// \brief Callback when a link is selected.
-      /// \param[in] _name Name of link.
-      /// \param[in] _selected True if the link is selected, false if
+      /// \brief Callback when an entity is selected.
+      /// \param[in] _name Name of entity.
+      /// \param[in] _selected True if the entity is selected, false if
       /// deselected.
-      private: void OnSetSelectedLink(const std::string &_name, bool _selected);
+      private: void OnSetSelectedEntity(const std::string &_name,
+          bool _selected);
 
       /// \brief Callback when a joint is selected.
       /// \param[in] _name Joint Id.
@@ -126,10 +127,10 @@ namespace gazebo
       private: void OnSetSelectedJoint(const std::string &_id,
           bool _selected);
 
-      /// \brief Callback when an entity is selected.
+      /// \brief Callback when an entity is selected outside of the editor.
       /// \param[in] _name Name of entity.
       /// \param[in] _mode Select mode
-      private: void OnSetSelectedEntity(const std::string &_name,
+      private: void OnDeselectAll(const std::string &_name,
           const std::string &_mode);
 
       /// \brief Qt event received when the widget is being resized
