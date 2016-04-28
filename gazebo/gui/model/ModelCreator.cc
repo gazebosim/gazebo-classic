@@ -2662,7 +2662,7 @@ void ModelCreator::SetSelected(const rendering::VisualPtr &_entityVis,
     model::Events::setSelectedLink(topLevelVis->GetName(), _selected);
   }
 
-  g_copyAct->setEnabled(this->dataPtr->selectedEntities.size() > 0u);
+  g_copyAct->setEnabled(!this->dataPtr->selectedEntities.empty());
   g_alignAct->setEnabled(this->dataPtr->selectedEntities.size() > 1u);
 }
 
