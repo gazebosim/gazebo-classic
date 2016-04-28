@@ -28,6 +28,7 @@
 #include <sdf/sdf.hh>
 
 #include <gazebo/physics/PhysicsTypes.hh>
+#include <gazebo/common/URI.hh>
 
 namespace gazebo
 {

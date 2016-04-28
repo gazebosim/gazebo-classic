@@ -46,7 +46,7 @@ ignition::math::Vector3d ODEBallJoint::Anchor(
   else
   {
     gzerr << "ODE Joint ID is invalid\n";
-    return math::Vector3::Zero;
+    return ignition::math::Vector3d::Zero;
   }
 
   return ignition::math::Vector3d(result[0], result[1], result[2]);
