@@ -2,6 +2,11 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
+1. Added a Temperature class to gazebo::common
+    * A contribution from Shintaro Noda
+    * See also this [pull request](https://github.com/ros-simulation/gazebo_ros_pkgs/pull/253)
+    * [Pull request #2283](https://bitbucket.org/osrf/gazebo/pull-request/2283)
+
 1. Fix memory and other issues found from running Coverity.
     * A contribution from Olivier Crave
     * [Pull request #2241](https://bitbucket.org/osrf/gazebo/pull-request/2241)

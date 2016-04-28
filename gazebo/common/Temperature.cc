@@ -20,15 +20,6 @@
 using namespace gazebo;
 using namespace common;
 
-/// The offset between Kelivin and Celsius.
-///
-/// Conversion equation:
-/// Temperature_celsius = Temperature_kelvin - 273.15
-///
-/// This is only in the source file to prevent symbol collisions, and
-/// the raw number does not seem useful to share publicly.
-#define KELVIN_CELSIUS_OFFSET 273.15
-
 namespace gazebo
 {
   namespace common
@@ -75,7 +66,7 @@ Temperature::~Temperature()
 /////////////////////////////////////////////////
 double Temperature::KelvinToCelsius(const double _temp)
 {
-  return _temp - KELVIN_CELSIUS_OFFSET;
+  return _temp - 273.15;
 }
 
 /////////////////////////////////////////////////
@@ -93,7 +84,7 @@ double Temperature::CelsiusToFarenheit(const double _temp)
 /////////////////////////////////////////////////
 double Temperature::CelsiusToKelvin(const double _temp)
 {
-  return std::max(_temp + KELVIN_CELSIUS_OFFSET, 0.0);
+  return std::max(_temp + 273.15, 0.0);
 }
 
 /////////////////////////////////////////////////
