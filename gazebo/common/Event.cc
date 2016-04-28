@@ -35,7 +35,19 @@ Event::~Event()
 //////////////////////////////////////////////////
 bool Event::GetSignaled() const
 {
+  return this->Signaled();
+}
+
+//////////////////////////////////////////////////
+bool Event::Signaled() const
+{
   return this->signaled;
+}
+
+//////////////////////////////////////////////////
+void Event::SetSignaled(const bool _sig)
+{
+  this->signaled = _sig;
 }
 
 //////////////////////////////////////////////////
@@ -56,10 +68,12 @@ Connection::~Connection()
 {
   common::Time diffTime = common::Time::GetWallTime() -
     this->dataPtr->creationTime;
-  if ((this->dataPtr->event && !this->dataPtr->event->GetSignaled()) &&
+  if ((this->dataPtr->event && !this->dataPtr->event->Signaled()) &&
       diffTime < common::Time(0, 10000))
+  {
     gzwarn << "Warning: Deleting a connection right after creation. "
           << "Make sure to save the ConnectionPtr from a Connect call\n";
+  }
 
   if (this->dataPtr->event && this->dataPtr->id >= 0)
   {

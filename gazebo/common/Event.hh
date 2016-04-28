@@ -60,10 +60,19 @@ namespace gazebo
 
       /// \brief Get whether this event has been signaled.
       /// \return True if the event has been signaled.
-      public: bool GetSignaled() const;
+      /// \deprecated See bool Signaled() const;
+      public: bool GetSignaled() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get whether this event has been signaled.
+      /// \return True if the event has been signaled.
+      public: bool Signaled() const;
+
+      /// \brief Set whether this event has been signaled.
+      /// \param[in] _sig True if the event has been signaled.
+      public: void SetSignaled(const bool _sig);
 
       /// \brief True if the event has been signaled.
-      protected: bool signaled;
+      private: bool signaled;
     };
 
     /// \internal
@@ -331,7 +340,7 @@ namespace gazebo
       {
         this->Cleanup();
 
-        this->signaled = true;
+        this->SetSignaled(true);
         for (auto iter: this->myDataPtr->connections)
         {
           if (iter.second->on)
@@ -346,7 +355,7 @@ namespace gazebo
       {
         this->Cleanup();
 
-        this->signaled = true;
+        this->SetSignaled(true);
         for (auto iter: this->myDataPtr->connections)
         {
           if (iter.second->on)
@@ -362,7 +371,7 @@ namespace gazebo
       {
         this->Cleanup();
 
-        this->signaled = true;
+        this->SetSignaled(true);
         for (auto iter: this->myDataPtr->connections)
         {
           if (iter.second->on)
@@ -379,7 +388,7 @@ namespace gazebo
       {
         this->Cleanup();
 
-        this->signaled = true;
+        this->SetSignaled(true);
         for (auto iter: this->myDataPtr->connections)
         {
           if (iter.second->on)
@@ -398,7 +407,7 @@ namespace gazebo
       {
         this->Cleanup();
 
-        this->signaled = true;
+        this->SetSignaled(true);
         for (auto iter: this->myDataPtr->connections)
         {
           if (iter.second->on)
@@ -419,7 +428,7 @@ namespace gazebo
       {
         this->Cleanup();
 
-        this->signaled = true;
+        this->SetSignaled(true);
         for (auto iter: this->myDataPtr->connections)
         {
           if (iter.second->on)
@@ -441,7 +450,7 @@ namespace gazebo
       {
         this->Cleanup();
 
-        this->signaled = true;
+        this->SetSignaled(true);
         for (auto iter: this->myDataPtr->connections)
         {
           if (iter.second->on)
@@ -464,7 +473,7 @@ namespace gazebo
       {
         this->Cleanup();
 
-        this->signaled = true;
+        this->SetSignaled(true);
         for (auto iter: this->myDataPtr->connections)
         {
           if (iter.second->on)
@@ -489,7 +498,7 @@ namespace gazebo
       {
         this->Cleanup();
 
-        this->signaled = true;
+        this->SetSignaled(true);
         for (auto iter: this->myDataPtr->connections)
         {
           if (iter.second->on)
@@ -518,7 +527,7 @@ namespace gazebo
       {
         this->Cleanup();
 
-        this->signaled = true;
+        this->SetSignaled(true);
         for (auto iter: this->myDataPtr->connections)
         {
           if (iter.second->on)
@@ -549,7 +558,7 @@ namespace gazebo
       {
         this->Cleanup();
 
-        this->signaled = true;
+        this->SetSignaled(true);
         for (auto iter: this->myDataPtr->connections)
         {
           if (iter.second->on)
