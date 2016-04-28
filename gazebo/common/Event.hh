@@ -14,13 +14,10 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_EVENT_HH_
-#define _GAZEBO_EVENT_HH_
+#ifndef GAZEBO_COMMON_EVENT_HH_
+#define GAZEBO_COMMON_EVENT_HH_
 
 #include <atomic>
-#include <iostream>
-#include <vector>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -32,7 +29,6 @@
 #include <gazebo/gazebo_config.h>
 #include <gazebo/common/Time.hh>
 #include <gazebo/common/CommonTypes.hh>
-#include <gazebo/math/Helpers.hh>
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -95,7 +91,7 @@ namespace gazebo
       /// \brief Constructor.
       /// \param[in] _e Event pointer to connect with.
       /// \param[in] _i Unique id.
-      public: Connection(Event *_e, int _i);
+      public: Connection(Event *_e, const int _i);
 
       /// \brief Destructor.
       public: ~Connection();
@@ -154,7 +150,7 @@ namespace gazebo
 
     /// \class EventT Event.hh common/common.hh
     /// \brief A class for event processing.
-    template< typename T>
+    template<typename T>
     class EventT : public Event
     {
       /// \brief Constructor.
@@ -649,7 +645,6 @@ namespace gazebo
         this->myDataPtr->connections.erase(conn);
       this->myDataPtr->connectionsToRemove.clear();
     }
-
     /// \}
   }
 }

@@ -45,7 +45,7 @@ ConnectionPrivate::ConnectionPrivate(Event *_e, int _i)
 }
 
 //////////////////////////////////////////////////
-Connection::Connection(Event *_e, int _i)
+Connection::Connection(Event *_e, const int _i)
   : dataPtr(new ConnectionPrivate(_e, _i))
 {
   this->dataPtr->creationTime = common::Time::GetWallTime();

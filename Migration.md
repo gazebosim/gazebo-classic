@@ -12,6 +12,8 @@ release will remove the deprecated code.
 1. **gazebo/common/Event.hh**
     + added protected: bool signaled to Event class
     + ConnectionPrivate made not visible
+    + Connection(Event*, int) constructor changed to
+      Connection(Event*, const int)
     + Connection::dataPtr changed to std::unique_ptr
     + EventConnection(const bool, boost::function<T>*) changed to
       EventConnection(const bool, boost::function<T>) (function pointer
