@@ -143,6 +143,9 @@ namespace gazebo
 
     /// \brief Upper joint limits to test.
     private: std::map<std::string, std::vector<double>> upperLimitParams;
+
+    /// \brief ToDo.
+    //private: std::string currentParam;
   };
 
   // Register this plugin with the simulator

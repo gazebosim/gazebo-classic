@@ -50,19 +50,20 @@ void GazeboReadyState::DoFeedback()
 //////////////////////////////////////////////////
 void GazeboSetState::DoInitialize()
 {
+  // Reset the world.
+  physics::get_world()->Reset();
+
   std::lock_guard<std::mutex> lock(this->mutex);
 
   // Load the parameters.
   if (!this->plugin.LoadModelParams())
   {
-    this->plugin.ChangeState(*this->plugin.readyState);
+    this->plugin.ChangeState(*this->plugin.endState);
     return;
   }
 
   // Start the run.
   this->plugin.ChangeState(*this->plugin.goState);
-
-  std::cout << "SetState::DoInitialize()" << std::endl;
 }
 
 //////////////////////////////////////////////////
@@ -78,15 +79,8 @@ void GazeboGoState::DoFeedback()
   std::lock_guard<std::mutex> lock(this->mutex);
   if (this->Feedback() == "controller_end")
   {
-    if (this->plugin.MoreRuns())
-    {
-      // Go for the next run.
-      this->plugin.ChangeState(*this->plugin.readyState);
-    }
-    else
-    {
-      this->plugin.ChangeState(*this->plugin.endState);
-    }
+    // Go for the next run.
+    this->plugin.ChangeState(*this->plugin.readyState);
   }
 }
 
@@ -161,6 +155,8 @@ void ValidationPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   this->model = _model;
   GZ_ASSERT(_sdf, "ValidationPlugin _sdf pointer is NULL");
 
+  std::cout << _sdf->ToString("") << std::endl;
+
   std::string name;
   double min, max, step;
 
@@ -197,13 +193,23 @@ void ValidationPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   }
 
   // Parameters to test:
-  //std::cout << "Lower limits" << std::endl;
-  //for (auto v : this->lowerLimitParams)
-  //  std::cout << v << std::endl;
+  std::cout << "Lower limits" << std::endl;
+  for (auto m : this->lowerLimitParams)
+  {
+    std::cout << m.first << ": ";
+    for (auto v : m.second)
+      std::cout << v << " ";
+    std::cout << std::endl;
+  }
 
-  //std::cout << "Upper limits" << std::endl;
-  //for (auto v : this->upperLimitParams)
-  //  std::cout << v << std::endl;
+  std::cout << "Upper limits" << std::endl;
+   for (auto m : this->upperLimitParams)
+  {
+    std::cout << m.first << ": ";
+    for (auto v : m.second)
+      std::cout << v << " ";
+    std::cout << std::endl;
+  }
 
   // Set up a physics update callback
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
@@ -237,10 +243,15 @@ bool ValidationPlugin::LoadModelParams()
       return false;
     }
 
-    std::cout << "Setting [" << value << "] as the lower joint limit on "
+    std::cout << "Setting [" << value << " rads (" << IGN_RTOD(value) << " degs"
+              << ")] as the lower joint limit on "
               << name << std::endl;
 
     joint->SetLowerLimit(0, gazebo::math::Angle(value));
+
+    //this->currentParam = "<lower_limit><name>" + std::to_string(name) +
+    //  "</name><value>" + std::to_string(value) + "</value>";
+                       ;
     return true;
   }
 
@@ -261,11 +272,18 @@ bool ValidationPlugin::LoadModelParams()
       return false;
     }
 
-    std::cout << "Setting [" << value << "] as the upper joint limit on "
+    std::cout << "Setting [" << value << " rads (" << IGN_RTOD(value) << " degs"
+              << ")] as the upper joint limit on "
               << name << std::endl;
     joint->SetUpperLimit(0, gazebo::math::Angle(value));
+
+    //this->currentParam = "<upper_limit><name>" + std::to_string(name) +
+    //  "</name><value>" + std::to_string(value) + "</value>";
+
     return true;
   }
+
+  std::cerr << "LoadModelParams() Nothing to do" << std::endl;
 
   return false;
 }

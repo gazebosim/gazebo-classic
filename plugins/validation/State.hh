@@ -166,7 +166,7 @@ namespace gazebo
     public: const std::string name;
 
     /// \brief Timer to measure time in the current state.
-    protected: common::Timer timer;
+    public: common::Timer timer;
 
     /// \brief Has initialized
     protected: bool initialized = false;

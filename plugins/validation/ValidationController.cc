@@ -44,39 +44,33 @@ void ControllerReadyState::DoFeedback()
 /////////////////////////////////////////////////
 void ControllerInitCondsState::DoInitialize()
 {
-  // Send initial conditions.
-  std::cout << "InitCondsState::DoInitialize()" << std::endl;
-  //std::cout << "Initial conditions" << std::endl;
+  this->controller.InitializeInitConds();
 }
 
 /////////////////////////////////////////////////
 void ControllerInitCondsState::DoUpdate()
 {
+  this->controller.UpdateInitConds();
+
   // Check if the initial conditions are satisfied.
-
-  //std::cout << "InitCondsState::DoUpdate()" << std::endl;
-
-  std::lock_guard<std::mutex> lock(this->mutex);
-  if (this->timer.GetElapsed() >= gazebo::common::Time(2.0))
+  if (!this->controller.Initializing())
     this->controller.ChangeState(*this->controller.runningState);
 }
 
 /////////////////////////////////////////////////
 void ControllerRunningState::DoInitialize()
 {
+  this->controller.InitializeRun();
   std::cout << "RunningState::Initialize()" << std::endl;
 }
 
 /////////////////////////////////////////////////
 void ControllerRunningState::DoUpdate()
 {
-  // Send the next command.
-
-  //std::cout << "RunningState::DoUpdate()" << std::endl;
+  this->controller.UpdateRun();
 
   // Check if we are done with the run
-  std::lock_guard<std::mutex> lock(this->mutex);
-  if (this->timer.GetElapsed() >= gazebo::common::Time(5.0))
+  if (!this->controller.Running())
     this->controller.ChangeState(*this->controller.endState);
 }
 

@@ -108,6 +108,24 @@ namespace gazebo
     /// \brief ToDo.
     public: void ChangeState(State &_newState);
 
+    /// ToDo
+    public: virtual void UpdateRun() = 0;
+
+    /// ToDo
+    public: virtual bool Running() const = 0;
+
+    /// ToDo
+    public: virtual void InitializeInitConds() {};
+
+    /// ToDo
+    public: virtual void UpdateInitConds() {};
+
+    /// ToDo
+    public: virtual bool Initializing() const {return false;};
+
+    /// ToDo
+    public: virtual void InitializeRun() {};
+
     /// \brief State machine states.
     public: std::unique_ptr<ControllerReadyState>     readyState;
     public: std::unique_ptr<ControllerInitCondsState> initCondsState;
