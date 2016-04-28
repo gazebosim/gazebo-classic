@@ -28,6 +28,9 @@ namespace gazebo
 {
   namespace physics
   {
+    /// \addtogroup gazebo_physics_ode
+    /// \{
+
     /// \brief ODE joint interface
     class GZ_PHYSICS_VISIBLE ODEJoint : public Joint
     {
@@ -288,6 +291,7 @@ namespace gazebo
       /// This will let us know if it's time to clean up forceApplied.
       private: common::Time forceAppliedTime;
     };
+    /// \}
   }
 }
 #endif

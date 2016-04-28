@@ -30,6 +30,9 @@ namespace gazebo
     /// Forward declare private data class
     class DARTSphereShapePrivate;
 
+    /// \addtogroup gazebo_physics_dart
+    /// \{
+
     /// \brief A DART sphere shape
     class GZ_PHYSICS_VISIBLE DARTSphereShape : public SphereShape
     {
@@ -47,6 +50,7 @@ namespace gazebo
       /// \brief Pointer to private data
       private: DARTSphereShapePrivate *dataPtr;
     };
+    /// \}
   }
 }
 #endif

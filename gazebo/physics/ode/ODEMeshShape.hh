@@ -27,6 +27,9 @@ namespace gazebo
   {
     class ODEMesh;
 
+    /// \addtogroup gazebo_physics_ode
+    /// \{
+
     /// \brief Triangle mesh collision.
     class GZ_PHYSICS_VISIBLE ODEMeshShape : public MeshShape
     {
@@ -49,6 +52,7 @@ namespace gazebo
       /// \brief ODE collsion mesh helper class.
       private: ODEMesh *odeMesh;
     };
+    /// \}
   }
 }
 #endif

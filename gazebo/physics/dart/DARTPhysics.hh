@@ -40,6 +40,7 @@ namespace gazebo
 
     /// \ingroup gazebo_physics
     /// \addtogroup gazebo_physics_dart DART Physics
+    /// \brief DART physics engine wrapper
     /// \{
 
     /// \brief DART physics engine

@@ -32,6 +32,9 @@ namespace gazebo
 {
   namespace physics
   {
+    /// \addtogroup gazebo_physics_ode
+    /// \{
+
     /// \brief Ray collision
     class GZ_PHYSICS_VISIBLE ODERayShape : public RayShape
     {
@@ -85,6 +88,7 @@ namespace gazebo
                  public: std::string name;
                };
     };
+    /// \}
   }
 }
 #endif
