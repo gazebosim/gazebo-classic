@@ -110,7 +110,8 @@ void SchematicViewWidget::Init()
 }
 
 /////////////////////////////////////////////////
-std::string SchematicViewWidget::UnscopedName(const std::string &_scopedName)
+std::string SchematicViewWidget::UnscopedName(
+    const std::string &_scopedName) const
 {
   if (_scopedName.empty())
     return "";
@@ -124,7 +125,8 @@ std::string SchematicViewWidget::UnscopedName(const std::string &_scopedName)
 }
 
 /////////////////////////////////////////////////
-std::string SchematicViewWidget::TopLevelName(const std::string &_scopedName)
+std::string SchematicViewWidget::TopLevelName(
+    const std::string &_scopedName) const
 {
   if (_scopedName.empty())
     return "";
