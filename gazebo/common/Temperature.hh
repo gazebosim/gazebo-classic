@@ -253,46 +253,46 @@ namespace gazebo
 
       /// \brief Less than to operator
       /// \param[in] _temp The temperature to compare
-      /// \return True if _temp is less than this.
+      /// \return True if this is less than _temp.
       public: bool operator<(const Temperature &_temp) const;
 
       /// \brief Less than operator, where the value of _temp is assumed to
       /// be in Kelvin
       /// \param[in] _temp The temperature (in Kelvin) to compare
-      /// \return True if _temp is less than this.
+      /// \return True if this is less than _temp.
       public: bool operator<(const double _temp) const;
 
       /// \brief Less than or equal to operator
       /// \param[in] _temp The temperature to compare
-      /// \return True if _temp is less than or equal to this.
+      /// \return True if this is less than or equal _temp.
       public: bool operator<=(const Temperature &_temp) const;
 
-      /// \brief Less than equal operator,
+      /// \brief Less than or equal operator,
       /// where the value of _temp is assumed to be in Kelvin
       /// \param[in] _temp The temperature (in Kelvin) to compare
-      /// \return True if _temp is less than or equal to this.
+      /// \return True if this is less than or equal to _temp.
       public: bool operator<=(const double _temp) const;
 
-      /// \brief Greater than to operator
+      /// \brief Greater than operator
       /// \param[in] _temp The temperature to compare
-      /// \return True if _temp is greater than this.
+      /// \return True if this is greater than _temp.
       public: bool operator>(const Temperature &_temp) const;
 
       /// \brief Greater than operator, where the value of _temp is assumed to
       /// be in Kelvin
       /// \param[in] _temp The temperature (in Kelvin) to compare
-      /// \return True if _temp is greater than this.
+      /// \return True if this is greater than _temp.
       public: bool operator>(const double _temp) const;
 
       /// \brief Greater than or equal to operator
       /// \param[in] _temp The temperature to compare
-      /// \return True if _temp is greater than or equal to this.
+      /// \return True if this is greater than or equal to _temp.
       public: bool operator>=(const Temperature &_temp) const;
 
       /// \brief Greater than equal operator,
       /// where the value of _temp is assumed to be in Kelvin
       /// \param[in] _temp The temperature (in Kelvin) to compare
-      /// \return True if _temp is greater than or equal to this.
+      /// \return True if this is greater than or equal to _temp.
       public: bool operator>=(const double _temp) const;
 
       /// \brief Stream insertion operator

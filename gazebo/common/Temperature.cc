@@ -24,7 +24,7 @@ namespace gazebo
 {
   namespace common
   {
-    /// \brief Private data for the Temperatue class.
+    /// \brief Private data for the Temperature class.
     class TemperaturePrivate
     {
       /// \brief Default constructor
