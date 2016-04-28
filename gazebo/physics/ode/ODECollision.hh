@@ -35,7 +35,6 @@ namespace gazebo
 {
   namespace physics
   {
-
     /// \addtogroup gazebo_physics_ode
     /// \{
 
