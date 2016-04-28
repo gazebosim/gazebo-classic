@@ -124,6 +124,23 @@ std::string SchematicViewWidget::UnscopedName(const std::string &_scopedName)
 }
 
 /////////////////////////////////////////////////
+std::string SchematicViewWidget::TopLevelName(const std::string &_scopedName)
+{
+  if (_scopedName.empty())
+    return "";
+
+  auto unscoped = this->UnscopedName(_scopedName);
+  auto unscopedPos = _scopedName.find(unscoped);
+
+  std::string topLevelName = _scopedName;
+  auto secondScopePos = topLevelName.find("::", unscopedPos);
+  if (secondScopePos != std::string::npos)
+    topLevelName = topLevelName.substr(0, secondScopePos);
+
+  return topLevelName;
+}
+
+/////////////////////////////////////////////////
 void SchematicViewWidget::AddNode(const std::string &_node)
 {
   std::string name = this->UnscopedName(_node);
@@ -384,26 +401,31 @@ void SchematicViewWidget::OnSelectionChanged()
 {
   QList<QGraphicsItem *> newlySelected = this->scene->selectedItems();
 
+  // Create list of top level names so we can also select siblings
+  QList<std::string> newTopLevel;
+  for (auto &item : newlySelected)
+  {
+    auto id = item->data(0).toString().toStdString();
+    auto topLevel = this->TopLevelName(id);
+    if (!newTopLevel.contains(topLevel))
+      newTopLevel.push_back(topLevel);
+  }
+
+  // Update all items
   for (auto &item : this->scene->items())
   {
     std::string id = item->data(0).toString().toStdString();
     std::string type = item->data(1).toString().toStdString();
 
-    bool selected = false;
+    bool selected = newlySelected.contains(item);
 
-    // Deselect previously selected
-    if (this->selectedItems.contains(item) && !newlySelected.contains(item))
-    {
-      selected = false;
-    }
-    // Select all newly selected
-    else if (!this->selectedItems.contains(item) &&
-        newlySelected.contains(item))
+    // Add sibling links
+    if (!newlySelected.contains(item) &&
+        newTopLevel.contains(this->TopLevelName(id)) &&
+        type == "Link")
     {
       selected = true;
     }
-    else
-      continue;
 
     if (type == "Link")
       gui::model::Events::setSelectedLink(id, selected);
