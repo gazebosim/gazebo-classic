@@ -90,7 +90,7 @@ void AdiabaticAtmosphere::OnRequest(ConstRequestPtr &_msg)
     msgs::Atmosphere atmosphereMsg;
     atmosphereMsg.set_type(msgs::Atmosphere::ADIABATIC);
     atmosphereMsg.set_enable_atmosphere(this->World().AtmosphereEnabled());
-    atmosphereMsg.set_temperature(Atmosphere::Temperature());
+    atmosphereMsg.set_temperature(Atmosphere::Temperature().Kelvin());
     atmosphereMsg.set_pressure(Atmosphere::Pressure());
     atmosphereMsg.set_mass_density(Atmosphere::MassDensity());
 
@@ -117,9 +117,10 @@ void AdiabaticAtmosphere::SetTemperatureGradient(const double _gradient)
 }
 
 //////////////////////////////////////////////////
-double AdiabaticAtmosphere::Temperature(const double _altitude) const
+common::Temperature AdiabaticAtmosphere::Temperature(
+    const double _altitude) const
 {
-  double temperature = Atmosphere::Temperature() +
+  common::Temperature temperature = Atmosphere::Temperature() +
       Atmosphere::TemperatureGradient() * _altitude;
   return temperature;
 }
@@ -127,14 +128,14 @@ double AdiabaticAtmosphere::Temperature(const double _altitude) const
 //////////////////////////////////////////////////
 double AdiabaticAtmosphere::Pressure(const double _altitude) const
 {
-  if (!ignition::math::equal(Atmosphere::Temperature(), 0.0, 1e-6))
+  if (!ignition::math::equal(Atmosphere::Temperature().Kelvin(), 0.0, 1e-6))
   {
     // See https://en.wikipedia.org/wiki/Density_of_air#Altitude
     // or equation (18) from Manual of the ICAO Standard Atmosphere.
     // http://ntrs.nasa.gov/search.jsp?R=19930083952
     return Atmosphere::Pressure() *
-        pow(1 + (Atmosphere::TemperatureGradient() * _altitude) /
-            Atmosphere::Temperature(), this->dataPtr->adiabaticPower);
+        std::pow(1 + (Atmosphere::TemperatureGradient() * _altitude) /
+            Atmosphere::Temperature().Kelvin(), this->dataPtr->adiabaticPower);
   }
   else
   {
@@ -145,14 +146,15 @@ double AdiabaticAtmosphere::Pressure(const double _altitude) const
 //////////////////////////////////////////////////
 double AdiabaticAtmosphere::MassDensity(const double _altitude) const
 {
-  if (!ignition::math::equal(Atmosphere::Temperature(), 0.0, 1e-6))
+  if (!ignition::math::equal(Atmosphere::Temperature().Kelvin(), 0.0, 1e-6))
   {
     // See https://en.wikipedia.org/wiki/Density_of_air#Altitude
     // or equation (33) from Manual of the ICAO Standard Atmosphere.
     // http://ntrs.nasa.gov/search.jsp?R=19930083952
     return Atmosphere::MassDensity() *
-      pow(1 + (Atmosphere::TemperatureGradient() * _altitude) /
-          Atmosphere::Temperature(), this->dataPtr->adiabaticPower - 1);
+      std::pow(1 + (Atmosphere::TemperatureGradient() * _altitude) /
+          Atmosphere::Temperature().Kelvin(),
+          this->dataPtr->adiabaticPower - 1);
   }
   else
   {

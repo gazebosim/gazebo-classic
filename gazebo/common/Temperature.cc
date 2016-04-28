@@ -70,13 +70,13 @@ double Temperature::KelvinToCelsius(const double _temp)
 }
 
 /////////////////////////////////////////////////
-double Temperature::KelvinToFarenheit(const double _temp)
+double Temperature::KelvinToFahrenheit(const double _temp)
 {
   return _temp * 1.8 - 459.67;
 }
 
 /////////////////////////////////////////////////
-double Temperature::CelsiusToFarenheit(const double _temp)
+double Temperature::CelsiusToFahrenheit(const double _temp)
 {
   return _temp * 1.8 + 32.0;
 }
@@ -88,13 +88,13 @@ double Temperature::CelsiusToKelvin(const double _temp)
 }
 
 /////////////////////////////////////////////////
-double Temperature::FarenheitToCelsius(const double _temp)
+double Temperature::FahrenheitToCelsius(const double _temp)
 {
   return (_temp - 32.0) / 1.8;
 }
 
 /////////////////////////////////////////////////
-double Temperature::FarenheitToKelvin(const double _temp)
+double Temperature::FahrenheitToKelvin(const double _temp)
 {
   return std::max((_temp + 459.67) / 1.8, 0.0);
 }
@@ -112,9 +112,9 @@ void Temperature::SetCelsius(const double _temp)
 }
 
 /////////////////////////////////////////////////
-void Temperature::SetFarenheit(const double _temp)
+void Temperature::SetFahrenheit(const double _temp)
 {
-  this->SetKelvin(FarenheitToKelvin(_temp));
+  this->SetKelvin(FahrenheitToKelvin(_temp));
 }
 
 /////////////////////////////////////////////////
@@ -130,9 +130,9 @@ double Temperature::Celsius() const
 }
 
 /////////////////////////////////////////////////
-double Temperature::Farenheit() const
+double Temperature::Fahrenheit() const
 {
-  return KelvinToFarenheit(this->dataPtr->kelvin);
+  return KelvinToFahrenheit(this->dataPtr->kelvin);
 }
 
 /////////////////////////////////////////////////

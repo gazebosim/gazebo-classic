@@ -65,7 +65,8 @@ namespace gazebo
       public: virtual void SetTemperatureGradient(const double _gradient);
 
       // Documentation inherited
-      public: virtual double Temperature(const double _altitude = 0.0) const;
+      public: virtual common::Temperature Temperature(
+                  const double _altitude = 0.0) const;
 
       // Documentation inherited
       public: virtual double Pressure(const double _altitude = 0.0) const;

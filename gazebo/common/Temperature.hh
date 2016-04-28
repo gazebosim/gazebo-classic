@@ -40,7 +40,7 @@ namespace gazebo
     ///
     /// The default unit is Kelvin. Most functions that accept a double
     /// value will assume the double is Kelvin. The exceptions are a few of
-    /// the conversion functions, such as CelsiusToFarenheit. Similarly,
+    /// the conversion functions, such as CelsiusToFahrenheit. Similarly,
     /// most doubles that are returned will be in Kelvin.
     ///
     /// ## Example usage ##
@@ -62,7 +62,7 @@ namespace gazebo
     ///     gazebo::common::Temperature newTemp(temp);
     ///     newTemp += temp + 23.5;
     ///     std::cout << "Copied the temp object and added 23.5K. newTemp = "
-    ///               << newTemp.Farenheit() << "F" << std::endl;
+    ///               << newTemp.Fahrenheit() << "F" << std::endl;
     ///
     class GZ_COMMON_VISIBLE Temperature
     {
@@ -85,30 +85,30 @@ namespace gazebo
       /// \return Temperature in Celsius
       public: static double KelvinToCelsius(const double _temp);
 
-      /// \brief Convert Kelvin to Farenheit
+      /// \brief Convert Kelvin to Fahrenheit
       /// \param[in] _temp Temperature in Kelvin
-      /// \return Temperature in Farenheit
-      public: static double KelvinToFarenheit(const double _temp);
+      /// \return Temperature in Fahrenheit
+      public: static double KelvinToFahrenheit(const double _temp);
 
-      /// \brief Convert Celsius to Farenheit
+      /// \brief Convert Celsius to Fahrenheit
       /// \param[in] _temp Temperature in Celsius
-      /// \return Temperature in Farenheit
-      public: static double CelsiusToFarenheit(const double _temp);
+      /// \return Temperature in Fahrenheit
+      public: static double CelsiusToFahrenheit(const double _temp);
 
       /// \brief Convert Celsius to Kelvin
       /// \param[in] _temp Temperature in Celsius
       /// \return Temperature in Kelvin
       public: static double CelsiusToKelvin(const double _temp);
 
-      /// \brief Convert Farenheit to Celsius
-      /// \param[in] _temp Temperature in Farenheit
+      /// \brief Convert Fahrenheit to Celsius
+      /// \param[in] _temp Temperature in Fahrenheit
       /// \return Temperature in Celsius
-      public: static double FarenheitToCelsius(const double _temp);
+      public: static double FahrenheitToCelsius(const double _temp);
 
-      /// \brief Convert Farenheit to Kelvin
-      /// \param[in] _temp Temperature in Farenheit
+      /// \brief Convert Fahrenheit to Kelvin
+      /// \param[in] _temp Temperature in Fahrenheit
       /// \return Temperature in Kelvin
-      public: static double FarenheitToKelvin(const double _temp);
+      public: static double FahrenheitToKelvin(const double _temp);
 
       /// \brief Set the temperature from a Kelvin value
       /// \param[in] _temp Temperature in Kelvin
@@ -118,9 +118,9 @@ namespace gazebo
       /// \param[in] _temp Temperature in Celsius
       public: void SetCelsius(const double _temp);
 
-      /// \brief Set the temperature from a Farenheit value
-      /// \param[in] _temp Temperature in Farenheit
-      public: void SetFarenheit(const double _temp);
+      /// \brief Set the temperature from a Fahrenheit value
+      /// \param[in] _temp Temperature in Fahrenheit
+      public: void SetFahrenheit(const double _temp);
 
       /// \brief Get the temperature in Kelvin
       /// \return Temperature in Kelvin
@@ -130,9 +130,9 @@ namespace gazebo
       /// \return Temperature in Celsius
       public: double Celsius() const;
 
-      /// \brief Get the temperature in Farenheit
-      /// \return Temperature in Farenheit
-      public: double Farenheit() const;
+      /// \brief Get the temperature in Fahrenheit
+      /// \return Temperature in Fahrenheit
+      public: double Fahrenheit() const;
 
       /// \brief Accessor operator
       /// \return Temperature in Kelvin

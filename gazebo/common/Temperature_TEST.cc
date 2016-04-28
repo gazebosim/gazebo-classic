@@ -58,14 +58,14 @@ TEST_F(TemperatureTest, Constructor)
 TEST_F(TemperatureTest, Conversions)
 {
   EXPECT_NEAR(Temperature::KelvinToCelsius(0), -273.15, 1e-6);
-  EXPECT_NEAR(Temperature::KelvinToFarenheit(300), 80.33, 1e-6);
+  EXPECT_NEAR(Temperature::KelvinToFahrenheit(300), 80.33, 1e-6);
 
-  EXPECT_NEAR(Temperature::CelsiusToFarenheit(20.0), 68.0, 1e-6);
+  EXPECT_NEAR(Temperature::CelsiusToFahrenheit(20.0), 68.0, 1e-6);
   EXPECT_NEAR(Temperature::CelsiusToKelvin(10.0), 283.15, 1e-6);
 
-  EXPECT_NEAR(Temperature::FarenheitToCelsius(-40.0),
-              Temperature::CelsiusToFarenheit(-40.0), 1e-6);
-  EXPECT_NEAR(Temperature::FarenheitToKelvin(60.0), 288.71, 1e-6);
+  EXPECT_NEAR(Temperature::FahrenheitToCelsius(-40.0),
+              Temperature::CelsiusToFahrenheit(-40.0), 1e-6);
+  EXPECT_NEAR(Temperature::FahrenheitToKelvin(60.0), 288.71, 1e-6);
 }
 
 /////////////////////////////////////////////////
@@ -80,8 +80,8 @@ TEST_F(TemperatureTest, MutatorsAccessors)
   temp.SetCelsius(20);
   EXPECT_NEAR(temp(), 293.15, 1e-6);
 
-  temp.SetFarenheit(30);
-  EXPECT_NEAR(temp.Farenheit(), 30.0, 1e-6);
+  temp.SetFahrenheit(30);
+  EXPECT_NEAR(temp.Fahrenheit(), 30.0, 1e-6);
   EXPECT_NEAR(temp(), 272.0388889, 1e-6);
 }
 

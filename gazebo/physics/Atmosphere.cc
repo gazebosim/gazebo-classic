@@ -53,7 +53,7 @@ namespace gazebo
       public: World &world;
 
       /// \brief Temperature at sea level in kelvins.
-      public: double temperature = 288.15;
+      public: common::Temperature temperature = 288.15;
 
       /// \brief Temperature gradient at sea level in K/m.
       public: double temperatureGradient = -0.0065;
@@ -168,7 +168,7 @@ void Atmosphere::OnAtmosphereMsg(ConstAtmospherePtr &_msg)
 }
 
 //////////////////////////////////////////////////
-void Atmosphere::SetTemperature(const double _temperature)
+void Atmosphere::SetTemperature(const common::Temperature &_temperature)
 {
   this->dataPtr->temperature = _temperature;
   this->UpdateMassDensity();
@@ -188,7 +188,7 @@ void Atmosphere::SetPressure(const double _pressure)
 }
 
 //////////////////////////////////////////////////
-double Atmosphere::Temperature(const double /*_altitude*/) const
+common::Temperature Atmosphere::Temperature(const double /*_altitude*/) const
 {
   return this->dataPtr->temperature;
 }
@@ -228,5 +228,5 @@ void Atmosphere::UpdateMassDensity()
 {
   this->dataPtr->massDensity = Atmosphere::Pressure() *
     Atmosphere::MOLAR_MASS /
-    (Atmosphere::IDEAL_GAS_CONSTANT_R * Atmosphere::Temperature());
+    (Atmosphere::IDEAL_GAS_CONSTANT_R * Atmosphere::Temperature().Kelvin());
 }

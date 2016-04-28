@@ -21,6 +21,7 @@
 #include <string>
 
 #include "gazebo/msgs/msgs.hh"
+#include "gazebo/common/Temperature.hh"
 
 #include "gazebo/util/system.hh"
 
@@ -72,8 +73,8 @@ namespace gazebo
       protected: virtual void OnAtmosphereMsg(ConstAtmospherePtr &_msg);
 
       /// \brief Set the sea level temperature.
-      /// \param[in] _t Temperature value in kelvins.
-      public: virtual void SetTemperature(const double _t);
+      /// \param[in] _t Temperature value.
+      public: virtual void SetTemperature(const common::Temperature &_t);
 
       /// \brief Set the sea level pressure.
       /// \param[in] _pressure Pressure in pascals.
@@ -83,7 +84,8 @@ namespace gazebo
       /// altitude.
       /// \param[in] _altitude Altitude above sea level in meters.
       /// \return Modeled temperature in kelvin at the specified altitude.
-      public: virtual double Temperature(const double _altitude = 0.0) const;
+      public: virtual common::Temperature Temperature(
+                  const double _altitude = 0.0) const;
 
       /// \brief Get the pressure at a specified altitude in pascals.
       /// \param[in] _altitude Altitude above sea level in meters.
