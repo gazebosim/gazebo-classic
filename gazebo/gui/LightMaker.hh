@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_LIGHTMAKER_HH_
-#define _GAZEBO_LIGHTMAKER_HH_
+#ifndef GAZEBO_GUI_LIGHTMAKER_HH_
+#define GAZEBO_GUI_LIGHTMAKER_HH_
 
 #include <string>
 

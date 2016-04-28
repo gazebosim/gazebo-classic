@@ -38,16 +38,11 @@ using namespace gui;
 EntityMaker::EntityMaker(EntityMakerPrivate &_dataPtr)
   : dataPtr(&_dataPtr)
 {
-  this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init();
 }
 
 //////////////////////////////////////////////////
 EntityMaker::~EntityMaker()
 {
-  this->dataPtr->node->Fini();
-  this->dataPtr->node.reset();
-
   delete this->dataPtr;
   this->dataPtr = NULL;
 }

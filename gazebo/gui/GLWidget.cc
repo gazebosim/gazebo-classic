@@ -138,7 +138,7 @@ GLWidget::GLWidget(QWidget *_parent)
   if (!this->dataPtr->ignNode.Subscribe("/notification",
       &GLWidget::OnNotification, this))
   {
-    gzerr << "Error subscribing to deletion notifications." << std::endl;
+    gzerr << "Error subscribing to notifications." << std::endl;
   }
 
   this->installEventFilter(this);

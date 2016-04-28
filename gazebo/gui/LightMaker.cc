@@ -24,7 +24,8 @@
 #include <iostream>
 #include <sstream>
 
-#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Request.hh"
+
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Light.hh"
 #include "gazebo/rendering/Scene.hh"
@@ -41,8 +42,6 @@ LightMaker::LightMaker() : EntityMaker(*new LightMakerPrivate)
 {
   LightMakerPrivate *dPtr =
       reinterpret_cast<LightMakerPrivate *>(this->dataPtr);
-
-  dPtr->lightPub = dPtr->node->Advertise<msgs::Light>("~/factory/light");
 
   msgs::Set(dPtr->msg.mutable_diffuse(), common::Color(0.5, 0.5, 0.5, 1));
   msgs::Set(dPtr->msg.mutable_specular(), common::Color(0.1, 0.1, 0.1, 1));
@@ -120,15 +119,7 @@ bool LightMaker::Init()
   if (dPtr->lightTypename == "directional")
     dPtr->light->SetDirection(ignition::math::Vector3d(.1, .1, -0.9));
 
-  // Unique name
-  int counter = 0;
-  std::string lightName;
-  do
-  {
-    lightName = "user_" + dPtr->lightTypename + "_light_" +
-        std::to_string(counter++);
-  } while (scene->GetLight(lightName));
-  dPtr->msg.set_name(lightName);
+  dPtr->msg.set_name("user_" + dPtr->lightTypename + "_light");
 
   return true;
 }
@@ -171,7 +162,8 @@ void LightMaker::CreateTheEntity()
             dPtr->light->Position());
   msgs::Set(dPtr->msg.mutable_pose()->mutable_orientation(),
             ignition::math::Quaterniond());
-  dPtr->lightPub->Publish(dPtr->msg);
+
+  transport::RequestLightInsert(dPtr->msg);
 }
 
 /////////////////////////////////////////////////

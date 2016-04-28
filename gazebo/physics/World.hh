@@ -425,6 +425,9 @@ namespace gazebo
       /// \param[in] _init True if sensors have been initialized.
       public: void _SetSensorsInitialized(const bool _init);
 
+      public: std::string UniqueModelName(const std::string &_name);
+      public: std::string UniqueLightName(const std::string &_name);
+
       /// \cond
       /// This is an internal function.
       /// \brief Get a model by id.
@@ -543,17 +546,15 @@ namespace gazebo
       /// \brief
       private: void ProcessRequests();
 
-      /// \brief Process all received factory messages.
-      /// Must only be called from the World::ProcessMessages function.
+      /// \brief
       private: bool ProcessInsertEntityRequest(const msgs::Factory &_msg);
+
+      /// \brief
+      private: std::string ProcessInsertLightRequest(const msgs::Factory &_msg);
 
       /// \brief Process all received model messages.
       /// Must only be called from the World::ProcessMessages function.
       private: void ProcessModelMsgs();
-
-      /// \brief Process all received light factory messages.
-      /// Must only be called from the World::ProcessMessages function.
-      private: void ProcessLightFactoryMsgs();
 
       /// \brief Process all received light modify messages.
       /// Must only be called from the World::ProcessMessages function.
@@ -570,13 +571,6 @@ namespace gazebo
 
       /// \brief Thread function for logging state data.
       private: void LogWorker();
-
-      /// \brief Callback when a light message is received.
-      /// \param[in] _msg Pointer to the light message.
-      /// \deprecated Topic ~/light deprecated.
-      /// See OnLightFactoryMsg which subscribes to ~/factory/light and
-      /// OnLightModifyMsg which subscribes to ~/light/modify
-      private: void OnLightMsg(ConstLightPtr &_msg);
 
       /// \brief Callback when a light message is received in the
       /// ~/factory/light topic.

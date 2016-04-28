@@ -760,10 +760,6 @@ namespace gazebo
       private: bool ProcessVisualMsg(ConstVisualPtr &_msg,
           Visual::VisualType _type = Visual::VT_ENTITY);
 
-      /// \brief Light factory message callback.
-      /// \param[in] _msg The message data.
-      private: void OnLightFactoryMsg(ConstLightPtr &_msg);
-
       /// \brief Light modify message callback.
       /// \param[in] _msg The message data.
       private: void OnLightModifyMsg(ConstLightPtr &_msg);
@@ -830,8 +826,8 @@ namespace gazebo
       /// \param[in] _vis Visual that the visualizations are attached to.
       private: void RemoveVisualizations(VisualPtr _vis);
 
-      /// \brief Ignition callback notifying an entity was deleted.
-      /// \param[in] _msg Message containing data about the deleted entity.
+      /// \brief Ignition callback with a notification.
+      /// \param[in] _msg Message containing an operation.
       private: void OnNotification(const msgs::Operation &_msg);
 
       /// \internal

@@ -33,9 +33,6 @@ namespace gazebo
       /// \brief Message that holds all the light information.
       public: msgs::Light msg;
 
-      /// \brief Publisher used to spawn a new light.
-      public: transport::PublisherPtr lightPub;
-
       /// \brief Type of the light being spawned.
       public: std::string lightTypename;
 

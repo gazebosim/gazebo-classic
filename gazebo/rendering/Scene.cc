@@ -143,10 +143,6 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
   this->dataPtr->visSub =
       this->dataPtr->node->Subscribe("~/visual", &Scene::OnVisualMsg, this);
 
-  this->dataPtr->lightFactorySub =
-      this->dataPtr->node->Subscribe("~/factory/light",
-      &Scene::OnLightFactoryMsg, this);
-
   this->dataPtr->lightModifySub =
       this->dataPtr->node->Subscribe("~/light/modify",
       &Scene::OnLightModifyMsg, this);
@@ -187,7 +183,7 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
   if (!this->dataPtr->ignNode.Subscribe("/notification",
       &Scene::OnNotification, this))
   {
-    gzerr << "Error subscribing to deletion notifications." << std::endl;
+    gzerr << "Error subscribing to notifications." << std::endl;
   }
 
   this->dataPtr->sdf.reset(new sdf::Element);
@@ -2893,13 +2889,6 @@ void Scene::OnSkeletonPoseMsg(ConstPoseAnimationPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-void Scene::OnLightFactoryMsg(ConstLightPtr &_msg)
-{
-  std::lock_guard<std::mutex> lock(*this->dataPtr->receiveMutex);
-  this->dataPtr->lightFactoryMsgs.push_back(_msg);
-}
-
-/////////////////////////////////////////////////
 void Scene::OnLightModifyMsg(ConstLightPtr &_msg)
 {
   std::lock_guard<std::mutex> lock(*this->dataPtr->receiveMutex);
@@ -2937,8 +2926,7 @@ bool Scene::ProcessLightModifyMsg(ConstLightPtr &_msg)
 
   if (iter == this->dataPtr->lights.end())
   {
-    gzerr << "Light [" << _msg->name() << "] not found."
-        << " Use topic ~/factory/light to spawn a new light." << std::endl;
+    gzerr << "Light [" << _msg->name() << "] not found." << std::endl;
     return false;
   }
   else
@@ -3579,37 +3567,46 @@ void Scene::ToggleLayer(const int32_t _layer)
 //////////////////////////////////////////////////
 void Scene::OnNotification(const msgs::Operation &_msg)
 {
-  if (!(_msg.type() == msgs::Operation::DELETE_ENTITY &&
-      _msg.has_uri()))
+  // Deletion
+  if (_msg.type() == msgs::Operation::DELETE_ENTITY &&
+      _msg.has_uri())
   {
-    return;
-  }
+    std::string name = _msg.uri();
 
-  std::string name = _msg.uri();
+    Light_M::iterator lightIter = this->dataPtr->lights.find(name);
 
-  Light_M::iterator lightIter = this->dataPtr->lights.find(name);
-
-  // Check to see if the deleted entity is a light.
-  if (lightIter != this->dataPtr->lights.end())
-  {
-    this->dataPtr->lights.erase(lightIter);
-  }
-  // Otherwise delete a visual
-  else
-  {
-    VisualPtr visPtr;
-    try
+    // Check to see if the deleted entity is a light.
+    if (lightIter != this->dataPtr->lights.end())
     {
-      auto iter = this->dataPtr->visuals.find(std::stoul(name));
-      if (iter != this->dataPtr->visuals.end())
-        visPtr = iter->second;
-
-    } catch(...)
-    {
-      visPtr = this->GetVisual(name);
+      this->dataPtr->lights.erase(lightIter);
     }
+    // Otherwise delete a visual
+    else
+    {
+      VisualPtr visPtr;
+      try
+      {
+        auto iter = this->dataPtr->visuals.find(std::stoul(name));
+        if (iter != this->dataPtr->visuals.end())
+          visPtr = iter->second;
 
-    if (visPtr)
-      this->RemoveVisual(visPtr);
+      } catch(...)
+      {
+        visPtr = this->GetVisual(name);
+      }
+
+      if (visPtr)
+        this->RemoveVisual(visPtr);
+    }
+  }
+
+  // Light insertion
+  if (_msg.type() == msgs::Operation::INSERT_LIGHT &&
+      _msg.has_factory() && _msg.factory().has_light())
+  {
+    boost::shared_ptr<msgs::Light> fac(new msgs::Light(_msg.factory().light()));
+
+    std::lock_guard<std::mutex> lock(*this->dataPtr->receiveMutex);
+    this->dataPtr->lightFactoryMsgs.push_back(fac);
   }
 }

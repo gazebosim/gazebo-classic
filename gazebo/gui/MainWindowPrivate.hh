@@ -14,13 +14,15 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_GUI_MAINWINDOW_PRIVATE_HH_
-#define _GAZEBO_GUI_MAINWINDOW_PRIVATE_HH_
+#ifndef GAZEBO_GUI_MAINWINDOW_PRIVATE_HH_
+#define GAZEBO_GUI_MAINWINDOW_PRIVATE_HH_
 
 #include <map>
 #include <memory>
 #include <string>
 #include <vector>
+
+#include <ignition/transport/Node.hh>
 
 #include "gazebo/gazebo_config.h"
 #include "gazebo/gui/qt.h"
@@ -161,6 +163,9 @@ namespace gazebo
 
       /// \brief Class which manages user commands and undoing / redoing them.
       public: UserCmdHistory *userCmdHistory;
+
+      /// \brief Ignition node used for communication.
+      public: ignition::transport::Node ignNode;
     };
   }
 }

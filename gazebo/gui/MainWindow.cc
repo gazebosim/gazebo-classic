@@ -346,10 +346,6 @@ void MainWindow::Init()
     "~/light/modify",
     &MainWindow::OnLight, this);
 
-  this->dataPtr->lightFactorySub = this->dataPtr->node->Subscribe(
-    "~/factory/light",
-    &MainWindow::OnLight, this);
-
   this->dataPtr->requestPub =
     this->dataPtr->node->Advertise<msgs::Request>("~/request");
   this->dataPtr->responseSub = this->dataPtr->node->Subscribe("~/response",
@@ -361,6 +357,13 @@ void MainWindow::Init()
 
   this->dataPtr->requestMsg = msgs::CreateRequest("scene_info");
   this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
+
+  // Ignition transport
+  if (!this->dataPtr->ignNode.Subscribe("/notification",
+      &MainWindow::OnNotification, this))
+  {
+    gzerr << "Error subscribing to notifications." << std::endl;
+  }
 
   gui::Events::mainWindowReady();
 }
@@ -2443,4 +2446,15 @@ void MainWindow::OnWindowMode(const std::string &_mode)
 
   // User commands
   this->dataPtr->userCmdHistory->SetActive(simulation);
+}
+
+//////////////////////////////////////////////////
+void MainWindow::OnNotification(const msgs::Operation &_msg)
+{
+  // Light insertion
+  if (_msg.type() == msgs::Operation::INSERT_LIGHT &&
+      _msg.has_factory() && _msg.factory().has_light())
+  {
+    gui::Events::lightUpdate(_msg.factory().light());
+  }
 }

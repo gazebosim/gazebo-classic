@@ -117,3 +117,31 @@ size_t transport::RequestEntityClone(const std::string &_name,
   return id;
 }
 
+/////////////////////////////////////////////////
+size_t transport::RequestLightInsert(const msgs::Light &_msg)
+{
+  // Unused callback
+  std::function<void(const msgs::Empty &, const bool)> unused =
+    [](const msgs::Empty &, const bool &)
+  {
+  };
+
+  // Unique id for request
+  auto id = ignition::math::Rand::IntUniform(1, 10000);
+
+  // Operation msg
+  msgs::Factory fac;
+  fac.mutable_light()->CopyFrom(_msg);
+
+  msgs::Operation req;
+  req.set_type(msgs::Operation::INSERT_LIGHT);
+  req.set_id(id);
+  req.mutable_factory()->CopyFrom(fac);
+
+  // Request
+  ignition::transport::Node ignNode;
+  ignNode.Request("/request", req, unused);
+
+  return id;
+}
+

@@ -27,6 +27,9 @@ message Operation
 
     /// \brief Inserting an entity.
     INSERT_ENTITY = 2;
+
+    /// \brief Inserting a light.
+    INSERT_LIGHT = 3;
   }
 
   /// \brief Type of operation.
@@ -35,7 +38,7 @@ message Operation
   /// \brief Unique ID of operation.
   optional uint32 id = 2;
 
-  /// \brief Optional message about operation.
+  /// \brief When notifying, this can be used to tell whether it was a success.
   optional bool success = 3;
 
   /// \brief Optional message about operation.

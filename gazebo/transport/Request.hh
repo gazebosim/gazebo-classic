@@ -22,6 +22,7 @@
 #include <ignition/math/Helpers.hh>
 #include <ignition/math/Pose3.hh>
 
+#include "gazebo/msgs/msgs.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -47,6 +48,10 @@ namespace gazebo
         const ignition::math::Pose3d &_pose =
         ignition::math::Pose3d(IGN_DBL_MAX, IGN_DBL_MAX, IGN_DBL_MAX,
                                0, 0, 0));
+
+    /// \brief Helper class to create requests for ignition transport.
+    GZ_TRANSPORT_VISIBLE
+    size_t RequestLightInsert(const msgs::Light &_light);
   }
 }
 #endif

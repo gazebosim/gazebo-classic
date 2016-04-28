@@ -1,11 +1,12 @@
 package gazebo.msgs;
 
 /// \ingroup gazebo_msgs
-/// \interface Factory 
+/// \interface Factory
 /// \brief Message to create new model in gazebo
 
 
 import "pose.proto";
+import "light.proto";
 
 message Factory
 {
@@ -14,4 +15,11 @@ message Factory
   optional Pose pose                        = 3;
   optional string edit_name                 = 4;
   optional string clone_model_name          = 5;
+
+  /// \brief Whether the server is allowed to rename the model in case of
+  // collision with existing models.
+  optional bool allow_renaming              = 6;
+
+  /// \brief For inserting lights.
+  optional Light light = 7;
 }

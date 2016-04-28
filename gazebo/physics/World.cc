@@ -230,8 +230,6 @@ void World::Load(sdf::ElementPtr _sdf)
   this->dataPtr->jointSub = this->dataPtr->node->Subscribe("~/joint",
       &World::JointLog, this);
 
-  this->dataPtr->lightSub = this->dataPtr->node->Subscribe("~/light",
-      &World::OnLightMsg, this);
   this->dataPtr->lightFactorySub =
       this->dataPtr->node->Subscribe("~/factory/light",
       &World::OnLightFactoryMsg, this);
@@ -857,7 +855,6 @@ void World::Fini()
   {
     this->dataPtr->requestMsgs.clear();
     this->dataPtr->modelMsgs.clear();
-    this->dataPtr->lightFactoryMsgs.clear();
     this->dataPtr->lightModifyMsgs.clear();
 
     this->dataPtr->poseLocalPub.reset();
@@ -873,8 +870,6 @@ void World::Fini()
     this->dataPtr->playbackControlSub.reset();
     this->dataPtr->requestSub.reset();
     this->dataPtr->jointSub.reset();
-    this->dataPtr->lightSub.reset();
-    this->dataPtr->lightFactorySub.reset();
     this->dataPtr->lightModifySub.reset();
     this->dataPtr->modelSub.reset();
 
@@ -1871,7 +1866,7 @@ void World::ProcessLightModifyMsgs()
     if (!light)
     {
       gzerr << "Light [" << lightModifyMsg.name() << "] not found."
-          << " Use topic ~/factory/light to spawn a new light." << std::endl;
+          << std::endl;
       continue;
     }
     else
@@ -1898,35 +1893,45 @@ void World::ProcessLightModifyMsgs()
 }
 
 //////////////////////////////////////////////////
-void World::ProcessLightFactoryMsgs()
+std::string World::ProcessInsertLightRequest(const msgs::Factory &_msg)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
-  for (auto const &lightFactoryMsg : this->dataPtr->lightFactoryMsgs)
+  if (!_msg.has_light())
+    return false;
+
+  msgs::Light lightMsg;
+  lightMsg.CopyFrom(_msg.light());
+
+  auto name = lightMsg.name();
+  if (name.empty())
   {
-    LightPtr light = this->Light(lightFactoryMsg.name());
-
-    if (light)
-    {
-      gzerr << "Light [" << lightFactoryMsg.name() << "] already exists."
-          << " Use topic ~/light/modify to modify it." << std::endl;
-      continue;
-    }
-    else
-    {
-      // Add to world SDF
-      sdf::ElementPtr lightSDF = msgs::LightToSDF(lightFactoryMsg);
-      lightSDF->SetParent(this->dataPtr->sdf);
-      lightSDF->GetParent()->InsertElement(lightSDF);
-
-      // Create new light object
-      this->LoadLight(lightSDF, this->dataPtr->rootElement);
-    }
+    gzerr << "Can't load light with empty name" << std::endl;
+    return false;
   }
 
-  if (!this->dataPtr->lightFactoryMsgs.empty())
+  // Light with the given name already exists
+  if (this->Light(name))
   {
-    this->dataPtr->lightFactoryMsgs.clear();
+    // If allow renaming is disabled
+    if (_msg.has_allow_renaming() && !_msg.allow_renaming())
+    {
+      gzerr << "A light named [" << name << "] already exists "
+            << "and allow_renaming is false." << std::endl;
+      return false;
+    }
+
+    name = this->UniqueLightName(name);
+    lightMsg.set_name(name);
   }
+
+  // Add to world SDF
+  sdf::ElementPtr lightSDF = msgs::LightToSDF(lightMsg);
+  lightSDF->SetParent(this->dataPtr->sdf);
+  lightSDF->GetParent()->InsertElement(lightSDF);
+
+  // Create new light object
+  this->LoadLight(lightSDF, this->dataPtr->rootElement);
+
+  return name;
 }
 
 //////////////////////////////////////////////////
@@ -1972,13 +1977,7 @@ bool World::ProcessInsertEntityRequest(const msgs::Factory &_msg)
         model->GetSDF()->Clone());
 
     std::string newName = model->GetName() + "_clone";
-    int i = 0;
-    while (this->GetModel(newName))
-    {
-      newName = model->GetName() + "_clone_" +
-        boost::lexical_cast<std::string>(i);
-      i++;
-    }
+    newName = this->UniqueModelName(newName);
 
     this->dataPtr->factorySDF->Root()->GetElement("model")->GetAttribute(
         "name")->Set(newName);
@@ -2061,22 +2060,29 @@ bool World::ProcessInsertEntityRequest(const msgs::Factory &_msg)
     }
     else if (isModel)
     {
-      try
+      auto name = elem->Get<std::string>("name");
+      if (name.empty())
       {
-        auto name = elem->Get<std::string>("name");
-        if (name.empty())
-        {
-          gzerr << "Can't load model with empty name" << std::endl;
-          return false;
-        }
+        gzerr << "Can't load model with empty name" << std::endl;
+        return false;
+      }
 
-        if (this->GetModel(name))
+      // Model with the given name already exists
+      if (this->GetModel(name))
+      {
+        // If allow renaming is disabled
+        if (_msg.has_allow_renaming() && !_msg.allow_renaming())
         {
           gzerr << "A model named [" << name << "] already exists. "
-                << "Spawn model with an unique name." << std::endl;
+                << "and allow_renaming is false." << std::endl;
           return false;
         }
 
+        elem->GetAttribute("name")->Set(this->UniqueModelName(name));
+      }
+
+      try
+      {
         boost::mutex::scoped_lock lock(this->dataPtr->factoryDeleteMutex);
 
         ModelPtr model = this->LoadModel(elem, this->dataPtr->rootElement);
@@ -2091,11 +2097,32 @@ bool World::ProcessInsertEntityRequest(const msgs::Factory &_msg)
     }
     else if (isLight)
     {
+      auto name = elem->Get<std::string>("name");
+      if (name.empty())
+      {
+        gzerr << "Can't load light with empty name" << std::endl;
+        return false;
+      }
+
+      // Light with the given name already exists
+      if (this->Light(name))
+      {
+        // If allow renaming is disabled
+        if (_msg.has_allow_renaming() && !_msg.allow_renaming())
+        {
+          gzerr << "A light named [" << name << "] already exists "
+                << "and allow_renaming is false." << std::endl;
+          return false;
+        }
+
+        elem->GetAttribute("name")->Set(this->UniqueLightName(name));
+      }
+
       try
       {
         boost::mutex::scoped_lock lock(this->dataPtr->factoryDeleteMutex);
 
-        LightPtr light = this->LoadLight(elem, this->dataPtr->rootElement);
+        this->LoadLight(elem, this->dataPtr->rootElement);
       }
       catch(...)
       {
@@ -2516,7 +2543,6 @@ void World::ProcessMessages()
     this->ProcessRequestMsgs();
     this->ProcessRequests();
     this->ProcessModelMsgs();
-    this->ProcessLightFactoryMsgs();
     this->ProcessLightModifyMsgs();
     this->dataPtr->prevProcessMsgsTime = common::Time::GetWallTime();
   }
@@ -2798,14 +2824,6 @@ bool World::RemoveModel(const std::string &_name)
   return true;
 }
 
-
-/////////////////////////////////////////////////
-void World::OnLightMsg(ConstLightPtr &/*_msg*/)
-{
-  gzerr << "Topic ~/light deprecated, use ~/factory/light to spawn new lights "
-      << "and ~/light/modify to modify existing lights." << std::endl;
-}
-
 /////////////////////////////////////////////////
 void World::OnLightModifyMsg(ConstLightPtr &_msg)
 {
@@ -2816,8 +2834,21 @@ void World::OnLightModifyMsg(ConstLightPtr &_msg)
 /////////////////////////////////////////////////
 void World::OnLightFactoryMsg(ConstLightPtr &_msg)
 {
-  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
-  this->dataPtr->lightFactoryMsgs.push_back(*_msg);
+  gzwarn << "Factory topic is deprecated. Use "
+      << "transport::RequestEntityInsert() instead." << std::endl;
+
+  // TODO: Converting to operation on Gazebo8, remove on Gazebo9
+  msgs::Factory fac;
+  fac.mutable_light()->CopyFrom(*_msg);
+
+  msgs::Operation msg;
+  msg.set_type(msgs::Operation::INSERT_LIGHT);
+  msg.mutable_factory()->CopyFrom(fac);
+
+  {
+    std::lock_guard<std::mutex> lock(this->dataPtr->requestsMutex);
+    this->dataPtr->requests.push_back(msg);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -2947,6 +2978,33 @@ void World::ProcessRequests()
       }
       this->dataPtr->ignNode.Publish("/notification", msg);
     }
+    // Light insert
+    else if (request.type() == msgs::Operation::INSERT_LIGHT &&
+        request.has_factory() && request.factory().has_light())
+    {
+      // Notify whether insertion succeeded or failed
+      msgs::Operation msg;
+      msg.set_type(msgs::Operation::INSERT_LIGHT);
+      msg.set_id(request.id());
+      msg.mutable_factory()->CopyFrom(request.factory());
+
+      auto lightName = this->ProcessInsertLightRequest(request.factory());
+
+      if (!lightName.empty())
+      {
+        msg.set_msg("Light [" + lightName + "] inserted successfully.");
+        msg.set_success(true);
+
+        // Update light name in factory msg
+        msg.mutable_factory()->mutable_light()->set_name(lightName);
+      }
+      else
+      {
+        msg.set_msg("Failed to insert light. See log for details.");
+        msg.set_success(false);
+      }
+      this->dataPtr->ignNode.Publish("/notification", msg);
+    }
     else
     {
       gzwarn << "Unrecognized request [" << request.DebugString() << "]"
@@ -2959,5 +3017,29 @@ void World::ProcessRequests()
     this->EnableAllModels();
     this->dataPtr->requests.clear();
   }
+}
+
+//////////////////////////////////////////////////
+std::string World::UniqueModelName(const std::string &_name)
+{
+  std::string result = _name;
+
+  int i = 0;
+  while (this->GetModel(result))
+    result = _name + "_" + std::to_string(i++);
+
+  return result;
+}
+
+//////////////////////////////////////////////////
+std::string World::UniqueLightName(const std::string &_name)
+{
+  std::string result = _name;
+
+  int i = 0;
+  while (this->Light(result))
+    result = _name + "_" + std::to_string(i++);
+
+  return result;
 }
 

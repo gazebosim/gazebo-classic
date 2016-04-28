@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_ENTITYMAKER_PRIVATE_HH_
-#define _GAZEBO_ENTITYMAKER_PRIVATE_HH_
-
-#include <ignition/math/Vector3.hh>
-
-#include "gazebo/transport/TransportTypes.hh"
-#include "gazebo/gui/EntityMaker.hh"
+#ifndef GAZEBO_GUI_ENTITYMAKER_PRIVATE_HH_
+#define GAZEBO_GUI_ENTITYMAKER_PRIVATE_HH_
 
 namespace gazebo
 {
@@ -29,9 +24,6 @@ namespace gazebo
     /// \brief Private data for the EntityMaker class
     class EntityMakerPrivate
     {
-      /// \brief Node to publish messages and spawn the entity. Each derived
-      /// class must create its own publisher to the appropriate topic.
-      public: transport::NodePtr node;
     };
   }
 }

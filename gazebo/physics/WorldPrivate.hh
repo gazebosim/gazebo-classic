@@ -195,9 +195,6 @@ namespace gazebo
       /// \brief Model message buffer.
       public: std::list<msgs::Model> modelMsgs;
 
-      /// \brief Light factory message buffer.
-      public: std::list<msgs::Light> lightFactoryMsgs;
-
       /// \brief Light modify message buffer.
       public: std::list<msgs::Light> lightModifyMsgs;
 

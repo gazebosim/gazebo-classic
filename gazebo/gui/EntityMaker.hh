@@ -14,13 +14,10 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_ENTITYMAKER_HH_
-#define _GAZEBO_ENTITYMAKER_HH_
+#ifndef GAZEBO_GUI_ENTITYMAKER_HH_
+#define GAZEBO_GUI_ENTITYMAKER_HH_
 
-#include <boost/function.hpp>
 #include <ignition/math/Vector3.hh>
-
-#include "gazebo/transport/TransportTypes.hh"
 
 namespace gazebo
 {
