@@ -86,5 +86,11 @@ Connection::~Connection()
 //////////////////////////////////////////////////
 int Connection::GetId() const
 {
+  return this->Id();
+}
+
+//////////////////////////////////////////////////
+int Connection::Id() const
+{
   return this->dataPtr->id;
 }

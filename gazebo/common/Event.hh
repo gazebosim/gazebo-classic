@@ -107,7 +107,12 @@ namespace gazebo
 
       /// \brief Get the id of this connection.
       /// \return The id of this connection.
-      public: int GetId() const;
+      /// \deprecated See const Id() const;
+      public: int GetId() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the id of this connection.
+      /// \return The id of this connection.
+      public: int Id() const;
 
       /// \brief Private data pointer.
       private: std::unique_ptr<ConnectionPrivate> dataPtr;
@@ -616,7 +621,7 @@ namespace gazebo
       if (!_c)
         return;
 
-      this->Disconnect(_c->GetId());
+      this->Disconnect(_c->Id());
       _c->dataPtr->event = nullptr;
       _c->dataPtr->id = -1;
     }
