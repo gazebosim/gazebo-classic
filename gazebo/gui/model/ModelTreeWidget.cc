@@ -388,7 +388,7 @@ void ModelTreeWidget::OnItemClicked(QTreeWidgetItem *_item,
     std::string type = _item->data(1, Qt::UserRole).toString().toStdString();
 
     // Deselect incompatible types. For example, joints and Links can't be
-    // selected at the same time, but links and nested can.
+    // selected at the same time, but links and nested models can.
     if (type != selectedType &&
         !((type == "Link" && selectedType == "Nested Model") ||
         (type == "Nested Model" && selectedType == "Link")))
