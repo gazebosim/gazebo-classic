@@ -461,14 +461,17 @@ JointData *JointMaker::CreateJointLine(const std::string &_name,
     const rendering::VisualPtr &_parent)
 {
   rendering::VisualPtr jointVis(
-      new rendering::Visual(_name, _parent->GetParent(), false));
+      new rendering::Visual(_name, _parent->GetRootVisual(), false));
   jointVis->Load();
   rendering::DynamicLines *jointLine =
       jointVis->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
-  auto origin = _parent->GetWorldPose().Ign().Pos()
-      - _parent->GetParent()->GetWorldPose().Ign().Pos();
-  jointLine->AddPoint(origin);
-  jointLine->AddPoint(origin + ignition::math::Vector3d(0, 0, 0.1));
+
+  auto parentOriginInRootFrame = _parent->GetWorldPose().Ign().Pos()
+      - _parent->GetRootVisual()->GetWorldPose().Ign().Pos();
+  jointLine->AddPoint(parentOriginInRootFrame);
+  jointLine->AddPoint(
+      parentOriginInRootFrame + ignition::math::Vector3d(0, 0, 0.1));
+
   jointVis->GetSceneNode()->setInheritScale(false);
   jointVis->GetSceneNode()->setInheritOrientation(false);
 
@@ -654,26 +657,24 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
   if (this->dataPtr->newJoint && this->dataPtr->newJoint->parent &&
       this->dataPtr->hoverVis && this->dataPtr->newJoint->line)
   {
-    ignition::math::Vector3d parentPos;
+    ignition::math::Vector3d posWorld;
 
-    // Set end point to center of child link
+    // Set end point to origin of child link
     if (!this->dataPtr->hoverVis->IsPlane())
     {
-      parentPos =  this->LinkWorldCentroid(this->dataPtr->newJoint->parent)
-          - this->dataPtr->newJoint->line->Point(0);
+      posWorld = this->dataPtr->hoverVis->GetWorldPose().Ign().Pos();
     }
     // Set end point to mouse plane intersection
     else
     {
-      ignition::math::Vector3d pt;
       camera->WorldPointOnPlane(_event.Pos().X(), _event.Pos().Y(),
-          ignition::math::Planed(ignition::math::Vector3d(0, 0, 1)), pt);
-
-      parentPos = this->LinkWorldCentroid(this->dataPtr->newJoint->parent)
-          - this->dataPtr->newJoint->line->Point(0) - pt;
+          ignition::math::Planed(ignition::math::Vector3d(0, 0, 1)), posWorld);
     }
-    this->dataPtr->newJoint->line->SetPoint(1,
-        (this->LinkWorldCentroid(this->dataPtr->hoverVis) - parentPos));
+
+    // Set point in root frame
+    this->dataPtr->newJoint->line->SetPoint(1, posWorld -
+        this->dataPtr->newJoint->parent->GetRootVisual()->
+        GetWorldPose().Ign().Pos());
   }
   return true;
 }
@@ -1013,25 +1014,6 @@ JointMaker::JointType JointMaker::State() const
 }
 
 /////////////////////////////////////////////////
-ignition::math::Vector3d JointMaker::LinkWorldCentroid(
-    const rendering::VisualPtr &_visual)
-{
-  ignition::math::Vector3d centroid;
-  int count = 0;
-  for (unsigned int i = 0; i < _visual->GetChildCount(); ++i)
-  {
-    if (_visual->GetChild(i)->GetName().find("_JOINT_VISUAL_") ==
-        std::string::npos)
-    {
-      centroid += _visual->GetChild(i)->GetWorldPose().Ign().Pos();
-      count++;
-    }
-  }
-  centroid /= count;
-  return centroid;
-}
-
-/////////////////////////////////////////////////
 unsigned int JointMaker::JointCount()
 {
   return this->dataPtr->joints.size();
@@ -1212,9 +1194,7 @@ void JointData::Update()
     // Parent - mouse
     else if (this->parent && this->parent->GetParent())
     {
-      ignition::math::Vector3d origin = (this->parent->GetWorldPose().pos
-          - this->parent->GetParent()->GetWorldPose().pos).Ign();
-      this->line->SetPoint(0, origin);
+      this->line->SetPoint(0, this->parent->GetWorldPose().Ign().Pos());
     }
   }
 
@@ -1487,15 +1467,16 @@ void JointMaker::CreateJointFromSDF(sdf::ElementPtr _jointElem,
 
   // Visuals
   rendering::VisualPtr jointVis(
-      new rendering::Visual(jointVisName, parentVis->GetParent(), false));
+      new rendering::Visual(jointVisName, parentVis->GetRootVisual(), false));
   jointVis->Load();
   rendering::DynamicLines *jointLine =
       jointVis->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
 
-  auto origin = parentVis->GetWorldPose().Ign().Pos()
-      - parentVis->GetParent()->GetWorldPose().Ign().Pos();
-  jointLine->AddPoint(origin);
-  jointLine->AddPoint(origin + ignition::math::Vector3d(0, 0, 0.1));
+  auto parentOriginInRootFrame = parentVis->GetWorldPose().Ign().Pos()
+      - parentVis->GetRootVisual()->GetWorldPose().Ign().Pos();
+  jointLine->AddPoint(parentOriginInRootFrame);
+  jointLine->AddPoint(parentOriginInRootFrame +
+                      ignition::math::Vector3d(0, 0, 0.1));
 
   jointVis->GetSceneNode()->setInheritScale(false);
   jointVis->GetSceneNode()->setInheritOrientation(false);
@@ -1742,7 +1723,7 @@ rendering::VisualPtr JointMaker::LinkVisualFromName(const std::string &_name)
 
 /////////////////////////////////////////////////
 void JointMaker::SetLinksRelativePose(const ignition::math::Pose3d &_pose,
-    const bool _reset)
+    const bool _resetAll, const int _resetAxis)
 {
   if (!this->dataPtr->newJoint || !this->dataPtr->newJoint->parent ||
       !this->dataPtr->newJoint->child)
@@ -1750,13 +1731,25 @@ void JointMaker::SetLinksRelativePose(const ignition::math::Pose3d &_pose,
     return;
   }
 
-  ignition::math::Pose3d newChildPose;
+  auto newChildPose = this->dataPtr->newJoint->child->GetWorldPose().Ign();
 
-  if (_reset)
+  if (_resetAll)
   {
     newChildPose = this->dataPtr->childLinkOriginalPose;
     this->dataPtr->newJoint->parent->SetWorldPose(
         this->dataPtr->parentLinkOriginalPose);
+  }
+  else if (_resetAxis == 0)
+  {
+    newChildPose.Pos().X(this->dataPtr->childLinkOriginalPose.Pos().X());
+  }
+  else if (_resetAxis == 1)
+  {
+    newChildPose.Pos().Y(this->dataPtr->childLinkOriginalPose.Pos().Y());
+  }
+  else if (_resetAxis == 2)
+  {
+    newChildPose.Pos().Z(this->dataPtr->childLinkOriginalPose.Pos().Z());
   }
   else
   {

@@ -772,9 +772,12 @@ void JointCreationDialog::UpdateRelativePose(
   this->dataPtr->configWidget->SetPoseWidgetValue("relative_pose", _pose);
 
   if (this->dataPtr->alignPending)
+  {
     this->dataPtr->alignPending = false;
-  else
-    this->UncheckAllAlign();
+    return;
+  }
+
+  this->UncheckAllAlign(true);
 }
 
 /////////////////////////////////////////////////
@@ -862,9 +865,66 @@ bool JointCreationDialog::CheckValid()
 /////////////////////////////////////////////////
 void JointCreationDialog::OnAlign(const int _int)
 {
-  // Reset pose
-  this->dataPtr->jointMaker->SetLinksRelativePose(ignition::math::Pose3d(),
-      true);
+  // Button groups
+  std::vector<std::string> axes = {"x", "y", "z"};
+  std::vector<std::string> configs = {"min", "center", "max"};
+
+  // Find out which axis was changed
+  QButtonGroup *group = NULL;
+  unsigned int g;
+  QObject *senderObject = this->sender();
+  if (senderObject == this->dataPtr->reverseXBox)
+  {
+    g = 0;
+    group = this->dataPtr->alignGroups[g];
+  }
+  else if (senderObject == this->dataPtr->reverseYBox)
+  {
+    g = 1;
+    group = this->dataPtr->alignGroups[g];
+  }
+  else if (senderObject == this->dataPtr->reverseZBox)
+  {
+    g = 2;
+    group = this->dataPtr->alignGroups[g];
+  }
+  else
+  {
+    for (g = 0; g < this->dataPtr->alignGroups.size(); ++g)
+    {
+      group = this->dataPtr->alignGroups[g];
+
+      if (senderObject == group)
+      {
+        break;
+      }
+    }
+  }
+
+  // When changing target, reset everything
+  if (senderObject == this->dataPtr->alignCombo)
+  {
+    this->dataPtr->jointMaker->SetLinksRelativePose(
+        ignition::math::Pose3d::Zero, true);
+  }
+  // Reset only the axis which was changed
+  else
+  {
+    this->dataPtr->jointMaker->SetLinksRelativePose(
+        ignition::math::Pose3d::Zero, false, g);
+  }
+
+  // Uncheck other buttons in the same group
+  if (group && qobject_cast<QButtonGroup *>(senderObject))
+  {
+    for (int i = 0; i < group->buttons().size(); ++i)
+    {
+      if (i != _int)
+      {
+        group->buttons()[i]->setChecked(false);
+      }
+    }
+  }
 
   // Reference link
   bool childToParent = this->dataPtr->alignCombo->currentIndex() == 0;
@@ -875,29 +935,16 @@ void JointCreationDialog::OnAlign(const int _int)
   reverse.push_back(this->dataPtr->reverseYBox->isChecked());
   reverse.push_back(this->dataPtr->reverseZBox->isChecked());
 
-  // Button groups
-  std::vector<std::string> axes = {"x", "y", "z"};
-  std::vector<std::string> configs = {"min", "center", "max"};
-  for (unsigned int g = 0; g < this->dataPtr->alignGroups.size(); ++g)
+  // Go through all groups and align
+  for (g = 0; g < this->dataPtr->alignGroups.size(); ++g)
   {
-    auto group = this->dataPtr->alignGroups[g];
+    group = this->dataPtr->alignGroups[g];
 
-    // Uncheck other buttons in the same group
-    if (this->sender() == group)
-    {
-      for (int i = 0; i < group->buttons().size(); ++i)
-      {
-        if (i != _int)
-        {
-          group->buttons()[i]->setChecked(false);
-        }
-      }
-    }
-
-    // Align for the checked button of each group
+    // Align if there is a checked button
     int checked = group->checkedId();
     if (checked >= 0 && checked <=2)
     {
+      // Align
       this->dataPtr->jointMaker->AlignLinks(childToParent, axes[g],
           configs[checked], reverse[g]);
     }
@@ -907,17 +954,33 @@ void JointCreationDialog::OnAlign(const int _int)
 }
 
 /////////////////////////////////////////////////
-void JointCreationDialog::UncheckAllAlign()
+void JointCreationDialog::UncheckAllAlign(const bool _blockSignals)
 {
   for (auto group : this->dataPtr->alignGroups)
   {
     for (auto button : group->buttons())
+    {
+      bool blocked = button->signalsBlocked();
+      button->blockSignals(_blockSignals);
       button->setChecked(false);
+      button->blockSignals(blocked);
+    }
   }
 
+  bool blocked = this->dataPtr->reverseXBox->signalsBlocked();
+  this->dataPtr->reverseXBox->blockSignals(_blockSignals);
   this->dataPtr->reverseXBox->setChecked(false);
+  this->dataPtr->reverseXBox->blockSignals(blocked);
+
+  blocked = this->dataPtr->reverseYBox->signalsBlocked();
+  this->dataPtr->reverseYBox->blockSignals(_blockSignals);
   this->dataPtr->reverseYBox->setChecked(false);
+  this->dataPtr->reverseYBox->blockSignals(blocked);
+
+  blocked = this->dataPtr->reverseZBox->signalsBlocked();
+  this->dataPtr->reverseZBox->blockSignals(_blockSignals);
   this->dataPtr->reverseZBox->setChecked(false);
+  this->dataPtr->reverseZBox->blockSignals(blocked);
 }
 
 /////////////////////////////////////////////////

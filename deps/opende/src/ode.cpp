@@ -27,11 +27,11 @@
 // this source file is mostly concerned with the data structures, not the
 // numerics.
 
-#include <ode/ode.h>
-#include <ode/odemath.h>
-#include <ode/matrix.h>
-#include <ode/memory.h>
-#include <ode/error.h>
+#include <gazebo/ode/ode.h>
+#include <gazebo/ode/odemath.h>
+#include <gazebo/ode/matrix.h>
+#include <gazebo/ode/memory.h>
+#include <gazebo/ode/error.h>
 #include "config.h"
 #include "objects.h"
 #include "joints/joints.h"

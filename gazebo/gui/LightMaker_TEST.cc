@@ -39,13 +39,7 @@ void LightMaker_TEST::PointLight()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get scene
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
@@ -98,13 +92,7 @@ void LightMaker_TEST::PointLight()
   light = scene->GetLight("user_point_light");
   QVERIFY(light == NULL);
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Check there's a light in the scene -- this is the final pointLight
   light = scene->GetLight("user_point_light_0");
@@ -130,13 +118,7 @@ void LightMaker_TEST::CopyLight()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get scene
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
@@ -189,13 +171,7 @@ void LightMaker_TEST::CopyLight()
   light = scene->GetLight("spotlight_clone_tmp");
   QVERIFY(light == NULL);
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Check there's a light in the scene -- this is the final light
   light = scene->GetLight("spotlight_clone");

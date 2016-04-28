@@ -21,7 +21,7 @@
  *************************************************************************/
 
 
-#include <ode/misc.h>
+#include <gazebo/ode/misc.h>
 #include "config.h"
 #include "hinge.h"
 #include "joint_internal.h"

@@ -128,7 +128,7 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   this->dataPtr->showJointsAct->setCheckable(true);
   this->dataPtr->showJointsAct->setChecked(true);
   connect(this->dataPtr->showJointsAct, SIGNAL(toggled(bool)),
-      this->dataPtr->modelPalette->GetModelCreator()->GetJointMaker(),
+      this->dataPtr->modelPalette->GetModelCreator()->JointMaker(),
       SLOT(ShowJoints(bool)));
 
   // Clone actions from main window
@@ -262,7 +262,7 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   connect(this->dataPtr->jointAct, SIGNAL(triggered()), this,
       SLOT(OnAddSelectedJoint()));
 
-  connect(this->dataPtr->modelPalette->GetModelCreator()->GetJointMaker(),
+  connect(this->dataPtr->modelPalette->GetModelCreator()->JointMaker(),
       SIGNAL(JointAdded()), this, SLOT(OnJointAdded()));
 
   this->dataPtr->connections.push_back(
