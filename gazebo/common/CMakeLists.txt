@@ -65,6 +65,7 @@ set (sources
   STLLoader.cc
   SystemPaths.cc
   SVGLoader.cc
+  Temperature.cc
   Time.cc
   Timer.cc
   URI.cc
@@ -121,6 +122,7 @@ set (headers
   STLLoader.hh
   SystemPaths.hh
   SVGLoader.hh
+  Temperature.hh
   Time.hh
   Timer.hh
   UpdateInfo.hh
