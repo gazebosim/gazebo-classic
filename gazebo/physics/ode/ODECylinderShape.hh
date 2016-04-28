@@ -25,6 +25,9 @@ namespace gazebo
 {
   namespace physics
   {
+    /// \addtogroup gazebo_physics_ode
+    /// \{
+
     /// \brief ODE cylinder shape
     class GZ_PHYSICS_VISIBLE ODECylinderShape : public CylinderShape
     {
@@ -50,6 +53,7 @@ namespace gazebo
           dGeomCylinderSetParams(oParent->GetCollisionId(), _radius, _length);
       }
     };
+    /// \}
   }
 }
 #endif
