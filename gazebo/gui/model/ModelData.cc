@@ -106,9 +106,8 @@ std::string NestedModelData::Name() const
 {
   if (this->modelSDF)
     return this->modelSDF->Get<std::string>("name");
-  else
-    gzerr << "Model SDF not found." << std::endl;
 
+  gzerr << "Model SDF not found." << std::endl;
   return "";
 }
 
@@ -126,9 +125,8 @@ ignition::math::Pose3d NestedModelData::Pose() const
 {
   if (this->modelSDF)
     return this->modelSDF->Get<ignition::math::Pose3d>("pose");
-  else
-    gzerr << "Model SDF not found." << std::endl;
 
+  gzerr << "Model SDF not found." << std::endl;
   return ignition::math::Pose3d::Zero;
 }
 

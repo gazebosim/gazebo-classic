@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_GUI_MODEL_MEUSERCMDMANAGER_HH_
-#define _GAZEBO_GUI_MODEL_MEUSERCMDMANAGER_HH_
+#ifndef GAZEBO_GUI_MODEL_MEUSERCMDMANAGER_HH_
+#define GAZEBO_GUI_MODEL_MEUSERCMDMANAGER_HH_
 
 #include <memory>
 #include <string>
@@ -49,22 +49,22 @@ namespace gazebo
       public: enum CmdType
       {
         /// \brief Insert a link.
-        INSERTING_LINK,
+        INSERTING_LINK = 0,
 
         /// \brief Delete a link.
-        DELETING_LINK,
+        DELETING_LINK = 1,
 
         /// \brief Insert a nested model.
-        INSERTING_NESTED_MODEL,
+        INSERTING_NESTED_MODEL = 2,
 
         /// \brief Delete a nested model.
-        DELETING_NESTED_MODEL,
+        DELETING_NESTED_MODEL = 3,
 
         /// \brief Insert a joint.
-        INSERTING_JOINT,
+        INSERTING_JOINT = 4,
 
         /// \brief Delete a joint.
-        DELETING_JOINT
+        DELETING_JOINT = 5
       };
 
       /// \brief Constructor

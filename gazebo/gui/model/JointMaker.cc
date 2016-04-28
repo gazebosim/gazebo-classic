@@ -56,7 +56,7 @@ JointMaker::JointMaker() : dataPtr(new JointMakerPrivate())
   this->unitVectors.push_back(ignition::math::Vector3d::UnitY);
   this->unitVectors.push_back(ignition::math::Vector3d::UnitZ);
 
-  this->dataPtr->newJoint = NULL;
+  this->dataPtr->newJoint = nullptr;
   this->dataPtr->modelSDF.reset();
   this->dataPtr->jointType = JointMaker::JOINT_NONE;
   this->dataPtr->jointCounter = 0;
@@ -80,7 +80,7 @@ JointMaker::JointMaker() : dataPtr(new JointMakerPrivate())
   this->jointTypes[JOINT_GEARBOX]   = "gearbox";
   this->jointTypes[JOINT_NONE]      = "none";
 
-  this->dataPtr->jointCreationDialog = NULL;
+  this->dataPtr->jointCreationDialog = nullptr;
 
   this->dataPtr->connections.push_back(
       event::Events::ConnectPreRender(
@@ -134,7 +134,7 @@ JointMaker::~JointMaker()
   if (this->dataPtr->newJoint)
   {
     delete this->dataPtr->newJoint;
-    this->dataPtr->newJoint = NULL;
+    this->dataPtr->newJoint = nullptr;
   }
 
   {
@@ -158,7 +158,7 @@ void JointMaker::Reset()
   if (this->dataPtr->newJoint)
   {
     delete this->dataPtr->newJoint;
-    this->dataPtr->newJoint = NULL;
+    this->dataPtr->newJoint = nullptr;
   }
 
   this->dataPtr->jointType = JointMaker::JOINT_NONE;
@@ -211,7 +211,7 @@ void JointMaker::RemoveJoint(const std::string &_jointId)
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->updateMutex);
 
   std::string jointId = _jointId;
-  JointData *joint = NULL;
+  JointData *joint = nullptr;
 
   auto jointIt = this->dataPtr->joints.find(_jointId);
 
@@ -248,7 +248,7 @@ void JointMaker::RemoveJoint(const std::string &_jointId)
   if (joint->handles)
   {
     scene->OgreSceneManager()->destroyBillboardSet(joint->handles);
-    joint->handles = NULL;
+    joint->handles = nullptr;
   }
 
   if (joint->hotspot)
@@ -288,10 +288,10 @@ void JointMaker::RemoveJoint(const std::string &_jointId)
   {
     joint->inspector->hide();
     delete joint->inspector;
-    joint->inspector = NULL;
+    joint->inspector = nullptr;
   }
 
-  this->dataPtr->newJoint = NULL;
+  this->dataPtr->newJoint = nullptr;
   joint->hotspot.reset();
   joint->visual.reset();
   joint->jointVisual.reset();
@@ -482,7 +482,7 @@ JointData *JointMaker::CreateJointLine(const std::string &_name,
   if (this->dataPtr->jointType == JOINT_NONE)
   {
     gzwarn << "Can't create joint line of type JOINT_NONE" << std::endl;
-    return NULL;
+    return nullptr;
   }
 
   rendering::VisualPtr jointVis(
@@ -1318,7 +1318,7 @@ void JointData::UpdateMsg()
   for (unsigned int i = 0; i < axisCount; ++i)
   {
     msgs::Axis *axisMsg;
-    msgs::Axis *oldAxisMsg = NULL;
+    msgs::Axis *oldAxisMsg = nullptr;
     if (i == 0u)
     {
       axisMsg = this->jointMsg->mutable_axis1();
@@ -1759,14 +1759,14 @@ rendering::VisualPtr JointMaker::LinkVisualFromName(const std::string &_name)
   if (scopedName.empty())
   {
     gzwarn << "No link found with name [" << _name << "]" << std::endl;
-    return NULL;
+    return nullptr;
   }
 
   // Get visual
   rendering::ScenePtr scene = rendering::get_scene();
 
   if (!scene)
-    return NULL;
+    return nullptr;
 
   return scene->GetVisual(scopedName);
 }
@@ -1898,7 +1898,7 @@ void JointMaker::FinalizeCreation()
     cmd->SetJointId(this->dataPtr->newJoint->hotspot->GetName());
   }
 
-  this->dataPtr->newJoint = NULL;
+  this->dataPtr->newJoint = nullptr;
 
   // Notify ModelEditor to uncheck tool button
   this->JointAdded();
