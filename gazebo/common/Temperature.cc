@@ -236,13 +236,13 @@ Temperature &Temperature::operator*=(const Temperature &_temp)
 /////////////////////////////////////////////////
 Temperature Temperature::operator/(const double _temp)
 {
-  return Temperature(this->dataPtr->kelvin /= _temp);
+  return Temperature(this->dataPtr->kelvin / _temp);
 }
 
 /////////////////////////////////////////////////
 Temperature Temperature::operator/(const Temperature &_temp)
 {
-  return Temperature(this->dataPtr->kelvin /= _temp.Kelvin());
+  return Temperature(this->dataPtr->kelvin / _temp.Kelvin());
 }
 
 /////////////////////////////////////////////////
