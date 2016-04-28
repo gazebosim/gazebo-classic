@@ -155,6 +155,7 @@ set (gtest_sources
   SphericalCoordinates_TEST.cc
   SystemPaths_TEST.cc
   SVGLoader_TEST.cc
+  Temperature_TEST.cc
   Time_TEST.cc
   URI_TEST.cc
 )
