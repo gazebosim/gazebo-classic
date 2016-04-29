@@ -417,6 +417,10 @@ void SimbodyPhysics::UpdateCollision()
   // Get all contacts from Simbody
   const SimTK::State &state = this->integ->getState();
 
+  // The tracker cannot generate a snapshot without a subsystem
+  if (state.getNumSubsystems() == 0)
+    return;
+
   // get contact snapshot
   const SimTK::ContactSnapshot &contactSnapshot =
     this->tracker.getActiveContacts(state);
@@ -638,6 +642,10 @@ void SimbodyPhysics::UpdatePhysics()
 
   common::Time currTime =  this->world->GetRealTime();
 
+  // Simbody cannot step the integrator without a subsystem
+  const SimTK::State &s = this->integ->getState();
+  if (s.getNumSubsystems() == 0)
+    return;
 
   bool trying = true;
   while (trying && integ->getTime() < this->world->GetSimTime().Double())
@@ -656,7 +664,6 @@ void SimbodyPhysics::UpdatePhysics()
   }
 
   this->simbodyPhysicsStepped = true;
-  const SimTK::State &s = this->integ->getState();
 
   // debug
   // gzerr << "time [" << s.getTime()
