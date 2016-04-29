@@ -24,6 +24,9 @@ namespace gazebo
 {
   namespace physics
   {
+    /// \addtogroup gazebo_physics_ode
+    /// \{
+
     /// \brief ODE specific version of MultiRayShape
     class GZ_PHYSICS_VISIBLE ODEMultiRayShape : public MultiRayShape
     {
@@ -64,6 +67,7 @@ namespace gazebo
       /// function.
       private: bool defaultUpdate = true;
     };
+    /// \}
   }
 }
 #endif

@@ -38,6 +38,8 @@ namespace gazebo
   namespace event
   {
     /// \addtogroup gazebo_event Events
+    /// \brief Signals and connections to send and receive event-based
+    /// triggers.
     /// \{
 
     /// \class Event Event.hh common/common.hh
@@ -75,7 +77,7 @@ namespace gazebo
       private: bool signaled;
     };
 
-    /// \internal
+    /// \cond
     // Private data members for Connection class.
     class ConnectionPrivate
     {
@@ -93,6 +95,7 @@ namespace gazebo
       /// \brief set during the constructor
       public: common::Time creationTime;
     };
+    /// \endcond
 
     /// \brief A class that encapsulates a connection.
     class GZ_COMMON_VISIBLE Connection
@@ -141,7 +144,7 @@ namespace gazebo
       public: boost::function<T> callback;
     };
 
-    /// \internal
+    /// \cond
     // Private data members for EventT<T> class.
     template< typename T>
     class EventTPrivate
@@ -161,6 +164,7 @@ namespace gazebo
       public: std::list<typename EvtConnectionMap::const_iterator>
               connectionsToRemove;
     };
+    /// \endcond
 
     /// \class EventT Event.hh common/common.hh
     /// \brief A class for event processing.

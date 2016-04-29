@@ -33,9 +33,7 @@ namespace gazebo
     /// Forward declare private data class
     class DARTLinkPrivate;
 
-    /// \ingroup gazebo_physics
-    /// \addtogroup gazebo_physics_dart DART Physics
-    /// \brief dart physics engine wrapper
+    /// \addtogroup gazebo_physics_dart
     /// \{
 
     /// \brief DART Link class

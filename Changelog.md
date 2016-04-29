@@ -68,6 +68,9 @@
     * [Pull request 2259](https://bitbucket.org/osrf/gazebo/pull-request/2259)
     * [Issue #1583](https://bitbucket.org/osrf/gazebo/issues/1583)
 
+1. PIMPLize gui/model/ModelEditorPalette
+    * [Pull request 2279](https://bitbucket.org/osrf/gazebo/pull-request/2279)
+
 1. Properly cleanup pointers when destroying a blank world.
     * [Pull request 2220](https://bitbucket.org/osrf/gazebo/pull-request/2220)
 
