@@ -17,6 +17,9 @@
 1. Adds an output option to gz log that allows the tool to filter a log file and write to a new log file.
     * [Pull request #2149](https://bitbucket.org/osrf/gazebo/pull-request/2149)
 
+1. Add common::URI class
+    * [Pull request #2275](https://bitbucket.org/osrf/gazebo/pull-request/2275)
+
 1. Update Actor animations by faciliting skeleton visualization, control via a plugin. Also resolves issue #1785.
     * [Pull request #2219](https://bitbucket.org/osrf/gazebo/pull-request/2219)
 
@@ -61,8 +64,11 @@
     * [Pull request 2259](https://bitbucket.org/osrf/gazebo/pull-request/2259)
     * [Issue #1583](https://bitbucket.org/osrf/gazebo/issues/1583)
 
-1. Remove blank world
+1. Properly cleanup pointers when destroying a blank world.
     * [Pull request 2220](https://bitbucket.org/osrf/gazebo/pull-request/2220)
+
+1. Properly cleanup pointers when destroying a world with models and lights.
+    * [Pull request 2263](https://bitbucket.org/osrf/gazebo/pull-request/2263)
 
 ## Gazebo 7.1.0 (2016-04-07)
 

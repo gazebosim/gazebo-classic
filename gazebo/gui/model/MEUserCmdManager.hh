@@ -49,28 +49,28 @@ namespace gazebo
       public: enum CmdType
       {
         /// \brief Insert a link.
-        INSERTING_LINK,
+        INSERTING_LINK = 0,
 
         /// \brief Delete a link.
-        DELETING_LINK,
+        DELETING_LINK = 1,
 
         /// \brief Insert a nested model.
-        INSERTING_NESTED_MODEL,
+        INSERTING_NESTED_MODEL = 2,
 
         /// \brief Delete a nested model.
-        DELETING_NESTED_MODEL,
+        DELETING_NESTED_MODEL = 3,
 
         /// \brief Insert a joint.
-        INSERTING_JOINT,
+        INSERTING_JOINT = 4,
 
         /// \brief Delete a joint.
-        DELETING_JOINT,
+        DELETING_JOINT = 5,
 
         /// \brief Move a link.
-        MOVING_LINK,
+        MOVING_LINK = 6,
 
         /// \brief Move a nested model.
-        MOVING_NESTED_MODEL
+        MOVING_NESTED_MODEL = 7
       };
 
       /// \brief Constructor

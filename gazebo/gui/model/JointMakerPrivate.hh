@@ -94,7 +94,7 @@ namespace gazebo
 
       /// \brief Pointer to the user command manager. The pointer's lifetime is
       /// managed by ModelCreator, so we don't need to delete it.
-      public: MEUserCmdManager *userCmdManager = NULL;
+      public: MEUserCmdManager *userCmdManager = nullptr;
     };
   }
 }

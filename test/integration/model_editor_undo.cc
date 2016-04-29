@@ -42,7 +42,7 @@ void ModelEditorUndoTest::LinkInsertionByMouse()
 
   // Create the main window.
   auto mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
   mainWindow->Load();
   mainWindow->Init();
   mainWindow->show();
@@ -51,29 +51,29 @@ void ModelEditorUndoTest::LinkInsertionByMouse()
 
   // Get the user camera, scene and GLWidget
   auto cam = gazebo::gui::get_active_camera();
-  QVERIFY(cam != NULL);
+  QVERIFY(cam != nullptr);
   auto scene = cam->GetScene();
-  QVERIFY(scene != NULL);
+  QVERIFY(scene != nullptr);
   auto glWidget = mainWindow->findChild<gazebo::gui::GLWidget *>("GLWidget");
-  QVERIFY(glWidget != NULL);
+  QVERIFY(glWidget != nullptr);
 
   // Get the cylinder button on the model editor palette
   auto cylinderButton = mainWindow->findChild<QToolButton *>(
       "modelEditorPaletteCylinderButton");
-  QVERIFY(cylinderButton != NULL);
+  QVERIFY(cylinderButton != nullptr);
   QVERIFY(!cylinderButton->isChecked());
   QVERIFY(!cylinderButton->isVisible());
 
   // Enter the model editor
-  QVERIFY(gazebo::gui::g_editModelAct != NULL);
+  QVERIFY(gazebo::gui::g_editModelAct != nullptr);
   gazebo::gui::g_editModelAct->trigger();
   QVERIFY(cylinderButton->isVisible());
 
   // Check undo/redo are disabled
-  QVERIFY(gazebo::gui::g_undoAct != NULL);
-  QVERIFY(gazebo::gui::g_undoHistoryAct != NULL);
-  QVERIFY(gazebo::gui::g_redoAct != NULL);
-  QVERIFY(gazebo::gui::g_redoHistoryAct != NULL);
+  QVERIFY(gazebo::gui::g_undoAct != nullptr);
+  QVERIFY(gazebo::gui::g_undoHistoryAct != nullptr);
+  QVERIFY(gazebo::gui::g_redoAct != nullptr);
+  QVERIFY(gazebo::gui::g_redoHistoryAct != nullptr);
   QVERIFY(!gazebo::gui::g_undoAct->isEnabled());
   QVERIFY(!gazebo::gui::g_undoHistoryAct->isEnabled());
   QVERIFY(!gazebo::gui::g_redoAct->isEnabled());
@@ -104,7 +104,7 @@ void ModelEditorUndoTest::LinkInsertionByMouse()
 
     // Check the link has been inserted
     auto link = scene->GetVisual(insertedLinkDefaultName);
-    QVERIFY(link != NULL);
+    QVERIFY(link != nullptr);
 
     // Undo
     gzmsg << "Undo inserting [" << insertedLinkDefaultName << "]" << std::endl;
@@ -118,7 +118,7 @@ void ModelEditorUndoTest::LinkInsertionByMouse()
 
     // Check the link has been removed
     link = scene->GetVisual(insertedLinkDefaultName);
-    QVERIFY(link == NULL);
+    QVERIFY(link == nullptr);
 
     // Redo
     gzmsg << "Redo inserting [" << insertedLinkDefaultName << "]" << std::endl;
@@ -127,7 +127,7 @@ void ModelEditorUndoTest::LinkInsertionByMouse()
 
   mainWindow->close();
   delete mainWindow;
-  mainWindow = NULL;
+  mainWindow = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -141,7 +141,7 @@ void ModelEditorUndoTest::LinkDeletionByContextMenu()
 
   // Create the main window.
   auto mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
   mainWindow->Load();
   mainWindow->Init();
   mainWindow->show();
@@ -150,20 +150,20 @@ void ModelEditorUndoTest::LinkDeletionByContextMenu()
 
   // Get the user camera, scene and GLWidget
   auto cam = gazebo::gui::get_active_camera();
-  QVERIFY(cam != NULL);
+  QVERIFY(cam != nullptr);
   auto scene = cam->GetScene();
-  QVERIFY(scene != NULL);
+  QVERIFY(scene != nullptr);
 
   // Enter the model editor to edit the box model
-  QVERIFY(gazebo::gui::g_editModelAct != NULL);
+  QVERIFY(gazebo::gui::g_editModelAct != nullptr);
   gazebo::gui::g_editModelAct->trigger();
   gazebo::gui::Events::editModel("box");
 
   // Check undo/redo are disabled
-  QVERIFY(gazebo::gui::g_undoAct != NULL);
-  QVERIFY(gazebo::gui::g_undoHistoryAct != NULL);
-  QVERIFY(gazebo::gui::g_redoAct != NULL);
-  QVERIFY(gazebo::gui::g_redoHistoryAct != NULL);
+  QVERIFY(gazebo::gui::g_undoAct != nullptr);
+  QVERIFY(gazebo::gui::g_undoHistoryAct != nullptr);
+  QVERIFY(gazebo::gui::g_redoAct != nullptr);
+  QVERIFY(gazebo::gui::g_redoHistoryAct != nullptr);
   QVERIFY(!gazebo::gui::g_undoAct->isEnabled());
   QVERIFY(!gazebo::gui::g_undoHistoryAct->isEnabled());
   QVERIFY(!gazebo::gui::g_redoAct->isEnabled());
@@ -172,7 +172,7 @@ void ModelEditorUndoTest::LinkDeletionByContextMenu()
   // Check the visuals have been created inside the editor
   std::string linkVisName = "ModelPreview_1::link";
   auto link = scene->GetVisual(linkVisName);
-  QVERIFY(link != NULL);
+  QVERIFY(link != nullptr);
 
   // Open the context menu and trigger the delete action
   QTimer::singleShot(500, this, SLOT(TriggerDelete()));
@@ -191,7 +191,7 @@ void ModelEditorUndoTest::LinkDeletionByContextMenu()
 
     // Check the link has been deleted
     link = scene->GetVisual(linkVisName);
-    QVERIFY(link == NULL);
+    QVERIFY(link == nullptr);
 
     // Undo
     gzmsg << "Undo deleting [" << linkVisName << "]" << std::endl;
@@ -207,7 +207,7 @@ void ModelEditorUndoTest::LinkDeletionByContextMenu()
 
     // Check the link has been inserted
     link = scene->GetVisual(linkVisName);
-    QVERIFY(link != NULL);
+    QVERIFY(link != nullptr);
 
     // Redo
     gzmsg << "Redo deleting [" << linkVisName << "]" << std::endl;
@@ -216,7 +216,7 @@ void ModelEditorUndoTest::LinkDeletionByContextMenu()
 
   mainWindow->close();
   delete mainWindow;
-  mainWindow = NULL;
+  mainWindow = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -229,7 +229,7 @@ void ModelEditorUndoTest::NestedModelInsertionByMouse()
 
   // Create the main window.
   auto mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
   mainWindow->Load();
   mainWindow->Init();
   mainWindow->show();
@@ -238,11 +238,11 @@ void ModelEditorUndoTest::NestedModelInsertionByMouse()
 
   // Get the user camera, scene and GLWidget
   auto cam = gazebo::gui::get_active_camera();
-  QVERIFY(cam != NULL);
+  QVERIFY(cam != nullptr);
   auto scene = cam->GetScene();
-  QVERIFY(scene != NULL);
+  QVERIFY(scene != nullptr);
   auto glWidget = mainWindow->findChild<gazebo::gui::GLWidget *>("GLWidget");
-  QVERIFY(glWidget != NULL);
+  QVERIFY(glWidget != nullptr);
 
   // Add the test model database to the insert tab
   gazebo::common::SystemPaths::Instance()->AddModelPathsUpdate(
@@ -251,7 +251,7 @@ void ModelEditorUndoTest::NestedModelInsertionByMouse()
   // Get the insert model widget
   auto insertModelWidget = mainWindow->findChild<
       gazebo::gui::InsertModelWidget *>("insertModel");
-  QVERIFY(insertModelWidget != NULL);
+  QVERIFY(insertModelWidget != nullptr);
 
   // Get the items in the list
   auto tree = insertModelWidget->findChildren<QTreeWidget *>();
@@ -261,14 +261,14 @@ void ModelEditorUndoTest::NestedModelInsertionByMouse()
   QVERIFY(cococanItem.size() > 0);
 
   // Enter the model editor
-  QVERIFY(gazebo::gui::g_editModelAct != NULL);
+  QVERIFY(gazebo::gui::g_editModelAct != nullptr);
   gazebo::gui::g_editModelAct->trigger();
 
   // Check undo/redo are disabled
-  QVERIFY(gazebo::gui::g_undoAct != NULL);
-  QVERIFY(gazebo::gui::g_undoHistoryAct != NULL);
-  QVERIFY(gazebo::gui::g_redoAct != NULL);
-  QVERIFY(gazebo::gui::g_redoHistoryAct != NULL);
+  QVERIFY(gazebo::gui::g_undoAct != nullptr);
+  QVERIFY(gazebo::gui::g_undoHistoryAct != nullptr);
+  QVERIFY(gazebo::gui::g_redoAct != nullptr);
+  QVERIFY(gazebo::gui::g_redoHistoryAct != nullptr);
   QVERIFY(!gazebo::gui::g_undoAct->isEnabled());
   QVERIFY(!gazebo::gui::g_undoHistoryAct->isEnabled());
   QVERIFY(!gazebo::gui::g_redoAct->isEnabled());
@@ -296,7 +296,7 @@ void ModelEditorUndoTest::NestedModelInsertionByMouse()
 
     // Check the model has been inserted
     auto link = scene->GetVisual(insertedModelName);
-    QVERIFY(link != NULL);
+    QVERIFY(link != nullptr);
 
     // Undo
     gzmsg << "Undo inserting [" << insertedModelName << "]" << std::endl;
@@ -310,7 +310,7 @@ void ModelEditorUndoTest::NestedModelInsertionByMouse()
 
     // Check the model has been removed
     link = scene->GetVisual(insertedModelName);
-    QVERIFY(link == NULL);
+    QVERIFY(link == nullptr);
 
     // Redo
     gzmsg << "Redo inserting [" << insertedModelName << "]" << std::endl;
@@ -319,7 +319,7 @@ void ModelEditorUndoTest::NestedModelInsertionByMouse()
 
   mainWindow->close();
   delete mainWindow;
-  mainWindow = NULL;
+  mainWindow = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -333,7 +333,7 @@ void ModelEditorUndoTest::NestedModelDeletionByContextMenu()
 
   // Create the main window.
   auto mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
   mainWindow->Load();
   mainWindow->Init();
   mainWindow->show();
@@ -342,20 +342,20 @@ void ModelEditorUndoTest::NestedModelDeletionByContextMenu()
 
   // Get the user camera, scene and GLWidget
   auto cam = gazebo::gui::get_active_camera();
-  QVERIFY(cam != NULL);
+  QVERIFY(cam != nullptr);
   auto scene = cam->GetScene();
-  QVERIFY(scene != NULL);
+  QVERIFY(scene != nullptr);
 
   // Enter the model editor to edit the nested model
-  QVERIFY(gazebo::gui::g_editModelAct != NULL);
+  QVERIFY(gazebo::gui::g_editModelAct != nullptr);
   gazebo::gui::g_editModelAct->trigger();
   gazebo::gui::Events::editModel("model_00");
 
   // Check undo/redo are disabled
-  QVERIFY(gazebo::gui::g_undoAct != NULL);
-  QVERIFY(gazebo::gui::g_undoHistoryAct != NULL);
-  QVERIFY(gazebo::gui::g_redoAct != NULL);
-  QVERIFY(gazebo::gui::g_redoHistoryAct != NULL);
+  QVERIFY(gazebo::gui::g_undoAct != nullptr);
+  QVERIFY(gazebo::gui::g_undoHistoryAct != nullptr);
+  QVERIFY(gazebo::gui::g_redoAct != nullptr);
+  QVERIFY(gazebo::gui::g_redoHistoryAct != nullptr);
   QVERIFY(!gazebo::gui::g_undoAct->isEnabled());
   QVERIFY(!gazebo::gui::g_undoHistoryAct->isEnabled());
   QVERIFY(!gazebo::gui::g_redoAct->isEnabled());
@@ -372,7 +372,7 @@ void ModelEditorUndoTest::NestedModelDeletionByContextMenu()
   visNames.push_back("ModelPreview_1::joint_01_UNIQUE_ID_");
   visNames.push_back("ModelPreview_1::joint_02_UNIQUE_ID_");
   for (auto name : visNames)
-    QVERIFY(scene->GetVisual(name) != NULL);
+    QVERIFY(scene->GetVisual(name) != nullptr);
 
   // Open the context menu and trigger the delete action
   QTimer::singleShot(500, this, SLOT(TriggerDelete()));
@@ -391,7 +391,7 @@ void ModelEditorUndoTest::NestedModelDeletionByContextMenu()
 
     // Check the model has been deleted
     for (auto name : visNames)
-      QVERIFY(scene->GetVisual(name) == NULL);
+      QVERIFY(scene->GetVisual(name) == nullptr);
 
     // Undo 4 times - one for each joint and one for the model
     gzmsg << "Undo deleting [" << visNames[0] << "]" << std::endl;
@@ -408,7 +408,7 @@ void ModelEditorUndoTest::NestedModelDeletionByContextMenu()
 
     // Check the model has been inserted
     for (auto name : visNames)
-      QVERIFY(scene->GetVisual(name) != NULL);
+      QVERIFY(scene->GetVisual(name) != nullptr);
 
     // Redo 4 times - one for each joint and one for the model
     gzmsg << "Redo deleting [" << visNames[0] << "]" << std::endl;
@@ -418,7 +418,7 @@ void ModelEditorUndoTest::NestedModelDeletionByContextMenu()
 
   mainWindow->close();
   delete mainWindow;
-  mainWindow = NULL;
+  mainWindow = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -431,7 +431,7 @@ void ModelEditorUndoTest::JointInsertionByDialog()
 
   // Create the main window.
   auto mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
   mainWindow->Load();
   mainWindow->Init();
   mainWindow->show();
@@ -440,21 +440,21 @@ void ModelEditorUndoTest::JointInsertionByDialog()
 
   // Get the user camera, scene, GLWidget and JointMaker
   auto cam = gazebo::gui::get_active_camera();
-  QVERIFY(cam != NULL);
+  QVERIFY(cam != nullptr);
   auto scene = cam->GetScene();
-  QVERIFY(scene != NULL);
+  QVERIFY(scene != nullptr);
   auto glWidget = mainWindow->findChild<gazebo::gui::GLWidget *>("GLWidget");
-  QVERIFY(glWidget != NULL);
+  QVERIFY(glWidget != nullptr);
   auto modelPalette = mainWindow->findChild<gazebo::gui::ModelEditorPalette *>(
       "modelEditorPalette");
-  QVERIFY(modelPalette != NULL);
+  QVERIFY(modelPalette != nullptr);
   auto jointMaker = modelPalette->GetModelCreator()->JointMaker();
-  QVERIFY(jointMaker != NULL);
+  QVERIFY(jointMaker != nullptr);
 
   // Get the cylinder button on the model editor palette
   auto cylinderButton = mainWindow->findChild<QToolButton *>(
       "modelEditorPaletteCylinderButton");
-  QVERIFY(cylinderButton != NULL);
+  QVERIFY(cylinderButton != nullptr);
 
   // Add the test model database to the insert tab
   gazebo::common::SystemPaths::Instance()->AddModelPathsUpdate(
@@ -463,7 +463,7 @@ void ModelEditorUndoTest::JointInsertionByDialog()
   // Get the insert model widget
   auto insertModelWidget = mainWindow->findChild<
       gazebo::gui::InsertModelWidget *>("insertModel");
-  QVERIFY(insertModelWidget != NULL);
+  QVERIFY(insertModelWidget != nullptr);
 
   // Get the items in the list
   auto tree = insertModelWidget->findChildren<QTreeWidget *>();
@@ -473,14 +473,14 @@ void ModelEditorUndoTest::JointInsertionByDialog()
   QVERIFY(nestedModelItem.size() > 0);
 
   // Enter the model editor
-  QVERIFY(gazebo::gui::g_editModelAct != NULL);
+  QVERIFY(gazebo::gui::g_editModelAct != nullptr);
   gazebo::gui::g_editModelAct->trigger();
 
   // Check undo/redo are disabled
-  QVERIFY(gazebo::gui::g_undoAct != NULL);
-  QVERIFY(gazebo::gui::g_undoHistoryAct != NULL);
-  QVERIFY(gazebo::gui::g_redoAct != NULL);
-  QVERIFY(gazebo::gui::g_redoHistoryAct != NULL);
+  QVERIFY(gazebo::gui::g_undoAct != nullptr);
+  QVERIFY(gazebo::gui::g_undoHistoryAct != nullptr);
+  QVERIFY(gazebo::gui::g_redoAct != nullptr);
+  QVERIFY(gazebo::gui::g_redoHistoryAct != nullptr);
   QVERIFY(!gazebo::gui::g_undoAct->isEnabled());
   QVERIFY(!gazebo::gui::g_undoHistoryAct->isEnabled());
   QVERIFY(!gazebo::gui::g_redoAct->isEnabled());
@@ -523,7 +523,7 @@ void ModelEditorUndoTest::JointInsertionByDialog()
   visNames.push_back("ModelPreview_0::" + childLink);
   for (auto name : visNames)
   {
-    QVERIFY2(scene->GetVisual(name) != NULL,
+    QVERIFY2(scene->GetVisual(name) != nullptr,
         std::string("Can't find visual [" + name + "]").c_str());
   }
 
@@ -538,7 +538,7 @@ void ModelEditorUndoTest::JointInsertionByDialog()
 
     // Check the joint has been inserted
     auto joint = scene->GetVisual(visNames[0]);
-    QVERIFY(joint != NULL);
+    QVERIFY(joint != nullptr);
 
     // Undo
     gzmsg << "Undo inserting [" << visNames[0] << "]" << std::endl;
@@ -553,7 +553,7 @@ void ModelEditorUndoTest::JointInsertionByDialog()
 
     // Check the joint has been removed
     joint = scene->GetVisual(visNames[0]);
-    QVERIFY(joint == NULL);
+    QVERIFY(joint == nullptr);
 
     // Redo
     gzmsg << "Redo inserting [" << visNames[0] << "]" << std::endl;
@@ -562,7 +562,7 @@ void ModelEditorUndoTest::JointInsertionByDialog()
 
   mainWindow->close();
   delete mainWindow;
-  mainWindow = NULL;
+  mainWindow = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -575,7 +575,7 @@ void ModelEditorUndoTest::TriggerDelete()
         widget->objectName() == "ModelEditorContextMenu")
     {
       auto context = qobject_cast<QMenu *>(widget);
-      QVERIFY(context != NULL);
+      QVERIFY(context != nullptr);
 
       // This only works as long as the Delete action is the last one in the
       // menu
