@@ -65,7 +65,6 @@ set (sources
   STLLoader.cc
   SystemPaths.cc
   SVGLoader.cc
-  Temperature.cc
   Time.cc
   Timer.cc
   URI.cc
@@ -122,7 +121,6 @@ set (headers
   STLLoader.hh
   SystemPaths.hh
   SVGLoader.hh
-  Temperature.hh
   Time.hh
   Timer.hh
   UpdateInfo.hh
@@ -155,7 +153,6 @@ set (gtest_sources
   SphericalCoordinates_TEST.cc
   SystemPaths_TEST.cc
   SVGLoader_TEST.cc
-  Temperature_TEST.cc
   Time_TEST.cc
   URI_TEST.cc
 )

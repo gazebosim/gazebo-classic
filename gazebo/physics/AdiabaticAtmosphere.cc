@@ -117,10 +117,10 @@ void AdiabaticAtmosphere::SetTemperatureGradient(const double _gradient)
 }
 
 //////////////////////////////////////////////////
-common::Temperature AdiabaticAtmosphere::Temperature(
+ignition::math::Temperature AdiabaticAtmosphere::Temperature(
     const double _altitude) const
 {
-  common::Temperature temperature = Atmosphere::Temperature() +
+  ignition::math::Temperature temperature = Atmosphere::Temperature() +
       Atmosphere::TemperatureGradient() * _altitude;
   return temperature;
 }

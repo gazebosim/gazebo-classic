@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-
+#include <ignition/math/Temperature.hh>
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/msgs/msgs.hh"
 
@@ -100,7 +100,7 @@ void AtmosphereTest::AtmosphereParam(const std::string &_atmosphere)
   // Test Atmosphere::[GS]etParam()
   {
     physics::Atmosphere &atmosphere = world->Atmosphere();
-    common::Temperature temperature = atmosphere.Temperature();
+    ignition::math::Temperature temperature = atmosphere.Temperature();
     EXPECT_DOUBLE_EQ(temperature.Kelvin(), atmospherePubMsg.temperature());
   }
 
