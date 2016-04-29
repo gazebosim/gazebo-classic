@@ -30,6 +30,9 @@ namespace gazebo
 {
   namespace physics
   {
+    /// \addtogroup gazebo_physics_ode
+    /// \{
+
     /// \brief A slider joint
     class GZ_PHYSICS_VISIBLE ODESliderJoint : public SliderJoint<ODEJoint>
     {
@@ -76,6 +79,7 @@ namespace gazebo
       // Documentation inherited
       protected: virtual void SetForceImpl(unsigned int _index, double _effort);
     };
+    /// \}
   }
 }
 #endif

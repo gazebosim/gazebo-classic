@@ -95,25 +95,39 @@ void ModelData::UpdateRenderGroup(rendering::VisualPtr _visual)
 /////////////////////////////////////////////////
 void NestedModelData::SetName(const std::string &_name)
 {
-  this->modelSDF->GetAttribute("name")->Set(_name);
+  if (this->modelSDF)
+    this->modelSDF->GetAttribute("name")->Set(_name);
+  else
+    gzerr << "Model SDF not found." << std::endl;
 }
 
 /////////////////////////////////////////////////
 std::string NestedModelData::Name() const
 {
-  return this->modelSDF->Get<std::string>("name");
+  if (this->modelSDF)
+    return this->modelSDF->Get<std::string>("name");
+
+  gzerr << "Model SDF not found." << std::endl;
+  return "";
 }
 
 /////////////////////////////////////////////////
 void NestedModelData::SetPose(const ignition::math::Pose3d &_pose)
 {
-  this->modelSDF->GetElement("pose")->Set(_pose);
+  if (this->modelSDF)
+    this->modelSDF->GetElement("pose")->Set(_pose);
+  else
+    gzerr << "Model SDF not found." << std::endl;
 }
 
 /////////////////////////////////////////////////
 ignition::math::Pose3d NestedModelData::Pose() const
 {
-  return this->modelSDF->Get<ignition::math::Pose3d>("pose");
+  if (this->modelSDF)
+    return this->modelSDF->Get<ignition::math::Pose3d>("pose");
+
+  gzerr << "Model SDF not found." << std::endl;
+  return ignition::math::Pose3d::Zero;
 }
 
 /////////////////////////////////////////////////

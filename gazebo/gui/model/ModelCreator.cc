@@ -234,6 +234,11 @@ ModelCreator::ModelCreator(QObject *_parent)
   this->dataPtr->jointMaker = new gui::JointMaker();
   this->dataPtr->userCmdManager.reset(new MEUserCmdManager());
 
+  // Give the joint maker a pointer to the user cmd manager, but we're still
+  // responsible for its lifetime.
+  this->dataPtr->jointMaker->SetUserCmdManager(
+      this->dataPtr->userCmdManager.get());
+
   connect(g_editModelAct, SIGNAL(toggled(bool)), this, SLOT(OnEdit(bool)));
 
   this->dataPtr->inspectAct = new QAction(tr("Open Link Inspector"), this);
@@ -1796,26 +1801,41 @@ void ModelCreator::OnDelete(const std::string &_entity)
   auto nestedModel = this->dataPtr->allNestedModels.find(_entity);
   if (nestedModel != this->dataPtr->allNestedModels.end())
   {
+    // Get data to use after the model has been deleted
+    auto name = nestedModel->second->Name();
+    auto sdf = nestedModel->second->modelSDF;
+    auto scopedName = nestedModel->second->modelVisual->GetName();
+
+    this->RemoveNestedModelImpl(_entity);
+
     // Register command
     auto cmd = this->dataPtr->userCmdManager->NewCmd(
-        "Delete [" + nestedModel->second->Name() + "]",
+        "Delete [" + name + "]",
         MEUserCmd::DELETING_NESTED_MODEL);
-    cmd->SetSDF(nestedModel->second->modelSDF);
-    cmd->SetScopedName(nestedModel->second->modelVisual->GetName());
+    cmd->SetSDF(sdf);
+    cmd->SetScopedName(scopedName);
+
+    return;
   }
 
   // If it's a link
   auto link = this->dataPtr->allLinks.find(_entity);
   if (link != this->dataPtr->allLinks.end())
   {
-    // Register command
+    // First delete joints
+    if (this->dataPtr->jointMaker)
+      this->dataPtr->jointMaker->RemoveJointsByLink(_entity);
+
+    // Then register command
     auto cmd = this->dataPtr->userCmdManager->NewCmd(
         "Delete [" + link->second->Name() + "]", MEUserCmd::DELETING_LINK);
     cmd->SetSDF(this->GenerateLinkSDF(link->second));
     cmd->SetScopedName(link->second->linkVisual->GetName());
-  }
 
-  this->RemoveEntity(_entity);
+    // Then delete link
+    this->RemoveLinkImpl(_entity);
+    return;
+  }
 }
 
 /////////////////////////////////////////////////
