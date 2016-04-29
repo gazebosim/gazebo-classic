@@ -69,12 +69,15 @@ set (plugins_single_header
   SkidSteerDrivePlugin
   SonarPlugin
   SphereAtlasDemoPlugin
-  VehiclePlugin)
+  VehiclePlugin
+  WindPlugin
+)
 
 set (plugins_private_header
   ElevatorPlugin
   RandomVelocityPlugin
-  TransporterPlugin)
+  TransporterPlugin
+)
 
 if (HAVE_USB AND UNIX AND NOT APPLE)
   set (plugins ${plugins}
@@ -118,7 +121,7 @@ foreach (src ${GUIplugins})
   target_link_libraries(${src} libgazebo ${ogre_libraries} ${QT_LIBRARIES})
   install (TARGETS ${src} DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
   gz_install_includes("plugins" ${src}.hh)
-endforeach (src ${GUIplugins})
+endforeach ()
 
 add_subdirectory(events)
 
