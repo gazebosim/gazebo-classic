@@ -448,7 +448,7 @@ void ModelEditorUndoTest::JointInsertionByDialog()
   auto modelPalette = mainWindow->findChild<gazebo::gui::ModelEditorPalette *>(
       "modelEditorPalette");
   QVERIFY(modelPalette != nullptr);
-  auto jointMaker = modelPalette->GetModelCreator()->JointMaker();
+  auto jointMaker = modelPalette->ModelCreator()->JointMaker();
   QVERIFY(jointMaker != nullptr);
 
   // Get the cylinder button on the model editor palette
