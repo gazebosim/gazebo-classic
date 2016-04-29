@@ -97,7 +97,7 @@ namespace gazebo
   class GAZEBO_VISIBLE ValidationController
   {
     /// \brief Class constructor.
-    public: ValidationController();
+    public: ValidationController(const bool _reference = false);
 
     /// \brief Class destructor.
     public: ~ValidationController();
@@ -134,6 +134,8 @@ namespace gazebo
 
     /// \brief Pointer to the current state.
     public: State *currentState;
+
+    private: bool reference;
   };
 }
 

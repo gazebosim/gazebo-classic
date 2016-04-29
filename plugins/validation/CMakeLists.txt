@@ -24,6 +24,6 @@ include_directories(
 
 link_directories(${GAZEBO_PLUGIN_PATH})
 add_library(ValidationPlugin SHARED ${validation_src})
-target_link_libraries(ValidationPlugin ${GAZEBO_libraries} gazebo_msgs ${IGNITION-TRANSPORT_LIBRARIES})
+target_link_libraries(ValidationPlugin ${GAZEBO_libraries} gazebo_msgs ${IGNITION-TRANSPORT_LIBRARIES} gazebo_physics)
 install (TARGETS ValidationPlugin DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
 gz_install_includes("plugins/validation" ${validation_headers})

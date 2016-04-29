@@ -95,13 +95,18 @@ void ControllerEndState::DoFeedback()
 }
 
 /////////////////////////////////////////////////
-ValidationController::ValidationController()
+ValidationController::ValidationController(const bool _reference)
   : readyState(new ControllerReadyState(kControllerReadyState, *this)),
     initCondsState(new ControllerInitCondsState(kControllerInitCondsState, *this)),
     runningState(new ControllerRunningState(kControllerRunningState, *this)),
     endState(new ControllerEndState(kControllerEndState, *this)),
-    currentState(readyState.get())
+    currentState(readyState.get()),
+    reference(_reference)
  {
+  if (this->reference)
+    this->currentState = initCondsState.get();
+  else
+    this->currentState = readyState.get();
  }
 
 /////////////////////////////////////////////////
