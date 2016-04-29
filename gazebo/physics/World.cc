@@ -1896,7 +1896,7 @@ void World::ProcessLightModifyMsgs()
 std::string World::ProcessInsertLightRequest(const msgs::Factory &_msg)
 {
   if (!_msg.has_light())
-    return false;
+    return "";
 
   msgs::Light lightMsg;
   lightMsg.CopyFrom(_msg.light());
@@ -1905,7 +1905,7 @@ std::string World::ProcessInsertLightRequest(const msgs::Factory &_msg)
   if (name.empty())
   {
     gzerr << "Can't load light with empty name" << std::endl;
-    return false;
+    return "";
   }
 
   // Light with the given name already exists
@@ -1916,7 +1916,7 @@ std::string World::ProcessInsertLightRequest(const msgs::Factory &_msg)
     {
       gzerr << "A light named [" << name << "] already exists "
             << "and allow_renaming is false." << std::endl;
-      return false;
+      return "";
     }
 
     name = this->UniqueLightName(name);
@@ -1935,9 +1935,12 @@ std::string World::ProcessInsertLightRequest(const msgs::Factory &_msg)
 }
 
 //////////////////////////////////////////////////
-bool World::ProcessInsertEntityRequest(const msgs::Factory &_msg)
+std::string World::ProcessInsertEntityRequest(const msgs::Factory &_msg)
 {
   this->dataPtr->factorySDF->Root()->ClearElements();
+
+  // Returned value
+  std::string entityName;
 
   // From SDF string
   if (_msg.has_sdf() && !_msg.sdf().empty())
@@ -1946,7 +1949,7 @@ bool World::ProcessInsertEntityRequest(const msgs::Factory &_msg)
     if (!sdf::readString(_msg.sdf(), this->dataPtr->factorySDF))
     {
       gzerr << "Unable to read sdf string[" << _msg.sdf() << "]\n";
-      return false;
+      return "";
     }
   }
   // From SDF file
@@ -1959,7 +1962,7 @@ bool World::ProcessInsertEntityRequest(const msgs::Factory &_msg)
     if (!sdf::readFile(filename, this->dataPtr->factorySDF))
     {
       gzerr << "Unable to read sdf file.\n";
-      return false;
+      return "";
     }
   }
   // Clone existing model
@@ -1970,24 +1973,24 @@ bool World::ProcessInsertEntityRequest(const msgs::Factory &_msg)
     {
       gzerr << "Unable to clone model[" << _msg.clone_model_name()
         << "]. Model not found.\n";
-      return false;
+      return "";
     }
 
     this->dataPtr->factorySDF->Root()->InsertElement(
         model->GetSDF()->Clone());
 
-    std::string newName = model->GetName() + "_clone";
-    newName = this->UniqueModelName(newName);
+    entityName = model->GetName() + "_clone";
+    entityName = this->UniqueModelName(entityName);
 
     this->dataPtr->factorySDF->Root()->GetElement("model")->GetAttribute(
-        "name")->Set(newName);
+        "name")->Set(entityName);
   }
   else
   {
     gzerr << "Unable to load sdf from factory message: " << std::endl <<
       _msg.DebugString() << std::endl
       << "No SDF or SDF filename specified.\n";
-    return false;
+    return "";
   }
 
   // Edit name
@@ -2018,7 +2021,7 @@ bool World::ProcessInsertEntityRequest(const msgs::Factory &_msg)
     {
       gzerr << "Invalid SDF:";
       this->dataPtr->factorySDF->Root()->PrintValues("");
-      return false;
+      return "";
     }
 
     if (elem->HasElement("world"))
@@ -2043,7 +2046,7 @@ bool World::ProcessInsertEntityRequest(const msgs::Factory &_msg)
     {
       gzerr << "Unable to find a model, light, or actor in:\n";
       this->dataPtr->factorySDF->Root()->PrintValues("");
-      return false;
+      return "";
     }
 
     elem->SetParent(this->dataPtr->sdf);
@@ -2060,25 +2063,26 @@ bool World::ProcessInsertEntityRequest(const msgs::Factory &_msg)
     }
     else if (isModel)
     {
-      auto name = elem->Get<std::string>("name");
-      if (name.empty())
+      entityName = elem->Get<std::string>("name");
+      if (entityName.empty())
       {
         gzerr << "Can't load model with empty name" << std::endl;
-        return false;
+        return "";
       }
 
       // Model with the given name already exists
-      if (this->GetModel(name))
+      if (this->GetModel(entityName))
       {
         // If allow renaming is disabled
         if (_msg.has_allow_renaming() && !_msg.allow_renaming())
         {
-          gzerr << "A model named [" << name << "] already exists. "
+          gzerr << "A model named [" << entityName << "] already exists. "
                 << "and allow_renaming is false." << std::endl;
-          return false;
+          return "";
         }
 
-        elem->GetAttribute("name")->Set(this->UniqueModelName(name));
+        entityName = this->UniqueModelName(entityName);
+        elem->GetAttribute("name")->Set(entityName);
       }
 
       try
@@ -2092,30 +2096,31 @@ bool World::ProcessInsertEntityRequest(const msgs::Factory &_msg)
       catch(...)
       {
         gzerr << "Loading model from factory message failed\n";
-        return false;
+        return "";
       }
     }
     else if (isLight)
     {
-      auto name = elem->Get<std::string>("name");
-      if (name.empty())
+      entityName = elem->Get<std::string>("name");
+      if (entityName.empty())
       {
         gzerr << "Can't load light with empty name" << std::endl;
-        return false;
+        return "";
       }
 
       // Light with the given name already exists
-      if (this->Light(name))
+      if (this->Light(entityName))
       {
         // If allow renaming is disabled
         if (_msg.has_allow_renaming() && !_msg.allow_renaming())
         {
-          gzerr << "A light named [" << name << "] already exists "
+          gzerr << "A light named [" << entityName << "] already exists "
                 << "and allow_renaming is false." << std::endl;
-          return false;
+          return "";
         }
 
-        elem->GetAttribute("name")->Set(this->UniqueLightName(name));
+        entityName = this->UniqueLightName(entityName);
+        elem->GetAttribute("name")->Set(entityName);
       }
 
       try
@@ -2127,11 +2132,11 @@ bool World::ProcessInsertEntityRequest(const msgs::Factory &_msg)
       catch(...)
       {
         gzerr << "Loading light from factory message failed\n";
-        return false;
+        return "";
       }
     }
   }
-  return true;
+  return entityName;
 }
 
 //////////////////////////////////////////////////
@@ -2966,10 +2971,14 @@ void World::ProcessRequests()
       msg.mutable_factory()->CopyFrom(request.factory());
       msg.set_id(request.id());
 
-      if (this->ProcessInsertEntityRequest(request.factory()))
+      auto entityName = this->ProcessInsertEntityRequest(request.factory());
+      if (!entityName.empty())
       {
-        msg.set_msg("Entity inserted successfully.");
+        msg.set_msg("Entity [" + entityName + "] inserted successfully.");
         msg.set_success(true);
+
+        // Update name in factory msg
+        msg.mutable_factory()->set_edit_name(entityName);
       }
       else
       {
@@ -2989,7 +2998,6 @@ void World::ProcessRequests()
       msg.mutable_factory()->CopyFrom(request.factory());
 
       auto lightName = this->ProcessInsertLightRequest(request.factory());
-
       if (!lightName.empty())
       {
         msg.set_msg("Light [" + lightName + "] inserted successfully.");

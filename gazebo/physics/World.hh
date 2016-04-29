@@ -547,7 +547,7 @@ namespace gazebo
       private: void ProcessRequests();
 
       /// \brief
-      private: bool ProcessInsertEntityRequest(const msgs::Factory &_msg);
+      private: std::string ProcessInsertEntityRequest(const msgs::Factory &_msg);
 
       /// \brief
       private: std::string ProcessInsertLightRequest(const msgs::Factory &_msg);

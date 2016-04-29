@@ -416,7 +416,7 @@ void ModelCommand::HelpDetailed()
   std::cerr <<
     "\tChange properties of a model, delete a model, or\n"
     "\tspawn a new model. If a name for the world, option -w, is\n"
-    "\tnot pecified, the first world found on the Gazebo master\n"
+    "\tnot specified, the first world found on the Gazebo master\n"
     "\twill be used.\n"
     << std::endl;
 }
