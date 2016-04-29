@@ -9,10 +9,12 @@ release will remove the deprecated code.
 
 ### Additions
 
-### Modifications
-
 1. **gazebo/common/Event.hh**
+    + public: bool Connection::Id() const;
+    + public: bool Event::Signaled() const;
     + public: void Event::SetSignaled(const bool);
+
+### Modifications
 
 1. **gazebo/common/Event.hh**
     + ConnectionPrivate made not visible
