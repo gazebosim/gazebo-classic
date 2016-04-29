@@ -69,7 +69,6 @@ void PhysicsTest::ElasticModulusContact(const std::string &_physicsEngine)
   Load("worlds/elastic_modulus_contact_test.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   EXPECT_TRUE(world != NULL);
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
 
   int i = 0;
   while (!this->HasEntity("sphere") && i < 20)

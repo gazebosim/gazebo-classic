@@ -37,8 +37,6 @@ void BuoyancyPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   this->model = _model;
   physics::WorldPtr world = _model->GetWorld();
   GZ_ASSERT(world != NULL, "Model is in a NULL world");
-  this->physicsEngine = world->GetPhysicsEngine();
-  GZ_ASSERT(this->physicsEngine != NULL, "Physics engine was NULL");
 
   GZ_ASSERT(_sdf != NULL, "Received NULL SDF pointer");
   this->sdf = _sdf;

@@ -70,8 +70,6 @@ void ImuTest::GetGravity(const math::Quaternion &_rot, math::Vector3 &_g)
 {
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
   // Rotate into IMU's frame
   _g = _rot.GetInverse().RotateVector(world->Gravity());
 }
@@ -122,10 +120,6 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
   // get world
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
-
-  // get physics engine
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
 
   // get pendulum
   std::string pendulumName = "model_pendulum";

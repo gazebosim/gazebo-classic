@@ -45,7 +45,6 @@ void PhysicsTest::InertiaRatioPendulum(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // verify lateral gravity
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   auto g = world->Gravity();
   EXPECT_EQ(g, ignition::math::Vector3d(0.1, 0, -9.81));
 
