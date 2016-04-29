@@ -286,6 +286,8 @@ void ModelTreeWidget::OnItemSelectionChanged()
 
     if (type == "Link")
       gui::model::Events::setSelectedEntity(name, true);
+    if (type == "Nested Model")
+      gui::model::Events::setSelectedEntity(name, true);
     else if (type == "Joint")
       gui::model::Events::setSelectedJoint(name, true);
     else if (type == "Model Plugin")
@@ -302,6 +304,8 @@ void ModelTreeWidget::OnItemSelectionChanged()
 
       if (type == "Link")
         gui::model::Events::setSelectedEntity(name, false);
+      if (type == "Nested Model")
+        gui::model::Events::setSelectedEntity(name, false);
       else if (type == "Joint")
         gui::model::Events::setSelectedJoint(name, false);
     else if (type == "Model Plugin")
@@ -316,12 +320,16 @@ void ModelTreeWidget::OnItemSelectionChanged()
 void ModelTreeWidget::OnDeselectAll(const std::string &/*_name*/,
     const std::string &/*_mode*/)
 {
+  this->modelTreeWidget->blockSignals(true);
+
   // deselect all
   for (auto &item : this->selected)
   {
     if (item)
       item->setSelected(false);
   }
+
+  this->modelTreeWidget->blockSignals(false);
 }
 
 /////////////////////////////////////////////////
@@ -355,6 +363,8 @@ void ModelTreeWidget::OnItemDoubleClicked(QTreeWidgetItem *_item,
 
     if (type == "Link")
       gui::model::Events::openLinkInspector(name);
+    else if (type == "Nested Model")
+      gzwarn << "There's no inspector for nested models yet." << std::endl;
     else if (type == "Joint")
       gui::model::Events::openJointInspector(name);
     else if (type == "Model Plugin")
@@ -377,8 +387,14 @@ void ModelTreeWidget::OnItemClicked(QTreeWidgetItem *_item,
 
     std::string type = _item->data(1, Qt::UserRole).toString().toStdString();
 
-    if (type != selectedType)
+    // Deselect incompatible types. For example, joints and Links can't be
+    // selected at the same time, but links and nested models can.
+    if (type != selectedType &&
+        !((type == "Link" && selectedType == "Nested Model") ||
+        (type == "Nested Model" && selectedType == "Link")))
+    {
       this->DeselectType(selectedType);
+    }
   }
 }
 
@@ -397,6 +413,8 @@ void ModelTreeWidget::DeselectType(const std::string &_type)
       (*it)->setSelected(false);
       it = this->selected.erase(it);
       if (type == "Link")
+        gui::model::Events::setSelectedEntity(name, false);
+      if (type == "Nested Model")
         gui::model::Events::setSelectedEntity(name, false);
       else if (type == "Joint")
         gui::model::Events::setSelectedJoint(name, false);
@@ -424,6 +442,8 @@ void ModelTreeWidget::OnCustomContextMenu(const QPoint &_pt)
     std::string type = item->data(1, Qt::UserRole).toString().toStdString();
 
     if (type == "Link")
+      gui::model::Events::showLinkContextMenu(name);
+    if (type == "Nested Model")
       gui::model::Events::showLinkContextMenu(name);
     else if (type == "Joint")
       gui::model::Events::showJointContextMenu(name);

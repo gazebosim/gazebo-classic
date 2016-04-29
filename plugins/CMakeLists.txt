@@ -39,7 +39,7 @@ if (HAVE_UUID)
   add_definitions(${uuid_CFLAGS})
 endif()
 
-set (plugins
+set (plugins_single_header
   ActorPlugin
   ActuatorPlugin
   ArrangePlugin
@@ -51,7 +51,6 @@ set (plugins
   ContactPlugin
   DepthCameraPlugin
   DiffDrivePlugin
-  ElevatorPlugin
   FollowerPlugin
   ForceTorquePlugin
   GpuRayPlugin
@@ -64,16 +63,18 @@ set (plugins
   ModelPropShop
   MudPlugin
   PressurePlugin
-  RandomVelocityPlugin
   RayPlugin
   RaySensorNoisePlugin
   RubblePlugin
   SkidSteerDrivePlugin
   SonarPlugin
   SphereAtlasDemoPlugin
-  TransporterPlugin
-  VehiclePlugin
-  WindPlugin)
+  VehiclePlugin)
+
+set (plugins_private_header
+  ElevatorPlugin
+  RandomVelocityPlugin
+  TransporterPlugin)
 
 if (HAVE_USB AND UNIX AND NOT APPLE)
   set (plugins ${plugins}
@@ -90,12 +91,26 @@ set (GUIplugins
 set(GAZEBO_PLUGIN_INSTALL_DIR
   ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/gazebo-${GAZEBO_MAJOR_VERSION}/plugins/
 )
-foreach (src ${plugins})
+
+foreach (src ${plugins_single_header})
   add_library(${src} SHARED ${src}.cc)
   target_link_libraries(${src} libgazebo ${ogre_libraries})
   install (TARGETS ${src} DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
   gz_install_includes("plugins" ${src}.hh)
-endforeach (src ${plugins})
+endforeach (src ${plugins_single_header})
+
+foreach (src ${plugins_private_header})
+  add_library(${src} SHARED ${src}.cc)
+  target_link_libraries(${src} libgazebo ${ogre_libraries})
+  install (TARGETS ${src} DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
+  gz_install_includes("plugins" ${src}.hh)
+  gz_install_includes("plugins" ${src}Private.hh)
+endforeach (src ${plugins_single_header})
+
+target_link_libraries(BreakableJointPlugin ForceTorquePlugin)
+set_target_properties(BreakableJointPlugin PROPERTIES
+  INSTALL_RPATH ${GAZEBO_PLUGIN_INSTALL_DIR}
+)
 
 foreach (src ${GUIplugins})
   QT4_WRAP_CPP(${src}_MOC ${src}.hh)

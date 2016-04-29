@@ -109,9 +109,18 @@ namespace gazebo
       public: void FitInView();
 
       /// \brief Helper function to get the unscoped name from a scoped name.
+      /// For example, for `Preview::Model1::Model2::Link`, we get
+      /// `Model1::Model2::Link`
       /// \param[in] _scopedName Scoped name.
       /// \return Unscoped name.
-      private: std::string UnscopedName(const std::string &_scopedName);
+      private: std::string UnscopedName(const std::string &_scopedName) const;
+
+      /// \brief Helper function to get the top level name from a scoped name.
+      /// For example, for `Preview::Model1::Model2::Link`, we get
+      /// `Preview::Model1`
+      /// \param[in] _scopedName Scoped name.
+      /// \return Top level name.
+      private: std::string TopLevelName(const std::string &_scopedName) const;
 
       /// \brief Callback when an entity is selected.
       /// \param[in] _name Name of entity.

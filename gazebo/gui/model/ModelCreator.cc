@@ -2771,16 +2771,30 @@ void ModelCreator::DeselectAllModelPlugins()
 /////////////////////////////////////////////////
 void ModelCreator::SetSelected(const std::string &_name, const bool _selected)
 {
+  rendering::VisualPtr topLevelVis;
+
+  // If it's a link
   auto it = this->dataPtr->allLinks.find(_name);
   if (it != this->dataPtr->allLinks.end())
   {
-    this->SetSelected((*it).second->linkVisual, _selected);
+    // For nested links, get parent model
+    topLevelVis = (*it).second->linkVisual->GetNthAncestor(2);
   }
   else
   {
     auto itNestedModel = this->dataPtr->allNestedModels.find(_name);
     if (itNestedModel != this->dataPtr->allNestedModels.end())
-      this->SetSelected((*itNestedModel).second->modelVisual, _selected);
+    {
+      topLevelVis = (*itNestedModel).second->modelVisual->GetNthAncestor(2);
+    }
+  }
+
+  if (topLevelVis)
+    this->SetSelected(topLevelVis, _selected);
+  else
+  {
+    gzwarn << "Couldn't find top level visual for [" << _name << "]. "
+        << "Not selecting in 3D scene." << std::endl;
   }
 }
 
@@ -2809,20 +2823,23 @@ void ModelCreator::SetSelected(const rendering::VisualPtr &_entityVis,
     return;
   }
 
+  // Only selecting top level visual for now
+  auto topLevelVis = _entityVis->GetNthAncestor(2);
+
   // Selecting something which wasn't selected yet
   if (_selected && itSelected == this->dataPtr->selectedEntities.end())
   {
-    this->dataPtr->selectedEntities.push_back(_entityVis);
-    model::Events::setSelectedEntity(_entityVis->GetName(), _selected);
+    this->dataPtr->selectedEntities.push_back(topLevelVis);
+    model::Events::setSelectedEntity(topLevelVis->GetName(), _selected);
   }
   // Deselecting
   else if (!_selected && itSelected != this->dataPtr->selectedEntities.end())
   {
     this->dataPtr->selectedEntities.erase(itSelected);
-    model::Events::setSelectedEntity(_entityVis->GetName(), _selected);
+    model::Events::setSelectedEntity(topLevelVis->GetName(), _selected);
   }
 
-  g_copyAct->setEnabled(this->dataPtr->selectedEntities.size() > 0u);
+  g_copyAct->setEnabled(!this->dataPtr->selectedEntities.empty());
   g_alignAct->setEnabled(this->dataPtr->selectedEntities.size() > 1u);
 }
 
