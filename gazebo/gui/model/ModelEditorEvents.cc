@@ -56,6 +56,10 @@ event::EventT<void (std::string, std::string, std::string, std::string,
     std::string)> model::Events::jointInserted;
 event::EventT<void (std::string)> model::Events::jointRemoved;
 
+event::EventT<void (sdf::ElementPtr, std::string)>
+    model::Events::requestJointInsertion;
+event::EventT<void (std::string)> model::Events::requestJointRemoval;
+
 event::EventT<void (std::string)> model::Events::openJointInspector;
 event::EventT<void (std::string)> model::Events::showJointContextMenu;
 event::EventT<void (std::string, bool)> model::Events::setSelectedJoint;
