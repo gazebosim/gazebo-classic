@@ -54,6 +54,7 @@ set (plugins
   ElevatorPlugin
   FollowerPlugin
   ForceTorquePlugin
+  FRC2016GamePlugin
   GpuRayPlugin
   ImuSensorPlugin
   InitialVelocityPlugin

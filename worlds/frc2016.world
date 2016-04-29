@@ -1,0 +1,216 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="default">
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <include>
+      <name>field</name>
+      <uri>model://frc2016_field</uri>
+    </include>
+
+    <include>
+      <pose>-2.9751 0.03770 0.13334 0 0 0</pose>
+      <name>ball1</name>
+      <uri>model://frc2016_ball</uri>
+    </include>
+    <include>
+      <pose>-1.81765 0.03770 0.13334 0 0 0</pose>
+      <name>ball2</name>
+      <uri>model://frc2016_ball</uri>
+    </include>
+    <include>
+      <pose>-0.66019 0.03770 0.13334 0 0 0</pose>
+      <name>ball3</name>
+      <uri>model://frc2016_ball</uri>
+    </include>
+    <include>
+      <pose>0.49727 0.03770 0.13334 0 0 0</pose>
+      <name>ball4</name>
+      <uri>model://frc2016_ball</uri>
+    </include>
+    <include>
+      <pose>1.65472 0.03770 0.13334 0 0 0</pose>
+      <name>ball5</name>
+      <uri>model://frc2016_ball</uri>
+    </include>
+    <include>
+      <pose>2.81218 0.03770 0.13334 0 0 0</pose>
+      <name>ball6</name>
+      <uri>model://frc2016_ball</uri>
+    </include>
+
+    <include>
+      <pose>-1 -10 0.13334 0 0 0</pose>
+      <name>ball7</name>
+      <uri>model://frc2016_ball</uri>
+    </include>
+    <include>
+      <pose>0 -10 0.13334 0 0 0</pose>
+      <name>ball8</name>
+      <uri>model://frc2016_ball</uri>
+    </include>
+    <include>
+      <pose>1 -10 0.13334 0 0 0</pose>
+      <name>ball9</name>
+      <uri>model://frc2016_ball</uri>
+    </include>
+
+    <include>
+      <pose>-1 10 0.13334 0 0 0</pose>
+      <name>ball10</name>
+      <uri>model://frc2016_ball</uri>
+    </include>
+    <include>
+      <pose>0 10 0.13334 0 0 0</pose>
+      <name>ball11</name>
+      <uri>model://frc2016_ball</uri>
+    </include>
+    <include>
+      <pose>1 10 0.13334 0 0 0</pose>
+      <name>ball12</name>
+      <uri>model://frc2016_ball</uri>
+    </include>
+
+    <model name="red_lowbar">
+      <pose>3.396225 -2.76442 0 0 0 3.1415</pose>
+      <include>
+        <uri>model://frc2016_lowbar</uri>
+      </include>
+      <joint type="revolute" name="world_joint">
+        <parent>world</parent>
+        <child>red_lowbar::frc2016_lowbar::base</child>
+        <axis>
+          <xyz>1 0 0</xyz>
+          <limit>
+            <lower>0</lower>
+            <upper>0</upper>
+          </limit>
+        </axis>
+      </joint>
+    </model>
+
+    <model name="red_chevaldefrise">
+      <pose>2.07895 -2.76442 0 0 0 0</pose>
+      <include>
+        <uri>model://frc2016_chevaldefrise</uri>
+      </include>
+      <joint type="revolute" name="world_joint">
+        <parent>world</parent>
+        <child>red_chevaldefrise::frc2016_chevaldefrise::base</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>0</lower>
+            <upper>0</upper>
+          </limit>
+        </axis>
+      </joint>
+    </model>
+
+    <include>
+      <pose>0.73275 -2.76511 0 0 0 0</pose>
+      <name>red_moat</name>
+      <uri>model://frc2016_moat</uri>
+    </include>
+
+    <model name="red_drawbridge">
+      <pose>-0.61345 -2.76442 0 0 0 0</pose>
+      <include>
+        <uri>model://frc2016_drawbridge</uri>
+      </include>
+      <joint type="revolute" name="world_joint">
+        <parent>world</parent>
+        <child>red_drawbridge::frc2016_drawbridge::base</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>0</lower>
+            <upper>0</upper>
+          </limit>
+        </axis>
+      </joint>
+    </model>
+
+    <include>
+      <pose>-1.95965 -2.76442 0 0 0 0</pose>
+      <name>red_rockwall</name>
+      <uri>model://frc2016_rockwall</uri>
+    </include>
+
+
+    <include>
+      <pose>1.95900 2.77051 0 0 0 0</pose>
+      <name>blue_rough</name>
+      <uri>model://frc2016_roughterrain</uri>
+    </include>
+
+    <model name="blue_portcullis">
+      <pose>0.61280 2.77051 0 0 0 0</pose>
+      <include>
+        <uri>model://frc2016_portcullis</uri>
+      </include>
+
+      <joint type="revolute" name="world_joint">
+        <parent>world</parent>
+        <child>blue_portcullis::frc2016_portcullis::base</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>0</lower>
+            <upper>0</upper>
+          </limit>
+        </axis>
+      </joint>
+    </model>
+
+    <include>
+      <pose>-0.73181 2.77051 0 0 0 0</pose>
+      <name>blue_ramparts</name>
+      <uri>model://frc2016_ramparts</uri>
+    </include>
+
+    <model name="blue_sallyport">
+      <pose>-2.07960 2.77051 0 0 0 0</pose>
+      <include>
+        <uri>model://frc2016_sallyport</uri>
+      </include>
+      <joint type="revolute" name="world_joint">
+        <parent>world</parent>
+        <child>blue_sallyport::frc2016_sallyport::base</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>0</lower>
+            <upper>0</upper>
+          </limit>
+        </axis>
+      </joint>
+    </model>
+
+    <model name="blue_lowbar">
+      <pose>-3.39953 2.77051 0 0 0 0</pose>
+      <include>
+        <uri>model://frc2016_lowbar</uri>
+      </include>
+      <joint type="revolute" name="world_joint">
+        <parent>world</parent>
+        <child>blue_lowbar::frc2016_lowbar::base</child>
+        <axis>
+          <xyz>1 0 0</xyz>
+          <limit>
+            <lower>0</lower>
+            <upper>0</upper>
+          </limit>
+        </axis>
+      </joint>
+    </model>
+
+    <plugin filename="libFRC2016GamePlugin.so" name="frc2016">
+    </plugin>
+  </world>
+</sdf>
