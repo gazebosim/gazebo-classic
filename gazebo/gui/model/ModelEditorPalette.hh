@@ -15,28 +15,28 @@
  *
 */
 
-#ifndef _GAZEBO_MODEL_EDITOR_PALETTE_HH_
-#define _GAZEBO_MODEL_EDITOR_PALETTE_HH_
+#ifndef GAZEBO_GUI_MODEL_MODELEDITORPALETTE_HH_
+#define GAZEBO_GUI_MODEL_MODELEDITORPALETTE_HH_
 
-#include <map>
+#include <memory>
 #include <string>
 
-#include "gazebo/rendering/RenderTypes.hh"
-#include "gazebo/common/Event.hh"
-
-#include "gazebo/gui/model/ModelCreator.hh"
 #include "gazebo/gui/qt.h"
+#include "gazebo/gui/model/ModelCreator.hh"
+
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
-  namespace rendering
+  namespace common
   {
+    class KeyEvent;
   }
 
   namespace gui
   {
-    class ModelCreator;
+    // Forward declare private data.
+    class ModelEditorPalettePrivate;
 
     /// \addtogroup gazebo_gui
     /// \{
@@ -63,7 +63,7 @@ namespace gazebo
       /// \brief Add a widget inside the model editor palette widget
       /// \param[in] _index Index in the splitter to insert the widget at.
       /// \param[in] _widget Widget to be added.
-      public: void InsertWidget(unsigned int _index, QWidget *_widget);
+      public: void InsertWidget(const unsigned int _index, QWidget *_widget);
 
       /// \brief Remove a widget from the model editor palette widget
       /// \param[in] _widget Widget to be added.
@@ -75,7 +75,7 @@ namespace gazebo
 
       /// \brief Get the model creator.
       /// \return a pointer to the model creator.
-      public: ModelCreator *GetModelCreator();
+      public: gui::ModelCreator *ModelCreator();
 
       /// \brief Key event filter callback when key is pressed.
       /// \param[in] _event The key event.
@@ -97,20 +97,9 @@ namespace gazebo
       /// \brief Qt callback when a link has been added.
       private slots: void OnLinkAdded();
 
-      /// \brief Links button group.
-      private: QButtonGroup *linkButtonGroup;
-
-      /// \brief Model creator.
-      private: ModelCreator *modelCreator;
-
-      /// \brief Layout for other items in the palette.
-      private: QVBoxLayout *otherItemsLayout;
-
-      /// \brief Map of categories to their layout
-      private: std::map<std::string, QGridLayout *> categories;
-
-      /// \brief Vertical splitter between widgets.
-      private: QSplitter *splitter;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<ModelEditorPalettePrivate> dataPtr;
     };
   }
 }

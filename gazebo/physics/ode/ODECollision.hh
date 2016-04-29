@@ -35,6 +35,9 @@ namespace gazebo
 {
   namespace physics
   {
+    /// \addtogroup gazebo_physics_ode
+    /// \{
+
     /// \brief Base class for all ODE collisions.
     class GZ_PHYSICS_VISIBLE ODECollision : public Collision
     {
@@ -107,6 +110,7 @@ namespace gazebo
       /// \brief Function used to set the pose of the ODE object.
       private: void (ODECollision::*onPoseChangeFunc)();
     };
+    /// \}
   }
 }
 #endif

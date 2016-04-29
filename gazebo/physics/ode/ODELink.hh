@@ -30,6 +30,9 @@ namespace gazebo
 {
   namespace physics
   {
+    /// \addtogroup gazebo_physics_ode
+    /// \{
+
     /// \brief ODE Link class.
     class GZ_PHYSICS_VISIBLE ODELink : public Link
     {
@@ -191,6 +194,7 @@ namespace gazebo
       /// \brief Cache torque applied on body
       private: math::Vector3 torque;
     };
+    /// \}
   }
 }
 #endif

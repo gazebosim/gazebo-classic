@@ -31,6 +31,7 @@ namespace gazebo
   namespace common
   {
     /// \addtogroup gazebo_common Common
+    /// \brief Classes and functions used by multiple modules.
     /// \{
 
     /// \class AudioDecoder AudioDecoder.hh common/common.hh

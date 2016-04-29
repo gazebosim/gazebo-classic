@@ -35,7 +35,7 @@ namespace gazebo
     /// \brief Prototype for view factory functions
     typedef TopicView* (*ViewFactoryFn) (QWidget *_parent);
 
-    /// \addtogroup gazebo_views
+    /// \addtogroup gazebo_gui
     /// \{
     /// \class ViewFactory ViewFactory.hh gui/viewers/ViewFactory.hh
     /// \brief The view factory creates GUI widgets to visualize data on

@@ -27,6 +27,9 @@ namespace gazebo
 {
   namespace physics
   {
+    /// \addtogroup gazebo_physics_ode
+    /// \{
+
     /// \brief A ODE sphere shape
     class GZ_PHYSICS_VISIBLE ODESphereShape : public SphereShape
     {
@@ -53,6 +56,7 @@ namespace gazebo
           dGeomSphereSetRadius(oParent->GetCollisionId(), _radius);
       }
     };
+    /// \}
   }
 }
 #endif

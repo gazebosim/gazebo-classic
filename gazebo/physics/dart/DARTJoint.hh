@@ -34,6 +34,9 @@ namespace gazebo
     /// Forward declare private data class
     class DARTJointPrivate;
 
+    /// \addtogroup gazebo_physics_dart
+    /// \{
+
     /// \brief DART joint interface
     class GZ_PHYSICS_VISIBLE DARTJoint : public Joint
     {
@@ -155,6 +158,7 @@ namespace gazebo
       /// \brief Pointer to private data
       protected: DARTJointPrivate *dataPtr;
     };
+    /// \}
   }
 }
 #endif
