@@ -16,12 +16,13 @@ release will remove the deprecated code.
 
 1. **gazebo/physics/PhysicsEngine.hh**
     + ***Deprecation:*** public: math::Vector3 GetGravity const
-    + ***Deprecation:*** public: ignition::math::Vector3d MagneticField const
-
 1. **gazebo/physics/World.hh**
     + ***Replacement:*** public: ignition::math::Vector3 Gravity const
-    + ***Replacement:*** public: ignition::math::Vector3d MagneticField const
 
+1. **gazebo/physics/PhysicsEngine.hh**
+    + ***Deprecation:*** public: ignition::math::Vector3d MagneticField const
+1. **gazebo/physics/World.hh**
+    + ***Replacement:*** public: ignition::math::Vector3d MagneticField const
 
 ## Gazebo 7.1.0 to 7.X
 
