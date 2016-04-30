@@ -33,6 +33,9 @@ namespace gazebo
 {
   namespace physics
   {
+    /// \addtogroup gazebo_physics_ode
+    /// \{
+
     /// \brief ODE Height map collision.
     class GZ_PHYSICS_VISIBLE ODEHeightmapShape : public HeightmapShape
     {
@@ -55,6 +58,7 @@ namespace gazebo
       /// \brief The heightmap data.
       private: dHeightfieldDataID odeData;
     };
+    /// \}
   }
 }
 #endif
