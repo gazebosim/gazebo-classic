@@ -92,7 +92,7 @@ namespace gazebo
             // return Eigen::Translation3d(ConvVec3(_pose.pos)) *
             //        ConvQuat(_pose.rot);
 
-            Eigen::Isometry3d res;
+            Eigen::Isometry3d res = Eigen::Isometry3d::Identity();
 
             res.translation() = ConvVec3(_pose.pos);
             res.linear() = Eigen::Matrix3d(ConvQuat(_pose.rot));
