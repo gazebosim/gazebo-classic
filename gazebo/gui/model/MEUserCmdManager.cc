@@ -43,6 +43,10 @@ namespace gazebo
 
       /// \brief Fully scoped name of the entity involved in the command.
       public: std::string scopedName;
+
+      /// \brief If the command is related to a joint, this is its unique Id.
+      /// It's different from the scopedName and we need both.
+      public: std::string jointId;
     };
 
     /// \internal
@@ -87,7 +91,7 @@ void MEUserCmd::Undo()
 {
   // Inserting link
   if (this->dataPtr->type == MEUserCmd::INSERTING_LINK &&
-     !this->dataPtr->scopedName.empty())
+      !this->dataPtr->scopedName.empty())
   {
     model::Events::requestLinkRemoval(this->dataPtr->scopedName);
   }
@@ -97,6 +101,35 @@ void MEUserCmd::Undo()
   {
     model::Events::requestLinkInsertion(this->dataPtr->sdf);
   }
+  // Inserting nested model
+  else if (this->dataPtr->type == MEUserCmd::INSERTING_NESTED_MODEL &&
+      !this->dataPtr->scopedName.empty())
+  {
+    model::Events::requestNestedModelRemoval(this->dataPtr->scopedName);
+  }
+  // Deleting nested model
+  else if (this->dataPtr->type == MEUserCmd::DELETING_NESTED_MODEL &&
+      this->dataPtr->sdf)
+  {
+    model::Events::requestNestedModelInsertion(this->dataPtr->sdf);
+  }
+  // Inserting joint
+  else if (this->dataPtr->type == MEUserCmd::INSERTING_JOINT &&
+     !this->dataPtr->jointId.empty())
+  {
+    model::Events::requestJointRemoval(this->dataPtr->jointId);
+  }
+  // Deleting joint
+  else if (this->dataPtr->type == MEUserCmd::DELETING_JOINT &&
+      this->dataPtr->sdf)
+  {
+    auto topModelName = this->dataPtr->scopedName;
+    size_t pIdx = topModelName.find("::");
+    if (pIdx != std::string::npos)
+      topModelName = topModelName.substr(0, pIdx);
+
+    model::Events::requestJointInsertion(this->dataPtr->sdf, topModelName);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -104,15 +137,44 @@ void MEUserCmd::Redo()
 {
   // Inserting link
   if (this->dataPtr->type == MEUserCmd::INSERTING_LINK &&
-     this->dataPtr->sdf)
+      this->dataPtr->sdf)
   {
     model::Events::requestLinkInsertion(this->dataPtr->sdf);
   }
   // Deleting link
   else if (this->dataPtr->type == MEUserCmd::DELETING_LINK &&
-     !this->dataPtr->scopedName.empty())
+      !this->dataPtr->scopedName.empty())
   {
     model::Events::requestLinkRemoval(this->dataPtr->scopedName);
+  }
+  // Inserting nested model
+  else if (this->dataPtr->type == MEUserCmd::INSERTING_NESTED_MODEL &&
+      this->dataPtr->sdf)
+  {
+    model::Events::requestNestedModelInsertion(this->dataPtr->sdf);
+  }
+  // Deleting nested model
+  else if (this->dataPtr->type == MEUserCmd::DELETING_NESTED_MODEL &&
+      !this->dataPtr->scopedName.empty())
+  {
+    model::Events::requestNestedModelRemoval(this->dataPtr->scopedName);
+  }
+  // Inserting joint
+  else if (this->dataPtr->type == MEUserCmd::INSERTING_JOINT &&
+     this->dataPtr->sdf)
+  {
+    auto topModelName = this->dataPtr->scopedName;
+    size_t pIdx = topModelName.find("::");
+    if (pIdx != std::string::npos)
+      topModelName = topModelName.substr(0, pIdx);
+
+    model::Events::requestJointInsertion(this->dataPtr->sdf, topModelName);
+  }
+  // Deleting joint
+  else if (this->dataPtr->type == MEUserCmd::DELETING_JOINT &&
+     !this->dataPtr->jointId.empty())
+  {
+    model::Events::requestJointRemoval(this->dataPtr->jointId);
   }
 }
 
@@ -138,6 +200,12 @@ void MEUserCmd::SetSDF(sdf::ElementPtr _sdf)
 void MEUserCmd::SetScopedName(const std::string &_name)
 {
   this->dataPtr->scopedName = _name;
+}
+
+/////////////////////////////////////////////////
+void MEUserCmd::SetJointId(const std::string &_id)
+{
+  this->dataPtr->jointId = _id;
 }
 
 /////////////////////////////////////////////////

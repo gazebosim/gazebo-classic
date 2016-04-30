@@ -2,6 +2,30 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
+<<<<<<< local
+=======
+1. Fix memory and other issues found from running Coverity.
+    * A contribution from Olivier Crave
+    * [Pull request #2241](https://bitbucket.org/osrf/gazebo/pull-request/2241)
+    * [Pull request #2242](https://bitbucket.org/osrf/gazebo/pull-request/2242)
+    * [Pull request #2243](https://bitbucket.org/osrf/gazebo/pull-request/2243)
+    * [Pull request #2244](https://bitbucket.org/osrf/gazebo/pull-request/2244)
+    * [Pull request #2245](https://bitbucket.org/osrf/gazebo/pull-request/2245)
+
+1. Add Wind support
+    * [Pull request #1985](https://bitbucket.org/osrf/gazebo/pull-request/1985)
+    * A contribution from Olivier Crave
+
+1. Adds an output option to gz log that allows the tool to filter a log file and write to a new log file.
+    * [Pull request #2149](https://bitbucket.org/osrf/gazebo/pull-request/2149)
+
+1. Add common::URI class
+    * [Pull request #2275](https://bitbucket.org/osrf/gazebo/pull-request/2275)
+
+1. Update Actor animations by faciliting skeleton visualization, control via a plugin. Also resolves issue #1785.
+    * [Pull request #2219](https://bitbucket.org/osrf/gazebo/pull-request/2219)
+
+>>>>>>> other
 1. Use only Gazebo's internal version of tinyxml2. The version of tinyxml2 distributed with Ubuntu fails when parsing large log files.
     * [Pull request #2146](https://bitbucket.org/osrf/gazebo/pull-request/2146)
 
@@ -13,6 +37,10 @@
 
 1. Added static camera when following a model.
     * [Pull request #1980](https://bitbucket.org/osrf/gazebo/pull-request/1980)
+<<<<<<< local
+=======
+    * A contribution from Oliver Crave
+>>>>>>> other
 
 1. Support conversions between SDF and protobuf for more sensors.
     * [Pull request #2118](https://bitbucket.org/osrf/gazebo/pull-request/2118)
@@ -28,6 +56,12 @@
     1. Undo / redo inserting and deleting links
         * [Pull request #2151](https://bitbucket.org/osrf/gazebo/pull-request/2151)
 
+<<<<<<< local
+=======
+    1. Undo / redo inserting and deleting nested models
+        * [Pull request #2229](https://bitbucket.org/osrf/gazebo/pull-request/2229)
+
+>>>>>>> other
 ## Gazebo 7
 
 ## Gazebo 7.x.x (2016-xx-xx)

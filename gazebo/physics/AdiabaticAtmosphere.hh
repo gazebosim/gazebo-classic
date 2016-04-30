@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PHYSICS_ADIABATICATMOSPHERE_HH_
-#define _GAZEBO_PHYSICS_ADIABATICATMOSPHERE_HH_
+#ifndef GAZEBO_PHYSICS_ADIABATICATMOSPHERE_HH_
+#define GAZEBO_PHYSICS_ADIABATICATMOSPHERE_HH_
 
 #include <memory>
 #include <string>
@@ -31,22 +31,29 @@ namespace gazebo
     /// Forward declare private data class.
     class AdiabaticAtmospherePrivate;
 
-    /// \brief Adiabatic atmosphere model.
-    /// Models the adiabatic atmosphere.
+    /// \addtogroup gazebo_physics
+    /// \{
+
+    /// \brief Adiabatic atmosphere model based on the
+    /// troposphere model in the
+    /// Manual of the ICAO Standard Atmosphere.
+    /// http://ntrs.nasa.gov/search.jsp?R=19930083952
+    /// This model assumes a specific composition of gases,
+    /// the ideal gas law, hydrostatic equilibrium, and
+    /// constant gradients of gravity and temperature
+    /// with respect to altitude.
+    /// The troposphere model is recommended for altitudes below 11 km.
     class GZ_PHYSICS_VISIBLE AdiabaticAtmosphere : public Atmosphere
     {
       /// \brief Constructor.
       /// \param[in] _world The World that uses this atmosphere model.
-      public: AdiabaticAtmosphere(WorldPtr _world);
+      public: AdiabaticAtmosphere(physics::World &_world);
 
       /// \brief Destructor.
       public: virtual ~AdiabaticAtmosphere();
 
       // Documentation inherited
       public: virtual void Load(sdf::ElementPtr _sdf);
-
-      // Documentation inherited
-      public: virtual void Init();
 
       // Documentation inherited
       public: virtual std::string Type() const;
@@ -76,6 +83,7 @@ namespace gazebo
       /// \brief Private data pointer.
       protected: std::unique_ptr<AdiabaticAtmospherePrivate> dataPtr;
     };
+    /// \}
   }
 }
 #endif

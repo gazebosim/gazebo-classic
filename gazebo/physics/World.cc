@@ -77,6 +77,7 @@
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/Light.hh"
 #include "gazebo/physics/Actor.hh"
+#include "gazebo/physics/Wind.hh"
 #include "gazebo/physics/WorldPrivate.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/common/SphericalCoordinates.hh"
@@ -145,6 +146,7 @@ World::World(const std::string &_name)
   this->dataPtr->resetTimeOnly = false;
   this->dataPtr->resetModelOnly = false;
   this->dataPtr->enablePhysicsEngine = true;
+  this->dataPtr->enableWind = true;
   this->dataPtr->enableAtmosphere = true;
   this->dataPtr->setWorldPoseMutex = new boost::mutex();
   this->dataPtr->worldUpdateMutex = new boost::recursive_mutex();
@@ -260,12 +262,22 @@ void World::Load(sdf::ElementPtr _sdf)
 
   this->dataPtr->physicsEngine->Load(physicsElem);
 
+  // This should come before loading of entities
+  sdf::ElementPtr windElem = this->dataPtr->sdf->GetElement("wind");
+
+  this->dataPtr->wind.reset(new physics::Wind(*this,
+                            this->dataPtr->sdf->GetElement("wind")));
+
+  if (this->dataPtr->wind == NULL)
+    gzthrow("Unable to create wind\n");
+
+  this->dataPtr->wind->Load(windElem);
+
   // This should come after loading physics engine
   sdf::ElementPtr atmosphereElem = this->dataPtr->sdf->GetElement("atmosphere");
 
   type = atmosphereElem->Get<std::string>("type");
-  this->dataPtr->atmosphere = AtmosphereFactory::NewAtmosphere(type,
-      shared_from_this());
+  this->dataPtr->atmosphere = AtmosphereFactory::NewAtmosphere(type, *this);
 
   if (this->dataPtr->atmosphere == NULL)
     gzerr << "Unable to create atmosphere model\n";
@@ -956,9 +968,15 @@ PhysicsEnginePtr World::GetPhysicsEngine() const
 }
 
 //////////////////////////////////////////////////
-AtmospherePtr World::Atmosphere() const
+Wind &World::Wind() const
 {
-  return this->dataPtr->atmosphere;
+  return *this->dataPtr->wind;
+}
+
+//////////////////////////////////////////////////
+Atmosphere &World::Atmosphere() const
+{
+  return *this->dataPtr->atmosphere;
 }
 
 //////////////////////////////////////////////////
@@ -2762,6 +2780,31 @@ bool World::GetEnablePhysicsEngine()
 void World::EnablePhysicsEngine(bool _enable)
 {
   this->dataPtr->enablePhysicsEngine = _enable;
+}
+
+/////////////////////////////////////////////////
+bool World::WindEnabled() const
+{
+  return this->dataPtr->enableWind;
+}
+
+/////////////////////////////////////////////////
+void World::SetWindEnabled(const bool _enable)
+{
+  if (this->dataPtr->enableWind == _enable)
+    return;
+
+  this->dataPtr->enableWind = _enable;
+
+  for (auto const &model : this->dataPtr->models)
+  {
+    Link_V links = model->GetLinks();
+    for (auto const &link : links)
+    {
+      if (link->WindMode())
+        link->SetWindEnabled(this->dataPtr->enableWind);
+    }
+  }
 }
 
 /////////////////////////////////////////////////

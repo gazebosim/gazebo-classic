@@ -29,8 +29,56 @@
 #include "gazebo/transport/TransportIface.hh"
 
 #include "gazebo/physics/Atmosphere.hh"
-#include "gazebo/physics/AtmospherePrivate.hh"
 #include "gazebo/physics/World.hh"
+
+namespace gazebo
+{
+  namespace physics
+  {
+    /// \internal
+    /// \brief Pointer to private data.
+    class AtmospherePrivate
+    {
+      /// \brief Class constructor.
+      /// \param[in] _world The reference to the world.
+      public: AtmospherePrivate(physics::World &_world)
+        : world(_world)
+      {
+      }
+
+      /// \brief Our SDF values.
+      public: sdf::ElementPtr sdf;
+
+      /// \brief Reference to the world.
+      public: World &world;
+
+      /// \brief Temperature at sea level in kelvins.
+      public: double temperature = 288.15;
+
+      /// \brief Temperature gradient at sea level in K/m.
+      public: double temperatureGradient = -0.0065;
+
+      /// \brief Pressure of the air at sea level in pascals.
+      public: double pressure = 101325;
+
+      /// \brief Mass density of the air at sea level in kg/m^3.
+      public: double massDensity = 1.225;
+
+      // Transport is declared last.
+      /// \brief Node for communication.
+      public: transport::NodePtr node;
+
+      /// \brief Response publisher.
+      public: transport::PublisherPtr responsePub;
+
+      /// \brief Subscribe to the atmosphere topic.
+      public: transport::SubscriberPtr atmosphereSub;
+
+      /// \brief Subscribe to the request topic.
+      public: transport::SubscriberPtr requestSub;
+    };
+  }
+}
 
 using namespace gazebo;
 using namespace physics;
@@ -39,16 +87,14 @@ const double Atmosphere::MOLAR_MASS = 0.0289644;
 const double Atmosphere::IDEAL_GAS_CONSTANT_R = 8.3144621;
 
 //////////////////////////////////////////////////
-Atmosphere::Atmosphere(WorldPtr _world)
-  : dataPtr(new AtmospherePrivate)
+Atmosphere::Atmosphere(physics::World &_world)
+  : dataPtr(new AtmospherePrivate(_world))
 {
-  this->dataPtr->world = _world;
-
   this->dataPtr->sdf.reset(new sdf::Element);
   sdf::initFile("atmosphere.sdf", this->dataPtr->sdf);
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init(this->dataPtr->world->GetName());
+  this->dataPtr->node->Init(this->dataPtr->world.GetName());
   this->dataPtr->atmosphereSub = this->dataPtr->node->Subscribe("~/atmosphere",
       &Atmosphere::OnAtmosphereMsg, this);
 
@@ -62,6 +108,8 @@ Atmosphere::Atmosphere(WorldPtr _world)
 //////////////////////////////////////////////////
 Atmosphere::~Atmosphere()
 {
+  // Must call fini on node to remove it from topic manager.
+  this->dataPtr->node->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -91,13 +139,6 @@ void Atmosphere::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void Atmosphere::Fini()
-{
-  this->dataPtr->world.reset();
-  this->dataPtr->node->Fini();
-}
-
-//////////////////////////////////////////////////
 void Atmosphere::Reset()
 {
 }
@@ -117,7 +158,7 @@ void Atmosphere::OnRequest(ConstRequestPtr &/*_msg*/)
 void Atmosphere::OnAtmosphereMsg(ConstAtmospherePtr &_msg)
 {
   if (_msg->has_enable_atmosphere())
-    this->World()->SetAtmosphereEnabled(_msg->enable_atmosphere());
+    this->World().SetAtmosphereEnabled(_msg->enable_atmosphere());
 
   if (_msg->has_temperature())
     this->SetTemperature(_msg->temperature());
@@ -171,7 +212,7 @@ double Atmosphere::TemperatureGradient() const
 }
 
 //////////////////////////////////////////////////
-WorldPtr Atmosphere::World() const
+World &Atmosphere::World() const
 {
   return this->dataPtr->world;
 }

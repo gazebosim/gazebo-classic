@@ -95,19 +95,39 @@ void ModelData::UpdateRenderGroup(rendering::VisualPtr _visual)
 /////////////////////////////////////////////////
 void NestedModelData::SetName(const std::string &_name)
 {
-  this->modelSDF->GetAttribute("name")->Set(_name);
+  if (this->modelSDF)
+    this->modelSDF->GetAttribute("name")->Set(_name);
+  else
+    gzerr << "Model SDF not found." << std::endl;
+}
+
+/////////////////////////////////////////////////
+std::string NestedModelData::Name() const
+{
+  if (this->modelSDF)
+    return this->modelSDF->Get<std::string>("name");
+
+  gzerr << "Model SDF not found." << std::endl;
+  return "";
 }
 
 /////////////////////////////////////////////////
 void NestedModelData::SetPose(const ignition::math::Pose3d &_pose)
 {
-  this->modelSDF->GetElement("pose")->Set(_pose);
+  if (this->modelSDF)
+    this->modelSDF->GetElement("pose")->Set(_pose);
+  else
+    gzerr << "Model SDF not found." << std::endl;
 }
 
 /////////////////////////////////////////////////
 ignition::math::Pose3d NestedModelData::Pose() const
 {
-  return this->modelSDF->Get<ignition::math::Pose3d>("pose");
+  if (this->modelSDF)
+    return this->modelSDF->Get<ignition::math::Pose3d>("pose");
+
+  gzerr << "Model SDF not found." << std::endl;
+  return ignition::math::Pose3d::Zero;
 }
 
 /////////////////////////////////////////////////
@@ -169,7 +189,7 @@ LinkData::~LinkData()
 }
 
 /////////////////////////////////////////////////
-std::string LinkData::GetName() const
+std::string LinkData::Name() const
 {
   return this->linkSDF->Get<std::string>("name");
 }
@@ -476,6 +496,11 @@ void LinkData::Load(sdf::ElementPtr _sdf)
   {
     sdf::ElementPtr selfCollideSDF = this->linkSDF->GetElement("self_collide");
     linkMsgPtr->set_self_collide(selfCollideSDF->Get<bool>(""));
+  }
+  if (_sdf->HasElement("enable_wind"))
+  {
+    sdf::ElementPtr enableWindSDF = this->linkSDF->GetElement("enable_wind");
+    linkMsgPtr->set_enable_wind(enableWindSDF->Get<bool>(""));
   }
   if (this->linkSDF->HasElement("kinematic"))
   {
