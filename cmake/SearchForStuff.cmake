@@ -205,20 +205,14 @@ if (PKG_CONFIG_FOUND)
   endif()
 
   #################################################
-  # Find tinyxml2. TinyXML version < 3 contains a bug that prevents large log
-  # files from being parsed. By default, we use Gazebo's internal version
-  # of tinyxml2 to overcome this problem.
+  # Find tinyxml2. Only debian distributions package tinyxml with a pkg-config
+  # Use pkg_check_modules and fallback to manual detection
+  # (needed, at least, for MacOS)
 
   # Use system installation on UNIX and Apple, and internal copy on Windows
   if (UNIX OR APPLE)
+    message (STATUS "Using system tinyxml2.")
     set (USE_EXTERNAL_TINYXML2 True)
-    pkg_check_modules(TINYXML2_VERSION_3 tinyxml2>=3)
-    if (TINYXML2_VERSION_3_FOUND)
-      message (STATUS "Using system tinyxml2.")
-    else()
-      message (STATUS "Using internal tinyxml2.")
-      set (USE_EXTERNAL_TINYXML2 False)
-    endif()
   elseif(WIN32)
     message (STATUS "Using internal tinyxml2.")
     set (USE_EXTERNAL_TINYXML2 False)

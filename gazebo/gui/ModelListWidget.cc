@@ -977,7 +977,6 @@ void ModelListWidget::WindPropertyChanged(QtProperty * /*_item*/)
   this->dataPtr->windPub->Publish(msg);
 }
 
-
 /////////////////////////////////////////////////
 void ModelListWidget::ScenePropertyChanged(QtProperty */*_item*/)
 {
