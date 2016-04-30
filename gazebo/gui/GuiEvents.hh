@@ -291,7 +291,8 @@ namespace gazebo
       public: static event::EventT<void (const std::string &,
           const math::Vector3 &)> scaleEntity;
 
-      /// \brief Move entity event.
+      /// \brief Move entity event. Parameters: Entity name, new pose, flag
+      /// indicating whether the pose is final.
       public: static event::EventT<void (const std::string &,
           const ignition::math::Pose3d &, const bool)> moveEntity;
     };

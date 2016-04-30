@@ -2052,10 +2052,6 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
     return true;
   }
 
-  // Set all links as not preview
-//  for (auto &link : this->dataPtr->allLinks)
-  //  link.second->SetIsPreview(false);
-
   // End moving links
   for (auto link : this->dataPtr->linkPoseUpdate)
   {
@@ -2933,7 +2929,7 @@ void ModelCreator::OnEntityScaleChanged(const std::string &_name,
 
 /////////////////////////////////////////////////
 void ModelCreator::OnEntityMoved(const std::string &_name,
-  const ignition::math::Pose3d &_pose, const bool _finalPoseForSure)
+  const ignition::math::Pose3d &_pose, const bool _isFinal)
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->updateMutex);
   for (auto linksIt : this->dataPtr->allLinks)
@@ -2945,7 +2941,7 @@ void ModelCreator::OnEntityMoved(const std::string &_name,
     if (_name == linksIt.first || linkName == linksIt.first)
     {
       // Register user command
-      if (_finalPoseForSure)
+      if (_isFinal)
       {
         auto cmd = this->dataPtr->userCmdManager->NewCmd(
             "Move [" + linksIt.second->Name() + "]", MEUserCmd::MOVING_LINK);

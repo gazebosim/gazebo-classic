@@ -100,7 +100,7 @@ foreach (src ${plugins_single_header})
   target_link_libraries(${src} libgazebo ${ogre_libraries})
   install (TARGETS ${src} DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
   gz_install_includes("plugins" ${src}.hh)
-endforeach (src ${plugins_single_header})
+endforeach ()
 
 foreach (src ${plugins_private_header})
   add_library(${src} SHARED ${src}.cc)
@@ -108,12 +108,7 @@ foreach (src ${plugins_private_header})
   install (TARGETS ${src} DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
   gz_install_includes("plugins" ${src}.hh)
   gz_install_includes("plugins" ${src}Private.hh)
-endforeach (src ${plugins_single_header})
-
-target_link_libraries(BreakableJointPlugin ForceTorquePlugin)
-set_target_properties(BreakableJointPlugin PROPERTIES
-  INSTALL_RPATH ${GAZEBO_PLUGIN_INSTALL_DIR}
-)
+endforeach ()
 
 foreach (src ${GUIplugins})
   QT4_WRAP_CPP(${src}_MOC ${src}.hh)

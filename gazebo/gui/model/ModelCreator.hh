@@ -412,9 +412,10 @@ namespace gazebo
       /// \brief Callback when an entity's pose has changed.
       /// \param[in] _name Name of entity.
       /// \param[in] _pose New pose.
-      /// \param[in] _finalPoseForSure
+      /// \param[in] _isFinal Whether this is the final pose or it is still
+      /// being manipulated.
       private: void OnEntityMoved(const std::string &_name,
-          const ignition::math::Pose3d &_pose, const bool _finalPoseForSure);
+          const ignition::math::Pose3d &_pose, const bool _isFinal);
 
       /// \brief Deselect anything whose selection is handled here, such as
       /// links and model plugins.
