@@ -547,7 +547,8 @@ namespace gazebo
       private: void ProcessRequests();
 
       /// \brief
-      private: std::string ProcessInsertEntityRequest(const msgs::Factory &_msg);
+      private: std::string ProcessInsertEntityRequest(
+          const msgs::Factory &_msg);
 
       /// \brief
       private: std::string ProcessInsertLightRequest(const msgs::Factory &_msg);
@@ -575,7 +576,9 @@ namespace gazebo
       /// \brief Callback when a light message is received in the
       /// ~/factory/light topic.
       /// \param[in] _msg Pointer to the light message.
-      private: void OnLightFactoryMsg(ConstLightPtr &_msg);
+      /// \deprecated Send request using ignition transport instead.
+      private: void OnLightFactoryMsg(ConstLightPtr &_msg)
+              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Callback when a light message is received in the
       /// ~/light/modify topic.

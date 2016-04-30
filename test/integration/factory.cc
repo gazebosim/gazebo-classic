@@ -172,13 +172,9 @@ void FactoryTest::Clone(const std::string &_physicsEngine)
 
   // clone the pr2
   std::string name = "pr2";
-  msgs::Factory msg;
-  ignition::math::Pose3d clonePose;
-  clonePose.Set(ignition::math::Vector3d(2, 3, 0.5),
+  ignition::math::Pose3d clonePose(ignition::math::Vector3d(2, 3, 0.5),
       ignition::math::Quaterniond(0, 0, 0));
-  msgs::Set(msg.mutable_pose(), clonePose);
-  msg.set_clone_model_name(name);
-  this->factoryPub->Publish(msg);
+  transport::RequestClone(name, clonePose);
 
   // Wait for the pr2 clone to spawn
   std::string cloneName = name + "_clone";

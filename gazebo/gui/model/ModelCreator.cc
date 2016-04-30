@@ -1638,7 +1638,7 @@ void ModelCreator::FinishModel()
     this->SetModelVisible(this->dataPtr->serverModelName, true);
 
     // delete model on server first before spawning the updated one.
-    transport::RequestEntityDelete(this->dataPtr->serverModelName);
+    transport::RequestDelete(this->dataPtr->serverModelName);
 
     int timeoutCounter = 0;
     int timeout = 100;
@@ -1702,7 +1702,7 @@ void ModelCreator::CreateTheEntity()
     modelElem->GetAttribute("name")->Set(modelElemName);
   }
 
-  transport::RequestEntityInsert(this->dataPtr->modelSDF->ToString(),
+  transport::RequestInsert(this->dataPtr->modelSDF->ToString(),
       this->dataPtr->modelPose);
 }
 

@@ -42,7 +42,6 @@ void NoiseTest::NoisePlugin(const std::string &_physicsEngine)
   std::string pluginFileName = "libRaySensorNoisePlugin.so";
   double maxRange = 5.0;
 
-  msgs::Factory msg;
   std::ostringstream newModelStr;
   newModelStr << "<sdf version='" << SDF_VERSION << "'>"
     << "<model name ='" << modelName << "'>"
@@ -81,8 +80,7 @@ void NoiseTest::NoisePlugin(const std::string &_physicsEngine)
     << "</model>"
     << "</sdf>";
 
-  msg.set_sdf(newModelStr.str());
-  this->factoryPub->Publish(msg);
+  transport::RequestInsert(newModelStr.str());
 
   WaitUntilEntitySpawn(modelName, 100, 100);
   WaitUntilSensorSpawn(raySensorName, 100, 100);

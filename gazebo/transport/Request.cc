@@ -22,15 +22,15 @@
 
 using namespace gazebo;
 
-/////////////////////////////////////////////////
-size_t transport::RequestEntityDelete(const std::string &_name)
+// Unused callback
+std::function<void(const msgs::Empty &, const bool)> unused =
+  [](const msgs::Empty &, const bool &)
 {
-  // Unused callback
-  std::function<void(const msgs::Empty &, const bool)> unused =
-    [](const msgs::Empty &, const bool &)
-  {
-  };
+};
 
+/////////////////////////////////////////////////
+size_t transport::RequestDelete(const std::string &_name)
+{
   // Unique id for request
   auto id = ignition::math::Rand::IntUniform(1, 10000);
 
@@ -48,15 +48,9 @@ size_t transport::RequestEntityDelete(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-size_t transport::RequestEntityInsert(const std::string &_sdf,
+size_t transport::RequestInsert(const std::string &_sdf,
     const ignition::math::Pose3d &_pose)
 {
-  // Unused callback
-  std::function<void(const msgs::Empty &, const bool)> unused =
-    [](const msgs::Empty &, const bool &)
-  {
-  };
-
   // Unique id for request
   auto id = ignition::math::Rand::IntUniform(1, 10000);
 
@@ -83,15 +77,9 @@ size_t transport::RequestEntityInsert(const std::string &_sdf,
 }
 
 /////////////////////////////////////////////////
-size_t transport::RequestEntityClone(const std::string &_name,
+size_t transport::RequestClone(const std::string &_name,
     const ignition::math::Pose3d &_pose)
 {
-  // Unused callback
-  std::function<void(const msgs::Empty &, const bool)> unused =
-    [](const msgs::Empty &, const bool &)
-  {
-  };
-
   // Unique id for request
   auto id = ignition::math::Rand::IntUniform(1, 10000);
 
@@ -118,14 +106,8 @@ size_t transport::RequestEntityClone(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
-size_t transport::RequestLightInsert(const msgs::Light &_msg)
+size_t transport::RequestInsert(const msgs::Light &_msg)
 {
-  // Unused callback
-  std::function<void(const msgs::Empty &, const bool)> unused =
-    [](const msgs::Empty &, const bool &)
-  {
-  };
-
   // Unique id for request
   auto id = ignition::math::Rand::IntUniform(1, 10000);
 

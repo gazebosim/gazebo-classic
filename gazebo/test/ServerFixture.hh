@@ -676,9 +676,6 @@ namespace gazebo
     /// \brief World statistics subscription.
     protected: transport::SubscriberPtr statsSub;
 
-    /// \brief Factory publisher.
-    protected: transport::PublisherPtr factoryPub;
-
     /// \brief Map of received poses.
     protected: std::map<std::string, math::Pose> poses;
 

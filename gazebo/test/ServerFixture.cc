@@ -213,9 +213,6 @@ void ServerFixture::LoadArgs(const std::string &_args)
   this->statsSub = this->node->Subscribe("~/world_stats",
       &ServerFixture::OnStats, this);
 
-  this->factoryPub =
-    this->node->Advertise<msgs::Factory>("~/factory");
-
   // Wait for the world to reach the correct pause state.
   // This might not work properly with multiple worlds.
   // Use a 30 second timeout.
@@ -229,8 +226,6 @@ void ServerFixture::LoadArgs(const std::string &_args)
   }
 
   ASSERT_LT(waitCount, maxWaitCount);
-
-  this->factoryPub->WaitForConnection();
 }
 
 /////////////////////////////////////////////////
@@ -613,8 +608,7 @@ void ServerFixture::SpawnCamera(const std::string &_modelName,
     << "</model>"
     << "</sdf>";
 
-  msg.set_sdf(newModelStr.str());
-  this->factoryPub->Publish(msg);
+  transport::RequestInsert(newModelStr.str());
 
   WaitUntilEntitySpawn(_modelName, 100, 50);
   WaitUntilSensorSpawn(_cameraName, 100, 100);
@@ -686,8 +680,7 @@ void ServerFixture::SpawnRaySensor(const std::string &_modelName,
     << "</model>"
     << "</sdf>";
 
-  msg.set_sdf(newModelStr.str());
-  this->factoryPub->Publish(msg);
+  transport::RequestInsert(newModelStr.str());
 
   WaitUntilEntitySpawn(_modelName, 100, 100);
   WaitUntilSensorSpawn(_raySensorName, 100, 100);
@@ -722,8 +715,7 @@ sensors::SonarSensorPtr ServerFixture::SpawnSonar(const std::string &_modelName,
     << "</model>"
     << "</sdf>";
 
-  msg.set_sdf(newModelStr.str());
-  this->factoryPub->Publish(msg);
+  transport::RequestInsert(newModelStr.str());
 
   WaitUntilEntitySpawn(_modelName, 100, 100);
   WaitUntilSensorSpawn(_sonarName, 100, 100);
@@ -789,8 +781,7 @@ void ServerFixture::SpawnGpuRaySensor(const std::string &_modelName,
     << "</model>"
     << "</sdf>";
 
-  msg.set_sdf(newModelStr.str());
-  this->factoryPub->Publish(msg);
+  transport::RequestInsert(newModelStr.str());
 
   WaitUntilEntitySpawn(_modelName, 100, 100);
   WaitUntilSensorSpawn(_raySensorName, 100, 100);
@@ -830,8 +821,7 @@ void ServerFixture::SpawnDepthCameraSensor(const std::string &_modelName,
     << "</model>"
     << "</sdf>";
 
-  msg.set_sdf(newModelStr.str());
-  this->factoryPub->Publish(msg);
+  transport::RequestInsert(newModelStr.str());
 
   WaitUntilEntitySpawn(_modelName, 100, 50);
   WaitUntilSensorSpawn(_cameraName, 100, 100);
@@ -928,8 +918,7 @@ void ServerFixture::SpawnImuSensor(const std::string &_modelName,
     << "</model>" << std::endl
     << "</sdf>" << std::endl;
 
-  msg.set_sdf(newModelStr.str());
-  this->factoryPub->Publish(msg);
+  transport::RequestInsert(newModelStr.str());
 
   WaitUntilEntitySpawn(_modelName, 100, 1000);
   WaitUntilSensorSpawn(_imuSensorName, 100, 100);
@@ -987,8 +976,7 @@ void ServerFixture::SpawnUnitContactSensor(const std::string &_name,
     << "</model>"
     << "</sdf>";
 
-  msg.set_sdf(newModelStr.str());
-  this->factoryPub->Publish(msg);
+  transport::RequestInsert(newModelStr.str());
 
   WaitUntilEntitySpawn(_name, 100, 100);
   WaitUntilSensorSpawn(_sensorName, 100, 100);
@@ -1043,8 +1031,7 @@ void ServerFixture::SpawnUnitImuSensor(const std::string &_name,
     << "</model>"
     << "</sdf>";
 
-  msg.set_sdf(newModelStr.str());
-  this->factoryPub->Publish(msg);
+  transport::RequestInsert(newModelStr.str());
 
   WaitUntilEntitySpawn(_name, 20, 50);
   WaitUntilSensorSpawn(_sensorName, 100, 100);
@@ -1098,8 +1085,7 @@ void ServerFixture::SpawnUnitAltimeterSensor(const std::string &_name,
     << "</model>"
     << "</sdf>";
 
-  msg.set_sdf(newModelStr.str());
-  this->factoryPub->Publish(msg);
+  transport::RequestInsert(newModelStr.str());
 
   WaitUntilEntitySpawn(_name, 20, 50);
   WaitUntilSensorSpawn(_sensorName, 100, 100);
@@ -1150,8 +1136,7 @@ void ServerFixture::SpawnUnitMagnetometerSensor(const std::string &_name,
     << "</model>"
     << "</sdf>";
 
-  msg.set_sdf(newModelStr.str());
-  this->factoryPub->Publish(msg);
+  transport::RequestInsert(newModelStr.str());
 
   WaitUntilEntitySpawn(_name, 20, 50);
   WaitUntilSensorSpawn(_sensorName, 100, 100);
@@ -1200,8 +1185,7 @@ void ServerFixture::SpawnWirelessTransmitterSensor(const std::string &_name,
     << "</model>"
     << "</sdf>";
 
-  msg.set_sdf(newModelStr.str());
-  this->factoryPub->Publish(msg);
+  transport::RequestInsert(newModelStr.str());
 
   WaitUntilEntitySpawn(_name, 100, 100);
   WaitUntilSensorSpawn(_sensorName, 100, 100);
@@ -1243,8 +1227,7 @@ void ServerFixture::SpawnWirelessReceiverSensor(const std::string &_name,
     << "</model>"
     << "</sdf>";
 
-  msg.set_sdf(newModelStr.str());
-  this->factoryPub->Publish(msg);
+  transport::RequestInsert(newModelStr.str());
 
   WaitUntilEntitySpawn(_name, 100, 100);
   WaitUntilSensorSpawn(_sensorName, 100, 100);
@@ -1361,8 +1344,7 @@ void ServerFixture::SpawnLight(const std::string &_name,
     << "</light>"
     << "</sdf>";
 
-  msg.set_sdf(newLightStr.str());
-  this->factoryPub->Publish(msg);
+  transport::RequestInsert(newLightStr.str());
 
   physics::WorldPtr world = physics::get_world();
   msgs::Scene sceneMsg;
@@ -1402,8 +1384,7 @@ void ServerFixture::SpawnCylinder(const std::string &_name,
     << msgs::ModelToSDF(model)->ToString("")
     << "</sdf>";
 
-  msg.set_sdf(newModelStr.str());
-  this->factoryPub->Publish(msg);
+  transport::RequestInsert(newModelStr.str());
 
   // Wait for the entity to spawn
   while (!this->HasEntity(_name))
@@ -1437,8 +1418,7 @@ void ServerFixture::SpawnSphere(const std::string &_name,
     << "</model>"
     << "</sdf>";
 
-  msg.set_sdf(newModelStr.str());
-  this->factoryPub->Publish(msg);
+  transport::RequestInsert(newModelStr.str());
 
   // Wait for the entity to spawn
   while (_wait && !this->HasEntity(_name))
@@ -1470,8 +1450,7 @@ void ServerFixture::SpawnSphere(const std::string &_name,
     << msgs::ModelToSDF(model)->ToString("")
     << "</sdf>";
 
-  msg.set_sdf(newModelStr.str());
-  this->factoryPub->Publish(msg);
+  transport::RequestInsert(newModelStr.str());
 
   // Wait for the entity to spawn
   while (_wait && !this->HasEntity(_name))
@@ -1499,8 +1478,7 @@ void ServerFixture::SpawnBox(const std::string &_name,
     << msgs::ModelToSDF(model)->ToString("")
     << "</sdf>";
 
-  msg.set_sdf(newModelStr.str());
-  this->factoryPub->Publish(msg);
+  transport::RequestInsert(newModelStr.str());
 
   // Wait for the entity to spawn
   while (!this->HasEntity(_name))
@@ -1538,8 +1516,7 @@ void ServerFixture::SpawnTrimesh(const std::string &_name,
     << "</model>"
     << "</sdf>";
 
-  msg.set_sdf(newModelStr.str());
-  this->factoryPub->Publish(msg);
+  transport::RequestInsert(newModelStr.str());
 
   // Wait for the entity to spawn
   while (!this->HasEntity(_name))
@@ -1565,8 +1542,7 @@ void ServerFixture::SpawnEmptyLink(const std::string &_name,
     << msgs::ModelToSDF(model)->ToString("")
     << "</sdf>";
 
-  msg.set_sdf(newModelStr.str());
-  this->factoryPub->Publish(msg);
+  transport::RequestInsert(newModelStr.str());
 
   // Wait for the entity to spawn
   while (!this->HasEntity(_name))
@@ -1578,7 +1554,8 @@ void ServerFixture::SpawnModel(const std::string &_filename)
 {
   msgs::Factory msg;
   msg.set_sdf_filename(_filename);
-  this->factoryPub->Publish(msg);
+  //this->factoryPub->Publish(msg);
+  //transport::RequestInsert(newModelStr.str());
 }
 
 /////////////////////////////////////////////////
@@ -1586,7 +1563,7 @@ void ServerFixture::SpawnSDF(const std::string &_sdf)
 {
   msgs::Factory msg;
   msg.set_sdf(_sdf);
-  this->factoryPub->Publish(msg);
+  transport::RequestInsert(_sdf);
 
   // The code above sends a message, but it will take some time
   // before the message is processed.
@@ -1629,7 +1606,7 @@ physics::ModelPtr ServerFixture::GetModel(const std::string &_name)
 /////////////////////////////////////////////////
 void ServerFixture::RemoveModel(const std::string &_name)
 {
-  transport::RequestEntityDelete(_name);
+  transport::RequestDelete(_name);
 }
 
 /////////////////////////////////////////////////

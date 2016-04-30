@@ -163,7 +163,7 @@ void LightMaker::CreateTheEntity()
   msgs::Set(dPtr->msg.mutable_pose()->mutable_orientation(),
             ignition::math::Quaterniond());
 
-  transport::RequestLightInsert(dPtr->msg);
+  transport::RequestInsert(dPtr->msg);
 }
 
 /////////////////////////////////////////////////

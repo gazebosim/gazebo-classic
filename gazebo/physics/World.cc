@@ -603,7 +603,7 @@ void World::LogStep()
 
           while (nameElem)
           {
-            transport::RequestEntityDelete(nameElem->Get<std::string>());
+            transport::RequestDelete(nameElem->Get<std::string>());
             nameElem = nameElem->GetNextElement("name");
           }
         }
@@ -1385,7 +1385,7 @@ void World::SetPaused(bool _p)
 void World::OnFactoryMsg(ConstFactoryPtr &_msg)
 {
   gzwarn << "Factory topic is deprecated. Use "
-      << "transport::RequestEntityInsert() instead." << std::endl;
+      << "transport::RequestInsert() instead." << std::endl;
 
   // TODO: Converting to operation on Gazebo8, remove on Gazebo9
   msgs::Operation msg;
@@ -1666,7 +1666,7 @@ void World::ProcessRequestMsgs()
     {
       gzwarn << "Request for `entity_delete` [" << requestMsg.data()
           << "] is deprecated. Use "
-          << "transport::RequestEntityDelete(<entity uri>)"
+          << "transport::RequestDelete(<entity uri>)"
           << " instead." << std::endl;
 
       msgs::Operation msg;
@@ -2840,7 +2840,7 @@ void World::OnLightModifyMsg(ConstLightPtr &_msg)
 void World::OnLightFactoryMsg(ConstLightPtr &_msg)
 {
   gzwarn << "Factory topic is deprecated. Use "
-      << "transport::RequestEntityInsert() instead." << std::endl;
+      << "transport::RequestInsert() instead." << std::endl;
 
   // TODO: Converting to operation on Gazebo8, remove on Gazebo9
   msgs::Factory fac;

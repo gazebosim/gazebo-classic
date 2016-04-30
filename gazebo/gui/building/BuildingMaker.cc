@@ -1203,7 +1203,7 @@ void BuildingMaker::CreateTheEntity()
     modelElem->GetAttribute("name")->Set(modelElemName);
   }
 
-  transport::RequestEntityInsert(this->dataPtr->modelSDF->ToString());
+  transport::RequestInsert(this->dataPtr->modelSDF->ToString());
 }
 
 /////////////////////////////////////////////////

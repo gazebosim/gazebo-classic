@@ -46,7 +46,6 @@ void Issue624Test::CollisionWorldPose(const std::string &_physicsEngine)
 
   // Spawn some custom model
   {
-    msgs::Factory msg;
     std::ostringstream newModelStr;
 
     std::string name = "box_1";
@@ -85,8 +84,7 @@ void Issue624Test::CollisionWorldPose(const std::string &_physicsEngine)
       << "</model>"
       << "</sdf>";
 
-    msg.set_sdf(newModelStr.str());
-    this->factoryPub->Publish(msg);
+    transport::RequestInsert(newModelStr.str());
 
     // Wait for the entity to spawn
     while (!this->HasEntity(name))

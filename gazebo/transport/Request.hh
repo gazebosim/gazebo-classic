@@ -29,29 +29,36 @@ namespace gazebo
 {
   namespace transport
   {
-    /// \brief Helper function to create entity delete requests using ignition
+    /// \brief Helper function to send an entity delete request using ignition
     /// transport.
     /// \param[in] _uri URI of entity to be deleted.
+    /// \return Unique id for the request.
     GZ_TRANSPORT_VISIBLE
-    size_t RequestEntityDelete(const std::string &_uri);
+    size_t RequestDelete(const std::string &_uri);
 
-    /// \brief Helper class to create requests for ignition transport.
+    /// \brief Helper class to send an entity insert request using ignition
+    /// transport.
+    /// \param[in] _sdf Entity SDF as a string.
+    /// \param[in] _pose Optional pose where entity will be spawned.
+    /// \return Unique id for the request.
     GZ_TRANSPORT_VISIBLE
-    size_t RequestEntityInsert(const std::string &_sdf,
+    size_t RequestInsert(const std::string &_sdf,
+        const ignition::math::Pose3d &_pose =
+        ignition::math::Pose3d(IGN_DBL_MAX, IGN_DBL_MAX, IGN_DBL_MAX,
+                               0, 0, 0));
+
+    /// \brief Helper class to send a clone entity request using ignition
+    /// transport.
+    /// \param[in] _uri URI of entity to be cloned.
+    GZ_TRANSPORT_VISIBLE
+    size_t RequestClone(const std::string &_uri,
         const ignition::math::Pose3d &_pose =
         ignition::math::Pose3d(IGN_DBL_MAX, IGN_DBL_MAX, IGN_DBL_MAX,
                                0, 0, 0));
 
     /// \brief Helper class to create requests for ignition transport.
     GZ_TRANSPORT_VISIBLE
-    size_t RequestEntityClone(const std::string &_name,
-        const ignition::math::Pose3d &_pose =
-        ignition::math::Pose3d(IGN_DBL_MAX, IGN_DBL_MAX, IGN_DBL_MAX,
-                               0, 0, 0));
-
-    /// \brief Helper class to create requests for ignition transport.
-    GZ_TRANSPORT_VISIBLE
-    size_t RequestLightInsert(const msgs::Light &_light);
+    size_t RequestInsert(const msgs::Light &_light);
   }
 }
 #endif

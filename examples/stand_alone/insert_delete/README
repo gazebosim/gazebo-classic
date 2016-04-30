@@ -1,0 +1,35 @@
+Delete / Insert examples
+
+These are simple examples on how to delete or insert entities using the
+transport API.
+
+===================
+Build Instructions
+===================
+
+ * From this directory:
+
+  $ mkdir build
+  $ cd build
+  $ cmake ..
+  $ make
+
+
+===================
+Execute Instructions
+===================
+
+ 1. Launch gazebo as usual.
+
+ 2. Then from the build directory above, insert a ball:
+
+  $ ./insert_ball
+
+ 3. A ball will show up in simulation.
+
+ 4. Now from the same directory, delete the ball:
+
+  $ ./delete_ball
+
+ 5. The ball will disappear.
+

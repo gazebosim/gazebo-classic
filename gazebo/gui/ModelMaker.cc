@@ -385,11 +385,11 @@ void ModelMaker::CreateTheEntity()
         dPtr->modelVisual->GetWorldPose().Ign());
 
     // Spawn the model in the physics server
-    transport::RequestEntityInsert(dPtr->modelSDF->ToString());
+    transport::RequestInsert(dPtr->modelSDF->ToString());
   }
   else
   {
-    transport::RequestEntityClone(dPtr->modelVisual->GetName().substr(0,
+    transport::RequestClone(dPtr->modelVisual->GetName().substr(0,
           dPtr->modelVisual->GetName().find("_clone_tmp")),
           dPtr->modelVisual->GetWorldPose().Ign());
   }
