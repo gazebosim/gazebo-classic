@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,22 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_MODEL_ALIGN_HH_
-#define _GAZEBO_MODEL_ALIGN_HH_
+#ifndef _GAZEBO_GUI_MODEL_ALIGN_HH_
+#define _GAZEBO_GUI_MODEL_ALIGN_HH_
 
 #include <string>
 #include <vector>
 
-#include "gazebo/common/MouseEvent.hh"
 #include "gazebo/common/KeyEvent.hh"
+#include "gazebo/common/MouseEvent.hh"
+#include "gazebo/common/SingletonT.hh"
+
+#include "gazebo/math/Box.hh"
+#include "gazebo/math/Pose.hh"
+#include "gazebo/math/Vector3.hh"
 
 #include "gazebo/rendering/RenderTypes.hh"
 
-#include "gazebo/common/SingletonT.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo

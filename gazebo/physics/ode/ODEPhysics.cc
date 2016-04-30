@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -158,30 +158,8 @@ ODEPhysics::ODEPhysics(WorldPtr _world)
 //////////////////////////////////////////////////
 ODEPhysics::~ODEPhysics()
 {
-  dCloseODE();
+  this->Fini();
 
-  dJointGroupDestroy(this->dataPtr->contactGroup);
-
-  // Delete all the joint feedbacks.
-  for (std::vector<ODEJointFeedback*>::iterator iter =
-      this->dataPtr->jointFeedbacks.begin(); iter !=
-          this->dataPtr->jointFeedbacks.end(); ++iter)
-  {
-    delete *iter;
-  }
-  this->dataPtr->jointFeedbacks.clear();
-
-  if (this->dataPtr->spaceId)
-  {
-    dSpaceSetCleanup(this->dataPtr->spaceId, 0);
-    dSpaceDestroy(this->dataPtr->spaceId);
-  }
-
-  if (this->dataPtr->worldId)
-    dWorldDestroy(this->dataPtr->worldId);
-
-  this->dataPtr->spaceId = NULL;
-  this->dataPtr->worldId = NULL;
   delete this->dataPtr;
   this->dataPtr = NULL;
 }
@@ -230,12 +208,12 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
   dWorldSetAutoDisableAngularThreshold(this->dataPtr->worldId, 0.1);
   dWorldSetAutoDisableSteps(this->dataPtr->worldId, 5);
 
-  math::Vector3 g = this->sdf->Get<math::Vector3>("gravity");
+  auto g = this->world->Gravity();
 
-  if (g == math::Vector3(0, 0, 0))
+  if (g == ignition::math::Vector3d::Zero)
     gzwarn << "Gravity vector is (0, 0, 0). Objects will float.\n";
 
-  dWorldSetGravity(this->dataPtr->worldId, g.x, g.y, g.z);
+  dWorldSetGravity(this->dataPtr->worldId, g.X(), g.Y(), g.Z());
 
   if (odeElem->HasElement("constraints"))
   {
@@ -470,6 +448,30 @@ void ODEPhysics::UpdatePhysics()
 //////////////////////////////////////////////////
 void ODEPhysics::Fini()
 {
+  dCloseODE();
+
+  dJointGroupDestroy(this->dataPtr->contactGroup);
+
+  // Delete all the joint feedbacks.
+  for (auto iter = this->dataPtr->jointFeedbacks.begin();
+      iter != this->dataPtr->jointFeedbacks.end(); ++iter)
+  {
+    delete *iter;
+  }
+  this->dataPtr->jointFeedbacks.clear();
+
+  if (this->dataPtr->spaceId)
+  {
+    dSpaceSetCleanup(this->dataPtr->spaceId, 0);
+    dSpaceDestroy(this->dataPtr->spaceId);
+  }
+
+  if (this->dataPtr->worldId)
+    dWorldDestroy(this->dataPtr->worldId);
+  this->dataPtr->worldId = NULL;
+
+  this->dataPtr->spaceId = NULL;
+
   PhysicsEngine::Fini();
 }
 
@@ -532,7 +534,12 @@ ShapePtr ODEPhysics::CreateShape(const std::string &_type,
   else if (_type == "polyline")
     shape.reset(new ODEPolylineShape(collision));
   else if (_type == "multiray")
-    shape.reset(new ODEMultiRayShape(collision));
+  {
+    if (_collision)
+      shape.reset(new ODEMultiRayShape(collision));
+    else
+      shape.reset(new ODEMultiRayShape(this->world->GetPhysicsEngine()));
+  }
   else if (_type == "mesh" || _type == "trimesh")
     shape.reset(new ODEMeshShape(collision));
   else if (_type == "heightmap")
@@ -540,10 +547,12 @@ ShapePtr ODEPhysics::CreateShape(const std::string &_type,
   else if (_type == "map" || _type == "image")
     shape.reset(new MapShape(collision));
   else if (_type == "ray")
+  {
     if (_collision)
       shape.reset(new ODERayShape(collision));
     else
       shape.reset(new ODERayShape(this->world->GetPhysicsEngine()));
+  }
   else
     gzerr << "Unable to create collision of type[" << _type << "]\n";
 
@@ -917,7 +926,7 @@ void ODEPhysics::SetStepType(const std::string &_type)
 //////////////////////////////////////////////////
 void ODEPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
 {
-  this->sdf->GetElement("gravity")->Set(_gravity);
+  this->world->SetGravitySDF(_gravity.Ign());
   dWorldSetGravity(this->dataPtr->worldId, _gravity.x, _gravity.y, _gravity.z);
 }
 
@@ -1049,7 +1058,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
     this->dataPtr->indices[i] = i;
 
   // Choose only the best contacts if too many were generated.
-  if (numc > maxCollide)
+  if (maxCollide > 0 && numc > maxCollide)
   {
     double max = _contactCollisions[maxCollide-1].depth;
     for (unsigned int i = maxCollide; i < numc; ++i)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,7 +56,7 @@ void AltimeterSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 std::string AltimeterSensor::GetTopic() const
 {
-  std::string topicName = "~/" + this->parentName + '/' + this->GetName();
+  std::string topicName = "~/" + this->ParentName() + '/' + this->Name();
   if (this->sdf->HasElement("topic"))
     topicName += '/' + this->sdf->Get<std::string>("topic");
   boost::replace_all(topicName, "::", "/");
@@ -69,12 +69,13 @@ void AltimeterSensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
 
-  physics::EntityPtr parentEntity = this->world->GetEntity(this->parentName);
+  physics::EntityPtr parentEntity = this->world->GetEntity(
+      this->ParentName());
   this->dataPtr->parentLink =
     boost::dynamic_pointer_cast<physics::Link>(parentEntity);
 
   this->dataPtr->altPub =
-    this->node->Advertise<msgs::Altimeter>(this->GetTopic(), 50);
+    this->node->Advertise<msgs::Altimeter>(this->Topic(), 50);
 
   // Parse sdf noise parameters
   sdf::ElementPtr altElem = this->sdf->GetElement("altimeter");
@@ -82,7 +83,7 @@ void AltimeterSensor::Load(const std::string &_worldName)
   if (!altElem)
   {
     gzerr << "Missing <altimeter> element in sensor["
-      << this->GetName() << "]\n";
+      << this->Name() << "]\n";
   }
   else
   {
@@ -139,7 +140,8 @@ bool AltimeterSensor::UpdateImpl(const bool /*_force*/)
     ignition::math::Pose3d altPose = this->pose + parentPose;
 
     ignition::math::Vector3d altVel =
-      this->dataPtr->parentLink->GetWorldLinearVel(this->pose.Pos()).Ign();
+      this->dataPtr->parentLink->GetWorldLinearVel(
+          this->pose.Pos()).Ign();
 
     // Apply noise to the position and velocity
     if (this->noises.find(ALTIMETER_POSITION_NOISE_METERS) !=
@@ -169,7 +171,8 @@ bool AltimeterSensor::UpdateImpl(const bool /*_force*/)
   }
 
   // Save the time of the measurement
-  msgs::Set(this->dataPtr->altMsg.mutable_time(), this->world->GetSimTime());
+  msgs::Set(this->dataPtr->altMsg.mutable_time(),
+      this->world->GetSimTime());
 
   // Publish the message if needed
   if (this->dataPtr->altPub)

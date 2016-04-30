@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,10 +54,10 @@ void onPoseInfo(ConstPose_VPtr &_msg)
 TEST(StateLogTest, PR2Record)
 {
   common::SystemPaths *paths = common::SystemPaths::Instance();
-  custom_exec(("gzserver -r --record_path " + paths->GetDefaultTestPath()
+  custom_exec(("gzserver -r --record_path " + paths->DefaultTestPath()
     + " --iters 1000 --seed 12345 worlds/pr2.world").c_str());
 
-  boost::filesystem::path path = paths->GetDefaultTestPath() + "/state.log";
+  boost::filesystem::path path = paths->DefaultTestPath() + "/state.log";
   EXPECT_TRUE(boost::filesystem::exists(path) != false);
 }
 
@@ -71,7 +71,7 @@ TEST(StateLogTest, PR2PlaybackZipped)
   // Run playback
   common::SystemPaths *paths = common::SystemPaths::Instance();
   boost::thread *play = new boost::thread(boost::bind(&custom_exec,
-    ("gzserver -u -p " + paths->GetDefaultTestPath() "/state.log").c_str()));
+    ("gzserver -u -p " + paths->DefaultTestPath() "/state.log").c_str()));
 
   // Setup transportation
   gazebo::transport::init();
@@ -134,12 +134,12 @@ TEST(StateLogTest, PR2PlaybackTxt)
 
   // Convert the zipped state to txt and set a Hz filter.
   common::SystemPaths *paths = common::SystemPaths::Instance();
-  custom_exec(("gzlog echo " + paths->GetDefaultTestPath() + "/state.log" +
-    " -z 30 > " + paths->GetDefaultTestPath() + "/state_txt.log").c_str());
+  custom_exec(("gzlog echo " + paths->DefaultTestPath() + "/state.log" +
+    " -z 30 > " + paths->DefaultTestPath() + "/state_txt.log").c_str());
 
   // Run playback
   boost::thread *play = new boost::thread(boost::bind(&custom_exec,
-    ("gzserver -u -p " + paths->GetDefaultTestPath() "/state.log").c_str()));
+    ("gzserver -u -p " + paths->DefaultTestPath() "/state.log").c_str()));
 
   // Setup transportation
   gazebo::transport::init();
@@ -194,14 +194,14 @@ int main(int argc, char **argv)
 {
   // Cleanup test directory and create a new one.
   common::SystemPaths *paths = common::SystemPaths::Instance();
-  boost::filesystem::remove_all(paths->GetDefaultTestPath());
-  boost::filesystem::create_directories(paths->GetDefaultTestPath());
+  boost::filesystem::remove_all(paths->DefaultTestPath());
+  boost::filesystem::create_directories(paths->DefaultTestPath());
 
   ::testing::InitGoogleTest(&argc, argv);
   int result = RUN_ALL_TESTS();
 
   // Cleanup test directory.
-  boost::filesystem::remove_all(paths->GetDefaultTestPath());
+  boost::filesystem::remove_all(paths->DefaultTestPath());
 
   return result;
 }

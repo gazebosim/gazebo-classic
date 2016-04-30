@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,7 +79,7 @@ void HeightmapTest::PhysicsLoad(const std::string &_physicsEngine)
   common::Image testImage = shape->GetImage();
 
   common::SystemPaths *paths = common::SystemPaths::Instance();
-  testImage.SavePNG(paths->GetTmpPath() + "/test_shape.png");
+  testImage.SavePNG(paths->TmpPath() + "/test_shape.png");
 
   EXPECT_EQ(trueImage.GetWidth(), testImage.GetWidth());
   EXPECT_EQ(trueImage.GetHeight(), testImage.GetHeight());

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,37 +88,51 @@ void PhysicsEngine::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void PhysicsEngine::Fini()
 {
+  // Clean up transport
+  {
+    this->responsePub.reset();
+    this->requestSub.reset();
+
+    this->node.reset();
+  }
+
+  if (this->sdf)
+  {
+    this->sdf->Reset();
+    this->sdf.reset();
+  }
+
+  if (this->contactManager)
+  {
+    delete this->contactManager;
+    this->contactManager = NULL;
+  }
+
+  if (this->physicsUpdateMutex)
+  {
+    delete this->physicsUpdateMutex;
+    this->physicsUpdateMutex = NULL;
+  }
+
   this->world.reset();
-  this->node->Fini();
 }
 
 //////////////////////////////////////////////////
 PhysicsEngine::~PhysicsEngine()
 {
-  this->sdf->Reset();
-  this->sdf.reset();
-  delete this->physicsUpdateMutex;
-  this->physicsUpdateMutex = NULL;
-  this->responsePub.reset();
-  this->requestSub.reset();
-  this->node.reset();
-
-  delete this->contactManager;
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
 math::Vector3 PhysicsEngine::GetGravity() const
 {
-  return this->sdf->Get<math::Vector3>("gravity");
+  return this->world->Gravity();
 }
 
 //////////////////////////////////////////////////
 ignition::math::Vector3d PhysicsEngine::MagneticField() const
 {
-  if (this->sdf->HasElement("magnetic_field"))
-    return this->sdf->Get<ignition::math::Vector3d>("magnetic_field");
-  else
-    return ignition::math::Vector3d::Zero;
+  return this->world->MagneticField();
 }
 
 //////////////////////////////////////////////////
@@ -266,8 +280,8 @@ bool PhysicsEngine::SetParam(const std::string &_key,
 #ifndef _WIN32
 #pragma GCC diagnostic pop
 #endif
-      this->sdf->GetElement("magnetic_field")->
-          Set(boost::any_cast<ignition::math::Vector3d>(copy));
+      this->world->SetMagneticField(
+          boost::any_cast<ignition::math::Vector3d>(copy));
     }
     else
     {
@@ -314,7 +328,7 @@ bool PhysicsEngine::GetParam(const std::string &_key,
   else if (_key == "gravity")
     _value = this->GetGravity();
   else if (_key == "magnetic_field")
-    _value = this->sdf->Get<math::Vector3>("magnetic_field");
+    _value = this->world->MagneticField();
   else
   {
     gzwarn << "GetParam failed for [" << _key << "] in physics engine "
@@ -335,4 +349,10 @@ ContactManager *PhysicsEngine::GetContactManager() const
 sdf::ElementPtr PhysicsEngine::GetSDF() const
 {
   return this->sdf;
+}
+
+//////////////////////////////////////////////////
+WorldPtr PhysicsEngine::World() const
+{
+  return this->world;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 #define _GAZEBO_GUI_CONVERSIONS_HH_
 
 #include <ignition/math/Vector2.hh>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/gui/qt.h"
 
@@ -59,6 +60,16 @@ namespace gazebo
       /// \param[in] _color QPointF to convert
       /// \return Ignition Vector2d.
       public: static ignition::math::Vector2d Convert(const QPointF &_pt);
+
+      /// \brief Return the equivalent qt vector 3d.
+      /// \param[in] _vec Ignition vector 3d to convert.
+      /// \return Qt vector 3d value.
+      public: static QVector3D Convert(const ignition::math::Vector3d &_vec);
+
+      /// \brief Return the equivalent ignition vector 3d.
+      /// \param[in] _vec Qt vector 3d to convert.
+      /// \return Ignition vector 3d value
+      public: static ignition::math::Vector3d Convert(const QVector3D &_vec);
     };
     /// \}
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,11 +80,11 @@ void DARTPhysics::Load(sdf::ElementPtr _sdf)
   PhysicsEngine::Load(_sdf);
 
   // Gravity
-  math::Vector3 g = this->sdf->Get<math::Vector3>("gravity");
+  auto g = this->world->Gravity();
   // ODEPhysics checks this, so we will too.
-  if (g == math::Vector3(0, 0, 0))
+  if (g == ignition::math::Vector3d::Zero)
     gzwarn << "Gravity vector is (0, 0, 0). Objects will float.\n";
-  this->dataPtr->dtWorld->setGravity(Eigen::Vector3d(g.x, g.y, g.z));
+  this->dataPtr->dtWorld->setGravity(Eigen::Vector3d(g.X(), g.Y(), g.Z()));
 }
 
 //////////////////////////////////////////////////
@@ -351,7 +351,7 @@ JointPtr DARTPhysics::CreateJoint(const std::string &_type, ModelPtr _parent)
 //////////////////////////////////////////////////
 void DARTPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
 {
-  this->sdf->GetElement("gravity")->Set(_gravity);
+  this->world->SetGravitySDF(_gravity.Ign());
   this->dataPtr->dtWorld->setGravity(
     Eigen::Vector3d(_gravity.x, _gravity.y, _gravity.z));
 }
@@ -459,7 +459,7 @@ void DARTPhysics::OnRequest(ConstRequestPtr &_msg)
     msgs::Physics physicsMsg;
     physicsMsg.set_type(msgs::Physics::DART);
     physicsMsg.mutable_gravity()->CopyFrom(
-      msgs::Convert(this->GetGravity().Ign()));
+      msgs::Convert(this->world->Gravity()));
     physicsMsg.mutable_magnetic_field()->CopyFrom(
       msgs::Convert(this->MagneticField()));
     physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());

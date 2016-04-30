@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,9 +53,6 @@ namespace gazebo
       /// \brief Transportation node.
       public: transport::NodePtr node;
 
-      /// \brief Model publisher that publishes model pose to the server.
-      public: transport::PublisherPtr modelPub;
-
       /// \brief Publish user command messages for the server to place in the
       /// undo queue.
       public: transport::PublisherPtr userCmdPub;
@@ -86,6 +83,9 @@ namespace gazebo
 
       /// \brief True to manipulate model in global frame.
       public: bool globalManip;
+
+      /// \brief True when a model is being manipulated, false otherwise.
+      public: bool transparent = false;
     };
   }
 }

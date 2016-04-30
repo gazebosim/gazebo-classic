@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,7 +63,10 @@ math::Vector3 ODEHinge2Joint::GetAnchor(unsigned int _index) const
       dJointGetHinge2Anchor2(this->jointId, result);
   }
   else
+  {
     gzerr << "ODE Joint ID is invalid\n";
+    return math::Vector3::Zero;
+  }
 
   return math::Vector3(result[0], result[1], result[2]);
 }

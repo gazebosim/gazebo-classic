@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -483,13 +483,13 @@ void JointInspector::OnSwap()
 /////////////////////////////////////////////////
 void JointInspector::OnLinkInserted(const std::string &_linkName)
 {
-  std::string leafName = _linkName;
-  size_t idx = _linkName.rfind("::");
+  std::string unscopedName = _linkName;
+  size_t idx = _linkName.find("::");
   if (idx != std::string::npos)
-    leafName = _linkName.substr(idx+2);
+    unscopedName = _linkName.substr(idx+2);
 
-  this->dataPtr->configWidget->AddItemEnumWidget("parentCombo", leafName);
-  this->dataPtr->configWidget->AddItemEnumWidget("childCombo", leafName);
+  this->dataPtr->configWidget->AddItemEnumWidget("parentCombo", unscopedName);
+  this->dataPtr->configWidget->AddItemEnumWidget("childCombo", unscopedName);
 
   this->OnLinksChanged();
 }
@@ -497,13 +497,14 @@ void JointInspector::OnLinkInserted(const std::string &_linkName)
 /////////////////////////////////////////////////
 void JointInspector::OnLinkRemoved(const std::string &_linkName)
 {
-  std::string leafName = _linkName;
-  size_t idx = _linkName.rfind("::");
+  std::string unscopedName = _linkName;
+  size_t idx = _linkName.find("::");
   if (idx != std::string::npos)
-    leafName = _linkName.substr(idx+2);
+    unscopedName = _linkName.substr(idx+2);
 
-  this->dataPtr->configWidget->RemoveItemEnumWidget("parentCombo", leafName);
-  this->dataPtr->configWidget->RemoveItemEnumWidget("childCombo", leafName);
+  this->dataPtr->configWidget->RemoveItemEnumWidget("parentCombo",
+      unscopedName);
+  this->dataPtr->configWidget->RemoveItemEnumWidget("childCombo", unscopedName);
 
   this->OnLinksChanged();
 }
@@ -526,7 +527,6 @@ void JointInspector::Open()
       this->dataPtr->configWidget->StringWidgetValue("parent");
   std::string currentChild =
       this->dataPtr->configWidget->StringWidgetValue("child");
-
 
   this->dataPtr->configWidget->blockSignals(true);
   if (!currentParent.empty())
@@ -573,7 +573,7 @@ void JointInspector::OnRemove()
 {
   this->close();
 
-  this->dataPtr->jointMaker->RemoveJoint(this->dataPtr->jointId);
+  this->dataPtr->jointMaker->RemoveJointByUser(this->dataPtr->jointId);
 }
 
 /////////////////////////////////////////////////
@@ -626,7 +626,7 @@ void JointInspector::OnCancel()
 {
   this->RestoreOriginalData();
 
-  this->close();
+  this->reject();
 }
 
 /////////////////////////////////////////////////
@@ -670,3 +670,8 @@ void JointInspector::keyPressEvent(QKeyEvent *_event)
     QDialog::keyPressEvent(_event);
 }
 
+///////////////////////////////////////////////////
+void JointInspector::closeEvent(QCloseEvent *_event)
+{
+  _event->accept();
+}

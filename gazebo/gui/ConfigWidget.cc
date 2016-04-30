@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@
 #include <google/protobuf/message.h>
 
 #include "gazebo/common/Console.hh"
+#include "gazebo/common/EnumIface.hh"
+#include "gazebo/common/MaterialDensity.hh"
 #include "gazebo/gui/ConfigWidget.hh"
 #include "gazebo/gui/ConfigWidgetPrivate.hh"
 
@@ -189,6 +191,11 @@ std::string ConfigWidget::UnitFromKey(const std::string &_key,
       return "Nm";
   }
 
+  if (_key == "density")
+  {
+    return "kg/m<sup>3</sup>";
+  }
+
   return "";
 }
 
@@ -209,7 +216,7 @@ void ConfigWidget::RangeFromKey(const std::string &_key, double &_min,
 
   if (_key == "mass" || _key == "ixx" || _key == "ixy" || _key == "ixz" ||
       _key == "iyy" || _key == "iyz" || _key == "izz" || _key == "length" ||
-      _key == "min_depth")
+      _key == "min_depth" || _key == "density")
   {
     _min = 0;
   }
@@ -459,6 +466,18 @@ bool ConfigWidget::SetGeometryWidgetValue(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
+bool ConfigWidget::SetDensityWidgetValue(const std::string &_name,
+    const double _value)
+{
+  auto iter = this->dataPtr->configWidgets.find(_name);
+
+  if (iter != this->dataPtr->configWidgets.end())
+    return this->UpdateDensityWidget(iter->second, _value);
+
+  return false;
+}
+
+/////////////////////////////////////////////////
 bool ConfigWidget::SetEnumWidgetValue(const std::string &_name,
     const std::string &_value)
 {
@@ -629,6 +648,23 @@ std::string ConfigWidget::GetGeometryWidgetValue(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
+double ConfigWidget::DensityWidgetValue(const std::string &_name) const
+{
+  double value = 0.0;
+  auto iter = this->dataPtr->configWidgets.find(_name);
+
+  if (iter != this->dataPtr->configWidgets.end())
+  {
+    DensityConfigWidget *widget =
+        qobject_cast<DensityConfigWidget *>(iter->second);
+
+    if (widget)
+      value = widget->Density();
+  }
+  return value;
+}
+
+/////////////////////////////////////////////////
 std::string ConfigWidget::GeometryWidgetValue(const std::string &_name,
     ignition::math::Vector3d &_dimensions, std::string &_uri) const
 {
@@ -712,6 +748,16 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
           if (newWidget)
           {
             configChildWidget = this->CreateDoubleWidget(name, _level);
+            if (name == "mass")
+            {
+              QDoubleSpinBox *valueSpinBox = qobject_cast<QDoubleSpinBox *>(
+                  configChildWidget->widgets[0]);
+              if (valueSpinBox)
+              {
+                this->connect(valueSpinBox, SIGNAL(valueChanged(double)),
+                    this, SLOT(OnMassValueChanged(double)));
+              }
+            }
             newFieldWidget = configChildWidget;
           }
           this->UpdateDoubleWidget(configChildWidget, value);
@@ -997,6 +1043,31 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
             color.a = values[3];
             this->UpdateColorWidget(configChildWidget, color);
           }
+          // parse and create custom density widgets
+          else if (field->message_type()->name() == "Density")
+          {
+            if (newWidget)
+            {
+              configChildWidget = this->CreateDensityWidget(name, _level);
+              newFieldWidget = configChildWidget;
+            }
+            const google::protobuf::Descriptor *valueDescriptor =
+                valueMsg->GetDescriptor();
+
+            double density = 1.0;
+
+            int valueMsgFieldCount = valueDescriptor->field_count();
+            for (int j = 0; j < valueMsgFieldCount ; ++j)
+            {
+              const google::protobuf::FieldDescriptor *valueField =
+                  valueDescriptor->field(j);
+
+              if (valueField && valueField->name() == "density")
+                density = valueMsg->GetReflection()->GetDouble(
+                    *valueMsg, valueField);
+            }
+            this->UpdateDensityWidget(configChildWidget, density);
+          }
           else
           {
             // parse the message fields recursively
@@ -1183,7 +1254,8 @@ GroupWidget *ConfigWidget::CreateGroupWidget(const std::string &_name,
         padding : 0;\
       }");
 
-  connect(buttonIcon, SIGNAL(toggled(bool)), groupWidget, SLOT(Toggle(bool)));
+  this->connect(buttonIcon, SIGNAL(toggled(bool)),
+      groupWidget, SLOT(Toggle(bool)));
 
   // Set the child widget
   groupWidget->childWidget = _childWidget;
@@ -1273,7 +1345,7 @@ ConfigChildWidget *ConfigWidget::CreateUIntWidget(const std::string &_key,
   QSpinBox *valueSpinBox = new QSpinBox(widget);
   valueSpinBox->setRange(0, 1e8);
   valueSpinBox->setAlignment(Qt::AlignRight);
-  connect(valueSpinBox, SIGNAL(editingFinished()), this,
+  this->connect(valueSpinBox, SIGNAL(editingFinished()), this,
       SLOT(OnUIntValueChanged()));
 
   // Layout
@@ -1310,7 +1382,7 @@ ConfigChildWidget *ConfigWidget::CreateIntWidget(const std::string &_key,
   QSpinBox *valueSpinBox = new QSpinBox(widget);
   valueSpinBox->setRange(-1e8, 1e8);
   valueSpinBox->setAlignment(Qt::AlignRight);
-  connect(valueSpinBox, SIGNAL(editingFinished()), this,
+  this->connect(valueSpinBox, SIGNAL(editingFinished()), this,
       SLOT(OnIntValueChanged()));
 
   // Layout
@@ -1353,7 +1425,7 @@ ConfigChildWidget *ConfigWidget::CreateDoubleWidget(const std::string &_key,
   valueSpinBox->setSingleStep(0.01);
   valueSpinBox->setDecimals(8);
   valueSpinBox->setAlignment(Qt::AlignRight);
-  connect(valueSpinBox, SIGNAL(editingFinished()), this,
+  this->connect(valueSpinBox, SIGNAL(editingFinished()), this,
       SLOT(OnDoubleValueChanged()));
 
   // Unit
@@ -1409,7 +1481,7 @@ ConfigChildWidget *ConfigWidget::CreateStringWidget(const std::string &_key,
   else if (_type == "line")
   {
     valueEdit = new QLineEdit(widget);
-    connect(valueEdit, SIGNAL(editingFinished()), this,
+    this->connect(valueEdit, SIGNAL(editingFinished()), this,
         SLOT(OnStringValueChanged()));
   }
   else
@@ -1452,12 +1524,12 @@ ConfigChildWidget *ConfigWidget::CreateBoolWidget(const std::string &_key,
   // Buttons
   QRadioButton *valueTrueRadioButton = new QRadioButton(widget);
   valueTrueRadioButton->setText(tr("True"));
-  connect(valueTrueRadioButton, SIGNAL(toggled(bool)), this,
+  this->connect(valueTrueRadioButton, SIGNAL(toggled(bool)), this,
       SLOT(OnBoolValueChanged()));
 
   QRadioButton *valueFalseRadioButton = new QRadioButton(widget);
   valueFalseRadioButton->setText(tr("False"));
-  connect(valueFalseRadioButton, SIGNAL(toggled(bool)), this,
+  this->connect(valueFalseRadioButton, SIGNAL(toggled(bool)), this,
       SLOT(OnBoolValueChanged()));
 
   QButtonGroup *boolButtonGroup = new QButtonGroup;
@@ -1506,7 +1578,7 @@ ConfigChildWidget *ConfigWidget::CreateVector3dWidget(
   presetsCombo->addItem(" Z", 5);
   presetsCombo->addItem("-Z", 6);
   presetsCombo->setMinimumWidth(80);
-  connect(presetsCombo, SIGNAL(currentIndexChanged(const int)), this,
+  this->connect(presetsCombo, SIGNAL(currentIndexChanged(const int)), this,
       SLOT(OnVector3dPresetChanged(const int)));
 
   // Labels
@@ -1528,7 +1600,7 @@ ConfigChildWidget *ConfigWidget::CreateVector3dWidget(
   vecXSpinBox->setDecimals(6);
   vecXSpinBox->setAlignment(Qt::AlignRight);
   vecXSpinBox->setMaximumWidth(100);
-  connect(vecXSpinBox, SIGNAL(editingFinished()), this,
+  this->connect(vecXSpinBox, SIGNAL(editingFinished()), this,
       SLOT(OnVector3dValueChanged()));
 
   QDoubleSpinBox *vecYSpinBox = new QDoubleSpinBox(widget);
@@ -1537,7 +1609,7 @@ ConfigChildWidget *ConfigWidget::CreateVector3dWidget(
   vecYSpinBox->setDecimals(6);
   vecYSpinBox->setAlignment(Qt::AlignRight);
   vecYSpinBox->setMaximumWidth(100);
-  connect(vecYSpinBox, SIGNAL(editingFinished()), this,
+  this->connect(vecYSpinBox, SIGNAL(editingFinished()), this,
       SLOT(OnVector3dValueChanged()));
 
   QDoubleSpinBox *vecZSpinBox = new QDoubleSpinBox(widget);
@@ -1546,7 +1618,7 @@ ConfigChildWidget *ConfigWidget::CreateVector3dWidget(
   vecZSpinBox->setDecimals(6);
   vecZSpinBox->setAlignment(Qt::AlignRight);
   vecZSpinBox->setMaximumWidth(100);
-  connect(vecZSpinBox, SIGNAL(editingFinished()), this,
+  this->connect(vecZSpinBox, SIGNAL(editingFinished()), this,
       SLOT(OnVector3dValueChanged()));
 
   // This is inside a group
@@ -1608,7 +1680,7 @@ ConfigChildWidget *ConfigWidget::CreateColorWidget(const std::string &_key,
   colorRSpinBox->setDecimals(3);
   colorRSpinBox->setAlignment(Qt::AlignRight);
   colorRSpinBox->setMaximumWidth(10);
-  connect(colorRSpinBox, SIGNAL(editingFinished()), this,
+  this->connect(colorRSpinBox, SIGNAL(editingFinished()), this,
       SLOT(OnColorValueChanged()));
 
   QDoubleSpinBox *colorGSpinBox = new QDoubleSpinBox(widget);
@@ -1617,7 +1689,7 @@ ConfigChildWidget *ConfigWidget::CreateColorWidget(const std::string &_key,
   colorGSpinBox->setDecimals(3);
   colorGSpinBox->setAlignment(Qt::AlignRight);
   colorGSpinBox->setMaximumWidth(10);
-  connect(colorGSpinBox, SIGNAL(editingFinished()), this,
+  this->connect(colorGSpinBox, SIGNAL(editingFinished()), this,
       SLOT(OnColorValueChanged()));
 
   QDoubleSpinBox *colorBSpinBox = new QDoubleSpinBox(widget);
@@ -1626,7 +1698,7 @@ ConfigChildWidget *ConfigWidget::CreateColorWidget(const std::string &_key,
   colorBSpinBox->setDecimals(3);
   colorBSpinBox->setAlignment(Qt::AlignRight);
   colorBSpinBox->setMaximumWidth(10);
-  connect(colorBSpinBox, SIGNAL(editingFinished()), this,
+  this->connect(colorBSpinBox, SIGNAL(editingFinished()), this,
       SLOT(OnColorValueChanged()));
 
   QDoubleSpinBox *colorASpinBox = new QDoubleSpinBox(widget);
@@ -1635,7 +1707,7 @@ ConfigChildWidget *ConfigWidget::CreateColorWidget(const std::string &_key,
   colorASpinBox->setDecimals(3);
   colorASpinBox->setAlignment(Qt::AlignRight);
   colorASpinBox->setMaximumWidth(10);
-  connect(colorASpinBox, SIGNAL(editingFinished()), this,
+  this->connect(colorASpinBox, SIGNAL(editingFinished()), this,
       SLOT(OnColorValueChanged()));
 
   // This is inside a group
@@ -1705,7 +1777,8 @@ ConfigChildWidget *ConfigWidget::CreatePoseWidget(const std::string &/*_key*/,
   for (unsigned int i = 0; i < elements.size(); ++i)
   {
     QDoubleSpinBox *spin = new QDoubleSpinBox(widget);
-    connect(spin, SIGNAL(editingFinished()), this, SLOT(OnPoseValueChanged()));
+    this->connect(spin, SIGNAL(editingFinished()), this,
+        SLOT(OnPoseValueChanged()));
     widget->widgets.push_back(spin);
 
     spin->setRange(min, max);
@@ -1759,7 +1832,7 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   geometryComboBox->addItem(tr("sphere"));
   geometryComboBox->addItem(tr("mesh"));
   geometryComboBox->addItem(tr("polyline"));
-  connect(geometryComboBox, SIGNAL(currentIndexChanged(const int)), this,
+  this->connect(geometryComboBox, SIGNAL(currentIndexChanged(const int)), this,
       SLOT(OnGeometryValueChanged(const int)));
 
   // Size XYZ
@@ -1774,7 +1847,7 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   geomSizeXSpinBox->setValue(1.000);
   geomSizeXSpinBox->setAlignment(Qt::AlignRight);
   geomSizeXSpinBox->setMaximumWidth(100);
-  connect(geomSizeXSpinBox, SIGNAL(editingFinished()), this,
+  this->connect(geomSizeXSpinBox, SIGNAL(editingFinished()), this,
       SLOT(OnGeometryValueChanged()));
 
   QDoubleSpinBox *geomSizeYSpinBox = new QDoubleSpinBox(widget);
@@ -1784,7 +1857,7 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   geomSizeYSpinBox->setValue(1.000);
   geomSizeYSpinBox->setAlignment(Qt::AlignRight);
   geomSizeYSpinBox->setMaximumWidth(100);
-  connect(geomSizeYSpinBox, SIGNAL(editingFinished()), this,
+  this->connect(geomSizeYSpinBox, SIGNAL(editingFinished()), this,
       SLOT(OnGeometryValueChanged()));
 
   QDoubleSpinBox *geomSizeZSpinBox = new QDoubleSpinBox(widget);
@@ -1794,7 +1867,7 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   geomSizeZSpinBox->setValue(1.000);
   geomSizeZSpinBox->setAlignment(Qt::AlignRight);
   geomSizeZSpinBox->setMaximumWidth(100);
-  connect(geomSizeZSpinBox, SIGNAL(editingFinished()), this,
+  this->connect(geomSizeZSpinBox, SIGNAL(editingFinished()), this,
       SLOT(OnGeometryValueChanged()));
 
   QLabel *geomSizeXLabel = new QLabel(tr("X"));
@@ -1831,7 +1904,7 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   QLabel *geomFilenameLabel = new QLabel(tr("Uri"));
   geomFilenameLabel->setToolTip(tr("uri"));
   QLineEdit *geomFilenameLineEdit = new QLineEdit(widget);
-  connect(geomFilenameLineEdit, SIGNAL(editingFinished()), this,
+  this->connect(geomFilenameLineEdit, SIGNAL(editingFinished()), this,
       SLOT(OnGeometryValueChanged()));
   QPushButton *geomFilenameButton = new QPushButton(tr("..."));
   geomFilenameButton->setMaximumWidth(30);
@@ -1863,7 +1936,7 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   geomRadiusSpinBox->setValue(0.500);
   geomRadiusSpinBox->setAlignment(Qt::AlignRight);
   geomRadiusSpinBox->setMaximumWidth(100);
-  connect(geomRadiusSpinBox, SIGNAL(editingFinished()), this,
+  this->connect(geomRadiusSpinBox, SIGNAL(editingFinished()), this,
       SLOT(OnGeometryValueChanged()));
 
   QDoubleSpinBox *geomLengthSpinBox = new QDoubleSpinBox(widget);
@@ -1873,7 +1946,7 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   geomLengthSpinBox->setValue(1.000);
   geomLengthSpinBox->setAlignment(Qt::AlignRight);
   geomLengthSpinBox->setMaximumWidth(100);
-  connect(geomLengthSpinBox, SIGNAL(editingFinished()), this,
+  this->connect(geomLengthSpinBox, SIGNAL(editingFinished()), this,
       SLOT(OnGeometryValueChanged()));
 
   QHBoxLayout *geomRLLayout = new QHBoxLayout;
@@ -1924,9 +1997,29 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   geomFilenameLineEdit->setVisible(false);
   geomFilenameButton->setVisible(false);
 
-  connect(geometryComboBox, SIGNAL(currentIndexChanged(const QString)),
-      widget, SLOT(GeometryChanged(const QString)));
-  connect(geomFilenameButton, SIGNAL(clicked()), widget, SLOT(OnSelectFile()));
+  this->connect(geometryComboBox, SIGNAL(currentIndexChanged(const QString)),
+      widget, SLOT(OnGeometryTypeChanged(const QString)));
+
+  this->connect(geomFilenameButton, SIGNAL(clicked()),
+      widget, SLOT(OnSelectFile()));
+
+  this->connect(widget, SIGNAL(GeometryChanged()),
+      this, SLOT(OnGeometryChanged()));
+
+  this->connect(geomSizeXSpinBox, SIGNAL(valueChanged(double)),
+      widget, SLOT(OnGeometrySizeChanged(double)));
+
+  this->connect(geomSizeYSpinBox, SIGNAL(valueChanged(double)),
+      widget, SLOT(OnGeometrySizeChanged(double)));
+
+  this->connect(geomSizeZSpinBox, SIGNAL(valueChanged(double)),
+      widget, SLOT(OnGeometrySizeChanged(double)));
+
+  this->connect(geomRadiusSpinBox, SIGNAL(valueChanged(double)),
+      widget, SLOT(OnGeometrySizeChanged(double)));
+
+  this->connect(geomLengthSpinBox, SIGNAL(valueChanged(double)),
+      widget, SLOT(OnGeometrySizeChanged(double)));
 
   widget->setLayout(widgetLayout);
   widget->widgets.push_back(geometryComboBox);
@@ -1970,16 +2063,86 @@ ConfigChildWidget *ConfigWidget::CreateEnumWidget(
   EnumConfigWidget *widget = new EnumConfigWidget();
   widget->setLayout(widgetLayout);
   widget->setFrameStyle(QFrame::Box);
-  connect(enumComboBox, SIGNAL(currentIndexChanged(const QString &)),
+  this->connect(enumComboBox, SIGNAL(currentIndexChanged(const QString &)),
       widget, SLOT(EnumChanged(const QString &)));
 
   widget->widgets.push_back(enumComboBox);
 
   // connect enum config widget event so that we can fire another
   // event from ConfigWidget that has the name of this field
-  connect(widget,
+  this->connect(widget,
       SIGNAL(EnumValueChanged(const QString &)), this,
       SLOT(OnEnumValueChanged(const QString &)));
+
+  return widget;
+}
+
+/////////////////////////////////////////////////
+ConfigChildWidget *ConfigWidget::CreateDensityWidget(
+    const std::string &/*_key*/, const int _level)
+{
+  QLabel *densityLabel = new QLabel(tr("Density"));
+  densityLabel->setToolTip(tr("density"));
+
+  QComboBox *comboBox = new QComboBox;
+  size_t minLen = 0;
+
+  for (const auto &it : common::MaterialDensity::Materials())
+  {
+    minLen = std::max(minLen,
+        common::EnumIface<common::MaterialType>::Str(it.first).length());
+
+    comboBox->addItem(tr(
+          common::EnumIface<common::MaterialType>::Str(it.first).c_str()),
+        QVariant::fromValue(it.second));
+  }
+
+  comboBox->addItem(tr("Custom..."));
+  // Longest entry plus check box and space
+  comboBox->setMinimumContentsLength(minLen+2);
+
+  double min = 0;
+  double max = 0;
+  this->RangeFromKey("density", min, max);
+
+  QDoubleSpinBox *spinBox = new QDoubleSpinBox;
+  spinBox->setRange(min, max);
+  spinBox->setSingleStep(0.1);
+  spinBox->setDecimals(1);
+  spinBox->setValue(1.0);
+  spinBox->setAlignment(Qt::AlignRight);
+  spinBox->setMaximumWidth(100);
+
+  std::string unit = this->UnitFromKey("density");
+  QLabel *unitLabel = new QLabel(QString::fromStdString(unit));
+
+  QHBoxLayout *widgetLayout = new QHBoxLayout;
+
+  widgetLayout->addSpacing((_level+1)*20);
+  widgetLayout->addWidget(densityLabel);
+  widgetLayout->addStretch();
+  widgetLayout->addWidget(comboBox);
+  widgetLayout->addWidget(spinBox);
+  widgetLayout->addWidget(unitLabel);
+
+  DensityConfigWidget *widget = new DensityConfigWidget;
+  widget->setFrameStyle(QFrame::Box);
+  widget->setLayout(widgetLayout);
+
+  widget->comboBox = comboBox;
+  widget->spinBox = spinBox;
+
+  this->connect(comboBox, SIGNAL(currentIndexChanged(const QString &)),
+      widget, SLOT(OnComboBoxChanged(const QString &)));
+
+  this->connect(spinBox, SIGNAL(valueChanged(const QString &)),
+      widget, SLOT(OnSpinBoxChanged(const QString &)));
+
+  this->connect(widget, SIGNAL(DensityValueChanged(const double)),
+      this, SLOT(OnDensityValueChanged(const double)));
+
+  widget->widgets.push_back(comboBox);
+  widget->widgets.push_back(spinBox);
 
   return widget;
 }
@@ -2300,6 +2463,20 @@ void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
                   valueSpinBox->value());
             }
           }
+          else if (field->message_type()->name() == "Density")
+          {
+            DensityConfigWidget *densityWidget =
+                qobject_cast<DensityConfigWidget *>(childWidget);
+
+            const google::protobuf::Descriptor *valueDescriptor =
+                valueMsg->GetDescriptor();
+
+            const google::protobuf::FieldDescriptor *densityField =
+                            valueDescriptor->FindFieldByName("density");
+
+            valueMsg->GetReflection()->SetDouble(valueMsg, densityField,
+                densityWidget->Density());
+          }
           else
           {
             // update the message fields recursively
@@ -2588,6 +2765,7 @@ bool ConfigWidget::UpdateGeometryWidget(ConfigChildWidget *_widget,
   if (isMesh)
     qobject_cast<QLineEdit *>(_widget->widgets[6])->setText(tr(_uri.c_str()));
 
+  emit GeometryChanged();
   return true;
 }
 
@@ -2620,6 +2798,21 @@ bool ConfigWidget::UpdateEnumWidget(ConfigChildWidget *_widget,
   qobject_cast<QComboBox *>(_widget->widgets[0])->setCurrentIndex(index);
 
   return true;
+}
+
+/////////////////////////////////////////////////
+bool ConfigWidget::UpdateDensityWidget(ConfigChildWidget *_widget,
+          const double _value)
+{
+  DensityConfigWidget *densityWidget =
+      qobject_cast<DensityConfigWidget *>(_widget);
+
+  if (densityWidget)
+  {
+    densityWidget->SetDensity(_value);
+    return true;
+  }
+  return false;
 }
 
 /////////////////////////////////////////////////
@@ -3166,6 +3359,24 @@ bool ConfigWidget::eventFilter(QObject *_obj, QEvent *_event)
 }
 
 /////////////////////////////////////////////////
+void ConfigWidget::OnDensityValueChanged(const double _value)
+{
+  emit DensityValueChanged(_value);
+}
+
+/////////////////////////////////////////////////
+void ConfigWidget::OnMassValueChanged(const double _value)
+{
+  emit MassValueChanged(_value);
+}
+
+/////////////////////////////////////////////////
+void ConfigWidget::OnGeometryChanged()
+{
+  emit GeometryChanged();
+}
+
+/////////////////////////////////////////////////
 void GroupWidget::Toggle(bool _checked)
 {
   if (!this->childWidget)
@@ -3175,7 +3386,7 @@ void GroupWidget::Toggle(bool _checked)
 }
 
 /////////////////////////////////////////////////
-void GeometryConfigWidget::GeometryChanged(const QString _text)
+void GeometryConfigWidget::OnGeometryTypeChanged(const QString &_text)
 {
   QWidget *widget= qobject_cast<QWidget *>(QObject::sender());
 
@@ -3213,6 +3424,13 @@ void GeometryConfigWidget::GeometryChanged(const QString _text)
     this->geomFilenameLineEdit->setVisible(isMesh);
     this->geomFilenameButton->setVisible(isMesh);
   }
+  emit GeometryChanged();
+}
+
+/////////////////////////////////////////////////
+void GeometryConfigWidget::OnGeometrySizeChanged(const double /*_value*/)
+{
+  emit GeometryChanged();
 }
 
 /////////////////////////////////////////////////
@@ -3240,6 +3458,59 @@ void GeometryConfigWidget::OnSelectFile()
       }
     }
   }
+}
+
+/////////////////////////////////////////////////
+void DensityConfigWidget::OnComboBoxChanged(const QString &/*_text*/)
+{
+  QVariant variant = this->comboBox->itemData(this->comboBox->currentIndex());
+  this->SetDensity(variant.toDouble());
+}
+
+/////////////////////////////////////////////////
+void DensityConfigWidget::OnSpinBoxChanged(const QString &/*_text*/)
+{
+  this->SetDensity(this->spinBox->value());
+}
+
+/////////////////////////////////////////////////
+void DensityConfigWidget::SetDensity(const double _density)
+{
+  bool comboSigState = this->comboBox->blockSignals(true);
+  bool spinSigState = this->spinBox->blockSignals(true);
+  {
+    common::MaterialType type;
+    double matDensity;
+
+    // Get the material closest to _density
+    std::tie(type, matDensity) = common::MaterialDensity::Nearest(
+        _density, 1.0);
+
+    if (matDensity >= 0)
+    {
+      this->comboBox->setCurrentIndex(
+          this->comboBox->findText(tr(
+              common::EnumIface<common::MaterialType>::Str(type).c_str())));
+    }
+    else
+    {
+      this->comboBox->setCurrentIndex(
+          this->comboBox->count()-1);
+    }
+
+    this->spinBox->setValue(_density);
+    this->density = _density;
+  }
+  this->comboBox->blockSignals(comboSigState);
+  this->spinBox->blockSignals(spinSigState);
+
+  emit DensityValueChanged(this->density);
+}
+
+/////////////////////////////////////////////////
+double DensityConfigWidget::Density() const
+{
+  return this->density;
 }
 
 /////////////////////////////////////////////////
@@ -3422,4 +3693,9 @@ QString ConfigWidget::StyleSheet(const std::string &_type, const int _level)
   }
   gzwarn << "Requested unknown style sheet type [" << _type << "]" << std::endl;
   return "";
+}
+
+/////////////////////////////////////////////////
+DensityConfigWidget::DensityConfigWidget()
+{
 }

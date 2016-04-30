@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,18 +17,77 @@
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/physics/Light.hh"
 #include "gazebo/physics/physics.hh"
+#include "gazebo/test/helper_physics_generator.hh"
 
 using namespace gazebo;
-class WorldTest : public ServerFixture
+class WorldTest : public ServerFixture,
+                  public testing::WithParamInterface<const char*>
 {
+  /// \brief Test clearing an empty (blank) world.
+  /// \param[in] _physicsEngine Name of physics engine.
+  public: void ClearEmptyWorld(const std::string &_physicsEngine);
 };
 
-/////////////////////////////////////////////////
-TEST_F(WorldTest, ClearEmptyWorld)
+/// \brief Pose after physics update
+ignition::math::Pose3d g_poseAfterUpdate;
+
+/// \brief Pose before physics update
+ignition::math::Pose3d g_poseBeforeUpdate;
+
+/// \brief Has the WorldUpdateBegin event been called
+bool g_updateBeginCalled = false;
+
+/// \brief Has the BeforePhysicsUpdate event been called
+bool g_beforePhysicsUpdateCalled = false;
+
+/// \brief Has the WorldUpdateEnd event been called
+bool g_updateEndCalled = false;
+
+/// \brief Callback for WorldUpdateBegin event, just records it's been called.
+/// \param[in] _updateInfo Information about the event time and world.
+void onWorldUpdateBegin(const common::UpdateInfo & /*_updateInfo*/)
 {
-  Load("worlds/blank.world");
+  g_updateBeginCalled = true;
+}
+
+/// \brief Callback for BeforePhysicsUpdate event.
+/// Record that it has been called, and also record the reported ball
+/// position.
+/// \param[in] updateInfo Information about the event time and world.
+void beforePhysicsUpdate(const common::UpdateInfo &_updateInfo)
+{
+  g_beforePhysicsUpdateCalled = true;
+
+  physics::WorldPtr world = physics::get_world(_updateInfo.worldName);
+  ASSERT_TRUE(world != NULL);
+
+  physics::ModelPtr sphereModel = world->GetModel("sphere");
+  ASSERT_TRUE(sphereModel != NULL);
+
+  physics::LinkPtr link = sphereModel->GetLink("link");
+  ASSERT_TRUE(link != NULL);
+
+  g_poseBeforeUpdate = link->GetWorldPose().Ign();
+}
+
+/// \brief Callback for WorldUpdateEnd event, just records it's been called.
+void onWorldUpdateEnd()
+{
+  g_updateEndCalled = true;
+}
+
+/////////////////////////////////////////////////
+void WorldTest::ClearEmptyWorld(const std::string &_physicsEngine)
+{
+  Load("worlds/blank.world", false, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
+
+  // Verify physics engine type
+  gzdbg << "Engine: " << _physicsEngine << std::endl;
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   EXPECT_EQ(world->GetModelCount(), 0u);
 
@@ -43,6 +102,12 @@ TEST_F(WorldTest, ClearEmptyWorld)
   // Now spawn something, and the model count should increase
   SpawnSphere("sphere", math::Vector3(0, 0, 1), math::Vector3(0, 0, 0));
   EXPECT_EQ(world->GetModelCount(), 1u);
+}
+
+/////////////////////////////////////////////////
+TEST_P(WorldTest, ClearEmptyWorld)
+{
+  ClearEmptyWorld(GetParam());
 }
 
 /////////////////////////////////////////////////
@@ -303,7 +368,6 @@ TEST_F(WorldTest, ModifyLight)
   }
 }
 
-
 /////////////////////////////////////////////////
 TEST_F(WorldTest, RemoveModelPaused)
 {
@@ -350,6 +414,81 @@ TEST_F(WorldTest, RemoveModelUnPaused)
   EXPECT_FALSE(sphereModel != NULL);
   EXPECT_FALSE(boxModel != NULL);
 }
+
+/////////////////////////////////////////////////
+/// \brief Check if WorldUpdateBegin, BeforePhysicsUpdate and WorldUpdateEnd
+/// events are called, and if the BeforePhysicsUpdate event is really called
+/// before the physics engine update happens
+TEST_F(WorldTest, CheckWorldEventsWork)
+{
+  Load("worlds/shapes.world");
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  physics::ModelPtr sphereModel = world->GetModel("sphere");
+  ASSERT_TRUE(sphereModel != NULL);
+
+  physics::LinkPtr link = sphereModel->GetLink("link");
+  ASSERT_TRUE(link != NULL);
+
+  // run the world for a while just to stabilize
+  world->Step(10);
+
+  // initial pose of the link
+  ignition::math::Pose3d initialPose = link->GetWorldPose().Ign();
+
+  // connect to the world events
+  event::ConnectionPtr worldUpdateBeginEventConnection =
+    event::Events::ConnectWorldUpdateBegin(&onWorldUpdateBegin);
+
+  event::ConnectionPtr beforePhysicsUpdateConnection =
+    event::Events::ConnectBeforePhysicsUpdate(&beforePhysicsUpdate);
+
+  event::ConnectionPtr worldUpdateEndEventConnection =
+    event::Events::ConnectWorldUpdateEnd(&onWorldUpdateEnd);
+
+  // iterate for a while pushing to the ball and check the events get called
+  // and that the pose changes only after BeforePhysicUpdate is called.
+  for (size_t i = 0; i < 100; ++i)
+  {
+    ASSERT_FALSE(g_updateBeginCalled);
+    ASSERT_FALSE(g_beforePhysicsUpdateCalled);
+    ASSERT_FALSE(g_updateEndCalled);
+
+    // push to the ball
+    link->AddForce(ignition::math::Vector3d(1000, 0, 0));
+
+    world->Step(1);
+
+    // pose after the physics update
+    ignition::math::Pose3d poseAfterUpdate = link->GetWorldPose().Ign();
+
+    // initial pose and pose before physics update should be the same
+    EXPECT_EQ(initialPose.Pos(), g_poseBeforeUpdate.Pos());
+
+    // pose before physics update and after it should be different
+    EXPECT_GT((g_poseAfterUpdate - g_poseBeforeUpdate).Pos().Abs().Sum(), 1e-9);
+
+    // the events should get called
+    EXPECT_TRUE(g_updateBeginCalled);
+    EXPECT_TRUE(g_beforePhysicsUpdateCalled);
+    EXPECT_TRUE(g_updateEndCalled);
+
+    g_updateBeginCalled = false;
+    g_beforePhysicsUpdateCalled = false;
+    g_updateEndCalled = false;
+
+    // remember the current pose to compare it in the next iteration
+    initialPose = poseAfterUpdate;
+  }
+
+  // disconnect from world events
+  event::Events::DisconnectWorldUpdateBegin(worldUpdateBeginEventConnection);
+  event::Events::DisconnectBeforePhysicsUpdate(beforePhysicsUpdateConnection);
+  event::Events::DisconnectWorldUpdateEnd(worldUpdateEndEventConnection);
+}
+
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, WorldTest, PHYSICS_ENGINE_VALUES);
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

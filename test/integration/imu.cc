@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -91,7 +91,7 @@ void ImuTest::GetImuData(sensors::ImuSensorPtr _imu,
     world->Step(1);
 
     int j = 0;
-    while (_imu->GetLastMeasurementTime() == gazebo::common::Time::Zero &&
+    while (_imu->LastMeasurementTime() == gazebo::common::Time::Zero &&
         j < 100)
     {
       _imu->Update(true);
@@ -113,7 +113,7 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
 {
   if (_physicsEngine != "ode")
   {
-    gzerr << "not working yet for anything other than ode. see issue #9999.\n";
+    gzerr << "not working yet for anything other than ode. see issue #893.\n";
     return;
   }
 

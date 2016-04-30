@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,13 +79,7 @@ Joint::Joint(BasePtr _parent)
 //////////////////////////////////////////////////
 Joint::~Joint()
 {
-  // Remove all the sensors attached to the joint
-  for (auto const &iter : this->sensors)
-  {
-    event::Events::removeSensor(iter);
-  }
-
-  this->sensors.clear();
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -400,11 +394,18 @@ void Joint::Init()
 void Joint::Fini()
 {
   // Remove all the sensors attached to the joint
-  for (auto const &iter : this->sensors)
+  for (auto const &sensor : this->sensors)
   {
-    event::Events::removeSensor(iter);
+    event::Events::removeSensor(sensor);
   }
   this->sensors.clear();
+
+  this->anchorLink.reset();
+  this->applyDamping.reset();
+  this->childLink.reset();
+  this->model.reset();
+  this->parentLink.reset();
+  this->sdfJoint.reset();
 
   Base::Fini();
 }

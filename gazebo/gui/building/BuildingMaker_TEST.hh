@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,9 @@ class BuildingMaker_TEST : public QTestFixture
 
   /// \brief Constructor
   public: BuildingMaker_TEST() = default;
+
+  /// \brief Test assigning layers according to level.
+  private slots: void Layers();
 
   /// \brief Test attaching and detaching manips.
   private slots: void Attach();

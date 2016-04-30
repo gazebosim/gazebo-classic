@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,13 +37,7 @@ void TopToolbar_TEST::WindowModes()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get the top toolbar
   gazebo::gui::TopToolbar *topToolbar =
@@ -112,13 +106,7 @@ void TopToolbar_TEST::Insert()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get the top toolbar
   gazebo::gui::TopToolbar *topToolbar =
@@ -186,13 +174,7 @@ void TopToolbar_TEST::Add()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get the top toolbar
   gazebo::gui::TopToolbar *topToolbar =

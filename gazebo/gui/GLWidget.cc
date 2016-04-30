@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -917,7 +917,7 @@ std::string GLWidget::OgreHandle() const
   ogreHandle = std::to_string(this->winId());
 #elif defined(WIN32)
   ogreHandle = std::to_string(
-      reinterpret_cast<uint32_t>(this->renderFrame->winId()));
+      reinterpret_cast<uint32_t>(this->dataPtr->renderFrame->winId()));
 #else
   QX11Info info = x11Info();
   QWidget *q_parent = dynamic_cast<QWidget*>(this->dataPtr->renderFrame);
@@ -1127,6 +1127,17 @@ void GLWidget::OnManipMode(const std::string &_mode)
     std::lock_guard<std::mutex> lock(this->dataPtr->selectedVisMutex);
     ModelManipulator::Instance()->SetAttachedVisual(
         this->dataPtr->selectedVisuals.back());
+
+    if (_mode == "select")
+    {
+      this->dataPtr->scene->SelectVisual("", "select");
+    }
+    else
+    {
+      // Make sure model is not updated by server during manipulation
+      this->dataPtr->scene->SelectVisual(
+          this->dataPtr->selectedVisuals.back()->GetName(), "move");
+    }
   }
 
   ModelManipulator::Instance()->SetManipulationMode(_mode);

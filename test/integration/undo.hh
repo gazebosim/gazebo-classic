@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,6 +41,9 @@ class UndoTest : public QTestFixture
 
   /// \brief Test undoing rotate light command.
   private slots: void UndoRotateLight();
+
+  /// \brief Test undoing scale model command.
+  private slots: void UndoScaleModel();
 
   /// \brief Test undoing snap commands.
   private slots: void UndoSnap();

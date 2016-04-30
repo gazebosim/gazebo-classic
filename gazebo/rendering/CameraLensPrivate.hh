@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,7 +75,8 @@ namespace gazebo
 
                   variants.push_back(std::make_tuple("id",
                         ignition::math::Vector3d::UnitZ,
-                        std::function<float (float)>([](float t) -> float
+                        std::function<float (float)>(
+                          [](float t) -> float
                           {
                           return t;
                           })));
@@ -130,7 +131,6 @@ namespace gazebo
                 private: std::vector<std::tuple<std::string,
                          ignition::math::Vector3d,
                            std::function<float (float)> > > variants;
-
 
                 /// \brief Current value of enumeration
                 private: decltype(variants)::value_type value;

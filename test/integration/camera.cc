@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,10 +43,12 @@ TEST_F(CameraTest, Follow)
   SpawnCamera("test_camera_model", "test_camera",
       cameraStartPose.Pos(), cameraStartPose.Rot().Euler());
 
-  rendering::ScenePtr scene = rendering::get_scene();
-  ASSERT_TRUE(scene != NULL);
-
-  rendering::CameraPtr camera = scene->GetCamera("test_camera");
+  sensors::SensorPtr sensor = sensors::get_sensor("test_camera");
+  EXPECT_TRUE(sensor != NULL);
+  sensors::CameraSensorPtr camSensor =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+  EXPECT_TRUE(camSensor != NULL);
+  rendering::CameraPtr camera = camSensor->Camera();
   ASSERT_TRUE(camera != NULL);
 
   // Make sure the sensor is at the correct initial pose
@@ -62,8 +64,8 @@ TEST_F(CameraTest, Follow)
   transport::NodePtr node(new transport::Node());
   node->Init("default");
 
-  transport::PublisherPtr pub =
-    node->Advertise<msgs::CameraCmd>("~/test_camera/cmd");
+  transport::PublisherPtr pub = node->Advertise<msgs::CameraCmd>(
+      "~/test_camera_model/body/test_camera/cmd");
 
   pub->WaitForConnection();
   pub->Publish(msg, true);
@@ -100,14 +102,17 @@ TEST_F(CameraTest, Visible)
 
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
   ASSERT_TRUE(sensor != NULL);
+  sensors::CameraSensorPtr camSensor =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+  EXPECT_TRUE(camSensor != NULL);
+  rendering::CameraPtr camera = camSensor->Camera();
+  ASSERT_TRUE(camera != NULL);
+
   // this makes sure a world step will trigger the camera render update
   sensor->SetUpdateRate(1000);
 
   rendering::ScenePtr scene = rendering::get_scene();
   ASSERT_TRUE(scene != NULL);
-  rendering::CameraPtr camera = scene->GetCamera(cameraName);
-  ASSERT_TRUE(camera != NULL);
-
   // Make sure the camera is at the correct initial pose
   EXPECT_EQ(camera->WorldPose(), cameraStartPose);
 

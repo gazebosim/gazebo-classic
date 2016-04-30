@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,6 +69,15 @@ namespace gazebo
 
       /// \brief Combo box to select the alignment target.
       public: QComboBox *alignCombo;
+
+      /// \brief Check box to toggle reverse X alignment.
+      public: QCheckBox *reverseXBox;
+
+      /// \brief Check box to toggle reverse Y alignment.
+      public: QCheckBox *reverseYBox;
+
+      /// \brief Check box to toggle reverse Z alignment.
+      public: QCheckBox *reverseZBox;
 
       /// \brief Label for joints without axes.
       public: QLabel *axis0Widget;

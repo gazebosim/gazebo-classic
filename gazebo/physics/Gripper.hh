@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,6 +86,8 @@ namespace gazebo
       private: physics::ModelPtr model;
 
       /// \brief The physics engine.
+      // NOTE: Variable not used, left here for ABI compatibility. Remove when
+      // merging forward.
       private: physics::PhysicsEnginePtr physics;
 
       /// \brief Pointer to the world.

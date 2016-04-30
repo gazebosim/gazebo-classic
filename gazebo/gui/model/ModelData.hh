@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2015 Open Source Robotics Foundation
+ * Copyright (C) 2013-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,12 @@ namespace gazebo
       /// \brief Get the default transparency setting for entities in model
       /// editor.
       public: static double GetEditTransparency();
+
+      /// \internal
+      /// \brief Update visual's render group. This is needed to fix an
+      /// alpha compositing issue in ogre when transparent objects overlap.
+      /// \param[in] _visual Visual to update
+      public: static void UpdateRenderGroup(rendering::VisualPtr _visual);
     };
 
     /// \brief Helper class to store nested models data.
@@ -53,6 +59,10 @@ namespace gazebo
       /// \brief Set the name of the model.
       /// \param[in] _name Name of model.
       public: void SetName(const std::string &_name);
+
+      /// \brief Get the unscoped name of the model.
+      /// \return Name of model.
+      public: std::string Name() const;
 
       /// \brief Set the pose of the model.
       /// \param[in] _pose Pose of model.
@@ -93,7 +103,7 @@ namespace gazebo
 
       /// \brief Get the name of the link.
       /// \return Name of link.
-      public: std::string GetName() const;
+      public: std::string Name() const;
 
       /// \brief Set the name of the link.
       /// \param[in] _name Name of link.
@@ -136,6 +146,30 @@ namespace gazebo
       /// \param[in] _newName Name to give to the cloned link.
       /// \return A clone of this link data.
       public: LinkData *Clone(const std::string &_newName);
+
+      /// \brief Computes the volume of a link.
+      /// \param[in] _collision A collision message.
+      /// \return The computed volume.
+      public: static double ComputeVolume(const msgs::Collision &_collision);
+
+      /// \brief Computes mass moment of inertia for a link.
+      /// \param[in] _collision A collision message.
+      /// \param[in] _mass The mass of the link.
+      /// \return Vector of principal moments of inertia.
+      public: static ignition::math::Vector3d ComputeMomentOfInertia(
+          const msgs::Collision &_collision, const double _mass);
+
+      /// \brief Computes the volume of the link.
+      /// \return The volume.
+      public: double ComputeVolume() const;
+
+      /// \brief Set the visual for the link.
+      /// \param[in] _visual Visual for the link.
+      public: void SetLinkVisual(const rendering::VisualPtr _visual);
+
+      /// \brief Get the visual for the link.
+      /// \return Visual for the link.
+      public: rendering::VisualPtr LinkVisual() const;
 
       /// \brief Update callback on PreRender.
       private: void Update();

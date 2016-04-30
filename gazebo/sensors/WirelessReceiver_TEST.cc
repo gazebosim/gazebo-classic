@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,11 @@ class WirelessReceiver_TEST : public ServerFixture
   /// is thrown
   /// \param[in] _sensorString Sensor SDF string
   private: void CheckIllegalValue(std::string _sensorString);
+
+  /// \brief Create a sensor with legal values and check that an exception
+  /// is not thrown
+  /// \param[in] _sensorString Sensor SDF string
+  private: void CheckLegalValue(std::string _sensorString);
 
   private: sensors::SensorManager *mgr;
   private: sdf::ElementPtr sdf;
@@ -95,22 +100,34 @@ void WirelessReceiver_TEST::TestCreateWirelessReceiver()
   // Make sure the above dynamic cast worked.
   ASSERT_TRUE(sensor != NULL);
 
-  EXPECT_DOUBLE_EQ(sensor->GetMinFreqFiltered(), 2412.0);
-  EXPECT_DOUBLE_EQ(sensor->GetMaxFreqFiltered(), 2484.0);
-  EXPECT_DOUBLE_EQ(sensor->GetPower(), 14.5);
-  EXPECT_DOUBLE_EQ(sensor->GetGain(), 2.5);
-  EXPECT_DOUBLE_EQ(sensor->GetSensitivity(), -90);
+  EXPECT_DOUBLE_EQ(sensor->MinFreqFiltered(), 2412.0);
+  EXPECT_DOUBLE_EQ(sensor->MaxFreqFiltered(), 2484.0);
+  EXPECT_DOUBLE_EQ(sensor->Power(), 14.5);
+  EXPECT_DOUBLE_EQ(sensor->Gain(), 2.5);
+  EXPECT_DOUBLE_EQ(sensor->Sensitivity(), -90);
 
   EXPECT_TRUE(sensor->IsActive());
 }
 
 /////////////////////////////////////////////////
+/// \brief Create a sensor with an illegal value and checks that an exception
+/// is thrown
 void WirelessReceiver_TEST::CheckIllegalValue(std::string _sensorString)
 {
   sdf::readString(_sensorString, this->sdf);
 
   // Create the wireless receiver sensor
   ASSERT_ANY_THROW(this->mgr->CreateSensor(this->sdf,
+      "default", "ground_plane::link", 0));
+}
+
+/////////////////////////////////////////////////
+void WirelessReceiver_TEST::CheckLegalValue(std::string _sensorString)
+{
+  sdf::readString(_sensorString, this->sdf);
+
+  // Create the wireless receiver sensor
+  ASSERT_NO_THROW(this->mgr->CreateSensor(this->sdf,
       "default", "ground_plane::link", 0));
 }
 
@@ -136,7 +153,7 @@ void WirelessReceiver_TEST::TestIllegalPower()
       boost::regex_replace(this->receiverSensorString,
           re, "<power>-1.0</power>");
 
-  this->CheckIllegalValue(receiverSensorStringCopy);
+  this->CheckLegalValue(receiverSensorStringCopy);
 }
 
 /////////////////////////////////////////////////
@@ -148,7 +165,7 @@ void WirelessReceiver_TEST::TestIllegalGain()
   std::string receiverSensorStringCopy =
       boost::regex_replace(this->receiverSensorString, re, "<gain>-1.0</gain>");
 
-  this->CheckIllegalValue(receiverSensorStringCopy);
+  this->CheckLegalValue(receiverSensorStringCopy);
 }
 
 /////////////////////////////////////////////////
@@ -161,7 +178,7 @@ void WirelessReceiver_TEST::TestIllegalMinFreq()
       boost::regex_replace(this->receiverSensorString, re,
         "<min_frequency>-1.0</min_frequency>");
 
-  this->CheckIllegalValue(receiverSensorStringCopy);
+  this->CheckLegalValue(receiverSensorStringCopy);
 }
 
 /////////////////////////////////////////////////
@@ -174,7 +191,7 @@ void WirelessReceiver_TEST::TestIllegalMaxFreq()
       boost::regex_replace(this->receiverSensorString, re,
         "<max_frequency>-1.0</max_frequency>");
 
-  this->CheckIllegalValue(receiverSensorStringCopy);
+  this->CheckLegalValue(receiverSensorStringCopy);
 }
 
 /////////////////////////////////////////////////
@@ -192,7 +209,7 @@ void WirelessReceiver_TEST::TestIllegalMinMaxFreq()
       boost::regex_replace(receiverSensorStringCopy, re,
         "<min_frequency>2484.0</min_frequency>");
 
-  this->CheckIllegalValue(receiverSensorStringCopy);
+  this->CheckLegalValue(receiverSensorStringCopy);
 }
 
 /////////////////////////////////////////////////
@@ -205,7 +222,7 @@ void WirelessReceiver_TEST::TestIllegalSensitivity()
       boost::regex_replace(this->receiverSensorString, re,
         "<sensitivity>1.0</sensitivity>");
 
-  this->CheckIllegalValue(receiverSensorStringCopy);
+  this->CheckLegalValue(receiverSensorStringCopy);
 }
 
 /////////////////////////////////////////////////

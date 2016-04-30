@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,10 +44,24 @@ ODERayShape::ODERayShape(PhysicsEnginePtr _physicsEngine)
   this->collisionParent.reset();
 }
 
+//////////////////////////////////////////////////
+ODERayShape::ODERayShape(PhysicsEnginePtr _physicsEngine, dSpaceID _spaceId)
+: RayShape(_physicsEngine)
+{
+  this->SetName("ODE Ray Shape");
+
+  this->physicsEngine =
+    boost::static_pointer_cast<ODEPhysics>(_physicsEngine);
+
+  this->geomId = dCreateRay(_spaceId, 2.0);
+  dGeomSetCategoryBits(this->geomId, GZ_SENSOR_COLLIDE);
+  dGeomSetCollideBits(this->geomId, ~GZ_SENSOR_COLLIDE);
+  this->collisionParent.reset();
+}
 
 //////////////////////////////////////////////////
 ODERayShape::ODERayShape(CollisionPtr _parent)
-    : RayShape(_parent)
+: RayShape(_parent)
 {
   GZ_ASSERT(_parent, "Parent collision shape is NULL");
   this->SetName("ODE Ray Shape");
@@ -208,4 +222,10 @@ void ODERayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
       }
     }
   }
+}
+
+/////////////////////////////////////////////////
+dGeomID ODERayShape::ODEGeomId() const
+{
+  return this->geomId;
 }

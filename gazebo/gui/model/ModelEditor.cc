@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,7 +81,7 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   this->dataPtr->schematicViewAct = NULL;
   this->dataPtr->svWidget = NULL;
 #ifdef HAVE_GRAPHVIZ
-  RenderWidget *renderWidget = _mainWindow->GetRenderWidget();
+  RenderWidget *renderWidget = _mainWindow->RenderWidget();
   this->dataPtr->svWidget = new SchematicViewWidget(renderWidget);
   this->dataPtr->svWidget->setSizePolicy(QSizePolicy::Expanding,
       QSizePolicy::Expanding);
@@ -128,7 +128,7 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   this->dataPtr->showJointsAct->setCheckable(true);
   this->dataPtr->showJointsAct->setChecked(true);
   connect(this->dataPtr->showJointsAct, SIGNAL(toggled(bool)),
-      this->dataPtr->modelPalette->GetModelCreator()->GetJointMaker(),
+      this->dataPtr->modelPalette->ModelCreator()->JointMaker(),
       SLOT(ShowJoints(bool)));
 
   // Clone actions from main window
@@ -198,7 +198,7 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   jointActionGroup->addAction(fixedJointAct);
   jointActionGroup->setExclusive(true);
 
-  TopToolbar *topToolbar = this->mainWindow->GetRenderWidget()->GetToolbar();
+  TopToolbar *topToolbar = this->mainWindow->RenderWidget()->GetToolbar();
 
   // Separator
   QAction *jointSeparatorAct =
@@ -262,7 +262,7 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   connect(this->dataPtr->jointAct, SIGNAL(triggered()), this,
       SLOT(OnAddSelectedJoint()));
 
-  connect(this->dataPtr->modelPalette->GetModelCreator()->GetJointMaker(),
+  connect(this->dataPtr->modelPalette->ModelCreator()->JointMaker(),
       SIGNAL(JointAdded()), this, SLOT(OnJointAdded()));
 
   this->dataPtr->connections.push_back(
@@ -404,13 +404,13 @@ void ModelEditor::OnEdit(bool /*_checked*/)
     this->mainWindow->ShowMenuBar(this->dataPtr->menuBar);
     if (!g_showToolbarsAct->isChecked())
       g_showToolbarsAct->trigger();
-    this->mainWindow->GetRenderWidget()->ShowTimePanel(false);
+    this->mainWindow->RenderWidget()->ShowTimePanel(false);
   }
   else
   {
     this->mainWindow->ShowLeftColumnWidget();
     this->mainWindow->ShowMenuBar();
-    this->mainWindow->GetRenderWidget()->ShowTimePanel(true);
+    this->mainWindow->RenderWidget()->ShowTimePanel(true);
   }
 
 #ifdef HAVE_GRAPHVIZ
@@ -540,5 +540,5 @@ void ModelEditor::AddEntity(sdf::ElementPtr _sdf)
 {
   event::Events::setSelectedEntity("", "normal");
   g_arrowAct->trigger();
-  this->dataPtr->modelPalette->GetModelCreator()->AddEntity(_sdf);
+  this->dataPtr->modelPalette->ModelCreator()->AddEntity(_sdf);
 }

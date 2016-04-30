@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -91,6 +91,10 @@ namespace gazebo
       /// \brief Pose of link currently selected to be the child of the joint
       /// being created, before being selected.
       public: ignition::math::Pose3d childLinkOriginalPose;
+
+      /// \brief Pointer to the user command manager. The pointer's lifetime is
+      /// managed by ModelCreator, so we don't need to delete it.
+      public: MEUserCmdManager *userCmdManager = nullptr;
     };
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -137,7 +137,6 @@ namespace gazebo
       /// \param[in] _parentName The name of the parent link which the sensor is
       /// attached to.
       /// \param[in] _parentId Unique id of the sensor to create.
-      /// \param[out] _sensorName The name of the sensor
       public: void OnCreateSensor(sdf::ElementPtr _elem,
                                   const std::string &_worldName,
                                   const std::string &_parentName,

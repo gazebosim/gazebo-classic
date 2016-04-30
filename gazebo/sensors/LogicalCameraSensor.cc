@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
-
 #include <boost/algorithm/string.hpp>
 #include "gazebo/transport/transport.hh"
 #include "gazebo/msgs/msgs.hh"
@@ -55,7 +54,8 @@ void LogicalCameraSensor::Load(const std::string &_worldName,
 
   // Get a pointer to the parent link. This will be used to adjust the
   // orientation of the logical camera.
-  physics::EntityPtr parentEntity = this->world->GetEntity(this->parentName);
+  physics::EntityPtr parentEntity =
+    this->world->GetEntity(this->ParentName());
   this->dataPtr->parentLink =
     boost::dynamic_pointer_cast<physics::Link>(parentEntity);
 
@@ -66,7 +66,7 @@ void LogicalCameraSensor::Load(const std::string &_worldName,
 //////////////////////////////////////////////////
 std::string LogicalCameraSensor::GetTopic() const
 {
-  std::string topicName = "~/" + this->parentName + "/" + this->GetName() +
+  std::string topicName = "~/" + this->ParentName() + "/" + this->Name() +
     "/models";
   boost::replace_all(topicName, "::", "/");
 
@@ -79,8 +79,8 @@ void LogicalCameraSensor::Load(const std::string &_worldName)
   Sensor::Load(_worldName);
 
   // Create publisher of the logical camera images
-  this->dataPtr->pub = this->node->Advertise<msgs::LogicalCameraImage>(
-      this->GetTopic(), 50);
+  this->dataPtr->pub =
+    this->node->Advertise<msgs::LogicalCameraImage>(this->Topic(), 50);
 }
 
 //////////////////////////////////////////////////
@@ -89,7 +89,8 @@ void LogicalCameraSensor::Init()
   // Read configuration values
   if (this->sdf->HasElement("logical_camera"))
   {
-    sdf::ElementPtr cameraSdf = this->sdf->GetElement("logical_camera");
+    sdf::ElementPtr cameraSdf =
+      this->sdf->GetElement("logical_camera");
 
     // These values are required in SDF, so no need to check for their
     // existence.

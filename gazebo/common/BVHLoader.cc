@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 #include <algorithm>
 #include <fstream>
 #include <sstream>
+#include <memory>
 
 #include <boost/algorithm/string.hpp>
 #include <ignition/math/Vector3.hh>
@@ -47,7 +48,7 @@ Skeleton *BVHLoader::Load(const std::string &_filename, double _scale)
 {
   std::string fullname = common::find_file(_filename);
 
-  Skeleton *skeleton = NULL;
+  std::unique_ptr<Skeleton> skeleton;
   std::ifstream file;
   file.open(fullname.c_str());
   std::vector<SkeletonNode*> nodes;
@@ -136,7 +137,7 @@ Skeleton *BVHLoader::Load(const std::string &_filename, double _scale)
                     file.close();
                     return NULL;
                   }
-                  skeleton = new Skeleton(nodes[0]);
+                  skeleton.reset(new Skeleton(nodes[0]));
                   break;
                 }
     }
@@ -269,5 +270,5 @@ Skeleton *BVHLoader::Load(const std::string &_filename, double _scale)
   skeleton->AddAnimation(animation);
 
   file.close();
-  return skeleton;
+  return skeleton.release();
 }

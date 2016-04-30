@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -125,8 +125,8 @@ TEST_F(MeshTest, Mesh)
 {
   // Cleanup test directory.
   common::SystemPaths *paths = common::SystemPaths::Instance();
-  boost::filesystem::remove_all(paths->GetDefaultTestPath());
-  boost::filesystem::create_directories(paths->GetDefaultTestPath());
+  boost::filesystem::remove_all(paths->DefaultTestPath());
+  boost::filesystem::create_directories(paths->DefaultTestPath());
 
   EXPECT_EQ(NULL, common::MeshManager::Instance()->Load("break.mesh"));
   EXPECT_EQ(NULL, common::MeshManager::Instance()->Load("break.3ds"));
@@ -228,24 +228,24 @@ TEST_F(MeshTest, Mesh)
   newMesh->GenSphericalTexCoord(ignition::math::Vector3d(0, 0, 0));
   delete newMesh;
 
-  std::ofstream stlFile((paths->GetDefaultTestPath() +
+  std::ofstream stlFile((paths->DefaultTestPath() +
       "/gazebo_stl_test.stl").c_str(), std::ios::out);
   stlFile << asciiSTLBox;
   stlFile.close();
 
   mesh = common::MeshManager::Instance()->Load(
-      paths->GetDefaultTestPath() + "/gazebo_stl_test-bad.stl");
+      paths->DefaultTestPath() + "/gazebo_stl_test-bad.stl");
   EXPECT_EQ(NULL, mesh);
 
   mesh = common::MeshManager::Instance()->Load(
-      paths->GetDefaultTestPath() + "/gazebo_stl_test.stl");
+      paths->DefaultTestPath() + "/gazebo_stl_test.stl");
   mesh->GetAABB(center, min, max);
   EXPECT_TRUE(center == ignition::math::Vector3d(0.5, 0.5, 0.5));
   EXPECT_TRUE(min == ignition::math::Vector3d(0, 0, 0));
   EXPECT_TRUE(max == ignition::math::Vector3d(1, 1, 1));
 
   // Cleanup test directory.
-  boost::filesystem::remove_all(paths->GetDefaultTestPath());
+  boost::filesystem::remove_all(paths->DefaultTestPath());
 }
 
 /////////////////////////////////////////////////

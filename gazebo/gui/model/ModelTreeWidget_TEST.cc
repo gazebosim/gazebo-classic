@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,6 +53,18 @@ void ModelTreeWidget_TEST::AddRemoveNestedModels()
   QVERIFY(nestedModelsItem->child(0)->data(0, Qt::UserRole) == "nestedModel1");
   QVERIFY(nestedModelsItem->child(1)->data(0, Qt::UserRole) == "nestedModel2");
 
+  // Insert more nested models and verify they are added to the correct parent.
+  gazebo::gui::model::Events::nestedModelInserted("nestedModel1::model");
+  QCOMPARE(nestedModelsItem->childCount(), 2);
+  QCOMPARE(nestedModelsItem->child(0)->childCount(), 1);
+  QVERIFY(nestedModelsItem->child(0)->child(0)->data(0, Qt::UserRole) ==
+      "nestedModel1::model");
+  gazebo::gui::model::Events::nestedModelInserted("nestedModel2::model");
+  QCOMPARE(nestedModelsItem->childCount(), 2);
+  QCOMPARE(nestedModelsItem->child(1)->childCount(), 1);
+  QVERIFY(nestedModelsItem->child(1)->child(0)->data(0, Qt::UserRole) ==
+      "nestedModel2::model");
+
   // Remove a nested model and check number again
   gazebo::gui::model::Events::nestedModelRemoved("nestedModel1");
   QCOMPARE(nestedModelsItem->childCount(), 1);
@@ -82,13 +94,7 @@ void ModelTreeWidget_TEST::LoadNestedModel()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get the user camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
@@ -104,13 +110,7 @@ void ModelTreeWidget_TEST::LoadNestedModel()
   gui::g_editModelAct->trigger();
   gui::Events::editModel("model_00");
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get model tree
   gazebo::gui::ModelTreeWidget *modelTree =

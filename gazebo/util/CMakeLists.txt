@@ -6,10 +6,10 @@ if (HAVE_OPENAL)
   include_directories(${OPENAL_INCLUDE_DIR})
 endif()
 
-include_directories(${TBB_INCLUDEDIR})
+include_directories(${TBB_INCLUDEDIR}
+                    ${tinyxml_INCLUDE_DIRS}
+                    ${tinyxml2_INCLUDE_DIRS})
 
-include_directories(${tinyxml_INCLUDE_DIRS})
-include_directories(${tinyxml2_INCLUDE_DIRS})
 link_directories(${tinyxml2_LIBRARY_DIRS})
 
 set (sources
@@ -19,17 +19,16 @@ set (sources
   OpenAL.cc
 )
 
+if (NOT USE_EXTERNAL_TINYXML2)
+  list (APPEND sources ${CMAKE_SOURCE_DIR}/deps/tinyxml2/gazebo/tinyxml2.cpp)
+endif()
+
 if (NOT USE_EXTERNAL_TINYXML)
   set (sources ${sources}
        ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinystr.cpp
        ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxml.cpp
        ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxmlerror.cpp
        ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxmlparser.cpp)
-endif()
-
-if (NOT USE_EXTERNAL_TINYXML2)
-  set (sources ${sources}
-       ${CMAKE_SOURCE_DIR}/deps/win/tinyxml2/tinyxml2.cpp)
 endif()
 
 set (headers
@@ -48,7 +47,7 @@ set (gtest_sources
   OpenAL_TEST.cc
 )
 
-gz_build_tests(${gtest_sources})
+gz_build_tests(${gtest_sources} EXTRA_LIBS gazebo_util)
 
 set (util_headers "" CACHE INTERNAL "util headers" FORCE)
 foreach (hdr ${headers})

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,9 +33,7 @@ namespace gazebo
     /// Forward declare private data class
     class DARTLinkPrivate;
 
-    /// \ingroup gazebo_physics
-    /// \addtogroup gazebo_physics_dart DART Physics
-    /// \brief dart physics engine wrapper
+    /// \addtogroup gazebo_physics_dart
     /// \{
 
     /// \brief DART Link class

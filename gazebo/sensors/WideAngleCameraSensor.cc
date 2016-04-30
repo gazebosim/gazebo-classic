@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -108,20 +108,20 @@ void WideAngleCameraSensor::Init()
     }
 
     this->camera->Init();
-    this->camera->CreateRenderTexture(this->GetName() + "_RttTex");
+    this->camera->CreateRenderTexture(this->Name() + "_RttTex");
 
     ignition::math::Pose3d cameraPose = this->pose;
     if (cameraSdf->HasElement("pose"))
       cameraPose = cameraSdf->Get<ignition::math::Pose3d>("pose") + cameraPose;
 
     this->camera->SetWorldPose(cameraPose);
-    this->camera->AttachToVisual(this->parentId, true);
+    this->camera->AttachToVisual(this->ParentId(), true, 0, 0);
 
     if (cameraSdf->HasElement("noise"))
     {
       this->noises[CAMERA_NOISE] =
         NoiseFactory::NewNoiseModel(cameraSdf->GetElement("noise"),
-        this->GetType());
+        this->Type());
       this->noises[CAMERA_NOISE]->SetCamera(this->camera);
     }
   }
@@ -142,20 +142,22 @@ void WideAngleCameraSensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
   this->imagePub = this->node->Advertise<msgs::ImageStamped>(
-      this->GetTopic(), 50);
+      this->Topic(), 50);
 
   std::string lensTopicName = "~/";
-  lensTopicName += this->parentName + "/" + this->GetName() + "/lens/";
+  lensTopicName += this->ParentName() + "/" + this->Name() + "/lens/";
   boost::replace_all(lensTopicName, "::", "/");
 
-  sdf::ElementPtr lensSdf = this->sdf->GetElement("camera")->GetElement("lens");
+  sdf::ElementPtr lensSdf =
+    this->sdf->GetElement("camera")->GetElement("lens");
 
   // create a topic that publishes lens states
   this->dataPtr->lensPub = this->node->Advertise<msgs::CameraLens>(
     lensTopicName+"info", 1);
 
-  this->dataPtr->lensSub = this->node->Subscribe(lensTopicName + "control",
-      &WideAngleCameraSensor::OnCtrlMessage, this);
+  this->dataPtr->lensSub =
+    this->node->Subscribe(lensTopicName + "control",
+        &WideAngleCameraSensor::OnCtrlMessage, this);
 }
 
 //////////////////////////////////////////////////
@@ -187,7 +189,8 @@ bool WideAngleCameraSensor::UpdateImpl(const bool _force)
     msgs::CameraLens msg;
 
     rendering::WideAngleCameraPtr wcamera =
-      boost::dynamic_pointer_cast<rendering::WideAngleCamera>(this->camera);
+      boost::dynamic_pointer_cast<rendering::WideAngleCamera>(
+          this->camera);
 
     const rendering::CameraLens *lens = wcamera->Lens();
 
@@ -217,7 +220,8 @@ void WideAngleCameraSensor::OnCtrlMessage(ConstCameraLensPtr &_msg)
   std::lock_guard<std::mutex> lock(this->dataPtr->lensCmdMutex);
 
   rendering::WideAngleCameraPtr wcamera =
-      boost::dynamic_pointer_cast<rendering::WideAngleCamera>(this->camera);
+      boost::dynamic_pointer_cast<rendering::WideAngleCamera>(
+          this->camera);
 
   rendering::CameraLens *lens = (wcamera->Lens());
 

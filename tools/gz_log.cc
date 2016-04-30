@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
@@ -24,6 +23,10 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/posix_time/posix_time_io.hpp>
+#include <boost/iostreams/filter/bzip2.hpp>
+#include <boost/iostreams/filter/zlib.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
+#include <boost/iostreams/copy.hpp>
 
 #include <gazebo/util/util.hh>
 #include "gz_log.hh"
@@ -590,8 +593,16 @@ LogCommand::LogCommand()
     ("hz,z", po::value<double>(), "Filter output to the specified Hz rate."
      "Only valid for echo and step commands.")
     ("file,f", po::value<std::string>(), "Path to a log file.")
+    ("output,o", po::value<std::string>(),
+     "Output file, valid in conjunction with the filter, raw, hz, and "
+     "encoding commands. By default, the output file will have the same "
+     "encoding as the source file. Override with the --encoding option")
+    ("encoding,n", po::value<std::string>(),
+     "Specify the encoding (txt, zlib, or bz2) for an output file. "
+     "Valid in conjunction with the output command. See also the "
+     "--output argument.")
     ("filter", po::value<std::string>(),
-     "Filter output. Valid only for the echo and step commands");
+     "Filter output. Valid only with the echo, step, and output commands");
 }
 
 /////////////////////////////////////////////////
@@ -661,7 +672,15 @@ bool LogCommand::RunImpl()
   g_stateSdf.reset(new sdf::Element);
   sdf::initFile("state.sdf", g_stateSdf);
 
-  if (this->vm.count("echo"))
+  if (this->vm.count("output"))
+  {
+    std::string encoding = this->vm.count("encoding") ?
+      this->vm["encoding"].as<std::string>() : "";
+
+    this->Output(this->vm["output"].as<std::string>(), filter, raw, stamp, hz,
+        encoding);
+  }
+  else if (this->vm.count("echo"))
     this->Echo(filter, raw, stamp, hz);
   else if (this->vm.count("step"))
     this->Step(filter, raw, stamp, hz);
@@ -776,6 +795,81 @@ void LogCommand::Info(const std::string &_filename)
     << "Encoding:       " << play->Encoding() << "\n"
     // << "Model Count:    " << modelCount << "\n"
     << "\n";
+}
+
+/////////////////////////////////////////////////
+void LogCommand::Output(const std::string &_outFilename,
+    const std::string &_filter, const bool _raw,
+    const std::string &_stamp, const double _hz, const std::string &_encoding)
+{
+  std::ofstream outFile(_outFilename, std::fstream::out | std::ios::binary);
+
+  if (!outFile.is_open())
+  {
+    std::cerr << "Unable to open file[" << _outFilename << "] for writing.\n";
+    return;
+  }
+
+  gazebo::util::LogPlay *play = gazebo::util::LogPlay::Instance();
+  if (!play->IsOpen())
+  {
+    std::cerr << "No source log file specified. Use the -f command line "
+      << "argument.\n";
+    return;
+  }
+
+  std::string stateString, bufferString;
+
+  std::string encoding = _encoding.empty() ? play->Encoding() : _encoding;
+  if (encoding != "txt" && encoding != "zlib" && encoding != "bz2")
+  {
+    std::cerr << "Invalid log file encoding[" << encoding << "]. "
+      << "Use one of: txt, bz2, zlib.\n";
+    outFile.close();
+    return;
+  }
+
+  // Output the header
+  if (!_raw)
+  {
+    std::string header = play->Header();
+    outFile.write(header.c_str(), header.size());
+  }
+
+  StateFilter filter(!_raw, _stamp, _hz);
+  filter.Init(_filter);
+
+  unsigned int i = 0;
+  while (play->Step(stateString))
+  {
+    if (i == 0 && !_raw)
+    {
+      this->OutputWriter(outFile, stateString, _raw, encoding);
+    }
+    else
+    {
+      bufferString += filter.Filter(stateString);
+
+      if (i%1000 == 0 && !bufferString.empty())
+      {
+        this->OutputWriter(outFile, bufferString, _raw, encoding);
+        bufferString.clear();
+      }
+    }
+
+    ++i;
+  }
+
+  if (!bufferString.empty())
+    this->OutputWriter(outFile, bufferString, _raw, encoding);
+
+  if (!_raw)
+  {
+    std::string endTag = "</gazebo_log>\n";
+    outFile.write(endTag.c_str(), endTag.size());
+  }
+
+  outFile.close();
 }
 
 /////////////////////////////////////////////////
@@ -951,4 +1045,57 @@ bool LogCommand::LoadLogFromFile(const std::string &_filename)
   }
 
   return true;
+}
+
+/////////////////////////////////////////////////
+void LogCommand::OutputWriter(std::ofstream &_outFile,
+    const std::string &_stateString, const bool _raw,
+    const std::string &_encoding)
+{
+  if (!_raw)
+  {
+    std::string buffer = "<chunk encoding='" + _encoding + "'>\n<![CDATA[";
+
+    if (_encoding == "txt")
+      buffer.append(_stateString);
+    else if (_encoding == "zlib")
+    {
+      std::string str;
+
+      // Compress to zlib
+      {
+        boost::iostreams::filtering_ostream out;
+        out.push(boost::iostreams::zlib_compressor());
+        out.push(std::back_inserter(str));
+        boost::iostreams::copy(
+            boost::make_iterator_range(_stateString), out);
+      }
+
+      // Encode in base64.
+      Base64Encode(str.c_str(), str.size(), buffer);
+    }
+    else if (_encoding == "bz2")
+    {
+      std::string str;
+
+      // Compress to bzip2
+      {
+        boost::iostreams::filtering_ostream out;
+        out.push(boost::iostreams::bzip2_compressor());
+        out.push(std::back_inserter(str));
+        boost::iostreams::copy(
+            boost::make_iterator_range(_stateString), out);
+      }
+
+      // Encode in base64.
+      Base64Encode(str.c_str(), str.size(), buffer);
+    }
+
+    buffer.append("]]>\n</chunk>\n");
+    _outFile.write(buffer.c_str(), buffer.size());
+  }
+  else
+  {
+    _outFile.write(_stateString.c_str(), _stateString.size());
+  }
 }

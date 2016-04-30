@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,11 +61,11 @@ TEST_F(GuiConversionsTest, Color)
 /////////////////////////////////////////////////
 TEST_F(GuiConversionsTest, Point2d)
 {
+  double x = -0.5;
+  double y = 123;
+
   // Ignition to Qt to Ignition
   {
-    double x = -0.5;
-    double y = 123;
-
     ignition::math::Vector2d point(x, y);
     EXPECT_EQ(gazebo::gui::Conversions::Convert(
               gazebo::gui::Conversions::Convert(point)), point);
@@ -73,11 +73,31 @@ TEST_F(GuiConversionsTest, Point2d)
 
   // Qt to Ignition to Qt
   {
-    double x = -0.5;
-    double y = 123;
-
     QPointF point(x, y);
     EXPECT_EQ(gazebo::gui::Conversions::Convert(
               gazebo::gui::Conversions::Convert(point)), point);
   }
 }
+
+/////////////////////////////////////////////////
+TEST_F(GuiConversionsTest, Vector3d)
+{
+  double x = -0.1;
+  double y = 0;
+  double z = 1234;
+
+  // Ignition to Qt to Ignition
+  {
+    ignition::math::Vector3d vec(x, y, z);
+    EXPECT_EQ(gazebo::gui::Conversions::Convert(
+              gazebo::gui::Conversions::Convert(vec)), vec);
+  }
+
+  // Qt to Ignition to Qt
+  {
+    QVector3D vec(x, y, z);
+    EXPECT_EQ(gazebo::gui::Conversions::Convert(
+              gazebo::gui::Conversions::Convert(vec)), vec);
+  }
+}
+

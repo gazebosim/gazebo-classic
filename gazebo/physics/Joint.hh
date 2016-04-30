@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -120,6 +120,7 @@ namespace gazebo
 
       /// \brief Reset the joint.
       public: virtual void Reset();
+      using Base::Reset;
 
       /// \brief Set the joint state.
       /// \param[in] _state Joint state

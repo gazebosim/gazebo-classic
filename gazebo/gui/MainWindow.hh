@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,16 @@
  * limitations under the License.
  *
 */
-#ifndef _MAINWINDOW_HH_
-#define _MAINWINDOW_HH_
+#ifndef _GAZEBO_GUI_MAINWINDOW_HH_
+#define _GAZEBO_GUI_MAINWINDOW_HH_
 
-#include <map>
+#include <memory>
 #include <string>
-#include <vector>
-#include <list>
-
-#include <boost/thread/mutex.hpp>
 
 #include "gazebo/gazebo_config.h"
-#include "gazebo/gui/qt.h"
-#include "gazebo/gui/DataLogger.hh"
-#include "gazebo/gui/HotkeyDialog.hh"
-#include "gazebo/common/Event.hh"
+#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/msgs/MessageTypes.hh"
-#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
 
 #ifdef HAVE_OCULUS
@@ -41,25 +34,36 @@ namespace gazebo
 {
   namespace gui
   {
-    class InsertModelWidget;
-    class RenderWidget;
-    class ToolsWidget;
-    class ModelListWidget;
     class Editor;
-    class SpaceNav;
-    class UserCmdHistory;
+    class RenderWidget;
+
+    // Forward declare private data
+    class MainWindowPrivate;
 
     class GZ_GUI_VISIBLE MainWindow : public QMainWindow
     {
       Q_OBJECT
 
+      /// \brief Constructor
       public: MainWindow();
+
+      /// \brief Destructor
       public: virtual ~MainWindow();
 
+      /// \brief Load the mainwindow
       public: void Load();
+
+      /// \brief Initialization
       public: void Init();
 
-      public: unsigned int GetEntityId(const std::string &_name);
+      /// \brief Get an entity id
+      /// \param[in] _name The name of the entity
+      /// \return The entity id
+      public: unsigned int EntityId(const std::string &_name);
+
+      /// \brief Has an entity name
+      /// \param[in] _name The entity name
+      /// \return True if the entity has a name
       public: bool HasEntityName(const std::string &_name);
 
       /// \brief Add a widget to the left column stack of widgets.
@@ -74,9 +78,15 @@ namespace gazebo
       /// the main tab.
       public: void ShowLeftColumnWidget(const std::string &_name = "default");
 
+
       /// \brief Get a pointer to the render widget.
       /// \return A pointer to the render widget.
-      public: RenderWidget *GetRenderWidget() const;
+      /// \deprecated See RenderWidget() const.
+      public: gui::RenderWidget *GetRenderWidget() const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get a pointer to the render widget.
+      /// \return A pointer to the render widget.
+      public: gui::RenderWidget *RenderWidget() const;
 
       /// \brief Returns the state of the simulation, true if paused.
       /// \return True if paused, false otherwise.
@@ -115,10 +125,21 @@ namespace gazebo
       /// \brief Get an editor by name
       /// \param[in] _name Name of the editor.
       /// \return Pointer to the editor.
-      public: Editor *GetEditor(const std::string &_name) const;
+      /// \deprecated See Editor(const std::string &_name) const.
+      public: gui::Editor *GetEditor(
+          const std::string &_name) const GAZEBO_DEPRECATED(7.0);
+
+      /// \brief Get an editor by name
+      /// \param[in] _name Name of the editor.
+      /// \return Pointer to the editor.
+      public: gui::Editor *Editor(const std::string &_name) const;
 
       /// \brief A signal to trigger loading of GUI plugins.
       signals: void AddPlugins();
+
+      /// \brief A signal to track a visual.
+      /// \param[in] _visualName Name of the visual to attach the camera to.
+      signals: void TrackVisual(const std::string &_visualName);
 
       /// \brief A signal to indicate the main window is about to close.
       signals: void Close();
@@ -203,6 +224,9 @@ namespace gazebo
       /// \brief Qt callback when the show link frame action is triggered.
       private slots: void ShowLinkFrame();
 
+      /// \brief Qt callback when the show skeleton action is triggered.
+      private slots: void ShowSkeleton();
+
       /// \brief Qt callback when the full screen action is triggered.
       private slots: void FullScreen();
 
@@ -234,6 +258,10 @@ namespace gazebo
 
       /// \brief Callback for adding plugins.
       private slots: void OnAddPlugins();
+
+      /// \brief Callback for tracking a visual.
+      /// \param[in] _visualName Name of the visual to attach the camera to.
+      private slots: void OnTrackVisual(const std::string &_visualName);
 
       /// \brief Qt call back when one of the editor actions is triggered.
       /// \param[in] _action Action in the group which was triggered.
@@ -295,101 +323,9 @@ namespace gazebo
       /// \param[in] _mode Window mode, such as "Simulation", "LogPlayback"...
       private: void OnWindowMode(const std::string &_mode);
 
-      private: QToolBar *playToolbar;
-
-      private: RenderWidget *renderWidget;
-      private: ToolsWidget *toolsWidget;
-      private: ModelListWidget *modelListWidget;
-
-      private: transport::NodePtr node;
-      private: transport::PublisherPtr worldControlPub;
-      private: transport::PublisherPtr serverControlPub;
-      private: transport::PublisherPtr requestPub;
-      private: transport::PublisherPtr scenePub;
-
-      /// \brief Publish user command messages for the server to place in the
-      /// undo queue.
-      private: transport::PublisherPtr userCmdPub;
-
-      private: transport::SubscriberPtr responseSub;
-      private: transport::SubscriberPtr guiSub;
-      private: transport::SubscriberPtr newEntitySub, statsSub;
-      private: transport::SubscriberPtr worldModSub;
-
-      /// \brief Subscriber to the light modify topic.
-      private: transport::SubscriberPtr lightModifySub;
-
-      /// \brief Subscriber to the light factory topic.
-      private: transport::SubscriberPtr lightFactorySub;
-
-      private: QDockWidget *toolsDock;
-
-      private: std::vector<event::ConnectionPtr> connections;
-
-      // A map that associates physics_id's with entity names
-      private: std::map<std::string, unsigned int> entities;
-
-      /// \brief Message used to field requests.
-      private: msgs::Request *requestMsg;
-
-      /// \brief The left-hand tab widget
-      private: QTabWidget *tabWidget;
-
-      /// \brief Mainwindow's menubar
-      private: QMenuBar *menuBar;
-
-      /// \brief The Edit menu.
-      private: QMenu *editMenu;
-
-      /// \brief A layout for the menu bar.
-      private: QHBoxLayout *menuLayout;
-
-      /// \brief Used to control size of each pane.
-      private: QStackedWidget *leftColumn;
-
-      /// \brief Map of names to widgets in the leftColumn QStackedWidget
-      private: std::map<std::string, int> leftColumnStack;
-
-      /// \brief The filename set via "Save As". This filename is used by
-      /// the "Save" feature.
-      private: std::string saveFilename;
-
-      /// \brief User specified step size for manually stepping the world
-      private: int inputStepSize;
-
-      /// \brief Map of all the editors to their names.
-      private: std::map<std::string, Editor *> editors;
-
-      /// \brief List of all the align action groups.
-      private: std::vector<QActionGroup *> alignActionGroups;
-
-      /// \brief Space navigator interface.
-      private: SpaceNav *spacenav;
-
-#ifdef HAVE_OCULUS
-      private: gui::OculusWindow *oculusWindow;
-#endif
-
-      /// \brief Buffer of plugin messages to process.
-      private: std::vector<boost::shared_ptr<msgs::Plugin const> > pluginMsgs;
-
-      /// \brief Mutext to protect plugin loading.
-      private: boost::mutex pluginLoadMutex;
-
-      /// \brief Splitter for the main window.
-      private: QSplitter *splitter;
-
-      /// \brief Data logger dialog.
-      private: gui::DataLogger *dataLogger;
-
-      /// \brief Hotkey chart dialog.
-      private: gui::HotkeyDialog *hotkeyDialog;
-
-      /// \brief Tab to insert models.
-      private: InsertModelWidget *insertModel;
-
-      /// \brief Class which manages user commands and undoing / redoing them.
-      private: UserCmdHistory *userCmdHistory;
+      /// \internal
+      /// \brief Private data pointer
+      private: std::unique_ptr<MainWindowPrivate> dataPtr;
     };
   }
 }

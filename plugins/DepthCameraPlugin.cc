@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ void DepthCameraPlugin::Load(sensors::SensorPtr _sensor,
 {
   this->parentSensor =
     std::dynamic_pointer_cast<sensors::DepthCameraSensor>(_sensor);
-  this->depthCamera = this->parentSensor->GetDepthCamera();
+  this->depthCamera = this->parentSensor->DepthCamera();
 
   if (!this->parentSensor)
   {
@@ -65,8 +65,9 @@ void DepthCameraPlugin::Load(sensors::SensorPtr _sensor,
         std::placeholders::_3, std::placeholders::_4, std::placeholders::_5));
 
   this->newImageFrameConnection = this->depthCamera->ConnectNewImageFrame(
-      boost::bind(&DepthCameraPlugin::OnNewImageFrame,
-        this, _1, _2, _3, _4, _5));
+      std::bind(&DepthCameraPlugin::OnNewImageFrame,
+        this, std::placeholders::_1, std::placeholders::_2,
+        std::placeholders::_3, std::placeholders::_4, std::placeholders::_5));
 
   this->parentSensor->SetActive(true);
 }

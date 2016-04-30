@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdio.h>
+#include <memory>
 
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/common/Console.hh"
@@ -58,9 +59,9 @@ Mesh *STLLoader::Load(const std::string &_filename)
     file = fopen(_filename.c_str(), "r");
     if (!this->ReadBinary(file, mesh))
       gzerr << "Unable to read STL[" << _filename << "]\n";
-    fclose(file);
   }
 
+  fclose(file);
   return mesh;
 }
 
@@ -185,7 +186,7 @@ bool STLLoader::ReadBinary(FILE *_filein, Mesh *_mesh)
   int iface;
   int face_num;
 
-  SubMesh *subMesh = new SubMesh();
+  std::unique_ptr<SubMesh> subMesh(new SubMesh());
 
   // 80 byte Header.
   for (i = 0; i < 80; ++i)
@@ -246,7 +247,7 @@ bool STLLoader::ReadBinary(FILE *_filein, Mesh *_mesh)
       return false;
   }
 
-  _mesh->AddSubMesh(subMesh);
+  _mesh->AddSubMesh(subMesh.release());
   return true;
 }
 

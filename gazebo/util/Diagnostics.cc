@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,8 +49,8 @@ DiagnosticManager::DiagnosticManager()
   {
     common::SystemPaths *paths = common::SystemPaths::Instance();
     gzwarn << "HOME environment variable missing. Diagnostic timing " <<
-      "information will be logged to " << paths->GetTmpPath() << "\n";
-    this->dataPtr->logPath = paths->GetTmpPath() + "/gazebo";
+      "information will be logged to " << paths->TmpPath() << "\n";
+    this->dataPtr->logPath = paths->TmpPath() + "/gazebo";
   }
   else
   {

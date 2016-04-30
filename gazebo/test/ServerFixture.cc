@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -509,8 +509,8 @@ void ServerFixture::GetFrame(const std::string &_cameraName,
   sensors::CameraSensorPtr camSensor =
     std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
 
-  _width = camSensor->GetImageWidth();
-  _height = camSensor->GetImageHeight();
+  _width = camSensor->ImageWidth();
+  _height = camSensor->ImageHeight();
 
   if (*_imgData)
   {
@@ -522,14 +522,14 @@ void ServerFixture::GetFrame(const std::string &_cameraName,
 
   this->gotImage = 0;
   event::ConnectionPtr c =
-    camSensor->GetCamera()->ConnectNewImageFrame(
+    camSensor->Camera()->ConnectNewImageFrame(
         boost::bind(&ServerFixture::OnNewFrame,
                     this, _1, _2, _3, _4, _5));
 
   while (this->gotImage < 20)
     common::Time::MSleep(100);
 
-  camSensor->GetCamera()->DisconnectNewImageFrame(c);
+  camSensor->Camera()->DisconnectNewImageFrame(c);
 }
 
 /////////////////////////////////////////////////
@@ -798,6 +798,47 @@ void ServerFixture::SpawnGpuRaySensor(const std::string &_modelName,
 
   WaitUntilEntitySpawn(_modelName, 100, 100);
   WaitUntilSensorSpawn(_raySensorName, 100, 100);
+}
+
+/////////////////////////////////////////////////
+void ServerFixture::SpawnDepthCameraSensor(const std::string &_modelName,
+    const std::string &_cameraName,
+    const ignition::math::Vector3d &_pos, const ignition::math::Vector3d &_rpy,
+    unsigned int _width, unsigned int _height, double _rate, double _near,
+    double _far)
+{
+  msgs::Factory msg;
+  std::ostringstream newModelStr;
+
+  newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+    << "<model name ='" << _modelName << "'>"
+    << "<static>true</static>"
+    << "<pose>" << _pos << " " << _rpy << "</pose>"
+    << "<link name ='body'>"
+    << "  <sensor name ='" << _cameraName << "' type ='depth'>"
+    << "    <always_on>1</always_on>"
+    << "    <update_rate>" << _rate << "</update_rate>"
+    << "    <visualize>true</visualize>"
+    << "    <camera>"
+    << "      <horizontal_fov>0.78539816339744828</horizontal_fov>"
+    << "      <image>"
+    << "        <width>" << _width << "</width>"
+    << "        <height>" << _height << "</height>"
+    << "      </image>"
+    << "      <clip>"
+    << "        <near>" << _near << "</near><far>" << _far << "</far>"
+    << "      </clip>"
+    << "    </camera>"
+    << "  </sensor>"
+    << "</link>"
+    << "</model>"
+    << "</sdf>";
+
+  msg.set_sdf(newModelStr.str());
+  this->factoryPub->Publish(msg);
+
+  WaitUntilEntitySpawn(_modelName, 100, 50);
+  WaitUntilSensorSpawn(_cameraName, 100, 100);
 }
 
 /////////////////////////////////////////////////
@@ -1354,8 +1395,8 @@ void ServerFixture::SpawnCylinder(const std::string &_name,
   msgs::Model model;
   model.set_name(_name);
   model.set_is_static(_static);
-  msgs::Set(model.mutable_pose(),
-      ignition::math::Pose3d(_pos.Ign(), _rpy.Ign()));
+  msgs::Set(model.mutable_pose(), ignition::math::Pose3d(_pos.Ign(),
+      ignition::math::Quaterniond(_rpy.Ign())));
   msgs::AddCylinderLink(model, 1.0, 0.5, 1.0);
   auto link = model.mutable_link(0);
   link->set_name("body");
@@ -1419,8 +1460,8 @@ void ServerFixture::SpawnSphere(const std::string &_name,
   msgs::Model model;
   model.set_name(_name);
   model.set_is_static(_static);
-  msgs::Set(model.mutable_pose(),
-      ignition::math::Pose3d(_pos.Ign(), _rpy.Ign()));
+  msgs::Set(model.mutable_pose(), ignition::math::Pose3d(_pos.Ign(),
+      ignition::math::Quaterniond(_rpy.Ign())));
   msgs::AddSphereLink(model, 1.0, _radius);
   auto link = model.mutable_link(0);
   link->set_name("body");
@@ -1451,8 +1492,8 @@ void ServerFixture::SpawnBox(const std::string &_name,
   msgs::Model model;
   model.set_name(_name);
   model.set_is_static(_static);
-  msgs::Set(model.mutable_pose(),
-      ignition::math::Pose3d(_pos.Ign(), _rpy.Ign()));
+  msgs::Set(model.mutable_pose(), ignition::math::Pose3d(_pos.Ign(),
+      ignition::math::Quaterniond(_rpy.Ign())));
   msgs::AddBoxLink(model, 1.0, _size.Ign());
   auto link = model.mutable_link(0);
   link->set_name("body");
@@ -1519,8 +1560,8 @@ void ServerFixture::SpawnEmptyLink(const std::string &_name,
   msgs::Model model;
   model.set_name(_name);
   model.set_is_static(_static);
-  msgs::Set(model.mutable_pose(),
-      ignition::math::Pose3d(_pos.Ign(), _rpy.Ign()));
+  msgs::Set(model.mutable_pose(), ignition::math::Pose3d(_pos.Ign(),
+      ignition::math::Quaterniond(_rpy.Ign())));
   model.add_link();
   model.mutable_link(0)->set_name("body");
 
