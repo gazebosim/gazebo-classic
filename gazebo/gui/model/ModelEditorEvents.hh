@@ -14,13 +14,14 @@
  * limitations under the License.
  *
 */
-#ifndef _MODEL_EDITOR_EVENTS_HH_
-#define _MODEL_EDITOR_EVENTS_HH_
+#ifndef GAZEBO_GUI_MODEL_MODELEDITOREVENTS_HH_
+#define GAZEBO_GUI_MODEL_MODELEDITOREVENTS_HH_
 
 #include <string>
 #include <sdf/sdf.hh>
-#include "gazebo/math/Pose.hh"
+
 #include "gazebo/common/Event.hh"
+
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -307,6 +308,36 @@ namespace gazebo
             event::ConnectionPtr _subscriber)
           { linkRemoved.Disconnect(_subscriber); }
 
+        /// \brief Connect a Gazebo event to the request joint removal signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectRequestJointRemoval(
+            T _subscriber)
+          { return requestJointRemoval.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the request joint removal
+        /// signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectRequestJointRemoval(
+            event::ConnectionPtr _subscriber)
+          { requestJointRemoval.Disconnect(_subscriber); }
+
+        /// \brief Connect a Gazebo event to the request joint insertion signal.
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectRequestJointInsertion(
+            T _subscriber)
+          { return requestJointInsertion.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the request joint insertion
+        /// signal.
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectRequestJointInsertion(
+            event::ConnectionPtr _subscriber)
+          { requestJointInsertion.Disconnect(_subscriber); }
+
         /// \brief Connect a Gazebo event to the joint removed signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
@@ -581,6 +612,13 @@ namespace gazebo
 
         /// \brief Request to remove a link.
         public: static event::EventT<void (std::string)> requestLinkRemoval;
+
+        /// \brief Request to remove a joint.
+        public: static event::EventT<void (std::string)> requestJointRemoval;
+
+        /// \brief Request to insert a joint.
+        public: static event::EventT<void (sdf::ElementPtr, std::string)>
+            requestJointInsertion;
 
         /// \brief Notify that a joint has been inserted. The parameters are:
         /// joint's unique id, joint name, joint type, parent link's name, and

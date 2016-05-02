@@ -39,6 +39,11 @@ namespace gazebo
     class ODEJointFeedback;
     class ODEPhysicsPrivate;
 
+    /// \ingroup gazebo_physics
+    /// \addtogroup gazebo_physics_ode ODE Physics
+    /// \brief Open Dynamics Engine physics wrapper
+    /// \{
+
     /// \brief ODE physics engine.
     class GZ_PHYSICS_VISIBLE ODEPhysics : public PhysicsEngine
     {
@@ -314,6 +319,7 @@ namespace gazebo
       /// \brief Private data pointer.
       private: ODEPhysicsPrivate *dataPtr;
     };
+    /// \}
   }
 }
 #endif

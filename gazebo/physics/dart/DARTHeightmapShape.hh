@@ -32,6 +32,9 @@ namespace gazebo
     /// Forward declare private data class
     class DARTHeightmapShapePrivate;
 
+    /// \addtogroup gazebo_physics_dart
+    /// \{
+
     /// \brief DART Height map collision.
     class GZ_PHYSICS_VISIBLE DARTHeightmapShape : public HeightmapShape
     {
@@ -49,6 +52,7 @@ namespace gazebo
       /// \brief Pointer to private data
       private: DARTHeightmapShapePrivate *dataPtr;
     };
+    /// \}
   }
 }
 #endif
