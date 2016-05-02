@@ -198,6 +198,7 @@ bool MarkerManager::ProcessMarkerMsg(const ignition::msgs::Marker &_msg)
 void MarkerManager::OnMarkerMsg(const ignition::msgs::Marker &_req,
     ignition::msgs::StringMsg &_rep, bool &_result)
 {
+  std::cout << "OnMarkerMsg\n";
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
   this->dataPtr->markerMsgs.push_back(_req);
   _result = true;

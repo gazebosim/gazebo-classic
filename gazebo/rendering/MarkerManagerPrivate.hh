@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_RENDERING_MARKER_MANAGER_PRIVATE_HH_
-#define _GAZEBO_RENDERING_MARKER_MANAGER_PRIVATE_HH_
+#ifndef GAZEBO_RENDERING_MARKER_MANAGER_PRIVATE_HH_
+#define GAZEBO_RENDERING_MARKER_MANAGER_PRIVATE_HH_
 
 #include <string>
 #include <map>
