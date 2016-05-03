@@ -98,11 +98,11 @@ void SchematicViewWidget::Init()
 
   this->connections.push_back(
      event::Events::ConnectSetSelectedEntity(
-       boost::bind(&SchematicViewWidget::OnSetSelectedEntity, this, _1, _2)));
+       boost::bind(&SchematicViewWidget::OnDeselectAll, this, _1, _2)));
 
   this->connections.push_back(
      gui::model::Events::ConnectSetSelectedLink(
-       boost::bind(&SchematicViewWidget::OnSetSelectedLink, this, _1, _2)));
+       boost::bind(&SchematicViewWidget::OnSetSelectedEntity, this, _1, _2)));
 
   this->connections.push_back(
      gui::model::Events::ConnectSetSelectedJoint(
@@ -110,7 +110,8 @@ void SchematicViewWidget::Init()
 }
 
 /////////////////////////////////////////////////
-std::string SchematicViewWidget::UnscopedName(const std::string &_scopedName)
+std::string SchematicViewWidget::UnscopedName(
+    const std::string &_scopedName) const
 {
   if (_scopedName.empty())
     return "";
@@ -121,6 +122,24 @@ std::string SchematicViewWidget::UnscopedName(const std::string &_scopedName)
     unscopedName = _scopedName.substr(idx+2);
 
   return unscopedName;
+}
+
+/////////////////////////////////////////////////
+std::string SchematicViewWidget::TopLevelName(
+    const std::string &_scopedName) const
+{
+  if (_scopedName.empty())
+    return "";
+
+  auto unscoped = this->UnscopedName(_scopedName);
+  auto unscopedPos = _scopedName.find(unscoped);
+
+  std::string topLevelName = _scopedName;
+  auto secondScopePos = topLevelName.find("::", unscopedPos);
+  if (secondScopePos != std::string::npos)
+    topLevelName = topLevelName.substr(0, secondScopePos);
+
+  return topLevelName;
 }
 
 /////////////////////////////////////////////////
@@ -318,72 +337,105 @@ void SchematicViewWidget::OnItemDoubleClicked(const QString &_id)
 }
 
 /////////////////////////////////////////////////
-void SchematicViewWidget::OnSetSelectedLink(const std::string &_name,
+void SchematicViewWidget::OnSetSelectedEntity(const std::string &_name,
     bool _selected)
 {
-  auto it = this->nodes.find(_name);
-  if (it != this->nodes.end())
-    it->second->setSelected(_selected);
+  this->scene->blockSignals(true);
+
+  // Select all nodes which start with _name, so we select all links of a
+  // nested model.
+  for (auto &node : this->nodes)
+  {
+    if (node.first.find(_name) == 0)
+    {
+      node.second->setSelected(_selected);
+
+      if (!this->selectedItems.contains(node.second))
+      {
+        this->selectedItems.push_back(node.second);
+      }
+    }
+  }
+
+  this->scene->blockSignals(false);
 }
 
 /////////////////////////////////////////////////
 void SchematicViewWidget::OnSetSelectedJoint(const std::string &_id,
     bool _selected)
 {
+  this->scene->blockSignals(true);
+
   auto it = this->edges.find(_id);
   if (it != this->edges.end())
+  {
     it->second->setSelected(_selected);
+
+    if (!this->selectedItems.contains(it->second))
+    {
+      this->selectedItems.push_back(it->second);
+    }
+  }
+
+  this->scene->blockSignals(false);
 }
 
 /////////////////////////////////////////////////
-void SchematicViewWidget::OnSetSelectedEntity(const std::string &/*_name*/,
+void SchematicViewWidget::OnDeselectAll(const std::string &/*_name*/,
     const std::string &/*_mode*/)
 {
+  this->scene->blockSignals(true);
+
   // deselect all
   for (auto &node : this->nodes)
     node.second->setSelected(false);
 
   for (auto &edge : this->edges)
     edge.second->setSelected(false);
+
+  this->selectedItems.clear();
+
+  this->scene->blockSignals(false);
 }
 
 /////////////////////////////////////////////////
 void SchematicViewWidget::OnSelectionChanged()
 {
-  QList<QGraphicsItem *> items = this->scene->selectedItems();
+  QList<QGraphicsItem *> newlySelected = this->scene->selectedItems();
 
-  // update and signal new selection
-  for (auto const item : items)
+  // Create list of top level names so we can also select siblings
+  QList<std::string> newTopLevel;
+  for (auto &item : newlySelected)
   {
-    int idx = this->selectedItems.indexOf(item);
-    if (idx >= 0)
-    {
-      this->selectedItems.removeAt(idx);
-      continue;
-    }
+    auto id = item->data(0).toString().toStdString();
+    auto topLevel = this->TopLevelName(id);
+    if (!newTopLevel.contains(topLevel))
+      newTopLevel.push_back(topLevel);
+  }
+
+  // Update all items
+  for (auto &item : this->scene->items())
+  {
     std::string id = item->data(0).toString().toStdString();
     std::string type = item->data(1).toString().toStdString();
 
-    if (type == "Link")
-      gui::model::Events::setSelectedLink(id, true);
-    else if (type == "Joint")
-      gui::model::Events::setSelectedJoint(id, true);
-  }
+    bool selected = newlySelected.contains(item);
 
-  // deselect
-  for (auto const &item : this->selectedItems)
-  {
-    if (item)
+    // Add sibling links
+    if (!newlySelected.contains(item) &&
+        newTopLevel.contains(this->TopLevelName(id)) &&
+        type == "Link")
     {
-      std::string id = item->data(0).toString().toStdString();
-      std::string type = item->data(1).toString().toStdString();
-
-      if (type == "Link")
-        gui::model::Events::setSelectedLink(id, false);
-      else if (type == "Joint")
-        gui::model::Events::setSelectedJoint(id, false);
+      selected = true;
     }
+
+    if (type == "Link")
+      gui::model::Events::setSelectedLink(id, selected);
+    else if (type == "Joint")
+      gui::model::Events::setSelectedJoint(id, selected);
+    else
+      gzwarn << "Unknown type [" << type << "]" << std::endl;
   }
 
-  this->selectedItems = items;
+  this->selectedItems = newlySelected;
 }
