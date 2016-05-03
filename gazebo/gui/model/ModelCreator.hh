@@ -255,9 +255,6 @@ namespace gazebo
       /// \brief Callback received when exiting the editor mode.
       private: void OnExit();
 
-      /// \brief Update callback on PreRender.
-      private: void Update();
-
       /// \brief Internal helper function to remove a nestedModel without
       /// removing the joints.
       /// \param[in] _nestedModelName Name of the nestedModel to remove
@@ -412,6 +409,14 @@ namespace gazebo
       private: void OnEntityScaleChanged(const std::string &_name,
           const gazebo::math::Vector3 &_scale);
 
+      /// \brief Callback when an entity's pose has changed.
+      /// \param[in] _name Name of entity.
+      /// \param[in] _pose New pose.
+      /// \param[in] _isFinal Whether this is the final pose or it is still
+      /// being manipulated.
+      private: void OnEntityMoved(const std::string &_name,
+          const ignition::math::Pose3d &_pose, const bool _isFinal);
+
       /// \brief Deselect anything whose selection is handled here, such as
       /// links and model plugins.
       private: void DeselectAll();
@@ -421,6 +426,14 @@ namespace gazebo
 
       /// \brief Deselect all currently selected model plugins.
       private: void DeselectAllModelPlugins();
+
+      /// \brief
+      private: void OnRequestLinkMove(const std::string &_name,
+          const ignition::math::Pose3d &_pose);
+
+      /// \brief
+      private: void OnRequestNestedModelMove(const std::string &_name,
+          const ignition::math::Pose3d &_pose);
 
       /// \brief Set visibilty of a visual recursively while storing their
       /// original values

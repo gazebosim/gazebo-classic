@@ -169,6 +169,7 @@ void ModelManipulator::RotateEntity(rendering::VisualPtr &_vis,
     rot = rot * this->dataPtr->mouseMoveVisStartPose.rot;
 
   _vis->SetWorldRotation(rot);
+  Events::moveEntity(_vis->GetName(), _vis->GetWorldPose().Ign(), false);
 }
 
 /////////////////////////////////////////////////
@@ -522,12 +523,17 @@ void ModelManipulator::TranslateEntity(rendering::VisualPtr &_vis,
     pose.pos.z = _vis->GetWorldPose().pos.z;
 
   _vis->SetWorldPose(pose);
+  Events::moveEntity(_vis->GetName(), pose.Ign(), false);
 }
 
 /////////////////////////////////////////////////
 void ModelManipulator::PublishVisualPose(rendering::VisualPtr _vis)
 {
   if (!_vis)
+    return;
+
+  // If the root visual's ID can't be found, we're probably in the model editor
+  if (!gui::get_entity_id(_vis->GetRootVisual()->GetName()))
     return;
 
   // Register user command on server
@@ -593,6 +599,10 @@ void ModelManipulator::PublishVisualScale(rendering::VisualPtr _vis)
   {
     return;
   }
+
+  // If the root visual's ID can't be found, we're probably in the model editor
+  if (!gui::get_entity_id(_vis->GetRootVisual()->GetName()))
+    return;
 
   // Register user command on server
   msgs::UserCmd userCmdMsg;

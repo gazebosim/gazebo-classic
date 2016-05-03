@@ -336,6 +336,8 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
         auto modelMsg = userCmdMsg.add_model();
         modelMsg->CopyFrom(msg);
       }
+
+      Events::moveEntity(vis->GetName(), vis->GetWorldPose().Ign(), true);
     }
 
     this->dataPtr->userCmdPub->Publish(userCmdMsg);
