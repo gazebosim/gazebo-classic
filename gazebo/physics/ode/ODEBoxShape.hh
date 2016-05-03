@@ -31,6 +31,9 @@ namespace gazebo
 {
   namespace physics
   {
+    /// \addtogroup gazebo_physics_ode
+    /// \{
+
     /// \brief ODE Box shape
     class GZ_PHYSICS_VISIBLE ODEBoxShape : public BoxShape
     {
@@ -58,6 +61,7 @@ namespace gazebo
                              _size.x, _size.y, _size.z);
       }
     };
+    /// \}
   }
 }
 #endif

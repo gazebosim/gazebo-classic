@@ -26,6 +26,9 @@ namespace gazebo
 {
   namespace physics
   {
+    /// \addtogroup gazebo_physics_dart
+    /// \{
+
     /// \brief A universal joint.
     class GZ_PHYSICS_VISIBLE DARTUniversalJoint :
       public UniversalJoint<DARTJoint>
@@ -65,6 +68,7 @@ namespace gazebo
       // Documentation inherited
       protected: virtual void SetForceImpl(unsigned int _index, double _effort);
     };
+    /// \}
   }
 }
 #endif

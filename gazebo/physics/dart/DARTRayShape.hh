@@ -29,8 +29,7 @@ namespace gazebo
 {
   namespace physics
   {
-    /// \ingroup gazebo_physics
-    /// \addtogroup gazebo_physics_dart DART Physics
+    /// \addtogroup gazebo_physics_dart
     /// \{
 
     /// Forward declare private data class
@@ -69,6 +68,7 @@ namespace gazebo
       /// \brief Pointer to private data
       private: DARTRayShapePrivate *dataPtr;
     };
+    /// \}
   }
 }
 #endif
