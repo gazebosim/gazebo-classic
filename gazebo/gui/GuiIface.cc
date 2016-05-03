@@ -255,7 +255,9 @@ bool gui::load()
   g_app = new QApplication(g_argc, g_argv);
   set_style();
 
-  gui::register_metatypes();
+  if (!gui::register_metatypes())
+    std::cerr << "Unable to register Qt metatypes" << std::endl;
+
 
   g_splashScreen = new gui::SplashScreen();
 
