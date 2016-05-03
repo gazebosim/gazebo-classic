@@ -647,14 +647,14 @@ endif()
 ########################################
 # Find graphviz
 include (${gazebo_cmake_dir}/FindGraphviz.cmake)
-if (NOT GRAPHVIZ_FOUND)
-  message (STATUS "Looking for libgraphviz-dev - not found")
-  BUILD_WARNING ("Graphviz not found, Model editor's schematic view will be disabled.")
+#if (NOT GRAPHVIZ_FOUND)
+#  message (STATUS "Looking for libgraphviz-dev - not found")
+#  BUILD_WARNING ("Graphviz not found, Model editor's schematic view will be disabled.")
   set (HAVE_GRAPHVIZ OFF CACHE BOOL "HAVE GRAPHVIZ" FORCE)
-else ()
-  message (STATUS "Looking for libgraphviz-dev - found")
-  set (HAVE_GRAPHVIZ ON CACHE BOOL "HAVE GRAPHVIZ" FORCE)
-endif ()
+#else ()
+#  message (STATUS "Looking for libgraphviz-dev - found")
+#  set (HAVE_GRAPHVIZ ON CACHE BOOL "HAVE GRAPHVIZ" FORCE)
+#endif ()
 
 ########################################
 # Find ignition math in unix platforms
