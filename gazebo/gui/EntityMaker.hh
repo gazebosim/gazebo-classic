@@ -25,14 +25,15 @@ namespace gazebo
   /// \brief gui namespace
   namespace gui
   {
-    class EntityMakerPrivate;
-
     /// \addtogroup gazebo_gui
     /// \{
 
     /// \brief To make an entity, base class
     class GZ_GUI_VISIBLE EntityMaker
     {
+      /// \brief Constructor
+      public: EntityMaker();
+
       /// \brief Destructor
       public: virtual ~EntityMaker();
 
@@ -59,16 +60,8 @@ namespace gazebo
       protected: virtual void SetEntityPosition(
           const ignition::math::Vector3d &_pos);
 
-      /// \brief Constructor used by inherited classes
-      /// \param[in] _dataPtr Pointer to private data.
-      protected: EntityMaker(EntityMakerPrivate &_dataPtr);
-
       /// \brief Creates the entity
       protected: virtual void CreateTheEntity() = 0;
-
-      /// \internal
-      /// \brief Pointer to private data.
-      protected: EntityMakerPrivate *dataPtr;
     };
   }
 }

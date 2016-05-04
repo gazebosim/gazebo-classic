@@ -15,20 +15,20 @@
  *
 */
 
-#ifndef _GAZEBO_LIGHTMAKER_PRIVATE_HH_
-#define _GAZEBO_LIGHTMAKER_PRIVATE_HH_
+#ifndef GAZEBO_GUI_LIGHTMAKER_PRIVATE_HH_
+#define GAZEBO_GUI_LIGHTMAKER_PRIVATE_HH_
 
 #include <string>
 
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/gui/EntityMakerPrivate.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 
 namespace gazebo
 {
   namespace gui
   {
     /// \brief Privata data for LightMaker class
-    class LightMakerPrivate : public EntityMakerPrivate
+    class LightMakerPrivate
     {
       /// \brief Message that holds all the light information.
       public: msgs::Light msg;

@@ -48,7 +48,7 @@ void LightMaker_TEST::PointLight()
   // Check there's no light in the scene yet
   gazebo::rendering::LightPtr light = scene->GetLight("__default__");
   QVERIFY(light == NULL);
-  light = scene->GetLight("user_point_light_0");
+  light = scene->GetLight("user_point_light");
   QVERIFY(light == NULL);
 
   // Create a pointLight maker
@@ -95,7 +95,7 @@ void LightMaker_TEST::PointLight()
   this->ProcessEventsAndDraw(mainWindow);
 
   // Check there's a light in the scene -- this is the final pointLight
-  light = scene->GetLight("user_point_light_0");
+  light = scene->GetLight("user_point_light");
   QVERIFY(light != NULL);
 
   // Terminate

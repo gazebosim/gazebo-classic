@@ -28,23 +28,19 @@
 #include "gazebo/gui/ModelManipulator.hh"
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/GuiIface.hh"
-#include "gazebo/gui/EntityMakerPrivate.hh"
 #include "gazebo/gui/EntityMaker.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 //////////////////////////////////////////////////
-EntityMaker::EntityMaker(EntityMakerPrivate &_dataPtr)
-  : dataPtr(&_dataPtr)
+EntityMaker::EntityMaker()
 {
 }
 
 //////////////////////////////////////////////////
 EntityMaker::~EntityMaker()
 {
-  delete this->dataPtr;
-  this->dataPtr = NULL;
 }
 
 /////////////////////////////////////////////////

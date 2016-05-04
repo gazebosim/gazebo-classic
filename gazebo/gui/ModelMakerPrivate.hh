@@ -14,19 +14,18 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_MODEL_MAKER_PRIVATE_HH_
-#define _GAZEBO_MODEL_MAKER_PRIVATE_HH_
+#ifndef GAZEBO_GUI_MODELMAKER_PRIVATE_HH_
+#define GAZEBO_GUI_MODELMAKER_PRIVATE_HH_
 
 #include <list>
-
-#include "gazebo/gui/EntityMakerPrivate.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 
 namespace gazebo
 {
   namespace gui
   {
     /// \brief Private data for the ModelMaker class
-    class ModelMakerPrivate : public EntityMakerPrivate
+    class ModelMakerPrivate
     {
       /// \brief The model visual being created.
       public: rendering::VisualPtr modelVisual;
@@ -40,9 +39,6 @@ namespace gazebo
       /// \brief True if the model is being created as a clone of an existing
       /// model.
       public: bool clone;
-
-      /// \brief Publisher for factory messages.
-      public: transport::PublisherPtr makerPub;
     };
   }
 }
