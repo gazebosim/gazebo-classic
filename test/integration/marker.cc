@@ -127,7 +127,7 @@ void Marker_TEST::AddRemove()
   QVERIFY(shapeWidth < 820);
 
   // Remove the shape
-  markerMsg.set_action(ignition::msgs::Marker::DELETE);
+  markerMsg.set_action(ignition::msgs::Marker::DELETE_MARKER);
   node.Publish(topicName, markerMsg);
   this->ProcessEventsAndDraw(mainWindow);
   shapeWidth = this->MidWhiteWidth();
@@ -242,7 +242,7 @@ void Marker_TEST::AddRemove()
   QVERIFY(shapeWidth < 130);
 
   // Remove the text
-  markerMsg.set_action(ignition::msgs::Marker::DELETE);
+  markerMsg.set_action(ignition::msgs::Marker::DELETE_MARKER);
   node.Publish(topicName, markerMsg);
   this->ProcessEventsAndDraw(mainWindow);
   shapeWidth = this->MidWhiteWidth();
@@ -271,7 +271,7 @@ void Marker_TEST::AddRemove()
   QVERIFY(shapeWidth < 1500);
 
   // Remove the triangle fan
-  markerMsg.set_action(ignition::msgs::Marker::DELETE);
+  markerMsg.set_action(ignition::msgs::Marker::DELETE_MARKER);
   node.Publish(topicName, markerMsg);
   this->ProcessEventsAndDraw(mainWindow);
   shapeWidth = this->MidWhiteWidth();
@@ -306,7 +306,7 @@ void Marker_TEST::AddRemove()
   QVERIFY(shapeWidth < 20);
 
   // Remove the triangle list
-  markerMsg.set_action(ignition::msgs::Marker::DELETE);
+  markerMsg.set_action(ignition::msgs::Marker::DELETE_MARKER);
   node.Publish(topicName, markerMsg);
   this->ProcessEventsAndDraw(mainWindow);
   shapeWidth = this->MidWhiteWidth();

@@ -182,7 +182,7 @@ void MarkerCommand::Delete(const std::string &_ns, const unsigned int _id)
   ignition::msgs::Marker msg;
   msg.set_ns(_ns);
   msg.set_id(_id);
-  msg.set_action(ignition::msgs::Marker::DELETE);
+  msg.set_action(ignition::msgs::Marker::DELETE_MARKER);
   this->node.Publish("/marker", msg);
 }
 
