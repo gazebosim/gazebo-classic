@@ -1116,6 +1116,18 @@ void Model::FillMsg(msgs::Model &_msg)
   {
     model->FillMsg(*_msg.add_model());
   }
+
+  if (this->sdf->HasElement("plugin"))
+  {
+    sdf::ElementPtr pluginElem = this->sdf->GetElement("plugin");
+    while (pluginElem)
+    {
+      auto pluginMsg = _msg.add_plugin();
+      pluginMsg->CopyFrom(msgs::PluginFromSDF(pluginElem));
+
+      pluginElem = pluginElem->GetNextElement("plugin");
+    }
+  }
 }
 
 //////////////////////////////////////////////////

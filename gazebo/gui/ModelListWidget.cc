@@ -2540,6 +2540,22 @@ void ModelListWidget::FillPropertyTree(const msgs::Model &_msg,
 
     this->FillPropertyTree(_msg.link(i), prop);
   }
+
+  for (int i = 0; i < _msg.plugin_size(); ++i)
+  {
+    QtVariantProperty *prop;
+    prop = this->dataPtr->variantManager->addProperty(
+        QtVariantPropertyManager::groupTypeId(), tr("plugin"));
+    prop->setToolTip(tr(_msg.plugin(i).name().c_str()));
+
+    bItem = this->dataPtr->propTreeBrowser->addProperty(prop);
+    this->dataPtr->propTreeBrowser->setExpanded(bItem, false);
+
+    //gzdbg << _msg.plugin(i).DebugString() << std::endl;
+
+    // Create FillPropertyTree(const msgs::Plugin &_msg...)
+    // this->FillPropertyTree(_msg.plugin(i), prop);
+  }
 }
 
 /////////////////////////////////////////////////
