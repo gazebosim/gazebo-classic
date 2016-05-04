@@ -150,7 +150,7 @@ bool MarkerManager::ProcessMarkerMsg(const ignition::msgs::Marker &_msg)
       this->dataPtr->markers[ns][_msg.id()] = marker;
     }
   }
-  else if (_msg.action() == ignition::msgs::Marker::DELETE)
+  else if (_msg.action() == ignition::msgs::Marker::DELETE_MARKER)
   {
     this->dataPtr->scene->PrintSceneGraph();
     std::map<uint64_t, MarkerVisualPtr>::iterator markerIter;
@@ -198,7 +198,6 @@ bool MarkerManager::ProcessMarkerMsg(const ignition::msgs::Marker &_msg)
 void MarkerManager::OnMarkerMsg(const ignition::msgs::Marker &_req,
     ignition::msgs::StringMsg &_rep, bool &_result)
 {
-  std::cout << "OnMarkerMsg\n";
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
   this->dataPtr->markerMsgs.push_back(_req);
   _result = true;
