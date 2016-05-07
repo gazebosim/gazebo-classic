@@ -5,7 +5,6 @@
 1. Include basic support for GNU Precompiled Headers to reduce compile time
     * [Pull request #2268](https://bitbucket.org/osrf/gazebo/pull-request/2268)
 
-
 1. Fix memory and other issues found from running Coverity.
     * A contribution from Olivier Crave
     * [Pull request #2241](https://bitbucket.org/osrf/gazebo/pull-request/2241)
