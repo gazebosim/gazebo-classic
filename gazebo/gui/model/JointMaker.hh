@@ -65,6 +65,7 @@ namespace gazebo
   {
     class JointData;
     class JointInspector;
+    class MEUserCmdManager;
 
     // Forward declare private data.
     class JointMakerPrivate;
@@ -144,6 +145,10 @@ namespace gazebo
       /// \param[in] _jointName Name of joint to be removed, or an empty string
       /// to remove the new joint under creation.
       public: void RemoveJoint(const std::string &_jointName);
+
+      /// \brief Remove joint by name and register user command.
+      /// \param[in] _jointName Name of joint to be removed.
+      public: void RemoveJointByUser(const std::string &_jointName);
 
       /// \brief Remove all joints connected to link.
       /// \param[in] _linkName Name of the link.
@@ -264,10 +269,12 @@ namespace gazebo
       /// created hass been chosen. The pose is expressed in the parent link
       /// frame. This has no effect if triggered before both links are chosen.
       /// \param[in] _pose New pose.
-      /// \param[in] _reset Set to true to reset the relative pose to the
+      /// \param[in] _resetAll Set to true to reset the relative pose to the
       /// original one.
+      /// \paran[in] _resetAxis Reset only the given axis 0 == x, 1 == y, 2 == z
       public: void SetLinksRelativePose(
-          const ignition::math::Pose3d &_pose, const bool _reset);
+          const ignition::math::Pose3d &_pose, const bool _resetAll,
+          const int _resetAxis = -1);
 
       /// \brief Align the parent and child links of the joint being created.
       /// \param[in] _childToParent True to align the child to the parent,
@@ -281,6 +288,10 @@ namespace gazebo
 
       /// \brief Finalize joint creation.
       public: void FinalizeCreation();
+
+      /// \brief Set the user command manager variable.
+      /// \param[in] _manager Pointer to the manager.
+      public: void SetUserCmdManager(MEUserCmdManager *_manager);
 
       /// \brief Mouse event filter callback when mouse button is pressed.
       /// \param[in] _event The mouse event.
@@ -306,12 +317,6 @@ namespace gazebo
       /// \param[in] _event The key event.
       /// \return True if the event was handled
       private: bool OnKeyPress(const common::KeyEvent &_event);
-
-      /// \brief Get the centroid of the link visual in world coordinates.
-      /// \param[in] _visual Visual of the link.
-      /// \return Centroid in world coordinates;
-      private: ignition::math::Vector3d LinkWorldCentroid(
-          const rendering::VisualPtr &_visual);
 
       /// \brief Open joint inspector.
       /// \param[in] _name Name of joint.

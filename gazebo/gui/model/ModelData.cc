@@ -95,19 +95,39 @@ void ModelData::UpdateRenderGroup(rendering::VisualPtr _visual)
 /////////////////////////////////////////////////
 void NestedModelData::SetName(const std::string &_name)
 {
-  this->modelSDF->GetAttribute("name")->Set(_name);
+  if (this->modelSDF)
+    this->modelSDF->GetAttribute("name")->Set(_name);
+  else
+    gzerr << "Model SDF not found." << std::endl;
+}
+
+/////////////////////////////////////////////////
+std::string NestedModelData::Name() const
+{
+  if (this->modelSDF)
+    return this->modelSDF->Get<std::string>("name");
+
+  gzerr << "Model SDF not found." << std::endl;
+  return "";
 }
 
 /////////////////////////////////////////////////
 void NestedModelData::SetPose(const ignition::math::Pose3d &_pose)
 {
-  this->modelSDF->GetElement("pose")->Set(_pose);
+  if (this->modelSDF)
+    this->modelSDF->GetElement("pose")->Set(_pose);
+  else
+    gzerr << "Model SDF not found." << std::endl;
 }
 
 /////////////////////////////////////////////////
 ignition::math::Pose3d NestedModelData::Pose() const
 {
-  return this->modelSDF->Get<ignition::math::Pose3d>("pose");
+  if (this->modelSDF)
+    return this->modelSDF->Get<ignition::math::Pose3d>("pose");
+
+  gzerr << "Model SDF not found." << std::endl;
+  return ignition::math::Pose3d::Zero;
 }
 
 /////////////////////////////////////////////////
@@ -169,7 +189,7 @@ LinkData::~LinkData()
 }
 
 /////////////////////////////////////////////////
-std::string LinkData::GetName() const
+std::string LinkData::Name() const
 {
   return this->linkSDF->Get<std::string>("name");
 }
@@ -410,19 +430,41 @@ ignition::math::Vector3d LinkData::Scale() const
 /////////////////////////////////////////////////
 void LinkData::Load(sdf::ElementPtr _sdf)
 {
+  if (!_sdf)
+  {
+    gzwarn << "NULL SDF pointer, not loading link data." << std::endl;
+    return;
+  }
+
   LinkConfig *linkConfig = this->inspector->GetLinkConfig();
 
   this->SetName(_sdf->Get<std::string>("name"));
   this->SetPose(_sdf->Get<ignition::math::Pose3d>("pose"));
 
-  msgs::LinkPtr linkMsgPtr(new msgs::Link);
-  if (_sdf->HasElement("inertial"))
+  // Clone SDF except for visuals and collisions, which will be handled
+  // separately
+  this->linkSDF = _sdf->Clone();
+
+  auto elem = this->linkSDF->GetElement("visual");
+  while (elem)
   {
-    sdf::ElementPtr inertialElem = _sdf->GetElement("inertial");
-    this->linkSDF->GetElement("inertial")->Copy(inertialElem);
+    this->linkSDF->RemoveChild(elem);
+    elem = elem->GetNextElement("visual");
+  }
+  elem = this->linkSDF->GetElement("collision");
+  while (elem)
+  {
+    this->linkSDF->RemoveChild(elem);
+    elem = elem->GetNextElement("collision");
+  }
+
+  // TODO: Use msgs::LinkFromSDF once that's available (issue #1903)
+  msgs::LinkPtr linkMsgPtr(new msgs::Link);
+  if (this->linkSDF->HasElement("inertial"))
+  {
+    sdf::ElementPtr inertialElem = this->linkSDF->GetElement("inertial");
 
     msgs::Inertial *inertialMsg = linkMsgPtr->mutable_inertial();
-
     if (inertialElem->HasElement("mass"))
     {
       this->mass = inertialElem->Get<double>("mass");
@@ -450,43 +492,39 @@ void LinkData::Load(sdf::ElementPtr _sdf)
       inertialMsg->set_iyz(inertiaElem->Get<double>("iyz"));
     }
   }
-  if (_sdf->HasElement("self_collide"))
+  if (this->linkSDF->HasElement("self_collide"))
   {
-    sdf::ElementPtr selfCollideSDF = _sdf->GetElement("self_collide");
+    sdf::ElementPtr selfCollideSDF = this->linkSDF->GetElement("self_collide");
     linkMsgPtr->set_self_collide(selfCollideSDF->Get<bool>(""));
-    this->linkSDF->InsertElement(selfCollideSDF->Clone());
   }
-  if (_sdf->HasElement("kinematic"))
+  if (_sdf->HasElement("enable_wind"))
   {
-    sdf::ElementPtr kinematicSDF = _sdf->GetElement("kinematic");
+    sdf::ElementPtr enableWindSDF = this->linkSDF->GetElement("enable_wind");
+    linkMsgPtr->set_enable_wind(enableWindSDF->Get<bool>(""));
+  }
+  if (this->linkSDF->HasElement("kinematic"))
+  {
+    sdf::ElementPtr kinematicSDF = this->linkSDF->GetElement("kinematic");
     linkMsgPtr->set_kinematic(kinematicSDF->Get<bool>());
-    this->linkSDF->InsertElement(kinematicSDF->Clone());
   }
-  if (_sdf->HasElement("must_be_base_link"))
-  {
-    sdf::ElementPtr baseLinkSDF = _sdf->GetElement("must_be_base_link");
-    // TODO link.proto is missing the must_be_base_link field.
-    // linkMsgPtr->set_must_be_base_link(baseLinkSDF->Get<bool>());
-    this->linkSDF->InsertElement(baseLinkSDF->Clone());
-  }
-  if (_sdf->HasElement("velocity_decay"))
-  {
-    sdf::ElementPtr velocityDecaySDF = _sdf->GetElement("velocity_decay");
-    // TODO link.proto is missing the velocity_decay field.
-    // linkMsgPtr->set_velocity_decay(velocityDecaySDF->Get<double>());
-    this->linkSDF->InsertElement(velocityDecaySDF->Clone());
-  }
-  linkConfig->Update(linkMsgPtr);
 
-  if (_sdf->HasElement("sensor"))
-  {
-    sdf::ElementPtr sensorElem = _sdf->GetElement("sensor");
-    while (sensorElem)
-    {
-      this->linkSDF->InsertElement(sensorElem->Clone());
-      sensorElem = sensorElem->GetNextElement("sensor");
-    }
-  }
+  // TODO link.proto is missing the must_be_base_link field.
+  // if (this->linkSDF->HasElement("must_be_base_link"))
+  // {
+  //   sdf::ElementPtr baseLinkSDF =
+  //       this->linkSDF->GetElement("must_be_base_link");
+  //   linkMsgPtr->set_must_be_base_link(baseLinkSDF->Get<bool>());
+  // }
+
+  // TODO link.proto is missing the velocity_decay field.
+  // if (this->linkSDF->HasElement("velocity_decay"))
+  // {
+  //   sdf::ElementPtr velocityDecaySDF =
+  //       this->linkSDF->GetElement("velocity_decay");
+  //   linkMsgPtr->set_velocity_decay(velocityDecaySDF->Get<double>());
+  // }
+
+  linkConfig->Update(linkMsgPtr);
 }
 
 /////////////////////////////////////////////////
@@ -601,8 +639,9 @@ LinkData *LinkData::Clone(const std::string &_newName)
 {
   GZ_ASSERT(this->linkVisual, "LinkVisual is NULL");
   LinkData *cloneLink = new LinkData();
+  auto cloneSDF = this->linkSDF->Clone();
 
-  cloneLink->Load(this->linkSDF);
+  cloneLink->Load(cloneSDF);
   cloneLink->SetName(_newName);
 
   std::string linkVisualName = this->linkVisual->GetName();

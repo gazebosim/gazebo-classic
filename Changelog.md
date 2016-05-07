@@ -2,9 +2,6 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
-1. Include basic support for GNU Precompiled Headers to reduce compile time
-    * [Pull request #2268](https://bitbucket.org/osrf/gazebo/pull-request/2268)
-
 1. Fix memory and other issues found from running Coverity.
     * A contribution from Olivier Crave
     * [Pull request #2241](https://bitbucket.org/osrf/gazebo/pull-request/2241)
@@ -36,6 +33,9 @@
     * [Pull request #1989](https://bitbucket.org/osrf/gazebo/pull-request/1989)
 
 1. Added static camera when following a model.
+    * [Pull request #1980](https://bitbucket.org/osrf/gazebo/pull-request/1980)
+    * A contribution from Oliver Crave
+
     * [Pull request #1980](https://bitbucket.org/osrf/gazebo/pull-request/1980)
     * A contribution from Oliver Crave
 

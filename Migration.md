@@ -12,6 +12,16 @@ release will remove the deprecated code.
 1. **gazebo/sensors/DepthCameraSensor.hh**
     + Modified to inherit from CameraSensor class.
 
+## Gazebo 7.1.0 to 7.X
+
+### Additions
+
+1. **gazebo/physics/ode/ODEJoint.hh**
+    + public: virtual void Fini();
+
+1. **gazebo/physics/bullet/BulletJoint.hh**
+    + public: virtual void Fini();
+
 ## Gazebo 6.X to 7.X
 
 ### Additions
@@ -72,7 +82,6 @@ release will remove the deprecated code.
     + ***Replacement:*** public: virtual void SetClipDist();
     + ***Removed:*** public: template<typename T> event::ConnectionPtr ConnectNewImageFrame(T _subscriber);
     + ***Replacement:*** public: event::ConnectionPtr ConnectNewImageFrame(std::function<void (const unsigned char *, unsigned int, unsigned int, unsigned int, const std::string &)> _subscriber);
-
 
 1. **gazebo/msgs/logical_camera_sensors.proto**
     + The `near` and `far` members have been replaced with `near_clip` and `far_clip`

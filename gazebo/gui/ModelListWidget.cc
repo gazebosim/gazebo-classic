@@ -197,6 +197,18 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
                                              this->dataPtr->selectedEntityName);
       this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
     }
+    else if (name == "Atmosphere")
+    {
+      this->dataPtr->requestMsg = msgs::CreateRequest("atmosphere_info",
+                                             this->dataPtr->selectedEntityName);
+      this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
+    }
+    else if (name == "Wind")
+    {
+      this->dataPtr->requestMsg = msgs::CreateRequest("wind_info",
+                                             this->dataPtr->selectedEntityName);
+      this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
+    }
     else if (name == "Spherical Coordinates")
     {
       this->dataPtr->requestMsg = msgs::CreateRequest(
@@ -233,12 +245,69 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
         ignition::math::Pose3d cameraPose = cam->WorldPose();
 
         this->FillPoseProperty(msgs::Convert(cameraPose), item);
-        // set expanded to true by default for easier viewing
-        this->dataPtr->propTreeBrowser->setExpanded(cameraBrowser, true);
-        for (auto browser : cameraBrowser->children())
-        {
-          this->dataPtr->propTreeBrowser->setExpanded(browser, true);
-        }
+      }
+
+      // Create and set the gui camera position relative to a tracked model
+      item = this->dataPtr->variantManager->addProperty(
+          QtVariantPropertyManager::groupTypeId(), tr("track_visual"));
+      {
+        topItem->addSubProperty(item);
+
+        rendering::VisualPtr trackedVisual = cam->TrackedVisual();
+        QtVariantProperty *item2 = this->dataPtr->variantManager->addProperty(
+            QVariant::String, tr("name"));
+        if (trackedVisual)
+            item2->setValue(trackedVisual->GetName().c_str());
+        else
+            item2->setValue("");
+        item2->setEnabled(false);
+        item->addSubProperty(item2);
+
+        bool isStatic = cam->TrackIsStatic();
+        item2 = this->dataPtr->variantManager->addProperty(
+            QVariant::Bool, tr("static"));
+        item2->setValue(isStatic);
+        item->addSubProperty(item2);
+
+        bool useModelFrame = cam->TrackUseModelFrame();
+        item2 = this->dataPtr->variantManager->addProperty(
+            QVariant::Bool, tr("use_model_frame"));
+        item2->setValue(useModelFrame);
+        item->addSubProperty(item2);
+
+        bool inheritYaw = cam->TrackInheritYaw();
+        item2 = this->dataPtr->variantManager->addProperty(
+            QVariant::Bool, tr("inherit_yaw"));
+        item2->setValue(inheritYaw);
+        item->addSubProperty(item2);
+
+        ignition::math::Vector3d trackPos = cam->TrackPosition();
+        this->FillVector3dProperty(msgs::Convert(trackPos), item);
+
+        double minDist = cam->TrackMinDistance();
+        item2 = this->dataPtr->variantManager->addProperty(
+            QVariant::Double, tr("min_distance"));
+        static_cast<QtVariantPropertyManager*>
+          (this->dataPtr->variantFactory->propertyManager(item2))->setAttribute(
+              item2, "decimals", 6);
+        item2->setValue(minDist);
+        item->addSubProperty(item2);
+
+        double maxDist = cam->TrackMaxDistance();
+        item2 = this->dataPtr->variantManager->addProperty(
+            QVariant::Double, tr("max_distance"));
+        static_cast<QtVariantPropertyManager*>
+          (this->dataPtr->variantFactory->propertyManager(item2))->setAttribute(
+              item2, "decimals", 6);
+        item2->setValue(maxDist);
+        item->addSubProperty(item2);
+      }
+
+      // set expanded to true by default for easier viewing
+      this->dataPtr->propTreeBrowser->setExpanded(cameraBrowser, true);
+      for (auto browser : cameraBrowser->children())
+      {
+        this->dataPtr->propTreeBrowser->setExpanded(browser, true);
       }
     }
     else
@@ -315,6 +384,10 @@ void ModelListWidget::Update()
       this->FillPropertyTree(this->dataPtr->sceneMsg, NULL);
     else if (this->dataPtr->fillTypes[0] == "Physics")
       this->FillPropertyTree(this->dataPtr->physicsMsg, NULL);
+    else if (this->dataPtr->fillTypes[0] == "Atmosphere")
+      this->FillPropertyTree(this->dataPtr->atmosphereMsg, NULL);
+    else if (this->dataPtr->fillTypes[0] == "Wind")
+      this->FillPropertyTree(this->dataPtr->windMsg, NULL);
     else if (this->dataPtr->fillTypes[0] == "Light")
       this->FillPropertyTree(this->dataPtr->lightMsg, NULL);
     else if (this->dataPtr->fillTypes[0] == "Spherical Coordinates")
@@ -478,6 +551,22 @@ void ModelListWidget::OnResponse(ConstResponsePtr &_msg)
     this->dataPtr->propMutex->unlock();
   }
   else if (_msg->has_type() && _msg->type() ==
+      this->dataPtr->atmosphereMsg.GetTypeName())
+  {
+    this->dataPtr->propMutex->lock();
+    this->dataPtr->atmosphereMsg.ParseFromString(_msg->serialized_data());
+    this->dataPtr->fillTypes.push_back("Atmosphere");
+    this->dataPtr->propMutex->unlock();
+  }
+  else if (_msg->has_type() && _msg->type() ==
+      this->dataPtr->windMsg.GetTypeName())
+  {
+    this->dataPtr->propMutex->lock();
+    this->dataPtr->windMsg.ParseFromString(_msg->serialized_data());
+    this->dataPtr->fillTypes.push_back("Wind");
+    this->dataPtr->propMutex->unlock();
+  }
+  else if (_msg->has_type() && _msg->type() ==
       this->dataPtr->lightMsg.GetTypeName())
   {
     this->dataPtr->propMutex->lock();
@@ -632,6 +721,10 @@ void ModelListWidget::OnPropertyChanged(QtProperty *_item)
     this->ScenePropertyChanged(_item);
   else if (currentItem == this->dataPtr->physicsItem)
     this->PhysicsPropertyChanged(_item);
+  else if (currentItem == this->dataPtr->atmosphereItem)
+    this->AtmospherePropertyChanged(_item);
+  else if (currentItem == this->dataPtr->windItem)
+    this->WindPropertyChanged(_item);
   else if (currentItem == this->dataPtr->guiItem)
     this->GUIPropertyChanged(_item);
 }
@@ -701,15 +794,12 @@ void ModelListWidget::LightPropertyChanged(QtProperty * /*_item*/)
 /////////////////////////////////////////////////
 void ModelListWidget::GUIPropertyChanged(QtProperty *_item)
 {
-  // Only camera pose editable for now
+  // Only camera pose and follow parameters editable for now
   QtProperty *cameraProperty = this->ChildItem("camera");
   if (!cameraProperty)
     return;
 
   QtProperty *cameraPoseProperty = this->ChildItem(cameraProperty, "pose");
-  if (!cameraPoseProperty)
-    return;
-
   if (cameraPoseProperty)
   {
     std::string changedProperty = _item->propertyName().toStdString();
@@ -725,6 +815,52 @@ void ModelListWidget::GUIPropertyChanged(QtProperty *_item)
       rendering::UserCameraPtr cam = gui::get_active_camera();
       if (cam)
         cam->SetWorldPose(msgs::ConvertIgn(poseMsg));
+    }
+  }
+
+  QtProperty *cameraFollowProperty = this->ChildItem(cameraProperty,
+                                                        "track_visual");
+  if (cameraFollowProperty)
+  {
+    rendering::UserCameraPtr cam = gui::get_active_camera();
+    if (!cam)
+      return;
+    std::string changedProperty = _item->propertyName().toStdString();
+    if (changedProperty == "static")
+    {
+      cam->SetTrackIsStatic(this->dataPtr->variantManager->value(
+             this->ChildItem(cameraFollowProperty, "static")).toBool());
+    }
+    else if (changedProperty == "use_model_frame")
+    {
+      cam->SetTrackUseModelFrame(this->dataPtr->variantManager->value(
+             this->ChildItem(cameraFollowProperty,
+                             "use_model_frame")).toBool());
+    }
+    else if (changedProperty == "inherit_yaw")
+    {
+      cam->SetTrackInheritYaw(this->dataPtr->variantManager->value(
+             this->ChildItem(cameraFollowProperty, "inherit_yaw")).toBool());
+    }
+    else if (changedProperty == "x"
+        || changedProperty == "y"
+        || changedProperty == "z")
+    {
+      msgs::Vector3d msg;
+      this->FillVector3Msg(cameraFollowProperty, &msg);
+      cam->SetTrackPosition(msgs::ConvertIgn(msg));
+    }
+    else if (changedProperty == "min_distance")
+    {
+      cam->SetTrackMinDistance(this->dataPtr->variantManager->value(
+             this->ChildItem(cameraFollowProperty,
+               "min_distance")).toDouble());
+    }
+    else if (changedProperty == "max_distance")
+    {
+      cam->SetTrackMaxDistance(this->dataPtr->variantManager->value(
+             this->ChildItem(cameraFollowProperty,
+               "max_distance")).toDouble());
     }
   }
 }
@@ -777,6 +913,68 @@ void ModelListWidget::PhysicsPropertyChanged(QtProperty * /*_item*/)
 
   msg.set_type(this->dataPtr->physicsType);
   this->dataPtr->physicsPub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
+void ModelListWidget::AtmospherePropertyChanged(QtProperty *_item)
+{
+  msgs::Atmosphere msg;
+
+  QList<QtProperty*> properties = this->dataPtr->propTreeBrowser->properties();
+  for (QList<QtProperty*>::iterator iter = properties.begin();
+       iter != properties.end(); ++iter)
+  {
+    if ((*iter)->propertyName().toStdString() == "enable atmosphere")
+    {
+      msg.set_enable_atmosphere(this->dataPtr->variantManager->value(
+            (*iter)).toBool());
+    }
+    else if ((*iter)->propertyName().toStdString() == "temperature")
+    {
+      msg.set_temperature(
+          this->dataPtr->variantManager->value((*iter)).toDouble());
+    }
+    else if ((*iter)->propertyName().toStdString() == "pressure")
+    {
+      msg.set_pressure(this->dataPtr->variantManager->value(
+            (*iter)).toDouble());
+    }
+  }
+
+  msg.set_type(this->dataPtr->atmosphereType);
+  this->dataPtr->atmospherePub->Publish(msg);
+
+  std::string changedProperty = _item->propertyName().toStdString();
+  if (changedProperty == "temperature" || changedProperty == "pressure")
+  {
+    // Send request to retrieve new value for mass_density
+    this->dataPtr->requestMsg = msgs::CreateRequest("atmosphere_info",
+                                           this->dataPtr->selectedEntityName);
+    this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
+  }
+}
+
+/////////////////////////////////////////////////
+void ModelListWidget::WindPropertyChanged(QtProperty * /*_item*/)
+{
+  msgs::Wind msg;
+
+  QList<QtProperty*> properties = this->dataPtr->propTreeBrowser->properties();
+  for (QList<QtProperty*>::iterator iter = properties.begin();
+       iter != properties.end(); ++iter)
+  {
+    if ((*iter)->propertyName().toStdString() == "enable wind")
+    {
+      msg.set_enable_wind(
+          this->dataPtr->variantManager->value((*iter)).toBool());
+    }
+    else if ((*iter)->propertyName().toStdString() == "linear_velocity")
+    {
+      this->FillVector3Msg((*iter), msg.mutable_linear_velocity());
+    }
+  }
+
+  this->dataPtr->windPub->Publish(msg);
 }
 
 /////////////////////////////////////////////////
@@ -1657,6 +1855,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
 {
   QtProperty *topItem = NULL;
   QtProperty *inertialItem = NULL;
+  QtProperty *windItem = NULL;
   QtVariantProperty *item = NULL;
 
   // id, store it but but make it hidden
@@ -1712,6 +1911,15 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
     item->setValue(false);
   this->AddProperty(item, _parent);
   item->setEnabled(false);
+
+  // wind
+  item = this->dataPtr->variantManager->addProperty(QVariant::Bool,
+      tr("enable_wind"));
+  if (_msg.has_enable_wind())
+    item->setValue(_msg.enable_wind());
+  else
+    item->setValue(true);
+  this->AddProperty(item, _parent);
 
   // pose
   topItem = this->dataPtr->variantManager->addProperty(
@@ -1798,6 +2006,22 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
       QtVariantPropertyManager::groupTypeId(), tr("pose"));
   inertialItem->addSubProperty(topItem);
   this->FillPoseProperty(_msg.inertial().pose(), topItem);
+
+  // Wind
+  windItem = this->dataPtr->variantManager->addProperty(
+      QtVariantPropertyManager::groupTypeId(), tr("wind"));
+  this->AddProperty(windItem, _parent);
+  windItem->setEnabled(false);
+  if (_msg.has_wind())
+    this->FillVector3dProperty(_msg.wind(), windItem);
+  else
+  {
+    msgs::Vector3d xyz;
+    xyz.set_x(0);
+    xyz.set_y(0);
+    xyz.set_z(0);
+    this->FillVector3dProperty(xyz, windItem);
+  }
 
   for (int i = 0; i < _msg.collision_size(); i++)
   {
@@ -2290,6 +2514,14 @@ void ModelListWidget::FillPropertyTree(const msgs::Model &_msg,
   item->setEnabled(false);
   this->dataPtr->propTreeBrowser->addProperty(item);
 
+  item = this->dataPtr->variantManager->addProperty(QVariant::Bool,
+      tr("enable_wind"));
+  if (_msg.has_enable_wind())
+    item->setValue(_msg.enable_wind());
+  else
+    item->setValue(false);
+  this->dataPtr->propTreeBrowser->addProperty(item);
+
   topItem = this->dataPtr->variantManager->addProperty(
       QtVariantPropertyManager::groupTypeId(), tr("pose"));
   QtBrowserItem *bItem = this->dataPtr->propTreeBrowser->addProperty(topItem);
@@ -2464,6 +2696,8 @@ void ModelListWidget::OnRemoveScene(const std::string &/*_name*/)
   this->dataPtr->modelPub.reset();
   this->dataPtr->scenePub.reset();
   this->dataPtr->physicsPub.reset();
+  this->dataPtr->atmospherePub.reset();
+  this->dataPtr->windPub.reset();
   this->dataPtr->lightPub.reset();
   this->dataPtr->responseSub.reset();
   this->dataPtr->requestSub.reset();
@@ -2492,6 +2726,8 @@ void ModelListWidget::InitTransport(const std::string &_name)
     this->dataPtr->modelPub.reset();
     this->dataPtr->scenePub.reset();
     this->dataPtr->physicsPub.reset();
+    this->dataPtr->atmospherePub.reset();
+    this->dataPtr->windPub.reset();
     this->dataPtr->lightPub.reset();
     this->dataPtr->responseSub.reset();
     this->dataPtr->requestSub.reset();
@@ -2506,6 +2742,12 @@ void ModelListWidget::InitTransport(const std::string &_name)
       "~/scene");
   this->dataPtr->physicsPub = this->dataPtr->node->Advertise<msgs::Physics>(
       "~/physics");
+
+  this->dataPtr->atmospherePub =
+    this->dataPtr->node->Advertise<msgs::Atmosphere>("~/atmosphere");
+
+  this->dataPtr->windPub = this->dataPtr->node->Advertise<msgs::Wind>(
+      "~/wind");
 
   this->dataPtr->lightPub = this->dataPtr->node->Advertise<msgs::Light>(
       "~/light/modify");
@@ -2552,6 +2794,22 @@ void ModelListWidget::ResetTree()
     this->dataPtr->physicsItem->setData(0, Qt::UserRole,
         QVariant(tr("Physics")));
     this->dataPtr->modelTreeWidget->addTopLevelItem(this->dataPtr->physicsItem);
+
+    // Atmosphere item
+    this->dataPtr->atmosphereItem = new QTreeWidgetItem(
+        static_cast<QTreeWidgetItem *>(0),
+        QStringList(QString("%1").arg(tr("Atmosphere"))));
+    this->dataPtr->atmosphereItem->setData(0, Qt::UserRole,
+        QVariant(tr("Atmosphere")));
+    this->dataPtr->modelTreeWidget->addTopLevelItem(
+        this->dataPtr->atmosphereItem);
+
+    // Wind item
+    this->dataPtr->windItem = new QTreeWidgetItem(
+        static_cast<QTreeWidgetItem*>(0),
+        QStringList(QString("%1").arg(tr("Wind"))));
+    this->dataPtr->windItem->setData(0, Qt::UserRole, QVariant(tr("Wind")));
+    this->dataPtr->modelTreeWidget->addTopLevelItem(this->dataPtr->windItem);
 
     // Models item
     this->dataPtr->modelsItem = new QTreeWidgetItem(
@@ -2619,30 +2877,30 @@ void ModelListWidget::FillPropertyTree(const msgs::Scene &_msg,
   this->dataPtr->propTreeBrowser->addProperty(item);
 
   /// \TODO: Put fog back in
-  /*topItem = this->variantManager->addProperty(
+  /*topItem = this->dataPtr->variantManager->addProperty(
       QtVariantPropertyManager::groupTypeId(), tr("fog"));
-  QtBrowserItem *bItem = this->propTreeBrowser->addProperty(topItem);
-  this->propTreeBrowser->setExpanded(bItem, false);
+  QtBrowserItem *bItem = this->dataPtr->propTreeBrowser->addProperty(topItem);
+  this->dataPtr->propTreeBrowser->setExpanded(bItem, false);
 
-  item = this->variantManager->addProperty(QVariant::Color, tr("color"));
+  item = this->dataPtr->variantManager->addProperty(QVariant::Color, tr("color"));
   topItem->addSubProperty(item);
 
-  item = this->variantManager->addProperty(QVariant::Double, tr("start"));
+  item = this->dataPtr->variantManager->addProperty(QVariant::Double, tr("start"));
   topItem->addSubProperty(item);
 
-  item = this->variantManager->addProperty(QVariant::Double, tr("end"));
+  item = this->dataPtr->variantManager->addProperty(QVariant::Double, tr("end"));
   topItem->addSubProperty(item);
 
-  item = this->variantManager->addProperty(QVariant::Double, tr("density"));
+  item = this->dataPtr->variantManager->addProperty(QVariant::Double, tr("density"));
   topItem->addSubProperty(item);
   */
 
   /// \TODO: Put sky modification back in GUI
   /*
-  topItem = this->variantManager->addProperty(
+  topItem = this->dataPtr->variantManager->addProperty(
       QtVariantPropertyManager::groupTypeId(), tr("sky"));
-  bItem = this->propTreeBrowser->addProperty(topItem);
-  this->propTreeBrowser->setExpanded(bItem, false);
+  bItem = this->dataPtr->propTreeBrowser->addProperty(topItem);
+  this->dataPtr->propTreeBrowser->setExpanded(bItem, false);
   */
 }
 
@@ -2654,6 +2912,8 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
 
   if (_msg.has_type())
   {
+    this->dataPtr->physicsType = _msg.type();
+
     item = this->dataPtr->variantManager->addProperty(
       QtVariantPropertyManager::enumTypeId(), tr("physics engine"));
     QStringList types;
@@ -2790,6 +3050,77 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
   if (_msg.has_contact_surface_layer())
     item->setValue(_msg.contact_surface_layer());
   constraintsItem->addSubProperty(item);
+}
+
+/////////////////////////////////////////////////
+void ModelListWidget::FillPropertyTree(const msgs::Atmosphere &_msg,
+                                       QtProperty */*_parent*/)
+{
+  QtVariantProperty *item = NULL;
+
+  if (_msg.has_type())
+    this->dataPtr->atmosphereType = _msg.type();
+
+  item = this->dataPtr->variantManager->addProperty(QVariant::Bool,
+    tr("enable atmosphere"));
+  if (_msg.has_enable_atmosphere())
+    item->setValue(_msg.enable_atmosphere());
+  this->dataPtr->propTreeBrowser->addProperty(item);
+
+  item = this->dataPtr->variantManager->addProperty(QVariant::Double,
+      tr("temperature"));
+  static_cast<QtVariantPropertyManager *>
+    (this->dataPtr->variantFactory->propertyManager(item))->setAttribute(
+        item, "decimals", 6);
+  if (_msg.has_temperature())
+    item->setValue(_msg.temperature());
+  this->dataPtr->propTreeBrowser->addProperty(item);
+
+  item = this->dataPtr->variantManager->addProperty(QVariant::Double,
+      tr("pressure"));
+  static_cast<QtVariantPropertyManager *>
+    (this->dataPtr->variantFactory->propertyManager(item))->setAttribute(
+        item, "decimals", 6);
+  if (_msg.has_pressure())
+    item->setValue(_msg.pressure());
+  this->dataPtr->propTreeBrowser->addProperty(item);
+
+  item = this->dataPtr->variantManager->addProperty(QVariant::Double,
+      tr("mass_density"));
+  static_cast<QtVariantPropertyManager *>
+    (this->dataPtr->variantFactory->propertyManager(item))->setAttribute(
+        item, "decimals", 6);
+  if (_msg.has_mass_density())
+    item->setValue(_msg.mass_density());
+  item->setEnabled(false);
+  this->dataPtr->propTreeBrowser->addProperty(item);
+}
+
+/////////////////////////////////////////////////
+void ModelListWidget::FillPropertyTree(const msgs::Wind &_msg,
+                                       QtProperty * /*_parent*/)
+{
+  QtVariantProperty *item = NULL;
+
+  item = this->dataPtr->variantManager->addProperty(QVariant::Bool,
+    tr("enable wind"));
+  if (_msg.has_enable_wind())
+    item->setValue(_msg.enable_wind());
+  this->dataPtr->propTreeBrowser->addProperty(item);
+
+  QtProperty *linearVelocityItem = this->dataPtr->variantManager->addProperty(
+      QtVariantPropertyManager::groupTypeId(), tr("linear_velocity"));
+  this->dataPtr->propTreeBrowser->addProperty(linearVelocityItem);
+  if (_msg.has_linear_velocity())
+    this->FillVector3dProperty(_msg.linear_velocity(), linearVelocityItem);
+  else
+  {
+    msgs::Vector3d xyz;
+    xyz.set_x(0.0);
+    xyz.set_y(0.0);
+    xyz.set_z(0.0);
+    this->FillVector3dProperty(xyz, linearVelocityItem);
+  }
 }
 
 /////////////////////////////////////////////////

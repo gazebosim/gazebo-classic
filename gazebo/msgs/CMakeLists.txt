@@ -3,6 +3,7 @@ include_directories(${IGNITION-MATH_INCLUDE_DIRS})
 
 set (msgs
   altimeter.proto
+  atmosphere.proto
   axis.proto
   battery.proto
   boxgeom.proto
@@ -116,6 +117,7 @@ set (msgs
   vector2d.proto
   vector3d.proto
   visual.proto
+  wind.proto
   wireless_node.proto
   wireless_nodes.proto
   world_control.proto
@@ -130,7 +132,7 @@ set (msgs_tests_sources
   msgs_TEST.cc
   MsgFactory_TEST.cc
 )
-gz_build_tests(${msgs_tests_sources})
+gz_build_tests(${msgs_tests_sources} EXTRA_LIBS gazebo_msgs)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 

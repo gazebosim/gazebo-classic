@@ -586,6 +586,10 @@ namespace gazebo
       /// \param[in] _show True to enable link frame visualization.
       public: void ShowLinkFrames(const bool _show);
 
+      /// \brief Enable or disable skeleton visualization.
+      /// \param[in] _show True to enable skeleton visualization.
+      public: void ShowSkeleton(const bool _show);
+
       /// \brief Enable or disable joint visualization.
       /// \param[in] _show True to enable joint visualization.
       public: void ShowJoints(const bool _show);

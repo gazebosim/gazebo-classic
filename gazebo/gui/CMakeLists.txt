@@ -246,8 +246,7 @@ set (gtest_sources
   Conversions_TEST.cc
 )
 
-set (GZ_BUILD_TESTS_EXTRA_LIBS gazebo_gui)
-gz_build_tests(${gtest_sources})
+gz_build_tests(${gtest_sources} EXTRA_LIBS gazebo_gui)
 
 add_definitions(${QT_DEFINITIONS})
 

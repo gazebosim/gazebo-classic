@@ -61,6 +61,7 @@ CameraSensor::CameraSensor()
 //////////////////////////////////////////////////
 CameraSensor::~CameraSensor()
 {
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -141,7 +142,7 @@ void CameraSensor::Init()
       cameraPose = cameraSdf->Get<ignition::math::Pose3d>("pose") + cameraPose;
 
     this->camera->SetWorldPose(cameraPose);
-    this->camera->AttachToVisual(this->ParentId(), true);
+    this->camera->AttachToVisual(this->ParentId(), true, 0, 0);
 
     if (cameraSdf->HasElement("noise"))
     {
@@ -171,8 +172,7 @@ void CameraSensor::Fini()
 
   if (this->camera)
   {
-    std::string scopedName = this->parentName + "::" + this->Name();
-    this->scene->RemoveCamera(scopedName);
+    this->scene->RemoveCamera(this->camera->Name());
   }
 
   this->camera.reset();
@@ -234,9 +234,15 @@ unsigned int CameraSensor::ImageWidth() const
   if (this->camera)
     return this->camera->ImageWidth();
 
-  sdf::ElementPtr cameraSdf = this->sdf->GetElement("camera");
-  sdf::ElementPtr elem = cameraSdf->GetElement("image");
-  return elem->Get<unsigned int>("width");
+  if (this->sdf && this->sdf->HasElement("camera"))
+  {
+    sdf::ElementPtr cameraSdf = this->sdf->GetElement("camera");
+    sdf::ElementPtr elem = cameraSdf->GetElement("image");
+    return elem->Get<unsigned int>("width");
+  }
+
+  gzwarn << "Can't get image width." << std::endl;
+  return 0;
 }
 
 //////////////////////////////////////////////////
@@ -251,9 +257,15 @@ unsigned int CameraSensor::ImageHeight() const
   if (this->camera)
     return this->camera->ImageHeight();
 
-  sdf::ElementPtr cameraSdf = this->sdf->GetElement("camera");
-  sdf::ElementPtr elem = cameraSdf->GetElement("image");
-  return elem->Get<unsigned int>("height");
+  if (this->sdf && this->sdf->HasElement("camera"))
+  {
+    sdf::ElementPtr cameraSdf = this->sdf->GetElement("camera");
+    sdf::ElementPtr elem = cameraSdf->GetElement("image");
+    return elem->Get<unsigned int>("height");
+  }
+
+  gzwarn << "Can't get image height." << std::endl;
+  return 0;
 }
 
 //////////////////////////////////////////////////

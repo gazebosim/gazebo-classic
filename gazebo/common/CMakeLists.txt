@@ -58,6 +58,7 @@ set (sources
   ModelDatabase.cc
   MouseEvent.cc
   PID.cc
+  SemanticVersion.cc
   SkeletonAnimation.cc
   Skeleton.cc
   SphericalCoordinates.cc
@@ -66,6 +67,7 @@ set (sources
   SVGLoader.cc
   Time.cc
   Timer.cc
+  URI.cc
   Video.cc
   ffmpeg_inc.cc
 )
@@ -111,6 +113,7 @@ set (headers
   MouseEvent.hh
   PID.hh
   Plugin.hh
+  SemanticVersion.hh
   SkeletonAnimation.hh
   Skeleton.hh
   SingletonT.hh
@@ -121,6 +124,7 @@ set (headers
   Time.hh
   Timer.hh
   UpdateInfo.hh
+  URI.hh
   Video.hh
   ffmpeg_inc.h
  )
@@ -145,10 +149,12 @@ set (gtest_sources
   MeshManager_TEST.cc
   MouseEvent_TEST.cc
   MovingWindowFilter_TEST.cc
+  SemanticVersion_TEST.cc
   SphericalCoordinates_TEST.cc
   SystemPaths_TEST.cc
   SVGLoader_TEST.cc
   Time_TEST.cc
+  URI_TEST.cc
 )
 
 # Timer test fails on OSX
@@ -183,7 +189,7 @@ if (HAVE_FFMPEG)
                      AudioDecoder_TEST.cc)
 endif()
 
-gz_build_tests(${gtest_sources})
+gz_build_tests(${gtest_sources} EXTRA_LIBS gazebo_common)
 
 set (common_headers "" CACHE INTERNAL "common headers" FORCE)
 foreach (hdr ${headers})

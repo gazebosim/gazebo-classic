@@ -638,6 +638,21 @@ namespace gazebo
       if (_sdf->HasElement("max_dist"))
         result.set_max_dist(_sdf->GetElement("max_dist")->Get<double>());
 
+      if (_sdf->HasElement("static"))
+        result.set_static_(_sdf->Get<bool>("static"));
+
+      if (_sdf->HasElement("use_model_frame"))
+        result.set_use_model_frame(_sdf->Get<bool>("use_model_frame"));
+
+      if (_sdf->HasElement("inherit_yaw"))
+        result.set_inherit_yaw(_sdf->Get<bool>("inherit_yaw"));
+
+      if (_sdf->HasElement("xyz"))
+      {
+        msgs::Set(result.mutable_xyz(),
+            _sdf->Get<ignition::math::Vector3d>("xyz"));
+      }
+
       return result;
     }
 
@@ -2339,6 +2354,8 @@ namespace gazebo
         linkSDF->GetElement("self_collide")->Set(_msg.self_collide());
       if (_msg.has_kinematic())
         linkSDF->GetElement("kinematic")->Set(_msg.kinematic());
+      if (_msg.has_enable_wind())
+        linkSDF->GetElement("enable_wind")->Set(_msg.enable_wind());
       if (_msg.has_pose())
         linkSDF->GetElement("pose")->Set(ConvertIgn(_msg.pose()));
       if (_msg.has_inertial())
@@ -2885,6 +2902,8 @@ namespace gazebo
       // ignore the id field, since it's not used in sdformat
       if (_msg.has_is_static())
         modelSDF->GetElement("static")->Set(_msg.is_static());
+      if (_msg.has_enable_wind())
+        modelSDF->GetElement("enable_wind")->Set(_msg.enable_wind());
       if (_msg.has_pose())
         modelSDF->GetElement("pose")->Set(msgs::ConvertIgn(_msg.pose()));
 

@@ -85,15 +85,26 @@ void QTestFixture::Load(const std::string &_worldFilename, bool _paused,
         _worldFilename, _paused, _serverScene));
 
   // Wait for the server to come up
-  // Use a 30 second timeout.
-  int waitCount = 0, maxWaitCount = 3000;
+  // Use a 60 second timeout.
+  int waitCount = 0, maxWaitCount = 6000;
   while ((!this->server || !this->server->GetInitialized()) &&
       ++waitCount < maxWaitCount)
     gazebo::common::Time::MSleep(10);
 
+  if (!this->server || !this->server->GetInitialized() ||
+      waitCount >= maxWaitCount)
+  {
+    gzerr << "Unable to initialize server. Potential reasons:" << std::endl;
+    gzerr << "\tIncorrect world name?" << std::endl;
+    gzerr << "\tConnection problem downloading models" << std::endl;
+    return;
+  }
+
   if (_clientScene)
+  {
     gazebo::rendering::create_scene(
         gazebo::physics::get_world()->GetName(), false);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -151,13 +162,10 @@ void QTestFixture::cleanup()
   delete this->serverThread;
   this->serverThread = NULL;
 
-  gazebo::gui::stop();
-
   double residentEnd, shareEnd;
   this->GetMemInfo(residentEnd, shareEnd);
 
-  // Calculate the percent change from the initial resident and shared
-  // memory
+  // Calculate the percent change from the initial resident and shared memory
   double resPercentChange = (residentEnd - residentStart) / residentStart;
   double sharePercentChange = (shareEnd - shareStart) / shareStart;
 

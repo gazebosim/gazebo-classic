@@ -27,7 +27,7 @@
 using namespace gazebo;
 
 /////////////////////////////////////////////////
-std::string GetNestedModelSDFString()
+std::string NestedModelSDFString()
 {
   // nested model - two top level links, one joint, and a nested model
   std::stringstream nestedModelSdfStream;
@@ -140,7 +140,7 @@ void ModelCreator_TEST::NestedModel()
   // test loading nested model from sdf
   sdf::ElementPtr modelSDF(new sdf::Element);
   sdf::initFile("model.sdf", modelSDF);
-  sdf::readString(GetNestedModelSDFString(), modelSDF);
+  sdf::readString(NestedModelSDFString(), modelSDF);
   modelCreator->AddEntity(modelSDF);
 
   // verify the model with joint has been added
@@ -206,29 +206,29 @@ void ModelCreator_TEST::SaveState()
 
   // Start never saved
   gui::ModelCreator *modelCreator = new gui::ModelCreator();
-  QCOMPARE(modelCreator->GetCurrentSaveState(), gui::ModelCreator::NEVER_SAVED);
+  QCOMPARE(modelCreator->CurrentSaveState(), gui::ModelCreator::NEVER_SAVED);
 
   // Inserting a link and it still is never saved
   modelCreator->AddShape(gui::ModelCreator::ENTITY_CYLINDER);
   gazebo::rendering::VisualPtr cylinder =
       scene->GetVisual("ModelPreview_0_0::link_0");
   QVERIFY(cylinder != NULL);
-  QCOMPARE(modelCreator->GetCurrentSaveState(),
+  QCOMPARE(modelCreator->CurrentSaveState(),
       gui::ModelCreator::NEVER_SAVED);
 
   // Save all changes
   modelCreator->SaveModelFiles();
-  QCOMPARE(modelCreator->GetCurrentSaveState(),
+  QCOMPARE(modelCreator->CurrentSaveState(),
       gui::ModelCreator::ALL_SAVED);
 
   // Insert another link to have unsaved changes
   modelCreator->AddShape(gui::ModelCreator::ENTITY_BOX);
-  QCOMPARE(modelCreator->GetCurrentSaveState(),
+  QCOMPARE(modelCreator->CurrentSaveState(),
       gui::ModelCreator::UNSAVED_CHANGES);
 
   // Save all changes
   modelCreator->SaveModelFiles();
-  QCOMPARE(modelCreator->GetCurrentSaveState(),
+  QCOMPARE(modelCreator->CurrentSaveState(),
       gui::ModelCreator::ALL_SAVED);
 
   // Move a link to have unsaved changes
@@ -236,22 +236,22 @@ void ModelCreator_TEST::SaveState()
 
   this->ProcessEventsAndDraw(mainWindow);
 
-  QCOMPARE(modelCreator->GetCurrentSaveState(),
+  QCOMPARE(modelCreator->CurrentSaveState(),
       gui::ModelCreator::UNSAVED_CHANGES);
 
   // Save all changes
   modelCreator->SaveModelFiles();
-  QCOMPARE(modelCreator->GetCurrentSaveState(),
+  QCOMPARE(modelCreator->CurrentSaveState(),
       gui::ModelCreator::ALL_SAVED);
 
   // Remove a link to have unsaved changes
   modelCreator->RemoveEntity(cylinder->GetName());
-  QCOMPARE(modelCreator->GetCurrentSaveState(),
+  QCOMPARE(modelCreator->CurrentSaveState(),
       gui::ModelCreator::UNSAVED_CHANGES);
 
   // Save all changes
   modelCreator->SaveModelFiles();
-  QCOMPARE(modelCreator->GetCurrentSaveState(),
+  QCOMPARE(modelCreator->CurrentSaveState(),
       gui::ModelCreator::ALL_SAVED);
 
   delete modelCreator;
@@ -454,7 +454,7 @@ void ModelCreator_TEST::NestedModelSelection()
   // a more complicated a nested model loaded from from sdf
   sdf::ElementPtr modelSDF(new sdf::Element);
   sdf::initFile("model.sdf", modelSDF);
-  sdf::readString(GetNestedModelSDFString(), modelSDF);
+  sdf::readString(NestedModelSDFString(), modelSDF);
   modelCreator->AddModel(modelSDF);
 
   this->ProcessEventsAndDraw(mainWindow);

@@ -125,15 +125,7 @@ Camera::Camera(const std::string &_name, ScenePtr _scene,
 //////////////////////////////////////////////////
 Camera::~Camera()
 {
-  delete [] this->saveFrameBuffer;
-  this->saveFrameBuffer = NULL;
-  delete [] this->bayerFrameBuffer;
-  this->bayerFrameBuffer = NULL;
-
   this->Fini();
-
-  this->sdf->Reset();
-  this->sdf.reset();
 }
 
 //////////////////////////////////////////////////
@@ -215,13 +207,35 @@ void Camera::Init()
   this->saveCount = 0;
 
   this->SetClipDist();
+
+  this->dataPtr->trackIsStatic = false;
+  this->dataPtr->trackUseModelFrame = true;
+  this->dataPtr->trackMinDistance = 8.0;
+  this->dataPtr->trackMaxDistance = 8.0;
+  this->dataPtr->trackPos = ignition::math::Vector3d(-5.0, 0.0, 3.0);
+  this->dataPtr->trackInheritYaw = false;
 }
 
 //////////////////////////////////////////////////
 void Camera::Fini()
 {
+  if (this->saveFrameBuffer)
+    delete [] this->saveFrameBuffer;
+  this->saveFrameBuffer = NULL;
+
+  if (this->bayerFrameBuffer)
+    delete [] this->bayerFrameBuffer;
+  this->bayerFrameBuffer = NULL;
+
   this->initialized = false;
+
+  this->dataPtr->cmdSub.reset();
+  if (this->dataPtr->node)
+    this->dataPtr->node->Fini();
   this->dataPtr->node.reset();
+
+  this->dataPtr->distortion.reset();
+  this->dataPtr->trackedVisual.reset();
 
   if (this->viewport && this->scene)
     RTShaderSystem::DetachViewport(this->viewport, this->scene);
@@ -245,6 +259,10 @@ void Camera::Fini()
 
   this->scene.reset();
   this->connections.clear();
+
+  if (this->sdf)
+    this->sdf->Reset();
+  this->sdf.reset();
 }
 
 //////////////////////////////////////////////////
@@ -384,9 +402,37 @@ void Camera::Update()
     this->SetWorldRotation(ignition::math::Quaterniond(0, currPitch + pitchAdj,
           currYaw + yawAdj));
 
-    double origDistance = 8.0;
-    double distance = direction.Length();
-    double error = origDistance - distance;
+    double error = 0.0;
+    if (!this->dataPtr->trackIsStatic)
+    {
+      if (direction.Length() < this->dataPtr->trackMinDistance)
+        error = this->dataPtr->trackMinDistance - direction.Length();
+      else if (direction.Length() > this->dataPtr->trackMaxDistance)
+        error = this->dataPtr->trackMaxDistance - direction.Length();
+    }
+    else
+    {
+      if (this->dataPtr->trackUseModelFrame)
+      {
+        if (this->dataPtr->trackInheritYaw)
+        {
+          yaw =
+              this->dataPtr->trackedVisual->GetWorldPose().Ign().Rot().Yaw();
+          ignition::math::Quaterniond rot =
+              ignition::math::Quaterniond(0.0, 0.0, yaw);
+          direction += rot.RotateVector(this->dataPtr->trackPos);
+        }
+        else
+        {
+          direction += this->dataPtr->trackPos;
+        }
+      }
+      else
+      {
+        direction = this->dataPtr->trackPos - this->WorldPose().Pos();
+      }
+      error = -direction.Length();
+    }
 
     double scaling = this->dataPtr->trackVisualPID.Update(error, 0.3);
 
@@ -1664,7 +1710,7 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
 }
 
 //////////////////////////////////////////////////
-void Camera::AttachToVisual(const uint32_t _visualId,
+void Camera::AttachToVisual(uint32_t _visualId,
                             const bool _inheritOrientation,
                             const double _minDist, const double _maxDist)
 {
@@ -1727,7 +1773,7 @@ void Camera::TrackVisual(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
-bool Camera::AttachToVisualImpl(const uint32_t _id,
+bool Camera::AttachToVisualImpl(uint32_t _id,
     const bool _inheritOrientation, const double _minDist,
     const double _maxDist)
 {
@@ -2174,4 +2220,82 @@ event::ConnectionPtr Camera::ConnectNewImageFrame(
 void Camera::DisconnectNewImageFrame(event::ConnectionPtr &_c)
 {
   this->newImageFrame.Disconnect(_c);
+}
+
+/////////////////////////////////////////////////
+VisualPtr Camera::TrackedVisual() const
+{
+  return this->dataPtr->trackedVisual;
+}
+
+/////////////////////////////////////////////////
+bool Camera::TrackIsStatic() const
+{
+  return this->dataPtr->trackIsStatic;
+}
+
+/////////////////////////////////////////////////
+void Camera::SetTrackIsStatic(const bool _isStatic)
+{
+  this->dataPtr->trackIsStatic = _isStatic;
+}
+
+/////////////////////////////////////////////////
+bool Camera::TrackUseModelFrame() const
+{
+  return this->dataPtr->trackUseModelFrame;
+}
+
+/////////////////////////////////////////////////
+void Camera::SetTrackUseModelFrame(const bool _useModelFrame)
+{
+  this->dataPtr->trackUseModelFrame = _useModelFrame;
+}
+
+/////////////////////////////////////////////////
+ignition::math::Vector3d Camera::TrackPosition() const
+{
+  return this->dataPtr->trackPos;
+}
+
+/////////////////////////////////////////////////
+void Camera::SetTrackPosition(const ignition::math::Vector3d &_pos)
+{
+  this->dataPtr->trackPos = _pos;
+}
+
+/////////////////////////////////////////////////
+double Camera::TrackMinDistance() const
+{
+  return this->dataPtr->trackMinDistance;
+}
+
+/////////////////////////////////////////////////
+double Camera::TrackMaxDistance() const
+{
+  return this->dataPtr->trackMaxDistance;
+}
+
+/////////////////////////////////////////////////
+void Camera::SetTrackMinDistance(const double _dist)
+{
+  this->dataPtr->trackMinDistance = _dist;
+}
+
+/////////////////////////////////////////////////
+void Camera::SetTrackMaxDistance(const double _dist)
+{
+  this->dataPtr->trackMaxDistance = _dist;
+}
+
+/////////////////////////////////////////////////
+bool Camera::TrackInheritYaw() const
+{
+  return this->dataPtr->trackInheritYaw;
+}
+
+/////////////////////////////////////////////////
+void Camera::SetTrackInheritYaw(const bool _inheritYaw)
+{
+  this->dataPtr->trackInheritYaw = _inheritYaw;
 }
