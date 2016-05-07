@@ -2,6 +2,9 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
+1. Include basic support for GNU Precompiled Headers to reduce compile time
+    * [Pull request #2268](https://bitbucket.org/osrf/gazebo/pull-request/2268)
+
 1. Support conversions between SDF and protobuf for more sensors.
     * [Pull request #2118](https://bitbucket.org/osrf/gazebo/pull-request/2118)
 
