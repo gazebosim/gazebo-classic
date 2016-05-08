@@ -53,6 +53,11 @@
     1. Undo / redo inserting and deleting nested models
         * [Pull request #2229](https://bitbucket.org/osrf/gazebo/pull-request/2229)
 
+1. Google Summer of Code Graphical interface for inserting plugins during simulation.
+
+    1. Display attached model plugins in the world tab
+        * [Pull request #2290](https://bitbucket.org/osrf/gazebo/pull-request/2290)
+
 ## Gazebo 7
 
 ## Gazebo 7.x.x (2016-xx-xx)
