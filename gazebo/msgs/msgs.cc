@@ -2916,6 +2916,15 @@ namespace gazebo
         jointElem = JointToSDF(_msg.joint(i), jointElem);
       }
 
+      if (_msg.plugin_size() > 0)
+        while (modelSDF->HasElement("plugin"))
+          modelSDF->GetElement("plugin")->RemoveFromParent();
+      for (int i = 0; i < _msg.plugin_size(); ++i)
+      {
+        sdf::ElementPtr pluginElem = modelSDF->AddElement("plugin");
+        pluginElem = PluginToSDF(_msg.plugin(i), pluginElem);
+      }
+
       if (_msg.link_size())
         while (modelSDF->HasElement("link"))
           modelSDF->GetElement("link")->RemoveFromParent();
@@ -3025,6 +3034,31 @@ namespace gazebo
 
       return jointSDF;
     }
+/*
+    ////////////////////////////////////////////////////////
+    sdf::ElementPtr PluginToSDF(const msgs::Plugin &_msg, sdf::ElementPtr _sdf)
+    {
+      sdf::ElementPtr pluginSDF;
+
+      if (_sdf)
+      {
+        pluginSDF = _sdf;
+      }
+      else
+      {
+        pluginSDF.reset(new sdf::Element);
+        sdf::initFile("plugin.sdf", pluginSDF);
+      }
+
+      if (_msg.has_name())
+        pluginSDF->GetAttribute("name")->Set(_msg.name());
+      if (_msg.has_filename())
+        pluginSDF->GetAttribute("filename")->Set(_msg.filename());
+      if (_msg.has_innerxml())
+        pluginSDF->GetElement("innerxml")->Set(_msg.innerxml());
+
+      return pluginSDF;
+    }*/
 
     ////////////////////////////////////////////////////////
     void AxisToSDF(const msgs::Axis &_msg, sdf::ElementPtr _sdf)

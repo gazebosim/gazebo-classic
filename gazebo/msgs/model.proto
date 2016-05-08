@@ -31,6 +31,6 @@ message Model
   /// \brief An array of nested models.
   repeated Model model         = 12;
 
-  /// \brief An array of nested plugins.
+  /// \brief An array of plugins.
   repeated Plugin plugin       = 13;
 }

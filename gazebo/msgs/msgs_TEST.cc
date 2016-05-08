@@ -3465,6 +3465,14 @@ TEST_F(MsgsTest, ModelToSDF)
   const ignition::math::Vector3d rearAxis(0, 0, 1);
   msgs::Set(rearJoint->mutable_axis1()->mutable_xyz(), rearAxis);
 
+  //Add buoyancy plugin
+  model.add_plugin();
+  ASSERT_EQ(model.plugin_size(), 1);
+  auto plugin = model.mutable_plugin(0);
+  plugin->set_name("buoyancy");
+  plugin->set_filename("libBuoyancyPlugin.so");
+  plugin->set_innerxml("<fluid_density>999.1026</fluid_density>");
+
   sdf::ElementPtr modelSDF = msgs::ModelToSDF(model);
   EXPECT_EQ(modelSDF->Get<std::string>("name"), name);
   EXPECT_FALSE(modelSDF->Get<bool>("static"));
@@ -3494,6 +3502,11 @@ TEST_F(MsgsTest, ModelToSDF)
   EXPECT_EQ(jointElem2->Get<std::string>("type"), "revolute");
   EXPECT_EQ(jointElem2->Get<ignition::math::Pose3d>("pose"),
       ignition::math::Pose3d());
+
+  sdf::ElementPtr pluginElem1 = modelSDF->GetElement("plugin");
+  EXPECT_EQ(pluginElem1->Get<std::string>("name"), "buoyancy");
+  EXPECT_EQ(pluginElem1->Get<std::string>("filename"), "libBuoyancyPlugin.so");
+  EXPECT_EQ(pluginElem1->Get<std::string>("innerxml"), "<fluid_density>999.1026</fluid_density>");
 }
 
 /////////////////////////////////////////////////

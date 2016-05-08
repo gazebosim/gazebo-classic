@@ -2553,9 +2553,34 @@ void ModelListWidget::FillPropertyTree(const msgs::Model &_msg,
 
     //gzdbg << _msg.plugin(i).DebugString() << std::endl;
 
-    // Create FillPropertyTree(const msgs::Plugin &_msg...)
-    // this->FillPropertyTree(_msg.plugin(i), prop);
+     this->FillPropertyTree(_msg.plugin(i), prop);
   }
+}
+
+/////////////////////////////////////////////////
+void ModelListWidget::FillPropertyTree(const msgs::Plugin &_msg,
+                                       QtProperty *_parent)
+{
+  QtVariantProperty *item = NULL;
+
+  // name
+  item = this->dataPtr->variantManager->addProperty(QVariant::String,
+      tr("name"));
+  item->setValue(_msg.name().c_str());
+  this->AddProperty(item, _parent);
+  item->setEnabled(false);
+
+  // filename
+  item = this->dataPtr->variantManager->addProperty(QVariant::String,
+    tr("filename"));
+  item->setValue(_msg.filename().c_str());
+  this->AddProperty(item, _parent);
+
+  // innerxml
+  item = this->dataPtr->variantManager->addProperty(QVariant::String,
+    tr("innerxml"));
+  item->setValue(_msg.innerxml().c_str());
+  this->AddProperty(item, _parent);
 }
 
 /////////////////////////////////////////////////

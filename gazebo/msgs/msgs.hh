@@ -420,15 +420,6 @@ namespace gazebo
     sdf::ElementPtr CameraSensorToSDF(const msgs::CameraSensor &_msg,
         sdf::ElementPtr _sdf = sdf::ElementPtr());
 
-    /// \brief Create or update an SDF element from a msgs::Plugin
-    /// \param[in] _msg Plugin messsage
-    /// \param[in] _sdf if supplied, performs an update from _msg instead of
-    /// creating a new sdf element.
-    /// \return The new SDF element.
-    GAZEBO_VISIBLE
-    sdf::ElementPtr PluginToSDF(const msgs::Plugin &_plugin,
-        sdf::ElementPtr _sdf = sdf::ElementPtr());
-
     /// \brief Create or update an SDF element from a msgs::Collision
     /// \param[in] _msg Collision messsage
     /// \param[in] _sdf if supplied, performs an update from _msg instead of
@@ -549,6 +540,15 @@ namespace gazebo
     /// \return The new SDF element.
     GAZEBO_VISIBLE
     sdf::ElementPtr JointToSDF(const msgs::Joint &_msg,
+                      sdf::ElementPtr _sdf = sdf::ElementPtr());
+
+    /// \brief Create or update an SDF element from msgs::Plugin.
+    /// \param[in] _msg The msgs::Plugin object.
+    /// \param[in] _sdf if supplied, performs an update from _sdf instead of
+    /// creating a new sdf element.
+    /// \return The new SDF element.
+    GAZEBO_VISIBLE
+    sdf::ElementPtr PluginToSDF(const msgs::Plugin &_msg,
                       sdf::ElementPtr _sdf = sdf::ElementPtr());
 
     /// \cond
