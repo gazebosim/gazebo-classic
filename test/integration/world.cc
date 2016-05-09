@@ -79,7 +79,7 @@ void onWorldUpdateEnd()
 /////////////////////////////////////////////////
 void WorldTest::ClearEmptyWorld(const std::string &_physicsEngine)
 {
-  Load("worlds/blank.world", false, _physicsEngine);
+  this->Load("worlds/blank.world", false, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
