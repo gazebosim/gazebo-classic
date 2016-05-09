@@ -36,8 +36,8 @@ namespace gazebo
     /// \brief Private data for the PlotWindow class
     class PlotWindowPrivate
     {
-      /// \brief Layout to hold all the canvases.
-      public: QVBoxLayout *canvasLayout;
+      /// \brief Splitter to hold all the canvases.
+      public: QSplitter *canvasSplitter;
 
       /// \brief Mutex to protect the canvas updates
       public: std::mutex mutex;
@@ -88,8 +88,7 @@ PlotWindow::PlotWindow(QWidget *_parent)
       Qt::CustomizeWindowHint);
 
   // new empty canvas
-  this->dataPtr->canvasLayout = new QVBoxLayout;
-  this->dataPtr->canvasLayout->setSpacing(20);
+  this->dataPtr->canvasSplitter = new QSplitter(Qt::Vertical);
   this->AddCanvas();
 
   // add button
@@ -111,9 +110,9 @@ PlotWindow::PlotWindow(QWidget *_parent)
 
   // Plot layout
   QVBoxLayout *plotLayout = new QVBoxLayout;
-  plotLayout->addLayout(this->dataPtr->canvasLayout);
+  plotLayout->addWidget(this->dataPtr->canvasSplitter);
   plotLayout->addLayout(addButtonLayout);
-  plotLayout->setStretchFactor(this->dataPtr->canvasLayout, 1);
+  plotLayout->setStretchFactor(this->dataPtr->canvasSplitter, 1);
   plotLayout->setStretchFactor(addButtonLayout, 0);
 
   auto plotFrame = new QFrame;
@@ -164,7 +163,7 @@ PlotCanvas *PlotWindow::AddCanvas()
   PlotCanvas *canvas = new PlotCanvas(this);
   connect(canvas, SIGNAL(CanvasDeleted()), this, SLOT(OnRemoveCanvas()));
 
-  this->dataPtr->canvasLayout->addWidget(canvas);
+  this->dataPtr->canvasSplitter->addWidget(canvas);
 
   this->UpdateCanvas();
 
@@ -174,11 +173,12 @@ PlotCanvas *PlotWindow::AddCanvas()
 /////////////////////////////////////////////////
 void PlotWindow::RemoveCanvas(PlotCanvas *_canvas)
 {
-  int idx = this->dataPtr->canvasLayout->indexOf(_canvas);
+  int idx = this->dataPtr->canvasSplitter->indexOf(_canvas);
   if (idx < 0)
     return;
 
-  this->dataPtr->canvasLayout->takeAt(idx);
+  _canvas->hide();
+  _canvas->setParent(NULL);
   _canvas->deleteLater();
 }
 
@@ -187,8 +187,8 @@ void PlotWindow::Clear()
 {
   while (this->CanvasCount() > 0u)
   {
-    QLayoutItem *item = this->dataPtr->canvasLayout->itemAt(0);
-    PlotCanvas *canvas = qobject_cast<PlotCanvas *>(item->widget());
+    PlotCanvas *canvas =
+        qobject_cast<PlotCanvas *>(this->dataPtr->canvasSplitter->widget(0));
     this->RemoveCanvas(canvas);
   }
 }
@@ -196,7 +196,7 @@ void PlotWindow::Clear()
 /////////////////////////////////////////////////
 unsigned int PlotWindow::CanvasCount() const
 {
-  return static_cast<unsigned int>(this->dataPtr->canvasLayout->count());
+  return static_cast<unsigned int>(this->dataPtr->canvasSplitter->count());
 }
 
 /////////////////////////////////////////////////
@@ -215,7 +215,7 @@ void PlotWindow::OnRemoveCanvas()
   this->RemoveCanvas(canvas);
 
   // add an empty canvas if the plot window is now empty
-  if (this->dataPtr->canvasLayout->isEmpty())
+  if (this->dataPtr->canvasSplitter->count() == 0)
     this->AddCanvas();
   else
   {
@@ -228,15 +228,12 @@ void PlotWindow::UpdateCanvas()
 {
   // disable Delete Canvas option in settings if there is only one
   // canvas in the window
-  QLayoutItem *item = this->dataPtr->canvasLayout->itemAt(0);
-  if (item)
+  PlotCanvas *plotCanvas =
+      qobject_cast<PlotCanvas *>(this->dataPtr->canvasSplitter->widget(0));
+  if (plotCanvas)
   {
-    PlotCanvas *plotCanvas = qobject_cast<PlotCanvas *>(item->widget());
-    if (plotCanvas)
-    {
-      plotCanvas->SetDeleteCanvasEnabled(
-          this->dataPtr->canvasLayout->count() != 1);
-    }
+    plotCanvas->SetDeleteCanvasEnabled(
+        this->dataPtr->canvasSplitter->count() != 1);
   }
 }
 
@@ -246,10 +243,10 @@ void PlotWindow::Update()
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
   if (this->dataPtr->restart)
   {
-    for (int i = 0; i < this->dataPtr->canvasLayout->count(); ++i)
+    for (int i = 0; i < this->dataPtr->canvasSplitter->count(); ++i)
     {
-      QLayoutItem *item = this->dataPtr->canvasLayout->itemAt(i);
-      PlotCanvas *canvas = qobject_cast<PlotCanvas *>(item->widget());
+      PlotCanvas *canvas =
+          qobject_cast<PlotCanvas *>(this->dataPtr->canvasSplitter->widget(i));
       if (!canvas)
         continue;
       canvas->Restart();
@@ -257,10 +254,10 @@ void PlotWindow::Update()
     this->dataPtr->restart = false;
   }
 
-  for (int i = 0; i < this->dataPtr->canvasLayout->count(); ++i)
+  for (int i = 0; i < this->dataPtr->canvasSplitter->count(); ++i)
   {
-    QLayoutItem *item = this->dataPtr->canvasLayout->itemAt(i);
-    PlotCanvas *canvas = qobject_cast<PlotCanvas *>(item->widget());
+    PlotCanvas *canvas =
+        qobject_cast<PlotCanvas *>(this->dataPtr->canvasSplitter->widget(i));
     if (!canvas)
       continue;
     canvas->Update();
@@ -291,10 +288,10 @@ void PlotWindow::TogglePause()
 void PlotWindow::Export()
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-  for (int i = 0; i < this->dataPtr->canvasLayout->count(); ++i)
+  for (int i = 0; i < this->dataPtr->canvasSplitter->count(); ++i)
   {
-    QLayoutItem *item = this->dataPtr->canvasLayout->itemAt(i);
-    PlotCanvas *canvas = qobject_cast<PlotCanvas *>(item->widget());
+    PlotCanvas *canvas =
+        qobject_cast<PlotCanvas *>(this->dataPtr->canvasSplitter->widget(i));
     if (!canvas)
       continue;
 

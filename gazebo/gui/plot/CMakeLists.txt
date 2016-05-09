@@ -4,10 +4,11 @@ set (sources_local
   plot/EditableLabel.cc
   plot/IncrementalPlot.cc
   plot/IntrospectionCurveHandler.cc
+  plot/Palette.cc
   plot/PlotCanvas.cc
   plot/PlotCurve.cc
   plot/PlotManager.cc
-  plot/Palette.cc
+  plot/PlotTracker.cc
   plot/PlotWindow.cc
   plot/TopicCurveHandler.cc
   plot/VariablePill.cc
