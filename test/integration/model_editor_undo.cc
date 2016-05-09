@@ -15,6 +15,7 @@
  *
 */
 
+#include "gazebo/common/MouseEvent.hh"
 #include "gazebo/common/SystemPaths.hh"
 
 #include "gazebo/gui/Actions.hh"
@@ -23,6 +24,8 @@
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/InsertModelWidget.hh"
 #include "gazebo/gui/MainWindow.hh"
+#include "gazebo/gui/ModelManipulator.hh"
+#include "gazebo/gui/MouseEventHandler.hh"
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/ModelCreator.hh"
 #include "gazebo/gui/model/ModelEditorEvents.hh"
@@ -585,6 +588,113 @@ void ModelEditorUndoTest::TriggerDelete()
       return;
     }
   }
+}
+
+/////////////////////////////////////////////////
+void ModelEditorUndoTest::LinkTranslation()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  // Load a world with simple shapes
+  this->Load("worlds/shapes.world", false, false, false);
+
+  // Create the main window.
+  auto mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  this->ProcessEventsAndDraw(mainWindow);
+
+  // Get the user camera, scene and GLWidget
+  auto cam = gazebo::gui::get_active_camera();
+  QVERIFY(cam != NULL);
+  auto scene = cam->GetScene();
+  QVERIFY(scene != NULL);
+
+  // Enter the model editor to edit the box model
+  QVERIFY(gazebo::gui::g_editModelAct != NULL);
+  gazebo::gui::g_editModelAct->trigger();
+  gazebo::gui::Events::editModel("box");
+
+  // Check undo/redo are disabled
+  QVERIFY(gazebo::gui::g_undoAct != NULL);
+  QVERIFY(gazebo::gui::g_undoHistoryAct != NULL);
+  QVERIFY(gazebo::gui::g_redoAct != NULL);
+  QVERIFY(gazebo::gui::g_redoHistoryAct != NULL);
+  QVERIFY(!gazebo::gui::g_undoAct->isEnabled());
+  QVERIFY(!gazebo::gui::g_undoHistoryAct->isEnabled());
+  QVERIFY(!gazebo::gui::g_redoAct->isEnabled());
+  QVERIFY(!gazebo::gui::g_redoHistoryAct->isEnabled());
+
+  // Get link initial pose
+  std::string linkVisName = "ModelPreview_1::link";
+  auto linkVis = scene->GetVisual(linkVisName);
+  QVERIFY(linkVis != NULL);
+  auto initialPose = linkVis->GetWorldPose().Ign();
+
+  // Move camera closer to model so we can easily click on it
+  cam->SetWorldPose(ignition::math::Pose3d(1.37, 0, 0.73, 0, 0.26, 3.1));
+
+  // Trigger translate mode
+  QVERIFY(gazebo::gui::g_translateAct);
+  QVERIFY(!gazebo::gui::g_translateAct->isChecked());
+  gazebo::gui::g_translateAct->trigger();
+
+  this->ProcessEventsAndDraw(mainWindow);
+
+  // Select link
+  gazebo::common::MouseEvent mouseEvent;
+  mouseEvent.SetType(gazebo::common::MouseEvent::PRESS);
+  mouseEvent.SetButton(gazebo::common::MouseEvent::LEFT);
+  mouseEvent.SetPos(mainWindow->width()/2.0, mainWindow->height()/2.0);
+  gazebo::gui::ModelManipulator::Instance()->OnMousePressEvent(mouseEvent);
+
+  // Drag link
+  mouseEvent.SetType(gazebo::common::MouseEvent::MOVE);
+  mouseEvent.SetDragging(true);
+  gazebo::gui::ModelManipulator::Instance()->OnMouseMoveEvent(mouseEvent);
+
+  // Release link
+  gazebo::gui::MouseEventHandler::Instance()->HandleRelease(mouseEvent);
+
+  this->ProcessEventsAndDraw(mainWindow);
+
+  // Undo -> Redo a few times
+  for (unsigned int j = 0; j < 3; ++j)
+  {
+    // Check undo is enabled
+    QVERIFY(gazebo::gui::g_undoAct->isEnabled());
+    QVERIFY(gazebo::gui::g_undoHistoryAct->isEnabled());
+    QVERIFY(!gazebo::gui::g_redoAct->isEnabled());
+    QVERIFY(!gazebo::gui::g_redoHistoryAct->isEnabled());
+
+    // Check link pose has changed
+    QVERIFY(linkVis->GetWorldPose().Ign() != initialPose);
+
+    // Undo
+    gzmsg << "Undo moving [" << linkVis->GetName() << "]" << std::endl;
+    gazebo::gui::g_undoAct->trigger();
+
+    // Check redo is enabled
+    QVERIFY(!gazebo::gui::g_undoAct->isEnabled());
+    QVERIFY(!gazebo::gui::g_undoHistoryAct->isEnabled());
+    QVERIFY(gazebo::gui::g_redoAct->isEnabled());
+    QVERIFY(gazebo::gui::g_redoHistoryAct->isEnabled());
+
+    // Check it's back to initial pose
+    QVERIFY(initialPose == linkVis->GetWorldPose().Ign());
+
+    // Redo
+    gzmsg << "Redo moving [" << linkVis->GetName() << "]" << std::endl;
+    gazebo::gui::g_redoAct->trigger();
+  }
+
+  mainWindow->close();
+  delete mainWindow;
+  mainWindow = NULL;
 }
 
 // Generate a main function for the test
