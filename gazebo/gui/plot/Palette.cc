@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-
 #include <mutex>
 #include <set>
 #include <string>
@@ -26,6 +25,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/URI.hh"
 
+#include "gazebo/gui/Futures.hh"
 #include "gazebo/gui/ConfigWidget.hh"
 #include "gazebo/gui/plot/Palette.hh"
 
@@ -521,6 +521,7 @@ Palette::Palette(QWidget *_parent) : QWidget(_parent),
   this->dataPtr->modelsModel = new PlotItemModel;
   this->dataPtr->modelsModel->setObjectName("plotModelsModel");
   this->dataPtr->modelsModel->setParent(this);
+
   this->FillModels();
 
   // A proxy model to filter models model
@@ -756,10 +757,14 @@ void Palette::FillTopics()
 /////////////////////////////////////////////////
 void Palette::FillModels()
 {
+  // Make sure that the managers have been retreived.
+  if (Futures::introspectionClientFuture.valid())
+    Futures::introspectionClientFuture.get();
+
   gazebo::util::IntrospectionClient client;
 
-  // Wait for the managers to come online
-  auto managerIds = client.WaitForManagers(std::chrono::seconds(2));
+  // Get the managers
+  auto managerIds = client.Managers();
 
   if (managerIds.empty())
   {
