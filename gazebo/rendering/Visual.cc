@@ -208,6 +208,17 @@ Visual::~Visual()
 /////////////////////////////////////////////////
 void Visual::Fini()
 {
+  // Remove all children
+  if (this->dataPtr->scene)
+  {
+    for (auto &vis : this->dataPtr->children)
+    {
+      if (vis)
+        this->dataPtr->scene->RemoveVisual(vis->GetId());
+    }
+  }
+  this->dataPtr->children.clear();
+
   this->dataPtr->plugins.clear();
 
   // Detach from the parent

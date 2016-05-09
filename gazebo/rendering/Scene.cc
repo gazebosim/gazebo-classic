@@ -2732,6 +2732,7 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
         this->dataPtr->visuals.end();
   }
 
+  // ?
   if (_msg->has_delete_me() && _msg->delete_me())
   {
     if (iter != this->dataPtr->visuals.end())
@@ -3212,7 +3213,8 @@ void Scene::RemoveVisual(uint32_t _id)
 /////////////////////////////////////////////////
 void Scene::RemoveVisual(VisualPtr _vis)
 {
-  this->RemoveVisual(_vis->GetId());
+  if (_vis)
+    this->RemoveVisual(_vis->GetId());
 }
 
 /////////////////////////////////////////////////
