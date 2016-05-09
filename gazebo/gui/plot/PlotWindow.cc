@@ -308,8 +308,9 @@ void PlotWindow::OnExport()
   for (int i = 0; i < this->dataPtr->canvasSplitter->count(); ++i)
   {
     bool hasData = false;
-    QLayoutItem *item = this->dataPtr->canvasSplitter->itemAt(i);
-    PlotCanvas *canvas = qobject_cast<PlotCanvas *>(item->widget());
+    PlotCanvas *canvas =
+        qobject_cast<PlotCanvas *>(this->dataPtr->canvasSplitter->widget(i));
+
     if (!canvas)
       continue;
 
@@ -357,8 +358,9 @@ std::list<PlotCanvas *> PlotWindow::Plots()
 
   for (int i = 0; i < this->dataPtr->canvasSplitter->count(); ++i)
   {
-    QLayoutItem *item = this->dataPtr->canvasSplitter->itemAt(i);
-    PlotCanvas *canvas = qobject_cast<PlotCanvas *>(item->widget());
+    PlotCanvas *canvas =
+        qobject_cast<PlotCanvas *>(this->dataPtr->canvasSplitter->widget(i));
+
     if (!canvas)
       continue;
     plots.push_back(canvas);
