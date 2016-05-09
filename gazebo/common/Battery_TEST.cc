@@ -185,6 +185,7 @@ TEST_F(BatteryTest, SetUpdateFunc)
 
   // Reinitialize the battery, and expect the same result
   battery->Init();
+  EXPECT_DOUBLE_EQ(battery->Voltage(), initVoltage);
 
   for (int i = 0; i < N; ++i)
     battery->Update();
@@ -193,6 +194,7 @@ TEST_F(BatteryTest, SetUpdateFunc)
 
   // Reset the voltage to its initial value, and expect the same result
   battery->ResetVoltage();
+  EXPECT_DOUBLE_EQ(battery->Voltage(), initVoltage);
 
   for (int i = 0; i < N; ++i)
     battery->Update();
