@@ -43,7 +43,7 @@ class gazebo::gui::ExportDialogPrivate
 class PlotViewItem : public QStandardItem
 {
   /// \brief Canvas pointer
-  public: PlotCanvas *canvas;
+  public: PlotCanvas *canvas = nullptr;
 };
 
 /////////////////////////////////////////////////
@@ -326,17 +326,18 @@ void ExportDialog::OnExport(FileType _type)
   QModelIndexList selectedPlots =
     this->dataPtr->listView->selectionModel()->selectedIndexes();
 
+  QStandardItemModel *model = static_cast<QStandardItemModel*>(
+      this->dataPtr->listView->model());
+
   // Export each selected canvas
   for (auto iter = selectedPlots.begin(); iter != selectedPlots.end(); ++iter)
   {
-    PlotViewItem *plotItem =
-      static_cast<PlotViewItem*>(
-          static_cast<QStandardItemModel*>(
-            this->dataPtr->listView->model())->itemFromIndex(*iter));
-
-    if (plotItem)
+    auto item = model->itemFromIndex(*iter);
+    if (item)
     {
-      plotItem->canvas->Export(selected[0].toStdString(), _type);
+      PlotViewItem *plotItem = static_cast<PlotViewItem*>(item);
+      if (plotItem->canvas)
+        plotItem->canvas->Export(selected[0].toStdString(), _type);
     }
   }
 

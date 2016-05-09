@@ -347,6 +347,7 @@ void PlotWindow::OnExport()
   else
   {
     ExportDialog *dialog = new ExportDialog(this, plots);
+    dialog->setModal(true);
     dialog->show();
   }
 }
