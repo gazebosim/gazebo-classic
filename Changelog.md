@@ -20,6 +20,9 @@
     * [Pull request 2258](https://bitbucket.org/osrf/gazebo/pull-request/2258)
     * [Issue #1925](https://bitbucket.org/osrf/gazebo/issues/1925)
 
+1. Register Qt metatypes in gui tests
+    * [Pull request 2273](https://bitbucket.org/osrf/gazebo/pull-request/2273)
+
 ### Gazebo 6.6.0 (2016-04-07)
 
 1. fix: remove back projection
