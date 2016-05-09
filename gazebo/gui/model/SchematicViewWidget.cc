@@ -131,11 +131,10 @@ std::string SchematicViewWidget::TopLevelName(
   if (_scopedName.empty())
     return "";
 
-  auto unscoped = this->UnscopedName(_scopedName);
-  auto unscopedPos = _scopedName.find(unscoped);
+  auto unscopedPos = _scopedName.find("::");
 
   std::string topLevelName = _scopedName;
-  auto secondScopePos = topLevelName.find("::", unscopedPos);
+  auto secondScopePos = topLevelName.find("::", unscopedPos + 2);
   if (secondScopePos != std::string::npos)
     topLevelName = topLevelName.substr(0, secondScopePos);
 
